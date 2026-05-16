@@ -82,6 +82,7 @@ Destrava: **upgrade dedos modulares** (capacidade de hack rápido em terminais; 
 - **vs [[caua-volt]]:** parceria operacional pragmática. Cauã não tem antena pra detectar duplicidade ainda.
 - **vs [[iara-lumen]]:** **Iara desconfia também** (lê micro-expressões — mas atribui inicialmente a "personalidade fechada"; revisão tardia).
 - **vs [[linda-siren]]:** Linda detecta tom da voz inconsistente em 2-3 falas chave. Não articula publicamente.
+- **vs [[patch-zero]] (F126):** Patch-Zero reconhece Dante como vetor antes do player. Em zonas infectadas com Dante na party, canal 2 ambient adiciona sussurro baixíssimo: "*ele não compila ... interpretam por ele ... ele pertence ao outro.*" Volume mínimo, audível só com fone + atenção. Inaudível com qualquer outra composição de party. Player Knowledge alta cruza retroativamente após reveal climax Etapa 1: o canal 2 sempre soube. Registrado no Diário como "anomalia" não-explícita.
 
 ---
 

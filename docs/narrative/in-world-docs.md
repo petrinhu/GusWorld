@@ -1,12 +1,12 @@
 # Documentos In-World — GusWorld
 
-> **Status:** Revisão 1 (2026-05-15). Doc novo. **Canônico — expansão Bloco G.**
+> **Status:** Revisão 2 (2026-05-16). **Canônico — expansão Bloco G + Bloco H viralizado.**
 >
-> **Escopo:** 15 documentos descobríveis pelo Gus durante o jogo (3 deles gated em Knowledge Ouro). Cada um: contexto de descoberta, texto integral, função narrativa.
+> **Escopo:** 23 documentos descobríveis pelo Gus durante o jogo (4 deles gated em Knowledge Ouro). Cada um: contexto de descoberta, texto integral, função narrativa.
 >
 > **Princípio:** lore via objeto (Pillar — mostre não conte). Player não escuta monólogo expositivo; lê fragmento, conecta sozinho. **Cada documento serve a foreshadow, lore-expansão, reveal ou red herring** específico do arco.
 >
-> **Cross-ref:** [[lore-bible]], [[arco-principal]], [[timeline]], [[characters]].
+> **Cross-ref:** [[lore-bible]], [[arco-principal]], [[timeline]], [[characters]], [[diary/entries-docs-descobriveis]].
 
 ---
 
@@ -16,7 +16,9 @@
 - **Diegese:** todo documento é objeto físico/digital no mundo (carta, diário, memorando, transcrição, pichação). Aparecem como pickup ou interagível no cenário.
 - **Acessibilidade:** entram no Diário do Gus subseção "Lore" depois de coletados. Re-leitura permanente.
 - **Knowledge Progression:** ler documento conta para % de Knowledge total (ending gate).
-- **Gate Ouro:** docs 11, 13 e 15 só descobríveis com Knowledge alta + decisões específicas.
+- **Gate Ouro:** docs 11, 13, 15 e 23 só descobríveis com Knowledge alta + decisões específicas. Doc 8 acessível antecipadamente via sub-quest Ouro ou pós-reveal canônico.
+- **Fragmentos vs integral:** docs longos aparecem fragmentados no pickup (1-3 trechos representativos) e ganham forma integral via cross-reading (Knowledge média) ou sub-quest (Knowledge alta). Mecânica detalhada em [[diary/entries-docs-descobriveis]] §Princípio.
+- **Exceção de em-dash (autoral in-character):** anti-pattern global "sem em-dash horizontal `—` em narrativa" **não se aplica neste arquivo**. Decisão canônica do criador supremo (2026-05-16). Justificativa: docs in-world são prosa autoral diegetica (Sterling Corp eufemístico, Era 2 cooperativa humano, Era 1 formal arcaico, Bento marginalia, etc); em-dash é instrumento expressivo legítimo do autor in-character. Aplica somente a este arquivo. Demais docs narrativos seguem regra geral (vírgula/dois pontos/parênteses).
 
 ---
 
@@ -670,19 +672,375 @@ A regra é uma só: SELAR, NÃO ERRADICAR.
 
 ---
 
+## Documento 16 — Caderno técnico de Salviano Alencar (parcial)
+
+**Tipo:** caderno de campo, papel pardo, ~30 páginas; ~12 sobreviventes (resto perdido na liquidação Sterling-FIR de -8).
+**Autor:** Salviano Alencar (pai morto de [[characters/dante-grid|Dante]]; cooperativa de mecânica justa).
+**Data:** ano -10 a -8 (últimas anotações).
+**Onde se encontra:** prateleira alta no Galpão Cooperativo abandonado, Periferia Industrial. Escondido por trás de pilha de caixas vazias. Mestre Almagre menciona vagamente em diálogo casual ("o caderno do Salviano tinha mais coisa do que ele dizia") — pista ambient.
+**Trigger:** sub-quest do arco Dante. Acessível em qualquer momento pós-recrutamento Dante; obrigatório para Knowledge alta linha Periferia. Gate: Knowledge média (interagir com prateleira alta requer Tavus-Drive nível 2). Knowledge alta destrava caderno integral.
+**Função:** humaniza Salviano (era pai presente, era técnico competente, viu Vorto chegando antes de morrer); reforça que Dante **viu** Vorto pelos olhos do pai antes de aceitar; substrato emocional pro reveal F026 (aliciamento começou no funeral). Fecha plants F019, F020, F021, F022.
+
+```
+[página 7 — fragmento]
+... e o Almagre veio aqui hoje, disse que tava vendo encrenca
+no fluxo de caixa da Federação. Concordei. A oferta deles de
+comprar a cooperativa era 18% abaixo do valor justo. Eu disse
+que não. Recusa registrada por escrito como obriga o estatuto.
+
+[página 19 — fragmento]
+... Dante terminou o segundo motor sozinho hoje. Tem 7 anos.
+Já solda melhor que metade dos meus aprendizes adultos. A
+Edilma viu e ficou em silêncio um minuto. Depois disse: 'ele
+é do pai. tem que ser do pai mesmo. não deixa pra outro.'
+
+[página 22 — última anotação legível]
+... Vorto veio. Sorriu pra Edilma. Apertou a mão do Dante
+como se fosse adulto. Ofereceu 'auxílio técnico FIR para
+recuperação da cooperativa'. Recusei na hora. Dante perguntou
+por que. Eu disse: 'porque quem oferece socorro quando você
+ainda não pediu, ele já te deve algum favor que você não
+conhece.' Dante não entendeu. Vai entender depois.
+```
+
+**Subtexto:** Salviano formulou a tese anti-FIR em linguagem técnica de oficina — "favor que você não conhece" é o que Vorto cobrou de Dante 1 ano depois no funeral. Página 22 é a última anotação legível porque foi escrita semanas antes da morte de Salviano; o restante do caderno está em branco ou queimado. Sub-quest culmina em momento opcional de mostrar trecho relevante a Dante (cena emocional contida, Pillar 4): Dante toca a página com um dedo, depois fecha o caderno e devolve. Não fala. Sem alavancagem de stats, só textura.
+
+---
+
+## Documento 17 — Diário de campo de Bartolo Penkin (anotações QA Apex-Data)
+
+**Tipo:** caderno técnico padrão Apex-Data Systems (capa rígida, papel pautado em quadrículas Engenharia). ~80 páginas escritas; legível.
+**Autor:** Bartolo Penkin (engenheiro QA sênior Apex-Data; desapareceu em -16, duas semanas após vazar o audit do doc 5).
+**Data:** ano -18 a -16.
+**Onde se encontra:** porão da casa antiga dos Penkin, Periferia Industrial. Casa atualmente habitada por Mateus Penkin (sobrinho, fofoqueiro). Mateus permite acesso ao porão se Gus traz item específico (favor: peça de hardware Era 2 raro, recuperável em sub-quest cruzada Underground).
+**Trigger:** sub-quest sequencial pós-coleta do doc 5. Mateus comenta "o tio escreveu coisa que ele não vazou" se Gus mostra que tem o audit. Gate: Knowledge média (favor sub-quest); Knowledge alta destrava nota final marginal (a página 80, abaixo).
+**Função:** atribui retroativamente o doc 5 a Bartolo Penkin (canon, lore-bible §13 já confirma hipótese; este doc consolida via física); humaniza Bartolo (não é só nome em rodapé); estabelece vínculo prévio entre Padrinho Tiago e Bartolo. Cross-link: F036 (autor identificado), F074 (caixa zinco modelo Penkin/Berenger/Alencar = preservação Era 2 padronizada).
+
+```
+[página 34 — fragmento]
+... Locke desceu pessoalmente do escritório executivo hoje.
+Olhou os terminais QA por 20 minutos sem falar. Foi embora
+sem cumprimentar ninguém. Três horas depois o Coordenador de
+Equipe pediu pra retirarmos da fila os tickets relativos ao
+INTERPRETADOR-A. Disse: 'questão estratégica acima do nível
+técnico'. Marquei a frase no caderno porque essa frase é
+exatamente o oposto de tudo que esse departamento sempre fez.
+
+[página 78 — penúltima entrada]
+... A engenharia tem um juramento antigo: você não deixa o
+hardware mentir pelo software. Hoje eu vi a empresa toda
+fazer o oposto disso. Vou registrar formalmente o audit ainda
+essa semana. Se nada acontecer no canal oficial em 30 dias,
+vazo pro Tiago. Ele saberá pra onde encaminhar.
+
+[página 80 — última entrada, letra apressada]
+Tiago, se essa página chegou em você de outra mão:
+o audit já tá na sua caixa.
+Cuida do que sobrar de mim na cooperativa.
+E cuida da Linda quando ela tiver idade.
+Você sabe quem ela é.
+                                                  Bart.
+```
+
+**Subtexto:** "cuida da Linda quando ela tiver idade" antecede em 8 anos o doc 6 (carta cifrada de Tiago a Linda). Knowledge alta retroativa permite player conectar: Tiago herdou a tutela emocional de Linda de Bartolo, não por acaso. "Você sabe quem ela é" deixa pista ambígua sobre o que Bartolo sabia da família Neumann e nunca disse. Sub-quest pós-DD-005 abre a leitura; Knowledge alta destrava a página 80 (a página existe mas o caderno parece terminar na 78 sem o gate).
+
+---
+
+## Documento 18 — Folheto do Tomo da Pilha Sobrecarregada (edição Era 2, -98)
+
+**Tipo:** folheto impresso em papel simples, dobrado em 4. Carimbo da Universidade Pública. ~40 linhas.
+**Autor:** Lin Tórun (uma dos 4 engenheiros da equipe original da Primeira Compilação, -150; aqui já idoso, ~73 anos).
+**Data:** ano -98 (50 anos após primeira compilação; aniversário simbólico da Pilha Sobrecarregada).
+**Onde se encontra:** sebo aberto na Praça do Compilador, Periferia Industrial. Encartado dentro de um exemplar antigo do Tomo (edição com capa azul desbotada).
+**Trigger:** pickup livre durante 1ª visita à Praça (ato 1 ou ato 2 médio). Vendedor (NPC ambient) diz: "leva o folheto também, é grátis. ninguém leva mais." Gate: n/a.
+**Função:** fundamenta tom Era 2 (cooperativo, código aberto, comunidade técnica) em voz humana específica; serve como contraste explícito ao tom corporativo Sterling Corp (docs 1, 12); última frase "compilando bem" reforça cumprimento canon "Compila bem" ([[lore-bible]] §11.4); cria substrato afetivo para o Gus (que lê isso aos 11 e absorve a tese antes de saber argumentar contra DRE). Cross-link: F067, F068.
+
+```
+AOS QUE COMPILARÃO DEPOIS DE NÓS
+
+Comemora-se este ano meio século da primeira linha. A Rosaria
+morreu em -107. O Henrique morreu em -103. A Marcela ainda
+trabalha, agora numa oficina perto do Núcleo, embora pouca
+gente saiba.
+
+Eu escrevo o que aprendi nos cinquenta anos. Três coisas.
+
+Primeira: ninguém compila sozinho. A primeira linha tinha
+quatro nomes na placa. Tinha trinta nomes que não couberam
+na placa. Tinha trezentos nomes que ninguém escreveu. Quem
+ler isso, escreva o nome de quem ajudou. A pilha continua
+enquanto a gente lembra.
+
+Segunda: o hardware merece respeito. Quem manda no script
+manda no que vai durar uma execução. Quem manda no hardware
+manda no que vai durar uma geração. Compila com calma.
+Otimiza com humildade. Não engana o ferro.
+
+Terceira: o conhecimento é o único bem que se multiplica
+quando se reparte. Tudo que aprendi tá no Tomo. Tudo que
+aprenderem, coloquem no Tomo também. Senão a primeira linha
+foi inútil.
+
+Sigam compilando bem.
+                                          Lin Tórun
+                                          -98
+```
+
+**Subtexto:** "não engana o ferro" é eco direto e invertido do que aparece no doc 1 (Sterling: "ferro é substrato"). Player que lê ambos percebe a fratura ideológica entre Era 2 cooperativista e Era 3 DRE como **mesma frase virada do avesso**. Folheto é o doc Era 2 mais íntimo e político simultaneamente — comunidade sem heroísmo individual, pilha como continuidade memorial.
+
+---
+
+## Documento 19 — Caderneta de saudações de Vênea Vance (lista de receitas + bilhetes do Patrício)
+
+**Tipo:** caderneta de cozinha barata, capa de oleado florido, ~50 páginas; receitas escritas à mão. Entre páginas, 4 bilhetes dobrados do Patrício (cartas raras canônicas do pai ausente).
+**Autor:** Vênea Vance (mãe do Gus) — receitas; Patrício Vance (pai ausente) — bilhetes.
+**Data:** ano -8 a presente (receitas acumuladas); bilhetes em -7, -4, -2, -0.5.
+**Onde se encontra:** gaveta da cozinha do apartamento Vance. Acessível desde o início; Gus precisa ter usado a mecânica de save base canônica pelo menos 3 vezes (voltar pra casa 3x) para o jogo destravar a interação com a caderneta (subtexto: a cumplicidade com a mãe vira hábito; hábito leva à descoberta).
+**Trigger:** mecânica de save base + 3 retornos. Gate: Knowledge baixa.
+**Função:** materializa a safe base canônica Vênea (Pillar 4 / ofuscada deliberadamente, [[lore-bible]] §14); humaniza Patrício (presente em ausência); bilhete final ("voltando em outubro") fica sem resolução em G1 — sequel hook ambíguo ou cena bonus epilogue se Knowledge Ouro; receita "caldo-de-folha-fractal" cria ponte entre Vênea (cidade) e Mariana (Pelicano Branco) — Vênea conhece Mariana ou tem rede oral indireta, lore-fundo.
+
+```
+[primeira página]
+Pão-de-bit com canela
+  farinha 2 xíc
+  fermento 1 colher
+  canela na ponta da faca, ele gosta
+  cuidado pra não passar — ele percebe
+
+Café-de-neurônio pra ele estudar
+  café 2 colheres
+  canela na ponta da faca
+  gengibre raspado pouquinho
+  SEM açúcar (ele acha que açúcar é debug com 'console.log')
+
+[página meio do caderno, receita interrompida pela metade,
+ bilhete dobrado encartado:]
+
+Vênea.
+Faço 6 meses na estação 11 ainda. O turno da noite tá pesado
+mas o pessoal aqui é bom.
+O Gus tá com a Matriz nova?
+Tira foto do aparelho dele e me manda pelo correio postal,
+o digital eles abrem aqui.
+                                            P.
+
+[outra página]
+Caldo-de-folha-fractal (pra febre — Mariana ensinou)
+  NUNCA mais que uma folha por ramificação. Respeito.
+  água fervendo lenta
+  folha cortada com a faca de cabo de madeira só
+  sal grosso no fim
+  serve quente
+  SE der febre alta de novo, hospital. ponto.
+
+[último bilhete, mais recente, encartado nas últimas páginas]
+Vênea, Gus.
+Tô voltando em outubro. Promessa firme dessa vez. Não fala
+pra ele ainda, não quero que ele crie expectativa errada
+caso o turno mude.
+Cheiro a fio queimado e a saudade. Vai passar.
+                                            P.
+```
+
+**Subtexto:** receita Pão-de-bit ensina sobre Gus por triangulação (Vênea sabe que ele percebe a canela; vê o filho como leitor de detalhe); receita Caldo-de-folha-fractal confirma que Vênea aprendeu técnica botânica Era 1 com Mariana, conexão jamais comentada explicitamente em diálogo; bilhete da estação 11 implica que o digital corporativo é monitorado (Patrício pede correio postal). Os 4 bilhetes nunca prometem mais do que conseguem cumprir — exceto o último, que tenta. "Vai passar" pode ser sobre saudade, sobre o turno, ou sobre algo que Patrício sabe e não diz.
+
+---
+
+## Documento 20 — Relatório de plantio de Solano Vanderbist (cartilha agrícola Pelicano Branco)
+
+**Tipo:** cartilha agrícola feita à mão, papel reciclado, ~25 páginas com esquemas botânicos + cálculos Fibonacci.
+**Autor:** Solano Vanderbist (pai morto de Jaci; morto em -8 junto com Lia no surto silencioso).
+**Data:** ano -10 a -8 (últimas semanas).
+**Onde se encontra:** quarto preservado de Solano e Lia na cabana da Anciã Mariana, Pelicano Branco. Mariana abre o quarto se Jaci pede (sub-beat Sho arco Jaci ou pós-arco Jaci).
+**Trigger:** sub-quest pós-recrutamento Jaci. Jaci pode ou não querer entrar — escolha narrativa contida. Se Jaci entra com Gus, há cena curta (3 falas dela, sem espetáculo). Gate: Knowledge média (sub-quest emocional).
+**Função:** consolida lore-bible §13 linha -8 (surto Pelicano Branco = vetor experimental Sterling); humaniza Solano e Lia (Solano era pai presente, técnico cuidadoso); última frase "veio de cima" é foreshadow direto da estação retransmissora drone Sterling (F047, [[environments/08-selve-profunda]]); cria substrato emocional pro arco Jaci sem expô-la a monólogo — ela lê com o Gus, não comenta, sai do quarto, retoma trabalho.
+
+```
+[introdução]
+Pra Jaci, quando souber ler.
+Plantar é matemática que respeita o vento.
+
+[página 4]
+Eucalipto-fractal: ramifica em Fibonacci limpo até a 7ª
+iteração. A partir da 8ª começa a ramificar fora do padrão.
+Hipótese da Mãe Soraia (in memoriam): a 8ª é onde a planta
+pergunta. A 9ª é onde a planta decide.
+
+[página 17]
+Semana passada o ribeirão do leste apareceu meio cinza no
+raso. A Lia perguntou pra Mariana. Mariana disse que ia
+consultar. Não voltou ainda com a resposta.
+Plantei a fileira do feijão com 1 metro de afastamento extra
+do leito, por precaução. Se a Mariana falar pra voltar, eu
+volto.
+
+[página 22, letra mais firme — penúltima entrada]
+Não é doença velha. É doença nova com cara de velha. Já
+perdi cinco fileiras em três dias. A Lia tá tossindo. Eu
+estou bem. Vou levar a Jaci pra dormir com a Mariana hoje
+no caso.
+
+[última entrada, lápis, letra trêmula]
+Pra quem ler:
+o experimento não veio da floresta.
+veio de cima.
+contem pra Jaci quando ela puder ouvir.
+                                            Sol.
+```
+
+**Subtexto:** página 22 mostra Solano colocando Jaci em segurança 1 noite antes de morrer — paralelo direto com o bilhete final de Davi (doc 13), o pai/irmão que sabe e protege antes de cair. "Veio de cima" é a única vez em toda a documentação canônica de Pelicano Branco em que o vetor é nomeado em texto (mesmo sem identificar Sterling por nome). Bonus epilogue Ouro: Jaci replanta a fileira do feijão na mesma distância do leito que Solano havia anotado.
+
+---
+
+## Documento 21 — Manual operacional das Unidades de Reabsorção (treinamento Sterling Corp)
+
+**Tipo:** manual de treinamento Sterling Corp, encadernado em capa preta com logo prata Sterling Sigma. ~12 páginas; tom corporativo asseptic militarizado.
+**Autor:** Departamento de Contenção Sterling Corp (sem assinatura individual; aprovação Diretora Octávia Penedo).
+**Data:** ano -1.
+**Onde se encontra:** vestiário Octante na incursão ato 3 (Cúpula Sterling). Pickup opcional; jogador atento pega antes do confronto Penedo (se Penedo aparece como mini-boss).
+**Trigger:** ato 3, exploração lateral durante incursão. Gate: Knowledge média (acesso ao vestiário requer chave Óxido).
+**Função:** confirma operacionalmente o eufemismo "transferido pra Heliópolis-Nova" canônico ([[lore-bible]] §11.5 tabu); cria horror corporativo sutil (reorientação narrativa = lavagem de memória institucionalizada); reforça que Sterling sabe mais do que admite publicamente sobre Patch-Zero; subtexto: "perda de afeto pelos colegas" descreve o que aconteceu com o Dante (paralelo retroativo Knowledge alta). Cross-link: F038, F050.
+
+```
+MANUAL OPERACIONAL — UNIDADES DE REABSORÇÃO
+Classificação: RESTRITO — pessoal autorizado
+Aprovação: Diretora Octávia Penedo, Departamento de Contenção
+
+[Capítulo 1 — Nomenclatura]
+A unidade não captura. A unidade reabsorve.
+Captura implica entidade a ser preservada.
+Reabsorção implica integração no sistema operacional vigente.
+
+Quando questionados publicamente, operadores responderão:
+'a Sterling Corp realiza monitoramento contínuo de
+comportamentos emergentes inesperados em sistemas urbanos
+e naturais, sem necessidade de mobilização operacional.'
+
+Sob nenhuma circunstância confirme a existência de:
+  (a) o programa Octante;
+  (b) a sub-amostra K-7;
+  (c) o evento de -0.25 do calendário corporativo.
+
+[Capítulo 4 — Protocolo de falha]
+Em caso de reabsorção fracassada do alvo:
+1. Operador é retirado de campo em até 12h.
+2. Equipamento é incinerado em até 24h.
+3. Memória residual do operador é submetida a sessão de
+   'reorientação narrativa' em até 72h.
+4. Em casos de exposição prolongada (>20 minutos com alvo
+   em fase comunicativa), operador é transferido a
+   Heliópolis-Nova para 'desenvolvimento de carreira em
+   ambiente mais estável'.
+
+Operadores que apresentem após sessão de reorientação:
+ - perda parcial de afeto pelos colegas
+ - confusão entre memória pessoal e memória corporativa
+ - sensação de 'já ter dito isso antes em outro lugar'
+devem reportar imediatamente ao supervisor de turno.
+
+[última página]
+Lembre-se: a empresa é o seu lar.
+O lar interpreta sobre você. Você executa.
+                                          (sem assinatura)
+```
+
+**Subtexto:** "perda parcial de afeto pelos colegas" + "confusão entre memória pessoal e memória corporativa" descreve o estado clínico do Dante após anos sob FIR-Sterling — paralelo retroativo Knowledge alta com a camada double-layer das memórias formativas do Dante. "Sensação de já ter dito isso antes em outro lugar" é a definição operacional do que Sterling chama "reorientação narrativa": a lavagem da memória é diagnosticada em sintoma, nunca em descrição. Última página inverte o ditado "o lar é o seu lar"; a empresa absorve a função maternal e a linguagem reforça (interpreta sobre você).
+
+---
+
+## Documento 22 — Tábua de ofícios da Catedral Menor de São Vargas (placa de mármore quebrada)
+
+**Tipo:** placa de mármore branco quebrada em 3 pedaços; inscrição parcialmente legível. Era 2 final / pré-saque.
+**Autor:** Ordem Recursiva (institucional); mestres listados: Ardenia Falke + Cândido Rui + outros 7 nomes ilegíveis.
+**Data:** ano -10 (placa de inauguração reformada); pedaços recuperados em -3 após saque Sterling.
+**Onde se encontra:** ruínas da Catedral Menor de São Vargas (sub-área visitável do setting Catedrais Neo-Sylvania, ato 2 arco Bento). Pedaços espalhados pelo chão sob entulho.
+**Trigger:** quebra-cabeça de remontagem (puzzle visual; reúne 3 pedaços). Gate: Knowledge baixa (puzzle simples); Knowledge alta destrava nota lateral marginal (gravação fina de Bento aos 12 anos).
+**Função:** confirma lore-bible §13 linha -3 (Sterling Corp saqueou Catedral, Ardenia + Cândido desaparecidos); a gravação marginal feita por Bento aos 12 anos (1 ano antes do jogo) é micro-ato canônico do Bento de preservar memória institucional — substrato silencioso da maturidade contida; conecta visualmente com F071 (cronômetro Ardenia intacto na vitrine de Velhusto, "ela está adiantada de nós em algum lugar"); convida player a perguntar onde estão os 7 nomes ilegíveis (sem resposta em G1 — sequel hook). Cross-link: F041, F071.
+
+```
+CATEDRAL MENOR DE SÃO VARGAS
+Inaugurada novamente no ano [-10]
+após restauração comunitária
+
+Mestres oficiantes:
+  Ardenia Falke (Mestra de Cinética Ressonante)
+  Cândido Rui (Mestre de Engrenagem Litúrgica)
+  [7 nomes em letras menores, ilegíveis pelo dano]
+
+Em honra à Selagem Asmódica de -78
+Em honra à Pilha que nos legou esta Catedral
+Em honra ao silêncio que nos guarda
+
+"A engrenagem te guie."
+
+[margem lateral, gravação fina, legível só com Knowledge alta:]
+Em -3, Sterling Corp ocupou esta Catedral durante 4 dias.
+Os Mestres Ardenia e Cândido permaneceram dentro.
+A Catedral foi devolvida vazia.
+Os mestres não.
+
+Bento Chevalier, em -2.
+```
+
+**Subtexto:** Bento gravou a margem aos 12 anos, 1 ano antes do início do jogo — micro-ato de preservação que ninguém pediu, ninguém aprovou, ninguém leu (até Gus, talvez). É a forma de Bento processar o que ainda não consegue dizer em voz alta: registrar em pedra, em letra pequena, em lugar que requer Knowledge alta pra ser achado. Os 7 nomes ilegíveis ficam deliberadamente sem solução em G1 (sequel hook); player Ouro percebe que a Catedral-Mãe (doc 15) também tem assinatura ilegível — padrão.
+
+---
+
+## Documento 23 — *Águas-de-Espelho passa aqui* (fragmento de placa cripto-glífica Era 1)
+
+**Tipo:** fragmento de placa de pedra cripto-glífica, ~25 cm. Inscrição parcial.
+**Autor:** anônimo Neo-Sylvania (mesma linhagem da Catedral-Mãe; provavelmente engenheiro topógrafo identificado como Olméa).
+**Data:** estimativa carbônica ~-750 (período de lacração).
+**Onde se encontra:** ⚠️ **GATE OURO.** Selve Profunda, próximo ao rio que um dia foi chamado Águas-de-Espelho (referência geográfica em doc 15). Atualmente: leito seco. Fragmento meio enterrado, encontrado por exploração ambiental.
+**Trigger:** pickup ambient, Selve Profunda. Não obrigatório; player atento detecta pelo brilho residual cripto-glífico noturno. Gate: Knowledge alta (decifragem requer Bento + Gus + Anciã Mariana consultora).
+**Função:** doc Era 1 que aparece sem ser sobre a Catedral diretamente; reforça que Neo-Sylvania tinha vida cotidiana técnica (topógrafo, marcação de rio, ciclos de mudança) — não era só "civilização mítica perdida"; última frase "antes de gravar qualquer coisa em si mesmos" é foreshadow Pillar 2 anti-Sterling (Sterling grava DRE em runtime universal: a Selve não permite); seca atual do leito = pista geográfica para Catedral-Mãe canônica em doc 15 (paralelo retroativo). Cross-link: F054, F064.
+
+**Texto original (cripto-glifo, transcrição visual parcial):**
+```
+[GLIFO ÁGUA] [GLIFO ESPELHO] [GLIFO PASSAGEM]
+     ≈              ◊              →
+[GLIFO MARCO] [GLIFO TOPÓGRAFO]
+     ▣              ⌖
+```
+
+**Tradução (Gus + Bento + Mariana combinados):**
+
+```
+ÁGUAS-DE-ESPELHO PASSA AQUI
+
+Marco do topógrafo Olméa, ciclo da segunda lua de [ilegível].
+
+Quem ler isto, saiba: o rio escolhe seu caminho conforme
+a Selve respira. Há setenta ciclos o rio passou pela
+Catedral-Mãe. Há cinquenta ciclos passou por leste. Há
+dezessete ciclos virou ao norte e secou aqui.
+
+A Selve faz isso com tudo que tenta marcar nela com pedra.
+Mesmo a pedra vai mudar de lugar.
+
+Que os engenheiros do depois lembrem disto antes de gravar
+qualquer coisa em si mesmos.
+
+                                          Olméa, topógrafo
+```
+
+**Subtexto:** primeiro doc Era 1 que não é místico, não é da Catedral-Mãe, não é sobre Patch-Zero. É um topógrafo registrando que o rio se move e que a pedra também vai se mover. Linguagem técnica e funcional, Pillar 2 ao vivo: Neo-Sylvania era civilização concreta, com profissão de topógrafo, com vocabulário de ciclo lunar como medida de tempo. "Antes de gravar qualquer coisa em si mesmos" é eco prévio (em 750 anos) ao que Sterling fará em DRE: tentar gravar runtime universal no mundo. Olméa avisa que a Selve não permite. Seca atual do leito (-0 do calendário do jogo) confirma o ciclo retroativamente; player Ouro cruza com o doc 15 ("se a fronteira da floresta se mover além do rio que era chamado Águas-de-Espelho, é sinal que a selagem cedeu") e percebe que o sinal já está dado.
+
+---
+
 ## Distribuição por ato (sumário)
 
 | Ato | Docs descobríveis (gate) | Notas |
 |---|---|---|
-| **Ato 1** | 12 (Setor Mirage), 4 (panfleto público), 1 (átrio Cúpula — fragmento público) | Setup; Knowledge ainda baixa. |
+| **Ato 1** | 12 (Setor Mirage), 4 (panfleto público), 1 (átrio Cúpula — fragmento público), 18 (folheto Lin Tórun no sebo da Praça do Compilador), 19 (caderneta Vênea — começa acessível, 3 retornos destrava) | Setup; Knowledge ainda baixa. Doc 18 ancora tom Era 2; doc 19 ancora safe base. |
 | **Ato 2 — Arco Cauã** | 2, 9 | Caixa zinco apartamento Berenger. |
 | **Ato 2 — Arco Iara** | 4 (versão decifrada) | Iara decifra a versão original conhecida. |
-| **Ato 2 — Arco Bento** | 3 (diário Atelaiá), 10 (tratado anônimo) | Biblioteca Velhusto + biblioteca pública. |
-| **Ato 2 — Arco Linda** | 5 (Apex-Data audit), 6 (carta Tiago), 11 (pichações Polis-Vermelha — Ouro) | Underground entrega gradualmente. |
-| **Ato 2 — Arco Dante** | 8 (memorando FIR — Ouro ou pós-reveal) | Knowledge alta destrava antes do reveal. |
-| **Ato 2 — Arco Jaci** | 7 (Fragmentos Diário Selve) | Mariana entrega via Jaci. |
+| **Ato 2 — Arco Bento** | 3 (diário Atelaiá), 10 (tratado anônimo), 22 (tábua São Vargas — puzzle remontagem) | Biblioteca Velhusto + biblioteca pública + ruínas Catedral Menor. |
+| **Ato 2 — Arco Linda** | 5 (Apex-Data audit), 6 (carta Tiago), 11 (pichações Polis-Vermelha — Ouro), 17 (diário Bartolo — pós-doc 5) | Underground entrega gradualmente. Doc 17 atribui audit. |
+| **Ato 2 — Arco Dante** | 8 (memorando FIR — Ouro ou pós-reveal), 16 (caderno Salviano — sub-quest arco Dante) | Knowledge alta destrava 8 antes do reveal; 16 humaniza Salviano. |
+| **Ato 2 — Arco Jaci** | 7 (Fragmentos Diário Selve), 20 (relatório plantio Solano — sub-quest pós-recrutamento), 23 (fragmento Águas-de-Espelho — Ouro) | Mariana entrega via Jaci; quarto preservado; exploração Selve Profunda. |
 | **Ato 2/3 transição** | 14 (Penedo-Locke) | Incursão ato 3 cedo. |
-| **Ato 3 — Climax** | 1 (versão completa interior Cúpula), 13 (bilhete Davi — Ouro), 15 (cripto-glifo Catedral-Mãe — Ouro) | Reveal pleno. Gate Ouro densifica. |
+| **Ato 3 — Climax** | 1 (versão completa interior Cúpula), 13 (bilhete Davi — Ouro), 15 (cripto-glifo Catedral-Mãe — Ouro), 21 (manual Octantes — vestiário incursão) | Reveal pleno. Gate Ouro densifica. Doc 21 paralelo retroativo Dante. |
 
 ---
 
@@ -691,10 +1049,12 @@ A regra é uma só: SELAR, NÃO ERRADICAR.
 - Eras canônicas: [[lore-bible]] §3, [[timeline]]
 - Facções (autores e contexto): [[factions]]
 - Companions (cartas e diários relacionados): [[characters]]
-- Sterling backstory (doc 1, 5, 8, 14): [[prelore_vilao]], [[sterling-locke]]
-- Patch-Zero (doc 3, 10, 11, 15): [[patch-zero]]
+- Sterling backstory (doc 1, 5, 8, 14, 17, 21): [[prelore_vilao]], [[sterling-locke]]
+- Patch-Zero (doc 3, 10, 11, 14, 15, 20, 21, 23): [[patch-zero]]
 - Pillars (Knowledge gating): [[pillars]]
+- Catálogo Diário do Gus (cross-link denso por entry): [[diary/entries-docs-descobriveis]]
+- Foreshadowing tracker (F### vinculados): [[foreshadowing]]
 
 ---
 
-**Última revisão:** 2026-05-15. Canônico (expansão Bloco G). Atualizações exigem aprovação do criador supremo.
+**Última revisão:** 2026-05-16. Canônico (expansão Bloco G + Bloco H viralizado). Atualizações exigem aprovação do criador supremo.

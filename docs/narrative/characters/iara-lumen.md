@@ -66,6 +66,7 @@ Destrava: **upgrade capa de refração** (clone holográfico permanente: Iara ma
 - **vs [[gus]]:** linguagem (Óxido vs C-Arcane). Cena 5 canônica.
 - **vs [[linda-siren]]:** **conflito principal**. Underground despreza estetização Cult; Linda vê Iara como "ex-conversa que ainda fala bonito demais pra ser confiável". Iara responde com elegância gélida. Aproximação durante arco Linda (Iara contribui sabotando holografia Sterling Corp; Linda aceita aliança operacional, não pessoal).
 - **vs [[bento-requiem]]:** filosófico. Iara acha Asmódico "lindo mas teatral demais". Bento acha Iara "técnica mas vazia". Cresce respeito mútuo em ato 3.
+- **vs [[patch-zero]] (F127):** durante mini-quest pós-recrutamento Iara, no porão do Cult Mirage, uma tela de holografia rachada acende sozinha. Patch-Zero canal 3, 4º encontro opcional: "você mente bem. eu também. nós podíamos." Iara recusa categórica — uma das poucas vezes que age sem hesitação no jogo. Sem dialogue tree extensiva. Reforça arc: "posso criar arte sem ser arma". Patch-Zero anota; ressurge entry sussurrante no Diário depois. Knowledge média destrava registro no Diário.
 
 ---
 

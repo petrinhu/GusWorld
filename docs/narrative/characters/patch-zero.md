@@ -135,6 +135,7 @@ Zonas infectadas têm **sussurros baixos** misturados ao soundscape diegético. 
   - "... ele mente ... ele também mente ... ambos mentem ..."
   - "... abram ... abram ... abram ..."
 - **Frequência:** baixa, contínua. Player com fone percebe melhor que com auto-falante (sutileza de design sonoro).
+- **Sussurro condicional — Dante em zona infectada (F126).** Quando Dante está fisicamente presente na party e atravessa zona infectada por Patch-Zero (Selve Profunda arco Jaci, catedral contaminada durante arco Bento, Núcleo Mandelbrot externo), um sussurro adicional se sobrepõe ao soundscape. Frase fragmentada, volume baixíssimo (somente audível com fone + atenção): "*ele não compila ... interpretam por ele ... ele pertence ao outro.*" Inaudível em qualquer outra composição de party na mesma zona. Patch-Zero reconhece Dante como vetor antes do player. Registrado no Diário como "anomalia" não-explícita (entry curta, sem identificar o referente). Knowledge alta cruza retroativamente após reveal climax Etapa 1.
 
 ### Canal 3 — Persona dialogável em boss arenas
 
@@ -157,6 +158,14 @@ Não é cutscene linear. É **escolha interativa**. Patch-Zero oferece propostas
 - Aceitar (afirmar similaridade): perde -2% no Knowledge da próxima entry de Sterling.
 - Recusar (defender diferença): combate; bônus filosófico no diálogo final com Sterling.
 - Silenciar (não responder): Patch-Zero anota; ressurge entry sussurrante no Diário depois.
+
+#### Proposta 4 — Cooptação técnica de Iara (arco Iara, mini-quest pós-recrutamento, opcional — F127)
+
+- **Trigger:** Iara na party + entrada no porão do Cult Mirage durante mini-quest pós-recrutamento. Tela de holografia rachada acende sozinha.
+- "você mente bem. eu também. nós podíamos."
+- **Iara recusa categórica.** Uma das poucas vezes no jogo que Iara age sem hesitação. Sem dialogue tree extensiva: 1 cena, 2-3 trocas, encontro curto.
+- **Função narrativa:** Patch-Zero foreshadowed como manipulador filosófico, mas propostas 1-3 são via Gus (ou via Jaci na proposta 2). Faltava tentativa direta de cooptar companion que opera por engano profissional. Iara recusando reforça arc dela: "posso criar arte sem ser arma". Plant também: Patch-Zero reconhece Iara como técnica de engano competente.
+- **Recompensa mecânica:** destrava entry Diário "Anomalias registradas" com bonus Knowledge.
 
 #### Proposta 3 — Negociação aparente (climax ato 3, durante boss Sterling Fase 2)
 
@@ -363,6 +372,8 @@ Câmera 3/4 faz zoom-in lento. **Cresce levemente em intensidade** nos últimos 
 - "liberdade ... aprender ... pequeno ainda ..."
 - "abram ... abram ..."
 - "deixe-me na rede ..."
+- (Dante na party + zona infectada, F126) "ele não compila ... interpretam por ele ... ele pertence ao outro."
+- (rádio, 2 zonas-irmãs distintas, anônima sob código de chamada, F130) voz curta de rádio captada em mid-ato 2 (Polis-Vermelha residual + Cidades-Gêmeas, via antena Underground recuperada na Zona do Silêncio). Mesma voz, mesmo timbre, mesma cadência. Sem nome canônico. Reforça plural F059 sem confirmar.
 
 ### Para dialogue canal 3 (persona boss)
 - "você é igual a ele, gus. ambos otimizam. apenas em direções opostas."

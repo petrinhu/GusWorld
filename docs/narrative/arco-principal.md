@@ -292,10 +292,11 @@ Um único ending canônico estrutural (Sterling derrotado, Patch-Zero selado, Gu
 
 - Sterling cai. Patch-Zero selado em laboratório controlado (não solto). Cooperação internacional ativa.
 - Cidades-irmãs salvas — Cidades-Gêmeas e Heliópolis-Nova se libertam de Sterling Corp em cascata pós-jogo. Polis-Vermelha em recuperação acelerada.
-- **Bonus epilogue (2-3 cenas adicionais):**
+- **Bonus epilogue (3-4 cenas adicionais):**
   - Cena 1: vilarejo do Pelicano Branco em festival. Jaci com avó.
   - Cena 2: Bento em catedral aberta ao público; primeira lição de Asmódico a uma criança.
   - Cena 3: Cauã + Linda fundando oficina mista nos Dutos.
+  - Cena 4 (F128): Beatriz Pólvora (17, +1 ano timeskip) abre Escola de Asmódico aberta a não-membros da Ordem Recursiva, na Praça do Compilador da Periferia (escolha simbólica: tradição catedral encontra território cooperativo Era 2). Crianças da Periferia se inscrevem. Mestre Almagre passa, faz um sinal de aprovação com a cabeça (não fala — recuperou). Bento aparece um segundo no fundo, segurando o escudo-catedral, sorri pequeno. Duração 8-12 segundos, sem diálogo. Costura cross-arco Catedrais + Periferia; tradição flexível continua viva, não dogma.
 - Dante: redenção forçada só destrava ending Ouro se branching #5 = redenção e sucesso. Caso contrário, Ouro alcançável mas Dante morto.
 - Diário entry final: "Sinal anômalo detectado em [cidade-irmã]." (Triple hook obrigatório, mesmo em Ouro — ameaça persiste.)
 

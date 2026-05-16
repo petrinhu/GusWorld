@@ -38,3 +38,6 @@ __pycache__/
 
 # Sessão Claude local (não versionar)
 .claude/local/
+
+# Resources pesados / não-versionáveis (livros de referência, fontes externas)
+/resources/livros/
