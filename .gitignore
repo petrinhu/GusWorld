@@ -1,0 +1,40 @@
+# Godot 4
+.godot/
+.import/
+export.cfg
+export_presets.cfg
+*.translation
+
+# Build outputs
+/build/
+
+# OS lixo
+.DS_Store
+Thumbs.db
+desktop.ini
+*~
+*.swp
+*.swo
+
+# IDE
+.vscode/
+.idea/
+*.code-workspace
+
+# Caches locais
+.cache/
+__pycache__/
+*.pyc
+
+# Logs
+*.log
+
+# Blender backup
+*.blend1
+*.blend2
+
+# Krita backup
+*~
+
+# Sessão Claude local (não versionar)
+.claude/local/
