@@ -124,6 +124,44 @@ Linhagens canônicas Vyrcátrix (Helíaco → Salomão / Hyperion → Salomão),
 | Pioneiro-Fundador Hilário Vanderbist | — | Ancestral direto Anciã Mariana Vanderbist + Jaci Vanderbist, lidera grupo fundador do vilarejo-fronteira Pelicano Branco pós-Êxodo (-720) | `docs/narrative/deep/eras/era-1-pre-codigo.md` §7.8 | 💀 histórico Era 1 |
 | Pioneiro Iremar Berenger-Velho | — | Ancestral comum Iremar Berenger Era 2 (co-autor Pythia -95) + Inácia Berenger Era 3 + Cauã. Fundador linhagem familiar produtiva contínua Era 1→Era 3 | `docs/narrative/deep/eras/era-1-pre-codigo.md` §7.8 | 💀 histórico Era 1 |
 
+## 8c. Cronistas-fundadores Era 2 e cantadeiras-anciãs (deep-lore §9)
+
+Cronistas canonizados em §9 deep-lore (vestígios cros-era Era 1 → Era 2 → Era 3). Cinco cronistas-fundadores canonizados, cinco cantadeiras-anciãs, mais cronistas-sementeira/cronistas-temáticos anônimos com designações convencionais. Sucessões geracionais articuladas em descendência ininterrupta das três linhagens canon (Famílias-Pilastra, Boroshova-Vance, Próspero Vance).
+
+| Nome | Apelido / codinome | Características | 1ª aparição | Status |
+|---|---|---|---|---|
+| Olafsson Argéndia o Recuperador | "o Recuperador" | Cronista-fundador Era 2 primeiro canonizado, paleógrafo-cartógrafo, Vilarejo do Acaceiro Antigo, datação -500 a -440, descendência institucional direta Família-Pilastra Argéndia (5 gerações pós Albertina) | `docs/narrative/deep/eras/era-1-pre-codigo.md` §9.7 | 💀 histórico Era 2 |
+| Praxídice Boroshova-Vance a Inspetora | "a Inspetora" | Cronista-fundadora Era 2 segunda canonizada + cantadeira-anciã canônica terminal, paleógrafa-tradutora, Vilarejo do Vale Boroshova, datação -490 a -430, descendência direta Linhagem Boroshova-Vance (5 gerações pós Vesperina) | `docs/narrative/deep/eras/era-1-pre-codigo.md` §9.3 + §9.7 | 💀 histórico Era 2 |
+| Theócrito Vance o Itinerante | "o Itinerante" | Cronista-fundador Era 2 terceiro canonizado, cantor-lector itinerante, vilarejos-fronteira amplos, datação -480 a -420, descendência direta linhagem Próspero Vance (5 gerações pós Próspero) | `docs/narrative/deep/eras/era-1-pre-codigo.md` §9.7 | 💀 histórico Era 2 |
+| Anselmo Boroshova-Vance o Paciente | "o Paciente" | Cronista-fundador Era 2 quarto canonizado, cronista-descobridor da Peça de São Vargas (-460 a -440), paleógrafo-cartógrafo, Vilarejo do Vale Boroshova, datação -490 a -420, descendência direta Linhagem Boroshova-Vance (4 gerações pós Vesperina) | `docs/narrative/deep/eras/era-1-pre-codigo.md` §9.3 + §9.7 | 💀 histórico Era 2 |
+| Hipólito Ferraz-Boroshova o Profundo | "o Profundo" | Cronista-fundador Era 2 quinto canonizado, cronista-expedicionário da Catedral-Mãe submersa (-380 a -340), cronista-cartógrafo-paleógrafo, Vilarejo do Vale Ferraz, datação -420 a -340, descendência institucional cruzada Ferraz + Boroshova-Vance (5 gerações cruzadas) | `docs/narrative/deep/eras/era-1-pre-codigo.md` §9.6 + §9.7 | 💀 histórico Era 2 |
+| Yvanova Argéndia a Memoriosa | "a Memoriosa" | Cantadeira-anciã canônica segunda, Vilarejo do Acaceiro Antigo, datação -680 a -610, descendência Família-Pilastra Argéndia (gerações 2-3 pós-Êxodo) | `docs/narrative/deep/eras/era-1-pre-codigo.md` §9.3 | 💀 histórico Era 1-2 |
+| Cassandra Ferraz a Cuidadora | "a Cuidadora" | Cantadeira-anciã canônica terceira, Vilarejo do Vale Ferraz, datação -620 a -550, descendência Família-Pilastra Ferraz (geração 2 pós Cassiel) | `docs/narrative/deep/eras/era-1-pre-codigo.md` §9.3 | 💀 histórico Era 1-2 |
+| Eufrásia Vanderbist a Diligente | "a Diligente" | Cantadeira-anciã canônica quarta, Vilarejo da Margem-do-Pelicano, datação -560 a -490, descendência institucional Família-Pilastra Vanderbist (gerações pós Hilário Vanderbist §7.8) | `docs/narrative/deep/eras/era-1-pre-codigo.md` §9.3 | 💀 histórico Era 1-2 |
+| Madalena Argéndia-Vanderbist | — | Cronista-sementeira contemporânea Era 3, descendência institucional direta cruzada Argéndia + Vanderbist (8 gerações pós Cronista-Sementeira Era 2), atribuições: inspeção ampolas herméticas + catalogação diversidade biótica residual + correspondência cruzada + transmissão geracional. Documenta em ata anual Vigília Neo-Sylvania | `docs/narrative/deep/eras/era-1-pre-codigo.md` §9.2 | ✅ canônico (Era 3) |
+| Cassandra "Bento" Chevalier | "Bento" (homônima) | Herdeira institucional canônica de Atelaiá Chevarier, 5 gerações em descendência ininterrupta direta, ofício em Catedral de São Camilo (mantenedora glossário cruzado cripto-glifo Era 1 ↔ Asmódico moderno), relação cronística com Bento "Requiem" Chevalier (party canon) | `docs/narrative/deep/eras/era-1-pre-codigo.md` §9.4 | ✅ canônico (Era 3) |
+
+**Cronistas-temáticos anônimos canonizados em §9 (designações convencionais preservadas em arquivo restrito Catedral de São Camilo):**
+
+- **Cronista do Sítio Fronteira do Quadrante Norte-Setentrional** (Era 2, -380 a -340, recuperador fragmento substancial primário)
+- **Cronista-Sementeira do Quadrante Meridional** (Era 2, -320 a -280, descendente Cassandra Yvanova, autora monografia sementes-relíquia)
+- **Cronista Etimologista do Quadrante Ocidental** (Era 2, -90 a -60, autor ensaio partículas auxiliares Atelaiá)
+- **Cronista Cético do Quadrante Setentrional** (Era 2, -445, posição cética na decifração da Peça de São Vargas)
+- **Cronista Conciliador do Quadrante Central** (Era 2, -440, posição conciliadora na decifração)
+- **Cronista do Quadrante Setentrional** (Era 2, -290 a -260, autor ensaio Friedman/Hayek nos vilarejos-fronteira)
+- **Cronista da Continuidade do Quadrante Central** (Era 2, -280 a -250, autor ensaio Smith/Friedman/Rothbard sobre propriedade familiar)
+- **Cronista das Causas** (Era 2, -310 a -280, autor ensaio Mises sobre colapso centralístico)
+- **Cronista do Reaprendizado do Quadrante Setentrional** (Era 2, -250 a -220, autor ensaio 4 fases reaprendizado)
+- **Cronista-Expedicionário do Quadrante da Selve Profunda** (Era 2, -380 a -340, anônimo, mesma expedição de Hipólito Ferraz-Boroshova)
+
+**Famílias-Pilastra Argéndia (8 gerações canonizadas):** Albertina → Argemiro → Cassandra → Diosvel → Evarista → Florêncio → Galatéa → Hipocrates Argéndia (-720 a -190)
+
+**Famílias-Pilastra Ferraz (8 gerações canonizadas):** Cassiel → Damião → Elisa → Fortunato → Gabriela → Hipocrates → Inocência → Justiniano Ferraz (-720 a -190)
+
+**Linhagem Boroshova-Vance (8 gerações intermediárias canonizadas):** Talita → Vesperina → Rasmiel → Vyandella → Sigismundo → Theodora → Ulises → Yvette Boroshova-Vance (-724 a -230), culminando em Pyotor + Yakov + Gus Vance contemporâneos
+
+**Linhagem Próspero Vance (11 gerações canonizadas):** Próspero → Próspero II → Próspera → Próspero IV → Próspera V → Próspero VI → Próspera VII → Próspero VIII o Itinerante → Próspera IX a Comerciante → Próspero X o Negociante → Próspera XI a Comerciante-Itinerante (-720 a Era 3 contemporânea)
+
 ## 8. Engenheiros canônicos Era 2 (históricos)
 
 | Nome | Apelido / codinome | Características | 1ª aparição | Status |

@@ -110,6 +110,13 @@ Toda decisão valida contra esses 5 pillars. Detalhes em `docs/design/pillars.md
 - **Idade 11 anos é canônica.** Tom: prodígio analítico, não power-fantasy adulta. Estética dos antagonistas/cenário pode ser sombria, mas o protagonista resolve por lógica (xadrez, TCG, otimização), não por força.
 - **Setting bipartido:** megacidade ciber-gótica × Selve Sombria. Manter contraste deliberado. Misturar paletas só no ato 3 (recompensa narrativa).
 
+## Easter eggs pervasivos canon (densidade ~10-15%)
+
+Dois sistemas de easter eggs sutis aplicam a TODOS docs deep-lore + assets do jogo. **SEM siglas, SEM gestos rituais nomeados.** Leitor familiar reconhece; leigo não nota.
+
+- **Fibonacci #1** (memória `project_fibonacci_easter_egg`): visual/arquitetural/textual/mecânico/sonoro/narrativo. Números 1,1,2,3,5,8,13,21,34,55,89,144 em datações/contagens/HP/dano/loot/proporções/compassos
+- **Maçonaria canon** (memória `project_eastereggs_maconaria_canonica`): vetor central Pigpen cipher ↔ cripto-glifo Era 1 (grade 3×3 + X + pontos). Símbolos visuais (pavimento tesselado, ashlar bruto/polido, esquadro+compasso, Colunas Boróstoma+Janor, acaceiro-tronco-vermelho, avental couro). Numéricos (3-5-7 degraus, 47ª proposição, cordão 89 nós). Lendário (Helíaco Vyr = Hiram Abiff echo)
+
 ## Comandos (preliminares — Godot ainda não instalado)
 
 Build/test/run **ainda não existem**. Pipeline definido em `docs/tech/build.md`:

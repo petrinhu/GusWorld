@@ -53,7 +53,12 @@
 | Nome | Tipo | Era | Localização canon | Status | Cross-ref |
 |---|---|---|---|---|---|
 | **Pelicano Branco** | Vilarejo-fronteira | Cross-eras (fundado -720) | Borda da Selve Sombria | ✅ canônico (Jaci + Anciã Mariana) | `factions.md` + `environments/08-selve-profunda.md` + `deep/eras/era-1-pre-codigo.md` §2.7 |
-| outros vilarejos-fronteira | Vilarejo-fronteira | Cross-eras | Bordas Selve diversos | ⏳ pendente catalogação (§7 deep-lore futuro) | `deep/eras/era-1-pre-codigo.md` §2.7 |
+| **Vilarejo do Acaceiro Antigo** | Vilarejo-fronteira | Cross-eras (fundado -720) | Região noroeste da Catedral-Mãe submersa | ✅ canônico (descendência direta Família-Pilastra Argéndia) | `deep/eras/era-1-pre-codigo.md` §9.2 + §9.5 |
+| **Vilarejo do Vale Ferraz** | Vilarejo-fronteira | Cross-eras (fundado -720) | Região central, descendência Família-Pilastra Ferraz | ✅ canônico (variedade canônica de milho ferraz) | `deep/eras/era-1-pre-codigo.md` §9.2 + §9.5 |
+| **Vilarejo da Margem-do-Pelicano** | Vilarejo-fronteira | Cross-eras (fundado -720) | Região meridional, descendência Família-Pilastra Vanderbist | ✅ canônico (variedade canônica de batata-de-margem; sob proteção Pelicano Branco) | `deep/eras/era-1-pre-codigo.md` §9.2 + §9.6 |
+| **Vilarejo da Selve-do-Norte** | Vilarejo-fronteira | Cross-eras (fundado -720) | Região setentrional, descendência Família-Pilastra | ✅ canônico (variedade canônica de raiz-amarga) | `deep/eras/era-1-pre-codigo.md` §9.2 + §9.6 |
+| **Vilarejo da Pedra-Cantante** | Vilarejo-fronteira | Cross-eras (fundado -720) | Região oriental, descendência Família-Pilastra | ✅ canônico (variedade canônica de erva-de-pedra) | `deep/eras/era-1-pre-codigo.md` §9.2 + §9.6 |
+| **Vilarejo do Vale Boroshova** | Vilarejo-fronteira | Cross-eras (fundado -720) | Refúgio canônico da Linhagem Boroshova-Vance | ✅ canônico (origem Vesperina Boroshova-Vance, Anselmo Boroshova-Vance, Praxídice Boroshova-Vance) | `deep/eras/era-1-pre-codigo.md` §8.4 + §9.3 + §9.5 + §9.7 |
 
 ## 5. Pontos geográficos / sub-locais relevantes
 
@@ -75,6 +80,11 @@
 | **Catedral do Cronômetro-Hilário** (Pátio) | Sub-local (Catedrais) | 1+2+3 | Catedrais Neo-Sylvania (wound environmental Bento) | ✅ canônico | `environments/03-catedrais-neo-sylvania.md` + `characters/bento-requiem.md` |
 | **Pilar Era 1 (canal esculpido)** | Sub-local (Dutos) | 1 | Dutos Infernais | ✅ canônico (vestígio Era 1 visível) | `environments/04-dutos-infernais.md` |
 | **Trilha dos Pioneiros** | Sub-local (Selve) | 2 | Selve Sombria | ✅ canônico (50 placas latão Era 2) | `environments/02-selve-sombria.md` |
+| **Trilha do Pelicano** | Sub-local (rota canon Selve) | Cross-eras (estabelecida -720) | Direção noroeste da Catedral-Mãe submersa | ✅ canônico (terminação Pelicano Branco; marcos: Pedra do Carrego, Fonte da Margem-Clara, Cruzamento dos Acaceiros Antigos) | `deep/eras/era-1-pre-codigo.md` §8.9 + §9.6 |
+| **Trilha da Garça-Preta** | Sub-local (rota canon Selve) | Cross-eras (estabelecida -720) | Direção sudoeste da Catedral-Mãe submersa | ✅ canônico (terminação Margem-do-Pelicano; marcos: Charco da Garça, Pedra do Salto) | `deep/eras/era-1-pre-codigo.md` §8.9 + §9.6 |
+| **Trilha do Caracará-Cinza** | Sub-local (rota canon Selve) | Cross-eras (estabelecida -720) | Direção amplamente distribuída em horizonte geográfico amplo | ✅ canônico (marcos: Encruzilhada das Três Águas, Pedra-Cantante, Vale da Selve-do-Norte, Cruzamento do Vale Ferraz, Limites da Selve Profunda) | `deep/eras/era-1-pre-codigo.md` §8.9 + §9.6 |
+| **Praça do Êxodo** | Sub-local (ponto canônico) | Cross-eras (estabelecida -720) | Ponto canônico de partida do Êxodo de -720 | ✅ canônico (ata fundacional preservada in-situ em placa basaltica; ritos cerimoniais anuais conduzidos pela Ordem Recursiva: Vigília do Aniversário + Leitura Institucional + Vigília Noturna da Continuidade) | `deep/eras/era-1-pre-codigo.md` §8.9 + §9.6 |
+| **Rota da Semente Recursiva** | Sub-local (rota etnobotânica Era 2) | 2 tardia (-250 a -130) | Circulação entre os 5 vilarejos-fronteira canônicos | ✅ canônico (ciclo institucional de aproximadamente 13 meses; circulação descentralizada de sementes-relíquia preservadas em ampolas herméticas) | `deep/eras/era-1-pre-codigo.md` §9.2 |
 | **Quintal Penkin (antena clandestina)** | Sub-local (Periferia) | 3 | Periferia, vizinho Dante | ✅ canônico (foreshadow Dante) | `environments/06-periferia.md` |
 | **Caleidoscópio (Mirage)** | Sub-local (Mirage) | 3 | Setor Mirage | ✅ canônico | `environments/05-setor-mirage.md` |
 | **Catacumbas Cult (Mirage níveis -1/-2/-3)** | Sub-local (Mirage subterrâneo) | 1 (-3 nascente Neo-Sylvania) + 3 | Sob Setor Mirage | ✅ canônico (Iara descobriu nascente) | `environments/05-setor-mirage.md` |
