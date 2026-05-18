@@ -85,6 +85,8 @@ Base canônica imutável: `sinopse.md` (worldbuilding + protagonista) + `Resourc
 gusworld/
 ├── CLAUDE.md
 ├── TODO.md              # backlog canônico (skill tab_pendencias)
+├── CHARS.md             # inventário canônico de TODOS personagens nomeados (atualizar sempre que criar novo)
+├── PLACES.md            # inventário canônico de TODOS lugares nomeados (settings/cidades/catedrais/sub-locais; atualizar sempre que criar novo)
 ├── sinopse.md           # base canônica imutável
 ├── docs/                # ver acima
 ├── engine/              # módulos Godot reutilizáveis (orbital_camera, turn-based, dialogue, save)

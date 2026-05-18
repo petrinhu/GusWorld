@@ -19,7 +19,13 @@ Tabela canônica de pendências e planejamento. Atualizar via skill `/tab_penden
 | F1.13 | F1-Concepção | Art sheets produção 7 chars faltantes (`docs/art/characters/`) | Média | F1.10 | Alta | ⏳ Pendente | — |
 | F1.14 | F1-Concepção | Validação concept art PNGs vs specs canônicas | Média | F1.10 | Baixa | ⏳ Pendente | — |
 | F1-DL.0 | F1-DeepLore | Setup pasta `docs/narrative/deep/` + `_INDEX.md` canônico + memo `project_deep_lore_canonico` | Alta | F1.5, F1.6 | Baixa | ✅ Concluído | — |
-| F1-DL.1 | F1-DeepLore | R1 — Eras (era-1, era-2, era-3, transicoes — 4 docs ~18k palavras) | Alta | F1-DL.0 | Alta | ⏳ Pendente | — |
+| F1-DL.1 | F1-DeepLore | R1 — Eras (era-1, era-2, era-3, transicoes — 4 docs). Era 1 alvo Fibonacci base 4: 286k pal | Alta | F1-DL.0 | Alta | 🔄 Em andamento | — |
+| F1-DL.1.6 | F1-DeepLore | Era 1 §6 Acústica e luz reativa (14.5k pal, 8 NPCs Ordem Recursiva, 4 sub-locais) | Alta | F1-DL.0 | Alta | ✅ Concluído | — |
+| F1-DL.1.7 | F1-DeepLore | Era 1 §7 Bancos sementes-relíquia + Ordem Recursiva embrionária (33.4k pal, 52 queries; 11 NPCs + 9 sub-locais; axiologia canon aplicada) | Alta | F1-DL.1.6 | Alta | ✅ Concluído | — |
+| F1-DL.1.8 | F1-DeepLore | Era 1 §8 Queda multi-hipótese (~42k pal, 84 queries Fibonacci) | Alta | F1-DL.1.7 | Alta | ✅ Concluído | — |
+| F1-DL.REFAC | F1-DeepLore | Refactor fluidez prose deep-lore — voz Stephenson/Sterling atual lê como palavras soltas/robótica, baixa qualidade literária. Reescrever §§6-8 (e §§9-10 quando concluídas) com cadência narrativa natural, varia ritmo de frase, reduz repetição obsessiva de marcadores ritualísticos (`articulada em registro`, `preservada em registro institucional`, `em horizonte temporal cumulativo`, `configuração cuja consequência operacional cumulativa verificável`) preservando conteúdo canônico, NPCs, geografia, datações, axiologia, Fibonacci. Via narrative-writer, briefing focado em fluência literária Stephenson/Krasznahorkai sem perder densidade técnica. Bloqueia F5-BK.1 (consolidação livro Volume 1) | Média | F1-DL.1.10 | Alta | ⏳ Pendente | — |
+| F1-DL.1.9 | F1-DeepLore | Era 1 §9 Vestígios cross-era (~68k pal, 136 queries Fibonacci) | Alta | F1-DL.1.8 | Alta | ⏳ Pendente | — |
+| F1-DL.1.10 | F1-DeepLore | Era 1 §10 Trecho in-character Verônica Atelaiá (~110k pal, 220 queries Fibonacci) | Alta | F1-DL.1.9 | Alta | ⏳ Pendente | — |
 | F1-DL.2 | F1-DeepLore | R2 — Facções (Sterling Corp, FIR, Ordem Recursiva, Cult Mirage, Underground Silêncio, Pelicano Branco, menores — 7 docs ~20k) | Alta | F1-DL.1 | Alta | ⏳ Pendente | — |
 | F1-DL.3 | F1-DeepLore | R3 — Settings deep (8 settings ~26k) | Alta | F1-DL.2 | Alta | ⏳ Pendente | — |
 | F1-DL.4 | F1-DeepLore | R4 — Characters deep (Gus "Dragon" + 6 companions ~35k) | Alta | F1-DL.3 | Alta | ⏳ Pendente | — |
@@ -81,7 +87,7 @@ Tabela canônica de pendências e planejamento. Atualizar via skill `/tab_penden
 | F5.2 | F5-Gold/RC | Auditoria final: `AUD` grupo zerado, `docs/auditoria/deploys/` populado | Alta | F5.1 | Média | ⏳ Pendente | — |
 | F5.3 | F5-Gold/RC | Release tag v1.0.0 + release notes | Alta | F5.2 | Baixa | ⏳ Pendente | — |
 | F5.4 | F5-Gold/RC | Post-launch patch plan | Média | F5.3 | Média | ⏳ Pendente | — |
-| F5-BK.1 | F5-Livro | Consolidação Volume 1 — Bíblia worldbuilding (revisão + prefácio + sumário + glossário + índice + capa) | Alta | F5.3, F1-DL.9 | Alta | ⏳ Pendente | — |
+| F5-BK.1 | F5-Livro | Consolidação Volume 1 — Bíblia worldbuilding (revisão + prefácio + sumário + glossário + índice + capa) | Alta | F5.3, F1-DL.9, F1-DL.REFAC | Alta | ⏳ Pendente | — |
 | F5-BK.2 | F5-Livro | Consolidação Volume 2 — Antologia narrativa (14 contos in-character revisados + arco coletivo + prefácio) | Alta | F5-BK.1 | Alta | ⏳ Pendente | — |
 | F5-BK.3 | F5-Livro | Tradução en-intl dos 2 volumes (post-release v1.0.0; usar i18n CSV pra parts já marcadas) | Média | F5-BK.2, F2-S.11 | Alta | ⏳ Pendente | — |
 | F5-BK.4 | F5-Livro | Publicação livro (digital + print-on-demand: KDP, Lulu ou similar) | Média | F5-BK.3 | Média | ⏳ Pendente | — |
@@ -115,3 +121,4 @@ Tabela canônica de pendências e planejamento. Atualizar via skill `/tab_penden
 - Grupos `F3-F5` placeholders altos. Vão ser quebrados em itens granulares quando F2 fechar.
 - **Cortes G1 (`CUT.*`)** = decisões one-way doors do GDD §9. Não fazer em v1.
 - **Disciplina antes de release** (ver memória `project_qa_deploy_disciplina`): AUD zerado + assinatura nominal em deploy irreversível (sub-fase 5.3: 48h + 30d offline).
+- **F1-DL.REFAC (débito literário)**: prose deep-lore §§6-8 atual prioriza densidade técnica obsessiva sobre fluência literária. Marcadores ritualísticos hiper-repetidos quebram cadência. Refactor obrigatório antes de F5-BK.1 (consolidação livro). Não bloqueia ciclos 9-10 (preferível terminar Era 1 inteira e refactorar tudo de uma vez).

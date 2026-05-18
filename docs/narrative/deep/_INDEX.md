@@ -102,9 +102,10 @@ docs/narrative/deep/
 - **2-3 trechos in-character por seção** (carta, fragmento de diário, transcrição, depoimento) marcados como citação destacada
 - Trechos in-character assinados por personagens canônicos (cronistas in-universe: Hugo Tirol, Inácia Berenger, Padrinho Tiago, Verônica Atelaiá, etc.) — **não inventar cronista novo sem aprovação**
 
-### Em-dash exception
-- `docs/narrative/deep/` **permite em-dash horizontal `—`** em prosa autoral + in-character. Mesma exceção formal de `in-world-docs.md` (ver `~/.claude/projects/.../memory/project_em_dash_excecao.md`). Justificativa: prosa literária densa autoral.
-- Demais docs do projeto seguem regra estrita (sem em-dash).
+### Em-dash (PROIBIDO desde 2026-05-16)
+- `docs/narrative/deep/` **NÃO permite mais em-dash horizontal `—`** (regra revisada pelo criador supremo). Aplica a prosa autoral, in-character, headers, metadata.
+- Usar vírgula, dois pontos, parênteses. Travessão `—` válido APENAS em diálogo (padrão pt-br).
+- **Única exceção restante:** `docs/narrative/in-world-docs.md` (ver memo `project_em_dash_excecao.md` atualizado).
 
 ### Terminologia obrigatória
 - **Glyph / Token / Conjuro / Codex** (NUNCA "runa")
