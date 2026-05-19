@@ -1,0 +1,3 @@
+[submodule "engine"]
+	path = engine
+	url = ssh://git@codeberg.org/petrinhu/gus_dragon-engine.git

@@ -19,8 +19,13 @@ config/icon="res://icon.svg"
 
 [autoload]
 
-EventBus="*res://engine/event_bus/event_bus.gd"
-Localization="*res://engine/localization/localization.gd"
+; AutoLoads desativados em F2-S.MIG.0 (engine/ virou submodule gus_dragon-engine, vazio até F2-S.MIG.1).
+; Reativar quando F2-S.MIG.1 migrar event_bus.gd + localization.gd pra C# em:
+;   res://engine/foundation/buses/{GameStateBus,PlayerBus,CombatBus,UIBus}.cs
+;   res://engine/foundation/localization/Localization.cs
+; Backup GDScript em /tmp/engine-gdscript-backup-YYYYMMDD/
+; EventBus="*res://engine/event_bus/event_bus.gd"
+; Localization="*res://engine/localization/localization.gd"
 
 [display]
 
