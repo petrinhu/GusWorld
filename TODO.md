@@ -42,8 +42,8 @@ Tabela canônica de pendências e planejamento. Atualizar via skill `/tab_penden
 | F2-S.6 | F2-Setup | Setup `.gitignore` Godot completo (`.import/`, `*.translation`, etc) | Alta | F2-S.3 | Baixa | 🟡 Parcial | — |
 | F2-S.7 | F2-Setup | Setup Forgejo Actions runner local | Alta | F2-S.4 | Média | ⏳ Pendente | — |
 | F2-S.8 | F2-Setup | Setup `CONTRACT.md` projeto, escopo B game-focused: RFC 2119 + Conventional Commits com scopes game-dev + branching solo + 12h cooling-off + DoD por tipo + perf budget GTX 1050+4GB + a11y gates D1 (4 obrigatórios) + save forward-only. 319 linhas | Alta | F2-S.3 | Baixa | ✅ 2026-05-19 | — |
-| F2-S.9 | F2-Setup | Setup `TESTES.md` projeto (T1-T15 / A1-A13 do manual canônico) | Alta | F2-S.8 | Baixa | ⏳ Pendente | — |
-| F2-S.10 | F2-Setup | Setup `CHANGELOG.md` + `README.md` (hub-and-spoke) | Alta | F2-S.3 | Baixa | ⏳ Pendente | — |
+| F2-S.9 | F2-Setup | Setup `TESTES.md` projeto, escopo B Godot-adaptado: subset T-sections (T1 GUT + T2 gdformat/gdlint + T5 deps + T8 secrets + T12 CVE) + A-sections (A1 descoberta + A2 camadas + A3 a11y + A6 cobertura + A7 acoplamento + A9 milestone + A10 pré-release) | Alta | F2-S.8 | Baixa | ✅ 2026-05-19 | — |
+| F2-S.10 | F2-Setup | Setup `CHANGELOG.md` Keep-a-Changelog format + `README.md` hub-and-spoke (escopo B) | Alta | F2-S.3 | Baixa | ✅ 2026-05-19 | — |
 | F2-S.11 | F2-Setup | Setup i18n Godot estrutura (`tr()` + `game/translations/strings.csv` header `keys,pt_br,en_intl` + fallback `pt_BR → en_intl` + fonts Latin Extended Noto/Inter). Dev fica em pt-br; coluna en_intl vazia até pós-release v1.0.0 | Alta | F2-S.2, F2-S.9 | Média | ⏳ Pendente | — |
 | F2-S.12 | F2-Setup | Audit + CI lint rule: zero hardcoded strings user-facing em GDScript (grep regex em CI fora de `tr()`) | Alta | F2-S.11, F2-CI.2 | Média | ⏳ Pendente | — |
 | F2-S.13 | F2-Setup | `docs/i18n/translatable-assets.md` (inventário de assets visuais com texto: sinais, placas, vitrais, propaganda Sterling, banners — plano de swap por locale pós-release) | Média | F2-S.11 | Baixa | ⏳ Pendente | — |
