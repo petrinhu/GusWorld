@@ -27,7 +27,7 @@ Tabela canônica de pendências e planejamento. Atualizar via skill `/tab_penden
 | F1-DL.1.9 | F1-DeepLore | Era 1 §9 Vestígios cross-era (~68k pal, 136 queries Fibonacci) | Alta | F1-DL.1.8 | Alta | ✅ Concluído | — |
 | F1-DL.1.10 | F1-DeepLore | Era 1 §10 Trecho in-character Verônica Atelaiá (~110k pal, 220 queries Fibonacci) — entregue 93k pal (~85% alvo). 7 dispatches incrementais voz Eco Adso fluida. Lacuna +17k em F1-DL.REFAC | Alta | F1-DL.1.9 | Alta | ✅ Concluído | — |
 | F1-DL.2 | F1-DeepLore | R2 — Facções (Sterling Corp, FIR, Ordem Recursiva, Cult Mirage, Underground Silêncio, Pelicano Branco, menores — 7 docs, 22.030 pal entregues; 20 queries RAG densas; audit narrative-designer aprovado com 6 fixes críticos aplicados) | Alta | F1-DL.1 | Alta | ✅ 2026-05-19 | — |
-| F1-DL.3 | F1-DeepLore | R3 — Settings deep (8 settings ~26k) | Alta | F1-DL.2 | Alta | ⏳ Pendente | — |
+| F1-DL.3 | F1-DeepLore | R3 — Settings deep (8 settings, 25.201 pal entregues; 20 queries RAG densas; audit narrative-designer aprovado com 4 fixes críticos aplicados) | Alta | F1-DL.2 | Alta | ✅ 2026-05-19 | — |
 | F1-DL.4 | F1-DeepLore | R4 — Characters deep (Gus "Dragon" + 6 companions ~35k) | Alta | F1-DL.3 | Alta | ⏳ Pendente | — |
 | F1-DL.5 | F1-DeepLore | R5 — Antagonistas + NPCs (Sterling Locke + Patch-Zero + NPCs antologia ~12k) | Alta | F1-DL.4 | Alta | ⏳ Pendente | — |
 | F1-DL.6 | F1-DeepLore | R6 — Magic (Glyph/Token/Conjuro/Codex + 4 linguagens + natureza-matemática ~10k) | Alta | F1-DL.5 | Alta | ⏳ Pendente | — |

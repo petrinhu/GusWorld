@@ -1,0 +1,98 @@
+# 01 GusWorld City (Núcleo Metropolitano + distritos)
+
+> Status canônico, deep-lore R3 F1-DL.3 Settings. Cross-ref obrigatório, [[environments/01-cidade-cyber-gotica]] (Bloco F, padrão fixo 117 linhas), [[lore-bible]] §5, [[timeline]] Era 3, [[factions]], [[deep/factions]] R2, [[design/pillars]] Pillar 5, PLACES.md, CHARS.md, Era 1 §§7-10.
+>
+> **Voz autoral**, Stephenson/Sterling cyberpunk denso com verniz Blade Runner. Cidade-protagonista. Cláusulas longas, aposição rica, neologismos in-universe. Sem em-dash horizontal na prosa autoral, sem siglas maçônicas, sem hipersaturação.
+
+---
+
+## 1. Origem e estratificação cross-era
+
+A Cidade não foi fundada, foi sedimentada. Cada nível de pavimento que se rebenta no Núcleo Metropolitano, sob o peso do tráfego pesado de carros-utilitários da Federação Industrial de Reciclagem, expõe o nível imediatamente anterior, e o nível imediatamente anterior expõe um nível antes dele, e assim a cidade desce em camadas até onde nenhuma escavação Sterling jamais foi autorizada a chegar, por motivos administrativos que ninguém da Corp se preocupou em registrar por escrito.
+
+A camada mais funda, segundo rumor não corroborado por documento oficial mas preservado em pichação Underground em vários becos do bairro Antigo, seria substrato Neo-Sylvania pré-Êxodo, aproximadamente ano -720, fundações líticas de uma cidade-modelo cooperativa que precedeu o Hiato e cujo plano arquitetônico ortogonal ainda condiciona, por debaixo, a grade civil moderna. A camada subsequente, Era do Compilador, ano -150 a ano -25, é a Cidade material visível, prédios densos de oito a catorze andares de tijolo cinza e latão oxidado encostados uns nos outros, escadarias externas de ferro fundido subindo por fachadas, oficinas C-Arcane periféricas, subestações ferroviárias, vitrais comemorativos esmaecidos pela poluição lumínica, placas cerimoniais com nomes de engenheiros que ninguém mais soletra direito. A camada mais recente, Era Sterling, ano -25 ao presente, é a verniz holográfica corporativa, painéis Janelarum cobrindo fachadas Era 2 inteiras, cartazes cromados que dizem "continue" em loop a cada quatro minutos, drones de patrulha amarelo-industrial circulando os últimos andares dos prédios mais altos.
+
+A Cúpula Sterling, eixo do Núcleo Metropolitano, foi iniciada em -12, doze anos antes do presente do jogo, no setor entre o Núcleo e o Anel Verde, e seu skyline cresce mês a mês como um tumor cromado sobre a silhueta densa-baixa da Cidade antiga. A Tetra-Torre Janelarum, lado norte do Núcleo, é estrutura administrativa Sterling em quatro torres geminadas, construída em -30, antes mesmo da consolidação Sterling Corp, e seus oitenta e nove andares de programa interno (numeração corporativa, não civil) abrigam departamentos cuja função permanece deliberadamente opaca à imprensa. As fachadas civis da Tetra-Torre, vistas da rua, mostram doze andares de painéis-tela, mesma propaganda, três décimos de segundo fora de sincronia. A discrepância entre os oitenta e nove andares de programa Sterling e os doze andares civis visíveis é arquitetura corporativa em si mesma, a Cidade tem mais Sterling do que vê.
+
+Há na Cidade, portanto, três Cidades superpostas. A Cidade Sterling, holográfica, performática, em loop. A Cidade Era 2, material, cansada, sustentando a Cidade Sterling por contrato silencioso de manutenção pendente. E a Cidade Neo-Sylvania, lítica, submersa, lembrada apenas por quem decifra cripto-glifo em chão rachado, e que ainda condiciona, por traçado e por rumor, tudo o que se constrói por cima.
+
+## 2. Geografia profunda e sistema espacial
+
+A Cidade organiza-se em cinco setores macro de gestão, herança administrativa Era 2 que Sterling Corp manteve por economia de papel: Núcleo Metropolitano (eixo civil, Cúpula Sterling, Tetra-Torre, Praça da Compilação), Periferia (a oeste, oficinas, subestações FIR, casa Berenger), Setor Mirage (adjacente ao Núcleo, distrito ofuscamento e propaganda Cult), Zona do Silêncio (norte, distrito acusticamente morto, antenas desativadas), Distritos Inferiores (subterrâneo industrial, Dutos Infernais e catacumbas).
+
+Por baixo dessa partição macro, vinte e um distritos administrativos canon dividem o tecido urbano em unidades fiscais que Sterling Corp reconhece para efeito de cobrança de Voucher Janelarum, treze estações de metro elevado Era 2 ainda em operação pontuam o tecido visível, oito pontes principais cruzam os canais cyber-góticos que cortam a Cidade no eixo leste-oeste, e cento e quarenta e quatro holovias arteriais (numeradas em registro Sterling Corp, embora a numeração salte de modo administrativamente conveniente) costuram o céu sobre as cabeças. Acima das holovias, drones. Abaixo delas, multidão. Entre as duas camadas, holograma.
+
+A geografia vertical é mais reveladora que a horizontal. Subsolo profundo, Dutos Infernais e catacumbas Cult Mirage e câmaras Era 1 não-mapeadas, lugar onde corrente alta corre em paralelo a culto subterrâneo e a vestígio litúrgico, sem que nenhum dos três se reconheça ao outro. Nível térreo, mercado, comércio, multidão pulverizada, vendedor itinerante, criança Janelarum, patrulha FIR em dupla. Mezanino corporativo, escritórios Sterling Corp, terminais de auditoria, salas de reunião onde se escreve "ajuste de portfólio menor" para significar a morte de um operário de dezesseis anos numa subestação. E acima do mezanino, em geometria vertical Sterling pura, Tetra-Torre, drones, hologramas, e Cúpula Sterling como abóbada de comando crescendo cromada por cima de tudo.
+
+## 3. Habitantes e comunidades
+
+A multidão metropolitana é o substrato social da Cidade e é também a sua principal infraestrutura. Sterling Corp opera sobre multidão pulverizada, FIR contrata operário com Voucher Janelarum, Cult Mirage capta adepto solitário pela porta dos fundos, Underground do Silêncio tece rede por sussurro em becos. Cada cidadão é simultaneamente cliente Sterling, contribuinte FIR, alvo potencial de Cult, e nó possível Underground, conforme o turno, conforme o bairro, conforme o que precisa naquela tarde.
+
+Sterling Locke ocupa o vértice da pirâmide. Vive na Cúpula Sterling, raramente sai dela, e quando sai é por holograma em geometria angular monolítica que aparece em cada poste do Núcleo Metropolitano dizendo "continue", "continue", "continue", em voz cromada neutra, em loop de quatro minutos. O Diretor Cassiano Vorto da Federação Industrial de Reciclagem frequenta café da esquina no Núcleo em horário comercial, negocia ali mesmo entre tomadas de café-de-neurônio, e seu cartão de visita aparece de vez em quando caído na sarjeta do lado de fora do estabelecimento, sinal involuntário de presença.
+
+Na Periferia, Inácia Berenger sucateia hardware Apex-Data Era 2 corporativa morta em bancada própria, com ferramenta herdada e com mão calejada por dezenove anos de aposentadoria forçada. Ela vai ao Mercado da Sucata Honesta nos dias úteis, atravessando o limite Núcleo-Periferia em pé. Bartolo Penkin opera o Quintal Penkin, em outro ponto da Periferia, oficina de antena clandestina sob aparência de ferro-velho, e seu filho Mateus comenta com vizinhos que "Dante sempre some no horário da manutenção Sterling", sem saber direito o que está dizendo. Padim Tércio Almagre, mentor enganado de Dante, atravessa o bairro periferia-Núcleo em rotina anômala, some por uma semana, volta como se nada tivesse acontecido.
+
+Mestre Hugo Tirol, tradicionalista aliado da biblioteca Velhusto, atravessa o Núcleo em trânsito quando vem da Catedral de São Camilo até a Universidade Pública, e o cronômetro dele bate oito e treze pontual em qualquer cidade, em qualquer continente, em qualquer ano da Era Sterling. Joaquim Bartolomeu, do Underground, técnico analógico veterano da Zona do Silêncio, atravessa o Núcleo eventualmente em missão de cabeamento, sempre de tarde, sempre de chapéu, sempre comprando café-de-neurônio na Vanda do Café antes de seguir caminho. Adila Murmúrio, Hierofante Cult Mirage, raramente sai do Caleidoscópio, mas seu sinal vaza pra propaganda Janelarum em postes adjacentes ao Mirage, e quem mora ali ouve a Atualização Sensorial sem nunca ter pedido. Helga Riza, escritora subterrânea Underground, mora num quarto sem janela em sub-bairro do Núcleo norte, escreve à mão em caderno de papel reciclado, e suas pichações compiladas circulam em xerox de balcão de bar.
+
+## 4. Eventos seminais
+
+A linha do tempo da Era Sterling, na escala da Cidade, é composta de poucos eventos canonizados e muitos eventos privados. Os eventos canonizados, em ordem cronológica reversa contada a partir do presente do jogo, são:
+
+- **Ano -19.** Falência forçada da Apex-Data Systems via Chapter 11 orquestrado por Locke. Inácia Berenger demitida com indenização nominal. Liquidação patrimonial libera protocolos Era 2 que Locke incorpora ao próprio acervo. Primeiro grande movimento Sterling no eixo corporativo da Cidade.
+- **Ano -16.** Audit interno vazado da Apex-Data circula clandestinamente em xerox de bar. Underground do Silêncio preserva cópia em arquivo paralelo. Documento revela engenharia deliberada de colapso. Sterling Corp nega oficialmente, FIR confisca cópias visíveis, a folha continua circulando.
+- **Ano -13.** Subestação 7. Davi Berenger, dezesseis anos, morre em operação descrita por FIR como "ajuste de portfólio menor". Viúva Inácia indenizada em oitocentos e cinquenta vouchers Janelarum mediante termo de quitação. Cauã nasce alguns meses antes; cresce sob ausência do irmão que nunca conheceu como presença.
+- **Ano -12.** Sterling consolida tudo em Sterling Corp. Inicia construção da Cúpula Sterling no eixo entre Núcleo e Anel Verde. Sede canônica nasce. Skyline da Cidade muda de modo lento e perceptível.
+- **Ano -10.** Sterling Corp absorve Janelarum 2.0, antes plataforma independente, agora ferramenta Sterling. Sistema operacional fica oficialmente subordinado, terminais públicos da Tetra-Torre passam a rodar versão corporativa.
+- **Ano -8.** Batida da FIR na casa Neumann, Zona do Silêncio, toca-discos histórico confiscado. Linda Neumann tem quatro anos, lembra mal, lembra direito da ausência.
+- **Ano -3.** Saque da Catedral Menor de São Vargas, dentro da Selve, comissionado por Sterling. Caminhão FIR atravessa Anel Verde no horário em que a patrulha justamente troca de turno. Coincidência administrativa.
+- **Ano -0.5.** Contaminação da Catedral Menor Atelaiá. Aldebrando Chevalier, pai de Bento, morre. Patch-Zero amostra primeira manifestação visível pública. Sterling rejeita a relevância em comunicação interna.
+- **Ano -0.25.** Escape de Patch-Zero do laboratório central da Cúpula Sterling. Sinal catalyst do jogo. Locke considera contenção interna, posterga decisão.
+- **Ano 0.** Chegada de Gus em ponto de inflexão. Início dos arcos companions.
+
+Os eventos privados, em escala individual, não comparecem em comunicação Sterling. Cada apartamento Era 2 tem o seu. Cada janela do Núcleo Metropolitano, vista da rua de fora, é um evento privado em curso.
+
+## 5. Camadas materiais cross-era
+
+A textura da Cidade é cross-temporal por sobreposição literal. Em qualquer rua do Núcleo Metropolitano, uma caminhada de oitenta e nove passos atravessa, sem aviso, três Eras de material.
+
+Cripto-glifos Neo-Sylvania na base de estátuas modernas, pedra Era 1 que serve hoje de pedestal a monumento Era 2 que serve hoje de poste para cartaz Era 3, e o cartaz Sterling Corp cobre o cripto-glifo, e a chuva refrativa de manhã descola o cartaz pela borda inferior, e quem passa e olha pra baixo vê dois centímetros de grade 3×3 com ponto no centro, e segue andando, e esquece. Cronômetros mecânicos Era 2 ainda batendo em fontes públicas, mecanismo de latão de setecentos anos calibrado num tique exato por segundo, e a multidão programa rotina por aquele tique sem saber que programa. Vitrais Era 2 rachados em fachadas decadentes do bairro Antigo, sob holograma Sterling que cobre o vitral, mas que à noite, quando o holograma trava por três segundos a cada quatro, mostra o vitral original embaixo, cromaticamente saturado, antigo.
+
+Pavimento tesselado em praças centrais do Núcleo Metropolitano, alternância de quadrados claros e escuros em geometria precisa, parte original Era 2, parte vinil estampado Sterling Corp aplicado por cima como restauração nominal, e a Sterling Corp não sabe o que está copiando, sabe que dá um ar antigo bonito de cartão postal. Acaceiros de tronco vermelho rachando o asfalto em becos esquecidos dos sub-bairros leste, árvore que ninguém plantou e que ninguém poda, e cujas raízes sobem por baixo da calçada com agenda própria.
+
+Pichações Underground sobrepostas a outdoors Sterling, frase em estêncil preto sobre fundo cromado, e a frase típica é "Compila com a gente", reverberação direta da pichação Polis-Vermelha do compilado de Helga Riza, e cada cartaz Sterling que cobre um cripto-glifo gera, por reação automática Underground, uma pichação que cobre o cartaz que cobre o cripto-glifo, e a Cidade fica assim, camada sobre camada, com a multidão atravessando.
+
+Cabos analógicos descascados visíveis através de janelas Janelarum quebradas no Edifício Vance, no Edifício Berenger, em prédios que ninguém repara mais. Ashlar bruto e polido alternados em fachadas decadentes Era 2, blocos rugosos e blocos lisos lado a lado, lembrança de canteiro de obra que ainda fala em alfabeto que a Cidade esqueceu como ler.
+
+## 6. Trecho in-character (Helga Riza)
+
+> *Arquivo de Pichações Compiladas, Volume III. Núcleo Metropolitano. Anotação manuscrita do dia 13 de junho, ano 0.*
+>
+> *Hoje contei vinte e um outdoors Sterling sobrepostos numa fachada só. A fachada é do antigo prédio do correio Era 2, esquina da Avenida da Pilha com a Rua dos Cinco Compiladores. Cada outdoor mede cerca de oito metros por três. Vinte e um outdoors. Imagine.*
+>
+> *Por baixo do mais velho, datado de oito anos atrás pelo carimbo Sterling Corp que ainda dá pra ler num canto rasgado, há pichação. Letra de estêncil. Tinta preta sobre azulejo Era 2 craquelado. Diz, compila com a gente. Mesma frase de Polis-Vermelha, mesma fonte, mesmo espaçamento entre letras. Não foi cópia, foi continuidade. A pichação foi feita antes do primeiro outdoor Sterling chegar ali. Ela esperou, deitada em azulejo, vinte e um outdoors em cima dela. Dormiu coberta.*
+>
+> *Andei oitenta e nove passos do correio até a Praça da Compilação. Contei. Sempre conto. No oitavo passo, parei numa rachadura. Da rachadura subia raiz de acaceiro de tronco vermelho. No vigésimo primeiro, parei num cartaz da Festa da Compilação rasgado amarrado em poste. No quinquagésimo quinto, parei num bloco de chão hexagonal Neo-Sylvania que tinha sido exposto pela queda de uma placa Sterling Corp. No bloco, cripto-glifo. Grade três por três. Ponto no centro do quadrante inferior direito. Letra que não se lê em voz alta, letra que se vê.*
+>
+> *No oitavo octogésimo nono passo, cheguei na Praça. A fonte ainda batia tique. Tique. Tique. Como sempre bate. Como bate há setecentos anos.*
+>
+> *Subi até o sexto andar do prédio onde moro e escrevi isto à mão. Cinco páginas. Treze parágrafos. Anotei a hora. Vinte e uma e oito. A janela está fechada. Por trás dela, holograma Sterling pisca azul fantasmagórico. Por trás do holograma, vitral Era 2 rachado. Por trás do vitral, o céu. O céu não está coberto.*
+
+## 7. Sombra e ambiguidade
+
+Sinais da Era 3 sobre as Eras anteriores são leitura primeiro estética, depois política, depois ontológica. Sterling Corp expande sua holografia mês a mês, e cada expansão é também uma operação de silenciamento sobre a memória material que estava ali antes. O cartaz cobre o vitral. O outdoor cobre o cripto-glifo. O holograma cobre o ashlar. A multidão passa, lembra do cartaz, esquece do vitral, esquece da pedra de baixo. É a maneira mais limpa de apagar, sobrepor sem destruir, deixar a memória material intacta debaixo, e impedir o acesso visual. Quem quer ler precisa olhar pra baixo, e ninguém olha pra baixo.
+
+Mas a Cidade resiste, em escala material, com paciência diferente da paciência humana. O cartaz desbota. O holograma trava. O outdoor descola da borda inferior, e o vitral aparece. A rachadura no asfalto cresce, e o acaceiro de tronco vermelho sobe. O cripto-glifo da base da estátua se expõe, oito centímetros, vinte e um centímetros, quando ninguém esperava. A Cidade não está organizada para resistir. Ela apenas resiste por matéria, por permanência. A Era 3 é cromada e pisca. A Era 2 é tijolo e cansa. A Era 1 é pedra e fica.
+
+Há rumor não corroborado, preservado em três pichações independentes do bairro Antigo e numa anotação manuscrita de Helga Riza datada de cinco meses atrás, segundo o qual o aquário central da Cúpula Sterling, exposição arquitetônica monumental que Sterling Corp inaugurou ano -8 como peça de propaganda institucional, teria sido instalado por acaso sobre antiga câmara submersa lítica de Era 1, possivelmente a Catedral-Mãe propriamente dita, possivelmente uma das catedrais menores derivadas. Sterling não sabe. Os engenheiros que tomaram a decisão de localização aprovaram o terreno pela densidade de lençol freático conveniente para o aquário, e a densidade do lençol freático naquele ponto é justamente o vestígio hidráulico do que teria sido o reservatório principal Neo-Sylvania, oitocentos e cinquenta anos atrás. O peixe colorido nada hoje sobre vitral submerso. Sterling olha pelo vitral cromado dele, em geometria angular monolítica, e não vê.
+
+Em fachada corroída da antiga Universidade Pública, lado leste do Núcleo, há inscrição parcial preservada por Era 2 e ignorada por Era 3, gravação em pedra que registra a quadragésima sétima proposição de algum tratado civil de engenharia cooperativa, autor desconhecido pela própria Universidade contemporânea, e a inscrição está hoje parcialmente coberta por holografia Sterling que anuncia curso de capacitação corporativa. Em outro prédio governamental Era 2 abandonado, próximo da Tetra-Torre, frontispício monumental ainda exibe esquadro e compasso esculpidos em pedra, parcialmente cobertos por painel holográfico cromado que anuncia, ironia involuntária, ferramenta de gestão Sterling Corp.
+
+Em vitrine de loja antiquária no bairro Antigo, abaixo de cartaz amarelado de leilão pendente há três anos, cordão de oitenta e nove nós trançados em fibra vermelha está exposto como peça curiosa de origem desconhecida. O dono da loja, idoso silencioso que veste avental de couro gasto, não sabe o que tem. Quem sabe não compra. Quem não sabe não compra porque não entende. O cordão fica.
+
+E em pichação Underground em beco do bairro Antigo, repetida em treze locais distintos do Núcleo Metropolitano por mão anônima paciente, está escrito o nome Helíaco Vyr em letra de estêncil simples, sem contexto, sem data, sem autoria. Quem lê em voz alta não entende. Quem não lê em voz alta, e que conhece o cantor primordial da Catedral-Mãe de oitenta gerações atrás, reconhece um eco. O nome circula sem corpo. A Cidade carrega Hiram Abiff em paralelo, e segue andando.
+
+A Cidade tem oitenta e nove andares de Tetra-Torre, vinte e um distritos administrativos, treze estações de metro elevadas, oito pontes principais sobre canais, cinco setores macro, cento e quarenta e quatro holovias arteriais. Funciona, apesar de si mesma. Continua, em loop a cada quatro minutos. Compila, com a gente.
+
+---
+
+**Última revisão:** 2026-05-19. Canônico deep-lore R3 F1-DL.3 Settings. Não modificar sem aprovação criador supremo. Cross-ref [[environments/01-cidade-cyber-gotica]] (Bloco F), [[lore-bible]] §5, [[timeline]] Era 3, [[factions]], [[deep/factions]] R2, [[design/pillars]] Pillar 5, PLACES.md, CHARS.md.
