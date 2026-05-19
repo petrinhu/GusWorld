@@ -16,4 +16,11 @@
   <ItemGroup>
     <ProjectReference Include="..\engine\Engine.csproj" />
   </ItemGroup>
+
+  <ItemGroup>
+    <!-- Excluir engine/ symlink (game/engine -> ../engine). Compilação engine via Engine.csproj. -->
+    <Compile Remove="engine/**" />
+    <None Remove="engine/**" />
+    <EmbeddedResource Remove="engine/**" />
+  </ItemGroup>
 </Project>

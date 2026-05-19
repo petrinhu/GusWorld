@@ -23,13 +23,11 @@ project/assembly_name="GusWorld"
 
 [autoload]
 
-; AutoLoads desativados em F2-S.MIG.0 (engine/ virou submodule gus_dragon-engine, vazio até F2-S.MIG.1).
-; Reativar quando F2-S.MIG.1 migrar event_bus.gd + localization.gd pra C# em:
-;   res://engine/foundation/buses/{GameStateBus,PlayerBus,CombatBus,UIBus}.cs
-;   res://engine/foundation/localization/Localization.cs
-; Backup GDScript em /tmp/engine-gdscript-backup-YYYYMMDD/
-; EventBus="*res://engine/event_bus/event_bus.gd"
-; Localization="*res://engine/localization/localization.gd"
+GameStateBus="*res://scripts/foundation/buses/GameStateBus.cs"
+PlayerBus="*res://scripts/foundation/buses/PlayerBus.cs"
+CombatBus="*res://scripts/foundation/buses/CombatBus.cs"
+UIBus="*res://scripts/foundation/buses/UIBus.cs"
+Localization="*res://scripts/foundation/localization/Localization.cs"
 
 [display]
 
