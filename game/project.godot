@@ -17,6 +17,10 @@ run/main_scene=""
 config/features=PackedStringArray("4.4", "GL Compatibility")
 config/icon="res://icon.svg"
 
+[dotnet]
+
+project/assembly_name="GusWorld"
+
 [autoload]
 
 ; AutoLoads desativados em F2-S.MIG.0 (engine/ virou submodule gus_dragon-engine, vazio até F2-S.MIG.1).
