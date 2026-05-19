@@ -105,7 +105,7 @@ Detalhes em [`docs/tech/build.md`](docs/tech/build.md).
 
 ## Tech stack
 
-- **Engine:** Godot 4 + GDScript (C# rejeitado pra G1, lentidão iteração solo)
+- **Engine:** Godot 4 + **C# .NET 8 AOT** (ADR-002 2026-05-19, supera decisão GDScript do ADR-001). GDScript MAY pra tooling editor-only. C++ GDExtension sob pressão perf medida.
 - **Renderer:** Forward+ (Godot 4)
 - **Visual:** 3D estilizado low-poly (referências: Sea of Stars, Sable, Death's Door). Sem PBR. Gradient atlas + vertex color. ~5 shaders custom.
 - **Câmera:** 3/4 rotacional + zoom orbital (referência Chrono Trigger, 3D real)

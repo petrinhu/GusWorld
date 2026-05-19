@@ -31,6 +31,8 @@ Este documento usa as palavras-chave **MUST**, **MUST NOT**, **REQUIRED**, **SHA
 
 Todo commit MUST seguir [Conventional Commits 1.0](https://www.conventionalcommits.org/) com scopes game-dev específicos.
 
+**Nota linguagem (pós-ADR-002 2026-05-19):** C# .NET 8 AOT é linguagem canon. Naming PascalCase pra classes/métodos/propriedades públicas, _camelCase pra fields privados. GDScript MAY pra tooling editor-only.
+
 ### Formato
 
 ```
@@ -133,17 +135,21 @@ Strategy: **`main` + `feat/*` PRs solo** com cooling-off seletivo.
 
 DoD MUST ser satisfeito antes de marcar task ✅ no TODO.md.
 
-### DoD: feat(engine) ou feat(game)
+### DoD: feat(engine) ou feat(game) [pós-ADR-002]
 
-- [ ] Código GDScript passa `gdformat` (sem warnings).
-- [ ] Código GDScript passa `gdlint` (zero erros, warnings justificados).
-- [ ] Cena teste demonstra feature funcional (scene + script standalone).
-- [ ] CI verde (lint + import + export ao menos Linux).
-- [ ] Se módulo `engine/*`: API pública documentada (docstring em métodos públicos).
-- [ ] Se toca `save_system`: migrator + teste do migrator com input/output esperado.
-- [ ] Strings user-facing via `tr()` (NUNCA hardcoded).
+- [ ] Código C# .NET 8 passa `dotnet format` (sem diffs).
+- [ ] Código C# passa Roslyn analyzer (zero warnings, ou justificados em commit body).
+- [ ] Cena teste demonstra feature funcional (scene + C# script standalone).
+- [ ] CI verde (`dotnet restore` + `dotnet build -c Release` + import + export Linux).
+- [ ] Se módulo `engine/*`: API pública documentada (XML doc comments `///` em métodos/classes públicos).
+- [ ] Se toca `save_system`: migrator + teste do migrator (xUnit/NUnit) com input/output esperado.
+- [ ] Strings user-facing via `Localization.TrMd("KEY")` (NUNCA hardcoded).
+- [ ] AOT-compatibility: zero uso de `dynamic`, reflection limitada a casos com `[DynamicallyAccessedMembers]`.
 - [ ] Commit message segue §2.
 - [ ] Cooling-off respeitado se feature grande (§3).
+
+**Legacy GDScript (validate_autoloads.gd, tooling):**
+- [ ] Passa `gdformat` + `gdlint` (somente em arquivos `.gd` editor-only).
 
 ### DoD: feat(art)
 

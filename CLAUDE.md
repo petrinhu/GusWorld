@@ -22,7 +22,7 @@ Bloco "Modo de operação" inserido em cada agent em `~/.claude/agents/`.
 
 ### Decisões fechadas
 
-- **Engine:** Godot 4 + GDScript. C# rejeitado pra G1 (iteração lenta solo). C++ GDExtension só sob pressão de perf.
+- **Engine:** Godot 4 + **C# .NET 8 AOT** (revisão ADR-002 2026-05-19). Decisão anterior GDScript canonizada em ADR-001 superada por critério "máxima performance em máquinas fracas". GDScript MAY pra tooling editor-only. C++ GDExtension sob pressão de perf medida. Ver `docs/tech/adr/ADR-002-csharp-aot-over-gdscript.md`.
 - **Visual:** 3D estilizado low-poly (Sea of Stars / Sable / Death's Door refs). Sem PBR. Gradient atlas + vertex color. ~5 shaders custom.
 - **Arquitetura:** engine modular reutilizável (`/engine/`) separada do game-specific (`/game/`). Engine vira repo próprio + Godot addons.
 - **Save format:** JSON versionado `save_version: 1` com migrators desde D1.

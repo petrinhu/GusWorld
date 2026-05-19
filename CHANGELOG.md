@@ -10,6 +10,8 @@ e este projeto adere a [Semantic Versioning](https://semver.org/spec/v2.0.0.html
 ## [Unreleased]
 
 ### Added
+- `docs/tech/adr/ADR-002-csharp-aot-over-gdscript.md` canonizado (Accepted, one-way door massivo). Mudança GDScript → C# .NET 8 AOT como linguagem primária. Critério: máxima performance em máquinas fracas (GTX 1050 target, Steam Deck).
+- `~/.claude/projects/.../memory/reference_godot_csharp.md` (síntese 3 páginas docs Godot C#).
 - `README.md` hub-and-spoke (escopo B aprovado).
 - `CHANGELOG.md` (Keep a Changelog format, escopo A aprovado).
 - `TESTES.md` adaptado Godot/GDScript (escopo B aprovado, T+A sections subset).
@@ -23,6 +25,7 @@ e este projeto adere a [Semantic Versioning](https://semver.org/spec/v2.0.0.html
 - Deep-lore Era 1 Pré-Código §§1-10: ~318k palavras canônicas em `docs/narrative/deep/eras/era-1-pre-codigo.md`.
 
 ### Changed
+- **BREAKING (ADR-002):** Linguagem canon pivot GDScript → C# .NET 8 AOT. `CLAUDE.md` decisões fechadas atualizadas. `CONTRACT.md` §2 + §4 DoD atualizados (PascalCase, dotnet format, xUnit). `README.md` tech stack atualizado.
 - `CLAUDE.md` atualizado: "Estado atual" reflete pivot Fase 1 para Fase 2 (ADR-001). Deep-lore canon ~365k pal entregue.
 - `TODO.md` atualizado: F1-DL.4-9 + F1-DL.REFAC reclassificados de Alta gating para Média paralelo orgânico. F2-S.1 ✅ (Godot 4.6.1 stable já instalado). F2-S.2 🔄 em andamento. F2-S.4 ✅ (repo Codeberg confirmado). F2-S.8 ✅ (CONTRACT.md canon).
 - Decisão canon pós-Era 1: Fibonacci descontinuado em contagem de palavras + RAG queries (20 queries fixas, alvos arredondados). Easter eggs Fibonacci + maçonaria MANTIDOS no texto/conteúdo.

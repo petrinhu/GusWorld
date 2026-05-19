@@ -12,18 +12,22 @@
 
 ## §0. Pré-requisitos + ferramentas
 
-### Stack GusWorld G1
+### Stack GusWorld G1 (pós-ADR-002)
 
-- **Godot 4.4+ stable** (testado em 4.6.1)
-- **GDScript** linguagem primária
-- **C++ GDExtension** apenas sob pressão de perf (não G1)
+- **Godot 4.4+ Mono** (testado em 4.6.1)
+- **C# .NET 8 LTS** linguagem primária canon
+- **GDScript** MAY pra tooling editor-only (ex: validate_autoloads.gd)
+- **C++ GDExtension** apenas sob pressão de perf medida (não G1)
 
 ### Ferramentas obrigatórias
 
 | Ferramenta | Uso | Install |
 |---|---|---|
-| `gdtoolkit` (`gdformat` + `gdlint`) | Formatação + lint GDScript | `pipx install gdtoolkit` |
-| `GUT` (Godot Unit Test) | Framework unit test GDScript | Addon Godot ou submodule |
+| `dotnet` SDK 8+ | Build + restore + test C# | <https://dotnet.microsoft.com/download> ou `dnf install dotnet-sdk-8.0` |
+| `dotnet format` | Formatação code style C# | Built-in com dotnet SDK |
+| Roslyn analyzers | Static analysis C# (warnings, code style) | Incluído via `.editorconfig` + `<AnalysisLevel>` em .csproj |
+| `xUnit` ou `NUnit` | Framework unit test C# | NuGet package via .csproj test project |
+| `gdtoolkit` (`gdformat` + `gdlint`) | Lint GDScript (tooling residual) | `pipx install gdtoolkit` |
 | `bandit` + `safety` (opcional) | Secret scan + dep CVE | `pipx install bandit safety` |
 | `git-secrets` | Pre-commit secret detection | Pacote distro |
 
@@ -36,7 +40,7 @@
 
 ---
 
-## T1. Testes Unitários (GDScript via GUT)
+## T1. Testes Unitários (C# via xUnit/NUnit, pós-ADR-002)
 
 ### Escopo obrigatório
 
@@ -46,10 +50,12 @@ Módulos `engine/*` **MUST** ter test suite. Módulos `/game/*` **SHOULD** ter c
 
 ```
 engine/<module>/
-├── <module>.gd                   (implementação)
-├── test_<module>.gd              (suite GUT)
+├── <Module>.cs                   (implementação C#)
+├── tests/<Module>Tests.cs        (suite xUnit ou NUnit)
 └── README.md                     (docs API pública)
 ```
+
+Test project pattern: arquivo .csproj separado pra tests com `Microsoft.NET.Test.Sdk` + framework escolhido (xUnit recomendado pelo ecosystem .NET 8).
 
 ### Módulos com cobertura obrigatória D1
 
@@ -65,13 +71,13 @@ engine/<module>/
 
 ```bash
 # Rodar todos os testes
-godot --headless --path ./game -d -s addons/gut/gut_cmdln.gd
+dotnet test
 
 # Rodar suite específica
-godot --headless --path ./game -d -s addons/gut/gut_cmdln.gd -gtest=res://engine/save_system/test_save_system.gd
+dotnet test --filter "FullyQualifiedName~SaveSystemTests"
 
-# Com coverage (futuro, GUT 9+)
-godot --headless --path ./game -d -s addons/gut/gut_cmdln.gd -gconfig=res://.gutconfig.json
+# Com coverage (Coverlet via NuGet)
+dotnet test /p:CollectCoverage=true /p:CoverletOutputFormat=opencover
 ```
 
 ### Critério "done"
@@ -82,42 +88,54 @@ godot --headless --path ./game -d -s addons/gut/gut_cmdln.gd -gconfig=res://.gut
 
 ---
 
-## T2. Análise Estática (gdformat + gdlint)
+## T2. Análise Estática (dotnet format + Roslyn, pós-ADR-002)
 
 ### Disciplina
 
-- `gdformat` **MUST** rodar pre-commit (hook configurado).
-- `gdlint` **MUST** rodar em CI; erros bloqueiam merge.
-- Warnings `gdlint` SHOULD ser justificados em comentário inline `# gdlint: ignore=<rule>` quando intencionais.
+- `dotnet format --verify-no-changes` **MUST** rodar pre-commit (hook configurado).
+- Roslyn analyzers warnings + code style **MUST** rodar em CI; warnings >= level configurado bloqueiam merge.
+- Warnings analyzers SHOULD ser justificados via `#pragma warning disable <ID>` + comentário quando intencionais.
 
 ### Comandos
 
 ```bash
 # Format check (não modifica)
-gdformat --check engine/ game/ tests/
+dotnet format --verify-no-changes
 
 # Format apply
-gdformat engine/ game/ tests/
+dotnet format
 
-# Lint
-gdlint engine/ game/ tests/
+# Build com warnings as errors
+dotnet build -c Release /warnaserror
+
+# GDScript residual (editor-only tooling)
+gdformat --check game/tools/
+gdlint game/tools/
 ```
 
 ### CI integration
 
 ```yaml
-# .forgejo/workflows/lint.yml (resumo)
-- name: gdformat check
-  run: gdformat --check engine/ game/ tests/
-- name: gdlint
-  run: gdlint engine/ game/ tests/
+# .forgejo/workflows/lint.yml (resumo, pós-ADR-002)
+- uses: actions/setup-dotnet@v4
+  with:
+    dotnet-version: '8.0.x'
+- name: dotnet restore
+  run: dotnet restore
+- name: dotnet format check
+  run: dotnet format --verify-no-changes
+- name: dotnet build (warnings as errors)
+  run: dotnet build -c Release /warnaserror
+- name: gdformat check (tooling residual)
+  run: gdformat --check game/tools/
 ```
 
 ### Critério "done"
 
-- Zero erros `gdlint`.
-- Zero diffs `gdformat`.
-- Warnings justificados se presentes.
+- `dotnet format --verify-no-changes` exit 0.
+- `dotnet build /warnaserror` exit 0.
+- Roslyn warnings justificados via `#pragma` se intencionais.
+- GDScript residual (`game/tools/`): zero `gdlint` errors + zero `gdformat` diffs.
 
 ---
 
@@ -232,7 +250,7 @@ game/        (game-specific)
 assets/      (sources arte/som)
   └── puro asset, sem código
 docs/        (canon + design)
-tests/       (test suites GUT)
+tests/       (test suites xUnit/NUnit em .csproj separados)
 ```
 
 ### Audit comando
@@ -277,7 +295,7 @@ Cobertura dos 4 gates D1 obrigatórios (`CONTRACT.md` §6):
 
 ---
 
-## A6. Cobertura de Testes (GUT coverage)
+## A6. Cobertura de Testes (Coverlet via dotnet)
 
 ### Disciplina
 
@@ -293,8 +311,12 @@ Cobertura dos 4 gates D1 obrigatórios (`CONTRACT.md` §6):
 ### Comando
 
 ```bash
-# Gerar report (GUT 9+, futuro)
-godot --headless --path ./game -d -s addons/gut/gut_cmdln.gd -gcoverage_html=res://coverage/
+# Gerar report via Coverlet
+dotnet test /p:CollectCoverage=true /p:CoverletOutputFormat=opencover
+
+# Visualizar via ReportGenerator (NuGet global tool)
+dotnet tool install -g dotnet-reportgenerator-globaltool
+reportgenerator -reports:coverage.opencover.xml -targetdir:coverage/ -reporttypes:Html
 ```
 
 ### Critério "done"
