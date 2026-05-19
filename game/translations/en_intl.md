@@ -1,0 +1,167 @@
+# en_intl.md, international English translations
+
+> Locale fallback international. **VALUES VAZIOS até pós-release v1.0.0** (canon: dev em pt-br, tradução en-intl pós-launch).
+>
+> Paridade estrutural com pt_br.md obrigatória: toda key em pt_br.md MUST existir aqui (valor vazio aceito durante G1).
+>
+> Formato: `## CHAVE_UPPER_SNAKE` + valor abaixo. Ver engine/localization/README.md.
+>
+> Última revisão: 2026-05-19.
+
+---
+
+## §1. Main menu
+
+## MENU_START_GAME
+
+## MENU_CONTINUE
+
+## MENU_NEW_GAME
+
+## MENU_LOAD_GAME
+
+## MENU_SAVE_GAME
+
+## MENU_OPTIONS
+
+## MENU_CREDITS
+
+## MENU_QUIT
+
+## MENU_QUIT_CONFIRM
+
+## MENU_QUIT_CONFIRM_YES
+
+## MENU_QUIT_CONFIRM_NO
+
+---
+
+## §2. Settings (accessibility canon CONTRACT §6)
+
+## SETTINGS_TITLE
+
+## SETTINGS_VIDEO
+
+## SETTINGS_AUDIO
+
+## SETTINGS_CONTROLS
+
+## SETTINGS_ACCESSIBILITY
+
+## SETTINGS_LANGUAGE
+
+## SETTINGS_BACK
+
+## SETTINGS_APPLY
+
+## SETTINGS_REVERT
+
+## SETTINGS_RESET_DEFAULTS
+
+---
+
+## §3. Accessibility (4 D1 gates canon)
+
+## A11Y_REMAP_CONTROLS
+
+## A11Y_REMAP_KEYBOARD
+
+## A11Y_REMAP_GAMEPAD
+
+## A11Y_REDUCE_MOTION
+
+## A11Y_REDUCE_MOTION_DESC
+
+## A11Y_SUBTITLES
+
+## A11Y_CLOSED_CAPTIONS
+
+## A11Y_SUBTITLE_SIZE
+
+## A11Y_SUBTITLE_SIZE_SMALL
+
+## A11Y_SUBTITLE_SIZE_MEDIUM
+
+## A11Y_SUBTITLE_SIZE_LARGE
+
+## A11Y_SUBTITLE_BG
+
+---
+
+## §4. Save / Load
+
+## SAVE_SLOT_EMPTY
+
+## SAVE_SLOT_LABEL
+
+## SAVE_TIMESTAMP_LABEL
+
+## SAVE_LOCATION_LABEL
+
+## SAVE_PLAYTIME_LABEL
+
+## SAVE_CONFIRM_OVERWRITE
+
+## SAVE_SUCCESS
+
+## SAVE_FAILED
+
+## LOAD_CONFIRM
+
+## LOAD_SUCCESS
+
+## LOAD_FAILED
+
+## LOAD_MIGRATION_REQUIRED
+
+---
+
+## §5. HUD + combat (placeholders)
+
+## HUD_HP_LABEL
+
+## HUD_AP_LABEL
+
+## HUD_TURN_LABEL
+
+## COMBAT_PLAYER_TURN
+
+## COMBAT_ENEMY_TURN
+
+## COMBAT_VICTORY
+
+## COMBAT_DEFEAT
+
+## COMBAT_FLEE
+
+## COMBAT_FLEE_FAILED
+
+## COMBAT_FLEE_SUCCESS
+
+---
+
+## §6. Dialogue (placeholders)
+
+## DIALOGUE_CONTINUE
+
+## DIALOGUE_CHOICE_PROMPT
+
+## DIALOGUE_GUS_INTRO_001
+
+## DIALOGUE_GUS_INTRO_002
+
+---
+
+## §7. Errors + system messages
+
+## ERROR_GENERIC
+
+## ERROR_FILE_NOT_FOUND
+
+## ERROR_INVALID_SAVE
+
+## ERROR_SAVE_VERSION_NEWER
+
+## INFO_AUTOSAVE
+
+## INFO_AUTOSAVE_DONE

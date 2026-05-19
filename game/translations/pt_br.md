@@ -1,0 +1,230 @@
+# pt_br.md, traduções pt-br canônicas
+
+> Locale primário (dev). **MUST** estar sempre completo. Outras locales fazem fallback aqui.
+>
+> Formato: `## CHAVE_UPPER_SNAKE` + valor abaixo. Ver engine/localization/README.md.
+>
+> Última revisão: 2026-05-19.
+
+---
+
+## §1. Menu principal
+
+## MENU_START_GAME
+Iniciar jogo
+
+## MENU_CONTINUE
+Continuar
+
+## MENU_NEW_GAME
+Novo jogo
+
+## MENU_LOAD_GAME
+Carregar
+
+## MENU_SAVE_GAME
+Salvar
+
+## MENU_OPTIONS
+Opções
+
+## MENU_CREDITS
+Créditos
+
+## MENU_QUIT
+Sair
+
+## MENU_QUIT_CONFIRM
+Sair do jogo?
+
+## MENU_QUIT_CONFIRM_YES
+Sim, sair
+
+## MENU_QUIT_CONFIRM_NO
+Cancelar
+
+---
+
+## §2. Settings (acessibilidade canon CONTRACT §6)
+
+## SETTINGS_TITLE
+Configurações
+
+## SETTINGS_VIDEO
+Vídeo
+
+## SETTINGS_AUDIO
+Áudio
+
+## SETTINGS_CONTROLS
+Controles
+
+## SETTINGS_ACCESSIBILITY
+Acessibilidade
+
+## SETTINGS_LANGUAGE
+Idioma
+
+## SETTINGS_BACK
+Voltar
+
+## SETTINGS_APPLY
+Aplicar
+
+## SETTINGS_REVERT
+Reverter
+
+## SETTINGS_RESET_DEFAULTS
+Restaurar padrões
+
+---
+
+## §3. Acessibilidade (4 gates D1 canon)
+
+## A11Y_REMAP_CONTROLS
+Remapear controles
+
+## A11Y_REMAP_KEYBOARD
+Teclado
+
+## A11Y_REMAP_GAMEPAD
+Controle (gamepad)
+
+## A11Y_REDUCE_MOTION
+Reduzir movimento
+
+## A11Y_REDUCE_MOTION_DESC
+Desativa screen shake, motion blur e parallax. Reduz desconforto em jogadores sensíveis a movimento.
+
+## A11Y_SUBTITLES
+Legendas
+
+## A11Y_CLOSED_CAPTIONS
+Closed captions (descrição de áudio)
+
+## A11Y_SUBTITLE_SIZE
+Tamanho da legenda
+
+## A11Y_SUBTITLE_SIZE_SMALL
+Pequeno
+
+## A11Y_SUBTITLE_SIZE_MEDIUM
+Médio
+
+## A11Y_SUBTITLE_SIZE_LARGE
+Grande
+
+## A11Y_SUBTITLE_BG
+Fundo opaco nas legendas
+
+---
+
+## §4. Save / Load
+
+## SAVE_SLOT_EMPTY
+Slot vazio
+
+## SAVE_SLOT_LABEL
+Slot {0}
+
+## SAVE_TIMESTAMP_LABEL
+Salvo em {0}
+
+## SAVE_LOCATION_LABEL
+Local: {0}
+
+## SAVE_PLAYTIME_LABEL
+Tempo de jogo: {0}
+
+## SAVE_CONFIRM_OVERWRITE
+Sobrescrever este slot?
+
+## SAVE_SUCCESS
+Jogo salvo.
+
+## SAVE_FAILED
+Falha ao salvar. Verifique espaço em disco.
+
+## LOAD_CONFIRM
+Carregar este save? Progresso não salvo será perdido.
+
+## LOAD_SUCCESS
+Save carregado.
+
+## LOAD_FAILED
+Falha ao carregar save. Arquivo pode estar corrompido.
+
+## LOAD_MIGRATION_REQUIRED
+Save em versão anterior. Migrando...
+
+---
+
+## §5. HUD + combate (placeholders)
+
+## HUD_HP_LABEL
+HP
+
+## HUD_AP_LABEL
+AP
+
+## HUD_TURN_LABEL
+Turno
+
+## COMBAT_PLAYER_TURN
+Seu turno
+
+## COMBAT_ENEMY_TURN
+Turno do inimigo
+
+## COMBAT_VICTORY
+Vitória.
+
+## COMBAT_DEFEAT
+Derrota.
+
+## COMBAT_FLEE
+Fugir
+
+## COMBAT_FLEE_FAILED
+Fuga falhou.
+
+## COMBAT_FLEE_SUCCESS
+Conseguiu fugir.
+
+---
+
+## §6. Dialogue (placeholders, expandir conforme arcos)
+
+## DIALOGUE_CONTINUE
+(continuar)
+
+## DIALOGUE_CHOICE_PROMPT
+Escolha:
+
+## DIALOGUE_GUS_INTRO_001
+Meus óculos táticos detectaram uma anomalia. Sterling está fazendo algo errado.
+
+## DIALOGUE_GUS_INTRO_002
+Onze anos não é jovem demais pra perceber que os adultos mentem.
+
+---
+
+## §7. Errors + mensagens sistema
+
+## ERROR_GENERIC
+Algo deu errado.
+
+## ERROR_FILE_NOT_FOUND
+Arquivo não encontrado: {0}
+
+## ERROR_INVALID_SAVE
+Save inválido ou corrompido.
+
+## ERROR_SAVE_VERSION_NEWER
+Save criado em versão mais nova do jogo. Atualize o jogo pra carregar.
+
+## INFO_AUTOSAVE
+Salvamento automático em {0} minuto(s).
+
+## INFO_AUTOSAVE_DONE
+Salvamento automático concluído.
