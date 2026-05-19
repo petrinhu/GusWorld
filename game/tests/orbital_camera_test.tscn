@@ -1,0 +1,67 @@
+[gd_scene load_steps=8 format=3 uid="uid://test_orbital_camera"]
+
+[ext_resource type="Script" uid="uid://orbital_camera_script" path="res://scripts/back/orbital_camera/OrbitalCamera.cs" id="1_orbcam"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_target"]
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_floor"]
+size = Vector2(20, 20)
+
+[sub_resource type="BoxMesh" id="BoxMesh_prop"]
+size = Vector3(0.5, 2, 0.5)
+
+[sub_resource type="StandardMaterial3D" id="Material_target"]
+albedo_color = Color(0.8, 0.2, 0.2, 1)
+
+[sub_resource type="StandardMaterial3D" id="Material_floor"]
+albedo_color = Color(0.3, 0.3, 0.3, 1)
+
+[sub_resource type="StandardMaterial3D" id="Material_prop"]
+albedo_color = Color(0.2, 0.6, 0.2, 1)
+
+[node name="OrbitalCameraTest" type="Node3D"]
+
+[node name="Sun" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.707, -0.5, 0.5, 0, 0.707, 0.707, -0.707, -0.5, 0.5, 0, 5, 0)
+shadow_enabled = true
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+
+[node name="Floor" type="MeshInstance3D" parent="."]
+mesh = SubResource("PlaneMesh_floor")
+surface_material_override/0 = SubResource("Material_floor")
+
+[node name="StaticBody3D" type="StaticBody3D" parent="Floor"]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Floor/StaticBody3D"]
+
+[node name="Target" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
+mesh = SubResource("BoxMesh_target")
+surface_material_override/0 = SubResource("Material_target")
+
+[node name="Prop1" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 1, 0)
+mesh = SubResource("BoxMesh_prop")
+surface_material_override/0 = SubResource("Material_prop")
+
+[node name="Prop2" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3, 1, 2)
+mesh = SubResource("BoxMesh_prop")
+surface_material_override/0 = SubResource("Material_prop")
+
+[node name="Prop3" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, -3)
+mesh = SubResource("BoxMesh_prop")
+surface_material_override/0 = SubResource("Material_prop")
+
+[node name="OrbitalCamera" type="Node3D" parent="." node_paths=PackedStringArray("FollowTarget")]
+script = ExtResource("1_orbcam")
+FollowTarget = NodePath("../Target")
+
+[node name="SpringArm3D" type="SpringArm3D" parent="OrbitalCamera"]
+spring_length = 6.0
+margin = 0.05
+
+[node name="Camera3D" type="Camera3D" parent="OrbitalCamera/SpringArm3D"]
+current = true

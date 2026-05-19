@@ -20,6 +20,8 @@
 // TDD pattern: cada novo AutoLoad migrado adiciona seção de validação aqui.
 
 using Godot;
+using GusDragon.Engine.Foundation;
+using GusWorld.Game.Back.OrbitalCamera;
 using GusWorld.Game.Foundation.Buses;
 using GusWorld.Game.Foundation.Localization;
 
@@ -44,6 +46,8 @@ public partial class ValidateAutoloads : SceneTree
         ValidateCombatBus();
         ValidateUIBus();
         ValidateLocalization();
+        ValidateMathHelpers();
+        ValidateOrbitalCameraClass();
 
         GD.Print($"=== Resultado: {_errors} erro(s) ===");
         Quit(_errors == 0 ? 0 : 1);
@@ -165,6 +169,52 @@ public partial class ValidateAutoloads : SceneTree
             Pass($"Interpolação {{0}} → '{interpolated}'");
         else
             Fail($"Interpolação esperava 'Slot 3' obteve '{interpolated}'");
+    }
+
+    private void ValidateMathHelpers()
+    {
+        // Snap 30° em 8 stops (45° cada) → 45°
+        var snapped = MathHelpers.SnapToStops(30f, 8);
+        if (Mathf.IsEqualApprox(snapped, 45f))
+            Pass($"MathHelpers.SnapToStops(30°, 8) → {snapped}°");
+        else
+            Fail($"SnapToStops esperava 45° obteve {snapped}°");
+
+        // Normalize -90° → 270°
+        var norm = MathHelpers.NormalizeAngle(-90f);
+        if (Mathf.IsEqualApprox(norm, 270f))
+            Pass($"MathHelpers.NormalizeAngle(-90°) → {norm}°");
+        else
+            Fail($"NormalizeAngle esperava 270° obteve {norm}°");
+
+        // Clamp01
+        if (Mathf.IsEqualApprox(MathHelpers.Clamp01(1.5f), 1f) && Mathf.IsEqualApprox(MathHelpers.Clamp01(-0.5f), 0f))
+            Pass("MathHelpers.Clamp01 boundaries OK");
+        else
+            Fail("Clamp01 falhou em boundaries");
+    }
+
+    private void ValidateOrbitalCameraClass()
+    {
+        // Check class existence via reflection-free pattern (compile-time link)
+        var type = typeof(OrbitalCamera);
+        if (type != null)
+            Pass($"OrbitalCamera class type {type.FullName} carregado");
+        else
+            Fail("OrbitalCamera class type não encontrado");
+
+        var configType = typeof(OrbitalCameraConfig);
+        if (configType != null)
+            Pass($"OrbitalCameraConfig Resource type {configType.FullName} carregado");
+        else
+            Fail("OrbitalCameraConfig type não encontrado");
+
+        // Defaults config (instance)
+        var config = new OrbitalCameraConfig();
+        if (Mathf.IsEqualApprox(config.PitchDefaultDegrees, 45f) && Mathf.IsEqualApprox(config.ZoomDefault, 6f))
+            Pass($"OrbitalCameraConfig defaults: pitch=45° zoom=6m");
+        else
+            Fail($"Config defaults inesperados: pitch={config.PitchDefaultDegrees}° zoom={config.ZoomDefault}m");
     }
 
     private static void Pass(string msg) => GD.Print($"OK: {msg}");
