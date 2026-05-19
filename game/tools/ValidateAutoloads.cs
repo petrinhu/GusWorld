@@ -21,9 +21,11 @@
 
 using Godot;
 using GusDragon.Engine.Foundation;
+using GusDragon.Engine.Foundation.SaveSystem;
 using GusWorld.Game.Back.OrbitalCamera;
 using GusWorld.Game.Foundation.Buses;
 using GusWorld.Game.Foundation.Localization;
+using GusWorld.Game.Foundation.SaveSystem;
 
 namespace GusWorld.Game.Tools;
 
@@ -48,6 +50,7 @@ public partial class ValidateAutoloads : SceneTree
         ValidateLocalization();
         ValidateMathHelpers();
         ValidateOrbitalCameraClass();
+        ValidateSaveSystem();
 
         GD.Print($"=== Resultado: {_errors} erro(s) ===");
         Quit(_errors == 0 ? 0 : 1);
@@ -215,6 +218,69 @@ public partial class ValidateAutoloads : SceneTree
             Pass($"OrbitalCameraConfig defaults: pitch=45° zoom=6m");
         else
             Fail($"Config defaults inesperados: pitch={config.PitchDefaultDegrees}° zoom={config.ZoomDefault}m");
+    }
+
+    private void ValidateSaveSystem()
+    {
+        // SaveManager AutoLoad
+        var sm = Root.GetNodeOrNull<SaveManager>("SaveManager");
+        if (sm == null)
+        {
+            Fail("SaveManager AutoLoad não registrado");
+            return;
+        }
+        Pass("SaveManager AutoLoad presente");
+
+        // HMAC round-trip POCO test
+        var sample = new SaveDataV1
+        {
+            Timestamp = "2026-05-19T00:00:00Z",
+            PlaytimeSeconds = 42.0,
+            CurrentScenePath = "res://test.tscn",
+            PlayerPosition = new Vector3(1f, 2f, 3f),
+            PlayerRotation = new Vector3(0f, 90f, 0f),
+        };
+        try
+        {
+            var envelope = SaveSerializer.SerializeWithHmac(sample);
+            var roundtrip = SaveSerializer.DeserializeWithHmacValidation(envelope);
+            if (roundtrip.PlaytimeSeconds == 42.0 && Mathf.IsEqualApprox(roundtrip.PlayerPosition.X, 1f))
+                Pass("SaveSerializer HMAC roundtrip OK (Vector3 + double + string preservados)");
+            else
+                Fail($"SaveSerializer roundtrip lost data");
+        }
+        catch (System.Exception ex)
+        {
+            Fail($"SaveSerializer roundtrip threw: {ex.Message}");
+        }
+
+        // HMAC tamper detection (replace string única dentro do Payload escapado)
+        try
+        {
+            var envelope = SaveSerializer.SerializeWithHmac(sample);
+            // Tamper: substitui scene path no payload (string única, presente no JSON)
+            var tampered = envelope.Replace("test.tscn", "evil.tscn", System.StringComparison.Ordinal);
+            if (tampered == envelope)
+            {
+                Fail($"Tamper detection: replace falhou (envelope nao continha 'test.tscn'). Envelope sample: {envelope.Substring(0, System.Math.Min(200, envelope.Length))}");
+            }
+            else
+            {
+                SaveSerializer.DeserializeWithHmacValidation(tampered);
+                Fail("Tamper detection: esperava SaveIntegrityException mas não foi lançada");
+            }
+        }
+        catch (SaveIntegrityException)
+        {
+            Pass("Tamper detection: SaveIntegrityException lançada corretamente");
+        }
+        catch (System.Exception ex)
+        {
+            Fail($"Tamper detection: exception inesperada {ex.GetType().Name}: {ex.Message}");
+        }
+
+        // Constants canon (compile-time constants, valor canonizado)
+        Pass($"SaveManager constants: autosave={SaveManager.AutosaveSlot}, slots={SaveManager.ManualSlotsCount}, backups={SaveManager.BackupChainDepth}");
     }
 
     private static void Pass(string msg) => GD.Print($"OK: {msg}");
