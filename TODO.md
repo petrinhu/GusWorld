@@ -23,19 +23,19 @@ Tabela canônica de pendências e planejamento. Atualizar via skill `/tab_penden
 | F1-DL.1.6 | F1-DeepLore | Era 1 §6 Acústica e luz reativa (14.5k pal, 8 NPCs Ordem Recursiva, 4 sub-locais) | Alta | F1-DL.0 | Alta | ✅ Concluído | — |
 | F1-DL.1.7 | F1-DeepLore | Era 1 §7 Bancos sementes-relíquia + Ordem Recursiva embrionária (33.4k pal, 52 queries; 11 NPCs + 9 sub-locais; axiologia canon aplicada) | Alta | F1-DL.1.6 | Alta | ✅ Concluído | — |
 | F1-DL.1.8 | F1-DeepLore | Era 1 §8 Queda multi-hipótese (~42k pal, 84 queries Fibonacci) | Alta | F1-DL.1.7 | Alta | ✅ Concluído | — |
-| F1-DL.REFAC | F1-DeepLore | Refactor fluidez prose deep-lore + retrofit easter eggs maçônicos + densificação §10 — (a) reduz repetição marcadores ritualísticos preservando conteúdo canônico/NPCs/geografia/datações/axiologia/Fibonacci. (b) insere easter eggs maçônicos canon §§6-8 (memo `project_eastereggs_maconaria_canonica`). (c) **densifica §10 +17k pal pra atingir alvo Fibonacci 110k** (atual 93k, foco saturação ritualística remanescente Parte I + densificação narrativa Parte II/III). Aplicar §§6-10. Via narrative-writer (briefing fluência Stephenson/Krasznahorkai + densidade técnica + easter eggs ~10-15%). Bloqueia F5-BK.1 | Alta | F1-DL.1.10 | Alta | ⏳ Pendente | — |
+| F1-DL.REFAC | F1-DeepLore | Refactor fluidez prose deep-lore + retrofit easter eggs maçônicos + densificação §10 — (a) reduz repetição marcadores ritualísticos preservando conteúdo canônico/NPCs/geografia/datações/axiologia/Fibonacci. (b) insere easter eggs maçônicos canon §§6-8 (memo `project_eastereggs_maconaria_canonica`). (c) **densifica §10 +17k pal pra atingir alvo Fibonacci 110k** (atual 93k, foco saturação ritualística remanescente Parte I + densificação narrativa Parte II/III). Aplicar §§6-10. Via narrative-writer. Bloqueia F5-BK.1 apenas. **PARALELO ORGÂNICO pós-pivot ADR-001** | Média | F1-DL.1.10 | Alta | ⏳ Pendente (paralelo) | — |
 | F1-DL.1.9 | F1-DeepLore | Era 1 §9 Vestígios cross-era (~68k pal, 136 queries Fibonacci) | Alta | F1-DL.1.8 | Alta | ✅ Concluído | — |
 | F1-DL.1.10 | F1-DeepLore | Era 1 §10 Trecho in-character Verônica Atelaiá (~110k pal, 220 queries Fibonacci) — entregue 93k pal (~85% alvo). 7 dispatches incrementais voz Eco Adso fluida. Lacuna +17k em F1-DL.REFAC | Alta | F1-DL.1.9 | Alta | ✅ Concluído | — |
 | F1-DL.2 | F1-DeepLore | R2 — Facções (Sterling Corp, FIR, Ordem Recursiva, Cult Mirage, Underground Silêncio, Pelicano Branco, menores — 7 docs, 22.030 pal entregues; 20 queries RAG densas; audit narrative-designer aprovado com 6 fixes críticos aplicados) | Alta | F1-DL.1 | Alta | ✅ 2026-05-19 | — |
 | F1-DL.3 | F1-DeepLore | R3 — Settings deep (8 settings, 25.201 pal entregues; 20 queries RAG densas; audit narrative-designer aprovado com 4 fixes críticos aplicados) | Alta | F1-DL.2 | Alta | ✅ 2026-05-19 | — |
-| F1-DL.4 | F1-DeepLore | R4 — Characters deep (Gus "Dragon" + 6 companions ~35k) | Alta | F1-DL.3 | Alta | ⏳ Pendente | — |
-| F1-DL.5 | F1-DeepLore | R5 — Antagonistas + NPCs (Sterling Locke + Patch-Zero + NPCs antologia ~12k) | Alta | F1-DL.4 | Alta | ⏳ Pendente | — |
-| F1-DL.6 | F1-DeepLore | R6 — Magic (Glyph/Token/Conjuro/Codex + 4 linguagens + natureza-matemática ~10k) | Alta | F1-DL.5 | Alta | ⏳ Pendente | — |
-| F1-DL.7 | F1-DeepLore | R7 — Ontologia (tech 3 eras + cosmologia + leitmotivs ~8k) | Alta | F1-DL.6 | Média | ⏳ Pendente | — |
-| F1-DL.8 | F1-DeepLore | R8 — Stinger (sequel hooks + post-credits ~4k) | Média | F1-DL.7 | Média | ⏳ Pendente | — |
-| F1-DL.9 | F1-DeepLore | R9 — Antologia Vol 2 (14 contos in-character ~42k) | Alta | F1-DL.8 | Alta | ⏳ Pendente | — |
-| F2-S.1 | F2-Setup | Instalar Godot 4 (LTS estável) — **PAUSADA até deep-lore F1-DL.9 completa** | Alta | F1-DL.9 | Baixa | ⏳ Pendente | — |
-| F2-S.2 | F2-Setup | Criar `/game/project.godot` inicial (Godot 4, GDScript, forward+ renderer) | Alta | F2-S.1 | Baixa | ⏳ Pendente | — |
+| F1-DL.4 | F1-DeepLore | R4 — Characters deep (Gus "Dragon" + 6 companions ~35k). **PARALELO ORGÂNICO pós-pivot ADR-001** | Média | F1-DL.3 | Alta | ⏳ Pendente (paralelo) | — |
+| F1-DL.5 | F1-DeepLore | R5 — Antagonistas + NPCs (Sterling Locke + Patch-Zero + NPCs antologia ~12k). **PARALELO ORGÂNICO pós-pivot ADR-001** | Média | F1-DL.4 | Alta | ⏳ Pendente (paralelo) | — |
+| F1-DL.6 | F1-DeepLore | R6 — Magic (Glyph/Token/Conjuro/Codex + 4 linguagens + natureza-matemática ~10k). **PARALELO ORGÂNICO pós-pivot ADR-001** | Média | F1-DL.5 | Alta | ⏳ Pendente (paralelo) | — |
+| F1-DL.7 | F1-DeepLore | R7 — Ontologia (tech 3 eras + cosmologia + leitmotivs ~8k). **PARALELO ORGÂNICO pós-pivot ADR-001** | Média | F1-DL.6 | Média | ⏳ Pendente (paralelo) | — |
+| F1-DL.8 | F1-DeepLore | R8 — Stinger (sequel hooks + post-credits ~4k). **PARALELO ORGÂNICO pós-pivot ADR-001** | Média | F1-DL.7 | Média | ⏳ Pendente (paralelo) | — |
+| F1-DL.9 | F1-DeepLore | R9 — Antologia Vol 2 (14 contos in-character ~42k). **PARALELO ORGÂNICO pós-pivot ADR-001** (era gating de F2-S.1, agora desbloqueado) | Média | F1-DL.8 | Alta | ⏳ Pendente (paralelo) | — |
+| F2-S.1 | F2-Setup | Instalar Godot 4 LTS — Godot 4.6.1 stable já instalado em `/usr/bin/godot` (Fedora 44). Desbloqueio ADR-001 | Alta | — | Baixa | ✅ 2026-05-19 | — |
+| F2-S.2 | F2-Setup | Criar `/game/project.godot` inicial (Godot 4, GDScript, forward+ renderer) | Alta | F2-S.1 | Baixa | 🔄 Em andamento sessão atual | — |
 | F2-S.3 | F2-Setup | `git init` + primeiro commit baseline | Alta | — | Baixa | ⏳ Pendente | — |
 | F2-S.4 | F2-Setup | Criar repo Forgejo `gusworld` privado via MCP `mcp__forgejo__create_repo` | Alta | F2-S.3 | Baixa | ⏳ Pendente | — |
 | F2-S.5 | F2-Setup | Decisão: `gusworld-engine` repo separado vs submódulo | Alta | F2-S.4 | Média | 💡 Decisão tomada | — |

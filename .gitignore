@@ -3,7 +3,9 @@
 .import/
 export.cfg
 export_presets.cfg
+export_presets.cfg.user
 *.translation
+user://
 
 # Build outputs
 /build/

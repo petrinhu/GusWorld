@@ -4,9 +4,13 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Estado atual
 
-**Fim de Fase 1 (Concepção) — REVISÃO 1.** Solo indie G1, Godot 4, PC Linux+Windows, single-player puro. Gênero: RPG + Puzzle + Aventura + combate turn-based. Câmera 3/4 rotacional + zoom orbital (Chrono Trigger reference, mas 3D real).
+**PIVOT Fase 1 → Fase 2 (ADR-001, 2026-05-19).** Solo indie G1, Godot 4.6.1 stable instalado (`/usr/bin/godot`), PC Linux+Windows, single-player puro. Gênero: RPG + Puzzle + Aventura + combate turn-based. Câmera 3/4 rotacional + zoom orbital (Chrono Trigger reference, mas 3D real).
 
-Sem código ainda. Pipeline e docs prontos pra início de Fase 2 (impl).
+**Deep-lore canon entregue (~365k pal):** Era 1 §§1-10 (~318k), R2 Facções (22k, 7 docs), R3 Settings (25k, 8 docs).
+
+**Deep-lore restante PARALELO ORGÂNICO** (não bloqueia código): F1-DL.4-9 + F1-DL.REFAC (~111k pal restantes) entram entre steps técnicos conforme necessidade ou descanso criativo. Ver `docs/tech/adr/ADR-001-pivot-lore-to-engine.md`.
+
+**Fase 2 ativa:** vertical slice (4-6 meses meta) — engine modular reutilizável + 1 área cidade + 1 encontro turn-based + 1 puzzle Vetor Gambito.
 
 ### Modo de trabalho com agentes (CRÍTICO)
 
