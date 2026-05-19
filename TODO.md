@@ -37,11 +37,11 @@ Tabela canônica de pendências e planejamento. Atualizar via skill `/tab_penden
 | F2-S.1 | F2-Setup | Instalar Godot 4 LTS — Godot 4.6.1 stable já instalado em `/usr/bin/godot` (Fedora 44). Desbloqueio ADR-001 | Alta | — | Baixa | ✅ 2026-05-19 | — |
 | F2-S.2 | F2-Setup | Criar `/game/project.godot` inicial (Godot 4, GDScript, forward+ renderer) | Alta | F2-S.1 | Baixa | 🔄 Em andamento sessão atual | — |
 | F2-S.3 | F2-Setup | `git init` + primeiro commit baseline | Alta | — | Baixa | ⏳ Pendente | — |
-| F2-S.4 | F2-Setup | Criar repo Forgejo `gusworld` privado via MCP `mcp__forgejo__create_repo` | Alta | F2-S.3 | Baixa | ⏳ Pendente | — |
+| F2-S.4 | F2-Setup | Criar repo Forgejo `gusworld` privado via MCP `mcp__forgejo__create_repo` — repo já criado em Codeberg, `origin` aponta `ssh://git@codeberg.org/petrinhu/gusworld.git`, pushes ativos | Alta | F2-S.3 | Baixa | ✅ 2026-05-19 | — |
 | F2-S.5 | F2-Setup | Decisão: `gusworld-engine` repo separado vs submódulo | Alta | F2-S.4 | Média | 💡 Decisão tomada | — |
 | F2-S.6 | F2-Setup | Setup `.gitignore` Godot completo (`.import/`, `*.translation`, etc) | Alta | F2-S.3 | Baixa | 🟡 Parcial | — |
 | F2-S.7 | F2-Setup | Setup Forgejo Actions runner local | Alta | F2-S.4 | Média | ⏳ Pendente | — |
-| F2-S.8 | F2-Setup | Setup `CONTRACT.md` projeto (RFC 2119 + SOLID + Conventional Commits) | Alta | F2-S.3 | Baixa | ⏳ Pendente | — |
+| F2-S.8 | F2-Setup | Setup `CONTRACT.md` projeto, escopo B game-focused: RFC 2119 + Conventional Commits com scopes game-dev + branching solo + 12h cooling-off + DoD por tipo + perf budget GTX 1050+4GB + a11y gates D1 (4 obrigatórios) + save forward-only. 319 linhas | Alta | F2-S.3 | Baixa | ✅ 2026-05-19 | — |
 | F2-S.9 | F2-Setup | Setup `TESTES.md` projeto (T1-T15 / A1-A13 do manual canônico) | Alta | F2-S.8 | Baixa | ⏳ Pendente | — |
 | F2-S.10 | F2-Setup | Setup `CHANGELOG.md` + `README.md` (hub-and-spoke) | Alta | F2-S.3 | Baixa | ⏳ Pendente | — |
 | F2-S.11 | F2-Setup | Setup i18n Godot estrutura (`tr()` + `game/translations/strings.csv` header `keys,pt_br,en_intl` + fallback `pt_BR → en_intl` + fonts Latin Extended Noto/Inter). Dev fica em pt-br; coluna en_intl vazia até pós-release v1.0.0 | Alta | F2-S.2, F2-S.9 | Média | ⏳ Pendente | — |
