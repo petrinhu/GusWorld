@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| **Status** | Accepted |
+| **Status** | Accepted (aprovado granular em 8 batches AskUserQuestion 2026-05-19, 30 decisões canonizadas) |
 | **Date** | 2026-05-19 |
 | **Decisor** | petrinhu (criador supremo) |
 | **Reversibilidade** | One-way door massivo. Reverter exige rewrite paralelo (~2-4 semanas). |
@@ -32,17 +32,42 @@ Critério decisor:
 
 ## Decisão
 
-**Migrar de GDScript para C# .NET AOT como linguagem primária canon.**
+**Migrar de GDScript para C# .NET 8 LTS AOT como linguagem primária canon.**
 
-### Diretrizes
+### Diretrizes canonizadas (8 batches AskUserQuestion 2026-05-19)
 
-1. **Todo código gameplay + engine MUST ser C# .NET 8** (LTS atual, suporte AOT estável Godot 4.4+).
-2. **GDScript MAY ser usado em** tooling auxiliar não-críticos (ex: `validate_autoloads.gd`, scripts editor-only).
-3. **AOT (Ahead-of-Time) compilation MUST estar habilitado** em export builds release (não JIT runtime).
-4. **Build target:** .NET 8 LTS (suportado até 2026-11) + Godot 4.4+ Mono.
-5. **Resources e `.tres` files permanecem** como cobertos por Godot core (não-código).
-6. **MD files** (translations, lore, docs) permanecem MD.
-7. **Hot paths** (turn resolve, save serialization, AI behavior) MUST atingir < 50% de frame budget em GTX 1050 target.
+#### Stack core
+1. **C# .NET 8 LTS** (suporte até 2026-11). Todo código gameplay + engine.
+2. **AOT MUST em release + dev** (mais estrito que Microsoft padrão). Iter mais lenta aceita pra garantir perf consistente.
+3. **GDScript DEPRECATED 100%.** Zero GDScript em todo repo. `validate_autoloads.gd` será migrado em F2-S.MIG.
+4. **xUnit** como framework test (não NUnit/MSTest).
+5. **2 .csproj separados:** `engine/Engine.csproj` (reuso) + `game/Game.csproj` (game-specific).
+6. **Naming Microsoft padrão:** PascalCase classes/métodos/propriedades públicas. `_camelCase` fields privados. UPPER_SNAKE_CASE pra const.
+7. **Roslyn analyzers `latest-recommended`** level em todos csproj.
+8. **AOT-compat MUST no DoD:** `dotnet publish -c Release` exit 0 sem trim/AOT warnings.
+
+#### Camadas arquiteturais (5)
+9. **Foundation:** event_bus_split(4) + save + i18n + input + audio + scene_router. Módulos críticos non-game-specific.
+10. **Back:** orbital_camera + turn_combat + party + card_engine + dialogue + puzzle_kit. Gameplay reusável.
+11. **Mid:** game-logic, ECS (futuro), state machines especificas GusWorld.
+12. **Front:** scenes + UI + assets visuais em runtime.
+13. **Assets:** sources arte/som (.blend, .kra, audio raw).
+
+#### Repo + estrutura
+14. **Engine repo separado desde agora:** `gus_dragon-engine` em Codeberg. Submodule em `gusworld` via `git submodule`.
+15. **Engine struct agrupado por camada:** `engine/foundation/<modulo>/`, `engine/back/<modulo>/`.
+16. **4 buses split:** `engine/foundation/buses/` contém `GameStateBus.cs`, `PlayerBus.cs`, `CombatBus.cs`, `UIBus.cs`.
+
+#### Patterns
+17. **AutoLoad pattern:** `public static T Instance { get; private set; }` em `_Ready`. Acesso global `Bus.Instance.EmitSignal(...)`.
+18. **Save format:** JSON via `System.Text.Json` source-generated + **HMAC-SHA256 com chave embarcada** (anti-cheat strict). Tampering detection bloqueia load. Backup chain N=3 saves anteriores preservados.
+19. **Game data:** C# `DataClass` POCO + Godot Resource wrapper. Editor Inspector visual + portabilidade C#.
+
+#### Build + CI
+20. **CI image:** `mcr.microsoft.com/dotnet/sdk:8.0` + Godot Mono binary cached entre runs.
+21. **Hot-reload:** aceitável (~5-15s rebuild). **Reavaliar em F2-M.1** se prejudicar produtividade.
+22. **MD files** permanecem MD (translations, lore, docs).
+23. **Hot paths** (turn resolve, save HMAC, AI behavior) MUST atingir < 50% frame budget em GTX 1050 target.
 
 ### Implicações imediatas
 

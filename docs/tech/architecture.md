@@ -1,416 +1,426 @@
-# GusWorld — Arquitetura Técnica
+# Architecture, GusWorld G1
 
-> **Escopo:** projeto solo indie G1, 6-12 meses, single-player puro, PC (Linux + Windows). Godot 4.x.
-> **Princípio diretor:** simplicidade agressiva. Cada decisão pondera *custo de iteração solo* contra *reaproveitamento futuro da engine modular*.
+> **Status:** Canon (revisão ADR-002 2026-05-19). Substitui rascunho inicial GDScript.
+>
+> **Autoridade:** docs/tech/architecture.md > engine-modules.md > build.md. Cross-ref ADR-001 + ADR-002 + CONTRACT.md + pillars.md.
 
 ---
 
-## 1. Engine e linguagem
+## §1. Engine e linguagem
 
-### 1.1. Decisão: **Godot 4.3+ LTS** (estável, .NET opcional desativado em G1)
+### §1.1. Engine: Godot 4.6+ Mono
 
-- 3D razoável (3/4 isométrica com `Camera3D` orbital cabe naturalmente).
-- Scene/Node + signals = boa fit pra turn-based e dialogue.
-- Export Linux + Windows nativo, sem royalties, sem account vendor lock-in.
-- Comunidade GDScript ampla, plugins de TCG/dialogue/save já existem como referência.
+- **Versão:** Godot 4.6.1+ stable (instalado `/usr/bin/godot`). Mono build obrigatório (suporte C# .NET 8).
+- **Renderer:** Forward+ (canon `game/project.godot`).
+- **Plataformas G1:** Linux (AppImage + tar.gz) + Windows (sem signing G1).
+- **Target hardware canon:** GTX 1050 + 4GB VRAM + 8GB RAM dual-core 3.0GHz+ (cobre Steam Deck + laptops 2017+).
 
-**Recusado:** Unity (custo licenciamento/runtime-fee + churn de management). Unreal (overkill 3D AAA, GDScript-equivalente Blueprints prende menos solo, mas peso de build + asset pipeline é incompatível com G1 solo). Custom engine (anti-objetivo crítico — ver §10).
+### §1.2. Linguagem: C# .NET 8 LTS AOT (ADR-002)
 
-### 1.2. Linguagem: **GDScript** (decisão SIM)
+- **C# .NET 8 LTS** (suporte até 2026-11) como linguagem primária canon.
+- **GDScript DEPRECATED 100%** em todo repo. Zero `.gd` files (após F2-S.MIG concluir migração).
+- **C++ GDExtension** apenas sob pressão de perf medida (profile real M.2). Não em G1 default.
+- **AOT compilation MUST** em release **+ dev** (mais estrito que padrão Microsoft).
+- **Hot-reload:** ~5-15s rebuild via `dotnet build` watcher. Aceitável; reavaliar em F2-M.1.
 
-| Critério | GDScript | C# |
+#### Naming convention (Microsoft padrão)
+
+| Element | Convention | Example |
 |---|---|---|
-| Iteração (hot reload, REPL editor) | **forte** | médio |
-| Tooling Godot nativo (signals, editor hints) | **first-class** | second-class |
-| Perf bruta | médio | forte |
-| Portabilidade futura (sair de Godot) | fraca | média |
-| Curva solo | **mínima** | exige .NET SDK + IDE separada |
-| Tamanho de export | **menor** | +30-80MB runtime |
+| Classes | PascalCase | `class EventBus` |
+| Métodos | PascalCase | `public void EmitGameStarted()` |
+| Propriedades públicas | PascalCase | `public int Health { get; set; }` |
+| Fields privados | _camelCase | `private int _signalCounter` |
+| Constantes | UPPER_SNAKE_CASE | `const int MAX_HP = 100` |
+| Namespaces | PascalCase dotted | `GusWorld.Engine.Foundation.Buses` |
+| Files | PascalCase matching class | `EventBus.cs` ↔ `class EventBus` |
+| Interfaces | I-prefix PascalCase | `interface ISaveable` |
 
-**Decisão:** GDScript pra 100% do gameplay G1. C# **não** entra em G1.
+#### Static typing
 
-**Reserva de exceção:** se profiler mostrar hotspot real (ex.: A* pathfinding em mapa grande, simulação de fauna da Selve com N>1000 entidades), extrair como **GDExtension em C++** (não C#). Justificativa: C++ via GDExtension já é stack default do usuário (Qt23) — coerência cognitiva > poliglota. C# traria runtime sem ganho proporcional.
-
----
-
-## 2. Separação engine/game
-
-### 2.1. Critério de divisão
-
-> *Engine = "se eu fizesse outro RPG turn-based amanhã, copio isto sem mudar".*
-> *Game = "se eu mudar de jogo, jogo isto fora".*
-
-### 2.2. Conteúdo de `/engine/` (reutilizável)
-
-| Módulo | Responsabilidade |
-|---|---|
-| `orbital_camera` | Camera3D 3/4 isométrica-livre, rotação orbital (8 ou 16 stops, ou contínua), zoom, edge-pan, follow target opcional |
-| `turn_combat` | State machine de turnos (Initiative → ActionSelect → Resolve → End), action queue, hooks de IA |
-| `party` | Roster de personagens, stats genéricas (HP/MP/AP/buffs), equipamento slots agnósticos |
-| `card_engine` | Deck/hand/discard/exile, custo, efeito como `Resource` com `apply(target, context)`, combos por tags |
-| `dialogue` | Grafo (nós + escolhas + condições), parser de arquivo (ver §6), variáveis de sessão, hook localização |
-| `save_system` | Snapshot serializável, slots, autosave, versionamento + migração (ver §5) |
-| `scene_router` | Stack de cenas, transições, persistência de estado entre mapas |
-| `audio_director` | Buses Master/Music/SFX/Voice/UI, ducking, crossfade entre tracks |
-| `input_remap` | Bind table editável runtime, gamepad+kbm, persiste em `user://input.cfg` |
-| `localization` | Wrapper sobre `tr()` + reload runtime + pluralização (ver §6) |
-| `event_bus` | Signal global tipado pra eventos cross-system (sem virar god-object — limite ~20 sinais) |
-| `puzzle_kit` | Primitivas: trigger, switch, gate, sequência, validador genérico (puzzles específicos ficam em `/game/`) |
-
-### 2.3. Conteúdo de `/game/` (game-specific GusWorld)
-
-- Lore, characters (Gus, NPCs, fauna da Selve), levels, mapas, scripts de quest.
-- Conteúdo de diálogo, conteúdo de cartas (Código de Raiz, Pulso Elétrico, etc.).
-- Balance data (`.tres` Resources), tabelas de loot, currency.
-- Arte/áudio importados (sources brutos ficam em `/assets/`).
-- Skins de UI (estética ciber-gótica + Selve).
-- Mecânicas-âncora específicas: Sintonização Ortodôntica, Compilação Rúnica, Vetores do Gambito — implementadas **sobre** as primitivas da engine, não dentro dela.
+C# é statically-typed obrigatório. Zero `dynamic`, zero reflection runtime não-trimming-friendly (AOT-compat).
 
 ---
 
-## 3. Estratégia de reaproveitamento
+## §2. Camadas arquiteturais (5 layers canon ADR-002)
 
-### 3.1. Avaliação das opções
+```
+┌─────────────────────────────────────────────────┐
+│  Front       game/scenes + game/ui (.tscn + UI) │  User-facing visual layer
+├─────────────────────────────────────────────────┤
+│  Mid         game/scripts (game-logic + ECS)    │  GusWorld-specific game logic
+├─────────────────────────────────────────────────┤
+│  Back        engine/back/ (gameplay reusável)   │  Engine-level gameplay modules
+├─────────────────────────────────────────────────┤
+│  Foundation  engine/foundation/ (core infra)    │  Critical non-game-specific
+├─────────────────────────────────────────────────┤
+│  Assets      assets/ (sources arte/som)         │  Source files (Blender, Krita)
+└─────────────────────────────────────────────────┘
+```
 
-| Opção | Prós | Contras | Veredito G1 |
-|---|---|---|---|
-| Submodule git | Versão independente, fácil bump | Submodule é frágil em workflow solo, fácil esquecer push | **SIM (escolha)** |
-| Godot addon (plugin.cfg em `addons/`) | Drag-and-drop entre projetos | Cada addon é silo, dependências entre addons viram dor | Sim **dentro** do submodule |
-| GDExtension C++ | Perf, portável binário | Build cross-platform vira projeto em si | Só sob pressão de perf |
-| Cópia manual | Zero overhead inicial | Drift entre projetos garantido | NÃO |
-| Asset Library publish | Comunidade, versionamento | Burocracia, exige API estável | NÃO em G1 |
+### §2.1. Foundation layer
 
-### 3.2. Decisão concreta
+**Críticos non-game-specific.** Reusáveis em qualquer projeto Godot.
 
-**Layout:**
-- `/engine/` é um **repositório git separado** (`gusworld-engine` ou nome neutro tipo `vector-engine`), incluído em `gusworld` via **git submodule**.
-- Dentro de `/engine/` cada módulo é um **Godot addon** (`engine/addons/<modulo>/plugin.cfg`). Isso garante que o projeto Godot do game (`/game/project.godot`) os ative individualmente via Project Settings → Plugins.
-- Symlink ou path config: `/game/addons/` aponta pra `/engine/addons/` (symlink em dev; cópia no CI build se necessário).
+```
+engine/foundation/
+├── buses/                  (4 buses split, ADR-002 batch 3)
+│   ├── GameStateBus.cs     (game_started, game_paused, game_saved, game_loaded)
+│   ├── PlayerBus.cs        (player_moved, player_interacted, player_hp_changed, player_died)
+│   ├── CombatBus.cs        (combat_started, combat_ended, turn_started, turn_ended, action_resolved)
+│   └── UIBus.cs            (dialogue_shown, dialogue_choice_made, menu_opened, menu_closed)
+├── save_system/            (JSON System.Text.Json source-gen + HMAC-SHA256 anti-cheat)
+├── localization/           (custom MD loader + AutoLoad)
+├── input_remap/            (InputMap remap + persist em save)
+├── audio_director/         (audio bus + AudioStreamPlayer wrappers)
+└── scene_router/           (fade in/out + async loading)
+```
 
-**Razão:** solo G1 não quer maintainence overhead de 12 repos. 1 repo `engine` + 1 repo `game` = balance. Addons internos viram standalone naturalmente quando maduros.
+### §2.2. Back layer
 
-**Versionamento da engine:** semver simples no submodule. Game cravado em commit hash. Bump deliberado.
+**Gameplay reusável.** Padrões turn-based + adventure indie genéricos.
+
+```
+engine/back/
+├── orbital_camera/         (Camera3D + SpringArm3D + Node3D pivot, 3/4 rotacional)
+├── turn_combat/            (state machine + initiative queue)
+├── party/                  (roster ≤7, active ≤3, swap mechanics)
+├── card_engine/            (deck operations + CardResource + effects)
+├── dialogue/               (branching + variables persist)
+└── puzzle_kit/             (Vetor do Gambito predição + outros futuros)
+```
+
+### §2.3. Mid layer
+
+**GusWorld-specific game-logic.**
+
+```
+game/scripts/
+├── knowledge_system/       (Knowledge Progression score híbrido + gates)
+├── arcs/                   (state machine progressão arcos companions)
+├── encounters/             (encounter design + balance specifics)
+├── characters/             (Gus + companions stats + abilities específicos)
+└── world/                  (world state + flags + canon variables)
+```
+
+### §2.4. Front layer
+
+**User-facing visual + interaction.**
+
+```
+game/
+├── scenes/                 (.tscn cenas Godot)
+│   ├── main.tscn
+│   ├── levels/             (distrito_inferiores.tscn, selve_sombria_01.tscn, etc)
+│   ├── characters/         (gus.tscn, npcs/, enemies/)
+│   └── ui/                 (hud.tscn, menus/, dialogue_ui.tscn)
+├── translations/           (pt_br.md + en_intl.md custom format)
+└── tools/                  (validate_autoloads.cs + dev helpers, pós-F2-S.MIG)
+```
+
+### §2.5. Assets layer
+
+**Source files.** Não-código.
+
+```
+assets/
+├── models/                 (.blend Blender sources)
+├── textures/               (.kra Krita + atlas gradient PNG export)
+├── sprites/                (.aseprite UI + 2D)
+├── sfx/                    (audio raw .wav)
+└── music/                  (DAW source + .ogg export)
+```
+
+### §2.6. Regras de dependência
+
+- **Foundation NÃO importa de** Back/Mid/Front/Assets.
+- **Back importa de** Foundation only.
+- **Mid importa de** Foundation + Back.
+- **Front importa de** Foundation + Back + Mid (Front = composição final).
+- **Assets** são consumidos por Front (load runtime), não importam código.
+
+Audit via CI: `grep -r "GusWorld.Game" engine/` deve retornar empty.
 
 ---
 
-## 4. Sistemas core (visão detalhada)
+## §3. Engine repo separado (gus_dragon-engine)
 
-### 4.1. Camera orbital 3/4
+ADR-002 batch 3 canonizou repo separado **desde agora**.
 
-- `Camera3D` filha de `SpringArm3D` filho de `Node3D` (pivot).
-- Rotação orbital: input `camera_rotate_left/right` aplica yaw em stops de 45° (ou contínuo via hold + mouse drag).
-- Zoom: spring length 6.0 → 20.0, smoothstep.
-- Tilt fixo isométrico (~30-35°) com override opcional pra cutscene.
-- Follow: target = `Node3D` exportado; tween de lerp pra evitar jitter.
-- API: `set_target(node)`, `snap_to(angle)`, `shake(intensity, duration)`.
+### §3.1. Setup
 
-### 4.2. Turn-based combat
+- **Repo:** `gus_dragon-engine` em Codeberg `petrinhu/gus_dragon-engine`.
+- **Inclusão em gusworld:** via `git submodule add`.
+- **Path em gusworld:** `engine/` (root level).
+- **Convenção:** game project `game/engine` é symlink pra `../engine/` (que é submodule pra repo separado).
 
-- State machine explícita: `RoundStart → TurnStart → ActionSelect (player ou AI) → ActionResolve → TurnEnd → (próximo) → RoundEnd`.
-- Initiative: array ordenado por stat `speed` + tiebreaker determinístico.
-- Action = `Resource` com `cost`, `range`, `targets`, `effect_script` (callable).
-- AI: behavior tree leve ou utility-based (1 arquivo por archetype de inimigo).
-- **Hook para Vetores do Gambito:** modo "preview" que executa simulação dry-run do próximo turno do inimigo e mostra trajetória holográfica.
+### §3.2. Versionamento
 
-### 4.3. Deck/cards system
+- Semver simples por commit hash em submodule.
+- Game cravado em commit específico do submodule.
+- Bump deliberado: revisar mudanças engine antes de bumpar reference em gusworld.
 
-- `CardResource`: id, name, cost (AP/MP), tags (`raiz`, `eletrico`, `gambito`...), effect_chain.
-- Deck = `Array[CardResource]` + RNG seeded por save.
-- Hand/Discard/Exile como `Array`. Operations: `draw(n)`, `play(card, target)`, `discard(n)`, `mill(n)`.
-- **Compilação Rúnica:** combo detector — se hand contém cards com tags compatíveis, expõe ação "Compile" que gera card temporário com efeito merge. Tabela de combos em `/game/data/runic_combos.tres`.
+### §3.3. Quando publicar (ordem standalone ADR-002 batch 7)
 
-### 4.4. Dialogue
+1. **save_system** (1º, mais reutilizável cross-genre).
+2. **event_bus + buses split** (2º).
+3. **localization** (3º).
+4. **input_remap** (4º).
+5. **orbital_camera** (5º, alto valor reuso indie).
+6. **card_engine + dialogue** (6º-7º).
 
-- Grafo nodes-and-edges. Arquivo `.dialogue` (texto custom) compilado em `Resource` no import.
-- Suporta: choices, conditions (`{has_item:tactical_glasses}`), variable set/get, jump, localized string key.
-- Renderer = cena UI no `/game/` (engine só fornece o runtime do grafo).
-
-### 4.5. Party management
-
-- G1: party pequena (1-3 personagens). Não generalizar pra 6+ — over-engineering.
-- Roster fora de combate vs active em combate.
-- Stats: HP, MP, AP, Defense, Speed, status effects (array de `Resource` com duração).
-
-### 4.6. Save/load
-
-Ver §5 (detalhe).
-
-### 4.7. Inventory
-
-- Slot-less com stack quantity (simples G1). Categoria: card, key_item, consumable, equipment.
-- Item = `Resource`. Inventory = `Dictionary[item_id, quantity]`.
-- Equipment slots: glasses, ortho_matrix, drive — fixos canônicos do Gus (não generalizar).
-
-### 4.8. Puzzle hooks
-
-- Primitivas da engine: `Trigger`, `Switch`, `Gate`, `Sequence`, `Validator`.
-- Puzzles específicos (sintonização de frequências, decode rúnico) ficam em `/game/scenes/puzzles/`.
+Publicação standalone = repo público próprio + Godot Asset Library opcional (pós-1.0.0).
 
 ---
 
-## 5. Save format
+## §4. Sistemas core (visão detalhada)
 
-### 5.1. Decisão: **JSON** (escolha SIM)
+### §4.1. Orbital camera (Back layer)
 
-| Critério | JSON | Binary `Resource` (.tres/.res) |
-|---|---|---|
-| Debuggable a olho nu | **sim** | não |
-| Diff em git (saves de teste) | **sim** | ruim |
-| Forward-compat manual | **controlado** | depende de Godot |
-| Tamanho | maior | menor |
-| Velocidade | suficiente | mais rápido |
-| Tampering por jogador | trivial | um pouco mais difícil |
+**Path:** `engine/back/orbital_camera/OrbitalCamera.cs`
 
-**Veredito G1:** JSON. Single-player puro, anti-tampering é não-objetivo. Debug solo agradece JSON legível.
+Setup canon Godot 4:
+```
+Node3D (pivot, follows player position)
+└── SpringArm3D
+    └── Camera3D
+```
 
-### 5.2. Schema D1
+- Rotação 3/4 + zoom min/max.
+- Spring length ajusta dinamicamente (collision-aware).
+- `collision_mask` exclui player layer.
+- Tests: `engine/back/orbital_camera/tests/OrbitalCameraTests.cs` (xUnit).
 
-```json
+### §4.2. Turn-based combat (Back layer)
+
+**Path:** `engine/back/turn_combat/TurnCombatManager.cs`
+
+State machine explícita:
+- `Round` then `Turn` then `ActionSelect` then `Resolve` then `TurnEnd`
+- Initiative queue (priority queue por agility stat).
+- Signals via `CombatBus.Instance`.
+- Tests cover state transitions + edge cases (tie-breaking, status effects).
+
+### §4.3. Card engine (Back layer)
+
+**Path:** `engine/back/card_engine/CardEngine.cs`
+
+- `CardResource` (Godot Resource wrapper + C# DataClass POCO, ADR-002 batch 4).
+- Deck ops: shuffle, draw, discard, reshuffle.
+- Effects via Callable-like pattern (delegate-based em C#, AOT-friendly).
+- Tests cover deck ops + effect resolution.
+
+### §4.4. Dialogue (Back layer)
+
+**Path:** `engine/back/dialogue/DialogueSystem.cs`
+
+- Decisão lib (Ink vs DialogueManager vs custom): ADR-003 futuro em F2-E.6 task.
+- Branching base + variáveis persistentes via SaveSystem.
+- Signals via `UIBus.Instance.DialogueShown` + `DialogueChoiceMade`.
+
+### §4.5. Party (Back layer)
+
+**Path:** `engine/back/party/PartyManager.cs`
+
+- Roster total: ≤7 (Gus + 6 companions canon).
+- Active in combat: ≤3.
+- Swap mechanics: trigger em hub seguro (não em combate).
+
+### §4.6. Save/load (Foundation layer)
+
+**Path:** `engine/foundation/save_system/SaveManager.cs`
+
+#### Formato
+
+- **JSON via `System.Text.Json` source-generated** (AOT-compat, perf max, no reflection).
+- Vector3/Color/Quaternion serializados via custom `JsonConverter<T>`.
+- Schema versionado `save_version: N` desde D1.
+- Forward-only migrators (`Migrator_N_to_N_plus_1.cs`).
+
+#### Anti-cheat (ADR-002 batch 5)
+
+**HMAC-SHA256 com chave embarcada** (strict anti-modding):
+
+```csharp
+// Estrutura save
 {
-  "save_version": 1,
-  "engine_version": "0.1.0",
-  "game_version": "0.1.0",
-  "created_at": "2026-05-15T14:00:00Z",
-  "playtime_seconds": 0,
-  "scene": "res://game/scenes/levels/distrito_inferior.tscn",
-  "player": { "position": [0,0,0], "stats": {...} },
-  "party": [...],
-  "inventory": {...},
-  "deck": [...],
-  "flags": {...},
-  "quests": {...}
+    "save_version": 1,
+    "payload": { ... game state ... },
+    "integrity_hmac": "abc123def...sha256hex"
 }
 ```
 
-### 5.3. Versionamento e migração
+- Em save: compute `HMAC-SHA256(payload, embedded_key)` resulta em `integrity_hmac`.
+- Em load: recompute + compare. Mismatch = **reject load** (não tenta repair).
+- Backup chain N=3: 3 autosaves anteriores preservados em rotation. Se atual rejected, oferece anterior.
+- Chave embarcada hardcoded na build (não em ENV, não em config). Trade-off: modders avançados podem extrair, mas casual cheating bloqueado.
 
-- `save_version: 1` desde D1. **Inegociável.**
-- Loader: `SaveSystem.load(path)` → detecta `save_version` → aplica chain de migrators (`migrate_1_to_2`, `migrate_2_to_3`...) → retorna struct atual.
-- Migrators são funções puras em `/engine/addons/save_system/migrations/`.
-- Forward-compat: campos desconhecidos em saves antigos = ignorados sem crash. Campos faltantes em saves antigos = preenchidos com defaults documentados.
-- Slot layout: `user://saves/slot_N.json` + `user://saves/autosave.json` + `user://saves/quicksave.json`.
+#### Caminhos cross-platform
+
+- Linux: `~/.local/share/godot/app_userdata/GusWorld/saves/`
+- Windows: `%APPDATA%/Godot/app_userdata/GusWorld/saves/`
+- Acesso via `user://saves/slot_N.json`.
+
+### §4.7. Inventory (Mid layer)
+
+**Path:** `game/scripts/world/InventoryManager.cs`
+
+- Equipment slots: `glasses`, `ortho_matrix`, `drive` (canônicos Gus, **game-specific NÃO em engine**).
+- Items consumíveis + key items + lore docs descobertos.
+- Persist via save.
+
+### §4.8. Puzzle hooks (Back layer)
+
+**Path:** `engine/back/puzzle_kit/PuzzleKit.cs`
+
+- Vetor do Gambito predição (turn-based preview).
+- Outros puzzles canon (a definir conforme arcos).
+- Padrão extensível via interface `IPuzzle`.
 
 ---
 
-## 6. Localização
+## §5. Save format
 
-### 6.1. Decisão: **Godot `tr()` + CSV** (escolha SIM)
+Canonizado em §4.6 + CONTRACT.md §7. Resumo:
 
-- v1 só pt-br, mas D1 com infra. Custo de retrofitar localização depois é alto.
-- CSV (`localization/strings.csv`) com colunas `key, pt_BR, en_US, ...` — Godot importa nativo.
-- Toda string visível ao jogador passa por `tr("KEY_ID")`. Sem string literal em UI.
-- Pluralização: Godot 4 suporta `tr_n("KEY", "KEY_PLURAL", count)`. Usar.
-- Formatação: `tr("KEY").format({"name": "Gus"})`. **Não** ICU MessageFormat (overhead pra solo).
-
-**Recusado:** sistema próprio (NIH). ICU MessageFormat (gramáticas slavas não são problema G1, pt-br + en-US bastam).
-
-### 6.2. Convenção de chaves
-
-- `UPPER_SNAKE_CASE` com namespace: `UI_MAIN_MENU_PLAY`, `DIALOGUE_GUS_INTRO_01`, `ITEM_CARD_RAIZ_NAME`, `ITEM_CARD_RAIZ_DESC`.
-- Diálogos: chaves geradas automaticamente pelo compilador de `.dialogue`.
+- JSON `System.Text.Json` source-generated.
+- `save_version: N` + forward-only migrators desde D1.
+- HMAC-SHA256 anti-cheat.
+- 3-save backup chain rotation.
+- Custom converters Vector3/Color/Quaternion.
 
 ---
 
-## 7. Build pipeline
+## §6. Localização (Foundation layer)
 
-### 7.1. Targets
+Canonizado em F2-S.11 + CONTRACT.md §6 (Gate 4 a11y).
 
-| Target | Formato | Signing |
+- **Custom MD loader** (decisão criador supremo, não-CSV canon Godot).
+- AutoLoad `Localization` C# pattern (singleton).
+- Locales: `pt_br` (dev primário), `en_intl` (alvo pós-v1.0.0).
+- Fallback chain: corrente, en_intl, pt_br, literal.
+- Hot-reload em dev via `Localization.Instance.Reload()`.
+
+Detalhes em `engine/foundation/localization/README.md`.
+
+---
+
+## §7. CI/CD strategy
+
+- **Forgejo Actions** em Codeberg.
+- Pipeline:
+  1. `lint`: `dotnet format --verify-no-changes` + `dotnet build /warnaserror`.
+  2. `test`: `dotnet test` (xUnit).
+  3. `import`: `godot --headless --path ./game --import`.
+  4. `build`: `dotnet publish -c Release` + `godot --export-release` (Linux + Windows).
+  5. `aot_check`: validar publish AOT exit 0 sem warnings.
+- CI image: `mcr.microsoft.com/dotnet/sdk:8.0` + Godot Mono binary cached.
+
+Detalhes em `build.md`.
+
+---
+
+## §8. Branching strategy
+
+Canonizado em CONTRACT.md §3:
+
+- `main` sempre verde.
+- `feat/*` pra features grandes (≥5 arquivos OU one-way door OU toca save).
+- **12h cooling-off** em features grandes antes de merge.
+- Squash merge feat to main; fast-forward bugfix to main.
+
+---
+
+## §9. Acessibilidade gates D1
+
+4 gates D1 obrigatórios pra v1.0.0 (CONTRACT.md §6):
+
+1. Controles remappáveis (InputMap + persist).
+2. Contraste WCAG 2.2 AA (4.5:1 corpo, 3:1 large/UI).
+3. Reduce motion toggle (screen shake, motion blur, parallax).
+4. Subtitles + closed captions (fonte ajustável, BG opcional).
+
+Implementação em Mid/Front layers conforme módulos UI.
+
+---
+
+## §10. Anti-objetivos G1 (NÃO fazer)
+
+- ❌ Multiplayer (single-player puro decisão fechada).
+- ❌ Modding API público.
+- ❌ Cloud save (3-save backup chain local suficiente).
+- ❌ Signing Windows G1 (SmartScreen warning aceito).
+- ❌ Steamworks G1 (Linux + Windows DRM-free initial).
+- ❌ Asset Library publish em G1 (publicar pós-1.0.0).
+- ❌ Localization en_intl pré-v1.0.0 (dev pt-br only).
+- ❌ AI/LLM em runtime (gameplay determinístico, AI tradicional).
+
+---
+
+## §11. Trade-offs aceitos (com justificativa)
+
+- **C# hot-reload mais lento que GDScript:** aceito pra ganhar perf nativa AOT (ADR-002 §5).
+- **AOT MUST em dev** (mais estrito que padrão): garante perf consistente, evita surprises em release.
+- **HMAC-SHA256 anti-cheat strict:** trade-off modding casual bloqueado pra anti-cheat. Solo single-player aceita.
+- **5 camadas (não 3):** overhead organizacional pra disciplina arquitetural máxima.
+- **Engine repo separado desde D1:** custo setup ~2-4h pra disciplina early.
+- **CSV/PO canon Godot rejeitado** (i18n custom MD): trade-off custom loader pra legibilidade lore longa.
+- **Backup chain N=3** (não maior): trade-off espaço disk pra robustez. N=3 cobre 95% casos.
+
+---
+
+## §12. AOT compilation + perf budget detalhado
+
+### §12.1. AOT policy
+
+- **AOT MUST em release + dev** (ADR-002 batch 1).
+- Justificativa: garantia perf máxima sem variabilidade JIT vs AOT entre dev e prod.
+- Override: emergência debug (debugger não suporta AOT bem), commit body `OVERRIDE CONTRACT §AOT` + follow-up task.
+
+### §12.2. AOT-compatibility rules
+
+- Zero `dynamic` keyword.
+- Reflection limitada: usar `[DynamicallyAccessedMembers]` quando necessário.
+- Source generators preferidos sobre runtime reflection (`System.Text.Json`, MessagePack, etc).
+- Trim warnings = build errors. CI flags.
+
+### §12.3. Perf budget (cross-ref CONTRACT.md §5)
+
+Target hardware: GTX 1050 + 4GB VRAM + 8GB RAM dual-core 3.0GHz.
+
+| Métrica | Alvo | Trigger refac |
 |---|---|---|
-| Linux x86_64 | `.tar.gz` contendo binário + `.pck` | não em G1 |
-| Linux x86_64 | AppImage (stretch goal) | não em G1 |
-| Windows x86_64 | `.zip` contendo `.exe` + `.pck` | **não em G1** (cert custa ~$300/ano; Defender SmartScreen vai reclamar; aceito) |
+| Frame rate sustentado | 60fps @ 1080p | < 55fps por > 3s |
+| Frame time pico | < 16.6ms | > 25ms p99 |
+| Memory RAM | < 1.5GB residente | > 2GB típica |
+| Memory VRAM | < 1GB | > 2GB pico |
+| Load scene | < 3s | > 5s |
+| Save/load roundtrip + HMAC | < 1s | > 2s |
+| Cold start | < 5s | > 8s |
+| Turn resolve combat | < 100ms | > 250ms |
 
-**Flatpak/Snap:** anti-objetivo G1. Avaliar pós-1.0.
+### §12.4. Profile workflow
 
-### 7.2. Templates de export
-
-- `export_presets.cfg` versionado no git (sem secrets).
-- Templates oficiais Godot baixados via `godot --headless --download-export-templates` na primeira run de CI.
-- Encryption key: **não** em G1 (custo > benefício pra single-player indie).
-
-Detalhes de comandos em [`build.md`](./build.md).
-
----
-
-## 8. Branching Forgejo
-
-### 8.1. Modelo: **Trunk-based simplificado** (solo G1 não precisa GitFlow)
-
-- `main` — sempre buildável. Tag `v0.X.Y` em milestones.
-- `dev` — integração diária. Pode ter WIP. Merge em `main` em milestone.
-- `feat/<short-name>` — feature de mais de 2 dias. Merge em `dev` via PR (mesmo solo, força reflexão).
-- `fix/<short-name>` — hotfix em `main`, cherry-pick pra `dev`.
-- Tags: `engine-v0.X.Y` no repo `engine`, `game-v0.X.Y` no repo `game`.
-
-### 8.2. Commits
-
-- Conventional Commits (`feat:`, `fix:`, `refactor:`, `docs:`, `chore:`).
-- pt-br no corpo OK; tipo em inglês.
-- Sem `--no-verify`, sem `--force` em `main`.
-
-### 8.3. CI
-
-- Forgejo Actions (esqueleto em [`build.md`](./build.md)).
-- Job mínimo: lint GDScript (`gdtoolkit`) + import headless + export Linux/Windows + upload artifact.
+- **dotnet-trace** pra CPU profiling C# (mais granular que Godot profiler).
+- **Godot Profiler** built-in pra rendering + scene tree.
+- **Coverlet** + OpenCover pra coverage tests.
+- Profile em milestones (M.1, M.2, M.3, M.4).
+- Otimização **MUST** ser data-driven (profiler real).
+- GDExtension C++ MAY ser introduzido quando hot path C# medido < target.
 
 ---
 
-## 9. Estrutura final do repo
+## §13. Cross-refs
 
-```
-gusworld/                          # repo "game" (root)
-├── CLAUDE.md
-├── README.md
-├── LICENSE
-├── sinopse.md
-├── .gitignore
-├── .gitmodules                    # aponta engine/ → repo gusworld-engine
-│
-├── engine/                        # SUBMODULE → gusworld-engine.git
-│   ├── README.md
-│   ├── VERSION                    # semver da engine
-│   ├── addons/
-│   │   ├── orbital_camera/
-│   │   │   ├── plugin.cfg
-│   │   │   ├── plugin.gd
-│   │   │   ├── orbital_camera.gd
-│   │   │   └── README.md
-│   │   ├── turn_combat/
-│   │   ├── party/
-│   │   ├── card_engine/
-│   │   ├── dialogue/
-│   │   ├── save_system/
-│   │   │   ├── plugin.cfg
-│   │   │   ├── save_system.gd
-│   │   │   └── migrations/
-│   │   ├── scene_router/
-│   │   ├── audio_director/
-│   │   ├── input_remap/
-│   │   ├── localization/
-│   │   ├── event_bus/
-│   │   └── puzzle_kit/
-│   └── tests/                     # GUT (Godot Unit Test) suite da engine
-│
-├── game/                          # projeto Godot principal
-│   ├── project.godot
-│   ├── icon.svg
-│   ├── addons/                    # symlink → ../engine/addons/
-│   ├── scenes/
-│   │   ├── main.tscn
-│   │   ├── levels/
-│   │   │   ├── distrito_inferior.tscn
-│   │   │   └── selve_sombria_01.tscn
-│   │   ├── characters/
-│   │   │   ├── gus.tscn
-│   │   │   └── npcs/
-│   │   ├── ui/
-│   │   ├── combat/
-│   │   ├── puzzles/
-│   │   └── cutscenes/
-│   ├── scripts/                   # game-specific GDScript
-│   │   ├── globals/
-│   │   ├── characters/
-│   │   ├── combat/                # subclasses dos hooks da engine
-│   │   └── puzzles/
-│   ├── data/                      # .tres / .json de balance, cartas, combos
-│   │   ├── cards/
-│   │   ├── enemies/
-│   │   ├── items/
-│   │   └── runic_combos.tres
-│   ├── dialogue/                  # arquivos .dialogue source
-│   ├── localization/
-│   │   └── strings.csv
-│   ├── shaders/
-│   ├── art/                       # arte importada (final), references em /assets/
-│   ├── audio/                     # áudio importado (final)
-│   ├── fonts/
-│   ├── tests/                     # GUT tests do game
-│   └── export_presets.cfg
-│
-├── assets/                        # sources brutos (FORA do project.godot)
-│   ├── models/                    # .blend, .fbx originais
-│   ├── sprites/                   # .aseprite, .psd
-│   ├── textures/                  # PSD/Krita sources
-│   ├── music/                     # .wav/FLAC masters, projetos DAW
-│   ├── sfx/                       # masters
-│   └── references/                # mood boards
-│
-├── docs/
-│   ├── tech/
-│   │   ├── architecture.md        # este arquivo
-│   │   ├── engine-modules.md
-│   │   └── build.md
-│   ├── design/
-│   ├── narrative/
-│   ├── art/
-│   ├── audio/
-│   └── production/
-│
-├── build/                         # outputs (gitignored)
-│   ├── linux/
-│   │   └── v0.1.0/
-│   └── windows/
-│       └── v0.1.0/
-│
-├── tools/                         # scripts CLI auxiliares
-│   ├── export_linux.sh
-│   ├── export_windows.sh
-│   └── version_bump.sh
-│
-└── .forgejo/
-    └── workflows/
-        └── ci.yml
-```
-
-`.gitignore` deve cobrir: `build/`, `.import/`, `*.translation`, `export_presets.cfg.user`, `*.pck` em build, `user://` (não é commitado por natureza), `assets/` opcionalmente em LFS ou em repo separado.
-
-**Decisão sobre `/assets/`:** sources brutos podem ficar em **git-lfs** OU em **repo separado** (`gusworld-assets`). G1 recomendação: **git-lfs no mesmo repo** até cruzar ~5GB. Acima disso, separar.
+- `docs/tech/adr/ADR-001-pivot-lore-to-engine.md` (pivot Fase 1 to Fase 2).
+- `docs/tech/adr/ADR-002-csharp-aot-over-gdscript.md` (esta arquitetura).
+- `docs/tech/engine-modules.md` (módulos detalhados).
+- `docs/tech/build.md` (pipeline build + CI).
+- `CONTRACT.md` (disciplinas técnicas).
+- `TESTES.md` (T+A sections).
+- `docs/design/pillars.md` (5 pillars criativos imutáveis).
+- Memory `reference_godot_docs.md` + `reference_godot_csharp.md`.
 
 ---
 
-## 10. Anti-objetivos G1
-
-Lista do que **NÃO** se faz em G1. Cada um destes mata escopo solo de 6-12 meses.
-
-- **Custom engine.** Godot resolve. Ponto.
-- **Multiplayer netcode.** Single-player puro. Sem `MultiplayerSpawner`, sem `RPC`, sem rollback.
-- **Mod support / Lua scripting / runtime plugins.** Carga de design API + sandboxing + suporte de comunidade. Não em G1.
-- **In-game level editor.** Editor do Godot basta.
-- **Cutscene engine complexa.** Timeline + AnimationPlayer cobre G1.
-- **Photorealistic 3D / PBR pesado.** Estética estilizada ciber-gótica + Selve cabe em low-poly + post-processing + emissive. Não chasing fidelidade.
-- **Voice acting.** Texto + bleeps estilo Undertale/Banjo. Voz é pós-1.0 (se).
-- **Console ports (Switch/PS/Xbox).** Devkit + cert + bizdev: fora de G1 solo.
-- **Mobile.** Touch UI + perf + storefront. Não.
-- **Achievements/Steam integration na primeira build.** Steamworks API entra **depois** de demo jogável.
-- **Save em cloud / cross-save.** Local file only.
-- **Localização além de pt-br no v1.** Infra D1, conteúdo pt-br only. en-US é stretch pós-demo.
-- **Anti-cheat / anti-tamper.** Single-player. Não.
-- **Procedural generation de levels.** Levels handcrafted. Procedural é tentação solo-killer.
-- **Day-one DLC / season pass.** Foco no jogo base.
-- **Marketplace de cartas / economia online.** Single-player.
-- **Sistema de mods workshop.** Pós-1.0 se tração.
-- **Sistema de partículas custom / GPU compute.** `GPUParticles3D` nativo basta.
-- **Refactor da engine sem teste.** Cada módulo da engine precisa pelo menos 1 GUT test antes de virar dependência de outro módulo.
-
----
-
-## 11. Trade-offs aceitos explícitos
-
-- **GDScript over C#:** sacrifica perf marginal e portabilidade fora-de-Godot pra ganhar 30-50% velocidade de iteração solo. Aceito.
-- **JSON save over binary:** sacrifica tamanho de arquivo e dificuldade-de-tampering. Ganha debuggabilidade. Aceito (single-player).
-- **Engine como submodule com addons internos** vs publicar em Asset Library: sacrifica "discoverabilidade". Ganha velocidade de iteração + zero burocracia de release. Aceito até pós-1.0.
-- **Sem code signing Windows G1:** SmartScreen warning na primeira execução. Aceito (jogadores indie estão acostumados; cert custa mais que o demo provavelmente fatura).
-- **Sem cloud save:** se o disco do jogador morre, save perde. Aceito (mitigado por slot múltiplo + autosave + quicksave).
-- **Symlink `game/addons → engine/addons`:** Windows requer dev mode ou admin pra symlink. Aceito (dev primário é Linux; build Windows é só export, não exige symlink em runtime do jogo final).
-
----
-
-## 12. Próximos passos sugeridos
-
-1. Criar repo `gusworld-engine` no Forgejo, init com README + `addons/` vazio.
-2. Adicionar submodule no `gusworld` apontando pra ele.
-3. Primeiro módulo a implementar: `orbital_camera` (validação rápida da câmera 3/4).
-4. Segundo: `save_system` com schema v1 + 1 migrator dummy (validar pipeline de migração antes de ter saves reais).
-5. Terceiro: `turn_combat` esqueleto com 2 personagens dummy.
-6. Setup CI Forgejo Actions com job de export Linux (Windows depois).
+**Última revisão:** 2026-05-19. Pós-ADR-002 30 decisões canonizadas em 8 batches AskUser. Revisão obrigatória em F2-M.1 (vertical slice done).

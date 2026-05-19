@@ -1,372 +1,410 @@
-# GusWorld Engine — Módulos
+# Engine Modules (gus_dragon-engine), canon ADR-002
 
-> Catálogo dos módulos reutilizáveis em `/engine/addons/`. Cada um é um Godot addon standalone (tem `plugin.cfg`). Interface pública é o **único contrato estável** — internals podem refatorar livre.
-
----
-
-## 1. Visão geral
-
-| Módulo | Tipo | Autoload? | Standalone-ready? |
-|---|---|---|---|
-| `event_bus` | core | sim | sim |
-| `localization` | core | sim | sim |
-| `audio_director` | core | sim | sim |
-| `input_remap` | core | sim | sim |
-| `save_system` | core | sim | sim (após maturação) |
-| `scene_router` | core | sim | sim |
-| `orbital_camera` | gameplay | não (nó) | **sim — primeiro candidato a publicar** |
-| `turn_combat` | gameplay | parcial | sim (após maturação) |
-| `party` | gameplay | sim | sim |
-| `card_engine` | gameplay | parcial | sim — útil em qualquer TCG/deckbuilder |
-| `dialogue` | gameplay | sim | sim — útil em qualquer RPG |
-| `puzzle_kit` | gameplay | não (nós) | sim |
-
-"Standalone-ready" = pode virar addon publicável independente do GusWorld (sem dependência game-specific).
+> **Status:** Canon (revisão ADR-002 2026-05-19). Substitui rascunho GDScript inicial.
+>
+> **Escopo:** módulos C# .NET 8 em `engine/foundation/` (Foundation layer) + `engine/back/` (Back layer). Repo separado `gus_dragon-engine` em Codeberg (ADR-002 batch 3).
 
 ---
 
-## 2. Módulos core
+## §1. Visão geral
 
-### 2.1. `event_bus`
+Engine modular C# .NET 8 AOT. Distribuição por camada arquitetural:
 
-**Responsabilidade:** signals globais tipados pra eventos cross-system. Anti god-object: limite ~20 sinais.
+| Camada | Path | Característica |
+|---|---|---|
+| Foundation | `engine/foundation/` | Críticos non-game-specific. Reusáveis em qualquer projeto Godot 4. |
+| Back | `engine/back/` | Gameplay reusável (turn-based + adventure indie). |
 
-**Interface pública (`EventBus` autoload):**
-```gdscript
-signal game_paused(paused: bool)
-signal scene_changing(from: String, to: String)
-signal save_requested(slot: int)
-signal save_completed(slot: int, success: bool)
-signal combat_started(encounter_id: String)
-signal combat_ended(result: int)   # enum Victory/Defeat/Flee
-signal dialogue_started(dialogue_id: String)
-signal dialogue_ended(dialogue_id: String)
-signal flag_changed(flag_name: String, value: Variant)
-# ... (manter <=20 — quando estourar, criar bus dedicado)
+Cada módulo C# tem:
+- `<Module>.cs` (implementação principal).
+- `README.md` (API pública + uso).
+- `tests/<Module>Tests.cs` (xUnit suite).
+- Namespace: `GusWorld.Engine.<Layer>.<Module>`.
+
+---
+
+## §2. Foundation layer (6 módulos)
+
+### §2.1. `engine/foundation/buses/` (4 buses split, ADR-002 batch 3)
+
+Bus splits canonizados pra evitar god-object EventBus único.
+
+#### §2.1.1. `GameStateBus.cs`
+
+Game lifecycle signals.
+
+```csharp
+namespace GusWorld.Engine.Foundation.Buses;
+
+public partial class GameStateBus : Node
+{
+    public static GameStateBus Instance { get; private set; }
+
+    [Signal] public delegate void GameStartedEventHandler();
+    [Signal] public delegate void GamePausedEventHandler();
+    [Signal] public delegate void GameResumedEventHandler();
+    [Signal] public delegate void GameSavedEventHandler(int slot);
+    [Signal] public delegate void GameLoadedEventHandler(int slot);
+
+    public override void _Ready() => Instance = this;
+    public override void _ExitTree() { if (Instance == this) Instance = null; }
+}
 ```
 
-**Standalone:** sim. Zero dependência.
+#### §2.1.2. `PlayerBus.cs`
 
----
+Player events.
 
-### 2.2. `localization`
-
-**Responsabilidade:** wrapper sobre `tr()` + `tr_n()` com reload runtime e formatação por dicionário.
-
-**Interface pública (`L10n` autoload):**
-```gdscript
-func t(key: String, args: Dictionary = {}) -> String
-func tn(key: String, key_plural: String, count: int, args: Dictionary = {}) -> String
-func set_locale(code: String) -> void
-func get_available_locales() -> Array[String]
-signal locale_changed(new_locale: String)
+```csharp
+[Signal] PlayerMoved(Vector3 from, Vector3 to)
+[Signal] PlayerInteracted(string targetName)
+[Signal] PlayerHpChanged(int current, int maximum)
+[Signal] PlayerDied()
 ```
 
-**Dependências:** nenhuma (usa apenas TranslationServer nativo do Godot).
+#### §2.1.3. `CombatBus.cs`
 
-**Standalone:** sim.
+Turn-based combat events.
 
----
-
-### 2.3. `audio_director`
-
-**Responsabilidade:** gerencia AudioBuses (Master/Music/SFX/Voice/UI), crossfade entre tracks, ducking de música durante diálogo.
-
-**Interface pública (`Audio` autoload):**
-```gdscript
-func play_music(stream: AudioStream, fade_sec: float = 1.0) -> void
-func stop_music(fade_sec: float = 1.0) -> void
-func play_sfx(stream: AudioStream, position: Vector3 = Vector3.ZERO) -> void
-func play_ui(stream: AudioStream) -> void
-func set_bus_volume(bus: String, db: float) -> void
-func duck_music(amount_db: float, duration_sec: float) -> void
+```csharp
+[Signal] CombatStarted(Godot.Collections.Array combatants)
+[Signal] CombatEnded(string winner)
+[Signal] TurnStarted(string combatantName)
+[Signal] TurnEnded(string combatantName)
+[Signal] ActionResolved(string actor, string target, string actionType, int value)
 ```
 
-**Dependências:** `event_bus` (opcional: escuta `dialogue_started/ended` pra duck automático).
+#### §2.1.4. `UIBus.cs`
 
-**Standalone:** sim (dependência de event_bus é opcional via if-exists).
+UI events.
 
----
-
-### 2.4. `input_remap`
-
-**Responsabilidade:** tabela de bindings editável runtime, persistida em `user://input.cfg`, suporta keyboard+mouse+gamepad.
-
-**Interface pública (`InputMap` autoload):**
-```gdscript
-func get_binding(action: String) -> Array[InputEvent]
-func set_binding(action: String, events: Array[InputEvent]) -> void
-func reset_to_defaults() -> void
-func save() -> void
-func load() -> void
-signal binding_changed(action: String)
+```csharp
+[Signal] DialogueShown(string dialogueId)
+[Signal] DialogueChoiceMade(string dialogueId, int choiceIndex)
+[Signal] MenuOpened(string menuName)
+[Signal] MenuClosed(string menuName)
 ```
 
-**Dependências:** nenhuma.
+**Total signals across 4 buses:** 5 + 4 + 5 + 4 = 18 (orçamento anti-god-object 20 mantido).
 
-**Standalone:** sim.
-
----
-
-### 2.5. `save_system`
-
-**Responsabilidade:** snapshot/restore de estado do jogo. Slots, autosave, versionamento, migrações.
-
-**Interface pública (`SaveSystem` autoload):**
-```gdscript
-func save(slot: int, payload: Dictionary) -> bool
-func load(slot: int) -> Dictionary    # já migrado pra schema atual
-func list_slots() -> Array[Dictionary] # [{slot, timestamp, playtime, scene}]
-func delete(slot: int) -> bool
-func quicksave() -> bool
-func quickload() -> Dictionary
-func autosave() -> bool
-const CURRENT_VERSION := 1
+**AutoLoad registro em `game/project.godot`:**
+```ini
+[autoload]
+GameStateBus="*res://engine/foundation/buses/GameStateBus.cs"
+PlayerBus="*res://engine/foundation/buses/PlayerBus.cs"
+CombatBus="*res://engine/foundation/buses/CombatBus.cs"
+UIBus="*res://engine/foundation/buses/UIBus.cs"
 ```
 
-**Como games registram dados:** cada sistema do game implementa `save_data() -> Dictionary` e `load_data(d: Dictionary)`. SaveSystem agrega via signals do `event_bus` (`save_requested` → coleta de todos os listeners).
+### §2.2. `engine/foundation/save_system/`
 
-**Migrações:** `addons/save_system/migrations/migrate_N_to_M.gd`, função pura `static func migrate(d: Dictionary) -> Dictionary`.
+**JSON System.Text.Json source-generated + HMAC-SHA256 anti-cheat** (ADR-002 batch 5).
 
-**Dependências:** `event_bus`.
+API pública (resumo):
 
-**Standalone:** sim (após estabilização — schema é game-specific, mas o framework é genérico).
+```csharp
+namespace GusWorld.Engine.Foundation.SaveSystem;
 
----
+public partial class SaveManager : Node
+{
+    public static SaveManager Instance { get; private set; }
 
-### 2.6. `scene_router`
+    public void SaveGame(int slot, SaveData data);
+    public SaveData LoadGame(int slot);  // throws SaveIntegrityException se HMAC falha
+    public bool HasSave(int slot);
+    public void DeleteSave(int slot);
 
-**Responsabilidade:** stack de cenas com transições fade, persistência opcional de estado entre cenas, prevenção de double-load.
-
-**Interface pública (`SceneRouter` autoload):**
-```gdscript
-func goto(scene_path: String, transition: String = "fade") -> void
-func push(scene_path: String) -> void       # empilha (overlay)
-func pop() -> void
-func current() -> String
-signal scene_changed(path: String)
+    // Backup chain rotation N=3
+    public IReadOnlyList<int> GetBackupSlots();
+}
 ```
 
-**Dependências:** `event_bus`.
+Migrators forward-only em `migrators/Migrator_<N>_to_<N_plus_1>.cs`.
 
-**Standalone:** sim.
+Tests obrigatórios: roundtrip + HMAC reject + migrator chain.
 
----
+### §2.3. `engine/foundation/localization/`
 
-## 3. Módulos gameplay
+Custom MD loader (decisão criador supremo, não-CSV canon Godot). F2-S.11 já implementado em GDScript; migração C# em F2-S.MIG.
 
-### 3.1. `orbital_camera`
+```csharp
+namespace GusWorld.Engine.Foundation.Localization;
 
-**Responsabilidade:** Camera3D 3/4 isométrica-livre, orbital, com zoom e follow.
+public partial class Localization : Node
+{
+    public static Localization Instance { get; private set; }
 
-**Interface pública (nó `OrbitalCamera` extends Node3D):**
-```gdscript
-@export var target: Node3D
-@export var orbit_stops: int = 8           # 0 = contínuo
-@export var zoom_min: float = 6.0
-@export var zoom_max: float = 20.0
-@export var pitch_degrees: float = 32.0
+    public string TrMd(string key, object[] args = null);
+    public void SetLocale(string locale);
+    public string GetLocale();
+    public IReadOnlyList<string> GetAvailableLocales();
+    public void Reload();  // dev-only iteration
+}
 
-func rotate_left() -> void
-func rotate_right() -> void
-func zoom_in() -> void
-func zoom_out() -> void
-func snap_to_angle(degrees: float) -> void
-func shake(intensity: float, duration_sec: float) -> void
-func set_target(node: Node3D) -> void
+public static class MdTranslationLoader
+{
+    public static Dictionary<string, string> LoadFromFile(string path);
+    public static Dictionary<string, string> Parse(string content);
+}
 ```
 
-**Dependências:** nenhuma.
+### §2.4. `engine/foundation/input_remap/`
 
-**Standalone:** **sim — primeiro candidato a publicar na Asset Library** quando estável. Câmera isométrica orbital genérica é demanda forte em Godot 4.
+InputMap remap canon (CONTRACT.md §6 Gate 1 a11y).
 
----
+```csharp
+public partial class InputRemapManager : Node
+{
+    public static InputRemapManager Instance { get; private set; }
 
-### 3.2. `turn_combat`
-
-**Responsabilidade:** state machine de turnos, fila de ações, hook de IA.
-
-**Interface pública (`TurnCombat` autoload + nó `CombatScene`):**
-```gdscript
-# TurnCombat (autoload)
-func start_encounter(actors: Array[CombatActor], encounter_id: String) -> void
-func end_encounter(result: int) -> void
-func current_actor() -> CombatActor
-func queue_action(action: CombatAction) -> void
-
-# CombatActor (Resource)
-@export var name: String
-@export var stats: Dictionary    # HP/MP/AP/Speed/Defense
-@export var ai_brain: Resource   # null = controlado pelo jogador
-@export var team: int            # 0=player, 1=enemy, etc.
-
-# CombatAction (Resource)
-@export var id: String
-@export var cost_ap: int
-@export var range_tiles: int
-@export var target_type: int     # enum self/ally/enemy/tile
-@export var effect: Callable
+    public void RemapAction(StringName action, InputEvent newEvent);
+    public void ResetToDefaults();
+    public Dictionary<StringName, InputEvent[]> ExportBindings();
+    public void ImportBindings(Dictionary<StringName, InputEvent[]> bindings);
+}
 ```
 
-**Estados (signals):** `round_started`, `turn_started(actor)`, `action_resolved(action)`, `turn_ended(actor)`, `round_ended`, `encounter_ended(result)`.
+Persist via SaveSystem.
 
-**Hooks Vetores do Gambito:** método `simulate_next_turn(actor) -> SimulationResult` que executa branch dry-run pra preview.
+### §2.5. `engine/foundation/audio_director/`
 
-**Dependências:** `event_bus`, `party` (opcional — combate pode usar actors avulsos).
+Audio bus + AudioStreamPlayer wrappers.
 
-**Standalone:** sim (após maturação).
+```csharp
+public partial class AudioDirector : Node
+{
+    public static AudioDirector Instance { get; private set; }
 
----
-
-### 3.3. `party`
-
-**Responsabilidade:** roster de personagens, ativos vs reserva, stats/equipment.
-
-**Interface pública (`Party` autoload):**
-```gdscript
-func add_member(member: PartyMember) -> void
-func remove_member(id: String) -> void
-func set_active(ids: Array[String]) -> void   # quais entram em combate
-func get_active() -> Array[PartyMember]
-func get_all() -> Array[PartyMember]
-func get_member(id: String) -> PartyMember
+    public void PlaySfx(string streamPath, float volumeDb = 0f);
+    public void PlayMusic(string streamPath, float fadeSeconds = 1.0f);
+    public void StopMusic(float fadeSeconds = 1.0f);
+    public void SetBusVolume(string busName, float volumeDb);
+}
 ```
 
-**Dependências:** `event_bus` (anuncia mudanças via signal).
+Buses: Master, Music, SFX, UI, Voice.
 
-**Standalone:** sim.
+### §2.6. `engine/foundation/scene_router/`
 
----
+Fade in/out + async scene loading.
 
-### 3.4. `card_engine`
+```csharp
+public partial class SceneRouter : Node
+{
+    public static SceneRouter Instance { get; private set; }
 
-**Responsabilidade:** deck/hand/discard/exile, draw/play/discard, combo detection.
-
-**Interface pública (`CardEngine` autoload + Resources):**
-```gdscript
-# CardEngine
-func create_deck(cards: Array[CardResource], seed: int = 0) -> Deck
-func draw(deck: Deck, n: int) -> Array[CardResource]
-func play(deck: Deck, card: CardResource, context: Dictionary) -> bool
-func discard(deck: Deck, cards: Array[CardResource]) -> void
-func find_combos(hand: Array[CardResource], combo_table: Array) -> Array[Combo]
-
-# CardResource
-@export var id: String
-@export var display_name_key: String  # localization key
-@export var cost: Dictionary          # {"ap": 1, "mp": 2}
-@export var tags: Array[String]       # ["raiz","eletrico","gambito"]
-@export var effect: Callable
-@export var art: Texture2D
+    public async Task GoToScene(string scenePath, float fadeSeconds = 0.5f);
+    public async Task ReloadCurrent();
+    public string GetCurrentScenePath();
+}
 ```
 
-**Dependências:** `event_bus`.
-
-**Standalone:** **sim — segundo candidato a publicar.** TCG/deckbuilder framework genérico é raro em Godot.
-
 ---
 
-### 3.5. `dialogue`
+## §3. Back layer (6 módulos)
 
-**Responsabilidade:** grafo de diálogo, parser de arquivo `.dialogue`, runtime (nodes/choices/conditions/variables).
+### §3.1. `engine/back/orbital_camera/`
 
-**Interface pública (`DialogueRunner` autoload):**
-```gdscript
-func start(dialogue_id: String) -> void
-func choose(option_index: int) -> void
-func get_current_line() -> DialogueLine    # {speaker, text_key, choices, ...}
-func set_variable(name: String, value: Variant) -> void
-func get_variable(name: String) -> Variant
-signal line_changed(line: DialogueLine)
-signal dialogue_finished(dialogue_id: String)
+Camera3D + SpringArm3D + Node3D pivot (canon Godot 4 + memo `reference_godot_docs.md`).
+
+```csharp
+namespace GusWorld.Engine.Back.OrbitalCamera;
+
+public partial class OrbitalCamera : Node3D
+{
+    [Export] public float ZoomMin { get; set; } = 2.0f;
+    [Export] public float ZoomMax { get; set; } = 12.0f;
+    [Export] public float RotationSpeed { get; set; } = 2.0f;
+    [Export] public Node3D FollowTarget { get; set; }
+
+    public void RotateBy(float deltaX, float deltaY);
+    public void ZoomBy(float delta);
+    public void ResetView();
+}
 ```
 
-**Formato `.dialogue`:** texto custom inspirado em Ink/Yarn (escolher Yarn-like por simplicidade). Compilado em `DialogueGraph` (Resource) no import via `EditorImportPlugin`.
+Cenas teste em `tests/OrbitalCameraTests.cs`.
 
-**Dependências:** `event_bus`, `localization`.
+### §3.2. `engine/back/turn_combat/`
 
-**Standalone:** sim (depende de localization, mas é dependência leve).
+State machine + initiative queue.
 
----
+```csharp
+public partial class TurnCombatManager : Node
+{
+    public enum CombatState { Idle, Round, Turn, ActionSelect, Resolve, TurnEnd, Ended }
 
-### 3.6. `puzzle_kit`
+    public CombatState CurrentState { get; private set; }
+    public IReadOnlyList<ICombatant> InitiativeOrder { get; private set; }
 
-**Responsabilidade:** primitivas reusáveis pra puzzles. Não implementa puzzles concretos.
-
-**Nós fornecidos:**
-- `PuzzleTrigger` — emite signal quando o player entra na área.
-- `PuzzleSwitch` — toggle on/off, signal `state_changed`.
-- `PuzzleGate` — abre/fecha em resposta a condição.
-- `PuzzleSequence` — valida ordem de ativação de N switches.
-- `PuzzleValidator` — node genérico com função `validate() -> bool` exportada como Callable.
-
-**Dependências:** `event_bus`.
-
-**Standalone:** sim.
-
----
-
-## 4. Diagrama de dependências
-
-```
-                          +-----------------+
-                          |    event_bus    |  (raiz; sem deps)
-                          +--------+--------+
-                                   |
-        +--------------+-----------+-----------+--------------+--------------+
-        |              |                       |              |              |
-        v              v                       v              v              v
- +-------------+ +-----------+         +---------------+ +-----------+ +-----------+
- |localization | |audio_dir. |         | scene_router  | |save_system| | party     |
- +------+------+ +-----+-----+         +-------+-------+ +-----+-----+ +-----+-----+
-        |              |                       |              |              |
-        |              | (duck on dialogue)    |              |              |
-        |              |                       |              |              |
-        v              |                       v              v              v
- +-------------+       |              +-----------------+                     |
- |  dialogue   |<------+              | (qualquer cena) |                     |
- +------+------+                      +-----------------+                     |
-        |                                                                    |
-        |                                                                    |
-        |    +-------------+                                                  |
-        |    | card_engine |                                                  |
-        |    +------+------+                                                  |
-        |           |                                                        |
-        |           v                                                        |
-        |    +-------------+                                                  |
-        +--->|turn_combat  |<-------------------------------------------------+
-             +------+------+
-                    |
-                    | (combate consome dialogue/cards/party)
-                    v
-             +-----------------+
-             |  game-specific  |
-             +-----------------+
-
- +----------------+   +----------------+
- |orbital_camera  |   |  puzzle_kit    |   (independentes; só event_bus opt.)
- +----------------+   +----------------+
-
- +----------------+
- |  input_remap   |   (independente)
- +----------------+
+    public void StartCombat(IEnumerable<ICombatant> participants);
+    public void SubmitAction(ICombatAction action);
+    public void EndCombat(string winner);
+}
 ```
 
-**Regras:**
-- `event_bus` não depende de ninguém. Tudo pode depender dele.
-- Sentido único: gameplay depende de core, **nunca o inverso**.
-- `localization` só depende de TranslationServer nativo (acima do diagrama em prioridade de boot).
-- `dialogue` é a única dep transversal (precisa de localization). Aceito — diálogo sem L10n é raro.
-- `turn_combat` é o módulo mais "acoplado" (combina party + cards + event_bus). Tolerável pela natureza do feature.
+Tests cobrem: tie-breaking, status effects, action queue ordering.
+
+### §3.3. `engine/back/party/`
+
+Roster ≤7, active ≤3, swap mechanics.
+
+```csharp
+public partial class PartyManager : Node
+{
+    public IReadOnlyList<PartyMember> Roster { get; }
+    public IReadOnlyList<PartyMember> Active { get; }
+
+    public void AddMember(PartyMember member);
+    public void SetActiveSlot(int slot, PartyMember member);
+    public bool CanSwap();  // false em combate
+}
+```
+
+### §3.4. `engine/back/card_engine/`
+
+Deck + CardResource + effects.
+
+```csharp
+public partial class CardEngine : Node
+{
+    public IReadOnlyList<CardResource> Hand { get; }
+    public IReadOnlyList<CardResource> Deck { get; }
+    public IReadOnlyList<CardResource> Discard { get; }
+
+    public void Draw(int count);
+    public void Play(CardResource card, ICombatant target);
+    public void Shuffle();
+    public void Reshuffle();
+}
+
+public partial class CardResource : Resource
+{
+    [Export] public string Id { get; set; }
+    [Export] public string NameKey { get; set; }  // i18n key
+    [Export] public int Cost { get; set; }
+    [Export] public CardEffectType EffectType { get; set; }
+    [Export] public int EffectValue { get; set; }
+}
+```
+
+### §3.5. `engine/back/dialogue/`
+
+Branching + variáveis persistentes.
+
+ADR-003 futuro pra decisão de lib (custom vs Ink C# port vs DialogueManager port).
+
+```csharp
+public partial class DialogueSystem : Node
+{
+    public static DialogueSystem Instance { get; private set; }
+
+    public void StartDialogue(string dialogueId);
+    public void Continue();
+    public void Choose(int choiceIndex);
+    public Variant GetVariable(string name);
+    public void SetVariable(string name, Variant value);
+}
+```
+
+### §3.6. `engine/back/puzzle_kit/`
+
+Padrão extensível via interface `IPuzzle`.
+
+```csharp
+public interface IPuzzle
+{
+    string PuzzleId { get; }
+    void Initialize();
+    bool CheckSolution(Variant input);
+    void OnSolved();
+}
+
+public partial class PuzzleKit : Node
+{
+    public static PuzzleKit Instance { get; private set; }
+    public void RegisterPuzzle(IPuzzle puzzle);
+    public IPuzzle GetPuzzle(string puzzleId);
+}
+```
+
+Vetor do Gambito implementa `IPuzzle`.
 
 ---
 
-## 5. Candidatos a publicação standalone (ordem)
+## §4. Diagrama de dependências
 
-1. **`orbital_camera`** — demanda alta na comunidade, escopo claro, zero dependência.
-2. **`card_engine`** — nicho, mas underserved. Útil pra qualquer deckbuilder.
-3. **`dialogue`** — competição maior (Dialogue Manager, Dialogic), mas se a sintaxe ficar elegante, vale.
-4. **`save_system`** — útil generalizado; framework de migração é diferenciador.
-5. **`puzzle_kit`** — primitivas simples; publicar só se virar maduro.
+```
+Foundation (engine/foundation/)
+  ├── buses (4 buses)              ← raíz, depende de nada
+  ├── save_system                  ← usa buses (signals)
+  ├── localization                 ← independente
+  ├── input_remap                  ← usa save_system (persist)
+  ├── audio_director               ← usa buses (signals)
+  └── scene_router                 ← usa buses + localization
 
-Os outros (`event_bus`, `localization`, `audio_director`, `input_remap`, `party`, `turn_combat`, `scene_router`) ficam internos da engine por enquanto. Publicar custa documentação + suporte; G1 não tem orçamento pra isso.
+Back (engine/back/)
+  ├── orbital_camera               ← Foundation: buses + input_remap
+  ├── turn_combat                  ← Foundation: buses + save_system
+  ├── party                        ← Foundation: buses + save_system
+  ├── card_engine                  ← Foundation: buses + save_system
+  ├── dialogue                     ← Foundation: buses + save_system + localization
+  └── puzzle_kit                   ← Foundation: buses
+
+Mid (game/scripts/)                 ← Foundation + Back
+Front (game/scenes/, game/ui/)      ← Foundation + Back + Mid + Assets
+```
+
+**Audit rule (CI):** `grep -r "GusWorld\.Game" engine/` MUST retornar empty.
+
+---
+
+## §5. Candidatos a publicação standalone (ordem ADR-002 batch 7)
+
+Sequência canonizada baseada em valor de reuso cross-genre:
+
+1. **`save_system`** (1º). Reusable em qualquer projeto Godot.
+2. **`buses` (event_bus split)** (2º). Pattern global pra signals desacoplados.
+3. **`localization`** (3º). Custom MD format ainda nicho, mas exemplar.
+4. **`input_remap`** (4º). A11y gate D1, demanda comunidade.
+5. **`orbital_camera`** (5º). Alto valor indie 3rd-person.
+6. **`card_engine`** (6º). Específico turn-based, valor médio.
+7. **`dialogue`** (7º). Depende de decisão ADR-003 da lib.
+
+**Publicação = repo público `gus_dragon-engine` + Godot Asset Library opcional pós-1.0.0.**
+
+---
+
+## §6. Testes obrigatórios por módulo (xUnit)
+
+Cross-ref TESTES.md T1.
+
+| Módulo | Cobertura alvo | Suites críticas |
+|---|---|---|
+| save_system | 80% | Roundtrip + HMAC + Migrators chain |
+| buses (4) | 60% | Emit + connect + disconnect + cleanup |
+| localization | 70% | tr_md + fallback + interpolation + missing key |
+| input_remap | 70% | Remap + persist + reset defaults |
+| turn_combat | 70% | State transitions + initiative + actions |
+| card_engine | 70% | Shuffle + draw + play + reshuffle |
+| orbital_camera | 50% | Input handling (rotation, zoom) |
+| dialogue | 60% | Branching + variables persist |
+| audio_director | 40% | Bus volume + stream play |
+| scene_router | 50% | Async load + fade |
+| party | 60% | Roster + active swap |
+| puzzle_kit | 50% | Register + solve flow |
+
+---
+
+## §7. Cross-refs
+
+- `docs/tech/architecture.md` (§2 camadas, §4 sistemas detalhados).
+- `docs/tech/build.md` (pipeline build + .csproj structure).
+- `CONTRACT.md` §4 DoD por tipo.
+- `TESTES.md` T+A sections.
+- ADR-002 (canon C# AOT + camadas + buses split).
+- Memory `reference_godot_csharp.md`.
+
+---
+
+**Última revisão:** 2026-05-19. Pós-ADR-002 canonization. Revisão obrigatória em F2-M.1.
