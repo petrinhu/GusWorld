@@ -32,7 +32,7 @@ Tabela canônica de pendências e planejamento. Atualizar via skill `/tab_penden
 | F1-DL.5 | F1-DeepLore | R5 — Antagonistas + NPCs (Sterling Locke 4573 + Patch-Zero 3923 + NPCs antologia 2908 = 11404 pal). **PARALELO ORGÂNICO pós-pivot ADR-001** | Média | F1-DL.4 | Alta | ✅ Done 2026-05-20 | — |
 | F1-DL.6 | F1-DeepLore | R6 — Magic (GTCC 3979 + 4 linguagens 5627 + natureza-matemática 3047 = 12653 pal). **PARALELO ORGÂNICO pós-pivot ADR-001** | Média | F1-DL.5 | Alta | ✅ Done 2026-05-20 | — |
 | F1-DL.7 | F1-DeepLore | R7 — Ontologia (tech-3-eras 3943 + cosmologia 3126 + leitmotivs 2119 + leitmotivs-musicais 3567 = 12755 pal, **4 docs**). **PARALELO ORGÂNICO pós-pivot ADR-001** | Média | F1-DL.6 | Média | ✅ Done 2026-05-20 | — |
-| F1-DL.8 | F1-DeepLore | R8 — Stinger (sequel hooks + post-credits ~4k). **PARALELO ORGÂNICO pós-pivot ADR-001** | Média | F1-DL.7 | Média | ⏳ Pendente (paralelo) | — |
+| F1-DL.8 | F1-DeepLore | R8 — Stinger (sequel-hooks 2475 + post-credits 1867 = 4342 pal, 2 docs). **PARALELO ORGÂNICO pós-pivot ADR-001** | Média | F1-DL.7 | Média | ✅ Done 2026-05-20 | — |
 | F1-DL.9 | F1-DeepLore | R9 — Antologia Vol 2 (14 contos in-character ~42k). **PARALELO ORGÂNICO pós-pivot ADR-001** (era gating de F2-S.1, agora desbloqueado) | Média | F1-DL.8 | Alta | ⏳ Pendente (paralelo) | — |
 | F2-S.1 | F2-Setup | Instalar Godot 4 LTS — Godot 4.6.1 stable já instalado em `/usr/bin/godot` (Fedora 44). Desbloqueio ADR-001 | Alta | — | Baixa | ✅ 2026-05-19 | — |
 | F2-S.2 | F2-Setup | Criar `/game/project.godot` inicial (Godot 4, GDScript, forward+ renderer) | Alta | F2-S.1 | Baixa | 🔄 Em andamento sessão atual | — |
