@@ -21,9 +21,11 @@
 
 using Godot;
 using GusDragon.Engine.Foundation;
+using GusDragon.Engine.Foundation.InputRemap;
 using GusDragon.Engine.Foundation.SaveSystem;
 using GusWorld.Game.Back.OrbitalCamera;
 using GusWorld.Game.Foundation.Buses;
+using GusWorld.Game.Foundation.InputRemap;
 using GusWorld.Game.Foundation.Localization;
 using GusWorld.Game.Foundation.SaveSystem;
 
@@ -36,9 +38,11 @@ public partial class ValidateAutoloads : SceneTree
     public override void _Initialize()
     {
         // SceneTree -s scripts rodam _Initialize antes de AutoLoads _Ready.
-        // Force carregamento explícito Localization antes de validar.
+        // Force carregamento explícito Localization + InputRemap antes de validar.
         var locEarly = Root.GetNodeOrNull<Localization>("Localization");
         locEarly?.LoadAllLocales();
+        var inputEarly = Root.GetNodeOrNull<InputRemapManager>("InputRemapManager");
+        inputEarly?.LoadConfig();
 
         GD.Print("=== Validação AutoLoads + i18n ===");
         _errors = 0;
@@ -51,6 +55,7 @@ public partial class ValidateAutoloads : SceneTree
         ValidateMathHelpers();
         ValidateOrbitalCameraClass();
         ValidateSaveSystem();
+        ValidateInputRemap();
 
         GD.Print($"=== Resultado: {_errors} erro(s) ===");
         Quit(_errors == 0 ? 0 : 1);
@@ -281,6 +286,51 @@ public partial class ValidateAutoloads : SceneTree
 
         // Constants canon (compile-time constants, valor canonizado)
         Pass($"SaveManager constants: autosave={SaveManager.AutosaveSlot}, slots={SaveManager.ManualSlotsCount}, backups={SaveManager.BackupChainDepth}");
+    }
+
+    private void ValidateInputRemap()
+    {
+        var manager = Root.GetNodeOrNull<InputRemapManager>("InputRemapManager");
+        if (manager == null)
+        {
+            Fail("InputRemapManager AutoLoad não registrado");
+            return;
+        }
+        Pass("InputRemapManager AutoLoad presente");
+
+        // ActionRegistry count canon (movement 5 + camera 7 + interact 1 + menu 8 + combat 7 + dialogue 6 + inventory 2 + diary 1 = 37)
+        var expectedActionCount = 37;
+        if (ActionRegistry.Count == expectedActionCount)
+            Pass($"ActionRegistry tem {expectedActionCount} actions canon");
+        else
+            Fail($"ActionRegistry esperava {expectedActionCount} actions, obteve {ActionRegistry.Count}");
+
+        // DefaultBindings preenchidos pra todas actions
+        var missingDefaults = 0;
+        foreach (var def in ActionRegistry.Actions)
+        {
+            if (DefaultBindings.GetDefault(def.ActionName) == null)
+            {
+                Fail($"DefaultBindings ausente pra action '{def.ActionName}'");
+                missingDefaults++;
+            }
+        }
+        if (missingDefaults == 0)
+            Pass($"DefaultBindings cobre todas {ActionRegistry.Count} actions");
+
+        // Config atual existe
+        var config = manager.GetCurrentConfig();
+        if (config.Actions.Count == expectedActionCount)
+            Pass($"InputRemapManager config atual tem {config.Actions.Count} actions bound");
+        else
+            Fail($"Config atual esperava {expectedActionCount} actions, obteve {config.Actions.Count}");
+
+        // Lookup específico
+        var moveBindings = manager.GetBindingsForAction("move_forward");
+        if (moveBindings != null && moveBindings.Keys.Count >= 1)
+            Pass($"move_forward bindings: {moveBindings.Keys.Count} keys, {moveBindings.GamepadAxes.Count} axes");
+        else
+            Fail("move_forward bindings ausentes");
     }
 
     private static void Pass(string msg) => GD.Print($"OK: {msg}");

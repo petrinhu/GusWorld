@@ -29,6 +29,7 @@ CombatBus="*res://scripts/foundation/buses/CombatBus.cs"
 UIBus="*res://scripts/foundation/buses/UIBus.cs"
 Localization="*res://scripts/foundation/localization/Localization.cs"
 SaveManager="*res://scripts/foundation/save_system/SaveManager.cs"
+InputRemapManager="*res://scripts/foundation/input_remap/InputRemapManager.cs"
 
 [display]
 
