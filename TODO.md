@@ -57,7 +57,7 @@ Tabela canônica de pendências e planejamento. Atualizar via skill `/tab_penden
 | F2-E.4 | F2-Engine | `engine/scene_manager/` — fade in/out + scene loading async | Alta | F2-E.2 | Média | ⏳ Pendente | — |
 | F2-E.5 | F2-Engine | `engine/turn_based_combat/` — initiative queue + action resolution + state machine | Alta | F2-E.2 | Alta | ⏳ Pendente | — |
 | F2-E.6 | F2-Engine | `engine/dialogue_system/` — Ink ou DialogueManager (decidir) + branching base | Alta | F2-E.2 | Alta | 🎨 Pendente design | — |
-| F2-E.7 | F2-Engine | `engine/input_remap/` — controles remappáveis (acessibilidade D1) | Alta | F2-S.2 | Média | ⏳ Pendente | — |
+| F2-E.7 | F2-Engine | InputRemap CONTRACT §6 Gate 1 a11y D1. **37 actions canon** (movement 5 + camera 7 + interact 1 + menu 8 + combat 7 + dialogue 6 + inventory 2 + diary 1). POCO em engine/foundation/input_remap/ (InputBinding records + ActionRegistry static). Node AutoLoad em game/scripts/foundation/input_remap/ (InputRemapManager + DefaultBindings). Persist user://config.json (sem HMAC). Modal capture API (Cancel/Timeout 5s). Conflict detection. Reset per-action + all. Modifier support Ctrl/Shift/Alt. Defaults WASD + arrows + standard gamepad Xbox. UI futura (depende scene_manager + dialogue_system). **VALIDADO 37 actions bound + lookup** | Alta | F2-S.2 | Média | ✅ 2026-05-19 | — |
 | F2-E.8 | F2-Engine | `engine/diary/` — UI Diário do Gus (caderno layer 1 + texto limpo layer 2) | Alta | F2-E.3, F2-E.4 | Alta | ⏳ Pendente | — |
 | F2-E.9 | F2-Engine | `engine/knowledge_system/` — Knowledge Progression score híbrido + HUD + gates | Alta | F2-E.3 | Média | ⏳ Pendente | — |
 | F2-G.1 | F2-Game | Blockout 1 área Distritos Inferiores (cidade ato 1, ~5min explore) | Alta | F2-E.1 | Alta | ⏳ Pendente | — |
