@@ -19,7 +19,7 @@
 
 | Nome | Apelido / codinome | Características | 1ª aparição | Status |
 |---|---|---|---|---|
-| Gus Vector Tavus Vance | **"Dragon"** | 11 anos, prodígio analítico, ruivo asimétrico, óculos cyan, aparelho ortodôntico, Tavus-Drive pulso esquerdo, sobretudo gótico cinza, Utility/Control, fala C-Arcane (vence climax) | `sinopse.md` + `docs/narrative/characters/gus.md` | ✅ canônico |
+| Gustaf "Gus" Vector Tavus Vance | **"Dragon"** | 11 anos, prodígio analítico, ruivo asimétrico, óculos cyan, aparelho ortodôntico, Tavus-Drive pulso esquerdo, sobretudo gótico cinza, Utility/Control, fala C-Arcane (vence climax). Nome formal **Gustaf VII** (canon 2026-05-20): apelido infantil "Gus" estabilizou aos 5 anos; sobrenome Tavus preservado linhagem | `sinopse.md` + `docs/narrative/characters/gus.md` | ✅ canônico |
 
 ## 2. Party (6 companions, peers 11-14)
 
@@ -209,6 +209,8 @@ Cronistas canonizados em §9 deep-lore (vestígios cros-era Era 1 → Era 2 → 
 | Iremar Berenger | — | Co-autor canônico do Pythia (-95), ancestral da família Berenger (Cauã, Inácia, Davi, Vivendel) | `lore-bible.md` §3.2 + `environments/04-dutos-infernais.md` | 💀 histórico Era 2 |
 | Anhuera Vanderbist | — | Co-autora canônica do Pythia (-95), ancestral da família Vanderbist (Jaci, Lia, Solano, Mariana, Vivendel) | `lore-bible.md` §3.2 + `environments/04-dutos-infernais.md` + `08-selve-profunda.md` | 💀 histórico Era 2 |
 | Tao Berisi | — | Runner Cauã canônico (Dutos Infernais); **não confundir com party antiga descartada "Tao"** — Tao Berisi é nome próprio NPC adulto | `environments/04-dutos-infernais.md` | ⚪ ambient |
+| Gustaf I Tavus Vance | — | Ancestral Era 2 (~-150), primeiro a estabelecer-se no setor que viria a ser **GusWorld City**. Apelido "Gus" virou nome do setor → cidade → planeta. Convenção família Vance: cada geração herda apelido. **Gus atual (Era 3 Ano 0) = Gustaf VII Tavus Vance** (6 intervalos × ~25 anos/geração). Sobrenome Tavus preservado canon linhagem. Canon 2026-05-20 | `memory/project_nome_gus_canon.md` + `CHARS.md` §2 | 💀 histórico Era 2 |
+| Gustaf II–VI Tavus Vance | — | Linhagem intermediária Era 2-3 (-125 a -25 aproximado, datações exatas pendentes deep-lore Bloco G futuro). Convenção Vance: cada geração herda apelido infantil "Gus" de Gustaf I. Linhagem preservou sobrenome Tavus + nome formal Gustaf | `memory/project_nome_gus_canon.md` | 💀 histórico Era 2-3 |
 
 ## 9. Stub: personagens a auditar/adicionar
 
