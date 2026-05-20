@@ -66,6 +66,10 @@
 | Lia Vanderbist | — | Mãe morta da Jaci, surto silencioso -8 no Pelicano Branco | `docs/narrative/characters/jaci-proxy.md` + DD-020 | 💀 morta pré-jogo |
 | Solano Vanderbist | — | Pai morto da Jaci, surto silencioso -8, plantador Pelicano Branco | `docs/narrative/characters/jaci-proxy.md` + DD-020 | 💀 morto pré-jogo |
 | Anciã Mariana Vanderbist | — | Avó da Jaci, líder do vilarejo Pelicano Branco, levantou sementes-relíquia em -1 | `docs/narrative/characters/jaci-proxy.md` + `factions.md` | ✅ canônico (idosa) |
+| Brígida Neumann | — | Mãe da Linda "Siren" Neumann, oficina Neumann destruída por batida Calveri/Sterling -8 (Linda tinha 4 anos). Revisora canônica primeira edição diário Underground técnico em -13. Descendente linhagem Tamara Neumann | `docs/narrative/deep/magic/4-linguagens-deep.md` R6 + `docs/narrative/factions.md` | ✅ canônico |
+| Tamara Neumann | — | Engenheira-mãe Era 2 (~-110), criadora canônica de Óxido; revisora-editora 2ª edição manual referência C-Arcane -89. Ancestral direta linhagem Neumann (Brígida, Linda) | `docs/narrative/lore-bible.md` §3.2 + timeline -110 + `docs/narrative/deep/magic/4-linguagens-deep.md` R6 | 💀 histórico Era 2 |
+| Camila Neumann | — | Tradutora -21 do "Tablete da Pancada de Neve" (fragmento Era 1 Snow Crash in-world reskin), linhagem Neumann intermediária | `docs/narrative/deep/magic/4-linguagens-deep.md` R6 §7 | 💀 histórico (fim Era 2) |
+| Verônica Atelaiá | — | Cientista -45, primeira teorizadora Patch-Zero como anomalia ontológica genuína. Tratado anônimo classificado "anomalia folclórica" por Sterling Locke em -25. Descendente matrilinear Atelaiá Chevalier. Cronista in-character §10 deep-lore Era 1 | `docs/narrative/factions.md` + `deep/eras/era-1-pre-codigo.md` §10 + `docs/narrative/deep/magic/natureza-matematica-rigida-deep.md` R6 §1 | 💀 histórico (fim Era 2 / cedo Era 3) |
 
 ## 6. Líderes / contatos de facção
 
@@ -204,7 +208,6 @@ Cronistas canonizados em §9 deep-lore (vestígios cros-era Era 1 → Era 2 → 
 | Marcela Sívo | — | Pioneira C-Arcane, placa cerimonial dos 4 engenheiros | `lore-bible.md` §3.2 + `environments/01-cidade-cyber-gotica.md` | 💀 histórico Era 2 |
 | Iremar Berenger | — | Co-autor canônico do Pythia (-95), ancestral da família Berenger (Cauã, Inácia, Davi, Vivendel) | `lore-bible.md` §3.2 + `environments/04-dutos-infernais.md` | 💀 histórico Era 2 |
 | Anhuera Vanderbist | — | Co-autora canônica do Pythia (-95), ancestral da família Vanderbist (Jaci, Lia, Solano, Mariana, Vivendel) | `lore-bible.md` §3.2 + `environments/04-dutos-infernais.md` + `08-selve-profunda.md` | 💀 histórico Era 2 |
-| Verônica Atelaiá | — | Cientista, teorizou Patch-Zero em -45 (chamado de "anomalia folclórica de erro de medição" por Sterling); cronista in-character canônica de §10 deep-lore Era 1 | `docs/narrative/factions.md` (menção) + `deep/eras/era-1-pre-codigo.md` §10 previsto | 💀 histórico (fim Era 2 / cedo Era 3) |
 | Tao Berisi | — | Runner Cauã canônico (Dutos Infernais); **não confundir com party antiga descartada "Tao"** — Tao Berisi é nome próprio NPC adulto | `environments/04-dutos-infernais.md` | ⚪ ambient |
 
 ## 9. Stub: personagens a auditar/adicionar
