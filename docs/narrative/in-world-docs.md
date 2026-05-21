@@ -377,7 +377,7 @@ o resto. Ele riu mas entendeu...
 [página 19 — fragmento queimado parcialmente]
 ... me ligaram. Disseram pra eu pa[QUEIMADO]
 de "complicação trabalhista". Mãe não pode sa[QUEIMADO]
-o Cauã tem 8. Não merec[QUEIMADO]
+o Cauã é bebê e ainda nem fala direito. Não merec[QUEIMADO]
 
 [página 23 — última entrada]
 Vou trabalhar dobrado essa semana. Acho que se eu
@@ -792,8 +792,8 @@ Sigam compilando bem.
 
 ## Documento 19 — Caderneta de saudações de Vênea Vance (lista de receitas + bilhetes do Patrício)
 
-**Tipo:** caderneta de cozinha barata, capa de oleado florido, ~50 páginas; receitas escritas à mão. Entre páginas, 4 bilhetes dobrados do Patrício (cartas raras canônicas do pai ausente).
-**Autor:** Vênea Vance (mãe do Gus) — receitas; Patrício Vance (pai ausente) — bilhetes.
+**Tipo:** caderneta de cozinha barata, capa de oleado florido, ~50 páginas; receitas escritas à mão. Entre páginas, 4 bilhetes dobrados do Pyotor (cartas raras canônicas do pai itinerante).
+**Autor:** Vênea Vance (mãe do Gus) — receitas; Pyotor Vance (pai itinerante, cartas raras) — bilhetes.
 **Data:** ano -8 a presente (receitas acumuladas); bilhetes em -7, -4, -2, -0.5.
 **Onde se encontra:** gaveta da cozinha do apartamento Vance. Acessível desde o início; Gus precisa ter usado a mecânica de save base canônica pelo menos 3 vezes (voltar pra casa 3x) para o jogo destravar a interação com a caderneta (subtexto: a cumplicidade com a mãe vira hábito; hábito leva à descoberta).
 **Trigger:** mecânica de save base + 3 retornos. Gate: Knowledge baixa.

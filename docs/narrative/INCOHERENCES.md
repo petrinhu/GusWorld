@@ -156,3 +156,13 @@ Para cada CRÍTICA C1-C10 + relevantes adicionais, decisão criador supremo nece
 ---
 
 **Versão inicial:** 2026-05-20. F1-DL.REFAC Plano 2C. Não modificar sem reaudit.
+
+---
+
+## NOTAS DE RESOLUÇÃO CANON SUPREMO (2026-05-20)
+
+### C2. Tragédia Catedral Menor de São Camilo -80: 17 mortos canon, DD-003 unreliable
+
+**Decisão criador supremo:** lore-bible §13 + timeline -80 mantêm **17 mestres mortos** como canon estrutural. DD-003 (Diário Atelaiá Chevalier, "estávamos em treze, saímos em quatro" = 13 presentes, 9 mortos, 4 sobreviventes) é **unreliable narrator deliberado**: Atelaiá omitiu 8 mortos por trauma e/ou proteção (poupar leitor in-world, ocultar identidade de mortos cujos descendentes ainda estão vivos, ou registro parcial da câmara em que esteve, não do total da catedral). Player sensível percebe a fratura em cross-reading; gate Knowledge alta pode expor a discrepância como pista de leitura crítica das fontes in-world.
+
+Nenhuma cascata fix em lore-bible/timeline. Apenas reconhecimento explícito do recurso narrativo.
