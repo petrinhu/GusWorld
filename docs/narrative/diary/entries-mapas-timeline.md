@@ -616,7 +616,7 @@ Cada wound canônico de companion = entry timeline + entry de ficha ([[entries-f
 - Surto Pelicano Branco -8 (entry 42) ↔ Jaci ficha wound
 - Cooperativa Alencar destruída -8 (entry 40) ↔ Dante ficha wound
 - Contaminação Catedral Atelaiá -7 (entry 43) ↔ Bento ficha wound
-- Adila assume Cult pró-Sterling -6 (entry 44) ↔ Iara ficha wound
+- Adila assume Cult pró-Sterling (tutela transitória -34, consolidação plena -6, entry 44) ↔ Iara ficha wound
 - Iara deserta -1 (entry 55) ↔ Iara ficha estado canônico pré-arco
 - Aldebrando morto -0.5 (entry 56) ↔ Bento ficha wound recente
 - Patch-Zero escapa -0.25 (entry 57) ↔ Patch-Zero ficha catalyst macro

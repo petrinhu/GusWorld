@@ -98,7 +98,7 @@ Tom autoral por origem:
 **STATUS:** APROVADA (2026-05-16) — viralizada como DD-017 canônico em [[in-world-docs]] §Documento 17. Plant agora GRAVADO.
 
 - **Tipo:** caderno técnico padrão Apex-Data Systems (capa rígida, papel pautado em quadrículas Engenharia). ~80 páginas escritas; legível.
-- **Autor:** **Bartolo Penkin** (engenheiro QA sênior Apex-Data; desapareceu em -16 duas semanas após vazar audit doc 5).
+- **Autor:** **Bartolo Penkin** (engenheiro QA sênior Apex-Data; vazou audit doc 5 em -16, manteve perfil baixo por 4 anos, desapareceu em -12).
 - **Data:** ano -18 a -16.
 - **Onde encontra:** porão da casa antiga dos Penkin, Periferia Industrial. Casa atualmente habitada por **Mateus Penkin** (sobrinho, fofoqueiro — NPC canônico em [[environments/06-periferia]]). Mateus permite acesso ao porão se Gus traz item específico (favor: peça de hardware Era 2 raro, recuperável em sub-quest cruzada Underground).
 - **Trigger:** sub-quest sequencial pós-coleta de DD-005 (relatório audit). Mateus comenta "o tio escreveu coisa que ele não vazou" se Gus mostra que tem o audit.

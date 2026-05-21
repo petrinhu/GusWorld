@@ -63,7 +63,7 @@ Visualmente: também é o ponto físico onde **termina o cabo Óxido coaxial** q
 
 ### 2.5 Quintal dos Penkin (foreshadow Dante, §3 e §8)
 
-Casinha térrea geminada três quadras ao norte da oficina Dante. Quintal pequeno, varal e horta minúscula. Família Penkin (vizinhos imediatos de Dante; **não confundir com Bartolo Penkin** desaparecido em -16; sobrenome comum em Periferia, descendentes distantes ou homônimos). Senhor Mateus Penkin (~62) é o vizinho fofoqueiro nomeado §6.
+Casinha térrea geminada três quadras ao norte da oficina Dante. Quintal pequeno, varal e horta minúscula. Família Penkin (vizinhos imediatos de Dante; **não confundir com Bartolo Penkin** desaparecido em -12; sobrenome comum em Periferia, descendentes distantes ou homônimos). Senhor Mateus Penkin (~62) é o vizinho fofoqueiro nomeado §6.
 
 **O quintal tem uma antena local** improvisada no telhado (UHF/VHF; padrão Underground original Era 2). Por trás dela, **uma segunda antena pequena, mais nova, montada à noite**, em banda suspeita (visível com óculos táticos do Gus em segunda passagem). Mateus diz que "instalei pra pegar futebol da Cidade-Gêmea melhor". Banda real: telemetria curta. Knowledge alta cruza retroativamente: foi instalada por Dante em -1, "como favor de vizinho". É o repetidor que envia stream Tavus-Drive do Gus pra subestação 11.
 

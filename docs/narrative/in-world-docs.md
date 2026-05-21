@@ -179,7 +179,7 @@ O adepto autoriza captação de:
 ## Documento 5 — Relatório técnico Apex-Data (audit interno)
 
 **Tipo:** relatório técnico assinado, formato corporativo, ~80 linhas. Versão em pdf interceptada.
-**Autor:** Engenheiro anônimo Apex-Data Systems (identidade redatada). Comunidade Underground atribui a **Bartolo Penkin** (engenheiro QA sênior, desaparecido em -16; ver [[timeline]]).
+**Autor:** Engenheiro anônimo Apex-Data Systems (identidade redatada). Comunidade Underground atribui a **Bartolo Penkin** (engenheiro QA sênior, vazou audit em -16, desaparecido em -12; ver [[timeline]]).
 **Data:** ano -16.
 **Onde se encontra:** servidor analógico da Zona do Silêncio. Linda entrega a Gus durante arco Linda se branching #4 = alertar Cidades-Gêmeas.
 **Função:** reveal histórico Sterling (Chapter 11 forçado); foreshadow operacional GRE.
@@ -710,7 +710,7 @@ conhece.' Dante não entendeu. Vai entender depois.
 ## Documento 17 — Diário de campo de Bartolo Penkin (anotações QA Apex-Data)
 
 **Tipo:** caderno técnico padrão Apex-Data Systems (capa rígida, papel pautado em quadrículas Engenharia). ~80 páginas escritas; legível.
-**Autor:** Bartolo Penkin (engenheiro QA sênior Apex-Data; desapareceu em -16, duas semanas após vazar o audit do doc 5).
+**Autor:** Bartolo Penkin (engenheiro QA sênior Apex-Data; vazou o audit do doc 5 em -16, manteve perfil baixo por 4 anos, desapareceu em -12).
 **Data:** ano -18 a -16.
 **Onde se encontra:** porão da casa antiga dos Penkin, Periferia Industrial. Casa atualmente habitada por Mateus Penkin (sobrinho, fofoqueiro). Mateus permite acesso ao porão se Gus traz item específico (favor: peça de hardware Era 2 raro, recuperável em sub-quest cruzada Underground).
 **Trigger:** sub-quest sequencial pós-coleta do doc 5. Mateus comenta "o tio escreveu coisa que ele não vazou" se Gus mostra que tem o audit. Gate: Knowledge média (favor sub-quest); Knowledge alta destrava nota final marginal (a página 80, abaixo).

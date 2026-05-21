@@ -179,7 +179,7 @@ Convenções de colunas:
 |---|---|---|---|---|---|---|---|
 | F046 | STE/COM-LIN | Diagrama fluxo de fase Sterling Posto 7 (mapeado §2.2) | (ver §2.2 F046) | — | — | — | Cross-ref. |
 | F065 | E1/COM-LIN | Câmaras acústicas Neo-Sylvania sob Zona do Silêncio, descobertas em -3 por Joaquim Bartolomeu | Mapa + Pickup leve | MAP-07-05 + P-OBJ-07 | n/a (arco Linda) | **Verde** + **Amarela** | Cancela o cancelamento. |
-| F085 | COM-LIN/STE | Padrinho Tiago conhecido de Bartolo Penkin (engenheiro QA Apex-Data desaparecido em -16) | Ficha-Tiago + Ficha-Bartolo | F-NPC-27 + F-NPC-28 | Knowledge alta | **Amarela** + **Cinza-prateado** | Cross-arco Linda-Periferia preservação. |
+| F085 | COM-LIN/STE | Padrinho Tiago conhecido de Bartolo Penkin (engenheiro QA Apex-Data desaparecido em -12, vazou audit em -16) | Ficha-Tiago + Ficha-Bartolo | F-NPC-27 + F-NPC-28 | Knowledge alta | **Amarela** + **Cinza-prateado** | Cross-arco Linda-Periferia preservação. |
 | F086 | COM-LIN | Doc 6 in-world: carta cifrada Tiago → Linda "eu te peguei do chão da Brígida em -8" | Pickup | P-DOC06 | Knowledge média (decifragem Óxido) | **Amarela** | Pai-figura escondido revelado retroativamente. |
 | F087 | COM-LIN/E2 | Música "Última Frequência" composta pelos 8 técnicos desaparecidos antes da batida -50 | Glossário cultural + Ficha-Underground | M-glossario-ultima-frequencia + F-FAC-UND | n/a (ambient anual) | **Verde** + **Amarela** | Tradição Noite Calada. |
 | F088 | COM-LIN/PAT | Vinil "Última Frequência" partido em 3 pedaços, guardado por Mara Bento, quebrou em -2 quando soube de Polis-Vermelha | Mapa + Pickup leve | MAP-07-06 + P-OBJ-10 | Knowledge baixa | **Amarela** + **Cinza-prateado** | Eco emocional Polis-Vermelha → Underground. |

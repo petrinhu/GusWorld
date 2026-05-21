@@ -296,7 +296,7 @@ Cada companion tem ficha com 3 estados de Knowledge canônicos:
 - Backstory: acadêmico dissidente que escolheu predação **por convicção, não por trauma** (anti-paternalismo declarado, [[factions]] §1 "não fazer"). Tese DRE rejeitada pela academia C-Arcane em -25. Migrou setor privado. Canibalização 3 conglomerados em sequência: Apex-Data Systems (-19), Nexus-Cloud (-15), Core-Synth Bio-Tech (-12). Consolidou Sterling Corp em -12.
 - Tese: "compilação é submissão ao hardware". Solução: máquina virtual universal interpretada que reescreve sintaxe em runtime. Lucro via licenciamento de "natureza on-demand" via Operação GRE (Global Runtime Environment).
 - Liberou Patch-Zero achando que controlava. Falhou. Finge publicamente que não existe ("comportamentos emergentes inesperados").
-- Tenentes nomeados: **Diretora Octávia Penedo** (52, Contenção, falhou Patch-Zero, [[entries-docs-descobriveis|doc 14]]); **Diretor Theodoro Calveri** (57, Aquisições); **Diretora Solange Vix** (49, Imagem Pública, [[entries-docs-descobriveis|doc 12]]).
+- Tenentes nomeados: **Diretora Octávia Penedo** (55, Contenção, falhou Patch-Zero, [[entries-docs-descobriveis|doc 14]]); **Diretor Theodoro Calveri** (52, Aquisições); **Diretora Solange Vix** (46, Imagem Pública, [[entries-docs-descobriveis|doc 12]]).
 - Sticky-note Bloco I: foreshadow F-002 (logo Sterling em todo poste do ato 1 — propaganda saturada), F-040 (saudação "runtime estável" repetida 7x antes do reveal), F-110 (Locke Core mencionado em diário Aldebrando Chevalier, [[entries-docs-descobriveis|doc 9]]).
 
 **Pulled quote (Gus, primeira margem, ato 1):** "ele fala 'continue' em loop a cada 4 minutos. é áudio diegético. o áudio é a propaganda. a propaganda é o que ele acha que o mundo deve ser: continuar sem questionar."
@@ -682,7 +682,7 @@ Patch-Zero é exceção: páginas glitcham permanentemente. Stats nunca "estabil
   - Surto Pelicano Branco -8 (Jaci)
   - Cooperativa Alencar destruída -8 (Dante)
   - Contaminação Catedral Atelaiá -7 (Bento, Hilário Tepenkov morto)
-  - Adila assume Cult pró-Sterling -6 (Iara)
+  - Adila assume Cult pró-Sterling (tutela transitória -34, consolidação plena -6, Iara)
   - Iara deserta -1
   - Aldebrando morto -0.5 (Bento)
   - Patch-Zero escapa -0.25 (catalyst macro)
