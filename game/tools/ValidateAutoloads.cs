@@ -23,11 +23,13 @@ using Godot;
 using GusDragon.Engine.Foundation;
 using GusDragon.Engine.Foundation.InputRemap;
 using GusDragon.Engine.Foundation.SaveSystem;
+using GusDragon.Engine.Foundation.SceneManager;
 using GusWorld.Game.Back.OrbitalCamera;
 using GusWorld.Game.Foundation.Buses;
 using GusWorld.Game.Foundation.InputRemap;
 using GusWorld.Game.Foundation.Localization;
 using GusWorld.Game.Foundation.SaveSystem;
+using GusWorld.Game.Foundation.SceneManager;
 
 namespace GusWorld.Game.Tools;
 
@@ -56,6 +58,7 @@ public partial class ValidateAutoloads : SceneTree
         ValidateOrbitalCameraClass();
         ValidateSaveSystem();
         ValidateInputRemap();
+        ValidateSceneManager();
 
         GD.Print($"=== Resultado: {_errors} erro(s) ===");
         Quit(_errors == 0 ? 0 : 1);
@@ -72,7 +75,7 @@ public partial class ValidateAutoloads : SceneTree
         Pass("GameStateBus AutoLoad presente");
 
         string[] expectedSignals = {
-            "GameStarted", "GamePaused", "GameResumed", "GameSaved", "GameLoaded"
+            "GameStarted", "GamePaused", "GameResumed", "GameSaved", "GameLoaded", "SceneChanged"
         };
         foreach (var sig in expectedSignals)
         {
@@ -80,7 +83,7 @@ public partial class ValidateAutoloads : SceneTree
                 Fail($"GameStateBus signal '{sig}' não encontrado");
         }
         if (_errors == 0)
-            Pass("GameStateBus 5 signals canon verificados");
+            Pass("GameStateBus 6 signals canon verificados (incluindo SceneChanged F2-E.4)");
     }
 
     private void ValidatePlayerBus()
@@ -331,6 +334,58 @@ public partial class ValidateAutoloads : SceneTree
             Pass($"move_forward bindings: {moveBindings.Keys.Count} keys, {moveBindings.GamepadAxes.Count} axes");
         else
             Fail("move_forward bindings ausentes");
+    }
+
+    private void ValidateSceneManager()
+    {
+        var manager = Root.GetNodeOrNull<SceneManager>("SceneManager");
+        if (manager == null)
+        {
+            Fail("SceneManager AutoLoad não registrado");
+            return;
+        }
+        Pass("SceneManager AutoLoad presente");
+
+        string[] expectedSignals = {
+            "SceneLoadStarted", "SceneLoadProgress", "SceneLoadCompleted", "SceneLoadFailed"
+        };
+        var missingSignals = 0;
+        foreach (var sig in expectedSignals)
+        {
+            if (!manager.HasSignal(sig))
+            {
+                Fail($"SceneManager signal '{sig}' não encontrado");
+                missingSignals++;
+            }
+        }
+        if (missingSignals == 0)
+            Pass($"SceneManager 4 signals canon verificados (Started, Progress, Completed, Failed)");
+
+        // Estado inicial: not loading, progress 0
+        if (!manager.IsLoading)
+            Pass("SceneManager.IsLoading = false em estado inicial");
+        else
+            Fail("SceneManager.IsLoading deveria ser false em estado inicial");
+
+        if (Mathf.IsEqualApprox(manager.GetLoadProgress(), 0f))
+            Pass("SceneManager.GetLoadProgress() = 0 em estado inicial");
+        else
+            Fail($"SceneManager.GetLoadProgress() esperava 0 obteve {manager.GetLoadProgress()}");
+
+        // FadeConfig POCO Default
+        var defaultConfig = FadeConfig.Default;
+        if (Mathf.IsEqualApprox(defaultConfig.DurationOut, 0.5f) &&
+            Mathf.IsEqualApprox(defaultConfig.DurationIn, 0.5f))
+            Pass($"FadeConfig.Default canon (out={defaultConfig.DurationOut}s, in={defaultConfig.DurationIn}s)");
+        else
+            Fail($"FadeConfig.Default inesperado: out={defaultConfig.DurationOut} in={defaultConfig.DurationIn}");
+
+        // GameStateBus.SceneChanged signal canon (relay)
+        var gsb = Root.GetNodeOrNull<GameStateBus>("GameStateBus");
+        if (gsb != null && gsb.HasSignal("SceneChanged"))
+            Pass("GameStateBus signal 'SceneChanged' canon presente (relay SceneManager)");
+        else
+            Fail("GameStateBus signal 'SceneChanged' faltando (canon F2-E.4 relay)");
     }
 
     private static void Pass(string msg) => GD.Print($"OK: {msg}");

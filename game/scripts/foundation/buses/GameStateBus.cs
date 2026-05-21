@@ -37,6 +37,9 @@ public partial class GameStateBus : Node
     /// <summary>Emitido após load bem-sucedido.</summary>
     [Signal] public delegate void GameLoadedEventHandler(int slot);
 
+    /// <summary>Emitido após swap completar com sucesso (relay SceneManager F2-E.4).</summary>
+    [Signal] public delegate void SceneChangedEventHandler(string scenePath);
+
     public override void _Ready()
     {
         Instance = this;

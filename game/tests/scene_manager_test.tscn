@@ -1,0 +1,3 @@
+[gd_scene format=3 uid="uid://scene_manager_test_root"]
+
+[node name="SceneManagerTestRoot" type="Node"]
