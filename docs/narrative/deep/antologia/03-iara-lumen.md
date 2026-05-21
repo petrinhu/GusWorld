@@ -70,7 +70,7 @@ Encaixo a fita. O leitor liga. Projeção mínima, vinte e um centímetros de al
 
 "Sonja Murmúrio, segunda hierofante da Catedral Mirage, gravação de campanha interna, ano menos trinta e quatro."
 
-Menos trinta e quatro. Cálculo rápido. Eu tenho doze. Adila tinha trinta e poucos quando me encontrou. Adila hoje tem em torno de quarenta e cinco, talvez quarenta e oito. Menos trinta e quatro é antes da reorganização que tirou Sonja do palco e instalou Adila como Hierofante única. Sonja era a segunda hierofante. Sonja existia oficialmente. Sonja estava viva nessa gravação.
+Menos trinta e quatro. Cálculo rápido. Eu tenho doze. Adila tinha trinta e quatro quando me encontrou. Adila hoje tem em torno de quarenta anos. Menos trinta e quatro é o ano em que Sonja desapareceu e Adila assumiu a tutela formal aos seis anos. Sonja era a segunda hierofante. Sonja existia oficialmente. Sonja estava viva nessa gravação.
 
 Eu pauso. Respiro. Os cinco clones acima de mim continuam estáveis. O ar do telhado continua respirando. A cidade abaixo continua emprestando luz de si pra si mesma. Eu retomo a gravação.
 
@@ -148,7 +148,7 @@ Ele desce. Eu fico.
 
 Os cinco clones acima de mim pulsam em sincronia perfeita. Eu olho pra eles e penso: cada um é um dialeto silencioso de mim. Não cópia, dialeto. Cópia é replicação. Dialeto é variação interna, é a mesma língua falada em outro lugar do tempo. Cinco lugares do meu tempo flutuam sobre o telhado da Lavanderia Vyr e nenhum deles está conversando com o outro, nenhum deles sabe da existência do outro, e por isso são honestos. Versão de mim que não dialoga com versão de mim é versão preservada. A Adila tentou me fundir em uma única projeção contínua, "querida você é uma artista única", e eu resisti sem saber que estava resistindo, eu mantive os meus eus em compartimentos estanques, e hoje cada compartimento sobe num clone diferente e respira sozinho. O clone norte é a Iara dos quatro anos, deixada à porta da catedral menor, registro civil ainda não escrito. O clone nordeste é a Iara dos seis, primeira sessão com Adila, ainda sem fissura. O clone leste é a Iara dos oito, primeira fissura, ar de três cores. O clone sudeste é a Iara dos nove, primeira vez decifrando mentira direta de Adila atrás da cortina dos bastidores. O clone sul é a Iara dos onze, dezessete minutos lendo a planilha Sterling, decidindo, fechando, saindo pelo portão de serviço às quatro da manhã.
 
-E eu, no centro, sou a Iara dos doze. A Iara que recebe fita de Filomena Garda, café de Cleomir Vasta, e silêncio de Sonja Murmúrio que morreu trinta e quatro anos antes de eu nascer e que ainda assim me deixou recado por cifra Pigpen em material residual de campanha.
+E eu, no centro, sou a Iara dos doze. A Iara que recebe fita de Filomena Garda, café de Cleomir Vasta, e silêncio de Sonja Murmúrio que morreu vinte e dois anos antes de eu nascer e que ainda assim me deixou recado por cifra Pigpen em material residual de campanha.
 
 Eu desativo os clones em ordem Fibonacci reversa. Cinco primeiro. O clone do sul apaga, último a nascer, primeiro a apagar, e por um segundo eu sinto vazio na lateral direita do corpo, como se um pedaço de mim aos onze anos tivesse se despedido. Três depois. O clone leste apaga, Iara dos oito anos se vai, e o ar do telhado volta a ter só duas cores. Dois depois. O clone nordeste apaga, Iara dos seis se vai, e Adila perde uma das versões de mim que ainda poderia interrogar em sonho. Um depois. O clone norte apaga, Iara dos quatro se vai, e o portão de serviço da catedral menor onde fui deixada na chuva se fecha por dentro pela primeira vez em doze anos. Um por último. O clone nordeste residual, redundância higiênica, apaga, e o telhado fica vazio menos por mim.
 
@@ -170,4 +170,4 @@ Eu sigo.
 
 ---
 
-**Última revisão:** 2026-05-20. Canônico deep-lore R9 F1-DL.9 Antologia Vol 2 conto 3/14. Não modificar sem aprovação criador supremo.
+**Última revisão:** 2026-05-21. Canônico deep-lore R9 F1-DL.9 Antologia Vol 2 conto 3/14. Cascata R-AUDIT aplicada (R2 Sonja morte -34 consistência interna + R7 Adila ~40 / Adila 34 quando encontrou Iara). Não modificar sem aprovação criador supremo.

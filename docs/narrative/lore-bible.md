@@ -482,6 +482,7 @@ Hospital cobra crédito por cura rápida (Pillar 4 / hospital + economia). Cura 
 - **-45** — Tratado anônimo *Sobre o Comportamento Emergente dos Padrões Fechados* publicado em rede acadêmica clandestina. Atribuído hipoteticamente à **Verônica Atelaiá** (descendente Atelaiá Chevalier; última grande pensadora pré-Sterling). Teorizou Patch-Zero 40 anos antes (ver [[in-world-docs]] doc 10). Ignorada na época.
 - **-40** — Underground do Silêncio surge informalmente.
 - **-35** — Cult Mirage surge como movimento artístico genuíno. Co-fundadora **Sonja Murmúrio** (mãe biológica da futura hierofante manipuladora Adila).
+- **-34** — **Sonja Murmúrio morre** em circunstâncias nunca esclarecidas. Adila Murmúrio assume formalmente liderança facção pró-Sterling do Cult Mirage no mesmo ano sob tutela transitória; facção dual artista + pró-Sterling consolidada desde então. Versão pública oficial Adila: "afastamento por saúde, retiro contemplativo".
 
 ### Era 3 (Sterling)
 
@@ -496,7 +497,7 @@ Hospital cobra crédito por cura rápida (Pillar 4 / hospital + economia). Cura 
 - **-8** — *Batida na casa Neumann.* Toca-discos histórico apreendido. Linda (4) vê. **Otmar Neumann** salva agulha intacta antes da apreensão; entrega à filha. Pingente Linda.
 - **-8** — *Surto silencioso no Pelicano Branco.* **Lia e Solano Vanderbist** (pais Jaci) morrem. Causa oficial: anomalia botânica. Causa real (ending Ouro): vetor experimental Sterling. Mariana suspeita; nunca prova.
 - **-7** — *Contaminação da Catedral Menor de Atelaiá.* Mestre-Aprendiz **Hilário Tepenkov** (companheiro estudos Bento) morre. Bento (4) presente; sobrevive por estar perto do escudo Velhusto. Patch-Zero pré-existente confirmado.
-- **-6** — **Adila Murmúrio** assume liderança facção pró-Sterling Cult Mirage. Sonja Murmúrio (mãe) forçada a "retiro espiritual"; morre ano seguinte.
+- **-6** — **Adila Murmúrio** consolida tutela administrativa plena Cult Mirage pró-Sterling (passa de Hierofante nominal a operacional plena). Sonja Murmúrio morta há 28 anos.
 - **-5** — **Dante (8 anos) recrutado por Diretor Cassiano Vorto da FIR.** Aliciamento canônico começa.
 - **-3** — Sterling Corp localiza bug primordial Patch-Zero. Tentativa de captura. Falha parcial. **Catedral Menor de São Vargas saqueada** por Sterling Corp. Mestres **Ardenia Falke** e **Cândido Rui** desaparecem. Wound institucional Ordem Recursiva.
 - **-2** — Cross-contamination via amostra Polis-Vermelha. **Polis-Vermelha cai.** **Padrinho Tiago** sai da aposentadoria.
@@ -512,7 +513,7 @@ Personagens secundários canônicos com peso narrativo no arco principal ou side
 
 ### Aliados e mentores
 
-- **Anciã Mariana Vanderbist** (75) — avó da Jaci. Líder informal Pelicano Branco. Lê Selve. Mentora cautelosa (não toma protagonismo).
+- **Anciã Mariana Vanderbist** (89) — avó da Jaci. Líder informal Pelicano Branco. Lê Selve. Mentora cautelosa (não toma protagonismo).
 - **Mestre-Hierofante Velhusto** (70) — líder Ordem Recursiva. Mentor distante Bento. Apoia tradicionalistas contra Sterling. Perdeu 3 aliados próximos no processo.
 - **Padrinho Tiago** (55) — coordenador atual Underground em GusWorld City. Mentor distante Linda. Engenheiro telecom aposentado que voltou ao serviço.
 - **Inácia Berenger** (45) — mãe Cauã. Técnica QA ex-Apex-Data. Vive contida. Sabe mais do que conta. Guarda documentos comprometedores de Davi.
@@ -520,6 +521,7 @@ Personagens secundários canônicos com peso narrativo no arco principal ou side
 - **Pyotor Vance** (40), pai Gus. Médico-cyber itinerante (medicina + bioengenharia + bioeletrônica + eng robótica + implantes) em rotação fronteira-Selve atendendo vilarejos pós-Êxodo (Pelicano Branco, Garça-Preta-Nova, Caracará-Cinza, Sabiá-de-Bronze). Hobby: programação. Separado amigavelmente de Vênea desde Gus aos 6 anos (ano -5). Cartas raras (3-4 no jogo total).
 - **Yakov Vance** (~36), irmão mais novo de Pyotor (4 anos a menos), tio paterno do Gus. Engenheiro e geólogo, atua na maior mineradora do reino. Apresentou xadrez ao Gus em visita.
 - **Atelaiana de Sevra Chevalier**, mãe biológica viva do Bento, irmã consanguínea de Mestre Lavínia Sevra. Partiu da Catedral três meses após o parto (canon R4 deep-lore).
+- **Irmã biológica do Bento** (nome intencionalmente não-escrito; canon R9 conto 4 antologia "minha irmã, pulso clavícula esquerda, nome não-escrito"). Morta ou desaparecida antes de -7. Wound primeiro Bento, antecede Hilário Tepenkov. Pulso na clavícula esquerda como marca canônica. Detalhes a definir em sequel.
 - **Edilma Alencar** (44), mãe Dante. Operária têxtil. **Oficialmente** vive reclusa em apartamento subsidiado pós-morte de Salviano. **Realidade canon (revelação ato 3):** sequestrada pelos Sterling brass na Caverna dos Perdidos como chantagem contra Dante (canon arco Dante Beat Ten + Dragon Victory). Apartamento mantido como fachada por Sterling. Interações mínimas no jogo; aparece em cena pós-reveal Dante (silêncio).
 - **Otmar Neumann** (50) — pai Linda. Engenheiro analógico. Vive em apartamento simples Zona do Silêncio.
 - **Brígida Neumann** (49) — mãe Linda. Musicista (violão). Hospeda versão antiga da Festa da Compilação ([[tradicoes-cultura]] §1).
@@ -558,7 +560,7 @@ Personagens secundários canônicos com peso narrativo no arco principal ou side
 
 ### Aldeias-fronteira Pelicano Branco (NPCs secundários)
 
-- **Anciã Mariana Vanderbist** (75) — já listada.
+- **Anciã Mariana Vanderbist** (89) — já listada.
 - **Bito Caldeira** (60) — prefeito informal vilarejo ([[comic-reliefs]] EE-14).
 - **Helena Sirinhaém** (50) — herborista júnior. Aliada Jaci.
 - **Solane Vanderbist** (8) — primo distante Jaci. Criança do vilarejo. Aparece em sub-quest plantio.

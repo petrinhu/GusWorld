@@ -345,7 +345,7 @@ Não tem porta-voz oficial. Tem aldeias humanas na fronteira (vilarejo do Pelica
 
 ### Figura central
 
-**Anciã Mariana Vanderbist** (avó de Jaci). Cerca de 75 anos. Líder informal do vilarejo do Pelicano Branco. Sabe ler Selve há décadas. Aceita Gus rapidamente porque reconhece nele a postura certa (respeitar o substrato).
+**Anciã Mariana Vanderbist** (avó de Jaci). Cerca de 89 anos (canon Fibonacci). Líder informal do vilarejo do Pelicano Branco. Sabe ler Selve há décadas. Aceita Gus rapidamente porque reconhece nele a postura certa (respeitar o substrato).
 
 ### Objetivo
 
@@ -386,7 +386,7 @@ Cor institucional: verde-ciano biolúmen + marrom-húmus + branco-fungo.
 
 #### Vilarejo do Pelicano Branco
 
-- **Anciã Mariana Vanderbist** (75) — já listada.
+- **Anciã Mariana Vanderbist** (89) — já listada.
 - **Bito Caldeira** (60) — prefeito informal vilarejo ([[comic-reliefs]] EE-14). Decisões coletivas passam por ele formalmente; substância vem da Anciã.
 - **Helena Sirinhaém** (50) — herborista júnior. Aliada Jaci. Trabalha em paralelo, especializada em antídotos respiratórios.
 - **Bem-Te-Vi Caldeira** (35) — filho do Bito. Mantém comércio do vilarejo. Pacifista declarado.
@@ -501,7 +501,7 @@ Cor institucional: gradient violeta-magenta-cyan saturado.
 
 - **Performador Sérgio Brimber** (24) — holografista jovem talentoso. Trabalha para Adila por necessidade; suporta a facção artista clandestinamente. Conhecedor pessoal de Iara desde a infância.
 - **Adepta Filomena Garda** (28) — adepta de longa data. "Acidente sensorial" durante festival anterior; sequela neurológica leve. Hoje vive marginalizada; pode dar pista sub-quest.
-- **Sonja Murmúrio** (**morta em -5**, 62 quando morreu) — co-fundadora original Cult Mirage. Mãe biológica Adila. Forçada a "retiro espiritual" em -6; morre ano seguinte em circunstâncias nunca esclarecidas. Adila guarda rancor paradoxal (não menciona, mas evita o nome).
+- **Sonja Murmúrio** (**morta em -34**, ~33 quando morreu) — co-fundadora original Cult Mirage. Mãe biológica Adila. Morta em circunstâncias nunca esclarecidas no mesmo ano em que Adila (6 anos na época) assumiu nominalmente a liderança da facção pró-Sterling sob tutela administrativa transitória. Adila guarda rancor paradoxal (não menciona, evita o nome).
 
 ### Tradições internas
 
@@ -514,9 +514,8 @@ Cor institucional: gradient violeta-magenta-cyan saturado.
 ### Eventos históricos onde a facção atuou
 
 - **-35** — Fundação como movimento artístico genuíno. Sonja Murmúrio co-funda.
-- **-6** — Adila assume liderança pró-Sterling. Sonja forçada a retiro.
-- **-6** — Iara adotada formalmente aos 6 anos.
-- **-5** — Sonja morre.
+- **-34** — Sonja morre em circunstâncias nunca esclarecidas. Adila (6 anos) assume formalmente liderança facção pró-Sterling sob tutela transitória. Cult dual canon desde então.
+- **-6** — Adila consolida tutela operacional plena. Iara adotada formalmente aos 6 anos.
 - **-1** — Iara deserta aos 11.
 - **-1** — Operação Atualização Sensorial planejada para ano 0.
 - **Ano 0 (durante jogo)** — Festival sabotado por Iara + Gus (Ketsu arco Iara). Crise reverberante para a facção.

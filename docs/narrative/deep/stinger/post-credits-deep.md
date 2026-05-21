@@ -86,7 +86,7 @@ Fade para preto. Duração canônica: 89 segundos.
 
 Fade-in: arquivo subterrâneo da Catedral de São Vargas, profundidade não-precisada em metragem, datação canônica -45. Iluminação fria, lâmpadas-cronistas pendentes em cabos longos, cinco unidades visíveis em fileira.
 
-**Verônica Atelaiá**, primeira teorizadora documentada de Patch-Zero conforme canon F056, entra em frame pela esquerda. Roupa simples de pesquisadora arquivista, sem insígnia visível, sem identificação cerimonial. A época é -45, três anos antes da redação do tratado anônimo que mais tarde Sterling Locke citaria em tese -25 como "anomalia folclórica de provincianismo selvático".
+**Verônica Atelaiá**, primeira teorizadora documentada de Patch-Zero conforme canon F056, entra em frame pela esquerda. Roupa simples de pesquisadora arquivista, sem insígnia visível, sem identificação cerimonial. Datação cronística -45, ano canônico da redação do tratado anônimo que mais tarde Sterling Locke citaria em tese -25 como "anomalia folclórica de provincianismo selvático".
 
 Mesa cronística central: microfilme arquivado em cartela de metal escuro, etiqueta manuscrita parcialmente desbotada. Verônica retira o microfilme da cartela, manipula com luvas de algodão, posiciona em projetor cronístico de bancada. Acende.
 

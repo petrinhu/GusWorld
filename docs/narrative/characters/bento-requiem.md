@@ -26,7 +26,7 @@
 
 ## Interno
 
-- **Wound:** treinado desde os 7 anos pela Ordem Recursiva. Pais distantes, missão sempre primeiro. Aos 14, herdeiro designado mas ainda inseguro de ser digno. Em paralelo: 3 anos antes do jogo, viu um irmão-aprendiz cair em zona contaminada de Patch-Zero (off-screen, pré-jogo). Carrega culpa por não ter conseguido prever a contaminação.
+- **Wound:** treinado desde os 7 anos pela Ordem Recursiva. Pais distantes, missão sempre primeiro. Aos 14, herdeiro designado mas ainda inseguro de ser digno. **Wound primeiro (anterior a Hilário Tepenkov):** irmã biológica morta ou desaparecida antes de -7 (canon R9 conto 4 antologia: "minha irmã, pulso clavícula esquerda, nome não-escrito"). Bento carrega pulso na clavícula esquerda como marca canônica. Nome próprio da irmã não canonizado por escolha autoral. Em paralelo: aos 4 anos (canônico -7), viu Hilário Tepenkov (mestre-aprendiz, companheiro de estudos, 14 anos) cair em zona contaminada de Patch-Zero na Catedral Menor de Atelaiá. Carrega culpa silenciosa por ter sobrevivido (Hilário caiu antes de chegar ao escudo de Velhusto pegando-o no colo).
 - **Want:** ser digno do legado. Honrar Mestre-Hierofante.
 - **Need:** entender que dignidade não é repetir o passado; é **adaptar o passado pra que ele continue vivo**. Tradição flexível, não dogma.
 - **Belief:** "se eu seguir as regras certas, tudo se sustenta."

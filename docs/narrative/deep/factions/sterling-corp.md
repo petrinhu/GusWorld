@@ -50,15 +50,15 @@ Perfil expandido em `characters/sterling-locke.md`. Aqui o registro aprofunda a 
 
 O Locke Core, implante neural cortical, exige bateria custosa de manutenção. Recarregamento contínuo via interface dorsal cervical durante o sono. Falha de bateria implicaria parada operacional da Rede Distribuída e, secundariamente, déficit cognitivo pessoal do operador. Locke trata a dependência como custo trivial. A doutrina DRE não admite vulnerabilidade pessoal como variável de risco. A vulnerabilidade existe e é, no terceiro ato, o vetor pelo qual Gus decodifica o sistema. Sterling Corp não conta com isso porque Sterling Corp não modela a si mesma com a mesma honestidade com que modela os adversários.
 
-### Diretora Octávia Penedo (Contenção, cinquenta e dois anos)
+### Diretora Octávia Penedo (Contenção, cinquenta e cinco anos)
 
 Engenheira bioquímica de formação, contratada em ano onze negativo durante a fase Core-Synth. Responsável direta pelos laboratórios Patch-Zero. Fracasso operacional canônico documentado em [[in-world-docs]] DD-014: a contenção da anomalia em ano três negativo escapou parcialmente, e o escape final em ano zero vírgula vinte e cinco negativo, três meses antes do início do jogo, foi catalogado por Locke como "evento aceitável de pesquisa de fronteira". Penedo manteve o cargo. A ratificação como Diretora plena ocorreu na semana seguinte ao escape, numa cerimônia corporativa fechada que distribuiu medalhas internas e fez constar em ata que "a Diretora demonstrou resiliência cognitiva sob pressão de runtime instável". Penedo aceitou a medalha. Não pediu desculpas, porque Sterling Corp não admite a possibilidade institucional do pedido de desculpas. Aparece via holograma corporativo nos arcos de Bento e Jaci. Nunca pessoalmente em combate.
 
-### Diretor Theodoro Calveri (Aquisições, cinquenta e sete anos)
+### Diretor Theodoro Calveri (Aquisições, cinquenta e dois anos)
 
 Ex-advogado de recuperação judicial, contratado em ano nove negativo. Arquiteto operacional do canibalismo corporativo continuado. Executou pessoalmente, ou por equipes que dirigiu, a engenharia financeira que destruiu a cooperativa Alencar em ano oito negativo, evento cuja consequência indireta foi a morte de Salviano Alencar seis meses depois e a semeadura, anos depois, da trajetória de Dante Alencar como operativo encoberto recrutado pelo Diretor Vorto da FIR. Calveri também coordenou a batida da casa Neumann em ano oito negativo, operação na qual o toca-discos histórico da família foi confiscado sob alegação contratual de "patrimônio cultural não-licenciado". Linda tinha quatro anos. Calveri assinou o auto de apreensão. Aparece em comunicações internas, em assinaturas de contrato, em emails confiscados pelo Underground do Silêncio e republicados em redes clandestinas. Nunca em campo. A frase corporativa que assina é "deprecação eficiente, sem overhead emocional".
 
-### Diretora Solange Vix (Imagem Pública, quarenta e nove anos)
+### Diretora Solange Vix (Imagem Pública, quarenta e seis anos)
 
 Roteirista de formação publicitária, contratada em ano dez negativo. Constrói nos bastidores a holografia corporativa que Sterling assina pessoalmente. Roteirizou pronunciamento público de ano três negativo que minimizou "boatos sobre vírus digital" na Zona do Silêncio. Roteirizou a propaganda Janelarum, a campanha "Sterling Corp entrega runtime", e o ciclo trimestral de oitenta e nove dias úteis durante o qual a Tetra-Torre projeta variações do slogan institucional sobre o skyline do Núcleo. Não aparece pessoalmente nunca, em conformidade com sua doutrina pessoal de invisibilidade autoral, formulada em manuscrito interno que circula apenas entre dezessete pessoas da diretoria. Sterling assina os anúncios. Solange escreve. A divisão é hierarquicamente eficiente e ideologicamente coerente: Sterling Corp não admite autoria distribuída em comunicação externa, porque autoria distribuída admite plural, e Sterling Corp é singular.
 
@@ -72,7 +72,7 @@ A linha do tempo corporativa, condensada em onze episódios canônicos, articula
 
 Ano dezenove negativo. Falência forçada da Apex-Data Systems. Cento e quarenta e quatro funcionários dispensados. Inácia Berenger entre os demitidos. Locke ainda como CTO interino, ainda sem rosto público. A demissão de Inácia gera, treze anos depois, a sucataria onde Cauã cresce, onde peças Apex-Data Era 2 são guardadas, onde a Subestação Sete é reconstruída em forma de memória material.
 
-Ano dezesseis negativo. Vazamento de audit interno durante a fase Nexus-Cloud. Autor desaparece. Sterling Corp não comenta. Documento residual, três páginas, sobrevive em arquivo Underground do Silêncio, recuperado por Bartolo Penkin em ano sete negativo.
+Ano dezesseis negativo. Vazamento de audit interno durante a fase Nexus-Cloud. Autor desaparece. Sterling Corp não comenta. Documento residual, três páginas, sobrevive em arquivo Underground do Silêncio, recuperado por Bartolo Penkin no mesmo ano dezesseis negativo, antes de Bartolo desaparecer em ano doze negativo.
 
 Ano quinze negativo. Falência forçada da Nexus-Cloud Conglomerate. Patentes de processamento por indução magnética transferidas para a entidade pré-Sterling.
 

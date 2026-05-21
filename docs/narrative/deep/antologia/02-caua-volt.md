@@ -2,9 +2,9 @@
 
 ## I
 
-A escada metálica da Subestação 11 tem trinta e quatro degraus, dos quais os três últimos são falsos: chapa fina sobre vazio, ecoam diferente, soltam um *tóc* oco que dedo treinado reconhece a três metros de distância. Eu desço contando, não por superstição (poxa, eu sou cético-irônico de carteirinha, não místico de feira), mas porque contar é hábito de Striker: tudo no corpo da gente acaba virando ciclo de relógio, BPM, divisão de compasso. Meu pai uma vez disse que engenheiro elétrico bom é o que conta sem perceber. Quando ouve uma turbina, já sabe o RPM antes de olhar o painel.
+A escada metálica da Subestação 11 tem trinta e quatro degraus, dos quais os três últimos são falsos: chapa fina sobre vazio, ecoam diferente, soltam um *tóc* oco que dedo treinado reconhece a três metros de distância. Eu desço contando, não por superstição (poxa, eu sou cético-irônico de carteirinha, não místico de feira), mas porque contar é hábito de Striker: tudo no corpo da gente acaba virando ciclo de relógio, BPM, divisão de compasso. Meu pai, conforme a Inácia conta, dizia que engenheiro elétrico bom é o que conta sem perceber. Quando ouve uma turbina, já sabe o RPM antes de olhar o painel.
 
-Meu pai é o Salvador Berenger, engenheiro elétrico de quarta geração, linha direta de um cara chamado Iremar Berenger que ajudou a escrever a primeira versão de Pythia faz uns noventa e cinco anos atrás. Não que ele faça questão de lembrar. Salvador faz questão é de consertar coisa quebrada, e eu, aos treze, faço questão de não chorar em frente a câmera nenhuma da cidade. Cético-irônico, lembra.
+Meu pai foi o Salvador Berenger, engenheiro elétrico de quarta geração, linha direta de um cara chamado Iremar Berenger que ajudou a escrever a primeira versão de Pythia faz uns noventa e cinco anos atrás. Não que ele tivesse feito questão de lembrar. Salvador morreu três anos antes de eu nascer, num acidente de tráfego na Periferia, mesmo ano em que eu fui gerado. Inácia ficou viúva grávida. Davi tinha três anos. Inácia me criou sozinha, com o Davi até eu ter oito anos, e depois só. Eu nunca conheci o homem em pessoa. Conheço pelo que a Inácia conta, pelo que está gravado nas peças que ele deixou, pelo silêncio específico que essa família guarda para o nome dele. Cético-irônico, lembra: eu não acredito em fantasma, mas reconheço presença material em peça honesta.
 
 A Subestação 11 zumbe na frequência conhecida. Cento e quarenta e quatro batidas por minuto, mais ou menos, é o BPM de fundo desse setor dos Dutos Infernais; eu sei porque já bati esse compasso no peito andando rápido pelos corredores. É leitmotiv da minha vida, parece, esse 144. Se eu fosse menos cético dizia que é destino. Sou bem cético, então digo que é coincidência elétrica com a turbina de refrigeração do andar de baixo.
 
@@ -12,13 +12,13 @@ Hoje é manhã de Ano 0, três meses (mais ou menos) antes daquilo que vocês ad
 
 ## II
 
-Desço os trinta e quatro degraus. Conto cinco, depois oito, depois treze, depois vinte e um, depois trinta e quatro. Fibonacci é tipo, sei lá, um vício de família. Meu pai mede tudo em Fibonacci e jura que não percebe. Minha mãe, a Inácia, mede tudo em peso de sucata e jura que percebe demais.
+Desço os trinta e quatro degraus. Conto cinco, depois oito, depois treze, depois vinte e um, depois trinta e quatro. Fibonacci é tipo, sei lá, um vício de família. Meu pai media tudo em Fibonacci e jurava que não percebia, conforme a Inácia conta (ela diz que era constante, que Salvador anotava espessura de fio, número de voltas de bobina, intervalo de pulso em sequência que ela só foi reconhecer depois de viúva, abrindo as cadernetas dele). Minha mãe, a Inácia, mede tudo em peso de sucata e jura que percebe demais.
 
 Cheguei no piso. Os Dutos Infernais não são exatamente "infernais"; o nome é uma piada que pegou. Ficaram conhecidos assim porque há uns quarenta anos um pastor pelicano achou que os relés de plasma faziam barulho de demônio. O nome ficou. A gente da Periferia ostensiva (essa parte da cidade onde a Catedral Asmódica não consegue por câmera porque os campos magnéticos detonam a calibragem) curte o nome. Aceita-se a herança e segue. Periferia ostensiva é assim: o que não pode mudar, vira marca.
 
 Procuro peça pra minha mãe. Inácia mandou: "filho, me traz um conector de junção tipo C-89, daqueles velhos, dos anos que ainda tinham núcleo de cobre puro, não dessa miséria de alumínio reciclado". Conector C-89 é peça que só existe nos Dutos porque foi banida do mercado oficial em algum momento e os Asmódicos não conseguiram chegar até aqui pra confiscar. Caçamba de sorte.
 
-Caminho até o subnível dois. Os corredores são vinte e um por trinta e quatro metros de seção transversal, mais ou menos, e o teto é abóbada de concreto reforçado com nervuras de ferro. Quem passa rápido nem repara nas nervuras. Quem passa devagar, como eu hoje, repara que as nervuras formam padrão. Cinco arcos depois um arco maior, depois oito menores, depois um maior de novo. Você passa olhando e o cérebro reconhece sequência. Meu pai uma vez disse: "Cauã, prédio honesto te conta a matemática dele de graça. Prédio mentiroso esconde". A Subestação 11 é prédio honesto. Conta tudo.
+Caminho até o subnível dois. Os corredores são vinte e um por trinta e quatro metros de seção transversal, mais ou menos, e o teto é abóbada de concreto reforçado com nervuras de ferro. Quem passa rápido nem repara nas nervuras. Quem passa devagar, como eu hoje, repara que as nervuras formam padrão. Cinco arcos depois um arco maior, depois oito menores, depois um maior de novo. Você passa olhando e o cérebro reconhece sequência. A Inácia tem caderneta do Salvador com frase escrita à mão, fonte serifa Era 2, que ela me deixou ler aos onze: "prédio honesto te conta a matemática dele de graça. Prédio mentiroso esconde". A Subestação 11 é prédio honesto. Conta tudo. (Eu releio a frase mentalmente como quem encosta na lateral de uma peça antiga. Cético-irônico, lembra. Mas peça antiga pesa, e pesar é fato.)
 
 ## III
 
@@ -30,9 +30,9 @@ S.B.
 
 Salvador Berenger. Meu pai. A gravação dele.
 
-Caçamba. Esse conector é trabalho dele, de uns dez ou doze anos atrás (eu reconheço o estilo: ele mudou de fonte tipográfica do carimbo umas três vezes na vida, e essa fonte aqui é a antiga, anterior à reforma do escritório dele). Foi instalado antes de eu nascer, ou bem no comecinho. Meu pai trabalhou nessa subestação? Nessa exata? Ele nunca me contou. Salvador Berenger é homem que não conta o que não foi perguntado, e eu nunca fiz a pergunta certa. Caramba.
+Caçamba. Esse conector é trabalho dele, de mais de treze anos atrás (eu reconheço o estilo: a Inácia me mostrou três fontes tipográficas distintas do carimbo dele nos cadernos preservados, e essa fonte aqui é a antiga, anterior à reforma do escritório que ele fez no último ano de vida). Foi instalado antes de eu nascer, com certeza, porque Salvador morreu antes de eu nascer. Ele trabalhou nessa subestação? Nessa exata? Nem a Inácia me contou; talvez ela mesma não soubesse. Salvador era, conforme ela conta, homem que não contava o que não foi perguntado, e eu nunca tive como fazer pergunta nenhuma a ele em vida. Caramba.
 
-Desligo a lanterna fina. Catalogo a informação. Não vou perguntar agora, vou esperar a hora. A gente Berenger faz assim: deixa o silêncio cozinhar. Quando ele estiver pronto, ele fala. Quando eu estiver pronto, eu pergunto.
+Desligo a lanterna fina. Catalogo a informação. Não vou perguntar à Inácia agora (no Mercado da Sucata Honesta, na frente das arruelas, em pé entre o conector e o bebedouro público, não é hora). Vou esperar a hora. A gente Berenger faz assim: deixa o silêncio cozinhar. Quando eu estiver pronto, eu pergunto. A Inácia responde no tempo dela.
 
 Solto o conector da bobina com cuidado, guardo no bolso lateral da jaqueta. Pesa. Pesa mais que conector novo. Cobre puro pesa.
 
@@ -68,15 +68,15 @@ Por um segundo ela para. Não é pausa dramática, é pausa de quem reconhece e 
 
 – Quando?
 
-Ela olha pra mim. Tira a lupa do olho. Põe o conector na caixa de peças aprovadas. Limpa a mão no avental de couro velho (que avental gasto, esse, eu reparo agora; ela tem ele desde antes de eu nascer, deve ter pelo menos uns vinte anos de uso, o couro endurecido nas bordas).
+Ela olha pra mim. Tira a lupa do olho. Põe o conector na caixa de peças aprovadas. Limpa a mão no avental de couro velho (que avental gasto, esse, eu reparo agora; ela tem ele desde antes de eu nascer, deve ter pelo menos uns dezesseis anos de uso, o couro endurecido nas bordas).
 
-– Quando o Davi tinha uns três anos. Antes de você. Ele fez seis meses lá, contrato extra. Não foi feliz.
+– Quando o Davi tinha uns três anos. Antes de eu te gestar. Ele fez seis meses lá, contrato extra. Não foi feliz.
 
 – Por quê?
 
-– Pergunta pra ele.
+– Não chegou a me contar inteiro. Veio o acidente antes.
 
-Inácia volta pra arruela. A conversa acabou. Eu reconheço o fim da conversa do mesmo jeito que reconheço o fim de um ciclo elétrico. Não insisto. Catalogo. Sigo.
+Inácia volta pra arruela. A conversa acabou. Eu reconheço o fim da conversa do mesmo jeito que reconheço o fim de um ciclo elétrico. Não insisto. Catalogo. Sigo. A Inácia não fala do acidente de tráfego se não for puxada com cuidado, e hoje, num banquinho baixo de mercado, não é o lugar.
 
 Antes de sair, ela diz, sem levantar o olhar:
 
@@ -132,9 +132,9 @@ Eu não choro. Aos treze a gente não chora, a gente cataloga. Tem hora pra chor
 
 ## VIII
 
-Em casa, almoço com Inácia (Salvador está fora, contrato de emergência em outra subestação, o de sempre). Sopa de raiz com pão de centeio. Inácia cozinha bem quando quer e mal quando não quer; hoje quis. Eu como em silêncio. Ela come em silêncio. A gente é família de silêncio bom, daqueles que não doem.
+Em casa, almoço com Inácia (Salvador, faz dezesseis anos que mora só no que a gente guarda dele: caderno, conector, ferro de solda, frase repetida pela Inácia). Sopa de raiz com pão de centeio. Inácia cozinha bem quando quer e mal quando não quer; hoje quis. Eu como em silêncio. Ela come em silêncio. A gente é família de silêncio bom, daqueles que não doem.
 
-Depois do almoço, eu subo pro meu quarto. Quarto pequeno, três metros por cinco, teto baixo, janela única dando pro pátio interno. Eu tenho um terminal velho ali, dos antigos, com teclado mecânico real e tela monocromática verde. Salvador me deu de presente de aniversário de onze anos. Disse: "se você quer aprender Pythia direito, aprende em máquina honesta". Máquina honesta, pra Salvador, é máquina que não mente sobre o que está fazendo.
+Depois do almoço, eu subo pro meu quarto. Quarto pequeno, três metros por cinco, teto baixo, janela única dando pro pátio interno. Eu tenho um terminal velho ali, dos antigos, com teclado mecânico real e tela monocromática verde. A Inácia me deu de presente de aniversário de onze anos, mas o terminal era do Salvador: ela tinha guardado lacrado num pano de algodão treze anos, esperando o momento certo. Frase do Salvador anotada por ela na primeira página do manual interno: "se você quer aprender Pythia direito, aprende em máquina honesta". Máquina honesta, pro Salvador, era máquina que não mente sobre o que está fazendo. A Inácia ratificou a frase no presente de aniversário. Eu aceitei sem protestar.
 
 Eu abro o terminal. Carrego o ambiente Pythia. Pythia é a linguagem bio-elétrica que minha gente usa, é o que eu falo melhor que português, é a linguagem que o Iremar Berenger meu tataravô ajudou a co-escrever lá em -95. Eu não tenho orgulho disso, porque orgulho de coisa antiga é coisa de adulto. Eu tenho costume. É a minha língua materna técnica.
 
@@ -148,13 +148,13 @@ Salvo o script com o nome `volt_oscila_89.pyt`. Backup duplo, pendrive físico e
 
 ## IX
 
-Antes de fechar o terminal, abro uma gaveta lateral. Tem ali uma chave-fenda velha do Salvador, de cabo de madeira escurecida, lâmina de aço-carbono. Ele me emprestou faz uns três anos e nunca pediu de volta. O cabo de madeira tem entalhes, uns vinte e poucos, distribuídos em padrão de grade três por três, com marcas internas: ponto, traço, ponto, espaço, traço. Eu sempre achei que eram marcas aleatórias, decoração de feira.
+Antes de fechar o terminal, abro uma gaveta lateral. Tem ali uma chave-fenda velha do Salvador, de cabo de madeira escurecida, lâmina de aço-carbono. A Inácia me passou faz uns três anos, sem cerimônia, dizendo "ferramenta tua, sempre foi". Eu nunca questionei a procedência exata. O cabo de madeira tem entalhes, uns vinte e poucos, distribuídos em padrão de grade três por três, com marcas internas: ponto, traço, ponto, espaço, traço. Eu sempre achei que eram marcas aleatórias, decoração de feira.
 
 Hoje, com o conector C-89 do pai no bolso e o nó da Vespa no outro, eu olho de novo. Reorganizo mentalmente. Grade três por três, marcas por célula. Não é decoração. É um alfabeto cifrado, daqueles que a subcultura do Pelicano Branco usava nos anos da clandestinidade, faz noventa anos atrás, anterior à fundação oficial da Catedral Asmódica. Cifra de pigpen residual, das mais antigas. Cada célula da grade representa uma letra, e os pontos internos modificam a leitura.
 
-Eu não leio cifra dessas, ainda. Mas reconheço. E reconheço também que o cabo dessa chave-fenda foi entalhado pelo meu pai, ou pelo pai dele, ou por algum Berenger antes. Outra coisa que ninguém me contou. Salvador é homem que não conta o que não foi perguntado.
+Eu não leio cifra dessas, ainda. Mas reconheço. E reconheço também que o cabo dessa chave-fenda foi entalhado pelo meu pai, ou pelo pai dele, ou por algum Berenger antes. Outra coisa que ninguém me contou em vida (o pai morreu antes da pergunta surgir, e a Inácia, quando perguntei aos nove se ela sabia o que significavam os entalhes, deu de ombros: "Salvador entalhava de noite. Nunca contou. Eu nunca perguntei").
 
-Catalogo. Guardo a chave-fenda de volta na gaveta. Vou perguntar um dia. Hoje não.
+Catalogo. Guardo a chave-fenda de volta na gaveta. Vou perguntar à Inácia um dia, com calma, talvez levar a chave-fenda junto da caderneta dele e cruzar entalhe com fonte tipográfica. Hoje não.
 
 ## X
 
@@ -178,4 +178,4 @@ Catalogo. Sigo.
 
 ---
 
-**Última revisão:** 2026-05-20. Canônico deep-lore R9 F1-DL.9 Antologia Vol 2 conto 2/14. Não modificar sem aprovação criador supremo.
+**Última revisão:** 2026-05-21. Canônico deep-lore R9 F1-DL.9 Antologia Vol 2 conto 2/14. Cascata R-AUDIT-04 aplicada: Salvador Berenger canon morto em -13 (acidente de tráfego Periferia, mesmo ano da gestação de Cauã). Cauã narra Salvador via memória oral materna + objetos herdados. Não modificar sem aprovação criador supremo.

@@ -256,7 +256,7 @@ Cada companion tem ficha com 3 estados de Knowledge canônicos:
 **Knowledge alta:**
 
 - Wound canônico: pais **Lia Vanderbist** (farmacêutica do Pelicano Branco) + **Solano Vanderbist** (mestre-herborista flamengo) mortos em -8 em "surto silencioso" do vilarejo. Causa oficial: anomalia botânica desconhecida. Causa real (ending Ouro): vetor experimental Sterling — testagem clandestina de bio-script DRE em vilarejo periférico. Jaci (3 anos) sobreviveu por estar em viagem com a avó Mariana.
-- Avó: **Anciã Mariana Vanderbist** (75), líder informal Pelicano Branco. Mentora. Suspeita Sterling desde -8; nunca prova.
+- Avó: **Anciã Mariana Vanderbist** (89), líder informal Pelicano Branco. Mentora. Suspeita Sterling desde -8; nunca prova.
 - Linhagem direta: Anhuera Vanderbist (~-95, co-autora Pythia com Iremar Berenger) → Soraia → Mariana → Lia → Jaci.
 - Sticky-note Bloco I: foreshadow F-029 (Jaci nota cor errada em folha biolúmen 3 settings antes da chegada ao vilarejo → escalation Patch-Zero), F-118 (rivalidade amigável com Vivendel Berenger, 14, [[08-selve-profunda|Selve Profunda §6]]).
 - NPCs satélite: **Helena Sirinhaém** (50, herborista júnior aliada). **Bito Caldeira** (60, prefeito informal). **Tatauín Branca** (22, caçadora-coletora). **Vivendel Berenger** (14, bio-hacker Pythia rival amigável).
@@ -382,7 +382,7 @@ não sou seu inimigo. ainda.
 - **Hierofante Marlena Aurora** (35) — detida em "reabilitação sensorial"; resgatável em sub-quest pós-recrutamento Iara.
 - **Hierofante Patrício Velô** (42) — quieto, observador. Knowledge alta destrava informação.
 
-**Sonja Murmúrio (morta em -5):** co-fundadora original Cult Mirage. Mãe biológica Adila. Forçada a "retiro espiritual" em -6; morre ano seguinte em circunstâncias nunca esclarecidas. Adila guarda rancor paradoxal (não menciona, mas evita o nome). Ficha-fantasma: Gus catalogou via fita cassete que Sérgio Brimber entrega ([[05-setor-mirage|Mirage §6 sub-quest]]).
+**Sonja Murmúrio (morta em -34):** co-fundadora original Cult Mirage. Mãe biológica Adila. Morta em -34 em circunstâncias nunca esclarecidas, no mesmo ano em que Adila (6 anos) assumiu liderança formal facção pró-Sterling sob tutela transitória. Adila guarda rancor paradoxal (não menciona, mas evita o nome). Ficha-fantasma: Gus catalogou via fita cassete que Sérgio Brimber entrega ([[05-setor-mirage|Mirage §6 sub-quest]]).
 
 ---
 
@@ -412,7 +412,7 @@ Tabela operacional canônica. Cada NPC tem entry-stub no Diário após **convers
 | **Joaquim Bartolomeu** | 32 | [[07-zona-do-silencio\|Zona do Silêncio]] | técnico analógico; reconstrói toca-discos artesanalmente; filho de luthiers | Mistura peças Era 2 + impressas em casa. Som "ligeiramente errado. funciona." | Sub-quest cross-arco Iara (extrai áudio fita Sonja). |
 | **Mara Bento** | 28 | [[07-zona-do-silencio\|Zona do Silêncio]] | operadora rádio analógica sub-célula Norte | Guarda vinil "Última Frequência" partido em 3 pedaços | Tem dois filhos pequenos. Conhece transmissões Cidades-Gêmeas. |
 | **Helga Riza** | 45 | [[07-zona-do-silencio\|Zona do Silêncio]] | escritora subterrânea; compila pichações Polis-Vermelha | Arquivo Underground | Cross-ref [[entries-docs-descobriveis\|doc 11]]. |
-| **Anciã Mariana Vanderbist** | 75 | [[08-selve-profunda\|Pelicano Branco]] | avó Jaci; líder informal vilarejo; lê Selve | Sabe ler Selve há décadas | Mentora cautelosa (não toma protagonismo). Suspeita Sterling desde -8. |
+| **Anciã Mariana Vanderbist** | 89 | [[08-selve-profunda\|Pelicano Branco]] | avó Jaci; líder informal vilarejo; lê Selve | Sabe ler Selve há décadas | Mentora cautelosa (não toma protagonismo). Suspeita Sterling desde -8. |
 | **Bito Caldeira** | 60 | [[08-selve-profunda\|Pelicano Branco]] | prefeito informal vilarejo ([[comic-reliefs]] EE-14) | Decisões coletivas passam por ele formalmente; substância vem da Anciã | NPC pacífico. |
 | **Tatauín Branca** | 22 | [[08-selve-profunda\|Pelicano Branco]] | caçadora-coletora veterana; conhece Selve Profunda | "se você ver a copa parar de respirar, você não estava na floresta. estava no que ela não é." | Aliada útil. Sub-quest navegação Pântano. |
 | **Vivendel Berenger** | 14 | [[08-selve-profunda\|Pelicano Branco]] | bio-hacker Pythia rival/aliado de Jaci | Competição amigável síntese antídoto | Jaci comenta "perdão de ponto-e-vírgula" ([[comic-reliefs]] cena 2). Recompensa token Pythia composto. |
@@ -501,7 +501,7 @@ Cada facção tem ficha visual + texto. Knowledge cresce em 3 estados como nos c
 | Cor | verde-ciano biolúmen + marrom-húmus + branco-fungo |
 | Origem | Pré-Era 2 (aldeias-fronteira descendem Êxodo Neo-Sylvania ~-720) |
 | Filosofia | Cooperação ecológica baseada em padrão matemático; sem porta-voz oficial |
-| Líderes | sem hierarquia formal; Anciã Mariana Vanderbist (75) é líder informal Pelicano Branco. 3 outras aldeias com anciões: Berenice Quaresma (Tucano-Cinza, 80), Otília Pamonha (Pelicano Roxo, 73), Bartolomeu Quintino (Tartaruga-Fractal, 78) |
+| Líderes | sem hierarquia formal; Anciã Mariana Vanderbist (89) é líder informal Pelicano Branco. 3 outras aldeias com anciões: Berenice Quaresma (Tucano-Cinza, 80), Otília Pamonha (Pelicano Roxo, 73), Bartolomeu Quintino (Tartaruga-Fractal, 78) |
 | Aliados | Ordem Recursiva, Underground, Gus + party (pós-arco Jaci) |
 | Inimigos | Sterling Corp (extração), FIR (predação), Patch-Zero (corrompe) |
 | Setting | [[02-selve-sombria\|Selve Sombria]] + [[08-selve-profunda\|Selve Profunda]] |
@@ -529,7 +529,7 @@ Cada facção tem ficha visual + texto. Knowledge cresce em 3 estados como nos c
 | Setting | [[05-setor-mirage\|Setor Mirage]] inteiro |
 | Knowledge baixa | "cor saturada. holografia em loop. adeptos parecem todos iguais." |
 | Knowledge média | "facção pró + facção artista. Adila manipula Iara desde 6. -1 Atualização Sensorial planejada como extração massiva." |
-| Knowledge alta | "Sonja Murmúrio (mãe Adila, co-fundadora original) forçada a 'retiro espiritual' em -6, morre -5. Pacto Sensorial = cessão de dados ([[entries-docs-descobriveis\|doc 4]])." |
+| Knowledge alta | "Sonja Murmúrio (mãe Adila, co-fundadora original) morta em -34 em circunstâncias nunca esclarecidas; Adila (6 anos) assume liderança facção pró-Sterling sob tutela transitória no mesmo ano. Pacto Sensorial = cessão de dados ([[entries-docs-descobriveis\|doc 4]])." |
 
 ### 4.6 Underground do Silêncio
 

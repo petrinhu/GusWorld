@@ -8,13 +8,13 @@
 
 **Acaceiro de tronco vermelho.** Espécie arbórea ritual das catedrais Neo-Sylvania e marker territorial mais confiável da fronteira da Selve. Onde há acaceiro saudável, a fronteira está intacta; onde o tronco perde saturação vermelha, há vetor de corrupção Patch-Zero a menos de 144 metros. As anciãs Voronoi tatuam broto de acaceiro no pulso esquerdo como marca de iniciação. Easter egg maçom (paralelo ramo de acácia). *Cross-ref:* deep/magic/natureza-matematica-rigida-deep.md §7; deep/magic/glyph-token-conjuro-codex-deep.md §8.
 
-**Adila Murmúrio (Hierofante).** 40 anos, líder facção pró-Sterling do Cult Mirage. Manipulou Iara desde criança; antagonista intermediária do arco Iara. Filha biológica de Sonja Murmúrio (co-fundadora original Cult, morta em -5 após "retiro espiritual" forçado em -6). *Cross-ref:* factions.md §5; characters/iara-lumen.md.
+**Adila Murmúrio (Hierofante).** 40 anos, líder facção pró-Sterling do Cult Mirage. Manipulou Iara desde criança; antagonista intermediária do arco Iara. Filha biológica de Sonja Murmúrio (co-fundadora original Cult, morta em -34 em circunstâncias nunca esclarecidas; Adila assumiu liderança facção pró-Sterling no mesmo ano sob tutela transitória aos 6 anos; consolidou tutela plena em -6). *Cross-ref:* factions.md §5; characters/iara-lumen.md.
 
 **Aldebrando Chevalier.** Pai biológico de Bento "Requiem" Chevalier, mestre-Asmódico da Ordem Recursiva, morto em -0.5 em incursão à catedral perdida. Causa oficial queda; causa real eliminação por descobrir interferência precoce Sterling em cripto-glifo profundo. Diário pessoal preservado por Velhusto e entregue a Bento no início do jogo. *Cross-ref:* timeline.md -0.5; characters/bento-requiem.md.
 
 **Anaximandro Vyrcátrix.** Irmão de Hyperion Vyrcátrix, Era 1, comissário-centralizador, executor da absorção dos vilarejos cooperativos pelo banco central. Trajetória paralela ao irmão místico. *Cross-ref:* deep/eras/era-1-pre-codigo.md §7.5.
 
-**Anciã Mariana Vanderbist.** 75 anos, líder informal do vilarejo do Pelicano Branco, avó de Jaci, figura central da facção Selve Sombria. Sabe ler a Selve há décadas. Assumiu guarda de Jaci após surto silencioso de -8 que matou Lia e Solano. *Cross-ref:* factions.md §4; characters/jaci-proxy.md.
+**Anciã Mariana Vanderbist.** 89 anos (canon Fibonacci), líder informal do vilarejo do Pelicano Branco, avó de Jaci, figura central da facção Selve Sombria. Sabe ler a Selve há décadas. Assumiu guarda de Jaci após surto silencioso de -8 que matou Lia e Solano. *Cross-ref:* factions.md §4; characters/jaci-proxy.md.
 
 **Anelida Recursiva.** Ver Orla Recursiva.
 
@@ -452,7 +452,7 @@
 
 **Sônico (família técnico-natural).** Família que opera por onda mecânica em meio elástico (ar, água, metal, biomassa programada). Inclui infrassom, ultrassom, ressonância estrutural não-audível. Token sônico: fundo violeta-noturno, padrão de onda senoidal em três ciclos visíveis. Companion-âncora: Linda "Siren" Neumann. *Cross-ref:* deep/magic/glyph-token-conjuro-codex-deep.md §2.
 
-**Sonja Murmúrio.** Co-fundadora canônica Cult Mirage original em -35, artista. Mãe biológica de Adila Murmúrio. Forçada a "retiro espiritual" em -6 quando Adila assumiu liderança pró-Sterling; morre em -5 de causa nunca esclarecida. *Cross-ref:* factions.md §5; timeline.md -6, -5.
+**Sonja Murmúrio.** Co-fundadora canônica Cult Mirage original em -35, artista. Mãe biológica de Adila Murmúrio. Morre em -34 em circunstâncias nunca esclarecidas, no mesmo ano em que Adila (6 anos) assumiu liderança formal facção pró-Sterling sob tutela transitória. Cult Mirage canon dual (artista + pró-Sterling) consolidada desde então. *Cross-ref:* factions.md §5; timeline.md -34; deep/antologia/03-iara-lumen.md.
 
 **Sterling Corp.** Primeira facção canônica, antagonista absoluta. CEO único monolítico (Sterling Locke). Departamentos: Interpretação Global (engenharia GRE), Contenção (Patch-Zero), Aquisições (canibalismo corporativo), Imagem Pública (propaganda), Recursos Humanos. Drones e proxies como camada operacional não-humana. Símbolo: monóculo angular cromado com laser vermelho. Slogan: "o futuro interpreta o presente". *Cross-ref:* factions.md §1; lore-bible.md §10.
 
