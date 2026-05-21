@@ -24,7 +24,7 @@ O Diário é um caderno físico tangível pertencente a Gus, 11 anos. Toda a int
   - Adesivo pequeno de **Pilha Sobrecarregada** (referência [[tradicoes-cultura]] §Dia do Tomo — pequeno logo estilizado de livro aberto com símbolo de pilha, ~3cm canto inferior direito).
   - Adesivo de **fractal Fibonacci** desenhado a caneta (não impresso; Gus copiou de fragmento Selve aos 10, ver `characters/gus.md` §Memórias formativas — primeira incursão).
   - **Dobra de canto** superior direito, vincada de uso.
-  - **Mancha** circular escura inferior-centro: café-de-neurônio derramado pelo pai Patrício (canônico — `lore-bible` §11.4 + `characters/gus.md` §pai ausente). Mancha funciona como **leitmotiv visual**: o pai está presente mesmo ausente.
+  - **Mancha** circular escura inferior-centro: café-de-neurônio derramado pelo pai Pyotor (canônico, `lore-bible` §11.4 + `characters/gus.md` §pai itinerante). Mancha funciona como **leitmotiv visual**: o pai está presente mesmo ausente.
   - **Fita adesiva amarelada** consertando lombada (caderno foi rasgado uma vez; Gus consertou ele mesmo, com cuidado técnico).
 - **Tipografia da etiqueta:** cursiva infantil 11 anos. Letras irregulares mas legíveis. "i" às vezes sem pingo. Tamanho consistente (Gus é organizado).
 - **Paleta layer 1:** papel envelhecido `#E8DDC4` (base), tinta azul-marinho `#1B2238` (cursiva — mesmo BG mid da cidade, link visual sutil), acentos vermelho-correção `#C03030` (rabiscos de revisão), laranja Gus `#FF6B1A` em sticky notes-âncora (laranja é cor canônica exclusiva do Gus, ver `style-guide.md` §4.3).

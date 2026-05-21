@@ -87,7 +87,7 @@ Cada companion tem ficha com 3 estados de Knowledge canônicos:
 
 **Knowledge alta (pós-arco completo + leitura docs canônicos):**
 
-- Wound canônico: Davi (irmão 16 anos) morto em -13 em "acidente" da Subestação 7. Causa real (ending Ouro): alvo deliberado FIR — Davi documentava irregularidades. Bilhete final preservado por Inácia ([[entries-docs-descobriveis|doc 13]]).
+- Wound canônico: Davi (irmão 16 anos) morto em -5 em "acidente" da Subestação 7 (Cauã tinha 8). Causa real (ending Ouro): alvo deliberado FIR; Davi documentava irregularidades. Bilhete final preservado por Inácia ([[entries-docs-descobriveis|doc 13]]).
 - Mãe **Inácia Berenger** (45), técnica QA ex-Apex-Data. Guarda materiais comprometedores. Vive contida.
 - Cooperativa juvenil dos Dutos formada após Davi (Cauã desceu aos 9 anos pra processar).
 - Sticky-note Bloco I: "lê 'cooperação' antes de 'liderança' — pillar Cauã canônico."
@@ -487,7 +487,7 @@ Cada facção tem ficha visual + texto. Knowledge cresce em 3 estados como nos c
 | Setting | [[06-periferia\|Periferia Industrial]] + escritórios Núcleo Metropolitano (frente legal) |
 | Slogan público | "FIR — circularidade que constrói futuro." |
 | Knowledge baixa | "uniforme amarelo, cassetete elétrico. dupla. cota." |
-| Knowledge média | "Vorto cabeça em GusWorld City. distritos rotacionais. -13 Subestação 7 (Davi). -8 cooperativa Alencar. -5 Dante aliciado." |
+| Knowledge média | "Vorto cabeça em GusWorld City. distritos rotacionais. -5 Subestação 7 (Davi). -8 cooperativa Alencar. -5 Dante aliciado." |
 | Knowledge alta | "Vitória Marquês começa a temer Sterling em ato 2 (sub-quest Ouro). caminhão FIR Distrito V estacionado fora de horário ([[06-periferia|Periferia §3]] — foreshadow Dante)." |
 
 ### 4.4 Selve Sombria (facção natural)
@@ -677,7 +677,7 @@ Patch-Zero é exceção: páginas glitcham permanentemente. Stats nunca "estabil
 
 ### Timeline Bloco H ↔ Fichas
 - Cada wound canônico de companion = entry timeline cruzada (ver [[entries-mapas-timeline]] §Era 3):
-  - Davi morre -13 (Cauã)
+  - Davi morre -5 (Cauã tinha 8)
   - Batida casa Neumann -8 (Linda)
   - Surto Pelicano Branco -8 (Jaci)
   - Cooperativa Alencar destruída -8 (Dante)

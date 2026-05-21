@@ -101,8 +101,8 @@ Ratio de leitura: ~70 entradas. ID formato F### sequencial. Categoria abreviada 
 | F075 | Doc 2 in-world: carta nunca enviada de Inácia Berenger a Davi — "eu li o que tu escreveu, filho. Anotações cabos subestação 7." | Wound Cauã: Davi documentou; Inácia sabe; nunca entregou por medo | COM-CAU | Cauã / Inácia / Davi | Knowledge média (sub-quest "favor pequeno" arco Cauã) | GRAVADO | `in-world-docs.md:56-89` |
 | F076 | Doc 9 in-world: diário pessoal queimado de Davi Berenger — "Vou trabalhar dobrado / Se algum d[QUEIMADO]" | Humanizar Davi; foreshadow do doc 13; Davi sabia que estava sendo ameaçado | COM-CAU | Cauã / Davi | Knowledge baixa | GRAVADO | `in-world-docs.md:357-389` |
 | F077 | Doc 13 in-world: bilhete final de Davi a Inácia — "Eles não vão achar — ninguém procura na escola" | Reveal final wound Cauã: Davi foi alvo, não vítima de acidente; coragem retroativa | COM-CAU / END | Cauã / Davi / Inácia | Ouro (Knowledge alta + sub-quest "favor pequeno") | GRAVADO | `in-world-docs.md:527-565` |
-| F078 | Almagre conheceu Davi Berenger antes da morte (Davi era aprendiz dele 4 meses em -14/-13) | Cross-arco Cauã-Periferia: "Davi era dos mais cuidadosos. Não foi descuido." | COM-CAU | Almagre / Cauã | Knowledge alta (sub-quest cross-arco) | GRAVADO | `environments/06-periferia.md:316` |
-| F079 | Davi estava na subestação 7 com cabos amarrados com fio de nylon (memória formativa Cauã aos 5) | Plant remoto: subestação 7 era mortal e Davi sabia desde criança | COM-CAU | Cauã / Davi | n/a (memória pré-jogo) | GRAVADO | `characters/caua-volt.md:93` |
+| F078 | Almagre conheceu Davi Berenger antes da morte (Davi era aprendiz dele 4 meses em -6/-5) | Cross-arco Cauã-Periferia: "Davi era dos mais cuidadosos. Não foi descuido." | COM-CAU | Almagre / Cauã | Knowledge alta (sub-quest cross-arco) | GRAVADO | `environments/06-periferia.md:316` |
+| F079 | Davi estava na subestação 7 com cabos amarrados com fio de nylon (memória formativa Cauã aos 5, ano -8; Davi tinha 13 e levou Cauã no telhado) | Plant remoto: subestação 7 era mortal e Davi sabia 3 anos antes de morrer ali | COM-CAU | Cauã / Davi | n/a (memória pré-jogo) | GRAVADO | `characters/caua-volt.md:93` |
 | F080 | Salviano Alencar planejou asilo no Pelicano Branco em -9 (mensageiro a Mariana) | Dante poderia ter crescido em Pelicano Branco; Salviano antecipava queda da cooperativa | DAN / COM-JAC | Dante / Salviano / Mariana | Ouro (sub-quest cross-arco Mariana) | GRAVADO | `environments/06-periferia.md:317-318` |
 | F081 | Iara, aos 9, ouve Adila falando com Cleomir: "ela é boa, mas é cedo demais pra investir tempo nela. Espera ela ter algo a perder." | Iara começou a espiar Adila aos 9 — preparou deserção por 2 anos | COM-IAR | Iara / Adila | n/a (memória formativa) | GRAVADO | `characters/iara-lumen.md:102-104` |
 | F082 | Doc 4 in-world: panfleto Atualização Sensorial Cult Mirage + cláusula oculta de cessão de dados | Cult coleta dados psicológicos via festival; Sterling-Cult contrato direto | COM-IAR / STE | Iara / Adila / Sterling | Knowledge baixa (panfleto) / média (decifragem Óxido) | GRAVADO | `in-world-docs.md:131-174` |
@@ -219,11 +219,11 @@ Patch-Zero **nunca** é cômico. Terror puro. Patch-Zero **nunca** é destruído
 
 ### 5.1 Cauã Volt (Striker, Pythia, Dutos Infernais)
 
-Wound canônico: morte do irmão Davi Berenger em -13 na Subestação 7. Plants distribuídos: doc 2 (F075, carta nunca enviada de Inácia), doc 9 (F076, diário queimado de Davi), doc 13 (F077, bilhete final — gate Ouro). Sub-quest "favor pequeno" arco Cauã destrava F075 e F076; Knowledge alta + decisão de mostrar a Cauã destrava F077.
+Wound canônico: morte do irmão Davi Berenger em -5 na Subestação 7 (Davi tinha 16, Cauã tinha 8). Plants distribuídos: doc 2 (F075, carta nunca enviada de Inácia), doc 9 (F076, diário queimado de Davi), doc 13 (F077, bilhete final, gate Ouro). Sub-quest "favor pequeno" arco Cauã destrava F075 e F076; Knowledge alta + decisão de mostrar a Cauã destrava F077.
 
-Memória formativa F079 (Davi mostrou a Cauã aos 5 que os cabos da Subestação 7 estavam amarrados com fio de nylon) é plant remoto: Davi sabia desde sempre, e nunca pôde corrigir, e morreu no que sabia. Cross-arco F078 com Almagre (que conheceu Davi 4 meses antes da morte): "Davi era dos mais cuidadosos. Não foi descuido. Eu sei." Almagre confirma a Cauã sem prova documental; só a fé profissional.
+Memória formativa F079 (Davi mostrou a Cauã aos 5 que os cabos da Subestação 7 estavam amarrados com fio de nylon) é plant remoto: Davi sabia desde sempre, e nunca pôde corrigir, e morreu no que sabia. Cross-arco F078 com Almagre (que conheceu Davi 4 meses antes da morte, em -6 a -5): "Davi era dos mais cuidadosos. Não foi descuido. Eu sei." Almagre confirma a Cauã sem prova documental; só a fé profissional.
 
-Payoff: reveal pleno wound recebe Knowledge gate Ouro. Cauã recontextualiza Davi como agente, não vítima passiva. Pillar 4 contém — sem catarse explosiva. Bonus epilogue Ouro: Cauã estabelece "Subestação 7" como nome simbólico de hub seguro juvenil pós-jogo. Eco de F088 ("Vinil Última Frequência partido em 3, quebrou em -2 quando Mara soube de Polis-Vermelha"): Cauã + Linda fundam oficina mista nos Dutos em epilogue Ouro.
+Payoff: reveal pleno wound recebe Knowledge gate Ouro. Cauã recontextualiza Davi como agente, não vítima passiva. Pillar 4 contém, sem catarse explosiva. Bonus epilogue Ouro: Cauã estabelece "Subestação 7" como nome simbólico de hub seguro juvenil pós-jogo. Eco de F088 ("Vinil Última Frequência partido em 3, quebrou em -2 quando Mara soube de Polis-Vermelha"): Cauã + Linda fundam oficina mista nos Dutos em epilogue Ouro.
 
 ### 5.2 Iara Lumen (Infiltradora, Óxido, Setor Mirage, desertora Cult)
 
@@ -423,7 +423,7 @@ As 8 propostas autorais aprovadas pelo criador supremo em 2026-05-16 foram viral
 | DD-016 (Caderno Salviano) | F019, F020, F021, F022, F026 | Humaniza Salviano + reforça que Dante viu Vorto antes do funeral |
 | DD-017 (Diário Bartolo) | F036, F074 | Atribui canonicamente autoria do audit Apex-Data + vínculo Tiago-Linda prévio |
 | DD-018 (Folheto Lin Tórun) | F067, F068 | Voz autoral fundadora Era 2 + contraste explícito com DRE Sterling (DD-001) |
-| DD-019 (Caderneta Vênea + Patrício) | (substrato emocional sem F### direto) | Materializa safe base canônica + pai ausente (lore-bible §14) |
+| DD-019 (Caderneta Vênea + Pyotor) | (substrato emocional sem F### direto) | Materializa safe base canônica + pai itinerante (lore-bible §14) |
 | DD-020 (Relatório Solano) | F047 (retroativo) | Confirma vetor Sterling no surto -8 Pelicano Branco ("veio de cima") |
 | DD-021 (Manual Octantes) | F038, F050 | Confirma operacionalmente Heliópolis-Nova + paralelo Dante (lavagem de memória) |
 | DD-022 (Tábua São Vargas) | F041, F071 | Confirma saque -3 + micro-ato Bento aos 12 anos preservando memória |

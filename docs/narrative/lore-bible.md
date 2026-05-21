@@ -489,7 +489,7 @@ Hospital cobra crédito por cura rápida (Pillar 4 / hospital + economia). Cura 
 - **-19** — Apex-Data Systems entra em Chapter 11. **Inácia Berenger** (mãe Cauã) demitida; trauma família.
 - **-16** — Audit interno Apex-Data vazado por engenheiro anônimo (provavelmente **Bartolo Penkin**, desaparecido em -12; ver [[in-world-docs]] doc 5). Underground preserva.
 - **-15** — Nexus-Cloud colapsa.
-- **-13** — *Acidente da Subestação 7.* **Davi Berenger** (16, irmão Cauã) morre. Causa oficial: negligência. Causa real (ending Ouro): alvo deliberado por documentar irregularidades FIR. Bilhete final preservado por Inácia ([[in-world-docs]] doc 13).
+- **-5** — *Acidente da Subestação 7.* **Davi Berenger** (16, irmão Cauã) morre. Causa oficial: negligência. Causa real (ending Ouro): alvo deliberado por documentar irregularidades FIR. Bilhete final preservado por Inácia ([[in-world-docs]] doc 13). Cauã tinha 8 anos.
 - **-12** — Core-Synth liquidada. Sterling consolida Sterling Corp. Construção da Cúpula começa.
 - **-10** — Operação GRE iniciada (projeto interno classificado "Projeto Continente").
 - **-8** — Cooperativa familiar **Alencar destruída** por engenharia financeira FIR-Sterling. **Salviano Alencar** (pai Dante) morre 6 meses depois. Wound canônico Dante.
@@ -520,7 +520,7 @@ Personagens secundários canônicos com peso narrativo no arco principal ou side
 - **Pyotor Vance** (40), pai Gus. Médico-cyber itinerante (medicina + bioengenharia + bioeletrônica + eng robótica + implantes) em rotação fronteira-Selve atendendo vilarejos pós-Êxodo (Pelicano Branco, Garça-Preta-Nova, Caracará-Cinza, Sabiá-de-Bronze). Hobby: programação. Separado amigavelmente de Vênea desde Gus aos 6 anos (ano -5). Cartas raras (3-4 no jogo total).
 - **Yakov Vance** (~36), irmão mais novo de Pyotor (4 anos a menos), tio paterno do Gus. Engenheiro e geólogo, atua na maior mineradora do reino. Apresentou xadrez ao Gus em visita.
 - **Atelaiana de Sevra Chevalier**, mãe biológica viva do Bento, irmã consanguínea de Mestre Lavínia Sevra. Partiu da Catedral três meses após o parto (canon R4 deep-lore).
-- **Edilma Alencar** (44) — mãe Dante. Operária têxtil. **Oficialmente** vive reclusa em apartamento subsidiado pós-morte de Salviano. **Realidade canon (revelação ato 3):** sequestrada pelos Sterling brass na Caverna dos Perdidos como chantagem contra Dante (canon arco Dante Beat Ten + Dragon Victory). Apartamento mantido como fachada por Sterling. Interações mínimas no jogo; aparece em cena pós-reveal Dante (silêncio).
+- **Edilma Alencar** (44), mãe Dante. Operária têxtil. **Oficialmente** vive reclusa em apartamento subsidiado pós-morte de Salviano. **Realidade canon (revelação ato 3):** sequestrada pelos Sterling brass na Caverna dos Perdidos como chantagem contra Dante (canon arco Dante Beat Ten + Dragon Victory). Apartamento mantido como fachada por Sterling. Interações mínimas no jogo; aparece em cena pós-reveal Dante (silêncio).
 - **Otmar Neumann** (50) — pai Linda. Engenheiro analógico. Vive em apartamento simples Zona do Silêncio.
 - **Brígida Neumann** (49) — mãe Linda. Musicista (violão). Hospeda versão antiga da Festa da Compilação ([[tradicoes-cultura]] §1).
 
@@ -530,7 +530,7 @@ Personagens secundários canônicos com peso narrativo no arco principal ou side
 - **Hierofante Adila Murmúrio** (40) — líder facção pró-Sterling Cult Mirage. Manipuladora canônica Iara. Carismática, sedutora. Mini-boss arco Iara.
 - **Octávia Penedo** (55) — Diretora Departamento de Contenção Sterling Corp. Subordinada direta Sterling. Falha operacional com Patch-Zero ([[in-world-docs]] doc 14). Não aparece pessoalmente em combate; aparece por holograma em arco Bento ou ato 3.
 - **Theodoro Calveri** (52), Diretor de Aquisições Sterling Corp. Autor canônico da engenharia financeira que destruiu cooperativa Alencar em -8 e oficina Neumann no mesmo ano, mais 12 operações similares. Assinatura "deprecação eficiente, sem overhead emocional" (ver [[in-world-docs]] DD-016).
-- **Solange Vix** (46), Diretora de Imagem Pública Sterling Corp. Roteirista da holografia corporativa. Autora canônica de 14 campanhas Sterling em 13 anos (inclui "Sustento Eficiente, Cidadania Tranquila"). Nunca aparece em pessoa, holograma ou voz.
+- **Solange Vix** (46), Diretora de Imagem Pública Sterling Corp. Roteirista da holografia corporativa. Autora canônica de 14 campanhas Sterling em 13 anos (inclui "Sustento Eficiente, Cidadania Tranquila"). Nunca aparece em pessoa, em holograma ou em voz.
 - **Sub-Diretor de Distrito FIR (3 outros)** — coronéis regionais FIR. Não nomeados in-game canonicamente; podem ser introduzidos em sidequest ato 2.
 - **Hierofantes Cult Mirage subordinados (3 menores):** **Cleomir Vasta**, **Tâmela Brida**, **Otoniel Rens**. Pró-Sterling. Subordinados Adila. Aparecem em cena coletiva festival Mirage.
 

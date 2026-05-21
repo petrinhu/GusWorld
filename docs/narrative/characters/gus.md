@@ -102,7 +102,7 @@ Vênea leva Gus para visitar a mãe dela no interior (Belinor morre meses depois
 
 ### Aos 9 anos, recebe primeiro Tavus-Drive de uso (dia do aniversário)
 
-Vênea economizou. Patrício (pai, ausente) mandou bilhete via mensageiro: "Filho, parabéns. Use bem. Pai." Sem assinar de outro jeito. Sem mais. Gus passa a tarde estudando o manual. À noite, mostra a Vênea como funciona. Ela aprende com ele. Quando vai dormir, Gus deixa o bilhete debaixo do travesseiro. Não comenta com ninguém. *Importa porque:* origem da relação ambígua com Patrício (presente em ausência; importa apesar de não estar). Padrão que se repete na vida adulta: ama-se sem articulação.
+Vênea economizou. Pyotor (pai, itinerante na rotação fronteira-Selve) mandou bilhete via mensageiro: "Filho, parabéns. Use bem. Pai." Sem assinar de outro jeito. Sem mais. Gus passa a tarde estudando o manual. À noite, mostra a Vênea como funciona. Ela aprende com ele. Quando vai dormir, Gus deixa o bilhete debaixo do travesseiro. Não comenta com ninguém. *Importa porque:* origem da relação ambígua com Pyotor (presente em ausência; importa apesar de não estar fisicamente perto). Padrão que se repete na vida adulta: ama-se sem articulação.
 
 ### Aos 10 anos, primeira vez que entra na Selve sozinho (sem permissão)
 

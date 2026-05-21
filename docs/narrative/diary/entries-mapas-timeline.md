@@ -511,7 +511,7 @@ Datas in-world (calendário Era 2, 12 meses 30-31 dias; ano 0 = presente do jogo
 | 31 | -16 | **Audit interno Apex-Data vazado:** relatório técnico assinado por engenheiro anônimo (provavelmente **Bartolo Penkin**, desaparece em 2 semanas — "transferido para Heliópolis-Nova"). | Doc 5 ([[entries-docs-descobriveis|audit Apex-Data]]) destrava arco Linda ou cross-arco Periferia. | Eufemismo Sterling exposto. | Mapas 1 + 6 (Mateus Penkin antena) + 9 (Heliópolis-Nova). |
 | 32 | -15 | Nexus-Cloud colapsa. Sterling sai com patentes de processamento por indução magnética. | Manuscrito Gus. | Tecnologia que sustenta drones Sterling Corp hoje. | — |
 | 33 | -14 | Sterling assume CEO da Core-Synth Bio-Tech. | Manuscrito Gus. | Última fase do canibalismo. | — |
-| 34 | -13 | **Acidente de manutenção em prédio popular da Periferia Industrial.** Sistema elétrico mal instalado por subcontratada FIR (alinhada Sterling) pega fogo. Morre **Davi Berenger** (irmão Cauã, 16 anos). Família silenciada com indenização irrisória. | Doc 13 ([[entries-docs-descobriveis|bilhete Davi]]) Knowledge Ouro. | Wound canônico Cauã. Confirmação tardia (Ouro): Davi não vítima negligência — alvo deliberado (documentava irregularidades FIR). | Mapa 6 (Subestação 11 paralelo Subestação 7). |
+| 34 | -5 | **Acidente de manutenção em prédio popular da Periferia Industrial.** Sistema elétrico mal instalado por subcontratada FIR (alinhada Sterling) pega fogo. Morre **Davi Berenger** (irmão Cauã, 16 anos; Cauã tinha 8). Família silenciada com indenização irrisória. | Doc 13 ([[entries-docs-descobriveis|bilhete Davi]]) Knowledge Ouro. | Wound canônico Cauã. Confirmação tardia (Ouro): Davi não vítima negligência, alvo deliberado (documentava irregularidades FIR). | Mapa 6 (Subestação 11 paralelo Subestação 7). |
 | 35 | -12 | Core-Synth Bio-Tech liquidada. Sterling sai com protocolos cérebro-máquina (base Locke Core). | Doc 9 ([[entries-docs-descobriveis|diário Aldebrando]]) menciona. | Tecnologia base do Locke Core. | — |
 | 36 | -12 | Sterling consolida tudo em **Sterling Corp**. Inicia construção da Cúpula Sterling. | Lore-bible §3. Cúpula aparece Mapa 1 Knowledge alta. | Sede canônica nasce. | Mapa 1 + Mapa 9. |
 | 37 | -11 a -13 | Nascimentos canônicos companions: **Bento (-11, 14 ato 1)**, **Cauã (-13, 13 ato 1)**, **Iara (-12, 12)**, **Linda (-12, 12)**, **Dante (-13, 13)**, **Gus (-11, 11)**, **Jaci (-11, 11)**. | Fichas companions estabilizadas no recrutamento. | Idades canônicas consistentes. | Mapas correspondentes (setting home cada companion). |
@@ -611,7 +611,7 @@ Cada mapa tem **3-5 entries timeline** ancoradas:
 
 Cada wound canônico de companion = entry timeline + entry de ficha ([[entries-fichas-bestiary]] §1):
 
-- Davi morre -13 (entry 34) ↔ Cauã ficha wound
+- Davi morre -5 (entry 34) ↔ Cauã ficha wound
 - Batida casa Neumann -8 (entry 41) ↔ Linda ficha wound
 - Surto Pelicano Branco -8 (entry 42) ↔ Jaci ficha wound
 - Cooperativa Alencar destruída -8 (entry 40) ↔ Dante ficha wound

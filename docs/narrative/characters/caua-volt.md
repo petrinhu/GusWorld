@@ -91,7 +91,7 @@ Disputa interna dos runners juvenis dos Dutos: facção do Cauã (defesa) vs fac
 
 ### Aos 5 anos, no telhado da subestação 7 com **Davi Berenger** (irmão mais velho)
 
-Davi (12 na época) leva Cauã pra ver o pôr-do-sol da Periferia. Cauã pergunta: "por que aquele cabo tá amarrado com fio de roupa?" Davi olha, anota mentalmente. "Porque alguém economizou na hora errada." Cauã: "alguém vai morrer?" Davi: "se ninguém arrumar, sim." Cauã, sério: "a gente arruma." Davi sorri: "a gente não tem ferramenta. mas a gente avisa." Davi não avisa naquele dia. Avisa depois. *Importa porque:* origem do impulso de Cauã (proteger via ação). Cauã não sabe ainda que aquela subestação vai matar Davi 8 anos depois.
+Davi (13 na época) leva Cauã pra ver o pôr-do-sol da Periferia. Cauã pergunta: "por que aquele cabo tá amarrado com fio de roupa?" Davi olha, anota mentalmente. "Porque alguém economizou na hora errada." Cauã: "alguém vai morrer?" Davi: "se ninguém arrumar, sim." Cauã, sério: "a gente arruma." Davi sorri: "a gente não tem ferramenta. mas a gente avisa." Davi não avisa naquele dia. Avisa depois. *Importa porque:* origem do impulso de Cauã (proteger via ação). Cauã não sabe ainda que aquela subestação vai matar Davi 3 anos depois.
 
 ### Aos 8 anos, no apartamento Berenger, hora em que recebe a notícia
 
@@ -101,7 +101,7 @@ A campainha toca às 11:40. **Inácia** abre. Funcionário FIR uniformizado: "ho
 
 Inês cai num poço vertical de manutenção. Cauã ouve grito. Calcula: 4 segundos pra chegar; corda a 7 metros. Salta diagonal apoiando-se em pistão. Pega Inês no ar. Pousa rolando. Quebra duas costelas dele. Inês intacta. Inês olha pra ele: "você tá sangrando." Cauã: "compila e roda. tô vivo." Inês fica chorando porque ele tá sangrando. *Importa porque:* origem da liderança canônica nos Dutos. Origem do bordão "compila e roda" (foi a primeira vez que ele disse com sentido próprio — depois virou tic). Inês nunca esquece; Cauã ganha lealdade absoluta dela.
 
-### Aos 12 anos, na cozinha da casa, primeira vez que Inácia chora na frente dele desde -13
+### Aos 12 anos, na cozinha da casa, primeira vez que Inácia chora na frente dele desde -5
 
 Cauã chega de noite. Inácia tá sentada à mesa. Caixa de zinco aberta na frente. Cartas espalhadas (doc 2 de [[in-world-docs]]; ela leu de novo). Quando Cauã entra, ela disfarça mas tarde. Cauã sem perguntar puxa uma cadeira. Senta do lado. Não fala. Inácia chora 3 minutos quietos. Cauã olha pras cartas mas não lê. Sabe que não é hora. Quando ela para, ele levanta, faz chá pros dois, volta, senta de novo. Bebem em silêncio. *Importa porque:* origem da contenção emocional canônica de Cauã (sabe quando não falar). Origem também da pista que Cauã vai seguir no jogo se Gus mostrar doc 13 (ele já sabia, vagamente, que tinha mais).
 

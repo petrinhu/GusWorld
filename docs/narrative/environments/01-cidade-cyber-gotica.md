@@ -27,7 +27,7 @@ A sensação dominante é a de uma cidade que **funciona apesar de si mesma**. O
 
 **Edifício Vance (Núcleo Metropolitano, lado leste).** Prédio residencial modesto de 9 andares, fachada de tijolo cinza Era 2, calçada de pedra Era 1 visível em três pontos onde o asfalto rachou. Apartamento Vance no 6º andar. Bancada de eletrônica de Vênea visível pela janela. Onde [[gus]] mora.
 *Primeira impressão:* prédio normal entre dois prédios normais, com uma janela de 6º andar onde sempre se vê alguém soldando placa-mãe sob luz de bancada.
-*Gancho exploratório:* save base canônica; mãe oferece feijão-computacional; cartas raras do pai Patrício chegam aqui (3-4 no jogo todo).
+*Gancho exploratório:* save base canônica; mãe oferece feijão-computacional; cartas raras do pai Pyotor (médico-cyber itinerante) chegam aqui (3-4 no jogo todo).
 
 **Anel Verde (fronteira leste).** Última faixa urbana antes da Selve Sombria. Estações botânicas Era 2 com cúpula de vidro, agora rachadas, fauna selvagem começando a invadir. Checkpoint federal corrompido (drones FIR cobram "taxa de passagem"). Concreto crescendo musgo biolúmen. Anomalias começam a vazar daqui pra dentro da cidade.
 *Primeira impressão:* arco de concreto Era 2 monumental com inscrição C-Arcane esmaecida, e duas estações de pesquisa botânica abandonadas ao lado, uma com janela quebrada por raiz que cresceu de dentro pra fora.
@@ -46,7 +46,7 @@ A sensação dominante é a de uma cidade que **funciona apesar de si mesma**. O
 | Bancada solta com placa-mãe Apex-Data Systems sendo dessoldada | Mercado da Sucata Honesta | Era 2 corporativa morta sendo extraída por mão pequena. Inácia Berenger ([[factions]] §1 + [[in-world-docs]] doc 2) ainda guarda peças. |
 | Caixa de chumbinho-de-recibo Sterling jogada na sarjeta | Núcleo Metropolitano, rua qualquer | Recibos físicos descartados; rastro de consumo Janelarum. Conta sem palavra que a cidade vive pagando. |
 | Bandeirinha de papel da Festa da Compilação rasgada amarrada em poste | Núcleo Metropolitano | Festa passou recentemente. Cor verde-e-branca (bolo-de-bit). |
-| Antena de rádio caseira improvisada no telhado do Edifício Vance | Edifício Vance, vista de fora | Patrício (pai Gus) operou daqui antes de ir pra rotação na fronteira. Gus herdou know-how. |
+| Antena de rádio caseira improvisada no telhado do Edifício Vance | Edifício Vance, vista de fora | Pyotor (pai Gus, médico-cyber itinerante) operou daqui antes de ir pra rotação na fronteira. Gus herdou know-how. |
 | Janelarum infantil esquecido em banco de praça | Praça da Compilação | Distribuição gratuita da Festa Sterling. Tela travada em mesma imagem. Criança que ganhou perdeu interesse em 20 minutos. |
 | Cabo de fibra ótica saindo de buraco no asfalto, sem cobertura | Núcleo Metropolitano | Manutenção pendente FIR. Ninguém cobre. Acidente esperando. |
 | Folha biolúmen Selve grudada no para-choque de caminhão FIR | Periferia (chegando ao Mercado) | Caminhão veio do Anel Verde. Selve se infiltra carregada inadvertidamente. |

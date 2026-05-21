@@ -146,7 +146,7 @@ Convenções de colunas:
 | F075 | COM-CAU | Doc 2 in-world: carta nunca enviada Inácia → Davi | Pickup | P-DOC02 | Knowledge média (sub-quest "favor pequeno" arco Cauã) | **Amarela** | Cross-link com F076 e F077. |
 | F076 | COM-CAU | Doc 9 in-world: diário pessoal queimado Davi Berenger | Pickup | P-DOC09 | Knowledge baixa | **Amarela** | "Vou trabalhar dobrado / Se algum d[QUEIMADO]". |
 | F077 | COM-CAU/END | Doc 13 in-world: bilhete final Davi → Inácia | Pickup | P-DOC13 | Ouro (Knowledge alta + sub-quest "favor pequeno") | **Amarela** + **Azul** | **Plant crítico Ouro.** Davi alvo, não vítima passiva. |
-| F078 | COM-CAU | Almagre conheceu Davi (Davi foi aprendiz 4 meses em -14/-13) | Ficha-Almagre + Ficha-Cauã | F-NPC-15 (atualização) + F-CAU-05 | Knowledge alta (sub-quest cross-arco) | **Amarela** | Cross-arco Cauã-Periferia. |
+| F078 | COM-CAU | Almagre conheceu Davi (Davi foi aprendiz 4 meses em -6/-5) | Ficha-Almagre + Ficha-Cauã | F-NPC-15 (atualização) + F-CAU-05 | Knowledge alta (sub-quest cross-arco) | **Amarela** | Cross-arco Cauã-Periferia. |
 | F079 | COM-CAU | Davi na subestação 7 com cabos amarrados com fio de nylon (memória formativa Cauã aos 5) | Ficha-Cauã (Memória formativa) | F-CAU-MF-01 | n/a (memória pré-jogo) | **Amarela** | Davi sabia desde criança. |
 
 ### 2.5 Companion-Iara (F081-F084, F114, F127) — 6 plants

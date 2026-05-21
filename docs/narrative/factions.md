@@ -100,9 +100,9 @@ Cor institucional: branco-estéril + cromo + acento vermelho-laser.
 
 ### NPCs secundários nomeados
 
-- **Diretora Octávia Penedo** (52) — Diretora Departamento de Contenção. Subordinada direta Sterling. Falha operacional canônica com Patch-Zero ([[in-world-docs]] doc 14). Aparece via holograma corporativo; não pessoalmente em combate.
-- **Diretor Theodoro Calveri** (57) — Departamento de Aquisições. Gerencia operação canibalismo continuado. Aparece em comunicações internas; mencionado em sidequest.
-- **Diretora Solange Vix** (49) — Departamento de Imagem Pública. Roteirista da propaganda holográfica ([[in-world-docs]] doc 12). Nunca aparece pessoalmente — Sterling assina os anúncios; Solange constrói nos bastidores.
+- **Diretora Octávia Penedo** (55) — Diretora Departamento de Contenção. Subordinada direta Sterling. Falha operacional canônica com Patch-Zero ([[in-world-docs]] doc 14). Aparece via holograma corporativo; não pessoalmente em combate.
+- **Diretor Theodoro Calveri** (52) — Departamento de Aquisições. Gerencia operação canibalismo continuado. Aparece em comunicações internas; mencionado em sidequest.
+- **Diretora Solange Vix** (46) — Departamento de Imagem Pública. Roteirista da propaganda holográfica ([[in-world-docs]] doc 12). Nunca aparece pessoalmente. Sterling assina os anúncios; Solange constrói nos bastidores.
 
 ### Tradições internas
 
@@ -116,7 +116,7 @@ Cor institucional: branco-estéril + cromo + acento vermelho-laser.
 - **-19** — Falência forçada Apex-Data Systems. **Inácia Berenger** entre demitidos.
 - **-16** — Vazamento do audit interno (autor desapareceu).
 - **-15** — Falência forçada Nexus-Cloud.
-- **-13** — Subestação 7. **Davi Berenger** morre (FIR direta; Sterling indireta).
+- **-5** — Subestação 7. **Davi Berenger** morre aos 16 (FIR direta; Sterling indireta). Cauã tinha 8 anos.
 - **-12** — Falência forçada Core-Synth. Consolidação Sterling Corp.
 - **-8** — Engenharia financeira destrói cooperativa Alencar. Salviano Alencar morre 6 meses depois.
 - **-8** — Batida casa Neumann (toca-discos).
@@ -314,7 +314,7 @@ Cor institucional: amarelo-industrial + preto-fuligem.
 
 - **-50** — Fundação como cooperativa de boa-fé. Inicialmente útil.
 - **-25** — Captura corporativa começa. Sterling consolida via Vorto.
-- **-13** — Subcontratada FIR responsável pela "manutenção" na Subestação 7. Davi Berenger morre. FIR paga indenização irrisória; silencia família.
+- **-5** — Subcontratada FIR responsável pela "manutenção" na Subestação 7. Davi Berenger morre aos 16. FIR paga indenização irrisória; silencia família.
 - **-8** — Engenharia financeira contra cooperativa Alencar. Salviano morre 6 meses depois.
 - **-8** — Participa da batida na casa Neumann (toca-discos apreendido).
 - **-5** — Vorto recruta Dante (8 anos). Aliciamento canônico.

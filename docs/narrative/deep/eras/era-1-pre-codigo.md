@@ -4548,7 +4548,7 @@ A figura articula paralelo institucional contido à **Mentat** preservada em arq
 
 A figura em geração futura imediata é **Gus Vector Tavus Vance**. Operador analítico jovem prodígio, descendente direto da linhagem Boroshova-Vance (§8.4 e §9.7). Em horizonte contemporâneo desta minha redação, Gus tem onze estações canônicas; eu tenho setenta e cinco. Gus é criança em formação institucional cumulativa.
 
-Eu não o conheço pessoalmente. Minha articulação muscular terminal de setenta e cinco anos limita o atravessamento à periferia urbana da Catedral de São Camilo, onde a família Vance reside. Vênea Boroshova-Vance, mãe de Gus, descende direta da linhagem Vesperina Boroshova canonizada em §8.4. Patrício Vance, pai de Gus, descende do ramo paterno preservado em arquivo restrito.
+Eu não o conheço pessoalmente. Minha articulação muscular terminal de setenta e cinco anos limita o atravessamento à periferia urbana da Catedral de São Camilo, onde a família Vance reside. Vênea Boroshova-Vance, mãe de Gus, descende direta da linhagem Vesperina Boroshova canonizada em §8.4. Pyotor Vance, pai de Gus, descende do ramo paterno preservado em arquivo restrito.
 
 A continuidade cronística canônica articula-se em geração futura imediata. Cassandra mediará a transmissão entre minha articulação terminal e a articulação cronística de Gus.
 

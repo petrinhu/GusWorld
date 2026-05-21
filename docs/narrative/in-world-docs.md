@@ -358,8 +358,8 @@ operativo titular após conclusão do GRE-fase-1.
 ## Documento 9 — Diário pessoal de Davi Berenger (incompleto, queimado)
 
 **Tipo:** caderno de notas escolar barato. Páginas queimadas em 60%; recuperáveis ~40%.
-**Autor:** Davi Berenger (irmão morto de [[caua-volt]], 16 anos no momento da morte).
-**Data:** ano -14 a -13.
+**Autor:** Davi Berenger (irmão morto de [[caua-volt]], 16 anos no momento da morte em -5).
+**Data:** ano -6 a -5.
 **Onde se encontra:** caixa de zinco no apartamento Berenger, junto com cartas da Inácia (doc 2). Gus encontra junto com doc 2. Recuperação requer Knowledge baixa (texto fragmentado mas legível).
 **Função:** humanizar Davi (não é só "irmão morto"); foreshadow do doc 13.
 
@@ -377,7 +377,7 @@ o resto. Ele riu mas entendeu...
 [página 19 — fragmento queimado parcialmente]
 ... me ligaram. Disseram pra eu pa[QUEIMADO]
 de "complicação trabalhista". Mãe não pode sa[QUEIMADO]
-o Cauã é bebê e ainda nem fala direito. Não merec[QUEIMADO]
+o Cauã tem 8 e já entende demais. Não merec[QUEIMADO]
 
 [página 23 — última entrada]
 Vou trabalhar dobrado essa semana. Acho que se eu
@@ -530,7 +530,7 @@ Patrocinado pela Sterling Corp.
 
 **Tipo:** bilhete dobrado em quatro, escondido entre folhas de um livro técnico (Manual de Sistemas Elétricos Públicos, ed. -25).
 **Autor:** Davi Berenger.
-**Data:** ano -13, manhã da morte (rascunho rápido).
+**Data:** ano -5, manhã da morte (rascunho rápido).
 **Onde se encontra:** ⚠️ **GATE OURO.** Cofre de armário escolar de Davi (Periferia Industrial, escola técnica popular). Inácia entrega a Gus SE Knowledge alta + Gus completou sidequest "favor pequeno" + decisão de mostrar a Cauã foi positiva.
 **Função:** reveal final do wound de Cauã (Davi foi alvo, não vítima de acidente); coragem retroativa de Davi. Cena emocional intensa (contida — Pillar 4).
 
@@ -790,14 +790,14 @@ Sigam compilando bem.
 
 ---
 
-## Documento 19 — Caderneta de saudações de Vênea Vance (lista de receitas + bilhetes do Patrício)
+## Documento 19 — Caderneta de saudações de Vênea Vance (lista de receitas + bilhetes do Pyotor)
 
 **Tipo:** caderneta de cozinha barata, capa de oleado florido, ~50 páginas; receitas escritas à mão. Entre páginas, 4 bilhetes dobrados do Pyotor (cartas raras canônicas do pai itinerante).
-**Autor:** Vênea Vance (mãe do Gus) — receitas; Pyotor Vance (pai itinerante, cartas raras) — bilhetes.
+**Autor:** Vênea Vance (mãe do Gus), receitas; Pyotor Vance (pai itinerante, cartas raras), bilhetes.
 **Data:** ano -8 a presente (receitas acumuladas); bilhetes em -7, -4, -2, -0.5.
 **Onde se encontra:** gaveta da cozinha do apartamento Vance. Acessível desde o início; Gus precisa ter usado a mecânica de save base canônica pelo menos 3 vezes (voltar pra casa 3x) para o jogo destravar a interação com a caderneta (subtexto: a cumplicidade com a mãe vira hábito; hábito leva à descoberta).
 **Trigger:** mecânica de save base + 3 retornos. Gate: Knowledge baixa.
-**Função:** materializa a safe base canônica Vênea (Pillar 4 / ofuscada deliberadamente, [[lore-bible]] §14); humaniza Patrício (presente em ausência); bilhete final ("voltando em outubro") fica sem resolução em G1 — sequel hook ambíguo ou cena bonus epilogue se Knowledge Ouro; receita "caldo-de-folha-fractal" cria ponte entre Vênea (cidade) e Mariana (Pelicano Branco) — Vênea conhece Mariana ou tem rede oral indireta, lore-fundo.
+**Função:** materializa a safe base canônica Vênea (Pillar 4, ofuscada deliberadamente, [[lore-bible]] §14); humaniza Pyotor (presente em ausência via cartas raras); bilhete final ("voltando em outubro") fica sem resolução em G1, sequel hook ambíguo ou cena bonus epilogue se Knowledge Ouro; receita "caldo-de-folha-fractal" cria ponte entre Vênea (cidade) e Mariana (Pelicano Branco), Vênea conhece Mariana ou tem rede oral indireta, lore-fundo.
 
 ```
 [primeira página]
@@ -817,8 +817,8 @@ Café-de-neurônio pra ele estudar
  bilhete dobrado encartado:]
 
 Vênea.
-Faço 6 meses na estação 11 ainda. O turno da noite tá pesado
-mas o pessoal aqui é bom.
+Faço 6 meses na rotação do Caracará-Cinza ainda. O plantão
+da noite tá pesado mas o pessoal aqui é bom.
 O Gus tá com a Matriz nova?
 Tira foto do aparelho dele e me manda pelo correio postal,
 o digital eles abrem aqui.
@@ -842,7 +842,7 @@ Cheiro a fio queimado e a saudade. Vai passar.
                                             P.
 ```
 
-**Subtexto:** receita Pão-de-bit ensina sobre Gus por triangulação (Vênea sabe que ele percebe a canela; vê o filho como leitor de detalhe); receita Caldo-de-folha-fractal confirma que Vênea aprendeu técnica botânica Era 1 com Mariana, conexão jamais comentada explicitamente em diálogo; bilhete da estação 11 implica que o digital corporativo é monitorado (Patrício pede correio postal). Os 4 bilhetes nunca prometem mais do que conseguem cumprir — exceto o último, que tenta. "Vai passar" pode ser sobre saudade, sobre o turno, ou sobre algo que Patrício sabe e não diz.
+**Subtexto:** receita Pão-de-bit ensina sobre Gus por triangulação (Vênea sabe que ele percebe a canela; vê o filho como leitor de detalhe); receita Caldo-de-folha-fractal confirma que Vênea aprendeu técnica botânica Era 1 com Mariana, conexão jamais comentada explicitamente em diálogo; bilhete do plantão remoto implica que o digital corporativo é monitorado (Pyotor pede correio postal). Os 4 bilhetes nunca prometem mais do que conseguem cumprir, exceto o último, que tenta. "Vai passar" pode ser sobre saudade, sobre o turno, ou sobre algo que Pyotor sabe e não diz.
 
 ---
 

@@ -70,7 +70,7 @@
 | **Edifício Vance** | Sub-local (Núcleo) | 2 (~-90 a -70) | Lado leste Núcleo, apartamento Vance 6º andar | ✅ canônico (safe base Gus) | `environments/01-cidade-cyber-gotica.md` |
 | **Anel Verde** | Sub-local (fronteira) | 2 | Fronteira leste Cidade, entrada Selve | ⚪ abandonado funcional (checkpoint FIR corrompido) | `environments/01-cidade-cyber-gotica.md` |
 | **Cúpula Sterling** | Sub-local (Núcleo) | 3 | Skyline tumoral cresce ato 2/3, sede Sterling Corp | ✅ canônico (climax ato 3 setting variação) | `lore-bible.md` + `in-world-docs.md` |
-| **Subestação 7** | Sub-local (Dutos) | 3 | Dutos Infernais | 💀 destruído (alvo Sterling -13, morte Davi Berenger) | `characters/caua-volt.md` + `in-world-docs.md` DD-013 |
+| **Subestação 7** | Sub-local (Dutos) | 3 | Dutos Infernais | 💀 destruído (alvo Sterling -5, morte Davi Berenger aos 16; Cauã tinha 8) | `characters/caua-volt.md` + `in-world-docs.md` DD-013 |
 | **Subestação 11** | Sub-local (Periferia ostensiva) | 3 | Periferia | ✅ canônico (foreshadow Dante) | `environments/06-periferia.md` |
 | **Oficina Alencar** | Sub-local (Periferia) | 2 (cooperativa) + 3 (FIR) | Periferia, oficina herdada Salviano | ⚪ abandonado funcional (Dante usa pra disfarce) | `environments/06-periferia.md` + `foreshadowing.md` F019, F129 |
 | **Caverna dos Perdidos** | Sub-local (Selve Sombria) | 1 (origem ancestral) + 3 (Sterling usa) | **Subterrânea profunda Selve Sombria, nordeste do Pântano Markov, abaixo de raízes ancestrais. Passagem secreta conhecida só por Sterling brass. Família Dante (mãe Edilma Alencar) presa lá pra chantagear Dante** (canon arco Dante Beat Ten reveal) | ✅ canônico (reveal arco Dante) | `memory/project_dragon_victory_canon.md` + `docs/narrative/deep/characters/dante-grid.md` R4 |
