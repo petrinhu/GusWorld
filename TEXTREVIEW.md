@@ -53,3 +53,27 @@ Após a conclusão da ingestão e revisão dos blocos, as entregas devem ser for
 4.  **Diagramação Visual (Mermaid.js):** Códigos gerados com a sintaxe `mermaid` (tipos `graph TD` ou `classDiagram`) ilustrando a árvore hierárquica e conexões da entidade analisada, prontos para renderização em interpretadores locais.
 
 **Regra de Retenção de Estado:** Ao receber um bloco particionado com a instrução de "aguardar próximo lote", o agente deverá responder APENAS com a confirmação de recebimento e um microrresumo técnico das entidades identificadas, suprimindo as formatações finais até o comando de compilação definitiva.
+
+## 5. DIRETRIZES DE AUDITORIA GRAMATICAL E ORTOGRÁFICA DETALHADA
+A revisão textual deve operar com o rigor de uma análise lógica, separando falhas estruturais de escolhas estéticas. A narrativa justapõe o arcaísmo e o valor histórico das instituições medievais orgânicas com a objetividade utilitarista e fria do maquinário cibernético. A correção não deve pasteurizar o texto, mas sim polir sua consistência formal.
+
+### 5.1. Preservação da Taxonomia Híbrida (Neologismos e Arcaísmos)
+A fusão de eras (alta tecnologia e feudalismo) exige vigilância estrita contra a "hipercorreção" algorítmica. 
+* **Lexicografia Intencional:** Termos que hibridizam a engenharia de software com a teologia e a arquitetura gótica (ex: *tecno-relicários*, *cripto-pergaminhos*, *liturgias de silício*) não devem ser sinalizados como erros ortográficos. 
+* O agente deve catalogar essas construções anômalas no Dicionário de Consistência para validar e padronizar suas ocorrências ao longo de todos os lotes futuros.
+
+### 5.2. Sintaxe, Coesão e Atmosfera Estilística
+A correção gramatical deve atuar como uma ferramenta de preservação da densidade narrativa. A métrica do texto frequentemente emula a tensão prolongada do horror epistolar — assemelhando-se à montagem de registros fragmentados de *Drácula*, de Bram Stoker — intercalada com a cadência dura, mecânica e melancólica da subcultura pós-punk.
+* **Concordância e Regência:** Aplicar correção rigorosa de desvios de concordância verbal e nominal e de regência. A complexidade das orações subordinadas e intercaladas, essenciais para a atmosfera de suspense, deve ser mantida com precisão gramatical cirúrgica.
+* **Pontuação Rítmica:** Ajustar vírgulas e pontos e vírgulas para garantir a fluidez do ritmo de leitura. A pontuação deve suportar a transição entre a frieza analítica das descrições tecnológicas e a urgência gótica das interações entre personagens.
+* **Redundâncias Analíticas:** Eliminar pleonasmos e repetições não intencionais que enfraqueçam a objetividade da prosa, a menos que sejam recursos estilísticos claros de fala de personagem.
+
+### 5.3. Gestão de Coesão na Janela Deslizante (Sobreposição de 200 Palavras)
+Durante a ingestão do bloco de 1000 palavras, a zona de sobreposição de 200 palavras opera como a âncora de coesão referencial.
+* **Anáforas e Catáforas:** O agente deve checar se os pronomes e as referências cruzadas na transição dos blocos mantêm a amarração lógica correta aos "Nós" (entidades/personagens) já estabelecidos no lote anterior.
+* **Paralelismo de Tempo e Voz:** Garantir que não existam quebras abruptas de tempo verbal ou dissonância da voz narrativa na costura exata entre o fim do bloco anterior e o início do texto não-sobreposto do lote atual.
+
+### 5.4. Protocolo de Modificação e Relatório de Intervenção
+Para evitar a supressão da voz do autor original por uma reescrita autônoma desenfreada, o agente aplicará as correções em duas camadas operacionais:
+1. **Intervenção Direta (Erros Booleanos/Objetivos):** Falhas claras de ortografia padrão, aplicação de crase, acentuação e digitação devem ser corrigidas diretamente no texto de saída.
+2. **Consultoria Estilística (Avisos de Ambiguidade):** Construções frasais que gerem ambiguidade interpretativa, quebra de ritmo ou cacofonia não devem ser reescritas de forma impositiva. O agente deve listá-las em *bullet points* ao final do processamento do lote, sob o título **"Auditoria Sintática e Sugestões"**, propondo alternativas estruturais para a validação do autor.
