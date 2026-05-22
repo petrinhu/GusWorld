@@ -229,7 +229,7 @@ Payoff: reveal pleno wound recebe Knowledge gate Ouro. Cauã recontextualiza Dav
 
 Wound canônico: manipulação por Adila Murmúrio desde os 6 anos. Plants: F081 (Iara aos 9 ouviu Adila falando com Cleomir — fissura primeira), F082 (doc 4 panfleto Atualização Sensorial + cláusula oculta), F084 (origem Iara como abandonada bebê em catedral menor anexa, "Iara Koslov" escolhido por funcionário Cult).
 
-Adila plantada como manipuladora desde a Era 2 tardia: F083 (rancor paradoxal por Sonja Murmúrio, mãe forçada a "retiro espiritual" em -6, morta em -5 em circunstâncias nunca esclarecidas). Adila guarda culpa internalizada — não menciona Sonja, evita o nome. Knowledge alta cruza retroativamente.
+Adila plantada como manipuladora desde a Era 2 tardia: F083 (rancor paradoxal por Sonja Murmúrio, mãe afastada ritualmente em -34 sob argumento de "retiro contemplativo" e morta no mesmo ano em circunstâncias nunca esclarecidas; consolidação operacional plena de Adila ocorre 28 anos depois em -6). Adila guarda culpa internalizada, não menciona Sonja, evita o nome. Knowledge alta cruza retroativamente.
 
 Cult Mirage não-monolítico: F114 (Florín Estopa, Marlena Aurora, Patrício Velô — facção artista resistente). Sub-quest pós-recrutamento Iara liberta ala artista. Payoff: Iara entende que pode criar arte sem ser arma, beleza pode servir à vida. Não destrava Ouro sozinho; alimenta densidade narrativa do final Ouro.
 

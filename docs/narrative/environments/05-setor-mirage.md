@@ -37,7 +37,7 @@ Sede oficial de espetáculos Cult Mirage. Fachada de fibra óptica refratante, h
 
 Interior: anfiteatro em meia-esfera invertida. Cinquenta projetores cônicos. Os assentos têm **biossensores embutidos** (cláusula oculta doc 4): batimento cardíaco, saccade ocular, pulso galvânico, micro-expressão facial. Tudo encaminhado a Sterling Corp via cabos Óxido escondidos no piso técnico.
 
-**Detalhe que Gus repara com óculos táticos:** sob o palco principal, marca de queimadura em forma irregular. Em ato 2, arco Iara, descobre-se: foi onde Sonja Murmúrio (mãe de Adila) deu sua última performance pública antes do "retiro espiritual" forçado em -6. Ninguém limpou. Adila proibiu. Ninguém pergunta por quê.
+**Detalhe que Gus repara com óculos táticos:** sob o palco principal, marca de queimadura em forma irregular. Em ato 2, arco Iara, descobre-se: foi onde Sonja Murmúrio (mãe de Adila) deu sua última performance pública antes do "retiro contemplativo" forçado em -34, mesmo ano da sua morte canon. Ninguém limpou. Adila proibiu. Ninguém pergunta por quê.
 
 ### 2.3 Beco dos Vestígios (becos artistas independentes)
 
@@ -258,7 +258,7 @@ Indiferente à perseguição.
 - **Periferia (setting 06):** o Mirage tem **informantes Sterling disfarçados de adeptos** que reportam a Vorto via FIR. Cabo Óxido coaxial do §3 termina em subestação FIR perto da oficina Dante. Knowledge alta cruza retroativamente: Iara, sem saber, ajudou Dante na primeira manutenção pública (Dante encomendou holograma de fachada na Cult; Iara projetou; o holograma cobria a oficina onde Dante recebia Vorto à noite). Foreshadow Dante distante mas amarrado.
 - **Cidade ciber-gótica / Núcleo (setting 01):** Festa da Compilação ([[tradicoes-cultura]] §1) é cooptada por Sterling Corp; Cult Mirage sobrepõe propaganda Atualização Sensorial. Em ano de jogo, ambas as cooptações disputam mesmo espaço público no Núcleo, e o Mirage exporta sua estética pra cidade central. Player que vai entre os dois settings sente: o Mirage está **vencendo** o Núcleo esteticamente, mesmo perdendo o Caleidoscópio narrativamente.
 - **Dutos Infernais (setting 04):** sob o nível -3 das Catacumbas, parede leste tem rachadura que conecta ao Duto Periférico Norte. Cauã conhece o atalho. Em sub-quest cross-arco (Iara + Cauã), party pode usar a passagem pra entrar no Caleidoscópio por baixo. Anedótica: Cauã: "Eu sabia que tinha lugar pra subir aqui. Eu não sabia que era teatro." Iara: "Não é teatro. É pior."
-- **Selve Profunda (setting 08):** a fita Sonja, se extraída, contém referência a "Pelicano Branco" como possível abrigo que Sonja considerou antes do retiro forçado. Mariana Vanderbist, se confrontada, confirma: Sonja chegou a mandar mensageiro em -6, dois dias antes do "retiro". Mariana ofereceu acolhimento; Sonja não respondeu. Lacuna deliberada (Sonja foi capturada antes de poder fugir? Escolheu confronto?).
+- **Selve Profunda (setting 08):** a fita Sonja, se extraída, contém referência a "Pelicano Branco" como possível abrigo que Sonja considerou antes do retiro forçado. Mariana Vanderbist, se confrontada, confirma: Sonja chegou a mandar mensageiro em -34, dois dias antes do "retiro". Mariana ofereceu acolhimento; Sonja não respondeu. Lacuna deliberada (Sonja foi capturada antes de poder fugir? Escolheu confronto?).
 
 ---
 

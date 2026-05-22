@@ -40,8 +40,8 @@ A sombra que paira sobre toda a estrutura é Sonja Murmúrio, morta em -34 aos t
 - **-27.** Reconhecimento oficial. Distrito 4 rebatizado Setor Mirage.
 - **-10.** Dissolução da antiga sociedade artística erudita à qual Sonja era remotamente ligada. Vocabulário técnico residual incorporado à Companhia.
 - **-8.** Primeira sondagem comercial Sterling Corp ao Setor.
-- **-6.** Adila Murmúrio assume liderança formal sob argumento de modernização operacional. Sonja conduzida a retiro espiritual em propriedade interna. Companhia rebatizada Cult Mirage. Pacto Sensorial canonizado em oitenta e nove cláusulas. Iara Koslov adotada formalmente por Adila aos seis anos.
-- **-5.** Morte de Sonja Murmúrio em circunstâncias nunca esclarecidas. Atestado emitido por médico contratado da Cult menciona exaustão sensorial crônica, expressão ausente em qualquer compêndio clínico oficial.
+- **-34.** Adila Murmúrio assume liderança nominal sob tutela administrativa transitória aos seis anos, Sonja conduzida a retiro contemplativo em propriedade interna da Cult, e morre no mesmo ano em circunstâncias nunca esclarecidas. Atestado emitido por médico contratado da Cult menciona exaustão sensorial crônica, expressão ausente em qualquer compêndio clínico oficial. Cross-ref [[CHARS]] Sonja Murmúrio (morta -34 aos 33) + [[factions]] §5.
+- **-6.** Adila consolida tutela administrativa plena sob argumento de modernização operacional, 28 anos após a morte de Sonja. Companhia rebatizada Cult Mirage. Pacto Sensorial canonizado em oitenta e nove cláusulas. Iara Koslov adotada formalmente por Adila aos seis anos.
 - **-3.** Marlena Aurora internada em reabilitação sensorial após confronto público com Adila durante reunião interna.
 - **-1.** Iara Koslov deserta aos onze anos. Operação Atualização Sensorial planejada para o Ano 0 entra em fase de calibração.
 - **Ano 0.** Festival de Atualização Sensorial sabotado por Iara e Gus durante o arco Iara. Crise reverberante para a facção pró-Sterling. Ala artista respira pela primeira vez em anos.

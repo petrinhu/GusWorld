@@ -59,7 +59,7 @@ o que vem depois.
 
 **Tipo:** carta manuscrita (papel envelhecido).
 **Autor:** Inácia Berenger (mãe de [[caua-volt]] e Davi).
-**Data:** ano -13 (semanas após o acidente). Continuou escrevendo até -12. Última carta data de -11. Nenhuma enviada.
+**Data:** ano -5 (semanas após o acidente Davi). Continuou escrevendo até -4. Última carta data de -3. Nenhuma enviada. Cauã tem 8 anos na época da primeira carta (nasc -13, acidente Davi -5).
 **Onde se encontra:** caixa de zinco escondida atrás de painel solto no apartamento Berenger (Periferia Industrial baixa). Gus descobre em sidequest do arco Cauã se interage com Inácia + cumpre "favor pequeno" (consertar terminal antigo dela).
 **Função:** reveal emocional (camada do wound de Cauã); preparação para o doc 13 (gate Ouro).
 
