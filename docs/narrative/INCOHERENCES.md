@@ -183,7 +183,7 @@ Nenhuma cascata fix em lore-bible/timeline. Apenas reconhecimento explícito do 
 | 2 | Colisão homônima Hilário (4 personagens) | Renomear patrilinear Chevalier; substituir Hilário por nome único etnia mista não-africana |
 | 3 | Gerações matrilineares R10 (5) vs Ordem (6) | 6 gerações com Antoneta + sobrenomes compostos matrilineares |
 | 4 | Gerações patrilineares timeline (4) vs Ordem (5) | 4 gerações intermediárias canon. Nomes: Antoneto + Dmitri + Casimiro + Aldebrando-pai-Bento |
-| 5 | Aritmética §1 L13 "43 anos pós Hiato" | "552 anos após Êxodo" (Êxodo -720 + 572 = -148) |
+| 5 | Aritmética §1 L13 "43 anos pós Hiato" | "572 anos após Êxodo" (Êxodo -720 + 572 = -148). Correção rerun TEXTREVIEW: original decisão "552" continha erro aritmético; valor canon final = 572. |
 | 6 | Polis-Vermelha "captura política -45" (R10 §6.2 NÃO tem isso) | Remover -45 + usar "deriva séculos" alinhado R10 canon |
 | 7+8 | 3 festas regionais novas | Canonizar 3 festas em tradicoes-cultura.md (Calibração 8 fev + Federação 8 mai + Coletivista 13 fev) |
 | 9 | Nomenclatura 5 catedrais cross-doc | PLACES como canonical: São Camilo + Quarta + Quinta ativas; São Vargas + Atelaiá saqueadas -3 |
