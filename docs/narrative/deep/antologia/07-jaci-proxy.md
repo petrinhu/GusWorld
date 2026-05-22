@@ -8,7 +8,7 @@ A colônia do fungo no tronco vermelho estava em padrão de quatro batidas e uma
 
 Eu agachei. Contei os anéis claros do fungo. Um, um, dois, três, cinco, oito, treze. Sete círculos concêntricos do menor ao maior, e cada um deles era a soma dos dois anteriores. O canon do Pillar 2, disse a vó na primeira vez que me mostrou, mas ela não usou a palavra Pillar nem a palavra canon. Disse que a Selve é matemática rígida e que a herborista é tradutora. Tinha eu seis anos. Anotei na cabeça. Hoje eu sei o nome técnico do padrão. O nome técnico não muda o padrão.
 
-A bioluminescência do fungo pulsava em quatro tempos e pausa. Bati o dedo no joelho acompanhando. Quatro tempos e pausa. Quatro tempos e pausa. A pausa tinha o mesmo comprimento da batida inicial. Era o jeito que o substrato vivo respira quando a janela climática está estável. Vó dizia que o dia em que essa pulsação saísse do compasso de quatro e pausa, a gente teria três dias pra preparar antídoto novo. A Tatauín tinha chegado outro dia de uma incursão na Selve profunda contando que o reflexo do poço do Núcleo Mandelbrot sai com meio segundo de atraso, e a vó tinha dobrado o relato em três e guardado no bolso interno do manto. Eu vi pela fresta da porta. Não comentei.
+A bioluminescência do fungo pulsava em quatro tempos e pausa. Bati o dedo no joelho acompanhando. Quatro tempos e pausa. Quatro tempos e pausa. A pausa tinha o mesmo comprimento da batida inicial. Era o jeito que o substrato vivo respira quando a janela climática está estável. Vó dizia que o dia em que essa pulsação saísse do compasso de quatro e pausa, a gente teria três dias pra preparar antídoto novo. A Tatauín tinha chegado outro dia de uma incursão na Selve Profunda contando que o reflexo do poço do Núcleo Mandelbrot sai com meio segundo de atraso, e a vó tinha dobrado o relato em três e guardado no bolso interno do manto. Eu vi pela fresta da porta. Não comentei.
 
 Mas hoje, manhã do quadragésimo sexto dia do ciclo, ano 0, o tronco vermelho do acaceiro segundo da fileira leste batia certinho. Quatro e pausa. Quatro e pausa. Anotei no caderno-semente. Boa raiz.
 
@@ -24,7 +24,7 @@ Anotei isso no caderno-semente em duas linhas só. Boa raiz.
 
 A Tatauín apareceu na orla quando o sol bateu na terceira pedra do caminho que vai até a Fonte da Margem-Clara. A terceira pedra é a pedra que serve de relógio na manhã, e a Fonte é a fonte que a vó me ensinou a olhar pra calibrar respiração quando o dia tá ruim. Eu ainda estava agachada no fungo do tronco vermelho. Tinha contado os anéis três vezes pra confirmar o padrão.
 
-Ela parou a uns dois metros. Não falou logo. A Tatauín não fala logo. Tem vinte e dois anos, conhece a Selve profunda em raio que ninguém mais do vilarejo atinge, e fala em registro técnico mesmo quando senta na bancada da vó pra tomar chá de erva-de-pedra. Eu olhei pra cima. O cabelo dela estava preso em duas tranças, uma de cada lado, com o jeito que ela usa quando vai pra fronteira norte. Manga curta. Bolsa de coleta a tiracolo, mas vazia.
+Ela parou a uns dois metros. Não falou logo. A Tatauín não fala logo. Tem vinte e dois anos, conhece a Selve Profunda em raio que ninguém mais do vilarejo atinge, e fala em registro técnico mesmo quando senta na bancada da vó pra tomar chá de erva-de-pedra. Eu olhei pra cima. O cabelo dela estava preso em duas tranças, uma de cada lado, com o jeito que ela usa quando vai pra fronteira norte. Manga curta. Bolsa de coleta a tiracolo, mas vazia.
 
 "Bom dia, Jaci."
 

@@ -129,7 +129,7 @@ Toda essa densidade significa que a Selve Profunda é o lugar do jogo onde **a l
 
 #### Tatauín Branca (22) — caçadora-coletora veterana
 
-Já listada em [[factions]] §4. Conhece Selve profunda em detalhe. Em -3 ela teve encontro com primeira raposa-fractal mutante na Selve; documentou em desenho carbão na parede de uma das casas vazias do vilarejo. Mariana respeita Tatauín como ninguém respeita ninguém no vilarejo: trata-a quase como par, apesar da diferença de 56 anos. Tatauín tem corpo magro, mãos calejadas, fala devagar mas com firmeza absoluta. Tem cicatriz de queimadura na clavícula esquerda (acidente de criança com fogareiro Pythia, sem relação narrativa-traumática).
+Já listada em [[factions]] §4. Conhece Selve Profunda em detalhe. Em -3 ela teve encontro com primeira raposa-fractal mutante na Selve; documentou em desenho carbão na parede de uma das casas vazias do vilarejo. Mariana respeita Tatauín como ninguém respeita ninguém no vilarejo: trata-a quase como par, apesar da diferença de 56 anos. Tatauín tem corpo magro, mãos calejadas, fala devagar mas com firmeza absoluta. Tem cicatriz de queimadura na clavícula esquerda (acidente de criança com fogareiro Pythia, sem relação narrativa-traumática).
 
 Hook de diálogo: pode levar o Gus a três pontos altos da Selve onde a Cúpula Sterling é visível no horizonte. Conta a Gus que viu Lia Vanderbist (mãe da Jaci) saindo do vilarejo na noite antes da morte, mas que decidiu não contar pra Mariana até hoje porque a história "não muda nada". Knowledge alta destrava esta cena. Recompensa: entry Diário substancial sobre Lia + token Bioquímico + Stream + Área de mestria avançada.
 

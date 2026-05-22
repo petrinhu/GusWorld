@@ -102,7 +102,7 @@ Jaci estava em viagem com Mariana ao Vilarejo do Pelicano Roxo (oeste; 2 dias de
 
 Mariana coloca os ingredientes na bancada. "Faz." Jaci hesita. Mariana: "se errar, eu te avisar." Jaci começa. Erra dosagem de uma raiz. Mariana segura. "Aqui. Conta de novo." Jaci conta: tinha posto 11 gotas em vez de 10. Refaz. Antídoto pronto. Mariana sorri. "Você vai contar a vida inteira. Vai contar errado às vezes. Vai aprender a recontar." *Importa porque:* origem da farmacêutica. Origem do "off-by-one" de [[comic-reliefs]] cena 9 — vem de longe. Mariana pré-empacotou a metáfora: contar é cuidar.
 
-### Aos 8 anos, primeira vez vê fauna corrompida na Selve profunda
+### Aos 8 anos, primeira vez vê fauna corrompida na Selve Profunda
 
 Acompanhou Tatauín Branca (caçadora-coletora) numa expedição autorizada. Encontram uma raposa-fractal cujo padrão de pelagem está **errado**. Não é Fibonacci; é arbitrário. Tatauín para o grupo. "Não chega perto. Não toca." Jaci pergunta: "ela tá doente?" Tatauín: "tá sendo OUTRA COISA pela primeira vez. A Selve faz isso de vez em quando. A gente respeita." Voltam sem caçar. Jaci anota mentalmente o padrão arbitrário. *Importa porque:* primeira vez que Jaci vê Patch-Zero (em forma embrionária, sem nome). Origem da intuição que ela vai trazer no arco dela (ela reconhece quando algo "deixou de ser sistema"). Mariana, quando Jaci conta, fica em silêncio longo — Mariana já tinha visto. Não comentou na época pra não assustar.
 

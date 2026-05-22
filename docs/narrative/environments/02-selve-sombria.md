@@ -76,7 +76,7 @@ A sensação não é a de aventura selvagem. É a de **estar dentro de algoritmo
 
 **Nomeados (3):**
 
-- **Tatauín Branca** (22, caçadora-coletora Pelicano Branco; já em [[factions]] §4) — atravessa Orla a Pântano regularmente. Conhece Selve profunda. Já teve encontro com fauna corrompida; sobreviveu. Hook: "se você ver a copa parar de respirar, você não estava na floresta. Estava no que ela não é." Aliada útil se Gus para pra conversar. Pode mostrar passagem segura através do Pântano.
+- **Tatauín Branca** (22, caçadora-coletora Pelicano Branco; já em [[factions]] §4) — atravessa Orla a Pântano regularmente. Conhece Selve Profunda. Já teve encontro com fauna corrompida; sobreviveu. Hook: "se você ver a copa parar de respirar, você não estava na floresta. Estava no que ela não é." Aliada útil se Gus para pra conversar. Pode mostrar passagem segura através do Pântano.
 - **Mestre Hugo Tirol** (55, Ordem Recursiva; já em [[factions]] §2) — pode aparecer cartografando cripto-glifo em ponto profundo da Trilha dos Pioneiros se cronologia colocar Gus aqui durante arco Bento. Hook: "Atelaiá passou por aqui em -42. Eu passo agora. Daqui a 50 anos, alguém vai passar de novo. Continuidade." Diálogo expansivo sobre Era 1 se Knowledge alta.
 - **Técnico Vlado Caspar** (34, Sterling Corp Departamento de Aquisições) — extrator em campo na borda de anomalia GRE. Não-violento em interação casual (cumpre cota, não procura confronto). Hook: "olha, eu também queria que isso fosse mais simples. Não é. Tem cota." NPC ambíguo do regime; sinaliza que nem todo Sterling-funcionário é convertido ideológico ([[factions]] §1 — exceção que confirma a regra). Pode dar pista útil involuntariamente.
 
@@ -107,7 +107,7 @@ A câmera entra por uma trilha normal. Há vento. Há canto de coruja distante. 
 ## 10. Cross-refs Bloco G
 
 - [[timeline]] — eventos visíveis aqui: cripto-glifo Era 1 "Anomalia Primeira" (~-820); Trilha dos Pioneiros (Era 2, -130 a -25); anomalias GRE (Sterling escapou -0.25); Patch-Zero pré-existente em Núcleo Mandelbrot (todos os tempos).
-- [[in-world-docs]] — docs descobríveis no setting: doc 7 (Fragmentos do Antigo Diário da Selve; Mariana entrega via Jaci, conteúdo refere fungo de tronco-vermelho desta área); doc 15 (cripto-glifo Catedral-Mãe, gate Ouro, geograficamente em Catedral perdida acessível só por Selve profunda + arco Bento conjunto).
+- [[in-world-docs]] — docs descobríveis no setting: doc 7 (Fragmentos do Antigo Diário da Selve; Mariana entrega via Jaci, conteúdo refere fungo de tronco-vermelho desta área); doc 15 (cripto-glifo Catedral-Mãe, gate Ouro, geograficamente em Catedral perdida acessível só por Selve Profunda + arco Bento conjunto).
 - [[tradicoes-cultura]] — costumes praticados aqui: cumprimento Pelicano Branco "Boa raiz / Boa colheita" (em trânsito); reverência mão sobre coração ao passar por cripto-glifo Neo-Sylvania (tabu universal "não pisar"); sopa-de-7-raízes em fogueiras de bivaque (caçadores).
 - [[factions]] — facções presentes: Selve Sombria (substrato; sem porta-voz, fauna como vetor); Pelicano Branco (caçadores-coletores em trânsito); Ordem Recursiva (mestres em expedição cartográfica, esporádico); Sterling Corp (extratores + drones + anomalias GRE); FIR (coleta forçada eventual).
 - [[jaci-proxy]] — Jaci atravessa daqui pra setting 08 (Selve Profunda) regularmente; Selve acessível é parte de sua identidade narrativa.

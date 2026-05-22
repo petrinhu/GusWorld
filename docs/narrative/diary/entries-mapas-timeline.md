@@ -370,7 +370,7 @@ Cada mapa segue padrão fixo:
 
 > *Visual:* página mais densa cross-temporal. Gus usou múltiplas camadas (sticky-notes coladas em sobreposição — vilarejo no centro, Câmara Neo-Sylvania ao norte, Núcleo Mandelbrot Interno ao sul/sudoeste com geometria desenhada deliberadamente errada — Gus reconhece e aceita o erro como dado). Margem: "aqui as 3 eras estão todas vivas simultaneamente. é o único setting onde Era 1 não é ruína."
 
-**Topologia.** Vilarejo do Pelicano Branco (sub-comunidades em ferradura ao redor da praça central) + fronteira-Selve profunda + Núcleo Mandelbrot Interno (gateway acesso climax Patch-Zero).
+**Topologia.** Vilarejo do Pelicano Branco (sub-comunidades em ferradura ao redor da praça central) + fronteira-Selve Profunda + Núcleo Mandelbrot Interno (gateway acesso climax Patch-Zero).
 
 **Landmarks visíveis (5):**
 

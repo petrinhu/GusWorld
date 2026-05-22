@@ -277,7 +277,7 @@ Canon F5-BK.AUDIT T2-C2 resolução "aliases folk = PLACES canonical": nomes fol
 | **Catedral Menor de Atelaiá** | = Catedral de Atelaiá (saqueada -3, contaminada -7/-0.5) | 27 julho | Borda Selve, Norte |
 | **Catedral de São Vargas** | = Catedral de São Vargas (saqueada -3, reocupada parcial) | 19 setembro | (aniversário hoje é vigília) |
 | **Catedral do Equinócio** | = Catedral Quarta (sede informal, ofício cronométrico Era 2) | 21 março (mesma da Vigília) | Combinada |
-| **Catedral Submersa** | = Catedral-Mãe (lendária submersa lacrada -750) | 3 outubro | Próxima a Anel Verde (memorial cerimonial — Mãe propriamente em região Selve profunda desconhecida) |
+| **Catedral Submersa** | = Catedral-Mãe (lendária submersa lacrada -750) | 3 outubro | Próxima a Anel Verde (memorial cerimonial — Mãe propriamente em região Selve Profunda desconhecida) |
 
 ### Tradições
 

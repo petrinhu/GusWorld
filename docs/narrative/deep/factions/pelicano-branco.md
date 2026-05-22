@@ -48,7 +48,7 @@ Cor institucional, na medida em que a expressão se aplica a uma cultura sem dep
 
 **Solane Vanderbist**, oito, primo distante de Jaci. Criança do vilarejo. Aparece em sub-quest de plantio (Ano 0): perde uma das treze sementes-relíquia durante o surto, recupera num arco curto, aprende a primeira lição completa de leitura de padrão.
 
-**Tatauín Branca**, vinte e dois, caçadora-coletora. Conhece a Selve profunda em raio que ninguém mais do vilarejo atinge. Testemunha primeira de encontros com fauna corrompida em -1 e ano 0 (raposa-fractal com pelo desfocado, coruja-Mandelbrot com chamado fora do padrão de Schroeder). Reporta a Mariana em registro técnico seco. Trança longa, marcas de espinho nos antebraços.
+**Tatauín Branca**, vinte e dois, caçadora-coletora. Conhece a Selve Profunda em raio que ninguém mais do vilarejo atinge. Testemunha primeira de encontros com fauna corrompida em -1 e ano 0 (raposa-fractal com pelo desfocado, coruja-Mandelbrot com chamado fora do padrão de Schroeder). Reporta a Mariana em registro técnico seco. Trança longa, marcas de espinho nos antebraços.
 
 **Mestre Loanis Penãoso** (morto -8, cinquenta e cinco), mestre-herborista do vilarejo na geração anterior. Referenciado em vários cadernos, citado como autoridade em formulação de antídoto sistêmico. Morreu no mesmo surto que matou Lia e Solano. Mariana o substituiu na função pública por necessidade, não por candidatura.
 

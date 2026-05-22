@@ -373,7 +373,7 @@ Não tem porta-voz oficial. Tem aldeias humanas na fronteira (vilarejo do Pelica
 
 - Bordados de mantos das aldeias.
 - Marcas nas embalagens de antídoto da Jaci.
-- Pinturas rupestres em cavernas Selve profunda.
+- Pinturas rupestres em cavernas Selve Profunda.
 
 Cor institucional: verde-ciano biolúmen + marrom-húmus + branco-fungo.
 
@@ -392,7 +392,7 @@ Cor institucional: verde-ciano biolúmen + marrom-húmus + branco-fungo.
 - **Helena Sirinhaém** (50) — herborista júnior. Aliada Jaci. Trabalha em paralelo, especializada em antídotos respiratórios.
 - **Bem-Te-Vi Caldeira** (35) — filho do Bito. Mantém comércio do vilarejo. Pacifista declarado.
 - **Solane Vanderbist** (8) — primo distante Jaci. Criança do vilarejo. Aparece em sub-quest plantio.
-- **Tatauín Branca** (22) — caçadora-coletora. Conhece Selve profunda; já teve encontro com fauna corrompida.
+- **Tatauín Branca** (22) — caçadora-coletora. Conhece Selve Profunda; já teve encontro com fauna corrompida.
 - **Mestre Loanis Penãoso** (55, **morto em -8**) — mestre-herborista. Morreu no mesmo surto que Lia e Solano. Ainda referenciado.
 
 #### Aldeias-fronteira (outras 3)
