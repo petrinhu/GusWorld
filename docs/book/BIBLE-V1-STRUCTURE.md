@@ -266,7 +266,7 @@ VOLUME 1 — BÍBLIA WORLDBUILDING
 
 | # | Sub-capítulo | Fonte | Palavras | Páginas | Nota revisão |
 |---|---|---|---|---|---|
-| 11.1 | Vance (Gustaf I → VII, 7 gerações) | `era-1-pre-codigo.md` §6 + `deep/antologia/10-pyotor-vance-pai.md` + `11-venea-vance-mae.md` + memória `project_familia_vance_canonica` | ~3k | ~10 | conector cross-eras com tabela genealógica |
+| 11.1 | Vance (Gustaf I → VII, 7 gerações) | `era-1-pre-codigo.md` §6 + `deep/antologia/10-pyotor-vance-pai.md` + `11-gargi-vance-mae.md` + memória `project_familia_vance_canonica` | ~3k | ~10 | conector cross-eras com tabela genealógica |
 | 11.2 | Chevalier (Atelaiá → Bento) | `era-1-pre-codigo.md` §6 + `deep/antologia/13-veronica-atelaia.md` | ~1.5k | ~5 | conector |
 | 11.3 | Vanderbist (Mariana → Jaci) | `deep/antologia/12-ancia-mariana-vanderbist.md` + `deep/characters/jaci-proxy.md` | ~1.5k | ~5 | conector |
 | 11.4 | Berenger (Inácia → Cauã, Davi morto) | `deep/characters/caua-volt.md` §família | ~1k | ~3 | conector |

@@ -328,7 +328,7 @@ LOMBADAS ALINHADAS (canto inferior, padrão 4 livros):
 
 | Componente | Fonte | Palavras | Páginas | Nota revisão |
 |---|---|---|---|---|
-| Texto do conto | `docs/narrative/deep/antologia/11-venea-vance-mae.md` | ~2.962 | ~10 | extrair íntegra; voz técnica de placas, fluxo amarelado (eco Conto 1 §I), terças à noite (cross-ref rotina rádio com Pyotor), três horas da madrugada, dedos no cabelo — leitor reconhece o ângulo já visto pelo filho |
+| Texto do conto | `docs/narrative/deep/antologia/11-gargi-vance-mae.md` | ~2.962 | ~10 | extrair íntegra; voz técnica de placas, fluxo amarelado (eco Conto 1 §I), terças à noite (cross-ref rotina rádio com Pyotor), três horas da madrugada, dedos no cabelo — leitor reconhece o ângulo já visto pelo filho |
 | Cabeçalho editorial | editorial | ~0.05 | — | — |
 
 **Subtotal Conto 11:** ~3.0k pal / ~10 pp
@@ -728,7 +728,7 @@ docs/narrative/deep/antologia/
 ├── 08-sterling-locke.md           [Conto 8 — Tomo 2 Parte III — abre T2]
 ├── 09-cassiano-vorto.md           [Conto 9 — Tomo 2 Parte III]
 ├── 10-pyotor-vance-pai.md         [Conto 10 — Tomo 2 Parte IV]
-├── 11-venea-vance-mae.md          [Conto 11 — Tomo 2 Parte IV]
+├── 11-gargi-vance-mae.md          [Conto 11 — Tomo 2 Parte IV]
 ├── 12-ancia-mariana-vanderbist.md [Conto 12 — Tomo 2 Parte IV]
 ├── 13-veronica-atelaia.md         [Conto 13 — Tomo 2 Parte V]
 └── 14-heliaco-vyr-era-1.md        [Conto 14 — Tomo 2 Parte V — fecha Vol 2]
