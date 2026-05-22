@@ -49,7 +49,7 @@ Patch-Zero não foi criado por uma fonte só. Quatro vetores convergiram. Cada u
 
 ### Vetor 1 — Bug primordial do Sistema
 
-Pré-existente. Patch-Zero (em estado embrionário) **já existia na Selve Sombria antes do início do jogo, antes de Sterling, antes da Era 3**. Era pequeno. Contido a uma região profunda do Núcleo Mandelbrot.
+Pré-existente. Patch-Zero (em estado embrionário) **já existia na Selve Sombria antes do início do jogo, antes de Sterling, antes da Era 3**. Era pequeno. Contido a uma região profunda do Núcleo Mandelbrot Interno.
 
 In-world hipótese arqueológica: Patch-Zero pode ser **resíduo da queda de Neo-Sylvania**. Algo que a civilização anterior produziu (intencional ou acidentalmente) e que sobreviveu encapsulado por séculos. Nunca confirmado.
 

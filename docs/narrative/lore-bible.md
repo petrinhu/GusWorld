@@ -313,7 +313,7 @@ A coexistência dos dois aspectos é deliberada. Patch-Zero não é "monstro" ne
 
 Patch-Zero não foi criado por uma fonte só. Quatro vetores convergiram:
 
-1. **Bug primordial do Sistema**: emergiu na Selve Sombria sozinho, antes de Sterling. Era pequeno, contido em uma região do Núcleo Mandelbrot. Pré-existente.
+1. **Bug primordial do Sistema**: emergiu na Selve Sombria sozinho, antes de Sterling. Era pequeno, contido em uma região do Núcleo Mandelbrot Interno. Pré-existente.
 2. **Captura corporativa**: Sterling Corp localizou o bug e **tentou domesticar** em laboratório. Quis transformar em arma proprietária (vazado em redes inimigas, derruba concorrência). Falhou em conter.
 3. **Amostra importada**: laboratórios Sterling Corp em uma cidade-irmã (ver §10) capturaram amostra adicional e enviaram para a sede. Cross-contamination.
 4. **Escape**: Patch-Zero escapou do laboratório central três meses antes do jogo. Agora se propaga sozinho. Foge do controle de Sterling e do controle de qualquer um.
