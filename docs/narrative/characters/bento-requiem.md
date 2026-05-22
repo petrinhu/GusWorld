@@ -94,9 +94,9 @@ Destrava: **upgrade escudo-catedral** (modo "barreira gravitacional aliada" em c
 
 5 cenas pré-jogo.
 
-### Aos 4 anos, dentro da Catedral Menor de Atelaiá quando a anomalia atravessa (canônico -7)
+### Aos 7 anos, dentro da Catedral Menor de Atelaiá quando a anomalia atravessa (canônico -7)
 
-Bento estava na seção de leitura com **Hilário Tepenkov** (14, aprendiz sênior que cuidava dele naquela tarde). Aldebrando (pai) estava no piso superior em reunião. Velhusto presente. A anomalia atravessa o cripto-glifo central como atravessa água a peneira (eco doc 3 Atelaiá). Hilário pega Bento no colo e corre para o escudo de Velhusto. Hilário não chega — cai a três metros. Velhusto estende o escudo um segundo a tempo de pegar Bento que está caindo das mãos dele. Hilário não se mexe mais. Bento, ainda no colo de Velhusto, olha pra Hilário. Não chora. Velhusto cobre os olhos dele com a mão livre. *Importa porque:* origem do wound. Origem da culpa silenciosa por ter sobrevivido (Bento sentiu que Hilário caiu pesando ele; aos 4 anos não conseguiu articular; aos 14 ainda carrega). Origem do gesto de Bento de levantar escudo antes de pensar — corpo lembra.
+Bento estava na seção de leitura com **Hilário Tepenkov** (14, aprendiz sênior que cuidava dele naquela tarde). Aldebrando (pai) estava no piso superior em reunião. Velhusto presente. A anomalia atravessa o cripto-glifo central como atravessa água a peneira (eco doc 3 Atelaiá). Hilário pega Bento no colo e corre para o escudo de Velhusto. Hilário não chega — cai a três metros. Velhusto estende o escudo um segundo a tempo de pegar Bento que está caindo das mãos dele. Hilário não se mexe mais. Bento, ainda no colo de Velhusto, olha pra Hilário. Não chora. Velhusto cobre os olhos dele com a mão livre. *Importa porque:* origem do wound. Origem da culpa silenciosa por ter sobrevivido (Bento sentiu que Hilário caiu pesando ele; aos 7 anos não conseguiu articular; aos 14 ainda carrega). Origem do gesto de Bento de levantar escudo antes de pensar — corpo lembra.
 
 ### Aos 6 anos, primeira lição formal de Asmódico com Aldebrando (pai)
 

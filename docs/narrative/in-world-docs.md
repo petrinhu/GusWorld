@@ -742,7 +742,7 @@ Você sabe quem ela é.
                                                   Bart.
 ```
 
-**Subtexto:** "cuida da Linda quando ela tiver idade" antecede em 8 anos o doc 6 (carta cifrada de Tiago a Linda). Knowledge alta retroativa permite player conectar: Tiago herdou a tutela emocional de Linda de Bartolo, não por acaso. "Você sabe quem ela é" deixa pista ambígua sobre o que Bartolo sabia da família Neumann e nunca disse. Sub-quest pós-DD-005 abre a leitura; Knowledge alta destrava a página 80 (a página existe mas o caderno parece terminar na 78 sem o gate).
+**Subtexto:** "cuida da Linda quando ela tiver idade" antecede em 8 anos o doc 6 (carta cifrada de Tiago a Linda). Knowledge alta retroativa permite player conectar: Tiago herdou a tutela emocional de Linda de Bartolo, não por acaso. "Você sabe quem ela é" deixa pista ambígua sobre o que Bartolo sabia da família Neumann e nunca disse. Sub-quest pós-DD-005 abre a leitura; Knowledge alta destrava a página 80 (a página existe mas o caderno parece terminar na 78 sem o gate). Coerência canônica retroativa (Knowledge alta cruza com [[timeline]]:113): Bartolo, como engenheiro QA sênior Apex-Data até -16, mantinha acesso operacional a relatório interno do laboratório de análise familiar, anterior ao nascimento de Linda em -12; o nome dela aparece em pasta pré-natal de monitoramento de perfil genético-cognitivo de prole de funcionários-chave, arquivada sob código de cliente externo cuja contraparte Bartolo não nomeia no diário. "Você sabe quem ela é" deixa de ser ambíguo afetivo e passa a ser índice documental: Bartolo sabia, com quatro anos de antecedência ao nascimento, que Linda estaria sob ficha aberta antes mesmo do primeiro choro.
 
 ---
 

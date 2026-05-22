@@ -159,7 +159,7 @@ Salviano deixa Dante mexer nas ferramentas. "Cuidado com a torquês — ela mord
 
 #### Aos 8 anos, dia da destruição da cooperativa familiar (canônico -8)
 
-FIR aparece com "auditoria fiscal". Em 3 horas, fecham a oficina. Salviano não consegue articular. Edilma chora baixo. Dante vê tudo. Aos 6 meses, Salviano morre por "overdose-medicação" (oficialmente acidente; vizinhos suspeitam suicídio). Edilma se isola. Dante (8) começa a passar tempo em garagem improvisada, sozinho. Aos 9, é "encontrado" por Diretor Vorto que oferece "oportunidade de aprendizado técnico subsidiado". Dante aceita. *Importa porque (aparente):* tragédia que justifica desconfiança institucional + necessidade pragmática de aceitar a única oferta disponível.
+FIR aparece com "auditoria fiscal". Em 3 horas, fecham a oficina. Salviano não consegue articular. Edilma chora baixo. Dante vê tudo. Aos 6 meses, Salviano morre por "overdose-medicação" (oficialmente acidente; vizinhos suspeitam suicídio). Edilma se isola. Dante (8) começa a passar tempo em garagem improvisada, sozinho. Aos 8, é "encontrado" por Diretor Vorto que oferece "oportunidade de aprendizado técnico subsidiado". Dante aceita. *Importa porque (aparente):* tragédia que justifica desconfiança institucional + necessidade pragmática de aceitar a única oferta disponível.
 
 ### CAMADA REVELADA — o que player com Knowledge alta cruza retroativamente
 

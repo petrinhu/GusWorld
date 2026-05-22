@@ -200,7 +200,7 @@ Cor institucional: latão oxidado + preto-titânio + branco-osso.
 - **Mestre Hugo Tirol** (55) — outro tradicionalista. Participa expedição catedral perdida arco Bento. Especialista em decifragem cripto-glífica.
 - **Mestre Ardenia Falke** (52, **desaparecida em -3**) — opôs-se publicamente ao saque da Catedral de São Vargas. Sumiu. Velhusto guarda seu cronômetro intacto.
 - **Mestre Cândido Rui** (60, **desaparecido em -3**) — também opôs-se publicamente. Sumiu. Mesmo destino.
-- **Aprendiz Hilário Tepenkov** (**morto em -7**, idade 14) — companheiro de estudos Bento. Morreu na contaminação da Catedral Menor de Atelaiá. Foto preservada na biblioteca privada Velhusto.
+- **Aprendiz Hilário Tepenkov** (**morto em -7**, idade 14) — companheiro de estudos Bento (que tinha 7 na época). Morreu na contaminação da Catedral Menor de Atelaiá. Foto preservada na biblioteca privada Velhusto.
 - **Aldebrando Chevalier** (**morto em -0.5**, 38) — pai Bento. Mestre Asmódico. Eliminado por descobrir interferência precoce Sterling. Diário pessoal preservado por Velhusto, entregue a Bento no início do jogo.
 - **Aprendiz Beatriz Pólvora** (16) — aprendiz atual de Bento (designada após morte Aldebrando). Aparece em arco Bento como mentora reversa (Bento ensina ela enquanto ele próprio se forma).
 - **Mestre Felippe Garante** (48, *pró-Sterling, morto em -0.5 do jogo*) — facção pró-modernização. Morto em contaminação parcial da Catedral Menor de Atelaiá (acidente Patch-Zero arco Bento). Outros 2 mestres pró-Sterling morrem na mesma cena (não nomeados — número exato vago, "três a quatro").
@@ -220,7 +220,7 @@ Cor institucional: latão oxidado + preto-titânio + branco-osso.
 - **-115** — Codificação formal Asmódico por **Atelaiá Chevalier**.
 - **-80** — *Tragédia da Catedral Menor de São Camilo.* 17 mestres mortos por anomalia. Trauma fundador. Diário Atelaiá preservado ([[in-world-docs]] doc 3).
 - **-78** — Protocolo Selagem Asmódica decretado.
-- **-7** — *Contaminação da Catedral Menor de Atelaiá.* Hilário Tepenkov morre. Bento (4) sobrevive.
+- **-7** — *Contaminação da Catedral Menor de Atelaiá.* Hilário Tepenkov morre. Bento (7) sobrevive.
 - **-3** — *Saque da Catedral de São Vargas* por Sterling Corp. Ardenia Falke e Cândido Rui desaparecem. Velhusto cala publicamente para proteger restante.
 - **-0.5** — Aldebrando Chevalier morto. Velhusto entrega diário Aldebrando a Bento.
 - **Ano 0 (durante jogo)** — Rachadura interna pró-modernização vs tradicionalismo. Resolução arco Bento. Ordem oficializa anti-Sterling. Mestres pró-Sterling morrem em contaminação Catedral Menor.
