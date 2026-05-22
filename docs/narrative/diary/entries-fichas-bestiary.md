@@ -51,7 +51,7 @@ Cada companion tem ficha com 3 estados de Knowledge canônicos:
 | Nome canônico | Gus Vector Tavus Vance |
 | Idade | 11 |
 | Linguagem-âncora | **C-Arcane** |
-| Facção home | nenhuma (cidadão livre, [[01-cidade-cyber-gotica\|Núcleo Metropolitano]]) |
+| Facção home | nenhuma (cidadão livre, [[01-cidade-cyber-gotica|Núcleo Metropolitano]]) |
 | Setting home | Núcleo Metropolitano (apartamento Vance, 6º andar Edifício Vance) |
 | Role mecânico | Utility / Control |
 | Signature | Compilação do Codex (3 tokens, 5 famílias, 6 tipos) |
@@ -79,7 +79,7 @@ Cada companion tem ficha com 3 estados de Knowledge canônicos:
 | Idade | 13 |
 | Linguagem-âncora | **Pythia** (scripting rápido, interpretado) |
 | Facção home | Dutos Infernais (comunidade descentralizada juvenil) |
-| Setting home | [[04-dutos-infernais\|Dutos Infernais]] (QG Runners, Pilar Era 1) |
+| Setting home | [[04-dutos-infernais|Dutos Infernais]] (QG Runners, Pilar Era 1) |
 | Role mecânico | Striker (DPS elétrico) |
 | Signature | **Pulso EM Concêntrico** (Elétrico + Stream + Área) |
 | Família mágica | Elétrico (plasma, indução, eletroestática, magnetismo) |
@@ -110,8 +110,8 @@ Cada companion tem ficha com 3 estados de Knowledge canônicos:
 | Apelido | "Lumen" |
 | Idade | 12 |
 | Linguagem-âncora | **Óxido** (segurança/precisão; ilegível pra iniciantes, indestrutível em runtime) |
-| Facção home | [[factions\|Cult Mirage]] — **desertora**; facção artista internamente |
-| Setting home | [[05-setor-mirage\|Setor Mirage]] (catacumbas Cult, ala artista) |
+| Facção home | [[factions|Cult Mirage]] — **desertora**; facção artista internamente |
+| Setting home | [[05-setor-mirage|Setor Mirage]] (catacumbas Cult, ala artista) |
 | Role mecânico | Infiltradora (criptográfico + decoy) |
 | Signature | **Decoy Lumen** (Criptográfico + Stream + Área) |
 | Família mágica | Criptográfico (refração, hash, esteganografia, decoy) |
@@ -142,8 +142,8 @@ Cada companion tem ficha com 3 estados de Knowledge canônicos:
 | Apelido | "Requiem" |
 | Idade | 14 |
 | Linguagem-âncora | **Asmódico** (analógico Neo-Sylvania, relojoaria + ressonância acústica) |
-| Facção home | [[factions\|Ordem Recursiva]] — sucessor designado de Velhusto |
-| Setting home | [[03-catedrais-neo-sylvania\|Catedrais Neo-Sylvania]] (Nave + Capela do Sino Asmódico) |
+| Facção home | [[factions|Ordem Recursiva]] — sucessor designado de Velhusto |
+| Setting home | [[03-catedrais-neo-sylvania|Catedrais Neo-Sylvania]] (Nave + Capela do Sino Asmódico) |
 | Role mecânico | Tanque (cinético analógico, defesa party) |
 | Signature | **Cronômetro Ressonante** (Cinético + Stream + Aliado) |
 | Família mágica | Cinético (gravitacional, inercial, compressivo, rotacional) |
@@ -175,8 +175,8 @@ Cada companion tem ficha com 3 estados de Knowledge canônicos:
 | Apelido | "Siren" |
 | Idade | 12 |
 | Linguagem-âncora | **Óxido** (segurança aplicada a som) |
-| Facção home | [[factions\|Underground do Silêncio]] — coordenadora célula jovem |
-| Setting home | [[07-zona-do-silencio\|Zona do Silêncio]] (Casa das Antenas, sub-célula norte) |
+| Facção home | [[factions|Underground do Silêncio]] — coordenadora célula jovem |
+| Setting home | [[07-zona-do-silencio|Zona do Silêncio]] (Casa das Antenas, sub-célula norte) |
 | Role mecânico | Crowd Control (sônico, atordoamento em área) |
 | Signature | **Eco do Cânion** (Sônico + Stream + Área) |
 | Família mágica | Sônico (infrassom, ultrassom, eco, ruído branco) |
@@ -213,7 +213,7 @@ Cada companion tem ficha com 3 estados de Knowledge canônicos:
 | Idade | 13 |
 | Linguagem-âncora | **Asmódico inicial** (pose tradicionalista) → reveal: **C-Arcane vassalo FIR/Sterling** |
 | Facção home | FIR (oficialmente ex; operativo encoberto Sterling Corp) |
-| Setting home | [[06-periferia\|Periferia Industrial]] (oficina Alencar abandonada, vizinhança Penkin) |
+| Setting home | [[06-periferia|Periferia Industrial]] (oficina Alencar abandonada, vizinhança Penkin) |
 | Role mecânico | Suporte hardware (integra componentes, manutenção alheia) |
 | Signature | **Manutenção Preventiva** — entry double-meaning. Layer 1: upgrade de aliados. Layer 2: instala rootkit no Tavus-Drive do Gus (revelado ato 3). |
 | Família mágica | Híbrida (não opera em família elétrica nem cinética isolada; **manipula hardware**) |
@@ -246,8 +246,8 @@ Cada companion tem ficha com 3 estados de Knowledge canônicos:
 | Apelido | "Proxy" |
 | Idade | 11 |
 | Linguagem-âncora | **Pythia** (scripting bio, interpretada) |
-| Facção home | [[factions\|Selve Sombria]] — vilarejo do Pelicano Branco |
-| Setting home | [[08-selve-profunda\|Selve Profunda]] (vilarejo, fronteira Núcleo Mandelbrot) |
+| Facção home | [[factions|Selve Sombria]] — vilarejo do Pelicano Branco |
+| Setting home | [[08-selve-profunda|Selve Profunda]] (vilarejo, fronteira Núcleo Mandelbrot) |
 | Role mecânico | Healer biológica (antídoto, mutação temporária, bio-script) |
 | Signature | **Antídoto Sintético** (Bioquímico + Null + Aliado) |
 | Família mágica | Bioquímico (polímero, antiviral, endorfínico, mutagênico controlado) |
@@ -285,7 +285,7 @@ Cada companion tem ficha com 3 estados de Knowledge canônicos:
 | Idade | adulto (sem confirmação cronológica precisa — operacional) |
 | Linguagem-âncora | **DRE (Dynamic-Runtime Evaluation)** — interpretação total, anti-tese de C-Arcane |
 | Facção home | Sterling Corp (CEO único, monolítico) |
-| Setting home | [[01-cidade-cyber-gotica\|Cúpula Sterling]] (interior euclidiano estéril; exterior Catedrais de Silício corrompidas) |
+| Setting home | [[01-cidade-cyber-gotica|Cúpula Sterling]] (interior euclidiano estéril; exterior Catedrais de Silício corrompidas) |
 | Role no climax | Boss climax 2 fases (Rede Distribuída → Locke Core) |
 | Signature | Reescrita em runtime (deletar variável que não cabe) |
 | Hardware-âncora | **Locke Core** (implante neural cortical, controla rede distribuída) |
@@ -323,7 +323,7 @@ Cada companion tem ficha com 3 estados de Knowledge canônicos:
 | Idade | indeterminada (embrionário pré-Era 3; ancestral possivelmente Neo-Sylvania) |
 | "Linguagem"-âncora | **Anti-padrão** — invalida previsibilidade local; ruído coerente vira ruído genuíno |
 | Facção home | nenhuma (limite do conhecimento personificado) |
-| Setting home | [[08-selve-profunda\|Núcleo Mandelbrot Interno]] (origem); 4 canais ativos cross-settings |
+| Setting home | [[08-selve-profunda|Núcleo Mandelbrot Interno]] (origem); 4 canais ativos cross-settings |
 | Role narrativo | Antagonista-sistema (anti-padrão + consciência alien) |
 | Manifestação | 4 canais: texto glitch no Diário · áudio ambient sussurrante · persona dialogável boss arenas · bug visual shader Perlin |
 | Cross-ref produção | [[characters/patch-zero]] · [[lore-bible]] §8 |
@@ -365,7 +365,7 @@ não sou seu inimigo. ainda.
 | Idade | 40 |
 | Linguagem | Pythia + DRE (formação Cult); pró-Sterling |
 | Facção | Cult Mirage (líder facção pró-Sterling) |
-| Setting | [[05-setor-mirage\|Setor Mirage]] (Catacumbas Cult, Praça do Olho em festivais) |
+| Setting | [[05-setor-mirage|Setor Mirage]] (Catacumbas Cult, Praça do Olho em festivais) |
 | Role | Mini-boss arco Iara |
 | Pulled quote (Gus margem) | "ela manipulou a Iara desde os 6. 'você tem dom para tornar mentiras belas.' (a Iara repetiu pra mim e tremeu na frase. eu anotei.)" |
 | Sticky-note Bloco I | F-058 (foto de Sonja em altar interno Cult, [[in-world-docs]] doc 6); F-082 (Adila evita pronunciar nome "Sonja") |
@@ -392,30 +392,30 @@ Tabela operacional canônica. Cada NPC tem entry-stub no Diário após **convers
 
 | Nome | Idade | Setting home | Função | Hook ambient resumido | Knowledge gate / cross-ref |
 |---|---|---|---|---|---|
-| **Seu Bertoldo Caím** | 62 | [[01-cidade-cyber-gotica\|Núcleo Metropolitano]] | técnico aposentado Era 2; banco fixo da Praça da Compilação 7h-9h | "vocês não viram a Lin Tórun assinar a placa, vocês não sabem o que é nostalgia." | Aliado passivo. Knowledge baixa: 1 hook. Média: 3 hooks (nomes engenheiros Era 2). Alta: leitura placa cripto-glífica sob asfalto, 7 nomes que ninguém lê. Cross-ref [[entries-mapas-timeline\|Mapa 1]]. |
-| **Vanda do Café** | 47 | [[01-cidade-cyber-gotica\|Núcleo Metropolitano]] | vendedora itinerante café-de-neurônio | "o moço do 6º andar dali fica até as 2 da manhã. aquilo não é trabalho, é saudade." (refere a Gargi) | Vetor fofoca. Cobra 3 créditos por café. |
-| **Patrulheiro Donato Fox** | 28 | [[01-cidade-cyber-gotica\|Mercado da Sucata]] | patrulha FIR fixa, não-violento casual | "Sterling diz isso, Sterling diz aquilo. eu só quero o turno acabar." | NPC ambíguo do regime. Foreshadow Vitória Marquês ([[factions]] §3). |
-| **Aprendiz Beatriz Pólvora** | 16 | [[03-catedrais-neo-sylvania\|Catedrais Neo-Sylvania]] | aprendiz atual de Bento, bancada anexa | Engrenagens semiacabadas, caderno em latim de aprendiz. Bento corrige em margem ("respira antes do compasso, B."). | Sub-quest pós-arco Bento: ajudar Beatriz a terminar primeiro projeto autônomo. |
-| **Mestre Hugo Tirol** | 55 | [[03-catedrais-neo-sylvania\|Catedrais]] / [[02-selve-sombria\|Selve]] / [[07-zona-do-silencio\|Zona do Silêncio]] / [[08-selve-profunda\|Selve Profunda]] | Ordem Recursiva; decifrador cripto-glífico (Era 1) — NPC mais cross-setting do jogo | "Atelaiá passou por aqui em -42. eu passo agora. daqui a 50 anos, alguém passa de novo. continuidade." | Diálogo expansivo Knowledge alta. Sub-quest cross-arco Bento + Linda + Jaci. Cross-ref [[entries-docs-descobriveis\|doc 15]] (gate Ouro). |
-| **Hosvaldo Pinhão** | ~50 | [[04-dutos-infernais\|Dutos Infernais]] | técnico-chefe núcleo operacional Pythia | "doze de fluxo, garoto. doze. era ousado." (pós-incidente Cauã arco) | Respeito permanente pós-arco Cauã. Sub-quest Knowledge alta desbloqueia. |
-| **Vespa Calderón** | 24 | [[04-dutos-infernais\|Dutos Infernais]] | scripter rebelde, pichação Pythia "while alive: roda" | NPC pichador; encontrado em corredor 4-leste nível 3 | Aliado periférico Cauã. Não-companion. |
-| **Tao Berisi** | 12 | [[04-dutos-infernais\|Dutos Infernais]] | segundo de Cauã; especialista navegação vertical | "Comutador-Antigo de jogos" ([[comic-reliefs]] EE-16) | Runner juvenil canônico. Lealdade Cauã. |
-| **Inês Marçal** | 11 | [[04-dutos-infernais\|Dutos Infernais]] | runner juvenil; salva por Cauã em -3 | Pequena, ágil, conhecedora dos Dutos profundos | Cimentou relação Cauã pós-incidente. |
-| **Bel Galvão** | 14 | [[04-dutos-infernais\|Dutos Infernais]] | mais velha do grupo runner; treina menores em combate básico | Voz mais firme do grupo após Cauã | Possível mentora secundária. |
-| **Pirilampo** | 13 | [[04-dutos-infernais\|Dutos Infernais]] | apelido (órfão registrado, sem nome formal); ilumina-se com baterias descartadas | Tic de iluminar a si mesmo no escuro | Aliado periférico. |
-| **Tata Bruno** | 10 | [[04-dutos-infernais\|Dutos Infernais]] | caçula do grupo, aprendiz não autorizado a Dutos profundos | Cauã o protege | Sub-quest sentimental Cauã: ensinar Tata a navegar. |
-| **Sérgio Brimber** | 24 | [[05-setor-mirage\|Setor Mirage]] | holografista jovem talentoso; conhecido de Iara desde infância | Suporta facção artista clandestinamente | Sub-quest pós-arco Iara: entrega fita cassete Sonja. Eco pesado em Adila. |
-| **Yara Ducourt** | 47 | [[05-setor-mirage\|Setor Mirage]] | vendedora "mais real que o real" | Comércio Holohaute irregular | Sub-quest Knowledge alta. |
-| **Mestre Hilário Murch** | 64 | [[06-periferia\|Periferia Industrial]] | técnico C-Arcane veterano cético; ex-colega Bartolo Penkin (Apex-Data audit) | Cínico mas honesto | Sub-quest cross-arco Dante: Tiago via Hilário entrega pista. [[entries-docs-descobriveis\|doc 5]] decifrável com ajuda dele. |
-| **Padim Tércio Almagre** | 58 | [[06-periferia\|Periferia Industrial]] | mestre confiante em Dante (a tragédia silenciosa) | Sente algo mas não verbaliza | Subtexto puro. Sticky-note Bloco I F-076. |
-| **Senhor Mateus Penkin** | 62 | [[06-periferia\|Periferia Industrial]] | vizinho fofoqueiro quintal Alencar (vizinhança imediata Dante) | Antena no telhado (foreshadow cabo Sterling) | Cross-ref foreshadow F-093 (terminal extra lacrado oficina). |
-| **Joaquim Bartolomeu** | 32 | [[07-zona-do-silencio\|Zona do Silêncio]] | técnico analógico; reconstrói toca-discos artesanalmente; filho de luthiers | Mistura peças Era 2 + impressas em casa. Som "ligeiramente errado. funciona." | Sub-quest cross-arco Iara (extrai áudio fita Sonja). |
-| **Mara Bento** | 28 | [[07-zona-do-silencio\|Zona do Silêncio]] | operadora rádio analógica sub-célula Norte | Guarda vinil "Última Frequência" partido em 3 pedaços | Tem dois filhos pequenos. Conhece transmissões Cidades-Gêmeas. |
-| **Helga Riza** | 45 | [[07-zona-do-silencio\|Zona do Silêncio]] | escritora subterrânea; compila pichações Polis-Vermelha | Arquivo Underground | Cross-ref [[entries-docs-descobriveis\|doc 11]]. |
-| **Anciã Mariana Vanderbist** | 89 | [[08-selve-profunda\|Pelicano Branco]] | avó Jaci; líder informal vilarejo; lê Selve | Sabe ler Selve há décadas | Mentora cautelosa (não toma protagonismo). Suspeita Sterling desde -8. |
-| **Bito Caldeira** | 60 | [[08-selve-profunda\|Pelicano Branco]] | prefeito informal vilarejo ([[comic-reliefs]] EE-14) | Decisões coletivas passam por ele formalmente; substância vem da Anciã | NPC pacífico. |
-| **Tatauín Branca** | 22 | [[08-selve-profunda\|Pelicano Branco]] | caçadora-coletora veterana; conhece Selve Profunda | "se você ver a copa parar de respirar, você não estava na floresta. estava no que ela não é." | Aliada útil. Sub-quest navegação Pântano. |
-| **Vivendel Berenger** | 14 | [[08-selve-profunda\|Pelicano Branco]] | bio-hacker Pythia rival/aliado de Jaci | Competição amigável síntese antídoto | Jaci comenta "perdão de ponto-e-vírgula" ([[comic-reliefs]] cena 2). Recompensa token Pythia composto. |
+| **Seu Bertoldo Caím** | 62 | [[01-cidade-cyber-gotica|Núcleo Metropolitano]] | técnico aposentado Era 2; banco fixo da Praça da Compilação 7h-9h | "vocês não viram a Lin Tórun assinar a placa, vocês não sabem o que é nostalgia." | Aliado passivo. Knowledge baixa: 1 hook. Média: 3 hooks (nomes engenheiros Era 2). Alta: leitura placa cripto-glífica sob asfalto, 7 nomes que ninguém lê. Cross-ref [[entries-mapas-timeline|Mapa 1]]. |
+| **Vanda do Café** | 47 | [[01-cidade-cyber-gotica|Núcleo Metropolitano]] | vendedora itinerante café-de-neurônio | "o moço do 6º andar dali fica até as 2 da manhã. aquilo não é trabalho, é saudade." (refere a Gargi) | Vetor fofoca. Cobra 3 créditos por café. |
+| **Patrulheiro Donato Fox** | 28 | [[01-cidade-cyber-gotica|Mercado da Sucata]] | patrulha FIR fixa, não-violento casual | "Sterling diz isso, Sterling diz aquilo. eu só quero o turno acabar." | NPC ambíguo do regime. Foreshadow Vitória Marquês ([[factions]] §3). |
+| **Aprendiz Beatriz Pólvora** | 16 | [[03-catedrais-neo-sylvania|Catedrais Neo-Sylvania]] | aprendiz atual de Bento, bancada anexa | Engrenagens semiacabadas, caderno em latim de aprendiz. Bento corrige em margem ("respira antes do compasso, B."). | Sub-quest pós-arco Bento: ajudar Beatriz a terminar primeiro projeto autônomo. |
+| **Mestre Hugo Tirol** | 55 | [[03-catedrais-neo-sylvania|Catedrais]] / [[02-selve-sombria|Selve]] / [[07-zona-do-silencio|Zona do Silêncio]] / [[08-selve-profunda|Selve Profunda]] | Ordem Recursiva; decifrador cripto-glífico (Era 1) — NPC mais cross-setting do jogo | "Atelaiá passou por aqui em -42. eu passo agora. daqui a 50 anos, alguém passa de novo. continuidade." | Diálogo expansivo Knowledge alta. Sub-quest cross-arco Bento + Linda + Jaci. Cross-ref [[entries-docs-descobriveis|doc 15]] (gate Ouro). |
+| **Hosvaldo Pinhão** | ~50 | [[04-dutos-infernais|Dutos Infernais]] | técnico-chefe núcleo operacional Pythia | "doze de fluxo, garoto. doze. era ousado." (pós-incidente Cauã arco) | Respeito permanente pós-arco Cauã. Sub-quest Knowledge alta desbloqueia. |
+| **Vespa Calderón** | 24 | [[04-dutos-infernais|Dutos Infernais]] | scripter rebelde, pichação Pythia "while alive: roda" | NPC pichador; encontrado em corredor 4-leste nível 3 | Aliado periférico Cauã. Não-companion. |
+| **Tao Berisi** | 12 | [[04-dutos-infernais|Dutos Infernais]] | segundo de Cauã; especialista navegação vertical | "Comutador-Antigo de jogos" ([[comic-reliefs]] EE-16) | Runner juvenil canônico. Lealdade Cauã. |
+| **Inês Marçal** | 11 | [[04-dutos-infernais|Dutos Infernais]] | runner juvenil; salva por Cauã em -3 | Pequena, ágil, conhecedora dos Dutos profundos | Cimentou relação Cauã pós-incidente. |
+| **Bel Galvão** | 14 | [[04-dutos-infernais|Dutos Infernais]] | mais velha do grupo runner; treina menores em combate básico | Voz mais firme do grupo após Cauã | Possível mentora secundária. |
+| **Pirilampo** | 13 | [[04-dutos-infernais|Dutos Infernais]] | apelido (órfão registrado, sem nome formal); ilumina-se com baterias descartadas | Tic de iluminar a si mesmo no escuro | Aliado periférico. |
+| **Tata Bruno** | 10 | [[04-dutos-infernais|Dutos Infernais]] | caçula do grupo, aprendiz não autorizado a Dutos profundos | Cauã o protege | Sub-quest sentimental Cauã: ensinar Tata a navegar. |
+| **Sérgio Brimber** | 24 | [[05-setor-mirage|Setor Mirage]] | holografista jovem talentoso; conhecido de Iara desde infância | Suporta facção artista clandestinamente | Sub-quest pós-arco Iara: entrega fita cassete Sonja. Eco pesado em Adila. |
+| **Yara Ducourt** | 47 | [[05-setor-mirage|Setor Mirage]] | vendedora "mais real que o real" | Comércio Holohaute irregular | Sub-quest Knowledge alta. |
+| **Mestre Hilário Murch** | 64 | [[06-periferia|Periferia Industrial]] | técnico C-Arcane veterano cético; ex-colega Bartolo Penkin (Apex-Data audit) | Cínico mas honesto | Sub-quest cross-arco Dante: Tiago via Hilário entrega pista. [[entries-docs-descobriveis|doc 5]] decifrável com ajuda dele. |
+| **Padim Tércio Almagre** | 58 | [[06-periferia|Periferia Industrial]] | mestre confiante em Dante (a tragédia silenciosa) | Sente algo mas não verbaliza | Subtexto puro. Sticky-note Bloco I F-076. |
+| **Senhor Mateus Penkin** | 62 | [[06-periferia|Periferia Industrial]] | vizinho fofoqueiro quintal Alencar (vizinhança imediata Dante) | Antena no telhado (foreshadow cabo Sterling) | Cross-ref foreshadow F-093 (terminal extra lacrado oficina). |
+| **Joaquim Bartolomeu** | 32 | [[07-zona-do-silencio|Zona do Silêncio]] | técnico analógico; reconstrói toca-discos artesanalmente; filho de luthiers | Mistura peças Era 2 + impressas em casa. Som "ligeiramente errado. funciona." | Sub-quest cross-arco Iara (extrai áudio fita Sonja). |
+| **Mara Bento** | 28 | [[07-zona-do-silencio|Zona do Silêncio]] | operadora rádio analógica sub-célula Norte | Guarda vinil "Última Frequência" partido em 3 pedaços | Tem dois filhos pequenos. Conhece transmissões Cidades-Gêmeas. |
+| **Helga Riza** | 45 | [[07-zona-do-silencio|Zona do Silêncio]] | escritora subterrânea; compila pichações Polis-Vermelha | Arquivo Underground | Cross-ref [[entries-docs-descobriveis|doc 11]]. |
+| **Anciã Mariana Vanderbist** | 89 | [[08-selve-profunda|Pelicano Branco]] | avó Jaci; líder informal vilarejo; lê Selve | Sabe ler Selve há décadas | Mentora cautelosa (não toma protagonismo). Suspeita Sterling desde -8. |
+| **Bito Caldeira** | 60 | [[08-selve-profunda|Pelicano Branco]] | prefeito informal vilarejo ([[comic-reliefs]] EE-14) | Decisões coletivas passam por ele formalmente; substância vem da Anciã | NPC pacífico. |
+| **Tatauín Branca** | 22 | [[08-selve-profunda|Pelicano Branco]] | caçadora-coletora veterana; conhece Selve Profunda | "se você ver a copa parar de respirar, você não estava na floresta. estava no que ela não é." | Aliada útil. Sub-quest navegação Pântano. |
+| **Vivendel Berenger** | 14 | [[08-selve-profunda|Pelicano Branco]] | bio-hacker Pythia rival/aliado de Jaci | Competição amigável síntese antídoto | Jaci comenta "perdão de ponto-e-vírgula" ([[comic-reliefs]] cena 2). Recompensa token Pythia composto. |
 
 **Notas operacionais:**
 
@@ -463,11 +463,11 @@ Cada facção tem ficha visual + texto. Knowledge cresce em 3 estados como nos c
 | Líderes | Mestre-Hierofante Velhusto (70) + Lavínia Sevra (62) + Hugo Tirol (55) |
 | Aliados | Selve Sombria, Underground, Gus + party (pós-arco Bento) |
 | Inimigos | Sterling Corp (pós-arco Bento), facção pró-modernização interna (purgada off-screen) |
-| Setting | [[03-catedrais-neo-sylvania\|Catedrais Neo-Sylvania]] (5 conhecidas, 3 ativas) |
+| Setting | [[03-catedrais-neo-sylvania|Catedrais Neo-Sylvania]] (5 conhecidas, 3 ativas) |
 | Slogan | "O que dura, dura. O que passa, passa." |
 | Knowledge baixa | "tradicionalistas. catedrais. cronômetros de latão." |
 | Knowledge média | "rachadura interna: tradicionalistas vs pró-modernização. Bento sucessor designado. -7 Hilário Tepenkov morto." |
-| Knowledge alta | "Atelaiá Chevalier (-115) codificou Asmódico. -80 Tragédia São Camilo. -3 saque São Vargas, Falke + Rui sumiram. -0.5 Aldebrando eliminado (diário entregue Bento, [[entries-docs-descobriveis\|doc 9]])." |
+| Knowledge alta | "Atelaiá Chevalier (-115) codificou Asmódico. -80 Tragédia São Camilo. -3 saque São Vargas, Falke + Rui sumiram. -0.5 Aldebrando eliminado (diário entregue Bento, [[entries-docs-descobriveis|doc 9]])." |
 
 ### 4.3 FIR (Federação Industrial de Reciclagem)
 
@@ -484,7 +484,7 @@ Cada facção tem ficha visual + texto. Knowledge cresce em 3 estados como nos c
 | Líderes | Diretor Cassiano Vorto (50) + sub-diretores Heitor Cravo, Vitória Marquês (dissidente potencial), Otelo Pancha, Floriana Etti |
 | Aliados | Sterling Corp (suserano); Cult Mirage (negócios comuns) |
 | Inimigos | Cooperativas independentes Periferia; Underground; Ordem Recursiva (filosoficamente); Gus + party (pós-arco Cauã/Dante) |
-| Setting | [[06-periferia\|Periferia Industrial]] + escritórios Núcleo Metropolitano (frente legal) |
+| Setting | [[06-periferia|Periferia Industrial]] + escritórios Núcleo Metropolitano (frente legal) |
 | Slogan público | "FIR — circularidade que constrói futuro." |
 | Knowledge baixa | "uniforme amarelo, cassetete elétrico. dupla. cota." |
 | Knowledge média | "Vorto cabeça em GusWorld City. distritos rotacionais. -5 Subestação 7 (Davi). -8 cooperativa Alencar. -5 Dante aliciado." |
@@ -504,7 +504,7 @@ Cada facção tem ficha visual + texto. Knowledge cresce em 3 estados como nos c
 | Líderes | sem hierarquia formal; Anciã Mariana Vanderbist (89) é líder informal Pelicano Branco. 3 outras aldeias com anciões: Berenice Quaresma (Tucano-Cinza, 80), Otília Pamonha (Pelicano Roxo, 73), Bartolomeu Quintino (Tartaruga-Fractal, 78) |
 | Aliados | Ordem Recursiva, Underground, Gus + party (pós-arco Jaci) |
 | Inimigos | Sterling Corp (extração), FIR (predação), Patch-Zero (corrompe) |
-| Setting | [[02-selve-sombria\|Selve Sombria]] + [[08-selve-profunda\|Selve Profunda]] |
+| Setting | [[02-selve-sombria|Selve Sombria]] + [[08-selve-profunda|Selve Profunda]] |
 | Knowledge baixa | "floresta. fauna estranha. cogumelos brilham." |
 | Knowledge média | "Fibonacci. fractais. Pântano de Markov estocástico. fauna comporta-se em padrão." |
 | Knowledge alta | "L-systems Orla Recursiva, cadeias de Markov Pântano, Mandelbrot Núcleo. fauna corrompida = Patch-Zero local. sementes-relíquia preservadas em câmaras Era 1 dentro das catedrais." |
@@ -526,10 +526,10 @@ Cada facção tem ficha visual + texto. Knowledge cresce em 3 estados como nos c
 | Líderes artistas | Florín Estopa (38) + Marlena Aurora (35, detida) + Patrício Velô (42) |
 | Aliados | Sterling Corp (facção pró); Gus + party (facção artista, pós-arco Iara) |
 | Inimigos | Underground (estética antitética); Ordem Recursiva (indiferença irônica); Iara desertora |
-| Setting | [[05-setor-mirage\|Setor Mirage]] inteiro |
+| Setting | [[05-setor-mirage|Setor Mirage]] inteiro |
 | Knowledge baixa | "cor saturada. holografia em loop. adeptos parecem todos iguais." |
 | Knowledge média | "facção pró + facção artista. Adila manipula Iara desde 6. -1 Atualização Sensorial planejada como extração massiva." |
-| Knowledge alta | "Sonja Murmúrio (mãe Adila, co-fundadora original) morta em -34 em circunstâncias nunca esclarecidas; Adila (6 anos) assume liderança facção pró-Sterling sob tutela transitória no mesmo ano. Pacto Sensorial = cessão de dados ([[entries-docs-descobriveis\|doc 4]])." |
+| Knowledge alta | "Sonja Murmúrio (mãe Adila, co-fundadora original) morta em -34 em circunstâncias nunca esclarecidas; Adila (6 anos) assume liderança facção pró-Sterling sob tutela transitória no mesmo ano. Pacto Sensorial = cessão de dados ([[entries-docs-descobriveis|doc 4]])." |
 
 ### 4.6 Underground do Silêncio
 
@@ -545,11 +545,11 @@ Cada facção tem ficha visual + texto. Knowledge cresce em 3 estados como nos c
 | Líderes | sem líder único; coordenador rotativo. Atual GusWorld City: Padrinho Tiago Sevroski (55). Cidades-Gêmeas: Lazar Tovrov (60) + Penha Cintra (45). Polis-Vermelha residual: anônimos |
 | Aliados | Cidades-Gêmeas Underground; Polis-Vermelha residual; Ordem Recursiva; Selve Sombria; Gus + party (pós-arco Linda) |
 | Inimigos | Sterling Corp; Cult Mirage; FIR |
-| Setting | [[07-zona-do-silencio\|Zona do Silêncio]] (antenas mortas reaproveitadas) |
+| Setting | [[07-zona-do-silencio|Zona do Silêncio]] (antenas mortas reaproveitadas) |
 | Slogan | "Quem escuta, escuta tudo. Quem fala demais, é ouvido por todos." |
 | Knowledge baixa | "antenas mortas. silêncio. dois dedos na orelha (cumprimento)." |
 | Knowledge média | "células descentralizadas. rádio analógica cifrada (Óxido sônico). -50 Batida Casa das Antenas. Última Frequência canônica." |
-| Knowledge alta | "-16 audit Apex-Data preservado ([[entries-docs-descobriveis\|doc 5]]). -2 Polis-Vermelha cai, Tiago sai aposentadoria. transmissões fragmentadas residuais." |
+| Knowledge alta | "-16 audit Apex-Data preservado ([[entries-docs-descobriveis|doc 5]]). -2 Polis-Vermelha cai, Tiago sai aposentadoria. transmissões fragmentadas residuais." |
 
 ### 4.7 Dutos Infernais (comunidade descentralizada juvenil)
 
@@ -565,7 +565,7 @@ Cada facção tem ficha visual + texto. Knowledge cresce em 3 estados como nos c
 | Líderes | sem hierarquia; Cauã líder informal. Segundo: Tao Berisi (12). Outros: Bel Galvão (14), Inês Marçal (11), Pirilampo (13), Tata Bruno (10). Facção radical interna: Calixto Rivaz (15, expulso/morto pós-arco Cauã sub-quest) |
 | Aliados | Underground (pós-arco Linda); Selve indireta |
 | Inimigos | FIR (frontal); Sterling Corp (indireto) |
-| Setting | [[04-dutos-infernais\|Dutos Infernais]] |
+| Setting | [[04-dutos-infernais|Dutos Infernais]] |
 | Cumprimento canônico | "Tá no fio." / "Tá no volt." |
 | Knowledge baixa | "garotada nos Dutos. corre rápido. carne-de-rato-cinético." |
 | Knowledge média | "Cauã lidera. Tao segundo. cooperativa post-Davi. ataque suicida Calixto destruiu ala radical." |
@@ -588,32 +588,32 @@ Patch-Zero é exceção: páginas glitcham permanentemente. Stats nunca "estabil
 
 | Inimigo | Setting | Stats observados (página 1) | Stats completos (página 4) | Fraqueza | Loot | Companion-counter |
 |---|---|---|---|---|---|---|
-| **Drone Patrulha FIR Mk-II** | [[01-cidade-cyber-gotica\|Núcleo Metropolitano]] + [[06-periferia\|Periferia]] | HP médio. Ataque: descarga elétrica cone curto. | HP 12. Cooldown EM 3 turnos. Motherboard exposta no torso traseiro. | Pulso EM atordoa 2 turnos; alvo de ataque cinético na motherboard exposta | sucata Sterling, token Elétrico baixo | **Cauã** (Pulso EM Concêntrico finaliza grupos de 3+) |
-| **Patrulheiro FIR** | [[01-cidade-cyber-gotica\|Mercado da Sucata Honesta]] + [[06-periferia]] | HP baixo. Ataque: cassetete elétrico. | HP 8. Recua a 30% HP (chama backup). Ignora ordens superiores se Knowledge alta + sub-quest Vitória Marquês ativa. | Crowd control sônico atordoa cassette antes de carregar | crédito, fragmento de cota | **Linda** (Eco do Cânion paralisa grupo) |
-| **Enforcer Sterling Corp** | [[01-cidade-cyber-gotica\|Tetra-Torre Janelarum]] base | HP alto. Ataque: chuva de mini-drones perfuradores. | HP 18. Locke-link a Cúpula Sterling: respawn se não eliminado em 2 turnos. | Refração criptográfica corta sinal Locke | hardware corporativo, token Criptográfico médio | **Iara** (Decoy Lumen quebra mira) |
-| **Coletor de Cota FIR** | [[06-periferia\|Periferia Industrial]] | HP médio. Ataque: cabo de extração corporal. | HP 14. Imune a 1 turno do primeiro ataque (escudo cota). Solta loot ao morrer. | Cinético quebra escudo cota; depois alvo qualquer | crédito alto, voucher Janelarum | **Bento** (Cronômetro Ressonante quebra cadência escudo) |
-| **Voz Cromada Sterling (entidade ambient hostil)** | [[01-cidade-cyber-gotica\|Núcleo Metropolitano]] + [[05-setor-mirage]] | HP indireto (mensagem). Ataque: voz "continue" causa atordoamento mental. | Persistente; não morre. Silenciável por 4 turnos com Mantra do Silêncio. | Sônico Null cancela transmissão | nada material; **info ambient destravada** | **Linda** (Mantra do Silêncio cancela transmissão por 4 turnos) |
+| **Drone Patrulha FIR Mk-II** | [[01-cidade-cyber-gotica|Núcleo Metropolitano]] + [[06-periferia|Periferia]] | HP médio. Ataque: descarga elétrica cone curto. | HP 12. Cooldown EM 3 turnos. Motherboard exposta no torso traseiro. | Pulso EM atordoa 2 turnos; alvo de ataque cinético na motherboard exposta | sucata Sterling, token Elétrico baixo | **Cauã** (Pulso EM Concêntrico finaliza grupos de 3+) |
+| **Patrulheiro FIR** | [[01-cidade-cyber-gotica|Mercado da Sucata Honesta]] + [[06-periferia]] | HP baixo. Ataque: cassetete elétrico. | HP 8. Recua a 30% HP (chama backup). Ignora ordens superiores se Knowledge alta + sub-quest Vitória Marquês ativa. | Crowd control sônico atordoa cassette antes de carregar | crédito, fragmento de cota | **Linda** (Eco do Cânion paralisa grupo) |
+| **Enforcer Sterling Corp** | [[01-cidade-cyber-gotica|Tetra-Torre Janelarum]] base | HP alto. Ataque: chuva de mini-drones perfuradores. | HP 18. Locke-link a Cúpula Sterling: respawn se não eliminado em 2 turnos. | Refração criptográfica corta sinal Locke | hardware corporativo, token Criptográfico médio | **Iara** (Decoy Lumen quebra mira) |
+| **Coletor de Cota FIR** | [[06-periferia|Periferia Industrial]] | HP médio. Ataque: cabo de extração corporal. | HP 14. Imune a 1 turno do primeiro ataque (escudo cota). Solta loot ao morrer. | Cinético quebra escudo cota; depois alvo qualquer | crédito alto, voucher Janelarum | **Bento** (Cronômetro Ressonante quebra cadência escudo) |
+| **Voz Cromada Sterling (entidade ambient hostil)** | [[01-cidade-cyber-gotica|Núcleo Metropolitano]] + [[05-setor-mirage]] | HP indireto (mensagem). Ataque: voz "continue" causa atordoamento mental. | Persistente; não morre. Silenciável por 4 turnos com Mantra do Silêncio. | Sônico Null cancela transmissão | nada material; **info ambient destravada** | **Linda** (Mantra do Silêncio cancela transmissão por 4 turnos) |
 
 ### 5.2 Inimigos da Selve (5)
 
 | Inimigo | Setting | Stats página 1 | Stats página 4 | Fraqueza | Loot | Companion-counter |
 |---|---|---|---|---|---|---|
-| **Raposa-Fractal corrompida** | [[02-selve-sombria\|Orla Recursiva]] | HP médio. Ataque: mordida em padrão Fibonacci. | HP 11. Padrão Fibonacci corrompido (números errados → sintoma Patch-Zero local). | Bioquímico Null cura corrupção (NÃO mata; transforma em raposa neutra) | semente-relíquia, token Bioquímico | **Jaci** (Antídoto Sintético converte em aliada temporária 3 turnos) |
-| **Coruja-Mandelbrot** | [[02-selve-sombria\|Pântano de Markov]] | HP alto. Ataque: olhar recursivo (debuff confusão). | HP 16. Padrão Markov estocástico — telegrafia varia. Boss-tier 3 estados (calm/agitada/recursiva infinita). | Cinético compressivo paralisa ciclo recursivo | pena-Mandelbrot, token Cinético médio | **Bento** (Vetor de Recuo + Cronômetro Ressonante) |
-| **Larva-Polinomial** | [[02-selve-sombria\|Orla Recursiva]] | HP baixo. Ataque: cuspe ácido. | HP 6. Multiplica em 3 polinômios de grau 2 se 1 sobrevive 2 turnos. | Pulso EM atordoa antes de multiplicar | polímero Pythia, token Bioquímico baixo | **Cauã** + **Jaci** (combo: EM + Antídoto) |
-| **Anomalia Glitch (Patch-Zero infectado)** | [[02-selve-sombria\|Pântano]] + [[08-selve-profunda\|Núcleo Mandelbrot Interno]] | HP **glitch — número não estabiliza**. Ataque: visual descontínuo. | Não estabiliza nunca. Página 4 do bestiary tem glitch tipográfico permanente. Telegrafia falha. | Nenhuma fraqueza catalogada; **selável**, não eliminável | nada material; **info Bloco I** (sticky-notes Patch-Zero) | nenhum companion único; combo party 3+ necessário |
-| **Fungo-Recursivo Patogênico** | [[08-selve-profunda\|Selve Profunda]] | HP médio. Ataque: esporos respiratórios em área. | HP 13. Esporos propagam contaminação se aliado não cura em 2 turnos. | Bioquímico Null limpa contágio; Sônico ultrassom quebra esporo | espora-mãe, token Bioquímico médio | **Jaci** (Antídoto em área) + **Linda** (ultrassom suporte) |
+| **Raposa-Fractal corrompida** | [[02-selve-sombria|Orla Recursiva]] | HP médio. Ataque: mordida em padrão Fibonacci. | HP 11. Padrão Fibonacci corrompido (números errados → sintoma Patch-Zero local). | Bioquímico Null cura corrupção (NÃO mata; transforma em raposa neutra) | semente-relíquia, token Bioquímico | **Jaci** (Antídoto Sintético converte em aliada temporária 3 turnos) |
+| **Coruja-Mandelbrot** | [[02-selve-sombria|Pântano de Markov]] | HP alto. Ataque: olhar recursivo (debuff confusão). | HP 16. Padrão Markov estocástico — telegrafia varia. Boss-tier 3 estados (calm/agitada/recursiva infinita). | Cinético compressivo paralisa ciclo recursivo | pena-Mandelbrot, token Cinético médio | **Bento** (Vetor de Recuo + Cronômetro Ressonante) |
+| **Larva-Polinomial** | [[02-selve-sombria|Orla Recursiva]] | HP baixo. Ataque: cuspe ácido. | HP 6. Multiplica em 3 polinômios de grau 2 se 1 sobrevive 2 turnos. | Pulso EM atordoa antes de multiplicar | polímero Pythia, token Bioquímico baixo | **Cauã** + **Jaci** (combo: EM + Antídoto) |
+| **Anomalia Glitch (Patch-Zero infectado)** | [[02-selve-sombria|Pântano]] + [[08-selve-profunda|Núcleo Mandelbrot Interno]] | HP **glitch — número não estabiliza**. Ataque: visual descontínuo. | Não estabiliza nunca. Página 4 do bestiary tem glitch tipográfico permanente. Telegrafia falha. | Nenhuma fraqueza catalogada; **selável**, não eliminável | nada material; **info Bloco I** (sticky-notes Patch-Zero) | nenhum companion único; combo party 3+ necessário |
+| **Fungo-Recursivo Patogênico** | [[08-selve-profunda|Selve Profunda]] | HP médio. Ataque: esporos respiratórios em área. | HP 13. Esporos propagam contaminação se aliado não cura em 2 turnos. | Bioquímico Null limpa contágio; Sônico ultrassom quebra esporo | espora-mãe, token Bioquímico médio | **Jaci** (Antídoto em área) + **Linda** (ultrassom suporte) |
 
 ### 5.3 Inimigos cross-settings (Catedrais / Dutos / Mirage / Periferia / Silêncio) (6)
 
 | Inimigo | Setting | Stats página 1 | Stats página 4 | Fraqueza | Loot | Companion-counter |
 |---|---|---|---|---|---|---|
-| **Mestre pró-Sterling Asmódico (3 inimigos coletivos)** | [[03-catedrais-neo-sylvania\|Catedrais Neo-Sylvania]] (cena contaminação arco Bento) | HP alto coletivo. Ataque: cinético rotacional + escudo cronômetro. | HP 14 cada. Sincronizam cronômetros mecânicos — combate em cadência. | Quebrar cadência (Cronômetro Ressonante reverso) desorienta os 3 | engrenagens valiosas, token Cinético médio | **Bento** (Cronômetro Ressonante reverso) — duelo simbólico interno Ordem |
-| **Drone-Operário FIR (Dutos)** | [[04-dutos-infernais\|Posto FIR Duto 7]] | HP médio. Ataque: serra plasma cinética. | HP 10. Bug exploit: para 1 turno se temperatura ambiente sobe acima de 70°C (Hosvaldo confirma). | Aproveitar turbina superaquecida; **EM + Pythia improvisada** quebra firmware | sucata cinética, token Elétrico médio | **Cauã** (signature local) |
-| **Adepto Cult Mirage hostil** | [[05-setor-mirage\|Catacumbas Cult]] festival sabotado | HP baixo. Ataque: refração holográfica (debuff visão). | HP 7. Imune se Iara não está na party (refração reconhece). Não-letal se rendido (Pillar 4: não matar adeptos). | Decoy Lumen quebra refração; rendição via diálogo | fragmento Holohaute, token Criptográfico baixo | **Iara** (signature local) |
-| **Tropa de extração FIR Periferia** | [[06-periferia\|Subestação 11]] | HP médio coletivo. Ataque: cordada de cabos cinética. | HP 9 cada (4 inimigos). Recuam em 2 turnos se líder cai. | Eliminar líder (alto à direita do grupo); cinético quebra cabos | crédito + cota | **Dante** pré-reveal usa ironicamente (sticky-note Bloco I retroativo) |
-| **Drone Camuflado Sterling (estação retransmissora)** | [[08-selve-profunda\|estação retransmissora oculta]] | HP alto. Ataque: scan paralisante. | HP 17. Camuflagem como pedra; Cauã detecta via EM. Sub-quest ato 2-3 destrava combate. | EM revela; Refração quebra scan | mapa retransmissor cifrado, token Elétrico alto | **Cauã** (detecção) + **Iara** (refração) |
-| **Sentinela Acústico Sterling (Silêncio)** | [[07-zona-do-silencio\|Casa das Antenas]] arco Linda | HP médio. Ataque: pulso ultrassom de área. | HP 11. Bug exploit: silêncio total dele desativa próprio firmware. | Mantra do Silêncio + Linda canta em frequência morta | cabo Óxido autêntico, token Sônico médio | **Linda** (signature local) |
+| **Mestre pró-Sterling Asmódico (3 inimigos coletivos)** | [[03-catedrais-neo-sylvania|Catedrais Neo-Sylvania]] (cena contaminação arco Bento) | HP alto coletivo. Ataque: cinético rotacional + escudo cronômetro. | HP 14 cada. Sincronizam cronômetros mecânicos — combate em cadência. | Quebrar cadência (Cronômetro Ressonante reverso) desorienta os 3 | engrenagens valiosas, token Cinético médio | **Bento** (Cronômetro Ressonante reverso) — duelo simbólico interno Ordem |
+| **Drone-Operário FIR (Dutos)** | [[04-dutos-infernais|Posto FIR Duto 7]] | HP médio. Ataque: serra plasma cinética. | HP 10. Bug exploit: para 1 turno se temperatura ambiente sobe acima de 70°C (Hosvaldo confirma). | Aproveitar turbina superaquecida; **EM + Pythia improvisada** quebra firmware | sucata cinética, token Elétrico médio | **Cauã** (signature local) |
+| **Adepto Cult Mirage hostil** | [[05-setor-mirage|Catacumbas Cult]] festival sabotado | HP baixo. Ataque: refração holográfica (debuff visão). | HP 7. Imune se Iara não está na party (refração reconhece). Não-letal se rendido (Pillar 4: não matar adeptos). | Decoy Lumen quebra refração; rendição via diálogo | fragmento Holohaute, token Criptográfico baixo | **Iara** (signature local) |
+| **Tropa de extração FIR Periferia** | [[06-periferia|Subestação 11]] | HP médio coletivo. Ataque: cordada de cabos cinética. | HP 9 cada (4 inimigos). Recuam em 2 turnos se líder cai. | Eliminar líder (alto à direita do grupo); cinético quebra cabos | crédito + cota | **Dante** pré-reveal usa ironicamente (sticky-note Bloco I retroativo) |
+| **Drone Camuflado Sterling (estação retransmissora)** | [[08-selve-profunda|estação retransmissora oculta]] | HP alto. Ataque: scan paralisante. | HP 17. Camuflagem como pedra; Cauã detecta via EM. Sub-quest ato 2-3 destrava combate. | EM revela; Refração quebra scan | mapa retransmissor cifrado, token Elétrico alto | **Cauã** (detecção) + **Iara** (refração) |
+| **Sentinela Acústico Sterling (Silêncio)** | [[07-zona-do-silencio|Casa das Antenas]] arco Linda | HP médio. Ataque: pulso ultrassom de área. | HP 11. Bug exploit: silêncio total dele desativa próprio firmware. | Mantra do Silêncio + Linda canta em frequência morta | cabo Óxido autêntico, token Sônico médio | **Linda** (signature local) |
 
 ### 5.4 Boss tier (climax 2 fases + Patch-Zero condicional) (3)
 

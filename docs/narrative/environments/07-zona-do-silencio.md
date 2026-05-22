@@ -53,7 +53,7 @@ O único dos doze postos enterrados do experimento Sterling que ficou parcialmen
 
 | Prop | Onde | O que conta |
 |---|---|---|
-| Agulha de toca-discos em pingente | pescoço da [[linda-siren\|Linda]] | Wound canônico (batida -8). Otmar salvou agulha do toca-discos histórico antes da apreensão FIR. Linda usa há quatro anos sem tirar. |
+| Agulha de toca-discos em pingente | pescoço da [[linda-siren|Linda]] | Wound canônico (batida -8). Otmar salvou agulha do toca-discos histórico antes da apreensão FIR. Linda usa há quatro anos sem tirar. |
 | Toca-discos artesanal restaurado | bancada de Joaquim Bartolomeu (sub-célula norte) | Joaquim reconstrói toca-discos para famílias Underground que perderam o seu. Mistura peças Era 2 com peças impressas em casa. Resultado: som ligeiramente metálico, ligeiramente quente, ligeiramente errado. Funciona. |
 | Cabo de cobre trançado pendurado em gancho | base Torre Mater | Linha de transmissão analógica original (ano -65). Ainda vibra em frequência específica quando recebe sinal das Cidades-Gêmeas. Tiago verifica diariamente apoiando dois dedos. |
 | Vinil "Última Frequência" partido em três pedaços | gaveta da casa de Mara Bento (sub-célula norte) | Cópia original da gravação dos oito técnicos desaparecidos na batida -50. Apenas três cópias completas conhecidas existem. Mara guarda os três pedaços por superstição (a peça quebrou em -2 quando ela soube de Polis-Vermelha). Continua tocável se montado com cuidado. |

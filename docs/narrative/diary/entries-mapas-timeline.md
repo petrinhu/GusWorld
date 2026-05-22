@@ -62,18 +62,18 @@ Cada mapa segue padrão fixo:
 
 | Pin | Landmark | Localização | Era predominante | Cross-ref |
 |---|---|---|---|---|
-| azul | **Praça da Compilação** | Centro civil Núcleo Metropolitano | Era 1 sob Era 2 (pedra cripto-glífica sob asfalto) | [[01-cidade-cyber-gotica\|§2]] |
-| azul | **Edifício Vance** | Lado leste Núcleo, 6º andar (apartamento Vance) | Era 2 | [[01-cidade-cyber-gotica\|§2]] · save base canônica |
-| azul | **Mercado da Sucata Honesta** | Entre Núcleo e Periferia (fronteira nordeste) | Era 2/Era 3 misto | [[01-cidade-cyber-gotica\|§2]] · sub-quest Inácia Berenger |
-| cinza | **Tetra-Torre Janelarum** | Lado norte Núcleo | Era 3 pura | [[01-cidade-cyber-gotica\|§2]] · terminal público doc 12 |
-| cinza | **Anel Verde** | Fronteira leste (portal pra Selve) | Era 2 ruína + Era 3 corrompida | [[01-cidade-cyber-gotica\|§2]] · gateway natural Selve |
+| azul | **Praça da Compilação** | Centro civil Núcleo Metropolitano | Era 1 sob Era 2 (pedra cripto-glífica sob asfalto) | [[01-cidade-cyber-gotica|§2]] |
+| azul | **Edifício Vance** | Lado leste Núcleo, 6º andar (apartamento Vance) | Era 2 | [[01-cidade-cyber-gotica|§2]] · save base canônica |
+| azul | **Mercado da Sucata Honesta** | Entre Núcleo e Periferia (fronteira nordeste) | Era 2/Era 3 misto | [[01-cidade-cyber-gotica|§2]] · sub-quest Inácia Berenger |
+| cinza | **Tetra-Torre Janelarum** | Lado norte Núcleo | Era 3 pura | [[01-cidade-cyber-gotica|§2]] · terminal público doc 12 |
+| cinza | **Anel Verde** | Fronteira leste (portal pra Selve) | Era 2 ruína + Era 3 corrompida | [[01-cidade-cyber-gotica|§2]] · gateway natural Selve |
 
 **Landmarks ocultos (Knowledge alta) (2):**
 
 | Pin | Landmark | Trigger | Cross-ref |
 |---|---|---|---|
-| "?" laranja | **Cripto-glifo Era 1 sob asfalto rachado Praça da Compilação (7 nomes em pedra)** | Knowledge média + decodificação C-Arcane do Gus em colaboração Asmódico Bento OU isolado dificuldade alta | foreshadow F-018 (placa Era 2 lista 4 nomes; cripto-glifo Era 1 lista 7) · [[01-cidade-cyber-gotica\|§5]] |
-| "?" laranja | **Cúpula Sterling** | Knowledge alta + progressão ato 3 destrava localização exata (entre Núcleo Metropolitano e Anel Verde) | foreshadow F-002 + F-110 · [[lore-bible\|§5.2]] · climax 2 fases |
+| "?" laranja | **Cripto-glifo Era 1 sob asfalto rachado Praça da Compilação (7 nomes em pedra)** | Knowledge média + decodificação C-Arcane do Gus em colaboração Asmódico Bento OU isolado dificuldade alta | foreshadow F-018 (placa Era 2 lista 4 nomes; cripto-glifo Era 1 lista 7) · [[01-cidade-cyber-gotica|§5]] |
+| "?" laranja | **Cúpula Sterling** | Knowledge alta + progressão ato 3 destrava localização exata (entre Núcleo Metropolitano e Anel Verde) | foreshadow F-002 + F-110 · [[lore-bible|§5.2]] · climax 2 fases |
 
 **Rotas canônicas Gus:**
 
@@ -109,17 +109,17 @@ Cada mapa segue padrão fixo:
 
 | Pin | Landmark | Localização | Era | Cross-ref |
 |---|---|---|---|---|
-| azul | **Orla Recursiva (entrada)** | Logo passado Anel Verde, fronteira leste cidade | cross-eras (Selve existe nas 3 eras) | [[02-selve-sombria\|§2]] |
+| azul | **Orla Recursiva (entrada)** | Logo passado Anel Verde, fronteira leste cidade | cross-eras (Selve existe nas 3 eras) | [[02-selve-sombria|§2]] |
 | azul | **Trilha dos Pioneiros** | Caminho Era 2 marcado por mestres Asmódico/herboristas Pelicano Branco | Era 2 | Hugo Tirol cartografa em -42 e agora |
-| cinza | **Pântano de Markov** | Meio-caminho entre Orla e Núcleo Mandelbrot | cross-eras | [[02-selve-sombria\|§2]] · gateway Tatauín Branca |
-| cinza | **Clareira do Mandelbrot Externo** | Profundidade Selve antes do Núcleo Interno | cross-eras | [[02-selve-sombria\|§2]] · paisagem não-euclidiana suave |
-| cinza | **Cripto-glifo da Anomalia Primeira** | Pedra basáltica em ponto profundo Trilha dos Pioneiros | Era 1 (~-820) | [[lore-bible\|§13]] · "o limite que escolheu falar" · foreshadow Patch-Zero ancestral |
+| cinza | **Pântano de Markov** | Meio-caminho entre Orla e Núcleo Mandelbrot | cross-eras | [[02-selve-sombria|§2]] · gateway Tatauín Branca |
+| cinza | **Clareira do Mandelbrot Externo** | Profundidade Selve antes do Núcleo Interno | cross-eras | [[02-selve-sombria|§2]] · paisagem não-euclidiana suave |
+| cinza | **Cripto-glifo da Anomalia Primeira** | Pedra basáltica em ponto profundo Trilha dos Pioneiros | Era 1 (~-820) | [[lore-bible|§13]] · "o limite que escolheu falar" · foreshadow Patch-Zero ancestral |
 
 **Landmarks ocultos (Knowledge alta) (1):**
 
 | Pin | Landmark | Trigger | Cross-ref |
 |---|---|---|---|
-| "?" laranja | **Acesso lateral ao Núcleo Mandelbrot Interno** | Knowledge alta + arco Jaci completo + decifração cripto-glífica Hugo Tirol | gate ato 3 / climax · [[entries-docs-descobriveis\|doc 15]] |
+| "?" laranja | **Acesso lateral ao Núcleo Mandelbrot Interno** | Knowledge alta + arco Jaci completo + decifração cripto-glífica Hugo Tirol | gate ato 3 / climax · [[entries-docs-descobriveis|doc 15]] |
 
 **Rotas canônicas Gus:**
 
@@ -153,10 +153,10 @@ Cada mapa segue padrão fixo:
 
 | Pin | Landmark | Localização | Era | Cross-ref |
 |---|---|---|---|---|
-| azul | **Nave Principal** | Centro estrutura | Era 1 estrutura, Era 2 ressignificada | [[03-catedrais-neo-sylvania\|§2]] |
-| azul | **Capela do Sino Asmódico** | Ala direita | Era 1 | [[03-catedrais-neo-sylvania\|§2]] · cronômetro monumental |
+| azul | **Nave Principal** | Centro estrutura | Era 1 estrutura, Era 2 ressignificada | [[03-catedrais-neo-sylvania|§2]] |
+| azul | **Capela do Sino Asmódico** | Ala direita | Era 1 | [[03-catedrais-neo-sylvania|§2]] · cronômetro monumental |
 | azul | **Biblioteca da Ordem Recursiva** | Ala esquerda | Era 2 (catalogação) sobre Era 1 (acervo) | foto Hilário Tepenkov preservada por Velhusto |
-| azul | **Bancada de Beatriz Pólvora (escola anexa)** | Anexo Era 2 atrás da nave | Era 2 pioneira (-115 Atelaiá) | [[entries-fichas-bestiary\|§3]] · Bento corrige cadernos |
+| azul | **Bancada de Beatriz Pólvora (escola anexa)** | Anexo Era 2 atrás da nave | Era 2 pioneira (-115 Atelaiá) | [[entries-fichas-bestiary|§3]] · Bento corrige cadernos |
 | cinza | **Catedral Menor de Atelaiá (visível ao longe)** | 2 km a leste catedral principal | Era 1 | -7 contaminação Hilário Tepenkov morto, Bento sobrevive |
 
 **Landmarks ocultos (Knowledge alta) (2):**
@@ -164,7 +164,7 @@ Cada mapa segue padrão fixo:
 | Pin | Landmark | Trigger | Cross-ref |
 |---|---|---|---|
 | "?" laranja | **Subterrâneo lacrado (Selagem Asmódica protocolo Atelaiá -78)** | Knowledge alta + Asmódico Bento decodifica selo | possível arco DLC pós-jogo · não acessível G1 |
-| "?" laranja | **Catedral perdida (incursão Aldebrando -0.5)** | Knowledge alta + diário Aldebrando ([[entries-docs-descobriveis\|doc 9]]) decodificado + cripto-glifo Hugo Tirol cruzado | gate Ouro · localização parcial revelada (não totalmente) |
+| "?" laranja | **Catedral perdida (incursão Aldebrando -0.5)** | Knowledge alta + diário Aldebrando ([[entries-docs-descobriveis|doc 9]]) decodificado + cripto-glifo Hugo Tirol cruzado | gate Ouro · localização parcial revelada (não totalmente) |
 
 **Rotas Gus:**
 
@@ -198,9 +198,9 @@ Cada mapa segue padrão fixo:
 
 | Pin | Landmark | Localização | Era | Cross-ref |
 |---|---|---|---|---|
-| azul | **Turbinas Era 2 (núcleo operacional Pythia)** | Centro vertical, nível 2 | Era 2 | [[04-dutos-infernais\|§2]] · Hosvaldo Pinhão técnico-chefe |
-| azul | **Posto FIR Duto 7** | Nível 2, ala leste | Era 3 (instalado pela FIR) | [[04-dutos-infernais\|§2]] · drone-operário FIR |
-| azul | **QG Runners (acampamento juvenil Cauã)** | Nível 3 (profundidade média) | Era 3 (improvisação) | [[entries-fichas-bestiary\|§3]] · runners Tao, Inês, Bel, Pirilampo, Tata |
+| azul | **Turbinas Era 2 (núcleo operacional Pythia)** | Centro vertical, nível 2 | Era 2 | [[04-dutos-infernais|§2]] · Hosvaldo Pinhão técnico-chefe |
+| azul | **Posto FIR Duto 7** | Nível 2, ala leste | Era 3 (instalado pela FIR) | [[04-dutos-infernais|§2]] · drone-operário FIR |
+| azul | **QG Runners (acampamento juvenil Cauã)** | Nível 3 (profundidade média) | Era 3 (improvisação) | [[entries-fichas-bestiary|§3]] · runners Tao, Inês, Bel, Pirilampo, Tata |
 | cinza | **Pilar Era 1 cripto-glífico** | Nível 4 (profundidade máxima visitada) | Era 1 puro | sub-quest Hugo Tirol cross-arco (Knowledge alta) |
 | cinza | **Pichação "while alive: roda" (corredor 4-leste nível 3)** | Nível 3 | Era 3 atual | Vespa Calderón scripter rebelde |
 
@@ -242,16 +242,16 @@ Cada mapa segue padrão fixo:
 
 | Pin | Landmark | Localização | Era | Cross-ref |
 |---|---|---|---|---|
-| azul | **Praça do Olho** | Centro Setor Mirage | Era 3 sobre Era 2 (pedra Era 2 visível em buracos do piso refletor) | [[05-setor-mirage\|§2]] · símbolo Cult em escala monumental |
-| azul | **Caleidoscópio (galeria holográfica permanente)** | Lado norte Praça do Olho | Era 3 | [[05-setor-mirage\|§2]] · Sérgio Brimber trabalha aqui |
-| azul | **Catacumbas Cult (entrada catedral menor anexa)** | Sob Praça do Olho, acesso disfarçado | Era 1 (catedral menor) + Era 3 (ressignificação Cult) | [[05-setor-mirage\|§2]] · Iara cresceu aqui |
+| azul | **Praça do Olho** | Centro Setor Mirage | Era 3 sobre Era 2 (pedra Era 2 visível em buracos do piso refletor) | [[05-setor-mirage|§2]] · símbolo Cult em escala monumental |
+| azul | **Caleidoscópio (galeria holográfica permanente)** | Lado norte Praça do Olho | Era 3 | [[05-setor-mirage|§2]] · Sérgio Brimber trabalha aqui |
+| azul | **Catacumbas Cult (entrada catedral menor anexa)** | Sob Praça do Olho, acesso disfarçado | Era 1 (catedral menor) + Era 3 (ressignificação Cult) | [[05-setor-mirage|§2]] · Iara cresceu aqui |
 | cinza | **Apartamento de Sérgio Brimber** | 2 quadras leste Praça do Olho | Era 3 | sub-quest fita cassete Sonja |
 
 **Landmarks ocultos (Knowledge alta) (2):**
 
 | Pin | Landmark | Trigger | Cross-ref |
 |---|---|---|---|
-| "?" laranja | **Altar interno Cult com foto de Sonja Murmúrio** | Knowledge média + arco Iara avançado | foreshadow F-058 + F-082 · [[entries-docs-descobriveis\|doc 6]] |
+| "?" laranja | **Altar interno Cult com foto de Sonja Murmúrio** | Knowledge média + arco Iara avançado | foreshadow F-058 + F-082 · [[entries-docs-descobriveis|doc 6]] |
 | "?" laranja | **Sala de "reabilitação sensorial" onde Marlena Aurora está detida** | Knowledge alta + sub-quest pós-recrutamento Iara | resgate Marlena · facção artista libertada |
 
 **Rotas Gus:**
@@ -286,9 +286,9 @@ Cada mapa segue padrão fixo:
 
 | Pin | Landmark | Localização | Era | Cross-ref |
 |---|---|---|---|---|
-| azul | **Oficina Alencar** | Centro Periferia (3 quadras norte do Mercado da Sucata) | Era 2 (oficina) + Era 3 (canibalismo) | [[06-periferia\|§2]] · família Dante |
-| azul | **Quintal Penkin (vizinhos imediatos)** | 3 quadras norte da oficina | Era 2 | [[06-periferia\|§2]] · Senhor Mateus Penkin fofoqueiro |
-| azul | **Subestação 11** | Limite leste Periferia | Era 2 (construção) + Era 3 (gestão FIR/Sterling) | [[06-periferia\|§2]] · paralelo Subestação 7 onde Davi morreu |
+| azul | **Oficina Alencar** | Centro Periferia (3 quadras norte do Mercado da Sucata) | Era 2 (oficina) + Era 3 (canibalismo) | [[06-periferia|§2]] · família Dante |
+| azul | **Quintal Penkin (vizinhos imediatos)** | 3 quadras norte da oficina | Era 2 | [[06-periferia|§2]] · Senhor Mateus Penkin fofoqueiro |
+| azul | **Subestação 11** | Limite leste Periferia | Era 2 (construção) + Era 3 (gestão FIR/Sterling) | [[06-periferia|§2]] · paralelo Subestação 7 onde Davi morreu |
 | cinza | **Apartamento subsidiado Edilma Alencar** | 8 quadras sudoeste oficina | Era 3 | mãe de Dante; vive reclusa pós-Salviano morto |
 | cinza | **Antena no telhado Mateus Penkin** | Telhado casa Penkin | Era 2 (estrutura) + Era 3 (cabo Sterling agregado) | foreshadow F-093 |
 
@@ -296,7 +296,7 @@ Cada mapa segue padrão fixo:
 
 | Pin | Landmark | Trigger | Cross-ref |
 |---|---|---|---|
-| "?" laranja | **Terminal extra a leste da oficina, com porta ofuscada** | Knowledge média (1ª passada: "terminal a mais"); Knowledge Ouro (2ª passada: terminal Sterling-corporativo lacrado, cabo subindo até antena Penkin) | foreshadow F-093 catalyst Dante · [[06-periferia\|§3]] |
+| "?" laranja | **Terminal extra a leste da oficina, com porta ofuscada** | Knowledge média (1ª passada: "terminal a mais"); Knowledge Ouro (2ª passada: terminal Sterling-corporativo lacrado, cabo subindo até antena Penkin) | foreshadow F-093 catalyst Dante · [[06-periferia|§3]] |
 | "?" laranja | **Esconderijo do caminhão FIR Distrito V** | Knowledge alta + ato 2 noturno | foreshadow F-076 · handler Vorto |
 
 **Rotas Gus:**
@@ -332,8 +332,8 @@ Cada mapa segue padrão fixo:
 
 | Pin | Landmark | Localização | Era | Cross-ref |
 |---|---|---|---|---|
-| azul | **Casa das Antenas (espaço comunitário Underground)** | Centro Zona do Silêncio | Era 2 | [[07-zona-do-silencio\|§2]] · -50 batida histórica |
-| azul | **Sub-célula norte (operadora rádio Mara Bento)** | Ala norte Zona do Silêncio | Era 2 + Era 3 (reuso) | [[07-zona-do-silencio\|§2]] |
+| azul | **Casa das Antenas (espaço comunitário Underground)** | Centro Zona do Silêncio | Era 2 | [[07-zona-do-silencio|§2]] · -50 batida histórica |
+| azul | **Sub-célula norte (operadora rádio Mara Bento)** | Ala norte Zona do Silêncio | Era 2 + Era 3 (reuso) | [[07-zona-do-silencio|§2]] |
 | azul | **Bancada de Joaquim Bartolomeu** | Sub-célula norte, anexo | Era 2 | toca-discos artesanais |
 | azul | **Apartamento Neumann** | Bloco residencial fronteira sul Zona do Silêncio | Era 2 | pais de Linda; saúde frágil Brígida pós-batida -8 |
 | cinza | **Câmara do Equinócio Acústico (Era 1)** | Subterrâneo lateral; descoberta Joaquim -3 | Era 1 | cripto-glifo sonoro mesmo tipo que Catedrais visuais |
@@ -376,18 +376,18 @@ Cada mapa segue padrão fixo:
 
 | Pin | Landmark | Localização | Era | Cross-ref |
 |---|---|---|---|---|
-| azul | **Vilarejo do Pelicano Branco (praça central)** | Centro setting | cross-eras (Era 1 fundação implícita via Êxodo, Era 2 formal -45, Era 3 atual) | [[08-selve-profunda\|§2]] · Anciã Mariana |
-| azul | **Casa da Anciã Mariana** | Lado norte praça vilarejo | Era 2/3 | [[08-selve-profunda\|§2]] · biblioteca farmacopeia |
-| azul | **Bancada de farmácia de Jaci (herdada da mãe Lia)** | Centro vilarejo | Era 2/3 | [[08-selve-profunda\|§2]] · antídotos comunitários |
-| azul | **Câmara Neo-Sylvania (coleta de DNA, sementes-relíquia)** | 1 km ao norte vilarejo | Era 1 (estrutura) + Era 2 (catalogação) | [[08-selve-profunda\|§2]] · Hugo Tirol decifrou 19 de 47 símbolos |
-| cinza | **Estação retransmissora drone Sterling Corp camuflada como pedra** | 2 km ao sul vilarejo, oculta | Era 3 | [[08-selve-profunda\|§2]] · Sterling -1 instalou; Mariana descobriu -0.5 |
+| azul | **Vilarejo do Pelicano Branco (praça central)** | Centro setting | cross-eras (Era 1 fundação implícita via Êxodo, Era 2 formal -45, Era 3 atual) | [[08-selve-profunda|§2]] · Anciã Mariana |
+| azul | **Casa da Anciã Mariana** | Lado norte praça vilarejo | Era 2/3 | [[08-selve-profunda|§2]] · biblioteca farmacopeia |
+| azul | **Bancada de farmácia de Jaci (herdada da mãe Lia)** | Centro vilarejo | Era 2/3 | [[08-selve-profunda|§2]] · antídotos comunitários |
+| azul | **Câmara Neo-Sylvania (coleta de DNA, sementes-relíquia)** | 1 km ao norte vilarejo | Era 1 (estrutura) + Era 2 (catalogação) | [[08-selve-profunda|§2]] · Hugo Tirol decifrou 19 de 47 símbolos |
+| cinza | **Estação retransmissora drone Sterling Corp camuflada como pedra** | 2 km ao sul vilarejo, oculta | Era 3 | [[08-selve-profunda|§2]] · Sterling -1 instalou; Mariana descobriu -0.5 |
 
 **Landmarks ocultos (Knowledge alta) (2):**
 
 | Pin | Landmark | Trigger | Cross-ref |
 |---|---|---|---|
 | "?" laranja | **Núcleo Mandelbrot Interno (epicentro Patch-Zero)** | Knowledge alta + arco Jaci completo + decifração doc 15 | climax ato 3 · selagem Patch-Zero |
-| "?" laranja | **Coordenadas parciais Catedral-Mãe (Era 1, lacrada por dentro -750)** | Knowledge Ouro + doc 15 ([[entries-docs-descobriveis\|doc 15]]) + cruzamento cripto-glifo Hugo Tirol no painel norte da Câmara | gate Ouro ending · localização incompleta |
+| "?" laranja | **Coordenadas parciais Catedral-Mãe (Era 1, lacrada por dentro -750)** | Knowledge Ouro + doc 15 ([[entries-docs-descobriveis|doc 15]]) + cruzamento cripto-glifo Hugo Tirol no painel norte da Câmara | gate Ouro ending · localização incompleta |
 
 **Rotas Gus:**
 
@@ -425,8 +425,8 @@ Cada mapa segue padrão fixo:
 
 | Pin | Landmark | Localização | Era | Cross-ref |
 |---|---|---|---|---|
-| azul | **GusWorld City + Selve Sombria adjacente** | Centro mapa | cross-eras | [[lore-bible\|§9]] |
-| cinza | **Polis-Vermelha caída** | Oeste-distante | Era 3 (quarentena) sobre infra Era 2 | [[lore-bible\|§9.1]] · [[entries-docs-descobriveis\|doc 11]] pichações |
+| azul | **GusWorld City + Selve Sombria adjacente** | Centro mapa | cross-eras | [[lore-bible|§9]] |
+| cinza | **Polis-Vermelha caída** | Oeste-distante | Era 3 (quarentena) sobre infra Era 2 | [[lore-bible|§9.1]] · [[entries-docs-descobriveis|doc 11]] pichações |
 | cinza | **Cidades-Gêmeas Underground** | Norte/nordeste-distante | Era 2 estável + Era 3 superficial | rede Underground Padrinho Tiago contato remoto |
 
 **Landmarks ocultos (Knowledge alta) (1):**
@@ -462,11 +462,11 @@ Datas in-world (calendário Era 2, 12 meses 30-31 dias; ano 0 = presente do jogo
 
 | # | Ano | Evento | Trigger | Knowledge contribuição | Cross-ref entry visual |
 |---|---|---|---|---|---|
-| 1 | ~-1100 | Primeira documentação cripto-glífica da "linguagem da floresta" (em pedra). | Bento ensina em arco Bento (~30% campanha). | Ficha Bento + [[entries-docs-descobriveis\|doc 3]] (diário Atelaiá). | Mapa 3 (Catedrais) + Mapa 2 (Trilha dos Pioneiros). |
-| 2 | ~-950 | Construção da Catedral-Mãe (localização desconhecida, provavelmente afundada região profunda Selve). | Doc 15 ([[entries-docs-descobriveis\|gate Ouro]]) destrava menção. | Hugo Tirol decifra cripto-glífico parcial. | Mapa 8 (coordenadas parciais Knowledge Ouro). |
+| 1 | ~-1100 | Primeira documentação cripto-glífica da "linguagem da floresta" (em pedra). | Bento ensina em arco Bento (~30% campanha). | Ficha Bento + [[entries-docs-descobriveis|doc 3]] (diário Atelaiá). | Mapa 3 (Catedrais) + Mapa 2 (Trilha dos Pioneiros). |
+| 2 | ~-950 | Construção da Catedral-Mãe (localização desconhecida, provavelmente afundada região profunda Selve). | Doc 15 ([[entries-docs-descobriveis|gate Ouro]]) destrava menção. | Hugo Tirol decifra cripto-glífico parcial. | Mapa 8 (coordenadas parciais Knowledge Ouro). |
 | 3 | ~-870 | Auge Neo-Sylvania. Cooperação ecológica plena. Sementes-relíquia produzidas em massa, depositadas em catedrais. | Jaci explica origem sementes-relíquia farmacopeia (~40% campanha). | Ficha Jaci + Câmara Neo-Sylvania Mapa 8. | Mapa 8. |
 | 4 | ~-820 | **Anomalia Primeira** registrada em cripto-glifo: "o limite que escolheu falar". | Cripto-glifo lido por Gus + Bento em arco Bento (Knowledge alta destrava decifração completa). | Sticky-note F-099 (Patch-Zero plural). | Mapa 2 (cripto-glifo Trilha dos Pioneiros). |
-| 5 | ~-800 | Coletivo de mestres-engenheiros propõe encapsulamento da anomalia. Tentativa documentada de "domesticar". | Bento cruza dado com diário Atelaiá ([[entries-docs-descobriveis\|doc 3]]). | "história se repete" — Sterling como replay. | Mapa 3 (biblioteca Ordem). |
+| 5 | ~-800 | Coletivo de mestres-engenheiros propõe encapsulamento da anomalia. Tentativa documentada de "domesticar". | Bento cruza dado com diário Atelaiá ([[entries-docs-descobriveis|doc 3]]). | "história se repete" — Sterling como replay. | Mapa 3 (biblioteca Ordem). |
 | 6 | ~-750 | Queda parcial. Cidades menores colapsam. Catedral-Mãe lacrada por dentro pelos próprios habitantes. | Hugo Tirol pista cripto-glífica + doc 15 (Knowledge Ouro). | Lacre interno = aceitação de limite. | Mapa 8 (coordenadas Knowledge Ouro). |
 | 7 | ~-720 | Êxodo. Sobreviventes dispersam. Aldeias-fronteira atuais descendem desses sobreviventes (Pelicano Branco). | Anciã Mariana narra tradição oral arco Jaci. | Ficha Mariana + Pelicano Branco Mapa 8. | Mapa 8. |
 | 8 | ~-700 | Colapso final. Civilização Neo-Sylvania cessa de existir como entidade política. Inicia o Hiato. | Lore-bible §3 destrava como contexto após arco Bento. | "Hiato" = silêncio narrativo deliberado (~550 anos sem evento). | Mapa-mãe 9. |
@@ -482,13 +482,13 @@ Datas in-world (calendário Era 2, 12 meses 30-31 dias; ano 0 = presente do jogo
 | 9 | -150 | **Primeira linha C-Arcane compilada** com sucesso. Equipe: 4 engenheiros (Lin Tórun, Rosaria Galp, Henrique Pira, Marcela Sívo). | Placa cerimonial Praça da Compilação (Mapa 1). Discurso da Pilha anual. | Festa da Compilação (1º setembro) institucionalizada. | Mapa 1 (Praça da Compilação) + Mapa 1 landmark oculto (cripto-glifo Era 1 sob, 7 nomes que ninguém lê). |
 | 10 | -148 | Fundação informal da Ordem Recursiva. Mestres-Asmódicos sobreviventes do Hiato se organizam. | Bento explica linhagem arco Bento. | Ficha Ordem Recursiva. | Mapa 3. |
 | 11 | -140 | Estabelecimento de **GusWorld City** sobre sítio Neo-Sylvania de superfície (catedrais parcialmente preservadas no que viria a ser o Anel Verde). | Gargi menciona "onde a gente mora foi construído sobre coisa mais velha" (manuscrito Gus pós ato 1). | Hub canônico. | Mapa 1 + Mapa 9. |
-| 12 | -130 | Fundação de **Polis-Vermelha** sobre sítio Neo-Sylvania mais profundo (subterrâneo extenso). | Doc 11 ([[entries-docs-descobriveis\|pichações Polis-Vermelha]]) destrava menção. | Sítio rico em cripto-glifos. Razão pela qual Patch-Zero capturado lá século depois. | Mapa 9. |
+| 12 | -130 | Fundação de **Polis-Vermelha** sobre sítio Neo-Sylvania mais profundo (subterrâneo extenso). | Doc 11 ([[entries-docs-descobriveis|pichações Polis-Vermelha]]) destrava menção. | Sítio rico em cripto-glifos. Razão pela qual Patch-Zero capturado lá século depois. | Mapa 9. |
 | 13 | -120 | Fundação Cidades-Gêmeas (Norte/Sul) e Heliópolis-Nova. Quatro grandes cidades estabelecidas. | Underground Padrinho Tiago menciona rede comercial arco Linda. | Rede comercial nasce. | Mapa 9. |
 | 14 | -115 | Desenvolvimento Asmódico canônico (codificação formal). Primeiro mestre-codificador: **Atelaiá Chevalier** (ancestral direto Bento, 5 gerações antes). | Bento exibe linhagem direta arco Bento (Knowledge média). | Asmódico vira disciplina formal. Catedrais reabertas como sedes. | Mapa 3. |
 | 15 | -110 | Desenvolvimento Óxido. Engenheira-mãe: **Tamara Neumann** (ancestral materna Linda, bisavó-bisavó). | Linda comenta arco Linda. Cross-ref [[characters/linda-siren]]. | Linguagem de segurança nasce. Underground absorve séculos depois. | Mapa 7. |
 | 16 | -100 | Surge o **Tomo da Pilha Sobrecarregada**. Documentação coletiva começa. | Dia do Tomo (14 janeiro) institucional. NPCs Pilha falam casualmente. | Conhecimento aberto institucionalizado ([[comic-reliefs]] cena 7). | Mapa 1. |
 | 17 | -95 | Desenvolvimento Pythia. Co-autoria: **Iremar Berenger** (ancestral Cauã) + **Anhuera Vanderbist** (ancestral Jaci). | Cauã + Jaci cruzam dados arco Cauã ou arco Jaci primeiro. | Aliança fundadora Berenger-Vanderbist. | Mapas 4 + 8. |
-| 18 | -80 | **Atelaiá Chevalier registra em diário pessoal:** queda parcial catedral menor por anomalia recorrente (Patch-Zero pré-Sterling). 17 mestres morrem em uma noite. | Doc 3 ([[entries-docs-descobriveis\|diário Atelaiá]]) destrava arco Bento. | Trauma fundador Ordem Recursiva. | Mapa 3 (Catedral Menor de São Camilo — visível ao longe). |
+| 18 | -80 | **Atelaiá Chevalier registra em diário pessoal:** queda parcial catedral menor por anomalia recorrente (Patch-Zero pré-Sterling). 17 mestres morrem em uma noite. | Doc 3 ([[entries-docs-descobriveis|diário Atelaiá]]) destrava arco Bento. | Trauma fundador Ordem Recursiva. | Mapa 3 (Catedral Menor de São Camilo — visível ao longe). |
 | 19 | -78 | Ordem Recursiva decreta protocolo "Selagem Asmódica": catedrais menores recebem lacre cerimonial + cinético se anomalia detectada. | Bento aprende protocolo arco Bento. | Bento herda saber. | Mapa 3 (subterrâneo lacrado Knowledge alta). |
 | 20 | -50 | Fundação Federação Industrial de Reciclagem (FIR). Inicialmente cooperativa de boa-fé. | Hilário Murch contexto ato 2. Ironia: FIR começou útil. | Captura corporativa começa ~25 anos depois. | Mapa 6. |
 | 21 | -50 | **Batida na Casa das Antenas.** 14 técnicos presos, 6 ressurgem, 8 desaparecidos. Música "Última Frequência" composta antes; partitura preservada. Origem Noite Calada (8 agosto). | Padrinho Tiago narra arco Linda. | Trauma histórico Underground. | Mapa 7 (Casa das Antenas). |

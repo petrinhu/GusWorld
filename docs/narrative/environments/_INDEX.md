@@ -20,14 +20,14 @@ Cada doc segue template fixo (10 seções, padrão estável cross-settings). Pla
 
 | # | Setting | Era predominante | Ato | Companion home | Status |
 |---|---|---|---|---|---|
-| 01 | [[01-cidade-cyber-gotica\|GusWorld City (Núcleo Metropolitano + cross-distritos)]] | Era 3 (sobre ruínas Era 1+2) | Ato 1 (hub persistente todos atos) | [[gus]] | **DONE** |
-| 02 | [[02-selve-sombria\|Selve Sombria (Orla Recursiva + Pântano Markov + Núcleo Mandelbrot)]] | Cross-eras (existe nas 3) | Ato 1-3 (cross-act) | n/a (cross-companion; [[jaci-proxy]] em Selve Profunda) | **DONE** |
-| 03 | [[03-catedrais-neo-sylvania\|Catedrais Neo-Sylvania (Nave + Biblioteca + Capela do Sino Asmódico)]] | Era 1 (estrutura) + Era 2 (Ordem) | Ato 2 (arco Bento) | [[bento-requiem]] | **DONE** |
-| 04 | [[04-dutos-infernais\|Dutos Infernais (Turbinas + Posto FIR + QG Runners + Pilar Era 1)]] | Era 1 + Era 2 (infra) + Era 3 (reconfig Sterling) | Ato 2 (arco Cauã) | [[caua-volt]] | **DONE** |
-| 05 | [[05-setor-mirage\|Setor Mirage (Praça do Olho + Caleidoscópio + Catacumbas Cult)]] | Era 3 (predominante) sobre vestígios Era 2 | Ato 2 (arco Iara) | [[iara-lumen]] | **DONE** |
-| 06 | [[06-periferia\|Periferia (Oficinas C-Arcane + Subestação 11 + Quintal Penkin)]] | Era 2 (oficinas) + Era 3 (FIR vassalo) | Ato 2 (arco Dante — foreshadow traidor) | [[dante-grid]] | **DONE** |
-| 07 | [[07-zona-do-silencio\|Zona do Silêncio]] | Era 2 (antenas) sob abandono Era 3, sobre câmaras Era 1 | Ato 2 (arco Linda) | [[linda-siren]] | **DONE** |
-| 08 | [[08-selve-profunda\|Selve Profunda (Pelicano Branco + Núcleo Mandelbrot)]] | Cross-temporal (3 eras densas) | Ato 2 (arco Jaci) + climax Patch-Zero | [[jaci-proxy]] | **DONE** |
+| 01 | [[01-cidade-cyber-gotica|GusWorld City (Núcleo Metropolitano + cross-distritos)]] | Era 3 (sobre ruínas Era 1+2) | Ato 1 (hub persistente todos atos) | [[gus]] | **DONE** |
+| 02 | [[02-selve-sombria|Selve Sombria (Orla Recursiva + Pântano Markov + Núcleo Mandelbrot)]] | Cross-eras (existe nas 3) | Ato 1-3 (cross-act) | n/a (cross-companion; [[jaci-proxy]] em Selve Profunda) | **DONE** |
+| 03 | [[03-catedrais-neo-sylvania|Catedrais Neo-Sylvania (Nave + Biblioteca + Capela do Sino Asmódico)]] | Era 1 (estrutura) + Era 2 (Ordem) | Ato 2 (arco Bento) | [[bento-requiem]] | **DONE** |
+| 04 | [[04-dutos-infernais|Dutos Infernais (Turbinas + Posto FIR + QG Runners + Pilar Era 1)]] | Era 1 + Era 2 (infra) + Era 3 (reconfig Sterling) | Ato 2 (arco Cauã) | [[caua-volt]] | **DONE** |
+| 05 | [[05-setor-mirage|Setor Mirage (Praça do Olho + Caleidoscópio + Catacumbas Cult)]] | Era 3 (predominante) sobre vestígios Era 2 | Ato 2 (arco Iara) | [[iara-lumen]] | **DONE** |
+| 06 | [[06-periferia|Periferia (Oficinas C-Arcane + Subestação 11 + Quintal Penkin)]] | Era 2 (oficinas) + Era 3 (FIR vassalo) | Ato 2 (arco Dante — foreshadow traidor) | [[dante-grid]] | **DONE** |
+| 07 | [[07-zona-do-silencio|Zona do Silêncio]] | Era 2 (antenas) sob abandono Era 3, sobre câmaras Era 1 | Ato 2 (arco Linda) | [[linda-siren]] | **DONE** |
+| 08 | [[08-selve-profunda|Selve Profunda (Pelicano Branco + Núcleo Mandelbrot)]] | Cross-temporal (3 eras densas) | Ato 2 (arco Jaci) + climax Patch-Zero | [[jaci-proxy]] | **DONE** |
 
 **Climax ato 3 (Catedrais de Silício corrompidas + Cúpula Sterling)** será coberto em variação operacional do setting 01 ou doc próprio anexo (decisão pendente; mesmas coordenadas urbanas, **2 zonas opostas** [[pillars]] §Pillar 5 tabela).
 

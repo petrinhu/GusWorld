@@ -51,7 +51,7 @@ Coração geometricamente impossível da Selve Profunda. Clareira fractal aninha
 
 | Prop | Onde | O que conta |
 |---|---|---|
-| Ampola Pythia bio com líquido verde-esmeralda pulsante | jaleco da [[jaci-proxy\|Jaci]] | Antídoto-base que Jaci sintetizou aos seis anos pela primeira vez sob supervisão de Mariana ([[jaci-proxy]] §Memórias formativas). Recarrega-se mensalmente. Ela carrega doze sempre, conta cada uma. |
+| Ampola Pythia bio com líquido verde-esmeralda pulsante | jaleco da [[jaci-proxy|Jaci]] | Antídoto-base que Jaci sintetizou aos seis anos pela primeira vez sob supervisão de Mariana ([[jaci-proxy]] §Memórias formativas). Recarrega-se mensalmente. Ela carrega doze sempre, conta cada uma. |
 | Pá curva de cabo de cumaru | encostada na cabana de Mariana | Pá da Anciã. Trabalho de carpintaria de Solano Vanderbist (pai da Jaci, morto -8) feito em -10 como presente para Mariana. O cabo tem dois entalhes pequenos: marcas dele para anotar profundidade. Mariana usa diariamente. |
 | Placa de latão verdoenga "EUCALYPTUS-FRACTALIS-7" | meio do caminho da Trilha dos Pioneiros | Placa #47 das 117 originais. Cripto-glifo no canto superior; transliteração Pythia no centro; data de catalogação "-78" gravada no canto inferior. Espécie ainda existe três metros da placa, intacta. |
 | Diário em couro com 14 páginas restantes em branco | mesa de Jaci na casa de farmacopeia | Diário herdado de Lia Vanderbist (mãe, morta -8). Lia escreveu até a página 156. Jaci começou na página 157 quando completou nove anos, com permissão da avó. Não preenche cada dia: só quando aprende coisa nova. Há treze páginas escritas dela em três anos. |
