@@ -48,7 +48,7 @@ Easter egg específico canônico: o BPM 47 combinado com a sobreposição dos tr
 
 ### Linda "Siren" Neumann, Crowd Control
 
-Tonalidade: **Mi frígio**. Compasso: **8/8** (valor Fibonacci). BPM: **55**. Instrumentação: vocais femininos melismáticos solo (canônico Linda usa a própria voz como instrumento), eco extendido em delay multitap, reverb cavernoso simulando a **Câmara do Equinócio Acústico** canon, recinto subterrâneo do Setor Mirage onde Linda treinou a técnica de Crowd Control vocal. Estrutura motívica **ABCA**: frase A de 5 compassos, frase B de 8, frase C de 13, retorno A de 5; total 31 compassos.
+Tonalidade: **Mi frígio**. Compasso: **8/8** (valor Fibonacci). BPM: **55**. Instrumentação: vocais femininos melismáticos solo (canônico Linda usa a própria voz como instrumento), eco extendido em delay multitap, reverb cavernoso simulando a **Câmara do Equinócio Acústico** canon, recinto subterrâneo da Zona do Silêncio onde Linda treinou a técnica de Crowd Control vocal. Estrutura motívica **ABCA**: frase A de 5 compassos, frase B de 8, frase C de 13, retorno A de 5; total 31 compassos.
 
 Evolução nos atos. Ato 1: vocais secos, sem eco. Ato 2: delay multitap ativado, ecos em intervalos curtos. Ato 3: reverb cavernoso pleno, vocais melismáticos plenos.
 
