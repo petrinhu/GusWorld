@@ -497,7 +497,7 @@ Hospital cobra crédito por cura rápida (Pillar 4 / hospital + economia). Cura 
 - **-8** — *Batida na casa Neumann.* Toca-discos histórico apreendido. Linda (4) vê. **Otmar Neumann** salva agulha intacta antes da apreensão; entrega à filha. Pingente Linda.
 - **-8** — *Surto silencioso no Pelicano Branco.* **Lia e Solano Vanderbist** (pais Jaci) morrem. Causa oficial: anomalia botânica. Causa real (ending Ouro): vetor experimental Sterling. Mariana suspeita; nunca prova.
 - **-7** — *Contaminação da Catedral Menor de Atelaiá.* Mestre-Aprendiz **Hilário Tepenkov** (companheiro estudos Bento) morre. Bento (7) presente; sobrevive por estar perto do escudo Velhusto. Patch-Zero pré-existente confirmado.
-- **-6** — **Adila Murmúrio** consolida tutela administrativa plena Cult Mirage pró-Sterling (passa de Hierofante nominal a operacional plena). Sonja Murmúrio morta há 28 anos.
+- **-6** — **Adila Murmúrio** consolida tutela administrativa plena Cult Mirage pró-Sterling (passa de Hierofante nominal a operacional plena). Sonja Murmúrio, morta em -34 aos 33 anos (canon timeline:86 + CHARS:82 + factions:505), deixa o vínculo materno operando há vinte e oito anos como ausência calibrada.
 - **-5** — **Dante (8 anos) recrutado por Diretor Cassiano Vorto da FIR.** Aliciamento canônico começa.
 - **-3** — Sterling Corp localiza bug primordial Patch-Zero. Tentativa de captura. Falha parcial. **Catedral Menor de São Vargas saqueada** por Sterling Corp. Mestres **Ardenia Falke** e **Cândido Rui** desaparecem. Wound institucional Ordem Recursiva.
 - **-2** — Cross-contamination via amostra Polis-Vermelha. **Polis-Vermelha cai.** **Padrinho Tiago** sai da aposentadoria.
@@ -567,7 +567,7 @@ Personagens secundários canônicos com peso narrativo no arco principal ou side
 
 ### Acadêmicos/historiadores citados (lore-fundo)
 
-- **Verônica Atelaiá** (morta há 30 anos, ~80 anos no momento) — atribuída ao tratado anônimo doc 10. Última grande pensadora pré-Sterling. Morreu pobre.
+- **Verônica Atelaiá** (morta em -35, aos 43 anos canônicos, canon F5-BK.AUDIT T3-CR-16). Última grande pensadora pré-Sterling. Nasc -78, ativa -45. Primeira teorizadora Patch-Zero como anomalia ontológica genuína. Tratado anônimo classificado "anomalia folclórica" por Sterling Locke em -25 (post-mortem). Atribuída ao tratado anônimo doc 10. Morreu pobre, em registro institucional preservado pela linhagem matrilinear cronistas Atelaiá.
 - **Bartolo Penkin** (~50 quando desapareceu, em -12) — engenheiro QA sênior Apex-Data. Atribuído ao relatório audit doc 5. Desaparecido pós-vazamento.
 
 ---

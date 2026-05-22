@@ -164,7 +164,7 @@ Convenções de colunas:
 
 | F### | Cat. | Plant (resumo curto) | Tipo Diário | Entry ID Diário | Knowledge gate 2ª-passada | Sticky note | Notas |
 |---|---|---|---|---|---|---|---|
-| F070 | COM-BEN/E2 | Pátio do Cronômetro-Hilário: cronômetro de bolso quebrado, ponteiros 14:37, placa latão | Mapa + Manuscrito leve | MAP-03-03 + M-010 | n/a (visual) | **Amarela** + **Verde** | Wound canônico Bento aos 4 anos. |
+| F070 | COM-BEN/E2 | Pátio do Cronômetro-Hilário: cronômetro de bolso quebrado, ponteiros 14:37, placa latão | Mapa + Manuscrito leve | MAP-03-03 + M-010 | n/a (visual) | **Amarela** + **Verde** | Wound canônico Bento aos 7 anos. |
 | F071 | COM-BEN/E3 | Cronômetro Ardenia Falke intacto vitrine biblioteca Velhusto | Mapa | MAP-03-04 | Knowledge média | **Amarela** + **Cinza-prateado** | "Ela está adiantada de nós em algum lugar." |
 | F072 | COM-BEN/STE | Diário Aldebrando Chevalier (pai morto Bento) — Velhusto entrega | Pickup | P-DOC-ALDB | n/a (entregue Memória formativa pré-jogo) | **Amarela** + **Cinza-prateado** | Sterling eliminou Aldebrando em -0.5. |
 | F073 | COM-BEN | Aprendiz Beatriz Pólvora, 16, designada após morte Aldebrando | Ficha-Beatriz + Ficha-Ordem | F-NPC-26 + F-FAC-ORD | n/a (ambient) | **Amarela** | Aprendiz reversa. F128 payoff em Ouro. |

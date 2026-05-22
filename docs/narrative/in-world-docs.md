@@ -125,7 +125,7 @@ verdade. Mas a verdade desta noite tem dezessete corpos.
                                             Mestre da Quarta Catedral
 ```
 
-**Subtexto:** o número 13 e a sobrevivência de 4 (a vida = 4 sobreviventes) ecoa o trauma do Bento aos 4 anos quando 4 também era a idade dele e sobreviveu por estar perto do escudo de Velhusto. Padrão recorrente — Selve "escolhe" via aleatoriedade aparente, parte do horror.
+**Subtexto:** o número 13 (mestres em -80) e a sobrevivência de 4 (sobreviventes canon) ecoa o trauma análogo de Bento aos 7 anos na Catedral Menor de Atelaiá em -7, episódio em que o paralelo numérico 13 mestres/4 sobreviventes operou como repetição estrutural ritual (Atelaiá Chevalier registrara o padrão em -80 sob a sua pena de cronista, e o padrão repetiu-se cerimonialmente em -7 com nova geração testemunha). Padrão recorrente; a Selve "escolhe" via aleatoriedade aparente, parte do horror. Bento sobreviveu por estar próximo do escudo de Velhusto.
 
 ---
 
