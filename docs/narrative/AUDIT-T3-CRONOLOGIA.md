@@ -52,8 +52,8 @@ Bartolo carta -16 refere Linda nascida -12 (4 anos pré-nascimento). Decisão on
 - Hipótese A: DD-017 data "entre -14 e -12" (Linda gestante/recém-nascida)
 - Hipótese B: Bartolo info Sterling pré-natal (Knowledge alta gate)
 
-### T3-CR-14. era-2-boom-tecnico:953 "Vênea ramo Boroshova matrilinear" não canon
-Linhagem Boroshova-Vance Era 1 (CHARS:202) culmina via patrilinear Pyotor, NÃO matrilinear Vênea. Fix: remover atribuição OU canonizar decisão.
+### T3-CR-14. era-2-boom-tecnico:953 "Gargi ramo Boroshova matrilinear" não canon
+Linhagem Boroshova-Vance Era 1 (CHARS:202) culmina via patrilinear Pyotor, NÃO matrilinear Gargi. Fix: remover atribuição OU canonizar decisão.
 
 ### T3-CR-15. lore-bible:522 Yakov sem retrofit 5 tecnologias canon
 INCOHERENCES C9 retrofit parcial. CHARS:48 detalha (radar GPR + sísmica + tomografia muônica + magnetotelúrica + espectrometria microbiana + 89% mortalidade reduzida). Fix: enriquecer lore-bible.

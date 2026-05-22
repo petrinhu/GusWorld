@@ -1,6 +1,6 @@
-# 11. Vênea Vance, mãe
+# 11. Gargi Vance, mãe
 
-> **Narradora in-character:** Vênea Vance, técnica de bancada, mãe do Gus.
+> **Narradora in-character:** Gargi Vance, técnica de bancada, mãe do Gus.
 > **Ano:** 0, três meses antes do final.
 > **Local:** apartamento Vance, 6º andar, Edifício Vance, lado leste do Núcleo Metropolitano de GusWorld City.
 > **Forma:** conto em 1ª pessoa, prosa noturna de bancada.
@@ -25,7 +25,7 @@ Onze anos. Onze.
 
 Eu não sei se as outras mães calculam os filhos assim, mas eu calculo. Calculo a altura, calculo o tempo de banho, calculo o intervalo entre o jantar e o sono. Há semanas que ele tem demorado vinte e um minutos do prato vazio até apagar a luz do quarto, e isso é mais tempo do que o costume dele, que sempre foi oito. O Gus de oito anos apagava a luz em oito minutos, de cabeça no travesseiro, livro fechado. O Gus de onze fica acordado num intervalo que eu reconheço sem precisar nomear: ele está pensando em alguma coisa que ainda não pôs em palavras, e enquanto não puser em palavras o sono não chega.
 
-Eu sei que ele resolve por lógica. Sempre soube. Sento na sala às vezes só para vê-lo encarando o tabuleiro do Tio Yakov com uma cara de quem está descompactando um arquivo, e o tabuleiro responde como tabuleiro responde, que é em silêncio com a metade dos quadrados claros e a metade escura. Penso muito nisso, na metade clara e na metade escura. Penso que o mundo é melhor de viver quando a gente reconhece que tem duas metades e não tenta forçar uma a virar a outra. O Pyotor costumava dizer isso, mas com as palavras dele, que sempre foram menos lentas que as minhas. "Vênea, dois lados, mesma sala. Não dá pra serrar o piso." E ria, o riso curto dele de quem ria como quem confere uma medida.
+Eu sei que ele resolve por lógica. Sempre soube. Sento na sala às vezes só para vê-lo encarando o tabuleiro do Tio Yakov com uma cara de quem está descompactando um arquivo, e o tabuleiro responde como tabuleiro responde, que é em silêncio com a metade dos quadrados claros e a metade escura. Penso muito nisso, na metade clara e na metade escura. Penso que o mundo é melhor de viver quando a gente reconhece que tem duas metades e não tenta forçar uma a virar a outra. O Pyotor costumava dizer isso, mas com as palavras dele, que sempre foram menos lentas que as minhas. "Gargi, dois lados, mesma sala. Não dá pra serrar o piso." E ria, o riso curto dele de quem ria como quem confere uma medida.
 
 O Gus tem o riso do Pyotor e o silêncio da minha mãe. Carrega os dois sem perceber que carrega. Eu percebo. Quando ele se concentra, ele fica como a Belinor ficava no canteiro, um pouco para dentro, um pouco prendendo a respiração no meio da frase, e essa pausa minúscula é a Belinor inteira, transmitida três gerações sem aviso prévio.
 
@@ -35,7 +35,7 @@ Volto para a bancada. O ferro está pronto.
 
 Cinco anos atrás eu sentei com o Pyotor na cozinha desse mesmo apartamento e a gente conversou três horas sobre a coisa mais óbvia que tínhamos para conversar. O Gus tinha seis. Estava dormindo no quarto, como dorme agora, embora o quarto fosse outro, mais perto, e ele ainda dormisse com um bicho de pelúcia que tinha o nome de uma cidade que ele tinha inventado.
 
-"Vênea", o Pyotor disse, "eu não vou mais ficar bom dentro do prédio. Não é você. É a fronteira."
+"Gargi", o Pyotor disse, "eu não vou mais ficar bom dentro do prédio. Não é você. É a fronteira."
 
 E eu sabia. Sabia havia dois anos, talvez três. O Pyotor foi feito para rotação, para os vilarejos pós-Êxodo, para chegar com a bolsa de instrumentos e abrir mão de bibliografia em troca de uma noite de plantão na varanda do Pelicano Branco. Tinha tentado ficar, durante a infância do Gus, porque tinha decidido que o filho merecia um pai presente. Mas presença forçada vira ausência também, só que disfarçada de móvel.
 
@@ -55,7 +55,7 @@ A placa é boa. Boa no sentido de bem feita, de quem soldou conhecendo o ponto e
 
 Não é uma placa-mãe. É uma placa de controle, possivelmente de uma antiga unidade de telemetria doméstica. Era 2 confirmada pela disposição dos capacitores: três fileiras curtas, espaçamento meio milímetro maior do que o padrão posterior. O verniz endurece num tom âmbar que só envelhece assim quando passou de cinquenta anos. Devolve à luz da lupa um cyan que mistura com o âmbar e vira um verde-pântano, e eu fico olhando esse verde-pântano pensando em quem teria entregue isso na oficina.
 
-Veio da Vanda. A Vanda do café tinha trazido na semana passada, embrulhada num pano de prato. Disse "Vênea, isso aqui é do tio Bertoldo, ele guardava no armário e nem sabia se funcionava. Vê se vale alguma coisa". Eu disse que ia ver. Vejo agora.
+Veio da Vanda. A Vanda do café tinha trazido na semana passada, embrulhada num pano de prato. Disse "Gargi, isso aqui é do tio Bertoldo, ele guardava no armário e nem sabia se funcionava. Vê se vale alguma coisa". Eu disse que ia ver. Vejo agora.
 
 Vale. Vale como vale um livro antigo, mais pela impressão do que pelo conteúdo. O circuito é simples: um relógio, dois temporizadores, uma fileira de relays. Pode ter sido controle de irrigação automatizado de um jardim suspenso, daqueles que o Núcleo tinha em quase todo edifício até a Sterling começar a engolir a infraestrutura comum. Funcionalmente reparável. Limpo o verniz envelhecido com solvente suave, passo o pincel antiestático nas trilhas, troco dois capacitores cansados.
 
@@ -93,7 +93,7 @@ Abro a portinhola, retiro o envelope. Papel áspero, do tipo que se compra na fe
 
 Sento na cadeira da cozinha. Abro com a faquinha de fruta, o jeito que abro envelopes desde menina. Cheira fungos secos e papel.
 
-"Vênea, vilarejo Caracará-Cinza, leitura 3-3, lua quarta-minguante. O surto biótico do equinócio passou sem perdas humanas. Perdas vegetais foram contabilizadas e estão dentro do esperado. Pedi à Mariana um pacote de sementes da raiz-amarga para entregar ao Gus quando o ciclo permitir; passei pelo Pelicano Branco no caminho de volta. A Jaci está bem, anda mais quieta, anda lendo um manual de uso de bisturi que eu deixei comigo desde a residência e que ela achou no banco. Diga ao Gus que o aparelho dele precisa de ajuste fino na barra interna nos próximos meses; meu olho me disse, mesmo na última foto. Já agendei consulta com o Dr. Quiroga para a próxima rotação minha pela cidade. Vênea, o céu nas trilhas estava sem ruído essa semana, e quando o céu fica sem ruído eu lembro daquela varanda do segundo apartamento, antes do prédio. Saudades sem peso. Manda beijo ao menino. Pyotor."
+"Gargi, vilarejo Caracará-Cinza, leitura 3-3, lua quarta-minguante. O surto biótico do equinócio passou sem perdas humanas. Perdas vegetais foram contabilizadas e estão dentro do esperado. Pedi à Mariana um pacote de sementes da raiz-amarga para entregar ao Gus quando o ciclo permitir; passei pelo Pelicano Branco no caminho de volta. A Jaci está bem, anda mais quieta, anda lendo um manual de uso de bisturi que eu deixei comigo desde a residência e que ela achou no banco. Diga ao Gus que o aparelho dele precisa de ajuste fino na barra interna nos próximos meses; meu olho me disse, mesmo na última foto. Já agendei consulta com o Dr. Quiroga para a próxima rotação minha pela cidade. Gargi, o céu nas trilhas estava sem ruído essa semana, e quando o céu fica sem ruído eu lembro daquela varanda do segundo apartamento, antes do prédio. Saudades sem peso. Manda beijo ao menino. Pyotor."
 
 Leio devagar. Leio de novo. Sorrio uma vez no meio e duas no fim.
 

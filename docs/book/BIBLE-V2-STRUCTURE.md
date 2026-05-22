@@ -307,7 +307,7 @@ LOMBADAS ALINHADAS (canto inferior, padrão 4 livros):
 
 ## PARTE IV — FAMÍLIA E OBSERVADORES
 
-**Função:** três vozes parentais/anciãs canon. Pyotor (pai médico itinerante, ausente pela vocação), Vênea (mãe técnica, presente pela cozinha), Anciã Mariana Vanderbist (matriarca Pelicano Branco, tradição oral). Tom: terno, didático sem ser piegas, eco da família funcional descentralizada Vance (memória `project_familia_vance_canonica`). Trio funciona como ponte entre antagonistas (T2 Parte III) e cronistas históricos (T2 Parte V).
+**Função:** três vozes parentais/anciãs canon. Pyotor (pai médico itinerante, ausente pela vocação), Gargi (mãe técnica, presente pela cozinha), Anciã Mariana Vanderbist (matriarca Pelicano Branco, tradição oral). Tom: terno, didático sem ser piegas, eco da família funcional descentralizada Vance (memória `project_familia_vance_canonica`). Trio funciona como ponte entre antagonistas (T2 Parte III) e cronistas históricos (T2 Parte V).
 
 **Estimativa parte:** ~9.669 pal / ~32 pp
 
@@ -324,7 +324,7 @@ LOMBADAS ALINHADAS (canto inferior, padrão 4 livros):
 
 ---
 
-### Conto 11 — Vênea Vance: Bancada de Solda, Madrugada Terça
+### Conto 11 — Gargi Vance: Bancada de Solda, Madrugada Terça
 
 | Componente | Fonte | Palavras | Páginas | Nota revisão |
 |---|---|---|---|---|
@@ -397,7 +397,7 @@ LOMBADAS ALINHADAS (canto inferior, padrão 4 livros):
 | 8 | Sterling Locke | Antagonista (tese) | adulto, ano -25 | Salão 3, Faculdade de Engenharia Recursiva | — (academia) | ~11 |
 | 9 | Cassiano Vorto | Antagonista (handler) | adulto, Ano 0 | escritório Sterling Corp | — (operativo) | ~12 |
 | 10 | Pyotor Vance | Pai itinerante | adulto, Ano 0 | estrada da fronteira da Selve | — (médico-cyber) | ~11 |
-| 11 | Vênea Vance | Mãe técnica | adulto, Ano 0 | bancada de solda, Edifício Vance | — (técnica) | ~10 |
+| 11 | Gargi Vance | Mãe técnica | adulto, Ano 0 | bancada de solda, Edifício Vance | — (técnica) | ~10 |
 | 12 | Anciã Mariana Vanderbist | Matriarca | idosa, Ano 0 | Pelicano Branco | tradição oral | ~12 |
 | 13 | Verônica Atelaiá | Paleógrafa | adulta, ano -45 | arquivo subterrâneo, Catedral de São Vargas | — (paleografia) | ~10 |
 | 14 | Mestre Helíaco Vyr | Cantor-de-Pedras Era 1 | adulto, ~ano -850 | câmara central, Catedral-Mãe | proto-Asmódico | ~11 |
@@ -413,7 +413,7 @@ LOMBADAS ALINHADAS (canto inferior, padrão 4 livros):
 | 8 — Sterling | "Três decide. Três rejeita. Três é número suficiente para encerrar uma hipótese." |
 | 9 — Cassiano | a definir — buscar passagem sobre operação GRE / racionalização burocrática |
 | 10 — Pyotor | a definir — buscar passagem do caracol em espiral perfeita |
-| 11 — Vênea | a definir — buscar passagem fluxo amarelado / dedos no cabelo (eco Conto 1) |
+| 11 — Gargi | a definir — buscar passagem fluxo amarelado / dedos no cabelo (eco Conto 1) |
 | 12 — Mariana | a definir — buscar passagem do cordão de 89 nós ou da mesa de boas-vindas |
 | 13 — Verônica | "registro o que ninguém mais quer registrar" |
 | 14 — Helíaco | "A nave tem três degraus à entrada, cinco ao pátio interno, sete ao altar do canto. Não os contei por capricho. Contei-os porque a pedra os pediu." |
@@ -429,7 +429,7 @@ LOMBADAS ALINHADAS (canto inferior, padrão 4 livros):
 | Sterling Locke | Cap 10.1 + Cap 7 (Era Sterling) | Cap 7.1 (tese DRE), Cap 7.2 (subida corporativa), Cap 7.7 (GRE), Cap 14.1 (Sterling Corp) |
 | Cassiano Vorto | Cap 10.4 (NPCs antagonistas menores) | Cap 7.7 (GRE), Cap 14.1 (Sterling Corp) |
 | Pyotor Vance | Cap 11.1 (linhagem Vance) | Cap 6.4 (Gustaf I→VII, 7 gerações), Apêndice B (CHARS) |
-| Vênea Vance | Cap 11.1 (linhagem Vance) | Cap 9.1 (Gus, contexto familiar), memória `project_familia_vance_canonica` |
+| Gargi Vance | Cap 11.1 (linhagem Vance) | Cap 9.1 (Gus, contexto familiar), memória `project_familia_vance_canonica` |
 | Anciã Mariana Vanderbist | Cap 11.3 (linhagem Vanderbist) | Cap 14.6 (Pelicano Branco), Cap 9.7 (Jaci, neta) |
 | Verônica Atelaiá | Cap 6.7 (cronistas Era 2) + Cap 11.2 (linhagem Chevalier-Atelaiá) | Cap 5.6 (Famílias-Pilastra, codificação institucional Atelaiá), Cap 7.8 (Patch-Zero como sistema), Apêndice E (DD-* in-world docs) |
 | Mestre Helíaco Vyr | Cap 5.8 (Era 1 §8 íntegro) | Cap 5.3 (arqueologia cripto-glifo), Cap 5.7 (Regime Vyrcátrix), Apêndice A (glossário: Hiram Abiff echo) |
@@ -513,7 +513,7 @@ Cada cronista carrega um trauma fundador específico que o conto **mostra sem no
 | 8 — Sterling | Rejeição acadêmica (Cap 10.2 Vol 1, prelore vilão) reescrita como triunfo na própria tese (-25). |
 | 9 — Cassiano | Profissionalização do dano (handler que não pergunta). |
 | 10 — Pyotor | Vocação como afastamento — escolhe estrada porque sabe que ficar dói outro tipo. |
-| 11 — Vênea | Cansaço sem queixa (3h da manhã, fluxo amarelado, café com filho). |
+| 11 — Gargi | Cansaço sem queixa (3h da manhã, fluxo amarelado, café com filho). |
 | 12 — Mariana | Sobrevivência matriarcal — todo amor seu já enterrou alguém. |
 | 13 — Verônica | Saber o que ninguém quer saber e registrar mesmo assim. |
 | 14 — Helíaco | Privilégio da sexta geração que viu o que cinco anteriores só sonharam — pesa. |
@@ -526,7 +526,7 @@ Cada cronista carrega um trauma fundador específico que o conto **mostra sem no
 
 Vozes do Vol 2 ancoram linhagens canon do Vol 1 Cap 11:
 
-- **Vance** (linhagem fundadora): Gus (Conto 1) ↔ Pyotor (10) ↔ Vênea (11). Genealogia 7 gerações Gustaf I→VII (Cap 11.1 Vol 1).
+- **Vance** (linhagem fundadora): Gus (Conto 1) ↔ Pyotor (10) ↔ Gargi (11). Genealogia 7 gerações Gustaf I→VII (Cap 11.1 Vol 1).
 - **Chevalier-Atelaiá**: Bento (Conto 4) ↔ Verônica Atelaiá (13). Eco direto Era 1 §6 (Cap 5.6 Vol 1, codificação institucional Atelaiá).
 - **Vanderbist**: Jaci (Conto 7) ↔ Anciã Mariana (12). Pelicano Branco (Cap 14.6 Vol 1).
 - **Berenger**: Cauã (Conto 2) ↔ Salvador Berenger (pai morto, mencionado dentro do Conto 2). Cap 11.4 Vol 1.
@@ -552,8 +552,8 @@ Cada conto coloca o cronista frente a uma decisão *já tomada antes do conto co
 | 7 — Jaci | Decidiu sair de Pelicano Branco rumo à Selve. |
 | 8 — Sterling | Decidiu defender a tese DRE publicamente. |
 | 9 — Cassiano | Decidiu operacionalizar GRE sem fazer perguntas. |
-| 10 — Pyotor | Decidiu ser médico itinerante (mesmo amando Vênea). |
-| 11 — Vênea | Decidiu ficar e consertar placa (mesmo amando Pyotor). |
+| 10 — Pyotor | Decidiu ser médico itinerante (mesmo amando Gargi). |
+| 11 — Gargi | Decidiu ficar e consertar placa (mesmo amando Pyotor). |
 | 12 — Mariana | Decidiu permanecer matriarca de Pelicano Branco. |
 | 13 — Verônica | Decidiu registrar mesmo que ninguém leia. |
 | 14 — Helíaco | Decidiu cantar a pedra (sexta geração, primeira a realizar). |
@@ -578,7 +578,7 @@ Cada conto deixa um objeto, gesto ou frase que o Vol 1 Bíblia trata como elemen
 | 8 — Sterling | Tese DRE como semente de tudo que vem depois (Cap 7 Vol 1). |
 | 9 — Cassiano | Vocabulário burocrático da operação GRE (cross-ref Cap 7.7). |
 | 10 — Pyotor | Carta-padrão "vi caracol em espiral perfeita" (eco Fibonacci canon). |
-| 11 — Vênea | Cheiro do fluxo amarelado (mnemônico canônico Vol 1). |
+| 11 — Gargi | Cheiro do fluxo amarelado (mnemônico canônico Vol 1). |
 | 12 — Mariana | Cordão 89 nós (easter egg maçom canon material). |
 | 13 — Verônica | Fólio 89 do códice anônimo (cross-ref Cap 6.7). |
 | 14 — Helíaco | Boca-da-Funda, 3-5-7 degraus, Catedral-Mãe (Cap 5.3, 5.8 Vol 1). |
@@ -599,7 +599,7 @@ Cada conto deixa um objeto, gesto ou frase que o Vol 1 Bíblia trata como elemen
 | **Abertura Tomo 2** | Página de rosto Tomo 2 com tinta vermelha (#C8323C) — ruptura com paleta cyan dominante do T1 | Aviso visual: o tom muda |
 | Entre Conto 8 ↔ 9 (antagonistas) | Linha reta vermelha vertical | Frieza ascética |
 | **Fim Conto 9 (cesura Partes III/IV)** | Página inteira branca + esquadro maçom miniatura brass sobre cyan-noite (#0E1B26) | Vale emocional; passagem antagonistas → família |
-| Entre Conto 10 ↔ 11, 11 ↔ 12 (família) | Mancha de tinta amarelada (eco fluxo da Vênea) | Calor doméstico |
+| Entre Conto 10 ↔ 11, 11 ↔ 12 (família) | Mancha de tinta amarelada (eco fluxo da Gargi) | Calor doméstico |
 | **Cesura Parte IV → Parte V (Conto 12 ↔ 13)** | Filete brass duplo + datação cronística "-45" centralizada | Aviso de salto temporal |
 | Entre Conto 13 ↔ 14 | Datação cronística "~-850" centralizada | Aviso de salto temporal maior |
 | **Fim Conto 14 (fim Vol 2)** | Coluna quebrada (canon maçom — Catedral-Mãe submersa) em tinta brass + cyan-noite | Fade final do volume; gancho semântico Vol 1 Cap 5.8 |

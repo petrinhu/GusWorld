@@ -178,18 +178,18 @@ Tom autoral por origem:
   ```
 - **Função:** fundamenta tom Era 2 (cooperativo, código aberto, comunidade técnica) em voz humana específica; serve como **contraste explícito** ao tom corporativo Sterling Corp (DD-001, DD-012); última frase "compilando bem" reforça cumprimento "Compila bem" canon ([[lore-bible]] §11.4); cria substrato afetivo para o Gus (que lê isso aos 11 e absorve a tese antes de saber argumentar contra DRE). Linha "não engana o ferro" é eco direto do que vai aparecer no doc 1 invertido.
 
-### DD-019 — Caderneta de saudações de Vênea Vance (lista de receitas + bilhetes do Pyotor)
+### DD-019 — Caderneta de saudações de Gargi Vance (lista de receitas + bilhetes do Pyotor)
 
 **STATUS:** APROVADA (2026-05-16) — viralizada como DD-019 canônico em [[in-world-docs]] §Documento 19. Plant agora GRAVADO.
 
 - **Tipo:** caderneta de cozinha barata, capa de oleado florido, ~50 páginas; receitas escritas à mão. Entre páginas, 4 bilhetes dobrados do Pyotor (cartas raras canônicas do pai itinerante).
-- **Autor:** **Vênea Vance** (mãe do Gus), receitas; **Pyotor Vance** (pai itinerante, médico-cyber em rotação fronteira-Selve), bilhetes.
+- **Autor:** **Gargi Vance** (mãe do Gus), receitas; **Pyotor Vance** (pai itinerante, médico-cyber em rotação fronteira-Selve), bilhetes.
 - **Data:** ano -8 a presente (receitas acumuladas); bilhetes em -7, -4, -2, -0.5.
 - **Onde encontra:** gaveta da cozinha do apartamento Vance. Acessível desde o início; Gus precisa ter feito mecânica do save base canônica pelo menos 3 vezes (volta pra casa 3x) para o jogo "destrava" a interação com a caderneta (subtexto: a cumplicidade com a mãe vira hábito, hábito leva à descoberta).
 - **Trigger:** mecânica de save base + 3 retornos.
 - **Gate:** Knowledge baixa (sem prereq formal; só requer hábito de voltar pra casa).
 - **Knowledge contribuição:** +2 Lore-Mãe (safe base canônica), +1 Lore-Voice, +1 Lore-Era2 (receitas herdadas).
-- **Cross-link Bloco I:** (sem F### direto; estabelece **substrato emocional ofuscado** característico Vênea, [[lore-bible]] §14.)
+- **Cross-link Bloco I:** (sem F### direto; estabelece **substrato emocional ofuscado** característico Gargi, [[lore-bible]] §14.)
 - **Conteúdo amostral:**
   ```
   [primeira página]
@@ -208,7 +208,7 @@ Tom autoral por origem:
   [página meio do caderno, receita interrompida pela metade,
    bilhete dobrado encartado:]
 
-  Vênea.
+  Gargi.
   Faço 6 meses na rotação do Caracará-Cinza ainda. O plantão
   da noite tá pesado mas o pessoal aqui é bom.
   O Gus tá com a Matriz nova?
@@ -226,14 +226,14 @@ Tom autoral por origem:
     SE der febre alta de novo, hospital. ponto.
 
   [último bilhete, mais recente, encartado nas últimas páginas]
-  Vênea, Gus.
+  Gargi, Gus.
   Tô voltando em outubro. Promessa firme dessa vez. Não fala
   pra ele ainda, não quero que ele crie expectativa errada
   caso o turno mude.
   Cheiro a fio queimado e a saudade. Vai passar.
                                               P.
   ```
-- **Função:** materializa a **safe base canônica** Vênea (Pillar 4, ofuscada deliberadamente, [[lore-bible]] §14); humaniza Pyotor (presente em ausência via cartas raras); bilhete final ("voltando em outubro") fica sem resolução em G1, sequel hook ambíguo ou cena bonus epilogue se Knowledge Ouro; receita "caldo-de-folha-fractal" cria ponte entre Vênea (cidade) e Mariana (Pelicano Branco), Vênea **conhece Mariana** ou tem rede oral indireta, lore-fundo.
+- **Função:** materializa a **safe base canônica** Gargi (Pillar 4, ofuscada deliberadamente, [[lore-bible]] §14); humaniza Pyotor (presente em ausência via cartas raras); bilhete final ("voltando em outubro") fica sem resolução em G1, sequel hook ambíguo ou cena bonus epilogue se Knowledge Ouro; receita "caldo-de-folha-fractal" cria ponte entre Gargi (cidade) e Mariana (Pelicano Branco), Gargi **conhece Mariana** ou tem rede oral indireta, lore-fundo.
 
 ### DD-020 — Relatório de plantio de Solano Vanderbist (cartilha agro Pelicano Branco)
 
@@ -435,7 +435,7 @@ Tom autoral por origem:
 | **DD-016** | Caderno Salviano Alencar | E3 | Galpão Cooperativo Periferia | Sub-quest arco Dante | Med (Alta destrava integral) | +3 PER +2 E3 +1 COM-DAN | F019 F020 F021 F022 | [[in-world-docs]] §16 |
 | **DD-017** | Diário campo Bartolo Penkin | E3 | Porão casa Penkin Periferia | Sub-quest pós-DD-005 | Med (Alta destrava página 80) | +3 STE +2 UNG +1 COM-LIN | F036 F074 | [[in-world-docs]] §17 |
 | **DD-018** | Folheto Lin Tórun Pilha -98 | E2 | Sebo Praça Compilador Periferia | Pickup livre 1ª visita | n/a | +2 E2 +1 TRA +1 PER | F067 F068 | [[in-world-docs]] §18 |
-| **DD-019** | Caderneta Vênea Vance + Pyotor | E3 | Gaveta cozinha Vance | Save base 3 retornos | Baixa | +2 MÃE +1 VOI +1 E2 | (substrato emocional) | [[in-world-docs]] §19 |
+| **DD-019** | Caderneta Gargi Vance + Pyotor | E3 | Gaveta cozinha Vance | Save base 3 retornos | Baixa | +2 MÃE +1 VOI +1 E2 | (substrato emocional) | [[in-world-docs]] §19 |
 | **DD-020** | Relatório plantio Solano Vanderbist | E3 | Quarto preservado cabana Mariana | Sub-quest pós-Jaci | Med | +3 PEL +2 COM-JAC +2 E3 +1 END | F047 (suporte) | [[in-world-docs]] §20 |
 | **DD-021** | Manual Octantes de Reabsorção | E3 | Vestiário Cúpula ato 3 | Exploração lateral | Med | +3 STE +2 PAT | F038 F050 | [[in-world-docs]] §21 |
 | **DD-022** | Tábua de ofícios São Vargas | E2 | Ruínas Catedral Menor | Puzzle remontagem | Baixa (Alta destrava margem) | +2 E3 +1 ORD +1 COM-BEN | F041 F071 | [[in-world-docs]] §22 |
@@ -452,7 +452,7 @@ Tom autoral por origem:
 1. **Histórico Salviano/Alencar (Periferia, lore Era 3 família Dante):** F019-F022 plantam, mas único doc canônico relativo é DD-008 (memorando Vorto → Dante) que é **operacional, não familiar**. DD-016 fecha a lacuna emocional.
 2. **Histórico Apex-Data (Era 3 pré-monopólio):** F036 + DD-005 cobrem o audit; DD-017 atribui canônicamente a Bartolo Penkin e ancora Underground como continuidade.
 3. **Cultura Era 2 viva (Tomo, Pilha, Festa da Compilação fundadora):** F067 + F068 plantam; doc canônico não materializa voz Era 2 em texto humano. DD-018 fecha.
-4. **Substrato emocional Vênea + Pyotor (safe base canônica + pai itinerante):** [[lore-bible]] §14 estabelece NPCs canônicos; bilhetes raros do Pyotor referenciados ("3-4 no jogo total") mas sem doc descobrível materializado. DD-019 materializa.
+4. **Substrato emocional Gargi + Pyotor (safe base canônica + pai itinerante):** [[lore-bible]] §14 estabelece NPCs canônicos; bilhetes raros do Pyotor referenciados ("3-4 no jogo total") mas sem doc descobrível materializado. DD-019 materializa.
 
 ### Densidade por setting
 

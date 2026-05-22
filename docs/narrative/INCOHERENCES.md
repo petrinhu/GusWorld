@@ -13,7 +13,7 @@ Mapeamento sistemático de conflitos canon detectados via cross-validation deep-
 **Conflito triplo: nome + profissão + dinâmica família**
 
 - `lore-bible.md:520`: "**Patrício Vance** (40) — pai Gus. Engenheiro de manutenção em estação de transmissão."
-- `timeline.md:115`: "Vênea Vance + **Patrício Vance** (pai, engenheiro de manutenção)."
+- `timeline.md:115`: "Gargi Vance + **Patrício Vance** (pai, engenheiro de manutenção)."
 - `in-world-docs.md` DD-019:797: "**Patrício Vance** (pai ausente)."
 - `CHARS.md:47`: "**Pyotor Vance** — Pai do Gus, **médico-cyber itinerante**."
 - `deep/antologia/10-pyotor-vance-pai.md` + `deep/stinger/post-credits-deep.md`: **Pyotor Vance**.

@@ -41,7 +41,7 @@ A tabela abaixo cataloga, conto a conto, a tríade de referências autorais que 
 | 08 | Sterling | Asimov Mule + Hare Without Conscience + Bruce Sterling Schismatrix |
 | 09 | Cassiano Vorto | Le Carré informant handler + Hare Without Conscience + Bruce Sterling |
 | 10 | Pyotor | Eco Adso adulto + Children of Dune golden path + Le Carré Smiley |
-| 11 | Vênea | Eco Adso íntima + Le Carré + Bene Gesserit silenciosa |
+| 11 | Gargi | Eco Adso íntima + Le Carré + Bene Gesserit silenciosa |
 | 12 | Anciã Mariana | Tolkien Silmarillion cantadeiras + Eco Adso + tradição oral |
 | 13 | Verônica | Foundation Seldon profética + Eco Nome da Rosa Adso + Asimov Mule |
 | 14 | Helíaco | Tolkien Silmarillion Ainur cosmogônico + Eco Adso arcaico |

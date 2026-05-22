@@ -8,7 +8,7 @@ O Tavus-Drive estava no meu pulso esquerdo, frio. Ele fica frio de manhã porque
 
 Mamãe tinha consertado uma placa-mãe na noite anterior, e dava pra ver pelo cheiro. Não é o cheiro do solda; o cheiro do solda some rápido. É o cheiro do fluxo que ela usa, um fluxo amarelado que ela compra do Tio Yakov por preço de família. Esse fluxo fica grudado nos dedos dela e ela fica passando os dedos no cabelo sem perceber. Aí o cheiro fica no apartamento por umas oito horas. Eu uso esse cheiro pra saber a que horas ela dormiu. Naquela manhã eu calculei que ela tinha terminado às três da madrugada. Cinco horas de sono. Cinco é Fibonacci também, mas é coincidência. Eu acho.
 
-Mamãe se chama Vênea. Quando eu era menor eu pensava que era um nome de planta, tipo uma trepadeira que sobe na grade da janela. Hoje eu sei que não é planta nenhuma, é só o nome dela. Mas eu ainda penso na trepadeira quando ela me chama. Funciona como mnemônico.
+Mamãe se chama Gargi. Quando eu era menor eu pensava que era um nome de planta, tipo uma trepadeira que sobe na grade da janela. Hoje eu sei que não é planta nenhuma, é só o nome dela. Mas eu ainda penso na trepadeira quando ela me chama. Funciona como mnemônico.
 
 O apartamento da gente fica no sexto andar do Edifício Vance, no Núcleo. Sexto andar é bom porque você vê o topo do acaceiro de tronco vermelho que cresce no quintal coletivo do prédio do lado. Quando eu olho pra baixo eu vejo o tronco inteiro: vermelho-sangue na base, vermelho-tijolo no meio, quase preto onde a casca começa. O Tio Yakov diz que o tronco vermelho é uma coisa antiga, que só cresce desse jeito perto de onde teve gente reunida em volta de fogo por gerações seguidas. Eu não sei se acredito. Mas é bonito.
 

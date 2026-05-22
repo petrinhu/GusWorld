@@ -48,8 +48,8 @@
 
 | Nome | Vínculo canon | Faixa | Status | 1ª aparição |
 |---|---|---|---|---|
-| Vênea Vance | Mãe do Gus, técnica de bancada, safe base Edifício Vance, separada amigavelmente de Pyotor desde Gus aos 6 anos (-5) | adulta | ✅ canônico | `sinopse.md` + memo `project_familia_vance_canonica` |
-| Pyotor Vance | Pai do Gus, médico-cyber itinerante rotação fronteira-Selve, hobby programação (apresentou ao Gus); separado amigavelmente de Vênea desde -5 | adulto | ✅ canônico (distante, presente) | `sinopse.md` + DD-019 + memo `project_familia_vance_canonica` |
+| Gargi Vance | Mãe do Gus, técnica de bancada, safe base Edifício Vance, separada amigavelmente de Pyotor desde Gus aos 6 anos (-5) | adulta | ✅ canônico | `sinopse.md` + memo `project_familia_vance_canonica` |
+| Pyotor Vance | Pai do Gus, médico-cyber itinerante rotação fronteira-Selve, hobby programação (apresentou ao Gus); separado amigavelmente de Gargi desde -5 | adulto | ✅ canônico (distante, presente) | `sinopse.md` + DD-019 + memo `project_familia_vance_canonica` |
 | Yakov Vance | Tio paterno do Gus, irmão mais novo de Pyotor (4 anos), engenheiro software + geólogo na maior mineradora do reino, apresentou xadrez ao Gus | adulto | ✅ canônico | memo `project_familia_vance_canonica` |
 | Belinor Vance | Avó morta do Gus, mãe biológica de Pyotor e Yakov | n/a | 💀 morta pré-jogo | `sinopse.md` |
 | Inácia Berenger | Mãe do Cauã, sucateira no Mercado da Sucata Honesta, ex-QA Apex-Data demitida -19 | adulta | ✅ canônico | `environments/01-cidade-cyber-gotica.md` + `factions.md` |
@@ -386,7 +386,7 @@ Cinco séculos de regressão. Pequenos vilarejos sobrevivem na fronteira-Selve. 
 | -12 | Iara Koslov nasce (idade canônica em ato 1: 12). Abandonada bebê em catedral menor anexa a Setor Mirage | Iara Koslov | `timeline.md` Era 3 |
 | -12 | Linda Neumann nasce (idade canônica em ato 1: 12). Pais: Otmar Neumann + Brígida Neumann (musicista, toca-discos histórico) | Linda Neumann; Otmar Neumann; Brígida Neumann | `timeline.md` Era 3 |
 | -11 | Diretora Octávia Penedo recrutada na fase Core-Synth Sterling Corp (-11) | Octávia Penedo | `deep/antagonists/npcs-antologia.md` R5 |
-| -11 | Gus Vance nasce (idade canônica em ato 1: 11). Pais: Vênea Vance + Pyotor Vance. Tio paterno Yakov Vance (~25 na época) | Gus Vance; Vênea Vance; Pyotor Vance; Yakov Vance | `timeline.md` Era 3 |
+| -11 | Gus Vance nasce (idade canônica em ato 1: 11). Pais: Gargi Vance + Pyotor Vance. Tio paterno Yakov Vance (~25 na época) | Gus Vance; Gargi Vance; Pyotor Vance; Yakov Vance | `timeline.md` Era 3 |
 | -11 | Jaci Vanderbist nasce (idade canônica em ato 1: 11). Pais: Lia Vanderbist + Solano Vanderbist | Jaci Vanderbist; Lia Vanderbist; Solano Vanderbist | `timeline.md` Era 3 |
 | -10 | Sterling Corp lança Janelarum 2.0 (versão "corporativa"). Absorve fabricante original. Janelarum vira ferramenta Sterling | Janelarum 2.0; Sterling Corp | `timeline.md` Era 3 |
 | -10 | Fundação da operação GRE (Global Runtime Environment) como projeto interno classificado. Conhecido inicialmente como "Projeto Continente" | Sterling Corp; GRE | `timeline.md` Era 3 |
@@ -397,7 +397,7 @@ Cinco séculos de regressão. Pequenos vilarejos sobrevivem na fronteira-Selve. 
 | -6 | Adila Murmúrio consolida tutela administrativa plena Cult Mirage pró-Sterling (passa de Hierofante nominal a operacional plena). Sonja morta há 28 anos | Adila Murmúrio; Cult Mirage | `timeline.md` Era 3 |
 | -6 | Iara (idade 6) adotada formalmente por Cult Mirage. Adila a treina como "promessa artística". Início da manipulação canônica | Iara Koslov; Adila Murmúrio | `timeline.md` Era 3 |
 | -5 | Acidente de manutenção em prédio popular da Periferia Industrial. Sistema elétrico mal instalado por subcontratada FIR (alinhada Sterling) pega fogo. Morre Davi Berenger (16 anos, irmão Cauã; Cauã tinha 8). Família silenciada com indenização irrisória. Wound canônico Cauã | Davi Berenger; Subestação 7; Inácia Berenger | `timeline.md` Era 3 + DD-013 |
-| -5 | Vênea e Pyotor Vance separam-se amigavelmente quando Gus tinha 6 anos. Contato contínuo, pais neutros entre si | Vênea Vance; Pyotor Vance; Gus | memo `project_familia_vance_canonica` |
+| -5 | Gargi e Pyotor Vance separam-se amigavelmente quando Gus tinha 6 anos. Contato contínuo, pais neutros entre si | Gargi Vance; Pyotor Vance; Gus | memo `project_familia_vance_canonica` |
 | -5 | Dante (8 anos) recrutado por Diretor Cassiano Vorto da FIR. Inicialmente "aprendizado técnico subsidiado". Sterling supervisiona à distância; Vorto reporta progresso. Aliciamento canônico Dante começa, mantido oculto | Dante Alencar; Cassiano Vorto | `timeline.md` Era 3 |
 | -4 | Cauã (9 anos) começa liderar grupo informal de runners juvenis dos Dutos Infernais. Após morte do irmão, dois anos em silêncio quase total. Tao Berisi entre os runners | Cauã Berenger; Dutos Infernais; Tao Berisi | `timeline.md` Era 3 |
 | -4 | Departamento de Contenção Sterling Corp criado. Diretora: Octávia Penedo (engenheira corporativa subordinada direta de Sterling) | Octávia Penedo; Sterling Corp | `timeline.md` Era 3 |

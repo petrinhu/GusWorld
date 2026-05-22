@@ -790,14 +790,14 @@ Sigam compilando bem.
 
 ---
 
-## Documento 19 — Caderneta de saudações de Vênea Vance (lista de receitas + bilhetes do Pyotor)
+## Documento 19 — Caderneta de saudações de Gargi Vance (lista de receitas + bilhetes do Pyotor)
 
 **Tipo:** caderneta de cozinha barata, capa de oleado florido, ~50 páginas; receitas escritas à mão. Entre páginas, 4 bilhetes dobrados do Pyotor (cartas raras canônicas do pai itinerante).
-**Autor:** Vênea Vance (mãe do Gus), receitas; Pyotor Vance (pai itinerante, cartas raras), bilhetes.
+**Autor:** Gargi Vance (mãe do Gus), receitas; Pyotor Vance (pai itinerante, cartas raras), bilhetes.
 **Data:** ano -8 a presente (receitas acumuladas); bilhetes em -7, -4, -2, -0.5.
 **Onde se encontra:** gaveta da cozinha do apartamento Vance. Acessível desde o início; Gus precisa ter usado a mecânica de save base canônica pelo menos 3 vezes (voltar pra casa 3x) para o jogo destravar a interação com a caderneta (subtexto: a cumplicidade com a mãe vira hábito; hábito leva à descoberta).
 **Trigger:** mecânica de save base + 3 retornos. Gate: Knowledge baixa.
-**Função:** materializa a safe base canônica Vênea (Pillar 4, ofuscada deliberadamente, [[lore-bible]] §14); humaniza Pyotor (presente em ausência via cartas raras); bilhete final ("voltando em outubro") fica sem resolução em G1, sequel hook ambíguo ou cena bonus epilogue se Knowledge Ouro; receita "caldo-de-folha-fractal" cria ponte entre Vênea (cidade) e Mariana (Pelicano Branco), Vênea conhece Mariana ou tem rede oral indireta, lore-fundo.
+**Função:** materializa a safe base canônica Gargi (Pillar 4, ofuscada deliberadamente, [[lore-bible]] §14); humaniza Pyotor (presente em ausência via cartas raras); bilhete final ("voltando em outubro") fica sem resolução em G1, sequel hook ambíguo ou cena bonus epilogue se Knowledge Ouro; receita "caldo-de-folha-fractal" cria ponte entre Gargi (cidade) e Mariana (Pelicano Branco), Gargi conhece Mariana ou tem rede oral indireta, lore-fundo.
 
 ```
 [primeira página]
@@ -816,7 +816,7 @@ Café-de-neurônio pra ele estudar
 [página meio do caderno, receita interrompida pela metade,
  bilhete dobrado encartado:]
 
-Vênea.
+Gargi.
 Faço 6 meses na rotação do Caracará-Cinza ainda. O plantão
 da noite tá pesado mas o pessoal aqui é bom.
 O Gus tá com a Matriz nova?
@@ -834,7 +834,7 @@ Caldo-de-folha-fractal (pra febre — Mariana ensinou)
   SE der febre alta de novo, hospital. ponto.
 
 [último bilhete, mais recente, encartado nas últimas páginas]
-Vênea, Gus.
+Gargi, Gus.
 Tô voltando em outubro. Promessa firme dessa vez. Não fala
 pra ele ainda, não quero que ele crie expectativa errada
 caso o turno mude.
@@ -842,7 +842,7 @@ Cheiro a fio queimado e a saudade. Vai passar.
                                             P.
 ```
 
-**Subtexto:** receita Pão-de-bit ensina sobre Gus por triangulação (Vênea sabe que ele percebe a canela; vê o filho como leitor de detalhe); receita Caldo-de-folha-fractal confirma que Vênea aprendeu técnica botânica Era 1 com Mariana, conexão jamais comentada explicitamente em diálogo; bilhete do plantão remoto implica que o digital corporativo é monitorado (Pyotor pede correio postal). Os 4 bilhetes nunca prometem mais do que conseguem cumprir, exceto o último, que tenta. "Vai passar" pode ser sobre saudade, sobre o turno, ou sobre algo que Pyotor sabe e não diz.
+**Subtexto:** receita Pão-de-bit ensina sobre Gus por triangulação (Gargi sabe que ele percebe a canela; vê o filho como leitor de detalhe); receita Caldo-de-folha-fractal confirma que Gargi aprendeu técnica botânica Era 1 com Mariana, conexão jamais comentada explicitamente em diálogo; bilhete do plantão remoto implica que o digital corporativo é monitorado (Pyotor pede correio postal). Os 4 bilhetes nunca prometem mais do que conseguem cumprir, exceto o último, que tenta. "Vai passar" pode ser sobre saudade, sobre o turno, ou sobre algo que Pyotor sabe e não diz.
 
 ---
 
@@ -1032,7 +1032,7 @@ qualquer coisa em si mesmos.
 
 | Ato | Docs descobríveis (gate) | Notas |
 |---|---|---|
-| **Ato 1** | 12 (Setor Mirage), 4 (panfleto público), 1 (átrio Cúpula — fragmento público), 18 (folheto Lin Tórun no sebo da Praça do Compilador), 19 (caderneta Vênea — começa acessível, 3 retornos destrava) | Setup; Knowledge ainda baixa. Doc 18 ancora tom Era 2; doc 19 ancora safe base. |
+| **Ato 1** | 12 (Setor Mirage), 4 (panfleto público), 1 (átrio Cúpula — fragmento público), 18 (folheto Lin Tórun no sebo da Praça do Compilador), 19 (caderneta Gargi — começa acessível, 3 retornos destrava) | Setup; Knowledge ainda baixa. Doc 18 ancora tom Era 2; doc 19 ancora safe base. |
 | **Ato 2 — Arco Cauã** | 2, 9 | Caixa zinco apartamento Berenger. |
 | **Ato 2 — Arco Iara** | 4 (versão decifrada) | Iara decifra a versão original conhecida. |
 | **Ato 2 — Arco Bento** | 3 (diário Atelaiá), 10 (tratado anônimo), 22 (tábua São Vargas — puzzle remontagem) | Biblioteca Velhusto + biblioteca pública + ruínas Catedral Menor. |

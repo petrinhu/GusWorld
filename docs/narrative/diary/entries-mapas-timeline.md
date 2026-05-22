@@ -86,12 +86,12 @@ Cada mapa segue padrão fixo:
 
 - "fonte Engrenagem-Mestra → tique exato 1/seg → 700 anos contínuos. ela é a única coisa que NÃO pertence à Sterling Corp na praça inteira." (Knowledge média)
 - "pedestal vazio Era 3 'reservado para futuro monumento Sterling Corp' há 8 anos. (eles compraram a Festa. não vão pagar pelo monumento.)" (Knowledge baixa, depois confirmada)
-- "Vanda do Café tem rotina de café que cruza com a Vênea. mãe sai 5:45 todo dia; Vanda passa 5:47. nunca falam. mas se cumprimentam com a mão." (Knowledge alta)
+- "Vanda do Café tem rotina de café que cruza com a Gargi. mãe sai 5:45 todo dia; Vanda passa 5:47. nunca falam. mas se cumprimentam com a mão." (Knowledge alta)
 - "Edifício Vance: calçada de pedra Era 1 visível em 3 pontos. ninguém olha pra baixo." (foreshadow plant F-018)
 
 **Cross-ref Bloco I:**
 
-- F-001 (pausa de 1 segundo antes de falar — origem aula -7 anos, Diretora liga pra Vênea)
+- F-001 (pausa de 1 segundo antes de falar — origem aula -7 anos, Diretora liga pra Gargi)
 - F-002 (logo Sterling em todo poste, propaganda saturada ato 1)
 - F-014 ("histórico é como a gente sabe pra onde a coisa vai")
 - F-018 (cripto-glifo Era 1 sob asfalto Praça da Compilação)
@@ -481,7 +481,7 @@ Datas in-world (calendário Era 2, 12 meses 30-31 dias; ano 0 = presente do jogo
 |---|---|---|---|---|---|
 | 9 | -150 | **Primeira linha C-Arcane compilada** com sucesso. Equipe: 4 engenheiros (Lin Tórun, Rosaria Galp, Henrique Pira, Marcela Sívo). | Placa cerimonial Praça da Compilação (Mapa 1). Discurso da Pilha anual. | Festa da Compilação (1º setembro) institucionalizada. | Mapa 1 (Praça da Compilação) + Mapa 1 landmark oculto (cripto-glifo Era 1 sob, 7 nomes que ninguém lê). |
 | 10 | -148 | Fundação informal da Ordem Recursiva. Mestres-Asmódicos sobreviventes do Hiato se organizam. | Bento explica linhagem arco Bento. | Ficha Ordem Recursiva. | Mapa 3. |
-| 11 | -140 | Estabelecimento de **GusWorld City** sobre sítio Neo-Sylvania de superfície (catedrais parcialmente preservadas no que viria a ser o Anel Verde). | Vênea menciona "onde a gente mora foi construído sobre coisa mais velha" (manuscrito Gus pós ato 1). | Hub canônico. | Mapa 1 + Mapa 9. |
+| 11 | -140 | Estabelecimento de **GusWorld City** sobre sítio Neo-Sylvania de superfície (catedrais parcialmente preservadas no que viria a ser o Anel Verde). | Gargi menciona "onde a gente mora foi construído sobre coisa mais velha" (manuscrito Gus pós ato 1). | Hub canônico. | Mapa 1 + Mapa 9. |
 | 12 | -130 | Fundação de **Polis-Vermelha** sobre sítio Neo-Sylvania mais profundo (subterrâneo extenso). | Doc 11 ([[entries-docs-descobriveis\|pichações Polis-Vermelha]]) destrava menção. | Sítio rico em cripto-glifos. Razão pela qual Patch-Zero capturado lá século depois. | Mapa 9. |
 | 13 | -120 | Fundação Cidades-Gêmeas (Norte/Sul) e Heliópolis-Nova. Quatro grandes cidades estabelecidas. | Underground Padrinho Tiago menciona rede comercial arco Linda. | Rede comercial nasce. | Mapa 9. |
 | 14 | -115 | Desenvolvimento Asmódico canônico (codificação formal). Primeiro mestre-codificador: **Atelaiá Chevalier** (ancestral direto Bento, 5 gerações antes). | Bento exibe linhagem direta arco Bento (Knowledge média). | Asmódico vira disciplina formal. Catedrais reabertas como sedes. | Mapa 3. |

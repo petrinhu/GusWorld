@@ -16,7 +16,7 @@
 
 | # | Conto (arquivo) | Narrador | Idade | Pal | Pp | Tema central | Cross-ref Vol 1 |
 |---|---|---|---|---|---|---|---|
-| 01 | `01-gus-gustaf-vii.md` | Gus Vector Tavus Vance | 11 | ~2.750 | ~9 | Descoberta Glyph-vyr ancestral via cifra Pyotor I, manhã chuvosa, mãe Vênea + cripto-glifo São Vargas | V1 B.1 (party), C.3 (catedrais), Era 1 (Pyotor I) |
+| 01 | `01-gus-gustaf-vii.md` | Gus Vector Tavus Vance | 11 | ~2.750 | ~9 | Descoberta Glyph-vyr ancestral via cifra Pyotor I, manhã chuvosa, mãe Gargi + cripto-glifo São Vargas | V1 B.1 (party), C.3 (catedrais), Era 1 (Pyotor I) |
 | 02 | `02-caua-volt.md` | Cauã "Volt" Berenger | 13 | ~3.000 | ~10 | Scavenging Subestação 11 + reencontro material com pai morto Salvador (conector C-89 gravado "S.B.") + nó Vespa Calderón | V1 B.3 (família Berenger), C.1 (Dutos Infernais), Timeline -13/-5 |
 | 03 | `03-iara-lumen.md` | Iara "Lumen" Koslov | 12 | ~3.100 | ~10 | Fita Sonja Murmúrio recebida Filomena Garda + café Cleomir Vasta, telhado Lavanderia Vyr, cinco clones Fibonacci | V1 B.2 (Adila), B.4 (Filomena/Cleomir), C.2 (Setor Mirage) |
 | 04 | `04-bento-requiem.md` | Bento "Requiem" Chevalier | 14 | ~3.000 | ~10 | Descida 15 degraus (3-5-7) Catedral São Camilo + revelação ancestralidade Atelaiá Chevalier (engenheira-mãe) via Velhusto | V1 B.3 (mãe Atelaiana), B.4 (Velhusto), C.3 (Catedral São Camilo), Era 1 (Atelaiá -115) |
@@ -33,7 +33,7 @@
 | 08 | `08-sterling-locke.md` | Sterling Locke | adulto (~25 doutorando) | ~3.172 | ~11 | Defesa pública tese DRE -25, banca rejeita 3-0, monólogo interno revela plano Sterling Corp (-12) + GRE (-5) | V1 B.2 (Sterling antagonista), Timeline -25/-12/-5, Era 3 |
 | 09 | `09-cassiano-vorto.md` | Cassiano Vorto | adulto (~50) | ~3.130 | ~10 | Mesa cinco Café da Esquina · dossiê Dante + planejamento contenção materna Edilma Caverna dos Perdidos + nova diligência Vance Atelaiá | V1 B.2 (Vorto), B.3 (Edilma), Foreshadowing F129/F-vance-atelaia |
 | 10 | `10-pyotor-vance-pai.md` | Pyotor Vance | adulto (40) | ~3.085 | ~10 | Manhã Pelicano Branco · paciente Mariana terminal + caderno família revela Gustaf I (-150) + rádio amador irmão Yakov + carta a Gus | V1 B.3 (família Vance), C.5 (vilarejos fronteira), Era 2 (Gustaf I) |
-| 11 | `11-venea-vance-mae.md` | Vênea Vance | adulta (~36) | ~3.140 | ~10 | Bancada 1h madrugada Edifício Vance · placa Era 2 com serigrafia "TAVUS" + carta Pyotor + retrospecto separação -5 | V1 B.3 (família Vance), C.4 (Edifício Vance), Era 2 |
+| 11 | `11-venea-vance-mae.md` | Gargi Vance | adulta (~36) | ~3.140 | ~10 | Bancada 1h madrugada Edifício Vance · placa Era 2 com serigrafia "TAVUS" + carta Pyotor + retrospecto separação -5 | V1 B.3 (família Vance), C.4 (Edifício Vance), Era 2 |
 | 12 | `12-ancia-mariana-vanderbist.md` | Anciã Mariana Vanderbist | 89 | ~3.080 | ~10 | Sala de cartas Pelicano Branco · sucessão Tatauín/Helena/Jaci + entrega ampola treze para Jaci + recapitulação surto silencioso -8 | V1 B.4 (Mariana), B.3 (Lia/Solano), C.5 (Pelicano Branco), Timeline -8 |
 | 13 | `13-veronica-atelaia.md` | Verônica Atelaiá | adulta (paleógrafa, datação -45) | ~2.350 | ~8 | Arquivo subterrâneo São Vargas · decifração placa cripto-glifo Era 1 "o limite escolheu falar" (Anomalia Primeira -820) + selo microfilme | V1 B.7 (cronistas Era 2), C.3 (São Vargas), Era 2 (-45/-820), Patch-Zero ancestral |
 | 14 | `14-heliaco-vyr-era-1.md` | Helíaco Vyr | maduro (~55, in-character ~-850) | ~3.443 | ~11 | Catedral-Mãe em pé · invenção das 21 raízes Glyph + sonho do limite (-820 prefigurado) + cegueira por sobreposição piezo | V1 B.7 (Era 1 cronistas), C.3 (Catedral-Mãe submersa), Era 1 (Helíaco = Hiram Abiff echo) |
@@ -80,7 +80,7 @@
 
 | Personagem citado em Vol 2 | Vol 1 ref | Contos Vol 2 onde aparece |
 |---|---|---|
-| Vênea Vance (mãe Gus) | V1 B.3 | 01, 10 (carta), 11 (protag) |
+| Gargi Vance (mãe Gus) | V1 B.3 | 01, 10 (carta), 11 (protag) |
 | Pyotor Vance (pai Gus) | V1 B.3 | 01 (carta), 07 (médico-cyber implante olho), 10 (protag), 11 (carta) |
 | Yakov Vance (tio paterno) | V1 B.3 | 01, 10 (rádio amador), 11 |
 | Belinor Vance (avó morta) | V1 B.3 | 11 (silêncio herdado) |
@@ -140,7 +140,7 @@
 | Yusuf Mendel | 08 | Colega cadeira Sterling, ano abaixo | 🟡 candidato V1 B.7 (ambient ~-25) |
 | Joana (garçonete Café da Esquina) | 09 | Vetor de fofoca ambiental, filho 8 anos Técnico Distrito 3 | 🟡 candidato V1 B.5 (ambient Núcleo) |
 | Donaí (porteiro noturno Edifício Vance) | 11 | Operador tubo pneumático, opera correio interno | 🟡 candidato V1 B.5 (ambient Edifício Vance) |
-| Vanda do Café | 11 | (já V1 B.5, mencionada como ponte Bertoldo → Vênea) | ✅ canônico V1 B.5 |
+| Vanda do Café | 11 | (já V1 B.5, mencionada como ponte Bertoldo → Gargi) | ✅ canônico V1 B.5 |
 | Seu Bertoldo Caím | 11 | (já V1 B.5, fonte da placa "TAVUS" Era 2) | ✅ canônico V1 B.5 |
 | Dr. Quiroga (consulta agendada aparelho Gus) | 11 | Profissional cyber-ortodôntico cidade | 🟡 candidato V1 B.5 (ambient Núcleo) |
 | Padre/mestre-cantor de obra (talhador Boróstoma) | 14 | Co-fundação Catedral-Mãe Era 1 sob Helíaco | 🟡 candidato V1 B.7 |
@@ -198,7 +198,7 @@
 | Camila Neumann · tradução primeira Tablete da Pancada de Neve | -21 | 05 (Brígida mostra página 8) |
 | Theodoro Calveri · liquidação cooperativa Alencar (Sterling Aquisições) | -8 | 06 (memória funeral pai), 09 (referenciado Vorto) |
 | Surto silencioso · 7 mortos Pelicano Branco em 8h (incluindo Lia, Solano, Loanis Penãoso, Marisete, velho Bito, criança Tucano-Cinza, filha Soraia velha) | -8 | 07 (carta Lia "cinco e pausa" 3 meses antes), 12 (protag, sucessão) |
-| Família Vance separação amigável (Pyotor sai do prédio, Gus 6 anos) | -5 | 01 (Gus retrospectivo), 10 (Pyotor carta), 11 (Vênea memória conversa 3h) |
+| Família Vance separação amigável (Pyotor sai do prédio, Gus 6 anos) | -5 | 01 (Gus retrospectivo), 10 (Pyotor carta), 11 (Gargi memória conversa 3h) |
 | Subestação 7 · alvo teste carga ilegal Sterling Locke (subdiretor), morte Davi Berenger (16 anos) | -5 | 02 (Vespa dívida com Davi, Cauã 8 anos na perda) |
 | Fundação Sterling Corp (Apex-Data → Nexus-Cloud → Core-Synth) | -12 | 08 (plano interno revelado pós-rejeição), 09 (lacre cera Calveri) |
 | Câmara do Equinócio Acústico · decifração Joaquim Bartolomeu | -3 | 05 (referenciada, "não saiu inteiro") |
@@ -253,13 +253,13 @@
 | 09 | Vorto | "Aviso é informação. Informação é mercadoria. Você forneceu mercadoria sem cobrar preço. Aprenda a cobrar." | ✅ canon | Resposta a Yusuf Mendel (cross-conto 08) corredor saída |
 | 09 | Vorto | "Reconhecimento é a moeda mais barata que existe, e eu compro com sobra." | ✅ canon | Releitura dossiê Dante mesa cinco |
 | 09 | Vorto | "Há treze anos eu opero no compasso." | ✅ canon | Fechamento do conto, caminhada Catedral menor Atelaiá |
-| 10 | Pyotor | "O Pyotor diria assim, com palavras dele: 'Vênea, dois lados, mesma sala. Não dá pra serrar o piso.'" | ✅ canon (Pyotor citado por Vênea no conto 11 também) | Frase canon separação amigável |
+| 10 | Pyotor | "O Pyotor diria assim, com palavras dele: 'Gargi, dois lados, mesma sala. Não dá pra serrar o piso.'" | ✅ canon (Pyotor citado por Gargi no conto 11 também) | Frase canon separação amigável |
 | 10 | Pyotor | "Eu sou um administrador da dor alheia." | ✅ canon | Apresentação interna profissional |
 | 10 | Pyotor | "Nome de família não é cela. É porta. Tu abre se quiser." | ✅ canon (carta a Gus) | Sobre Pyotor I Draco vs Gustaf VII |
 | 10 | Pyotor | "Velocidade demais cedo demais é uma armadilha que come pela frente." | ✅ canon | Reflexão Gus 9 anos identifica 34 constelações |
-| 11 | Vênea | "A gente subdividiu o problema em dois subproblemas mais fáceis de resolver." | ✅ canon (Vênea sobre separação) | Definição modelo família descentralizada |
-| 11 | Vênea | "Saudades sem peso." | 🜲 leitmotiv Pyotor-Vênea (cunhada na conversa 3h, ressurge em cartas) | Carta noturna do Pyotor |
-| 11 | Vênea | "Nó dito em corda dura mais que nó dito em voz." | ✅ canon (sobre cordão 89 nós Belinor) | Maçaneta quarto Gus desde -5 |
+| 11 | Gargi | "A gente subdividiu o problema em dois subproblemas mais fáceis de resolver." | ✅ canon (Gargi sobre separação) | Definição modelo família descentralizada |
+| 11 | Gargi | "Saudades sem peso." | 🜲 leitmotiv Pyotor-Gargi (cunhada na conversa 3h, ressurge em cartas) | Carta noturna do Pyotor |
+| 11 | Gargi | "Nó dito em corda dura mais que nó dito em voz." | ✅ canon (sobre cordão 89 nós Belinor) | Maçaneta quarto Gus desde -5 |
 | 12 | Mariana | "Eu peguei a Jaci. É o verbo que eu uso até hoje. Peguei a Jaci. Não criei, não adotei, não acolhi. Peguei. Como quem pega uma semente do chão antes que o vento leve." | ✅ canon | Pós-surto -8, adoção Jaci órfã 3 anos |
 | 12 | Mariana | "Não tenho medo. Tem uma diferença entre não ter medo e estar pronta. Eu não estou pronta. Mas não tenho medo. São coisas diferentes." | ✅ canon | Sucessão organizada cara a cara com terminal |
 | 12 | Mariana | "Anhuera plantou. Eu colhi. Eu plantei. A Jaci vai colher. A Jaci vai plantar." | ✅ canon | Continuidade matrilinear 5+ gerações |
@@ -279,7 +279,7 @@
 | **"Compilo, logo respondo"** | 04 Bento (herdado Atelaiá -100) | (eco implícito) | V1 §3 Ordem Recursiva canon |
 | **"Boa raiz"** | 07 Jaci / 12 Mariana | (consistente Pelicano Branco) | V1 §3 Pythia bio-hacking canon |
 | **"Catalogo. Sigo."** | 02 Cauã (cético-irônico Striker) | (assinatura Volt) | V1 B.1 (voz Cauã) |
-| **"Saudades sem peso"** | 11 Vênea (cunhagem Pyotor -5) | 10 (Pyotor carta) | V1 B.3 (separação amigável) |
+| **"Saudades sem peso"** | 11 Gargi (cunhagem Pyotor -5) | 10 (Pyotor carta) | V1 B.3 (separação amigável) |
 | **"Não encena"** | 03 Iara (frase canon Óxido baixo) | (assinatura Lumen) | V1 §3 Óxido canon |
 | **"Quem ler isto vai ler mal"** | 13 Verônica (margem fólio -45) | 08 Sterling (corrobora "anomalia folclórica" -25) | V1 §2 Era 2 cronistas |
 | **"Mercado é runtime"** | 08 Sterling (rejeição banca -25) | (manifesto fundador Sterling Corp) | V1 §3 Era 3, V1 B.2 |
@@ -311,7 +311,7 @@
 | **Caderno-semente** | Documento canon Vanderbist matrilinear; cada herborista anota fungos, frequências do substrato, plantios, sequências canônicas; sucessão Anhuera → Soraia → ... → Mariana → Tatauín → Jaci | 07, 12 | ✅ canônico |
 | **Padrão 4-e-pausa** | Pulsação canônica de bioluminescência do fungo do acaceiro de tronco vermelho quando a janela climática está estável; saída para 5-e-pausa = 3 dias para preparar antídoto novo (sinal de surto) | 07 Jaci, 12 Mariana | ✅ canônico |
 | **Padrão 3-5-7 (degraus/plantio/colunas)** | Costume antigo de carpinteiro de fronteira: nunca 4 nem 6, sempre 3 ou 5 ou 7; aplicado em alpendres, escadas, fileiras de erva-de-pedra, batidas de plantio Pelicano Branco | 04, 07, 10, 12, 13, 14 | ✅ canônico |
-| **Cordão de 89 nós** | Item ritual matrilinear canon (Brígida/Linda, Mara, Verônica, Vespa, Helíaco, Vênea via Belinor); cada nó = "uma palavra que não se disse"; nó dito em corda dura mais que nó dito em voz | 02, 03, 05, 09, 11, 12, 13, 14 | ✅ canônico |
+| **Cordão de 89 nós** | Item ritual matrilinear canon (Brígida/Linda, Mara, Verônica, Vespa, Helíaco, Gargi via Belinor); cada nó = "uma palavra que não se disse"; nó dito em corda dura mais que nó dito em voz | 02, 03, 05, 09, 11, 12, 13, 14 | ✅ canônico |
 | **Compasso 144 BPM** | Pulsação canon dos Dutos Infernais (turbina refrigeração subnível); leitmotiv da vida do Cauã; também BPM do circuito harmônico superior Ressonância Plena Bento | 02, 04 | ✅ canônico |
 | **Subestação 11** | Posto específico canônico dos Dutos onde Cauã faz scavenging Ano 0; escada metálica 34 degraus (3 últimos falsos); cabo bobina 144m | 02 | ✅ canônico |
 | **Conector C-89** | Peça canon Pythia banida do mercado oficial (núcleo cobre puro, anterior alumínio reciclado); só sobrevive nos Dutos onde Asmódicos não conseguem confiscar | 02 | ✅ canônico |
@@ -357,7 +357,7 @@
 | **Octavia Pelicano Branco** | Membro canon banca examinadora -25 (arguição 21 min segurança DRE) | 08 | 🟡 candidato |
 | **Yusuf Mendel** | Colega cadeira ano abaixo Sterling, alertou sobre capítulo 8 (recusado por Sterling) | 08 | 🟡 candidato |
 | **Tio Yakov Vance** | Irmão paterno mais novo (4 anos) de Pyotor; engenheiro telecom GusWorld City apto 21 bloco 15; apresentou xadrez ao Gus; consertou scanner doppler do Pyotor | 10, 11 | ✅ canônico (já V1 B.3) |
-| **Donaí (porteiro noturno Edifício Vance)** | Operador tubo pneumático canon; aprecia "respiração de meia-noite" trazida pelas cartas Pyotor para Vênea | 11 | 🟡 candidato |
+| **Donaí (porteiro noturno Edifício Vance)** | Operador tubo pneumático canon; aprecia "respiração de meia-noite" trazida pelas cartas Pyotor para Gargi | 11 | 🟡 candidato |
 | **Joana (garçonete Café da Esquina)** | NPC ambient canon Vorto: filho 8 anos Técnico Distrito 3; xícara louça pesada borda lascada nunca trocada | 09 | 🟡 candidato |
 | **Dr. Quiroga** | Cyber-ortodôntico canon GusWorld City; consulta agendada para barra interna aparelho Gus por Pyotor via foto | 11 | 🟡 candidato |
 | **Velho mestre de Helíaco (anônimo intencional)** | Mentor canon Era 1 do Vyr aos 13; ermida acaceiro; frase "acertar é apenas o nome que damos a um erro que ainda não chegou" | 14 | 🟡 candidato (intencionalmente sem nome) |
@@ -384,7 +384,7 @@
 | **Operar no compasso** | Auto-descrição canon Cassiano Vorto: 89 BPM dórico 4×4 swing leve do sax tenor; "há treze anos eu opero no compasso" | 09 | ✅ canônico |
 | **Âncora externa** | Termo técnico canon Vorto/Fundação: elemento de chantagem sustentável de longo prazo para reter "ativo juvenil" durante janela 13→16 anos; "âncora é mais limpo, âncora segura" | 09 | ✅ canônico |
 | **Deprecação eficiente sem overhead emocional** | Assinatura canon Theodoro Calveri (Sterling Aquisições); usada como assinatura interna em memorandos (nome próprio redundante) | 06, 09 | ✅ canônico |
-| **Modelo descentralizado / família funcional descentralizada** | Definição canon Vênea da separação amigável Vance: cada nó faz a parte dele, links permanecem abertos; modelo libertário-empresarial família funcional | 02 (Inácia indireto), 11 | ✅ canônico |
+| **Modelo descentralizado / família funcional descentralizada** | Definição canon Gargi da separação amigável Vance: cada nó faz a parte dele, links permanecem abertos; modelo libertário-empresarial família funcional | 02 (Inácia indireto), 11 | ✅ canônico |
 | **Resíduo de fé compilada estaticamente** | Caracterização canon Sterling Locke (em reunião plenária Sterling Corp) para o conjunto das catedrais menores; Vorto registra como elegante | 09 | ✅ canônico |
 | **Abelha dormindo dentro do osso** | Metáfora canon Mariana Vanderbist para a dor do câncer ósseo metastático descendo até o joelho; Pyotor anota "porque metáforas de pacientes são quase sempre mais precisas do que escala visual analógica" | 10, 12 | ✅ canônico |
 | **30 colheitas (sonho do limite Helíaco)** | Datação canon do sonho profético Era 1: Helíaco sonha com presença do "limite que escolheu falar" anunciando chegada em ~-820 (Anomalia Primeira); pergaminho selado tubo cobre nicho atrás Coluna Janor | 14 | ✅ canônico |

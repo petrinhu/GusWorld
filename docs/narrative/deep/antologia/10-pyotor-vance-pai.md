@@ -52,9 +52,9 @@ Eu disse que cuidava. Ela balançou a cabeça como quem não acredita totalmente
 
 Quando Mariana saiu, eu fechei o estojo, lavei as mãos no balde de cobre, e sentei na cadeira que ela tinha desocupado. A cadeira ainda estava morna. Esse é o tipo de detalhe que o Gustaf, meu filho, registraria. Ele registra tudo. Eu sei disso porque, quando ele tinha sete anos, eu o vi sentado na escada de casa, em GusWorld City, contando os degraus em voz baixa e dizendo para si mesmo "um, um, dois, três, cinco, oito, e a escada acabou porque o construtor não respeitou a sequência". Eu não falei nada. Subi os degraus atrás dele, contei na minha cabeça, e ele estava certo: oito degraus, e a sequência teria pedido treze. O construtor parou em oito porque o pé direito do andar de cima não permitia mais.
 
-Não foi eu que ensinei Fibonacci pro Gustaf. Foi a Vênea, a mãe dele. Eu e a Vênea nos separamos quando ele tinha seis anos, em condições amigáveis, o que significa que continuamos nos respeitando, continuamos compartilhando o calendário do menino, continuamos sendo dois adultos que decidiram que a casa única tinha virado uma equação mal balanceada e que duas casas, separadas mas em conversa, somavam mais do que uma casa só, em conflito surdo. A Vênea diria assim, com palavras dela: "a gente subdividiu o problema em dois subproblemas mais fáceis de resolver". Ela é programadora de protocolos de rede. Eu sou médico itinerante. Os dois somos, no fundo, recursivos.
+Não foi eu que ensinei Fibonacci pro Gustaf. Foi a Gargi, a mãe dele. Eu e a Gargi nos separamos quando ele tinha seis anos, em condições amigáveis, o que significa que continuamos nos respeitando, continuamos compartilhando o calendário do menino, continuamos sendo dois adultos que decidiram que a casa única tinha virado uma equação mal balanceada e que duas casas, separadas mas em conversa, somavam mais do que uma casa só, em conflito surdo. A Gargi diria assim, com palavras dela: "a gente subdividiu o problema em dois subproblemas mais fáceis de resolver". Ela é programadora de protocolos de rede. Eu sou médico itinerante. Os dois somos, no fundo, recursivos.
 
-O Gustaf herdou a recursão. Ele resolve qualquer problema da mesma forma: olha o problema inteiro, quebra em duas partes, pergunta se cada parte é simples o bastante, e se não for, quebra de novo. Eu nunca o vi desistir de nada. O que me preocupa, e isso eu não digo nem pra Vênea, é que ele também não pede ajuda. Ele resolve sozinho, ou não resolve. E o mundo, esse mundo aqui que eu venho cartografando consulta a consulta de Pelicano Branco a Garça-Preta-Nova a Caracará-Cinza a Sabiá-de-Bronze, esse mundo tem problemas que não se resolvem sozinhos. Tem problemas que pedem rede, pedem cordão de mãos, pedem que alguém em algum lugar levante a cabeça e diga "eu também".
+O Gustaf herdou a recursão. Ele resolve qualquer problema da mesma forma: olha o problema inteiro, quebra em duas partes, pergunta se cada parte é simples o bastante, e se não for, quebra de novo. Eu nunca o vi desistir de nada. O que me preocupa, e isso eu não digo nem pra Gargi, é que ele também não pede ajuda. Ele resolve sozinho, ou não resolve. E o mundo, esse mundo aqui que eu venho cartografando consulta a consulta de Pelicano Branco a Garça-Preta-Nova a Caracará-Cinza a Sabiá-de-Bronze, esse mundo tem problemas que não se resolvem sozinhos. Tem problemas que pedem rede, pedem cordão de mãos, pedem que alguém em algum lugar levante a cabeça e diga "eu também".
 
 Eu penso nisso muito. Penso enquanto dirijo o veículo cyber-anfíbio entre os quatro vilarejos, no circuito de oito dias que eu cumpro a cada cinco semanas. Penso enquanto recarrego baterias no painel solar do telhado do dispensário. Penso enquanto durmo, em sonhos que eu não anoto porque sonho de médico itinerante é, em geral, repetição de plantão.
 
@@ -86,7 +86,7 @@ Hoje a frequência estava limpa. Cinco minutos de chiado, depois oito minutos de
 
 Eu sorri sozinho, em cima do telhado. Espiral horária é a espiral do caracol comum, é a espiral do nautilus visto de frente, é a espiral que o Gustaf I desenhou nas primeiras quadras de GusWorld City. O Gustaf VII desenha pela mesma mão invisível. Eu não vou interferir nisso. Eu prefiro que ele descubra sozinho que está repetindo um gesto antigo, porque a descoberta é metade do prazer.
 
-"Yakov, e a Vênea? Câmbio."
+"Yakov, e a Gargi? Câmbio."
 
 "Tá bem. Trabalhando demais. Mandou lembrança. Disse que se tu passar por aqui no próximo circuito, ela quer te mostrar uma coisa nova que ela compilou. Algo com cifra simétrica, eu não entendi muito. Câmbio."
 
@@ -112,7 +112,7 @@ Desci do telhado. Acendi a lamparina (o gerador eu desliguei pra economizar dies
 >
 > Tua mãe me contou que tu tá lendo um livro de lógica proposicional que eu não conheço. Mande o título no próximo encontro. Quero ler junto contigo.
 >
-> Cuida da Vênea. Ela é mais forte do que parece, mas a força dela é a do bambu, que verga sem quebrar, e bambu que verga muito tempo pede descanso. Tu, que mora com ela três semanas por mês, é o descanso dela mais do que tu imagina.
+> Cuida da Gargi. Ela é mais forte do que parece, mas a força dela é a do bambu, que verga sem quebrar, e bambu que verga muito tempo pede descanso. Tu, que mora com ela três semanas por mês, é o descanso dela mais do que tu imagina.
 >
 > Beijo no alto da cabeça,
 > Teu pai, Pyotor.
@@ -133,7 +133,7 @@ Eu desci do veículo, abri a mochila, dispus os cinco instrumentos sobre o pano 
 
 "Senta aqui, mocinha. Vai doer um pouquinho no começo, mas depois passa. Eu te prometo. Como é teu nome?"
 
-Ela disse o nome. Eu anotei no caderno de campo. Mais um nome na lista. Mais uma manhã. O dia inteiro pela frente, e depois o circuito, e depois a volta pra GusWorld City no fim do mês, e depois o abraço no Gustaf, que vai estar mais alto do que da última vez (criança de onze anos cresce três centímetros a cada cinco semanas, em média, e eu meço sempre, na parede do corredor, com lápis), e depois o jantar com a Vênea, em casas separadas mas com porta de cozinha aberta de uma pra outra, e depois a noite seguinte no telhado, na antena, conversando com o Yakov, e depois outra manhã, e outro vilarejo, e outro paciente.
+Ela disse o nome. Eu anotei no caderno de campo. Mais um nome na lista. Mais uma manhã. O dia inteiro pela frente, e depois o circuito, e depois a volta pra GusWorld City no fim do mês, e depois o abraço no Gustaf, que vai estar mais alto do que da última vez (criança de onze anos cresce três centímetros a cada cinco semanas, em média, e eu meço sempre, na parede do corredor, com lápis), e depois o jantar com a Gargi, em casas separadas mas com porta de cozinha aberta de uma pra outra, e depois a noite seguinte no telhado, na antena, conversando com o Yakov, e depois outra manhã, e outro vilarejo, e outro paciente.
 
 É assim que se cura uma pessoa por vez. É assim que se carrega um nome de seis gerações sem deixar o nome esmagar quem o carrega. É assim que se prepara, em silêncio, um filho de onze anos pra um futuro que o pai já intui, mas que o pai, por enquanto, ainda guarda em três dobras de papel selado em cera vermelha, dentro do bolso interno da jaqueta de couro.
 

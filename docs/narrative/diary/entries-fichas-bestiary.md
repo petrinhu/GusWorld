@@ -62,9 +62,9 @@ Cada companion tem ficha com 3 estados de Knowledge canônicos:
 **Bullets de auto-observação (cursiva margem):**
 - "frases curtas. processa em silêncio. (mãe percebeu primeiro.)"
 - "compila baixo nível MAS legível. discordo do Bento mas respeito."
-- "se eu otimizar demais, viro o Sterling. (Vênea: 'então não otimiza demais, filho.')"
+- "se eu otimizar demais, viro o Sterling. (Gargi: 'então não otimiza demais, filho.')"
 
-**Status canônico:** atualiza beat a beat. Ato 3 ganha nota "stats degradados refletem trauma agudo Dante. Vênea, soldando, dia 47: 'a luz volta. devagar.'"
+**Status canônico:** atualiza beat a beat. Ato 3 ganha nota "stats degradados refletem trauma agudo Dante. Gargi, soldando, dia 47: 'a luz volta. devagar.'"
 
 ### 1.2 Cauã "Volt" Berenger — Striker
 
@@ -313,7 +313,7 @@ Cada companion tem ficha com 3 estados de Knowledge canônicos:
 >
 > *Visual médio (~50% campanha, pós 1º diálogo Canal 3):* página com 3 entries de texto glitch coladas (sobrepostas, gradient saturado violeta-magenta canal Mirage). Margem: "ele falou comigo. não foi cutscene. ele falou comigo. e mentiu. (eu sei porque a consequência apareceu duas cenas depois e não bateu com o que ele disse.) (50% de mentira por frase? mais? menos?)"
 >
-> *Visual alta (pós Patch-Zero como Boss climax 2 condicional):* página intacta visualmente — mas o conteúdo continua glitch. Gus aceita: o glitch **é** o conteúdo. Margem trêmula: "ele é o limite. Pillar 2 diz Mandelbrot pode descer infinito; fronteira final é caos irredutível. ele é a fronteira. não dá pra debugar. selei, não destruí. (Vênea disse manutenção é eterna. ela tinha razão.)"
+> *Visual alta (pós Patch-Zero como Boss climax 2 condicional):* página intacta visualmente — mas o conteúdo continua glitch. Gus aceita: o glitch **é** o conteúdo. Margem trêmula: "ele é o limite. Pillar 2 diz Mandelbrot pode descer infinito; fronteira final é caos irredutível. ele é a fronteira. não dá pra debugar. selei, não destruí. (Gargi disse manutenção é eterna. ela tinha razão.)"
 
 **Knowledge média (perfil ambíguo):**
 
@@ -393,7 +393,7 @@ Tabela operacional canônica. Cada NPC tem entry-stub no Diário após **convers
 | Nome | Idade | Setting home | Função | Hook ambient resumido | Knowledge gate / cross-ref |
 |---|---|---|---|---|---|
 | **Seu Bertoldo Caím** | 62 | [[01-cidade-cyber-gotica\|Núcleo Metropolitano]] | técnico aposentado Era 2; banco fixo da Praça da Compilação 7h-9h | "vocês não viram a Lin Tórun assinar a placa, vocês não sabem o que é nostalgia." | Aliado passivo. Knowledge baixa: 1 hook. Média: 3 hooks (nomes engenheiros Era 2). Alta: leitura placa cripto-glífica sob asfalto, 7 nomes que ninguém lê. Cross-ref [[entries-mapas-timeline\|Mapa 1]]. |
-| **Vanda do Café** | 47 | [[01-cidade-cyber-gotica\|Núcleo Metropolitano]] | vendedora itinerante café-de-neurônio | "o moço do 6º andar dali fica até as 2 da manhã. aquilo não é trabalho, é saudade." (refere a Vênea) | Vetor fofoca. Cobra 3 créditos por café. |
+| **Vanda do Café** | 47 | [[01-cidade-cyber-gotica\|Núcleo Metropolitano]] | vendedora itinerante café-de-neurônio | "o moço do 6º andar dali fica até as 2 da manhã. aquilo não é trabalho, é saudade." (refere a Gargi) | Vetor fofoca. Cobra 3 créditos por café. |
 | **Patrulheiro Donato Fox** | 28 | [[01-cidade-cyber-gotica\|Mercado da Sucata]] | patrulha FIR fixa, não-violento casual | "Sterling diz isso, Sterling diz aquilo. eu só quero o turno acabar." | NPC ambíguo do regime. Foreshadow Vitória Marquês ([[factions]] §3). |
 | **Aprendiz Beatriz Pólvora** | 16 | [[03-catedrais-neo-sylvania\|Catedrais Neo-Sylvania]] | aprendiz atual de Bento, bancada anexa | Engrenagens semiacabadas, caderno em latim de aprendiz. Bento corrige em margem ("respira antes do compasso, B."). | Sub-quest pós-arco Bento: ajudar Beatriz a terminar primeiro projeto autônomo. |
 | **Mestre Hugo Tirol** | 55 | [[03-catedrais-neo-sylvania\|Catedrais]] / [[02-selve-sombria\|Selve]] / [[07-zona-do-silencio\|Zona do Silêncio]] / [[08-selve-profunda\|Selve Profunda]] | Ordem Recursiva; decifrador cripto-glífico (Era 1) — NPC mais cross-setting do jogo | "Atelaiá passou por aqui em -42. eu passo agora. daqui a 50 anos, alguém passa de novo. continuidade." | Diálogo expansivo Knowledge alta. Sub-quest cross-arco Bento + Linda + Jaci. Cross-ref [[entries-docs-descobriveis\|doc 15]] (gate Ouro). |

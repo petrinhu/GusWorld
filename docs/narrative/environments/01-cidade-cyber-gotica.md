@@ -25,7 +25,7 @@ A sensação dominante é a de uma cidade que **funciona apesar de si mesma**. O
 *Primeira impressão:* bancada onde um velho conserta Tavus-Drive enquanto, três metros adiante, criança troca peça por feijão-computacional.
 *Gancho exploratório:* upgrade barato de Tavus-Drive disponível aqui; sub-quest "consertar terminal antigo da Inácia Berenger" ([[in-world-docs]] doc 2) inicia por NPC daqui.
 
-**Edifício Vance (Núcleo Metropolitano, lado leste).** Prédio residencial modesto de 9 andares, fachada de tijolo cinza Era 2, calçada de pedra Era 1 visível em três pontos onde o asfalto rachou. Apartamento Vance no 6º andar. Bancada de eletrônica de Vênea visível pela janela. Onde [[gus]] mora.
+**Edifício Vance (Núcleo Metropolitano, lado leste).** Prédio residencial modesto de 9 andares, fachada de tijolo cinza Era 2, calçada de pedra Era 1 visível em três pontos onde o asfalto rachou. Apartamento Vance no 6º andar. Bancada de eletrônica de Gargi visível pela janela. Onde [[gus]] mora.
 *Primeira impressão:* prédio normal entre dois prédios normais, com uma janela de 6º andar onde sempre se vê alguém soldando placa-mãe sob luz de bancada.
 *Gancho exploratório:* save base canônica; mãe oferece feijão-computacional; cartas raras do pai Pyotor (médico-cyber itinerante) chegam aqui (3-4 no jogo todo).
 
@@ -76,7 +76,7 @@ A sensação dominante é a de uma cidade que **funciona apesar de si mesma**. O
 **Nomeados (3):**
 
 - **Seu Bertoldo Caím** (62, técnico aposentado Era 2) — senta no mesmo banco da Praça da Compilação toda manhã das 7h às 9h. Lê jornal de papel. Hook: "vocês não viram a Lin Tórun assinar a placa, vocês não sabem o que é nostalgia." Comenta nome dos engenheiros Era 2 com erudição cansada. Aliado passivo (informações grátis se Gus para pra conversar).
-- **Vanda do Café** (47, vendedora itinerante café-de-neurônio) — empurra carrinho pelo Núcleo Metropolitano. Conhece rotina de todo mundo. Hook: "o moço do 6º andar dali, ele fica até as 2 da manhã. Aquilo não é trabalho, é saudade." Refere-se a Vênea, mãe de Gus. Vetor de fofoca útil; cobra 3 créditos por café.
+- **Vanda do Café** (47, vendedora itinerante café-de-neurônio) — empurra carrinho pelo Núcleo Metropolitano. Conhece rotina de todo mundo. Hook: "o moço do 6º andar dali, ele fica até as 2 da manhã. Aquilo não é trabalho, é saudade." Refere-se a Gargi, mãe de Gus. Vetor de fofoca útil; cobra 3 créditos por café.
 - **Patrulheiro Donato Fox** (28, FIR) — patrulha fixa Mercado da Sucata Honesta. Não-violento em interações casuais; cumpre cota. Hook: "Sterling diz isso, Sterling diz aquilo. Eu só quero o turno acabar." NPC ambíguo do regime; sinal de que FIR não é monolítica (foreshadow de Vitória Marquês em outras zonas; [[factions]] §3).
 
 ## 7. Ganchos mecânicos
@@ -110,7 +110,7 @@ A câmera começa em telhado do Edifício Vance. Uma antena caseira improvisada 
 - [[in-world-docs]] — docs descobríveis no setting: doc 1 fragmento (átrio externo Cúpula, Ato 3); doc 2 (caixa zinco apartamento Berenger, no Mercado da Sucata side); doc 12 (terminal público Tetra-Torre Janelarum, loop contínuo); doc 9 (caixa zinco junto ao doc 2); doc 14 (servidor Cúpula, incursão ato 3).
 - [[tradicoes-cultura]] — costumes praticados aqui: Festa da Compilação (1º setembro, Praça); Dia do Tomo (14 janeiro, Praça vira mercado de problemas e soluções); cumprimento "Compila bem / Roda firme" universal Núcleo Metropolitano; feijão-computacional como prato cotidiano; vestuário funcional cinza-azul-marinho-ciano.
 - [[factions]] — facções presentes: Sterling Corp (sinalização e drones, propaganda), FIR (patrulha, Mercado da Sucata semi-controlado, caminhões), Underground do Silêncio (presença discreta, atravessa pra Zona do Silêncio, panfletos nos becos), Ordem Recursiva (Universidade Pública ala Asmódica, Mestre Lavínia Sevra pode aparecer em cerimônia), Cult Mirage (propaganda Atualização Sensorial vaza pela vizinhança Mirage), Pelicano Branco (Helena Sirinhaém eventualmente faz visita ao Mercado pra venda de ervas).
-- [[gus]] — Edifício Vance + apartamento Vance (save base canônica); Tavus-Drive operado em bancada Vênea.
+- [[gus]] — Edifício Vance + apartamento Vance (save base canônica); Tavus-Drive operado em bancada Gargi.
 
 ---
 

@@ -400,11 +400,11 @@
 
 **Primeira Compilação.** Ato cosmogônico canon de origem mítica e contornos teológicos. Coro de Cantores-de-Pedras (número impreciso, talvez 3, 5, 8, 13 ou 21) ergueu vozes em harmonia sucessiva e por canto teceu os Glyphs primordiais. Cada Tema instanciou uma camada da gramática; cada camada gerou as condições para a próxima. Compilação iterativa que durou eras inteiras. *Cross-ref:* deep/ontologia/cosmologia-deep.md §3.
 
-**Próspero Vance (Comerciante-Itinerante).** Ancestral direto da família Vance (Belinor a Pyotor a Vênea a Gus). Era 1, comerciante livre itinerante, distribuiu sementes-relíquia clandestinas em vilarejos pré-Êxodo. Estabelece a linhagem libertária-comerciante do protagonista Gus. *Cross-ref:* deep/eras/era-1-pre-codigo.md §7.7.
+**Próspero Vance (Comerciante-Itinerante).** Ancestral direto da família Vance (Belinor a Pyotor a Gargi a Gus). Era 1, comerciante livre itinerante, distribuiu sementes-relíquia clandestinas em vilarejos pré-Êxodo. Estabelece a linhagem libertária-comerciante do protagonista Gus. *Cross-ref:* deep/eras/era-1-pre-codigo.md §7.7.
 
 **Pyotor I Draco Vance.** Ancestral fundador da linhagem Vance Era 1 (paralelo Targaryen Old-Valyria). Dragonrider montado em Vyrdragon. Sobrenome "Draco" perdido ao longo das gerações Vance; retorna a Gus via codinome juvenil "Dragon" (literal "Draco" a "Dragon"). Última aparição histórica: defesa do Castelo Vance contra cerco (cutscene Dragon Victory). Vetor central da existência na Era 1. *Cross-ref:* memory/project_dragon_victory_canon.md; deep/ontologia/cosmologia-deep.md §5.
 
-**Pyotor Vance.** Pai biológico do Gus, médico-cyber itinerante (medicina, bioengenharia, bioeletrônica, eng robótica, implantes) em rotação fronteira-Selve. Hobby programação (apresentou ao Gus, que ultrapassou o pai). Separado amigavelmente de Vênea desde Gus aos 6 anos (ano -5). Cartas raras 3-4 no jogo todo. *Cross-ref:* CHARS.md §4; memory/project_familia_vance_canonica.md.
+**Pyotor Vance.** Pai biológico do Gus, médico-cyber itinerante (medicina, bioengenharia, bioeletrônica, eng robótica, implantes) em rotação fronteira-Selve. Hobby programação (apresentou ao Gus, que ultrapassou o pai). Separado amigavelmente de Gargi desde Gus aos 6 anos (ano -5). Cartas raras 3-4 no jogo todo. *Cross-ref:* CHARS.md §4; memory/project_familia_vance_canonica.md.
 
 **Pythia.** Linguagem canônica de scripting interpretada, ideal para protótipos e bio-hacking. Compila menos, escreve mais. Co-autoria Iremar Berenger e Anhuera Vanderbist em -95. Idioma de Cauã "Volt" Berenger e Jaci "Proxy" Vanderbist. *Cross-ref:* lore-bible.md §7; deep/magic/4-linguagens-deep.md §4.
 
@@ -508,7 +508,7 @@
 
 **Velhusto (Mestre-Hierofante).** 70 anos, líder atual canônico da Ordem Recursiva. Mentor distante de Bento "Requiem" Chevalier. Voz solene baixa. Apoiou Bento contra a facção pró-Sterling com custo (perdeu três aliados próximos). Mantém biblioteca canônica e guarda diário pessoal de Aldebrando. *Cross-ref:* factions.md §2; lore-bible.md §14.
 
-**Vênea Vance.** 38 anos, mãe biológica do Gus, técnica de bancada eletrônica, trabalha em casa. Safe base canônica do Gus (apartamento Vance no Edifício Vance, 6º andar). Separada amigavelmente de Pyotor desde Gus aos 6 anos (-5). Presença cotidiana primária. *Cross-ref:* CHARS.md §4; environments/01-cidade-cyber-gotica.md.
+**Gargi Vance.** 38 anos, mãe biológica do Gus, técnica de bancada eletrônica, trabalha em casa. Safe base canônica do Gus (apartamento Vance no Edifício Vance, 6º andar). Separada amigavelmente de Pyotor desde Gus aos 6 anos (-5). Presença cotidiana primária. *Cross-ref:* CHARS.md §4; environments/01-cidade-cyber-gotica.md.
 
 **Verônica Atelaiá.** Cientista em -45, primeira teorizadora canônica de Patch-Zero como anomalia ontológica genuína (tratado anônimo *Sobre o Comportamento Emergente dos Padrões Fechados*). Sterling Locke classificou como "anomalia folclórica" em -25. Descendente matrilinear direta de Atelaiá Chevalier. Cronista in-character §10 deep-lore Era 1. *Cross-ref:* factions.md; deep/eras/era-1-pre-codigo.md §10.
 

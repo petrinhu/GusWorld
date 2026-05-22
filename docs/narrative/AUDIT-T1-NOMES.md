@@ -39,8 +39,8 @@ Tenho dados suficientes. Compilando output 4-pack final.
 
 ### 1.2 Família Vance (NPCs adultos canon estabilizado)
 
-- **Pyotor Vance** (médico-cyber itinerante, pai Gus, separado amigavelmente de Vênea desde Gus aos 6 anos, ano -5).
-- **Vênea Vance** (mãe Gus, técnica de bancada, safe base).
+- **Pyotor Vance** (médico-cyber itinerante, pai Gus, separado amigavelmente de Gargi desde Gus aos 6 anos, ano -5).
+- **Gargi Vance** (mãe Gus, técnica de bancada, safe base).
 - **Yakov Vance** ("Tio Yakov", engenheiro+geólogo mineradora, 4 anos a menos que Pyotor).
 - **Belinor Vance** (avó morta, mãe biológica de Pyotor + Yakov, "errei muito, ainda planto").
 - **Gustaf I Tavus Vance** (topógrafo Era 2 ~-150, fundador Setor Tavus 21 quadras razão acaceiro).
@@ -107,10 +107,10 @@ Antologia profunda: **Vespa Calderón** (24), **Berenice Quaresma**, **Yara Duco
 Termo obsoleto "Patrício Vance" (substituído por **Pyotor Vance** canon CHARS + memo `project_familia_vance_canonica`) ainda em **5 ocorrências**:
 
 - `docs/narrative/lore-bible.md:520`: "**Patrício Vance** (40) — pai Gus. Engenheiro de manutenção em estação de transmissão."
-- `docs/narrative/timeline.md:115`: "Vênea Vance + **Patrício Vance** (pai, engenheiro de manutenção)."
+- `docs/narrative/timeline.md:115`: "Gargi Vance + **Patrício Vance** (pai, engenheiro de manutenção)."
 - `docs/narrative/in-world-docs.md:797` (DD-019): "**Patrício Vance** (pai ausente)."
 - `docs/narrative/deep/eras/era-2-boom-tecnico.md:691`: "**Patrício Vance** contemporâneo (pai do Gus) articula-se em registro de bioengenharia itinerante..."
-- `docs/narrative/deep/eras/era-2-boom-tecnico.md:953`: "**Patrício Vance** contemporâneo (pai biológico de Gus, separado de Vênea quando Gus tinha seis anos calibrados em registro biográfico) articula-se em registro de empresário libertário..."
+- `docs/narrative/deep/eras/era-2-boom-tecnico.md:953`: "**Patrício Vance** contemporâneo (pai biológico de Gus, separado de Gargi quando Gus tinha seis anos calibrados em registro biográfico) articula-se em registro de empresário libertário..."
 - `docs/book/BIBLE-V2-CAPA.md:67`: "**Patrício Vance** (pai de Gus) está deliberadamente ausente da formação visual..."
 
 **Fix proposto:** substituição global "Patrício Vance" → "Pyotor Vance" + retrofit profissão (engenheiro manutenção → médico-cyber itinerante) em lore-bible:520 + timeline:115 + in-world-docs:797. era-2-boom-tecnico.md:691 + 953 + BIBLE-V2-CAPA.md:67: apenas substituição nominal (profissão já correta).
@@ -525,7 +525,7 @@ Nome próprio NÃO especificado. Decisão canon necessária: nomear ou preservar
 **Severidade:** CRÍTICO. **Categoria:** NPC ambíguo deep-lore.
 
 - `diary/entries-manuscrito-glossario.md:35`: "Memória 8 anos (avó Belinor) ↔ doc 7 (paralelo **Soraia**)".
-- `diary/entries-manuscrito-glossario.md:103`: "Verônica. Atelaiá. **Soraia**. Mariana. Vênea. Belinor."
+- `diary/entries-manuscrito-glossario.md:103`: "Verônica. Atelaiá. **Soraia**. Mariana. Gargi. Belinor."
 - `in-world-docs.md` doc 7 referenciado.
 
 Soraia não consta CHARS. Cronista in-world doc 7 não-catalogada.
@@ -538,11 +538,11 @@ Soraia não consta CHARS. Cronista in-world doc 7 não-catalogada.
 
 #### T1-MD-01. Pyotor Vance descrito como "ramo Vance-Boroshova matrilinear" (era-2-boom-tecnico)
 
-`era-2-boom-tecnico.md:953`: "Vênea Vance contemporânea (mãe biológica de Gus, **ramo Vance-Boroshova matrilinear**)."
+`era-2-boom-tecnico.md:953`: "Gargi Vance contemporânea (mãe biológica de Gus, **ramo Vance-Boroshova matrilinear**)."
 
-Cross-ref CHARS+timeline+lore-bible: Vênea NÃO documentada como Boroshova-descendente. Linhagem Boroshova-Vance Era 1 culmina em "Pyotor + Yakov + Gus Vance contemporâneos" (CHARS:202). Vênea = Vance por casamento ou nascimento? Indeterminado.
+Cross-ref CHARS+timeline+lore-bible: Gargi NÃO documentada como Boroshova-descendente. Linhagem Boroshova-Vance Era 1 culmina em "Pyotor + Yakov + Gus Vance contemporâneos" (CHARS:202). Gargi = Vance por casamento ou nascimento? Indeterminado.
 
-**Fix proposto:** consultar criador supremo se Vênea = Boroshova-Vance (matrilinear genuíno) ou Vance por casamento. CHARS atualizar.
+**Fix proposto:** consultar criador supremo se Gargi = Boroshova-Vance (matrilinear genuíno) ou Vance por casamento. CHARS atualizar.
 
 ---
 
@@ -591,9 +591,9 @@ INCOHERENCES C14 já mapeou. Pendente decisão.
 
 ---
 
-#### T1-MD-06. Vênea Vance idade canon — 38 (BIBLE-V1) vs não-explícito CHARS
+#### T1-MD-06. Gargi Vance idade canon — 38 (BIBLE-V1) vs não-explícito CHARS
 
-`BIBLE-V1-GLOSSARIO.md:511`: "Vênea Vance. **38 anos**, mãe biológica do Gus."
+`BIBLE-V1-GLOSSARIO.md:511`: "Gargi Vance. **38 anos**, mãe biológica do Gus."
 `CHARS.md:46`: idade não-canonizada explícita.
 
 **Fix proposto:** adicionar idade 38 em CHARS.md:46 (canon BIBLE-V1).
@@ -721,7 +721,7 @@ Mas Inês Marçal AUSENTE CHARS — adicionar entry §7 NPCs ambientais.
 |---|---|---|---|---|---|---|---|---|
 | Gus Vector Tavus Vance | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | OK |
 | Pyotor Vance | ✅ | ❌ "Patrício" | ❌ "Patrício" | — | — | ✅ | ✅ V1 ❌ V2 | T1-CR-01 |
-| Vênea Vance | ✅ | ✅ | ✅ | — | ✅ | ✅ | ✅ | OK |
+| Gargi Vance | ✅ | ✅ | ✅ | — | ✅ | ✅ | ✅ | OK |
 | Yakov Vance | ✅ | ❌ ausente | ❌ ausente | — | — | ✅ | ✅ | INCOHERENCES C9 |
 | Belinor Vance | ✅ | ✅ | — | — | ✅ | ✅ | ✅ | T1-CR-02 (Belorian variante) |
 | Gustaf I Tavus Vance | ✅ | — | — | — | — | ✅ | ✅ | T1-MD-02 datação |

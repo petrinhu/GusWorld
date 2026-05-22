@@ -423,7 +423,7 @@ As 8 propostas autorais aprovadas pelo criador supremo em 2026-05-16 foram viral
 | DD-016 (Caderno Salviano) | F019, F020, F021, F022, F026 | Humaniza Salviano + reforça que Dante viu Vorto antes do funeral |
 | DD-017 (Diário Bartolo) | F036, F074 | Atribui canonicamente autoria do audit Apex-Data + vínculo Tiago-Linda prévio |
 | DD-018 (Folheto Lin Tórun) | F067, F068 | Voz autoral fundadora Era 2 + contraste explícito com DRE Sterling (DD-001) |
-| DD-019 (Caderneta Vênea + Pyotor) | (substrato emocional sem F### direto) | Materializa safe base canônica + pai itinerante (lore-bible §14) |
+| DD-019 (Caderneta Gargi + Pyotor) | (substrato emocional sem F### direto) | Materializa safe base canônica + pai itinerante (lore-bible §14) |
 | DD-020 (Relatório Solano) | F047 (retroativo) | Confirma vetor Sterling no surto -8 Pelicano Branco ("veio de cima") |
 | DD-021 (Manual Octantes) | F038, F050 | Confirma operacionalmente Heliópolis-Nova + paralelo Dante (lavagem de memória) |
 | DD-022 (Tábua São Vargas) | F041, F071 | Confirma saque -3 + micro-ato Bento aos 12 anos preservando memória |

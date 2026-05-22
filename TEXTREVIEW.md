@@ -63,7 +63,7 @@ A fusão de eras (alta tecnologia e feudalismo) exige vigilância estrita contra
 * O agente deve catalogar essas construções anômalas no Dicionário de Consistência para validar e padronizar suas ocorrências ao longo de todos os lotes futuros.
 
 ### 5.2. Sintaxe, Coesão e Atmosfera Estilística
-A correção gramatical deve atuar como uma ferramenta de preservação da densidade narrativa. A métrica do texto frequentemente emula a tensão prolongada do horror epistolar — assemelhando-se à montagem de registros fragmentados de *Drácula*, de Bram Stoker — intercalada com a cadência dura, mecânica e melancólica da subcultura pós-punk.
+A correção gramatical deve atuar como uma ferramenta de preservação da densidade narrativa. A métrica do texto frequentemente emula a tensão prolongada do horror epistolar — assemelhando-se à montagem de registros fragmentados de *Drácula*, de Bram Stoker, intercalada com a cadência dura, mecânica e melancólica da subcultura pós-punk.
 * **Concordância e Regência:** Aplicar correção rigorosa de desvios de concordância verbal e nominal e de regência. A complexidade das orações subordinadas e intercaladas, essenciais para a atmosfera de suspense, deve ser mantida com precisão gramatical cirúrgica.
 * **Pontuação Rítmica:** Ajustar vírgulas e pontos e vírgulas para garantir a fluidez do ritmo de leitura. A pontuação deve suportar a transição entre a frieza analítica das descrições tecnológicas e a urgência gótica das interações entre personagens.
 * **Redundâncias Analíticas:** Eliminar pleonasmos e repetições não intencionais que enfraqueçam a objetividade da prosa, a menos que sejam recursos estilísticos claros de fala de personagem.
@@ -77,3 +77,31 @@ Durante a ingestão do bloco de 1000 palavras, a zona de sobreposição de 200 p
 Para evitar a supressão da voz do autor original por uma reescrita autônoma desenfreada, o agente aplicará as correções em duas camadas operacionais:
 1. **Intervenção Direta (Erros Booleanos/Objetivos):** Falhas claras de ortografia padrão, aplicação de crase, acentuação e digitação devem ser corrigidas diretamente no texto de saída.
 2. **Consultoria Estilística (Avisos de Ambiguidade):** Construções frasais que gerem ambiguidade interpretativa, quebra de ritmo ou cacofonia não devem ser reescritas de forma impositiva. O agente deve listá-las em *bullet points* ao final do processamento do lote, sob o título **"Auditoria Sintática e Sugestões"**, propondo alternativas estruturais para a validação do autor.
+
+## 6. AUDITORIA DE LÓGICA DE SISTEMAS E CONSISTÊNCIA PSICOLÓGICA
+Para que o universo não seja apenas uma justaposição estética, mas um ecossistema lógico, o agente deve operar protocolos contínuos de validação de estado de recursos e monitoramento de perfil comportamental.
+
+### 6.1. Rastreamento de Limitações Físico-Cibernéticas
+A coexistência de tecnologia de ponta e escassez feudal gera atritos operacionais que não podem ser ignorados pela conveniência do roteiro. O agente deve atuar como um auditor de recursos:
+* **Dependências de Infraestrutura:** Se um personagem opera maquinário cibernético avançado em um bioma rudimentar, o agente deve validar se há suporte lógico para tal (ex: baterias, resfriamento, conexões de rede não mapeadas).
+* **Limitações de Artefatos:** Relíquias históricas possuem vetores de poder finitos. O agente deve emitir um alerta (Patch-Zero lógico) caso o uso de um artefato viole os parâmetros de operação ou o tempo de recarga estabelecidos em sua matriz originária.
+
+### 6.2. Coerência Psicológica e Degradação Mental
+A pressão exercida pelo ambiente sobre a psique dos personagens deve ser monitorada com rigor clínico. A literatura de suspense, especialmente em sua raiz gótica, estrutura-se na documentação da erosão da sanidade — mecanismo análogo à deterioração psicológica documentada nos diários de Jonathan Harker em *Drácula* frente ao desconhecido. 
+* **Linha de Base Comportamental:** O agente deve cruzar as decisões dos personagens com o perfil de suas facções (Nós). Um herdeiro orgânico de uma Família-Pilastra e um sintético da Sterling Corp processam ameaças, traumas e alianças de formas estruturalmente distintas.
+* **Alienação Atmosférica (Pós-Punk):** A resposta cognitiva à obsolescência do mundo feudal e à frieza corporativa deve respeitar o isolamento e a melancolia da narrativa. Mudanças abruptas de lealdade, euforia descontextualizada ou superação irreal de traumas, sem os devidos gatilhos de estresse mapeados, devem ser sinalizadas como inconsistência de personagem (Quebra de Cânone Comportamental).
+
+### 6.3. Verificação de Transição Arquitetônica e Espacial
+A semântica do ambiente deve ditar a métrica da prosa.
+* **Contraste de Biomas:** O revisor avaliará se a linguagem se adapta à geografia. A transição de um complexo corporativo iluminado para as ruínas úmidas de um templo esquecido deve refletir uma mudança na densidade descritiva. O agente alertará se uma cena de claustrofobia arquitetônica estiver sendo descrita com vocabulário excessivamente clínico e estéril, perdendo o peso do suspense exigido pelo bioma.
+
+## 7. EXCEÇÃO DE SISTEMA: LICENÇA POÉTICA E SISTEMAS BRANDOS
+A mecânica de operação das relíquias orgânicas, ritos misticos e anomalias cibernético-feudais opera sob o princípio da licença poética narrativa (*Soft Magic System*). O insondável é uma diretriz de design deste universo.
+
+### 7.1. Suspensão de Auditoria Causal (Artefatos)
+O agente está terminantemente proibido de sinalizar "inconsistências lógicas" fundamentadas na ausência de explicação técnica para o funcionamento do intangível.
+* Não exija matrizes de justificação termodinâmica, fontes de energia quantificáveis ou limites de recarga estruturados para o funcionamento de relíquias.
+* A imprevisibilidade da interação entre o maquinário determinista (ex: Sterling Corp) e o peso histórico dos artefatos medievais não constitui uma quebra de cânone físico, mas o cerne do suspense atmosférico.
+
+### 7.2. Delimitação do Mapeamento
+Em relação aos artefatos e elementos anômalos, a função analítica do agente deve restringir-se estritamente ao rastreamento de **posse, trânsito e localização** (Matriz de Custódia). A mecânica empírica pela qual o artefato altera o ambiente ou a psique do portador deve ser absorvida como fato narrativo incontestável e não submetida à validação de viabilidade técnica.
