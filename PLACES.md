@@ -39,6 +39,7 @@
 | **São Camilo** (catedral menor) | Catedral (subroutine acústica) | 1 derivada | Dentro Selve | ✅ canônico (em uso ativo Ordem Recursiva) | `deep/eras/era-1-pre-codigo.md` §2.2 |
 | **Quarta** (catedral menor) | Catedral (subroutine archive lítico) | 1 derivada | Dentro Selve (inscrição parcial; nome próprio perdido) | ✅ canônico (em uso ativo Ordem Recursiva, sede informal) | `deep/eras/era-1-pre-codigo.md` §2.2 |
 | **Quinta** (catedral menor) | Catedral (subroutine calendário) | 1 derivada | Dentro Selve (inscrição parcial; nome próprio perdido) | ✅ canônico (em uso ativo Ordem Recursiva, sede informal) | `deep/eras/era-1-pre-codigo.md` §2.2 |
+| **Boca-da-Funda** | Sub-local artefato (Catedral-Mãe Era 1) | 1 | Par de cristais piezo pareados canônicos preservados em câmara central Catedral-Mãe. Calibrados originalmente por Helíaco Vyr (Primeiro Cantor-de-Pedras canon §6.3 deep-lore). Função: amplificação ressonante acústica-piezo ritual. Hoje submerso com Catedral-Mãe (-750 selagem) | 🟡 lendário (submerso) | `deep/eras/era-1-pre-codigo.md` §6.2 + `R9 conto 14 Helíaco` |
 
 ## 3. Cidades-irmãs (mencionadas, não-jogáveis em G1)
 
@@ -68,6 +69,7 @@
 | **Tetra-Torre Janelarum** | Sub-local (Núcleo) | 3 | Lado norte Núcleo | ✅ canônico | `environments/01-cidade-cyber-gotica.md` |
 | **Mercado da Sucata Honesta** | Sub-local (Núcleo↔Periferia) | 2+3 | Zona-charneira | ✅ canônico | `environments/01-cidade-cyber-gotica.md` |
 | **Edifício Vance** | Sub-local (Núcleo) | 2 (~-90 a -70) | Lado leste Núcleo, apartamento Vance 6º andar | ✅ canônico (safe base Gus) | `environments/01-cidade-cyber-gotica.md` |
+| **Setor Tavus** | Sub-local (Núcleo GusWorld City) | 2+3 | Histórico Núcleo Metropolitano. Residência linhagem Vance pós-Gustaf I (~-150 fundação). Preservado pela tradição canon Tavus. 21 quadras iniciais traçadas por Gustaf I em proporção razão acaceiro (Fibonacci) | ✅ canônico | `CHARS.md` §4 + `deep/antologia/10-pyotor-vance-pai.md` R9 |
 | **Anel Verde** | Sub-local (fronteira) | 2 | Fronteira leste Cidade, entrada Selve | ⚪ abandonado funcional (checkpoint FIR corrompido) | `environments/01-cidade-cyber-gotica.md` |
 | **Cúpula Sterling** | Sub-local (Núcleo) | 3 | Skyline tumoral cresce ato 2/3, sede Sterling Corp | ✅ canônico (climax ato 3 setting variação) | `lore-bible.md` + `in-world-docs.md` |
 | **Subestação 7** | Sub-local (Dutos) | 3 | Dutos Infernais | 💀 destruído (alvo Sterling -5, morte Davi Berenger aos 16; Cauã tinha 8) | `characters/caua-volt.md` + `in-world-docs.md` DD-013 |
@@ -97,6 +99,7 @@
 | **Praça Sem Eco (Zona Silêncio)** | Sub-local (Zona Silêncio) | 3 | Zona do Silêncio | ✅ canônico | `environments/07-zona-do-silencio.md` |
 | **Torre Mater (Zona Silêncio)** | Sub-local (Zona Silêncio) | 2 | Zona do Silêncio | ⚪ abandonado funcional | `environments/07-zona-do-silencio.md` |
 | **Casa Neumann (Zona Silêncio)** | Sub-local (Zona Silêncio) | 2 | Zona do Silêncio | ✅ canônico (Linda Neumann origem) | `environments/07-zona-do-silencio.md` |
+| **Câmara Última Frequência** | Sub-local (Zona Silêncio) | 2+3 | Câmara ritual Underground Silêncio. Sede da Última Frequência (canon R9 conto 5 Linda Siren). Acesso restrito sub-célula Norte Mara Bento | 🟡 lendário (descobrível ato 2) | `factions.md` Underground + `R9 conto 5` |
 | **Estação Pythia Bio sucateada** | Sub-local (Selve Profunda) | 2 | Selve Profunda | ⚪ abandonado funcional | `environments/08-selve-profunda.md` |
 | **Câmara Neo-Sylvania de Coleta de DNA** | Sub-local (Selve Profunda) | 1 | Selve Profunda | ✅ canônico (sementes-relíquia) | `environments/08-selve-profunda.md` |
 

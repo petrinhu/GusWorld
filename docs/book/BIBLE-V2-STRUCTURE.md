@@ -149,7 +149,7 @@ LOMBADAS ALINHADAS (canto inferior, padrão 4 livros):
 
 | Componente | Fonte | Palavras | Páginas | Nota revisão |
 |---|---|---|---|---|
-| Texto do conto | `docs/narrative/deep/antologia/06-dante-grid-sincero.md` | ~3.379 | ~11 | extrair íntegra; voz estoica-fraternal **ato 1-2 antes da traição**; CUIDADO EDITORIAL: este conto é o *layer superficial* sincero — leitor sente a fraternidade real antes de descobrir (no jogo / Vol 1 Cap 9.6) a chantagem Edilma. Não vazar reveal aqui. Easter egg maçom canon (esquadro do bisavô) ostensivo no título mas justificado in-world (oficina de marcenaria avô) |
+| Texto do conto | `docs/narrative/deep/antologia/06-dante-grid.md` | ~3.379 | ~11 | extrair íntegra; voz estoica-fraternal **ato 1-2 antes da traição**; CUIDADO EDITORIAL: este conto é o *layer superficial* sincero — leitor sente a fraternidade real antes de descobrir (no jogo / Vol 1 Cap 9.6) a chantagem Edilma. Não vazar reveal aqui. Easter egg maçom canon (esquadro do bisavô) ostensivo no título mas justificado in-world (oficina de marcenaria avô) |
 | Nota editorial in-tomo | editorial direto | ~0.1 | ~0.5 | **uma frase** no cabeçalho: "Versão pessoal recolhida três meses antes de Ano 0. Compare com leituras posteriores do mesmo autor." Sinal sutil sem spoiler |
 | Cabeçalho editorial | editorial | ~0.05 | — | — |
 
@@ -723,7 +723,7 @@ docs/narrative/deep/antologia/
 ├── 03-iara-lumen.md               [Conto 3 — Tomo 1 Parte II]
 ├── 04-bento-requiem.md            [Conto 4 — Tomo 1 Parte II]
 ├── 05-linda-siren.md              [Conto 5 — Tomo 1 Parte II]
-├── 06-dante-grid-sincero.md       [Conto 6 — Tomo 1 Parte II — DOUBLE-LAYER]
+├── 06-dante-grid.md               [Conto 6 — Tomo 1 Parte II — DOUBLE-LAYER]
 ├── 07-jaci-proxy.md               [Conto 7 — Tomo 1 Parte II — fecha T1]
 ├── 08-sterling-locke.md           [Conto 8 — Tomo 2 Parte III — abre T2]
 ├── 09-cassiano-vorto.md           [Conto 9 — Tomo 2 Parte III]

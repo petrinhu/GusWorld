@@ -621,6 +621,7 @@ Cor institucional: preto-carbono + fúcsia-neon discreto.
 - **Dia da Inicialização** — individual, não-coletivo ([[tradicoes-cultura]] §8). 12 horas de silêncio + música única.
 - **Cumprimento canônico:** gesto silente (dois dedos na orelha). Verbal: "Frequência boa." / "Sem ruído."
 - **Música canônica:** "Última Frequência" (composição original dos 8 técnicos desaparecidos na batida Casa das Antenas, ~-50). Tocada apenas anualmente.
+- **Ritual Noite Calada:** ritual anual canon Underground Silêncio. Tocado uma vez por ano em Câmara Última Frequência (canon PLACES). Música: composição canon 55 BPM (Fibonacci), modo frígio, vocal melismático Linda + reverb cavernoso. Função: memorial dos não-voltados (técnicos Underground perdidos pré-jogo: Bartolo Penkin, Calixto Rivaz, oito técnicos Casa das Antenas batida -50). Liderada por Mara Bento + Linda Siren canon ato 2+.
 - **Tatuagem opcional:** símbolo Underground (onda cruzada por linha reta) atrás da orelha.
 - **Pingente-agulha:** membros que perderam familiares em batida corporativa frequentemente carregam agulha de toca-discos como pingente (Linda canônica).
 - **Compromisso silente da inicialização:** novo membro nunca conta a outro a música que recebeu. Privacidade absoluta.
@@ -678,6 +679,25 @@ Sobrevivência cooperativa em terreno hostil. Sem manifesto. Lealdade horizontal
 - **Inimigos:** FIR (frontal). Sterling Corp (indireto).
 - **Distância civil:** Cult Mirage, Ordem Recursiva.
 - **Sympathy parcial:** Pelicano Branco (afeto natural; sem contato operacional próximo).
+
+---
+
+## 8. Ordem Sevra (facção menor, litúrgica paralela)
+
+### Ideologia
+
+Ordem litúrgica paralela ao Asmódico canon, fundada por **Mestre Lavínia Sevra** (canon CHARS §6). Estrutura ritualística diferenciada: 8 catedrais separam Sevra do Asmódico em geografia litúrgica canon Era 2-3.
+
+### Função canônica
+
+Ordem complementar não-adversária ao Asmódico, foco em meditação silenciosa, escrita ritual, e preservação cripto-glífica menor. Atelaiana de Sevra Chevalier (mãe biológica Bento, canon CHARS §5) desertou da Sevra para o Asmódico após o parto, atravessando as 8 catedrais (canon R9 conto 4 Bento Requiem). Liderada por Lavínia Sevra desde ~-3.
+
+### Cross-ref
+
+- `CHARS.md` §6 Mestre Lavínia Sevra
+- `CHARS.md` §5 Atelaiana de Sevra Chevalier
+- `docs/narrative/deep/antologia/04-bento-requiem.md` R9 conto 4
+- `docs/narrative/characters/bento-requiem.md` deep R4
 
 ---
 

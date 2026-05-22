@@ -210,4 +210,4 @@ Por enquanto, é o que eu sei fazer.
 
 ---
 
-**Última revisão:** 2026-05-20. Canônico deep-lore R9 F1-DL.9 Antologia Vol 2 conto 6/14. Versão SINCERA ato 1-2 do leitmotiv duplo canon Dante. Não modificar sem aprovação criador supremo.
+**Última revisão:** 2026-05-22. Canônico deep-lore R9 F1-DL.9 Antologia Vol 2 conto 6/14. Versão SINCERA ato 1-2 do leitmotiv duplo canon Dante. Renomeado de `06-dante-grid-sincero.md` para `06-dante-grid.md` (cascata fix Vol 2 M6, 2026-05-22). Não modificar sem aprovação criador supremo.
