@@ -28,6 +28,9 @@ GusWorld usa calendário solar de **12 meses, 30-31 dias**, herdado intacto da E
 - **Festival do Reaproveitamento** (FIR) — anual, semana 2 de novembro. Corporativo cínico disfarçado de celebração do trabalhador.
 - **Dia da Inicialização** (Underground) — pessoal, não-coletivo. Marca individual de cada novo membro Underground.
 - **Aniversário da Catedral Local** (Ordem Recursiva) — varia por catedral. 5 ativas, 5 datas distintas.
+- **Festa da Calibração** (Ordem Recursiva, capítulo Heliópolis-Nova) — anual, 8 de fevereiro. Comemora fundação capítulo regional Heliópolis Era 2; cordão reduzido de 34 nós (Fibonacci) em vez do cordão 89 nós principal (canon F1-DL.ORDEM-EXPAND §8.5). Era 3: capítulo capturado Sterling Corp, festa preservada residual.
+- **Festa da Federação** (Cidades-Gêmeas Norte+Sul) — anual, 8 de maio. Comemora estatutos federação bilateral Era 2; procession atravessa ponte 89 vãos entre Colunas Boróstoma (Norte) e Janor (Sul); cordão 89 nós alternado entre cidades-irmãs (canon F1-DL.ORDEM-EXPAND §8.6).
+- **Festa Coletivista** (Polis-Vermelha) — anual, 13 de fevereiro. Comemora fundação configuração coletivista cidade desde -129 (canon R10 §6.2 era-2-boom-tecnico.md §6.2 + F1-DL.ORDEM-EXPAND §8.7). Ordem Recursiva participa em registro tenso (cordão dobrado retido em vez de desdobrado, sinal cerimonial de reserva canônica).
 
 ---
 

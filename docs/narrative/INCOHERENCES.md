@@ -166,3 +166,41 @@ Para cada CRÍTICA C1-C10 + relevantes adicionais, decisão criador supremo nece
 **Decisão criador supremo:** lore-bible §13 + timeline -80 mantêm **17 mestres mortos** como canon estrutural. DD-003 (Diário Atelaiá Chevalier, "estávamos em treze, saímos em quatro" = 13 presentes, 9 mortos, 4 sobreviventes) é **unreliable narrator deliberado**: Atelaiá omitiu 8 mortos por trauma e/ou proteção (poupar leitor in-world, ocultar identidade de mortos cujos descendentes ainda estão vivos, ou registro parcial da câmara em que esteve, não do total da catedral). Player sensível percebe a fratura em cross-reading; gate Knowledge alta pode expor a discrepância como pista de leitura crítica das fontes in-world.
 
 Nenhuma cascata fix em lore-bible/timeline. Apenas reconhecimento explícito do recurso narrativo.
+
+---
+
+## PILOTO TEXTREVIEW LOTE 1 — ORDEM RECURSIVA (2026-05-22)
+
+**Contexto:** F5-BK.AUDIT.PILOTO executado pós-F1-DL.ORDEM-EXPAND. Revisor-textual + TEXTREVIEW.md protocolo dominante aplicado a `docs/narrative/deep/factions/ordem-recursiva.md` (11815 pal, Lote 1 = §1 + §3 + §8).
+
+**Achados:** 13 CRÍTICOS + 6 MÉDIOS + 4 LEVES detectados (output 4-pack: Dicionário + Inconsistências + Tabelas + Mermaid).
+
+**9 decisões one-way door resolvidas pelo criador supremo:**
+
+| # | Decisão | Resolução |
+|---|---|---|
+| 1 | Canonizar 7 NPCs novos | Canonizar todos 7 (3 matrilineares + 3 patrilineares + Aldebrando já canon) |
+| 2 | Colisão homônima Hilário (4 personagens) | Renomear patrilinear Chevalier; substituir Hilário por nome único etnia mista não-africana |
+| 3 | Gerações matrilineares R10 (5) vs Ordem (6) | 6 gerações com Antoneta + sobrenomes compostos matrilineares |
+| 4 | Gerações patrilineares timeline (4) vs Ordem (5) | 4 gerações intermediárias canon. Nomes: Antoneto + Dmitri + Casimiro + Aldebrando-pai-Bento |
+| 5 | Aritmética §1 L13 "43 anos pós Hiato" | "552 anos após Êxodo" (Êxodo -720 + 572 = -148) |
+| 6 | Polis-Vermelha "captura política -45" (R10 §6.2 NÃO tem isso) | Remover -45 + usar "deriva séculos" alinhado R10 canon |
+| 7+8 | 3 festas regionais novas | Canonizar 3 festas em tradicoes-cultura.md (Calibração 8 fev + Federação 8 mai + Coletivista 13 fev) |
+| 9 | Nomenclatura 5 catedrais cross-doc | PLACES como canonical: São Camilo + Quarta + Quinta ativas; São Vargas + Atelaiá saqueadas -3 |
+
+**Cascata canon executada (2026-05-22):**
+
+1. ✅ CHARS.md §8c: +6 NPCs (Antoneta Argéndia-Chevalier + Tarsila Atelaiá-Verônica + Felícia Tarsila + Antoneto + Dmitri + Casimiro Chevalier) + 2 linhagens canonizadas (matrilinear cronistas 6 gerações + patrilinear Chevalier 6 totais 4 intermediárias)
+2. ✅ tradicoes-cultura.md: +3 festas regionais (Calibração + Federação + Coletivista)
+3. ✅ timeline.md: 5 eventos novos linhagem (-110 Antoneta nasce, -95 Antoneto, -78 expandido linhagem matrilinear, -55 Dmitri, -25 Casimiro+Tarsila, -8 Felícia) + Linhagens cruzadas atualizada (Chevalier 4 gerações nomeadas + nova Cronistas matrilineares Atelaiá)
+4. ⏳ ordem-recursiva.md: prose deep-lore fixes pendentes (dispatchar narrative-writer):
+   - §1 L13 aritmética
+   - §3 catedrais ativas (3 ativas + 2 saqueadas alinhar PLACES)
+   - §8.4 sobrenomes Tarsila/Felícia (matrilinear composto)
+   - §9.5 patrilineares (4 nomes: Antoneto + Dmitri + Casimiro + Aldebrando)
+   - §8.7 + §9.2 + §11.1 remover "Polis-Vermelha -45" → "deriva séculos"
+5. ⏳ era-2-boom-tecnico.md (R10): drift sobrenomes Tarsila/Felícia alinhar
+
+**Status piloto:** PROTOCOLO VALIDADO. ROI revisão proativa confirmado empiricamente. 13 críticos que cascateariam pra docs futuros + custo audit final 3-5× maior se adiados.
+
+**Próximo passo:** rerun TEXTREVIEW Lote 1 pós-fixes prose pra validar 0 críticos remanescentes.
