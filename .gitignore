@@ -43,3 +43,4 @@ __pycache__/
 
 # Resources pesados / não-versionáveis (livros de referência, fontes externas)
 /resources/livros/
+.TEXTREVIEW.md.kate-swp
