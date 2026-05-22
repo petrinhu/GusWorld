@@ -70,7 +70,7 @@ Encaixo a fita. O leitor liga. Projeção mínima, vinte e um centímetros de al
 
 "Sonja Murmúrio, segunda hierofante da Catedral Mirage, gravação de campanha interna, ano menos trinta e quatro."
 
-Menos trinta e quatro. Cálculo rápido. Eu tenho doze. Adila tinha trinta e quatro quando me encontrou. Adila hoje tem em torno de quarenta anos. Menos trinta e quatro é o ano em que Sonja desapareceu e Adila assumiu a tutela formal aos seis anos. Sonja era a segunda hierofante. Sonja existia oficialmente. Sonja estava viva nessa gravação.
+Menos trinta e quatro. Cálculo rápido. Eu tenho doze. Adila tinha trinta e dois quando me encontrou. Adila hoje tem em torno de quarenta anos. Menos trinta e quatro é o ano em que Sonja desapareceu e Adila assumiu a tutela formal aos seis anos. Sonja era a segunda hierofante. Sonja existia oficialmente. Sonja estava viva nessa gravação.
 
 Eu pauso. Respiro. Os cinco clones acima de mim continuam estáveis. O ar do telhado continua respirando. A cidade abaixo continua emprestando luz de si pra si mesma. Eu retomo a gravação.
 

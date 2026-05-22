@@ -1,5 +1,7 @@
 # Defesa Pública de Tese, Faculdade de Engenharia Recursiva, Salão 3
 
+> **Nota editorial:** Transcrição preserva voz original Sterling Locke (defesa de tese de doutorado em -25, futura fundação Sterling Corp em -12). Sem comentário interpretativo. Leitor consulte Vol 1 Bíblia §3 Era 3 + ficha CHARS para contexto adversarial canônico.
+
 *por Sterling Locke, doutorando candidato ao grau, cadeira de Paradigmas de Avaliação Runtime, transcrição autorizada pelo próprio*
 
 ---

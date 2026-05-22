@@ -4,7 +4,7 @@
 
 A escada metálica da Subestação 11 tem trinta e quatro degraus, dos quais os três últimos são falsos: chapa fina sobre vazio, ecoam diferente, soltam um *tóc* oco que dedo treinado reconhece a três metros de distância. Eu desço contando, não por superstição (poxa, eu sou cético-irônico de carteirinha, não místico de feira), mas porque contar é hábito de Striker: tudo no corpo da gente acaba virando ciclo de relógio, BPM, divisão de compasso. Meu pai, conforme a Inácia conta, dizia que engenheiro elétrico bom é o que conta sem perceber. Quando ouve uma turbina, já sabe o RPM antes de olhar o painel.
 
-Meu pai foi o Salvador Berenger, engenheiro elétrico de quarta geração, linha direta de um cara chamado Iremar Berenger que ajudou a escrever a primeira versão de Pythia faz uns noventa e cinco anos atrás. Não que ele tivesse feito questão de lembrar. Salvador morreu três anos antes de eu nascer, num acidente de tráfego na Periferia, mesmo ano em que eu fui gerado. Inácia ficou viúva grávida. Davi tinha três anos. Inácia me criou sozinha, com o Davi até eu ter oito anos, e depois só. Eu nunca conheci o homem em pessoa. Conheço pelo que a Inácia conta, pelo que está gravado nas peças que ele deixou, pelo silêncio específico que essa família guarda para o nome dele. Cético-irônico, lembra: eu não acredito em fantasma, mas reconheço presença material em peça honesta.
+Meu pai foi o Salvador Berenger, engenheiro elétrico de quarta geração, linha direta de um cara chamado Iremar Berenger que ajudou a escrever a primeira versão de Pythia faz uns noventa e cinco anos atrás. Não que ele tivesse feito questão de lembrar. Salvador morreu no ano em que eu fui gerado, num acidente de tráfego na Periferia. Inácia ficou viúva grávida. Davi tinha oito anos. Inácia me criou sozinha, com o Davi até eu ter oito anos, e depois só. Eu nunca conheci o homem em pessoa. Conheço pelo que a Inácia conta, pelo que está gravado nas peças que ele deixou, pelo silêncio específico que essa família guarda para o nome dele. Cético-irônico, lembra: eu não acredito em fantasma, mas reconheço presença material em peça honesta.
 
 A Subestação 11 zumbe na frequência conhecida. Cento e quarenta e quatro batidas por minuto, mais ou menos, é o BPM de fundo desse setor dos Dutos Infernais; eu sei porque já bati esse compasso no peito andando rápido pelos corredores. É leitmotiv da minha vida, parece, esse 144. Se eu fosse menos cético dizia que é destino. Sou bem cético, então digo que é coincidência elétrica com a turbina de refrigeração do andar de baixo.
 
@@ -68,7 +68,7 @@ Por um segundo ela para. Não é pausa dramática, é pausa de quem reconhece e 
 
 – Quando?
 
-Ela olha pra mim. Tira a lupa do olho. Põe o conector na caixa de peças aprovadas. Limpa a mão no avental de couro velho (que avental gasto, esse, eu reparo agora; ela tem ele desde antes de eu nascer, deve ter pelo menos uns dezesseis anos de uso, o couro endurecido nas bordas).
+Ela olha pra mim. Tira a lupa do olho. Põe o conector na caixa de peças aprovadas. Limpa a mão no avental de couro velho (que avental gasto, esse, eu reparo agora; ela tem ele desde antes de eu nascer, deve ter pelo menos uns treze anos de uso, o couro endurecido nas bordas).
 
 – Quando o Davi tinha uns três anos. Antes de eu te gestar. Ele fez seis meses lá, contrato extra. Não foi feliz.
 
@@ -132,7 +132,7 @@ Eu não choro. Aos treze a gente não chora, a gente cataloga. Tem hora pra chor
 
 ## VIII
 
-Em casa, almoço com Inácia (Salvador, faz dezesseis anos que mora só no que a gente guarda dele: caderno, conector, ferro de solda, frase repetida pela Inácia). Sopa de raiz com pão de centeio. Inácia cozinha bem quando quer e mal quando não quer; hoje quis. Eu como em silêncio. Ela come em silêncio. A gente é família de silêncio bom, daqueles que não doem.
+Em casa, almoço com Inácia (Salvador, faz treze anos que mora só no que a gente guarda dele: caderno, conector, ferro de solda, frase repetida pela Inácia). Sopa de raiz com pão de centeio. Inácia cozinha bem quando quer e mal quando não quer; hoje quis. Eu como em silêncio. Ela come em silêncio. A gente é família de silêncio bom, daqueles que não doem.
 
 Depois do almoço, eu subo pro meu quarto. Quarto pequeno, três metros por cinco, teto baixo, janela única dando pro pátio interno. Eu tenho um terminal velho ali, dos antigos, com teclado mecânico real e tela monocromática verde. A Inácia me deu de presente de aniversário de onze anos, mas o terminal era do Salvador: ela tinha guardado lacrado num pano de algodão treze anos, esperando o momento certo. Frase do Salvador anotada por ela na primeira página do manual interno: "se você quer aprender Pythia direito, aprende em máquina honesta". Máquina honesta, pro Salvador, era máquina que não mente sobre o que está fazendo. A Inácia ratificou a frase no presente de aniversário. Eu aceitei sem protestar.
 
