@@ -326,7 +326,7 @@ Cada mapa segue padrão fixo:
 
 > *Visual:* página fria. Pouco traço. Gus usou só caneta cinza claro (sem nanquim — "ruído visual ofende este lugar"). Casa das Antenas como ponto-âncora. Sub-célula norte (Mara Bento operadora) marcada. Bancada Joaquim Bartolomeu separada. Margem: "aqui se fala baixo. mãe me ensinou a respeitar isso antes de eu saber por quê."
 
-**Topologia.** Antigo distrito de transmissão analógica. Antenas mortas verticais (5 conhecidas, 2 ainda parcialmente funcionais). Câmara do Equinócio Acústico (Era 1, cripto-glifo sonoro) descoberta por Joaquim em ano -1.
+**Topologia.** Antigo distrito de transmissão analógica. Antenas mortas verticais (5 conhecidas, 2 ainda parcialmente funcionais). Câmara do Equinócio Acústico (Era 1, cripto-glifo sonoro) descoberta por Joaquim em ano -3.
 
 **Landmarks visíveis (5):**
 
@@ -336,7 +336,7 @@ Cada mapa segue padrão fixo:
 | azul | **Sub-célula norte (operadora rádio Mara Bento)** | Ala norte Zona do Silêncio | Era 2 + Era 3 (reuso) | [[07-zona-do-silencio\|§2]] |
 | azul | **Bancada de Joaquim Bartolomeu** | Sub-célula norte, anexo | Era 2 | toca-discos artesanais |
 | azul | **Apartamento Neumann** | Bloco residencial fronteira sul Zona do Silêncio | Era 2 | pais de Linda; saúde frágil Brígida pós-batida -8 |
-| cinza | **Câmara do Equinócio Acústico (Era 1)** | Subterrâneo lateral; descoberta Joaquim -1 | Era 1 | cripto-glifo sonoro mesmo tipo que Catedrais visuais |
+| cinza | **Câmara do Equinócio Acústico (Era 1)** | Subterrâneo lateral; descoberta Joaquim -3 | Era 1 | cripto-glifo sonoro mesmo tipo que Catedrais visuais |
 
 **Landmarks ocultos (Knowledge alta) (1):**
 
