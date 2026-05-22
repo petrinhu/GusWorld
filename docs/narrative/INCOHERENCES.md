@@ -73,14 +73,11 @@ Mapeamento sistemático de conflitos canon detectados via cross-validation deep-
 
 ---
 
-### C6. Salvador Berenger (pai Cauã) canon CHARS sem retrofit
+### C6. Salvador Berenger (pai Cauã) — **RESOLVIDO 2026-05-22** (canon F5-BK.AUDIT T3-CR-02)
 
-- `CHARS.md:61`: "Salvador Berenger — Pai biológico morto Cauã, acidente tráfego Periferia **-16**. Inácia viúva desde então. Cauã nasceu **-13**."
-- `timeline.md / lore-bible / factions`: **zero menção a Salvador**.
+**Resolução canon:** Salvador Berenger morreu **-13** (acidente tráfego Periferia mesmo ano nascimento Cauã). CHARS:62 atualizado. R-AUDIT-04 documentou Conto 02 reescrito com Cauã narrando Salvador via memória oral materna (Cauã não conheceu pai pessoalmente). timeline.md retrofit aplicado (entry -13: Cauã nasce + Salvador morre). lore-bible + factions + deep-lore alinhados em cascata. Cross-ref AUDIT-T1-NOMES:279.
 
-**Conflito implícito:** Salvador morreu -16, Cauã nasceu -13. Inácia viúva 3 anos antes de Cauã nascer → quem é pai biológico Cauã?
-
-**Cascata fix:** decisão criador supremo (Salvador pai biológico ambíguo OU revisar datação).
+**Status:** RESOLVIDO. Sem ação pendente.
 
 ---
 

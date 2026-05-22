@@ -32,7 +32,7 @@
 |---|---|---|---|---|---|---|---|
 | 08 | `08-sterling-locke.md` | Sterling Locke | adulto (~25 doutorando) | ~3.172 | ~11 | Defesa pública tese DRE -25, banca rejeita 3-0, monólogo interno revela plano Sterling Corp (-12) + GRE (-5) | V1 B.2 (Sterling antagonista), Timeline -25/-12/-5, Era 3 |
 | 09 | `09-cassiano-vorto.md` | Cassiano Vorto | adulto (~50) | ~3.130 | ~10 | Mesa cinco Café da Esquina · dossiê Dante + planejamento contenção materna Edilma Caverna dos Perdidos + nova diligência Vance Atelaiá | V1 B.2 (Vorto), B.3 (Edilma), Foreshadowing F129/F-vance-atelaia |
-| 10 | `10-pyotor-vance-pai.md` | Pyotor Vance | adulto (~37) | ~3.085 | ~10 | Manhã Pelicano Branco · paciente Mariana terminal + caderno família revela Gustaf I (-150) + rádio amador irmão Yakov + carta a Gus | V1 B.3 (família Vance), C.5 (vilarejos fronteira), Era 2 (Gustaf I) |
+| 10 | `10-pyotor-vance-pai.md` | Pyotor Vance | adulto (40) | ~3.085 | ~10 | Manhã Pelicano Branco · paciente Mariana terminal + caderno família revela Gustaf I (-150) + rádio amador irmão Yakov + carta a Gus | V1 B.3 (família Vance), C.5 (vilarejos fronteira), Era 2 (Gustaf I) |
 | 11 | `11-venea-vance-mae.md` | Vênea Vance | adulta (~36) | ~3.140 | ~10 | Bancada 1h madrugada Edifício Vance · placa Era 2 com serigrafia "TAVUS" + carta Pyotor + retrospecto separação -5 | V1 B.3 (família Vance), C.4 (Edifício Vance), Era 2 |
 | 12 | `12-ancia-mariana-vanderbist.md` | Anciã Mariana Vanderbist | 89 | ~3.080 | ~10 | Sala de cartas Pelicano Branco · sucessão Tatauín/Helena/Jaci + entrega ampola treze para Jaci + recapitulação surto silencioso -8 | V1 B.4 (Mariana), B.3 (Lia/Solano), C.5 (Pelicano Branco), Timeline -8 |
 | 13 | `13-veronica-atelaia.md` | Verônica Atelaiá | adulta (paleógrafa, datação -45) | ~2.350 | ~8 | Arquivo subterrâneo São Vargas · decifração placa cripto-glifo Era 1 "o limite escolheu falar" (Anomalia Primeira -820) + selo microfilme | V1 B.7 (cronistas Era 2), C.3 (São Vargas), Era 2 (-45/-820), Patch-Zero ancestral |
@@ -202,7 +202,7 @@
 | Subestação 7 · alvo teste carga ilegal Sterling Locke (subdiretor), morte Davi Berenger (16 anos) | -5 | 02 (Vespa dívida com Davi, Cauã 8 anos na perda) |
 | Fundação Sterling Corp (Apex-Data → Nexus-Cloud → Core-Synth) | -12 | 08 (plano interno revelado pós-rejeição), 09 (lacre cera Calveri) |
 | Câmara do Equinócio Acústico · decifração Joaquim Bartolomeu | -3 | 05 (referenciada, "não saiu inteiro") |
-| Patrício Tércio comprou galpão Alencar por preço demolição | -7 | 06 (placa não trocada) |
+| Padim Tércio Almagre comprou galpão Alencar por preço demolição | -7 | 06 (placa não trocada) |
 | Salviano Alencar morto (overdose-medicação 6 meses pós destruição cooperativa) | -7.5 (atribuído -7 funeral) | 06 (3 quadros funeral), 09 (Vorto observa do poste queimado) |
 | Aldebrando Chevalier morto (contaminado, interferência cripto-glifo profundo) | -0.5 | 04 (Bento 13.5 anos) |
 | Vorto inicia recrutamento Dante (envelope codinome "Grid") | -5 (Dante 8 anos) → -2 (Dante 11 anos) | 09 (terceira aproximação) |
