@@ -61,6 +61,16 @@
 | **Vilarejo da Pedra-Cantante** | Vilarejo-fronteira | Cross-eras (fundado -720) | Região oriental, descendência Família-Pilastra | ✅ canônico (variedade canônica de erva-de-pedra) | `deep/eras/era-1-pre-codigo.md` §9.2 + §9.6 |
 | **Vilarejo do Vale Boroshova** | Vilarejo-fronteira | Cross-eras (fundado -720) | Refúgio canônico da Linhagem Boroshova-Vance | ✅ canônico (origem Vesperina Boroshova-Vance, Anselmo Boroshova-Vance, Praxídice Boroshova-Vance) | `deep/eras/era-1-pre-codigo.md` §8.4 + §9.3 + §9.5 + §9.7 |
 
+## 4b. Clãs vilarejos-fronteira menores (Selve oriental, anel menor não-Êxodo)
+
+Canon F5-BK.AUDIT T2-C3 resolução "modelo dois-anéis": 10 vilarejos pós-Êxodo (§4 + §5b = 7+3) + 3 clãs menores anel oriental tributária NÃO-Êxodo = 13 vilarejos total (Fibonacci canon).
+
+| Nome | Tipo | Era | Localização canon | Status | Cross-ref |
+|---|---|---|---|---|---|
+| **Tucano-Cinza** | Clã vilarejo-fronteira menor | Era 1 (origem antropológica não-Êxodo) | Norte Selve oriental tributária | ✅ canônico (Berenice Quaresma anciã) | `factions.md:399-401` + `environments/02-selve-sombria.md` + `environments/08-selve-profunda.md` + `pelicano-branco.md` + `cosmologia-deep.md:67` |
+| **Pelicano Roxo** | Clã vilarejo-fronteira menor | Era 1 (origem antropológica não-Êxodo) | Oeste Selve oriental tributária | ✅ canônico (Otília Pamonha anciã) | `factions.md:399-401` + `environments/02-selve-sombria.md` + `environments/08-selve-profunda.md` + `pelicano-branco.md` |
+| **Tartaruga-Fractal** | Clã vilarejo-fronteira menor | Era 1 (origem antropológica não-Êxodo) | Sul Selve oriental tributária | ✅ canônico (Bartolomeu Quintino ancião) | `factions.md:399-401` + `environments/02-selve-sombria.md` + `environments/08-selve-profunda.md` + `pelicano-branco.md` |
+
 ## 5. Pontos geográficos / sub-locais relevantes
 
 | Nome | Tipo | Era | Localização canon | Status | Cross-ref |
@@ -102,6 +112,8 @@
 | **Câmara Última Frequência** | Sub-local (Zona Silêncio) | 2+3 | Câmara ritual Underground Silêncio. Sede da Última Frequência (canon R9 conto 5 Linda Siren). Acesso restrito sub-célula Norte Mara Bento | 🟡 lendário (descobrível ato 2) | `factions.md` Underground + `R9 conto 5` |
 | **Estação Pythia Bio sucateada** | Sub-local (Selve Profunda) | 2 | Selve Profunda | ⚪ abandonado funcional | `environments/08-selve-profunda.md` |
 | **Câmara Neo-Sylvania de Coleta de DNA** | Sub-local (Selve Profunda) | 1 | Selve Profunda | ✅ canônico (sementes-relíquia) | `environments/08-selve-profunda.md` |
+| **Trilha das Sementes** | Sub-local (Selve Profunda) | 1-2-3 | Principal entre 13 caminhos entrada Pelicano Branco → Núcleo Mandelbrot | ✅ canônico (117 placas latão Era 2, 23 desaparecidas, canon F5-BK.AUDIT T2-M10 resolução) | `deep/settings/08-selve-profunda.md:21` |
+| **Distrito V (Distrito 5)** | Sub-local (Periferia) | 3 | Bunker FIR canon, pavimento tesselado profanado | ✅ canônico (sede FIR operacional, canon F5-BK.AUDIT T2-L3 resolução) | `dante-grid.md:165` + `factions.md:301` + `foreshadowing.md` F005 + `diary/entries-fichas-bestiary.md:228-229` |
 
 ## 5a. Sub-locais Era 1 (canon §6 deep-lore, Ordem Recursiva)
 
