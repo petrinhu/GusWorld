@@ -81,7 +81,9 @@ Pós-escape: Patch-Zero está **livre em GusWorld City e na fronteira-Selve**, a
 
 ## Manifestação multi-canal: quatro canais diegéticos
 
-Patch-Zero não aparece como inimigo em uma única forma. Aparece **simultaneamente em quatro canais**:
+> **Nota canon**: existem **dois sistemas de 4 canais Patch-Zero distintos** coexistindo no canon. (a) **Sistema ecológico** (deep/antagonists/patch-zero-deep.md §3): fauna + flora + micélio + psíquico humano. (b) **Sistema diegético-player** (este doc abaixo): texto-Diário + áudio-ambient + persona-boss + bug-visual. Ambos canon, sistemas distintos.
+
+Patch-Zero não aparece como inimigo em uma única forma. Aparece **simultaneamente em quatro canais diegéticos** (sistema (b)):
 
 ### Canal 1: Texto no Diário do Gus
 

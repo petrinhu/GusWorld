@@ -11,7 +11,7 @@
 ## Externo
 
 - **Goal:** decodificar Sterling Locke (e a cascata de problemas que ele criou).
-- **Aparência:** ectomorfo, ruivo asimétrico, óculos cyan, aparelho ortodôntico visível (orgulho técnico, não esconde), Tavus-Drive no pulso esquerdo, sobretudo gótico.
+- **Aparência:** ectomorfo, ruivo asimétrico, óculos cyan, aparelho ortodôntico visível (canon técnico: **Matriz Ortodôntica**, vértice 2 do triângulo Pillar 3, antena UHF/VHF amplificadora; orgulho técnico, não esconde), Tavus-Drive no pulso esquerdo, sobretudo gótico.
 - **Voice:**
   - **Vocabulário:** técnico aplicado a tudo (chama almoço de "input calórico").
   - **Sintaxe:** frases curtas declarativas.

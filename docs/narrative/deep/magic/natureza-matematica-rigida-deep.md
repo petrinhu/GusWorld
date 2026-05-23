@@ -94,7 +94,7 @@ Patch-Zero opera contemporaneamente, na Era 3, por quatro canais de manifestaç�
 
 O resto da Selve obedece caos determinístico: parece caótico, é Mandelbrot. Equação existe; só é preciso achá-la. **Patch-Zero opera fora de fechamento matemático**: nenhuma equação parametrizada por qualquer linguagem conhecida (C-Arcane, Asmódico, Óxido, Pythia, criptográfica, DRE) reproduz seu comportamento sem deixar resíduo. Não é caos que esconde ordem; é caos que recusa ser ordem.
 
-O Pillar 2 não é falsificado por Patch-Zero; é **confirmado pela exceção**. A regra "tudo na Selve é matemático" tolera precisamente um buraco, e o buraco está marcado, cartografado e contido pelas anciãs Voronoi há séculos. Sterling Locke tentou weaponizar a anomalia em -3 (dois anos antes do início do jogo), sob o nome operacional **GRE Patch Zero**, e perdeu controle em -1. Hoje o Patch-Zero vaza pela rede internacional; é o motor do dread cósmico canônico do ato 3.
+O Pillar 2 não é falsificado por Patch-Zero; é **confirmado pela exceção**. A regra "tudo na Selve é matemático" tolera precisamente um buraco, e o buraco está marcado, cartografado e contido pelas anciãs Voronoi há séculos. Sterling Locke tentou weaponizar a anomalia em -3 (dois anos antes do início do jogo), sob o nome operacional **GRE Patch-Zero**, e perdeu controle em -1. Hoje o Patch-Zero vaza pela rede internacional; é o motor do dread cósmico canônico do ato 3.
 
 ## §6. Modo scan dos Óculos Táticos do Gus (mecânica diegética)
 

@@ -177,7 +177,7 @@ Endings em GusWorld são gradiente knowledge-gated, não escolha binária. Sem m
 
 Os três caminhos visíveis na borda do Núcleo Mandelbrot Interno (F100) são plant visual final: fuga (leste, Bronze), confronto direto (norte, Prata), compilação reversa (oeste, Ouro). Player Bronze entrou sem Knowledge suficiente para ler o caminho oeste como opção; o caminho está lá, mas a habilidade de seguir não foi treinada. Quem chegou a F099 com Knowledge alta tem a terceira opção destravada em diálogo com Patch-Zero canal 3 no climax.
 
-Bronze paga o foreshadow de Polis-Vermelha caída como espelho: GusWorld City beira o mesmo destino. Sem epilogue bonus. Hook 1 pulsa intenso. Diário entry final em F104. Dante (capturado) morto pela Sterling Corp residual. Vilarejo Pelicano Branco perde 100% das sementes-relíquia em F063.
+Bronze paga o foreshadow de Polis-Vermelha caída como espelho: GusWorld City beira o mesmo destino. Sem epilogue bonus. Hook 1 pulsa intenso. Diário entry final em F104. Dante (capturado) morto pela Sterling Corp residual. Vilarejo do Pelicano Branco perde 100% das sementes-relíquia em F063.
 
 Prata paga o foreshadow como vitória limpa mas melancólica. Patch-Zero selado controlado. Polis-Vermelha começa recuperação lenta. Vilarejo seguro com 60% das sementes (recuperação parcial via sub-quest base Sterling abandonada). Dante: por branching #5. Hook 1 pulsa moderado. Diário entry F104 igual.
 

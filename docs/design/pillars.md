@@ -176,7 +176,7 @@ Romance; gore explícito centrado no Gus; fan-service edgy; dilema moral cínico
 | 5 | **Setor Mirage** (entretenimento) | Iara "Lumen" | Holo-publicidade sobreposta, refração instável, desorientação espacial. |
 | 6 | **Zona do Silêncio** (antenas mortas) | Linda "Siren" | Cânion tecnológico, silêncio gótico, ruído branco estático. |
 | 7 | **Selve Sombria** (fronteira tecnorgânica) | Jaci "Proxy" | Biomassa programada, Fibonacci visível, esporos sintéticos, fauna biocibernética. |
-| 8 | **Catedrais de Silício + Cúpula Sterling** (ato 3) | Sterling Locke | **Mesmo setting, 2 zonas opostas**: exterior = híbrido corrompido (Sterling tentou fundir cidade+Selve, falhou); interior = estéril euclidiano perfeito (santuário negacionista). |
+| 8 | **Catedrais de Silício + Cúpula Sterling** (ato 3) (canon Pillar 5 setting 8 = climax ato 3 Sterling, NÃO confundir com environments/08-selve-profunda.md que é setting Selve Profunda Jaci) | Sterling Locke | **Mesmo setting, 2 zonas opostas**: exterior = híbrido corrompido (Sterling tentou fundir cidade+Selve, falhou); interior = estéril euclidiano perfeito (santuário negacionista). |
 
 ### Mecânicas que servem
 
