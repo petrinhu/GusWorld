@@ -1,0 +1,1 @@
+{ 3D game asset of a Seed-Relic (Semente-Relíquia). Cyber-goth-punk aesthetic, somber and moody tones, Anime 3D style, cel-shaded, low-poly. A single glowing golden seed with tiny rúnic engravings on its surface. Floating in mid-air. Clean isometric view, orthographic projection. Pure white background, cinematic somber lighting with high contrast --ar 1:1 --style raw --v 6.0 }
