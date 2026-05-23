@@ -1,18 +1,18 @@
-# Linda "Siren" Neumann — Crowd Control
+# Linda "Siren" Neumann: Crowd Control
 
 > **Status:** Canônico. Revisão 1 (2026-05-15). Refatorado a partir de `party.md`.
 >
-> **Idade:** 12. **Role mecânico:** Crowd Control — ondas infra-sônicas atordoam alvos biológicos e geram micro-fissuras em hardware/blindagem. **Linguagem-âncora:** **Óxido** (precisão sônica).
+> **Idade:** 12. **Role mecânico:** Crowd Control, ondas infra-sônicas atordoam alvos biológicos e geram micro-fissuras em hardware/blindagem. **Linguagem-âncora:** **Óxido** (precisão sônica).
 >
 > **Cross-ref:** spec mestre `Resources/gusworld/character-spec-linda-siren.md` · facção `factions.md` (Underground do Silêncio) · setting `lore-bible.md` (Zona do Silêncio).
 >
-> **Etimologia:** Luso-BR+Germânica — "Bela / Homem Novo".
+> **Etimologia:** Luso-BR+Germânica, "Bela / Homem Novo".
 
 ---
 
 ## Externo
 
-- **Goal:** proteger Underground do Silêncio + alertar Cidades-Gêmeas sobre operação Sterling de transmissão Patch-Zero em larga escala.
+- **Goal:** proteger Underground do Silêncio, alertar Cidades-Gêmeas sobre operação Sterling de transmissão Patch-Zero em larga escala.
 - **Aparência:** ectomorfa ágil, postura pós-punk inclinada, spiky hair caótico, jaqueta de couro preta com fúcsia-neon, fones industriais, módulos de áudio pulsantes nas ombreiras.
 - **Voice:**
   - **Vocabulário:** técnico de áudio + slang pós-punk. Refere música como "matéria". "Frequência" como verbo ("eu frequenço melhor de noite").
@@ -24,7 +24,7 @@
 
 ## Interno
 
-- **Wound:** pais músicos do circuito Underground perderam toca-discos histórico em batida Sterling Corp + FIR aos 8 anos (Linda viu, criança). Toca-discos era passado de geração. Linda guardou agulha intacta — usa como pingente no pescoço.
+- **Wound:** pais músicos do circuito Underground perderam toca-discos histórico em batida Sterling Corp + FIR aos 8 anos (Linda viu, criança). Toca-discos era passado de geração. Linda guardou agulha intacta, usa como pingente no pescoço.
 - **Want:** vingar perda simbólica do toca-discos + organizar resistência sonora.
 - **Need:** entender que **silêncio também é mensagem**. Underground não é só anti-ruído; é cultivo de espaço pra escuta. Linda confunde silêncio com vazio inicialmente.
 - **Belief:** "quem ouve mais, sobrevive mais."
@@ -38,7 +38,7 @@
 | Sub-beat | Conteúdo |
 |---|---|
 | **Chamado** | Mensagem cifrada via rádio analógica chega de Cidades-Gêmeas: "resista, mantenha as antenas, segredo importante." Linda precisa decifrar. |
-| **Recusa** | Recusa [[gus]] inicialmente — Underground não confia em "criança do Núcleo Metropolitano". |
+| **Recusa** | Recusa [[gus]] inicialmente, Underground não confia em "criança do Núcleo Metropolitano". |
 | **Mentor** | Gus oferece análise de óculos táticos: padrão sônico tem componente eletromagnético. Linda aceita parceria técnica. |
 | **Prova** | Decifragem da mensagem. Reveal: Sterling Corp planeja transmissão Patch-Zero global. Linda em choque. Patch-Zero canal 2 audível pela primeira vez na fita decodificada (sussurros de Polis-Vermelha). |
 | **Retorno** | Linda junta-se à party. Conjuro novo: **Eco do Cânion**. Underground oficializa aliança com Gus + Cidades-Gêmeas. |
@@ -53,17 +53,17 @@ Underground tem ala "antenas ativas" (luta por preservação) vs ala "antenas do
 
 **Crise:** Cidades-Gêmeas Underground responde à mensagem decifrada. Sterling Corp localiza rádio analógica via triangulação. Ataque iminente à Zona do Silêncio em GusWorld City.
 
-**Reflexão filosófica:** Linda duvida — "fui rápida demais. expus a comunidade. underground sobrevivia por estar escondido; agora vamos ser caçados." Gus contra-argumenta: "sobrevivência sem comunicação não é sobrevivência; é estoque. você ativou o sinal. cidades-irmãs respondem. **vocês existem agora**."
+**Reflexão filosófica:** Linda duvida: "fui rápida demais. expus a comunidade. underground sobrevivia por estar escondido; agora vamos ser caçados." Gus contra-argumenta: "sobrevivência sem comunicação não é sobrevivência; é estoque. você ativou o sinal. cidades-irmãs respondem. **vocês existem agora**."
 
 **Resolução:** defesa da Zona do Silêncio (combate tático em terreno + acústica de cânion). [[caua-volt]] + Linda treinam combo Pulso EM + Eco do Cânion (sinergia perfeita; rivalidade vira parceria operacional). Vitória defensiva. Underground sobrevive + ganha visibilidade internacional moderada.
 
-Destrava: **upgrade fones industriais** (modo "ressonância seletiva" — Linda pode silenciar conjuros inimigos por 1 turno; cooldown longo, devastador).
+Destrava: **upgrade fones industriais** (modo "ressonância seletiva": Linda pode silenciar conjuros inimigos por 1 turno; cooldown longo, devastador).
 
 ---
 
 ## Conflito intra-party específico
 
-- **vs [[gus]]:** filosófico mais que linguístico. Cena 6 `comic-reliefs.md` ("Bug declarado Feature"). Linda capta rápido como Sterling distorce realidade via linguagem — Gus reconhece valor.
+- **vs [[gus]]:** filosófico mais que linguístico. Cena 6 `comic-reliefs.md` ("Bug declarado Feature"). Linda capta rápido como Sterling distorce realidade via linguagem; Gus reconhece valor.
 - **vs [[caua-volt]]:** **conflito principal**. Ruído incidental vs noise-canceling. Aproximação via arco Linda (Cauã percebe peso do som). Cena cômica reservada (`comic-reliefs.md` pode adicionar).
 - **vs [[iara-lumen]]:** desprezo mútuo inicial (Underground vs Cult Mirage). Aliança operacional gradual.
 - **vs [[bento-requiem]]:** aliança natural (tradição + underground compartilham antitese a Sterling).
@@ -94,7 +94,7 @@ Destrava: **upgrade fones industriais** (modo "ressonância seletiva" — Linda 
 
 ### Aos 4 anos, durante a batida Sterling Corp + FIR (canônico -8)
 
-Linda estava na cozinha. Otmar (pai) tava na sala. Brígida (mãe) no quarto. Quando bateram na porta, Otmar correu pro quarto onde tava o toca-discos. Conseguiu desparafusar a agulha em 30 segundos exatos (treinou). Ouviu passos subindo. Linda ouviu também. Caminhou da cozinha pro corredor. Viu Otmar saindo do quarto com a agulha na mão. Otmar parou. Olhou pra ela. Sem palavra, ajoelhou. Puxou a corrente do próprio pescoço (corrente vazia, esperava algo). Passou a agulha na corrente. Pôs no pescoço da Linda. Brígida vinha atrás. Os três foram pra sala juntos. A FIR levou o toca-discos em 6 minutos. Otmar não brigou. Brígida chorou. Linda não chorou. *Importa porque:* origem do wound. Origem da hipervigilância (Linda nunca esqueceu a velocidade com que os passos subiram a escada — 27 segundos da porta ao quarto, ela contou aos 8 anos quando entendeu a importância). Origem do pingente. Origem do "quem ouve mais, sobrevive mais."
+Linda estava na cozinha. Otmar (pai) tava na sala. Brígida (mãe) no quarto. Quando bateram na porta, Otmar correu pro quarto onde tava o toca-discos. Conseguiu desparafusar a agulha em 30 segundos exatos (treinou). Ouviu passos subindo. Linda ouviu também. Caminhou da cozinha pro corredor. Viu Otmar saindo do quarto com a agulha na mão. Otmar parou. Olhou pra ela. Sem palavra, ajoelhou. Puxou a corrente do próprio pescoço (corrente vazia, esperava algo). Passou a agulha na corrente. Pôs no pescoço da Linda. Brígida vinha atrás. Os três foram pra sala juntos. A FIR levou o toca-discos em 6 minutos. Otmar não brigou. Brígida chorou. Linda não chorou. *Importa porque:* origem do wound. Origem da hipervigilância (Linda nunca esqueceu a velocidade com que os passos subiram a escada: 27 segundos da porta ao quarto, ela contou aos 8 anos quando entendeu a importância). Origem do pingente. Origem do "quem ouve mais, sobrevive mais."
 
 ### Aos 5 anos, primeira Noite Calada (Brígida levou)
 
@@ -102,11 +102,11 @@ Brígida não explicou nada antes. Só disse: "vem comigo. Hoje a gente fica em 
 
 ### Aos 9 anos, dia da inicialização Underground (12 horas de silêncio)
 
-Padrinho Tiago a leva à câmara silente (interior de antena lacrada). "Tu vai ficar 12 horas. Quando sair, eu toco uma música pra ti. Só pra ti." Linda concorda. Entra. As primeiras 2 horas são fáceis. Da 3ª à 6ª, fica desconfortável. Da 7ª à 9ª, dói. Da 9ª à 11ª, ela começa a ouvir coisas que não existem (cérebro preenchendo o vazio com ruído fantasma). Na hora 12, Tiago abre. Linda sai pálida. Tiago a leva à sala de rádio. Toca a música escolhida (NUNCA revelada in-game; tradição). Linda ouve. Chora 3 minutos quietos. Depois pergunta: "você escolheu essa música por quê?" Tiago: "isso é só meu." Linda aceita. *Importa porque:* origem da disciplina canônica. Origem da relação mentor-distante com Tiago (ele a marcou; ele não invade). Origem do compromisso silente (Linda nunca conta nada de inicialização a ninguém — incluindo Gus).
+Padrinho Tiago a leva à câmara silente (interior de antena lacrada). "Tu vai ficar 12 horas. Quando sair, eu toco uma música pra ti. Só pra ti." Linda concorda. Entra. As primeiras 2 horas são fáceis. Da 3ª à 6ª, fica desconfortável. Da 7ª à 9ª, dói. Da 9ª à 11ª, ela começa a ouvir coisas que não existem (cérebro preenchendo o vazio com ruído fantasma). Na hora 12, Tiago abre. Linda sai pálida. Tiago a leva à sala de rádio. Toca a música escolhida (NUNCA revelada in-game; tradição). Linda ouve. Chora 3 minutos quietos. Depois pergunta: "você escolheu essa música por quê?" Tiago: "isso é só meu." Linda aceita. *Importa porque:* origem da disciplina canônica. Origem da relação mentor-distante com Tiago (ele a marcou; ele não invade). Origem do compromisso silente (Linda nunca conta nada de inicialização a ninguém, incluindo Gus).
 
 ### Aos 11 anos, primeira vez decifra mensagem cifrada sozinha
 
-Padrinho Tiago joga um cifrado simples na mesa. "Tenta." Linda decifra em 12 minutos. Tiago: "bom. Agora isto." Joga cifrado mais complexo. Linda demora 4 horas. Tiago: "agora isto" (cifrado nível 3). Linda fica acordada a noite inteira. Decifra de manhã. Texto decifrado: "*você está pronta pra coordenar a célula jovem*". Linda olha pra Tiago. Tiago: "tu mesma escolheu o teste." Ela aceita. *Importa porque:* origem da liderança canônica jovem. Tiago não a recrutou — deu a ela a opção de se recrutar. Linda escolheu. Aos 11 já liderava células de 4 outras crianças. No jogo (12) tem responsabilidade de Cidades-Gêmeas.
+Padrinho Tiago joga um cifrado simples na mesa. "Tenta." Linda decifra em 12 minutos. Tiago: "bom. Agora isto." Joga cifrado mais complexo. Linda demora 4 horas. Tiago: "agora isto" (cifrado nível 3). Linda fica acordada a noite inteira. Decifra de manhã. Texto decifrado: "*você está pronta pra coordenar a célula jovem*". Linda olha pra Tiago. Tiago: "tu mesma escolheu o teste." Ela aceita. *Importa porque:* origem da liderança canônica jovem. Tiago não a recrutou: deu a ela a opção de se recrutar. Linda escolheu. Aos 11 já liderava células de 4 outras crianças. No jogo (12) tem responsabilidade de Cidades-Gêmeas.
 
 ---
 

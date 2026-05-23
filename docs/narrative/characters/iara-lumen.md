@@ -1,12 +1,12 @@
-# Iara "Lumen" Koslov — Infiltradora
+# Iara "Lumen" Koslov: Infiltradora
 
 > **Status:** Canônico. Revisão 1 (2026-05-15). Refatorado a partir de `party.md`.
 >
-> **Idade:** 12. **Role mecânico:** Infiltradora — projeta clones holográficos no grid tático, manipula sensores inimigos. **Linguagem-âncora:** **Óxido** (segurança opaca).
+> **Idade:** 12. **Role mecânico:** Infiltradora, projeta clones holográficos no grid tático, manipula sensores inimigos. **Linguagem-âncora:** **Óxido** (segurança opaca).
 >
-> **Cross-ref:** spec mestre `Resources/gusworld/character-spec-iara-lumen.md` · facção `factions.md` (Cult Mirage — desertora) · setting `lore-bible.md` (Setor Mirage).
+> **Cross-ref:** spec mestre `Resources/gusworld/character-spec-iara-lumen.md` · facção `factions.md` (Cult Mirage, desertora) · setting `lore-bible.md` (Setor Mirage).
 >
-> **Etimologia:** Tupi+Eslava — "Senhora das Águas / Resiliência em Terrenos Íngremes".
+> **Etimologia:** Tupi+Eslava, "Senhora das Águas / Resiliência em Terrenos Íngremes".
 
 ---
 
@@ -28,7 +28,7 @@
 - **Want:** vingança fria contra Adila + libertar facção artista genuína.
 - **Need:** descobrir que pode criar **arte sem ser arma**. Que beleza pode servir à vida, não consumir.
 - **Belief:** "tudo é encenação. quem não percebe, é encenado."
-- **Flaw:** opacidade defensiva. Esconde sentimento por reflexo de auto-preservação. Difícil de ler — até para a party.
+- **Flaw:** opacidade defensiva. Esconde sentimento por reflexo de auto-preservação. Difícil de ler, até para a party.
 - **Strength:** decifra manipulação social em segundos. Lê micro-expressões. Inteligência emocional aplicada como criptografia inversa.
 
 ---
@@ -53,7 +53,7 @@ Iara já é desertora. Disputa de facção: ala pró-Sterling (Adila) vs ala art
 
 **Crise:** Adila descobre que Iara forneceu prova. Retalia capturando a ala artista para "reabilitação sensorial" (eufemismo: re-doutrinação).
 
-**Reflexão filosófica:** Iara duvida — "ela me ensinou tudo. eu sou a aluna que ataca o mestre. e se eu virar igual a ela por matar ela?" Gus responde: "você não está matando. está fechando o programa que ela escreveu em você. compilando seu próprio binário."
+**Reflexão filosófica:** Iara duvida: "ela me ensinou tudo. eu sou a aluna que ataca o mestre. e se eu virar igual a ela por matar ela?" Gus responde: "você não está matando. está fechando o programa que ela escreveu em você. compilando seu próprio binário."
 
 **Resolução:** invasão clandestina ao Cult Mirage central + libertação ala artista. Confronto Adila não-letal (Pillar 4): Iara desativa Adila com decoy lumen + denúncia pública. Adila desce do palco silenciada.
 
@@ -66,7 +66,7 @@ Destrava: **upgrade capa de refração** (clone holográfico permanente: Iara ma
 - **vs [[gus]]:** linguagem (Óxido vs C-Arcane). Cena 5 canônica.
 - **vs [[linda-siren]]:** **conflito principal**. Underground despreza estetização Cult; Linda vê Iara como "ex-conversa que ainda fala bonito demais pra ser confiável". Iara responde com elegância gélida. Aproximação durante arco Linda (Iara contribui sabotando holografia Sterling Corp; Linda aceita aliança operacional, não pessoal).
 - **vs [[bento-requiem]]:** filosófico. Iara acha Asmódico "lindo mas teatral demais". Bento acha Iara "técnica mas vazia". Cresce respeito mútuo em ato 3.
-- **vs [[patch-zero]] (F127):** durante mini-quest pós-recrutamento Iara, no porão do Cult Mirage, uma tela de holografia rachada acende sozinha. Patch-Zero canal 3, 4º encontro opcional: "você mente bem. eu também. nós podíamos." Iara recusa categórica — uma das poucas vezes que age sem hesitação no jogo. Sem dialogue tree extensiva. Reforça arc: "posso criar arte sem ser arma". Patch-Zero anota; ressurge entry sussurrante no Diário depois. Knowledge média destrava registro no Diário.
+- **vs [[patch-zero]] (F127):** durante mini-quest pós-recrutamento Iara, no porão do Cult Mirage, uma tela de holografia rachada acende sozinha. Patch-Zero canal 3, 4º encontro opcional: "você mente bem. eu também. nós podíamos." Iara recusa categórica, uma das poucas vezes que age sem hesitação no jogo. Sem dialogue tree extensiva. Reforça arc: "posso criar arte sem ser arma". Patch-Zero anota; ressurge entry sussurrante no Diário depois. Knowledge média destrava registro no Diário.
 
 ---
 
@@ -82,7 +82,7 @@ Destrava: **upgrade capa de refração** (clone holográfico permanente: Iara ma
 
 ## Não fazer
 
-- Não eroticização. Tem 12 anos. Beleza referida = elegância, postura, voz — não corporal.
+- Não eroticização. Tem 12 anos. Beleza referida = elegância, postura, voz, não corporal.
 - Não fan-service "femme fatale juvenil". Iara é grave, não sedutora.
 - Não redemption arc Adila. Adila cai e fica caída.
 
@@ -94,7 +94,7 @@ Destrava: **upgrade capa de refração** (clone holográfico permanente: Iara ma
 
 ### Aos 4 anos, deixada à porta de catedral menor anexa Setor Mirage (anônima)
 
-Não lembra. Não sabe quem deixou. Sabe que foi noite porque uma das primeiras coisas que registra ao ser acolhida pela Cult Mirage é alguém comentando "tava chovendo". Foi encontrada por **Sérgio Brimber** (holografista jovem aos 16 anos na época, futuro adepto Cult). Sérgio nunca esquece. Iara não pergunta sobre os pais biológicos. Sterling Corp tem ficha (sub-quest opcional Ouro pode descobrir parcialmente — mãe biológica era operária de Polis-Vermelha; pai não-identificado). *Importa porque:* origem da identidade fluida. Iara nunca teve nome próprio antes do registro civil; "Iara Koslov" foi escolhido por funcionário Cult Mirage. Ela aceita mas sabe que é construção.
+Não lembra. Não sabe quem deixou. Sabe que foi noite porque uma das primeiras coisas que registra ao ser acolhida pela Cult Mirage é alguém comentando "tava chovendo". Foi encontrada por **Sérgio Brimber** (holografista jovem aos 16 anos na época, futuro adepto Cult). Sérgio nunca esquece. Iara não pergunta sobre os pais biológicos. Sterling Corp tem ficha (sub-quest opcional Ouro pode descobrir parcialmente: mãe biológica era operária de Polis-Vermelha; pai não-identificado). *Importa porque:* origem da identidade fluida. Iara nunca teve nome próprio antes do registro civil; "Iara Koslov" foi escolhido por funcionário Cult Mirage. Ela aceita mas sabe que é construção.
 
 ### Aos 6 anos, primeira sessão de treinamento com **Adila Murmúrio**
 
@@ -102,11 +102,11 @@ Adila se ajoelha pra ficar na altura dela. "Você sabe o que é mentir bonito?" 
 
 ### Aos 9 anos, primeira vez decifra que Adila mente pra ela diretamente
 
-Festival pequeno. Adila promete a Iara uma performance solo (Iara treinou meses). Na hora, Adila redireciona para um adepto mais velho. Justifica depois: "você estava nervosa demais. Era pelo seu bem." Iara aceita. Mas naquela noite, escondida atrás da cortina dos bastidores, ouve Adila falando com Cleomir Vasta: "ela é boa, mas é cedo demais pra investir tempo nela. Espera ela ter algo a perder." *Importa porque:* primeira fissura. Iara não confronta Adila — começa a observar. Origem da inteligência emocional aplicada como criptografia inversa. Aos 9 anos vira espiã interna sem se chamar de espiã.
+Festival pequeno. Adila promete a Iara uma performance solo (Iara treinou meses). Na hora, Adila redireciona para um adepto mais velho. Justifica depois: "você estava nervosa demais. Era pelo seu bem." Iara aceita. Mas naquela noite, escondida atrás da cortina dos bastidores, ouve Adila falando com Cleomir Vasta: "ela é boa, mas é cedo demais pra investir tempo nela. Espera ela ter algo a perder." *Importa porque:* primeira fissura. Iara não confronta Adila; começa a observar. Origem da inteligência emocional aplicada como criptografia inversa. Aos 9 anos vira espiã interna sem se chamar de espiã.
 
 ### Aos 11 anos, dia da deserção (canônico em [[timeline]] ano -1)
 
-Iara estava em sub-quest opaca: ajudar Adila com "monitoramento de adeptos sensíveis" para um novo "ritual de cura sensorial". Iara abre, por curiosidade, uma pasta restrita que Adila esqueceu aberta. Descobre os contratos Sterling Corp + as planilhas de dados psicológicos coletados de adeptos durante a década. Fica 17 minutos lendo. Quando termina, fecha a pasta, levanta, sai. Passa em sua cabine, pega 3 objetos pessoais (um livro de poesia que Adila NÃO conhece, uma agulha de tatuagem que ela mesma comprou no Setor Mirage com seu próprio crédito, o registro civil dela). Sai pelo portão de serviço às 04h. Sérgio Brimber a vê sair; não impede. Ele entende. *Importa porque:* origem do canon "Iara desertora aos 11". Ela não fugiu por medo. Saiu por escolha técnica. Decidiu em 17 minutos. Quando assumir o arco no jogo, está pronta pra desmontar Adila — preparou por um ano.
+Iara estava em sub-quest opaca: ajudar Adila com "monitoramento de adeptos sensíveis" para um novo "ritual de cura sensorial". Iara abre, por curiosidade, uma pasta restrita que Adila esqueceu aberta. Descobre os contratos Sterling Corp + as planilhas de dados psicológicos coletados de adeptos durante a década. Fica 17 minutos lendo. Quando termina, fecha a pasta, levanta, sai. Passa em sua cabine, pega 3 objetos pessoais (um livro de poesia que Adila NÃO conhece, uma agulha de tatuagem que ela mesma comprou no Setor Mirage com seu próprio crédito, o registro civil dela). Sai pelo portão de serviço às 04h. Sérgio Brimber a vê sair; não impede. Ele entende. *Importa porque:* origem do canon "Iara desertora aos 11". Ela não fugiu por medo. Saiu por escolha técnica. Decidiu em 17 minutos. Quando assumir o arco no jogo, está pronta pra desmontar Adila: preparou por um ano.
 
 ---
 

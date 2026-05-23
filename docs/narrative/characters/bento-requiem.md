@@ -1,14 +1,14 @@
-# Bento "Requiem" Chevalier — Tanque
+# Bento "Requiem" Chevalier: Tanque
 
 > **Status:** Canônico. Revisão 1 (2026-05-15). Refatorado a partir de `party.md`.
 >
-> **Idade:** 14 (mais velho da party). **Role mecânico:** Tanque / Defensor de Área — campos de contenção gravitacional via escudo mecânico pesado. **Linguagem-âncora:** **Asmódico** (analógico tradicional).
+> **Idade:** 14 (mais velho da party). **Role mecânico:** Tanque / Defensor de Área, campos de contenção gravitacional via escudo mecânico pesado. **Linguagem-âncora:** **Asmódico** (analógico tradicional).
 >
 > **Cross-ref:** spec mestre `Resources/gusworld/character-spec-bento-requiem.md` · facção `factions.md` (Ordem Recursiva) · setting `lore-bible.md` (Catedrais de Neo-Sylvania).
 >
-> **Etimologia:** Luso-BR+Francesa — "Bendito / Cavaleiro".
+> **Etimologia:** Luso-BR+Francesa, "Bendito / Cavaleiro".
 >
-> **⚠️ Exceção declarada Pillar 2** — usa "engrenagens" substituindo cartas, slots fixos 5-6 habilidades em rotação mecânica. Lore-justificativa: relógio mecânico É state machine, substrato analógico.
+> **⚠️ Exceção declarada Pillar 2**: usa "engrenagens" substituindo cartas, slots fixos 5-6 habilidades em rotação mecânica. Lore-justificativa: relógio mecânico É state machine, substrato analógico.
 
 ---
 
@@ -28,7 +28,7 @@
 
 - **Wound:** treinado desde os 7 anos pela Ordem Recursiva. Pais distantes, missão sempre primeiro. Aos 14, herdeiro designado mas ainda inseguro de ser digno. **Wound primeiro (anterior a Hilário Tepenkov):** irmã biológica morta ou desaparecida antes de -7 (canon R9 conto 4 antologia: "minha irmã, pulso clavícula esquerda, nome não-escrito"). Bento carrega pulso na clavícula esquerda como marca canônica. Nome próprio da irmã não canonizado por escolha autoral. Em paralelo: aos 7 anos (canônico -7), viu Hilário Tepenkov (mestre-aprendiz, companheiro de estudos, 14 anos) cair em zona contaminada de Patch-Zero na Catedral Menor de Atelaiá. Carrega culpa silenciosa por ter sobrevivido (Hilário caiu antes de chegar ao escudo de Velhusto pegando-o no colo).
 - **Want:** ser digno do legado. Honrar Mestre-Hierofante.
-- **Need:** entender que dignidade não é repetir o passado; é **adaptar o passado pra que ele continue vivo**. Tradição flexível, não dogma.
+- **Need:** entender que dignidade não é repetir o passado, é **adaptar o passado pra que ele continue vivo**. Tradição flexível, não dogma.
 - **Belief:** "se eu seguir as regras certas, tudo se sustenta."
 - **Flaw:** rigidez. Reluta a aceitar mudança. Vê C-Arcane como ameaça à tradição (no início).
 - **Strength:** firmeza absoluta. Não cede sob pressão. Companions confiam nele como **âncora emocional** da party.
@@ -55,7 +55,7 @@ Disputa interna da Ordem: facção pró-modernização (3 mestres + adeptos) vs 
 
 **Crise:** catedral perdida (uma das duas com localização desconhecida) tem coordenadas decifradas em cripto-glifos. Ordem Recursiva quer enviar expedição. Sterling Corp recebe vazamento e envia expedição rival. Corrida.
 
-**Reflexão filosófica:** Bento duvida — "estou abandonando minha Ordem pra correr ao lado de você. estou virando moderno? estou perdendo o que era?" Gus responde: "tradição que viaja sem mover não chega em lugar nenhum. você não virou moderno; virou **portátil**."
+**Reflexão filosófica:** Bento duvida: "estou abandonando minha Ordem pra correr ao lado de você. estou virando moderno? estou perdendo o que era?" Gus responde: "tradição que viaja sem mover não chega em lugar nenhum. você não virou moderno; virou **portátil**."
 
 **Resolução:** expedição conjunta Bento + Gus à catedral perdida. Confronto com expedição Sterling. Vitória (decifragem mais rápida graças à combinação Asmódico + C-Arcane). Catedral preservada, sob proteção Ordem Recursiva.
 
@@ -96,7 +96,7 @@ Destrava: **upgrade escudo-catedral** (modo "barreira gravitacional aliada" em c
 
 ### Aos 7 anos, dentro da Catedral Menor de Atelaiá quando a anomalia atravessa (canônico -7)
 
-Bento estava na seção de leitura com **Hilário Tepenkov** (14, aprendiz sênior que cuidava dele naquela tarde). Aldebrando (pai) estava no piso superior em reunião. Velhusto presente. A anomalia atravessa o cripto-glifo central como atravessa água a peneira (eco doc 3 Atelaiá). Hilário pega Bento no colo e corre para o escudo de Velhusto. Hilário não chega — cai a três metros. Velhusto estende o escudo um segundo a tempo de pegar Bento que está caindo das mãos dele. Hilário não se mexe mais. Bento, ainda no colo de Velhusto, olha pra Hilário. Não chora. Velhusto cobre os olhos dele com a mão livre. *Importa porque:* origem do wound. Origem da culpa silenciosa por ter sobrevivido (Bento sentiu que Hilário caiu pesando ele; aos 7 anos não conseguiu articular; aos 14 ainda carrega). Origem do gesto de Bento de levantar escudo antes de pensar — corpo lembra.
+Bento estava na seção de leitura com **Hilário Tepenkov** (14, aprendiz sênior que cuidava dele naquela tarde). Aldebrando (pai) estava no piso superior em reunião. Velhusto presente. A anomalia atravessa o cripto-glifo central como atravessa água a peneira (eco doc 3 Atelaiá). Hilário pega Bento no colo e corre para o escudo de Velhusto. Hilário não chega: cai a três metros. Velhusto estende o escudo um segundo a tempo de pegar Bento que está caindo das mãos dele. Hilário não se mexe mais. Bento, ainda no colo de Velhusto, olha pra Hilário. Não chora. Velhusto cobre os olhos dele com a mão livre. *Importa porque:* origem do wound. Origem da culpa silenciosa por ter sobrevivido (Bento sentiu que Hilário caiu pesando ele; aos 7 anos não conseguiu articular; aos 14 ainda carrega). Origem do gesto de Bento de levantar escudo antes de pensar: corpo lembra.
 
 ### Aos 6 anos, primeira lição formal de Asmódico com Aldebrando (pai)
 
@@ -112,7 +112,7 @@ Velhusto autoriza com condição: ir à biblioteca pública, ler 1 livro de C-Ar
 
 ### Aos 14 anos (3 meses antes do jogo), Velhusto entrega o diário de Aldebrando
 
-Velhusto chama Bento à biblioteca privada. Estende a arca de cedro com o diário do pai morto. "Ele teria querido que você lesse quando estivesse pronto. Eu não sei se você está. Mas é hora." Bento abre. Lê 4 páginas em silêncio. Para. Fecha. Olha pra Velhusto. Não pergunta nada. Velhusto: "Sterling Corp não é só ameaça filosófica. Aldebrando descobriu cedo." Bento: "Ele morreu por isso." Velhusto: "Sim." Silêncio longo. Bento: "Mestre. Vou continuar lendo, mas não hoje." Velhusto: "Como quiser." Bento sai com o diário. Não conta a ninguém durante 3 meses. Lê de noite, sozinho, página por página. Termina exatamente na semana em que Gus chega à catedral pela primeira vez (início do arco Bento). *Importa porque:* origem da maturidade emocional canônica em ato 2. Bento entra o arco já consciente do peso. Não chora porque chorou sozinho durante 3 meses. Aceita a parceria com Gus porque sabe que sozinho não vai conseguir vingar nada — e vingança não é o ponto.
+Velhusto chama Bento à biblioteca privada. Estende a arca de cedro com o diário do pai morto. "Ele teria querido que você lesse quando estivesse pronto. Eu não sei se você está. Mas é hora." Bento abre. Lê 4 páginas em silêncio. Para. Fecha. Olha pra Velhusto. Não pergunta nada. Velhusto: "Sterling Corp não é só ameaça filosófica. Aldebrando descobriu cedo." Bento: "Ele morreu por isso." Velhusto: "Sim." Silêncio longo. Bento: "Mestre. Vou continuar lendo, mas não hoje." Velhusto: "Como quiser." Bento sai com o diário. Não conta a ninguém durante 3 meses. Lê de noite, sozinho, página por página. Termina exatamente na semana em que Gus chega à catedral pela primeira vez (início do arco Bento). *Importa porque:* origem da maturidade emocional canônica em ato 2. Bento entra o arco já consciente do peso. Não chora porque chorou sozinho durante 3 meses. Aceita a parceria com Gus porque sabe que sozinho não vai conseguir vingar nada, e vingança não é o ponto.
 
 ---
 

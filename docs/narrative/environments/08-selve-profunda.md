@@ -1,7 +1,7 @@
 # Selve Profunda
 
-> **Status:** Canônico (Bloco F — environmental storytelling).
-> **Era predominante:** cross-temporal (as três eras coexistem aqui mais densamente que em qualquer outro setting), com Era 3 dominante pela presença operacional do GRE — Sterling Corp está mais avançada aqui do que admite publicamente.
+> **Status:** Canônico (Bloco F, environmental storytelling).
+> **Era predominante:** cross-temporal (as três eras coexistem aqui mais densamente que em qualquer outro setting), com Era 3 dominante pela presença operacional do GRE. Sterling Corp está mais avançada aqui do que admite publicamente.
 > **Ato narrativo:** Ato 2 (arco [[jaci-proxy|Jaci]]) + climax Ato 3 (decisão de ending).
 > **Companion home:** [[jaci-proxy|Jaci "Proxy" Vanderbist]].
 
@@ -127,19 +127,19 @@ Toda essa densidade significa que a Selve Profunda é o lugar do jogo onde **a l
 
 ### Nomeados
 
-#### Tatauín Branca (22) — caçadora-coletora veterana
+#### Tatauín Branca (22), caçadora-coletora veterana
 
 Já listada em [[factions]] §4. Conhece Selve Profunda em detalhe. Em -3 ela teve encontro com primeira raposa-fractal mutante na Selve; documentou em desenho carbão na parede de uma das casas vazias do vilarejo. Mariana respeita Tatauín como ninguém respeita ninguém no vilarejo: trata-a quase como par, apesar da diferença de 56 anos. Tatauín tem corpo magro, mãos calejadas, fala devagar mas com firmeza absoluta. Tem cicatriz de queimadura na clavícula esquerda (acidente de criança com fogareiro Pythia, sem relação narrativa-traumática).
 
 Hook de diálogo: pode levar o Gus a três pontos altos da Selve onde a Cúpula Sterling é visível no horizonte. Conta a Gus que viu Lia Vanderbist (mãe da Jaci) saindo do vilarejo na noite antes da morte, mas que decidiu não contar pra Mariana até hoje porque a história "não muda nada". Knowledge alta destrava esta cena. Recompensa: entry Diário substancial sobre Lia + token Bioquímico + Stream + Área de mestria avançada.
 
-#### Mestre-Aprendiz Vivendel Berenger (14) — bio-hacker Pythia rival/aliado de Jaci
+#### Mestre-Aprendiz Vivendel Berenger (14), bio-hacker Pythia rival/aliado de Jaci
 
 Sobrinho distante de Iremar Berenger (ancestral comum com [[caua-volt|Cauã]] cinco gerações antes), criou-se no vilarejo do Tucano-Cinza ao norte. Visita Pelicano Branco a cada quatro meses para trocar scripts com Jaci. Mais inquieto que Jaci, gosta de experimentar scripts agressivos, falha mais, aprende mais rápido em alguns vetores, esquece detalhes em outros. Inveja levemente a precisão da Jaci; respeita a vantagem dela. Trata Mariana como avó honorária.
 
 Hook de diálogo: oferece a Gus competição amigável de síntese Pythia: cada um sintetiza antídoto contra a mesma toxina em tempo limitado. Vivendel termina primeiro mas com efeito colateral leve. Jaci, se presente, comenta "perdão de ponto-e-vírgula", referência canônica ([[comic-reliefs]] cena 2). Vivendel ri da própria pressa. Recompensa: token Pythia composto. Vivendel pode aparecer em sub-quest pós-recrutamento Jaci como referência de respaldo regional.
 
-#### Mestre Hugo Tirol (55) — Ordem Recursiva, decifrador cripto-glífico
+#### Mestre Hugo Tirol (55), Ordem Recursiva, decifrador cripto-glífico
 
 Já listado em [[factions]] §2 e referenciado em [[07-zona-do-silencio]] §6. Em sub-quest Bento + Jaci coordenada (pós-recrutamento dos dois), Hugo pode descer à Câmara Neo-Sylvania de Coleta de DNA com Gus para tradução conjunta de painel cripto-glífico. Resultado parcial: mais 12 dos 47 símbolos do painel norte. Tradução aprofundada: "selar não é fechar para sempre. é guardar para o seguinte. quem abrir não pode abrir tudo." Foreshadow forte do ending Ouro.
 
@@ -149,13 +149,13 @@ Hook de diálogo: encrespado com Sterling especificamente. Hugo perdeu Mestre Ar
 
 ## 7. Ganchos mecânicos
 
-- **Sub-beat Sho do arco Jaci — colheita de sementes-relíquia na Orla Recursiva** (subseção da Selve Profunda mais próxima ao vilarejo). Tutorial de Selve para Gus: bestiário, padrões fractais, scan via óculos. Player aprende a ler ruído coerente em flora. Recompensa mestria. [[arco-principal]] §Arco Jaci.
-- **Sub-beat Ten do arco Jaci — boss arena dialogável Patch-Zero canal 3**. Patch-Zero oferece a Jaci: "eu paro o surto se você me deixar passar pelo vilarejo". Jaci recusa horrorizada. Combate Patch-Zero localizado em instância pequena. Token novo: Antídoto Sintético + Bio-Sutura Rápida destravados.
+- **Sub-beat Sho do arco Jaci: colheita de sementes-relíquia na Orla Recursiva** (subseção da Selve Profunda mais próxima ao vilarejo). Tutorial de Selve para Gus: bestiário, padrões fractais, scan via óculos. Player aprende a ler ruído coerente em flora. Recompensa mestria. [[arco-principal]] §Arco Jaci.
+- **Sub-beat Ten do arco Jaci: boss arena dialogável Patch-Zero canal 3**. Patch-Zero oferece a Jaci: "eu paro o surto se você me deixar passar pelo vilarejo". Jaci recusa horrorizada. Combate Patch-Zero localizado em instância pequena. Token novo: Antídoto Sintético + Bio-Sutura Rápida destravados.
 - **Sub-quest opcional: plantio coletivo do Dia das Sementes** ([[tradicoes-cultura]] §4). Gus participa. Cena emocional contida: Jaci e Mariana plantam semente em nome de Lia. Recompensa: Cristal-de-Colheita (token raro de cura).
 - **Sub-quest opcional: recuperação de subset de sementes-relíquia roubadas em base Sterling abandonada**. Sub-beat pós-recrutamento Jaci. Recupera-se 60%, perde-se 40%. Aceitar perda parcial.
 - **Compilação Pythia bio em folha demonstrativa** com Jaci. Mecânica diegética: Gus escreve script Pythia de 3 linhas (combo de tokens), Jaci aplica em folha de planta-índice. Folha brota três centímetros extra em três segundos. Token destravado: Pythia + Bool + Aliado (buff temporário). Demonstra Pillar 2: magia respeita substrato.
 - **Encontro com fauna corrompida (sintaxe quebrada).** Raposídeo mutante atravessa trilha. Não-hostil. Player aprende: nem todo "errado" é "inimigo". Pillar 1: análise antes de ataque.
-- **Climax ato 3 — escolha visual entre três rotas no Núcleo Mandelbrot Interno.** Três caminhos visíveis da borda externa do Núcleo, três atmosferas distintas. Sem revelar mecânica:
+- **Climax ato 3: escolha visual entre três rotas no Núcleo Mandelbrot Interno.** Três caminhos visíveis da borda externa do Núcleo, três atmosferas distintas. Sem revelar mecânica:
   - **Rota leste (Bronze):** caminho descendente, vegetação rala, biolúmen apagado, trilha clara saída fácil. Visualmente "fuga", emocionalmente "sobrevivência apertada".
   - **Rota norte (Prata):** caminho ascendente direto pra dentro do Núcleo, biolúmen intenso, geometria irregular crescente, sem volta visível. Visualmente "confronto direto", emocionalmente "vitória limpa, ainda melancólica".
   - **Rota oeste (Ouro):** caminho lateral em espiral, biolúmen dourado em padrão fractal aninhado, descida gradual até câmara onde cripto-glifo Neo-Sylvania ainda pulsa em ressonância ativa. Visualmente "compilação reversa", emocionalmente "vitória plena, esperança fundada". Acessível apenas com Knowledge alta (a entrada da rota está coberta por vegetação fractal que só abre se Gus reconhece padrão Fibonacci correto na borda).
@@ -166,11 +166,11 @@ Hook de diálogo: encrespado com Sterling especificamente. Hugo perdeu Mestre Ar
 
 ## 8. Vinhetas sensoriais
 
-### Vinheta 1 — Jaci compila script Pythia em folha
+### Vinheta 1: Jaci compila script Pythia em folha
 
 Bancada da casa de farmacopeia. Janela aberta para o leste, sol entrando em 47 graus. Jaci tem uma folha de planta-índice diante dela na mesa. Pega a seringa fina, perfura a base do pecíolo com cuidado, injeta três gotas de líquido verde-esmeralda. Conta em voz baixa: "uma, duas, três." Para. Recolhe a seringa. Espera. Quatro segundos. Cinco. Seis. A folha vibra muito de leve em sub-frequência. Sete segundos. A ponta superior da folha cresce três centímetros visíveis em meio segundo, ondulando suavemente como onda lenta. Para em dez centímetros. Estabiliza. Jaci passa o indicador pela folha, sente que está firme. Olha pro Gus que está do outro lado da mesa observando. "Pythia te entende. Você escreve devagar, ela compila no tempo dela, devolve o que você pediu se você pediu certo." Gus anota mentalmente. Mariana, em outro canto da casa, sorri sem olhar.
 
-### Vinheta 2 — Borda de zona de deleção GRE
+### Vinheta 2: Borda de zona de deleção GRE
 
 Trilha de aproximação ao Núcleo Mandelbrot Interno, três quilômetros a sul do vilarejo. Tatauín Branca guia o grupo. Para. Levanta a mão. Mostra com o queixo: à direita, a vinte metros, há uma clareira cinza chapada. Sem textura. Sem flora. Sem sombra. Cinza chapado, três metros por quatro metros, retangular. Solo lá dentro tem coloração morta sem padrão; ar acima parece menos denso. Não há vento, mas o ar dentro do retângulo é mais quieto do que o ar fora. Jaci se aproxima sem entrar. Estende a mão a vinte centímetros do limite. Sente a temperatura do ar cair três graus exatos. Volta a mão. Olha pra Gus. "É isto que ele faz. Não é veneno. Não é doença. É apagamento. A Selve não doeu. A Selve foi deletada aqui." Gus tira óculos tático, vê: dentro do retângulo, **não há ruído coerente**. Tela limpa. Pixel placeholder. O lugar não existe mais como sistema. Existe como ausência de sistema. Gus volta o óculos pro normal. De longe, um raposídeo com pelagem em ruído visual atravessa a trilha à frente do grupo e some na vegetação. Tatauín marca o ponto na própria memória. Caminham contornando a clareira por três minutos extra.
 
@@ -194,11 +194,11 @@ Trilha de aproximação ao Núcleo Mandelbrot Interno, três quilômetros a sul 
 - **Hiato e Êxodo Neo-Sylvania (-700 a -720), fundação Pelicano Branco (-45), surto silencioso (-8), captura Patch-Zero (-3), cross-contamination (-2), escape Patch-Zero (-0.25):** [[timeline]] Era 1, Era 2, Era 3.
 - **Selve Sombria como facção natural + NPCs Pelicano Branco + linhagem Vanderbist:** [[factions]] §4.
 - **Tradição Dia das Sementes (22 junho), antídotos comunitários, bordado da espiral, cumprimentos Pelicano:** [[tradicoes-cultura]] §4, §Costumes universais.
-- **Documentos in-world descobertos no setting:** [[in-world-docs]] doc 7 (Fragmentos do Antigo Diário da Selve, Mariana entrega via Jaci), doc 14 (comunicação interna Sterling sobre escape Patch-Zero, refere câmara K-7 off-screen aqui), doc 15 (cripto-glifo Neo-Sylvania Catedral-Mãe, gate Ouro — pista cruzada de Hugo Tirol no painel norte da Câmara de Coleta de DNA).
+- **Documentos in-world descobertos no setting:** [[in-world-docs]] doc 7 (Fragmentos do Antigo Diário da Selve, Mariana entrega via Jaci), doc 14 (comunicação interna Sterling sobre escape Patch-Zero, refere câmara K-7 off-screen aqui), doc 15 (cripto-glifo Neo-Sylvania Catedral-Mãe, gate Ouro; pista cruzada de Hugo Tirol no painel norte da Câmara de Coleta de DNA).
 - **Jaci spec narrativa, memórias formativas, conjuros:** [[jaci-proxy]] (todas as cinco memórias formativas ocorrem nesta região, todas as ampolas pulsam Pythia bio aqui).
 - **Patch-Zero canal 3 boss arena + climax ato 3 + branching #5:** [[arco-principal]] §Arco Jaci + Climax + Endings.
 - **Pillar 2 (magia é sistema formal computável, natureza é matemática) + Pillar 5 (setting Selve):** [[pillars]] §Pillar 2, §Pillar 5.
 
 ---
 
-**Última revisão:** 2026-05-15. Canônico (Bloco F — environmental storytelling). Atualizações exigem aprovação do criador supremo.
+**Última revisão:** 2026-05-15. Canônico (Bloco F, environmental storytelling). Atualizações exigem aprovação do criador supremo.

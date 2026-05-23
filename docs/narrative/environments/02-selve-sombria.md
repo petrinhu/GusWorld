@@ -1,9 +1,9 @@
 # Selve Sombria
 
-> **Status:** Canônico (Bloco F — environmental storytelling).
+> **Status:** Canônico (Bloco F, environmental storytelling).
 > **Era predominante:** Cross-eras (existe nas 3, mutável). Substrato Era 1 sobrevivente; presença humana cross-eras (rota dos pioneiros Era 2, anomalias Sterling Era 3).
 > **Ato narrativo:** Cross-act. Tutorial ato 1 (Orla Recursiva), meio-jogo ato 2 (Pântano de Markov), climax ato 3 (Núcleo Mandelbrot).
-> **Companion home:** n/a (cross-companion). [[jaci-proxy]] tem **Selve Profunda** ([[08-selve-profunda.md|setting 08]] — vilarejo Pelicano Branco + Núcleo Mandelbrot). Este doc cobre Selve **acessível** (Orla + Pântano + bordas Mandelbrot).
+> **Companion home:** n/a (cross-companion). [[jaci-proxy]] tem **Selve Profunda** ([[08-selve-profunda.md|setting 08]]: vilarejo Pelicano Branco + Núcleo Mandelbrot). Este doc cobre Selve **acessível** (Orla + Pântano + bordas Mandelbrot).
 
 ## 1. Identidade
 
@@ -25,7 +25,7 @@ A sensação não é a de aventura selvagem. É a de **estar dentro de algoritmo
 *Primeira impressão:* clareira aberta, três rãs-mecânicas paradas em padrão geométrico perfeito, todas piscando azul em sincronia, depois saindo em sincronia.
 *Gancho exploratório:* primeiros bosses-vírus aparecem aqui. Catedral Submersa fica ao centro do Pântano (gateway pra arco Bento).
 
-**Anomalias do GRE (zonas vazadas, dispersas).** Bolsões dispersos da Selve onde Sterling Corp começou a escrever por cima do substrato. Bordas dessas zonas são reconhecíveis a olho nu: copa de árvore corta em linha reta artificial, chão muda de textura biolúmen para textura placeholder cinza chapado, vento para de soprar de modo perceptível. Dentro dessas zonas, fauna falta. Som diferente. Tudo é levemente errado. Aumentam em quantidade conforme ato 2 avança (Pillar 5 — mundo evolui).
+**Anomalias do GRE (zonas vazadas, dispersas).** Bolsões dispersos da Selve onde Sterling Corp começou a escrever por cima do substrato. Bordas dessas zonas são reconhecíveis a olho nu: copa de árvore corta em linha reta artificial, chão muda de textura biolúmen para textura placeholder cinza chapado, vento para de soprar de modo perceptível. Dentro dessas zonas, fauna falta. Som diferente. Tudo é levemente errado. Aumentam em quantidade conforme ato 2 avança (Pillar 5: mundo evolui).
 *Primeira impressão:* atravessar trilha normal e topar com clareira onde a grama é cor de tela carregando, e a árvore central está em pose de "esperando textura".
 *Gancho exploratório:* puzzle de "leitura de bug" via óculos táticos. Encontros com inimigos contaminados (Knowledge Progression invalidada para esses; óculos mostra estática, [[lore-bible]] §8.1).
 
@@ -68,7 +68,7 @@ A sensação não é a de aventura selvagem. É a de **estar dentro de algoritmo
 
 - **Era 2 (Era do Compilador):** Trilha dos Pioneiros com suas 50 placas de latão. Pegadas Era 2 ainda visíveis em pontos onde o solo argiloso preservou. Cronômetros mecânicos Era 2 abandonados em pontos pontuais (mestres Asmódicos que não voltaram; Ordem Recursiva mantém lista por respeito). Vilarejo do Pelicano Branco fundado em -45 ([[setting 08]]) usa Selve como casa.
 
-- **Era 3 (Era Sterling, presente):** anomalias GRE espalhadas pela Selve, crescendo em número durante o jogo (setup conforme [[timeline]] -10 a 0). Drones Sterling Corp falhando em extração. Cartuchos de coleta Sterling jogados nas bordas. Pichações holográficas "Bem-vindo ao GRE" em rocha de Era 1 (sobreposição literal — pior dimensão do contraste: presente Sterling escrito por cima de cripto-glifo Neo-Sylvania).
+- **Era 3 (Era Sterling, presente):** anomalias GRE espalhadas pela Selve, crescendo em número durante o jogo (setup conforme [[timeline]] -10 a 0). Drones Sterling Corp falhando em extração. Cartuchos de coleta Sterling jogados nas bordas. Pichações holográficas "Bem-vindo ao GRE" em rocha de Era 1 (sobreposição literal, pior dimensão do contraste: presente Sterling escrito por cima de cripto-glifo Neo-Sylvania).
 
 ## 6. NPCs ambientais
 
@@ -76,9 +76,9 @@ A sensação não é a de aventura selvagem. É a de **estar dentro de algoritmo
 
 **Nomeados (3):**
 
-- **Tatauín Branca** (22, caçadora-coletora Pelicano Branco; já em [[factions]] §4) — atravessa Orla a Pântano regularmente. Conhece Selve Profunda. Já teve encontro com fauna corrompida; sobreviveu. Hook: "se você ver a copa parar de respirar, você não estava na floresta. Estava no que ela não é." Aliada útil se Gus para pra conversar. Pode mostrar passagem segura através do Pântano.
-- **Mestre Hugo Tirol** (55, Ordem Recursiva; já em [[factions]] §2) — pode aparecer cartografando cripto-glifo em ponto profundo da Trilha dos Pioneiros se cronologia colocar Gus aqui durante arco Bento. Hook: "Atelaiá passou por aqui em -42. Eu passo agora. Daqui a 50 anos, alguém vai passar de novo. Continuidade." Diálogo expansivo sobre Era 1 se Knowledge alta.
-- **Técnico Vlado Caspar** (34, Sterling Corp Departamento de Aquisições) — extrator em campo na borda de anomalia GRE. Não-violento em interação casual (cumpre cota, não procura confronto). Hook: "olha, eu também queria que isso fosse mais simples. Não é. Tem cota." NPC ambíguo do regime; sinaliza que nem todo Sterling-funcionário é convertido ideológico ([[factions]] §1 — exceção que confirma a regra). Pode dar pista útil involuntariamente.
+- **Tatauín Branca** (22, caçadora-coletora Pelicano Branco; já em [[factions]] §4): atravessa Orla a Pântano regularmente. Conhece Selve Profunda. Já teve encontro com fauna corrompida; sobreviveu. Hook: "se você ver a copa parar de respirar, você não estava na floresta. Estava no que ela não é." Aliada útil se Gus para pra conversar. Pode mostrar passagem segura através do Pântano.
+- **Mestre Hugo Tirol** (55, Ordem Recursiva; já em [[factions]] §2): pode aparecer cartografando cripto-glifo em ponto profundo da Trilha dos Pioneiros se cronologia colocar Gus aqui durante arco Bento. Hook: "Atelaiá passou por aqui em -42. Eu passo agora. Daqui a 50 anos, alguém vai passar de novo. Continuidade." Diálogo expansivo sobre Era 1 se Knowledge alta.
+- **Técnico Vlado Caspar** (34, Sterling Corp Departamento de Aquisições): extrator em campo na borda de anomalia GRE. Não-violento em interação casual (cumpre cota, não procura confronto). Hook: "olha, eu também queria que isso fosse mais simples. Não é. Tem cota." NPC ambíguo do regime; sinaliza que nem todo Sterling-funcionário é convertido ideológico ([[factions]] §1, exceção que confirma a regra). Pode dar pista útil involuntariamente.
 
 ## 7. Ganchos mecânicos
 
@@ -88,11 +88,11 @@ A sensação não é a de aventura selvagem. É a de **estar dentro de algoritmo
 
 ## 8. Vinhetas sensoriais (2 cenas curtas)
 
-*Vinheta 1 — Movimento natural fractal puro (Orla Recursiva, meio da tarde).*
+*Vinheta 1: Movimento natural fractal puro (Orla Recursiva, meio da tarde).*
 
 A câmera cruza a copa do Orla a três metros do chão. A luz filtra pela copa em raios biolúmen verde-ciano calculáveis. Um anel de cogumelos pulsa em ritmo Fibonacci na base do tronco mais próximo: um, um, dois, três, cinco, oito, reinicia. Uma coruja-Mandelbrot observa de cima sem piscar. Tique. Pisca uma vez. Tique. Pisca três vezes. Tique. Pisca cinco. Um pequeno besouro atravessa a casca de árvore em espiral logarítmica perfeita, sobe e some no buraco de outra árvore que tem o mesmo padrão na entrada. Nada faz barulho exceto a água gotejando no fundo da clareira, e a água gota em padrão que se você prestar atenção é o mesmo da pulsação dos cogumelos só fora de fase em 90 graus. A coruja pisca de novo. Oito vezes. A floresta inteira está em equação.
 
-*Vinheta 2 — Bug-de-mundo (anomalia GRE, fim de tarde).*
+*Vinheta 2: Bug-de-mundo (anomalia GRE, fim de tarde).*
 
 A câmera entra por uma trilha normal. Há vento. Há canto de coruja distante. Há cheiro de seiva. Em três passos, tudo isso para. A copa da árvore à esquerda corta em linha reta artificial, como se alguém tivesse cortado da realidade com tesoura. O chão muda de musgo biolúmen pra cor cinza chapada de tela carregando. A árvore central da clareira está parada em pose de "esperando textura": os galhos saem dela em ângulo que ninguém programou. Não há vento aqui. Não há som aqui. Há, à distância, sussurro grave que quase é palavra. A faixa de cinza placeholder treme uma vez como se alguém houvesse corrigido o mesh sem terminar. Uma folha biolúmen Era 1 cai dentro da zona, atravessa o ar normalmente, atinge o chão cinza e some sem fazer barulho. A câmera fica três segundos a mais. O sussurro grave repete o "gus" baixo o suficiente pra você duvidar de ter ouvido.
 
@@ -106,12 +106,12 @@ A câmera entra por uma trilha normal. Há vento. Há canto de coruja distante. 
 
 ## 10. Cross-refs Bloco G
 
-- [[timeline]] — eventos visíveis aqui: cripto-glifo Era 1 "Anomalia Primeira" (~-820); Trilha dos Pioneiros (Era 2, -130 a -25); anomalias GRE (Sterling escapou -0.25); Patch-Zero pré-existente em Núcleo Mandelbrot (todos os tempos).
-- [[in-world-docs]] — docs descobríveis no setting: doc 7 (Fragmentos do Antigo Diário da Selve; Mariana entrega via Jaci, conteúdo refere fungo de tronco-vermelho desta área); doc 15 (cripto-glifo Catedral-Mãe, gate Ouro, geograficamente em Catedral perdida acessível só por Selve Profunda + arco Bento conjunto).
-- [[tradicoes-cultura]] — costumes praticados aqui: cumprimento Pelicano Branco "Boa raiz / Boa colheita" (em trânsito); reverência mão sobre coração ao passar por cripto-glifo Neo-Sylvania (tabu universal "não pisar"); sopa-de-7-raízes em fogueiras de bivaque (caçadores).
-- [[factions]] — facções presentes: Selve Sombria (substrato; sem porta-voz, fauna como vetor); Pelicano Branco (caçadores-coletores em trânsito); Ordem Recursiva (mestres em expedição cartográfica, esporádico); Sterling Corp (extratores + drones + anomalias GRE); FIR (coleta forçada eventual).
-- [[jaci-proxy]] — Jaci atravessa daqui pra setting 08 (Selve Profunda) regularmente; Selve acessível é parte de sua identidade narrativa.
-- [[bento-requiem]] — Trilha dos Pioneiros é caminho canônico do arco Bento pra Catedral Menor de Atelaiá e expedição catedral perdida.
+- [[timeline]], eventos visíveis aqui: cripto-glifo Era 1 "Anomalia Primeira" (~-820); Trilha dos Pioneiros (Era 2, -130 a -25); anomalias GRE (Sterling escapou -0.25); Patch-Zero pré-existente em Núcleo Mandelbrot (todos os tempos).
+- [[in-world-docs]], docs descobríveis no setting: doc 7 (Fragmentos do Antigo Diário da Selve; Mariana entrega via Jaci, conteúdo refere fungo de tronco-vermelho desta área); doc 15 (cripto-glifo Catedral-Mãe, gate Ouro, geograficamente em Catedral perdida acessível só por Selve Profunda + arco Bento conjunto).
+- [[tradicoes-cultura]], costumes praticados aqui: cumprimento Pelicano Branco "Boa raiz / Boa colheita" (em trânsito); reverência mão sobre coração ao passar por cripto-glifo Neo-Sylvania (tabu universal "não pisar"); sopa-de-7-raízes em fogueiras de bivaque (caçadores).
+- [[factions]], facções presentes: Selve Sombria (substrato; sem porta-voz, fauna como vetor); Pelicano Branco (caçadores-coletores em trânsito); Ordem Recursiva (mestres em expedição cartográfica, esporádico); Sterling Corp (extratores + drones + anomalias GRE); FIR (coleta forçada eventual).
+- [[jaci-proxy]]: Jaci atravessa daqui pra setting 08 (Selve Profunda) regularmente; Selve acessível é parte de sua identidade narrativa.
+- [[bento-requiem]]: Trilha dos Pioneiros é caminho canônico do arco Bento pra Catedral Menor de Atelaiá e expedição catedral perdida.
 
 ---
 

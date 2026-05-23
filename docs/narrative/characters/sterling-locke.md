@@ -1,4 +1,4 @@
-# Sterling Locke — Spec Narrativa
+# Sterling Locke: Spec Narrativa
 
 > **Status:** Revisão 1 (2026-05-15). Doc novo. **Canônico.**
 >
@@ -13,7 +13,7 @@
 - **Antagonista principal canônico.** Substitui completamente Iolanda da versão anterior dos docs.
 - **Vilão puro, sem redenção.** Confirmado Pillar 4: não há cena de "Sterling teve infância difícil" justificando. Não há momento de hesitação ética. Sterling escolheu predação por convicção.
 - **Espelho filosófico do Gus.** Ambos são lógicos prodigiosos. Diferem em um único eixo: serve à vida (Gus) ou serve a si mesmo consumindo vida (Sterling).
-- **Único adulto em foco no jogo.** Todos os outros protagonistas e antagonistas são peers 11-14. Sterling é o adulto. A diferença etária é parte da ameaça — ele tem décadas de vantagem técnica e ideológica.
+- **Único adulto em foco no jogo.** Todos os outros protagonistas e antagonistas são peers 11-14. Sterling é o adulto. A diferença etária é parte da ameaça: ele tem décadas de vantagem técnica e ideológica.
 
 ---
 
@@ -22,16 +22,16 @@
 Detalhes integrais em `Resources/gusworld/character-spec-sterling-locke.md`. Resumo:
 
 - **Proporção SD 1:1:1 mantida** (cabeça : torso : pernas), mas **geometria monolítica angular** que **nega o cômico** inerente ao SD. Quebra deliberada do tom visual para sinalizar ameaça.
-- **Paleta:** preto-graphene polido + branco-estéril fosco + cromo espelhado. **Metallic Map ≈ 1.0** (única figura no jogo com refletividade metálica plena — exceção autorizada para reforçar "extração esteriliza").
+- **Paleta:** preto-graphene polido + branco-estéril fosco + cromo espelhado. **Metallic Map ≈ 1.0** (única figura no jogo com refletividade metálica plena: exceção autorizada para reforçar "extração esteriliza").
 - **Sobretudo monolítico** geométrico, sem dobras orgânicas. Vincos mecânicos precisos.
-- **Monóculo Ocular Criptográfico:** implante circular no olho esquerdo com laser vermelho emissivo `#FF0000` projetado para a frente. Único vermelho saturado fora de zonas Patch-Zero — assinatura visual da ameaça corporativa.
+- **Monóculo Ocular Criptográfico:** implante circular no olho esquerdo com laser vermelho emissivo `#FF0000` projetado para a frente. Único vermelho saturado fora de zonas Patch-Zero, assinatura visual da ameaça corporativa.
 - **Rosto perfeitamente simétrico.** Queixo poligonal pronunciado. Expressão aristocrática de desprezo congelado em superfícies rígidas.
 
 ---
 
 ## Etimologia (importante)
 
-- **Sterling:** prata esterlina → padrão de pureza indestrutível. Também: estrela, moeda. Sonoridade ríspida monossilábica.
+- **Sterling:** prata esterlina, padrão de pureza indestrutível. Também: estrela, moeda. Sonoridade ríspida monossilábica.
 - **Locke:** **fechadura, criptografia, confinamento.** O nome é o método.
 
 Contraste etimológico com Gus:
@@ -49,7 +49,7 @@ A escolha de derrota narrativa: Gus **decodifica** Sterling, não destrói. Deco
 
 ### Origens acadêmicas
 
-Sterling Locke começou como **acadêmico dissidente**. Doutorado em Lógica Computacional. Tese rejeitada pela ortodoxia da Era 2: "*Tratado sobre a Supremacia do Script*", que argumentava que compilação para hardware específico era "submissão obsoleta" e propunha o paradigma **DRE — Dynamic-Runtime Evaluation**.
+Sterling Locke começou como **acadêmico dissidente**. Doutorado em Lógica Computacional. Tese rejeitada pela ortodoxia da Era 2: "*Tratado sobre a Supremacia do Script*", que argumentava que compilação para hardware específico era "submissão obsoleta" e propunha o paradigma **DRE (Dynamic-Runtime Evaluation)**.
 
 Tese citada literalmente:
 
@@ -57,7 +57,7 @@ Tese citada literalmente:
 
 Comunidade C-Arcane riu da tese. Sterling não esqueceu.
 
-### Carreira corporativa — predador sequencial
+### Carreira corporativa: predador sequencial
 
 Sterling não fundou empresa do zero. Migrou para o setor privado como executivo de aluguel e **canibalizou três conglomerados** em sequência calculada:
 
@@ -73,7 +73,7 @@ Cooperativas de hardware da Periferia Industrial foram destruídas no processo. 
 
 ### Consolidação e GRE
 
-Com os três conglomerados absorvidos, Sterling consolidou tudo em **Sterling Corp** e iniciou a operação **GRE — Global Runtime Environment**:
+Com os três conglomerados absorvidos, Sterling consolidou tudo em **Sterling Corp** e iniciou a operação **GRE (Global Runtime Environment)**:
 
 > Envelopar a Selve Sombria inteira dentro de uma máquina virtual interpretada. Uma vez que a Selve esteja rodando dentro do interpretador Sterling, a realidade biológica perderá soberania física: Locke poderá deletar espécies, alterar clima, reter recursos vitais alterando uma linha de código no terminal de controle. Sem precisar respeitar nem compreender as leis físicas da criação.
 
@@ -107,7 +107,7 @@ Para isso, ele precisa de uma chave de descriptografia que mapeie a Selve como �
 
 ### Vocabulário
 
-- **Latim corporativo ocasional.** Tons como *ad astra*, *de jure*, *fait accompli*, *modus operandi* aparecem sem ostentação — naturalmente integrados.
+- **Latim corporativo ocasional.** Tons como *ad astra*, *de jure*, *fait accompli*, *modus operandi* aparecem sem ostentação, naturalmente integrados.
 - **Vocabulário técnico de alto nível.** "Runtime", "abstração", "encapsulamento", "deprecar" usados como verbos cotidianos.
 - **Eufemismo corporativo refinado.** Nunca diz "matar"; diz "deprecar". Nunca "expropriar"; diz "reabsorver". Nunca "vírus"; diz "comportamento emergente inesperado" (referência direta `comic-reliefs.md` cena 6).
 
@@ -155,7 +155,7 @@ Para isso, ele precisa de uma chave de descriptografia que mapeie a Selve como �
 
 #### Confronto final (ato 3, fase 2)
 
-> "Você decodifica. Honra. Mas a fechadura não cede a quem decodifica — cede a quem detém. E eu detenho mais que você."
+> "Você decodifica. Honra. Mas a fechadura não cede a quem decodifica: cede a quem detém. E eu detenho mais que você."
 
 ---
 
@@ -180,8 +180,8 @@ Cresce em intimidade e ameaça do primeiro ao sexto arco. **Setor Mirage e Perif
 
 - **Holografia em massa.** Onipresença visual sem deslocamento físico.
 - **Drones proxy.** Operação à distância via Locke Core + Rede Distribuída.
-- **Cooptação.** Comprar opositores antes de combatê-los. Dante é caso de sucesso; tentou com Iara (falhou via Adila); tenta com Bento via parceria comercial (Ordem Recursiva facção pró-modernização — também falha).
-- **Falência calculada.** Quando enfrenta cooperativa rival, financia colapso interno. Nunca ataque frontal — sempre engenharia financeira.
+- **Cooptação.** Comprar opositores antes de combatê-los. Dante é caso de sucesso; tentou com Iara (falhou via Adila); tenta com Bento via parceria comercial (Ordem Recursiva facção pró-modernização, também falha).
+- **Falência calculada.** Quando enfrenta cooperativa rival, financia colapso interno. Nunca ataque frontal; sempre engenharia financeira.
 - **Propaganda eufemística.** Janelarum + terminais públicos + festivais Cult Mirage = mídia controlada.
 
 ### O que Sterling NÃO faz
@@ -213,7 +213,7 @@ Renfield-like: o servo que admira o mestre que o consome. Mas com diferença cr�
 
 ### O que Sterling pensa de Dante
 
-Sterling vê Dante como **ferramenta competente, expansível**. Não tem afeto. Reconhece capacidade técnica. No ato 3, se Dante é capturado vivo, Sterling o sabota à distância (`comic-reliefs.md` regra: morte de NPCs off-screen ou estilizada — P4). Dante morre como variável zerada.
+Sterling vê Dante como **ferramenta competente, expansível**. Não tem afeto. Reconhece capacidade técnica. No ato 3, se Dante é capturado vivo, Sterling o sabota à distância (`comic-reliefs.md` regra: morte de NPCs off-screen ou estilizada, P4). Dante morre como variável zerada.
 
 ### O que Dante pensa de Sterling
 
@@ -223,7 +223,7 @@ A traição do Dante NÃO é narrativa de "ele foi enganado". É narrativa de "e
 
 ---
 
-## Plano GRE — Global Runtime Environment
+## Plano GRE (Global Runtime Environment)
 
 ### Conceito técnico
 
@@ -253,7 +253,7 @@ O jogo argumenta narrativamente: **mesmo se Sterling vencesse, perderia em médi
 
 ---
 
-## 4º Elemento proprietário — Locke Core + Rede Distribuída
+## 4º Elemento proprietário: Locke Core + Rede Distribuída
 
 Pillar 3: triângulo de hardware do Gus = Óculos Táticos + Matriz Ortodôntica + Tavus-Drive. Sterling tem **4º elemento exclusivo**: combinação inacessível ao Gus.
 
@@ -283,9 +283,9 @@ Gus não consegue copiar Locke Core. Não tem implante cortical. Não tem rede m
 
 ---
 
-## Combate final — 2 fases
+## Combate final: 2 fases
 
-### Fase 1 — Rede Distribuída (corredor de aproximação à Cúpula)
+### Fase 1: Rede Distribuída (corredor de aproximação à Cúpula)
 
 - **Arena:** corredor cromo espelhado, vazio, geometricamente perfeito.
 - **Sterling:** ausente fisicamente; comanda à distância.
@@ -293,7 +293,7 @@ Gus não consegue copiar Locke Core. Não tem implante cortical. Não tem rede m
 - **Recompensa por Knowledge:** Bestiário acumulado = -20% RNG hostile, +10% precisão Gus.
 - **Soundscape:** silêncio crescente. Patch-Zero canal 2 sussurra esporádico (não interage diretamente; presença residual).
 
-### Fase 2 — Locke Core exposto (interior da Cúpula)
+### Fase 2: Locke Core exposto (interior da Cúpula)
 
 - **Arena:** Cúpula Sterling interior. Branco-cromo. Geometria euclidiana perfeita. Espelhos. Servidores silenciosos. Sterling no centro, monóculo brilhando.
 - **Mecânica de combate:** **decodificação**, não DPS-check.

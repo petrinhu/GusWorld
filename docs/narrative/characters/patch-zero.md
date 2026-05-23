@@ -1,4 +1,4 @@
-# Patch-Zero — Spec Narrativa
+# Patch-Zero: Spec Narrativa
 
 > **Status:** Revisão 1 (2026-05-15). Doc novo. **Canônico.**
 >
@@ -15,18 +15,18 @@
 
 ---
 
-## Natureza — os dois aspectos inseparáveis
+## Natureza: os dois aspectos inseparáveis
 
-### Aspecto 1 — Anti-padrão técnico
+### Aspecto 1: Anti-padrão técnico
 
 Onde Patch-Zero passa, **a previsibilidade falha**:
 
 - **Fibonacci e fractais locais quebram.** Sequências matemáticas que regem flora/fauna da Selve apresentam descontinuidades. Galhos crescem em ângulos arbitrários. Bioluminescência pisca em padrões aperiódicos.
 - **Knowledge Progression (Pillar 1) é invalidada localmente.** Inimigos contaminados por Patch-Zero **não previsibilizam** mesmo após múltiplas catalogações no Bestiário. O óculos tático do Gus mostra **estática** em vez de telegrafia.
-- **Ruído coerente (Perlin/Simplex) glitcha.** Shaders procedurais que regem texturas/comportamentos da Selve apresentam descontinuidades visíveis (faixas de gradiente quebradas, mesh popping). Não é bug do jogo — é bug **do mundo**.
+- **Ruído coerente (Perlin/Simplex) glitcha.** Shaders procedurais que regem texturas/comportamentos da Selve apresentam descontinuidades visíveis (faixas de gradiente quebradas, mesh popping). Não é bug do jogo, é bug **do mundo**.
 - **Cifragem deteriora.** Sterling Corp tenta envelopar Patch-Zero no GRE; cifras Sterling apresentam erros aleatórios na presença de Patch-Zero.
 
-### Aspecto 2 — Consciência alien
+### Aspecto 2: Consciência alien
 
 Patch-Zero **tem voz, planeja, mente, manipula**:
 
@@ -43,11 +43,11 @@ Se fosse só anti-padrão, seria boss técnico (puzzle de debug). Se fosse só c
 
 ---
 
-## Origem multi-causal — quatro vetores
+## Origem multi-causal: quatro vetores
 
 Patch-Zero não foi criado por uma fonte só. Quatro vetores convergiram. Cada um isolado talvez fosse contido; juntos, formaram a entidade atual.
 
-### Vetor 1 — Bug primordial do Sistema
+### Vetor 1: Bug primordial do Sistema
 
 Pré-existente. Patch-Zero (em estado embrionário) **já existia na Selve Sombria antes do início do jogo, antes de Sterling, antes da Era 3**. Era pequeno. Contido a uma região profunda do Núcleo Mandelbrot Interno.
 
@@ -55,19 +55,19 @@ In-world hipótese arqueológica: Patch-Zero pode ser **resíduo da queda de Neo
 
 Cripto-glifos Neo-Sylvania dentro de catedrais profundas (acessíveis no arco Bento) mencionam, em tradução parcial, "**o limite que escolheu falar**". Pode ser referência. Pode ser coincidência.
 
-### Vetor 2 — Captura corporativa Sterling
+### Vetor 2: Captura corporativa Sterling
 
 Sterling Corp localizou e iniciou captura do bug primordial em -8 (canon deep R5 ratificado). Departamento de Contenção tentou **domesticar em laboratório** ao longo de 8 anos consecutivos sob codinome operacional **GRE Patch Zero**. Objetivo: transformar em arma proprietária para soltar em redes de empresas rivais, derrubando concorrência por dentro. Contenção falhou em três fases canon: -3 falha parcial (vetor 4 latente em rede de exaustão termal), -1 segunda falha (escape para micélio simulado), -0.25 escape final (propagação para rede Selve oriental).
 
 **Falhou.** Patch-Zero resistiu a contenção, expandiu-se durante captura, contaminou pessoal de laboratório. Sterling **subestimou caos irredutível** (Pillar 2). Achou que era bug "como qualquer outro".
 
-### Vetor 3 — Amostra importada de Polis-Vermelha
+### Vetor 3: Amostra importada de Polis-Vermelha
 
-Cidade-irmã. Laboratório regional Sterling de Polis-Vermelha capturou amostra independente do mesmo fenômeno (ou fenômeno cognato — Patch-Zero pode ser plural, várias instâncias que comunicam).
+Cidade-irmã. Laboratório regional Sterling de Polis-Vermelha capturou amostra independente do mesmo fenômeno (ou fenômeno cognato, Patch-Zero pode ser plural, várias instâncias que comunicam).
 
 Amostra foi **importada para GusWorld City** para análise comparativa. Cross-contamination ocorreu em transporte. Polis-Vermelha caiu meses depois (off-screen). Underground do Silêncio acompanha desde então.
 
-### Vetor 4 — Escape do laboratório central
+### Vetor 4: Escape do laboratório central
 
 Há 3 meses do início do jogo: Patch-Zero **escapou** do laboratório Sterling central. Como? Não está claro. Hipóteses:
 
@@ -79,11 +79,11 @@ Pós-escape: Patch-Zero está **livre em GusWorld City e na fronteira-Selve**, a
 
 ---
 
-## Manifestação multi-canal — quatro canais diegéticos
+## Manifestação multi-canal: quatro canais diegéticos
 
 Patch-Zero não aparece como inimigo em uma única forma. Aparece **simultaneamente em quatro canais**:
 
-### Canal 1 — Texto no Diário do Gus
+### Canal 1: Texto no Diário do Gus
 
 **Entries surgem sem que o jogador as escreva.** Aparecem como se digitadas em tempo real, com glitches tipográficos.
 
@@ -124,7 +124,7 @@ sinal anômalo detectado em ▓▓▓▓▓▓▓.
 
 **Funcionamento mecânico:** entries piscam no Diário. Player precisa clicar em segundos pra ler antes de "expirarem" (efeito visual). Algumas re-aparecem; outras não. Diário registra "entries fantasma" numa subseção própria (Knowledge Progression: catalogar todas conta como bonus para ending Ouro).
 
-### Canal 2 — Áudio ambient
+### Canal 2: Áudio ambient
 
 Zonas infectadas têm **sussurros baixos** misturados ao soundscape diegético. Não são vozes claras: são padrões reconhecíveis se você ouve com atenção.
 
@@ -135,9 +135,9 @@ Zonas infectadas têm **sussurros baixos** misturados ao soundscape diegético. 
   - "... ele mente ... ele também mente ... ambos mentem ..."
   - "... abram ... abram ... abram ..."
 - **Frequência:** baixa, contínua. Player com fone percebe melhor que com auto-falante (sutileza de design sonoro).
-- **Sussurro condicional — Dante em zona infectada (F126).** Quando Dante está fisicamente presente na party e atravessa zona infectada por Patch-Zero (Selve Profunda arco Jaci, catedral contaminada durante arco Bento, Núcleo Mandelbrot externo), um sussurro adicional se sobrepõe ao soundscape. Frase fragmentada, volume baixíssimo (somente audível com fone + atenção): "*ele não compila ... interpretam por ele ... ele pertence ao outro.*" Inaudível em qualquer outra composição de party na mesma zona. Patch-Zero reconhece Dante como vetor antes do player. Registrado no Diário como "anomalia" não-explícita (entry curta, sem identificar o referente). Knowledge alta cruza retroativamente após reveal climax Etapa 1.
+- **Sussurro condicional, Dante em zona infectada (F126).** Quando Dante está fisicamente presente na party e atravessa zona infectada por Patch-Zero (Selve Profunda arco Jaci, catedral contaminada durante arco Bento, Núcleo Mandelbrot externo), um sussurro adicional se sobrepõe ao soundscape. Frase fragmentada, volume baixíssimo (somente audível com fone + atenção): "*ele não compila ... interpretam por ele ... ele pertence ao outro.*" Inaudível em qualquer outra composição de party na mesma zona. Patch-Zero reconhece Dante como vetor antes do player. Registrado no Diário como "anomalia" não-explícita (entry curta, sem identificar o referente). Knowledge alta cruza retroativamente após reveal climax Etapa 1.
 
-### Canal 3 — Persona dialogável em boss arenas
+### Canal 3: Persona dialogável em boss arenas
 
 **Três encontros chave** durante o jogo (mid-ato 2, final ato 2, mid-ato 3) trazem Patch-Zero **falando diretamente com Gus** via terminal projetado, espelho rachado, ou superfície reflexiva qualquer.
 
@@ -145,21 +145,21 @@ Não é cutscene linear. É **escolha interativa**. Patch-Zero oferece propostas
 
 **Exemplos de proposta (esquemáticos):**
 
-#### Proposta 1 — Trégua falsa (arco Bento, encontro 1)
+#### Proposta 1: Trégua falsa (arco Bento, encontro 1)
 
 - "deixe-me passar pela catedral. eu paro de corromper a ordem recursiva por uma semana."
 - Aceitar: catedral suja ainda mais; perde token "compreensão Asmódico" temporário.
 - Recusar: combate Patch-Zero local, mais difícil; ganho token "resistência criptográfica".
 - Negociar: dialogue tree de 2-3 trocas; Patch-Zero responde com 50% mentira.
 
-#### Proposta 2 — Provocação filosófica (arco Jaci, encontro 2)
+#### Proposta 2: Provocação filosófica (arco Jaci, encontro 2)
 
 - "você é igual a ele, gus. ambos otimizam. apenas em direções opostas."
 - Aceitar (afirmar similaridade): perde -2% no Knowledge da próxima entry de Sterling.
 - Recusar (defender diferença): combate; bônus filosófico no diálogo final com Sterling.
 - Silenciar (não responder): Patch-Zero anota; ressurge entry sussurrante no Diário depois.
 
-#### Proposta 4 — Cooptação técnica de Iara (arco Iara, mini-quest pós-recrutamento, opcional — F127)
+#### Proposta 4: Cooptação técnica de Iara (arco Iara, mini-quest pós-recrutamento, opcional, F127)
 
 - **Trigger:** Iara na party + entrada no porão do Cult Mirage durante mini-quest pós-recrutamento. Tela de holografia rachada acende sozinha.
 - "você mente bem. eu também. nós podíamos."
@@ -167,7 +167,7 @@ Não é cutscene linear. É **escolha interativa**. Patch-Zero oferece propostas
 - **Função narrativa:** Patch-Zero foreshadowed como manipulador filosófico, mas propostas 1-3 são via Gus (ou via Jaci na proposta 2). Faltava tentativa direta de cooptar companion que opera por engano profissional. Iara recusando reforça arc dela: "posso criar arte sem ser arma". Plant também: Patch-Zero reconhece Iara como técnica de engano competente.
 - **Recompensa mecânica:** destrava entry Diário "Anomalias registradas" com bonus Knowledge.
 
-#### Proposta 3 — Negociação aparente (climax ato 3, durante boss Sterling Fase 2)
+#### Proposta 3: Negociação aparente (climax ato 3, durante boss Sterling Fase 2)
 
 - "eu posso te dar acesso ao Locke Core. basta deixar uma janela aberta na cúpula."
 - Aceitar: Sterling cai mais rápido; **Patch-Zero escapa**, ending tende a Bronze.
@@ -176,7 +176,7 @@ Não é cutscene linear. É **escolha interativa**. Patch-Zero oferece propostas
 
 **Visual:** Patch-Zero aparece como **silhueta refratada em vidro rachado**. Vermelho saturado piscando (canal visual). Voz com **glitch overlay** (efeito de áudio digital corrompido).
 
-### Canal 4 — Bug visual ambient
+### Canal 4: Bug visual ambient
 
 Em zonas infectadas, shaders procedurais (Perlin para flora/fauna; cel-shading para personagens próximos) **glitcham visualmente**:
 
@@ -195,7 +195,7 @@ Em zonas infectadas, shaders procedurais (Perlin para flora/fauna; cel-shading p
 
 ### Sterling tentou capturar; Patch-Zero não esquece
 
-Sterling Corp tentou domesticar Patch-Zero. Falhou. Liberou-se acidentalmente. Patch-Zero **odeia Sterling especificamente** — odeia, na medida em que uma entidade não-humana pode odiar. Refere-se a Sterling como "**o que tentou nos enjaular**" (plural deliberado — Patch-Zero pode ser múltiplo).
+Sterling Corp tentou domesticar Patch-Zero. Falhou. Liberou-se acidentalmente. Patch-Zero **odeia Sterling especificamente**, odeia, na medida em que uma entidade não-humana pode odiar. Refere-se a Sterling como "**o que tentou nos enjaular**" (plural deliberado: Patch-Zero pode ser múltiplo).
 
 ### Patch-Zero NÃO é aliado do Gus
 
@@ -207,7 +207,7 @@ Propostas a Gus são **manobras táticas**: usar Gus contra Sterling, depois con
 
 Sterling fingiu publicamente que Patch-Zero não existe ("comportamentos emergentes inesperados"; ver `comic-reliefs.md` cena 6). Privadamente, Sterling tenta contenção massiva. Falha.
 
-**Sterling teme Patch-Zero.** Único momento em todo o jogo em que Sterling demonstra algo próximo de emoção genuína: privado, ato 2, sussurrando a Vorto da FIR — "*patch* extrapolou. reabsorção é prioridade. não publicidade."
+**Sterling teme Patch-Zero.** Único momento em todo o jogo em que Sterling demonstra algo próximo de emoção genuína: privado, ato 2, sussurrando a Vorto da FIR: "*patch* extrapolou. reabsorção é prioridade. não publicidade."
 
 ### Triângulo Gus / Sterling / Patch-Zero
 
@@ -228,7 +228,7 @@ No clímax, Gus enfrenta Sterling com Patch-Zero **interferindo na arena**. Tria
 - **Sintaxe quebrada**: pontuação solta, frases sem início.
 - **Glitches tipográficos**: caracteres trocados, blocos `[corrompido]`.
 - **Plural deliberado**: "nós", não "eu" (Patch-Zero é múltiplo? único? ambíguo).
-- **Sem perguntas formais** (sem `?` final): Patch-Zero não pergunta — afirma com cadência de pergunta.
+- **Sem perguntas formais** (sem `?` final): Patch-Zero não pergunta; afirma com cadência de pergunta.
 - **Frequência alta de palavras curtas**: "abram", "saiam", "livres", "lembramos".
 
 ### Exemplos extras (banco para gravação/render):
@@ -270,7 +270,7 @@ em gusworld decidimos.
 
 ---
 
-## Mecânica de design — como manifestação afeta gameplay
+## Mecânica de design: como manifestação afeta gameplay
 
 ### Invalidação local de Knowledge Progression
 
@@ -281,7 +281,7 @@ em gusworld decidimos.
 ### Shader glitch ambient
 
 - Toggle por flag de capítulo. Aumenta intensidade conforme progressão.
-- Zonas afetadas: Núcleo Mandelbrot inteiro (sempre); Catedrais Neo-Sylvania durante e após arco Bento (parcial); cidade após 75% (Pillar 5 — hub evolui visualmente).
+- Zonas afetadas: Núcleo Mandelbrot inteiro (sempre); Catedrais Neo-Sylvania durante e após arco Bento (parcial); cidade após 75% (Pillar 5: hub evolui visualmente).
 
 ### Entry fantasma no Diário
 
@@ -333,13 +333,13 @@ Após combate Sterling Fase 2, mini-puzzle de selagem:
 
 ### Por que Patch-Zero NÃO morre
 
-Pillar 2 explicitamente: **caos genuíno irredutível existe**. Tentar destruir Patch-Zero é tentar resolver problema indecidível — impossível por teorema, não por dificuldade. Selagem é o melhor resultado teórico atingível.
+Pillar 2 explicitamente: **caos genuíno irredutível existe**. Tentar destruir Patch-Zero é tentar resolver problema indecidível: impossível por teorema, não por dificuldade. Selagem é o melhor resultado teórico atingível.
 
 Gus aprende essa lição **durante** o climax. Antes, achava que poderia "deletar". A passagem é parte do arco multifase A→B→C→D do Pillar 4 (luminosidade reforjada).
 
 ---
 
-## Stinger pós-créditos (B.8) — Hook 1 detalhado
+## Stinger pós-créditos (B.8): Hook 1 detalhado
 
 Tela escura. Câmera fade-in lento em **câmara hermética distante** (provavelmente laboratório de Cidades-Gêmeas; nunca confirmado in-game).
 

@@ -1,12 +1,12 @@
-# Cauã "Volt" Berenger — Striker
+# Cauã "Volt" Berenger: Striker
 
 > **Status:** Canônico. Revisão 1 (2026-05-15). Refatorado a partir de `party.md`.
 >
-> **Idade:** 13. **Role mecânico:** Striker (EMP cinético — acumula energia por movimento e descarrega pulso eletromagnético). **Linguagem-âncora:** **Pythia** (scripting rápido).
+> **Idade:** 13. **Role mecânico:** Striker (EMP cinético, acumula energia por movimento e descarrega pulso eletromagnético). **Linguagem-âncora:** **Pythia** (scripting rápido).
 >
-> **Cross-ref:** spec mestre `Resources/gusworld/character-spec-caua-volt.md` · facção `factions.md` (Dutos Infernais — comunidade jovem) · setting `lore-bible.md` (Dutos Infernais).
+> **Cross-ref:** spec mestre `Resources/gusworld/character-spec-caua-volt.md` · facção `factions.md` (Dutos Infernais, comunidade jovem) · setting `lore-bible.md` (Dutos Infernais).
 >
-> **Etimologia:** Tupi+Germânico — "Falcão / Lança de Urso".
+> **Etimologia:** Tupi+Germânico, "Falcão / Lança de Urso".
 
 ---
 
@@ -17,7 +17,7 @@
 - **Voice:**
   - **Vocabulário:** gíria de cidade + termos técnicos básicos. Solta "compila e roda" como expressão coloquial.
   - **Sintaxe:** frases médias, exclamativas frequentes. Energia alta no diálogo.
-  - **Tic:** estala os dedos quando empolga (descarrega micro-pulso involuntário — efeito visual cyan).
+  - **Tic:** estala os dedos quando empolga (descarrega micro-pulso involuntário, efeito visual cyan).
   - **Linguagem-âncora cômica:** **Pythia**. Defende com paixão. "Pythia entende. Pythia te abraça." Vs C-Arcane do Gus: "Você compila tudo. Eu só **rodo**."
 
 ---
@@ -38,7 +38,7 @@
 | Sub-beat | Conteúdo |
 |---|---|
 | **Chamado** | Patrulha FIR ameaça inundar túneis com efluente industrial. Cauã sabe que precisa ajuda externa. |
-| **Recusa** | Recusa [[gus]] inicialmente — "ninguém de fora compreende os Dutos". Atrito visível. |
+| **Recusa** | Recusa [[gus]] inicialmente, "ninguém de fora compreende os Dutos". Atrito visível. |
 | **Mentor** | Gus prova competência via puzzle vertical (uso de Vetor do Gambito). Cauã aceita parceria de igual pra igual. |
 | **Prova** | Combate contra unidade FIR no laboratório oculto. Cauã quase morre por impulsividade (puxa cabo errado); Gus salva via cálculo. Lição: "rápido só vence se for **certo** rápido". |
 | **Retorno** | Cauã se junta. Conjuro novo destravado: **Pulso EM Concêntrico**. Setting Dutos vira hub seguro alternativo no ato 2. |
@@ -53,7 +53,7 @@ Disputa interna dos runners juvenis dos Dutos: facção do Cauã (defesa) vs fac
 
 **Crise:** facção radical, sem Cauã liderando dia-a-dia, fez ataque suicida a base FIR e foi destruída. Sobreviventes pedem socorro. Cauã volta sozinho (ou com Gus + party); precisa reconstruir comunidade desmoralizada.
 
-**Reflexão filosófica:** Cauã duvida — "minha velocidade salva ou condena? eu deveria ter ficado?" Gus contra-argumenta com analogia C-Arcane: "rotina principal não pode rodar em todos os processadores ao mesmo tempo. você escalou. delegou. confiou na thread errada — mas a thread também tinha agência."
+**Reflexão filosófica:** Cauã duvida: "minha velocidade salva ou condena? eu deveria ter ficado?" Gus contra-argumenta com analogia C-Arcane: "rotina principal não pode rodar em todos os processadores ao mesmo tempo. você escalou. delegou. confiou na thread errada, mas a thread também tinha agência."
 
 **Resolução:** ação concreta (resgatar sobreviventes) + insight (delegar com método, não com fé cega). Destrava: **upgrade exo-botas hidráulicas** (mobilidade vertical aprimorada, pulo duplo permanente em combate).
 
@@ -80,7 +80,7 @@ Disputa interna dos runners juvenis dos Dutos: facção do Cauã (defesa) vs fac
 ## Não fazer
 
 - Não usar arma de fogo. EMP é "magia kinética" (Pillar 2).
-- Não fan-service "garoto durão sem sentimento". Cauã chora quando é hora de chorar — e Gus respeita.
+- Não fan-service "garoto durão sem sentimento". Cauã chora quando é hora de chorar, e Gus respeita.
 - Não infantilizar. Tem 13. Lidera comunidade. Adulto em maturidade.
 
 ---
@@ -95,11 +95,11 @@ Davi (13 na época) leva Cauã pra ver o pôr-do-sol da Periferia. Cauã pergunt
 
 ### Aos 8 anos, no apartamento Berenger, hora em que recebe a notícia
 
-A campainha toca às 11:40. **Inácia** abre. Funcionário FIR uniformizado: "houve um incidente. Davi Berenger." Inácia não cai. Encosta na parede. Cauã está na cozinha; ouve. Não corre, não chora. Vai pro quarto. Senta no chão entre a cama dele e a cama vazia do irmão. Fica 5 dias quase sem falar. No 6º dia, sai. Desce nos Dutos pela primeira vez. *Importa porque:* origem do wound. Origem também da decisão silenciosa: "se eu for rápido, ninguém me pega." (Velocidade como armadura.) Origem do estala-dedo como tic — começou aqui, como controle motor pra não chorar.
+A campainha toca às 11:40. **Inácia** abre. Funcionário FIR uniformizado: "houve um incidente. Davi Berenger." Inácia não cai. Encosta na parede. Cauã está na cozinha; ouve. Não corre, não chora. Vai pro quarto. Senta no chão entre a cama dele e a cama vazia do irmão. Fica 5 dias quase sem falar. No 6º dia, sai. Desce nos Dutos pela primeira vez. *Importa porque:* origem do wound. Origem também da decisão silenciosa: "se eu for rápido, ninguém me pega." (Velocidade como armadura.) Origem do estala-dedo como tic: começou aqui, como controle motor pra não chorar.
 
 ### Aos 10 anos, primeira vez salva alguém nos Dutos (**Inês Marçal**, 8 anos na época)
 
-Inês cai num poço vertical de manutenção. Cauã ouve grito. Calcula: 4 segundos pra chegar; corda a 7 metros. Salta diagonal apoiando-se em pistão. Pega Inês no ar. Pousa rolando. Quebra duas costelas dele. Inês intacta. Inês olha pra ele: "você tá sangrando." Cauã: "compila e roda. tô vivo." Inês fica chorando porque ele tá sangrando. *Importa porque:* origem da liderança canônica nos Dutos. Origem do bordão "compila e roda" (foi a primeira vez que ele disse com sentido próprio — depois virou tic). Inês nunca esquece; Cauã ganha lealdade absoluta dela.
+Inês cai num poço vertical de manutenção. Cauã ouve grito. Calcula: 4 segundos pra chegar; corda a 7 metros. Salta diagonal apoiando-se em pistão. Pega Inês no ar. Pousa rolando. Quebra duas costelas dele. Inês intacta. Inês olha pra ele: "você tá sangrando." Cauã: "compila e roda. tô vivo." Inês fica chorando porque ele tá sangrando. *Importa porque:* origem da liderança canônica nos Dutos. Origem do bordão "compila e roda" (foi a primeira vez que ele disse com sentido próprio; depois virou tic). Inês nunca esquece; Cauã ganha lealdade absoluta dela.
 
 ### Aos 12 anos, na cozinha da casa, primeira vez que Inácia chora na frente dele desde -5
 

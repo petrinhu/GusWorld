@@ -1,9 +1,9 @@
 # Periferia (Industrial)
 
-> **Status:** Canônico (Bloco F — environmental storytelling).
+> **Status:** Canônico (Bloco F, environmental storytelling).
 > **Era predominante:** Era 2 (auge cooperativo C-Arcane, oficinas independentes) com **colapso Era 3 visível** (FIR vassala Sterling, propaganda Janelarum em telas públicas travando).
 > **Ato narrativo:** Ato 2 (arco [[dante-grid]]; transitável em ato 1 como ambient).
-> **Companion home:** [[dante-grid]] (C-Arcane, FIR — **TRAIDOR canônico**).
+> **Companion home:** [[dante-grid]] (C-Arcane, FIR, **TRAIDOR canônico**).
 
 > **Cross-ref imutáveis:** [[lore-bible]] §5.1 (distrito 2 Ferrovelhos), [[factions]] §3 (FIR), [[timeline]] (-8 cooperativa Alencar destruída, -5 Dante recrutado por Vorto, -0.5 memorando interno FIR), [[in-world-docs]] doc 8 (memorando Vorto-Dante), [[tradicoes-cultura]] §7 (Festival do Reaproveitamento).
 
@@ -29,7 +29,7 @@ A regra cultural: aqui se trabalha com a mão. Quem terceiriza para Sterling é 
 
 ### 2.1 Oficina Alencar (Dante)
 
-Galpão pequeno na Rua dos Tornos, esquina com Travessa do Compilador Velho. Fachada de chapa galvanizada com placa pintada à mão: **"ALENCAR — Manutenção C-Arcane Honesta"**. Sob a placa atual, riscado mal, ainda visível: a placa anterior — **"ALENCAR & FILHOS — Cooperativa de Mecânica Justa"**. Riscada por Dante aos 9 (Knowledge média percebe a sobreposição).
+Galpão pequeno na Rua dos Tornos, esquina com Travessa do Compilador Velho. Fachada de chapa galvanizada com placa pintada à mão: **"ALENCAR, Manutenção C-Arcane Honesta"**. Sob a placa atual, riscado mal, ainda visível: a placa anterior, **"ALENCAR & FILHOS, Cooperativa de Mecânica Justa"**. Riscada por Dante aos 9 (Knowledge média percebe a sobreposição).
 
 Interior: bancada principal de madeira, ferramentas organizadas por uso (mais usadas perto da mão dominante), terminal C-Arcane funcionando bem, **um segundo terminal a leste**, mais novo, **com porta ofuscada e cabo que sai pelo teto** (foreshadow visível §3). Cadeira giratória do Salviano (pai morto) ainda no canto, vazia. Dante deixou de propósito.
 
@@ -55,7 +55,7 @@ Aqui acontece a cena diurna de oficina-em-pé descrita em §8 vinheta A: mestre 
 
 ### 2.4 Subestação Industrial 11 (FIR ostensivo)
 
-Subestação elétrica com letreiro grande: "**FIR — CIRCULARIDADE QUE CONSTRÓI FUTURO**" (slogan público canônico, [[factions]] §3). Cerca alta, drone Sterling em sobrevoo de baixa altitude regular. Patrulha FIR amarela-e-preta com cortador plasma. Caminhões entrando e saindo carregados.
+Subestação elétrica com letreiro grande: "**FIR: CIRCULARIDADE QUE CONSTRÓI FUTURO**" (slogan público canônico, [[factions]] §3). Cerca alta, drone Sterling em sobrevoo de baixa altitude regular. Patrulha FIR amarela-e-preta com cortador plasma. Caminhões entrando e saindo carregados.
 
 Operacionalmente: lava ativos. Hardware "reciclado" entra; patente registrada Sterling Corp sai. Player sente o que é. NPCs não comentam diretamente (tabu social).
 
@@ -78,7 +78,7 @@ Casinha térrea geminada três quadras ao norte da oficina Dante. Quintal pequen
 | **Cabo que sai pelo teto da oficina** | Acima do terminal extra | Disfarçado de fio elétrico residencial. Trama externa: cobre comum. Trama interna: par trançado Óxido. Knowledge alta: identifica padrão de blindagem industrial. |
 | **Cadeira giratória do Salviano** | Canto da oficina Alencar | Vazia, polida pelo uso de Dante a observar (ele se senta na cadeira do pai apenas quando está sozinho; testemunhas zero). Knowledge alta: poeira no resto da oficina, ZERO poeira na cadeira. |
 | **Moldura vazia entre Salviano e Dante criança** | Parede oeste da oficina | Lacuna deliberada. Player nunca recebe explicação canônica. Dois caminhos hipotéticos plantados (foto família completa antes da queda / foto Dante com Vorto pós-promoção). Subtexto: Dante removeu a foto que doía mais; player decide qual. |
-| **Placa pintada antiga sob a placa atual** | Fachada oficina | "ALENCAR & FILHOS — Cooperativa de Mecânica Justa" riscada com tinta nova por cima. Dante riscou aos 9 (~ano -4, pós-recrutamento Vorto). Knowledge média percebe a sobreposição mal-feita. |
+| **Placa pintada antiga sob a placa atual** | Fachada oficina | "ALENCAR & FILHOS, Cooperativa de Mecânica Justa" riscada com tinta nova por cima. Dante riscou aos 9 (~ano -4, pós-recrutamento Vorto). Knowledge média percebe a sobreposição mal-feita. |
 | **Caixa de zinco vazia no Galpão Cooperativo abandonado** | Galpão §2.2, atrás de prateleira | Mesmo modelo das caixas Inácia (doc 2). Edilma usou pra esconder documentos da cooperativa antes da liquidação FIR; Vorto recolheu em -5 ao recrutar Dante. Knowledge alta: foreshadow institucional de que Vorto opera há mais tempo do que admite. |
 | **Marca permanente de óleo no piso de cimento** | Galpão §2.2, centro | Onde ficava a bancada principal do Salviano antes da queda. Óleo penetrou em -10 a -8. Ninguém limpou. Bento, se cruzar arco Dante, identifica: "isso é mancha de C-Arcane de baixo nível; oficinas Era 2 cooperativa usavam óleo específico." |
 | **Caminhão FIR estacionado fora do horário** | Rua adjacente à oficina, à noite (canônico em arco Dante pré-recrutamento) | Caminhão Distrito V (subordinado Diretor Cassiano Vorto). Placa específica. Vizinhos comentam casualmente em ambient. Mateus Penkin é o NPC que verbaliza (§6). |
@@ -108,17 +108,17 @@ Casinha térrea geminada três quadras ao norte da oficina Dante. Quintal pequen
 
 ## 5. Ruínas cross-era
 
-### 5.1 Era 1 — Pré-Código (Neo-Sylvania)
+### 5.1 Era 1: Pré-Código (Neo-Sylvania)
 
-**Presença mínima.** A Periferia foi construída sobre área que **não tinha catedral Neo-Sylvania significativa**. Era zona de fronteira agrícola da civilização anterior — campo, não centro urbano. Por isso o substrato Era 1 aqui é raso.
+**Presença mínima.** A Periferia foi construída sobre área que **não tinha catedral Neo-Sylvania significativa**. Era zona de fronteira agrícola da civilização anterior: campo, não centro urbano. Por isso o substrato Era 1 aqui é raso.
 
 Vestígios:
 
 - **Alguns cripto-glifos enterrados** em fundações antigas. Visíveis em rachaduras de calçada em 2-3 pontos (mapeáveis com Knowledge média). Cripto-glifos isolados, sem sintaxe contextual. Bento, se cruzar, identifica: "isso era marco de divisa rural Neo-Sylvania, não conjuro."
 - **Não há fonte hidráulica analógica nem cisterna funcional** (diferente do Setor Mirage que tem nascente). A Periferia bebeu o subsolo seco; Era 1 aqui foi superficial.
-- **Subtexto narrativo:** a Periferia **não tem mito profundo**. Não é bairro antigo no sentido Neo-Sylvania. É bairro **da Era 2** — nasceu cooperativo, vive cooperativo, e foi Era 2 que deu identidade. Por isso o trauma da queda Era 2 é mais cortante aqui: o bairro **não tem camada anterior** pra acolher quem perde a camada do meio. Quem cai, cai direto.
+- **Subtexto narrativo:** a Periferia **não tem mito profundo**. Não é bairro antigo no sentido Neo-Sylvania. É bairro **da Era 2**: nasceu cooperativo, vive cooperativo, e foi Era 2 que deu identidade. Por isso o trauma da queda Era 2 é mais cortante aqui: o bairro **não tem camada anterior** pra acolher quem perde a camada do meio. Quem cai, cai direto.
 
-### 5.2 Era 2 — Era do Compilador
+### 5.2 Era 2: Era do Compilador
 
 **Camada dominante material e cultural.** A Periferia **é** Era 2 viva. Oficinas C-Arcane, cooperativas familiares (sobreviventes e mortas), Praça do Compilador com chafariz cerimonial, slogans cooperativos pintados em paredes, caderno técnico Era 2 ainda em uso ativo.
 
@@ -133,7 +133,7 @@ Sobrevivências canônicas:
 
 **Tensão cross-eras:** Era 2 cooperativa morre por **engenharia financeira**, não por catástrofe ecológica como Neo-Sylvania morreu. Sterling Corp não destrói prédios; **deleta contratos**. A Era 2 sobrevive fisicamente; está morrendo administrativamente. A Periferia é onde essa morte é visível em pleno fluxo.
 
-### 5.3 Era 3 — Era Sterling
+### 5.3 Era 3: Era Sterling
 
 **Sobreposição assimétrica e desigual.** Sterling Corp não conseguiu (ainda) replicar o que fez no Setor Mirage: revestimento total. Aqui, a captura é via **FIR vassala** mais que via marketing visual.
 
@@ -167,18 +167,18 @@ Vestígios Era 3:
 
 Pré-jogo: trabalhou na Apex-Data com Inácia Berenger até -19. Demitido junto. Voltou pra oficina própria. Não é Underground formal; sympathizer cauteloso.
 
-- **Onde:** oficina pequena na Rua dos Tornos, 4 portas a leste da oficina Dante. Placa: "MURCH — Diagnóstico C-Arcane".
+- **Onde:** oficina pequena na Rua dos Tornos, 4 portas a leste da oficina Dante. Placa: "MURCH, Diagnóstico C-Arcane".
 - **Visual:** baixo, magro, cabelo branco curto, óculos com cordão de couro, dedos longos e ágeis. Sempre veste avental azul desbotado com mancha de café. Cicatriz fina na testa (acidente de bancada em -15).
 - **Hook de diálogo (primeira passagem, sem Dante na party):** "Você é o garoto da Vance? Sua mãe consertou bancada minha em -17. Mulher mão de fada. Sente-se. Eu não cobro pra ouvir."
 - **Hook (Dante na party, ato 2 mid):** olha pra Dante 2 segundos a mais do que cumprimento normal exige. Fala com Gus: "Garoto, qualquer hora que precisar de segunda opinião, eu tô aqui." (Subtexto: ele desconfia de algo no Dante mas não articula. Knowledge alta: confirma em sub-quest opcional pós-reveal climax.)
-- **Hook (pós-reveal Dante, ato 3, se Gus volta):** "Eu vi o Vorto chegar aqui há cinco anos. Pra ele, três da manhã. Eu fingia dormir na bancada. Eu vi o que vi. Eu nunca contei pro garoto, e eu devia ter contado. Não sou conselheiro. Sou só velho." (Pillar 4 — emoção contida, sem catarse explícita.)
-- **Sub-quest opcional:** se Gus traz prop-evidência (memorando interno FIR — doc 8 — ou caixa de zinco vazia do Galpão Cooperativo), Hilário corrobora silenciosamente. Recompensa: testemunho útil em branching #5 redenção forçada Dante.
+- **Hook (pós-reveal Dante, ato 3, se Gus volta):** "Eu vi o Vorto chegar aqui há cinco anos. Pra ele, três da manhã. Eu fingia dormir na bancada. Eu vi o que vi. Eu nunca contei pro garoto, e eu devia ter contado. Não sou conselheiro. Sou só velho." (Pillar 4: emoção contida, sem catarse explícita.)
+- **Sub-quest opcional:** se Gus traz prop-evidência (memorando interno FIR, doc 8, ou caixa de zinco vazia do Galpão Cooperativo), Hilário corrobora silenciosamente. Recompensa: testemunho útil em branching #5 redenção forçada Dante.
 
 #### Padim Tércio Almagre, 58, mestre confiante em Dante (a tragédia silenciosa)
 
 O **mentor de Dante**, pós-morte de Salviano. Almagre acolheu o garoto aos 9. Ensinou C-Arcane intermediário. **Acredita genuinamente** que Dante é a esperança da nova geração C-Arcane. **Não desconfia de nada.**
 
-- **Onde:** oficina maior na Avenida do Engrenagem, duas quadras ao sul da oficina Dante. Placa: "ALMAGRE — Oficina Mestra C-Arcane".
+- **Onde:** oficina maior na Avenida do Engrenagem, duas quadras ao sul da oficina Dante. Placa: "ALMAGRE, Oficina Mestra C-Arcane".
 - **Visual:** alto, ombros pesados, cabelo grisalho cortado curto, barba branca aparada. Tem dois dedos da mão esquerda perdidos em acidente Era 2 (-22); usa dedos modulares simples Era 2 (sem cibernética avançada, contraste deliberado com os de Dante). Veste jaqueta de couro marrom, sempre.
 - **Hook de diálogo (primeira passagem, sem Dante na party):** "Você procura o Dante? Garoto é bom. Tem mão. Tem cabeça. Vai ser grande se a gente conseguir proteger." (Tom de pai-figura sincero.)
 - **Hook (Dante na party, ato 2 mid):** ilumina-se ao ver Dante. Abraço de meio-segundo no ombro do garoto. "Já tá ensinando o Vance? Boa. Você ensina bem quando quer." Dante: tic do olhar de lado por 1 segundo. Almagre não percebe. **Player atento percebe.**
@@ -187,7 +187,7 @@ O **mentor de Dante**, pós-morte de Salviano. Almagre acolheu o garoto aos 9. E
 
 #### Senhor Mateus Penkin, 62, vizinho fofoqueiro do quintal §2.5
 
-Aposentado da Era 2 (era operário em armazém de cabos coaxiais). Hoje, mantém horta minúscula, antena de rádio improvisada, e ouvido encostado em todas as conversas da rua. Conhece o cronograma de todo mundo. Não desconfia de nada estrategicamente — apenas relata o que vê.
+Aposentado da Era 2 (era operário em armazém de cabos coaxiais). Hoje, mantém horta minúscula, antena de rádio improvisada, e ouvido encostado em todas as conversas da rua. Conhece o cronograma de todo mundo. Não desconfia de nada estrategicamente; apenas relata o que vê.
 
 - **Onde:** casa térrea geminada com quintal (§2.5), três quadras ao norte da oficina Dante. Quase sempre na varanda, bebendo café, observando.
 - **Visual:** baixo, barriga arredondada, cabelo branco esparso, óculos quadrados grossos, chinelo eternamente. Camisa polo cinza desbotada. Tem terno marrom guardado no armário só pra funerais (já usou 5 vezes nos últimos 8 anos).
@@ -211,7 +211,7 @@ Aposentado da Era 2 (era operário em armazém de cabos coaxiais). Hoje, mantém
 
 ## 8. Vinhetas sensoriais
 
-### Vinheta A — "Aula de oficina, FIR passando"
+### Vinheta A: "Aula de oficina, FIR passando"
 
 ```
 Praça do Compilador. Sol meio cinza. Almagre, em pé, com a
@@ -261,7 +261,7 @@ Dante: continua sorrindo. Sorri mais largo.
  Sorriso permanece exato. Olhos não acompanham.)
 ```
 
-### Vinheta B — "Quintal do Mateus, antena, três da manhã"
+### Vinheta B: "Quintal do Mateus, antena, três da manhã"
 
 ```
 Noite na Rua dos Tornos. Lua cheia. Pouco gerador
@@ -331,15 +331,15 @@ Mateus: (pra si mesmo, alto demais, costume de quem
 - **[[timeline]] -0.5** (memorando interno FIR doc 8 datado).
 - **[[factions]] §3** (FIR: Diretor Cassiano Vorto handler de Dante; Sub-Diretores regionais; Bruno Caval, Penha Lirio NPCs ambient). Festival do Reaproveitamento Internal Tradition.
 - **[[factions]] §3 dissensão interna:** Sub-Diretora Vitória Marquês começa a temer Sterling em ato 2 (sidequest Ouro destrava aproximação cuidadosa cross-arco Dante).
-- **[[tradicoes-cultura]] §1** (Festa da Compilação — versão cooperativa local no Praça do Compilador).
-- **[[tradicoes-cultura]] §7** (Festival do Reaproveitamento — cínico cobrindo a Periferia em novembro).
+- **[[tradicoes-cultura]] §1** (Festa da Compilação, versão cooperativa local no Praça do Compilador).
+- **[[tradicoes-cultura]] §7** (Festival do Reaproveitamento, cínico cobrindo a Periferia em novembro).
 - **[[tradicoes-cultura]] cumprimentos Periferia** ("tá no fio", "tá no volt"; "e aí, mano"). **Saudação Sterling Corp interna** ("Runtime estável") só ouvida em uniforme FIR raramente, e em **uma fala** lá pelas tantas do Dante (Knowledge alta percebe).
 - **[[dante-grid]] memórias formativas** (5 anos na oficina do pai; 8 anos da destruição da cooperativa; 10 anos da reunião com Sterling pessoalmente, andar superior FIR). A FIR e o Galpão §2.2 são cenários canônicos físicos dessas memórias.
 - **[[dante-grid]] camada double-layer:** todos os foreshadows §3 e §8 vinheta A sustentam a leitura retroativa pós-reveal. NÃO há revelação aqui ainda; o setting **planta**, o climax **paga**.
 - **[[lore-bible]] §5.1 distrito 2** (Periferia Industrial canônica). §10 facção FIR (vassalagem comercial Sterling).
-- **[[pillars]] §Pillar 3** (triângulo de hardware: Tavus-Drive / Matriz Ortodôntica / óculos táticos — Dante manipula o hardware do Gus via "manutenção rotineira"; setting hospeda o terminal e antena que tornam a manipulação possível).
+- **[[pillars]] §Pillar 3** (triângulo de hardware: Tavus-Drive / Matriz Ortodôntica / óculos táticos; Dante manipula o hardware do Gus via "manutenção rotineira"; setting hospeda o terminal e antena que tornam a manipulação possível).
 - **[[pillars]] §Pillar 5** (setting com identidade visual única; contraste cinza-fuligem com saturação Mirage; recompensa narrativa de mistura paletas só em ato 3).
 
 ---
 
-**Última revisão:** 2026-05-15. Canônico (Bloco F — environmental storytelling). Atualizações exigem aprovação do criador supremo.
+**Última revisão:** 2026-05-15. Canônico (Bloco F, environmental storytelling). Atualizações exigem aprovação do criador supremo.

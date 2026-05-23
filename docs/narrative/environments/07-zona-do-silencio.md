@@ -1,6 +1,6 @@
 # Zona do Silêncio
 
-> **Status:** Canônico (Bloco F — environmental storytelling).
+> **Status:** Canônico (Bloco F, environmental storytelling).
 > **Era predominante:** Era 2 (estrutura: bairro residencial + antenas analógicas) sob camada Era 3 abandonada (matriz de cancelamento sônico Sterling, retro-fit falhado em -7 a -5), sobre vestígios Era 1 (câmaras acústicas ressonantes Neo-Sylvania, enterradas).
 > **Ato narrativo:** Ato 2 (arco [[linda-siren|Linda]]).
 > **Companion home:** [[linda-siren|Linda "Siren" Neumann]].
@@ -45,7 +45,7 @@ Câmara Neo-Sylvania descoberta acidentalmente em -3 por Joaquim Bartolomeu dura
 
 ### 2.5 Estação Espelho Acústico (Posto 7)
 
-O único dos doze postos enterrados do experimento Sterling que ficou parcialmente acessível por baixo. Hangar técnico subterrâneo, 4 por 7 metros, painéis Sterling de -7 cobertos por dezenove anos de poeira e mofo. Lâmpadas de emergência ainda piscam em ciclo irregular, alimentadas por bateria de longa duração que Sterling esqueceu de desligar. Diagramas de fluxo de fase pendem da parede. Um console gravado em chapa de aço lê "Operação Espelho Acústico — Fase Piloto — Distrito 4 — Em Validação". Ninguém validou. A fase piloto virou estado permanente.
+O único dos doze postos enterrados do experimento Sterling que ficou parcialmente acessível por baixo. Hangar técnico subterrâneo, 4 por 7 metros, painéis Sterling de -7 cobertos por dezenove anos de poeira e mofo. Lâmpadas de emergência ainda piscam em ciclo irregular, alimentadas por bateria de longa duração que Sterling esqueceu de desligar. Diagramas de fluxo de fase pendem da parede. Um console gravado em chapa de aço lê "Operação Espelho Acústico, Fase Piloto, Distrito 4, Em Validação". Ninguém validou. A fase piloto virou estado permanente.
 
 ---
 
@@ -58,13 +58,13 @@ O único dos doze postos enterrados do experimento Sterling que ficou parcialmen
 | Cabo de cobre trançado pendurado em gancho | base Torre Mater | Linha de transmissão analógica original (ano -65). Ainda vibra em frequência específica quando recebe sinal das Cidades-Gêmeas. Tiago verifica diariamente apoiando dois dedos. |
 | Vinil "Última Frequência" partido em três pedaços | gaveta da casa de Mara Bento (sub-célula norte) | Cópia original da gravação dos oito técnicos desaparecidos na batida -50. Apenas três cópias completas conhecidas existem. Mara guarda os três pedaços por superstição (a peça quebrou em -2 quando ela soube de Polis-Vermelha). Continua tocável se montado com cuidado. |
 | Fones industriais pendurados em prego junto à porta | Casa Neumann | Otmar usou esses fones por dezessete anos como engenheiro de estação de transmissão. Aposentou-se em -2. Pendurou os fones no prego. Não tocou mais. Linda toca quando sai de casa. |
-| Console Espelho Acústico mofado | Estação Espelho Acústico | Display ainda mostra "Fase Piloto — Validação Pendente". Botão "Encerrar Operação" piscando em verde há dezenove anos. Ninguém apertou. Ninguém autorizado a apertar. |
+| Console Espelho Acústico mofado | Estação Espelho Acústico | Display ainda mostra "Fase Piloto, Validação Pendente". Botão "Encerrar Operação" piscando em verde há dezenove anos. Ninguém apertou. Ninguém autorizado a apertar. |
 | Diagrama de fluxo de fase Sterling, papel oleoso | parede Estação Espelho Acústico | Mostra padrão de emissores em contrafase. Curva de cancelamento por frequência. Faixa de 60Hz a 8kHz marcada em verde "cancelada"; faixa abaixo de 60Hz marcada em vermelho "atravessa". Vetor sônico Óxido da Linda opera em 47Hz. |
 | Caixa de partituras encadernadas em couro | sala lateral Câmara do Equinócio Acústico | Partituras Era 2 da Casa das Antenas pré-batida -50. Doze peças, oito autores conhecidos, quatro autores anônimos. Última Frequência é a primeira do livro. Linda nunca abriu sozinha. |
-| Folheto datilografado amarelado | painel de aviso da Praça Sem Eco | "Quem fala alto aqui, fala sozinho." Anônimo, Era 2. Foi pichado por cima em -3 com tinta vermelha Sterling "ESPAÇO SUBUTILIZADO — CONSULTAR REUSO" e depois pichado por cima da pichação por mão Underground em -1: "subutilizado por nós. Próprio." |
+| Folheto datilografado amarelado | painel de aviso da Praça Sem Eco | "Quem fala alto aqui, fala sozinho." Anônimo, Era 2. Foi pichado por cima em -3 com tinta vermelha Sterling "ESPAÇO SUBUTILIZADO: CONSULTAR REUSO" e depois pichado por cima da pichação por mão Underground em -1: "subutilizado por nós. Próprio." |
 | Cronômetro de latão Asmódico em silêncio | bolso interno do casaco de um peregrino Ordem Recursiva visitante | Cronômetro deveria ticar audivelmente. Aqui não tica. O som existe (mecanicamente o tique acontece), mas não viaja três metros. Para o monge, é a primeira vez na vida que carrega o cronômetro sem ouvi-lo. Experiência cerimonial. |
 | Banco de praça com placa de bronze | Praça Sem Eco, lado norte | "Aqui sentou Otmar Neumann antes de cada turno na estação, 22 anos". Brígida mandou fazer em -2 quando Otmar aposentou. Otmar nunca sentou no banco depois (acha exagero). Linda senta às vezes, contra a vontade do pai. |
-| Cartaz Sterling rasgado nas bordas | postes da Avenida Ressoante | "FREQUÊNCIAS LIMPAS PARA UM AMANHÃ CLARO. Sterling Sigma Áudio Doméstico — disponível em pacote Janelarum." Cartaz colado no início de cada mês. Rasgado por mão Underground antes do segundo dia. Sterling Corp recoloca por princípio, sem investigar. |
+| Cartaz Sterling rasgado nas bordas | postes da Avenida Ressoante | "FREQUÊNCIAS LIMPAS PARA UM AMANHÃ CLARO. Sterling Sigma Áudio Doméstico, disponível em pacote Janelarum." Cartaz colado no início de cada mês. Rasgado por mão Underground antes do segundo dia. Sterling Corp recoloca por princípio, sem investigar. |
 | Caderno escolar com folhas em branco no meio | mesa de Helga Riza, anexo Underground | Helga ([[factions]] §6) compila pichações. Meio do caderno tem 18 páginas em branco: ela parou de escrever em -2 quando começou a transcrever Polis-Vermelha ([[in-world-docs]] doc 11) e não retomou outra cidade ainda. Espera. |
 | Antena parabólica enferrujada apontando pra cima | telhado de prédio abandonado, Rua das Frequências 9 | Tentativa Sterling Corp -4 de instalar nova torre. Burocracia Underground emperrou licença municipal usando regras municipais Era 2 sobre poluição visual. Antena nunca conectada. Apontando pro céu vazio há quatro anos. |
 | Pichação branca em parede preta | beco entre Casa Neumann e Torre Mater | "FREQUÊNCIA BOA / SEM RUÍDO" em caligrafia limpa. Cumprimento Underground canônico ([[tradicoes-cultura]] §Costumes universais). Renovada anualmente em Noite Calada. |
@@ -82,7 +82,7 @@ O único dos doze postos enterrados do experimento Sterling que ficou parcialmen
 - **Última Frequência tocando em loop curto** dentro da Câmara do Equinócio Acústico, baixo, gravação restaurada. A câmara amplifica naturalmente. O efeito é cinema invertido: o player entra do silêncio para o som, não do som para o silêncio.
 - **Vozes parciais de Polis-Vermelha** captadas em rádio analógica fragmentada no canto sul da Praça Sem Eco. Sussurros entrecortados por estática. [[lore-bible]] §8.3 canal 2 (Patch-Zero ambient) audível aqui mais do que em qualquer outro setting fora da Selve.
 - **Risada de criança brincando de Vetor do Cego** ([[tradicoes-cultura]] §Brincadeiras infantis) que decai mid-frase e o jogador termina de ouvir só na cabeça.
-- **Voz anônima via rádio, mesma em duas cidades-irmãs (F130).** Captada por antena analógica recuperada do Underground em dois momentos distintos do mid-ato 2: primeiro como sinal residual de Polis-Vermelha, depois em transmissão Cidades-Gêmeas. **Mesma voz, mesmo timbre, mesma cadência**, sob código de chamada anônimo. Sem nome canônico. Sem identificação operacional. Frases curtas, técnicas, fora de contexto. Player Knowledge alta pode cruzar retroativamente: Patch-Zero plural (F059, F104)? Operativo Underground multi-cidade? Coincidência? Lacuna deliberada — sem confirmação in-game. Mitigação contra confusão com NPCs nomeados do Underground (Lazar Tovrov, Penha Cintra, Otília Vermelha): voz curta, não nomeada, registro técnico árido. Reforça sequel hook universal F104.
+- **Voz anônima via rádio, mesma em duas cidades-irmãs (F130).** Captada por antena analógica recuperada do Underground em dois momentos distintos do mid-ato 2: primeiro como sinal residual de Polis-Vermelha, depois em transmissão Cidades-Gêmeas. **Mesma voz, mesmo timbre, mesma cadência**, sob código de chamada anônimo. Sem nome canônico. Sem identificação operacional. Frases curtas, técnicas, fora de contexto. Player Knowledge alta pode cruzar retroativamente: Patch-Zero plural (F059, F104)? Operativo Underground multi-cidade? Coincidência? Lacuna deliberada, sem confirmação in-game. Mitigação contra confusão com NPCs nomeados do Underground (Lazar Tovrov, Penha Cintra, Otília Vermelha): voz curta, não nomeada, registro técnico árido. Reforça sequel hook universal F104.
 
 ---
 
@@ -115,19 +115,19 @@ A coexistência das três camadas faz com que o player que aprenda a ler o ambie
 
 ### Nomeados
 
-#### Joaquim Bartolomeu (32) — técnico Underground, descobridor da câmara
+#### Joaquim Bartolomeu (32), técnico Underground, descobridor da câmara
 
 Filho de luthiers. Reconstrói toca-discos artesanais. Em -3 ele foi consertar cabo subterrâneo na Praça Sem Eco e cavou três metros a mais por engano: caiu na primeira câmara Neo-Sylvania. Subiu pálido e foi avisar Padrinho Tiago. Hoje a câmara é segredo de oito pessoas (Tiago, Joaquim, Mara, Helga, Otmar, Brígida, Linda, e dois monges da Ordem). Joaquim guarda a chave da entrada lateral. Quando alguém pede pra entrar, ele pergunta primeiro: "por quê?" Resposta errada e ele finge não saber do que está se falando.
 
 Hook de diálogo: explica ao Gus a geometria da câmara e por que ela cancela o cancelamento. Linguagem técnica simples. Mostra um diagrama em três linhas. Termina com "se você sair daqui e contar, eu não te conheci."
 
-#### Mara Bento (28) — operadora de rádio analógica, sub-célula norte
+#### Mara Bento (28), operadora de rádio analógica, sub-célula norte
 
 Mãe de duas crianças pequenas (Inê, 4; Vico, 7). Marido morreu em -3 num acidente de obra que provavelmente foi sabotagem FIR; Mara nunca pediu investigação. Coordena recepção de transmissão de Cidades-Gêmeas. Trabalha na sala de rádio dentro de uma das antenas mortas; tem cadeira ergonômica improvisada e um termo de café-de-neurônio sempre quente. Quando Linda chega, Mara já preparou uma segunda xícara antes dela falar.
 
 Hook de diálogo: entrega ao Gus o pedaço da partitura "Última Frequência" se Knowledge alta e tom respeitoso. Pergunta sobre o que ele acha do filho do meio dela (Vico está aprendendo Óxido aos sete e Mara não sabe se incentiva). Gus responde tecnicamente. Mara aceita a resposta.
 
-#### Mestre Hugo Tirol (55) — Ordem Recursiva, peregrino acústico
+#### Mestre Hugo Tirol (55), Ordem Recursiva, peregrino acústico
 
 Já listado em [[factions]] §2. Mestre tradicionalista, especialista em decifragem cripto-glífica. Visita a Câmara do Equinócio Acústico mensalmente desde -3, sempre sozinho, sempre com o mesmo cronômetro Asmódico de latão. Acredita que as câmaras Neo-Sylvania foram usadas para preservar **cripto-glifos sonoros** que não foram transcritos em pedra, e que o conhecimento perdido pode ser reconstruído via ressonância ativa. Trabalha quieto.
 
@@ -148,11 +148,11 @@ Hook de diálogo: pode revelar ao Gus, se Gus toca o cripto-glifo certo com veto
 
 ## 8. Vinhetas sensoriais
 
-### Vinheta 1 — Entrada no distrito
+### Vinheta 1: Entrada no distrito
 
 A primeira coisa que Gus nota é o som dos próprios passos. Audível, normal, quatro tijolos da entrada do distrito. Cinco tijolos. Seis. No décimo tijolo já não tem mais som. Ele para. Bate o pé de novo, com vontade. Quase nada. Olha para trás, vê a cidade ruidosa atrás dele em volume normal, separada do distrito por uma linha invisível. Volta o pé pra fronteira. Volta o som. Olha de novo pra frente. Avança. Os passos somem outra vez. Gus tira o óculos tático, olha no infravermelho, vê os doze postos enterrados em padrão hexagonal regular. Volta o óculos pro normal. Caminha. O distrito recebe-o em ausência.
 
-### Vinheta 2 — Câmara do Equinócio Acústico, primeira visita
+### Vinheta 2: Câmara do Equinócio Acústico, primeira visita
 
 Linda passa primeiro. Gus atrás. Joaquim segura a porta de pedra polida e fecha quando os dois entram. Por três segundos, silêncio completo. Depois Linda fala "frequência boa." A voz dela bate no cristal da parede oposta, volta, bate no cristal atrás, volta de novo. Gus ouve a voz da Linda quatro vezes em duas linhas. A última eco é mais quente que a primeira. Linda olha pra ele e sorri muito de leve. "Aqui o som existe." Gus sente o ar tremer levemente quando ela aciona o vetor sônico Óxido a 47Hz, e a câmara reage: os cristais começam a brilhar muito fraco, em padrão Fibonacci na ordem 1, 1, 2, 3, 5, 8. Linda observa. "Eu não comandei isso." Joaquim, do lado de fora, ouve o som da câmara pela primeira vez em três anos vazar pela porta. Para. Encosta a orelha no batente. Não conta a ninguém depois.
 
@@ -181,4 +181,4 @@ Linda passa primeiro. Gus atrás. Joaquim segura a porta de pedra polida e fecha
 
 ---
 
-**Última revisão:** 2026-05-15. Canônico (Bloco F — environmental storytelling). Atualizações exigem aprovação do criador supremo.
+**Última revisão:** 2026-05-15. Canônico (Bloco F, environmental storytelling). Atualizações exigem aprovação do criador supremo.

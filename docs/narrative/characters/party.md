@@ -1,6 +1,6 @@
-# Party — GusWorld
+# Party: GusWorld
 
-> **Status:** Canônico. Revisão 2 (2026-05-15). **Refatorado pra ÍNDICE.** Conteúdo individual movido pra arquivos próprios. Este doc agora é **roteador + resumo executivo + matrizes de relacionamento**.
+> **Status:** Canônico. Revisão 2 (2026-05-15). **Refatorado pra ÍNDICE.** Conteúdo individual movido pra arquivos próprios. Este doc agora é **roteador, resumo executivo e matrizes de relacionamento**.
 >
 > **Escopo:** Gus + 6 companions canônicos. Roles complementares. Recrutamento em ordem livre (B.6). Cada companion segue Hero's Journey individual mini dentro do macro-arco do Gus.
 >
@@ -19,16 +19,16 @@
 | 4 | **Linda "Siren" Neumann** | [`linda-siren.md`](linda-siren.md) |
 | 5 | **Dante "Grid" Alencar** ⚠️ TRAIDOR | [`dante-grid.md`](dante-grid.md) |
 | 6 | **Jaci "Proxy" Vanderbist** | [`jaci-proxy.md`](jaci-proxy.md) |
-| — | **Sterling Locke** (antagonista) | [`sterling-locke.md`](sterling-locke.md) |
-| — | **Patch-Zero** (antagonista-sistema) | [`patch-zero.md`](patch-zero.md) |
+| n/a | **Sterling Locke** (antagonista) | [`sterling-locke.md`](sterling-locke.md) |
+| n/a | **Patch-Zero** (antagonista-sistema) | [`patch-zero.md`](patch-zero.md) |
 
-**Cross-ref produção 3D:** `docs/art/characters/<nome>.md` (sheets de produção visual — derivados das specs mestras).
+**Cross-ref produção 3D:** `docs/art/characters/<nome>.md` (sheets de produção visual, derivados das specs mestras).
 
 ---
 
 ## Princípios da party
 
-- **Child-led / peers.** Todos os 7 personagens da party têm 11-14 anos. Adultos aparecem como antagonistas (Sterling, Vorto, Adila), mentores distantes (Mestre-Hierofante Velhusto, Anciã Mariana, Padrinho Tiago) ou contraponto — **nunca** assumem o protagonismo (Pillar 4).
+- **Child-led / peers.** Todos os 7 personagens da party têm 11-14 anos. Adultos aparecem como antagonistas (Sterling, Vorto, Adila), mentores distantes (Mestre-Hierofante Velhusto, Anciã Mariana, Padrinho Tiago) ou contraponto, **nunca** assumem o protagonismo (Pillar 4).
 - **Roles complementares, não trinity rígida.** 7 papéis distintos cobrem o espectro tático sem repetir.
 - **Voice única.** Vocabulário, sintaxe, linguagem-âncora, tics. Leitor cego deve identificar quem fala.
 - **Cada companion carrega 1 sub-tema** que dialoga com o theme central ("a inteligência mais alta é a que serve à vida").
@@ -53,14 +53,14 @@
 
 ---
 
-## Dinâmicas de party — quem briga com quem
+## Dinâmicas de party: quem briga com quem
 
 | Par | Tipo conflito | Resolução |
 |---|---|---|
 | **Gus × Cauã** | Linguagem (C-Arcane vs Pythia). Velocidade vs cálculo. | Banter constante; aliança operacional sólida. |
 | **Gus × Iara** | Legibilidade vs elegância opaca. | Convivência respeitosa; diferença permanente. |
 | **Gus × Bento** | Linguagem (C-Arcane vs Asmódico). Modernidade vs tradição. | Aliança filosófica em ato 3 (Bento vira "portátil"). |
-| **Gus × Linda** | Filosófico — linguagem como arma (Sterling). | Aliança sólida; Linda lê rápido. |
+| **Gus × Linda** | Filosófico, linguagem como arma (Sterling). | Aliança sólida; Linda lê rápido. |
 | **Gus × Dante** | Disfarçada. Histórico (preservar vs descartar). | Reveal climax. |
 | **Gus × Jaci** | Linguagem leve (C-Arcane vs Pythia). Pessoa vs sistema. | Aliança emocional mais profunda. |
 | **Cauã × Linda** | Ruído incidental vs noise-canceling. | Aliança operacional via combo Pulso EM + Eco. |
@@ -91,11 +91,11 @@ Cross-ref: `comic-reliefs.md` (cenas 2, 5, 7, 8, 9, 10).
 
 | Pillar | Como a party respeita |
 |---|---|
-| **P1 — Lógica vence força** | Todos resolvem por análise/método/leitura; Cauã é exceção (impulso) mas aprende. |
-| **P2 — Magia computável + Natureza matemática** | Cada companion = especialista de uma família de linguagem; Bento exceção declarada (Asmódico analógico). |
-| **P3 — Triângulo hardware** | Gus = triângulo completo; companions = hardware análogo individual (escudo, exo-bota, ampola, fone, mão modular, fibra capilar). |
-| **P4 — Prodígio 11 anos** | Todos os 7 são peers 11-14. Adultos = antagonistas, mentores distantes, contraponto. Gus arc multifase A→B→C→D. |
-| **P5 — Multipolar 2 âncoras** | Cada companion ancorado em 1 setting (Dutos / Mirage / Catedrais / Silêncio / Periferia / Selve). Núcleo Metropolitano = Gus. |
+| **P1 (Lógica vence força)** | Todos resolvem por análise/método/leitura; Cauã é exceção (impulso) mas aprende. |
+| **P2 (Magia computável + Natureza matemática)** | Cada companion = especialista de uma família de linguagem; Bento exceção declarada (Asmódico analógico). |
+| **P3 (Triângulo hardware)** | Gus = triângulo completo; companions = hardware análogo individual (escudo, exo-bota, ampola, fone, mão modular, fibra capilar). |
+| **P4 (Prodígio 11 anos)** | Todos os 7 são peers 11-14. Adultos = antagonistas, mentores distantes, contraponto. Gus arc multifase A→B→C→D. |
+| **P5 (Multipolar 2 âncoras)** | Cada companion ancorado em 1 setting (Dutos / Mirage / Catedrais / Silêncio / Periferia / Selve). Núcleo Metropolitano = Gus. |
 
 ---
 
@@ -103,7 +103,7 @@ Cross-ref: `comic-reliefs.md` (cenas 2, 5, 7, 8, 9, 10).
 
 - **Sem adulto party-member.** Pillar 4 absoluto.
 - **Sem mascote falante.** Clichê e custo de animação.
-- **Sem personagem que existe só para morrer.** Anti-fridging. Se companion morre, é arc completo (Dante traidor é o único — e ele é vilão por dentro).
+- **Sem personagem que existe só para morrer.** Anti-fridging. Se companion morre, é arc completo (Dante traidor é o único, e ele é vilão por dentro).
 - **Sem voice intercambiável.** Se duas falas trocam de boca sem soar errado, refatorar.
 - **Sem romance.** Vínculos = amizade, respeito, rivalidade.
 - **Sem grupo "Power Rangers" com líder + 5 secundários.** Gus é protagonista mas companions têm subjetividade plena.

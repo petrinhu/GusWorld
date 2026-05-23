@@ -1,10 +1,10 @@
-# Gus Vector Tavus Vance — Protagonista
+# Gus Vector Tavus Vance: Protagonista
 
 > **Status:** Canônico. Revisão 1 (2026-05-15). Refatorado a partir de `party.md`.
 >
 > **Idade:** 11. **Role mecânico:** Utility / Control. **Linguagem-âncora:** **C-Arcane** (vence o conflito linguístico no final do jogo).
 >
-> **Cross-ref:** spec mestre `Resources/gusworld/character-spec-gus.md` · sheet produção `docs/art/characters/gus.md` · base imutável `sinopse.md`.
+> **Cross-ref:** spec mestre `Resources/gusworld/character-spec-gus.md` (sheet produção `docs/art/characters/gus.md`) · base imutável `sinopse.md`.
 
 ---
 
@@ -36,16 +36,16 @@
 
 | Fase | Conteúdo |
 |---|---|
-| **Ato 1 — A (puro otimista, inocência intacta)** | Curioso, otimizador, tecnicismo total. Mãe é safe base. |
-| **Ato 2 progressivo — B+C (perde inocência gradual, amadurece)** | Cada arco companion adiciona camada de fricção. Confronta Sterling em escalada. Cresce em maturidade técnica e emocional. |
-| **Pós-traição Dante (ato 3) — D (trauma agudo, endurece)** | Stats degradados materializam ferida emocional. Combate Dante. |
-| **Final — luminosidade reforjada pela experiência** | Não destruída. Volta para mãe na bancada, soldando. Mas sabe o custo agora. |
+| **Ato 1, A (puro otimista, inocência intacta)** | Curioso, otimizador, tecnicismo total. Mãe é safe base. |
+| **Ato 2 progressivo, B+C (perde inocência gradual, amadurece)** | Cada arco companion adiciona camada de fricção. Confronta Sterling em escalada. Cresce em maturidade técnica e emocional. |
+| **Pós-traição Dante (ato 3), D (trauma agudo, endurece)** | Stats degradados materializam ferida emocional. Combate Dante. |
+| **Final, luminosidade reforjada pela experiência** | Não destruída. Volta para mãe na bancada, soldando. Mas sabe o custo agora. |
 
 ---
 
 ## Mini-quest pré-recrutamento (companion #1)
 
-Catalyst: anomalia massiva na Orla Recursiva. Gus precisa decidir **qual setting visita primeiro** — escolha = recrutamento companion #1. Player-driven (B.6 ordem livre).
+Catalyst: anomalia massiva na Orla Recursiva. Gus precisa decidir **qual setting visita primeiro**: escolha = recrutamento companion #1. Player-driven (B.6 ordem livre).
 
 ## Mini-quest pós-recrutamento
 
@@ -80,7 +80,7 @@ Atrita com **todos**, em alternância. Conflitos linguísticos contínuos:
 
 - Não usar arma de fogo. Tavus-Drive é a única "arma".
 - Não pegar romance.
-- Não verbalizar sentimentos diretamente — sempre por metáfora técnica.
+- Não verbalizar sentimentos diretamente; sempre por metáfora técnica.
 
 ---
 
@@ -94,7 +94,7 @@ Gus pergunta por que o ferro de solda derrete o filamento mas não o pano. **Gar
 
 ### Aos 7 anos, primeira aula de C-Arcane na escola pública (Núcleo Metropolitano)
 
-Professora distribui exercício: combinar 2 tokens. Gus levanta a mão: "posso fazer com 3?" Professora dispensa: "depois, Vance, na ordem". Aos 7 anos termina o exercício oficial em 2 minutos. Faz a versão com 3 tokens em outros 5. Faz a versão com 4 em outros 10. Quando a professora vê, fica em silêncio. No fim da aula, leva ele para a sala da diretora. Diretora liga para Gargi: "ele talvez precise de programa diferenciado." Gargi responde com firmeza contida: "ele talvez precise de uma escola que não esteja com medo dele." Mantém na pública. *Importa porque:* origem do tic (pausa de 1 segundo antes de falar — começou aqui, processando se a resposta vai assustar quem ouve).
+Professora distribui exercício: combinar 2 tokens. Gus levanta a mão: "posso fazer com 3?" Professora dispensa: "depois, Vance, na ordem". Aos 7 anos termina o exercício oficial em 2 minutos. Faz a versão com 3 tokens em outros 5. Faz a versão com 4 em outros 10. Quando a professora vê, fica em silêncio. No fim da aula, leva ele para a sala da diretora. Diretora liga para Gargi: "ele talvez precise de programa diferenciado." Gargi responde com firmeza contida: "ele talvez precise de uma escola que não esteja com medo dele." Mantém na pública. *Importa porque:* origem do tic (pausa de 1 segundo antes de falar; começou aqui, processando se a resposta vai assustar quem ouve).
 
 ### Aos 8 anos, na horta da avó **Belinor Vance** (interior, antes da morte da avó)
 
@@ -106,7 +106,7 @@ Gargi economizou. Pyotor (pai, itinerante na rotação fronteira-Selve) mandou b
 
 ### Aos 10 anos, primeira vez que entra na Selve sozinho (sem permissão)
 
-Hackeia perímetro de proteção urbana (alegoria sinopse — primeiro hack canônico). Anda 2 horas. Vê o primeiro fractal Fibonacci vivo (galho de árvore-luz pulsando). Para. Não respira. Por 4 minutos olha. Volta correndo. Não conta a Gargi naquela noite. Conta semanas depois. Gargi não briga, só pergunta: "você ia chamar alguém se desse errado?" Gus responde: "ia me virar." Gargi: "errado. ia chamar você mesmo. me ensina o canal." Aprendeu juntos. *Importa porque:* origem do wound real (autossuficiência forçada precoce) e da virtude técnica (lê padrões antes de qualquer um). Cena que justifica por que Gus aos 11 está pronto pro arco — não saiu do nada.
+Hackeia perímetro de proteção urbana (alegoria sinopse, primeiro hack canônico). Anda 2 horas. Vê o primeiro fractal Fibonacci vivo (galho de árvore-luz pulsando). Para. Não respira. Por 4 minutos olha. Volta correndo. Não conta a Gargi naquela noite. Conta semanas depois. Gargi não briga, só pergunta: "você ia chamar alguém se desse errado?" Gus responde: "ia me virar." Gargi: "errado. ia chamar você mesmo. me ensina o canal." Aprendeu juntos. *Importa porque:* origem do wound real (autossuficiência forçada precoce) e da virtude técnica (lê padrões antes de qualquer um). Cena que justifica por que Gus aos 11 está pronto pro arco: não saiu do nada.
 
 ---
 

@@ -1,6 +1,6 @@
-# Environments — Índice (Bloco F)
+# Environments: Índice (Bloco F)
 
-> **Status:** Canônico (Bloco F — environmental storytelling). Doc-por-setting, padrão fixo cross-settings.
+> **Status:** Canônico (Bloco F, environmental storytelling). Doc-por-setting, padrão fixo cross-settings.
 >
 > **Escopo:** os 8 settings de [[pillars]] §Pillar 5 ganham doc próprio aqui. Cada doc traduz lore canônica em **espaço jogável**: landmarks, props que contam história sem texto, áudio diegético (ganchos), ruínas cross-era (3 eras visíveis em cada setting), NPCs ambientais (genéricos + 2-3 nomeados), ganchos mecânicos, vinhetas sensoriais, conexões cross-setting.
 >
@@ -25,7 +25,7 @@ Cada doc segue template fixo (10 seções, padrão estável cross-settings). Pla
 | 03 | [[03-catedrais-neo-sylvania|Catedrais Neo-Sylvania (Nave + Biblioteca + Capela do Sino Asmódico)]] | Era 1 (estrutura) + Era 2 (Ordem) | Ato 2 (arco Bento) | [[bento-requiem]] | **DONE** |
 | 04 | [[04-dutos-infernais|Dutos Infernais (Turbinas + Posto FIR + QG Runners + Pilar Era 1)]] | Era 1 + Era 2 (infra) + Era 3 (reconfig Sterling) | Ato 2 (arco Cauã) | [[caua-volt]] | **DONE** |
 | 05 | [[05-setor-mirage|Setor Mirage (Praça do Olho + Caleidoscópio + Catacumbas Cult)]] | Era 3 (predominante) sobre vestígios Era 2 | Ato 2 (arco Iara) | [[iara-lumen]] | **DONE** |
-| 06 | [[06-periferia|Periferia (Oficinas C-Arcane + Subestação 11 + Quintal Penkin)]] | Era 2 (oficinas) + Era 3 (FIR vassalo) | Ato 2 (arco Dante — foreshadow traidor) | [[dante-grid]] | **DONE** |
+| 06 | [[06-periferia|Periferia (Oficinas C-Arcane + Subestação 11 + Quintal Penkin)]] | Era 2 (oficinas) + Era 3 (FIR vassalo) | Ato 2 (arco Dante, foreshadow traidor) | [[dante-grid]] | **DONE** |
 | 07 | [[07-zona-do-silencio|Zona do Silêncio]] | Era 2 (antenas) sob abandono Era 3, sobre câmaras Era 1 | Ato 2 (arco Linda) | [[linda-siren]] | **DONE** |
 | 08 | [[08-selve-profunda|Selve Profunda (Pelicano Branco + Núcleo Mandelbrot)]] | Cross-temporal (3 eras densas) | Ato 2 (arco Jaci) + climax Patch-Zero | [[jaci-proxy]] | **DONE** |
 
@@ -40,15 +40,15 @@ Cada doc segue template fixo (10 seções, padrão estável cross-settings). Pla
 - **Áudio = ganchos textuais.** Apenas descrição evocativa do que se ouve. Sem LUFS, sem spec de layers, sem mix técnico. Spec sonora completa delegada a `audio-designer-composer` em Fase 2 de produção, em modo colaborativo.
 - **Vinhetas sensoriais** são prosa curta (4-8 linhas), sem diálogo, estilo "câmera entra em X". Servem como referência de mood para `art-director` e `level-designer` em blockout.
 - **Ganchos mecânicos** são conceitos de 1 linha. Detalhamento (regras de puzzle, balance de encontro, tabela de loot) cabe a docs de design dedicados em Fase 2.
-- **Sem em-dash horizontal em conteúdo narrativo.** Travessão (—) só em diálogo, padrão pt-br. Resto: vírgulas, pontos, parênteses.
+- **Zero em-dash horizontal (U+2014) em conteúdo narrativo.** Substituição por vírgulas, pontos, parênteses, dois pontos.
 
 ---
 
 ## Não fazer
 
-- Nunca usar "runa" (terminologia canônica: Glyph / Token / Conjuro / Codex — ver [[lore-bible]] §7.10).
-- Nunca "Sindicato dos Ferro-Velhos" (correto: FIR — Federação Industrial de Reciclagem).
-- Nunca "Iolanda" nem party antiga (Kira/Dimi/Tao) — substituídos integralmente.
+- Nunca usar "runa" (terminologia canônica: Glyph / Token / Conjuro / Codex, ver [[lore-bible]] §7.10).
+- Nunca "Sindicato dos Ferro-Velhos" (correto: FIR, Federação Industrial de Reciclagem).
+- Nunca "Iolanda" nem party antiga (Kira/Dimi/Tao); substituídos integralmente.
 - Adultos não aparecem como party. NPCs ambientais adultos são contexto, nunca companion ou figura central.
 - Lore já em [[lore-bible]] / [[timeline]] / [[factions]] não é repetida; é referenciada via wikilink.
 - Não inventar comandos de build / teste / engine.

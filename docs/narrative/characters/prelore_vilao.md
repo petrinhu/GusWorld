@@ -11,7 +11,7 @@ Locke argumentava que otimizar código para arquiteturas físicas específicas e
 Ele dedicou sua carreira ao desenvolvimento e à imposição de linguagens puramente interpretadas e dinamicamente tipadas executadas sobre uma máquina virtual universal.
 
 > "A compilação engessa a realidade em matrizes rígidas. A interpretação avalia a existência linha por linha, permitindo que a sintaxe do mundo seja reescrita durante o tempo de execução (*runtime*) sem a necessidade de reiniciar o sistema."
-> — Sterling Locke, *Tratado sobre a Supremacia do Script*
+> Sterling Locke, *Tratado sobre a Supremacia do Script*
 
 ### O Contraste Técnico com Gus Vector
 

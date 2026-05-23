@@ -1,6 +1,6 @@
 # GusWorld City (Cidade Ciber-gótica)
 
-> **Status:** Canônico (Bloco F — environmental storytelling).
+> **Status:** Canônico (Bloco F, environmental storytelling).
 > **Era predominante:** Era 3 (presente), construída sobre infra Era 2 e ruínas Era 1.
 > **Ato narrativo:** Ato 1 (introdução), hub persistente todos atos. Evolui visualmente conforme jogo progride.
 > **Companion home:** [[gus]] (Núcleo Metropolitano). Cross-act hub geral da party.
@@ -75,9 +75,9 @@ A sensação dominante é a de uma cidade que **funciona apesar de si mesma**. O
 
 **Nomeados (3):**
 
-- **Seu Bertoldo Caím** (62, técnico aposentado Era 2) — senta no mesmo banco da Praça da Compilação toda manhã das 7h às 9h. Lê jornal de papel. Hook: "vocês não viram a Lin Tórun assinar a placa, vocês não sabem o que é nostalgia." Comenta nome dos engenheiros Era 2 com erudição cansada. Aliado passivo (informações grátis se Gus para pra conversar).
-- **Vanda do Café** (47, vendedora itinerante café-de-neurônio) — empurra carrinho pelo Núcleo Metropolitano. Conhece rotina de todo mundo. Hook: "o moço do 6º andar dali, ele fica até as 2 da manhã. Aquilo não é trabalho, é saudade." Refere-se a Gargi, mãe de Gus. Vetor de fofoca útil; cobra 3 créditos por café.
-- **Patrulheiro Donato Fox** (28, FIR) — patrulha fixa Mercado da Sucata Honesta. Não-violento em interações casuais; cumpre cota. Hook: "Sterling diz isso, Sterling diz aquilo. Eu só quero o turno acabar." NPC ambíguo do regime; sinal de que FIR não é monolítica (foreshadow de Vitória Marquês em outras zonas; [[factions]] §3).
+- **Seu Bertoldo Caím** (62, técnico aposentado Era 2): senta no mesmo banco da Praça da Compilação toda manhã das 7h às 9h. Lê jornal de papel. Hook: "vocês não viram a Lin Tórun assinar a placa, vocês não sabem o que é nostalgia." Comenta nome dos engenheiros Era 2 com erudição cansada. Aliado passivo (informações grátis se Gus para pra conversar).
+- **Vanda do Café** (47, vendedora itinerante café-de-neurônio): empurra carrinho pelo Núcleo Metropolitano. Conhece rotina de todo mundo. Hook: "o moço do 6º andar dali, ele fica até as 2 da manhã. Aquilo não é trabalho, é saudade." Refere-se a Gargi, mãe de Gus. Vetor de fofoca útil; cobra 3 créditos por café.
+- **Patrulheiro Donato Fox** (28, FIR): patrulha fixa Mercado da Sucata Honesta. Não-violento em interações casuais; cumpre cota. Hook: "Sterling diz isso, Sterling diz aquilo. Eu só quero o turno acabar." NPC ambíguo do regime; sinal de que FIR não é monolítica (foreshadow de Vitória Marquês em outras zonas; [[factions]] §3).
 
 ## 7. Ganchos mecânicos
 
@@ -87,11 +87,11 @@ A sensação dominante é a de uma cidade que **funciona apesar de si mesma**. O
 
 ## 8. Vinhetas sensoriais (2 cenas curtas)
 
-*Vinheta 1 — Hora do trabalho (Praça da Compilação, 8h12 da manhã).*
+*Vinheta 1: Hora do trabalho (Praça da Compilação, 8h12 da manhã).*
 
 A câmera entra pela esquina norte. A fonte da Engrenagem-Mestra gira. Tique. Tique. Tique. Um vendedor empurra carrinho de café-de-neurônio passando pelo pedestal vazio. O cheiro do café cruza com o cheiro de alfafa morta da fonte. Uma criança de 9 anos atravessa correndo a praça segurando Janelarum infantil acendendo e apagando na mão. Ela passa por baixo do holograma cromado, que diz "continue", e some na rua lateral. O cronômetro do mecanismo bate em sincronia exata com o tique que ele sempre bate. Tique. O sol sobe atrás da Tetra-Torre.
 
-*Vinheta 2 — Noite no Núcleo (3h47 da madrugada).*
+*Vinheta 2: Noite no Núcleo (3h47 da madrugada).*
 
 A câmera começa em telhado do Edifício Vance. Uma antena caseira improvisada captando algo. Lá embaixo, três quadras vazias. O letreiro Janelarum trava em azul fantasmagórico, ascendendo e apagando ascendendo e apagando, sozinho, sem ninguém olhando. Na janela do 6º andar do Edifício Vance, uma silhueta de mulher segura ferro de solda sobre placa-mãe, postura calma de quem trabalha há horas. O drone Sterling Corp passa alto, longe o suficiente para virar apenas linha de luz vermelha cruzando o céu. A fonte da Praça, sete quadras adiante, ainda bate seu tique exato. A cidade dorme ouvindo.
 
@@ -102,15 +102,15 @@ A câmera começa em telhado do Edifício Vance. Uma antena caseira improvisada 
 - **Para Zona do Silêncio ([[07-zona-do-silencio.md|setting 07]]):** antenas mortas começam a aparecer no lado norte do Núcleo (boundary). Padrinho Tiago atravessa daqui pra lá regularmente. Versão antiga da Festa da Compilação acontece em quintal Neumann ali (Brígida hospeda).
 - **Para Anel Verde / Selve ([[02-selve-sombria.md|setting 02]]):** portal canônico de saída pelo Anel Verde. Caminhões de coleta forçada FIR usam essa rota. Folha biolúmen no para-choque sinaliza retorno.
 - **Para Catedrais Neo-Sylvania ([[03-catedrais-neo-sylvania.md|setting 03]]):** vestígios Neo-Sylvania na cidade (vitrais, cronômetro fonte, cripto-glifos chão) são amostra pequena. Catedrais reais ficam dentro da Selve. Bento atravessa daqui pra lá. Universidade Pública mantém pequena ala de estudos Asmódico no átrio.
-- **Para Cúpula Sterling (ato 3, setting 08 variação):** Cúpula é geográfica entre Núcleo e Anel Verde. Crescimento da Cúpula visível como skyline tumoral conforme jogo progride (Pillar 5 — hub evolui).
+- **Para Cúpula Sterling (ato 3, setting 08 variação):** Cúpula é geográfica entre Núcleo e Anel Verde. Crescimento da Cúpula visível como skyline tumoral conforme jogo progride (Pillar 5: hub evolui).
 
 ## 10. Cross-refs Bloco G
 
-- [[timeline]] — eventos visíveis aqui: Festa da Compilação ([[tradicoes-cultura]] §1), construção Edifício Vance (-90 a -70), construção Tetra-Torre Janelarum (-30), construção Cúpula Sterling (a partir de -12, crescendo on-screen durante ato 2/3).
-- [[in-world-docs]] — docs descobríveis no setting: doc 1 fragmento (átrio externo Cúpula, Ato 3); doc 2 (caixa zinco apartamento Berenger, no Mercado da Sucata side); doc 12 (terminal público Tetra-Torre Janelarum, loop contínuo); doc 9 (caixa zinco junto ao doc 2); doc 14 (servidor Cúpula, incursão ato 3).
-- [[tradicoes-cultura]] — costumes praticados aqui: Festa da Compilação (1º setembro, Praça); Dia do Tomo (14 janeiro, Praça vira mercado de problemas e soluções); cumprimento "Compila bem / Roda firme" universal Núcleo Metropolitano; feijão-computacional como prato cotidiano; vestuário funcional cinza-azul-marinho-ciano.
-- [[factions]] — facções presentes: Sterling Corp (sinalização e drones, propaganda), FIR (patrulha, Mercado da Sucata semi-controlado, caminhões), Underground do Silêncio (presença discreta, atravessa pra Zona do Silêncio, panfletos nos becos), Ordem Recursiva (Universidade Pública ala Asmódica, Mestre Lavínia Sevra pode aparecer em cerimônia), Cult Mirage (propaganda Atualização Sensorial vaza pela vizinhança Mirage), Pelicano Branco (Helena Sirinhaém eventualmente faz visita ao Mercado pra venda de ervas).
-- [[gus]] — Edifício Vance + apartamento Vance (save base canônica); Tavus-Drive operado em bancada Gargi.
+- [[timeline]], eventos visíveis aqui: Festa da Compilação ([[tradicoes-cultura]] §1), construção Edifício Vance (-90 a -70), construção Tetra-Torre Janelarum (-30), construção Cúpula Sterling (a partir de -12, crescendo on-screen durante ato 2/3).
+- [[in-world-docs]], docs descobríveis no setting: doc 1 fragmento (átrio externo Cúpula, Ato 3); doc 2 (caixa zinco apartamento Berenger, no Mercado da Sucata side); doc 12 (terminal público Tetra-Torre Janelarum, loop contínuo); doc 9 (caixa zinco junto ao doc 2); doc 14 (servidor Cúpula, incursão ato 3).
+- [[tradicoes-cultura]], costumes praticados aqui: Festa da Compilação (1º setembro, Praça); Dia do Tomo (14 janeiro, Praça vira mercado de problemas e soluções); cumprimento "Compila bem / Roda firme" universal Núcleo Metropolitano; feijão-computacional como prato cotidiano; vestuário funcional cinza-azul-marinho-ciano.
+- [[factions]], facções presentes: Sterling Corp (sinalização e drones, propaganda), FIR (patrulha, Mercado da Sucata semi-controlado, caminhões), Underground do Silêncio (presença discreta, atravessa pra Zona do Silêncio, panfletos nos becos), Ordem Recursiva (Universidade Pública ala Asmódica, Mestre Lavínia Sevra pode aparecer em cerimônia), Cult Mirage (propaganda Atualização Sensorial vaza pela vizinhança Mirage), Pelicano Branco (Helena Sirinhaém eventualmente faz visita ao Mercado pra venda de ervas).
+- [[gus]]: Edifício Vance + apartamento Vance (save base canônica); Tavus-Drive operado em bancada Gargi.
 
 ---
 

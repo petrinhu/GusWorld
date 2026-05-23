@@ -1,6 +1,6 @@
 # Setor Mirage
 
-> **Status:** Canônico (Bloco F — environmental storytelling).
+> **Status:** Canônico (Bloco F, environmental storytelling).
 > **Era predominante:** Era 2 (substrato cooperativo soterrado) + Era 3 (revestimento Sterling/Cult Mirage).
 > **Ato narrativo:** Ato 2 (arco [[iara-lumen]]; pode ser visitado em ato 1 como ambient).
 > **Companion home:** [[iara-lumen]] (Óxido, Cult Mirage desertora).
@@ -70,7 +70,7 @@ Nível -1: depósito convencional, equipamento holográfico. Nível -2: arquivo 
 | **Frasco de pigmento violeta vencido** | Atelier de Marlena Aurora, mural inacabado | Etiqueta de fabricação Era 2 cooperativa. Pigmento moído à mão. Marlena usava porque o industrial Sterling "tem chumbo escondido na fórmula" (Florín confirma se interrogado). |
 | **Folheto Atualização Sensorial XIV** ([[in-world-docs]] doc 4) | Terminais públicos do distrito | Versão pública: panfleto branco com gradient. Versão decifrada por Iara (Óxido): cláusula oculta de cessão de dados. |
 | **Lente de óculos quebrada com marca de batom** | Calçada perto do Teatro, depois de noite de festival | Adepta Filomena Garda saiu daquela noite com sequela neurológica leve. Ninguém recolhe. Sterling Corp considera "perdão técnico operacional". |
-| **Disco rígido de servidor Era 2 enferrujado** | Caçamba de descarte fora do nível -1 do Caleidoscópio | Etiqueta legível: "ARQUIVO COOPERATIVO DE BAIRRO — 1ª PARTE". Conteúdo: irretrievível com hardware comercial. Linda saberia recuperar parcialmente; Iara desconfia mas não pediu (orgulho). |
+| **Disco rígido de servidor Era 2 enferrujado** | Caçamba de descarte fora do nível -1 do Caleidoscópio | Etiqueta legível: "ARQUIVO COOPERATIVO DE BAIRRO, 1ª PARTE". Conteúdo: irretrievível com hardware comercial. Linda saberia recuperar parcialmente; Iara desconfia mas não pediu (orgulho). |
 | **Cronômetro de pulso quebrado em vitrine de penhor** | Loja de penhor da Avenida Refratada | Modelo Asmódico simples; herança de mestre obscuro pré-Era 3. Quem penhorou foi Cleomir Vasta há 2 anos (Knowledge alta: dossiê interno Cult). |
 | **Brasão Cult Mirage de pano gasto** | Pendurado na entrada do Beco dos Vestígios | Versão Era 2 do brasão (olho aberto, sem prisma). Florín Estopa mantém pendurado como protesto silencioso. |
 | **Caderno escolar de uma criança Cult** | Praça do Olho Refratado, banco | Páginas com desenhos de "minha hierofante favorita" e "meu sonho de ficar bonita pra sempre". Letra de criança de ~7 anos. Iara passa direto. Player atento sente o eco. |
@@ -81,7 +81,7 @@ Nível -1: depósito convencional, equipamento holográfico. Nível -2: arquivo 
 ## 4. Áudio diegético (ganchos)
 
 - **Pop hipersaturado Cult Mirage**, ritmo 128 BPM, vocais filtrados em auto-tune extremo. Toca em loop em alto-falantes públicos. Letra geralmente sobre "ser visto", "brilhar", "pertencer ao espetáculo". Quem mora aqui já não ouve conscientemente; só sente.
-- **Holografia Sterling Voice em loop** ([[in-world-docs]] doc 12). Versão Setor Mirage tem variação: "cidadã Não-Definida, sua identidade hoje é uma escolha estética". Loop a cada 90 segundos. Sutilmente fora de fase entre quatro postes diferentes — o som "viaja" pela rua.
+- **Holografia Sterling Voice em loop** ([[in-world-docs]] doc 12). Versão Setor Mirage tem variação: "cidadã Não-Definida, sua identidade hoje é uma escolha estética". Loop a cada 90 segundos. Sutilmente fora de fase entre quatro postes diferentes; o som "viaja" pela rua.
 - **Aplausos pré-gravados** vazando dos teatros menores em pulsos irregulares. Aplausos sem espetáculo, espetáculo sem público, depende do horário.
 - **Anúncio biossensor de festival próximo:** "Sua adesão sensorial foi reconhecida. Bem-vindo, adepto." (voz feminina suave, dirigida diretamente ao Tavus-Drive do Gus se ele passar perto do Caleidoscópio com bio-tag aberto). Gus pode silenciar com configuração; Iara fez o tutorial dela mesma.
 - **Tique mecânico baixíssimo** vindo de algum lugar não-localizável no Beco dos Vestígios. Cronômetro de latão antigo, escondido. Iara nunca soube de quem; sabe que é ali. Bento, se vier visitar (cross-arco), identifica: "alguém da Ordem deixou em vigília passiva. Ainda funciona."
@@ -92,7 +92,7 @@ Nível -1: depósito convencional, equipamento holográfico. Nível -2: arquivo 
 
 ## 5. Ruínas cross-era
 
-### 5.1 Era 1 — Pré-Código (Neo-Sylvania)
+### 5.1 Era 1: Pré-Código (Neo-Sylvania)
 
 **Nascente subterrânea Neo-Sylvania escondida sob três camadas de construção.** Sob o nível -3 das Catacumbas do Cult, há uma cavidade de pedra trabalhada com hidráulica analógica ainda operante: pequeno tanque de água com regulação por engrenagem de cobre verdete. A água sai fria, com pulsação de 1 batida a cada 8 segundos. Cripto-glifos cobrem o teto curvo (não-decifrados; foreshadow lore-profunda).
 
@@ -100,7 +100,7 @@ Acesso: parede de concreto Era 3 com fissura natural por trás de um armário Cu
 
 Significado: **antes de tudo, este lugar foi cooperativo.** A cidade Neo-Sylvania que existia aqui tinha distrito que oferecia água pra quem precisava, regulada por mecanismo público. Trezentos anos depois, o mesmo solo virou distrito que oferece **espetáculo** pra quem precisa de identidade, regulado por mecanismo proprietário. Inversão simétrica deliberada.
 
-### 5.2 Era 2 — Era do Compilador
+### 5.2 Era 2: Era do Compilador
 
 **Bairro cooperativo original.** Auge Era 2 (~ano -100 a -50): o que hoje é Setor Mirage era o **Bairro do Espelho Limpo**, distrito de comércio honesto. Marketing honesto era trademark do bairro: gravavam em latão promessas vinculantes ("se a peça não rende, devolva", "se o serviço atrasar, desconto"). Placas dessas existem na praça central, sob o pedestal do Olho Refratado (§2.1), nas portas-fundo de várias lojas hoje fechadas, em rodapés de prédios públicos.
 
@@ -113,7 +113,7 @@ Sobrevivências visíveis:
 
 **Tensão cross-eras:** Era 2 era marketing honesto. Era 3 é marketing manipulador. O substrato é o mesmo. Quem deletou o que se prometia foi a Era 3.
 
-### 5.3 Era 3 — Era Sterling
+### 5.3 Era 3: Era Sterling
 
 **Revestimento total.** Painéis LED Sterling em todos os postes, telas curvas montadas sobre fachadas Era 2, hologramas suspensos em torre. Atualização Sensorial (Cult, capturada por Sterling em -6) como evento principal. Biossensores em assentos públicos. Cabo Óxido coaxial saindo de fresta de calçada.
 
@@ -175,13 +175,13 @@ Vendedora dos perfumes-memória. Cobertura cínica que esconde informante leve d
 - **Encontro corredor-de-espelhos** (catacumbas Cult, nível -2): arena com 5 espelhos refrativos. Inimigos veem 5 Gus; Gus vê 5 inimigos. Cada espelho quebrado anula uma cópia. Iara guia ordem ótima (Knowledge média = guia; baixa = adivinhação).
 - **Exploração vertical:** prédios do Mirage têm 4-5 andares, fachadas escaláveis por andaime de eventos Cult. Cobertura visual permite ver "atrás" dos hologramas. Recompensa Knowledge: lore-fragments + linha-de-visão pra Praça do Olho Refratado.
 - **Stealth ambient:** distrito tem patrulhas Cult contratadas + drones Sterling de baixa altitude. Gus pode atravessar sem combate usando **cifragem Iara** (token criptográfico + bool aliado). Falha em ato 2 = encontro forçado; sucesso = bypass + bonus Knowledge entry sobre rotas Cult.
-- **Hub social:** Praça do Olho Refratado funciona como hub menor durante ato 2 — Gus volta entre arcos pra ouvir ambient mudar (NPCs comentam progresso da resistência artista, fofocas Cult, descontentamento crescente pós-festival sabotado).
+- **Hub social:** Praça do Olho Refratado funciona como hub menor durante ato 2; Gus volta entre arcos pra ouvir ambient mudar (NPCs comentam progresso da resistência artista, fofocas Cult, descontentamento crescente pós-festival sabotado).
 
 ---
 
 ## 8. Vinhetas sensoriais
 
-### Vinheta A — "A placa que estava aí o tempo todo"
+### Vinheta A: "A placa que estava aí o tempo todo"
 
 ```
 Iara pára na praça do Olho Refratado. Não fala.
@@ -200,7 +200,7 @@ antiga.
 
   "SE A ÁGUA NÃO ROLAR LIMPA, COMUNIQUE.
    ESTA FONTE É DO BAIRRO."
-   — Cooperativa do Espelho Limpo, ano -84
+   Cooperativa do Espelho Limpo, ano -84
 
 LED reacende. Logo Cult volta.
 
@@ -216,7 +216,7 @@ Iara: "Tem quatro. Quatro que eu sei.
 (Continua andando. Não olha pra trás.)
 ```
 
-### Vinheta B — "Corredor-de-espelhos, perseguição"
+### Vinheta B: "Corredor-de-espelhos, perseguição"
 
 ```
 Catacumbas, nível -2. Sirene fina de detecção Óxido começa.
@@ -265,14 +265,14 @@ Indiferente à perseguição.
 ## 10. Cross-refs Bloco G
 
 - **[[in-world-docs]] doc 4** (panfleto Atualização Sensorial; versão decifrada Iara revela cláusula oculta de cessão de dados). Aparece em terminais públicos do distrito.
-- **[[in-world-docs]] doc 12** (anúncio Sterling Voice — variação Mirage). Captura automática por óculos táticos.
+- **[[in-world-docs]] doc 12** (anúncio Sterling Voice, variação Mirage). Captura automática por óculos táticos.
 - **[[timeline]] -35** (fundação Cult Mirage genuína; Sonja co-funda).
 - **[[timeline]] -12** (Iara nasce; abandonada bebê em catedral menor anexa ao Setor Mirage).
 - **[[timeline]] -6** (Adila assume liderança pró-Sterling; Sonja forçada a retiro espiritual; morre ano seguinte). Marca de queimadura no palco (§2.2) é desse período.
 - **[[timeline]] -6** (Iara adotada formalmente aos 6; treinamento manipulação começa).
 - **[[timeline]] -1** (Iara deserta aos 11). Catedrala menor anexa onde foi deixada-de-bebê fica em quadra adjacente ao Caleidoscópio.
 - **[[factions]] §5** (Cult Mirage: facção pró-Sterling dominante + facção artista subjugada; NPCs nomeados Adila, Cleomir, Tâmela, Otoniel, Florín, Marlena, Patrício Velô, Sérgio, Filomena, Sonja).
-- **[[tradicoes-cultura]] §6** (Atualização Sensorial — catalyst arco Iara).
+- **[[tradicoes-cultura]] §6** (Atualização Sensorial, catalyst arco Iara).
 - **[[tradicoes-cultura]] cumprimentos Mirage** ("brilhe bem" / "cores firmes"; gesto mão aberta palma pra cima). Variação artista: "brilhe baixo".
 - **[[iara-lumen]] memórias formativas** (Sérgio Brimber a encontra bebê; Adila a treina dos 6 aos 11; Iara deserta aos 11). Quatro memórias inteiramente ancoradas geograficamente neste distrito.
 - **[[lore-bible]] §5.1 distrito 3** (Setor Mirage canônico). §8.3 canal 2 (Patch-Zero sussurra em zonas infectadas; sub-encontro opcional nível -3).
@@ -280,4 +280,4 @@ Indiferente à perseguição.
 
 ---
 
-**Última revisão:** 2026-05-15. Canônico (Bloco F — environmental storytelling). Atualizações exigem aprovação do criador supremo.
+**Última revisão:** 2026-05-15. Canônico (Bloco F, environmental storytelling). Atualizações exigem aprovação do criador supremo.
