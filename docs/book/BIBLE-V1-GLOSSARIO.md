@@ -508,7 +508,7 @@
 
 **Velhusto (Mestre-Hierofante).** 70 anos, líder atual canônico da Ordem Recursiva. Mentor distante de Bento "Requiem" Chevalier. Voz solene baixa. Apoiou Bento contra a facção pró-Sterling com custo (perdeu três aliados próximos). Mantém biblioteca canônica e guarda diário pessoal de Aldebrando. *Cross-ref:* factions.md §2; lore-bible.md §14.
 
-**Gargi Vance.** 38 anos, mãe biológica do Gus, técnica de bancada eletrônica, trabalha em casa. Safe base canônica do Gus (apartamento Vance no Edifício Vance, 6º andar). Separada amigavelmente de Pyotor desde Gus aos 6 anos (-5). Presença cotidiana primária. *Cross-ref:* CHARS.md §4; environments/01-cidade-cyber-gotica.md.
+**Gargi Vance.** 43 anos, mãe biológica do Gus, técnica de bancada eletrônica, trabalha em casa. Safe base canônica do Gus (apartamento Vance no Edifício Vance, 6º andar). Separada amigavelmente de Pyotor desde Gus aos 6 anos (-5). Presença cotidiana primária. *Cross-ref:* CHARS.md §4; environments/01-cidade-cyber-gotica.md.
 
 **Verônica Atelaiá.** Cientista em -45, primeira teorizadora canônica de Patch-Zero como anomalia ontológica genuína (tratado anônimo *Sobre o Comportamento Emergente dos Padrões Fechados*). Sterling Locke classificou como "anomalia folclórica" em -25. Descendente matrilinear direta de Atelaiá Chevalier. Cronista in-character §10 deep-lore Era 1. *Cross-ref:* factions.md; deep/eras/era-1-pre-codigo.md §10.
 
