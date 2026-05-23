@@ -1,4 +1,4 @@
-# Lore Bible — GusWorld
+# Lore Bible: GusWorld
 
 > **Status:** Revisão 1 concluída em sessão colaborativa com criador supremo (2026-05-15). Substitui versão prévia (que tinha Iolanda como antagonista) integralmente. **Canônico.**
 >
@@ -57,16 +57,16 @@ A maioria dos cidadãos da Era 2 trata Neo-Sylvania como folclore: "lendas antes
 
 ### Era 2: Era do Compilador
 
-A reconstrução. Há cerca de 150 anos antes do jogo, a civilização atual emergiu — não como continuação direta de Neo-Sylvania, mas como retomada parcial sobre os escombros.
+A reconstrução. Há cerca de 150 anos antes do jogo, a civilização atual emergiu, não como continuação direta de Neo-Sylvania, mas como retomada parcial sobre os escombros.
 
 **O que aconteceu:**
 
 - Pioneiros descobriram que o substrato natural (a Selve, os mecanismos de Neo-Sylvania sobreviventes, os cripto-glifos) era **legível** se tratado como linguagem.
 - A primeira geração de engenheiros desenvolveu **C-Arcane**: linguagem de baixo nível compilada para o substrato físico do mundo. C-Arcane respeita o hardware. Cada conjuro é otimizado para a arquitetura local.
 - Outras linguagens surgiram em paralelo:
-  - **Asmódico** (Bento) — analógico, herdado das catedrais Neo-Sylvania, executado em relojoaria e ressonância acústica.
-  - **Óxido** (Iara, Linda) — linguagem de baixo nível voltada a segurança e precisão; quase ilegível para iniciantes mas indestrutível em runtime.
-  - **Pythia** (Cauã, Jaci) — linguagem de scripting rápido, interpretada, ideal para protótipos e bio-hacking. Compila menos, escreve mais.
+  - **Asmódico** (Bento): analógico, herdado das catedrais Neo-Sylvania, executado em relojoaria e ressonância acústica.
+  - **Óxido** (Iara, Linda): linguagem de baixo nível voltada a segurança e precisão; quase ilegível para iniciantes mas indestrutível em runtime.
+  - **Pythia** (Cauã, Jaci): linguagem de scripting rápido, interpretada, ideal para protótipos e bio-hacking. Compila menos, escreve mais.
 - A **Federação Industrial de Reciclagem** (FIR) emergiu nesse período como esforço cooperativo de aproveitamento de hardware antigo. Vermelha de boa-fé no começo. Capturada por interesses corporativos depois.
 - Cidades cresceram em torno dos sítios Neo-Sylvania melhor preservados. **GusWorld City** é a maior dessas cidades; outras três grandes existem nesta região do mundo (ver §10).
 - Tom geral da Era 2: pragmatismo cooperativo, código aberto, conhecimento compartilhado. O **Tomo da Pilha Sobrecarregada** (referenciado em `comic-reliefs.md` cena 7) data dessa era: documentação coletiva de soluções, mantida por séculos.
@@ -87,7 +87,7 @@ Nos 25 anos seguintes, Sterling:
 4. Consolidou tudo em **Sterling Corp** (sede: Cúpula Sterling, ato 3).
 5. Subordinou a FIR como vassala (ela ainda finge cooperativa; é cartel mafioso lavando ativos pra Sterling).
 6. Lançou hardware de consumo agressivo: Janelarum (sistema operacional comercial frágil que vende serviços de manutenção; ver `comic-reliefs.md` cena 11), terminais públicos, infraestrutura privatizada de rede.
-7. Iniciou a operação **GRE — Global Runtime Environment**: envelopar a Selve Sombria em uma máquina virtual interpretada, transformando ecossistemas em variáveis editáveis por linha de comando.
+7. Iniciou a operação **GRE (Global Runtime Environment)**: envelopar a Selve Sombria em uma máquina virtual interpretada, transformando ecossistemas em variáveis editáveis por linha de comando.
 
 A Era 3 está só na metade. O Sistema ainda funciona aparentemente. Mas a Selve já mostra sinais: anomalias inexplicáveis, fauna se comportando fora do padrão fractal, ruído estranho na rede.
 
@@ -109,7 +109,7 @@ Cidades como GusWorld City são reconstruções tecnológicas sobre ruínas viva
 
 ---
 
-## 5. Geografia — GusWorld City (megacidade ciber-gótica)
+## 5. Geografia: GusWorld City (megacidade ciber-gótica)
 
 Hub central persistente. Visualmente evolui conforme o jogo progride (Pillar 5): no início, neon vibrante e movimento; conforme Sterling expande controle, frio, drones aumentam, NPCs somem.
 
@@ -129,12 +129,12 @@ Os Dutos Infernais (setting Cauã, Pillar 5) **não são um distrito de superfí
 
 Sede de Sterling Corp. Visualmente é o mesmo setting com duas zonas opostas:
 
-- **Exterior — Catedrais de Silício corrompidas:** torres híbridas onde Sterling tentou fundir arquitetura cidade + biomassa Selve. Falhou. Resultado: estrutura morta-viva, mistura repulsiva e tecnicamente fascinante. Cresce como tumor entre o Núcleo Metropolitano e o Anel Verde.
-- **Interior — Cúpula Sterling:** santuário euclidiano estéril. Geometria perfeita, branco-cromo, sem qualquer traço orgânico. Espelhos. Servidores silenciosos. É onde Sterling vive. É onde o boss final acontece (2 fases: Rede Distribuída → Locke Core).
+- **Exterior (Catedrais de Silício corrompidas):** torres híbridas onde Sterling tentou fundir arquitetura cidade + biomassa Selve. Falhou. Resultado: estrutura morta-viva, mistura repulsiva e tecnicamente fascinante. Cresce como tumor entre o Núcleo Metropolitano e o Anel Verde.
+- **Interior (Cúpula Sterling):** santuário euclidiano estéril. Geometria perfeita, branco-cromo, sem qualquer traço orgânico. Espelhos. Servidores silenciosos. É onde Sterling vive. É onde o boss final acontece (2 fases: Rede Distribuída → Locke Core).
 
 ---
 
-## 6. Geografia — Selve Sombria (fronteira tecnorgânica)
+## 6. Geografia: Selve Sombria (fronteira tecnorgânica)
 
 Ecossistema sobrevivente da Era 1. Auto-organizado em padrões matemáticos. Hostil a quem ignora as regras; legível para quem aprende.
 
@@ -154,7 +154,7 @@ Jaci nasceu numa aldeia da fronteira-Selve (vilarejo do Pelicano Branco, EE-14 e
 2. **Bug = anomalia visível.** Glitch visual, ruído, geometria quebrada são sinais diagnósticos, não decoração.
 3. **Vírus se propaga por contato com runtime hospedeiro.** Estagiar a contenção é mais barato que purgar tarde.
 4. **Bioluminescência é log.** Cor e pulsação codificam estado do organismo. Gus lê com óculos + matriz; outros aprendem com tempo.
-5. **A Selve não é hostil — é um sistema sob ataque.** Inimigos verdadeiros são os que injetam vírus.
+5. **A Selve não é hostil, e sim um sistema sob ataque.** Inimigos verdadeiros são os que injetam vírus.
 
 ### 6.3 Catedrais Neo-Sylvania dentro da Selve
 
@@ -210,7 +210,7 @@ Modificadores aplicam-se a qualquer família. Estes são os seis tipos de dado c
 | **Stream** | Fluxo contínuo. Conjuros que sustentam efeito por turnos. |
 | **Null** | Negação, ausência. Anula outro efeito. Conjuro de contra-conjuro. |
 
-### 7.5 Sintaxe — stack 3 slots
+### 7.5 Sintaxe: stack 3 slots
 
 Cada conjuro = combinação de **três tokens** carregados no Tavus-Drive:
 
@@ -234,12 +234,12 @@ O **Codex de Conjuros** é o deck pessoal. **Compilação do Codex** é o ato de
 
 Escopo G1:
 
-- **40-60 tokens** totais no jogo (não conjuros — tokens, que combinam). Combinatoriamente, ~200 conjuros pré-planejados surgem.
+- **40-60 tokens** totais no jogo (não conjuros, mas tokens, que combinam). Combinatoriamente, ~200 conjuros pré-planejados surgem.
 - **15 tokens em campo** (deck ativo). Trocáveis fora de combate.
 - **Mestria por uso**: token cresce com repetição (Pillar 1).
 - **5-10 easter-egg combos**: combinações não-óbvias que destravam efeitos surpresa.
 
-### 7.7 Biblioteca de conjuros — amostra-template
+### 7.7 Biblioteca de conjuros: amostra-template
 
 Não vamos listar os 200 aqui. Apenas amostra para fixar o tom:
 
@@ -265,7 +265,7 @@ Combos não óbvios. Total: 5-10 destraváveis. Exemplos sem revelação complet
 - **Null x Null** → contra-conjuro perfeito; anula totalmente o próximo conjuro inimigo, com custo alto.
 - Outros documentados no Diário do Gus conforme jogador descobre.
 
-### 7.9 Asmódico — exceção declarada (Bento)
+### 7.9 Asmódico: exceção declarada (Bento)
 
 Asmódico é **a linguagem analógica de Neo-Sylvania**. Roda em relojoaria de latão, ressonância acústica, ancoragem mecânica. Bento herdou da Ordem Recursiva (Catedrais de Neo-Sylvania, setting 2, Pillar 5).
 
@@ -276,7 +276,7 @@ Asmódico é **a linguagem analógica de Neo-Sylvania**. Roda em relojoaria de l
 - Cada habilidade tem ciclo próprio (cronômetro físico no peitoral; ver spec Bento).
 - Não é flexível como C-Arcane. É **previsível, lento e firme**.
 
-**Justificativa de pillar:** relógio mecânico é state machine, só substrato diferente. Asmódico segue Pillar 2 ("sistema formal computável"); apenas opera em latão e mola em vez de silício. Drama interno party: Asmódico é tese rival ao C-Arcane do Gus. Atrito narrativo (ver `comic-reliefs.md` cena 2 — "Tabulações vs Espaços" e cena 8 — "Comentários em Latim").
+**Justificativa de pillar:** relógio mecânico é state machine, só substrato diferente. Asmódico segue Pillar 2 ("sistema formal computável"); apenas opera em latão e mola em vez de silício. Drama interno party: Asmódico é tese rival ao C-Arcane do Gus. Atrito narrativo (ver `comic-reliefs.md` cena 2, "Tabulações vs Espaços" e cena 8, "Comentários em Latim").
 
 ### 7.10 Glossário terminológico (sem "runa")
 
@@ -298,7 +298,7 @@ Asmódico é **a linguagem analógica de Neo-Sylvania**. Roda em relojoaria de l
 
 ---
 
-## 8. Patch-Zero — natureza, origem, manifestação
+## 8. Patch-Zero: natureza, origem, manifestação
 
 ### 8.1 O que é
 
@@ -322,7 +322,7 @@ Patch-Zero não foi criado por uma fonte só. Quatro vetores convergiram:
 
 Patch-Zero não aparece como inimigo único. Aparece **simultaneamente em quatro canais diegéticos**:
 
-#### Canal 1 — Texto no Diário do Gus
+#### Canal 1: Texto no Diário do Gus
 
 Entries surgem **sem que o jogador as escreva**. Pseudocódigo corrompido, com glitches tipográficos:
 
@@ -336,11 +336,11 @@ não sou seu inimigo. ainda.
 
 Frequência: 1-3 entries por arco companion. Aparecem em capítulos onde a infecção da Selve está mais ativa.
 
-#### Canal 2 — Áudio ambient
+#### Canal 2: Áudio ambient
 
-Zonas infectadas têm sussurros baixos misturados ao soundscape. Não são vozes claras: são padrões reconhecíveis se você ouve com atenção. Áudio diegético — gravado, não trilha sonora. Sterling Corp não consegue limpar o ruído.
+Zonas infectadas têm sussurros baixos misturados ao soundscape. Não são vozes claras: são padrões reconhecíveis se você ouve com atenção. Áudio diegético (gravado, não trilha sonora). Sterling Corp não consegue limpar o ruído.
 
-#### Canal 3 — Persona dialogável em boss arenas
+#### Canal 3: Persona dialogável em boss arenas
 
 Em três encontros chave (mid-ato 2, final ato 2, mid-ato 3), Patch-Zero **fala diretamente com Gus** via terminal projetado, espelho rachado, ou superfície reflexiva qualquer. Oferece propostas:
 
@@ -350,9 +350,9 @@ Em três encontros chave (mid-ato 2, final ato 2, mid-ato 3), Patch-Zero **fala 
 
 Gus pode aceitar, recusar, negociar. **Todas as opções têm consequência mas nenhuma é "boa"**: Patch-Zero mente sobre uma porcentagem variável das próprias afirmações.
 
-#### Canal 4 — Bug visual ambient
+#### Canal 4: Bug visual ambient
 
-Em zonas infectadas, o shader Perlin que rege flora/fauna **glitcha visualmente**: descontinuidades, faixas de gradiente quebradas, mesh popping. Não é bug do jogo — é bug **do mundo**. Reforça lore-via-imagem (mostre não conte).
+Em zonas infectadas, o shader Perlin que rege flora/fauna **glitcha visualmente**: descontinuidades, faixas de gradiente quebradas, mesh popping. Não é bug do jogo, e sim bug **do mundo**. Reforça lore-via-imagem (mostre não conte).
 
 ### 8.4 Relação com Sterling
 
@@ -401,7 +401,7 @@ Seis facções paralelas operam em GusWorld City e adjacências. Pirâmide de po
 
 | # | Facção | Postura vs Gus | Companion |
 |---|---|---|---|
-| 1 | **Sterling Corp** | Antagonista absoluta | — |
+| 1 | **Sterling Corp** | Antagonista absoluta | (nenhum) |
 | 2 | **Ordem Recursiva** | Aliada cautelosa, tradicionalista | Bento |
 | 3 | **Federação Industrial de Reciclagem (FIR)** | Hostil disfarçada (vassala Sterling) | Dante (ex-funcionário; contato corrompido) |
 | 4 | **Selve Sombria** (facção natural) | Aliada se respeitada | Jaci |
@@ -436,7 +436,7 @@ Hospital cobra crédito por cura rápida (Pillar 4 / hospital + economia). Cura 
 
 ### 11.5 Tabus e honra
 
-- **Histórico apagado é tabu** entre tradicionalistas (Ordem Recursiva, Underground): "histórico é como a gente sabe pra onde a coisa vai" (citação de Gus em `comic-reliefs.md` cena 4 — foreshadow Dante).
+- **Histórico apagado é tabu** entre tradicionalistas (Ordem Recursiva, Underground): "histórico é como a gente sabe pra onde a coisa vai" (citação de Gus em `comic-reliefs.md` cena 4; foreshadow Dante).
 - **Honrar o substrato** é virtude técnica: bom programador respeita o hardware. Mau programador (paradigma Sterling) trata hardware como descartável.
 - **Quebrar contrato com a Selve** (entrar sem respeito, extrair sem dar) é desonra entre pesquisadores éticos. Sterling Corp violou esse contrato sistematicamente.
 
@@ -464,46 +464,46 @@ Hospital cobra crédito por cura rápida (Pillar 4 / hospital + economia). Cura 
 
 ### Era 1 (Pré-Código)
 
-- **~-820** — *Anomalia Primeira* registrada em cripto-glifo: "o limite que escolheu falar". Hipótese arqueológica: ancestral de [[patch-zero]]. Cripto-glifo lido por [[gus]] + [[bento-requiem]] no arco Bento. Sterling rejeita publicamente; Ordem Recursiva considera credível.
-- **~-800** — Coletivo de mestres-engenheiros Neo-Sylvania tenta domesticar a anomalia. Precedente direto do fracasso Sterling. **História se repete.**
-- **~-750** — Queda parcial Neo-Sylvania. Catedral-Mãe lacrada por dentro. Coordenadas preservadas em cripto-glifo (descobrível apenas em ending Ouro; ver [[in-world-docs]] doc 15).
-- **~-720** — Êxodo. Aldeias-fronteira atuais (vilarejo do Pelicano Branco inclusive) descendem desses sobreviventes.
+- **~-820**: *Anomalia Primeira* registrada em cripto-glifo, "o limite que escolheu falar". Hipótese arqueológica: ancestral de [[patch-zero]]. Cripto-glifo lido por [[gus]] + [[bento-requiem]] no arco Bento. Sterling rejeita publicamente; Ordem Recursiva considera credível.
+- **~-800**: Coletivo de mestres-engenheiros Neo-Sylvania tenta domesticar a anomalia. Precedente direto do fracasso Sterling. **História se repete.**
+- **~-750**: Queda parcial Neo-Sylvania. Catedral-Mãe lacrada por dentro. Coordenadas preservadas em cripto-glifo (descobrível apenas em ending Ouro; ver [[in-world-docs]] doc 15).
+- **~-720**: Êxodo. Aldeias-fronteira atuais (vilarejo do Pelicano Branco inclusive) descendem desses sobreviventes.
 
 ### Era 2 (Compilador)
 
-- **-150** — Primeira linha C-Arcane compilada. Festa da Compilação anual ([[tradicoes-cultura]] §1).
-- **-115** — Asmódico codificado formalmente. **Mestre Atelaiá Chevalier** (ancestral direto Bento, 5 gerações antes) é codificador-mãe.
-- **-110** — Óxido desenvolvido. **Engenheira-mãe Tamara Neumann** (ancestral materna direta Linda).
-- **-100** — Tomo da Pilha Sobrecarregada nasce. Documentação coletiva canônica.
-- **-95** — Pythia desenvolvida em parceria **Iremar Berenger + Anhuera Vanderbist** (ancestrais de Cauã e Jaci).
-- **-80** — *Tragédia da Catedral Menor de São Camilo.* 17 mestres morrem em uma noite por contaminação anomalia. Atelaiá Chevalier registra em diário pessoal (preservado até hoje; ver [[in-world-docs]] doc 3). Protocolo "Selagem Asmódica" criado em resposta. Trauma fundador Ordem Recursiva.
-- **-50** — Federação Industrial de Reciclagem (FIR) fundada como cooperativa de boa-fé.
-- **-45** — Vilarejo do Pelicano Branco formalizado. **Anciã Soraia Vanderbist** (bisavó Jaci) lidera.
-- **-45** — Tratado anônimo *Sobre o Comportamento Emergente dos Padrões Fechados* publicado em rede acadêmica clandestina. Atribuído hipoteticamente à **Verônica Atelaiá** (descendente Atelaiá Chevalier; última grande pensadora pré-Sterling). Teorizou Patch-Zero 42 anos antes da localização Sterling em -3 (ver [[in-world-docs]] doc 10). Ignorada na época.
-- **-40** — Underground do Silêncio surge informalmente.
-- **-35** — Cult Mirage surge como movimento artístico genuíno. Co-fundadora **Sonja Murmúrio** (mãe biológica da futura hierofante manipuladora Adila).
-- **-34** — **Sonja Murmúrio morre** em circunstâncias nunca esclarecidas. Adila Murmúrio assume formalmente liderança facção pró-Sterling do Cult Mirage no mesmo ano sob tutela transitória; facção dual artista + pró-Sterling consolidada desde então. Versão pública oficial Adila: "afastamento por saúde, retiro contemplativo".
+- **-150**: Primeira linha C-Arcane compilada. Festa da Compilação anual ([[tradicoes-cultura]] §1).
+- **-115**: Asmódico codificado formalmente. **Mestre Atelaiá Chevalier** (ancestral direto Bento, 5 gerações antes) é codificador-mãe.
+- **-110**: Óxido desenvolvido. **Engenheira-mãe Tamara Neumann** (ancestral materna direta Linda).
+- **-100**: Tomo da Pilha Sobrecarregada nasce. Documentação coletiva canônica.
+- **-95**: Pythia desenvolvida em parceria **Iremar Berenger + Anhuera Vanderbist** (ancestrais de Cauã e Jaci).
+- **-80**: *Tragédia da Catedral Menor de São Camilo.* 17 mestres morrem em uma noite por contaminação anomalia. Atelaiá Chevalier registra em diário pessoal (preservado até hoje; ver [[in-world-docs]] doc 3). Protocolo "Selagem Asmódica" criado em resposta. Trauma fundador Ordem Recursiva.
+- **-50**: Federação Industrial de Reciclagem (FIR) fundada como cooperativa de boa-fé.
+- **-45**: Vilarejo do Pelicano Branco formalizado. **Anciã Soraia Vanderbist** (bisavó Jaci) lidera.
+- **-45**: Tratado anônimo *Sobre o Comportamento Emergente dos Padrões Fechados* publicado em rede acadêmica clandestina. Atribuído hipoteticamente à **Verônica Atelaiá** (descendente Atelaiá Chevalier; última grande pensadora pré-Sterling). Teorizou Patch-Zero 42 anos antes da localização Sterling em -3 (ver [[in-world-docs]] doc 10). Ignorada na época.
+- **-40**: Underground do Silêncio surge informalmente.
+- **-35**: Cult Mirage surge como movimento artístico genuíno. Co-fundadora **Sonja Murmúrio** (mãe biológica da futura hierofante manipuladora Adila).
+- **-34**: **Sonja Murmúrio morre** em circunstâncias nunca esclarecidas. Adila Murmúrio assume formalmente liderança facção pró-Sterling do Cult Mirage no mesmo ano sob tutela transitória; facção dual artista + pró-Sterling consolidada desde então. Versão pública oficial Adila: "afastamento por saúde, retiro contemplativo".
 
 ### Era 3 (Sterling)
 
-- **-25** — Sterling Locke publica tese DRE. Rejeitado pela academia. Ponto de inflexão.
-- **-19** — Apex-Data Systems entra em Chapter 11. **Inácia Berenger** (mãe Cauã) demitida; trauma família.
-- **-16** — Audit interno Apex-Data vazado por engenheiro anônimo (provavelmente **Bartolo Penkin**, desaparecido em -12; ver [[in-world-docs]] doc 5). Underground preserva.
-- **-15** — Nexus-Cloud colapsa.
-- **-5** — *Acidente da Subestação 7.* **Davi Berenger** (16, irmão Cauã) morre. Causa oficial: negligência. Causa real (ending Ouro): alvo deliberado por documentar irregularidades FIR. Bilhete final preservado por Inácia ([[in-world-docs]] doc 13). Cauã tinha 8 anos.
-- **-12** — Core-Synth liquidada. Sterling consolida Sterling Corp. Construção da Cúpula começa.
-- **-10** — Operação GRE iniciada (projeto interno classificado "Projeto Continente").
-- **-8** — Cooperativa familiar **Alencar destruída** por engenharia financeira FIR-Sterling. **Salviano Alencar** (pai Dante) morre 6 meses depois. Wound canônico Dante.
-- **-8** — *Batida na casa Neumann.* Toca-discos histórico apreendido. Linda (4) vê. **Otmar Neumann** salva agulha intacta antes da apreensão; entrega à filha. Pingente Linda.
-- **-8** — *Surto silencioso no Pelicano Branco.* **Lia e Solano Vanderbist** (pais Jaci) morrem. Causa oficial: anomalia botânica. Causa real (ending Ouro): vetor experimental Sterling. Mariana suspeita; nunca prova.
-- **-7** — *Contaminação da Catedral Menor de Atelaiá.* Mestre-Aprendiz **Hilário Tepenkov** (companheiro estudos Bento) morre. Bento (7) presente; sobrevive por estar perto do escudo Velhusto. Patch-Zero pré-existente confirmado.
-- **-6** — **Adila Murmúrio** consolida tutela administrativa plena Cult Mirage pró-Sterling (passa de Hierofante nominal a operacional plena). Sonja Murmúrio, morta em -34 aos 33 anos (canon timeline:86 + CHARS:82 + factions:505), deixa o vínculo materno operando há vinte e oito anos como ausência calibrada.
-- **-5** — **Dante (8 anos) recrutado por Diretor Cassiano Vorto da FIR.** Aliciamento canônico começa.
-- **-3** — Sterling Corp localiza bug primordial Patch-Zero. Tentativa de captura. Falha parcial. **Catedral Menor de São Vargas saqueada** por Sterling Corp. Mestres **Ardenia Falke** e **Cândido Rui** desaparecem. Wound institucional Ordem Recursiva.
-- **-2** — Cross-contamination via amostra Polis-Vermelha. **Polis-Vermelha cai.** **Padrinho Tiago** sai da aposentadoria.
-- **-1** — **Iara deserta do Cult Mirage** aos 11 anos.
-- **-0.5** — **Aldebrando Chevalier (pai Bento) morre** em incursão à catedral perdida. Causa real: eliminado por descobrir interferência precoce Sterling. Diário pessoal de Aldebrando preservado por Velhusto, entregue a Bento no início do jogo.
-- **-0.25 (3 meses antes)** — **Patch-Zero escapa do laboratório central Sterling.** Catalyst macro.
+- **-25**: Sterling Locke publica tese DRE. Rejeitado pela academia. Ponto de inflexão.
+- **-19**: Apex-Data Systems entra em Chapter 11. **Inácia Berenger** (mãe Cauã) demitida; trauma família.
+- **-16**: Audit interno Apex-Data vazado por engenheiro anônimo (provavelmente **Bartolo Penkin**, desaparecido em -12; ver [[in-world-docs]] doc 5). Underground preserva.
+- **-15**: Nexus-Cloud colapsa.
+- **-5**: *Acidente da Subestação 7.* **Davi Berenger** (16, irmão Cauã) morre. Causa oficial: negligência. Causa real (ending Ouro): alvo deliberado por documentar irregularidades FIR. Bilhete final preservado por Inácia ([[in-world-docs]] doc 13). Cauã tinha 8 anos.
+- **-12**: Core-Synth liquidada. Sterling consolida Sterling Corp. Construção da Cúpula começa.
+- **-10**: Operação GRE iniciada (projeto interno classificado "Projeto Continente").
+- **-8**: Cooperativa familiar **Alencar destruída** por engenharia financeira FIR-Sterling. **Salviano Alencar** (pai Dante) morre 6 meses depois. Wound canônico Dante.
+- **-8**: *Batida na casa Neumann.* Toca-discos histórico apreendido. Linda (4) vê. **Otmar Neumann** salva agulha intacta antes da apreensão; entrega à filha. Pingente Linda.
+- **-8**: *Surto silencioso no Pelicano Branco.* **Lia e Solano Vanderbist** (pais Jaci) morrem. Causa oficial: anomalia botânica. Causa real (ending Ouro): vetor experimental Sterling. Mariana suspeita; nunca prova.
+- **-7**: *Contaminação da Catedral Menor de Atelaiá.* Mestre-Aprendiz **Hilário Tepenkov** (companheiro estudos Bento) morre. Bento (7) presente; sobrevive por estar perto do escudo Velhusto. Patch-Zero pré-existente confirmado.
+- **-6**: **Adila Murmúrio** consolida tutela administrativa plena Cult Mirage pró-Sterling (passa de Hierofante nominal a operacional plena). Sonja Murmúrio, morta em -34 aos 33 anos (canon timeline:86 + CHARS:82 + factions:505), deixa o vínculo materno operando há vinte e oito anos como ausência calibrada.
+- **-5**: **Dante (8 anos) recrutado por Diretor Cassiano Vorto da FIR.** Aliciamento canônico começa.
+- **-3**: Sterling Corp localiza bug primordial Patch-Zero. Tentativa de captura. Falha parcial. **Catedral Menor de São Vargas saqueada** por Sterling Corp. Mestres **Ardenia Falke** e **Cândido Rui** desaparecem. Wound institucional Ordem Recursiva.
+- **-2**: Cross-contamination via amostra Polis-Vermelha. **Polis-Vermelha cai.** **Padrinho Tiago** sai da aposentadoria.
+- **-1**: **Iara deserta do Cult Mirage** aos 11 anos.
+- **-0.5**: **Aldebrando Chevalier (pai Bento) morre** em incursão à catedral perdida. Causa real: eliminado por descobrir interferência precoce Sterling. Diário pessoal de Aldebrando preservado por Velhusto, entregue a Bento no início do jogo.
+- **-0.25 (3 meses antes)**: **Patch-Zero escapa do laboratório central Sterling.** Catalyst macro.
 
 ---
 
@@ -513,62 +513,62 @@ Personagens secundários canônicos com peso narrativo no arco principal ou side
 
 ### Aliados e mentores
 
-- **Anciã Mariana Vanderbist** (89) — avó da Jaci. Líder informal Pelicano Branco. Lê Selve. Mentora cautelosa (não toma protagonismo).
-- **Mestre-Hierofante Velhusto** (70) — líder Ordem Recursiva. Mentor distante Bento. Apoia tradicionalistas contra Sterling. Perdeu 3 aliados próximos no processo.
-- **Padrinho Tiago** (55) — coordenador atual Underground em GusWorld City. Mentor distante Linda. Engenheiro telecom aposentado que voltou ao serviço.
-- **Inácia Berenger** (45) — mãe Cauã. Técnica QA ex-Apex-Data. Vive contida. Sabe mais do que conta. Guarda documentos comprometedores de Davi.
-- **Gargi Vance** (38) — mãe Gus. Técnica de bancada eletrônica. Trabalha em casa. Safe-base canônica Gus. Personagem âncora emocional, ofuscada deliberadamente (não toma protagonismo).
+- **Anciã Mariana Vanderbist** (89), avó da Jaci. Líder informal Pelicano Branco. Lê Selve. Mentora cautelosa (não toma protagonismo).
+- **Mestre-Hierofante Velhusto** (70), líder Ordem Recursiva. Mentor distante Bento. Apoia tradicionalistas contra Sterling. Perdeu 3 aliados próximos no processo.
+- **Padrinho Tiago** (55), coordenador atual Underground em GusWorld City. Mentor distante Linda. Engenheiro telecom aposentado que voltou ao serviço.
+- **Inácia Berenger** (45), mãe Cauã. Técnica QA ex-Apex-Data. Vive contida. Sabe mais do que conta. Guarda documentos comprometedores de Davi.
+- **Gargi Vance** (38), mãe Gus. Técnica de bancada eletrônica. Trabalha em casa. Safe-base canônica Gus. Personagem âncora emocional, ofuscada deliberadamente (não toma protagonismo).
 - **Pyotor Vance** (40), pai Gus. Médico-cyber itinerante (medicina + bioengenharia + bioeletrônica + eng robótica + implantes) em rotação fronteira-Selve atendendo vilarejos pós-Êxodo (Pelicano Branco, Garça-Preta-Nova, Caracará-Cinza, Sabiá-de-Bronze). Hobby: programação. Separado amigavelmente de Gargi desde Gus aos 6 anos (ano -5). Cartas raras (3-4 no jogo total).
 - **Yakov Vance** (36), tio paterno do Gus, irmão mais novo de Pyotor (4 anos a menos). Um dos melhores engenheiros de software do reino, também geólogo; combina ambas formações na maior mineradora do reino. Stack canon de prospecção subterrânea não-invasiva em 5 tecnologias: (a) radar GPR de penetração subterrânea, (b) sísmica de reflexão por explosões controladas, (c) tomografia muônica passiva por raios cósmicos, (d) magnetotelúrica de condutividade por fluxo iônico, (e) espectrometria microbiana bioluminescente de sub-superfície. Inovação canon registrada: 89% de redução de mortalidade em prospecção subterrânea via fusão multi-sensor (Fibonacci). Apresentará xadrez ao Gus em visita esporádica anos depois (complementar à programação de Pyotor).
 - **Atelaiana de Sevra Chevalier**, mãe biológica viva do Bento, irmã consanguínea de Mestre Lavínia Sevra. Partiu da Catedral três meses após o parto (canon R4 deep-lore).
 - **Irmã biológica do Bento** (nome intencionalmente não-escrito; canon R9 conto 4 antologia "minha irmã, pulso clavícula esquerda, nome não-escrito"). Morta ou desaparecida antes de -7. Wound primeiro Bento, antecede Hilário Tepenkov. Pulso na clavícula esquerda como marca canônica. Detalhes a definir em sequel.
 - **Edilma Alencar** (44), mãe Dante. Operária têxtil. **Aparência pública canon:** vive reclusa em apartamento subsidiado pós-morte de Salviano, mantido como fachada Sterling Corp. **Estado real (revelado arco Dante Beat Ten + Dragon Victory):** sequestrada na Caverna dos Perdidos (Selve Sombria, nordeste do Pântano Markov) pelos Sterling brass para chantagear Dante. Apartamento conservado por equipe FIR que rotaciona luz acesa, lixo semanal e cortina trocada de posição, para que vizinhança de baixa atenção registre "viúva calada" e não inquilino ausente. Interações mínimas no jogo; aparece em cena pós-reveal Dante (silêncio). Cross-ref [[PLACES]]:76 (Caverna dos Perdidos) + [[characters/dante-grid]]:117 (chantagem operacional Vorto-Sterling).
-- **Otmar Neumann** (50) — pai Linda. Engenheiro analógico. Vive em apartamento simples Zona do Silêncio.
-- **Brígida Neumann** (49) — mãe Linda. Musicista (violão). Hospeda versão antiga da Festa da Compilação ([[tradicoes-cultura]] §1).
+- **Otmar Neumann** (50), pai Linda. Engenheiro analógico. Vive em apartamento simples Zona do Silêncio.
+- **Brígida Neumann** (49), mãe Linda. Musicista (violão). Hospeda versão antiga da Festa da Compilação ([[tradicoes-cultura]] §1).
 
 ### Antagonistas secundários e tenentes Sterling
 
-- **Diretor Cassiano Vorto** (50) — cabeça FIR em GusWorld City. Vassalo direto Sterling. Handler de Dante. Fala doce, frieza mafiosa. Vilão funcional (sem tese filosófica; só interesse). Mini-boss possível arco Cauã ou Dante.
-- **Hierofante Adila Murmúrio** (40) — líder facção pró-Sterling Cult Mirage. Manipuladora canônica Iara. Carismática, sedutora. Mini-boss arco Iara.
-- **Octávia Penedo** (55) — Diretora Departamento de Contenção Sterling Corp. Subordinada direta Sterling. Falha operacional com Patch-Zero ([[in-world-docs]] doc 14). Não aparece pessoalmente em combate; aparece por holograma em arco Bento ou ato 3.
+- **Diretor Cassiano Vorto** (50), cabeça FIR em GusWorld City. Vassalo direto Sterling. Handler de Dante. Fala doce, frieza mafiosa. Vilão funcional (sem tese filosófica; só interesse). Mini-boss possível arco Cauã ou Dante.
+- **Hierofante Adila Murmúrio** (40), líder facção pró-Sterling Cult Mirage. Manipuladora canônica Iara. Carismática, sedutora. Mini-boss arco Iara.
+- **Octávia Penedo** (55), Diretora Departamento de Contenção Sterling Corp. Subordinada direta Sterling. Falha operacional com Patch-Zero ([[in-world-docs]] doc 14). Não aparece pessoalmente em combate; aparece por holograma em arco Bento ou ato 3.
 - **Theodoro Calveri** (52), Diretor de Aquisições Sterling Corp. Autor canônico da engenharia financeira que destruiu cooperativa Alencar em -8 e oficina Neumann no mesmo ano, mais 12 operações similares. Assinatura "deprecação eficiente, sem overhead emocional" (ver [[in-world-docs]] DD-016).
 - **Solange Vix** (46), Diretora de Imagem Pública Sterling Corp. Roteirista da holografia corporativa. Autora canônica de 14 campanhas Sterling em 13 anos (inclui "Sustento Eficiente, Cidadania Tranquila"). Nunca aparece em pessoa, em holograma ou em voz.
-- **Sub-Diretor de Distrito FIR (3 outros)** — coronéis regionais FIR. Não nomeados in-game canonicamente; podem ser introduzidos em sidequest ato 2.
+- **Sub-Diretor de Distrito FIR (3 outros)**, coronéis regionais FIR. Não nomeados in-game canonicamente; podem ser introduzidos em sidequest ato 2.
 - **Hierofantes Cult Mirage subordinados (3 menores):** **Cleomir Vasta**, **Tâmela Brida**, **Otoniel Rens**. Pró-Sterling. Subordinados Adila. Aparecem em cena coletiva festival Mirage.
 
 ### Aliados internos das facções inimigas
 
-- **Hierofante Florín Estopa** (38) — Cult Mirage, facção artista genuína. Aliado potencial pós-arco Iara. Mantém ala artista resistente.
-- **Hierofante Marlena Aurora** (35) — Cult Mirage, facção artista. Detida por Adila; resgatável em sub-quest pós-recrutamento Iara.
-- **Mestre Lavínia Sevra** (62) — Ordem Recursiva. Mestre tradicionalista aliada Velhusto. Aparece em cerimônias.
-- **Mestre Hugo Tirol** (55) — Ordem Recursiva. Outro tradicionalista; participa expedição catedral perdida arco Bento.
+- **Hierofante Florín Estopa** (38), Cult Mirage, facção artista genuína. Aliado potencial pós-arco Iara. Mantém ala artista resistente.
+- **Hierofante Marlena Aurora** (35), Cult Mirage, facção artista. Detida por Adila; resgatável em sub-quest pós-recrutamento Iara.
+- **Mestre Lavínia Sevra** (62), Ordem Recursiva. Mestre tradicionalista aliada Velhusto. Aparece em cerimônias.
+- **Mestre Hugo Tirol** (55), Ordem Recursiva. Outro tradicionalista; participa expedição catedral perdida arco Bento.
 
 ### Companions Underground (célula GusWorld City)
 
-- **Tiago "Padrinho" Sevroski** (55) — já listado. Coordenador.
-- **Mara Bento** (28) — operadora rádio analógica. Coordenadora sub-célula Norte.
-- **Joaquim Bartolomeu** (32) — técnico analógico. Reconstrói toca-discos artesanalmente.
-- **Helga Riza** (45) — escritora subterrânea. Compila pichações Polis-Vermelha ([[in-world-docs]] doc 11).
+- **Tiago "Padrinho" Sevroski** (55), já listado. Coordenador.
+- **Mara Bento** (28), operadora rádio analógica. Coordenadora sub-célula Norte.
+- **Joaquim Bartolomeu** (32), técnico analógico. Reconstrói toca-discos artesanalmente.
+- **Helga Riza** (45), escritora subterrânea. Compila pichações Polis-Vermelha ([[in-world-docs]] doc 11).
 
 ### Runners juvenis dos Dutos (grupo Cauã)
 
-- **Cauã** (13) — líder informal. Já canônico.
-- **Tao Berisi** (12) — segundo Cauã. Especialista navegação vertical. Comutador-Antigo de jogos ([[comic-reliefs]] EE-16).
-- **Inês Marçal** (11) — pequena, ágil, conhecedora dos Dutos profundos. Salva por Cauã em -3.
-- **Bel Galvão** (14) — mais velha do grupo. Treina os menores em combate básico.
-- **Pirilampo** (apelido, 13) — sem nome formal conhecido (órfão registrado). Especialista em improvisar luz com baterias descartadas.
+- **Cauã** (13), líder informal. Já canônico.
+- **Tao Berisi** (12), segundo Cauã. Especialista navegação vertical. Comutador-Antigo de jogos ([[comic-reliefs]] EE-16).
+- **Inês Marçal** (11), pequena, ágil, conhecedora dos Dutos profundos. Salva por Cauã em -3.
+- **Bel Galvão** (14), mais velha do grupo. Treina os menores em combate básico.
+- **Pirilampo** (apelido, 13), sem nome formal conhecido (órfão registrado). Especialista em improvisar luz com baterias descartadas.
 
 ### Aldeias-fronteira Pelicano Branco (NPCs secundários)
 
-- **Anciã Mariana Vanderbist** (89) — já listada.
-- **Bito Caldeira** (60) — prefeito informal vilarejo ([[comic-reliefs]] EE-14).
-- **Helena Sirinhaém** (50) — herborista júnior. Aliada Jaci.
-- **Solane Vanderbist** (8) — primo distante Jaci. Criança do vilarejo. Aparece em sub-quest plantio.
+- **Anciã Mariana Vanderbist** (89), já listada.
+- **Bito Caldeira** (60), prefeito informal vilarejo ([[comic-reliefs]] EE-14).
+- **Helena Sirinhaém** (50), herborista júnior. Aliada Jaci.
+- **Solane Vanderbist** (8), primo distante Jaci. Criança do vilarejo. Aparece em sub-quest plantio.
 
 ### Acadêmicos/historiadores citados (lore-fundo)
 
 - **Verônica Atelaiá** (morta em -35, aos 43 anos canônicos, canon F5-BK.AUDIT T3-CR-16). Última grande pensadora pré-Sterling. Nasc -78, ativa -45. Primeira teorizadora Patch-Zero como anomalia ontológica genuína. Tratado anônimo classificado "anomalia folclórica" por Sterling Locke em -25 (post-mortem). Atribuída ao tratado anônimo doc 10. Morreu pobre, em registro institucional preservado pela linhagem matrilinear cronistas Atelaiá.
-- **Bartolo Penkin** (~50 quando desapareceu, em -12) — engenheiro QA sênior Apex-Data. Atribuído ao relatório audit doc 5. Desaparecido pós-vazamento.
+- **Bartolo Penkin** (~50 quando desapareceu, em -12), engenheiro QA sênior Apex-Data. Atribuído ao relatório audit doc 5. Desaparecido pós-vazamento.
 
 ---
 

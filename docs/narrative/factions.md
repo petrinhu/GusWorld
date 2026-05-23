@@ -1,4 +1,4 @@
-# Facções — GusWorld
+# Facções, GusWorld
 
 > **Status:** Revisão 1 (2026-05-15). Doc novo. **Canônico.**
 >
@@ -35,7 +35,7 @@ Companions vêm das quatro facções independentes mais a FIR (Dante). Sterling 
 
 ### Ideologia
 
-**DRE — Dynamic-Runtime Evaluation.** A realidade é interpretável. Hardware é submissão; abstração total é controle. Tudo que existe deve poder ser reescrito por linha de comando. Natureza é "código não-mantido"; civilização anterior (Neo-Sylvania) caiu porque foi "rígida demais para se adaptar".
+**DRE (Dynamic-Runtime Evaluation).** A realidade é interpretável. Hardware é submissão; abstração total é controle. Tudo que existe deve poder ser reescrito por linha de comando. Natureza é "código não-mantido"; civilização anterior (Neo-Sylvania) caiu porque foi "rígida demais para se adaptar".
 
 Ver `characters/prelore_vilao.md` para o tratado integral.
 
@@ -45,7 +45,7 @@ Ver `characters/prelore_vilao.md` para o tratado integral.
 - **CTO/COO/CFO** são adjuntos de função; nenhum tem autonomia ideológica.
 - **Departamentos verticais especializados:**
   - **Departamento de Interpretação Global** (engenharia do GRE).
-  - **Departamento de Contenção** (laboratórios Patch-Zero — fracasso operacional).
+  - **Departamento de Contenção** (laboratórios Patch-Zero, fracasso operacional).
   - **Departamento de Aquisições** (canibalismo corporativo continuado).
   - **Departamento de Imagem Pública** (holografia, propaganda, terminais Janelarum).
   - **Departamento de Recursos Humanos** (eufemismo; faz o trabalho de cooptar talentos da periferia, ex-Dante).
@@ -57,7 +57,7 @@ Ver `characters/prelore_vilao.md` para o tratado integral.
 
 ### Objetivo
 
-Implementar **GRE — Global Runtime Environment**. Envelopar a Selve Sombria em máquina virtual interpretada. Transformar fauna, flora, geografia em variáveis editáveis. Lucrar via licenciamento de "natureza on-demand".
+Implementar **GRE (Global Runtime Environment)**. Envelopar a Selve Sombria em máquina virtual interpretada. Transformar fauna, flora, geografia em variáveis editáveis. Lucrar via licenciamento de "natureza on-demand".
 
 ### Aliados
 
@@ -96,13 +96,13 @@ Cor institucional: branco-estéril + cromo + acento vermelho-laser.
 
 ### Slogan público
 
-> "Sterling Corp — o futuro interpreta o presente."
+> "Sterling Corp: o futuro interpreta o presente."
 
 ### NPCs secundários nomeados
 
-- **Diretora Octávia Penedo** (55) — Diretora Departamento de Contenção. Subordinada direta Sterling. Falha operacional canônica com Patch-Zero ([[in-world-docs]] doc 14). Aparece via holograma corporativo; não pessoalmente em combate.
-- **Diretor Theodoro Calveri** (52) — Departamento de Aquisições. Gerencia operação canibalismo continuado. Aparece em comunicações internas; mencionado em sidequest.
-- **Diretora Solange Vix** (46) — Departamento de Imagem Pública. Roteirista da propaganda holográfica ([[in-world-docs]] doc 12). Nunca aparece pessoalmente. Sterling assina os anúncios; Solange constrói nos bastidores.
+- **Diretora Octávia Penedo** (55): Diretora Departamento de Contenção. Subordinada direta Sterling. Falha operacional canônica com Patch-Zero ([[in-world-docs]] doc 14). Aparece via holograma corporativo; não pessoalmente em combate.
+- **Diretor Theodoro Calveri** (52): Departamento de Aquisições. Gerencia operação canibalismo continuado. Aparece em comunicações internas; mencionado em sidequest.
+- **Diretora Solange Vix** (46): Departamento de Imagem Pública. Roteirista da propaganda holográfica ([[in-world-docs]] doc 12). Nunca aparece pessoalmente. Sterling assina os anúncios; Solange constrói nos bastidores.
 
 ### Tradições internas
 
@@ -113,20 +113,20 @@ Cor institucional: branco-estéril + cromo + acento vermelho-laser.
 
 ### Eventos históricos onde a facção atuou
 
-- **-19** — Falência forçada Apex-Data Systems. **Inácia Berenger** entre demitidos.
-- **-16** — Vazamento do audit interno (autor desapareceu).
-- **-15** — Falência forçada Nexus-Cloud.
-- **-5** — Subestação 7. **Davi Berenger** morre aos 16 (FIR direta; Sterling indireta). Cauã tinha 8 anos.
-- **-12** — Falência forçada Core-Synth. Consolidação Sterling Corp.
-- **-8** — Engenharia financeira destrói cooperativa Alencar. Salviano Alencar morre 6 meses depois.
-- **-8** — Batida casa Neumann (toca-discos).
-- **-8** — Surto silencioso Pelicano Branco. **Lia e Solano Vanderbist** morrem.
-- **-7** — Catedral Menor de Atelaiá contaminada. Hilário Tepenkov morre.
-- **-3** — Catedral de São Vargas saqueada.
-- **-3** — Captura tentada Patch-Zero. Falha parcial.
-- **-2** — Cross-contamination Polis-Vermelha. Cidade-irmã cai.
-- **-0.5** — Eliminação **Aldebrando Chevalier** (pai Bento) em catedral perdida.
-- **-0.25** — Patch-Zero escapa do laboratório central. Catalyst do jogo.
+- **-19**: Falência forçada Apex-Data Systems. **Inácia Berenger** entre demitidos.
+- **-16**: Vazamento do audit interno (autor desapareceu).
+- **-15**: Falência forçada Nexus-Cloud.
+- **-5**: Subestação 7. **Davi Berenger** morre aos 16 (FIR direta; Sterling indireta). Cauã tinha 8 anos.
+- **-12**: Falência forçada Core-Synth. Consolidação Sterling Corp.
+- **-8**: Engenharia financeira destrói cooperativa Alencar. Salviano Alencar morre 6 meses depois.
+- **-8**: Batida casa Neumann (toca-discos).
+- **-8**: Surto silencioso Pelicano Branco. **Lia e Solano Vanderbist** morrem.
+- **-7**: Catedral Menor de Atelaiá contaminada. Hilário Tepenkov morre.
+- **-3**: Catedral de São Vargas saqueada.
+- **-3**: Captura tentada Patch-Zero. Falha parcial.
+- **-2**: Cross-contamination Polis-Vermelha. Cidade-irmã cai.
+- **-0.5**: Eliminação **Aldebrando Chevalier** (pai Bento) em catedral perdida.
+- **-0.25**: Patch-Zero escapa do laboratório central. Catalyst do jogo.
 
 ### Não fazer
 
@@ -139,7 +139,7 @@ Cor institucional: branco-estéril + cromo + acento vermelho-laser.
 
 ### Ideologia
 
-**Continuidade analógica.** A civilização atual (Era 2) tem dívida com a anterior (Neo-Sylvania). Asmódico, relojoaria, ressonância acústica, cripto-glifos: tudo isso precisa ser preservado, estudado, transmitido. Não como religião — como **manutenção de patrimônio técnico-cultural**.
+**Continuidade analógica.** A civilização atual (Era 2) tem dívida com a anterior (Neo-Sylvania). Asmódico, relojoaria, ressonância acústica, cripto-glifos: tudo isso precisa ser preservado, estudado, transmitido. Não como religião, e sim como **manutenção de patrimônio técnico-cultural**.
 
 A Ordem **não é culto místico**. É uma sociedade erudita conservadora que rejeita a substituição cega de tradição por inovação. Tese: "se C-Arcane é eficiente, Asmódico é durável. Ambos têm lugar."
 
@@ -164,7 +164,7 @@ Bento é seu protegido e sucessor designado se a Ordem sobreviver.
 
 ### Aliados
 
-- **Gus** (após arco Bento — aliança tática + filosófica).
+- **Gus** (após arco Bento; aliança tática + filosófica).
 - **Selve Sombria** indiretamente (Ordem respeita matemática natural).
 - **Underground do Silêncio** (compartilham antitese a Sterling, embora ideologicamente distintos).
 
@@ -195,15 +195,15 @@ Cor institucional: latão oxidado + preto-titânio + branco-osso.
 
 ### NPCs secundários nomeados
 
-- **Mestre-Hierofante Velhusto** (70) — já listado em "Figura central".
-- **Mestre Lavínia Sevra** (62) — tradicionalista aliada Velhusto. Especialista em ressonância acústica de catedrais. Apoiou Bento na rachadura interna.
-- **Mestre Hugo Tirol** (55) — outro tradicionalista. Participa expedição catedral perdida arco Bento. Especialista em decifragem cripto-glífica.
-- **Mestre Ardenia Falke** (52, **desaparecida em -3**) — opôs-se publicamente ao saque da Catedral de São Vargas. Sumiu. Velhusto guarda seu cronômetro intacto.
-- **Mestre Cândido Rui** (60, **desaparecido em -3**) — também opôs-se publicamente. Sumiu. Mesmo destino.
-- **Aprendiz Hilário Tepenkov** (**morto em -7**, idade 14) — companheiro de estudos Bento (que tinha 7 na época). Morreu na contaminação da Catedral Menor de Atelaiá. Foto preservada na biblioteca privada Velhusto.
-- **Aldebrando Chevalier** (**morto em -0.5**, 38) — pai Bento. Mestre Asmódico. Eliminado por descobrir interferência precoce Sterling. Diário pessoal preservado por Velhusto, entregue a Bento no início do jogo.
-- **Aprendiz Beatriz Pólvora** (16) — aprendiz atual de Bento (designada após morte Aldebrando). Aparece em arco Bento como mentora reversa (Bento ensina ela enquanto ele próprio se forma).
-- **Mestre Felippe Garante** (48, *pró-Sterling, morto em -0.5 do jogo*) — facção pró-modernização. Morto em contaminação parcial da Catedral Menor de Atelaiá (acidente Patch-Zero arco Bento). Outros 2 mestres pró-Sterling morrem na mesma cena (não nomeados — número exato vago, "três a quatro").
+- **Mestre-Hierofante Velhusto** (70): já listado em "Figura central".
+- **Mestre Lavínia Sevra** (62): tradicionalista aliada Velhusto. Especialista em ressonância acústica de catedrais. Apoiou Bento na rachadura interna.
+- **Mestre Hugo Tirol** (55): outro tradicionalista. Participa expedição catedral perdida arco Bento. Especialista em decifragem cripto-glífica.
+- **Mestre Ardenia Falke** (52, **desaparecida em -3**): opôs-se publicamente ao saque da Catedral de São Vargas. Sumiu. Velhusto guarda seu cronômetro intacto.
+- **Mestre Cândido Rui** (60, **desaparecido em -3**): também opôs-se publicamente. Sumiu. Mesmo destino.
+- **Aprendiz Hilário Tepenkov** (**morto em -7**, idade 14): companheiro de estudos Bento (que tinha 7 na época). Morreu na contaminação da Catedral Menor de Atelaiá. Foto preservada na biblioteca privada Velhusto.
+- **Aldebrando Chevalier** (**morto em -0.5**, 38): pai Bento. Mestre Asmódico. Eliminado por descobrir interferência precoce Sterling. Diário pessoal preservado por Velhusto, entregue a Bento no início do jogo.
+- **Aprendiz Beatriz Pólvora** (16): aprendiz atual de Bento (designada após morte Aldebrando). Aparece em arco Bento como mentora reversa (Bento ensina ela enquanto ele próprio se forma).
+- **Mestre Felippe Garante** (48, *pró-Sterling, morto em -0.5 do jogo*): facção pró-modernização. Morto em contaminação parcial da Catedral Menor de Atelaiá (acidente Patch-Zero arco Bento). Outros 2 mestres pró-Sterling morrem na mesma cena (não nomeados; número exato vago, "três a quatro").
 
 ### Tradições internas
 
@@ -216,14 +216,14 @@ Cor institucional: latão oxidado + preto-titânio + branco-osso.
 
 ### Eventos históricos onde a facção atuou
 
-- **-148** — Fundação informal pós-Hiato. Reorganização.
-- **-115** — Codificação formal Asmódico por **Atelaiá Chevalier**.
-- **-80** — *Tragédia da Catedral Menor de São Camilo.* 17 mestres mortos por anomalia. Trauma fundador. Diário Atelaiá preservado ([[in-world-docs]] doc 3).
-- **-78** — Protocolo Selagem Asmódica decretado.
-- **-7** — *Contaminação da Catedral Menor de Atelaiá.* Hilário Tepenkov morre. Bento (7) sobrevive.
-- **-3** — *Saque da Catedral de São Vargas* por Sterling Corp. Ardenia Falke e Cândido Rui desaparecem. Velhusto cala publicamente para proteger restante.
-- **-0.5** — Aldebrando Chevalier morto. Velhusto entrega diário Aldebrando a Bento.
-- **Ano 0 (durante jogo)** — Rachadura interna pró-modernização vs tradicionalismo. Resolução arco Bento. Ordem oficializa anti-Sterling. Mestres pró-Sterling morrem em contaminação Catedral Menor.
+- **-148**: Fundação informal pós-Hiato. Reorganização.
+- **-115**: Codificação formal Asmódico por **Atelaiá Chevalier**.
+- **-80**: *Tragédia da Catedral Menor de São Camilo.* 17 mestres mortos por anomalia. Trauma fundador. Diário Atelaiá preservado ([[in-world-docs]] doc 3).
+- **-78**: Protocolo Selagem Asmódica decretado.
+- **-7**: *Contaminação da Catedral Menor de Atelaiá.* Hilário Tepenkov morre. Bento (7) sobrevive.
+- **-3**: *Saque da Catedral de São Vargas* por Sterling Corp. Ardenia Falke e Cândido Rui desaparecem. Velhusto cala publicamente para proteger restante.
+- **-0.5**: Aldebrando Chevalier morto. Velhusto entrega diário Aldebrando a Bento.
+- **Ano 0 (durante jogo)**: Rachadura interna pró-modernização vs tradicionalismo. Resolução arco Bento. Ordem oficializa anti-Sterling. Mestres pró-Sterling morrem em contaminação Catedral Menor.
 
 ### Não fazer
 
@@ -251,7 +251,7 @@ O discurso pró-ambiental é cínico. A FIR fala em "preservação do legado tec
 
 **Diretor Cassiano Vorto** (NPC adulto, antagonista secundário; cabeça da FIR em GusWorld City). Cerca de 50 anos. Fala doce, postura empresarial, frieza mafiosa por baixo. Aliado direto de Sterling Locke. Não é vilão filosófico (não tem tese, só interesse). Vilão funcional.
 
-Dante trabalhou para Vorto por dois anos antes do jogo. Saiu em "rivalidade pública" — encenação. Vorto continua sendo handler de Dante remotamente.
+Dante trabalhou para Vorto por dois anos antes do jogo. Saiu em "rivalidade pública": encenação. Vorto continua sendo handler de Dante remotamente.
 
 ### Objetivo
 
@@ -273,7 +273,7 @@ Dante trabalhou para Vorto por dois anos antes do jogo. Saiu em "rivalidade púb
 
 ### Símbolo visual
 
-**Triângulo amarelo de reciclagem ironicamente subvertido** — três setas que parecem girar mas, em close, **giram para fora**, não em ciclo. Detalhe sutil que NPCs comentam: "olha bem, não é o triângulo de verdade." Aparece em:
+**Triângulo amarelo de reciclagem ironicamente subvertido**: três setas que parecem girar mas, em close, **giram para fora**, não em ciclo. Detalhe sutil que NPCs comentam: "olha bem, não é o triângulo de verdade." Aparece em:
 
 - Caminhões da frota.
 - Uniformes de soldados-técnicos.
@@ -290,36 +290,36 @@ Cor institucional: amarelo-industrial + preto-fuligem.
 
 ### Slogan público
 
-> "FIR — circularidade que constrói futuro."
+> "FIR: circularidade que constrói futuro."
 
 ### NPCs secundários nomeados
 
-- **Diretor Cassiano Vorto** (50) — já listado em "Figura central". Cabeça em GusWorld City.
-- **Sub-Diretor Heitor Cravo** (43) — Distrito 2 da Periferia (Norte). Próximo Vorto. Operacional bruto. Mini-boss intermediário possível.
-- **Sub-Diretor Vitória Marquês** (41) — Distrito 3. Mais conservadora; **começa a temer Sterling em ato 2** — semente da dissensão interna (sidequest Ouro: descobrir Vitória pra eventualmente alianças).
-- **Sub-Diretor Otelo Pancha** (55) — Distrito 4. Veterano cínico. Sem ideologia.
-- **Sub-Diretor Floriana Etti** (38) — Distrito 5. Recém-promovida. Ambiciosa.
-- **Sub-Diretor "anônimo" (mantido vago)** — Distrito 1 (Setor de fronteira). Posto rotativo; ninguém dura mais que 6 meses (zona perigosa).
-- **Soldado-Técnico Bruno Caval** (32) — chefe de patrulha local. Encontro de combate canônico arco Cauã.
-- **Soldado-Técnica Penha Lirio** (29) — operária reformada Apex-Data, hoje FIR por necessidade. Sem ideologia. Inácia Berenger a conhece (sub-quest opcional).
+- **Diretor Cassiano Vorto** (50): já listado em "Figura central". Cabeça em GusWorld City.
+- **Sub-Diretor Heitor Cravo** (43): Distrito 2 da Periferia (Norte). Próximo Vorto. Operacional bruto. Mini-boss intermediário possível.
+- **Sub-Diretor Vitória Marquês** (41): Distrito 3. Mais conservadora; **começa a temer Sterling em ato 2**, semente da dissensão interna (sidequest Ouro: descobrir Vitória pra eventualmente alianças).
+- **Sub-Diretor Otelo Pancha** (55): Distrito 4. Veterano cínico. Sem ideologia.
+- **Sub-Diretor Floriana Etti** (38): Distrito 5. Recém-promovida. Ambiciosa.
+- **Sub-Diretor "anônimo" (mantido vago)**: Distrito 1 (Setor de fronteira). Posto rotativo; ninguém dura mais que 6 meses (zona perigosa).
+- **Soldado-Técnico Bruno Caval** (32): chefe de patrulha local. Encontro de combate canônico arco Cauã.
+- **Soldado-Técnica Penha Lirio** (29): operária reformada Apex-Data, hoje FIR por necessidade. Sem ideologia. Inácia Berenger a conhece (sub-quest opcional).
 - **Edilma Alencar** (44, viúva Salviano morto -8, mãe biológica de [[characters/dante-grid|Dante Alencar]]). **Aparência pública canon:** vive reclusa em apartamento subsidiado da Periferia, ala leste do Distrito 3, recusa contato externo segundo versão oficial mantida pelo handler Cassiano Vorto. Fachada operacional sustentada por equipe FIR rotacionando indicadores de habitação ativa, luz acesa em janela três noites por semana em padrão calibrado para não chamar atenção, saco de lixo depositado semanalmente no horário do prédio, cortina trocada de posição em intervalos calculados para sugerir presença orgânica. Vizinhos próximos relatam ter "ouvido a vizinha", ninguém afirma ter visto. **Estado real (revelação canon arco Dante Beat Ten + Dragon Victory):** sequestrada em -8 sob ordem direta Sterling Corp executada por Cassiano Vorto, mantida em cela da Caverna dos Perdidos no nordeste do Pântano Markov, subterrânea profunda da Selve Sombria, instrumento permanente de chantagem psicológica sobre Dante Alencar (canon traidor da party recrutado aos 8 anos como aprendiz técnico subsidiado, revelação progressiva ato 3). Vorto comunica prova de vida a Dante em ritmo controlado, fragmentos de áudio reciclados de gravações antigas combinados com referências circunstanciais frescas obtidas via canal Sterling em Heliópolis-Nova, suficiente para sustentar a chantagem sem permitir verificação independente. **Cross-ref:** [[PLACES]] Caverna dos Perdidos + [[characters/dante-grid]] arco wound canônico + INCOHERENCES C10 resolvido + [[timeline]] L122 retrofit dual-state aplicado.
 
 ### Tradições internas
 
-- **Festival do Reaproveitamento** (anual, semana 2 novembro) — celebração corporativa cínica ([[tradicoes-cultura]] §7). Desfile, discurso Vorto, sanduíche-de-aproveitamento.
+- **Festival do Reaproveitamento** (anual, semana 2 novembro): celebração corporativa cínica ([[tradicoes-cultura]] §7). Desfile, discurso Vorto, sanduíche-de-aproveitamento.
 - **Cumprimento canônico:** sem cumprimento formal específico; usa saudação Periferia ("E aí, mano") por imersão local.
 - **Voucher Janelarum:** funcionários recebem voucher mensal para reparo de Janelarum (FIR vende reparo a outras pessoas a preço alto; benefício "interno"). Loop fechado de captura.
 - **Cota de transferência:** cada Distrito tem cota mensal de "ativo reciclado" a transferir para Sterling Corp. Cumprir = bônus; não-cumprir = "ajuste de portfólio" (transferência para Heliópolis-Nova; eufemismo).
 
 ### Eventos históricos onde a facção atuou
 
-- **-50** — Fundação como cooperativa de boa-fé. Inicialmente útil.
-- **-25** — Captura corporativa começa. Sterling consolida via Vorto.
-- **-5** — Subcontratada FIR responsável pela "manutenção" na Subestação 7. Davi Berenger morre aos 16. FIR paga indenização irrisória; silencia família.
-- **-8** — Engenharia financeira contra cooperativa Alencar. Salviano morre 6 meses depois.
-- **-8** — Participa da batida na casa Neumann (toca-discos apreendido).
-- **-5** — Vorto recruta Dante (8 anos). Aliciamento canônico.
-- **Ano 0 (durante jogo)** — Pressão sobre Dutos Infernais (arco Cauã). Operação extração Pelicano Branco (arco Jaci). Dissensão Vitória Marquês começa.
+- **-50**: Fundação como cooperativa de boa-fé. Inicialmente útil.
+- **-25**: Captura corporativa começa. Sterling consolida via Vorto.
+- **-5**: Subcontratada FIR responsável pela "manutenção" na Subestação 7. Davi Berenger morre aos 16. FIR paga indenização irrisória; silencia família.
+- **-8**: Engenharia financeira contra cooperativa Alencar. Salviano morre 6 meses depois.
+- **-8**: Participa da batida na casa Neumann (toca-discos apreendido).
+- **-5**: Vorto recruta Dante (8 anos). Aliciamento canônico.
+- **Ano 0 (durante jogo)**: Pressão sobre Dutos Infernais (arco Cauã). Operação extração Pelicano Branco (arco Jaci). Dissensão Vitória Marquês começa.
 
 ### Não fazer
 
@@ -341,7 +341,7 @@ Não tem porta-voz oficial. Tem aldeias humanas na fronteira (vilarejo do Pelica
 - **Aldeias-fronteira:** 4 aldeias humanas conhecidas na borda Selve. Vilarejo do Pelicano Branco é a mais próxima de GusWorld City.
 - **Anciões-tradutores:** humanos idosos das aldeias que sabem ler Selve.
 - **Sem hierarquia formal.** Reputação ganha por contribuição prática.
-- **Conhecimento herdado:** sementes-relíquia preservadas em bancos clandestinos (cooperação parcial com Ordem Recursiva — alguns bancos são em catedrais Neo-Sylvania).
+- **Conhecimento herdado:** sementes-relíquia preservadas em bancos clandestinos (cooperação parcial com Ordem Recursiva; alguns bancos são em catedrais Neo-Sylvania).
 - **Fauna como vetor de comunicação:** alguns animais carregam padrões reconhecíveis (raposa-fractal, coruja-Mandelbrot, etc.); aldeias leem os comportamentos.
 
 ### Figura central
@@ -381,29 +381,29 @@ Cor institucional: verde-ciano biolúmen + marrom-húmus + branco-fungo.
 
 - **Jaci:** filha legítima da Selve; herdeira da farmacopeia.
 - **Bento:** aliado filosófico (Ordem Recursiva também respeita Selve).
-- **Outros:** Cauã e Linda têm respeito pragmático; Iara aprende a respeitar ao longo do jogo; Dante é estranho à Selve (não conhece, não respeita — pista sutil).
+- **Outros:** Cauã e Linda têm respeito pragmático; Iara aprende a respeitar ao longo do jogo; Dante é estranho à Selve (não conhece, não respeita; pista sutil).
 
 ### NPCs secundários nomeados
 
 #### Vilarejo do Pelicano Branco
 
-- **Anciã Mariana Vanderbist** (89) — já listada.
-- **Bito Caldeira** (60) — prefeito informal vilarejo ([[comic-reliefs]] EE-14). Decisões coletivas passam por ele formalmente; substância vem da Anciã.
-- **Helena Sirinhaém** (50) — herborista júnior. Aliada Jaci. Trabalha em paralelo, especializada em antídotos respiratórios.
-- **Bem-Te-Vi Caldeira** (35) — filho do Bito. Mantém comércio do vilarejo. Pacifista declarado.
-- **Solane Vanderbist** (8) — primo distante Jaci. Criança do vilarejo. Aparece em sub-quest plantio.
-- **Tatauín Branca** (22) — caçadora-coletora. Conhece Selve Profunda; já teve encontro com fauna corrompida.
-- **Mestre Loanis Penãoso** (55, **morto em -8**) — mestre-herborista. Morreu no mesmo surto que Lia e Solano. Ainda referenciado.
+- **Anciã Mariana Vanderbist** (89): já listada.
+- **Bito Caldeira** (60): prefeito informal vilarejo ([[comic-reliefs]] EE-14). Decisões coletivas passam por ele formalmente; substância vem da Anciã.
+- **Helena Sirinhaém** (50): herborista júnior. Aliada Jaci. Trabalha em paralelo, especializada em antídotos respiratórios.
+- **Bem-Te-Vi Caldeira** (35): filho do Bito. Mantém comércio do vilarejo. Pacifista declarado.
+- **Solane Vanderbist** (8): primo distante Jaci. Criança do vilarejo. Aparece em sub-quest plantio.
+- **Tatauín Branca** (22): caçadora-coletora. Conhece Selve Profunda; já teve encontro com fauna corrompida.
+- **Mestre Loanis Penãoso** (55, **morto em -8**): mestre-herborista. Morreu no mesmo surto que Lia e Solano. Ainda referenciado.
 
 #### Aldeias-fronteira (outras 3)
 
-- **Vilarejo do Tucano-Cinza** (norte) — Anciã: **Berenice Quaresma** (80). Aliada Mariana.
-- **Vilarejo do Pelicano Roxo** (oeste) — Anciã: **Otília Pamonha** (73). Mais isolada; visitada por Mariana ocasionalmente.
-- **Vilarejo da Tartaruga-Fractal** (sul, mais distante) — Ancião: **Bartolomeu Quintino** (78). Visitado raramente.
+- **Vilarejo do Tucano-Cinza** (norte). Anciã: **Berenice Quaresma** (80). Aliada Mariana.
+- **Vilarejo do Pelicano Roxo** (oeste). Anciã: **Otília Pamonha** (73). Mais isolada; visitada por Mariana ocasionalmente.
+- **Vilarejo da Tartaruga-Fractal** (sul, mais distante). Ancião: **Bartolomeu Quintino** (78). Visitado raramente.
 
 ### Tradições internas
 
-- **Dia das Sementes** (22 junho) — festividade central ([[tradicoes-cultura]] §4). Sopa-de-7-raízes, plantio coletivo, vigília das mães.
+- **Dia das Sementes** (22 junho): festividade central ([[tradicoes-cultura]] §4). Sopa-de-7-raízes, plantio coletivo, vigília das mães.
 - **Cumprimento canônico:** "Boa raiz." / "Boa colheita." Varia por estação (no plantio: "Boa raiz"; na colheita: "Boa colheita").
 - **Mão sobre coração:** gesto canônico Pelicano Branco. Reverência ao plantio. Usado também em despedidas.
 - **Cuidado coletivo:** quando alguém adoece no vilarejo, vizinhos se revezam preparando refeições. Sem cobrança. Sem registro.
@@ -412,13 +412,13 @@ Cor institucional: verde-ciano biolúmen + marrom-húmus + branco-fungo.
 
 ### Eventos históricos onde a facção atuou
 
-- **Pré-Era 2** — Aldeias-fronteira atuais descendem de sobreviventes Êxodo Neo-Sylvania (~-720).
-- **-95** — **Anhuera Vanderbist** co-autora Pythia. Aliança fundadora Berenger-Vanderbist consolidada.
-- **-45** — Vilarejo do Pelicano Branco formalizado. **Soraia Vanderbist** lidera.
-- **-8** — Surto silencioso. **Lia e Solano Vanderbist** + **Mestre Loanis Penãoso** + 2 outros não nomeados morrem. Jaci órfã. Mariana assume guarda.
-- **-2 a -1** — Mariana percebe sinais Selve. Suspeita Sterling. Não consegue provar; mantém vigilância.
-- **-0.02 (1 semana antes do jogo)** — Mariana envia mensageiro a GusWorld City alertando Ordem Recursiva.
-- **Ano 0 (durante jogo)** — Surto causado por escape Patch-Zero. Arco Jaci. Vilarejo salvo; sementes parcialmente perdidas (40%). Recuperadas em sidequest pós-recrutamento.
+- **Pré-Era 2**: Aldeias-fronteira atuais descendem de sobreviventes Êxodo Neo-Sylvania (~-720).
+- **-95**: **Anhuera Vanderbist** co-autora Pythia. Aliança fundadora Berenger-Vanderbist consolidada.
+- **-45**: Vilarejo do Pelicano Branco formalizado. **Soraia Vanderbist** lidera.
+- **-8**: Surto silencioso. **Lia e Solano Vanderbist** + **Mestre Loanis Penãoso** + 2 outros não nomeados morrem. Jaci órfã. Mariana assume guarda.
+- **-2 a -1**: Mariana percebe sinais Selve. Suspeita Sterling. Não consegue provar; mantém vigilância.
+- **-0.02 (1 semana antes do jogo)**: Mariana envia mensageiro a GusWorld City alertando Ordem Recursiva.
+- **Ano 0 (durante jogo)**: Surto causado por escape Patch-Zero. Arco Jaci. Vilarejo salvo; sementes parcialmente perdidas (40%). Recuperadas em sidequest pós-recrutamento.
 
 ### Não fazer
 
@@ -462,7 +462,7 @@ Há também hierofantes artistas genuínos (1-2 NPCs aliados potenciais; sideque
 
 ### Inimigos
 
-- **Underground do Silêncio** (Cult Mirage explora atenção; Underground cultiva silêncio — antíteses estéticas).
+- **Underground do Silêncio** (Cult Mirage explora atenção; Underground cultiva silêncio; antíteses estéticas).
 - **Ordem Recursiva** (Cult Mirage acha Ordem "ridícula em sua nostalgia"; Ordem acha Cult "inconsciente").
 - **Iara (Iara desertora)** (relação pessoal complicada com Adila).
 
@@ -487,26 +487,26 @@ Cor institucional: gradient violeta-magenta-cyan saturado.
 
 #### Facção pró-Sterling (dominante)
 
-- **Hierofante Adila Murmúrio** (40) — já listada em "Figura central".
-- **Hierofante Cleomir Vasta** (37) — pró-Sterling. Especialista holografia massiva. Subordinado Adila.
-- **Hierofante Tâmela Brida** (44) — pró-Sterling. Especialista em "ressonância sensorial" (eufemismo: extração de dados). Subordinada Adila.
-- **Hierofante Otoniel Rens** (50) — pró-Sterling. Veterano financeiro. Negocia contratos com Sterling Corp diretamente. Cínico, sem entusiasmo religioso.
+- **Hierofante Adila Murmúrio** (40): já listada em "Figura central".
+- **Hierofante Cleomir Vasta** (37): pró-Sterling. Especialista holografia massiva. Subordinado Adila.
+- **Hierofante Tâmela Brida** (44): pró-Sterling. Especialista em "ressonância sensorial" (eufemismo: extração de dados). Subordinada Adila.
+- **Hierofante Otoniel Rens** (50): pró-Sterling. Veterano financeiro. Negocia contratos com Sterling Corp diretamente. Cínico, sem entusiasmo religioso.
 
 #### Facção artista independente (subjugada)
 
-- **Hierofante Florín Estopa** (38) — facção artista. Aliado potencial pós-arco Iara. Resistência interna passiva.
-- **Hierofante Marlena Aurora** (35) — facção artista. Detida por Adila em "reabilitação sensorial"; resgatável em sub-quest pós-recrutamento Iara.
-- **Hierofante Patrício Velô** (42) — facção artista. Quieto, observador. Pode fornecer informação se Knowledge alta.
+- **Hierofante Florín Estopa** (38): facção artista. Aliado potencial pós-arco Iara. Resistência interna passiva.
+- **Hierofante Marlena Aurora** (35): facção artista. Detida por Adila em "reabilitação sensorial"; resgatável em sub-quest pós-recrutamento Iara.
+- **Hierofante Patrício Velô** (42): facção artista. Quieto, observador. Pode fornecer informação se Knowledge alta.
 
 #### Outros
 
-- **Performador Sérgio Brimber** (24) — holografista jovem talentoso. Trabalha para Adila por necessidade; suporta a facção artista clandestinamente. Conhecedor pessoal de Iara desde a infância.
-- **Adepta Filomena Garda** (28) — adepta de longa data. "Acidente sensorial" durante festival anterior; sequela neurológica leve. Hoje vive marginalizada; pode dar pista sub-quest.
-- **Sonja Murmúrio** (**morta em -34**, ~33 quando morreu) — co-fundadora original Cult Mirage. Mãe biológica Adila. Morta em circunstâncias nunca esclarecidas no mesmo ano em que Adila (6 anos na época) assumiu nominalmente a liderança da facção pró-Sterling sob tutela administrativa transitória. Adila guarda rancor paradoxal (não menciona, evita o nome).
+- **Performador Sérgio Brimber** (24): holografista jovem talentoso. Trabalha para Adila por necessidade; suporta a facção artista clandestinamente. Conhecedor pessoal de Iara desde a infância.
+- **Adepta Filomena Garda** (28): adepta de longa data. "Acidente sensorial" durante festival anterior; sequela neurológica leve. Hoje vive marginalizada; pode dar pista sub-quest.
+- **Sonja Murmúrio** (**morta em -34**, ~33 quando morreu): co-fundadora original Cult Mirage. Mãe biológica Adila. Morta em circunstâncias nunca esclarecidas no mesmo ano em que Adila (6 anos na época) assumiu nominalmente a liderança da facção pró-Sterling sob tutela administrativa transitória. Adila guarda rancor paradoxal (não menciona, evita o nome).
 
 ### Tradições internas
 
-- **Atualização Sensorial** — festival ([[tradicoes-cultura]] §6). Versão atual é manipuladora.
+- **Atualização Sensorial**: festival ([[tradicoes-cultura]] §6). Versão atual é manipuladora.
 - **Cumprimento canônico:** "Brilhe bem." / "Cores firmes." (cooptado da gíria Cidade original, adaptado).
 - **Mão aberta espalmada palma pra cima:** reverência ao "espetáculo". Substituto de saudação informal entre adeptos.
 - **Vestuário Holohaute:** peças com fibra óptica embutida. Status interno medido por refração da peça.
@@ -514,12 +514,12 @@ Cor institucional: gradient violeta-magenta-cyan saturado.
 
 ### Eventos históricos onde a facção atuou
 
-- **-35** — Fundação como movimento artístico genuíno. Sonja Murmúrio co-funda.
-- **-34** — Sonja morre em circunstâncias nunca esclarecidas. Adila (6 anos) assume formalmente liderança facção pró-Sterling sob tutela transitória. Cult dual canon desde então.
-- **-6** — Adila consolida tutela operacional plena. Iara adotada formalmente aos 6 anos.
-- **-1** — Iara deserta aos 11.
-- **-1** — Operação Atualização Sensorial planejada para ano 0.
-- **Ano 0 (durante jogo)** — Festival sabotado por Iara + Gus (Ketsu arco Iara). Crise reverberante para a facção.
+- **-35**: Fundação como movimento artístico genuíno. Sonja Murmúrio co-funda.
+- **-34**: Sonja morre em circunstâncias nunca esclarecidas. Adila (6 anos) assume formalmente liderança facção pró-Sterling sob tutela transitória. Cult dual canon desde então.
+- **-6**: Adila consolida tutela operacional plena. Iara adotada formalmente aos 6 anos.
+- **-1**: Iara deserta aos 11.
+- **-1**: Operação Atualização Sensorial planejada para ano 0.
+- **Ano 0 (durante jogo)**: Festival sabotado por Iara + Gus (Ketsu arco Iara). Crise reverberante para a facção.
 
 ### Não fazer
 
@@ -594,18 +594,18 @@ Cor institucional: preto-carbono + fúcsia-neon discreto.
 
 #### Célula GusWorld City
 
-- **Padrinho Tiago Sevroski** (55) — já listado em "Figura central".
-- **Mara Bento** (28) — operadora rádio analógica. Coordenadora sub-célula Norte. Recebe transmissões longas distâncias.
-- **Joaquim Bartolomeu** (32) — técnico analógico. Reconstrói toca-discos artesanalmente. Filho de luthiers.
-- **Helga Riza** (45) — escritora subterrânea. Compila pichações Polis-Vermelha em arquivo Underground ([[in-world-docs]] doc 11).
-- **Otmar Neumann** (50) — pai Linda. Engenheiro analógico aposentado; consultor Underground. Vive em apartamento simples Zona do Silêncio.
-- **Brígida Neumann** (49) — mãe Linda. Musicista (violão). Hospeda versão antiga Festa da Compilação. Tem saúde frágil pós-batida -8.
+- **Padrinho Tiago Sevroski** (55): já listado em "Figura central".
+- **Mara Bento** (28): operadora rádio analógica. Coordenadora sub-célula Norte. Recebe transmissões longas distâncias.
+- **Joaquim Bartolomeu** (32): técnico analógico. Reconstrói toca-discos artesanalmente. Filho de luthiers.
+- **Helga Riza** (45): escritora subterrânea. Compila pichações Polis-Vermelha em arquivo Underground ([[in-world-docs]] doc 11).
+- **Otmar Neumann** (50): pai Linda. Engenheiro analógico aposentado; consultor Underground. Vive em apartamento simples Zona do Silêncio.
+- **Brígida Neumann** (49): mãe Linda. Musicista (violão). Hospeda versão antiga Festa da Compilação. Tem saúde frágil pós-batida -8.
 
 #### Cidades-Gêmeas Underground (contato remoto)
 
-- **Lazar Tovrov** (60) — coordenador Cidade-Gêmea Norte. Voz familiar nas rádios; nunca visto pessoalmente.
-- **Penha Cintra** (45) — coordenadora Cidade-Gêmea Sul.
-- **Otília Vermelha** (44) — sobrevivente Polis-Vermelha, refugiada em Cidades-Gêmeas. Sua filha pode estar em GusWorld City; busca anônima (sub-quest opcional Ouro).
+- **Lazar Tovrov** (60): coordenador Cidade-Gêmea Norte. Voz familiar nas rádios; nunca visto pessoalmente.
+- **Penha Cintra** (45): coordenadora Cidade-Gêmea Sul.
+- **Otília Vermelha** (44): sobrevivente Polis-Vermelha, refugiada em Cidades-Gêmeas. Sua filha pode estar em GusWorld City; busca anônima (sub-quest opcional Ouro).
 
 #### Polis-Vermelha Underground residual
 
@@ -614,13 +614,13 @@ Cor institucional: preto-carbono + fúcsia-neon discreto.
 
 #### Sympathizers não-membros
 
-- **Inácia Berenger** (45) — mãe Cauã. Não é membro Underground mas guarda materiais comprometedores; teria sido acolhida se quisesse.
-- **Hierofante Florín Estopa** (Cult Mirage, artista) — contato indireto. Compartilha alertas.
+- **Inácia Berenger** (45): mãe Cauã. Não é membro Underground mas guarda materiais comprometedores; teria sido acolhida se quisesse.
+- **Hierofante Florín Estopa** (Cult Mirage, artista): contato indireto. Compartilha alertas.
 
 ### Tradições internas
 
-- **Noite Calada** (8 agosto) — festividade central ([[tradicoes-cultura]] §5). Hora do silêncio, Última Frequência tocada à 00h01.
-- **Dia da Inicialização** — individual, não-coletivo ([[tradicoes-cultura]] §8). 12 horas de silêncio + música única.
+- **Noite Calada** (8 agosto): festividade central ([[tradicoes-cultura]] §5). Hora do silêncio, Última Frequência tocada à 00h01.
+- **Dia da Inicialização**: individual, não-coletivo ([[tradicoes-cultura]] §8). 12 horas de silêncio + música única.
 - **Cumprimento canônico:** gesto silente (dois dedos na orelha). Verbal: "Frequência boa." / "Sem ruído."
 - **Música canônica:** "Última Frequência" (composição original dos 8 técnicos desaparecidos na batida Casa das Antenas, ~-50). Tocada apenas anualmente.
 - **Ritual Noite Calada:** ritual anual canon Underground Silêncio. Tocado uma vez por ano em Câmara Última Frequência (canon PLACES). Música: composição canon 55 BPM (Fibonacci), modo frígio, vocal melismático Linda + reverb cavernoso. Função: memorial dos não-voltados (técnicos Underground perdidos pré-jogo: Bartolo Penkin, Calixto Rivaz, oito técnicos Casa das Antenas batida -50). Liderada por Mara Bento + Linda Siren canon ato 2+.
@@ -630,12 +630,12 @@ Cor institucional: preto-carbono + fúcsia-neon discreto.
 
 ### Eventos históricos onde a facção atuou
 
-- **~-50** — *Batida na Casa das Antenas.* 14 técnicos presos, 6 ressurgem, 8 desaparecidos. Música "Última Frequência" composta antes da batida; partitura preservada. Origem da Noite Calada (8 agosto).
-- **-16** — Recebe e preserva audit interno Apex-Data ([[in-world-docs]] doc 5).
-- **-8** — Batida casa Neumann. Otmar salva agulha. Linda traumatizada.
-- **-2** — Polis-Vermelha cai. Underground residual de lá começa transmitir fragmentos. Padrinho Tiago sai da aposentadoria.
-- **-2 a 0** — Linda assume liderança célula jovem em GusWorld City.
-- **Ano 0 (durante jogo)** — Decifragem mensagem Cidades-Gêmeas (arco Linda). Sabotagem transmissor corporativo. Defesa Zona do Silêncio.
+- **~-50**: *Batida na Casa das Antenas.* 14 técnicos presos, 6 ressurgem, 8 desaparecidos. Música "Última Frequência" composta antes da batida; partitura preservada. Origem da Noite Calada (8 agosto).
+- **-16**: Recebe e preserva audit interno Apex-Data ([[in-world-docs]] doc 5).
+- **-8**: Batida casa Neumann. Otmar salva agulha. Linda traumatizada.
+- **-2**: Polis-Vermelha cai. Underground residual de lá começa transmitir fragmentos. Padrinho Tiago sai da aposentadoria.
+- **-2 a 0**: Linda assume liderança célula jovem em GusWorld City.
+- **Ano 0 (durante jogo)**: Decifragem mensagem Cidades-Gêmeas (arco Linda). Sabotagem transmissor corporativo. Defesa Zona do Silêncio.
 
 ### Não fazer
 
@@ -644,7 +644,7 @@ Cor institucional: preto-carbono + fúcsia-neon discreto.
 
 ---
 
-## 7. Dutos Infernais — comunidade juvenil (não-facção formal)
+## 7. Dutos Infernais, comunidade juvenil (não-facção formal)
 
 > **Nota:** Dutos Infernais não são facção instituída como as 6 acima. São **comunidade descentralizada de runners juvenis** que se abrigam na rede subterrânea reconfigurada. Listada aqui por completude de NPCs nomeados e contexto cultural.
 
@@ -654,12 +654,12 @@ Sobrevivência cooperativa em terreno hostil. Sem manifesto. Lealdade horizontal
 
 ### NPCs secundários nomeados
 
-- **Cauã "Volt" Berenger** (13) — líder informal. Já canônico.
-- **Tao Berisi** (12) — segundo Cauã. Especialista navegação vertical. Comutador-Antigo de jogos ([[comic-reliefs]] EE-16).
-- **Inês Marçal** (11) — pequena, ágil, conhecedora dos Dutos profundos. Salva por Cauã em -3 (incidente que cimentou relação).
-- **Bel Galvão** (14) — mais velha do grupo. Treina os menores em combate básico. Voz mais firme do grupo após Cauã.
-- **Pirilampo** (apelido, 13) — sem nome formal conhecido (órfão registrado). Especialista em improvisar luz com baterias descartadas. Apelido vem do tic de iluminar a si mesmo no escuro.
-- **Tata Bruno** (10) — caçula do grupo. Aprendiz; ainda não autorizado a entrar nos Dutos profundos. Cauã o protege.
+- **Cauã "Volt" Berenger** (13): líder informal. Já canônico.
+- **Tao Berisi** (12): segundo Cauã. Especialista navegação vertical. Comutador-Antigo de jogos ([[comic-reliefs]] EE-16).
+- **Inês Marçal** (11): pequena, ágil, conhecedora dos Dutos profundos. Salva por Cauã em -3 (incidente que cimentou relação).
+- **Bel Galvão** (14): mais velha do grupo. Treina os menores em combate básico. Voz mais firme do grupo após Cauã.
+- **Pirilampo** (apelido, 13): sem nome formal conhecido (órfão registrado). Especialista em improvisar luz com baterias descartadas. Apelido vem do tic de iluminar a si mesmo no escuro.
+- **Tata Bruno** (10): caçula do grupo. Aprendiz; ainda não autorizado a entrar nos Dutos profundos. Cauã o protege.
 - **Fac-ção radical interna:** **Calixto Rivaz** (15, expulso após arco Cauã sub-quest pós-recrutamento) lidera ala "ataque direto FIR". Cauã defende paciência. Calixto morto em ataque suicida + grupo destruído (catalyst da reflexão filosófica Cauã pós-recrutamento). Sobreviventes do grupo radical reabsorvidos depois.
 
 ### Tradições internas
@@ -672,8 +672,8 @@ Sobrevivência cooperativa em terreno hostil. Sem manifesto. Lealdade horizontal
 
 ### Eventos históricos
 
-- **-4 a 0** — Comunidade canônica consolida após morte Davi (Cauã desce). Crescimento gradual.
-- **Ano 0 (durante jogo)** — Pressão FIR (eflufluente industrial). Arco Cauã. Sub-quest pós-recrutamento: facção radical destruída.
+- **-4 a 0**: Comunidade canônica consolida após morte Davi (Cauã desce). Crescimento gradual.
+- **Ano 0 (durante jogo)**: Pressão FIR (eflufluente industrial). Arco Cauã. Sub-quest pós-recrutamento: facção radical destruída.
 
 ### Relações
 
@@ -703,16 +703,16 @@ Ordem complementar não-adversária ao Asmódico, foco em meditação silenciosa
 
 ---
 
-## Resumo cruzado — quem alia, quem briga
+## Resumo cruzado, quem alia, quem briga
 
 | Facção | Sterling | FIR | Ordem | Selve | Cult Mirage | Underground |
 |---|---|---|---|---|---|---|
-| **Sterling Corp** | — | suserano | rival | extração-alvo | comercial | inimigo |
-| **FIR** | vassala | — | desprezo | predação | parceria | inimigo |
-| **Ordem Recursiva** | rival | desprezo | — | aliado | indiferença irônica | aliado |
-| **Selve Sombria** | extração-alvo | predação-alvo | aliado | — | indiferença | aliado |
-| **Cult Mirage** | comercial | parceria | indiferença | indiferença | — | inimigo |
-| **Underground** | inimigo | inimigo | aliado | aliado | inimigo | — |
+| **Sterling Corp** | self | suserano | rival | extração-alvo | comercial | inimigo |
+| **FIR** | vassala | self | desprezo | predação | parceria | inimigo |
+| **Ordem Recursiva** | rival | desprezo | self | aliado | indiferença irônica | aliado |
+| **Selve Sombria** | extração-alvo | predação-alvo | aliado | self | indiferença | aliado |
+| **Cult Mirage** | comercial | parceria | indiferença | indiferença | self | inimigo |
+| **Underground** | inimigo | inimigo | aliado | aliado | inimigo | self |
 
 ---
 
@@ -727,7 +727,7 @@ Ordem complementar não-adversária ao Asmódico, foco em meditação silenciosa
 | **Dante "Grid" Alencar** | FIR (oficialmente ex; encoberto Sterling) | Vassalo encoberto |
 | **Jaci "Proxy" Vanderbist** | Selve Sombria (vilarejo do Pelicano Branco) | Farmacêutica jovem; herdeira |
 
-Cauã não vem de facção formal porque os Dutos Infernais funcionam como **comunidade descentralizada juvenil**, não como organização instituída. Isso é deliberado: ele é o companion mais "puro" politicamente, sem amarras institucionais — o que o torna primeiro recrutável natural para jogadores não-políticos.
+Cauã não vem de facção formal porque os Dutos Infernais funcionam como **comunidade descentralizada juvenil**, não como organização instituída. Isso é deliberado: ele é o companion mais "puro" politicamente, sem amarras institucionais; o que o torna primeiro recrutável natural para jogadores não-políticos.
 
 ---
 

@@ -1,8 +1,8 @@
-# Tradições e Cultura — GusWorld
+# Tradições e Cultura (GusWorld)
 
-> **Status:** Revisão 1 (2026-05-15). Doc novo. **Canônico — expansão Bloco G.**
+> **Status:** Revisão 1 (2026-05-15). Doc novo. **Canônico (expansão Bloco G).**
 >
-> **Escopo:** festividades por facção, calendário in-world, costumes universais, rituais, comidas, gestos, vestuário. Materializa cultura como ambiente, não como exposição. Pillar — mostre não conte: tradição aparece em ambient, NPCs comentam casualmente, jogador absorve.
+> **Escopo:** festividades por facção, calendário in-world, costumes universais, rituais, comidas, gestos, vestuário. Materializa cultura como ambiente, não como exposição. Pillar "mostre não conte": tradição aparece em ambient, NPCs comentam casualmente, jogador absorve.
 >
 > **Imutáveis cross-ref:** [[lore-bible]] §11, [[factions]], [[timeline]] (calendário), [[comic-reliefs]] (já referencia tradições).
 
@@ -24,13 +24,13 @@ GusWorld usa calendário solar de **12 meses, 30-31 dias**, herdado intacto da E
 
 ### Festividades menores ou facção-específicas
 
-- **Atualização Sensorial** (Cult Mirage) — irregular, anunciada com 30 dias de antecedência; tipicamente 2-3 por ano. Manipuladora.
-- **Festival do Reaproveitamento** (FIR) — anual, semana 2 de novembro. Corporativo cínico disfarçado de celebração do trabalhador.
-- **Dia da Inicialização** (Underground) — pessoal, não-coletivo. Marca individual de cada novo membro Underground.
-- **Aniversário da Catedral Local** (Ordem Recursiva) — varia por catedral. 5 ativas, 5 datas distintas.
-- **Festa da Calibração** (Ordem Recursiva, capítulo Heliópolis-Nova) — anual, 8 de fevereiro. Comemora fundação capítulo regional Heliópolis Era 2; cordão reduzido de 34 nós (Fibonacci) em vez do cordão 89 nós principal (canon F1-DL.ORDEM-EXPAND §8.5). Era 3: capítulo capturado Sterling Corp, festa preservada residual.
-- **Festa da Federação** (Cidades-Gêmeas Norte+Sul) — anual, 8 de maio. Comemora estatutos federação bilateral Era 2; procession atravessa ponte 89 vãos entre Colunas Boróstoma (Norte) e Janor (Sul); cordão 89 nós alternado entre cidades-irmãs (canon F1-DL.ORDEM-EXPAND §8.6).
-- **Festa Coletivista** (Polis-Vermelha) — anual, 13 de fevereiro. Comemora fundação configuração coletivista cidade desde -129 (canon R10 §6.2 era-2-boom-tecnico.md §6.2 + F1-DL.ORDEM-EXPAND §8.7). Ordem Recursiva participa em registro tenso (cordão dobrado retido em vez de desdobrado, sinal cerimonial de reserva canônica).
+- **Atualização Sensorial** (Cult Mirage): irregular, anunciada com 30 dias de antecedência; tipicamente 2-3 por ano. Manipuladora.
+- **Festival do Reaproveitamento** (FIR): anual, semana 2 de novembro. Corporativo cínico disfarçado de celebração do trabalhador.
+- **Dia da Inicialização** (Underground): pessoal, não-coletivo. Marca individual de cada novo membro Underground.
+- **Aniversário da Catedral Local** (Ordem Recursiva): varia por catedral. 5 ativas, 5 datas distintas.
+- **Festa da Calibração** (Ordem Recursiva, capítulo Heliópolis-Nova): anual, 8 de fevereiro. Comemora fundação capítulo regional Heliópolis Era 2; cordão reduzido de 34 nós (Fibonacci) em vez do cordão 89 nós principal (canon F1-DL.ORDEM-EXPAND §8.5). Era 3: capítulo capturado Sterling Corp, festa preservada residual.
+- **Festa da Federação** (Cidades-Gêmeas Norte+Sul): anual, 8 de maio. Comemora estatutos federação bilateral Era 2; procession atravessa ponte 89 vãos entre Colunas Boróstoma (Norte) e Janor (Sul); cordão 89 nós alternado entre cidades-irmãs (canon F1-DL.ORDEM-EXPAND §8.6).
+- **Festa Coletivista** (Polis-Vermelha): anual, 13 de fevereiro. Comemora fundação configuração coletivista cidade desde -129 (canon R10 §6.2 era-2-boom-tecnico.md §6.2 + F1-DL.ORDEM-EXPAND §8.7). Ordem Recursiva participa em registro tenso (cordão dobrado retido em vez de desdobrado, sinal cerimonial de reserva canônica).
 
 ---
 
@@ -43,7 +43,7 @@ Aniversário da primeira linha C-Arcane compilada com sucesso (ano -150). Equipe
 ### Tradições originais (Era 2)
 
 - **Bancada aberta:** universidades, oficinas, escolas técnicas abrem laboratórios ao público. Crianças escrevem primeira linha C-Arcane assistida.
-- **Comida cerimonial:** **bolo-de-bit** (bolo retangular com cobertura quadriculada em duas cores; tradicionalmente verde e branco — pixels primeiros). Cortado em 8 partes iguais (homenagem a octeto).
+- **Comida cerimonial:** **bolo-de-bit** (bolo retangular com cobertura quadriculada em duas cores; tradicionalmente verde e branco, pixels primeiros). Cortado em 8 partes iguais (homenagem a octeto).
 - **Discurso da Pilha:** representante eleito da Pilha Sobrecarregada (anual, rotativo) faz fala curta agradecendo a próxima geração.
 - **Acender de terminal:** crianças de 7 anos (idade de início de currículo C-Arcane) acendem terminal próprio pela primeira vez em cerimônia pública.
 
@@ -52,8 +52,8 @@ Aniversário da primeira linha C-Arcane compilada com sucesso (ano -150). Equipe
 Sterling Corp comprou o evento principal há 8 anos. Mudanças:
 
 - **Holograma Sterling** no palco central. Pronunciamento ao vivo dele (uma das únicas aparições públicas anuais).
-- **Distribuição gratuita de Janelarum infantil** — versão "educativa" do sistema operacional. Cooptação de geração.
-- **Bolo-de-bit corporativo:** versão Sterling Corp tem 32 partes (4x8 — alusão a versão "mais avançada"). Crítica popular: "tem 32 partes e a gente come 8".
+- **Distribuição gratuita de Janelarum infantil:** versão "educativa" do sistema operacional. Cooptação de geração.
+- **Bolo-de-bit corporativo:** versão Sterling Corp tem 32 partes (4x8, alusão a versão "mais avançada"). Crítica popular: "tem 32 partes e a gente come 8".
 - **Discurso da Pilha** ainda acontece, mas em palco lateral menor. Manifestação simbólica de continuidade comunitária.
 
 ### Reação das facções
@@ -62,13 +62,13 @@ Sterling Corp comprou o evento principal há 8 anos. Mudanças:
 - **Underground do Silêncio:** boicota oficialmente. Realiza versão pequena em quintal privado (família Neumann tradicionalmente; com Brígida ainda como anfitriã apesar da idade).
 - **FIR:** financia versão Sterling. Distribui brindes corporativos.
 - **Cult Mirage:** sobrepõe propaganda Atualização Sensorial.
-- **Pelicano Branco:** ignora. Festeja Dia das Sementes em junho — escala diferente.
+- **Pelicano Branco:** ignora. Festeja Dia das Sementes em junho; escala diferente.
 
 ### No jogo
 
 - Possível trigger ambient ato 1 se jogo começa em agosto.
 - NPCs comentam ("amanhã é Compilação, vai chover de drone").
-- Bolo-de-bit pode aparecer como item consumível (cura HP modesta + buff temporário de Knowledge — recompensa por participar).
+- Bolo-de-bit pode aparecer como item consumível (cura HP modesta + buff temporário de Knowledge: recompensa por participar).
 
 ---
 
@@ -76,13 +76,13 @@ Sterling Corp comprou o evento principal há 8 anos. Mudanças:
 
 ### Origem
 
-Homenagem coletiva à Pilha Sobrecarregada (Tomo da Pilha Sobrecarregada surgido ~ano -100; ver [[lore-bible]] §11.2 e [[comic-reliefs]] cena 7). Mantida pela comunidade técnica desde então sem captura corporativa significativa (Sterling tentou; população resistiu por trivialização — "não tem ROI suficiente").
+Homenagem coletiva à Pilha Sobrecarregada (Tomo da Pilha Sobrecarregada surgido ~ano -100; ver [[lore-bible]] §11.2 e [[comic-reliefs]] cena 7). Mantida pela comunidade técnica desde então sem captura corporativa significativa (Sterling tentou; população resistiu por trivialização: "não tem ROI suficiente").
 
 ### Tradições
 
 - **Praça aberta:** principal praça do Núcleo Metropolitano (Praça da Compilação) vira mercado de problemas e soluções. Bancadas improvisadas. Pessoas trazem problemas técnicos não-resolvidos do ano. Outras pessoas resolvem na hora.
 - **Resposta cerimonial:** o problema mais bobo do ano é eleito por aclamação. Quem trouxe ganha **Selo da Pergunta Pequena** (medalha simbólica de latão; orgulho irônico). [[comic-reliefs]] cena 7 ressoa.
-- **Comida cerimonial:** **café-de-neurônio** (café forte com canela e gengibre — coquetel "anti-burnout") + **biscoito-de-loop** (biscoito em formato infinito; massa enrolada sobre si).
+- **Comida cerimonial:** **café-de-neurônio** (café forte com canela e gengibre, coquetel "anti-burnout") + **biscoito-de-loop** (biscoito em formato infinito; massa enrolada sobre si).
 - **Vigília de manutenção:** voluntários técnicos consertam terminais públicos de pessoas que não podem pagar manutenção. Toda a noite. Sem cobrança.
 
 ### Reação das facções
@@ -101,7 +101,7 @@ Homenagem coletiva à Pilha Sobrecarregada (Tomo da Pilha Sobrecarregada surgido
 
 ---
 
-## 3. Vigília Neo-Sylvania (21 março — equinócio outono)
+## 3. Vigília Neo-Sylvania (21 março, equinócio outono)
 
 ### Origem
 
@@ -109,8 +109,8 @@ Cerimônia da Ordem Recursiva (~ano -148). Catedrais ativas abrem ao público um
 
 ### Tradições
 
-- **Hora do silêncio:** das 22h às 23h, todos presentes guardam silêncio absoluto. Apenas os cronômetros de latão das catedrais tique-taqueiam (sincronizados ritualmente — som é parte da experiência).
-- **Acendimento do círculo:** 12 mestres acendem 12 lamparinas em sequência Fibonacci truncada (1, 1, 2, 3, 5, 8 — depois reinicia). Engrenagem-símbolo da Ordem (12 dentes assimétricos) ressoa.
+- **Hora do silêncio:** das 22h às 23h, todos presentes guardam silêncio absoluto. Apenas os cronômetros de latão das catedrais tique-taqueiam (sincronizados ritualmente; som é parte da experiência).
+- **Acendimento do círculo:** 12 mestres acendem 12 lamparinas em sequência Fibonacci truncada (1, 1, 2, 3, 5, 8; depois reinicia). Engrenagem-símbolo da Ordem (12 dentes assimétricos) ressoa.
 - **Recitação dos nomes:** lista parcial dos mestres de Neo-Sylvania conhecidos (~40 nomes preservados nos cripto-glifos) é recitada em latim litúrgico. Crianças aprendem a recitação por exposição anual.
 - **Canto coral:** breve (4 minutos) canto coral em dialeto pré-Asmódico, conhecido apenas por mestres da Ordem. Único momento do ano em que é executado.
 - **Comida cerimonial:** **pão-de-engrenagem** (pão redondo com dentes em alto-relevo na crosta; sem cobertura, simples), partilhado em pedaços.
@@ -127,12 +127,12 @@ Cerimônia da Ordem Recursiva (~ano -148). Catedrais ativas abrem ao público um
 ### No jogo
 
 - Trigger possível mid-ato 2 se ordem dos arcos colocar Bento ali.
-- Sub-quest opcional arco Bento: Gus assiste à Vigília inteira (compromisso silencioso de 1 hora real de jogo, com cinemática contemplativa — opcional puro; recompensa: **Token-de-Continuidade** + entry Diário substancial).
+- Sub-quest opcional arco Bento: Gus assiste à Vigília inteira (compromisso silencioso de 1 hora real de jogo, com cinemática contemplativa; opcional puro; recompensa: **Token-de-Continuidade** + entry Diário substancial).
 - Pode ser revisitada ato 3 se ending Ouro: Vigília extra-cerimonial após queda Sterling.
 
 ---
 
-## 4. Dia das Sementes (22 junho — solstício inverno)
+## 4. Dia das Sementes (22 junho, solstício inverno)
 
 ### Origem
 
@@ -140,15 +140,15 @@ Festividade do vilarejo do Pelicano Branco e aldeias-fronteira Selve. Pré-Era 2
 
 ### Tradições
 
-- **Seleção das sementes:** Anciã do vilarejo (atualmente Mariana Vanderbist) escolhe pessoalmente 12 sementes-relíquia de seu acervo. Cada uma escolhida representa um habitante do vilarejo nascido no ano anterior (simbólico — vilarejo cresce com a colheita).
-- **Plantio coletivo:** sementes são plantadas em canteiros comunitários ao pôr-do-sol. Crianças plantam; idosos guiam. Sem cerimônia formal — gestos silenciosos.
+- **Seleção das sementes:** Anciã do vilarejo (atualmente Mariana Vanderbist) escolhe pessoalmente 12 sementes-relíquia de seu acervo. Cada uma escolhida representa um habitante do vilarejo nascido no ano anterior (simbólico: vilarejo cresce com a colheita).
+- **Plantio coletivo:** sementes são plantadas em canteiros comunitários ao pôr-do-sol. Crianças plantam; idosos guiam. Sem cerimônia formal; gestos silenciosos.
 - **Sopa do solstício:** **sopa-de-7-raízes** (mandioca, cará, batata-doce, beterraba, nabo, gengibre, cenoura). Cada raiz simboliza um ano de espera. Cozida em panela única partilhada.
 - **Vigília das mães:** mães de crianças nascidas no ano passam a noite junto às sementes plantadas. Não dormem (ou dormem em turnos). Acompanham a primeira noite das sementes em terra.
 - **Antídotos comunitários:** Jaci (no jogo) prepara antídotos preventivos em massa pra distribuir gratuitamente. Hereditário: Lia Vanderbist fazia; Soraia também.
 
 ### Reação das facções
 
-- **Selve Sombria:** central. Fauna local "responde" durante a noite — comportamento mais quieto, biolúmen mais brilhante (segundo registros Pelicano Branco; não cientificamente confirmado mas consistente).
+- **Selve Sombria:** central. Fauna local "responde" durante a noite: comportamento mais quieto, biolúmen mais brilhante (segundo registros Pelicano Branco; não cientificamente confirmado mas consistente).
 - **Ordem Recursiva:** envia mestre por afinidade técnica + filosófica (matemática natural).
 - **Sterling Corp:** considera "folclore irrelevante"; privadamente registra Dia como janela de potencial extração (Pillar 5 hostil).
 - **FIR:** ausente.
@@ -158,7 +158,7 @@ Festividade do vilarejo do Pelicano Branco e aldeias-fronteira Selve. Pré-Era 2
 ### No jogo
 
 - Sub-quest opcional arco Jaci: Gus participa do plantio. Recompensa: **Cristal-de-Colheita** (Token raro de cura; ver [[comic-reliefs]] EE-13).
-- Cena emocional contida: Jaci e Mariana plantam semente em nome de Lia (mãe morta). Gus presente. Silêncio. (Pillar 4 — sem catarse explosiva.)
+- Cena emocional contida: Jaci e Mariana plantam semente em nome de Lia (mãe morta). Gus presente. Silêncio. (Pillar 4: sem catarse explosiva.)
 - Trigger ambient ato 2 se cronologia o permite. Pode aparecer como flashback narrativo em ending Ouro.
 
 ---
@@ -189,12 +189,12 @@ Underground do Silêncio, ~ano -50, informal. Marca aniversário de bater corpor
 ### No jogo
 
 - Sub-quest obrigatória arco Linda: Gus participa de Noite Calada inteira (1 hora real de jogo contemplativa com áudio mínimo; tem skip pós-1ª). Cena chave: Padrinho Tiago entrega doc 6 ao final.
-- Trigger ambient: se cronologia do jogo cruza 8 agosto, Zona do Silêncio entra automaticamente em modo "Noite Calada" — drones Sterling Corp evitam a zona naquela noite específica (programados pra não atritar; cálculo cínico de PR).
-- Possível variação ending Ouro: pós-jogo, Noite Calada do ano seguinte é maior — Underground sai da clandestinidade parcialmente.
+- Trigger ambient: se cronologia do jogo cruza 8 agosto, Zona do Silêncio entra automaticamente em modo "Noite Calada": drones Sterling Corp evitam a zona naquela noite específica (programados pra não atritar; cálculo cínico de PR).
+- Possível variação ending Ouro: pós-jogo, Noite Calada do ano seguinte é maior: Underground sai da clandestinidade parcialmente.
 
 ---
 
-## 6. Atualização Sensorial (Cult Mirage — irregular)
+## 6. Atualização Sensorial (Cult Mirage, irregular)
 
 ### Origem
 
@@ -205,7 +205,7 @@ Movimento original (Era 2 tardia) era performance artística genuína. Anual, mo
 - 2-3 vezes por ano, anunciada com 30 dias.
 - Hierofantes lideram espetáculo holográfico massivo no Setor Mirage.
 - "Pacto Sensorial" (adesão simbólica) autoriza coleta de dados psicológicos via biossensores embutidos em holografia ([[in-world-docs]] doc 4).
-- Comida cerimonial: nenhuma (anti-tradição; espetáculo é "alimento espiritual" — discurso Adila).
+- Comida cerimonial: nenhuma (anti-tradição; espetáculo é "alimento espiritual": discurso Adila).
 
 ### No jogo
 
@@ -214,7 +214,7 @@ Movimento original (Era 2 tardia) era performance artística genuína. Anual, mo
 
 ---
 
-## 7. Festival do Reaproveitamento (FIR — anual, novembro)
+## 7. Festival do Reaproveitamento (FIR, anual, novembro)
 
 ### Origem
 
@@ -238,32 +238,32 @@ Captura corporativa cínica (~ano -25, alinhada à ascensão Sterling). Discurso
 ### No jogo
 
 - Pode aparecer como ambient ato 2 se cronologia cruza novembro.
-- Dante comenta com tom neutro (subtexto: orgulho disfarçado de cinismo) — foreshadow sutil.
+- Dante comenta com tom neutro (subtexto: orgulho disfarçado de cinismo): foreshadow sutil.
 - Sub-quest opcional: Gus + Cauã sabotam um caminhão FIR durante desfile. Combate cômico-leve (Pillar 4); recompensa: **Token-de-Subversão**.
 
 ---
 
-## 8. Dia da Inicialização (Underground — individual)
+## 8. Dia da Inicialização (Underground, individual)
 
 ### Origem
 
-Marca pessoal de cada novo membro Underground. Não é data fixa coletiva — cada membro tem sua data.
+Marca pessoal de cada novo membro Underground. Não é data fixa coletiva; cada membro tem sua data.
 
 ### Tradições
 
 - **12 horas de silêncio absoluto:** novo membro passa 12 horas em câmara silente (dentro de antena morta lacrada) sem dispositivo, sem música, sem comunicação. Costume herdado de monges medievais? Origem incerta.
 - **Música única ao final:** ao terminar, coordenador local toca **uma música única escolhida pelo coordenador para o novo membro**. Apenas 1 música. Sem repetição. Sem comentário.
 - **Tatuagem opcional:** símbolo Underground (onda cruzada por linha reta) atrás da orelha. Discreta. Sinaliza a outros membros.
-- **Compromisso silente:** novo membro nunca conta a outro a música que recebeu. Privacidade absoluta — música é só dele.
+- **Compromisso silente:** novo membro nunca conta a outro a música que recebeu. Privacidade absoluta; música é só dele.
 
 ### No jogo
 
-- Linda passou pela inicialização aos 9 anos. Música dela: nunca revelada in-game. Sub-quest opcional pós-arco Linda permite a Gus testemunhar inicialização de novo membro (sem ouvir a música — ele fica do lado de fora). Recompensa: confiança Underground +1.
+- Linda passou pela inicialização aos 9 anos. Música dela: nunca revelada in-game. Sub-quest opcional pós-arco Linda permite a Gus testemunhar inicialização de novo membro (sem ouvir a música; ele fica do lado de fora). Recompensa: confiança Underground +1.
 - Padrinho Tiago: única pessoa que sabe todas as músicas escolhidas (coordenador atual). Carga emocional implícita.
 
 ---
 
-## 9. Aniversário da Catedral Local (Ordem Recursiva — varia)
+## 9. Aniversário da Catedral Local (Ordem Recursiva, varia)
 
 ### Origem
 
@@ -277,14 +277,14 @@ Canon F5-BK.AUDIT T2-C2 resolução "aliases folk = PLACES canonical": nomes fol
 | **Catedral Menor de Atelaiá** | = Catedral de Atelaiá (saqueada -3, contaminada -7/-0.5) | 27 julho | Borda Selve, Norte |
 | **Catedral de São Vargas** | = Catedral de São Vargas (saqueada -3, reocupada parcial) | 19 setembro | (aniversário hoje é vigília) |
 | **Catedral do Equinócio** | = Catedral Quarta (sede informal, ofício cronométrico Era 2) | 21 março (mesma da Vigília) | Combinada |
-| **Catedral Submersa** | = Catedral-Mãe (lendária submersa lacrada -750) | 3 outubro | Próxima a Anel Verde (memorial cerimonial — Mãe propriamente em região Selve Profunda desconhecida) |
+| **Catedral Submersa** | = Catedral-Mãe (lendária submersa lacrada -750) | 3 outubro | Próxima a Anel Verde (memorial cerimonial; Mãe propriamente em região Selve Profunda desconhecida) |
 
 ### Tradições
 
 - **Recitação do nome do fundador:** mestre local recita biografia curta do primeiro mestre da catedral.
 - **Cerimônia de manutenção:** verificação cerimonial de cada engrenagem da catedral (~200 engrenagens; demora todo o dia). Mestres veteranos guiam aprendizes.
 - **Pão-de-engrenagem** (igual à Vigília principal) servido no almoço.
-- **Aniversário da Catedral de São Vargas (saqueada):** vigília fúnebre. Mestres usam laço preto. Não há cerimônia interna — catedral está vazia. Vigília acontece à porta.
+- **Aniversário da Catedral de São Vargas (saqueada):** vigília fúnebre. Mestres usam laço preto. Não há cerimônia interna; catedral está vazia. Vigília acontece à porta.
 
 ### No jogo
 
@@ -303,7 +303,7 @@ Costumes não-festivos do dia a dia em GusWorld. Apareciam em ambient, dialogue 
 - **Periferia Industrial:** "**E aí, mano.**" / "**Tá no fio.**" (referência a estar conectado/seguro). Variação Cauã: "**Tá no volt.**"
 - **Catedrais:** "**A engrenagem te guie.**" Resposta: "**E a tua também.**" Solene mas afetuoso.
 - **Pelicano Branco:** "**Boa raiz.**" / "**Boa colheita.**" (cumprimento por estação).
-- **Zona do Silêncio:** **gesto** — dois dedos tocando a orelha (saudação silenciosa). Verbal: "**Frequência boa.**" Resposta: "**Sem ruído.**"
+- **Zona do Silêncio:** **gesto** (dois dedos tocando a orelha, saudação silenciosa). Verbal: "**Frequência boa.**" Resposta: "**Sem ruído.**"
 - **Setor Mirage:** "**Brilhe bem.**" / "**Cores firmes.**" Cult Mirage adoptado oficialmente em -5; alguns artistas independentes resistem usando saudação Cidade.
 - **Sterling Corp interno:** "**Runtime estável.**" Resposta corporativa: "**Sem overhead.**"
 
@@ -330,7 +330,7 @@ Costumes não-festivos do dia a dia em GusWorld. Apareciam em ambient, dialogue 
 
 ### Comidas típicas (universais, não-festivas)
 
-- **Feijão-computacional:** feijão preto com "tabuleiro" — pedaços de mandioca branca cortados em quadrados pequenos (quase parece pixel). Popular em todo Núcleo Metropolitano. Custo baixo. Inácia Berenger faz a versão melhor da Periferia.
+- **Feijão-computacional:** feijão preto com "tabuleiro" (pedaços de mandioca branca cortados em quadrados pequenos, quase parece pixel). Popular em todo Núcleo Metropolitano. Custo baixo. Inácia Berenger faz a versão melhor da Periferia.
 - **Café-de-neurônio:** café forte com canela e gengibre. Anti-burnout. Servido em qualquer mercado.
 - **Pão-de-bit:** baguete fina cortada em 8 fatias iguais. Comum em padarias do Núcleo.
 - **Caldo-de-folha-fractal:** caldo com folhas da Selve (variedade específica não-tóxica). Especialidade Pelicano Branco. Tem efeito leve de "calma" (efeito real, comprovado in-world; Jaci documenta).
@@ -341,7 +341,7 @@ Costumes não-festivos do dia a dia em GusWorld. Apareciam em ambient, dialogue 
 
 ### Brincadeiras infantis (universais)
 
-- **Compila ou Crasha:** brincadeira de roda. Uma criança fala 3 tokens (família + modificador + alvo) e outra fala se "compila" ou "crasha". Quem erra paga prenda. Gus jogou muito quando criança — daí parte da intuição.
+- **Compila ou Crasha:** brincadeira de roda. Uma criança fala 3 tokens (família + modificador + alvo) e outra fala se "compila" ou "crasha". Quem erra paga prenda. Gus jogou muito quando criança; daí parte da intuição.
 - **Vetor do Cego:** uma criança vendada anda; outras gritam "esquerda 3!" "frente 2!". Treina noção de coordenada espacial. Adultos consideram "tutorial xadrez disfarçado".
 - **Tomo da Pergunta Boba:** crianças se reúnem e fazem perguntas absurdas, votando a mais boba. Vencedor ganha respeito irônico ("ancião por um dia"). Referência infantil à Pilha Sobrecarregada.
 - **Cubo do Cauã** (regional, Periferia + Dutos): brincadeira de equilíbrio em cubo de sucata. Cauã é campeão histórico aos 13 anos.
@@ -367,7 +367,7 @@ Costumes não-festivos do dia a dia em GusWorld. Apareciam em ambient, dialogue 
 | Cura paga hospital (1 sessão rápida) | 100 créditos | 30 token-rádio |
 | Aluguel mensal apartamento Periferia | 800 créditos | (não-aplicável; aluguel só em crédito) |
 
-Underground recusa crédito Sterling sempre que possível. Não-Underground aceita token-rádio só em bairros específicos (Zona do Silêncio, fronteira-Selve, alguns becos da Periferia). Gus carrega ambos (Pillar — neutralidade técnica, sobrevivência prática).
+Underground recusa crédito Sterling sempre que possível. Não-Underground aceita token-rádio só em bairros específicos (Zona do Silêncio, fronteira-Selve, alguns becos da Periferia). Gus carrega ambos (Pillar: neutralidade técnica, sobrevivência prática).
 
 ---
 
@@ -387,8 +387,8 @@ Underground recusa crédito Sterling sempre que possível. Não-Underground acei
 
 - **Pintura urbana (graffiti):** muros do Núcleo e Periferia. Algumas peças são códigos Óxido escondidos (Linda decifra ocasionalmente). Underground patrocina silenciosamente artistas.
 - **Holografia:** dominada por Cult Mirage comercialmente; arte independente em becos do Setor Mirage.
-- **Escultura analógica:** Ordem Recursiva — esculturas de latão e bronze em catedrais. Bento aprendeu a esculpir aos 10.
-- **Bordado:** Pelicano Branco — bordado de espiral Fibonacci em mantos comunitários. Mariana ensina meninas (Jaci sabe).
+- **Escultura analógica:** Ordem Recursiva, esculturas de latão e bronze em catedrais. Bento aprendeu a esculpir aos 10.
+- **Bordado:** Pelicano Branco, bordado de espiral Fibonacci em mantos comunitários. Mariana ensina meninas (Jaci sabe).
 
 ---
 
@@ -410,10 +410,10 @@ Nenhum grupo proselitiza ofensivamente. Conflito ideológico é técnico/políti
 ## Notas de design (uso no jogo)
 
 - **Festividades aparecem como ambient**, não como obrigação narrativa. Player que joga sem cronologia exata pode nem perceber datas.
-- **NPCs comentam casualmente** ("ah, semana que vem é Vigília", "comprou bolo-de-bit hoje?") — densidade cultural sem exposição forçada.
+- **NPCs comentam casualmente** ("ah, semana que vem é Vigília", "comprou bolo-de-bit hoje?"): densidade cultural sem exposição forçada.
 - **Sub-quests opcionais associadas a festividades** dão recompensas Knowledge (entries Diário, Tokens raros, contexto bonus epilogue Ouro).
 - **Festividades também são vetor de combate ambient:** Festival do Reaproveitamento pode trigger sub-quest sabotagem; Vigília Neo-Sylvania pode trigger encontro Patch-Zero opcional na catedral.
-- **Tom respeitoso a tradições brasileiras de base:** café, feijão, pamonha, sopa-de-7-raízes ancoram autenticidade cultural pt-br **sem virar comédia barata**. Pillar 4 — sem fan-service.
+- **Tom respeitoso a tradições brasileiras de base:** café, feijão, pamonha, sopa-de-7-raízes ancoram autenticidade cultural pt-br **sem virar comédia barata**. Pillar 4: sem fan-service.
 
 ---
 

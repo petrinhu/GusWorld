@@ -1,6 +1,6 @@
-# Timeline Cronológica — GusWorld
+# Timeline Cronológica (GusWorld)
 
-> **Status:** Revisão 1 (2026-05-15). Doc novo. **Canônico — expansão Bloco G.**
+> **Status:** Revisão 1 (2026-05-15). Doc novo. **Canônico (expansão Bloco G).**
 >
 > **Escopo:** três eras estruturais do mundo (Pré-Código / Era do Compilador / Era Sterling). Eventos-chave com consequência narrativa rastreável. Não enciclopédia; cronologia funcional que sustenta arco e lore.
 >
@@ -12,9 +12,9 @@
 
 ## Calendário in-world
 
-A Era do Compilador adotou calendário solar de **12 meses de 30-31 dias**, herdado por convenção da Era 2 sem ruptura na Era Sterling (Sterling Corp considerou "ajuste de calendário" mas concluiu que era custo político alto demais para ganho administrativo nulo — concedeu).
+A Era do Compilador adotou calendário solar de **12 meses de 30-31 dias**, herdado por convenção da Era 2 sem ruptura na Era Sterling (Sterling Corp considerou "ajuste de calendário" mas concluiu que era custo político alto demais para ganho administrativo nulo: concedeu).
 
-- **Festa da Compilação:** 1º de setembro (equinócio reverso local — primavera no hemisfério sul). Aniversário da primeira linha C-Arcane.
+- **Festa da Compilação:** 1º de setembro (equinócio reverso local, primavera no hemisfério sul). Aniversário da primeira linha C-Arcane.
 - **Dia do Tomo:** 14 de janeiro (verão, calor alto). Comunidade troca soluções em praça pública.
 - **Vigília Neo-Sylvania:** equinócio de outono (21 de março). Catedrais abrem ao público uma noite.
 - **Dia das Sementes:** 22 de junho (solstício de inverno). Pelicano Branco celebra plantio do ciclo seguinte.
@@ -23,7 +23,7 @@ Detalhes festividades em [[tradicoes-cultura]].
 
 ---
 
-## Era 1 — Pré-Código (Neo-Sylvania)
+## Era 1: Pré-Código (Neo-Sylvania)
 
 > **Janela temporal:** aproximadamente ano **-1100 a -700**. Marco zero do colapso é convencionado em **-700**, mas duvidoso (registros parciais).
 
@@ -36,11 +36,11 @@ Construção em pedra, vidro e biomassa programada. Computação analógica via 
 | Ano | Evento | Consequência |
 |---|---|---|
 | **~-1100** | Primeira documentação cripto-glífica da "linguagem da floresta" (cripto-glifos em pedra). | Base do Asmódico. Bento e Ordem Recursiva ainda a estudam. |
-| **~-950** | Construção da Catedral-Mãe (localização desconhecida — provavelmente afundada em região profunda da Selve). | Fonte mítica das catedrais menores conhecidas. |
+| **~-950** | Construção da Catedral-Mãe (localização desconhecida; provavelmente afundada em região profunda da Selve). | Fonte mítica das catedrais menores conhecidas. |
 | **~-870** | Auge de Neo-Sylvania. Cooperação ecológica plena. Sementes-relíquia produzidas em massa. | Bancos genéticos depositados em catedrais; sobrevivem até hoje (acervo Pelicano Branco vem daí). |
 | **~-820** | **Anomalia Primeira** registrada nos cripto-glifos: "o limite que escolheu falar". | Hipótese arqueológica: primeira manifestação ancestral de [[patch-zero]]. Sterling rejeita publicamente; Ordem Recursiva considera credível. |
 | **~-800** | Tentativa documentada de "domesticar a anomalia". Coletivo de mestres-engenheiros propõe encapsulamento. | Hipótese: precedente direto da falha Sterling. História se repete. |
-| **~-750** | Queda parcial. Cidades menores colapsam. Catedral-Mãe lacrada por dentro pelos próprios habitantes. | Marca o início do fim. Causa exata desconhecida — catástrofe ecológica? Conflito interno? Fracasso da contenção do "limite"? |
+| **~-750** | Queda parcial. Cidades menores colapsam. Catedral-Mãe lacrada por dentro pelos próprios habitantes. | Marca o início do fim. Causa exata desconhecida: catástrofe ecológica? Conflito interno? Fracasso da contenção do "limite"? |
 | **~-720** | Êxodo. Sobreviventes dispersam. Conhecimento começa a fragmentar. | Aldeias-fronteira da Selve atuais descendem desses sobreviventes (vilarejo do Pelicano Branco inclusive). |
 | **~-700** | Colapso final. Civilização Neo-Sylvania cessa de existir como entidade política. | Inicia o Hiato. ~550 anos de regressão tecnológica. |
 
@@ -48,11 +48,11 @@ Construção em pedra, vidro e biomassa programada. Computação analógica via 
 
 Cinco séculos de regressão. Pequenos vilarejos sobrevivem na fronteira-Selve. Cidades caem. Mestres-Asmódicos passam tradição oralmente, depois em fragmentos escritos. Cripto-glifos preservados em catedrais lacradas.
 
-**Sem evento documentado de relevância dramática.** O Hiato é silêncio narrativo deliberado — a humanidade quase desaparece, e ninguém vivo lembra direito por quê.
+**Sem evento documentado de relevância dramática.** O Hiato é silêncio narrativo deliberado: a humanidade quase desaparece, e ninguém vivo lembra direito por quê.
 
 ---
 
-## Era 2 — Era do Compilador
+## Era 2: Era do Compilador
 
 > **Janela temporal:** ano **-150 a -25**. 125 anos de reconstrução cooperativa.
 
@@ -69,14 +69,14 @@ Pioneiros descobrem que substrato (Selve, mecanismos Neo-Sylvania, cripto-glifos
 | **-140** | Estabelecimento de GusWorld City sobre sítio Neo-Sylvania de superfície (catedrais já parcialmente preservadas no que viria a ser o Anel Verde). | Hub canônico. |
 | **-130** | Fundação de Polis-Vermelha. Cidade-irmã construída sobre sítio Neo-Sylvania mais profundo (subterrâneo extenso). | Sítio rico em cripto-glifos. Razão pela qual Patch-Zero capturado lá século depois. |
 | **-120** | Fundação das Cidades-Gêmeas (Norte e Sul) e Heliópolis-Nova. | Quatro grandes cidades estabelecidas. Rede comercial nasce. |
-| **-115** | Desenvolvimento do Asmódico canonical (codificação formal da linguagem analógica herdada). Primeiro mestre-codificador: **Atelaiá Chevalier** (ancestral direto de [[bento-requiem]], 5 gerações antes — Antoneto → Dmitri → Casimiro → Aldebrando → Bento, canon F1-DL.ORDEM-EXPAND). Cônjuge co-codificador: **Eusébio Argéndia-Chevalier**. | Asmódico vira disciplina formal. Catedrais reabertas como sedes. |
+| **-115** | Desenvolvimento do Asmódico canonical (codificação formal da linguagem analógica herdada). Primeiro mestre-codificador: **Atelaiá Chevalier** (ancestral direto de [[bento-requiem]], 5 gerações antes: Antoneto → Dmitri → Casimiro → Aldebrando → Bento, canon F1-DL.ORDEM-EXPAND). Cônjuge co-codificador: **Eusébio Argéndia-Chevalier**. | Asmódico vira disciplina formal. Catedrais reabertas como sedes. |
 | **-110** | Desenvolvimento do Óxido. Engenheira-mãe: **Tamara Neumann** (ancestral de [[linda-siren]], linhagem materna; bisavó-bisavó). **Antoneta Argéndia-Chevalier nasce** (filha biológica Atelaiá + Eusébio, fundadora futura diário cronístico Ordem Recursiva, 1ª geração matrilinear pós-Atelaiá). | Linguagem de segurança nasce. Underground absorve Óxido séculos depois. Linhagem matrilinear cronistas Atelaiá inicia. |
 | **-95** | Desenvolvimento do Pythia (interpretação rápida, ideal para protótipo e bio-script). Co-autoria: **Iremar Berenger** (ancestral de [[caua-volt]]) + **Anhuera Vanderbist** (ancestral materna de [[jaci-proxy]], avó-avó). **Antoneto Chevalier** assume mestre-primaz patrilinear Chevalier (1ª geração intermediária pós-Atelaiá, italiano canon). | Aliança fundadora Berenger-Vanderbist. Pythia vira linguagem cooperativa entre Dutos e Pelicano Branco. Continuidade Asmódico Catedrais Neo-Sylvania. |
 | **-100** | Surge o Tomo da Pilha Sobrecarregada. Documentação coletiva começa a ser mantida. | Conhecimento aberto institucionalizado. [[comic-reliefs]] cena 7 referencia. |
-| **-80** | **Atelaiá Chevalier registra em diário pessoal**: queda parcial de catedral menor por "anomalia recorrente" (provável Patch-Zero pré-Sterling, primeira manifestação na Era 2). 17 mestres morrem em uma noite. | Trauma fundador da Ordem Recursiva. Diário de Atelaiá preservado — Bento herda. Documento canônico in-world (ver [[in-world-docs]]). |
+| **-80** | **Atelaiá Chevalier registra em diário pessoal**: queda parcial de catedral menor por "anomalia recorrente" (provável Patch-Zero pré-Sterling, primeira manifestação na Era 2). 17 mestres morrem em uma noite. | Trauma fundador da Ordem Recursiva. Diário de Atelaiá preservado: Bento herda. Documento canônico in-world (ver [[in-world-docs]]). |
 | **-78** | Ordem Recursiva decreta protocolo "Selagem Asmódica": catedrais menores recebem lacre cerimonial + cinético se anomalia detectada. Atelaiá Chevalier (69 anos) sela manifesto pessoalmente em cerimônia 89 dias (1 setembro a 30 novembro). Tradição cronística matrilinear inaugurada (sucessoras: Antoneta → Verônica → Tarsila → Felícia → contemporânea, 6 gerações). | Protocolo ainda válido. Bento aprende. Linhagem matrilinear cronistas 6 gerações canon. |
 | **-55** | **Dmitri Chevalier** assume mestre-primaz patrilinear Chevalier (2ª geração intermediária pós-Atelaiá, russo canon, etnia mista linhagem). Intervalo Antoneto (-95) → Dmitri (-55) de 40 anos justificado canon pela longevidade Antoneto (vida ativa ~75 anos) + transição tardia institucional típica da Ordem Recursiva: aprendizes designados assumem cargo apenas após período prolongado de tutoria, raramente antes dos 20 anos de aprendizado formal. | Continuidade Asmódico + relojoaria Catedrais. |
-| **-25** | **Casimiro Chevalier** assume mestre-primaz patrilinear Chevalier (3ª geração intermediária pós-Atelaiá, polonês canon — etnia mista linhagem). **Tarsila Atelaiá-Verônica** assume cronista matrilinear (3ª geração pós-Atelaiá, filha Verônica). | Continuidade relojoaria gravitacional Catedrais Neo-Sylvania. Cronistas continuam. |
+| **-25** | **Casimiro Chevalier** assume mestre-primaz patrilinear Chevalier (3ª geração intermediária pós-Atelaiá, polonês canon, etnia mista linhagem). **Tarsila Atelaiá-Verônica** assume cronista matrilinear (3ª geração pós-Atelaiá, filha Verônica). | Continuidade relojoaria gravitacional Catedrais Neo-Sylvania. Cronistas continuam. |
 | **-8** | **Felícia Tarsila** assume cronista matrilinear (4ª geração pós-Atelaiá, filha Tarsila), audit cross-cidades + cross-Famílias. | Linhagem matrilinear cronistas continua. |
 | **-50** | Fundação da Federação Industrial de Reciclagem (FIR). Inicialmente cooperativa de boa-fé: aproveitamento de hardware Neo-Sylvania para uso público. | Inicialmente útil. Captura corporativa começa 25 anos depois. |
 | **~-50** | **Batida Casa das Antenas** (operação FIR pré-captura corporativa em coordenação com forças pré-Sterling). 14 técnicos analógicos detidos. 6 ressurgem em meses, 8 desaparecidos canônicos. Partitura "Última Frequência" composta antes da batida; preservada por sobreviventes. | Trauma fundador do Underground do Silêncio. Cordão 89 nós herdado pelos 6 sobreviventes; tradição matrilinear de luto consolidada. Origem da Noite Calada (8 agosto). Cross-ref [[factions]] §6. |
@@ -84,11 +84,11 @@ Pioneiros descobrem que substrato (Selve, mecanismos Neo-Sylvania, cripto-glifos
 | **-40** | Underground do Silêncio surge informalmente como movimento de proteção de antenas analógicas contra obsolescência forçada. Nome ainda não cunhado. | Pré-história do Underground. |
 | **-35** | Cult Mirage surge como movimento artístico genuíno (performances holográficas, cinema imersivo). Co-fundadora: **Sonja Murmúrio** (mãe biológica de **Adila Murmúrio**, futura hierofante manipuladora). | Cult nasce ético. Degrada já no ano seguinte com a morte de Sonja. |
 | **-34** | **Sonja Murmúrio morre** em circunstâncias nunca esclarecidas. Adila Murmúrio (então com 6 anos) assume formalmente a liderança facção pró-Sterling do Cult Mirage no mesmo ano, sob tutela administrativa transitória. Cult Mirage canon dual (artista genuína + pró-Sterling) consolidada desde então. Versão pública oficial sustentada por Adila por 34 anos: "Sonja afastou-se por saúde e segue em retiro contemplativo". Não houve corpo, atestado público, fotografia recente ou gravação posterior. | Wound de origem Adila. Catalyst da degradação Cult. |
-| **-30** | Janelarum lançado em versão 1.0 (sistema operacional comercial, ainda independente — não Sterling Corp; será absorvido depois). | Plataforma fragil que vira meme. [[comic-reliefs]] cenas 11 e 12. |
+| **-30** | Janelarum lançado em versão 1.0 (sistema operacional comercial, ainda independente, não Sterling Corp; será absorvido depois). | Plataforma fragil que vira meme. [[comic-reliefs]] cenas 11 e 12. |
 
 ---
 
-## Era 3 — Era Sterling
+## Era 3: Era Sterling
 
 > **Janela temporal:** ano **-25 ao presente (ano 0)**. 25 anos de erosão silenciosa.
 
@@ -103,11 +103,12 @@ Sterling Locke publica tese DRE (Dynamic-Runtime Evaluation). Migra para setor p
 | **-25** | **Sterling Locke publica tese de doutorado** "Tratado sobre a Supremacia do Script". Rejeitado pela academia C-Arcane. | Ponto de inflexão. Sterling jura vingança epistêmica silenciosa. |
 | **-22** | Sterling assume CTO da Apex-Data Systems. Inicia migração forçada de sistemas legados para interpretador instável. | Engenharia de colapso começa. |
 | **-19** | Apex-Data Systems entra em Chapter 11. Sterling sai com código-fonte de autenticação central da metrópole. | Empresa colapsa. Funcionária de QA: **Inácia Berenger** (mãe de [[caua-volt]] e Davi), demitida nesse ano com indenização irrisória. Trauma seed família. |
+
 | **-18** | Sterling assume CIO da Nexus-Cloud Conglomerate. | Próximo alvo. |
-| **-16** | **Apex-Data audit interno vazado:** relatório técnico assinado por engenheiro anônimo documenta sabotagem deliberada de Sterling. Engenheiro desaparece em 2 semanas — "transferido para Heliópolis-Nova". Nunca mais visto. | Documento sobrevive em rede underground. Linda recebe cópia anos depois (ver [[in-world-docs]] doc 5). |
+| **-16** | **Apex-Data audit interno vazado:** relatório técnico assinado por engenheiro anônimo documenta sabotagem deliberada de Sterling. Engenheiro desaparece em 2 semanas (oficialmente "transferido para Heliópolis-Nova"). Nunca mais visto. | Documento sobrevive em rede underground. Linda recebe cópia anos depois (ver [[in-world-docs]] doc 5). |
 | **-15** | Nexus-Cloud colapsa. Sterling sai com patentes de processamento por indução magnética. | Tecnologia que sustenta drones Sterling Corp hoje. |
 | **-14** | Sterling assume CEO da Core-Synth Bio-Tech. | Última fase do canibalismo. |
-| **-5** | **Acidente de manutenção em prédio popular da Periferia Industrial.** Sistema elétrico mal instalado por subcontratada FIR (alinhada Sterling) pega fogo. Morre **Davi Berenger** (irmão mais velho de [[caua-volt]], 16 anos na época; nasceu ~-21). Cauã tinha 8 anos. Família Berenger silenciada com indenização irrisória. | Wound canônico Cauã. Confirmação tardia (ending Ouro): Davi não foi vítima negligência, foi alvo deliberado (Davi tinha começado a documentar irregularidades FIR; bilhete final preservado por Inácia, ver [[in-world-docs]] doc 13). |
+| **-5** | **Acidente de manutenção em prédio popular da Periferia Industrial.** Sistema elétrico mal instalado por subcontratada FIR (alinhada Sterling) pega fogo. Morre **Davi Berenger** (irmão mais velho de [[caua-volt]], 16 anos na época; nasceu ~-21). Cauã tinha 8 anos. Família Berenger silenciada com indenização irrisória. | Wound canônico Cauã. Confirmação tardia (ending Ouro): Davi não foi vítima negligência, e sim alvo deliberado (Davi tinha começado a documentar irregularidades FIR; bilhete final preservado por Inácia, ver [[in-world-docs]] doc 13). |
 | **-12** | Core-Synth Bio-Tech liquidada. Sterling sai com protocolos cérebro-máquina. | Tecnologia base do Locke Core (implante neural cortical). |
 | **-12** | Sterling consolida tudo em **Sterling Corp**. Inicia construção da Cúpula Sterling no que viria a ser o setor entre Núcleo Metropolitano e Anel Verde. | Sede canônica nasce. |
 | **-12** | **Bartolo Penkin desaparece** (engenheiro QA sênior ex-Apex-Data, ~50 anos, atribuído ao relatório audit doc 5 vazado em -16). Pós-vazamento, manteve perfil baixo por 4 anos; eliminado em -12. Identificação oficial nunca confirmada in-world. | Underground preserva audit. Cordão 89 nós herdado por sobrinho Mateus Penkin (Periferia). |
@@ -122,7 +123,7 @@ Sterling Locke publica tese DRE (Dynamic-Runtime Evaluation). Migra para setor p
 | **-10** | Fundação da operação GRE (Global Runtime Environment) como projeto interno classificado. Conhecido inicialmente como "Projeto Continente". | Plano canônico Sterling. |
 | **-8** | Cooperativa familiar Alencar (oficina dos pais de Dante) destruída por engenharia financeira FIR-Sterling. Salviano Alencar morre por overdose-medicação 6 meses depois (oficialmente "acidente"; comunidade suspeita suicídio). Edilma sobrevive nominalmente. Apartamento subsidiado da Periferia mantido como fachada operacional por equipe FIR rotacionando indicadores de habitação ativa (luz acesa em janela, lixo semanal, cortina trocada de posição). Realidade canon (revelação ato 3 + arco Dante Beat Ten + Dragon Victory): Edilma é sequestrada pela Sterling brass via Cassiano Vorto e mantida em cela da Caverna dos Perdidos (nordeste Pântano Markov, subterrânea profunda Selve Sombria) como chantagem psicológica permanente contra Dante. Cross-ref [[factions]] §3 FIR NPC Edilma entry + [[PLACES]] Caverna dos Perdidos + INCOHERENCES C10 resolvido. | Wound canônico Dante. Aliciamento Sterling começa nesse período (ver -5). |
 | **-8** | **Batida Sterling Corp + FIR em casa da família Neumann.** Toca-discos histórico apreendido como "equipamento clandestino não-licenciado". Linda (4 anos na época) vê. Otmar consegue salvar agulha intacta antes da apreensão; entrega a Linda. | Wound canônico Linda. Agulha vira pingente. |
-| **-8** | **Mãe e pai da Jaci morrem por surto silencioso no Pelicano Branco.** Causa registrada in-world: "anomalia botânica de origem desconhecida". Jaci (3 anos na época) sobrevive por estar em viagem com a avó Mariana. Causa real (revelada ending Ouro): vetor experimental Sterling — testagem clandestina de bio-script DRE em vilarejo periférico. Mariana suspeita; nunca consegue provar. | Wound canônico Jaci. Anciã Mariana assume guarda. |
+| **-8** | **Mãe e pai da Jaci morrem por surto silencioso no Pelicano Branco.** Causa registrada in-world: "anomalia botânica de origem desconhecida". Jaci (3 anos na época) sobrevive por estar em viagem com a avó Mariana. Causa real (revelada ending Ouro): vetor experimental Sterling, testagem clandestina de bio-script DRE em vilarejo periférico. Mariana suspeita; nunca consegue provar. | Wound canônico Jaci. Anciã Mariana assume guarda. |
 | **-7** | **Acidente Patch-Zero "primeira-aparição-moderna" off-screen na Catedral Menor de Atelaiá** (catedral nomeada em homenagem ao mestre fundador da linhagem Bento). Mestre-Aprendiz **Hilário Tepenkov** (companheiro de estudos de Bento, 14 anos na época) morre na contaminação. Bento (7 anos na época) presente; sobrevive por sair ao alcance do escudo de [[bento-requiem|Mestre-Hierofante Velhusto]]. | Wound canônico Bento (testemunhar cedo). Patch-Zero pré-existente confirmado nesta era. |
 | **-6** | Adila Murmúrio consolida tutela administrativa plena do Cult Mirage pró-Sterling iniciada em -34; passa de Hierofante nominal a Hierofante operacional plena. | Marco operacional, não institucional (institucional foi em -34). |
 | **-6** | Iara (idade 6) adotada formalmente por Cult Mirage. Adila a treina como "promessa artística". | Início da manipulação canônica Iara. |
@@ -144,13 +145,13 @@ Sterling Locke publica tese DRE (Dynamic-Runtime Evaluation). Migra para setor p
 
 ---
 
-## Ano 0 — eventos durante o jogo (mapeamento por ato)
+## Ano 0: eventos durante o jogo (mapeamento por ato)
 
 ### Ato 1 (~primeira semana de jogo in-world)
 
 - Gus solo no Núcleo Metropolitano. Catalyst. Recrutamento companion #1.
 - Sterling cresce em presença holográfica.
-- Festa da Compilação (1º setembro) pode coincidir narrativamente com ato 1 (se o jogo começa em agosto) — propaganda Sterling sobre o evento aparece como ambient.
+- Festa da Compilação (1º setembro) pode coincidir narrativamente com ato 1 (se o jogo começa em agosto); propaganda Sterling sobre o evento aparece como ambient.
 
 ### Ato 2 (~três a seis meses in-world)
 
@@ -198,7 +199,7 @@ Detalhes em cada [[characters]].
 | **Berenger (Pythia + Dutos)** | Iremar Berenger (~-95, 1ª geração) → 3 gerações intermediárias → Salvador (4ª geração, morto -13 acidente tráfego Periferia) + Inácia (mãe viva, ex-Apex-Data demitida -19) → Davi (5ª geração, nascido -21, morto -5 aos 16) e Cauã (5ª geração, nascido -13) | [[caua-volt]] |
 | **Neumann (Óxido + Underground)** | Tamara Neumann (~-110) → 4 gerações → Otmar + Brígida (vivos) → Linda | [[linda-siren]] |
 | **Vance (Gus)** | Linhagem Vance modesta sem prestígio acadêmico. Avó materna **Belinor Vance** mencionada por Gargi como "a que dizia que toda lógica começa numa horta" ([[comic-reliefs]] EE-13). Avô morto antes de Gus nascer. | [[gus]] |
-| **Koslov (Iara)** | Pais biológicos desconhecidos. Sobrenome Koslov atribuído por registro civil Cult Mirage (origem eslava obscura). Lacuna deliberada — sidequest opcional ending Ouro pode parcialmente preencher (não totalmente). | [[iara-lumen]] |
+| **Koslov (Iara)** | Pais biológicos desconhecidos. Sobrenome Koslov atribuído por registro civil Cult Mirage (origem eslava obscura). Lacuna deliberada: sidequest opcional ending Ouro pode parcialmente preencher (não totalmente). | [[iara-lumen]] |
 | **Alencar (Dante)** | Cooperativa familiar Alencar (3 gerações de mecânicos independentes). Salviano (morto -8) + Edilma (viva reclusa) → Dante. | [[dante-grid]] |
 | **Sterling (pseudo-linhagem)** | Sem família declarada. Linhagem corporativa: Apex-Data → Nexus-Cloud → Core-Synth → Sterling Corp. | [[sterling-locke]] |
 | **Murmúrio (Cult Mirage)** | Sonja Murmúrio (co-fundadora artista ~-35 fundação Cult, morta -34 aos 33) → Adila (filha biológica nasc -40, hierofante atual, ~40 anos ano 0). | Adila Murmúrio (NPC antagonista intermediária) |
