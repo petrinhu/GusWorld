@@ -1,4 +1,4 @@
-# GusWorld — Bíblia Worldbuilding, Volume 1
+# GusWorld, Bíblia Worldbuilding, Volume 1
 
 > **Status:** Estrutura TOC unificada (proposta de consolidação editorial). Não é livro redigido; é blueprint de organização do canon existente em forma de obra de referência publicável.
 >
@@ -33,7 +33,7 @@
 ## Mapa visual da obra
 
 ```
-VOLUME 1 — BÍBLIA WORLDBUILDING
+VOLUME 1: BÍBLIA WORLDBUILDING
 │
 ├── PARTE I       FRONTISPÍCIO                    (~28k pal /  ~95 pp)
 ├── PARTE II      COSMOLOGIA                      (~44k pal / ~145 pp)
@@ -50,7 +50,7 @@ VOLUME 1 — BÍBLIA WORLDBUILDING
 
 ---
 
-# PARTE I — FRONTISPÍCIO
+# PARTE I: FRONTISPÍCIO
 
 **Função:** abrir o livro, declarar premissa, dar ao leitor as cinco regras de leitura (pillars) e o manifesto autoral que sustenta tudo.
 
@@ -58,11 +58,11 @@ VOLUME 1 — BÍBLIA WORLDBUILDING
 
 ---
 
-## Capítulo 1 — Sinopse e Visão Geral
+## Capítulo 1: Sinopse e Visão Geral
 
 | # | Sub-capítulo | Fonte | Palavras | Páginas | Nota revisão |
 |---|---|---|---|---|---|
-| 1.1 | Sinopse canônica | `sinopse.md` | ~3k | ~10 | imutável — base canon |
+| 1.1 | Sinopse canônica | `sinopse.md` | ~3k | ~10 | imutável; base canon |
 | 1.2 | Premissa em três princípios | `docs/narrative/lore-bible.md` §1-2 | ~1.5k | ~5 | extrair + leve adaptação editorial |
 | 1.3 | Theme central: a inteligência mais alta serve à vida | `lore-bible.md` §2 | ~0.5k | ~2 | extrair (1 frase + parágrafo expansão) |
 | 1.4 | Como ler esta bíblia (manual do leitor) | **novo, redacional** | ~2k | ~7 | encomendar a `narrative-writer` (estilo Stephenson/Sterling) |
@@ -72,7 +72,7 @@ VOLUME 1 — BÍBLIA WORLDBUILDING
 
 ---
 
-## Capítulo 2 — Pillars Canônicos e Manifesto Autoral
+## Capítulo 2: Pillars Canônicos e Manifesto Autoral
 
 | # | Sub-capítulo | Fonte | Palavras | Páginas | Nota revisão |
 |---|---|---|---|---|---|
@@ -88,7 +88,7 @@ VOLUME 1 — BÍBLIA WORLDBUILDING
 
 ---
 
-# PARTE II — COSMOLOGIA
+# PARTE II: COSMOLOGIA
 
 **Função:** dar ao leitor o esqueleto ontológico antes de mergulhar nas eras. Sem cosmologia, o leitor não entende por que magia e biologia operam pelas mesmas regras.
 
@@ -96,12 +96,12 @@ VOLUME 1 — BÍBLIA WORLDBUILDING
 
 ---
 
-## Capítulo 3 — Sistema Formal Computável
+## Capítulo 3: Sistema Formal Computável
 
 | # | Sub-capítulo | Fonte | Palavras | Páginas | Nota revisão |
 |---|---|---|---|---|---|
 | 3.1 | Pós-apocalipse digital sem meta-simulação | `lore-bible.md` §4 + `deep/ontologia/cosmologia-deep.md` | ~5k | ~17 | consolidar duas fontes; remover duplicação |
-| 3.2 | A tese de Neo-Sylvania: o mundo já era programável | `deep/eras/era-1-pre-codigo.md` §1 (frontispício) — extrato | ~3k | ~10 | extrato editorial (1ª pessoa do cronista) |
+| 3.2 | A tese de Neo-Sylvania: o mundo já era programável | `deep/eras/era-1-pre-codigo.md` §1 (frontispício), extrato | ~3k | ~10 | extrato editorial (1ª pessoa do cronista) |
 | 3.3 | Substratos suportados (silício, latão, proteína, mineral ressonante) | `deep/ontologia/tech-3-eras-deep.md` §1-3 | ~5k | ~17 | extrair com adaptação |
 | 3.4 | Limites do sistema (custo, escopo, tipo, terminação) | `deep/magic/glyph-token-conjuro-codex-deep.md` §sistema formal | ~4k | ~13 | extrair |
 
@@ -109,7 +109,7 @@ VOLUME 1 — BÍBLIA WORLDBUILDING
 
 ---
 
-## Capítulo 4 — Natureza como Matemática Rígida
+## Capítulo 4: Natureza como Matemática Rígida
 
 | # | Sub-capítulo | Fonte | Palavras | Páginas | Nota revisão |
 |---|---|---|---|---|---|
@@ -125,7 +125,7 @@ VOLUME 1 — BÍBLIA WORLDBUILDING
 
 ---
 
-# PARTE III — AS TRÊS ERAS
+# PARTE III: AS TRÊS ERAS
 
 **Função:** coluna vertebral histórica da obra. Bloco maior do livro (~835 pp). Era 1 é desproporcional em peso porque é a fundação esquecida que ressoa em todo o resto.
 
@@ -133,7 +133,7 @@ VOLUME 1 — BÍBLIA WORLDBUILDING
 
 ---
 
-## Capítulo 5 — Era 1: Pré-Código (Neo-Sylvania)
+## Capítulo 5: Era 1, Pré-Código (Neo-Sylvania)
 
 > **Tom:** ensaio arqueológico em prosa densa Stephenson/Sterling. O cronista da Era 2 fala em primeira pessoa metódica. Bloco mais longo do livro.
 
@@ -156,7 +156,7 @@ VOLUME 1 — BÍBLIA WORLDBUILDING
 
 ---
 
-## Capítulo 6 — Era 2: Era do Compilador
+## Capítulo 6: Era 2, Era do Compilador
 
 | # | Sub-capítulo | Fonte | Palavras | Páginas | Nota revisão |
 |---|---|---|---|---|---|
@@ -172,18 +172,18 @@ VOLUME 1 — BÍBLIA WORLDBUILDING
 
 ---
 
-## Capítulo 7 — Era 3: Era Sterling (presente do jogo)
+## Capítulo 7: Era 3, Era Sterling (presente do jogo)
 
 | # | Sub-capítulo | Fonte | Palavras | Páginas | Nota revisão |
 |---|---|---|---|---|---|
-| 7.1 | A tese de doutorado (DRE — Dynamic-Runtime Evaluation) | `lore-bible.md` §3.3 + `characters/sterling-locke.md` §tese + `deep/antagonists/sterling-locke-deep.md` §1 | ~3k | ~10 | consolidar |
+| 7.1 | A tese de doutorado (DRE, Dynamic-Runtime Evaluation) | `lore-bible.md` §3.3 + `characters/sterling-locke.md` §tese + `deep/antagonists/sterling-locke-deep.md` §1 | ~3k | ~10 | consolidar |
 | 7.2 | A subida corporativa de Sterling Locke | `deep/antagonists/sterling-locke-deep.md` §2 + `lore-bible.md` §3.3 | ~4k | ~13 | extrair |
 | 7.3 | Apex-Data, Nexus-Cloud, Core-Synth: canibalização de três conglomerados | `characters/sterling-locke.md` §canibalização | ~3k | ~10 | extrair |
 | 7.4 | Sterling Corp consolidada + Cúpula Sterling | `deep/antagonists/sterling-locke-deep.md` §3 + `deep/factions/sterling-corp.md` | ~5k | ~17 | consolidar |
 | 7.5 | A FIR vassala (mafiosa lavando ativos) | `deep/factions/fir.md` §captura | ~3k | ~10 | extrair |
 | 7.6 | Janelarum, terminais públicos, infraestrutura privatizada | `comic-reliefs.md` cena 11 + `lore-bible.md` §3.3 | ~2k | ~7 | consolidar (tom satírico controlado) |
-| 7.7 | Operação GRE — Global Runtime Environment | `lore-bible.md` §3.3 + `deep/antagonists/sterling-locke-deep.md` §GRE | ~3k | ~10 | extrair |
-| 7.8 | Patch-Zero — o antagonista-sistema | `characters/patch-zero.md` + `deep/antagonists/patch-zero-deep.md` | ~5k | ~17 | consolidar |
+| 7.7 | Operação GRE (Global Runtime Environment) | `lore-bible.md` §3.3 + `deep/antagonists/sterling-locke-deep.md` §GRE | ~3k | ~10 | extrair |
+| 7.8 | Patch-Zero, o antagonista-sistema | `characters/patch-zero.md` + `deep/antagonists/patch-zero-deep.md` | ~5k | ~17 | consolidar |
 | 7.9 | A Selve resistindo (anomalias de runtime no presente) | `lore-bible.md` §3.3 final + `deep/settings/02-selve-sombria.md` §anomalias | ~3k | ~10 | extrato editorial |
 
 **Subtotal Cap 7:** ~31k pal / ~104 pp
@@ -194,7 +194,7 @@ VOLUME 1 — BÍBLIA WORLDBUILDING
 
 ---
 
-# PARTE IV — MAGIA E LINGUAGEM
+# PARTE IV: MAGIA E LINGUAGEM
 
 **Função:** explicar formalmente o sistema GTCC (Glyph/Token/Conjuro/Codex) e as quatro linguagens canônicas. Leitor sai daqui sabendo escrever uma instrução básica em C-Arcane.
 
@@ -202,7 +202,7 @@ VOLUME 1 — BÍBLIA WORLDBUILDING
 
 ---
 
-## Capítulo 8 — Sistema GTCC e as Quatro Linguagens
+## Capítulo 8: Sistema GTCC e as Quatro Linguagens
 
 | # | Sub-capítulo | Fonte | Palavras | Páginas | Nota revisão |
 |---|---|---|---|---|---|
@@ -212,8 +212,8 @@ VOLUME 1 — BÍBLIA WORLDBUILDING
 | 8.4 | Codex (programa mágico) | `glyph-token-conjuro-codex-deep.md` §Codex | ~3k | ~10 | extrair |
 | 8.5 | C-Arcane (Gus, baixo nível compilado) | `deep/magic/4-linguagens-deep.md` §C-Arcane | ~5k | ~17 | extrair |
 | 8.6 | Asmódico (Bento, analógico Neo-Sylvania) | `4-linguagens-deep.md` §Asmódico | ~5k | ~17 | extrair (cross-ref Era 1 §3) |
-| 8.7 | Óxido (Iara, Linda — alta segurança) | `4-linguagens-deep.md` §Óxido | ~5k | ~17 | extrair |
-| 8.8 | Pythia (Cauã, Jaci — scripting rápido bio-hacking) | `4-linguagens-deep.md` §Pythia | ~5k | ~17 | extrair |
+| 8.7 | Óxido (Iara, Linda; alta segurança) | `4-linguagens-deep.md` §Óxido | ~5k | ~17 | extrair |
+| 8.8 | Pythia (Cauã, Jaci; scripting rápido bio-hacking) | `4-linguagens-deep.md` §Pythia | ~5k | ~17 | extrair |
 | 8.9 | Comparativa cruzada das quatro linguagens (custo, escopo, runtime) | `4-linguagens-deep.md` §comparativa | ~4k | ~13 | extrair |
 
 **Subtotal Cap 8:** ~36k pal / ~121 pp
@@ -222,7 +222,7 @@ VOLUME 1 — BÍBLIA WORLDBUILDING
 
 ---
 
-# PARTE V — PERSONAGENS
+# PARTE V: PERSONAGENS
 
 **Função:** dossiê completo do elenco canônico. Tom autoral biográfico denso, com 1-2 trechos in-character por personagem (carta, fragmento de diário, depoimento).
 
@@ -230,37 +230,37 @@ VOLUME 1 — BÍBLIA WORLDBUILDING
 
 ---
 
-## Capítulo 9 — A Party (Gus + Seis Companions)
+## Capítulo 9: A Party (Gus + Seis Companions)
 
 | # | Sub-capítulo | Fonte | Palavras | Páginas | Nota revisão |
 |---|---|---|---|---|---|
-| 9.1 | Gustaf VII "Gus" Vector Tavus Vance — protagonista | `characters/gus.md` + `deep/characters/gus-dragon.md` + memória `project_dragon_victory_canon` | ~9k | ~30 | consolidar; reforçar canon "Dragon" + Pyotor I Draco Vance |
-| 9.2 | Cauã "Volt" Berenger — Striker (Pythia, Dutos Infernais) | `characters/caua-volt.md` + `deep/characters/caua-volt.md` | ~7k | ~23 | consolidar |
-| 9.3 | Iara "Lumen" Koslov — Infiltradora (Óxido, Setor Mirage, ex-Cult) | `characters/iara-lumen.md` + `deep/characters/iara-lumen.md` | ~7k | ~23 | consolidar |
-| 9.4 | Bento "Requiem" Chevalier — Tanque (Asmódico, exceção Pillar 2) | `characters/bento-requiem.md` + `deep/characters/bento-requiem.md` | ~7k | ~23 | consolidar |
-| 9.5 | Linda "Siren" Neumann — Crowd Control (Óxido, Zona do Silêncio) | `characters/linda-siren.md` + `deep/characters/linda-siren.md` | ~7k | ~23 | consolidar |
-| 9.6 | Dante "Grid" Alencar — o traidor (Asmódico→C-Arcane, Periferia) | `characters/dante-grid.md` + `deep/characters/dante-grid.md` + memória chantagem Edilma | ~9k | ~30 | tratamento double-layer; cuidado pra não vazar reveal antes do leitor lê arco principal |
-| 9.7 | Jaci "Proxy" Vanderbist — Healer biológica (Pythia, Selve Sombria) | `characters/jaci-proxy.md` + `deep/characters/jaci-proxy.md` | ~7k | ~23 | consolidar |
+| 9.1 | Gustaf VII "Gus" Vector Tavus Vance, protagonista | `characters/gus.md` + `deep/characters/gus-dragon.md` + memória `project_dragon_victory_canon` | ~9k | ~30 | consolidar; reforçar canon "Dragon" + Pyotor I Draco Vance |
+| 9.2 | Cauã "Volt" Berenger, Striker (Pythia, Dutos Infernais) | `characters/caua-volt.md` + `deep/characters/caua-volt.md` | ~7k | ~23 | consolidar |
+| 9.3 | Iara "Lumen" Koslov, Infiltradora (Óxido, Setor Mirage, ex-Cult) | `characters/iara-lumen.md` + `deep/characters/iara-lumen.md` | ~7k | ~23 | consolidar |
+| 9.4 | Bento "Requiem" Chevalier, Tanque (Asmódico, exceção Pillar 2) | `characters/bento-requiem.md` + `deep/characters/bento-requiem.md` | ~7k | ~23 | consolidar |
+| 9.5 | Linda "Siren" Neumann, Crowd Control (Óxido, Zona do Silêncio) | `characters/linda-siren.md` + `deep/characters/linda-siren.md` | ~7k | ~23 | consolidar |
+| 9.6 | Dante "Grid" Alencar, o traidor (Asmódico→C-Arcane, Periferia) | `characters/dante-grid.md` + `deep/characters/dante-grid.md` + memória chantagem Edilma | ~9k | ~30 | tratamento double-layer; cuidado pra não vazar reveal antes do leitor lê arco principal |
+| 9.7 | Jaci "Proxy" Vanderbist, Healer biológica (Pythia, Selve Sombria) | `characters/jaci-proxy.md` + `deep/characters/jaci-proxy.md` | ~7k | ~23 | consolidar |
 | 9.8 | Dinâmicas da party (matriz linguagens + matriz afetos) | `characters/party.md` | ~3k | ~10 | extrair tabelas + comentário editorial |
 
 **Subtotal Cap 9:** ~56k pal / ~185 pp
 
 ---
 
-## Capítulo 10 — Antagonistas
+## Capítulo 10: Antagonistas
 
 | # | Sub-capítulo | Fonte | Palavras | Páginas | Nota revisão |
 |---|---|---|---|---|---|
-| 10.1 | Sterling Locke — perfil integral | `characters/sterling-locke.md` + `deep/antagonists/sterling-locke-deep.md` | ~10k | ~33 | consolidar (235 + 61 linhas; doc canônico largo) |
+| 10.1 | Sterling Locke, perfil integral | `characters/sterling-locke.md` + `deep/antagonists/sterling-locke-deep.md` | ~10k | ~33 | consolidar (235 + 61 linhas; doc canônico largo) |
 | 10.2 | Pre-lore vilão (formação acadêmica, rejeição, migração) | `characters/prelore_vilao.md` | ~2k | ~7 | extrair íntegra |
-| 10.3 | Patch-Zero — antagonista-sistema (anti-padrão + 4 canais) | `characters/patch-zero.md` + `deep/antagonists/patch-zero-deep.md` | ~8k | ~27 | consolidar |
+| 10.3 | Patch-Zero, antagonista-sistema (anti-padrão + 4 canais) | `characters/patch-zero.md` + `deep/antagonists/patch-zero-deep.md` | ~8k | ~27 | consolidar |
 | 10.4 | NPCs antagonistas menores (FIR-vassalos, executivos Sterling Corp) | `deep/antagonists/npcs-antologia.md` | ~4k | ~13 | extrair |
 
 **Subtotal Cap 10:** ~24k pal / ~80 pp
 
 ---
 
-## Capítulo 11 — Linhagens Canônicas (cross-eras)
+## Capítulo 11: Linhagens Canônicas (cross-eras)
 
 > **Função:** retratar 8 linhagens que atravessam as 3 eras, dando densidade familiar ao mundo. Conector entre Era 1 §6 (Famílias-Pilastra) e Era 3 presente.
 
@@ -270,7 +270,7 @@ VOLUME 1 — BÍBLIA WORLDBUILDING
 | 11.2 | Chevalier (Atelaiá → Bento) | `era-1-pre-codigo.md` §6 + `deep/antologia/13-veronica-atelaia.md` | ~1.5k | ~5 | conector |
 | 11.3 | Vanderbist (Mariana → Jaci) | `deep/antologia/12-ancia-mariana-vanderbist.md` + `deep/characters/jaci-proxy.md` | ~1.5k | ~5 | conector |
 | 11.4 | Berenger (Inácia → Cauã, Davi morto) | `deep/characters/caua-volt.md` §família | ~1k | ~3 | conector |
-| 11.5 | Neumann (Linda — origem Zona do Silêncio) | `deep/characters/linda-siren.md` §família | ~1k | ~3 | conector |
+| 11.5 | Neumann (Linda, origem Zona do Silêncio) | `deep/characters/linda-siren.md` §família | ~1k | ~3 | conector |
 | 11.6 | Argéndia, Boroshova, Ferraz (linhagens menores Era 1 residuais) | `CHARS.md` + `era-1-pre-codigo.md` §6 | ~2k | ~7 | conector enciclopédico |
 
 **Subtotal Cap 11:** ~10k pal / ~33 pp
@@ -279,7 +279,7 @@ VOLUME 1 — BÍBLIA WORLDBUILDING
 
 ---
 
-# PARTE VI — SETTINGS
+# PARTE VI: SETTINGS
 
 **Função:** geografia narrativa. Cada setting recebe ensaio denso + extratos in-character.
 
@@ -287,24 +287,24 @@ VOLUME 1 — BÍBLIA WORLDBUILDING
 
 ---
 
-## Capítulo 12 — GusWorld City e os Oito Settings do Bloco F
+## Capítulo 12: GusWorld City e os Oito Settings do Bloco F
 
 | # | Sub-capítulo | Fonte | Palavras | Páginas | Nota revisão |
 |---|---|---|---|---|---|
-| 12.1 | GusWorld City — núcleo metropolitano ciber-gótico | `environments/01-cidade-cyber-gotica.md` + `deep/settings/01-cidade.md` | ~7k | ~23 | consolidar (canon Bloco F + deep) |
-| 12.2 | Selve Sombria — floresta-fronteira matemática | `environments/02-selve-sombria.md` + `deep/settings/02-selve-sombria.md` | ~7k | ~23 | consolidar |
-| 12.3 | Catedrais Neo-Sylvania — gótico arcaico funcional | `environments/03-catedrais-neo-sylvania.md` + `deep/settings/03-catedrais.md` | ~7k | ~23 | consolidar; cross-ref Era 1 §3 |
-| 12.4 | Dutos Infernais — subterrâneo industrial-arcano | `environments/04-dutos-infernais.md` + `deep/settings/04-dutos.md` | ~7k | ~23 | consolidar |
-| 12.5 | Setor Mirage — distrito do ofuscamento | `environments/05-setor-mirage.md` + `deep/settings/05-mirage.md` | ~7k | ~23 | consolidar |
-| 12.6 | Periferia — bairro oeste sucateiro | `environments/06-periferia.md` + `deep/settings/06-periferia.md` | ~7k | ~23 | consolidar; conector Dante "Grid" |
-| 12.7 | Zona do Silêncio — distrito acusticamente morto | `environments/07-zona-do-silencio.md` + `deep/settings/07-silencio.md` | ~5k | ~17 | consolidar |
-| 12.8 | Selve Profunda — climax ato 3 | `environments/08-selve-profunda.md` + `deep/settings/08-selve-profunda.md` | ~7k | ~23 | consolidar; cuidado com spoiler controlado |
+| 12.1 | GusWorld City, núcleo metropolitano ciber-gótico | `environments/01-cidade-cyber-gotica.md` + `deep/settings/01-cidade.md` | ~7k | ~23 | consolidar (canon Bloco F + deep) |
+| 12.2 | Selve Sombria, floresta-fronteira matemática | `environments/02-selve-sombria.md` + `deep/settings/02-selve-sombria.md` | ~7k | ~23 | consolidar |
+| 12.3 | Catedrais Neo-Sylvania, gótico arcaico funcional | `environments/03-catedrais-neo-sylvania.md` + `deep/settings/03-catedrais.md` | ~7k | ~23 | consolidar; cross-ref Era 1 §3 |
+| 12.4 | Dutos Infernais, subterrâneo industrial-arcano | `environments/04-dutos-infernais.md` + `deep/settings/04-dutos.md` | ~7k | ~23 | consolidar |
+| 12.5 | Setor Mirage, distrito do ofuscamento | `environments/05-setor-mirage.md` + `deep/settings/05-mirage.md` | ~7k | ~23 | consolidar |
+| 12.6 | Periferia, bairro oeste sucateiro | `environments/06-periferia.md` + `deep/settings/06-periferia.md` | ~7k | ~23 | consolidar; conector Dante "Grid" |
+| 12.7 | Zona do Silêncio, distrito acusticamente morto | `environments/07-zona-do-silencio.md` + `deep/settings/07-silencio.md` | ~5k | ~17 | consolidar |
+| 12.8 | Selve Profunda, climax ato 3 | `environments/08-selve-profunda.md` + `deep/settings/08-selve-profunda.md` | ~7k | ~23 | consolidar; cuidado com spoiler controlado |
 
 **Subtotal Cap 12:** ~54k pal / ~178 pp
 
 ---
 
-## Capítulo 13 — Cidades-Irmãs e Vilarejos-Fronteira
+## Capítulo 13: Cidades-Irmãs e Vilarejos-Fronteira
 
 | # | Sub-capítulo | Fonte | Palavras | Páginas | Nota revisão |
 |---|---|---|---|---|---|
@@ -317,7 +317,7 @@ VOLUME 1 — BÍBLIA WORLDBUILDING
 
 ---
 
-# PARTE VII — FACÇÕES
+# PARTE VII: FACÇÕES
 
 **Função:** sete facções canon do presente, mais menores. Cada uma com goal, recurso, aliados, inimigos, crença.
 
@@ -325,16 +325,16 @@ VOLUME 1 — BÍBLIA WORLDBUILDING
 
 ---
 
-## Capítulo 14 — As Sete Facções Canon do Presente
+## Capítulo 14: As Sete Facções Canon do Presente
 
 | # | Sub-capítulo | Fonte | Palavras | Páginas | Nota revisão |
 |---|---|---|---|---|---|
-| 14.1 | Sterling Corp — o predador corporativo | `factions.md` §Sterling + `deep/factions/sterling-corp.md` | ~6k | ~20 | consolidar |
-| 14.2 | FIR (Federação Industrial de Reciclagem) — vassala mafiosa | `factions.md` §FIR + `deep/factions/fir.md` | ~7k | ~23 | consolidar |
-| 14.3 | Ordem Recursiva — guardiãs das catedrais Neo-Sylvania | `factions.md` §Ordem + `deep/factions/ordem-recursiva.md` | ~6k | ~20 | consolidar; cross-ref Era 1 |
-| 14.4 | Cult Mirage Reality — manipulação holográfica | `factions.md` §Cult + `deep/factions/cult-mirage.md` | ~7k | ~23 | consolidar |
-| 14.5 | Underground do Silêncio — resistência acústica | `factions.md` §Underground + `deep/factions/underground-silencio.md` | ~6k | ~20 | consolidar |
-| 14.6 | Pelicano Branco — vilarejo-fronteira (Anciã Mariana Vanderbist) | `factions.md` §Pelicano + `deep/factions/pelicano-branco.md` | ~6k | ~20 | consolidar |
+| 14.1 | Sterling Corp, o predador corporativo | `factions.md` §Sterling + `deep/factions/sterling-corp.md` | ~6k | ~20 | consolidar |
+| 14.2 | FIR (Federação Industrial de Reciclagem), vassala mafiosa | `factions.md` §FIR + `deep/factions/fir.md` | ~7k | ~23 | consolidar |
+| 14.3 | Ordem Recursiva, guardiãs das catedrais Neo-Sylvania | `factions.md` §Ordem + `deep/factions/ordem-recursiva.md` | ~6k | ~20 | consolidar; cross-ref Era 1 |
+| 14.4 | Cult Mirage Reality, manipulação holográfica | `factions.md` §Cult + `deep/factions/cult-mirage.md` | ~7k | ~23 | consolidar |
+| 14.5 | Underground do Silêncio, resistência acústica | `factions.md` §Underground + `deep/factions/underground-silencio.md` | ~6k | ~20 | consolidar |
+| 14.6 | Pelicano Branco, vilarejo-fronteira (Anciã Mariana Vanderbist) | `factions.md` §Pelicano + `deep/factions/pelicano-branco.md` | ~6k | ~20 | consolidar |
 | 14.7 | Facções menores | `factions.md` §menores + `deep/factions/facoes-menores.md` | ~3k | ~10 | consolidar |
 | 14.8 | Diagrama de alinhamentos cross-facção (axiologia canon) | **novo, derivado** de memória `project_axiologia_canonica` | ~3k | ~10 | escrever síntese editorial |
 
@@ -344,7 +344,7 @@ VOLUME 1 — BÍBLIA WORLDBUILDING
 
 ---
 
-# PARTE VIII — LEITMOTIVS E ESTÉTICA
+# PARTE VIII: LEITMOTIVS E ESTÉTICA
 
 **Função:** fechar a obra com a camada artística que costura tudo. Tema musical, símbolo visual, ecos narrativos.
 
@@ -352,7 +352,7 @@ VOLUME 1 — BÍBLIA WORLDBUILDING
 
 ---
 
-## Capítulo 15 — Leitmotivs Musicais e Temas Recorrentes
+## Capítulo 15: Leitmotivs Musicais e Temas Recorrentes
 
 | # | Sub-capítulo | Fonte | Palavras | Páginas | Nota revisão |
 |---|---|---|---|---|---|
@@ -366,7 +366,7 @@ VOLUME 1 — BÍBLIA WORLDBUILDING
 
 ---
 
-# PARTE IX — STINGER E LEGADO
+# PARTE IX: STINGER E LEGADO
 
 **Função:** ganchos pra futuro (Volume 2 / sequels). Curto, intencional, pós-credits literário.
 
@@ -374,7 +374,7 @@ VOLUME 1 — BÍBLIA WORLDBUILDING
 
 ---
 
-## Capítulo 16 — Sequel Hooks e Pós-Créditos Narrativos
+## Capítulo 16: Sequel Hooks e Pós-Créditos Narrativos
 
 | # | Sub-capítulo | Fonte | Palavras | Páginas | Nota revisão |
 |---|---|---|---|---|---|
@@ -396,7 +396,7 @@ VOLUME 1 — BÍBLIA WORLDBUILDING
 
 ---
 
-## Apêndice A — Glossário Canon
+## Apêndice A: Glossário Canon
 
 | Componente | Fonte | Palavras | Páginas | Nota |
 |---|---|---|---|---|
@@ -407,7 +407,7 @@ VOLUME 1 — BÍBLIA WORLDBUILDING
 
 ---
 
-## Apêndice B — Índice de Personagens (CHARS.md expandido)
+## Apêndice B: Índice de Personagens (CHARS.md expandido)
 
 | Componente | Fonte | Palavras | Páginas | Nota |
 |---|---|---|---|---|
@@ -418,7 +418,7 @@ VOLUME 1 — BÍBLIA WORLDBUILDING
 
 ---
 
-## Apêndice C — Índice de Lugares (PLACES.md expandido)
+## Apêndice C: Índice de Lugares (PLACES.md expandido)
 
 | Componente | Fonte | Palavras | Páginas | Nota |
 |---|---|---|---|---|
@@ -429,7 +429,7 @@ VOLUME 1 — BÍBLIA WORLDBUILDING
 
 ---
 
-## Apêndice D — Timeline Canon (3 eras + transições)
+## Apêndice D: Timeline Canon (3 eras + transições)
 
 | Componente | Fonte | Palavras | Páginas | Nota |
 |---|---|---|---|---|
@@ -440,7 +440,7 @@ VOLUME 1 — BÍBLIA WORLDBUILDING
 
 ---
 
-## Apêndice E — Documentos In-Character Descobríveis (DD-001 a DD-020+)
+## Apêndice E: Documentos In-Character Descobríveis (DD-001 a DD-020+)
 
 | Componente | Fonte | Palavras | Páginas | Nota |
 |---|---|---|---|---|
@@ -451,18 +451,18 @@ VOLUME 1 — BÍBLIA WORLDBUILDING
 
 ---
 
-## Apêndice F — Inconsistências Documentadas
+## Apêndice F: Inconsistências Documentadas
 
 | Componente | Fonte | Palavras | Páginas | Nota |
 |---|---|---|---|---|
 | 20+ conflitos canon detectados em audit cross-doc | `INCOHERENCES.md` íntegra | ~2k | ~7 | extrair íntegra; tom de aparátus crítico (transparência editorial) |
-| Resoluções aplicadas (F1-DL.REFAC Plano 3 — 12 decisões criador supremo) | commit `2ed93b6` (canon C1-C12) + sessão decisões | ~3k | ~10 | tabela das 12 decisões + diff |
+| Resoluções aplicadas (F1-DL.REFAC Plano 3, 12 decisões criador supremo) | commit `2ed93b6` (canon C1-C12) + sessão decisões | ~3k | ~10 | tabela das 12 decisões + diff |
 
 **Subtotal Apêndice F:** ~5k pal / ~17 pp
 
 ---
 
-## Apêndice G — Citação-Pedra-de-Toque + Aparátus Crítico
+## Apêndice G: Citação-Pedra-de-Toque + Aparátus Crítico
 
 > **Função:** transparência autoral. Declara as bibliografias de inspiração (RAG queries top-k), o estilo Stephenson/Sterling, as licenças, e a metodologia editorial.
 
@@ -486,15 +486,15 @@ VOLUME 1 — BÍBLIA WORLDBUILDING
 
 | Bloco | Palavras | Páginas | % do volume |
 |---|---|---|---|
-| Parte I — Frontispício | ~28k | ~94 | 5.0% |
-| Parte II — Cosmologia | ~44k | ~147 | 7.8% |
-| Parte III — As Três Eras | ~269k | ~896 | 47.6% |
-| Parte IV — Magia e Linguagem | ~36k | ~121 | 6.4% |
-| Parte V — Personagens | ~90k | ~298 | 16.0% |
-| Parte VI — Settings | ~58k | ~192 | 10.3% |
-| Parte VII — Facções | ~44k | ~146 | 7.8% |
-| Parte VIII — Leitmotivs e Estética | ~14k | ~46 | 2.5% |
-| Parte IX — Stinger e Legado | ~9k | ~29 | 1.6% |
+| Parte I (Frontispício) | ~28k | ~94 | 5.0% |
+| Parte II (Cosmologia) | ~44k | ~147 | 7.8% |
+| Parte III (As Três Eras) | ~269k | ~896 | 47.6% |
+| Parte IV (Magia e Linguagem) | ~36k | ~121 | 6.4% |
+| Parte V (Personagens) | ~90k | ~298 | 16.0% |
+| Parte VI (Settings) | ~58k | ~192 | 10.3% |
+| Parte VII (Facções) | ~44k | ~146 | 7.8% |
+| Parte VIII (Leitmotivs e Estética) | ~14k | ~46 | 2.5% |
+| Parte IX (Stinger e Legado) | ~9k | ~29 | 1.6% |
 | Apêndices A-G | ~85k | ~286 | (referência) |
 | **TOTAL VOLUME 1** | **~677k pal** | **~2.255 pp** | 100% |
 
@@ -508,20 +508,20 @@ VOLUME 1 — BÍBLIA WORLDBUILDING
 
 Itens que **não existem ainda** e precisam ser produzidos antes do livro fechar:
 
-1. **Cap 1.4 — manual do leitor** (~2k pal) → `narrative-writer`
-2. **Cap 2.3 — manifesto Pillar 2 expandido** (~5k pal extrato editorial) → `narrative-writer`
-3. **Cap 2.4 — apresentação easter eggs canon** (~4k pal, tom discreto) → `narrative-writer` + validação `narrative-designer`
-4. **Cap 4.5 — bestiary computacional consolidado** (~9k pal) → `narrative-writer` consolidando fichas
-5. **Cap 6.4 — fundação GusWorld City (Gustaf I→VII)** (~4k pal conector) → `narrative-writer`
-6. **Cap 11 — linhagens canônicas cross-eras** (~10k pal, conectores) → `narrative-writer`
-7. **Cap 13 — cidades-irmãs e vilarejos-fronteira** (~4k pal) → `narrative-writer`
-8. **Cap 14.8 — diagrama axiologia cross-facção** (~3k pal síntese) → `narrative-designer`
-9. **Cap 16.3 — eco final autoral** (~0.5k pal) → `narrative-writer`
-10. **Apêndice A — glossário canon completo** (~15k pal) → `narrative-designer` consolida; `narrative-writer` pule verbetes
-11. **Apêndice F.2 — 12 decisões REFAC tabuladas** (~3k pal) → editorial direto
-12. **Apêndice G — colofão, créditos, RAG trace** (~8k pal) → editorial + `narrative-writer`
+1. **Cap 1.4, manual do leitor** (~2k pal) → `narrative-writer`
+2. **Cap 2.3, manifesto Pillar 2 expandido** (~5k pal extrato editorial) → `narrative-writer`
+3. **Cap 2.4, apresentação easter eggs canon** (~4k pal, tom discreto) → `narrative-writer` + validação `narrative-designer`
+4. **Cap 4.5, bestiary computacional consolidado** (~9k pal) → `narrative-writer` consolidando fichas
+5. **Cap 6.4, fundação GusWorld City (Gustaf I→VII)** (~4k pal conector) → `narrative-writer`
+6. **Cap 11, linhagens canônicas cross-eras** (~10k pal, conectores) → `narrative-writer`
+7. **Cap 13, cidades-irmãs e vilarejos-fronteira** (~4k pal) → `narrative-writer`
+8. **Cap 14.8, diagrama axiologia cross-facção** (~3k pal síntese) → `narrative-designer`
+9. **Cap 16.3, eco final autoral** (~0.5k pal) → `narrative-writer`
+10. **Apêndice A, glossário canon completo** (~15k pal) → `narrative-designer` consolida; `narrative-writer` pule verbetes
+11. **Apêndice F.2, 12 decisões REFAC tabuladas** (~3k pal) → editorial direto
+12. **Apêndice G, colofão, créditos, RAG trace** (~8k pal) → editorial + `narrative-writer`
 
-**Total a produzir antes do livro fechar:** ~67.5k pal (~225 pp) — ~10% do volume.
+**Total a produzir antes do livro fechar:** ~67.5k pal (~225 pp), ou seja, ~10% do volume.
 
 ---
 

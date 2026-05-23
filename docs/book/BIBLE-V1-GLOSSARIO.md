@@ -6,7 +6,7 @@
 
 ## A
 
-**Acaceiro de tronco vermelho.** Espécie arbórea ritual das catedrais Neo-Sylvania e marker territorial mais confiável da fronteira da Selve. Onde há acaceiro saudável, a fronteira está intacta; onde o tronco perde saturação vermelha, há vetor de corrupção Patch-Zero a menos de 144 metros. As anciãs Voronoi tatuam broto de acaceiro no pulso esquerdo como marca de iniciação. Easter egg maçom (paralelo ramo de acácia). *Cross-ref:* deep/magic/natureza-matematica-rigida-deep.md §7; deep/magic/glyph-token-conjuro-codex-deep.md §8.
+**Acaceiro de tronco vermelho.** Espécie arbórea ritual das catedrais Neo-Sylvania e marker territorial mais confiável da fronteira da Selve. Onde há acaceiro saudável, a fronteira está intacta; onde o tronco perde saturação vermelha, há vetor de corrupção Patch-Zero a menos de 144 metros. As anciãs Voronoi tatuam broto de acaceiro no pulso esquerdo como marca de iniciação. *Cross-ref:* deep/magic/natureza-matematica-rigida-deep.md §7; deep/magic/glyph-token-conjuro-codex-deep.md §8.
 
 **Adila Murmúrio (Hierofante).** 40 anos, líder facção pró-Sterling do Cult Mirage. Manipulou Iara desde criança; antagonista intermediária do arco Iara. Filha biológica de Sonja Murmúrio (co-fundadora original Cult, morta em -34 em circunstâncias nunca esclarecidas; Adila assumiu liderança facção pró-Sterling no mesmo ano sob tutela transitória aos 6 anos; consolidou tutela plena em -6). *Cross-ref:* factions.md §5; characters/iara-lumen.md.
 
@@ -28,9 +28,9 @@
 
 **Apex-Data Systems.** Primeiro conglomerado canibalizado por Sterling Locke (Chapter 11 em -19). Sterling assumiu CTO em -22, induziu falência calculada, saiu com código-fonte de autenticação central da metrópole. Inácia Berenger (mãe Cauã) demitida nesse processo. *Cross-ref:* lore-bible.md §3 Era 3; timeline.md -22 a -19.
 
-**Aprendiz (grau de iniciação).** Primeiro grau formal do sistema de progressão da Ordem Recursiva. Lê três Glyphs simultaneamente sem confusão; reconhece família por cor de fundo e raiz por silhueta. Exame consiste em identificar três Glyphs misturados em pavimento tesselado sob luz ambiente. *Cross-ref:* deep/magic/glyph-token-conjuro-codex-deep.md §8.
+**Aprendiz (etapa formal de progressão Ordem Recursiva).** Primeira etapa do sistema de progressão da Ordem Recursiva. Lê três Glyphs simultaneamente sem confusão; reconhece família por cor de fundo e raiz por silhueta. Exame consiste em identificar três Glyphs misturados em pavimento tesselado sob luz ambiente. *Cross-ref:* deep/magic/glyph-token-conjuro-codex-deep.md §8.
 
-**Ashlar bruto e ashlar polido.** Par de pedras canônicas presentes em câmaras cerimoniais da Ordem Recursiva. O ashlar bruto pede trabalho; o ashlar polido pede testemunha. Em catedrais Neo-Sylvania, a Coluna Boróstoma (esquerda) carrega ashlar bruto e a Coluna Janor (direita) carrega ashlar polido. Easter egg maçom canon (paralelo pedra-bruta-pedra-polida). *Cross-ref:* deep/ontologia/cosmologia-deep.md §7; deep/magic/natureza-matematica-rigida-deep.md §7.
+**Ashlar bruto e ashlar polido.** Par de pedras canônicas presentes em câmaras cerimoniais da Ordem Recursiva. O ashlar bruto pede trabalho; o ashlar polido pede testemunha. Em catedrais Neo-Sylvania, a Coluna Boróstoma (estrutura ritual fundadora canônica, à esquerda) carrega ashlar bruto e a Coluna Janor (par cerimonial, à direita) carrega ashlar polido. *Cross-ref:* deep/ontologia/cosmologia-deep.md §7; deep/magic/natureza-matematica-rigida-deep.md §7.
 
 **Asmódico.** Linguagem analógica herdada das catedrais Neo-Sylvania, executada em relojoaria de latão, ressonância acústica e ancoragem mecânica. Linguagem de Bento "Requiem" Chevalier. Codificada formalmente em -115 por Atelaiá Chevalier (engenheira-mãe). Exceção declarada ao paradigma silício de C-Arcane; estado-máquina mecânica, não software digital. *Cross-ref:* lore-bible.md §7.9; deep/magic/4-linguagens-deep.md §3.
 
@@ -126,13 +126,13 @@
 
 **Codex de Conjuros.** Deck pessoal do operador, acervo de Tokens disponíveis. Para Gus, 40 a 60 Tokens; para aprendiz, 8; para mestre da Ordem Recursiva, 144. Quarenta Tokens em três slots dão 64 mil Conjuros teóricos, dos quais ~200 são fisicamente coerentes. Substitui terminologia antiga "Deck Rúnico". *Cross-ref:* lore-bible.md §7.6, §7.10; deep/magic/glyph-token-conjuro-codex-deep.md §1, §4.
 
-**Coluna Boróstoma.** Coluna canônica esquerda em câmaras cerimoniais da Catedral-Mãe e catedrais menores. Carrega versão latim litúrgico da formulação Chevalier. Paralelo canon a Jachin maçom. *Cross-ref:* deep/magic/natureza-matematica-rigida-deep.md §4; deep/ontologia/cosmologia-deep.md §7.
+**Coluna Boróstoma.** Estrutura ritual fundadora canônica à esquerda em câmaras cerimoniais da Catedral-Mãe e catedrais menores. Carrega versão latim litúrgico da formulação Chevalier. *Cross-ref:* deep/magic/natureza-matematica-rigida-deep.md §4; deep/ontologia/cosmologia-deep.md §7.
 
-**Coluna Janor.** Coluna canônica direita em câmaras cerimoniais, contraparte de Boróstoma. Carrega versão Asmódica da formulação Chevalier. Paralelo canon a Boaz maçom. *Cross-ref:* deep/magic/natureza-matematica-rigida-deep.md §4.
+**Coluna Janor.** Par cerimonial canônico à direita em câmaras cerimoniais, contraparte de Boróstoma. Carrega versão Asmódica da formulação Chevalier. *Cross-ref:* deep/magic/natureza-matematica-rigida-deep.md §4.
 
-**Coluna quebrada.** Símbolo canônico das catedrais Neo-Sylvania menores significando a Catedral-Mãe submersa. Aparece em câmara cerimonial de mestrado terceiro grau à esquerda do candidato. Easter egg maçom canon (paralelo coluna quebrada Hiram). *Cross-ref:* deep/ontologia/cosmologia-deep.md §7.
+**Coluna quebrada.** Símbolo canônico das catedrais Neo-Sylvania menores significando a Catedral-Mãe submersa. Aparece em câmara cerimonial da terceira etapa de progressão à esquerda do candidato. *Cross-ref:* deep/ontologia/cosmologia-deep.md §7.
 
-**Companheiro (grau de iniciação).** Segundo grau formal do sistema de progressão. Lê cinco Tokens simultaneamente, incluindo composição morfológica e gematria. Distingue Tokens autênticos de falsificações por leitura cruzada do checksum. Exame: bancada de cinco Tokens (três autênticos, dois adulterados) sob restrição de 47 segundos. *Cross-ref:* deep/magic/glyph-token-conjuro-codex-deep.md §8.
+**Companheiro (etapa formal de progressão Ordem Recursiva).** Segunda etapa do sistema de progressão. Lê cinco Tokens simultaneamente, incluindo composição morfológica e gematria. Distingue Tokens autênticos de falsificações por leitura cruzada do checksum. Exame: bancada de cinco Tokens (três autênticos, dois adulterados) sob restrição de 47 segundos. *Cross-ref:* deep/magic/glyph-token-conjuro-codex-deep.md §8.
 
 **Compilação (leitmotiv principal).** Tema musical wagner-like que abre o jogo, atravessa transições entre eras, fecha cada ending. Três frases sucessivas em compassos 3/4, 5/4 e 8/4, totalizando 16 tempos por exposição. Modos dórico (Era 1), mixolídio (Era 2) e eólio (Era 3). Aparece em sub-bass de quase todos os outros leitmotivs. *Cross-ref:* deep/ontologia/leitmotivs-deep.md §6.
 
@@ -142,13 +142,13 @@
 
 **Conjuro híbrido.** Conjuro composto por três Tokens de famílias diferentes. Mais poderoso e mais difícil de compilar; custo em lúmens segue a sequência 1, 1, 2, 3, 5, 8 a partir da família de menor índice. *Cross-ref:* deep/magic/glyph-token-conjuro-codex-deep.md §3.
 
-**Cordão 89 nós.** Peça simbólica entregue ao mestre da Ordem Recursiva ao completar exame final canon. Carregada ao pescoço pelo resto da carreira. Easter egg maçom canon (paralelo cordel iniciático). Múltiplas linhagens canônicas (Vespa Calderón herdou de Calixto Rivaz; Helga Riza herdou da avó; Mateus Penkin herdou do tio Bartolo). *Cross-ref:* deep/magic/glyph-token-conjuro-codex-deep.md §8.
+**Cordão 89 nós.** Peça simbólica entregue ao mestre da Ordem Recursiva ao completar exame final canon. Carregada ao pescoço pelo resto da carreira. Múltiplas linhagens canônicas (Vespa Calderón herdou de Calixto Rivaz; Helga Riza herdou da avó; Mateus Penkin herdou do tio Bartolo). *Cross-ref:* deep/magic/glyph-token-conjuro-codex-deep.md §8.
 
 **Cordó-Cristal.** Instrumento ancestral Sylvania, Era 1, executado por Cantor-de-Pedras para excitar resposta piezo-litúrgica das pedras das catedrais. *Cross-ref:* deep/eras/era-1-pre-codigo.md §6.2.
 
 **Core-Synth Bio-Tech.** Terceiro conglomerado canibalizado por Sterling Locke (liquidada em -12). Sterling assumiu CEO em -14, saiu com protocolos cérebro-máquina (base tecnológica do Locke Core). Sterling Corp formalmente consolidada em -12 sobre esses ativos. *Cross-ref:* lore-bible.md §3 Era 3; timeline.md -14 a -12.
 
-**Cripto-glifo.** Sistema de escrita canon Era 1. Cifra de grade três por três acrescida de um X angular e de uma constelação de pontos posicionais. Equivalente canon ao Pigpen cipher (descrito em §8 GTCC como dívida arquitetural reconhecida). Cada Glyph base do C-Arcane mapeia por correspondência canônica exatamente uma letra do alfabeto Pigpen. *Cross-ref:* deep/magic/glyph-token-conjuro-codex-deep.md §8; deep/eras/era-1-pre-codigo.md §2.1, §4.
+**Cripto-glifo.** Sistema de escrita canon Era 1. Cifra de grade três por três acrescida de um X angular e de uma constelação de pontos posicionais. Estruturalmente equivalente a sistemas clássicos de cifragem geométrica (dívida arquitetural reconhecida em §8 GTCC). Cada Glyph base do C-Arcane mapeia por correspondência canônica exatamente uma letra do alfabeto cifrado. *Cross-ref:* deep/magic/glyph-token-conjuro-codex-deep.md §8; deep/eras/era-1-pre-codigo.md §2.1, §4.
 
 **Criptográfico (família técnico-natural).** Família operando por cifragem, inferência, decisão booleana, ofuscamento estrutural, refração de identidade. Token criptográfico: fundo branco-papel, traço fino, par de chaves angulares, constelação de pontos posicionais. Atua sobre percepção e identidade, não matéria. Companion-âncora: Iara "Lumen" Koslov. *Cross-ref:* deep/magic/glyph-token-conjuro-codex-deep.md §2.
 
@@ -224,7 +224,7 @@
 
 **Gematria de Tokens.** Sistema canônico de valoração numérica em lúmens. Tokens de família simples custam 1 lúmen; Tokens articulados custam até 8. Conjuros compostos somam gematrias dos três Tokens. Escala secundária para Tokens raros: 13, 21, 34. Tokens lendários atingem 89 ou 144 lúmens (apenas Drives com upgrade significativo executam). *Cross-ref:* deep/magic/glyph-token-conjuro-codex-deep.md §8.
 
-**Glyph.** Imagem rúnica visível desenhada na face da carta-token, identidade gráfica. Signo composicional (não decoração) com raiz semântica composta; aglutinação de raízes produz Tokens compostos. Cada Glyph base mapeia exatamente uma letra do alfabeto Pigpen (cripto-glifo Era 1). *Cross-ref:* lore-bible.md §7.10; deep/magic/glyph-token-conjuro-codex-deep.md §1, §6.
+**Glyph.** Imagem rúnica visível desenhada na face da carta-token, identidade gráfica. Signo composicional (não decoração) com raiz semântica composta; aglutinação de raízes produz Tokens compostos. Cada Glyph base mapeia exatamente uma letra do alfabeto cifrado do cripto-glifo Era 1. *Cross-ref:* lore-bible.md §7.10; deep/magic/glyph-token-conjuro-codex-deep.md §1, §6.
 
 **Glyph-do.** Raiz canônica "objeto", presente em Conjuros Object. Cognato direto do Pythia *do* (coisa nomeada). Aparece em 13 dos 40 Tokens base de objeto. *Cross-ref:* deep/magic/glyph-token-conjuro-codex-deep.md §6.
 
@@ -250,9 +250,9 @@
 
 **Hare predator (Sterling como).** Caracterização canônica de Sterling Locke segundo o modelo predador-acadêmico-corporativo. Não trauma; convicção: acadêmico dissidente que escolheu predação por convicção, não por trauma. *Cross-ref:* characters/prelore_vilao.md; deep/antagonists/sterling-locke-deep.md.
 
-**Helga Riza.** 45 anos, escritora subterrânea Underground do Silêncio. Compila pichações Polis-Vermelha em arquivo Underground (in-world-docs doc 11). Cordão 89 nós herdado da avó (easter egg maçom). *Cross-ref:* factions.md §6; CHARS.md §6.
+**Helga Riza.** 45 anos, escritora subterrânea Underground do Silêncio. Compila pichações Polis-Vermelha em arquivo Underground (in-world-docs doc 11). Cordão 89 nós herdado da avó. *Cross-ref:* factions.md §6; CHARS.md §6.
 
-**Helíaco Vyr (Mestre).** Primeiro Cantor-de-Pedras canônico, fundador do rito litúrgico-piezo da Catedral-Mãe. Codificador canônico do protocolo coral. Barítono limpo amplitude baixo-tenor, cego de luz reativa após exposição prolongada, calos cristal nas mãos. Figura semilendária Era 1 cuja menção sobrevive em pelo menos três manuscritos independentes. Capaz de compilar 21 Conjuros em paralelo sem Tavus-Drive (registro marginal). Easter egg maçom canon (paralelo Hiram Abiff). *Cross-ref:* deep/eras/era-1-pre-codigo.md §6.3; deep/ontologia/cosmologia-deep.md §3, §7; deep/magic/glyph-token-conjuro-codex-deep.md §8.
+**Helíaco Vyr (Mestre).** Primeiro Cantor-de-Pedras canônico, fundador do rito litúrgico-piezo da Catedral-Mãe. Codificador canônico do protocolo coral. Barítono limpo amplitude baixo-tenor, cego de luz reativa após exposição prolongada, calos cristal nas mãos. Figura semilendária Era 1 cuja menção sobrevive em pelo menos três manuscritos independentes. Capaz de compilar 21 Conjuros em paralelo sem Tavus-Drive (registro marginal). *Cross-ref:* deep/eras/era-1-pre-codigo.md §6.3; deep/ontologia/cosmologia-deep.md §3, §7; deep/magic/glyph-token-conjuro-codex-deep.md §8.
 
 **Heliópolis-Nova.** Cidade-irmã distante, hostil, submissa a Sterling há mais tempo. Núcleo de mineração de hardware, quase colônia. Eufemismo canônico Sterling: "transferido para Heliópolis-Nova" significa eliminado/desaparecido. *Cross-ref:* lore-bible.md §9; PLACES.md §3; in-world-docs.md DD-021.
 
@@ -286,7 +286,7 @@
 
 **Janelarum.** Sistema operacional comercial canônico, plataforma frágil que vira meme cultural. Lançado v1.0 em -30 (independente); v2.0 em -10 (absorvida por Sterling Corp). Sterling vende serviços de manutenção. NÃO é cidade (não-canon). *Cross-ref:* comic-reliefs.md cenas 11-12; timeline.md -30, -10.
 
-**Joaquim Bartolomeu.** 32 anos, técnico analógico Underground, filho de luthiers, herdou compasso e esquadro de luthieria do bisavô (easter egg maçom). Decifrou a Câmara do Equinócio Acústico em -3. *Cross-ref:* factions.md §6; deep/characters/linda-siren.md R4.
+**Joaquim Bartolomeu.** 32 anos, técnico analógico Underground, filho de luthiers, herdou compasso e esquadro de luthieria do bisavô. Decifrou a Câmara do Equinócio Acústico em -3. *Cross-ref:* factions.md §6; deep/characters/linda-siren.md R4.
 
 ## K
 
@@ -314,7 +314,7 @@
 
 **Matriz Ortodôntica.** Vértice canônico do triângulo de hardware do Gus. Antena bio-integrada (UHF/VHF) amplificadora de alcance. Permite captação de sinais anômalos e amplificação de scan. *Cross-ref:* pillars.md Pillar 3; lore-bible.md §7.10.
 
-**Mestre (grau de iniciação).** Terceiro grau formal canônico do sistema de progressão. Compila sete Conjuros simultaneamente em sequência ininterrupta, sem repetir família, sem falhar Compilação. Cerimônia de duas horas, conduzida em câmara com pavimento tesselado de tons alternados, sob as duas Colunas (Boróstoma e Janor) que flanqueiam a bancada. *Cross-ref:* deep/magic/glyph-token-conjuro-codex-deep.md §8.
+**Mestre (etapa formal de progressão Ordem Recursiva).** Terceira etapa canônica do sistema de progressão. Compila sete Conjuros simultaneamente em sequência ininterrupta, sem repetir família, sem falhar Compilação. Cerimônia de duas horas, conduzida em câmara com pavimento tesselado de tons alternados, sob as duas Colunas (Boróstoma e Janor) que flanqueiam a bancada. *Cross-ref:* deep/magic/glyph-token-conjuro-codex-deep.md §8.
 
 **Mestre-Hierofante.** Cargo canônico líder da Ordem Recursiva. Velhusto é o atual ocupante; Hyperion Vyrcátrix foi ocupante histórico Era 1; Hipérides Vyrcátrix foi seu filho-sucessor que viveu 55 anos no cargo. *Cross-ref:* factions.md §2; deep/eras/era-1-pre-codigo.md §6.7, §7.6.
 
@@ -366,7 +366,7 @@
 
 **Patch-Zero.** Antagonista-sistema não-humano canônico. Dois fenômenos ao mesmo tempo: anti-padrão (rompe previsibilidade da Selve) e consciência alien (tem voz, planeja, manipula). Origem multi-causal: bug primordial do Sistema, captura corporativa Sterling, amostra importada Polis-Vermelha, escape do laboratório central em -0.25. Manifestação multi-canal: texto-glitch (canal-1), sussurro-áudio (canal-2), persona-dialogável (canal-3), bug-Perlin (canal-4). Contível, não destrutível. *Cross-ref:* characters/patch-zero.md; lore-bible.md §8; deep/antagonists/patch-zero-deep.md.
 
-**Pavimento tesselado.** Padrão canon de pavimentação alternada (branco e preto, bruto e polido) presente em câmaras cerimoniais da Ordem Recursiva e em formações rochosas naturais das gargantas do rio Vesperal (erosão produz blocos cúbicos alternados). Significado canon: alternância eterna entre o substrato e a anomalia. Easter egg maçom canon. *Cross-ref:* deep/magic/natureza-matematica-rigida-deep.md §7; deep/ontologia/cosmologia-deep.md §7.
+**Pavimento tesselado.** Padrão canon de pavimentação alternada (branco e preto, bruto e polido) presente em câmaras cerimoniais da Ordem Recursiva e em formações rochosas naturais das gargantas do rio Vesperal (erosão produz blocos cúbicos alternados). Significado canon: alternância eterna entre o substrato e a anomalia. *Cross-ref:* deep/magic/natureza-matematica-rigida-deep.md §7; deep/ontologia/cosmologia-deep.md §7.
 
 **Pelicano Branco (Vilarejo do).** Vilarejo-fronteira canônico cross-eras (fundado -720), borda da Selve Sombria. Setting de origem de Jaci "Proxy" Vanderbist e da Anciã Mariana Vanderbist. Linhagem pioneira-fundadora: Hilário Vanderbist. *Cross-ref:* factions.md §4; PLACES.md §4; environments/08-selve-profunda.md.
 
@@ -374,7 +374,7 @@
 
 **Periferia Industrial (Ferrovelhos).** Setting principal #6, sucata, fuligem carbono, hardware descartado, matéria-prima infinita. Bairro oeste da cidade. Setting de Dante "Grid" Alencar (traidor). FIR opera abertamente aqui. *Cross-ref:* lore-bible.md §5.1; environments/06-periferia.md.
 
-**Pigpen cipher.** Sistema cifra geométrica equivalência canônica ao cripto-glifo de Era 1 (grade 3 por 3 mais X angular mais constelação de pontos). Dívida arquitetural reconhecida sem alarde pela redação canon. Operadores que conhecem Pigpen leem Glyphs como texto. Iniciados aprendem na terceira semana, depois de Boole e antes de stack. Easter egg maçom vetor central canon. *Cross-ref:* deep/magic/glyph-token-conjuro-codex-deep.md §8; memory/project_eastereggs_maconaria_canonica.md.
+**Cripto-glifo de Era 1.** Sistema canônico de cifra geométrica (grade 3 por 3 mais X angular mais constelação de pontos). Equivalência estrutural a sistemas de cifragem geométrica clássicos reconhecida sem alarde pela redação canon. Operadores que dominam o sistema leem Glyphs como texto. Iniciados aprendem na terceira semana, depois de Boole e antes de stack. *Cross-ref:* deep/magic/glyph-token-conjuro-codex-deep.md §8.
 
 **Pillar 1.** "Lógica vence força". Combate e exploração resolvidos por análise, predição, combinação; nunca por reflexo, dano bruto ou grind. Active turn-based, telegrafia condicional, RNG calibrado, Knowledge Progression. *Cross-ref:* pillars.md Pillar 1.
 
@@ -512,7 +512,7 @@
 
 **Verônica Atelaiá.** Cientista em -45, primeira teorizadora canônica de Patch-Zero como anomalia ontológica genuína (tratado anônimo *Sobre o Comportamento Emergente dos Padrões Fechados*). Sterling Locke classificou como "anomalia folclórica" em -25. Descendente matrilinear direta de Atelaiá Chevalier. Cronista in-character §10 deep-lore Era 1. *Cross-ref:* factions.md; deep/eras/era-1-pre-codigo.md §10.
 
-**Vespa Calderón ("Vespa").** 24 anos, Underground Dutos Infernais e scripter Pythia rebelde, mentora lateral de Cauã. Guardou cordão 89 nós de Calixto Rivaz pós-morte (easter egg maçom canon). *Cross-ref:* deep/characters/caua-volt.md R4; environments/04-dutos-infernais.md.
+**Vespa Calderón ("Vespa").** 24 anos, Underground Dutos Infernais e scripter Pythia rebelde, mentora lateral de Cauã. Guardou cordão 89 nós de Calixto Rivaz pós-morte. *Cross-ref:* deep/characters/caua-volt.md R4; environments/04-dutos-infernais.md.
 
 **Vetor central da existência.** Conceito canon preservado em oitavo grau de mestrado da Ordem Recursiva. O cosmo é grafo orientado de vetores compostos; cada vetor é tripla ordenada Glyph-Token-Conjuro. Vetor de máxima conectividade canônico se manifesta em cada Era em um portador: na Era 1, Pyotor I Draco Vance; na Era 3, Gus Vector Tavus Vance. *Cross-ref:* deep/ontologia/cosmologia-deep.md §5.
 

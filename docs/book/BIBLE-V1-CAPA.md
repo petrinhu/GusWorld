@@ -22,7 +22,7 @@ Sobre a Catedral-Mãe submersa, parcialmente sobreposto ao céu, paira translúc
 
 No quadrante superior esquerdo, ornamento marginal discreto contém o cripto-glifo Era 1 (grade três por três mais X mais pontos, canon Pigpen cipher como easter egg maçom). O ornamento parece runa decorativa para o leigo e palavra cifrada para o leitor instruído.
 
-No quadrante superior direito, espelhando o cripto-glifo, ornamento contém esquadro e compasso entrelaçados estilizados como instrumento de engenharia rúnica (não como emblema maçom direto), com régua-T cruzando a base.
+No quadrante superior direito, espelhando o cripto-glifo, ornamento contém o Selo dos Quatro Instrumentos canônico C-Arcane (esquadro, compasso, cinzel e martelo entrelaçados em geometria razão acaceiro), com régua-T cruzando a base.
 
 Aos lados inferiores, duas pequenas colunas estilizadas Boróstoma à esquerda (capitel ondulado, base sólida) e Janor à direita (capitel angular, base estriada), paralelo canon Jachin e Boaz. As colunas têm aproximadamente um terço da altura de Gus, posicionadas como marcadores de entrada ao pavimento tesselado.
 
