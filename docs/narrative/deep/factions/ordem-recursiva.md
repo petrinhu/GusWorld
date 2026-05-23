@@ -63,7 +63,7 @@ Cerimonial é moderado, contido, deliberadamente desprovido de transe. A Vigíli
 ## 5. Eventos seminais
 
 - **-148.** Fundação informal pós-Hiato. Conferência de catalogação na Catedral de São Camilo. 1 247 fólios sobreviventes. Sem juramento.
-- **-115.** Codificação formal do Asmódico em treze fólios-pivô por Atelaiá Chevalier e Eusébio Argéndia-Chevalier. Brasão da engrenagem estampado pela primeira vez. Frontispício em esquadro e compasso. 47ª proposição de Euclides em margem do oitavo fólio.
+- **-115.** Codificação formal do Asmódico em treze fólios-pivô por Atelaiá Chevalier e Eusébio Argéndia-Chevalier. Brasão da engrenagem estampado pela primeira vez. Frontispício com iconografia cerimonial fundadora em instrumentos de medida pareados. 47ª proposição de Euclides em margem do oitavo fólio.
 - **-80.** Tragédia da Catedral Menor de São Camilo. Anomalia ressonante derruba a abóbada durante Vigília. Dezessete mestres mortos, contagem precisa preservada e canônica. Trauma fundador. Diário Atelaiá daquele período, doc 3 in-world, é a fonte primária do que se conhece sobre o evento.
 - **-78.** Protocolo de Selagem Asmódica decretado, herdado das margens do diário Atelaiá, codificado em fólio próprio. Toda catedral ativa passa a manter Conjuro de lacre cinético atualizado.
 - **-7.** Contaminação da Catedral Menor de Atelaiá. Hilário Tepenkov morre, idade catorze. Bento, idade sete, sobrevive por estar fora da câmara central durante o pico ressonante. Aldebrando começa a registrar suspeita de interferência externa em diário próprio.

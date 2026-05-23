@@ -3,7 +3,7 @@
 > **Status:** Canônico deep-lore R7 F1-DL.7. Estilo Asimov (Foundation, *interregnum* e o *Mule* como ruptura de previsibilidade) cruzado com Bruce Sterling (subcultura técnica, Piratas de Dados, cyberpunk de oficina) e Tolkien (Silmarillion, idades como camadas cosmogônicas).
 > **Escopo:** substrato técnico canônico das três eras (Neo-Sylvania, Era do Compilador, Era Sterling) e do interregnum do Êxodo, em registro técnico-poético cronístico.
 > **Cros-ref:** [[../../lore-bible]] §3, [[../eras/era-1-pre-codigo]], [[../../timeline]], [[../../factions]] §Ordem Recursiva, [[../magic/4-linguagens-deep]], [[../antagonists/sterling-locke-deep]], [[../antagonists/patch-zero-deep]].
-> **Convenção:** zero em-dash. Censura canônica aplicada (poxa, caçamba, caramba). Easter eggs Fibonacci + maçom pervasivos por desenho, não por declaração.
+> **Convenção:** zero em-dash. Censura canônica aplicada (poxa, caçamba, caramba). Easter eggs Fibonacci + cerimoniais fundadores pervasivos por desenho, não por declaração.
 
 ---
 

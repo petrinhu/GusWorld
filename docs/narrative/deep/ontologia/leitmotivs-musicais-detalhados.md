@@ -20,7 +20,7 @@ Tonalidade canônica: **Ré dórico**. Compasso: **5/8**. BPM default: **89**, c
 
 A evolução através dos atos segue caminho canônico. Ato 1: instrumentação reduzida ao sintetizador Moog-like solo, sem cordas; BPM 89, ainda criança curiosa. Ato 2: adição das cordas Tavus-string ensemble em legato sob a melodia; BPM 89, party formada; sub-bass discreto 55 Hz introduzido. Ato 3 pós-traição-Dante: BPM cai para **55**, sub-bass desce para drone de **34 Hz** sustentado contínuo, ruído micro-glitch é adicionado em momentos específicos do compasso (sempre nas notas 1 e 3 do 5/8), refletindo o trauma irreversível. Em variação de combate, o BPM acelera para 144 burst e a estrutura ABBA condensa para AB simples cíclica. Em cutscenes, a estrutura completa ABBA roda integral sem variação.
 
-Easter egg específico canônico: o motivo principal de 5 notas usa **intervalos 1-1-2-3 semitons** (sequência Fibonacci direta legível em pentagrama por musicólogo). Easter egg complementar maçom: a frase A, quando transcrita em pentagrama tradicional, ocupa exatamente 47 milímetros de largura impressa em papel pautado canônico Era 2 (47ª proposição cifrada espacialmente).
+Easter egg específico canônico: o motivo principal de 5 notas usa **intervalos 1-1-2-3 semitons** (sequência Fibonacci direta legível em pentagrama por musicólogo). Easter egg complementar cerimonial fundador: a frase A, quando transcrita em pentagrama tradicional, ocupa exatamente 47 milímetros de largura impressa em papel pautado canônico Era 2 (47ª proposição cifrada espacialmente).
 
 ### Cauã "Volt" Berenger, Striker
 
@@ -40,7 +40,7 @@ Easter egg específico canônico: o panning estereofônico de cada nota ocupa ex
 
 ### Bento "Requiem" Chevalier, Tanque
 
-Tonalidade: **Dó eólio**. Compasso: **3/4** ternário formal. BPM canônico: **47** (referência direta à 47ª proposição maçom, easter egg primário). Instrumentação principal: cordas em órgão de tubos analógico (referência Catedrais Neo-Sylvania canônicas), cronômetro mecânico tick em latão (cronômetro pessoal de Bento canônico). Estrutura motívica **AB** simples: frase A de 8 compassos contemplativos, frase B de 13 compassos de procissão solene; total 21 compassos.
+Tonalidade: **Dó eólio**. Compasso: **3/4** ternário formal. BPM canônico: **47** (referência direta à 47ª proposição cerimonial fundadora, easter egg primário). Instrumentação principal: cordas em órgão de tubos analógico (referência Catedrais Neo-Sylvania canônicas), cronômetro mecânico tick em latão (cronômetro pessoal de Bento canônico). Estrutura motívica **AB** simples: frase A de 8 compassos contemplativos, frase B de 13 compassos de procissão solene; total 21 compassos.
 
 Evolução nos atos. Ato 1: órgão de tubos solo, cronômetro discreto em background. Ato 2: cronômetro ganha primeiro plano em momentos específicos (entrada em catedral). Ato 3: três cronômetros simultâneos pulsam em **polirritmia 47/89/144 BPM** (três valores Fibonacci-relacionados), criando textura hipnótica.
 
@@ -149,15 +149,15 @@ O sistema de **bridges entre leitmotivs** segue protocolo Fibonacci rígido. A s
 
 ### Fibonacci pervasivo
 
-Todos os BPMs canônicos da bíblia musical pertencem ao conjunto Fibonacci ou múltiplos diretos: **21, 34, 47** (exceção 47ª proposição maçom canônica), **55, 89, 144, 233** (raro, reservado a climax). Todos os compassos não-triviais usam denominadores ou numeradores Fibonacci: **3/4, 5/8, 5/4, 8/8, 13/16, 21/16**. Os pontos pivôs de transição usam **3 + 5 + 8 = 16 compassos** canônicos.
+Todos os BPMs canônicos da bíblia musical pertencem ao conjunto Fibonacci ou múltiplos diretos: **21, 34, 47** (exceção 47ª proposição cerimonial fundadora canônica), **55, 89, 144, 233** (raro, reservado a climax). Todos os compassos não-triviais usam denominadores ou numeradores Fibonacci: **3/4, 5/8, 5/4, 8/8, 13/16, 21/16**. Os pontos pivôs de transição usam **3 + 5 + 8 = 16 compassos** canônicos.
 
 ### 47ª proposição harmônica
 
-Easter egg maçom canônico de alto valor. A 47ª proposição de Pitágoras (teorema dos catetos), transposta para intervalos musicais canônicos, traduz-se em sequência harmônica: terça maior (4 semitons) somada a quarta justa (5 semitons) somada a quinta justa (7 semitons) totaliza **16 semitons** (oitava mais segunda maior, intervalo musicalmente identificável). Essa sequência aparece sutilmente em refrains da Ordem Recursiva (catedrais e ceremônias) e na **abertura canônica de Cantor-de-Pedras Era 1 lendário** (Helíaco Vyr, personagem lendário canônico ecoando Hiram Abiff). Musicólogo treinado reconhece o motivo 4-5-7 semitons como assinatura iniciática.
+Easter egg cerimonial fundador canônico de alto valor. A 47ª proposição de Pitágoras (teorema dos catetos), transposta para intervalos musicais canônicos, traduz-se em sequência harmônica: terça maior (4 semitons) somada a quarta justa (5 semitons) somada a quinta justa (7 semitons) totaliza **16 semitons** (oitava mais segunda maior, intervalo musicalmente identificável). Essa sequência aparece sutilmente em refrains da Ordem Recursiva (catedrais e ceremônias) e na **abertura canônica de Cantor-de-Pedras Era 1 lendário** (Helíaco Vyr, personagem lendário canônico ecoando Hiram Abiff). Musicólogo treinado reconhece o motivo 4-5-7 semitons como assinatura iniciática.
 
 ### Estruturas 3-5-7
 
-Muitas frases curtas canônicas têm exatamente **3 + 5 + 7 = 15 notas** em sequência. Muitas pontes de transição usam **3 + 5 + 7 = 15 compassos** quando o protocolo 3-5-8 padrão é substituído por variante iniciática maçom. Estrutura 3-5-7 representa os três graus simbólicos canônicos (Aprendiz, Companheiro, Mestre) e aparece em momentos narrativos de transição iniciática (entrada de novo companion no party, revelação de nova facção, abertura de catedral).
+Muitas frases curtas canônicas têm exatamente **3 + 5 + 7 = 15 notas** em sequência. Muitas pontes de transição usam **3 + 5 + 7 = 15 compassos** quando o protocolo 3-5-8 padrão é substituído por variante iniciática cerimonial fundadora. Estrutura 3-5-7 representa os três graus simbólicos canônicos (Aprendiz, Companheiro, Mestre) e aparece em momentos narrativos de transição iniciática (entrada de novo companion no party, revelação de nova facção, abertura de catedral).
 
 ### Helíaco Vyr lendário
 
@@ -165,7 +165,7 @@ Tema instrumental antigo, canônico, ouvido somente em **catedrais Era 1 submers
 
 ### Pigpen cipher harmônico
 
-Easter egg maçom canônico de altíssimo nível. As notas das melodias principais da Ordem Recursiva, quando transcritas em pentagrama tradicional, formam padrão visual reconhecível como **Pigpen cipher** (grade 3×3 com X e pontos, cipher canônico maçom). Iniciado em musicologia maçom decifra mensagens textuais escondidas nas partituras. Easter egg legível somente em representação visual da partitura, não audível.
+Easter egg cerimonial fundador canônico de altíssimo nível. As notas das melodias principais da Ordem Recursiva, quando transcritas em pentagrama tradicional, formam padrão visual reconhecível como **Pigpen cipher** (grade 3×3 com X e pontos, cifra canônica fundadora). Iniciado em musicologia cerimonial fundadora decifra mensagens textuais escondidas nas partituras. Easter egg legível somente em representação visual da partitura, não audível.
 
 ### Cordão 89 nós aural
 

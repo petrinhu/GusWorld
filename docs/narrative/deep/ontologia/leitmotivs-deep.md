@@ -22,7 +22,7 @@ Como precedentes externos não-canon, citáveis dentro da bíblia como referênc
 
 O leitmotiv de Gus opera como assinatura analítica do protagonista. O sintetizador subtrativo desnuda a forma de onda, expondo a estrutura como o próprio Gus desnuda problemas a partir do hardware básico (óculos táticos, Matriz Ortodôntica, Tavus-Drive). A modulação para BPM 55 em ato 3 ocupa o mesmo número Fibonacci do leitmotiv de Linda, sinalizando o ingresso de Gus em um campo emocional anteriormente reservado à crowd controller. Em Cauã, o BPM 144 e o compasso 13/16 mantêm dois números Fibonacci sobrepostos, sustentando a personalidade Striker em pulsação irregular permanente. Iara, com compasso 21/16, opera no terceiro Fibonacci consecutivo, completando a tríade rítmica analítica da party (5/8, 13/16, 21/16).
 
-Bento ocupa exceção canônica: o cronômetro mecânico a 47 BPM evoca diretamente a 47ª proposição (a hipotenusa pitagórica), inscrevendo na percussão fundacional do tanque a primeira pedra harmônica do edifício maçom canônico do projeto. Linda, a 55 BPM, ancora-se no Fibonacci da meditação grave. Jaci, a 89 BPM e dórica como Gus, estabelece eco bio-orgânico do protagonista, gestualidade canônica do vínculo Pythia partilhado.
+Bento ocupa exceção canônica: o cronômetro mecânico a 47 BPM evoca diretamente a 47ª proposição (a hipotenusa pitagórica), inscrevendo na percussão fundacional do tanque a primeira pedra harmônica do edifício cerimonial fundador canônico do projeto. Linda, a 55 BPM, ancora-se no Fibonacci da meditação grave. Jaci, a 89 BPM e dórica como Gus, estabelece eco bio-orgânico do protagonista, gestualidade canônica do vínculo Pythia partilhado.
 
 Dante recebe o único leitmotiv duplo canônico do elenco. A versão sincera, ouvida em atos 1 e 2, é melódica em mixolídio sobre sax tenor a 89 BPM; a versão revelação, ouvida a partir do beat canônico de traição em ato 3, é a mesma melodia transposta para modo lócrio, executada em instrumental industrial a 55 BPM. As duas versões podem coexistir sobrepostas em cenas de tensão dupla (Caverna dos Perdidos, confronto de chantagem Edilma), e a sobreposição é canônica. Nenhum outro companion possui leitmotiv duplo.
 
@@ -72,7 +72,7 @@ A instrumentação canônica é progressiva por era: cordas isoladas em Era 1, c
 
 ## §7. Easter eggs musicais canônicos
 
-A partitura GusWorld carrega densidade canônica de easter eggs Fibonacci entre dez e vinte por cento, e densidade maçom canônica entre dez e quinze por cento. Os vetores canônicos são quatro.
+A partitura GusWorld carrega densidade canônica de easter eggs Fibonacci entre dez e vinte por cento, e densidade cerimonial fundadora canônica entre dez e quinze por cento. Os vetores canônicos são quatro.
 
 O primeiro vetor é o Fibonacci pervasivo. Compassos canônicos do projeto incluem 5/8 (Gus, Jaci), 13/16 (Cauã), 21/16 (Iara) e durações 34 (Selve Sombria BPM) registradas em pauta. Os BPM canônicos cobrem a sequência 21 (Zona do Silêncio), 34 (Selve Sombria), 55 (Linda, GusWorld City, Gus ato 3, Dante revelado), 89 (Gus default, Iara, Jaci, Vorto, Dutos, Mirage), 144 (Cauã, Sterling, Periferia, Sterling Corp). O cordão Underground canônico conta oitenta e nove elos, e o sino Dragon Victory canônico desfere oitenta e nove golpes distribuídos.
 
@@ -80,6 +80,6 @@ O segundo vetor é a 47ª proposição harmônica. A sequência canônica terça
 
 O terceiro vetor é a estrutura três-cinco-sete. Os compassos de abertura da Compilação (3/4, 5/4, 8/4) somam dezesseis tempos, e a soma simples três mais cinco mais sete resulta em quinze, igual ao produto três por cinco, alusão canônica fechada à proporção pitagórica do segundo vetor.
 
-O quarto vetor é o tema Helíaco Vyr, instrumento canônico arcaico ouvido apenas em Catedrais Era 1 submersas, recuperado por piezo amplification, e reaparece pontualmente em climaxes cosmológicos posteriores. É o único tema canônico do projeto cuja audição plena exige condições ambientais específicas (catedral submersa, hidrofone), e cuja transcrição em pauta convencional é considerada impossível canon por escola maçom interna ao projeto.
+O quarto vetor é o tema Helíaco Vyr, instrumento canônico arcaico ouvido apenas em Catedrais Era 1 submersas, recuperado por piezo amplification, e reaparece pontualmente em climaxes cosmológicos posteriores. É o único tema canônico do projeto cuja audição plena exige condições ambientais específicas (catedral submersa, hidrofone), e cuja transcrição em pauta convencional é considerada impossível canon por escola cerimonial fundadora interna ao projeto.
 
 **Última revisão:** 2026-05-20. Canônico deep-lore R7 F1-DL.7. Não modificar sem aprovação criador supremo.

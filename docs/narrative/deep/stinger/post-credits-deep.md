@@ -54,7 +54,7 @@ Quando a câmera passa pelo centro da figura, o **cripto-glifo canon Era 1** (gr
 
 Voz inaudível percorre o substrato. Não é som propriamente; é ressonância de baixa frequência transmitida pelo basalto, perceptível apenas como tremor sub-perceptível na imagem.
 
-Plano final fecha em coluna basáltica quebrada ao centro da câmara. A fratura é horizontal, limpa, antiga. Símbolo maçom canon: a coluna quebrada significa Catedral-Mãe submersa, o templo perdido cuja localização foi deliberadamente esquecida pelas linhagens fundadoras.
+Plano final fecha em coluna basáltica quebrada ao centro da câmara. A fratura é horizontal, limpa, antiga. Símbolo cerimonial fundador canon: a coluna quebrada significa Catedral-Mãe submersa, o templo perdido cuja localização foi deliberadamente esquecida pelas linhagens fundadoras.
 
 Fade para preto. Duração canônica: 55 segundos.
 
@@ -110,7 +110,7 @@ Fade para preto. Duração canônica: 34 segundos.
 
 Fade-in: clearing de acaceiros antigos na Selve Sombria, profundidade média, raiz ancestral documentada. Crepúsculo. A luz é quente, ângulo baixo, três tons dominantes: âmbar saturado, vermelho-acaceiro, sombra violácea.
 
-**Acaceiro de tronco vermelho** central no enquadramento, easter egg canon de marcação territorial maçom em Selve. A casca tem textura granulada visível, com fissuras verticais que desenham padrão fractal sub-óbvio. Câmera inicia zoom lento, oito segundos contínuos, em direção a uma folha pequena recém-nascida no galho mais baixo.
+**Acaceiro de tronco vermelho** central no enquadramento, easter egg canon de marcação territorial cerimonial fundadora em Selve. A casca tem textura granulada visível, com fissuras verticais que desenham padrão fractal sub-óbvio. Câmera inicia zoom lento, oito segundos contínuos, em direção a uma folha pequena recém-nascida no galho mais baixo.
 
 A folha é jovem, ainda verde-pálida nas bordas, nervuras vermelhas ainda translúcidas. Quando o zoom atinge close-up extremo, o padrão das veias revela-se em macro: a disposição das ramificações compõe matriz **micro-Pigpen**, legível apenas neste grau de aproximação. Nove células, X diagonal, três pontos. Idêntica em estrutura ao selo da carta, ao tratado de Atelaiá, ao cripto-glifo na pedra basáltica.
 

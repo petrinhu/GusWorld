@@ -94,7 +94,7 @@ Respondi. "A palavra profanar pressupõe sacralidade prévia. Não atribuo sacra
 
 Cláudio Vance Atelaiá sorriu sem alegria. Disse, lentamente, que era exatamente o tipo de resposta que esperava de mim. Não respondi à observação dele porque a observação dele não continha pergunta.
 
-Ele prosseguiu. "Doutorando Locke. O senhor citou, no capítulo final, em nota de rodapé, a tradição cerimonial dos artesãos de Boróstoma. O senhor descreveu, e cito o senhor literalmente, o ritual de aferição mútua com esquadro e compasso como, e cito, *ineficiência cerimonial corporativa*. O senhor mantém essa caracterização?"
+Ele prosseguiu. "Doutorando Locke. O senhor citou, no capítulo final, em nota de rodapé, a tradição cerimonial dos artesãos de Boróstoma. O senhor descreveu, e cito o senhor literalmente, o ritual de aferição mútua com instrumentos de medida pareados como, e cito, *ineficiência cerimonial corporativa*. O senhor mantém essa caracterização?"
 
 Respondi. "Mantenho. A tradição cerimonial dos artesãos de Boróstoma consome cinco horas semanais de cada artesão participante para produzir aferição que poderia ser obtida em três minutos por instrumentação calibrada. A diferença entre cinco horas e três minutos é ineficiência. A função cerimonial da prática é função afetiva, e função afetiva, conforme já estabeleci na resposta à senhora Pelicano Branco, é recurso. Recurso desperdiçado em cerimônia é recurso subtraído de produção. Mantenho a caracterização."
 
