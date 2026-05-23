@@ -1,0 +1,1 @@
+{ Full body 3D game asset sprite of an 8-year-old girl named Solane. Anime 3D style, cel-shaded, strict 1:1:1 chibi SD proportion. Curious expression, wearing simple Pelicano Branco child's clothes. Holding a small basket with different glowing plants. Clean isometric view, orthographic projection. Pure white background, isolated studio lighting --ar 1:1 --style raw --v 6.0 }

@@ -1,0 +1,1 @@
+{ Full body 3D game asset sprite of an adult man named Patrício Velô. Anime 3D style, cel-shaded, strict 1:1:1 chibi SD proportion. Quiet artist look, wearing modified Cult Mirage robes. Holding a sketchbook and observing with keen interest. Clean isometric view, orthographic projection. Pure white background, isolated studio lighting --ar 1:1 --style raw --v 6.0 }

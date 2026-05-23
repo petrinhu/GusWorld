@@ -1,0 +1,1 @@
+{ Full body 3D game asset sprite of an Era 2 woman named Praxídice Boroshova-Vance. Anime 3D style, cel-shaded, strict 1:1:1 chibi SD proportion. Inspector look, wearing scholarly robes mixed with practical travel gear. Holding a translation tablet. Clean isometric view, orthographic projection. Pure white background, isolated studio lighting --ar 1:1 --style raw --v 6.0 }

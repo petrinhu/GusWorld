@@ -1,0 +1,1 @@
+{ 3D game asset of the Fungo-Relógio (Clock-Fungus). Anime 3D style, cel-shaded, low-poly. Bioluminescent green fungus growing in 7 concentric rings. The rings glow in a rhythmic "4-and-pause" pattern. Growing on a dark forest log. Clean isometric view, orthographic projection. Pure white background, isolated studio lighting --ar 1:1 --style raw --v 6.0 }

@@ -1,0 +1,1 @@
+{ Full body 3D game asset sprite of a 28-year-old woman named Filomena Garda. Anime 3D style, cel-shaded, strict 1:1:1 chibi SD proportion. Marginalized adept look, wearing simple and slightly worn Cult Mirage robes. Confused but gentle expression. Clean isometric view, orthographic projection. Pure white background, isolated studio lighting --ar 1:1 --style raw --v 6.0 }

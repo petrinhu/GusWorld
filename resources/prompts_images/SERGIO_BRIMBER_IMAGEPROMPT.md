@@ -1,0 +1,1 @@
+{ Full body 3D game asset sprite of a 24-year-old man named Sérgio Brimber. Anime 3D style, cel-shaded, strict 1:1:1 chibi SD proportion. Youthful performer look, wearing Cult Mirage stage attire. Expressing subtle resistance through his posture. Clean isometric view, orthographic projection. Pure white background, isolated studio lighting --ar 1:1 --style raw --v 6.0 }

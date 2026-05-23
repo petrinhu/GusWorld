@@ -1,0 +1,1 @@
+{ Full body 3D game asset sprite of an Era 2 woman named Yvanova Argéndia. Anime 3D style, cel-shaded, strict 1:1:1 chibi SD proportion. Ancient singer-elder look, wearing layered traditional robes. Carrying a memory-ledger of the first generations. Clean isometric view, orthographic projection. Pure white background, isolated studio lighting --ar 1:1 --style raw --v 6.0 }

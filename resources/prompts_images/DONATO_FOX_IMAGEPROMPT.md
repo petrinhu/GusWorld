@@ -1,0 +1,1 @@
+{ Full body 3D game asset sprite of a 28-year-old man named Patrulheiro Donato Fox. Anime 3D style, cel-shaded, strict 1:1:1 chibi SD proportion. Bored expression, wearing a standard FIR patrol uniform (District 1). Holding a basic stun baton. Clean isometric view, orthographic projection. Pure white background, isolated studio lighting --ar 1:1 --style raw --v 6.0 }

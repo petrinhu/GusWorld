@@ -1,0 +1,1 @@
+{ Full body 3D game asset sprite of an adult man named Mateus Penkin. Anime 3D style, cel-shaded, strict 1:1:1 chibi SD proportion. Nosy neighbor look, wearing simple Periferia casual clothes. Peeking over a small digital fence. Clean isometric view, orthographic projection. Pure white background, isolated studio lighting --ar 1:1 --style raw --v 6.0 }

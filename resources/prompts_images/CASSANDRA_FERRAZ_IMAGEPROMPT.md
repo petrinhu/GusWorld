@@ -1,0 +1,1 @@
+{ Full body 3D game asset sprite of an Era 2 woman named Cassandra Ferraz. Anime 3D style, cel-shaded, strict 1:1:1 chibi SD proportion. Caring elder look, wearing practical village robes. Holding a basket of healing herbs. Clean isometric view, orthographic projection. Pure white background, isolated studio lighting --ar 1:1 --style raw --v 6.0 }

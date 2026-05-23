@@ -1,0 +1,1 @@
+{ Full body 3D game asset sprite of a 62-year-old man named Seu Bertoldo Caím. Anime 3D style, cel-shaded, strict 1:1:1 chibi SD proportion. Retired technician look, wearing a worn vest and holding a physical paper newspaper. Friendly but tired expression. Clean isometric view, orthographic projection. Pure white background, isolated studio lighting --ar 1:1 --style raw --v 6.0 }

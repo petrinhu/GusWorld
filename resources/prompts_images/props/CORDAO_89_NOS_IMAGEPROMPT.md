@@ -1,0 +1,1 @@
+{ 3D game asset close-up of the Cordão de 89 Nós (89-Knot Cord). Anime 3D style, cel-shaded, low-poly. A thick, weathered cotton cord with exactly 89 intricate knots. Each knot has a slightly different texture. Draped over a stone surface. Clean isometric view, orthographic projection. Pure white background, isolated studio lighting --ar 1:1 --style raw --v 6.0 }

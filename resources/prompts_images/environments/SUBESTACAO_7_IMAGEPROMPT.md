@@ -1,0 +1,1 @@
+{ Isometric 3D game environment asset of the Subestação 7. Anime 3D style, cel-shaded, low-poly. Industrial underground station with heavy pipes, sparking electrical panels, and rúnic safety warnings. Dark metallic textures with orange glowing accents. Clean isometric view, orthographic projection. Pure white background, isolated studio lighting --ar 1:1 --style raw --v 6.0 }

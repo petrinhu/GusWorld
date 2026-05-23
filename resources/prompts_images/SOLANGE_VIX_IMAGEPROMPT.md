@@ -1,0 +1,2 @@
+{ Full body 3D game asset sprite of a 46-year-old woman named Diretora Solange Vix. Anime 3D style, cel-shaded, strict 1:1:1 chibi SD proportion. Focused professional expression, wearing a minimalist corporate uniform. Holding a digital stylus and projecting a small holographic script. Clean isometric view, orthographic projection. Pure white background, isolated studio lighting --ar 1:1 --style raw --v 6.0 }
+<!-- NOTE: This character appears ONLY as a hologram. Apply scanline, flicker, and transparency shaders in Nano Banana/Engine for the final look. -->

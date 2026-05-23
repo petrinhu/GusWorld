@@ -1,0 +1,1 @@
+{ Full body 3D game asset sprite of a 60-year-old man named Lazar Tovrov. Anime 3D style, cel-shaded, strict 1:1:1 chibi SD proportion. Veteran transmitter look, wearing heavy cold-weather gear from the Cidades-Gêmeas Norte. Holding a coded audio cassette. Clean isometric view, orthographic projection. Pure white background, isolated studio lighting --ar 1:1 --style raw --v 6.0 }

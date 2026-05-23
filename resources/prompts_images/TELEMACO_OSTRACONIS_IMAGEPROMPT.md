@@ -1,0 +1,1 @@
+{ Full body 3D game asset sprite of an Era 1 man named Mestre-Sementeiro Telêmaco Ostraconis. Anime 3D style, cel-shaded, strict 1:1:1 chibi SD proportion. Bureaucratic but liturgical look, wearing heavy Era 1 robes. Holding a large, ancient seed-ledger. Clean isometric view, orthographic projection. Pure white background, isolated studio lighting --ar 1:1 --style raw --v 6.0 }

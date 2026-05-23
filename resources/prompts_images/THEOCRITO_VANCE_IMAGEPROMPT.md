@@ -1,0 +1,1 @@
+{ Full body 3D game asset sprite of an Era 2 man named Theócrito Vance. Anime 3D style, cel-shaded, strict 1:1:1 chibi SD proportion. Itinerant singer-lector look, wearing travel-worn liturgical robes. Holding a portable rúnic songbook. Clean isometric view, orthographic projection. Pure white background, isolated studio lighting --ar 1:1 --style raw --v 6.0 }

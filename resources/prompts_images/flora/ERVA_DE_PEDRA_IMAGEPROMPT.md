@@ -1,0 +1,1 @@
+{ 3D game asset of the Erva-de-Pedra (Stone-Herb). Anime 3D style, cel-shaded, low-poly. A resilient, crystalline plant growing directly from a gray rock. Small blue glowing flowers. Clean isometric view, orthographic projection. Pure white background, isolated studio lighting --ar 1:1 --style raw --v 6.0 }

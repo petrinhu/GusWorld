@@ -1,0 +1,1 @@
+{ Full body 3D game asset sprite of an adult woman named Otília Vermelha. Anime 3D style, cel-shaded, strict 1:1:1 chibi SD proportion. Refugee look, wearing worn Polis-Vermelha traditional clothes. Holding a small, old photo of a child. Clean isometric view, orthographic projection. Pure white background, isolated studio lighting --ar 1:1 --style raw --v 6.0 }

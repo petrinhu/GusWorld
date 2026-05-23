@@ -1,0 +1,1 @@
+{ Full body 3D game asset sprite of an Era 2 man named Hipólito Ferraz-Boroshova. Anime 3D style, cel-shaded, strict 1:1:1 chibi SD proportion. Expeditionary look, wearing underwater-ready exploration gear (Era 2 style). Holding a glowing depth-scanner. Clean isometric view, orthographic projection. Pure white background, isolated studio lighting --ar 1:1 --style raw --v 6.0 }

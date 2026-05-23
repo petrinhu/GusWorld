@@ -1,0 +1,1 @@
+{ Full body 3D game asset sprite of an Era 2 woman named Lin Tórun. Anime 3D style, cel-shaded, strict 1:1:1 chibi SD proportion. Inventor and pioneer look, wearing 19th-century attire integrated with digital circuitry. Holding a rúnic compilation tablet. Clean isometric view, orthographic projection. Pure white background, isolated studio lighting --ar 1:1 --style raw --v 6.0 }

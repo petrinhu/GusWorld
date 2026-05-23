@@ -1,0 +1,1 @@
+{ Full body 3D game asset sprite of an ancient woman named Berenice Quaresma. Anime 3D style, cel-shaded, strict 1:1:1 chibi SD proportion. Wise elder from Tucano-Cinza, wearing traditional village robes. Holding a bundle of letters tied with 89 knots. Clean isometric view, orthographic projection. Pure white background, isolated studio lighting --ar 1:1 --style raw --v 6.0 }

@@ -1,0 +1,1 @@
+{ 3D game asset close-up of the Boca-da-Funda Crystals. Anime 3D style, cel-shaded, low-poly. A pair of twin, vibrating piezo crystals mounted on a liturgical stone base. Emitting soft light and visible ripple effects in the air. Clean isometric view, orthographic projection. Pure white background, isolated studio lighting --ar 1:1 --style raw --v 6.0 }

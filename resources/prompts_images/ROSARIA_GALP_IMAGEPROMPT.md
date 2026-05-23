@@ -1,0 +1,1 @@
+{ Full body 3D game asset sprite of a woman named Rosaria Galp. Anime 3D style, cel-shaded, strict 1:1:1 chibi SD proportion. C-Arcane pioneer look, wearing early Era 2 engineering clothes. Holding a primitive compilation tablet. Clean isometric view, orthographic projection. Pure white background, isolated studio lighting --ar 1:1 --style raw --v 6.0 }

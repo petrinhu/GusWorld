@@ -1,0 +1,1 @@
+{ Full body 3D game asset sprite of an Era 2 woman named Eufrásia Vanderbist. Anime 3D style, cel-shaded, strict 1:1:1 chibi SD proportion. Diligent elder look, wearing traditional robes with archive tools. Holding a historical seed-register. Clean isometric view, orthographic projection. Pure white background, isolated studio lighting --ar 1:1 --style raw --v 6.0 }
