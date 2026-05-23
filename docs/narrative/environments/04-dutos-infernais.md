@@ -91,7 +91,7 @@ Nível 5, profundidade 80m. Pilar de pedra escura, dois metros de diâmetro, cra
 - **Eco metálico de passos:** ferro batendo em ferro. Cada nível tem reverberação diferente; runners experientes localizam quem está caminhando só pelo som. Cauã sabe quem está pelo "passo do Tao" (mais leve) ou "passo do Bel" (mais firme).
 - **Carne-de-rato-cinético sendo grelhada no fogareiro:** chiado de gordura caindo na resistência elétrica. Cheiro descrito como "frango defumado com nota metálica" ([[tradicoes-cultura]] §Comidas). Sustento principal dos runners.
 
-Spec sonora detalhada (Hz exatos, layers, mixagem turbinas vs Pythia chirps) delegada a Fase 2 com [[audio-designer-composer]].
+Spec sonora detalhada (Hz exatos, layers, mixagem turbinas vs Pythia chirps) delegada a Fase 2 com `audio-designer-composer`.
 
 ---
 
@@ -233,4 +233,4 @@ Diário entry destrava sobre Pythia em situação real + improviso técnico Pill
 
 ---
 
-**Última revisão:** 2026-05-15. Canônico (Bloco F — environmental storytelling). Expansão futura: paleta detalhada + spec sonora exata em Fase 2 com [[art-director]] + [[audio-designer-composer]]. Sub-rotina Pythia exemplo da Vinheta B deve ser validada por [[engine-graphics-programmer]] / [[lead-game-designer]] na implementação real (hoje é prosa narrativa, não código rodável).
+**Última revisão:** 2026-05-15. Canônico (Bloco F — environmental storytelling). Expansão futura: paleta detalhada + spec sonora exata em Fase 2 com `art-director` + `audio-designer-composer`. Sub-rotina Pythia exemplo da Vinheta B deve ser validada por `engine-graphics-programmer` / `lead-game-designer` na implementação real (hoje é prosa narrativa, não código rodável).

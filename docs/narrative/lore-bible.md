@@ -185,7 +185,7 @@ Cada companion é especialista em uma família. Gus mistura todas (alta complexi
 | **Cinético** | Força aplicada, gravidade, vetor de massa | Bento (analógico) |
 | **Criptográfico** | Cifragem, ofuscamento, ilusão, refração | Iara |
 
-Dante é exceção: ele não opera em família elétrica nem cinética isolada; ele **integra hardware** — sua "magia" é instalar componentes que rodam conjuros pré-existentes (torres, escudos modulares, manutenção de implantes alheios). Mecanicamente útil; narrativamente significativo: é o personagem que **manipula o hardware dos outros**. Daí o foreshadow do rootkit (D.1).
+Dante é **exceção Pillar 3 invertida (meta-hardware)**: NÃO tem vértice próprio do triângulo, não opera em família elétrica nem cinética isolada. Opera **root nos vértices dos outros**, sua "magia" é instalar componentes que rodam conjuros pré-existentes (torres, escudos modulares, manutenção de implantes alheios). Paralelo embrionário do **4º elemento Sterling** (Locke Core + Rede Distribuída): Dante é mini-Sterling em formação, foreshadow estrutural da traição (D.1 rootkit). Mecanicamente útil em party; narrativamente significativo como personagem que manipula hardware alheio. Anti-Pillar 3 invertida confirma o triângulo dos outros companions por contraste.
 
 ### 7.3 Subtipos elementais
 

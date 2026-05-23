@@ -89,7 +89,7 @@ Atrás da nave principal, conjunto de três edifícios baixos em pedra-aparelhad
 - **Recitação dos 40 nomes em latim litúrgico:** ocorre em Vigília + aniversários de catedral. Voz única (mestre sênior) recita lista. Nomes têm cadência poética. Bento sabe de cor desde os 8.
 - **Eco prolongado de passos:** acústica da nave é arquitetada para reverberação longa. Sussurros viajam vinte metros. Player aprende sem ser dito: silêncio é etiqueta.
 
-Spec sonora detalhada (Hz exatos, layers, mixagem) delegada a Fase 2 com [[audio-designer-composer]].
+Spec sonora detalhada (Hz exatos, layers, mixagem) delegada a Fase 2 com `audio-designer-composer`.
 
 ---
 
@@ -185,4 +185,4 @@ O monge para. O sino continua vibrando por mais vinte segundos por inércia. Dep
 
 ---
 
-**Última revisão:** 2026-05-15. Canônico (Bloco F — environmental storytelling). Expansão futura: paleta detalhada + spec sonora exata em Fase 2 com [[art-director]] + [[audio-designer-composer]].
+**Última revisão:** 2026-05-15. Canônico (Bloco F — environmental storytelling). Expansão futura: paleta detalhada + spec sonora exata em Fase 2 com `art-director` + `audio-designer-composer`.

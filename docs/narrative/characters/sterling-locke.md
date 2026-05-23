@@ -99,7 +99,7 @@ Para isso, ele precisa de uma chave de descriptografia que mapeie a Selve como �
 
 ### O eixo theme
 
-**Sterling é o filósofo da extração. Gus é o filósofo da manutenção.** Os dois são igualmente lógicos. Os dois são igualmente capazes. O jogo argumenta que servir à vida é a posição superior — não por sentimentalismo, mas por sustentabilidade técnica de longo prazo. Sterling vai colapsar o sistema (como Polis-Vermelha já colapsou); Gus vai mantê-lo.
+**Sterling é o filósofo da extração. Gus é o filósofo da manutenção.** Os dois são tecnicamente capazes em registro lógico-formal: esta é a única simetria. Eticamente e estruturalmente NÃO são simétricos. Sterling é predador (anti-Pillar 4 canon, vilão puro sem redenção); Gus é mantenedor. A equivalência lógica não é equivalência ética nem estrutural. O jogo argumenta narrativamente que servir à vida (Gus) é estruturalmente superior a servir à extração predatória (Sterling), não por sentimentalismo, mas porque a extração predatória colapsa em médio prazo (Polis-Vermelha cascata canon, timeline -2 queda biológica). Sterling vai colapsar o sistema; Gus vai mantê-lo.
 
 ---
 

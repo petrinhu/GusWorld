@@ -57,7 +57,7 @@ Cripto-glifos Neo-Sylvania dentro de catedrais profundas (acessíveis no arco Be
 
 ### Vetor 2 — Captura corporativa Sterling
 
-Sterling Corp localizou o bug primordial cerca de 3 anos antes do jogo. Departamento de Contenção tentou **domesticar em laboratório**. Objetivo: transformar em arma proprietária para soltar em redes de empresas rivais, derrubando concorrência por dentro.
+Sterling Corp localizou e iniciou captura do bug primordial em -8 (canon deep R5 ratificado). Departamento de Contenção tentou **domesticar em laboratório** ao longo de 8 anos consecutivos sob codinome operacional **GRE Patch Zero**. Objetivo: transformar em arma proprietária para soltar em redes de empresas rivais, derrubando concorrência por dentro. Contenção falhou em três fases canon: -3 falha parcial (vetor 4 latente em rede de exaustão termal), -1 segunda falha (escape para micélio simulado), -0.25 escape final (propagação para rede Selve oriental).
 
 **Falhou.** Patch-Zero resistiu a contenção, expandiu-se durante captura, contaminou pessoal de laboratório. Sterling **subestimou caos irredutível** (Pillar 2). Achou que era bug "como qualquer outro".
 
