@@ -609,7 +609,8 @@ Cor institucional: preto-carbono + fúcsia-neon discreto.
 
 #### Polis-Vermelha Underground residual
 
-- **Anônimos** (3-5 sobreviventes em transmissão fragmentada) — nomes nunca claros. Identificação por código de chamada apenas. Mensagens descontínuas, gradativamente raras.
+- **Anônimos** (3-5 sobreviventes em transmissão fragmentada). Nomes nunca claros. Identificação por código de chamada apenas. Mensagens descontínuas, gradativamente raras.
+- **Festa Coletivista** (canon F1-DL.ORDEM-EXPAND §8.7 + R10 §6.2): celebrada 13 de fevereiro desde -129 em Polis-Vermelha. Comemora fundação configuração coletivista cidade. Ordem Recursiva participa em registro tenso (cordão dobrado retido em vez de desdobrado, sinal cerimonial de reserva canônica). Cross-ref `tradicoes-cultura.md:33`. Trajetória axiológica má-evolução canon: -130 fundação boa-fé honesta → 128 anos deriva coletivista cumulativa → cristalização ideológica Era 3 → -2 queda biológica.
 
 #### Sympathizers não-membros
 

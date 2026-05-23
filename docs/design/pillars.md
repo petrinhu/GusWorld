@@ -93,7 +93,8 @@ QTE; real-time twitch; HP-sponge boss; dano inflacionado por level; "spam habili
 - **UI diegética** que reflete o hardware ativo.
 - **Companions B+C híbrido:**
   - Alguns sem hardware (habilidades inatas/treinadas — Cauã reflexos, Iara psicologia)
-  - Outros com 1 vértice próprio / hardware análogo individual (Bento relojoaria, Dante implantes-ferramenta, Jaci bio-ampolas)
+  - Outros com 1 vértice próprio / hardware análogo individual (Bento relojoaria, Jaci bio-ampolas)
+  - **Dante exceção Pillar 3 invertida (meta-hardware)**: NÃO tem vértice próprio. Opera root nos vértices dos outros (instala componentes alheios + manipula hardware dos companions). Paralelo embrionário do 4º elemento Sterling (Locke Core + Rede). Foreshadow estrutural traição canon (D.1 rootkit). Cross-ref lore-bible:188.
 - **7 árvores de skill paralelas** (Gus + 6 companions), cada uma alinhada à tech/perfil do dono:
   - **Auto-mode**: IA sobe upgrade conforme arquétipo do personagem
   - **Manual**: jogador escolhe ramo
