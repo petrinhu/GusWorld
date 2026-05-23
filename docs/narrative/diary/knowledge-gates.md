@@ -1,6 +1,6 @@
-# Diário — Knowledge Gates
+# Diário: Knowledge Gates
 
-> **Status:** Canônico (Bloco H — sistema Knowledge Progression). Revisão 2026-05-16. Modo autônomo autorizado pelo criador supremo (decisões macro fechadas em AskUserQuestion prévio).
+> **Status:** Canônico (Bloco H, sistema Knowledge Progression). Revisão 2026-05-16. Modo autônomo autorizado pelo criador supremo (decisões macro fechadas em AskUserQuestion prévio).
 >
 > **Visibilidade:** score numérico em HUD principal (visível, técnico). Diário é manifestação narrativa do mesmo score (entries não exibem número exato; mostram estado: parcial / completo / com cross-links).
 >
@@ -12,11 +12,11 @@
 
 ## 1. Princípio
 
-Em Pillar 1 ([[pillars]] §1) a frase-âncora é clara: combate e exploração são resolvidos por análise, predição e combinação — nunca por reflexo, dano bruto ou grind. Knowledge Progression materializa esse pillar como mecânica: cada kill rende **menos XP** mas **mais conhecimento**, e o conhecimento se acumula em escala que **não decai**. XP cresce decrescente conforme o jogo avança (curva logarítmica saturando perto do level cap funcional ~25-30); Knowledge cresce em escala linear ou levemente acelerada conforme o player descobre, lê, decifra e cruza informação. **O player que prefere combate vê XP cap atingido cedo; o player que explora, lê, conversa, scaneia e cruza docs continua crescendo via Knowledge.**
+Em Pillar 1 ([[pillars]] §1) a frase-âncora é clara: combate e exploração são resolvidos por análise, predição e combinação, nunca por reflexo, dano bruto ou grind. Knowledge Progression materializa esse pillar como mecânica: cada kill rende **menos XP** mas **mais conhecimento**, e o conhecimento se acumula em escala que **não decai**. XP cresce decrescente conforme o jogo avança (curva logarítmica saturando perto do level cap funcional ~25-30); Knowledge cresce em escala linear ou levemente acelerada conforme o player descobre, lê, decifra e cruza informação. **O player que prefere combate vê XP cap atingido cedo; o player que explora, lê, conversa, scaneia e cruza docs continua crescendo via Knowledge.**
 
-A consequência narrativa direta é o gradiente de endings. Não há escolha binária "você matou Sterling: bom ou mau?". O climax é o mesmo (Sterling derrotado, Patch-Zero selado, Gus volta pra casa) e o que muda é **a textura do mundo pós-jogo**, knowledge-gated em três variações Bronze / Prata / Ouro ([[arco-principal]] §Endings). Quem investigou ganha o ending pleno. Quem correu ganha sobrevivência apertada. Quem ficou no meio ganha vitória limpa mas melancólica. O critério não é "fez X cena obrigatória" — é "leu o suficiente do mundo pra entender o que estava acontecendo".
+A consequência narrativa direta é o gradiente de endings. Não há escolha binária "você matou Sterling: bom ou mau?". O climax é o mesmo (Sterling derrotado, Patch-Zero selado, Gus volta pra casa) e o que muda é **a textura do mundo pós-jogo**, knowledge-gated em três variações Bronze / Prata / Ouro ([[arco-principal]] §Endings). Quem investigou ganha o ending pleno. Quem correu ganha sobrevivência apertada. Quem ficou no meio ganha vitória limpa mas melancólica. O critério não é "fez X cena obrigatória", e sim "leu o suficiente do mundo pra entender o que estava acontecendo".
 
-Filosoficamente, isto é o theme do arco ([[arco-principal]] §Theme: *A inteligência mais alta é a que serve à vida*) virando mecânica. Gus respeita o substrato; o player respeita o jogo lendo-o; o ending Ouro é o respeito retribuído. Sterling consome o substrato; o player Bronze consome o jogo apenas combatendo; o ending Bronze é a versão Sterling do jogador. Não é punição. É consequência sentida — o jogo se comporta como o player se comportou com ele.
+Filosoficamente, isto é o theme do arco ([[arco-principal]] §Theme: *A inteligência mais alta é a que serve à vida*) virando mecânica. Gus respeita o substrato; o player respeita o jogo lendo-o; o ending Ouro é o respeito retribuído. Sterling consome o substrato; o player Bronze consome o jogo apenas combatendo; o ending Bronze é a versão Sterling do jogador. Não é punição. É consequência sentida: o jogo se comporta como o player se comportou com ele.
 
 ---
 
@@ -48,7 +48,7 @@ Knowledge total é a **soma de categorias independentes**, cada uma com cap teó
 
 ### 2.2 Por que multi-categoria, não score único
 
-Categoria única teria fluxo trivial: farme até X, ganhe Ouro. Multi-categoria força o player a **explorar diversificadamente**. Quem só lê docs Era 3 chega cap categoria 3 mas Era 1 fica zerada — gate Ouro exige cap mínimo por categoria. Player Bronze invariavelmente tem 1-3 categorias razoáveis e 8-12 vazias. Player Ouro tem todas razoáveis e 4-5 plenas.
+Categoria única teria fluxo trivial: farme até X, ganhe Ouro. Multi-categoria força o player a **explorar diversificadamente**. Quem só lê docs Era 3 chega cap categoria 3 mas Era 1 fica zerada; gate Ouro exige cap mínimo por categoria. Player Bronze invariavelmente tem 1-3 categorias razoáveis e 8-12 vazias. Player Ouro tem todas razoáveis e 4-5 plenas.
 
 Plus: cada categoria corresponde a um eixo do mundo (eras + companions + magia + natureza + setting + cultura + auto-leitura). Knowledge alta em uma categoria significa que **o jogador entende aquela faceta de GusWorld**, não que ele moeu pontos. O score é proxy de compreensão, não de tempo investido.
 
@@ -76,7 +76,7 @@ Crescimento por trigger único catalogado. Cada trigger tem ID de eventual no sa
 | Combate boss (bestiary completo) | Magia + setting + Sterling/PZ se aplicável | +2 a +5 | Não | Boss Sterling Fase 2 = +5 a STE/PZ. |
 | Completar sub-quest opcional | Companion-X + Era apropriada | +5 a +10 | Não | "Auditoria Cruzada" (F125) = +8 a Companion-Dante + +3 a Sterling. |
 | Decifrar mensagem cifrada (rádio, código Pythia) | Magia + Cultural ou companion-âncora | +3 a +5 | Não por mensagem | Carta Tiago (F086) = +5 a Companion-Linda. |
-| Branching foldback escolha pesada | Companion-X envolvido | +2 | Não por branch | Não é farmar — é registrar que escolheu. |
+| Branching foldback escolha pesada | Companion-X envolvido | +2 | Não por branch | Não é farmar, e sim registrar que escolheu. |
 
 > **Anti-grind explícito:** Knowledge **não cresce** com combate repetido (matar o mesmo inimigo cap-completado dá zero), com farming de moeda, com viagem repetida entre settings, com diálogo repetido com NPC já completado. Cresce com descoberta única + cross-reference + dedução. Pillar 1 protege contra grind degenerativo ([[pillars]] §Anti-pillars).
 
@@ -86,7 +86,7 @@ Crescimento por trigger único catalogado. Cada trigger tem ID de eventual no sa
 - **Iara na party:** +1 bônus em decifragem Óxido (mensagens cifradas).
 - **Cauã + Linda na party simultaneamente:** +1 bônus em qualquer trigger E2 cooperativo (eco F088 + F074 caixas zinco).
 - **Jaci na party em Selve:** +1 bônus em scan fauna/flora.
-- **Dante na party em Periferia:** **zero bônus** (foreshadow F006 — Dante mimetiza cultura local mas não a habita). Sub-quest "Auditoria Cruzada" (F125) destrava retroativamente bônus de +3 a Companion-Dante quando completada.
+- **Dante na party em Periferia:** **zero bônus** (foreshadow F006: Dante mimetiza cultura local mas não a habita). Sub-quest "Auditoria Cruzada" (F125) destrava retroativamente bônus de +3 a Companion-Dante quando completada.
 - **Óculos táticos modo scan ativo:** +1 bônus em scan de prop ambient antigo (Era 1 e Era 2). Custa AP-parcial.
 
 ---
@@ -97,7 +97,7 @@ Endings em GusWorld são **gradiente knowledge-gated, não escolha binária** ([
 
 A decisão final ocorre no **limite externo do Núcleo Mandelbrot Interno** (Selve Profunda, ato 3), onde 3 caminhos visíveis se apresentam (F100): leste (Bronze, fuga), norte (Prata, confronto direto), oeste (Ouro, compilação reversa). Knowledge baixa só consegue ler o caminho leste como opção real; Knowledge média lê leste e norte; Knowledge alta lê os três, e a terceira opção destrava em diálogo com Patch-Zero canal 3 no climax (F099).
 
-### 4.1 Bronze (rota de fuga — low-knowledge)
+### 4.1 Bronze (rota de fuga, low-knowledge)
 
 **Threshold canônico:** Knowledge total **< 40% do cap operacional (~280 pontos absolutos)** OR não atende gate Prata (uma das categorias críticas zerada).
 
@@ -117,15 +117,15 @@ A decisão final ocorre no **limite externo do Núcleo Mandelbrot Interno** (Sel
 
 **Gate negativo identificável:** se uma das categorias Sterling/Patch-Zero, Lore-Era1, ou Magia formal está **abaixo de 15 pontos**, ending Bronze é forçado mesmo com total agregado mais alto. O jogo entende que o player não entendeu o sistema.
 
-### 4.2 Prata (rota de confronto direto — médio-knowledge)
+### 4.2 Prata (rota de confronto direto, médio-knowledge)
 
 **Threshold canônico:** Knowledge total **≥ 50% (~380 pontos)** AND **média de 3 companions ≥ 30 pontos** AND **Sterling/Patch-Zero ≥ 25 pontos**. Sem cap mínimo por categoria (apenas total + média companion + agregado antagonista).
 
-**Filosofia:** vitória limpa, ainda melancólica. Sterling derrotado em batalha direta. GRE desligado mas Selve sofre dano residual. Companions saem com 1-2 ferimentos sérios (incapacitação temporária, P4 contém — vão pro hospital pós-jogo).
+**Filosofia:** vitória limpa, ainda melancólica. Sterling derrotado em batalha direta. GRE desligado mas Selve sofre dano residual. Companions saem com 1-2 ferimentos sérios (incapacitação temporária, P4 contém; vão pro hospital pós-jogo).
 
 **Cena climax (rota norte):**
 - Duração ~60 segundos. Cena composta.
-- Sterling cai. Patch-Zero selado controlado (não destruído; coerência Pillar 2 — caos irredutível existe).
+- Sterling cai. Patch-Zero selado controlado (não destruído; coerência Pillar 2: caos irredutível existe).
 - Dante: morte ou captura conforme branching #5 escolhido pelo player.
 
 **Estado do mundo:**
@@ -137,17 +137,17 @@ A decisão final ocorre no **limite externo do Núcleo Mandelbrot Interno** (Sel
 
 **Sem bonus epilogue.** Cena final + créditos + triple hook universal.
 
-### 4.3 Ouro (rota de compilação reversa — high-knowledge)
+### 4.3 Ouro (rota de compilação reversa, high-knowledge)
 
 **Threshold canônico:** Knowledge total **≥ 75% (~600 pontos)** AND **TODAS as 9 categorias agregadas ≥ 30 pontos** AND **Magia formal ≥ 45** AND **Cross-reference (Mecânico-meta) ≥ 15 pontos** AND **mínimo 3 plants F### específicos colhidos** entre: F021 (caixa zinco Galpão Cooperativo), F025 (memorando FIR Vorto→Dante), F125 (Auditoria Cruzada completa), F128 (gate epilogue Beatriz), F099 (negociação Patch-Zero terceira opção).
 
-**Filosofia:** vitória plena, esperança fundada. Doc 15 (F064) confirma linhagem Neo-Sylvania → Verônica → Gus: "selar, não erradicar". Sterling redirected pela própria DRE (auto-compilação reversa via diálogo + puzzle — Gus aplica o paradigma do inimigo contra ele mesmo, alegoria perfeita do theme). GRE desfeito limpo. Selve preserved.
+**Filosofia:** vitória plena, esperança fundada. Doc 15 (F064) confirma linhagem Neo-Sylvania → Verônica → Gus: "selar, não erradicar". Sterling redirected pela própria DRE (auto-compilação reversa via diálogo + puzzle: Gus aplica o paradigma do inimigo contra ele mesmo, alegoria perfeita do theme). GRE desfeito limpo. Selve preserved.
 
 **Cena climax (rota oeste):**
 - Duração ~120 segundos. Composta + sequência de puzzle Knowledge-driven.
 - Sterling cai sem fala dramática. Cessa de operar. Cúpula apaga.
 - Patch-Zero selado em laboratório controlado pós-jogo (não solto). Cooperação internacional ativa (Cidades-Gêmeas + Heliópolis-Nova).
-- Dante: redenção forçada só destrava Ouro se branching #5 = redenção AND sucesso no mini-puzzle de re-hacking. Caso contrário, Ouro alcançável estruturalmente mas Dante morto (linha narrativa contida — não destrava bonus epilogue Cena 4 sobre Beatriz?? Sim destrava, F128 não depende de Dante).
+- Dante: redenção forçada só destrava Ouro se branching #5 = redenção AND sucesso no mini-puzzle de re-hacking. Caso contrário, Ouro alcançável estruturalmente mas Dante morto (linha narrativa contida; não destrava bonus epilogue Cena 4 sobre Beatriz?? Sim destrava, F128 não depende de Dante).
 
 **Estado do mundo:**
 - Cidades-irmãs salvas em cascata pós-jogo (Cidades-Gêmeas + Heliópolis-Nova libertam-se de Sterling Corp).
@@ -158,7 +158,7 @@ A decisão final ocorre no **limite externo do Núcleo Mandelbrot Interno** (Sel
 1. Vilarejo do Pelicano Branco em festival. Jaci com avó Mariana. Pena de pelicano branco (F101) recontextualizada. Mariana adiciona 12º nó no cordão de cipó (F102, pagando 4 anos em 1 frame).
 2. Bento em catedral aberta ao público. Primeira lição de Asmódico a uma criança. Engrenagem-mestre Fibonacci girando de fundo.
 3. Cauã + Linda fundando oficina mista nos Dutos Infernais (Subestação 7 reconvertida como hub seguro juvenil pós-jogo). Mara Bento ouve vinil Última Frequência reconstituído (eco F088).
-4. **Cena Beatriz Pólvora** (F128). Beatriz aos 17 (+1 ano timeskip) abre Escola de Asmódico aberta a não-membros da Ordem Recursiva, na Praça do Compilador da Periferia (escolha simbólica: tradição catedral encontra território cooperativo Era 2). Crianças da Periferia se inscrevem. Mestre Almagre passa, faz sinal de aprovação com a cabeça (não fala — recuperou da quebra moral pós-reveal Dante). Bento aparece 1 segundo no fundo, segurando escudo-catedral, sorri pequeno. Duração 8-12 segundos sem diálogo. Tradição flexível continua viva, não dogma.
+4. **Cena Beatriz Pólvora** (F128). Beatriz aos 17 (+1 ano timeskip) abre Escola de Asmódico aberta a não-membros da Ordem Recursiva, na Praça do Compilador da Periferia (escolha simbólica: tradição catedral encontra território cooperativo Era 2). Crianças da Periferia se inscrevem. Mestre Almagre passa, faz sinal de aprovação com a cabeça (não fala; recuperou da quebra moral pós-reveal Dante). Bento aparece 1 segundo no fundo, segurando escudo-catedral, sorri pequeno. Duração 8-12 segundos sem diálogo. Tradição flexível continua viva, não dogma.
 
 **F104 ainda toca em pulsação leve.** Patch-Zero **nunca** destruído (coerência Pillar 2). A ameaça persiste mesmo em Ouro. O sequel hook é canônico e universal.
 
@@ -172,7 +172,7 @@ Filosoficamente: ending knowledge-gated é o jogo confiando no player. Se o play
 
 ## 5. HUD design
 
-Knowledge score numérico é **visível no HUD principal** (decisão macro fechada Bloco H — modelo híbrido). O Diário é manifestação narrativa do mesmo dado (entries mostram estado, não número). Player olha HUD para saber "quanto"; abre Diário para entender "o quê".
+Knowledge score numérico é **visível no HUD principal** (decisão macro fechada Bloco H: modelo híbrido). O Diário é manifestação narrativa do mesmo dado (entries mostram estado, não número). Player olha HUD para saber "quanto"; abre Diário para entender "o quê".
 
 ### 5.1 Wireframe ASCII do HUD principal
 
@@ -195,10 +195,10 @@ Knowledge score numérico é **visível no HUD principal** (decisão macro fecha
 ### 5.2 Layers visuais
 
 - **Layer principal (sempre visível):** HP + AP + Knowledge total. Compacto, canto superior esquerdo.
-- **Layer micro (expandível em pause):** 9 barras micro categorias + carta-mestria top 3 + status hardware (degradação rootkit Dante visível aqui — foreshadow F013).
+- **Layer micro (expandível em pause):** 9 barras micro categorias + carta-mestria top 3 + status hardware (degradação rootkit Dante visível aqui; foreshadow F013).
 - **Layer Diário (separado):** abrir Diário = nova UI, abas, conteúdo narrativo. Knowledge não aparece como número aqui; aparece como estado de entry (texto borrado / parcial / cristalino / com sticky note conectivo).
 
-### 5.3 Barras micro — comportamento
+### 5.3 Barras micro: comportamento
 
 Cada barra micro mostra **valor absoluto** (ex: "E1: 32") + **gradiente cromático** indicando proximidade do próximo gate da própria categoria. Cores canônicas:
 - **Cinza apagado** = categoria < 10 (zerada ou quase).
@@ -215,7 +215,7 @@ Quando Knowledge cruza threshold de gate (40%, 50%, 75% etc), notificação disc
 ```
 ┌─────────────────────────────────────────┐
 │ ✓ Gate Prata acessível (rota norte)     │
-│   Núcleo Mandelbrot — entrada destravada│
+│   Núcleo Mandelbrot, entrada destravada │
 └─────────────────────────────────────────┘
 ```
 
@@ -259,13 +259,13 @@ Sticky notes (post-it diegético) marcam entries com cross-link foreshadow dispo
 - **Amarelo:** Companion arc payoff.
 - **Azul:** Endings gates.
 
-Sticky note aparece quando Knowledge categoria-correspondente atinge gate específico. Player vê surgir gradualmente — feedback visual contínuo de progresso.
+Sticky note aparece quando Knowledge categoria-correspondente atinge gate específico. Player vê surgir gradualmente (feedback visual contínuo de progresso).
 
 ### 6.3 Indicador "esta entry tem mais a oferecer"
 
 Em entries cujo conteúdo cresce quando Knowledge total ou categoria sobe, indicador discreto (pequeno ◐ canto superior direito da página) sinaliza disponibilidade de nova revelação ao reabrir. Ex: ficha Dante pré-reveal mostra ◐ assim que stats Gus começam a degradar (F013 em ~50%); ao reabrir, parágrafo novo aparece com voice de Gus marcando estranhamento.
 
-Este indicador casa com o sistema de **"texto borrado/incompleto em entries com Knowledge baixa"** — não é magia escondida, é leitura de Gus refinando progressivamente.
+Este indicador casa com o sistema de **"texto borrado/incompleto em entries com Knowledge baixa"**: não é magia escondida, é leitura de Gus refinando progressivamente.
 
 ### 6.4 Patch-Zero invasão (caso especial)
 
@@ -439,7 +439,7 @@ Outros docs do Bloco H ou cross-arco devem citar gates com formato:
 - **Prata:** "ver [[knowledge-gates]] §4.2"
 - **Ouro:** "ver [[knowledge-gates]] §4.3"
 - **Categoria específica:** "ver [[knowledge-gates]] §2.1 categoria E1 (Lore-Era1)"
-- **Trigger único:** "ver [[knowledge-gates]] §3 — trigger 'decifrar cripto-glifo'"
+- **Trigger único:** "ver [[knowledge-gates]] §3, trigger 'decifrar cripto-glifo'"
 
 Plants foreshadow específicos têm cross-link próprio em [[foreshadow-links]].
 
@@ -456,7 +456,7 @@ Aplicáveis a sistemas Knowledge:
 - **Ending escolhido por menu.** Reprovado: ending emerge de Knowledge total + categorias + plants colhidos.
 - **Notificações invasivas.** Reprovado: notificação dura 3-4s, não pausa, não força ação.
 - **Lore dump no Diário pra subir score.** Reprovado: lore vira entry curta com voice de Gus, nunca tratado.
-- **Em-dash horizontal "—" em narrativa.** Reprovado (anti-pattern global CLAUDE.md raiz).
+- **Em-dash horizontal (`U+2014`) em narrativa.** Reprovado (anti-pattern global CLAUDE.md raiz).
 - **Hint mode forçado.** Reprovado: hint é opt-in. Default exige exploração.
 - **Bypass de gate Ouro via cheat code.** Reprovado: gates respeitados sempre. Ending Ouro é fatura paga; sem fatura, sem ending.
 

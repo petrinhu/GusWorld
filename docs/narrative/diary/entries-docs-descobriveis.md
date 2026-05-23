@@ -1,10 +1,10 @@
-# Diário — Docs Descobríveis
+# Diário: Docs Descobríveis
 
 > **Status:** Canônico (Bloco H, doc 2 de 2 de catálogo de entries). Revisão 2 (2026-05-16, pós-aprovação).
 >
 > **Escopo:** catálogo de **docs físicos coletáveis pelo Gus durante a campanha**. Cobre integralmente os **23 documentos canônicos em [[in-world-docs]]** (Bloco G: docs 1-15; Bloco H viralizado: docs 16-23). **Aprovação 2026-05-16:** todas as 8 propostas autorais DD-016 a DD-023 foram aprovadas pelo criador supremo e gravadas como canônicas em [[in-world-docs]] §Doc 16-23. PROPOSTA-DD-### renomeado para DD-### canônico.
 >
-> **Trigger:** **pickup explícito** — player interage com objeto físico no mundo (carta, diário, memorando, transcrição, pichação, placa). Doc inteiro vai pro Diário em subseção "Lore" depois de coletado. Re-leitura permanente. Knowledge sobe por leitura inicial **e** por correlação entre docs (cross-link in-Diário).
+> **Trigger:** **pickup explícito**; player interage com objeto físico no mundo (carta, diário, memorando, transcrição, pichação, placa). Doc inteiro vai pro Diário em subseção "Lore" depois de coletado. Re-leitura permanente. Knowledge sobe por leitura inicial **e** por correlação entre docs (cross-link in-Diário).
 >
 > **Cross-ref imutáveis:** [[in-world-docs]] (base canônica), [[lore-bible]] §3 + §6 + §8 + §13, [[foreshadowing]] (cross-link denso), [[characters]], [[environments/_INDEX]], [[timeline]].
 
@@ -16,7 +16,7 @@ Os docs descobríveis são **objetos físicos no mundo**, não pop-ups expositiv
 
 Docs curtos (até ~80 palavras): aparecem integrais no momento do pickup. Player relê quando quiser.
 
-Docs longos (>80 palavras): aparecem **fragmentados no pickup** (1-3 trechos representativos) e ganham forma **integral** quando Gus correlaciona com outro doc (Knowledge média) ou completa sub-quest (Knowledge alta). Mecânica: a página do Diário tem placeholder visível "fragmento descoberto — completar via cross-reading"; quando o critério é atingido, a página se expande visualmente (caderno diegético dobra e abre nova folha). Visual híbrido (caderno + texto limpo) decidido em Bloco H.
+Docs longos (>80 palavras): aparecem **fragmentados no pickup** (1-3 trechos representativos) e ganham forma **integral** quando Gus correlaciona com outro doc (Knowledge média) ou completa sub-quest (Knowledge alta). Mecânica: a página do Diário tem placeholder visível "fragmento descoberto, completar via cross-reading"; quando o critério é atingido, a página se expande visualmente (caderno diegético dobra e abre nova folha). Visual híbrido (caderno + texto limpo) decidido em Bloco H.
 
 Docs em outras linguagens (Asmódico, C-Arcane, Óxido, cripto-glifo Era 1): texto **criptado** até Gus aprender a linguagem suficiente. Companions específicos (Bento para Asmódico, Iara para Óxido) podem decifrar parcial ou total quando estão na party. Cripto-glifos Era 1 exigem Bento + Gus combinados; gate Ouro adiciona Anciã Mariana para Era 1 profunda.
 
@@ -31,7 +31,7 @@ Tom autoral por origem:
 
 ---
 
-## Catálogo principal — 15 docs canônicos de [[in-world-docs]]
+## Catálogo principal: 15 docs canônicos de [[in-world-docs]]
 
 | ID | Título canônico | Era | Onde encontra (setting / landmark) | Trigger | Gate | Knowledge contribuição | Cross-ref F### | Path canônico |
 |---|---|---|---|---|---|---|---|---|
@@ -53,37 +53,37 @@ Tom autoral por origem:
 
 ---
 
-## Catálogo de docs viralizados — 8 docs canônicos novos (DD-016 a DD-023)
+## Catálogo de docs viralizados: 8 docs canônicos novos (DD-016 a DD-023)
 
 **Status (2026-05-16):** todas as 8 propostas autorais aprovadas pelo criador supremo e gravadas como canônicas em [[in-world-docs]]. PROPOSTA-DD-### renomeado para DD-### canônico. Plants gerados marcados GRAVADO em [[foreshadowing]]. Selecionados originalmente com critério explícito (ver "Princípios de seleção" abaixo).
 
-### DD-016 — Caderno técnico de Salviano Alencar (parcial)
+### DD-016: Caderno técnico de Salviano Alencar (parcial)
 
-**STATUS:** APROVADA (2026-05-16) — viralizada como DD-016 canônico em [[in-world-docs]] §Documento 16. Plant agora GRAVADO.
+**STATUS:** APROVADA (2026-05-16): viralizada como DD-016 canônico em [[in-world-docs]] §Documento 16. Plant agora GRAVADO.
 
 - **Tipo:** caderno de campo, papel pardo, ~30 páginas; ~12 sobreviventes (resto perdido na liquidação Sterling-FIR -8).
 - **Autor:** **Salviano Alencar** (pai morto de [[characters/dante-grid|Dante]]; cooperativa de mecânica justa).
 - **Data:** ano -10 a -8 (últimas anotações).
-- **Onde encontra:** prateleira alta no Galpão Cooperativo abandonado, Periferia Industrial. Escondido por trás de pilha de caixas vazias. Mestre Almagre menciona vagamente em diálogo casual ("o caderno do Salviano tinha mais coisa do que ele dizia") — pista ambient.
+- **Onde encontra:** prateleira alta no Galpão Cooperativo abandonado, Periferia Industrial. Escondido por trás de pilha de caixas vazias. Mestre Almagre menciona vagamente em diálogo casual ("o caderno do Salviano tinha mais coisa do que ele dizia"); pista ambient.
 - **Trigger:** pickup em sub-quest do arco Dante. Acessível em qualquer momento pós-recrutamento Dante; obrigatório para Knowledge alta linha Periferia.
 - **Gate:** Knowledge média (interagir com prateleira alta requer Tavus-Drive nível 2).
 - **Knowledge contribuição:** +3 Lore-Periferia (legado Alencar), +2 Lore-Era3 (FIR predatória), +1 Lore-Companion-Dante.
 - **Cross-link Bloco I:** **F019** (placa "ALENCAR & FILHOS"), **F020** (moldura vazia), **F021** (caixa zinco Edilma), **F022** (Mestre Almagre acolheu Dante aos 9).
 - **Conteúdo amostral (fragmento ato 2):**
   ```
-  [página 7 — fragmento]
+  [página 7, fragmento]
   ... e o Almagre veio aqui hoje, disse que tava vendo encrenca
   no fluxo de caixa da Federação. Concordei. A oferta deles de
   comprar a cooperativa era 18% abaixo do valor justo. Eu disse
   que não. Recusa registrada por escrito como obriga o estatuto.
 
-  [página 19 — fragmento]
+  [página 19, fragmento]
   ... Dante terminou o segundo motor sozinho hoje. Tem 7 anos.
   Já solda melhor que metade dos meus aprendizes adultos. A
   Edilma viu e ficou em silêncio um minuto. Depois disse: 'ele
   é do pai. tem que ser do pai mesmo. não deixa pra outro.'
 
-  [página 22 — última anotação legível]
+  [página 22, última anotação legível]
   ... Vorto veio. Sorriu pra Edilma. Apertou a mão do Dante
   como se fosse adulto. Ofereceu 'auxílio técnico FIR para
   recuperação da cooperativa'. Recusei na hora. Dante perguntou
@@ -93,21 +93,21 @@ Tom autoral por origem:
   ```
 - **Função:** humaniza Salviano (era pai presente, era técnico competente, viu Vorto chegando antes de morrer); reforça a tese de que Dante **viu** Vorto pelos olhos do pai antes de aceitar; substrato emocional pro reveal F026 (aliciamento começou no funeral). Sub-quest culmina em momento opcional de mostrar trecho relevante a Dante (cena emocional contida, Pillar 4; sem alavancagem de stats, só textura).
 
-### DD-017 — Diário de campo de Bartolo Penkin (anotações QA Apex-Data)
+### DD-017: Diário de campo de Bartolo Penkin (anotações QA Apex-Data)
 
-**STATUS:** APROVADA (2026-05-16) — viralizada como DD-017 canônico em [[in-world-docs]] §Documento 17. Plant agora GRAVADO.
+**STATUS:** APROVADA (2026-05-16): viralizada como DD-017 canônico em [[in-world-docs]] §Documento 17. Plant agora GRAVADO.
 
 - **Tipo:** caderno técnico padrão Apex-Data Systems (capa rígida, papel pautado em quadrículas Engenharia). ~80 páginas escritas; legível.
 - **Autor:** **Bartolo Penkin** (engenheiro QA sênior Apex-Data; vazou audit doc 5 em -16, manteve perfil baixo por 4 anos, desapareceu em -12).
 - **Data:** ano -18 a -16.
-- **Onde encontra:** porão da casa antiga dos Penkin, Periferia Industrial. Casa atualmente habitada por **Mateus Penkin** (sobrinho, fofoqueiro — NPC canônico em [[environments/06-periferia]]). Mateus permite acesso ao porão se Gus traz item específico (favor: peça de hardware Era 2 raro, recuperável em sub-quest cruzada Underground).
+- **Onde encontra:** porão da casa antiga dos Penkin, Periferia Industrial. Casa atualmente habitada por **Mateus Penkin** (sobrinho, fofoqueiro; NPC canônico em [[environments/06-periferia]]). Mateus permite acesso ao porão se Gus traz item específico (favor: peça de hardware Era 2 raro, recuperável em sub-quest cruzada Underground).
 - **Trigger:** sub-quest sequencial pós-coleta de DD-005 (relatório audit). Mateus comenta "o tio escreveu coisa que ele não vazou" se Gus mostra que tem o audit.
 - **Gate:** Knowledge média (favor sub-quest); Knowledge alta destrava nota final marginal.
 - **Knowledge contribuição:** +3 Lore-Sterling (history pré-monopólio), +2 Lore-Underground (Bartolo era próximo de Padrinho Tiago via comunidade), +1 Lore-Companion-Linda.
 - **Cross-link Bloco I:** **F036** (audit Apex-Data, autor identificado), **F074** (caixa zinco - mesmo modelo Penkin/Berenger/Alencar = preservação Era 2 padronizada).
 - **Conteúdo amostral (fragmento):**
   ```
-  [página 34 — fragmento]
+  [página 34, fragmento]
   ... Loke desceu pessoalmente do escritório executivo hoje.
   Olhou os terminais QA por 20 minutos sem falar. Foi embora
   sem cumprimentar ninguém. Três horas depois o Coordenador de
@@ -116,14 +116,14 @@ Tom autoral por origem:
   técnico'. Marquei a frase no caderno porque essa frase é
   exatamente o oposto de tudo que esse departamento sempre fez.
 
-  [página 78 — penúltima entrada]
+  [página 78, penúltima entrada]
   ... A engenharia tem um juramento antigo: você não deixa o
   hardware mentir pelo software. Hoje eu vi a empresa toda
   fazer o oposto disso. Vou registrar formalmente o audit ainda
   essa semana. Se nada acontecer no canal oficial em 30 dias,
   vazo pro Tiago. Ele saberá pra onde encaminhar.
 
-  [página 80 — última entrada, letra apressada]
+  [página 80, última entrada, letra apressada]
   Tiago, se essa página chegou em você de outra mão:
   o audit já tá na sua caixa.
   Cuida do que sobrar de mim na cooperativa.
@@ -131,11 +131,11 @@ Tom autoral por origem:
   Você sabe quem ela é.
                                                     Bart.
   ```
-- **Função:** atribui retroativamente o doc 5 a Bartolo Penkin (canon, lore-bible §13 já confirma hipótese — esta proposta consolida como certo via doc físico); humaniza Bartolo (não é só nome em rodapé); estabelece **vínculo prévio entre Tiago e Bartolo** (compatível com lore: Padrinho Tiago era conhecido de Bartolo, doc 5 menciona); foreshadow "cuida da Linda" antes do canônico DD-006 ser lido — Knowledge alta retroativa permite player conectar.
+- **Função:** atribui retroativamente o doc 5 a Bartolo Penkin (canon, lore-bible §13 já confirma hipótese; esta proposta consolida como certo via doc físico); humaniza Bartolo (não é só nome em rodapé); estabelece **vínculo prévio entre Tiago e Bartolo** (compatível com lore: Padrinho Tiago era conhecido de Bartolo, doc 5 menciona); foreshadow "cuida da Linda" antes do canônico DD-006 ser lido (Knowledge alta retroativa permite player conectar).
 
-### DD-018 — Folheto do Tomo da Pilha Sobrecarregada (edição Era 2 -98)
+### DD-018: Folheto do Tomo da Pilha Sobrecarregada (edição Era 2 -98)
 
-**STATUS:** APROVADA (2026-05-16) — viralizada como DD-018 canônico em [[in-world-docs]] §Documento 18. Plant agora GRAVADO.
+**STATUS:** APROVADA (2026-05-16): viralizada como DD-018 canônico em [[in-world-docs]] §Documento 18. Plant agora GRAVADO.
 
 - **Tipo:** folheto impresso em papel simples, dobrado em 4. Carimbo da Universidade Pública. ~40 linhas.
 - **Autor:** **Lin Tórun** (uma dos 4 engenheiros da equipe original da Primeira Compilação, -150; aqui já idoso, ~73 anos).
@@ -178,9 +178,9 @@ Tom autoral por origem:
   ```
 - **Função:** fundamenta tom Era 2 (cooperativo, código aberto, comunidade técnica) em voz humana específica; serve como **contraste explícito** ao tom corporativo Sterling Corp (DD-001, DD-012); última frase "compilando bem" reforça cumprimento "Compila bem" canon ([[lore-bible]] §11.4); cria substrato afetivo para o Gus (que lê isso aos 11 e absorve a tese antes de saber argumentar contra DRE). Linha "não engana o ferro" é eco direto do que vai aparecer no doc 1 invertido.
 
-### DD-019 — Caderneta de saudações de Gargi Vance (lista de receitas + bilhetes do Pyotor)
+### DD-019: Caderneta de saudações de Gargi Vance (lista de receitas + bilhetes do Pyotor)
 
-**STATUS:** APROVADA (2026-05-16) — viralizada como DD-019 canônico em [[in-world-docs]] §Documento 19. Plant agora GRAVADO.
+**STATUS:** APROVADA (2026-05-16): viralizada como DD-019 canônico em [[in-world-docs]] §Documento 19. Plant agora GRAVADO.
 
 - **Tipo:** caderneta de cozinha barata, capa de oleado florido, ~50 páginas; receitas escritas à mão. Entre páginas, 4 bilhetes dobrados do Pyotor (cartas raras canônicas do pai itinerante).
 - **Autor:** **Gargi Vance** (mãe do Gus), receitas; **Pyotor Vance** (pai itinerante, médico-cyber em rotação fronteira-Selve), bilhetes.
@@ -197,7 +197,7 @@ Tom autoral por origem:
     farinha 2 xíc
     fermento 1 colher
     canela na ponta da faca, ele gosta
-    cuidado pra não passar — ele percebe
+    cuidado pra não passar, ele percebe
 
   Café-de-neurônio pra ele estudar
     café 2 colheres
@@ -217,7 +217,7 @@ Tom autoral por origem:
                                               P.
 
   [outra página]
-  Caldo-de-folha-fractal (pra febre — Mariana ensinou)
+  Caldo-de-folha-fractal (pra febre, Mariana ensinou)
     NUNCA mais que uma folha por ramificação. Respeito.
     água fervendo lenta
     folha cortada com a faca de cabo de madeira só
@@ -235,15 +235,15 @@ Tom autoral por origem:
   ```
 - **Função:** materializa a **safe base canônica** Gargi (Pillar 4, ofuscada deliberadamente, [[lore-bible]] §14); humaniza Pyotor (presente em ausência via cartas raras); bilhete final ("voltando em outubro") fica sem resolução em G1, sequel hook ambíguo ou cena bonus epilogue se Knowledge Ouro; receita "caldo-de-folha-fractal" cria ponte entre Gargi (cidade) e Mariana (Pelicano Branco), Gargi **conhece Mariana** ou tem rede oral indireta, lore-fundo.
 
-### DD-020 — Relatório de plantio de Solano Vanderbist (cartilha agro Pelicano Branco)
+### DD-020: Relatório de plantio de Solano Vanderbist (cartilha agro Pelicano Branco)
 
-**STATUS:** APROVADA (2026-05-16) — viralizada como DD-020 canônico em [[in-world-docs]] §Documento 20. Plant agora GRAVADO.
+**STATUS:** APROVADA (2026-05-16): viralizada como DD-020 canônico em [[in-world-docs]] §Documento 20. Plant agora GRAVADO.
 
 - **Tipo:** cartilha agrícola feita à mão, papel reciclado, ~25 páginas com esquemas botânicos + cálculos Fibonacci.
 - **Autor:** **Solano Vanderbist** (pai morto de Jaci; morto em -8 junto com Lia no surto silencioso).
 - **Data:** ano -10 a -8 (últimas semanas).
 - **Onde encontra:** quarto preservado de Solano e Lia na cabana da Anciã Mariana, Pelicano Branco. Mariana abre o quarto se Jaci pede (sub-beat Sho arco Jaci ou pós-arco Jaci).
-- **Trigger:** sub-quest pós-recrutamento Jaci. Jaci pode ou não querer entrar — escolha narrativa contida. Se Jaci entra com o Gus, há cena curta (3 falas dela, sem espetáculo).
+- **Trigger:** sub-quest pós-recrutamento Jaci. Jaci pode ou não querer entrar (escolha narrativa contida). Se Jaci entra com o Gus, há cena curta (3 falas dela, sem espetáculo).
 - **Gate:** Knowledge média (sub-quest emocional).
 - **Knowledge contribuição:** +3 Lore-Pelicano-Branco, +2 Lore-Companion-Jaci, +2 Lore-Era3 (Sterling como vetor experimental), +1 Lore-Endings.
 - **Cross-link Bloco I:** (suporte ao plant **timeline -8 surto Pelicano Branco**; reforço lore-bible §13 linha "vetor experimental Sterling - causa real ending Ouro".)
@@ -267,7 +267,7 @@ Tom autoral por origem:
   do leito, por precaução. Se a Mariana falar pra voltar, eu
   volto.
 
-  [página 22, letra mais firme — penúltima entrada]
+  [página 22, letra mais firme, penúltima entrada]
   Não é doença velha. É doença nova com cara de velha. Já
   perdi cinco fileiras em três dias. A Lia tá tossindo. Eu
   estou bem. Vou levar a Jaci pra dormir com a Mariana hoje
@@ -280,11 +280,11 @@ Tom autoral por origem:
   contem pra Jaci quando ela puder ouvir.
                                               Sol.
   ```
-- **Função:** consolida lore-bible §13 linha -8 (surto Pelicano Branco = vetor experimental Sterling); humaniza Solano e Lia (Solano era pai presente, técnico cuidadoso); última frase "veio de cima" é foreshadow direto da estação retransmissora drone Sterling (F047, [[environments/08-selve-profunda]]); cria substrato emocional pro arco Jaci sem expô-la a monólogo — ela lê com o Gus, não comenta, sai do quarto, retoma trabalho.
+- **Função:** consolida lore-bible §13 linha -8 (surto Pelicano Branco = vetor experimental Sterling); humaniza Solano e Lia (Solano era pai presente, técnico cuidadoso); última frase "veio de cima" é foreshadow direto da estação retransmissora drone Sterling (F047, [[environments/08-selve-profunda]]); cria substrato emocional pro arco Jaci sem expô-la a monólogo (ela lê com o Gus, não comenta, sai do quarto, retoma trabalho).
 
-### DD-021 — Manifesto interno Octantes de Reabsorção (treinamento operacional)
+### DD-021: Manifesto interno Octantes de Reabsorção (treinamento operacional)
 
-**STATUS:** APROVADA (2026-05-16) — viralizada como DD-021 canônico em [[in-world-docs]] §Documento 21. Plant agora GRAVADO.
+**STATUS:** APROVADA (2026-05-16): viralizada como DD-021 canônico em [[in-world-docs]] §Documento 21. Plant agora GRAVADO.
 
 - **Tipo:** manual de treinamento Sterling Corp, encadernado em capa preta com logo prata Sterling Sigma. ~12 páginas; tom corporativo asseptic militarizado.
 - **Autor:** Departamento de Contenção Sterling Corp (sem assinatura individual; aprovação Diretora Octávia Penedo).
@@ -296,11 +296,11 @@ Tom autoral por origem:
 - **Cross-link Bloco I:** **F038** (Sterling sabia há 3 meses), **F050** (Sterling beirando admissão).
 - **Conteúdo amostral:**
   ```
-  MANUAL OPERACIONAL — UNIDADES DE REABSORÇÃO
-  Classificação: RESTRITO — pessoal autorizado
+  MANUAL OPERACIONAL: UNIDADES DE REABSORÇÃO
+  Classificação: RESTRITO (pessoal autorizado)
   Aprovação: Diretora Octávia Penedo, Departamento de Contenção
 
-  [Capítulo 1 — Nomenclatura]
+  [Capítulo 1: Nomenclatura]
   A unidade não captura. A unidade reabsorve.
   Captura implica entidade a ser preservada.
   Reabsorção implica integração no sistema operacional vigente.
@@ -315,7 +315,7 @@ Tom autoral por origem:
     (b) a sub-amostra K-7;
     (c) o evento de -0.25 do calendário corporativo.
 
-  [Capítulo 4 — Protocolo de falha]
+  [Capítulo 4: Protocolo de falha]
   Em caso de reabsorção fracassada do alvo:
   1. Operador é retirado de campo em até 12h.
   2. Equipamento é incinerado em até 24h.
@@ -339,9 +339,9 @@ Tom autoral por origem:
   ```
 - **Função:** confirma operacionalmente o eufemismo "transferido pra Heliópolis-Nova" canônico ([[lore-bible]] §11.5 tabu); cria horror corporativo sutil (reorientação narrativa = lavagem de memória institucionalizada); reforça que **Sterling sabe mais do que admite publicamente** sobre Patch-Zero; subtexto: "perda de afeto pelos colegas" descreve o que aconteceu com o Dante (paralelo retroativo Knowledge alta).
 
-### DD-022 — Tábua de ofícios da Catedral Menor de São Vargas (placa de mármore quebrada)
+### DD-022: Tábua de ofícios da Catedral Menor de São Vargas (placa de mármore quebrada)
 
-**STATUS:** APROVADA (2026-05-16) — viralizada como DD-022 canônico em [[in-world-docs]] §Documento 22. Plant agora GRAVADO.
+**STATUS:** APROVADA (2026-05-16): viralizada como DD-022 canônico em [[in-world-docs]] §Documento 22. Plant agora GRAVADO.
 
 - **Tipo:** placa de mármore branco quebrada em 3 pedaços; inscrição parcialmente legível. Era 2 final / pré-saque.
 - **Autor:** Ordem Recursiva (institucional); mestres listados: **Ardenia Falke** + **Cândido Rui** + outros 7 nomes ilegíveis.
@@ -376,11 +376,11 @@ Tom autoral por origem:
 
   Bento Chevalier, em -2.
   ```
-- **Função:** confirma lore-bible §13 linha -3 (Sterling Corp saqueou Catedral, Ardenia + Cândido desaparecidos); a **gravação marginal feita por Bento aos 12 anos** (1 ano antes do jogo) é micro-ato canônico do Bento de preservar memória institucional — substrato silencioso da maturidade contida; conecta visualmente com F071 (cronômetro Ardenia intacto na vitrine de Velhusto, "ela está adiantada de nós em algum lugar"); convida player a perguntar onde estão os 7 nomes ilegíveis (sem resposta em G1 — sequel hook).
+- **Função:** confirma lore-bible §13 linha -3 (Sterling Corp saqueou Catedral, Ardenia + Cândido desaparecidos); a **gravação marginal feita por Bento aos 12 anos** (1 ano antes do jogo) é micro-ato canônico do Bento de preservar memória institucional, substrato silencioso da maturidade contida; conecta visualmente com F071 (cronômetro Ardenia intacto na vitrine de Velhusto, "ela está adiantada de nós em algum lugar"); convida player a perguntar onde estão os 7 nomes ilegíveis (sem resposta em G1; sequel hook).
 
-### DD-023 — Fragmento de placa de pedra ("Águas-de-Espelho") — Era 1 isolada
+### DD-023: Fragmento de placa de pedra ("Águas-de-Espelho"), Era 1 isolada
 
-**STATUS:** APROVADA (2026-05-16) — viralizada como DD-023 canônico em [[in-world-docs]] §Documento 23. Plant agora GRAVADO.
+**STATUS:** APROVADA (2026-05-16): viralizada como DD-023 canônico em [[in-world-docs]] §Documento 23. Plant agora GRAVADO.
 
 - **Tipo:** fragmento de placa de pedra cripto-glífica, ~25 cm. Inscrição parcial.
 - **Autor:** anônimo Neo-Sylvania (mesma linhagem da Catedral-Mãe; provavelmente engenheiro topógrafo).
@@ -409,11 +409,11 @@ Tom autoral por origem:
 
                                               Olméa, topógrafo
   ```
-- **Função:** doc Era 1 que aparece **sem ser sobre a Catedral diretamente**; reforça que Neo-Sylvania tinha **vida cotidiana técnica** (topógrafo, marcação de rio, ciclos de mudança) — não era só "civilização mítica perdida"; última frase "antes de gravar qualquer coisa em si mesmos" é foreshadow Pillar 2 anti-Sterling (Sterling grava DRE em runtime universal: a Selve não permite); seca atual do leito = pista geográfica para Catedral-Mãe canônica em DD-015 (paralelo retroativo).
+- **Função:** doc Era 1 que aparece **sem ser sobre a Catedral diretamente**; reforça que Neo-Sylvania tinha **vida cotidiana técnica** (topógrafo, marcação de rio, ciclos de mudança), não era só "civilização mítica perdida"; última frase "antes de gravar qualquer coisa em si mesmos" é foreshadow Pillar 2 anti-Sterling (Sterling grava DRE em runtime universal: a Selve não permite); seca atual do leito = pista geográfica para Catedral-Mãe canônica em DD-015 (paralelo retroativo).
 
 ---
 
-## Tabela mestre (23 entries — sumário cruzado)
+## Tabela mestre (23 entries, sumário cruzado)
 
 | ID | Título curto | Era | Onde | Trigger | Gate | Knowledge +X | Cross-ref F### | Path canônico |
 |---|---|---|---|---|---|---|---|---|
@@ -458,10 +458,10 @@ Tom autoral por origem:
 
 Adicionais cobrem settings com lore canônica em [[lore-bible]] §13 mas sem doc físico catalogado:
 
-5. **Pelicano Branco — surto -8 (Sterling como vetor experimental):** DD-007 cobre lore Era 2 / oral; surto -8 é canônico mas só lore-bible, sem doc físico. DD-020 materializa via Solano.
-6. **Sterling Corp — Octantes de Reabsorção:** DD-014 menciona Octantes; manual operacional fecha a lacuna de "como Sterling treina" (paralelo retroativo Dante).
-7. **Ordem Recursiva — saque -3 São Vargas:** F041 + F071 plantam densamente; DD-015 é a Catedral-Mãe ancestral, não São Vargas (recente). DD-022 fecha lacuna Era 3 vs Ordem Recursiva específica.
-8. **Era 1 cotidiana (não só Catedral-Mãe):** DD-015 é cripto-glifo da Catedral-Mãe (gate Ouro, ato 3); só doc Era 1 visível no jogo. DD-023 adiciona doc Era 1 de **vida cotidiana** (topógrafo, marcação de rio) — desenfeitiça Neo-Sylvania de "civilização mítica" pra "civilização técnica concreta" (Pillar 2).
+5. **Pelicano Branco, surto -8 (Sterling como vetor experimental):** DD-007 cobre lore Era 2 / oral; surto -8 é canônico mas só lore-bible, sem doc físico. DD-020 materializa via Solano.
+6. **Sterling Corp, Octantes de Reabsorção:** DD-014 menciona Octantes; manual operacional fecha a lacuna de "como Sterling treina" (paralelo retroativo Dante).
+7. **Ordem Recursiva, saque -3 São Vargas:** F041 + F071 plantam densamente; DD-015 é a Catedral-Mãe ancestral, não São Vargas (recente). DD-022 fecha lacuna Era 3 vs Ordem Recursiva específica.
+8. **Era 1 cotidiana (não só Catedral-Mãe):** DD-015 é cripto-glifo da Catedral-Mãe (gate Ouro, ato 3); só doc Era 1 visível no jogo. DD-023 adiciona doc Era 1 de **vida cotidiana** (topógrafo, marcação de rio); desenfeitiça Neo-Sylvania de "civilização mítica" pra "civilização técnica concreta" (Pillar 2).
 
 ### Critério de não-inflação
 
@@ -495,13 +495,13 @@ Todos os docs Sterling Corp seguem padrão estrito:
 - Eufemismo institucionalizado ("Cidadão Não-Definido", "reabsorção", "transferido pra Heliópolis-Nova").
 - Voz pseudo-cordial corporativa em superfície.
 - Cláusula técnica restritiva escondida em letra miúda ou apêndice.
-- Quando Sterling beira emoção (raro — DD-014, DD-021 último parágrafo), o tom muda para imperativo seco.
+- Quando Sterling beira emoção (raro: DD-014, DD-021 último parágrafo), o tom muda para imperativo seco.
 
 ### Docs em outras eras
 
 - **Era 1:** tom formal arcaico mas **funcional**. Engenheiros falando de engenharia, topógrafos falando de rio, mestres falando de protocolo. Sem misticismo decorativo. Sem palavra mística sem referente técnico.
 - **Era 2:** pragmatismo cooperativo. Voz comunitária. "A pilha continua enquanto a gente lembra." Vocabulário técnico moderno acessível.
-- **Era 3:** dois polos — Sterling (eufemístico) vs comunidade contida (Inácia, Davi, Tiago, Bartolo, Salviano, Solano). Pillar 4 nas vozes humanas.
+- **Era 3:** dois polos: Sterling (eufemístico) vs comunidade contida (Inácia, Davi, Tiago, Bartolo, Salviano, Solano). Pillar 4 nas vozes humanas.
 
 ### Mecânica de re-leitura
 
@@ -522,13 +522,13 @@ Cenas de pickup emocional **nunca** envolvem música crescente, slow-motion, ou 
 - **Base canônica imutável:** [[in-world-docs]] (15 docs originais; este doc preserva integralmente)
 - **Lore-bible:** [[lore-bible]] §3 (eras), §6 (Selve), §8 (Patch-Zero), §13 (eventos cross-eras), §14 (NPCs lore-importantes)
 - **Personagens:** [[characters/gus|gus]] (leitor + DD-019 substrato emocional), [[characters/caua-volt|caua-volt]] (DD-002 + DD-009 + DD-013 + DD-016 colateral), [[characters/iara-lumen|iara-lumen]] (DD-004 decifragem), [[characters/bento-requiem|bento-requiem]] (DD-003 + DD-015 + DD-022 + DD-023), [[characters/linda-siren|linda-siren]] (DD-005 + DD-006 + DD-011 + DD-017), [[characters/jaci-proxy|jaci-proxy]] (DD-007 + DD-020), [[characters/dante-grid|dante-grid]] (DD-008 + DD-016 colateral), [[characters/sterling-locke|sterling-locke]] (DD-001 + DD-014 + DD-021), [[characters/patch-zero|patch-zero]] (DD-010 + DD-014 + DD-015 + DD-020 + DD-021 + DD-023 colateral)
-- **Foreshadowing tracker:** [[foreshadowing]] — cross-link denso registrado por entry em "Cross-ref F###"
-- **Settings:** [[environments/_INDEX]] — cada doc localizado em landmark canônico
-- **Timeline:** [[timeline]] — anos de eventos canônicos referenciados em cada doc
-- **Tradições:** [[tradicoes-cultura]] — DD-018 (Lin Tórun fundador) ancora Festa da Compilação
-- **Facções:** [[factions]] — Sterling, FIR, Ordem Recursiva, Cult Mirage, Underground, Pelicano Branco
-- **Entries Manuscrito (irmão diretamente):** [[entries-manuscrito-glossario]] — Manuscrito Gus reage e cross-referencia docs descobríveis (MG-008 ↔ DD-002 + DD-009; MG-011 ↔ DD-004; MG-015 ↔ DD-003; MG-017 ↔ DD-010; MG-020 ↔ DD-005 + DD-006; MG-022 ↔ DD-011; MG-024 ↔ DD-007; MG-031 ↔ DD-008; MG-033 ↔ DD-013; MG-034 ↔ DD-001)
-- **Pillars:** [[pillars]] — todo doc reforça Pillar 1 (Knowledge Progression), Pillar 2 (sistema formal), Pillar 4 (emoção contida) e Pillar 5 (setting bipartido)
+- **Foreshadowing tracker:** [[foreshadowing]]; cross-link denso registrado por entry em "Cross-ref F###"
+- **Settings:** [[environments/_INDEX]]; cada doc localizado em landmark canônico
+- **Timeline:** [[timeline]]; anos de eventos canônicos referenciados em cada doc
+- **Tradições:** [[tradicoes-cultura]]; DD-018 (Lin Tórun fundador) ancora Festa da Compilação
+- **Facções:** [[factions]]; Sterling, FIR, Ordem Recursiva, Cult Mirage, Underground, Pelicano Branco
+- **Entries Manuscrito (irmão diretamente):** [[entries-manuscrito-glossario]]; Manuscrito Gus reage e cross-referencia docs descobríveis (MG-008 ↔ DD-002 + DD-009; MG-011 ↔ DD-004; MG-015 ↔ DD-003; MG-017 ↔ DD-010; MG-020 ↔ DD-005 + DD-006; MG-022 ↔ DD-011; MG-024 ↔ DD-007; MG-031 ↔ DD-008; MG-033 ↔ DD-013; MG-034 ↔ DD-001)
+- **Pillars:** [[pillars]]; todo doc reforça Pillar 1 (Knowledge Progression), Pillar 2 (sistema formal), Pillar 4 (emoção contida) e Pillar 5 (setting bipartido)
 
 ---
 

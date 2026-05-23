@@ -1,6 +1,6 @@
-# Diário do Gus — UI/UX Spec
+# Diário do Gus: UI/UX Spec
 
-> **Status:** Canônico (Bloco H — Diário UI/UX). Revisão inicial 2026-05-16.
+> **Status:** Canônico (Bloco H, Diário UI/UX). Revisão inicial 2026-05-16.
 >
 > **Escopo:** spec de interface, interação, wireframes textuais. **Não** trata conteúdo das entries (ver `entries-*.md`).
 >
@@ -12,7 +12,7 @@
 
 ---
 
-## 1. Conceito visual — caderno diegético (layer 1)
+## 1. Conceito visual: caderno diegético (layer 1)
 
 O Diário é um caderno físico tangível pertencente a Gus, 11 anos. Toda a interface se apresenta como folhear esse caderno: o player não abre "menu de wiki"; ele vê **a mão do Gus virando uma capa rabiscada**.
 
@@ -21,20 +21,20 @@ O Diário é um caderno físico tangível pertencente a Gus, 11 anos. Toda a int
 - **Material:** papelão escolar barato, marrom-mostarda, manchado.
 - **Decoração canônica:**
   - Etiqueta escolar Educacional Padrão (formato retangular branco, canto superior esquerdo). Campo "Nome:" preenchido com letra cursiva de Gus: "**Gus V. T. Vance**". Campo "Turma:" riscado três vezes (Gus passou de série e nunca atualizou).
-  - Adesivo pequeno de **Pilha Sobrecarregada** (referência [[tradicoes-cultura]] §Dia do Tomo — pequeno logo estilizado de livro aberto com símbolo de pilha, ~3cm canto inferior direito).
-  - Adesivo de **fractal Fibonacci** desenhado a caneta (não impresso; Gus copiou de fragmento Selve aos 10, ver `characters/gus.md` §Memórias formativas — primeira incursão).
+  - Adesivo pequeno de **Pilha Sobrecarregada** (referência [[tradicoes-cultura]] §Dia do Tomo: pequeno logo estilizado de livro aberto com símbolo de pilha, ~3cm canto inferior direito).
+  - Adesivo de **fractal Fibonacci** desenhado a caneta (não impresso; Gus copiou de fragmento Selve aos 10, ver `characters/gus.md` §Memórias formativas, primeira incursão).
   - **Dobra de canto** superior direito, vincada de uso.
   - **Mancha** circular escura inferior-centro: café-de-neurônio derramado pelo pai Pyotor (canônico, `lore-bible` §11.4 + `characters/gus.md` §pai itinerante). Mancha funciona como **leitmotiv visual**: o pai está presente mesmo ausente.
   - **Fita adesiva amarelada** consertando lombada (caderno foi rasgado uma vez; Gus consertou ele mesmo, com cuidado técnico).
 - **Tipografia da etiqueta:** cursiva infantil 11 anos. Letras irregulares mas legíveis. "i" às vezes sem pingo. Tamanho consistente (Gus é organizado).
-- **Paleta layer 1:** papel envelhecido `#E8DDC4` (base), tinta azul-marinho `#1B2238` (cursiva — mesmo BG mid da cidade, link visual sutil), acentos vermelho-correção `#C03030` (rabiscos de revisão), laranja Gus `#FF6B1A` em sticky notes-âncora (laranja é cor canônica exclusiva do Gus, ver `style-guide.md` §4.3).
+- **Paleta layer 1:** papel envelhecido `#E8DDC4` (base), tinta azul-marinho `#1B2238` (cursiva, mesmo BG mid da cidade, link visual sutil), acentos vermelho-correção `#C03030` (rabiscos de revisão), laranja Gus `#FF6B1A` em sticky notes-âncora (laranja é cor canônica exclusiva do Gus, ver `style-guide.md` §4.3).
 
 ### 1.2 Animação de abertura
 
 - Duração: **2-3 segundos** (não pula se for primeira abertura; pulável em re-aberturas).
 - Frames-chave: (1) caderno fechado no centro da tela; (2) mão direita do Gus aparece pelo canto inferior direito e abre a capa; (3) páginas folheiam até a última aba aberta (memória da última posição); (4) settle em interface idle.
-- Áudio diegético: papelão dobrando + páginas viradas (foley capturado, não trilha sonora — ver [[_INDEX]] §Princípio).
-- Frame zero antes da animação: blur leve do mundo de fundo (gameplay pausada visualmente; sem freeze rígido — pausa diegética).
+- Áudio diegético: papelão dobrando + páginas viradas (foley capturado, não trilha sonora; ver [[_INDEX]] §Princípio).
+- Frame zero antes da animação: blur leve do mundo de fundo (gameplay pausada visualmente; sem freeze rígido; pausa diegética).
 
 ### 1.3 Elementos persistentes ao redor do caderno
 
@@ -47,7 +47,7 @@ Quando aberto, o caderno ocupa ~80% da tela. Os 20% periféricos mostram:
 
 ---
 
-## 2. Layout macro — 4 abas
+## 2. Layout macro: 4 abas
 
 O caderno tem **4 abas físicas** correspondendo aos 4 tipos canônicos de entry. Cada aba tem cor própria (compatível com daltonismo: além de cor, posição vertical fixa e ícone-glyph desenhado a mão).
 
@@ -110,7 +110,7 @@ Layer 1 visual: a página interna tem linhas-horizontais sutis de caderno pautad
 +-- DIÁRIO DO GUS ----------------------------------- pag 22/47 --+
 | (=) [Manuscrito] [Docs*1] [Fichas] [Mapas]                     |
 +-----------------+----------------------------------------------+
-| DOCS COLETADOS  | Doc 05 — Auditoria Apex-Data                 |
+| DOCS COLETADOS  | Doc 05: Auditoria Apex-Data                  |
 | 8 de 15         |                                              |
 |                 |  [imagem do documento físico]                |
 | > 01 Tratado    |  papel A4 manchado, timbre Apex-Data,        |
@@ -151,7 +151,7 @@ Entries com gate Ouro **aparecem na lista mas com "??"** e cadeado (sticky-note 
 +-- DIÁRIO DO GUS ----------------------------------- pag 33/47 --+
 | (=) [Manuscrito] [Docs] [Fichas*2] [Mapas]                     |
 +-----------------+----------------------------------------------+
-| PARTY           | Cauã Berenger — "Volt"                       |
+| PARTY           | Cauã Berenger, "Volt"                        |
 | > Gus (auto)    |                                              |
 | > Cauã [NEW]    |  [retrato esboço cursiva: cabeça meia-perfil |
 | > Iara          |   com cicatriz fina sobre sobrancelha;       |
@@ -166,7 +166,7 @@ Entries com gate Ouro **aparecem na lista mas com "??"** e cadeado (sticky-note 
 | > Patch-Zero    |   Ele não sabe que eu sei. Eu não vou       |
 |   ??? glitch    |   contar até ele querer contar."             |
 | > Adila Murm.   |                                              |
-| > Cassiano V.   |  [Sticky-note verde — atualizado]            |
+| > Cassiano V.   |  [Sticky-note verde: atualizado]             |
 |                 |  "Cauã me chamou de 'mano' hoje. Primeira   |
 | BESTIARY        |   vez. Eu anotei aqui pra não esquecer."     |
 | > Drone Sterli  |                                              |
@@ -190,7 +190,7 @@ Bestiary mostra estrelas preenchidas (`★`) conforme páginas se completam. Ini
 +-- DIÁRIO DO GUS ----------------------------------- pag 41/47 --+
 | (=) [Manuscrito] [Docs] [Fichas] [Mapas*1]                     |
 +-----------------+----------------------------------------------+
-| MAPAS (8)       | NÚCLEO METROPOLITANO — explorado 67%         |
+| MAPAS (8)       | NÚCLEO METROPOLITANO: explorado 67%          |
 | > Núcleo Met.   |                                              |
 |   67% [NEW]     |  [grid esboço cursiva, ruas em ângulo reto.  |
 | > Periferia I.  |   Áreas exploradas em tinta cheia; áreas     |
@@ -204,7 +204,7 @@ Bestiary mostra estrelas preenchidas (`★`) conforme páginas se completam. Ini
 | > Dutos Infer.  |   4. Praça Central (fonte Fibonacci 🌀)      |
 |   31%           |   5. Cúpula Sterling (X vermelho ENORME)     |
 | > Catedrais Sy. |                                              |
-|   3%            |  [Sticky-note cyan — cross-ref doc 01]       |
+|   3%            |  [Sticky-note cyan: cross-ref doc 01]        |
 | > Selve Sombria |                                              |
 |   0%            |                                              |
 |                 |                                              |
@@ -239,7 +239,7 @@ A cursiva da layer 1 aparece em:
 - **Sticky notes anexos** (texto curto, todo em cursiva)
 - **Esboços** (descrições visuais no estilo de garatuja técnica)
 
-Corpo da entry: **fonte sans-serif clara (ex: Inter 11pt)**, espaçamento generoso, alinhamento à esquerda (não justificado — justificado quebra leitura cursiva). Pillar 4 + acessibilidade.
+Corpo da entry: **fonte sans-serif clara (ex: Inter 11pt)**, espaçamento generoso, alinhamento à esquerda (não justificado, pois justificado quebra leitura cursiva). Pillar 4 + acessibilidade.
 
 ### 3.1 Tipografia detalhada
 
@@ -258,7 +258,7 @@ Corpo da entry: **fonte sans-serif clara (ex: Inter 11pt)**, espaçamento genero
 
 ### 4.1 Abertura/fechamento
 
-- **PC keyboard:** tecla **`J`** (de Diário; mnemonic) — abrir/fechar.
+- **PC keyboard:** tecla **`J`** (de Diário; mnemonic) abre/fecha.
 - **Gamepad:** botão **MENU** (Start) → seleciona "Diário" no menu de pausa OU atalho direto via **D-pad up** (configurável).
 - **Touch:** não suportado em G1 (decisão Fase 1).
 - **Mouse:** clique no ícone do caderno no canto do HUD principal (sempre visível, discreto).
@@ -309,7 +309,7 @@ Quando nova entry chega no Diário durante gameplay, **popup discreto** aparece 
 - **Player não-disrupted:** popup é cosmético; gameplay continua. Player pode abrir Diário depois pela tecla J.
 - **Acessibilidade:** popup também tem ícone forma + texto, não só cor (compatível daltonismo). Som tem alternativa visual (vibração leve no controle se ativada).
 
-### 5.1 Caso especial — invasão Patch-Zero (Canal 1, ver [[lore-bible]] §8.3)
+### 5.1 Caso especial: invasão Patch-Zero (Canal 1, ver [[lore-bible]] §8.3)
 
 Quando Patch-Zero adiciona entry sozinho:
 
@@ -435,7 +435,7 @@ Salva **apenas state mínimo**:
 
 - **IDs canônicos** para cada entry (esquema `<tipo>_<slug>[_<lvl>]`): `m_*` manuscrito, `d_*` doc descobrível, `f_*` ficha, `b_*` bestiary, `mp_*` mapa, `t_*` timeline. Definidos individualmente nos `entries-*.md`.
 - **Migrators desde D1** (alinhado com decisão Fase 1, CLAUDE.md raiz). Se schema muda, migrator converte.
-- **Tamanho de save** estimado: ~3-8 KB para Diário cheio. Texto das entries vive nos `entries-*.md` (data, não save) — save só armazena qual ID está destravado/lido.
+- **Tamanho de save** estimado: ~3-8 KB para Diário cheio. Texto das entries vive nos `entries-*.md` (data, não save); save só armazena qual ID está destravado/lido.
 
 ### 9.3 Loading
 
@@ -454,7 +454,7 @@ Salva **apenas state mínimo**:
 | **Touch / mobile** | Não suportado em G1. | Fora de scope. |
 | **VR** | Não suportado. | Fora de scope. |
 
-Tecla padrão PC: **`J`**. Remapeable em opções (Pillar acessibilidade — `accessibility-specialist` requirement).
+Tecla padrão PC: **`J`**. Remapeable em opções (Pillar acessibilidade; `accessibility-specialist` requirement).
 
 Gamepad padrão: **MENU + D-pad up** para abrir; **B/O** para fechar. Remapeable.
 
@@ -464,7 +464,7 @@ Resolução suportada: 1280×720 mínimo (caderno renderiza ok em 720p), 1920×1
 
 ## 11. Casos edge / regras de exceção
 
-- **Diário durante combate:** abrir Diário **fora do turno do Gus** é instantâneo (combate pausa). **Durante o turno do Gus**: bloqueado (player não fica abrindo wiki para vencer combate; isso vai contra Pillar 1 — Knowledge precisa ser farmado antes, não consultado no meio da luta). Tooltip explica: "Você consultará o Diário melhor depois deste turno."
+- **Diário durante combate:** abrir Diário **fora do turno do Gus** é instantâneo (combate pausa). **Durante o turno do Gus**: bloqueado (player não fica abrindo wiki para vencer combate; isso vai contra Pillar 1, Knowledge precisa ser farmado antes, não consultado no meio da luta). Tooltip explica: "Você consultará o Diário melhor depois deste turno."
 - **Diário durante diálogo:** bloqueado. Diálogo é prioridade narrativa; Diário disponível antes ou depois.
 - **Diário durante cutscene:** bloqueado.
 - **Diário durante combate boss (turno inimigo)\:** disponível (player ansioso pode ler bestiary do boss enquanto inimigo joga; permite Knowledge farming reativo).
@@ -476,19 +476,19 @@ Resolução suportada: 1280×720 mínimo (caderno renderiza ok em 720p), 1920×1
 
 ## 12. Cross-refs
 
-- **[[_INDEX]]** — princípio do Diário + decisões macro Bloco H.
-- **[[pillars]] §Pillar 1** — Knowledge Progression (anti-grind real, sources/decay).
-- **[[pillars]] §Pillar 4** — tom de 11 anos (cursiva, voice, multimodalidade).
-- **[[in-world-docs]]** — 15 documentos descobríveis que populam aba 2.
-- **[[foreshadow-links]]** — 130 plants Bloco I, sticky-note conectivo.
-- **[[entries-manuscrito-glossario]]** — conteúdo aba 1.
-- **[[entries-docs-descobriveis]]** — conteúdo aba 2.
-- **[[entries-fichas-bestiary]]** — conteúdo aba 3.
-- **[[entries-mapas-timeline]]** — conteúdo aba 4.
-- **[[knowledge-gates]]** — tiers Bronze/Prata/Ouro + decisão de unlock.
-- **`art/style-guide.md`** — paleta canônica (papel envelhecido `#E8DDC4`, tinta `#1B2238`, laranja Gus `#FF6B1A` em sticky notes-âncora).
-- **`characters/gus.md`** — voice/cursiva do Gus aos 11 anos.
+- **[[_INDEX]]**: princípio do Diário + decisões macro Bloco H.
+- **[[pillars]] §Pillar 1**: Knowledge Progression (anti-grind real, sources/decay).
+- **[[pillars]] §Pillar 4**: tom de 11 anos (cursiva, voice, multimodalidade).
+- **[[in-world-docs]]**: 15 documentos descobríveis que populam aba 2.
+- **[[foreshadow-links]]**: 130 plants Bloco I, sticky-note conectivo.
+- **[[entries-manuscrito-glossario]]**: conteúdo aba 1.
+- **[[entries-docs-descobriveis]]**: conteúdo aba 2.
+- **[[entries-fichas-bestiary]]**: conteúdo aba 3.
+- **[[entries-mapas-timeline]]**: conteúdo aba 4.
+- **[[knowledge-gates]]**: tiers Bronze/Prata/Ouro + decisão de unlock.
+- **`art/style-guide.md`**: paleta canônica (papel envelhecido `#E8DDC4`, tinta `#1B2238`, laranja Gus `#FF6B1A` em sticky notes-âncora).
+- **`characters/gus.md`**: voice/cursiva do Gus aos 11 anos.
 
 ---
 
-**Última revisão:** 2026-05-16. Canônico Bloco H — UI/UX Spec do Diário. Atualizações exigem aprovação do criador supremo.
+**Última revisão:** 2026-05-16. Canônico Bloco H, UI/UX Spec do Diário. Atualizações exigem aprovação do criador supremo.

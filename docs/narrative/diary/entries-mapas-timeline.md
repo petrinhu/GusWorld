@@ -1,6 +1,6 @@
-# Diário — Mapas + Timeline
+# Diário: Mapas + Timeline
 
-> **Status:** Canônico (Bloco H — Tipo 4 do Diário do Gus: mapas dos 8 settings com anotações + timeline cronológica auto-gerada). Revisão inicial 2026-05-16. Modo autônomo autorizado pelo criador supremo.
+> **Status:** Canônico (Bloco H, Tipo 4 do Diário do Gus: mapas dos 8 settings com anotações + timeline cronológica auto-gerada). Revisão inicial 2026-05-16. Modo autônomo autorizado pelo criador supremo.
 >
 > **Trigger:**
 > - **Mapas:** exploração diegética. Área descoberta sai da "fog of war" → mapa visível. Scan dos Óculos Táticos revela detalhes. Knowledge alta destrava landmarks ocultos (1-2 por mapa).
@@ -12,13 +12,13 @@
 
 ## Princípio
 
-Os **Mapas** são as páginas mais visuais do Diário. Gus desenha à mão: topologia geral em traço pesado de caneta nanquim infantil cuidada, pins coloridos coladinhos (sticky pins de cor canônica do caderno — azul-frio para visitado, cinza para conhecido-não-visitado, laranja `#FF6B1A` para sticky-notes-âncora, "?" rabiscado a lápis quando Knowledge alta destrava landmark oculto que ele intuiu mas não confirmou). Em margem cursiva: "fonte Engrenagem-Mestra → tique exato → Era 1" — anotações de quem está cruzando dados sensoriais com hipótese técnica. O mapa é simultaneamente memória e ferramenta de inferência.
+Os **Mapas** são as páginas mais visuais do Diário. Gus desenha à mão: topologia geral em traço pesado de caneta nanquim infantil cuidada, pins coloridos coladinhos (sticky pins de cor canônica do caderno: azul-frio para visitado, cinza para conhecido-não-visitado, laranja `#FF6B1A` para sticky-notes-âncora, "?" rabiscado a lápis quando Knowledge alta destrava landmark oculto que ele intuiu mas não confirmou). Em margem cursiva: "fonte Engrenagem-Mestra → tique exato → Era 1"; anotações de quem está cruzando dados sensoriais com hipótese técnica. O mapa é simultaneamente memória e ferramenta de inferência.
 
-A **Timeline** é a página mais retrospectiva. Cresce sozinha. Gus não precisa anotar manualmente — o sistema do Diário (em diegese: a "Pilha do próprio Gus" rodando atrás dos Óculos + Matriz) cruza fichas, docs descobríveis, manuscrito autobiográfico, dialogue com NPCs lore-importantes, e auto-gera entries datadas. **Datas in-world**, calendário canônico Era 2 herdado por convenção ([[lore-bible]] §11.2; [[tradicoes-cultura]] §3 §4 §5): 12 meses de 30-31 dias, ano 0 = presente do jogo, ano negativo = passado. Gus aceita o calendário herdado (não tenta refazer; isso seria perda de tempo de prodígio que respeita substrato — Pillar 2 aplicado a convenção).
+A **Timeline** é a página mais retrospectiva. Cresce sozinha. Gus não precisa anotar manualmente; o sistema do Diário (em diegese: a "Pilha do próprio Gus" rodando atrás dos Óculos + Matriz) cruza fichas, docs descobríveis, manuscrito autobiográfico, dialogue com NPCs lore-importantes, e auto-gera entries datadas. **Datas in-world**, calendário canônico Era 2 herdado por convenção ([[lore-bible]] §11.2; [[tradicoes-cultura]] §3 §4 §5): 12 meses de 30-31 dias, ano 0 = presente do jogo, ano negativo = passado. Gus aceita o calendário herdado (não tenta refazer; isso seria perda de tempo de prodígio que respeita substrato; Pillar 2 aplicado a convenção).
 
 Cada entry timeline tem: ano, evento (1 frase técnica), trigger no jogo (quando Gus aprende), Knowledge contribuída (qual ficha/doc/manuscrito plantou a linha), cross-ref a entry visual (mapa associado, se houver). Knowledge baixa = entries esparsas com lacunas explícitas ("?" entre ~-1100 e ~-700, Era 1 mal conhecida). Knowledge alta = densificação progressiva; padrões emergem (cooperativas familiares destruídas em sequência -19 → -13 → -8 = canibalismo Sterling visível como padrão, não como acidentes isolados).
 
-A regra **mostre, não conte** vale duplamente aqui: os mapas mostram cidades inteiras antes de qualquer NPC falar; a timeline mostra padrão histórico antes de qualquer ficha verbalizar. Player infere causa e efeito olhando o caderno do Gus. Quando ele entende, o Diário já entendeu — porque os dados já estavam lá, esperando o cruzamento.
+A regra **mostre, não conte** vale duplamente aqui: os mapas mostram cidades inteiras antes de qualquer NPC falar; a timeline mostra padrão histórico antes de qualquer ficha verbalizar. Player infere causa e efeito olhando o caderno do Gus. Quando ele entende, o Diário já entendeu, porque os dados já estavam lá, esperando o cruzamento.
 
 ---
 
@@ -39,7 +39,7 @@ A regra **mostre, não conte** vale duplamente aqui: os mapas mostram cidades in
 
 ---
 
-## §1. Mapas — Catálogo (8 settings + macro)
+## §1. Mapas: Catálogo (8 settings + macro)
 
 Cada mapa segue padrão fixo:
 
@@ -52,11 +52,11 @@ Cada mapa segue padrão fixo:
 
 ---
 
-### Mapa 1 — GusWorld City (Núcleo Metropolitano + cross-distritos)
+### Mapa 1: GusWorld City (Núcleo Metropolitano + cross-distritos)
 
 > *Visual diegético:* página dupla. Topologia mais detalhada do Diário inteiro (Gus mora aqui; conhece de cor). Traçado de caneta nanquim em **grid ortogonal** rígido no Núcleo Metropolitano; ângulos quebrados conforme aproxima da Periferia (norte) ou Zona do Silêncio (oeste). Sticky-pin azul no apartamento Vance (Edifício Vance, 6º andar, lado leste do Núcleo). Margem: "casa = (0,0). tudo é deslocamento em relação a aqui."
 
-**Topologia.** Grid ortogonal Núcleo (Era 2 planejado); curvas e quebras conforme distritos periféricos. Trem suspenso Era 2 corta horizontalmente. Subterrâneo dos Dutos Infernais (mapa 4) não aparece neste — mapas são por setting.
+**Topologia.** Grid ortogonal Núcleo (Era 2 planejado); curvas e quebras conforme distritos periféricos. Trem suspenso Era 2 corta horizontalmente. Subterrâneo dos Dutos Infernais (mapa 4) não aparece neste (mapas são por setting).
 
 **Landmarks visíveis (5):**
 
@@ -91,7 +91,7 @@ Cada mapa segue padrão fixo:
 
 **Cross-ref Bloco I:**
 
-- F-001 (pausa de 1 segundo antes de falar — origem aula -7 anos, Diretora liga pra Gargi)
+- F-001 (pausa de 1 segundo antes de falar; origem aula -7 anos, Diretora liga pra Gargi)
 - F-002 (logo Sterling em todo poste, propaganda saturada ato 1)
 - F-014 ("histórico é como a gente sabe pra onde a coisa vai")
 - F-018 (cripto-glifo Era 1 sob asfalto Praça da Compilação)
@@ -99,9 +99,9 @@ Cada mapa segue padrão fixo:
 
 ---
 
-### Mapa 2 — Selve Sombria (Orla Recursiva + Pântano Markov + Núcleo Mandelbrot Externo)
+### Mapa 2: Selve Sombria (Orla Recursiva + Pântano Markov + Núcleo Mandelbrot Externo)
 
-> *Visual:* traçado mais orgânico. Sem grid. Trilhas em padrão **L-system** visível (Gus desenhou explicitamente ramificações em ângulo Fibonacci 3 vezes recursivo). Pântano de Markov representado em malha estocástica (Gus rascunhou em lápis fraco — "nada aqui é determinístico em pequena escala, mas é em larga escala. é só esperar."). Núcleo Mandelbrot Externo: clareira com geometria sutilmente não-euclidiana — desenho falha de propósito (canto da página dobrado pra "encaixar"; piada visual diegética).
+> *Visual:* traçado mais orgânico. Sem grid. Trilhas em padrão **L-system** visível (Gus desenhou explicitamente ramificações em ângulo Fibonacci 3 vezes recursivo). Pântano de Markov representado em malha estocástica (Gus rascunhou em lápis fraco: "nada aqui é determinístico em pequena escala, mas é em larga escala. é só esperar."). Núcleo Mandelbrot Externo: clareira com geometria sutilmente não-euclidiana (desenho falha de propósito; canto da página dobrado pra "encaixar"; piada visual diegética).
 
 **Topologia.** Floresta densa biolúmen ciano-verde (Orla); brejo com névoa probabilística (Pântano); clareira geometricamente impossível (Mandelbrot Externo). Gateway natural a partir do Anel Verde (Mapa 1).
 
@@ -137,15 +137,15 @@ Cada mapa segue padrão fixo:
 
 **Cross-ref Bloco I:**
 
-- F-029 (Jaci nota cor errada em folha biolúmen — escalation Patch-Zero)
+- F-029 (Jaci nota cor errada em folha biolúmen; escalation Patch-Zero)
 - F-055 (raposa-fractal com pelo errado, Orla Recursiva)
 - F-099 (Patch-Zero plural "nós em Polis-Vermelha já são livres")
 
 ---
 
-### Mapa 3 — Catedrais Neo-Sylvania
+### Mapa 3: Catedrais Neo-Sylvania
 
-> *Visual:* página dedicada à estrutura gótica arcaica. Gus desenhou a nave principal em perspectiva 1-ponto (cuidado raro; ele leva tempo neste mapa — Bento o ensina a "ler a catedral"). Vitrais marcados com X minúsculos: cada um reage a temperatura/hora; Gus catalogou 6 vitrais ainda funcionais. Cronômetro mecânico monumental no peitoral interno do prédio (sino Asmódico). Margem: "essa página demorou 3 sessões. Bento corrigiu 2 vezes."
+> *Visual:* página dedicada à estrutura gótica arcaica. Gus desenhou a nave principal em perspectiva 1-ponto (cuidado raro; ele leva tempo neste mapa; Bento o ensina a "ler a catedral"). Vitrais marcados com X minúsculos: cada um reage a temperatura/hora; Gus catalogou 6 vitrais ainda funcionais. Cronômetro mecânico monumental no peitoral interno do prédio (sino Asmódico). Margem: "essa página demorou 3 sessões. Bento corrigiu 2 vezes."
 
 **Topologia.** Catedral principal (Nave + Biblioteca + Capela do Sino Asmódico) + Escola anexa Era 2 (bancada Beatriz Pólvora). Subterrâneo lacrado (Selagem Asmódica protocolo Atelaiá -78).
 
@@ -188,9 +188,9 @@ Cada mapa segue padrão fixo:
 
 ---
 
-### Mapa 4 — Dutos Infernais
+### Mapa 4: Dutos Infernais
 
-> *Visual:* esquemático em 3 níveis verticais (Gus desenhou em corte transversal — vista de lateral). Núcleo operacional Pythia no centro vertical. QG Runners no nível 3 (mais profundo). Pilar Era 1 (cripto-glífico monolítico) no nível 4 (mais profundo ainda, descoberta tardia). Pin azul em ponto onde Cauã salvou Inês em -3 ("ponto X — Cauã. canto inferior duto B-7.").
+> *Visual:* esquemático em 3 níveis verticais (Gus desenhou em corte transversal: vista de lateral). Núcleo operacional Pythia no centro vertical. QG Runners no nível 3 (mais profundo). Pilar Era 1 (cripto-glífico monolítico) no nível 4 (mais profundo ainda, descoberta tardia). Pin azul em ponto onde Cauã salvou Inês em -3 ("ponto X: Cauã. canto inferior duto B-7.").
 
 **Topologia.** Rede subterrânea Era 1 (infra original) + Era 2 (reaproveitamento) + Era 3 (reconfig parcial Sterling/FIR). Conecta os 5 distritos por baixo. Quem domina os Dutos navega por baixo de toda a cidade.
 
@@ -232,9 +232,9 @@ Cada mapa segue padrão fixo:
 
 ---
 
-### Mapa 5 — Setor Mirage
+### Mapa 5: Setor Mirage
 
-> *Visual:* página saturada com gradient violeta-magenta-cyan no fundo (Gus tentou marker; saiu manchado; deixou — "o setor inteiro é assim. faz sentido."). Praça do Olho no centro: olho refratado em prisma desenhado com 6 traços (cor cyan + magenta cruzando). Caleidoscópio (galeria holográfica permanente). Catacumbas Cult com entrada disfarçada como obra de arte interativa. Margem: "tudo aqui é estúdio. nada aqui é casa. (a Iara morava 2 quartos atrás da Praça. ela apontou. eu marquei.)"
+> *Visual:* página saturada com gradient violeta-magenta-cyan no fundo (Gus tentou marker; saiu manchado; deixou: "o setor inteiro é assim. faz sentido."). Praça do Olho no centro: olho refratado em prisma desenhado com 6 traços (cor cyan + magenta cruzando). Caleidoscópio (galeria holográfica permanente). Catacumbas Cult com entrada disfarçada como obra de arte interativa. Margem: "tudo aqui é estúdio. nada aqui é casa. (a Iara morava 2 quartos atrás da Praça. ela apontou. eu marquei.)"
 
 **Topologia.** Praça central + galerias circundantes + catacumbas subterrâneas Cult. Era 3 dominante sobre vestígios Era 2.
 
@@ -276,9 +276,9 @@ Cada mapa segue padrão fixo:
 
 ---
 
-### Mapa 6 — Periferia Industrial
+### Mapa 6: Periferia Industrial
 
-> *Visual:* traçado mais sujo (Gus aplicou intencionalmente menos cuidado — Periferia é áspera; o caderno reflete). Quintal Penkin desenhado em detalhe (foreshadow plant denso). Oficina Alencar com porta lateral marcada. Antena no telhado da casa Penkin desenhada com cabo descendo até a oficina lateral leste (Gus traçou o cabo em uma sessão tarde após ler doc; sticky-note depois conecta).
+> *Visual:* traçado mais sujo (Gus aplicou intencionalmente menos cuidado; Periferia é áspera; o caderno reflete). Quintal Penkin desenhado em detalhe (foreshadow plant denso). Oficina Alencar com porta lateral marcada. Antena no telhado da casa Penkin desenhada com cabo descendo até a oficina lateral leste (Gus traçou o cabo em uma sessão tarde após ler doc; sticky-note depois conecta).
 
 **Topologia.** Quebrada em ruas estreitas + becos. Era 2 (oficinas independentes) + Era 3 (FIR vassalo presença). Sem grid.
 
@@ -322,9 +322,9 @@ Cada mapa segue padrão fixo:
 
 ---
 
-### Mapa 7 — Zona do Silêncio
+### Mapa 7: Zona do Silêncio
 
-> *Visual:* página fria. Pouco traço. Gus usou só caneta cinza claro (sem nanquim — "ruído visual ofende este lugar"). Casa das Antenas como ponto-âncora. Sub-célula norte (Mara Bento operadora) marcada. Bancada Joaquim Bartolomeu separada. Margem: "aqui se fala baixo. mãe me ensinou a respeitar isso antes de eu saber por quê."
+> *Visual:* página fria. Pouco traço. Gus usou só caneta cinza claro (sem nanquim, "ruído visual ofende este lugar"). Casa das Antenas como ponto-âncora. Sub-célula norte (Mara Bento operadora) marcada. Bancada Joaquim Bartolomeu separada. Margem: "aqui se fala baixo. mãe me ensinou a respeitar isso antes de eu saber por quê."
 
 **Topologia.** Antigo distrito de transmissão analógica. Antenas mortas verticais (5 conhecidas, 2 ainda parcialmente funcionais). Câmara do Equinócio Acústico (Era 1, cripto-glifo sonoro) descoberta por Joaquim em ano -3.
 
@@ -366,9 +366,9 @@ Cada mapa segue padrão fixo:
 
 ---
 
-### Mapa 8 — Selve Profunda (Pelicano Branco + Núcleo Mandelbrot Interno)
+### Mapa 8: Selve Profunda (Pelicano Branco + Núcleo Mandelbrot Interno)
 
-> *Visual:* página mais densa cross-temporal. Gus usou múltiplas camadas (sticky-notes coladas em sobreposição — vilarejo no centro, Câmara Neo-Sylvania ao norte, Núcleo Mandelbrot Interno ao sul/sudoeste com geometria desenhada deliberadamente errada — Gus reconhece e aceita o erro como dado). Margem: "aqui as 3 eras estão todas vivas simultaneamente. é o único setting onde Era 1 não é ruína."
+> *Visual:* página mais densa cross-temporal. Gus usou múltiplas camadas (sticky-notes coladas em sobreposição: vilarejo no centro, Câmara Neo-Sylvania ao norte, Núcleo Mandelbrot Interno ao sul/sudoeste com geometria desenhada deliberadamente errada; Gus reconhece e aceita o erro como dado). Margem: "aqui as 3 eras estão todas vivas simultaneamente. é o único setting onde Era 1 não é ruína."
 
 **Topologia.** Vilarejo do Pelicano Branco (sub-comunidades em ferradura ao redor da praça central) + fronteira-Selve Profunda + Núcleo Mandelbrot Interno (gateway acesso climax Patch-Zero).
 
@@ -405,17 +405,17 @@ Cada mapa segue padrão fixo:
 
 **Cross-ref Bloco I:**
 
-- F-029 (Jaci nota cor errada em folha biolúmen — escalation Patch-Zero)
+- F-029 (Jaci nota cor errada em folha biolúmen; escalation Patch-Zero)
 - F-118 (rivalidade amigável Vivendel/Jaci)
 - F-099 (Patch-Zero plural)
 - Doc 14, Doc 15
 
 ---
 
-### Mapa 9 — Macro do mundo (mapa-mãe, todos 8 settings em escala + cidades-irmãs)
+### Mapa 9: Macro do mundo (mapa-mãe, todos 8 settings em escala + cidades-irmãs)
 
 > *Visual:* página dupla central. Gus desenhou em escala aproximada (margens "não desenhei pra escala. desenhei pra topologia. eu vou refazer quando tiver dado mais.") GusWorld City no centro com Selve Sombria circundando setor leste; Catedrais Neo-Sylvania dentro da Selve cardinal-leste; Dutos Infernais por baixo de toda a cidade (camada subterrânea representada em hachura); Setor Mirage adjacente Núcleo (sudoeste); Periferia Industrial nordeste cidade; Zona do Silêncio oeste cidade; Selve Profunda mais ao sul/sudoeste da Selve. Cidades-irmãs marcadas em pinos cinza:
-> - **Polis-Vermelha** (oeste-distante, quarentena Sterling, "?" sobre o nome — Gus rabiscou "caída há 2 anos. Underground residual fragmentado. lição visível.").
+> - **Polis-Vermelha** (oeste-distante, quarentena Sterling, "?" sobre o nome; Gus rabiscou "caída há 2 anos. Underground residual fragmentado. lição visível.").
 > - **Cidades-Gêmeas Norte/Sul** (norte e nordeste-distante, Underground forte).
 > - **Heliópolis-Nova** (sul-distante, núcleo de mineração Sterling, "quase colônia").
 
@@ -440,7 +440,7 @@ Cada mapa segue padrão fixo:
 - "Polis-Vermelha: a cidade-irmã caída. Underground residual transmite fragmentos. é o que pode acontecer aqui. (não vai. eu juro.)" (Knowledge média)
 - "Cidades-Gêmeas: Lazar Tovrov e Penha Cintra coordenam Underground lá. nunca vi os dois. ouvi voz de Lazar em rádio analógica curta uma vez. ele falou em Óxido cifrado. Linda traduziu." (Knowledge alta)
 - "Heliópolis-Nova: 'transferidos pra Heliópolis-Nova' é o eufemismo Sterling pra 'desapareceram'. as pessoas que dizem isso baixinho são as que sabem." (Knowledge alta)
-- "trem suspenso Era 2 ainda opera entre cidades. Sterling não conseguiu fechar — comunidade técnica de manutenção mantém. resistência distribuída por know-how. (Pillar 2 em escala social.)" (Knowledge alta)
+- "trem suspenso Era 2 ainda opera entre cidades. Sterling não conseguiu fechar: comunidade técnica de manutenção mantém. resistência distribuída por know-how. (Pillar 2 em escala social.)" (Knowledge alta)
 
 **Cross-ref Bloco I:**
 
@@ -450,7 +450,7 @@ Cada mapa segue padrão fixo:
 
 ---
 
-## §2. Timeline — Catálogo cronológico (50+ eventos)
+## §2. Timeline: Catálogo cronológico (50+ eventos)
 
 Timeline auto-gerada. Cada entry tem: **ano**, **evento**, **trigger no jogo** (quando Gus aprende), **Knowledge contribuída** (fonte), **cross-ref entry visual** (mapa associado se houver). Knowledge baixa = entries esparsas; Knowledge alta = densificação.
 
@@ -458,7 +458,7 @@ Datas in-world (calendário Era 2, 12 meses 30-31 dias; ano 0 = presente do jogo
 
 ---
 
-### Era 1 — Pré-Código (Neo-Sylvania) (~-1100 a -700)
+### Era 1: Pré-Código (Neo-Sylvania) (~-1100 a -700)
 
 | # | Ano | Evento | Trigger | Knowledge contribuição | Cross-ref entry visual |
 |---|---|---|---|---|---|
@@ -466,7 +466,7 @@ Datas in-world (calendário Era 2, 12 meses 30-31 dias; ano 0 = presente do jogo
 | 2 | ~-950 | Construção da Catedral-Mãe (localização desconhecida, provavelmente afundada região profunda Selve). | Doc 15 ([[entries-docs-descobriveis|gate Ouro]]) destrava menção. | Hugo Tirol decifra cripto-glífico parcial. | Mapa 8 (coordenadas parciais Knowledge Ouro). |
 | 3 | ~-870 | Auge Neo-Sylvania. Cooperação ecológica plena. Sementes-relíquia produzidas em massa, depositadas em catedrais. | Jaci explica origem sementes-relíquia farmacopeia (~40% campanha). | Ficha Jaci + Câmara Neo-Sylvania Mapa 8. | Mapa 8. |
 | 4 | ~-820 | **Anomalia Primeira** registrada em cripto-glifo: "o limite que escolheu falar". | Cripto-glifo lido por Gus + Bento em arco Bento (Knowledge alta destrava decifração completa). | Sticky-note F-099 (Patch-Zero plural). | Mapa 2 (cripto-glifo Trilha dos Pioneiros). |
-| 5 | ~-800 | Coletivo de mestres-engenheiros propõe encapsulamento da anomalia. Tentativa documentada de "domesticar". | Bento cruza dado com diário Atelaiá ([[entries-docs-descobriveis|doc 3]]). | "história se repete" — Sterling como replay. | Mapa 3 (biblioteca Ordem). |
+| 5 | ~-800 | Coletivo de mestres-engenheiros propõe encapsulamento da anomalia. Tentativa documentada de "domesticar". | Bento cruza dado com diário Atelaiá ([[entries-docs-descobriveis|doc 3]]). | "história se repete"; Sterling como replay. | Mapa 3 (biblioteca Ordem). |
 | 6 | ~-750 | Queda parcial. Cidades menores colapsam. Catedral-Mãe lacrada por dentro pelos próprios habitantes. | Hugo Tirol pista cripto-glífica + doc 15 (Knowledge Ouro). | Lacre interno = aceitação de limite. | Mapa 8 (coordenadas Knowledge Ouro). |
 | 7 | ~-720 | Êxodo. Sobreviventes dispersam. Aldeias-fronteira atuais descendem desses sobreviventes (Pelicano Branco). | Anciã Mariana narra tradição oral arco Jaci. | Ficha Mariana + Pelicano Branco Mapa 8. | Mapa 8. |
 | 8 | ~-700 | Colapso final. Civilização Neo-Sylvania cessa de existir como entidade política. Inicia o Hiato. | Lore-bible §3 destrava como contexto após arco Bento. | "Hiato" = silêncio narrativo deliberado (~550 anos sem evento). | Mapa-mãe 9. |
@@ -475,7 +475,7 @@ Datas in-world (calendário Era 2, 12 meses 30-31 dias; ano 0 = presente do jogo
 
 ---
 
-### Era 2 — Era do Compilador (-150 a -25)
+### Era 2: Era do Compilador (-150 a -25)
 
 | # | Ano | Evento | Trigger | Knowledge contribuição | Cross-ref entry visual |
 |---|---|---|---|---|---|
@@ -488,31 +488,31 @@ Datas in-world (calendário Era 2, 12 meses 30-31 dias; ano 0 = presente do jogo
 | 15 | -110 | Desenvolvimento Óxido. Engenheira-mãe: **Tamara Neumann** (ancestral materna Linda, bisavó-bisavó). | Linda comenta arco Linda. Cross-ref [[characters/linda-siren]]. | Linguagem de segurança nasce. Underground absorve séculos depois. | Mapa 7. |
 | 16 | -100 | Surge o **Tomo da Pilha Sobrecarregada**. Documentação coletiva começa. | Dia do Tomo (14 janeiro) institucional. NPCs Pilha falam casualmente. | Conhecimento aberto institucionalizado ([[comic-reliefs]] cena 7). | Mapa 1. |
 | 17 | -95 | Desenvolvimento Pythia. Co-autoria: **Iremar Berenger** (ancestral Cauã) + **Anhuera Vanderbist** (ancestral Jaci). | Cauã + Jaci cruzam dados arco Cauã ou arco Jaci primeiro. | Aliança fundadora Berenger-Vanderbist. | Mapas 4 + 8. |
-| 18 | -80 | **Atelaiá Chevalier registra em diário pessoal:** queda parcial catedral menor por anomalia recorrente (Patch-Zero pré-Sterling). 17 mestres morrem em uma noite. | Doc 3 ([[entries-docs-descobriveis|diário Atelaiá]]) destrava arco Bento. | Trauma fundador Ordem Recursiva. | Mapa 3 (Catedral Menor de São Camilo — visível ao longe). |
+| 18 | -80 | **Atelaiá Chevalier registra em diário pessoal:** queda parcial catedral menor por anomalia recorrente (Patch-Zero pré-Sterling). 17 mestres morrem em uma noite. | Doc 3 ([[entries-docs-descobriveis|diário Atelaiá]]) destrava arco Bento. | Trauma fundador Ordem Recursiva. | Mapa 3 (Catedral Menor de São Camilo, visível ao longe). |
 | 19 | -78 | Ordem Recursiva decreta protocolo "Selagem Asmódica": catedrais menores recebem lacre cerimonial + cinético se anomalia detectada. | Bento aprende protocolo arco Bento. | Bento herda saber. | Mapa 3 (subterrâneo lacrado Knowledge alta). |
 | 20 | -50 | Fundação Federação Industrial de Reciclagem (FIR). Inicialmente cooperativa de boa-fé. | Hilário Murch contexto ato 2. Ironia: FIR começou útil. | Captura corporativa começa ~25 anos depois. | Mapa 6. |
 | 21 | -50 | **Batida na Casa das Antenas.** 14 técnicos presos, 6 ressurgem, 8 desaparecidos. Música "Última Frequência" composta antes; partitura preservada. Origem Noite Calada (8 agosto). | Padrinho Tiago narra arco Linda. | Trauma histórico Underground. | Mapa 7 (Casa das Antenas). |
 | 22 | -45 | Fundação vilarejo Pelicano Branco entidade comunitária formal. Anciã anterior: **Soraia Vanderbist** (avó Mariana, bisavó Jaci). | Anciã Mariana narra arco Jaci. | Linhagem materna Pelicano Branco consolidada. | Mapa 8. |
 | 23 | -45 | Tratado anônimo *Sobre o Comportamento Emergente dos Padrões Fechados* publicado. Atribuído hipoteticamente à **Verônica Atelaiá** (descendente Atelaiá Chevalier; última grande pensadora pré-Sterling). Teorizou Patch-Zero 40 anos antes. Ignorada. | Doc 10 ([[entries-docs-descobriveis|tratado anônimo]]) destrava arco Bento. | Sticky-note F-099 retroativo. | Mapa 3 (biblioteca Ordem). |
 | 24 | -40 | Underground do Silêncio surge informalmente como movimento de proteção de antenas analógicas. Nome não cunhado ainda. | Padrinho Tiago contexto histórico arco Linda. | Pré-história Underground. | Mapa 7. |
-| 25 | -35 | Cult Mirage surge como movimento artístico genuíno. Co-fundadora: **Sonja Murmúrio** (mãe biológica Adila). | Sub-quest Sérgio Brimber fita cassete arco Iara. | Cult nasce ético. Degrada décadas depois. | Mapa 5 (altar interno Cult, Knowledge alta — foto Sonja). |
-| 26 | -30 | Janelarum lançado v1.0 (sistema operacional comercial, ainda independente — não Sterling Corp; absorvido depois). | Terminal público doc 12 Tetra-Torre Janelarum. | Plataforma frágil que vira meme ([[comic-reliefs]] cenas 11/12). | Mapa 1 (Tetra-Torre). |
+| 25 | -35 | Cult Mirage surge como movimento artístico genuíno. Co-fundadora: **Sonja Murmúrio** (mãe biológica Adila). | Sub-quest Sérgio Brimber fita cassete arco Iara. | Cult nasce ético. Degrada décadas depois. | Mapa 5 (altar interno Cult, Knowledge alta: foto Sonja). |
+| 26 | -30 | Janelarum lançado v1.0 (sistema operacional comercial, ainda independente, não Sterling Corp; absorvido depois). | Terminal público doc 12 Tetra-Torre Janelarum. | Plataforma frágil que vira meme ([[comic-reliefs]] cenas 11/12). | Mapa 1 (Tetra-Torre). |
 
 ---
 
-### Era 3 — Era Sterling (-25 a presente, ano 0)
+### Era 3: Era Sterling (-25 a presente, ano 0)
 
 | # | Ano | Evento | Trigger | Knowledge contribuição | Cross-ref entry visual |
 |---|---|---|---|---|---|
 | 27 | -25 | **Sterling Locke publica tese de doutorado** "Tratado sobre a Supremacia do Script". Rejeitado pela academia C-Arcane. | Manuscrito Gus pós 1º holograma Sterling (~10% campanha). | Ponto de inflexão. Sterling jura vingança epistêmica silenciosa. | Mapa 1 (Cúpula Sterling Knowledge alta). |
 | 28 | -22 | Sterling assume CTO da Apex-Data Systems. Inicia migração forçada de sistemas legados para interpretador instável. | Cauã pesquisa Apex-Data pós-arco. | Engenharia de colapso começa. | Mapa 1 (Mercado da Sucata, bancada Inácia). |
 | 29 | -19 | Apex-Data Systems entra em Chapter 11. **Inácia Berenger** (mãe Cauã) demitida com indenização irrisória. Sterling sai com código de autenticação central da metrópole. | Doc 2 ([[entries-docs-descobriveis|terminal antigo Inácia]]) sub-quest. | Trauma seed família Berenger. | Mapa 1. |
-| 30 | -18 | Sterling assume CIO da Nexus-Cloud Conglomerate. | Manuscrito Gus catalogação Sterling (~30% campanha). | Próximo alvo. | — |
-| 31 | -16 | **Audit interno Apex-Data vazado:** relatório técnico assinado por engenheiro anônimo (provavelmente **Bartolo Penkin**, desaparece em 2 semanas — "transferido para Heliópolis-Nova"). | Doc 5 ([[entries-docs-descobriveis|audit Apex-Data]]) destrava arco Linda ou cross-arco Periferia. | Eufemismo Sterling exposto. | Mapas 1 + 6 (Mateus Penkin antena) + 9 (Heliópolis-Nova). |
-| 32 | -15 | Nexus-Cloud colapsa. Sterling sai com patentes de processamento por indução magnética. | Manuscrito Gus. | Tecnologia que sustenta drones Sterling Corp hoje. | — |
-| 33 | -14 | Sterling assume CEO da Core-Synth Bio-Tech. | Manuscrito Gus. | Última fase do canibalismo. | — |
+| 30 | -18 | Sterling assume CIO da Nexus-Cloud Conglomerate. | Manuscrito Gus catalogação Sterling (~30% campanha). | Próximo alvo. | n/a |
+| 31 | -16 | **Audit interno Apex-Data vazado:** relatório técnico assinado por engenheiro anônimo (provavelmente **Bartolo Penkin**, desaparece em 2 semanas, "transferido para Heliópolis-Nova"). | Doc 5 ([[entries-docs-descobriveis|audit Apex-Data]]) destrava arco Linda ou cross-arco Periferia. | Eufemismo Sterling exposto. | Mapas 1 + 6 (Mateus Penkin antena) + 9 (Heliópolis-Nova). |
+| 32 | -15 | Nexus-Cloud colapsa. Sterling sai com patentes de processamento por indução magnética. | Manuscrito Gus. | Tecnologia que sustenta drones Sterling Corp hoje. | n/a |
+| 33 | -14 | Sterling assume CEO da Core-Synth Bio-Tech. | Manuscrito Gus. | Última fase do canibalismo. | n/a |
 | 34 | -5 | **Acidente de manutenção em prédio popular da Periferia Industrial.** Sistema elétrico mal instalado por subcontratada FIR (alinhada Sterling) pega fogo. Morre **Davi Berenger** (irmão Cauã, 16 anos; Cauã tinha 8). Família silenciada com indenização irrisória. | Doc 13 ([[entries-docs-descobriveis|bilhete Davi]]) Knowledge Ouro. | Wound canônico Cauã. Confirmação tardia (Ouro): Davi não vítima negligência, alvo deliberado (documentava irregularidades FIR). | Mapa 6 (Subestação 11 paralelo Subestação 7). |
-| 35 | -12 | Core-Synth Bio-Tech liquidada. Sterling sai com protocolos cérebro-máquina (base Locke Core). | Doc 9 ([[entries-docs-descobriveis|diário Aldebrando]]) menciona. | Tecnologia base do Locke Core. | — |
+| 35 | -12 | Core-Synth Bio-Tech liquidada. Sterling sai com protocolos cérebro-máquina (base Locke Core). | Doc 9 ([[entries-docs-descobriveis|diário Aldebrando]]) menciona. | Tecnologia base do Locke Core. | n/a |
 | 36 | -12 | Sterling consolida tudo em **Sterling Corp**. Inicia construção da Cúpula Sterling. | Lore-bible §3. Cúpula aparece Mapa 1 Knowledge alta. | Sede canônica nasce. | Mapa 1 + Mapa 9. |
 | 37 | -11 a -13 | Nascimentos canônicos companions: **Bento (-11, 14 ato 1)**, **Cauã (-13, 13 ato 1)**, **Iara (-12, 12)**, **Linda (-12, 12)**, **Dante (-13, 13)**, **Gus (-11, 11)**, **Jaci (-11, 11)**. | Fichas companions estabilizadas no recrutamento. | Idades canônicas consistentes. | Mapas correspondentes (setting home cada companion). |
 | 38 | -10 | Sterling Corp lança Janelarum 2.0 (versão "corporativa"). Absorve fabricante original. | Doc 12 ([[entries-docs-descobriveis|Sterling Voice]]) destrava. | Janelarum vira ferramenta Sterling. | Mapa 1 (Tetra-Torre). |
@@ -540,20 +540,20 @@ Datas in-world (calendário Era 2, 12 meses 30-31 dias; ano 0 = presente do jogo
 
 ---
 
-### Ano 0 — Eventos durante o jogo (8 beats Kishōtenketsu canônicos)
+### Ano 0: Eventos durante o jogo (8 beats Kishōtenketsu canônicos)
 
 Cada beat de [[arco-principal]] = 1 entry timeline obrigatório. Auto-fill conforme beat dispara. Datas relativas in-world ("Dia 1 do mês do Compilador", "Dia 47", etc.).
 
 | # | Dia in-world | Beat | Conteúdo | Cross-ref |
 |---|---|---|---|---|
-| 60 | Dia 1 (1º setembro, mês do Compilador) | **B.1 — Ki (起): Apresentação** | Gus solo no Núcleo Metropolitano. Catalyst: anomalia massiva detectada via Matriz Ortodôntica. Ato 1 começa. | Mapa 1 + manuscrito tutorial. |
-| 61 | Dia ~7 | **B.2 — Recrutamento companion #1** | Player escolhe primeiro setting (mini-quest pré-recrutamento). | Mapa correspondente. |
-| 62 | Dia ~30-50 | **B.3 — Shō (承): Desenvolvimento (arcos companion 1-3)** | Três arcos completos. Knowledge cresce ~30%. Cidade visivelmente esfria. | Mapas dos 3 settings escolhidos. |
-| 63 | Dia ~60-90 | **B.4 — Foreshadow Dante dispara** | Após 3 arcos completos (~50% campanha). Patch-Zero Canal 3 encontro 1. | Mapa 6 + Mapa cross. |
-| 64 | Dia ~100-130 | **B.5 — Ten (転): Reviravolta (arcos companion 4-6)** | Três arcos restantes. Knowledge ~70%. Patch-Zero Canal 3 encontro 2. Catedral Menor de Atelaiá contaminada novamente; mestres pró-Sterling morrem. | Mapas restantes. |
-| 65 | Dia ~135 | **B.6 — Catalyst Dante (reveal traidor ato 3 entrada)** | Convergência companions. Dante reveal + mini-boss. Stats Gus degradados. | Mapa 6 (oficina Alencar — confronto). |
-| 66 | Dia ~140 | **B.7 — Ketsu (結): Conclusão Fase 1 climax (Rede Distribuída Sterling)** | Boss Sterling Fase 1. Patch-Zero Canal 3 encontro 3. | Mapa 1 (Cúpula Sterling). |
-| 67 | Dia ~145 | **B.8 — Ketsu Fase 2 + Selagem Patch-Zero** | Locke Core (climax). Selagem Patch-Zero (4 linguagens em sincronia). Ending Bronze/Prata/Ouro. | Mapas 1 + 8 (Núcleo Mandelbrot Interno). |
+| 60 | Dia 1 (1º setembro, mês do Compilador) | **B.1, Ki (起): Apresentação** | Gus solo no Núcleo Metropolitano. Catalyst: anomalia massiva detectada via Matriz Ortodôntica. Ato 1 começa. | Mapa 1 + manuscrito tutorial. |
+| 61 | Dia ~7 | **B.2, Recrutamento companion #1** | Player escolhe primeiro setting (mini-quest pré-recrutamento). | Mapa correspondente. |
+| 62 | Dia ~30-50 | **B.3, Shō (承): Desenvolvimento (arcos companion 1-3)** | Três arcos completos. Knowledge cresce ~30%. Cidade visivelmente esfria. | Mapas dos 3 settings escolhidos. |
+| 63 | Dia ~60-90 | **B.4, Foreshadow Dante dispara** | Após 3 arcos completos (~50% campanha). Patch-Zero Canal 3 encontro 1. | Mapa 6 + Mapa cross. |
+| 64 | Dia ~100-130 | **B.5, Ten (転): Reviravolta (arcos companion 4-6)** | Três arcos restantes. Knowledge ~70%. Patch-Zero Canal 3 encontro 2. Catedral Menor de Atelaiá contaminada novamente; mestres pró-Sterling morrem. | Mapas restantes. |
+| 65 | Dia ~135 | **B.6, Catalyst Dante (reveal traidor ato 3 entrada)** | Convergência companions. Dante reveal + mini-boss. Stats Gus degradados. | Mapa 6 (oficina Alencar, confronto). |
+| 66 | Dia ~140 | **B.7, Ketsu (結): Conclusão Fase 1 climax (Rede Distribuída Sterling)** | Boss Sterling Fase 1. Patch-Zero Canal 3 encontro 3. | Mapa 1 (Cúpula Sterling). |
+| 67 | Dia ~145 | **B.8, Ketsu Fase 2 + Selagem Patch-Zero** | Locke Core (climax). Selagem Patch-Zero (4 linguagens em sincronia). Ending Bronze/Prata/Ouro. | Mapas 1 + 8 (Núcleo Mandelbrot Interno). |
 
 ---
 
@@ -634,27 +634,27 @@ Cada wound canônico de companion = entry timeline + entry de ficha ([[entries-f
 - Doc 14 (comunicação interna Sterling Patch-Zero) ↔ entries 39, 49, 51, 57
 - Doc 15 (cripto-glifo Catedral-Mãe gate Ouro) ↔ entries 2, 6
 
-### Foreshadowing Bloco I (130 plants — referência completa em [[foreshadow-links]])
+### Foreshadowing Bloco I (130 plants; referência completa em [[foreshadow-links]])
 
 **Mapas com densidade alta de plants:**
 
 - **Mapa 1:** F-001, F-002, F-018, F-110 (≥4 plants principais)
-- **Mapa 6 (Periferia):** F-014, F-076, F-093, F-104 (≥4 plants — densidade máxima Dante traidor)
+- **Mapa 6 (Periferia):** F-014, F-076, F-093, F-104 (≥4 plants; densidade máxima Dante traidor)
 - **Mapa 3 (Catedrais):** F-022, F-067, doc 9 (≥3 plants)
 - **Mapa 8 (Selve Profunda):** F-029, F-099, F-118, docs 14/15 (≥4 plants)
-- **Mapa 9 (Macro):** F-099, F-119, F-128 (sticky-notes meta — escalation cross-cidade)
+- **Mapa 9 (Macro):** F-099, F-119, F-128 (sticky-notes meta; escalation cross-cidade)
 
 **Timeline com densidade alta de plants:**
 
 - Era 1 (entries 4, 5, 8): plants F-099 retroativo (Patch-Zero plural ancestral).
-- Era 2 (entry 23 — tratado Verônica Atelaiá): plant F-099 explicitado.
+- Era 2 (entry 23, tratado Verônica Atelaiá): plant F-099 explicitado.
 - Era 3 (entries 27-57): plants Sterling F-002, F-040, F-110; plants Dante F-014, F-076, F-093, F-104; plants Patch-Zero F-007, F-055, F-099, F-128.
 
 ---
 
 ## Notas de design
 
-- **Calendário herdado Era 2 é convenção operacional.** Gus não tenta reformar (prodígio respeita substrato — Pillar 2 aplicado a convenção social). Datas canônicas reforçam continuidade Era 2 → Era 3 mesmo sob captura corporativa Sterling.
+- **Calendário herdado Era 2 é convenção operacional.** Gus não tenta reformar (prodígio respeita substrato; Pillar 2 aplicado a convenção social). Datas canônicas reforçam continuidade Era 2 → Era 3 mesmo sob captura corporativa Sterling.
 - **Hiato (-700 a -150) é silêncio narrativo deliberado.** Não preencher entries inventando. "O esquecimento é parte do tema" ([[lore-bible]] §3). Gus margem: "o Hiato não tem entry. é o silêncio que define a forma do que veio depois."
 - **Causa exata da queda Neo-Sylvania não é revelada em nenhum ending.** Hipóteses, sim; certeza, não. Reforça "limite do conhecimento" ([[lore-bible]] §8).
 - **Datas de nascimento companions consistentes:** Bento 14, Cauã 13, Dante 13, Iara 12, Linda 12, Gus 11, Jaci 11. Ordem cronológica respeitada.
@@ -673,7 +673,7 @@ Cada wound canônico de companion = entry timeline + entry de ficha ([[entries-f
 - **Anotação Gus em primeira pessoa adulta.** Reprovado: 11 anos, tecnicismo + tic, não filosofia. Voz canônica preservada em margens.
 - **Cidades-irmãs "visitáveis" G1.** Reprovado: escopo G1 = não visitáveis. Mencionadas via Diário + terminais + Underground.
 - **Hiato Era 1 preenchido com lore inventada.** Reprovado: silêncio é deliberado.
-- **Em-dash horizontal narrativo.** Reprovado: hífen ou ponto-final (anti-pattern global CLAUDE.md raiz).
+- **Em-dash horizontal (`U+2014`) narrativo.** Reprovado: vírgula, parênteses, dois-pontos ou ponto-final (anti-pattern global CLAUDE.md raiz).
 - **Vocabulário fora canônico:** "runa", "Iolanda", "Kira", "Dimi", "Tao" (exceto Tao Berisi canônico), "Sindicato dos Ferro-Velhos". Glossário oficial: [[lore-bible]] §7.10.
 - **Romance entre crianças.** Reprovado (Pillar 4).
 - **Mapas inventando landmarks fora dos environments canônicos.** Reprovado: todos landmarks vêm de [[environments/_INDEX]]; cross-ref obrigatório.
