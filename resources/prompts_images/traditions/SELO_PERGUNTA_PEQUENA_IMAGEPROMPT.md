@@ -1,1 +1,5 @@
-{ 3D game asset of a Selo da Pergunta Pequena (Small Question Seal). Cyber-goth-punk aesthetic, somber and moody tones, Anime 3D style, cel-shaded, low-poly. A small, polished brass medal featuring a question mark integrated with a gear. Hanging on a thin cord. Clean isometric view, orthographic projection. Pure white background, cinematic somber lighting with high contrast --ar 1:1 --style raw --v 6.0 }
+# Small Question Seal (Selo da Pergunta Pequena) — image prompt (nano banana)
+
+A single commemorative medal shown flat and straight-on, filling the frame: an ironic prize awarded for the silliest honest question of the year. A round brass medallion with a raised decorative rim, the face stamped with a single bold question-mark glyph at its center surrounded by tiny engraved gear and dot ornaments; the brass is warm and slightly worn, hung from a short simple dark ribbon at the top. Humble, charming, a little tongue-in-cheek.
+
+Art style: cel-shaded anime 3D / stylized illustration, clean flat colors with soft cel shading, somber cyber-gothic mood warmed by burnished brass. Just the object, no character. Framing: the medal centered and filling the image, perfectly straight-on flat front view, on a plain solid pure-white (#FFFFFF) background, even neutral lighting.

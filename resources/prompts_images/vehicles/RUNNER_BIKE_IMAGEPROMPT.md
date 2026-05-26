@@ -1,1 +1,5 @@
-{ Isometric 3D game vehicle asset of an Underground Runner Bike. Cyber-goth-punk aesthetic, somber and moody tones, Anime 3D style, cel-shaded, low-poly. A light, high-speed motorcycle with an exposed engine, multiple glowing wires, and a large radio antenna at the back. Rusted but functional. Clean isometric view, orthographic projection. Pure white background, cinematic somber lighting with high contrast --ar 1:1 --style raw --v 6.0 }
+# Runner Bike (Underground Runner Bike) — image prompt (nano banana)
+
+A low-poly 3D motorcycle, three-quarter view, centered, the whole bike visible. A lean stripped-down underground street racer: low aggressive frame, fat knobbly rear tyre, exposed engine, patched-up bodywork in dark charcoal and gunmetal with worn crimson stripes and stencilled graffiti, a glowing cyan headlamp and thin cyan light-strips along the chassis. Fast, scrappy, rebellious courier machine of the underground scene.
+
+Art style: cel-shaded anime 3D, low-poly stylized, somber cyber-gothic. Three-quarter view, whole vehicle centered, plain pure-white (#FFFFFF) background, flat even lighting.

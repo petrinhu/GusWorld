@@ -1,1 +1,5 @@
-{ 3D game asset of a Café-de-neurônio (Neuron-Coffee). Cyber-goth-punk aesthetic, somber and moody tones, Anime 3D style, cel-shaded, low-poly. A steaming white porcelain cup with dark coffee inside. Sprinkled with cinnamon and ginger bits. Beside the cup is an infinite-shaped "Biscoito-de-loop". Clean isometric view, orthographic projection. Pure white background, cinematic somber lighting with high contrast --ar 1:1 --style raw --v 6.0 }
+# Neuron-Coffee (Café-de-neurônio) — image prompt (nano banana)
+
+A single stylized low-poly 3D drink item, a game-item icon: a steaming mug of strong spiced coffee, the working technician's anti-burnout brew. A chunky dented dark-metal mug with a thin burnished-brass rim and handle, filled with deep near-black coffee dusted with cinnamon and a thin grated-ginger fleck on top; a faint warm steam wisp rises, and the surface foam has a subtle branching pattern that hints at neurons. Warm, simple, bracing and well-used.
+
+Art style: cel-shaded anime 3D, low-poly stylized game asset, clean flat colors with soft cel shading, somber cyber-gothic mood with warm appetizing tones. Just the drink item, no character. Framing: the mug centered, three-quarter view, on a plain solid pure-white (#FFFFFF) background, flat even neutral studio lighting with no dramatic shadows (clean asset turnaround).

@@ -1,1 +1,5 @@
-{ 3D game asset detail of the Coluna Janor. Cyber-goth-punk aesthetic, somber and moody tones, Anime 3D style, cel-shaded, low-poly. A slender stone column with a smooth, polished white marble texture. Engraved with delicate rúnic patterns that glow softly in cyan. The top (capital) is elegant and curved. Clean isometric view, orthographic projection. Pure white background, cinematic somber lighting with high contrast --ar 1:1 --style raw --v 6.0 }
+# Coluna Janor (Janor Pillar) — image prompt (nano banana)
+
+A single low-poly 3D ceremonial temple pillar standing upright, three-quarter view, centered, the whole column from base to capital visible. The twin counterpart to its partner column, this one carved from pale weathered grey-stone with a fluted shaft and an ornate capital wreathed in stylized pomegranate and lily relief, fine engraved lines glowing faint crimson winding up the shaft to mirror its darker sibling. Solemn, vertical, authoritative. A free-standing architectural element, not a whole building.
+
+Art style: cel-shaded anime 3D, low-poly stylized, somber cyber-gothic. Three-quarter view, whole pillar centered, plain pure-white (#FFFFFF) background, flat even lighting.

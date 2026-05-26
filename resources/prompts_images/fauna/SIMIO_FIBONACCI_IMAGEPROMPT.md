@@ -1,1 +1,5 @@
-{ 3D game asset of a Símio-Fibonacci (Fibonacci Ape). Cyber-goth-punk aesthetic, somber and moody tones, Anime 3D style, cel-shaded, strict 1:1:1 chibi SD proportion. A small, intelligent-looking ape with fur markings that follow Fibonacci spirals. Sitting in a triangular defensive posture (3-4-5 triangle). Clean isometric view, orthographic projection. Pure white background, cinematic somber lighting with high contrast --ar 1:1 --style raw --v 6.0 }
+# Símio-Fibonacci (Fibonacci Ape) — image prompt (nano banana)
+
+A cute stylized low-poly 3D creature: a small chubby ape, plump rounded body, big round head with large round eyes, short arms and stubby legs, sitting hunched. Its long prehensile tail curls into a perfect logarithmic Fibonacci spiral, and the dark slate-grey fur of its chest and back is marked with the same spiral pattern repeating in faint glowing cyan, the swirls nested at golden-ratio proportions. Slightly eerie but adorable.
+
+Art style: cel-shaded anime 3D, low-poly stylized, somber cyber-gothic nature with subtle cyan glow. Natural cute animal proportions (chunky like a plush, NOT human chibi). Whole creature centered, three-quarter view, plain pure-white (#FFFFFF) background, flat even lighting.

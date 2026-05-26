@@ -1,1 +1,5 @@
-{ 3D game asset of the Girassol Sombrio (Dark Sunflower). Cyber-goth-punk aesthetic, somber and moody tones, Anime 3D style, cel-shaded, low-poly. A large sunflower with dark purple petals and a golden center. The seeds are organized in 21/34 Fibonacci spirals. Faint purple bioluminescence. Clean isometric view, orthographic projection. Pure white background, cinematic somber lighting with high contrast --ar 1:1 --style raw --v 6.0 }
+# Girassol Sombrio (Dark Sunflower) — image prompt (nano banana)
+
+A stylized low-poly 3D sunflower with natural plant proportions, single tall stem and one large head, the whole flower centered in frame. The dark seed head is its key feature: the seeds are packed in two interlocking sets of logarithmic spirals winding outward from the center, the precise Fibonacci spiral arrangement clearly visible, each seed a small faceted bead. Petals are deep-charcoal and dark crimson rather than bright yellow, drooping slightly, the stem dark green-grey with sparse leaves. Faint cyan light glints along the spiral seam lines of the seed head. Somber, beautiful, mathematically exact.
+
+Art style: cel-shaded anime 3D, low-poly stylized, somber cyber-gothic nature with subtle cyan glow. Natural sunflower proportions. Whole plant centered, plain pure-white (#FFFFFF) background, flat even lighting.

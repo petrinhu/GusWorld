@@ -1,1 +1,5 @@
-{ 3D game asset detail of the Coluna Boróstoma. Cyber-goth-punk aesthetic, somber and moody tones, Anime 3D style, cel-shaded, low-poly. A heavy stone column with a rough, unpolished texture. Engraved with ancient Asmódico rúnic symbols. The top (capital) is shaped like a giant mechanical gear. Clean isometric view, orthographic projection. Pure white background, cinematic somber lighting with high contrast --ar 1:1 --style raw --v 6.0 }
+# Coluna Boróstoma (Boróstoma Pillar) — image prompt (nano banana)
+
+A single low-poly 3D ceremonial temple pillar standing upright, three-quarter view, centered, the whole column from base to capital visible. One of a matched pair of guardian columns flanking a temple entrance, this one carved from dark polished basalt with a fluted shaft, an ornate capital wreathed in stylized pomegranate and lily relief, and a network of fine engraved lines glowing faint cyan winding up the shaft. Solemn, vertical, authoritative. A free-standing architectural element, not a whole building.
+
+Art style: cel-shaded anime 3D, low-poly stylized, somber cyber-gothic. Three-quarter view, whole pillar centered, plain pure-white (#FFFFFF) background, flat even lighting.

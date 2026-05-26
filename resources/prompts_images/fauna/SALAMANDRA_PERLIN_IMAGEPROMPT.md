@@ -1,1 +1,5 @@
-{ 3D game asset of a Salamandra-Perlin (Perlin Salamander). Cyber-goth-punk aesthetic, somber and moody tones, Anime 3D style, cel-shaded, low-poly. A lizard whose skin texture is a literal Perlin noise pattern in shades of blue and gray. The texture seems to shift slightly. Clean isometric view, orthographic projection. Pure white background, cinematic somber lighting with high contrast --ar 1:1 --style raw --v 6.0 }
+# Salamandra-Perlin (Perlin Salamander) — image prompt (nano banana)
+
+A cute stylized low-poly 3D creature: a small chubby salamander crawling on four short stubby legs, plump rounded body, broad soft head with big round eyes, stubby tail. Its smooth dark-teal skin is covered in organic mottled blotches like Perlin-noise, soft cloudy patches of deep blue and charcoal that blend smoothly into one another with no hard edges, the brighter patches glowing faint cyan. Damp and glistening, slightly eerie but adorable.
+
+Art style: cel-shaded anime 3D, low-poly stylized, somber cyber-gothic nature with subtle cyan glow. Natural cute animal proportions (chunky like a plush, NOT human chibi). Whole creature centered, three-quarter view, plain pure-white (#FFFFFF) background, flat even lighting.

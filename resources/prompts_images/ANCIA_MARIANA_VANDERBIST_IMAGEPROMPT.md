@@ -1,1 +1,6 @@
-{ Full body 3D game asset sprite of an 89-year-old woman named Anciã Mariana Vanderbist. Cyber-goth-punk aesthetic, somber and moody tones, Anime 3D style, cel-shaded, strict 1:1:1 chibi SD proportion. Very thin, deeply wrinkled skin, wise and calm expression. Wearing traditional Pelicano Branco layered green and earth-tone robes. Wearing a thick cord with exactly 89 knots around her neck, holding a seed-relic vial with a red wax seal. Clean isometric view, orthographic projection. Pure white background, cinematic somber lighting with high contrast --ar 1:1 --style raw --v 6.0 }
+{ [SUBJECT]: Full body view of a tiny Chibi SD an 89-year-old woman named Anciã Mariana Vanderbist.
+[STYLE_AND_MOOD]: Cyber-goth-punk aesthetic, somber and moody tones, Anime 3D style, cel-shaded, low-poly.
+[ANATOMY_SCALE]: Extreme Super Deformed (SD) style. Ultra-chibi 1:1:1 ratio: Big oversized head, tiny torso, short stubby legs. Head size is equal to body size. Three-head-height total. No realistic proportions. Small and cute proportions.
+[TECHNICAL_SPECS]: Max detail, high-fidelity 8k, subsurface scattering for organic textures, materials (polished dark obsidian, burnished brass, weathered dark leather, heavy structured Kevlar).
+[ENV_AND_LIGHTING]: Wide shot, full character visible from head to feet. Straight-on frontal view, character facing the camera directly, orthographic projection, Pure white background, cinematic somber lighting with deep shadows, sharp rim-lighting, light bloom, volumetric haze.
+[RENDER_PARAMS]: --ar 1:1 --style raw --v 6.0 }

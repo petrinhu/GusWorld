@@ -1,1 +1,5 @@
-{ 3D game asset VFX of a Ritual Recursivo (Recursive Ritual). Cyber-goth-punk aesthetic, somber and moody tones, Anime 3D style, cel-shaded. A circle of 12 small stone lamps lit in a Fibonacci sequence (1, 1, 2, 3, 5, 8). Long exposure light trails connecting the lamps in a glowing cyan spiral. Atmospheric smoke and shadows. Clean isometric view, orthographic projection. Pure white background, cinematic somber lighting with high contrast --ar 1:1 --style raw --v 6.0 }
+# Ritual Recursivo (Recursive Ritual) — image prompt (nano banana)
+
+A glowing visual effect floating in empty space: a recursive ritual circle of sacred geometry, concentric rings of runic sigils where each ring contains a smaller exact copy of the whole circle, repeating inward toward the center in self-similar fractal nesting, the same pattern echoing down to the tiniest scale. Interlocking triangles, fine radial lines, and Fibonacci spiral arms rotating around the core, drawn in glowing cyan light with faint crimson highlights, a soft volumetric haze. Mathematical, sacred, hypnotic.
+
+Art style: cel-shaded anime 3D, low-poly stylized, somber cyber-gothic with subtle cyan glow. Effect centered and glowing on a plain neutral near-black background, no object or scenery.

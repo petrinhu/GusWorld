@@ -1,1 +1,5 @@
-{ 3D game asset VFX of a C-Arcane Compilation. Cyber-goth-punk aesthetic, somber and moody tones, Anime 3D style, cel-shaded. Intense cyan holographic glow forming vertical streams of scrolling rúnic code around a central point. Glowing geometric particles. Clean isometric view, orthographic projection. Pure white background, cinematic somber lighting with high contrast --ar 1:1 --style raw --v 6.0 }
+# C-Arcane Compilation — image prompt (nano banana)
+
+A glowing visual effect floating in empty space: arcane runic source code compiling in mid-air, columns of cyan glyphs and angular runes scrolling and cascading downward like streaming terminal text, some lines locking solid and bright as they finish compiling while others flicker and dissolve, thin wireframe brackets and progress bars assembling around them, faint digital glitch artifacts and scan-lines. Magic rendered as low-level programming, cold cyan light with occasional crimson error-flashes.
+
+Art style: cel-shaded anime 3D, low-poly stylized, somber cyber-gothic with subtle cyan glow. Effect centered and glowing on a plain neutral near-black background, no object or scenery.

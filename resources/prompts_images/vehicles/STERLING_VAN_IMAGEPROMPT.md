@@ -1,1 +1,5 @@
-{ Isometric 3D game vehicle asset of a Sterling Acquisition Van. Cyber-goth-punk aesthetic, somber and moody tones, Anime 3D style, cel-shaded, low-poly. A sleek but menacing black van with polarized windows and the Sterling Sigma logo in silver. Small surveillance antennas on top. Clean isometric view, orthographic projection. Pure white background, cinematic somber lighting with high contrast --ar 1:1 --style raw --v 6.0 }
+# Sterling Van (Sterling Acquisition Van) — image prompt (nano banana)
+
+A low-poly 3D corporate van, three-quarter view, centered, the whole vehicle visible. A boxy armored utility van in brushed silver and dark gunmetal, blacked-out windows, sharp angular minimalist panels, reinforced bumpers, thin crimson accent lines and an embossed sigma logo on the side door, small crimson sensor lights along the roof. Sterile, corporate, vaguely menacing acquisition transport.
+
+Art style: cel-shaded anime 3D, low-poly stylized, somber cyber-gothic. Three-quarter view, whole vehicle centered, plain pure-white (#FFFFFF) background, flat even lighting.

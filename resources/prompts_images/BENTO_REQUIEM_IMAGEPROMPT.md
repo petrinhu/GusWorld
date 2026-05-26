@@ -1,0 +1,9 @@
+# Bento "Requiem" Chevalier — image prompt (nano banana)
+
+An extreme chibi super-deformed (SD) figurine of a sturdy 14-year-old boy knight, styled like a small collectible vinyl figure (Funko Pop / nendoroid). VERY IMPORTANT PROPORTIONS: the head is enormous, round and as large as the entire rest of the body; the whole character is only about three heads tall; tiny torso, very short stubby arms and legs. This is NOT a realistic human body — exaggerate the big-head, tiny-body cute chibi look. Even though he is a heavy "tank", keep him chibi: just a little chunkier and broader than the others, never tall or muscular-realistic.
+
+The character is a young cathedral guardian. His huge round head has a calm, reliable, stern boy's face with short dark hair. He wears heavy gothic plate armor of dark brushed steel decorated with ornate brass gear-and-cog filigree, with cream-and-amber ceremonial cloth showing at the joints (a warrior-monk of a gothic cathedral order). Big rounded pauldrons. In front of his body he holds a large round metal shield, and on the front face of that shield is a clearly engraved golden sprig of acacia (a small leafy acacia branch emblem). Solid, protective, warm presence.
+
+Art style: cel-shaded anime 3D, low-poly stylized game asset, clean flat colors with soft cel shading, somber cathedral-gothic mood with warm gold accents. Framing: full body from head to feet, centered, facing the camera straight-on, on a plain solid pure-white (#FFFFFF) background, flat even neutral studio lighting with no dramatic shadows (clean asset turnaround).
+
+REMINDER — keep the proportions extreme chibi: gigantic round head equal in size to the whole body, only three heads tall, tiny stubby limbs. Do not draw realistic or muscular adult proportions. Keep the acacia-branch emblem clearly visible on the front of the shield.
