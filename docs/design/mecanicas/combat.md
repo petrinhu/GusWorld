@@ -196,6 +196,7 @@ A sintaxe é apresentada na UI exatamente nesse formato (Pillar 2: gramática in
 | `StatusApplied` | `StatusEffect?` | status que a carta aplica (pode ser nulo) |
 | `Modifiers` | lista de `CardModifier` | modificadores anexados em runtime |
 | `Mastery` | int (0..N) | nível de mestria por uso (Pillar 1; cresce por uso, não por kill) |
+| `CritChance` | int (0..100) | porcentagem de crit (0 = sem crit). Visível na UI antes de confirmar a ação. |
 
 ---
 
@@ -276,12 +277,24 @@ Receita é casada por **assinatura exata** de família + base + modificador, nã
 
 ---
 
-## 11. Fórmula de dano (determinística)
+## 11. Fórmula de dano (canonizada 2026-05-26)
+
+Duas fórmulas distintas: **UseCard é divisiva** (Def reduz por fração, escala bem sem zerar), **ataque básico é subtrativo** (recurso simples sempre-disponível, 0 mana).
+
+### Fórmula UseCard (divisiva)
 
 ```
-danoFinal = round( (Power + Atk) × multFraqueza × multMod × multCombo − Def )
-clamp: danoFinal >= 1   // nunca zera por subtração de Def (a não ser multFraqueza == 0.0 → imune → 0)
+danoBase       = (Power + Atk) × (100 / (100 + Def)) × multFraqueza × multMod × multCombo
+varianceFactor = max(0.05, 0.30 × e^(-knowledgeKills × 0.10))
+rolled         = danoBase × rand(1 - varianceFactor, 1 + varianceFactor)
+danoFinal      = round( rolled × (isCrit ? 1.5 : 1.0) )
+isCrit         = rand(0..99) < card.CritChance
 ```
+
+- **Imune** (`multFraqueza == 0.0`): `danoFinal = 0`.
+- **Sem clamp mínimo**: a divisiva nunca chega a 0 contra não-imunes (frações muito pequenas podem arredondar pra 0, telegrafando "elemento errado / Def alta demais").
+- **Ordem**: base divisiva → variância Knowledge → crit → um único `round` no final.
+- RNG **injetável e seedável** (`CombatStateMachine(..., Random? rng = null)`; default `Random.Shared`, testes injetam semente fixa). Pillar 1/2: variância é transparente, não opaca.
 
 | Fator | Origem | Valores |
 |---|---|---|
@@ -290,17 +303,27 @@ clamp: danoFinal >= 1   // nunca zera por subtração de Def (a não ser multFra
 | `multFraqueza` | roda de fraqueza (§6) | 1.5 / 1.0 / 0.66 / 0.0 |
 | `multMod` | modificador aplicado | default 1.0; Stream pode distribuir; valores tabelados |
 | `multCombo` | receita de combo (§10) | default 1.0; >1.0 em combo casado |
-| `Def` | atributo do defensor | stat (reduzido por Break/Corrode) |
+| `Def` | atributo do defensor | divisor `100/(100+Def)`; reduzido por Break/Corrode |
+| `knowledgeKills` | `CombatActor.KnowledgeKills` (SaveSystem) | kills do mesmo tipo de inimigo; alimenta o decaimento de variância |
+| `card.CritChance` | carta | 0..100 (%) ; 0 = sem crit |
 
-Caso `multFraqueza == 0.0` (imune): `danoFinal = 0` (a regra de clamp mínimo 1 NÃO se aplica a imunidade; imunidade é zero genuíno e telegrafa "elemento errado" ao jogador).
+**Variância Knowledge Decay**: 1º encontro (`kills=0`) → ±30%; conforme o player farma o mesmo tipo, decai exponencialmente até o piso ±5% (`kills` altos). Contra inimigos muito farmados o dano fica quase determinístico (Knowledge Progression: conhecer o inimigo remove a incerteza).
 
-### RNG visível decaindo (opção B)
+### Fórmula ataque básico (subtrativa)
 
-- Hit / crit têm **porcentagem mostrada** ao jogador antes de confirmar a ação (transparência total, Pillar 1).
-- RNG é **seedável** e usa **ruído coerente** (Perlin/Simplex), nunca opaco (Pillar 2: o jogador, via Óculos, "vê o noise underlying").
-- Gambito pode **forçar re-roll** ou **cancelar** um resultado de RNG (Pillar 1).
-- A variância **decai com Knowledge** (Knowledge Progression): contra inimigos farmados, variância tende a 0 (RNG zerado pra esse inimigo).
-- **No vertical slice F2-E.5: entregar determinístico (variância 0)** com o gancho Knowledge plugado na interface, mas sem a curva de decaimento ativa. Hit/crit % aparece na UI sempre mostrando o valor determinístico (ex: 100% hit no slice).
+```
+danoFinal = clamp(Atk - Def, 1)
+```
+
+Sem variância, sem crit, sem fraqueza de família. Recurso de 0 mana sempre disponível.
+
+### XP pós-batalha (differential por zona)
+
+```
+xp = base_xp × max(0, 1 - (player_zone - enemy_zone) × 0.15)
+```
+
+Penaliza farmar inimigos de zonas muito abaixo da do player (anti-grind degenerado). Implementado em `game/` ao integrar `PlayerBus.CombatResultReceived` (F2-G.8) — **não** vive no POCO de combate do engine.
 
 ---
 
@@ -424,7 +447,7 @@ Subconjunto mínimo implementável via TDD. Tudo abaixo é entregável no slice;
 
 ### Fora do slice (jogo posterior, interface já plugada)
 
-- Curva de decaimento de variância por Knowledge (no slice é variância 0 / determinístico, gancho plugado).
+- Alimentação real de `KnowledgeKills` pelo SaveSystem (curva de decaimento de variância já implementada no engine; no slice o valor vem fixo até a integração de persistência).
 - `UtilityBrain` e camada de ruído de mini-boss.
 - Tabela completa de ~200 combos (slice usa 1-2 mockups; formato §10 já definido).
 - Upgrades de Scan/Gambito (multi-turno, buffs/posição).
@@ -463,7 +486,8 @@ public readonly record struct Card(
     TargetShape TargetShape,
     StatusEffect? StatusApplied,
     IReadOnlyList<CardModifier> Modifiers,
-    int Mastery                  // cresce por uso
+    int Mastery,                 // cresce por uso
+    int CritChance = 0           // 0..100 (%); 0 = sem crit
 );
 
 public readonly record struct ComboRecipe(
@@ -496,9 +520,13 @@ public interface IEnemyBrain {
     EnemyAction   DecideAction(CombatState state);
 }
 
-// Fórmula de dano (referência de implementação):
-// danoFinal = Math.Max(1, (int)Math.Round((Power + Atk) * multFraqueza * multMod * multCombo - Def));
-// caso multFraqueza == 0.0f => danoFinal = 0 (imunidade ignora o clamp mínimo).
+// Fórmula de dano UseCard (divisiva, canon 2026-05-26 — ver §11 pra detalhamento):
+//   baseDamage = (Power + Atk) * (100f / (100f + Def)) * multFraqueza * multMod * multCombo;
+//   v          = MathF.Max(0.05f, 0.30f * MathF.Exp(-knowledgeKills * 0.10f));
+//   rolled     = baseDamage * (1 + (v * 2 * rng.NextDouble() - v));
+//   if (CritChance > 0 && rng.Next(100) < CritChance) rolled *= 1.5f;
+//   danoFinal  = multFraqueza == 0f ? 0 : (int)MathF.Round(rolled);  // sem clamp mínimo
+// Ataque básico (subtrativo): danoFinal = Math.Max(1, Atk - Def);   // sem variância/crit/fraqueza
 ```
 
 ### Roda de fraqueza (tabela de dados para teste)
