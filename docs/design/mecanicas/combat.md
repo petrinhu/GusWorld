@@ -310,7 +310,7 @@ Duas fórmulas distintas: **UseCard é divisiva** (Def reduz por fração, escal
 
 ```
 multExpose     = alvoTemExpose ? (1 + Expose.Magnitude / 100) : 1.0
-danoBase       = (Power + Atk) × (100 / (100 + Def)) × multFraqueza × multMod × multCombo × multExpose
+danoBase       = (Power + Atk) × (100 / (100 + Def)) × multFraqueza × multMod × multCombo × multExpose × multAmbiente
 varianceFactor = max(0.05, 0.30 × e^(-knowledgeKills × 0.10))
 rolled         = danoBase × rand(1 - varianceFactor, 1 + varianceFactor)
 danoFinal      = round( rolled × (isCrit ? 1.5 : 1.0) )
@@ -319,9 +319,12 @@ isCrit         = rand(0..99) < card.CritChance
 
 - **Imune** (`multFraqueza == 0.0`): `danoFinal = 0`.
 - **Sem clamp mínimo**: a divisiva nunca chega a 0 contra não-imunes (frações muito pequenas podem arredondar pra 0, telegrafando "elemento errado / Def alta demais").
-- **`multExpose`** (§9, canon 2026-05-26): último fator da cadeia divisiva, ANTES da variância/crit. Só UseCard; o ataque básico não usa. Sem Expose no alvo = 1.0.
-- **Ordem**: base divisiva (incl. `multExpose`) → variância Knowledge → crit → um único `round` no final.
+- **`multExpose`** (§9, canon 2026-05-26): penúltimo fator da cadeia divisiva, ANTES da variância/crit. Só UseCard; o ataque básico não usa. Sem Expose no alvo = 1.0.
+- **`multAmbiente`** (§18, canon 2026-05-26): último fator da cadeia divisiva. Produto dos multiplicadores das camadas ambientais ATIVAS (terreno + clima + período) que afetam a família da carta jogada. Default 1.0 (encontro sem ambiente marcado). Faixa por camada 0.66 a 1.5. **NUNCA toca `multFraqueza`** (a roda de fraqueza é fator independente; ambiente nunca altera a relação de fraqueza). Só UseCard; o ataque básico subtrativo não usa.
+- **Ordem**: base divisiva (incl. `multExpose` e `multAmbiente`) → variância Knowledge → crit → um único `round` no final.
 - RNG **injetável e seedável** (`CombatStateMachine(..., Random? rng = null)`; default `Random.Shared`, testes injetam semente fixa). Pillar 1/2: variância é transparente, não opaca.
+
+**Stacking das 3 camadas ambientais** (terreno + clima + período, canonizado 2026-05-26): os multiplicadores das camadas ativas que afetam a mesma família **se multiplicam** entre si, com **cap final `multAmbiente ∈ [0.44, 2.25]`** (mesmo teto que o sistema já permite via 1.5 × 1.5 = 2.25 e piso via 0.66 × 0.66 ≈ 0.44). A curadoria de transições (§18.6) impede por design que 2 fontes ×1.5 da MESMA família coexistam (nunca atingir 2.25 organicamente fora de janela curta); o cap é a trava de segurança numérica.
 
 | Fator | Origem | Valores |
 |---|---|---|
@@ -331,6 +334,7 @@ isCrit         = rand(0..99) < card.CritChance
 | `multMod` | modificador aplicado | default 1.0; Stream pode distribuir; valores tabelados |
 | `multCombo` | receita de combo (§10) | default 1.0; >1.0 em combo casado |
 | `multExpose` | status Expose no alvo (§9) | default 1.0; `1 + Expose.Magnitude/100` se Expose presente; só UseCard |
+| `multAmbiente` | camadas ambientais ativas (§18) | default 1.0; produto das camadas (terreno+clima+período) por família; só UseCard; nunca toca `multFraqueza`; cap proposto [0.44, 2.25] |
 | `Def` | atributo do defensor | divisor `100/(100+Def)`; reduzido por Break/Corrode |
 | `knowledgeKills` | `CombatActor.KnowledgeKills` (SaveSystem) | kills do mesmo tipo de inimigo; alimenta o decaimento de variância |
 | `card.CritChance` | carta | 0..100 (%) ; 0 = sem crit |
@@ -487,6 +491,7 @@ Subconjunto mínimo implementável via TDD. Tudo abaixo é entregável no slice;
 12. **`ScriptedBrain`** + interface `IEnemyBrain` com `IntentPreview` (telegraph determinístico).
 13. **Flee stub**: 1 AP, threshold de SPD determinístico; bloqueado se flag boss/mini-boss.
 14. **Integração `CombatBus` + `PlayerBus`**: emitir eventos da §16; PlayerBus mock recebe `CombatEnded`.
+15. **Subsistema de ambientes de combate (§18)**: o slice inclui o **catálogo completo** (decisão do criador: "todos os ~15" terrenos + 8 climas + 4 períodos como dados). `multAmbiente` default 1.0 mantém **retrocompatibilidade** (encontros sem ambiente marcado funcionam exatamente igual). Implementação no slice: record `EnvironmentModifier` no engine POCO (§16); **aplicação estática por arena** (level-designer marca o terreno/clima/período inicial do encontro); verb **Scan-ambiente** (1 AP) para revelar tier Codex. **Cartas-clima e inimigos que invocam ambiente = fase posterior** (os dados já são preparados para isso).
 
 ### Fora do slice (jogo posterior, interface já plugada)
 
@@ -586,4 +591,169 @@ public interface IEnemyBrain {
 
 ---
 
-**Última revisão:** 2026-05-26. Status: canônico, pronto para implementação TDD F2-E.5. Próxima revisão prevista: após primeiro playtest do encontro do vertical slice (validar tensão do mana ramp, legibilidade da fila, sensação do Gambito).
+## 18. Sistema de Ambientes de Combate (terreno + clima + período)
+
+Camada de ambiente que materializa o setting bipartido (Pillar 5: cidade ciber-gótica × Selve Sombria) e a natureza-matemática (Pillar 2) dentro da arena de combate. O ambiente nunca substitui a leitura de sistema (Scan/Gambito): ele **adiciona uma dimensão de decisão posicional e temporal** que o jogador lê via hardware e responde via escolha de família. Toda regra abaixo respeita os anti-pillars: sem RNG punitivo, sem hardware inútil, sem teto cognitivo estourado.
+
+### 18.1 Arquitetura
+
+Três **camadas simultâneas**, cada uma com sabor e ritmo próprios:
+
+| Camada | Persistência | Quem define |
+|---|---|---|
+| **Terreno** | fixo por encontro | level-designer marca a arena |
+| **Clima** | transitório, muda a cada N turnos | curadoria de transições (§18.6) ou cartas/inimigos (fase posterior) |
+| **Período** | roda temporal de 4 fases (ciclo automático) | motor de ciclo (Selve natural / cidade = grade elétrica) |
+
+Efeito mecânico de cada ambiente (qualquer camada) age por até quatro canais:
+
+1. **`multAmbiente` por família** (faixa 0.66 a 1.5), entra na fórmula §11 como fator separado, **nunca na roda de fraqueza**.
+2. **Facilita um status do enum existente** (§9: Stun / Poison / Corrode / Disrupt / Silence / Knockback / Break / Expose / Decrypt / Shield / Regen / Haste / Slow). **Nenhum status novo é criado.** "Root" mencionado neste documento = `Slow` de magnitude extrema (não é status novo).
+3. **Efeitos em fila / SPD** (deltas via `ReorderActor` e Haste/Slow).
+4. **Interação com hardware** (triângulo Pillar 3: Óculos/Scan, Matriz Ortodôntica, Tavus-Drive).
+
+Princípios não negociáveis desta camada:
+
+- **Dados no engine POCO**: record `EnvironmentModifier` (NÃO Resource Godot; mantém o engine puro, §16). Aplicação estática por arena no slice; cartas/inimigos que invocam ambiente = fase posterior (os dados já são preparados para isso).
+- **Telegraph obrigatório (Pillar 4)**: toda mudança de clima ou período é avisada N turnos antes na fila, com ícone persistente; Scan revela o número exato de turnos restantes. Nunca RNG punitivo.
+- **Cap anti-Scan (Pillar 3)**: degradações de custo de Scan **não empilham além de -2 AP total** num mesmo encontro. A curadoria (§18.6) impede 2 ambientes anti-Scan fortes simultâneos. Hardware nunca vira inútil.
+- **Teto cognitivo**: no máximo ~12 terrenos visíveis. O tier **Codex** (efeitos sutis) só **ativa/revela após Scan-ambiente** (novo verb: Scan aplicado ao campo, custo 1 AP).
+- **Separação da fórmula**: `multAmbiente` é fator próprio na cadeia divisiva (§11), nunca altera `multFraqueza`.
+- **Mutabilidade = interações curadas**: tabela fechada determinística (§18.6). Sem RNG nas transições.
+
+### 18.2 Camada CLIMA (8, transitória)
+
+Muda a cada N turnos, sempre telegrafada. Cada clima favorece uma família e prejudica outra, facilita um status e pode mexer no hardware/fila.
+
+| Clima | Família ↑ | Família ↓ | Status facilitado | Hardware / fila |
+|---|---|---|---|---|
+| **Neblina** | Sônico ×1.3 | Criptográfico ×0.66 | Disrupt +1 mag | Scan +1 AP; Prever só 1 turno à frente |
+| **Chuva** | Elétrico ×1.5 | Bioquímico ×0.66 | Stun +1 dur | — |
+| **Calor** | Bioquímico ×1.3 | Elétrico ×0.66 | Corrode +1 dur | overheat: 3+ cartas seguidas do mesmo ator → auto-Disrupt nele |
+| **Tempestade Elétrica** | Elétrico ×1.5 | Criptográfico ×0.66 | Stun +1 dur | Scan +1 AP mas Prever +1 turno; raio a cada 3 turnos aplica Slow -1 ao ator mais lento da fila |
+| **Vento** | Sônico ×1.3 | Bioquímico ×0.66 | Knockback +1 fila | Prever +1; Object Cinético ×0.85; party SPD +1 |
+| **Estática / Interferência** | Criptográfico ×1.5 | Sônico ×0.66 | Decrypt / Expose / Silence +1 dur | Scan -1 dado de info; Null custa 0 AP |
+| **Fumaça / Cinzas** | Bioquímico ×1.3 | Criptográfico ×0.66 | Poison / Corrode +1 dur; DoT +1 tick | Scan +1 AP; Prever -1 alcance |
+| **Escuridão Total** | Sônico ×1.5 | Criptográfico ×0.85 | Disrupt +1 dur | Scan +2 AP (única fonte de info); Iara vê no escuro; inimigos sem visão Slow -1 |
+
+### 18.3 Camada PERÍODO (roda de 4 fases)
+
+Ciclo temporal automático: **Dia (5) → Crepúsculo (2) → Noite (5) → Aurora (2) → Dia**, em turnos. As fases curtas (Crepúsculo/Aurora) funcionam como telegraph de graça da transição que se aproxima.
+
+| Fase | Família ↑ | Família ↓ | Status | Hardware / fila | Duração |
+|---|---|---|---|---|---|
+| **Dia** | Bioquímico ×1.3 | Criptográfico ×0.85 | Regen +1 dur (party) | Scan grátis | 5 |
+| **Crepúsculo** | (transição, neutro) | — | Disrupt +1 mag | Scan revela +1 dado | 2 |
+| **Noite** | Criptográfico ×1.5 + Sônico ×1.3 | Bioquímico ×0.85 | Decrypt / Expose +1 dur | Scan +1 AP; Iara: 1ª carta Cripto por turno ignora telegraph; inimigos diurnos Slow -1 | 5 |
+| **Aurora** | Elétrico ×1.3 | — | Haste +1 dur (party) | Scan normaliza; Prever +1; party SPD +1 | 2 |
+
+- **Selve Sombria**: ciclo natural automático (dia/noite reais).
+- **Cidade ciber-gótica**: o eixo vira "ciclo da grade elétrica" (Surto ↔ Blackout) usando o **mesmo motor**, só muda o sabor (Pillar 5: contraste deliberado de setting com sistema unificado por baixo).
+- Crepúsculo e Aurora curtos = janelas-ponte que telegrafam a próxima fase forte sem custo de Scan.
+
+### 18.4 Camada TERRENO — Tier VISÍVEL (12, fixo por encontro)
+
+Lido a olho nu (sem Scan), até ~12 visíveis simultâneos (teto cognitivo). Cada um declara família ↑ / ↓, status facilitado e efeitos de fila/hardware.
+
+**Existentes (7):**
+
+- **Lamacento**: Elétrico ×1.3 / Cinético ×0.66 (deslocamento dificultado); Knockback no alvo → +2 na fila (em vez de +1); Slow -2 todos (-3 para Cinético).
+- **Seco**: Cinético ×1.3 / Elétrico ×0.66; DoT (Poison/Corrode) -1 dur; Break +1 dur.
+- **Vinhas**: Bioquímico ×1.3 (Object +1 dur) / Cinético ×0.85; aplica Root (Slow de magnitude extrema); Knockback anulado em alvo enraizado; Scan revela crescimento Fibonacci.
+- **Gelo**: Cinético ×1.3 / Bioquímico ×0.66; Break +1 dur; Slow -1; SPD -1 todos; Tavus-Drive +1 mana na 1ª carta do turno.
+- **Água / Alagado**: Elétrico ×1.3 / Cinético ×0.85; Stun +1 dur; SPD -1 todos; alvo dentro da água que leva dano Elétrico → Disrupt grátis.
+- **Metal-Condutor**: Elétrico ×1.3 / Sônico ×0.66; Corrode +1 dur; Knockback ricocheteia +1 fila adicional; Scan grátis + revela 1 dado extra (Matriz Ortodôntica amplificada).
+- **Bioluminescência (SÓ SELVE)**: Sônico ×1.3 / Elétrico ×0.85; Regen / Haste +1 dur; Scan grátis + Prever +1; pulso luminoso em sequência 1-1-2-3-5.
+
+**Novos (5):**
+
+- **T1 Pavimento Tesselado** (cidade forte; variante na Selve): Criptográfico ×1.3 / Sônico ×0.66. **DUAL por rodada completa de fila**, sincronizado a `turnoIndex`: rodada **ÍMPAR = Branco (lapidado)** → +1 dado de Scan grátis a quem scaneia; rodada **PAR = Preto (bruto)** → a 1ª carta Cripto da rodada aplica Expose magnitude 13 grátis no alvo. Telegraph: o quadriculado pulsa branco/preto conforme a rodada. (Easter egg maçônico canon: ashlar bruto/polido; "13" Fibonacci.)
+- **T2 Talude Instável**: Cinético ×1.5 / Criptográfico ×0.66. Pune o INATIVO: ator que não agiu ofensivamente na rodada anterior entra com Slow magnitude 2; ator que gastou ≥2 AP ofensivo na rodada anterior fica imune. Premia agressão, pune turtle. Telegraph: o chão racha sob o ator inativo 1 turno antes. Mexe a fila por comportamento (via Slow).
+- **T4 Ashlar Bruto**: Cinético ×1.3 / Elétrico ×0.66. Usar **Defender** aqui → pool de Shield ×1.5 (Magnitude = Def × 1.5). Premia turtle (espelho do T2). Não dá Shield de graça (exige gastar AP em Defender). Transição de **PROGRESSÃO** (entre encontros): arena vencida "lapida" o Ashlar Bruto → vira **T1 Pavimento Tesselado** (bruto → polido = ofício maçônico canon).
+- **T5 Solo Fértil Recursivo (SÓ SELVE)**: Bioquímico ×1.5 / Cinético ×0.66. Entidades Object plantadas aqui ganham +1 Duration e escalam o efeito por rodada na sequência 1,1,2,3,5 (ex: um totem de Poison aplica magnitude 1,1,2,3,5 ao longo das rodadas). Facilita Poison / Regen / Root. Scan revela o estágio do L-system. (Fibonacci canon.)
+- **T6 Anomalia Perlin** (Selve profunda + cidade no ato 3): NENHUMA família ↑; Criptográfico ×0.66. Degrada hardware: Gambito-Prever sempre retorna ruído (`IsChaotic` global) + Scan retorna perfil parcial (revela HP, mas exige 2 scans para a fraqueza). **NÃO mexe no dano** (`multAmbiente` geral = 1.0). Telegraph forte: glitch visual no canal-4 (Perlin quebrado, gradiente cyan → vermelho a 21 lúmens). Vetor anti-padrão Patch-Zero canon.
+
+### 18.5 Camada TERRENO — Tier CODEX (3, efeito ativa/revela só após Scan-ambiente 1 AP)
+
+Efeitos sutis, deliberadamente fora do teto cognitivo "a olho nu". Só ativam e se revelam após o verb **Scan-ambiente** (1 AP) ser usado no campo.
+
+- **T3 Espelho Ressonante**: Sônico ×1.5 / Bioquímico ×0.66. Cartas com `TargetShape` Grupo/Linha ricocheteiam um 2º tick a 0.5× no alvo de maior HP. **SIMÉTRICO**: AoE inimiga também ricocheteia neles (premia ler intent via Gambito antes de aglomerar a party). Facilita Disrupt.
+- **T7 Duto Condutor Pressurizado (SÓ CIDADE)**: Elétrico ×1.3 / Bioquímico ×0.66. Se um ator usa Elétrico E outro usa Sônico na MESMA rodada → "Ressonância de Duto": +1 Disrupt em todos os inimigos (materializa a sinergia canon Cauã + Linda). Facilita Disrupt / Stun.
+- **T8 Elevação Dominante**: Cinético ×1.3 / Sônico ×0.66. O 1º ator da party a agir na rodada (topo da fila) ganha Haste magnitude 1 até o fim da rodada + revela o intent de +1 inimigo grátis. Premia SPD / Gambito-reordenar. Efeito por **posição-de-FILA** (não por posição de grid).
+
+### 18.6 Mutabilidade — interações curadas (tabela fechada determinística)
+
+Transições de ambiente são **DETERMINÍSTICAS** (não RNG), só avançam/transformam de forma legível, nunca pulam estados. Tabela fechada de interações canonizadas:
+
+| Gatilho | Resultado |
+|---|---|
+| Elétrico forte OU Calor sobre **Lamacento** | seca → vira **Seco** |
+| Elétrico forte OU Calor sobre **Vinhas** | queima → vira **Seco** |
+| Elétrico forte OU Calor sobre **Gelo** | derrete → vira **Água / Alagado** |
+| Sônico forte sobre **Neblina / Fumaça / Estática** | dissipa → ar limpo |
+| **Vento** sobre Neblina / Fumaça / Cinzas | dissipa → ar limpo |
+| **Chuva + Calor** | gera **Vapor** (Neblina + calor leve) |
+| **Chuva + Vinhas** | vinhas crescem mais rápido (avança estágio) |
+| **Chuva + Elétrico ambiente** | escala para **Tempestade Elétrica** |
+| **Calor** em **T5 Solo Fértil** | Object pula para o estágio 3 da sequência |
+| **Gelo** em **T5 Solo Fértil** | congela o crescimento (trava estágio) |
+| **Água** sobre **Metal-Condutor** | "condução total": Elétrico ×1.5 por 2 turnos |
+| **Acaceiro saudável** próximo (estado de arena) | "Anomalia Contida": **T6** Scan volta a funcionar (vetor de purificação canon) |
+| **T4 Ashlar Bruto** vencido (entre encontros) | lapida → vira **T1 Pavimento Tesselado** (progressão) |
+
+Regras gerais: as transições são curadas e determinísticas; só avançam ou transformam de modo legível para o jogador; nunca pulam estados intermediários.
+
+### 18.7 Mapa família → ambiente-casa (balance)
+
+Cada família tem 2-3 casas (↑) e 2-3 hostis (↓): nenhuma família é sempre-ótima (anti-degeneração preservado, alinhado à roda fechada §6).
+
+| Família | Casas (↑) | Hostis (↓) | Pico |
+|---|---|---|---|
+| **Elétrico** | Chuva, Tempestade, Água, Metal-Condutor, T7 Duto, Aurora | Seco, Calor, T4 Ashlar | 1.5 |
+| **Cinético** | Seco, Gelo, T2 Talude, T4 Ashlar, T8 Elevação | Lamacento, Vinhas, Água, T5 Solo | 1.5 (T2) |
+| **Criptográfico** | Noite, Estática, T1 Tesselado | Neblina, Tempestade, Fumaça, T2, T6 | 1.3 (sem pico de dano, por design: ganha informação, não dano bruto) |
+| **Sônico** | Escuridão, Vento, Bioluminescência, T3 Espelho, Noite (2ª) | Estática, Metal-Condutor, T1, T8 | 1.5 |
+| **Bioquímico** | Calor, Fumaça, Vinhas, T5 Solo, Dia | Chuva, Gelo, Água, Vento, T3, T7 | 1.5 (T5) |
+
+Nota de balance: **Criptográfico é a única família deliberadamente sem pico de dano ×1.5**, compensada por ganhos informacionais (Scan grátis, dados extras, Expose grátis no T1). Reforça a identidade da família (utilidade/anti-buff, §6) e impede que ambiente vire mero amplificador de burst.
+
+### 18.8 Eixos-espelho (legibilidade de opostos)
+
+Pares opostos legíveis que ajudam o jogador a ler o sistema por simetria (Pillar 1: o sistema é decifrável porque é coerente):
+
+| Eixo | Par |
+|---|---|
+| Umidade do solo | Lamacento ↔ Seco |
+| Precipitação | Chuva ↔ Calor |
+| Temperatura | Gelo ↔ Calor |
+| Solo seco | Água ↔ Seco |
+| Esconde ↔ revela info | Neblina ↔ Vento |
+| Sinal ↔ limpa | Estática ↔ Vento |
+| Luz | Dia ↔ Noite |
+| Selve ↔ cidade | Bioluminescência ↔ Escuridão |
+| Grade da cidade | Tempestade ↔ Blackout |
+| Pune-parado ↔ premia-parado | T2 Talude ↔ T4 Ashlar |
+| Maçônico (bruto ↔ polido) | T1 Tesselado polido ↔ T4 Ashlar bruto |
+
+Vinhas / T5 Solo Fértil = eixo de **tempo / recursão** (Fibonacci), ainda sem espelho pleno declarado.
+
+### 18.9 Easter eggs (densidade ~10-15%, sutil)
+
+Aplicam os dois sistemas canon (sem siglas, sem ritual nomeado):
+
+- **Fibonacci**: durações de período 5/2/5/2; crescimento de T5 em 1,1,2,3,5; pulso de Bioluminescência 1-1-2-3-5; Expose magnitude 13 no T1; raio de Tempestade a cada 3 turnos; T6 a 21 lúmens.
+- **Maçonaria**: T1 Pavimento Tesselado (ashlar polido preto/branco), T4 Ashlar Bruto, transição bruto → polido. Sem siglas nem ritual nomeado.
+
+### 18.10 Escopo de implementação (slice)
+
+- Record **`EnvironmentModifier`** no engine POCO: família-mults, status facilitado, deltas de fila/SPD, hooks de hardware, tipo de camada (terreno/clima/período), tier (visível/codex).
+- **`multAmbiente`** plugado na fórmula §11 (default 1.0 = retrocompatível).
+- Evento **`CombatBus.EnvironmentSet(envId)`** e evento de mudança de camada (clima/período avançou).
+- Verb **Scan-ambiente** (1 AP) para revelar o tier Codex.
+- **Aplicação estática por arena**: level-designer marca o ambiente inicial do encontro. **Cartas-clima e inimigos que invocam ambiente = fase posterior** (dados já preparados).
+
+A regra de STACKING das 3 camadas e seu cap final (`multAmbiente ∈ [0.44, 2.25]`) está canonizada em §11.
+
+---
+
+**Última revisão:** 2026-05-26. Adicionada **§18 (Sistema de Ambientes de Combate — terreno + clima + período)**; atualizada a fórmula §11 com o fator `multAmbiente` (incl. regra de stacking das 3 camadas canonizada); ampliado o escopo do slice §17 (item 15, catálogo completo de ambientes com `multAmbiente` default 1.0 retrocompatível). Status: canônico, pronto para implementação TDD F2-E.5. Próxima revisão prevista: após primeiro playtest do encontro do vertical slice (validar tensão do mana ramp, legibilidade da fila, sensação do Gambito, e legibilidade/telegraph do sistema de ambientes).
