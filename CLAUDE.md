@@ -149,7 +149,7 @@ Nada de inventar comandos antes de existirem. Atualizar esta seção quando prim
 Projeto de **jogo** — usar `proj_jogo` (não `proj_software`). Agentes relevantes:
 
 - **Fase 1 (concluída):** `lead-game-designer`, `narrative-designer`, `art-director`, `software-architect`
-- **Fase 2 (próxima):** `engine-graphics-programmer` (orbital camera, shaders), `level-designer` (blockout), `game-animator` (locomotion + combat anims), `3d-artist-rigger` (chars + props low-poly), `audio-designer-composer` (música adaptive + SFX)
+- **Fase 2 (próxima):** `gameplay_engineer` (mecânicas de gameplay puro: combate, exploração, progressão, inventário, IA, loot, status — consome POCO do `backend-engineer`, NÃO cria domínio/persistência), `backend-engineer` (POCO de domínio, persistência, serialização, repositórios, serviços centrais), `engine-graphics-programmer` (orbital camera, shaders), `level-designer` (blockout), `game-animator` (locomotion + combat anims), `3d-artist-rigger` (chars + props low-poly), `audio-designer-composer` (música adaptive + SFX)
 - **Fase 4 (QA/compliance):** `qa-engineer` (playtest plan), `compliance-legal` (age rating IARC/ESRB/PEGI), `accessibility-specialist` (controles remappáveis, color)
 - **Fase 5 (release):** `devops-sre` (Forgejo Actions build), `i18n-l10n-specialist` (se localizar v1.x)
 
