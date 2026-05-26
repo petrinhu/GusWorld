@@ -43,6 +43,10 @@ public partial class CombatManager : Node
     // Ponteiro no log da FSM: a partir de onde ainda não emitimos ActionResolved.
     private int _lastLogIndex;
 
+    // Ponteiro no buffer de mudanças de status da FSM: a partir de onde ainda não
+    // emitimos StatusApplied/StatusExpired (§16). Mesmo padrão do _lastLogIndex.
+    private int _lastStatusChangeIndex;
+
     private IReadOnlyDictionary<string, Card> _cardRegistry = new Dictionary<string, Card>();
     private IReadOnlyDictionary<string, IEnemyBrain> _brainRegistry = new Dictionary<string, IEnemyBrain>();
 
@@ -73,6 +77,7 @@ public partial class CombatManager : Node
         _actors.AddRange(actors);
         _reportedDown.Clear();
         _lastLogIndex = 0;
+        _lastStatusChangeIndex = 0;
 
         _cardRegistry = cardRegistry ?? new Dictionary<string, Card>();
         _brainRegistry = brainRegistry ?? new Dictionary<string, IEnemyBrain>();
@@ -168,6 +173,7 @@ public partial class CombatManager : Node
         }
 
         EmitRecentLogSignals();
+        EmitRecentStatusChanges();
         EmitDownedSignals();
 
         Phase = CombatPhase.TurnEnd;
@@ -212,6 +218,39 @@ public partial class CombatManager : Node
                 entry.Value);
         }
         _lastLogIndex = log.Count;
+    }
+
+    /// <summary>
+    /// Traduz cada nova mudança de status do buffer da FSM (§16) em CombatBus.StatusApplied /
+    /// StatusExpired. Mapeia StatusId enum -> string via ToString() (mesma convenção dos
+    /// demais signals). Absorbed não tem signal próprio no contrato atual: emitido como
+    /// StatusApplied com o pool restante (Magnitude) pra a UI atualizar a barra de Shield
+    /// sem alargar o contrato do bus.
+    /// </summary>
+    private void EmitRecentStatusChanges()
+    {
+        if (_fsm == null) return;
+
+        var changes = _fsm.StatusChanges;
+        for (var i = _lastStatusChangeIndex; i < changes.Count; i++)
+        {
+            var change = changes[i];
+            var statusId = change.Id.ToString();
+            switch (change.Kind)
+            {
+                case StatusChangeKind.Applied:
+                case StatusChangeKind.Absorbed:
+                    CombatBus.Instance?.EmitSignal(
+                        CombatBus.SignalName.StatusApplied,
+                        change.ActorId, statusId, change.Magnitude, change.Duration);
+                    break;
+                case StatusChangeKind.Expired:
+                    CombatBus.Instance?.EmitSignal(
+                        CombatBus.SignalName.StatusExpired, change.ActorId, statusId);
+                    break;
+            }
+        }
+        _lastStatusChangeIndex = changes.Count;
     }
 
     /// <summary>

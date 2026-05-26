@@ -240,11 +240,36 @@ Status é record uniforme aplicado a qualquer ator. Tick processado no `TurnStar
 | **Silence** | Sônico | bloqueia jogar cartas (só ataque básico/defender/flee) |
 | **Knockback** | Cinético | empurra o alvo na fila: `ReorderActor(alvo, +1)` |
 | **Break** | Cinético | reduz Def do alvo por Duration turnos |
-| **Expose** | Criptográfico | aumenta dano recebido pelo alvo (revela ponto fraco) |
+| **Expose** | Criptográfico | aumenta dano de carta recebido pelo alvo (ver detalhe abaixo) |
 | **Decrypt** | Criptográfico | anula/remove buffs do alvo e bloqueia novos por Duration |
-| **Shield** | utilitário | absorve dano (Magnitude = pontos absorvidos) antes do HP |
+| **Shield** | utilitário | pool de absorção: absorve TODO dano antes do HP (ver detalhe abaixo) |
 | **Regen** | utilitário | cura por tick no TurnStart |
 | **Haste / Slow** | utilitário | aumenta/reduz SPD (recomputa posição na fila) |
+
+### Shield (pool de absorção), canonizado 2026-05-26
+
+`Magnitude` é um **pool de absorção** que protege o HP de QUALQUER fonte de dano (carta, ataque básico, tick de DoT). A cada dano:
+
+```
+absorvido  = min(dano, Magnitude)
+Magnitude -= absorvido
+Hp        -= (dano - absorvido)
+```
+
+- O Shield é **removido imediatamente** quando o pool zera (`Magnitude <= 0`), OU expira por `Duration` (o que vier primeiro).
+- Implementado em `CombatActor.TakeDamage` (consulta o próprio Shield antes de tocar o HP). `Defend` deixa de ser no-op: aplica Shield com `Magnitude = Def` e passa a efetivamente reduzir o dano recebido.
+- Registra mudança de status (§16): `Absorbed` a cada absorção (Magnitude = pool restante), `Expired` ao depletar o pool.
+
+### Expose (amplificação de dano de carta), canonizado 2026-05-26
+
+Alvo com Expose recebe dano de **UseCard** multiplicado por:
+
+```
+multExpose = alvoTemExpose ? (1 + Expose.Magnitude / 100) : 1.0
+```
+
+- Aplica **somente em UseCard**, como último fator da cadeia divisiva (§11). O ataque básico subtrativo `clamp(Atk - Def, 1)` **não** é afetado.
+- Ex: `Expose.Magnitude = 30` → dano de carta ×1.3.
 
 ---
 
@@ -284,7 +309,8 @@ Duas fórmulas distintas: **UseCard é divisiva** (Def reduz por fração, escal
 ### Fórmula UseCard (divisiva)
 
 ```
-danoBase       = (Power + Atk) × (100 / (100 + Def)) × multFraqueza × multMod × multCombo
+multExpose     = alvoTemExpose ? (1 + Expose.Magnitude / 100) : 1.0
+danoBase       = (Power + Atk) × (100 / (100 + Def)) × multFraqueza × multMod × multCombo × multExpose
 varianceFactor = max(0.05, 0.30 × e^(-knowledgeKills × 0.10))
 rolled         = danoBase × rand(1 - varianceFactor, 1 + varianceFactor)
 danoFinal      = round( rolled × (isCrit ? 1.5 : 1.0) )
@@ -293,7 +319,8 @@ isCrit         = rand(0..99) < card.CritChance
 
 - **Imune** (`multFraqueza == 0.0`): `danoFinal = 0`.
 - **Sem clamp mínimo**: a divisiva nunca chega a 0 contra não-imunes (frações muito pequenas podem arredondar pra 0, telegrafando "elemento errado / Def alta demais").
-- **Ordem**: base divisiva → variância Knowledge → crit → um único `round` no final.
+- **`multExpose`** (§9, canon 2026-05-26): último fator da cadeia divisiva, ANTES da variância/crit. Só UseCard; o ataque básico não usa. Sem Expose no alvo = 1.0.
+- **Ordem**: base divisiva (incl. `multExpose`) → variância Knowledge → crit → um único `round` no final.
 - RNG **injetável e seedável** (`CombatStateMachine(..., Random? rng = null)`; default `Random.Shared`, testes injetam semente fixa). Pillar 1/2: variância é transparente, não opaca.
 
 | Fator | Origem | Valores |
@@ -303,6 +330,7 @@ isCrit         = rand(0..99) < card.CritChance
 | `multFraqueza` | roda de fraqueza (§6) | 1.5 / 1.0 / 0.66 / 0.0 |
 | `multMod` | modificador aplicado | default 1.0; Stream pode distribuir; valores tabelados |
 | `multCombo` | receita de combo (§10) | default 1.0; >1.0 em combo casado |
+| `multExpose` | status Expose no alvo (§9) | default 1.0; `1 + Expose.Magnitude/100` se Expose presente; só UseCard |
 | `Def` | atributo do defensor | divisor `100/(100+Def)`; reduzido por Break/Corrode |
 | `knowledgeKills` | `CombatActor.KnowledgeKills` (SaveSystem) | kills do mesmo tipo de inimigo; alimenta o decaimento de variância |
 | `card.CritChance` | carta | 0..100 (%) ; 0 = sem crit |
@@ -409,10 +437,25 @@ O combate comunica via dois buses desacoplados (arquitetura de engine; ver `docs
 - `CombatStarted(encounter)`
 - `TurnStarted(actor, turnoIndex)`
 - `ActionResolved(actor, action, result)`
-- `StatusApplied(actor, statusEffect)` / `StatusExpired(actor, statusId)`
+- `StatusApplied(actorId, statusId, magnitude, duration)` / `StatusExpired(actorId, statusId)`
 - `ActorDefeated(actor)` / `ActorIncapacitated(companion)`
 - `TurnEnded(actor)`
 - `CombatEnded(outcome, payload)` // vitória / derrota / fuga
+
+#### Contrato de evento de status (canonizado 2026-05-26)
+
+O POCO **não** emite signals diretamente (mantém-se sem dependência Godot). Em vez disso a FSM **acumula uma lista de `StatusEffectChange`** (mesmo padrão do `Log` de `CombatLogEntry`), drenada dos atores em cada transição de fase relevante (tick / resolução / expire). O `CombatManager` (ponte Node) lê essa lista pós-turno por índice e traduz em signals:
+
+```
+StatusEffectChange(ActorId, StatusId Id, StatusChangeKind Kind, int Magnitude, int Duration)
+StatusChangeKind = { Applied, Expired, Absorbed }
+```
+
+- `Applied` (carta `StatusApplied`, combo `ResultStatus`, Defend/Shield) → `CombatBus.StatusApplied(actorId, statusId, magnitude, duration)`.
+- `Expired` (Duration ≤ 0 no TurnEnd, OU depleção de pool de Shield) → `CombatBus.StatusExpired(actorId, statusId)`.
+- `Absorbed` (Shield absorveu dano; Magnitude = pool restante) → emitido como `StatusApplied` (atualiza a barra de Shield na UI sem alargar o contrato do bus).
+
+`StatusId` enum é mapeado pra string via `ToString()` (mesma convenção dos demais signals). Validado headless em `game/tools/TestCombatIntegration.cs`.
 
 ### `PlayerBus` (acoplamento com sistemas persistentes)
 

@@ -48,11 +48,13 @@ public partial class TestCombatIntegration : SceneTree
         var turnStartedActors = new List<string>();
         var playerResultReceived = false;
         var enemyDefeated = false;
+        var statusAppliedFired = new List<string>(); // "actorId:statusId"
 
         combatBus?.Connect(CombatBus.SignalName.CombatStarted, Callable.From<Godot.Collections.Array>((_) => combatStartedFired = true));
         combatBus?.Connect(CombatBus.SignalName.CombatEnded, Callable.From<string>((o) => combatEndedOutcome = o));
         combatBus?.Connect(CombatBus.SignalName.TurnStarted, Callable.From<string, int>((id, _) => turnStartedActors.Add(id)));
         combatBus?.Connect(CombatBus.SignalName.ActorDefeated, Callable.From<string>((_) => enemyDefeated = true));
+        combatBus?.Connect(CombatBus.SignalName.StatusApplied, Callable.From<string, string, int, int>((aid, sid, _, __) => statusAppliedFired.Add($"{aid}:{sid}")));
         playerBus?.Connect(PlayerBus.SignalName.CombatResultReceived, Callable.From<string, int>((_, __) => playerResultReceived = true));
 
         // --- Montar combate: 1 party vs 1 inimigo, inimigo mais fraco ---
@@ -62,9 +64,12 @@ public partial class TestCombatIntegration : SceneTree
         var brain = new ScriptedBrain();
         var brainRegistry = new Dictionary<string, IEnemyBrain> { ["enemy_trash"] = brain };
 
-        // Carta de teste.
+        // Carta de teste com status aplicado (valida emissão de StatusApplied, §16).
+        // AddStatus roda mesmo num golpe letal, então o StatusApplied dispara ainda que a
+        // carta mate o inimigo (a UI quer feedback do efeito aplicado).
+        var poison = new StatusEffect(StatusId.Poison, Magnitude: 2, Duration: 3, StackRule.Replace, CardFamily.Bioquimico);
         var card = new Card("pulso.eletrico", "Pulso Elétrico", CardFamily.Eletrico, CardBaseType.Pulso,
-            ManaCost: 1, ApCost: 1, Power: 5, TargetShape.Single, StatusApplied: null,
+            ManaCost: 1, ApCost: 1, Power: 5, TargetShape.Single, StatusApplied: poison,
             Modifiers: new List<CardModifier>(), Mastery: 0);
         var cardRegistry = new Dictionary<string, Card> { [card.Id] = card };
 
@@ -73,9 +78,11 @@ public partial class TestCombatIntegration : SceneTree
         Assert(combatStartedFired, "CombatBus.CombatStarted disparado em StartCombat");
 
         // --- Simular turno do jogador: Gus vai primeiro (SPD 8 > 4) ---
+        // Joga a carta (aplica Poison + dano). O dano mata a lata velha; o Poison ainda
+        // é aplicado e deve emitir StatusApplied.
         if (manager != null && CombatManager.Instance?.ActiveActorId == "gus")
         {
-            manager.SubmitPlayerAction(CombatAction.Attack("enemy_trash"));
+            manager.SubmitPlayerAction(CombatAction.UseCard("pulso.eletrico", "enemy_trash"));
         }
 
         // Em headless, _Process não roda automaticamente: chamar diretamente.
@@ -88,6 +95,8 @@ public partial class TestCombatIntegration : SceneTree
         Assert(playerResultReceived, "PlayerBus.CombatResultReceived disparado ao fim do combate");
         Assert(turnStartedActors.Count > 0, "TurnStarted disparado ao menos 1x");
         Assert(enemyDefeated, "CombatBus.ActorDefeated disparado para o inimigo derrotado");
+        Assert(statusAppliedFired.Contains("enemy_trash:Poison"),
+            $"CombatBus.StatusApplied disparado para Poison no inimigo (fired: [{string.Join(", ", statusAppliedFired)}])");
 
         // --- Report ---
         GD.Print($"=== RESULTADO: {passed} passou, {failed} falhou ===");
