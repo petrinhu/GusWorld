@@ -19,7 +19,7 @@ Tabela canônica de pendências e planejamento. Atualizar via skill `/tab_penden
 | F1.13 | F1-Concepção | Art sheets produção 7 chars faltantes (`docs/art/characters/`) | Média | F1.10 | Alta | ⏳ Pendente | — |
 | F1.14 | F1-Concepção | Validação concept art PNGs vs specs canônicas | Média | F1.10 | Baixa | ⏳ Pendente | — |
 | F1-DL.0 | F1-DeepLore | Setup pasta `docs/narrative/deep/` + `_INDEX.md` canônico + memo `project_deep_lore_canonico` | Alta | F1.5, F1.6 | Baixa | ✅ Concluído | — |
-| F1-DL.1 | F1-DeepLore | R1 — Eras (era-1, era-2, era-3, transicoes — 4 docs). Era 1 alvo Fibonacci base 4: 286k pal | Alta | F1-DL.0 | Alta | 🔄 Em andamento | — |
+| F1-DL.1 | F1-DeepLore | R1 — Eras (era-1, era-2, era-3, transicoes — 4 docs). era-1 (~318k) + era-2 (65k) + **era-3-sterling (11.9k, voz Cassandra Bento Chevalier) + transicoes-entre-eras (7.1k, voz Madalena Argéndia-Vanderbist)** canonizados 2026-05-26 via workflow RAG colaborativo (8 inspirações era-3 + 5 transições, score ≥0.499). Audit TEXTREVIEW incremental dos 2 novos = pendente | Alta | F1-DL.0 | Alta | ✅ Concluído 2026-05-26 | — |
 | F1-DL.1.6 | F1-DeepLore | Era 1 §6 Acústica e luz reativa (14.5k pal, 8 NPCs Ordem Recursiva, 4 sub-locais) | Alta | F1-DL.0 | Alta | ✅ Concluído | — |
 | F1-DL.1.7 | F1-DeepLore | Era 1 §7 Bancos sementes-relíquia + Ordem Recursiva embrionária (33.4k pal, 52 queries; 11 NPCs + 9 sub-locais; axiologia canon aplicada) | Alta | F1-DL.1.6 | Alta | ✅ Concluído | — |
 | F1-DL.1.8 | F1-DeepLore | Era 1 §8 Queda multi-hipótese (~42k pal, 84 queries Fibonacci) | Alta | F1-DL.1.7 | Alta | ✅ Concluído | — |

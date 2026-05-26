@@ -162,7 +162,7 @@ user fecha decisões macro da rodada
 
 | Rodada | Conteúdo | Status |
 |---|---|---|
-| R1 (Eras) | era-1, era-2, era-3, transicoes (4 docs, ~18k palavras) | ⏳ Pendente |
+| R1 (Eras) | era-1, era-2, era-3, transicoes (4 docs) | ✅ Concluído (2026-05-26) |
 | R2 (Facções) | 6 principais + menores (7 docs, ~20k) | ⏳ Pendente |
 | R3 (Settings) | 8 settings deep (8 docs, ~26k) | ⏳ Pendente |
 | R4 (Characters) | Gus + 6 companions (7 docs, ~35k) | ⏳ Pendente |
