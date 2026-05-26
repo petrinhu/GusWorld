@@ -79,7 +79,7 @@ Upgrade-tree no vértice Matriz: ganho de range (escuta ecolocalização de long
 
 **Verb:** compilar/jogar. **Vértice:** Tavus-Drive executa.
 
-Em **combate turn-based**, Gus tem deck de 20-30 cartas rúnicas. Cada carta = `tipo + modificador + alvo` (sintaxe diegética legível: ex. `RAIZ.elétrica → área-3x3`). Por turno: saca 3, joga 1-2 dependendo de mana (recurso de compilação). Cartas combinam: `Código de Raiz` + `Pulso Elétrico` = armadilha elétrica em área; combos são receitas determinísticas, não RNG.
+Em **combate turn-based**, Gus tem deck de 40-60 cartas totais, 15 em campo, rúnicas. Cada carta = `tipo + modificador + alvo` (sintaxe diegética legível: ex. `RAIZ.elétrica → área-3x3`). Por turno: saca 3, joga 1-2 dependendo de mana (recurso de compilação). Cartas combinam: `Código de Raiz` + `Pulso Elétrico` = armadilha elétrica em área; combos são receitas determinísticas, não RNG.
 
 Deck é construído fora de combate. Cartas obtidas por progresso narrativo (não loot drop aleatório). Trade-off: deck especializado (4 cópias da mesma carta) vs versátil (variedade).
 
