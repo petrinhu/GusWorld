@@ -61,7 +61,8 @@ Tabela canônica de pendências e planejamento. Atualizar via skill `/tab_penden
 | F2-E.8 | F2-Engine | `engine/diary/` — UI Diário do Gus (caderno layer 1 + texto limpo layer 2) | Alta | F2-E.3, F2-E.4 | Alta | ⏳ Pendente | — |
 | F2-E.9 | F2-Engine | `engine/knowledge_system/` — Knowledge Progression score híbrido + HUD + gates | Alta | F2-E.3 | Média | ⏳ Pendente | — |
 | F2-G.1 | F2-Game | Blockout 1 área Distritos Inferiores (cidade ato 1, ~5min explore) | Alta | F2-E.1 | Alta | ⏳ Pendente | — |
-| F2-G.2 | F2-Game | Modelo low-poly Gus (3k-4.5k tris, 512² atlas, silhouette test 8 ângulos) | Alta | F1.10 | Alta | ⏳ Pendente | — |
+| F2-G.2 | F2-Game | Modelo low-poly Gus (3k-4.5k tris, 512² atlas, silhouette test 8 ângulos turntable) | Alta | F1.10 | Alta | ⏳ Pendente | — |
+| F2-G.2b | F2-Game | Rig Gus (skeleton + skin/weight paint + IK pés + look-at + blendshapes facial) + export glTF 2.0 → Godot | Alta | F2-G.2 | Alta | ⏳ Pendente | — |
 | F2-G.3 | F2-Game | Locomotion básico Gus (idle / walk / run / interagir) | Alta | F2-G.2 | Média | ⏳ Pendente | — |
 | F2-G.4 | F2-Game | 1 inimigo comum (800-1.5k tris) | Alta | F1.10 | Média | ⏳ Pendente | — |
 | F2-G.5 | F2-Game | Combate turn-based 1v1 + Compilação Deck Rúnico (3-5 cartas básicas) | Alta | F2-E.5 | Alta | ⏳ Pendente | — |
@@ -73,7 +74,13 @@ Tabela canônica de pendências e planejamento. Atualizar via skill `/tab_penden
 | F2-A.2 | F2-Arte | Shader outline inverted-hull reutilizável | Alta | F2-S.2 | Alta | ⏳ Pendente | — |
 | F2-A.3 | F2-Arte | Shader holograma (cartas + UI rúnica) | Alta | F2-S.2 | Alta | ⏳ Pendente | — |
 | F2-A.4 | F2-Arte | Material toon Gus | Alta | F2-G.2, F2-A.2 | Média | ⏳ Pendente | — |
-| F2-A.5 | F2-Arte | 5-10 props modulares cidade (tile-based) | Alta | F2-A.1 | Média | ⏳ Pendente | — |
+| F2-A.5 | F2-Arte | 5-10 props modulares cidade (tile-based, atlas 512² compartilhado por bioma) | Alta | F2-A.1 | Média | ⏳ Pendente | — |
+| F2-A.6 | F2-Arte | Shader glitch/anomalia (screen-space: UV distortion + chromatic aberration leve; só zonas infectadas) | Média | F2-S.2 | Média | ⏳ Pendente | — |
+| F2-A.7 | F2-Arte | Shader água/lúmen Selve (vertex displacement seno + emissive vertex color) | Média | F2-S.2 | Média | ⏳ Pendente | — |
+| F2-A.8 | F2-Arte | Produção assets 2D (Krita/Aseprite): faces cartas rúnicas + UI frames + HUD + glifos/logos. Render via shader holograma F2-A.3. Prompts nano banana em resources/prompts_images/{runic_cards,ui_frames,logos_glyphs} alimentam | Alta | F2-A.3 | Média | ⏳ Pendente | — |
+| F2-ART.TOOL | F2-Arte | **Avaliar pipeline 2D→3D AI** (Tripo/Meshy/Hunyuan3D/TRELLIS/Rodin) a partir dos concepts nano banana: medir se base-mesh + auto-rig acelera vs hand-model Blender, dado retopo ao budget + troca do PBR pelo estilo canon (gradient atlas+vertex color+cel-shade) + GPU 3.68GB (cloud free-tier vs Hunyuan3D local que pede 8-16GB). Decidir: AI só base-mesh/blockout vs pipeline-asset completo | Alta | F1.10 | Média | ⏳ Pendente (avaliação) | — |
+| F2-ART.CONCEPT | F2-Arte | Gerar imagens concept (nano banana) dos assets do vertical slice (Gus + 1 inimigo + props cidade) a partir dos prompts; aprovar + mover prontos pra resources/prompts_images/feitos/ | Média | — | Baixa | 🔄 Em andamento (alguns gerados) | — |
+| F2-G.10 | F2-Game | Combat anims (Gus: attack/cast-carta/hit-react/KO + inimigo comum: attack/hit/death); manifestar hardware triad visualmente (Tavus-Drive executa carta) | Alta | F2-G.2b, F2-E.5 | Média | ⏳ Pendente | — |
 | F2-AU.1 | F2-Áudio | 1 track ambient cidade noturna (pós-punk + drone) | Média | — | Média | ⏳ Pendente | — |
 | F2-AU.2 | F2-Áudio | SFX base (footstep, card-play, hit, scan-óculos, UI confirm/cancel) | Alta | — | Baixa | ⏳ Pendente | — |
 | F2-AU.3 | F2-Áudio | Audio bus setup Godot (master / music / sfx / ui / vo) | Alta | F2-S.2 | Baixa | ⏳ Pendente | — |
