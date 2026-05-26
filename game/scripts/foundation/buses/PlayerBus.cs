@@ -28,6 +28,12 @@ public partial class PlayerBus : Node
     /// <summary>Emitido quando player morre. Game over flow começa aqui.</summary>
     [Signal] public delegate void PlayerDiedEventHandler();
 
+    /// <summary>
+    /// Emitido ao fim de um combate. CombatManager → PlayerBus pra concessão de XP/mestria/loot.
+    /// Stub no slice: payload simplificado (outcome string + roundsElapsed int).
+    /// </summary>
+    [Signal] public delegate void CombatResultReceivedEventHandler(string outcome, int roundsElapsed);
+
     public override void _Ready()
     {
         Instance = this;

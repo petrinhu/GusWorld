@@ -31,6 +31,7 @@ Localization="*res://scripts/foundation/localization/Localization.cs"
 SceneManager="*res://scripts/foundation/scene_manager/SceneManager.cs"
 SaveManager="*res://scripts/foundation/save_system/SaveManager.cs"
 InputRemapManager="*res://scripts/foundation/input_remap/InputRemapManager.cs"
+CombatManager="*res://scripts/foundation/turn_combat/CombatManager.cs"
 
 [display]
 

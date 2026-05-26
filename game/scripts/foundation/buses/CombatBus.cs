@@ -22,14 +22,26 @@ public partial class CombatBus : Node
     /// <summary>Emitido no fim de cena de combate.</summary>
     [Signal] public delegate void CombatEndedEventHandler(string winner);
 
-    /// <summary>Emitido quando turn de um combatente começa.</summary>
-    [Signal] public delegate void TurnStartedEventHandler(string combatantName);
+    /// <summary>Emitido quando turn de um combatente começa. roundIndex = rodada de fila (ramp de mana).</summary>
+    [Signal] public delegate void TurnStartedEventHandler(string combatantName, int roundIndex);
 
     /// <summary>Emitido quando turn termina.</summary>
     [Signal] public delegate void TurnEndedEventHandler(string combatantName);
 
     /// <summary>Emitido após ação ser resolvida (card jogado, dano aplicado, status mudado).</summary>
     [Signal] public delegate void ActionResolvedEventHandler(string actor, string target, string actionType, int value);
+
+    /// <summary>Status aplicado a um ator.</summary>
+    [Signal] public delegate void StatusAppliedEventHandler(string actorId, string statusId, int magnitude, int duration);
+
+    /// <summary>Status expirado em um ator.</summary>
+    [Signal] public delegate void StatusExpiredEventHandler(string actorId, string statusId);
+
+    /// <summary>Ator (inimigo) derrotado (HP 0, removido do combate).</summary>
+    [Signal] public delegate void ActorDefeatedEventHandler(string actorId);
+
+    /// <summary>Companion incapacitado (HP 0, fica fora do combate mas recuperável). Pillar 4.</summary>
+    [Signal] public delegate void ActorIncapacitatedEventHandler(string actorId);
 
     public override void _Ready()
     {
