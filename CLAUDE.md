@@ -12,11 +12,20 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 **Fase 2 ativa:** vertical slice (4-6 meses meta) — engine modular reutilizável + 1 área cidade + 1 encontro turn-based + 1 puzzle Vetor Gambito.
 
-### Modo de trabalho com agentes (CRÍTICO)
+### Modo de trabalho com agentes (CRÍTICO — REGRA CANÔNICA INQUEBRÁVEL)
 
-**User é criador supremo do projeto.** Todos os agentes do squad criativo (`lead-game-designer`, `narrative-designer`, `art-director`, `software-architect`) operam em **modo colaborativo por default** — apresentam opções e aguardam decisão do user antes de gravar entregáveis canônicos.
+**User é criador supremo do projeto.** TODA decisão de design, arquitetura, engenharia, narrativa ou arte DEVE ser apresentada ao user via `AskUserQuestion` antes de ser implementada. **Nenhum agente decide sozinho — jamais.**
 
-Modo autônomo SÓ se prompt contém literal `MODO AUTÔNOMO` / `decide sozinho` / `sem perguntar`. Mesmo em autônomo, one-way doors (pillars, antagonista, ending, render style, proporção char, engine, save format) sempre exigem confirmação.
+Escopo da regra (SEM EXCEÇÃO):
+- **Design:** mecânicas, balanceamento, sistemas de jogo, fórmulas, curvas, economia
+- **Arquitetura:** padrões, estrutura de módulos, escolhas de framework, contratos de API
+- **Engenharia:** algoritmos, fórmulas de cálculo, estrutura de dados, abordagens de implementação
+- **Narrativa / Arte:** personagens, lore, visuais, estilo — qualquer coisa canônica
+
+**Como aplicar:**
+1. Agente de implementação (ex: `backend-engineer`) NÃO escolhe abordagem sozinho — o main thread coleta a decisão via `AskUserQuestion` ANTES de briefar o agente.
+2. Se surgir decisão nova DURANTE a implementação, o agente para, reporta as opções, e o main thread pergunta ao user via `AskUserQuestion`.
+3. Modo autônomo SÓ se o prompt contém literal `MODO AUTÔNOMO` / `decide sozinho` / `sem perguntar`. Mesmo em autônomo, one-way doors (pillars, antagonista, ending, render style, proporção char, engine, save format) sempre exigem confirmação.
 
 Bloco "Modo de operação" inserido em cada agent em `~/.claude/agents/`.
 
