@@ -1,0 +1,3 @@
+# Cap. 7 — 05 QA / Testes (qa-engineer / Caetano CTO mais Narciso CISO)
+
+Atencao. Suite de alta qualidade mas cobertura estreita (133/133 verde 40-78ms, deterministico, AAA). CRITICO: save_system sem regressao (455 LOC zero teste; A6 exige 80 por cento mais migrators 100 por cento; save corrupt classificado critico; suite xUnit antes de F2-G.8). IMPORTANTE: A6 inexequivel sem Coverlet (1 PackageReference mais baseline); cobertura so turn_combat (save, input_remap, localization, Math sem teste; viola T1); testes nao rodam em CI; F2-M.3 sem protocolo nem instrumentacao de time-to-fun. COSMETICO: tools Godot rotulados como testes (sao smoke manual); claims VALIDADO de F2-E.3 e F2-E.7 refutados (ad-hoc).

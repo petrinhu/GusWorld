@@ -1,0 +1,23 @@
+# .bigtech-porte — Marcador de porte e ativação (Cósimo / Chief of Staff)
+# GusWorld — classificado 2026-05-29
+
+PORTE_INTRINSECO: Solo indie (1 pessoa, single-player offline puro, sem usuários externos)
+PORTE_EFETIVO: Scale-up-equivalente por COMPLEXIDADE (engine modular + deep-lore 365k + 2 vol livro + arte/áudio + release Steam futuro)
+VARIANTE: Pipeline-Padrão-Plus (12 fases completas, profundidade calibrada por fase — anti-OE dentro do decreto)
+DECRETO_SOBERANO: criador supremo determinou TODO o time + TODOS os C-level ativos (considera projeto grande, quer máxima ajuda)
+
+# Reconciliação anti-OE: todos os C-level ATIVOS por decreto, mas com PROFUNDIDADE calibrada.
+# Tech / Produto / Canon / Processo  = A FUNDO AGORA (Fase 2 vertical slice).
+# Business (CMO/CRO/CFO/CDO)          = roadmap + ativação-por-fase, NAO plano operacional pré-VS.
+
+FASE_PIPELINE_ATUAL: 2 (vertical slice) — com 4,5,6,7 em execução real; 0-3 já consolidados
+CERIMONIA: Kanban solo (TODO.md como board canônico) + Shape Up por feature. SEM Scrum cerimonioso (1 pessoa).
+SKILL_ENGENHARIA: /proj_jogo (game-dev, NAO /proj_software)
+
+C_LEVELS_ATIVOS: Celso(CEO) Capitolino(CPO) Caetano(CTO) Camilo(CMO) Cosmo(COO) Narciso(CISO) Candido(CDO) Confucio(CFO) Cicero(CRO) Claudio(CLO) Cosimo(CoS)
+C_LEVELS_PROFUNDIDADE_AGORA: Celso Capitolino Caetano Cosmo Narciso  (full-depth Fase 2)
+C_LEVELS_MODO_ROADMAP: Camilo Cicero Confucio Candido Claudio  (entregam roadmap/ativação-por-fase; standby operacional até gatilho)
+
+GATILHO_REROTEAMENTO: fim da Fase 2 (VS end-to-end F2-M.1) OU primeiro build público/wishlist Steam OU contratação/colaborador externo OU requisito legal (age rating IARC/ESRB/PEGI na Fase 5)
+
+# Re-avaliar a cada marco. Subir profundidade business quando aproximar GTM (Fase 10) / cert (Fase 5).

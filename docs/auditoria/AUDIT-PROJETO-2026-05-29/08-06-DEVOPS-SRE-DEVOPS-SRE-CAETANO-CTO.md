@@ -1,0 +1,3 @@
+# Cap. 8 — 06 DevOps / SRE (devops-sre / Caetano CTO)
+
+Atencao. Nao existe esteira de CI nem build distribuivel; build.md canon-completo mas 100 por cento papel. CRITICO: build fisicamente impossivel (export templates 4.6 nao instalados, 0 arquivos, mais export_presets.cfg ausente; TODO nao registra os 2 bloqueios); sem backup off-site (ahead 3 mais submodule ahead 1; push submodule-primeiro). IMPORTANTE: drift de SDK (4.4.1 vs 4.6); renderer auto-contraditorio; gitignore nao cobre bin e obj do .NET; canon AOT vs realidade (PoC antes de comprometer). COSMETICO: cs.uid misto, working tree sujo (GEMINI.md, .bigtech-porte, PNGs, resumo.pdf), icon.svg, divergencia doc vs backlog dos wrappers.

@@ -1,0 +1,37 @@
+# Dossiê de Auditoria — GusWorld (2026-05-29)
+
+Auditoria multidisciplinar full via constelação bigtech (Cósimo + 15 disciplinas + 10 pareceres C-level + ordenação tab_pendencias + consolidação internal-auditor). Verificação EMPÍRICA de disco (133/133 xUnit, 9/9 combat integration, 0 erros autoloads, sweep de artefatos, git ground-truth).
+
+## Sumário executivo
+
+Pre-producao tecnica avancada, ANTES do first-playable, confirmado empiricamente nas 15 disciplinas. SOLIDO (verificado no disco): engine modular C# (POCO separada de game via submodule), 9 AutoLoads, combate turn-based completo (combat.md 1-17 materializado, formula divisiva + Knowledge-decay + crit + Shield/Expose), 133/133 xUnit verde 41ms, 9/9 integracao headless, save HMAC-SHA256 funcional (roundtrip + tamper comprovados). Canon narrativo de 365k palavras existe de fato com alta qualidade, idade-11 preservada. Postura de seguranca e privacidade excelente e proporcional ao porte (offline puro, zero PII, zero rede, zero telemetria, supply-chain minima). FRAGIL ou ausente: (1) o pilar tecnico mais caro e irreversivel, AOT canonizado como MUST em ADR-002 e nos docs tech, esta 100 por cento NAO implementado (zero PublishAot, zero export_presets.cfg, EnableDynamicLoading true em conflito direto) e e um requisito-fantasma que quebra o primeiro build de release; (2) o SaveSystem (caminho critico de nao-perda-de-progresso) tem zero cobertura na suite xUnit rapida e a infra de migrators e codigo morto que viola clausula proibida do CONTRACT secao 7; (3) nenhum gameplay jogavel existe (todas as cenas sao scaffolding de teste, zero asset 3D ou 2D, zero blockout, zero HUD, zero dialogo, zero audio); (4) o pipeline de arte AI (TripoSR no RTX 3050 4GB), gargalo numero 1 do caminho critico do VS, nao foi validado; (5) CI e build totalmente ausentes, export templates do Godot nao instalados, e ha 3 commits mais 1 do submodule nao-pushados (trabalho so no laptop, sem backup off-site). Transversalmente ha um padrao recorrente de drift doc-codigo e doc-canon: os 3 tech docs descrevem arquitetura que nao bate com o disco; o GDD diverge dos pillars canonicos; os cortes CUT divergem do GDD secao 9; o target de hardware aparece em 3 valores; os trackers de canon listam como abertos cerca de 10 criticos ja resolvidos no canon central. Nada disso e dano imediato no porte solo pre-VS, mas e divida de sincronizacao que corroi a confianca no canon e induz retrabalho.
+
+## Veredito geral
+
+GO CONDICIONAL para prosseguir a Fase 2 (vertical slice). A direcao e correta e a fundacao e saudavel; o front-load do motor (combate testado antes dos assets) foi a aposta arquitetural certa e reduziu cedo o risco macro mais perigoso. NAO ha motivo para no-go ou pivot. Porem o projeto NAO esta pronto para entregar a um auditor externo nem para fechar o VS sem antes resolver 2 achados criticos de viabilidade tecnica (AOT-fantasma e cobertura/wiring de save) e os bloqueios fisicos de build (export templates, presets, CI e push off-site). O parecer C-level e unanime em saudavel/atencao, com dois alertas de execucao solo: gargalo de arte 3D nao-validado e ausencia de criterio de saida testavel dos milestones. Recomendacao: tratar este dossie como o livro de pre-auditoria, destravar os 6 criticos e os bloqueios de build ANTES do primeiro build distribuivel (F2-M.4), antecipar a validacao de fun para a esquerda do cronograma, e pagar a divida de sincronizacao doc-canon numa passada barata. Toda remediacao de severidade alta e toda decisao one-way door (renderer, AOT, schema de save, pricing, licenca) vai ao criador supremo via AskUserQuestion; o internal-auditor consolida e prioriza, nao decide.
+
+## Índice de severidade
+
+- CRÍTICOS: **6**
+- IMPORTANTES: **34**
+- COSMÉTICOS: **33**
+
+Vereditos de verificação: 147 itens checados — 80 confirmados, 34 parciais, 30 refutados, 3 não-verificáveis.
+
+## Top remediação (proposta — criador decide via AskUserQuestion)
+
+1. CRITICO AOT - via AskUserQuestion escrever ADR-002-ERRATUM rebaixando AOT MUST para meta condicional (NativeAOT/trimming so nos POCO da engine, runtime do jogo em JIT/Mono) OU rodar PoC dotnet publish e medir. Hoje zero PublishAot, zero export_presets.cfg, EnableDynamicLoading true. Pre-requisito: migrar save para System.Text.Json source-gen.
+2. CRITICO save - antes de F2-G.8 criar engine tests save_system com xUnit do SaveSerializer (HMAC roundtrip schema v1 completo, tamper para SaveIntegrityException, corrupt/null para SaveCorruptException, round-trip dos 6 JsonConverters). POCO puro, mesmo runner dos 133 testes. Hoje so cobertura via Godot headless.
+3. CRITICO migrators - via AskUserQuestion decidir wire da SaveMigratorChain no load path (ler SaveVersion, rejeitar versao futura, rodar chain forward-only) agora vs deferir ate o primeiro bump. A chain e codigo morto e o load ignora a versao, violando clausula proibida do CONTRACT 7. Registrar a discrepancia ja.
+4. CRITICO build - instalar export templates Godot 4.6.stable.mono (dir hoje com 0 arquivos), materializar game export_presets.cfg (Linux e Windows), alinhar Godot.NET.Sdk 4.4.1 para 4.6.x. Sem isso F2-M.4 e fisicamente impossivel.
+5. CRITICO backup - push imediato dos 3 commits locais mais 1 do submodule para Codeberg, na ordem submodule-primeiro. Trabalho real so no laptop; sem off-site equivale a sem backup (viola 3-2-1).
+6. CRITICO/IMPORTANTE arte - spike time-boxed de cerca de 1 semana de validacao do pipeline de arte AI (TripoSR no RTX 3050 4GB) com 1 char (Gus); via AskUserQuestion decidir AI-base-mesh vs hand-model com dado empirico antes de comprometer o cronograma. Gargalo numero 1 do VS; cadeia de arte em 0 por cento.
+7. IMPORTANTE renderer - via AskUserQuestion decidir o renderer de producao (forward_plus vs Mobile/GL Compatibility) e alinhar project.godot (hoje auto-contraditorio, versao 4.4 vs editor 4.6); reconciliar o target de hardware unico (1050 vs 1060 vs RTX 3050).
+8. IMPORTANTE doc-canon - passada barata via AskUserQuestion: F2-S.TECH-RECONCILE dos 3 tech docs; atualizar CONTRACT 7 de GDScript/GUT para C#/xUnit; refresh do GDD para os pillars canonicos mais 6 companions; reconciliar cortes CUT vs GDD 9 e idioma v1; fechar trackers de canon (INCOHERENCES.md mais 10 AUDIT-T-V2).
+9. IMPORTANTE CI - materializar CI Forgejo enxuto (F2-CI.2): dotnet format verify-no-changes mais build warnaserror mais test exit-code mais audit de camadas A2 mais gitleaks real (o atual e stub quebrado) mais dotnet list package vulnerable; export pesado manual ou por-tag. Adicionar coverlet.collector (destrava A6); configurar pre-commit hook dotnet format.
+10. IMPORTANTE produto - definir criterio de saida testavel para F2-M.1 e antecipar a prova de fun: balance prototype em planilha (1 encontro real, 5-8 cartas, party com numeros) antes de produzir arte ou audio; escrever a spec de design do puzzle Vetor do Gambito (1/3 dos pilares do VS, hoje sem spec); concluir F5-BK.AUDIT.C-EX secao 10. Itens de design vao ao criador via AskUserQuestion.
+
+## Nota de verificação da própria auditoria
+
+- CRÍTICO-6 (DevOps: '3 commits não-pushados') = **FALSO-POSITIVO**: verificado `git ls-remote` — local==remote em ambos repos (main 1c00433, engine 00db1a0). Tracking ref `origin/main` estava stale porque pushes foram via URL HTTPS direto. Trabalho seguro no remoto.
+- Demais 'refutado' que dizem 'status Pendente correto' confirmam a pendência (não são defeitos novos).

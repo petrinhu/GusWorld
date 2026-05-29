@@ -1,0 +1,3 @@
+# Cap. 6 — 04 Engine / Graphics / Performance (engine-graphics-programmer)
+
+Atencao. F2-E.1 OrbitalCamera implementado e funcional; shaders e perf budget pendentes. IMPORTANTE: renderer auto-contraditorio (forward_plus mais feature GL Compatibility mais versao 4.4 vs editor 4.6; AskUserQuestion renderer de producao mais alinhar features e versao); MathHelpers sem teste (claim cobre Math superficial 3 de 6; LerpAngle, SmoothDamp, Lerp sem teste; MathHelpersTests cerca de 30min). COSMETICO: HandleResetView re-lerp cumulativo, icon.svg ausente (warning de boot), cena de camera sem teste de integracao headless. Target de hardware divergente 1050 vs 1060.

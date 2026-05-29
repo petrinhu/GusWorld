@@ -1,0 +1,3 @@
+# Cap. 5 — 03 Gameplay (gameplay_engineer)
+
+Atencao. F2-E.5 (TurnCombat) confirmado e de alta qualidade (133/133 mais 9/9 headless, 18 specs materializadas, POCO/Node desacoplado). Combate jogavel bloqueado pela ausencia da cadeia de gameplay ao redor, nao pela engine. F2-E.6, E.9, E.10, G.5, G.6, G.9 refutados (pendentes). IMPORTANTE: divergencia spec 11 vs codigo (multAmbiente nao plugado; adicionar 1.0 default ao implementar F2-E.11); status inertes (6 mais Silence/Disrupt/Break/Decrypt/Haste/Slow so decrementam Duration; F2-E.5b pre-req de F2-E.11); cadeia de gameplay do VS ausente do TODO (EXPLORE, INVENT, QUEST, LOOT; F2-M.1 inalcancavel mesmo com F2-E.5 100 por cento). COSMETICO: comentarios TODO-incremento obsoletos; combos e cartas mockup (esperado).
