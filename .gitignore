@@ -44,3 +44,7 @@ __pycache__/
 # Resources pesados / não-versionáveis (livros de referência, fontes externas)
 /resources/livros/
 .TEXTREVIEW.md.kate-swp
+
+# Concept art / refs e PDFs soltos (locais, fora do repo) — F2-S.OPS.2
+resources/images/
+resumo.pdf
