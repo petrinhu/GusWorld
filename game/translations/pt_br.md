@@ -2,7 +2,7 @@
 
 > Locale primário (dev). **MUST** estar sempre completo. Outras locales fazem fallback aqui.
 >
-> Formato: `## CHAVE_UPPER_SNAKE` + valor abaixo. Ver engine/localization/README.md.
+> Formato: `## CHAVE_UPPER_SNAKE` + valor abaixo. Ver engine/foundation/localization/MdTranslationLoader.cs.
 >
 > Última revisão: 2026-05-19.
 

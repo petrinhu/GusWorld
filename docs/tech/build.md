@@ -122,18 +122,18 @@ godot --headless --path ./game --export-release "Windows Desktop" ../build/windo
 
 Output: `build/windows/gusworld.exe` + DLLs runtime .NET 8.
 
-### §3.3. Wrappers shell (`tools/`)
+### §3.3. Wrappers shell (`scripts/`)
 
-Wrappers ergonômicos:
+Wrappers ergonômicos em `scripts/` na raiz (canon pós-F2-CI.1, 2026-05-30). `game/tools/` é reservado para ferramentas headless Godot (ValidateAutoloads, TestCombatIntegration).
 
-#### `tools/build_all.sh`
+#### `scripts/build_linux.sh`
 ```bash
 #!/usr/bin/env bash
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
 VERSION=$(cat game/VERSION)
-echo "Building GusWorld $VERSION"
+echo "Building GusWorld $VERSION (Linux)"
 
 dotnet restore
 dotnet format --verify-no-changes
@@ -141,17 +141,31 @@ dotnet build -c Release /warnaserror
 dotnet test --no-build -c Release
 
 godot --headless --path ./game --import
-mkdir -p build/linux build/windows
+mkdir -p build/linux
 godot --headless --path ./game --export-release "Linux/X11" "$(pwd)/build/linux/gusworld.x86_64"
-godot --headless --path ./game --export-release "Windows Desktop" "$(pwd)/build/windows/gusworld.exe"
 
-echo "Build done: build/linux/ + build/windows/"
+echo "Build done: build/linux/gusworld.x86_64"
 ```
 
-#### `tools/version_bump.sh`
+#### `scripts/build_windows.sh`
 ```bash
 #!/usr/bin/env bash
-# Usage: tools/version_bump.sh 0.1.0
+set -euo pipefail
+cd "$(dirname "$0")/.."
+
+VERSION=$(cat game/VERSION)
+echo "Building GusWorld $VERSION (Windows)"
+
+mkdir -p build/windows
+godot --headless --path ./game --export-release "Windows Desktop" "$(pwd)/build/windows/gusworld.exe"
+
+echo "Build done: build/windows/gusworld.exe"
+```
+
+#### `scripts/version_bump.sh`
+```bash
+#!/usr/bin/env bash
+# Usage: scripts/version_bump.sh 0.1.0
 set -euo pipefail
 NEW_VERSION="$1"
 echo "$NEW_VERSION" > game/VERSION
@@ -159,7 +173,7 @@ git add game/VERSION
 echo "Bumped to $NEW_VERSION (not committed)"
 ```
 
-Wrappers usam `set -euo pipefail` (disciplina shell).
+Wrappers usam `set -euo pipefail` (disciplina shell). Os arquivos shell são gerados quando F2-CI.1 for implementado.
 
 ---
 

@@ -177,7 +177,7 @@ Publicação standalone = repo público próprio + Godot Asset Library opcional 
 
 ### §4.1. Orbital camera (Back layer)
 
-**Path:** `engine/back/orbital_camera/OrbitalCamera.cs`
+**Path:** `game/scripts/back/orbital_camera/OrbitalCamera.cs`
 
 Setup canon Godot 4:
 ```
@@ -189,7 +189,7 @@ Node3D (pivot, follows player position)
 - Rotação 3/4 + zoom min/max.
 - Spring length ajusta dinamicamente (collision-aware).
 - `collision_mask` exclui player layer.
-- Tests: `engine/back/orbital_camera/tests/OrbitalCameraTests.cs` (xUnit).
+- Tests: `engine/tests/OrbitalCameraTests.cs (TODO)` (xUnit).
 
 ### §4.2. Turn-based combat (Back layer)
 

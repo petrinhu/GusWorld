@@ -14,7 +14,7 @@ config/name="GusWorld"
 config/version="0.0.1"
 config/description="RPG turn-based 3D estilizado. Prodígio-hacker de 11 anos contra megacorporação ciber-gótica. Solo indie."
 run/main_scene=""
-config/features=PackedStringArray("4.4", "GL Compatibility")
+config/features=PackedStringArray("4.6", "GL Compatibility")
 config/icon="res://icon.svg"
 
 [dotnet]
@@ -90,4 +90,4 @@ locale/fallback="pt_BR"
 
 [rendering]
 
-renderer/rendering_method="forward_plus"
+renderer/rendering_method="gl_compatibility"

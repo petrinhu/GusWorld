@@ -4,7 +4,7 @@
 >
 > Paridade estrutural com pt_br.md obrigatória: toda key em pt_br.md MUST existir aqui (valor vazio aceito durante G1).
 >
-> Formato: `## CHAVE_UPPER_SNAKE` + valor abaixo. Ver engine/localization/README.md.
+> Formato: `## CHAVE_UPPER_SNAKE` + valor abaixo. Ver engine/foundation/localization/MdTranslationLoader.cs.
 >
 > Última revisão: 2026-05-19.
 

@@ -90,10 +90,10 @@ UI events.
 **AutoLoad registro em `game/project.godot`:**
 ```ini
 [autoload]
-GameStateBus="*res://engine/foundation/buses/GameStateBus.cs"
-PlayerBus="*res://engine/foundation/buses/PlayerBus.cs"
-CombatBus="*res://engine/foundation/buses/CombatBus.cs"
-UIBus="*res://engine/foundation/buses/UIBus.cs"
+GameStateBus="*res://scripts/foundation/buses/GameStateBus.cs"
+PlayerBus="*res://scripts/foundation/buses/PlayerBus.cs"
+CombatBus="*res://scripts/foundation/buses/CombatBus.cs"
+UIBus="*res://scripts/foundation/buses/UIBus.cs"
 ```
 
 ### §2.2. `engine/foundation/save_system/`

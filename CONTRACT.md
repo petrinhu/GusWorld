@@ -148,8 +148,8 @@ DoD MUST ser satisfeito antes de marcar task ✅ no TODO.md.
 - [ ] Commit message segue §2.
 - [ ] Cooling-off respeitado se feature grande (§3).
 
-**Legacy GDScript (validate_autoloads.gd, tooling):**
-- [ ] Passa `gdformat` + `gdlint` (somente em arquivos `.gd` editor-only).
+**GDScript editor-only (tooling):**
+- [ ] Arquivo `.gd` editor-only passa `gdformat` + `gdlint` (se existir; pós-ADR-002 o projeto é C# canon).
 
 ### DoD: feat(art)
 
@@ -260,11 +260,11 @@ Save format canon: **JSON versionado `save_version: N` com migrators forward-onl
 
 ### Princípios
 
-- `save_version` inicia em `1` em D1 da implementação `engine/save_system/`.
+- `save_version` inicia em `1` em D1 da implementação `engine/foundation/save_system/`.
 - Toda mudança de schema **MUST** bumpar `save_version`.
-- Cada bump **MUST** ter migrator `migrate_N_to_N_plus_1.gd` em `engine/save_system/migrators/`.
+- Cada bump **MUST** ter migrator `MigrateVNtoVN1.cs` em `engine/foundation/save_system/Migrators/` implementando `IMigrator`.
 - Migrators **MUST** ser funções puras (input save N, output save N+1, sem efeito colateral).
-- Migrators **MUST** ter teste unitário com input/output esperado (`tests/save/migrator_N_to_N_plus_1_test.gd`).
+- Migrators **MUST** ter teste xUnit com input/output esperado (`engine/tests/save_system/MigrateVNtoVN1Tests.cs`).
 - Chain de migrators automática: save em version K carrega via chain K para K+1 para ... para N (versão atual).
 
 ### Política forward-only
