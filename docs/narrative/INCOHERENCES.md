@@ -237,3 +237,17 @@ Nenhuma cascata fix em lore-bible/timeline. Apenas reconhecimento explícito do 
 **Status piloto:** PROTOCOLO VALIDADO. ROI revisão proativa confirmado empiricamente. 13 críticos que cascateariam pra docs futuros + custo audit final 3-5× maior se adiados.
 
 **Próximo passo:** rerun TEXTREVIEW Lote 1 pós-fixes prose pra validar 0 críticos remanescentes.
+
+## RESOLUÇÃO CANON 2026-05-30 — Homônimo Hipátia + cadeia de sucessão (§10 era-1)
+
+**C16. Colisão de nome "Hipátia" (§10 era-1) — RESOLVIDO 2026-05-30.**
+Duas personagens distintas chamadas Hipátia: (a) **Hipátia Atelaiá-Vargas**, 5ª geração da cadeia institucional de cronistas-mãe (ancestral, L2747/L4509) — MANTIDA; (b) cantadeira-anciã contemporânea de São Vargas, ~45ª estação, epíteto "a Vigilante", linhagem Argéndia-Vargas — **RENOMEADA para `Urânia Argéndia-Vargas a Vigilante`** (decisão criador: renomear a contemporânea + corrigir sobrenome pra refletir matrilinhagem). 37 ocorrências reclassificadas; topônimo "São Vargas" preservado. CHARS.md:189 entrada nova. **Status:** RESOLVIDO.
+
+**C17. Bug cronológico: Urânia como mestra de Verônica — RESOLVIDO 2026-05-30.**
+Pós-rename, Urânia ficou listada como mestra formativa de Verônica (L4421), mas é ~30 anos mais nova (aprendiz de ~20 quando Verônica tinha 50, L3921-3923). Reposicionada como **discípula que Verônica formou** (D-2b), pagando o foreshadowing da Travessia (partituras-mapa L3921). Lista de mestras reais = 3 (Cassandra Yvanova, Olímpia, Margarida a Atenta). **Status:** RESOLVIDO.
+
+**C18. Tensão escala da cadeia (8 séculos) × mentoria pessoal — RESOLVIDO 2026-05-30.**
+A cadeia "10 nomes / 8 séculos" não podia ser fila biológica de mentoria (elos seculares não mentoram pessoalmente). Enquadrada (D-1/B) como **linhagem institucional honorífica do título** (marcos de sucessão), distinta das **mestras vivas contemporâneas** ("três gerações sobrepostas") que formaram Verônica em pessoa. Glosa na voz de Verônica em L4513, ancorada em L4515 ("continuidade é institucional, não genética"). Zero números seculares alterados. **Status:** RESOLVIDO.
+
+**C19. Oscilação "seiscentos" vs "oito séculos" — RESOLVIDO 2026-05-30.**
+Padronizado em "oito séculos / oitocentos anos" (ancorado no Êxodo -720). 9 ocorrências da duração da linhagem corrigidas; 3 "seiscentos" legítimos mantidos (radicais paleográficos L122, escadaria física L4163, janela de placa L4285). **Status:** RESOLVIDO.
