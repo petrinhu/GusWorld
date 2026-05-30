@@ -104,18 +104,16 @@ public partial class Localization : Node
     /// </summary>
     public string TrMd(string key, Variant[]? args = null)
     {
-        string value;
+        // Fallback chain: locale atual -> en_intl -> pt_br -> literal.
+        // Em G1 o en_intl.md tem valores VAZIOS (paridade estrutural sem tradução):
+        // um value vazio/whitespace NÃO conta como resolvido -> cai pro próximo locale.
+        // Ausência total da key também cai pro próximo locale; literal só no fim.
+        var value = ResolveValue(key);
 
-        if (_strings.TryGetValue(_currentLocale, out var current) && current.TryGetValue(key, out var v1))
-            value = v1;
-        else if (_strings.TryGetValue(FallbackLocale, out var fallback) && fallback.TryGetValue(key, out var v2))
-            value = v2;
-        else if (_strings.TryGetValue(DefaultLocale, out var def) && def.TryGetValue(key, out var v3))
-            value = v3;
-        else
+        if (value == null)
         {
             if (OS.IsDebugBuild())
-                GD.PushWarning($"Localization: chave '{key}' não encontrada em nenhum locale");
+                GD.PushWarning($"Localization: chave '{key}' não encontrada (ou só vazia) em nenhum locale");
             return key;
         }
 
@@ -127,6 +125,36 @@ public partial class Localization : Node
         }
 
         return value;
+    }
+
+    /// <summary>
+    /// Caminha a fallback chain (locale atual, en_intl, pt_br, sem repetir) e
+    /// retorna o primeiro value NÃO-vazio. Retorna null se nenhum locale tem a
+    /// key com value não-vazio (caller decide o literal).
+    /// </summary>
+    private string? ResolveValue(string key)
+    {
+        foreach (var locale in FallbackChain())
+        {
+            if (_strings.TryGetValue(locale, out var table)
+                && table.TryGetValue(key, out var v)
+                && !string.IsNullOrWhiteSpace(v))
+            {
+                return v;
+            }
+        }
+        return null;
+    }
+
+    /// <summary>
+    /// Ordem de tentativa de locales, sem duplicatas: atual primeiro, depois
+    /// en_intl, depois pt_br. Se atual já for um deles, não repete.
+    /// </summary>
+    private IEnumerable<string> FallbackChain()
+    {
+        yield return _currentLocale;
+        if (FallbackLocale != _currentLocale) yield return FallbackLocale;
+        if (DefaultLocale != _currentLocale && DefaultLocale != FallbackLocale) yield return DefaultLocale;
     }
 
     /// <summary>
