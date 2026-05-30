@@ -48,3 +48,11 @@ __pycache__/
 # Concept art / refs e PDFs soltos (locais, fora do repo) — F2-S.OPS.2
 resources/images/
 resumo.pdf
+
+# .NET build outputs (game/ e engine/ — F2-S.6)
+bin/
+obj/
+*.user
+*.suo
+.vs/
+project.lock.json
