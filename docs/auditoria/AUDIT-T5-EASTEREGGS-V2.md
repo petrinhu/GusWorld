@@ -3,6 +3,14 @@
 **Data:** 2026-05-22 (TEXTREVIEW v2)
 **Status:** AMBARULO COM REPAROS CRÍTICOS
 
+---
+
+## STATUS DE CASCATA (revisão F1-DL.TRACKER-CLOSE 2026-05-30)
+
+> Marcador de bookkeeping. NÃO altera o canon.
+
+**Os 10 CRÍTICOS T5 v2 permanecem PENDENTES (BLOQUEADO).** Natureza: easter eggs (maçom literal 9 violações em `era-2-boom-tecnico.md`; Pigpen/Fibonacci over-explicit; GAP cronômetro mestre). **Não são incoerências factuais de canon**; são ajustes de densidade/sutileza de easter egg + 1 gap de prosa. Dependem do refator era-2 agendado pós-T10. Fora do escopo de F1-DL.TRACKER-CLOSE (incoerências factuais C1-C15). Nenhum crítico marcado resolvido. NOTA: o GAP "Cronômetro mestre destravado" (Ardenia + Cândido) pode ser canon-extension a confirmar com criador, não simples fix.
+
 ## CRÍTICOS (10)
 
 ### Anti-pattern "maçom literal" era-2-boom-tecnico (9 violações)

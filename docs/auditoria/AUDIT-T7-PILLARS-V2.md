@@ -2,7 +2,21 @@
 
 **Data:** 2026-05-22 (TEXTREVIEW v2)
 **Issues totais:** 17 (3 CRÍTICOS + 6 MÉDIOS + 8 LEVES)
-**Veredito:** APROVAR COM FIXES MÉDIOS — Pillars 1-5 reformulados canon Revisão 1 PROPAGADOS consistentemente em 15+ docs
+**Veredito:** APROVAR COM FIXES MÉDIOS, Pillars 1-5 reformulados canon Revisão 1 PROPAGADOS consistentemente em 15+ docs
+
+---
+
+## STATUS DE CASCATA (revisão F1-DL.TRACKER-CLOSE 2026-05-30)
+
+> Marcador de bookkeeping. NÃO altera o canon. Críticos não reverificados nesta passada (fora do escopo factual C1-C15).
+
+| Crítico | Status | Nota |
+|---|---|---|
+| CRIT-T7-01 Dante Pillar 3 ambíguo (meta-hardware) | PENDENTE (não verificado) | Ajuste de clareza em `characters/dante-grid.md:11` + `lore-bible §7.2`. Não é incoerência factual; é precisão de pillar. |
+| CRIT-T7-02 Datação Patch-Zero -3 vs -8 | PENDENTE (não verificado) | `characters/patch-zero.md:58` vs `deep/antagonists/patch-zero-deep §5`. Canon deep prevalece (-8 captura inicial). Fix de datação em characters/patch-zero não confirmado. |
+| CRIT-T7-03 Sterling simetria lógica vs ética | PENDENTE (não verificado) | `characters/sterling-locke.md:100-103`. Reforço anti-Pillar 4 + axiologia (Sterling não simétrico a Gus). Não verificado. |
+
+**Resumo:** os 3 CRÍTICOS são ajustes de consistência de pillar em docs de personagem, **PENDENTES** (não reverificados nesta passada de tracker-close, pois estão fora do escopo das incoerências factuais C1-C15). Veredito original "APROVAR COM FIXES MÉDIOS" mantido.
 
 ## CRÍTICOS (3)
 

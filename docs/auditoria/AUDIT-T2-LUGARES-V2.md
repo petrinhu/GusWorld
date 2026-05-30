@@ -4,6 +4,19 @@
 **Issues totais:** 12 (2 CRÍTICOS reais + 5 MÉDIOS + 3 LEVES)
 **Eficácia cascata T2 v1:** 93% confirmada (zero drift lista negra Sylvania-Catedrais/Vyr-Aldeia/Polis Vermelha s/hífen/Cidade Janelarum)
 
+---
+
+## STATUS DE CASCATA (revisão F1-DL.TRACKER-CLOSE 2026-05-30)
+
+> Marcador de bookkeeping. NÃO altera o canon.
+
+| Crítico | Status no canon | Nota |
+|---|---|---|
+| CR-T2v2-01 Câmara Equinócio Acústico datação -3 vs -1 | PENDENTE (fix diary) | Canon -3 (PLACES:91 + environments/07 + factions); drift em `diary/entries-mapas-timeline` 2 ocorrências, não verificado/corrigido. Fix trivial sed. |
+| CR-T2v2-02 Quadrante Pelicano Branco "oeste-sul" vs "centro-sul" | PENDENTE (decisão criador) | One-way door entre `deep/settings/02` e `deep/settings/08`; sem decisão registrada. |
+
+**Relação com incoerências factuais C1-C15:** C15 (datação vilarejos -720 físico vs -45 institucional) está RESOLVIDO em INCOHERENCES.md (camadas distintas canon). O lugar "Caverna dos Perdidos" (relevante a C10 Edilma) foi verificado alinhado cross-doc (L-T2v2-01 confirmado). Os 2 críticos T2 são de datação/quadrante em prosa deep-lore + diary, **PENDENTES**. Status BLOQUEADO original mantido para os 2 críticos.
+
 ## CRÍTICOS REAIS (2)
 
 ### CR-T2v2-01. Câmara do Equinócio Acústico datação -3 vs -1

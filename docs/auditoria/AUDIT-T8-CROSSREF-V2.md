@@ -2,7 +2,17 @@
 
 **Data:** 2026-05-22 (TEXTREVIEW v2)
 **Issues totais:** 20 (5 CRÍTICOS + 7 MÉDIOS + 8 LEVES)
-**Veredito:** APROVAR COM FIXES MÉDIOS — backbone cross-ref canon ROBUSTO
+**Veredito:** APROVAR COM FIXES MÉDIOS, backbone cross-ref canon ROBUSTO
+
+---
+
+## STATUS DE CASCATA (revisão F1-DL.TRACKER-CLOSE 2026-05-30)
+
+> Marcador de bookkeeping. NÃO altera o canon.
+
+**Os 5 CRÍTICOS T8 v2 são técnicos (sintaxe wikilink), permanecem PENDENTES (não verificados).** São de integridade de link Obsidian, não incoerências factuais. CRIT-T8v2-05 (path INCOHERENCES em `~/.claude/agents/revisor-textual.md`) NÃO foi tocado (fora do repo do jogo; arquivo de agent).
+
+**Validação da afirmação deste AUDIT sobre INCOHERENCES (linha "INCOHERENCES C1-C15: resolvidos"):** CONFIRMADA em 2026-05-30. Verificação ponto-a-ponto contra o canon central confirma que C1-C15 estão resolvidos. INCOHERENCES.md foi atualizado (F1-DL.TRACKER-CLOSE) com veredito RESOLVIDO em cada Cx + STATUS GLOBAL (15/15 resolvidas, 0 abertas). A matriz deste AUDIT estava correta.
 
 ## ESTATÍSTICAS
 

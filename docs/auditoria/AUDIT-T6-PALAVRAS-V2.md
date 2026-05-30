@@ -1,8 +1,16 @@
 # F5-BK.AUDIT.FULL T6 v2 — PALAVRAS PROIBIDAS CROSS-DOC
 
 **Data:** 2026-05-22 (TEXTREVIEW v2)
-**Status:** **BLOQUEADO MASSIVO** — 1.060+ issues
+**Status:** **BLOQUEADO MASSIVO**, 1.060+ issues
 **Issues:** 1.001 críticos + 30 médios + 356 leves
+
+---
+
+## STATUS DE CASCATA (revisão F1-DL.TRACKER-CLOSE 2026-05-30)
+
+> Marcador de bookkeeping. NÃO altera o canon.
+
+**Os ~1.001 CRÍTICOS T6 v2 (majoritariamente em-dash em prose) permanecem PENDENTES (BLOQUEADO).** Natureza: anti-pattern de pontuação (992 em-dash) + maçom literal (9) + termos de glossário. **Não são incoerências factuais de canon**; são limpeza de pontuação/estilo + decisões de terminologia in-world (6 one-way doors pendentes). Fora do escopo de F1-DL.TRACKER-CLOSE (incoerências factuais C1-C15). Nenhum crítico marcado resolvido. NOTA: a LISTA NEGRA factual citada aqui (Patrício Vance, -13 Davi morte, Chevarier, Salvador -16) está confirmada **0 ocorrências** em prose canon (cf. INCOHERENCES C1/C3); essa parte está coerente com o fechamento das incoerências.
 
 ## ACHADO PRINCIPAL: 992 violações em-dash prose canon central
 

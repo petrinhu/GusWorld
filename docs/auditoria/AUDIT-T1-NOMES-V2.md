@@ -2,7 +2,23 @@
 
 **Data:** 2026-05-22 (refazer com TEXTREVIEW v2)
 **Persona:** Revisor Profissional Copydesk + Auditor Cânone Longo Prazo
-**Issues totais:** 9 (4 CRÍTICOS + 3 MÉDIOS + 2 LEVES) — drift residual pós-cascata T1 v1 93%
+**Issues totais:** 9 (4 CRÍTICOS + 3 MÉDIOS + 2 LEVES), drift residual pós-cascata T1 v1 93%
+
+---
+
+## STATUS DE CASCATA (revisão F1-DL.TRACKER-CLOSE 2026-05-30)
+
+> Marcador de bookkeeping. Verificação contra o canon central. NÃO altera o canon.
+
+| Crítico | Status no canon | Nota |
+|---|---|---|
+| CR-T1v2-01 Felícia Atelaiá → Felícia Tarsila | PENDENTE (prosa deep-lore) | Nome canon CHARS:193 já é "Felícia Tarsila"; a correção na PROSA de `ordem-recursiva.md:266+268` não foi confirmada. Não é incoerência factual de canon (CHARS está certo); é cascata de redação deep-lore. |
+| CR-T1v2-02 Tarsila -21 → Tarsila Atelaiá-Verônica -25 | PENDENTE (prosa deep-lore) | Canon CHARS:192 + timeline:79 já fixam -25 + sobrenome composto; correção na prosa de `era-2-boom-tecnico.md:917` não confirmada. |
+| CR-T1v2-03 Lucélia/Antonella/Helga obsoletos → patrilinear Chevalier | PENDENTE (prosa deep-lore) | Canon CHARS §8c + timeline já canonizam patrilinear Chevalier (Antoneto/Dmitri/Casimiro/Aldebrando); correção na prosa de `era-2-boom-tecnico.md:925` não confirmada. |
+| CR-T1v2-04 Filename `11-venea-vance-mae.md` obsoleto | PENDENTE | Rename de arquivo + 4 cross-refs; não verificado. |
+| MD-T1v2-03 Verônica morte cross-conflict (lore-bible:570 -30/80a + sterling-locke ~-1) | **CASCATEADO no canon** | Verificação 2026-05-30: `lore-bible.md:570` já diz "morta em -35, aos 43 anos" (0 ocorrências de "morta há 30 anos"/"80 anos"); `deep/antologia/08-sterling-locke.md` realinhado (tratado datado -45, sem "~-1"). Corrigido **após** este AUDIT. Ver INCOHERENCES C13. |
+
+**Resumo:** os 4 CRÍTICOS são drift de prosa em 2 docs deep-lore + 1 filename, e permanecem **PENDENTES** (refator de redação, não incoerência factual de canon, pois CHARS/timeline já têm os nomes corretos). MD-T1v2-03 foi cascateado no canon. Incoerências factuais relacionadas (C1 Pyotor, C13 Verônica) estão fechadas em INCOHERENCES.md. O status BLOQUEADO original mantém-se para os 4 críticos de prosa.
 
 ## CRÍTICOS (4)
 

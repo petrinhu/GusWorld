@@ -2,7 +2,15 @@
 
 **Data:** 2026-05-22 (TEXTREVIEW v2)
 **Issues totais:** 71 (18 CRÍTICOS + 31 MÉDIOS + 22 LEVES)
-**Status:** **BLOQUEADO pré-publicação Vol 1** — fadiga prosa terminal era-2
+**Status:** **BLOQUEADO pré-publicação Vol 1**, fadiga prosa terminal era-2
+
+---
+
+## STATUS DE CASCATA (revisão F1-DL.TRACKER-CLOSE 2026-05-30)
+
+> Marcador de bookkeeping. NÃO altera o canon.
+
+**Os 18 CRÍTICOS T4 v2 permanecem PENDENTES (BLOQUEADO).** Natureza: refatoração de VOZ/ESTILO (fadiga de prosa Stephenson em `era-2-boom-tecnico.md`, fórmulas auto-replicantes "articula-se em registro de" 241x, "calibrad*" 800+x, etc.). **Não são incoerências factuais de canon** (o canon factual está correto; o problema é densidade estilística). Este AUDIT está fora do escopo da tarefa F1-DL.TRACKER-CLOSE (que fecha as incoerências factuais C1-C15 de INCOHERENCES.md). A refatoração massiva de era-2 (~93k → ~70-75k pal, 10-15 dispatches narrative-writer) continua agendada e não-executada. Nenhum crítico marcado resolvido.
 
 ## ACHADO PRINCIPAL: era-2-boom-tecnico.md FADIGA PROSA TERMINAL
 

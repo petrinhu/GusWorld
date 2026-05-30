@@ -2,7 +2,25 @@
 
 **Data:** 2026-05-22 (TEXTREVIEW v2)
 **Issues totais:** 31 (6 CRÍTICOS + 11 MÉDIOS + 14 LEVES)
-**Veredito:** APROVAR COM RESSALVAS MÉDIAS — axiologia canon binária aplicada com consistência IMPRESSIONANTE em 6 docs deep-lore
+**Veredito:** APROVAR COM RESSALVAS MÉDIAS, axiologia canon binária aplicada com consistência IMPRESSIONANTE em 6 docs deep-lore
+
+---
+
+## STATUS DE CASCATA (revisão F1-DL.TRACKER-CLOSE 2026-05-30)
+
+> Marcador de bookkeeping. NÃO altera o canon.
+
+| Crítico | Status | Nota |
+|---|---|---|
+| C-T10v2-01 factions.md 135 em-dash | PENDENTE | Mesmo que T6 (em-dash global). Estilo, não factual. |
+| C-T10v2-02 / -04 Festa Coletivista cross-ref ausente | PENDENTE (não verificado) | Propagação canon-extension factions + tradicoes-cultura. |
+| C-T10v2-03 Theodora Argéndia obsoleto era-2:953 | PENDENTE (prosa deep-lore) | Canon fundadora Argéndia = Calíope + Albertina (CHARS §8b); "Theodora" não existe canon. Fix na prosa de `era-2-boom-tecnico.md` não confirmado. |
+| C-T10v2-05 Datação Setor Tavus -148 vs -150 | RESOLVIDO no canon central / PENDENTE prosa deep | Canon central JÁ distingue 3 datas (não drift): -150 Setor Tavus, -148 Ordem informal, -140 GusWorld City (`CHARS.md:234` + `timeline.md:67-69`). Drift residual seria só em `ordem-recursiva.md:182` (prosa deep), não confirmado. |
+| C-T10v2-06 Aritmética Polis-Vermelha 105 vs 128 anos | PENDENTE (prosa deep-lore) | Fix aritmético em `era-2-boom-tecnico.md:957`. Não verificado. |
+
+**Nota factual:** L03 deste AUDIT pedia verificar "Salvador morto -13 trânsito vs -5 Subestação". Resolvido em INCOHERENCES C3/C6: **Salvador morre -13** (acidente tráfego, mesmo ano nascimento Cauã); **Davi morre -5** (Subestação 7). São duas pessoas distintas (pai Salvador vs irmão Davi), canon timeline:116+199. Coerente. M05 (Pyotor "médico-cyber itinerante") alinha com C1 fechado.
+
+**Resumo:** dos 6 CRÍTICOS, C-T10v2-05 tem a distinção de datas já canonizada no canon central; os demais são propagação de cross-ref + correções de prosa deep-lore (era-2/ordem-recursiva) + em-dash, **PENDENTES**, fora do escopo das incoerências factuais C1-C15. Veredito original mantido.
 
 ## ESCOPO
 

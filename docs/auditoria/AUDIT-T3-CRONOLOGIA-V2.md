@@ -4,6 +4,21 @@
 **Issues totais:** 17 (4 CRÍTICOS reais + 9 MÉDIOS + 4 LEVES)
 **Eficácia cascata T3 v1:** ~80% (16 críticos cobertos, 4 residuais detectados v2)
 
+---
+
+## STATUS DE CASCATA (revisão F1-DL.TRACKER-CLOSE 2026-05-30)
+
+> Marcador de bookkeeping. Verificação contra o canon central. NÃO altera o canon. Forte cascata aplicada **após** este AUDIT (2026-05-22).
+
+| Crítico | Status no canon | Verificação 2026-05-30 |
+|---|---|---|
+| CR-T3v2-01 Bento "aos 4 anos" cross-doc (8 docs) | **CASCATEADO (fontes primárias)** | `factions.md:223` agora "Bento (7) sobrevive"; `characters/bento-requiem.md:29+97` "aos 7 anos (canônico -7)"; `in-world-docs.md:128` subtexto "Bento aos 7 anos"; `foreshadowing.md` 0 ocorrências de "Bento 4 anos". **Não exaustivamente verificados nesta passada:** `diary/foreshadow-links.md`, `diary/entries-mapas-timeline.md`, `diary/entries-fichas-bestiary.md`, `diary/entries-manuscrito-glossario.md` (diary deep). |
+| CR-T3v2-02 Verônica morte lore-bible:570 | **CASCATEADO** | `lore-bible.md:570` "morta em -35, aos 43 anos" (0 ocorrências "morta há 30 anos"/"80 anos"). Ver INCOHERENCES C13. |
+| CR-T3v2-03 Sonja "morta há 28 anos" lore-bible:500 | **CASCATEADO** | `lore-bible.md:500` agora datação absoluta "morta em -34 aos 33 anos (canon timeline:86 + CHARS:82 + factions:505)"; ambiguidade sanada. |
+| CR-T3v2-04 DD-003 subtexto Bento 4 anos paralelo Fibonacci | **CASCATEADO** | `in-world-docs.md:128` reformulado: paralelo numérico "13 mestres/4 sobreviventes" preservado, idade Bento corrigida para 7. |
+
+**Resumo:** os 4 CRÍTICOS reais foram cascateados no canon central **após** a data deste AUDIT (verificado nas fontes primárias: factions, bento-requiem, lore-bible, in-world-docs, foreshadowing). Resta varredura confirmatória nos arquivos `diary/*` deep (não checados exaustivamente nesta passada de tracker-close). Incoerências factuais relacionadas (C3 Cauã/Davi, C13 Verônica) fechadas em INCOHERENCES.md. Status original BLOQUEADO deve ser revisto para "majoritariamente cascateado, pendente varredura diary".
+
 ## CRÍTICOS REAIS (4)
 
 ### CR-T3v2-01. Bento "aos 4 anos" cross-doc drift sistêmico 8 docs

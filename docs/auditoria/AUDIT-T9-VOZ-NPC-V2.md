@@ -2,7 +2,21 @@
 
 **Data:** 2026-05-22 (TEXTREVIEW v2)
 **Issues totais:** 9 (3 CRÍTICOS + 4 MÉDIOS + 2 LEVES)
-**Veredito:** APROVAR — voz NPC canon ROBUSTO ≥95% consistência cross-doc
+**Veredito:** APROVAR, voz NPC canon ROBUSTO ≥95% consistência cross-doc
+
+---
+
+## STATUS DE CASCATA (revisão F1-DL.TRACKER-CLOSE 2026-05-30)
+
+> Marcador de bookkeeping. NÃO altera o canon. Críticos de prosa de conto não reverificados nesta passada.
+
+| Crítico | Status | Nota |
+|---|---|---|
+| CRIT-T9v2-01 Conto 09 Vorto §32 Padim Tércio parentesco drift | PENDENTE (não verificado) | Canon CHARS:131 fixa Padim Tércio Almagre "sem vínculo de sangue com família Alencar (afetivo informal)". Correção de 1 parágrafo na PROSA do conto 09 não confirmada. |
+| CRIT-T9v2-02 Conto 02 Cauã en-dash em diálogo | PENDENTE (decisão/estilo) | Padronização de diálogo (aspas vs en-dash); cf. memo `feedback_dialogo_travessao_vol2` (exceção travessão Vol 2). Decisão de formato. |
+| CRIT-T9v2-03 Conto 09 §32 duplicação "Almagre Almagre" | PENDENTE (fix trivial) | Erro de repetição; sed simples na prosa do conto, não confirmado. |
+
+**Nota:** MD-T9v2-02 já reconhece "DD-003 17 corpos = unreliable narrator C2 INCOHERENCES já canonizado" (alinhado ao fechamento de C2). MD-T9v2-03 (Pyotor cross-doc consistente) e MD-T9v2-04 (Calveri CHARS:96) alinham com C1 e C7 fechados. Os 3 críticos são de prosa de conto/estilo, **PENDENTES**, fora do escopo das incoerências factuais C1-C15. Veredito original APROVAR mantido.
 
 ## ESCOPO AUDITADO
 
