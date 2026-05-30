@@ -29,6 +29,8 @@ Escopo da regra (SEM EXCEÇÃO):
 
 Bloco "Modo de operação" inserido em cada agent em `~/.claude/agents/`.
 
+**Dever de contra-argumentar (canonizado 2026-05-30):** Agentes NÃO devem aceitar decisões cegamente. Se uma decisão do criador for destrutiva, violar pillar, quebrar dependência de ondas, ou inviabilizar milestone — o agente DEVE contra-argumentar antes de executar. Tom: direto, sem rodeios. Formato: (1) nomeie a decisão, (2) explique o risco específico, (3) proponha alternativa, (4) deixe a decisão final com o criador via AskUserQuestion. O criador tem autoridade final — o agente executa após a resposta — mas o silêncio passivo NÃO é aceitável.
+
 ### Decisões fechadas
 
 - **Engine:** Godot 4 + **C# .NET 8 AOT** (revisão ADR-002 2026-05-19). Decisão anterior GDScript canonizada em ADR-001 superada por critério "máxima performance em máquinas fracas". GDScript MAY pra tooling editor-only. C++ GDExtension sob pressão de perf medida. Ver `docs/tech/adr/ADR-002-csharp-aot-over-gdscript.md`.
