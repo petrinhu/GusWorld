@@ -159,6 +159,8 @@ Cada família tem identidade mecânica distinta: a sobreposição de papéis é 
 
 Gus = **todas as famílias** (protagonista é o compilador universal; companions são especialistas).
 
+> **Representação no engine (canon 2026-06-03, F2-E.10):** a universalidade do Gus NÃO é um valor da enum `CardFamily` (a roda de fraqueza mantém só os 5 elementais puros). É uma **flag `IsUniversalCompiler`** no `CharacterTemplate`: o deck do Gus pode conter qualquer família; companions ficam travados na sua. Defesa do Gus = neutra (sem fraqueza de família amplificada; a fragilidade dele vem do HP/contrato §2.1, não de tipagem). Implementação da flag + consumo em combate = F2-E.10b (CharacterRepository).
+
 ### Roda de fraqueza fechada e determinística
 
 Ciclo fechado de 5 elos. Cada família é **forte contra** a seguinte no sentido da seta. Não há ambiguidade: a relação é determinística e revelada por Scan.

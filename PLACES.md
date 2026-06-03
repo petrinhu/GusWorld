@@ -76,6 +76,7 @@ Canon F5-BK.AUDIT T2-C3 resolução "modelo dois-anéis": 10 vilarejos pós-Êxo
 | Nome | Tipo | Era | Localização canon | Status | Cross-ref |
 |---|---|---|---|---|---|
 | **Praça da Compilação** | Sub-local (Núcleo) | 2 + 3 | Centro civil Núcleo Metropolitano | ✅ canônico | `environments/01-cidade-cyber-gotica.md` |
+| **Distritos Inferiores** | Sub-local (Núcleo↔Periferia) | 2 + 3 | Borda baixa do Núcleo Metropolitano descendo à charneira da Periferia; engloba a Praça da Compilação e a descida sul ao portão da Periferia. Área-âncora do Vertical Slice (cidade ato 1, ~5min explore) | ✅ canônico (VS; canonizado 2026-06-03 via F2-G.1 DA-1) | `docs/design/levels/blockout-distritos-inferiores.md` + `environments/01-cidade-cyber-gotica.md` |
 | **Tetra-Torre Janelarum** | Sub-local (Núcleo) | 3 | Lado norte Núcleo | ✅ canônico | `environments/01-cidade-cyber-gotica.md` |
 | **Mercado da Sucata Honesta** | Sub-local (Núcleo↔Periferia) | 2+3 | Zona-charneira | ✅ canônico | `environments/01-cidade-cyber-gotica.md` |
 | **Edifício Vance** | Sub-local (Núcleo) | 2 (~-90 a -70) | Lado leste Núcleo, apartamento Vance 6º andar | ✅ canônico (safe base Gus) | `environments/01-cidade-cyber-gotica.md` |
