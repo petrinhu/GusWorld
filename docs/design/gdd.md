@@ -1,6 +1,6 @@
 # GusWorld — Game Design Document (1-page)
 
-Versão: 0.1 (pré-produção) — escopo solo G1, Godot 4, PC Linux+Windows, single-player.
+Versão: 0.2 (pré-produção, F1.12-REFRESH 2026-06-02) — escopo solo G1, Godot 4, PC Linux v1 (Windows pós-v1), single-player.
 
 ---
 
@@ -15,10 +15,10 @@ RPG turn-based de prodígio-hacker de 11 anos que compila feitiços como código
 Detalhe completo em [[pillars]]. Resumo decisório:
 
 1. **Lógica vence força** — SIM turn-based + predição; NÃO QTE/twitch/HP-sponge.
-2. **Magia é software, natureza é matemática** — SIM cartas com sintaxe + fractais visíveis; NÃO RNG opaco / lore místico.
+2. **Magia é sistema formal computável, natureza é matemática** — SIM cartas com sintaxe + fractais visíveis; NÃO RNG opaco / lore místico.
 3. **Triângulo de hardware é a interface** — SIM upgrades em Óculos / Matriz / Tavus-Drive; NÃO habilidade sem origem técnica.
 4. **Prodígio de 11 anos, não herói adulto** — SIM tom analítico / vulnerável / curioso; NÃO power-fantasy adulta / edgy.
-5. **Contraste bipartido cidade × floresta** — SIM paleta/áudio/mecânica distintos por lado; NÃO bioma híbrido genérico.
+5. **Contraste multipolar com 2 âncoras (cidade × Selve)** — SIM paleta/áudio/mecânica distintos por 8 settings; NÃO setting como decoração genérica.
 
 ---
 
@@ -103,8 +103,8 @@ Sinergia com 6.1 e 6.2: scan dá input, gambito dá output, deck é a ferramenta
 
 - **Duração total:** 4-8 horas (campanha principal), +2h se completar todos os puzzles opcionais.
 - **Capítulos:** 6 (alternando cidade ↔ Selve ↔ cidade ↔ Selve ↔ híbrido-set-piece ↔ boss final).
-- **Biomas:** 2 macro (Megacidade ciber-gótica, Selve Sombria tecnorgânica) com 3 sub-zonas cada.
-- **Party:** 3 personagens em combate (Gus + 2 companions desbloqueados ao longo da campanha; companions ainda a desenhar — placeholder para narrative-designer).
+- **Biomas:** 2 macro-biomas (Megacidade ciber-gótica, Selve Sombria tecnorgânica); **8 settings de identidade visual/sonora/mecânica distinta** distribuídos entre eles. Detalhe completo: [[pillars]] §Pillar5.
+- **Party:** Gus + **6 companions canônicos**: Cauã "Volt" Berenger, Iara "Lumen" Koslov, Bento "Requiem" Chevalier, Linda "Siren" Neumann, Dante "Grid" Alencar (traidor), Jaci "Proxy" Vanderbist. Em combate: Gus + 2 ativos rotativos. Detalhe: `docs/narrative/characters/party.md`.
 - **Progressão qualitativa:**
   - Cap 1-2: Gus solo, 1 vértice ativo (Tavus-Drive básico, ~10 cartas). Tutorial diegético.
   - Cap 3-4: 2 companions, 2 vértices, ~20 cartas, primeiros upgrades de hardware.
@@ -116,7 +116,7 @@ Sem level numérico estilo "Gus Lv 47". Progressão por **módulos de hardware**
 
 ## 8. Métrica de sucesso
 
-**Time-to-fun ≤ 5 minutos.** Em playtest N≥10, jogador novo precisa ter executado o core loop completo (scan → compilar → prever → resolver 1 encontro) em até 5 minutos de gameplay real. Se falhar, onboarding é refeito.
+**Time-to-fun ≤ 5 minutos.** Em playtest interno N=3 (Petrus + Gus Dragon + Iago — time familiar), jogador novo precisa ter executado o core loop completo (scan → compilar → prever → resolver 1 encontro) em até 5 minutos de gameplay real. Se falhar, onboarding é refeito.
 
 Secundárias (não bloqueantes): "would play again" ≥70%, taxa de conclusão da campanha ≥40% em primeira run.
 
@@ -135,7 +135,9 @@ Secundárias (não bloqueantes): "would play again" ≥70%, taxa de conclusão d
 - Mais de 2 macro-biomas.
 - Crafting de cartas (cartas são obtidas, não craftadas).
 - DLC / season pass / live-service.
-- Console port no MVP (Linux+Windows apenas).
-- Tradução além de pt-br + en-us.
+- Console port no MVP (Linux v1; Windows export template preparado mas ship pós-v1).
+- Tradução além de pt-br em v1 (en-intl pós-release v1.0.0; estrutura i18n-ready desde F2-S.11).
+- Mod support / in-game editor.
+- Achievements / leaderboards (post-launch talvez).
 - Tutorial wall-of-text / cinemática de abertura > 90s.
 - Mais de 8h de campanha (escopo G1 mata).

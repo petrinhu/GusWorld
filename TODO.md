@@ -26,9 +26,9 @@ Tabela canônica de pendências e planejamento. Atualizar via skill `/tab_penden
 | F2-S.6b | — | F2-Setup | Padronizar tracking de `*.cs.uid` (Godot 4.4+): DECIDIR versionar TODOS (recomendado p/ estabilidade de referência) ou ignorar todos, e aplicar uniforme no `.gitignore` raiz E `engine/.gitignore`. Estado misto: ~14 commitados, ~27 untracked. Decisão one-shot | Baixa | — | Baixa | ✅ Concluído 2026-05-29 | ✓ |
 | F2-S.14 | — | F2-Setup | `icon.svg` ausente: `project.godot:18` aponta `res://icon.svg` (raiz, NÃO `game/icon.svg`). Criar o arquivo no path real ou ajustar a referência. Evita warning de import + ícone faltante no export, polui log do CI | Baixa | F2-S.2 | Baixa | ✅ Concluído 2026-05-30: icon.svg criado na raiz (placeholder G violet #7c3aed, 128×128). project.godot:18 aponta res://icon.svg. | ✓ |
 | F2-CI.1 (alinhar doc) | — | F2-Build/CI | Resolver divergência doc×TODO dos wrappers: TODO F2-CI.1 diz `scripts/build_linux.sh`+`build_windows.sh`; build.md §3.3 diz `tools/build_all.sh`+`version_bump.sh`. Escolher um (recomendo `scripts/` com `set -euo pipefail`) e alinhar o canon ANTES de codar | Média | — | Baixa | ✅ Concluído 2026-05-30: build.md §3.3 canonizado em scripts/ (build_linux.sh + build_windows.sh + version_bump.sh). game/tools/ reservado pra headless Godot. | ✓ |
-| F1.12-REFRESH | W1 | F1-Concepção | Refresh canônico GDD 1-page pós-pivot (aplica decisões W0): alinhar §2 pillars a pillars.md ("sistema formal computável" não "software"; "multipolar 2 âncoras/8 settings"), substituir §7 "companions a desenhar" pelos 6 nomeados, reconciliar §9 cortes c/ CUT.*, harmonizar threshold playtest (GDD N≥10 vs F2-M.3 N=5). Promover 🟡⚠→canônico após revisão criador | Alta | F1.1, F2-E.5 | Baixa | 🎨 Aguarda revisão criador | — |
-| CUT-RECONCILE | W1 | F1-Concepção | Fonte-única dos cortes G1: decidir se canônico é GDD §9 ou CUT.1..10, fazer uma referenciar a outra (itens exclusivos cada). Esclarecer idioma v1 (GDD §9 L139 diz "pt-br+en-us"; CUT.9+memo i18n dizem só pt-br em v1, en-intl pós-1.0.0) — impacta budget i18n | Média | F1.12-REFRESH | Baixa | 🎨 Decisão criador (AskUser) | — |
-| F2-ROADMAP.VS | W1 | F2-Setup | Roadmap Now/Next/Later explícito do restante do VS por valor×risco×dependência (1 tabela leve no TODO, NÃO PMO). Caminho crítico agora é Game+Arte (G.1/G.2/A.2/G.5/G.6), não foundation. Anti-dispersão solo | Média | F1.12-REFRESH | Baixa | ⏳ Pendente | — |
+| F1.12-REFRESH | — | F1-Concepção | Refresh canônico GDD 1-page pós-pivot (aplica decisões W0): alinhar §2 pillars a pillars.md ("sistema formal computável" não "software"; "multipolar 2 âncoras/8 settings"), substituir §7 "companions a desenhar" pelos 6 nomeados, reconciliar §9 cortes c/ CUT.*, harmonizar threshold playtest (GDD N≥10 vs F2-M.3 N=5). Promover 🟡⚠→canônico após revisão criador | Alta | F1.1, F2-E.5 | Baixa | ✅ Concluído 2026-06-02 (gdd.md v0.2: §2 pillars P2/P5 alinhados, §7 6 companions nomeados + 8 settings, §8 N=3, §9 idioma pt-br + Windows pós-v1 + CUT.7/8 adicionados) | ✓ |
+| CUT-RECONCILE | — | F1-Concepção | Fonte-única dos cortes G1: decidir se canônico é GDD §9 ou CUT.1..10, fazer uma referenciar a outra (itens exclusivos cada). Esclarecer idioma v1 (GDD §9 L139 diz "pt-br+en-us"; CUT.9+memo i18n dizem só pt-br em v1, en-intl pós-1.0.0) — impacta budget i18n | Média | F1.12-REFRESH | Baixa | ✅ Concluído 2026-06-02 (GDD §9 primário; idioma pt-br only v1; Windows → CUT.11; 7 novos CUT.11-17 adicionados) | ✓ |
+| F2-ROADMAP.VS | — | F2-Setup | Roadmap Now/Next/Later explícito do restante do VS por valor×risco×dependência (1 tabela leve no TODO, NÃO PMO). Caminho crítico agora é Game+Arte (G.1/G.2/A.2/G.5/G.6), não foundation. Anti-dispersão solo | Média | F1.12-REFRESH | Baixa | ✅ Concluído 2026-06-02 (seção "Roadmap VS" adicionada ao TODO) | ✓ |
 | F2-S.6 | — | F2-Setup | Setup `.gitignore` Godot completo (`.import/`, `*.translation`, etc) | Alta | F2-S.3 | Baixa | ✅ Concluído 2026-05-30: gitignore .NET adicionado sessão 2026-05-30 (F2-S.6 completar) + .cs.uid versionados (F2-S.6b). Cobertura Godot+.NET completa. | ✓ |
 | F2-QA.1 | — | F2-QA | Adicionar `coverlet.collector` (ou `coverlet.msbuild`) a `tests/EngineTests.csproj` p/ destravar medição de cobertura. Verificado AUSENTE: rodar `/p:CollectCoverage=true` passa testes mas NÃO gera arquivo. Destrava toda a disciplina A6. 1 PackageReference | Alta | F2-S.9 | Baixa | ✅ Concluído 2026-05-30: coverlet.collector 6.0.0 em EngineTests.csproj. `dotnet test --collect:"XPlat Code Coverage"`. 86% linha. | ✓ |
 | F2-E.3.TEST / F2-QA.2 | — | F2-Engine / QA | Suite xUnit do SaveSystem em `engine/tests/save_system/` (455 LOC, ZERO teste): HMAC roundtrip (schema v1 completo incl. Dictionaries/Vector3), tamper detection (byte flip → SaveIntegrityException), payload corrupto/null → SaveCorruptException, 6 JsonConverters round-trip, backup chain N=3, cada migrator input→output. POCO puro, roda no runner dos 133 testes. CONTRACT §7 + TESTES A6 exigem | Alta | F2-E.3, F2-QA.1 | Média | ✅ Concluído 2026-05-30: Suite SaveSystem (engine/tests/save_system/): HMAC roundtrip + tamper + corrupt + 6 JsonConverters + migrator chain + ComputeHmac determinístico. 254/254 verde. | ✓ |
@@ -129,7 +129,7 @@ Tabela canônica de pendências e planejamento. Atualizar via skill `/tab_penden
 | F2-M.1 | W7 | F2-Milestone | VS end-to-end coeso 5-10min gameplay (com grayboxing F2-PROD.2) | Alta | F2-G.1, F2-G.EXPLORE, F2-G.5 / G.9, F2-G.6, F2-G.7, F2-G.8 | Alta | ⏳ Pendente | ⚠ refutado: pré-reqs G.* todos pendentes; zero cena de jogo; critério de saída é frase não-testável (ver F2-PROD.1) |
 | F2-M.2 | W7 | F2-Milestone | 60fps @ 1080p no floor canônico (decidido em F2-S.2-HW/F2-M.2-FLOOR) | Alta | F2-M.1, F2-S.2-HW | Alta | ⏳ Pendente | ✓ confirmado pendente: zero harness de perf; divergência de target reconciliada em F2-S.2-HW |
 | F2-QA.4 / F2-D.7 | W7 | F2-QA / Design | Protocolo de playtest do VS em `docs/qa/playtest_plan_vs.md` ANTES do milestone: charter, perfil 5 testers, roteiro de observação, instrumentação objetiva de time-to-fun (log timestamp scan→compilar→prever→resolver), consentimento, pontos de confusão/abandono, telegraph legível. Métrica existe (gdd L119) mas medir sem instrumentação vira impressão subjetiva | Média | F2-M.1 | Baixa | ⏳ Pendente | — |
-| F2-M.3 | W7 | F2-Milestone | 5 playtesters externos: time-to-fun ≤ 5min (métrica GDD; reconciliar N=5 vs GDD §8 N≥10 em F1.12-REFRESH) | Alta | F2-M.1 | Média | ⏳ Pendente | ⚠ parcial: métrica bem definida (gdd L119) mas sem protocolo documentado (ver F2-QA.4) |
+| F2-M.3 | W7 | F2-Milestone | Playtest interno N=3 (Petrus+Gus Dragon+Iago): time-to-fun ≤ 5min (métrica GDD §8; N canonizado em F1.12-REFRESH 2026-06-02) | Alta | F2-M.1 | Média | ⏳ Pendente | ⚠ parcial: métrica bem definida mas sem protocolo documentado (ver F2-QA.4) |
 | F2-M.4 | W7 | F2-Milestone | Build Linux + Windows distribuível (.tar.gz / .zip) | Alta | F2-CI.5, F2-CI.6 / F2-CI.1a, F2-CI.1 | Média | ⏳ Pendente | ⚠ refutado: bloqueado por export_templates vazio + export_presets.cfg ausente (não registrados no TODO original) |
 | F2-M.5 | W7 | F2-Milestone | Revisão style guide com dados reais de perf | Alta | F2-M.2 | Baixa | ⏳ Pendente | — |
 | F2-LEG.2 | W7 | F2-Setup / Legal | `NOTICE`/`THIRD-PARTY-LICENSES.md` em /game + tela "Créditos/Licenças": texto+copyright MIT de Godot, .NET/runtime MIT, fontes (Noto/Inter/JetBrains Mono SIL OFL/Apache), Required Notice da PolyForm da engine. Incluir no PCK + distribuição. MIT/PolyForm exigem propagação ao redistribuir | Média | F2-S.5 | Baixa | ⏳ Pendente | ⚠ refutado: ZERO arquivos de atribuição no game; README cita "Godot 4 (MIT)" em prosa só, não satisfaz a obrigação |
@@ -159,7 +159,7 @@ Tabela canônica de pendências e planejamento. Atualizar via skill `/tab_penden
 | F1.9 | — | F1-Concepção | Style guide 3D low-poly (`docs/art/style-guide.md`) | Alta | — | Média | ✅ Concluído | ✓ confirmado: 249 linhas, 13 seções acionáveis (paletas hex+WCAG, lighting, poly budget, shader strategy, checklist rejeição) |
 | F1.10 | — | F1-Concepção | Specs canônicas 8 personagens (`Resources/gusworld/character-spec-*.md`) | Alta | F1.2 | Alta | ✅ Concluído | — |
 | F1.11 | — | F1-Concepção | Arquitetura Godot 4 modular + build pipeline (`docs/tech/architecture.md`, `engine-modules.md`, `build.md`) | Alta | — | Alta | 🟡 Parcial | ⚠ parcial: 3 docs densos mas divergem do disco em 4 eixos (engine/back/ inexistente, buses em game/scripts, namespace GusDragon, 24 signals reais vs 18 doc) — não canonizar como estão (ver F2-S.TECH-RECONCILE) |
-| F1.12 | — | F1-Concepção | GDD consolidado pós-reforma (`docs/design/gdd.md`) — superseded por F1.12-REFRESH | Alta | F1.1-F1.6 | Média | 🟡 Parcial | ⚠ parcial: gdd.md existe mas defasado vs pillars.md (§2 "software"/"bipartido", §7 party placeholder, §9 cortes divergem, §8 N≥10 vs F2-M.3 N=5) — aguarda revisão |
+| F1.12 | — | F1-Concepção | GDD consolidado pós-reforma (`docs/design/gdd.md`) — superseded por F1.12-REFRESH | Alta | F1.1-F1.6 | Média | ✅ Concluído | ✓ F1.12-REFRESH aplicado 2026-06-02; gdd.md v0.2 canônico |
 | F1-DL.0 | — | F1-DeepLore | Setup pasta `docs/narrative/deep/` + `_INDEX.md` canônico + memo `project_deep_lore_canonico` | Alta | F1.5, F1.6 | Baixa | ✅ Concluído | — |
 | F1-DL.1 | — | F1-DeepLore | R1 — Eras (era-1, era-2, era-3, transicoes — 4 docs). era-1 (~318k) + era-2 (65k) + era-3-sterling + transicoes canonizados 2026-05-26 via workflow RAG colaborativo. Audit TEXTREVIEW incremental FEITO (0 críticos era-3, 2 críticos transições corrigidos). 2 deferidos RESOLVIDOS (Belinor 4 gerações; São Camilo propagado catedral menor + evacuação pré-saque) | Alta | F1-DL.0 | Alta | ✅ Concluído 2026-05-26 | ✓ confirmado: era-1 ~4593 linhas §1-§10; era-2/3/transicoes presentes; aritmética "-148" confirma fix piloto |
 | F1-DL.1.6 | — | F1-DeepLore | Era 1 §6 Acústica e luz reativa (14.5k pal, 8 NPCs Ordem Recursiva, 4 sub-locais) | Alta | F1-DL.0 | Alta | ✅ Concluído | — |
@@ -209,8 +209,15 @@ Tabela canônica de pendências e planejamento. Atualizar via skill `/tab_penden
 | CUT.6 | — | Cortes-G1 | DDA (dynamic difficulty) | — | — | — | 💡 Decisão tomada | — |
 | CUT.7 | — | Cortes-G1 | Mod support / in-game editor | — | — | — | 💡 Decisão tomada | — |
 | CUT.8 | — | Cortes-G1 | Achievements / leaderboards (post-launch talvez) | — | — | — | 💡 Decisão tomada | — |
-| CUT.9 | — | Cortes-G1 | Localização **conteúdo** além de pt-br em v1 (estrutura i18n-ready desde F2-S.11; tradução en-intl real só pós-release). Ver memo `project_i18n_canonico.md` | — | — | — | 💡 Decisão tomada | ⚠ parcial: divergência idioma v1 com GDD §9 (en-us no escopo?) — reconciliar em CUT-RECONCILE |
+| CUT.9 | — | Cortes-G1 | Localização **conteúdo** além de pt-br em v1 (estrutura i18n-ready desde F2-S.11; tradução en-intl real só pós-release). Ver memo `project_i18n_canonico.md` | — | — | — | 💡 Decisão tomada | ✓ reconciliado 2026-06-02: pt-br only em v1 canonizado; GDD §9 atualizado |
 | CUT.10 | — | Cortes-G1 | Console cert (Steam Deck verified vem depois) | — | — | — | 💡 Decisão tomada | — |
+| CUT.11 | — | Cortes-G1 | Windows export em v1 (Linux only; export template preparado mas sem ship; Windows pós-v1) | — | — | — | 💡 Decisão tomada 2026-06-02 | ✓ |
+| CUT.12 | — | Cortes-G1 | Romance / morality system / múltiplos finais (1 final + variantes mínimas canônico) | — | — | — | 💡 Decisão tomada | — |
+| CUT.13 | — | Cortes-G1 | Sistema de companions com afinidade / dating-sim mechanics | — | — | — | 💡 Decisão tomada | — |
+| CUT.14 | — | Cortes-G1 | Crafting de cartas (cartas são obtidas por progresso narrativo, não craftadas; ver anti-pillar P1) | — | — | — | 💡 Decisão tomada | — |
+| CUT.15 | — | Cortes-G1 | DLC / season pass / live-service | — | — | — | 💡 Decisão tomada | — |
+| CUT.16 | — | Cortes-G1 | Mais de 8h de campanha (escopo G1: 4-8h principal + 2h puzzles opcionais) | — | — | — | 💡 Decisão tomada | — |
+| CUT.17 | — | Cortes-G1 | Tutorial wall-of-text / cinemática de abertura > 90s (onboarding orgânico via jogo) | — | — | — | 💡 Decisão tomada | — |
 
 ## Legenda de status
 
@@ -236,14 +243,29 @@ Tabela canônica de pendências e planejamento. Atualizar via skill `/tab_penden
 - **W7+ — Pós-VS (F3-F5 + livro).** Alpha/Beta/Gold + age rating + auditoria final + tradução/publicação do livro.
 - **`—` — Concluído / Decisão tomada / CUT.** Sem onda de execução.
 
+## Roadmap VS — Now / Next / Later
+
+**Atualizado 2026-06-02 (F2-ROADMAP.VS ✅).** Caminho crítico: `G.1 → E.10/E.10b → G.5/G.9 → F2-M.1`. Anti-dispersão solo: Game+Arte primeiro, foundation está madura.
+
+| Now — W2/W3 (libera combate jogável) | Next — W4/W5 (loop end-to-end + arte real) | Later — W6/W7 (ship-ready) |
+|---|---|---|
+| Design specs: D.1 balance, D.2 Gambito, D.3/DSGN.KP Knowledge, D.5 core-loop, D.6 onboarding | **Combate jogável** G.5/G.9 + HUD (cápsulas) | CI + build + export templates W6 |
+| **TemplateSerializer** E.10 + **CharacterRepository** E.10b ← crítico | Exploração + interação G.EXPLORE | Legal: NOTICE + EULA + F5-LEG.2 |
+| Blockout área 1 G.1 | Dialogue 1 NPC G.7 | Playtest N=3 F2-M.3 |
+| Art spike TripoSR ART.SPIKE (lateral paralelo) | Arte real: Gus + inimigo G.2/G.4 | Milestone F2-M.1 + ADR-001 revisão |
+| Dialogue engine ADR-003 / E.6 | Save/load + quest + loot G.8/G.QUEST/G.LOOT | |
+| Plano produção PROD.1 + RAID PROD.3 | Música adaptive 2 estados + SFX AU.2-AU.6 | |
+| Wiring status inertes E.5b | Inventário/deck G.INVENT + Knowledge wired E.9 | |
+| Audio bus + AudioDirector AU.3/AU.4 | Arte: shader gate antes de modelar (W5 ANTES de G.2/G.4) | |
+
 ## Notas
 
 - **One-way doors (W0)** DEVEM ir ao criador supremo via AskUserQuestion (opção recomendada primeiro), conforme regra canônica inquebrável. Nenhuma foi decidida pelos agents — apenas ordenadas e marcada a reversibilidade.
 - **3 arestas de dependência reais AUSENTES do TODO original** (gravadas agora): (1) F2-G.5 depende de F2-E.10 + F2-E.10b, não só F2-E.5 (= F2-PROD.5); (2) F2-E.11 depende de F2-E.5b (status inertes), não só F2-E.5; (3) F2-M.4 depende fisicamente de export templates (dir vazia) + export_presets.cfg (ausente) + SDK pin.
 - **Caminho crítico técnico do VS** (mais longo até jogável, antes invisível): F2-E.3.PARTY → F2-E.10-CONTRACT → F2-E.10 → F2-E.10b → F2-G.5/G.9.
 - **Anti-over-engineering (porte solo):** a engine-foundation está madura/testada (combate 133 testes, save HMAC, scene, input 37 actions, i18n, câmera). O caminho crítico AGORA é Game+Arte, não foundation. Cortado/adiado: §18 catálogo completo (→2-3 arenas), música 3 estados (→2), FsCheck/lockfile/ICU plural/SCA pesado.
-- **F1.11** (`docs/tech/*`) e **F1.12** (GDD): 🟡⚠ — gerados em modo autônomo pré-reforma. Aguardam revisão ponto-a-ponto do criador (F1.12-REFRESH aplica o refresh).
-- **Cortes G1 (`CUT.*`)** = decisões one-way doors. Reconciliar fonte-única GDD §9 ↔ CUT.* em CUT-RECONCILE.
+- **F1.11** (`docs/tech/*`): 🟡⚠ — gerado em modo autônomo pré-reforma, aguarda revisão criador. **F1.12** (GDD): ✅ F1.12-REFRESH aplicado 2026-06-02; gdd.md v0.2 canônico.
+- **Cortes G1 (`CUT.*`)** = decisões one-way doors. ✅ CUT-RECONCILE 2026-06-02: GDD §9 fonte primária (CUT.1..17); CUT.* no TODO rastreia internamente.
 - **Disciplina antes de release** (memória `project_qa_deploy_disciplina`): AUD zerado + assinatura nominal em deploy irreversível (sub-fase 5.3: 48h + 30d offline).
 - **F1-DL.REFAC (débito literário)**: prose §§6-8 prioriza densidade técnica obsessiva. Refactor antes de F5-BK.1. Não bloqueia código.
 - **Fibonacci descontinuado em MÉTRICAS DE PROCESSO** (palavras/queries) mas **MANTIDO no TEXTO** (datações/contagens/idades/dimensões/compassos ~10-20%); maçonaria pervasiva mantida (~10-15%). Memos: `project_fibonacci_easter_egg.md`, `project_eastereggs_maconaria_canonica.md`.
