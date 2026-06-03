@@ -253,10 +253,18 @@ Status é record uniforme aplicado a qualquer ator. Tick processado no `TurnStar
 | **Knockback** | Cinético | empurra o alvo na fila: `ReorderActor(alvo, +1)` |
 | **Break** | Cinético | reduz Def do alvo por Duration turnos |
 | **Expose** | Criptográfico | aumenta dano de carta recebido pelo alvo (ver detalhe abaixo) |
-| **Decrypt** | Criptográfico | anula/remove buffs do alvo e bloqueia novos por Duration |
+| **Decrypt** | Criptográfico | anula/remove TODOS os buffs do alvo (qualquer status benéfico); NÃO bloqueia reaplicação (reset, não lockout; alvo pode re-buffar via item/poção/carta). Canon revisado 2026-06-03 (F2-E.5b) |
 | **Shield** | utilitário | pool de absorção: absorve TODO dano antes do HP (ver detalhe abaixo) |
 | **Regen** | utilitário | cura por tick no TurnStart |
 | **Haste / Slow** | utilitário | aumenta/reduz SPD (recomputa posição na fila) |
+
+> **Forma dos efeitos (ratificada 2026-06-03, F2-E.5b — wiring real dos status).** Magnitudes vêm sempre da carta/combo que aplica (parametrizado), nunca hardcoded:
+> - **Disrupt:** penalidade multiplicativa de Power `× (1 - Magnitude/100)`, consumida na 1ª carta ofensiva do alvo (literal "próxima ação").
+> - **Break:** redução de Def aplicada de uma vez, mantida e restaurada ao expirar. Distinta de Corrode (que reduz Def por tick, acumulativo).
+> - **Haste / Slow:** **aditivo** `SPD ±= Magnitude` (clamp 0), recomputa a fila na aplicação e no expire; restaura ao expirar. (NÃO multiplicativo: previsibilidade tática + equilibra o lento + casa com a notação "+1/-1/magnitude N" dos efeitos de ambiente §18.)
+> - **Decrypt:** dispela qualquer buff benéfico; SEM lockout (ver linha acima).
+> - **Knockback:** `ReorderActor(alvo, +1)`; NÃO custa o turno corrente do alvo (mantém-se distinto de Stun, que é quem tira o turno).
+> - **Silence:** gate em `ResolveUseCard` com mensagem ERRO DE COMPILAÇÃO (§10); ataque básico / defender / flee passam.
 
 ### Shield (pool de absorção), canonizado 2026-05-26
 
