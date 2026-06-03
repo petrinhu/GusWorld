@@ -58,6 +58,9 @@ public partial class SaveManager : Node
     [Signal] public delegate void LoadCompletedEventHandler(int slot);
     [Signal] public delegate void LoadIntegrityFailedEventHandler(int slot);
     [Signal] public delegate void LoadCorruptedEventHandler(int slot);
+    // Save de versão FUTURA (forward-only, CONTRACT §7): jogo mais antigo não lê save mais novo.
+    // UI deve orientar atualizar o jogo. saveVersion = versão do save; currentVersion = suportada.
+    [Signal] public delegate void LoadVersionTooNewEventHandler(int slot, int saveVersion, int currentVersion);
 
     public override void _Ready()
     {
@@ -155,7 +158,10 @@ public partial class SaveManager : Node
             if (string.IsNullOrEmpty(json))
                 return null;
 
-            var data = await Task.Run(() => SaveSerializer.DeserializeWithHmacValidation(json));
+            // Load version-aware (CONTRACT §7, forward-only): valida HMAC, rejeita versão futura,
+            // roda a chain de migradores em saves antigos ANTES de materializar. Antes de
+            // F2-E.3.MIG-WIRE este caminho ignorava SaveVersion (migradores eram dead code).
+            var data = await Task.Run(() => SaveSerializer.DeserializeWithMigration(json));
 
             if (!isBackup)
             {
@@ -164,6 +170,16 @@ public partial class SaveManager : Node
             }
 
             return data;
+        }
+        catch (SaveVersionTooNewException ex)
+        {
+            // Save de versão futura: forward-only não lê o futuro. Não tratar como corrupção;
+            // UI deve orientar o jogador a atualizar o jogo.
+            GD.PushWarning(
+                $"SaveManager: save versão futura em {path}: {ex.Message}");
+            if (!isBackup)
+                EmitSignal(SignalName.LoadVersionTooNew, slot, ex.SaveVersion, ex.CurrentVersion);
+            return null;
         }
         catch (SaveIntegrityException ex)
         {
