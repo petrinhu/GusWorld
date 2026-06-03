@@ -37,6 +37,14 @@ Princípio decisório: **toda regra abaixo existe para forçar decisão interess
 | Carry-over de mana | **nenhum** | recarrega ao máximo todo TurnStart; impossível bankar |
 | Determinismo no slice | total (variância 0) | RNG visível plugado mas com variância zerada na entrega F2-E.5 |
 
+### 2.1 Contrato de fragilidade do protagonista (Pillar 4, one-way door)
+
+Decisão canônica N.2 R1, 2026-06-03:
+
+- **HP de Gus é sempre o menor da party** (hard cap no statline; nenhum companion pode ter HP base igual ou menor que Gus).
+- **Análise Preditiva (1× por batalha)**: se Gus tomaria dano fatal (HP → 0 ou abaixo), a mecânica absorve o golpe e Gus sobrevive com 1 HP. Não se acumula, não recarrega durante a batalha. Anunciado na UI: `ANÁLISE PREDITIVA: golpe fatal absorvido`.
+- Reforça Pillar 4 mecanicamente: prodígio de 11 anos não é tank; vence por lógica (Scan/Gambito/Compilação), não por resistência bruta.
+
 ---
 
 ## 3. Máquina de estados do combate (FSM)
@@ -109,12 +117,14 @@ Dois recursos, propósitos distintos. AP limita **quantas** ações; Mana limita
 - `AP = 3` fixo por turno no vertical slice.
 - Reseta no `TurnStart`. Sem carry-over.
 - Cresce via skill tree em jogo posterior (fora do escopo do slice; o campo é parametrizável).
+- **Por-ator** (CTB, §3): AP pertence ao ator ativo no turno. Cada membro da party tem seus 3 AP independentes quando age na fila. Canonizado D.1 Sprint 1 W2, 2026-06-03.
 
 ### Mana / Compilação
 
 - `manaMax = 2 + turnoIndex`, com `cap = 8`.
 - Recarrega ao **máximo** a cada `TurnStart`. **Sem carry-over** (impossível bankar mana entre turnos: anti-degeneração, ver §13).
 - Ramp linear garante que combos premium só ficam viáveis no mid-late do combate, preservando curva de tensão.
+- **Por-ator** (CTB, §3): cada ator tem seu próprio pool de mana independente. Sem pool compartilhado entre personagens. Canonizado D.1 Sprint 1 W2, 2026-06-03.
 
 ### Tabela de custos canônica
 
@@ -300,6 +310,20 @@ A tabela completa (~200 combos) é trabalho futuro. Esta spec define o **formato
 
 Receita é casada por **assinatura exata** de família + base + modificador, não por instância de carta específica. Isto mantém ~200 receitas gerenciáveis e descobríveis (Pillar 2: ~200 combinações pré-planejadas + 5-10 easter-egg combos).
 
+### Feedback de erro de compilação (Pillar 2, N.2 R2 2026-06-03)
+
+Toda tentativa de jogar carta que falha em pré-condição DEVE exibir mensagem de erro explícita na UI (não só desabilitar o botão silenciosamente):
+
+| Pré-condição falha | Mensagem |
+|---|---|
+| Mana insuficiente | `ERRO DE COMPILAÇÃO: mana insuficiente (custa X, tem Y)` |
+| AP insuficiente | `ERRO DE COMPILAÇÃO: AP insuficiente` |
+| Alvo inválido | `ERRO DE COMPILAÇÃO: alvo inválido para <família>` |
+| Null sem Scan prévio | `ERRO DE COMPILAÇÃO: Null requer Scan prévio no alvo` |
+| Pipeline cheia | `ERRO DE COMPILAÇÃO: pipeline já contém 3 slots` |
+
+Feedback textual visível reforça a metáfora de compilação (Pillar 2: magia é sistema formal com gramática legível e erros detectáveis).
+
 ---
 
 ## 11. Fórmula de dano (canonizada 2026-05-26)
@@ -376,7 +400,7 @@ Dois modos, ambos operam sobre a fila/intent:
 **Prever** (1 AP):
 - Lê o `IntentPreview` do inimigo (alvo, dano, área do próximo turno).
 - Upgrade (jogo posterior): 2-3 turnos à frente para um inimigo escolhido.
-- **Falha contra intent caótico** de mini-boss: retorna ruído Perlin em vez de leitura limpa (Pillar 2: limite do conhecimento é narrativo e mecânico).
+- **Falha contra intent caótico exclusivamente de Patch-Zero**: retorna ruído Perlin em vez de leitura limpa. Mini-bosses têm UtilityBrain sem ruído (intent complexo, mas legível). (N.2 R3, one-way door 2026-06-03.)
 
 **Reordenar / forçar-recuo** (2 AP):
 - Empurra um inimigo na fila via `ReorderActor`, OU força mudança de alvo do inimigo.
@@ -399,7 +423,8 @@ interface IEnemyBrain {
 |---|---|---|
 | **Trash** | `ScriptedBrain` | determinístico, roteiro fixo. Intent 100% legível. |
 | **Elite** | `UtilityBrain` | pontuação de utilidade por ação (escolhe melhor jogada por heurística). Intent legível. |
-| **Mini-boss** | `UtilityBrain` + ruído | utility com camada de intent caótico (ruído Perlin) que faz Gambito-Prever falhar parcialmente. |
+| **Mini-boss** | `UtilityBrain` | utility sem ruído Perlin; intent legível porém complexo. Gambito-Prever funciona normalmente. |
+| **Boss (Patch-Zero)** | `UtilityBrain` + **ruído Perlin exclusivo** | caos irredutível reservado EXCLUSIVAMENTE para Patch-Zero; Gambito-Prever retorna ruído. N.2 R3, one-way door 2026-06-03. |
 
 **Vertical slice F2-E.5 entrega apenas `ScriptedBrain` + a interface `IEnemyBrain`** (com `IntentPreview`). `UtilityBrain` e a camada de ruído ficam para jogo posterior, mas a interface já contempla os três níveis.
 
@@ -424,7 +449,7 @@ Cada item abaixo é uma trava de design contra estratégia dominante ou jogo "re
 | **Fraqueza força variar** | roda de fraqueza recompensa trocar de família; spam de uma família perde eficiência |
 | **Sem grind (Knowledge)** | farmar reduz XP e aumenta conhecimento; não há power-creep por nível |
 | **RNG visível** | porcentagem mostrada + seedável + Gambito re-roll/cancela; variância nunca pune skill às cegas |
-| **Intent caótico** | mini-bosses resistem a predição total (Gambito não trivializa) |
+| **Intent caótico** | Patch-Zero resiste a predição total (boss final exclusivo; mini-bosses têm intent legível porém complexo. N.2 R3.) |
 | **Sem mana banking** | mana recarrega ao máximo e não acumula; impossível estocar pra combo gigante |
 | **Roda fechada** | relação de fraqueza é determinística e completa; sem família "sempre melhor" |
 | **Clamp dano mínimo 1** | impede build de Def infinita que zera dano (exceto imunidade telegrafa) |
@@ -496,7 +521,8 @@ Subconjunto mínimo implementável via TDD. Tudo abaixo é entregável no slice;
 ### Fora do slice (jogo posterior, interface já plugada)
 
 - Alimentação real de `KnowledgeKills` pelo SaveSystem (curva de decaimento de variância já implementada no engine; no slice o valor vem fixo até a integração de persistência).
-- `UtilityBrain` e camada de ruído de mini-boss.
+- `UtilityBrain` para mini-bosses e Elite.
+- Ruído Perlin exclusivo de Patch-Zero (boss final; N.2 R3).
 - Tabela completa de ~200 combos (slice usa 1-2 mockups; formato §10 já definido).
 - Upgrades de Scan/Gambito (multi-turno, buffs/posição).
 - Skill tree que cresce AP e Scan-passivo (campos parametrizáveis já existem).
@@ -560,7 +586,7 @@ public readonly record struct IntentPreview(
     int PredictedDamage,
     TargetShape PredictedShape,
     string PredictedTargetId,
-    bool IsChaotic               // true => Gambito-Prever retorna ruído
+    bool IsChaotic               // true => Gambito-Prever retorna ruído; EXCLUSIVO Patch-Zero (N.2 R3, one-way door 2026-06-03)
 );
 
 public interface IEnemyBrain {
@@ -588,6 +614,29 @@ public interface IEnemyBrain {
 | **Bioquímico** | **1.5** | 1.0 | 1.0 | 0.66 | 1.0 |
 
 (Linha = atacante, coluna = alvo. 1.5 = fraco/forte-contra; 0.66 = resistente; 1.0 = neutro. Imune 0.0 é caso especial de inimigo, não da roda base.)
+
+### Stats de referência do encontro (canônico D.1 Sprint 1 W2, 2026-06-03)
+
+Stats para TDD do encontro F2-E.5. HP pós-inflação +60% (Trash 34→55, Elite 89→144; sequência Fibonacci; TTK alvo 3-5 turnos).
+
+**Party (Gus + 2 companions ativos):**
+
+| Personagem | HP | Atk | Def | SPD | Família |
+|---|---|---|---|---|---|
+| Gus Vector Tavus Vance | **34** | 8 | 5 | 9 | Todas (compilador universal) |
+| Cauã "Volt" Berenger | 55 | 14 | 8 | 13 | Elétrico |
+| Jaci "Proxy" Vanderbist | 55 | 9 | 10 | 7 | Bioquímico |
+
+Obs.: HP Gus (34) é o menor da party por hard cap canônico (§2.1).
+
+**Inimigos do encontro de referência:**
+
+| Inimigo | Tier | HP | Def | Tipo | Fraqueza (1.5×) | Brain (slice) |
+|---|---|---|---|---|---|---|
+| Sentinela-Bit | Trash | **55** | 8 | Cinético | Elétrico | ScriptedBrain |
+| Daemon-Guard | Elite | **144** | 14 | Cinético | Elétrico | ScriptedBrain (placeholder; UtilityBrain = jogo posterior) |
+
+Notas: Atk e SPD dos inimigos = TBD (definir na implementação F2-E.5). Cauã (Elétrico) é o DPS natural deste encontro pela roda de fraqueza (§6).
 
 ---
 
@@ -756,4 +805,4 @@ A regra de STACKING das 3 camadas e seu cap final (`multAmbiente ∈ [0.44, 2.25
 
 ---
 
-**Última revisão:** 2026-05-26. Adicionada **§18 (Sistema de Ambientes de Combate — terreno + clima + período)**; atualizada a fórmula §11 com o fator `multAmbiente` (incl. regra de stacking das 3 camadas canonizada); ampliado o escopo do slice §17 (item 15, catálogo completo de ambientes com `multAmbiente` default 1.0 retrocompatível). Status: canônico, pronto para implementação TDD F2-E.5. Próxima revisão prevista: após primeiro playtest do encontro do vertical slice (validar tensão do mana ramp, legibilidade da fila, sensação do Gambito, e legibilidade/telegraph do sistema de ambientes).
+**Última revisão:** 2026-06-03 (D.1+N.2 Sprint 1 W2). Decisões canonizadas: HP +60% Trash 34→55 / Elite 89→144; AP e Mana por-ator CTB (§5); §2.1 contrato fragilidade Gus (N.2 R1, one-way door); §10 feedback ERRO DE COMPILAÇÃO (N.2 R2); §12/§13/§15 caos Perlin exclusivo Patch-Zero (N.2 R3, one-way door); §17 stats de referência pós-inflação + roda de fraqueza confirmada. Revisão anterior 2026-05-26: §18 ambientes de combate, §11 multAmbiente + stacking 3 camadas, escopo slice item 15. Status: canônico, pronto para implementação TDD F2-E.5.
