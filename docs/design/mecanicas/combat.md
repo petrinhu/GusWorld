@@ -368,7 +368,7 @@ isCrit         = rand(0..99) < card.CritChance
 | `multMod` | modificador aplicado | default 1.0; Stream pode distribuir; valores tabelados |
 | `multCombo` | receita de combo (§10) | default 1.0; >1.0 em combo casado |
 | `multExpose` | status Expose no alvo (§9) | default 1.0; `1 + Expose.Magnitude/100` se Expose presente; só UseCard |
-| `multAmbiente` | camadas ambientais ativas (§18) | default 1.0; produto das camadas (terreno+clima+período) por família; só UseCard; nunca toca `multFraqueza`; cap proposto [0.44, 2.25] |
+| `multAmbiente` | camadas ambientais ativas (§18) | default 1.0; produto das camadas (terreno+clima+período) por família; só UseCard; nunca toca `multFraqueza`; cap [0.44, 2.25] (canonizado + implementado F2-E.11, ADR-004) |
 | `Def` | atributo do defensor | divisor `100/(100+Def)`; reduzido por Break/Corrode |
 | `knowledgeKills` | `CombatActor.KnowledgeKills` (SaveSystem) | kills do mesmo tipo de inimigo; alimenta o decaimento de variância |
 | `card.CritChance` | carta | 0..100 (%) ; 0 = sem crit |

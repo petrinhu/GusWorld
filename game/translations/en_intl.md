@@ -165,3 +165,63 @@
 ## INFO_AUTOSAVE
 
 ## INFO_AUTOSAVE_DONE
+
+---
+
+## §8. Combat data names (cards, status, families, combos)
+
+> Structural parity with pt_br.md §8 (values empty until post-v1.0.0).
+
+### Card families (FAMILY_<id>_NAME)
+
+## FAMILY_ELETRICO_NAME
+
+## FAMILY_BIOQUIMICO_NAME
+
+## FAMILY_SONICO_NAME
+
+## FAMILY_CINETICO_NAME
+
+## FAMILY_CRIPTOGRAFICO_NAME
+
+### Status (STATUS_<id>_NAME)
+
+## STATUS_STUN_NAME
+
+## STATUS_POISON_NAME
+
+## STATUS_CORRODE_NAME
+
+## STATUS_DISRUPT_NAME
+
+## STATUS_SILENCE_NAME
+
+## STATUS_KNOCKBACK_NAME
+
+## STATUS_BREAK_NAME
+
+## STATUS_EXPOSE_NAME
+
+## STATUS_DECRYPT_NAME
+
+## STATUS_SHIELD_NAME
+
+## STATUS_REGEN_NAME
+
+## STATUS_HASTE_NAME
+
+## STATUS_SLOW_NAME
+
+### Curated combos (COMBO_<comboId>_NAME)
+
+## COMBO_PULSO_STREAM_NAME
+
+## COMBO_RAIZ_NULL_NAME
+
+### Slice placeholder cards (CARD_<id>_NAME)
+
+## CARD_PULSO_ELETRICO_NAME
+
+## CARD_SCAN_BASICO_NAME
+
+## CARD_RAIZ_CURA_NAME

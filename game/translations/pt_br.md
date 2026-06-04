@@ -228,3 +228,88 @@ Salvamento automático em {0} minuto(s).
 
 ## INFO_AUTOSAVE_DONE
 Salvamento automático concluído.
+
+---
+
+## §8. Nomes de dados de combate (cartas, status, famílias, combos)
+
+> Estes valores são as KEYS que a camada de DADOS de combate carrega no campo DisplayName
+> (ComboTable, Card, etc). O runtime de combate carrega a KEY; o DISPLAY/UI (F2-G.5) resolve
+> key→pt-br via Localization.TrMd. Nomes pt-br canônicos: combat.md §6 (famílias), §9 (status), §10 (combos).
+
+### Famílias de carta (combat.md §6, FAMILY_<id>_NAME)
+
+## FAMILY_ELETRICO_NAME
+Elétrico
+
+## FAMILY_BIOQUIMICO_NAME
+Bioquímico
+
+## FAMILY_SONICO_NAME
+Sônico
+
+## FAMILY_CINETICO_NAME
+Cinético
+
+## FAMILY_CRIPTOGRAFICO_NAME
+Criptográfico
+
+### Status (combat.md §9, STATUS_<id>_NAME)
+
+## STATUS_STUN_NAME
+Atordoamento
+
+## STATUS_POISON_NAME
+Veneno
+
+## STATUS_CORRODE_NAME
+Corrosão
+
+## STATUS_DISRUPT_NAME
+Interferência
+
+## STATUS_SILENCE_NAME
+Silêncio
+
+## STATUS_KNOCKBACK_NAME
+Repulsão
+
+## STATUS_BREAK_NAME
+Fratura
+
+## STATUS_EXPOSE_NAME
+Exposição
+
+## STATUS_DECRYPT_NAME
+Decifração
+
+## STATUS_SHIELD_NAME
+Escudo
+
+## STATUS_REGEN_NAME
+Regeneração
+
+## STATUS_HASTE_NAME
+Aceleração
+
+## STATUS_SLOW_NAME
+Lentidão
+
+### Combos curados (combat.md §10, COMBO_<comboId>_NAME)
+
+## COMBO_PULSO_STREAM_NAME
+Descarga Dupla
+
+## COMBO_RAIZ_NULL_NAME
+Antídoto Inverso
+
+### Cartas placeholder do slice (CARD_<id>_NAME; deck real = CardRepository futuro)
+
+## CARD_PULSO_ELETRICO_NAME
+Pulso Elétrico
+
+## CARD_SCAN_BASICO_NAME
+Varredura Básica
+
+## CARD_RAIZ_CURA_NAME
+Raiz Curativa
