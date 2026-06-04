@@ -141,6 +141,8 @@ ambos tipo Cinético / fraqueza Elétrica (Cauã é o DPS natural).
 - A ponte para o Diário (Eixo B) é via `PlayerBus.CombatResultReceived` (combat.md §16); o engine POCO de combate
   não referencia o Diário (mantém-se reutilizável).
 
+> **Implementação canônica (2026-06-03, F2-E.9/G.XP).** KnowledgeKills é **por TIPO de inimigo** (não por personagem da party): mora em `SaveDataV1.EnemyKnowledge` = `Dictionary<string,int>` (chave = enemyTypeId, valor = kills do player contra o tipo). É essa fonte que `CharacterRepository.LoadEnemyActor` lê para setar `CombatActor.KnowledgeKills` do alvo, alimentando a variância (combat.md §11). Save `save_version` v2→v3 + `MigrateV2ToV3` (forward-only, CONTRACT §7). POCOs testáveis: `EnemyKnowledgeTracker` (incremento puro: só Victory + inimigo derrotado conta; Flee/Defeat=0, §3) e `XpDifferential` (fórmula §11, fator clamp **[0,1]** — sem bônus por enfrentar acima do nível, anti-grind §7, decisão criador 2026-06-03). `CharacterSaveState.KnowledgeKills` (Sprint 8) ficou **vestigial** (não alimenta variância; reservado para eventual "maestria per-character"). **Wiring ao vivo** (persistir o incremento após a luta + XP com dado real de zona) = F2-G.8/G.5 (precisa da cena de combate).
+
 ---
 
 ## Decisões Canonizadas (Sprint 2 W2 2026-06-03)

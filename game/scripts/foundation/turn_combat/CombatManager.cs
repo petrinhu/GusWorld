@@ -13,8 +13,10 @@
 // Cross-ref: docs/design/mecanicas/combat.md §16 (event bus), §17 (escopo do slice).
 
 using Godot;
+using GusDragon.Engine.Foundation.Knowledge;
 using GusDragon.Engine.Foundation.TurnCombat;
 using GusWorld.Game.Foundation.Buses;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -52,6 +54,20 @@ public partial class CombatManager : Node
 
     /// <summary>Fase corrente do combate (espelha o ponto da orquestração). UI consome.</summary>
     public CombatPhase Phase { get; private set; } = CombatPhase.SetupPhase;
+
+    /// <summary>
+    /// Tipos de inimigo DERROTADOS no último combate encerrado (F2-E.9). Calculado no
+    /// CombatEnd via <see cref="EnemyKnowledgeTracker.DefeatedEnemyTypes"/> (só Victory
+    /// concede; Flee/Defeat = vazio, §3). É o seam que o fluxo de progressão de Knowledge
+    /// consome para incrementar SaveDataV1.EnemyKnowledge por tipo.
+    /// <para>
+    /// FRONTEIRA (reportado ao criador): a APLICAÇÃO real (ler o store do save, chamar
+    /// EnemyKnowledgeTracker.ApplyVictory, persistir via SaveManager) é F2-G.8 (save/load
+    /// funcional, ainda pendente). Aqui apenas EXPOMOS os tipos derrotados — a lógica de
+    /// incremento já vive testada no POCO; falta só o wiring de persistência game-side.
+    /// </para>
+    /// </summary>
+    public IReadOnlyList<string> LastDefeatedEnemyTypes { get; private set; } = Array.Empty<string>();
 
     /// <summary>Id do ator do turno corrente, ou null se não há combate ativo.</summary>
     public string? ActiveActorId => _fsm?.ActiveActor?.Id;
@@ -187,6 +203,12 @@ public partial class CombatManager : Node
 
             _combatActive = false;
             Phase = CombatPhase.CombatEnd;
+
+            // F2-E.9: tipos de inimigo derrotados a creditar no Knowledge por tipo (§3).
+            // Só Victory concede; Flee/Defeat = vazio. Lógica pura no POCO (testada); aqui
+            // só expomos via LastDefeatedEnemyTypes. A PERSISTÊNCIA (ApplyVictory + save) é
+            // F2-G.8, fora desta fronteira (ver doc de LastDefeatedEnemyTypes).
+            LastDefeatedEnemyTypes = EnemyKnowledgeTracker.DefeatedEnemyTypes(_fsm.Outcome, _actors);
 
             var outcome = _fsm.Outcome.ToString();
             CombatBus.Instance?.EmitSignal(CombatBus.SignalName.CombatEnded, outcome);
