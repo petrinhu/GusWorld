@@ -43,6 +43,12 @@ public partial class CombatBus : Node
     /// <summary>Companion incapacitado (HP 0, fica fora do combate mas recuperável). Pillar 4.</summary>
     [Signal] public delegate void ActorIncapacitatedEventHandler(string actorId);
 
+    /// <summary>
+    /// Ambiente de combate marcado/trocado (§18.10). envId = EnvironmentId (string). Cobre
+    /// tanto a marcação inicial da arena quanto o avanço automático da roda de período (§18.3).
+    /// </summary>
+    [Signal] public delegate void EnvironmentSetEventHandler(string envId);
+
     public override void _Ready()
     {
         Instance = this;

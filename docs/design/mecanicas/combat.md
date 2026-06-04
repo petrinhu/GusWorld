@@ -699,6 +699,8 @@ Muda a cada N turnos, sempre telegrafada. Cada clima favorece uma família e pre
 
 Ciclo temporal automático: **Dia (5) → Crepúsculo (2) → Noite (5) → Aurora (2) → Dia**, em turnos. As fases curtas (Crepúsculo/Aurora) funcionam como telegraph de graça da transição que se aproxima.
 
+> **Granularidade e telegraph (canon 2026-06-03, F2-E.11).** "Turnos" do ciclo = **rodadas completas de fila** (1 tique quando todos os atores agiram uma vez; o dia passa no mesmo ritmo independente do tamanho da party, casa com `RoundIndex`/ramp de mana). **Telegraph = 2 turnos** (as próprias fases Crepúsculo/Aurora de 2 turnos são a janela de aviso da fase forte seguinte). Parametrizável (`EnvironmentClock`).
+
 | Fase | Família ↑ | Família ↓ | Status | Hardware / fila | Duração |
 |---|---|---|---|---|---|
 | **Dia** | Bioquímico ×1.3 | Criptográfico ×0.85 | Regen +1 dur (party) | Scan grátis | 5 |

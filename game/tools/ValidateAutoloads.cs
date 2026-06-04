@@ -117,7 +117,8 @@ public partial class ValidateAutoloads : SceneTree
         Pass("CombatBus AutoLoad presente");
 
         string[] expectedSignals = {
-            "CombatStarted", "CombatEnded", "TurnStarted", "TurnEnded", "ActionResolved"
+            "CombatStarted", "CombatEnded", "TurnStarted", "TurnEnded", "ActionResolved",
+            "EnvironmentSet"
         };
         foreach (var sig in expectedSignals)
         {
