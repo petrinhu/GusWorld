@@ -15,8 +15,6 @@
 //
 // Exit code 0 = sucesso, 1 = falha.
 
-using System;
-using System.Threading.Tasks;
 using Godot;
 using GusDragon.Engine.Foundation.SceneManager;
 using GusWorld.Game.Foundation.Buses;

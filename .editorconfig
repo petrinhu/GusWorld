@@ -1,0 +1,9 @@
+root = true
+
+[*.cs]
+# Using redundante: aviso (live no editor; vira gate de build se EnforceCodeStyleInBuild=true for ligado no futuro)
+dotnet_diagnostic.IDE0005.severity = warning
+
+# Estilo deliberadamente NÃO imposto no GusWorld (decisão do criador 2026-06-05): silenciar ruído do editor
+dotnet_diagnostic.IDE0008.severity = none   # var vs tipo explícito
+dotnet_diagnostic.IDE0011.severity = none   # chaves em if/else de uma linha

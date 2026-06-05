@@ -17,7 +17,6 @@
 //
 // Cross-ref: docs/tech/architecture.md §6 + CONTRACT.md §6 (a11y) + project_i18n_canonico memo.
 
-using System.Collections.Generic;
 using Godot;
 using GusDragon.Engine.Foundation.Localization;
 
