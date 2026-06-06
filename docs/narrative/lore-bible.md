@@ -228,6 +228,10 @@ Exemplos:
 
 A ordem importa. Famílias diferentes na mesma stack produzem **conjuros híbridos** (poderosos, mais difíceis de compilar). Tokens incompatíveis falham e gastam 1 ciclo do Tavus-Drive sem efeito.
 
+Combater por scripts é confrontar processos em execução. Cada combatente sustenta, sobre o hardware frágil que é o corpo, um sistema vivo: a alma como núcleo que orquestra, a mente como camada que interpreta, e os Conjuros como rotinas disparadas em sequência contra o estado adversário. Vencer um duelo não é incendiar a máquina alheia: é forçar o processo dela ao colapso de pilha, conduzi-lo ao ponto em que nenhuma instrução seguinte pode resolver, em que a execução trava sobre si mesma e suspende. O corpo permanece intacto, pedra ainda não talhada à espera de retomada; só a corrente de comandos cessa. Destruir o hardware de modo permanente jamais foi considerado triunfo entre os que compreendem o ofício: é vandalismo de sistema, falha grosseira, o oposto exato da maestria.
+
+Por isso o derrotado não morre: adormece em estado suspenso. Estabelecida a dominância, o processo vencido reconhece a posição irrecuperável e cede, exatamente como um enxadrista tomba o rei diante do mate inevitável: o rei nunca é removido do tabuleiro, apenas admite que toda continuação leva ao mesmo desfecho. As três camadas do vencido permanecem íntegras (núcleo, interpretador, rotinas dormentes), congeladas até que outra mão reative a execução. Provou-se domínio de estado, não aniquilação. O adversário cede, e o silêncio que se segue não é o da máquina quebrada, mas o da máquina compilada e posta em pausa, à espera do próximo ciclo que a devolverá, inteira, ao mundo.
+
 ### 7.6 Codex de Conjuros (mecânica-âncora #2)
 
 O **Codex de Conjuros** é o deck pessoal. **Compilação do Codex** é o ato de combinar tokens disponíveis para gerar conjuros executáveis. Substitui a antiga "Compilação de Deck Rúnico" por terminologia mais limpa (sem "runa"; ver §7.10).
