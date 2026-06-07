@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Estado atual
 
-**PIVOT Fase 1 → Fase 2 (ADR-001, 2026-05-19).** Solo indie G1, Godot 4.6.1 stable instalado (`/usr/bin/godot`), PC Linux+Windows, single-player puro. Gênero: RPG + Puzzle + Aventura + combate turn-based. Câmera 3/4 rotacional + zoom orbital (Chrono Trigger reference, mas 3D real).
+**PIVOT Fase 1 → Fase 2 (ADR-001, 2026-05-19).** Solo indie G1, Godot 4.6.stable.mono instalado (`~/.local/bin/godot`), PC Linux+Windows, single-player puro. Gênero: RPG + Puzzle + Aventura + combate turn-based. Câmera 3/4 rotacional + zoom orbital (Chrono Trigger reference, mas 3D real).
 
 **Deep-lore canon entregue (~365k pal):** Era 1 §§1-10 (~318k), R2 Facções (22k, 7 docs), R3 Settings (25k, 8 docs).
 

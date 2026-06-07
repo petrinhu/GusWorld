@@ -11,15 +11,10 @@ config_version=5
 [application]
 
 config/name="GusWorld"
-config/version="0.0.1"
 config/description="RPG turn-based 3D estilizado. Prodígio-hacker de 11 anos contra megacorporação ciber-gótica. Solo indie."
-run/main_scene=""
-config/features=PackedStringArray("4.6", "GL Compatibility")
+config/version="0.0.1"
+config/features=PackedStringArray("4.6", "C#", "GL Compatibility")
 config/icon="res://icon.svg"
-
-[dotnet]
-
-project/assembly_name="GusWorld"
 
 [autoload]
 
@@ -34,15 +29,15 @@ InputRemapManager="*res://scripts/foundation/input_remap/InputRemapManager.cs"
 CombatManager="*res://scripts/foundation/turn_combat/CombatManager.cs"
 AudioDirector="*res://scripts/foundation/audio/AudioDirector.cs"
 
-[audio]
-
-buses/default_bus_layout="res://default_bus_layout.tres"
-
 [display]
 
 window/size/viewport_width=1920
 window/size/viewport_height=1080
 window/stretch/mode="canvas_items"
+
+[dotnet]
+
+project/assembly_name="GusWorld"
 
 [input]
 
