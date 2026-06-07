@@ -56,3 +56,9 @@ obj/
 *.suo
 .vs/
 project.lock.json
+
+# Ferramenta de dev Funplay MCP (addon SÓ-editor, de terceiro, auditado e
+# patchado localmente 2026-06-06 — NÃO versionar no repo canônico).
+# Ver reference_funplay_mcp na memória do projeto + auditoria security-engineer.
+game/addons/funplay_mcp/
+.mcp.json
