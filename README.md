@@ -145,7 +145,8 @@ Bug reports + feedback (pós-release) via issues Codeberg: <https://codeberg.org
 
 ## Licença
 
-A definir antes do release v1.0.0. Provavelmente proprietário comercial (código) + CC-BY-NC (lore/arte) ou similar. Decisão em ADR futuro.
+**Código-fonte:** [GNU Affero General Public License v3.0](LICENSE) - copyleft forte.
+**Lore e arte:** A definir (provavelmente CC-BY-NC ou similar) - decisão separada em ADR futuro.
 
 ---
 
