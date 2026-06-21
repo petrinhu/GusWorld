@@ -143,10 +143,24 @@ Bug reports + feedback (pós-release) via issues Codeberg: <https://codeberg.org
 
 ---
 
+## ☕ Apoie o projeto
+
+GusWorld é **freeware** (de graça, pra sempre). Se curtir e quiser ajudar a tocar o desenvolvimento (inclusive os tokens de IA que ajudam a construir o jogo):
+
+[![Buy me a coffee and some AI tokens](resources/buymecoffe.png)](https://www.paypal.com/donate/?business=9XNZQ4RND67KL&no_recurring=0&currency_code=BRL)
+
+**Buy me a coffee and some AI tokens.** Via [PayPal](https://www.paypal.com/donate/?business=9XNZQ4RND67KL&no_recurring=0&currency_code=BRL) _(totalmente opcional, nunca obrigatório)._
+
+Ou aponte a câmera do celular no QR Code:
+
+![QR Code de doação PayPal](resources/QRCode.png)
+
+---
+
 ## Licença
 
-**Código-fonte:** [GNU Affero General Public License v3.0](LICENSE) - copyleft forte.
-**Lore e arte:** A definir (provavelmente CC-BY-NC ou similar) - decisão separada em ADR futuro.
+**Código-fonte:** [GNU General Public License v3.0 (GPLv3)](LICENSE), copyleft forte, compatível com Qt (GPL/LGPL) sem custo. _(migrado de AGPL-3.0 para GPLv3 em 2026-06-21, pivot RF-9.)_
+**Lore e arte (assets):** [CC-BY-SA-4.0](ASSETS-LICENSE.md), exceto os livros Vol1/Vol2 (direitos reservados, obra à parte). Atribuições de terceiros em [THIRD-PARTY-LICENSES.md](THIRD-PARTY-LICENSES.md).
 
 ---
 
