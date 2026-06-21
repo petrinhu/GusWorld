@@ -176,6 +176,9 @@ Seu turno
 ## COMBAT_ENEMY_TURN
 Turno do inimigo
 
+## COMBAT_SELECT_TARGET
+Escolha o alvo:
+
 ## COMBAT_VICTORY
 Vitória.
 
@@ -190,6 +193,69 @@ Fuga falhou.
 
 ## COMBAT_FLEE_SUCCESS
 Conseguiu fugir.
+
+## COMBAT_PANEL_ENEMIES
+INIMIGOS
+
+## COMBAT_PANEL_ACTIONS
+AÇÕES
+
+## COMBAT_PANEL_HAND
+MÃO DE CARTAS
+
+## COMBAT_ACTION_ATTACK
+Atacar
+
+## COMBAT_ACTION_DEFEND
+Defender
+
+## COMBAT_ACTION_SCAN
+Scan
+
+## COMBAT_ACTION_GAMBIT_PREDICT
+Gambito: Prever
+
+## COMBAT_ACTION_GAMBIT_REORDER
+Gambito: Reordenar (+1)
+
+## COMBAT_ACTION_USE_CARD
+Usar Carta
+
+## COMBAT_ACTION_PASS
+Passar
+
+## COMBAT_ACTION_RESTART
+Reiniciar
+
+## COMBAT_TURN_ROUND
+Rodada {0}: {1}
+
+## COMBAT_LOG_ACTION
+[{0}] {1} -> {2} ({3})
+
+## COMBAT_LOG_ACTION_NOTARGET
+[{0}] {1}
+
+## COMBAT_LOG_STATUS_APPLIED
+[{0}] status {1} (x{2}, {3} turno(s))
+
+## COMBAT_LOG_STATUS_EXPIRED
+[{0}] status {1} expirou
+
+## COMBAT_LOG_DEFEATED
+[{0}] derrotado
+
+## COMBAT_LOG_INCAPACITATED
+[{0}] incapacitado
+
+## COMBAT_LOG_COMPILED
+COMPILADO: {0}
+
+## COMBAT_LOG_COMPILE_ERROR
+ERRO DE COMPILAÇÃO
+
+## COMBAT_ACTOR_RESOURCES
+AP {0}/{1} | Mana {2}/{3}
 
 ---
 
@@ -302,6 +368,23 @@ Descarga Dupla
 
 ## COMBO_RAIZ_NULL_NAME
 Antídoto Inverso
+
+### Nomes de atores do slice (ACTOR_<id_upper>; fallback = id lowercase se ausente)
+
+## ACTOR_GUS
+Gus
+
+## ACTOR_CAUA
+Cauã
+
+## ACTOR_JACI
+Jaci
+
+## ACTOR_SENTINELA_BIT
+Sentinela Bit
+
+## ACTOR_DAEMON_GUARD
+Daemon Guard
 
 ### Cartas placeholder do slice (CARD_<id>_NAME; deck real = CardRepository futuro)
 

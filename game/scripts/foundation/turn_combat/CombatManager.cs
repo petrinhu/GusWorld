@@ -69,6 +69,33 @@ public partial class CombatManager : Node
     /// <summary>Id do ator do turno corrente, ou null se não há combate ativo.</summary>
     public string? ActiveActorId => _fsm?.ActiveActor?.Id;
 
+    // -------------------------------------------------------------------------
+    // Seams de leitura para a UI (F2-G.5). Só EXPÕEM estado já mantido aqui ou na
+    // FSM; nenhuma lógica de combate nova vive nestes membros (fronteira POCO).
+    // -------------------------------------------------------------------------
+
+    /// <summary>true quando é turno da party e aguarda <see cref="SubmitPlayerAction"/>.</summary>
+    public bool WaitingForPlayerAction => _waitingForPlayerAction;
+
+    /// <summary>
+    /// Todos os atores do combate (vivos e derrotados), na ordem de registro de
+    /// <see cref="StartCombat"/>. Para a montagem inicial dos painéis de HP/AP/Mana.
+    /// </summary>
+    public IReadOnlyList<CombatActor> Actors => _actors;
+
+    /// <summary>
+    /// Ordem de iniciativa atual (snapshot da fila da FSM). Vazio se não há combate ativo.
+    /// </summary>
+    public IReadOnlyList<CombatActor> QueueOrder => _fsm?.Queue?.Order ?? Array.Empty<CombatActor>();
+
+    /// <summary>Retorna o ator pelo id, ou null se não existir.</summary>
+    public CombatActor? GetActor(string id) => _actors.Find(a => a.Id == id);
+
+    /// <summary>
+    /// Card registry do combate ativo. Para a UI listar as cartas disponíveis (mão do slice).
+    /// </summary>
+    public IReadOnlyDictionary<string, Card> ActiveCardRegistry => _cardRegistry;
+
     public override void _Ready() => Instance = this;
 
     public override void _ExitTree()
