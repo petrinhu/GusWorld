@@ -1,0 +1,9 @@
+# Artefatos de build do CMake. Os presets (CMakePresets.json) colocam o
+# binaryDir em GusEngine/build/<preset>. O .gitignore raiz so cobre /build/
+# (raiz do repo), entao este ignore local protege a pasta da engine contra
+# commit acidental de artefatos e do _deps/ do Catch2 (FetchContent).
+build/
+
+# Caches de IDE/ferramentas C++ locais.
+.cache/
+compile_commands.json

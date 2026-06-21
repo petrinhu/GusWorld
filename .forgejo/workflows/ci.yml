@@ -1,0 +1,139 @@
+name: ci
+
+# CI do GusEngine (pivot C++/Qt6, marco M0 andaime).
+# Escopo: build + testes da engine nova em GusEngine/. NAO toca game/ nem engine/
+# (base Godot/C#, congelada como referencia). Sem deploy.
+#
+# Runner: codeberg-medium (global, estavel). NAO usar runs-on: docker (runner
+# individual claudio fica offline por dias). codeberg-small (4 GB / 5 min) e
+# insuficiente para Qt6 + C++20 + Catch2, conforme precedente do driver Qt6.
+# Container: ghcr.io/catthehacker/ubuntu:act-latest (compat actions/setup-*).
+#
+# PRE-REQUISITO no Codeberg: habilitar a unidade "Actions" em
+# Settings > Repository do repo (nao vem ligada por default).
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'GusEngine/**'
+      - '.forgejo/workflows/ci.yml'
+  pull_request:
+    paths:
+      - 'GusEngine/**'
+      - '.forgejo/workflows/ci.yml'
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  QT_VERSION: "6.8.3"
+  QT_ARCH: "linux_gcc_64"
+  QT_MODULES: "qtmultimedia qtshadertools"
+
+jobs:
+  linux:
+    name: Linux (gcc, Release)
+    runs-on: codeberg-medium
+    container:
+      image: ghcr.io/catthehacker/ubuntu:act-latest
+    timeout-minutes: 25
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # Toolchain de build. cmake/ninja/g++ via apt; deps de runtime do Qt
+      # (libGL, xkbcommon, fontconfig) para o link/carga do executavel Qt
+      # (gusworld_app linka Qt mesmo que os testes M0 sejam Catch2 headless).
+      - name: Install toolchain
+        run: |
+          set -eux
+          apt-get update -qq
+          apt-get install -y --no-install-recommends \
+            cmake ninja-build g++ build-essential \
+            python3 python3-pip python3-venv \
+            libgl1 libegl1 libxkbcommon0 libfontconfig1 \
+            libdbus-1-3 libglib2.0-0
+
+      # aqtinstall num venv isolado (evita PEP 668 do python do sistema).
+      - name: Install aqtinstall
+        run: |
+          set -eux
+          python3 -m venv "$HOME/.venv-aqt"
+          "$HOME/.venv-aqt/bin/pip" install --upgrade pip
+          "$HOME/.venv-aqt/bin/pip" install "aqtinstall>=3,<4"
+
+      # Cache do Qt: ~1.8 GB de download so no cache-miss. Chave amarrada a
+      # versao/arch/modulos -> invalida apenas quando muda a stack do Qt.
+      - name: Cache Qt
+        id: cache-qt
+        uses: actions/cache@v4
+        with:
+          path: ~/Qt
+          key: qt-${{ env.QT_VERSION }}-${{ env.QT_ARCH }}-${{ env.QT_MODULES }}
+
+      - name: Install Qt 6.8 LTS
+        if: steps.cache-qt.outputs.cache-hit != 'true'
+        run: |
+          set -eux
+          "$HOME/.venv-aqt/bin/aqt" install-qt linux desktop "$QT_VERSION" "$QT_ARCH" \
+            -m $QT_MODULES \
+            --outputdir "$HOME/Qt"
+
+      # O preset le QT_ROOT_DIR = $HOME/Qt/<ver>/gcc_64 (mesmo layout do aqt).
+      # Exportar e so um seguro extra; o default do preset ja casa com o path.
+      - name: Export Qt path
+        run: echo "QT_ROOT_DIR=$HOME/Qt/${QT_VERSION}/gcc_64" >> "$GITHUB_ENV"
+
+      # Gate de arquitetura (invariante de GusEngine/CMakeLists.txt secao 2):
+      # core/ e domain/ sao POCO puro e NAO podem incluir Qt. Falha o CI cedo,
+      # antes de gastar tempo de build, se algum <Q...> vazar para essas camadas.
+      - name: Architecture gate (no Qt in core/domain)
+        run: |
+          set -eu
+          if grep -rnE '#[[:space:]]*include[[:space:]]*<Q[A-Za-z]' \
+               GusEngine/core GusEngine/domain; then
+            echo "::error::Qt include encontrado em core/ ou domain/ (camadas POCO)."
+            echo "core/ e domain/ devem ser headless, sem Qt. Mover o uso de Qt para platform/ ou app/."
+            exit 1
+          fi
+          echo "OK: nenhum include Qt em core/ ou domain/."
+
+      - name: Configure
+        working-directory: GusEngine
+        run: cmake --preset linux-release
+
+      - name: Build
+        working-directory: GusEngine
+        run: cmake --build --preset linux-release
+
+      - name: Test
+        working-directory: GusEngine
+        run: ctest --preset linux-release
+
+# ---------------------------------------------------------------------------
+# ESBOCO ADIADO: job Windows (MSVC). Habilitar em M1+ quando houver runner
+# Windows disponivel (Codeberg nao oferece runner Windows global; precisaria
+# runner self-hosted Windows ou GitHub Actions espelhado). Ajustes pendentes:
+#   - QT_ARCH = win64_msvc2022_64 ; preset windows-release (hoje hidden)
+#   - QT_ROOT_DIR = %USERPROFILE%\Qt\6.8.3\msvc2022_64
+#   - setup do toolchain MSVC (ilammy/msvc-dev-cmd ou imagem windows com VS)
+#
+#  windows:
+#    name: Windows (MSVC, Release)
+#    runs-on: windows            # TODO: runner Windows self-hosted
+#    timeout-minutes: 40
+#    steps:
+#      - uses: actions/checkout@v4
+#      - name: Install Qt 6.8 LTS (Windows)
+#        run: |
+#          python -m pip install "aqtinstall>=3,<4"
+#          aqt install-qt windows desktop 6.8.3 win64_msvc2022_64 -m qtmultimedia qtshadertools --outputdir %USERPROFILE%\Qt
+#      - name: Configure / Build / Test
+#        working-directory: GusEngine
+#        run: |
+#          cmake --preset windows-release
+#          cmake --build --preset windows-release
+#          ctest --preset windows-release
+# ---------------------------------------------------------------------------
