@@ -1,0 +1,7 @@
+# .clangd: aponta o clangd para o compile_commands.json gerado pelo CMake
+# (preset linux-release), eliminando os falsos-positivos de header nao
+# encontrado (headers do projeto, do Qt6 e do Catch2) no editor.
+# O build de verdade e sempre via CMake; isto so alimenta o language server.
+# Pre-requisito local: rodar `cmake --preset linux-release` uma vez (gera o db).
+CompileFlags:
+  CompilationDatabase: build/linux-release
