@@ -5,13 +5,15 @@
 # domain/ e POCO puro, exercitado sem abrir janela (como a logica do jogo roda
 # hoje sem Godot).
 #
-# Marco M3: spec executavel portada do i18n (loader .md + paridade). Outros
-# subsistemas (save/progression/templates/combat) ganham seus alvos de teste
-# aqui conforme forem portados.
+# Marco M3: spec executavel portada do i18n (loader .md + paridade) e do
+# progression (EnemyKnowledgeTracker + XpDifferential). Outros subsistemas
+# (save/templates/combat) ganham seus alvos de teste aqui conforme forem portados.
 
 add_executable(gusengine_domain_tests
     md_translation_loader_test.cpp
     translation_parity_validator_test.cpp
+    xp_differential_test.cpp
+    enemy_knowledge_tracker_test.cpp
 )
 
 target_link_libraries(gusengine_domain_tests

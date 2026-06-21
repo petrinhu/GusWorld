@@ -18,6 +18,8 @@ add_library(gusengine_domain STATIC
     src/domain_info.cpp
     src/i18n/md_translation_loader.cpp
     src/i18n/translation_parity_validator.cpp
+    src/progression/enemy_knowledge_tracker.cpp
+    src/progression/xp_differential.cpp
 )
 
 target_include_directories(gusengine_domain
