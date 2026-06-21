@@ -43,9 +43,20 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      # Toolchain de build. cmake/ninja/g++ via apt; deps de runtime do Qt
-      # (libGL, xkbcommon, fontconfig) para o link/carga do executavel Qt
-      # (gusworld_app linka Qt mesmo que os testes M0 sejam Catch2 headless).
+      # Toolchain de build. cmake/ninja/g++ via apt.
+      #
+      # IMPORTANTE (causa do 1o run vermelho, run #6717614): o find_package(Qt6
+      # ... COMPONENTS Gui Quick Multimedia ...) puxa o target WrapOpenGL, que
+      # faz find_package(OpenGL). No CONFIGURE isso exige os arquivos de
+      # DESENVOLVIMENTO (symlink libGL.so/libEGL.so + headers GL/gl.h), nao so os
+      # runtimes libGL.so.1/libEGL.so.1. O container act traz so os runtimes, de
+      # modo que o configure quebrava com:
+      #   Could NOT find OpenGL (missing: OPENGL_opengl_LIBRARY OPENGL_INCLUDE_DIR)
+      #   Could NOT find WrapOpenGL  ->  CMake Error em CMakeLists.txt:39
+      # Idem XKB::XKB (Qt6GuiPrivate) precisa do libxkbcommon.so de dev.
+      # Reproduzido e validado em ghcr.io/catthehacker/ubuntu:act-latest: com os
+      # pacotes -dev abaixo, configure+build+ctest ficam verdes (3/3) e o
+      # gusworld_app linka e roda. Mantemos tambem os runtimes (carga em exec).
       - name: Install toolchain
         run: |
           set -eux
@@ -54,7 +65,8 @@ jobs:
             cmake ninja-build g++ build-essential \
             python3 python3-pip python3-venv \
             libgl1 libegl1 libxkbcommon0 libfontconfig1 \
-            libdbus-1-3 libglib2.0-0
+            libdbus-1-3 libglib2.0-0 \
+            libgl1-mesa-dev libegl1-mesa-dev libxkbcommon-dev
 
       # aqtinstall num venv isolado (evita PEP 668 do python do sistema).
       - name: Install aqtinstall
