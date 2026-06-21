@@ -16,6 +16,8 @@
 
 add_library(gusengine_domain STATIC
     src/domain_info.cpp
+    src/i18n/md_translation_loader.cpp
+    src/i18n/translation_parity_validator.cpp
 )
 
 target_include_directories(gusengine_domain
@@ -29,3 +31,9 @@ target_link_libraries(gusengine_domain
 target_compile_features(gusengine_domain PUBLIC cxx_std_20)
 
 # Sem target_link_libraries(... Qt6::*) por design. Camada pura portada.
+
+# Testes do dominio (Catch2 headless). BUILD_TESTING vem do include(CTest) na
+# raiz; os casos sao registrados no mesmo ctest dos testes do M0.
+if(BUILD_TESTING)
+    add_subdirectory(tests)
+endif()
