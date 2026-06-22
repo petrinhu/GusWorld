@@ -193,6 +193,32 @@ TEST_CASE("tpl/fuzz: payload HMAC-valido com deck-count gigante rejeita",
         [&] { (void)deserialize_character(packed); }));
 }
 
+// ---- IMP-01: deck-count gigante rejeita TIPADO ANTES de alocar -------------
+//
+// Defesa em profundidade (auditoria_seguranca_crypto.md IMP-01, CWE-789): um .gdt
+// SELADO (HMAC VALIDO, atacante tem a chave embarcada por design) cujo deck_count
+// afirma ~4 bilhoes de cartas. Antes do fix, read_deck chamava reserve(count) ANTES
+// de checar bytes restantes -> bad_alloc/length_error (crash). Apos o fix,
+// bounded_count rejeita com TemplateCorruptError ANTES de qualquer alocacao grande
+// (cada carta custa >= 4 bytes de length, entao count > remaining()/4 e implausivel).
+
+TEST_CASE("tpl/IMP-01: deck-count gigante rejeita TemplateCorruptError antes de alocar",
+          "[domain][templates][fuzz][imp01]") {
+    std::vector<std::uint8_t> payload;
+    put_u32_le(payload, 3u);                 // id_len = 3
+    payload.push_back('g'); payload.push_back('u'); payload.push_back('s');
+    put_u32_le(payload, 34u);                // max_hp
+    put_u32_le(payload, 8u);                 // atk
+    put_u32_le(payload, 5u);                 // def
+    put_u32_le(payload, 9u);                 // spd
+    put_u32_le(payload, 0u);                 // family = Eletrico
+    payload.push_back(0u);                   // is_universal_compiler = false
+    put_u32_le(payload, 0xFFFFFFFFu);        // deck_count GIGANTE
+
+    const auto packed = pack(payload);
+    REQUIRE_THROWS_AS(deserialize_character(packed), TemplateCorruptError);
+}
+
 // ---- HMAC valido + bem-formado mas invariante violado (validate no load) ---
 
 TEST_CASE("tpl/fuzz: character com max_hp=0 (HMAC valido) rejeita por validate",

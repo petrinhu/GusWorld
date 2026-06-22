@@ -99,7 +99,10 @@ class Reader {
     }
 
     std::vector<std::string> read_deck() {
-        const std::uint32_t count = read_u32();
+        // IMP-01 (CWE-789): cada carta custa no minimo 4 bytes (o u32 de length).
+        // Rejeita count implausivel ANTES de reserve, para um .gdt selado mas
+        // mentiroso nao pedir dezenas de GiB e crashar com bad_alloc/length_error.
+        const std::uint32_t count = bounded_count(read_u32(), 4, "deck");
         std::vector<std::string> deck;
         deck.reserve(count);
         for (std::uint32_t i = 0; i < count; ++i) {
@@ -116,7 +119,24 @@ class Reader {
         }
     }
 
+    // IMP-01 (CWE-789/CWE-130): maximo de elementos que CABEM no resto do buffer,
+    // dado o tamanho minimo de cada um. Rejeita count externo absurdo ANTES de
+    // reserve/loop, para um .gdt selado-mas-mentiroso (atacante tem a chave por
+    // design) nao alocar dezenas de GiB. Erro TIPADO do decoder, nao bad_alloc.
+    std::uint32_t bounded_count(std::uint32_t count, std::size_t min_elem_bytes,
+                                const char* what) const {
+        if (min_elem_bytes != 0 &&
+            static_cast<std::uint64_t>(count) * min_elem_bytes > remaining()) {
+            throw TemplateCorruptError(std::string("Contagem implausivel em ") +
+                                       what +
+                                       " (excede bytes restantes do payload).");
+        }
+        return count;
+    }
+
    private:
+    std::size_t remaining() const { return buf_.size() - pos_; }
+
     void require(std::size_t n, const char* what) const {
         if (pos_ + n > buf_.size()) {
             throw TemplateCorruptError(

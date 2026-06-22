@@ -212,6 +212,32 @@ TEST_CASE("save/fuzz: payload HMAC-valido com list-count gigante rejeita",
         [&] { (void)deserialize_save(packed); }));
 }
 
+// ---- IMP-01: count interno gigante rejeita TIPADO ANTES de alocar ----------
+//
+// Defesa em profundidade (auditoria_seguranca_crypto.md IMP-01, CWE-789): um save
+// SELADO (HMAC VALIDO, o atacante tem a chave embarcada por design) cujo COUNT
+// interno de um list<str> afirma ~4 bilhoes de elementos. Antes do fix, o decoder
+// chamava reserve(count) ANTES de checar bytes restantes -> bad_alloc/length_error
+// (crash em vez de "save corrompido"). Apos o fix, bounded_count rejeita com
+// SaveCorruptError ANTES de qualquer alocacao grande (cada elemento custa >= 4 bytes
+// de length, entao count > remaining()/4 e implausivel).
+
+TEST_CASE("save/IMP-01: list-count gigante rejeita SaveCorruptError antes de alocar",
+          "[domain][save][fuzz][imp01]") {
+    // party_roster.count = 0xFFFFFFFF num payload curto. bounded_count deve barrar
+    // com o erro TIPADO do decoder, NAO bad_alloc/length_error do reserve.
+    std::vector<std::uint8_t> payload;
+    put_u32_le(payload, 1u);                 // schema_version = 1
+    payload.insert(payload.end(), 8, 0x00u); // timestamp_ms
+    payload.insert(payload.end(), 8, 0x00u); // playtime_seconds
+    put_u32_le(payload, 0u);                 // current_scene_path len = 0
+    payload.insert(payload.end(), 48, 0x00u);// player_position + player_rotation
+    put_u32_le(payload, 0xFFFFFFFFu);        // party_roster count GIGANTE
+
+    const auto packed = pack_save(payload);
+    REQUIRE_THROWS_AS(deserialize_save(packed), SaveCorruptError);
+}
+
 // ---- version: futura / zero / negativa-bit-pattern -------------------------
 
 TEST_CASE("save/fuzz: version futura rejeita tipado (forward-only)",
