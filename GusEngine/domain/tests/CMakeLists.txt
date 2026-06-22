@@ -59,6 +59,9 @@ add_executable(gusengine_domain_tests
     environment_cap_property_test.cpp
     combat_formula_property_test.cpp
     initiative_queue_property_test.cpp
+    # Marco M2 (metade de logica pura): input_remap (ActionRegistry/InputBinding)
+    # portado C#->C++ POCO. O backend de evento Qt (platform/input/) NAO entra aqui.
+    input_remap_test.cpp
 )
 
 # Os testes do combate incluem helpers de teste headers-only (fixed_random.hpp).

@@ -39,6 +39,7 @@ add_library(gusengine_domain STATIC
     src/combat/scripted_brain.cpp
     src/combat/placeholder_cards.cpp
     src/combat/combat_state_machine.cpp
+    src/input/action_registry.cpp
 )
 
 target_include_directories(gusengine_domain
