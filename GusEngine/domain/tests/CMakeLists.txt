@@ -24,6 +24,10 @@ add_executable(gusengine_domain_tests
     save_migrators_test.cpp
     save_backup_test.cpp
     template_serializer_fuzz_test.cpp
+    combat_constants_test.cpp
+    combat_enums_test.cpp
+    environment_enums_test.cpp
+    combat_records_test.cpp
 )
 
 target_link_libraries(gusengine_domain_tests
