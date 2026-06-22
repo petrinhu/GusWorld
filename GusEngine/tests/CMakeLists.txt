@@ -14,6 +14,7 @@ add_executable(gusengine_core_tests
     tile_grid_test.cpp
     grid_collision_test.cpp
     camera_clamp_test.cpp
+    fixed_timestep_test.cpp
 )
 
 target_link_libraries(gusengine_core_tests

@@ -61,11 +61,18 @@ if [ "$BUILD" != "0" ]; then
 fi
 
 # ---------------------------------------------------------------- SMOKE
+# A partir do M1 o app ABRE JANELA no modo normal (entraria no event loop e
+# travaria o check sem display). Por isso o smoke roda o modo HEADLESS do app:
+#   --smoke         => inicializa tudo, roda N ticks do loop, 1 render OFFSCREEN
+#                      (backend Null do QRhi, sem GPU), imprime resumo e sai 0.
+#   QT_QPA_PLATFORM=offscreen => sem servidor de janelas (vale no CI).
+# timeout como cinto de seguranca: se algum dia o smoke travar, falha rapido em
+# vez de pendurar o hook/CI.
 SMOKE=0
 if [ "$BUILD" = "0" ]; then
     if [ -x "$APP_BIN" ]; then
         set +e
-        run_log "$APP_BIN"
+        QT_QPA_PLATFORM=offscreen run_log timeout 60 "$APP_BIN" --smoke
         SMOKE=$?
         set -e
     else

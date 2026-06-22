@@ -1,0 +1,60 @@
+// gus/platform/render2d/i_renderer.hpp
+//
+// IRenderer: interface de desenho 2D do M1. ABSTRACAO que isola o backend grafico
+// (Qt RHI hoje) do resto do jogo - o risco R1 do design (RHI e API semi-privada,
+// estabiliza por versao do Qt): trocar de backend deve ser ~1 arquivo, e nada
+// alem de platform/render2d/ enxerga QRhi. O app (OverworldSim) fala SO com esta
+// interface.
+//
+// HEADER limpo (sem <Q...>): usa tipos proprios (DrawColor + Rect de core/spatial),
+// pra que app/ e os testes consumam a interface sem arrastar Qt. A impl concreta
+// (Render2dRhi) vive no .cpp da camada platform/, que pode tocar QRhi.
+//
+// CONVENCAO: as coordenadas dos retangulos sao em unidades de MUNDO (nao pixels);
+// quem projeta para a tela e o renderer (via a camera passada em begin_frame e a
+// matematica de viewport_transform). Cores em [0,1] (RGBA linear simples; sem
+// gestao de espaco de cor no M1 - placeholder). 2D puro: sem profundidade, a
+// ordem de emissao e a ordem de desenho (painter's order).
+
+#ifndef GUS_PLATFORM_RENDER2D_I_RENDERER_HPP
+#define GUS_PLATFORM_RENDER2D_I_RENDERER_HPP
+
+#include "gus/core/spatial/camera_clamp.hpp"  // gus::core::spatial::Rect
+
+namespace gus::platform::render2d {
+
+// Cor RGBA em [0,1]. Placeholder: sem sRGB/linear explicito no M1.
+struct DrawColor {
+    float r = 0.0f;
+    float g = 0.0f;
+    float b = 0.0f;
+    float a = 1.0f;
+};
+
+// Interface de render 2D. O ciclo e: begin_frame -> N draws -> end_frame.
+class IRenderer {
+public:
+    virtual ~IRenderer() = default;
+
+    // Abre o frame. camera_world e a janela visivel em mundo (de clamp_camera);
+    // pixel_w/h sao o tamanho do alvo em pixels (pra aspect/escala do backend).
+    virtual void begin_frame(const gus::core::spatial::Rect& camera_world,
+                             int pixel_w, int pixel_h) = 0;
+
+    // Retangulo de mundo preenchido (ex.: celula de parede).
+    virtual void draw_filled_rect(const gus::core::spatial::Rect& world_rect,
+                                  const DrawColor& color) = 0;
+
+    // Contorno de retangulo de mundo (ex.: hitbox do jogador), espessura em
+    // unidades de mundo. O backend pode aproximar a espessura.
+    virtual void draw_rect_outline(const gus::core::spatial::Rect& world_rect,
+                                   const DrawColor& color,
+                                   float thickness_world) = 0;
+
+    // Fecha o frame (submete ao backend / swap).
+    virtual void end_frame() = 0;
+};
+
+}  // namespace gus::platform::render2d
+
+#endif  // GUS_PLATFORM_RENDER2D_I_RENDERER_HPP

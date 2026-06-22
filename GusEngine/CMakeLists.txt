@@ -36,7 +36,8 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 # Qt 6.8 LTS. O devops instala o Qt e ajusta CMAKE_PREFIX_PATH no preset;
 # aqui so se exige a versao e os componentes usados pela camada platform/app.
-find_package(Qt6 6.8 REQUIRED COMPONENTS Core Gui Quick Multimedia Test)
+# ShaderTools: fornece qt6_add_shaders (compila GLSL -> .qsb via qsb) pro render2d.
+find_package(Qt6 6.8 REQUIRED COMPONENTS Core Gui Quick Multimedia Test ShaderTools)
 
 # Politica recomendada do Qt6: nao auto-rodar moc/uic/rcc nas libs sem Qt
 # (core/domain). Quem precisa (platform/app) liga AUTOMOC localmente.
