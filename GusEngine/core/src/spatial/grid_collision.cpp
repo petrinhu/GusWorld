@@ -100,6 +100,53 @@ AxisOutcome resolve_y(const TileGrid& grid, float fixed_x, float cur_y, float w,
     return out;
 }
 
+// Procura o MENOR empurrao perpendicular (em modulo) que destrava o eixo
+// principal, dentro de [0, max_assist]. Varredura fina deterministica (passo
+// tile/64): pra cada sentido (+ e -) testa empurroes crescentes; um empurrao
+// candidato `p` so vale se (a) a posicao empurrada NAO esta em parede (o empurrao
+// em si e livre) E (b) a partir dela o passo do eixo principal deixa de bater.
+// Devolve o empurrao com menor |p| (preferindo o lado que destrava antes); 0 se
+// nenhum destrava. `horizontal` = true se o movimento principal e em X (empurra em
+// Y); false se e em Y (empurra em X). `main_delta` = dx ou dy (o sinal do passo).
+float find_corner_push(const TileGrid& grid, const Aabb& box, bool horizontal,
+                       float main_delta, float max_assist) noexcept {
+    if (max_assist <= 0.0f) {
+        return 0.0f;
+    }
+    const float tile = grid.tile_size();
+    float step = tile / 64.0f;
+    if (step <= 0.0f) {
+        return 0.0f;
+    }
+
+    // Testa se, empurrando o eixo perpendicular por `push`, o eixo principal
+    // passa a estar livre (sem sobrepor parede) E o empurrao em si e livre.
+    auto destrava = [&](float push) -> bool {
+        const float bx = horizontal ? box.x : box.x + push;
+        const float by = horizontal ? box.y + push : box.y;
+        // (a) o empurrao perpendicular nao pode meter o corpo numa parede.
+        if (overlaps_blocked(grid, bx, by, box.w, box.h)) {
+            return false;
+        }
+        // (b) a partir da posicao empurrada, o passo do eixo principal e livre.
+        const float tx = horizontal ? bx + main_delta : bx;
+        const float ty = horizontal ? by : by + main_delta;
+        return !overlaps_blocked(grid, tx, ty, box.w, box.h);
+    };
+
+    // Varre |p| crescente; nos dois sentidos no mesmo nivel, pegando o que
+    // destravar primeiro (menor modulo). Empate (ambos no mesmo |p|): prefere +.
+    for (float mag = step; mag <= max_assist + 1e-4f; mag += step) {
+        if (destrava(+mag)) {
+            return +mag;
+        }
+        if (destrava(-mag)) {
+            return -mag;
+        }
+    }
+    return 0.0f;
+}
+
 }  // namespace
 
 MoveResult resolve_move(const TileGrid& grid, const Aabb& box, float dx,
@@ -112,6 +159,57 @@ MoveResult resolve_move(const TileGrid& grid, const Aabb& box, float dx,
     MoveResult result;
     result.box = Aabb{rx.coord, ry.coord, box.w, box.h};
     result.hit_x = rx.hit;
+    result.hit_y = ry.hit;
+    return result;
+}
+
+MoveResult resolve_move_with_corner_assist(const TileGrid& grid, const Aabb& box,
+                                           float dx, float dy,
+                                           const CornerAssistOptions& opts) noexcept {
+    // Resolve normal primeiro: e a base e tambem o fallback se nada destravar.
+    const MoveResult base = resolve_move(grid, box, dx, dy);
+    if (!opts.enabled || opts.max_assist_fraction <= 0.0f) {
+        return base;
+    }
+
+    const float max_assist = opts.max_assist_fraction * grid.tile_size();
+
+    // Corner-assist so atua em movimento CARDINAL (um eixo) que bateu. Em
+    // diagonal a resolucao por eixo do resolve_move ja contorna quinas isoladas
+    // (mantemos o comportamento da base; ver nota no header). Detecta o eixo:
+    const bool horizontal = (dx != 0.0f && dy == 0.0f && base.hit_x);
+    const bool vertical = (dy != 0.0f && dx == 0.0f && base.hit_y);
+    if (!horizontal && !vertical) {
+        return base;
+    }
+
+    const float main_delta = horizontal ? dx : dy;
+    const float push = find_corner_push(grid, box, horizontal, main_delta, max_assist);
+    if (push == 0.0f) {
+        return base;  // nenhuma abertura dentro do limite: trava como hoje
+    }
+
+    // Aplica o empurrao perpendicular e resolve o movimento a partir dali. O
+    // resolve_move encosta o eixo perpendicular na borda da celula (snap limpo) e
+    // leva o eixo principal pela abertura agora livre.
+    const Aabb pushed = horizontal ? Aabb{box.x, box.y + push, box.w, box.h}
+                                   : Aabb{box.x + push, box.y, box.w, box.h};
+    if (horizontal) {
+        // Resolve Y (o empurrao, encostando na borda) e depois X (o movimento).
+        const AxisOutcome ry = resolve_y(grid, pushed.x, box.y, box.w, box.h, push);
+        const AxisOutcome rx = resolve_x(grid, pushed.x, ry.coord, box.w, box.h, main_delta);
+        MoveResult result;
+        result.box = Aabb{rx.coord, ry.coord, box.w, box.h};
+        result.hit_x = rx.hit;
+        result.hit_y = false;  // o empurrao perpendicular nao e "bater"
+        return result;
+    }
+    // vertical: empurra em X, depois move em Y.
+    const AxisOutcome rx = resolve_x(grid, box.x, pushed.y, box.w, box.h, push);
+    const AxisOutcome ry = resolve_y(grid, rx.coord, box.y, box.w, box.h, main_delta);
+    MoveResult result;
+    result.box = Aabb{rx.coord, ry.coord, box.w, box.h};
+    result.hit_x = false;
     result.hit_y = ry.hit;
     return result;
 }

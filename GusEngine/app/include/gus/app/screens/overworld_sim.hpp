@@ -14,13 +14,14 @@
 // NAO formaliza a state machine de telas (Overworld/Battle/Menu) - YAGNI, isso e
 // M5. E so a tela do overworld.
 //
-// VELOCIDADE e MULTIPLICADOR DE CORRIDA sao PLACEHOLDER (o lider ajusta vendo).
-// A diagonal NAO e normalizada no M1 (mover (1,1) cobre ~1.41x a distancia
-// cardinal): decisao de FEEL deixada explicita pro lider (RF-3), nao escondida.
+// TODO o feel ajustavel (velocidade, corrida, normalize_diagonal, corner-assist,
+// zoom, cores) mora no OverworldTuning (overworld_tuning.hpp) - PONTO UNICO de
+// tuning. O OverworldSim so consome esse struct; mexer no feel nao reescreve nada.
 
 #ifndef GUS_APP_SCREENS_OVERWORLD_SIM_HPP
 #define GUS_APP_SCREENS_OVERWORLD_SIM_HPP
 
+#include "gus/app/screens/overworld_tuning.hpp"
 #include "gus/core/spatial/camera_clamp.hpp"
 #include "gus/core/spatial/grid_collision.hpp"
 #include "gus/core/spatial/tile_grid.hpp"
@@ -30,16 +31,21 @@ namespace gus::app::screens {
 
 class OverworldSim {
 public:
-    // grid: o mapa (copiado). player_start: AABB inicial do jogador (canto sup-esq
-    // + w/h em mundo). walk_speed_tiles_per_sec: velocidade base de caminhada, em
-    // TILES por segundo (multiplicada por tile_size para virar unidades de mundo).
+    // Ctor principal: grid (copiado), AABB inicial do jogador e o tuning completo
+    // (movimento + corner-assist + camera + cores). O lider ajusta tudo via o
+    // OverworldTuning, sem tocar nesta classe.
+    OverworldSim(gus::core::spatial::TileGrid grid,
+                 gus::core::spatial::Aabb player_start, OverworldTuning tuning);
+
+    // Ctor de conveniencia: so a velocidade de caminhada (tiles/s); o resto do
+    // tuning fica no default. Mantido para chamadas/testes simples.
     OverworldSim(gus::core::spatial::TileGrid grid,
                  gus::core::spatial::Aabb player_start,
                  float walk_speed_tiles_per_sec);
 
     // Um passo de simulacao a dt FIXO. dx,dy em {-1,0,1} (cardinal cru). run liga
-    // o multiplicador de corrida. Aplica resolve_move (desliza nas paredes) e
-    // guarda a posicao anterior pra interpolacao do render.
+    // o multiplicador de corrida (tuning). Aplica a colisao (com corner-assist se
+    // ligado no tuning) e guarda a posicao anterior pra interpolacao do render.
     void step_fixed(int dx, int dy, bool run, float fixed_dt) noexcept;
 
     // Visao da camera (clampada ao mapa) centrada no jogador ATUAL.
@@ -58,6 +64,10 @@ public:
     // Mapa (pra inspecao/desenho externo, se preciso).
     [[nodiscard]] const gus::core::spatial::TileGrid& grid() const noexcept { return grid_; }
 
+    // Tuning vigente (leitura). O lider/main podem inspecionar/ajustar a copia
+    // antes de construir; aqui e so leitura do que esta em uso.
+    [[nodiscard]] const OverworldTuning& tuning() const noexcept { return tuning_; }
+
 private:
     // Posicao do jogador interpolada entre prev_ e curr_ por alpha.
     [[nodiscard]] gus::core::spatial::Aabb interpolated_player(float alpha) const noexcept;
@@ -65,7 +75,7 @@ private:
     gus::core::spatial::TileGrid grid_;
     gus::core::spatial::Aabb prev_;  // posicao no passo anterior (pra interpolar)
     gus::core::spatial::Aabb curr_;  // posicao atual
-    float walk_speed_world_;         // unidades de MUNDO por segundo (ja x tile_size)
+    OverworldTuning tuning_;         // PONTO UNICO de feel (velocidade/corner/zoom/cores)
 };
 
 }  // namespace gus::app::screens

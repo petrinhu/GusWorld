@@ -93,7 +93,7 @@ int run_smoke(int ticks) {
     gus::app::screens::OverworldSim sim(
         gus::app::screens::make_test_map(),
         gus::app::screens::kTestPlayerStart,
-        gus::app::screens::kTestWalkTilesPerSec);
+        gus::app::screens::make_test_tuning());
     gus::core::time::FixedTimestep clock(1.0 / 60.0, 5);
 
     // Roda N ticks logicos com input roteirizado (direita), simulando 1/60s/tick.

@@ -21,13 +21,16 @@
 
 #include <QtTest/QtTest>
 
+#include <cmath>
 #include <vector>
 
 #include "gus/app/screens/overworld_sim.hpp"
+#include "gus/app/screens/overworld_tuning.hpp"
 #include "gus/core/spatial/tile_grid.hpp"
 #include "gus/platform/render2d/i_renderer.hpp"
 
 using gus::app::screens::OverworldSim;
+using gus::app::screens::OverworldTuning;
 using gus::core::spatial::Aabb;
 using gus::core::spatial::CameraView;
 using gus::core::spatial::Rect;
@@ -231,6 +234,79 @@ private slots:
         walk.step_fixed(1, 0, false, 1.0f / 60.0f);
         run.step_fixed(1, 0, true, 1.0f / 60.0f);
         QVERIFY(run.player().x > walk.player().x);
+    }
+
+    void ctor_com_tuning_define_velocidade() {
+        // O ctor que recebe OverworldTuning deve respeitar a velocidade dele.
+        TileGrid g = make_map();
+        OverworldTuning t;
+        t.walk_speed_tiles_per_sec = 4.0f;
+        OverworldSim sim(g, Aabb{16.0f, 16.0f, 8.0f, 8.0f}, t);
+        float x0 = sim.player().x;
+        sim.step_fixed(1, 0, false, 1.0f / 60.0f);
+        QVERIFY(sim.player().x > x0);
+    }
+
+    void corner_assist_ligado_contorna_quina() {
+        // Tile 16. Parede so na celula (1,0); abertura em (1,1). Jogador 8x8
+        // levemente desalinhado (4 u na faixa da parede), indo para a direita.
+        // Com corner-assist (default LIGADO no tuning), deve ser empurrado pra
+        // baixo e contornar; sem ele, travaria.
+        TileGrid g = TileGrid::from_rows({
+            ".#.",
+            "...",
+        }, 16.0f);
+        OverworldTuning on;  // corner.enabled = true (default)
+        OverworldSim sim_on(g, Aabb{8.0f, 12.0f, 8.0f, 8.0f}, on);
+        // velocidade alta pra o passo cruzar a quina num tick.
+        on.walk_speed_tiles_per_sec = 8.0f;
+        OverworldSim sim_on2(g, Aabb{8.0f, 12.0f, 8.0f, 8.0f}, on);
+        sim_on2.step_fixed(1, 0, false, 1.0f / 60.0f);
+        QVERIFY(sim_on2.player().y > 12.0f);  // empurrado para a abertura (baixo)
+
+        OverworldTuning off;
+        off.walk_speed_tiles_per_sec = 8.0f;
+        off.corner.enabled = false;
+        OverworldSim sim_off(g, Aabb{8.0f, 12.0f, 8.0f, 8.0f}, off);
+        sim_off.step_fixed(1, 0, false, 1.0f / 60.0f);
+        QVERIFY(qAbs(sim_off.player().y - 12.0f) < kEps);  // sem assist: nao empurra
+    }
+
+    void normalize_diagonal_iguala_velocidade_a_cardinal() {
+        // Campo aberto. Com normalize_diagonal=true, a distancia percorrida na
+        // diagonal (1,1) deve igualar a de um eixo so (modulo do vetor = 1), nao
+        // ~1.41x. Comparo o deslocamento total.
+        TileGrid g(9, 9, 16.0f);
+        OverworldTuning norm;
+        norm.normalize_diagonal = true;
+        norm.walk_speed_tiles_per_sec = 4.0f;
+
+        OverworldSim card(g, Aabb{64.0f, 64.0f, 8.0f, 8.0f}, norm);
+        OverworldSim diag(g, Aabb{64.0f, 64.0f, 8.0f, 8.0f}, norm);
+        card.step_fixed(1, 0, false, 1.0f / 60.0f);
+        diag.step_fixed(1, 1, false, 1.0f / 60.0f);
+
+        const float card_dx = card.player().x - 64.0f;  // deslocamento cardinal
+        const float diag_dx = diag.player().x - 64.0f;
+        const float diag_dy = diag.player().y - 64.0f;
+        const float diag_len = std::sqrt(diag_dx * diag_dx + diag_dy * diag_dy);
+        // Normalizada: o COMPRIMENTO do passo diagonal == o passo cardinal.
+        QVERIFY(qAbs(diag_len - card_dx) < 1e-3f);
+    }
+
+    void diagonal_crua_por_padrao_anda_mais_que_cardinal() {
+        // Sem normalizar (default): a diagonal cobre ~1.41x o eixo unico.
+        TileGrid g(9, 9, 16.0f);
+        OverworldTuning raw;  // normalize_diagonal = false (default)
+        raw.walk_speed_tiles_per_sec = 4.0f;
+        OverworldSim card(g, Aabb{64.0f, 64.0f, 8.0f, 8.0f}, raw);
+        OverworldSim diag(g, Aabb{64.0f, 64.0f, 8.0f, 8.0f}, raw);
+        card.step_fixed(1, 0, false, 1.0f / 60.0f);
+        diag.step_fixed(1, 1, false, 1.0f / 60.0f);
+        const float card_dx = card.player().x - 64.0f;
+        const float diag_dx = diag.player().x - 64.0f;
+        QVERIFY(qAbs(diag_dx - card_dx) < kEps);  // cada eixo igual ao cardinal
+        // logo o comprimento diagonal ~ 1.41x (mais rapido) - comportamento atual.
     }
 };
 

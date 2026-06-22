@@ -43,6 +43,40 @@ struct MoveResult {
 MoveResult resolve_move(const TileGrid& grid, const Aabb& box, float dx,
                         float dy) noexcept;
 
+// ---------------------------------------------------------------------------
+// Corner-correction (corner-assist) - EXTENSAO do resolve_move (M1, feel do lider)
+// ---------------------------------------------------------------------------
+//
+// FEEL (decidido pelo lider): quando o jogador anda contra uma parede e SO A
+// QUINA pega (esta levemente desalinhado com uma abertura adjacente, e a MAIOR
+// PARTE da largura perpendicular passaria pela abertura), o movimento o empurra
+// lateralmente o suficiente pra alinhar e contornar (estilo Stardew/Zelda/Celeste).
+// So ajuda quando HA abertura (celula lateral/diagonal livre); NUNCA atravessa
+// parede solida. E uma EXTENSAO: o resolve_move acima fica intacto.
+//
+// COMO FUNCIONA (resumo): se o eixo do movimento foi bloqueado, tenta um pequeno
+// empurrao PERPENDICULAR (ate max_assist_fraction * tile), nos dois sentidos,
+// pegando o MENOR que faz o eixo principal deixar de bater (preferindo o lado com
+// abertura). O empurrao perpendicular e validado contra a grade (nao atravessa
+// parede). Se nenhum empurrao dentro do limite destrava, comporta como resolve_move.
+
+struct CornerAssistOptions {
+    // Liga/desliga o corner-assist. Desligado (ou max_assist_fraction == 0)
+    // reproduz exatamente o resolve_move atual.
+    bool enabled = true;
+
+    // Quanto "perdoa" a quina, como FRACAO do tile (0..1). Default ~0.35: empurra
+    // ate ~1/3 do tile pra alinhar; alem disso, considera que a quina pega demais
+    // (a maior parte do corpo esta obstruido) e NAO ajuda. O lider ajusta vendo.
+    float max_assist_fraction = 0.35f;
+};
+
+// Igual ao resolve_move, mas com corner-assist (ver acima). Deterministico.
+// Com opts.enabled == false, identico a resolve_move(grid, box, dx, dy).
+MoveResult resolve_move_with_corner_assist(const TileGrid& grid, const Aabb& box,
+                                           float dx, float dy,
+                                           const CornerAssistOptions& opts) noexcept;
+
 }  // namespace gus::core::spatial
 
 #endif  // GUS_CORE_SPATIAL_GRID_COLLISION_HPP

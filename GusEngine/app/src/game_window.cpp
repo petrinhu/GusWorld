@@ -32,10 +32,12 @@ GameWindow::GameWindow(QWindow* parent)
     setTitle(QStringLiteral("GusWorld"));
     resize(1280, 720);
 
+    // Tuning unico da cena (velocidade + corner-assist ligado + ganchos). O lider
+    // ajusta em test_overworld.hpp / overworld_tuning.hpp, sem tocar aqui.
     sim_ = std::make_unique<gus::app::screens::OverworldSim>(
         gus::app::screens::make_test_map(),
         gus::app::screens::kTestPlayerStart,
-        gus::app::screens::kTestWalkTilesPerSec);
+        gus::app::screens::make_test_tuning());
 }
 
 GameWindow::~GameWindow() {

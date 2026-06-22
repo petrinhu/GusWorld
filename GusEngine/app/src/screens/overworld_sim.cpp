@@ -5,22 +5,15 @@
 
 #include "gus/app/screens/overworld_sim.hpp"
 
+#include <cmath>    // std::sqrt
 #include <utility>  // std::move
 
 namespace gus::app::screens {
 
 namespace {
 
-// Multiplicador de corrida (PLACEHOLDER; o lider ajusta vendo). 1.6x walk.
-constexpr float kRunMultiplier = 1.6f;
-
-// Cores placeholder de bom contraste (RGBA em [0,1]).
-//   parede: cinza-azulado escuro; jogador: ciano vivo.
-constexpr gus::platform::render2d::DrawColor kWallColor{0.18f, 0.20f, 0.28f, 1.0f};
-constexpr gus::platform::render2d::DrawColor kPlayerColor{0.20f, 0.85f, 0.90f, 1.0f};
-
-// Espessura do contorno do jogador em mundo (placeholder; ~1/8 de um tile de 16).
-constexpr float kPlayerOutlineWorld = 2.0f;
+// 1/sqrt(2): fator de normalizacao do passo diagonal (modulo do vetor (1,1)).
+constexpr float kInvSqrt2 = 0.70710678f;
 
 // true se os retangulos de mundo a e b se sobrepoem (meio-aberto).
 bool overlaps(const gus::core::spatial::Rect& a, const gus::core::spatial::Rect& b) {
@@ -31,11 +24,21 @@ bool overlaps(const gus::core::spatial::Rect& a, const gus::core::spatial::Rect&
 
 OverworldSim::OverworldSim(gus::core::spatial::TileGrid grid,
                            gus::core::spatial::Aabb player_start,
-                           float walk_speed_tiles_per_sec)
+                           OverworldTuning tuning)
     : grid_(std::move(grid)),
       prev_(player_start),
       curr_(player_start),
-      walk_speed_world_(walk_speed_tiles_per_sec * grid_.tile_size()) {}
+      tuning_(tuning) {}
+
+OverworldSim::OverworldSim(gus::core::spatial::TileGrid grid,
+                           gus::core::spatial::Aabb player_start,
+                           float walk_speed_tiles_per_sec)
+    : OverworldSim(std::move(grid), player_start,
+                   [walk_speed_tiles_per_sec] {
+                       OverworldTuning t;
+                       t.walk_speed_tiles_per_sec = walk_speed_tiles_per_sec;
+                       return t;
+                   }()) {}
 
 void OverworldSim::step_fixed(int dx, int dy, bool run, float fixed_dt) noexcept {
     // A posicao atual vira a "anterior" deste frame (base da interpolacao).
@@ -45,15 +48,28 @@ void OverworldSim::step_fixed(int dx, int dy, bool run, float fixed_dt) noexcept
         return;  // parado: prev == curr, render nao interpola movimento
     }
 
-    const float speed = walk_speed_world_ * (run ? kRunMultiplier : 1.0f);
-    // Deslocamento desejado neste passo (cardinal cru; diagonal NAO normalizada -
-    // decisao de feel pro lider). dx,dy em {-1,0,1}.
-    const float move_x = static_cast<float>(dx) * speed * fixed_dt;
-    const float move_y = static_cast<float>(dy) * speed * fixed_dt;
+    // Velocidade em unidades de mundo/s = tiles/s * tile_size, com a corrida.
+    const float speed = tuning_.walk_speed_tiles_per_sec * grid_.tile_size() *
+                        (run ? tuning_.run_multiplier : 1.0f);
+    const float dist = speed * fixed_dt;  // distancia neste passo
 
-    // Colisao que desliza nas paredes (resolucao por eixo: X depois Y).
+    float fx = static_cast<float>(dx);
+    float fy = static_cast<float>(dy);
+    // GANCHO normalize_diagonal: se ligado E for diagonal, normaliza o vetor pra a
+    // diagonal ter a MESMA velocidade das cardinais (senao (1,1) anda ~1.41x).
+    // Desligado (default): mantem cru (cada eixo recebe o passo cheio).
+    if (tuning_.normalize_diagonal && dx != 0 && dy != 0) {
+        fx *= kInvSqrt2;
+        fy *= kInvSqrt2;
+    }
+    const float move_x = fx * dist;
+    const float move_y = fy * dist;
+
+    // Colisao que desliza nas paredes (resolucao por eixo: X depois Y), agora com
+    // corner-assist quando ligado no tuning (escorrega na quina se ha abertura).
     const gus::core::spatial::MoveResult r =
-        gus::core::spatial::resolve_move(grid_, curr_, move_x, move_y);
+        gus::core::spatial::resolve_move_with_corner_assist(grid_, curr_, move_x,
+                                                            move_y, tuning_.corner);
     curr_ = r.box;
 }
 
@@ -63,6 +79,9 @@ gus::core::spatial::CameraView OverworldSim::camera_view(
     const float map_h = static_cast<float>(grid_.height()) * grid_.tile_size();
     const gus::core::spatial::Vec2 center{curr_.x + curr_.w * 0.5f,
                                           curr_.y + curr_.h * 0.5f};
+    // ZOOM: gancho pronto, INERTE (tuning_.camera_zoom == 1.0 hoje). Pra ligar o
+    // zoom, passar (viewport_w / tuning_.camera_zoom, viewport_h / tuning_.camera_zoom)
+    // aqui (viewport menor em mundo = mais perto). NAO aplicado agora.
     return gus::core::spatial::clamp_camera(center, viewport_w, viewport_h, map_w,
                                             map_h);
 }
@@ -83,6 +102,8 @@ void OverworldSim::render(gus::platform::render2d::IRenderer& renderer,
     const float map_h = static_cast<float>(grid_.height()) * grid_.tile_size();
     const gus::core::spatial::Vec2 cam_center{shown.x + shown.w * 0.5f,
                                               shown.y + shown.h * 0.5f};
+    // ZOOM: gancho pronto, INERTE (tuning_.camera_zoom == 1.0). Pra ligar, dividir
+    // viewport_w/viewport_h por tuning_.camera_zoom aqui. NAO aplicado agora.
     const gus::core::spatial::CameraView view = gus::core::spatial::clamp_camera(
         cam_center, viewport_w, viewport_h, map_w, map_h);
 
@@ -103,14 +124,15 @@ void OverworldSim::render(gus::platform::render2d::IRenderer& renderer,
             gus::core::spatial::Rect cell{static_cast<float>(cx) * ts,
                                           static_cast<float>(cy) * ts, ts, ts};
             if (overlaps(cell, view.rect)) {
-                renderer.draw_filled_rect(cell, kWallColor);
+                renderer.draw_filled_rect(cell, tuning_.wall_color);
             }
         }
     }
 
     // Jogador por cima (contorno da hitbox, na posicao interpolada).
     const gus::core::spatial::Rect player_rect{shown.x, shown.y, shown.w, shown.h};
-    renderer.draw_rect_outline(player_rect, kPlayerColor, kPlayerOutlineWorld);
+    renderer.draw_rect_outline(player_rect, tuning_.player_color,
+                               tuning_.player_outline_world);
 
     renderer.end_frame();
 }
