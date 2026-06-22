@@ -1,10 +1,10 @@
 # GusWorld
 
-> RPG turn-based 3D estilizado. Prodígio-hacker de 11 anos contra megacorporação ciber-gótica.
+> RPG turn-based 2D estilizado. Prodígio-hacker de 11 anos contra megacorporação ciber-gótica.
 
-**Status:** Fase 2 (vertical slice em produção). Pivot Fase 1 canonizado em [ADR-001](docs/tech/adr/ADR-001-pivot-lore-to-engine.md).
+**Status:** Pivot de stack em curso (Godot/C# para C++/Qt6 com engine própria). Migração faseada anti big-bang, Godot vivo até o decommission no marco M8. Decisão âncora em [`docs/tech/pivot/engine-design.md`](docs/tech/pivot/engine-design.md), ratificada pelo líder em 2026-06-21.
 
-**Solo indie.** Petrinhu, 2026. Linux + Windows. Single-player puro. Godot 4.
+**Solo indie, freeware.** Petrinhu, 2026. Linux + Windows. Single-player puro. C++20 + Qt6.
 
 ---
 
@@ -14,7 +14,7 @@
 2. **Natureza é matemática rígida**, não caos (Fibonacci, fractais, ruído coerente).
 3. **Hardware loop:** Óculos táticos + Matriz Ortodôntica + Tavus-Drive.
 4. **Idade canônica 11 anos.** Prodígio analítico, não power-fantasy adulta.
-5. **Setting bipartido:** megacidade ciber-gótica × Selve Sombria.
+5. **Setting bipartido:** megacidade ciber-gótica versus Selve Sombria.
 
 Detalhes em [`docs/design/pillars.md`](docs/design/pillars.md).
 
@@ -27,23 +27,31 @@ gusworld/
 ├── CLAUDE.md            (estado atual + decisões fechadas)
 ├── CONTRACT.md          (disciplinas técnicas canon)
 ├── TODO.md              (backlog canônico via skill tab_pendencias)
-├── TESTES.md            (T-sections + A-sections adaptados Godot)
+├── TESTES.md            (T-sections + A-sections)
 ├── CHANGELOG.md         (Keep a Changelog)
-├── CHARS.md             (inventário canônico personagens nomeados)
-├── PLACES.md            (inventário canônico lugares nomeados)
+├── CHARS.md             (inventário canônico de personagens nomeados)
+├── PLACES.md            (inventário canônico de lugares nomeados)
 ├── sinopse.md           (base canônica imutável)
 ├── docs/
-│   ├── design/          (pillars, GDD)
+│   ├── design/          (pillars, GDD, mecânicas)
 │   ├── narrative/       (lore-bible, characters, factions, timeline + deep-lore)
 │   ├── art/             (style guide)
-│   └── tech/            (architecture, engine-modules, build, ADRs)
-├── engine/              (módulos Godot reutilizáveis: orbital_camera, save, dialogue, turn-based)
-├── game/                (projeto Godot game-specific; project.godot, scenes, scripts)
-│   ├── project.godot
-│   └── VERSION          (single source of truth versionamento)
+│   └── tech/            (architecture, ADRs, pivot/engine-design.md)
+├── GusEngine/           (engine própria C++/Qt6, em 4 camadas)
+│   ├── core/            (POCO C++ puro: time, rng, ecs_lite, resource, events)
+│   ├── domain/          (POCO C++ puro: save, i18n, progression, templates, combat)
+│   ├── platform/        (única fronteira Qt: window, render2d, input, audio, fs)
+│   ├── app/             (GusWorld-specific: screens, main)
+│   ├── tests/           (Catch2 + Qt Test)
+│   ├── CMakeLists.txt
+│   └── CMakePresets.json
+├── game/                (projeto Godot legado, referência de leitura até M8)
+├── engine/              (engine C# legada, referência de leitura até M8)
 ├── assets/              (sources arte/som: Blender, Krita, Aseprite, audio raw)
 └── build/               (outputs export Linux + Windows)
 ```
+
+A engine antiga (`game/` Godot + `engine/` C#) permanece no repo como referência de leitura durante o porte e é apagada no marco M8 (decommission).
 
 ---
 
@@ -53,17 +61,15 @@ gusworld/
 |---|---|
 | [CLAUDE.md](CLAUDE.md) | Estado atual + decisões fechadas |
 | [CONTRACT.md](CONTRACT.md) | Disciplinas técnicas (RFC 2119, Conventional Commits, branching, DoD, perf budget, a11y) |
-| [TODO.md](TODO.md) | Backlog canônico (skill `tab_pendencias`) |
-| [TESTES.md](TESTES.md) | Suíte de testes + auditorias (T+A sections adaptadas Godot) |
+| [TODO.md](TODO.md) | Backlog canônico + board do pivot M0-M9 (skill `tab_pendencias`) |
+| [TESTES.md](TESTES.md) | Suíte de testes + auditorias (T+A sections) |
 | [CHANGELOG.md](CHANGELOG.md) | Histórico de releases (Keep a Changelog) |
 | [CHARS.md](CHARS.md) | Inventário canônico de personagens nomeados |
 | [PLACES.md](PLACES.md) | Inventário canônico de lugares nomeados |
 | [sinopse.md](sinopse.md) | Worldbuilding + protagonista (imutável) |
 | [docs/design/pillars.md](docs/design/pillars.md) | 5 pillars canon |
 | [docs/design/gdd.md](docs/design/gdd.md) | Game Design Document 1-page |
-| [docs/tech/architecture.md](docs/tech/architecture.md) | Arquitetura de software |
-| [docs/tech/engine-modules.md](docs/tech/engine-modules.md) | Módulos engine |
-| [docs/tech/build.md](docs/tech/build.md) | Pipeline build + CI |
+| [docs/tech/pivot/engine-design.md](docs/tech/pivot/engine-design.md) | Design da engine do pivot C++/Qt6 (fonte do stack atual) |
 | [docs/tech/adr/](docs/tech/adr/) | Architecture Decision Records |
 
 ---
@@ -72,66 +78,78 @@ gusworld/
 
 ### Pré-requisitos
 
-- Godot 4.4+ stable (testado 4.6.1)
+- C++20 (GCC, Clang ou MSVC/MinGW)
+- Qt6 6.8 LTS (componentes Core, Gui, Quick, Multimedia, Test, ShaderTools)
+- CMake + Ninja
 - Linux ou Windows
 - Git
 
 ### Desenvolvimento local
 
 ```bash
-# Importar projeto (primeira vez)
-godot --headless --path ./game --import
+# Entrar na engine (onde vivem o CMakeLists e o CMakePresets)
+cd GusEngine
 
-# Abrir editor
-godot --path ./game --editor
+# Configurar (primeira vez; gera build/linux-release/)
+cmake --preset linux-release
 
-# Rodar (após main_scene definido)
-godot --path ./game
+# Compilar
+cmake --build --preset linux-release
+
+# Rodar o jogo
+./build/linux-release/app/gusworld_app
+
+# Rodar a suíte de testes (Catch2 para a lógica + Qt Test para a camada Qt)
+ctest --preset linux-release
 ```
 
-### Export release
-
-```bash
-# Linux
-godot --headless --path ./game --export-release "Linux/X11" ../build/linux/gusworld.x86_64
-
-# Windows
-godot --headless --path ./game --export-release "Windows Desktop" ../build/windows/gusworld.exe
-```
-
-Detalhes em [`docs/tech/build.md`](docs/tech/build.md).
+Para Windows, troque o preset por `windows-release`. A lógica de `core/` e `domain/` roda headless (sem abrir janela). Detalhes em [`docs/tech/pivot/engine-design.md`](docs/tech/pivot/engine-design.md).
 
 ---
 
 ## Tech stack
 
-- **Engine:** Godot 4 + **C# .NET 8 AOT** (ADR-002 2026-05-19, supera decisão GDScript do ADR-001). GDScript MAY pra tooling editor-only. C++ GDExtension sob pressão perf medida.
-- **Renderer:** Forward+ (Godot 4)
-- **Visual:** 3D estilizado low-poly (referências: Sea of Stars, Sable, Death's Door). Sem PBR. Gradient atlas + vertex color. ~5 shaders custom.
-- **Câmera:** 3/4 rotacional + zoom orbital (referência Chrono Trigger, 3D real)
-- **Save format:** JSON versionado `save_version: N` + migrators forward-only desde D1
-- **Localização:** Godot `tr()` + CSV. Dev pt-br. Tradução en-intl pós-release v1.0.0.
-- **CI:** Forgejo Actions (esqueleto em `docs/tech/build.md`)
-- **Plataformas:** Linux (AppImage + tar.gz) + Windows (sem signing G1)
-- **Target hardware:** GTX 1050 + 4GB VRAM + 8GB RAM (cobre Steam Deck e laptops gaming 2017+)
+- **Linguagem:** C++20 (RAII, value semantics, `std::`). Engine própria, sem runtime de terceiros.
+- **Framework:** Qt6 6.8 LTS. Único na fronteira `platform/` + `app/`; `core/` + `domain/` são POCO C++ puro (zero Qt, zero I/O real, auditado por grep no CI).
+- **Renderer:** Qt RHI (escolhe Vulkan ou OpenGL por GPU) para o mundo + Qt Quick/QML para UI, menus e telas de batalha. 2D-only.
+- **Câmera:** ortográfica fixa top-down (clamp ao mapa). Zoom e follow ficam para refinamento futuro (RF-3).
+- **Visual:** 2D estilizado, super-deformed (SD) 1:1:1. Pixel art à mão (estilo Zelda A Link to the Past, SNES) ou modelagem 3D no Blender baked para sprite (estilo Stardew Valley, Sea of Stars, Death's Door). O 3D é só ferramenta de produção, nunca runtime.
+- **Save format:** binário próprio com criptografia própria (SHA-256 / HMAC, zero dependência externa, validada contra vetores FIPS 180-4 e RFC 4231), migrators forward-only, schema v4, anti-tamper.
+- **RNG:** PRNG determinístico seedável e injetável (para save e replay).
+- **Localização:** loader próprio + i18n próprio. Dev em pt-br. Tradução en-intl pós-release v1.0.0.
+- **Build/Test:** CMake + CMakePresets + Qt6. Testes via `ctest` (Catch2 para a lógica pura, Qt Test para a camada Qt).
+- **CI:** Forgejo Actions, matriz Linux + Windows.
+- **Plataformas:** Linux (AppImage + tar.gz) + Windows (sem signing em G1).
+- **Target hardware:** floor iGPU (Intel HD / AMD integrada, sem GPU dedicada); ceiling RTX 3050 Laptop 4GB.
+
+Motivação do pivot: máxima performance em máquinas modestas. C++ é AOT por natureza, o que elimina toda a complexidade de AOT do .NET da fase anterior (ADR-002).
 
 ---
 
-## Roadmap
+## Pipeline de arte
+
+GusWorld é feito por uma pessoa só, então a produção de assets se apoia num pipeline assistido por IA, do lore ao sprite final. O Claude transforma o lore canônico (lore-bible, character specs) em prompts visuais detalhados e fiéis a cada personagem. Esses prompts alimentam a geração de imagem 2D no [nano banana (Google Gemini)](https://gemini.google.com/) e no [Grok (xAI)](https://grok.com/), que produzem as imagens-base dos personagens. Quando um asset pede volume 3D, o [Tripo3D](https://www.tripo3d.ai/) faz image-to-3D, convertendo a imagem-base num modelo 3D que alimenta o pipeline de bake. Vale o lembrete: **o jogo é 2D** (sprites desenhados pelo Qt RHI em runtime); o 3D existe apenas como ferramenta de produção (modelar ou gerar em 3D, renderizar e converter em sprite 2D), nunca em runtime. Por fim, o [PixelLab](https://www.pixellab.ai/) gera e anima os sprites multi-direção (personagem em várias direções + ciclos de animação a partir de uma imagem). Um agradecimento às camadas gratuitas dessas ferramentas, que ajudam muito um projeto solo e freeware a produzir arte.
+
+---
+
+## Roadmap (pivot C++/Qt6, marcos M0-M9)
+
+Migração faseada anti big-bang. Cada marco fecha pelo seu critério de saída testável; o Godot legado só é apagado no M8, depois que a engine nova provar paridade jogável (M7). Board completo e critérios de saída em [TODO.md](TODO.md); design dos marcos em [`docs/tech/pivot/engine-design.md`](docs/tech/pivot/engine-design.md).
 
 | Marco | Status | Descrição |
 |---|---|---|
-| Fase 1 (Concepção) | ✅ Concluída pivot ADR-001 | Pillars + GDD + lore canon ~365k pal + character specs + style guide + tech docs primeira passada |
-| F2-Setup | 🔄 Em andamento | `project.godot` + CONTRACT.md + README + CHANGELOG + TESTES + CI |
-| F2-Engine | ⏳ Pendente | `engine/event_bus` + `orbital_camera` (prioridade máxima) + `save_system` + `turn_based_combat` + `dialogue_system` |
-| F2-Game | ⏳ Pendente | Blockout 1 área cidade + Gus placeholder + locomotion + HUD |
-| F2-M.1 | ⏳ Pendente | Vertical slice coeso 5-10min jogável (alvo 4-6 meses) |
-| F2-M.2 | ⏳ Pendente | Perf budget validado (60fps @ 1080p GTX 1050+) |
-| F2-M.3 | ⏳ Pendente | Playtest externo (time-to-fun ≤ 5min, N ≥ 5) |
-| F3-F4 | ⏳ Pendente | Production + QA + Beta |
-| F5 | ⏳ Pendente | Release v1.0.0 + livro Vol 1 (bíblia worldbuilding) + Vol 2 (antologia 14 contos) |
+| M0 (Andaime) | 🔍 Em validação | Repo C++ + CMake + presets + link Qt6 + framework de teste. Build Linux verde + testes ctest passando |
+| M1 (Janela + loop + sprite) | 🔍 Em validação | Janela Qt6 + render2d (Qt RHI) + loop de tempo fixo + ponte de input. Boneco-placeholder anda no mapa, câmera ortográfica presa ao mapa |
+| M3 (Lógica pura portada) | ✅ Auditado | Save + i18n + progression + templates portados para POCO C++ puro. 174 testes verdes, crypto bate vetores FIPS/RFC, oráculo de save semântico |
+| M2 (Input) | 🔍 Lógica feita | Eventos Qt para ações lógicas + porta de input_remap + persistência de controles + save v4. Falta o backend de evento Qt + I/O em disco |
+| M4 (Cena top-down) | 🔍 Lógica feita | Tilemap + colisão de grid + clamp de câmera (lógica pura). Falta a parte visual (tilemap render Qt RHI) |
+| M5 (Combate portado + tela de batalha) | 🔄 Motor portado, auditado | Motor `turn_combat` portado e endurecido (fórmula de dano §11 evoluída, auditada). Falta a BattleScreen (apresentação estilo Pokémon) |
+| M6 (Áudio) | ⏳ Pendente | platform/audio sobre Qt Multimedia + música + SFX + fade entre telas |
+| M7 (Paridade jogável) | ⏳ Pendente | Loop completo (andar, NPC, combate, save, carregar) 100% na engine nova, sem Godot |
+| M8 (Decommission) | ⏳ Pendente | Apagar Godot + C# + addons. Repo compila e roda sem nenhum bit do stack antigo |
+| M9 (Higienização) | ⏳ Pendente | Limpar a árvore pós-porte, remover resíduo do stack antigo, normalizar `GusEngine/` |
 
-Backlog completo em [TODO.md](TODO.md).
+Meta: vertical slice jogável (1 área cidade + 1 encontro turn-based + 1 puzzle Vetor do Gambito).
 
 ---
 
@@ -159,7 +177,7 @@ Ou aponte a câmera do celular no QR Code:
 
 ## Licença
 
-**Código-fonte:** [GNU General Public License v3.0 (GPLv3)](LICENSE), copyleft forte, compatível com Qt (GPL/LGPL) sem custo. _(migrado de AGPL-3.0 para GPLv3 em 2026-06-21, pivot RF-9.)_
+**Código-fonte:** [GNU General Public License v3.0 (GPLv3)](LICENSE), copyleft forte, compatível com Qt (GPL/LGPL) sem custo, inclusive em static-link. _(migrado de AGPL-3.0 para GPLv3 em 2026-06-21, pivot RF-9.)_
 **Lore e arte (assets):** [CC-BY-SA-4.0](ASSETS-LICENSE.md), exceto os livros Vol1/Vol2 (direitos reservados, obra à parte). Atribuições de terceiros em [THIRD-PARTY-LICENSES.md](THIRD-PARTY-LICENSES.md).
 
 ---
@@ -167,6 +185,9 @@ Ou aponte a câmera do celular no QR Code:
 ## Créditos
 
 - **Direção criativa + código + arte + narrativa + tudo:** petrinhu (2026)
-- **Engine:** Godot 4 (MIT)
+- **Engine base:** Qt6 (LGPL/GPL). Godot 4 (MIT) permanece como referência de leitura até o decommission no marco M8.
+- **Geração de imagem 2D:** [nano banana (Google Gemini)](https://gemini.google.com/) + [Grok (xAI)](https://grok.com/), a partir de prompts derivados do lore canônico.
+- **Geração 3D (ferramenta de produção):** [Tripo3D](https://www.tripo3d.ai/), image-to-3D para o pipeline de bake 3D-para-sprite. O jogo é 2D em runtime.
+- **Pixel art / sprites:** [PixelLab](https://www.pixellab.ai/), gerador de pixel art por IA (personagem multi-direção + animação a partir de imagem). Agradecimento pela generosa camada gratuita, que ajuda muito um projeto solo e freeware a produzir sprites.
 - **Lore-bible canon (~365k pal):** Era 1 §§1-10 + R2 Facções + R3 Settings + Bloco F/G/H/I
 - **Apoio técnico narrativo:** Squad Claude Code (narrative-writer, narrative-designer, software-architect, etc) sob direção do criador supremo
