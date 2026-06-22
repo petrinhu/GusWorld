@@ -8,6 +8,8 @@
 
 add_executable(gusengine_core_tests
     core_smoke_test.cpp
+    sha256_test.cpp
+    hmac_sha256_test.cpp
 )
 
 target_link_libraries(gusengine_core_tests

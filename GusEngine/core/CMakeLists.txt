@@ -11,6 +11,8 @@
 add_library(gusengine_core STATIC
     src/version.cpp
     src/math_util.cpp
+    src/crypto/sha256.cpp
+    src/crypto/hmac_sha256.cpp
 )
 
 target_include_directories(gusengine_core

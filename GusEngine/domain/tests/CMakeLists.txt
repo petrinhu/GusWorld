@@ -14,6 +14,10 @@ add_executable(gusengine_domain_tests
     translation_parity_validator_test.cpp
     xp_differential_test.cpp
     enemy_knowledge_tracker_test.cpp
+    character_template_test.cpp
+    template_serializer_test.cpp
+    template_source_test.cpp
+    canonical_templates_test.cpp
 )
 
 target_link_libraries(gusengine_domain_tests

@@ -20,6 +20,11 @@ add_library(gusengine_domain STATIC
     src/i18n/translation_parity_validator.cpp
     src/progression/enemy_knowledge_tracker.cpp
     src/progression/xp_differential.cpp
+    src/templates/character_template.cpp
+    src/templates/enemy_template.cpp
+    src/templates/template_serializer.cpp
+    src/templates/template_source.cpp
+    src/templates/canonical_templates.cpp
 )
 
 target_include_directories(gusengine_domain
