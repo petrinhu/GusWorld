@@ -18,6 +18,10 @@ add_executable(gusengine_domain_tests
     template_serializer_test.cpp
     template_source_test.cpp
     canonical_templates_test.cpp
+    save_slots_test.cpp
+    save_serializer_test.cpp
+    save_migrators_test.cpp
+    save_backup_test.cpp
 )
 
 target_link_libraries(gusengine_domain_tests
