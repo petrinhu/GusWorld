@@ -4,15 +4,18 @@
 // arvore JSON (como era o C#). Cada bump de schema (VN -> VN+1) e um passo da chain;
 // CurrentVersion = maior versao alcancavel = gus::domain::kSaveSchemaVersion.
 //
-// Schema atual = V2:
+// Schema atual = V4 (fonte unica: gus::domain::kSaveSchemaVersion). NAO confiar
+// neste comentario como autoridade da versao; a ancora kSaveSchemaVersion e que manda.
 //   V1 = inicial, SEM character_states (per-character).
 //   V2 = + character_states. MigrateV1ToV2 popula character_states VAZIO (semantica
 //        honesta de um save v1: party usa stats do template, sem delta registrado).
+//   V3 = + enemy_knowledge (conhecimento de bestiario por TIPO). MigrateV2ToV3 vazio.
+//   V4 = + input_remap_backup + controls_hash128 + slot_id (ADR-007). MigrateV3ToV4
+//        popula backup = default canonico, hash = hash do default, slot_id = o slot
+//        lido (passado no load).
 //
-// Por que para em V2: o ancora gus::domain::kSaveSchemaVersion = 2. O C# ja foi a
-// V3 (EnemyKnowledge), mas portar aquele bump mexeria no ancora (fora do escopo
-// deste marco). A chain e extensivel: somar o passo V2->V3 + bumpar o ancora quando
-// o marco chegar (test-guarda current_schema_version()==kSaveSchemaVersion trava).
+// A chain e extensivel: somar o passo VN->VN+1 + bumpar a ancora quando o marco
+// chegar (test-guarda current_schema_version()==kSaveSchemaVersion trava o esquecimento).
 //
 // Forward-only: versao > atual e rejeitada no load (SaveVersionTooNewError); versao
 // < atual sobe pela chain antes de materializar; == atual materializa direto.
@@ -55,6 +58,12 @@ namespace gus::domain::save {
 // enemy_knowledge) dentro do envelope selado. Representa a "geracao V2" do jogo, para
 // a fixture de migracao V2->V3. NAO valida invariantes de V3.
 [[nodiscard]] std::vector<std::uint8_t> serialize_save_v2(const SaveData& data);
+
+// Serializa um SaveData no layout do payload V3 (comuns + character_states +
+// enemy_knowledge, SEM os campos V4: backup/hash128/slot_id) dentro do envelope
+// selado. Representa a "geracao V3" do jogo, para a fixture de migracao V3->V4. NAO
+// valida invariantes de V4.
+[[nodiscard]] std::vector<std::uint8_t> serialize_save_v3(const SaveData& data);
 
 // Forja um envelope selado (HMAC valido) cujo payload declara schema_version =
 // version, com o restante dos campos minimos (layout V1). Usado para testar a

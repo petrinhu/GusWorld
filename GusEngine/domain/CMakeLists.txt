@@ -40,6 +40,11 @@ add_library(gusengine_domain STATIC
     src/combat/placeholder_cards.cpp
     src/combat/combat_state_machine.cpp
     src/input/action_registry.cpp
+    src/input/controls_name.cpp
+    src/input/controls_json.cpp
+    src/input/controls_hash.cpp
+    src/input/controls_diff.cpp
+    src/input/controls_restore.cpp
 )
 
 target_include_directories(gusengine_domain

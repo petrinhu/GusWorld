@@ -14,6 +14,7 @@ add_library(gusengine_core STATIC
     src/math_util.cpp
     src/crypto/sha256.cpp
     src/crypto/hmac_sha256.cpp
+    src/crypto/key_derivation.cpp
     src/spatial/tile_grid.cpp
     src/spatial/grid_collision.cpp
     src/spatial/camera_clamp.cpp

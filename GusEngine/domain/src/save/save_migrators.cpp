@@ -11,6 +11,8 @@
 #include <stdexcept>
 
 #include "gus/domain/domain_info.hpp"
+#include "gus/domain/input/controls_hash.hpp"
+#include "gus/domain/input/controls_restore.hpp"
 
 namespace gus::domain::save {
 
@@ -39,13 +41,28 @@ SaveData migrate_v2_to_v3(SaveData data) {
     return data;
 }
 
+// Passo V3 -> V4 (ADR-007): adiciona input_remap_backup + controls_hash128 + slot_id.
+// Semantica honesta de um save V3: "nao havia backup de controles; assume-se o
+// default canonico" (mesma forma do migrate_v1_to_v2: campo novo com valor neutro
+// honesto). backup = default_controls(); hash = hash 128 desse default; slot_id fica
+// -1 (origem nao-selada): o load por slot (load_save) atribui o slot lido. Funcao
+// pura.
+SaveData migrate_v3_to_v4(SaveData data) {
+    data.input_remap_backup = gus::domain::input::default_controls();
+    data.controls_hash128 =
+        gus::domain::input::controls_hash128(data.input_remap_backup);
+    data.slot_id = -1;  // origem nao-selada num save V3; o load por slot define
+    data.schema_version = 4;
+    return data;
+}
+
 }  // namespace
 
 int current_schema_version() noexcept {
     // Fonte unica: o ancora do dominio. A chain abaixo (passos 1->2->3) DEVE alcancar
     // exatamente esta versao; o test-guarda current_schema_version()==kSaveSchemaVersion
     // trava qualquer divergencia (ex.: somar passo sem bumpar o ancora).
-    return gus::domain::kSaveSchemaVersion;  // 3
+    return gus::domain::kSaveSchemaVersion;  // 4
 }
 
 SaveData migrate_to_current(SaveData data, int from_version) {
@@ -66,6 +83,10 @@ SaveData migrate_to_current(SaveData data, int from_version) {
             case 2:
                 data = migrate_v2_to_v3(std::move(data));
                 version = 3;
+                break;
+            case 3:
+                data = migrate_v3_to_v4(std::move(data));
+                version = 4;
                 break;
             default:
                 // GAP na chain: versao sem migrator registrado. Bug de schema.

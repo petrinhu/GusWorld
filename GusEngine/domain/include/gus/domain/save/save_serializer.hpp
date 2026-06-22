@@ -5,7 +5,8 @@
 // selado pelo HMAC proprio de gus::core::crypto. POCO puro, ZERO Qt.
 //
 // ENVELOPE (little-endian), mesma estrutura do template serializer:
-//   [4]      MAGIC   = "GDS2" (GusDragon Save v2). Distingue de templates ("GDT1").
+//   [4]      MAGIC   = "GDS2" (GusDragon Save). Distingue de templates ("GDT1"). O
+//                      sufixo do magic NAO e a versao do schema (que vive no payload).
 //   [4]      LENGTH  = uint32 LE = tamanho do PAYLOAD em bytes.
 //   [LENGTH] PAYLOAD = serializacao binaria compacta PROPRIA do SaveData (abaixo).
 //   [32]     HMAC    = HMAC-SHA256( MAGIC || LENGTH || PAYLOAD ), chave embutida
@@ -21,10 +22,18 @@
 //   list<str> party_roster | list<str> party_active |
 //   map<str,u8> flags | map<str,i32> inventory | map<str,i32> quest_progress |
 //   map<str,i32> relations |
-//   map<str, CharacterSaveState{ i32 current_hp | i32 xp | list<str> deck }>
-// (mapas gravados em ordem de chave: std::map = serializacao deterministica).
-// O layout V1 (sem character_states) e produzido por serialize_save_v1, para as
-// fixtures de migracao.
+//   map<str, CharacterSaveState{ i32 current_hp | i32 xp | list<str> deck }> |
+//   map<str,i32> enemy_knowledge (V3) |
+//   input_remap_backup (V4: u32 config_version | u32 actions_count | repeat:
+//     str action_name | f32 deadzone |
+//     u32 keys_count{ i64 keycode | u8 ctrl | u8 shift | u8 alt } |
+//     u32 gamepad_buttons_count{ i32 } | u32 mouse_buttons_count{ i32 } |
+//     u32 gamepad_axes_count{ i32 axis | f32 axis_value }) |
+//   controls_hash128 (V4: 16 bytes crus) | i32 slot_id (V4)
+// (mapas gravados em ordem de chave; actions do backup na ordem do vetor que o caller
+// monta na ordem do ActionRegistry: std::map/ordem = serializacao deterministica).
+// Os layouts antigos (V1 sem character_states; V2 sem enemy_knowledge; V3 sem campos
+// V4) sao produzidos por serialize_save_v1/v2/v3, para as fixtures de migracao.
 //
 // ORDEM DO LOAD (deserialize_save, forward-only, CONTRACT §7):
 //   1. valida HMAC do envelope (integridade ANTES de versao: nunca migra bytes
@@ -90,7 +99,7 @@ class SaveVersionTooNewError : public std::runtime_error {
 
 // ---- serialize / deserialize ----------------------------------------------
 
-// Serializa SaveData no formato atual (V2). Valida invariantes antes (fail-fast:
+// Serializa SaveData no formato atual (V4). Valida invariantes antes (fail-fast:
 // lanca std::invalid_argument se invalido). Carimbo timestamp_ms ja deve estar
 // preenchido pelo chamador (injetado, ADR-006 item 4).
 [[nodiscard]] std::vector<std::uint8_t> serialize_save(const SaveData& data);
@@ -105,6 +114,37 @@ class SaveVersionTooNewError : public std::runtime_error {
 // a chain de migracao se atras, materializa e valida invariantes. Lanca
 // SaveIntegrityError / SaveCorruptError / SaveVersionTooNewError / invalid_argument.
 [[nodiscard]] SaveData deserialize_save(const std::vector<std::uint8_t>& data);
+
+// ---- T1.1 detect-and-respond: load NAO-lancante por valor ------------------
+//
+// Resultado de um load (camada PURA, sem UI). A camada app decide o que avisar:
+// HmacInvalid (adulterado) / Corrupt (malformado) / VersionTooNew (futuro) =
+// oferecer o slot anterior; WrongSlot = avisar troca de arquivo entre slots (T1.2).
+enum class LoadResult {
+    Ok,             // carregou e validou
+    HmacInvalid,    // HMAC nao bate: adulterado
+    Corrupt,        // malformado (magic/length/truncado/payload invalido)
+    VersionTooNew,  // schema_version > atual (forward-only)
+    Invalid,        // payload bem-formado mas schema-divergente (invariante violada)
+    WrongSlot,      // slot_id selado != expected_slot (arquivo trocado de slot)
+};
+
+// Saida de load_save: o resultado + os dados (validos sse result == Ok ou WrongSlot;
+// em WrongSlot os dados estao integros, so a origem do slot diverge, e a app decide).
+struct LoadOutcome {
+    LoadResult result = LoadResult::Corrupt;
+    SaveData data;
+};
+
+// Load NAO-lancante (T1.1): mesma logica de deserialize_save, mas sinaliza por valor
+// em vez de lancar, para a camada app decidir avisar/oferecer o slot anterior. Pura.
+//
+// expected_slot (T1.2): o slot de onde o arquivo foi lido (a camada de I/O sabe).
+// Se o slot_id selado no payload divergir de expected_slot, o resultado e WrongSlot
+// (mas data fica preenchida). expected_slot < 0 = "nao verificar slot" (import
+// avulso): nunca reporta WrongSlot.
+[[nodiscard]] LoadOutcome load_save(const std::vector<std::uint8_t>& data,
+                                    int expected_slot);
 
 // ---- envelope cru (pack/unpack), testavel diretamente ----------------------
 

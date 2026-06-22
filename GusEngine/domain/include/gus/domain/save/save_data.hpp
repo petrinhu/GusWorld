@@ -1,8 +1,9 @@
 // gus/domain/save/save_data.hpp
 //
-// Estado de SAVE versionado (schema atual V3 = gus::domain::kSaveSchemaVersion).
+// Estado de SAVE versionado (schema atual V4 = gus::domain::kSaveSchemaVersion).
 // Dado PURO, ZERO Qt. Portado de engine/foundation/save_system/SaveDataV1.cs +
-// CharacterSaveState.cs (sealed records C#).
+// CharacterSaveState.cs (sealed records C#); campos V4 (input_remap_backup,
+// controls_hash128, slot_id) sao novos do ADR-007 (sem origem C#).
 //
 // EVOLUCAO de schema por CAMPO aditivo + migrator forward-only (NAO renomeia o
 // tipo a cada bump): o numero de schema vive em SaveData::schema_version + no
@@ -31,11 +32,13 @@
 #ifndef GUS_DOMAIN_SAVE_SAVE_DATA_HPP
 #define GUS_DOMAIN_SAVE_SAVE_DATA_HPP
 
+#include <array>
 #include <cstdint>
 #include <map>
 #include <string>
 #include <vector>
 
+#include "gus/domain/input/input_binding.hpp"  // InputRemapConfig (V4 backup)
 #include "gus/domain/progression/enemy_knowledge_tracker.hpp"  // KnowledgeStore
 
 namespace gus::domain::save {
@@ -71,7 +74,7 @@ struct CharacterSaveState {
 struct SaveData {
     // Versao do schema deste save. Save novo nasce na versao atual
     // (kSaveSchemaVersion); saves antigos sobem pela chain antes de materializar.
-    int schema_version = 3;
+    int schema_version = 4;
 
     // CARIMBO injetado (epoch ms). Metadado de listagem/ordenacao (ADR-006 item 4).
     std::int64_t timestamp_ms = 0;
@@ -111,6 +114,25 @@ struct SaveData {
     // encontro). Alimenta o decaimento de variancia da formula de combate. O caller
     // game-side grava aqui o resultado de EnemyKnowledgeTracker::apply_victory.
     progression::KnowledgeStore enemy_knowledge;
+
+    // ---- campos V4 (ADR-007) ----------------------------------------------
+
+    // Backup integral do esquema de controles vigente no momento do save. Fonte de
+    // restauracao quando o controls.json foi adulterado a mao. Gravado em TODO save.
+    // Default = config vazio (config_version=1, actions vazio); o migrator V3->V4
+    // popula com default_controls() e os saves novos com o config vigente.
+    gus::domain::input::InputRemapConfig input_remap_backup;
+
+    // Hash 128 do controls.json canonico vigente no momento do save (ADR-007 item 2).
+    // E o "valor esperado" contra o qual a deteccao de adulteracao compara. Default
+    // = todos-zero (sem controles registrados).
+    std::array<std::uint8_t, 16> controls_hash128{};
+
+    // ID/origem do slot deste save, SELADO dentro do payload (T1.2). Detecta troca de
+    // arquivo entre slots no gerenciador de arquivos: se o arquivo do slot 2 for
+    // copiado para a posicao do slot 5, o slot_id selado (2) diverge do slot lido (5).
+    // -1 = origem desconhecida (save importado / legado pre-V4 sem slot conhecido).
+    int slot_id = -1;
 
     [[nodiscard]] bool operator==(const SaveData&) const = default;
 

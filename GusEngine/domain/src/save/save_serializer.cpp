@@ -21,6 +21,7 @@
 #include <vector>
 
 #include "gus/core/crypto/hmac_sha256.hpp"
+#include "gus/core/crypto/key_derivation.hpp"
 #include "gus/domain/save/save_migrators.hpp"
 
 namespace gus::domain::save {
@@ -29,19 +30,27 @@ namespace {
 
 namespace crypto = gus::core::crypto;
 
-// MAGIC "GDS2" (GusDragon Save, schema atual V2). Distingue de templates ("GDT1").
+// MAGIC "GDS2" (GusDragon Save). O sufixo do magic NAO e a versao do schema (a
+// versao vive no payload, u32 inicial); distingue de templates ("GDT1").
 constexpr std::array<std::uint8_t, 4> kMagic = {'G', 'D', 'S', '2'};
 constexpr std::size_t kMagicLen = 4;
 constexpr std::size_t kLengthFieldLen = 4;
 constexpr std::size_t kHmacLen = crypto::kSha256DigestSize;       // 32
 constexpr std::size_t kHeaderLen = kMagicLen + kLengthFieldLen;   // 8
 
-// Chave de integridade FIXA embutida (ADR-006: integridade casual local, nao
-// sigilo). PROPRIA do SAVE (distinta da chave dos templates), para que um payload
-// de template nao passe como save valido e vice-versa.
+// Chave de integridade DERIVADA (ADR-006 T2.2): em vez de embutida CRUA, a chave do
+// HMAC do save e derivada de um segredo-base + um contexto ("save-hmac"). Transparente
+// ao layout (so muda o VALOR do HMAC). NAO e sigilo (o segredo-base vive no binario,
+// extraivel por decompile): e soberania da ORIGEM da chave (nao aparece literal). O
+// contexto da separacao de dominio (save != templates). PROPRIA do SAVE.
 const std::vector<std::uint8_t>& embedded_key() {
-    static const std::string s = "gusengine-cpp-2026-save-v2-hmac-sha256-key";
-    static const std::vector<std::uint8_t> k(s.begin(), s.end());
+    static const std::vector<std::uint8_t> k = [] {
+        static const std::string base = "gusengine-cpp-2026-integrity-base-secret";
+        static const std::string ctx = "save-hmac";
+        return crypto::derive_key(
+            reinterpret_cast<const std::uint8_t*>(base.data()), base.size(),
+            reinterpret_cast<const std::uint8_t*>(ctx.data()), ctx.size());
+    }();
     return k;
 }
 
@@ -71,6 +80,14 @@ void put_f64(std::vector<std::uint8_t>& out, double v) {
     std::uint64_t bits = 0;
     std::memcpy(&bits, &v, sizeof(bits));
     put_u64(out, bits);
+}
+
+// f32 (V4: deadzone / axis_value). Grava o bit-pattern IEEE-754 de 32 bits LE
+// (roundtrip fiel, mesmo criterio do f64).
+void put_f32(std::vector<std::uint8_t>& out, float v) {
+    std::uint32_t bits = 0;
+    std::memcpy(&bits, &v, sizeof(bits));
+    put_u32(out, bits);
 }
 
 void put_string(std::vector<std::uint8_t>& out, const std::string& s) {
@@ -139,6 +156,13 @@ class Reader {
     double read_f64() {
         const std::uint64_t bits = read_u64();
         double v = 0.0;
+        std::memcpy(&v, &bits, sizeof(v));
+        return v;
+    }
+
+    float read_f32() {
+        const std::uint32_t bits = read_u32();
+        float v = 0.0f;
         std::memcpy(&v, &bits, sizeof(v));
         return v;
     }
@@ -288,11 +312,104 @@ void read_enemy_knowledge(Reader& r, SaveData& s) {
     }
 }
 
-// Monta o payload no layout corrente (V3): u32 schema_version || comuns ||
-// character_states || enemy_knowledge.
+// V4 (ADR-007): input_remap_backup. As actions sao gravadas na ORDEM do vetor (que o
+// caller monta na ordem do ActionRegistry: determinismo do selo). Layout fiel ao
+// ADR-007 item 3.
+void write_input_remap_backup(std::vector<std::uint8_t>& payload, const SaveData& s) {
+    const auto& cfg = s.input_remap_backup;
+    put_u32(payload, static_cast<std::uint32_t>(cfg.config_version));
+    put_u32(payload, static_cast<std::uint32_t>(cfg.actions.size()));
+    for (const auto& a : cfg.actions) {
+        put_string(payload, a.action_name);
+        put_f32(payload, a.deadzone);
+        put_u32(payload, static_cast<std::uint32_t>(a.keys.size()));
+        for (const auto& k : a.keys) {
+            put_i64(payload, k.keycode);
+            payload.push_back(k.ctrl_pressed ? 1u : 0u);
+            payload.push_back(k.shift_pressed ? 1u : 0u);
+            payload.push_back(k.alt_pressed ? 1u : 0u);
+        }
+        put_u32(payload, static_cast<std::uint32_t>(a.gamepad_buttons.size()));
+        for (const auto& b : a.gamepad_buttons) put_i32(payload, b.button_index);
+        put_u32(payload, static_cast<std::uint32_t>(a.mouse_buttons.size()));
+        for (const auto& b : a.mouse_buttons) put_i32(payload, b.button_index);
+        put_u32(payload, static_cast<std::uint32_t>(a.gamepad_axes.size()));
+        for (const auto& ax : a.gamepad_axes) {
+            put_i32(payload, ax.axis);
+            put_f32(payload, ax.axis_value);
+        }
+    }
+}
+
+void read_input_remap_backup(Reader& r, SaveData& s) {
+    gus::domain::input::InputRemapConfig cfg;
+    cfg.config_version = static_cast<int>(r.read_u32());
+    const std::uint32_t actions_count = r.bounded_count(r.read_u32(), 4, "v4-actions");
+    cfg.actions.reserve(actions_count);
+    for (std::uint32_t i = 0; i < actions_count; ++i) {
+        gus::domain::input::ActionBindings a;
+        a.action_name = r.read_string();
+        a.deadzone = r.read_f32();
+        const std::uint32_t keys_n = r.bounded_count(r.read_u32(), 11, "v4-keys");
+        for (std::uint32_t k = 0; k < keys_n; ++k) {
+            gus::domain::input::KeyBinding kb;
+            kb.keycode = r.read_i64();
+            kb.ctrl_pressed = (r.read_u8() != 0);
+            kb.shift_pressed = (r.read_u8() != 0);
+            kb.alt_pressed = (r.read_u8() != 0);
+            a.keys.push_back(kb);
+        }
+        const std::uint32_t gb_n = r.bounded_count(r.read_u32(), 4, "v4-gpbtn");
+        for (std::uint32_t j = 0; j < gb_n; ++j)
+            a.gamepad_buttons.push_back(
+                gus::domain::input::GamepadButtonBinding{r.read_i32()});
+        const std::uint32_t mb_n = r.bounded_count(r.read_u32(), 4, "v4-mousebtn");
+        for (std::uint32_t j = 0; j < mb_n; ++j)
+            a.mouse_buttons.push_back(
+                gus::domain::input::MouseButtonBinding{r.read_i32()});
+        const std::uint32_t ax_n = r.bounded_count(r.read_u32(), 8, "v4-axes");
+        for (std::uint32_t j = 0; j < ax_n; ++j) {
+            gus::domain::input::GamepadAxisBinding ax;
+            ax.axis = r.read_i32();
+            ax.axis_value = r.read_f32();
+            a.gamepad_axes.push_back(ax);
+        }
+        cfg.actions.push_back(std::move(a));
+    }
+    s.input_remap_backup = std::move(cfg);
+}
+
+// V4: controls_hash128 (16 bytes crus).
+void write_controls_hash(std::vector<std::uint8_t>& payload, const SaveData& s) {
+    payload.insert(payload.end(), s.controls_hash128.begin(),
+                   s.controls_hash128.end());
+}
+
+void read_controls_hash(Reader& r, SaveData& s) {
+    for (std::size_t i = 0; i < s.controls_hash128.size(); ++i)
+        s.controls_hash128[i] = r.read_u8();
+}
+
+// Monta o payload no layout corrente (V4): u32 schema_version || comuns ||
+// character_states || enemy_knowledge || input_remap_backup || controls_hash128 ||
+// i32 slot_id.
 std::vector<std::uint8_t> build_payload_current(const SaveData& data) {
     std::vector<std::uint8_t> payload;
     put_u32(payload, static_cast<std::uint32_t>(current_schema_version()));
+    write_common_payload(payload, data);
+    write_character_states(payload, data);
+    write_enemy_knowledge(payload, data);
+    write_input_remap_backup(payload, data);
+    write_controls_hash(payload, data);
+    put_i32(payload, data.slot_id);
+    return payload;
+}
+
+// Monta o payload no layout V3 (comuns + character_states + enemy_knowledge, SEM os
+// campos V4), para a fixture de migracao V3->V4.
+std::vector<std::uint8_t> build_payload_v3(const SaveData& data) {
+    std::vector<std::uint8_t> payload;
+    put_u32(payload, 3u);
     write_common_payload(payload, data);
     write_character_states(payload, data);
     write_enemy_knowledge(payload, data);
@@ -411,6 +528,11 @@ SaveData deserialize_save(const std::vector<std::uint8_t>& data) {
     read_common_payload(r, decoded);
     if (version >= 2) read_character_states(r, decoded);
     if (version >= 3) read_enemy_knowledge(r, decoded);
+    if (version >= 4) {
+        read_input_remap_backup(r, decoded);
+        read_controls_hash(r, decoded);
+        decoded.slot_id = r.read_i32();
+    }
     r.expect_end();
 
     // 5. Sobe pela chain ate a versao atual (no-op se ja == atual).
@@ -435,10 +557,53 @@ std::vector<std::uint8_t> serialize_save_v2(const SaveData& data) {
     return pack_save(build_payload_v2(data));
 }
 
+std::vector<std::uint8_t> serialize_save_v3(const SaveData& data) {
+    return pack_save(build_payload_v3(data));
+}
+
 std::vector<std::uint8_t> make_v1_payload(int version) {
     SaveData minimal;
     minimal.current_scene_path = "res://forged.tscn";
     return pack_save(build_payload_v1(minimal, version));
+}
+
+// ---- load_save (T1.1 detect-and-respond, NAO-lancante) ---------------------
+
+LoadOutcome load_save(const std::vector<std::uint8_t>& data, int expected_slot) {
+    LoadOutcome out;
+    try {
+        out.data = deserialize_save(data);
+        out.result = LoadResult::Ok;
+    } catch (const SaveIntegrityError&) {
+        out.result = LoadResult::HmacInvalid;
+        return out;
+    } catch (const SaveVersionTooNewError&) {
+        out.result = LoadResult::VersionTooNew;
+        return out;
+    } catch (const SaveCorruptError&) {
+        out.result = LoadResult::Corrupt;
+        return out;
+    } catch (const std::invalid_argument&) {
+        // Payload bem-formado e selado, mas schema-divergente (invariante violada).
+        out.result = LoadResult::Invalid;
+        return out;
+    }
+
+    // T1.2: o save carregou integro. Se veio de um save PRE-V4 (sem slot_id selado,
+    // slot_id == -1 default que o migrator nao altera), adota o slot informado pelo
+    // load como origem (e o slot de onde a camada de I/O leu). Saves V4 ja trazem o
+    // slot_id selado: ai comparamos.
+    if (expected_slot >= 0) {
+        if (out.data.slot_id < 0) {
+            // Origem nao selada (save migrado): assume o slot lido como origem.
+            out.data.slot_id = expected_slot;
+        } else if (out.data.slot_id != expected_slot) {
+            // Slot selado diverge do slot lido: arquivo trocado de posicao. Dados
+            // ficam disponiveis; a app decide avisar/aceitar.
+            out.result = LoadResult::WrongSlot;
+        }
+    }
+    return out;
 }
 
 }  // namespace gus::domain::save

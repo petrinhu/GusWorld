@@ -62,6 +62,14 @@ add_executable(gusengine_domain_tests
     # Marco M2 (metade de logica pura): input_remap (ActionRegistry/InputBinding)
     # portado C#->C++ POCO. O backend de evento Qt (platform/input/) NAO entra aqui.
     input_remap_test.cpp
+    # Marco M2 (ADR-007): persistencia de controles (json proprio + hash128 + diff/
+    # restore + sanitize) e SAVE V4 (backup + slot-id selado + KDF + detect-respond).
+    controls_json_test.cpp
+    controls_hash_test.cpp
+    controls_diff_test.cpp
+    controls_name_sanitize_test.cpp
+    controls_restore_test.cpp
+    save_v4_test.cpp
 )
 
 # Os testes do combate incluem helpers de teste headers-only (fixed_random.hpp).
