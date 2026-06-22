@@ -51,6 +51,14 @@ add_executable(gusengine_domain_tests
     universal_compiler_defense_test.cpp
     environment_damage_test.cpp
     environment_fsm_test.cpp
+    # Reforco de QA M5: property-based + fuzz das invariantes do motor de combate
+    # (recomendado pela auditoria AUD-M5-MOTOR-2026-06-22). Sem dependencia externa:
+    # property-based "a mao" via LCG deterministico (property_gen.hpp).
+    combat_actor_property_test.cpp
+    weakness_wheel_property_test.cpp
+    environment_cap_property_test.cpp
+    combat_formula_property_test.cpp
+    initiative_queue_property_test.cpp
 )
 
 # Os testes do combate incluem helpers de teste headers-only (fixed_random.hpp).
