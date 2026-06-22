@@ -32,6 +32,12 @@ add_executable(gusengine_domain_tests
     combat_actor_test.cpp
     initiative_queue_test.cpp
     combat_state_test.cpp
+    environment_modifier_test.cpp
+    environment_catalog_test.cpp
+    environment_stacking_test.cpp
+    environment_status_facilitation_test.cpp
+    environment_clock_test.cpp
+    environment_transitions_test.cpp
 )
 
 target_link_libraries(gusengine_domain_tests

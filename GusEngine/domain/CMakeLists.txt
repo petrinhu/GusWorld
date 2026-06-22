@@ -32,6 +32,9 @@ add_library(gusengine_domain STATIC
     src/templates/canonical_templates.cpp
     src/combat/combat_actor.cpp
     src/combat/initiative_queue.cpp
+    src/combat/environment_catalog.cpp
+    src/combat/environment_transitions.cpp
+    src/combat/environment_clock.cpp
 )
 
 target_include_directories(gusengine_domain
