@@ -39,6 +39,6 @@ TEST_CASE("core::engine_version expoe a versao semver", "[core][version]") {
 
 TEST_CASE("domain expoe identidade e schema de save", "[domain]") {
     REQUIRE(gus::domain::domain_label() == "gusengine-domain");
-    // Schema forward-only: o C# atual ja esta em save_version=2.
-    REQUIRE(gus::domain::kSaveSchemaVersion == 2);
+    // Schema forward-only: o C# atual ja esta em save_version=3 (+EnemyKnowledge).
+    REQUIRE(gus::domain::kSaveSchemaVersion == 3);
 }
