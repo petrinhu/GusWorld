@@ -42,6 +42,7 @@ Os 8 marcos da migração faseada (`engine-design.md §4`) materializados como i
 | M6 | PI5 | Pivot_Áudio | **Áudio:** platform/audio sobre Qt Multimedia + 1 música + SFX. SAÍDA: música em loop, SFX no hit, fade entre telas, sem stutter | Média | M4 | Média | ⏳ Pendente | — |
 | M7 | PI6 | Pivot_Milestone | **Paridade jogável:** loop completo (andar, NPC, combate, save, carregar) 100% na engine nova. SAÍDA: playthrough de ~5min sem o Godot aberto | Alta | M5, M6 | Alta | ⏳ Pendente | — |
 | M8 | PI7 | Pivot_Decommission | **Decommission (RF-2.1b):** apagar game/, .csproj, project.godot, addons, .mcp.json + desinstalar Godot. SAÍDA: repo compila e roda sem nenhum bit de Godot/C#; CI verde | Alta | M7 | Média | ⏳ Pendente | — |
+| M9 | PI7 | Pivot_Higiene | **Higienização de arquivos e pastas pós-porte (pedido do líder 2026-06-21):** limpar e organizar a árvore depois do porte C++/Qt completo. Remover lixo/temporários/artefatos do porte, `.gitkeep` obsoletos e pastas vazias; normalizar a estrutura de `GusEngine/`; revisar `.gitignore`; conferir que não sobrou referência morta a Godot/C# em docs/scripts; padronizar nomes inconsistentes. SAÍDA: árvore de arquivos limpa e coerente, sem resíduo do stack antigo, build + suíte verdes | Média | M8 | Baixa | ⏳ Pendente | — |
 
 ---
 
