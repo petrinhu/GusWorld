@@ -26,13 +26,26 @@ SaveData migrate_v1_to_v2(SaveData data) {
     return data;
 }
 
+// Passo V2 -> V3: adiciona enemy_knowledge (vazio) e bumpa a versao. Espelha
+// MigrateV2ToV3.cs (C#). Funcao pura. EnemyKnowledge VAZIO e a semantica honesta de um
+// save v2: nunca rastreou Knowledge por TIPO de inimigo (variancia maxima no 1o
+// encontro). NAO se deriva de character_states: aquele era keyed por COMPANION, este
+// por enemy_type_id; as chaves nao se mapeiam (derivar inventaria dado errado). O
+// decoder ja deixou enemy_knowledge vazio ao ler um payload V2; aqui so confirmamos o
+// invariante e bumpamos a versao.
+SaveData migrate_v2_to_v3(SaveData data) {
+    data.enemy_knowledge.clear();  // V2 nao tinha o conceito: vazio e o correto
+    data.schema_version = 3;
+    return data;
+}
+
 }  // namespace
 
 int current_schema_version() noexcept {
-    // Fonte unica: o ancora do dominio. A chain abaixo (passos 1->2) DEVE alcancar
+    // Fonte unica: o ancora do dominio. A chain abaixo (passos 1->2->3) DEVE alcancar
     // exatamente esta versao; o test-guarda current_schema_version()==kSaveSchemaVersion
     // trava qualquer divergencia (ex.: somar passo sem bumpar o ancora).
-    return gus::domain::kSaveSchemaVersion;  // 2
+    return gus::domain::kSaveSchemaVersion;  // 3
 }
 
 SaveData migrate_to_current(SaveData data, int from_version) {
@@ -49,6 +62,10 @@ SaveData migrate_to_current(SaveData data, int from_version) {
             case 1:
                 data = migrate_v1_to_v2(std::move(data));
                 version = 2;
+                break;
+            case 2:
+                data = migrate_v2_to_v3(std::move(data));
+                version = 3;
                 break;
             default:
                 // GAP na chain: versao sem migrator registrado. Bug de schema.

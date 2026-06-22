@@ -33,6 +33,15 @@ void SaveData::validate() const {
                 "SaveData: chave de character_states nao pode ser vazia.");
         state.validate();
     }
+    for (const auto& [enemy_type_id, kills] : enemy_knowledge) {
+        if (enemy_type_id.empty())
+            throw std::invalid_argument(
+                "SaveData: chave de enemy_knowledge (enemy_type_id) nao pode ser "
+                "vazia.");
+        if (kills < 0)
+            throw std::invalid_argument(
+                "SaveData: kills de enemy_knowledge deve ser >= 0.");
+    }
 }
 
 }  // namespace gus::domain::save

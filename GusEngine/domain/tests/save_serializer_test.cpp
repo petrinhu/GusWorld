@@ -66,6 +66,9 @@ SaveData rich_fixture() {
         {"gus", CharacterSaveState{34, 120, {"pulso_eletrico", "scan_basico"}}},
         {"caua", CharacterSaveState{40, 89, {"stream_raio"}}},
     };
+    // V3: conhecimento de bestiario por TIPO (enemy_type_id -> kills). std::map =
+    // serializacao deterministica (selo estavel).
+    s.enemy_knowledge = {{"sentinela_bit", 8}, {"daemon_fork", 13}};
     return s;
 }
 
@@ -104,6 +107,29 @@ TEST_CASE("save: carimbo de timestamp roundtrippa intacto (metadado)",
     original.timestamp_ms = 1718900000999LL;
     const auto restored = deserialize_save(serialize_save(original));
     REQUIRE(restored.timestamp_ms == 1718900000999LL);
+}
+
+TEST_CASE("save: conhecimento de inimigos roundtrippa por tipo (oraculo a)",
+          "[domain][save][serializer]") {
+    auto original = rich_fixture();
+    const auto restored = deserialize_save(serialize_save(original));
+    REQUIRE(restored.enemy_knowledge == original.enemy_knowledge);
+    REQUIRE(restored.enemy_knowledge.at("sentinela_bit") == 8);
+    REQUIRE(restored.enemy_knowledge.at("daemon_fork") == 13);
+}
+
+TEST_CASE("save: conhecimento vazio roundtrippa (1o encontro, variancia maxima)",
+          "[domain][save][serializer]") {
+    const auto restored = deserialize_save(serialize_save(minimal_fixture()));
+    REQUIRE(restored.enemy_knowledge.empty());
+}
+
+TEST_CASE("save: conhecimento diferente muda o selo (determinismo por campo)",
+          "[domain][save][serializer]") {
+    auto a = rich_fixture();
+    auto b = rich_fixture();
+    b.enemy_knowledge["sentinela_bit"] = 9;  // delta de 1 kill
+    REQUIRE(serialize_save(a) != serialize_save(b));
 }
 
 // ---- header binario valido -------------------------------------------------
@@ -208,6 +234,21 @@ TEST_CASE("save: serialize de save invalido lanca (fail-fast)",
           "[domain][save][serializer]") {
     auto bad = rich_fixture();
     bad.character_states = {{"gus", CharacterSaveState{0, -5, {}}}};  // Xp < 0
+    REQUIRE_THROWS_AS(serialize_save(bad), std::invalid_argument);
+}
+
+TEST_CASE("save: kills de conhecimento negativo rejeitado no load (forjado)",
+          "[domain][save][serializer]") {
+    auto s = rich_fixture();
+    s.enemy_knowledge = {{"sentinela_bit", -1}};  // kills < 0: impossivel honesto
+    const auto bytes = gus::domain::save::serialize_save_unchecked(s);
+    REQUIRE_THROWS_AS(deserialize_save(bytes), std::invalid_argument);
+}
+
+TEST_CASE("save: chave de conhecimento vazia rejeitada (fail-fast)",
+          "[domain][save][serializer]") {
+    auto bad = rich_fixture();
+    bad.enemy_knowledge = {{"", 1}};  // enemy_type_id vazio: invalido
     REQUIRE_THROWS_AS(serialize_save(bad), std::invalid_argument);
 }
 

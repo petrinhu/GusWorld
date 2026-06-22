@@ -9,9 +9,9 @@
 
 namespace gus::domain {
 
-// Versao do schema de save. No C# atual e save_version=2 (CharacterStates).
-// Aqui fica como ancora forward-only; o porte do save (M3) assume esta fonte.
-inline constexpr int kSaveSchemaVersion = 2;
+// Versao do schema de save. C# atual: save_version=3 (V1 inicial; V2 +CharacterStates;
+// V3 +EnemyKnowledge). Ancora forward-only; o porte do save (M3) assume esta fonte.
+inline constexpr int kSaveSchemaVersion = 3;
 
 // Rotulo da camada de dominio, util para diagnostico/log na fase de andaime.
 std::string_view domain_label() noexcept;

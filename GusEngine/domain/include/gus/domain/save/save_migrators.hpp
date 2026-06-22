@@ -51,6 +51,11 @@ namespace gus::domain::save {
 // valida invariantes de V2 (V1 nao os tinha).
 [[nodiscard]] std::vector<std::uint8_t> serialize_save_v1(const SaveData& data);
 
+// Serializa um SaveData no layout do payload V2 (comuns + character_states, SEM
+// enemy_knowledge) dentro do envelope selado. Representa a "geracao V2" do jogo, para
+// a fixture de migracao V2->V3. NAO valida invariantes de V3.
+[[nodiscard]] std::vector<std::uint8_t> serialize_save_v2(const SaveData& data);
+
 // Forja um envelope selado (HMAC valido) cujo payload declara schema_version =
 // version, com o restante dos campos minimos (layout V1). Usado para testar a
 // rejeicao de versao futura (version > atual). Determinista.

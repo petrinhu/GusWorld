@@ -1,6 +1,6 @@
 // gus/domain/save/save_data.hpp
 //
-// Estado de SAVE versionado (schema atual V2 = gus::domain::kSaveSchemaVersion).
+// Estado de SAVE versionado (schema atual V3 = gus::domain::kSaveSchemaVersion).
 // Dado PURO, ZERO Qt. Portado de engine/foundation/save_system/SaveDataV1.cs +
 // CharacterSaveState.cs (sealed records C#).
 //
@@ -11,10 +11,13 @@
 // DIVERGENCIAS vs C# (ADR-006 + ancora kSaveSchemaVersion):
 //   - Vector3 do Godot (PlayerPosition/Rotation) vira Vec3 = 3 doubles POCO (sem Qt,
 //     sem Godot). Mesma semantica (x/y/z), formato NOSSO.
-//   - O C# foi a V3 (EnemyKnowledge). O C++ para em V2 de proposito
-//     (kSaveSchemaVersion=2): EnemyKnowledge e o bump V2->V3 NAO sao portados neste
-//     marco (mexeriam no ancora, fora do escopo). CharacterSaveState aqui NAO tem
-//     KnowledgeKills (campo que so existe a partir de V3 no C#).
+//   - EnemyKnowledge (V3): reusa progression::KnowledgeStore (= std::map<string,int>),
+//     o MESMO tipo do EnemyKnowledgeTracker (chave = enemy_type_id, valor = kills do
+//     player contra aquele tipo). NAO duplica o tipo. Espelha o Dictionary<string,int>
+//     EnemyKnowledge do C# (SaveDataV1.cs).
+//   - CharacterSaveState aqui NAO tem KnowledgeKills: no C# esse campo per-character
+//     virou VESTIGIAL ao chegar V3 (o consumidor le de EnemyKnowledge, keyed por TIPO,
+//     nao por companion). Nao portamos o campo morto.
 //
 // CARIMBO (ADR-006 item 4): timestamp_ms (epoch ms, data+hora+ms) gravado como
 // metadado para listar/ordenar saves e exibir "salvo em X". PUREZA: o domain NUNCA
@@ -32,6 +35,8 @@
 #include <map>
 #include <string>
 #include <vector>
+
+#include "gus/domain/progression/enemy_knowledge_tracker.hpp"  // KnowledgeStore
 
 namespace gus::domain::save {
 
@@ -62,11 +67,11 @@ struct CharacterSaveState {
     void validate() const;
 };
 
-// Save data versionado (schema atual V2). Imutavel por convencao (struct de valor).
+// Save data versionado (schema atual V3). Imutavel por convencao (struct de valor).
 struct SaveData {
     // Versao do schema deste save. Save novo nasce na versao atual
     // (kSaveSchemaVersion); saves antigos sobem pela chain antes de materializar.
-    int schema_version = 2;
+    int schema_version = 3;
 
     // CARIMBO injetado (epoch ms). Metadado de listagem/ordenacao (ADR-006 item 4).
     std::int64_t timestamp_ms = 0;
@@ -100,10 +105,18 @@ struct SaveData {
     // deterministica (chave de determinismo do selo).
     std::map<std::string, CharacterSaveState> character_states;
 
+    // Conhecimento de bestiario do PLAYER por TIPO de inimigo (V3). Reusa o tipo do
+    // progression (enemy_type_id -> kills acumulados); std::map = serializacao
+    // deterministica. Vazio = "nenhum tipo conhecido" (variancia maxima no 1o
+    // encontro). Alimenta o decaimento de variancia da formula de combate. O caller
+    // game-side grava aqui o resultado de EnemyKnowledgeTracker::apply_victory.
+    progression::KnowledgeStore enemy_knowledge;
+
     [[nodiscard]] bool operator==(const SaveData&) const = default;
 
     // Valida invariantes (fail-fast): timestamp_ms>=0; playtime>=0; cada
-    // CharacterSaveState valido. Lanca std::invalid_argument.
+    // CharacterSaveState valido; enemy_knowledge sem chave vazia e com kills>=0.
+    // Lanca std::invalid_argument.
     void validate() const;
 };
 

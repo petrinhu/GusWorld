@@ -5,15 +5,15 @@
 // MUDANCA do ADR-006: migrators operam sobre STRUCTS VERSIONADAS (V1 -> V2), NAO
 // sobre arvore JSON. Cada versao tem sua FIXTURE.
 //
-// Schema atual = V2 (gus::domain::kSaveSchemaVersion):
+// Schema atual = V3 (gus::domain::kSaveSchemaVersion):
 //   V1 = schema inicial, SEM character_states (per-character);
 //   V2 = + character_states. MigrateV1ToV2 popula character_states vazio (semantica
 //        honesta de um save v1: party usa stats do template, sem delta).
-//
-// O C++ para em V2 de proposito (kSaveSchemaVersion=2). O C# ja foi a v3
-// (EnemyKnowledge); aquele bump NAO e portado neste marco (seria mexer no ancora
-// kSaveSchemaVersion, fora do escopo). A chain e extensivel: somar MigrateV2ToV3
-// aqui + bumpar o ancora quando o marco chegar.
+//   V3 = + enemy_knowledge (conhecimento de bestiario por TIPO de inimigo).
+//        MigrateV2ToV3 popula enemy_knowledge VAZIO: um save v2 nunca rastreou
+//        Knowledge por tipo, logo "nenhum tipo conhecido" (variancia maxima no 1o
+//        encontro) e a semantica honesta. NAO se deriva de character_states (keyed
+//        por COMPANION, nao por tipo de inimigo: as chaves nao se mapeiam).
 //
 // Forward-only: rejeita versao FUTURA (save mais novo que o schema suportado).
 //
@@ -67,21 +67,22 @@ SaveData v1_state_fixture() {
 TEST_CASE("migrators: CurrentVersion da chain == kSaveSchemaVersion (guarda)",
           "[domain][save][migrators]") {
     REQUIRE(current_schema_version() == gus::domain::kSaveSchemaVersion);
-    REQUIRE(current_schema_version() == 2);
+    REQUIRE(current_schema_version() == 3);
 }
 
-// ---- migracao V1 -> V2: load de save antigo sobe pela chain ----------------
+// ---- migracao V1 -> V3: load de save antigo sobe os dois saltos da chain ----
 
-TEST_CASE("migrators: save V1 carregado sobe para V2 (character_states vazio)",
+TEST_CASE("migrators: save V1 carregado sobe ate V3 (campos novos vazios)",
           "[domain][save][migrators]") {
     const auto v1 = v1_state_fixture();
     const auto bytes_v1 = serialize_save_v1(v1);  // envelope com payload V1
 
-    // O load version-aware roda a chain ANTES de materializar.
+    // O load version-aware roda a chain inteira (V1->V2->V3) ANTES de materializar.
     const auto loaded = deserialize_save(bytes_v1);
 
-    REQUIRE(loaded.schema_version == 2);              // bumpado
-    REQUIRE(loaded.character_states.empty());          // campo novo, vazio
+    REQUIRE(loaded.schema_version == 3);              // bumpado ate o topo
+    REQUIRE(loaded.character_states.empty());          // campo V2, vazio
+    REQUIRE(loaded.enemy_knowledge.empty());           // campo V3, vazio
     // Campos que existiam em V1 preservados:
     REQUIRE(loaded.current_scene_path == "res://old_city.tscn");
     REQUIRE(loaded.playtime_seconds == 42.0);
@@ -90,19 +91,42 @@ TEST_CASE("migrators: save V1 carregado sobe para V2 (character_states vazio)",
     REQUIRE(loaded.timestamp_ms == 1000LL);
 }
 
-// ---- save V2 carrega direto, sem dupla-migracao ----------------------------
+// ---- migracao V2 -> V3: save com character_states ganha enemy_knowledge vazio
 
-TEST_CASE("migrators: save V2 carrega direto (chain no-op)",
+TEST_CASE("migrators: save V2 carregado sobe para V3 (enemy_knowledge vazio)",
           "[domain][save][migrators]") {
+    // Forja um envelope V2 (layout antigo, SEM enemy_knowledge) via helper de teste.
     SaveData v2;
     v2.schema_version = 2;
-    v2.timestamp_ms = 5LL;
-    v2.current_scene_path = "res://now.tscn";
-    v2.character_states = {{"gus", CharacterSaveState{34, 0, {"glifo_root"}}}};
+    v2.timestamp_ms = 7LL;
+    v2.current_scene_path = "res://v2.tscn";
+    v2.character_states = {{"gus", CharacterSaveState{34, 89, {"glifo_root"}}}};
+    v2.relations = {{"caua", 21}};
+    const auto bytes_v2 = gus::domain::save::serialize_save_v2(v2);
+
+    const auto loaded = deserialize_save(bytes_v2);
+
+    REQUIRE(loaded.schema_version == 3);              // bumpado V2->V3
+    REQUIRE(loaded.enemy_knowledge.empty());           // campo V3, vazio (honesto)
+    // Campos que ja existiam em V2 preservados:
+    REQUIRE(loaded.character_states.at("gus").xp == 89);
+    REQUIRE(loaded.relations.at("caua") == 21);
+}
+
+// ---- save V3 carrega direto, sem migracao (chain no-op) --------------------
+
+TEST_CASE("migrators: save V3 carrega direto (chain no-op)",
+          "[domain][save][migrators]") {
+    SaveData v3;
+    v3.schema_version = 3;
+    v3.timestamp_ms = 5LL;
+    v3.current_scene_path = "res://now.tscn";
+    v3.character_states = {{"gus", CharacterSaveState{34, 0, {"glifo_root"}}}};
+    v3.enemy_knowledge = {{"sentinela_bit", 8}, {"daemon_fork", 13}};
 
     const auto loaded =
-        deserialize_save(gus::domain::save::serialize_save(v2));
-    REQUIRE(loaded == v2);
+        deserialize_save(gus::domain::save::serialize_save(v3));
+    REQUIRE(loaded == v3);
 }
 
 // ---- forward-only: rejeita versao FUTURA -----------------------------------

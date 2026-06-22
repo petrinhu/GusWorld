@@ -255,22 +255,49 @@ void read_character_states(Reader& r, SaveData& s) {
     }
 }
 
-// Monta o payload no layout corrente (V2): u32 schema_version || comuns ||
-// character_states.
+// V3: enemy_knowledge = map<enemy_type_id, kills>. Mesmo codec dos demais int-maps;
+// std::map garante ordem de chave (selo deterministico).
+void write_enemy_knowledge(std::vector<std::uint8_t>& payload, const SaveData& s) {
+    put_map(payload, s.enemy_knowledge,
+            [](std::vector<std::uint8_t>& o, int v) { put_i32(o, v); });
+}
+
+void read_enemy_knowledge(Reader& r, SaveData& s) {
+    const std::uint32_t n = r.read_u32();
+    for (std::uint32_t i = 0; i < n; ++i) {
+        const std::string enemy_type_id = r.read_string();
+        s.enemy_knowledge[enemy_type_id] = r.read_i32();
+    }
+}
+
+// Monta o payload no layout corrente (V3): u32 schema_version || comuns ||
+// character_states || enemy_knowledge.
 std::vector<std::uint8_t> build_payload_current(const SaveData& data) {
     std::vector<std::uint8_t> payload;
     put_u32(payload, static_cast<std::uint32_t>(current_schema_version()));
     write_common_payload(payload, data);
     write_character_states(payload, data);
+    write_enemy_knowledge(payload, data);
     return payload;
 }
 
-// Monta o payload no layout V1 (u32 version || comuns; SEM character_states), com a
-// versao declarada (1 no save_v1 real; arbitrario em make_v1_payload).
+// Monta o payload no layout V1 (u32 version || comuns; SEM character_states/
+// enemy_knowledge), com a versao declarada (1 no save_v1 real; arbitrario em
+// make_v1_payload).
 std::vector<std::uint8_t> build_payload_v1(const SaveData& data, int declared_version) {
     std::vector<std::uint8_t> payload;
     put_u32(payload, static_cast<std::uint32_t>(declared_version));
     write_common_payload(payload, data);
+    return payload;
+}
+
+// Monta o payload no layout V2 (u32 version=2 || comuns || character_states; SEM
+// enemy_knowledge), para a fixture de migracao V2->V3.
+std::vector<std::uint8_t> build_payload_v2(const SaveData& data) {
+    std::vector<std::uint8_t> payload;
+    put_u32(payload, 2u);
+    write_common_payload(payload, data);
+    write_character_states(payload, data);
     return payload;
 }
 
@@ -365,6 +392,7 @@ SaveData deserialize_save(const std::vector<std::uint8_t>& data) {
     decoded.schema_version = version;
     read_common_payload(r, decoded);
     if (version >= 2) read_character_states(r, decoded);
+    if (version >= 3) read_enemy_knowledge(r, decoded);
     r.expect_end();
 
     // 5. Sobe pela chain ate a versao atual (no-op se ja == atual).
@@ -383,6 +411,10 @@ SaveData deserialize_save(const std::vector<std::uint8_t>& data) {
 
 std::vector<std::uint8_t> serialize_save_v1(const SaveData& data) {
     return pack_save(build_payload_v1(data, 1));
+}
+
+std::vector<std::uint8_t> serialize_save_v2(const SaveData& data) {
+    return pack_save(build_payload_v2(data));
 }
 
 std::vector<std::uint8_t> make_v1_payload(int version) {
