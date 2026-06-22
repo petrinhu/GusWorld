@@ -203,3 +203,45 @@ TEST_CASE("brain_kind: ordinais espelham EnemyTemplate.cs",
     REQUIRE(static_cast<std::uint32_t>(BrainKind::Scripted) == 0u);
     REQUIRE(static_cast<std::uint32_t>(BrainKind::Utility) == 1u);
 }
+
+// ---- A1 (auditoria M3): validate() rejeita ordinal de family/brain fora do dominio ----
+//
+// O fechamento do A1 religou templates::CardFamily a fonte canonica do combate e endureceu
+// o validate() pra rejeitar um ordinal de enum fora do conjunto valido (o C# Validate() NAO
+// cobria isso; e um hardening alem da paridade, pedido pela auditoria). Um .gdt selado mas
+// schema-divergente (family=9999) deixa de ser aceito silenciosamente.
+
+TEST_CASE("character_template: family com ordinal fora do dominio lanca",
+          "[domain][templates][a1]") {
+    auto c = gus_fixture();
+    c.family = static_cast<CardFamily>(9999u);  // fora de {0..4}
+    REQUIRE_THROWS_AS(c.validate(), std::invalid_argument);
+}
+
+TEST_CASE("character_template: family no limite superior valido (Criptografico) nao lanca",
+          "[domain][templates][a1]") {
+    auto c = gus_fixture();
+    c.family = CardFamily::Criptografico;  // ordinal 4, ultimo valido
+    REQUIRE_NOTHROW(c.validate());
+}
+
+TEST_CASE("enemy_template: family com ordinal fora do dominio lanca",
+          "[domain][templates][a1]") {
+    auto e = sentinela_fixture();
+    e.family = static_cast<CardFamily>(7u);  // fora de {0..4}
+    REQUIRE_THROWS_AS(e.validate(), std::invalid_argument);
+}
+
+TEST_CASE("enemy_template: brain com ordinal fora do dominio lanca",
+          "[domain][templates][a1]") {
+    auto e = sentinela_fixture();
+    e.brain = static_cast<BrainKind>(2u);  // fora de {0..1}
+    REQUIRE_THROWS_AS(e.validate(), std::invalid_argument);
+}
+
+TEST_CASE("enemy_template: brain Utility (ordinal 1, ultimo valido) nao lanca",
+          "[domain][templates][a1]") {
+    auto e = sentinela_fixture();
+    e.brain = BrainKind::Utility;
+    REQUIRE_NOTHROW(e.validate());
+}

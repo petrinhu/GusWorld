@@ -7,8 +7,11 @@
 
 #include <algorithm>
 #include <cctype>
+#include <cstdint>
 #include <stdexcept>
 #include <string>
+
+#include "gus/domain/templates/card_family.hpp"
 
 namespace gus::domain::templates {
 
@@ -38,6 +41,16 @@ void EnemyTemplate::validate() const {
     }
     if (spd < 0) {
         throw std::invalid_argument("EnemyTemplate.spd deve ser >= 0.");
+    }
+    // A1 (auditoria M3): rejeita ordinal de family/brain fora do dominio canonico. Hardening
+    // alem da paridade (o C# Validate() nao cobria isto): um .gdt selado mas schema-
+    // divergente deixa de ser aceito silenciosamente. family religada a fonte canonica do
+    // combate (range [0, kCardFamilyCount)); brain permanece template-only ([0, kBrainKindCount)).
+    if (static_cast<std::uint32_t>(family) >= kCardFamilyCount) {
+        throw std::invalid_argument("EnemyTemplate.family fora do dominio (ordinal invalido).");
+    }
+    if (static_cast<std::uint32_t>(brain) >= kBrainKindCount) {
+        throw std::invalid_argument("EnemyTemplate.brain fora do dominio (ordinal invalido).");
     }
     for (const auto& card_id : base_deck) {
         if (is_null_or_whitespace(card_id)) {

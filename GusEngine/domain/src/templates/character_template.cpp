@@ -8,6 +8,7 @@
 
 #include <algorithm>
 #include <cctype>
+#include <cstdint>
 #include <stdexcept>
 #include <string>
 
@@ -39,6 +40,14 @@ void CharacterTemplate::validate() const {
     }
     if (spd < 0) {
         throw std::invalid_argument("CharacterTemplate.spd deve ser >= 0.");
+    }
+    // A1 (auditoria M3): rejeita ordinal de family fora do dominio canonico {0..4}. O C#
+    // Validate() NAO cobria isto; e hardening alem da paridade (um .gdt selado mas
+    // schema-divergente, family=9999, deixa de ser aceito silenciosamente). Como
+    // templates::CardFamily agora e a fonte canonica do combate (religacao A1), o range
+    // valido e [0, kCardFamilyCount).
+    if (static_cast<std::uint32_t>(family) >= kCardFamilyCount) {
+        throw std::invalid_argument("CharacterTemplate.family fora do dominio (ordinal invalido).");
     }
     for (const auto& card_id : base_deck) {
         if (is_null_or_whitespace(card_id)) {

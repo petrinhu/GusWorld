@@ -38,7 +38,23 @@ add_executable(gusengine_domain_tests
     environment_status_facilitation_test.cpp
     environment_clock_test.cpp
     environment_transitions_test.cpp
+    random_source_test.cpp
+    combo_table_test.cpp
+    scripted_brain_test.cpp
+    placeholder_cards_test.cpp
+    combat_state_machine_test.cpp
+    combat_formula_test.cpp
+    combat_inc2_test.cpp
+    combat_inc3_test.cpp
+    combat_status_effects_test.cpp
+    combat_status_fixes_test.cpp
+    universal_compiler_defense_test.cpp
+    environment_damage_test.cpp
+    environment_fsm_test.cpp
 )
+
+# Os testes do combate incluem helpers de teste headers-only (fixed_random.hpp).
+target_include_directories(gusengine_domain_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 
 target_link_libraries(gusengine_domain_tests
     PRIVATE

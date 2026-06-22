@@ -35,6 +35,10 @@ add_library(gusengine_domain STATIC
     src/combat/environment_catalog.cpp
     src/combat/environment_transitions.cpp
     src/combat/environment_clock.cpp
+    src/combat/combo_table.cpp
+    src/combat/scripted_brain.cpp
+    src/combat/placeholder_cards.cpp
+    src/combat/combat_state_machine.cpp
 )
 
 target_include_directories(gusengine_domain

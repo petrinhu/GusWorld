@@ -34,6 +34,11 @@ enum class BrainKind : std::uint32_t {
     Utility = 1,
 };
 
+// Numero de valores canonicos de BrainKind (0..kBrainKindCount-1). Usado pela validacao
+// de ordinal (A1): rejeita brain fora do dominio no validate(). BrainKind permanece
+// definido aqui (conceito so-de-template; a FSM/brains do combate nao o usam).
+inline constexpr std::uint32_t kBrainKindCount = 2;
+
 // Template imutavel de inimigo. Source de stats + identidade de AI (secao 13/17).
 struct EnemyTemplate {
     // Identidade estavel (chave de repositorio/i18n). Invariante: nao vazia.

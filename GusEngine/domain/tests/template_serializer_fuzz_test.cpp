@@ -286,17 +286,18 @@ TEST_CASE("tpl/fuzz: cauda extra apos os campos (HMAC valido) rejeita",
     REQUIRE_THROWS_AS(deserialize_character(packed), TemplateCorruptError);
 }
 
-// ---- ACHADO (info): enum family/brain fora de range NAO e validado ---------
+// ---- A1 (auditoria M3): enum family/brain fora de range agora REJEITA no load ----------
 //
-// validate() dos templates checa id/stats/deck, mas NAO o ordinal de family/brain.
-// Um payload HMAC-valido com family=9999 desserializa para um CardFamily fora do
-// conjunto {0..4} e e ACEITO (nao lanca). Nao e crash/UB nem OOB (o enum e so um
-// u32 reinterpretado), mas e "aceitacao de valor fora do dominio". Documentamos o
-// comportamento ATUAL para a thread principal decidir com o lider (validar ordinal
-// no load vs aceitar). Este teste fixa o comportamento observado, NAO o ideal.
+// FECHADO no chunk 4 do M5 (A1): o validate() dos templates passou a checar o ORDINAL de
+// family/brain (alem de id/stats/deck), e templates::CardFamily foi religado a fonte
+// canonica do combate. Um payload HMAC-valido com family=9999 desserializa, chama
+// validate() no fim, e e REJEITADO com std::invalid_argument (defesa contra .gdt selado
+// mas schema-divergente). Antes do A1 isto era ACEITO silenciosamente (achado documentado
+// na auditoria QA). A virada de REQUIRE_NOTHROW para REQUIRE_THROWS_AS aqui e a melhoria
+// prometida, NAO uma regressao.
 
-TEST_CASE("tpl/fuzz: family fora de range e ACEITO hoje (achado documentado)",
-          "[domain][templates][fuzz][achado]") {
+TEST_CASE("tpl/A1: family fora de range REJEITA no load (validate de ordinal)",
+          "[domain][templates][fuzz][a1]") {
     std::vector<std::uint8_t> payload;
     put_u32_le(payload, 3u);
     payload.push_back('g'); payload.push_back('u'); payload.push_back('s');
@@ -309,12 +310,8 @@ TEST_CASE("tpl/fuzz: family fora de range e ACEITO hoje (achado documentado)",
     put_u32_le(payload, 0u);                 // deck_count = 0
     const auto packed = pack(payload);
 
-    // Comportamento ATUAL: aceita (validate nao cobre ordinal de enum). Se um dia o
-    // produto passar a validar o ordinal, troque para REQUIRE_THROWS_AS — e sera uma
-    // melhoria, nao uma regressao. NAO crasha de qualquer forma.
-    CharacterTemplate tpl;
-    REQUIRE_NOTHROW(tpl = deserialize_character(packed));
-    REQUIRE(static_cast<std::uint32_t>(tpl.family) == 9999u);
+    // A1: validate() no load rejeita o ordinal fora do dominio. Nao crasha; erro TIPADO.
+    REQUIRE_THROWS_AS(deserialize_character(packed), std::invalid_argument);
 }
 
 // ---- bytes aleatorios deterministicos (seed FIXA) --------------------------
