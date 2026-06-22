@@ -30,6 +30,8 @@ add_library(gusengine_domain STATIC
     src/templates/template_serializer.cpp
     src/templates/template_source.cpp
     src/templates/canonical_templates.cpp
+    src/combat/combat_actor.cpp
+    src/combat/initiative_queue.cpp
 )
 
 target_include_directories(gusengine_domain

@@ -28,6 +28,10 @@ add_executable(gusengine_domain_tests
     combat_enums_test.cpp
     environment_enums_test.cpp
     combat_records_test.cpp
+    weakness_wheel_test.cpp
+    combat_actor_test.cpp
+    initiative_queue_test.cpp
+    combat_state_test.cpp
 )
 
 target_link_libraries(gusengine_domain_tests
