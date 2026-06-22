@@ -3,15 +3,20 @@
 // Duplo deterministico da porta IRandomSource (gus/domain/combat/random_source.hpp),
 // portado de engine/tests/turn_combat/FixedRandom.cs. POCO puro, ZERO Qt, ZERO I/O.
 //
-// A formula de UseCard (secao 11) usa duas fontes de aleatoriedade da porta:
-//   - next_double(): variancia Knowledge Decay -> rolled = base * (1 + (v*2*x - v))
-//   - next(100):     chance de critico         -> is_crit = next(100) < crit_chance
+// A formula de UseCard (secao 11) usa duas fontes de aleatoriedade da porta, NESTA ordem:
+//   - next(100):     sorteio de canal -> roll<fumble=FALHA; roll<fumble+crit=CRIT; senao COMUM
+//   - next_double(): variancia Knowledge -> rolled = base * (1 + (v*2*x - v)); SO no canal COMUM
 //
 // FixedRandom crava ambas:
-//   - next_double == 0.5 => contribuicao de variancia ZERO (rolled == base_damage).
-//   - next_double == 1.0 => variancia maxima (+v).
-//   - next_double == 0.0 => variancia minima (-v).
-//   - next_int fixa o roll de crit (0 => sempre crita se crit_chance>0; 99 => quase nunca).
+//   - next_int fixa o sorteio de canal (roll = min(next_int, 99)):
+//       roll = 0   => FALHA  (quando fumbleChance > 0; ex. kills baixos)
+//       roll = fumbleChance (ex. 5 com kills=0) => CRIT (cai na faixa [fumble, fumble+crit))
+//       roll = 99  => COMUM  (default; topo da faixa, fora de FALHA/CRIT no caso comum)
+//   - next_double (so consumido no canal COMUM):
+//       0.5 => contribuicao de variancia ZERO (rolled == base_damage).
+//       1.0 => variancia maxima (+v).
+//       0.0 => variancia minima (-v).
+// Default = (0.5, 99): canal COMUM com variancia ZERO (dano == danoBase deterministico).
 //
 // Determinismo independente de plataforma (NAO dependemos de PRNG interno). Espelha
 // FixedRandom.cs 1:1: Next(maxValue) = maxValue<=0 ? 0 : min(next_int, maxValue-1).
@@ -30,7 +35,7 @@ namespace gus::domain::tests {
 // Random de valor fixo pra testes deterministicos da formula de dano (secao 11).
 class FixedRandom final : public gus::domain::combat::IRandomSource {
 public:
-    explicit FixedRandom(double next_double = 0.5, int next_int = 0)
+    explicit FixedRandom(double next_double = 0.5, int next_int = 99)
         : next_double_(next_double), next_int_(next_int) {}
 
     // Espelha Random.NextDouble() do C#: valor em [0,1) (aqui fixo).

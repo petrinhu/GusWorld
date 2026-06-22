@@ -1,6 +1,6 @@
 # Sistema de Combate Turn-Based (GusWorld)
 
-**Status:** Canônico. Decisões ratificadas pelo criador supremo em 2026-05-26 (proposta de combate aprovada integralmente, sem reabertura). Spec de produção para implementação TDD da Fase 2 (vertical slice F2-E.5).
+**Status:** Canônico. Decisões ratificadas pelo criador supremo em 2026-05-26 (proposta de combate aprovada integralmente, sem reabertura). Spec de produção para implementação TDD da Fase 2 (vertical slice F2-E.5). **Evolução 2026-06-22 (M5-DMG):** §11 ganhou o sorteio de canal FALHA/CRIT/COMUM sobre a variância Knowledge; a §11 deixa de ser paridade com o C# (que morre no M8) e passa a ser o contrato do motor C++.
 
 **Cross-ref pillars:** este sistema materializa GDD §6.1 (Sintonização Ortodôntica / Scan), §6.2 (Compilação de Deck Rúnico) e §6.3 (Vetores do Gambito), e serve diretamente Pillar 1 (Lógica vence força), Pillar 2 (Magia é sistema formal computável), Pillar 3 (Triângulo de hardware é a interface) e Pillar 4 (Prodígio de 11 anos, vulnerabilidade física + vitória por descoberta).
 
@@ -208,7 +208,7 @@ A sintaxe é apresentada na UI exatamente nesse formato (Pillar 2: gramática in
 | `StatusApplied` | `StatusEffect?` | status que a carta aplica (pode ser nulo) |
 | `Modifiers` | lista de `CardModifier` | modificadores anexados em runtime |
 | `Mastery` | int (0..N) | nível de mestria por uso (Pillar 1; cresce por uso, não por kill) |
-| `CritChance` | int (0..100) | porcentagem de crit (0 = sem crit). Visível na UI antes de confirmar a ação. |
+| `CritChance` | int (0..100) | **piso de crit configurável por carta** (canon 2026-06-22, M5-DMG): chance efetiva de crit = `max(5, CritChance)`. Existe um **piso global de 5%** de crit; `CritChance = 0` significa "usa o piso 5%", e um valor maior ELEVA a chance acima de 5%. Visível na UI antes de confirmar a ação. NÃO é mais "0 = sem crit". |
 
 ---
 
@@ -336,27 +336,88 @@ Feedback textual visível reforça a metáfora de compilação (Pillar 2: magia 
 
 ---
 
-## 11. Fórmula de dano (canonizada 2026-05-26)
+## 11. Fórmula de dano (canonizada 2026-05-26; evoluída 2026-06-22, item M5-DMG)
 
 Duas fórmulas distintas: **UseCard é divisiva** (Def reduz por fração, escala bem sem zerar), **ataque básico é subtrativo** (recurso simples sempre-disponível, 0 mana).
 
+> **Nota de divergência canônica (2026-06-22, M5-DMG).** A partir desta revisão, a §11 NÃO é mais paridade 1:1 com o C# de referência. O protótipo C# morre no M8 (port para C++ concluído); **o motor C++ passa a seguir esta §11**, não a antiga implementação C#. A evolução abaixo (sorteio de canal falha/crit/comum) é a fórmula canônica de produção. O snippet ilustrativo do §17 reflete a forma C# antiga e fica como referência histórica do protótipo, não como contrato.
+
 ### Fórmula UseCard (divisiva)
 
+A variância Knowledge atual É o "range da arma": preservada intacta. Sobre ela roda **um único sorteio de canal** que decide se o golpe é FALHA, CRIT ou COMUM (mutuamente exclusivos).
+
 ```
-multExpose     = alvoTemExpose ? (1 + Expose.Magnitude / 100) : 1.0
-danoBase       = (Power + Atk) × (100 / (100 + Def)) × multFraqueza × multMod × multCombo × multExpose × multAmbiente
-varianceFactor = max(0.05, 0.30 × e^(-knowledgeKills × 0.10))
-rolled         = danoBase × rand(1 - varianceFactor, 1 + varianceFactor)
-danoFinal      = round( rolled × (isCrit ? 1.5 : 1.0) )
-isCrit         = rand(0..99) < card.CritChance
+// 1. Cadeia divisiva (INALTERADA — nenhum fator novo aqui)
+multExpose  = alvoTemExpose ? (1 + Expose.Magnitude / 100) : 1.0
+danoBase    = (Power + Atk) × (100 / (100 + Def)) × multFraqueza × multMod × multCombo × multExpose × multAmbiente
+
+// 2. Curto-circuito de imunidade (ANTES de qualquer sorteio)
+se multFraqueza == 0.0  →  danoFinal = 0  (FIM; nenhum RNG consumido)
+
+// 3. Range da arma neste encontro (variância Knowledge, preservada)
+v       = max(0.05, 0.30 × e^(-kills × 0.10))      // kills = target.KnowledgeKills
+maxArma = danoBase × (1 + v)                        // topo do range deste encontro
+
+// 4. Chances dos canais
+fumbleChance = round(5 × e^(-kills × 0.50))         // 5% no 1º encontro, decai a ~0
+critChance   = max(5, card.CritChance)              // piso global 5%; carta eleva acima
+
+// 5. UM sorteio de canal (consome RNG UMA vez; ver ordem abaixo)
+roll = rng.Next(0..99)                              // inteiro 0..99
+se roll < fumbleChance                 → canal = FALHA
+senão se roll < fumbleChance + critChance → canal = CRIT
+senão                                  → canal = COMUM
+
+// 6. Resolução por canal
+FALHA:  danoFinal = 0                               // log com estética de erro de compilação (§10)
+CRIT:   danoFinal = round(maxArma × 1.5)            // = round(danoBase × (1+v) × 1.5); sufixo [CRITICO]
+COMUM:  r = rng.NextDouble()                        // 2º consumo de RNG, SÓ no canal COMUM
+        danoFinal = round(danoBase × (1 + (v × 2 × r - v)))   // aplica a variância normal
 ```
 
-- **Imune** (`multFraqueza == 0.0`): `danoFinal = 0`.
-- **Sem clamp mínimo**: a divisiva nunca chega a 0 contra não-imunes (frações muito pequenas podem arredondar pra 0, telegrafando "elemento errado / Def alta demais").
-- **`multExpose`** (§9, canon 2026-05-26): penúltimo fator da cadeia divisiva, ANTES da variância/crit. Só UseCard; o ataque básico não usa. Sem Expose no alvo = 1.0.
-- **`multAmbiente`** (§18, canon 2026-05-26): último fator da cadeia divisiva. Produto dos multiplicadores das camadas ambientais ATIVAS (terreno + clima + período) que afetam a família da carta jogada. Default 1.0 (encontro sem ambiente marcado). Faixa por camada 0.66 a 1.5. **NUNCA toca `multFraqueza`** (a roda de fraqueza é fator independente; ambiente nunca altera a relação de fraqueza). Só UseCard; o ataque básico subtrativo não usa.
-- **Ordem**: base divisiva (incl. `multExpose` e `multAmbiente`) → variância Knowledge → crit → um único `round` no final.
-- RNG **injetável e seedável** (`CombatStateMachine(..., Random? rng = null)`; default `Random.Shared`, testes injetam semente fixa). Pillar 1/2: variância é transparente, não opaca.
+#### Ordem de consumo do RNG (determinismo dos testes)
+
+A cadeia consome o RNG injetado nesta ordem fixa (importa para reproduzir testes com semente fixa):
+
+1. **Sorteio de canal** (`rng.Next(100)`): sempre consumido, exceto no curto-circuito de imunidade (`multFraqueza == 0.0`), que retorna antes de tocar o RNG.
+2. **Variância COMUM** (`rng.NextDouble()`): consumido **somente** quando o canal resolvido é COMUM. FALHA e CRIT não consomem o 2º roll (dano deles é fechado).
+
+Implicação para testes: um inimigo imune não move o RNG; um golpe que cai em FALHA ou CRIT move o RNG exatamente 1 vez; um golpe COMUM move 2 vezes. Os testes de paridade devem assertar essa contagem.
+
+#### Canais (detalhe)
+
+- **FALHA (dano 0):** chance NÃO fixa. Começa em 5% no 1º encontro (`kills=0`) e DECAI a ~0 conforme a maestria (Knowledge) sobe, MESMA família exponencial da variância (`e^(-kills × k)`). Constante `k = 0.50` (justificativa abaixo). Telegrafada no log com estética de "erro de compilação" (§10), ex. `FALHA DE COMPILACAO`. A falha é o "tropeço de quem ainda não conhece o inimigo": some com a maestria, reforçando a Knowledge Progression (Pillar 1).
+- **CRIT:** chance = piso global de 5%, que `card.CritChance` pode ELEVAR (piso configurável por carta; ver §7). Dano = "máximo da arma" × 1.5, onde "máximo da arma" = topo do range do encontro = `danoBase × (1 + v)`. Logo `critCrit = round(danoBase × (1+v) × 1.5)`. Sufixo `[CRITICO]` no log.
+- **COMUM:** o resto da probabilidade. Aplica a variância Knowledge normal sobre `danoBase` (forma idêntica à antiga: `danoBase × (1 + (v × 2 × r − v))`).
+
+#### Curva de decaimento da FALHA
+
+```
+fumbleChance(%) = round(5 × e^(-kills × 0.50))
+```
+
+| kills | 5 × e^(-kills×0.50) | round → % |
+|---|---|---|
+| 0 | 5.00 | **5** |
+| 1 | 3.03 | 3 |
+| 2 | 1.84 | 2 |
+| 3 | 1.12 | 1 |
+| 4 | 0.68 | 1 |
+| 5 | 0.41 | 0 |
+| 6+ | < 0.30 | **0** |
+
+A falha chega a **0% a partir de 5 kills** do mesmo tipo de inimigo.
+
+**Justificativa da constante `k = 0.50`:** a falha é um "risco de iniciante" que deve sumir RÁPIDO (cinco mortes do mesmo inimigo já é familiaridade plena), enquanto a variância de dano persiste mais tempo (a dispersão só atinge o piso ±5% bem mais tarde). Por isso a falha usa um decaimento **mais agressivo** que a variância (`k = 0.50` vs `k = 0.10`), mantendo a **mesma família funcional** `e^(-kills × k)` pedida pelo criador. Racional de design: o jogador não deve ser punido com "dano zero" depois que já domina o inimigo (anti-frustração; Pillar 4), mas a variância pode continuar comunicando incerteza por mais encontros sem frustrar (errar 0 vs. errar a magnitude são pesos psicológicos diferentes). A constante 0.50 também produz uma escada limpa de números pequenos (5→3→2→1→1→0), legível na UI.
+
+#### Regras gerais
+
+- **Imune** (`multFraqueza == 0.0`): `danoFinal = 0`, curto-circuito ANTES do sorteio (não consome RNG). Tem prioridade sobre FALHA/CRIT/COMUM.
+- **Sem clamp mínimo** no canal COMUM: a divisiva nunca chega a 0 contra não-imunes (frações muito pequenas podem arredondar pra 0, telegrafando "elemento errado / Def alta demais"). Isto é distinto de FALHA (dano 0 deliberado por sorteio, com log de erro de compilação).
+- **`multExpose`** (§9, canon 2026-05-26): último fator da cadeia divisiva, ANTES do sorteio de canal. Só UseCard; o ataque básico não usa. Sem Expose no alvo = 1.0.
+- **`multAmbiente`** (§18, canon 2026-05-26): também na cadeia divisiva, ANTES do sorteio. Produto dos multiplicadores das camadas ambientais ATIVAS (terreno + clima + período) que afetam a família da carta jogada. Default 1.0 (encontro sem ambiente marcado). Faixa por camada 0.66 a 1.5. **NUNCA toca `multFraqueza`** (a roda de fraqueza é fator independente; ambiente nunca altera a relação de fraqueza). Só UseCard; o ataque básico subtrativo não usa.
+- **Ordem**: cadeia divisiva completa (incl. `multExpose` e `multAmbiente`) → curto-circuito de imunidade → sorteio de canal → resolução por canal → um único `round` no final.
+- **RNG injetável e seedável** (porta `IRandomSource`, ADR-006): o domínio é PURO; a semente real (data+hora+ms) é injetada na fronteira `app/`, nunca dentro do domínio. O canal (falha/crit/comum) é decidido por UM sorteio do RNG injetado; o 2º roll (variância) só ocorre no canal COMUM. Pillar 1/2: a incerteza é transparente (chances visíveis na UI), não opaca.
 
 **Stacking das 3 camadas ambientais** (terreno + clima + período, canonizado 2026-05-26): os multiplicadores das camadas ativas que afetam a mesma família **se multiplicam** entre si, com **cap final `multAmbiente ∈ [0.44, 2.25]`** (mesmo teto que o sistema já permite via 1.5 × 1.5 = 2.25 e piso via 0.66 × 0.66 ≈ 0.44). A curadoria de transições (§18.6) impede por design que 2 fontes ×1.5 da MESMA família coexistam (nunca atingir 2.25 organicamente fora de janela curta); o cap é a trava de segurança numérica.
 
@@ -370,10 +431,39 @@ isCrit         = rand(0..99) < card.CritChance
 | `multExpose` | status Expose no alvo (§9) | default 1.0; `1 + Expose.Magnitude/100` se Expose presente; só UseCard |
 | `multAmbiente` | camadas ambientais ativas (§18) | default 1.0; produto das camadas (terreno+clima+período) por família; só UseCard; nunca toca `multFraqueza`; cap [0.44, 2.25] (canonizado + implementado F2-E.11, ADR-004) |
 | `Def` | atributo do defensor | divisor `100/(100+Def)`; reduzido por Break/Corrode |
-| `knowledgeKills` | `CombatActor.KnowledgeKills` (SaveSystem) | kills do mesmo tipo de inimigo; alimenta o decaimento de variância |
-| `card.CritChance` | carta | 0..100 (%) ; 0 = sem crit |
+| `kills` (`knowledgeKills`) | `CombatActor.KnowledgeKills` (SaveSystem) | kills do mesmo tipo de inimigo; alimenta o decaimento de variância E de falha |
+| `v` (varianceFactor) | derivado de `kills` | `max(0.05, 0.30 × e^(-kills × 0.10))`; range da arma neste encontro |
+| `fumbleChance` | derivado de `kills` | `round(5 × e^(-kills × 0.50))`; chance de FALHA (dano 0), decai a 0 em 5 kills |
+| `critChance` | piso global + carta | `max(5, card.CritChance)`; piso 5%, carta eleva acima |
+| `card.CritChance` | carta | **bônus acima do piso global de 5%** (§7); 0 = usa o piso 5% |
 
-**Variância Knowledge Decay**: 1º encontro (`kills=0`) → ±30%; conforme o player farma o mesmo tipo, decai exponencialmente até o piso ±5% (`kills` altos). Contra inimigos muito farmados o dano fica quase determinístico (Knowledge Progression: conhecer o inimigo remove a incerteza).
+**Variância Knowledge Decay**: 1º encontro (`kills=0`) → ±30%; conforme o player farma o mesmo tipo, decai exponencialmente até o piso ±5% (`kills` altos). Contra inimigos muito farmados o dano comum fica quase determinístico (Knowledge Progression: conhecer o inimigo remove a incerteza).
+
+**Falha Knowledge Decay**: 1º encontro → 5% de FALHA (dano 0); decai exponencialmente (`k = 0.50`, mais agressivo que a variância) até **0% a partir de 5 kills**. O "tropeço de iniciante" some quando o inimigo já é familiar (anti-frustração, Pillar 4).
+
+### Exemplo numérico (3 canais)
+
+Dado: carta `Power = 20`, atacante `Atk = 10`, alvo `Def = 0`, fraqueza ativa (`multFraqueza = 1.5`), demais mults = 1.0.
+
+`danoBase = (20 + 10) × (100/100) × 1.5 = 45`.
+
+**Caso A — 1º encontro (`kills = 0`):** `v = 0.30`, `maxArma = 45 × 1.30 = 58.5`. `fumbleChance = 5%`, `critChance = max(5, CritChance)`.
+
+| Canal | Condição (roll 0..99, CritChance=0 → crit 5%) | Dano |
+|---|---|---|
+| FALHA | roll ∈ [0, 4] (5%) | **0** (`FALHA DE COMPILACAO`) |
+| CRIT | roll ∈ [5, 9] (5%) | `round(58.5 × 1.5)` = **88** `[CRITICO]` |
+| COMUM | roll ∈ [10, 99] (90%) | `round(45 × (1 + (0.30 × 2r − 0.30)))`, r∈[0,1) → faixa **32 a 58** |
+
+**Caso B — inimigo farmado (`kills = 6`):** `v = max(0.05, 0.30 × e^(-0.6)) = max(0.05, 0.165) = 0.165`, `maxArma = 45 × 1.165 ≈ 52.4`. `fumbleChance = round(5 × e^(-3.0)) = round(0.25) = 0` → **sem falha**.
+
+| Canal | Condição (CritChance=0 → crit 5%) | Dano |
+|---|---|---|
+| FALHA | — (0%) | impossível neste estágio de maestria |
+| CRIT | roll ∈ [0, 4] (5%) | `round(52.4 × 1.5)` = **79** `[CRITICO]` |
+| COMUM | roll ∈ [5, 99] (95%) | `round(45 × (1 + (0.165 × 2r − 0.165)))`, r∈[0,1) → faixa **38 a 52** |
+
+Leitura de design: conforme o jogador domina o inimigo, a FALHA desaparece e o range do COMUM aperta (variância cai), tornando o dano mais previsível e a maestria perceptível (Knowledge Progression).
 
 ### Fórmula ataque básico (subtrativa)
 
@@ -571,7 +661,7 @@ public readonly record struct Card(
     StatusEffect? StatusApplied,
     IReadOnlyList<CardModifier> Modifiers,
     int Mastery,                 // cresce por uso
-    int CritChance = 0           // 0..100 (%); 0 = sem crit
+    int CritChance = 0           // piso de crit por carta (M5-DMG): chance = max(5, CritChance); 0 = usa piso global 5%
 );
 
 public readonly record struct ComboRecipe(
@@ -604,13 +694,27 @@ public interface IEnemyBrain {
     EnemyAction   DecideAction(CombatState state);
 }
 
-// Fórmula de dano UseCard (divisiva, canon 2026-05-26 — ver §11 pra detalhamento):
+// NOTA (2026-06-22, M5-DMG): o snippet abaixo é a forma C# ANTIGA do protótipo (morre no M8).
+// A fórmula canônica de produção (motor C++) é a §11 evoluída: sorteio de canal FALHA/CRIT/COMUM.
+// Mantido aqui apenas como referência histórica do protótipo C#; NÃO é o contrato vigente.
+//
 //   baseDamage = (Power + Atk) * (100f / (100f + Def)) * multFraqueza * multMod * multCombo;
 //   v          = MathF.Max(0.05f, 0.30f * MathF.Exp(-knowledgeKills * 0.10f));
 //   rolled     = baseDamage * (1 + (v * 2 * rng.NextDouble() - v));
 //   if (CritChance > 0 && rng.Next(100) < CritChance) rolled *= 1.5f;
 //   danoFinal  = multFraqueza == 0f ? 0 : (int)MathF.Round(rolled);  // sem clamp mínimo
-// Ataque básico (subtrativo): danoFinal = Math.Max(1, Atk - Def);   // sem variância/crit/fraqueza
+//
+// Forma canônica vigente (§11, motor C++, RNG via porta IRandomSource ADR-006):
+//   se multFraqueza == 0 -> 0 (curto-circuito, sem RNG)
+//   v            = max(0.05, 0.30 * exp(-kills * 0.10))
+//   maxArma      = baseDamage * (1 + v)
+//   fumbleChance = round(5 * exp(-kills * 0.50))     // 0% a partir de 5 kills
+//   critChance   = max(5, CritChance)                // piso global 5%
+//   roll         = rng.Next(100)                     // 1 sorteio de canal
+//   FALHA  (roll < fumbleChance)                  -> 0
+//   CRIT   (roll < fumbleChance + critChance)     -> round(maxArma * 1.5)
+//   COMUM  (resto)                                -> round(baseDamage * (1 + (v*2*rng.NextDouble() - v)))  // 2º roll só aqui
+// Ataque básico (subtrativo): danoFinal = Math.Max(1, Atk - Def);   // sem variância/canal/fraqueza
 ```
 
 ### Roda de fraqueza (tabela de dados para teste)
@@ -817,4 +921,4 @@ A regra de STACKING das 3 camadas e seu cap final (`multAmbiente ∈ [0.44, 2.25
 
 ---
 
-**Última revisão:** 2026-06-03 (D.1+N.2 Sprint 1 W2). Decisões canonizadas: HP +60% Trash 34→55 / Elite 89→144; AP e Mana por-ator CTB (§5); §2.1 contrato fragilidade Gus (N.2 R1, one-way door); §10 feedback ERRO DE COMPILAÇÃO (N.2 R2); §12/§13/§15 caos Perlin exclusivo Patch-Zero (N.2 R3, one-way door); §17 stats de referência pós-inflação + roda de fraqueza confirmada. Revisão anterior 2026-05-26: §18 ambientes de combate, §11 multAmbiente + stacking 3 camadas, escopo slice item 15. Status: canônico, pronto para implementação TDD F2-E.5.
+**Última revisão:** 2026-06-22 (M5-DMG). §11 evoluída: sorteio único de canal FALHA/CRIT/COMUM sobre a variância Knowledge preservada; FALHA decai com a maestria (`round(5 × e^(-kills × 0.50))`, 0% a partir de 5 kills); CRIT com piso global 5% elevável por `card.CritChance`, dano = `round(danoBase × (1+v) × 1.5)`; imunidade `multFraqueza==0` em curto-circuito antes do RNG; ordem de consumo do RNG documentada (1 sorteio de canal, +1 só no COMUM); RNG via porta `IRandomSource` (ADR-006, domínio puro); §7 `CritChance` redefinido como piso por carta. A §11 deixa de ser paridade com o C# (que morre no M8); o motor C++ segue esta §11. Revisão anterior 2026-06-03 (D.1+N.2 Sprint 1 W2): HP +60% Trash 34→55 / Elite 89→144; AP e Mana por-ator CTB (§5); §2.1 contrato fragilidade Gus (N.2 R1, one-way door); §10 feedback ERRO DE COMPILAÇÃO (N.2 R2); §12/§13/§15 caos Perlin exclusivo Patch-Zero (N.2 R3, one-way door); §17 stats de referência pós-inflação + roda de fraqueza confirmada. Revisão 2026-05-26: §18 ambientes de combate, §11 multAmbiente + stacking 3 camadas, escopo slice item 15. Status: canônico, pronto para implementação TDD F2-E.5.

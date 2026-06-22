@@ -67,7 +67,7 @@ int damage_against(CombatActor& tgt, const Card& card) {
     CombatActor atk = attacker();
     std::unordered_map<std::string, Card> reg;
     reg.emplace(card.id, card);
-    FixedRandom rng(0.5, 0);
+    FixedRandom rng;  // default (0.5, 99): canal COMUM, variancia zero (secao 11)
     CombatStateMachine sm({&atk, &tgt}, play_once(CombatAction::use_card(card.id, tgt.id())),
                           &reg, nullptr, &rng);
     sm.begin_turn();

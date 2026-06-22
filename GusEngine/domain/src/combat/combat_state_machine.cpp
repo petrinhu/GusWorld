@@ -37,13 +37,15 @@ namespace {
 // Guarda contra loop infinito caso um provider mal-comportado nunca passe nem gaste AP.
 constexpr int kMaxActionsPerTurn = 64;
 
-// Default DETERMINISTICO da porta de RNG (ver header): variancia zero (next_double 0.5),
-// sem crit (next 0). Usado quando NENHUM rng e injetado, mantendo o dominio puro (o C#
-// usaria Random.Shared global, impossivel num dominio determinístico). NAO e seeding.
+// Default DETERMINISTICO da porta de RNG (ver header). Usado quando NENHUM rng e injetado,
+// mantendo o dominio puro (o C# usaria Random.Shared global, impossivel num dominio
+// determinístico). NAO e seeding. Sob a formula da secao 11 (sorteio de canal), "neutro"
+// significa SEMPRE COMUM com variancia ZERO: next(100) retorna o topo da faixa (max-1, ex.
+// 99) para cair fora de FALHA/CRIT, e next_double 0.5 zera a variancia (dano == danoBase).
 class NeutralRandom final : public IRandomSource {
 public:
     double next_double() override { return 0.5; }
-    int next(int) override { return 0; }
+    int next(int max_value) override { return max_value <= 0 ? 0 : max_value - 1; }
 };
 
 NeutralRandom& neutral_random() {
@@ -588,28 +590,64 @@ void CombatStateMachine::resolve_use_card(CombatActor& actor, const CombatAction
         // mult_ambiente (secao 18, 11): ULTIMO fator da cadeia divisiva.
         const float mult_ambiente = mult_ambiente_for(card.family);
 
+        // 1. Cadeia divisiva (secao 11). danoBase = "range da arma" base, ANTES da variancia.
         const float base_damage =
             static_cast<float>(card.power + actor.atk()) *
             (100.0f / (100.0f + static_cast<float>(target->def()))) * mult_fraqueza * mult_mod *
             mult_combo * mult_expose * mult_disrupt * mult_ambiente;
 
-        // Knowledge Decay (secao 11): variancia +-30% no 1o encontro, decaindo ate +-5%.
-        // Aplicada ANTES do crit. Espelha: v = max(0.05, 0.30 * MathF.Exp(-kills*0.10));
-        // rolled = base * (float)(1.0 + (v*2.0*rng.NextDouble() - v)).
-        const float v = std::max(
-            0.05f, 0.30f * std::exp(-static_cast<float>(target->knowledge_kills()) * 0.10f));
-        float rolled = base_damage * static_cast<float>(
-                                         1.0 + (static_cast<double>(v) * 2.0 * rng_->next_double() -
-                                                static_cast<double>(v)));
+        // 2. Curto-circuito de imunidade (secao 11): multFraqueza == 0 => dano 0 ANTES de
+        //    qualquer sorteio. NAO consome RNG (determinismo: imune = 0 consumos).
+        if (mult_fraqueza == 0.0f) {
+            target->take_damage(0);
+            if (card.status_applied.has_value())
+                target->add_status(*card.status_applied);
+            if (combo.has_value() && combo->result_status.has_value())
+                target->add_status(*combo->result_status);
+            log_.push_back(CombatLogEntry{
+                actor.id(), CombatActionType::UseCard, target->id(), 0,
+                actor.id() + " compila " + card.id + " em " + target->id() + " por 0."});
+            continue;
+        }
 
-        // Critico por carta (secao 11): chance percentual da propria carta; *1.5 pos-
-        // variancia. crit_chance 0 => nunca crita.
-        const bool is_crit = card.crit_chance > 0 && rng_->next(100) < card.crit_chance;
-        if (is_crit)
-            rolled *= 1.5f;
+        // 3. Variancia Knowledge (secao 11): "range da arma" deste encontro. Preservada.
+        //    v = max(0.05, 0.30 * exp(-kills * 0.10)).
+        const int kills = target->knowledge_kills();
+        const float v = std::max(0.05f, 0.30f * std::exp(-static_cast<float>(kills) * 0.10f));
 
-        // Sem clamp minimo: a divisiva nunca chega a 0 contra nao-imunes. Imune zera.
-        const int damage = mult_fraqueza == 0.0f ? 0 : static_cast<int>(std::lround(rolled));
+        // 4. Chances dos canais (secao 11).
+        //    fumbleChance = round(5 * exp(-kills * 0.50)); 0 kills = 5%, 5+ kills = 0%.
+        //    critChance   = max(5, card.CritChance); piso global de 5%, carta eleva.
+        const int fumble_chance = static_cast<int>(
+            std::lround(5.0 * std::exp(-static_cast<double>(kills) * 0.50)));
+        const int crit_chance = std::max(5, card.crit_chance);
+
+        // 5. UM sorteio de canal (secao 11): consome rng.next(100) UMA vez.
+        //    roll < fumble                -> FALHA
+        //    roll < fumble + crit         -> CRIT  (faixa contigua a FALHA; ver secao 11)
+        //    senao                        -> COMUM
+        const int roll = rng_->next(100);
+
+        int damage = 0;
+        std::string channel_suffix;
+        if (roll < fumble_chance) {
+            // FALHA: dano 0. Log com estetica de erro de compilacao (secao 10). 1 consumo RNG.
+            damage = 0;
+            channel_suffix = " FALHA DE COMPILACAO";
+        } else if (roll < fumble_chance + crit_chance) {
+            // CRIT: round(maxArma * 1.5) = round(danoBase * (1 + v) * 1.5). 1 consumo RNG.
+            const float crit_damage = base_damage * (1.0f + v) * 1.5f;
+            damage = static_cast<int>(std::lround(crit_damage));
+            channel_suffix = " [CRITICO]";
+        } else {
+            // COMUM: 2o consumo de RNG (next_double); aplica a variancia normal.
+            const double r = rng_->next_double();
+            const float rolled = base_damage * static_cast<float>(
+                                                   1.0 + (static_cast<double>(v) * 2.0 * r -
+                                                          static_cast<double>(v)));
+            damage = static_cast<int>(std::lround(rolled));
+        }
+
         target->take_damage(damage);
 
         if (card.status_applied.has_value())
@@ -618,11 +656,10 @@ void CombatStateMachine::resolve_use_card(CombatActor& actor, const CombatAction
         if (combo.has_value() && combo->result_status.has_value())
             target->add_status(*combo->result_status);
 
-        const std::string crit_suffix = is_crit ? " [CRITICO]" : "";
         log_.push_back(CombatLogEntry{
             actor.id(), CombatActionType::UseCard, target->id(), damage,
             actor.id() + " compila " + card.id + " em " + target->id() + " por " +
-                std::to_string(damage) + "." + crit_suffix});
+                std::to_string(damage) + "." + channel_suffix});
     }
 }
 
