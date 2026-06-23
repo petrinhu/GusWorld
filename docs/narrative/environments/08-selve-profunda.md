@@ -27,7 +27,7 @@ Tom dominante: **densidade orgânica matemática invadida**. Biolúmen contínuo
 
 ### 2.1 Vilarejo do Pelicano Branco
 
-Centro de presença humana da Selve Profunda na borda norte. Aldeia de fronteira aproximadamente quarenta casas baixas de adobe e madeira, telhado de palma trançada em padrão Fibonacci visível (uma das três visíveis daqui de cima do morro lateral). Praça central com poço, casa da farmacopeia com janelas voltadas pra leste (Jaci trabalha em luz natural quando dá), cabana da Anciã Mariana Vanderbist na ponta sul olhando pra fronteira-Selve. Plantação comunitária ao longo do córrego. Casa-índice da família Vanderbist é a sexta da rua principal (Jaci ainda mora ali com Mariana). Hub canônico do arco Jaci.
+Centro de presença humana da Selve Profunda na borda norte. Aldeia de fronteira aproximadamente quarenta casas baixas de adobe e madeira, telhado de palma trançada num padrão de razão recorrente visível (uma das três visíveis daqui de cima do morro lateral). Praça central com poço, casa da farmacopeia com janelas voltadas pra leste (Jaci trabalha em luz natural quando dá), cabana da Anciã Mariana Vanderbist na ponta sul olhando pra fronteira-Selve. Plantação comunitária ao longo do córrego. Casa-índice da família Vanderbist é a sexta da rua principal (Jaci ainda mora ali com Mariana). Hub canônico do arco Jaci.
 
 ### 2.2 Trilha de Latão dos Pioneiros
 
@@ -63,7 +63,7 @@ Coração geometricamente impossível da Selve Profunda. Clareira fractal aninha
 | Pena de pelicano branco branca pura, presa em prego | porta da casa de farmacopeia | Pelicano branco apareceu na soleira da casa quando Jaci tinha cinco anos. Mariana disse "ele veio te ver". O pelicano deixou a pena, foi embora, nunca voltou. Jaci pregou. Foi a primeira coisa que ela pregou em parede sozinha. |
 | Clareira cinza sem nenhuma textura visível, com mancha de cinza no centro | borda externa do Núcleo Mandelbrot Interno, três zonas | Zonas de deleção GRE. Sterling editou sintaxe da Selve em runtime; o solo, a vegetação, e o ar local **deixaram de existir como pattern coerente** e foram substituídos por placeholder de renderização: cinza chapado. Anomalia visível a olho nu. Animais que entram saem com sintaxe quebrada (item próximo). |
 | Pequeno raposídeo sem cor coerente atravessando trilha | trilha de aproximação ao Núcleo, intermitente | Raposa-fractal originalmente. Atravessou clareira de deleção uma vez. Saiu com pelagem em ruído branco visual (cor não-mapeada, vibra entre cinza e magenta cada quadro), som de patas distorcido (pisada do mesmo pé soa diferente cada vez), padrão de movimento aperiódico. Vivo, mas alterado. Não-hostil. Não-curável. Aparece em algumas árias de exploração. |
-| Banner de pano branco bordado com espiral Fibonacci verde | praça central do vilarejo | Bordado tradição [[tradicoes-cultura]] §Costumes universais. Mãe e avó da Jaci bordaram juntas em -10 como decoração para o Dia das Sementes daquele ano. Jaci aprendeu a bordar olhando esse pano. |
+| Banner de pano branco bordado com espiral logarítmica verde | praça central do vilarejo | Bordado tradição [[tradicoes-cultura]] §Costumes universais. Mãe e avó da Jaci bordaram juntas em -10 como decoração para o Dia das Sementes daquele ano. Jaci aprendeu a bordar olhando esse pano. |
 | Estação retransmissora drone Sterling Corp camuflada como pedra | dois quilômetros ao sul do vilarejo, oculta | Sterling instalou em -1 sem autorização da Anciã. Mariana descobriu em -0.5 com Tatauín Branca; resolveram não tocar (mexer alerta Sterling). Drone faz scan de vegetação a cada 4 horas. Jaci ainda não sabe que existe. Cauã (se na party em arco Jaci) detecta com pulso EM. |
 | Bilhete em código Pythia bio amarrado a galho de árvore | borda do Núcleo Mandelbrot, marcação de fronteira | Mariana deixou em -0.5: "não passar daqui sem mim ou sem Jaci. Mestre Loanis morreu por seis metros a mais." Código simples; Jaci lê de primeira. |
 
@@ -72,7 +72,7 @@ Coração geometricamente impossível da Selve Profunda. Clareira fractal aninha
 ## 4. Áudio diegético (ganchos)
 
 - **Cantante de ruído coerente.** Insetos, anfíbios, pássaros. Padrão Perlin de três oitavas, audível como tapete sonoro contínuo de chiado vivo. Fundo permanente da exploração regular. Jaci aprendeu a ouvir oito espécies separadas no fundo único.
-- **Pulso de bioluminescência subaudível.** Cada flor luminosa pulsa em frequência fixa entre 1Hz e 4Hz, padrão Fibonacci entre espécies. Não-audível por si, mas o cérebro do jogador percebe o ritmo via flicker visual. Sentido como calma.
+- **Pulso de bioluminescência subaudível.** Cada flor luminosa pulsa em frequência fixa entre 1Hz e 4Hz, padrão de razão recorrente entre espécies. Não-audível por si, mas o cérebro do jogador percebe o ritmo via flicker visual. Sentido como calma.
 - **Tique de cristal Neo-Sylvania.** Câmara de coleta de DNA: tique muito leve de cristal contra cristal a cada 23 segundos, perpetuamente, mesmo selada. Ainda não decifrado. Mariana achou que era ressonância térmica; Hugo Tirol acha que é metrônomo intencional Era 1. Jaci não tem teoria.
 - **Distorção em zonas de deleção.** Ao aproximar-se de clareira cinza, áudio diegético **rateia**: chiado vivo de fundo perde uma oitava, depois duas, depois fica em silêncio chapado. Dentro da clareira, áudio é silêncio absoluto (não o silêncio da Zona do Silêncio, que tem 47Hz residual; aqui é silêncio digital, sem assinatura). Inquietação imediata.
 - **Som de pata de raposa-fractal mutante.** Pisada do mesmo pé soa diferente cada vez. Variação aleatória sem padrão. Indica fauna com sintaxe quebrada (Patch-Zero ou GRE).
@@ -100,7 +100,7 @@ A Selve Profunda é onde a Era 1 deixou os vestígios **mais densos** do mundo. 
 - **Estação Pythia Bio** (landmark 2.3). Sucateada mas operante.
 - **Vilarejo do Pelicano Branco** (landmark 2.1). Formalizado em -45 por Soraia Vanderbist (bisavó da Jaci). Casas Era 2 simples, ainda em uso.
 - **Caderno Pythia de Lia Vanderbist** (prop) e farmacopeia familiar herdada (geração Soraia → Mariana → Lia → Jaci).
-- **Bordado tradicional** da espiral Fibonacci em mantos comunitários (prop banner). Mariana ensina meninas; arte Era 2 com motivo Era 1.
+- **Bordado tradicional** da espiral logarítmica em mantos comunitários (prop banner). Mariana ensina meninas; arte Era 2 com motivo Era 1.
 
 ### Era 3 (Sterling)
 
@@ -158,7 +158,7 @@ Hook de diálogo: encrespado com Sterling especificamente. Hugo perdeu Mestre Ar
 - **Climax ato 3: escolha visual entre três rotas no Núcleo Mandelbrot Interno.** Três caminhos visíveis da borda externa do Núcleo, três atmosferas distintas. Sem revelar mecânica:
   - **Rota leste (Bronze):** caminho descendente, vegetação rala, biolúmen apagado, trilha clara saída fácil. Visualmente "fuga", emocionalmente "sobrevivência apertada".
   - **Rota norte (Prata):** caminho ascendente direto pra dentro do Núcleo, biolúmen intenso, geometria irregular crescente, sem volta visível. Visualmente "confronto direto", emocionalmente "vitória limpa, ainda melancólica".
-  - **Rota oeste (Ouro):** caminho lateral em espiral, biolúmen dourado em padrão fractal aninhado, descida gradual até câmara onde cripto-glifo Neo-Sylvania ainda pulsa em ressonância ativa. Visualmente "compilação reversa", emocionalmente "vitória plena, esperança fundada". Acessível apenas com Knowledge alta (a entrada da rota está coberta por vegetação fractal que só abre se Gus reconhece padrão Fibonacci correto na borda).
+  - **Rota oeste (Ouro):** caminho lateral em espiral, biolúmen dourado em padrão fractal aninhado, descida gradual até câmara onde cripto-glifo Neo-Sylvania ainda pulsa em ressonância ativa. Visualmente "compilação reversa", emocionalmente "vitória plena, esperança fundada". Acessível apenas com Knowledge alta (a entrada da rota está coberta por vegetação fractal que só abre se Gus reconhece o padrão numérico recorrente correto na borda).
   - O jogador entra por uma das três. Caminho influencia ending. Mecânica de seleção é silenciosa. Sem moral-meter.
 - **Combate de defesa do vilarejo** durante encontro Ten do arco Jaci. Drones Sterling Corp + unidade FIR em incursão de extração. Terreno cooperativo: paredes de adobe + canteiros plantados servem de cobertura. Pillar 4 mantido: combate contido, sem mortes civis encenadas.
 

@@ -66,7 +66,7 @@ O escopo G1 fixa **doze Conjuros base canônicos**, listados aqui não como best
 | **Cifra Espelho** | Criptográfico + Null + Inimigo | Desfaz camuflagem inimiga |
 | **Pirâmide de Carga** | Elétrico + Object + Inimigo | Descarga única, dano alto, custo alto |
 
-Cada um desses doze Conjuros tem entrada própria no Diário de Gus, com tempo de descoberta narrativa distribuído pelos atos. Os outros cento e oitenta e oito Conjuros teóricos do espaço combinatório emergem por experimentação do jogador, e cerca de oito deles ativam **easter-egg combos** que disparam diálogo de companion ao serem descobertos.
+Cada um desses doze Conjuros tem entrada própria no Diário de Gus, com tempo de descoberta narrativa distribuído pelos atos. Os outros cento e oitenta e oito Conjuros teóricos do espaço combinatório emergem por experimentação do jogador, e cerca de oito deles ativam **combos secretos** que disparam diálogo de companion ao serem descobertos.
 
 ## §5. Boole, Investigation Laws Thought, e o substrato lógico in-world
 
@@ -110,11 +110,11 @@ Conjuros híbridos produzem Prime Radiants visualmente mais complexos: três nó
 
 A escolha estética do cyan e da projeção em três eixos não é arbitrária. Remonta às descrições recuperadas dos cripto-glifos de Neo-Sylvania, que descrevem máquinas analógicas projetando "luz azul de saber" sobre superfícies tesseladas em quadrados alternados (ver §8). A continuidade visual da Era 1 para a Era 2 é deliberada: o Prime Radiant é a forma como C-Arcane homenageia o substrato perdido.
 
-## §8. Easter eggs canônicos: cifra, gematria, iniciação
+## §8. Motivos canônicos: cifra, gematria, iniciação
 
 A redação canônica do sistema GTCC carrega três camadas de simbolismo cifrado que operam abaixo da superfície narrativa, perceptíveis em segunda leitura e invisíveis em primeira.
 
-A primeira camada é a equivalência entre o **Pigpen cipher** e o **cripto-glifo de Era 1**. O cripto-glifo, descrito nos manuscritos sobreviventes de Neo-Sylvania, organiza letras em uma grade três por três, completada por um X angular e por uma constelação de pontos posicionais. Cada Glyph base do C-Arcane mapeia, por correspondência canônica, exatamente uma letra do alfabeto Pigpen. A leitura cruzada não é coincidência; é dívida arquitetural que a redação canônica reconhece sem alardear. Operadores que conhecem Pigpen leem Glyphs como texto; operadores que não conhecem leem como signo opaco. A Ordem Recursiva mantém o conhecimento da equivalência em circulação restrita, e iniciados aprendem Pigpen na terceira semana, depois de Boole e antes de stack.
+A primeira camada é a equivalência entre a **cifra de substituição em grade** e o **cripto-glifo de Era 1**. O cripto-glifo, descrito nos manuscritos sobreviventes de Neo-Sylvania, organiza letras em uma grade três por três, completada por um X angular e por uma constelação de pontos posicionais. Cada Glyph base do C-Arcane mapeia, por correspondência canônica, exatamente uma letra do alfabeto cifrado. A leitura cruzada não é coincidência; é dívida arquitetural que a redação canônica reconhece sem alardear. Operadores que conhecem o cripto-glifo leem Glyphs como texto; operadores que não conhecem leem como signo opaco. A Ordem Recursiva mantém o conhecimento da equivalência em circulação restrita, e iniciados aprendem o cripto-glifo na terceira semana, depois de Boole e antes de stack.
 
 A segunda camada é a **gematria de Tokens**, sistema de valoração numérica em que cada Token base carrega valor em lúmens segundo a sequência um, um, dois, três, cinco, oito. Os Tokens de família mais simples (Elétrico-Object, por exemplo) custam um lúmen; Tokens de família mais articulada (Criptográfico-Stream) custam oito lúmens. Conjuros compostos somam as gematrias dos seus três Tokens, e o reservatório do Tavus-Drive deve suportar a soma. Há, ainda, uma escala secundária para Tokens raros (treze, vinte e um, trinta e quatro lúmens), e os Tokens mais raros conhecidos atingem oitenta e nove ou cento e quarenta e quatro lúmens, valores que apenas Drives com upgrade significativo conseguem executar.
 

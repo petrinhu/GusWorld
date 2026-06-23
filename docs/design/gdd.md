@@ -71,7 +71,7 @@ Sem grind: progressão é linear-narrativa, não farmável. Replay opcional via 
 
 Em **combate turn-based**, gastar 1 ponto de ação ativa scan: revela HP, fraqueza elemental, próximo movimento telegrafado, e — com upgrades — buffs/debuffs ativos do inimigo. Sem scan, o jogador joga às cegas; com scan, jogo vira xadrez de info completa parcial. Trade-off: ação gasta em scan é ação não gasta em ataque.
 
-Em **puzzle/aventura**, scan revela padrão matemático do bioma (Fibonacci nas árvores, função recursiva no pulso bioluminescente, harmônica no canto de criatura). Decifrar o padrão abre passagem, identifica caminho seguro, ou expõe "bug" (inimigo-vírus) escondido.
+Em **puzzle/aventura**, scan revela padrão matemático do bioma (sequência numérica recorrente nos galhos das árvores, função recursiva no pulso bioluminescente, harmônica no canto de criatura). Decifrar o padrão abre passagem, identifica caminho seguro, ou expõe "bug" (inimigo-vírus) escondido.
 
 Upgrade-tree no vértice Matriz: ganho de range (escuta ecolocalização de longe), filtros (ignora ruído eletromagnético da cidade), e modo "sonar maxilar" passivo que destaca anomalias no minimapa. Pillar servido: 1, 2, 3.
 

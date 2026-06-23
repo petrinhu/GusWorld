@@ -22,7 +22,7 @@ Materializa GDD §6.3 ("mesmo tabuleiro decifra movimento de patrulhas... e prev
 
 ## 3. Mini-board holográfico (lookahead)
 
-- Ativar projeção mostra os próximos **K passos** de cada patrulha como rastro numerado (1, 2, 3, 5... Fibonacci sutil no estilo do rastro, easter egg canon).
+- Ativar projeção mostra os próximos **K passos** de cada patrulha como rastro numerado (1, 2, 3, 5...).
 - **K (D1 canon 2026-06-03): K=2 base; K=3 via upgrade da Matriz Ortodôntica** (Pillar 3). K=2 no VS — simples, legível, prodígio de 11 anos. K=3 como recompensa de upgrade de hardware mid-game.
 - A projeção **não move o Gus**: é leitura. O movimento é input separado (verb "planejar a rota"). Isto separa cognitivamente leitura (Óculos) de ação (Tavus-Drive), Pillar 3.
 - Sem timer no planejamento (Pillar 1: sem twitch). A pressão é espacial/lógica, não de reflexo.

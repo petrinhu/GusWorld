@@ -118,7 +118,7 @@ Linhagens canônicas: Vyrcátrix (Helíaco → Salomão / Hyperion → Salomão)
 
 | Nome | Codinome/título | Função canon | 1ª aparição | Status |
 |---|---|---|---|---|
-| Mestre Helíaco Vyr | "Primeiro Cantor-de-Pedras" | Fundador rito litúrgico-piezo Catedral-Mãe, codificador protocolo coral, cego de luz reativa após exposição prolongada, calos cristal nas mãos. Echo Hiram Abiff easter egg maçom | `docs/narrative/deep/eras/era-1-pre-codigo.md` §6.3 | 💀 histórico Era 1 |
+| Mestre Helíaco Vyr | "Primeiro Cantor-de-Pedras" | Fundador rito litúrgico-piezo Catedral-Mãe, codificador protocolo coral, cego de luz reativa após exposição prolongada, calos cristal nas mãos. Mártir-fundador lendário | `docs/narrative/deep/eras/era-1-pre-codigo.md` §6.3 | 💀 histórico Era 1 |
 | Cira Helena Boroshova | "Cantora-Heretice" | Geração seguinte Helíaco, soprano cristalino, inventou varredura heretice, redigiu manual portátil em 7 cópias geográficas | `docs/narrative/deep/eras/era-1-pre-codigo.md` §6.3 | 💀 histórico Era 1 |
 | Salomão Tessar Vyrcátrix | n/a | Arquivista-chefe Codex Cantata, neto direto Helíaco Vyr, consolidou cifra musical em 4 estratos | `docs/narrative/deep/eras/era-1-pre-codigo.md` §6.4 | 💀 histórico Era 1 |
 | Brother Lúcio Ostraconis | "Mártir do Acesso Aberto" | Monge-aprendiz dissidente, propôs disponibilização gradual cifra Codex Cantata, morto em detenção temporária Biblioteca Cintilante | `docs/narrative/deep/eras/era-1-pre-codigo.md` §6.5 | 💀 histórico Era 1 |

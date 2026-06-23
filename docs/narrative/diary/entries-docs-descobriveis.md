@@ -239,7 +239,7 @@ Tom autoral por origem:
 
 **STATUS:** APROVADA (2026-05-16): viralizada como DD-020 canônico em [[in-world-docs]] §Documento 20. Plant agora GRAVADO.
 
-- **Tipo:** cartilha agrícola feita à mão, papel reciclado, ~25 páginas com esquemas botânicos + cálculos Fibonacci.
+- **Tipo:** cartilha agrícola feita à mão, papel reciclado, ~25 páginas com esquemas botânicos + cálculos de sequências recorrentes.
 - **Autor:** **Solano Vanderbist** (pai morto de Jaci; morto em -8 junto com Lia no surto silencioso).
 - **Data:** ano -10 a -8 (últimas semanas).
 - **Onde encontra:** quarto preservado de Solano e Lia na cabana da Anciã Mariana, Pelicano Branco. Mariana abre o quarto se Jaci pede (sub-beat Sho arco Jaci ou pós-arco Jaci).

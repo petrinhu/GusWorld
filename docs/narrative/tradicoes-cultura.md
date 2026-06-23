@@ -28,7 +28,7 @@ GusWorld usa calendário solar de **12 meses, 30-31 dias**, herdado intacto da E
 - **Festival do Reaproveitamento** (FIR): anual, semana 2 de novembro. Corporativo cínico disfarçado de celebração do trabalhador.
 - **Dia da Inicialização** (Underground): pessoal, não-coletivo. Marca individual de cada novo membro Underground.
 - **Aniversário da Catedral Local** (Ordem Recursiva): varia por catedral. 5 ativas, 5 datas distintas.
-- **Festa da Calibração** (Ordem Recursiva, capítulo Heliópolis-Nova): anual, 8 de fevereiro. Comemora fundação capítulo regional Heliópolis Era 2; cordão reduzido de 34 nós (Fibonacci) em vez do cordão 89 nós principal (canon F1-DL.ORDEM-EXPAND §8.5). Era 3: capítulo capturado Sterling Corp, festa preservada residual.
+- **Festa da Calibração** (Ordem Recursiva, capítulo Heliópolis-Nova): anual, 8 de fevereiro. Comemora fundação capítulo regional Heliópolis Era 2; cordão reduzido de 34 nós em vez do cordão de 89 nós principal (canon F1-DL.ORDEM-EXPAND §8.5). Era 3: capítulo capturado Sterling Corp, festa preservada residual.
 - **Festa da Federação** (Cidades-Gêmeas Norte+Sul): anual, 8 de maio. Comemora estatutos federação bilateral Era 2; procession atravessa ponte 89 vãos entre Colunas Boróstoma (Norte) e Janor (Sul); cordão 89 nós alternado entre cidades-irmãs (canon F1-DL.ORDEM-EXPAND §8.6).
 - **Festa Coletivista** (Polis-Vermelha): anual, 13 de fevereiro. Comemora fundação configuração coletivista cidade desde -129 (canon R10 §6.2 era-2-boom-tecnico.md §6.2 + F1-DL.ORDEM-EXPAND §8.7). Ordem Recursiva participa em registro tenso (cordão dobrado retido em vez de desdobrado, sinal cerimonial de reserva canônica).
 
@@ -110,7 +110,7 @@ Cerimônia da Ordem Recursiva (~ano -148). Catedrais ativas abrem ao público um
 ### Tradições
 
 - **Hora do silêncio:** das 22h às 23h, todos presentes guardam silêncio absoluto. Apenas os cronômetros de latão das catedrais tique-taqueiam (sincronizados ritualmente; som é parte da experiência).
-- **Acendimento do círculo:** 12 mestres acendem 12 lamparinas em sequência Fibonacci truncada (1, 1, 2, 3, 5, 8; depois reinicia). Engrenagem-símbolo da Ordem (12 dentes assimétricos) ressoa.
+- **Acendimento do círculo:** 12 mestres acendem 12 lamparinas em sequência recorrente truncada (1, 1, 2, 3, 5, 8; depois reinicia). Engrenagem-símbolo da Ordem (12 dentes assimétricos) ressoa.
 - **Recitação dos nomes:** lista parcial dos mestres de Neo-Sylvania conhecidos (~40 nomes preservados nos cripto-glifos) é recitada em latim litúrgico. Crianças aprendem a recitação por exposição anual.
 - **Canto coral:** breve (4 minutos) canto coral em dialeto pré-Asmódico, conhecido apenas por mestres da Ordem. Único momento do ano em que é executado.
 - **Comida cerimonial:** **pão-de-engrenagem** (pão redondo com dentes em alto-relevo na crosta; sem cobertura, simples), partilhado em pedaços.
@@ -388,7 +388,7 @@ Underground recusa crédito Sterling sempre que possível. Não-Underground acei
 - **Pintura urbana (graffiti):** muros do Núcleo e Periferia. Algumas peças são códigos Óxido escondidos (Linda decifra ocasionalmente). Underground patrocina silenciosamente artistas.
 - **Holografia:** dominada por Cult Mirage comercialmente; arte independente em becos do Setor Mirage.
 - **Escultura analógica:** Ordem Recursiva, esculturas de latão e bronze em catedrais. Bento aprendeu a esculpir aos 10.
-- **Bordado:** Pelicano Branco, bordado de espiral Fibonacci em mantos comunitários. Mariana ensina meninas (Jaci sabe).
+- **Bordado:** Pelicano Branco, bordado de espiral logarítmica em mantos comunitários. Mariana ensina meninas (Jaci sabe).
 
 ---
 

@@ -125,7 +125,7 @@ Cena infectada sobrepõe pulso vermelho `#F43F5E` no rim de tudo + glitch shader
 - **Character read em 3/4 rotacional:** silhueta tem que funcionar em 8 ângulos (rotação a cada 45°). Testar em turntable Blender antes de aprovar.
 - **Gus:** SD 1:1:1 com triângulo invertido (cabelo asimétrico dominando **quadrante superior DIREITO** + ombros do sobretudo + base estreita das pernas finas). Aparelho ortodôntico visível mesmo em silhueta lateral (mandíbula com "linha" extra). Tavus-Drive saliente no pulso ESQUERDO. Sheet completo: `docs/art/characters/gus.md`.
 - **Inimigos cidade:** ângulos agudos, simetria quebrada (corporativo = uncanny). Triangular shape language.
-- **Inimigos Selve:** fractal/orgânico, ramificação Fibonacci visível. Curvas com pontas (cipó + espinho).
+- **Inimigos Selve:** fractal/orgânico, ramificação em razão recorrente visível. Curvas com pontas (cipó + espinho).
 - **NPCs amigáveis:** silhueta arredondada, simetria estável. Quadrado/círculo dominante.
 - **Figure/ground:** char sempre 2+ steps de value acima ou abaixo do BG imediato. Sem char ocupando o midtone do bioma.
 
@@ -199,7 +199,7 @@ Três famílias visuais, **nunca misturadas**:
 
 ### 11.2 Biolúmen (Selve, magia natural)
 - Cor: verde `#34D399` + violeta `#A78BFA`.
-- Forma: partículas orgânicas, trilhas curvas, fractal Fibonacci.
+- Forma: partículas orgânicas, trilhas curvas, fractal recorrente.
 - Movimento: senoidal, lento, breathing.
 - Uso: plantas reagindo a Gus, fauna passiva, magia "natural" (cartas de Raiz, Esporo).
 

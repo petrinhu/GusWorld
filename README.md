@@ -11,7 +11,7 @@
 ## Pilares criativos (imutáveis)
 
 1. **Magia = software.** Feitiços são scripts rúnicos compilados (Glyph/Token/Conjuro/Codex).
-2. **Natureza é matemática rígida**, não caos (Fibonacci, fractais, ruído coerente).
+2. **Natureza é matemática rígida**, não caos (sequências numéricas recorrentes, fractais, ruído coerente).
 3. **Hardware loop:** Óculos táticos + Matriz Ortodôntica + Tavus-Drive.
 4. **Idade canônica 11 anos.** Prodígio analítico, não power-fantasy adulta.
 5. **Setting bipartido:** megacidade ciber-gótica versus Selve Sombria.

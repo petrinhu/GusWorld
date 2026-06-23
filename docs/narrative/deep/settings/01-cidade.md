@@ -2,7 +2,7 @@
 
 > Status canônico, deep-lore R3 F1-DL.3 Settings. Cross-ref obrigatório, [[environments/01-cidade-cyber-gotica]] (Bloco F, padrão fixo 117 linhas), [[lore-bible]] §5, [[timeline]] Era 3, [[factions]], [[deep/factions]] R2, [[design/pillars]] Pillar 5, PLACES.md, CHARS.md, Era 1 §§7-10.
 >
-> **Voz autoral**, Stephenson/Sterling cyberpunk denso com verniz Blade Runner. Cidade-protagonista. Cláusulas longas, aposição rica, neologismos in-universe. Sem em-dash horizontal na prosa autoral, sem siglas maçônicas, sem hipersaturação.
+> **Voz autoral**, Stephenson/Sterling cyberpunk denso com verniz Blade Runner. Cidade-protagonista. Cláusulas longas, aposição rica, neologismos in-universe. Sem em-dash horizontal na prosa autoral, sem rótulos cifrados explícitos, sem hipersaturação.
 
 ---
 
@@ -89,7 +89,7 @@ Em fachada corroída da antiga Universidade Pública, lado leste do Núcleo, há
 
 Em vitrine de loja antiquária no bairro Antigo, abaixo de cartaz amarelado de leilão pendente há três anos, cordão de oitenta e nove nós trançados em fibra vermelha está exposto como peça curiosa de origem desconhecida. O dono da loja, idoso silencioso que veste avental de couro gasto, não sabe o que tem. Quem sabe não compra. Quem não sabe não compra porque não entende. O cordão fica.
 
-E em pichação Underground em beco do bairro Antigo, repetida em treze locais distintos do Núcleo Metropolitano por mão anônima paciente, está escrito o nome Helíaco Vyr em letra de estêncil simples, sem contexto, sem data, sem autoria. Quem lê em voz alta não entende. Quem não lê em voz alta, e que conhece o cantor primordial da Catedral-Mãe de oitenta gerações atrás, reconhece um eco. O nome circula sem corpo. A Cidade carrega Hiram Abiff em paralelo, e segue andando.
+E em pichação Underground em beco do bairro Antigo, repetida em treze locais distintos do Núcleo Metropolitano por mão anônima paciente, está escrito o nome Helíaco Vyr em letra de estêncil simples, sem contexto, sem data, sem autoria. Quem lê em voz alta não entende. Quem não lê em voz alta, e que conhece o cantor primordial da Catedral-Mãe de oitenta gerações atrás, reconhece um eco. O nome circula sem corpo. A Cidade carrega o eco antigo em paralelo, e segue andando.
 
 A Cidade tem oitenta e nove andares de Tetra-Torre, vinte e um distritos administrativos, treze estações de metro elevadas, oito pontes principais sobre canais, cinco setores macro, cento e quarenta e quatro holovias arteriais. Funciona, apesar de si mesma. Continua, em loop a cada quatro minutos. Compila, com a gente.
 

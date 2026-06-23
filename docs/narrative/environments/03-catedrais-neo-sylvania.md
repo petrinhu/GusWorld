@@ -24,7 +24,7 @@ Cinquenta metros de pé direito, doze pilares de pedra escura cravejados de crip
 
 **Função narrativa:** primeira impressão da escala Neo-Sylvania para o jogador. Ato 2, arco Bento, entrada inicial.
 **Primeira impressão:** câmera abre em low-angle. Trilha cai pra silêncio. O jogador escuta o tique-taque antes de ver. Vitral de fundo está vermelho profundo, fim de tarde.
-**Gancho exploratório:** três engrenagens-mestre giram em proporções diferentes. Jogador atento percebe sequência Fibonacci truncada (1, 1, 2, 3, 5, 8). Puzzle opcional Knowledge Bronze: sincronizar uma quarta engrenagem manualmente.
+**Gancho exploratório:** três engrenagens-mestre giram em proporções diferentes. Jogador atento percebe sequência recorrente truncada (1, 1, 2, 3, 5, 8). Puzzle opcional Knowledge Bronze: sincronizar uma quarta engrenagem manualmente.
 
 ### 2.2 Biblioteca Privada do Mestre-Hierofante Velhusto
 
@@ -64,7 +64,7 @@ Atrás da nave principal, conjunto de três edifícios baixos em pedra-aparelhad
 
 | Prop | Onde | O que conta |
 |---|---|---|
-| **Engrenagem-mestre de meio metro (3 unidades)** | Altar nave principal | Pillar 2 ao vivo: state machine analógica rodando há 950 anos. Proporções Fibonacci truncadas. |
+| **Engrenagem-mestre de meio metro (3 unidades)** | Altar nave principal | Pillar 2 ao vivo: state machine analógica rodando há 950 anos. Proporções recorrentes truncadas. |
 | **Cripto-glifos espiralados em 12 pilares** | Nave principal | Lore Era 1: matemática avançada gravada em pedra. Sterling Corp tentou estudar; cripto-glifos resistem à interpretação DRE (estática quando scaneados por óculos Sterling). |
 | **Vitral em arco-quente (vermelho-vinho)** | Nave principal, ala leste | Reage à temperatura. Cor mais saturada nas horas quentes. Aviso silencioso: vermelho profundo + relojoaria desacelerando = anomalia. |
 | **Tapete cerimonial bordado em latim litúrgico** | Diante do altar | Contém os 40 nomes recitados na Vigília Neo-Sylvania ([[tradicoes-cultura]] §3). Pisar com sapato sujo = ofensa séria. |
@@ -73,7 +73,7 @@ Atrás da nave principal, conjunto de três edifícios baixos em pedra-aparelhad
 | **Cronômetro de Mestre Ardenia Falke (intacto)** | Vitrine no canto da biblioteca privada | Ardenia desapareceu em -3 quando opôs-se ao saque de São Vargas. Velhusto guarda. Cronômetro continua marcando segundo correto. Quando Gus pergunta sobre isso: "Ela está adiantada de nós em algum lugar." |
 | **Sino mecânico Asmódico (bronze de 2m)** | Capela lateral | Ver landmark 2.3. Computação acústica ao vivo. |
 | **Sementes-relíquia em câmara hermética** | Cripta lateral norte | Banco genético Era 1. Acervo cooperativo Pelicano Branco / Ordem Recursiva. Jaci sabe do banco; visita opcional cross-arc. |
-| **Lamparinas Fibonacci (12 unidades, latão)** | Distribuídas pela nave | Acesas na sequência 1-1-2-3-5-8 durante Vigília Neo-Sylvania. Resto do ano: apagadas. Player que visita fora da Vigília vê apenas pedestais frios. |
+| **Lamparinas em sequência recorrente (12 unidades, latão)** | Distribuídas pela nave | Acesas na sequência 1-1-2-3-5-8 durante Vigília Neo-Sylvania. Resto do ano: apagadas. Player que visita fora da Vigília vê apenas pedestais frios. |
 | **Pão-de-engrenagem ressecado (oferenda)** | Pequeno altar lateral | Resto da Vigília anterior. Aprendiz se encarrega de retirar a cada lua nova. Esquecimento sutil = pista de que catedral está sob estresse interno. |
 | **Placas Sterling Corp em três pilares** | Pilares 3, 7 e 11 da nave | Inventário extrativo: "Patrimônio sob avaliação técnica, Sterling Corp Departamento de Aquisições." Coladas em vinil industrial barato. Aprendizes têm proibido por Velhusto de removê-las (provoca confronto direto). Bento odeia. Player pode tentar arrancar; sticker resiste, gameplay-friction proposital. |
 | **Bancada de Beatriz Pólvora (escola anexa)** | Anexo Era 2 | Engrenagens semiacabadas, ferramentas miniaturizadas, caderno de notas em latim de aprendiz. Bento corrige caderno dela ocasionalmente; comentários breves em margem ("respira antes do compasso, B."). |
@@ -115,13 +115,13 @@ Spec sonora detalhada (Hz exatos, layers, mixagem) delegada a Fase 2 com `audio-
 
 - **Aprendiz Beatriz Pólvora** (16). Designada aprendiz de Bento após a morte de Aldebrando em -0.5. Pequena, magra, olhos atentos. Sotaque do Anel Verde (cresceu na fronteira-Selve, transferida pra catedral aos 12). Voz: frases curtas, observa antes de responder. Bento corrige caderno dela ocasionalmente. Quando Gus aparece na catedral, Beatriz observa de longe três cenas inteiras antes de se aproximar e fazer pergunta técnica curta sobre C-Arcane. Função narrativa: mostrar que Bento já está ensinando, mesmo se sentindo aprendiz ele próprio.
 
-- **Mestre Hugo Tirol** (55). Tradicionalista aliado a Velhusto. Especialista em decifragem cripto-glífica. Barbado, mãos grandes, fala em pausas longas (sintaxe Bento mais velha). Participa da expedição à catedral perdida no arco Bento sub-quest pós-recrutamento. Aprovou a aliança com Gus antes mesmo de conhecê-lo pessoalmente: leu relatório de Bento sobre o garoto e disse a Velhusto: "ele compila como nós sincronizamos. Pode trazer." Tem cronômetro mecânico de bolso em proporção 8:13 (Fibonacci adjacente; tique-taque ligeiramente diferente do resto da Ordem). Função narrativa: confirma que Bento não está sozinho no tradicionalismo; profundidade da Ordem.
+- **Mestre Hugo Tirol** (55). Tradicionalista aliado a Velhusto. Especialista em decifragem cripto-glífica. Barbado, mãos grandes, fala em pausas longas (sintaxe Bento mais velha). Participa da expedição à catedral perdida no arco Bento sub-quest pós-recrutamento. Aprovou a aliança com Gus antes mesmo de conhecê-lo pessoalmente: leu relatório de Bento sobre o garoto e disse a Velhusto: "ele compila como nós sincronizamos. Pode trazer." Tem cronômetro mecânico de bolso em proporção 8:13 (termos recorrentes adjacentes; tique-taque ligeiramente diferente do resto da Ordem). Função narrativa: confirma que Bento não está sozinho no tradicionalismo; profundidade da Ordem.
 
 ---
 
 ## 7. Ganchos mecânicos
 
-- **Puzzle, Sincronização da quarta engrenagem (Knowledge Bronze):** três engrenagens-mestre do altar giram em proporções Fibonacci truncadas (1, 1, 2, 3, 5, 8). Mecanismo defeituoso na lateral da nave esconde quarta engrenagem desconectada. Player deve identificar próxima razão na sequência (13) e ajustar manualmente via interface diegética. Recompensa: Token-de-Continuidade + Diário entry sobre Pillar 2 em substrato analógico. Bento elogia em sintaxe formal: "vossa mercê leu o que estava na frente." Cauã, se presente: "é, fez conta. legal. dá pra ir agora?"
+- **Puzzle, Sincronização da quarta engrenagem (Knowledge Bronze):** três engrenagens-mestre do altar giram em proporções recorrentes truncadas (1, 1, 2, 3, 5, 8). Mecanismo defeituoso na lateral da nave esconde quarta engrenagem desconectada. Player deve identificar próxima razão na sequência (13) e ajustar manualmente via interface diegética. Recompensa: Token-de-Continuidade + Diário entry sobre Pillar 2 em substrato analógico. Bento elogia em sintaxe formal: "vossa mercê leu o que estava na frente." Cauã, se presente: "é, fez conta. legal. dá pra ir agora?"
 
 - **Encontro, Mestres pró-Sterling contaminados (sub-beat Ten arco Bento):** facção pró-modernização interna da Ordem, três a quatro mestres (incluindo Felippe Garante, citado na Memória Formativa de Bento aos 10 anos). Quando Gus + Bento chegam à Catedral Menor de Atelaiá em estado contaminado, encontram os mestres já em estágio avançado de infecção Patch-Zero. Não atacam fisicamente; falam. Linhas geradas por Patch-Zero canal 3 manipulando vozes preservadas. Bento reconhece a voz de Garante; player atento (Knowledge alta) reconhece que está sendo manipulado emocionalmente. Combate sem fim "bom": contenção e selagem (protocolo Asmódico herdado de Atelaiá -78). Recompensa: ataque conjunto Bento + Gus destrava Cronômetro Ressonante. Pillar 4: morte off-screen, sem catarse explosiva.
 

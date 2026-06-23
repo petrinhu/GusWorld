@@ -21,7 +21,7 @@
 
 Onde Patch-Zero passa, **a previsibilidade falha**:
 
-- **Fibonacci e fractais locais quebram.** Sequências matemáticas que regem flora/fauna da Selve apresentam descontinuidades. Galhos crescem em ângulos arbitrários. Bioluminescência pisca em padrões aperiódicos.
+- **As sequências numéricas recorrentes e fractais locais quebram.** Sequências matemáticas que regem flora/fauna da Selve apresentam descontinuidades. Galhos crescem em ângulos arbitrários. Bioluminescência pisca em padrões aperiódicos.
 - **Knowledge Progression (Pillar 1) é invalidada localmente.** Inimigos contaminados por Patch-Zero **não previsibilizam** mesmo após múltiplas catalogações no Bestiário. O óculos tático do Gus mostra **estática** em vez de telegrafia.
 - **Ruído coerente (Perlin/Simplex) glitcha.** Shaders procedurais que regem texturas/comportamentos da Selve apresentam descontinuidades visíveis (faixas de gradiente quebradas, mesh popping). Não é bug do jogo, é bug **do mundo**.
 - **Cifragem deteriora.** Sterling Corp tenta envelopar Patch-Zero no GRE; cifras Sterling apresentam erros aleatórios na presença de Patch-Zero.

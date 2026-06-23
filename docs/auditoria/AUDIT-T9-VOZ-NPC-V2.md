@@ -47,7 +47,7 @@ Erro repetição. Fix: sed simples.
 ## LEVES (2)
 
 - LV-T9v2-01 Hilário pioneiro-fundador (registro positivo cross-ref)
-- LV-T9v2-02 Densidade Fibonacci/maçom 18-28% alta nos contos cerimoniais (voz canon deliberada Atelaiá+Bento+Mariana+Helíaco)
+- LV-T9v2-02 Densidade dos motivos recorrentes alta nos contos cerimoniais (voz canon deliberada Atelaiá+Bento+Mariana+Helíaco)
 
 ## MATRIZ VOZ NPC × DOCS (resumo)
 

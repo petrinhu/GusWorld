@@ -236,7 +236,7 @@ Cada companion tem ficha com 3 estados de Knowledge canônicos:
 
 ### 1.7 Jaci "Proxy" Vanderbist: Healer
 
-> *Visual stub:* silhueta pequena, frasco de antídoto na cintura, mantos da Selve (espiral Fibonacci bordada na manga; Gus desenhou a espiral 4 voltas, leu o padrão). Bullet: "fala devagar mas exato. cheira a café-de-folha-fractal. (Jaci é o jeito Pelicano Branco de chamar 'farmacêutica que ainda não é mestra.')"
+> *Visual stub:* silhueta pequena, frasco de antídoto na cintura, mantos da Selve (espiral logarítmica bordada na manga; Gus desenhou a espiral 4 voltas, leu o padrão). Bullet: "fala devagar mas exato. cheira a café-de-folha-fractal. (Jaci é o jeito Pelicano Branco de chamar 'farmacêutica que ainda não é mestra.')"
 
 **Knowledge média:**
 
@@ -451,12 +451,12 @@ Cada facção tem ficha visual + texto. Knowledge cresce em 3 estados como nos c
 
 ### 4.2 Ordem Recursiva
 
-> *Esboço Gus:* engrenagem de latão envelhecida com 12 dentes assimétricos (Gus contou os dentes; Fibonacci truncada). Cor latão oxidado + preto-titânio + branco-osso.
+> *Esboço Gus:* engrenagem de latão envelhecida com 12 dentes assimétricos (Gus contou os dentes; sequência recorrente truncada). Cor latão oxidado + preto-titânio + branco-osso.
 
 | Campo | Conteúdo |
 |---|---|
 | Tag | Ordem Recursiva |
-| Símbolo | Engrenagem 12 dentes assimétricos (Fibonacci truncada) |
+| Símbolo | Engrenagem 12 dentes assimétricos (sequência recorrente truncada) |
 | Cor | latão oxidado + preto-titânio + branco-osso |
 | Origem | Era 2 (~-148; reorganização pós-Hiato dos mestres-Asmódicos sobreviventes) |
 | Filosofia | Continuidade analógica; preservação técnico-cultural Neo-Sylvania; "se C-Arcane é eficiente, Asmódico é durável." |
@@ -492,12 +492,12 @@ Cada facção tem ficha visual + texto. Knowledge cresce em 3 estados como nos c
 
 ### 4.4 Selve Sombria (facção natural)
 
-> *Esboço Gus:* espiral Fibonacci sobre folha estilizada. 4 voltas (Gus contou). Cor verde-ciano biolúmen + marrom-húmus + branco-fungo.
+> *Esboço Gus:* espiral logarítmica sobre folha estilizada. 4 voltas (Gus contou). Cor verde-ciano biolúmen + marrom-húmus + branco-fungo.
 
 | Campo | Conteúdo |
 |---|---|
 | Tag | Selve Sombria |
-| Símbolo | Espiral Fibonacci sobre folha |
+| Símbolo | Espiral logarítmica sobre folha |
 | Cor | verde-ciano biolúmen + marrom-húmus + branco-fungo |
 | Origem | Pré-Era 2 (aldeias-fronteira descendem Êxodo Neo-Sylvania ~-720) |
 | Filosofia | Cooperação ecológica baseada em padrão matemático; sem porta-voz oficial |
@@ -598,7 +598,7 @@ Patch-Zero é exceção: páginas glitcham permanentemente. Stats nunca "estabil
 
 | Inimigo | Setting | Stats página 1 | Stats página 4 | Fraqueza | Loot | Companion-counter |
 |---|---|---|---|---|---|---|
-| **Raposa-Fractal corrompida** | [[02-selve-sombria|Orla Recursiva]] | HP médio. Ataque: mordida em padrão Fibonacci. | HP 11. Padrão Fibonacci corrompido (números errados → sintoma Patch-Zero local). | Bioquímico Null cura corrupção (NÃO mata; transforma em raposa neutra) | semente-relíquia, token Bioquímico | **Jaci** (Antídoto Sintético converte em aliada temporária 3 turnos) |
+| **Raposa-Fractal corrompida** | [[02-selve-sombria|Orla Recursiva]] | HP médio. Ataque: mordida em padrão recorrente. | HP 11. Padrão recorrente corrompido (números errados → sintoma Patch-Zero local). | Bioquímico Null cura corrupção (NÃO mata; transforma em raposa neutra) | semente-relíquia, token Bioquímico | **Jaci** (Antídoto Sintético converte em aliada temporária 3 turnos) |
 | **Coruja-Mandelbrot** | [[02-selve-sombria|Pântano de Markov]] | HP alto. Ataque: olhar recursivo (debuff confusão). | HP 16. Padrão Markov estocástico; telegrafia varia. Boss-tier 3 estados (calm/agitada/recursiva infinita). | Cinético compressivo paralisa ciclo recursivo | pena-Mandelbrot, token Cinético médio | **Bento** (Vetor de Recuo + Cronômetro Ressonante) |
 | **Larva-Polinomial** | [[02-selve-sombria|Orla Recursiva]] | HP baixo. Ataque: cuspe ácido. | HP 6. Multiplica em 3 polinômios de grau 2 se 1 sobrevive 2 turnos. | Pulso EM atordoa antes de multiplicar | polímero Pythia, token Bioquímico baixo | **Cauã** + **Jaci** (combo: EM + Antídoto) |
 | **Anomalia Glitch (Patch-Zero infectado)** | [[02-selve-sombria|Pântano]] + [[08-selve-profunda|Núcleo Mandelbrot Interno]] | HP **glitch (número não estabiliza)**. Ataque: visual descontínuo. | Não estabiliza nunca. Página 4 do bestiary tem glitch tipográfico permanente. Telegrafia falha. | Nenhuma fraqueza catalogada; **selável**, não eliminável | nada material; **info Bloco I** (sticky-notes Patch-Zero) | nenhum companion único; combo party 3+ necessário |
@@ -639,7 +639,7 @@ Patch-Zero é exceção: páginas glitcham permanentemente. Stats nunca "estabil
 |---|---|
 | HP completo | 45. Sem nodes (todos eliminados na fase 1). |
 | Ataques | Loop infinito (continuous damage stream); recompilação forçada (anula token Gus 1 turno); monóculo refratado (ofusca telegrafia) |
-| Fraqueza | Compilação Reversa easter-egg (3 tokens específicos ordem invertida) restaura HP party. **Conjuro "Você é uma fechadura. Eu sou a chave."** ([[characters/gus]] pulled quote climax) destrava finale. |
+| Fraqueza | Compilação Reversa secreta (3 tokens específicos ordem invertida) restaura HP party. **Conjuro "Você é uma fechadura. Eu sou a chave."** ([[characters/gus]] pulled quote climax) destrava finale. |
 | Loot | Nenhum material; **resolução narrativa** |
 | Companion-counter | **Gus protagonista** (signature Compilação do Codex em pleno potencial); party 5 ativos buffam |
 | Cross-ref Bloco I | F-002 (logo Sterling presente desde ato 1; payoff visual: cúpula em ruínas), F-014 ("histórico é como a gente sabe pra onde a coisa vai"; payoff filosófico) |

@@ -13,7 +13,7 @@ A sensação dominante é a de uma cidade que **funciona apesar de si mesma**. O
 
 ## 2. Landmarks (5)
 
-**Praça da Compilação (Núcleo Metropolitano).** Centro civil. Pedra Neo-Sylvania pavimenta o chão sob asfalto Era 2 que rachou e expôs blocos hexagonais incrustados de cripto-glifos. No centro, **fonte da Engrenagem-Mestra**: mecanismo de latão Era 1 ainda gira a água em padrão Fibonacci. Placa cerimonial Era 2 (nomes dos 4 engenheiros da primeira linha C-Arcane) na lateral. Pedestal Era 3 vazio do lado oposto, "reservado para futuro monumento Sterling Corp" (placa diz; está lá há 8 anos).
+**Praça da Compilação (Núcleo Metropolitano).** Centro civil. Pedra Neo-Sylvania pavimenta o chão sob asfalto Era 2 que rachou e expôs blocos hexagonais incrustados de cripto-glifos. No centro, **fonte da Engrenagem-Mestra**: mecanismo de latão Era 1 ainda gira a água numa cadência de razão recorrente. Placa cerimonial Era 2 (nomes dos 4 engenheiros da primeira linha C-Arcane) na lateral. Pedestal Era 3 vazio do lado oposto, "reservado para futuro monumento Sterling Corp" (placa diz; está lá há 8 anos).
 *Primeira impressão:* fonte de latão antiga girando perfeita no meio de praça enquanto holograma Sterling pisca atrás dela.
 *Gancho exploratório:* placa Era 2 lista 4 nomes; player que decodifica cripto-glifo Era 1 sob o chão descobre 7 nomes em pedra que ninguém mais lê.
 

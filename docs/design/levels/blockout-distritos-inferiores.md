@@ -96,12 +96,12 @@ Tensão
 - **Landmarks de navegação (3):** (1) fonte de latão central = âncora do hub; (2) holograma Sterling piscante ao fundo norte = "de onde vim"; (3) portão sul iluminado = "para onde vou". Navegação por landmark, não por minimapa (princípio).
 - **Choke com propósito:** a escada 3-5-7 força a transição hub→combate e dá perspectiva descendente da arena (momento de leitura antes da luta). Não é corredor decorativo.
 
-## 6. Hardware-triad no espaço (Pillar 3) + easter egg
+## 6. Hardware-triad no espaço (Pillar 3) + motivos recorrentes
 
 - **Óculos (Scan-overworld, raio ~8m):** pinga (L) como decifrável, (T) como interativo, e o cone de detecção do Sentinela pintado no chão da arena. Fora do raio, nós = silhueta neutra (core-loop §3).
 - **Matriz Ortodôntica:** amplifica alcance/filtra ruído da praça; destaca a anomalia escondida no padrão das fachadas (gancho de combate oculto opcional, não no MVV).
 - **Tavus-Drive:** executa a carta ambiental em (T) (duplo-uso GDD §6.2).
-- **Padrão matemático do bioma (easter egg pervasivo, NÃO narrado):** as fachadas do hub e os degraus do choke seguem Fibonacci. Choke = **3, 5, 7** degraus (maçonaria canon, não-Fibonacci, deliberado). Vãos das janelas das fachadas norte em proporção 1:1:2:3:5. Rastro do board do puzzle numera 1,2,3,5 (puzzle §3). Densidade sutil ~10-15%; leitor familiar reconhece, leigo não nota.
+- **Padrão matemático do bioma:** as fachadas do hub e os degraus do choke seguem uma sequência numérica recorrente. Choke = **3, 5, 7** degraus (motivo deliberado, distinto da sequência das fachadas). Vãos das janelas das fachadas norte em proporção 1:1:2:3:5. Rastro do board do puzzle numera 1,2,3,5 (puzzle §3). Leitor atento reconhece, leigo não nota.
 
 ## 7. Notas de geometria graybox (caixas primitivas, para a engine)
 

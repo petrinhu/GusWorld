@@ -1,6 +1,6 @@
 # GusWorld, Bíblia Worldbuilding Volume 1, Spec Design de Capa
 
-Brief técnico para artista contratado em Fase 2+. Documento serve como contrato visual entre criador supremo e ilustrador/designer gráfico. Toda decisão estética abaixo deriva de canon já fechado (pillars, paletas, easter eggs maçom, Fibonacci, Dragon Victory). Artista pode propor variações dentro do envelope, nunca contradizer.
+Brief técnico para artista contratado em Fase 2+. Documento serve como contrato visual entre criador supremo e ilustrador/designer gráfico. Toda decisão estética abaixo deriva de canon já fechado (pillars, paletas, motivos cerimoniais fundadores, sequência recorrente, Dragon Victory). Artista pode propor variações dentro do envelope, nunca contradizer.
 
 Volume 1 é a Bíblia Worldbuilding. Volume 2 (Antologia narrativa) ganha capa separada do mesmo artista, com design coeso descrito em §7. Volume 1 está dividido em dois tomos físicos por motivo logístico de gramatura e legibilidade: Tomo 1 cobre Frontispício, Cosmologia e Era 1 Pré-Código (cerca de 1100 páginas); Tomo 2 cobre Eras 2 e 3, Magia Computável, Personagens, Linhagens, Settings, Facções, Stinger e Apêndices (cerca de 1155 páginas).
 
@@ -10,17 +10,17 @@ Volume 1 é a Bíblia Worldbuilding. Volume 2 (Antologia narrativa) ganha capa s
 
 Composição vertical em três planos.
 
-Background (fundo, profundidade máxima): mar negro tranquilo coberto por bruma cyan baixa. No horizonte central, silhouetted contra céu de aurora cinza-azulada, a Catedral-Mãe submersa emerge parcialmente, dois terços de sua estrutura visíveis acima da linha d'água. A catedral exibe uma coluna quebrada lateral (canon, referência ao colapso pós-Era 1 e easter egg maçom da coluna quebrada). Telhados em ângulos góticos altos. Janelas ogivais escuras. Da água sobe vapor leve, cyan na base e cinza no topo.
+Background (fundo, profundidade máxima): mar negro tranquilo coberto por bruma cyan baixa. No horizonte central, silhouetted contra céu de aurora cinza-azulada, a Catedral-Mãe submersa emerge parcialmente, dois terços de sua estrutura visíveis acima da linha d'água. A catedral exibe uma coluna quebrada lateral (canon, referência ao colapso pós-Era 1 e ao motivo cerimonial fundador da coluna quebrada). Telhados em ângulos góticos altos. Janelas ogivais escuras. Da água sobe vapor leve, cyan na base e cinza no topo.
 
-Midground (plano médio): pavimento tesselado preto-e-branco em xadrez (canon maçom, motivo Catedrais Neo-Sylvania) recua em perspectiva forçada partindo do leitor até a base da Catedral-Mãe submersa. O pavimento está parcialmente coberto por água rasa que reflete a aurora. Onde as ladrilhas tocam a linha d'água, alguns blocos brancos viraram ashlar bruto (canon maçom: pedra não-polida) e outros mantêm ashlar polido. À esquerda do pavimento, plantada na junção entre terra firme e água, uma única árvore acaceiro de tronco vermelho carmesim (canon botânico, easter egg maçom da acácia) com folhagem rala em formato fractal.
+Midground (plano médio): pavimento tesselado preto-e-branco em xadrez (canon cerimonial fundador, motivo Catedrais Neo-Sylvania) recua em perspectiva forçada partindo do leitor até a base da Catedral-Mãe submersa. O pavimento está parcialmente coberto por água rasa que reflete a aurora. Onde as ladrilhas tocam a linha d'água, alguns blocos brancos viraram ashlar bruto (canon cerimonial fundador: pedra não-polida) e outros mantêm ashlar polido. À esquerda do pavimento, plantada na junção entre terra firme e água, uma única árvore acaceiro de tronco vermelho carmesim (canon botânico, motivo cerimonial fundador da acácia) com folhagem rala em formato fractal.
 
-Foreground (primeiro plano, base da capa): Gus Vector aparece em escala média, três quartos de costas para o leitor, virado em diagonal para a Catedral-Mãe. Aproximadamente 11 anos canônicos, ruivo asimétrico cobrindo parcialmente o olho direito, óculos cyan refletindo a aurora, aparelho ortodôntico discreto sob lábio entreaberto, sobretudo gótico cinza-chumbo até os joelhos com gola alta. Pulso esquerdo levantado mostra o Tavus-Drive ativo, pequeno display irradiando halo cyan sobre o ar úmido. Sua silhueta forma um triângulo invertido suave (ombros do sobretudo largos, base afilada nas botas pretas). Em torno de Gus, partículas digitais cyan flutuam ascendentes, formando subliminarmente uma espiral Fibonacci (oito partículas grandes, treze médias, vinte e uma pequenas, em curva logarítmica saindo do Tavus-Drive em direção ao topo da capa).
+Foreground (primeiro plano, base da capa): Gus Vector aparece em escala média, três quartos de costas para o leitor, virado em diagonal para a Catedral-Mãe. Aproximadamente 11 anos canônicos, ruivo asimétrico cobrindo parcialmente o olho direito, óculos cyan refletindo a aurora, aparelho ortodôntico discreto sob lábio entreaberto, sobretudo gótico cinza-chumbo até os joelhos com gola alta. Pulso esquerdo levantado mostra o Tavus-Drive ativo, pequeno display irradiando halo cyan sobre o ar úmido. Sua silhueta forma um triângulo invertido suave (ombros do sobretudo largos, base afilada nas botas pretas). Em torno de Gus, partículas digitais cyan flutuam ascendentes, formando subliminarmente uma espiral logarítmica (oito partículas grandes, treze médias, vinte e uma pequenas, em curva saindo do Tavus-Drive em direção ao topo da capa).
 
 Sobre a Catedral-Mãe submersa, parcialmente sobreposto ao céu, paira translúcido o Vyrdragon ancestral em silhueta vermelha carmesim, asas semi-abertas, cabeça baixa em pose contemplativa não-agressiva, como espírito guardião e não ameaça imediata. Sua presença é fantasmagórica, com transparência de cerca de 40 por cento sobre o céu de aurora. O dragão é dimensionalmente maior que a Catedral, sugerindo escala mítica.
 
 ### Iconografia secundária
 
-No quadrante superior esquerdo, ornamento marginal discreto contém o cripto-glifo Era 1 (grade três por três mais X mais pontos, canon Pigpen cipher como easter egg maçom). O ornamento parece runa decorativa para o leigo e palavra cifrada para o leitor instruído.
+No quadrante superior esquerdo, ornamento marginal discreto contém o cripto-glifo Era 1 (grade três por três mais X mais pontos, cifra canônica fundadora). O ornamento parece runa decorativa para o leigo e palavra cifrada para o leitor instruído.
 
 No quadrante superior direito, espelhando o cripto-glifo, ornamento contém o Selo dos Quatro Instrumentos canônico C-Arcane (esquadro, compasso, cinzel e martelo entrelaçados em geometria razão acaceiro), com régua-T cruzando a base.
 
@@ -28,7 +28,7 @@ Aos lados inferiores, duas pequenas colunas estilizadas Boróstoma à esquerda (
 
 ### Paleta dominante
 
-Cyan analítico (#4FC3F7 a #1A5C7A) ocupa cerca de 35 por cento da composição: óculos de Gus, Tavus-Drive, partículas Fibonacci, reflexos da aurora na água. Vermelho carmesim ancestral (#8B1A1A a #C72E2E) ocupa cerca de 15 por cento: Vyrdragon, tronco do acaceiro, detalhes de costura no sobretudo de Gus. Preto-tesselado puro com branco quebrado em ashlar (#0A0A0A e #E8E4D8) ocupa cerca de 30 por cento: pavimento, Catedral, ornamentos. Cinza-azulado de aurora (#5A6878 a #8A9AAB) ocupa cerca de 20 por cento: céu, bruma, sobretudo. Brass corporativo está ausente neste tomo (reservado ao Tomo 2).
+Cyan analítico (#4FC3F7 a #1A5C7A) ocupa cerca de 35 por cento da composição: óculos de Gus, Tavus-Drive, partículas em espiral recorrente, reflexos da aurora na água. Vermelho carmesim ancestral (#8B1A1A a #C72E2E) ocupa cerca de 15 por cento: Vyrdragon, tronco do acaceiro, detalhes de costura no sobretudo de Gus. Preto-tesselado puro com branco quebrado em ashlar (#0A0A0A e #E8E4D8) ocupa cerca de 30 por cento: pavimento, Catedral, ornamentos. Cinza-azulado de aurora (#5A6878 a #8A9AAB) ocupa cerca de 20 por cento: céu, bruma, sobretudo. Brass corporativo está ausente neste tomo (reservado ao Tomo 2).
 
 ### Tipografia título
 
@@ -48,7 +48,7 @@ No terço inferior, acima do nome de Gus se essa região estiver visualmente ocu
 
 ### Selo Glyph-vyr
 
-Canto inferior direito, hot stamping cyan metálico (efeito físico real na impressão, ver §6). Selo combina cripto-glifo Era 1 central com cordão de oitenta e nove nós circundando (canon maçom numérico, easter egg Fibonacci pois 89 pertence à sequência). Diâmetro do selo cerca de 4cm no formato físico final. Selo aparece em Tomo 1, Tomo 2, Volume 2 Antologia: marca da edição canônica.
+Canto inferior direito, hot stamping cyan metálico (efeito físico real na impressão, ver §6). Selo combina cripto-glifo Era 1 central com cordão de oitenta e nove nós circundando (canon cerimonial fundador numérico, 89 pertence à sequência recorrente). Diâmetro do selo cerca de 4cm no formato físico final. Selo aparece em Tomo 1, Tomo 2, Volume 2 Antologia: marca da edição canônica.
 
 ## 2. Tomo 2, Capa Frontal
 
@@ -56,7 +56,7 @@ Canto inferior direito, hot stamping cyan metálico (efeito físico real na impr
 
 Composição complementar ao Tomo 1, espelhada em paleta e simbologia mas atravessada por progressão narrativa: enquanto Tomo 1 olha para o passado submerso, Tomo 2 olha para o presente megaurbano e o futuro de Dragon Victory.
 
-Background: skyline noturno de GusWorld City, arranha-céus angulares ciber-góticos com janelas iluminadas em padrão Fibonacci (três, cinco, oito, treze, vinte e uma janelas acesas por torre, sequência discreta). No centro do horizonte, dominante e monolítica, a Cúpula Sterling Corp em formato hexagonal angular brass metálico, refletindo as luzes da cidade. Cúpula é dimensionalmente desproporcional, ocupando cerca de 25 por cento da largura do background, transmitindo opressão corporativa.
+Background: skyline noturno de GusWorld City, arranha-céus angulares ciber-góticos com janelas iluminadas em padrão recorrente (três, cinco, oito, treze, vinte e uma janelas acesas por torre, sequência discreta). No centro do horizonte, dominante e monolítica, a Cúpula Sterling Corp em formato hexagonal angular brass metálico, refletindo as luzes da cidade. Cúpula é dimensionalmente desproporcional, ocupando cerca de 25 por cento da largura do background, transmitindo opressão corporativa.
 
 Midground: Vyrdragon emerge agora em pose ativa, asas totalmente abertas em envergadura horizontal, cabeça erguida em rugido silencioso, cor vermelho carmesim plena (não mais translúcida como no Tomo 1). Dragão atravessa o céu noturno em diagonal ascendente da esquerda inferior para direita superior, deixando rastro de partículas vermelho-cyan misturadas (canon Dragon Victory aura gradient). Em torno do dragão, oito esferas pequenas cyan giram em trajetória orbital (canon: Fireball certeiro pós-Dragon Victory).
 
@@ -70,7 +70,7 @@ Ornamentos marginais espelham Tomo 1 mas progressão temporal está marcada: o c
 
 Ashlar polido predomina sobre ashlar bruto neste tomo (canon maçom: pedra trabalhada como evolução civilizatória, embora aqui ambígua pois civilização Era 3 também distorce).
 
-A coluna quebrada do Tomo 1 não reaparece literalmente. Em seu lugar, no quadrante inferior esquerdo, uma única ladrilha do pavimento tesselado está rachada em formato fractal, easter egg sutil indicando que o legado de Era 1 segue presente sob a urbanidade Era 3.
+A coluna quebrada do Tomo 1 não reaparece literalmente. Em seu lugar, no quadrante inferior esquerdo, uma única ladrilha do pavimento tesselado está rachada em formato fractal, detalhe sutil indicando que o legado de Era 1 segue presente sob a urbanidade Era 3.
 
 ### Paleta dominante
 
@@ -114,7 +114,7 @@ Fundo da lombada Tomo 2: gradiente vertical do vermelho carmesim profundo (#8B1A
 
 ### Padrão visual quando alinhados
 
-Quando Volume 1 Tomo 1, Volume 1 Tomo 2 e Volume 2 Antologia estão alinhados lado a lado na estante (três lombadas), as bases formam linha contínua tesselada preto-e-branco (canon maçom pavimento) que se estende horizontalmente atravessando os três volumes. Easter egg final: contagem total de ladrilhas brancas visíveis nas três lombadas combinadas deve ser 89 (Fibonacci).
+Quando Volume 1 Tomo 1, Volume 1 Tomo 2 e Volume 2 Antologia estão alinhados lado a lado na estante (três lombadas), as bases formam linha contínua tesselada preto-e-branco (canon cerimonial fundador, pavimento) que se estende horizontalmente atravessando os três volumes. Detalhe final: contagem total de ladrilhas brancas visíveis nas três lombadas combinadas deve ser 89 (valor recorrente).
 
 ## 4. Contracapa
 
@@ -196,7 +196,7 @@ Papel miolo: 50 a 65 gsm bíblia semi-opaco offset. Justificativa: tomo de 1100 
 
 Papel capa: cartão 300gsm laminado fosco, com hot stamping cyan metálico aplicado exclusivamente no selo Glyph-vyr (frente e lombada). Verniz fosco geral aplicado sobre toda a capa exceto o selo. Contraste entre fosco e metálico cria experiência tátil.
 
-Encadernação: capa dura costurada, lombada quadrada reforçada, cabeceado em cyan (Tomo 1) e vermelho carmesim (Tomo 2). Sobrecapa removível em papel couché 150gsm fosco com mesma arte da capa dura. Sob a sobrecapa, capa dura nua exibe apenas o selo Glyph-vyr hot stamped sobre tecido preto: easter egg físico para o leitor que removeu a sobrecapa.
+Encadernação: capa dura costurada, lombada quadrada reforçada, cabeceado em cyan (Tomo 1) e vermelho carmesim (Tomo 2). Sobrecapa removível em papel couché 150gsm fosco com mesma arte da capa dura. Sob a sobrecapa, capa dura nua exibe apenas o selo Glyph-vyr hot stamped sobre tecido preto: detalhe físico para o leitor que removeu a sobrecapa.
 
 Margens internas: 2cm interna (lombada), 1.5cm externa, 2cm topo, 2.5cm rodapé. Rodapé maior acomoda numeração de página e canon Glyph-vyr discreto.
 
@@ -226,6 +226,6 @@ Lombadas dos três volumes alinhadas na estante formam padrão visual contínuo:
 
 Sobrecapas removíveis dos três volumes, quando posicionadas lado a lado abertas (frente, lombada, contracapa estendidas em superfície plana), formam mural panorâmico horizontal: Catedral-Mãe submersa à esquerda extrema (Tomo 1), skyline GusWorld City no meio com Vyrdragon atravessando (Tomo 2), e cena culminante a definir do Volume 2 Antologia à direita. Artista deve projetar a continuidade horizontal explicitamente.
 
-Capa dura nua sob sobrecapa exibe nos três volumes apenas o selo Glyph-vyr em hot stamping cyan sobre tecido preto. Easter egg físico recompensa o colecionador que desnudou os três livros: tem em mãos a versão "secreta" da edição.
+Capa dura nua sob sobrecapa exibe nos três volumes apenas o selo Glyph-vyr em hot stamping cyan sobre tecido preto. Detalhe físico recompensa o colecionador que desnudou os três livros: tem em mãos a versão "secreta" da edição.
 
 **Pre-consolidação:** 2026-05-21. F5-BK.1 sub-tarefa 5/8. Spec design capa Volume 1 Bíblia GusWorld. Brief para artista (Fase 2+). Não modificar sem aprovação criador supremo.

@@ -38,8 +38,8 @@ Knowledge total é a **soma de categorias independentes**, cada uma com cap teó
 | 8 | **Companion-Dante** | ~50 | Salviano, Edilma, cooperativa Alencar, traição. **Categoria cresce mais retroativamente após reveal climax Etapa 1.** | Sub-quest "Auditoria Cruzada" + memórias formativas pós-reveal + ficha atualizada double-layer. |
 | 9 | **Companion-Jaci** | ~50 | Lia, Solano, Pelicano Branco, Mariana, sementes-relíquia, Selve Profunda. | Mini-quests arco + sub-quest cruzada Mariana + decifragem doc 7. |
 | 10 | **Sterling / Patch-Zero** | ~80 | Antagonistas. Filosofia DRE, conglomerados canibalizados, captura Patch-Zero, 4 canais. | Doc 1 (tratado DRE) + doc 5 (audit Apex-Data) + doc 14 (Penedo-Locke) + ficha + canais Patch-Zero. |
-| 11 | **Magia formal** | ~70 | Glyph/Token/Conjuro/Codex, linguagens (C-Arcane, Asmódico, Óxido, Pythia), grammar de cartas, easter-egg combos. | Mestria por uso (carta) + decifragem cripto-glifo + lição de companion (Asmódico via Bento, Óxido via Iara/Linda, Pythia via Cauã/Jaci). |
-| 12 | **Natureza-matemática** | ~60 | Fibonacci, fractais, Mandelbrot, Markov, ruído coerente (Perlin/Simplex), anomalias Pillar 2. | Scan via óculos táticos + decifragem padrão fauna/flora + bestiary completado. |
+| 11 | **Magia formal** | ~70 | Glyph/Token/Conjuro/Codex, linguagens (C-Arcane, Asmódico, Óxido, Pythia), grammar de cartas, combos secretos. | Mestria por uso (carta) + decifragem cripto-glifo + lição de companion (Asmódico via Bento, Óxido via Iara/Linda, Pythia via Cauã/Jaci). |
+| 12 | **Natureza-matemática** | ~60 | Sequência recorrente, fractais, Mandelbrot, Markov, ruído coerente (Perlin/Simplex), anomalias Pillar 2. | Scan via óculos táticos + decifragem padrão fauna/flora + bestiary completado. |
 | 13 | **Cidade / Selve** (Pillar 5) | ~60 | 8 settings master, mapas, landmarks ocultos, fog-of-war. | Exploração + landmark oculto descoberto + scan setting completo. |
 | 14 | **Cultural** | ~40 | Tradições, festas, comidas, cumprimentos, calendário, costumes ([[tradicoes-cultura]]). | Participação em festa + conversa com NPC ambient + observação de saudação local. |
 | 15 | **Mecânico-meta** | ~30 | Knowledge sobre o próprio sistema. Cross-references entre 2+ entries pelo player. Auto-leitura. | Cross-reference (cruzar 2 entries em janela de leitura) + insight de glossário + leitura repetida de doc em novo contexto. |
@@ -70,7 +70,7 @@ Crescimento por trigger único catalogado. Cada trigger tem ID de eventual no sa
 | Completar bestiary entry (kill cap) | Magia + Natureza-matemática | +2 | Não | Comum (4 kills) = +2; Mestre raro (4 kills) = +5; Boss único (1 kill) = +8. |
 | Anotação manuscrito auto-gerada pós-cena chave | Depende do contexto | +1 a +2 | Não | Beat Kishōtenketsu gera entry; entry vale +1 (Ki/Sho) ou +2 (Ten/Ketsu). |
 | Cross-reference manual (cruzar 2 entries em janela) | Mecânico-meta | +2 | Sim por par único | Cruzamento canônico: doc 5 (Apex-Data) + doc 13 (Davi Berenger) = +3 a COM-CAU + STE. |
-| Scan de prop ambient (óculos táticos) | Categoria do prop | +1 a +2 | Não por prop | Engrenagem-mestre Fibonacci Catedral (F069) = +2 a E1. |
+| Scan de prop ambient (óculos táticos) | Categoria do prop | +1 a +2 | Não por prop | Engrenagem-mestre de dentes em razão recorrente, Catedral (F069) = +2 a E1. |
 | Scan de fauna/flora Selve | Natureza-matemática | +1 | Não por espécie | 100% bestiary Selve = +60 cap categoria. |
 | Participar de festa/tradição | Cultural | +2 | Sim por tradição única | Festa da Compilação Era 2, Noite Calada Underground, etc. |
 | Combate boss (bestiary completo) | Magia + setting + Sterling/PZ se aplicável | +2 a +5 | Não | Boss Sterling Fase 2 = +5 a STE/PZ. |
@@ -156,7 +156,7 @@ A decisão final ocorre no **limite externo do Núcleo Mandelbrot Interno** (Sel
 
 **Bonus epilogue (4 cenas adicionais):**
 1. Vilarejo do Pelicano Branco em festival. Jaci com avó Mariana. Pena de pelicano branco (F101) recontextualizada. Mariana adiciona 12º nó no cordão de cipó (F102, pagando 4 anos em 1 frame).
-2. Bento em catedral aberta ao público. Primeira lição de Asmódico a uma criança. Engrenagem-mestre Fibonacci girando de fundo.
+2. Bento em catedral aberta ao público. Primeira lição de Asmódico a uma criança. Engrenagem-mestre de dentes em razão recorrente girando de fundo.
 3. Cauã + Linda fundando oficina mista nos Dutos Infernais (Subestação 7 reconvertida como hub seguro juvenil pós-jogo). Mara Bento ouve vinil Última Frequência reconstituído (eco F088).
 4. **Cena Beatriz Pólvora** (F128). Beatriz aos 17 (+1 ano timeskip) abre Escola de Asmódico aberta a não-membros da Ordem Recursiva, na Praça do Compilador da Periferia (escolha simbólica: tradição catedral encontra território cooperativo Era 2). Crianças da Periferia se inscrevem. Mestre Almagre passa, faz sinal de aprovação com a cabeça (não fala; recuperou da quebra moral pós-reveal Dante). Bento aparece 1 segundo no fundo, segurando escudo-catedral, sorri pequeno. Duração 8-12 segundos sem diálogo. Tradição flexível continua viva, não dogma.
 

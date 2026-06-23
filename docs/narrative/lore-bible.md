@@ -19,7 +19,7 @@ Há três eras estruturais. A primeira ruiu antes que alguém vivo se lembrasse.
 Três princípios atravessam as eras:
 
 1. **Magia é sistema formal computável** (Pillar 2). Não há "força arcana"; há instruções, tipos, escopos, custos. Algumas instruções rodam em silício; outras em latão e mola; outras em proteína e seiva. Todas obedecem regras.
-2. **Natureza é matemática rígida** (Pillar 2). Fauna e flora seguem Fibonacci, fractais, ruído coerente. O caos aparente é caos determinístico até a fronteira final.
+2. **Natureza é matemática rígida** (Pillar 2). Fauna e flora seguem sequências numéricas recorrentes, fractais, ruído coerente. O caos aparente é caos determinístico até a fronteira final.
 3. **Inteligência prodigiosa serve à vida ou se vira contra ela** (Theme do arco). É escolha. Esta é a história que o jogo conta.
 
 ---
@@ -243,7 +243,7 @@ Escopo G1:
 - **40-60 tokens** totais no jogo (não conjuros, mas tokens, que combinam). Combinatoriamente, ~200 conjuros pré-planejados surgem.
 - **15 tokens em campo** (deck ativo). Trocáveis fora de combate.
 - **Mestria por uso**: token cresce com repetição (Pillar 1).
-- **5-10 easter-egg combos**: combinações não-óbvias que destravam efeitos surpresa.
+- **5-10 combos secretos**: combinações não-óbvias que destravam efeitos surpresa.
 
 ### 7.7 Biblioteca de conjuros: amostra-template
 
@@ -262,7 +262,7 @@ Não vamos listar os 200 aqui. Apenas amostra para fixar o tom:
 | **Cronômetro Ressonante** | Cinético + Stream + Aliado | Bento Asmódico: amplia defesa party (analógico) |
 | **Antídoto Sintético** | Bioquímico + Null + Aliado | Jaci signature, remove status hostil |
 
-### 7.8 Easter-egg combos (hint)
+### 7.8 Combos secretos (hint)
 
 Combos não óbvios. Total: 5-10 destraváveis. Exemplos sem revelação completa:
 
@@ -310,7 +310,7 @@ Asmódico é **a linguagem analógica de Neo-Sylvania**. Roda em relojoaria de l
 
 Patch-Zero é **dois fenômenos ao mesmo tempo**, indistinguíveis entre si até o late game:
 
-1. **Anti-padrão**: rompe a previsibilidade da Selve. Onde Patch-Zero passa, Fibonacci falha localmente, ruído coerente vira ruído genuíno, Knowledge Progression (Pillar 1) é **invalidada para inimigos contaminados** (não dá pra prever o próximo movimento; o óculos tático mostra estática).
+1. **Anti-padrão**: rompe a previsibilidade da Selve. Onde Patch-Zero passa, as sequências numéricas recorrentes falham localmente, ruído coerente vira ruído genuíno, Knowledge Progression (Pillar 1) é **invalidada para inimigos contaminados** (não dá pra prever o próximo movimento; o óculos tático mostra estática).
 2. **Consciência alien**: tem voz. Planeja. Manipula. Não é simplesmente bug; é entidade pensante operando através do bug.
 
 A coexistência dos dois aspectos é deliberada. Patch-Zero não é "monstro" nem "vírus"; é **o limite do conhecimento** se manifestando como ameaça.
@@ -525,7 +525,7 @@ Personagens secundários canônicos com peso narrativo no arco principal ou side
 - **Inácia Berenger** (45), mãe Cauã. Técnica QA ex-Apex-Data. Vive contida. Sabe mais do que conta. Guarda documentos comprometedores de Davi.
 - **Gargi Vance** (43), mãe Gus. Técnica de bancada eletrônica. Trabalha em casa. Safe-base canônica Gus. Personagem âncora emocional, ofuscada deliberadamente (não toma protagonismo).
 - **Pyotor Vance** (46), pai Gus. Médico-cyber itinerante (medicina + bioengenharia + bioeletrônica + eng robótica + implantes) em rotação fronteira-Selve atendendo vilarejos pós-Êxodo (Pelicano Branco, Garça-Preta-Nova, Caracará-Cinza, Sabiá-de-Bronze). Hobby: programação. Separado amigavelmente de Gargi desde Gus aos 6 anos (ano -5). Cartas raras (3-4 no jogo total).
-- **Yakov Vance** (42), tio paterno do Gus, irmão mais novo de Pyotor (4 anos a menos). Um dos melhores engenheiros de software do reino, também geólogo; combina ambas formações na maior mineradora do reino. Stack canon de prospecção subterrânea não-invasiva em 5 tecnologias: (a) radar GPR de penetração subterrânea, (b) sísmica de reflexão por explosões controladas, (c) tomografia muônica passiva por raios cósmicos, (d) magnetotelúrica de condutividade por fluxo iônico, (e) espectrometria microbiana bioluminescente de sub-superfície. Inovação canon registrada: 89% de redução de mortalidade em prospecção subterrânea via fusão multi-sensor (Fibonacci). Apresentará xadrez ao Gus em visita esporádica anos depois (complementar à programação de Pyotor).
+- **Yakov Vance** (42), tio paterno do Gus, irmão mais novo de Pyotor (4 anos a menos). Um dos melhores engenheiros de software do reino, também geólogo; combina ambas formações na maior mineradora do reino. Stack canon de prospecção subterrânea não-invasiva em 5 tecnologias: (a) radar GPR de penetração subterrânea, (b) sísmica de reflexão por explosões controladas, (c) tomografia muônica passiva por raios cósmicos, (d) magnetotelúrica de condutividade por fluxo iônico, (e) espectrometria microbiana bioluminescente de sub-superfície. Inovação canon registrada: 89% de redução de mortalidade em prospecção subterrânea via fusão multi-sensor. Apresentará xadrez ao Gus em visita esporádica anos depois (complementar à programação de Pyotor).
 - **Atelaiana de Sevra Chevalier**, mãe biológica viva do Bento, irmã consanguínea de Mestre Lavínia Sevra. Partiu da Catedral três meses após o parto (canon R4 deep-lore).
 - **Irmã biológica do Bento** (nome intencionalmente não-escrito; canon R9 conto 4 antologia "minha irmã, pulso clavícula esquerda, nome não-escrito"). Morta ou desaparecida antes de -7. Wound primeiro Bento, antecede Hilário Tepenkov. Pulso na clavícula esquerda como marca canônica. Detalhes a definir em sequel.
 - **Edilma Alencar** (44), mãe Dante. Operária têxtil. **Aparência pública canon:** vive reclusa em apartamento subsidiado pós-morte de Salviano, mantido como fachada Sterling Corp. **Estado real (revelado arco Dante Beat Ten + Dragon Victory):** sequestrada na Caverna dos Perdidos (Selve Sombria, nordeste do Pântano Markov) pelos Sterling brass para chantagear Dante. Apartamento conservado por equipe FIR que rotaciona luz acesa, lixo semanal e cortina trocada de posição, para que vizinhança de baixa atenção registre "viúva calada" e não inquilino ausente. Interações mínimas no jogo; aparece em cena pós-reveal Dante (silêncio). Cross-ref [[PLACES]]:76 (Caverna dos Perdidos) + [[characters/dante-grid]]:117 (chantagem operacional Vorto-Sterling).

@@ -63,9 +63,9 @@ QTE; real-time twitch; HP-sponge boss; dano inflacionado por level; "spam habili
 ### Mecânicas que servem
 
 - **Sintaxe de cartas** legível e curada: tipo + modificador + alvo, gramática internamente consistente.
-- **~200 combinações pré-planejadas** + **5-10 easter-egg combos** descobríveis por experimentação.
+- **~200 combinações pré-planejadas** + **5-10 combos secretos** descobríveis por experimentação.
 - **Inimigos especiais = bugs/vírus**; debug = puzzle.
-- **Fractais e Fibonacci visíveis** na flora da Selve; scan revela fórmula do bioma.
+- **Fractais e padrões numéricos recorrentes visíveis** na flora da Selve; scan revela fórmula do bioma.
 - **Ruído Coerente (Perlin/Simplex) como standard de RNG natural** — determinístico, seedable, multi-octave, fractal real. Usado em geração de bioma, padrões de spawn, comportamento de fauna passiva, textura procedural.
 - **Diegético:** óculos táticos do Gus **revelam o noise underlying** (modo scan = vê o gradient Perlin literal por trás do "caos aparente").
 - **Caos calibrado em camadas:**
@@ -175,7 +175,7 @@ Romance; gore explícito centrado no Gus; fan-service edgy; dilema moral cínico
 | 4 | **Periferia Industrial** (Ferrovelhos) | Dante "Grid" (traidor) | Sucata, fuligem carbono, hardware descartado, matéria-prima infinita. |
 | 5 | **Setor Mirage** (entretenimento) | Iara "Lumen" | Holo-publicidade sobreposta, refração instável, desorientação espacial. |
 | 6 | **Zona do Silêncio** (antenas mortas) | Linda "Siren" | Cânion tecnológico, silêncio gótico, ruído branco estático. |
-| 7 | **Selve Sombria** (fronteira tecnorgânica) | Jaci "Proxy" | Biomassa programada, Fibonacci visível, esporos sintéticos, fauna biocibernética. |
+| 7 | **Selve Sombria** (fronteira tecnorgânica) | Jaci "Proxy" | Biomassa programada, padrões numéricos recorrentes visíveis, esporos sintéticos, fauna biocibernética. |
 | 8 | **Catedrais de Silício + Cúpula Sterling** (ato 3) (canon Pillar 5 setting 8 = climax ato 3 Sterling, NÃO confundir com environments/08-selve-profunda.md que é setting Selve Profunda Jaci) | Sterling Locke | **Mesmo setting, 2 zonas opostas**: exterior = híbrido corrompido (Sterling tentou fundir cidade+Selve, falhou); interior = estéril euclidiano perfeito (santuário negacionista). |
 
 ### Mecânicas que servem
@@ -237,7 +237,7 @@ Doc dedicado: `docs/design/mecanicas/hospital-economia.md` (a criar).
 
 Wiki in-game paginada que registra Knowledge Progression. Sub-seções:
 - **Bestiário** (inimigos — 1-4 páginas por entrada, preenche por kill)
-- **Cartas** (mestria, combos descobertos, easter eggs)
+- **Cartas** (mestria, combos descobertos, combos secretos)
 - **Lore** (mundo, facções, settings, eventos)
 - **Companions** (perfis, arcs, mini-quests)
 - **Diagnóstico de hardware** (status do triângulo do Gus — vai mostrar degradação sutil pela sabotagem de Dante; foreshadowing)

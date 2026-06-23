@@ -79,7 +79,7 @@ VOLUME 1: BÍBLIA WORLDBUILDING
 | 2.1 | Cinco pillars testáveis | `docs/design/pillars.md` | ~6k | ~20 | extrair íntegra (canon validado) |
 | 2.2 | Anti-pillars (boundaries) | `pillars.md` §Anti-pillars | ~3k | ~10 | extrair íntegra |
 | 2.3 | Manifesto Pillar 2 expandido (magia = software, natureza = matemática) | `deep/magic/natureza-matematica-rigida-deep.md` (extrato + abertura ensaio) | ~5k | ~17 | encomendar extrato editorial a `narrative-writer` |
-| 2.4 | Easter eggs pervasivos canônicos (Fibonacci + maçonaria) | `CLAUDE.md` §Easter eggs + memórias `project_fibonacci_easter_egg` + `project_eastereggs_maconaria_canonica` | ~4k | ~13 | escrever apresentação autoral discreta (não didática); revelação parcial |
+| 2.4 | Motivos pervasivos canônicos (numéricos + cerimoniais fundadores) | `CLAUDE.md` | ~4k | ~13 | escrever apresentação autoral discreta (não didática); revelação parcial |
 | 2.5 | Convenções editoriais (em-dash, terminologia, voz autoral) | `deep/_INDEX.md` §Convenções autorais | ~2k | ~7 | extrair + adaptar pra prefacio editorial |
 
 **Subtotal Cap 2:** ~20k pal / ~67 pp
@@ -113,7 +113,7 @@ VOLUME 1: BÍBLIA WORLDBUILDING
 
 | # | Sub-capítulo | Fonte | Palavras | Páginas | Nota revisão |
 |---|---|---|---|---|---|
-| 4.1 | Fibonacci como assinatura biótica universal | `deep/magic/natureza-matematica-rigida-deep.md` §Fibonacci | ~4k | ~13 | extrair |
+| 4.1 | Sequência recorrente como assinatura biótica universal | `deep/magic/natureza-matematica-rigida-deep.md` §2.2 | ~4k | ~13 | extrair |
 | 4.2 | Fractais, recursão, ruído coerente | `natureza-matematica-rigida-deep.md` §fractais + ruído | ~5k | ~17 | extrair |
 | 4.3 | Anomalias e bugs (quando a Selve cospe runtime error) | `natureza-matematica-rigida-deep.md` §anomalias | ~4k | ~13 | extrair |
 | 4.4 | Selve Sombria como compilador vivo (case study) | `deep/settings/02-selve-sombria.md` + `08-selve-profunda.md` (extratos) | ~5k | ~17 | extrato editorial |
@@ -146,13 +146,13 @@ VOLUME 1: BÍBLIA WORLDBUILDING
 | 5.5 | Ética material e frugalidade calculada | `era-1-pre-codigo.md` §5 | ~22k | ~73 | extrair íntegra |
 | 5.6 | Famílias-Pilastra, Pelicano Branco, linhagens fundadoras | `era-1-pre-codigo.md` §6 + memória `project_familia_vance_canonica` | ~25k | ~83 | extrair íntegra + reforçar canon Vance |
 | 5.7 | O Regime Vyrcátrix (centralização e ruína) | `era-1-pre-codigo.md` §7 | ~24k | ~80 | extrair íntegra |
-| 5.8 | Helíaco Vyr (eco de Hiram Abiff, lenda fundadora) | `era-1-pre-codigo.md` §8 + `deep/antologia/14-heliaco-vyr-era-1.md` (entrada autoral) | ~25k | ~83 | consolidar (cap 5.8 = ensaio; antologia = conto pessoal) |
+| 5.8 | Helíaco Vyr (mártir-fundador, lenda fundadora) | `era-1-pre-codigo.md` §8 + `deep/antologia/14-heliaco-vyr-era-1.md` (entrada autoral) | ~25k | ~83 | consolidar (cap 5.8 = ensaio; antologia = conto pessoal) |
 | 5.9 | O Êxodo de -720 e o silêncio que sobrou | `era-1-pre-codigo.md` §9 | ~24k | ~80 | extrair íntegra |
 | 5.10 | Eco no presente (como Era 1 ressoa em Era 3) | `era-1-pre-codigo.md` §10 + tese Velhusto (cross-ref Pillar 2) | ~25k | ~83 | extrair íntegra |
 
 **Subtotal Cap 5:** ~218k pal / ~725 pp
 
-> **Nota crítica de revisão:** Era 1 §§6-8 receberam retrofit em 2026-05-21 (Plano 1 + 3 REFAC) integrando easter eggs maçom canon (Pigpen ↔ cripto-glifo, Helíaco Vyr ↔ Hiram Abiff, pavimento tesselado, acaceiro). Validar com `narrative-designer` que densidade ficou em 10-15% (não didática, não evidente).
+> **Nota crítica de revisão:** Era 1 §§6-8 receberam retrofit em 2026-05-21 (Plano 1 + 3 REFAC) integrando motivos cerimoniais fundadores canon (cripto-glifo cifrado, Helíaco Vyr, pavimento tesselado, acaceiro). Validar com `narrative-designer` que ficou discreto (não didático, não evidente).
 
 ---
 
@@ -357,7 +357,7 @@ VOLUME 1: BÍBLIA WORLDBUILDING
 | # | Sub-capítulo | Fonte | Palavras | Páginas | Nota revisão |
 |---|---|---|---|---|---|
 | 15.1 | Leitmotivs por personagem/facção | `deep/ontologia/leitmotivs-deep.md` | ~4k | ~13 | extrair |
-| 15.2 | Catálogo musical detalhado (compassos Fibonacci 5/8, 13/16; intervalos) | `deep/ontologia/leitmotivs-musicais-detalhados.md` | ~7k | ~23 | extrair |
+| 15.2 | Catálogo musical detalhado (compassos recorrentes 5/8, 13/16; intervalos) | `deep/ontologia/leitmotivs-musicais-detalhados.md` | ~7k | ~23 | extrair |
 | 15.3 | Temas narrativos recorrentes (substrato, custo, conservação, traição-perdão) | `deep/ontologia/leitmotivs-deep.md` §temas | ~3k | ~10 | extrair |
 
 **Subtotal Cap 15:** ~14k pal / ~46 pp
@@ -510,7 +510,7 @@ Itens que **não existem ainda** e precisam ser produzidos antes do livro fechar
 
 1. **Cap 1.4, manual do leitor** (~2k pal) → `narrative-writer`
 2. **Cap 2.3, manifesto Pillar 2 expandido** (~5k pal extrato editorial) → `narrative-writer`
-3. **Cap 2.4, apresentação easter eggs canon** (~4k pal, tom discreto) → `narrative-writer` + validação `narrative-designer`
+3. **Cap 2.4, apresentação dos motivos canon** (~4k pal, tom discreto) → `narrative-writer` + validação `narrative-designer`
 4. **Cap 4.5, bestiary computacional consolidado** (~9k pal) → `narrative-writer` consolidando fichas
 5. **Cap 6.4, fundação GusWorld City (Gustaf I→VII)** (~4k pal conector) → `narrative-writer`
 6. **Cap 11, linhagens canônicas cross-eras** (~10k pal, conectores) → `narrative-writer`
@@ -567,7 +567,7 @@ docs/design/
 raiz/
 ├── CHARS.md                                              [Apêndice B]
 ├── PLACES.md                                             [Apêndice C]
-├── CLAUDE.md                                             [Cap 2.4 easter eggs + Apêndice G]
+├── CLAUDE.md                                             [Cap 2.4 motivos + Apêndice G]
 └── memórias em ~/.claude/.../memory/                     [Cap 9.1 Dragon, 11.1 Vance, 14.8 axiologia]
 ```
 

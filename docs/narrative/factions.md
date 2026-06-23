@@ -175,7 +175,7 @@ Bento é seu protegido e sucessor designado se a Ordem sobreviver.
 
 ### Símbolo visual
 
-**Engrenagem de latão envelhecida com 12 dentes assimétricos (sequência Fibonacci truncada).** Aparece em:
+**Engrenagem de latão envelhecida com 12 dentes assimétricos (espaçados numa sequência recorrente truncada).** Aparece em:
 
 - Brasão das vestes mestres.
 - Inscrições nas catedrais.
@@ -332,7 +332,7 @@ Cor institucional: amarelo-industrial + preto-fuligem.
 
 ### Ideologia
 
-**Cooperação ecológica baseada em padrão matemático.** A Selve não é uma facção *política*; é uma **rede de comportamentos coordenados** entre fauna, flora, micélios, fungos, predadores e presas. Auto-organizada por fractais, Fibonacci, ruído coerente.
+**Cooperação ecológica baseada em padrão matemático.** A Selve não é uma facção *política*; é uma **rede de comportamentos coordenados** entre fauna, flora, micélios, fungos, predadores e presas. Auto-organizada por fractais, sequências numéricas recorrentes, ruído coerente.
 
 Não tem porta-voz oficial. Tem aldeias humanas na fronteira (vilarejo do Pelicano Branco, outros) que **traduzem** sinais da Selve para a cidade quando necessário.
 
@@ -346,7 +346,7 @@ Não tem porta-voz oficial. Tem aldeias humanas na fronteira (vilarejo do Pelica
 
 ### Figura central
 
-**Anciã Mariana Vanderbist** (avó de Jaci). Cerca de 89 anos (canon Fibonacci). Líder informal do vilarejo do Pelicano Branco. Sabe ler Selve há décadas. Aceita Gus rapidamente porque reconhece nele a postura certa (respeitar o substrato).
+**Anciã Mariana Vanderbist** (avó de Jaci). Cerca de 89 anos. Líder informal do vilarejo do Pelicano Branco. Sabe ler Selve há décadas. Aceita Gus rapidamente porque reconhece nele a postura certa (respeitar o substrato).
 
 ### Objetivo
 
@@ -369,7 +369,7 @@ Não tem porta-voz oficial. Tem aldeias humanas na fronteira (vilarejo do Pelica
 
 ### Símbolo visual
 
-**Espiral Fibonacci sobre folha estilizada.** Aparece em:
+**Espiral logarítmica sobre folha estilizada.** Aparece em:
 
 - Bordados de mantos das aldeias.
 - Marcas nas embalagens de antídoto da Jaci.
@@ -407,7 +407,7 @@ Cor institucional: verde-ciano biolúmen + marrom-húmus + branco-fungo.
 - **Cumprimento canônico:** "Boa raiz." / "Boa colheita." Varia por estação (no plantio: "Boa raiz"; na colheita: "Boa colheita").
 - **Mão sobre coração:** gesto canônico Pelicano Branco. Reverência ao plantio. Usado também em despedidas.
 - **Cuidado coletivo:** quando alguém adoece no vilarejo, vizinhos se revezam preparando refeições. Sem cobrança. Sem registro.
-- **Bordado da espiral:** mantos comunitários trazem espiral Fibonacci bordada. Cada espiral é única (variação artística autorizada). Mariana ensina meninas; Jaci sabe.
+- **Bordado da espiral:** mantos comunitários trazem espiral logarítmica bordada. Cada espiral é única (variação artística autorizada). Mariana ensina meninas; Jaci sabe.
 - **Antídotos comunitários:** farmacêutica do vilarejo distribui antídotos preventivos gratuitamente em festividades. Jaci continua tradição da mãe Lia.
 
 ### Eventos históricos onde a facção atuou
@@ -623,7 +623,7 @@ Cor institucional: preto-carbono + fúcsia-neon discreto.
 - **Dia da Inicialização**: individual, não-coletivo ([[tradicoes-cultura]] §8). 12 horas de silêncio + música única.
 - **Cumprimento canônico:** gesto silente (dois dedos na orelha). Verbal: "Frequência boa." / "Sem ruído."
 - **Música canônica:** "Última Frequência" (composição original dos 8 técnicos desaparecidos na batida Casa das Antenas, ~-50). Tocada apenas anualmente.
-- **Ritual Noite Calada:** ritual anual canon Underground Silêncio. Tocado uma vez por ano em Câmara Última Frequência (canon PLACES). Música: composição canon 55 BPM (Fibonacci), modo frígio, vocal melismático Linda + reverb cavernoso. Função: memorial dos não-voltados (técnicos Underground perdidos pré-jogo: Bartolo Penkin, Calixto Rivaz, oito técnicos Casa das Antenas batida -50). Liderada por Mara Bento + Linda Siren canon ato 2+.
+- **Ritual Noite Calada:** ritual anual canon Underground Silêncio. Tocado uma vez por ano em Câmara Última Frequência (canon PLACES). Música: composição canon 55 BPM, modo frígio, vocal melismático Linda + reverb cavernoso. Função: memorial dos não-voltados (técnicos Underground perdidos pré-jogo: Bartolo Penkin, Calixto Rivaz, oito técnicos Casa das Antenas batida -50). Liderada por Mara Bento + Linda Siren canon ato 2+.
 - **Tatuagem opcional:** símbolo Underground (onda cruzada por linha reta) atrás da orelha.
 - **Pingente-agulha:** membros que perderam familiares em batida corporativa frequentemente carregam agulha de toca-discos como pingente (Linda canônica).
 - **Compromisso silente da inicialização:** novo membro nunca conta a outro a música que recebeu. Privacidade absoluta.

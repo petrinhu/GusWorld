@@ -46,7 +46,7 @@ Dante "Grid" Alencar, enquanto operava na periferia, testemunhou a destruição 
 
 ## 3. O Nexo Narrativo: A Virtualização da Selve Sombria
 
-O objetivo final de Sterling Locke é a implementação do **Global Runtime Environment (GRE)**. Ele identificou que a *Selve Sombria* e seus algoritmos biológicos recursivos representam o último bastião de hardware não controlado. A natureza, com suas sequências de Fibonacci e física intrínseca, é o equivalente a um sistema operacional de código aberto imune aos seus *scripts*.
+O objetivo final de Sterling Locke é a implementação do **Global Runtime Environment (GRE)**. Ele identificou que a *Selve Sombria* e seus algoritmos biológicos recursivos representam o último bastião de hardware não controlado. A natureza, com suas sequências numéricas recorrentes e física intrínseca, é o equivalente a um sistema operacional de código aberto imune aos seus *scripts*.
 
 Locke planeja utilizar a infraestrutura remanescente das empresas falidas que ele consolidou para envelopar a floresta inteira dentro de uma camada de emulação computacional. Uma vez que a *Selve Sombria* esteja rodando dentro de sua Máquina Virtual interpretada, a realidade biológica perderá sua soberania física: Locke poderá deletar espécies de fauna, alterar o clima ou reter recursos vitais alterando apenas uma linha de código em seu terminal de controle, sem precisar compreender ou respeitar as leis físicas da criação.
 

@@ -7,13 +7,13 @@
 
 ## 1. Identidade
 
-A Selve não é floresta. A Selve é um **sistema vivo escrito em matemática**. Cada ramo cresce em ângulo Fibonacci. Cada folha cai em padrão calculável se você lê o fungo de tronco-vermelho contar ([[in-world-docs]] doc 7). A bioluminescência verde-ciano que pulsa no escuro não é mística; é log de estado. Olho destreinado vê caos lindo. Olho treinado (óculos táticos de [[gus]], Matriz Ortodôntica, séculos de leitura Pelicano Branco) vê **função recursiva rodando em proteína e seiva**.
+A Selve não é floresta. A Selve é um **sistema vivo escrito em matemática**. Cada ramo cresce em ângulo de razão recorrente. Cada folha cai em padrão calculável se você lê o fungo de tronco-vermelho contar ([[in-world-docs]] doc 7). A bioluminescência verde-ciano que pulsa no escuro não é mística; é log de estado. Olho destreinado vê caos lindo. Olho treinado (óculos táticos de [[gus]], Matriz Ortodôntica, séculos de leitura Pelicano Branco) vê **função recursiva rodando em proteína e seiva**.
 
 A sensação não é a de aventura selvagem. É a de **estar dentro de algoritmo antigo que conhece muito bem o que faz, e que vai te ignorar se você for cuidadoso, e vai te corrigir se você for arrogante**. A Selve não ataca por hostilidade. A Selve corrige bug. Quem entra mexendo no substrato vira bug. E nas zonas onde o GRE Sterling começou a escrever por cima do substrato, o sistema **falha de outra maneira**: descontinuidade visual, faixas de gradiente quebradas, mesh popping em plena copa de árvore. Esses pedaços não são natureza. São placeholder cinza. São a Selve sendo escrita por fora.
 
 ## 2. Landmarks (5)
 
-**Orla Recursiva (entrada).** Floresta densa logo passada o Anel Verde da cidade. Copa cerrada bloqueia luz direta. Bioluminescência verde-ciano em cogumelos de base de tronco, marcando trilhas. Ramificações dos troncos obedecem L-system visível: cada galho gera dois galhos menores em ângulo Fibonacci, três vezes recursivo. Padrão fácil de identificar; tutorial natural de "leitura da Selve".
+**Orla Recursiva (entrada).** Floresta densa logo passada o Anel Verde da cidade. Copa cerrada bloqueia luz direta. Bioluminescência verde-ciano em cogumelos de base de tronco, marcando trilhas. Ramificações dos troncos obedecem L-system visível: cada galho gera dois galhos menores em ângulo de razão recorrente, três vezes recursivo. Padrão fácil de identificar; tutorial natural de "leitura da Selve".
 *Primeira impressão:* árvore que parece arte fractal porque é arte fractal.
 *Gancho exploratório:* primeiros cripto-glifos Era 1 visíveis em rocha de margem. Hub de tutorial.
 
@@ -44,7 +44,7 @@ A sensação não é a de aventura selvagem. É a de **estar dentro de algoritmo
 | Coruja-Mandelbrot empoleirada (não foge ao se aproximar) | Orla Recursiva | Fauna Selve não-hostil. Padrão olho-piscar em sequência fractal. Diagnóstico de "Selve sob controle aqui". |
 | Pegada Sterling Corp moderna ao lado de pegada Era 2 antiga | Trilha dos Pioneiros | Sterling sobrepôs rota. Cobertura cínica. |
 | Cartucho vazio de coleta Sterling jogado | Anomalia GRE adjacente | Extração ativa. Selve sendo capturada. |
-| Anel de cogumelos pulsando em padrão Fibonacci perfeito | Orla Recursiva, clareira pequena | Pillar 2 demonstrável. Knowledge progression: scan ensina a função. |
+| Anel de cogumelos pulsando em padrão recorrente perfeito | Orla Recursiva, clareira pequena | Pillar 2 demonstrável. Knowledge progression: scan ensina a função. |
 | Carcaça de drone Sterling Corp caída entre raízes | Anomalia GRE borda | Drone falhou; Selve "rejeitou". Patch-Zero contaminou. |
 | Semente-relíquia Neo-Sylvania em câmara de pedra hermética | Sub-clareira Orla profunda | Era 1 preservada. Aliada do Pelicano Branco. |
 | Rã-mecânica viva em estado "alerta" piscando | Pântano de Markov | Cadeia de Markov observável: alerta → passivo em 7 segundos se Gus não se mexer. |
@@ -56,7 +56,7 @@ A sensação não é a de aventura selvagem. É a de **estar dentro de algoritmo
 ## 4. Áudio diegético (ganchos)
 
 - Água gotejando em padrão fractal calculável (Orla, Pântano). Pulso varia conforme zona, sempre matemático.
-- Canto de coruja-Mandelbrot em sequência Fibonacci truncada (3 piados, depois 5, depois 8, reinicia).
+- Canto de coruja-Mandelbrot em sequência recorrente truncada (3 piados, depois 5, depois 8, reinicia).
 - Silêncio cortado em zonas de anomalia GRE: o ambient soundscape simplesmente para, como se alguém tivesse mutado o canal, e volta na saída.
 - Sussurros baixos quase-palavras misturados ao soundscape em borda do Mandelbrot. Não são vozes claras; padrões reconhecíveis ([[lore-bible]] §8.3 canal 2).
 - Tique distante de cronômetro mecânico Era 2 abandonado, ainda funcional, ouvido em ponto profundo da Trilha dos Pioneiros.
@@ -90,7 +90,7 @@ A sensação não é a de aventura selvagem. É a de **estar dentro de algoritmo
 
 *Vinheta 1: Movimento natural fractal puro (Orla Recursiva, meio da tarde).*
 
-A câmera cruza a copa do Orla a três metros do chão. A luz filtra pela copa em raios biolúmen verde-ciano calculáveis. Um anel de cogumelos pulsa em ritmo Fibonacci na base do tronco mais próximo: um, um, dois, três, cinco, oito, reinicia. Uma coruja-Mandelbrot observa de cima sem piscar. Tique. Pisca uma vez. Tique. Pisca três vezes. Tique. Pisca cinco. Um pequeno besouro atravessa a casca de árvore em espiral logarítmica perfeita, sobe e some no buraco de outra árvore que tem o mesmo padrão na entrada. Nada faz barulho exceto a água gotejando no fundo da clareira, e a água gota em padrão que se você prestar atenção é o mesmo da pulsação dos cogumelos só fora de fase em 90 graus. A coruja pisca de novo. Oito vezes. A floresta inteira está em equação.
+A câmera cruza a copa do Orla a três metros do chão. A luz filtra pela copa em raios biolúmen verde-ciano calculáveis. Um anel de cogumelos pulsa em ritmo recorrente na base do tronco mais próximo: um, um, dois, três, cinco, oito, reinicia. Uma coruja-Mandelbrot observa de cima sem piscar. Tique. Pisca uma vez. Tique. Pisca três vezes. Tique. Pisca cinco. Um pequeno besouro atravessa a casca de árvore em espiral logarítmica perfeita, sobe e some no buraco de outra árvore que tem o mesmo padrão na entrada. Nada faz barulho exceto a água gotejando no fundo da clareira, e a água gota em padrão que se você prestar atenção é o mesmo da pulsação dos cogumelos só fora de fase em 90 graus. A coruja pisca de novo. Oito vezes. A floresta inteira está em equação.
 
 *Vinheta 2: Bug-de-mundo (anomalia GRE, fim de tarde).*
 

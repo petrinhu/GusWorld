@@ -1,6 +1,6 @@
 # Stinger Post-Credits Deep-Lore
 
-Seis cenas pós-créditos canônicas. Estrutura coral: cada cena projeta uma sombra residual sobre o final ambíguo da arco principal, sem fechar nenhuma. Ordem de exibição fixa, intercaladas por fade-to-black de 1 segundo entre cada. Duração total: 254 segundos (somatório Fibonacci: 21+34+55+89+34+21).
+Seis cenas pós-créditos canônicas. Estrutura coral: cada cena projeta uma sombra residual sobre o final ambíguo da arco principal, sem fechar nenhuma. Ordem de exibição fixa, intercaladas por fade-to-black de 1 segundo entre cada. Duração total: 254 segundos (somatório recorrente: 21+34+55+89+34+21).
 
 ---
 
@@ -28,7 +28,7 @@ Corte abrupto para preto. Duração canônica: 21 segundos.
 
 Fade-in: sala de cartas do vilarejo Pelicano Branco. Manhã de inverno do Ano 0+1, três meses após o desfecho canônico do arco principal. A luz entra pela janela leste em ângulo baixo, atravessando vidro antigo com pequenas imperfeições que projetam manchas oblongas no piso de madeira.
 
-**Anciã Mariana Vanderbist** está sentada à mesa central. Não há diálogo. Suas mãos, em pele marcada pelo tempo cronístico canon, erguem uma carta selada. O selo é de cera vermelha, espessa, com impressão em relevo. Quando a câmera fecha em macro sobre o selo, o padrão impresso revela-se: matriz de nove células, traçados ortogonais e diagonais, três pontos isolados em posições específicas. O olho atento decifra a estrutura como **Pigpen residual**, gravado de modo a parecer ornamento heráldico genérico para o leigo.
+**Anciã Mariana Vanderbist** está sentada à mesa central. Não há diálogo. Suas mãos, em pele marcada pelo tempo cronístico canon, erguem uma carta selada. O selo é de cera vermelha, espessa, com impressão em relevo. Quando a câmera fecha em macro sobre o selo, o padrão impresso revela-se: matriz de nove células, traçados ortogonais e diagonais, três pontos isolados em posições específicas. O olho atento decifra a estrutura como **cripto-glifo residual**, gravado de modo a parecer ornamento heráldico genérico para o leigo.
 
 Assinatura impressa abaixo do selo: **Bartolomeu Quintino**, codinome Tartaruga-Fractal. O silêncio canônico do Ano 0, em que nenhuma correspondência cruzou de Quintino para fora do isolamento autoimposto, é quebrado por este único objeto.
 
@@ -48,7 +48,7 @@ Câmera em descida vertical contínua, três segundos de queda visual antes do e
 
 O material da câmara é basalto negro pré-Êxodo, datado anterior a -1100, anterior à fundação canônica das Catedrais Neo-Sylvania. Inscrições em **Asmódico** cobrem três das cinco paredes visíveis. A sintaxe é arcaica, anterior à variante consolidada que Bento Requiem ainda recita em canon Era 3.
 
-A câmera lenta percorre a parede sul. Em silhueta projetada por luz fosforescente de origem indeterminada, uma figura semilendária emerge da inscrição: **Helíaco Vyr**, Primeiro Cantor-de-Pedras, paralelo cronístico de Hiram Abiff canon. A silhueta não tem rosto, apenas contorno: braços abertos em ângulo de 47 graus, cabeça inclinada, mãos sustentando ferramenta que não se distingue completamente entre cinzel e diapasão.
+A câmera lenta percorre a parede sul. Em silhueta projetada por luz fosforescente de origem indeterminada, uma figura semilendária emerge da inscrição: **Helíaco Vyr**, Primeiro Cantor-de-Pedras. A silhueta não tem rosto, apenas contorno: braços abertos em ângulo de 47 graus, cabeça inclinada, mãos sustentando ferramenta que não se distingue completamente entre cinzel e diapasão.
 
 Quando a câmera passa pelo centro da figura, o **cripto-glifo canon Era 1** (grade 3×3 com X diagonal e três pontos) ilumina-se em fosforescência azul-fria por exatamente cinco segundos. A iluminação não vem de fonte externa: emana do próprio sulco gravado, como se o basalto estivesse respondendo à passagem da observação.
 
@@ -90,7 +90,7 @@ Fade-in: arquivo subterrâneo da Catedral de São Vargas, profundidade não-prec
 
 Mesa cronística central: microfilme arquivado em cartela de metal escuro, etiqueta manuscrita parcialmente desbotada. Verônica retira o microfilme da cartela, manipula com luvas de algodão, posiciona em projetor cronístico de bancada. Acende.
 
-Projeção em parede branca: texto em pt-arcaico, três parágrafos visíveis, redação densa. Câmera fecha em close-up sobre a parede projetada. O leitor casual percebe apenas prosa técnica de tom monográfico; o espectador com Knowledge alta, treinado em cripto-glifo Era 1, decifra: três das linhas projetadas, dispostas em posições não-óbvias dentro dos parágrafos, formam matriz **Pigpen canon**, idêntica ao selo da carta de Mariana em §2.
+Projeção em parede branca: texto em pt-arcaico, três parágrafos visíveis, redação densa. Câmera fecha em close-up sobre a parede projetada. O leitor casual percebe apenas prosa técnica de tom monográfico; o espectador com Knowledge alta, treinado em cripto-glifo Era 1, decifra: três das linhas projetadas, dispostas em posições não-óbvias dentro dos parágrafos, formam a matriz do **cripto-glifo cifrado**, idêntica ao selo da carta de Mariana em §2.
 
 A coincidência matricial entre os dois objetos (carta de Quintino em Ano 0+1, tratado de Atelaiá em -45) é a pista deliberada: a mesma cifra atravessa 88 anos cronísticos sem ruptura.
 
@@ -110,9 +110,9 @@ Fade para preto. Duração canônica: 34 segundos.
 
 Fade-in: clearing de acaceiros antigos na Selve Sombria, profundidade média, raiz ancestral documentada. Crepúsculo. A luz é quente, ângulo baixo, três tons dominantes: âmbar saturado, vermelho-acaceiro, sombra violácea.
 
-**Acaceiro de tronco vermelho** central no enquadramento, easter egg canon de marcação territorial cerimonial fundadora em Selve. A casca tem textura granulada visível, com fissuras verticais que desenham padrão fractal sub-óbvio. Câmera inicia zoom lento, oito segundos contínuos, em direção a uma folha pequena recém-nascida no galho mais baixo.
+**Acaceiro de tronco vermelho** central no enquadramento, marcação territorial cerimonial fundadora em Selve. A casca tem textura granulada visível, com fissuras verticais que desenham padrão fractal sub-óbvio. Câmera inicia zoom lento, oito segundos contínuos, em direção a uma folha pequena recém-nascida no galho mais baixo.
 
-A folha é jovem, ainda verde-pálida nas bordas, nervuras vermelhas ainda translúcidas. Quando o zoom atinge close-up extremo, o padrão das veias revela-se em macro: a disposição das ramificações compõe matriz **micro-Pigpen**, legível apenas neste grau de aproximação. Nove células, X diagonal, três pontos. Idêntica em estrutura ao selo da carta, ao tratado de Atelaiá, ao cripto-glifo na pedra basáltica.
+A folha é jovem, ainda verde-pálida nas bordas, nervuras vermelhas ainda translúcidas. Quando o zoom atinge close-up extremo, o padrão das veias revela-se em macro: a disposição das ramificações compõe a matriz do **micro cripto-glifo cifrado**, legível apenas neste grau de aproximação. Nove células, X diagonal, três pontos. Idêntica em estrutura ao selo da carta, ao tratado de Atelaiá, ao cripto-glifo na pedra basáltica.
 
 Som ambiente: vento moderado, folhas roçando, ausência de fauna audível. Sob essa camada, em frequência sub-perceptível canonicamente fixada em **21 Hz** (canal-4 bug-Perlin de Patch-Zero, frequência abaixo do espectro audível humano, percebida apenas como pressão), um sussurro começa. Não há linguagem identificável, apenas cadência rítmica de articulação humana.
 

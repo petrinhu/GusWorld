@@ -198,7 +198,7 @@ Convenções de colunas:
 | F096 | COM-JAC/PAT | Bilhete código Pythia bio Mariana: "não passar daqui sem mim ou sem Jaci. Mestre Loanis morreu por seis metros a mais." | Pickup + Mapa | P-OBJ-12 + MAP-08-08 | Knowledge baixa (Jaci lê de primeira) | **Amarela** | Fronteira mortal Selve Profunda. |
 | F101 | COM-JAC/END | Pena de pelicano branco na porta da casa (Mariana a Jaci 5 anos): "ele veio te ver" | Ficha-Mariana (Memória formativa Jaci) | F-NPC-19 + F-JAC-MF-02 | Ouro | **Amarela** + **Azul** | Foreshadow bonus epilogue Ouro. |
 | F102 | COM-JAC | Cordão de cipó trançado Mariana com 11 nós (1 por solstício Jaci) | Ficha-Mariana (detalhe visual) | F-NPC-19 | n/a (visual) | **Amarela** (Ouro: 12º nó adicionado in-frame) | Marca de tempo; em Ouro cresce in-frame epilogue. |
-| F121 | E1/COM-JAC | Espiral Fibonacci sobre folha estilizada bordada em mantos Pelicano Branco | Ficha-Pelicano-Branco | F-FAC-PB | n/a (visual) | **Verde** + **Amarela** | Tradição matemática viva. |
+| F121 | E1/COM-JAC | Espiral logarítmica sobre folha estilizada bordada em mantos Pelicano Branco | Ficha-Pelicano-Branco | F-FAC-PB | n/a (visual) | **Verde** + **Amarela** | Tradição matemática viva. |
 | F124 | STE/COM-JAC | Mariana descobriu drone Sterling camuflado em -0.5 com Tatauín, resolveu não tocar | Ficha-Mariana + Timeline | F-NPC-19 (atualização) + T-(-0.5) | Knowledge média | **Cinza-prateado** + **Amarela** | Escolha tática prudente. |
 
 ### 2.9 Lore-Era 1 / Era 2 / Era 3 ambient ou cross-categoria (F061-F062, F066-F069, F106-F107): 8 plants
@@ -210,7 +210,7 @@ Convenções de colunas:
 | F066 | E2 | Placa latão "EUCALYPTUS-FRACTALIS-7 / -78" Trilha dos Pioneiros (Selve) | Mapa + Pickup leve | MAP-08-09 + P-OBJ-13 | Knowledge baixa | **Verde** | Era 2 catalogou via parceria Berenger-Vanderbist. |
 | F067 | E2 | Placa latão "À PRIMEIRA LINHA QUE COMPILOU, OBRIGADO" no chafariz seco Praça do Compilador | Mapa + Pickup leve | MAP-06-10 + P-OBJ-14 | n/a | **Verde** | Comunidade pré-Sterling cooperativa. |
 | F068 | E2 | Tomo da Pilha Sobrecarregada em sebo aberto Praça do Compilador | Pickup | P-DOC-TPS | n/a (cena 7 `comic-reliefs`) | **Verde** | Documentação coletiva Era 2 continua aberta. |
-| F069 | E1/E2 | Engrenagem-mestre Fibonacci 950 anos altar Catedral Principal | Mapa + Pickup leve | MAP-03-07 + P-OBJ-15 | n/a (visual) | **Verde** | Pillar 2 ao vivo. |
+| F069 | E1/E2 | Engrenagem-mestre de dentes em razão recorrente, 950 anos, altar Catedral Principal | Mapa + Pickup leve | MAP-03-07 + P-OBJ-15 | n/a (visual) | **Verde** | Pillar 2 ao vivo. |
 | F106 | E3/DAN | Festival do Reaproveitamento FIR cínico (novembro), cartazes cobrindo pichações cooperativas | Glossário cultural + Mapa | M-glossario-festivais + MAP-06-11 | n/a | **Verde** (Era 2 sob) + **Cinza-prateado** + **Vermelha** | Era 3 sobrepõe Era 2 ritualmente. |
 | F107 | E2 | Pichação "AINDA SOMOS NÓS" repintada semanalmente no Galpão Cooperativo abandonado | Mapa + Manuscrito leve | MAP-06-12 + M-023 | n/a (visual) | **Verde** | Periferia resiste passivamente. |
 

@@ -64,7 +64,7 @@ Concentração quase-exclusiva em **era-2-boom-tecnico.md §6.3+§6.4+§6.5+§9.
 
 ## LEVES T4 v2 (22)
 
-Ancoragem sinestésica §11 v2 + Fibonacci+maçom densidade — sugestões pontuais não bloqueantes.
+Ancoragem sinestésica §11 v2 + densidade dos motivos recorrentes: sugestões pontuais não bloqueantes.
 
 ## REFATORAÇÃO RECOMENDADA era-2
 
@@ -76,7 +76,7 @@ Alvo:
 - Inserir ancoragem sinestésica por subseção (cheiro de cobre + peso úmido bobinas + tinta sépia + frio granito + couro de bezerro + pavimento tesselado)
 - Mutação vocabular entre cronistas Era 1/Era 2/Era 3
 - Preservar canon factual integral
-- Preservar Fibonacci + maçom pervasive ~10-15%
+- Preservar motivos recorrentes pervasivos
 
 Tamanho refatorado esperado: ~93k pal → ~70-75k pal (-20-25%).
 

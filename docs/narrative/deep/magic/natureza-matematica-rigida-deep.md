@@ -20,14 +20,14 @@ Décadas depois, em -45, a cientista **Verônica Atelaiá** (descendente direta 
 
 Os três rios maiores da Orla Recursiva, o **Verdor**, o **Vesperal** e o **Lentíssimo**, meandram em fractal Mandelbrot real. A medição de Atelaiá (caderno azul, fólio 13) demonstrou que a auto-similaridade se reproduz em pelo menos três escalas verificáveis: traçado kilometrário do leito principal, micro-meandro de afluente menor, recorte de seixos em margem-bandeja. A dimensão fractal estimada nos três rios converge para o intervalo entre 1,21 e 1,34, mesma faixa em que se encaixa a costa do continente Era 1 segundo reconstrução pelos cripto-glifos da catedral submersa. Concidência improvável; canonicamente, evidência de que o substrato natural da Selve não foi alterado pela queda Neo-Sylvania, apenas perdeu seus leitores.
 
-### 2.2 Flora Fibonacci
+### 2.2 Flora em sequência recorrente
 
 A flora da Selve cumpre a sequência com obediência tão constante que os cronistas a chamam de "lei de Atelaiá":
 
 - **Caracóis fluviais** (gênero *Helix recursiva*) constroem concha em espirais de 1, 1, 2, 3, 5, 8 ou 13 voltas conforme estágio de vida; nenhum indivíduo adulto saudável apresenta contagem fora dessa série.
 - **Girassóis sombrios** do Pântano de Markov organizam sementes em duas famílias de espirais cruzadas, sempre na razão 21/34 (índice 8 e 9 da sequência). Indivíduos com razão fora desse par são sintomáticos de infecção runtime.
 - **Pinhas de acaceiro** (tronco vermelho, ver §7) apresentam 8 espirais horárias e 13 antihorárias. O acaceiro é o marker territorial mais confiável da fronteira Selve; sua pinha é o teste botânico de pureza local.
-- **Samambaias L-system** ramificam em 1, 1, 2, 3, 5, 8 níveis por broto conforme idade. Uma samambaia de 8 níveis tem entre 21 e 34 estações de vida (Fibonacci aplicado à idade, não apenas à forma).
+- **Samambaias L-system** ramificam em 1, 1, 2, 3, 5, 8 níveis por broto conforme idade. Uma samambaia de 8 níveis tem entre 21 e 34 estações de vida (sequência recorrente aplicada à idade, não apenas à forma).
 
 ### 2.3 Terreno Perlin
 
@@ -55,7 +55,7 @@ A face é literalmente uma espiral fractal aninhada; ornitólogos da Era 2 levar
 
 ### 3.3 Símio-Fibonacci (*Pan recursivensis*)
 
-Novo canon. Vivem em grupos cuja contagem por clearing obedece estritamente a Fibonacci: solitários em clareira de borda (1), pares estáveis em segunda fronteira (1), trios em terça (2), e assim por diante até bandos máximos de 89 indivíduos em clareiras-mãe profundas (raras, três conhecidas em toda a Orla Recursiva). Indivíduos isolados são jovens em rito de dispersão; bandos de 5 são unidades expedicionárias adultas; bandos de 8 ou 13 incluem ancião. HP 34, dano 13. A 47ª proposição (pitágoras três-quatro-cinco) é o triângulo de posicionamento defensivo natural que assumem quando ameaçados, e a cronista-cataloguista que primeiro mediu o ângulo, **Anhuera Vanderbist** (co-autora canônica do Pythia, pioneira bio-hacker, expedição de catalogação -95 a -89 na Orla Recursiva profunda), deixou registro de campo que mais tarde se descobriu coincidir com a geometria sacra dos canteiros de obra Neo-Sylvania Era 1. Coincidência improvável; canonicamente, evidência de continuidade biocultural entre matemática profunda da Selve e arquitetura cerimonial Pré-Código.
+Novo canon. Vivem em grupos cuja contagem por clearing obedece estritamente à sequência recorrente: solitários em clareira de borda (1), pares estáveis em segunda fronteira (1), trios em terça (2), e assim por diante até bandos máximos de 89 indivíduos em clareiras-mãe profundas (raras, três conhecidas em toda a Orla Recursiva). Indivíduos isolados são jovens em rito de dispersão; bandos de 5 são unidades expedicionárias adultas; bandos de 8 ou 13 incluem ancião. HP 34, dano 13. A 47ª proposição (pitágoras três-quatro-cinco) é o triângulo de posicionamento defensivo natural que assumem quando ameaçados, e a cronista-cataloguista que primeiro mediu o ângulo, **Anhuera Vanderbist** (co-autora canônica do Pythia, pioneira bio-hacker, expedição de catalogação -95 a -89 na Orla Recursiva profunda), deixou registro de campo que mais tarde se descobriu coincidir com a geometria sacra dos canteiros de obra Neo-Sylvania Era 1. Coincidência improvável; canonicamente, evidência de continuidade biocultural entre matemática profunda da Selve e arquitetura cerimonial Pré-Código.
 
 ### 3.4 Salamandra-Perlin (*Salamandra coherens*)
 
@@ -102,13 +102,13 @@ Os óculos táticos, primeiro vértice do triângulo de hardware do Gus, executa
 
 O scan tem dois limites canônicos. Primeiro, exige que a equação esteja na base de dados local do Diário do Gus; entidades não-catalogadas retornam apenas "perfil parcial, oitavas 1 e 2 estáveis, oitava 3 não convergente". Segundo, **Patch-Zero não decodifica**: ao mirar qualquer dos quatro canais, o óculos retorna a string de erro canônica do C-Arcane runtime, "exceção não-determinística: padrão fora de fechamento", em vermelho 21 lúmens (não cyan), e a lente esfria 3 graus por causa de proteção térmica do circuito. É um dos jumpscares atmosféricos canônicos do jogo.
 
-## §7. Easter eggs canônicos pervasivos
+## §7. Motivos canônicos pervasivos
 
-A matemática rígida da Selve carrega, embutidos no próprio tecido descritivo, dois sistemas de easter eggs sutis que recorrem por toda a tese e por toda a deep-lore subsequente. Não há siglas ostensivas, não há gestos rituais nomeados; o leitor familiar reconhece, o leigo apenas sente a coerência sem nomeá-la.
+A matemática rígida da Selve carrega, embutidos no próprio tecido descritivo, dois conjuntos de motivos sutis que recorrem por toda a tese e por toda a deep-lore subsequente. Eles não se anunciam: o leitor familiar reconhece, o leigo apenas sente a coerência sem nomeá-la.
 
-**Árvores marco Fibonacci** distribuem-se pela Orla Recursiva em alturas escalonadas: 3, 5, 8, 13, 21 metros. Cada altura corresponde a uma idade canônica do bosque, e os cronistas usam essas árvores como marcadores de cartografia temporal. **Fauna em grupos Fibonacci**: já abordada no bestiário (§3), mas é estrutural à ecologia da região, não decoração.
+**Árvores marco** distribuem-se pela Orla Recursiva em alturas escalonadas: 3, 5, 8, 13, 21 metros. Cada altura corresponde a uma idade canônica do bosque, e os cronistas usam essas árvores como marcadores de cartografia temporal. **Fauna em grupos numéricos recorrentes**: já abordada no bestiário (§3), mas é estrutural à ecologia da região, não decoração.
 
-**Maçom 3-5-7** como degraus de iniciação aplicados a marker biológico canônico: três indivíduos juvenis para raposa-fractal são unidade familiar mínima; cinco corujas-Mandelbrot adultas formam parlamento de caça; sete símios-Fibonacci anciãos constituem conselho de bando-mãe. A escalada 3-5-7 não é coincidência; é o esqueleto cardinal das transições de fase ecológica da Selve.
+**A escalada 3-5-7** aplica-se a marker biológico canônico: três indivíduos juvenis para raposa-fractal são unidade familiar mínima; cinco corujas-Mandelbrot adultas formam parlamento de caça; sete símios anciãos constituem conselho de bando-mãe. A escalada 3-5-7 não é coincidência; é o esqueleto cardinal das transições de fase ecológica da Selve.
 
 **A 47ª proposição** de Euclides (pitágoras, três por quatro por cinco) aplica-se literalmente em medições cronistas. Atelaiá Chevalier usou-a 21 vezes em seu catálogo, sempre nomeada in-world como "proposição da bandeja", em referência à bandeja de medição que os cronistas Era 2 levavam a campo. Hoje a expressão é coloquial: "puxa a bandeja" significa "mede direito antes de afirmar".
 

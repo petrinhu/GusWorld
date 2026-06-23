@@ -14,7 +14,7 @@
 
 **Anaximandro Vyrcátrix.** Irmão de Hyperion Vyrcátrix, Era 1, comissário-centralizador, executor da absorção dos vilarejos cooperativos pelo banco central. Trajetória paralela ao irmão místico. *Cross-ref:* deep/eras/era-1-pre-codigo.md §7.5.
 
-**Anciã Mariana Vanderbist.** 89 anos (canon Fibonacci), líder informal do vilarejo do Pelicano Branco, avó de Jaci, figura central da facção Selve Sombria. Sabe ler a Selve há décadas. Assumiu guarda de Jaci após surto silencioso de -8 que matou Lia e Solano. *Cross-ref:* factions.md §4; characters/jaci-proxy.md.
+**Anciã Mariana Vanderbist.** 89 anos, líder informal do vilarejo do Pelicano Branco, avó de Jaci, figura central da facção Selve Sombria. Sabe ler a Selve há décadas. Assumiu guarda de Jaci após surto silencioso de -8 que matou Lia e Solano. *Cross-ref:* factions.md §4; characters/jaci-proxy.md.
 
 **Anelida Recursiva.** Ver Orla Recursiva.
 
@@ -24,7 +24,7 @@
 
 **Anomalia Primeira.** Primeira manifestação canônica documentada de Patch-Zero, registrada em margem rúbrica de manuscrito da Catedral-Mãe submersa em -820 (Era 1 tardia). Três caracteres não pertencentes a alfabeto conhecido, descritos pelo escriba como "ruído que não fecha" e transliterados por Mestre Velhusto contemporâneo como "o limite que escolheu falar". *Cross-ref:* deep/antagonists/patch-zero-deep.md §1; deep/magic/natureza-matematica-rigida-deep.md §5.1; lore-bible.md §13.
 
-**Anti-padrão.** Característica ontológica primária de Patch-Zero, oposta à matemática rígida da Selve. Onde Patch-Zero passa, Fibonacci falha localmente, ruído coerente vira ruído genuíno, Knowledge Progression é invalidada para inimigos contaminados. *Cross-ref:* lore-bible.md §8.1.
+**Anti-padrão.** Característica ontológica primária de Patch-Zero, oposta à matemática rígida da Selve. Onde Patch-Zero passa, as sequências numéricas recorrentes falham localmente, ruído coerente vira ruído genuíno, Knowledge Progression é invalidada para inimigos contaminados. *Cross-ref:* lore-bible.md §8.1.
 
 **Apex-Data Systems.** Primeiro conglomerado canibalizado por Sterling Locke (Chapter 11 em -19). Sterling assumiu CTO em -22, induziu falência calculada, saiu com código-fonte de autenticação central da metrópole. Inácia Berenger (mãe Cauã) demitida nesse processo. *Cross-ref:* lore-bible.md §3 Era 3; timeline.md -22 a -19.
 
@@ -178,7 +178,7 @@
 
 **Dragon Victory.** Mecânica épica canônica de luta final 2ª fase contra Sterling Locke. Resgate temático ancestral de Pyotor I Draco Vance da Era 1 sobreposto a Vyrdragon. Pré-condição: Gus perdoou Dante (chantagem Edilma Caverna dos Perdidos). Trigger expandido: 10% HP Sterling OU menos de 3% HP Gus OU party all KO OU 3+ combos consecutivos. Aura gradient cyan a vermelho carmesim. Fireball 100% certeiro. Sterling escape ambíguo. *Cross-ref:* memory/project_dragon_victory_canon.md; deep/ontologia/leitmotivs-deep.md §5.
 
-**Dragon Victory leitmotif.** Tema climático canônico do projeto. Quatro camadas simultâneas: leitmotiv conduzido em violino solista, lastro de cordas plenas em divisi, sub-bass orgânico em pulsação Fibonacci, sinos cerimoniais com cordão de 89 golpes distribuídos. Crossfade unidirecional de cyan analítico (Gus "Vector") para vermelho carmesim Vyrdragon. *Cross-ref:* deep/ontologia/leitmotivs-deep.md §5.
+**Dragon Victory leitmotif.** Tema climático canônico do projeto. Quatro camadas simultâneas: leitmotiv conduzido em violino solista, lastro de cordas plenas em divisi, sub-bass orgânico em pulsação recorrente, sinos cerimoniais com cordão de 89 golpes distribuídos. Crossfade unidirecional de cyan analítico (Gus "Vector") para vermelho carmesim Vyrdragon. *Cross-ref:* deep/ontologia/leitmotivs-deep.md §5.
 
 **DRE (Dynamic-Runtime Evaluation).** Paradigma canônico de Sterling Locke. Máquina virtual universal interpretada, capaz de reescrever a sintaxe do mundo em runtime. Anti-tese ideológica de C-Arcane (que respeita o hardware). Tese de doutorado Sterling publicada em -25 e rejeitada pela academia ortodoxa. *Cross-ref:* lore-bible.md §3 Era 3; deep/magic/4-linguagens-deep.md §6; characters/prelore_vilao.md.
 
@@ -214,7 +214,7 @@
 
 **Festa da Compilação.** Festividade canônica anual, 1º de setembro (primavera hemisfério sul). Aniversário da primeira linha C-Arcane compilada em -150. Cooptada por Sterling Corp para propaganda; resistência popular mantém versão comunitária. *Cross-ref:* tradicoes-cultura.md §1; lore-bible.md §11.2.
 
-**Fibonacci canônica.** Sequência canon 1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144 que rege flora, fauna, contagens, HP, dano, loot, proporções visuais, compassos sonoros, durações narrativas pervasivamente pela obra. Densidade alvo 10 a 20%, easter egg #1 do projeto. Caracóis em espirais Fibonacci, girassóis em razão 21/34, pinhas de acaceiro 8/13, samambaias L-system em níveis Fibonacci. *Cross-ref:* memory/project_fibonacci_easter_egg.md; deep/magic/natureza-matematica-rigida-deep.md §2.2.
+**Sequência recorrente canônica.** Sequência canon 1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144 que rege flora, fauna, contagens, HP, dano, loot, proporções visuais, compassos sonoros, durações narrativas pervasivamente pela obra. Motivo numérico pervasivo discreto. Caracóis em espirais logarítmicas, girassóis em razão 21/34, pinhas de acaceiro 8/13, samambaias L-system em níveis sucessivos da sequência. *Cross-ref:* deep/magic/natureza-matematica-rigida-deep.md §2.2.
 
 **Filomena Garda.** Adepta Cult Mirage, cataloga sem decifrar gradient violeta-magenta-cyan. NPC ambiental das Catacumbas Cult. *Cross-ref:* deep/characters/iara-lumen.md R4; CHARS.md §6.
 
@@ -442,7 +442,7 @@
 
 **Selve Profunda.** Setting principal #8, núcleo central da Selve. Cross-eras (densa Era 3). Cenário do climax ato 3. Inclui Núcleo Mandelbrot Interno e Câmara Neo-Sylvania de Coleta de DNA. *Cross-ref:* environments/08-selve-profunda.md; PLACES.md §1.
 
-**Selve Sombria.** Setting principal #2 e facção natural #4. Floresta-fronteira leste da cidade. Ecossistema sobrevivente Era 1, auto-organizado em padrões matemáticos (Mandelbrot, Fibonacci, Perlin, Voronoi, L-systems). Hostil a quem ignora regras; legível para quem aprende. Três regiões: Orla Recursiva, Pântano de Markov, Núcleo Mandelbrot. *Cross-ref:* lore-bible.md §6; environments/02-selve-sombria.md.
+**Selve Sombria.** Setting principal #2 e facção natural #4. Floresta-fronteira leste da cidade. Ecossistema sobrevivente Era 1, auto-organizado em padrões matemáticos (Mandelbrot, sequência recorrente, Perlin, Voronoi, L-systems). Hostil a quem ignora regras; legível para quem aprende. Três regiões: Orla Recursiva, Pântano de Markov, Núcleo Mandelbrot. *Cross-ref:* lore-bible.md §6; environments/02-selve-sombria.md.
 
 **Setor Mirage.** Setting principal #5, distrito de entretenimento. Holo-publicidade sobreposta, refração instável, desorientação espacial. Sede da Cult Mirage. Companion-âncora: Iara "Lumen" Koslov. *Cross-ref:* lore-bible.md §5.1; environments/05-setor-mirage.md.
 
@@ -546,7 +546,7 @@
 
 ## Y
 
-**Yakov Vance ("Tio Yakov").** Tio paterno do Gus, irmão mais novo de Pyotor (quatro anos a menos). Um dos melhores engenheiros de software do reino e geólogo. Trabalha na maior mineradora do reino. Inovação canon: maior sistema de segurança contra acidentes em minas com veículos (mortalidade reduzida 89%, Fibonacci). Apresentou xadrez ao Gus (complementar à programação de Pyotor). *Cross-ref:* CHARS.md §4; memory/project_familia_vance_canonica.md.
+**Yakov Vance ("Tio Yakov").** Tio paterno do Gus, irmão mais novo de Pyotor (quatro anos a menos). Um dos melhores engenheiros de software do reino e geólogo. Trabalha na maior mineradora do reino. Inovação canon: maior sistema de segurança contra acidentes em minas com veículos (mortalidade reduzida 89%). Apresentou xadrez ao Gus (complementar à programação de Pyotor). *Cross-ref:* CHARS.md §4; memory/project_familia_vance_canonica.md.
 
 **Yara Ducourt.** 32 anos, performadora-artista da resistência interna do Cult Mirage (facção artista). Especialista canônica em dança holográfica gradient violeta-magenta-cyan, paleta cromática consistente com a Cult Mirage canon. Foi aprendiz de Marlena Aurora antes da detenção desta em -3 pós manifestação dissidente. Atualmente opera em ateliê clandestino subterrâneo do Setor Mirage. Pista decisiva em sub-quest Iara avançada (gated Knowledge alta) sobre a estrutura do Festival de Atualização Sensorial. Ex-amante de Patrício Velô, o que abre rota narrativa cruzada para acesso a informação contextual interna da Cult. Aliado passivo na rota Iara. *Cross-ref:* environments/05-setor-mirage.md; characters/iara-lumen.md; CHARS.md §7.
 

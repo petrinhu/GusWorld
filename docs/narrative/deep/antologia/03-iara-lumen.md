@@ -46,7 +46,7 @@ Filomena sobe as últimas três escadas. Três é número honesto. Ela traz uma 
 
 "Resto", ela diz. "Resto de coisa que ninguém quis guardar."
 
-Eu abro a caixa. Dentro: uma única fita de gravação holo antiga, fina, retangular, oito centímetros por treze, dessa medida que ninguém fabrica mais faz vinte e um anos. O selo lateral está intacto. O selo lateral é a parte interessante: três pontos, dois traços, um arco. Padrão Pigpen residual. Eu vi padrão Pigpen residual três vezes na vida; sempre em material da Cult Mirage anterior à reorganização administrativa de menos vinte e um. Sempre em material que mencionava a fundadora original que ninguém menciona.
+Eu abro a caixa. Dentro: uma única fita de gravação holo antiga, fina, retangular, oito centímetros por treze, dessa medida que ninguém fabrica mais faz vinte e um anos. O selo lateral está intacto. O selo lateral é a parte interessante: três pontos, dois traços, um arco. Padrão cifrado residual. Eu vi esse padrão cifrado residual três vezes na vida; sempre em material da Cult Mirage anterior à reorganização administrativa de menos vinte e um. Sempre em material que mencionava a fundadora original que ninguém menciona.
 
 "De onde?" eu pergunto.
 
@@ -58,7 +58,7 @@ Filomena não diz "Sonja". Filomena não diz "Adila". Ela diz "seu interesse", e
 
 "Não. Eu não tenho mais equipamento. E não é pra mim."
 
-Eu olho a fita. Oito por treze. Selo Pigpen. Conteúdo desconhecido. Eu agradeço com um aceno minúsculo, dois graus de cabeça. Filomena devolve o aceno em um grau e meio. A gente se entende.
+Eu olho a fita. Oito por treze. Selo cifrado. Conteúdo desconhecido. Eu agradeço com um aceno minúsculo, dois graus de cabeça. Filomena devolve o aceno em um grau e meio. A gente se entende.
 
 Ela desce. Eu fico.
 
@@ -80,7 +80,7 @@ A fita termina.
 
 A campanha jamais foi anunciada publicamente. Sonja nunca apareceu de novo. A versão pública que Adila sustenta há trinta e quatro anos é que Sonja "se afastou por motivo de saúde e continua em retiro contemplativo, sem comunicação por escolha pessoal". Nunca houve corpo. Nunca houve atestado. Nunca houve fotografia recente, nunca houve gravação de voz posterior, nunca houve sequer carta interna que Adila pudesse exibir num momento de pressão administrativa. Sonja sumiu como personagem é cortado do roteiro entre uma versão de ensaio e a final, sem rasura, sem cicatriz, apenas ausência onde antes havia presença. Sterling Corp tem ficha (eu sei porque a Adila tem cópia da ficha em uma pasta que ela me deixou ver aos onze anos, ato de confiança calculado pra me amarrar), e na ficha Sterling Corp consta apenas: "Sonja Murmúrio, óbito, ano menos trinta e quatro, mês oito, dia treze, causa não especificada, atestado lavrado em arquivo interno Cult Mirage não disponibilizado a terceiros".
 
-Trinta e quatro anos. Adila nunca admitiu publicamente. Tem material residual de campanha onde a projeção da Adila daquela época usa padrão Pigpen no selo lateral, e o padrão Pigpen do selo é cifra para localização do arquivo morto, e o arquivo morto guarda a gravação que a Adila apagou da memória oficial mas não conseguiu apagar do material físico, porque material físico resiste, material físico é sucata honesta.
+Trinta e quatro anos. Adila nunca admitiu publicamente. Tem material residual de campanha onde a projeção da Adila daquela época usa padrão cifrado no selo lateral, e o padrão cifrado do selo é cifra para localização do arquivo morto, e o arquivo morto guarda a gravação que a Adila apagou da memória oficial mas não conseguiu apagar do material físico, porque material físico resiste, material físico é sucata honesta.
 
 Eu desligo o leitor. Guardo a fita na caixa. Guardo a caixa no bolso interno do casaco, próximo à costela esquerda, onde o calor do corpo amortece e ninguém detecta. Catalogo. Não vou usar agora. Vou esperar a hora. A gente Koslov faz assim. Espera o silêncio cozinhar.
 
@@ -148,7 +148,7 @@ Ele desce. Eu fico.
 
 Os cinco clones acima de mim pulsam em sincronia perfeita. Eu olho pra eles e penso: cada um é um dialeto silencioso de mim. Não cópia, dialeto. Cópia é replicação. Dialeto é variação interna, é a mesma língua falada em outro lugar do tempo. Cinco lugares do meu tempo flutuam sobre o telhado da Lavanderia Vyr e nenhum deles está conversando com o outro, nenhum deles sabe da existência do outro, e por isso são honestos. Versão de mim que não dialoga com versão de mim é versão preservada. A Adila tentou me fundir em uma única projeção contínua, "querida você é uma artista única", e eu resisti sem saber que estava resistindo, eu mantive os meus eus em compartimentos estanques, e hoje cada compartimento sobe num clone diferente e respira sozinho. O clone norte é a Iara dos quatro anos, deixada à porta da catedral menor, registro civil ainda não escrito. O clone nordeste é a Iara dos seis, primeira sessão com Adila, ainda sem fissura. O clone leste é a Iara dos oito, primeira fissura, ar de três cores. O clone sudeste é a Iara dos nove, primeira vez decifrando mentira direta de Adila atrás da cortina dos bastidores. O clone sul é a Iara dos onze, dezessete minutos lendo a planilha Sterling, decidindo, fechando, saindo pelo portão de serviço às quatro da manhã.
 
-E eu, no centro, sou a Iara dos doze. A Iara que recebe fita de Filomena Garda, café de Cleomir Vasta, e silêncio de Sonja Murmúrio que morreu vinte e dois anos antes de eu nascer e que ainda assim me deixou recado por cifra Pigpen em material residual de campanha.
+E eu, no centro, sou a Iara dos doze. A Iara que recebe fita de Filomena Garda, café de Cleomir Vasta, e silêncio de Sonja Murmúrio que morreu vinte e dois anos antes de eu nascer e que ainda assim me deixou recado por cifra residual em material de campanha.
 
 Eu desativo os clones em ordem Fibonacci reversa. Cinco primeiro. O clone do sul apaga, último a nascer, primeiro a apagar, e por um segundo eu sinto vazio na lateral direita do corpo, como se um pedaço de mim aos onze anos tivesse se despedido. Três depois. O clone leste apaga, Iara dos oito anos se vai, e o ar do telhado volta a ter só duas cores. Dois depois. O clone nordeste apaga, Iara dos seis se vai, e Adila perde uma das versões de mim que ainda poderia interrogar em sonho. Um depois. O clone norte apaga, Iara dos quatro se vai, e o portão de serviço da catedral menor onde fui deixada na chuva se fecha por dentro pela primeira vez em doze anos. Um por último. O clone nordeste residual, redundância higiênica, apaga, e o telhado fica vazio menos por mim.
 

@@ -32,7 +32,7 @@ Scan é **passivo-ambiente contínuo** fora de combate (não consome AP, que só
 
 - **Alcance:** raio fixo ao redor de Gus (proposta: ~8m em escala de blockout; calibrar em F2-G.EXPLORE). Fora do raio, nós aparecem como silhueta neutra; dentro do raio, revelam tipo + 1 dado.
 - **O que revela por tipo de nó:** combate = fraqueza-âncora prevista (se já scaneado antes em batalha, herda Knowledge); puzzle = vetor da patrulha/projétil; lore = "decifrável" + dica de método; terminal = "interativo via carta X".
-- **Padrão matemático do bioma (GDD §6.1):** ao scanear flora/estrutura da cidade, Óculos expõem o padrão (Fibonacci nas fachadas, grade ortogonal do circuito). Decifrar o padrão abre passagem ou expõe um "bug" escondido (nó de combate oculto). Easter egg pervasivo, não narrado.
+- **Padrão matemático do bioma (GDD §6.1):** ao scanear flora/estrutura da cidade, Óculos expõem o padrão (sequência numérica recorrente nas fachadas, grade ortogonal do circuito). Decifrar o padrão abre passagem ou expõe um "bug" escondido (nó de combate oculto).
 - **Onboarding (F2-D.6):** o 1º nó de lore ensina Scan-overworld antes de qualquer combate. "Aponte o olhar, leia o padrão" via affordance visual, sem wall-of-text (anti-pillar).
 
 ## 4. Gatilho de combate

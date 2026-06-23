@@ -101,7 +101,7 @@ Cada mapa segue padrão fixo:
 
 ### Mapa 2: Selve Sombria (Orla Recursiva + Pântano Markov + Núcleo Mandelbrot Externo)
 
-> *Visual:* traçado mais orgânico. Sem grid. Trilhas em padrão **L-system** visível (Gus desenhou explicitamente ramificações em ângulo Fibonacci 3 vezes recursivo). Pântano de Markov representado em malha estocástica (Gus rascunhou em lápis fraco: "nada aqui é determinístico em pequena escala, mas é em larga escala. é só esperar."). Núcleo Mandelbrot Externo: clareira com geometria sutilmente não-euclidiana (desenho falha de propósito; canto da página dobrado pra "encaixar"; piada visual diegética).
+> *Visual:* traçado mais orgânico. Sem grid. Trilhas em padrão **L-system** visível (Gus desenhou explicitamente ramificações em ângulo de razão recorrente, 3 vezes recursivo). Pântano de Markov representado em malha estocástica (Gus rascunhou em lápis fraco: "nada aqui é determinístico em pequena escala, mas é em larga escala. é só esperar."). Núcleo Mandelbrot Externo: clareira com geometria sutilmente não-euclidiana (desenho falha de propósito; canto da página dobrado pra "encaixar"; piada visual diegética).
 
 **Topologia.** Floresta densa biolúmen ciano-verde (Orla); brejo com névoa probabilística (Pântano); clareira geometricamente impossível (Mandelbrot Externo). Gateway natural a partir do Anel Verde (Mapa 1).
 

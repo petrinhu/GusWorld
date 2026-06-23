@@ -859,7 +859,7 @@ GUS
 
 ---
 
-## Easter Eggs: homenagens diégeticas
+## Homenagens diégeticas
 
 Referências reconhecíveis sem violação de marca. Cada uma redirige pra elemento diégetico do mundo GusWorld. **Aparecem como flavor opcional, não críticas ao caminho principal.**
 

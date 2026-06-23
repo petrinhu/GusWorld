@@ -69,7 +69,7 @@ docs/narrative/deep/
 ├── magic/                          # Sistema mágico formal (~10k)
 │   ├── glyph-token-conjuro-codex.md   # Metafísica formal (~3k)
 │   ├── linguagens-magicas.md          # C-Arcane/Asmódico/Óxido/Pythia deep (~4k)
-│   └── natureza-matematica.md         # Pillar 2 expansão fractais/Fibonacci/ruído (~3k)
+│   └── natureza-matematica.md         # Pillar 2 expansão fractais/sequência recorrente/ruído (~3k)
 ├── ontologia/                      # Conceito macro (~8k)
 │   ├── tecnologia-3-eras.md        # Hardware/substrato 3 eras (~3k)
 │   ├── cosmologia.md               # Pós-apocalipse digital sem meta-sim (~3k)

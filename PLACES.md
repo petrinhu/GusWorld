@@ -63,7 +63,7 @@
 
 ## 4b. Clãs vilarejos-fronteira menores (Selve oriental, anel menor não-Êxodo)
 
-Canon F5-BK.AUDIT T2-C3 resolução "modelo dois-anéis": 10 vilarejos pós-Êxodo (§4 + §5b = 7+3) + 3 clãs menores anel oriental tributária NÃO-Êxodo = 13 vilarejos total (Fibonacci canon).
+Canon F5-BK.AUDIT T2-C3 resolução "modelo dois-anéis": 10 vilarejos pós-Êxodo (§4 + §5b = 7+3) + 3 clãs menores anel oriental tributária NÃO-Êxodo = 13 vilarejos total (valor recorrente canon).
 
 | Nome | Tipo | Era | Localização canon | Status | Cross-ref |
 |---|---|---|---|---|---|
@@ -80,7 +80,7 @@ Canon F5-BK.AUDIT T2-C3 resolução "modelo dois-anéis": 10 vilarejos pós-Êxo
 | **Tetra-Torre Janelarum** | Sub-local (Núcleo) | 3 | Lado norte Núcleo | ✅ canônico | `environments/01-cidade-cyber-gotica.md` |
 | **Mercado da Sucata Honesta** | Sub-local (Núcleo↔Periferia) | 2+3 | Zona-charneira | ✅ canônico | `environments/01-cidade-cyber-gotica.md` |
 | **Edifício Vance** | Sub-local (Núcleo) | 2 (~-90 a -70) | Lado leste Núcleo, apartamento Vance 6º andar | ✅ canônico (safe base Gus) | `environments/01-cidade-cyber-gotica.md` |
-| **Setor Tavus** | Sub-local (Núcleo GusWorld City) | 2+3 | Histórico Núcleo Metropolitano. Residência linhagem Vance pós-Gustaf I (**-150 fundação Setor Tavus**, mesmo ano da primeira linha C-Arcane compilada; antecede em 10 anos a fundação formal de GusWorld City em -140 sobre sítio Neo-Sylvania de superfície). Preservado pela tradição canon Tavus. 21 quadras iniciais traçadas por Gustaf I em proporção razão acaceiro (Fibonacci) | ✅ canônico | `CHARS.md` §4 + `deep/antologia/10-pyotor-vance-pai.md` R9 + `timeline.md` -150/-140 |
+| **Setor Tavus** | Sub-local (Núcleo GusWorld City) | 2+3 | Histórico Núcleo Metropolitano. Residência linhagem Vance pós-Gustaf I (**-150 fundação Setor Tavus**, mesmo ano da primeira linha C-Arcane compilada; antecede em 10 anos a fundação formal de GusWorld City em -140 sobre sítio Neo-Sylvania de superfície). Preservado pela tradição canon Tavus. 21 quadras iniciais traçadas por Gustaf I em proporção razão acaceiro (valor recorrente) | ✅ canônico | `CHARS.md` §4 + `deep/antologia/10-pyotor-vance-pai.md` R9 + `timeline.md` -150/-140 |
 | **Anel Verde** | Sub-local (fronteira) | 2 | Fronteira leste Cidade, entrada Selve | ⚪ abandonado funcional (checkpoint FIR corrompido) | `environments/01-cidade-cyber-gotica.md` |
 | **Cúpula Sterling** | Sub-local (Núcleo) | 3 | Skyline tumoral cresce ato 2/3, sede Sterling Corp | ✅ canônico (climax ato 3 setting variação) | `lore-bible.md` + `in-world-docs.md` |
 | **Subestação 7** | Sub-local (Dutos) | 3 | Dutos Infernais | 💀 destruído (alvo Sterling -5, morte Davi Berenger aos 16; Cauã tinha 8) | `characters/caua-volt.md` + `in-world-docs.md` DD-013 |

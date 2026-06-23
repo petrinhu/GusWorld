@@ -75,17 +75,17 @@ LOMBADAS ALINHADAS (canto inferior, padrão 4 livros):
 
 ## PARTE I: PROTAGONISTA
 
-**Função:** abrir o volume na voz que sustenta o jogo. Gus aos onze anos numa manhã chuvosa, contando pingo em Fibonacci, esperando rotina compilar no Tavus-Drive. Tom prodígio analítico mas criança real: chupa bala de morango, fica bravo com Cauã no jogo de cartas. Estabelece registro autoral do volume todo: prosa observacional minuciosa, primeira pessoa, sem em-dash, sem floreio.
+**Função:** abrir o volume na voz que sustenta o jogo. Gus aos onze anos numa manhã chuvosa, contando pingo em sequência recorrente, esperando rotina compilar no Tavus-Drive. Tom prodígio analítico mas criança real: chupa bala de morango, fica bravo com Cauã no jogo de cartas. Estabelece registro autoral do volume todo: prosa observacional minuciosa, primeira pessoa, sem em-dash, sem floreio.
 
 **Estimativa parte:** ~2.746 pal / ~10 pp
 
 ---
 
-### Conto 1: Gus Gustaf VII Vance, A Manhã do Pingo em Fibonacci
+### Conto 1: Gus Gustaf VII Vance, A Manhã do Pingo em Sequência Recorrente
 
 | Componente | Fonte | Palavras | Páginas | Nota revisão |
 |---|---|---|---|---|
-| Texto do conto (10 seções §I-§X) | `docs/narrative/deep/antologia/01-gus-gustaf-vii.md` | ~2.746 | ~10 | extrair íntegra; checar densidade Fibonacci §I + maçom (acaceiro tronco vermelho §I) já validados |
+| Texto do conto (10 seções §I-§X) | `docs/narrative/deep/antologia/01-gus-gustaf-vii.md` | ~2.746 | ~10 | extrair íntegra; checar densidade dos motivos numéricos §I + cerimoniais fundadores (acaceiro tronco vermelho §I) já validados |
 | Cabeçalho editorial (codinome, idade, setting, ano cronístico) | editorial direto | ~0.05 | ~0.5 | template repetido em todos 14 contos |
 | Cesura final (filete tipográfico, ornamento discreto, esquadro miniatura) | editorial direto | (sem) | (sem) | espaçamento pós-conto |
 
@@ -149,7 +149,7 @@ LOMBADAS ALINHADAS (canto inferior, padrão 4 livros):
 
 | Componente | Fonte | Palavras | Páginas | Nota revisão |
 |---|---|---|---|---|
-| Texto do conto | `docs/narrative/deep/antologia/06-dante-grid.md` | ~3.379 | ~11 | extrair íntegra; voz estoica-fraternal **ato 1-2 antes da traição**; CUIDADO EDITORIAL: este conto é o *layer superficial* sincero, leitor sente a fraternidade real antes de descobrir (no jogo / Vol 1 Cap 9.6) a chantagem Edilma. Não vazar reveal aqui. Easter egg canon (esquadro do bisavô) ostensivo no título mas justificado in-world (oficina de marcenaria avô) |
+| Texto do conto | `docs/narrative/deep/antologia/06-dante-grid.md` | ~3.379 | ~11 | extrair íntegra; voz estoica-fraternal **ato 1-2 antes da traição**; CUIDADO EDITORIAL: este conto é o *layer superficial* sincero, leitor sente a fraternidade real antes de descobrir (no jogo / Vol 1 Cap 9.6) a chantagem Edilma. Não vazar reveal aqui. Motivo canon (esquadro do bisavô) ostensivo no título mas justificado in-world (oficina de marcenaria avô) |
 | Nota editorial in-tomo | editorial direto | ~0.1 | ~0.5 | **uma frase** no cabeçalho: "Versão pessoal recolhida três meses antes de Ano 0. Compare com leituras posteriores do mesmo autor." Sinal sutil sem spoiler |
 | Cabeçalho editorial | editorial | ~0.05 | (sem) | (sem) |
 
@@ -339,7 +339,7 @@ LOMBADAS ALINHADAS (canto inferior, padrão 4 livros):
 
 | Componente | Fonte | Palavras | Páginas | Nota revisão |
 |---|---|---|---|---|
-| Texto do conto | `docs/narrative/deep/antologia/12-ancia-mariana-vanderbist.md` | ~3.456 | ~12 | extrair íntegra; voz matriarca oral, tradição vilarejo-fronteira, avó Jaci (linhagem cross-ref Conto 7 + Cap 11.3 Vol 1), cordão 89 nós (easter egg canon) discreto em material de bordado |
+| Texto do conto | `docs/narrative/deep/antologia/12-ancia-mariana-vanderbist.md` | ~3.456 | ~12 | extrair íntegra; voz matriarca oral, tradição vilarejo-fronteira, avó Jaci (linhagem cross-ref Conto 7 + Cap 11.3 Vol 1), cordão 89 nós (motivo canon) discreto em material de bordado |
 | Cabeçalho editorial | editorial | ~0.05 | (sem) | (sem) |
 
 **Subtotal Conto 12:** ~3.5k pal / ~12 pp
@@ -348,7 +348,7 @@ LOMBADAS ALINHADAS (canto inferior, padrão 4 livros):
 
 ## PARTE V: CRONISTAS ANCESTRAIS
 
-**Função:** dois contos que saem da Era 3 (presente do jogo) e mergulham em camadas anteriores: Verônica Atelaiá no ano cronístico -45 (paleógrafa contratada arquivo Catedral São Vargas; cronista *avant la lettre* de Patch-Zero), Mestre Helíaco Vyr na Era 1 (~ano -850, Primeiro Cantor-de-Pedras, fragmento litúrgico). Tom: prosa Stephenson denso para Verônica; voz litúrgica primeira-pessoa-da-câmara para Helíaco. Estes contos fecham o Vol 2 e empurram o leitor pra Era 1 §§6-8 do Vol 1 (linhagens fundadoras, regime Vyrcátrix, Helíaco como eco-de-Hiram-Abiff canon).
+**Função:** dois contos que saem da Era 3 (presente do jogo) e mergulham em camadas anteriores: Verônica Atelaiá no ano cronístico -45 (paleógrafa contratada arquivo Catedral São Vargas; cronista *avant la lettre* de Patch-Zero), Mestre Helíaco Vyr na Era 1 (~ano -850, Primeiro Cantor-de-Pedras, fragmento litúrgico). Tom: prosa Stephenson denso para Verônica; voz litúrgica primeira-pessoa-da-câmara para Helíaco. Estes contos fecham o Vol 2 e empurram o leitor pra Era 1 §§6-8 do Vol 1 (linhagens fundadoras, regime Vyrcátrix, Helíaco como mártir-fundador canon).
 
 **Estimativa parte:** ~5.903 pal / ~20 pp
 
@@ -358,7 +358,7 @@ LOMBADAS ALINHADAS (canto inferior, padrão 4 livros):
 
 | Componente | Fonte | Palavras | Páginas | Nota revisão |
 |---|---|---|---|---|
-| Texto do conto | `docs/narrative/deep/antologia/13-veronica-atelaia.md` | ~2.705 | ~9 | extrair íntegra; voz paleógrafa, datação cronística -45, fólio 89 (Fibonacci canon), pavimento tesselado (easter egg canon), depois catalogado por Sterling Locke em tese -25 como "anomalia folclórica de provincianismo selvático"; conexão direta a Conto 8 (Sterling jovem cita esta paleógrafa para descartá-la) |
+| Texto do conto | `docs/narrative/deep/antologia/13-veronica-atelaia.md` | ~2.705 | ~9 | extrair íntegra; voz paleógrafa, datação cronística -45, fólio 89 (valor recorrente canon), pavimento tesselado (motivo canon), depois catalogado por Sterling Locke em tese -25 como "anomalia folclórica de provincianismo selvático"; conexão direta a Conto 8 (Sterling jovem cita esta paleógrafa para descartá-la) |
 | Nota editorial in-tomo | editorial direto | ~0.1 | ~0.5 | uma frase: "Leia este conto e o Conto 8 lado a lado. Note quem fala de quem, e quem despreza quem." |
 | Cabeçalho editorial | editorial | ~0.05 | (sem) | (sem) |
 
@@ -370,7 +370,7 @@ LOMBADAS ALINHADAS (canto inferior, padrão 4 livros):
 
 | Componente | Fonte | Palavras | Páginas | Nota revisão |
 |---|---|---|---|---|
-| Texto do conto | `docs/narrative/deep/antologia/14-heliaco-vyr-era-1.md` | ~3.198 | ~11 | extrair íntegra; voz litúrgica Primeiro Cantor-de-Pedras, Catedral-Mãe (submersa em Era 3, "coluna quebrada" canon), Boca-da-Funda (cristal pareado piezo), 3-5-7 degraus (easter egg canon), eco Hiram Abiff (memória `project_eastereggs_maconaria_canonica`); fecha Vol 2 inteiro |
+| Texto do conto | `docs/narrative/deep/antologia/14-heliaco-vyr-era-1.md` | ~3.198 | ~11 | extrair íntegra; voz litúrgica Primeiro Cantor-de-Pedras, Catedral-Mãe (submersa em Era 3, "coluna quebrada" canon), Boca-da-Funda (cristal pareado piezo), 3-5-7 degraus (motivo canon), Helíaco como mártir-fundador; fecha Vol 2 inteiro |
 | Cabeçalho editorial | editorial | ~0.05 | (sem) | (sem) |
 
 **Subtotal Conto 14:** ~3.2k pal / ~11 pp
@@ -432,7 +432,7 @@ LOMBADAS ALINHADAS (canto inferior, padrão 4 livros):
 | Gargi Vance | Cap 11.1 (linhagem Vance) | Cap 9.1 (Gus, contexto familiar), memória `project_familia_vance_canonica` |
 | Anciã Mariana Vanderbist | Cap 11.3 (linhagem Vanderbist) | Cap 14.6 (Pelicano Branco), Cap 9.7 (Jaci, neta) |
 | Verônica Atelaiá | Cap 6.7 (cronistas Era 2) + Cap 11.2 (linhagem Chevalier-Atelaiá) | Cap 5.6 (Famílias-Pilastra, codificação institucional Atelaiá), Cap 7.8 (Patch-Zero como sistema), Apêndice E (DD-* in-world docs) |
-| Mestre Helíaco Vyr | Cap 5.8 (Era 1 §8 íntegro) | Cap 5.3 (arqueologia cripto-glifo), Cap 5.7 (Regime Vyrcátrix), Apêndice A (glossário: Hiram Abiff echo) |
+| Mestre Helíaco Vyr | Cap 5.8 (Era 1 §8 íntegro) | Cap 5.3 (arqueologia cripto-glifo), Cap 5.7 (Regime Vyrcátrix), Apêndice A (glossário: mártir-fundador) |
 | Lugares mencionados | (cross-ref) | Apêndice C Vol 1 (PLACES.md): Catedral de São Vargas, Catedral-Mãe submersa, Faculdade de Engenharia Recursiva, Pelicano Branco |
 | Termos técnicos / históricos | (cross-ref) | Apêndice A Vol 1 (Glossário) |
 
@@ -531,7 +531,7 @@ Vozes do Vol 2 ancoram linhagens canon do Vol 1 Cap 11:
 - **Vanderbist**: Jaci (Conto 7) ↔ Anciã Mariana (12). Pelicano Branco (Cap 14.6 Vol 1).
 - **Berenger**: Cauã (Conto 2) ↔ Salvador Berenger (pai morto, mencionado dentro do Conto 2). Cap 11.4 Vol 1.
 - **Neumann**: Linda (Conto 5); solitária, primeira geração nomeada no canon. Cap 11.5 Vol 1.
-- **Vyr** (residual Era 1): Helíaco (Conto 14); sem descendentes nomeados, mas eco Hiram Abiff canon. Cap 5.8 Vol 1.
+- **Vyr** (residual Era 1): Helíaco (Conto 14); sem descendentes nomeados, mas mártir-fundador canon. Cap 5.8 Vol 1.
 
 **Recomendação:** apêndice F T2 (cross-ref) já mapeia. Posfácio P2.1 destaca em prosa breve.
 
@@ -573,13 +573,13 @@ Cada conto deixa um objeto, gesto ou frase que o Vol 1 Bíblia trata como elemen
 | 3 (Iara) | Saída-da-Cult como tipologia narrativa. |
 | 4 (Bento) | Vigília litúrgica como hábito traduzido em mecânica de combate (Tanque). |
 | 5 (Linda) | Zona do Silêncio como cenário emocional (não só geográfico). |
-| 6 (Dante) | Esquadro do bisavô como artefato físico (e easter egg canon). |
+| 6 (Dante) | Esquadro do bisavô como artefato físico (e motivo canon). |
 | 7 (Jaci) | Observação como método de cura (Pythia bio-hacking). |
 | 8 (Sterling) | Tese DRE como semente de tudo que vem depois (Cap 7 Vol 1). |
 | 9 (Cassiano) | Vocabulário burocrático da operação GRE (cross-ref Cap 7.7). |
-| 10 (Pyotor) | Carta-padrão "vi caracol em espiral perfeita" (eco Fibonacci canon). |
+| 10 (Pyotor) | Carta-padrão "vi caracol em espiral perfeita" (eco recorrente canon). |
 | 11 (Gargi) | Cheiro do fluxo amarelado (mnemônico canônico Vol 1). |
-| 12 (Mariana) | Cordão 89 nós (easter egg canon material). |
+| 12 (Mariana) | Cordão 89 nós (motivo canon material). |
 | 13 (Verônica) | Fólio 89 do códice anônimo (cross-ref Cap 6.7). |
 | 14 (Helíaco) | Boca-da-Funda, 3-5-7 degraus, Catedral-Mãe (Cap 5.3, 5.8 Vol 1). |
 
@@ -595,7 +595,7 @@ Cada conto deixa um objeto, gesto ou frase que o Vol 1 Bíblia trata como elemen
 |---|---|---|
 | Entre Conto 1 ↔ 2 (saída do protagonista, entrada nos companions) | Tavus-Drive miniatura | Marca passagem da voz central pra periferia coral |
 | Entre Conto 2 ↔ 3, 3 ↔ 4, 4 ↔ 5, 5 ↔ 6, 6 ↔ 7 | Filete cyan (#00C8D8) simples | Cesura curta de respiração entre companions |
-| **Fim Conto 7 (fim Tomo 1)** | Página fechamento Tomo 1: caracol em espiral Fibonacci (eco Conto 1, Conto 10) | Fade-to-black tipográfico; respira antes de abrir Tomo 2 |
+| **Fim Conto 7 (fim Tomo 1)** | Página fechamento Tomo 1: caracol em espiral logarítmica (eco Conto 1, Conto 10) | Fade-to-black tipográfico; respira antes de abrir Tomo 2 |
 | **Abertura Tomo 2** | Página de rosto Tomo 2 com tinta vermelha (#C8323C); ruptura com paleta cyan dominante do T1 | Aviso visual: o tom muda |
 | Entre Conto 8 ↔ 9 (antagonistas) | Linha reta vermelha vertical | Frieza ascética |
 | **Fim Conto 9 (cesura Partes III/IV)** | Página inteira branca + esquadro miniatura brass sobre cyan-noite (#0E1B26) | Vale emocional; passagem antagonistas → família |
@@ -629,7 +629,7 @@ Cada conto deixa um objeto, gesto ou frase que o Vol 1 Bíblia trata como elemen
 | Tinta | Hex | Uso |
 |---|---|---|
 | Cyan-claro | `#00C8D8` | Filetes, cesuras curtas, capitulares do Tomo 1 |
-| Vermelho-sangue | `#C8323C` | Tomo 2 abertura, ornamentos antagonistas, acaceiro-tronco-vermelho (easter egg) |
+| Vermelho-sangue | `#C8323C` | Tomo 2 abertura, ornamentos antagonistas, acaceiro-tronco-vermelho (motivo) |
 | Brass / latão | `#B89B5E` | Ornamentos sutis canon, cordão 89 nós, esquadro miniatura, coluna quebrada |
 | Preto | `#0E1B26` (cyan-noite) | Lombadas, capa Vol 2 T2, fundo de páginas de cesura |
 | Branco papel | `#F4EFE8` (creme suave, não-branco-puro) | Corpo de texto, fundo geral |
@@ -661,7 +661,7 @@ Cada conto deixa um objeto, gesto ou frase que o Vol 1 Bíblia trata como elemen
 
 ## Capa Vol 2
 
-- **Tomo 1:** fundo cyan-noite (#0E1B26). Title "GusWorld · Antologia · Tomo 1, Vozes da Party" em vermelho-sangue + brass. Ornamento central: sete pingos descendentes em espiral Fibonacci (eco Conto 1).
+- **Tomo 1:** fundo cyan-noite (#0E1B26). Title "GusWorld · Antologia · Tomo 1, Vozes da Party" em vermelho-sangue + brass. Ornamento central: sete pingos descendentes em espiral logarítmica (eco Conto 1).
 - **Tomo 2:** fundo cyan-noite + faixa diagonal vermelho-sangue. Title "GusWorld · Antologia · Tomo 2, Vozes Periféricas" em brass. Ornamento central: coluna quebrada brass sobre fundo escuro.
 
 ## Tipografia
@@ -688,7 +688,7 @@ Cada conto deixa um objeto, gesto ou frase que o Vol 1 Bíblia trata como elemen
 
 2. **Citações pedra-de-toque B e E (10 contos restantes):** `narrative-designer` curadoria → user valida.
 
-3. **Ornamentos editoriais (design gráfico):** Tavus-Drive miniatura, esquadro miniatura brass, coluna quebrada brass, caracol Fibonacci. Encomendar a `art-director` quando próximo de print-on-demand (Fase E pós-release).
+3. **Ornamentos editoriais (design gráfico):** Tavus-Drive miniatura, esquadro miniatura brass, coluna quebrada brass, caracol em espiral logarítmica. Encomendar a `art-director` quando próximo de print-on-demand (Fase E pós-release).
 
 4. **Conto 6 Dante, sinal sutil de double-layer:** confirmar com criador supremo se nota editorial in-tomo (uma frase no cabeçalho do conto) está canon. Há risco de quebrar leitura sincera ato 1-2 se sinal for forte demais. Alternativa: deixar **sem nenhum sinal** e confiar que leitor que terminou jogo (ou Vol 1) traz o conhecimento. `narrative-designer` recomenda alternativa (sem sinal). Decisão de criador supremo.
 
@@ -752,7 +752,7 @@ docs/book/BIBLE-V1-GLOSSARIO.md    [Vol 2 NÃO duplica; apenas aponta]
 2. **Fase B (release jogo v1.0.0):** publicar jogo. Antologia segue em standby alinhada com Vol 1.
 3. **Fase C (pós-release T+3 a T+6 meses):** produzir paratexto Vol 2 (~3-4k pal a escrever) **em paralelo** com Vol 1 (12 pendências, ~67.5k pal). Workflow `narrative-designer` (audit) + `narrative-writer` (produção) + criador supremo (aprovação).
 4. **Fase D (pós-release T+6 a T+9):** revisão editorial integral Vol 2. Curadoria de citações pedra-de-toque (Apêndices B e E). Validação cesuras tipográficas com `art-director`.
-5. **Fase E (pós-release T+9 a T+12):** diagramação Vol 1 + Vol 2 em paralelo. Encomenda de ornamentos editoriais (Tavus-Drive miniatura, esquadro brass, coluna quebrada, caracol Fibonacci) a `art-director`. Preparação print-on-demand sincronizada.
+5. **Fase E (pós-release T+9 a T+12):** diagramação Vol 1 + Vol 2 em paralelo. Encomenda de ornamentos editoriais (Tavus-Drive miniatura, esquadro brass, coluna quebrada, caracol em espiral logarítmica) a `art-director`. Preparação print-on-demand sincronizada.
 6. **Fase F (T+12+):** publicação Vol 1 + Vol 2 **simultânea** (caixa de coleção 4 tomos lombadas alinhadas é o objeto-alvo). Sai como conjunto.
 
 ---

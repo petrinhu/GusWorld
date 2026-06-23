@@ -106,7 +106,7 @@ Gargi economizou. Pyotor (pai, itinerante na rotação fronteira-Selve) mandou b
 
 ### Aos 10 anos, primeira vez que entra na Selve sozinho (sem permissão)
 
-Hackeia perímetro de proteção urbana (alegoria sinopse, primeiro hack canônico). Anda 2 horas. Vê o primeiro fractal Fibonacci vivo (galho de árvore-luz pulsando). Para. Não respira. Por 4 minutos olha. Volta correndo. Não conta a Gargi naquela noite. Conta semanas depois. Gargi não briga, só pergunta: "você ia chamar alguém se desse errado?" Gus responde: "ia me virar." Gargi: "errado. ia chamar você mesmo. me ensina o canal." Aprendeu juntos. *Importa porque:* origem do wound real (autossuficiência forçada precoce) e da virtude técnica (lê padrões antes de qualquer um). Cena que justifica por que Gus aos 11 está pronto pro arco: não saiu do nada.
+Hackeia perímetro de proteção urbana (alegoria sinopse, primeiro hack canônico). Anda 2 horas. Vê o primeiro fractal recorrente vivo (galho de árvore-luz pulsando). Para. Não respira. Por 4 minutos olha. Volta correndo. Não conta a Gargi naquela noite. Conta semanas depois. Gargi não briga, só pergunta: "você ia chamar alguém se desse errado?" Gus responde: "ia me virar." Gargi: "errado. ia chamar você mesmo. me ensina o canal." Aprendeu juntos. *Importa porque:* origem do wound real (autossuficiência forçada precoce) e da virtude técnica (lê padrões antes de qualquer um). Cena que justifica por que Gus aos 11 está pronto pro arco: não saiu do nada.
 
 ---
 

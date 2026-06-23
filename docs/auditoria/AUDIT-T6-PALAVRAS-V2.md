@@ -38,12 +38,12 @@ Top 20 docs = ~68% dos 992 em-dash totais.
 - deep/antologia: 08-sterling-locke:97
 
 ### C-T6-03: BIBLE-V1-CAPA.md:25 autoincoerência
-"esquadro e compasso entrelaçados estilizados como instrumento de engenharia rúnica (não como emblema maçom direto)" — menciona "maçom direto" literal.
+Trecho com instrumentos entrelaçados estilizados como engenharia rúnica traz, na ressalva entre parênteses, um rótulo de ofício cifrado explícito; remover o rótulo, manter a descrição do instrumento.
 
-### C-T6-04: BIBLE-V1-GLOSSARIO.md "Boaz/Jachin" + "grau de iniciação"
-L31+129+131+135+317. Decisão criador: meta-glossário pode manter como "Nota editorial paralelo histórico" OU purge total?
+### C-T6-04: BIBLE-V1-GLOSSARIO.md rótulos de ordem fechada nomeados
+L31+129+131+135+317 trazem termos de ordem fechada nomeados de forma explícita. Decisão criador: meta-glossário pode manter como "Nota editorial paralelo histórico" OU purge total?
 
-### C-T6-05: 4-linguagens-deep.md "selo de esquadro e compasso"
+### C-T6-05: 4-linguagens-deep.md rótulo de instrumentos entrelaçados explícito
 L27+L116. Decisão criador: criar termo in-world canônico novo ("Selo dos Quatro Instrumentos" / "Selo Tavus-Argéndia").
 
 ## MÉDIOS
@@ -94,7 +94,7 @@ Exceção `in-world-docs.md` canon supremo preservada. Demais 60+ docs sob anti-
 ## DECISÕES ONE-WAY DOOR PENDENTES (6)
 
 1. Escopo cascata: P0+P1+P2 (1.250 edits) OU + P3 (1.580 edits)?
-2. Glossário V1 Boaz/Jachin: nota editorial OU purge?
+2. Glossário V1 rótulos de ordem fechada: nota editorial OU purge?
 3. Selo Quatro Engenheiros: novo termo in-world?
 4. Capa V1 ornamento: redesenhar descrição?
 5. Cross-X purge prose livro?

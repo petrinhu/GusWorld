@@ -22,7 +22,7 @@ O Diário é um caderno físico tangível pertencente a Gus, 11 anos. Toda a int
 - **Decoração canônica:**
   - Etiqueta escolar Educacional Padrão (formato retangular branco, canto superior esquerdo). Campo "Nome:" preenchido com letra cursiva de Gus: "**Gus V. T. Vance**". Campo "Turma:" riscado três vezes (Gus passou de série e nunca atualizou).
   - Adesivo pequeno de **Pilha Sobrecarregada** (referência [[tradicoes-cultura]] §Dia do Tomo: pequeno logo estilizado de livro aberto com símbolo de pilha, ~3cm canto inferior direito).
-  - Adesivo de **fractal Fibonacci** desenhado a caneta (não impresso; Gus copiou de fragmento Selve aos 10, ver `characters/gus.md` §Memórias formativas, primeira incursão).
+  - Adesivo de **fractal recorrente** desenhado a caneta (não impresso; Gus copiou de fragmento Selve aos 10, ver `characters/gus.md` §Memórias formativas, primeira incursão).
   - **Dobra de canto** superior direito, vincada de uso.
   - **Mancha** circular escura inferior-centro: café-de-neurônio derramado pelo pai Pyotor (canônico, `lore-bible` §11.4 + `characters/gus.md` §pai itinerante). Mancha funciona como **leitmotiv visual**: o pai está presente mesmo ausente.
   - **Fita adesiva amarelada** consertando lombada (caderno foi rasgado uma vez; Gus consertou ele mesmo, com cuidado técnico).
@@ -78,7 +78,7 @@ Wireframe ASCII (paisagem, 16:9):
 | MANUSCRITO      | "Dia 14 do mês do Compilador.                |
 | ---             |                                              |
 | > Cena Beat Ki  |  Hoje vi a fonte da Praça Central girar      |
-|   [NEW]         |  exato no padrão Fibonacci. 1, 1, 2, 3, 5    |
+|   [NEW]         |  exato no padrão recorrente. 1, 1, 2, 3, 5   |
 |   (laranja)     |  oito borrifos por ciclo. Aí parou. Voltou.  |
 |                 |                                              |
 | > Cena Beat Sho |  Eu fiquei dois minutos olhando. A mãe       |
@@ -201,7 +201,7 @@ Bestiary mostra estrelas preenchidas (`★`) conforme páginas se completam. Ini
 |   8%            |   1. Casa Vance (seta com coração rabiscado) |
 | > Anel Verde    |   2. Escola pública (gus rabiscou "ufa")     |
 |   0%            |   3. Pilha Sobrecarregada (estrela ★)        |
-| > Dutos Infer.  |   4. Praça Central (fonte Fibonacci 🌀)      |
+| > Dutos Infer.  |   4. Praça Central (fonte recorrente 🌀)     |
 |   31%           |   5. Cúpula Sterling (X vermelho ENORME)     |
 | > Catedrais Sy. |                                              |
 |   3%            |  [Sticky-note cyan: cross-ref doc 01]        |
@@ -424,7 +424,7 @@ Salva **apenas state mínimo**:
     "entries_read": ["m_beat_ki", "d_01", ...],
     "stickynotes_active": {
       "m_dante_drive_4": ["d_08"],
-      "m_fonte_fibonacci": ["b_bento_lv2"]
+      "m_fonte_recorrente": ["b_bento_lv2"]
     },
     "current_tab": 1,
     "last_entry_open": "d_05",

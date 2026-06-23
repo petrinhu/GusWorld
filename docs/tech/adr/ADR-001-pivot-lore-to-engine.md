@@ -12,9 +12,9 @@
 
 GusWorld está no fim da Fase 1 (Concepção). Estado factual em 2026-05-19:
 
-- **Entregue:** Era 1 §§1-10 deep-lore (~286k pal Fibonacci antigo) + R2 Facções (22k pal) + R3 Settings deep (25k pal). Total deep-lore canônico: **~365k pal**.
+- **Entregue:** Era 1 §§1-10 deep-lore (~286k pal, contagem antiga) + R2 Facções (22k pal) + R3 Settings deep (25k pal). Total deep-lore canônico: **~365k pal**.
 - **Falta no plano original (F1-DL.4 → F1-DL.9):** ~111k pal — Characters deep (~35k), Antagonistas+NPCs (~12k), Magic (~10k), Ontologia (~8k), Stinger (~4k), Antologia Vol 2 (~42k).
-- **Decisão fechada:** dois volumes-livro pós-release (F5-BK.1, F5-BK.2) dependem de F1-DL.9 completo + F1-DL.REFAC (refactor fluidez + retrofit easter eggs maçônicos + densificação §10).
+- **Decisão fechada:** dois volumes-livro pós-release (F5-BK.1, F5-BK.2) dependem de F1-DL.9 completo + F1-DL.REFAC (refactor fluidez + retrofit dos motivos cerimoniais fundadores + densificação §10).
 - **Restrição operacional:** F2-S.1 (instalar Godot 4) está formalmente bloqueada por F1-DL.9 no TODO.md atual ("PAUSADA até deep-lore F1-DL.9 completa").
 
 ### Forças em jogo
@@ -30,7 +30,7 @@ GusWorld está no fim da Fase 1 (Concepção). Estado factual em 2026-05-19:
 
 - **Qualidade de lore.** Os 365k entregues estão validados, audit-approved, canônicos. Era 1 fechada em §10 com voz Verônica Atelaiá / Eco Adso consolidada.
 - **Falta de visão criativa.** Pillars, GDD, arco principal, 3 endings, 8 settings, 7 facções — todos validados em sessão colaborativa.
-- **Risco de virar projeto técnico genérico.** Easter eggs Fibonacci + maçonaria canon mantidos no TEXTO de qualquer lore futuro. Pillar narrativo intacto.
+- **Risco de virar projeto técnico genérico.** Motivos numéricos recorrentes + cerimoniais fundadores canon mantidos no TEXTO de qualquer lore futuro. Pillar narrativo intacto.
 
 ---
 

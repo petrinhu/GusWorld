@@ -18,7 +18,7 @@
 |---|---|---|
 | Encontro vencido | **8 cr** × `max(0, 1 − (player_zone − enemy_zone) × 0.15)` | herda XP differential já implementado — farm de zona baixa definha |
 | Baú / terminal hackeado | **13–34 cr** (fixo por achado) | curatorado, não farmável |
-| Marco narrativo (beat de capítulo) | **55 / 89 / 144 cr** | Fibonacci; determinístico; não repetível |
+| Marco narrativo (beat de capítulo) | **55 / 89 / 144 cr** | sequência recorrente; determinístico; não repetível |
 
 ---
 
@@ -26,7 +26,7 @@
 
 ### 3.1 Cura paga (instantânea)
 - HP faltando: **1 cr por 3 HP** (arredonda pra cima). Quem apanhou pouco paga pouco.
-- Reativar companion incapacitado: **Fibonacci imediatamente acima do HP-máximo do companion** (`Fibonacci(HP_max+ε)`)  
+- Reativar companion incapacitado: **valor da sequência recorrente imediatamente acima do HP-máximo do companion** (`seq_acima(HP_max+ε)`)  
   - HP-max 55 → custo **89 cr** · HP-max 34 → custo **55 cr**  
   - "Multa" proporcional à força do companion. Consequência real, reversível.
 
@@ -39,8 +39,8 @@
 
 ## §4. Bio-Ampola (consumível de combate)
 
-- **Cura dinâmica:** `Fibonacci_inferior(floor((HP_max − HP_atual) / 2))`  
-  Ex: faltam 35 HP → metade = 17.5 → Fibonacci inferior = **13 HP curados**.
+- **Cura dinâmica:** `seq_inferior(floor((HP_max − HP_atual) / 2))`  
+  Ex: faltam 35 HP → metade = 17.5 → valor inferior da sequência = **13 HP curados**.
 - **NÃO reativa** companion incapacitado (só Hospital ou Life Ampola).
 - **NÃO comprável.** Drop curado (1-2 no VS inteiro).
 - 1 AP pra usar em combate.
@@ -50,7 +50,7 @@
 
 ## §5. Life Ampola
 
-- **Reativa** companion incapacitado (HP = `Fibonacci_inferior(HP_max / 2)` ao reativar).
+- **Reativa** companion incapacitado (HP = `seq_inferior(HP_max / 2)` ao reativar).
 - **Craftável** (sistema de craft §7) **OU comprável** com crédito premium no Hospital.
 - Não é drop curado — obtida por craft ou compra deliberada.
 
@@ -87,7 +87,7 @@ Craft = **compilação de componentes via hardware de Gus** (Pillar 2: magia=sis
 | P2 | Ampola de Antídoto | 1 | 3 | Dispel Poison/Corrode + imune DoT 2 turnos |
 | P3 | Life Ampola | 2 | 5 (1 raro) | reativa companion incapacitado |
 | P4 | Ampola de Sobrecarga | 2 | 5 | `Haste` mag 1 + +2 mana próximo turno |
-| P5 | Ampola Recursiva | 3 | 8 (1 componente-boss) | cura Fibonacci por 5 turnos (1,1,2,3,5) + `Shield` |
+| P5 | Ampola Recursiva | 3 | 8 (1 componente-boss) | cura recorrente por 5 turnos (1,1,2,3,5) + `Shield` |
 
 ### 7.3 "Armas" = Cartuchos Tavus-Drive + upgrades de stat (Forja de Firmware / Gus)
 
@@ -159,7 +159,7 @@ Curva **sigmoid** (GDD §5.4): efeito ×1.6 por salto, platô em T3 — sem powe
 | 12 | Antena UHF Rara | eletrônico | drop mini-boss | raro |
 | 13 | Esporo-Mestre | Selve | drop inimigo-mestre (Knowledge-gated) | raro |
 | 14 | Dado Íntegro | cripto | drop raro / puzzle | raro |
-| 15 | Liga de Acaceiro | Selve | drop curado raro (easter egg maçônico) | raro |
+| 15 | Liga de Acaceiro | Selve | drop curado raro | raro |
 | 16 | Núcleo de Recompilação | universal | compra cara (crédito) | incomum |
 | 17 | Componente-Boss: Núcleo Quente | boss | drop boss único | épico |
 | 18 | Componente-Boss: Fragmento Locke | boss | drop boss (Sterling) | épico |

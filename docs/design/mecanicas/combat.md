@@ -316,9 +316,9 @@ A tabela completa (~200 combos) é trabalho futuro. Esta spec define o **formato
 | `Signature` | sequência ordenada de slots que dispara (ex: `[Card:pulso.elétrico, Modifier:stream, Card:raiz.cinético]`) |
 | `ResultEffect` | efeito resultante (dano, status, entidade, `multCombo`) |
 | `multCombo` | multiplicador de dano aplicado na fórmula (§11) |
-| `Discoverable` | bool (combo curado vs easter-egg descobrível por experimentação) |
+| `Discoverable` | bool (combo curado vs combo secreto descobrível por experimentação) |
 
-Receita é casada por **assinatura exata** de família + base + modificador, não por instância de carta específica. Isto mantém ~200 receitas gerenciáveis e descobríveis (Pillar 2: ~200 combinações pré-planejadas + 5-10 easter-egg combos).
+Receita é casada por **assinatura exata** de família + base + modificador, não por instância de carta específica. Isto mantém ~200 receitas gerenciáveis e descobríveis (Pillar 2: ~200 combinações pré-planejadas + 5-10 combos secretos).
 
 ### Feedback de erro de compilação (Pillar 2, N.2 R2 2026-06-03)
 
@@ -733,7 +733,7 @@ public interface IEnemyBrain {
 
 ### Stats de referência do encontro (canônico D.1 Sprint 1 W2, 2026-06-03)
 
-Stats para TDD do encontro F2-E.5. HP pós-inflação +60% (Trash 34→55, Elite 89→144; sequência Fibonacci; TTK alvo 3-5 turnos).
+Stats para TDD do encontro F2-E.5. HP pós-inflação +60% (Trash 34→55, Elite 89→144; sequência recorrente; TTK alvo 3-5 turnos).
 
 **Party (Gus + 2 companions ativos):**
 
@@ -826,7 +826,7 @@ Lido a olho nu (sem Scan), até ~12 visíveis simultâneos (teto cognitivo). Cad
 
 - **Lamacento**: Elétrico ×1.3 / Cinético ×0.66 (deslocamento dificultado); Knockback no alvo → +2 na fila (em vez de +1); Slow -2 todos (-3 para Cinético).
 - **Seco**: Cinético ×1.3 / Elétrico ×0.66; DoT (Poison/Corrode) -1 dur; Break +1 dur.
-- **Vinhas**: Bioquímico ×1.3 (Object +1 dur) / Cinético ×0.85; aplica Root (Slow de magnitude extrema); Knockback anulado em alvo enraizado; Scan revela crescimento Fibonacci.
+- **Vinhas**: Bioquímico ×1.3 (Object +1 dur) / Cinético ×0.85; aplica Root (Slow de magnitude extrema); Knockback anulado em alvo enraizado; Scan revela crescimento em sequência recorrente.
 - **Gelo**: Cinético ×1.3 / Bioquímico ×0.66; Break +1 dur; Slow -1; SPD -1 todos; Tavus-Drive +1 mana na 1ª carta do turno.
 - **Água / Alagado**: Elétrico ×1.3 / Cinético ×0.85; Stun +1 dur; SPD -1 todos; alvo dentro da água que leva dano Elétrico → Disrupt grátis.
 - **Metal-Condutor**: Elétrico ×1.3 / Sônico ×0.66; Corrode +1 dur; Knockback ricocheteia +1 fila adicional; Scan grátis + revela 1 dado extra (Matriz Ortodôntica amplificada).
@@ -834,10 +834,10 @@ Lido a olho nu (sem Scan), até ~12 visíveis simultâneos (teto cognitivo). Cad
 
 **Novos (5):**
 
-- **T1 Pavimento Tesselado** (cidade forte; variante na Selve): Criptográfico ×1.3 / Sônico ×0.66. **DUAL por rodada completa de fila**, sincronizado a `turnoIndex`: rodada **ÍMPAR = Branco (lapidado)** → +1 dado de Scan grátis a quem scaneia; rodada **PAR = Preto (bruto)** → a 1ª carta Cripto da rodada aplica Expose magnitude 13 grátis no alvo. Telegraph: o quadriculado pulsa branco/preto conforme a rodada. (Easter egg maçônico canon: ashlar bruto/polido; "13" Fibonacci.)
+- **T1 Pavimento Tesselado** (cidade forte; variante na Selve): Criptográfico ×1.3 / Sônico ×0.66. **DUAL por rodada completa de fila**, sincronizado a `turnoIndex`: rodada **ÍMPAR = Branco (lapidado)** → +1 dado de Scan grátis a quem scaneia; rodada **PAR = Preto (bruto)** → a 1ª carta Cripto da rodada aplica Expose magnitude 13 grátis no alvo. Telegraph: o quadriculado pulsa branco/preto conforme a rodada.
 - **T2 Talude Instável**: Cinético ×1.5 / Criptográfico ×0.66. Pune o INATIVO: ator que não agiu ofensivamente na rodada anterior entra com Slow magnitude 2; ator que gastou ≥2 AP ofensivo na rodada anterior fica imune. Premia agressão, pune turtle. Telegraph: o chão racha sob o ator inativo 1 turno antes. Mexe a fila por comportamento (via Slow).
-- **T4 Ashlar Bruto**: Cinético ×1.3 / Elétrico ×0.66. Usar **Defender** aqui → pool de Shield ×1.5 (Magnitude = Def × 1.5). Premia turtle (espelho do T2). Não dá Shield de graça (exige gastar AP em Defender). Transição de **PROGRESSÃO** (entre encontros): arena vencida "lapida" o Ashlar Bruto → vira **T1 Pavimento Tesselado** (bruto → polido = ofício maçônico canon).
-- **T5 Solo Fértil Recursivo (SÓ SELVE)**: Bioquímico ×1.5 / Cinético ×0.66. Entidades Object plantadas aqui ganham +1 Duration e escalam o efeito por rodada na sequência 1,1,2,3,5 (ex: um totem de Poison aplica magnitude 1,1,2,3,5 ao longo das rodadas). Facilita Poison / Regen / Root. Scan revela o estágio do L-system. (Fibonacci canon.)
+- **T4 Ashlar Bruto**: Cinético ×1.3 / Elétrico ×0.66. Usar **Defender** aqui → pool de Shield ×1.5 (Magnitude = Def × 1.5). Premia turtle (espelho do T2). Não dá Shield de graça (exige gastar AP em Defender). Transição de **PROGRESSÃO** (entre encontros): arena vencida "lapida" o Ashlar Bruto → vira **T1 Pavimento Tesselado** (bruto → polido).
+- **T5 Solo Fértil Recursivo (SÓ SELVE)**: Bioquímico ×1.5 / Cinético ×0.66. Entidades Object plantadas aqui ganham +1 Duration e escalam o efeito por rodada na sequência 1,1,2,3,5 (ex: um totem de Poison aplica magnitude 1,1,2,3,5 ao longo das rodadas). Facilita Poison / Regen / Root. Scan revela o estágio do L-system.
 - **T6 Anomalia Perlin** (Selve profunda + cidade no ato 3): NENHUMA família ↑; Criptográfico ×0.66. Degrada hardware: Gambito-Prever sempre retorna ruído (`IsChaotic` global) + Scan retorna perfil parcial (revela HP, mas exige 2 scans para a fraqueza). **NÃO mexe no dano** (`multAmbiente` geral = 1.0). Telegraph forte: glitch visual no canal-4 (Perlin quebrado, gradiente cyan → vermelho a 21 lúmens). Vetor anti-padrão Patch-Zero canon.
 
 ### 18.5 Camada TERRENO — Tier CODEX (3, efeito ativa/revela só após Scan-ambiente 1 AP)
@@ -900,16 +900,16 @@ Pares opostos legíveis que ajudam o jogador a ler o sistema por simetria (Pilla
 | Selve ↔ cidade | Bioluminescência ↔ Escuridão |
 | Grade da cidade | Tempestade ↔ Blackout |
 | Pune-parado ↔ premia-parado | T2 Talude ↔ T4 Ashlar |
-| Maçônico (bruto ↔ polido) | T1 Tesselado polido ↔ T4 Ashlar bruto |
+| Ofício (bruto ↔ polido) | T1 Tesselado polido ↔ T4 Ashlar bruto |
 
-Vinhas / T5 Solo Fértil = eixo de **tempo / recursão** (Fibonacci), ainda sem espelho pleno declarado.
+Vinhas / T5 Solo Fértil = eixo de **tempo / recursão** (sequência recorrente), ainda sem espelho pleno declarado.
 
-### 18.9 Easter eggs (densidade ~10-15%, sutil)
+### 18.9 Detalhes recorrentes de design
 
-Aplicam os dois sistemas canon (sem siglas, sem ritual nomeado):
+Dois conjuntos de motivos atravessam os terrenos:
 
-- **Fibonacci**: durações de período 5/2/5/2; crescimento de T5 em 1,1,2,3,5; pulso de Bioluminescência 1-1-2-3-5; Expose magnitude 13 no T1; raio de Tempestade a cada 3 turnos; T6 a 21 lúmens.
-- **Maçonaria**: T1 Pavimento Tesselado (ashlar polido preto/branco), T4 Ashlar Bruto, transição bruto → polido. Sem siglas nem ritual nomeado.
+- **Numéricos**: durações de período 5/2/5/2; crescimento de T5 em 1,1,2,3,5; pulso de Bioluminescência 1-1-2-3-5; Expose magnitude 13 no T1; raio de Tempestade a cada 3 turnos; T6 a 21 lúmens.
+- **Ofício de pedra**: T1 Pavimento Tesselado (ashlar polido preto/branco), T4 Ashlar Bruto, transição bruto → polido.
 
 ### 18.10 Escopo de implementação (slice)
 

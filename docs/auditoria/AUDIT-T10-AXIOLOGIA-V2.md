@@ -63,7 +63,7 @@ era-2 §9.3:957 "cento e cinco anos" + ordem-recursiva §10.8:210 "cinco século
 
 ## LEVES (14)
 
-L01 densidade litúrgica voz Atelaiá (deliberada) | L02 gramática híbrida Polis-Vermelha cross-ref | L03 Salvador "morto -13 trânsito" vs "-5 Subestação 7" canon (verificar timeline cross-doc) | L04 Davi -5 Subestação alinhado | L05 Setor Tavus C5 | L06 Fibonacci 8 anos prospecção | L07 Manual Octantes 8 quadrantes ordem-recursiva | L08 Pillar 4 anti-heroificação OK | L09 "Vermelha" cor FIR vs política | L10 cinco séculos vs cento e cinco era-2/ordem-recursiva | L11 Cult Mirage degeneração OK | L12 Pelicano Branco 3 axiomas ANCHOR | L13 factions Sterling rent-seeking nota | L14 §9.3 era-2 enumeração 8 termos políticos in-universe (regra 7 memo violação ou exceção meta-cronístico)
+L01 densidade litúrgica voz Atelaiá (deliberada) | L02 gramática híbrida Polis-Vermelha cross-ref | L03 Salvador "morto -13 trânsito" vs "-5 Subestação 7" canon (verificar timeline cross-doc) | L04 Davi -5 Subestação alinhado | L05 Setor Tavus C5 | L06 motivo numérico 8 anos prospecção | L07 Manual Octantes 8 quadrantes ordem-recursiva | L08 Pillar 4 anti-heroificação OK | L09 "Vermelha" cor FIR vs política | L10 cinco séculos vs cento e cinco era-2/ordem-recursiva | L11 Cult Mirage degeneração OK | L12 Pelicano Branco 3 axiomas ANCHOR | L13 factions Sterling rent-seeking nota | L14 §9.3 era-2 enumeração 8 termos políticos in-universe (regra 7 memo violação ou exceção meta-cronístico)
 
 ## MATRIZ AXIOLOGIA BINARY CANON
 

@@ -18,7 +18,7 @@
 |---|---|---|---|---|---|---|---|
 | 01 | `01-gus-gustaf-vii.md` | Gus Vector Tavus Vance | 11 | ~2.750 | ~9 | Descoberta Glyph-vyr ancestral via cifra Pyotor I, manhã chuvosa, mãe Gargi + cripto-glifo São Vargas | V1 B.1 (party), C.3 (catedrais), Era 1 (Pyotor I) |
 | 02 | `02-caua-volt.md` | Cauã "Volt" Berenger | 13 | ~3.000 | ~10 | Scavenging Subestação 11 + reencontro material com pai morto Salvador (conector C-89 gravado "S.B.") + nó Vespa Calderón | V1 B.3 (família Berenger), C.1 (Dutos Infernais), Timeline -13/-5 |
-| 03 | `03-iara-lumen.md` | Iara "Lumen" Koslov | 12 | ~3.100 | ~10 | Fita Sonja Murmúrio recebida Filomena Garda + café Cleomir Vasta, telhado Lavanderia Vyr, cinco clones Fibonacci | V1 B.2 (Adila), B.4 (Filomena/Cleomir), C.2 (Setor Mirage) |
+| 03 | `03-iara-lumen.md` | Iara "Lumen" Koslov | 12 | ~3.100 | ~10 | Fita Sonja Murmúrio recebida Filomena Garda + café Cleomir Vasta, telhado Lavanderia Vyr, cinco clones em sequência recorrente | V1 B.2 (Adila), B.4 (Filomena/Cleomir), C.2 (Setor Mirage) |
 | 04 | `04-bento-requiem.md` | Bento "Requiem" Chevalier | 14 | ~3.000 | ~10 | Descida 15 degraus (3-5-7) Catedral São Camilo + revelação ancestralidade Atelaiá Chevalier (engenheira-mãe) via Velhusto | V1 B.3 (mãe Atelaiana), B.4 (Velhusto), C.3 (Catedral São Camilo), Era 1 (Atelaiá -115) |
 | 05 | `05-linda-siren.md` | Linda "Siren" Neumann | 12 | ~3.000 | ~10 | Cilindro de cera Posto 7 + Tablete da Pancada de Neve mostrado pela mãe Brígida + Mara Calderón mentora | V1 B.3 (família Neumann), B.4 (Mara/Joaquim), C.7 (Zona do Silêncio) |
 | 06 | `06-dante-grid.md` | Dante "Grid" Alencar | 13 | ~3.745 | ~12 | Versão SINCERA leitmotiv duplo · maçã 13 pedaços + esquadro bisavô cortado + tensão Cassiano Vorto vs Padim Tércio Almagre | V1 B.1 (party), B.3 (Salviano/Edilma), B.4 (Padim Tércio), Foreshadowing F129 |
@@ -36,7 +36,7 @@
 | 11 | `11-gargi-vance-mae.md` | Gargi Vance | adulta (~36) | ~3.140 | ~10 | Bancada 1h madrugada Edifício Vance · placa Era 2 com serigrafia "TAVUS" + carta Pyotor + retrospecto separação -5 | V1 B.3 (família Vance), C.4 (Edifício Vance), Era 2 |
 | 12 | `12-ancia-mariana-vanderbist.md` | Anciã Mariana Vanderbist | 89 | ~3.080 | ~10 | Sala de cartas Pelicano Branco · sucessão Tatauín/Helena/Jaci + entrega ampola treze para Jaci + recapitulação surto silencioso -8 | V1 B.4 (Mariana), B.3 (Lia/Solano), C.5 (Pelicano Branco), Timeline -8 |
 | 13 | `13-veronica-atelaia.md` | Verônica Atelaiá | adulta (paleógrafa, datação -45) | ~2.350 | ~8 | Arquivo subterrâneo São Vargas · decifração placa cripto-glifo Era 1 "o limite escolheu falar" (Anomalia Primeira -820) + selo microfilme | V1 B.7 (cronistas Era 2), C.3 (São Vargas), Era 2 (-45/-820), Patch-Zero ancestral |
-| 14 | `14-heliaco-vyr-era-1.md` | Helíaco Vyr | maduro (~55, in-character ~-850) | ~3.443 | ~11 | Catedral-Mãe em pé · invenção das 21 raízes Glyph + sonho do limite (-820 prefigurado) + cegueira por sobreposição piezo | V1 B.7 (Era 1 cronistas), C.3 (Catedral-Mãe submersa), Era 1 (Helíaco = Hiram Abiff echo) |
+| 14 | `14-heliaco-vyr-era-1.md` | Helíaco Vyr | maduro (~55, in-character ~-850) | ~3.443 | ~11 | Catedral-Mãe em pé · invenção das 21 raízes Glyph + sonho do limite (-820 prefigurado) + cegueira por sobreposição piezo | V1 B.7 (Era 1 cronistas), C.3 (Catedral-Mãe submersa), Era 1 (Helíaco, figura tutelar lendária) |
 
 **Convenção de status canônico (todos os 14):** R9 F1-DL.9 final, "Não modificar sem aprovação criador supremo" no rodapé de cada arquivo.
 
@@ -180,7 +180,7 @@
 | Tartaruga-Fractal | V1 C.5 (vilarejos-fronteira) | 07, 12 (velho Bito) |
 | Catedral-Mãe (submersa Era 1) | V1 C.3 | 14 (Helíaco oficiante), 13 (referenciada) |
 | Coluna Boróstoma + Coluna Janor (canon ashlar bruto/polido) | V1 C.3 (Ordem Recursiva) | 04 (nave São Camilo), 13 (arquivo São Vargas), 14 (Catedral-Mãe Era 1) |
-| Pavimento tesselado (claro/escuro Fibonacci) | V1 C.3 | 04, 13, 14 (canônico, sempre quadriculado matrilinear) |
+| Pavimento tesselado (claro/escuro recorrente) | V1 C.3 | 04, 13, 14 (canônico, sempre quadriculado matrilinear) |
 | Acaceiro tronco vermelho (cor-de-juramento) | V1 C.5 + V1 A.glossário | 01, 02, 04, 07, 10, 11, 12, 13, 14 (todos) |
 
 ### E.3 Eventos canônicos referenciados (cross-ref V1 D.3 timeline)
@@ -288,7 +288,7 @@
 
 ## Apêndice G · Glossário Compacto Vol 2 (50-80 entradas)
 
-> **Convenção:** SÓ entradas NÃO presentes em `BIBLE-V1-GLOSSARIO.md`. Termos exclusivos dos 14 contos (neologismos, nomes ambientais novos, easter eggs específicos), agrupados por categoria.
+> **Convenção:** SÓ entradas NÃO presentes em `BIBLE-V1-GLOSSARIO.md`. Termos exclusivos dos 14 contos (neologismos, nomes ambientais novos, motivos específicos), agrupados por categoria.
 > **Status:** ✅ canônico (gravado na fonte) · 🟡 candidato (mencionado em conto sem definição formal; consolidação pendente em GLOSSARIO Vol 1 R2).
 
 ### G.1 Termos canônicos exclusivos contos · técnico-rúnico
@@ -389,23 +389,23 @@
 | **Abelha dormindo dentro do osso** | Metáfora canon Mariana Vanderbist para a dor do câncer ósseo metastático descendo até o joelho; Pyotor anota "porque metáforas de pacientes são quase sempre mais precisas do que escala visual analógica" | 10, 12 | ✅ canônico |
 | **30 colheitas (sonho do limite Helíaco)** | Datação canon do sonho profético Era 1: Helíaco sonha com presença do "limite que escolheu falar" anunciando chegada em ~-820 (Anomalia Primeira); pergaminho selado tubo cobre nicho atrás Coluna Janor | 14 | ✅ canônico |
 
-### G.5 Easter eggs canônicos pervasivos (Fibonacci + maçonaria) com manifestações específicas Vol 2
+### G.5 Motivos canônicos pervasivos (numéricos + cerimoniais fundadores) com manifestações específicas Vol 2
 
 | Manifestação canon | Tipo | Origem (conto) | Status |
 |---|---|---|---|
-| **Sequência Fibonacci (1,1,2,3,5,8,13,21,34,55,89,144)** em chuva / degraus / passos / pétalas / anéis de fungo / batidas plantio / dentes engrenagem / pedaços maçã / nós cordão | pervasivo | 01-14 (todos) | ✅ canônico |
-| **Cripto-glifo Era 1 ↔ Pigpen (grade 3×3 + X + pontos)** | maçônico | 01 (pedra Pyotor I), 04 (manuscrito Atelaiá), 13 (placa Era 1 -820), 14 (origem 21 raízes Vyr) | ✅ canônico |
-| **Pavimento tesselado claro/escuro** | maçônico | 04, 09 (corredor faculdade), 13, 14 | ✅ canônico |
-| **Coluna Boróstoma (ashlar bruto) + Coluna Janor (ashlar polido)** | maçônico | 04, 13, 14 + 06 (esquina Rua Boróstoma com Rua Janor, Periferia) | ✅ canônico |
-| **3-5-7 degraus em três tramos (descida iniciado)** | maçônico | 04 (São Camilo), 13 (arquivo São Vargas), 14 (Catedral-Mãe nave) | ✅ canônico |
-| **Cordão litúrgico 89 nós (duplos, espaçados em proporção decrescente)** | maçônico | 02, 03, 05, 09, 11, 12, 13, 14 | ✅ canônico |
-| **Acaceiro tronco vermelho (cor-de-juramento)** | maçônico (~acacia/acácio) | 01, 02, 04, 07, 08 (Sterling passa adro), 09, 10, 11, 12, 13, 14 | ✅ canônico |
-| **Esquadro + Compasso (entrelaçados em silêncio)** | maçônico | 04 (caderno iniciado contracapa), 05 (Linda Posto 7, esquadro luthier), 06 (esquadro bisavô cortado), 09 (Vorto medalha-esquadro-cortado herança 4 gerações) | ✅ canônico |
-| **Esquadro cortado / perna cortada deliberadamente** | maçônico (coluna quebrada Hiram echo) | 06 (Dante caixa pai), 09 (Vorto medalha família) | ✅ canônico |
-| **Avental de couro** | maçônico | 02 (Inácia), 05 (Brígida, retalho mãe que serve caderno Mara), 13 (Atelaiá Chevalier pena visão Bento) | ✅ canônico |
-| **Quadragésima sétima proposição (Pitágoras)** | maçônico | 14 (Helíaco -47 polegadas espelho obsidiana) | ✅ canônico |
-| **Helíaco Vyr ~Hiram Abiff echo (cantor-de-pedras sumido em câmara central)** | maçônico lendário | 14 ("sumir é uma maneira de continuar") | ✅ canônico |
-| **Catedral-Mãe submersa = coluna quebrada simbólica** | maçônico | 14 (profecia "ala leste partida pela água") | ✅ canônico |
+| **Sequência recorrente (1,1,2,3,5,8,13,21,34,55,89,144)** em chuva / degraus / passos / pétalas / anéis de fungo / batidas plantio / dentes engrenagem / pedaços maçã / nós cordão | pervasivo | 01-14 (todos) | ✅ canônico |
+| **Cripto-glifo cifrado Era 1 (grade 3×3 + X + pontos)** | cerimonial fundador | 01 (pedra Pyotor I), 04 (manuscrito Atelaiá), 13 (placa Era 1 -820), 14 (origem 21 raízes Vyr) | ✅ canônico |
+| **Pavimento tesselado claro/escuro** | cerimonial fundador | 04, 09 (corredor faculdade), 13, 14 | ✅ canônico |
+| **Coluna Boróstoma (ashlar bruto) + Coluna Janor (ashlar polido)** | cerimonial fundador | 04, 13, 14 + 06 (esquina Rua Boróstoma com Rua Janor, Periferia) | ✅ canônico |
+| **3-5-7 degraus em três tramos (descida iniciado)** | cerimonial fundador | 04 (São Camilo), 13 (arquivo São Vargas), 14 (Catedral-Mãe nave) | ✅ canônico |
+| **Cordão litúrgico 89 nós (duplos, espaçados em proporção decrescente)** | cerimonial fundador | 02, 03, 05, 09, 11, 12, 13, 14 | ✅ canônico |
+| **Acaceiro tronco vermelho (cor-de-juramento)** | cerimonial fundador | 01, 02, 04, 07, 08 (Sterling passa adro), 09, 10, 11, 12, 13, 14 | ✅ canônico |
+| **Instrumentos entrelaçados (em silêncio)** | cerimonial fundador | 04 (caderno iniciado contracapa), 05 (Linda Posto 7, esquadro luthier), 06 (esquadro bisavô cortado), 09 (Vorto medalha-esquadro-cortado herança 4 gerações) | ✅ canônico |
+| **Instrumento cortado / perna cortada deliberadamente** | cerimonial fundador (coluna quebrada) | 06 (Dante caixa pai), 09 (Vorto medalha família) | ✅ canônico |
+| **Avental de couro** | cerimonial fundador | 02 (Inácia), 05 (Brígida, retalho mãe que serve caderno Mara), 13 (Atelaiá Chevalier pena visão Bento) | ✅ canônico |
+| **Teorema dos catetos** | cerimonial fundador | 14 (Helíaco -47 polegadas espelho obsidiana) | ✅ canônico |
+| **Helíaco Vyr (cantor-de-pedras sumido em câmara central)** | cerimonial fundador lendário | 14 ("sumir é uma maneira de continuar") | ✅ canônico |
+| **Catedral-Mãe submersa = coluna quebrada simbólica** | cerimonial fundador | 14 (profecia "ala leste partida pela água") | ✅ canônico |
 
 ---
 
@@ -415,7 +415,7 @@
 - Apêndice D · Índice de Contos: 14 contos + 4 arcos coletivos = 18 entradas (Tomo 1: 7 / Tomo 2: 7 / sumário polifônico: 4)
 - Apêndice E · Cross-Ref Vol 1: 47 personagens cross-ref (7 party + 4 antagonistas + 17 família + 9 facções + 14 históricos Era 1-2) + 11 NPCs candidatos novos + 30 lugares cross-ref + 21 eventos cronológicos = ~109 entradas
 - Apêndice F · Citações Memoráveis: 25 citações canon (T1: 11 / T2: 14) + 8 leitmotivs canon cross-Vol = 33 entradas
-- Apêndice G · Glossário Compacto: 71 entradas únicas (21 técnico-rúnico + 15 lugares + 19 nomes próprios + 16 conceitos + manifestações easter eggs catalogadas)
+- Apêndice G · Glossário Compacto: 71 entradas únicas (21 técnico-rúnico + 15 lugares + 19 nomes próprios + 16 conceitos + manifestações de motivos catalogadas)
 
 **Zero em-dash:** confirmado por inspeção. Hífens "-" em medidas (5-pétalas, 3-5-7, etc.) preservados. Travessões longos e en-dash ausentes do documento. (Exceção canônica de em-dash aplica-se apenas a `docs/narrative/in-world-docs.md` per memória `project_em_dash_excecao`.)
 

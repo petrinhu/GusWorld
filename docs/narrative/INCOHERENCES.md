@@ -117,7 +117,7 @@ Mapeamento sistemático de conflitos canon detectados via cross-validation deep-
 
 **Cascata fix:** retrofit lore-bible §14.
 
-**RESOLVIDO (cascata F1-DL.REFAC):** retrofit aplicado em `lore-bible.md:522` §14 (Yakov Vance, 42, tio paterno, irmão mais novo de Pyotor 4 anos a menos, engenheiro de software + geólogo na maior mineradora do reino, stack prospecção 5 tecnologias, 89% redução mortalidade Fibonacci, apresenta xadrez ao Gus) + `timeline.md:120` (-11 "Tio paterno Yakov Vance ~25 na época"). Alinhado a CHARS:48. Cross-ref `AUDIT-T3-CRONOLOGIA-V2` LV-T3v2-03 (Pyotor 40 + Yakov 36 alinhado).
+**RESOLVIDO (cascata F1-DL.REFAC):** retrofit aplicado em `lore-bible.md:522` §14 (Yakov Vance, 42, tio paterno, irmão mais novo de Pyotor 4 anos a menos, engenheiro de software + geólogo na maior mineradora do reino, stack prospecção 5 tecnologias, 89% redução mortalidade, apresenta xadrez ao Gus) + `timeline.md:120` (-11 "Tio paterno Yakov Vance ~25 na época"). Alinhado a CHARS:48. Cross-ref `AUDIT-T3-CRONOLOGIA-V2` LV-T3v2-03 (Pyotor 40 + Yakov 36 alinhado).
 
 ---
 
@@ -184,7 +184,7 @@ Para cada CRÍTICA C1-C10 + relevantes adicionais, decisão criador supremo nece
 - "Patrício Vance" / "Bento (4)" / "-13 Davi morte" / "Chevarier" / "Salvador -16" = 0 ocorrências em prose canon central (só remanescem como citações do problema neste tracker). Lista negra confirmada limpa.
 - C13: lore-bible:570 + sterling-locke-deep já corrigidos para -35 / tratado -45, **após** a data dos AUDIT-T1/T3 (2026-05-22). Os críticos AUDIT correspondentes (MD-T1v2-03, CR-T3v2-02) estavam stale; marcados como cascateados nos respectivos AUDIT-T*.
 
-**Distinção importante (não confundir):** este tracker (C1-C15) cobre **incoerências factuais de canon** (nomes, idades, parentescos, datas, estados de personagem), TODAS resolvidas. Os 10 docs `AUDIT-T*-V2` cobrem **categorias de auditoria de prosa/estilo** (voz Stephenson, easter eggs Fibonacci/maçom, em-dash, pillars, axiologia) e contêm críticos PRÓPRIOS, em sua maioria refatorações de prosa deep-lore (era-2 fadiga, maçom literal, em-dash global) que permanecem **PENDENTES** (BLOQUEADO). Fechar este tracker NÃO fecha aqueles refatores. Ver marcador de status no topo de cada AUDIT-T*.
+**Distinção importante (não confundir):** este tracker (C1-C15) cobre **incoerências factuais de canon** (nomes, idades, parentescos, datas, estados de personagem), TODAS resolvidas. Os 10 docs `AUDIT-T*-V2` cobrem **categorias de auditoria de prosa/estilo** (voz Stephenson, motivos recorrentes velados, em-dash, pillars, axiologia) e contêm críticos PRÓPRIOS, em sua maioria refatorações de prosa deep-lore (era-2 fadiga, rótulos explícitos a velar, em-dash global) que permanecem **PENDENTES** (BLOQUEADO). Fechar este tracker NÃO fecha aqueles refatores. Ver marcador de status no topo de cada AUDIT-T*.
 
 ---
 
