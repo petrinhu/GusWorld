@@ -67,5 +67,5 @@ Texture maps:
 4. Retopo low-poly (atinge budget acima)
 5. UV unwrap + atlas painting (Krita ou Substance Painter pra cel-shading)
 6. Rig (Rigify modificado pra SD)
-7. Test render in-Godot com câmera 3/4 rotacional → screenshot apresentado ao user
+7. Test render na engine (C++20 + SDL3) com câmera 3/4 rotacional → screenshot apresentado ao user
 8. Aprovação final do user antes de animar

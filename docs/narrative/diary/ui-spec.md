@@ -408,7 +408,7 @@ Lista completa de plants/payoffs em [[foreshadow-links]] (130 plants canônicos 
 ### 9.1 Render
 
 - **Caderno (layer 1):** sprite atlas único de ~2048² contendo capa, abas, sticky notes (todas as cores), bordas, fita adesiva, manchas. Tudo pré-renderizado em Krita/Aseprite, exportado uma vez. Custo runtime: 1 draw call para frame.
-- **Conteúdo (layer 2):** text rendering on-demand via Godot `Label` / `RichTextLabel`. Cache de strings recentes. Nunca pre-renderiza todas as entries simultaneamente.
+- **Conteúdo (layer 2):** text rendering on-demand via a UI da engine própria (RmlUi sobre C++20 + SDL3; ver ROADMAP.md e o ADR-008). Cache de strings recentes. Nunca pre-renderiza todas as entries simultaneamente.
 - **Esboços:** sprites pequenos pré-renderizados, atlas separado por aba (4 atlas no total). Carregados sob demanda.
 - **Animação de abertura:** sequência de 4-6 sprites do papelão dobrando. ~120 KB total.
 - **Custo total estimado de Diário aberto:** ~5-10 draw calls + 1-2 MB VRAM. Negligível frente ao gameplay.
@@ -449,7 +449,7 @@ Salva **apenas state mínimo**:
 
 | Plataforma | Input | Notas |
 |---|---|---|
-| **PC Linux (AppImage / .tar.gz)** | Keyboard + mouse + gamepad (Xbox/PS4/PS5 nativo via Godot) | Decisão Fase 1 canônica. |
+| **PC Linux (AppImage / .tar.gz)** | Keyboard + mouse + gamepad (Xbox/PS4/PS5 nativo via SDL3) | Decisão Fase 1 canônica. |
 | **PC Windows (sem signing G1)** | Idem PC Linux | Decisão Fase 1 canônica. |
 | **Touch / mobile** | Não suportado em G1. | Fora de scope. |
 | **VR** | Não suportado. | Fora de scope. |

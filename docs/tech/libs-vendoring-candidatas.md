@@ -1,6 +1,6 @@
 # Bibliotecas C++ candidatas a incorporacao (vendoring) - GusWorld
 
-**Status:** pesquisa 2026-06-22. **Fonte:** cppreference External Libraries (~876 libs em ~40 categorias), filtradas pelas categorias uteis a um RPG 2D single-player C++20/Qt6 (equipe de agentes por categoria).
+**Status:** pesquisa 2026-06-22. **Fonte:** cppreference External Libraries (~876 libs em ~40 categorias), filtradas pelas categorias uteis a um RPG 2D single-player C++20 + SDL3 (equipe de agentes por categoria).
 
 **Filosofia ZERO-DEP:** incorporar o CODIGO no repo (header-only ou poucos arquivos), NAO como dependencia externa de build. Criterio de aprovacao: (1) util ao jogo, (2) vendorizavel (header-only/poucos arquivos), (3) licenca permissiva compativel com GPLv3.
 

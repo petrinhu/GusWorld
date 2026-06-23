@@ -69,6 +69,7 @@ A engine antiga (`game/` Godot + `engine/` C#) permanece no repo como referênci
 | [sinopse.md](sinopse.md) | Worldbuilding + protagonista (imutável) |
 | [docs/design/pillars.md](docs/design/pillars.md) | 5 pillars canon |
 | [docs/design/gdd.md](docs/design/gdd.md) | Game Design Document 1-page |
+| [docs/narrative/bibliografia-rag.md](docs/narrative/bibliografia-rag.md) | Bibliografia de inspiração da lore: ~306 obras no RAG principal + corpus élfico no RAG da conlang |
 | [docs/tech/pivot/engine-design.md](docs/tech/pivot/engine-design.md) | Design da engine do pivot C++20 (4 camadas; plataforma superada pelo [ADR-008](docs/tech/adr/ADR-008-repivot-qt-to-sdl3.md)) |
 | [docs/tech/adr/](docs/tech/adr/) | Architecture Decision Records |
 

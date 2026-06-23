@@ -1,6 +1,8 @@
 # Style Guide — GusWorld
 
-Solo G1 indie, Godot 4, **3D cel-shaded com proporção SD 1:1:1** (chibi-SD com extremidades ectomorfas, NÃO chibi inflado). Câmera 3/4 rotacional + zoom orbital (Chrono Trigger-ish, mas 3D real). Documento vivo. Toda decisão visual valida contra `docs/design/pillars.md`.
+> **NOTA DE STACK (pós-ADR-008).** As diretrizes de ARTE deste doc (proporção, paleta, silhueta, color script, budget de polígonos, estratégia de texture/shader cel-shaded) são canônicas e independem de engine. Os nomes de API antigos que aparecem nas seções técnicas (5 Lighting, 8 Budget, 10 Shader) foram escritos sobre o stack Godot 4, depois superado pela engine própria C++20 + SDL3 (ver ROADMAP.md e o ADR-008). Leia esses nomes como referência conceitual (luz direcional, ambiente/fog, luzes pontuais, shader custom); serão re-mapeados para a engine atual pelo squad técnico. O conteúdo visual em si não muda.
+
+Solo G1 indie, engine própria C++20 + SDL3, **3D cel-shaded com proporção SD 1:1:1** (chibi-SD com extremidades ectomorfas, NÃO chibi inflado). Câmera 3/4 rotacional + zoom orbital (Chrono Trigger-ish, mas 3D real). Documento vivo. Toda decisão visual valida contra `docs/design/pillars.md`.
 
 **Spec mestre de personagem:** `Resources/gusworld/character-spec-gus.md` (canônica). Sheet de produção: `docs/art/characters/gus.md`.
 
@@ -83,7 +85,7 @@ Biolúmen vegetal, fractais visíveis, gótico-matemático. **Verde-azulado domi
 
 ## 5. Lighting bible
 
-Godot 4 com `DirectionalLight3D` + `WorldEnvironment` (fog + ambient).
+Luz direcional + ambiente/fog (nomes de API antigos abaixo são referência conceitual, ver banner de topo).
 
 ### 5.1 Cidade
 
@@ -129,7 +131,7 @@ Cena infectada sobrepõe pulso vermelho `#F43F5E` no rim de tudo + glitch shader
 
 ## 8. Target poly budget
 
-Solo G1, 12 meses. Godot 4 PC mid-range (GTX 1060+). Alvo: **60fps @ 1080p**.
+Solo G1, 12 meses. PC mid-range (GTX 1060+). Alvo: **60fps @ 1080p**.
 
 | Asset | Tris | Texture | Material slots | Notas |
 |---|---|---|---|---|
@@ -167,7 +169,7 @@ Justificativa solo G1:
 
 ## 10. Shader strategy
 
-Godot 4. Mínimo de shader custom; maximizar built-in.
+Mínimo de shader custom; maximizar o que a engine oferece de fábrica.
 
 | Necessidade | Solução | Custo |
 |---|---|---|

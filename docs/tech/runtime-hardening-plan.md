@@ -12,7 +12,7 @@ Autor: security-engineer (defensivo)
 > 4. Manter HMAC do save (ADR-006) + hash-128 do controls (ADR-007).
 > FORA do escopo G1 (NAO fazer): kernel anti-cheat, anti-debug agressivo, deteccao de injection/hook, packing, pointer-scan dedicado.
 > Quando os valores de gameplay existirem (combate ja tem HP/AP/mana; economia/XP em progression/save), aplicar 1-3 nesses pontos.
-Escopo: GusWorld G1, C++20 + Qt6, engine propria, Linux + Windows, FOSS/GPLv3, SEM code signing.
+Escopo: GusWorld G1, C++20 + SDL3, engine propria, Linux + Windows, FOSS/GPLv3, SEM code signing.
 Conecta com: ADR-006 (HMAC-SHA256 save), ADR-007 (hash-128 controls.json), invariantes de combate.
 
 NAO e codigo. E um plano para o lider escolher o nivel. Descreve os vetores SO o

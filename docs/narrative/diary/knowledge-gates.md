@@ -373,7 +373,9 @@ Categoria Mecânico-meta tem cap baixo (~30) intencionalmente. Não pode "destra
 
 ## 10. Notas técnicas (delegadas Fase 2)
 
-Implementação Godot 4 + GDScript ([[CLAUDE.md]] §Decisões fechadas) será definida quando squad técnico entrar em produção. Spec preliminar:
+> **NOTA DE STACK (pós-ADR-008).** A spec preliminar abaixo foi escrita sobre o stack antigo Godot 4 + GDScript, depois superado pela engine própria C++20 + SDL3 (ver ROADMAP.md e o ADR-008). O que segue válido: o save schema JSON versionado, o tracking por IDs de trigger (set lookup), os pares de cross-reference data-driven e o recálculo on-demand. O que muda: a implementação é em C++20, event-driven via `core/events/` (barramento de eventos próprio), sem signals de framework. Termos de engine antiga abaixo permanecem só como referência conceitual; serão re-derivados pelo squad técnico na engine atual.
+
+A spec de DESIGN dos gates (thresholds, triggers, categorias) é canônica e independe de engine. Spec técnica preliminar:
 
 ### 10.1 Save schema (JSON versionado `save_version: 1`)
 
@@ -423,7 +425,7 @@ Pares canônicos registrados em arquivo de configuração separado (data-driven)
 
 - Knowledge score recalculado on-demand (open menu, gate notification, save). Não-tick-frame.
 - Entries do Diário renderizadas on-demand quando aba aberta. Sprite atlas único para frame caderno.
-- Notificação de gate é signal Godot disparado quando trigger consumido cruza threshold (event-driven).
+- Notificação de gate é evento publicado no barramento próprio (`core/events/`) quando um trigger consumido cruza threshold (event-driven; sem signals de framework).
 
 ### 10.5 Telemetria opcional Fase 4 QA
 

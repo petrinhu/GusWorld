@@ -112,6 +112,6 @@ First-visit alvo: **≤30-45s de leitura** (janela 0:45-1:30 menos a caminhada).
 | # | Decisão | Escolha |
 |---|---|---|
 | **DA-1** | Identidade do NPC introdutório | **Seu Bertoldo Caím** (existente, CHARS.md §7). Fixado como guia do VS. NÃO Gargi (queima beat família), NÃO companion. |
-| **DA-2** | Lib/sistema de diálogo | **DialogueManager** (Godot 4, MIT) — já decidido 2026-05-30 (TODO F2-E.6-DECISION); ADR-003 dedicado pendente (item W3). Blueprint expressável nativamente. |
+| **DA-2** | Lib/sistema de diálogo | **OBSOLETO (pós-ADR-008).** A escolha original era DialogueManager (addon Godot 4, MIT), registrada em ADR-003 e decidida 2026-05-30 (TODO F2-E.6-DECISION). O re-pivot para a engine própria C++20 + SDL3 (ADR-008) aposentou o addon Godot. O **blueprint de diálogo deste doc segue válido** (é dado de design agnóstico de engine); o runtime de diálogo será re-derivado em C++20 pelo squad técnico. Ver ROADMAP.md. |
 | **DA-3** | NPC dispara nota de cor no Diário no first-visit? | **SIM**, 1 nota de cor não-bestiary, voz analítica de Gus (P4). Escrita = narrative-writer. |
 | **DA-4** | `npc_intro.choice` tem callback futuro? | **Reservar para callback pós-VS** (companion/ending reconhece o tom do Gus). Persistir desde já (custo trivial). |

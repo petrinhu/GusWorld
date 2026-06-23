@@ -1,16 +1,16 @@
 # Blockout — Distritos Inferiores (Vertical Slice)
-**Status:** Canônico (design). Ratificado Sprint 5 W3 2026-06-03. F2-G.1. Build de editor (`.tscn` graybox) = follow-up do criador.
+**Status:** Canônico (design). Ratificado Sprint 5 W3 2026-06-03. F2-G.1. Build do nível (graybox) = follow-up do criador na engine própria (C++20 + SDL3).
 **Cross-ref:** core-loop-exploracao.md §2/§3/§4/§5 (5 tipos de nó, Scan raio ~8m, gatilhos); onboarding-vs.md §2/§7 (ordem dos degraus + timeline ≤5min); puzzle-gambito.md §8 (grid 7×5, P1/P2); dialogue-tree-npc-intro.md §1 (Bertoldo na Praça da Compilação); combat.md §17 (Sentinela-Bit HP55 + Daemon-Guard HP144); gdd.md §6/§7; pillars.md (P5 hub+radiais); PLACES.md (Praça da Compilação canon, Periferia canon); plano_vs.md §4 MVV / M.1.
 
 **Convenção:** pt-br. Termos game-dev no original (blockout, graybox, gold path, sightline, choke point, CSG, trigger, capsule). Sem em-dash.
 
-> **Nota de escopo (honesta):** este doc é o blockout DESIGN. Não constrói a `.tscn`. Toda dimensão e nó está concreta o bastante para que o graybox no editor (follow-up) seja trabalho mecânico. Placeholder-first (F2-PROD.2): cápsulas/CSG, zero arte final.
+> **Nota de escopo (honesta):** este doc é o blockout DESIGN. Não constrói a geometria do nível. Toda dimensão e nó está concreta o bastante para que o graybox na engine (follow-up) seja trabalho mecânico. Placeholder-first (F2-PROD.2): cápsulas/caixas, zero arte final.
 
 ---
 
 ## 1. Visão da área
 
-Praça civil na borda baixa do Núcleo Metropolitano, descendo para a charneira da Periferia. Tom P5 ciber-gótico: pavimento tesselado de pedra Era 1 rachado, postes de neon ciano, fonte de latão Era 2 girando, holograma de Sterling piscando "continue" ao fundo. Cidade que funciona apesar de si mesma (env 01-cidade §1). **Não open-world** (anti-pillar): grafo curto hub+radiais, atravessável de ponta a ponta em ~5min. Tamanho-alvo: caixa de ~60×40m em escala Godot. **Entrada:** rampa norte (vem do Edifício Vance, save base). **Saída:** portão sul para a Periferia, bloqueado pelo puzzle-patrulha (caminho único, canon).
+Praça civil na borda baixa do Núcleo Metropolitano, descendo para a charneira da Periferia. Tom P5 ciber-gótico: pavimento tesselado de pedra Era 1 rachado, postes de neon ciano, fonte de latão Era 2 girando, holograma de Sterling piscando "continue" ao fundo. Cidade que funciona apesar de si mesma (env 01-cidade §1). **Não open-world** (anti-pillar): grafo curto hub+radiais, atravessável de ponta a ponta em ~5min. Tamanho-alvo: caixa de ~60×40m em escala de mundo (metros). **Entrada:** rampa norte (vem do Edifício Vance, save base). **Saída:** portão sul para a Periferia, bloqueado pelo puzzle-patrulha (caminho único, canon).
 
 ## 2. Mapa blockout (topologia)
 
@@ -103,15 +103,15 @@ Tensão
 - **Tavus-Drive:** executa a carta ambiental em (T) (duplo-uso GDD §6.2).
 - **Padrão matemático do bioma (easter egg pervasivo, NÃO narrado):** as fachadas do hub e os degraus do choke seguem Fibonacci. Choke = **3, 5, 7** degraus (maçonaria canon, não-Fibonacci, deliberado). Vãos das janelas das fachadas norte em proporção 1:1:2:3:5. Rastro do board do puzzle numera 1,2,3,5 (puzzle §3). Densidade sutil ~10-15%; leitor familiar reconhece, leigo não nota.
 
-## 7. Notas de geometria graybox (CSG, para o editor)
+## 7. Notas de geometria graybox (caixas primitivas, para a engine)
 
 Escala canônica (core-loop-exploracao §3 calibra em F2-G.EXPLORE):
-- Player width ~0.5m (cápsula 0.5r ×1.7h). Wall height 3m. Cover height 1m. Door/portão width ~2m. Célula de puzzle = 2×2m (grid 7×5 = 14×10m). Escada do choke = 5 degraus visuais agrupados em rampa de colisão (suave para navmesh).
-- **Piso navegável:** CSGBox cinza médio, +0m no hub, -2m na arena (rampa de transição via escada). Colisão estática (StaticBody3D + CollisionShape box).
-- **Bloqueios/paredes:** CSGBox 3m alt, material preto flat = sem-passagem. Bordas do mapa fecham a caixa 60×40.
+- Player width ~0.5m (cápsula 0.5r ×1.7h). Wall height 3m. Cover height 1m. Door/portão width ~2m. Célula de puzzle = 2×2m (grid 7×5 = 14×10m). Escada do choke = 5 degraus visuais agrupados em rampa de colisão (suave para a navegação).
+- **Piso navegável:** caixa primitiva cinza médio, +0m no hub, -2m na arena (rampa de transição via escada). Colisão estática (corpo estático + collider de caixa).
+- **Bloqueios/paredes:** caixa 3m alt, material preto flat = sem-passagem. Bordas do mapa fecham a caixa 60×40.
 - **Hazard:** nenhum hazard de dano no overworld do VS (puzzle é fail=reset suave, sem dano).
-- **Nós interativos:** Area3D + trigger por tipo. (B) raio 2m; (C) raio 3m de aproximação; (L)/(T) raio ~8m de Scan; (P) Area3D que cobre a entrada do corredor-puzzle.
-- **Cover na arena:** 2 CSGBox 1m alt (azul graybox) para 60-70% de tempo-em-cover possível (encounter checklist); 1 vantage point leve (+1m) acessível ao jogador pelo flanco via (T).
+- **Nós interativos:** volume-gatilho por tipo. (B) raio 2m; (C) raio 3m de aproximação; (L)/(T) raio ~8m de Scan; (P) volume que cobre a entrada do corredor-puzzle.
+- **Cover na arena:** 2 caixas 1m alt (azul graybox) para 60-70% de tempo-em-cover possível (encounter checklist); 1 vantage point leve (+1m) acessível ao jogador pelo flanco via (T).
 
 ## 8. Cápsula de teste do loop (fecha M.1)
 
@@ -128,17 +128,17 @@ Esse blockout fecha o loop end-to-end de M.1 (plano_vs §1) numa sessão de 5-10
 | **DA-2** | Save points | **Entrada (S0) + portão sul.** Save na base + pós-puzzle; fecha o loop M.1 save/load testável sem save em zona tensa. |
 | **DA-3** | Daemon-Guard (HP144) | **Spawn na arena, ativado pós-Sentinela** (1º combate "real"). Mantém o encontro canônico §17 íntegro sem inflar o tutorial de 5min (onboarding DA-1). |
 
-## Follow-up de editor (mãos do criador, Godot — F2-G.1 build)
+## Follow-up de build do nível (mãos do criador, engine própria C++20+SDL3, F2-G.1 build)
 
 Trabalho mecânico, derivado direto das §3/§7 (nada de decisão de design pendente além das DAs acima):
 
-1. Criar cena `game/levels/distritos_inferiores.tscn` (raiz Node3D), caixa do mapa 60×40m com CSGBox de borda (parede 3m, material preto flat).
-2. Piso: CSGBox hub +0m + arena -2m + rampa-escada de transição (colisão suave para navmesh).
-3. Instanciar os 5 nós como Area3D + marker nas coords da §3 (B/L/C/P/T), com os raios de trigger da tabela.
+1. Criar o nível `distritos_inferiores` (cena/dado do mundo), caixa do mapa 60×40m com caixas de borda (parede 3m, material preto flat).
+2. Piso: caixa hub +0m + arena -2m + rampa-escada de transição (colisão suave para a navegação).
+3. Instanciar os 5 nós como volume-gatilho + marker nas coords da §3 (B/L/C/P/T), com os raios de trigger da tabela.
 4. 2 cover boxes (1m) + 1 vantage (+1m) na arena; portão sul (door 2m) como bloqueio até `puzzle_patrol.cleared`.
 5. Grid 7×5 do puzzle alinhado a células de 2m nas coords (P); reusar ciclos P1/P2 de puzzle-gambito §8 sem alteração.
 6. 2 save points (S0 entrada + portão sul), conforme DA-2 ratificada.
-7. Bake do NavMesh do graybox; smoke-test de travessia do gold path (§4) cronometrado contra os ≤5min.
+7. Gerar a malha de navegação do graybox; smoke-test de travessia do gold path (§4) cronometrado contra os ≤5min.
 8. Spawn-points de Sentinela-Bit + Daemon-Guard (DA-3) na arena, com dados do `CharacterRepository` (não atores ad-hoc, M.1).
 
-**Nota:** geometria não é validável headless; o smoke-test de travessia (passo 7) exige o editor/runtime nas mãos do criador. Este doc deixa todo o resto pré-resolvido.
+**Nota:** geometria não é validável headless; o smoke-test de travessia (passo 7) exige o runtime nas mãos do criador. Este doc deixa todo o resto pré-resolvido.

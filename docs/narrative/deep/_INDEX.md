@@ -134,7 +134,7 @@ docs/narrative/deep/
 | Ordem produção | Top-down: lore (eras) → facções → settings → personagens → magic → ontologia → stinger → antologia |
 | Estilo literário | Stephenson/Sterling cyberpunk denso |
 | Era 1 tratamento | Completa pro autor, calibrada pro player (gate Ouro) |
-| Cronograma | Deep-lore prioritário (Fase 2 Godot pausada) |
+| Cronograma | Deep-lore prioritário (paralelo orgânico à Fase 2: vertical slice na engine própria C++20 + SDL3, em andamento) |
 | Estrutura Vol 1 | Híbrida (voz autoral + trechos in-character) |
 | Idioma | pt-br (i18n estrutura ready desde dia 1; tradução en-intl pós-release v1.0.0) |
 | Em-dash | Permitido nesta camada (exceção formal) |

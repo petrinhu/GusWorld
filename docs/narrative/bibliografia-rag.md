@@ -4,7 +4,7 @@
 > **Owner:** narrativa. **Last-reviewed:** 2026-06-23. **Versão:** corpus RAG v1 (manifest 2026-06).
 > **Reportar imprecisão:** abrir item no `TODO.md` (tag `F1-DL`) ou avisar no canal de narrativa.
 
-Este documento cataloga as **306 obras** indexadas no RAG (Retrieval-Augmented Generation) local do projeto. O RAG é uma camada de **busca semântica de inspiração** para a deep-lore: serve para cruzar referências, achar passagens temáticas e enriquecer worldbuilding durante o design narrativo.
+Este documento cataloga o material indexado nos RAGs (Retrieval-Augmented Generation) locais do projeto. São **dois índices isolados**: o **RAG principal** (~306 obras, ~163.443 chunks) com a bibliografia geral de lore, e o **RAG élfico** (`rag_elvish`, 1.989 chunks) com o material de língua élfica de Tolkien que inspira a conlang **Sylvarin** (ver §13). O RAG é uma camada de **busca semântica de inspiração** para a deep-lore: serve para cruzar referências, achar passagens temáticas e enriquecer worldbuilding durante o design narrativo.
 
 **Importante: isto é bibliografia de inspiração e referência, não fonte de cópia.** Nenhum texto destes livros é reproduzido no jogo. O RAG ajuda o squad a *pensar com* essas obras (encontrar uma analogia de economia austríaca, um padrão de cronologia tolkieniana, uma imagem cyberpunk), nunca a *plagiar*. A lore canônica do GusWorld é original e escrita pelo squad, validada pelo criador.
 
@@ -16,7 +16,7 @@ O corpus vive em `resources/livros/` (pasta inteira gitignored, não versionada)
 
 - **Embedding:** modelo `bge-m3` servido localmente via Ollama. Converte cada trecho de livro em vetor semântico.
 - **Reranker:** `bge-reranker-v2-m3` reordena os candidatos por relevância à consulta.
-- **Banco vetorial:** `resources/livros/rag/chunks.lance` (Lance) + metadados em `resources/livros/rag/manifest.json` (fonte desta bibliografia).
+- **Banco vetorial:** `resources/livros/rag/chunks.lance` (Lance) + metadados em `resources/livros/rag/manifest.json` (fonte do inventário principal). O corpus élfico (§13 a §15) é um **segundo índice isolado** em `resources/livros/rag_elvish` (1.989 chunks), consultado à parte para não poluir as queries de lore geral.
 - **Wrapper:** usar sempre `rag-safe query "..."` (serializa via `flock`, 1 consulta por vez; respeita os limites de hardware da máquina).
 
 Consulta típica durante design de lore:
@@ -149,6 +149,32 @@ Base teórica da axiologia do projeto (memória `project_axiologia_canonica`).
 
 ---
 
+## Corpus élfico (RAG isolado para a conlang Sylvarin)
+
+> **Índice separado.** Este material NÃO está no RAG principal. Vive no segundo índice `resources/livros/rag_elvish` (1.989 chunks), consultado de forma isolada. Os arquivos-fonte ficam em `resources/livros/elvish/` (gitignored). Serve a um único objetivo de design: alimentar a **língua-mãe Sylvarin** (a conlang do GusWorld; ver `docs/narrative/lingua/00-arquitetura.md`).
+
+A Sylvarin é uma família linguística de 3 camadas no tempo (antiga Era 1 / atual Era 3 / mágica C-Arcane) mais uma escrita cifrada transversal. O corpus élfico de Tolkien é a referência filológica para quatro frentes da conlang: **(a)** fonologia élfica melódica temperada com português (o "português élfico arcaico"); **(b)** gramática rígida e regular sem exceção (Pillar 2, natureza é matemática; paradigmas em Fibonacci); **(c)** a escrita cifrada maçônica (cripto-glifo Pigpen, modo de grafar oculto, à la modos Tengwar); **(d)** a deriva histórica antiga para atual (como Quenya gera línguas posteriores; modelo para o substrato Sylvarin no português da Era 3). **Importante:** nenhum vocábulo élfico de Tolkien entra no jogo; o método (como inventar idioma com história interna e deriva fonética coerente) é o que inspira, não o léxico.
+
+### 13. Cursos de língua élfica (Sindarin, Quenya, Adúnaico)
+
+- **Thorsten Renk - *Pedin Edhellen* (curso de Sindarin, v2.0, EN)** (`en/pedin_edhellen_en_v2.0.pdf`): curso estruturado de Sindarin. Inspira a progressão pedagógica e a fonologia consonantal suave da camada antiga da Sylvarin.
+- **Ardalambion Brazil / Valinor (trad. PT) - *Curso de Sindarin*** (`pt/curso-de-sindarin_pt/`, 22 lições + 3 apêndices): versão em português do curso de Sindarin. A leitura em PT ajuda a calibrar o tempero "português élfico" (como o som élfico convive com nasais e dígrafos lh/nh).
+- **Thorsten Renk - *Quetin i lambe eldaiva* (curso de Quenya, v2, EN)** (`en/quetin_lambe_eldaiva_en_v2.pdf`): curso estruturado de Quenya. Modelo de gramática regular e de classe nominal; referência para os paradigmas rígidos em Fibonacci.
+- **Ardalambion Brazil / Valinor (trad. PT) - *Curso de Quenya*** (`pt/curso-de-quenya_pt/`, 20 lições + intro, apêndice, respostas, vocabulário, dicionário Quenya-Português p1/p2): versão em português do curso de Quenya. Fonte da deriva histórica (Quenya como "latim" élfico) que inspira a Sylvarin como latim do GusWorld.
+- **Diversos autores - *Ni-bitha Adúnaye* (curso de Adúnaico, EN)** (`en/ni_bitha_adunaye.pdf`): curso da língua dos Homens de Númenor (Adúnaico). Contraste útil: uma língua menos élfica e mais "humana/terrena", referência para registros menos melódicos do substrato atual.
+
+### 14. Gramáticas e artigos filológicos élficos
+
+- **Diversos autores - 8 gramáticas élficas (HTML)** (`en/grammar_*.html`): notas de gramática sobre casos (`grammar_cases`), mutações consonantais (`grammar_mutations`), pronomes (`grammar_pron_rek`, `grammar_quenya_pronouns`), verbos (`grammar_verbs`), e tempos verbais Quenya passado/perfeito (`grammar_quenya_past_tense`, `grammar_quenya_perfect_tense`) e Sindarin passado (`grammar_sindarin_past_tense`). Inspiram os paradigmas formais sem exceção da gramática rígida da Sylvarin (Pillar 2): as mutações consonantais são o modelo direto para a derivação por regra que a conlang exige.
+- **Diversos autores - *Tengwestie* (~15 artigos do journal, EN)** (`en/tengwestie_*.pdf`): artigos acadêmicos do periódico de linguística tolkieniana (Tengwestie). Cobrem tópicos como acento eldarin (`eldarinaccent`), plurais e padrões Noldorin (`noldplur`, `noldpat`, `noldintenspref`), tempos compostos do Quenya (`quenyacompoundtenses`), numerais rúmilianos (`rumiliannumerals`), Ilkorin antigo (`earlyilkorin`), reencarnação élfica (`elvishreincarnationgloss`), comentários de topônimos (`limlight`, `limlightcommentary`, `goldpat`, `causquen`, `sindll`), luz e árvore (`lightandtree`) e resenha de *The Nature of Middle-earth* (`natureofmiddleearthreview`). Inspiram o rigor do **método filológico**: como tratar a língua antiga como objeto com história interna, variantes e deriva.
+- **Diversos autores - *VT-index* (índice do Vinyar Tengwar, EN)** (`en/VT-index-en.pdf`): índice do periódico Vinyar Tengwar. Mapa de consulta para localizar tópicos filológicos específicos no corpus.
+
+### 15. Escrita: modos Tengwar / cifra
+
+- **Diversos autores - *Tengwar-Português* (modo MTP, PT)** (`pt/tengwar-portugues-mtp.pdf`): modo de transcrição do português em Tengwar (a escrita élfica). Inspira diretamente a **escrita cifrada transversal** da Sylvarin: como mapear sons do português a um sistema de grafia élfico, base conceitual para o cripto-glifo maçônico (grade 3x3 Pigpen) como "forma sagrada/oculta de grafar a língua".
+
+---
+
 ## Contagem por grupo
 
 | # | Grupo | Obras | Pillar / memória que inspira |
@@ -165,7 +191,9 @@ Base teórica da axiologia do projeto (memória `project_axiologia_canonica`).
 | 10 | Umberto Eco | 2 | Semiótica; conspiração; maçonaria |
 | 11 | Dan Brown | 7 | Cifras; maçonaria; gates Ouro |
 | 12 | Illuminatus + diversos | ~6 | Conspiração; padrão oculto; apoio |
-| | **Total** | **306** | |
+| | **Total (RAG principal)** | **306** | |
+
+> **Corpus élfico (RAG isolado `rag_elvish`, ver §13 a §15):** cursos de Sindarin (Pedin Edhellen, EN + PT), Quenya (Quetin i lambe eldaiva, EN + PT) e Adúnaico (Ni-bitha Adúnaye, EN); ~15 artigos do journal Tengwestie; 8 gramáticas em HTML; VT-index; modo Tengwar-Português. Inspira a conlang **Sylvarin** (fonologia élfica + português, gramática rígida Fibonacci, escrita cifrada maçônica, deriva histórica antiga para atual). Não conta no total do RAG principal.
 
 > Os grupos 5, 6, 7, 9 e 12 partilham a categoria física "avulsos" (50 arquivos na raiz de `resources/livros/`); a soma das estimativas (`~`) reflete a classificação temática, não pastas. Os grupos 1 a 4, 8, 10, 11 correspondem a pastas dedicadas. Fonte exata: `resources/livros/rag/manifest.json`.
 
@@ -177,5 +205,6 @@ Base teórica da axiologia do projeto (memória `project_axiologia_canonica`).
 - `docs/narrative/timeline.md`: cronologia das 3 eras (modelo tolkieniano/Martin).
 - `docs/narrative/in-world-docs.md`: docs descobríveis (modelo Fogo & Sangue / Eco / Dan Brown).
 - `docs/narrative/factions.md`: 7 facções (modelo ASOIAF + Dune + axiologia).
+- `docs/narrative/lingua/00-arquitetura.md`: arquitetura da conlang Sylvarin (destino do corpus élfico, §13 a §15).
 - `resources/livros/howto_rag.md`: how-to de uso do CLI `rag` (não versionado).
 - Memórias: `reference_rag_cli`, `reference_rag_scoring_oom`, `project_alvo_palavras_pos_era_1`, `project_axiologia_canonica`, `project_eastereggs_maconaria_canonica`, `project_fibonacci_easter_egg`, `feedback_rag_query_batch_2`.
