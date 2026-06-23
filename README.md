@@ -221,7 +221,7 @@ E as ferramentas de IA que ajudaram a construir o GusWorld:
 - **[Gemini (nano banana)](https://gemini.google.com/) e [Grok (xAI)](https://grok.com/):** geração de imagem conceitual 2D.
 - **[Tripo3D](https://www.tripo3d.ai/):** criação de arte conceitual em 3D.
 
-Aos **autores das obras que inspiraram a lore**: de Tolkien aos demais nomes do corpus, cujos livros alimentaram o worldbuilding do GusWorld. A bibliografia completa (cerca de 306 obras no RAG principal, mais o corpus élfico da conlang) está em [docs/narrative/bibliografia-rag.md](docs/narrative/bibliografia-rag.md). Nenhum texto foi copiado: serviram de inspiração e referência.
+Aos **autores das obras que inspiraram a lore**: de Tolkien aos demais nomes do corpus, cujos livros alimentaram o worldbuilding do GusWorld. A bibliografia completa (cerca de 306 obras no RAG principal, mais o corpus élfico da conlang) está em [docs/narrative/bibliografia-rag.md](docs/narrative/bibliografia-rag.md). O índice de busca semântica reúne **165.432 chunks** (163.443 do corpus principal + 1.989 do élfico), fatiados em ~2000 caracteres com 500 de sobreposição (janela de interposição), via `bge-m3` (1024 dimensões) + LanceDB. Nenhum texto foi copiado: serviram de inspiração e referência.
 
 Por fim, as ferramentas livres e as inspirações que sustentam o projeto:
 
