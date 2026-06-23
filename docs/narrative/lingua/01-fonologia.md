@@ -9,13 +9,13 @@ Equilibrio: a melodia do Quenya (vogais puras) na base + aspereza pontual do Sin
 - Puras: **a e i o u** (como no portugues / Quenya), claras e abertas.
 - Longas: **a e i o u** com macron ou acento agudo na escrita romanizada (a, e, i, o, u longas), contrastivas (mudam sentido).
 - Nasais (marca brasileira): **a-til e o-til** (ex.: "Selvar-a-til-e").
-- Ditongos (conjunto fechado, contagem Fibonacci): ai, au, ei, oi, eu (5).
+- Ditongos (conjunto fechado): ai, au, ei, oi, eu (5).
 
 ## Consoantes
 - Nucleo melodico/liquido: **l r m n v s** (sons que fluem).
 - Tipicamente nossas: **lh, nh** (portugues).
 - Aspereza pontual (Sindarin): **th** (como em "think"), **dh** (como o "th" de "this").
-- Demais de apoio: p t c/k b d g f h. Contagem-alvo do inventario consonantal: Fibonacci (13).
+- Demais de apoio: p t c/k b d g f h. Contagem-alvo do inventario consonantal: 13.
 
 ## Estrutura silabica
 - Padrao **(C)V(C)**, com forte preferencia por silaba ABERTA (consoante+vogal), o que da fluidez.
@@ -30,9 +30,6 @@ Equilibrio: a melodia do Quenya (vogais puras) na base + aspereza pontual do Sin
 O achado de ouro do Sindarin. A **primeira consoante da palavra muta conforme o contexto gramatical** (ex.: depois do artigo, ou em composicao), por uma TABELA FIXA e previsivel. E a "matematica viva" da lingua: sem excecao, decifravel por regra (Pillar 2; e por isso o cripto-glifo Era 1 e decifravel via C-Arcane).
 - Mutacao suave (lenicao), ex.: p->b, t->d, c->g, s->h (a definir a tabela completa).
 - Outras classes (nasal, mista) a especificar na gramatica.
-
-## Fibonacci escondido (easter egg, nunca narrado)
-- 5 vogais puras, 5 ditongos, 13 consoantes-alvo, contagens estruturais (casos, classes nominais) em 3/5/8/13.
 
 ## Pendente (proximas etapas)
 - Lexico-semente (raizes ancoradas no canon: Sylva, Vyr, Tavus...).

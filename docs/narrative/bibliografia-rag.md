@@ -29,7 +29,7 @@ rag-safe query "ecologia planetária moldando religião e profecia em deserto" -
 
 O gate de score `>= 0.499` do reranker **não mede tema certo, mede tipo textual do corpus.** Resumo da memória `reference_rag_scoring_oom`:
 
-- **Crava alto (0.7 a 0.98):** texto expositivo/argumentativo. Economia austríaca, "As 48 Leis do Poder", Orwell didático, Umberto Eco discursivo, "Without Conscience", Dan Brown expondo conspiração maçônica.
+- **Crava alto (0.7 a 0.98):** texto expositivo/argumentativo. Economia austríaca, "As 48 Leis do Poder", Orwell didático, Umberto Eco discursivo, "Without Conscience", Dan Brown expondo conspirações.
 - **Reprova (0.01 a 0.45) mesmo on-tema:** prosa narrativa pura. Bíblia, Mad Max, Gibson, Dick. A imagética não cross-encoda bem contra consultas temáticas em português.
 
 **Consequência de método:** para temas com forte match expositivo, deixar o RAG sugerir. Para imagética narrativa (cyberpunk, queda, catástrofe, êxodo), **escrever do canon do jogo** (timeline, lore-bible, era-1 §8); o RAG é camada bônus, não fonte única.
@@ -51,7 +51,7 @@ Saga e materiais filológicos de J.R.R. (e Christopher) Tolkien:
 - **Menores / contos:** *Tales from the Perilous Realm*, *Farmer Giles of Ham*, *Roverandom*, *Leaf by Niggle*, *Smith / Tom Bombadil*, *Bilbo's Last Song*, *Letters from Father Christmas*, *The Legend of Sigurd and Gudrún*, *The Homecoming of Beorhtnoth*, *Pictures by J.R.R. Tolkien*.
 - **Filologia (chave para lore de língua):** *A Middle English Vocabulary*, *Songs for the Philologists*, *Finn and Hengest*, *The Lays of Beleriand*.
 
-**Como inspira:** modelo máximo de **worldbuilding profundo com camadas de tempo** (cronologia em eras, versões in-world divergentes de um mesmo mito), alimenta a estrutura de 3 eras do GusWorld e os docs descobríveis (`in-world-docs.md`). A vertente filológica é a referência direta para a **lore de língua/conlang** que o criador quer construir: como inventar idiomas com história interna e deriva fonética coerente. Conecta ao pillar **Magia = software** (linguagens rúnicas compiladas como artefatos com gramática e versão) e ao easter egg Fibonacci em proporções/datações.
+**Como inspira:** modelo máximo de **worldbuilding profundo com camadas de tempo** (cronologia em eras, versões in-world divergentes de um mesmo mito), alimenta a estrutura de 3 eras do GusWorld e os docs descobríveis (`in-world-docs.md`). A vertente filológica é a referência direta para a **lore de língua/conlang** que o criador quer construir: como inventar idiomas com história interna e deriva fonética coerente. Conecta ao pillar **Magia = software** (linguagens rúnicas compiladas como artefatos com gramática e versão) e aos padrões numéricos recorrentes em proporções/datações.
 
 ### 2. Asimov, ficção científica e ciência popular (171 obras)
 
@@ -129,23 +129,23 @@ Base teórica da axiologia do projeto (memória `project_axiologia_canonica`).
 
 - *O Nome da Rosa* e *O Pêndulo de Foucault*.
 
-**Como inspira:** o **mistério decifrável por erudição** e a conspiração de sociedades secretas. Fonte direta dos **easter eggs maçônicos canônicos** (memória `project_eastereggs_maconaria_canonica`) e dos docs in-world enigmáticos. Eco discursivo crava alto no reranker.
+**Como inspira:** o **mistério decifrável por erudição** e a conspiração de ordens fechadas. Fonte direta dos **enigmas decifráveis e da escrita cifrada da Era 1**, e dos docs in-world enigmáticos. Eco discursivo crava alto no reranker.
 
-### 11. Dan Brown, cifras e maçonaria (7 obras)
+### 11. Dan Brown, cifras e criptografia (7 obras)
 
 - *O Código Da Vinci*, *Anjos e Demônios*, *O Símbolo Perdido*, *Inferno*, *Fortaleza Digital*, *A Chave de Salomão*, *A Conspiração*.
 
-**Como inspira:** ligação direta ao **easter egg maçônico** (Pigpen cipher e cripto-glifo Era 1, esquadro/compasso, colunas, graus 3-5-7, 47ª proposição, Helíaco Vyr = eco de Hiram Abiff). *O Símbolo Perdido* (maçonaria explícita) e *Fortaleza Digital* (criptografia) modelam os enigmas decifráveis e os gates Ouro. Exposição conspiratória crava alto no reranker.
+**Como inspira:** ligação direta à **escrita cifrada da Era 1** (o cripto-glifo) e aos enigmas decifráveis. *O Símbolo Perdido* e *Fortaleza Digital* (criptografia) modelam os enigmas e os gates Ouro. Exposição conspiratória crava alto no reranker.
 
 ### 12. Illuminatus + diversos, conspiração e apoio (resto de "avulsos")
 
-- Robert Shea & Robert Anton Wilson *The Illuminatus! Trilogy*: sociedades secretas, paranoia conspiratória pós-moderna (reforça maçonaria + Fibonacci como padrão oculto pervasivo).
+- Robert Shea & Robert Anton Wilson *The Illuminatus! Trilogy*: paranoia conspiratória pós-moderna (reforça os padrões ocultos pervasivos da lore).
 - Arthur C. Clarke *23 Science Fiction Books*: antologia de FC clássica (apoio ao pillar **Magia = software** e natureza-matemática).
 - Bíblia King James 1611: referência mítica/genealógica e de linguagem arcaica (cronologias, profecia; reprova no reranker, leitura humana).
 - Simon Sinek *O Jogo Infinito*: teoria de jogos de longo prazo (estratégia de facções).
 - Pavinato *O Que É a Verdade*: apoio filosófico/epistemológico.
 
-**Como inspira:** camada de **conspiração e padrão oculto** que sustenta os dois sistemas de easter egg (Fibonacci #1 + maçonaria), mantendo a densidade ~10-15% pervasiva sem siglas nem gestos nomeados.
+**Como inspira:** camada de **conspiração e padrão oculto** que sustenta os padrões pervasivos da lore, sem siglas nem gestos nomeados.
 
 ---
 
@@ -153,13 +153,13 @@ Base teórica da axiologia do projeto (memória `project_axiologia_canonica`).
 
 > **Índice separado.** Este material NÃO está no RAG principal. Vive no segundo índice `resources/livros/rag_elvish` (1.989 chunks), consultado de forma isolada. Os arquivos-fonte ficam em `resources/livros/elvish/` (gitignored). Serve a um único objetivo de design: alimentar a **língua-mãe Sylvarin** (a conlang do GusWorld; ver `docs/narrative/lingua/00-arquitetura.md`).
 
-A Sylvarin é uma família linguística de 3 camadas no tempo (antiga Era 1 / atual Era 3 / mágica C-Arcane) mais uma escrita cifrada transversal. O corpus élfico de Tolkien é a referência filológica para quatro frentes da conlang: **(a)** fonologia élfica melódica temperada com português (o "português élfico arcaico"); **(b)** gramática rígida e regular sem exceção (Pillar 2, natureza é matemática; paradigmas em Fibonacci); **(c)** a escrita cifrada maçônica (cripto-glifo Pigpen, modo de grafar oculto, à la modos Tengwar); **(d)** a deriva histórica antiga para atual (como Quenya gera línguas posteriores; modelo para o substrato Sylvarin no português da Era 3). **Importante:** nenhum vocábulo élfico de Tolkien entra no jogo; o método (como inventar idioma com história interna e deriva fonética coerente) é o que inspira, não o léxico.
+A Sylvarin é uma família linguística de 3 camadas no tempo (antiga Era 1 / atual Era 3 / mágica C-Arcane) mais uma escrita cifrada transversal. O corpus élfico de Tolkien é a referência filológica para quatro frentes da conlang: **(a)** fonologia élfica melódica temperada com português (o "português élfico arcaico"); **(b)** gramática rígida e regular sem exceção (Pillar 2, natureza é matemática; paradigmas com números recorrentes); **(c)** a escrita cifrada da Era 1 (o cripto-glifo, modo de grafar oculto, à la modos Tengwar); **(d)** a deriva histórica antiga para atual (como Quenya gera línguas posteriores; modelo para o substrato Sylvarin no português da Era 3). **Importante:** nenhum vocábulo élfico de Tolkien entra no jogo; o método (como inventar idioma com história interna e deriva fonética coerente) é o que inspira, não o léxico.
 
 ### 13. Cursos de língua élfica (Sindarin, Quenya, Adúnaico)
 
 - **Thorsten Renk - *Pedin Edhellen* (curso de Sindarin, v2.0, EN)** (`en/pedin_edhellen_en_v2.0.pdf`): curso estruturado de Sindarin. Inspira a progressão pedagógica e a fonologia consonantal suave da camada antiga da Sylvarin.
 - **Ardalambion Brazil / Valinor (trad. PT) - *Curso de Sindarin*** (`pt/curso-de-sindarin_pt/`, 22 lições + 3 apêndices): versão em português do curso de Sindarin. A leitura em PT ajuda a calibrar o tempero "português élfico" (como o som élfico convive com nasais e dígrafos lh/nh).
-- **Thorsten Renk - *Quetin i lambe eldaiva* (curso de Quenya, v2, EN)** (`en/quetin_lambe_eldaiva_en_v2.pdf`): curso estruturado de Quenya. Modelo de gramática regular e de classe nominal; referência para os paradigmas rígidos em Fibonacci.
+- **Thorsten Renk - *Quetin i lambe eldaiva* (curso de Quenya, v2, EN)** (`en/quetin_lambe_eldaiva_en_v2.pdf`): curso estruturado de Quenya. Modelo de gramática regular e de classe nominal; referência para os paradigmas rígidos.
 - **Ardalambion Brazil / Valinor (trad. PT) - *Curso de Quenya*** (`pt/curso-de-quenya_pt/`, 20 lições + intro, apêndice, respostas, vocabulário, dicionário Quenya-Português p1/p2): versão em português do curso de Quenya. Fonte da deriva histórica (Quenya como "latim" élfico) que inspira a Sylvarin como latim do GusWorld.
 - **Diversos autores - *Ni-bitha Adúnaye* (curso de Adúnaico, EN)** (`en/ni_bitha_adunaye.pdf`): curso da língua dos Homens de Númenor (Adúnaico). Contraste útil: uma língua menos élfica e mais "humana/terrena", referência para registros menos melódicos do substrato atual.
 
@@ -171,7 +171,7 @@ A Sylvarin é uma família linguística de 3 camadas no tempo (antiga Era 1 / at
 
 ### 15. Escrita: modos Tengwar / cifra
 
-- **Diversos autores - *Tengwar-Português* (modo MTP, PT)** (`pt/tengwar-portugues-mtp.pdf`): modo de transcrição do português em Tengwar (a escrita élfica). Inspira diretamente a **escrita cifrada transversal** da Sylvarin: como mapear sons do português a um sistema de grafia élfico, base conceitual para o cripto-glifo maçônico (grade 3x3 Pigpen) como "forma sagrada/oculta de grafar a língua".
+- **Diversos autores - *Tengwar-Português* (modo MTP, PT)** (`pt/tengwar-portugues-mtp.pdf`): modo de transcrição do português em Tengwar (a escrita élfica). Inspira diretamente a **escrita cifrada transversal** da Sylvarin: como mapear sons do português a um sistema de grafia élfico, base conceitual para o cripto-glifo cifrado da Era 1 como "forma sagrada/oculta de grafar a língua".
 
 ---
 
@@ -179,7 +179,7 @@ A Sylvarin é uma família linguística de 3 camadas no tempo (antiga Era 1 / at
 
 | # | Grupo | Obras | Pillar / memória que inspira |
 |:--|:------|:-----:|:-----------------------------|
-| 1 | Tolkien (Legendarium + filologia) | 42 | Worldbuilding profundo; conlang; Magia = software; Fibonacci |
+| 1 | Tolkien (Legendarium + filologia) | 42 | Worldbuilding profundo; conlang; Magia = software; padrões numéricos |
 | 2 | Asimov (FC + ciência popular) | 171 | Magia = software; Natureza = matemática; prodígio lógico |
 | 3 | Herbert / Dune | 22 | Ecologia; religião-tecnologia; profecia; axiologia |
 | 4 | George R. R. Martin (ASOIAF) | 10 | Política de facções; cronistas in-world |
@@ -188,12 +188,12 @@ A Sylvarin é uma família linguística de 3 camadas no tempo (antiga Era 1 / at
 | 7 | Filosofia / poder | ~7 | Antagonistas; Sterling; Patch-Zero |
 | 8 | Homero (clássicos) | 2 | Arco heroico; engenho > força |
 | 9 | Orwell | 2 | Vigilância; linguagem; axiologia |
-| 10 | Umberto Eco | 2 | Semiótica; conspiração; maçonaria |
-| 11 | Dan Brown | 7 | Cifras; maçonaria; gates Ouro |
+| 10 | Umberto Eco | 2 | Semiótica; conspiração; enigmas |
+| 11 | Dan Brown | 7 | Cifras; criptografia; gates Ouro |
 | 12 | Illuminatus + diversos | ~6 | Conspiração; padrão oculto; apoio |
 | | **Total (RAG principal)** | **306** | |
 
-> **Corpus élfico (RAG isolado `rag_elvish`, ver §13 a §15):** cursos de Sindarin (Pedin Edhellen, EN + PT), Quenya (Quetin i lambe eldaiva, EN + PT) e Adúnaico (Ni-bitha Adúnaye, EN); ~15 artigos do journal Tengwestie; 8 gramáticas em HTML; VT-index; modo Tengwar-Português. Inspira a conlang **Sylvarin** (fonologia élfica + português, gramática rígida Fibonacci, escrita cifrada maçônica, deriva histórica antiga para atual). Não conta no total do RAG principal.
+> **Corpus élfico (RAG isolado `rag_elvish`, ver §13 a §15):** cursos de Sindarin (Pedin Edhellen, EN + PT), Quenya (Quetin i lambe eldaiva, EN + PT) e Adúnaico (Ni-bitha Adúnaye, EN); ~15 artigos do journal Tengwestie; 8 gramáticas em HTML; VT-index; modo Tengwar-Português. Inspira a conlang **Sylvarin** (fonologia élfica + português, gramática rígida, escrita cifrada da Era 1, deriva histórica antiga para atual). Não conta no total do RAG principal.
 
 > Os grupos 5, 6, 7, 9 e 12 partilham a categoria física "avulsos" (50 arquivos na raiz de `resources/livros/`); a soma das estimativas (`~`) reflete a classificação temática, não pastas. Os grupos 1 a 4, 8, 10, 11 correspondem a pastas dedicadas. Fonte exata: `resources/livros/rag/manifest.json`.
 
@@ -207,4 +207,4 @@ A Sylvarin é uma família linguística de 3 camadas no tempo (antiga Era 1 / at
 - `docs/narrative/factions.md`: 7 facções (modelo ASOIAF + Dune + axiologia).
 - `docs/narrative/lingua/00-arquitetura.md`: arquitetura da conlang Sylvarin (destino do corpus élfico, §13 a §15).
 - `resources/livros/howto_rag.md`: how-to de uso do CLI `rag` (não versionado).
-- Memórias: `reference_rag_cli`, `reference_rag_scoring_oom`, `project_alvo_palavras_pos_era_1`, `project_axiologia_canonica`, `project_eastereggs_maconaria_canonica`, `project_fibonacci_easter_egg`, `feedback_rag_query_batch_2`.
+- Memórias: `reference_rag_cli`, `reference_rag_scoring_oom`, `project_alvo_palavras_pos_era_1`, `project_axiologia_canonica`, `feedback_rag_query_batch_2`.

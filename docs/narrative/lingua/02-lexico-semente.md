@@ -2,7 +2,7 @@
 
 Status: as 3 raizes canon (sylva/vyr/tavus) e a abordagem APROVADAS pelo lider 2026-06-23. As 10 raizes novas e as derivacoes abaixo sao PROPOSTA aguardando validacao. Segue a fonologia de `01-fonologia.md` (equilibrio elfico + PT, silaba aberta, acento paroxitono).
 
-Total de raizes: **13** (Fibonacci). Cada raiz gera familias de palavras por sufixo.
+Total de raizes: **13**. Cada raiz gera familias de palavras por sufixo.
 
 ## As 13 raizes
 
@@ -12,10 +12,10 @@ Total de raizes: **13** (Fibonacci). Cada raiz gera familias de palavras por suf
 | 2 | **vyr-** | fogo draconico, poder sagrado | Vyrdragon, Vyrcatrix, Heliaco Vyr; codinome "Dragon" |
 | 3 | **tavus-** | o pulso que executa, motor-coracao | Tavus-Drive (aparato de pulso do Gus) |
 | 4 | **nenh-** | agua corrente | Aguas-de-Espelho (rio canon, in-world-docs) |
-| 5 | **ondh-** | pedra, construcao, alicerce | Neo-Sylvania (cidade de pedra), ashlar maconico |
+| 5 | **ondh-** | pedra, construcao, alicerce | Neo-Sylvania (cidade de pedra), cantaria da Era 1 |
 | 6 | **cale-** | luz, claridade | biolumen da Selve; "modo scan" dos oculos |
 | 7 | **mor-** | sombra, escuro | Selve **Sombria** |
-| 8 | **rime-** | numero, ordem, computo | Fibonacci; Ordem Recursiva; natureza = matematica |
+| 8 | **rime-** | numero, ordem, computo | Ordem Recursiva; natureza = matematica; sequencias numericas |
 | 9 | **glyfa-** | glifo, palavra-codigo | C-Arcane, cripto-glifo Era 1, "Glyph" canon |
 | 10 | **elen-** | estrela, ceu | datacao por ciclo (calendario Era 1) |
 | 11 | **gala-** | vida, crescimento, arvore | fractais/recursao da flora da Selve (Pillar 2) |
@@ -35,7 +35,7 @@ Total de raizes: **13** (Fibonacci). Cada raiz gera familias de palavras por suf
 - **Selve Sombria** = *mor* + *sylva* -> *morsylva*, "a mata-sombra" (o nome moderno e meio-traduzido).
 - **Neo-Sylvania** = *Neo* (emprestimo Era 3) + *sylva* + *-nia* (terra) = "nova terra-da-Selve".
 - **Vyrdragon** = *vyr* + *dragon* (raiz hibrida) = "dragao de fogo sagrado".
-- **Heliaco Vyr** = *heliaco* (relativo ao sol nascente) + *vyr* = titulo lendario (eco de Hiram Abiff).
+- **Heliaco Vyr** = *heliaco* (relativo ao sol nascente) + *vyr* = titulo lendario da Era 1.
 - **Tavus-Drive** = *tavus* + *Drive* (emprestimo Era 3) = hibrido tecnologico moderno sobre raiz antiga.
 - **Aguas-de-Espelho** = traducao de um composto com *nenh-* + *cale-* (agua + luz/reflexo).
 
@@ -48,4 +48,4 @@ Total de raizes: **13** (Fibonacci). Cada raiz gera familias de palavras por suf
 - Tabela completa de mutacao consonantal.
 - Morfologia nominal (casos) e verbal (tempos), ordem das palavras.
 - Deriva historica Sylvarin puro (Era 1) -> substrato no portugues do jogo (Era 3).
-- Escrita cifrada (cripto-glifo maconico) como sistema de grafia.
+- Escrita cifrada (cripto-glifo da Era 1) como sistema de grafia.

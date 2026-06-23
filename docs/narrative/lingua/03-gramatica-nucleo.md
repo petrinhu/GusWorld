@@ -19,7 +19,7 @@ Gatilhos: depois do artigo definido, adjetivo posposto, objeto direto, 2o elemen
 | m | v |
 | s | h |
 
-(8 mapeamentos = Fibonacci.) As demais consoantes (l, r, n, v, lh, nh, th, dh, f, h) nao mutam na lenicao.
+(8 mapeamentos no total.) As demais consoantes (l, r, n, v, lh, nh, th, dh, f, h) nao mutam na lenicao.
 
 ### Outras classes (resumo; detalhar depois)
 - **Mutacao nasal** (depois de prefixo/preposicao nasal *an-*, *in-*): p->f, t->th, c->ch.
@@ -76,12 +76,9 @@ Posposto ao nome (como em portugues e Sindarin) e sofre lenicao. Ex.: *dragna vy
 
 Para possuidor explicito, usa-se o genitivo com *en*: *sylva en Gus* (a floresta do Gus).
 
-## Contagens Fibonacci (easter egg)
-3 tempos verbais, 5 sufixos derivacionais (cap. lexico), 8 mapeamentos de lenicao, 13 raizes-semente.
-
 ## Itens abertos (proxima etapa)
 - Colisao de lenicao (cale->gala vs raiz gala): fechar regra de desambiguacao.
 - Tabelas completas das mutacoes nasal e mista.
 - Pronomes pessoais e possessivos.
 - Deriva historica Era 1 -> Era 3 (como o Sylvarin puro virou substrato no portugues do jogo).
-- Sistema de escrita cifrada (cripto-glifo maconico).
+- Sistema de escrita cifrada (cripto-glifo da Era 1).

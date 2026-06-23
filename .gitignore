@@ -66,3 +66,6 @@ game/addons/funplay_mcp/
 # Assets de imagem/sprite (binarios grandes; uncommitted, controle do user; estrategia de backup a definir)
 resources/images/
 resources/sprites/
+
+# Manual privado dos easter eggs (NUNCA publicar: mata o segredo)
+docs/_secret/
