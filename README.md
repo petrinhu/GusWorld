@@ -202,3 +202,29 @@ Ou aponte a câmera do celular no QR Code:
 - **Pixel art / sprites:** [PixelLab](https://www.pixellab.ai/), gerador de pixel art por IA (personagem multi-direção + animação a partir de imagem). Agradecimento pela generosa camada gratuita, que ajuda muito um projeto solo e freeware a produzir sprites.
 - **Lore-bible canon (~365k pal):** Era 1 §§1-10 + R2 Facções + R3 Settings + Bloco F/G/H/I
 - **Apoio técnico narrativo:** Squad Claude Code (narrative-writer, narrative-designer, software-architect, etc) sob direção do criador supremo
+
+---
+
+## Agradecimentos
+
+Este jogo existe por causa de muita gente. Primeiro, as pessoas:
+
+- **Gus Dragon (meu filho):** inspiração do protagonista, na aparência e nos gostos. Parceiro nas decisões sobre o jogo e meu tester principal.
+- **El Iagows (meu irmão):** inspiração do Yakov. Engenheiro de computação que me deu várias dicas de arquitetura e stack, e me orientou no uso de SDL e de spritesheets para o movimento. Criador de uma das melhores libs de rolagem de dados (800+ downloads): [@iagows/3d-dice-ts no npm](https://www.npmjs.com/package/@iagows/3d-dice-ts) ([código no GitLab](https://gitlab.com/iagows/3d-dice-ts)).
+- **Od Fuinha Minduim, Thiago MadDog e Thiago Arcanjo:** profissionais de primeira classe em TI, que deram inúmeras dicas de testes, arquitetura, QA, segurança, CI e RAG, e me puseram para estudar.
+- **A galera do grupo #metaleiros-PE** (WhatsApp): pela parceria de sempre.
+- **Bruno Vettore:** deu a sugestão de criar uma língua para o jogo, numa conversa sobre Tolkien e repórteres intrometidos e inconvenientes, ao ver meus protótipos. O Sylvarin nasceu daí.
+
+E as ferramentas de IA que ajudaram a construir o GusWorld:
+
+- **[Claude Code (Anthropic)](https://claude.com/claude-code):** par de programação e a constelação de agentes ao longo de todo o desenvolvimento. Cerca de 800 milhões de tokens usados até aqui (estimativa), em torno de 15% do projeto concluído antes do lançamento.
+- **[Gemini (nano banana)](https://gemini.google.com/) e [Grok (xAI)](https://grok.com/):** geração de imagem conceitual 2D.
+- **[Tripo3D](https://www.tripo3d.ai/):** criação de arte conceitual em 3D.
+
+Aos **autores das obras que inspiraram a lore**: de Tolkien aos demais nomes do corpus, cujos livros alimentaram o worldbuilding do GusWorld. A bibliografia completa (cerca de 306 obras no RAG principal, mais o corpus élfico da conlang) está em [docs/narrative/bibliografia-rag.md](docs/narrative/bibliografia-rag.md). Nenhum texto foi copiado: serviram de inspiração e referência.
+
+Por fim, as ferramentas livres e as inspirações que sustentam o projeto:
+
+- **Engine e libs FOSS:** [SDL3](https://www.libsdl.org/), [RmlUi](https://github.com/mikke89/RmlUi), [miniaudio](https://miniaud.io/), [Catch2](https://github.com/catchorg/Catch2) e as bibliotecas header-only vendorizadas em `GusEngine/third_party/` (lista e licenças em [THIRD-PARTY-LICENSES.md](THIRD-PARTY-LICENSES.md)).
+- **Ferramentas de produção:** [Blender](https://www.blender.org/), [PixelLab](https://www.pixellab.ai/) (sprites) e o stack local de busca da lore ([Ollama](https://ollama.com/) + bge-m3, [LanceDB](https://lancedb.com/), `rag_maker`).
+- **Inspirações de design** (homenagem, nada copiado): Chrono Trigger, Sea of Stars, Sable e Death's Door.
