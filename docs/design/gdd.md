@@ -1,6 +1,6 @@
 # GusWorld — Game Design Document (1-page)
 
-Versão: 0.2 (pré-produção, F1.12-REFRESH 2026-06-02) — escopo solo G1, Godot 4, PC Linux v1 (Windows pós-v1), single-player.
+Versão: 0.2 (pré-produção, F1.12-REFRESH 2026-06-02; higienização de stack 2026-06-23). Escopo solo G1, engine própria C++20 + SDL3 (ADR-008), PC Linux v1 (Windows pós-v1), single-player.
 
 ---
 

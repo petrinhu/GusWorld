@@ -1,8 +1,8 @@
-# Engine Modules (gus_dragon-engine), canon ADR-002
+# Engine Modules (gus_dragon-engine)
 
-> **Status:** Canon (revisão ADR-002 2026-05-19). Substitui rascunho GDScript inicial.
+> **STATUS: SUPERADO (2026-06-23).** Este documento cataloga os módulos da engine no stack **C# .NET 8 + Godot** (`engine/foundation/` + `engine/back/`, AutoLoads, signals, `Resource`, AOT), **aposentado** pelo pivot para C++/Qt6 (engine-design.md) e depois pelo [ADR-008](adr/ADR-008-repivot-qt-to-sdl3.md) (SDL3 + RmlUi + miniaudio). **NÃO é mais o catálogo canônico.** A fonte canônica atual é [`docs/tech/pivot/engine-design.md`](pivot/engine-design.md) (módulos C++20: `core/time|rng|ecs_lite|resource|events`, `domain/save|i18n|progression|templates|combat`, `platform/window|render2d|input|audio|fs`). Fica como **registro histórico de leitura** até o decommission no marco M8; não editar como se fosse vigente.
 >
-> **Escopo:** módulos C# .NET 8 em `engine/foundation/` (Foundation layer) + `engine/back/` (Back layer). Repo separado `gus_dragon-engine` em Codeberg (ADR-002 batch 3).
+> **Escopo (histórico):** módulos C# .NET 8 em `engine/foundation/` (Foundation layer) + `engine/back/` (Back layer). Repo separado `gus_dragon-engine` em Codeberg (ADR-002 batch 3).
 
 ---
 

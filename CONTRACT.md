@@ -2,9 +2,9 @@
 
 > **Status:** Canônico. Autoridade sobre processo de desenvolvimento, commits, branching, qualidade.
 >
-> **Escopo:** vincula todo código, asset, documentação, e atividade técnica do projeto GusWorld G1 (solo indie, Godot 4, vertical slice até release v1.0.0).
+> **Escopo:** vincula todo código, asset, documentação, e atividade técnica do projeto GusWorld G1 (solo indie, C++20 + SDL3, engine própria, vertical slice até release v1.0.0).
 >
-> **Última revisão:** 2026-05-19. Mudanças requerem ADR explícito.
+> **Última revisão:** 2026-06-23 (higienização de stack pós-ADR-008: Godot/C# para C++20 + SDL3). Revisão de conteúdo anterior 2026-05-19. Mudanças requerem ADR explícito.
 
 ---
 
@@ -31,7 +31,7 @@ Este documento usa as palavras-chave **MUST**, **MUST NOT**, **REQUIRED**, **SHA
 
 Todo commit MUST seguir [Conventional Commits 1.0](https://www.conventionalcommits.org/) com scopes game-dev específicos.
 
-**Nota linguagem (pós-ADR-002 2026-05-19):** C# .NET 8 AOT é linguagem canon. Naming PascalCase pra classes/métodos/propriedades públicas, _camelCase pra fields privados. GDScript MAY pra tooling editor-only.
+**Nota linguagem (pós-ADR-008 2026-06-23):** C++20 é a linguagem canon (engine própria; AOT por natureza). Naming snake_case pra arquivos, `PascalCase` pra tipos/classes, `snake_case` pra funções/variáveis, `m_` ou trailing `_` pra membros privados conforme `.clang-format`/`.clang-tidy`. A camada de plataforma usa SDL3; `core/`+`domain/` são POCO C++ puro (zero framework). (O stack anterior Godot 4 + C# .NET 8 AOT foi superado pelo ADR-002 e depois pelo ADR-008.)
 
 ### Formato
 
@@ -47,30 +47,31 @@ Todo commit MUST seguir [Conventional Commits 1.0](https://www.conventionalcommi
 
 | Type | Uso | Exemplo |
 |---|---|---|
-| `feat` | Nova feature jogável ou módulo | `feat(engine): orbital_camera com rotação + zoom` |
+| `feat` | Nova feature jogável ou módulo | `feat(platform): render2d batcher de sprites sobre SDL_Renderer` |
 | `fix` | Correção de bug | `fix(combat): turn order quando initiative empata` |
 | `refactor` | Restruturação sem mudar comportamento | `refactor(save): extrair migrators pra módulo próprio` |
-| `perf` | Otimização medida | `perf(render): batch instancing reduz 40% draw calls` |
-| `style` | Formatação, sem mudança lógica | `style(engine): aplica gdformat em todos módulos` |
+| `perf` | Otimização medida | `perf(render): batch reduz 40% draw calls` |
+| `style` | Formatação, sem mudança lógica | `style(engine): aplica clang-format em todos os módulos` |
 | `test` | Adiciona/corrige testes | `test(save): cobre migrator 1 para 2 com 5 casos` |
-| `docs` | Documentação apenas | `docs(tech): atualiza architecture.md §4.5` |
-| `chore` | Manutenção, build, deps | `chore(deps): atualiza Godot 4.4 para 4.5` |
-| `build` | Sistema de build | `build(ci): adiciona job smoke-test pós-export` |
-| `ci` | Pipeline CI | `ci(forgejo): cache export templates entre runs` |
+| `docs` | Documentação apenas | `docs(tech): atualiza engine-design.md §4.5` |
+| `chore` | Manutenção, build, deps | `chore(deps): pin SDL3 3.2.x no FetchContent` |
+| `build` | Sistema de build | `build(cmake): adiciona preset linux-release ao CMakePresets` |
+| `ci` | Pipeline CI | `ci(forgejo): cacheia build do SDL3 entre runs` |
 
 ### Scopes game-dev (MUST usar)
 
 | Scope | Domínio | Path típico |
 |---|---|---|
-| `engine` | Módulos reutilizáveis | `/engine/*` |
-| `game` | Código game-specific | `/game/scripts/*`, `/game/scenes/*` |
-| `art` | Arte 3D, shaders, atlas, sprites | `/assets/models/*`, `/assets/textures/*`, shaders |
-| `narrative` | Lore canon, deep-lore, dialogue, in-world docs | `/docs/narrative/*`, `/game/scripts/dialogue/*` |
+| `engine` | Módulos reutilizáveis (lógica pura) | `GusEngine/core/*`, `GusEngine/domain/*` |
+| `platform` | Fronteira SDL3 (janela, render2d, input, audio, fs) | `GusEngine/platform/*` |
+| `game` | Código game-specific (casca da aplicação) | `GusEngine/app/*` |
+| `art` | Arte 2D, sprites, atlas, shaders | `/assets/sprites/*`, `/assets/textures/*`, shaders |
+| `narrative` | Lore canon, deep-lore, dialogue, in-world docs | `/docs/narrative/*` |
 | `design` | GDD, pillars, balanceamento | `/docs/design/*` |
 | `tech` | Arquitetura, ADRs, build, infra | `/docs/tech/*`, `/.forgejo/*` |
 | `audio` | SFX, música, mix | `/assets/sfx/*`, `/assets/music/*` |
-| `i18n` | Localização, CSV strings, fontes | `/game/translations/*` |
-| `qa` | Testes, playtest plans, bugs | `/tests/*`, `docs/qa/*` |
+| `i18n` | Localização, strings, fontes | loader `.md` próprio + CSV de strings |
+| `qa` | Testes, playtest plans, bugs | `GusEngine/tests/*`, `docs/qa/*` |
 | `release` | Versionamento, CHANGELOG, packaging | `VERSION`, `CHANGELOG.md`, build outputs |
 
 ### Regras
@@ -109,7 +110,7 @@ Strategy: **`main` + `feat/*` PRs solo** com cooling-off seletivo.
 - ≥ 5 arquivos modificados
 - Refactor cross-module
 - One-way door arquitetural (decisão ADR)
-- Toque em `engine/save_system/` ou em qualquer migrator
+- Toque em `GusEngine/domain/save/` ou em qualquer migrator
 
 **Política:**
 - Feature grande **MUST** dormir em `feat/*` por **mínimo 12 horas** antes do merge em `main`.
@@ -135,21 +136,18 @@ Strategy: **`main` + `feat/*` PRs solo** com cooling-off seletivo.
 
 DoD MUST ser satisfeito antes de marcar task ✅ no TODO.md.
 
-### DoD: feat(engine) ou feat(game) [pós-ADR-002]
+### DoD: feat(engine), feat(platform) ou feat(game) [pós-ADR-008]
 
-- [ ] Código C# .NET 8 passa `dotnet format` (sem diffs).
-- [ ] Código C# passa Roslyn analyzer (zero warnings, ou justificados em commit body).
-- [ ] Cena teste demonstra feature funcional (scene + C# script standalone).
-- [ ] CI verde (`dotnet restore` + `dotnet build -c Release` + import + export Linux).
-- [ ] Se módulo `engine/*`: API pública documentada (XML doc comments `///` em métodos/classes públicos).
-- [ ] Se toca `save_system`: migrator + teste do migrator (xUnit/NUnit) com input/output esperado.
-- [ ] Strings user-facing via `Localization.TrMd("KEY")` (NUNCA hardcoded).
-- [ ] AOT-compatibility: zero uso de `dynamic`, reflection limitada a casos com `[DynamicallyAccessedMembers]`.
+- [ ] Código C++20 passa `clang-format` (sem diffs).
+- [ ] Código C++20 passa `clang-tidy` (zero warnings, ou justificados em commit body / `// NOLINT(...)` com motivo).
+- [ ] Teste Catch2 demonstra a feature; lógica pura roda headless (`core/`+`domain/` sem janela).
+- [ ] CI verde (`cmake --preset` + `cmake --build` + `ctest`). Smoke da plataforma headless com `SDL_VIDEODRIVER=dummy`.
+- [ ] Se módulo `core/` ou `domain/`: API pública documentada (comentário Doxygen-style nos headers públicos).
+- [ ] Se toca `domain/save/`: migrator + teste Catch2 do migrator com input/output esperado.
+- [ ] Strings user-facing via o loader de i18n próprio (chave de tradução, NUNCA hardcoded).
+- [ ] Invariante das 4 camadas: `core/`+`domain/` NÃO incluem `<SDL...>` nem qualquer header de plataforma (auditável por grep no CI).
 - [ ] Commit message segue §2.
 - [ ] Cooling-off respeitado se feature grande (§3).
-
-**GDScript editor-only (tooling):**
-- [ ] Arquivo `.gd` editor-only passa `gdformat` + `gdlint` (se existir; pós-ADR-002 o projeto é C# canon).
 
 ### DoD: feat(art)
 
@@ -206,7 +204,7 @@ Target hardware canon: **GTX 1050 + 4GB VRAM + 8GB RAM dual-core 3.0GHz+** (cobr
 - Profile **SHOULD** rodar em milestone (M.1, M.2) antes de canonizar como done.
 - Otimização **MUST** ser data-driven (profiler real, NÃO intuição).
 - Premature optimization é anti-pattern: **SHOULD NOT** otimizar antes de medir.
-- GDExtension C++ **MAY** ser introduzido apenas quando GDScript provadamente insuficiente em ponto quente medido.
+- Otimização de baixo nível (SIMD, layout de dados, custom allocator) **MAY** ser introduzida apenas em ponto quente medido por profiler real.
 
 ---
 
@@ -218,7 +216,7 @@ Os seguintes gates **MUST** estar funcionais em ship de v1.0.0. Cortes em VS sã
 
 - Keyboard + gamepad totalmente remappáveis pelo player (menu in-game).
 - Schemes default sensatos (WASD + setas + gamepad standard).
-- Persistência via save (`engine/input_remap/`).
+- Persistência via save (`GusEngine/domain/input/`).
 - Reset to defaults sempre disponível.
 
 ### Gate 2: Contraste WCAG 2.2 AA
@@ -256,15 +254,15 @@ Os seguintes gates **MUST** estar funcionais em ship de v1.0.0. Cortes em VS sã
 
 ## §7. Save format compat (forward-only)
 
-Save format canon: **JSON versionado `save_version: N` com migrators forward-only puros desde D1**.
+Save format canon: **binário próprio versionado `save_version: N` (schema v4 atual, ADR-006/ADR-007) com criptografia própria (HMAC-SHA256) e migrators forward-only puros desde D1**.
 
 ### Princípios
 
-- `save_version` inicia em `1` em D1 da implementação `engine/foundation/save_system/`.
+- `save_version` é parte do header desde D1 da implementação `GusEngine/domain/save/`.
 - Toda mudança de schema **MUST** bumpar `save_version`.
-- Cada bump **MUST** ter migrator `MigrateVNtoVN1.cs` em `engine/foundation/save_system/Migrators/` implementando `IMigrator`.
-- Migrators **MUST** ser funções puras (input save N, output save N+1, sem efeito colateral).
-- Migrators **MUST** ter teste xUnit com input/output esperado (`engine/tests/save_system/MigrateVNtoVN1Tests.cs`).
+- Cada bump **MUST** ter um migrator dedicado em `GusEngine/domain/save/` (ex. `migrate_v3_to_v4`), implementando o contrato de migrator do domínio.
+- Migrators **MUST** ser funções puras (input save N, output save N+1, sem efeito colateral, sem I/O).
+- Migrators **MUST** ter teste Catch2 com input/output esperado.
 - Chain de migrators automática: save em version K carrega via chain K para K+1 para ... para N (versão atual).
 
 ### Política forward-only
@@ -277,8 +275,8 @@ Save format canon: **JSON versionado `save_version: N` com migrators forward-onl
 
 - ❌ Quebrar save format sem bump de version + migrator.
 - ❌ Migrator que altera dados de outro slot (efeito colateral).
-- ❌ Save sem `save_version` field.
-- ❌ Carregar save sem validar `save_version <= current_version`.
+- ❌ Save sem `save_version` no header.
+- ❌ Carregar save sem validar `save_version <= current_version` (e sem checar o HMAC anti-tamper).
 
 ### Pre-v1.0.0 (G1 VS)
 
@@ -294,8 +292,8 @@ Save format canon: **JSON versionado `save_version: N` com migrators forward-onl
 
 1. **CLAUDE.md** (estado atual + decisões fechadas), autoridade situacional.
 2. **CONTRACT.md** (este doc), autoridade processual.
-3. **ADRs em `docs/tech/adr/*`**, autoridade pra decisões arquiteturais one-way door.
-4. **`docs/tech/architecture.md` + `engine-modules.md` + `build.md`**, autoridade técnica detalhada.
+3. **ADRs em `docs/tech/adr/*`**, autoridade pra decisões arquiteturais one-way door (ADR-008 = stack atual C++20 + SDL3).
+4. **`docs/tech/pivot/engine-design.md`**, autoridade técnica detalhada da engine (4 camadas, plataforma SDL3 conforme ADR-008). Os antigos `architecture.md` / `engine-modules.md` / `build.md` descrevem o stack Godot/C# aposentado e estão marcados como SUPERADOS.
 5. **`docs/design/pillars.md`**, autoridade criativa (5 pillars imutáveis).
 
 Conflito entre níveis: nível mais alto vence. Conflito intra-nível: ADR explícito resolve.

@@ -1,8 +1,8 @@
-# Build Pipeline, GusWorld G1 canon ADR-002
+# Build Pipeline, GusWorld G1
 
-> **Status:** Canon (revisão ADR-002 2026-05-19). Substitui rascunho GDScript inicial.
+> **STATUS: SUPERADO (2026-06-23).** Este documento descreve o build do stack **Godot 4 Mono + C# .NET 8 AOT** (`dotnet restore/build/format/test`, `export_presets.cfg`, `godot --headless --export-release`, export templates, AOT), **aposentado** pelo pivot para C++/Qt6 e depois pelo [ADR-008](adr/ADR-008-repivot-qt-to-sdl3.md) (engine própria C++20 + SDL3). **NÃO é mais o pipeline canônico.** O build atual usa **CMake + Ninja + CMakePresets** (`cmake --preset` + `cmake --build` + `ctest`), com SDL3 + RmlUi via FetchContent (pin de versão) e Catch2 nos testes; smoke da plataforma headless com `SDL_VIDEODRIVER=dummy`. Comandos de referência atuais estão no [README](../../README.md) (seção Build / Run) e o design da engine em [`docs/tech/pivot/engine-design.md`](pivot/engine-design.md). Este arquivo fica como **registro histórico de leitura** até o decommission no marco M8; não editar como se fosse vigente. Re-derivar o pipeline (CMake local + CI Forgejo) para o stack atual é decisão de produção do criador.
 >
-> **Escopo:** build local + CI Forgejo Actions. Linux primário (dev Fedora 44), Windows via export Godot cross-platform. C# .NET 8 AOT.
+> **Escopo (histórico):** build local + CI Forgejo Actions. Linux primário (dev Fedora 44), Windows via export Godot cross-platform. C# .NET 8 AOT.
 
 ---
 

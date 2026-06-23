@@ -559,7 +559,9 @@ Cada item abaixo é uma trava de design contra estratégia dominante ou jogo "re
 
 ## 16. Integração com event bus
 
-O combate comunica via dois buses desacoplados (arquitetura de engine; ver `docs/tech/architecture.md`).
+O combate comunica via dois buses desacoplados (arquitetura de engine; ver `docs/tech/pivot/engine-design.md`).
+
+> **Nota de stack (2026-06-23, pós-ADR-008).** Esta seção descreve a integração no vocabulário do protótipo **C# + Godot** (signals, `CombatManager` como "ponte Node", `game/tools/TestCombatIntegration.cs`), que morre no M8. No motor **C++20 + SDL3** o equivalente é: o domínio puro (`domain/combat/`) não emite eventos diretamente, apenas acumula a lista de `StatusEffectChange`; a casca da aplicação (`app/`) drena essa lista e a publica no barramento de eventos interno (`core/events/`), sem `Node` nem `signals` de framework. O CONTRATO de dados (acumular mudanças de status numa lista drenável, manter o domínio livre de framework) permanece idêntico; só o nome dos mecanismos muda.
 
 ### `CombatBus` (eventos internos de combate)
 

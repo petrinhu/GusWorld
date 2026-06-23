@@ -2,6 +2,8 @@
 
 **Status:** Canônico. Gerado F2-PROD.1 Sprint 1 W2 2026-06-03.
 
+> **NOTA DE STACK (2026-06-23, pós-ADR-008).** Este plano foi escrito sobre o stack **Godot 4 + C# .NET 8 AOT**, depois aposentado pelo [ADR-008](../../tech/adr/ADR-008-repivot-qt-to-sdl3.md) (engine própria C++20 + SDL3). O **conteúdo de produção segue válido e canônico** (exit criteria por milestone, critical path, RAID, MVV, buffer policy são agnósticos de stack). Apenas as **mecânicas de build/perf citadas estão obsoletas**: onde se lê `dotnet`/AOT/`export_presets.cfg`/`godot --headless`/`Performance.get_monitor`/`RenderingServer`/`gl_compatibility`, o equivalente atual é CMake + Ninja + CMakePresets, `ctest`/Catch2, smoke headless `SDL_VIDEODRIVER=dummy` e profiling nativo C++ (sem runtime gerenciado). O **floor de perf** (iGPU) e o **teto RTX 3050 4GB** seguem canônicos. O "Plano B AOT inflado" perde o motivo original (C++ é AOT por natureza, sem runtime .NET); o gatilho de tamanho de binário (>150MB) permanece como sinal, mas a mitigação muda (LTO, strip, redução de assets). Re-derivar este plano para o stack atual é decisão de produção do criador (AskUserQuestion), fora do escopo da higienização de termos.
+
 Documento leve de delivery. Não é PMO. Autoridade de escopo permanece no GDD (`docs/design/gdd.md`) e nos pillars. Aqui ficam só: critério de pronto por milestone, sequência crítica, riscos e política de buffer.
 
 **Meta VS:** 4-6 meses para um slice coeso jogável de 5-10min que prova os 3 pilares-âncora (Scan, Compilação de Deck, Vetor do Gambito) em uma área-cidade com 1 combate e 1 puzzle.

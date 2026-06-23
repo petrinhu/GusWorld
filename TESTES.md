@@ -1,35 +1,36 @@
-# TESTES.md, suíte de testes + auditorias canon (Godot adaptado)
+# TESTES.md, suíte de testes + auditorias canon (C++20 + SDL3)
 
-> **Status:** Canônico. Escopo B aprovado pelo criador supremo: subset T+A sections do manual canon `Resources/Standards/TESTES.md` adaptado pra Godot 4 + GDScript.
+> **Status:** Canônico. Escopo B aprovado pelo criador supremo: subset T+A sections do manual canon `Resources/Standards/TESTES.md` adaptado pro stack C++20 + SDL3 (engine própria).
 >
 > **Autoridade:** processual (T-sections = testes obrigatórios) + auditorial (A-sections = revisões periódicas).
 >
-> **Cross-ref:** `CONTRACT.md` §4 (DoD por tipo), `docs/tech/architecture.md`, `docs/tech/build.md`.
+> **Cross-ref:** `CONTRACT.md` §4 (DoD por tipo), `docs/tech/pivot/engine-design.md` (design da engine, plataforma SDL3 pós-ADR-008).
 >
-> **Última revisão:** 2026-05-19.
+> **Última revisão:** 2026-06-23 (higienização de stack pós-ADR-008: testes em Catch2/ctest no lugar de dotnet/xUnit). Conteúdo anterior 2026-05-19.
 
 ---
 
 ## §0. Pré-requisitos + ferramentas
 
-### Stack GusWorld G1 (pós-ADR-002)
+### Stack GusWorld G1 (pós-ADR-008)
 
-- **Godot 4.4+ Mono** (testado em 4.6.1)
-- **C# .NET 8 LTS** linguagem primária canon
-- **GDScript** MAY pra tooling editor-only (ex: validate_autoloads.gd)
-- **C++ GDExtension** apenas sob pressão de perf medida (não G1)
+- **C++20** linguagem primária canon (engine própria, AOT por natureza)
+- **SDL3** na camada de plataforma (janela, render2d, input, gamepad, eventos); `core/`+`domain/` são POCO C++ puro
+- **RmlUi** (UI do jogador, Fase 3 do re-pivot) + **miniaudio** (áudio)
+- **CMake + Ninja + CMakePresets** para build reprodutível Linux + Windows
 
 ### Ferramentas obrigatórias
 
-| Ferramenta | Uso | Install |
+| Ferramenta | Uso | Install Fedora 44 |
 |---|---|---|
-| `dotnet` SDK 8+ | Build + restore + test C# | <https://dotnet.microsoft.com/download> ou `dnf install dotnet-sdk-8.0` |
-| `dotnet format` | Formatação code style C# | Built-in com dotnet SDK |
-| Roslyn analyzers | Static analysis C# (warnings, code style) | Incluído via `.editorconfig` + `<AnalysisLevel>` em .csproj |
-| `xUnit` ou `NUnit` | Framework unit test C# | NuGet package via .csproj test project |
-| `gdtoolkit` (`gdformat` + `gdlint`) | Lint GDScript (tooling residual) | `pipx install gdtoolkit` |
-| `bandit` + `safety` (opcional) | Secret scan + dep CVE | `pipx install bandit safety` |
-| `git-secrets` | Pre-commit secret detection | Pacote distro |
+| `cmake` (3.21+) | Configuração de build + presets | `sudo dnf install cmake` |
+| `ninja` | Backend de build rápido | `sudo dnf install ninja-build` |
+| GCC/Clang (C++20) | Compilador | `sudo dnf install gcc-c++ clang` |
+| `ctest` | Runner de testes (Catch2) | incluído com CMake |
+| Catch2 | Framework de unit test C++ | via FetchContent no CMake (pin de versão) |
+| `clang-format` | Formatação de code style C++ | `sudo dnf install clang-tools-extra` |
+| `clang-tidy` | Análise estática C++ (warnings, code style) | `sudo dnf install clang-tools-extra` |
+| `gitleaks` (ou `git-secrets`) | Pre-commit secret detection | binário oficial / pacote distro |
 
 ### Não aplicáveis (G1 single-player puro)
 
@@ -40,127 +41,136 @@
 
 ---
 
-## T1. Testes Unitários (C# via xUnit/NUnit, pós-ADR-002)
+## T1. Testes Unitários (C++ via Catch2, pós-ADR-008)
 
 ### Escopo obrigatório
 
-Módulos `engine/*` **MUST** ter test suite. Módulos `/game/*` **SHOULD** ter cobertura quando lógica não-trivial.
+Módulos `core/*` e `domain/*` **MUST** ter test suite (lógica pura, roda headless). Código `app/*` **SHOULD** ter cobertura quando a lógica não é trivial; a fronteira `platform/*` roda smoke headless (`SDL_VIDEODRIVER=dummy`).
 
 ### Suite mínima por módulo
 
 ```
-engine/<module>/
-├── <Module>.cs                   (implementação C#)
-├── tests/<Module>Tests.cs        (suite xUnit ou NUnit)
-└── README.md                     (docs API pública)
+GusEngine/<layer>/<module>/
+├── <module>.hpp / <module>.cpp   (implementação C++)
+GusEngine/tests/
+└── <module>_test.cpp             (suite Catch2)
 ```
 
-Test project pattern: arquivo .csproj separado pra tests com `Microsoft.NET.Test.Sdk` + framework escolhido (xUnit recomendado pelo ecosystem .NET 8).
+Os testes vivem em `GusEngine/tests/` e são registrados no CMake; `ctest` os descobre. Catch2 entra via FetchContent com pin de versão (build reprodutível).
 
 ### Módulos com cobertura obrigatória D1
 
 | Módulo | Critério |
 |---|---|
-| `engine/save_system/` | Roundtrip save/load + cada migrator com input/output esperado |
-| `engine/turn_based_combat/` | State machine (Round, Turn, ActionSelect, Resolve, TurnEnd) com casos boundary |
-| `engine/card_engine/` | Deck operations (shuffle, draw, discard, reshuffle) + effects resolution |
-| `engine/orbital_camera/` | Rotação, zoom min/max, follow target, collision-aware quando implementado |
-| `engine/event_bus/` | Signal emit/connect/disconnect + edge cases (signal removido com listeners ativos) |
+| `domain/save/` | Roundtrip save/load + HMAC reject + cada migrator com input/output esperado |
+| `domain/combat/` | State machine (TurnStart, ActionSelect, ActionResolve, TurnEnd, CheckEnd) com casos boundary + fórmula de dano §11 (canais FALHA/CRIT/COMUM) |
+| `domain/i18n/` | Loader `.md` + fallback + interpolação + chave faltante + paridade de locale |
+| `domain/progression/` | EnemyKnowledgeTracker + XpDifferential |
+| `core/rng/` | PRNG determinístico seedável (mesma semente = mesma sequência) |
+| `core/events/` | Sinal/slot interno: emit/connect/disconnect + edge cases (slot removido com emissores ativos) |
 
 ### Comandos
 
 ```bash
+# Configurar (primeira vez)
+cmake --preset linux-release
+
+# Compilar
+cmake --build --preset linux-release
+
 # Rodar todos os testes
-dotnet test
+ctest --preset linux-release
 
-# Rodar suite específica
-dotnet test --filter "FullyQualifiedName~SaveSystemTests"
+# Rodar suite específica (filtro por nome de teste Catch2)
+ctest --preset linux-release -R Save
 
-# Com coverage (Coverlet via NuGet)
-dotnet test /p:CollectCoverage=true /p:CoverletOutputFormat=opencover
+# Saída detalhada em falha
+ctest --preset linux-release --output-on-failure
 ```
 
 ### Critério "done"
 
-- Verde local: zero failures.
+- Verde local: zero failures (`ctest` exit 0).
 - Verde CI: pipeline `tests` job retorna exit 0.
-- Cobertura módulo crítico (engine/save, engine/combat, engine/card): ≥ 70% de lines.
+- Cobertura módulo crítico (`domain/save`, `domain/combat`): ≥ 70% de linhas.
 
 ---
 
-## T2. Análise Estática (dotnet format + Roslyn, pós-ADR-002)
+## T2. Análise Estática (clang-format + clang-tidy, pós-ADR-008)
 
 ### Disciplina
 
-- `dotnet format --verify-no-changes` **MUST** rodar pre-commit (hook configurado).
-- Roslyn analyzers warnings + code style **MUST** rodar em CI; warnings >= level configurado bloqueiam merge.
-- Warnings analyzers SHOULD ser justificados via `#pragma warning disable <ID>` + comentário quando intencionais.
+- `clang-format --dry-run --Werror` **MUST** rodar pre-commit (hook configurado).
+- `clang-tidy` warnings + code style **MUST** rodar em CI; warnings acima do nível configurado bloqueiam merge.
+- Warnings de analisador SHOULD ser justificados via `// NOLINT(<check>)` + comentário quando intencionais.
 
 ### Comandos
 
 ```bash
 # Format check (não modifica)
-dotnet format --verify-no-changes
+find GusEngine/{core,domain,platform,app,tests} -name '*.cpp' -o -name '*.hpp' \
+  | xargs clang-format --dry-run --Werror
 
 # Format apply
-dotnet format
+find GusEngine/{core,domain,platform,app,tests} -name '*.cpp' -o -name '*.hpp' \
+  | xargs clang-format -i
 
-# Build com warnings as errors
-dotnet build -c Release /warnaserror
+# Análise estática (usa o compile_commands.json gerado pelo CMake)
+clang-tidy -p build/linux-release GusEngine/**/*.cpp
 
-# GDScript residual (editor-only tooling)
-gdformat --check game/tools/
-gdlint game/tools/
+# Build com warnings as errors (flag de compilação no preset)
+cmake --build --preset linux-release   # presets ativam -Werror
 ```
 
 ### CI integration
 
 ```yaml
-# .forgejo/workflows/lint.yml (resumo, pós-ADR-002)
-- uses: actions/setup-dotnet@v4
+# .forgejo/workflows/lint.yml (resumo, pós-ADR-008)
+- uses: actions/checkout@v4
   with:
-    dotnet-version: '8.0.x'
-- name: dotnet restore
-  run: dotnet restore
-- name: dotnet format check
-  run: dotnet format --verify-no-changes
-- name: dotnet build (warnings as errors)
-  run: dotnet build -c Release /warnaserror
-- name: gdformat check (tooling residual)
-  run: gdformat --check game/tools/
+    submodules: recursive
+- name: clang-format check
+  run: |
+    find GusEngine/{core,domain,platform,app,tests} -name '*.cpp' -o -name '*.hpp' \
+      | xargs clang-format --dry-run --Werror
+- name: configure (gera compile_commands.json)
+  run: cmake --preset linux-release
+- name: clang-tidy
+  run: clang-tidy -p build/linux-release $(git diff --name-only --diff-filter=ACM | grep -E '\.(cpp|hpp)$')
+- name: build (warnings as errors)
+  run: cmake --build --preset linux-release
 ```
 
 ### Critério "done"
 
-- `dotnet format --verify-no-changes` exit 0.
-- `dotnet build /warnaserror` exit 0.
-- Roslyn warnings justificados via `#pragma` se intencionais.
-- GDScript residual (`game/tools/`): zero `gdlint` errors + zero `gdformat` diffs.
+- `clang-format --dry-run --Werror` exit 0.
+- Build com `-Werror` exit 0.
+- `clang-tidy` warnings justificados via `// NOLINT` se intencionais.
 
 ---
 
-## T5. Scanning de Dependências (Godot + addons)
+## T5. Scanning de Dependências (SDL3 + RmlUi + vendorizadas)
 
 ### Escopo
 
-- Versão Godot fixada em `game/project.godot` (campo `config_version` + `config/features`).
-- Addons internos (`engine/*` standalone-ready) versionados.
-- Addons externos terceiros (GUT, DialogueManager, Ink, etc): MUST estar em `game/addons/<addon_name>/` com `plugin.cfg` + version locked.
+- Versões de SDL3 e RmlUi fixadas no `CMakeLists.txt`/`CMakePresets.json` via FetchContent (pin de tag/commit, build reprodutível).
+- Libs C++ header-only vendorizadas em `GusEngine/third_party/` (filosofia zero-dep): version locked + licença registrada em `THIRD-PARTY-LICENSES.md`.
+- Módulos próprios (`core/`, `domain/`) são standalone-ready, sem dependência externa.
 
 ### Disciplina
 
-- Toda bump de Godot **MUST** gerar entry em `CHANGELOG.md` + commit `chore(deps): atualiza Godot X.Y.Z`.
-- Addons externos **MUST** ser auditados antes de adicionar (compatibilidade Godot 4, license, mantenedor ativo nos últimos 12 meses).
-- Dependências em `.tres` (Resources) que apontem pra recursos externos **MUST** estar versionadas.
+- Toda bump de SDL3, RmlUi ou lib vendorizada **MUST** gerar entry em `CHANGELOG.md` + commit `chore(deps): atualiza <lib> X.Y.Z`.
+- Dependências externas **MUST** ser auditadas antes de adicionar (licença permissiva compatível com GPLv3, mantenedor ativo nos últimos 12 meses).
+- O pin de versão **MUST** estar versionado no CMake (nunca "latest" flutuante).
 
 ### Comando inventário
 
 ```bash
-# Inventariar addons instalados
-find game/addons -name "plugin.cfg" -exec grep -l "name=" {} \; -exec cat {} \;
+# Versões pinadas no build (FetchContent)
+grep -rEn "GIT_TAG|URL_HASH|FetchContent_Declare" GusEngine/CMakeLists.txt
 
-# Versão Godot em uso
-godot --version
+# Inventariar libs vendorizadas
+ls GusEngine/third_party/
 ```
 
 ---
@@ -176,9 +186,9 @@ godot --version
 ### Comando pre-commit
 
 ```bash
-git-secrets --scan
+gitleaks detect --no-banner
 # OU
-trufflehog filesystem ./ --no-update
+git-secrets --scan
 ```
 
 ### Hook canônico (já ativo no global)
@@ -187,7 +197,7 @@ trufflehog filesystem ./ --no-update
 
 ### Critério "done"
 
-- `git-secrets --scan` retorna exit 0 antes de cada push.
+- Scan de secrets retorna exit 0 antes de cada push.
 - CI roda secret scan job (futuro F2-CI.X).
 
 ---
@@ -196,21 +206,21 @@ trufflehog filesystem ./ --no-update
 
 ### Escopo
 
-- Godot engine: monitorar [advisories Godot Engine](https://github.com/godotengine/godot/security/advisories).
-- gdtoolkit: monitorar releases.
-- Addons externos: revisar quando bumpar Godot major.
+- SDL3: monitorar [advisories SDL](https://github.com/libsdl-org/SDL/security/advisories).
+- RmlUi: monitorar [advisories RmlUi](https://github.com/mikke89/RmlUi/security/advisories).
+- Libs vendorizadas (`GusEngine/third_party/`): revisar releases quando bumpar.
 
 ### Disciplina
 
 - Verificação manual a cada milestone (F2-M.1, F2-M.2, F2-M.3, F2-M.4).
-- Hotfix urgente se CVE crítico afetar engine + saves do jogador (raro).
+- Hotfix urgente se CVE crítico afetar a engine + saves do jogador (raro).
 
 ### Comando (manual)
 
 ```bash
-# Versão Godot atual + checagem manual GitHub advisories
-godot --version
-# Cross-ref: https://github.com/godotengine/godot/security/advisories
+# Versões pinadas atuais + checagem manual de advisories
+grep -rEn "GIT_TAG|FetchContent_Declare" GusEngine/CMakeLists.txt
+# Cross-ref: advisories de SDL3, RmlUi e das libs de third_party/
 ```
 
 ---
@@ -221,8 +231,8 @@ godot --version
 
 Antes de implementar novo módulo `engine/*` ou feature game-side significativa:
 
-1. **Descoberta canon:** revisar `docs/tech/architecture.md` + `engine-modules.md` + `pillars.md` pra contexto.
-2. **Modelagem:** desenhar API pública (assinaturas + signals + Resources) em comentário no commit OU ADR se one-way door.
+1. **Descoberta canon:** revisar `docs/tech/pivot/engine-design.md` + `pillars.md` pra contexto.
+2. **Modelagem:** desenhar API pública (assinaturas dos headers + eventos do barramento interno) em comentário no commit OU ADR se one-way door.
 3. **Validação cross-pillar:** mudança respeita os 5 pillars canônicos?
 
 ### Critério "done"
@@ -236,28 +246,27 @@ Antes de implementar novo módulo `engine/*` ou feature game-side significativa:
 
 ### Princípio
 
-**Engine não depende de game.** Game **MAY** depender de engine. Asserts MUST quebrar em CI se `engine/` importa algo de `game/`.
+**Lógica pura não depende de plataforma nem da casca.** A invariante das 4 camadas: `core/`+`domain/` NÃO incluem `<SDL...>` nem nenhum header de plataforma; só `platform/` e `app/` linkam SDL3. Asserts MUST quebrar em CI se a invariante for violada.
 
 ### Estrutura canon
 
 ```
-engine/      (reutilizável; standalone-ready)
-  └── não importa de /game/
-  └── não importa de /assets/
-game/        (game-specific)
-  └── importa engine/ via res://engine/...
-  └── importa assets via res://assets/...
-assets/      (sources arte/som)
-  └── puro asset, sem código
-docs/        (canon + design)
-tests/       (test suites xUnit/NUnit em .csproj separados)
+GusEngine/
+├── core/        POCO C++ puro, ZERO SDL, 100% testável headless
+├── domain/      POCO C++ puro, ZERO SDL (save, i18n, progression, templates, combat)
+├── platform/    ÚNICA fronteira SDL3 (window, render2d, input, audio, fs)
+├── app/         GusWorld-specific (screens, main)
+└── tests/       suites Catch2 (registradas no CMake, descobertas por ctest)
+assets/          (sources arte/som; puro asset, sem código)
+docs/            (canon + design)
 ```
 
 ### Audit comando
 
 ```bash
-# Detecta import indevido engine -> game
-grep -rE "extends.*game/|preload.*game/|load.*game/" engine/ && echo "VIOLATION" || echo "OK"
+# Detecta inclusão indevida de SDL/plataforma na lógica pura
+grep -rE '#include[[:space:]]*[<"]SDL' GusEngine/core GusEngine/domain \
+  && echo "VIOLATION" || echo "OK"
 ```
 
 ### Critério "done"
@@ -295,34 +304,36 @@ Cobertura dos 4 gates D1 obrigatórios (`CONTRACT.md` §6):
 
 ---
 
-## A6. Cobertura de Testes (Coverlet via dotnet)
+## A6. Cobertura de Testes (gcov/llvm-cov + lcov)
 
 ### Disciplina
 
-- Cobertura **medida**, não estimada (GUT coverage report).
+- Cobertura **medida**, não estimada (relatório de cobertura do compilador).
 - Alvo por módulo:
-  - `engine/save_system/`: ≥ 80% lines (críticos: migrators 100%).
-  - `engine/turn_based_combat/`: ≥ 70% lines (state transitions cobertas).
-  - `engine/card_engine/`: ≥ 70% lines.
-  - `engine/orbital_camera/`: ≥ 50% lines (input handling testável).
-  - Demais módulos engine: ≥ 50% lines.
-  - `/game/scripts/`: ≥ 30% lines (lógica não-trivial coberta; cenas Godot inerentemente difíceis de testar).
+  - `domain/save/`: ≥ 80% linhas (críticos: migrators 100%).
+  - `domain/combat/`: ≥ 70% linhas (transições de estado + fórmula de dano cobertas).
+  - `core/rng/`, `core/events/`: ≥ 70% linhas.
+  - Demais módulos `core/`/`domain/`: ≥ 50% linhas.
+  - `app/`: ≥ 30% linhas (lógica não-trivial coberta; a fronteira de render/input é difícil de cobrir headless).
 
 ### Comando
 
 ```bash
-# Gerar report via Coverlet
-dotnet test /p:CollectCoverage=true /p:CoverletOutputFormat=opencover
+# Build instrumentado (preset com --coverage / -fprofile-instr-generate)
+cmake --preset linux-coverage
+cmake --build --preset linux-coverage
+ctest --preset linux-coverage
 
-# Visualizar via ReportGenerator (NuGet global tool)
-dotnet tool install -g dotnet-reportgenerator-globaltool
-reportgenerator -reports:coverage.opencover.xml -targetdir:coverage/ -reporttypes:Html
+# Gerar report (GCC/gcov + lcov)
+lcov --capture --directory build/linux-coverage --output-file coverage.info
+genhtml coverage.info --output-directory coverage/
+# Clang: usar llvm-profdata merge + llvm-cov show/report
 ```
 
 ### Critério "done"
 
-- Cobertura atingida em todos módulos D1.
-- Report HTML commitado em CI artifact (não no repo).
+- Cobertura atingida em todos os módulos D1.
+- Report HTML como CI artifact (não no repo).
 
 ---
 
@@ -330,24 +341,24 @@ reportgenerator -reports:coverage.opencover.xml -targetdir:coverage/ -reporttype
 
 ### Princípio
 
-- Acoplamento engine → engine: minimizado via `event_bus` (signals globais).
-- Acoplamento engine → game: **proibido** (ver A2).
-- Acoplamento game → engine: explícito via `res://engine/...`.
+- Acoplamento intra-camada: minimizado via o barramento de eventos interno (`core/events/`, sinal/slot desacoplado de plataforma).
+- Acoplamento lógica pura → plataforma: **proibido** (ver A2; `core/`+`domain/` nunca incluem SDL).
+- Acoplamento `app/` → engine: explícito via include dos headers públicos.
 
 ### Audit
 
 ```bash
-# Mapear deps cross-engine via grep
-for module in engine/*/; do
+# Mapear inclusões entre módulos de domínio/core via grep
+for module in GusEngine/core/*/ GusEngine/domain/*/; do
   echo "=== $module ==="
-  grep -rE "preload.*engine/|load.*engine/" "$module" | grep -v "^$module"
+  grep -rhoE '#include[[:space:]]*[<"][^>"]+' "$module" | sort -u
 done
 ```
 
 ### Critério "done"
 
-- Cada módulo engine importa no máximo `event_bus` + 1-2 outros módulos sibling.
-- Zero ciclo de dependência (engine_a → engine_b → engine_a).
+- Cada módulo importa no máximo `core/events/` + 1-2 outros módulos sibling.
+- Zero ciclo de dependência (módulo_a → módulo_b → módulo_a).
 
 ---
 

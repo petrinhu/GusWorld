@@ -3,6 +3,8 @@
 **Status:** Protocolo aprovado; **EXECUÇÃO DEFERIDA** (decisão criador 2026-06-03: arte fora do caminho crítico via placeholder-first; rodar quando arte virar prioridade, pós loop graybox-jogável). Sprint 6 W3. F2-ART.SPIKE.
 **Cross-ref:** raid-log.md R-01/A-01, style-guide.md, TODO F2-ART.SPIKE.
 
+> **NOTA DE STACK (2026-06-23, pós-ADR-008).** O passo final do spike (P7/P8: import Godot + material toon `diffuse_toon` + outline inverted-hull) assumia o engine **Godot**, depois aposentado pelo [ADR-008](../../tech/adr/ADR-008-repivot-qt-to-sdl3.md). O **pipeline de produção de arte** (nano banana → TripoSR → Blender → retopo → sprite) segue válido e agnóstico de engine. A validação final de render/silhueta passa a ser feita na **engine própria C++20 + SDL3** (render2d / `gusworld_app --anim-preview`, ver ROADMAP) em vez de uma cena Godot; o jogo é **2D-only** (sprites desenhados pelo `SDL_Renderer` em runtime), com o 3D apenas como ferramenta de bake para sprite. Onde se lê "Godot" nos passos P7/P8, leia "engine própria (SDL3)".
+
 > Eu produzo o ROTEIRO. O criador executa nas mãos dele (time-box rígido de 1 semana). O objetivo único do spike: validar ou refutar **A-01** (pipeline AI gera topologia retopo-ável dentro de 3k-4.5k tris, sem PBR) com DADO REAL. Char de teste: **Gus**. Hardware confirmado: RTX 3050 Laptop **4096 MiB** (ceiling); floor = iGPU.
 
 ## 1. Premissa sob teste e o que falseia

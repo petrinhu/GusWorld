@@ -1,7 +1,9 @@
 # Plano Mínimo CI/Build — Gate do M.4
 
 **Status:** Canônico. Ratificado Sprint 4 W2 2026-06-03. F2-PROD.7.
-**Cross-ref:** build.md, plano_vs.md M.4, raid-log.md R-05.
+**Cross-ref:** `docs/tech/pivot/engine-design.md`, plano_vs.md M.4, raid-log.md R-05.
+
+> **NOTA DE STACK (2026-06-23, pós-ADR-008).** Este plano foi escrito sobre o stack **Godot 4 + C# .NET 8 AOT** (export templates, `export_presets.cfg`, `godot --headless --export-release`, `dotnet format/build/test`, PoC AOT), depois aposentado pelo [ADR-008](../../tech/adr/ADR-008-repivot-qt-to-sdl3.md) (engine própria C++20 + SDL3). A **filosofia do gate segue válida** (anti-OE: artefato distribuível roda em VM clean Fedora, reproduzível por 1 comando; CI Forgejo vem depois e não bloqueia o VS; artefatos `.tar.gz` + `.rpm`, AppImage adiado). As **mecânicas obsoletas**: todo o setup de export Godot e o PoC AOT (F2-CI.5/F2-CI.7) deixam de existir; o build atual é `cmake --preset` + `cmake --build` + `ctest`, com SDL3/RmlUi via FetchContent (não export templates). O gatilho de binário >150MB permanece como sinal de tamanho; a causa-raiz "runtime .NET AOT" não se aplica (C++ não tem runtime gerenciado). Re-derivar o pipeline para CMake/Forgejo no stack atual é decisão de produção do criador (AskUserQuestion), fora do escopo da higienização de termos.
 
 Documento leve de delivery solo. Princípio reitor (anti-OE): o gate do M.4 é **"`.rpm` + `.tar.gz` rodam em VM clean Fedora sem libs extras, reproduzível via `scripts/build_linux.sh`"** — NÃO "pipeline CI verde". Export manual e smoke vêm PRIMEIRO; CI Forgejo vem DEPOIS e não bloqueia o Vertical Slice. Ordem dura: Fase 0 → 1 → 2 (= gate) → 3 (pós-gate).
 
