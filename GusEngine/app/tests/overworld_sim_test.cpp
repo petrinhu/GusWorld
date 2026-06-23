@@ -121,7 +121,29 @@ PlayerSpriteSet make_fake_sprites() {
     TextureId next = 1;
     for (int d = 0; d < gus::app::screens::kDirectionCount; ++d) {
         s.idle[d] = next++;
+        s.idle_frames[d][0] = s.idle[d];  // idle congelado (1 quadro) = compat Caua
+        s.idle_count[d] = 1;
         for (int f = 0; f < kWalkFrameCount; ++f) {
+            s.walk[d][f] = next++;
+        }
+        s.walk_count[d] = kWalkFrameCount;
+    }
+    return s;
+}
+
+// Set "estilo Gus": 7 quadros de walk + 5 quadros de breathing idle por direcao,
+// todos com handles distintos (pra assertar QUAL textura saiu). NAO toca disco.
+PlayerSpriteSet make_gus_like_sprites(int walk_n = 7, int idle_n = 5) {
+    PlayerSpriteSet s;
+    TextureId next = 1;
+    for (int d = 0; d < gus::app::screens::kDirectionCount; ++d) {
+        s.idle_count[d] = idle_n;
+        for (int f = 0; f < idle_n; ++f) {
+            s.idle_frames[d][f] = next++;
+        }
+        s.idle[d] = s.idle_frames[d][0];  // representativo = quadro 0
+        s.walk_count[d] = walk_n;
+        for (int f = 0; f < walk_n; ++f) {
             s.walk[d][f] = next++;
         }
     }
@@ -497,4 +519,107 @@ TEST_CASE("overworld: quadro de walk avanca com a distancia", "[overworld]") {
     const int f = sim.walk_cycle().current_frame();
     REQUIRE(f >= 0);
     REQUIRE(f < kWalkFrameCount);
+}
+
+// --- GUS: walk de 7 quadros + breathing idle animado ------------------------
+
+TEST_CASE("overworld: set_player_sprites configura o ciclo pelo walk_count (Gus 7)",
+          "[overworld]") {
+    // O WalkCycle tem que ciclar pelos 7 quadros do Gus (nao no 4 do default Caua).
+    TileGrid g(40, 40, 16.0f);
+    OverworldSim sim(g, Aabb{200.0f, 200.0f, 8.0f, 8.0f}, 8.0f);
+    sim.set_player_sprites(make_gus_like_sprites(/*walk*/ 7, /*idle*/ 5));
+    REQUIRE(sim.walk_cycle().frame_count() == 7);
+    REQUIRE(sim.idle_clock().frame_count() == 5);
+}
+
+TEST_CASE("overworld: andando mostra um quadro de walk do Gus da direcao certa",
+          "[overworld]") {
+    TileGrid g(40, 40, 16.0f);
+    OverworldSim sim(g, Aabb{200.0f, 200.0f, 8.0f, 8.0f}, 8.0f);
+    PlayerSpriteSet s = make_gus_like_sprites(7, 5);
+    sim.set_player_sprites(s);
+    for (int i = 0; i < 20; ++i) {
+        sim.step_fixed(1, 0, false, 1.0f / 60.0f);  // Leste
+    }
+    REQUIRE(sim.facing() == Direction::East);
+    FakeRenderer r;
+    sim.render(r, 80.0f, 80.0f, 1.0f);
+    REQUIRE(static_cast<int>(r.sprites.size()) == 1);
+    const TextureId t = r.sprites[0].texture;
+    bool is_east_walk = false;
+    for (int f = 0; f < s.walk_count[static_cast<int>(Direction::East)]; ++f) {
+        if (t == s.walk[static_cast<int>(Direction::East)][f]) is_east_walk = true;
+    }
+    REQUIRE(is_east_walk);
+}
+
+TEST_CASE("overworld: parado mostra um quadro do breathing idle (animado)",
+          "[overworld]") {
+    // O lider pediu RESPIRACAO no idle, nao frame congelado. Parado, o sprite mostrado
+    // tem que ser um dos quadros do breathing daquela direcao.
+    TileGrid g(40, 40, 16.0f);
+    OverworldSim sim(g, Aabb{200.0f, 200.0f, 8.0f, 8.0f}, 8.0f);
+    PlayerSpriteSet s = make_gus_like_sprites(7, 5);
+    sim.set_player_sprites(s);
+    sim.step_fixed(0, 0, false, 1.0f / 60.0f);  // parado, direcao default Sul
+    FakeRenderer r;
+    sim.render(r, 80.0f, 80.0f, 1.0f);
+    REQUIRE(static_cast<int>(r.sprites.size()) == 1);
+    const TextureId t = r.sprites[0].texture;
+    bool is_south_idle = false;
+    for (int f = 0; f < s.idle_count[static_cast<int>(Direction::South)]; ++f) {
+        if (t == s.idle_frames[static_cast<int>(Direction::South)][f]) {
+            is_south_idle = true;
+        }
+    }
+    REQUIRE(is_south_idle);
+}
+
+TEST_CASE("overworld: breathing idle avanca de quadro com o tempo parado",
+          "[overworld]") {
+    // O AnimClock do idle toca por TEMPO. A respiracao agora e calibrada em ciclos/min
+    // (default 16 = ~3.75 s por ciclo); com 5 quadros no loop o fps fica ~1.33 (troca a
+    // cada ~0.75 s). Parado por tempo suficiente (~4 s = mais que um ciclo), o quadro
+    // mostrado tem que MUDAR (respira lento e realista).
+    TileGrid g(40, 40, 16.0f);
+    OverworldSim sim(g, Aabb{200.0f, 200.0f, 8.0f, 8.0f}, 8.0f);
+    sim.set_player_sprites(make_gus_like_sprites(7, 5));
+
+    auto idle_tex = [&]() {
+        FakeRenderer r;
+        sim.render(r, 80.0f, 80.0f, 1.0f);
+        return r.sprites.at(0).texture;
+    };
+
+    sim.step_fixed(0, 0, false, 1.0f / 60.0f);  // garante estado parado
+    const int f0 = sim.idle_clock().frame();
+    const TextureId t0 = idle_tex();
+
+    // Avanca ~1 s parado (60 ticks de 1/60): a ~1.33 fps (troca a cada ~0.75 s) cruza
+    // UMA troca, mas SEM completar o ciclo de 5 quadros (que voltaria ao quadro 0 e
+    // mascararia a mudanca). Prova que o breathing avanca mesmo calmo.
+    for (int i = 0; i < 60; ++i) {
+        sim.step_fixed(0, 0, false, 1.0f / 60.0f);
+    }
+    const int f1 = sim.idle_clock().frame();
+    const TextureId t1 = idle_tex();
+
+    REQUIRE(f1 != f0);   // o relogio do breathing girou
+    REQUIRE(t1 != t0);   // e o sprite mostrado acompanhou
+}
+
+TEST_CASE("overworld: idle congelado (1 quadro) nao quebra - compat Caua",
+          "[overworld]") {
+    // make_fake_sprites = idle de 1 quadro (Caua). Parado tem que mostrar idle[di] e
+    // o clock fica com frame_count 1 (congelado), sem animar.
+    TileGrid g = make_map();
+    OverworldSim sim(g, Aabb{36.0f, 36.0f, 8.0f, 8.0f}, 4.0f);
+    PlayerSpriteSet s = make_fake_sprites();
+    sim.set_player_sprites(s);
+    REQUIRE(sim.idle_clock().frame_count() == 1);
+    sim.step_fixed(0, 0, false, 1.0f / 60.0f);
+    FakeRenderer r;
+    sim.render(r, 80.0f, 80.0f, 1.0f);
+    REQUIRE(r.sprites[0].texture == s.idle[static_cast<int>(Direction::South)]);
 }

@@ -94,6 +94,26 @@ struct OverworldTuning {
     // locomotion.md). Run usa passada mais longa (run_px_per_frame). Escalavel.
     float anim_walk_px_per_frame = 8.0f;
     float anim_run_px_per_frame = 11.0f;
+
+    // --- IDLE ANIMADO (breathing) ------------------------------------------
+    // RESPIRACAO PARADA em CICLOS POR MINUTO (semantico, fisiologico), nao fps cru.
+    // Referencia do lider: ventilacao humana media ~16 ciclos/min (1 ciclo a cada
+    // ~3.75 s) = calmo e realista. O loop de quadros do breathing representa 1 CICLO
+    // COMPLETO (inspira + expira): no Gus os 5 quadros vao da postura baixa (f0) ao
+    // pico inflado (f2) e voltam (f4), fechando um ciclo ao dar wrap pro f0.
+    //
+    // O FPS do AnimClock e DERIVADO daqui em idle_fps_for_loop() (ver abaixo): com N
+    // quadros no loop, fps = N * bpm / 60 -> um loop inteiro leva 60/bpm s. O sim
+    // recalcula o fps quando recebe os sprites (sabe o N real). Personagem sem breathing
+    // (1 quadro) nao anima na pratica (clock de 1 frame fica congelado). Ajustavel.
+    float idle_breaths_per_minute = 16.0f;
+
+    // FPS derivado para o AnimClock do idle, dado o numero de quadros de UM ciclo
+    // (loop completo de breathing). fps = loop_frames * bpm / 60. Saneia loop_frames<1.
+    [[nodiscard]] float idle_fps_for_loop(int loop_frames) const noexcept {
+        const int n = loop_frames < 1 ? 1 : loop_frames;
+        return static_cast<float>(n) * idle_breaths_per_minute / 60.0f;
+    }
 };
 
 }  // namespace gus::app::screens

@@ -35,9 +35,19 @@ enum class Direction {
 // Numero de direcoes (pra dimensionar tabelas de sprite no render).
 inline constexpr int kDirectionCount = 4;
 
-// Numero de quadros da animacao de walk por direcao (export PixelLab: 0..3). O
-// neutro (idle) e um sprite a parte; aqui sao so os quadros de PASSO.
+// Numero de quadros de walk PADRAO por direcao (legado do Caua: 4, ping-pong). O
+// WalkCycle aceita um frame_count diferente no ctor (Gus tem 7 frames por direcao);
+// esta constante e so o DEFAULT - dimensiona testes/chamadas antigas. O numero REAL
+// de quadros vive no PlayerSpriteSet (medido por personagem) e e passado ao WalkCycle.
 inline constexpr int kWalkFrameCount = 4;
+
+// Teto de quadros de walk por direcao suportado (dimensiona os arrays fixos do
+// PlayerSpriteSet sem alocacao dinamica). Gus = 7; folga ate 16 pra futuras anims.
+inline constexpr int kMaxWalkFrameCount = 16;
+
+// Teto de quadros do IDLE animado por direcao (breathing do Gus = 5). Idem: array
+// fixo, sem heap. Headless degradado mantem 1 (idle congelado).
+inline constexpr int kMaxIdleFrameCount = 16;
 
 // POLITICA de qual eixo manda o "olhar" do boneco na DIAGONAL (ambos dx,dy != 0).
 // O lider escolhe via OverworldTuning (ponto unico de feel). Cardinal puro nunca
@@ -103,6 +113,11 @@ public:
 
     WalkCycle() = default;
     explicit WalkCycle(Config cfg) noexcept : cfg_(cfg) {}
+    // frame_count = numero REAL de quadros do ciclo desta arte (Caua 4, Gus 7).
+    // Saneado: < 1 vira kWalkFrameCount (default seguro). O wrap usa este valor.
+    WalkCycle(Config cfg, int frame_count) noexcept
+        : cfg_(cfg),
+          frame_count_(frame_count >= 1 ? frame_count : kWalkFrameCount) {}
 
     // Avanca o ciclo com a distancia percorrida NESTE passo (>= 0, ja em px de
     // mundo) e se estava correndo. distance <= 0 => PARADO: zera o acumulador e
@@ -125,11 +140,15 @@ public:
     // Distancia acumulada ainda nao "gasta" numa troca (debug/teste).
     [[nodiscard]] float accumulated() const noexcept { return accum_; }
 
+    // Numero de quadros do ciclo (>= 1). Usado pelo wrap; util pra teste/debug.
+    [[nodiscard]] int frame_count() const noexcept { return frame_count_; }
+
 private:
     Config cfg_{};
     float accum_ = 0.0f;  // distancia acumulada desde a ultima troca
-    int frame_ = 0;       // quadro de walk corrente [0, kWalkFrameCount)
+    int frame_ = 0;       // quadro de walk corrente [0, frame_count_)
     bool moving_ = false; // false = neutro (idle)
+    int frame_count_ = kWalkFrameCount;  // quadros do ciclo (Caua 4, Gus 7)
 };
 
 }  // namespace gus::app::screens

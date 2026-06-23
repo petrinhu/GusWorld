@@ -10,6 +10,7 @@ add_executable(gusengine_app_tests
     sprite_animation_test.cpp
     sprite_anchor_test.cpp
     anim_catalog_test.cpp
+    player_sprites_layout_test.cpp
 )
 
 target_link_libraries(gusengine_app_tests

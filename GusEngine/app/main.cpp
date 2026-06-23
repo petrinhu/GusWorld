@@ -24,6 +24,7 @@
 #include <string_view>
 
 #include "gus/app/sdl_window.hpp"
+#include "gus/app/screens/anim_catalog.hpp"  // resolve_gus_sprites_dir
 #include "gus/app/screens/anim_preview.hpp"
 #include "gus/app/screens/overworld_sim.hpp"
 #include "gus/app/screens/player_sprites_loader.hpp"
@@ -84,10 +85,10 @@ int run_smoke(int ticks) {
         gus::app::screens::kTestPlayerStart,
         gus::app::screens::make_test_tuning());
 
-    // Exercita o caminho de SPRITE tambem no headless: o loader degrada (renderer
-    // nulo -> kInvalidTexture) e o sim cai pro contorno. Nao crasha.
-    const std::string assets = gus::app::screens::resolve_caua_sprites_dir();
-    sim.set_player_sprites(gus::app::screens::load_caua_sprites(renderer, assets));
+    // Exercita o caminho de SPRITE do GUS tambem no headless: o loader degrada
+    // (renderer nulo -> kInvalidTexture) e o sim cai pro contorno. Nao crasha.
+    const std::string assets = gus::app::screens::resolve_gus_sprites_dir();
+    sim.set_player_sprites(gus::app::screens::load_gus_sprites(renderer, assets));
 
     gus::core::time::FixedTimestep clock(1.0 / 60.0, 5);
     const float dt = static_cast<float>(clock.fixed_dt());

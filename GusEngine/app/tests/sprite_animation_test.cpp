@@ -223,3 +223,40 @@ TEST_CASE("walk: reset volta ao neutro", "[sprite_anim]") {
     REQUIRE(c.current_frame() == WalkCycle::kNeutralFrame);
     REQUIRE(c.accumulated() == 0.0f);
 }
+
+// --- GENERALIZACAO N quadros (Gus tem 7 por direcao) -------------------------
+
+TEST_CASE("walk: frame_count default e kWalkFrameCount (compat Caua)", "[sprite_anim]") {
+    WalkCycle c;
+    REQUIRE(c.frame_count() == kWalkFrameCount);
+}
+
+TEST_CASE("walk: frame_count saneia entradas invalidas", "[sprite_anim]") {
+    WalkCycle zero(WalkCycle::Config{}, 0);
+    REQUIRE(zero.frame_count() == kWalkFrameCount);  // < 1 cai no default
+    WalkCycle neg(WalkCycle::Config{}, -3);
+    REQUIRE(neg.frame_count() == kWalkFrameCount);
+    WalkCycle ok(WalkCycle::Config{}, 7);
+    REQUIRE(ok.frame_count() == 7);
+}
+
+TEST_CASE("walk: cicla os 7 quadros do Gus e volta a 0", "[sprite_anim]") {
+    // Gus: 7 quadros por direcao. O wrap tem que ser em 7 (nao no kWalkFrameCount=4).
+    WalkCycle c(WalkCycle::Config{/*walk*/ 8.0f, /*run*/ 11.0f}, /*frames*/ 7);
+    for (int expected = 1; expected < 7; ++expected) {
+        c.advance(8.0f, false);
+        REQUIRE(c.current_frame() == expected);  // 1,2,3,4,5,6
+    }
+    c.advance(8.0f, false);
+    REQUIRE(c.current_frame() == 0);  // ciclico no 7o passo, nao no 4o
+}
+
+TEST_CASE("walk: 7 quadros - quadro sempre valido no intervalo", "[sprite_anim]") {
+    WalkCycle c(WalkCycle::Config{8.0f, 11.0f}, 7);
+    for (int i = 0; i < 200; ++i) {
+        c.advance(3.7f, false);
+        const int f = c.current_frame();
+        REQUIRE(f >= 0);
+        REQUIRE(f < 7);
+    }
+}

@@ -7,6 +7,7 @@
 
 #include "gus/app/sdl_window.hpp"
 
+#include "gus/app/screens/anim_catalog.hpp"  // resolve_gus_sprites_dir
 #include "gus/app/screens/player_sprites_loader.hpp"
 #include "gus/app/screens/test_overworld.hpp"
 
@@ -52,11 +53,12 @@ bool SdlWindow::init() {
     // Abre gamepad ja conectado + arma hot-plug.
     input_.open_gamepads();
 
-    // Carrega os sprites do Caua e os entrega ao sim (handles resolvidos pelo
-    // renderer). Se faltar arquivo, o set fica incompleto e o sim cai pro contorno.
-    const std::string assets = gus::app::screens::resolve_caua_sprites_dir();
+    // PLAYER = GUS (default). Carrega o walk de 7 quadros por direcao + o breathing
+    // idle de 5 quadros e os entrega ao sim (handles resolvidos pelo renderer). Se
+    // faltar arquivo, o set fica incompleto e o sim cai pro contorno (fallback).
+    const std::string assets = gus::app::screens::resolve_gus_sprites_dir();
     sim_->set_player_sprites(
-        gus::app::screens::load_caua_sprites(*render2d_, assets));
+        gus::app::screens::load_gus_sprites(*render2d_, assets));
     return true;
 }
 

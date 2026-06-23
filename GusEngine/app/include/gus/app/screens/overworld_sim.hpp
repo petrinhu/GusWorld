@@ -24,6 +24,7 @@
 #include "gus/app/screens/overworld_tuning.hpp"
 #include "gus/app/screens/sprite_anchor.hpp"  // FootInset (ancoragem pelos pes)
 #include "gus/app/screens/sprite_animation.hpp"
+#include "gus/core/anim/anim_clock.hpp"  // idle animado (breathing) por TEMPO
 #include "gus/core/spatial/camera_clamp.hpp"
 #include "gus/core/spatial/grid_collision.hpp"
 #include "gus/core/spatial/tile_grid.hpp"
@@ -32,17 +33,37 @@
 namespace gus::app::screens {
 
 // Conjunto de sprites de locomocao do jogador, ja resolvidos para TextureId pelo
-// renderer (a casca Qt chama IRenderer::load_texture e preenche isto). POCO sem
-// Qt: o OverworldSim so guarda os handles e escolhe qual mostrar por
+// renderer (a casca SDL chama IRenderer::load_texture e preenche isto). POCO sem
+// SDL: o OverworldSim so guarda os handles e escolhe qual mostrar por
 // (direcao, quadro). Indices: [direcao] = Direction (Sul/Norte/Leste/Oeste).
-//   - idle[d]    = sprite neutro daquela direcao (parado E quadro neutro do walk);
-//   - walk[d][f] = quadro f de walk (f em [0, kWalkFrameCount)).
-// kInvalidTexture em qualquer slot => o render DEGRADA para o contorno da AABB
+//   - idle[d]          = quadro REPRESENTATIVO/neutro (frame 0 do breathing) daquela
+//                        direcao - acesso direto preservado pra compat de testes;
+//   - idle_frames[d][i]= quadro i do IDLE ANIMADO (breathing); i em [0, idle_count[d]);
+//   - walk[d][f]       = quadro f de walk; f em [0, walk_count[d]).
+//
+// GENERALIZACAO (Gus): walk e idle aceitam N quadros POR DIRECAO (Caua: 4 walk e 1
+// idle congelado; Gus: 7 walk e 5 breathing). Arrays FIXOS dimensionados pelos tetos
+// (kMaxWalkFrameCount/kMaxIdleFrameCount), SEM heap; as contagens reais ficam em
+// walk_count[d]/idle_count[d]. idle_count[d] >= 1 sempre (frame 0 == idle[d]).
+//
+// kInvalidTexture em qualquer slot usado => o render DEGRADA para o contorno da AABB
 // (caminho do smoke/headless e de "ainda sem arte"). loaded() = true so se os 4
-// idle estiverem validos (minimo para desenhar algo).
+// idle representativos estiverem validos (minimo para desenhar algo).
 struct PlayerSpriteSet {
+    // Quadro representativo (frame 0 do idle/breathing) por direcao. Mantido pra
+    // compat de acesso direto (testes legados: s.idle[d]).
     gus::platform::render2d::TextureId idle[kDirectionCount] = {};
-    gus::platform::render2d::TextureId walk[kDirectionCount][kWalkFrameCount] = {};
+    // Quadros do walk por direcao (N reais em walk_count[d]).
+    gus::platform::render2d::TextureId walk[kDirectionCount][kMaxWalkFrameCount] = {};
+    // Quadros do IDLE ANIMADO (breathing) por direcao (N reais em idle_count[d]).
+    gus::platform::render2d::TextureId idle_frames[kDirectionCount][kMaxIdleFrameCount] = {};
+
+    // Contagem REAL de quadros por direcao. walk_count default = kWalkFrameCount (4,
+    // legado do Caua, mantido pra make_fake_sprites antigo); idle_count default = 1
+    // (idle congelado legado). O loader sobrescreve com o que achou no disco.
+    int walk_count[kDirectionCount] = {kWalkFrameCount, kWalkFrameCount,
+                                       kWalkFrameCount, kWalkFrameCount};
+    int idle_count[kDirectionCount] = {1, 1, 1, 1};
 
     // ANCORAGEM AUTOMATICA (M1-BUG.SUL): margem inferior transparente de cada sprite
     // IDLE, em fracao do canvas, MEDIDA pelo loader via IRenderer::texture_content_bbox.
@@ -58,6 +79,24 @@ struct PlayerSpriteSet {
             }
         }
         return true;
+    }
+
+    // Maior contagem de walk entre as 4 direcoes (>= 1). Dirige o frame_count do
+    // WalkCycle (ciclo unico pro personagem; todas as direcoes do Gus tem 7).
+    [[nodiscard]] int max_walk_count() const noexcept {
+        int m = 1;
+        for (int d = 0; d < kDirectionCount; ++d) {
+            if (walk_count[d] > m) m = walk_count[d];
+        }
+        return m;
+    }
+    // Idem pro idle animado (breathing). >= 1.
+    [[nodiscard]] int max_idle_count() const noexcept {
+        int m = 1;
+        for (int d = 0; d < kDirectionCount; ++d) {
+            if (idle_count[d] > m) m = idle_count[d];
+        }
+        return m;
     }
 };
 
@@ -102,12 +141,22 @@ public:
 
     // Define os sprites do jogador (handles ja resolvidos pelo renderer). Se nao
     // for chamado (ou vier incompleto), o render usa o contorno da AABB (fallback
-    // do headless / "sem arte"). Chamado pela casca Qt apos load_texture.
-    void set_player_sprites(const PlayerSpriteSet& sprites) noexcept { sprites_ = sprites; }
+    // do headless / "sem arte"). Chamado pela casca SDL apos load_texture.
+    //
+    // RECONFIGURA as duas animacoes pelo numero REAL de quadros da arte recebida:
+    //   - WalkCycle: frame_count = sprites.max_walk_count() (Caua 4, Gus 7), preservando
+    //     o feel por DISTANCIA (mesmo px_per_frame do tuning);
+    //   - AnimClock do idle: frame_count = sprites.max_idle_count() (Caua 1 = congelado,
+    //     Gus 5 = breathing), tocado por TEMPO no step_fixed (loop em loop).
+    void set_player_sprites(const PlayerSpriteSet& sprites) noexcept;
 
     // Direcao e quadro de walk correntes (leitura/teste).
     [[nodiscard]] Direction facing() const noexcept { return facing_; }
     [[nodiscard]] const WalkCycle& walk_cycle() const noexcept { return walk_; }
+    // Quadro corrente do idle animado (breathing) - leitura/teste.
+    [[nodiscard]] const gus::core::anim::AnimClock& idle_clock() const noexcept {
+        return idle_clock_;
+    }
 
 private:
     // Posicao do jogador interpolada entre prev_ e curr_ por alpha.
@@ -124,6 +173,14 @@ private:
     Direction facing_ = Direction::South;
     WalkCycle walk_;
     PlayerSpriteSet sprites_{};
+
+    // IDLE animado (breathing): toca por TEMPO (AnimClock), nao por distancia. Avanca
+    // no step_fixed pelo fixed_dt (independe do movimento - respira parado). frame_count
+    // = quadros do breathing (1 = congelado, legado Caua). O fps e DERIVADO dos ciclos/min
+    // do tuning quando os sprites chegam (set_player_sprites sabe o N real do loop); o
+    // init aqui usa 1 quadro de loop so pra arrancar coerente.
+    gus::core::anim::AnimClock idle_clock_{
+        1, OverworldTuning{}.idle_fps_for_loop(1)};
 
     // MEMORIA DO INPUT do tick anterior (cru, em {-1,0,1}). Necessaria pra politica
     // LastAxisWins decidir o eixo RECEM-acionado pela mudanca do INPUT (e nao pelo

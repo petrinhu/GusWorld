@@ -119,7 +119,7 @@ void WalkCycle::advance(float distance, bool running) noexcept {
     // advance sem pular a contagem de quadros.
     while (accum_ >= step) {
         accum_ -= step;
-        frame_ = (frame_ + 1) % kWalkFrameCount;
+        frame_ = (frame_ + 1) % frame_count_;
     }
 }
 

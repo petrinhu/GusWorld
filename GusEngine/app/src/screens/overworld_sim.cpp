@@ -30,7 +30,26 @@ OverworldSim::OverworldSim(gus::core::spatial::TileGrid grid,
       curr_(player_start),
       tuning_(tuning),
       walk_(WalkCycle::Config{tuning.anim_walk_px_per_frame,
-                              tuning.anim_run_px_per_frame}) {}
+                              tuning.anim_run_px_per_frame}),
+      idle_clock_(/*frame_count=*/1, tuning.idle_fps_for_loop(1)) {}
+
+void OverworldSim::set_player_sprites(const PlayerSpriteSet& sprites) noexcept {
+    sprites_ = sprites;
+    // Reconfigura as animacoes pelo numero REAL de quadros da arte recebida, sem
+    // tocar no feel (px_per_frame do walk continua do tuning; fps do idle idem).
+    // Ciclo unico do personagem: o WalkCycle usa o MAIOR walk_count entre as direcoes
+    // (Caua 4, Gus 7); o render so indexa walk[dir][frame] dentro do que existe.
+    walk_ = WalkCycle(WalkCycle::Config{tuning_.anim_walk_px_per_frame,
+                                        tuning_.anim_run_px_per_frame},
+                      sprites_.max_walk_count());
+    // O loop de breathing tem agora o N REAL de quadros (Gus 5, Caua 1). Reconta o
+    // frame_count E re-deriva o fps a partir dos ciclos/min do tuning: um loop inteiro
+    // deve durar 60/bpm s, logo fps = N * bpm / 60 (idle_fps_for_loop). Sem isso o fps
+    // ficaria no init de loop=1 e a respiracao sairia errada.
+    const int idle_loop = sprites_.max_idle_count();
+    idle_clock_.set_frame_count(idle_loop);
+    idle_clock_.set_fps(tuning_.idle_fps_for_loop(idle_loop));
+}
 
 OverworldSim::OverworldSim(gus::core::spatial::TileGrid grid,
                            gus::core::spatial::Aabb player_start,
@@ -45,6 +64,10 @@ OverworldSim::OverworldSim(gus::core::spatial::TileGrid grid,
 void OverworldSim::step_fixed(int dx, int dy, bool run, float fixed_dt) noexcept {
     // A posicao atual vira a "anterior" deste frame (base da interpolacao).
     prev_ = curr_;
+
+    // IDLE animado (breathing) toca por TEMPO, sempre - so e MOSTRADO quando parado.
+    // Avancar tambem andando mantem o clock vivo e evita "pulo" ao voltar pro idle.
+    idle_clock_.advance(fixed_dt);
 
     if (dx == 0 && dy == 0) {
         // Parado: prev == curr (render nao interpola). A direcao MANTEM a ultima
@@ -166,11 +189,25 @@ void OverworldSim::render(gus::platform::render2d::IRenderer& renderer,
         // centrado em X sobre a AABB.
         const int di = static_cast<int>(facing_);
         const int frame = walk_.current_frame();  // kNeutralFrame = parado
-        gus::platform::render2d::TextureId tex =
-            (frame == WalkCycle::kNeutralFrame || frame < 0 || frame >= kWalkFrameCount)
-                ? sprites_.idle[di]
-                : sprites_.walk[di][frame];
-        // Se faltar o quadro de walk (so idle carregado), cai pro idle.
+        const bool moving =
+            (frame != WalkCycle::kNeutralFrame && frame >= 0 &&
+             frame < sprites_.walk_count[di]);
+
+        gus::platform::render2d::TextureId tex;
+        if (moving) {
+            // ANDANDO: quadro f de walk da direcao (Gus 7 / Caua 4 quadros).
+            tex = sprites_.walk[di][frame];
+        } else {
+            // PARADO: IDLE animado (breathing) tocado por TEMPO. O AnimClock cicla os
+            // quadros do breathing (Gus 5); com 1 quadro (Caua) fica congelado. Clampa
+            // o indice ao que existe naquela direcao (degrada pro frame 0 = idle[di]).
+            int idle_f = idle_clock_.frame();
+            if (idle_f < 0 || idle_f >= sprites_.idle_count[di]) {
+                idle_f = 0;
+            }
+            tex = sprites_.idle_frames[di][idle_f];
+        }
+        // Se o quadro escolhido faltar (slot invalido), cai pro idle representativo.
         if (tex == gus::platform::render2d::kInvalidTexture) {
             tex = sprites_.idle[di];
         }
