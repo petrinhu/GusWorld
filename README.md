@@ -227,4 +227,4 @@ Por fim, as ferramentas livres e as inspirações que sustentam o projeto:
 
 - **Engine e libs FOSS:** [SDL3](https://www.libsdl.org/), [RmlUi](https://github.com/mikke89/RmlUi), [miniaudio](https://miniaud.io/), [Catch2](https://github.com/catchorg/Catch2) e as bibliotecas header-only vendorizadas em `GusEngine/third_party/` (lista e licenças em [THIRD-PARTY-LICENSES.md](THIRD-PARTY-LICENSES.md)).
 - **Ferramentas de produção:** [Blender](https://www.blender.org/), [PixelLab](https://www.pixellab.ai/) (sprites) e o stack local de busca da lore ([Ollama](https://ollama.com/) + bge-m3, [LanceDB](https://lancedb.com/), `rag_maker`).
-- **Inspirações de design** (homenagem, nada copiado): Chrono Trigger, Sea of Stars, Sable e Death's Door.
+- **Inspirações de design** (homenagem, nada copiado): Chrono Trigger, The Legend of Zelda: A Link to the Past (SNES), Stardew Valley, Sea of Stars, Sable e Death's Door.
