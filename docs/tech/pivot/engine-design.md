@@ -1,5 +1,7 @@
 # Design da Engine — Pivot C++/Qt6 (GusWorld)
 
+> **NOTA 2026-06-23:** a camada de PLATAFORMA (Qt RHI + Qt Quick/QML + Qt Multimedia) foi SUPERADA por SDL3 + RmlUi + miniaudio. Ver [`docs/tech/adr/ADR-008-repivot-qt-to-sdl3.md`](../adr/ADR-008-repivot-qt-to-sdl3.md). O restante do design (4 camadas, POCO core/domain, save, i18n, board M0-M9) segue válido.
+
 **Status:** decisões macro **ratificadas pelo líder supremo** no brainstorm de 2026-06-21. O design da **engine** está fechado; os demais eixos do pivot (combate Pokémon, câmera, arte, áudio, porte, licença) ficam para brainstorms separados.
 
 **Decisão âncora (one-way door):** GusWorld migra de **Godot 4.6 + C# .NET 8** para **C++ + Qt6 com engine própria**. Cross-ref: `TODO.md` → onda de Refatoração (RF-1, RF-2, RF-7).

@@ -2,9 +2,9 @@
 
 > RPG turn-based 2D estilizado. Prodígio-hacker de 11 anos contra megacorporação ciber-gótica.
 
-**Status:** Pivot de stack em curso (Godot/C# para C++/Qt6 com engine própria). Migração faseada anti big-bang, Godot vivo até o decommission no marco M8. Decisão âncora em [`docs/tech/pivot/engine-design.md`](docs/tech/pivot/engine-design.md), ratificada pelo líder em 2026-06-21.
+**Status:** Pivot de stack em curso (Godot/C# para C++20 com engine própria). A camada de plataforma é **SDL3** desde o re-pivot Qt6 para SDL3 ([ADR-008](docs/tech/adr/ADR-008-repivot-qt-to-sdl3.md), 2026-06-22); o Qt6 anterior foi aposentado. Migração faseada anti big-bang, Godot vivo até o decommission no marco M8. Decisão âncora da engine em [`docs/tech/pivot/engine-design.md`](docs/tech/pivot/engine-design.md), ratificada pelo líder em 2026-06-21.
 
-**Solo indie, freeware.** Petrinhu, 2026. Linux + Windows. Single-player puro. C++20 + Qt6.
+**Solo indie, freeware.** Petrinhu, 2026. Linux + Windows. Single-player puro. C++20 + SDL3.
 
 ---
 
@@ -37,12 +37,12 @@ gusworld/
 │   ├── narrative/       (lore-bible, characters, factions, timeline + deep-lore)
 │   ├── art/             (style guide)
 │   └── tech/            (architecture, ADRs, pivot/engine-design.md)
-├── GusEngine/           (engine própria C++/Qt6, em 4 camadas)
+├── GusEngine/           (engine própria C++20, em 4 camadas)
 │   ├── core/            (POCO C++ puro: time, rng, ecs_lite, resource, events)
 │   ├── domain/          (POCO C++ puro: save, i18n, progression, templates, combat)
-│   ├── platform/        (única fronteira Qt: window, render2d, input, audio, fs)
+│   ├── platform/        (única fronteira SDL3: window, render2d, input, audio, fs)
 │   ├── app/             (GusWorld-specific: screens, main)
-│   ├── tests/           (Catch2 + Qt Test)
+│   ├── tests/           (Catch2)
 │   ├── CMakeLists.txt
 │   └── CMakePresets.json
 ├── game/                (projeto Godot legado, referência de leitura até M8)
@@ -69,7 +69,7 @@ A engine antiga (`game/` Godot + `engine/` C#) permanece no repo como referênci
 | [sinopse.md](sinopse.md) | Worldbuilding + protagonista (imutável) |
 | [docs/design/pillars.md](docs/design/pillars.md) | 5 pillars canon |
 | [docs/design/gdd.md](docs/design/gdd.md) | Game Design Document 1-page |
-| [docs/tech/pivot/engine-design.md](docs/tech/pivot/engine-design.md) | Design da engine do pivot C++/Qt6 (fonte do stack atual) |
+| [docs/tech/pivot/engine-design.md](docs/tech/pivot/engine-design.md) | Design da engine do pivot C++20 (4 camadas; plataforma superada pelo [ADR-008](docs/tech/adr/ADR-008-repivot-qt-to-sdl3.md)) |
 | [docs/tech/adr/](docs/tech/adr/) | Architecture Decision Records |
 
 ---
@@ -86,7 +86,7 @@ A engine antiga (`game/` Godot + `engine/` C#) permanece no repo como referênci
 ### Pré-requisitos
 
 - C++20 (GCC, Clang ou MSVC/MinGW)
-- Qt6 6.8 LTS (componentes Core, Gui, Quick, Multimedia, Test, ShaderTools)
+- SDL3 + RmlUi (via FetchContent; o CMake baixa e fixa a versão, build reprodutível Linux + Windows)
 - CMake + Ninja
 - Linux ou Windows
 - Git
@@ -106,7 +106,7 @@ cmake --build --preset linux-release
 # Rodar o jogo
 ./build/linux-release/app/gusworld_app
 
-# Rodar a suíte de testes (Catch2 para a lógica + Qt Test para a camada Qt)
+# Rodar a suíte de testes (Catch2)
 ctest --preset linux-release
 ```
 
@@ -117,41 +117,43 @@ Para Windows, troque o preset por `windows-release`. A lógica de `core/` e `dom
 ## Tech stack
 
 - **Linguagem:** C++20 (RAII, value semantics, `std::`). Engine própria, sem runtime de terceiros.
-- **Framework:** Qt6 6.8 LTS. Único na fronteira `platform/` + `app/`; `core/` + `domain/` são POCO C++ puro (zero Qt, zero I/O real, auditado por grep no CI).
-- **Renderer:** Qt RHI (escolhe Vulkan ou OpenGL por GPU) para o mundo + Qt Quick/QML para UI, menus e telas de batalha. 2D-only.
+- **Framework:** SDL3 (janela, loop próprio, input, gamepad nativo, eventos) na fronteira `platform/` + `app/`; `core/` + `domain/` são POCO C++ puro (zero framework, zero I/O real, auditado por grep no CI). UI do jogador via **RmlUi** (HTML/CSS-like, retido, data binding MVC; chega na Fase 3 do re-pivot, marco M5+). Áudio via **miniaudio** (vendorizado em `third_party/`).
+- **Renderer:** `SDL_Renderer` (2D, escolhe o backend de GPU disponível) para o mundo; RmlUi desenha sobre o mesmo `render2d` para UI e menus. Tudo atrás de uma interface `IRenderer` (trocar o backend = um arquivo). 2D-only.
 - **Câmera:** ortográfica fixa top-down (clamp ao mapa). Zoom e follow ficam para refinamento futuro (RF-3).
 - **Visual:** 2D estilizado, super-deformed (SD) 1:1:1. Pixel art à mão (estilo Zelda A Link to the Past, SNES) ou modelagem 3D no Blender baked para sprite (estilo Stardew Valley, Sea of Stars, Death's Door). O 3D é só ferramenta de produção, nunca runtime.
 - **Save format:** binário próprio com criptografia própria (SHA-256 / HMAC, zero dependência externa, validada contra vetores FIPS 180-4 e RFC 4231), migrators forward-only, schema v4, anti-tamper.
 - **RNG:** PRNG determinístico seedável e injetável (para save e replay).
 - **Localização:** loader próprio + i18n próprio. Dev em pt-br. Tradução en-intl pós-release v1.0.0.
-- **Build/Test:** CMake + CMakePresets + Qt6. Testes via `ctest` (Catch2 para a lógica pura, Qt Test para a camada Qt).
+- **Build/Test:** CMake + CMakePresets. SDL3 + RmlUi entram via FetchContent (pin de versão); testes via `ctest` (Catch2). A camada de plataforma roda smoke headless com `SDL_VIDEODRIVER=dummy`.
 - **CI:** Forgejo Actions, matriz Linux + Windows.
 - **Plataformas:** Linux (AppImage + tar.gz) + Windows (sem signing em G1).
 - **Target hardware:** floor iGPU (Intel HD / AMD integrada, sem GPU dedicada); ceiling RTX 3050 Laptop 4GB.
 
-Motivação do pivot: máxima performance em máquinas modestas. C++ é AOT por natureza, o que elimina toda a complexidade de AOT do .NET da fase anterior (ADR-002).
+Motivação do pivot Godot/C# para C++20: máxima performance em máquinas modestas. C++ é AOT por natureza, o que elimina toda a complexidade de AOT do .NET da fase anterior (ADR-002).
+
+Motivação do re-pivot Qt6 para SDL3 ([ADR-008](docs/tech/adr/ADR-008-repivot-qt-to-sdl3.md)): gamepad nativo de classe AAA (o Qt6 removeu o módulo QtGamepad), binário e deploy ~10x menores (licença zlib), fim do risco do Qt RHI (API semi-privada, agora substituída pelo `SDL_Renderer` público e estável) e portabilidade para mobile e console (caminho fechado no Qt). A lógica pura (`core`/`domain`, ~590 testes auditados) não muda no re-pivot: só a fronteira `platform/` + a casca `app/` foram reescritas.
 
 ---
 
 ## Pipeline de arte
 
-GusWorld é feito por uma pessoa só, então a produção de assets se apoia num pipeline assistido por IA, do lore ao sprite final. O Claude transforma o lore canônico (lore-bible, character specs) em prompts visuais detalhados e fiéis a cada personagem. Esses prompts alimentam a geração de imagem 2D no [nano banana (Google Gemini)](https://gemini.google.com/) e no [Grok (xAI)](https://grok.com/), que produzem as imagens-base dos personagens. Quando um asset pede volume 3D, o [Tripo3D](https://www.tripo3d.ai/) faz image-to-3D, convertendo a imagem-base num modelo 3D que alimenta o pipeline de bake. Vale o lembrete: **o jogo é 2D** (sprites desenhados pelo Qt RHI em runtime); o 3D existe apenas como ferramenta de produção (modelar ou gerar em 3D, renderizar e converter em sprite 2D), nunca em runtime. Por fim, o [PixelLab](https://www.pixellab.ai/) gera e anima os sprites multi-direção (personagem em várias direções + ciclos de animação a partir de uma imagem). Um agradecimento às camadas gratuitas dessas ferramentas, que ajudam muito um projeto solo e freeware a produzir arte.
+GusWorld é feito por uma pessoa só, então a produção de assets se apoia num pipeline assistido por IA, do lore ao sprite final. O Claude transforma o lore canônico (lore-bible, character specs) em prompts visuais detalhados e fiéis a cada personagem. Esses prompts alimentam a geração de imagem 2D no [nano banana (Google Gemini)](https://gemini.google.com/) e no [Grok (xAI)](https://grok.com/), que produzem as imagens-base dos personagens. Quando um asset pede volume 3D, o [Tripo3D](https://www.tripo3d.ai/) faz image-to-3D, convertendo a imagem-base num modelo 3D que alimenta o pipeline de bake. Vale o lembrete: **o jogo é 2D** (sprites desenhados pelo `SDL_Renderer` em runtime); o 3D existe apenas como ferramenta de produção (modelar ou gerar em 3D, renderizar e converter em sprite 2D), nunca em runtime. Por fim, o [PixelLab](https://www.pixellab.ai/) gera e anima os sprites multi-direção (personagem em várias direções + ciclos de animação a partir de uma imagem). Um agradecimento às camadas gratuitas dessas ferramentas, que ajudam muito um projeto solo e freeware a produzir arte.
 
 ---
 
-## Roadmap (pivot C++/Qt6, marcos M0-M9)
+## Roadmap (pivot C++20, marcos M0-M9)
 
 Migração faseada anti big-bang. Cada marco fecha pelo seu critério de saída testável; o Godot legado só é apagado no M8, depois que a engine nova provar paridade jogável (M7). Board completo e critérios de saída em [TODO.md](TODO.md); design dos marcos em [`docs/tech/pivot/engine-design.md`](docs/tech/pivot/engine-design.md).
 
 | Marco | Status | Descrição |
 |---|---|---|
-| M0 (Andaime) | 🔍 Em validação | Repo C++ + CMake + presets + link Qt6 + framework de teste. Build Linux verde + testes ctest passando |
-| M1 (Janela + loop + sprite) | 🔍 Em validação | Janela Qt6 + render2d (Qt RHI) + loop de tempo fixo + ponte de input. Boneco-placeholder anda no mapa, câmera ortográfica presa ao mapa |
+| M0 (Andaime) | 🔍 Em validação | Repo C++ + CMake + presets + framework de teste. Build Linux verde + testes ctest passando |
+| M1 (Janela + loop + sprite) | 🔍 Em validação | Janela SDL3 + render2d (`SDL_Renderer`) + loop de tempo fixo + ponte de input com gamepad. Boneco-placeholder anda no mapa, câmera ortográfica presa ao mapa. Fronteira já reescrita em SDL3 (Fase 1 do re-pivot, [ADR-008](docs/tech/adr/ADR-008-repivot-qt-to-sdl3.md)) |
 | M3 (Lógica pura portada) | ✅ Auditado | Save + i18n + progression + templates portados para POCO C++ puro. 174 testes verdes, crypto bate vetores FIPS/RFC, oráculo de save semântico |
-| M2 (Input) | 🔍 Lógica feita | Eventos Qt para ações lógicas + porta de input_remap + persistência de controles + save v4. Falta o backend de evento Qt + I/O em disco |
-| M4 (Cena top-down) | 🔍 Lógica feita | Tilemap + colisão de grid + clamp de câmera (lógica pura). Falta a parte visual (tilemap render Qt RHI) |
+| M2 (Input) | 🔍 Lógica feita | Eventos da plataforma para ações lógicas + porta de input_remap + persistência de controles + save v4. Falta o backend de evento (SDL) + I/O em disco |
+| M4 (Cena top-down) | 🔍 Lógica feita | Tilemap + colisão de grid + clamp de câmera (lógica pura). Falta a parte visual (tilemap render no `SDL_Renderer`, Fase 2 do re-pivot) |
 | M5 (Combate portado + tela de batalha) | 🔄 Motor portado, auditado | Motor `turn_combat` portado e endurecido (fórmula de dano §11 evoluída, auditada). Falta a BattleScreen (apresentação estilo Pokémon) |
-| M6 (Áudio) | ⏳ Pendente | platform/audio sobre Qt Multimedia + música + SFX + fade entre telas |
+| M6 (Áudio) | ⏳ Pendente | platform/audio sobre miniaudio + música + SFX + fade entre telas |
 | M7 (Paridade jogável) | ⏳ Pendente | Loop completo (andar, NPC, combate, save, carregar) 100% na engine nova, sem Godot |
 | M8 (Decommission) | ⏳ Pendente | Apagar Godot + C# + addons. Repo compila e roda sem nenhum bit do stack antigo |
 | M9 (Higienização) | ⏳ Pendente | Limpar a árvore pós-porte, remover resíduo do stack antigo, normalizar `GusEngine/` |
@@ -184,7 +186,7 @@ Ou aponte a câmera do celular no QR Code:
 
 ## Licença
 
-**Código-fonte:** [GNU General Public License v3.0 (GPLv3)](LICENSE), copyleft forte, compatível com Qt (GPL/LGPL) sem custo, inclusive em static-link. _(migrado de AGPL-3.0 para GPLv3 em 2026-06-21, pivot RF-9.)_
+**Código-fonte:** [GNU General Public License v3.0 (GPLv3)](LICENSE), copyleft forte. SDL3 (zlib) e RmlUi (MIT) são licenças permissivas, compatíveis com GPLv3 inclusive em static-link. _(migrado de AGPL-3.0 para GPLv3 em 2026-06-21, pivot RF-9.)_
 **Lore e arte (assets):** [CC-BY-SA-4.0](ASSETS-LICENSE.md), exceto os livros Vol1/Vol2 (direitos reservados, obra à parte). Atribuições de terceiros em [THIRD-PARTY-LICENSES.md](THIRD-PARTY-LICENSES.md).
 
 ---
@@ -192,7 +194,7 @@ Ou aponte a câmera do celular no QR Code:
 ## Créditos
 
 - **Direção criativa + código + arte + narrativa + tudo:** petrinhu (2026)
-- **Engine base:** Qt6 (LGPL/GPL). Godot 4 (MIT) permanece como referência de leitura até o decommission no marco M8.
+- **Engine base:** SDL3 (zlib) + RmlUi (MIT) + miniaudio (MIT-0/PD) na camada de plataforma. Godot 4 (MIT) permanece como referência de leitura até o decommission no marco M8.
 - **Bibliotecas C++ vendorizadas:** libs header-only de licenças permissivas incorporadas em `GusEngine/third_party/` (filosofia zero-dep); lista e licenças em [THIRD-PARTY-LICENSES.md](THIRD-PARTY-LICENSES.md).
 - **Geração de imagem 2D:** [nano banana (Google Gemini)](https://gemini.google.com/) + [Grok (xAI)](https://grok.com/), a partir de prompts derivados do lore canônico.
 - **Geração 3D (ferramenta de produção):** [Tripo3D](https://www.tripo3d.ai/), image-to-3D para o pipeline de bake 3D-para-sprite. O jogo é 2D em runtime.
