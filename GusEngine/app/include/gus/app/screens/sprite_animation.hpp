@@ -1,0 +1,105 @@
+// gus/app/screens/sprite_animation.hpp
+//
+// LOGICA de animacao de locomocao do jogador, POCO "fora da casca Qt" (mesma
+// disciplina do OverworldSim): SEM Qt, SEM I/O, SEM GPU. So decide DUAS coisas a
+// partir do movimento, pra que o render apenas escolha qual sprite mostrar:
+//   1. DIRECAO cardinal (Sul/Norte/Leste/Oeste) a partir do vetor de movimento;
+//   2. QUADRO da animacao de walk a partir da DISTANCIA percorrida (nao do tempo).
+//
+// CANON: docs/design/mecanicas/locomotion.md.
+//   - 4 direcoes puras, sem flip (Pillar 3: hardware do personagem e assimetrico);
+//   - troca de quadro por DISTANCIA (~8 px no tile 16 -> escalavel com o tile),
+//     nao por timer, pra eliminar o "foot slide";
+//   - parado = distancia 0 = quadro neutro (idle congelado);
+//   - run NAO acelera o fps: a passada e mais LONGA (px maior por troca), nao mais
+//     rapida (ver WalkCycle::Config::run_px_per_frame).
+//
+// Esta unidade e testavel sem janela (app/tests/sprite_animation_test.cpp): varios
+// vetores -> direcao, acumulo de distancia -> quadro ciclico, parado -> neutro. O
+// carregamento de textura + draw e a casca Qt (Render2dRhi), coberta pelo smoke.
+
+#ifndef GUS_APP_SCREENS_SPRITE_ANIMATION_HPP
+#define GUS_APP_SCREENS_SPRITE_ANIMATION_HPP
+
+namespace gus::app::screens {
+
+// As 4 direcoes cardinais canonicas (locomotion.md). A ordem do enum e tambem a
+// ordem dos slots de sprite no render (Sul, Norte, Leste, Oeste).
+enum class Direction {
+    South = 0,
+    North = 1,
+    East = 2,
+    West = 3,
+};
+
+// Numero de direcoes (pra dimensionar tabelas de sprite no render).
+inline constexpr int kDirectionCount = 4;
+
+// Numero de quadros da animacao de walk por direcao (export PixelLab: 0..3). O
+// neutro (idle) e um sprite a parte; aqui sao so os quadros de PASSO.
+inline constexpr int kWalkFrameCount = 4;
+
+// Escolhe a direcao cardinal dominante a partir de um vetor de movimento cardinal
+// cru (dx,dy em {-1,0,1}). REGRAS (documentadas e cobertas por teste):
+//   - parado (0,0): MANTEM prev (a ultima direcao; idle nao gira o boneco);
+//   - cardinal puro: a propria direcao;
+//   - DIAGONAL (ambos != 0): criterio = HORIZONTAL vence (Leste/Oeste tem
+//     prioridade sobre Sul/Norte). Escolha deliberada: no top-down a leitura do
+//     perfil lateral (onde o aparato lateral aparece, Pillar 3) e a mais legivel;
+//     empate resolvido sempre pra horizontal. Ajustavel se o lider preferir
+//     vertical-vence ou "manter a anterior na diagonal".
+[[nodiscard]] Direction direction_from_move(int dx, int dy, Direction prev) noexcept;
+
+// Ciclo de walk dirigido por DISTANCIA. Acumula a distancia andada e, a cada
+// "passo de troca" (px por quadro), avanca um quadro ciclico em [0, kWalkFrameCount).
+// Parado (advance com dist 0, ou reset) volta ao estado neutro: current_frame()
+// devolve kNeutralFrame e is_moving() = false, pro render mostrar o sprite idle.
+class WalkCycle {
+public:
+    // Sinaliza "sem quadro de passo" (mostrar o neutro/idle). Vem de current_frame()
+    // quando o personagem nao esta andando.
+    static constexpr int kNeutralFrame = -1;
+
+    struct Config {
+        // Px percorridos por troca de quadro ANDANDO. Default ~8 px (locomotion.md,
+        // tile 16). Escalavel: se o tile mudar, escalar na mesma proporcao.
+        float walk_px_per_frame = 8.0f;
+        // Px por troca CORRENDO: passada mais LONGA (nao mais rapida). ~11 px
+        // (faixa 10-12 do canon). run >= walk garante "pe colado" na corrida.
+        float run_px_per_frame = 11.0f;
+    };
+
+    WalkCycle() = default;
+    explicit WalkCycle(Config cfg) noexcept : cfg_(cfg) {}
+
+    // Avanca o ciclo com a distancia percorrida NESTE passo (>= 0, ja em px de
+    // mundo) e se estava correndo. distance <= 0 => PARADO: zera o acumulador e
+    // entra em estado neutro (idle). distance > 0 => acumula; cada vez que o
+    // acumulado cruza o passo de troca, avanca 1 quadro ciclico.
+    void advance(float distance, bool running) noexcept;
+
+    // Forca o estado neutro (idle): zera acumulador e marca parado. Usado quando o
+    // movimento e exatamente nulo no passo.
+    void reset() noexcept;
+
+    // true se esta em movimento (mostrar quadro de walk); false = idle (neutro).
+    [[nodiscard]] bool is_moving() const noexcept { return moving_; }
+
+    // Quadro atual: [0, kWalkFrameCount) se andando; kNeutralFrame se parado.
+    [[nodiscard]] int current_frame() const noexcept {
+        return moving_ ? frame_ : kNeutralFrame;
+    }
+
+    // Distancia acumulada ainda nao "gasta" numa troca (debug/teste).
+    [[nodiscard]] float accumulated() const noexcept { return accum_; }
+
+private:
+    Config cfg_{};
+    float accum_ = 0.0f;  // distancia acumulada desde a ultima troca
+    int frame_ = 0;       // quadro de walk corrente [0, kWalkFrameCount)
+    bool moving_ = false; // false = neutro (idle)
+};
+
+}  // namespace gus::app::screens
+
+#endif  // GUS_APP_SCREENS_SPRITE_ANIMATION_HPP

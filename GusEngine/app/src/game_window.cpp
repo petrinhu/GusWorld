@@ -16,6 +16,7 @@
 
 #include <rhi/qrhi.h>
 
+#include "gus/app/screens/player_sprites_loader.hpp"
 #include "gus/app/screens/test_overworld.hpp"
 #include "gus/domain/input/controls_restore.hpp"
 #include "gus/platform/input/key_translation.hpp"
@@ -66,6 +67,15 @@ bool GameWindow::init_rhi() {
     swapchain_->setRenderPassDescriptor(rp_.get());
 
     renderer_ = std::make_unique<gus::platform::render2d::Render2dRhi>(rhi_.get());
+
+    // Carrega os sprites do Caua e os entrega ao sim. O load_texture cria os
+    // recursos de GPU (o upload dos pixels acontece no 1o frame). Se faltar
+    // arquivo, o set fica incompleto e o sim cai pro contorno (fallback). O
+    // caminho dos assets e resolvido em resolve_caua_sprites_dir() (env >
+    // compilado > relativo ao CWD).
+    const std::string assets = gus::app::screens::resolve_caua_sprites_dir();
+    sim_->set_player_sprites(
+        gus::app::screens::load_caua_sprites(*renderer_, assets));
     return true;
 }
 

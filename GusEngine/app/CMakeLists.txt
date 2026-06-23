@@ -14,6 +14,8 @@ set(CMAKE_AUTOMOC ON)
 # --- lib gusengine_app: logica de tela + casca de janela/loop (testavel) ---
 add_library(gusengine_app STATIC
     src/screens/overworld_sim.cpp
+    src/screens/sprite_animation.cpp
+    src/screens/player_sprites_loader.cpp
     src/game_window.cpp
     # Header com Q_OBJECT listado explicitamente pra o AUTOMOC gerar o moc dele
     # (esta em include/, fora do dir de fontes; sem isto, falta a vtable no link).
@@ -22,6 +24,14 @@ add_library(gusengine_app STATIC
 
 target_include_directories(gusengine_app
     PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include
+)
+
+# Caminho ABSOLUTO da pasta resources/ do repo (raiz = pai de GusEngine/), embutido
+# para o loader de sprites resolver os assets do Caua quando rodando do build dir
+# (a pasta resources/ vive FORA do git, junto do codigo). Override em runtime via
+# env GUSWORLD_ASSETS. ${CMAKE_SOURCE_DIR} = GusEngine/ (raiz do projeto CMake).
+target_compile_definitions(gusengine_app
+    PRIVATE GUSWORLD_ASSETS_DIR="${CMAKE_SOURCE_DIR}/../resources"
 )
 
 target_link_libraries(gusengine_app

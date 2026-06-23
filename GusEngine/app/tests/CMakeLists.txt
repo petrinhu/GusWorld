@@ -6,6 +6,7 @@ set(CMAKE_AUTOMOC ON)
 
 set(GUSENGINE_APP_TESTS
     overworld_sim_test
+    sprite_animation_test
 )
 
 foreach(_t IN LISTS GUSENGINE_APP_TESTS)

@@ -28,7 +28,9 @@ OverworldSim::OverworldSim(gus::core::spatial::TileGrid grid,
     : grid_(std::move(grid)),
       prev_(player_start),
       curr_(player_start),
-      tuning_(tuning) {}
+      tuning_(tuning),
+      walk_(WalkCycle::Config{tuning.anim_walk_px_per_frame,
+                              tuning.anim_run_px_per_frame}) {}
 
 OverworldSim::OverworldSim(gus::core::spatial::TileGrid grid,
                            gus::core::spatial::Aabb player_start,
@@ -45,8 +47,15 @@ void OverworldSim::step_fixed(int dx, int dy, bool run, float fixed_dt) noexcept
     prev_ = curr_;
 
     if (dx == 0 && dy == 0) {
-        return;  // parado: prev == curr, render nao interpola movimento
+        // Parado: prev == curr (render nao interpola). A direcao MANTEM a ultima
+        // (idle nao gira o boneco); o ciclo de walk volta ao neutro (idle congelado).
+        walk_.advance(0.0f, run);
+        return;
     }
+
+    // Direcao cardinal pela intencao de input (vetor cru), nao pelo movimento
+    // resolvido: encostar na parede num eixo NAO deve girar o boneco.
+    facing_ = direction_from_move(dx, dy, facing_);
 
     // Velocidade em unidades de mundo/s = tiles/s * tile_size, com a corrida.
     const float speed = tuning_.walk_speed_tiles_per_sec * grid_.tile_size() *
@@ -71,6 +80,14 @@ void OverworldSim::step_fixed(int dx, int dy, bool run, float fixed_dt) noexcept
         gus::core::spatial::resolve_move_with_corner_assist(grid_, curr_, move_x,
                                                             move_y, tuning_.corner);
     curr_ = r.box;
+
+    // Anima o walk pela distancia REALMENTE percorrida (apos a colisao): bater na
+    // parede num eixo reduz o avanco e, portanto, a troca de quadro - o pe nao
+    // "patina". Distancia euclidiana do deslocamento resolvido neste passo.
+    const float adx = curr_.x - prev_.x;
+    const float ady = curr_.y - prev_.y;
+    const float moved = std::sqrt(adx * adx + ady * ady);
+    walk_.advance(moved, run);
 }
 
 gus::core::spatial::CameraView OverworldSim::camera_view(
@@ -129,10 +146,37 @@ void OverworldSim::render(gus::platform::render2d::IRenderer& renderer,
         }
     }
 
-    // Jogador por cima (contorno da hitbox, na posicao interpolada).
-    const gus::core::spatial::Rect player_rect{shown.x, shown.y, shown.w, shown.h};
-    renderer.draw_rect_outline(player_rect, tuning_.player_color,
-                               tuning_.player_outline_world);
+    // Jogador por cima, na posicao interpolada.
+    if (sprites_.loaded()) {
+        // SPRITE ancorado nos PES sobre a AABB de colisao. A AABB e a hitbox dos
+        // pes; o sprite (corpo+cabeca) e maior e "vaza" pra cima. Quadrado (PNG
+        // 68x68): largura = altura. Altura = N tiles; base do sprite = base da AABB;
+        // centrado em X sobre a AABB.
+        const int di = static_cast<int>(facing_);
+        const int frame = walk_.current_frame();  // kNeutralFrame = parado
+        gus::platform::render2d::TextureId tex =
+            (frame == WalkCycle::kNeutralFrame || frame < 0 || frame >= kWalkFrameCount)
+                ? sprites_.idle[di]
+                : sprites_.walk[di][frame];
+        // Se faltar o quadro de walk (so idle carregado), cai pro idle.
+        if (tex == gus::platform::render2d::kInvalidTexture) {
+            tex = sprites_.idle[di];
+        }
+
+        const float sprite_h = tuning_.player_sprite_height_tiles * grid_.tile_size();
+        const float sprite_w = sprite_h;  // PNG quadrado
+        const float sx = shown.x + shown.w * 0.5f - sprite_w * 0.5f;  // centrado em X
+        const float sy = shown.y + shown.h - sprite_h;  // base do sprite = base da AABB
+        const gus::core::spatial::Rect sprite_rect{sx, sy, sprite_w, sprite_h};
+        const gus::platform::render2d::UvRect uv{0.0f, 0.0f, 1.0f, 1.0f};
+        const gus::platform::render2d::DrawColor white{1.0f, 1.0f, 1.0f, 1.0f};
+        renderer.draw_textured_rect(sprite_rect, tex, uv, white);
+    } else {
+        // FALLBACK (headless/smoke ou "sem arte"): contorno da hitbox.
+        const gus::core::spatial::Rect player_rect{shown.x, shown.y, shown.w, shown.h};
+        renderer.draw_rect_outline(player_rect, tuning_.player_color,
+                                   tuning_.player_outline_world);
+    }
 
     renderer.end_frame();
 }

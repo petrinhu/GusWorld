@@ -31,9 +31,13 @@ qt6_add_shaders(gusengine_platform "gusengine_render2d_shaders"
     FILES
         render2d/shaders/quad.vert
         render2d/shaders/quad.frag
+        render2d/shaders/sprite.vert
+        render2d/shaders/sprite.frag
     OUTPUTS
         shaders/quad.vert.qsb
         shaders/quad.frag.qsb
+        shaders/sprite.vert.qsb
+        shaders/sprite.frag.qsb
 )
 
 target_include_directories(gusengine_platform

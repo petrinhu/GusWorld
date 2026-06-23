@@ -59,8 +59,20 @@ struct OverworldTuning {
     // --- CORES PLACEHOLDER (sem arte ainda; o lider ajusta vendo) ----------
     gus::platform::render2d::DrawColor wall_color{0.18f, 0.20f, 0.28f, 1.0f};
     gus::platform::render2d::DrawColor player_color{0.20f, 0.85f, 0.90f, 1.0f};
-    // Espessura do contorno do jogador, em unidades de mundo.
+    // Espessura do contorno do jogador, em unidades de mundo (fallback sem sprite).
     float player_outline_world = 2.0f;
+
+    // --- SPRITE DO JOGADOR (Caua) ------------------------------------------
+    // Altura do sprite em TILES (art-director: char ~2.75 tiles; brief: ~3). O
+    // sprite e desenhado ancorado nos PES sobre a AABB de colisao (a hitbox e so
+    // os pes; o corpo+cabeca "vazam" pra cima). Largura derivada da proporcao do
+    // PNG (quadrado 68x68 -> mesma altura). Ajustavel pelo lider.
+    float player_sprite_height_tiles = 2.75f;
+
+    // Px de mundo percorridos por troca de quadro do walk (~8 px no tile 16,
+    // locomotion.md). Run usa passada mais longa (run_px_per_frame). Escalavel.
+    float anim_walk_px_per_frame = 8.0f;
+    float anim_run_px_per_frame = 11.0f;
 };
 
 }  // namespace gus::app::screens

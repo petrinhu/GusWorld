@@ -28,6 +28,7 @@
 
 #include "gus/app/game_window.hpp"
 #include "gus/app/screens/overworld_sim.hpp"
+#include "gus/app/screens/player_sprites_loader.hpp"
 #include "gus/app/screens/test_overworld.hpp"
 #include "gus/core/spatial/grid_collision.hpp"
 #include "gus/core/time/fixed_timestep.hpp"
@@ -94,6 +95,14 @@ int run_smoke(int ticks) {
         gus::app::screens::make_test_map(),
         gus::app::screens::kTestPlayerStart,
         gus::app::screens::make_test_tuning());
+
+    // Exercita o caminho de SPRITE tambem no headless: carrega o set do Caua e o
+    // entrega ao sim. No backend Null pode nao haver textura real - o loader
+    // DEGRADA (slots invalidos) e o sim cai pro contorno; o objetivo do smoke e
+    // so provar que load + render-com-sprite-ou-fallback nao crasham offscreen.
+    const std::string assets = gus::app::screens::resolve_caua_sprites_dir();
+    sim.set_player_sprites(gus::app::screens::load_caua_sprites(renderer, assets));
+
     gus::core::time::FixedTimestep clock(1.0 / 60.0, 5);
 
     // Roda N ticks logicos com input roteirizado (direita), simulando 1/60s/tick.
