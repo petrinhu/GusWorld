@@ -17,6 +17,8 @@ add_executable(gusengine_core_tests
     camera_clamp_test.cpp
     fixed_timestep_test.cpp
     anim_clock_test.cpp
+    stamina_test.cpp
+    breath_oscillator_test.cpp
 )
 
 target_link_libraries(gusengine_core_tests

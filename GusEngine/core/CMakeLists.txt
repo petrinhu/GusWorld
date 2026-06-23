@@ -20,6 +20,8 @@ add_library(gusengine_core STATIC
     src/spatial/camera_clamp.cpp
     src/time/fixed_timestep.cpp
     src/anim/anim_clock.cpp
+    src/anim/breath_oscillator.cpp
+    src/player/stamina.cpp
 )
 
 target_include_directories(gusengine_core

@@ -576,12 +576,85 @@ TEST_CASE("overworld: parado mostra um quadro do breathing idle (animado)",
     REQUIRE(is_south_idle);
 }
 
-TEST_CASE("overworld: breathing idle avanca de quadro com o tempo parado",
-          "[overworld]") {
-    // O AnimClock do idle toca por TEMPO. A respiracao agora e calibrada em ciclos/min
-    // (default 16 = ~3.75 s por ciclo); com 5 quadros no loop o fps fica ~1.33 (troca a
-    // cada ~0.75 s). Parado por tempo suficiente (~4 s = mais que um ciclo), o quadro
-    // mostrado tem que MUDAR (respira lento e realista).
+TEST_CASE(
+    "overworld: idle CALMO (descansado) NAO troca quadro - mostra o neutro f0",
+    "[overworld]") {
+    // IDLE EM DOIS MODOS por STAMINA (lider 2026-06-23). DESCANSADO (stamina cheia >=
+    // limiar) = respiracao CALMA PROCEDURAL: o render usa o quadro NEUTRO (frame 0) e
+    // aplica uma senoide de bob/escala (testada a parte no breath_oscillator). O sprite
+    // mostrado NAO troca de quadro (fim do staccato): segue sempre o idle_frames[di][0].
+    TileGrid g(40, 40, 16.0f);
+    OverworldSim sim(g, Aabb{200.0f, 200.0f, 8.0f, 8.0f}, 8.0f);
+    PlayerSpriteSet s = make_gus_like_sprites(7, 5);
+    sim.set_player_sprites(s);
+
+    auto idle_tex = [&]() {
+        FakeRenderer r;
+        sim.render(r, 80.0f, 80.0f, 1.0f);
+        return r.sprites.at(0).texture;
+    };
+
+    sim.step_fixed(0, 0, false, 1.0f / 60.0f);  // parado, sem correr -> descansado
+    REQUIRE_FALSE(sim.is_tired());
+    const TextureId t0 = idle_tex();
+
+    // Varios segundos parado e descansado: o quadro mostrado segue o NEUTRO (f0).
+    for (int i = 0; i < 240; ++i) {
+        sim.step_fixed(0, 0, false, 1.0f / 60.0f);
+    }
+    REQUIRE_FALSE(sim.is_tired());
+    const TextureId t1 = idle_tex();
+    const int di = static_cast<int>(sim.facing());
+
+    REQUIRE(t0 == t1);                                  // nao trocou de quadro (calmo)
+    REQUIRE(t1 == s.idle_frames[di][0]);                // e e o quadro NEUTRO
+    // E a senoide da respiracao calma avancou (continua, sem staccato).
+    REQUIRE(sim.breath().phase() > 0.0f);
+}
+
+TEST_CASE(
+    "overworld: idle CALMO aplica bob/escala procedural no RECT (sem trocar quadro)",
+    "[overworld]") {
+    // Prova que a respiracao calma e PROCEDURAL: com o MESMO quadro neutro, o RETANGULO
+    // de desenho (altura e/ou y) MUDA ao longo do tempo pela senoide do breath, e o PE
+    // (base = y + altura) fica plantado na ancoragem. Sem staccato (textura fixa).
+    TileGrid g(40, 40, 16.0f);
+    OverworldTuning t = OverworldTuning{};
+    t.walk_speed_tiles_per_sec = 8.0f;
+    t.idle_calm_scale_amplitude = 0.03f;  // amplitude visivel pro teste
+    t.idle_calm_bob_tiles = 0.1f;
+    OverworldSim sim(g, Aabb{200.0f, 200.0f, 8.0f, 8.0f}, t);
+    sim.set_player_sprites(make_gus_like_sprites(7, 5));
+
+    auto idle_rect_tex = [&]() {
+        FakeRenderer r;
+        sim.render(r, 80.0f, 80.0f, 1.0f);
+        return r.sprites.at(0);
+    };
+
+    // Captura o desenho em duas fases distintas da senoide (parado, descansado).
+    sim.step_fixed(0, 0, false, 1.0f / 60.0f);
+    REQUIRE_FALSE(sim.is_tired());
+    const auto a = idle_rect_tex();
+    // Avanca ~1/4 do ciclo (~0.94 s a 16/min) -> perto do pico inspirado (osc ~ +1).
+    for (int i = 0; i < 56; ++i) {
+        sim.step_fixed(0, 0, false, 1.0f / 60.0f);
+    }
+    const auto b = idle_rect_tex();
+
+    REQUIRE(a.texture == b.texture);  // MESMO quadro neutro (procedural, nao troca)
+    // O desenho respirou: altura e y mudaram entre as duas fases.
+    const bool rect_changed =
+        std::fabs(a.rect.h - b.rect.h) > 1e-3f || std::fabs(a.rect.y - b.rect.y) > 1e-3f;
+    REQUIRE(rect_changed);
+}
+
+TEST_CASE(
+    "overworld: idle OFEGANTE (cansado) troca os quadros do breathing rapido",
+    "[overworld]") {
+    // CANSADO (Carga < limiar 34) = respiracao OFEGANTE: aI sim toca os 5 quadros do
+    // breathing num ritmo RAPIDO (AnimClock). Drenamos a Carga correndo de verdade ate
+    // cruzar a ofegancia, depois paramos e provamos que o quadro mostrado MUDA no tempo.
     TileGrid g(40, 40, 16.0f);
     OverworldSim sim(g, Aabb{200.0f, 200.0f, 8.0f, 8.0f}, 8.0f);
     sim.set_player_sprites(make_gus_like_sprites(7, 5));
@@ -592,21 +665,31 @@ TEST_CASE("overworld: breathing idle avanca de quadro com o tempo parado",
         return r.sprites.at(0).texture;
     };
 
-    sim.step_fixed(0, 0, false, 1.0f / 60.0f);  // garante estado parado
+    // CORRE de verdade (Shift + movimento) por 10 s (600 ticks). NUMEROS CANONICOS:
+    // drain 8/s, max 89, limiar 34 -> cruzar a ofegancia leva ~6.9 s (89-34=55, /8);
+    // 10 s drenam BEM abaixo do limiar, pra a curta recuperacao do trecho parado nao
+    // mascarar o estado cansado. (Paredes nao importam: drena por INTENCAO de input.)
+    for (int i = 0; i < 600; ++i) {
+        sim.step_fixed(/*dx=*/1, 0, /*run=*/true, 1.0f / 60.0f);
+    }
+    REQUIRE(sim.is_tired());
+
+    // Agora PARADO e cansado: o idle ofegante deve girar os quadros do breathing.
+    sim.step_fixed(0, 0, false, 1.0f / 60.0f);
     const int f0 = sim.idle_clock().frame();
     const TextureId t0 = idle_tex();
-
-    // Avanca ~1 s parado (60 ticks de 1/60): a ~1.33 fps (troca a cada ~0.75 s) cruza
-    // UMA troca, mas SEM completar o ciclo de 5 quadros (que voltaria ao quadro 0 e
-    // mascararia a mudanca). Prova que o breathing avanca mesmo calmo.
-    for (int i = 0; i < 60; ++i) {
+    // Ainda cansado logo apos parar: a Carga foi a ~0 e o regen PARADO e 13/s, logo
+    // ~0.25 s (15 ticks) sobem so ~3.25 (bem abaixo de 34), mas ja cruzam varias trocas
+    // no ritmo ofegante (~6 fps), sem fechar o ciclo de 5 quadros.
+    for (int i = 0; i < 15; ++i) {
         sim.step_fixed(0, 0, false, 1.0f / 60.0f);
     }
+    REQUIRE(sim.is_tired());
     const int f1 = sim.idle_clock().frame();
     const TextureId t1 = idle_tex();
 
-    REQUIRE(f1 != f0);   // o relogio do breathing girou
-    REQUIRE(t1 != t0);   // e o sprite mostrado acompanhou
+    REQUIRE(f1 != f0);  // o relogio do breathing ofegante girou
+    REQUIRE(t1 != t0);  // e o sprite mostrado acompanhou (5 quadros rapidos)
 }
 
 TEST_CASE("overworld: idle congelado (1 quadro) nao quebra - compat Caua",

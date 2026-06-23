@@ -74,6 +74,13 @@ A engine antiga (`game/` Godot + `engine/` C#) permanece no repo como referênci
 
 ---
 
+## Por onde o projeto anda
+
+- [ROADMAP.md](ROADMAP.md): o caminho do projeto (Fase 1 lore concluída, Fase 2 vertical slice em andamento com marcos M0-M9, re-pivot SDL em 3 fases, trilha de arte, pós-VS).
+- [CHANGELOG.md](CHANGELOG.md): histórico de mudanças, com destaque para os pivôs de stack (Godot/C# para C++/Qt6 e o re-pivot Qt6 para SDL3).
+
+---
+
 ## Build / Run
 
 ### Pré-requisitos

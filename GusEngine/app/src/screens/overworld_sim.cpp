@@ -31,7 +31,12 @@ OverworldSim::OverworldSim(gus::core::spatial::TileGrid grid,
       tuning_(tuning),
       walk_(WalkCycle::Config{tuning.anim_walk_px_per_frame,
                               tuning.anim_run_px_per_frame}),
-      idle_clock_(/*frame_count=*/1, tuning.idle_fps_for_loop(1)) {}
+      idle_clock_(/*frame_count=*/1, tuning.idle_fps_for_loop(1)),
+      stamina_(gus::core::player::StaminaConfig{
+          tuning.stamina_max, tuning.run_drain_per_sec,
+          tuning.recover_walk_per_sec, tuning.recover_idle_per_sec,
+          tuning.tired_threshold}),
+      breath_(tuning.idle_calm_breaths_per_minute) {}
 
 void OverworldSim::set_player_sprites(const PlayerSpriteSet& sprites) noexcept {
     sprites_ = sprites;
@@ -65,9 +70,29 @@ void OverworldSim::step_fixed(int dx, int dy, bool run, float fixed_dt) noexcept
     // A posicao atual vira a "anterior" deste frame (base da interpolacao).
     prev_ = curr_;
 
-    // IDLE animado (breathing) toca por TEMPO, sempre - so e MOSTRADO quando parado.
-    // Avancar tambem andando mantem o clock vivo e evita "pulo" ao voltar pro idle.
+    // IDLE OFEGANTE (breathing rapido) e a respiracao CALMA procedural tocam por TEMPO,
+    // sempre - so um deles e MOSTRADO quando parado (decide a stamina). Avancar tambem
+    // andando mantem ambos vivos e evita "pulo" ao voltar pro idle.
     idle_clock_.advance(fixed_dt);
+    breath_.advance(fixed_dt);
+
+    // CARGA DO APARATO (seam de 3 estados, canon 2026-06-23 - stamina.md):
+    //   - Running (Shift + movimento real): DRENA. "Correr no lugar" preso na parede
+    //     NAO conta como sprint (sem movimento de input -> nao esgota a Carga).
+    //   - Walking (anda sem Shift, ou Shift sem mover): regenera DEVAGAR.
+    //   - Idle (parado): regenera RAPIDO.
+    // O movimento real (apos colidir) e apurado abaixo; aqui usamos a INTENCAO de input
+    // (dx,dy) + Shift, coerente com o resto do feel (encostar na parede nao zera a Carga).
+    const bool moving_now = (dx != 0 || dy != 0);
+    gus::core::player::MoveState move_state;
+    if (run && moving_now) {
+        move_state = gus::core::player::MoveState::Running;
+    } else if (moving_now) {
+        move_state = gus::core::player::MoveState::Walking;
+    } else {
+        move_state = gus::core::player::MoveState::Idle;
+    }
+    stamina_.tick(move_state, fixed_dt);
 
     if (dx == 0 && dy == 0) {
         // Parado: prev == curr (render nao interpola). A direcao MANTEM a ultima
@@ -193,19 +218,32 @@ void OverworldSim::render(gus::platform::render2d::IRenderer& renderer,
             (frame != WalkCycle::kNeutralFrame && frame >= 0 &&
              frame < sprites_.walk_count[di]);
 
+        // IDLE EM DOIS MODOS por STAMINA (lider 2026-06-23): CALMO quando descansado
+        // (senoide procedural no quadro NEUTRO, sem trocar frame), OFEGANTE quando
+        // cansado (troca os quadros do breathing rapido). So vale quando PARADO.
+        const bool tired = stamina_.is_tired();
+        // calm_breath != 0 so quando PARADO e DESCANSADO: liga o bob/escala procedural.
+        bool calm_breathing = false;
+
         gus::platform::render2d::TextureId tex;
         if (moving) {
             // ANDANDO: quadro f de walk da direcao (Gus 7 / Caua 4 quadros).
             tex = sprites_.walk[di][frame];
-        } else {
-            // PARADO: IDLE animado (breathing) tocado por TEMPO. O AnimClock cicla os
-            // quadros do breathing (Gus 5); com 1 quadro (Caua) fica congelado. Clampa
-            // o indice ao que existe naquela direcao (degrada pro frame 0 = idle[di]).
+        } else if (tired) {
+            // PARADO + CANSADO: IDLE OFEGANTE. O AnimClock cicla os quadros do breathing
+            // RAPIDO (Gus 5 ~6 fps), comunicando fadiga. Com 1 quadro (Caua) fica
+            // congelado. Clampa o indice ao que existe (degrada pro frame 0 = idle[di]).
             int idle_f = idle_clock_.frame();
             if (idle_f < 0 || idle_f >= sprites_.idle_count[di]) {
                 idle_f = 0;
             }
             tex = sprites_.idle_frames[di][idle_f];
+        } else {
+            // PARADO + DESCANSADO: IDLE CALMO. Quadro NEUTRO (frame 0) + respiracao
+            // PROCEDURAL (senoide) aplicada no transform do desenho abaixo - FLUIDO,
+            // SEM staccato (nao troca frame).
+            tex = sprites_.idle_frames[di][0];
+            calm_breathing = true;
         }
         // Se o quadro escolhido faltar (slot invalido), cai pro idle representativo.
         if (tex == gus::platform::render2d::kInvalidTexture) {
@@ -225,7 +263,29 @@ void OverworldSim::render(gus::platform::render2d::IRenderer& renderer,
         const float manual_offset = tuning_.sprite_foot_offset_tiles * grid_.tile_size();
         const float sy = sprite_top_y(shown.y + shown.h, sprite_h, bottom_fraction,
                                       manual_offset);
-        const gus::core::spatial::Rect sprite_rect{sx, sy, sprite_w, sprite_h};
+
+        // RESPIRACAO CALMA PROCEDURAL (idle descansado): aplica um bob/escala SENOIDAL
+        // suave no desenho do quadro NEUTRO - sem trocar frame, sem staccato. A senoide
+        // (breath_.value() em [-1,1]) modula:
+        //   - ESCALA vertical: estica/encolhe o sprite (peito subindo) mantendo o PE
+        //     plantado (cresce SO pra cima: a base fica na ancoragem dos pes);
+        //   - BOB: pequeno sobe-desce do desenho inteiro.
+        // So no idle calmo; andando/ofegante o transform e identidade (intacto).
+        float draw_y = sy;
+        float draw_h = sprite_h;
+        if (calm_breathing) {
+            const float osc = breath_.value();  // [-1, 1], continuo no tempo
+            // Escala vertical: 1 + amp * osc (amp em fracao, ex.: 0.025 = +-2.5%).
+            const float scaled_h = sprite_h * (1.0f + tuning_.idle_calm_scale_amplitude * osc);
+            // Cresce/encolhe pela base (pe plantado): topo sobe o tanto que a altura
+            // aumentou (base = sy + sprite_h preservada).
+            draw_y = (sy + sprite_h) - scaled_h;
+            draw_h = scaled_h;
+            // BOB: sobe-desce o desenho inteiro (amplitude em tiles -> mundo).
+            const float bob = tuning_.idle_calm_bob_tiles * grid_.tile_size() * osc;
+            draw_y -= bob;  // osc>0 (inspirado) sobe um pouquinho
+        }
+        const gus::core::spatial::Rect sprite_rect{sx, draw_y, sprite_w, draw_h};
         const gus::platform::render2d::UvRect uv{0.0f, 0.0f, 1.0f, 1.0f};
         const gus::platform::render2d::DrawColor white{1.0f, 1.0f, 1.0f, 1.0f};
         renderer.draw_textured_rect(sprite_rect, tex, uv, white);

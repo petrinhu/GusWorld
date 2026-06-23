@@ -97,23 +97,67 @@ struct OverworldTuning {
 
     // --- IDLE ANIMADO (breathing) ------------------------------------------
     // RESPIRACAO PARADA em CICLOS POR MINUTO (semantico, fisiologico), nao fps cru.
-    // Referencia do lider: ventilacao humana media ~16 ciclos/min (1 ciclo a cada
-    // ~3.75 s) = calmo e realista. O loop de quadros do breathing representa 1 CICLO
-    // COMPLETO (inspira + expira): no Gus os 5 quadros vao da postura baixa (f0) ao
-    // pico inflado (f2) e voltam (f4), fechando um ciclo ao dar wrap pro f0.
+    // O loop de quadros do breathing representa 1 CICLO COMPLETO (inspira + expira):
+    // no Gus os 5 quadros vao da postura baixa (f0) ao pico inflado (f2) e voltam (f4),
+    // fechando um ciclo ao dar wrap pro f0.
     //
-    // O FPS do AnimClock e DERIVADO daqui em idle_fps_for_loop() (ver abaixo): com N
-    // quadros no loop, fps = N * bpm / 60 -> um loop inteiro leva 60/bpm s. O sim
-    // recalcula o fps quando recebe os sprites (sabe o N real). Personagem sem breathing
-    // (1 quadro) nao anima na pratica (clock de 1 frame fica congelado). Ajustavel.
-    float idle_breaths_per_minute = 16.0f;
+    // NOTA (lider 2026-06-23): o idle agora tem DOIS modos por STAMINA (ver abaixo). A
+    // troca de QUADROS do breathing ficou SO no idle OFEGANTE (cansado), num ritmo
+    // rapido. O idle CALMO (descansado) NAO troca quadro: e uma senoide procedural
+    // (idle_calm_*). Por isso a cadencia do AnimClock vem de idle_tired_breaths_per_minute,
+    // nao mais de um unico "breaths_per_minute" calmo (que ficava travado/staccato).
 
-    // FPS derivado para o AnimClock do idle, dado o numero de quadros de UM ciclo
-    // (loop completo de breathing). fps = loop_frames * bpm / 60. Saneia loop_frames<1.
+    // FPS derivado para o AnimClock do idle OFEGANTE (cansado), dado o numero de
+    // quadros de UM ciclo (loop completo de breathing). Usado SO no idle ofegante,
+    // que toca os 5 quadros do breathing num ritmo bem mais rapido que a respiracao
+    // calma (ver idle_tired_breaths_per_minute). fps = loop_frames * bpm / 60.
     [[nodiscard]] float idle_fps_for_loop(int loop_frames) const noexcept {
         const int n = loop_frames < 1 ? 1 : loop_frames;
-        return static_cast<float>(n) * idle_breaths_per_minute / 60.0f;
+        return static_cast<float>(n) * idle_tired_breaths_per_minute / 60.0f;
     }
+
+    // --- IDLE EM DOIS MODOS por STAMINA/CARGA (lider 2026-06-23) -----------
+    // Decisao do lider: a respiracao do idle muda com a CARGA do aparato do Gus.
+    //   DESCANSADO (Carga >= tired_threshold): respiracao CALMA, PROCEDURAL - uma
+    //       senoide continua e suave (bob/escala) no sprite parado, FLUIDA, SEM trocar
+    //       quadro (acaba com o staccato dos 5 quadros lentos). Usa o quadro NEUTRO do
+    //       idle (frame 0). Cadencia = idle_calm_breaths_per_minute.
+    //   CANSADO (Carga < tired_threshold): respiracao OFEGANTE (overflow do aparato no
+    //       corpo) - aI sim toca os 5 quadros do breathing RAPIDO
+    //       (idle_tired_breaths_per_minute), comunicando fadiga. Reusa o idle_frames.
+
+    // --- CARGA DO APARATO ("stamina") - NUMEROS CANONICOS ------------------
+    // Carga do Tavus-Drive (NAO stamina fisica) - docs/design/mecanicas/stamina.md.
+    // Numeros aprovados pelo lider 2026-06-23 (economy-designer), todos em Fibonacci.
+    // Correr (Shift) DRENA; PARADO regenera rapido; ANDANDO regenera devagar; a Carga
+    // NUNCA trava o deslocamento (regra de ouro). O OverworldSim alimenta o POCO
+    // core::Stamina passando o MoveState real (correndo/andando/parado).
+    float stamina_max = 89.0f;             // teto e valor inicial (cheio = descansado).
+    float run_drain_per_sec = 8.0f;        // Carga perdida/s CORRENDO (cheio -> 0 em ~11s).
+    float recover_walk_per_sec = 5.0f;     // Carga ganha/s ANDANDO (devagar; nunca trava).
+    float recover_idle_per_sec = 13.0f;    // Carga ganha/s PARADO (rapido; parar recompensa).
+    // Abaixo deste valor de Carga (em UNIDADE, ~38% de 89, NAO percentual) o Gus fica
+    // CANSADO (idle ofegante / overflow). >= => calmo. Drains curtos quase nunca ofegam.
+    float tired_threshold = 34.0f;
+
+    // --- IDLE CALMO (procedural, senoide) ----------------------------------
+    // Cadencia da respiracao CALMA, em ciclos/min (humano em repouso ~16). Dirige a
+    // senoide do core::BreathOscillator. NAO troca quadro: e bob/escala continuo.
+    float idle_calm_breaths_per_minute = 16.0f;
+    // Amplitude da ESCALA vertical da respiracao calma, em FRACAO (0.025 = +-2.5%):
+    // o sprite estica/encolhe levemente na vertical (peito subindo/descendo). Faixa
+    // sugerida do lider: 0.02 a 0.03. 0 desliga a escala.
+    float idle_calm_scale_amplitude = 0.025f;
+    // Amplitude do BOB (sobe-desce) da respiracao calma, em TILES (0.06 tile ~= 1px
+    // no tile 16; ~0.12 no tile 32). Pequeno deslize vertical do desenho. Faixa
+    // sugerida 0.03 a 0.12 tile. 0 desliga o bob (so a escala respira).
+    float idle_calm_bob_tiles = 0.06f;
+
+    // --- IDLE OFEGANTE (quadros do breathing, rapido) ----------------------
+    // Cadencia da respiracao OFEGANTE em ciclos/min: bem mais rapida que a calma pra
+    // "comunicar cansaco". Com 5 quadros num ciclo, ~72/min da ~6 fps (5*72/60),
+    // pedido do lider ("~6 fps, ofegante"). Dirige o AnimClock do idle ofegante.
+    float idle_tired_breaths_per_minute = 72.0f;
 };
 
 }  // namespace gus::app::screens

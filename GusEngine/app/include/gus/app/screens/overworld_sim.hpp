@@ -24,7 +24,9 @@
 #include "gus/app/screens/overworld_tuning.hpp"
 #include "gus/app/screens/sprite_anchor.hpp"  // FootInset (ancoragem pelos pes)
 #include "gus/app/screens/sprite_animation.hpp"
-#include "gus/core/anim/anim_clock.hpp"  // idle animado (breathing) por TEMPO
+#include "gus/core/anim/anim_clock.hpp"  // idle OFEGANTE (breathing) por TEMPO
+#include "gus/core/anim/breath_oscillator.hpp"  // idle CALMO (senoide procedural)
+#include "gus/core/player/stamina.hpp"  // folego: dirige calmo vs ofegante
 #include "gus/core/spatial/camera_clamp.hpp"
 #include "gus/core/spatial/grid_collision.hpp"
 #include "gus/core/spatial/tile_grid.hpp"
@@ -153,10 +155,21 @@ public:
     // Direcao e quadro de walk correntes (leitura/teste).
     [[nodiscard]] Direction facing() const noexcept { return facing_; }
     [[nodiscard]] const WalkCycle& walk_cycle() const noexcept { return walk_; }
-    // Quadro corrente do idle animado (breathing) - leitura/teste.
+    // Quadro corrente do idle OFEGANTE (breathing rapido) - leitura/teste.
     [[nodiscard]] const gus::core::anim::AnimClock& idle_clock() const noexcept {
         return idle_clock_;
     }
+    // Folego corrente do jogador (drena correndo, recupera parado/andando) - dirige a
+    // escolha entre idle CALMO (descansado) e OFEGANTE (cansado). Leitura/teste.
+    [[nodiscard]] const gus::core::player::Stamina& stamina() const noexcept {
+        return stamina_;
+    }
+    // Oscilador da respiracao CALMA (senoide procedural do idle descansado) - leitura/teste.
+    [[nodiscard]] const gus::core::anim::BreathOscillator& breath() const noexcept {
+        return breath_;
+    }
+    // true quando o jogador esta cansado (stamina < limiar): mostra idle OFEGANTE.
+    [[nodiscard]] bool is_tired() const noexcept { return stamina_.is_tired(); }
 
 private:
     // Posicao do jogador interpolada entre prev_ e curr_ por alpha.
@@ -174,13 +187,23 @@ private:
     WalkCycle walk_;
     PlayerSpriteSet sprites_{};
 
-    // IDLE animado (breathing): toca por TEMPO (AnimClock), nao por distancia. Avanca
-    // no step_fixed pelo fixed_dt (independe do movimento - respira parado). frame_count
-    // = quadros do breathing (1 = congelado, legado Caua). O fps e DERIVADO dos ciclos/min
-    // do tuning quando os sprites chegam (set_player_sprites sabe o N real do loop); o
-    // init aqui usa 1 quadro de loop so pra arrancar coerente.
+    // IDLE OFEGANTE (cansado): troca os QUADROS do breathing por TEMPO (AnimClock),
+    // num ritmo RAPIDO (idle_tired_breaths_per_minute). So e mostrado quando parado E
+    // cansado (stamina < limiar). Avanca no step_fixed pelo fixed_dt (respira parado).
+    // frame_count = quadros do breathing (1 = congelado, legado Caua). O fps e DERIVADO
+    // do tuning quando os sprites chegam (set_player_sprites sabe o N real do loop).
     gus::core::anim::AnimClock idle_clock_{
         1, OverworldTuning{}.idle_fps_for_loop(1)};
+
+    // FOLEGO do jogador: drena correndo, recupera parado/andando. Decide se o idle e
+    // CALMO (descansado) ou OFEGANTE (cansado). Avanca no step_fixed pelo fixed_dt.
+    gus::core::player::Stamina stamina_{};
+
+    // IDLE CALMO (descansado): respiracao PROCEDURAL - senoide continua e suave (bob/
+    // escala), SEM trocar quadro (fim do staccato). Avanca no step_fixed pelo fixed_dt;
+    // o render usa breath_.value() pra esticar/deslocar levemente o sprite NEUTRO.
+    gus::core::anim::BreathOscillator breath_{
+        OverworldTuning{}.idle_calm_breaths_per_minute};
 
     // MEMORIA DO INPUT do tick anterior (cru, em {-1,0,1}). Necessaria pra politica
     // LastAxisWins decidir o eixo RECEM-acionado pela mudanca do INPUT (e nao pelo
