@@ -1,8 +1,8 @@
-# gusengine_domain - POCO portado do C#, ZERO Qt.
+# gusengine_domain - POCO portado do C#, ZERO Qt E ZERO SDL (ADR-008).
 #
-# INVARIANTE (engine-design.md secao 2): este target NAO pode linkar Qt.
-# NAO adicione Qt6::* em target_link_libraries(gusengine_domain ...). Nenhum
-# header aqui pode incluir <Q...>. O CI audita includes Qt nesta pasta.
+# INVARIANTE (engine-design.md sec 2 + ADR-008): este target NAO pode linkar Qt
+# NEM SDL. NAO adicione Qt6::*/SDL3::* em target_link_libraries(gusengine_domain).
+# Nenhum header aqui pode incluir <Q...> nem <SDL...>. O CI audita ambos nesta pasta.
 #
 # Subdominios previstos (engine-design.md secao 2, portados em M3+):
 #   save/        HMAC-SHA256 + migrators forward-only + backup chain
@@ -57,7 +57,7 @@ target_link_libraries(gusengine_domain
 
 target_compile_features(gusengine_domain PUBLIC cxx_std_20)
 
-# Sem target_link_libraries(... Qt6::*) por design. Camada pura portada.
+# Sem target_link_libraries(... Qt6::*/SDL3::*) por design. Camada pura portada.
 
 # Testes do dominio (Catch2 headless). BUILD_TESTING vem do include(CTest) na
 # raiz; os casos sao registrados no mesmo ctest dos testes do M0.

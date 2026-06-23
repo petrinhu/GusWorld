@@ -1,66 +1,41 @@
-# gusengine_platform - fronteira Qt. UNICA camada (com app/) que conhece Qt.
+# gusengine_platform - fronteira SDL3 (pos repivot ADR-008). UNICA camada (com
+# app/) que conhece SDL. Toda dependencia de SDL fica confinada aqui e em app/, de
+# modo que core/ e domain/ permanecam puros (sem Qt E sem SDL) e reutilizaveis.
 #
-# Esta lib PODE e DEVE linkar Qt. E aqui que a invariante das 4 camadas
-# "se paga": toda dependencia de Qt fica confinada a platform/ e app/, de
-# modo que core/ e domain/ permanecam puros e reutilizaveis.
-#
-# Subdominios previstos (engine-design.md secao 2, em M1+):
-#   window/   janela + swap
-#   render2d/ batcher de sprites + atlas + tilemap (Qt RHI)
-#   input/    eventos Qt para acoes logicas (consome input_remap)
-#   audio/    saida sobre Qt Multimedia (implementa o hook de core/)
-#   fs/       I/O de arquivo (implementa save/i18n)
-# No M0 so existe um stub que prova que o Qt linka (retorna qVersion()).
-
-# AUTOMOC ligado so aqui (camada Qt). Mantido OFF nas libs puras.
-set(CMAKE_AUTOMOC ON)
+# Subdominios (engine-design.md secao 2, atualizado por ADR-008):
+#   render2d/ IRenderer sobre SDL_Renderer (sprite via SDL_Texture, quads das
+#             paredes); viewport_transform POCO (mundo->pixel) testavel sem GPU.
+#   input/    eventos SDL (teclado + gamepad) -> intencao cardinal (consome o
+#             InputMapper/key_translation; gamepad_mapping POCO).
 
 add_library(gusengine_platform STATIC
     src/platform_info.cpp
     src/input/key_translation.cpp
     src/input/input_mapper.cpp
+    src/input/gamepad_mapping.cpp
+    src/input/sdl_input.cpp
     src/render2d/viewport_transform.cpp
-    src/render2d/render2d_rhi.cpp
-)
-
-# Shaders do render2d: GLSL -> .qsb (via qsb/ShaderTools), embutidos como recurso
-# Qt (prefixo /gusengine/shaders). O Render2dRhi carrega de
-# :/gusengine/shaders/quad.{vert,frag}.qsb em runtime.
-qt6_add_shaders(gusengine_platform "gusengine_render2d_shaders"
-    PREFIX "/gusengine"
-    FILES
-        render2d/shaders/quad.vert
-        render2d/shaders/quad.frag
-        render2d/shaders/sprite.vert
-        render2d/shaders/sprite.frag
-    OUTPUTS
-        shaders/quad.vert.qsb
-        shaders/quad.frag.qsb
-        shaders/sprite.vert.qsb
-        shaders/sprite.frag.qsb
+    src/render2d/render2d_sdl.cpp
 )
 
 target_include_directories(gusengine_platform
     PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include
+    # stb_image (vendorizado header-only) para load_texture no Render2dSdl.
+    PRIVATE ${CMAKE_SOURCE_DIR}/third_party/stb
 )
 
-# domain/ entra aqui: input_mapper consome o mapa logico puro (InputRemapConfig).
-# Qt6::GuiPrivate expoe os headers do QRhi (API semi-privada do Qt; usada por
-# window/ e render2d/ no M1, atras da interface IRenderer - risco R1 mitigado).
+# domain/ entra aqui: input_mapper/sdl_input consomem o mapa logico puro. SDL3 e a
+# camada de plataforma. SDL3::SDL3 e o target estatico vindo do FetchContent.
 target_link_libraries(gusengine_platform
     PUBLIC
         gusengine_core
         gusengine_domain
-        Qt6::Core
-        Qt6::Gui
-        Qt6::GuiPrivate
-        Qt6::Quick
-        Qt6::Multimedia
+        SDL3::SDL3
 )
 
 target_compile_features(gusengine_platform PUBLIC cxx_std_20)
 
-# Testes Qt da camada platform/ (headless). Mesma condicao do raiz (BUILD_TESTING).
+# Testes (Catch2, headless) da camada platform/.
 if(BUILD_TESTING)
     add_subdirectory(tests)
 endif()

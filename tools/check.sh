@@ -2,21 +2,24 @@
 # check.sh - build + smoke + gate + suite do GusEngine, num comando.
 #
 # Espelha o "=== build + smoke + gate + suite ===" do PokemonTCGViewer,
-# adaptado a stack do GusWorld (C++20 + CMake + Ninja + Catch2 + Qt6).
+# adaptado a stack do GusWorld (C++20 + CMake + Ninja + Catch2 + SDL3).
 # Roda a cada mudanca de codigo (via hook PostToolUse) e tambem a mao.
+#
+# POS REPIVOT ADR-008: a camada de plataforma e SDL3 (nao mais Qt). O smoke roda o
+# app em modo headless com os drivers DUMMY do SDL (sem display/audio), e o gate de
+# arquitetura audita que core/ e domain/ nao incluem Qt NEM SDL.
 #
 # ESTAGIOS (cada um imprime seu exit; o script sai != 0 se QUALQUER um falhar):
 #   BUILD : cmake --build (incremental; no-op ~0.02s, rebuild real ~1.5s)
-#   SMOKE : roda o gusworld_app (imprime versao do Qt e sai 0)
-#   GATE  : (a) arquitetura - core/ e domain/ NAO incluem Qt (mesmo grep do CI)
+#   SMOKE : roda o gusworld_app --smoke (N ticks + 1 render headless, sai 0)
+#   GATE  : (a) arquitetura - core/ e domain/ NAO incluem Qt NEM SDL
 #           (b) paridade i18n - tabela por locale (tools/i18n_parity.py)
 #   SUITE : ctest (resumo "100% tests passed ... out of N")
 #
 # Idempotente. Reaproveita o build dir existente (so reconfigura no 1o uso).
-# So Linux por enquanto (preset linux-release; Windows e M1+).
+# So Linux por enquanto (preset linux-release; Windows e fase posterior).
 #
 # Variaveis de ambiente uteis:
-#   QT_ROOT_DIR   sobrescreve o Qt (default do preset: $HOME/Qt/6.8.3/gcc_64)
 #   CHECK_QUIET=1 silencia o log de build/ctest (so mostra os marcadores e a
 #                 tabela); usado pelo hook para nao poluir o transcript.
 #   CHECK_MIN_I18N=<n>  alem da estrutura, exige cobertura de conteudo >= n%.
@@ -29,9 +32,6 @@ ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 ENGINE="$ROOT/GusEngine"
 PRESET="linux-release"
 APP_BIN="$ENGINE/build/$PRESET/app/gusworld_app"
-
-# Qt: respeita o que ja vier do ambiente; senao usa o default do preset.
-export QT_ROOT_DIR="${QT_ROOT_DIR:-$HOME/Qt/6.8.3/gcc_64}"
 
 QUIET="${CHECK_QUIET:-0}"
 MIN_I18N="${CHECK_MIN_I18N:-}"
@@ -61,18 +61,20 @@ if [ "$BUILD" != "0" ]; then
 fi
 
 # ---------------------------------------------------------------- SMOKE
-# A partir do M1 o app ABRE JANELA no modo normal (entraria no event loop e
-# travaria o check sem display). Por isso o smoke roda o modo HEADLESS do app:
-#   --smoke         => inicializa tudo, roda N ticks do loop, 1 render OFFSCREEN
-#                      (backend Null do QRhi, sem GPU), imprime resumo e sai 0.
-#   QT_QPA_PLATFORM=offscreen => sem servidor de janelas (vale no CI).
-# timeout como cinto de seguranca: se algum dia o smoke travar, falha rapido em
-# vez de pendurar o hook/CI.
+# O app ABRE JANELA no modo normal (entraria no loop e travaria o check sem
+# display). Por isso o smoke roda o modo HEADLESS do app:
+#   --smoke  => inicializa tudo, roda N ticks do loop logico + 1 render OFFSCREEN
+#              (Render2dSdl em modo headless, sem GPU/display), imprime resumo e
+#              sai 0.
+# SDL_VIDEODRIVER=dummy / SDL_AUDIODRIVER=dummy => o SDL nao tenta abrir display
+# nem audio (vale no CI sem X/Wayland). timeout como cinto de seguranca: se algum
+# dia o smoke travar, falha rapido em vez de pendurar o hook/CI.
 SMOKE=0
 if [ "$BUILD" = "0" ]; then
     if [ -x "$APP_BIN" ]; then
         set +e
-        QT_QPA_PLATFORM=offscreen run_log timeout 60 "$APP_BIN" --smoke
+        SDL_VIDEODRIVER=dummy SDL_AUDIODRIVER=dummy \
+            run_log timeout 60 "$APP_BIN" --smoke
         SMOKE=$?
         set -e
     else
@@ -83,15 +85,15 @@ if [ "$BUILD" = "0" ]; then
 fi
 
 # ---------------------------------------------------------------- GATE
-# (a) Arquitetura: core/ e domain/ sao POCO; nenhum #include <Q...>. Mesma
-#     logica do .forgejo/workflows/ci.yml (mantida em sincronia de proposito).
+# (a) Arquitetura: core/ e domain/ sao POCO; nenhum #include <Q...> NEM <SDL...>
+#     (ADR-008). Mesma logica do .forgejo/workflows/ci.yml (sincronia de proposito).
 GATE_ARCH=0
-if grep -rnE '#[[:space:]]*include[[:space:]]*<Q[A-Za-z]' \
+if grep -rnE '#[[:space:]]*include[[:space:]]*<(Q[A-Za-z]|SDL)' \
         "$ENGINE/core" "$ENGINE/domain" 2>/dev/null; then
-    echo "GATE(arch): Qt include encontrado em core/ ou domain/ (camadas POCO)."
+    echo "GATE(arch): include de Qt ou SDL encontrado em core/ ou domain/ (POCO)."
     GATE_ARCH=1
 else
-    [ "$QUIET" = "1" ] || echo "GATE(arch): OK (sem Qt em core/ ou domain/)."
+    [ "$QUIET" = "1" ] || echo "GATE(arch): OK (sem Qt nem SDL em core/ ou domain/)."
 fi
 
 # (b) Paridade i18n: tabela por locale (faltando/extra/dup reprovam; % so exibe).

@@ -1,31 +1,25 @@
 // GusEngine/platform/tests/key_translation_test.cpp
 //
-// Qt Test da traducao de keycode Qt -> keycode Godot (M1, platform/input).
-// TEST-FIRST. Headless: nao abre janela, so exercita a tabela de traducao.
+// Catch2 da traducao SDL_Keycode -> keycode Godot (platform/input). TEST-FIRST.
+// Headless: nao abre janela, so exercita a tabela de traducao.
 //
 // POR QUE EXISTE: o esquema de fabrica (domain/input/controls_restore.cpp) usa os
-// keycodes do enum Godot Key (decisao do porte M3, congelada nos saves). O backend
-// Qt produz Qt::Key, cujos valores DIVERGEM para teclas nomeadas (setas, Shift,
-// Enter, ...). As letras ASCII coincidem por acaso (Qt::Key_A == 'A' == 65), mas
-// nao se deve depender do acaso: a tabela traduz explicitamente. Esta e a "1 peca"
-// que casa o backend de evento com o mapa logico puro (engine-design.md secao 3).
+// keycodes do enum Godot Key (congelados nos saves). O backend SDL produz
+// SDL_Keycode, cujos valores DIVERGEM para teclas nomeadas (setas, Shift, ...). As
+// letras ASCII coincidem (SDLK_a == 'a'), mas a tabela traduz explicitamente. E a
+// "1 peca" que casa o backend de evento com o mapa logico puro (ADR-008).
 //
-// CONTRATO exercitado:
-//   - qt_key_to_godot_keycode(qt_key) -> long long no esquema Godot;
-//   - teclas ASCII (letras/numeros) passam inalteradas (Qt == ASCII == Godot);
-//   - teclas nomeadas usadas no overworld (setas, Shift) mapeiam para o valor
-//     Godot exato de controls_restore.cpp (senao WASD-vs-setas divergiria);
-//   - tecla desconhecida -> 0 (sentinela "sem binding"), nunca lixo.
+// Os literais SDL espelham <SDL3/SDL_keycode.h>; os Godot espelham
+// controls_restore.cpp (fonte canonica). Se um valor mudar la, este teste pega.
 
-#include <QtTest/QtTest>
+#include <catch2/catch_test_macros.hpp>
 
 #include "gus/platform/input/key_translation.hpp"
 
-using gus::platform::input::qt_key_to_godot_keycode;
+using gus::platform::input::sdl_key_to_godot_keycode;
 
 namespace {
-// Espelho dos literais Godot de domain/src/input/controls_restore.cpp (fonte
-// canonica). Se aquele arquivo mudar um valor, este teste pega a divergencia.
+// Esquema Godot Key enum (espelho de controls_restore.cpp).
 constexpr long long kGodotLeft = 4194319;
 constexpr long long kGodotRight = 4194321;
 constexpr long long kGodotUp = 4194320;
@@ -35,68 +29,60 @@ constexpr long long kGodotEnter = 4194309;
 constexpr long long kGodotEscape = 4194305;
 constexpr long long kGodotTab = 4194308;
 
-// Valores Qt::Key (qnamespace.h) das teclas exercitadas.
-constexpr int kQtKeyW = 0x57;
-constexpr int kQtKeyA = 0x41;
-constexpr int kQtKeyS = 0x53;
-constexpr int kQtKeyD = 0x44;
-constexpr int kQtKey1 = 0x31;
-constexpr int kQtKeyLeft = 0x01000012;
-constexpr int kQtKeyRight = 0x01000014;
-constexpr int kQtKeyUp = 0x01000013;
-constexpr int kQtKeyDown = 0x01000015;
-constexpr int kQtKeyShift = 0x01000020;
-constexpr int kQtKeyReturn = 0x01000004;
-constexpr int kQtKeyEnter = 0x01000005;
-constexpr int kQtKeyEscape = 0x01000000;
-constexpr int kQtKeyTab = 0x01000001;
+// Valores SDL_Keycode (SDL3 SDL_keycode.h) das teclas exercitadas. Letras = ASCII
+// minusculo (SDL entrega minuscula). Nomeadas usam SDLK_SCANCODE_MASK | scancode.
+constexpr int kSdlW = 'w';   // SDLK_w
+constexpr int kSdlA = 'a';
+constexpr int kSdlS = 's';
+constexpr int kSdlD = 'd';
+constexpr int kSdl1 = '1';
+constexpr int kSdlLeft = 0x40000050;   // SDLK_LEFT
+constexpr int kSdlRight = 0x4000004F;  // SDLK_RIGHT
+constexpr int kSdlUp = 0x40000052;     // SDLK_UP
+constexpr int kSdlDown = 0x40000051;   // SDLK_DOWN
+constexpr int kSdlLShift = 0x400000E1; // SDLK_LSHIFT
+constexpr int kSdlRShift = 0x400000E5; // SDLK_RSHIFT
+constexpr int kSdlReturn = 0x0D;       // SDLK_RETURN ('\r')
+constexpr int kSdlKpEnter = 0x40000058; // SDLK_KP_ENTER
+constexpr int kSdlEscape = 0x1B;       // SDLK_ESCAPE
+constexpr int kSdlTab = 0x09;          // SDLK_TAB
 }  // namespace
 
-class KeyTranslationTest : public QObject {
-    Q_OBJECT
+TEST_CASE("key_translation: letras minusculas normalizam para maiuscula",
+          "[key_translation]") {
+    // SDLK_w == 'w' (minusculo); o esquema de fabrica usa 'W' (maiusculo).
+    REQUIRE(sdl_key_to_godot_keycode(kSdlW) == static_cast<long long>('W'));
+    REQUIRE(sdl_key_to_godot_keycode(kSdlA) == static_cast<long long>('A'));
+    REQUIRE(sdl_key_to_godot_keycode(kSdlS) == static_cast<long long>('S'));
+    REQUIRE(sdl_key_to_godot_keycode(kSdlD) == static_cast<long long>('D'));
+}
 
-private slots:
-    void letras_ascii_passam_inalteradas() {
-        // Letras: Qt::Key_X == 'X' == Godot 'X'. WASD precisa casar para o
-        // movimento default funcionar.
-        QCOMPARE(qt_key_to_godot_keycode(kQtKeyW), static_cast<long long>('W'));
-        QCOMPARE(qt_key_to_godot_keycode(kQtKeyA), static_cast<long long>('A'));
-        QCOMPARE(qt_key_to_godot_keycode(kQtKeyS), static_cast<long long>('S'));
-        QCOMPARE(qt_key_to_godot_keycode(kQtKeyD), static_cast<long long>('D'));
-    }
+TEST_CASE("key_translation: numeros ASCII passam inalterados", "[key_translation]") {
+    REQUIRE(sdl_key_to_godot_keycode(kSdl1) == static_cast<long long>('1'));
+}
 
-    void numeros_ascii_passam_inalterados() {
-        QCOMPARE(qt_key_to_godot_keycode(kQtKey1), static_cast<long long>('1'));
-    }
+TEST_CASE("key_translation: setas mapeiam para o Godot exato", "[key_translation]") {
+    REQUIRE(sdl_key_to_godot_keycode(kSdlLeft) == kGodotLeft);
+    REQUIRE(sdl_key_to_godot_keycode(kSdlRight) == kGodotRight);
+    REQUIRE(sdl_key_to_godot_keycode(kSdlUp) == kGodotUp);
+    REQUIRE(sdl_key_to_godot_keycode(kSdlDown) == kGodotDown);
+}
 
-    void setas_mapeiam_para_o_godot_exato() {
-        // Aqui esta o ponto: Qt::Key_Left (0x01000012) != Godot Left (4194319).
-        QCOMPARE(qt_key_to_godot_keycode(kQtKeyLeft), kGodotLeft);
-        QCOMPARE(qt_key_to_godot_keycode(kQtKeyRight), kGodotRight);
-        QCOMPARE(qt_key_to_godot_keycode(kQtKeyUp), kGodotUp);
-        QCOMPARE(qt_key_to_godot_keycode(kQtKeyDown), kGodotDown);
-    }
+TEST_CASE("key_translation: ambos Shift viram o Shift Godot", "[key_translation]") {
+    REQUIRE(sdl_key_to_godot_keycode(kSdlLShift) == kGodotShift);
+    REQUIRE(sdl_key_to_godot_keycode(kSdlRShift) == kGodotShift);
+}
 
-    void shift_mapeia_para_o_godot_exato() {
-        // move_run = Shift no esquema de fabrica; precisa casar.
-        QCOMPARE(qt_key_to_godot_keycode(kQtKeyShift), kGodotShift);
-    }
+TEST_CASE("key_translation: teclas nomeadas de UI mapeiam", "[key_translation]") {
+    // Return e KP-Enter ambos viram o Enter Godot (o esquema usa um so codigo).
+    REQUIRE(sdl_key_to_godot_keycode(kSdlReturn) == kGodotEnter);
+    REQUIRE(sdl_key_to_godot_keycode(kSdlKpEnter) == kGodotEnter);
+    REQUIRE(sdl_key_to_godot_keycode(kSdlEscape) == kGodotEscape);
+    REQUIRE(sdl_key_to_godot_keycode(kSdlTab) == kGodotTab);
+}
 
-    void teclas_nomeadas_de_ui_mapeiam() {
-        // Return e Enter ambos viram o Enter Godot (o esquema usa um so codigo).
-        QCOMPARE(qt_key_to_godot_keycode(kQtKeyReturn), kGodotEnter);
-        QCOMPARE(qt_key_to_godot_keycode(kQtKeyEnter), kGodotEnter);
-        QCOMPARE(qt_key_to_godot_keycode(kQtKeyEscape), kGodotEscape);
-        QCOMPARE(qt_key_to_godot_keycode(kQtKeyTab), kGodotTab);
-    }
-
-    void tecla_desconhecida_vira_zero() {
-        // Um keycode Qt fora da tabela e que nao e ASCII imprimivel -> 0
-        // (sentinela "sem binding"), nunca um valor arbitrario.
-        QCOMPARE(qt_key_to_godot_keycode(0x01FFFFFF), 0LL);
-        QCOMPARE(qt_key_to_godot_keycode(-1), 0LL);
-    }
-};
-
-QTEST_MAIN(KeyTranslationTest)
-#include "key_translation_test.moc"
+TEST_CASE("key_translation: tecla desconhecida vira zero", "[key_translation]") {
+    // Um SDL_Keycode fora da tabela e nao-ASCII -> 0 (sentinela "sem binding").
+    REQUIRE(sdl_key_to_godot_keycode(0x40000099) == 0LL);
+    REQUIRE(sdl_key_to_godot_keycode(-1) == 0LL);
+}

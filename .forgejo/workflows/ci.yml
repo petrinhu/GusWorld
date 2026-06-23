@@ -1,13 +1,17 @@
 name: ci
 
-# CI do GusEngine (pivot C++/Qt6, marco M0 andaime).
+# CI do GusEngine (pos repivot C++/SDL3, ADR-008).
 # Escopo: build + testes da engine nova em GusEngine/. NAO toca game/ nem engine/
 # (base Godot/C#, congelada como referencia). Sem deploy.
 #
 # Runner: codeberg-medium (global, estavel). NAO usar runs-on: docker (runner
 # individual claudio fica offline por dias). codeberg-small (4 GB / 5 min) e
-# insuficiente para Qt6 + C++20 + Catch2, conforme precedente do driver Qt6.
+# insuficiente para compilar SDL3 do fonte + C++20 + Catch2.
 # Container: ghcr.io/catthehacker/ubuntu:act-latest (compat actions/setup-*).
+#
+# STACK (ADR-008): SDL3 + RmlUi + Catch2 entram via FetchContent (pin de tag,
+# compilados do fonte) - nao ha mais aqtinstall/Qt. As deps de BUILD do SDL (libs
+# de dev X11/Wayland/GL) sao instaladas por apt; o resto o FetchContent resolve.
 #
 # PRE-REQUISITO no Codeberg: habilitar a unidade "Actions" em
 # Settings > Repository do repo (nao vem ligada por default).
@@ -27,90 +31,55 @@ concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: true
 
-env:
-  QT_VERSION: "6.8.3"
-  QT_ARCH: "linux_gcc_64"
-  QT_MODULES: "qtmultimedia qtshadertools"
-
 jobs:
   linux:
     name: Linux (gcc, Release)
     runs-on: codeberg-medium
     container:
       image: ghcr.io/catthehacker/ubuntu:act-latest
-    timeout-minutes: 25
+    timeout-minutes: 30
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      # Toolchain de build. cmake/ninja/g++ via apt.
-      #
-      # IMPORTANTE (causa do 1o run vermelho, run #6717614): o find_package(Qt6
-      # ... COMPONENTS Gui Quick Multimedia ...) puxa o target WrapOpenGL, que
-      # faz find_package(OpenGL). No CONFIGURE isso exige os arquivos de
-      # DESENVOLVIMENTO (symlink libGL.so/libEGL.so + headers GL/gl.h), nao so os
-      # runtimes libGL.so.1/libEGL.so.1. O container act traz so os runtimes, de
-      # modo que o configure quebrava com:
-      #   Could NOT find OpenGL (missing: OPENGL_opengl_LIBRARY OPENGL_INCLUDE_DIR)
-      #   Could NOT find WrapOpenGL  ->  CMake Error em CMakeLists.txt:39
-      # Idem XKB::XKB (Qt6GuiPrivate) precisa do libxkbcommon.so de dev.
-      # Reproduzido e validado em ghcr.io/catthehacker/ubuntu:act-latest: com os
-      # pacotes -dev abaixo, configure+build+ctest ficam verdes (3/3) e o
-      # gusworld_app linka e roda. Mantemos tambem os runtimes (carga em exec).
-      - name: Install toolchain
+      # Toolchain de build + deps de DESENVOLVIMENTO do SDL3. O SDL3 e compilado do
+      # fonte (FetchContent), entao precisa dos -dev de X11/Wayland/GL/xkb. Lista
+      # derivada do README-linux do SDL3 (build dependencies). Sem isto, o configure
+      # do SDL quebra pedindo XCURSOR/XTEST/etc.
+      - name: Install toolchain + SDL build deps
         run: |
           set -eux
           apt-get update -qq
           apt-get install -y --no-install-recommends \
-            cmake ninja-build g++ build-essential \
+            cmake ninja-build g++ build-essential git \
             python3 python3-pip python3-venv \
-            libgl1 libegl1 libxkbcommon0 libfontconfig1 \
-            libdbus-1-3 libglib2.0-0 \
-            libgl1-mesa-dev libegl1-mesa-dev libxkbcommon-dev
+            libx11-dev libxext-dev libxrandr-dev libxcursor-dev libxi-dev \
+            libxfixes-dev libxss-dev libxtst-dev \
+            libxkbcommon-dev libwayland-dev wayland-protocols libdecor-0-dev \
+            libgl1-mesa-dev libegl1-mesa-dev libdrm-dev libgbm-dev \
+            libpulse-dev libasound2-dev libdbus-1-3
 
-      # aqtinstall num venv isolado (evita PEP 668 do python do sistema).
-      - name: Install aqtinstall
-        run: |
-          set -eux
-          python3 -m venv "$HOME/.venv-aqt"
-          "$HOME/.venv-aqt/bin/pip" install --upgrade pip
-          "$HOME/.venv-aqt/bin/pip" install "aqtinstall>=3,<4"
-
-      # Cache do Qt: ~1.8 GB de download so no cache-miss. Chave amarrada a
-      # versao/arch/modulos -> invalida apenas quando muda a stack do Qt.
-      - name: Cache Qt
-        id: cache-qt
-        uses: actions/cache@v4
-        with:
-          path: ~/Qt
-          key: qt-${{ env.QT_VERSION }}-${{ env.QT_ARCH }}-${{ env.QT_MODULES }}
-
-      - name: Install Qt 6.8 LTS
-        if: steps.cache-qt.outputs.cache-hit != 'true'
-        run: |
-          set -eux
-          "$HOME/.venv-aqt/bin/aqt" install-qt linux desktop "$QT_VERSION" "$QT_ARCH" \
-            -m $QT_MODULES \
-            --outputdir "$HOME/Qt"
-
-      # O preset le QT_ROOT_DIR = $HOME/Qt/<ver>/gcc_64 (mesmo layout do aqt).
-      # Exportar e so um seguro extra; o default do preset ja casa com o path.
-      - name: Export Qt path
-        run: echo "QT_ROOT_DIR=$HOME/Qt/${QT_VERSION}/gcc_64" >> "$GITHUB_ENV"
-
-      # Gate de arquitetura (invariante de GusEngine/CMakeLists.txt secao 2):
-      # core/ e domain/ sao POCO puro e NAO podem incluir Qt. Falha o CI cedo,
-      # antes de gastar tempo de build, se algum <Q...> vazar para essas camadas.
-      - name: Architecture gate (no Qt in core/domain)
+      # Gate de arquitetura (invariante ADR-008): core/ e domain/ sao POCO puro e
+      # NAO podem incluir Qt NEM SDL. Falha o CI cedo, antes de gastar build, se
+      # algum <Q...> ou <SDL...> vazar para essas camadas.
+      - name: Architecture gate (no Qt/SDL in core/domain)
         run: |
           set -eu
-          if grep -rnE '#[[:space:]]*include[[:space:]]*<Q[A-Za-z]' \
+          if grep -rnE '#[[:space:]]*include[[:space:]]*<(Q[A-Za-z]|SDL)' \
                GusEngine/core GusEngine/domain; then
-            echo "::error::Qt include encontrado em core/ ou domain/ (camadas POCO)."
-            echo "core/ e domain/ devem ser headless, sem Qt. Mover o uso de Qt para platform/ ou app/."
+            echo "::error::include de Qt ou SDL encontrado em core/ ou domain/ (POCO)."
+            echo "core/ e domain/ devem ser headless, sem Qt nem SDL. Mover para platform/ ou app/."
             exit 1
           fi
-          echo "OK: nenhum include Qt em core/ ou domain/."
+          echo "OK: nenhum include Qt/SDL em core/ ou domain/."
+
+      # Cache dos fontes de FetchContent (_deps: SDL3, RmlUi, Catch2). Evita
+      # re-clonar a cada run. Chave amarrada ao CMakeLists (onde os pins vivem).
+      - name: Cache FetchContent deps
+        uses: actions/cache@v4
+        with:
+          path: GusEngine/build/linux-release/_deps
+          key: deps-${{ hashFiles('GusEngine/CMakeLists.txt') }}
 
       - name: Configure
         working-directory: GusEngine
@@ -124,13 +93,20 @@ jobs:
         working-directory: GusEngine
         run: ctest --preset linux-release
 
+      # Smoke headless: o app roda N ticks + 1 render offscreen com os drivers DUMMY
+      # do SDL (sem display/audio no runner) e sai 0.
+      - name: Smoke (headless, SDL dummy)
+        working-directory: GusEngine
+        run: |
+          set -eux
+          SDL_VIDEODRIVER=dummy SDL_AUDIODRIVER=dummy \
+            ./build/linux-release/app/gusworld_app --smoke
+
 # ---------------------------------------------------------------------------
-# ESBOCO ADIADO: job Windows (MSVC). Habilitar em M1+ quando houver runner
-# Windows disponivel (Codeberg nao oferece runner Windows global; precisaria
-# runner self-hosted Windows ou GitHub Actions espelhado). Ajustes pendentes:
-#   - QT_ARCH = win64_msvc2022_64 ; preset windows-release (hoje hidden)
-#   - QT_ROOT_DIR = %USERPROFILE%\Qt\6.8.3\msvc2022_64
-#   - setup do toolchain MSVC (ilammy/msvc-dev-cmd ou imagem windows com VS)
+# ESBOCO ADIADO: job Windows (MSVC). Habilitar quando houver runner Windows
+# disponivel (Codeberg nao oferece runner Windows global; precisaria self-hosted
+# Windows ou GitHub Actions espelhado). Com SDL3 via FetchContent, o setup fica
+# MAIS simples que com Qt: nao ha aqtinstall; basta o toolchain MSVC + cmake.
 #
 #  windows:
 #    name: Windows (MSVC, Release)
@@ -138,10 +114,7 @@ jobs:
 #    timeout-minutes: 40
 #    steps:
 #      - uses: actions/checkout@v4
-#      - name: Install Qt 6.8 LTS (Windows)
-#        run: |
-#          python -m pip install "aqtinstall>=3,<4"
-#          aqt install-qt windows desktop 6.8.3 win64_msvc2022_64 -m qtmultimedia qtshadertools --outputdir %USERPROFILE%\Qt
+#      - uses: ilammy/msvc-dev-cmd@v1
 #      - name: Configure / Build / Test
 #        working-directory: GusEngine
 #        run: |

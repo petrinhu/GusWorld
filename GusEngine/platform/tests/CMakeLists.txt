@@ -1,36 +1,29 @@
-# Testes da camada platform/ (Qt Test). Headless: rodam sem abrir janela e sem
-# GPU (so exercitam a logica testavel da fronteira Qt - traducao de input,
-# matematica de projecao do render). Complementam os testes Catch2 de core/+domain/.
+# Testes da camada platform/ (Catch2 v3, headless). Pos repivot ADR-008: a logica
+# testavel da fronteira SDL roda sem abrir janela e sem GPU - traducao de input
+# (teclado SDL + gamepad), fusao de intencao, matematica de projecao do render, e o
+# ciclo do backend Render2dSdl em modo headless (renderer nulo). O irredutivel
+# (janela/render SDL real) e coberto pelo smoke do app.
 #
-# Cada arquivo e um executavel QTEST_MAIN proprio (padrao Qt Test) registrado no
-# ctest via add_test. AUTOMOC ligado (os .moc dos QObject de teste).
-#
-# Rodam com QT_QPA_PLATFORM=offscreen (sem display) - configurado no ENVIRONMENT
-# de cada teste, pra valer tanto no CI quanto no ctest local.
+# Um executavel agregado + catch_discover_tests (cada TEST_CASE vira um teste no
+# ctest), no mesmo padrao de core/+domain/. NAO linka Qt.
 
-set(CMAKE_AUTOMOC ON)
-
-# Lista de (nome do teste, fonte). Cada um vira target + add_test.
-set(GUSENGINE_PLATFORM_TESTS
-    key_translation_test
-    input_mapper_test
-    viewport_transform_test
-    render2d_rhi_test
+add_executable(gusengine_platform_tests
+    key_translation_test.cpp
+    input_mapper_test.cpp
+    gamepad_mapping_test.cpp
+    sdl_input_test.cpp
+    viewport_transform_test.cpp
+    render2d_sdl_test.cpp
 )
 
-foreach(_t IN LISTS GUSENGINE_PLATFORM_TESTS)
-    add_executable(${_t} ${_t}.cpp)
-    target_link_libraries(${_t}
-        PRIVATE
-            gusengine_platform
-            gusengine_core
-            gusengine_domain
-            Qt6::Test
-    )
-    target_compile_features(${_t} PRIVATE cxx_std_20)
-    add_test(NAME ${_t} COMMAND ${_t})
-    # Headless: sem isto, QTEST_MAIN tenta abrir a plataforma de janela e falha no CI.
-    set_tests_properties(${_t} PROPERTIES
-        ENVIRONMENT "QT_QPA_PLATFORM=offscreen"
-    )
-endforeach()
+target_link_libraries(gusengine_platform_tests
+    PRIVATE
+        gusengine_platform
+        gusengine_core
+        gusengine_domain
+        Catch2::Catch2WithMain
+)
+
+target_compile_features(gusengine_platform_tests PRIVATE cxx_std_20)
+
+catch_discover_tests(gusengine_platform_tests)

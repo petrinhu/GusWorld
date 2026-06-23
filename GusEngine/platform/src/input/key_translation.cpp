@@ -1,16 +1,16 @@
 // gus/platform/src/input/key_translation.cpp
 //
-// Tabela de traducao Qt::Key -> keycode Godot (M1). Ver header. Travado por
+// Tabela de traducao SDL_Keycode -> keycode Godot. Ver header. Travado por
 // platform/tests/key_translation_test.cpp (TEST-FIRST).
 //
 // Os literais Godot espelham domain/src/input/controls_restore.cpp (fonte unica
-// do esquema de fabrica). Os literais Qt espelham qnamespace.h (Qt::Key). Inclui
-// <QtCore> APENAS por estar na camada platform/ (permitido); poderia usar os
-// literais crus, mas referenciar Qt::Key documenta a intencao.
+// do esquema de fabrica). As constantes SDL vem de <SDL3/SDL_keycode.h> (camada
+// platform/, SDL permitido); referencia-las documenta a intencao e blinda contra
+// mudanca de valor entre versoes do SDL.
 
 #include "gus/platform/input/key_translation.hpp"
 
-#include <qnamespace.h>  // Qt::Key_* (camada platform/, Qt permitido)
+#include <SDL3/SDL_keycode.h>  // SDLK_* (camada platform/, SDL permitido)
 
 namespace gus::platform::input {
 
@@ -29,44 +29,44 @@ constexpr long long kGodotSpace = 32;  // ASCII, coincide
 
 }  // namespace
 
-long long qt_key_to_godot_keycode(int qt_key) noexcept {
+long long sdl_key_to_godot_keycode(int sdl_keycode) noexcept {
     // 1) Teclas nomeadas: mapeamento explicito (os valores divergem do Godot).
-    switch (qt_key) {
-        case Qt::Key_Left:
+    switch (static_cast<SDL_Keycode>(sdl_keycode)) {
+        case SDLK_LEFT:
             return kGodotLeft;
-        case Qt::Key_Right:
+        case SDLK_RIGHT:
             return kGodotRight;
-        case Qt::Key_Up:
+        case SDLK_UP:
             return kGodotUp;
-        case Qt::Key_Down:
+        case SDLK_DOWN:
             return kGodotDown;
-        case Qt::Key_Shift:
+        // Os dois Shift (esquerdo e direito) viram o mesmo Shift Godot (o esquema
+        // de fabrica usa um codigo so para move_run).
+        case SDLK_LSHIFT:
+        case SDLK_RSHIFT:
             return kGodotShift;
-        // Return (teclado principal) e Enter (numerico) viram o mesmo Enter
-        // Godot, espelhando o esquema (que usa um codigo so).
-        case Qt::Key_Return:
-        case Qt::Key_Enter:
+        // Return (teclado principal) e Enter (numerico) viram o mesmo Enter Godot.
+        case SDLK_RETURN:
+        case SDLK_KP_ENTER:
             return kGodotEnter;
-        case Qt::Key_Escape:
+        case SDLK_ESCAPE:
             return kGodotEscape;
-        case Qt::Key_Tab:
+        case SDLK_TAB:
             return kGodotTab;
-        case Qt::Key_Space:
+        case SDLK_SPACE:
             return kGodotSpace;
         default:
             break;
     }
 
-    // 2) ASCII imprimivel (0x20..0x7E): passa direto (Qt == ASCII == Godot).
-    //    Letras minusculas (a..z) sao normalizadas para maiuscula, pois o esquema
-    //    de fabrica usa o codigo maiusculo ('W', 'A', ...). Na pratica o Qt ja
-    //    entrega maiuscula em QKeyEvent::key(), mas a normalizacao e barata e
-    //    blinda contra qualquer fonte que mande minuscula.
-    if (qt_key >= 0x20 && qt_key <= 0x7E) {
-        if (qt_key >= 'a' && qt_key <= 'z') {
-            return static_cast<long long>(qt_key - ('a' - 'A'));
+    // 2) ASCII imprimivel (0x20..0x7E): passa direto (SDL == ASCII == Godot).
+    //    SDL entrega minuscula para letras (SDLK_a == 'a'); o esquema de fabrica
+    //    usa o codigo MAIUSCULO ('W','A',...), entao normalizamos a..z -> A..Z.
+    if (sdl_keycode >= 0x20 && sdl_keycode <= 0x7E) {
+        if (sdl_keycode >= 'a' && sdl_keycode <= 'z') {
+            return static_cast<long long>(sdl_keycode - ('a' - 'A'));
         }
-        return static_cast<long long>(qt_key);
+        return static_cast<long long>(sdl_keycode);
     }
 
     // 3) Desconhecida (nao-ASCII fora da tabela): sentinela "sem binding".

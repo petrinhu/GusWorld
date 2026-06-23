@@ -1,27 +1,24 @@
-# Testes da camada app/ (Qt Test). Headless: o OverworldSim e desenhado num
-# IRenderer FALSO (sem GPU), e o movimento/colisao/camera/interpolacao sao
-# exercitados deterministicamente. Roda com QT_QPA_PLATFORM=offscreen.
+# Testes da camada app/ (Catch2 v3, headless). O OverworldSim e desenhado num
+# IRenderer FALSO (sem GPU), e o movimento/colisao/camera/interpolacao/sprite sao
+# exercitados deterministicamente. A LOGICA de animacao (sprite_animation) e POCO
+# pura. NAO linka Qt nem SDL: tudo roda sem abrir janela.
+#
+# Um executavel agregado + catch_discover_tests, no padrao de core/+domain/.
 
-set(CMAKE_AUTOMOC ON)
-
-set(GUSENGINE_APP_TESTS
-    overworld_sim_test
-    sprite_animation_test
+add_executable(gusengine_app_tests
+    overworld_sim_test.cpp
+    sprite_animation_test.cpp
 )
 
-foreach(_t IN LISTS GUSENGINE_APP_TESTS)
-    add_executable(${_t} ${_t}.cpp)
-    target_link_libraries(${_t}
-        PRIVATE
-            gusengine_app
-            gusengine_core
-            gusengine_domain
-            gusengine_platform
-            Qt6::Test
-    )
-    target_compile_features(${_t} PRIVATE cxx_std_20)
-    add_test(NAME ${_t} COMMAND ${_t})
-    set_tests_properties(${_t} PROPERTIES
-        ENVIRONMENT "QT_QPA_PLATFORM=offscreen"
-    )
-endforeach()
+target_link_libraries(gusengine_app_tests
+    PRIVATE
+        gusengine_app
+        gusengine_core
+        gusengine_domain
+        gusengine_platform
+        Catch2::Catch2WithMain
+)
+
+target_compile_features(gusengine_app_tests PRIVATE cxx_std_20)
+
+catch_discover_tests(gusengine_app_tests)

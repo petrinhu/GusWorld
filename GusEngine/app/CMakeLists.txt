@@ -1,25 +1,16 @@
-# gusworld_app - executavel GusWorld-specific + a lib gusengine_app que ele usa.
+# gusworld_app - executavel GusWorld-specific + a lib gusengine_app (pos repivot
+# SDL3, ADR-008).
 #
-# Estrutura (M1): a logica de tela (OverworldSim e a casca de janela/loop) vira
-# uma LIB estatica (gusengine_app) pra ser testavel headless (Qt Test) e linkavel
-# pelo executavel. O executavel (gusworld_app) e so o main.cpp.
-#
-# Subdominios (engine-design.md secao 2):
-#   screens/ Overworld (a state machine completa Overworld/Battle/Menu e M5)
-#   main.cpp ponto de entrada (QGuiApplication + janela + loop, ou --smoke)
-
-# AUTOMOC: a casca de janela usa QObject/sinais; os screens tambem podem.
-set(CMAKE_AUTOMOC ON)
+# A logica de tela (OverworldSim) e a casca de janela/loop (SdlWindow) viram uma
+# LIB estatica (gusengine_app) pra ser testavel headless (Catch2) e linkavel pelo
+# executavel. O executavel (gusworld_app) e so o main.cpp (modo janela + --smoke).
 
 # --- lib gusengine_app: logica de tela + casca de janela/loop (testavel) ---
 add_library(gusengine_app STATIC
     src/screens/overworld_sim.cpp
     src/screens/sprite_animation.cpp
     src/screens/player_sprites_loader.cpp
-    src/game_window.cpp
-    # Header com Q_OBJECT listado explicitamente pra o AUTOMOC gerar o moc dele
-    # (esta em include/, fora do dir de fontes; sem isto, falta a vtable no link).
-    include/gus/app/game_window.hpp
+    src/sdl_window.cpp
 )
 
 target_include_directories(gusengine_app
@@ -34,11 +25,13 @@ target_compile_definitions(gusengine_app
     PRIVATE GUSWORLD_ASSETS_DIR="${CMAKE_SOURCE_DIR}/../resources"
 )
 
+# SDL3 entra aqui (a casca SdlWindow + o main tocam SDL diretamente).
 target_link_libraries(gusengine_app
     PUBLIC
         gusengine_core
         gusengine_domain
         gusengine_platform
+        SDL3::SDL3
 )
 
 target_compile_features(gusengine_app PUBLIC cxx_std_20)
@@ -54,11 +47,12 @@ target_link_libraries(gusworld_app
         gusengine_core
         gusengine_domain
         gusengine_platform
+        SDL3::SDL3
 )
 
 target_compile_features(gusworld_app PRIVATE cxx_std_20)
 
-# Testes da camada app/ (Qt Test, headless).
+# Testes da camada app/ (Catch2, headless).
 if(BUILD_TESTING)
     add_subdirectory(tests)
 endif()

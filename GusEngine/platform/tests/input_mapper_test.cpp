@@ -1,29 +1,20 @@
 // GusEngine/platform/tests/input_mapper_test.cpp
 //
-// Qt Test do InputMapper (M1, platform/input): estado de teclas pressionadas ->
-// acoes logicas ativas -> vetor de movimento cardinal. TEST-FIRST. Headless: nao
+// Catch2 do InputMapper (platform/input): estado de teclas pressionadas -> acoes
+// logicas ativas -> vetor de movimento cardinal. TEST-FIRST. Headless (POCO): nao
 // abre janela; alimenta keycodes (ja no esquema Godot) e consulta o resultado.
 //
 // O InputMapper consome um InputRemapConfig (de default_controls(), o esquema de
-// fabrica puro). E a ponte: o app traduz QKeyEvent -> keycode Godot (via
+// fabrica puro). E a ponte: o app traduz SDL_Keycode -> keycode Godot (via
 // key_translation) e chama press/release; o mapper diz quais ACOES estao ativas.
 // A regra de qual tecla e qual acao continua no dado puro (domain/), nao no codigo.
 //
 // CONVENCAO DE EIXO (segue tile_grid.hpp: +X direita, +Y BAIXO, top-down):
-//   move_left  -> dx = -1   move_right -> dx = +1
-//   move_forward (W, "pra cima" na tela) -> dy = -1
-//   move_backward (S, "pra baixo")       -> dy = +1
-// O vetor devolvido e CARDINAL CRU (componentes em {-1,0,1}); a normalizacao da
-// diagonal (feel) NAO e responsabilidade do mapper (decisao do lider, RF-3).
-//
-// CONTRATO exercitado:
-//   - press(keycode)/release(keycode) mantem o conjunto pressionado;
-//   - is_action_active(name) true sse alguma tecla bound aquela acao esta down;
-//   - movement_dx()/movement_dy() somam as 4 direcoes ativas (cancelam se opostas);
-//   - run_active() reflete move_run (Shift);
-//   - clear() esvazia tudo.
+//   move_left -> dx=-1   move_right -> dx=+1
+//   move_forward (W, "cima") -> dy=-1   move_backward (S, "baixo") -> dy=+1
+// O vetor e CARDINAL CRU; a normalizacao da diagonal (feel) nao e do mapper.
 
-#include <QtTest/QtTest>
+#include <catch2/catch_test_macros.hpp>
 
 #include "gus/domain/input/controls_restore.hpp"
 #include "gus/platform/input/input_mapper.hpp"
@@ -40,110 +31,98 @@ constexpr long long kD = 'D';
 constexpr long long kShift = 4194325;
 }  // namespace
 
-class InputMapperTest : public QObject {
-    Q_OBJECT
+TEST_CASE("InputMapper: inicial sem teclas nao move", "[input_mapper]") {
+    InputMapper m(default_controls());
+    REQUIRE(m.movement_dx() == 0);
+    REQUIRE(m.movement_dy() == 0);
+    REQUIRE_FALSE(m.is_action_active("move_right"));
+    REQUIRE_FALSE(m.run_active());
+}
 
-private slots:
-    void inicial_sem_teclas_sem_movimento() {
-        InputMapper m(default_controls());
-        QCOMPARE(m.movement_dx(), 0);
-        QCOMPARE(m.movement_dy(), 0);
-        QVERIFY(!m.is_action_active("move_right"));
-        QVERIFY(!m.run_active());
-    }
+TEST_CASE("InputMapper: D anda para a direita", "[input_mapper]") {
+    InputMapper m(default_controls());
+    m.press(kD);
+    REQUIRE(m.is_action_active("move_right"));
+    REQUIRE(m.movement_dx() == 1);
+    REQUIRE(m.movement_dy() == 0);
+}
 
-    void d_anda_para_a_direita() {
-        InputMapper m(default_controls());
-        m.press(kD);
-        QVERIFY(m.is_action_active("move_right"));
-        QCOMPARE(m.movement_dx(), 1);
-        QCOMPARE(m.movement_dy(), 0);
-    }
+TEST_CASE("InputMapper: A anda para a esquerda", "[input_mapper]") {
+    InputMapper m(default_controls());
+    m.press(kA);
+    REQUIRE(m.movement_dx() == -1);
+}
 
-    void a_anda_para_a_esquerda() {
-        InputMapper m(default_controls());
-        m.press(kA);
-        QCOMPARE(m.movement_dx(), -1);
-    }
+TEST_CASE("InputMapper: W anda para cima (Y negativo)", "[input_mapper]") {
+    InputMapper m(default_controls());
+    m.press(kW);
+    REQUIRE(m.is_action_active("move_forward"));
+    REQUIRE(m.movement_dy() == -1);
+}
 
-    void w_anda_para_cima_y_negativo() {
-        InputMapper m(default_controls());
-        m.press(kW);
-        QVERIFY(m.is_action_active("move_forward"));
-        QCOMPARE(m.movement_dy(), -1);  // +Y e baixo; "frente"/W e cima
-    }
+TEST_CASE("InputMapper: S anda para baixo (Y positivo)", "[input_mapper]") {
+    InputMapper m(default_controls());
+    m.press(kS);
+    REQUIRE(m.movement_dy() == 1);
+}
 
-    void s_anda_para_baixo_y_positivo() {
-        InputMapper m(default_controls());
-        m.press(kS);
-        QCOMPARE(m.movement_dy(), 1);
-    }
+TEST_CASE("InputMapper: diagonal soma cardinal cru", "[input_mapper]") {
+    InputMapper m(default_controls());
+    m.press(kW);
+    m.press(kD);
+    REQUIRE(m.movement_dx() == 1);
+    REQUIRE(m.movement_dy() == -1);
+}
 
-    void diagonal_soma_cardinal_cru() {
-        // W + D = cima-direita: (dx,dy) = (1,-1) CRU (sem normalizar; isso e feel).
-        InputMapper m(default_controls());
-        m.press(kW);
-        m.press(kD);
-        QCOMPARE(m.movement_dx(), 1);
-        QCOMPARE(m.movement_dy(), -1);
-    }
+TEST_CASE("InputMapper: teclas opostas cancelam", "[input_mapper]") {
+    InputMapper m(default_controls());
+    m.press(kA);
+    m.press(kD);
+    REQUIRE(m.movement_dx() == 0);
+}
 
-    void teclas_opostas_se_cancelam() {
-        // A + D pressionadas ao mesmo tempo -> dx = 0 (cancelam).
-        InputMapper m(default_controls());
-        m.press(kA);
-        m.press(kD);
-        QCOMPARE(m.movement_dx(), 0);
-    }
+TEST_CASE("InputMapper: release para o movimento", "[input_mapper]") {
+    InputMapper m(default_controls());
+    m.press(kD);
+    REQUIRE(m.movement_dx() == 1);
+    m.release(kD);
+    REQUIRE(m.movement_dx() == 0);
+    REQUIRE_FALSE(m.is_action_active("move_right"));
+}
 
-    void release_para_o_movimento() {
-        InputMapper m(default_controls());
-        m.press(kD);
-        QCOMPARE(m.movement_dx(), 1);
-        m.release(kD);
-        QCOMPARE(m.movement_dx(), 0);
-        QVERIFY(!m.is_action_active("move_right"));
-    }
+TEST_CASE("InputMapper: Shift ativa run", "[input_mapper]") {
+    InputMapper m(default_controls());
+    m.press(kShift);
+    REQUIRE(m.run_active());
+    m.release(kShift);
+    REQUIRE_FALSE(m.run_active());
+}
 
-    void shift_ativa_run() {
-        InputMapper m(default_controls());
-        m.press(kShift);
-        QVERIFY(m.run_active());
-        m.release(kShift);
-        QVERIFY(!m.run_active());
-    }
+TEST_CASE("InputMapper: tecla sem binding nao afeta movimento", "[input_mapper]") {
+    InputMapper m(default_controls());
+    m.press(0);
+    m.press('K');  // K nao e movimento no esquema de fabrica
+    REQUIRE(m.movement_dx() == 0);
+    REQUIRE(m.movement_dy() == 0);
+}
 
-    void tecla_sem_binding_nao_afeta_movimento() {
-        // Keycode 0 (sentinela "sem binding") ou tecla nao mapeada nao mexe nada.
-        InputMapper m(default_controls());
-        m.press(0);
-        m.press('K');  // K nao e movimento no esquema de fabrica
-        QCOMPARE(m.movement_dx(), 0);
-        QCOMPARE(m.movement_dy(), 0);
-    }
+TEST_CASE("InputMapper: press repetido e idempotente", "[input_mapper]") {
+    InputMapper m(default_controls());
+    m.press(kD);
+    m.press(kD);
+    m.press(kD);
+    REQUIRE(m.movement_dx() == 1);
+    m.release(kD);  // um release zera (conjunto, nao contador)
+    REQUIRE(m.movement_dx() == 0);
+}
 
-    void press_repetido_e_idempotente() {
-        // Auto-repeat do SO: varios press da mesma tecla sem release == 1 tecla.
-        InputMapper m(default_controls());
-        m.press(kD);
-        m.press(kD);
-        m.press(kD);
-        QCOMPARE(m.movement_dx(), 1);
-        m.release(kD);  // um release zera (conjunto, nao contador)
-        QCOMPARE(m.movement_dx(), 0);
-    }
-
-    void clear_esvazia_tudo() {
-        InputMapper m(default_controls());
-        m.press(kW);
-        m.press(kD);
-        m.press(kShift);
-        m.clear();
-        QCOMPARE(m.movement_dx(), 0);
-        QCOMPARE(m.movement_dy(), 0);
-        QVERIFY(!m.run_active());
-    }
-};
-
-QTEST_MAIN(InputMapperTest)
-#include "input_mapper_test.moc"
+TEST_CASE("InputMapper: clear esvazia tudo", "[input_mapper]") {
+    InputMapper m(default_controls());
+    m.press(kW);
+    m.press(kD);
+    m.press(kShift);
+    m.clear();
+    REQUIRE(m.movement_dx() == 0);
+    REQUIRE(m.movement_dy() == 0);
+    REQUIRE_FALSE(m.run_active());
+}

@@ -1,25 +1,16 @@
 // GusEngine/app/tests/overworld_sim_test.cpp
 //
-// Qt Test da simulacao do overworld (M1, app/screens): junta input cardinal +
+// Catch2 da simulacao do overworld (app/screens): junta input cardinal +
 // resolve_move (colisao slide) + clamp_camera + interpolacao de render. TEST-FIRST.
 // Headless: usa um IRenderer FALSO que so registra o que seria desenhado, sem GPU.
 //
-// O OverworldSim e a "regra de jogo POCO fora da casca Qt" (engine-design.md
-// secao 2/4): recebe dx/dy CRUS (int, ja resolvidos pelo InputMapper) + dt fixo,
-// nao QKeyEvent. A casca Qt (GameWindow/main) so o alimenta e desenha. Isso o
-// torna testavel sem janela - e prova o feel pedido pelo lider (desliza nas
-// paredes, camera presa ao mapa) de forma deterministica.
-//
-// CONTRATO exercitado:
-//   - construcao com TileGrid + Aabb inicial + velocidade (tiles/s);
-//   - step_fixed(dx,dy,run,dt) move o jogador deslizando nas paredes (delega a
-//     core::spatial::resolve_move): bate na parede num eixo, desliza no outro;
-//   - camera_view(vw,vh) = clamp_camera centrado no jogador, preso ao mapa;
-//   - render(IRenderer&, alpha) interpola a posicao do jogador entre o passo
-//     anterior e o atual (alpha 0 -> anterior, 1 -> atual) e emite os quads das
-//     paredes + do jogador. O fake conta/inspeciona os quads.
+// O OverworldSim e a "regra de jogo POCO fora da casca" (engine-design.md sec 2/4):
+// recebe dx/dy CRUS (int, ja resolvidos pelo input) + dt fixo. A casca SDL
+// (SdlWindow/main) so o alimenta e desenha. Isso o torna testavel sem janela - e
+// prova o feel (desliza nas paredes, camera presa ao mapa) deterministicamente.
 
-#include <QtTest/QtTest>
+#include <catch2/catch_test_macros.hpp>
+#include <catch2/matchers/catch_matchers_floating_point.hpp>
 
 #include <cmath>
 #include <vector>
@@ -29,12 +20,12 @@
 #include "gus/core/spatial/tile_grid.hpp"
 #include "gus/platform/render2d/i_renderer.hpp"
 
+using Catch::Matchers::WithinAbs;
 using gus::app::screens::Direction;
 using gus::app::screens::kWalkFrameCount;
 using gus::app::screens::OverworldSim;
 using gus::app::screens::OverworldTuning;
 using gus::app::screens::PlayerSpriteSet;
-using gus::app::screens::WalkCycle;
 using gus::core::spatial::Aabb;
 using gus::core::spatial::CameraView;
 using gus::core::spatial::Rect;
@@ -48,7 +39,7 @@ using gus::platform::render2d::UvRect;
 namespace {
 
 // IRenderer falso: registra cada chamada (cor + retangulo de mundo) pra inspecao,
-// sem tocar GPU. begin/end so marcam que o frame abriu/fechou e guardam a camera.
+// sem tocar GPU.
 class FakeRenderer : public IRenderer {
 public:
     struct Cmd {
@@ -77,10 +68,7 @@ public:
                            float /*thickness_world*/) override {
         cmds.push_back({world_rect, c, false});
     }
-    TextureId load_texture(const char* /*path*/) override {
-        // Fake: cada caminho vira um handle sequencial valido (1,2,3,...).
-        return ++next_texture;
-    }
+    TextureId load_texture(const char* /*path*/) override { return ++next_texture; }
     void draw_textured_rect(const Rect& world_rect, TextureId texture,
                             const UvRect& uv, const DrawColor& /*tint*/) override {
         sprites.push_back({world_rect, texture, uv});
@@ -96,34 +84,21 @@ public:
     std::vector<Cmd> cmds;
     std::vector<SpriteCmd> sprites;
 
-    // Conta quantos quads PREENCHIDOS (paredes) foram emitidos.
     int filled_count() const {
         int n = 0;
         for (const auto& c : cmds) {
-            if (c.filled) {
-                ++n;
-            }
+            if (c.filled) ++n;
         }
         return n;
     }
-    // Devolve o ultimo quad NAO-preenchido (contorno) = o jogador (desenhado por
-    // ultimo, como contorno da AABB).
     const Cmd* player_cmd() const {
         for (auto it = cmds.rbegin(); it != cmds.rend(); ++it) {
-            if (!it->filled) {
-                return &*it;
-            }
+            if (!it->filled) return &*it;
         }
         return nullptr;
     }
 };
 
-// Mapa de teste 5x5, tile 16, com um bloco interno em (2,2) pra exercitar slide.
-//   #####
-//   #...#
-//   #.#.#
-//   #...#
-//   #####
 TileGrid make_map() {
     return TileGrid::from_rows(
         {
@@ -136,305 +111,248 @@ TileGrid make_map() {
         16.0f);
 }
 
-constexpr float kEps = 1e-3f;
+PlayerSpriteSet make_fake_sprites() {
+    PlayerSpriteSet s;
+    TextureId next = 1;
+    for (int d = 0; d < gus::app::screens::kDirectionCount; ++d) {
+        s.idle[d] = next++;
+        for (int f = 0; f < kWalkFrameCount; ++f) {
+            s.walk[d][f] = next++;
+        }
+    }
+    return s;
+}
+
+constexpr double kEps = 1e-3;
 }  // namespace
 
-class OverworldSimTest : public QObject {
-    Q_OBJECT
+TEST_CASE("overworld: anda para a direita em campo livre", "[overworld]") {
+    TileGrid g = make_map();
+    OverworldSim sim(g, Aabb{16.0f, 16.0f, 8.0f, 8.0f}, 4.0f);
+    float x0 = sim.player().x;
+    sim.step_fixed(1, 0, false, 1.0f / 60.0f);
+    REQUIRE(sim.player().x > x0);
+    REQUIRE_THAT(sim.player().y, WithinAbs(16.0, kEps));
+}
 
-private slots:
-    void anda_para_a_direita_em_campo_livre() {
-        // Jogador 8x8 na celula (1,1) (canto em mundo 16,16). Velocidade 4 tiles/s
-        // = 64 u/s. dt = 1/60 -> ~1.0667 u por passo. Move dx=+1.
-        TileGrid g = make_map();
-        OverworldSim sim(g, Aabb{16.0f, 16.0f, 8.0f, 8.0f}, 4.0f);
-        float x0 = sim.player().x;
-        sim.step_fixed(1, 0, false, 1.0f / 60.0f);
-        QVERIFY(sim.player().x > x0);                 // andou para +X
-        QVERIFY(qAbs(sim.player().y - 16.0f) < kEps);  // Y nao mudou
-    }
+TEST_CASE("overworld: parede bloqueia um eixo mas desliza no outro", "[overworld]") {
+    TileGrid g = make_map();
+    OverworldSim sim(g, Aabb{24.0f, 34.0f, 8.0f, 8.0f}, 6.0f);
+    sim.step_fixed(1, 1, true, 1.0f / 60.0f);
+    REQUIRE(sim.player().x <= 24.0f + kEps);
+    REQUIRE(sim.player().y > 34.0f);
+}
 
-    void parede_bloqueia_o_eixo_mas_desliza_no_outro() {
-        // Jogador encostando na parede de baixo da celula (1,1), tentando ir
-        // para baixo-e-direita. A parede em (2,2) e o desenho do mapa forcam o
-        // teste do slide: indo (dx=+1, dy=+1) contra um bloco, ainda anda no eixo
-        // livre. Posiciono o jogador colado a face esquerda do bloco (2,2).
-        TileGrid g = make_map();
-        // Bloco (2,2) ocupa mundo [32,48]x[32,48]. Jogador 8x8 colado a esquerda
-        // dele: x = 24 (face direita em 32), y = 34 (sobrepoe a faixa do bloco).
-        OverworldSim sim(g, Aabb{24.0f, 34.0f, 8.0f, 8.0f}, 6.0f);
-        sim.step_fixed(1, 1, true, 1.0f / 60.0f);  // tenta direita+baixo, correndo
-        // X deve ser bloqueado pelo bloco (nao atravessa 32 - 8 = 24); Y desliza.
-        QVERIFY(sim.player().x <= 24.0f + kEps);  // barrado em X pelo bloco
-        QVERIFY(sim.player().y > 34.0f);          // deslizou em Y (eixo livre)
-    }
-
-    void nao_atravessa_a_borda_do_mapa() {
-        // Jogador colado a borda esquerda (celula (1,1), x=16 toca a parede (0,*)).
-        // Empurrando para a esquerda, nao deve passar de x=16 (borda = parede).
-        TileGrid g = make_map();
-        OverworldSim sim(g, Aabb{16.0f, 16.0f, 8.0f, 8.0f}, 8.0f);
-        for (int i = 0; i < 10; ++i) {
-            sim.step_fixed(-1, 0, false, 1.0f / 60.0f);
-        }
-        QVERIFY(sim.player().x >= 16.0f - kEps);  // nunca entra na parede
-    }
-
-    void camera_segue_o_jogador_presa_ao_mapa() {
-        // Mapa 5x5 tile 16 -> mundo 80x80. Viewport 40x40. Jogador no centro.
-        TileGrid g = make_map();
-        OverworldSim sim(g, Aabb{36.0f, 36.0f, 8.0f, 8.0f}, 4.0f);
-        CameraView v = sim.camera_view(40.0f, 40.0f);
-        // Centro do jogador = (40,40); viewport 40 cabe no mapa 80 -> sem clamp.
-        QVERIFY(qAbs(v.center.x - 40.0f) < kEps);
-        QVERIFY(qAbs(v.center.y - 40.0f) < kEps);
-        QVERIFY(qAbs(v.rect.x - 20.0f) < kEps);  // 40 - 40/2
-    }
-
-    void camera_clampa_na_borda() {
-        // Jogador no canto superior-esquerdo: a camera nao pode mostrar fora do mapa.
-        TileGrid g = make_map();
-        OverworldSim sim(g, Aabb{16.0f, 16.0f, 8.0f, 8.0f}, 4.0f);
-        CameraView v = sim.camera_view(40.0f, 40.0f);
-        QVERIFY(v.rect.x >= -kEps);  // retangulo preso em x>=0
-        QVERIFY(v.rect.y >= -kEps);
-    }
-
-    void render_emite_paredes_e_jogador() {
-        // O sim deve mandar desenhar as celulas bloqueadas (preenchidas) e o
-        // jogador (contorno). O mapa 5x5 tem 16 celulas de borda + 1 interna = 17
-        // bloqueadas. Pode otimizar pra desenhar so as visiveis; aqui o mapa
-        // inteiro cabe no viewport, entao espera-se 17 paredes.
-        TileGrid g = make_map();
-        OverworldSim sim(g, Aabb{36.0f, 36.0f, 8.0f, 8.0f}, 4.0f);
-        FakeRenderer r;
-        sim.render(r, 80.0f, 80.0f, 0.0f);
-        QCOMPARE(r.begins, 1);
-        QCOMPARE(r.ends, 1);
-        QCOMPARE(r.filled_count(), 17);          // 16 borda + 1 bloco interno
-        QVERIFY(r.player_cmd() != nullptr);       // jogador desenhado
-    }
-
-    void render_interpola_posicao_do_jogador() {
-        // Apos um passo, render(alpha=0) desenha na posicao ANTERIOR, alpha=1 na
-        // ATUAL, alpha=0.5 no meio. Prova o movimento suave (o lider vai ver liso).
-        TileGrid g = make_map();
-        OverworldSim sim(g, Aabb{16.0f, 16.0f, 8.0f, 8.0f}, 60.0f);  // rapido p/ delta visivel
-        float xprev = sim.player().x;
-        sim.step_fixed(1, 0, false, 1.0f / 60.0f);
-        float xcurr = sim.player().x;
-        QVERIFY(xcurr > xprev);  // sanidade: andou
-
-        FakeRenderer r0;
-        sim.render(r0, 80.0f, 80.0f, 0.0f);
-        QVERIFY(qAbs(r0.player_cmd()->rect.x - xprev) < kEps);  // alpha 0 -> anterior
-
-        FakeRenderer r1;
-        sim.render(r1, 80.0f, 80.0f, 1.0f);
-        QVERIFY(qAbs(r1.player_cmd()->rect.x - xcurr) < kEps);  // alpha 1 -> atual
-
-        FakeRenderer rh;
-        sim.render(rh, 80.0f, 80.0f, 0.5f);
-        float mid = (xprev + xcurr) * 0.5f;
-        QVERIFY(qAbs(rh.player_cmd()->rect.x - mid) < kEps);    // alpha 0.5 -> meio
-    }
-
-    void passo_parado_nao_move() {
-        TileGrid g = make_map();
-        OverworldSim sim(g, Aabb{36.0f, 36.0f, 8.0f, 8.0f}, 4.0f);
-        float x0 = sim.player().x;
-        float y0 = sim.player().y;
-        sim.step_fixed(0, 0, false, 1.0f / 60.0f);
-        QVERIFY(qAbs(sim.player().x - x0) < kEps);
-        QVERIFY(qAbs(sim.player().y - y0) < kEps);
-    }
-
-    void run_move_mais_que_andar() {
-        // Mesma direcao/tempo: correr cobre mais distancia que andar.
-        TileGrid g = make_map();
-        OverworldSim walk(g, Aabb{16.0f, 16.0f, 8.0f, 8.0f}, 4.0f);
-        OverworldSim run(g, Aabb{16.0f, 16.0f, 8.0f, 8.0f}, 4.0f);
-        walk.step_fixed(1, 0, false, 1.0f / 60.0f);
-        run.step_fixed(1, 0, true, 1.0f / 60.0f);
-        QVERIFY(run.player().x > walk.player().x);
-    }
-
-    void ctor_com_tuning_define_velocidade() {
-        // O ctor que recebe OverworldTuning deve respeitar a velocidade dele.
-        TileGrid g = make_map();
-        OverworldTuning t;
-        t.walk_speed_tiles_per_sec = 4.0f;
-        OverworldSim sim(g, Aabb{16.0f, 16.0f, 8.0f, 8.0f}, t);
-        float x0 = sim.player().x;
-        sim.step_fixed(1, 0, false, 1.0f / 60.0f);
-        QVERIFY(sim.player().x > x0);
-    }
-
-    void corner_assist_ligado_contorna_quina() {
-        // Tile 16. Parede so na celula (1,0); abertura em (1,1). Jogador 8x8
-        // levemente desalinhado (4 u na faixa da parede), indo para a direita.
-        // Com corner-assist (default LIGADO no tuning), deve ser empurrado pra
-        // baixo e contornar; sem ele, travaria.
-        TileGrid g = TileGrid::from_rows({
-            ".#.",
-            "...",
-        }, 16.0f);
-        OverworldTuning on;  // corner.enabled = true (default)
-        OverworldSim sim_on(g, Aabb{8.0f, 12.0f, 8.0f, 8.0f}, on);
-        // velocidade alta pra o passo cruzar a quina num tick.
-        on.walk_speed_tiles_per_sec = 8.0f;
-        OverworldSim sim_on2(g, Aabb{8.0f, 12.0f, 8.0f, 8.0f}, on);
-        sim_on2.step_fixed(1, 0, false, 1.0f / 60.0f);
-        QVERIFY(sim_on2.player().y > 12.0f);  // empurrado para a abertura (baixo)
-
-        OverworldTuning off;
-        off.walk_speed_tiles_per_sec = 8.0f;
-        off.corner.enabled = false;
-        OverworldSim sim_off(g, Aabb{8.0f, 12.0f, 8.0f, 8.0f}, off);
-        sim_off.step_fixed(1, 0, false, 1.0f / 60.0f);
-        QVERIFY(qAbs(sim_off.player().y - 12.0f) < kEps);  // sem assist: nao empurra
-    }
-
-    void normalize_diagonal_iguala_velocidade_a_cardinal() {
-        // Campo aberto. Com normalize_diagonal=true, a distancia percorrida na
-        // diagonal (1,1) deve igualar a de um eixo so (modulo do vetor = 1), nao
-        // ~1.41x. Comparo o deslocamento total.
-        TileGrid g(9, 9, 16.0f);
-        OverworldTuning norm;
-        norm.normalize_diagonal = true;
-        norm.walk_speed_tiles_per_sec = 4.0f;
-
-        OverworldSim card(g, Aabb{64.0f, 64.0f, 8.0f, 8.0f}, norm);
-        OverworldSim diag(g, Aabb{64.0f, 64.0f, 8.0f, 8.0f}, norm);
-        card.step_fixed(1, 0, false, 1.0f / 60.0f);
-        diag.step_fixed(1, 1, false, 1.0f / 60.0f);
-
-        const float card_dx = card.player().x - 64.0f;  // deslocamento cardinal
-        const float diag_dx = diag.player().x - 64.0f;
-        const float diag_dy = diag.player().y - 64.0f;
-        const float diag_len = std::sqrt(diag_dx * diag_dx + diag_dy * diag_dy);
-        // Normalizada: o COMPRIMENTO do passo diagonal == o passo cardinal.
-        QVERIFY(qAbs(diag_len - card_dx) < 1e-3f);
-    }
-
-    void diagonal_crua_por_padrao_anda_mais_que_cardinal() {
-        // Sem normalizar (default): a diagonal cobre ~1.41x o eixo unico.
-        TileGrid g(9, 9, 16.0f);
-        OverworldTuning raw;  // normalize_diagonal = false (default)
-        raw.walk_speed_tiles_per_sec = 4.0f;
-        OverworldSim card(g, Aabb{64.0f, 64.0f, 8.0f, 8.0f}, raw);
-        OverworldSim diag(g, Aabb{64.0f, 64.0f, 8.0f, 8.0f}, raw);
-        card.step_fixed(1, 0, false, 1.0f / 60.0f);
-        diag.step_fixed(1, 1, false, 1.0f / 60.0f);
-        const float card_dx = card.player().x - 64.0f;
-        const float diag_dx = diag.player().x - 64.0f;
-        QVERIFY(qAbs(diag_dx - card_dx) < kEps);  // cada eixo igual ao cardinal
-        // logo o comprimento diagonal ~ 1.41x (mais rapido) - comportamento atual.
-    }
-
-    // --- integracao do SPRITE no render --------------------------------------
-
-    // Helper: monta um PlayerSpriteSet com handles fake validos (1..) distintos
-    // por (direcao, papel), pra inspecionar qual textura o render escolheu.
-    static PlayerSpriteSet make_fake_sprites() {
-        PlayerSpriteSet s;
-        TextureId next = 1;
-        for (int d = 0; d < gus::app::screens::kDirectionCount; ++d) {
-            s.idle[d] = next++;
-            for (int f = 0; f < kWalkFrameCount; ++f) {
-                s.walk[d][f] = next++;
-            }
-        }
-        return s;
-    }
-
-    void sem_sprites_desenha_contorno_fallback() {
-        // Sem set_player_sprites: mantem o contorno (caminho headless/sem arte).
-        TileGrid g = make_map();
-        OverworldSim sim(g, Aabb{36.0f, 36.0f, 8.0f, 8.0f}, 4.0f);
-        FakeRenderer r;
-        sim.render(r, 80.0f, 80.0f, 0.0f);
-        QVERIFY(r.player_cmd() != nullptr);  // contorno do jogador presente
-        QVERIFY(r.sprites.empty());          // nenhum sprite texturizado
-    }
-
-    void com_sprites_desenha_textura_e_nao_contorno() {
-        TileGrid g = make_map();
-        OverworldSim sim(g, Aabb{36.0f, 36.0f, 8.0f, 8.0f}, 4.0f);
-        sim.set_player_sprites(make_fake_sprites());
-        FakeRenderer r;
-        sim.render(r, 80.0f, 80.0f, 0.0f);
-        QCOMPARE(static_cast<int>(r.sprites.size()), 1);  // 1 sprite do jogador
-        QVERIFY(r.player_cmd() == nullptr);               // sem contorno (so paredes)
-    }
-
-    void parado_usa_o_sprite_neutro_da_direcao() {
-        TileGrid g = make_map();
-        OverworldSim sim(g, Aabb{36.0f, 36.0f, 8.0f, 8.0f}, 4.0f);
-        PlayerSpriteSet s = make_fake_sprites();
-        sim.set_player_sprites(s);
-        sim.step_fixed(0, 0, false, 1.0f / 60.0f);  // parado: direcao default Sul
-        FakeRenderer r;
-        sim.render(r, 80.0f, 80.0f, 1.0f);
-        QCOMPARE(static_cast<int>(r.sprites.size()), 1);
-        // Sul = idle[South], pois parado -> quadro neutro.
-        QCOMPARE(r.sprites[0].texture, s.idle[static_cast<int>(Direction::South)]);
-    }
-
-    void direcao_muda_o_sprite_escolhido() {
-        TileGrid g = make_map();
-        OverworldSim sim(g, Aabb{36.0f, 36.0f, 8.0f, 8.0f}, 4.0f);
-        PlayerSpriteSet s = make_fake_sprites();
-        sim.set_player_sprites(s);
-        // Anda para a esquerda: facing = Oeste.
+TEST_CASE("overworld: nao atravessa a borda do mapa", "[overworld]") {
+    TileGrid g = make_map();
+    OverworldSim sim(g, Aabb{16.0f, 16.0f, 8.0f, 8.0f}, 8.0f);
+    for (int i = 0; i < 10; ++i) {
         sim.step_fixed(-1, 0, false, 1.0f / 60.0f);
-        QCOMPARE(sim.facing(), Direction::West);
-        FakeRenderer r;
-        sim.render(r, 80.0f, 80.0f, 1.0f);
-        // Andando -> quadro de walk de Oeste (um dos walk[West][*]), nao idle.
-        const TextureId t = r.sprites[0].texture;
-        bool is_west_walk = false;
-        for (int f = 0; f < kWalkFrameCount; ++f) {
-            if (t == s.walk[static_cast<int>(Direction::West)][f]) {
-                is_west_walk = true;
-            }
-        }
-        QVERIFY(is_west_walk);
     }
+    REQUIRE(sim.player().x >= 16.0f - kEps);
+}
 
-    void sprite_ancorado_nos_pes_e_maior_que_a_aabb() {
-        // O sprite e ~N tiles de altura, centrado em X sobre a AABB, com a BASE
-        // alinhada a base da AABB (pes). Logo: mais alto que a AABB, e o topo do
-        // sprite fica ACIMA do topo da AABB (corpo vaza pra cima).
-        TileGrid g = make_map();  // tile 16
-        OverworldSim sim(g, Aabb{36.0f, 36.0f, 8.0f, 8.0f}, 4.0f);
-        sim.set_player_sprites(make_fake_sprites());
-        FakeRenderer r;
-        sim.render(r, 80.0f, 80.0f, 1.0f);
-        const Rect sr = r.sprites[0].rect;
-        const Rect aabb{36.0f, 36.0f, 8.0f, 8.0f};
-        QVERIFY(sr.h > aabb.h);                                  // mais alto que a hitbox
-        QVERIFY(qAbs((sr.y + sr.h) - (aabb.y + aabb.h)) < kEps); // base alinhada (pes)
-        QVERIFY(sr.y < aabb.y);                                  // topo vaza pra cima
-        const float sr_cx = sr.x + sr.w * 0.5f;
-        const float aabb_cx = aabb.x + aabb.w * 0.5f;
-        QVERIFY(qAbs(sr_cx - aabb_cx) < kEps);                   // centrado em X
+TEST_CASE("overworld: camera segue o jogador presa ao mapa", "[overworld]") {
+    TileGrid g = make_map();
+    OverworldSim sim(g, Aabb{36.0f, 36.0f, 8.0f, 8.0f}, 4.0f);
+    CameraView v = sim.camera_view(40.0f, 40.0f);
+    REQUIRE_THAT(v.center.x, WithinAbs(40.0, kEps));
+    REQUIRE_THAT(v.center.y, WithinAbs(40.0, kEps));
+    REQUIRE_THAT(v.rect.x, WithinAbs(20.0, kEps));
+}
+
+TEST_CASE("overworld: camera clampa na borda", "[overworld]") {
+    TileGrid g = make_map();
+    OverworldSim sim(g, Aabb{16.0f, 16.0f, 8.0f, 8.0f}, 4.0f);
+    CameraView v = sim.camera_view(40.0f, 40.0f);
+    REQUIRE(v.rect.x >= -kEps);
+    REQUIRE(v.rect.y >= -kEps);
+}
+
+TEST_CASE("overworld: render emite paredes e jogador", "[overworld]") {
+    TileGrid g = make_map();
+    OverworldSim sim(g, Aabb{36.0f, 36.0f, 8.0f, 8.0f}, 4.0f);
+    FakeRenderer r;
+    sim.render(r, 80.0f, 80.0f, 0.0f);
+    REQUIRE(r.begins == 1);
+    REQUIRE(r.ends == 1);
+    REQUIRE(r.filled_count() == 17);  // 16 borda + 1 bloco interno
+    REQUIRE(r.player_cmd() != nullptr);
+}
+
+TEST_CASE("overworld: render interpola posicao do jogador", "[overworld]") {
+    TileGrid g = make_map();
+    OverworldSim sim(g, Aabb{16.0f, 16.0f, 8.0f, 8.0f}, 60.0f);
+    float xprev = sim.player().x;
+    sim.step_fixed(1, 0, false, 1.0f / 60.0f);
+    float xcurr = sim.player().x;
+    REQUIRE(xcurr > xprev);
+
+    FakeRenderer r0;
+    sim.render(r0, 80.0f, 80.0f, 0.0f);
+    REQUIRE_THAT(r0.player_cmd()->rect.x, WithinAbs(xprev, kEps));
+
+    FakeRenderer r1;
+    sim.render(r1, 80.0f, 80.0f, 1.0f);
+    REQUIRE_THAT(r1.player_cmd()->rect.x, WithinAbs(xcurr, kEps));
+
+    FakeRenderer rh;
+    sim.render(rh, 80.0f, 80.0f, 0.5f);
+    float mid = (xprev + xcurr) * 0.5f;
+    REQUIRE_THAT(rh.player_cmd()->rect.x, WithinAbs(mid, kEps));
+}
+
+TEST_CASE("overworld: passo parado nao move", "[overworld]") {
+    TileGrid g = make_map();
+    OverworldSim sim(g, Aabb{36.0f, 36.0f, 8.0f, 8.0f}, 4.0f);
+    float x0 = sim.player().x;
+    float y0 = sim.player().y;
+    sim.step_fixed(0, 0, false, 1.0f / 60.0f);
+    REQUIRE_THAT(sim.player().x, WithinAbs(x0, kEps));
+    REQUIRE_THAT(sim.player().y, WithinAbs(y0, kEps));
+}
+
+TEST_CASE("overworld: run move mais que andar", "[overworld]") {
+    TileGrid g = make_map();
+    OverworldSim walk(g, Aabb{16.0f, 16.0f, 8.0f, 8.0f}, 4.0f);
+    OverworldSim run(g, Aabb{16.0f, 16.0f, 8.0f, 8.0f}, 4.0f);
+    walk.step_fixed(1, 0, false, 1.0f / 60.0f);
+    run.step_fixed(1, 0, true, 1.0f / 60.0f);
+    REQUIRE(run.player().x > walk.player().x);
+}
+
+TEST_CASE("overworld: ctor com tuning define velocidade", "[overworld]") {
+    TileGrid g = make_map();
+    OverworldTuning t;
+    t.walk_speed_tiles_per_sec = 4.0f;
+    OverworldSim sim(g, Aabb{16.0f, 16.0f, 8.0f, 8.0f}, t);
+    float x0 = sim.player().x;
+    sim.step_fixed(1, 0, false, 1.0f / 60.0f);
+    REQUIRE(sim.player().x > x0);
+}
+
+TEST_CASE("overworld: corner-assist ligado contorna a quina", "[overworld]") {
+    TileGrid g = TileGrid::from_rows({".#.", "..."}, 16.0f);
+    OverworldTuning on;  // corner.enabled = true (default)
+    on.walk_speed_tiles_per_sec = 8.0f;
+    OverworldSim sim_on(g, Aabb{8.0f, 12.0f, 8.0f, 8.0f}, on);
+    sim_on.step_fixed(1, 0, false, 1.0f / 60.0f);
+    REQUIRE(sim_on.player().y > 12.0f);  // empurrado para a abertura (baixo)
+
+    OverworldTuning off;
+    off.walk_speed_tiles_per_sec = 8.0f;
+    off.corner.enabled = false;
+    OverworldSim sim_off(g, Aabb{8.0f, 12.0f, 8.0f, 8.0f}, off);
+    sim_off.step_fixed(1, 0, false, 1.0f / 60.0f);
+    REQUIRE_THAT(sim_off.player().y, WithinAbs(12.0, kEps));  // sem assist
+}
+
+TEST_CASE("overworld: normalize_diagonal iguala velocidade a cardinal",
+          "[overworld]") {
+    TileGrid g(9, 9, 16.0f);
+    OverworldTuning norm;
+    norm.normalize_diagonal = true;
+    norm.walk_speed_tiles_per_sec = 4.0f;
+    OverworldSim card(g, Aabb{64.0f, 64.0f, 8.0f, 8.0f}, norm);
+    OverworldSim diag(g, Aabb{64.0f, 64.0f, 8.0f, 8.0f}, norm);
+    card.step_fixed(1, 0, false, 1.0f / 60.0f);
+    diag.step_fixed(1, 1, false, 1.0f / 60.0f);
+    const float card_dx = card.player().x - 64.0f;
+    const float diag_dx = diag.player().x - 64.0f;
+    const float diag_dy = diag.player().y - 64.0f;
+    const float diag_len = std::sqrt(diag_dx * diag_dx + diag_dy * diag_dy);
+    REQUIRE_THAT(diag_len, WithinAbs(card_dx, 1e-3));
+}
+
+TEST_CASE("overworld: diagonal crua por padrao anda mais que cardinal",
+          "[overworld]") {
+    TileGrid g(9, 9, 16.0f);
+    OverworldTuning raw;  // normalize_diagonal = false (default)
+    raw.walk_speed_tiles_per_sec = 4.0f;
+    OverworldSim card(g, Aabb{64.0f, 64.0f, 8.0f, 8.0f}, raw);
+    OverworldSim diag(g, Aabb{64.0f, 64.0f, 8.0f, 8.0f}, raw);
+    card.step_fixed(1, 0, false, 1.0f / 60.0f);
+    diag.step_fixed(1, 1, false, 1.0f / 60.0f);
+    const float card_dx = card.player().x - 64.0f;
+    const float diag_dx = diag.player().x - 64.0f;
+    REQUIRE_THAT(diag_dx, WithinAbs(card_dx, kEps));
+}
+
+// --- integracao do SPRITE no render ------------------------------------------
+
+TEST_CASE("overworld: sem sprites desenha contorno fallback", "[overworld]") {
+    TileGrid g = make_map();
+    OverworldSim sim(g, Aabb{36.0f, 36.0f, 8.0f, 8.0f}, 4.0f);
+    FakeRenderer r;
+    sim.render(r, 80.0f, 80.0f, 0.0f);
+    REQUIRE(r.player_cmd() != nullptr);
+    REQUIRE(r.sprites.empty());
+}
+
+TEST_CASE("overworld: com sprites desenha textura e nao contorno", "[overworld]") {
+    TileGrid g = make_map();
+    OverworldSim sim(g, Aabb{36.0f, 36.0f, 8.0f, 8.0f}, 4.0f);
+    sim.set_player_sprites(make_fake_sprites());
+    FakeRenderer r;
+    sim.render(r, 80.0f, 80.0f, 0.0f);
+    REQUIRE(static_cast<int>(r.sprites.size()) == 1);
+    REQUIRE(r.player_cmd() == nullptr);
+}
+
+TEST_CASE("overworld: parado usa o sprite neutro da direcao", "[overworld]") {
+    TileGrid g = make_map();
+    OverworldSim sim(g, Aabb{36.0f, 36.0f, 8.0f, 8.0f}, 4.0f);
+    PlayerSpriteSet s = make_fake_sprites();
+    sim.set_player_sprites(s);
+    sim.step_fixed(0, 0, false, 1.0f / 60.0f);  // parado: direcao default Sul
+    FakeRenderer r;
+    sim.render(r, 80.0f, 80.0f, 1.0f);
+    REQUIRE(static_cast<int>(r.sprites.size()) == 1);
+    REQUIRE(r.sprites[0].texture == s.idle[static_cast<int>(Direction::South)]);
+}
+
+TEST_CASE("overworld: direcao muda o sprite escolhido", "[overworld]") {
+    TileGrid g = make_map();
+    OverworldSim sim(g, Aabb{36.0f, 36.0f, 8.0f, 8.0f}, 4.0f);
+    PlayerSpriteSet s = make_fake_sprites();
+    sim.set_player_sprites(s);
+    sim.step_fixed(-1, 0, false, 1.0f / 60.0f);
+    REQUIRE(sim.facing() == Direction::West);
+    FakeRenderer r;
+    sim.render(r, 80.0f, 80.0f, 1.0f);
+    const TextureId t = r.sprites[0].texture;
+    bool is_west_walk = false;
+    for (int f = 0; f < kWalkFrameCount; ++f) {
+        if (t == s.walk[static_cast<int>(Direction::West)][f]) is_west_walk = true;
     }
+    REQUIRE(is_west_walk);
+}
 
-    void quadro_de_walk_avanca_com_a_distancia() {
-        // Andando o suficiente, o quadro de walk avanca (sai do 0). Velocidade
-        // alta + varios passos garantem cruzar varios "passos de troca" de 8 px.
-        TileGrid g(20, 20, 16.0f);
-        OverworldSim sim(g, Aabb{64.0f, 64.0f, 8.0f, 8.0f}, 8.0f);
-        sim.set_player_sprites(make_fake_sprites());
-        for (int i = 0; i < 30; ++i) {
-            sim.step_fixed(1, 0, false, 1.0f / 60.0f);
-        }
-        QVERIFY(sim.walk_cycle().is_moving());
-        const int f = sim.walk_cycle().current_frame();
-        QVERIFY(f >= 0 && f < kWalkFrameCount);
+TEST_CASE("overworld: sprite ancorado nos pes e maior que a aabb", "[overworld]") {
+    TileGrid g = make_map();  // tile 16
+    OverworldSim sim(g, Aabb{36.0f, 36.0f, 8.0f, 8.0f}, 4.0f);
+    sim.set_player_sprites(make_fake_sprites());
+    FakeRenderer r;
+    sim.render(r, 80.0f, 80.0f, 1.0f);
+    const Rect sr = r.sprites[0].rect;
+    const Rect aabb{36.0f, 36.0f, 8.0f, 8.0f};
+    REQUIRE(sr.h > aabb.h);
+    REQUIRE_THAT((sr.y + sr.h) - (aabb.y + aabb.h), WithinAbs(0.0, kEps));
+    REQUIRE(sr.y < aabb.y);
+    const float sr_cx = sr.x + sr.w * 0.5f;
+    const float aabb_cx = aabb.x + aabb.w * 0.5f;
+    REQUIRE_THAT(sr_cx - aabb_cx, WithinAbs(0.0, kEps));
+}
+
+TEST_CASE("overworld: quadro de walk avanca com a distancia", "[overworld]") {
+    TileGrid g(20, 20, 16.0f);
+    OverworldSim sim(g, Aabb{64.0f, 64.0f, 8.0f, 8.0f}, 8.0f);
+    sim.set_player_sprites(make_fake_sprites());
+    for (int i = 0; i < 30; ++i) {
+        sim.step_fixed(1, 0, false, 1.0f / 60.0f);
     }
-};
-
-QTEST_MAIN(OverworldSimTest)
-#include "overworld_sim_test.moc"
+    REQUIRE(sim.walk_cycle().is_moving());
+    const int f = sim.walk_cycle().current_frame();
+    REQUIRE(f >= 0);
+    REQUIRE(f < kWalkFrameCount);
+}

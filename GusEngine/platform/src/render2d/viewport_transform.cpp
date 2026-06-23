@@ -1,11 +1,50 @@
 // gus/platform/src/render2d/viewport_transform.cpp
 //
-// Implementacao da projecao mundo -> NDC (M1). Ver header. Travado por
+// Implementacao da projecao mundo -> tela. Ver header. Travado por
 // platform/tests/viewport_transform_test.cpp (TEST-FIRST).
 
 #include "gus/platform/render2d/viewport_transform.hpp"
 
 namespace gus::platform::render2d {
+
+ScreenPoint world_to_screen(float world_x, float world_y,
+                            const gus::core::spatial::Rect& cam_rect,
+                            int viewport_px_w, int viewport_px_h) noexcept {
+    ScreenPoint p;
+
+    // X: normaliza [cam.x, cam.x+cam.w] -> [0, viewport_px_w].
+    if (cam_rect.w > 0.0f) {
+        p.x = (world_x - cam_rect.x) / cam_rect.w * static_cast<float>(viewport_px_w);
+    } else {
+        p.x = 0.0f;  // camera degenerada: nao divide por zero
+    }
+
+    // Y: normaliza [cam.y, cam.y+cam.h] -> [0, viewport_px_h]. SEM inversao: mundo
+    // +Y e baixo, tela +Y e baixo (SDL_Renderer). Topo do mundo -> y=0.
+    if (cam_rect.h > 0.0f) {
+        p.y = (world_y - cam_rect.y) / cam_rect.h * static_cast<float>(viewport_px_h);
+    } else {
+        p.y = 0.0f;
+    }
+
+    return p;
+}
+
+QuadScreen build_quad_screen(const gus::core::spatial::Rect& world_rect,
+                             const gus::core::spatial::Rect& cam_rect,
+                             int viewport_px_w, int viewport_px_h) noexcept {
+    const ScreenPoint tl = world_to_screen(world_rect.x, world_rect.y, cam_rect,
+                                           viewport_px_w, viewport_px_h);
+    const ScreenPoint br =
+        world_to_screen(world_rect.x + world_rect.w, world_rect.y + world_rect.h,
+                        cam_rect, viewport_px_w, viewport_px_h);
+    QuadScreen q;
+    q.x = tl.x;
+    q.y = tl.y;
+    q.w = br.x - tl.x;
+    q.h = br.y - tl.y;
+    return q;
+}
 
 NdcPoint world_to_ndc(float world_x, float world_y,
                       const gus::core::spatial::Rect& cam_rect) noexcept {

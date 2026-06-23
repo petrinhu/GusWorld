@@ -1,14 +1,13 @@
 // gus/platform/render2d/i_renderer.hpp
 //
-// IRenderer: interface de desenho 2D do M1. ABSTRACAO que isola o backend grafico
-// (Qt RHI hoje) do resto do jogo - o risco R1 do design (RHI e API semi-privada,
-// estabiliza por versao do Qt): trocar de backend deve ser ~1 arquivo, e nada
-// alem de platform/render2d/ enxerga QRhi. O app (OverworldSim) fala SO com esta
-// interface.
+// IRenderer: interface de desenho 2D. ABSTRACAO que isola o backend grafico
+// (SDL_Renderer hoje, via Render2dSdl; antes Qt RHI - ver ADR-008) do resto do
+// jogo: trocar de backend deve ser ~1 arquivo, e nada alem de platform/render2d/
+// enxerga SDL. O app (OverworldSim) fala SO com esta interface.
 //
-// HEADER limpo (sem <Q...>): usa tipos proprios (DrawColor + Rect de core/spatial),
-// pra que app/ e os testes consumam a interface sem arrastar Qt. A impl concreta
-// (Render2dRhi) vive no .cpp da camada platform/, que pode tocar QRhi.
+// HEADER limpo (sem <SDL...>): usa tipos proprios (DrawColor + Rect de
+// core/spatial), pra que app/ e os testes consumam a interface sem arrastar SDL. A
+// impl concreta (Render2dSdl) vive no .cpp da camada platform/, que pode tocar SDL.
 //
 // CONVENCAO: as coordenadas dos retangulos sao em unidades de MUNDO (nao pixels);
 // quem projeta para a tela e o renderer (via a camera passada em begin_frame e a

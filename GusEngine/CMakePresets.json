@@ -7,27 +7,23 @@
   },
   "vendor": {
     "gusworld.devops-sre/notes": {
-      "summary": "Presets do GusEngine (pivot C++/Qt6, marco M0). Mantidos pelo devops-sre.",
-      "qtPrefix": "CMAKE_PREFIX_PATH aponta para o Qt 6.8 LTS (6.8.3) instalado via aqtinstall.",
-      "qtLayout": "Layout padrao do aqtinstall: $HOME/Qt/6.8.3/gcc_64 (sobrescrevivel por env QT_ROOT_DIR).",
+      "summary": "Presets do GusEngine (pos repivot C++/SDL3, ADR-008). Mantidos pelo devops-sre.",
+      "deps": "SDL3 + RmlUi + Catch2 entram via FetchContent (pin de tag no CMakeLists.txt); NAO ha mais Qt/aqtinstall. Cacheados em build/<preset>/_deps.",
+      "sdlBuildDeps": "Compilar SDL3 do fonte exige libs -dev de X11/Wayland/GL (ver .forgejo/workflows/ci.yml). Local: dnf/apt instala libXcursor-devel/libXi-devel/libXtst-devel/etc.",
       "generator": "Gerador padrao: Ninja. Quem nao tem Ninja usa o preset linux-release-make (fallback Makefiles).",
-      "gitignore": "binaryDir fica em GusEngine/build/<preset>; precisa estar no .gitignore (ver relatorio)."
+      "gitignore": "binaryDir fica em GusEngine/build/<preset> (inclui _deps); ja no .gitignore."
     }
   },
   "configurePresets": [
     {
       "name": "linux-base",
       "hidden": true,
-      "description": "Base Linux: Qt 6.8 LTS, C++20, compile_commands. Nao usar direto.",
+      "description": "Base Linux: C++20, compile_commands. Nao usar direto.",
       "binaryDir": "${sourceDir}/build/${presetName}",
       "cacheVariables": {
-        "CMAKE_PREFIX_PATH": "$env{QT_ROOT_DIR}",
         "CMAKE_CXX_STANDARD": "20",
         "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
         "CMAKE_COLOR_DIAGNOSTICS": "ON"
-      },
-      "environment": {
-        "QT_ROOT_DIR": "$env{HOME}/Qt/6.8.3/gcc_64"
       },
       "condition": {
         "type": "equals",
@@ -79,18 +75,14 @@
     {
       "name": "windows-release",
       "hidden": true,
-      "displayName": "Windows Release (MSVC) - TODO M1+",
-      "description": "ESBOCO, ADIADO. Marcado hidden para nao aparecer ate validacao no Windows. Ver relatorio: faltam runner/toolchain Windows e ajuste do QT_ROOT_DIR (ex.: msvc2022_64).",
+      "displayName": "Windows Release (MSVC) - ADIADO",
+      "description": "ESBOCO, ADIADO ate haver runner Windows. Com SDL3 via FetchContent o setup e simples (toolchain MSVC + cmake; sem aqtinstall). Marcado hidden ate validacao no Windows.",
       "generator": "Ninja",
       "binaryDir": "${sourceDir}/build/${presetName}",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Release",
         "CMAKE_CXX_STANDARD": "20",
-        "CMAKE_PREFIX_PATH": "$env{QT_ROOT_DIR}",
         "CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
-      },
-      "environment": {
-        "QT_ROOT_DIR": "$env{USERPROFILE}/Qt/6.8.3/msvc2022_64"
       },
       "condition": {
         "type": "equals",

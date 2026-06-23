@@ -10,7 +10,10 @@ O código próprio do GusWorld está sob GPLv3 (ver [LICENSE](LICENSE)); os asse
 
 | Componente | Licença | Titular / fonte | Nota |
 |---|---|---|---|
-| Qt 6 | LGPLv3 (núcleo) + GPLv3 (alguns módulos) | The Qt Company / Qt Project | Alvo do pivot C++. Módulos GPL-only ficam OK (jogo todo é GPLv3). Disponibilizar o source do Qt usado. |
+| Qt 6 | LGPLv3 (núcleo) + GPLv3 (alguns módulos) | The Qt Company / Qt Project | Camada de plataforma da Fase 1 do pivot; SUBSTITUIDA por SDL3 no re-pivot (ADR-008). Sai do projeto conforme as fases SDL fecharem. |
+| SDL3 | zlib | SDL / Sam Lantinga e contribuidores | Camada de plataforma atual (ADR-008). Via FetchContent (release-3.4.10), link estatico. |
+| RmlUi | MIT | mikke89 e contribuidores | UI do jogador (Fase 3 do re-pivot). Via FetchContent (6.2); ainda nao usada. |
+| Dear ImGui | MIT | Omar Cornut (ocornut) e contribuidores | UI de debug/dev (futuro). |
 | Godot Engine | MIT | Juan Linietsky, Ariel Manzur e contribuidores | Engine da fase de transição (pre-pivot). |
 | DialogueManager (addon) | MIT | Copyright (c) 2022-present Nathan Hoad | Addon Godot de diálogo. |
 | Fontes Noto | SIL OFL 1.1 | Google e contribuidores | <https://openfontlicense.org> |
