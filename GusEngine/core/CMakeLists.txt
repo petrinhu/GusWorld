@@ -19,6 +19,7 @@ add_library(gusengine_core STATIC
     src/spatial/grid_collision.cpp
     src/spatial/camera_clamp.cpp
     src/time/fixed_timestep.cpp
+    src/anim/anim_clock.cpp
 )
 
 target_include_directories(gusengine_core

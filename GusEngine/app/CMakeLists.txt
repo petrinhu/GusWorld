@@ -10,6 +10,8 @@ add_library(gusengine_app STATIC
     src/screens/overworld_sim.cpp
     src/screens/sprite_animation.cpp
     src/screens/player_sprites_loader.cpp
+    src/screens/anim_catalog.cpp
+    src/screens/anim_preview.cpp
     src/sdl_window.cpp
 )
 

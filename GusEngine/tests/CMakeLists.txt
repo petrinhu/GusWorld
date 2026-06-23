@@ -16,6 +16,7 @@ add_executable(gusengine_core_tests
     corner_assist_test.cpp
     camera_clamp_test.cpp
     fixed_timestep_test.cpp
+    anim_clock_test.cpp
 )
 
 target_link_libraries(gusengine_core_tests

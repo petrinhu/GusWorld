@@ -24,6 +24,7 @@
 #include <string_view>
 
 #include "gus/app/sdl_window.hpp"
+#include "gus/app/screens/anim_preview.hpp"
 #include "gus/app/screens/overworld_sim.hpp"
 #include "gus/app/screens/player_sprites_loader.hpp"
 #include "gus/app/screens/test_overworld.hpp"
@@ -36,6 +37,18 @@ namespace {
 
 // Parseia "--smoke" ou "--smoke=N". Devolve true se o modo smoke foi pedido e
 // escreve o numero de ticks em out_ticks (default 120). N invalido/ausente -> 120.
+// True se "--anim-preview" estiver entre os argumentos. Modo VIEWER: abre uma
+// janela que mostra as animacoes do Gus em loop (catalogo varrido em runtime),
+// pro lider VER a arte rodando na nossa engine. Reusa o mesmo backend (Render2dSdl).
+bool parse_anim_preview(int argc, char** argv) {
+    for (int i = 1; i < argc; ++i) {
+        if (std::string_view(argv[i]) == "--anim-preview") {
+            return true;
+        }
+    }
+    return false;
+}
+
 bool parse_smoke(int argc, char** argv, int& out_ticks) {
     out_ticks = 120;
     for (int i = 1; i < argc; ++i) {
@@ -96,6 +109,11 @@ int run_smoke(int ticks) {
 }  // namespace
 
 int main(int argc, char* argv[]) {
+    // Modo VIEWER de animacao: --anim-preview. Cuida do proprio SDL_Init/Quit.
+    if (parse_anim_preview(argc, argv)) {
+        return gus::app::screens::run_anim_preview();
+    }
+
     int ticks = 0;
     const bool smoke = parse_smoke(argc, argv, ticks);
 
