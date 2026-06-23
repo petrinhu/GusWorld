@@ -39,16 +39,48 @@ inline constexpr int kDirectionCount = 4;
 // neutro (idle) e um sprite a parte; aqui sao so os quadros de PASSO.
 inline constexpr int kWalkFrameCount = 4;
 
+// POLITICA de qual eixo manda o "olhar" do boneco na DIAGONAL (ambos dx,dy != 0).
+// O lider escolhe via OverworldTuning (ponto unico de feel). Cardinal puro nunca
+// depende disto. Default do tuning = LastAxisWins (pedido do lider: andar pro lado
+// e acionar Norte/Sul faz o boneco VIRAR pra Norte/Sul, e vice-versa).
+enum class DiagonalFacing {
+    // Leste/Oeste sempre ganham na diagonal (regra LEGADA do M1).
+    HorizontalWins = 0,
+    // Norte/Sul sempre ganham na diagonal.
+    VerticalWins = 1,
+    // Vence o eixo RECEM-acionado, decidido pela MEMORIA DO INPUT (dx_prev,dy_prev),
+    // NAO pela direcao anterior: se o vertical acabou de entrar (dy != 0, dy_prev == 0),
+    // vira pro vertical; se o horizontal acabou de entrar, vira pro horizontal. Com
+    // as duas teclas SUSTENTADAS (nada recem-acionado), MANTEM prev se ele ja for um
+    // dos eixos da diagonal (estavel, sem flicker); senao cai no vertical da diagonal.
+    // ATENCAO: a sobrecarga SEM memoria de input (dx_prev/dy_prev) deriva esta
+    // politica do facing anterior e por isso OSCILA na diagonal sustentada; prefira a
+    // sobrecarga de 6 args quando a politica for LastAxisWins.
+    LastAxisWins = 2,
+};
+
 // Escolhe a direcao cardinal dominante a partir de um vetor de movimento cardinal
 // cru (dx,dy em {-1,0,1}). REGRAS (documentadas e cobertas por teste):
 //   - parado (0,0): MANTEM prev (a ultima direcao; idle nao gira o boneco);
 //   - cardinal puro: a propria direcao;
-//   - DIAGONAL (ambos != 0): criterio = HORIZONTAL vence (Leste/Oeste tem
-//     prioridade sobre Sul/Norte). Escolha deliberada: no top-down a leitura do
-//     perfil lateral (onde o aparato lateral aparece, Pillar 3) e a mais legivel;
-//     empate resolvido sempre pra horizontal. Ajustavel se o lider preferir
-//     vertical-vence ou "manter a anterior na diagonal".
+//   - DIAGONAL (ambos != 0): resolvida pela DiagonalFacing escolhida.
+//
+// Sobrecargas:
+//   - (dx,dy,prev): comportamento LEGADO (HorizontalWins), pra nao quebrar chamadas
+//     antigas;
+//   - (dx,dy,prev,policy): a politica decide a diagonal. Para LastAxisWins, deriva o
+//     eixo "novo" do facing anterior - aproximacao SEM historico de teclas, que pode
+//     OSCILAR numa diagonal sustentada;
+//   - (dx,dy,dx_prev,dy_prev,prev,policy): a forma CORRETA para LastAxisWins. Usa a
+//     MEMORIA DO INPUT do tick anterior pra detectar o eixo recem-acionado e fica
+//     ESTAVEL (sem flicker) enquanto as duas teclas seguem apertadas. VerticalWins e
+//     HorizontalWins ignoram dx_prev/dy_prev (resultado identico a sobrecarga de 4).
 [[nodiscard]] Direction direction_from_move(int dx, int dy, Direction prev) noexcept;
+[[nodiscard]] Direction direction_from_move(int dx, int dy, Direction prev,
+                                            DiagonalFacing policy) noexcept;
+[[nodiscard]] Direction direction_from_move(int dx, int dy, int dx_prev, int dy_prev,
+                                            Direction prev,
+                                            DiagonalFacing policy) noexcept;
 
 // Ciclo de walk dirigido por DISTANCIA. Acumula a distancia andada e, a cada
 // "passo de troca" (px por quadro), avanca um quadro ciclico em [0, kWalkFrameCount).

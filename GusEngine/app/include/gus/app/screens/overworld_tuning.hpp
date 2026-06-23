@@ -22,6 +22,7 @@
 #ifndef GUS_APP_SCREENS_OVERWORLD_TUNING_HPP
 #define GUS_APP_SCREENS_OVERWORLD_TUNING_HPP
 
+#include "gus/app/screens/sprite_animation.hpp"  // DiagonalFacing
 #include "gus/core/spatial/grid_collision.hpp"  // CornerAssistOptions
 #include "gus/platform/render2d/i_renderer.hpp"  // DrawColor
 
@@ -40,6 +41,15 @@ struct OverworldTuning {
     //   true:         normaliza, deixando a diagonal com a MESMA velocidade das
     //                 cardinais. So virar a flag - o OverworldSim ja le isto.
     bool normalize_diagonal = false;
+
+    // --- OLHAR NA DIAGONAL (qual direcao o sprite mostra) ------------------
+    // BUG-FIX (lider 2026-06-22): andando pro lado e acionando Norte/Sul, o boneco
+    // nao virava (regra antiga = horizontal sempre vence). LastAxisWins faz o
+    // boneco VIRAR pro eixo recem-acionado: lado + W/S -> vira N/S; N/S + A/D ->
+    // vira pro lado. O lider troca aqui se preferir:
+    //   DiagonalFacing::VerticalWins    -> Norte/Sul sempre ganham na diagonal;
+    //   DiagonalFacing::HorizontalWins  -> regra legada (lado sempre ganha).
+    DiagonalFacing diagonal_facing = DiagonalFacing::LastAxisWins;
 
     // --- COLISAO (corner-correction) --------------------------------------
     // Corner-assist (Stardew/Zelda): escorrega na quina quando ha abertura.
@@ -68,6 +78,17 @@ struct OverworldTuning {
     // os pes; o corpo+cabeca "vazam" pra cima). Largura derivada da proporcao do
     // PNG (quadrado 68x68 -> mesma altura). Ajustavel pelo lider.
     float player_sprite_height_tiles = 2.75f;
+
+    // AJUSTE FINO da ancoragem dos pes (M1-BUG.SUL, lider 2026-06-22). O grosso e
+    // AUTOMATICO: o jogo MEDE a sobra transparente embaixo de cada sprite (alpha-bbox
+    // no load) e desce o desenho ate o PE REAL encostar na base da hitbox - por
+    // personagem/direcao, sem numero magico (ver player_sprites_loader + sprite_anchor).
+    // Este offset (em TILES) e SOMADO POR CIMA do automatico, so pra refino a gosto:
+    // >0 afunda mais (desce a base), <0 levanta. Default 0 = so o automatico (ja cola
+    // o pe). NAO mexe na colisao, so no desenho. (Alavancas-irma: player_sprite_height_tiles,
+    // ou a altura da hitbox em test_overworld.hpp / kTestPlayerStart.) NAO ha dois
+    // mecanismos concorrentes: automatico = base; manual = ajuste somado.
+    float sprite_foot_offset_tiles = 0.0f;
 
     // Px de mundo percorridos por troca de quadro do walk (~8 px no tile 16,
     // locomotion.md). Run usa passada mais longa (run_px_per_frame). Escalavel.

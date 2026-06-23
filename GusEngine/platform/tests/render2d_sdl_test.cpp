@@ -16,6 +16,7 @@
 #include "gus/platform/render2d/render2d_sdl.hpp"
 
 using gus::core::spatial::Rect;
+using gus::platform::render2d::ContentBbox;
 using gus::platform::render2d::DrawColor;
 using gus::platform::render2d::kInvalidTexture;
 using gus::platform::render2d::Render2dSdl;
@@ -52,6 +53,21 @@ TEST_CASE("Render2dSdl headless: sprite invalido nao desenha nada",
                          DrawColor{1.0f, 1.0f, 1.0f, 1.0f});
     r.end_frame();
     REQUIRE(r.last_draw_count() == 0);
+}
+
+TEST_CASE("Render2dSdl headless: texture_content_bbox degrada para invalido",
+          "[render2d_sdl]") {
+    Render2dSdl r(nullptr);
+    // Sem renderer, nenhuma textura e criada e nenhum PNG e decodificado: o bbox e
+    // invalido (valid()==false, bottom_margin()==0) e o anchor cai no comportamento
+    // legado. Tambem para o sentinela invalido e handles fora de faixa.
+    const ContentBbox b0 = r.texture_content_bbox(kInvalidTexture);
+    REQUIRE_FALSE(b0.valid());
+    REQUIRE(b0.bottom_margin() == 0);
+    const ContentBbox b1 = r.texture_content_bbox(r.load_texture("x.png"));
+    REQUIRE_FALSE(b1.valid());  // load_texture devolveu invalido (headless)
+    const ContentBbox b2 = r.texture_content_bbox(9999);  // fora de faixa
+    REQUIRE_FALSE(b2.valid());
 }
 
 TEST_CASE("Render2dSdl frame vazio e valido (zero draws)", "[render2d_sdl]") {

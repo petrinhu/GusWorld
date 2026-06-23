@@ -73,6 +73,11 @@ public:
                             const UvRect& uv, const DrawColor& /*tint*/) override {
         sprites.push_back({world_rect, texture, uv});
     }
+    // Headless: sem decode de PNG, devolve sempre um bbox invalido (anchor legado).
+    gus::platform::render2d::ContentBbox texture_content_bbox(
+        TextureId /*texture*/) const override {
+        return gus::platform::render2d::ContentBbox{};
+    }
     void end_frame() override { ++ends; }
 
     int begins = 0;
@@ -342,6 +347,143 @@ TEST_CASE("overworld: sprite ancorado nos pes e maior que a aabb", "[overworld]"
     const float sr_cx = sr.x + sr.w * 0.5f;
     const float aabb_cx = aabb.x + aabb.w * 0.5f;
     REQUIRE_THAT(sr_cx - aabb_cx, WithinAbs(0.0, kEps));
+}
+
+TEST_CASE("overworld: ancoragem AUTOMATICA desce o desenho pela margem medida",
+          "[overworld]") {
+    // M1-BUG.SUL: a margem inferior transparente MEDIDA do sprite (FootInset, vinda
+    // do alpha-bbox no loader) desce o CANVAS pra o PE REAL encostar na base da AABB.
+    // Aqui injetamos a fracao direto (sem renderer/PNG): o render deve baixar a base
+    // do canvas por fracao*sprite_h, e o pe (canvas - margem) cair sobre a base AABB.
+    TileGrid g = make_map();  // tile 16
+    const Aabb start{36.0f, 36.0f, 8.0f, 8.0f};
+    OverworldTuning base;  // sprite_foot_offset_tiles default 0 (so o automatico)
+
+    // Sem margem (referencia): base do canvas == base da AABB.
+    OverworldSim s0(g, start, base);
+    s0.set_player_sprites(make_fake_sprites());
+    FakeRenderer r0;
+    s0.render(r0, 80.0f, 80.0f, 1.0f);
+    const Rect ref = r0.sprites[0].rect;
+    REQUIRE_THAT((ref.y + ref.h) - (start.y + start.h), WithinAbs(0.0, kEps));
+
+    // Com margem medida (ex.: 0.16 do canvas no Sul). Parado => direcao Sul (default).
+    PlayerSpriteSet s = make_fake_sprites();
+    const float frac = 11.0f / 68.0f;  // caso medido do Caua south
+    s.foot.bottom_fraction[static_cast<int>(Direction::South)] = frac;
+    OverworldSim s1(g, start, base);
+    s1.set_player_sprites(s);
+    FakeRenderer r1;
+    s1.render(r1, 80.0f, 80.0f, 1.0f);
+    const Rect sr = r1.sprites[0].rect;
+    const float foot_world = frac * sr.h;  // margem convertida pra mundo
+    // O canvas desceu: o PE REAL (canvas_bottom - margem) cai EXATO na base da AABB.
+    REQUIRE_THAT((sr.y + sr.h) - foot_world - (start.y + start.h),
+                 WithinAbs(0.0, kEps));
+    // E a base do canvas avancou pra DENTRO da parede (canvas_bottom > base AABB).
+    REQUIRE((sr.y + sr.h) > (start.y + start.h));
+    // Mesma altura do sprite (so a posicao vertical mudou).
+    REQUIRE_THAT(sr.h, WithinAbs(ref.h, kEps));
+}
+
+TEST_CASE("overworld: ajuste manual SOMA por cima do automatico", "[overworld]") {
+    // O automatico (FootInset medido) e o padrao; sprite_foot_offset_tiles e refino
+    // OPCIONAL somado por cima - nao um mecanismo concorrente. Aqui: mesma margem
+    // automatica, com e sem o ajuste manual; a diferenca = exatamente o ajuste.
+    TileGrid g = make_map();  // tile 16
+    const Aabb start{36.0f, 36.0f, 8.0f, 8.0f};
+    PlayerSpriteSet s = make_fake_sprites();
+    s.foot.bottom_fraction[static_cast<int>(Direction::South)] = 11.0f / 68.0f;
+
+    OverworldTuning autom;  // so automatico (offset 0)
+    OverworldSim sa(g, start, autom);
+    sa.set_player_sprites(s);
+    FakeRenderer ra;
+    sa.render(ra, 80.0f, 80.0f, 1.0f);
+    const float auto_bottom = ra.sprites[0].rect.y + ra.sprites[0].rect.h;
+
+    OverworldTuning manual = autom;
+    manual.sprite_foot_offset_tiles = 0.5f;  // +0.5 tile (8 u no tile 16) por cima
+    OverworldSim sm(g, start, manual);
+    sm.set_player_sprites(s);
+    FakeRenderer rm;
+    sm.render(rm, 80.0f, 80.0f, 1.0f);
+    const float manual_bottom = rm.sprites[0].rect.y + rm.sprites[0].rect.h;
+
+    // O manual desce exatamente 8 u ALEM do automatico (soma, nao substitui).
+    REQUIRE_THAT(manual_bottom - auto_bottom, WithinAbs(8.0, kEps));
+}
+
+TEST_CASE("overworld: sprite_foot_offset afunda/levanta a base do sprite",
+          "[overworld]") {
+    // BUG-FIX bug 1 (lider 2026-06-22): a base do sprite cai sobre a base da AABB
+    // por padrao (offset 0). O lider ajusta sprite_foot_offset_tiles pra alinhar os
+    // PES VISUAIS do desenho a hitbox sem mexer em codigo. offset > 0 desce a base
+    // (afunda os pes/encosta mais perto da parede de baixo); < 0 levanta.
+    TileGrid g = make_map();  // tile 16
+    const Aabb start{36.0f, 36.0f, 8.0f, 8.0f};
+
+    OverworldTuning base;  // sprite_foot_offset_tiles default 0
+    OverworldSim s0(g, start, base);
+    s0.set_player_sprites(make_fake_sprites());
+    FakeRenderer r0;
+    s0.render(r0, 80.0f, 80.0f, 1.0f);
+    const float base_bottom = r0.sprites[0].rect.y + r0.sprites[0].rect.h;
+    // Offset 0: base do sprite == base da AABB (comportamento preservado).
+    REQUIRE_THAT(base_bottom - (start.y + start.h), WithinAbs(0.0, kEps));
+
+    OverworldTuning off = base;
+    off.sprite_foot_offset_tiles = 0.5f;  // desce meia tile (8 u no tile 16)
+    OverworldSim s1(g, start, off);
+    s1.set_player_sprites(make_fake_sprites());
+    FakeRenderer r1;
+    s1.render(r1, 80.0f, 80.0f, 1.0f);
+    const float off_bottom = r1.sprites[0].rect.y + r1.sprites[0].rect.h;
+    // A base desceu exatamente 0.5 tile (8 u) em relacao ao default.
+    REQUIRE_THAT(off_bottom - base_bottom, WithinAbs(8.0, kEps));
+    // Largura/altura do sprite nao mudam (so a posicao vertical).
+    REQUIRE_THAT(r1.sprites[0].rect.h, WithinAbs(r0.sprites[0].rect.h, kEps));
+}
+
+TEST_CASE("overworld: diagonal sustentada nao OSCILA a direcao (anti-flicker)",
+          "[overworld]") {
+    // BUG do flicker (M1): segurar uma diagonal (D+W) fazia o facing alternar a cada
+    // tick (East->North->East...) porque a direcao era derivada do facing ANTERIOR.
+    // Com a memoria de INPUT (dx_prev,dy_prev) no sim, segurar a MESMA diagonal por
+    // N ticks tem que manter a MESMA direcao apos o primeiro tick que a aciona.
+    TileGrid g(20, 20, 16.0f);
+    OverworldTuning t;
+    t.walk_speed_tiles_per_sec = 4.0f;
+    t.diagonal_facing = gus::app::screens::DiagonalFacing::LastAxisWins;
+    OverworldSim sim(g, Aabb{64.0f, 64.0f, 8.0f, 8.0f}, t);
+    // 1) anda so pro lado um tick (estabelece dx_prev=1, dy_prev=0, facing=East).
+    sim.step_fixed(1, 0, false, 1.0f / 60.0f);
+    REQUIRE(sim.facing() == Direction::East);
+    // 2) adiciona W: o eixo vertical e o recem-acionado -> vira Norte.
+    sim.step_fixed(1, -1, false, 1.0f / 60.0f);
+    const Direction held = sim.facing();
+    REQUIRE(held == Direction::North);
+    // 3) segura a diagonal por varios ticks: NAO pode mais oscilar.
+    for (int i = 0; i < 20; ++i) {
+        sim.step_fixed(1, -1, false, 1.0f / 60.0f);
+        REQUIRE(sim.facing() == held);  // estavel, sem piscar
+    }
+}
+
+TEST_CASE("overworld: cima-depois-lado vira para o lado e fica estavel", "[overworld]") {
+    TileGrid g(20, 20, 16.0f);
+    OverworldTuning t;
+    t.walk_speed_tiles_per_sec = 4.0f;
+    t.diagonal_facing = gus::app::screens::DiagonalFacing::LastAxisWins;
+    OverworldSim sim(g, Aabb{64.0f, 64.0f, 8.0f, 8.0f}, t);
+    sim.step_fixed(0, -1, false, 1.0f / 60.0f);  // so pra cima
+    REQUIRE(sim.facing() == Direction::North);
+    sim.step_fixed(1, -1, false, 1.0f / 60.0f);  // adiciona D (horizontal recem)
+    REQUIRE(sim.facing() == Direction::East);
+    for (int i = 0; i < 20; ++i) {
+        sim.step_fixed(1, -1, false, 1.0f / 60.0f);
+        REQUIRE(sim.facing() == Direction::East);  // estavel no Leste
+    }
 }
 
 TEST_CASE("overworld: quadro de walk avanca com a distancia", "[overworld]") {

@@ -8,6 +8,8 @@
 #include <array>
 #include <cstdlib>  // std::getenv
 
+#include "gus/app/screens/sprite_anchor.hpp"  // bottom_margin_fraction
+
 #ifndef GUSWORLD_ASSETS_DIR
 #define GUSWORLD_ASSETS_DIR ""
 #endif
@@ -43,6 +45,16 @@ PlayerSpriteSet load_caua_sprites(gus::platform::render2d::IRenderer& renderer,
         // Neutro/idle: <base>/<dir>.png.
         const std::string idle_path = join(base_dir, kIdleFiles[d]);
         set.idle[d] = renderer.load_texture(idle_path.c_str());
+
+        // ANCORAGEM AUTOMATICA (M1-BUG.SUL): mede a margem inferior TRANSPARENTE do
+        // sprite IDLE desta direcao (alpha-bbox do PNG, ja decodificado no load) e a
+        // guarda como FRACAO do canvas. O render desce o desenho por isso pra COLAR o
+        // pe na base da AABB - sem numero magico, por personagem/direcao. Headless
+        // (bbox invalido) => bottom_margin() == 0 => fracao 0 => anchor legado.
+        const gus::platform::render2d::ContentBbox bbox =
+            renderer.texture_content_bbox(set.idle[d]);
+        set.foot.bottom_fraction[d] =
+            bottom_margin_fraction(bbox.bottom_margin(), bbox.canvas_h);
 
         // Walk: <base>/walk/<dir>/<f>.png  (f = 0..kWalkFrameCount-1).
         for (int f = 0; f < kWalkFrameCount; ++f) {

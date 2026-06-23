@@ -46,6 +46,37 @@ struct UvRect {
     float h = 1.0f;
 };
 
+// Caixa do CONTEUDO nao-transparente de uma textura, em PIXELS (o alpha-bbox).
+// Medida pelo backend ao carregar (decodifica o alpha do PNG). Serve pra ancorar
+// o sprite pelos PES REAIS (a margem inferior transparente = canvas_h - (top+h)):
+// ver app/screens/sprite_anchor.hpp e o M1-BUG.SUL. valid() = false quando o
+// backend nao decodifica (headless/Null) ou a textura e invalida - o chamador
+// degrada pro anchor legado (margem 0). Origem (0,0) = topo-esquerda do canvas.
+struct ContentBbox {
+    int canvas_w = 0;  // largura total do canvas (px)
+    int canvas_h = 0;  // altura total do canvas (px)
+    int left = 0;      // 1o pixel nao-transparente (x)
+    int top = 0;       // 1a linha nao-transparente (y)
+    int width = 0;     // largura do conteudo (px); 0 = nada/tudo transparente
+    int height = 0;    // altura do conteudo (px)
+
+    // false = sem medicao confiavel (headless/textura invalida): use anchor legado.
+    [[nodiscard]] bool valid() const noexcept {
+        return canvas_w > 0 && canvas_h > 0 && width > 0 && height > 0;
+    }
+
+    // Margem inferior TRANSPARENTE em px (espaco vazio abaixo do conteudo). E o que
+    // o anchor desconta pra colar o pe real na base da AABB. 0 se invalido.
+    [[nodiscard]] int bottom_margin() const noexcept {
+        if (!valid()) {
+            return 0;
+        }
+        const int content_bottom = top + height;
+        const int m = canvas_h - content_bottom;
+        return m > 0 ? m : 0;
+    }
+};
+
 // Interface de render 2D. O ciclo e: begin_frame -> N draws -> end_frame.
 class IRenderer {
 public:
@@ -82,6 +113,16 @@ public:
     virtual void draw_textured_rect(const gus::core::spatial::Rect& world_rect,
                                     TextureId texture, const UvRect& uv,
                                     const DrawColor& tint) = 0;
+
+    // Caixa do CONTEUDO nao-transparente (alpha > 0) de uma textura ja carregada,
+    // medida no decode do PNG e cacheada por TextureId. Serve pra ANCORAR o sprite
+    // pelos PES REAIS: o anchor desconta a margem inferior transparente
+    // (ContentBbox::bottom_margin) pra colar o pe na base da AABB (M1-BUG.SUL),
+    // SEM numero magico - cada sprite/direcao mede a propria sobra. Devolve um
+    // ContentBbox com valid()==false quando o handle e invalido ou o backend nao
+    // decodifica (headless/Null): o chamador degrada pro anchor legado (margem 0).
+    [[nodiscard]] virtual ContentBbox texture_content_bbox(
+        TextureId texture) const = 0;
 
     // Fecha o frame (submete ao backend / swap).
     virtual void end_frame() = 0;

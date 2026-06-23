@@ -49,13 +49,21 @@ void OverworldSim::step_fixed(int dx, int dy, bool run, float fixed_dt) noexcept
     if (dx == 0 && dy == 0) {
         // Parado: prev == curr (render nao interpola). A direcao MANTEM a ultima
         // (idle nao gira o boneco); o ciclo de walk volta ao neutro (idle congelado).
+        // Memoria de input zerada: o proximo movimento sera "eixo recem-acionado".
         walk_.advance(0.0f, run);
+        dx_prev_ = 0;
+        dy_prev_ = 0;
         return;
     }
 
     // Direcao cardinal pela intencao de input (vetor cru), nao pelo movimento
-    // resolvido: encostar na parede num eixo NAO deve girar o boneco.
-    facing_ = direction_from_move(dx, dy, facing_);
+    // resolvido: encostar na parede num eixo NAO deve girar o boneco. A politica de
+    // diagonal (qual eixo manda o olhar) vem do tuning (ponto unico de feel). Passa a
+    // MEMORIA DO INPUT do tick anterior (dx_prev_,dy_prev_) pra LastAxisWins decidir o
+    // eixo recem-acionado pela mudanca do INPUT - estavel na diagonal sustentada
+    // (sem flicker), em vez de derivar do facing anterior.
+    facing_ = direction_from_move(dx, dy, dx_prev_, dy_prev_, facing_,
+                                  tuning_.diagonal_facing);
 
     // Velocidade em unidades de mundo/s = tiles/s * tile_size, com a corrida.
     const float speed = tuning_.walk_speed_tiles_per_sec * grid_.tile_size() *
@@ -88,6 +96,10 @@ void OverworldSim::step_fixed(int dx, int dy, bool run, float fixed_dt) noexcept
     const float ady = curr_.y - prev_.y;
     const float moved = std::sqrt(adx * adx + ady * ady);
     walk_.advance(moved, run);
+
+    // Guarda o INPUT deste tick pra o proximo decidir o eixo recem-acionado.
+    dx_prev_ = dx;
+    dy_prev_ = dy;
 }
 
 gus::core::spatial::CameraView OverworldSim::camera_view(
@@ -166,7 +178,16 @@ void OverworldSim::render(gus::platform::render2d::IRenderer& renderer,
         const float sprite_h = tuning_.player_sprite_height_tiles * grid_.tile_size();
         const float sprite_w = sprite_h;  // PNG quadrado
         const float sx = shown.x + shown.w * 0.5f - sprite_w * 0.5f;  // centrado em X
-        const float sy = shown.y + shown.h - sprite_h;  // base do sprite = base da AABB
+        // ANCORAGEM PELOS PES (M1-BUG.SUL): desce o desenho ate o PE REAL coincidir
+        // com a base da AABB. A margem inferior transparente do sprite IDLE daquela
+        // direcao (foot.bottom_fraction, MEDIDA do alpha pelo loader) sobe a base do
+        // canvas o tanto da sobra; o ajuste fino manual do lider
+        // (sprite_foot_offset_tiles, default 0) e SOMADO por cima. Automatico = padrao;
+        // manual = so refino opcional. base AABB = shown.y + shown.h.
+        const float bottom_fraction = sprites_.foot.for_direction(facing_);
+        const float manual_offset = tuning_.sprite_foot_offset_tiles * grid_.tile_size();
+        const float sy = sprite_top_y(shown.y + shown.h, sprite_h, bottom_fraction,
+                                      manual_offset);
         const gus::core::spatial::Rect sprite_rect{sx, sy, sprite_w, sprite_h};
         const gus::platform::render2d::UvRect uv{0.0f, 0.0f, 1.0f, 1.0f};
         const gus::platform::render2d::DrawColor white{1.0f, 1.0f, 1.0f, 1.0f};

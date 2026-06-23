@@ -35,11 +35,24 @@ inline constexpr gus::core::spatial::Aabb kTestPlayerStart{64.0f, 40.0f, 20.0f, 
 inline OverworldTuning make_test_tuning() {
     OverworldTuning t;  // pega os defaults documentados em overworld_tuning.hpp
     t.walk_speed_tiles_per_sec = kTestWalkTilesPerSec;
-    // corner-assist ligado com perdao ~0.35 do tile (default). Ajuste a gosto:
-    //   t.corner.max_assist_fraction = 0.5f;   // perdoa mais
-    //   t.corner.enabled = false;              // desliga o assist
+
+    // ANCORAGEM PELOS PES = AUTOMATICA (M1-BUG.SUL, lider 2026-06-22): "colar o pe
+    // na parede sozinho". O jogo MEDE a sobra transparente embaixo de cada sprite
+    // (alpha-bbox no load) e desce o desenho ate o pe encostar na base da hitbox -
+    // por personagem/direcao, SEM numero magico. (Antes era um 0.45 tile calculado a
+    // mao do south.png 68x68; agora o automatico cobre todas as direcoes.)
+    //
+    // sprite_foot_offset_tiles fica so como AJUSTE FINO opcional, SOMADO por cima do
+    // automatico (default 0 = so o automatico). O lider mexe aqui se quiser afundar/
+    // levantar um tiquinho a gosto; nao precisa pra colar o pe.
+    t.sprite_foot_offset_tiles = 0.0f;
+
+    // Ajustes a gosto:
+    //   t.corner.max_assist_fraction = 0.5f;   // perdoa mais na quina
+    //   t.corner.enabled = false;              // desliga o corner-assist
     //   t.normalize_diagonal = true;           // diagonal com vel. das cardinais
     //   t.camera_zoom = 1.5f;                  // (gancho; zoom ainda nao ligado)
+    //   t.diagonal_facing = DiagonalFacing::VerticalWins;  // N/S sempre na diagonal
     return t;
 }
 

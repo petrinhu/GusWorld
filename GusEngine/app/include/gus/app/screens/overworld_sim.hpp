@@ -22,6 +22,7 @@
 #define GUS_APP_SCREENS_OVERWORLD_SIM_HPP
 
 #include "gus/app/screens/overworld_tuning.hpp"
+#include "gus/app/screens/sprite_anchor.hpp"  // FootInset (ancoragem pelos pes)
 #include "gus/app/screens/sprite_animation.hpp"
 #include "gus/core/spatial/camera_clamp.hpp"
 #include "gus/core/spatial/grid_collision.hpp"
@@ -42,6 +43,13 @@ namespace gus::app::screens {
 struct PlayerSpriteSet {
     gus::platform::render2d::TextureId idle[kDirectionCount] = {};
     gus::platform::render2d::TextureId walk[kDirectionCount][kWalkFrameCount] = {};
+
+    // ANCORAGEM AUTOMATICA (M1-BUG.SUL): margem inferior transparente de cada sprite
+    // IDLE, em fracao do canvas, MEDIDA pelo loader via IRenderer::texture_content_bbox.
+    // Ancora-se pelo IDLE (estavel: o tronco/cabeca nao "pula" entre quadros de walk).
+    // Tudo zero (headless/Null, sem decode) => anchor legado (base do canvas == base
+    // da AABB), preservando o comportamento e os testes antigos.
+    FootInset foot{};
 
     [[nodiscard]] bool loaded() const noexcept {
         for (int d = 0; d < kDirectionCount; ++d) {
@@ -116,6 +124,12 @@ private:
     Direction facing_ = Direction::South;
     WalkCycle walk_;
     PlayerSpriteSet sprites_{};
+
+    // MEMORIA DO INPUT do tick anterior (cru, em {-1,0,1}). Necessaria pra politica
+    // LastAxisWins decidir o eixo RECEM-acionado pela mudanca do INPUT (e nao pelo
+    // facing anterior), eliminando o flicker da diagonal sustentada. Init (0,0).
+    int dx_prev_ = 0;
+    int dy_prev_ = 0;
 };
 
 }  // namespace gus::app::screens

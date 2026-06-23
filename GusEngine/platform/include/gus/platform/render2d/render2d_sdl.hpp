@@ -59,6 +59,8 @@ public:
     void draw_textured_rect(const gus::core::spatial::Rect& world_rect,
                             TextureId texture, const UvRect& uv,
                             const DrawColor& tint) override;
+    [[nodiscard]] ContentBbox texture_content_bbox(
+        TextureId texture) const override;
     void end_frame() override;
 
     // Numero de primitivos (quads/sprites) emitidos no ultimo frame (debug/teste).
@@ -71,6 +73,11 @@ private:
     // por caminho evita recarregar o mesmo arquivo. As SDL_Texture sao owned aqui.
     std::vector<SDL_Texture*> textures_;
     std::unordered_map<std::string, TextureId> texture_by_path_;
+
+    // Alpha-bbox de cada textura, medido no decode do PNG (load_texture) e cacheado
+    // PARALELO a textures_ (mesmo TextureId indexa os dois). Slot 0 = invalido. Serve
+    // pra ancorar o sprite pelos PES (texture_content_bbox); ver alpha_bbox.hpp.
+    std::vector<ContentBbox> bboxes_;
 
     gus::core::spatial::Rect camera_{};
     int pixel_w_ = 0;

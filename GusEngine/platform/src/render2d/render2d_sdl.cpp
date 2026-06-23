@@ -11,6 +11,7 @@
 
 #include <cstdint>
 
+#include "gus/platform/render2d/alpha_bbox.hpp"  // scan_alpha_content_bbox (POCO)
 #include "gus/platform/render2d/viewport_transform.hpp"
 
 // stb_image: so esta TU define a implementacao (evita simbolos duplicados).
@@ -33,8 +34,10 @@ std::uint8_t to_byte(float c) noexcept {
 }  // namespace
 
 Render2dSdl::Render2dSdl(SDL_Renderer* renderer) noexcept : renderer_(renderer) {
-    // Slot 0 reservado: kInvalidTexture == 0 nunca indexa uma textura real.
+    // Slot 0 reservado: kInvalidTexture == 0 nunca indexa uma textura real. Os dois
+    // caches (textura + alpha-bbox) sao indexados PARALELO pelo mesmo TextureId.
     textures_.push_back(nullptr);
+    bboxes_.push_back(ContentBbox{});  // slot 0: invalido (valid() == false)
 }
 
 Render2dSdl::~Render2dSdl() {
@@ -126,6 +129,12 @@ TextureId Render2dSdl::load_texture(const char* path) {
     }
     // pitch = w * 4 bytes (RGBA8).
     SDL_UpdateTexture(tex, nullptr, pixels, w * 4);
+
+    // ANCORAGEM (M1-BUG.SUL): mede o alpha-bbox do conteudo AGORA, com os pixels
+    // ainda em memoria (antes de liberar). E o que da pra COLAR o pe na base da
+    // AABB sem numero magico - cada sprite mede a propria margem inferior vazia.
+    const ContentBbox bbox =
+        scan_alpha_content_bbox(static_cast<const std::uint8_t*>(pixels), w, h);
     stbi_image_free(pixels);
 
     // NEAREST (pixel-art crisp) + blend alpha (sprite com transparencia).
@@ -134,8 +143,19 @@ TextureId Render2dSdl::load_texture(const char* path) {
 
     const TextureId id = static_cast<TextureId>(textures_.size());
     textures_.push_back(tex);
+    bboxes_.push_back(bbox);  // PARALELO a textures_ (mesmo id indexa os dois)
     texture_by_path_[key] = id;
     return id;
+}
+
+ContentBbox Render2dSdl::texture_content_bbox(TextureId texture) const {
+    // Fora de faixa / invalido / slot 0: ContentBbox vazio (valid() == false). O
+    // chamador (anchor do sprite) degrada pro comportamento legado (margem 0). No
+    // headless (renderer nulo) nenhuma textura e criada, entao sempre cai aqui.
+    if (texture == kInvalidTexture || texture >= bboxes_.size()) {
+        return ContentBbox{};
+    }
+    return bboxes_[texture];
 }
 
 void Render2dSdl::draw_textured_rect(const gus::core::spatial::Rect& world_rect,

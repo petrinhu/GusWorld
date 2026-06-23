@@ -14,6 +14,7 @@ add_executable(gusengine_platform_tests
     sdl_input_test.cpp
     viewport_transform_test.cpp
     render2d_sdl_test.cpp
+    alpha_bbox_test.cpp
 )
 
 target_link_libraries(gusengine_platform_tests
