@@ -36,7 +36,10 @@ OverworldSim::OverworldSim(gus::core::spatial::TileGrid grid,
           tuning.stamina_max, tuning.run_drain_per_sec,
           tuning.recover_walk_per_sec, tuning.recover_idle_per_sec,
           tuning.tired_threshold}),
-      breath_(tuning.idle_calm_breaths_per_minute) {}
+      breath_(tuning.idle_calm_breaths_per_minute),
+      winded_(gus::core::player::WindedConfig{
+          tuning.winded_min_seconds, tuning.winded_max_seconds,
+          tuning.winded_run_for_max_seconds, tuning.winded_run_threshold_seconds}) {}
 
 void OverworldSim::set_player_sprites(const PlayerSpriteSet& sprites) noexcept {
     sprites_ = sprites;
@@ -93,6 +96,17 @@ void OverworldSim::step_fixed(int dx, int dy, bool run, float fixed_dt) noexcept
         move_state = gus::core::player::MoveState::Idle;
     }
     stamina_.tick(move_state, fixed_dt);
+
+    // FOLEGO DO CORPO (timer separado da Carga, lider 2026-06-23): acumula enquanto
+    // CORRE; em qualquer outro estado (anda/parado) "para de correr" -> ao cruzar a
+    // transicao dispara a ofegancia escalada (>= 5 s) e decai parado ate zerar. Isso
+    // mantem o Gus ofegante por >= 5 s mesmo com a Carga ja recarregada. Dirigido pelo
+    // MESMO move_state (correr = sprint real, com movimento de input).
+    if (move_state == gus::core::player::MoveState::Running) {
+        winded_.tick_running(fixed_dt);
+    } else {
+        winded_.tick_stopped(fixed_dt);
+    }
 
     if (dx == 0 && dy == 0) {
         // Parado: prev == curr (render nao interpola). A direcao MANTEM a ultima
@@ -221,7 +235,10 @@ void OverworldSim::render(gus::platform::render2d::IRenderer& renderer,
         // IDLE EM DOIS MODOS por STAMINA (lider 2026-06-23): CALMO quando descansado
         // (senoide procedural no quadro NEUTRO, sem trocar frame), OFEGANTE quando
         // cansado (troca os quadros do breathing rapido). So vale quando PARADO.
-        const bool tired = stamina_.is_tired();
+        // OFEGANTE = Carga baixa (overflow do aparato) OU folego do corpo ainda ativo
+        // (timer separado, lider 2026-06-23): o Gus ofega por >= 5 s ao parar de correr,
+        // mesmo com a Carga ja recarregada. Une as duas leituras (show_winded_idle).
+        const bool tired = show_winded_idle();
         // calm_breath != 0 so quando PARADO e DESCANSADO: liga o bob/escala procedural.
         bool calm_breathing = false;
 

@@ -26,7 +26,8 @@
 #include "gus/app/screens/sprite_animation.hpp"
 #include "gus/core/anim/anim_clock.hpp"  // idle OFEGANTE (breathing) por TEMPO
 #include "gus/core/anim/breath_oscillator.hpp"  // idle CALMO (senoide procedural)
-#include "gus/core/player/stamina.hpp"  // folego: dirige calmo vs ofegante
+#include "gus/core/player/stamina.hpp"  // Carga do aparato: drena correndo
+#include "gus/core/player/winded_timer.hpp"  // folego do corpo: ofega ao parar (>= 5 s)
 #include "gus/core/spatial/camera_clamp.hpp"
 #include "gus/core/spatial/grid_collision.hpp"
 #include "gus/core/spatial/tile_grid.hpp"
@@ -168,8 +169,20 @@ public:
     [[nodiscard]] const gus::core::anim::BreathOscillator& breath() const noexcept {
         return breath_;
     }
-    // true quando o jogador esta cansado (stamina < limiar): mostra idle OFEGANTE.
+    // true quando a CARGA do aparato esta abaixo do limiar (leitura do hardware).
     [[nodiscard]] bool is_tired() const noexcept { return stamina_.is_tired(); }
+    // true enquanto o FOLEGO do corpo (timer separado) esta ativo: ao parar de correr,
+    // o Gus ofega por >= 5 s INDEPENDENTE da Carga ja ter recarregado (lider 2026-06-23).
+    [[nodiscard]] bool is_winded() const noexcept { return winded_.is_winded(); }
+    // O idle OFEGANTE e mostrado quando QUALQUER um dispara: Carga baixa (overflow do
+    // aparato) OU folego do corpo ainda alto (peito acalmando). Une as duas leituras.
+    [[nodiscard]] bool show_winded_idle() const noexcept {
+        return stamina_.is_tired() || winded_.is_winded();
+    }
+    // Timer de folego do corpo (leitura/teste).
+    [[nodiscard]] const gus::core::player::WindedTimer& winded() const noexcept {
+        return winded_;
+    }
 
 private:
     // Posicao do jogador interpolada entre prev_ e curr_ por alpha.
@@ -204,6 +217,12 @@ private:
     // o render usa breath_.value() pra esticar/deslocar levemente o sprite NEUTRO.
     gus::core::anim::BreathOscillator breath_{
         OverworldTuning{}.idle_calm_breaths_per_minute};
+
+    // FOLEGO do corpo (lider 2026-06-23): acumula tempo enquanto CORRE; ao parar de
+    // correr (apos correr o bastante), ofega por >= 5 s escalado, decaindo parado ate
+    // zerar - INDEPENDENTE da Carga. Avancado no step_fixed pelo move_state real; o
+    // render forca o idle ofegante enquanto is_winded() (ou a Carga estiver baixa).
+    gus::core::player::WindedTimer winded_{};
 
     // MEMORIA DO INPUT do tick anterior (cru, em {-1,0,1}). Necessaria pra politica
     // LastAxisWins decidir o eixo RECEM-acionado pela mudanca do INPUT (e nao pelo

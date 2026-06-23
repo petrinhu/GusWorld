@@ -18,6 +18,7 @@ add_executable(gusengine_core_tests
     fixed_timestep_test.cpp
     anim_clock_test.cpp
     stamina_test.cpp
+    winded_timer_test.cpp
     breath_oscillator_test.cpp
 )
 

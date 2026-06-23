@@ -68,6 +68,17 @@ struct SpriteLayout {
     int idle_frames = 5;                          // quadros do breathing (Gus 5)
     const char* idle_dir = "anims/breathing_idle";  // subpasta do idle animado
     const char* idle_prefix = "f";                // prefixo dos quadros do idle animado
+
+    // BUG 1 (lider 2026-06-23): o idle animado do Gus (breathing) so existe de FRENTE
+    // (Sul). Replicar esse loop nas 4 direcoes fazia o Gus PARECER virar pra Sul ao
+    // parar (a logica de facing ja estava certa; o problema era a arte). Com este flag,
+    // o idle animado (breathing) e usado SO na direcao idle_animated_facing; as OUTRAS
+    // direcoes recebem o walk f0 DAQUELA direcao como idle de 1 quadro (arte que ja
+    // existe), preservando o olhar visualmente sem arte nova. Quando houver breathing
+    // direcional completo, basta desligar este flag.
+    bool idle_animated_only_one_facing = true;
+    // Direcao que TEM o breathing animado (default Sul = a arte de frente do Gus).
+    Direction idle_animated_facing = Direction::South;
 };
 
 // Layouts canonicos prontos.

@@ -158,6 +158,19 @@ struct OverworldTuning {
     // "comunicar cansaco". Com 5 quadros num ciclo, ~72/min da ~6 fps (5*72/60),
     // pedido do lider ("~6 fps, ofegante"). Dirige o AnimClock do idle ofegante.
     float idle_tired_breaths_per_minute = 72.0f;
+
+    // --- TIMER DE FOLEGO (corpo) vs CARGA (aparato) - lider 2026-06-23 -------
+    // PROBLEMA: amarrar a ofegancia so a Carga (Stamina) deixava o Gus ofegar ~2-3 s,
+    // porque a Carga regenera RAPIDO ao parar (~13/s). DECISAO do lider: um TIMER DE
+    // FOLEGO do CORPO SEPARADO - ao PARAR de correr (apos correr o bastante), o Gus
+    // ofega por um MINIMO de 5 s que ESCALA com quanto tempo correu (ate 8 s),
+    // INDEPENDENTE de a Carga ja ter recarregado. O idle ofegante e FORCADO enquanto
+    // este timer esta ativo (OU a Carga estiver abaixo do limiar). Dirige o POCO
+    // core::player::WindedTimer. Ver docs/design/mecanicas/stamina.md.
+    float winded_min_seconds = 5.0f;        // piso da ofegancia ao parar. CANON: 5 s.
+    float winded_max_seconds = 8.0f;        // teto da ofegancia (corrida longa). CANON: 8 s.
+    float winded_run_for_max_seconds = 8.0f;  // correr este tanto (s) atinge o teto.
+    float winded_run_threshold_seconds = 2.0f;  // correr menos que isso e parar nao ofega.
 };
 
 }  // namespace gus::app::screens

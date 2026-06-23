@@ -18,7 +18,7 @@ A barra e a **Carga do Tavus-Drive** (energia do aparato de pulso; o poder vem d
 - **REGRA DE OURO (inegociavel)**: a Carga NUNCA trava o deslocamento basico. Esgotada, o Gus so perde o sprint e os modos ativos (scan), JAMAIS a capacidade de andar e progredir. Sem "parede de exaustao" - e isso que mantem o anti-pillar respeitado.
 
 ## Modelo numerico (CANONICO, aprovado 2026-06-23; economy-designer)
-Barra **continua** [0..max], todos os numeros em **Fibonacci**. Recarga FORA da economia de credito (Bio-Ampola continua so HP).
+Barra **continua** [0..max], todos os numeros seguem a **sequencia recorrente canonica** (1, 1, 2, 3, 5, 8, 13, 21...). Recarga FORA da economia de credito (Bio-Ampola continua so HP).
 
 | Parametro | Valor | Deriva |
 | :--- | :--- | :--- |
@@ -31,6 +31,28 @@ Barra **continua** [0..max], todos os numeros em **Fibonacci**. Recarga FORA da 
 | Celula de Pulso (pos-VS) | **+34** (rara: +89), drop curado, sem credito | espelha a Bio-Ampola; nao farmavel |
 
 Nota: limiar e em UNIDADE de Carga (34), nao percentual - ofegancia le como "Carga acabando" (sobrecarga do aparato), nao "metade" (que soaria cansaco fisico = anti-pillar). Drains curtos quase nunca ofegam.
+
+## Timer de folego (corpo) vs Carga (aparato) - decisao do lider 2026-06-23
+
+Sao DUAS coisas distintas, com ritmos proprios:
+
+- **Carga do aparato** (`core::player::Stamina`): a energia do Tavus-Drive. Drena correndo (8/s) e REGENERA RAPIDO ao parar (13/s). E o numero do hardware.
+- **Folego do corpo** (`core::player::WindedTimer`, POCO novo): a respiracao ofegante do Gus. Tem INERCIA: o peito demora a acalmar mesmo com o aparato ja recarregado.
+
+**Por que separar.** Atado so a Carga, o idle ofegante durava ~2-3 s (a Carga sobe a 13/s e cruza o limiar 34 quase imediato ao parar). Sentia curto demais no playtest do M1. O folego do corpo passa a ter timer proprio, independente da Carga.
+
+**Regra do timer de folego (numeros finais, lider 2026-06-23):**
+
+| Parametro | Valor | Deriva |
+| :--- | :--- | :--- |
+| Folego MINIMO ao parar | **5 s** | piso: parou de correr (acima do limiar) -> ofega ao menos 5 s |
+| Folego MAXIMO (teto) | **8 s** | corrida longa nao ofega alem disso |
+| Corrida ate o teto | **8 s** | correr 8 s sustentados atinge o teto de folego (escala LINEAR ate aqui) |
+| Limiar de corrida | **2 s** | correr menos que isso e parar NAO ofega (corrida curta) |
+
+Formula da duracao ao parar: `folego = 5 + (8 - 5) * clamp(tempo_correndo / 8, 0, 1)` segundos. Saturada no teto. Decai linearmente com o tempo parado ate zerar.
+
+**Integracao (OverworldSim):** o timer e dirigido pelo MESMO `move_state` real. Correndo (`Running`) acumula; qualquer outro estado conta como "parou de correr" (dispara o folego na transicao e decai parado). O idle OFEGANTE e forcado quando `Carga < limiar` OU `folego ativo` (`show_winded_idle()`); voltar a correr limpa o folego e reinicia o acumulo. Tudo ajustavel no `OverworldTuning` (`winded_*`). Numeros em `core::player::WindedConfig`.
 
 ## Feedback (multimodal, a11y - Pillar 4 nunca depende de 1 canal)
 - Animacao (JA existe): idle calmo (procedural, descansado) vs respiracao ofegante (overflow).

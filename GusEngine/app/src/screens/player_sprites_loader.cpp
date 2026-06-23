@@ -89,14 +89,43 @@ PlayerSpriteSet load_player_sprites(gus::platform::render2d::IRenderer& renderer
     }
 
     for (int d = 0; d < kDirectionCount; ++d) {
+        // --- WALK: <base>/walk/<dir>/<pref>f.png  (f = 0..walk_n-1) ---
+        // Carregado ANTES do idle: o fix do BUG 1 (idle direcional) usa o walk f0
+        // DAQUELA direcao como idle das direcoes sem breathing proprio.
+        // A subpasta vem do layout (data-driven): default {south,north,east,west};
+        // o Gus troca leste<->oeste pra corrigir o rotulo invertido da fonte.
+        set.walk_count[d] = walk_n;
+        for (int f = 0; f < walk_n; ++f) {
+            const std::string walk_path =
+                join(join(join(base_dir, "walk"),
+                          layout.walk_dir_names[static_cast<std::size_t>(d)]),
+                     std::string(layout.walk_prefix) + std::to_string(f) + ".png");
+            set.walk[d][f] = renderer.load_texture(walk_path.c_str());
+        }
+
         // --- IDLE (breathing animado OU congelado direcional) ---
-        if (layout.idle_animated) {
+        // BUG 1 (lider 2026-06-23): o breathing animado so existe de FRENTE. Quando
+        // idle_animated_only_one_facing, ele e usado SO na direcao idle_animated_facing
+        // (Sul); as OUTRAS direcoes recebem o walk f0 DAQUELA direcao como idle de 1
+        // quadro - assim parar olhando Norte/Leste/Oeste NAO mostra a pose de frente.
+        const bool use_breathing_here =
+            layout.idle_animated &&
+            (!layout.idle_animated_only_one_facing ||
+             d == static_cast<int>(layout.idle_animated_facing));
+        if (use_breathing_here) {
             set.idle_count[d] = idle_n;
             for (int f = 0; f < idle_n; ++f) {
                 set.idle_frames[d][f] = shared_idle[static_cast<std::size_t>(f)];
             }
             set.idle[d] = shared_idle[0];  // representativo = quadro 0 do breathing
+        } else if (layout.idle_animated) {
+            // Direcao sem breathing proprio: idle de 1 quadro = walk f0 daquela direcao
+            // (arte direcional que ja existe), preservando o facing parado.
+            set.idle[d] = set.walk[d][0];
+            set.idle_frames[d][0] = set.walk[d][0];
+            set.idle_count[d] = 1;
         } else {
+            // Caua: idle congelado direcional, 1 quadro por direcao (<base>/<dir>.png).
             const std::string idle_path = join(base_dir, kIdleFilesCaua[d]);
             const gus::platform::render2d::TextureId t =
                 renderer.load_texture(idle_path.c_str());
@@ -114,18 +143,6 @@ PlayerSpriteSet load_player_sprites(gus::platform::render2d::IRenderer& renderer
             renderer.texture_content_bbox(set.idle[d]);
         set.foot.bottom_fraction[d] =
             bottom_margin_fraction(bbox.bottom_margin(), bbox.canvas_h);
-
-        // --- WALK: <base>/walk/<dir>/<pref>f.png  (f = 0..walk_n-1) ---
-        // A subpasta vem do layout (data-driven): default {south,north,east,west};
-        // o Gus troca leste<->oeste pra corrigir o rotulo invertido da fonte.
-        set.walk_count[d] = walk_n;
-        for (int f = 0; f < walk_n; ++f) {
-            const std::string walk_path =
-                join(join(join(base_dir, "walk"),
-                          layout.walk_dir_names[static_cast<std::size_t>(d)]),
-                     std::string(layout.walk_prefix) + std::to_string(f) + ".png");
-            set.walk[d][f] = renderer.load_texture(walk_path.c_str());
-        }
     }
     return set;
 }

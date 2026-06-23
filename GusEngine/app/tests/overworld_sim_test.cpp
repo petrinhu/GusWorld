@@ -692,6 +692,143 @@ TEST_CASE(
     REQUIRE(t1 != t0);  // e o sprite mostrado acompanhou (5 quadros rapidos)
 }
 
+// --- BUG 1 (lider 2026-06-23): parar/colidir NAO gira o boneco -------------
+
+TEST_CASE("overworld: parar PRESERVA a ultima direcao (todas as 4)", "[overworld][facing]") {
+    // O bug reportado era o Gus virar pra SUL ao soltar os botoes. A logica do sim deve
+    // MANTER o facing anterior quando parado, em qualquer das 4 direcoes.
+    TileGrid g(40, 40, 16.0f);
+    struct Caso { int dx; int dy; Direction esperado; };
+    const Caso casos[] = {
+        {1, 0, Direction::East},
+        {-1, 0, Direction::West},
+        {0, -1, Direction::North},
+        {0, 1, Direction::South},
+    };
+    for (const auto& c : casos) {
+        OverworldSim sim(g, Aabb{300.0f, 300.0f, 8.0f, 8.0f}, 4.0f);
+        sim.step_fixed(c.dx, c.dy, false, 1.0f / 60.0f);  // anda na direcao
+        REQUIRE(sim.facing() == c.esperado);
+        // Solta os botoes por varios ticks: o facing NAO pode reverter pra Sul.
+        for (int i = 0; i < 30; ++i) {
+            sim.step_fixed(0, 0, false, 1.0f / 60.0f);
+            REQUIRE(sim.facing() == c.esperado);
+        }
+    }
+}
+
+TEST_CASE("overworld: colidir num eixo PRESERVA o facing do INPUT (nao gira)",
+          "[overworld][facing]") {
+    // Encostar numa parede num eixo NAO deve girar o boneco: o facing vem do INPUT cru
+    // (dx,dy), nao do movimento resolvido (que zera no eixo bloqueado).
+    // Mapa: parede a Oeste; jogador colado nela empurrando pra Oeste -> X bloqueia, mas
+    // o facing tem que ficar Oeste (input), nao virar pra outra direcao.
+    TileGrid g = TileGrid::from_rows({"#..", "#..", "#.."}, 16.0f);
+    OverworldSim sim(g, Aabb{16.0f, 20.0f, 8.0f, 8.0f}, 8.0f);
+    for (int i = 0; i < 10; ++i) {
+        sim.step_fixed(-1, 0, false, 1.0f / 60.0f);  // empurra contra a parede oeste
+    }
+    REQUIRE(sim.player().x <= 16.0f + kEps);          // ficou colado (X bloqueado)
+    REQUIRE(sim.facing() == Direction::West);          // mas continua olhando Oeste
+
+    // Colisao na vertical (parede ao Norte): empurra pra Norte preso -> facing Norte.
+    TileGrid gv = TileGrid::from_rows({"###", "...", "..."}, 16.0f);
+    OverworldSim simv(gv, Aabb{20.0f, 16.0f, 8.0f, 8.0f}, 8.0f);
+    for (int i = 0; i < 10; ++i) {
+        simv.step_fixed(0, -1, false, 1.0f / 60.0f);
+    }
+    REQUIRE(simv.player().y <= 16.0f + kEps);
+    REQUIRE(simv.facing() == Direction::North);
+}
+
+TEST_CASE("overworld: parado mostra o sprite IDLE da DIRECAO corrente (nao Sul)",
+          "[overworld][facing]") {
+    // RAIZ VISUAL do bug: parado tem que indexar idle_frames[facing], nao sempre o Sul.
+    // Com sprites DIRECIONAIS distintos por direcao, parar olhando Norte mostra um
+    // quadro de idle do NORTE, nunca do Sul.
+    TileGrid g(40, 40, 16.0f);
+    OverworldSim sim(g, Aabb{300.0f, 300.0f, 8.0f, 8.0f}, 8.0f);
+    PlayerSpriteSet s = make_gus_like_sprites(7, 5);  // handles distintos por direcao
+    sim.set_player_sprites(s);
+
+    sim.step_fixed(0, -1, false, 1.0f / 60.0f);   // anda pro Norte
+    REQUIRE(sim.facing() == Direction::North);
+    sim.step_fixed(0, 0, false, 1.0f / 60.0f);    // para
+    REQUIRE(sim.facing() == Direction::North);     // facing preservado
+    FakeRenderer r;
+    sim.render(r, 80.0f, 80.0f, 1.0f);
+    const TextureId t = r.sprites.at(0).texture;
+    const int north = static_cast<int>(Direction::North);
+    const int south = static_cast<int>(Direction::South);
+    // O quadro mostrado e um idle do NORTE...
+    bool is_north_idle = false;
+    for (int f = 0; f < s.idle_count[north]; ++f) {
+        if (t == s.idle_frames[north][f]) is_north_idle = true;
+    }
+    REQUIRE(is_north_idle);
+    // ...e NAO um idle do Sul (o bug original).
+    for (int f = 0; f < s.idle_count[south]; ++f) {
+        REQUIRE(t != s.idle_frames[south][f]);
+    }
+}
+
+// --- TIMER DE FOLEGO (corpo) vs CARGA (aparato) - lider 2026-06-23 -----------
+
+TEST_CASE(
+    "overworld: ao parar de correr o Gus ofega por >= 5 s mesmo com a Carga recarregada",
+    "[overworld][winded]") {
+    // BUG do lider: a ofegancia (antes so atada a Carga) durava ~2-3 s porque a Carga
+    // regenera rapido (~13/s) ao parar. Com o TIMER DE FOLEGO separado, parar apos uma
+    // corrida longa mantem o idle ofegante por >= 5 s INDEPENDENTE da Carga.
+    TileGrid g(60, 60, 16.0f);
+    OverworldSim sim(g, Aabb{300.0f, 300.0f, 8.0f, 8.0f}, 8.0f);
+    sim.set_player_sprites(make_gus_like_sprites(7, 5));
+
+    // Corre o bastante pra encher o folego (>= run_for_max 8 s). 9 s = 540 ticks.
+    for (int i = 0; i < 540; ++i) {
+        sim.step_fixed(1, 0, /*run=*/true, 1.0f / 60.0f);
+    }
+    // Para: dispara o folego. A Carga ja vai recuperar rapido daqui pra frente.
+    sim.step_fixed(0, 0, false, 1.0f / 60.0f);
+    REQUIRE(sim.is_winded());
+    REQUIRE(sim.show_winded_idle());
+
+    // Parado 4.5 s (270 ticks): a Carga ja recarregou MUITO (13/s -> bem acima do
+    // limiar 34), mas o folego do corpo ainda nao zerou -> SEGUE ofegante.
+    for (int i = 0; i < 270; ++i) {
+        sim.step_fixed(0, 0, false, 1.0f / 60.0f);
+    }
+    REQUIRE_FALSE(sim.is_tired());      // a CARGA ja descansou (prova a independencia)
+    REQUIRE(sim.is_winded());           // mas o folego do CORPO ainda esta ativo
+    REQUIRE(sim.show_winded_idle());    // -> idle ofegante forcado pelo folego
+}
+
+TEST_CASE("overworld: a ofegancia ESCALA com o tempo de corrida (mais corre, mais ofega)",
+          "[overworld][winded]") {
+    TileGrid g(60, 60, 16.0f);
+    OverworldSim curto(g, Aabb{300.0f, 300.0f, 8.0f, 8.0f}, 8.0f);
+    OverworldSim longo(g, Aabb{300.0f, 300.0f, 8.0f, 8.0f}, 8.0f);
+    // Corrida curta (3 s) vs longa (8 s), ambas acima do limiar de 2 s.
+    for (int i = 0; i < 180; ++i) curto.step_fixed(1, 0, true, 1.0f / 60.0f);
+    for (int i = 0; i < 480; ++i) longo.step_fixed(1, 0, true, 1.0f / 60.0f);
+    curto.step_fixed(0, 0, false, 1.0f / 60.0f);
+    longo.step_fixed(0, 0, false, 1.0f / 60.0f);
+    REQUIRE(longo.winded().remaining() > curto.winded().remaining());
+    REQUIRE(curto.winded().remaining() >= 5.0f - 1e-3f);  // piso
+    REQUIRE(longo.winded().remaining() <= 8.0f + 1e-3f);  // teto
+}
+
+TEST_CASE("overworld: andar (sem correr) e parar NAO dispara folego", "[overworld][winded]") {
+    // So CORRER (sprint real) conta. Andar muito tempo e parar nao deve ofegar.
+    TileGrid g(60, 60, 16.0f);
+    OverworldSim sim(g, Aabb{300.0f, 300.0f, 8.0f, 8.0f}, 8.0f);
+    for (int i = 0; i < 600; ++i) {
+        sim.step_fixed(1, 0, /*run=*/false, 1.0f / 60.0f);  // anda 10 s, sem Shift
+    }
+    sim.step_fixed(0, 0, false, 1.0f / 60.0f);  // para
+    REQUIRE_FALSE(sim.is_winded());
+}
+
 TEST_CASE("overworld: idle congelado (1 quadro) nao quebra - compat Caua",
           "[overworld]") {
     // make_fake_sprites = idle de 1 quadro (Caua). Parado tem que mostrar idle[di] e
