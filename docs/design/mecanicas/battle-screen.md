@@ -124,6 +124,15 @@ Decidido 2026-06-24. **Entrada:** ao esbarrar no inimigo, BOOT/COMPILACAO temati
 
 ---
 
+## 3.4 Pipeline dos atores na arena (decisao do criador 2026-06-24)
+
+Os atores na arena side-view sao **sprites 2D puros**, gerados direto no **PixelLab** (mesmo pipeline dos 37 icones + 11 retratos ja produzidos). NAO ha bake 3D: o jogo e 2D-only (style-guide, ADR-008); o 3D era so ferramenta de bake e foi aposentado no pivot (os .glb do art-spike foram deletados). Consequencias:
+- Poses de batalha (idle / cast / ataque / hit / vitoria) por personagem = PixelLab. A foto `gus_baby/gus_meiafrente.png` serve de referencia pra pose lateral do Gus; demais personagens partem dos retratos/character-specs ja canonicos.
+- O PixelLab gera personagem com 4/8 direcoes nativas (`create_character`), util pra a pose leste (party) / oeste (inimigo) sem flip (Pillar 3).
+- Fecha o gate que estava adiado: as poses de corpo inteiro deixam de ser bloqueadas e entram no pipeline normal de arte.
+
+---
+
 ## 4. Escopo do M5 (vertical slice) vs depois
 
 ### M5 entrega (a tela jogavel do combate)
