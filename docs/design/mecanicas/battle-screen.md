@@ -99,6 +99,25 @@ A economia do hospital (estes parametros) deve ser integrada formalmente em [`ec
 
 ---
 
+## 3.2 Overlay de compilacao (mao + pipeline)
+
+Decidido no brainstorm 2026-06-23. O CORACAO da jogabilidade: aparece ao escolher COMPILAR no menu de verbos (par.1, decisao 3, comando-first). Materializa a pipeline de 3 slots do [`combat.md`](combat.md) par.10.
+
+- **Montagem (tap-to-place):** clica uma carta da mao e ela vai pro proximo slot livre da pipeline; clica no slot pra remover. Funciona igual em mouse, teclado e controller (sem drag-drop).
+- **Mao (leque), carta COMPACTA:** cada carta mostra cor da familia + nome + custo de mana + marcador RAPIDA (compilada) ou LENTA (interpretada). O detalhe (power, fraqueza vs alvo, status aplicado, mestria, alvo) aparece num painel lateral ao FOCAR a carta. Leque limpo, decisao agil.
+- **Pipeline de 3 slots:** preenchida em ordem. Cada slot = carta OU modificador (canon par.10). Conforme monta, mostra o custo acumulado (mana/AP) e, se a assinatura casar uma receita:
+  - combo JA descoberto (no codex de receitas): preview ao vivo `COMPILANDO: <nome>` + efeito + se e rapido/lento.
+  - combo NAO catalogado: `??? combo nao catalogado` (dica de que vale disparar pra descobrir; preserva o aesthetic Discovery).
+- **Modificadores (combat.md par.8):** ocupam 1 slot e afetam a carta do slot anterior, somando mana.
+  - **Object (+1)** e **Stream (+2):** sempre disponiveis (2 botoes fixos).
+  - **Null (+1):** ESPECIAL, so via carta/desbloqueio (o mais forte, anti-buff); exige Scan previo no alvo (botao desabilitado sem Scan, com a mensagem de erro do par.10).
+- **Erros (combat.md par.10):** tentativa invalida mostra a mensagem no log: `ERRO DE COMPILACAO: mana insuficiente (custa X, tem Y)` / `AP insuficiente` / `alvo invalido` / `Null requer Scan previo` / `pipeline ja contem 3 slots`.
+- **Disparar:** confirma a pipeline -> resolve sequencial (slot 1, 2, 3) -> se casou receita, `COMPILADO: <combo>` no log + flash na pipeline. A velocidade (rapida/lenta, cast-time) do resultado segue [`combat-flavor.md`](combat-flavor.md) par.1.
+
+Pendencias finas (lead-game-designer / ux-ui-designer): posicao exata do overlay (quanto sobrepoe a arena), vocabulario visual do marcador rapida/lenta e dos icones de modificador, animacao de encaixe.
+
+---
+
 ## 4. Escopo do M5 (vertical slice) vs depois
 
 ### M5 entrega (a tela jogavel do combate)
