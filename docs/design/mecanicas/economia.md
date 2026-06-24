@@ -35,6 +35,42 @@
 - Companion incapacitado: recovery ao cruzar **2 beats narrativos**.
 - Regra dura: cura grátis NUNCA é amarrada a vencer N combates (incentivaria grind — anti-pillar).
 
+### 3.3 Derrota (party wipe): safe mode e dívida
+
+**Status:** parâmetros ratificados pelo criador supremo (AskUserQuestion, 2026-06-24).
+**Cross-ref:** [`battle-screen.md`](battle-screen.md) §3.1 (tela de resultado `BUILD FAILED` que corta pro Hospital), [`combat.md`](combat.md) §2.1 (HP de Gus = menor da party; Análise Preditiva absorve 1 golpe fatal por batalha) e §16 (`ActorIncapacitated` / `ActorDefeated` aciona este fluxo).
+
+A derrota NÃO é game-over e NÃO perde progresso: é um **custo econômico** (Pillar 4). O wipe corta pro Hospital, que cura pelo custo proporcional da §3.1 (1 cr / 3 HP) e reativa incapacitados pela §3.1 (multa Fibonacci `seq_acima(HP_max)`). Se o jogador não tem crédito pra cura completa, ele **ESCOLHE** (anti-softlock, nunca trava):
+
+#### 3.3.1 Safe mode (grátis)
+
+- Revive a party a **13% do HP-máximo por ator** (Fibonacci; arredonda pra baixo; **piso 1 HP**). Ex: HP-max 34 → 4 HP, HP-max 55 → 7 HP.
+- Como o HP de Gus é o menor da party (combat.md §2.1), o % incide sobre statlines desiguais e **preserva a hierarquia de fragilidade** (companion tanky revive com mais HP absoluto; Gus segue o mais frágil).
+- Sai capenga, mas SEM death-loop: a **Análise Preditiva** (combat.md §2.1, recarrega por batalha) cobre o próximo golpe fatal, garantindo um colchão.
+- **Só ofertado em wipe REAL** (party toda incapacitada). Nunca acionável voluntariamente estando vivo.
+- **Anti-abuso (net-negativo sempre):** perder rende ~6 cr de "HP de mercado" (13% da party, ~18 HP, ~6 cr a 1 cr / 3 HP), mas custa o crédito do encontro (8 cr × mult) mais XP, loot e Knowledge, que NÃO são recebidos na derrota. Perder de propósito pra curar é sempre pior que curar pagando.
+
+#### 3.3.2 Cura completa a crédito (dívida)
+
+Alternativa ao safe mode: sai com **cura completa**, devendo. Saldo fica NEGATIVO. Lida diegeticamente como **"taxa de recompilação do snapshot"** do Hospital: transparente, plafonada, finita (Pillar 2: sistema formal legível). É o **oposto da usura opaca, composta, de compadrio** (estilo Sterling): livre-troca mais responsabilidade conservadora é o lado bom da axiologia canon.
+
+**Termos (exibidos no terminal ANTES de aceitar, sem letra miúda):**
+
+| Componente | Regra | Teto |
+|---|---|---|
+| **Principal** | 1 cura completa da party atual (~48 cr nas statlines do VS; calculado da party, sem hardcode) | custo da cura completa |
+| **Juros** | **5% SIMPLES** sobre o principal (NUNCA composto), cobrado **1× por NOVA ZONA cruzada** (não por encontro, não por tempo) | **21% do principal** (~11 cr); param de crescer no teto |
+| **Multa (reincidência)** | só ao sofrer wipe **enquanto ainda devendo**. Escada curta: **8 cr** na 1ª reincidência, **13 cr** da 2ª em diante, **TRAVA em 13 cr**. Evento pontual, nunca relógio | 13 cr |
+| **Dívida total** | principal mais encargos (tetos próprios) | **~72 cr fixo** |
+
+- **Encargos são cobrança morta:** juros e multa aumentam o que se deve, mas NUNCA compram mais cura nem movem o cap. O Hospital só empresta até o cap do principal.
+- **Quitação automática:** o jogador escolhe o **plano** ao sair do Hospital (reajustável nas próximas saídas): **agressivo (62%** do crédito recebido vai pra dívida) / **médio (50%)** / **suave (38%)**; o resto fica livre pra jogar. Ordem de abate: **multa, depois juros, depois principal** (estanca a fonte de juros primeiro). Pior caso (~68 cr) quita em ~17 encontros de mult baixo no plano médio: sempre quitável jogando normal.
+- **Bloqueia SÓ compras voluntárias** (loja / craft / itens). **NUNCA bloqueia o Hospital** (curar sempre disponível = anti-softlock; ao bater o cap, resta o safe mode grátis, que nunca trava).
+
+#### 3.3.3 Trava anti-bola-de-neve (regra dura)
+
+Juros simples (jamais composto) mais tetos fixos (juros 21%, multa 13 cr, dívida total ~72 cr) mais multa plafonada por-evento mais abate automático = **é matematicamente impossível a dívida crescer mais rápido do que se paga jogando normalmente**. A dívida só anda numa direção (pra baixo) enquanto se joga; nunca afunda sozinha parada. Esta seção é canon anti-dark-pattern: se algum ajuste futuro permitir composição de juros, cap móvel ou multa recorrente, ele viola este contrato e fere o Pillar 4.
+
 ---
 
 ## §4. Bio-Ampola (consumível de combate)
