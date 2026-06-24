@@ -37,9 +37,14 @@ namespace {
 
 std::uint16_t k(TileKind t) { return static_cast<std::uint16_t>(t); }
 
+// UUIDs v4 FIXOS de teste (literais estaveis; nenhum RNG no caminho). Dois mapas
+// distintos para exercitar o binding de identidade e o cenario map-swap.
+constexpr const char* kIdA = "11111111-1111-4111-8111-111111111111";
+constexpr const char* kIdB = "22222222-2222-4222-8222-222222222222";
+
 // Fixture rica: mapa 5x4 com paredes nas bordas, marco, entrada/saida, spawn,
-// portais. Exercita matriz + metadados juntos.
-TileMap rich_map() {
+// portais. Exercita matriz + metadados juntos. map_id parametrizavel (v2 exige id).
+TileMap rich_map(const char* id = kIdA) {
     TileMap m(5, 4, 2.0f);
     for (std::int32_t x = 0; x < 5; ++x) {
         m.set(x, 0, k(TileKind::Parede));
@@ -55,6 +60,7 @@ TileMap rich_map() {
     m.set_spawn(Cell{2, 1});
     m.add_portal(Portal{"entrada_norte", Cell{2, 0}});
     m.add_portal(Portal{"saida_sul", Cell{2, 3}});
+    m.set_map_id(id);
     return m;
 }
 
@@ -66,6 +72,8 @@ TEST_CASE("map_serializer: roundtrip preserva mapa identico", "[map][serializer]
     const auto out = load_map(bytes);
     REQUIRE(out.result == MapLoadResult::Ok);
     REQUIRE(out.map == original);
+    // v2: o map_id (identidade) sobrevive ao roundtrip e e parte da igualdade.
+    REQUIRE(out.map.map_id() == kIdA);
 }
 
 TEST_CASE("map_serializer: determinismo (selo estavel)", "[map][serializer]") {
@@ -144,4 +152,88 @@ TEST_CASE("map_serializer: payload selado mas dims invalidas -> Invalid",
     const auto forged = gus::domain::map::forge_bad_dims_envelope();
     const auto out = load_map(forged);
     REQUIRE(out.result == MapLoadResult::Invalid);
+}
+
+// ---- BINDING DE IDENTIDADE (v2, anti map-swap) -----------------------------
+
+TEST_CASE("map_serializer: serializar sem map_id -> fail-fast",
+          "[map][serializer][identity]") {
+    // v2 exige identidade: um mapa sem #map_id na fonte nao deve produzir .gmap.
+    TileMap sem_id = rich_map();
+    sem_id.set_map_id("");
+    REQUIRE_THROWS_AS(serialize_map(sem_id), std::invalid_argument);
+}
+
+TEST_CASE("map_serializer: tamper no map_id -> HmacInvalid (id dentro do HMAC)",
+          "[map][serializer][identity][tamper]") {
+    // O map_id mora DENTRO do payload selado: flipar qualquer byte dele quebra o
+    // selo. Localiza um byte do UUID (todos '1' em kIdA) e o adultera; o load tem de
+    // recusar por HMAC, NUNCA chegar a comparar identidade.
+    auto bytes = serialize_map(rich_map(kIdA));
+    // Procura o primeiro byte '1' (0x31) do UUID no envelope e o flipa.
+    bool flipped = false;
+    for (std::size_t i = 0; i < bytes.size(); ++i) {
+        if (bytes[i] == static_cast<std::uint8_t>('1')) {
+            bytes[i] = static_cast<std::uint8_t>('9');
+            flipped = true;
+            break;
+        }
+    }
+    REQUIRE(flipped);
+    // Mesmo informando o expected correto, cai em HmacInvalid antes do binding.
+    const auto out = load_map(bytes, kIdA);
+    REQUIRE(out.result == MapLoadResult::HmacInvalid);
+}
+
+TEST_CASE("map_serializer: load com expected_id correto -> Ok",
+          "[map][serializer][identity]") {
+    const auto bytes = serialize_map(rich_map(kIdA));
+    const auto out = load_map(bytes, kIdA);
+    REQUIRE(out.result == MapLoadResult::Ok);
+    REQUIRE(out.map.map_id() == kIdA);
+}
+
+TEST_CASE("map_serializer: load com expected_id divergente -> IdentityMismatch",
+          "[map][serializer][identity]") {
+    // Selo VALIDO, mas o slot esperava outro mapa: recusa por identidade.
+    const auto bytes = serialize_map(rich_map(kIdA));
+    const auto out = load_map(bytes, kIdB);
+    REQUIRE(out.result == MapLoadResult::IdentityMismatch);
+}
+
+TEST_CASE("map_serializer: load SEM expected_id -> Ok (so HMAC, retrocompat)",
+          "[map][serializer][identity]") {
+    // Chamada sem binding (expected vazio): comporta-se como antes, so valida o selo.
+    const auto bytes = serialize_map(rich_map(kIdA));
+    const auto out = load_map(bytes);  // expected_map_id default ""
+    REQUIRE(out.result == MapLoadResult::Ok);
+    const auto out2 = load_map(bytes, "");
+    REQUIRE(out2.result == MapLoadResult::Ok);
+}
+
+TEST_CASE("map_serializer: cenario MAP-SWAP -> IdentityMismatch",
+          "[map][serializer][identity][mapswap]") {
+    // Ataque que o binding fecha: o jogador troca o .gmap do mapa A (selado valido)
+    // pelo slot que esperava o mapa B (tambem selado valido). Sem binding, o selo
+    // passaria; COM binding, o id divergente e recusado.
+    const auto gmap_de_A = serialize_map(rich_map(kIdA));   // mapa A, selo OK
+    const auto out = load_map(gmap_de_A, /*expected=*/kIdB);  // slot esperava B
+    REQUIRE(out.result == MapLoadResult::IdentityMismatch);
+
+    // Sanidade: o MESMO .gmap carrega Ok no slot certo (A).
+    REQUIRE(load_map(gmap_de_A, kIdA).result == MapLoadResult::Ok);
+}
+
+TEST_CASE("map_serializer: migrator v1->v2 (legado sem id) carrega sem binding",
+          "[map][serializer][identity][migracao]") {
+    // Um envelope v1 LEGADO (sem map_id) ainda carrega forward-only: HMAC OK, id
+    // estampado vazio, Ok. Como nao tem id, nao casa binding nenhum nao-vazio.
+    const auto legacy = gus::domain::map::forge_legacy_v1_envelope(rich_map(kIdA));
+    const auto out = load_map(legacy);  // sem expected: forward-only puro
+    REQUIRE(out.result == MapLoadResult::Ok);
+    REQUIRE(out.map.map_id().empty());  // v1 nao tinha identidade
+
+    // Com binding nao-vazio, um mapa legado (id vazio) nao casa -> IdentityMismatch.
+    const auto bound = load_map(legacy, kIdA);
+    REQUIRE(bound.result == MapLoadResult::IdentityMismatch);
 }

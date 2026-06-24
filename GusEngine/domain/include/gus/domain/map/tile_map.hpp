@@ -31,6 +31,14 @@
 // METADADOS: spawn do player (celula cx,cy) + lista opcional de portais/saidas
 // nomeados (id textual + celula que ele ocupa). Minimo necessario para o slice.
 //
+// IDENTIDADE (map_id, decisao do lider 2026-06-23): cada mapa carrega um UUID textual
+// ESTAVEL (gerado na FONTE .csv via diretiva #map_id, embutido pelo compilador). Ele
+// entra no payload .gmap DENTRO do HMAC (a partir da v2): o selo prova autenticidade,
+// o map_id prova IDENTIDADE. O loader, dado um expected_map_id, recusa um .gmap
+// CORRETAMENTE SELADO mas de OUTRO mapa (defesa contra map-swap). O TileMap em si nao
+// exige map_id (um mapa em construcao/legado v1 pode ter id vazio); a obrigatoriedade
+// e da serializacao v2 (fail-fast em serialize_map) e do binding (load_map).
+//
 // Cross-ref: gus/core/spatial/tile_grid.hpp (consumidor da colisao),
 //            gus/domain/map/map_serializer.hpp (formato .gmap selado),
 //            docs/design/levels/blockout-distritos-inferiores.md (1o mapa).
@@ -131,6 +139,11 @@ public:
     void add_portal(Portal p) { portals_.push_back(std::move(p)); }
     void clear_portals() noexcept { portals_.clear(); }
 
+    // Identidade do mapa (UUID textual estavel, ver doc acima). Vazio = sem binding
+    // (mapa em construcao ou legado v1). Setado pelo compilador a partir de #map_id.
+    [[nodiscard]] const std::string& map_id() const noexcept { return map_id_; }
+    void set_map_id(std::string id) { map_id_ = std::move(id); }
+
     // Valida todas as invariantes. Lanca std::invalid_argument na primeira violacao
     // (fail-fast). Chamado pelo serializer antes de empacotar e pelo loader depois de
     // materializar (defesa em profundidade, mesmo padrao do save).
@@ -159,6 +172,7 @@ private:
     std::vector<std::uint16_t> tiles_;  // row-major: index = y*width + x
     Cell spawn_;
     std::vector<Portal> portals_;
+    std::string map_id_;  // UUID textual estavel; vazio = sem binding (legado/em construcao)
 };
 
 }  // namespace gus::domain::map

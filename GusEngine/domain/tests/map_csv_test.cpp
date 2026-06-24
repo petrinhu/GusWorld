@@ -63,6 +63,24 @@ TEST_CASE("map_csv: diretivas tile_size/spawn/portal", "[map][csv][meta]") {
     REQUIRE(m.portals()[0].cell == Cell{2, 1});
 }
 
+TEST_CASE("map_csv: diretiva #map_id embute a identidade", "[map][csv][identity]") {
+    const std::string csv =
+        "#map_id 11111111-1111-4111-8111-111111111111\n"
+        "0,0\n"
+        "0,0\n";
+    const TileMap m = parse_csv_to_tilemap(csv);
+    REQUIRE(m.map_id() == "11111111-1111-4111-8111-111111111111");
+}
+
+TEST_CASE("map_csv: sem #map_id -> id vazio (compila)", "[map][csv][identity]") {
+    const TileMap m = parse_csv_to_tilemap("0,0\n0,0\n");
+    REQUIRE(m.map_id().empty());
+}
+
+TEST_CASE("map_csv: #map_id sem valor -> erro", "[map][csv][identity][malformado]") {
+    REQUIRE_THROWS_AS(parse_csv_to_tilemap("#map_id\n0,0\n0,0\n"), MapCsvError);
+}
+
 TEST_CASE("map_csv: ignora linhas em branco e comentarios //", "[map][csv]") {
     const std::string csv =
         "// mapa de teste\n"

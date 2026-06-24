@@ -112,6 +112,7 @@ TileMap parse_csv_to_tilemap(std::string_view csv) {
     bool has_spawn = false;
     Cell spawn{0, 0};
     std::vector<Portal> portals;
+    std::string map_id;  // UUID de identidade (#map_id); vazio se ausente.
 
     std::vector<std::vector<std::uint16_t>> rows;
     int width = -1;  // largura da primeira linha de grade
@@ -133,7 +134,12 @@ TileMap parse_csv_to_tilemap(std::string_view csv) {
             const auto tk = tokens(line.substr(1));  // sem o '#'
             if (tk.empty()) continue;
             const std::string_view dir = tk[0];
-            if (dir == "tile_size") {
+            if (dir == "map_id") {
+                if (tk.size() != 2)
+                    throw MapCsvError("CSV linha " + std::to_string(line_no) +
+                                      ": #map_id espera 1 valor (uuid).");
+                map_id = std::string(tk[1]);
+            } else if (dir == "tile_size") {
                 if (tk.size() != 2)
                     throw MapCsvError("CSV linha " + std::to_string(line_no) +
                                       ": #tile_size espera 1 valor.");
@@ -190,6 +196,7 @@ TileMap parse_csv_to_tilemap(std::string_view csv) {
 
     if (has_spawn) map.set_spawn(spawn);
     for (auto& p : portals) map.add_portal(std::move(p));
+    map.set_map_id(std::move(map_id));  // identidade (vazio se sem #map_id)
 
     // Invariantes (spawn/portal dentro dos limites): std::invalid_argument se nao.
     map.validate();

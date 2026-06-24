@@ -11,6 +11,10 @@
 //     da esquerda para a direita). TODAS as linhas de grade devem ter a MESMA
 //     largura (a do primeiro; largura divergente = erro).
 //   - Linhas-DIRETIVA com prefixo '#' carregam metadados:
+//       #map_id <uuid>         UUID textual ESTAVEL de identidade (binding anti
+//                              map-swap). Literal na fonte (sem RNG); embutido no
+//                              .gmap dentro do HMAC. Sem #map_id -> map_id vazio
+//                              (compila, mas serialize_map v2 recusa por fail-fast).
 //       #tile_size <float>     lado da celula em unidades de mundo (default 1.0)
 //       #spawn <x> <y>         celula de spawn do player (default 0 0)
 //       #portal <id> <x> <y>   portal/saida nomeada (pode repetir)

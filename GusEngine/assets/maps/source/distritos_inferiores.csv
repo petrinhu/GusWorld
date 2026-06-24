@@ -4,6 +4,10 @@
 // Derivado de docs/design/levels/blockout-distritos-inferiores.md (F2-G.1).
 // Grade 30x20 celulas x tile_size 2.0m = caixa ~60x40m. Eixo Y p/ baixo.
 // ids: 0=Chao 1=Parede 2=Marco(no/landmark) 3=Entrada 4=Saida.
+// #map_id = UUID v4 FIXO de identidade (binding anti map-swap, decisao do lider
+// 2026-06-23). Literal estavel (NAO regenerar a cada compilacao). Deve casar com
+// app/screens/city_scene.hpp::kDistritosInferioresMapId.
+#map_id 5f9a2c14-8d3b-4e07-9a21-3c6f1d8b2e55
 #tile_size 2.0
 #spawn 15 1
 #portal entrada_norte 15 0

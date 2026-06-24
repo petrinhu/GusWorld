@@ -99,7 +99,8 @@ gus::core::spatial::TileGrid TileMap::to_tile_grid() const {
 bool operator==(const TileMap& a, const TileMap& b) noexcept {
     return a.width_ == b.width_ && a.height_ == b.height_ &&
            a.tile_size_ == b.tile_size_ && a.tiles_ == b.tiles_ &&
-           a.spawn_ == b.spawn_ && a.portals_ == b.portals_;
+           a.spawn_ == b.spawn_ && a.portals_ == b.portals_ &&
+           a.map_id_ == b.map_id_;
 }
 
 }  // namespace gus::domain::map

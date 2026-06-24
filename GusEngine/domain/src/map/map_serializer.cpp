@@ -168,6 +168,8 @@ private:
 std::vector<std::uint8_t> build_payload(const TileMap& map, int version) {
     std::vector<std::uint8_t> p;
     put_u32(p, static_cast<std::uint32_t>(version));
+    // v2+: map_id (UUID textual) DENTRO do HMAC, logo apos a versao. v1 nao tinha.
+    if (version >= 2) put_string(p, map.map_id());
     put_i32(p, map.width());
     put_i32(p, map.height());
     put_f32(p, map.tile_size());
@@ -242,14 +244,26 @@ std::vector<std::uint8_t> unpack(const std::vector<std::uint8_t>& data) {
         data.begin() + static_cast<std::ptrdiff_t>(payload_end));
 }
 
-// Forward-only: hoje so existe a v1, a chain e no-op. Gancho para campos aditivos.
-TileMap migrate_to_current(TileMap decoded, int /*from_version*/) {
+// Forward-only v1->v2: o v1 nao tinha map_id; o decode ja deixa o campo VAZIO para
+// um payload v1, entao a migracao apenas confirma (sem binding). Gancho para campos
+// aditivos futuros; mantem a forma "migrate(decoded, from_version)" do save.
+TileMap migrate_to_current(TileMap decoded, int from_version) {
+    if (from_version < 2) {
+        // v1 -> v2: sem map_id na origem; carrega como mapa SEM binding (id vazio).
+        // (decode_payload ja nao escreveu map_id para v1, entao nada a fazer; este
+        //  bloco documenta a intencao e e o ponto de costura para futuras migracoes.)
+        decoded.set_map_id("");
+    }
     return decoded;
 }
 
 // Materializa o TileMap do payload (na versao lida). Pode lancar MapCorruptError
 // (truncado/contagem absurda) ou std::invalid_argument (dims do construtor).
 TileMap decode_payload(Reader& r, int version) {
+    // v2+: map_id selado vem logo apos a versao (ja consumida pelo caller). v1 nao tem.
+    std::string map_id;
+    if (version >= 2) map_id = r.read_string();
+
     const std::int32_t width = r.read_i32();
     const std::int32_t height = r.read_i32();
     const float tile_size = r.read_f32();
@@ -276,7 +290,7 @@ TileMap decode_payload(Reader& r, int version) {
     }
     r.expect_end();
 
-    (void)version;
+    map.set_map_id(std::move(map_id));  // vazio para v1; UUID selado para v2+
     return map;
 }
 
@@ -286,6 +300,12 @@ TileMap decode_payload(Reader& r, int version) {
 
 std::vector<std::uint8_t> serialize_map(const TileMap& map) {
     map.validate();  // fail-fast antes de empacotar (std::invalid_argument)
+    // v2 EXIGE identidade: serializar um mapa sem map_id e bug do chamador (o
+    // compilador deve ter lido #map_id da fonte). Fail-fast, igual ao resto.
+    if (map.map_id().empty())
+        throw std::invalid_argument(
+            "serialize_map: map_id vazio (v2 exige UUID de identidade; defina "
+            "#map_id na fonte CSV).");
     return pack(build_payload(map, kMapSchemaVersion));
 }
 
@@ -295,9 +315,10 @@ std::vector<std::uint8_t> serialize_map_with_version(const TileMap& map,
 }
 
 std::vector<std::uint8_t> forge_bad_dims_envelope() {
-    // Payload v1 com width*height != tile_count: anuncia 2x2 mas grava 3 tiles.
+    // Payload v2 com width*height != tile_count: anuncia 2x2 mas grava 3 tiles.
     std::vector<std::uint8_t> p;
     put_u32(p, static_cast<std::uint32_t>(kMapSchemaVersion));
+    put_string(p, "forged-bad-dims");  // v2: map_id apos a versao
     put_i32(p, 2);  // width
     put_i32(p, 2);  // height
     put_f32(p, 1.0f);
@@ -311,7 +332,14 @@ std::vector<std::uint8_t> forge_bad_dims_envelope() {
     return pack(p);  // selado corretamente
 }
 
-MapLoadOutcome load_map(const std::vector<std::uint8_t>& data) {
+std::vector<std::uint8_t> forge_legacy_v1_envelope(const TileMap& map) {
+    map.validate();  // o mapa-fonte tem de ser coerente (so o id e omitido)
+    // build_payload com version=1 NAO escreve map_id (formato antigo), selado correto.
+    return pack(build_payload(map, 1));
+}
+
+MapLoadOutcome load_map(const std::vector<std::uint8_t>& data,
+                        const std::string& expected_map_id) {
     MapLoadOutcome out;
     std::vector<std::uint8_t> payload;
     try {
@@ -340,6 +368,15 @@ MapLoadOutcome load_map(const std::vector<std::uint8_t>& data) {
         TileMap decoded = decode_payload(r, version);
         TileMap migrated = migrate_to_current(std::move(decoded), version);
         migrated.validate();  // defesa em profundidade pos-HMAC
+
+        // BINDING DE IDENTIDADE: se o chamador informou um expected_map_id, o map_id
+        // SELADO tem de bater. Divergencia (com selo OK) = map-swap -> IdentityMismatch.
+        // expected vazio = sem binding (so HMAC). O map_id vive dentro do HMAC, entao
+        // adulterar o id ja teria caido em HmacInvalid antes de chegar aqui.
+        if (!expected_map_id.empty() && migrated.map_id() != expected_map_id) {
+            out.result = MapLoadResult::IdentityMismatch;
+            return out;
+        }
 
         out.map = std::move(migrated);
         out.result = MapLoadResult::Ok;

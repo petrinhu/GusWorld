@@ -47,6 +47,8 @@ const char* describe(gus::domain::map::MapLoadResult r) {
             return "schema futuro (binario mais novo que a engine)";
         case R::Invalid:
             return "invariante violada (dimensoes/spawn)";
+        case R::IdentityMismatch:
+            return "identidade divergente (map_id != esperado: map-swap)";
     }
     return "desconhecido";
 }
@@ -70,7 +72,11 @@ CityLoadOutcome load_city_or_fallback() {
         return CityLoadOutcome{make_fallback(), CityLoadStatus::FileMissing, path};
     }
 
-    gus::domain::map::MapLoadOutcome loaded = gus::domain::map::load_map(bytes);
+    // BINDING DE IDENTIDADE: o slot da cidade espera o UUID dos Distritos Inferiores.
+    // Um .gmap autentico mas de OUTRO mapa (map-swap) e recusado (IdentityMismatch) e
+    // cai no fallback, igual a um selo invalido.
+    gus::domain::map::MapLoadOutcome loaded =
+        gus::domain::map::load_map(bytes, kDistritosInferioresMapId);
     if (loaded.result != gus::domain::map::MapLoadResult::Ok) {
         std::cerr << "cidade: .gmap recusado (" << describe(loaded.result) << "): "
                   << path << "; usando a cena de teste (fallback).\n";

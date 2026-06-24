@@ -31,6 +31,15 @@
 
 namespace gus::app::screens {
 
+// REGISTRO area -> UUID de identidade (binding anti map-swap, decisao do lider
+// 2026-06-23). O jogo sabe qual map_id ESPERAR por slot/area: este e o registro
+// minimo (uma area = um slot, no slice). O valor e o MESMO UUID v4 fixo gravado na
+// fonte assets/maps/source/distritos_inferiores.csv (#map_id). Mante-los em sincronia
+// e a unica disciplina: a fonte gera o selo, este constante valida o binding. Ao
+// adicionar uma area, adicione seu par aqui (ou migre para um manifest se crescer).
+inline constexpr const char* kDistritosInferioresMapId =
+    "5f9a2c14-8d3b-4e07-9a21-3c6f1d8b2e55";
+
 // Lado da hitbox do jogador como FRACAO do tile (~0.6, igual ao M1: 20px num tile de
 // 32). A hitbox sao "os pes"; o sprite vaza pra cima (ver overworld_sim render).
 inline constexpr float kPlayerHitboxTileFraction = 0.6f;
