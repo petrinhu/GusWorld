@@ -77,6 +77,22 @@ O motor (`domain/combat/`) ja entrega o estado; a BattleScreen e a CAMADA DE APR
 
 ---
 
+## 3.1 Tela de resultado (fim de combate)
+
+Decidido no brainstorm 2026-06-23. O fim do combate e um LOG DE BUILD que imprime ao vivo (terminal; coerente com "software fala em terminal", ver [`combat-flavor.md`](combat-flavor.md) paragrafo 5). Acervo de frases (vitoria/derrota/rotulos) em combat-flavor.md.
+
+- **Formato:** o terminal imprime as etapas e os ganhos linha a linha (build rodando), nao um painel estatico. A satisfacao esta no scroll de sucesso.
+- **Vitoria:** imprime `BUILD SUCCEEDED` / `exit 0` + ganhos: XP, loot, Knowledge (o selo do bestiario sobe), mestria de carta (+1 por uso, Pillar 1). **Metrica de build:** os turnos viram "compile time"; build rapido ganha rotulo de elogio (blazing fast / clean build) + BONUS de loot/XP por eficiencia; build lento recebe rotulo NEUTRO (nunca xinga). Liga com Knowledge (dominar = build mais rapido) e com o bonus de "lutar de verdade" do auto-kill.
+- **Derrota (party wipe):** imprime `BUILD FAILED` / `core dumped`, corta pro HOSPITAL (canon Pillar 4 + economia: `ActorIncapacitated` -> hospital). NAO e game-over, NAO perde progresso: a derrota e um CUSTO (cura proporcional ao dano, ~1cr/3HP). Hospital tematizado como "restaurando do snapshot".
+- **Sem creditos pro hospital (sintese safe-mode + divida, decisao 2026-06-23):** o jogador ESCOLHE, nunca trava (anti-softlock):
+  - **Safe mode (gratis):** revive a party com HP minimo (~20%, parametro a afinar), "no optimizations". Sai capenga (a fraqueza E o custo; nao da pra abusar, pois curar pagando e sempre melhor).
+  - **OU cura completa a credito (divida):** sai inteiro, mas com saldo NEGATIVO; precisa quitar antes de novas compras (responsabilidade economica, axiologia canon). Limite de divida + juros (se houver) = parametro do economy-designer.
+  - Tematizacao terminal: `insufficient funds` -> `[1] safe mode (20% HP)` / `[2] full repair on credit (debt)`.
+
+A economia do hospital (safe-mode + divida, parametros) deve ser canonizada em [`economia.md`](economia.md) via economy-designer.
+
+---
+
 ## 4. Escopo do M5 (vertical slice) vs depois
 
 ### M5 entrega (a tela jogavel do combate)

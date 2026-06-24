@@ -186,6 +186,67 @@ Sorteadas aleatoriamente ao falhar, do canal correspondente. Marcador: `[C]` = C
 
 ---
 
+## 3b. Acervo de fim de combate (vitoria / derrota / performance)
+
+Para a tela de resultado (log de build ao vivo; ver [`battle-screen.md`](battle-screen.md) paragrafo 3.1). Distintos das 100 frases de falha-de-carta (par. 3): aquelas sao falha de UMA carta no meio da luta; estas sao o FIM do combate. Originais tecnicos, autenticos.
+
+### Vitoria (party venceu)
+```
+1.  BUILD SUCCEEDED
+2.  Process finished with exit code 0
+3.  Compilation finished successfully
+4.  0 errors, 0 warnings
+5.  All tests passed (8/8)
+6.  Test suite passed: 13 passed, 0 failed
+7.  LeakSanitizer: no leaks detected
+8.  Linking succeeded
+9.  Clippy: no warnings emitted
+10. Coverage: 100% of statements
+11. Merged branch 'combat' into main
+12. Fast-forward merge, working tree clean
+13. Deploy succeeded, 0 rollbacks
+14. All checks have passed
+15. Done. Build completed without errors.
+```
+
+### Derrota (party wipe) -- processo/servico morto (sistemico, nao sintaxe)
+```
+1.  Killed (signal 9: SIGKILL)
+2.  Process terminated (core dumped)
+3.  Process finished with exit code 137
+4.  Out of memory: Killed process (party)
+5.  Kernel panic - not syncing: Attempted to kill init
+6.  fatal error: all goroutines are asleep - deadlock!
+7.  Connection to host lost
+8.  Process finished with exit code 139 (interrupted by signal 11: SIGSEGV)
+9.  terminate called recursively
+10. Service exited, status=143/n/a
+11. Aborted (core dumped)
+12. No more processes left to schedule. System halted.
+```
+(exit 137 = 128+9 SIGKILL; exit 139 = 128+11 SIGSEGV; status 143 = 128+15 SIGTERM: codigos reais de morte por sinal.)
+
+### Rotulos de performance (metrica "compile time" = turnos)
+```
+[RAPIDO] (elogio + bonus de eficiencia):
+1. Blazing fast: built in 0.4s
+2. Clean build, no warnings
+3. Zero-cost abstraction
+4. Optimized build (-O3)
+5. Cache hit, nothing to rebuild
+6. Sub-millisecond execution
+7. Hot path inlined
+8. Compiled with link-time optimization
+
+[NEUTRO] (build lento; NUNCA xinga, so constata):
+9.  Build complete
+10. Compiled
+11. Done
+12. Finished
+```
+
+---
+
 ## 4. Regra de i18n (sugestao da ux-writer, canonica)
 
 - O **codigo de erro** (ex: `Segmentation fault (core dumped)`) e string LITERAL nao-traduzivel: faz parte do gag tecnico e da autenticidade. O dev ri do erro real em qualquer locale.
