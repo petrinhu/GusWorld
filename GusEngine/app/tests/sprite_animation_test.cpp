@@ -260,3 +260,96 @@ TEST_CASE("walk: 7 quadros - quadro sempre valido no intervalo", "[sprite_anim]"
         REQUIRE(f < 7);
     }
 }
+
+// --- HISTERESE / COAST do walk (anti-desliza ao SPAMMAR direcao) -------------
+// PROBLEMA do lider (2026-06-23): spammar o botao de direcao (tap-tap-tap) fazia o
+// Gus DESLIZAR sem animar - cada gap entre os taps caia no ramo "parado" e RESETAVA
+// a anim pro neutro antes de completar um passo. CONSERTO: a sobrecarga com dt
+// segura o estado "andando" por um BUFFER curto (coast_seconds) apos o ultimo
+// movimento real, sem cair seco pro idle. Durante o coast SEM movimento real, o
+// quadro e SEGURADO (nao avanca: nada de "marchar parado"). So cai pro neutro
+// quando o coast expira. A sobrecarga LEGADA (sem dt) preserva o corte seco.
+const float kDt60 = 1.0f / 60.0f;  // ~0.0167 s
+
+TEST_CASE("walk coast: micro-gap dentro do buffer MANTEM o estado andando",
+          "[sprite_anim][coast]") {
+    // coast 0.12 s = ~7 frames a 60fps. Um gap de 1 frame (sem movimento) entre dois
+    // taps de movimento NAO pode derrubar pro neutro.
+    WalkCycle c(WalkCycle::Config{/*walk*/ 8.0f, /*run*/ 11.0f, /*coast*/ 0.12f}, 7);
+    c.advance(4.0f, false, kDt60);  // movimento real
+    REQUIRE(c.is_moving());
+    c.advance(0.0f, false, kDt60);  // micro-gap (1 frame sem mover) -> coast segura
+    REQUIRE(c.is_moving());
+    REQUIRE(c.current_frame() != WalkCycle::kNeutralFrame);
+}
+
+TEST_CASE("walk coast: spam (taps com micro-gaps) mantem a anim rodando continua",
+          "[sprite_anim][coast]") {
+    // Simula o SPAM: alterna 1 frame com movimento e 2 frames parado (gap < coast),
+    // por varios ciclos. A anim tem que ficar SEMPRE em movimento (nunca volta ao
+    // neutro entre os taps) e os quadros DEVEM progredir (passos de verdade).
+    WalkCycle c(WalkCycle::Config{8.0f, 11.0f, 0.12f}, 7);
+    int neutral_hits = 0;
+    int changes = 0;
+    int last = c.current_frame();
+    for (int i = 0; i < 60; ++i) {
+        const bool tap = (i % 3 == 0);          // 1 tap a cada 3 frames
+        c.advance(tap ? 6.0f : 0.0f, false, kDt60);
+        if (c.current_frame() == WalkCycle::kNeutralFrame) ++neutral_hits;
+        if (c.current_frame() != last) { ++changes; last = c.current_frame(); }
+    }
+    REQUIRE(neutral_hits == 0);  // nunca caiu pro idle no meio do spam
+    REQUIRE(changes > 0);        // e a animacao progrediu (deu passos)
+}
+
+TEST_CASE("walk coast: parar ALEM do buffer cai pro idle (neutro)",
+          "[sprite_anim][coast]") {
+    WalkCycle c(WalkCycle::Config{8.0f, 11.0f, 0.12f}, 7);
+    c.advance(8.0f, false, kDt60);
+    REQUIRE(c.is_moving());
+    // Solta de verdade: frames parados o bastante pra exceder o coast (0.12 s ~ 8
+    // frames). 12 frames sem movimento garante o corte pro idle.
+    for (int i = 0; i < 12; ++i) {
+        c.advance(0.0f, false, kDt60);
+    }
+    REQUIRE_FALSE(c.is_moving());
+    REQUIRE(c.current_frame() == WalkCycle::kNeutralFrame);
+}
+
+TEST_CASE("walk coast: parado de verdade NAO marcha no lugar (quadro segurado)",
+          "[sprite_anim][coast]") {
+    // Durante o coast SEM movimento real, o quadro NAO pode avancar (senao o boneco
+    // "anda no lugar"). Anda um tick (fixa um quadro), depois fica parado dentro do
+    // buffer: o quadro mostrado tem que ser o MESMO (segurado), nunca progride sem
+    // deslocamento real.
+    WalkCycle c(WalkCycle::Config{8.0f, 11.0f, 0.20f}, 7);
+    c.advance(8.0f, false, kDt60);          // 1 troca -> quadro 1
+    const int held = c.current_frame();
+    REQUIRE(held != WalkCycle::kNeutralFrame);
+    for (int i = 0; i < 8; ++i) {           // parado dentro do coast
+        c.advance(0.0f, false, kDt60);
+        REQUIRE(c.current_frame() == held);  // segura o quadro: nao marcha parado
+    }
+}
+
+TEST_CASE("walk coast: coast zero corta seco (equivale ao legado)",
+          "[sprite_anim][coast]") {
+    // coast_seconds 0 -> a sobrecarga com dt deve cair pro neutro no primeiro tick
+    // sem movimento (mesmo comportamento da sobrecarga legada).
+    WalkCycle c(WalkCycle::Config{8.0f, 11.0f, 0.0f}, 7);
+    c.advance(8.0f, false, kDt60);
+    REQUIRE(c.is_moving());
+    c.advance(0.0f, false, kDt60);
+    REQUIRE_FALSE(c.is_moving());
+}
+
+TEST_CASE("walk coast: sobrecarga legada (sem dt) ainda corta seco no parado",
+          "[sprite_anim][coast]") {
+    // Preserva os testes/chamadas antigos: advance(dist, running) sem dt nao tem
+    // coast - parar volta ao neutro imediatamente.
+    WalkCycle c(WalkCycle::Config{8.0f, 11.0f, 0.12f}, 7);
+    c.advance(8.0f, false);
+    REQUIRE(c.is_moving());
+    c.advance(0.0f, false);  // sem dt -> sem histerese
+    REQUIRE_FALSE(c.is_moving());
+}

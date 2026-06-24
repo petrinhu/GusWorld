@@ -48,6 +48,17 @@ struct CameraView {
 CameraView clamp_camera(Vec2 target_center, float viewport_w, float viewport_h,
                         float map_w, float map_h) noexcept;
 
+// ZOOM (px por unidade de mundo) -> tamanho da visao EM UNIDADES DE MUNDO, dado o
+// tamanho da viewport em PIXELS. Esta e a peca que faltava: a camera mostra
+// (pixels / px_por_unidade) unidades de mundo, e nao "pixels unidades" (que fazia o
+// mapa de 60x40 unidades virar um retangulo de 60x40 px no centro da tela).
+//   px_per_world_unit > 1  => cada unidade de mundo ocupa mais de 1 px = APROXIMA
+//                             (mostra MENOS mundo, tudo maior na tela).
+//   px_per_world_unit <= 0 => guarda: devolve os proprios pixels (zoom 1, sem
+//                             divisao por zero/negativo). Pura, deterministica.
+[[nodiscard]] float world_span_from_pixels(float pixels,
+                                           float px_per_world_unit) noexcept;
+
 }  // namespace gus::core::spatial
 
 #endif  // GUS_CORE_SPATIAL_CAMERA_CLAMP_HPP

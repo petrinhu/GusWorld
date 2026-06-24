@@ -179,10 +179,20 @@ TEST_CASE("overworld: nao atravessa a borda do mapa", "[overworld]") {
     REQUIRE(sim.player().x >= 16.0f - kEps);
 }
 
+// Tuning que neutraliza o ZOOM (1 px == 1 unidade de mundo) para os testes de CLAMP
+// e CULLING que raciocinam em unidades de mundo. Com tile_size 16 do make_map(),
+// camera_zoom_px_per_tile = 16 => px-por-unidade = 16/16 = 1.0. Assim camera_view e
+// render recebem pixels que valem 1:1 em mundo (semantica testada antes do zoom).
+OverworldTuning tuning_no_zoom_for_tile16() {
+    OverworldTuning t;
+    t.camera_zoom_px_per_tile = 16.0f;  // ppu = 16 / tile_size(16) = 1.0
+    return t;
+}
+
 TEST_CASE("overworld: camera segue o jogador presa ao mapa", "[overworld]") {
     TileGrid g = make_map();
-    OverworldSim sim(g, Aabb{36.0f, 36.0f, 8.0f, 8.0f}, 4.0f);
-    CameraView v = sim.camera_view(40.0f, 40.0f);
+    OverworldSim sim(g, Aabb{36.0f, 36.0f, 8.0f, 8.0f}, tuning_no_zoom_for_tile16());
+    CameraView v = sim.camera_view(40.0f, 40.0f);  // zoom 1:1 => 40 px == 40 unidades
     REQUIRE_THAT(v.center.x, WithinAbs(40.0, kEps));
     REQUIRE_THAT(v.center.y, WithinAbs(40.0, kEps));
     REQUIRE_THAT(v.rect.x, WithinAbs(20.0, kEps));
@@ -190,17 +200,35 @@ TEST_CASE("overworld: camera segue o jogador presa ao mapa", "[overworld]") {
 
 TEST_CASE("overworld: camera clampa na borda", "[overworld]") {
     TileGrid g = make_map();
-    OverworldSim sim(g, Aabb{16.0f, 16.0f, 8.0f, 8.0f}, 4.0f);
+    OverworldSim sim(g, Aabb{16.0f, 16.0f, 8.0f, 8.0f}, tuning_no_zoom_for_tile16());
     CameraView v = sim.camera_view(40.0f, 40.0f);
     REQUIRE(v.rect.x >= -kEps);
     REQUIRE(v.rect.y >= -kEps);
 }
 
+// ZOOM REAL (M4-BUG.CAMERA): com zoom > 1:1 a visao mostra MENOS unidades de mundo do
+// que os pixels da janela (AMPLIA). camera_zoom_px_per_tile 48 no tile_size 16 da
+// px-por-unidade = 3.0; logo camera_view(120 px) = 40 unidades de mundo de visao (e
+// NAO 120). Era exatamente isto que faltava: a visao deixa de "caber o mapa inteiro".
+TEST_CASE("overworld: zoom amplia (pixels da janela viram menos mundo)", "[overworld][zoom]") {
+    TileGrid g = make_map();  // tile_size 16, mapa 80x80 unidades
+    OverworldTuning t;
+    t.camera_zoom_px_per_tile = 48.0f;  // ppu = 48/16 = 3.0
+    OverworldSim sim(g, Aabb{36.0f, 36.0f, 8.0f, 8.0f}, t);
+    REQUIRE_THAT(sim.px_per_world_unit(), WithinAbs(3.0, kEps));
+    // 120 px de janela / 3.0 = 40 unidades de mundo visiveis (centradas no Gus 40,40).
+    CameraView v = sim.camera_view(120.0f, 120.0f);
+    REQUIRE_THAT(v.rect.w, WithinAbs(40.0, kEps));
+    REQUIRE_THAT(v.rect.h, WithinAbs(40.0, kEps));
+    REQUIRE_THAT(v.center.x, WithinAbs(40.0, kEps));  // centra no Gus, dentro do mapa
+    REQUIRE_THAT(v.rect.x, WithinAbs(20.0, kEps));     // 40 - 40/2
+}
+
 TEST_CASE("overworld: render emite paredes e jogador", "[overworld]") {
     TileGrid g = make_map();
-    OverworldSim sim(g, Aabb{36.0f, 36.0f, 8.0f, 8.0f}, 4.0f);
+    OverworldSim sim(g, Aabb{36.0f, 36.0f, 8.0f, 8.0f}, tuning_no_zoom_for_tile16());
     FakeRenderer r;
-    sim.render(r, 80.0f, 80.0f, 0.0f);
+    sim.render(r, 80.0f, 80.0f, 0.0f);  // zoom 1:1 => visao 80x80 = mapa inteiro
     REQUIRE(r.begins == 1);
     REQUIRE(r.ends == 1);
     REQUIRE(r.filled_count() == 17);  // 16 borda + 1 bloco interno
@@ -521,6 +549,107 @@ TEST_CASE("overworld: quadro de walk avanca com a distancia", "[overworld]") {
     REQUIRE(f < kWalkFrameCount);
 }
 
+// REGRESSAO do bug "Gus desliza sem dar passos" (irmao do bug do zoom): a cadencia do
+// walk era ABSOLUTA (~8 px), calibrada para o tile 16 do M1; no .gmap real (tile_size
+// 2.0) o quadro quase nunca trocava. A cadencia agora e por FRACAO DE TILE, escalada
+// pelo tile_size, entao a MESMA velocidade (em tiles/s) por o MESMO tempo tem que dar
+// o MESMO numero de quadros de walk EM QUALQUER escala. Dois mapas, tile_size 2.0 e
+// 16.0, andando os mesmos ticks na mesma velocidade: a contagem de trocas de quadro
+// tem que bater (imune a escala).
+TEST_CASE("overworld: cadencia do walk e invariante ao tile_size (anti-desliza)",
+          "[overworld]") {
+    auto count_frame_changes = [](float tile_size) {
+        // Mapa grande o bastante pra nao bater na borda nos ticks andados (qualquer
+        // escala). Velocidade IGUAL em tiles/s; a fracao de tile/quadro do walk e a
+        // default do tuning. O Gus (7 quadros) anda pra Leste em campo livre.
+        TileGrid g(200, 200, tile_size);
+        OverworldTuning t;
+        t.walk_speed_tiles_per_sec = 4.5f;
+        OverworldSim sim(g, Aabb{50.0f * tile_size, 50.0f * tile_size, 0.5f * tile_size,
+                                 0.5f * tile_size},
+                         t);
+        sim.set_player_sprites(make_gus_like_sprites(7, 5));
+        int changes = 0;
+        int last = sim.walk_cycle().current_frame();
+        for (int i = 0; i < 120; ++i) {
+            sim.step_fixed(1, 0, false, 1.0f / 60.0f);
+            const int f = sim.walk_cycle().current_frame();
+            if (f != last) ++changes;
+            last = f;
+        }
+        return changes;
+    };
+    const int small_scale = count_frame_changes(2.0f);   // .gmap real (era o bug)
+    const int large_scale = count_frame_changes(16.0f);  // cena de teste do M1
+    // Mesma cadencia nas duas escalas: prova que a troca de quadro acompanha o tile_size.
+    REQUIRE(small_scale == large_scale);
+    // E houve passos de verdade em 2 s a 4.5 tiles/s (nao "deslizou parado").
+    REQUIRE(small_scale > 0);
+}
+
+// --- HISTERESE/COAST do walk: SPAM de direcao nao desliza (lider 2026-06-23) --
+
+TEST_CASE("overworld: spammar a direcao MANTEM a anim de walk (nao desliza)",
+          "[overworld][coast]") {
+    // BUG do lider: tap-tap-tap rapido (ex.: 1 frame movendo, 2 parados) fazia o Gus
+    // DESLIZAR sem animar - cada gap caia no ramo parado e RESETAVA o walk pro neutro.
+    // Com a histerese (coast), o estado "andando" segura por um buffer curto entre os
+    // taps: a anim fica em movimento o tempo todo, nunca cai pro neutro no meio do spam.
+    TileGrid g(40, 40, 16.0f);
+    OverworldSim sim(g, Aabb{200.0f, 200.0f, 8.0f, 8.0f}, 8.0f);
+    sim.set_player_sprites(make_gus_like_sprites(7, 5));
+    // Estabelece movimento com um tick andando.
+    sim.step_fixed(0, 1, false, 1.0f / 60.0f);  // Sul
+    REQUIRE(sim.walk_cycle().is_moving());
+    int neutral_hits = 0;
+    for (int i = 0; i < 60; ++i) {
+        const bool tap = (i % 3 == 0);  // spam: 1 tap a cada 3 frames
+        sim.step_fixed(0, tap ? 1 : 0, false, 1.0f / 60.0f);
+        if (!sim.walk_cycle().is_moving()) ++neutral_hits;
+    }
+    REQUIRE(neutral_hits == 0);  // nunca caiu pro idle durante o spam (deslize curado)
+}
+
+TEST_CASE("overworld: soltar de verdade (alem do buffer) volta ao idle",
+          "[overworld][coast]") {
+    // Parar mesmo (soltar e ficar parado alem do coast) tem que voltar ao idle normal.
+    TileGrid g(40, 40, 16.0f);
+    OverworldSim sim(g, Aabb{200.0f, 200.0f, 8.0f, 8.0f}, 8.0f);
+    sim.set_player_sprites(make_gus_like_sprites(7, 5));
+    sim.step_fixed(0, 1, false, 1.0f / 60.0f);  // anda Sul
+    REQUIRE(sim.walk_cycle().is_moving());
+    // Solta por bem mais que o coast (~0.12 s ~ 8 frames): 30 frames parado.
+    for (int i = 0; i < 30; ++i) {
+        sim.step_fixed(0, 0, false, 1.0f / 60.0f);
+    }
+    REQUIRE_FALSE(sim.walk_cycle().is_moving());  // idle de volta
+}
+
+TEST_CASE("overworld: parado de verdade nao MARCHA no lugar durante o buffer",
+          "[overworld][coast]") {
+    // Durante o coast SEM movimento real, o quadro do walk e SEGURADO (nao progride):
+    // o Gus nao "anda no lugar". Anda um tick, depois fica parado dentro do buffer; o
+    // quadro mostrado nao pode avancar enquanto nao ha deslocamento real.
+    TileGrid g(40, 40, 16.0f);
+    OverworldSim sim(g, Aabb{200.0f, 200.0f, 8.0f, 8.0f}, 8.0f);
+    sim.set_player_sprites(make_gus_like_sprites(7, 5));
+    sim.step_fixed(1, 0, false, 1.0f / 60.0f);  // Leste, fixa um quadro
+    const int held = sim.walk_cycle().current_frame();
+    for (int i = 0; i < 5; ++i) {  // parado dentro do coast
+        sim.step_fixed(0, 0, false, 1.0f / 60.0f);
+        REQUIRE(sim.walk_cycle().current_frame() == held);  // segura: nao marcha
+    }
+}
+
+TEST_CASE("feel: coast do walk no default (curto, anti-deslize ao spammar)",
+          "[overworld][feel][coast]") {
+    const OverworldTuning t{};
+    // Curto o bastante pra nao "andar no lugar" perceptivel, longo pra cobrir os
+    // micro-gaps do spam humano a 60fps. Faixa util ~0.08..0.16 (lider afina no display).
+    REQUIRE(t.anim_walk_coast_seconds >= 0.08f);
+    REQUIRE(t.anim_walk_coast_seconds <= 0.16f);
+}
+
 // --- GUS: walk de 7 quadros + breathing idle animado ------------------------
 
 TEST_CASE("overworld: set_player_sprites configura o ciclo pelo walk_count (Gus 7)",
@@ -753,7 +882,12 @@ TEST_CASE("overworld: parado mostra o sprite IDLE da DIRECAO corrente (nao Sul)"
 
     sim.step_fixed(0, -1, false, 1.0f / 60.0f);   // anda pro Norte
     REQUIRE(sim.facing() == Direction::North);
-    sim.step_fixed(0, 0, false, 1.0f / 60.0f);    // para
+    // Solta ALEM do coast (~0.10 s ~ 6 frames): a histerese segura o walk por um
+    // instante apos o ultimo passo, entao o IDLE so aparece depois do buffer expirar.
+    // 12 frames parado garante o estado idle (sem isso, o boneco ainda mostraria walk).
+    for (int i = 0; i < 12; ++i) {
+        sim.step_fixed(0, 0, false, 1.0f / 60.0f);  // para
+    }
     REQUIRE(sim.facing() == Direction::North);     // facing preservado
     FakeRenderer r;
     sim.render(r, 80.0f, 80.0f, 1.0f);
@@ -842,4 +976,49 @@ TEST_CASE("overworld: idle congelado (1 quadro) nao quebra - compat Caua",
     FakeRenderer r;
     sim.render(r, 80.0f, 80.0f, 1.0f);
     REQUIRE(r.sprites[0].texture == s.idle[static_cast<int>(Direction::South)]);
+}
+
+// --- CALIBRACAO DE FEEL (lider 2026-06-23, no display) ----------------------
+// Trava as 3 decisoes de feel do lider nos DEFAULTS do OverworldTuning pra um edit
+// descuidado nao desfazer o ajuste em silencio. Sao invariantes de DADO PURO (sem
+// SDL/GPU/IO), nao testam render. O lider ainda afina os numeros exatos no display;
+// estes testes so guardam a FAIXA/DIRECAO da calibracao, nao o valor cravado.
+TEST_CASE("feel: zoom default reduzido ~10% (lider no display)", "[overworld][feel]") {
+    using Catch::Matchers::WithinAbs;
+    const OverworldTuning t{};
+    // Era 48; o lider pediu -10% (~43). Faixa util do header ~24..64.
+    REQUIRE_THAT(t.camera_zoom_px_per_tile, WithinAbs(43.0f, 1e-4f));
+    REQUIRE(t.camera_zoom_px_per_tile < 48.0f);          // ficou MENOR (menos zoom)
+    REQUIRE(t.camera_zoom_px_per_tile >= 24.0f);         // dentro da faixa util
+    REQUIRE(t.camera_zoom_px_per_tile <= 64.0f);
+}
+
+TEST_CASE("feel: cadencia do walk NATURAL (meio-termo, lider round 2)",
+          "[overworld][feel]") {
+    const OverworldTuning t{};
+    // ROUND 2 (lider no display): 0.30 = arrastado, 0.16 = frenetico ("passos muito
+    // rapidos"). Buscado o MEIO-TERMO em ciclos/s a 4.5 tiles/s (ciclo de 7 quadros):
+    // ciclos/s = 4.5 / (7*cadencia). Janela pedida 0.22..0.24 (0.23 = 2.80 ciclos/s,
+    // passo natural nem arrastado nem frenetico). Trava a janela + a direcao.
+    REQUIRE(t.anim_walk_tiles_per_frame >= 0.18f);       // nao frenetico (mais lento que 0.16)
+    REQUIRE(t.anim_walk_tiles_per_frame <= 0.24f);       // nao arrastado (mais rapido que 0.30)
+    // Correr troca MENOS quadros por tile (passada mais LONGA, "pe colado" na corrida) e
+    // mantem ~1.4x a cadencia do walk.
+    REQUIRE(t.anim_run_tiles_per_frame > t.anim_walk_tiles_per_frame);
+    REQUIRE(t.anim_run_tiles_per_frame >= t.anim_walk_tiles_per_frame * 1.3f);
+    REQUIRE(t.anim_run_tiles_per_frame <= t.anim_walk_tiles_per_frame * 1.5f);
+}
+
+TEST_CASE("feel: respiracao calma so BOB (escala zerada, sem esticar/achatar, lider round 2)",
+          "[overworld][feel]") {
+    const OverworldTuning t{};
+    // ROUND 2 (lider no display): "ainda estica/achata muito" mesmo com escala em 0.008.
+    // CAUSA REAL = a escala procedural e ANCORADA NA BASE (squash/stretch nao-uniforme):
+    // a cabeca balanca com o pe cravado, e em pixel-art rigido o olho le isso como
+    // deformacao elastica mesmo a ~1px. CORRECAO: ZERAR a escala; a respiracao calma fica
+    // SO no bob (sobe-desce UNIFORME, sem distorcer). NAO era o idle ofegante (winded), que
+    // so dispara apos corrida real, nunca apos caminhada.
+    REQUIRE(t.idle_calm_scale_amplitude == 0.0f);        // escala DESLIGADA (sem squash/stretch)
+    REQUIRE(t.idle_calm_bob_tiles > 0.0f);               // ainda respira, so pelo bob
+    REQUIRE(t.idle_calm_bob_tiles <= 0.06f);             // deslize vertical contido (sutil)
 }

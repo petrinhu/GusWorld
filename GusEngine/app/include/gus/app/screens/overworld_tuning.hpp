@@ -57,14 +57,29 @@ struct OverworldTuning {
     // default ~0.35). O lider ajusta vendo.
     gus::core::spatial::CornerAssistOptions corner{};
 
-    // --- CAMERA ------------------------------------------------------------
-    // GANCHO (INERTE por decisao do lider): zoom da camera ortografica.
-    //   1.0 (hoje): sem zoom (a camera atual nao muda).
-    //   >1.0:       aproxima (mostra menos mundo); <1.0 afasta. Quando o lider
-    //               quiser ligar: dividir o viewport em mundo por camera_zoom nos
-    //               DOIS pontos marcados "// ZOOM:" em overworld_sim.cpp. NAO esta
-    //               aplicado agora (gancho pronto, camera intacta).
-    float camera_zoom = 1.0f;
+    // --- CAMERA (ZOOM) -----------------------------------------------------
+    // PONTO UNICO DO ZOOM (lider calibra vendo o display). Quantos PIXELS de tela
+    // cada TILE do mapa ocupa. O lider pensa em "tile = N px" (estilo Zelda ALttP /
+    // Stardew), INDEPENDENTE do tile_size em unidades de mundo do .gmap (o overworld
+    // converte: px-por-unidade = camera_zoom_px_per_tile / tile_size). A camera
+    // mostra (pixels_da_janela / px-por-unidade) unidades de mundo e CENTRA no Gus,
+    // rolando quando o mapa e maior que a tela.
+    //
+    // ESTE NUMERO ERA O BUG DO M4: antes a camera tratava 1 unidade de mundo == 1 px
+    // (zoom ausente). Com o .gmap de tile_size 2.0, o mapa de 30x20 tiles = 60x40
+    // unidades virava um retangulo de ~60x40 px no centro de uma tela 1280x720. No
+    // M1 a cena de teste usava tile_size 32, que por coincidencia dava ~32 px/tile e
+    // "parecia ok". Agora o zoom e explicito.
+    //
+    // 43 px/tile @1280x720 (tile_size 2.0 => px-por-unidade ~21.5): visao ~29.8x16.7
+    // tiles (~59.5x33.5 unidades); o mapa 60x40 unidades ROLA nos dois eixos seguindo o
+    // Gus. O sprite do Gus (player_sprite_height_tiles ~2.75 => ~118 px) ocupa ~1/6 da
+    // altura da tela (estilo Zelda ALttP / Stardew). Faixa util ~24..64: maior = mais
+    // perto (personagem maior, rola mais); menor = mais longe (mostra mais mundo).
+    //
+    // LIDER 2026-06-23 (FEEL no display): 48 -> 43 (-10%), zoom estava "um pouco grande".
+    // Ponto unico: mexer SO neste numero reescala a camera inteira (sem tocar logica).
+    float camera_zoom_px_per_tile = 43.0f;
 
     // --- CORES PLACEHOLDER (sem arte ainda; o lider ajusta vendo) ----------
     gus::platform::render2d::DrawColor wall_color{0.18f, 0.20f, 0.28f, 1.0f};
@@ -90,10 +105,70 @@ struct OverworldTuning {
     // mecanismos concorrentes: automatico = base; manual = ajuste somado.
     float sprite_foot_offset_tiles = 0.0f;
 
-    // Px de mundo percorridos por troca de quadro do walk (~8 px no tile 16,
-    // locomotion.md). Run usa passada mais longa (run_px_per_frame). Escalavel.
-    float anim_walk_px_per_frame = 8.0f;
-    float anim_run_px_per_frame = 11.0f;
+    // --- CADENCIA DO WALK CYCLE (troca de quadro do sprite) ----------------
+    // PONTO UNICO da cadencia da caminhada (lider calibra vendo o display). Quanto o
+    // Gus precisa andar para o sprite TROCAR UM QUADRO, em FRACAO DE TILE (NAO em px
+    // absolutos). RELATIVO a escala do mundo de proposito: o overworld multiplica por
+    // grid_.tile_size() para virar unidades de mundo, entao a passada parece NATURAL
+    // EM QUALQUER tile_size (cena de teste do M1 tile 16/32 OU o .gmap real tile 2.0).
+    //
+    // ESTE NUMERO ERA O BUG DO WALK (irmao do bug do zoom): antes a cadencia era ABSOLUTA
+    // (~8 px), calibrada para o tile 16 do M1. No .gmap real (tile_size 2.0) a velocidade
+    // 4.5 tiles/s = 9 unidades/s dava ~0.15 unidade/frame contra um passo de 8 unidades:
+    // o quadro quase nunca trocava, o Gus DESLIZAVA sem dar passos. Agora a cadencia e
+    // por fracao de tile, imune a escala.
+    //
+    // LIDER 2026-06-23 (FEEL no display): foot-slide (o pe PATINA - a troca de quadro nao
+    // casava com a translacao) + os passos pareciam LENTOS/arrastados. A correcao e troca
+    // de quadro MAIS RAPIDA (cadencia MENOR), nao mais lenta: cadencia 0.30 -> 0.16
+    // tile/quadro. Ciclo de 7 quadros do Gus span ~1.12 tile (era ~2.1): passada VISUAL
+    // bem mais curta -> o pe "agarra" o chao com mais frequencia e o walk fica ENERGICO
+    // (estilo Zelda ALttP / Stardew). A 4.5 tiles/s troca ~28 quadros/s -> ~4 ciclos/s.
+    // Faixa util ~0.12..0.30: MAIOR = passada mais longa (troca menos, desliza/arrasta
+    // mais); MENOR = passada mais curta e energica (troca mais rapido). Ponto unico:
+    // afinar SO este numero no display.
+    //
+    // LIMITE DA ARTE (diagnostico engine-graphics 2026-06-23): a arte de 7 quadros do
+    // walk do Gus e um BOB/sway de peso (torso+cabelo balancam), NAO uma passada com
+    // CONTATO claro (uma perna plantada a frente, outra atras alternando). Sem keyframe
+    // de pe-plantado pra ancorar a translacao, NENHUMA cadencia ELIMINA 100% o desliza;
+    // cadencia menor MINIMIZA (acopla a frequencia do bob a velocidade). Eliminacao total
+    // exige RE-ARTE do walk com poses de contato (candidato ARTE-RESP-4DIR/regen).
+    //
+    // LIDER 2026-06-23 (FEEL no display, ROUND 2): 0.16 ficou FRENETICO ("passos muito
+    // rapidos"); o historico mostrou 0.30 = lento/arrastado, 0.16 = rapido demais. Buscado
+    // o MEIO-TERMO em CICLOS/s (a leitura fisiologica do passo): a 4.5 tiles/s o ciclo de
+    // 7 quadros do Gus span = 7*cadencia tiles, logo ciclos/s = 4.5 / (7*cadencia).
+    //   0.30 -> span 2.10 -> 2.14 ciclos/s (arrastado);  0.16 -> span 1.12 -> 4.02 ciclos/s
+    //   (frenetico);  0.23 -> span 1.61 -> 2.80 ciclos/s (~19.6 quadros/s) = passo NATURAL,
+    // centro da janela pedida (0.22..0.24) e perto da cadencia de caminhada percebida no
+    // top-down acelerado. Ponto unico: afinar SO este numero no display.
+    float anim_walk_tiles_per_frame = 0.19f;
+    // Idem CORRENDO: passada mais LONGA (nao fps maior). Maior que o walk garante "pe
+    // colado" na corrida. 0.32 tile/quadro = ~1.4x o walk (0.23*1.4); a 7.2 tiles/s (run
+    // 1.6x) span 2.24 -> 3.21 ciclos/s > walk (2.80) = leitura clara de "correndo".
+    float anim_run_tiles_per_frame = 0.27f;
+
+    // --- HISTERESE (coast) da animacao de walk (anti-deslize ao SPAMMAR) ---------
+    // PROBLEMA (lider 2026-06-23, no display): SPAMMAR o botao de direcao (tap-tap-tap
+    // rapido) fazia o Gus DESLIZAR pela tela sem animar os passos. CAUSA: a anim de
+    // walk estava acoplada ao INPUT do frame exato - cada micro-gap entre os taps caia
+    // no ramo "parado" e RESETAVA o ciclo pro neutro antes de completar um passo, entao
+    // o deslocamento real acumulava mas o boneco voltava ao quadro neutro (deslize).
+    //
+    // CONSERTO (estilo Zelda ALttP / Stardew): a anim segue o ESTADO de movimento, nao o
+    // input do frame. Ao soltar, NAO corta seco pro idle - segura o estado "andando" por
+    // este BUFFER curto (em SEGUNDOS) antes de cair pro idle. Durante o buffer SEM
+    // deslocamento real o quadro e SEGURADO (nao avanca: nada de "marchar parado"). Os
+    // micro-gaps do spam ficam dentro do buffer e a anim segue fluida; soltar de verdade
+    // (parar alem do buffer) volta ao idle normal.
+    //
+    // 0.10 s @60fps = ~6 frames de tolerancia: cobre taps humanos rapidos sem o boneco
+    // "andar no lugar" perceptivel parado. Faixa util ~0.08..0.16: MAIOR = mais tolerante
+    // ao spam (mas arrisca segurar o walk parado um tiquinho a mais); MENOR = corta mais
+    // cedo (risco de voltar o deslize no spam muito rapido). 0 = corte seco (sem coast).
+    // Ponto unico: afinar SO este numero no display.
+    float anim_walk_coast_seconds = 0.10f;
 
     // --- IDLE ANIMADO (breathing) ------------------------------------------
     // RESPIRACAO PARADA em CICLOS POR MINUTO (semantico, fisiologico), nao fps cru.
@@ -144,14 +219,25 @@ struct OverworldTuning {
     // Cadencia da respiracao CALMA, em ciclos/min (humano em repouso ~16). Dirige a
     // senoide do core::BreathOscillator. NAO troca quadro: e bob/escala continuo.
     float idle_calm_breaths_per_minute = 16.0f;
-    // Amplitude da ESCALA vertical da respiracao calma, em FRACAO (0.025 = +-2.5%):
-    // o sprite estica/encolhe levemente na vertical (peito subindo/descendo). Faixa
-    // sugerida do lider: 0.02 a 0.03. 0 desliga a escala.
-    float idle_calm_scale_amplitude = 0.025f;
-    // Amplitude do BOB (sobe-desce) da respiracao calma, em TILES (0.06 tile ~= 1px
-    // no tile 16; ~0.12 no tile 32). Pequeno deslize vertical do desenho. Faixa
-    // sugerida 0.03 a 0.12 tile. 0 desliga o bob (so a escala respira).
-    float idle_calm_bob_tiles = 0.06f;
+    // Amplitude da ESCALA vertical da respiracao calma, em FRACAO (0.0 = DESLIGADA).
+    //
+    // LIDER 2026-06-23 (FEEL no display, ROUND 2): "ainda estica/achata muito" MESMO em
+    // 0.008 (+-0.8%, ~1px) - suspeito, porque 0.8% deveria ser imperceptivel. CAUSA REAL
+    // diagnosticada (engine-graphics): a escala e ANCORADA NA BASE (pe plantado, cresce so
+    // pra cima), entao e um SQUASH/STRETCH NAO-UNIFORME: a cabeca/cabelo do Gus balanca
+    // enquanto os pes ficam cravados. Em pixel-art RIGIDO o olho le QUALQUER escala
+    // nao-uniforme como deformacao ELASTICA (gelatina), nao como respiracao - 1px ja
+    // chama atencao. NAO era o idle ofegante (winded): aquele so dispara apos CORRIDA real
+    // (>=2s de sprint -> WindedTimer), nunca apos caminhada; ao parar de ANDAR o idle e
+    // sempre o CALMO procedural. CORRECAO do lider: ZERAR a escala procedural. A
+    // respiracao calma fica SO no bob (sobe-desce UNIFORME, sem distorcer o sprite).
+    // O mecanismo de escala continua intacto e testado (ligavel >0 a qualquer momento).
+    float idle_calm_scale_amplitude = 0.0f;
+    // Amplitude do BOB (sobe-desce) da respiracao calma, em TILES. Deslize vertical do
+    // desenho INTEIRO (UNIFORME, nao deforma): unico componente da respiracao calma agora
+    // que a escala foi zerada. 0.03 tile * tile_size 2.0 = 0.06 unidade ~= 1.3px no .gmap:
+    // sobe-desce SUTIL e limpo, sem esticar/achatar. Faixa util ~0.02..0.06. 0 desliga.
+    float idle_calm_bob_tiles = 0.03f;
 
     // --- IDLE OFEGANTE (quadros do breathing, rapido) ----------------------
     // Cadencia da respiracao OFEGANTE em ciclos/min: bem mais rapida que a calma pra

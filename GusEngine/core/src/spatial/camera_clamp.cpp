@@ -33,6 +33,13 @@ float clamp_axis(float target, float half, float map_size) noexcept {
 
 }  // namespace
 
+float world_span_from_pixels(float pixels, float px_per_world_unit) noexcept {
+    if (px_per_world_unit <= 0.0f) {
+        return pixels;  // guarda: zoom invalido => 1 px == 1 unidade (sem divisao ruim)
+    }
+    return pixels / px_per_world_unit;
+}
+
 CameraView clamp_camera(Vec2 target_center, float viewport_w, float viewport_h,
                         float map_w, float map_h) noexcept {
     const float half_w = viewport_w * 0.5f;

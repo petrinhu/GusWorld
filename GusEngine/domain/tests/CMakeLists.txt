@@ -23,6 +23,9 @@ add_executable(gusengine_domain_tests
     save_serializer_fuzz_test.cpp
     save_migrators_test.cpp
     save_backup_test.cpp
+    tile_map_test.cpp
+    map_serializer_test.cpp
+    map_csv_test.cpp
     template_serializer_fuzz_test.cpp
     combat_constants_test.cpp
     combat_enums_test.cpp

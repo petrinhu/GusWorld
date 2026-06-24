@@ -101,10 +101,37 @@ void WalkCycle::reset() noexcept {
 
 void WalkCycle::advance(float distance, bool running) noexcept {
     if (distance <= 0.0f) {
-        reset();  // parado: volta ao neutro (idle)
+        reset();  // parado: volta ao neutro (idle) - SEM histerese (legado)
+        return;
+    }
+    advance_moving(distance, running);
+}
+
+void WalkCycle::advance(float distance, bool running, float dt) noexcept {
+    if (distance > 0.0f) {
+        // Movimento REAL: avanca os quadros e RECARREGA o buffer de coast (a anim
+        // segue viva por coast_seconds apos o ultimo deslocamento).
+        coast_remaining_ = cfg_.coast_seconds;
+        advance_moving(distance, running);
         return;
     }
 
+    // SEM movimento neste tick. Em vez de cortar seco, gasta o buffer de coast.
+    if (dt > 0.0f) {
+        coast_remaining_ -= dt;
+    }
+    if (coast_remaining_ > 0.0f && moving_) {
+        // Ainda dentro do buffer e ja estava andando: SEGURA o estado. NAO avanca o
+        // quadro nem mexe no acumulador (sem deslocamento real = nada de marchar
+        // parado). O spam de direcao cai aqui nos micro-gaps e a anim segue rodando.
+        return;
+    }
+    // Buffer esgotado (ou nunca estava andando): agora sim cai pro idle.
+    coast_remaining_ = 0.0f;
+    reset();
+}
+
+void WalkCycle::advance_moving(float distance, bool running) noexcept {
     moving_ = true;
     accum_ += distance;
 

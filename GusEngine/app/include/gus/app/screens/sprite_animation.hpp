@@ -109,6 +109,14 @@ public:
         // Px por troca CORRENDO: passada mais LONGA (nao mais rapida). ~11 px
         // (faixa 10-12 do canon). run >= walk garante "pe colado" na corrida.
         float run_px_per_frame = 11.0f;
+        // HISTERESE (coast) do estado de animacao, em SEGUNDOS. Buffer que mantem o
+        // estado "andando" apos o ultimo movimento REAL antes de cair pro idle. Sem
+        // ele, spammar a direcao (taps com micro-gaps) resetava a anim pro neutro a
+        // cada gap e o Gus DESLIZAVA sem animar (estilo Zelda/Stardew: a anim segue o
+        // ESTADO de movimento, nao o input do frame exato). So vale na sobrecarga
+        // advance(dist, running, dt). 0 = corte seco (legado). Default sobreposto pelo
+        // OverworldTuning (anim_walk_coast_seconds).
+        float coast_seconds = 0.0f;
     };
 
     WalkCycle() = default;
@@ -123,7 +131,19 @@ public:
     // mundo) e se estava correndo. distance <= 0 => PARADO: zera o acumulador e
     // entra em estado neutro (idle). distance > 0 => acumula; cada vez que o
     // acumulado cruza o passo de troca, avanca 1 quadro ciclico.
+    //
+    // Sobrecarga LEGADA (sem dt): SEM histerese - parar corta seco pro neutro. Mantida
+    // pra nao quebrar chamadas/testes antigos.
     void advance(float distance, bool running) noexcept;
+
+    // Sobrecarga com HISTERESE (coast). Igual a de cima quando ha movimento real
+    // (distance > 0): avanca os quadros e RECARREGA o buffer de coast. Sem movimento
+    // (distance <= 0): NAO corta seco - decrementa o buffer pelo dt (segundos) e,
+    // enquanto ele dura, SEGURA o estado "andando" e o quadro ATUAL (nao avanca: nada
+    // de marchar parado). So cai pro neutro (reset) quando o buffer expira. Cura o
+    // "Gus desliza ao spammar a direcao": micro-gaps entre taps ficam dentro do coast
+    // e a anim segue rodando. dt <= 0 e tratado como 0 (nao mexe no buffer).
+    void advance(float distance, bool running, float dt) noexcept;
 
     // Forca o estado neutro (idle): zera acumulador e marca parado. Usado quando o
     // movimento e exatamente nulo no passo.
@@ -144,11 +164,18 @@ public:
     [[nodiscard]] int frame_count() const noexcept { return frame_count_; }
 
 private:
+    // Nucleo do avanco por DISTANCIA (assume distance > 0): marca moving e consome o
+    // acumulado em passos de troca. Compartilhado pelas duas sobrecargas de advance.
+    void advance_moving(float distance, bool running) noexcept;
+
     Config cfg_{};
     float accum_ = 0.0f;  // distancia acumulada desde a ultima troca
     int frame_ = 0;       // quadro de walk corrente [0, frame_count_)
     bool moving_ = false; // false = neutro (idle)
     int frame_count_ = kWalkFrameCount;  // quadros do ciclo (Caua 4, Gus 7)
+    // Buffer de HISTERESE restante (s): recarregado no movimento real, decai parado
+    // (sobrecarga com dt). Enquanto > 0 segura o estado "andando" entre taps do spam.
+    float coast_remaining_ = 0.0f;
 };
 
 }  // namespace gus::app::screens

@@ -6,6 +6,7 @@
 #include "gus/app/screens/overworld_sim.hpp"
 
 #include <cmath>    // std::sqrt
+#include <cstdint>  // std::uint16_t (tile-id do TileMap)
 #include <utility>  // std::move
 
 namespace gus::app::screens {
@@ -20,6 +21,21 @@ bool overlaps(const gus::core::spatial::Rect& a, const gus::core::spatial::Rect&
     return a.x < b.x + b.w && a.x + a.w > b.x && a.y < b.y + b.h && a.y + a.h > b.y;
 }
 
+// Converte a cadencia do walk de FRACAO DE TILE (tuning, imune a escala) para UNIDADES
+// DE MUNDO por troca de quadro (o que o WalkCycle consome, ja em unidades de mundo, do
+// mesmo jeito que o "moved" do step_fixed). Multiplica pelo tile_size REAL do mapa:
+// assim o passo do sprite acompanha a escala (tile 16 do M1 OU tile 2.0 do .gmap) e o
+// Gus da passos visiveis e na cadencia natural em qualquer escala. tile_size degenerado
+// (<= 0) cai em 1.0 para nao zerar o passo (fica equivalente a fracao crua).
+WalkCycle::Config make_walk_config(const OverworldTuning& t,
+                                   const gus::core::spatial::TileGrid& grid) noexcept {
+    const float ts = grid.tile_size() > 0.0f ? grid.tile_size() : 1.0f;
+    // coast_seconds e em TEMPO (s), imune a escala: nao multiplica pelo tile_size.
+    return WalkCycle::Config{t.anim_walk_tiles_per_frame * ts,
+                             t.anim_run_tiles_per_frame * ts,
+                             t.anim_walk_coast_seconds};
+}
+
 }  // namespace
 
 OverworldSim::OverworldSim(gus::core::spatial::TileGrid grid,
@@ -29,8 +45,7 @@ OverworldSim::OverworldSim(gus::core::spatial::TileGrid grid,
       prev_(player_start),
       curr_(player_start),
       tuning_(tuning),
-      walk_(WalkCycle::Config{tuning.anim_walk_px_per_frame,
-                              tuning.anim_run_px_per_frame}),
+      walk_(make_walk_config(tuning, grid_)),
       idle_clock_(/*frame_count=*/1, tuning.idle_fps_for_loop(1)),
       stamina_(gus::core::player::StaminaConfig{
           tuning.stamina_max, tuning.run_drain_per_sec,
@@ -44,12 +59,11 @@ OverworldSim::OverworldSim(gus::core::spatial::TileGrid grid,
 void OverworldSim::set_player_sprites(const PlayerSpriteSet& sprites) noexcept {
     sprites_ = sprites;
     // Reconfigura as animacoes pelo numero REAL de quadros da arte recebida, sem
-    // tocar no feel (px_per_frame do walk continua do tuning; fps do idle idem).
+    // tocar no feel (a cadencia do walk em fracao de tile do tuning, escalada pelo
+    // tile_size do mapa, continua a mesma; fps do idle idem).
     // Ciclo unico do personagem: o WalkCycle usa o MAIOR walk_count entre as direcoes
     // (Caua 4, Gus 7); o render so indexa walk[dir][frame] dentro do que existe.
-    walk_ = WalkCycle(WalkCycle::Config{tuning_.anim_walk_px_per_frame,
-                                        tuning_.anim_run_px_per_frame},
-                      sprites_.max_walk_count());
+    walk_ = WalkCycle(make_walk_config(tuning_, grid_), sprites_.max_walk_count());
     // O loop de breathing tem agora o N REAL de quadros (Gus 5, Caua 1). Reconta o
     // frame_count E re-deriva o fps a partir dos ciclos/min do tuning: um loop inteiro
     // deve durar 60/bpm s, logo fps = N * bpm / 60 (idle_fps_for_loop). Sem isso o fps
@@ -57,6 +71,16 @@ void OverworldSim::set_player_sprites(const PlayerSpriteSet& sprites) noexcept {
     const int idle_loop = sprites_.max_idle_count();
     idle_clock_.set_frame_count(idle_loop);
     idle_clock_.set_fps(tuning_.idle_fps_for_loop(idle_loop));
+}
+
+OverworldSim::OverworldSim(gus::domain::map::TileMap map,
+                           gus::core::spatial::Aabb player_start,
+                           OverworldTuning tuning)
+    // A colisao vem do TileGrid derivado do mapa (so Parede bloqueia, regra do
+    // dominio). Delega ao ctor principal pra montar todo o estado de uma vez, depois
+    // guarda o TileMap pro render pintar por TileKind.
+    : OverworldSim(map.to_tile_grid(), player_start, tuning) {
+    map_ = std::move(map);
 }
 
 OverworldSim::OverworldSim(gus::core::spatial::TileGrid grid,
@@ -110,9 +134,13 @@ void OverworldSim::step_fixed(int dx, int dy, bool run, float fixed_dt) noexcept
 
     if (dx == 0 && dy == 0) {
         // Parado: prev == curr (render nao interpola). A direcao MANTEM a ultima
-        // (idle nao gira o boneco); o ciclo de walk volta ao neutro (idle congelado).
+        // (idle nao gira o boneco). O ciclo de walk NAO corta seco pro neutro: a
+        // HISTERESE (coast, sobrecarga com dt) segura o estado "andando" por um buffer
+        // curto antes de cair pro idle - assim SPAMMAR a direcao (taps com micro-gaps)
+        // mantem a anim rodando em vez de deslizar. Sem deslocamento real, o quadro e
+        // segurado (nao marcha parado). So vai pro idle quando o buffer expira.
         // Memoria de input zerada: o proximo movimento sera "eixo recem-acionado".
-        walk_.advance(0.0f, run);
+        walk_.advance(0.0f, run, fixed_dt);
         dx_prev_ = 0;
         dy_prev_ = 0;
         return;
@@ -157,24 +185,42 @@ void OverworldSim::step_fixed(int dx, int dy, bool run, float fixed_dt) noexcept
     const float adx = curr_.x - prev_.x;
     const float ady = curr_.y - prev_.y;
     const float moved = std::sqrt(adx * adx + ady * ady);
-    walk_.advance(moved, run);
+    // Sobrecarga com HISTERESE (coast): moved > 0 avanca os quadros e recarrega o
+    // buffer; moved == 0 (preso na parede num eixo, sem deslocamento real) gasta o
+    // buffer como no ramo parado - segura o estado por um instante e depois cai pro
+    // idle (parede = parado). Cura o deslize do spam mantendo o resto do feel.
+    walk_.advance(moved, run, fixed_dt);
 
     // Guarda o INPUT deste tick pra o proximo decidir o eixo recem-acionado.
     dx_prev_ = dx;
     dy_prev_ = dy;
 }
 
+float OverworldSim::px_per_world_unit() const noexcept {
+    // Zoom em px-por-TILE (tuning, intuicao do lider) -> px-por-UNIDADE de mundo,
+    // dividindo pelo tile_size real do mapa (o .gmap da cidade usa 2.0). Guarda em
+    // tile_size degenerado: cai pro proprio px-por-tile (1 unidade == 1 tile).
+    const float ts = grid_.tile_size();
+    if (ts <= 0.0f) {
+        return tuning_.camera_zoom_px_per_tile;
+    }
+    return tuning_.camera_zoom_px_per_tile / ts;
+}
+
 gus::core::spatial::CameraView OverworldSim::camera_view(
-    float viewport_w, float viewport_h) const noexcept {
+    float viewport_px_w, float viewport_px_h) const noexcept {
     const float map_w = static_cast<float>(grid_.width()) * grid_.tile_size();
     const float map_h = static_cast<float>(grid_.height()) * grid_.tile_size();
     const gus::core::spatial::Vec2 center{curr_.x + curr_.w * 0.5f,
                                           curr_.y + curr_.h * 0.5f};
-    // ZOOM: gancho pronto, INERTE (tuning_.camera_zoom == 1.0 hoje). Pra ligar o
-    // zoom, passar (viewport_w / tuning_.camera_zoom, viewport_h / tuning_.camera_zoom)
-    // aqui (viewport menor em mundo = mais perto). NAO aplicado agora.
-    return gus::core::spatial::clamp_camera(center, viewport_w, viewport_h, map_w,
-                                            map_h);
+    // ZOOM (M4-BUG.CAMERA): converte os PIXELS da viewport em UNIDADES DE MUNDO pelo
+    // zoom (px-por-unidade). Antes os pixels iam crus pro clamp como se fossem mundo,
+    // e o mapa de 60x40 unidades cabia inteiro num retangulo minusculo. Agora a visao
+    // mostra so a porcao ao redor do Gus, AMPLIADA, e o clamp ao mapa segue valendo.
+    const float ppu = px_per_world_unit();
+    const float world_w = gus::core::spatial::world_span_from_pixels(viewport_px_w, ppu);
+    const float world_h = gus::core::spatial::world_span_from_pixels(viewport_px_h, ppu);
+    return gus::core::spatial::clamp_camera(center, world_w, world_h, map_w, map_h);
 }
 
 gus::core::spatial::Aabb OverworldSim::interpolated_player(float alpha) const noexcept {
@@ -186,35 +232,48 @@ gus::core::spatial::Aabb OverworldSim::interpolated_player(float alpha) const no
 }
 
 void OverworldSim::render(gus::platform::render2d::IRenderer& renderer,
-                          float viewport_w, float viewport_h, float alpha) const {
+                          float viewport_px_w, float viewport_px_h,
+                          float alpha) const {
     // Camera centrada no jogador INTERPOLADO (camera segue suave junto do boneco).
     const gus::core::spatial::Aabb shown = interpolated_player(alpha);
     const float map_w = static_cast<float>(grid_.width()) * grid_.tile_size();
     const float map_h = static_cast<float>(grid_.height()) * grid_.tile_size();
     const gus::core::spatial::Vec2 cam_center{shown.x + shown.w * 0.5f,
                                               shown.y + shown.h * 0.5f};
-    // ZOOM: gancho pronto, INERTE (tuning_.camera_zoom == 1.0). Pra ligar, dividir
-    // viewport_w/viewport_h por tuning_.camera_zoom aqui. NAO aplicado agora.
+    // ZOOM (M4-BUG.CAMERA): a visao da camera (em MUNDO) vem dos PIXELS da viewport
+    // divididos pelo zoom (px-por-unidade). begin_frame recebe os PIXELS REAIS pra a
+    // projecao mundo->tela (build_quad_screen) mapear a visao-mundo na janela cheia.
+    const float ppu = px_per_world_unit();
+    const float world_w =
+        gus::core::spatial::world_span_from_pixels(viewport_px_w, ppu);
+    const float world_h =
+        gus::core::spatial::world_span_from_pixels(viewport_px_h, ppu);
     const gus::core::spatial::CameraView view = gus::core::spatial::clamp_camera(
-        cam_center, viewport_w, viewport_h, map_w, map_h);
+        cam_center, world_w, world_h, map_w, map_h);
 
-    renderer.begin_frame(view.rect, static_cast<int>(viewport_w),
-                         static_cast<int>(viewport_h));
+    renderer.begin_frame(view.rect, static_cast<int>(viewport_px_w),
+                         static_cast<int>(viewport_px_h));
 
-    // Paredes: desenha so as celulas bloqueadas que intersectam a janela da camera
-    // (culling simples). A borda do mapa e parede implicita (nao tem celula
-    // armazenada); aqui desenhamos as celulas DENTRO de [0,width)x[0,height) que
-    // estao bloqueadas - o limite externo aparece como o "vazio" alem da ultima
-    // fileira de paredes do mapa de teste.
+    // TILES: so as celulas que intersectam a janela da camera (culling simples; a
+    // camera ja clampa). Duas vias:
+    //   (a) MAPA REAL (map_ presente): pinta CADA celula da grade pela cor do seu
+    //       TileKind (graybox) via a TilePalette - Chao/Parede/Marco/Entrada/Saida.
+    //       Legivel pro blockout; arte de tileset vem depois e isto sai.
+    //   (b) FALLBACK (so TileGrid, sem TileMap): comportamento legado do M1 - desenha
+    //       so as celulas BLOQUEADAS na wall_color (cena de teste / mapa que nao
+    //       carregou). A borda externa do mapa e parede implicita (sem celula).
     const float ts = grid_.tile_size();
     for (int cy = 0; cy < grid_.height(); ++cy) {
         for (int cx = 0; cx < grid_.width(); ++cx) {
-            if (!grid_.is_blocked(cx, cy)) {
-                continue;
-            }
             gus::core::spatial::Rect cell{static_cast<float>(cx) * ts,
                                           static_cast<float>(cy) * ts, ts, ts};
-            if (overlaps(cell, view.rect)) {
+            if (!overlaps(cell, view.rect)) {
+                continue;
+            }
+            if (map_.has_value()) {
+                const std::uint16_t tile_id = map_->at(cx, cy);
+                renderer.draw_filled_rect(cell, color_for_tile(palette_, tile_id));
+            } else if (grid_.is_blocked(cx, cy)) {
                 renderer.draw_filled_rect(cell, tuning_.wall_color);
             }
         }

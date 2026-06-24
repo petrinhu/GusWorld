@@ -25,6 +25,9 @@ add_library(gusengine_domain STATIC
     src/save/save_serializer.cpp
     src/save/save_migrators.cpp
     src/save/save_backup.cpp
+    src/map/tile_map.cpp
+    src/map/map_serializer.cpp
+    src/map/map_csv.cpp
     src/templates/character_template.cpp
     src/templates/enemy_template.cpp
     src/templates/template_serializer.cpp

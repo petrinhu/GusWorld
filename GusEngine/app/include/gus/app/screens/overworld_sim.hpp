@@ -21,9 +21,13 @@
 #ifndef GUS_APP_SCREENS_OVERWORLD_SIM_HPP
 #define GUS_APP_SCREENS_OVERWORLD_SIM_HPP
 
+#include <optional>
+
 #include "gus/app/screens/overworld_tuning.hpp"
 #include "gus/app/screens/sprite_anchor.hpp"  // FootInset (ancoragem pelos pes)
 #include "gus/app/screens/sprite_animation.hpp"
+#include "gus/app/screens/tile_palette.hpp"  // TilePalette (cor por TileKind, graybox)
+#include "gus/domain/map/tile_map.hpp"  // TileMap (mapa real, pinta por TileKind)
 #include "gus/core/anim/anim_clock.hpp"  // idle OFEGANTE (breathing) por TEMPO
 #include "gus/core/anim/breath_oscillator.hpp"  // idle CALMO (senoide procedural)
 #include "gus/core/player/stamina.hpp"  // Carga do aparato: drena correndo
@@ -117,20 +121,46 @@ public:
                  gus::core::spatial::Aabb player_start,
                  float walk_speed_tiles_per_sec);
 
+    // Ctor a partir do MAPA REAL (TileMap do dominio): a colisao vem de
+    // map.to_tile_grid() (so Parede bloqueia), o player_start ja deve estar derivado
+    // do map.spawn() (ver city_scene.hpp). GUARDA o TileMap pra o render pintar cada
+    // celula pela cor do seu TileKind (graybox) via a TilePalette. O ctor de TileGrid
+    // continua valendo (cena de teste / fallback) e cai no render de paredes legado.
+    OverworldSim(gus::domain::map::TileMap map,
+                 gus::core::spatial::Aabb player_start, OverworldTuning tuning);
+
+    // Paleta graybox (cor por TileKind) usada quando ha TileMap. Ponto unico de cor;
+    // o lider ajusta em tile_palette.hpp ou troca aqui antes/depois de construir.
+    void set_tile_palette(const TilePalette& palette) noexcept { palette_ = palette; }
+    [[nodiscard]] const TilePalette& tile_palette() const noexcept { return palette_; }
+
+    // O TileMap em uso (nullopt quando construido so do TileGrid). Leitura/teste.
+    [[nodiscard]] const std::optional<gus::domain::map::TileMap>& tile_map()
+        const noexcept {
+        return map_;
+    }
+
     // Um passo de simulacao a dt FIXO. dx,dy em {-1,0,1} (cardinal cru). run liga
     // o multiplicador de corrida (tuning). Aplica a colisao (com corner-assist se
     // ligado no tuning) e guarda a posicao anterior pra interpolacao do render.
     void step_fixed(int dx, int dy, bool run, float fixed_dt) noexcept;
 
-    // Visao da camera (clampada ao mapa) centrada no jogador ATUAL.
+    // Visao da camera (clampada ao mapa) centrada no jogador ATUAL. viewport_px_w/h
+    // em PIXELS de tela; o ZOOM (tuning camera_zoom_px_per_tile) converte pra unidades
+    // de mundo internamente. A camera AMPLIA a porcao ao redor do Gus e rola no mapa.
     [[nodiscard]] gus::core::spatial::CameraView camera_view(
-        float viewport_w, float viewport_h) const noexcept;
+        float viewport_px_w, float viewport_px_h) const noexcept;
 
-    // Desenha o frame: abre com a camera (interpolada), emite as paredes visiveis
-    // (preenchidas) e o jogador (contorno da AABB, interpolado por alpha em [0,1]
-    // entre a posicao anterior e a atual), fecha. viewport_w/h em mundo.
-    void render(gus::platform::render2d::IRenderer& renderer, float viewport_w,
-                float viewport_h, float alpha) const;
+    // Desenha o frame: abre com a camera (interpolada + zoom), emite as paredes
+    // visiveis (preenchidas) e o jogador (interpolado por alpha em [0,1] entre a
+    // posicao anterior e a atual), fecha. viewport_px_w/h em PIXELS de tela (o zoom
+    // do tuning os converte pra unidades de mundo da visao).
+    void render(gus::platform::render2d::IRenderer& renderer, float viewport_px_w,
+                float viewport_px_h, float alpha) const;
+
+    // Fator de conversao do zoom: PIXELS de tela por UNIDADE de mundo (=
+    // camera_zoom_px_per_tile / tile_size do mapa). Leitura/teste. Guarda tile_size<=0.
+    [[nodiscard]] float px_per_world_unit() const noexcept;
 
     // Posicao ATUAL do jogador (canto sup-esq + w/h).
     [[nodiscard]] const gus::core::spatial::Aabb& player() const noexcept { return curr_; }
@@ -189,6 +219,11 @@ private:
     [[nodiscard]] gus::core::spatial::Aabb interpolated_player(float alpha) const noexcept;
 
     gus::core::spatial::TileGrid grid_;
+    // MAPA REAL opcional: presente quando construido do TileMap. Da ao render a
+    // identidade (TileKind) de cada celula pra pintar por cor (graybox). Ausente
+    // (nullopt) = cena de teste/fallback do TileGrid -> render de paredes legado.
+    std::optional<gus::domain::map::TileMap> map_;
+    TilePalette palette_{};  // cor por TileKind (so usada quando ha map_)
     gus::core::spatial::Aabb prev_;  // posicao no passo anterior (pra interpolar)
     gus::core::spatial::Aabb curr_;  // posicao atual
     OverworldTuning tuning_;         // PONTO UNICO de feel (velocidade/corner/zoom/cores)

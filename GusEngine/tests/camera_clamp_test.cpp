@@ -21,6 +21,7 @@
 using gus::core::spatial::CameraView;
 using gus::core::spatial::clamp_camera;
 using gus::core::spatial::Vec2;
+using gus::core::spatial::world_span_from_pixels;
 using Catch::Matchers::WithinAbs;
 
 namespace {
@@ -97,4 +98,35 @@ TEST_CASE("clamp_camera: mapa menor nos dois eixos centraliza nos dois",
     CameraView v = clamp_camera(Vec2{0.0f, 0.0f}, 100.0f, 80.0f, 60.0f, 40.0f);
     REQUIRE_THAT(v.center.x, WithinAbs(30.0f, kEps));
     REQUIRE_THAT(v.center.y, WithinAbs(20.0f, kEps));
+}
+
+// --- ZOOM: pixels da viewport -> unidades de mundo (a peca do bug do M4) --------
+
+TEST_CASE("world_span_from_pixels: zoom 1 px por unidade devolve os proprios pixels",
+          "[core][spatial][camera][zoom]") {
+    REQUIRE_THAT(world_span_from_pixels(1280.0f, 1.0f), WithinAbs(1280.0f, kEps));
+}
+
+TEST_CASE("world_span_from_pixels: aproxima (mais px por unidade => menos mundo)",
+          "[core][spatial][camera][zoom]") {
+    // 1280 px / 24 px-por-unidade = ~53.33 unidades de mundo visiveis (mapa 60x40
+    // unidades passa a ROLAR, em vez de caber inteiro num retangulo minusculo).
+    REQUIRE_THAT(world_span_from_pixels(1280.0f, 24.0f), WithinAbs(53.3333f, 1e-3f));
+    REQUIRE_THAT(world_span_from_pixels(800.0f, 24.0f), WithinAbs(33.3333f, 1e-3f));
+}
+
+TEST_CASE("world_span_from_pixels: 48 px por tile no tile_size 2.0 (mapa da cidade)",
+          "[core][spatial][camera][zoom]") {
+    // O lider pensa em PX POR TILE (48); o tile do .gmap = 2.0 unidades de mundo.
+    // px-por-unidade = 48 / 2.0 = 24. Logo 1280 px mostram ~53.33 unidades = ~26.7
+    // tiles de largura: o mapa 30x20 tiles rola seguindo o Gus.
+    const float px_per_world_unit = 48.0f / 2.0f;  // 24
+    const float world_w = world_span_from_pixels(1280.0f, px_per_world_unit);
+    REQUIRE_THAT(world_w / 2.0f, WithinAbs(26.6667f, 1e-3f));  // em TILES
+}
+
+TEST_CASE("world_span_from_pixels: zoom invalido (<=0) cai pra 1:1 sem dividir por zero",
+          "[core][spatial][camera][zoom]") {
+    REQUIRE_THAT(world_span_from_pixels(640.0f, 0.0f), WithinAbs(640.0f, kEps));
+    REQUIRE_THAT(world_span_from_pixels(640.0f, -5.0f), WithinAbs(640.0f, kEps));
 }

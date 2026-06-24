@@ -8,8 +8,8 @@
 #include "gus/app/sdl_window.hpp"
 
 #include "gus/app/screens/anim_catalog.hpp"  // resolve_gus_sprites_dir
+#include "gus/app/screens/city_loader.hpp"   // load_city_or_fallback
 #include "gus/app/screens/player_sprites_loader.hpp"
-#include "gus/app/screens/test_overworld.hpp"
 
 namespace gus::app {
 
@@ -19,12 +19,14 @@ constexpr int kWindowH = 720;
 }  // namespace
 
 SdlWindow::SdlWindow() : clock_(1.0 / 60.0, 5) {
-    // Tuning unico da cena (velocidade + corner-assist + ganchos). O lider ajusta
-    // em test_overworld.hpp / overworld_tuning.hpp, sem tocar aqui.
-    sim_ = std::make_unique<gus::app::screens::OverworldSim>(
-        gus::app::screens::make_test_map(),
-        gus::app::screens::kTestPlayerStart,
-        gus::app::screens::make_test_tuning());
+    // CENA DEFAULT = cidade REAL (Distritos Inferiores) carregada do .gmap selado. O
+    // I/O + load_map + fallback ficam no city_loader (fronteira app/); se o .gmap
+    // faltar/estiver invalido, ele cai na cena de teste do M1 sem crashar. O feel
+    // (velocidade/corner/zoom) vem do tuning da cidade (city_scene.hpp); as cores dos
+    // tiles, da TilePalette (graybox). O lider ajusta nesses pontos unicos.
+    gus::app::screens::CityLoadOutcome city =
+        gus::app::screens::load_city_or_fallback();
+    sim_ = std::make_unique<gus::app::screens::OverworldSim>(std::move(city.sim));
 }
 
 SdlWindow::~SdlWindow() {

@@ -12,6 +12,8 @@ add_library(gusengine_app STATIC
     src/screens/player_sprites_loader.cpp
     src/screens/anim_catalog.cpp
     src/screens/anim_preview.cpp
+    src/screens/city_scene.cpp
+    src/screens/city_loader.cpp
     src/sdl_window.cpp
 )
 
@@ -25,6 +27,10 @@ target_include_directories(gusengine_app
 # env GUSWORLD_ASSETS. ${CMAKE_SOURCE_DIR} = GusEngine/ (raiz do projeto CMake).
 target_compile_definitions(gusengine_app
     PRIVATE GUSWORLD_ASSETS_DIR="${CMAKE_SOURCE_DIR}/../resources"
+    # Pasta dos mapas compilados (.gmap) DENTRO do repo (versionada), nao em
+    # resources/. O resolver de city_scene usa isto pra achar o .gmap rodando do
+    # build dir; override em runtime via env GUSWORLD_MAPS.
+    PRIVATE GUSWORLD_MAPS_DIR="${CMAKE_SOURCE_DIR}/assets/maps/compiled"
 )
 
 # SDL3 entra aqui (a casca SdlWindow + o main tocam SDL diretamente).
