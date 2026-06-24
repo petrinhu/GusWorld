@@ -297,18 +297,14 @@ Os 8 marcos da migração faseada (`engine-design.md §4`) materializados como i
 
 ## Roadmap VS — Now / Next / Later
 
-**Atualizado 2026-06-02 (F2-ROADMAP.VS ✅).** Caminho crítico: `G.1 → E.10/E.10b → G.5/G.9 → F2-M.1`. Anti-dispersão solo: Game+Arte primeiro, foundation está madura.
+**Atualizado 2026-06-23 (pos-pivot SDL3, board M0-M9; game-producer).** O LOOP JOGAVEL (M4) fechou e foi validado no display; o proximo pilar e o COMBATE (M5 BattleScreen). WIP=2 frentes de codigo (conlang fora do WIP; sprites bloqueados nao contam).
 
-| Now — W2/W3 (libera combate jogável) | Next — W4/W5 (loop end-to-end + arte real) | Later — W6/W7 (ship-ready) |
+| Now (CONCLUIDO) | Next (proxima onda) | Later |
 |---|---|---|
-| Design specs: D.1 balance, D.2 Gambito, D.3/DSGN.KP Knowledge, D.5 core-loop, D.6 onboarding | **Combate jogável** G.5/G.9 + HUD (cápsulas) | CI + build + export templates W6 |
-| **TemplateSerializer** E.10 + **CharacterRepository** E.10b ← crítico | Exploração + interação G.EXPLORE | Legal: NOTICE + EULA + F5-LEG.2 |
-| Blockout área 1 G.1 | Dialogue 1 NPC G.7 | Playtest N=3 F2-M.3 |
-| Art spike TripoSR ART.SPIKE (lateral paralelo) | Arte real: Gus + inimigo G.2/G.4 | Milestone F2-M.1 + ADR-001 revisão |
-| Dialogue engine ADR-003 / E.6 | Save/load + quest + loot G.8/G.QUEST/G.LOOT | |
-| Plano produção PROD.1 + RAID PROD.3 | Música adaptive 2 estados + SFX AU.2-AU.6 | |
-| Wiring status inertes E.5b | Inventário/deck G.INVENT + Knowledge wired E.9 | |
-| Audio bus + AudioDirector AU.3/AU.4 | Arte: shader gate antes de modelar (W5 ANTES de G.2/G.4) | |
+| **M0-M5 motor portado** C++/SDL (save/i18n/progression/templates/combat/crypto); M3 e M5-DMG auditados | **M5 BattleScreen** (motor turn_combat ja portado/auditado; falta a apresentacao): comecar pelo BRAINSTORM da tela (layout, posicoes, UI de cartas, transicao overworld->batalha->volta, feel Pokemon) | **Tiled** + pipeline de mapas (brainstorm lore -> blockout level-designer -> .tmj -> compilador -> .gmap) |
+| **M1 visual** (janela+loop+sprite SDL) validado | Trilha de ARTE em paralelo (a 2a vaga do WIP): re-arte do walk com pe-plantado (zera foot-slide) + **ARTE-RESP-4DIR** (respiracao nas 4 direcoes) | **M6 audio** (miniaudio), M7 paridade jogavel, M8 decommission Godot/C#, M9 higiene |
+| **M4 loop jogavel** (cidade do .gmap selado HMAC+UUID + camera/zoom + walk polido + anti-deslize) | (Sprites: **76 secundarios** bloqueados pela API PixelLab/500; re-rodar em lote quando estabilizar) | **Conlang Sylvarin** (paralelo organico): mutacoes, deriva historica, escrita cifrada |
+| Mecanica **Carga do Aparato** canonizada (numeros) | **COMBATE-AUTOKILL** (INBOX, parametros fechados): canonizar no combat.md DENTRO do M5 | **ARTE-DIAGONAL-8DIR** (decisao 4-dir vs 8-dir) |
 
 ## Notas
 
