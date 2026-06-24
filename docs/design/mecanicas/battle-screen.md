@@ -4,7 +4,7 @@
 
 **Convencao de escrita:** pt-br. Termos de game-dev no original. Sem em-dash; usa ponto, virgula, parenteses, dois-pontos.
 
-**Cross-ref:** [`combat.md`](combat.md) (motor turn_combat ja portado/auditado), [`pillars.md`](../pillars.md), [`locomotion.md`](locomotion.md) (poses 4 direcoes, Pillar 3).
+**Cross-ref:** [`combat.md`](combat.md) (motor turn_combat ja portado/auditado), [`pillars.md`](../pillars.md), [`locomotion.md`](locomotion.md) (poses 4 direcoes, Pillar 3), [`../art/vfx-combate-familias.md`](../art/vfx-combate-familias.md) (vocabulario visual de ataque das 5 familias).
 
 ---
 
