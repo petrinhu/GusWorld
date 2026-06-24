@@ -55,7 +55,7 @@ Gerados em modo autonomo (sessao 2026-06-24, criador dormindo, autorizou "contin
 ### Retratos (9) -- tag m5-retrato
 | Personagem | var | object_id | | Personagem | var | object_id |
 |---|---|---|---|---|---|---|
-| Gus | v3 | 90aef2b3 | | Linda | v3 | a877d868 |
+| Gus | **FOTO v0** | b7589475 | | Linda | v3 | a877d868 |
 | Caua | v1 | 841213ce | | Bento | v2 | a3b2603b |
 | Jaci | v3 | e8164ea4 | | Iara | v0 | dddb013d |
 | Inimigo generico | v3 | db628b90 | | Dante | v1 | 2a93df63 |
