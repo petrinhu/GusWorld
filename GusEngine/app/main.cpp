@@ -31,6 +31,7 @@
 #include "gus/app/sdl_window.hpp"
 #include "gus/app/screens/anim_catalog.hpp"  // resolve_gus_sprites_dir
 #include "gus/app/screens/anim_preview.hpp"
+#include "gus/app/screens/battle_preview.hpp"  // run_battle_preview (viewer M5)
 #include "gus/app/screens/city_loader.hpp"   // load_city_or_fallback (cena real headless)
 #include "gus/app/screens/overworld_sim.hpp"
 #include "gus/app/screens/player_sprites_loader.hpp"
@@ -116,6 +117,18 @@ bool parse_compile_map(int argc, char** argv, std::string& in, std::string& out)
 bool parse_anim_preview(int argc, char** argv) {
     for (int i = 1; i < argc; ++i) {
         if (std::string_view(argv[i]) == "--anim-preview") {
+            return true;
+        }
+    }
+    return false;
+}
+
+// True se "--battle" estiver entre os argumentos. Modo VIEWER: abre uma janela direto
+// na BattleScene (esqueleto M5: arena + fila CTB + HUD), pro lider VER a tela de
+// batalha rodando na engine. Esc/fechar sai. Reusa o mesmo backend (Render2dSdl).
+bool parse_battle_preview(int argc, char** argv) {
+    for (int i = 1; i < argc; ++i) {
+        if (std::string_view(argv[i]) == "--battle") {
             return true;
         }
     }
@@ -208,6 +221,12 @@ int main(int argc, char* argv[]) {
     // Modo VIEWER de animacao: --anim-preview. Cuida do proprio SDL_Init/Quit.
     if (parse_anim_preview(argc, argv)) {
         return gus::app::screens::run_anim_preview();
+    }
+
+    // Modo VIEWER da tela de batalha: --battle. Abre a BattleScene (esqueleto M5)
+    // direto numa janela pra inspecao visual. Cuida do proprio SDL_Init/Quit.
+    if (parse_battle_preview(argc, argv)) {
+        return gus::app::screens::run_battle_preview();
     }
 
     int ticks = 0;

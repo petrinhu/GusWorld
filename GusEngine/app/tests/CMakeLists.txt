@@ -12,6 +12,8 @@ add_executable(gusengine_app_tests
     anim_catalog_test.cpp
     player_sprites_layout_test.cpp
     city_scene_test.cpp
+    battle_layout_test.cpp
+    battle_scene_test.cpp
 )
 
 target_link_libraries(gusengine_app_tests
