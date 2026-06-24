@@ -114,7 +114,7 @@ Decidido no brainstorm 2026-06-23. O CORACAO da jogabilidade: aparece ao escolhe
 - **Erros (combat.md par.10):** tentativa invalida mostra a mensagem no log: `ERRO DE COMPILACAO: mana insuficiente (custa X, tem Y)` / `AP insuficiente` / `alvo invalido` / `Null requer Scan previo` / `pipeline ja contem 3 slots`.
 - **Disparar:** confirma a pipeline -> resolve sequencial (slot 1, 2, 3) -> se casou receita, `COMPILADO: <combo>` no log + flash na pipeline. A velocidade (rapida/lenta, cast-time) do resultado segue [`combat-flavor.md`](combat-flavor.md) par.1.
 
-Pendencias finas (lead-game-designer / ux-ui-designer): posicao exata do overlay (quanto sobrepoe a arena), vocabulario visual do marcador rapida/lenta e dos icones de modificador, animacao de encaixe.
+Decisoes finas: posicao do overlay = D5 (inferior parcial, arena com dim); animacao de encaixe = D6 (snap + slot acende + pulse de receita); ver paragrafo 5. Vocabulario visual do marcador rapida/lenta e dos icones de modificador fica pro ux-ui-designer no polimento (os icones de modificador ja existem em resources/sprites/icons-m5/modificador/).
 
 ---
 
@@ -154,14 +154,16 @@ Os atores na arena side-view sao **sprites 2D puros**, gerados direto no **Pixel
 
 ---
 
-## 5. Pendencias de detalhe (a propor pelos agentes, validar com o criador)
+## 5. Decisoes finas de layout (FECHADAS pelo criador 2026-06-24)
 
-Decisoes FINAS ainda nao tomadas (vao por AskUserQuestion quando os agentes chegarem nelas):
-- **Transicao exata** de entrada/saida (flash, wipe estilo Pokemon, zoom): o lead-game-designer/engine-graphics propoe 2-3, o criador escolhe.
-- **Forma fina da fila** (quantos atores a frente mostrar; tamanho dos retratos).
-- **Estilo dos icones** de intent e de status (vocabulario visual coeso com o HUD do overworld).
-- **Posicionamento** com 1 vs 4 inimigos (formacao que nao quebra a leitura).
-- **Cores/tokens** da UI de batalha (herdar do HUD do overworld).
+Briefing 100% fechado pro engine-graphics-programmer (proposta do lead-game-designer + decisao do criador via AskUserQuestion).
+
+- **D1 Resolucao base:** **640x360** (16:9), pixel-perfect, escala inteira (x2 720p / x3 1080p). E a tela mais densa do jogo (7 atores + 4 zonas de HUD + overlay); 640x360 da folego sem perder o pixel.
+- **D2/D3 Arena (disposicao):** **coluna unica de cada lado, espacamento fixo.** Party empilha a esquerda (pose leste), inimigos a direita (pose oeste), sempre centralizados no eixo vertical (1 a 4 inimigos, SEM escala dinamica = pixel-perfect, mira deterministica). **Gus levemente recuado** (1 regra, serve Pillar 4: o fragil). Profundidade real (V/frente-tras) = polimento pos-M5. Mini-boss ocupa mais por sprite-base maior, nao por escala.
+- **D4 Fila CTB:** mostra os **5 proximos**, celula = **retrato 48px** (asset nativo, sem downscale) + marca de "proximo" no 1o. SEM nome, SEM mini-barra (a barra de HP vive sob o ator na arena). Preparada pra o marcador "interpretando..." (cast LENTO, CARTAS-CAST-TIME) ocupar uma celula como ator-fantasma; se resolver alem de 5 casas, a 5a celula marca "+N".
+- **D5 Overlay de COMPILAR:** **inferior parcial** (~40% da tela, sobe de baixo sobre painel+log), a **arena fica visivel atras com leve dim** (nao apaga). Pillar 1: ver intent/fraqueza do inimigo enquanto monta o combo. (Acoplado a D1=640x360 pra caber.)
+- **D6 Encaixe de carta (tap-to-place):** **snap instantaneo** (<100ms, sem tween bloqueante) + o slot "acende" na cor/icone da familia + quando a assinatura casa receita, a **pipeline pulsa** (preview COMPILANDO). Ao remover, fade-out rapido. O juice esta no "ding" de combo fechado (Discovery). Slide animado = polimento opcional depois.
+- **D7 Camera + dano:** **camera estatica** (sem zoom/pan a cada turno; CTB troca muito de turno, pan enjoa e esconde fila/intents), so um **highlight/seta no ator ativo**. Dano = **numero flutuante** sobre o alvo (sobe + fade ~700ms). O **log fica SO pra sistema** (COMPILADO/ERRO/ANALISE) + ecoa apenas eventos NOTAVEIS (CRITICO, FALHA, morte de ator), nunca todo hit (mantem as mensagens-piada legiveis). Cinematografia de golpe especial = pos-M5.
 
 ---
 
