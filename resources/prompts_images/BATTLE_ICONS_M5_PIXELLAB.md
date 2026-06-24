@@ -607,3 +607,97 @@ rotation. Transparent background outside the card silhouette.
 1. Rodar os 25 no PixelLab e o criador escolher as versoes (como nos 5 de familia).
 2. Validar coesao do conjunto inteiro do P0 (30 icones lado a lado: mesmo dialeto, status legiveis na barra, intents distintos das familias, retratos legiveis na faixa CTB).
 3. Fechado o P0, seguir para P1 (VFX de ataque das 5 familias como sprite-sheets/animation + poses de batalha cast/ataque/hit/vitoria; depende ainda da decisao 2D-vs-3D da arena).
+
+---
+
+## PARTE 4 - Retratos do elenco (5 personagens restantes)
+
+Bustos CTB do restante do elenco, MESMO dialeto-irmao dos retratos ja aprovados (Gus/Caua/Jaci na PARTE 3): busto pixel-art 48x48, cel-shading 2-3 valores duros, 1px dark outline `#0A0E1A`, fundo SOLIDO dark slate `#1B2238` (nao transparente), cabeca grande SD, enquadrar cabeca e ombros, tracos-assinatura canonicos martelados.
+
+Fontes canon: `docs/narrative/characters/{linda-siren,bento-requiem,iara-lumen,dante-grid,sterling-locke}.md`. Cada cor-marca segue a familia/lore do personagem.
+
+**Nota de idade/proporcao:** os 4 companions (Linda 12, Bento 14, Iara 12, Dante 13) sao criancas/adolescentes SD 1:1:1 (cabeca grande). **Sterling Locke e ADULTO** (antagonista, anti-Pillar 4): proporcao ligeiramente alongada (style-guide secao 3, NPC adulto 1:1:1.2), cabeca menos inflada, postura aristocratica fria. E o unico do conjunto que NAO e chibi-crianca, de proposito (hierarquia visual: o predador adulto destoa do elenco infantil).
+
+#### P5 - Retrato CTB Linda "Siren"
+**Prompt:**
+```
+A 48x48 pixel-art portrait bust for a turn-order queue: head and shoulders of a
+12-year-old girl with a big round chibi head (SD), agile lean post-punk build,
+sharp lateral scanning glance (always half-listening to the environment). Signature
+traits, must be visible: chaotic spiky hair, a black leather jacket with neon
+fuchsia (#E11D74) accents, large industrial headphones over the ears, small
+pulsing audio modules on the shoulder pads glowing cobalt blue (#3B82F6), and a
+thin chain necklace holding a single phonograph needle as a pendant. Cobalt and
+fuchsia are her accents against black. Cel-shaded, clean flat colors, hard bands,
+1px dark outline (#0A0E1A). Centered bust, front-facing. Solid dark background
+(#1B2238).
+```
+**Parametros PixelLab:** size 48x48; view single front-facing bust; background solid dark `#1B2238`; outline single dark; detail medium; palette: hair black, jacket black, fuchsia `#E11D74`, audio-module cobalt `#3B82F6`, needle pendant silver, bg `#1B2238`, outline `#0A0E1A`; shading cel/flat.
+**Reforcar (canon):** fones industriais (tic: ajusta sempre) + spiky hair caotico + jaqueta couro preta com fucsia-neon + modulos de audio nas ombreiras + PINGENTE de agulha de toca-discos no pescoco (wound canon). Cor-marca cobalto = familia Sonico (vfx). Olhar lateral escaneando.
+
+#### P6 - Retrato CTB Bento "Requiem"
+**Prompt:**
+```
+A 48x48 pixel-art portrait bust for a turn-order queue: head and shoulders of a
+14-year-old boy (the oldest of the party), big chibi head (SD) but sturdy robust
+build, calm steady firm expression (an emotional anchor, never panics). Signature
+traits, must be visible: heavy gothic armor in titanium-grey (#9AA6B2) and aged
+burnished brass (#E8A33D), a mechanical clockwork chronometer mounted on his chest
+with visible gears, the top edge of a cathedral-like mechanical shield at his
+shoulder, brass clockwork ornament with a faint warm glow. Warm brass and cold
+titanium, gothic-industrial. Cel-shaded, clean flat colors, hard bands, 1px dark
+outline (#0A0E1A). Centered bust, front-facing. Solid dark background (#1B2238).
+```
+**Parametros PixelLab:** size 48x48; view single front-facing bust; background solid dark `#1B2238`; outline single dark; detail medium-high (armadura + cronometro); palette: titanium `#9AA6B2`, brass `#E8A33D`, bg `#1B2238`, outline `#0A0E1A`; shading cel/flat.
+**Reforcar (canon):** armadura gotica titanio + latao envelhecido + CRONOMETRO mecanico no peito (engrenagens visiveis) + escudo-catedral na ombreira. Latao = familia Cinetico/Asmodico (exceção Pillar 2, relojoaria). O mais velho/robusto da party; expressao firme de ancora emocional.
+
+#### P7 - Retrato CTB Iara "Lumen"
+**Prompt:**
+```
+A 48x48 pixel-art portrait bust for a turn-order queue: head and shoulders of a
+12-year-old girl with a big chibi head (SD), pale skin, slender elongated frame,
+guarded hard-to-read elegant expression (defensive opacity). Signature traits,
+must be visible: long hair braided with thin optical-fiber strands glowing violet
+(#7C3AED) and emerald (#34D399), a matte-black outfit, and a holographic
+refraction cape at her shoulders shimmering with a faint fractal-cyan (#67E8F9)
+prismatic sheen. Violet is her color-brand. Cel-shaded, clean flat colors, hard
+bands, 1px dark outline (#0A0E1A). Centered bust, front-facing. Solid dark
+background (#1B2238).
+```
+**Parametros PixelLab:** size 48x48; view single front-facing bust; background solid dark `#1B2238`; outline single dark; detail medium; palette: pale skin, hair dark with fiber violet `#7C3AED` + emerald `#34D399`, matte black outfit, cape sheen fractal-cyan `#67E8F9`, bg `#1B2238`, outline `#0A0E1A`; shading cel/flat.
+**Reforcar (canon):** cabelo longo trancado com FIBRA OPTICA violeta/esmeralda + traje preto matte + CAPA de refracao holografica. Cor-marca violeta = familia Criptografica/Oxido. Expressao fechada/elegante (opacidade defensiva, flaw canon).
+
+#### P8 - Retrato CTB Dante "Grid" (o TRAIDOR)
+**Prompt:**
+```
+A 48x48 pixel-art portrait bust for a turn-order queue: head and shoulders of a
+13-year-old boy with a big chibi head (SD), a friendly approachable competent
+look on the surface with a subtle guardedness in the eyes (he hides something).
+Signature traits, must be visible: a practical scrapyard-tech mechanic look,
+modular tool-fingers / segmented gloves on a visible hand at the shoulder, a
+utility harness with salvaged hardware, and a faint amber (#FACC15) work-light.
+ONE small detail is OFF: a single thin cold-red (#F43F5E) status LED hidden among
+the amber tools (a quiet wrong note, foreshadowing the betrayal, never obvious).
+Cel-shaded, clean flat colors, hard bands, 1px dark outline (#0A0E1A). Centered
+bust, front-facing. Solid dark background (#1B2238).
+```
+**Parametros PixelLab:** size 48x48; view single front-facing bust; background solid dark `#1B2238`; outline single dark; detail medium; palette: skin, dark scrap-tech outfit, amber work-light `#FACC15`, ONE hidden red LED `#F43F5E`, bg `#1B2238`, outline `#0A0E1A`; shading cel/flat.
+**Reforcar (canon):** estetica de mecanico da Periferia Industrial / Ferrovelhos (sucata, hardware salvado) + DEDOS MODULARES (upgrade canon) + harness de utilidade. Aparencia AMIGAVEL e competente (engana o player). Easter egg de traicao: UM detalhe frio errado (LED vermelho-anomalia escondido entre o ambar), velado, nunca obvio (foreshadow canon; player Knowledge alta nota). NAO rotular.
+
+#### P9 - Retrato CTB Sterling Locke (antagonista adulto)
+**Prompt:**
+```
+A 48x48 pixel-art portrait bust of an adult antagonist for a turn-order queue:
+head and shoulders of a cold aristocratic corporate predator, NOT chibi (slightly
+elongated adult proportions, smaller head than the child cast), gaunt severe
+face, frozen disdain, an immobile eyebrow and a fixed stare. Signature traits,
+must be visible: a sterile palette of polished black graphene, matte sterile white
+and mirror-chrome, a circular cryptographic ocular implant over the LEFT eye
+projecting a forward-pointing saturated red (#FF0000) laser line (his single
+signature threat color, the only saturated red outside virus zones). Impeccable
+corporate attire, mirror-chrome accents (the only metallic-reflective figure in
+the game). Cel-shaded, clean flat colors, hard bands, 1px dark outline (#0A0E1A).
+Centered bust, front-facing. Solid dark background (#1B2238).
+```
+**Parametros PixelLab:** size 48x48; view single front-facing bust (proporcao adulta, cabeca menor que o elenco infantil); background solid dark `#1B2238`; outline single dark; detail medium-high (monoculo + atire); palette: polished black, sterile white, mirror-chrome, ocular laser red `#FF0000`, bg `#1B2238`, outline `#0A0E1A`; shading cel/flat (com 1 ponto especular cromado, exceção autorizada).
+**Reforcar (canon):** ADULTO predador (anti-Pillar 4, sem redencao) destoa do elenco infantil (proporcao alongada, cabeca menor). MONOCULO ocular criptografico no olho ESQUERDO com laser vermelho `#FF0000` (a unica assinatura vermelha saturada fora de zonas Patch-Zero, a ameaca corporativa). Paleta esteril: preto-graphene polido + branco-esteril + cromo espelhado (unica figura com refletividade metalica plena no jogo). Expressao: desprezo congelado, sobrancelha imovel, aristocratico frio.
