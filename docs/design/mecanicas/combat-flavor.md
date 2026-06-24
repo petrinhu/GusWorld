@@ -195,7 +195,35 @@ Coerente com o i18n canonico do GusWorld (dev em pt-br, estrutura i18n-ready des
 
 ---
 
-## 5. Pendencias (a fechar no design do M5)
+## 5. Apresentacao das falas: terminal (software) vs caixa quente (humano)
+
+Decisao do criador 2026-06-23 (hibrido com significado). Os baloes de fala viram telas de TERMINAL, mas so quando faz sentido. O CONTRASTE vira linguagem:
+
+- **TERMINAL** quando o SOFTWARE/maquina fala: combate (falas de carta, COMPILADO, frases de falha do paragrafo 3), auto-kill (kill -9...), magia, HUD, mensagens de sistema, e o sarcasmo tecno dos personagens (banter de linguagem). Frio, monospace.
+- **CAIXA QUENTE (com retrato)** quando o CORACAO fala: cena emocional, lore intima, momentos de party, drama (ex: a traicao do Dante, Gus e Jaci). Cor suave, fonte legivel, retrato grande. Protege o calor das cenas humanas.
+
+### Prompt-de-linguagem por personagem (caracterizacao no modo terminal)
+
+Cada personagem "fala" no prompt da sua linguagem-ancora (paragrafo 2), de graca pela lore:
+
+| Personagem | Prompt de terminal | Detalhe |
+|---|---|---|
+| Gus | `gus@c-arcane:~$` | compilado, legivel (a sintese final do heroi) |
+| Caua | `caua@pythia:~$ >>>` | o REPL do Python literal ("voce compila tudo, eu so rodo") |
+| Jaci | `jaci@pythia:~$ >>>` | Pythia bio (mesma familia do Caua, sabor organico) |
+| Iara | `iara@oxido:~$ cargo run` | Rust, elegancia opaca |
+| Linda | `linda@oxido:~$` | Oxido (crowd control) |
+| Bento | `bento@asmodico:~$` | asm, baixo nivel (registradores/hex, tom de monitor antigo) |
+| Dante | `dante@asmodico:~$` -> `dante@c-arcane:~$` | **FORESHADOW:** o prompt muda de Asmodico pra C-Arcane no late game (~75%), sinal sutil da corrupcao Sterling (ja canon em `characters/dante-grid.md`; player atento nota) |
+| Sterling | `sterling@DRE:/#` | root (`#`), o runtime do vilao (DRE/GRE); o `#` ja grita "privilegio demais" |
+
+### Nota de escopo
+
+Decisao macro tomada. O design FINO dos dois registros (estilo do terminal cru vs quente, fonte, cores, integracao com o retrato, animacao de digitacao tipo type-on) vai pra ux-ui-designer + ux-writer (propostas -> AskUserQuestion ao criador), no design do M5 e do sistema de dialogo. Afeta a [`battle-screen.md`](battle-screen.md) e o runtime de dialogo (a re-derivar em C++; ver [`dialogue-tree-npc-intro.md`](../narrativa/dialogue-tree-npc-intro.md)).
+
+---
+
+## 6. Pendencias (a fechar no design do M5)
 
 - Canonizar a mecanica de cast-time (paragrafo 1) como extensao do combat.md, via lead-game-designer (ratificacao do criador). Parametros finos a definir: quantas posicoes a frente a lenta resolve (por carta?), o que a interrupcao faz (cancela e perde AP/mana? atrasa? reduz potencia proporcional ao dano?), o que "le o tabuleiro tarde" significa (re-mira? escala com estado?), e a amarracao linguagem<->carta<->personagem (paragrafo 2).
 - Estilo visual das fases (spinner/log) e da mensagem de falha na tela: ver [`battle-screen.md`](battle-screen.md).
