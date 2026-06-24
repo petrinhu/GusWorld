@@ -206,10 +206,404 @@ background.
 
 ---
 
-## Proximos passos (apos validacao do criador)
+## Status de validacao
 
-1. Criador valida o ESTILO nestes 5 (coesao do conjunto, espessura, tamanho, leitura).
-2. Ajustes finos no dialeto, se houver (ex: 32 vs 48 px, espessura de outline).
-3. So entao escrever os 25 prompts restantes do P0 (13 status, 4 intent, 3 modificador, 4 retratos CTB, 1 moldura de carta), todos herdando o dialeto travado aqui.
-4. Gerados/aprovados os icones, seguir para P1 (VFX de ataque das 5 familias, poses de batalha).
+ESTILO dos 5 icones de familia APROVADO pelo criador (rodados no PixelLab, escolhidos: Eletrico v3, Bioquimico v1, Sonico v0, Cinetico v2, Cripto v3). O dialeto da PARTE 1 (32x32, outline 1px `#0A0E1A`, cel 2-3 valores duros, fundo transparente, silhueta distinta, glow interno, paleta canon) esta TRAVADO. A PARTE 3 abaixo herda esse dialeto exato.
+
+---
+
+## PARTE 3 - Demais icones P0 (25 prompts)
+
+Os 25 restantes do P0, herdando o dialeto travado na PARTE 1. Tres sub-grupos seguem o MESMO dialeto dos 5 de familia (32x32, outline 1px `#0A0E1A`, cel 2-3 valores, fundo transparente, vista unica frontal, glow interno): STATUS, INTENT, MODIFICADOR. O 4o sub-grupo (RETRATOS CTB) usa um dialeto-irmao com ajustes declarados (tamanho maior, fundo solido).
+
+**Regra de cor transversal (status):** a cor do icone de status = cor da FAMILIA-ORIGEM do status (vfx-combate-familias.md). Status utilitarios sem familia (Shield/Haste/Slow) usam uma cor NEUTRA de HUD; Regen usa um verde-cura suave distinto do verde-toxina do Bioquimico (ver nota em cada um).
+
+**Neutro de HUD (definicao):** para Shield/Haste/Slow uso o cinza-azulado frio do style-guide `#6B6F7A` (Neutral warm da City) com luz em `#9AA6B2` (titanio). Distinto das 5 cores-marca de familia (nao confunde status utilitario com status elemental).
+
+### 13 STATUS
+
+#### S1 - Stun (Eletrico)
+**Prompt:**
 ```
+A 32x32 pixel-art game HUD status icon: a small gear locked by a lightning bolt
+jammed between its teeth (a stuck/frozen cog), self-lit electric cyan (#22D3EE)
+with a hot white-blue (#E8FBFF) spark accent. Reads as "stunned / skip turn /
+locked". Clean cel-shading, 2 to 3 hard value bands, no soft gradient. Closed
+1px dark outline (#0A0E1A). Strong distinct silhouette. Minimal internal detail.
+Front-facing flat icon, single view, no rotation. Transparent background.
+```
+**Parametros PixelLab:** size 32x32; view single front-facing icon; background transparent; outline single dark; detail low; palette limited (cyan `#22D3EE`, spark `#E8FBFF`, outline `#0A0E1A`); shading cel/flat.
+**Reforcar:** engrenagem-relampago TRAVADA (o "loop infinito" do vfx). Cyan = Eletrico (Caua). Perde o proximo turno.
+
+#### S2 - Poison (Bioquimico)
+**Prompt:**
+```
+A 32x32 pixel-art game HUD status icon: a small vial or flask tipping with a
+single emerald-green (#34D399) droplet falling from it, self-lit green core with
+a thin violet (#A78BFA) rim. Organic rounded shapes. Reads as "poison / damage
+over time". Clean cel-shading, 2 to 3 hard value bands, no soft gradient. Closed
+1px dark outline (#0A0E1A). Distinct silhouette. Minimal internal detail. Front-
+facing flat icon, single view, no rotation. Transparent background.
+```
+**Parametros PixelLab:** size 32x32; view single; background transparent; outline single dark; detail low; palette limited (green `#34D399`, violet `#A78BFA`, outline `#0A0E1A`); shading cel/flat.
+**Reforcar:** frasco/gota pingando (DoT que pinga do alvo no vfx). Verde-esmeralda das ampolas da Jaci.
+
+#### S3 - Corrode (Bioquimico)
+**Prompt:**
+```
+A 32x32 pixel-art game HUD status icon: a small shield or armor plate being
+eaten away, with a jagged violet (#A78BFA) crack splitting it and emerald-green
+(#34D399) corrosion eating the edges. Reads as "armor corroded / defense down".
+Distinct from the poison flask icon: this one is a cracking plate, not a vial.
+Clean cel-shading, 2 to 3 hard value bands, no soft gradient. Closed 1px dark
+outline (#0A0E1A). Distinct silhouette. Minimal internal detail. Front-facing
+flat icon, single view, no rotation. Transparent background.
+```
+**Parametros PixelLab:** size 32x32; view single; background transparent; outline single dark; detail low-medium; palette limited (green `#34D399`, violet `#A78BFA`, outline `#0A0E1A`); shading cel/flat.
+**Reforcar:** fissura violeta na armadura (Corrode reduz Def alem do dano; "armadura comida" no vfx). Mesma familia do Poison mas silhueta de PLACA RACHADA, nao de frasco (diferenciar).
+
+#### S4 - Disrupt (Sonico)
+**Prompt:**
+```
+A 32x32 pixel-art game HUD status icon: a broken / interrupted sound wave (a
+sonar arc cut in the middle with a gap, weak-signal bars), self-lit cobalt blue
+(#3B82F6) with pale ice-blue (#DBEAFE) crest highlights. Reads as "disrupted /
+weakened next action". Open ring/arc silhouette, hollow. Clean cel-shading, 2 to
+3 hard value bands, no soft gradient. Closed 1px dark outline (#0A0E1A). Distinct
+silhouette. Minimal internal detail. Front-facing flat icon, single view, no
+rotation. Transparent background.
+```
+**Parametros PixelLab:** size 32x32; view single; background transparent; outline single dark; detail low; palette limited (cobalt `#3B82F6`, ice `#DBEAFE`, outline `#0A0E1A`); shading cel/flat.
+**Reforcar:** onda QUEBRADA / sinal fraco (a proxima acao sai enfraquecida). Cobalto = Sonico (Linda). Silhueta vazada, irma do icone de familia Sonico.
+
+#### S5 - Silence (Sonico)
+**Prompt:**
+```
+A 32x32 pixel-art game HUD status icon: a sound wave with a diagonal slash
+through it (a muted/struck-out wave, like a "no sound" symbol), self-lit cobalt
+blue (#3B82F6) with the slash in pale ice-blue (#DBEAFE). Reads as "silenced /
+cannot cast cards". Distinct from Disrupt: Disrupt is a broken/weak wave, Silence
+is a wave struck out by a clear slash. Clean cel-shading, 2 to 3 hard value
+bands, no soft gradient. Closed 1px dark outline (#0A0E1A). Distinct silhouette.
+Minimal internal detail. Front-facing flat icon, single view, no rotation.
+Transparent background.
+```
+**Parametros PixelLab:** size 32x32; view single; background transparent; outline single dark; detail low; palette limited (cobalt `#3B82F6`, ice `#DBEAFE`, outline `#0A0E1A`); shading cel/flat.
+**Reforcar:** mute-glyph (onda RISCADA). Bloqueia jogar cartas. Diferenciar de Disrupt pela barra diagonal clara.
+
+#### S6 - Knockback (Cinetico)
+**Prompt:**
+```
+A 32x32 pixel-art game HUD status icon: a heavy angular wedge / chevron arrow
+shoving rightward (a push-back marker), self-lit burnished brass-amber (#E8A33D)
+with titanium-grey (#9AA6B2) shadow planes for weight. Solid mechanical look.
+Reads as "knocked back / pushed in the turn queue". Clean cel-shading, 2 to 3
+hard value bands, no soft gradient. Closed 1px dark outline (#0A0E1A). Distinct
+silhouette. Minimal internal detail. Front-facing flat icon, single view, no
+rotation. Transparent background.
+```
+**Parametros PixelLab:** size 32x32; view single; background transparent; outline single dark; detail low; palette limited (brass `#E8A33D`, titanium `#9AA6B2`, outline `#0A0E1A`); shading cel/flat.
+**Reforcar:** seta-cunha de recuo (empurra na fila CTB). Latao = Cinetico (Bento), familia mecanica/quente.
+
+#### S7 - Break (Cinetico)
+**Prompt:**
+```
+A 32x32 pixel-art game HUD status icon: a cracked / split shield broken in two,
+self-lit titanium-grey (#9AA6B2) with the fracture line glowing brass-amber
+(#E8A33D). Reads as "armor broken / defense down". Distinct from Knockback (an
+arrow) and from Corrode (a green-eaten plate): Break is a clean split shield with
+a brass crack. Clean cel-shading, 2 to 3 hard value bands, no soft gradient.
+Closed 1px dark outline (#0A0E1A). Distinct silhouette. Minimal internal detail.
+Front-facing flat icon, single view, no rotation. Transparent background.
+```
+**Parametros PixelLab:** size 32x32; view single; background transparent; outline single dark; detail low-medium; palette limited (titanium `#9AA6B2`, brass `#E8A33D`, outline `#0A0E1A`); shading cel/flat.
+**Reforcar:** escudo PARTIDO (reduz Def por Duration turnos). Familia Cinetico, mas latao na fissura e titanio no corpo (inverte enfase do Knockback pra diferenciar). Diferenciar de Corrode (que e verde-comido).
+
+#### S8 - Expose (Criptografico)
+**Prompt:**
+```
+A 32x32 pixel-art game HUD status icon: a targeting crosshair / reticle overlaid
+on a small wireframe box, self-lit violet (#7C3AED) with the reticle lines in
+bright fractal cyan (#67E8F9). Reads as "exposed / takes more card damage,
+weak points revealed". Geometric, ortho. Clean cel-shading, 2 to 3 hard value
+bands, no soft gradient. Closed 1px dark outline (#0A0E1A). Distinct silhouette.
+Minimal internal detail. Front-facing flat icon, single view, no rotation.
+Transparent background.
+```
+**Parametros PixelLab:** size 32x32; view single; background transparent; outline single dark; detail low-medium; palette limited (violet `#7C3AED`, fractal-cyan `#67E8F9`, outline `#0A0E1A`); shading cel/flat.
+**Reforcar:** crosshair sobre wireframe (alvo marcado, recebe mais dano de carta). Violeta = Cripto (Iara). Irmao do icone de familia Cripto.
+
+#### S9 - Decrypt (Criptografico)
+**Prompt:**
+```
+A 32x32 pixel-art game HUD status icon: a buff aura / shield glyph shattering
+into falling hex fragments (small breaking pieces flying off), self-lit violet
+(#7C3AED) with the shatter sparks in bright fractal cyan (#67E8F9). Reads as
+"buffs stripped / decrypted". Distinct from Expose (a crosshair): Decrypt is a
+shattering symbol with flying fragments. Clean cel-shading, 2 to 3 hard value
+bands, no soft gradient. Closed 1px dark outline (#0A0E1A). Distinct silhouette.
+Minimal internal detail. Front-facing flat icon, single view, no rotation.
+Transparent background.
+```
+**Parametros PixelLab:** size 32x32; view single; background transparent; outline single dark; detail low-medium; palette limited (violet `#7C3AED`, fractal-cyan `#67E8F9`, outline `#0A0E1A`); shading cel/flat.
+**Reforcar:** buff ESTILHACANDO em hex (remove todos os buffs do alvo, sem lockout). Familia Cripto. Diferenciar de Expose pela acao de quebrar/cair fragmentos.
+
+#### S10 - Shield (utilitario, neutro)
+**Prompt:**
+```
+A 32x32 pixel-art game HUD status icon: a solid intact shield with a faint inner
+fill bar suggesting an absorption pool, self-lit cool neutral steel-grey
+(#6B6F7A) with titanium (#9AA6B2) highlight, a thin cool-cyan inner glow hinting
+at an energy barrier. Reads as "shield / absorb pool". Deliberately NEUTRAL color
+(not tied to any of the 5 families). Clean cel-shading, 2 to 3 hard value bands,
+no soft gradient. Closed 1px dark outline (#0A0E1A). Distinct silhouette (intact
+shield, unlike the broken Break shield). Minimal internal detail. Front-facing
+flat icon, single view, no rotation. Transparent background.
+```
+**Parametros PixelLab:** size 32x32; view single; background transparent; outline single dark; detail low; palette limited (steel `#6B6F7A`, titanium `#9AA6B2`, faint cyan inner, outline `#0A0E1A`); shading cel/flat.
+**Reforcar:** escudo INTEIRO com barra de pool interna (absorve dano antes do HP). Cor NEUTRA (utilitario, sem familia). Diferenciar de Break (escudo partido).
+
+#### S11 - Regen (utilitario, verde-cura)
+**Prompt:**
+```
+A 32x32 pixel-art game HUD status icon: a soft pulsing healing cross or a small
+leaf with an upward sparkle, self-lit a soft mint/teal healing green (#67E8C8,
+distinct and lighter than the toxic emerald of Poison) with a pale glow. Reads as
+"regeneration / heal over time". Warm, friendly, rounded. Clean cel-shading, 2 to
+3 hard value bands, no soft gradient. Closed 1px dark outline (#0A0E1A). Distinct
+silhouette. Minimal internal detail. Front-facing flat icon, single view, no
+rotation. Transparent background.
+```
+**Parametros PixelLab:** size 32x32; view single; background transparent; outline single dark; detail low; palette limited (heal-green `#67E8C8`, pale glow, outline `#0A0E1A`); shading cel/flat.
+**Reforcar:** cruz/folha pulsando (cura por tick). Verde-CURA suave e mais claro (`#67E8C8`), DELIBERADAMENTE distinto do verde-toxina `#34D399` do Poison, pra nunca confundir cura com veneno na barra de status (Pillar 1, leitura tatica).
+
+#### S12 - Haste (utilitario, neutro)
+**Prompt:**
+```
+A 32x32 pixel-art game HUD status icon: an upward-pointing speed chevron (double
+arrow up) with small motion lines, self-lit cool neutral steel-grey (#6B6F7A)
+with a bright titanium (#9AA6B2) edge and a faint cool-cyan speed glow. Reads as
+"haste / speed up". NEUTRAL color (utility, not a family). Clean cel-shading, 2
+to 3 hard value bands, no soft gradient. Closed 1px dark outline (#0A0E1A).
+Distinct silhouette. Minimal internal detail. Front-facing flat icon, single
+view, no rotation. Transparent background.
+```
+**Parametros PixelLab:** size 32x32; view single; background transparent; outline single dark; detail low; palette limited (steel `#6B6F7A`, titanium `#9AA6B2`, faint cyan, outline `#0A0E1A`); shading cel/flat.
+**Reforcar:** seta-velocidade pra CIMA (SPD+, recomputa fila). Neutro. Par visual com Slow (mesma forma, direcao oposta).
+
+#### S13 - Slow (utilitario, neutro)
+**Prompt:**
+```
+A 32x32 pixel-art game HUD status icon: a downward-pointing speed chevron (double
+arrow down) with small heavy/drag lines, self-lit cool neutral steel-grey
+(#6B6F7A) with titanium (#9AA6B2) edge, dimmer and heavier than the Haste icon.
+Reads as "slow / speed down". NEUTRAL color (utility, not a family). Clean cel-
+shading, 2 to 3 hard value bands, no soft gradient. Closed 1px dark outline
+(#0A0E1A). Distinct silhouette. Minimal internal detail. Front-facing flat icon,
+single view, no rotation. Transparent background.
+```
+**Parametros PixelLab:** size 32x32; view single; background transparent; outline single dark; detail low; palette limited (steel `#6B6F7A`, titanium `#9AA6B2`, outline `#0A0E1A`); shading cel/flat.
+**Reforcar:** seta-velocidade pra BAIXO (SPD-). Neutro. Par com Haste (forma identica, direcao invertida e tom mais escuro/pesado para leitura instantanea de "ruim").
+
+### 4 INTENT
+
+Telegraph sobre o inimigo (estilo Slay the Spire, battle-screen.md decisao 5). Devem ler como "plano do inimigo neste turno". Mesmo dialeto 32x32. Cor: usar um AMBAR-ALERTA neutro de telegraph (`#FACC15`, o Hot signal do style-guide, ja e a cor de "alerta/UI critica" do jogo) como base dos intents, para que o jogador associe "intent" a uma cor unica de HUD, distinta das cores de familia. Excecao: o Ruido/Patch-Zero usa o vermelho-anomalia.
+
+#### I1 - Atacar
+**Prompt:**
+```
+A 32x32 pixel-art game HUD intent icon: a sword or angular attack arrow pointing
+down-forward, self-lit alert amber-yellow (#FACC15) with a darker amber shadow,
+leaving clear empty space beside or below it where a predicted damage number will
+be drawn in code (do not draw any number, just the symbol with breathing room).
+Reads as "this enemy will attack". Clean cel-shading, 2 to 3 hard value bands, no
+soft gradient. Closed 1px dark outline (#0A0E1A). Distinct silhouette. Minimal
+internal detail. Front-facing flat icon, single view, no rotation. Transparent
+background.
+```
+**Parametros PixelLab:** size 32x32; view single; background transparent; outline single dark; detail low; palette limited (alert-amber `#FACC15`, dark amber, outline `#0A0E1A`); shading cel/flat.
+**Reforcar:** espada/seta de ataque + ESPACO VAZIO pro numero previsto (o codigo desenha o numero ao lado; o icone so reserva o lugar). Ambar-alerta = "intent" como cor unica de HUD.
+
+#### I2 - Defender
+**Prompt:**
+```
+A 32x32 pixel-art game HUD intent icon: a raised shield (guard stance), self-lit
+alert amber-yellow (#FACC15) with darker amber shadow. Reads as "this enemy will
+defend / brace". Distinct from the Shield status (which is steel-grey): this
+intent shield is amber, signaling a PLANNED action, not an active buff. Clean
+cel-shading, 2 to 3 hard value bands, no soft gradient. Closed 1px dark outline
+(#0A0E1A). Distinct silhouette. Minimal internal detail. Front-facing flat icon,
+single view, no rotation. Transparent background.
+```
+**Parametros PixelLab:** size 32x32; view single; background transparent; outline single dark; detail low; palette limited (alert-amber `#FACC15`, dark amber, outline `#0A0E1A`); shading cel/flat.
+**Reforcar:** escudo erguido (vai defender). Ambar = intent (diferencia do Shield status, que e cinza-aco): cor comunica "plano" vs "estado ativo".
+
+#### I3 - Aplicar-status
+**Prompt:**
+```
+A 32x32 pixel-art game HUD intent icon: a generic incoming hostile debuff symbol
+(a small downward spiral aura with a down-arrow, or a hex glyph with a downward
+mark), self-lit alert amber-yellow (#FACC15) with darker amber shadow. Reads as
+"this enemy will apply a debuff". Neutral/generic (not tied to one family, since
+it covers any status). Clean cel-shading, 2 to 3 hard value bands, no soft
+gradient. Closed 1px dark outline (#0A0E1A). Distinct silhouette. Minimal
+internal detail. Front-facing flat icon, single view, no rotation. Transparent
+background.
+```
+**Parametros PixelLab:** size 32x32; view single; background transparent; outline single dark; detail low; palette limited (alert-amber `#FACC15`, dark amber, outline `#0A0E1A`); shading cel/flat.
+**Reforcar:** simbolo GENERICO de debuff hostil chegando (cobre qualquer status, por isso neutro-ambar e nao a cor de uma familia). Down-arrow = piora chegando.
+
+#### I4 - Ruido / Patch-Zero (intent caotico)
+**Prompt:**
+```
+A 32x32 pixel-art game HUD intent icon: a scrambled, unreadable glitch glyph (a
+corrupted symbol made of jumbled broken pixel fragments and random noise),
+self-lit anomaly red (#F43F5E) with hot-yellow (#FACC15) noise flecks. Reads as
+"unreadable / chaotic intent". Deliberately illegible and unsettling, distinct
+from all clean intent icons. Clean cel-shading where possible, hard pixel noise.
+Closed 1px dark outline (#0A0E1A) around the scrambled mass. Distinct silhouette
+(broken/irregular). Front-facing flat icon, single view, no rotation. Transparent
+background.
+```
+**Parametros PixelLab:** size 32x32; view single; background transparent; outline single dark; detail medium (ruido controlado); palette limited (anomaly-red `#F43F5E`, hot-yellow `#FACC15`, outline `#0A0E1A`); shading cel/flat com ruido.
+**Reforcar:** simbolo EMBARALHADO/ilegivel (intent caotico, EXCLUSIVO de Patch-Zero, one-way door canon; Gambito-Prever retorna ruido). Vermelho-anomalia = a unica familia visual de glitch do jogo (style-guide 11.4). Quebra deliberada do ambar-alerta dos outros intents: o jogador SENTE que este e diferente.
+
+### 3 MODIFICADOR
+
+Modificadores da pipeline (combat.md paragrafo 8). Mesmo dialeto 32x32. Cor: cinza-aco neutro de UI (`#6B6F7A` + titanio `#9AA6B2`), pois modificador transforma carta de QUALQUER familia (nao pertence a uma cor de familia). Null tem um detalhe de alerta.
+
+#### M1 - Object
+**Prompt:**
+```
+A 32x32 pixel-art game HUD modifier icon: a small persistent totem / deployable
+trap-node on the ground (a compact tech obelisk or turret-stub with a glowing
+core), self-lit cool steel-grey (#6B6F7A) with titanium (#9AA6B2) edges and a
+small neutral cyan core light. Reads as "Object: persistent entity on the field".
+Clean cel-shading, 2 to 3 hard value bands, no soft gradient. Closed 1px dark
+outline (#0A0E1A). Distinct silhouette. Minimal internal detail. Front-facing
+flat icon, single view, no rotation. Transparent background.
+```
+**Parametros PixelLab:** size 32x32; view single; background transparent; outline single dark; detail low-medium; palette limited (steel `#6B6F7A`, titanium `#9AA6B2`, faint cyan core, outline `#0A0E1A`); shading cel/flat.
+**Reforcar:** totem/armadilha PERSISTENTE no campo (+1 mana). Cinza-aco neutro (modificador aplica a qualquer familia).
+
+#### M2 - Stream
+**Prompt:**
+```
+A 32x32 pixel-art game HUD modifier icon: three parallel forward-flowing arrows /
+a fanning multi-hit splash (suggesting repetition or area spread), self-lit cool
+steel-grey (#6B6F7A) with titanium (#9AA6B2) highlights. Reads as "Stream:
+single-target becomes area or multi-hit". Clean cel-shading, 2 to 3 hard value
+bands, no soft gradient. Closed 1px dark outline (#0A0E1A). Distinct silhouette.
+Minimal internal detail. Front-facing flat icon, single view, no rotation.
+Transparent background.
+```
+**Parametros PixelLab:** size 32x32; view single; background transparent; outline single dark; detail low-medium; palette limited (steel `#6B6F7A`, titanium `#9AA6B2`, outline `#0A0E1A`); shading cel/flat.
+**Reforcar:** fluxo multi-hit/area (+2 mana). Setas paralelas = repeticao/espalhamento. Neutro.
+
+#### M3 - Null
+**Prompt:**
+```
+A 32x32 pixel-art game HUD modifier icon: a cancellation glyph (a circle with a
+diagonal bar, a "no/invert" symbol) over a tiny inverted-rune mark, self-lit cool
+steel-grey (#6B6F7A) with titanium (#9AA6B2) and a small alert-amber (#FACC15)
+accent on the bar to signal it is special / conditional. Reads as "Null: invert
+or cancel an effect (requires prior Scan)". Clean cel-shading, 2 to 3 hard value
+bands, no soft gradient. Closed 1px dark outline (#0A0E1A). Distinct silhouette.
+Minimal internal detail. Front-facing flat icon, single view, no rotation.
+Transparent background.
+```
+**Parametros PixelLab:** size 32x32; view single; background transparent; outline single dark; detail low-medium; palette limited (steel `#6B6F7A`, titanium `#9AA6B2`, alert-amber `#FACC15`, outline `#0A0E1A`); shading cel/flat.
+**Reforcar:** inversao/cancelamento "barrado" (+1 mana, EXIGE Scan previo; o mais forte). Acento ambar = sinaliza "especial/condicional" (o jogo desabilita sem Scan, com a mensagem de erro do paragrafo 10). Neutro com toque de alerta.
+
+### 4 RETRATOS CTB pequenos
+
+**Decisao de dialeto (justificada):** os retratos da fila CTB usam um dialeto-IRMAO, com 2 desvios deliberados do dos icones:
+
+1. **Tamanho 48x48 px** (nao 32x32): retrato precisa de rosto reconhecivel (aparelho do Gus, heterocromia da Jaci); a 32 px o rosto nao le. 48 e o minimo que carrega identidade facial em pixel art mantendo a faixa CTB compacta. (64 seria opcao se a faixa for grande; recomendo 48 e validar na tela.)
+2. **Fundo SOLIDO escuro, NAO transparente.** Justificativa: (a) o retrato e um "selo" emoldurado na faixa CTB, nao um simbolo que flutua sobre paineis variados como os icones de status; um fundo solido consistente da unidade visual a fila e separa cada retrato do vizinho; (b) o fundo escuro `#1B2238` (City BG mid do style-guide) faz o cabelo ruivo do Gus e os glows (cyan do Caua, ampolas da Jaci) saltarem (contraste, figure/ground do style-guide secao 7); (c) facilita o highlight de "proximo ator" (a moldura muda de cor sobre fundo estavel). O codigo ainda pode aplicar um leve vignette/moldura por cima.
+
+Proporcao SD 1:1:1 e canon, mas em retrato (busto/rosto) o que importa e a CABECA grande e os tracos-assinatura; enquadrar cabeca e ombros.
+
+#### P1 - Retrato CTB Gus
+**Prompt:**
+```
+A 48x48 pixel-art portrait bust for a turn-order queue: head and shoulders of an
+11-year-old boy with a big round chibi head (SD proportions), bright saturated
+orange-red (#FF6B1A) asymmetric hair dominating the upper-RIGHT quadrant, fair
+warm skin (#F5E6D8), serious analytical expression (not smiling). Signature
+traits, must be visible: silver-blue dental braces (#C0D8E8) on his teeth, a thin
+tactical antenna and active cyan (#22D3EE) glasses lenses, a hint of his arm
+computer at the shoulder. Cel-shaded, clean flat colors, hard bands, 1px dark
+outline (#0A0E1A). Centered bust, front-facing. Solid dark background (#1B2238).
+```
+**Parametros PixelLab:** size 48x48; view single front-facing bust; background solid dark `#1B2238`; outline single dark; detail medium (rosto + tracos-assinatura); palette: hair `#FF6B1A`, skin `#F5E6D8`, braces `#C0D8E8`, lens cyan `#22D3EE`, outfit `#2B3A55`, bg `#1B2238`, outline `#0A0E1A`; shading cel/flat.
+**Reforcar:** aparelho ortodontico + antena + lentes cyan + cabelo ruivo `#FF6B1A` no quadrante superior DIREITO (canon, style-guide don'ts). Expressao seria/analitica, nao fofa.
+
+#### P2 - Retrato CTB Caua
+**Prompt:**
+```
+A 48x48 pixel-art portrait bust for a turn-order queue: head and shoulders of a
+13-year-old mixed-race boy with a big round chibi head (SD), warm brown skin,
+confident cocky grin. Signature traits, must be visible: jet-black asymmetric
+UNDERCUT with thin glowing electric-cyan (#22D3EE) circuit-line tattoos on the
+shaved scalp, bright reactive eyes, a hint of cyan-glowing forearm accumulator at
+the shoulder. Cyan is the only bright accent against dark techwear. Cel-shaded,
+clean flat colors, hard bands, 1px dark outline (#0A0E1A). Centered bust, front-
+facing. Solid dark background (#1B2238).
+```
+**Parametros PixelLab:** size 48x48; view single front-facing bust; background solid dark `#1B2238`; outline single dark; detail medium; palette: skin warm brown, hair black, circuit cyan `#22D3EE`, bg `#1B2238`, outline `#0A0E1A`; shading cel/flat.
+**Reforcar:** undercut com circuitos cyan glow no couro cabeludo (cor-marca cyan, unico brilho). Grin confiante. Coerente com `CAUA_VOLT_IMAGEPROMPT.md` (mesma identidade, agora em busto pixel).
+
+#### P3 - Retrato CTB Jaci
+**Prompt:**
+```
+A 48x48 pixel-art portrait bust for a turn-order queue: head and shoulders of an
+11-year-old girl with a big round chibi head (SD), severe pale near-vampiric skin
+(genetic, not goth), calm serious expression. Signature traits, must be visible:
+HETEROCHROMIA (one cyan #22D3EE eye, one golden #FACC15 eye), a grey kevlar lab-
+coat collar, and small glowing emerald-green (#34D399) bioluminescent vials at
+her shoulder/chest. Cel-shaded, clean flat colors, hard bands, 1px dark outline
+(#0A0E1A). Centered bust, front-facing. Solid dark background (#1B2238).
+```
+**Parametros PixelLab:** size 48x48; view single front-facing bust; background solid dark `#1B2238`; outline single dark; detail medium; palette: pale skin, eye cyan `#22D3EE`, eye gold `#FACC15`, vials green `#34D399`, coat grey, bg `#1B2238`, outline `#0A0E1A`; shading cel/flat.
+**Reforcar:** heterocromia (olho cyan + olho dourado) + ampolas verde-esmeralda bioluminescentes + jaleco kevlar cinza. Expressao calma/seria.
+
+#### P4 - Retrato CTB inimigo generico (trash mob do slice)
+**Prompt:**
+```
+A 48x48 pixel-art portrait bust for a turn-order queue: head and shoulders of a
+generic low-tier cyber-gothic enemy (a corporate FIR drone-soldier or a small
+glitch-construct), angular asymmetric silhouette (uncanny corporate shape
+language), faceless or visored, dark steel-blue body (#3A4566) with a single
+hostile magenta (#E11D74) accent light. Reads instantly as "enemy / not party".
+Cel-shaded, clean flat colors, hard bands, 1px dark outline (#0A0E1A). Centered
+bust, front-facing. Solid dark background (#1B2238).
+```
+**Parametros PixelLab:** size 48x48; view single front-facing bust; background solid dark `#1B2238`; outline single dark; detail medium; palette: body steel-blue `#3A4566`, hostile magenta `#E11D74`, bg `#1B2238`, outline `#0A0E1A`; shading cel/flat.
+**Reforcar:** placeholder de trash mob: silhueta ANGULAR/uncanny (inimigo cidade = triangular, style-guide secao 7) + UM neon hostil magenta (inimigo pode ter UM neon; party tem mais). Le na hora como "inimigo". Substituir por retratos especificos quando o bestiario do slice fechar.
+
+### 1 MOLDURA de carta
+
+#### F1 - Moldura/frame de carta (object)
+**Prompt:**
+```
+A pixel-art trading-card frame for a hand-of-cards UI: a vertical portrait
+rectangular card frame (empty inner area for the card art/info, drawn by code),
+with an ornate-but-clean angular rune border in burnished brass (#E8A33D) on a
+dark charcoal (#1B2238) card face, small decorative corner runes, cyber-gothic
+arcane-tech look. The inner field is empty/flat (a placeholder fill) so code can
+composite the card name, mana cost and family color on top. Clean cel-shading,
+hard bands, 1px dark outline (#0A0E1A). Straight-on flat view, single, no
+rotation. Transparent background outside the card silhouette.
+```
+**Parametros PixelLab:** size 64x96 px (proporcao retrato de carta ~2:3; ajustar ao leque na tela); view single straight-on; background transparent (fora da carta); outline single dark; detail medium (borda runica + cantos); palette: brass border `#E8A33D`, charcoal face `#1B2238`, outline `#0A0E1A`; shading cel/flat.
+**Variantes por familia (tint da borda):** gerar a moldura-base UMA vez; o codigo (ou 5 variantes geradas) re-tinta a BORDA pela cor da familia da carta: Eletrico cyan `#22D3EE`, Bioquimico verde `#34D399`, Sonico cobalto `#3B82F6`, Cinetico latao `#E8A33D` (ja e a base), Criptografico violeta `#7C3AED`. Recomendo gerar a base em latao neutro e tintar em runtime (1 asset, 5 leituras; barato pra solo G1, coerente com a estrategia de atlas tintado do vfx-combate-familias.md).
+**Reforcar:** frame do slot do leque (battle-screen.md 3.2: carta compacta mostra cor da familia + nome + mana + marcador rapida/lenta). Coerente com `runic_cards/` (borda rúnica de latao, face charcoal), mas aqui e a MOLDURA VAZIA reutilizavel, nao a arte de uma carta especifica.
+
+---
+
+## Proximos passos (apos esta leva)
+
+1. Rodar os 25 no PixelLab e o criador escolher as versoes (como nos 5 de familia).
+2. Validar coesao do conjunto inteiro do P0 (30 icones lado a lado: mesmo dialeto, status legiveis na barra, intents distintos das familias, retratos legiveis na faixa CTB).
+3. Fechado o P0, seguir para P1 (VFX de ataque das 5 familias como sprite-sheets/animation + poses de batalha cast/ataque/hit/vitoria; depende ainda da decisao 2D-vs-3D da arena).
