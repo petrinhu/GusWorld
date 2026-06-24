@@ -318,6 +318,43 @@ Os 8 marcos da migração faseada (`engine-design.md §4`) materializados como i
 - **F1-DL.REFAC (débito literário)**: prose §§6-8 prioriza densidade técnica obsessiva. Refactor antes de F5-BK.1. Não bloqueia código.
 - **Padroes numericos descontinuados em MÉTRICAS DE PROCESSO** (palavras/queries) mas **MANTIDOS no TEXTO** (datações/contagens/idades/dimensões/compassos); a camada velada do conteudo segue mantida. Detalhe so em `docs/_secret/` + memorias privadas.
 
+## Inventario de assets PixelLab (renderizacoes feitas / por fazer)
+
+Atualizado 2026-06-24. **Status:** ✅ feito (em `resources/sprites/icons-m5/`, versionado) | 📝 prompt pronto (em `resources/prompts_images/`, nao gerado) | ⬜ por planejar. Rastreabilidade (object_id + variacao) em `BATTLE_ICONS_M5_GENLOG.md`. Custo ate agora ~780 fichas (sobra ~1028/2000).
+
+### Combate / BattleScreen (M5)
+
+| # | Asset | Qtd | Status | Posicao / uso na tela (battle-screen.md) |
+|---|---|---|---|---|
+| 1 | Icones de FAMILIA (eletrico/bioquimico/sonico/cinetico/criptografico) | 5 | ✅ | overlay de COMPILAR (cor da carta), roda de fraqueza, HUD |
+| 2 | Icones de STATUS (stun/poison/corrode/disrupt/silence/knockback/break/expose/decrypt/shield/regen/haste/slow) | 13 | ✅ | sob cada ator afetado na arena |
+| 3 | Icones de INTENT (atacar/defender/aplicar-status/ruido-PatchZero) | 4 | ✅ | flutuando sobre o inimigo (telegraph, par.3 D7) |
+| 4 | Icones de MODIFICADOR (object/stream/null) | 3 | ✅ | overlay de COMPILAR (3 botoes de modificador) |
+| 5 | Moldura de CARTA (base, tintavel por familia) | 1 | ✅ | leque da mao + pipeline de 3 slots (overlay) |
+| 6 | RETRATOS do elenco (Gus +feliz +conjurando, Caua, Jaci, Linda, Bento, Iara, Dante, Sterling, inimigo generico) | 11 | ✅ | fila CTB no topo (48px, D4) + caixa de dialogo quente |
+| 7 | **FACES das cartas** (arte interna de cada carta do deck: 5 base types x 5 familias, ~15-25 cartas-semente) | ~15-25 | ⬜ | dentro da moldura, no leque da mao. DECISAO PENDENTE: face com arte propria por carta VS montada em codigo (moldura tintada + icone familia + icone base-type + texto). Definir com o criador antes de gerar |
+| 8 | POSES de batalha dos personagens (idle/cast/ataque/hit/vitoria, pose leste party / oeste inimigo) | ~5 x N chars | ⬜ | atores de corpo inteiro na arena (pipeline 2D PixelLab decidido 2026-06-24; Gus usa foto gus_meiafrente de ref). Comecar pelo Gus + 1 inimigo do slice |
+| 9 | VFX de ATAQUE das 5 familias (sheets: raio+bytecode / nuvem / ondas dessaturando / relojoaria / grade) + canal FALHA + CRIT | ~7 sheets | ⬜ | animacao do golpe sobre o alvo (vfx-combate-familias.md; P1, pos-tela-base) |
+| 10 | Fundo de bioma da arena (evolucao pro hibrido) | 1+ | ⬜ | fundo da BattleScene (hoje plano; P2) |
+
+### Cenario / Overworld (Distritos Inferiores)
+
+| # | Asset | Qtd | Status | Posicao / uso |
+|---|---|---|---|---|
+| 11 | TILESET chao (pavimento tesselado) + parede ciber-gotica (auto-tiling) | 2 | 📝 | piso e paredes do mapa (TileKind Chao=0 / Parede=1). Prompts em `WORLD_DISTRITOS_INFERIORES_PIXELLAB.md`; tileset custa mais fichas, validar gasto |
+| 12 | MAP OBJECTS landmark (fonte de latao, placa-lore, holograma Sterling, portao) | 4 | 📝 | pontos do gold path (Marco/Entrada/Saida do CSV); P0 do cenario |
+| 13 | MAP OBJECTS preenchimento (2 casas ciber-goticas, poste de neon, terminal-hack, cover box, board do puzzle) | ~6 | 📝 | decoracao de rua; P1/P2 do cenario |
+
+### Locomocao / overworld (fora do M5, ja na INBOX abaixo)
+
+| # | Asset | Status | Nota |
+|---|---|---|---|
+| 14 | Respiracao N/E/O do Gus (idle direcional) | ⬜ | item ARTE-RESP-4DIR abaixo |
+| 15 | Walk com pe-plantado (re-arte, zera foot-slide) | ⬜ | item da INBOX/M4 |
+| 16 | Diagonais 8-dir de todos os personagens | ⬜ | item ARTE-DIAGONAL-8DIR abaixo (decisao 4-dir vs 8-dir pendente) |
+
+**Resumo:** 37 assets ✅ feitos (icones+retratos+moldura) | 13 📝 prompt pronto (cenario) | ~6 grupos ⬜ por planejar (faces de carta, poses de batalha, VFX, fundo, locomocao). Proxima leva natural = **cenario** (prompts prontos, so validar gasto) OU **faces de carta** (precisa decisao arte-vs-codigo) OU **poses do Gus** (pipeline 2D ja decidido).
+
 ## INBOX (descobertas nao priorizadas)
 
 - **ARTE-RESP-4DIR:** respiracao (breathing) animada nas 4 direcoes. Hoje so o Sul tem arte de respiracao; Norte/Leste/Oeste usam o walk f0 congelado como idle (fix do M1). Gerar sprites de respiracao N/E/O (PixelLab) + loader montar breathing direcional completo (desligar a flag `idle_animated_only_one_facing` em SpriteLayout). Follow-up do idle direcional do M1, decisao do lider 2026-06-23.
