@@ -64,6 +64,18 @@ Gerados em modo autonomo (sessao 2026-06-24, criador dormindo, autorizou "contin
 ### Moldura (1) -- tag m5-moldura
 | Moldura de carta | v2 | 0d86d823 |
 
+### Retratos do Gus a partir das fotos pessoais (gus_baby/, ja estilizadas pelo nano banana)
+
+O retrato do Gus foi refeito usando as fotos pessoais como STYLE REFERENCE no PixelLab. **REGRA FIXA pra todo retrato/sprite do Gus: SEMPRE antena + cabelo laranja-fogo #E66319 + olhos azuis.**
+
+| Expressao | Foto base | PNG | object / nota |
+|---|---|---|---|
+| CTB / formal | gus_terno.png | retrato_gus.png | v0, b7589475 |
+| Feliz (dialogo alegre / vitoria) | sorriso_infinito.png | retrato_gus_feliz.png | v0, 55c63d43 |
+| Conjurando (cast, raio eletrico cyan) | gus_magia.png | retrato_gus_conjurando.png | v1 ESPELHADO (flip horizontal pra a antena bater no mesmo lado do retrato CTB) |
+
+Fotos ainda NAO usadas (acervo de referencia, mapeamento pra usar quando chegar nas poses/dialogo): **gus_meiafrente.png** (pose lateral 3/4, util pra arena side-view), **magia.png** (variante de efeito magico).
+
 ### Custo
 ~720 geracoes (fichas) nesta sessao (5 familia + 13 status + 4 intent com 1 retry + 3 modificador + 9 retratos + 1 moldura). Saldo: used ~911 de 2000, restam ~1089.
 
