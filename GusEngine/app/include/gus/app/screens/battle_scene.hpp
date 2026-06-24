@@ -28,10 +28,12 @@
 #ifndef GUS_APP_SCREENS_BATTLE_SCENE_HPP
 #define GUS_APP_SCREENS_BATTLE_SCENE_HPP
 
+#include <array>
 #include <memory>
 #include <string>
 #include <vector>
 
+#include "gus/domain/combat/combat_enums.hpp"  // StatusId
 #include "gus/domain/combat/combat_state_machine.hpp"
 #include "gus/platform/render2d/i_renderer.hpp"
 
@@ -54,6 +56,19 @@ struct BattlePortraitSet {
         const std::string& id) const noexcept;
 };
 
+// Icones de status (14px) ja resolvidos para TextureId pela casca SDL, indexados por
+// StatusId (status_icon_index). POCO sem SDL: a cena so guarda os handles e escolhe
+// qual mostrar pelos status_effects() do ator. kInvalidTexture em qualquer slot =>
+// aquele status cai num quadradinho placeholder (headless / "sem arte").
+struct BattleStatusIconSet {
+    // [status_icon_index(id)] = handle. Vazio/ausente => placeholder.
+    std::array<gus::platform::render2d::TextureId, /*kStatusIdCount=*/13> by_index{};
+
+    // Handle do icone de um StatusId. kInvalidTexture se nao carregado.
+    [[nodiscard]] gus::platform::render2d::TextureId find(
+        gus::domain::combat::StatusId id) const noexcept;
+};
+
 class BattleScene {
 public:
     // Monta um encontro de DEMO (party de 3 com Gus + 4 inimigos) pra validar a tela
@@ -68,6 +83,12 @@ public:
     // chamado (ou incompleto), as celulas CTB caem no retangulo (fallback headless).
     void set_portraits(BattlePortraitSet portraits) noexcept {
         portraits_ = std::move(portraits);
+    }
+
+    // Define os icones de status (handles ja resolvidos pelo renderer). Se nao for
+    // chamado, os status do ator caem num quadradinho placeholder (fallback headless).
+    void set_status_icons(BattleStatusIconSet icons) noexcept {
+        status_icons_ = icons;
     }
 
     // ---- Leitura do estado do motor (pro render e pros testes) ----
@@ -100,6 +121,7 @@ private:
     std::vector<std::unique_ptr<gus::domain::combat::CombatActor>> actors_;
     std::unique_ptr<gus::domain::combat::CombatStateMachine> machine_;
     BattlePortraitSet portraits_{};
+    BattleStatusIconSet status_icons_{};
 };
 
 }  // namespace gus::app::screens

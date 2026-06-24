@@ -14,11 +14,16 @@
 
 #include <vector>
 
+#include "gus/app/screens/battle_hud_model.hpp"  // kHpBarW/kArenaHpBarH p/ casar rects
 #include "gus/app/screens/battle_scene.hpp"
 #include "gus/domain/combat/combat_actor.hpp"
 #include "gus/platform/render2d/i_renderer.hpp"
 
 using gus::app::screens::BattleScene;
+using gus::app::screens::BattleStatusIconSet;
+using gus::app::screens::kArenaHpBarH;
+using gus::app::screens::kHpBarH;
+using gus::app::screens::kHpBarW;
 using gus::core::spatial::Rect;
 using gus::platform::render2d::ContentBbox;
 using gus::platform::render2d::DrawColor;
@@ -163,4 +168,119 @@ TEST_CASE("BattleScene::render headless degrada CTB pro retangulo (sem retratos)
     REQUIRE(ctb_cells == 5);
     // O ator ativo recebe um highlight (outline) na arena.
     REQUIRE(r.outlines.size() >= 1);
+}
+
+// ---- INCREMENTO 2: painel com dados reais + barras na arena + ativo na fila --------
+
+TEST_CASE("painel do ator ativo desenha a barra de HP (largura kHpBarW)",
+          "[battle_scene]") {
+    BattleScene scene;
+    CountingRenderer r;
+    scene.render(r, 640.0f, 360.0f);
+    // O painel emite uma barra de HP do tamanho kHpBarW x kHpBarH (fundo) + o fill.
+    // O fill tem a MESMA altura e largura <= kHpBarW (fracao do HP). Procuramos o
+    // FUNDO exato (kHpBarW x kHpBarH) na metade inferior da tela (y do painel).
+    bool found_panel_hp = false;
+    for (const auto& f : r.fills) {
+        if (f.rect.w == static_cast<float>(kHpBarW) &&
+            f.rect.h == static_cast<float>(kHpBarH) && f.rect.y > 250.0f) {
+            found_panel_hp = true;
+        }
+    }
+    REQUIRE(found_panel_hp);
+}
+
+TEST_CASE("painel desenha pips de AP e Mana do ator ativo (recursos reais)",
+          "[battle_scene]") {
+    BattleScene scene;
+    // begin_turn() foi chamado no ctor: o ator ativo tem AP=max_ap (3) e mana=max_mana
+    // (ramp). Logo ha pips desenhados (quadradinhos kPipSize) no painel.
+    REQUIRE(scene.active_actor() != nullptr);
+    REQUIRE(scene.active_actor()->max_ap() == 3);
+    REQUIRE(scene.active_actor()->ap() == 3);          // recarregado no begin_turn
+    REQUIRE(scene.active_actor()->max_mana() >= 2);    // ramp >= base
+    CountingRenderer r;
+    scene.render(r, 640.0f, 360.0f);
+    // Conta pips (7x7) no painel: AP (3) + Mana (max_mana) >= 5 quadradinhos.
+    int pips = 0;
+    for (const auto& f : r.fills) {
+        if (f.rect.w == 7.0f && f.rect.h == 7.0f && f.rect.y > 250.0f) {
+            ++pips;
+        }
+    }
+    REQUIRE(pips >= scene.active_actor()->max_ap() +
+                       scene.active_actor()->max_mana());
+}
+
+TEST_CASE("arena desenha 1 mini-barra de HP por ator vivo (7 barras)",
+          "[battle_scene]") {
+    BattleScene scene;
+    CountingRenderer r;
+    scene.render(r, 640.0f, 360.0f);
+    // Mini-barra da arena = altura kArenaHpBarH. Cada ator emite FUNDO (56 x H) + FILL
+    // (largura <= 56) na MESMA posicao (x,y). Como party (x=40) e inimigos (x=544) ficam
+    // centralizados na MESMA banda, varios Y coincidem entre os lados; o que e unico por
+    // ator e o par (x,y). Contar pares (x,y) distintos entre os fills de altura
+    // kArenaHpBarH da exatamente 1 barra por ator (7), sem depender de cor.
+    std::vector<std::pair<float, float>> bar_pos;
+    for (const auto& f : r.fills) {
+        if (f.rect.h == static_cast<float>(kArenaHpBarH)) {
+            const std::pair<float, float> xy{f.rect.x, f.rect.y};
+            bool seen = false;
+            for (const auto& p : bar_pos) {
+                if (p == xy) {
+                    seen = true;
+                    break;
+                }
+            }
+            if (!seen) {
+                bar_pos.push_back(xy);
+            }
+        }
+    }
+    REQUIRE(bar_pos.size() == 7);  // 3 party (x=40) + 4 inimigos (x=544)
+}
+
+TEST_CASE("mini-barra de HP reflete dano real (Jaci ferida < cheia)",
+          "[battle_scene]") {
+    BattleScene scene;
+    CountingRenderer r;
+    scene.render(r, 640.0f, 360.0f);
+    // Existe pelo menos um FILL de HP da arena com largura < 56 (ator ferido: Jaci/Gus
+    // levaram dano no demo). O fill tem altura kArenaHpBarH e largura estritamente
+    // menor que o fundo (56) e > 0.
+    bool found_partial = false;
+    for (const auto& f : r.fills) {
+        if (f.rect.h == static_cast<float>(kArenaHpBarH) && f.rect.w > 0.0f &&
+            f.rect.w < 56.0f) {
+            found_partial = true;
+        }
+    }
+    REQUIRE(found_partial);
+}
+
+TEST_CASE("status icons: com set_status_icons, o status do ator ativo vira textura",
+          "[battle_scene]") {
+    BattleScene scene;
+    // O ator ativo (inimigo3, Drone spd 13) tem Poison no demo. Carrega icones fake.
+    BattleStatusIconSet icons;
+    for (std::size_t i = 0; i < icons.by_index.size(); ++i) {
+        icons.by_index[i] = static_cast<TextureId>(i + 1);  // handles validos
+    }
+    scene.set_status_icons(icons);
+
+    CountingRenderer r;
+    scene.render(r, 640.0f, 360.0f);
+    // Sem retratos mas COM icones de status: ha pelo menos 1 textura desenhada (o
+    // icone do Poison do ator ativo no painel).
+    REQUIRE(r.textured.size() >= 1);
+}
+
+TEST_CASE("status icons: sem set, o status degrada pro placeholder (sem textura)",
+          "[battle_scene]") {
+    BattleScene scene;  // sem icones nem retratos
+    CountingRenderer r;
+    scene.render(r, 640.0f, 360.0f);
+    // Nada texturizado (status cai no quadradinho placeholder).
+    REQUIRE(r.textured.empty());
 }

@@ -15,6 +15,7 @@ add_library(gusengine_app STATIC
     src/screens/city_scene.cpp
     src/screens/city_loader.cpp
     src/screens/battle_layout.cpp
+    src/screens/battle_hud_model.cpp
     src/screens/battle_scene.cpp
     src/screens/battle_preview.cpp
     src/sdl_window.cpp

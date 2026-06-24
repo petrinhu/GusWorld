@@ -15,7 +15,9 @@
 
 #include <SDL3/SDL.h>
 
+#include "gus/app/screens/battle_hud_model.hpp"  // status_icon_file/index
 #include "gus/app/screens/battle_scene.hpp"
+#include "gus/domain/combat/combat_enums.hpp"  // StatusId
 #include "gus/platform/render2d/render2d_sdl.hpp"
 
 // Raiz resources/ do repo, embutida pelo CMake (mesma macro do resolver de sprites).
@@ -66,6 +68,19 @@ std::string resolve_retratos_dir() {
     return "resources/sprites/icons-m5/retratos";
 }
 
+std::string resolve_status_icons_dir() {
+    if (const char* env = std::getenv("GUSWORLD_ASSETS")) {
+        if (env[0] != '\0') {
+            return join(env, "sprites/icons-m5/status");
+        }
+    }
+    const std::string compiled = GUSWORLD_ASSETS_DIR;
+    if (!compiled.empty()) {
+        return join(compiled, "sprites/icons-m5/status");
+    }
+    return "resources/sprites/icons-m5/status";
+}
+
 int run_battle_preview() {
     if (!SDL_Init(SDL_INIT_VIDEO)) {
         std::cerr << "BattlePreview: SDL_Init falhou: " << SDL_GetError() << "\n";
@@ -103,6 +118,18 @@ int run_battle_preview() {
             portraits.by_id.emplace_back(actor->id(), tex);
         }
         scene.set_portraits(std::move(portraits));
+
+        // Carrega os icones de status (14px), indexados por StatusId (status_icon_index),
+        // e os entrega a cena. Ausencia degrada pro quadradinho placeholder.
+        const std::string sdir = resolve_status_icons_dir();
+        BattleStatusIconSet status_icons;
+        for (int i = 0; i < static_cast<int>(status_icons.by_index.size()); ++i) {
+            const auto id = static_cast<gus::domain::combat::StatusId>(i);
+            const std::string spath = join(sdir, std::string(status_icon_file(id)));
+            status_icons.by_index[static_cast<std::size_t>(i)] =
+                renderer.load_texture(spath.c_str());
+        }
+        scene.set_status_icons(status_icons);
 
         std::cout << "BattlePreview: party=" << scene.party_count()
                   << " inimigos=" << scene.enemy_count()

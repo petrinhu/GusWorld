@@ -25,6 +25,10 @@ namespace gus::app::screens {
 // ao CWD. So monta a STRING (nao abre arquivo).
 [[nodiscard]] std::string resolve_retratos_dir();
 
+// Resolve a pasta dos icones de status (resources/sprites/icons-m5/status), na mesma
+// ordem do resolver de retratos. So monta a STRING (nao abre arquivo).
+[[nodiscard]] std::string resolve_status_icons_dir();
+
 // Roda o viewer da BattleScene: SDL_Init proprio, janela, loop de render do esqueleto
 // (camera logica 640x360 escalada por inteiro), Esc/fechar encerra. Devolve 0 ok.
 int run_battle_preview();

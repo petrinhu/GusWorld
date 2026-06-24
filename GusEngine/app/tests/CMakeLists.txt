@@ -13,6 +13,7 @@ add_executable(gusengine_app_tests
     player_sprites_layout_test.cpp
     city_scene_test.cpp
     battle_layout_test.cpp
+    battle_hud_model_test.cpp
     battle_scene_test.cpp
 )
 
