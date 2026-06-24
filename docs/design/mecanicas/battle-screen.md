@@ -118,6 +118,12 @@ Pendencias finas (lead-game-designer / ux-ui-designer): posicao exata do overlay
 
 ---
 
+## 3.3 Transicao de entrada e saida
+
+Decidido 2026-06-24. **Entrada:** ao esbarrar no inimigo, BOOT/COMPILACAO tematico (~0.5s, rapido, nao cansa ao repetir): flash + scanline + micro-log de terminal (`encounter.init()` / `arena: linking atores...` / `READY`) e a arena MONTA. Simetria com a tela de resultado (abre "compilando", fecha "BUILD SUCCEEDED"). **NAO usa o glitch / RGB-split** (reservado ao anomalo / Patch-Zero, ver vfx-combate-familias.md): a linguagem aqui e scanline + build-log, nao glitch. **Saida:** o inverso (a arena "descompila" de volta pro overworld). Coerente com magia=software e o registro terminal de todo o combate.
+
+---
+
 ## 4. Escopo do M5 (vertical slice) vs depois
 
 ### M5 entrega (a tela jogavel do combate)
