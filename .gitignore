@@ -63,9 +63,13 @@ project.lock.json
 game/addons/funplay_mcp/
 .mcp.json
 
-# Assets de imagem/sprite (binarios grandes; uncommitted, controle do user; estrategia de backup a definir)
+# Assets de imagem/sprite (binarios grandes; uncommitted, controle do user)
 resources/images/
-resources/sprites/
+resources/sprites/*
+# EXCECAO: icones/retratos do M5 (pixel-art pequenos) versionados pra backup. Politica: pixel-art pequeno = git normal; asset grande = LFS
+!resources/sprites/icons-m5/
+# Fotos pessoais (do filho do criador): NUNCA versionar (o repo e publico)
+resources/gus_baby/
 
 # Manual privado dos easter eggs (NUNCA publicar: mata o segredo)
 docs/_secret/
