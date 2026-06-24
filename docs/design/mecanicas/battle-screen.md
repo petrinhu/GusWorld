@@ -84,12 +84,18 @@ Decidido no brainstorm 2026-06-23. O fim do combate e um LOG DE BUILD que imprim
 - **Formato:** o terminal imprime as etapas e os ganhos linha a linha (build rodando), nao um painel estatico. A satisfacao esta no scroll de sucesso.
 - **Vitoria:** imprime `BUILD SUCCEEDED` / `exit 0` + ganhos: XP, loot, Knowledge (o selo do bestiario sobe), mestria de carta (+1 por uso, Pillar 1). **Metrica de build:** os turnos viram "compile time"; build rapido ganha rotulo de elogio (blazing fast / clean build) + BONUS de loot/XP por eficiencia; build lento recebe rotulo NEUTRO (nunca xinga). Liga com Knowledge (dominar = build mais rapido) e com o bonus de "lutar de verdade" do auto-kill.
 - **Derrota (party wipe):** imprime `BUILD FAILED` / `core dumped`, corta pro HOSPITAL (canon Pillar 4 + economia: `ActorIncapacitated` -> hospital). NAO e game-over, NAO perde progresso: a derrota e um CUSTO (cura proporcional ao dano, ~1cr/3HP). Hospital tematizado como "restaurando do snapshot".
-- **Sem creditos pro hospital (sintese safe-mode + divida, decisao 2026-06-23):** o jogador ESCOLHE, nunca trava (anti-softlock):
-  - **Safe mode (gratis):** revive a party com HP minimo (~20%, parametro a afinar), "no optimizations". Sai capenga (a fraqueza E o custo; nao da pra abusar, pois curar pagando e sempre melhor).
-  - **OU cura completa a credito (divida):** sai inteiro, mas com saldo NEGATIVO; precisa quitar antes de novas compras (responsabilidade economica, axiologia canon). Limite de divida + juros (se houver) = parametro do economy-designer.
-  - Tematizacao terminal: `insufficient funds` -> `[1] safe mode (20% HP)` / `[2] full repair on credit (debt)`.
+- **Sem creditos pro hospital (anti-softlock; parametros do economy-designer + criador 2026-06-23):** o jogador ESCOLHE, nunca trava:
+  - **Safe mode (gratis):** revive a party a **13% do HP max** (Fibonacci; piso 1 HP), "no optimizations". So ofertado em wipe REAL (nunca voluntario). Capenga sem death-loop (a Analise Preditiva cobre o golpe fatal seguinte). Anti-abuso: o HP ganho vale menos que o XP/loot/credito perdido ao morrer (perder e sempre net-negativo).
+  - **OU cura completa a credito (divida = "taxa de recompilacao do snapshot"):** sai inteiro, devendo. Termos TRANSPARENTES no terminal antes de aceitar (Pillar 2, anti-Sterling: sem letra miuda):
+    - **Principal:** 1 cura completa da party (~48cr no VS, escala sozinho).
+    - **Juros:** 5% SIMPLES (nunca composto) sobre o principal, 1x por NOVA ZONA cruzada, teto 21% do principal (~11cr). Param de crescer no teto.
+    - **Multa:** so por REINCIDENCIA (wipe enquanto ainda devendo). Escada curta: 8cr na 1a, 13cr da 2a em diante, TRAVA em 13cr. Evento pontual, nunca relogio.
+    - **Cap total fixo ~72cr** (principal + encargos com tetos proprios). Encargos nunca compram mais cura nem movem o cap.
+    - **Quitacao automatica:** o JOGADOR escolhe o PLANO ao sair do hospital (pode reajustar): agressivo (62% do credito recebido pra divida) / medio (50%) / suave (38%); o resto fica livre. Ordem de abate: multa -> juros -> principal. Pior caso quita em ~17 encontros, sempre jogando normal.
+    - Bloqueia SO compras/craft, NUNCA o hospital (curar sempre disponivel = anti-softlock).
+  - Tematizacao terminal: `insufficient funds` -> `[1] safe mode (13% HP, gratis)` / `[2] recompilar a credito (ver termos)`.
 
-A economia do hospital (safe-mode + divida, parametros) deve ser canonizada em [`economia.md`](economia.md) via economy-designer.
+A economia do hospital (estes parametros) deve ser integrada formalmente em [`economia.md`](economia.md) via economy-designer.
 
 ---
 
