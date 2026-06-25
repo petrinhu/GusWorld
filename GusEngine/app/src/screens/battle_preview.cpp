@@ -134,7 +134,8 @@ int run_battle_preview() {
         std::cout << "BattlePreview: party=" << scene.party_count()
                   << " inimigos=" << scene.enemy_count()
                   << " fila=" << scene.queue_len() << " retratos em " << dir
-                  << " (Esc sai)\n";
+                  << "\n  Cima/Baixo: navega o menu | Enter/Espaco: confirma o verbo | "
+                     "Esc: sai\n";
 
         bool running = true;
         while (running) {
@@ -142,9 +143,29 @@ int run_battle_preview() {
             while (SDL_PollEvent(&ev)) {
                 if (ev.type == SDL_EVENT_QUIT) {
                     running = false;
-                } else if (ev.type == SDL_EVENT_KEY_DOWN &&
-                           ev.key.key == SDLK_ESCAPE) {
-                    running = false;
+                } else if (ev.type == SDL_EVENT_KEY_DOWN) {
+                    switch (ev.key.key) {
+                        case SDLK_ESCAPE:
+                            running = false;
+                            break;
+                        // Navegacao do menu de verbos (incremento 3). So opera no turno
+                        // de jogador (a cena ignora fora dele); a cena auto-encadeia os
+                        // turnos de inimigo ate o proximo turno de jogador ou o fim.
+                        case SDLK_UP:
+                        case SDLK_W:
+                            scene.menu_move(-1);
+                            break;
+                        case SDLK_DOWN:
+                        case SDLK_S:
+                            scene.menu_move(+1);
+                            break;
+                        case SDLK_RETURN:
+                        case SDLK_SPACE:
+                            scene.menu_confirm();
+                            break;
+                        default:
+                            break;
+                    }
                 }
             }
             if (!running) {

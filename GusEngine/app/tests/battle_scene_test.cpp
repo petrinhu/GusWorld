@@ -15,12 +15,16 @@
 #include <vector>
 
 #include "gus/app/screens/battle_hud_model.hpp"  // kHpBarW/kArenaHpBarH p/ casar rects
+#include "gus/app/screens/battle_log_model.hpp"  // LogLine/LogLineKind
+#include "gus/app/screens/battle_menu.hpp"       // BattleVerb
 #include "gus/app/screens/battle_scene.hpp"
 #include "gus/domain/combat/combat_actor.hpp"
 #include "gus/platform/render2d/i_renderer.hpp"
 
 using gus::app::screens::BattleScene;
 using gus::app::screens::BattleStatusIconSet;
+using gus::app::screens::BattleVerb;
+using gus::app::screens::LogLineKind;
 using gus::app::screens::kArenaHpBarH;
 using gus::app::screens::kHpBarH;
 using gus::app::screens::kHpBarW;
@@ -94,10 +98,15 @@ TEST_CASE("BattleScene monta o encontro de demo e le a fila do motor",
     BattleScene scene;
     REQUIRE(scene.party_count() == 3);
     REQUIRE(scene.enemy_count() == 4);
+    // Pode haver dano (inimigo de maior SPD age primeiro no incremento 3), mas todos os
+    // 7 atores seguem vivos na demo (ataque basico nao mata em 1 hit aqui).
     REQUIRE(scene.queue_len() == 7);
-    // Ator ativo existe (fila nao vazia) e e o de maior SPD (Drone spd 13 = inimigo3).
     REQUIRE(scene.active_actor() != nullptr);
-    REQUIRE(scene.active_actor()->spd() == 13);
+    // INCREMENTO 3: a cena conduz a batalha ate o 1o turno de JOGADOR. O inimigo de
+    // maior SPD (inimigo3, 13) ja agiu; a parada e num ator do LADO DO JOGADOR vivo.
+    REQUIRE(scene.current_actor_is_player());
+    REQUIRE(scene.active_actor()->is_player_side());
+    REQUIRE_FALSE(scene.combat_over());
 }
 
 TEST_CASE("BattleScene acha o Gus na party pelo compilador universal",
@@ -283,4 +292,141 @@ TEST_CASE("status icons: sem set, o status degrada pro placeholder (sem textura)
     scene.render(r, 640.0f, 360.0f);
     // Nada texturizado (status cai no quadradinho placeholder).
     REQUIRE(r.textured.empty());
+}
+
+// ---- INCREMENTO 3: menu de verbos + conducao de turno + log -----------------------
+
+namespace {
+
+// Navega o menu da cena ate o verbo desejado ficar selecionado (wrap garante achar).
+void select_verb(BattleScene& scene, BattleVerb want) {
+    for (int i = 0; i < 12 && scene.menu().selected_verb() != want; ++i) {
+        scene.menu_move(+1);
+    }
+}
+
+}  // namespace
+
+TEST_CASE("turno: a cena para no 1o turno de JOGADOR com o menu pronto",
+          "[battle_scene]") {
+    BattleScene scene;
+    REQUIRE(scene.current_actor_is_player());
+    REQUIRE_FALSE(scene.combat_over());
+    // O menu reflete o AP do ator ativo (3): todos os verbos de 1 AP habilitados.
+    REQUIRE(scene.menu().is_enabled(BattleVerb::Atacar));
+    REQUIRE(scene.menu().is_enabled(BattleVerb::Compilar));
+}
+
+TEST_CASE("turno: Atacar resolve a acao e troca o ator ativo", "[battle_scene]") {
+    BattleScene scene;
+    const auto* before = scene.active_actor();
+    REQUIRE(before != nullptr);
+
+    select_verb(scene, BattleVerb::Atacar);
+    scene.menu_confirm();
+
+    // Apos confirmar, OU o combate avancou pro proximo turno de jogador (ator ativo
+    // diferente do que agiu), OU terminou. Em ambos, o ator que agiu nao e mais o ativo
+    // com AP cheio "esperando".
+    if (!scene.combat_over()) {
+        REQUIRE(scene.current_actor_is_player());
+        // O motor registrou o ataque no log (entrada de Attack do atacante).
+        bool found_attack = false;
+        for (const auto& e : scene.machine().log()) {
+            if (e.actor_id == before->id() &&
+                e.action == gus::domain::combat::CombatActionType::Attack) {
+                found_attack = true;
+            }
+        }
+        REQUIRE(found_attack);
+    }
+}
+
+TEST_CASE("turno: Compilar NAO consome o turno (so loga, incr 4)", "[battle_scene]") {
+    BattleScene scene;
+    const auto* actor_before = scene.active_actor();
+    const int log_before = static_cast<int>(scene.machine().log().size());
+
+    select_verb(scene, BattleVerb::Compilar);
+    scene.menu_confirm();
+
+    // O ator ativo continua o MESMO (turno nao encerrou) e o motor NAO recebeu acao
+    // (log do motor inalterado); a sinalizacao foi pra o log de UI (log_lines).
+    REQUIRE(scene.active_actor() == actor_before);
+    REQUIRE(static_cast<int>(scene.machine().log().size()) == log_before);
+    const auto lines = scene.log_lines(20);
+    bool has_system = false;
+    for (const auto& l : lines) {
+        if (l.kind == LogLineKind::System) {
+            has_system = true;
+        }
+    }
+    REQUIRE(has_system);  // "COMPILAR: abriria o overlay..." entrou no log de UI
+}
+
+TEST_CASE("turno: Defender aplica Shield no proprio ator (acao real)",
+          "[battle_scene]") {
+    BattleScene scene;
+    const auto* self = scene.active_actor();
+    REQUIRE(self != nullptr);
+    const std::string self_id = self->id();
+
+    select_verb(scene, BattleVerb::Defender);
+    scene.menu_confirm();
+
+    // O motor logou um Defend do ator que agiu.
+    bool found_defend = false;
+    for (const auto& e : scene.machine().log()) {
+        if (e.actor_id == self_id &&
+            e.action == gus::domain::combat::CombatActionType::Defend) {
+            found_defend = true;
+        }
+    }
+    REQUIRE(found_defend);
+}
+
+TEST_CASE("turno: menu_confirm e no-op fora do turno de jogador / verbo sem AP",
+          "[battle_scene]") {
+    BattleScene scene;
+    // Seleciona Atacar e zera o cenario: nao da pra forcar 0 AP sem agir, entao
+    // exercitamos o no-op por estado: apos o combate acabar, confirmar nao faz nada.
+    // Conduz a batalha ate o fim (muitos Atacar) e checa que confirmar e inerte.
+    int guard = 0;
+    while (!scene.combat_over() && guard++ < 200) {
+        if (scene.current_actor_is_player()) {
+            select_verb(scene, BattleVerb::Atacar);
+            scene.menu_confirm();
+        } else {
+            break;  // a cena auto-encadeia inimigos; nao deveria parar em inimigo
+        }
+    }
+    // Eventualmente termina (vitoria ou derrota) - o ataque basico resolve a demo.
+    REQUIRE(scene.combat_over());
+    // Confirmar/navegar apos o fim e no-op (nao crasha, nao muda nada).
+    const auto* a = scene.active_actor();
+    scene.menu_confirm();
+    scene.menu_move(+1);
+    REQUIRE(scene.active_actor() == a);
+}
+
+TEST_CASE("log: render desenha 1 marca por linha notavel na zona do log",
+          "[battle_scene]") {
+    BattleScene scene;
+    // Forca eventos notaveis: um Atacar (gera log de ataque do jogador + o inimigo que
+    // ja agiu antes). Depois renderiza e conta marcas curtas na zona do log (y > 314).
+    select_verb(scene, BattleVerb::Atacar);
+    scene.menu_confirm();
+
+    CountingRenderer r;
+    scene.render(r, 640.0f, 360.0f);
+
+    // A caixa de log fica na base (y do log_panel ~314). As marcas sao retangulos
+    // estreitos (altura 5) dentro dela. Deve haver >= 1 (houve acao notavel).
+    int log_marks = 0;
+    for (const auto& f : r.fills) {
+        if (f.rect.h == 5.0f && f.rect.y >= 314.0f) {
+            ++log_marks;
+        }
+    }
+    REQUIRE(log_marks >= 1);
 }

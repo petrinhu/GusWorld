@@ -14,6 +14,8 @@ add_executable(gusengine_app_tests
     city_scene_test.cpp
     battle_layout_test.cpp
     battle_hud_model_test.cpp
+    battle_menu_test.cpp
+    battle_log_model_test.cpp
     battle_scene_test.cpp
 )
 

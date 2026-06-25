@@ -64,6 +64,46 @@ constexpr DrawColor kManaLitColor{0.40f, 0.65f, 0.95f, 1.0f};      // pip de Man
 constexpr DrawColor kManaOffColor{0.16f, 0.20f, 0.28f, 1.0f};      // pip de Mana apagado
 constexpr DrawColor kStatusBoxColor{0.30f, 0.30f, 0.42f, 1.0f};    // placeholder de status
 constexpr DrawColor kActiveCtbColor{0.30f, 0.95f, 0.55f, 1.0f};    // marca de ativo na fila
+// --- menu de verbos (incremento 3): 1 cor por verbo (sem set de icones de verbo) ---
+constexpr DrawColor kVerbScanColor{0.35f, 0.70f, 0.85f, 1.0f};
+constexpr DrawColor kVerbGambitoColor{0.70f, 0.45f, 0.85f, 1.0f};
+constexpr DrawColor kVerbAtacarColor{0.85f, 0.40f, 0.35f, 1.0f};
+constexpr DrawColor kVerbDefenderColor{0.45f, 0.65f, 0.45f, 1.0f};
+constexpr DrawColor kVerbCompilarColor{0.85f, 0.75f, 0.30f, 1.0f};
+constexpr DrawColor kVerbFleeColor{0.55f, 0.55f, 0.60f, 1.0f};
+constexpr DrawColor kVerbDisabledColor{0.18f, 0.18f, 0.20f, 1.0f};  // verbo sem AP
+constexpr DrawColor kVerbSelectColor{0.98f, 0.98f, 0.70f, 1.0f};    // borda do selecionado
+// --- log: cor por categoria de linha (D7) ---
+constexpr DrawColor kLogSystemColor{0.70f, 0.70f, 0.78f, 1.0f};
+constexpr DrawColor kLogDamageColor{0.88f, 0.40f, 0.35f, 1.0f};
+constexpr DrawColor kLogHealColor{0.40f, 0.82f, 0.45f, 1.0f};
+constexpr DrawColor kLogStatusColor{0.75f, 0.60f, 0.85f, 1.0f};
+constexpr DrawColor kLogDefeatColor{0.55f, 0.20f, 0.20f, 1.0f};
+
+// Cor de fundo de um verbo (1 por verbo; placeholder ate haver set de icones de verbo).
+DrawColor verb_color(BattleVerb v) noexcept {
+    switch (v) {
+        case BattleVerb::Scan:     return kVerbScanColor;
+        case BattleVerb::Gambito:  return kVerbGambitoColor;
+        case BattleVerb::Atacar:   return kVerbAtacarColor;
+        case BattleVerb::Defender: return kVerbDefenderColor;
+        case BattleVerb::Compilar: return kVerbCompilarColor;
+        case BattleVerb::Flee:     return kVerbFleeColor;
+    }
+    return kVerbAtacarColor;
+}
+
+// Cor de uma linha do log pela categoria (D7).
+DrawColor log_line_color(LogLineKind k) noexcept {
+    switch (k) {
+        case LogLineKind::System: return kLogSystemColor;
+        case LogLineKind::Damage: return kLogDamageColor;
+        case LogLineKind::Heal:   return kLogHealColor;
+        case LogLineKind::Status: return kLogStatusColor;
+        case LogLineKind::Defeat: return kLogDefeatColor;
+    }
+    return kLogSystemColor;
+}
 
 // Conta atores vivos de um lado na fila do motor.
 int count_alive(const gus::domain::combat::CombatStateMachine& m, bool player_side) {
@@ -104,9 +144,13 @@ std::vector<std::unique_ptr<CombatActor>> make_demo_actors() {
     v[0]->take_damage(20);  // Gus ~64% HP (35/55)
     v[2]->take_damage(35);  // Jaci ~30% HP (15/50)
     v[3]->take_damage(10);  // inimigo1 75% HP
-    // Status de demo (Regen no Gus, Poison no inimigo3) pra exercitar os icones.
+    // Status de demo pra exercitar os icones no painel/arena. Caua (v[1]) ganha Haste:
+    // como Caua e o 1o JOGADOR a agir (SPD 12, depois do inimigo3), o painel do ator
+    // ativo mostra o icone dele na 1a parada. Gus = Regen, inimigo3 = Poison.
     v[0]->add_status(gus::domain::combat::StatusEffect{
         gus::domain::combat::StatusId::Regen, /*magnitude=*/3, /*duration=*/2});
+    v[1]->add_status(gus::domain::combat::StatusEffect{
+        gus::domain::combat::StatusId::Haste, /*magnitude=*/2, /*duration=*/3});
     v[5]->add_status(gus::domain::combat::StatusEffect{
         gus::domain::combat::StatusId::Poison, /*magnitude=*/4, /*duration=*/3});
     return v;
@@ -153,6 +197,12 @@ void draw_pips(IRenderer& r, float x, float y, int total, int lit, int max_pips,
 
 }  // namespace
 
+// Aliases de dominio usados pelas DEFINICOES de metodo abaixo (fora do anon namespace).
+using gus::domain::combat::CombatAction;
+using gus::domain::combat::CombatActor;
+using gus::domain::combat::CombatOutcome;
+using gus::domain::combat::CombatPhase;
+
 BattleScene::BattleScene() {
     actors_ = make_demo_actors();
 
@@ -162,20 +212,193 @@ BattleScene::BattleScene() {
         ptrs.push_back(a.get());
     }
 
-    // Provider NO-OP no incremento 1: a cena NAO conduz turnos ainda, so le a fila e a
-    // contagem. A FSM exige um provider no ctor; um Pass deterministico basta (nunca
-    // chamado enquanto nao rodarmos run_active_turn_to_end).
-    auto provider = [](CombatActor&, const gus::domain::combat::CombatState&) {
-        return gus::domain::combat::CombatAction::pass();
+    // Provider = MAILBOX (incremento 3): devolve a acao pendente (do menu, pro jogador;
+    // ou auto, pro inimigo) e a reseta pra Pass. Captura `this` pra acessar o mailbox.
+    auto provider = [this](CombatActor& actor,
+                           const gus::domain::combat::CombatState&) {
+        return take_pending_action(actor);
     };
     machine_ = std::make_unique<gus::domain::combat::CombatStateMachine>(
         std::move(ptrs), std::move(provider));
 
-    // PRIMING do turno (incremento 2, LEITURA-only): begin_turn() recarrega AP/Mana do
-    // ator ativo (ramp de mana) e o poe em ActionSelect, que e EXATAMENTE o estado que
-    // o painel exibe ("o ator cujo turno e"). NAO conduzimos o turno (sem
-    // run_active_turn_to_end): so deixamos o ator ativo com recursos reais pra mostrar.
-    machine_->begin_turn();
+    // Comeca a batalha: begin_turn do 1o ator + auto-encadeia turnos de inimigo ate cair
+    // num turno de JOGADOR vivo (onde o menu opera) ou o combate terminar. O painel
+    // mostra o ator ativo (AP/Mana recarregados pelo begin_turn).
+    step_until_player_or_end();
+    menu_.refresh(active_actor() != nullptr ? active_actor()->ap() : 0);
+}
+
+CombatAction BattleScene::take_pending_action(CombatActor& actor) {
+    // Inimigo: ignora o mailbox e age sozinho (ataque basico). Jogador: consome o
+    // mailbox (acao do menu) e o reseta pra Pass (proxima chamada encerra o turno).
+    if (!actor.is_player_side()) {
+        return enemy_auto_action(actor);
+    }
+    CombatAction a = pending_action_;
+    pending_action_ = CombatAction::pass();
+    return a;
+}
+
+CombatActor* BattleScene::first_alive_enemy() const {
+    for (CombatActor* a : machine_->queue().order()) {
+        if (a != nullptr && !a->is_player_side() && a->is_alive()) {
+            return a;
+        }
+    }
+    return nullptr;
+}
+
+CombatActor* BattleScene::first_alive_player() const {
+    for (CombatActor* a : machine_->queue().order()) {
+        if (a != nullptr && a->is_player_side() && a->is_alive()) {
+            return a;
+        }
+    }
+    return nullptr;
+}
+
+CombatAction BattleScene::enemy_auto_action(const CombatActor& /*enemy*/) const {
+    const CombatActor* target = first_alive_player();
+    if (target == nullptr) {
+        return CombatAction::pass();
+    }
+    return CombatAction::attack(target->id());
+}
+
+bool BattleScene::current_actor_is_player() const noexcept {
+    const CombatActor* a = active_actor();
+    return a != nullptr && a->is_player_side() && a->is_alive();
+}
+
+bool BattleScene::combat_over() const noexcept {
+    return machine_->outcome() != gus::domain::combat::CombatOutcome::Ongoing;
+}
+
+void BattleScene::resolve_current_turn() {
+    // A acao ja esta no mailbox (jogador) ou sera auto (inimigo). run_active_turn_to_end
+    // consome AP ate Pass/0; depois CheckEnd e, se nao acabou, avanca pro proximo ator.
+    if (machine_->phase() == gus::domain::combat::CombatPhase::ActionSelect) {
+        machine_->run_active_turn_to_end();
+    }
+    if (!machine_->check_end()) {
+        machine_->advance_to_next_actor();
+    }
+}
+
+void BattleScene::step_until_player_or_end() {
+    // begin_turn do ator atual; se ele for inimigo (ou perder o turno), resolve e avanca
+    // ate cair num turno de JOGADOR vivo ou o combate terminar. Guarda contra loop.
+    int guard = 0;
+    const int max_steps = machine_->queue().count() * 4 + 8;
+    while (!combat_over()) {
+        if (++guard > max_steps) {
+            break;  // seguranca: nunca pendura o frame
+        }
+        // Inicia o turno do ator corrente (recarrega AP/Mana, aplica tick de status).
+        machine_->begin_turn();
+        if (combat_over()) {
+            break;
+        }
+        // Turno de JOGADOR vivo: para aqui e espera o menu (o player escolhe o verbo).
+        if (current_actor_is_player()) {
+            return;
+        }
+        // Inimigo (ou stunned): resolve automaticamente e avanca pro proximo.
+        resolve_current_turn();
+    }
+}
+
+void BattleScene::menu_move(int delta) noexcept {
+    if (combat_over() || !current_actor_is_player()) {
+        return;  // menu so opera no turno de jogador vivo
+    }
+    menu_.move(delta);
+}
+
+void BattleScene::menu_confirm() {
+    if (combat_over() || !current_actor_is_player()) {
+        return;
+    }
+    const BattleVerb verb = menu_.selected_verb();
+    if (!menu_.is_enabled(verb)) {
+        return;  // verbo sem AP: confirm e no-op (o item fica visivel acinzentado)
+    }
+
+    CombatActor* self = active_actor() != nullptr
+                            ? const_cast<CombatActor*>(active_actor())
+                            : nullptr;
+    if (self == nullptr) {
+        return;
+    }
+
+    // COMPILAR (incremento 3): NAO abre o overlay ainda (incr 4). So sinaliza no log que
+    // abriria, e NAO consome o turno (o jogador continua podendo escolher outro verbo).
+    if (verb == BattleVerb::Compilar) {
+        ui_log_.push_back(LogLine{LogLineKind::System,
+                                  "COMPILAR: abriria o overlay de cartas (incr 4)"});
+        return;
+    }
+
+    // Monta a CombatAction real conforme o verbo (alvo default: 1o inimigo vivo pras
+    // ofensivas; self pro Defender; sem alvo pro Flee). combat.md par.5 (custos de AP ja
+    // vem das factories).
+    CombatAction action = CombatAction::pass();
+    switch (verb) {
+        case BattleVerb::Atacar: {
+            const CombatActor* t = first_alive_enemy();
+            if (t == nullptr) {
+                return;
+            }
+            action = CombatAction::attack(t->id());
+            break;
+        }
+        case BattleVerb::Scan: {
+            const CombatActor* t = first_alive_enemy();
+            if (t == nullptr) {
+                return;
+            }
+            action = CombatAction::scan(t->id());
+            break;
+        }
+        case BattleVerb::Gambito: {
+            // Gambito-Prever exige IEnemyBrain registrado (a demo nao registra brains):
+            // no incremento 3 sinaliza no log e NAO submete (evita excecao do motor).
+            ui_log_.push_back(LogLine{
+                LogLineKind::System,
+                "GAMBITO: requer brain do alvo (telegraph entra no incr 5)"});
+            return;
+        }
+        case BattleVerb::Defender:
+            action = CombatAction::defend();
+            break;
+        case BattleVerb::Flee:
+            action = CombatAction::flee();
+            break;
+        case BattleVerb::Compilar:
+            return;  // tratado acima
+    }
+
+    // Submete a acao (mailbox) e conduz o turno; depois auto-encadeia turnos de inimigo
+    // ate o proximo turno de jogador ou o fim. Atualiza a habilitacao do menu.
+    pending_action_ = std::move(action);
+    resolve_current_turn();
+    if (!combat_over()) {
+        step_until_player_or_end();
+    }
+    menu_.refresh(active_actor() != nullptr ? active_actor()->ap() : 0);
+}
+
+std::vector<LogLine> BattleScene::log_lines(int max_lines) const {
+    // Junta as linhas NOTAVEIS do motor (D7) com as linhas de UI (COMPILAR/GAMBITO
+    // sinalizados aqui), preservando a ordem: motor primeiro, UI depois (as de UI sao as
+    // mais recentes ao escolher um verbo que ainda nao age). Corta pro tamanho da caixa.
+    std::vector<LogLine> lines = build_log_lines(
+        machine_->log(), machine_->status_changes(), /*max_lines=*/0);
+    lines.insert(lines.end(), ui_log_.begin(), ui_log_.end());
+    if (max_lines > 0 && static_cast<int>(lines.size()) > max_lines) {
+        lines.erase(lines.begin(), lines.end() - max_lines);
+    }
+    return lines;
 }
 
 int BattleScene::party_count() const { return count_alive(*machine_, true); }
@@ -345,14 +568,50 @@ void BattleScene::render(IRenderer& renderer, float viewport_px_w,
                     break;  // nao invade a area de HP/recursos
                 }
             }
+
+            // --- menu de verbos comando-first (incremento 3) ---
+            // So no turno de JOGADOR vivo (CTB por-ator) e enquanto o combate roda. Ocupa
+            // a METADE DIREITA do painel, em coluna. Cada verbo = caixa colorida (sem set
+            // de icones de verbo); desabilitado (sem AP) = cinza; selecionado = borda.
+            if (current_actor_is_player() && !combat_over()) {
+                const Rect menu_zone{p.x + p.w * 0.5f, p.y, p.w * 0.5f, p.h};
+                const auto items = menu_.layout(menu_zone);
+                for (int i = 0; i < kBattleVerbCount; ++i) {
+                    const MenuItem& it = items[static_cast<std::size_t>(i)];
+                    const DrawColor col =
+                        it.enabled ? verb_color(it.verb) : kVerbDisabledColor;
+                    renderer.draw_filled_rect(it.rect, col);
+                    if (i == menu_.selected_index()) {
+                        renderer.draw_rect_outline(it.rect, kVerbSelectColor, 2.0f);
+                    }
+                }
+            }
         }
     }
 
-    // --- caixa de log (base) ---
+    // --- caixa de log (base): ESTRUTURA por evento (D7), 1 marca colorida por linha ---
     {
         const Rect l = log_panel_rect();
         renderer.draw_filled_rect(l, kLogColor);
         renderer.draw_rect_outline(l, kHudBorderColor, 1.0f);
+
+        // Quantas linhas cabem na caixa (altura por linha fixa; texto vem com a fonte).
+        constexpr float kLogLineH = 5.0f;
+        constexpr float kLogLineGap = 2.0f;
+        const float pad = 2.0f;
+        const int capacity = static_cast<int>(
+            (l.h - 2.0f * pad) / (kLogLineH + kLogLineGap));
+        if (capacity > 0) {
+            const std::vector<LogLine> lines = log_lines(capacity);
+            float ly = l.y + pad;
+            for (const LogLine& line : lines) {
+                // MARCA: uma barra curta colorida por categoria (placeholder do texto).
+                // Quando a fonte entrar, troca-se a barra pelo glifo da message.
+                const Rect mark{l.x + pad, ly, l.w * 0.6f, kLogLineH};
+                renderer.draw_filled_rect(mark, log_line_color(line.kind));
+                ly += kLogLineH + kLogLineGap;
+            }
+        }
     }
 
     renderer.end_frame();

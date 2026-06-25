@@ -1,0 +1,129 @@
+// gus/app/src/screens/battle_log_model.cpp
+//
+// Implementacao do modelo PURO do log (ver header). Classifica CombatLogEntry e
+// StatusEffectChange em LogLine (categoria + texto cru), e seleciona os NOTAVEIS (D7).
+// Sem SDL. As heuristicas seguem as mensagens que a FSM ja produz (combat_state_machine).
+
+#include "gus/app/screens/battle_log_model.hpp"
+
+
+#include "gus/domain/combat/combat_enums.hpp"
+
+namespace gus::app::screens {
+
+namespace {
+
+using gus::domain::combat::CombatActionType;
+using gus::domain::combat::CombatLogEntry;
+using gus::domain::combat::StatusChangeKind;
+using gus::domain::combat::StatusEffectChange;
+
+// Piso de "dano grande" pra entrar no log mesmo sem ser critico (D7: nao todo hit, mas
+// hits pesados sim). Ajustavel; conservador no slice.
+constexpr int kBigDamageFloor = 20;
+
+// true se a message carrega um marcador de canal NOTAVEL (critico/falha de compilacao),
+// que o motor sufixa (combat.md par.11; ver resolve_use_card).
+bool has_channel_marker(const std::string& m) noexcept {
+    return m.find("[CRITICO]") != std::string::npos ||
+           m.find("FALHA DE COMPILACAO") != std::string::npos;
+}
+
+// true se a message e uma anuncio de combo/sistema (COMPILADO:, ERRO, ANALISE).
+bool is_system_message(const std::string& m) noexcept {
+    return m.rfind("COMPILADO:", 0) == 0 ||
+           m.find("ERRO DE COMPILACAO") != std::string::npos ||
+           m.find("ANALISE PREDITIVA") != std::string::npos;
+}
+
+}  // namespace
+
+bool is_notable(const CombatLogEntry& e) noexcept {
+    switch (e.action) {
+        case CombatActionType::Attack:
+        case CombatActionType::UseCard:
+            // Dano: notavel se grande OU marcado (critico/falha) OU anuncio de sistema
+            // (COMPILADO/ERRO). Hit comum pequeno NAO entra (numero flutuante cobre).
+            return is_system_message(e.message) || has_channel_marker(e.message) ||
+                   e.value >= kBigDamageFloor;
+        case CombatActionType::Scan:
+        case CombatActionType::ScanEnvironment:
+        case CombatActionType::GambitPredict:
+        case CombatActionType::GambitReorder:
+        case CombatActionType::Flee:
+            return true;  // acoes de sistema/informacao sempre ecoam (D7)
+        case CombatActionType::Defend:
+            return true;  // ganhar Shield e notavel (muda a leitura do proximo hit)
+        case CombatActionType::Pass:
+            // Pass so e notavel se carrega message de sistema (ex.: ANALISE PREDITIVA).
+            return !e.message.empty() && is_system_message(e.message);
+    }
+    return false;
+}
+
+LogLine classify(const CombatLogEntry& e) {
+    LogLineKind kind = LogLineKind::System;
+    switch (e.action) {
+        case CombatActionType::Attack:
+        case CombatActionType::UseCard:
+            // Anuncio de combo/sistema vence (COMPILADO:); senao e dano.
+            kind = is_system_message(e.message) ? LogLineKind::System
+                                                : LogLineKind::Damage;
+            break;
+        case CombatActionType::Defend:
+            kind = LogLineKind::Status;  // Shield aplicado
+            break;
+        case CombatActionType::Scan:
+        case CombatActionType::ScanEnvironment:
+        case CombatActionType::GambitPredict:
+        case CombatActionType::GambitReorder:
+        case CombatActionType::Flee:
+        case CombatActionType::Pass:
+            kind = LogLineKind::System;
+            break;
+    }
+    return LogLine{kind, e.message};
+}
+
+LogLine classify(const StatusEffectChange& c) {
+    // Toda mudanca de status e categoria Status (cura/Regen poderia ser Heal, mas o
+    // tick de cura nao vem por StatusEffectChange; mantemos Status pra Applied/Expired/
+    // Absorbed). O texto cru e sintetico (o motor nao da message aqui).
+    std::string txt = "status ";
+    switch (c.kind) {
+        case StatusChangeKind::Applied:  txt += "aplicado"; break;
+        case StatusChangeKind::Expired:  txt += "expirou"; break;
+        case StatusChangeKind::Absorbed: txt += "absorvido"; break;
+    }
+    txt += " em " + c.actor_id;
+    return LogLine{LogLineKind::Status, std::move(txt)};
+}
+
+std::vector<LogLine> build_log_lines(
+    const std::vector<CombatLogEntry>& log,
+    const std::vector<StatusEffectChange>& status_changes, int max_lines) {
+    std::vector<LogLine> lines;
+
+    // Logs de acao NOTAVEIS, na ordem de chegada.
+    for (const CombatLogEntry& e : log) {
+        if (is_notable(e)) {
+            lines.push_back(classify(e));
+        }
+    }
+    // Mudancas de status (Applied/Expired/Absorbed): so as APLICADAS sao "notaveis" o
+    // bastante pra D7 (aplicar Poison/Stun muda a leitura); expire/absorbed sao ruido.
+    for (const StatusEffectChange& c : status_changes) {
+        if (c.kind == StatusChangeKind::Applied) {
+            lines.push_back(classify(c));
+        }
+    }
+
+    // A caixa rola: mantem so as ULTIMAS max_lines.
+    if (max_lines > 0 && static_cast<int>(lines.size()) > max_lines) {
+        lines.erase(lines.begin(),
+                    lines.end() - max_lines);
+    }
+    return lines;
+}
+
+}  // namespace gus::app::screens

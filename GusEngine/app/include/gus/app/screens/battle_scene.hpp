@@ -33,7 +33,10 @@
 #include <string>
 #include <vector>
 
-#include "gus/domain/combat/combat_enums.hpp"  // StatusId
+#include "gus/app/screens/battle_log_model.hpp"  // LogLine
+#include "gus/app/screens/battle_menu.hpp"       // BattleMenu / BattleVerb
+#include "gus/domain/combat/combat_enums.hpp"    // StatusId
+#include "gus/domain/combat/combat_records.hpp"  // CombatAction
 #include "gus/domain/combat/combat_state_machine.hpp"
 #include "gus/platform/render2d/i_renderer.hpp"
 
@@ -110,6 +113,38 @@ public:
         return *machine_;
     }
 
+    // ---- Conducao de turno (incremento 3): menu comando-first + FSM real ----
+    //
+    // MODELO DE DRIVE (reportado ao coordenador): o provider da FSM e um MAILBOX (uma
+    // acao por vez). No turno do JOGADOR, o menu seta UMA acao e a cena roda o turno ate
+    // o fim (a acao resolve, depois Pass encerra) - ou seja, 1 verbo = 1 turno no
+    // incremento 3 (multi-acao por turno e refinamento do overlay, incr 4+). No turno do
+    // INIMIGO, a cena auto-resolve (ataque basico num alvo vivo) e avanca. Apos qualquer
+    // acao, a cena auto-encadeia os turnos de inimigo ate o proximo turno de JOGADOR ou
+    // o fim do combate.
+
+    // true se o ator ativo e do lado do JOGADOR (mostra o menu e ESPERA input). false =
+    // inimigo (a cena auto-resolve via step_until_player_or_end).
+    [[nodiscard]] bool current_actor_is_player() const noexcept;
+
+    // true se o combate JA terminou (Victory/Defeat/Fled). O menu nao opera mais.
+    [[nodiscard]] bool combat_over() const noexcept;
+
+    // O menu de verbos do ator ativo (leitura, pro render).
+    [[nodiscard]] const BattleMenu& menu() const noexcept { return menu_; }
+
+    // Navega a selecao do menu (cima/baixo). No-op se nao e turno de jogador ou acabou.
+    void menu_move(int delta) noexcept;
+
+    // Confirma o verbo selecionado: monta a CombatAction real e conduz o turno (no caso
+    // do Compilar, apenas sinaliza "abriria o overlay" no log; incremento 4). No-op se
+    // o verbo esta desabilitado, nao e turno de jogador ou o combate acabou. Apos
+    // resolver, auto-encadeia turnos de inimigo ate o proximo turno de jogador/fim.
+    void menu_confirm();
+
+    // Linhas NOTAVEIS do log (D7), ja classificadas/cortadas pra caixa (max_lines).
+    [[nodiscard]] std::vector<LogLine> log_lines(int max_lines) const;
+
     // Desenha o ESQUELETO da batalha (placeholders): fundo, arena (party/inimigos),
     // fila CTB, painel do ator ativo, log. viewport_px_w/h = PIXELS REAIS da janela
     // (o backend escala 640x360 por inteiro). LE a contagem/ordem do motor.
@@ -117,11 +152,43 @@ public:
                 float viewport_px_h) const;
 
 private:
+    // Provider da FSM = mailbox: devolve pending_action_ e o reseta pra Pass. Usado
+    // tanto pro jogador (acao do menu) quanto pro inimigo (acao auto). Definido no ctor.
+    [[nodiscard]] gus::domain::combat::CombatAction take_pending_action(
+        gus::domain::combat::CombatActor& actor);
+
+    // Comeca o turno do ator ativo (begin_turn) e, se ele perder o turno (Stun) ou for
+    // inimigo, auto-encadeia ate cair num turno de JOGADOR vivo ou o combate terminar.
+    void step_until_player_or_end();
+
+    // Resolve UM turno do ator ativo com a acao ja no mailbox (run_active_turn_to_end +
+    // check_end + advance). Atualiza a habilitacao do menu pro proximo ator.
+    void resolve_current_turn();
+
+    // Acao automatica de um inimigo: ataque basico no 1o player vivo (POCO-ish; o alvo
+    // vem de first_alive_player). Pass se nao houver player vivo.
+    [[nodiscard]] gus::domain::combat::CombatAction enemy_auto_action(
+        const gus::domain::combat::CombatActor& enemy) const;
+
+    // Primeiro inimigo vivo (alvo default das acoes ofensivas do jogador). nullptr se
+    // nenhum. Primeiro player vivo (alvo das acoes de inimigo). nullptr se nenhum.
+    [[nodiscard]] gus::domain::combat::CombatActor* first_alive_enemy() const;
+    [[nodiscard]] gus::domain::combat::CombatActor* first_alive_player() const;
+
     // Atores de demo (DONOS). Declarados ANTES da FSM: vivem mais que ela.
     std::vector<std::unique_ptr<gus::domain::combat::CombatActor>> actors_;
     std::unique_ptr<gus::domain::combat::CombatStateMachine> machine_;
     BattlePortraitSet portraits_{};
     BattleStatusIconSet status_icons_{};
+
+    // Menu de verbos do ator ativo (incremento 3).
+    BattleMenu menu_{};
+    // Mailbox de acao do provider (1 por vez). Default Pass = "nada a fazer".
+    gus::domain::combat::CombatAction pending_action_{
+        gus::domain::combat::CombatAction::pass()};
+    // Linhas de log geradas pela UI (nao pelo motor): COMPILAR/GAMBITO sinalizados antes
+    // de existir mecanica (incr 4/5). Mescladas com o log do motor em log_lines().
+    std::vector<LogLine> ui_log_;
 };
 
 }  // namespace gus::app::screens
