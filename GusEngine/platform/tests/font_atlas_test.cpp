@@ -50,6 +50,30 @@ TEST_CASE("bake_font_atlas carrega a Pixel Operator Mono embarcada (CC0)",
     REQUIRE_FALSE(atlas.glyph_has_ink(' '));
 }
 
+TEST_CASE("BUG A: o atlas cobre os acentos do pt-br (Latin-1) com tinta",
+          "[font_atlas]") {
+    const FontAtlas atlas =
+        bake_font_atlas(resolve_font_path("PixelOperatorMono.ttf"), 16);
+    REQUIRE(atlas.valid());
+    // Code points essenciais do pt-br (Latin-1 Supplement): a-til, c-cedilha, e-agudo,
+    // a-agudo, o-til, e maiusculas. Todos devem existir E ter tinta (rasterizados), nao
+    // virar buraco. (Antes do incremento 6, o atlas so tinha ASCII -> acento = buraco.)
+    const int cps[] = {0x00E3 /*ã*/, 0x00E7 /*ç*/, 0x00E9 /*é*/, 0x00E1 /*á*/,
+                       0x00F3 /*ó*/, 0x00ED /*í*/, 0x00FA /*ú*/, 0x00C7 /*Ç*/,
+                       0x00C1 /*Á*/};
+    for (int cp : cps) {
+        REQUIRE(atlas.has_glyph(cp));
+        REQUIRE(atlas.glyph_has_ink(cp));
+        const auto uv = atlas.glyph_uv(cp);
+        REQUIRE(uv.w > 0.0f);
+        REQUIRE(uv.u + uv.w <= 1.0f + 1e-4f);
+        REQUIRE(uv.v + uv.h <= 1.0f + 1e-4f);
+    }
+    // Code point fora das faixas (ex.: U+0100 Latin Extended) cai em UV vazio sem crash.
+    REQUIRE_FALSE(atlas.has_glyph(0x0100));
+    REQUIRE(atlas.glyph_uv(0x0100).w == 0.0f);
+}
+
 TEST_CASE("glyph_uv devolve sub-regiao normalizada [0,1] do caractere",
           "[font_atlas]") {
     const FontAtlas atlas =

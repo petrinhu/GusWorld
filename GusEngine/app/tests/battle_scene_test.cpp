@@ -111,6 +111,26 @@ int fills_in_x_band(const std::vector<CountingRenderer::Item>& fills, float x0,
     return n;
 }
 
+// Navega o menu da cena ate o verbo desejado ficar selecionado (wrap garante achar).
+void select_verb(BattleScene& scene, BattleVerb want) {
+    for (int i = 0; i < 12 && scene.menu().selected_verb() != want; ++i) {
+        scene.menu_move(+1);
+    }
+}
+
+// PACING (incremento 6): a cena comeca PARADA (intro) e anima turno-a-turno. Pra os
+// testes de turno, "bombeia" o ritmo (skip + update) ate cair na vez do jogador ou o
+// combate acabar. Cada skip pula a intro/delay; update conduz 1 passo por vez.
+void pump_to_player_turn(BattleScene& scene) {
+    for (int i = 0; i < 200; ++i) {
+        if (scene.combat_over() || scene.waiting_player_input()) {
+            return;
+        }
+        scene.skip();                // acelera a intro/delay corrente
+        scene.update(1.0f / 60.0f);  // conduz 1 passo (resolve 1 turno de inimigo)
+    }
+}
+
 }  // namespace
 
 TEST_CASE("BattleScene monta o encontro de demo e le a fila do motor",
@@ -270,14 +290,17 @@ TEST_CASE("arena desenha 1 mini-barra de HP por ator vivo (7 barras)",
     REQUIRE(bar_pos.size() == 7);  // 3 party (x=40) + 4 inimigos (x=544)
 }
 
-TEST_CASE("mini-barra de HP reflete dano real (Jaci ferida < cheia)",
-          "[battle_scene]") {
+TEST_CASE("mini-barra de HP reflete dano real (apos um ataque)", "[battle_scene]") {
+    // Abertura LIMPA (incr 6, BUG B): todos comecam com HP CHEIO. Pra ver uma barra
+    // PARCIAL, resolvemos um ataque do jogador (o alvo perde HP) e renderizamos.
     BattleScene scene;
+    pump_to_player_turn(scene);
+    select_verb(scene, BattleVerb::Atacar);
+    scene.menu_confirm();
     CountingRenderer r;
     scene.render(r, 640.0f, 360.0f);
-    // Existe pelo menos um FILL de HP da arena com largura < 56 (ator ferido: Jaci/Gus
-    // levaram dano no demo). O fill tem altura kArenaHpBarH e largura estritamente
-    // menor que o fundo (56) e > 0.
+    // Existe pelo menos um FILL de HP da arena com largura < 56 (o alvo ferido). O fill
+    // tem altura kArenaHpBarH e largura estritamente menor que o fundo (56) e > 0.
     bool found_partial = false;
     for (const auto& f : r.fills) {
         if (f.rect.h == static_cast<float>(kArenaHpBarH) && f.rect.w > 0.0f &&
@@ -291,17 +314,19 @@ TEST_CASE("mini-barra de HP reflete dano real (Jaci ferida < cheia)",
 TEST_CASE("status icons: com set_status_icons, o status do ator ativo vira textura",
           "[battle_scene]") {
     BattleScene scene;
-    // O ator ativo (inimigo3, Drone spd 13) tem Poison no demo. Carrega icones fake.
+    // Na vez do jogador, o ator ativo (Caua, 1o jogador) tem Haste (condicao inicial do
+    // demo) -> o painel mostra o icone. Carrega icones fake e bombeia ate a vez dele.
     BattleStatusIconSet icons;
     for (std::size_t i = 0; i < icons.by_index.size(); ++i) {
         icons.by_index[i] = static_cast<TextureId>(i + 1);  // handles validos
     }
     scene.set_status_icons(icons);
+    pump_to_player_turn(scene);
 
     CountingRenderer r;
     scene.render(r, 640.0f, 360.0f);
-    // Sem retratos mas COM icones de status: ha pelo menos 1 textura desenhada (o
-    // icone do Poison do ator ativo no painel).
+    // Sem retratos mas COM icones de status: ha pelo menos 1 textura (o icone de Haste do
+    // ator ativo no painel).
     REQUIRE(r.textured.size() >= 1);
 }
 
@@ -315,30 +340,7 @@ TEST_CASE("status icons: sem set, o status degrada pro placeholder (sem textura)
 }
 
 // ---- INCREMENTO 3: menu de verbos + conducao de turno + log -----------------------
-
-namespace {
-
-// Navega o menu da cena ate o verbo desejado ficar selecionado (wrap garante achar).
-void select_verb(BattleScene& scene, BattleVerb want) {
-    for (int i = 0; i < 12 && scene.menu().selected_verb() != want; ++i) {
-        scene.menu_move(+1);
-    }
-}
-
-// PACING (incremento 6): a cena comeca PARADA (intro) e anima turno-a-turno. Pra os
-// testes de turno, "bombeia" o ritmo (skip + update) ate cair na vez do jogador ou o
-// combate acabar. Cada skip pula a intro/delay; update conduz 1 passo por vez.
-void pump_to_player_turn(BattleScene& scene) {
-    for (int i = 0; i < 200; ++i) {
-        if (scene.combat_over() || scene.waiting_player_input()) {
-            return;
-        }
-        scene.skip();             // acelera a intro/delay corrente
-        scene.update(1.0f / 60.0f);  // conduz 1 passo (resolve 1 turno de inimigo)
-    }
-}
-
-}  // namespace
+// (helpers select_verb/pump_to_player_turn definidos no anon namespace do topo)
 
 TEST_CASE("turno: a cena para no 1o turno de JOGADOR com o menu pronto",
           "[battle_scene]") {
@@ -660,6 +662,31 @@ TEST_CASE("pacing D10: comeca PARADA na intro, ninguem agiu (log vazio)",
     REQUIRE(scene.log_lines(10).empty());
     // O banner anuncia a batalha.
     REQUIRE(scene.turn_banner_key() == std::string_view("COMBAT_BANNER_BATTLE"));
+}
+
+TEST_CASE("pacing D10 REGRESSAO (BUG B): abertura 100% LIMPA - HP cheio, sem dano/log",
+          "[battle_scene]") {
+    // BUG B (criador no display): "a batalha iniciou com um ataque de inimigo JA
+    // realizado". Causa: o demo pre-aplicava dano no ctor (HP parcial) -> parecia combate.
+    // Trava: na abertura, TODOS com HP CHEIO, ZERO floaters, ZERO log de acao - e ASSIM
+    // permanece DURANTE TODA a intro (nenhum turno resolve antes do intro terminar).
+    BattleScene scene;
+    for (const auto* a : scene.machine().queue().order()) {
+        REQUIRE(a->hp() == a->max_hp());  // ninguem perdeu HP no start
+    }
+    REQUIRE(scene.floaters().empty());
+    REQUIRE(scene.machine().log().empty());
+    // Avanca o tempo ATE QUASE o fim da intro (sem ultrapassar): ninguem agiu ainda.
+    scene.update(kPacingIntroSeconds - 0.05f);
+    REQUIRE(scene.is_intro());
+    REQUIRE(scene.machine().log().empty());   // nenhum ataque resolveu durante a intro
+    REQUIRE(scene.floaters().empty());
+    for (const auto* a : scene.machine().queue().order()) {
+        REQUIRE(a->hp() == a->max_hp());      // HP ainda cheio
+    }
+    // So DEPOIS da intro o 1o turno anima (ai sim entra no log).
+    scene.update(0.1f);
+    REQUIRE(scene.machine().log().size() >= 1);
 }
 
 TEST_CASE("pacing D8: os turnos de inimigo animam UM DE CADA VEZ (nao todos juntos)",

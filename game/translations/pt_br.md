@@ -180,10 +180,10 @@ Turno do inimigo
 BATALHA!
 
 ## COMBAT_BANNER_PLAYER_TURN
-SUA VEZ: escolha uma acao
+Vez de {0}
 
 ## COMBAT_BANNER_ENEMY_TURN
-Vez do inimigo
+Vez de {0}
 
 ## COMBAT_SELECT_TARGET
 Escolha o alvo:

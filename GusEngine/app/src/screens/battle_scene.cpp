@@ -187,21 +187,19 @@ std::vector<std::unique_ptr<CombatActor>> make_demo_actors() {
     add("inimigo3", "Drone", 30, 13, CardFamily::Sonico, false, false);
     add("inimigo4", "Drone", 30, 8, CardFamily::Sonico, false, false);
 
-    // Estado de DEMO pra a tela mostrar dados nao-triviais (incremento 2): alguns
-    // atores levam dano (barra de HP parcial) e ganham status (icone no painel/arena).
-    // Tudo via a API real do CombatActor; nada hardcoded no render. v[0]=gus ...
-    v[0]->take_damage(20);  // Gus ~64% HP (35/55)
-    v[2]->take_damage(35);  // Jaci ~30% HP (15/50)
-    v[3]->take_damage(10);  // inimigo1 75% HP
-    // Status de demo pra exercitar os icones no painel/arena. Caua (v[1]) ganha Haste:
-    // como Caua e o 1o JOGADOR a agir (SPD 12, depois do inimigo3), o painel do ator
-    // ativo mostra o icone dele na 1a parada. Gus = Regen, inimigo3 = Poison.
+    // ABERTURA LIMPA (incremento 6, BUG B): os atores comecam com HP CHEIO - "ninguem
+    // agiu" (D10). Antes o demo pre-aplicava dano (HP parcial) pra exibir as barras, mas
+    // no display isso parecia que um inimigo ja tinha atacado, atropelando o BATALHA!. As
+    // barras de HP continuam visiveis (cheias) e enchem/esvaziam no ritmo do combate.
+    //
+    // Status de demo como CONDICAO INICIAL (nao "ataque"): Caua (v[1]) ganha Haste pra o
+    // painel do 1o jogador a agir mostrar o icone; Gus (v[0]) Regen. Sao buffs/debuffs de
+    // partida (icone sob o ator), nao combate resolvido. NAO ha Poison no inimigo no
+    // start (evitaria parecer "dano ja aplicado" quando ticasse no 1o turno).
     v[0]->add_status(gus::domain::combat::StatusEffect{
         gus::domain::combat::StatusId::Regen, /*magnitude=*/3, /*duration=*/2});
     v[1]->add_status(gus::domain::combat::StatusEffect{
         gus::domain::combat::StatusId::Haste, /*magnitude=*/2, /*duration=*/3});
-    v[5]->add_status(gus::domain::combat::StatusEffect{
-        gus::domain::combat::StatusId::Poison, /*magnitude=*/4, /*duration=*/3});
     return v;
 }
 
@@ -732,6 +730,13 @@ void BattleScene::render(IRenderer& renderer, float viewport_px_w,
         const std::string_view key = turn_banner_key();
         if (!key.empty()) {
             std::string text = translator_->tr(std::string(key));
+            // "Vez de {0}": interpola o NOME do ator ativo (D9; jogador e inimigo). O
+            // banner de turno usa display_name (ex: "Vez de Gus", "Vez de Drone").
+            const auto pos = text.find("{0}");
+            if (pos != std::string::npos) {
+                const auto* a = active_actor();
+                text.replace(pos, 3, a != nullptr ? a->display_name() : "");
+            }
             DrawColor col = kBannerIntroColor;
             if (current_actor_is_player()) {
                 col = kBannerPlayerColor;

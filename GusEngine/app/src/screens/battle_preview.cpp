@@ -203,6 +203,7 @@ int run_battle_preview() {
                             scene.menu_move(+1);
                             break;
                         case SDLK_RETURN:
+                        case SDLK_KP_ENTER:  // Enter do numpad tambem confirma
                         case SDLK_SPACE:
                             // D8/D9: na vez do jogador, confirma o verbo; fora dela
                             // (intro/delay entre turnos), ACELERA o ritmo (pula a pausa).

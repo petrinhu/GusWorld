@@ -11,16 +11,40 @@
 #include "gus/platform/render2d/text_metrics.hpp"
 
 using Catch::Matchers::WithinAbs;
+using gus::platform::render2d::decode_utf8;
 using gus::platform::render2d::glyph_advance;
 using gus::platform::render2d::kMonoAdvanceRatio;
 using gus::platform::render2d::text_char_count;
 using gus::platform::render2d::text_height;
 using gus::platform::render2d::text_width;
 
-TEST_CASE("text_char_count conta os bytes ASCII", "[text_metrics]") {
+TEST_CASE("text_char_count conta CODE POINTS (nao bytes), inclui acentos UTF-8",
+          "[text_metrics]") {
     REQUIRE(text_char_count("") == 0);
     REQUIRE(text_char_count("Atacar") == 6);
     REQUIRE(text_char_count("HP 45/58") == 8);
+    // BUG A: "Aceleracao" com acentos UTF-8 ("Aceleração" = A-c-e-l-e-r-a-c-a-o, 10
+    // code points, mas o c-cedilha e o a-til sao 2 bytes cada => 12 bytes). Conta 10.
+    REQUIRE(text_char_count("Acelera\xC3\xA7\xC3\xA3o") == 10);  // Aceleração
+    REQUIRE(text_char_count("An\xC3\xA1lise") == 7);              // Análise
+}
+
+TEST_CASE("decode_utf8 itera CODE POINTS de uma string UTF-8", "[text_metrics]") {
+    // "cão" = c (0x63) + a-til (U+00E3 = 0xC3 0xA3) + o (0x6F) = 3 code points.
+    const auto cps = decode_utf8("c\xC3\xA3o");
+    REQUIRE(cps.size() == 3);
+    REQUIRE(cps[0] == 0x63);    // 'c'
+    REQUIRE(cps[1] == 0x00E3);  // 'ã' (U+00E3)
+    REQUIRE(cps[2] == 0x6F);    // 'o'
+    // ASCII puro: 1 code point por byte.
+    const auto ascii = decode_utf8("AB");
+    REQUIRE(ascii.size() == 2);
+    REQUIRE(ascii[0] == 'A');
+    // c-cedilha minusculo (U+00E7) e maiusculo (U+00C7).
+    const auto ce = decode_utf8("\xC3\xA7\xC3\x87");  // ç Ç
+    REQUIRE(ce.size() == 2);
+    REQUIRE(ce[0] == 0x00E7);
+    REQUIRE(ce[1] == 0x00C7);
 }
 
 TEST_CASE("text_width = chars * ratio * px (monospace)", "[text_metrics]") {

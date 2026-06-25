@@ -19,7 +19,9 @@
 #ifndef GUS_PLATFORM_RENDER2D_TEXT_METRICS_HPP
 #define GUS_PLATFORM_RENDER2D_TEXT_METRICS_HPP
 
+#include <cstdint>
 #include <string_view>
+#include <vector>
 
 namespace gus::platform::render2d {
 
@@ -28,8 +30,14 @@ namespace gus::platform::render2d {
 // se trocar a fonte, re-mede aqui (a parte SDL do atlas confirma com stbtt_GetFontVMetrics).
 inline constexpr float kMonoAdvanceRatio = 0.5f;
 
-// Numero de caracteres (avancos) de uma string. ASCII/Latin-1: 1 por byte. (UTF-8
-// multibyte conta cada byte; aceitavel pros rotulos curtos do slice - ver header.)
+// Decodifica uma string UTF-8 numa lista de CODE POINTS (BUG A, incremento 6): o jogo e
+// pt-br, entao acento (c-cedilha, a-til, e-agudo...) e essencial. Um code point latino e
+// 2 bytes em UTF-8 (ex.: 'c' = 0xC3 0xA7); iterar por BYTE quebraria o texto. Sequencias
+// invalidas/truncadas viram U+FFFD (replacement) ou sao ignoradas com seguranca (nunca
+// lanca). Continuation bytes soltos sao pulados. POCO puro (sem SDL).
+[[nodiscard]] std::vector<std::uint32_t> decode_utf8(std::string_view text);
+
+// Numero de CODE POINTS (avancos monospace) de uma string UTF-8 (= decode_utf8().size()).
 [[nodiscard]] int text_char_count(std::string_view text) noexcept;
 
 // Largura em px logico de uma string monospace ao tamanho px_size (altura da celula).

@@ -62,21 +62,28 @@ std::vector<unsigned char> read_file(const std::string& path) {
 
 }  // namespace
 
-bool FontAtlas::has_glyph(char c) const noexcept {
-    if (!valid()) {
-        return false;
+int glyph_slot(int codepoint) noexcept {
+    // ASCII printable -> slots 0..94; Latin-1 (160..255) -> slots 95..190. Fora = -1.
+    if (codepoint >= kFontAsciiFirst && codepoint <= kFontAsciiLast) {
+        return codepoint - kFontAsciiFirst;
     }
-    const int code = static_cast<unsigned char>(c);
-    return code >= kFontFirstChar && code <= kFontLastChar;
+    if (codepoint >= kFontLatin1First && codepoint <= kFontLatin1Last) {
+        return kFontAsciiCount + (codepoint - kFontLatin1First);
+    }
+    return -1;
 }
 
-UvRect FontAtlas::glyph_uv(char c) const noexcept {
-    if (!has_glyph(c)) {
+bool FontAtlas::has_glyph(int codepoint) const noexcept {
+    return valid() && glyph_slot(codepoint) >= 0;
+}
+
+UvRect FontAtlas::glyph_uv(int codepoint) const noexcept {
+    const int slot = valid() ? glyph_slot(codepoint) : -1;
+    if (slot < 0) {
         return UvRect{0.0f, 0.0f, 0.0f, 0.0f};  // vazio
     }
-    const int idx = static_cast<unsigned char>(c) - kFontFirstChar;
-    const int cx = idx % cols;
-    const int cy = idx / cols;
+    const int cx = slot % cols;
+    const int cy = slot / cols;
     const float u = static_cast<float>(cx * cell_px) / static_cast<float>(atlas_w);
     const float v = static_cast<float>(cy * cell_px) / static_cast<float>(atlas_h);
     const float w = static_cast<float>(cell_px) / static_cast<float>(atlas_w);
@@ -84,13 +91,13 @@ UvRect FontAtlas::glyph_uv(char c) const noexcept {
     return UvRect{u, v, w, h};
 }
 
-bool FontAtlas::glyph_has_ink(char c) const noexcept {
-    if (!has_glyph(c)) {
+bool FontAtlas::glyph_has_ink(int codepoint) const noexcept {
+    const int slot = valid() ? glyph_slot(codepoint) : -1;
+    if (slot < 0) {
         return false;
     }
-    const int idx = static_cast<unsigned char>(c) - kFontFirstChar;
-    const int cx = (idx % cols) * cell_px;
-    const int cy = (idx / cols) * cell_px;
+    const int cx = (slot % cols) * cell_px;
+    const int cy = (slot / cols) * cell_px;
     for (int y = 0; y < cell_px; ++y) {
         const int row = (cy + y) * atlas_w + cx;
         for (int x = 0; x < cell_px; ++x) {
@@ -152,9 +159,9 @@ FontAtlas bake_font_atlas(const std::string& ttf_path, int cell_px) {
         return atlas;  // stb_truetype recusou o arquivo
     }
 
-    // Grade quadrada-ish que cabe os 95 glifos (cols x rows >= count). 12 colunas da uma
-    // folha compacta (12x8 = 96 >= 95).
-    const int cols = 12;
+    // Grade quadrada-ish que cabe os kFontGlyphCount glifos (ASCII + Latin-1 = 191).
+    // 14 colunas da uma folha compacta (14x14 = 196 >= 191).
+    const int cols = 14;
     const int rows = (kFontGlyphCount + cols - 1) / cols;
     const int aw = cols * cell_px;
     const int ah = rows * cell_px;
@@ -167,8 +174,16 @@ FontAtlas bake_font_atlas(const std::string& ttf_path, int cell_px) {
     stbtt_GetFontVMetrics(&font, &ascent, &descent, &line_gap);
     const int baseline = static_cast<int>(static_cast<float>(ascent) * scale);
 
+    // Mapeia cada SLOT linear (0..190) -> codepoint da sua faixa (ASCII ou Latin-1).
+    const auto slot_to_codepoint = [](int slot) -> int {
+        if (slot < kFontAsciiCount) {
+            return kFontAsciiFirst + slot;
+        }
+        return kFontLatin1First + (slot - kFontAsciiCount);
+    };
+
     for (int i = 0; i < kFontGlyphCount; ++i) {
-        const int codepoint = kFontFirstChar + i;
+        const int codepoint = slot_to_codepoint(i);
         // Espaco e similares sem contorno: stbtt devolve bitmap vazio (ink=false), ok.
         int gw = 0, gh = 0, gx = 0, gy = 0;
         unsigned char* glyph = stbtt_GetCodepointBitmap(

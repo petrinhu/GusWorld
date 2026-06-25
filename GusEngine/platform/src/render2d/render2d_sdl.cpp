@@ -263,9 +263,10 @@ void Render2dSdl::draw_text(const char* text, float x, float y, float px_size,
 
     const float advance = glyph_advance(px_size);  // largura monospace por glifo (mundo)
     float pen_x = x;
-    for (const char* p = text; *p != '\0'; ++p) {
-        const char c = *p;
-        const UvRect uv = face->atlas.glyph_uv(c);
+    // BUG A: DECODIFICA UTF-8 -> code points (acentos do pt-br sao multibyte). Itera por
+    // CODE POINT, nao por byte: cada code point ocupa 1 celula monospace e mapeia 1 glifo.
+    for (const std::uint32_t cp : decode_utf8(text)) {
+        const UvRect uv = face->atlas.glyph_uv(static_cast<int>(cp));
         if (uv.w > 0.0f) {
             // Quad de MUNDO da celula (px_size x px_size) na caneta atual; projeta.
             const gus::core::spatial::Rect cell_world{pen_x, y, px_size, px_size};
@@ -274,11 +275,9 @@ void Render2dSdl::draw_text(const char* text, float x, float y, float px_size,
             SDL_FRect dst{q.x, q.y, q.w, q.h};
             SDL_FRect src{uv.u * tw, uv.v * th, uv.w * tw, uv.h * th};
             SDL_RenderTexture(renderer_, tex, &src, &dst);
-            ++draw_count_;  // 1 por glifo desenhavel (espaco nao conta: uv.w==0? nao -
-                            // o espaco tem uv valido mas sem tinta; ainda conta como
-                            // glifo emitido. Mantemos simples: conta os com uv valido.)
+            ++draw_count_;  // 1 por glifo desenhavel (codepoint dentro das faixas baked)
         }
-        pen_x += advance;
+        pen_x += advance;  // monospace: 1 avanco por code point, mesmo sem glifo
     }
 }
 
