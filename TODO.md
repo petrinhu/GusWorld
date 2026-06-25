@@ -1,6 +1,11 @@
 # GusWorld — Planejamento
 
-Tabela canonica de pendencias. Atualizar via skill `/tab_pendencias`. Historico narrativo em CHANGELOG.md; roadmap em ROADMAP.md.
+> **INSTRUCOES DESTE ARQUIVO (manter sempre):**
+> 1. Este arquivo contem APENAS a(s) TABELA(S) de pendencias + a Legenda + o Inventario + o INBOX. NADA de texto narrativo, atualizacoes datadas, preambulos ou paragrafos de contexto.
+> 2. NAO adicionar "Atualizacao 2026-..." nem relatos de sessao aqui. Esse historico vai pro **CHANGELOG.md**.
+> 3. Roadmap, ondas de execucao e visao Now/Next/Later vao pro **ROADMAP.md**.
+> 4. Decisoes de arquitetura/design vao pros **docs/** (ADR em docs/tech/adr/, design em docs/design/).
+> 5. Atualizar status na TABELA via skill `/tab_pendencias`. Aqui so muda celula de Status/Estado Auditado e linhas novas de pendencia.
 
 ## ⚠ Onda de Refatoração — PIVOT (RF-*, 2026-06-21)
 
