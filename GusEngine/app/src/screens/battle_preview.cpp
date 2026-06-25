@@ -46,7 +46,10 @@ std::string join(const std::string& a, const std::string& b) {
 // compartilham retrato_inimigo. Ponto unico; quando os retratos forem por-personagem
 // reais, troca-se aqui (ou vira data-driven).
 std::string retrato_file_for(const std::string& actor_id) {
-    if (actor_id == "gus") return "retrato_gus.png";
+    // Gus na BATALHA usa o retrato de COMBATE (meio corpo do sprite de jogo: cabelo
+    // revolto + oculos taticos + aparelho + antena + casaco tatico). O retrato_gus.png
+    // (terno/formal) NAO entra na luta (vira quadro na casa dos pais / narracoes).
+    if (actor_id == "gus") return "retrato_gus_combate.png";
     if (actor_id == "caua") return "retrato_caua.png";
     if (actor_id == "jaci") return "retrato_jaci.png";
     // inimigo1..4 e qualquer outro -> retrato generico de inimigo.
