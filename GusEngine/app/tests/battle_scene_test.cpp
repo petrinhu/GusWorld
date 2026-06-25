@@ -14,6 +14,7 @@
 
 #include <vector>
 
+#include "gus/app/screens/battle_floaters.hpp"   // Floater/HitChannel
 #include "gus/app/screens/battle_hud_model.hpp"  // kHpBarW/kArenaHpBarH p/ casar rects
 #include "gus/app/screens/battle_log_model.hpp"  // LogLine/LogLineKind
 #include "gus/app/screens/battle_menu.hpp"       // BattleVerb
@@ -24,6 +25,7 @@
 using gus::app::screens::BattleScene;
 using gus::app::screens::BattleStatusIconSet;
 using gus::app::screens::BattleVerb;
+using gus::app::screens::kFloaterLifeSeconds;
 using gus::app::screens::LogLineKind;
 using gus::app::screens::kArenaHpBarH;
 using gus::app::screens::kHpBarH;
@@ -507,4 +509,104 @@ TEST_CASE("menu: render emite o NOME (texto) de cada verbo quando ha translator"
         }
     }
     REQUIRE(found_atacar);  // o verbo Atacar aparece com nome legivel
+}
+
+// ---- INCREMENTO 5: numeros flutuantes + log narra + intent --------------------------
+
+TEST_CASE("floater: Atacar spawna um numero flutuante sobre o alvo", "[battle_scene]") {
+    BattleScene scene;
+    // No ctor os inimigos de maior SPD ja agiram (auto), entao pode haver floaters dos
+    // ataques deles. Medimos o DELTA: o ataque do jogador adiciona pelo menos 1 floater.
+    const std::size_t before = scene.floaters().size();
+
+    select_verb(scene, BattleVerb::Atacar);
+    scene.menu_confirm();
+    // O ataque do jogador (e os inimigos que agiram depois) spawnaram floaters de dano.
+    REQUIRE(scene.floaters().size() > before);
+}
+
+TEST_CASE("floater: update(dt) envelhece e poda os mortos", "[battle_scene]") {
+    BattleScene scene;
+    select_verb(scene, BattleVerb::Atacar);
+    scene.menu_confirm();
+    const std::size_t spawned = scene.floaters().size();
+    REQUIRE(spawned > 0);
+    // Avanca o tempo alem da vida: todos os floaters morrem e sao podados.
+    scene.update(kFloaterLifeSeconds + 0.1f);
+    REQUIRE(scene.floaters().empty());
+}
+
+TEST_CASE("floater: render desenha o numero (texto) sobre o alvo", "[battle_scene]") {
+    BattleScene scene;
+    select_verb(scene, BattleVerb::Atacar);
+    scene.menu_confirm();
+    REQUIRE(scene.floaters().size() > 0);
+    // O floater mais recente tem um texto (numero/FALHA). O render emite esse texto.
+    CountingRenderer r;
+    scene.render(r, 640.0f, 360.0f);
+    bool found_floater_text = false;
+    const std::string want = scene.floaters().back().text;
+    for (const auto& t : r.texts) {
+        if (t.text == want) {
+            found_floater_text = true;
+        }
+    }
+    REQUIRE(found_floater_text);
+}
+
+TEST_CASE("log: D7 revisado - narra TODA acao (hit comum aparece no log)",
+          "[battle_scene]") {
+    BattleScene scene;
+    select_verb(scene, BattleVerb::Atacar);
+    scene.menu_confirm();
+    // Apos um ataque, o log_lines tem >= 1 linha de Damage (o golpe narrado), mesmo que
+    // o dano nao seja "notavel" (antes o so-notavel escondia hits comuns).
+    const auto lines = scene.log_lines(20);
+    bool has_damage_line = false;
+    for (const auto& l : lines) {
+        if (l.kind == LogLineKind::Damage) {
+            has_damage_line = true;
+        }
+    }
+    REQUIRE(has_damage_line);
+}
+
+TEST_CASE("log REGRESSAO: status do inicio NAO esconde os ataques na janela visivel",
+          "[battle_scene]") {
+    // BUG do display (criador): o demo aplica Regen/Haste/Poison no inicio; antes esses
+    // 3 "status aplicado" enchiam as ultimas N linhas da caixa e empurravam a narracao de
+    // ataque pra fora. Esta regressao trava: na janela VISIVEL (capacity ~4), as acoes
+    // aparecem e NENHUMA linha de Status ocupa a caixa.
+    BattleScene scene;
+    select_verb(scene, BattleVerb::Atacar);
+    scene.menu_confirm();
+    const auto window = scene.log_lines(4);  // o que cabe na caixa
+    REQUIRE(window.size() >= 1);
+    int damage_lines = 0;
+    for (const auto& l : window) {
+        REQUIRE(l.kind != LogLineKind::Status);  // status nao polui o rolling
+        if (l.kind == LogLineKind::Damage) {
+            ++damage_lines;
+        }
+    }
+    REQUIRE(damage_lines >= 1);  // o ataque aparece na caixa
+}
+
+TEST_CASE("intent: cada inimigo vivo expoe um IntentPreview (telegraph)",
+          "[battle_scene]") {
+    BattleScene scene;
+    // Os inimigos tem ScriptedBrain registrado: intent_for devolve a previsao (ataque).
+    int with_intent = 0;
+    for (const auto* a : scene.machine().queue().order()) {
+        if (a != nullptr && !a->is_player_side() && a->is_alive()) {
+            if (scene.intent_for(*a).has_value()) {
+                ++with_intent;
+            }
+        }
+    }
+    REQUIRE(with_intent >= 1);
+    // Um player NAO tem intent (so inimigos telegrafam).
+    const auto* player = scene.active_actor();
+    REQUIRE(player != nullptr);
+    REQUIRE_FALSE(scene.intent_for(*player).has_value());
 }

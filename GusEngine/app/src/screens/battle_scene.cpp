@@ -18,17 +18,22 @@
 
 #include "gus/app/screens/battle_scene.hpp"
 
-#include <cstdio>   // std::snprintf (numeros do painel)
+#include <algorithm>  // std::remove_if (poda floaters mortos)
+#include <cstdio>     // std::snprintf (numeros do painel)
+#include <optional>
 #include <string>
-#include <utility>  // std::move
+#include <utility>    // std::move
 #include <vector>
 
+#include "gus/app/screens/battle_floaters.hpp"
 #include "gus/app/screens/battle_hud_model.hpp"
 #include "gus/app/screens/battle_layout.hpp"
 #include "gus/domain/combat/combat_actor.hpp"
 #include "gus/domain/combat/combat_constants.hpp"
 #include "gus/domain/combat/combat_enums.hpp"
 #include "gus/domain/combat/combat_records.hpp"
+#include "gus/domain/combat/combat_state.hpp"  // CombatState (preview_intent)
+#include "gus/platform/render2d/text_metrics.hpp"  // text_width (centrar floater)
 
 namespace gus::app::screens {
 
@@ -103,6 +108,14 @@ DrawColor verb_color(BattleVerb v) noexcept {
     return kVerbAtacarColor;
 }
 
+// Intent (telegraph, incremento 5): tamanho do icone + cor da marca placeholder.
+constexpr float kIntentIconSize = 12.0f;
+constexpr DrawColor kIntentMarkColor{0.95f, 0.75f, 0.20f, 1.0f};  // placeholder ambar
+// Numero flutuante de dano: tamanho do texto (px logico). 16px = tamanho NATIVO da
+// Pixel Operator (denso/nitido) e GRANDE o bastante pra o criador VER o dano (o teste no
+// display mostrou que o numero pequeno sumia). Sobe sobre o alvo e some por fade.
+constexpr float kFloaterTextPx = 16.0f;
+
 // Cor de uma linha do log pela categoria (D7).
 DrawColor log_line_color(LogLineKind k) noexcept {
     switch (k) {
@@ -113,6 +126,25 @@ DrawColor log_line_color(LogLineKind k) noexcept {
         case LogLineKind::Defeat: return kLogDefeatColor;
     }
     return kLogSystemColor;
+}
+
+// Textura do icone de intent pra um IntentPreview (incremento 5). is_chaotic => ruido
+// (Patch-Zero); senao pelo predicted_action_id (attack/defend/status). kInvalidTexture
+// se o icone correspondente nao foi setado (o render cai na marca placeholder).
+TextureId intent_icon_tex(const BattleIntentIconSet& icons,
+                          const gus::domain::combat::IntentPreview& intent) noexcept {
+    if (intent.is_chaotic) {
+        return icons.ruido;
+    }
+    const std::string& a = intent.predicted_action_id;
+    if (a.find("defend") != std::string::npos) {
+        return icons.defender;
+    }
+    if (a.find("status") != std::string::npos || a.find("card") != std::string::npos) {
+        return icons.aplicar_status;
+    }
+    // "attack"/"pass"/default: o telegraph mais comum e o ataque.
+    return icons.atacar;
 }
 
 // Conta atores vivos de um lado na fila do motor.
@@ -222,6 +254,18 @@ BattleScene::BattleScene() {
         ptrs.push_back(a.get());
     }
 
+    // BRAINS dos inimigos (incremento 5): cada inimigo ganha um ScriptedBrain (telegraph
+    // honesto, ataca o 1o player vivo). O brain_registry (id -> brain) habilita o
+    // IntentPreview (intent sobre o inimigo) e o Gambito-Prever. DONOS em brains_; o
+    // registry guarda ponteiros NAO-donos, vivos enquanto a cena viver.
+    for (const auto& a : actors_) {
+        if (!a->is_player_side()) {
+            brains_.push_back(
+                std::make_unique<gus::domain::combat::ScriptedBrain>());
+            brain_registry_[a->id()] = brains_.back().get();
+        }
+    }
+
     // Provider = MAILBOX (incremento 3): devolve a acao pendente (do menu, pro jogador;
     // ou auto, pro inimigo) e a reseta pra Pass. Captura `this` pra acessar o mailbox.
     auto provider = [this](CombatActor& actor,
@@ -229,7 +273,8 @@ BattleScene::BattleScene() {
         return take_pending_action(actor);
     };
     machine_ = std::make_unique<gus::domain::combat::CombatStateMachine>(
-        std::move(ptrs), std::move(provider));
+        std::move(ptrs), std::move(provider), /*card_registry=*/nullptr,
+        &brain_registry_);
 
     // Comeca a batalha: begin_turn do 1o ator + auto-encadeia turnos de inimigo ate cair
     // num turno de JOGADOR vivo (onde o menu opera) ou o combate terminar. O painel
@@ -274,6 +319,94 @@ std::string BattleScene::tr_verb_label(BattleVerb verb) const {
     return translator_->tr(std::string(gus::app::i18n::verb_label_key(verb)));
 }
 
+std::optional<gus::core::spatial::Rect> BattleScene::arena_rect_for_actor(
+    const std::string& actor_id) const {
+    const ArenaLayout arena =
+        arena_layout(party_count(), enemy_count(), gus_party_index());
+    // Reconstroi a ordem dos vivos por lado (mesma do render): o i-esimo vivo casa o
+    // i-esimo slot. Acha o lado e o indice do ator pedido.
+    int p_idx = 0, e_idx = 0;
+    for (const CombatActor* a : machine_->queue().order()) {
+        if (a == nullptr || !a->is_alive()) {
+            continue;
+        }
+        if (a->is_player_side()) {
+            if (a->id() == actor_id && p_idx < arena.party_count) {
+                return arena.party[static_cast<std::size_t>(p_idx)].rect;
+            }
+            ++p_idx;
+        } else {
+            if (a->id() == actor_id && e_idx < arena.enemy_count) {
+                return arena.enemies[static_cast<std::size_t>(e_idx)].rect;
+            }
+            ++e_idx;
+        }
+    }
+    return std::nullopt;
+}
+
+void BattleScene::spawn_floaters_from_new_logs() {
+    const auto& log = machine_->log();
+    for (std::size_t i = log_cursor_; i < log.size(); ++i) {
+        const auto& e = log[i];
+        // So Attack/UseCard geram numero flutuante de dano (Defend/Scan/Gambito/Flee
+        // narram no log, nao "batem" num alvo). Precisa de alvo pra ancorar.
+        const bool is_hit = e.action == gus::domain::combat::CombatActionType::Attack ||
+                            e.action == gus::domain::combat::CombatActionType::UseCard;
+        if (!is_hit || !e.target_id.has_value()) {
+            continue;
+        }
+        // COMPILADO: <combo> e anuncio de sistema (value 0, sem dano) - nao floata.
+        if (e.message.rfind("COMPILADO:", 0) == 0) {
+            continue;
+        }
+        const std::optional<gus::core::spatial::Rect> slot =
+            arena_rect_for_actor(*e.target_id);
+        if (!slot.has_value()) {
+            continue;  // alvo ja saiu da arena (morreu): sem ancora, pula
+        }
+        const HitResult hit = parse_hit(e.message, e.value, /*is_heal=*/false);
+        // Posicao: topo-centro do slot do alvo (o numero nasce sobre a cabeca).
+        Floater f;
+        f.text = hit.text;
+        f.channel = hit.channel;
+        f.origin_x = slot->x + slot->w * 0.5f;
+        f.origin_y = slot->y - 2.0f;
+        f.age = 0.0f;
+        floaters_.push_back(std::move(f));
+    }
+    log_cursor_ = log.size();
+}
+
+void BattleScene::update(float dt_seconds) {
+    if (dt_seconds <= 0.0f) {
+        return;
+    }
+    for (Floater& f : floaters_) {
+        f.age += dt_seconds;
+    }
+    // Poda os mortos (idade > vida). erase-remove.
+    floaters_.erase(
+        std::remove_if(floaters_.begin(), floaters_.end(),
+                       [](const Floater& f) { return !floater_alive(f.age); }),
+        floaters_.end());
+}
+
+std::optional<gus::domain::combat::IntentPreview> BattleScene::intent_for(
+    const CombatActor& enemy) const {
+    if (combat_over() || enemy.is_player_side() || !enemy.is_alive()) {
+        return std::nullopt;
+    }
+    const auto it = brain_registry_.find(enemy.id());
+    if (it == brain_registry_.end() || it->second == nullptr) {
+        return std::nullopt;
+    }
+    // Monta a CombatState read-only pro brain prever (mesmo padrao do motor).
+    const gus::domain::combat::CombatState state(
+        machine_->queue(), machine_->active_actor(), machine_->queue().round_index());
+    return it->second->preview_intent(state, enemy);
+}
+
 CombatAction BattleScene::enemy_auto_action(const CombatActor& /*enemy*/) const {
     const CombatActor* target = first_alive_player();
     if (target == nullptr) {
@@ -297,6 +430,9 @@ void BattleScene::resolve_current_turn() {
     if (machine_->phase() == gus::domain::combat::CombatPhase::ActionSelect) {
         machine_->run_active_turn_to_end();
     }
+    // Spawna os numeros flutuantes dos golpes deste turno (logs novos) ANTES do
+    // check_end/advance: o alvo ainda esta vivo/visivel na arena pra ancorar o numero.
+    spawn_floaters_from_new_logs();
     if (!machine_->check_end()) {
         machine_->advance_to_next_actor();
     }
@@ -531,6 +667,25 @@ void BattleScene::render(IRenderer& renderer, float viewport_px_w,
                     if (active != nullptr && a == active) {
                         renderer.draw_rect_outline(r, kActiveHiColor, 2.0f);  // D7
                     }
+                    // INTENT (telegraph, incremento 5): icone sobre cada INIMIGO, lendo o
+                    // IntentPreview do ScriptedBrain (o que ele vai fazer). Sem icone
+                    // setado => marca ambar placeholder. So pra inimigos vivos.
+                    if (!a->is_player_side()) {
+                        const auto intent = intent_for(*a);
+                        if (intent.has_value()) {
+                            const Rect ibox{r.x + (r.w - kIntentIconSize) * 0.5f,
+                                            r.y - kIntentIconSize - 1.0f,
+                                            kIntentIconSize, kIntentIconSize};
+                            const TextureId itex = intent_icon_tex(
+                                intent_icons_, *intent);
+                            if (itex != kInvalidTexture) {
+                                renderer.draw_textured_rect(ibox, itex, UvRect{},
+                                                            kWhite);
+                            } else {
+                                renderer.draw_filled_rect(ibox, kIntentMarkColor);
+                            }
+                        }
+                    }
                 }
             }
         };
@@ -663,6 +818,22 @@ void BattleScene::render(IRenderer& renderer, float viewport_px_w,
                 ly += kLogLineH + kLogLineGap;
             }
         }
+    }
+
+    // --- NUMEROS FLUTUANTES de dano (incremento 5), POR CIMA de tudo ---
+    // Cada floater sobe + some pela idade (battle_floaters). Cor por canal; CRIT em bold.
+    // O texto e centrado sobre o alvo (origin_x e o centro). Alpha = fade pela idade.
+    for (const Floater& f : floaters_) {
+        if (!floater_alive(f.age)) {
+            continue;
+        }
+        DrawColor col = floater_color_for_channel(f.channel);
+        col.a = floater_alpha(f.age);  // fade
+        const float w = gus::platform::render2d::text_width(f.text, kFloaterTextPx);
+        const float fx = f.origin_x - w * 0.5f;  // centra o texto sobre o alvo
+        const float fy = f.origin_y + floater_offset_y(f.age);  // sobe
+        const bool bold = f.channel == HitChannel::Crit;
+        renderer.draw_text(f.text.c_str(), fx, fy, kFloaterTextPx, col, bold);
     }
 
     renderer.end_frame();

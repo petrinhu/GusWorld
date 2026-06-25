@@ -102,26 +102,28 @@ LogLine classify(const StatusEffectChange& c) {
 std::vector<LogLine> build_log_lines(
     const std::vector<CombatLogEntry>& log,
     const std::vector<StatusEffectChange>& status_changes, int max_lines) {
+    // BUG-FIX (criador testou no display, 2026-06-25): o log nao mostrava as acoes de
+    // ataque. CAUSA-RAIZ confirmada por instrumentacao: status_changes (Applied) eram
+    // empilhados DEPOIS de TODAS as acoes; com o corte das ULTIMAS N linhas, a janela
+    // ficava dominada pelos "status aplicado" do INICIO da batalha (Regen/Haste/Poison
+    // do demo), empurrando a narracao de ataque pra fora da caixa.
+    //
+    // FIX: o log e a NARRACAO DAS ACOES (combat.md/battle-screen D7-LOG: "gus ataca por
+    // X"). As acoes mandam: o corte mantem as ULTIMAS N ACOES (o que o criador quer ver).
+    // O status nao polui mais o historico - o status do ator ja aparece como ICONE sob
+    // ele na arena/painel (incremento 2); o log nao precisa repetir, e o dump inicial de
+    // status nao pode esconder o combate. (status_changes fica disponivel pra um painel
+    // de status dedicado no futuro, mas FORA do rolling de narracao.)
     std::vector<LogLine> lines;
-
-    // Logs de acao NOTAVEIS, na ordem de chegada.
+    lines.reserve(log.size());
     for (const CombatLogEntry& e : log) {
-        if (is_notable(e)) {
-            lines.push_back(classify(e));
-        }
+        lines.push_back(classify(e));
     }
-    // Mudancas de status (Applied/Expired/Absorbed): so as APLICADAS sao "notaveis" o
-    // bastante pra D7 (aplicar Poison/Stun muda a leitura); expire/absorbed sao ruido.
-    for (const StatusEffectChange& c : status_changes) {
-        if (c.kind == StatusChangeKind::Applied) {
-            lines.push_back(classify(c));
-        }
-    }
+    (void)status_changes;  // intencionalmente fora do rolling de narracao (ver acima)
 
-    // A caixa rola: mantem so as ULTIMAS max_lines.
+    // A caixa rola: mantem so as ULTIMAS max_lines acoes (mostra o combate recente).
     if (max_lines > 0 && static_cast<int>(lines.size()) > max_lines) {
-        lines.erase(lines.begin(),
-                    lines.end() - max_lines);
+        lines.erase(lines.begin(), lines.end() - max_lines);
     }
     return lines;
 }

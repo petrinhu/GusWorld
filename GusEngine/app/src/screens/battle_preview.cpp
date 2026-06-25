@@ -81,6 +81,19 @@ std::string resolve_status_icons_dir() {
     return "resources/sprites/icons-m5/status";
 }
 
+std::string resolve_intent_icons_dir() {
+    if (const char* env = std::getenv("GUSWORLD_ASSETS")) {
+        if (env[0] != '\0') {
+            return join(env, "sprites/icons-m5/intent");
+        }
+    }
+    const std::string compiled = GUSWORLD_ASSETS_DIR;
+    if (!compiled.empty()) {
+        return join(compiled, "sprites/icons-m5/intent");
+    }
+    return "resources/sprites/icons-m5/intent";
+}
+
 int run_battle_preview() {
     if (!SDL_Init(SDL_INIT_VIDEO)) {
         std::cerr << "BattlePreview: SDL_Init falhou: " << SDL_GetError() << "\n";
@@ -131,6 +144,20 @@ int run_battle_preview() {
         }
         scene.set_status_icons(status_icons);
 
+        // Carrega os icones de INTENT (telegraph, incremento 5) e os entrega a cena.
+        // Ausencia => marca placeholder ambar sobre o inimigo.
+        const std::string sdir_intent = resolve_intent_icons_dir();
+        BattleIntentIconSet intent_icons;
+        intent_icons.atacar =
+            renderer.load_texture(join(sdir_intent, "intent_atacar.png").c_str());
+        intent_icons.defender =
+            renderer.load_texture(join(sdir_intent, "intent_defender.png").c_str());
+        intent_icons.aplicar_status = renderer.load_texture(
+            join(sdir_intent, "intent_aplicar_status.png").c_str());
+        intent_icons.ruido = renderer.load_texture(
+            join(sdir_intent, "intent_ruido_patchzero.png").c_str());
+        scene.set_intent_icons(intent_icons);
+
         // Carrega o catalogo de traducao (pt_br.md) e o entrega a cena, pra os verbos do
         // menu aparecerem com NOME legivel (incremento 3.5). Ausencia => fallback (caixa
         // colorida sem nome, mas nao crasha). O Translator vive aqui (casca), a cena so
@@ -149,6 +176,8 @@ int run_battle_preview() {
                      "Esc: sai\n";
 
         bool running = true;
+        bool have_last = false;
+        unsigned long long last_ns = 0;
         while (running) {
             SDL_Event ev;
             while (SDL_PollEvent(&ev)) {
@@ -182,6 +211,16 @@ int run_battle_preview() {
             if (!running) {
                 break;
             }
+
+            // dt real desde o ultimo frame (segundos): envelhece os numeros flutuantes.
+            const unsigned long long now_ns = SDL_GetTicksNS();
+            float dt = 0.0f;
+            if (have_last) {
+                dt = static_cast<float>(now_ns - last_ns) / 1.0e9f;
+            }
+            have_last = true;
+            last_ns = now_ns;
+            scene.update(dt);  // anima os floaters (incremento 5); nao toca a FSM
 
             int pw = kWindowW, ph = kWindowH;
             SDL_GetCurrentRenderOutputSize(sdl_renderer, &pw, &ph);

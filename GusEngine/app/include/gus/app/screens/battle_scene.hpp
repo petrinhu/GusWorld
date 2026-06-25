@@ -30,15 +30,20 @@
 
 #include <array>
 #include <memory>
+#include <optional>
 #include <string>
 #include <vector>
 
-#include "gus/app/i18n/translator.hpp"           // Translator (tr() de UI)
-#include "gus/app/screens/battle_log_model.hpp"  // LogLine
-#include "gus/app/screens/battle_menu.hpp"       // BattleMenu / BattleVerb
-#include "gus/domain/combat/combat_enums.hpp"    // StatusId
-#include "gus/domain/combat/combat_records.hpp"  // CombatAction
+#include <unordered_map>
+
+#include "gus/app/i18n/translator.hpp"            // Translator (tr() de UI)
+#include "gus/app/screens/battle_floaters.hpp"    // Floater (numeros flutuantes)
+#include "gus/app/screens/battle_log_model.hpp"   // LogLine
+#include "gus/app/screens/battle_menu.hpp"        // BattleMenu / BattleVerb
+#include "gus/domain/combat/combat_enums.hpp"     // StatusId
+#include "gus/domain/combat/combat_records.hpp"   // CombatAction / IntentPreview
 #include "gus/domain/combat/combat_state_machine.hpp"
+#include "gus/domain/combat/scripted_brain.hpp"   // ScriptedBrain (telegraph)
 #include "gus/platform/render2d/i_renderer.hpp"
 
 namespace gus::domain::combat {
@@ -73,6 +78,17 @@ struct BattleStatusIconSet {
         gus::domain::combat::StatusId id) const noexcept;
 };
 
+// Icones de INTENT (telegraph, incremento 5) ja resolvidos para TextureId. O ScriptedBrain
+// expoe IntentPreview (o que o inimigo vai fazer); a cena mostra o icone sobre o inimigo.
+// Os 4 icones de resources/sprites/icons-m5/intent/: atacar, defender, aplicar_status,
+// ruido (Patch-Zero / caotico). kInvalidTexture => placeholder (marca) no render.
+struct BattleIntentIconSet {
+    gus::platform::render2d::TextureId atacar = 0;
+    gus::platform::render2d::TextureId defender = 0;
+    gus::platform::render2d::TextureId aplicar_status = 0;
+    gus::platform::render2d::TextureId ruido = 0;  // intent caotico (is_chaotic)
+};
+
 class BattleScene {
 public:
     // Monta um encontro de DEMO (party de 3 com Gus + 4 inimigos) pra validar a tela
@@ -100,6 +116,12 @@ public:
     // (rotulo = a chave, ou as caixas/marcas sem texto). Mantem o headless seguro.
     void set_translator(const gus::app::i18n::Translator* tr) noexcept {
         translator_ = tr;
+    }
+
+    // Define os icones de intent (telegraph, incremento 5). Sem set => o intent vira uma
+    // marca placeholder sobre o inimigo (fallback headless).
+    void set_intent_icons(BattleIntentIconSet icons) noexcept {
+        intent_icons_ = icons;
     }
 
     // ---- Leitura do estado do motor (pro render e pros testes) ----
@@ -150,8 +172,25 @@ public:
     // resolver, auto-encadeia turnos de inimigo ate o proximo turno de jogador/fim.
     void menu_confirm();
 
-    // Linhas NOTAVEIS do log (D7), ja classificadas/cortadas pra caixa (max_lines).
+    // Linhas do log (D7 revisado, incremento 5: NARRA todo o combate), ja classificadas
+    // (cor por categoria) e cortadas pra caixa (max_lines = ultimas N).
     [[nodiscard]] std::vector<LogLine> log_lines(int max_lines) const;
+
+    // ---- Feedback (incremento 5): numeros flutuantes + intent ----
+
+    // Avanca o tempo da cena (segundos): envelhece os numeros flutuantes e poda os
+    // mortos. Chamado pela casca a cada frame (dt real). NAO toca a FSM (so animacao).
+    void update(float dt_seconds);
+
+    // Numeros flutuantes ATIVOS (leitura/teste). Cada um sobe + some pela idade.
+    [[nodiscard]] const std::vector<Floater>& floaters() const noexcept {
+        return floaters_;
+    }
+
+    // IntentPreview do inimigo (telegraph). nullopt se nao for inimigo vivo, sem brain,
+    // ou o combate acabou. Le o ScriptedBrain registrado (preview_intent).
+    [[nodiscard]] std::optional<gus::domain::combat::IntentPreview> intent_for(
+        const gus::domain::combat::CombatActor& enemy) const;
 
     // Desenha o ESQUELETO da batalha (placeholders): fundo, arena (party/inimigos),
     // fila CTB, painel do ator ativo, log. viewport_px_w/h = PIXELS REAIS da janela
@@ -187,11 +226,25 @@ private:
     // string vazia (o render trata: a caixa colorida fica sem nome, mas nao crasha).
     [[nodiscard]] std::string tr_verb_label(BattleVerb verb) const;
 
+    // Drena os logs NOVOS do motor (desde log_cursor_) e spawna um numero flutuante
+    // sobre o alvo pra cada dano/cura. Chamado apos cada resolucao de turno.
+    void spawn_floaters_from_new_logs();
+
+    // Retangulo do slot do ator na arena (party/inimigo), pelo id. nullopt se nao esta
+    // vivo/visivel. Usado pra posicionar o numero flutuante e o icone de intent.
+    [[nodiscard]] std::optional<gus::core::spatial::Rect> arena_rect_for_actor(
+        const std::string& actor_id) const;
+
     // Atores de demo (DONOS). Declarados ANTES da FSM: vivem mais que ela.
     std::vector<std::unique_ptr<gus::domain::combat::CombatActor>> actors_;
+    // Brains dos inimigos (DONOS), antes da FSM. ScriptedBrain por inimigo (telegraph).
+    std::vector<std::unique_ptr<gus::domain::combat::ScriptedBrain>> brains_;
+    // Registro id-do-inimigo -> brain (NAO-dono), passado a FSM pro Gambito/intent.
+    std::unordered_map<std::string, gus::domain::combat::IEnemyBrain*> brain_registry_;
     std::unique_ptr<gus::domain::combat::CombatStateMachine> machine_;
     BattlePortraitSet portraits_{};
     BattleStatusIconSet status_icons_{};
+    BattleIntentIconSet intent_icons_{};
 
     // Menu de verbos do ator ativo (incremento 3).
     BattleMenu menu_{};
@@ -203,6 +256,12 @@ private:
     std::vector<LogLine> ui_log_;
     // Translator de UI (NAO-DONO). nullptr = sem traducao (fallback no render).
     const gus::app::i18n::Translator* translator_ = nullptr;
+
+    // Numeros flutuantes ATIVOS (incremento 5). update(dt) envelhece e poda; render
+    // desenha sobre o alvo. Spawnados de logs NOVOS do motor (spawn_floaters_from_new_logs).
+    std::vector<Floater> floaters_;
+    // Cursor do log do motor ja consumido pra floaters (so processa entradas NOVAS).
+    std::size_t log_cursor_ = 0;
 };
 
 }  // namespace gus::app::screens

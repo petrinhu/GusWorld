@@ -85,33 +85,39 @@ TEST_CASE("log: StatusEffectChange Applied classifica como Status", "[battle_log
     REQUIRE(classify(c).kind == LogLineKind::Status);
 }
 
-TEST_CASE("build_log_lines: filtra notaveis e corta pro tamanho da caixa",
+TEST_CASE("build_log_lines: NARRA toda ACAO; status NAO polui o rolling (bug-fix)",
           "[battle_log]") {
+    // BUG-FIX (criador testou no display): o log nao mostrava os ataques porque os
+    // status_changes (Applied) do INICIO da batalha enchiam as ultimas N linhas. Agora o
+    // log e a NARRACAO DAS ACOES; o status fica FORA do rolling (aparece como icone sob o
+    // ator). O log narra TODA acao/dano (nao so notavel).
     std::vector<CombatLogEntry> log;
-    log.push_back(attack_entry(3, "hit comum 3"));    // NAO notavel
-    log.push_back(attack_entry(30, "hit grande 30")); // notavel (Damage)
+    log.push_back(attack_entry(3, "hit comum 3"));    // entra (Damage)
+    log.push_back(attack_entry(30, "hit grande 30")); // entra (Damage)
     CombatLogEntry combo;
     combo.action = CombatActionType::UseCard;
     combo.message = "COMPILADO: X";
-    log.push_back(combo);                              // notavel (System)
+    log.push_back(combo);                              // entra (System)
 
     std::vector<StatusEffectChange> changes;
-    StatusEffectChange applied;
+    StatusEffectChange applied;  // dump inicial de status NAO deve esconder o combate
     applied.actor_id = "alvo";
     applied.id = StatusId::Stun;
     applied.kind = StatusChangeKind::Applied;
-    changes.push_back(applied);                        // notavel (Status)
-    StatusEffectChange expired;
-    expired.kind = StatusChangeKind::Expired;
-    changes.push_back(expired);                        // ruido (nao entra)
+    changes.push_back(applied);
 
-    // Sem corte: 3 linhas (hit grande + combo + status applied; hit comum e expired fora).
+    // Sem corte: 3 linhas = as 3 ACOES (status fora do rolling de narracao).
     const auto all = build_log_lines(log, changes, /*max_lines=*/0);
     REQUIRE(all.size() == 3);
+    REQUIRE(all[0].kind == LogLineKind::Damage);  // o hit comum (3) aparece
+    REQUIRE(all[2].kind == LogLineKind::System);  // o COMPILADO aparece
+    // Nenhuma linha de Status no rolling (o status spam nao esconde mais o combate).
+    for (const auto& l : all) {
+        REQUIRE(l.kind != LogLineKind::Status);
+    }
 
-    // Corte em 2: mantem as 2 ULTIMAS (a caixa rola).
+    // Corte em 2: mantem as 2 ULTIMAS ACOES (a caixa rola, mostra o combate recente).
     const auto last2 = build_log_lines(log, changes, /*max_lines=*/2);
     REQUIRE(last2.size() == 2);
-    // A ultima e o status applied (entra depois dos logs de acao).
-    REQUIRE(last2.back().kind == LogLineKind::Status);
+    REQUIRE(last2.back().kind == LogLineKind::System);  // COMPILADO (a acao mais recente)
 }
