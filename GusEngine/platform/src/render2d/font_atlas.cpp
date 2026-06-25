@@ -10,9 +10,10 @@
 
 #include "gus/platform/render2d/font_atlas.hpp"
 
-#include <cstdio>    // std::fopen/fread/fclose
-#include <cstdlib>   // std::getenv
-#include <cstring>   // std::memset
+#include <cstdio>      // std::fopen/fread/fclose
+#include <cstdlib>     // std::getenv
+#include <cstring>     // std::memset
+#include <filesystem>  // std::filesystem::exists (escolhe o candidato que existe)
 #include <vector>
 
 #define STB_TRUETYPE_IMPLEMENTATION
@@ -102,20 +103,36 @@ bool FontAtlas::glyph_has_ink(char c) const noexcept {
 }
 
 std::string resolve_font_path(const std::string& ttf_file) {
-    // 1) Override por ambiente: o lider aponta a raiz de assets; a fonte vive em
-    //    <GUSWORLD_ASSETS>/fonts (espelha sprites/icons que ficam em <assets>/...).
+    // Tenta os candidatos EM ORDEM e retorna o PRIMEIRO QUE EXISTE no disco. A fonte
+    // vive em GusEngine/assets/fonts (asset de engine), separada dos sprites/icons que
+    // ficam em <GUSWORLD_ASSETS>/. Por isso checamos existencia: setar GUSWORLD_ASSETS
+    // (pra arte) nao pode "sequestrar" a fonte pra um <assets>/fonts inexistente.
+    std::error_code ec;
+    const auto exists = [&ec](const std::string& p) {
+        return !p.empty() && std::filesystem::exists(p, ec);
+    };
+
+    // 1) Override por ambiente, SE a fonte de fato estiver la (<GUSWORLD_ASSETS>/fonts).
     if (const char* env = std::getenv("GUSWORLD_ASSETS")) {
         if (env[0] != '\0') {
-            return join(join(env, "fonts"), ttf_file);
+            const std::string p = join(join(env, "fonts"), ttf_file);
+            if (exists(p)) {
+                return p;
+            }
         }
     }
     // 2) Pasta de fontes do repo embutida em compilacao (= GusEngine/assets/fonts).
-    const std::string compiled = GUSWORLD_FONTS_DIR;
-    if (!compiled.empty()) {
-        return join(compiled, ttf_file);
+    const std::string compiled = join(GUSWORLD_FONTS_DIR, ttf_file);
+    if (exists(compiled)) {
+        return compiled;
     }
     // 3) Relativo ao CWD (rodando da raiz do GusEngine).
-    return join("assets/fonts", ttf_file);
+    const std::string cwd_rel = join("assets/fonts", ttf_file);
+    if (exists(cwd_rel)) {
+        return cwd_rel;
+    }
+    // Nenhum existe: devolve o melhor chute (compilado) pra o erro ser claro no log.
+    return compiled.empty() ? cwd_rel : compiled;
 }
 
 FontAtlas bake_font_atlas(const std::string& ttf_path, int cell_px) {
