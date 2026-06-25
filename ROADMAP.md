@@ -104,3 +104,32 @@ As viradas de stack e os contratos irreversíveis estão registrados em [`docs/t
 | [ADR-006](docs/tech/adr/ADR-006-crypto-hmac-formato-domain.md) | Cripto HMAC-SHA256 + formato de serialização do domain |
 | [ADR-007](docs/tech/adr/ADR-007-controls-json-hash128-save-v4.md) | Persistência de controles + save V4 anti-tamper |
 | [ADR-008](docs/tech/adr/ADR-008-repivot-qt-to-sdl3.md) | Re-pivot Qt6 para SDL3 + RmlUi + miniaudio |
+
+
+---
+
+## Migrado do TODO.md em 2026-06-25
+
+## Ondas de execução (Cosmo/COO 2026-05-29)
+
+- **W0 — Salvaguarda + One-Way Doors + Higiene.** Backup off-site (submodule-first), decisões irreversíveis em lote via AskUserQuestion ao criador (renderer, hardware-floor, AOT-erratum, lib diálogo, contrato .gdt, modelo schema, licença, placeholder-first, escopo §18), reconciliação doc↔código. Maioria é decisão/edição barata, não código. Saída: zero one-way-door aberto + remoto com backup + canon não-mente.
+- **W1 — Fundação barata + re-baseline de escopo.** Folhas POCO testáveis (coverlet, save HMAC tests, MathHelpers, localization/input, fix parser i18n), GDD refresh + cortes reconciliados, roadmap VS, fechar trackers de auditoria, C-EX §10 restante. Paralelizável, sem one-way-door.
+- **W2 — Design-spec do VS.** Specs que destravam produção (balance prototype com números reais, puzzle Gambito, Knowledge curve, core loop fora de combate, onboarding, economia mínima, dialogue tree blueprint, ludonarrative check) + plano de produção com exit-criteria + RAID + mapear aresta F2-E.10→G.5. Spec PRIMEIRO, impl depois.
+- **W3 — Cadeia de dados do combate + status + diálogo + áudio-bus.** TemplateSerializer → CharacterRepository, wiring de status inertes, ambientes (escopo cortado 2-3 arenas) + TDD, source-gen JSON, blockout, spike de arte (lateral), audio bus + AudioDirector. Caminho crítico técnico do VS.
+- **W4 — Loop jogável placeholder-first.** Movimento/interação/triggers, combate jogável + HUD com cápsulas, puzzle, diálogo 1 NPC, save/load, inventário/deck, quest, loot, SFX/hooks, concepts do VS + validações de arte. Saída: VS end-to-end JOGÁVEL com grayboxing = base de F2-M.3 cedo.
+- **W5 — Arte no caminho crítico (substitui placeholders) + áudio mínimo.** Shader-gate (outline+toon) ANTES de modelar Gus, modelo+rig+locomotion+inimigo+anims, atlas + import Nearest, demais shaders, art sheets, música adaptive 2 estados. NÃO bloquear fun-loop atrás disto.
+- **W6 — CI + segurança + build (depois do runner; não bloquear VS).** Runner → workflow enxuto → test job + gitleaks + CVE scan + i18n lint, export templates + presets + PoC AOT + wrappers. Export local manual primeiro. Diferidos anti-OE: FsCheck, lockfile, ICU plural.
+- **W7 — Milestone + produção + legal-release.** VS coeso + perf + playtest instrumentado + build distribuível + NOTICE/atribuição + marcador revisão ADR-001.
+- **W7+ — Pós-VS (F3-F5 + livro).** Alpha/Beta/Gold + age rating + auditoria final + tradução/publicação do livro.
+- **`—` — Concluído / Decisão tomada / CUT.** Sem onda de execução.
+
+## Roadmap VS — Now / Next / Later
+
+**Atualizado 2026-06-23 (pos-pivot SDL3, board M0-M9; game-producer).** O LOOP JOGAVEL (M4) fechou e foi validado no display; o proximo pilar e o COMBATE (M5 BattleScreen). WIP=2 frentes de codigo (conlang fora do WIP; sprites bloqueados nao contam).
+
+| Now (CONCLUIDO) | Next (proxima onda) | Later |
+|---|---|---|
+| **M0-M5 motor portado** C++/SDL (save/i18n/progression/templates/combat/crypto); M3 e M5-DMG auditados | **M5 BattleScreen** (motor turn_combat ja portado/auditado; falta a apresentacao): comecar pelo BRAINSTORM da tela (layout, posicoes, UI de cartas, transicao overworld->batalha->volta, feel Pokemon) | **Tiled** + pipeline de mapas (brainstorm lore -> blockout level-designer -> .tmj -> compilador -> .gmap) |
+| **M1 visual** (janela+loop+sprite SDL) validado | Trilha de ARTE em paralelo (a 2a vaga do WIP): re-arte do walk com pe-plantado (zera foot-slide) + **ARTE-RESP-4DIR** (respiracao nas 4 direcoes) | **M6 audio** (miniaudio), M7 paridade jogavel, M8 decommission Godot/C#, M9 higiene |
+| **M4 loop jogavel** (cidade do .gmap selado HMAC+UUID + camera/zoom + walk polido + anti-deslize) | (Sprites: **76 secundarios** bloqueados pela API PixelLab/500; re-rodar em lote quando estabilizar) | **Conlang Sylvarin** (paralelo organico): mutacoes, deriva historica, escrita cifrada |
+| Mecanica **Carga do Aparato** canonizada (numeros) | **COMBATE-AUTOKILL** (INBOX, parametros fechados): canonizar no combat.md DENTRO do M5 | **ARTE-DIAGONAL-8DIR** (decisao 4-dir vs 8-dir) |

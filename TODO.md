@@ -1,24 +1,9 @@
 # GusWorld — Planejamento
 
-Tabela canônica de pendências e planejamento. Atualizar via skill `/tab_pendencias`.
-
-**Reorganização 2026-05-29 (Cosmo/COO + squad C-level):** 9 colunas (adicionada **Onda**). Linhas em ordem topológica + WSJF. ~85 gaps da auditoria multidisciplinar inseridos. Status/Estado Auditado atualizados pelos vereditos da auditoria empírica de disco. Ondas W0–W7 (paralelizáveis dentro da onda); concluídos/CUT = Onda `—`.
-
-**Auditoria de execução Cosmo/COO 2026-06-04:** 13 sprints (W2 fechado + W3) auditados contra disco. **Zero ✅ refutado** nesta sessão (motor real, não casca); **577 testes verdes confirmados empiricamente** (main thread rodou `dotnet test`); game compila. 1 rebaixamento: F2-AU.3 ✅→🔍 (`.tres`+AutoLoad não validáveis headless, validar no editor). W0/W1/W2 = 100%; W3 ~85% (poço de motor puro SECOU); W4/W5/W6/W7 ~0%. **Risco ativo: motor MUITO à frente da integração jogável (R-02 parcial) — nenhuma cena jogável existe. Próximo passo de maior valor = F2-G.5 (tela de combate) no EDITOR com o criador, NÃO mais motor solo.** Itens solo-able restantes são poucos (F2-QA.4 playtest plan, F2-S.12a paridade i18n, F2-D.8 doc, F2-LEG.3 SCA); FsCheck/extras de motor = adiar (anti-OE).
-
-**Reorg 2026-06-07 (`--reorder`, thread direta — anti-OE: atualização de status, sem mudança de dependência ou WSJF):** **F2-G.5** polido nesta sessão (fix mouse-filter que bloqueava cartas; tooltips de cartas + 8 ações; HP barra vermelha + Mana barra azul; indicador de status sob o nome; nomes da party Title-Case via 5 chaves `ACTOR_*`; auto-target quando sobra 1 inimigo) — falta só validação interativa no editor. **F2-E.6 passou de 🎨 Pendente design → 🟡 Parcial:** fundação DialogueManager implementada (plugin v3.10.4 MIT + `DialogueService` 461 linhas + `.dialogue` stub Bertoldo; escopo "só fundação" escolhido pelo criador; build limpo). Sub-pendências realocadas ao lar natural: balloon UI→**G.7**, world-state ao vivo→**G.8**, AOT-do-plugin→**CI.7**, SCA-do-plugin→**LEG.3**. Novo item de polish reportado pelo criador: **F2-G.5-UX** (GambitPredict sem feedback visível). Ordem/ondas inalteradas. Próximo de maior valor (W4): validar G.5 no editor, depois **F2-G.EXPLORE** (movimento/interação) ou **F2-G.7** (diálogo na tela, já com a fundação E.6 pronta).
-
-**⚠ PIVOT DE STACK — DECISÃO DO LÍDER SUPREMO (2026-06-21, ULTRA-PRIORITÁRIO):** o criador decidiu refatorar o projeto para nova base técnica e de design. **O QUÊ está decidido (one-way doors do líder); o COMO sai de brainstorm bigtech colaborativo (RF-7).** Resumo: stack **C++/Qt6** + **engine própria** (jogo + áudio/música in-house, fim do Godot), câmera **fixa top-down** (Zelda ALttP / Stardew), combate **por turnos estilo Pokémon**, estilo visual Stardew, porte → **grande**. **Consequência:** o roadmap Godot/C# abaixo (W0–W7, ADR-002 C#/AOT, ADR-003 DialogueManager, pillar câmera 3/4, combate CTB/cartas/Gambito) fica **SOB REVISÃO / SUSPENSO** pendente do brainstorm — NÃO apagar nem reordenar até a estratégia de migração ser decidida (o que se reaproveita vs reescreve). Os RF-* abaixo só registram o escopo; ordem/prioridade/dependências finas saem de RF-7.
-
-**Atualização 2026-06-23 (re-pivot SDL EM EXECUÇÃO + trilha de arte):** o pivot RF-* avançou e SUPEROU a primeira intenção. O brainstorm RF-7 levou a **C++20 + Qt6** e, ao testar o M1 na prática, a um **RE-PIVOT de Qt6 → SDL3 + RmlUi + miniaudio (ADR-008)** (motivos: risco do Qt RHI semi-privado, gamepad nativo, binário ~10x menor, portabilidade console). **Estado real:** RF-1 (stack) e RF-2 (engine própria) **EM EXECUÇÃO** — `GusEngine/` em 4 camadas (core/domain POCO + platform/app SDL); board M0–M9 com M0/M2/M3/M4-lógica/M5-motor feitos e **M1 (camada visual) ENTREGUE em SDL** (janela + loop + render2d + input + gamepad + sprite animado). **824 testes**, pushado até `6b2bba9`. **Novos itens desta onda** (a sequenciar num `/tab_pendencias --reorder` futuro): pipeline de arte PixelLab Pro (party + 16 secundários gerados, ~76 na fila), **demo Gus jogável** (walk/idle/respiração), **viewer de animação** (`--anim-preview`), **mecânica de Carga do aparato** canonizada (`docs/design/mecanicas/stamina.md`, projetada por lead-game-designer + economy-designer). Pendências pequenas da Carga: cabear "Carga 0 corta o sprint" (gancho 1 linha) + decidir drain por input vs pós-colisão. Caminho e histórico canônicos: ver **ROADMAP.md** + **CHANGELOG.md**. Re-sequenciamento fino do board pós-SDL fica pra sessão dedicada de `/tab_pendencias`.
-
-**Atualização 2026-06-23 (parte 2), trilhas paralelas (narrativa/docs/RAG, NÃO bloqueiam o board de código):** sessão longa pós-M1-SDL. (1) **Conlang "Sylvarin" criada** (brainstorm colaborativo com o criador): 4 docs canônicos em `docs/narrative/lingua/` (00-arquitetura/espinha, 01-fonologia, 02-lexico-semente de 13 raízes, 03-gramatica-nucleo). Sabor élfico + português forte, gramática rígida (Pillar 2), mutação consonantal como assinatura, escrita cifrada da Era 1, padroes numericos recorrentes nas contagens; as raízes explicam nomes já canon (Sylvarin, Selve Sombria, Neo-Sylvania, Vyrdragon). Pendente: mutações nasal/mista, deriva histórica Era 1 para Era 3, sistema de escrita cripto-glifo. (2) **RAG aumentado:** baixados 79 arquivos de língua élfica de Tolkien (`resources/livros/elvish/`, gitignored) e criado um **2º índice ISOLADO `rag_elvish` (1.989 chunks)** sem tocar o principal (163.443). Incidente resolvido: um `rag ingest` no índice principal removeu os 306 livros (corpus-fonte fora do disco), RESTAURADO via versão do LanceDB (v582). (3) **Docs higienizados pro SDL3 (2ª passada):** ~10 docs que ainda citavam Godot/C#/Qt como atual (blockout, knowledge-gates, style-guide, ui-spec, leitmotivs, dialogue-tree, libs-vendoring, runtime-hardening, deep/_INDEX) + bibliografia nova (`docs/narrative/bibliografia-rag.md`). (4) **README** higienizado + seção **Agradecimentos** (pessoas, IAs com URLs, autores do corpus com link, ferramentas FOSS) + parâmetros do RAG; **descrição do repo Codeberg** atualizada (Godot/Fase 1 para C++20+SDL3/Fase 2). Pushado até `13bdbf2`. **Board técnico (M0-M9) inalterado**; re-sequenciamento fino pós-SDL segue pendente de `/tab_pendencias --reorder` dedicado.
-
-**Atualização 2026-06-23 (parte 3), LOOP JOGAVEL (M4) FECHADO + constelacao ativada:** o M4 visual fechou e foi VALIDADO pelo lider no display. Cidade Distritos Inferiores carregada do formato de mapa `.gmap` binario proprio SELADO (HMAC-SHA256 + UUID anti map-swap; review do security-engineer = adequado a ameaca, 0 criticos) + compilador CSV->.gmap + camera com zoom (43px/tile, follow+clamp) + walk polido (cadencia relativa ao tile, respiracao so-bob, histerese anti deslize-no-spam). **M4 = checkmark.** Commits `90ffa6c` (loop) + `0f178be` (binding UUID). 900 testes verdes. **Constelacao bigtech ATIVADA** (Cosimo deu o mapa: 3 C-levels CEO/CTO/CPO + game-producer; regua de 3 niveis: thread direto pra ajuste fechado, game-producer pra 2+ frentes, C-level + AskUserQuestion pra one-way doors). **Proxima frente: M5 BattleScreen** (motor turn_combat ja portado/auditado; falta a apresentacao), a comecar por brainstorm da tela. WIP=2 frentes de codigo. Higiene Qt->SDL: M4/M6 feitos; resto do `--reorder` pendente.
+Tabela canonica de pendencias. Atualizar via skill `/tab_pendencias`. Historico narrativo em CHANGELOG.md; roadmap em ROADMAP.md.
 
 ## ⚠ Onda de Refatoração — PIVOT (RF-*, 2026-06-21)
 
-Registro do pivot do líder supremo, na ordem em que as ideias surgiram (NÃO é ordem de prioridade — RF-7 organiza). `💡 Decisão (líder)` = o QUÊ está fechado; `🎨 Pendente brainstorm` = o COMO/viabilidade sai de RF-7. **Ainda NÃO executar (só tabela).**
 
 | ID | Onda | Grupo | Descrição Técnica | Prioridade | Pré-requisito | Dificuldade | Status | Estado Auditado |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
@@ -282,41 +267,6 @@ Os 8 marcos da migração faseada (`engine-design.md §4`) materializados como i
 
 - `—` não auditado | `✓` auditado e aprovado | `⚠` auditado com ressalvas
 
-## Ondas de execução (Cosmo/COO 2026-05-29)
-
-- **W0 — Salvaguarda + One-Way Doors + Higiene.** Backup off-site (submodule-first), decisões irreversíveis em lote via AskUserQuestion ao criador (renderer, hardware-floor, AOT-erratum, lib diálogo, contrato .gdt, modelo schema, licença, placeholder-first, escopo §18), reconciliação doc↔código. Maioria é decisão/edição barata, não código. Saída: zero one-way-door aberto + remoto com backup + canon não-mente.
-- **W1 — Fundação barata + re-baseline de escopo.** Folhas POCO testáveis (coverlet, save HMAC tests, MathHelpers, localization/input, fix parser i18n), GDD refresh + cortes reconciliados, roadmap VS, fechar trackers de auditoria, C-EX §10 restante. Paralelizável, sem one-way-door.
-- **W2 — Design-spec do VS.** Specs que destravam produção (balance prototype com números reais, puzzle Gambito, Knowledge curve, core loop fora de combate, onboarding, economia mínima, dialogue tree blueprint, ludonarrative check) + plano de produção com exit-criteria + RAID + mapear aresta F2-E.10→G.5. Spec PRIMEIRO, impl depois.
-- **W3 — Cadeia de dados do combate + status + diálogo + áudio-bus.** TemplateSerializer → CharacterRepository, wiring de status inertes, ambientes (escopo cortado 2-3 arenas) + TDD, source-gen JSON, blockout, spike de arte (lateral), audio bus + AudioDirector. Caminho crítico técnico do VS.
-- **W4 — Loop jogável placeholder-first.** Movimento/interação/triggers, combate jogável + HUD com cápsulas, puzzle, diálogo 1 NPC, save/load, inventário/deck, quest, loot, SFX/hooks, concepts do VS + validações de arte. Saída: VS end-to-end JOGÁVEL com grayboxing = base de F2-M.3 cedo.
-- **W5 — Arte no caminho crítico (substitui placeholders) + áudio mínimo.** Shader-gate (outline+toon) ANTES de modelar Gus, modelo+rig+locomotion+inimigo+anims, atlas + import Nearest, demais shaders, art sheets, música adaptive 2 estados. NÃO bloquear fun-loop atrás disto.
-- **W6 — CI + segurança + build (depois do runner; não bloquear VS).** Runner → workflow enxuto → test job + gitleaks + CVE scan + i18n lint, export templates + presets + PoC AOT + wrappers. Export local manual primeiro. Diferidos anti-OE: FsCheck, lockfile, ICU plural.
-- **W7 — Milestone + produção + legal-release.** VS coeso + perf + playtest instrumentado + build distribuível + NOTICE/atribuição + marcador revisão ADR-001.
-- **W7+ — Pós-VS (F3-F5 + livro).** Alpha/Beta/Gold + age rating + auditoria final + tradução/publicação do livro.
-- **`—` — Concluído / Decisão tomada / CUT.** Sem onda de execução.
-
-## Roadmap VS — Now / Next / Later
-
-**Atualizado 2026-06-23 (pos-pivot SDL3, board M0-M9; game-producer).** O LOOP JOGAVEL (M4) fechou e foi validado no display; o proximo pilar e o COMBATE (M5 BattleScreen). WIP=2 frentes de codigo (conlang fora do WIP; sprites bloqueados nao contam).
-
-| Now (CONCLUIDO) | Next (proxima onda) | Later |
-|---|---|---|
-| **M0-M5 motor portado** C++/SDL (save/i18n/progression/templates/combat/crypto); M3 e M5-DMG auditados | **M5 BattleScreen** (motor turn_combat ja portado/auditado; falta a apresentacao): comecar pelo BRAINSTORM da tela (layout, posicoes, UI de cartas, transicao overworld->batalha->volta, feel Pokemon) | **Tiled** + pipeline de mapas (brainstorm lore -> blockout level-designer -> .tmj -> compilador -> .gmap) |
-| **M1 visual** (janela+loop+sprite SDL) validado | Trilha de ARTE em paralelo (a 2a vaga do WIP): re-arte do walk com pe-plantado (zera foot-slide) + **ARTE-RESP-4DIR** (respiracao nas 4 direcoes) | **M6 audio** (miniaudio), M7 paridade jogavel, M8 decommission Godot/C#, M9 higiene |
-| **M4 loop jogavel** (cidade do .gmap selado HMAC+UUID + camera/zoom + walk polido + anti-deslize) | (Sprites: **76 secundarios** bloqueados pela API PixelLab/500; re-rodar em lote quando estabilizar) | **Conlang Sylvarin** (paralelo organico): mutacoes, deriva historica, escrita cifrada |
-| Mecanica **Carga do Aparato** canonizada (numeros) | **COMBATE-AUTOKILL** (INBOX, parametros fechados): canonizar no combat.md DENTRO do M5 | **ARTE-DIAGONAL-8DIR** (decisao 4-dir vs 8-dir) |
-
-## Notas
-
-- **One-way doors (W0)** DEVEM ir ao criador supremo via AskUserQuestion (opção recomendada primeiro), conforme regra canônica inquebrável. Nenhuma foi decidida pelos agents — apenas ordenadas e marcada a reversibilidade.
-- **3 arestas de dependência reais AUSENTES do TODO original** (gravadas agora): (1) F2-G.5 depende de F2-E.10 + F2-E.10b, não só F2-E.5 (= F2-PROD.5); (2) F2-E.11 depende de F2-E.5b (status inertes), não só F2-E.5; (3) F2-M.4 depende fisicamente de export templates (dir vazia) + export_presets.cfg (ausente) + SDK pin.
-- **Caminho crítico técnico do VS** (mais longo até jogável, antes invisível): F2-E.3.PARTY → F2-E.10-CONTRACT → F2-E.10 → F2-E.10b → F2-G.5/G.9.
-- **Anti-over-engineering (porte solo):** a engine-foundation está madura/testada (combate 133 testes, save HMAC, scene, input 37 actions, i18n, câmera). O caminho crítico AGORA é Game+Arte, não foundation. Cortado/adiado: §18 catálogo completo (→2-3 arenas), música 3 estados (→2), FsCheck/lockfile/ICU plural/SCA pesado.
-- **F1.11** (`docs/tech/*`): 🟡⚠ — gerado em modo autônomo pré-reforma, aguarda revisão criador. **F1.12** (GDD): ✅ F1.12-REFRESH aplicado 2026-06-02; gdd.md v0.2 canônico.
-- **Cortes G1 (`CUT.*`)** = decisões one-way doors. ✅ CUT-RECONCILE 2026-06-02: GDD §9 fonte primária (CUT.1..17); CUT.* no TODO rastreia internamente.
-- **Disciplina antes de release** (memória `project_qa_deploy_disciplina`): AUD zerado + assinatura nominal em deploy irreversível (sub-fase 5.3: 48h + 30d offline).
-- **F1-DL.REFAC (débito literário)**: prose §§6-8 prioriza densidade técnica obsessiva. Refactor antes de F5-BK.1. Não bloqueia código.
-- **Padroes numericos descontinuados em MÉTRICAS DE PROCESSO** (palavras/queries) mas **MANTIDOS no TEXTO** (datações/contagens/idades/dimensões/compassos); a camada velada do conteudo segue mantida. Detalhe so em `docs/_secret/` + memorias privadas.
 
 ## Inventario de assets PixelLab (renderizacoes feitas / por fazer)
 
@@ -342,8 +292,9 @@ Atualizado 2026-06-24. **Status:** ✅ feito (em `resources/sprites/icons-m5/`, 
 | # | Asset | Qtd | Status | Posicao / uso |
 |---|---|---|---|---|
 | 11 | TILESET chao (pavimento tesselado) + parede ciber-gotica (auto-tiling) | 2 | 📝 | piso e paredes do mapa (TileKind Chao=0 / Parede=1). Prompts em `WORLD_DISTRITOS_INFERIORES_PIXELLAB.md`; tileset custa mais fichas, validar gasto |
-| 12 | MAP OBJECTS landmark (fonte de latao, placa-lore, holograma Sterling, portao) | 4 | 📝 | pontos do gold path (Marco/Entrada/Saida do CSV); P0 do cenario |
-| 13 | MAP OBJECTS preenchimento (2 casas ciber-goticas, poste de neon, terminal-hack, cover box, board do puzzle) | ~6 | 📝 | decoracao de rua; P1/P2 do cenario |
+| 12 | MAP OBJECTS landmark (fonte de latao, placa-lore, holograma Sterling, portao) | 4 | ✅🔍 | GERADOS 2026-06-25 (modo autonomo) em `resources/sprites/world/distritos_inferiores/`; object_ids no genlog do `WORLD_DISTRITOS_INFERIORES_PIXELLAB.md`. **PENDENTE: revisao visual do lider** (mosaico `_REVISAO_mosaico.png` enviado) |
+| 13 | MAP OBJECTS preenchimento (2 casas ciber-goticas, poste de neon, terminal-hack, cover box, board do puzzle) | 6 | ✅🔍 | GERADOS 2026-06-25 (modo autonomo). **PENDENTE: revisao visual do lider** |
+| 6b | RETRATO DE COMBATE do Gus (meio corpo do sprite de jogo: cabelo revolto + oculos + aparelho) | 1 | ✅ | usado na batalha (substituiu o retrato de terno, que foi pra quadro na casa dos pais). retrato_gus_combate.png |
 
 ### Locomocao / overworld (fora do M5, ja na INBOX abaixo)
 
