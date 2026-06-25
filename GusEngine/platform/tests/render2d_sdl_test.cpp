@@ -77,3 +77,17 @@ TEST_CASE("Render2dSdl frame vazio e valido (zero draws)", "[render2d_sdl]") {
     r.end_frame();
     REQUIRE(r.last_draw_count() == 0);
 }
+
+TEST_CASE("Render2dSdl headless: draw_text nao crasha e conta 1 por glifo desenhavel",
+          "[render2d_sdl]") {
+    // Sem renderer, a fonte nao bakeia textura, mas draw_text deve degradar sem crash
+    // (sem fonte = nada desenhado). Prova que o caminho de texto e seguro headless/CI.
+    Render2dSdl r(nullptr);
+    const Rect cam{0.0f, 0.0f, 640.0f, 360.0f};
+    r.begin_frame(cam, 640, 360);
+    r.draw_text("Atacar", 10.0f, 10.0f, 8.0f,
+                DrawColor{1.0f, 1.0f, 1.0f, 1.0f}, /*bold=*/false);
+    r.end_frame();
+    // Headless: sem fonte/textura, nenhum glifo emitido (degrada). Nao crasha.
+    REQUIRE(r.last_draw_count() == 0);
+}

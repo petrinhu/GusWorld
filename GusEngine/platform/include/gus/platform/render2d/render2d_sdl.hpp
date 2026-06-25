@@ -33,6 +33,7 @@
 
 #include <SDL3/SDL.h>
 
+#include "gus/platform/render2d/font_atlas.hpp"
 #include "gus/platform/render2d/i_renderer.hpp"
 
 namespace gus::platform::render2d {
@@ -61,6 +62,8 @@ public:
                             const DrawColor& tint) override;
     [[nodiscard]] ContentBbox texture_content_bbox(
         TextureId texture) const override;
+    void draw_text(const char* text, float x, float y, float px_size,
+                   const DrawColor& color, bool bold) override;
     void end_frame() override;
 
     // Numero de primitivos (quads/sprites) emitidos no ultimo frame (debug/teste).
@@ -78,6 +81,20 @@ private:
     // PARALELO a textures_ (mesmo TextureId indexa os dois). Slot 0 = invalido. Serve
     // pra ancorar o sprite pelos PES (texture_content_bbox); ver alpha_bbox.hpp.
     std::vector<ContentBbox> bboxes_;
+
+    // FONTE (incremento 3.5): atlas bakeado (CPU) + SDL_Texture do atlas, por FACE
+    // (regular/bold). Carregado PREGUICOSAMENTE no 1o draw_text (so se houver renderer).
+    // Se a fonte faltar (headless/CI sem assets), atlas invalido e draw_text vira no-op.
+    struct FontFace {
+        FontAtlas atlas;              // bitmap + metricas (vazio = nao bakeado)
+        SDL_Texture* texture = nullptr;  // owned; nullptr ate subir o atlas
+        bool tried = false;           // ja tentou bakear (evita re-tentar a cada draw)
+    };
+    // Garante o face carregado (bake + textura). Devolve nullptr se indisponivel.
+    FontFace* ensure_font(bool bold);
+
+    FontFace font_regular_{};
+    FontFace font_bold_{};
 
     gus::core::spatial::Rect camera_{};
     int pixel_w_ = 0;

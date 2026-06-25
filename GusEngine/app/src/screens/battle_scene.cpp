@@ -18,6 +18,8 @@
 
 #include "gus/app/screens/battle_scene.hpp"
 
+#include <cstdio>   // std::snprintf (numeros do painel)
+#include <string>
 #include <utility>  // std::move
 #include <vector>
 
@@ -41,6 +43,14 @@ using gus::platform::render2d::IRenderer;
 using gus::platform::render2d::kInvalidTexture;
 using gus::platform::render2d::TextureId;
 using gus::platform::render2d::UvRect;
+
+// Tamanho de texto (px logico) das zonas. Pixel Operator e crisp a multiplos de 8.
+constexpr float kVerbTextPx = 8.0f;     // rotulo do verbo na caixa do menu
+constexpr float kLogTextPx = 8.0f;      // linha do log
+constexpr float kPanelTextPx = 8.0f;    // numeros do painel (HP/AP/Mana)
+// Cor do texto sobre a caixa do verbo (claro p/ contraste) e do numero do painel.
+constexpr DrawColor kVerbTextColor{0.06f, 0.06f, 0.08f, 1.0f};   // escuro sobre caixa clara
+constexpr DrawColor kPanelTextColor{0.92f, 0.92f, 0.96f, 1.0f};  // claro sobre painel escuro
 
 // --- Paleta placeholder do esqueleto (ponto unico; arte real entra depois) ---
 // Cores em [0,1] (DrawColor). Graybox legivel: distingue zonas e lados sem arte.
@@ -255,6 +265,13 @@ CombatActor* BattleScene::first_alive_player() const {
         }
     }
     return nullptr;
+}
+
+std::string BattleScene::tr_verb_label(BattleVerb verb) const {
+    if (translator_ == nullptr) {
+        return std::string{};  // sem translator: o render so desenha a caixa colorida
+    }
+    return translator_->tr(std::string(gus::app::i18n::verb_label_key(verb)));
 }
 
 CombatAction BattleScene::enemy_auto_action(const CombatActor& /*enemy*/) const {
@@ -532,24 +549,41 @@ void BattleScene::render(IRenderer& renderer, float viewport_px_w,
             const float x = p.x + kPanelPad;
             float y = p.y + kPanelPad;
 
-            // HP: barra + preenchimento real (hp/max_hp).
+            // NUMEROS REAIS (incremento 3.5): texto complementa as barras/pips, nao as
+            // remove. Buffer pequeno; strings tecnicas de HUD (numero) nao passam por
+            // tr() (sao numerais universais).
+            char num[32];
+
+            // HP: barra + preenchimento real (hp/max_hp) + "hp/max" a direita da barra.
             const Rect hp_frame{x, y, static_cast<float>(kHpBarW),
                                 static_cast<float>(kHpBarH)};
             draw_bar(renderer, hp_frame, bar_fill(a->hp(), a->max_hp()),
                      kHpFillColor);
+            std::snprintf(num, sizeof(num), "%d/%d", a->hp(), a->max_hp());
+            renderer.draw_text(num, x + kHpBarW + 4.0f,
+                               y + (kHpBarH - kPanelTextPx) * 0.5f, kPanelTextPx,
+                               kPanelTextColor, /*bold=*/false);
             y += kHpBarH + kResourceRowGap;
 
-            // AP: pips (max_ap pips; ap acesos). max_ap = kBaseApPerTurn (3).
-            draw_pips(renderer, x, y, a->max_ap(), a->ap(),
-                      gus::domain::combat::combat_constants::kBaseApPerTurn,
-                      kApLitColor, kApOffColor);
+            // AP: pips (max_ap pips; ap acesos) + "AP n/m" apos os pips.
+            const int ap_max = gus::domain::combat::combat_constants::kBaseApPerTurn;
+            draw_pips(renderer, x, y, a->max_ap(), a->ap(), ap_max, kApLitColor,
+                      kApOffColor);
+            std::snprintf(num, sizeof(num), "AP %d/%d", a->ap(), a->max_ap());
+            renderer.draw_text(
+                num, x + static_cast<float>(ap_max) * (kPipSize + kPipGap) + 4.0f, y,
+                kPanelTextPx, kPanelTextColor, /*bold=*/false);
             y += kPipSize + kResourceRowGap;
 
-            // Mana: pips (max_mana pips, cap kManaCap=8; mana acesos). O ramp
-            // (max_mana = 2 + round_index, cap 8) ja esta no max_mana() do ator.
-            draw_pips(renderer, x, y, a->max_mana(), a->mana(),
-                      gus::domain::combat::combat_constants::kManaCap, kManaLitColor,
+            // Mana: pips (max_mana pips, cap kManaCap=8; mana acesos) + "Mana n/m". O
+            // ramp (max_mana = 2 + round_index, cap 8) ja esta no max_mana() do ator.
+            const int mana_cap = gus::domain::combat::combat_constants::kManaCap;
+            draw_pips(renderer, x, y, a->max_mana(), a->mana(), mana_cap, kManaLitColor,
                       kManaOffColor);
+            std::snprintf(num, sizeof(num), "Mana %d/%d", a->mana(), a->max_mana());
+            renderer.draw_text(
+                num, x + static_cast<float>(mana_cap) * (kPipSize + kPipGap) + 4.0f, y,
+                kPanelTextPx, kPanelTextColor, /*bold=*/false);
 
             // Status effects ATIVOS: 1 icone por efeito, na lateral direita do painel.
             float sx = p.x + p.w - kPanelPad - kStatusIconSize;
@@ -584,6 +618,14 @@ void BattleScene::render(IRenderer& renderer, float viewport_px_w,
                     if (i == menu_.selected_index()) {
                         renderer.draw_rect_outline(it.rect, kVerbSelectColor, 2.0f);
                     }
+                    // ROTULO do verbo (incremento 3.5): NOME legivel via tr(), centrado
+                    // verticalmente na caixa, com pequena margem a esquerda. Resolve o
+                    // "injogavel" (caixa colorida sem nome). Sem translator => no-op
+                    // (draw_text degrada; a caixa colorida ainda orienta).
+                    const std::string label = tr_verb_label(it.verb);
+                    const float ty = it.rect.y + (it.rect.h - kVerbTextPx) * 0.5f;
+                    renderer.draw_text(label.c_str(), it.rect.x + 3.0f, ty,
+                                       kVerbTextPx, kVerbTextColor, /*bold=*/false);
                 }
             }
         }
@@ -595,8 +637,11 @@ void BattleScene::render(IRenderer& renderer, float viewport_px_w,
         renderer.draw_filled_rect(l, kLogColor);
         renderer.draw_rect_outline(l, kHudBorderColor, 1.0f);
 
-        // Quantas linhas cabem na caixa (altura por linha fixa; texto vem com a fonte).
-        constexpr float kLogLineH = 5.0f;
+        // Linha de log = TEXTO (incremento 3.5) da message real do motor, na cor da
+        // categoria (D7). Uma marca curta colorida a esquerda ancora a cor (legivel
+        // mesmo se a fonte faltar: a marca sobrevive headless/sem-fonte). Bold pra
+        // sistema/dano notavel (criticos/COMPILADO).
+        constexpr float kLogLineH = kLogTextPx;  // altura da linha = altura do glifo
         constexpr float kLogLineGap = 2.0f;
         const float pad = 2.0f;
         const int capacity = static_cast<int>(
@@ -605,10 +650,16 @@ void BattleScene::render(IRenderer& renderer, float viewport_px_w,
             const std::vector<LogLine> lines = log_lines(capacity);
             float ly = l.y + pad;
             for (const LogLine& line : lines) {
-                // MARCA: uma barra curta colorida por categoria (placeholder do texto).
-                // Quando a fonte entrar, troca-se a barra pelo glifo da message.
-                const Rect mark{l.x + pad, ly, l.w * 0.6f, kLogLineH};
-                renderer.draw_filled_rect(mark, log_line_color(line.kind));
+                const DrawColor col = log_line_color(line.kind);
+                // Marca de cor (ancora a categoria; fallback sem-fonte).
+                const Rect mark{l.x + pad, ly + 1.0f, 3.0f, kLogLineH - 2.0f};
+                renderer.draw_filled_rect(mark, col);
+                // Texto da message (sistema/dano em bold pra enfase).
+                const bool bold = line.kind == LogLineKind::System ||
+                                  line.kind == LogLineKind::Damage ||
+                                  line.kind == LogLineKind::Defeat;
+                renderer.draw_text(line.text.c_str(), l.x + pad + 5.0f, ly,
+                                   kLogTextPx, col, bold);
                 ly += kLogLineH + kLogLineGap;
             }
         }

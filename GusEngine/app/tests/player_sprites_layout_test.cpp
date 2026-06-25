@@ -46,6 +46,8 @@ public:
         TextureId) const override {
         return gus::platform::render2d::ContentBbox{};
     }
+    void draw_text(const char*, float, float, float,
+                   const gus::platform::render2d::DrawColor&, bool) override {}
     void end_frame() override {}
 
     TextureId load_texture(const char* path) override {

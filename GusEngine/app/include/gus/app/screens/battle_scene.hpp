@@ -33,6 +33,7 @@
 #include <string>
 #include <vector>
 
+#include "gus/app/i18n/translator.hpp"           // Translator (tr() de UI)
 #include "gus/app/screens/battle_log_model.hpp"  // LogLine
 #include "gus/app/screens/battle_menu.hpp"       // BattleMenu / BattleVerb
 #include "gus/domain/combat/combat_enums.hpp"    // StatusId
@@ -92,6 +93,13 @@ public:
     // chamado, os status do ator caem num quadradinho placeholder (fallback headless).
     void set_status_icons(BattleStatusIconSet icons) noexcept {
         status_icons_ = icons;
+    }
+
+    // Define o Translator de UI (tr() dos rotulos de verbo). Ponteiro NAO-DONO (vive na
+    // casca/main). nullptr (default) => sem texto traduzido; o render cai pro fallback
+    // (rotulo = a chave, ou as caixas/marcas sem texto). Mantem o headless seguro.
+    void set_translator(const gus::app::i18n::Translator* tr) noexcept {
+        translator_ = tr;
     }
 
     // ---- Leitura do estado do motor (pro render e pros testes) ----
@@ -175,6 +183,10 @@ private:
     [[nodiscard]] gus::domain::combat::CombatActor* first_alive_enemy() const;
     [[nodiscard]] gus::domain::combat::CombatActor* first_alive_player() const;
 
+    // Rotulo localizado de um verbo (tr() via translator_). Sem translator => devolve
+    // string vazia (o render trata: a caixa colorida fica sem nome, mas nao crasha).
+    [[nodiscard]] std::string tr_verb_label(BattleVerb verb) const;
+
     // Atores de demo (DONOS). Declarados ANTES da FSM: vivem mais que ela.
     std::vector<std::unique_ptr<gus::domain::combat::CombatActor>> actors_;
     std::unique_ptr<gus::domain::combat::CombatStateMachine> machine_;
@@ -189,6 +201,8 @@ private:
     // Linhas de log geradas pela UI (nao pelo motor): COMPILAR/GAMBITO sinalizados antes
     // de existir mecanica (incr 4/5). Mescladas com o log do motor em log_lines().
     std::vector<LogLine> ui_log_;
+    // Translator de UI (NAO-DONO). nullptr = sem traducao (fallback no render).
+    const gus::app::i18n::Translator* translator_ = nullptr;
 };
 
 }  // namespace gus::app::screens

@@ -78,6 +78,8 @@ public:
         TextureId /*texture*/) const override {
         return gus::platform::render2d::ContentBbox{};
     }
+    void draw_text(const char*, float, float, float,
+                   const gus::platform::render2d::DrawColor&, bool) override {}
     void end_frame() override { ++ends; }
 
     int begins = 0;

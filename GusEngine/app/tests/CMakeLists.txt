@@ -17,6 +17,7 @@ add_executable(gusengine_app_tests
     battle_menu_test.cpp
     battle_log_model_test.cpp
     battle_scene_test.cpp
+    translator_test.cpp
 )
 
 target_link_libraries(gusengine_app_tests

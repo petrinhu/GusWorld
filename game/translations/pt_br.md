@@ -218,6 +218,12 @@ Gambito: Prever
 ## COMBAT_ACTION_GAMBIT_REORDER
 Gambito: Reordenar (+1)
 
+## COMBAT_VERB_GAMBITO
+Gambito
+
+## COMBAT_VERB_COMPILAR
+Compilar
+
 ## COMBAT_ACTION_USE_CARD
 Usar Carta
 

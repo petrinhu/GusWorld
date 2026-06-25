@@ -20,6 +20,7 @@ add_library(gusengine_app STATIC
     src/screens/battle_log_model.cpp
     src/screens/battle_scene.cpp
     src/screens/battle_preview.cpp
+    src/i18n/translator.cpp
     src/sdl_window.cpp
 )
 
@@ -37,6 +38,10 @@ target_compile_definitions(gusengine_app
     # resources/. O resolver de city_scene usa isto pra achar o .gmap rodando do
     # build dir; override em runtime via env GUSWORLD_MAPS.
     PRIVATE GUSWORLD_MAPS_DIR="${CMAKE_SOURCE_DIR}/assets/maps/compiled"
+    # Pasta dos catalogos de traducao (game/translations/) DENTRO do repo (raiz = pai
+    # de GusEngine/). O Translator de UI le pt_br.md daqui rodando do build dir;
+    # override em runtime via env GUSWORLD_TRANSLATIONS (caminho completo do .md).
+    PRIVATE GUSWORLD_TRANSLATIONS_DIR="${CMAKE_SOURCE_DIR}/../game/translations"
 )
 
 # SDL3 entra aqui (a casca SdlWindow + o main tocam SDL diretamente).

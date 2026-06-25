@@ -131,7 +131,18 @@ int run_battle_preview() {
         }
         scene.set_status_icons(status_icons);
 
-        std::cout << "BattlePreview: party=" << scene.party_count()
+        // Carrega o catalogo de traducao (pt_br.md) e o entrega a cena, pra os verbos do
+        // menu aparecerem com NOME legivel (incremento 3.5). Ausencia => fallback (caixa
+        // colorida sem nome, mas nao crasha). O Translator vive aqui (casca), a cena so
+        // aponta pra ele (nao-dono): mantemos o objeto vivo ate o fim do loop.
+        gus::app::i18n::Translator translator;
+        const std::string tr_path = gus::app::i18n::resolve_translations_path();
+        const bool tr_ok = translator.load_from_file(tr_path);
+        scene.set_translator(&translator);
+
+        std::cout << "BattlePreview: traducao "
+                  << (tr_ok ? "carregada" : "AUSENTE (fallback)") << " de " << tr_path
+                  << "\n  party=" << scene.party_count()
                   << " inimigos=" << scene.enemy_count()
                   << " fila=" << scene.queue_len() << " retratos em " << dir
                   << "\n  Cima/Baixo: navega o menu | Enter/Espaco: confirma o verbo | "

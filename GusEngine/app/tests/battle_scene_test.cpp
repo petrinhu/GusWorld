@@ -65,11 +65,25 @@ public:
         textured.push_back(r);
     }
     ContentBbox texture_content_bbox(TextureId) const override { return {}; }
+    void draw_text(const char* text, float x, float y, float px_size,
+                   const DrawColor& c, bool bold) override {
+        texts.push_back(TextItem{text != nullptr ? text : "", x, y, px_size, c, bold});
+    }
     void end_frame() override { ++ends; }
+
+    struct TextItem {
+        std::string text;
+        float x = 0.0f;
+        float y = 0.0f;
+        float px = 0.0f;
+        DrawColor color;
+        bool bold = false;
+    };
 
     std::vector<Item> fills;
     std::vector<Item> outlines;
     std::vector<Rect> textured;
+    std::vector<TextItem> texts;
     Rect last_cam{};
     int last_pw = 0;
     int last_ph = 0;
@@ -409,24 +423,88 @@ TEST_CASE("turno: menu_confirm e no-op fora do turno de jogador / verbo sem AP",
     REQUIRE(scene.active_actor() == a);
 }
 
-TEST_CASE("log: render desenha 1 marca por linha notavel na zona do log",
+TEST_CASE("log: render emite o TEXTO da message de cada linha notavel (incr 3.5)",
           "[battle_scene]") {
     BattleScene scene;
     // Forca eventos notaveis: um Atacar (gera log de ataque do jogador + o inimigo que
-    // ja agiu antes). Depois renderiza e conta marcas curtas na zona do log (y > 314).
+    // ja agiu antes). Renderiza e checa que ha TEXTO desenhado na zona do log (y>=314).
     select_verb(scene, BattleVerb::Atacar);
     scene.menu_confirm();
 
     CountingRenderer r;
     scene.render(r, 640.0f, 360.0f);
 
-    // A caixa de log fica na base (y do log_panel ~314). As marcas sao retangulos
-    // estreitos (altura 5) dentro dela. Deve haver >= 1 (houve acao notavel).
+    // Texto de log = draw_text na zona do log (y >= 314), com a message crua do motor.
+    int log_texts = 0;
+    for (const auto& t : r.texts) {
+        if (t.y >= 314.0f && !t.text.empty()) {
+            ++log_texts;
+        }
+    }
+    REQUIRE(log_texts >= 1);
+    // A marca de cor (ancora a categoria) tambem sobrevive ao lado (fallback sem-fonte).
     int log_marks = 0;
     for (const auto& f : r.fills) {
-        if (f.rect.h == 5.0f && f.rect.y >= 314.0f) {
+        if (f.rect.w == 3.0f && f.rect.y >= 314.0f) {
             ++log_marks;
         }
     }
     REQUIRE(log_marks >= 1);
+}
+
+TEST_CASE("painel: render emite os NUMEROS reais de HP/AP/Mana (incr 3.5)",
+          "[battle_scene]") {
+    BattleScene scene;
+    const auto* a = scene.active_actor();
+    REQUIRE(a != nullptr);
+    // O painel imprime "hp/max" do ator ativo (numero real lido do motor).
+    char expected_hp[32];
+    std::snprintf(expected_hp, sizeof(expected_hp), "%d/%d", a->hp(), a->max_hp());
+
+    CountingRenderer r;
+    scene.render(r, 640.0f, 360.0f);
+
+    bool found_hp = false;
+    bool found_ap = false;
+    bool found_mana = false;
+    for (const auto& t : r.texts) {
+        if (t.text == expected_hp) found_hp = true;
+        if (t.text.rfind("AP ", 0) == 0) found_ap = true;
+        if (t.text.rfind("Mana ", 0) == 0) found_mana = true;
+    }
+    REQUIRE(found_hp);
+    REQUIRE(found_ap);
+    REQUIRE(found_mana);
+}
+
+TEST_CASE("menu: render emite o NOME (texto) de cada verbo quando ha translator",
+          "[battle_scene]") {
+    // Sem translator setado, tr_verb_label devolve "" e o render nao emite texto de
+    // verbo - prova o fallback seguro. Com translator, emite os nomes.
+    BattleScene scene_no_tr;
+    CountingRenderer r0;
+    scene_no_tr.render(r0, 640.0f, 360.0f);
+    int verb_texts_no_tr = 0;
+    for (const auto& t : r0.texts) {
+        // Zona do menu: metade direita do painel (x > 320), y do painel (~252..312).
+        if (t.x > 320.0f && t.y >= 252.0f && t.y < 314.0f && !t.text.empty()) {
+            ++verb_texts_no_tr;
+        }
+    }
+    REQUIRE(verb_texts_no_tr == 0);  // sem translator: caixas sem nome (fallback)
+
+    BattleScene scene;
+    gus::app::i18n::Translator tr;
+    tr.load_from_content(
+        "## COMBAT_ACTION_ATTACK\nAtacar\n\n## COMBAT_ACTION_DEFEND\nDefender\n");
+    scene.set_translator(&tr);
+    CountingRenderer r;
+    scene.render(r, 640.0f, 360.0f);
+    bool found_atacar = false;
+    for (const auto& t : r.texts) {
+        if (t.text == "Atacar") {
+            found_atacar = true;
+        }
+    }
+    REQUIRE(found_atacar);  // o verbo Atacar aparece com nome legivel
 }

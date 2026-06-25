@@ -124,6 +124,16 @@ public:
     [[nodiscard]] virtual ContentBbox texture_content_bbox(
         TextureId texture) const = 0;
 
+    // Desenha TEXTO (M5, incremento 3.5) na fonte monospace embarcada (Pixel Operator
+    // Mono). pos (x,y) = canto superior-esquerdo da 1a celula, em coordenadas de MUNDO
+    // (na BattleScreen o mundo == px logico 640x360, entao e px de tela logico).
+    // px_size = altura da celula em unidades de mundo; o backend escala o glifo do atlas
+    // (NEAREST, crisp). color tinge o glifo (alpha incluso). bold usa a face Bold
+    // (enfase: criticos/sistema no log). Se a fonte nao carregou (headless/CI sem
+    // assets), e um NO-OP seguro (o chamador desenhou um fallback antes - barras/marcas).
+    virtual void draw_text(const char* text, float x, float y, float px_size,
+                           const DrawColor& color, bool bold) = 0;
+
     // Fecha o frame (submete ao backend / swap).
     virtual void end_frame() = 0;
 };

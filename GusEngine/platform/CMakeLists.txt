@@ -15,13 +15,23 @@ add_library(gusengine_platform STATIC
     src/input/gamepad_mapping.cpp
     src/input/sdl_input.cpp
     src/render2d/viewport_transform.cpp
+    src/render2d/text_metrics.cpp
+    src/render2d/font_atlas.cpp
     src/render2d/render2d_sdl.cpp
 )
 
 target_include_directories(gusengine_platform
     PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include
-    # stb_image (vendorizado header-only) para load_texture no Render2dSdl.
+    # stb_image + stb_truetype (vendorizado header-only): load_texture e o atlas de
+    # fonte (font_atlas) no Render2dSdl.
     PRIVATE ${CMAKE_SOURCE_DIR}/third_party/stb
+)
+
+# Pasta dos assets de fonte da engine (.ttf embarcados no repo, dentro de assets/fonts/).
+# Embutida em compilacao pra o resolver achar a fonte rodando do build dir; override em
+# runtime via env GUSWORLD_ASSETS (mesma logica do resolver de mapas/sprites).
+target_compile_definitions(gusengine_platform
+    PRIVATE GUSWORLD_FONTS_DIR="${CMAKE_SOURCE_DIR}/assets/fonts"
 )
 
 # domain/ entra aqui: input_mapper/sdl_input consomem o mapa logico puro. SDL3 e a

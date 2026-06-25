@@ -80,6 +80,8 @@ public:
         TextureId) const override {
         return {};
     }
+    void draw_text(const char*, float, float, float, const DrawColor&,
+                   bool) override {}
     void end_frame() override {}
 
     std::vector<Fill> fills;

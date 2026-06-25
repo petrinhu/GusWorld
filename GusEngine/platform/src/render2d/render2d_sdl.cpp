@@ -10,8 +10,10 @@
 #include "gus/platform/render2d/render2d_sdl.hpp"
 
 #include <cstdint>
+#include <vector>
 
 #include "gus/platform/render2d/alpha_bbox.hpp"  // scan_alpha_content_bbox (POCO)
+#include "gus/platform/render2d/text_metrics.hpp"  // glyph_advance (monospace)
 #include "gus/platform/render2d/viewport_transform.hpp"
 
 // stb_image: so esta TU define a implementacao (evita simbolos duplicados).
@@ -46,6 +48,13 @@ Render2dSdl::~Render2dSdl() {
         if (textures_[i] != nullptr) {
             SDL_DestroyTexture(textures_[i]);
         }
+    }
+    // Texturas do atlas de fonte (regular/bold).
+    if (font_regular_.texture != nullptr) {
+        SDL_DestroyTexture(font_regular_.texture);
+    }
+    if (font_bold_.texture != nullptr) {
+        SDL_DestroyTexture(font_bold_.texture);
     }
 }
 
@@ -189,6 +198,88 @@ void Render2dSdl::draw_textured_rect(const gus::core::spatial::Rect& world_rect,
     SDL_SetTextureAlphaMod(tex, to_byte(tint.a));
 
     SDL_RenderTexture(renderer_, tex, &src, &dst);
+}
+
+Render2dSdl::FontFace* Render2dSdl::ensure_font(bool bold) {
+    FontFace& face = bold ? font_bold_ : font_regular_;
+    if (face.tried) {
+        return face.atlas.valid() && face.texture != nullptr ? &face : nullptr;
+    }
+    face.tried = true;
+
+    // Headless (sem renderer): nao da pra criar textura. Fica indisponivel (no-op).
+    if (renderer_ == nullptr) {
+        return nullptr;
+    }
+
+    // Bake na CPU (16px nativo = multiplo de 8 da Pixel Operator, crisp ao escalar).
+    const char* file =
+        bold ? "PixelOperatorMono-Bold.ttf" : "PixelOperatorMono.ttf";
+    face.atlas = bake_font_atlas(resolve_font_path(file), /*cell_px=*/16);
+    if (!face.atlas.valid()) {
+        return nullptr;  // fonte ausente: degrada (sem texto, so fallback do caller)
+    }
+
+    // Converte o atlas grayscale (alpha) -> RGBA32 (branco + alpha do glifo). O
+    // color-mod no draw tinge depois. NEAREST = crisp ao escalar pro px_size logico.
+    const int w = face.atlas.atlas_w;
+    const int h = face.atlas.atlas_h;
+    std::vector<std::uint8_t> rgba(static_cast<std::size_t>(w) * h * 4);
+    for (std::size_t i = 0; i < static_cast<std::size_t>(w) * h; ++i) {
+        const std::uint8_t a = face.atlas.pixels[i];
+        rgba[i * 4 + 0] = 255;  // R
+        rgba[i * 4 + 1] = 255;  // G
+        rgba[i * 4 + 2] = 255;  // B
+        rgba[i * 4 + 3] = a;    // A = tinta do glifo
+    }
+    SDL_Texture* tex = SDL_CreateTexture(renderer_, SDL_PIXELFORMAT_RGBA32,
+                                         SDL_TEXTUREACCESS_STATIC, w, h);
+    if (tex == nullptr) {
+        face.atlas = FontAtlas{};  // invalida pra cair no no-op
+        return nullptr;
+    }
+    SDL_UpdateTexture(tex, nullptr, rgba.data(), w * 4);
+    SDL_SetTextureScaleMode(tex, SDL_SCALEMODE_NEAREST);
+    SDL_SetTextureBlendMode(tex, SDL_BLENDMODE_BLEND);
+    face.texture = tex;
+    return &face;
+}
+
+void Render2dSdl::draw_text(const char* text, float x, float y, float px_size,
+                            const DrawColor& color, bool bold) {
+    if (text == nullptr || px_size <= 0.0f) {
+        return;
+    }
+    FontFace* face = ensure_font(bold);
+    if (face == nullptr) {
+        return;  // sem fonte (headless/ausente): no-op, o caller ja desenhou o fallback
+    }
+
+    SDL_Texture* tex = face->texture;
+    float tw = 0.0f, th = 0.0f;
+    SDL_GetTextureSize(tex, &tw, &th);
+    SDL_SetTextureColorMod(tex, to_byte(color.r), to_byte(color.g), to_byte(color.b));
+    SDL_SetTextureAlphaMod(tex, to_byte(color.a));
+
+    const float advance = glyph_advance(px_size);  // largura monospace por glifo (mundo)
+    float pen_x = x;
+    for (const char* p = text; *p != '\0'; ++p) {
+        const char c = *p;
+        const UvRect uv = face->atlas.glyph_uv(c);
+        if (uv.w > 0.0f) {
+            // Quad de MUNDO da celula (px_size x px_size) na caneta atual; projeta.
+            const gus::core::spatial::Rect cell_world{pen_x, y, px_size, px_size};
+            const QuadScreen q =
+                build_quad_screen(cell_world, camera_, pixel_w_, pixel_h_);
+            SDL_FRect dst{q.x, q.y, q.w, q.h};
+            SDL_FRect src{uv.u * tw, uv.v * th, uv.w * tw, uv.h * th};
+            SDL_RenderTexture(renderer_, tex, &src, &dst);
+            ++draw_count_;  // 1 por glifo desenhavel (espaco nao conta: uv.w==0? nao -
+                            // o espaco tem uv valido mas sem tinta; ainda conta como
+                            // glifo emitido. Mantemos simples: conta os com uv valido.)
+        }
+        pen_x += advance;
+    }
 }
 
 void Render2dSdl::end_frame() {
