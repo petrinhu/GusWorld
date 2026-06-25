@@ -30,7 +30,7 @@ namespace gus::app::screens {
 [[nodiscard]] std::string resolve_status_icons_dir();
 
 // Roda o viewer da BattleScene: SDL_Init proprio, janela, loop de render do esqueleto
-// (camera logica 640x360 escalada por inteiro), Esc/fechar encerra. Devolve 0 ok.
+// (camera logica 960x540 escalada por inteiro x2 = 1080p), Esc/fechar encerra. Devolve 0 ok.
 int run_battle_preview();
 
 }  // namespace gus::app::screens

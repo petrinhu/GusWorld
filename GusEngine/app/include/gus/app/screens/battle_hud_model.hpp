@@ -3,7 +3,7 @@
 // MODELO PURO do HUD da BattleScreen (M5, incremento 2): POCO 100% testavel SEM SDL.
 // Calcula tudo que o painel do ator ativo, a fila CTB e as barras de HP da arena
 // precisam, a partir do ESTADO LIDO do motor (HP/AP/Mana/status), em PIXELS LOGICOS
-// (640x360, D1). O render (battle_scene) so consome esses retangulos/fracoes/indices.
+// (960x540, D1). O render (battle_scene) so consome esses retangulos/fracoes/indices.
 //
 // SEM TEXTO (decisao reportada ao coordenador no incremento 2): a engine ainda nao tem
 // sistema de fonte. Os VALORES numericos sao mostrados de forma FONT-FREE, reversivel:
@@ -40,19 +40,20 @@ inline constexpr int kStatusIdCount = 13;
 // Constantes de layout do HUD (px logico). Ponto unico; ux-ui-designer ajusta aqui.
 // ----------------------------------------------------------------------------
 
-// Barra de HP do painel do ator ativo.
-inline constexpr int kPanelPad = 5;          // padding interno do painel
-inline constexpr int kHpBarH = 8;            // altura da barra de HP do painel
-inline constexpr int kHpBarW = 120;          // largura da barra de HP do painel
+// Barra de HP do painel do ator ativo. Dimensoes subiram com a resolucao 960x540 (lider
+// 2026-06-25), proporcionais ao painel maior (92px de altura) e ao texto de 16px.
+inline constexpr int kPanelPad = 8;          // padding interno do painel
+inline constexpr int kHpBarH = 14;           // altura da barra de HP do painel
+inline constexpr int kHpBarW = 200;          // largura da barra de HP do painel
 
 // Pip de recurso (AP/Mana) no painel.
-inline constexpr int kPipSize = 7;           // lado do pip quadrado
-inline constexpr int kPipGap = 3;            // espaco entre pips
-inline constexpr int kResourceRowGap = 4;    // espaco vertical entre linhas (HP/AP/Mana)
+inline constexpr int kPipSize = 11;          // lado do pip quadrado
+inline constexpr int kPipGap = 4;            // espaco entre pips
+inline constexpr int kResourceRowGap = 6;    // espaco vertical entre linhas (HP/AP/Mana)
 
 // Icone de status no painel (assets sao quadrados; aqui o quadro de exibicao).
-inline constexpr int kStatusIconSize = 14;
-inline constexpr int kStatusIconGap = 3;
+inline constexpr int kStatusIconSize = 22;
+inline constexpr int kStatusIconGap = 4;
 
 // Mini-barra de HP de cada ator NA ARENA. FIX (lider no display): antes a barra ficava
 // ABAIXO do slot (slot.y + h + gap) e encostava no slot de baixo, poluindo. Agora fica

@@ -11,10 +11,10 @@
 // AP/Mana=pips, status=icone). Decisao reportada ao coordenador (reversivel; numeros
 // podem se sobrepor depois sem mudar o layout).
 //
-// RENDER 1:1: a camera do IRenderer e dirigida pro retangulo logico 640x360 (D1), entao
+// RENDER 1:1: a camera do IRenderer e dirigida pro retangulo logico 960x540 (D1), entao
 // cada Rect do battle_layout (em px logico) vira um Rect de mundo identico. O backend
-// (Render2dSdl) escala 640x360 -> janela por inteiro (pixel-perfect), letterbox a cargo
-// do backend/janela.
+// (Render2dSdl) escala 960x540 -> janela por inteiro (x2 = 1080p, pixel-perfect),
+// letterbox a cargo do backend/janela.
 
 #include "gus/app/screens/battle_scene.hpp"
 
@@ -49,75 +49,91 @@ using gus::platform::render2d::kInvalidTexture;
 using gus::platform::render2d::TextureId;
 using gus::platform::render2d::UvRect;
 
-// Tamanho de texto (px logico) das zonas. Pixel Operator e crisp a multiplos de 8.
-constexpr float kVerbTextPx = 8.0f;     // rotulo do verbo na caixa do menu
-constexpr float kLogTextPx = 8.0f;      // linha do log
-constexpr float kPanelTextPx = 8.0f;    // numeros do painel (HP/AP/Mana)
-// Cor do texto sobre a caixa do verbo (claro p/ contraste) e do numero do painel.
-constexpr DrawColor kVerbTextColor{0.06f, 0.06f, 0.08f, 1.0f};   // escuro sobre caixa clara
-constexpr DrawColor kPanelTextColor{0.92f, 0.92f, 0.96f, 1.0f};  // claro sobre painel escuro
+// Tamanho de texto (px logico) das zonas. Pixel Operator e crisp a multiplos de 8/16. Os
+// textos de corpo subiram 8px->16px com a resolucao 960x540 (lider 2026-06-25), mantendo
+// a legibilidade proporcional ao canvas 1.5x maior (e crisp no x2 ate 1080p).
+constexpr float kVerbTextPx = 12.0f;    // rotulo do verbo na caixa do menu (cockpit fino)
+constexpr float kLogTextPx = 11.0f;     // linha do log (terminal fino)
+constexpr float kPanelTextPx = 13.0f;   // numeros gerais
+// Texto do COCKPIT (variante C): nome do ator, numeros, rotulos.
+constexpr float kCockpitNamePx = 15.0f;   // nome grande do ator ativo
+constexpr float kCockpitTextPx = 8.0f;    // numero "hp/max" sobre a barra (compacto)
+constexpr float kCockpitLabelPx = 9.0f;   // rotulos "AP"/"MANA"/"ACAO"
+constexpr float kCockpitResLabelW = 34.0f;  // largura reservada pro rotulo antes dos pips
 
-// --- Paleta placeholder do esqueleto (ponto unico; arte real entra depois) ---
-// Cores em [0,1] (DrawColor). Graybox legivel: distingue zonas e lados sem arte.
-constexpr DrawColor kBgColor{0.07f, 0.07f, 0.10f, 1.0f};           // fundo da arena
-constexpr DrawColor kCtbBandColor{0.14f, 0.14f, 0.20f, 1.0f};      // faixa CTB
-constexpr DrawColor kCtbCellColor{0.30f, 0.30f, 0.42f, 1.0f};      // celula CTB ocupada
-constexpr DrawColor kCtbNextColor{0.95f, 0.82f, 0.25f, 1.0f};      // marca "proximo"
-constexpr DrawColor kPartyColor{0.30f, 0.55f, 0.85f, 1.0f};        // party (esquerda)
-constexpr DrawColor kEnemyColor{0.80f, 0.32f, 0.32f, 1.0f};        // inimigos (direita)
-constexpr DrawColor kActiveHiColor{0.98f, 0.92f, 0.45f, 1.0f};     // highlight ator ativo
-constexpr DrawColor kPanelColor{0.12f, 0.12f, 0.16f, 1.0f};        // painel do ator
-constexpr DrawColor kLogColor{0.09f, 0.09f, 0.12f, 1.0f};          // caixa de log
-constexpr DrawColor kHudBorderColor{0.45f, 0.45f, 0.55f, 1.0f};    // contorno HUD
+// --- PALETA CANONICA "Tatico Cockpit" (variante C, HEX exatos do _common.css aprovado
+//     pelo criador 2026-06-25). Cores em [0,1]. ---
+constexpr DrawColor kBgColor{0.047f, 0.059f, 0.102f, 1.0f};        // #0c0f1a fundo
+constexpr DrawColor kBg1Color{0.106f, 0.133f, 0.220f, 1.0f};       // #1B2238 cockpit topo
+constexpr DrawColor kBg2Color{0.078f, 0.102f, 0.173f, 1.0f};       // #141a2c cockpit base
+constexpr DrawColor kTerminalColor{0.055f, 0.075f, 0.133f, 1.0f};  // #0e1322 terminal/log
+constexpr DrawColor kSlotDarkColor{0.039f, 0.051f, 0.086f, 1.0f};  // #0a0d16 slot escuro
+constexpr DrawColor kCyan{0.133f, 0.827f, 0.933f, 1.0f};           // #22D3EE party/ativo/CRIT
+constexpr DrawColor kCyanDim{0.082f, 0.369f, 0.420f, 1.0f};        // #155e6b
+constexpr DrawColor kMagenta{0.882f, 0.114f, 0.455f, 1.0f};        // #E11D74 inimigo/intent
+constexpr DrawColor kMagentaDim{0.361f, 0.071f, 0.188f, 1.0f};     // #5c1230
+constexpr DrawColor kBrass{0.910f, 0.639f, 0.239f, 1.0f};          // #E8A33D Compilar/AP/fraqueza
+constexpr DrawColor kHp{0.247f, 0.725f, 0.478f, 1.0f};             // #3FB97A HP verde
+constexpr DrawColor kHpDim{0.114f, 0.361f, 0.235f, 1.0f};          // #1d5c3c
+constexpr DrawColor kErr{0.957f, 0.247f, 0.369f, 1.0f};            // #F43F5E erro/FALHA
+constexpr DrawColor kInk{0.812f, 0.902f, 0.933f, 1.0f};            // #cfe6ee tinta
+constexpr DrawColor kInkDim{0.435f, 0.522f, 0.576f, 1.0f};         // #6f8593 tinta-dim
+constexpr DrawColor kLine{0.165f, 0.204f, 0.314f, 1.0f};           // #2a3450 borda
 constexpr DrawColor kWhite{1.0f, 1.0f, 1.0f, 1.0f};                // tint neutro
-// --- dados reais (incremento 2): barras de HP, pips de AP/Mana, marca de ativo ---
-constexpr DrawColor kBarBackColor{0.05f, 0.05f, 0.07f, 1.0f};      // fundo de barra
-constexpr DrawColor kHpFillColor{0.35f, 0.80f, 0.40f, 1.0f};       // HP cheio (verde)
-constexpr DrawColor kApLitColor{0.95f, 0.85f, 0.30f, 1.0f};        // pip de AP aceso
-constexpr DrawColor kApOffColor{0.25f, 0.23f, 0.16f, 1.0f};        // pip de AP apagado
-constexpr DrawColor kManaLitColor{0.40f, 0.65f, 0.95f, 1.0f};      // pip de Mana aceso
-constexpr DrawColor kManaOffColor{0.16f, 0.20f, 0.28f, 1.0f};      // pip de Mana apagado
-constexpr DrawColor kStatusBoxColor{0.30f, 0.30f, 0.42f, 1.0f};    // placeholder de status
-constexpr DrawColor kActiveCtbColor{0.30f, 0.95f, 0.55f, 1.0f};    // marca de ativo na fila
-// --- menu de verbos (incremento 3): 1 cor por verbo (sem set de icones de verbo) ---
-constexpr DrawColor kVerbScanColor{0.35f, 0.70f, 0.85f, 1.0f};
-constexpr DrawColor kVerbGambitoColor{0.70f, 0.45f, 0.85f, 1.0f};
-constexpr DrawColor kVerbAtacarColor{0.85f, 0.40f, 0.35f, 1.0f};
-constexpr DrawColor kVerbDefenderColor{0.45f, 0.65f, 0.45f, 1.0f};
-constexpr DrawColor kVerbCompilarColor{0.85f, 0.75f, 0.30f, 1.0f};
-constexpr DrawColor kVerbFleeColor{0.55f, 0.55f, 0.60f, 1.0f};
-constexpr DrawColor kVerbDisabledColor{0.18f, 0.18f, 0.20f, 1.0f};  // verbo sem AP
-constexpr DrawColor kVerbSelectColor{0.98f, 0.98f, 0.70f, 1.0f};    // borda do selecionado
-// --- log: cor por categoria de linha (D7) ---
-constexpr DrawColor kLogSystemColor{0.70f, 0.70f, 0.78f, 1.0f};
-constexpr DrawColor kLogDamageColor{0.88f, 0.40f, 0.35f, 1.0f};
-constexpr DrawColor kLogHealColor{0.40f, 0.82f, 0.45f, 1.0f};
-constexpr DrawColor kLogStatusColor{0.75f, 0.60f, 0.85f, 1.0f};
-constexpr DrawColor kLogDefeatColor{0.55f, 0.20f, 0.20f, 1.0f};
 
-// Cor de fundo de um verbo (1 por verbo; placeholder ate haver set de icones de verbo).
-DrawColor verb_color(BattleVerb v) noexcept {
-    switch (v) {
-        case BattleVerb::Scan:     return kVerbScanColor;
-        case BattleVerb::Gambito:  return kVerbGambitoColor;
-        case BattleVerb::Atacar:   return kVerbAtacarColor;
-        case BattleVerb::Defender: return kVerbDefenderColor;
-        case BattleVerb::Compilar: return kVerbCompilarColor;
-        case BattleVerb::Flee:     return kVerbFleeColor;
+// Mapeamentos semanticos sobre a paleta canonica:
+constexpr DrawColor kCtbBandColor = kBg2Color;        // faixa CTB
+constexpr DrawColor kCtbCellColor = kSlotDarkColor;   // celula CTB ocupada
+constexpr DrawColor kCtbNextColor = kCyan;            // marca "proximo" (cyan)
+constexpr DrawColor kPartyColor = kCyanDim;           // placeholder party (cyan dim)
+constexpr DrawColor kEnemyColor = kMagentaDim;        // placeholder inimigo (magenta dim)
+constexpr DrawColor kActiveHiColor = kCyan;           // highlight ator ativo (cyan)
+constexpr DrawColor kPanelColor = kBg1Color;          // fundo cockpit (gradiente -> usa bg1)
+constexpr DrawColor kLogColor = kTerminalColor;       // caixa de log (terminal)
+constexpr DrawColor kHudBorderColor = kLine;          // contorno HUD (borda)
+constexpr DrawColor kBarBackColor = kSlotDarkColor;   // fundo de barra
+constexpr DrawColor kHpFillColor = kHp;               // HP cheio (verde)
+constexpr DrawColor kApLitColor = kBrass;             // pip de AP aceso (latao)
+constexpr DrawColor kApOffColor = kSlotDarkColor;     // pip de AP apagado
+constexpr DrawColor kManaLitColor = kCyan;            // pip de Mana aceso (cyan)
+constexpr DrawColor kManaOffColor = kSlotDarkColor;   // pip de Mana apagado
+constexpr DrawColor kStatusBoxColor = kMagentaDim;    // placeholder de status
+constexpr DrawColor kActiveCtbColor = kCyan;          // marca de ativo na fila (cyan)
+constexpr DrawColor kVerbColor = kInk;                // texto de verbo neutro
+constexpr DrawColor kVerbBoxColor{0.063f, 0.090f, 0.165f, 1.0f};   // #10172a fundo do verbo
+constexpr DrawColor kVerbDisabledColor = kSlotDarkColor;           // verbo sem AP
+constexpr DrawColor kVerbSelectColor = kCyan;         // verbo selecionado (cyan)
+constexpr DrawColor kVerbPrimaryColor = kBrass;       // COMPILAR (latao)
+// --- log: cor por categoria de linha (D7), na paleta canonica ---
+constexpr DrawColor kLogSystemColor = kCyan;          // sistema (cyan, bold)
+constexpr DrawColor kLogDamageColor = kInk;           // dano (tinta clara)
+constexpr DrawColor kLogHealColor = kHp;              // cura (verde)
+constexpr DrawColor kLogStatusColor = kMagenta;       // status (magenta)
+constexpr DrawColor kLogDefeatColor = kErr;           // derrota (erro)
+
+// Cor de DESTAQUE de um verbo (selecionado=cyan, Compilar=latao, demais=neutro).
+DrawColor verb_color(BattleVerb v, bool selected) noexcept {
+    if (selected) {
+        return kVerbSelectColor;
     }
-    return kVerbAtacarColor;
+    if (v == BattleVerb::Compilar) {
+        return kVerbPrimaryColor;
+    }
+    return kVerbColor;
 }
 
-// Intent (telegraph, incremento 5): tamanho do icone + cor da marca placeholder.
-constexpr float kIntentIconSize = 12.0f;
+// Intent (telegraph, incremento 5): tamanho do icone + cor da marca placeholder. Subiu
+// com a resolucao 960x540 (lider 2026-06-25), proporcional ao slot de ator maior.
+constexpr float kIntentIconSize = 18.0f;
 constexpr DrawColor kIntentMarkColor{0.95f, 0.75f, 0.20f, 1.0f};  // placeholder ambar
-// Numero flutuante de dano: tamanho do texto (px logico). 16px = tamanho NATIVO da
-// Pixel Operator (denso/nitido) e GRANDE o bastante pra o criador VER o dano (o teste no
-// display mostrou que o numero pequeno sumia). Sobe sobre o alvo e some por fade.
-constexpr float kFloaterTextPx = 16.0f;
+// Numero flutuante de dano: tamanho do texto (px logico). 24px (1.5x os 16px do 640x360):
+// Pixel Operator densa/nitida e GRANDE o bastante pra o criador VER o dano no canvas
+// maior. Sobe sobre o alvo e some por fade.
+constexpr float kFloaterTextPx = 24.0f;
 
 // Banner de turno (D9/D10): tamanho + cor. Texto grande e centrado abaixo da fila CTB.
-constexpr float kBannerTextPx = 16.0f;
+// 24px (1.5x os 16px do 640x360) pra dominar a tela maior na abertura.
+constexpr float kBannerTextPx = 24.0f;
 constexpr DrawColor kBannerBgColor{0.05f, 0.05f, 0.09f, 0.85f};   // faixa semi-opaca
 constexpr DrawColor kBannerPlayerColor{0.55f, 0.95f, 0.65f, 1.0f};  // sua vez (verde)
 constexpr DrawColor kBannerEnemyColor{0.95f, 0.55f, 0.45f, 1.0f};   // vez do inimigo
@@ -722,20 +738,108 @@ int BattleScene::gus_party_index() const {
 
 void BattleScene::render(IRenderer& renderer, float viewport_px_w,
                          float viewport_px_h) const {
-    // Camera 1:1 no retangulo logico 640x360 (D1). begin_frame recebe os PIXELS REAIS
+    // Camera 1:1 no retangulo logico 960x540 (D1). begin_frame recebe os PIXELS REAIS
     // pro backend escalar por inteiro. Cada Rect de layout (px logico) == Rect de mundo.
     const Rect screen = battle_screen_rect();
     renderer.begin_frame(screen, static_cast<int>(viewport_px_w),
                          static_cast<int>(viewport_px_h));
 
-    // --- fundo da arena (D7: camera estatica, fundo plano no M5) ---
+    // --- fundo (D7: camera estatica, fundo plano no M5) ---
     renderer.draw_filled_rect(screen, kBgColor);
 
-    // --- faixa da fila CTB (topo, D4) ---
+    // ====================================================================
+    // VARIANTE C "Tatico Cockpit": cockpit lateral esq + arena a direita +
+    // CTB topo + banner em faixa propria + terminal/log no rodape.
+    // Ordem de render: fundo -> COCKPIT (opaco) -> CTB -> banner -> atores
+    // -> log (opaco) -> floaters (por cima). O cockpit/log opacos garantem
+    // que nenhum ator invada (e a arena ja vive a DIREITA do cockpit).
+    // ====================================================================
+
+    const CombatActor* active = active_actor();
+
+    // --- COCKPIT lateral esquerdo (painel do ator ativo + verbos) ---
+    // So mostra os DADOS do ator quando NAO e abertura (na abertura o ativo e o 1o da
+    // fila por SPD = inimigo; o cockpit fica vazio/dim). A faixa do cockpit e sempre
+    // desenhada (opaca) pra demarcar a coluna.
     {
-        const Rect band{0.0f, 0.0f, static_cast<float>(kBattleLogicalW),
-                        static_cast<float>(kCtbStripTop + kCtbPortraitPx +
-                                           kCtbStripTop)};
+        const Rect cp = cockpit_rect();
+        renderer.draw_filled_rect(cp, kPanelColor);
+        renderer.draw_rect_outline(
+            Rect{cp.x + cp.w - 1.0f, cp.y, 1.0f, cp.h}, kHudBorderColor, 1.0f);
+
+        if (!is_intro() && active != nullptr) {
+            const CombatActor* a = active;
+            // Retrato grande do ator ativo (cyan border via highlight). Sem retrato => box.
+            const Rect pr = cockpit_portrait_rect();
+            const TextureId ptex = portraits_.find(a->id());
+            if (ptex != kInvalidTexture) {
+                renderer.draw_textured_rect(pr, ptex, UvRect{}, kWhite);
+            } else {
+                renderer.draw_filled_rect(pr, kSlotDarkColor);
+            }
+            renderer.draw_rect_outline(pr, kCyan, 1.0f);
+
+            // Nome do ator (cyan), centrado sob o retrato.
+            const std::string who = a->display_name();
+            const float nw = gus::platform::render2d::text_width(who, kCockpitNamePx);
+            renderer.draw_text(who.c_str(), pr.x + (pr.w - nw) * 0.5f,
+                               pr.y + pr.h + 4.0f, kCockpitNamePx, kCyan, /*bold=*/true);
+
+            // HP: barra (cockpit largura) + "hp/max" por cima, centrado.
+            const Rect hp = cockpit_hp_bar_rect();
+            draw_bar(renderer, hp, bar_fill(a->hp(), a->max_hp()), kHpFillColor);
+            char num[40];
+            std::snprintf(num, sizeof(num), "%d/%d", a->hp(), a->max_hp());
+            const float hw = gus::platform::render2d::text_width(num, kCockpitTextPx);
+            renderer.draw_text(num, hp.x + (hp.w - hw) * 0.5f,
+                               hp.y + (hp.h - kCockpitTextPx) * 0.5f, kCockpitTextPx,
+                               kInk, /*bold=*/false);
+
+            // AP pips (latao) + rotulo "AP".
+            const Vec2 apo = cockpit_ap_pips_origin();
+            renderer.draw_text("AP", apo.x, apo.y - kCockpitLabelPx - 1.0f,
+                               kCockpitLabelPx, kInkDim, /*bold=*/false);
+            draw_pips(renderer, apo.x + kCockpitResLabelW, apo.y, a->max_ap(), a->ap(),
+                      gus::domain::combat::combat_constants::kBaseApPerTurn,
+                      kApLitColor, kApOffColor);
+            // Mana pips (cyan) + rotulo "MANA".
+            const Vec2 mno = cockpit_mana_pips_origin();
+            renderer.draw_text("MANA", mno.x, mno.y - kCockpitLabelPx - 1.0f,
+                               kCockpitLabelPx, kInkDim, /*bold=*/false);
+            draw_pips(renderer, mno.x + kCockpitResLabelW, mno.y, a->max_mana(),
+                      a->mana(), gus::domain::combat::combat_constants::kManaCap,
+                      kManaLitColor, kManaOffColor);
+
+            // MENU de verbos EMPILHADO (so no turno de jogador vivo).
+            if (current_actor_is_player() && !combat_over()) {
+                const Rect mz = cockpit_menu_zone();
+                renderer.draw_text("ACAO", mz.x, mz.y - kCockpitLabelPx - 2.0f,
+                                   kCockpitLabelPx, kInkDim, /*bold=*/false);
+                const auto items = menu_.layout(mz);
+                for (int i = 0; i < kBattleVerbCount; ++i) {
+                    const MenuItem& it = items[static_cast<std::size_t>(i)];
+                    const bool sel = (i == menu_.selected_index());
+                    // Caixa do verbo (fundo escuro) + borda na cor do verbo.
+                    renderer.draw_filled_rect(
+                        it.rect, it.enabled ? kVerbBoxColor : kVerbDisabledColor);
+                    const DrawColor vc =
+                        it.enabled ? verb_color(it.verb, sel) : kInkDim;
+                    renderer.draw_rect_outline(it.rect, vc, sel ? 2.0f : 1.0f);
+                    // Nome do verbo (na cor do verbo), centrado vertical, margem esq.
+                    const std::string label = tr_verb_label(it.verb);
+                    const float ty = it.rect.y + (it.rect.h - kVerbTextPx) * 0.5f;
+                    renderer.draw_text(label.c_str(), it.rect.x + 6.0f, ty,
+                                       kVerbTextPx, vc, /*bold=*/sel);
+                }
+            }
+        }
+    }
+
+    // --- faixa da fila CTB (topo, a direita do cockpit; D4) ---
+    {
+        const Rect band{static_cast<float>(kRightZoneX), 0.0f,
+                        static_cast<float>(kBattleLogicalW - kRightZoneX),
+                        static_cast<float>(kCtbStripTop + kCtbStripH)};
         renderer.draw_filled_rect(band, kCtbBandColor);
 
         const CtbStrip strip = ctb_strip(queue_len());
@@ -797,44 +901,42 @@ void BattleScene::render(IRenderer& renderer, float viewport_px_w,
             } else if (!is_intro()) {
                 col = kBannerEnemyColor;
             }
-            // Faixa de fundo + texto centrado horizontalmente, logo abaixo da fila CTB.
-            const float by = static_cast<float>(kCtbStripTop + kCtbPortraitPx +
-                                                kCtbStripTop + 2);
-            const Rect band{0.0f, by, static_cast<float>(kBattleLogicalW),
-                            kBannerTextPx + 4.0f};
-            renderer.draw_filled_rect(band, kBannerBgColor);
-            const float tw = gus::platform::render2d::text_width(text, kBannerTextPx);
-            const float tx = (static_cast<float>(kBattleLogicalW) - tw) * 0.5f;
-            renderer.draw_text(text.c_str(), tx, by + 2.0f, kBannerTextPx, col,
+            // Banner na FAIXA PROPRIA do topo da arena (a direita do cockpit), centrado
+            // NESSE espaco - nao sobre os atores. Na abertura, sobe pro centro da arena.
+            const Rect bz = arena_banner_rect();
+            const float center_x = bz.x + bz.w * 0.5f;
+            const float by = is_intro() ? (static_cast<float>(kArenaTop) + 40.0f)
+                                        : (bz.y + (bz.h - kBannerTextPx) * 0.5f);
+            const float bigPx = is_intro() ? kBannerTextPx + 6.0f : kBannerTextPx;
+            const float tw = gus::platform::render2d::text_width(text, bigPx);
+            renderer.draw_text(text.c_str(), center_x - tw * 0.5f, by, bigPx, col,
                                /*bold=*/true);
 
-            // ABERTURA: prompt de input abaixo do "BATALHA!" (lider 2026-06-25). A luta so
-            // comeca quando o jogador ENCARA. "[Enter] Encarar" sempre; "[Q] Resolver sem
-            // encarar" so se oferecido (TRASH). Texto menor, centrado, sob o banner.
+            // ABERTURA: prompt de input abaixo do "BATALHA!" (lider). A luta so comeca
+            // quando o jogador ENCARA. "[Enter] Encarar" sempre; "[Q] Resolver sem
+            // encarar" so se oferecido (TRASH). Centrado na faixa da arena.
             if (is_intro()) {
-                float py = by + kBannerTextPx + 6.0f;
-                const auto draw_prompt = [&](const char* tr_key) {
+                float py = by + bigPx + 12.0f;
+                const auto draw_prompt = [&](const char* tr_key, DrawColor pc) {
                     const std::string t = translator_->tr(tr_key);
                     const float pw =
                         gus::platform::render2d::text_width(t, kPanelTextPx);
-                    const float px = (static_cast<float>(kBattleLogicalW) - pw) * 0.5f;
-                    renderer.draw_text(t.c_str(), px, py, kPanelTextPx,
-                                       kBannerPlayerColor, /*bold=*/false);
-                    py += kPanelTextPx + 4.0f;
+                    renderer.draw_text(t.c_str(), center_x - pw * 0.5f, py,
+                                       kPanelTextPx, pc, /*bold=*/false);
+                    py += kPanelTextPx + 6.0f;
                 };
-                draw_prompt("COMBAT_INTRO_ENCARAR");
+                draw_prompt("COMBAT_INTRO_ENCARAR", kCyan);  // Encarar = cyan (primary)
                 if (offers_auto_resolve()) {
-                    draw_prompt("COMBAT_INTRO_AUTORESOLVE");
+                    draw_prompt("COMBAT_INTRO_AUTORESOLVE", kInkDim);
                 }
             }
         }
     }
 
-    // --- arena: party (esquerda) e inimigos (direita), D2/D3 ---
+    // --- arena: party (esq-da-arena) e inimigos (dir), distribuidos space-around ---
     {
         const ArenaLayout arena =
             arena_layout(party_count(), enemy_count(), gus_party_index());
-        const CombatActor* active = active_actor();
 
         // Mapeia o slot da party/inimigo de volta pro ator (mesma ordem dos vivos) pra
         // saber QUEM e o ator ativo (highlight D7).
@@ -850,141 +952,74 @@ void BattleScene::render(IRenderer& renderer, float viewport_px_w,
         // Desenha um lado da arena: placeholder do ator + mini-barra de HP REAL sob ele
         // (incremento 2) + highlight se for o ativo (D7). A i-esima slot casa o i-esimo
         // ator vivo daquele lado (mesma ordem do layout/arena_layout).
+        // Ator na arena = RETRATO (placeholder; sprite de corpo depois). Moldura na cor
+        // do lado (cyan party / magenta inimigo), highlight cyan no ativo (D7/D9),
+        // mini-barra de HP (verde party / magenta inimigo via o body color), nome curto.
         auto draw_side = [&](int count, const auto& slots,
                              const std::vector<const CombatActor*>& alive,
-                             const DrawColor& body) {
+                             const DrawColor& side, const DrawColor& hp_fill,
+                             bool is_party) {
             for (int i = 0; i < count; ++i) {
                 const Rect& r = slots[static_cast<std::size_t>(i)].rect;
-                renderer.draw_filled_rect(r, body);
-                if (i < static_cast<int>(alive.size())) {
-                    const CombatActor* a = alive[static_cast<std::size_t>(i)];
-                    // Mini-barra de HP REAL sob o sprite (lida do motor).
-                    draw_bar(renderer, arena_hp_bar_frame(r),
-                             bar_fill(a->hp(), a->max_hp()), kHpFillColor);
-                    if (active != nullptr && a == active) {
-                        renderer.draw_rect_outline(r, kActiveHiColor, 2.0f);  // D7
+                if (i >= static_cast<int>(alive.size())) {
+                    continue;
+                }
+                const CombatActor* a = alive[static_cast<std::size_t>(i)];
+                // Retrato (ou slot escuro de fallback).
+                const TextureId tex = portraits_.find(a->id());
+                if (tex != kInvalidTexture) {
+                    renderer.draw_textured_rect(r, tex, UvRect{}, kWhite);
+                } else {
+                    renderer.draw_filled_rect(r, kSlotDarkColor);
+                }
+                // Moldura: ativo = cyan grossa; senao a cor do lado, fina.
+                const bool act = (active != nullptr && a == active);
+                renderer.draw_rect_outline(r, act ? kCyan : side, act ? 2.0f : 1.0f);
+                // Mini-barra de HP sob o ator.
+                const Rect hpbar = arena_hp_bar_frame(r);
+                draw_bar(renderer, hpbar, bar_fill(a->hp(), a->max_hp()), hp_fill);
+                // STATUSROW: icones de status do ator (sob a barra de HP), como no mock.
+                {
+                    float sx = r.x;
+                    const float sy = hpbar.y + hpbar.h + 2.0f;
+                    for (const auto& st : a->status_effects()) {
+                        const Rect sbox{sx, sy, static_cast<float>(kStatusIconSize),
+                                        static_cast<float>(kStatusIconSize)};
+                        const TextureId stex = status_icons_.find(st.id);
+                        if (stex != kInvalidTexture) {
+                            renderer.draw_textured_rect(sbox, stex, UvRect{}, kWhite);
+                        } else {
+                            renderer.draw_filled_rect(sbox, kStatusBoxColor);
+                        }
+                        sx += static_cast<float>(kStatusIconSize + kStatusIconGap);
+                        if (sx > r.x + r.w) {
+                            break;  // nao vaza a largura do slot
+                        }
                     }
-                    // INTENT (telegraph, incremento 5): icone sobre cada INIMIGO, lendo o
-                    // IntentPreview do ScriptedBrain (o que ele vai fazer). Sem icone
-                    // setado => marca ambar placeholder. So pra inimigos vivos.
-                    if (!a->is_player_side()) {
-                        const auto intent = intent_for(*a);
-                        if (intent.has_value()) {
-                            const Rect ibox{r.x + (r.w - kIntentIconSize) * 0.5f,
-                                            r.y - kIntentIconSize - 1.0f,
-                                            kIntentIconSize, kIntentIconSize};
-                            const TextureId itex = intent_icon_tex(
-                                intent_icons_, *intent);
-                            if (itex != kInvalidTexture) {
-                                renderer.draw_textured_rect(ibox, itex, UvRect{},
-                                                            kWhite);
-                            } else {
-                                renderer.draw_filled_rect(ibox, kIntentMarkColor);
-                            }
+                }
+                // INTENT sobre cada INIMIGO vivo (telegraph). Sem icone => marca magenta.
+                if (!is_party) {
+                    const auto intent = intent_for(*a);
+                    if (intent.has_value()) {
+                        const Rect ibox{r.x + (r.w - kIntentIconSize) * 0.5f,
+                                        r.y - kIntentIconSize - 2.0f,
+                                        kIntentIconSize, kIntentIconSize};
+                        const TextureId itex =
+                            intent_icon_tex(intent_icons_, *intent);
+                        if (itex != kInvalidTexture) {
+                            renderer.draw_textured_rect(ibox, itex, UvRect{}, kWhite);
+                        } else {
+                            renderer.draw_filled_rect(ibox, kMagentaDim);
+                            renderer.draw_rect_outline(ibox, kMagenta, 1.0f);
                         }
                     }
                 }
             }
         };
-        draw_side(arena.party_count, arena.party, alive_party, kPartyColor);
-        draw_side(arena.enemy_count, arena.enemies, alive_enemies, kEnemyColor);
-    }
-
-    // --- painel do ator ativo (base): DADOS REAIS do motor (incremento 2) ---
-    // FIX (lider no display): NAO renderiza na ABERTURA (is_intro). No hold de abertura o
-    // ator ativo e o 1o da fila por SPD (o inimigo Drone), entao o painel exibia os dados
-    // do INIMIGO e o menu nao aparecia ("quadro preto sem opcoes"). A abertura mostra so
-    // CTB + arena + banner + prompt; o painel/menu so aparecem DEPOIS de Encarar.
-    if (!is_intro()) {
-        const Rect p = active_panel_rect();
-        renderer.draw_filled_rect(p, kPanelColor);
-        renderer.draw_rect_outline(p, kHudBorderColor, 1.0f);
-
-        const CombatActor* a = active_actor();
-        if (a != nullptr) {
-            const float x = p.x + kPanelPad;
-            float y = p.y + kPanelPad;
-
-            // NUMEROS REAIS (incremento 3.5): texto complementa as barras/pips, nao as
-            // remove. Buffer pequeno; strings tecnicas de HUD (numero) nao passam por
-            // tr() (sao numerais universais).
-            char num[32];
-
-            // HP: barra + preenchimento real (hp/max_hp) + "hp/max" a direita da barra.
-            const Rect hp_frame{x, y, static_cast<float>(kHpBarW),
-                                static_cast<float>(kHpBarH)};
-            draw_bar(renderer, hp_frame, bar_fill(a->hp(), a->max_hp()),
-                     kHpFillColor);
-            std::snprintf(num, sizeof(num), "%d/%d", a->hp(), a->max_hp());
-            renderer.draw_text(num, x + kHpBarW + 4.0f,
-                               y + (kHpBarH - kPanelTextPx) * 0.5f, kPanelTextPx,
-                               kPanelTextColor, /*bold=*/false);
-            y += kHpBarH + kResourceRowGap;
-
-            // AP: pips (max_ap pips; ap acesos) + "AP n/m" apos os pips.
-            const int ap_max = gus::domain::combat::combat_constants::kBaseApPerTurn;
-            draw_pips(renderer, x, y, a->max_ap(), a->ap(), ap_max, kApLitColor,
-                      kApOffColor);
-            std::snprintf(num, sizeof(num), "AP %d/%d", a->ap(), a->max_ap());
-            renderer.draw_text(
-                num, x + static_cast<float>(ap_max) * (kPipSize + kPipGap) + 4.0f, y,
-                kPanelTextPx, kPanelTextColor, /*bold=*/false);
-            y += kPipSize + kResourceRowGap;
-
-            // Mana: pips (max_mana pips, cap kManaCap=8; mana acesos) + "Mana n/m". O
-            // ramp (max_mana = 2 + round_index, cap 8) ja esta no max_mana() do ator.
-            const int mana_cap = gus::domain::combat::combat_constants::kManaCap;
-            draw_pips(renderer, x, y, a->max_mana(), a->mana(), mana_cap, kManaLitColor,
-                      kManaOffColor);
-            std::snprintf(num, sizeof(num), "Mana %d/%d", a->mana(), a->max_mana());
-            renderer.draw_text(
-                num, x + static_cast<float>(mana_cap) * (kPipSize + kPipGap) + 4.0f, y,
-                kPanelTextPx, kPanelTextColor, /*bold=*/false);
-
-            // Status effects ATIVOS: 1 icone por efeito, na lateral direita do painel.
-            float sx = p.x + p.w - kPanelPad - kStatusIconSize;
-            const float sy = p.y + kPanelPad;
-            for (const auto& st : a->status_effects()) {
-                const Rect box{sx, sy, static_cast<float>(kStatusIconSize),
-                               static_cast<float>(kStatusIconSize)};
-                const TextureId tex = status_icons_.find(st.id);
-                if (tex != kInvalidTexture) {
-                    renderer.draw_textured_rect(box, tex, UvRect{}, kWhite);
-                } else {
-                    renderer.draw_filled_rect(box, kStatusBoxColor);  // placeholder
-                }
-                sx -= (kStatusIconSize + kStatusIconGap);  // empilha pra esquerda
-                if (sx < x + kHpBarW) {
-                    break;  // nao invade a area de HP/recursos
-                }
-            }
-
-            // --- menu de verbos comando-first (incremento 3) ---
-            // So no turno de JOGADOR vivo (CTB por-ator) e enquanto o combate roda. Ocupa
-            // a METADE DIREITA do painel, em coluna. Cada verbo = caixa colorida (sem set
-            // de icones de verbo); desabilitado (sem AP) = cinza; selecionado = borda.
-            if (current_actor_is_player() && !combat_over()) {
-                const Rect menu_zone{p.x + p.w * 0.5f, p.y, p.w * 0.5f, p.h};
-                const auto items = menu_.layout(menu_zone);
-                for (int i = 0; i < kBattleVerbCount; ++i) {
-                    const MenuItem& it = items[static_cast<std::size_t>(i)];
-                    const DrawColor col =
-                        it.enabled ? verb_color(it.verb) : kVerbDisabledColor;
-                    renderer.draw_filled_rect(it.rect, col);
-                    if (i == menu_.selected_index()) {
-                        renderer.draw_rect_outline(it.rect, kVerbSelectColor, 2.0f);
-                    }
-                    // ROTULO do verbo (incremento 3.5): NOME legivel via tr(), centrado
-                    // verticalmente na caixa, com pequena margem a esquerda. Resolve o
-                    // "injogavel" (caixa colorida sem nome). Sem translator => no-op
-                    // (draw_text degrada; a caixa colorida ainda orienta).
-                    const std::string label = tr_verb_label(it.verb);
-                    const float ty = it.rect.y + (it.rect.h - kVerbTextPx) * 0.5f;
-                    renderer.draw_text(label.c_str(), it.rect.x + 3.0f, ty,
-                                       kVerbTextPx, kVerbTextColor, /*bold=*/false);
-                }
-            }
-        }
+        draw_side(arena.party_count, arena.party, alive_party, kCyan, kHp,
+                  /*is_party=*/true);
+        draw_side(arena.enemy_count, arena.enemies, alive_enemies, kMagenta, kMagenta,
+                  /*is_party=*/false);
     }
 
     // --- caixa de log (base): ESTRUTURA por evento (D7), 1 marca colorida por linha ---

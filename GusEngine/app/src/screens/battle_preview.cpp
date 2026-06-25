@@ -29,8 +29,8 @@ namespace gus::app::screens {
 
 namespace {
 
-constexpr int kWindowW = 1280;  // 640x360 * 2 (escala inteira x2, D1)
-constexpr int kWindowH = 720;
+constexpr int kWindowW = 1920;  // 960x540 * 2 (escala inteira x2 = 1080p, D1)
+constexpr int kWindowH = 1080;
 
 std::string join(const std::string& a, const std::string& b) {
     if (a.empty()) {

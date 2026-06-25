@@ -126,7 +126,7 @@ public:
 
     // Desenha TEXTO (M5, incremento 3.5) na fonte monospace embarcada (Pixel Operator
     // Mono). pos (x,y) = canto superior-esquerdo da 1a celula, em coordenadas de MUNDO
-    // (na BattleScreen o mundo == px logico 640x360, entao e px de tela logico).
+    // (na BattleScreen o mundo == px logico 960x540, entao e px de tela logico).
     // px_size = altura da celula em unidades de mundo; o backend escala o glifo do atlas
     // (NEAREST, crisp). color tinge o glifo (alpha incluso). bold usa a face Bold
     // (enfase: criticos/sistema no log). Se a fonte nao carregou (headless/CI sem

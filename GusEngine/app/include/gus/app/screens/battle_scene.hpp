@@ -15,7 +15,7 @@
 // CombatStateMachine. A FSM/fila guardam ponteiros NAO-DONOS pros atores (mesmo padrao
 // do dominio). A ordem de declaracao garante que os atores sobrevivem a FSM.
 //
-// RENDER 1:1: o layout vive em PIXELS LOGICOS 640x360 (D1); o render dirige a camera do
+// RENDER 1:1: o layout vive em PIXELS LOGICOS 960x540 (D1); o render dirige a camera do
 // IRenderer EXATAMENTE pra esse retangulo (px_per_world_unit = 1), entao cada Rect de
 // layout vira um Rect de "mundo" identico. begin_frame recebe os PIXELS REAIS da janela
 // pro backend escalar por inteiro (pixel-perfect).
@@ -237,7 +237,7 @@ public:
 
     // Desenha o ESQUELETO da batalha (placeholders): fundo, arena (party/inimigos),
     // fila CTB, painel do ator ativo, log. viewport_px_w/h = PIXELS REAIS da janela
-    // (o backend escala 640x360 por inteiro). LE a contagem/ordem do motor.
+    // (o backend escala 960x540 por inteiro). LE a contagem/ordem do motor.
     void render(gus::platform::render2d::IRenderer& renderer, float viewport_px_w,
                 float viewport_px_h) const;
 

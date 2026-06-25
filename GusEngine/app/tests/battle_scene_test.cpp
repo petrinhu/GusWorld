@@ -16,6 +16,7 @@
 
 #include "gus/app/screens/battle_floaters.hpp"   // Floater/HitChannel
 #include "gus/app/screens/battle_hud_model.hpp"  // kHpBarW/kArenaHpBarH p/ casar rects
+#include "gus/app/screens/battle_layout.hpp"     // kBattleLogical*/kActorSlotW p/ rects
 #include "gus/app/screens/battle_log_model.hpp"  // LogLine/LogLineKind
 #include "gus/app/screens/battle_menu.hpp"       // BattleVerb
 #include "gus/app/screens/battle_pacing.hpp"     // PacingState/constantes
@@ -30,9 +31,17 @@ using gus::app::screens::kFloaterLifeSeconds;
 using gus::app::screens::kPacingAnnounceSeconds;
 using gus::app::screens::LogLineKind;
 using gus::app::screens::PacingState;
+using gus::app::screens::arena_rect;
+using gus::app::screens::cockpit_hp_bar_rect;
+using gus::app::screens::cockpit_menu_zone;
+using gus::app::screens::cockpit_rect;
 using gus::app::screens::kArenaHpBarH;
-using gus::app::screens::kHpBarH;
-using gus::app::screens::kHpBarW;
+using gus::app::screens::kActorSlotH;
+using gus::app::screens::kActorSlotW;
+using gus::app::screens::kBattleLogicalH;
+using gus::app::screens::kBattleLogicalW;
+using gus::app::screens::kCockpitW;
+using gus::app::screens::kPipSize;
 using gus::core::spatial::Rect;
 using gus::platform::render2d::ContentBbox;
 using gus::platform::render2d::DrawColor;
@@ -160,19 +169,19 @@ TEST_CASE("BattleScene acha o Gus na party pelo compilador universal",
     REQUIRE(gi < scene.party_count());
 }
 
-TEST_CASE("BattleScene::render abre/fecha 1 frame com camera logica 640x360",
+TEST_CASE("BattleScene::render abre/fecha 1 frame com camera logica 960x540",
           "[battle_scene]") {
     BattleScene scene;
     CountingRenderer r;
-    scene.render(r, /*viewport_px_w=*/1280.0f, /*viewport_px_h=*/720.0f);
+    scene.render(r, /*viewport_px_w=*/1920.0f, /*viewport_px_h=*/1080.0f);
     REQUIRE(r.begins == 1);
     REQUIRE(r.ends == 1);
-    // Camera 1:1 no retangulo logico 640x360.
-    REQUIRE(r.last_cam.w == 640.0f);
-    REQUIRE(r.last_cam.h == 360.0f);
-    // begin_frame recebeu os PIXELS REAIS da janela (pro backend escalar).
-    REQUIRE(r.last_pw == 1280);
-    REQUIRE(r.last_ph == 720);
+    // Camera 1:1 no retangulo logico 960x540 (D1, lider 2026-06-25).
+    REQUIRE(r.last_cam.w == static_cast<float>(kBattleLogicalW));
+    REQUIRE(r.last_cam.h == static_cast<float>(kBattleLogicalH));
+    // begin_frame recebeu os PIXELS REAIS da janela (pro backend escalar x2).
+    REQUIRE(r.last_pw == 1920);
+    REQUIRE(r.last_ph == 1080);
 }
 
 TEST_CASE("BattleScene::render desenha 1 placeholder por ator (esquerda x direita)",
@@ -185,13 +194,16 @@ TEST_CASE("BattleScene::render desenha 1 placeholder por ator (esquerda x direit
     REQUIRE(r.fills.size() >= 7);  // pelo menos um por ator
 
     // Atores: 3 na metade esquerda (party) e 4 na metade direita (inimigos). O slot tem
-    // LARGURA fixa (kActorSlotW=56) e ALTURA adaptativa (encolhe com +atores, FIX
-    // 2026-06-25). Conta os fills de largura 56 (so os slots de ator tem essa largura; a
-    // barra de HP da arena e inset=48, painel/log sao mais largos, CTB e 48).
+    // LARGURA e ALTURA FIXAS (kActorSlotW x kActorSlotH, sem escala dinamica - D3, 960x540
+    // lider 2026-06-25). Conta os fills de largura kActorSlotW (so os slots de ator tem
+    // essa largura; a barra de HP da arena e mais estreita, painel/log mais largos, CTB e
+    // 48).
+    const float mid_x = static_cast<float>(kBattleLogicalW) * 0.5f;
     auto count_actor_slots = [&](float x0, float x1) {
         int n = 0;
         for (const auto& f : r.fills) {
-            if (f.rect.w == 56.0f && f.rect.h >= 30.0f) {  // slot de ator (altura adaptativa)
+            if (f.rect.w == static_cast<float>(kActorSlotW) &&
+                f.rect.h == static_cast<float>(kActorSlotH)) {  // slot de ator (fixo)
                 const float cx = f.rect.x + f.rect.w * 0.5f;
                 if (cx >= x0 && cx < x1) {
                     ++n;
@@ -200,8 +212,8 @@ TEST_CASE("BattleScene::render desenha 1 placeholder por ator (esquerda x direit
         }
         return n;
     };
-    REQUIRE(count_actor_slots(0.0f, 320.0f) == 3);    // party esquerda
-    REQUIRE(count_actor_slots(320.0f, 640.0f) == 4);  // inimigos direita
+    REQUIRE(count_actor_slots(0.0f, mid_x) == 3);  // party esquerda
+    REQUIRE(count_actor_slots(mid_x, static_cast<float>(kBattleLogicalW)) == 4);  // inimigos
     (void)fills_in_x_band;  // helper disponivel pra evolucao do teste
 }
 
@@ -226,41 +238,39 @@ TEST_CASE("BattleScene::render headless degrada CTB pro retangulo (sem retratos)
 
 // ---- INCREMENTO 2: painel com dados reais + barras na arena + ativo na fila --------
 
-TEST_CASE("painel do ator ativo desenha a barra de HP (largura kHpBarW)",
+TEST_CASE("cockpit do ator ativo desenha a barra de HP (variante C)",
           "[battle_scene]") {
     BattleScene scene;
-    pump_to_player_turn(scene);  // o painel so renderiza FORA da abertura (apos Encarar)
+    pump_to_player_turn(scene);  // o cockpit so mostra dados FORA da abertura (pos-Encarar)
     CountingRenderer r;
-    scene.render(r, 640.0f, 360.0f);
-    // O painel emite uma barra de HP do tamanho kHpBarW x kHpBarH (fundo) + o fill.
-    // O fill tem a MESMA altura e largura <= kHpBarW (fracao do HP). Procuramos o
-    // FUNDO exato (kHpBarW x kHpBarH) na metade inferior da tela (y do painel).
-    bool found_panel_hp = false;
+    scene.render(r, 960.0f, 540.0f);
+    // O cockpit emite a barra de HP em cockpit_hp_bar_rect (fundo) + fill. Procuramos o
+    // FUNDO exato (largura/altura do cockpit_hp_bar) na coluna do cockpit (x pequeno).
+    const Rect hp = cockpit_hp_bar_rect();
+    bool found = false;
     for (const auto& f : r.fills) {
-        if (f.rect.w == static_cast<float>(kHpBarW) &&
-            f.rect.h == static_cast<float>(kHpBarH) && f.rect.y > 250.0f) {
-            found_panel_hp = true;
+        if (f.rect.w == hp.w && f.rect.h == hp.h && f.rect.x < kCockpitW) {
+            found = true;
         }
     }
-    REQUIRE(found_panel_hp);
+    REQUIRE(found);
 }
 
-TEST_CASE("painel desenha pips de AP e Mana do ator ativo (recursos reais)",
+TEST_CASE("cockpit desenha pips de AP e Mana do ator ativo (recursos reais)",
           "[battle_scene]") {
     BattleScene scene;
-    pump_to_player_turn(scene);  // o painel so renderiza na vez do jogador (apos Encarar)
-    // Na vez do jogador, o ator ativo tem AP=max_ap (3) e mana=max_mana (ramp). Logo ha
-    // pips desenhados (quadradinhos kPipSize) no painel.
+    pump_to_player_turn(scene);  // o cockpit so mostra na vez do jogador (pos-Encarar)
     REQUIRE(scene.active_actor() != nullptr);
     REQUIRE(scene.active_actor()->max_ap() == 3);
     REQUIRE(scene.active_actor()->ap() == 3);          // recarregado no begin_turn
     REQUIRE(scene.active_actor()->max_mana() >= 2);    // ramp >= base
     CountingRenderer r;
-    scene.render(r, 640.0f, 360.0f);
-    // Conta pips (7x7) no painel: AP (3) + Mana (max_mana) >= 5 quadradinhos.
+    scene.render(r, 960.0f, 540.0f);
+    // Pips (kPipSize x kPipSize) na coluna do cockpit (x < cockpit largura).
     int pips = 0;
     for (const auto& f : r.fills) {
-        if (f.rect.w == 7.0f && f.rect.h == 7.0f && f.rect.y > 250.0f) {
+        if (f.rect.w == static_cast<float>(kPipSize) &&
+            f.rect.h == static_cast<float>(kPipSize) && f.rect.x < kCockpitW) {
             ++pips;
         }
     }
@@ -486,30 +496,31 @@ TEST_CASE("log: render emite o TEXTO da message de cada linha notavel (incr 3.5)
     REQUIRE(log_marks >= 1);
 }
 
-TEST_CASE("painel: render emite os NUMEROS reais de HP/AP/Mana (incr 3.5)",
+TEST_CASE("cockpit: render emite os NUMEROS reais de HP + rotulos AP/MANA (variante C)",
           "[battle_scene]") {
     BattleScene scene;
-    pump_to_player_turn(scene);  // o painel so renderiza FORA da abertura (apos Encarar)
+    pump_to_player_turn(scene);  // o cockpit so mostra FORA da abertura (apos Encarar)
     const auto* a = scene.active_actor();
     REQUIRE(a != nullptr);
-    // O painel imprime "hp/max" do ator ativo (numero real lido do motor).
+    // O cockpit imprime "hp/max" do ator ativo (numero real lido do motor) sobre a barra,
+    // e os rotulos "AP"/"MANA" ao lado dos pips.
     char expected_hp[32];
     std::snprintf(expected_hp, sizeof(expected_hp), "%d/%d", a->hp(), a->max_hp());
 
     CountingRenderer r;
-    scene.render(r, 640.0f, 360.0f);
+    scene.render(r, 960.0f, 540.0f);
 
-    bool found_hp = false;
-    bool found_ap = false;
-    bool found_mana = false;
+    bool found_hp = false, found_ap = false, found_mana = false, found_name = false;
     for (const auto& t : r.texts) {
         if (t.text == expected_hp) found_hp = true;
-        if (t.text.rfind("AP ", 0) == 0) found_ap = true;
-        if (t.text.rfind("Mana ", 0) == 0) found_mana = true;
+        if (t.text == "AP") found_ap = true;
+        if (t.text == "MANA") found_mana = true;
+        if (t.text == a->display_name()) found_name = true;
     }
     REQUIRE(found_hp);
     REQUIRE(found_ap);
     REQUIRE(found_mana);
+    REQUIRE(found_name);  // nome do ator ativo no cockpit
 }
 
 TEST_CASE("menu: render emite o NOME (texto) de cada verbo quando ha translator",
@@ -517,16 +528,19 @@ TEST_CASE("menu: render emite o NOME (texto) de cada verbo quando ha translator"
     // Sem translator setado, tr_verb_label devolve "" e o render nao emite texto de
     // verbo - prova o fallback seguro. Com translator, emite os nomes.
     BattleScene scene_no_tr;
+    pump_to_player_turn(scene_no_tr);  // o menu so renderiza na vez do jogador (cockpit)
     CountingRenderer r0;
-    scene_no_tr.render(r0, 640.0f, 360.0f);
+    scene_no_tr.render(r0, 960.0f, 540.0f);
     int verb_texts_no_tr = 0;
+    const Rect mz = cockpit_menu_zone();
     for (const auto& t : r0.texts) {
-        // Zona do menu: metade direita do painel (x > 320), y do painel (~252..312).
-        if (t.x > 320.0f && t.y >= 252.0f && t.y < 314.0f && !t.text.empty()) {
+        // Zona do MENU: cockpit lateral esquerdo (x < cockpit), dentro da faixa do menu.
+        if (t.x < static_cast<float>(kCockpitW) && t.y >= mz.y &&
+            t.y <= mz.y + mz.h && !t.text.empty()) {
             ++verb_texts_no_tr;
         }
     }
-    REQUIRE(verb_texts_no_tr == 0);  // sem translator: caixas sem nome (fallback)
+    REQUIRE(verb_texts_no_tr == 0);  // sem translator: verbos sem nome (fallback)
 
     BattleScene scene;
     gus::app::i18n::Translator tr;
@@ -764,31 +778,32 @@ TEST_CASE("abertura: ESPERA o jogador ENCARAR (nao auto-avanca por tempo)",
 
 TEST_CASE("abertura REGRESSAO (UI): NAO renderiza painel/menu/log na abertura",
           "[battle_scene]") {
-    // BUG do lider no display: na abertura, o painel mostrava os dados do INIMIGO ativo,
-    // o menu nao aparecia e a caixa de log virava um "quadrao preto". Fix: nada de
-    // painel/menu/log na abertura - so CTB + arena + banner + prompt. Esta regressao
-    // trava: na abertura, ZERO barra de HP do painel (kHpBarW x kHpBarH) e ZERO pip do
-    // painel (7x7); apos ENCARAR, o painel aparece.
+    // BUG do lider: na abertura o cockpit nao deve expor os dados do INIMIGO ativo (1o da
+    // fila por SPD). Fix: o cockpit so mostra HP/AP/Mana/verbos FORA da abertura. Esta
+    // regressao trava: na abertura ZERO barra de HP do cockpit e ZERO pip; apos ENCARAR,
+    // aparecem. (A faixa do cockpit/log e desenhada sempre como fundo opaco - isso e ok;
+    // o que importa e nao mostrar os DADOS do inimigo na abertura.)
     BattleScene scene;
     gus::app::i18n::Translator tr;
     tr.load_from_content(
         "## COMBAT_BANNER_BATTLE\nBATALHA!\n\n## COMBAT_INTRO_ENCARAR\n[Enter] Encarar\n");
     scene.set_translator(&tr);
     REQUIRE(scene.is_intro());
+    const Rect hp = cockpit_hp_bar_rect();
     CountingRenderer r0;
-    scene.render(r0, 640.0f, 360.0f);
-    int panel_hp = 0, panel_pips = 0;
+    scene.render(r0, 960.0f, 540.0f);
+    int cockpit_hp = 0, cockpit_pips = 0;
     for (const auto& f : r0.fills) {
-        if (f.rect.w == static_cast<float>(kHpBarW) &&
-            f.rect.h == static_cast<float>(kHpBarH)) {
-            ++panel_hp;  // barra de HP do painel
+        if (f.rect.w == hp.w && f.rect.h == hp.h && f.rect.x < kCockpitW) {
+            ++cockpit_hp;  // barra de HP do cockpit
         }
-        if (f.rect.w == 7.0f && f.rect.h == 7.0f && f.rect.y > 250.0f) {
-            ++panel_pips;  // pip de AP/Mana do painel
+        if (f.rect.w == static_cast<float>(kPipSize) &&
+            f.rect.h == static_cast<float>(kPipSize) && f.rect.x < kCockpitW) {
+            ++cockpit_pips;  // pip de AP/Mana do cockpit
         }
     }
-    REQUIRE(panel_hp == 0);    // sem painel na abertura (nao expoe o inimigo)
-    REQUIRE(panel_pips == 0);  // sem pips de recurso na abertura
+    REQUIRE(cockpit_hp == 0);    // sem dados do ator na abertura (nao expoe o inimigo)
+    REQUIRE(cockpit_pips == 0);
     // Mas o banner "BATALHA!" + prompt aparecem (texto na abertura).
     bool has_intro_text = false;
     for (const auto& t : r0.texts) {
@@ -798,19 +813,18 @@ TEST_CASE("abertura REGRESSAO (UI): NAO renderiza painel/menu/log na abertura",
     }
     REQUIRE(has_intro_text);
 
-    // ENCARAR: agora o painel aparece (barra de HP do painel renderizada).
+    // ENCARAR: agora o cockpit mostra a barra de HP do ator ativo.
     scene.start_combat();
     pump_to_player_turn(scene);
     CountingRenderer r1;
-    scene.render(r1, 640.0f, 360.0f);
-    bool panel_now = false;
+    scene.render(r1, 960.0f, 540.0f);
+    bool cockpit_now = false;
     for (const auto& f : r1.fills) {
-        if (f.rect.w == static_cast<float>(kHpBarW) &&
-            f.rect.h == static_cast<float>(kHpBarH)) {
-            panel_now = true;
+        if (f.rect.w == hp.w && f.rect.h == hp.h && f.rect.x < kCockpitW) {
+            cockpit_now = true;
         }
     }
-    REQUIRE(panel_now);  // painel aparece DEPOIS de Encarar
+    REQUIRE(cockpit_now);  // cockpit aparece DEPOIS de Encarar
 }
 
 TEST_CASE("abertura: skip NAO comeca a luta (so Encarar/start_combat)",

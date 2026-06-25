@@ -85,11 +85,13 @@ FSM por-ator. Cada ator (party ou inimigo) toma seu turno na ordem da fila de in
 
 ### Notas de transição
 
-- `SetupPhase → TurnStart`: a fila já está ordenada por SPD; o primeiro ator entra.
+- `SetupPhase → TurnStart`: a fila já está ordenada por SPD; o primeiro ator entra. A SPD também decide qual LADO abre a rodada (party-block ou enemy-block), ver §4.1 (Janela de Comando da Party, modelo 1B).
 - `TurnStart → ActionSelect`: mana e AP do ator são preparados ANTES da seleção.
 - `ActionSelect ⇄ ActionResolve`: laço interno. Cada ação custa AP. Quando `AP == 0` ou o ator escolhe "passar", sai do laço.
-- `TurnEnd → CheckEnd → TurnStart`: avança para o próximo ator na fila. `turnoIndex` é por rodada completa de fila (afeta o ramp de mana de forma consistente entre todos).
+- `TurnEnd → CheckEnd → TurnStart`: avança para o próximo ator. Quando o ator era da party, o "próximo" é escolhido pelo jogador dentro do bloco da party (comando livre, §4.1); quando era inimigo, segue a ordem de SPD entre inimigos. `turnoIndex` é por rodada completa de fila (afeta o ramp de mana de forma consistente entre todos).
 - Qualquer ator que chega a HP 0 é resolvido conforme regra de morte/incapacitação (companions incapacitados, Pillar 4; inimigos removidos da fila).
+
+> **Modelo de seleção de ator (canon 2026-06-25, decisão do criador via AskUserQuestion, modelo 1B).** A FORMA da FSM acima NÃO muda. O que muda é a regra de QUEM entra em `ActionSelect` quando é a vez da party: em vez de forçar o topo da fila, o motor expõe os membros-da-party-elegíveis-na-rodada e o jogador escolhe qual age, em que ordem, com qual ação e qual alvo (comando livre estilo Final Fantasy clássico). A SPD deixa de microgerenciar a ordem DENTRO da party, mas continua decidindo qual lado abre a rodada e segue valendo para Haste/Slow, Gambito-Reordenar, ambientes-SPD (§18) e o item de iniciativa. Detalhe completo + nota técnica em §4.1.
 
 ---
 
@@ -105,6 +107,82 @@ Move um ator `deltaPosicao` casas na fila (negativo = adiantar, positivo = atras
 - Knockback (status, ver §9) tipicamente chama `ReorderActor(alvo, +1)`.
 - Gambito-reordenar (2 AP) chama `ReorderActor(alvo, +deltaUpgradavel)`.
 - A fila é recomputada por SPD apenas na entrada de novos atores ou em mudança de SPD (Haste/Slow); reordenações manuais persistem até a próxima recomputação natural.
+
+---
+
+## 4.1 Janela de Comando da Party (comando livre sobre o CTB, modelo 1B)
+
+**Status:** canonizado pelo criador supremo em 2026-06-25 (decisão D1/D2 via AskUserQuestion). Substitui o "agir só com o ator do topo da fila" pelo comando LIVRE da party dentro do seu bloco, mantendo o CTB por SPD como esqueleto. O criador ACEITOU o contra-argumento do lead-game-designer: SPD NÃO vira pura sugestão; continua sendo um stat de build que decide o que importa.
+
+### Conceito
+
+A ordem de turno continua sendo o CTB por SPD (§4). A mudança é a fantasia de comando: quando chega a vez da party, o jogador comanda o BLOCO da party na ordem que quiser (escolhe qual membro age, em que ordem, qual ação e qual alvo de cada um), em vez de ser forçado a agir só com o ator do topo. É o feel Final Fantasy clássico / Dragon Quest (comando de bloco por lado).
+
+- **SPD = pré-seleção sugerida** dentro do bloco: ao abrir a Janela, o membro com maior SPD entre os ainda-não-agiram fica pré-selecionado, mas o jogador pode escolher qualquer um.
+- **SPD = quem ABRE a rodada:** a SPD do lado decide se o party-block ou o enemy-block joga primeiro na rodada. É aqui que o stat SPD preserva peso real (o inimigo rápido ainda te pega primeiro).
+
+### Fluxo de rodada (modelo 1B)
+
+```
+RODADA = uma volta completa da fila CTB (turnoIndex / RoundIndex, igual antes).
+
+1. SetupPhase / início de rodada: a fila é ordenada por SPD e os atores são
+   agrupados por LADO. A SPD comparada entre os lados decide quem abre:
+   party-block primeiro OU enemy-block primeiro.
+
+2. JANELA DE COMANDO DA PARTY (quando é a vez do bloco da party):
+   - Membros vivos da party que ainda não agiram nesta rodada ficam elegíveis.
+   - Pré-selecionado = o de maior SPD entre os elegíveis (sugestão, não trava).
+   - O jogador escolhe QUAL membro age -> entra no loop de AP normal (ActionSelect,
+     3 AP, §5): Scan / Gambito / Atacar / Defender / COMPILAR / Flee / passar, com
+     ALVO escolhido (modo-mira, battle-screen §3.5).
+   - Resolve a ação imediatamente (feedback na hora, pacing battle-screen §5.2).
+   - Repete até todos os membros da party terem agido nesta rodada.
+
+3. BLOCO DOS INIMIGOS: agem na ordem de SPD entre eles (ScriptedBrain / UtilityBrain,
+   §13; AP por tier §13.1). O PacingDirector itera por-ação (battle-screen §5.2 D8-D12).
+
+4. CheckEnd -> próxima rodada (recomputa quem abre por SPD).
+```
+
+A rodada é, portanto, "um lado age todo, depois o outro", com a SPD decidindo a ordem dos lados. Dentro do bloco da party o comando é 100% livre; dentro do bloco inimigo a ordem segue SPD (IA).
+
+### Impacto nos sistemas canônicos (todos PRESERVADOS em 1B)
+
+| Sistema | Efeito em 1B |
+|---|---|
+| **Fila CTB (§4)** | Preservada. Continua a estrutura, reagrupada por lado/rodada via SPD. A faixa visível (battle-screen §2) segue mecânica, não cosmética. |
+| **Gambito-Reordenar (§12, `ReorderActor`)** | Preservado e mais valioso. Empurrar um inimigo o atrasa para a rodada seguinte ou adia a abertura do enemy-block; puxar um aliado para frente afeta a ordem entre os lados. |
+| **Gambito-Prever (§12, `IntentPreview`)** | Preservado e mais valioso. O jogador lê o intent e ordena a party para responder (proteger o Gus, focar quem vai bater). |
+| **AP por ator (§5)** | Intacto. Cada membro mantém seus 3 AP independentes; o loop interno de `ActionSelect` não muda. Só muda QUEM o jogador seleciona para entrar nele. |
+| **Iniciativa / SetupPhase (§3)** | Estendida: passa a calcular qual lado abre (comparação de SPD entre os lados). |
+| **Cast-time / cartas lentas (CARTAS-CAST-TIME, INBOX)** | Preservado (D4). Como 1B mantém a fila, a carta lenta segue resolvendo posições à frente na fila/rodada; o Gambito ainda a vê e pode proteger/reordenar. |
+| **Haste / Slow (§9/§18)** | Preservados: mexem na SPD, logo em quem abre a rodada e na posição na fila. Continuam decisões táticas reais. |
+| **Ambientes que mexem SPD/fila (§18: T8 Elevação "1º a agir", T2 Talude, Aurora, Gelo)** | Preservados: o "1º da fila/rodada" continua definido por SPD. |
+| **ITEM-SPD-INICIATIVA (INBOX)** | Preservado e justificado: usar o item aumenta SPD e faz o party-block abrir a rodada. O item ganha razão de existir exatamente por causa de 1B. |
+| **IA / AP por tier (§13.1)** | Intacto. Inimigos agem em bloco por SPD; o PacingDirector já itera por-ação (2 beats por inimigo). |
+| **Auto-resolve / AutoResolveBrain (§19)** | Intacto. Roda a FSM headless; comando livre é seleção de ator na apresentação, não muda o headless (o AutoResolveBrain já decide ações sozinho). |
+| **Análise Preditiva / fragilidade do Gus (§2.1)** | Intacta. Bônus: comando livre deixa o jogador proteger melhor o Gus frágil (coerente com Pillar 4). |
+| **Fórmula de dano (§11)** | NÃO muda. Comando livre não toca a resolução de ação, só a seleção de ator. |
+
+### Por que SPD continua sendo um stat com peso (preservação do equilíbrio)
+
+O comando livre tira do SPD apenas o microgerenciamento da ordem DENTRO da party (a parte que o criador quis libertar). O SPD continua decidindo o que importa: (a) qual lado abre a rodada (o inimigo rápido te pega primeiro); (b) o membro pré-selecionado ao abrir a Janela; (c) o alvo/efeito de Gambito-Reordenar, Haste/Slow e ambientes; (d) o valor do item de iniciativa. Um stat que não decide nada seria decoração (viola "tensão > complexidade"); 1B impede isso.
+
+### Bônus de iniciativa (PENDENTE de playtest, D5)
+
+Opcional, decidido depois com dados: o lado que abre a rodada por SPD poderia ganhar um pequeno bônus tático (ex.: na linha do T8 Elevação, que já dá Haste ao 1º da fila), reforçando que correr na frente vale sem ser dominante. Registrado como pendência; não entra agora. Mede-se em playtest.
+
+### Nota técnica para o backend-engineer (mudança mínima, FSM e §11 NÃO mudam)
+
+A implementação é uma extensão ADITIVA ao `CombatStateMachine`. A auditoria do motor permanece válida porque a FORMA da FSM e a fórmula de dano (§11) não mudam; muda a seleção de ator, não a resolução de ação. Os testes de transição existentes continuam passando (forçar o topo é o caso particular de o conjunto elegível ter 1 elemento).
+
+- **Campo novo no estado:** `PendingPartyActors` (membros vivos da party que ainda não agiram NESTA rodada). Análogo do lado inimigo já é coberto pela fila por SPD.
+- **`ActionSelect`:** quando o lado ativo é a party, consulta `PendingPartyActors` (membros elegíveis) em vez de só `fila.Peek()`. O jogador escolhe qual entra no loop de AP; o pré-selecionado é o de maior SPD entre os elegíveis.
+- **`SetupPhase` / início de rodada:** agrupa a fila por lado e compara SPD para decidir quem abre (party-block ou enemy-block). É reordenação da fila já existente, não reescrita do loop.
+- **`CheckEnd` / avanço:** marca o ator escolhido como "já agiu nesta rodada" (em vez de `Dequeue` cego) e, quando o party-block esvazia, passa para o enemy-block (ou inicia nova rodada). Recomputa quem abre por SPD na nova rodada.
+- **Determinismo preservado:** a ordem de consumo do RNG (§11) não muda; a seleção de ator é input de jogador (ou do AutoResolveBrain headless), não consome RNG.
+- **Escopo (D6):** o target selection (modo-mira, zero motor, battle-screen §3.5) entra JÁ; a Janela de Comando da Party (extensão do motor acima) entra logo após, briefada ao backend-engineer + gameplay_engineer.
 
 ---
 
@@ -1064,4 +1142,4 @@ O contraste `-O0` (pulou) vs `-O2` (encarou e otimizou) é o feedback diegético
 
 ---
 
-**Última revisão:** 2026-06-25 (§19 Resolver sem encarar + auto-kill, eixo de domínio). Nova seção canoniza a mecânica opt-in de pular combate de Trash (Opção 1B + abertura-espera-input), o cálculo via FSM headless com `AutoResolveBrain` sub-ótima (Opção 2C), a tematização `-O0`/`-O2` no terminal (D-C), o toggle de HUD de 3 estados (Opção 4B), escopo só-Trash (Opção 5A), rótulo de risco baixo/médio/alto com aviso de Hospital no alto (Opção 6A), o gate de onboarding em Bronze, e o princípio "pular nunca é a jogada ótima contra trash não-dominado". Parâmetros econômicos (x/y por selo, faixas de P-derrota) em `economia.md` (economy-designer, paralelo). Revisão anterior 2026-06-22 (M5-DMG). §11 evoluída: sorteio único de canal FALHA/CRIT/COMUM sobre a variância Knowledge preservada; FALHA decai com a maestria (`round(5 × e^(-kills × 0.50))`, 0% a partir de 5 kills); CRIT com piso global 5% elevável por `card.CritChance`, dano = `round(danoBase × (1+v) × 1.5)`; imunidade `multFraqueza==0` em curto-circuito antes do RNG; ordem de consumo do RNG documentada (1 sorteio de canal, +1 só no COMUM); RNG via porta `IRandomSource` (ADR-006, domínio puro); §7 `CritChance` redefinido como piso por carta. A §11 deixa de ser paridade com o C# (que morre no M8); o motor C++ segue esta §11. Revisão anterior 2026-06-03 (D.1+N.2 Sprint 1 W2): HP +60% Trash 34→55 / Elite 89→144; AP e Mana por-ator CTB (§5); §2.1 contrato fragilidade Gus (N.2 R1, one-way door); §10 feedback ERRO DE COMPILAÇÃO (N.2 R2); §12/§13/§15 caos Perlin exclusivo Patch-Zero (N.2 R3, one-way door); §17 stats de referência pós-inflação + roda de fraqueza confirmada. Revisão 2026-05-26: §18 ambientes de combate, §11 multAmbiente + stacking 3 camadas, escopo slice item 15. Status: canônico, pronto para implementação TDD F2-E.5.
+**Última revisão:** 2026-06-25 (§4.1 Janela de Comando da Party, modelo 1B: comando livre da party dentro do bloco com SPD decidindo qual lado abre a rodada; decisão D1/D2 do criador via AskUserQuestion; criador aceitou o contra-argumento de preservar o SPD como stat; FSM e §11 não mudam, extensão aditiva `PendingPartyActors`; sistemas fila/Gambito/AP/Haste-Slow/ambientes-SPD/cast-time/auto-resolve/ITEM-SPD todos preservados; bônus de iniciativa pendente de playtest D5; target selection entra já, comando-livre-sobre-o-CTB logo após D6). Revisão anterior nesta data: §19 Resolver sem encarar + auto-kill, eixo de domínio. Nova seção canoniza a mecânica opt-in de pular combate de Trash (Opção 1B + abertura-espera-input), o cálculo via FSM headless com `AutoResolveBrain` sub-ótima (Opção 2C), a tematização `-O0`/`-O2` no terminal (D-C), o toggle de HUD de 3 estados (Opção 4B), escopo só-Trash (Opção 5A), rótulo de risco baixo/médio/alto com aviso de Hospital no alto (Opção 6A), o gate de onboarding em Bronze, e o princípio "pular nunca é a jogada ótima contra trash não-dominado". Parâmetros econômicos (x/y por selo, faixas de P-derrota) em `economia.md` (economy-designer, paralelo). Revisão anterior 2026-06-22 (M5-DMG). §11 evoluída: sorteio único de canal FALHA/CRIT/COMUM sobre a variância Knowledge preservada; FALHA decai com a maestria (`round(5 × e^(-kills × 0.50))`, 0% a partir de 5 kills); CRIT com piso global 5% elevável por `card.CritChance`, dano = `round(danoBase × (1+v) × 1.5)`; imunidade `multFraqueza==0` em curto-circuito antes do RNG; ordem de consumo do RNG documentada (1 sorteio de canal, +1 só no COMUM); RNG via porta `IRandomSource` (ADR-006, domínio puro); §7 `CritChance` redefinido como piso por carta. A §11 deixa de ser paridade com o C# (que morre no M8); o motor C++ segue esta §11. Revisão anterior 2026-06-03 (D.1+N.2 Sprint 1 W2): HP +60% Trash 34→55 / Elite 89→144; AP e Mana por-ator CTB (§5); §2.1 contrato fragilidade Gus (N.2 R1, one-way door); §10 feedback ERRO DE COMPILAÇÃO (N.2 R2); §12/§13/§15 caos Perlin exclusivo Patch-Zero (N.2 R3, one-way door); §17 stats de referência pós-inflação + roda de fraqueza confirmada. Revisão 2026-05-26: §18 ambientes de combate, §11 multAmbiente + stacking 3 camadas, escopo slice item 15. Status: canônico, pronto para implementação TDD F2-E.5.

@@ -1,6 +1,6 @@
 # Tela de Batalha (BattleScreen): Design de Apresentacao
 
-**Status:** Decisoes macro ratificadas pelo criador supremo em 2026-06-23 (brainstorm colaborativo, 5 perguntas via AskUserQuestion). Spec de APRESENTACAO do combate; o motor e as regras vivem em [`combat.md`](combat.md) (canonico, fechado, nao reaberto aqui). Implementacao no M5 (BattleScreen) da engine C++20 + SDL3.
+**Status:** Decisoes macro ratificadas pelo criador supremo em 2026-06-23 (brainstorm colaborativo, 5 perguntas via AskUserQuestion). Spec de APRESENTACAO do combate; o motor e as regras vivem em [`combat.md`](combat.md) (canonico, fechado, nao reaberto aqui). Implementacao no M5 (BattleScreen) da engine C++20 + SDL3. **Atualizacao 2026-06-25 (comando livre):** §3.5 modo-mira / target selection (D3) integrado ao menu de verbos; o painel do ator ativo e a faixa de fila refletem o comando livre da party (combat.md §4.1, modelo 1B).
 
 **Convencao de escrita:** pt-br. Termos de game-dev no original. Sem em-dash; usa ponto, virgula, parenteses, dois-pontos.
 
@@ -20,39 +20,44 @@
 
 ---
 
-## 2. Layout consolidado (mockup)
+## 2. Layout consolidado - "Tatico Cockpit" (variante C, aprovada pelo criador 2026-06-25)
+
+Apos 3 variantes mockadas (A compacto / B cinematografico / C tatico), o criador aprovou a **variante C "Tatico Cockpit"**. O painel do ator ativo deixou o rodape e virou um COCKPIT lateral esquerdo; a arena ocupa o resto. Resolucao logica **960x540** (16:9, escala inteira). Mock canonico: `scratchpad/battle_mock/variante_C_tatico.html` + `_common.css`.
 
 ```
-+------------------------------------------------------+
-| FILA CTB:  > Gus   > [i]   > Caua   > [i]   > Jaci .. |   topo: ordem de turno (Gambito mexe aqui)
-+------------------------------------------------------+
-|                                                      |
-|  [Gus >]                      (espada 12 ->Gus) [i<] |   arena side-view:
-|                                                      |   party a ESQ (pose leste)
-|  [Caua >]             (escudo)                  [i<] |   inimigos a DIR (pose oeste)
-|                                                      |   icone de intent sobre cada inimigo
-|  [Jaci >]                     (gota veneno)     [i<] |
-|                         -45 [CRITICO]                |   numero de dano flutua sobre o alvo
-+------------------------------------------------------+
-| > TURNO: Gus     HP||||||   AP:3   Mana:5            |   painel do ator ativo
-|   [Scan] [Gambito] [Atacar] [Defender] [COMPILAR] [Flee]
-|------------------------------------------------------|
-| LOG:  > COMPILADO: Descarga Tripla                   |   caixa de log (mensagens de sistema)
-|       > inimigo sofre 45  [CRITICO]                  |
-+------------------------------------------------------+
-
-ao escolher [COMPILAR], abre POR CIMA (overlay):
-   mao (leque):  [carta] [carta] [carta] [carta] [carta]
-   pipeline:     [ slot 1 ] [ slot 2 ] [ slot 3 ]   -> COMPILADO: <combo>
++--------+----------------------------------------------+
+| COCKPIT|  FILA CTB:  > Gus  [i]  Caua  [i]  Jaci  +2  |   topo (a dir do cockpit)
+| retrato|----------------------------------------------|
+|  GRANDE|             VEZ DE GUS                       |   banner em FAIXA PROPRIA
+|  GUS   |          SUA VEZ: escolha uma acao           |   (nao sobre os atores)
+|        |----------------------------------------------|
+| HP ====| [Gus]                              [i] intent|   arena: party a ESQ-da-arena,
+| AP ooo | [Caua]                  -45 CRIT   [i]       |   inimigos a DIR, atores
+| MANA   | [Jaci] (status)                    [i]       |   DISTRIBUIDOS (space-around),
+|        |                                    [i]       |   intent sobre cada inimigo,
+| ACAO   |                                              |   floater sobre o alvo
+| [Scan] |                                              |
+| [Gamb] |----------------------------------------------|
+| [Atac]<| TERMINAL                                     |   log fino no rodape
+| [Defe] | COMPILADO: Descarga Tripla  Caua ataca: 25  |
+| COMPIL | Drone sofre 45 [CRIT]  Jaci recebe Regen     |
+| [Fugir]| > Vez de Gus_                                |
++--------+----------------------------------------------+
 ```
 
-### Zonas da tela
+### Zonas da tela (variante C)
 
-- **Topo, faixa horizontal:** fila de iniciativa CTB (proximos N atores, ordem esquerda->direita). E mecanica, nao cosmetico (o Gambito-Reordenar opera nela). Mostra retratos pequenos + marca de "proximo".
-- **Centro, arena:** atores em side-view. Party (ate 3) a esquerda; inimigos (1 a 4) a direita. Sobre cada inimigo, o icone de intent. Sobre o alvo de um golpe, o numero de dano flutuante.
-- **Base, painel do ator ativo:** so do ator cujo turno e (CTB por-ator). HP, AP (3), Mana (ramp), status effects, e o menu de verbos.
-- **Base, caixa de log:** mensagens de sistema (COMPILADO, ERRO DE COMPILACAO, ANALISE PREDITIVA, FALHA/CRIT) + historico curto.
-- **Overlay de compilacao:** so visivel ao escolher COMPILAR. Leque da mao + pipeline de 3 slots.
+- **Cockpit lateral ESQUERDO (~174px, ~1/4 da largura):** o painel do ator ativo + o menu de verbos, empilhados verticalmente como um cockpit. De cima pra baixo: retrato GRANDE (64px) + nome + barra de HP (com numero) + pips de AP (latao) e Mana (cyan) + os 6 verbos EMPILHADOS (Scan/Gambito/Atacar/Defender/COMPILAR/Fugir). E onde o jogador comanda. So mostra dados FORA da abertura (na abertura o ativo e o 1o da fila por SPD = inimigo; o cockpit fica sem dados).
+- **Topo da arena, faixa horizontal:** fila de iniciativa CTB (5 proximos, retrato 48px + marca de "proximo"), a direita do cockpit.
+- **Faixa PROPRIA do banner:** "VEZ DE <nome>" / "BATALHA!" numa faixa reservada ACIMA dos atores (nao invade ninguem).
+- **Arena central-direita:** party (ate 3) numa coluna a esquerda-da-arena, inimigos (1 a 4) numa coluna a direita, atores DISTRIBUIDOS com espaco proprio (space-around vertical, cada um na sua faixa, ~54px). Por ora os atores sao RETRATOS (placeholder; sprites de corpo animados num passo futuro - decisao do criador "testar com retratos, animacoes depois"). Gus na arena usa `retrato_gus_combate.png`. Intent flutuante sobre cada inimigo; floater de dano sobre o alvo; mini-barra de HP + statusrow sob cada ator.
+- **Terminal/log fino no rodape:** mensagens narradas (COMPILADO/ERRO/dano/cura) com cor por categoria. So aparece FORA da abertura.
+
+### Paleta canonica (variante C, HEX exatos - o criador AMOU as cores)
+
+Fundo `#0c0f1a`; cockpit gradiente `#1B2238`->`#141a2c`; terminal `#0e1322`; slot escuro `#0a0d16`. **CYAN** (party / ativo / mira / CRIT / banner) `#22D3EE` (dim `#155e6b`); **MAGENTA** hostil (inimigo / intent) `#E11D74` (dim `#5c1230`); **LATAO** (Compilar / AP / fraqueza) `#E8A33D`; **VERDE HP** `#3FB97A` (dim `#1d5c3c`); **ERRO/FALHA** `#F43F5E`; tinta `#cfe6ee`, tinta-dim `#6f8593`; borda `#2a3450`. Verbos: neutros fundo `#10172a` borda `#2a3450`; Atacar(selecionado)=cyan; Compilar=latao; pips AP=latao, Mana=cyan. (Embarcada em `battle_scene.cpp` como constantes `kCyan/kMagenta/...`.)
+
+- **Overlay de compilacao:** so visivel ao escolher COMPILAR. Leque da mao + pipeline de 3 slots (incremento futuro).
 
 ---
 
@@ -137,6 +142,46 @@ Os atores na arena side-view sao **sprites 2D puros**, gerados direto no **Pixel
 
 ---
 
+## 3.5 Modo-mira / target selection (D-nova, canon 2026-06-25)
+
+Decidido pelo criador supremo via AskUserQuestion (D3). Integra a escolha de ALVO ao menu de verbos comando-first (par.1, decisao 3). E APRESENTACAO pura: o motor (domain/combat) ja recebe o alvo na acao (a roda de fraqueza e a formula §11 ja usam o alvo); a tela so deixa o jogador navegar e confirmar. Zero mudanca no motor (entra JA, antes da Janela de Comando da Party, combat.md §4.1 / decisao D6).
+
+### Fluxo (encaixado no menu de verbos)
+
+```
+Menu do membro selecionado: [Scan] [Gambito] [Atacar] [Defender] [COMPILAR] [Flee]
+
+[Atacar]  -> entra em MODO-MIRA:
+   - cursor/seta sobre o inimigo SUGERIDO por default (regra D3 abaixo)
+   - jogador navega entre inimigos vivos (setas / clique / toque / D-pad)
+   - cada inimigo mirado mostra HP e, se ja escaneado, o tier de fraqueza vs a acao
+     (fraco 1.5 / neutro 1.0 / resistente 0.66 / imune 0.0 = combat.md §6, ja previsto no par.3)
+   - confirma (Enter / clique) -> resolve
+   - cancela (Esc / voltar) -> volta ao menu de verbos
+
+[COMPILAR] -> o alvo segue o TargetShape da carta/pipeline:
+   - Single -> a mesma mira de inimigo
+   - Linha / Area3x3 / Grupo -> mira o ponto/grupo; o preview destaca quem sera atingido
+   - Self -> sem mira
+
+[Gambito-Reordenar] / [Null] -> mira o inimigo-alvo (Null exige Scan previo, combat.md §8)
+```
+
+### Alvo sugerido por default (D3: opcao (d) com fallback (b))
+
+Ao abrir o modo-mira para uma acao ofensiva, a pre-selecao segue, nesta ordem:
+
+1. **Se o inimigo ja foi escaneado:** pre-seleciona o inimigo FRACO a familia da acao atual (multFraqueza 1.5). Premia o Scan (Pillar 1: informacao habilita acao); a mira ja "aponta para a jogada certa" para quem investiu em ler o inimigo.
+2. **Sem Scan (fallback):** pre-seleciona o inimigo mais A FRENTE na fila (o que vai agir antes), reduzindo o dano que a party vai tomar.
+
+A pre-selecao e sempre apenas sugestao: a mira e 100% navegavel, o jogador escolhe qualquer inimigo vivo. Coerente com a filosofia do comando livre (combat.md §4.1): o sistema sugere a jogada otima por SPD/Scan, mas a decisao e do jogador.
+
+### Acessibilidade (Pillar 4 / WCAG)
+
+A mira e navegavel por teclado e controller, nao so mouse (mesmo principio tap-to-place do par.3.2). O inimigo mirado tem destaque multimodal (contorno + seta + nome/HP no painel), nunca so cor (daltonismo).
+
+---
+
 ## 4. Escopo do M5 (vertical slice) vs depois
 
 ### M5 entrega (a tela jogavel do combate)
@@ -162,10 +207,10 @@ Os atores na arena side-view sao **sprites 2D puros**, gerados direto no **Pixel
 
 Briefing 100% fechado pro engine-graphics-programmer (proposta do lead-game-designer + decisao do criador via AskUserQuestion).
 
-- **D1 Resolucao base:** **640x360** (16:9), pixel-perfect, escala inteira (x2 720p / x3 1080p). E a tela mais densa do jogo (7 atores + 4 zonas de HUD + overlay); 640x360 da folego sem perder o pixel.
-- **D2/D3 Arena (disposicao):** **coluna unica de cada lado, espacamento fixo.** Party empilha a esquerda (pose leste), inimigos a direita (pose oeste), sempre centralizados no eixo vertical (1 a 4 inimigos, SEM escala dinamica = pixel-perfect, mira deterministica). **Gus levemente recuado** (1 regra, serve Pillar 4: o fragil). Profundidade real (V/frente-tras) = polimento pos-M5. Mini-boss ocupa mais por sprite-base maior, nao por escala.
+- **D1 Resolucao base:** **960x540** (16:9), pixel-perfect, escala inteira (x2 = 1920x1080). E a tela mais densa do jogo (7 atores + 4 zonas de HUD + overlay). **Subiu de 640x360 (lider 2026-06-25):** no display o 640x360 ficou apertado (4 inimigos + painel nao cabiam, a coluna de inimigos transbordava pro menu); 960x540 da folga pra TODOS os slots em tamanho fixo (sem escala) e pro HUD respirar, mantendo o pixel-perfect no x2 ate 1080p. (Constantes de layout em `gus/app/screens/battle_layout.hpp`; textos de corpo subiram 8px->16px, banner/floater 16px->24px, pra legibilidade proporcional no canvas 1.5x maior.)
+- **D2/D3 Arena (disposicao):** **coluna unica de cada lado, espacamento fixo.** Party empilha a esquerda (pose leste), inimigos a direita (pose oeste), sempre centralizados no eixo vertical (1 a 4 inimigos, **SEM escala dinamica = TAMANHO FIXO**, pixel-perfect, mira deterministica). **Gus levemente recuado** (1 regra, serve Pillar 4: o fragil). Profundidade real (V/frente-tras) = polimento pos-M5. Mini-boss ocupa mais por sprite-base maior, nao por escala.
 - **D4 Fila CTB:** mostra os **5 proximos**, celula = **retrato 48px** (asset nativo, sem downscale) + marca de "proximo" no 1o. SEM nome, SEM mini-barra (a barra de HP vive sob o ator na arena). Preparada pra o marcador "interpretando..." (cast LENTO, CARTAS-CAST-TIME) ocupar uma celula como ator-fantasma; se resolver alem de 5 casas, a 5a celula marca "+N".
-- **D5 Overlay de COMPILAR:** **inferior parcial** (~40% da tela, sobe de baixo sobre painel+log), a **arena fica visivel atras com leve dim** (nao apaga). Pillar 1: ver intent/fraqueza do inimigo enquanto monta o combo. (Acoplado a D1=640x360 pra caber.)
+- **D5 Overlay de COMPILAR:** **inferior parcial** (~40% da tela, sobe de baixo sobre painel+log), a **arena fica visivel atras com leve dim** (nao apaga). Pillar 1: ver intent/fraqueza do inimigo enquanto monta o combo. (Acoplado a D1=960x540 pra caber.)
 - **D6 Encaixe de carta (tap-to-place):** **snap instantaneo** (<100ms, sem tween bloqueante) + o slot "acende" na cor/icone da familia + quando a assinatura casa receita, a **pipeline pulsa** (preview COMPILANDO). Ao remover, fade-out rapido. O juice esta no "ding" de combo fechado (Discovery). Slide animado = polimento opcional depois.
 - **D7 Camera + dano:** **camera estatica** (sem zoom/pan a cada turno; CTB troca muito de turno, pan enjoa e esconde fila/intents), so um **highlight/seta no ator ativo**. Dano = **numero flutuante** sobre o alvo (sobe + fade ~700ms), **cor por canal** (combat.md par.11): COMUM claro, CRIT ciano + bold, FALHA dano-0 vermelho-erro `#F43F5E`, CURA verde com `+N`. Cinematografia de golpe especial = pos-M5.
   - **REVISAO D7-LOG (criador, 2026-06-25, apos teste no display):** o log **NARRA o combate** (mostra TODA acao e dano em texto, nao so eventos notaveis). Motivo: a regra original "log so notavel + dano = numero flutuante" deixou o dano comum **invisivel** enquanto os numeros flutuantes nao existiam (eram do incr 5); ao implementar os dois juntos, o criador decidiu que o log deve narrar (ex.: "Caua ataca o Drone: 25", "Drone usa Pulso em Gus: 12", "Gus defende"). Mantem **cor por categoria** (dano/cura/status/sistema), **bold** nas mensagens-codigo (COMPILADO / ERRO DE COMPILACAO) e nos golpes notaveis, e **rola cortando no tamanho da caixa** (mostra as ultimas N linhas). O numero flutuante cobre o IMPACTO imediato; o log cobre o HISTORICO legivel. (Implementado no incr 5: `battle_floaters` + `battle_log_model::build_log_lines` sem filtro de notavel.)
@@ -206,12 +251,22 @@ Consequencia arquitetural: a BattleScene ganha um "diretor de pacing" (POCO test
 
 **Fix "ataque colado/duplo" (2026-06-25, do playtest):** o lider no display: "quando o ataque SEGUINTE e de um inimigo, sai COLADO com o anterior (impressao de ataque duplo)". Causa-raiz (confirmada por instrumentacao da fila real): apertar a tecla durante o BEAT 1 (anuncio) chamava `skip()`, que ZERAVA o timer do anuncio -> o anuncio durava 1 frame e o golpe resolvia colado. Fix: `skip()` agora so acelera a pausa de LEITURA pos-resolucao (`WaitingDelay`); NUNCA o anuncio (`AnnouncingEnemy`) - o anuncio "Vez de <nome>" sempre toca seu tempo proprio (e o beat do windup da animacao). Verificado: com skip a cada frame, o anuncio dura ~0.7s (42 frames), nao 1. Regressao em `battle_scene_test` (skip nao colapsa o anuncio; na fila REAL todo inimigo resolvido teve seu proprio anuncio).
 
-**Fix sobreposicao arena x painel (2026-06-25, do playtest):** o lider no display: a coluna de 4 inimigos (slots 56x64 empilhados) transbordava pra dentro do menu/log (4o inimigo atras do verbo "Fugir"). Causa: 4 slots de 64px + gaps (~274px) nao cabiam na banda da arena (kArenaTop=64..kArenaBottom=250 = 186px); o empilhamento clampava no topo e invadia o painel (kActivePanelTop=252). Fix: a ALTURA do slot virou ADAPTATIVA por contagem (`arena_slot_height(count)`): teto kActorSlotH=64 com 1-2 atores, encolhe pra a coluna inteira caber na banda com folga (3 atores -> 55px; 4 -> 40px; piso kActorSlotMinH=36). A banda termina ACIMA do painel e o painel/log tem fundo OPACO desenhado por cima dos atores (ordem: fundo arena -> atores -> painel/menu/log). Verificado pra 1..4 de cada lado: todo slot termina com y+altura <= kActivePanelTop. Regressao travada em `battle_layout_test` (nenhum slot invade o painel em nenhuma contagem).
-  - **TENSAO COM D3 (reportar ao criador):** o D3 dizia "1 a 4 inimigos, SEM escala dinamica = pixel-perfect". O fix introduz escala da ALTURA do quadro do slot por contagem (mesma altura pra todos do lado, deterministica - nao e por-sprite arbitrario), pra nao transbordar. Alternativas que preservariam "sem escala" (decisao do criador, NAO implementadas): (a) manter 64px fixo e dispor 4 inimigos em 2 sub-colunas/zigue-zague a direita; (b) banda de arena mais alta (subir a fila CTB / encolher o painel); (c) limitar a 3 inimigos visiveis no slice. O fix atual (altura adaptativa) e o caminho de menor atrito e cabe pixel-perfect; se o criador preferir manter D3 estrito, troca-se a estrategia sem mexer no resto.
+**Fix sobreposicao arena x painel -> RESOLVIDO PELO BUMP DE RESOLUCAO (2026-06-25, do playtest):** o lider no display: a coluna de 4 inimigos (slots empilhados) transbordava pra dentro do menu/log (4o inimigo atras do verbo "Fugir") - o aperto do 640x360 (banda da arena de so 186px nao cabia 4 slots de 64px + gaps = ~274px). **Solucao definitiva: subir a resolucao base pra 960x540 (D1).** Com a banda da arena agora em ~304px (kArenaTop=96..kArenaBottom=400), os 4 slots de **altura FIXA** (kActorSlotH=64, sem escala) cabem com ~24px de folga, centralizados. O painel/log tem fundo OPACO desenhado por cima dos atores (ordem: fundo arena -> atores -> painel/menu/log). Verificado pra 1..4 de cada lado: todo slot termina com y+altura <= kActivePanelTop. Regressao travada em `battle_layout_test` (nenhum slot invade o painel em nenhuma contagem; altura SEMPRE = kActorSlotH).
+  - **TENSAO COM D3 ENCERRADA:** o paliativo anterior (altura ADAPTATIVA por contagem - `arena_slot_height`, que encolhia o slot pra caber no 640x360 apertado) **foi revertido**. Com 960x540 o D3 ("SEM escala dinamica = pixel-perfect") volta a valer ao pe da letra: TODO slot de ator tem o mesmo tamanho fixo, em toda contagem. Sem trade-off pendente.
 
 ---
 
-## 6. Pipeline de implementacao (agentes)
+## 6. Animacao de combate (game-feel e timing)
+
+A especificacao de game-feel da animacao de ATAQUE (3 tipos: magia com cast no lugar + projetil; melee que desloca e volta; hit-react do alvo), o ENCAIXE no pacing de 2 beats (§5.2), a TABELA DE SONS (pendente, pos-visual) e o BRIEFING dos sprites de batalha necessarios vivem em doc dedicado: [`battle-anim.md`](battle-anim.md) (canon 2026-06-25). Resumo do contrato:
+
+- **Ator na arena = SPRITE animado** (battle-idle virado pro oponente), nao o retrato (retrato fica no cockpit lateral). Por ora testa-se com RETRATOS como placeholder; sprites de corpo entram depois.
+- **Magia:** cast no proprio lugar + projetil que viaja ate o alvo (placeholder circular por ora; VFX das 5 familias depois, vfx-combate-familias.md).
+- **Melee:** desloca ate o alvo, golpeia, volta a posicao de repouso (estilo Chrono Trigger / FF).
+- **Hit-react (nos dois):** sofrimento + knockback visual + volta a battle-idle.
+- **Encaixe no pacing (§5.2):** o windup mora no Beat 1 ANUNCIO; o contato/floater/hit-react/VFX no Beat 2 RESOLUCAO. `skip()` nunca colapsa o Beat 1 (e o beat do windup).
+
+## 7. Pipeline de implementacao (agentes)
 
 1. **lead-game-designer**: fecha as pendencias finas do paragrafo 5 (propostas -> AskUserQuestion ao criador).
 2. **engine-graphics-programmer**: implementa a BattleScreen em `app/` (cena, render side-view, overlay de cartas, numeros flutuantes, log, icones de intent), lendo o estado do motor `domain/combat/` e enganchando no barramento de eventos (`core/events/`) por CombatEnded/PlayerBus.

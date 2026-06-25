@@ -1,28 +1,38 @@
 // gus/app/screens/battle_layout.hpp
 //
 // LAYOUT PURO da BattleScreen (M5), POCO 100% testavel SEM SDL nem janela. Calcula
-// TODOS os retangulos/pontos da tela de batalha em ESPACO LOGICO 640x360 (D1: base
-// pixel-perfect, escala inteira) como FUNCOES PURAS da contagem de atores. A casca de
-// render (battle_scene + SdlWindow) projeta esse layout 1:1 num IRenderer dirigindo a
-// camera para o retangulo logico 640x360 (px_per_world_unit = 1).
+// TODOS os retangulos/pontos da tela de batalha em ESPACO LOGICO 960x540 (D1: base
+// pixel-perfect, escala inteira x2 = 1080p) como FUNCOES PURAS da contagem de atores. A
+// casca de render (battle_scene + SdlWindow) projeta esse layout 1:1 num IRenderer
+// dirigindo a camera para o retangulo logico 960x540 (px_per_world_unit = 1).
 //
 // Por que aqui (camada app/, mas POCO): a regra das 4 camadas mantem core/ e domain/
 // como POCO puros; a BattleScreen vive em app/. Toda logica "calculavel-sem-janela"
 // (onde fica cada slot, a fila CTB, as zonas de HUD) e separada do render SDL e
 // testavel headless (Catch2), exatamente como sprite_animation/camera_clamp.
 //
-// AS DECISOES DE LAYOUT (par.5 de docs/design/mecanicas/battle-screen.md, FECHADAS):
-//   D1  resolucao base 640x360, pixel-perfect, escala inteira.
-//   D2/D3 arena: COLUNA UNICA de cada lado, espacamento fixo. Party empilha a ESQUERDA
-//         (pose leste), inimigos a DIREITA (pose oeste), SEMPRE centralizados no eixo
-//         vertical (1 a 4 inimigos, SEM escala dinamica). GUS levemente recuado.
-//   D4  fila CTB no TOPO: 5 proximos, celula = retrato 48px + marca de "proximo" no 1o.
-//   D5  overlay de COMPILAR (NAO neste incremento): inferior parcial ~40%.
-//   D7  camera estatica + highlight do ator ativo; numero flutuante; log so sistema.
+// REDESIGN "TATICO COCKPIT" (variante C, aprovada pelo criador 2026-06-25). O painel do
+// ator ativo deixou o RODAPE e virou um COCKPIT lateral ESQUERDO (coluna vertical fina,
+// ~1/4 da largura): retrato GRANDE + nome + HP + AP/Mana + menu de verbos EMPILHADO. A
+// arena ocupa o resto (a direita do cockpit), com a fila CTB no topo, um banner de turno
+// numa FAIXA PROPRIA acima dos atores, e um terminal/log fino no rodape. As zonas (mock
+// HTML _common.css + variante_C_tatico.html):
+//   - cockpit:  x=0,   y=0,   w=174, h=540 (full).
+//   - CTB:      x=188, y=10,  w=758, h=54.
+//   - banner:   x=188, y=70,  w=758, h=46 (faixa propria; nao invade atores).
+//   - arena:    x=188, y=120, w=758, h=328 (party-col esq, foe-col dir, space-around).
+//   - log:      x=188, y=456, w=772, h=84.
+// Os atores na arena sao distribuidos com ESPACO PROPRIO (space-around vertical, cada um
+// na sua faixa, ~54px), NAO empilhados colados - leitura limpa de intent/fraqueza.
 //
-// Cross-ref: docs/design/mecanicas/battle-screen.md par.2 (zonas) e par.5 (D1-D7);
-//            gus/core/spatial/camera_clamp.hpp (Rect/Vec2);
-//            gus/app/screens/city_scene.hpp (cena IRMA, mesmo padrao POCO em app/).
+// DECISOES PRESERVADAS (par.5/5.2): D4 (fila CTB 5 proximos), D7 (camera estatica +
+// highlight + floater), D8 (pacing 2-beats), D9 (banner "Vez de <nome>"), D10/D13
+// (abertura-espera-input). So mudou o LAYOUT (denso -> cockpit) e a PALETA (canonica do
+// _common.css). A resolucao logica 960x540 fica.
+//
+// Cross-ref: scratchpad/battle_mock/variante_C_tatico.html + _common.css (mock aprovado);
+//            docs/design/mecanicas/battle-screen.md par.2 (zonas);
+//            gus/core/spatial/camera_clamp.hpp (Rect/Vec2).
 
 #ifndef GUS_APP_SCREENS_BATTLE_LAYOUT_HPP
 #define GUS_APP_SCREENS_BATTLE_LAYOUT_HPP
@@ -38,57 +48,71 @@ namespace gus::app::screens {
 // lider/ux-ui-designer ajusta AQUI sem tocar no render. Tudo em PIXELS LOGICOS.
 // ----------------------------------------------------------------------------
 
-// D1: resolucao base logica (16:9). A janela real escala por inteiro (x2/x3).
-inline constexpr int kBattleLogicalW = 640;
-inline constexpr int kBattleLogicalH = 360;
+// D1: resolucao base logica (16:9). A janela real escala por inteiro (x2 = 1080p / x3).
+// Subiu de 640x360 (lider 2026-06-25): com 960x540 os 4 inimigos + 4 zonas de HUD cabem
+// COM FOLGA, e os slots de ator voltam a TAMANHO FIXO (sem escala adaptativa).
+inline constexpr int kBattleLogicalW = 960;
+inline constexpr int kBattleLogicalH = 540;
 
 // D2/D3: maximo de slots por lado na arena (party <=3, inimigos 1..4). secao 2.
 inline constexpr int kMaxPartySlots = 3;
 inline constexpr int kMaxEnemySlots = 4;
 
+// --- COCKPIT lateral ESQUERDO (variante C) ---
+// Coluna vertical fina a esquerda: retrato grande + nome + HP + AP/Mana + verbos.
+inline constexpr int kCockpitX = 0;
+inline constexpr int kCockpitW = 174;       // largura do cockpit (~1/4 da tela)
+inline constexpr int kCockpitPad = 12;      // padding interno
+inline constexpr int kCockpitPortraitPx = 64;  // retrato grande do ator ativo
+inline constexpr int kCockpitHpBarH = 11;   // barra de HP do cockpit (com numero por cima)
+inline constexpr int kCockpitPipSize = 9;   // pip de AP/Mana (circular no mock; quadrado aqui)
+inline constexpr int kCockpitPipGap = 3;
+// Faixa lateral util (DENTRO do cockpit, descontado o padding).
+inline constexpr int kCockpitInnerX = kCockpitX + kCockpitPad;             // 12
+inline constexpr int kCockpitInnerW = kCockpitW - 2 * kCockpitPad;         // 150
+// X onde a arena/CTB/banner/log comecam (a direita do cockpit, com folga).
+inline constexpr int kRightZoneX = 188;     // x do inicio das zonas a direita do cockpit
+inline constexpr int kRightZoneMargin = 14; // margem direita das zonas (CTB/banner/arena)
+
 // D4: a fila CTB mostra os 5 PROXIMOS; celula = retrato 48px nativo (sem downscale).
 inline constexpr int kCtbVisibleCells = 5;
 inline constexpr int kCtbPortraitPx = 48;
 
-// --- Faixa da fila CTB (topo) ---
-inline constexpr int kCtbStripTop = 4;     // margem do topo da tela
-inline constexpr int kCtbCellGap = 6;      // espaco horizontal entre celulas
-inline constexpr int kCtbStripLeft = 8;    // margem esquerda da faixa
+// --- Faixa da fila CTB (topo, a direita do cockpit) ---
+inline constexpr int kCtbStripTop = 10;    // y do topo da faixa CTB
+inline constexpr int kCtbStripH = 54;      // altura da faixa
+inline constexpr int kCtbCellGap = 8;      // espaco horizontal entre celulas
+inline constexpr int kCtbStripLeft = kRightZoneX;  // x do inicio (188)
 
-// --- Arena (centro) ---
-// Banda vertical util da arena (entre a fila CTB e o painel do ator). Os slots de
-// cada lado sao CENTRALIZADOS verticalmente DENTRO desta banda (D3). A banda termina
-// ACIMA de kActivePanelTop: nenhum slot pode invadir o painel/menu/log (FIX 2026-06-25,
-// lider pegou a coluna de 4 inimigos transbordando pra dentro do menu).
-inline constexpr int kArenaTop = 64;       // logo abaixo da faixa CTB (48 + margens)
-inline constexpr int kArenaBottom = 250;   // logo acima do painel do ator (kActivePanelTop=252)
+// --- Faixa do BANNER de turno (acima dos atores, faixa PROPRIA) ---
+inline constexpr int kBannerBandTop = 70;  // y da faixa do banner
+inline constexpr int kBannerBandH = 46;
 
-// Sprite-base do ator na arena (placeholder retangulo neste incremento; o sprite
-// PixelLab entra depois, par.3.4). Largura fixa; ALTURA e o TETO (com poucos atores).
-inline constexpr int kActorSlotW = 56;
-inline constexpr int kActorSlotH = 64;     // altura MAXIMA (1-2 atores); adapta p/ +atores
-inline constexpr int kActorSlotMinH = 36;  // piso da altura adaptativa (legibilidade)
+// --- Arena (a direita do cockpit) ---
+// A area dos atores fica ENTRE o banner e o log. Os atores sao distribuidos com espaco
+// proprio (space-around) DENTRO da banda [kArenaTop, kArenaBottom], nao empilhados colados.
+inline constexpr int kArenaTop = 120;      // abaixo do banner (faixa 70..116)
+inline constexpr int kArenaBottom = 448;   // acima do log (logbar comeca em 456)
 
-// Espacamento vertical FIXO entre slots empilhados na coluna (D2: espacamento fixo).
-inline constexpr int kActorSlotGapY = 6;
-// Margem de FOLGA dentro da banda (topo+base) pro empilhamento nao colar nas bordas da
-// banda/painel - garante que o slot mais baixo termina ACIMA de kArenaBottom com folga.
-inline constexpr int kArenaBandMargin = 4;
+// Slot de ator (retrato-placeholder por ora; sprite de corpo depois). Menor que antes
+// (o cockpit ja come 1/4 da largura): 54px, como no mock variante C.
+inline constexpr int kActorSlotW = 54;
+inline constexpr int kActorSlotH = 54;
 
-// Coluna da party (esquerda) e dos inimigos (direita): X do canto esquerdo do slot.
-inline constexpr int kPartyColumnX = 40;
-inline constexpr int kEnemyColumnX = kBattleLogicalW - 40 - kActorSlotW;  // = 544
+// Colunas dos atores DENTRO da arena (offsets a partir de kRightZoneX). party-col a
+// esquerda-da-arena (logo a direita do cockpit), foe-col a direita. Cada coluna tem
+// largura propria; o slot e CENTRADO nela.
+inline constexpr int kPartyColCenterX = kRightZoneX + 42 + 60;   // centro da party-col
+inline constexpr int kFoeColCenterX = kBattleLogicalW - kRightZoneMargin - 44 - 60;  // centro da foe-col
 
-// D3: GUS levemente RECUADO (serve Pillar 4: o fragil). Deslocamento em X (pra dentro,
-// ou seja, pra DIREITA na coluna da esquerda) aplicado SO ao slot do Gus.
-inline constexpr int kGusRecuoX = 14;
+// D3: GUS levemente RECUADO (Pillar 4). Deslocamento em X aplicado SO ao slot do Gus
+// (pra dentro da arena = pra direita na coluna da esquerda).
+inline constexpr int kGusRecuoX = 16;
 
-// --- Painel do ator ativo (base) + caixa de log (base) ---
-inline constexpr int kActivePanelTop = 252;
-inline constexpr int kActivePanelH = 60;
-inline constexpr int kLogTop = 314;
-inline constexpr int kLogH = kBattleLogicalH - kLogTop - 2;  // ate a base, margem 2
-inline constexpr int kHudSideMargin = 6;
+// --- Terminal/log fino (rodape, a direita do cockpit) ---
+inline constexpr int kLogTop = 456;
+inline constexpr int kLogH = kBattleLogicalH - kLogTop;  // 84, ate a base
+inline constexpr int kLogLeft = kRightZoneX;
 
 // ----------------------------------------------------------------------------
 // Saidas do layout. Todos os Rect estao em PIXELS LOGICOS (origem topo-esquerda,
@@ -96,6 +120,7 @@ inline constexpr int kHudSideMargin = 6;
 // ----------------------------------------------------------------------------
 
 using gus::core::spatial::Rect;
+using gus::core::spatial::Vec2;
 
 // Retangulo do quadro logico do ator ativo (highlight de turno, D7). is_party indica
 // o lado (so para conveniencia de quem desenha a seta/borda).
@@ -130,32 +155,50 @@ struct CtbStrip {
 // Funcoes puras de layout. Determinismo total: mesma contagem -> mesmos retangulos.
 // ----------------------------------------------------------------------------
 
-// O retangulo logico inteiro da tela (640x360), origem (0,0). Util pro fundo/dim.
+// O retangulo logico inteiro da tela (960x540), origem (0,0). Util pro fundo/dim.
 [[nodiscard]] Rect battle_screen_rect() noexcept;
 
-// ALTURA ADAPTATIVA do slot de ator dado o numero de slots empilhados numa coluna (FIX
-// 2026-06-25): retorna kActorSlotH (teto) com poucos atores, e ENCOLHE quando count
-// cresce pra a coluna inteira (count slots + gaps + margem) caber na banda
-// [kArenaTop, kArenaBottom] - assim NENHUM slot invade o painel (kActivePanelTop). Piso
-// em kActorSlotMinH (legibilidade). count<=0 => kActorSlotH. Pura/deterministica.
-[[nodiscard]] int arena_slot_height(int count) noexcept;
-
-// Layout da arena (D2/D3): party_count slots empilhados na coluna ESQUERDA, enemy_count
-// na coluna DIREITA, ambos CENTRALIZADOS verticalmente na banda da arena, espacamento
-// FIXO. gus_party_index (>=0) marca qual indice de party e o GUS, que recua em X
-// (kGusRecuoX); -1 = sem recuo (nenhum slot e o Gus). Conta saturada nos maximos.
+// Layout da arena (variante C): party_count slots na coluna ESQUERDA-da-arena (logo a
+// direita do cockpit), enemy_count na coluna DIREITA, DISTRIBUIDOS com espaco proprio
+// (space-around vertical) na banda [kArenaTop, kArenaBottom] - cada ator na sua faixa,
+// SEM empilhar colado. gus_party_index (>=0) marca qual party e o GUS, que recua em X
+// (kGusRecuoX); -1 = sem recuo. Conta saturada nos maximos.
 [[nodiscard]] ArenaLayout arena_layout(int party_count, int enemy_count,
                                        int gus_party_index = 0) noexcept;
 
-// Layout da faixa CTB (D4): preenche ate 5 celulas. queue_len = total de atores na
-// fila do motor; a 1a celula ocupada vira "proximo"; se queue_len > 5, a 5a celula
-// vira "+N" (overflow). Celulas alem de queue_len ficam vazias.
+// Layout da faixa CTB (D4): preenche ate 5 celulas, comecando em kCtbStripLeft (a direita
+// do cockpit). queue_len = total de atores na fila; a 1a celula ocupada vira "proximo";
+// se queue_len > 5, a 5a celula vira "+N" (overflow). Celulas alem de queue_len vazias.
 [[nodiscard]] CtbStrip ctb_strip(int queue_len) noexcept;
 
-// Retangulo do painel do ator ativo (base): HP/AP/Mana/status + menu de verbos.
-[[nodiscard]] Rect active_panel_rect() noexcept;
+// --- Zonas da variante C (todas em px logico) ---
 
-// Retangulo da caixa de log (base): mensagens de sistema (D7).
+// Retangulo do COCKPIT lateral esquerdo (painel do ator ativo + menu de verbos).
+[[nodiscard]] Rect cockpit_rect() noexcept;
+
+// Retangulo do RETRATO grande do ator ativo no topo do cockpit (centrado na largura).
+[[nodiscard]] Rect cockpit_portrait_rect() noexcept;
+
+// Retangulo da BARRA DE HP do cockpit (largura util do cockpit), logo abaixo do retrato+nome.
+[[nodiscard]] Rect cockpit_hp_bar_rect() noexcept;
+
+// Ponto (x,y) de origem da linha de pips de AP no cockpit (abaixo do HP).
+[[nodiscard]] Vec2 cockpit_ap_pips_origin() noexcept;
+
+// Ponto (x,y) de origem da linha de pips de Mana no cockpit (abaixo do AP).
+[[nodiscard]] Vec2 cockpit_mana_pips_origin() noexcept;
+
+// Zona do MENU de verbos no cockpit: os 6 verbos sao EMPILHADOS verticalmente nessa
+// faixa (parte de baixo do cockpit). O battle_menu distribui os itens dentro dela.
+[[nodiscard]] Rect cockpit_menu_zone() noexcept;
+
+// Faixa PROPRIA do BANNER de turno (acima dos atores; nao invade ninguem).
+[[nodiscard]] Rect arena_banner_rect() noexcept;
+
+// Retangulo da AREA da arena (onde os atores vivem), a direita do cockpit.
+[[nodiscard]] Rect arena_rect() noexcept;
+
+// Retangulo do TERMINAL/log fino no rodape (a direita do cockpit).
 [[nodiscard]] Rect log_panel_rect() noexcept;
 
 }  // namespace gus::app::screens
