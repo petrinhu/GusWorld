@@ -1,0 +1,110 @@
+// gus/core/asset_paths.hpp
+//
+// CAMINHOS DE ASSET CENTRALIZADOS (fonte unica da verdade). Toda referencia a um
+// sub-caminho de asset (relativo a raiz resources/ ou ao repo) vive AQUI, como constante
+// `constexpr std::string_view` - NUNCA hardcoded espalhado pelo codigo. Objetivo: a
+// PROXIMA reorganizacao de pastas edita 1 lugar so (este header), sem cacar literais pelo
+// codigo (decisao do criador 2026-06-25, apos a movida de sprites/gus ->
+// sprites/personagens_inspirados/gus).
+//
+// POR QUE EM core/: e o nivel mais BAIXO, acessivel a TODAS as camadas (platform/, app/,
+// domain/) respeitando a direcao de dependencia (app -> platform -> core). Sao so STRINGS
+// (zero I/O, zero SDL/Qt): nao viola o GATE (core/ permanece POCO puro) nem a invariante
+// das 4 camadas. A LOGICA de resolucao (env GUSWORLD_ASSETS + macro embutido + fallback
+// CWD) permanece em quem usa (anim_catalog/battle_preview/font_atlas/...); aqui so mora a
+// FONTE dos sub-caminhos.
+//
+// CONVENCAO: os caminhos sao RELATIVOS (sem a raiz, sem barra inicial nem final). Quem
+// resolve junta a raiz (env ou macro de compilacao ou CWD). "<X>Dir" = pasta; "<X>File" =
+// nome de arquivo dentro dela.
+//
+// Cross-ref: anim_catalog.cpp / player_sprites_loader.cpp / battle_preview.cpp /
+//            font_atlas.cpp / translator.cpp (consumidores).
+
+#ifndef GUS_CORE_ASSET_PATHS_HPP
+#define GUS_CORE_ASSET_PATHS_HPP
+
+#include <string_view>
+
+namespace gus::core::assets {
+
+// ============================================================================
+// SPRITES DE PERSONAGENS (sob resources/sprites/).
+//
+// Duas familias (estado do disco em 2026-06-25):
+//   - "personagens_inspirados/" agrupa personagens baseados em PESSOAS REAIS:
+//     gus, yakov, pyotor_vance, brunus_vetorial. (Reorg do criador 2026-06-25.)
+//   - os COMPANIONS (caua_volt, jaci_proxy, bento_requiem, dante_grid, linda_siren,
+//     iara_lumen) continuam na RAIZ de sprites/ (NAO foram movidos).
+// ============================================================================
+
+// Raiz dos sprites de personagens inspirados (pessoas reais).
+inline constexpr std::string_view kPersonagensInspiradosDir =
+    "sprites/personagens_inspirados";
+
+// --- inspirados (pessoas reais) ---
+// GUS (protagonista). MOVIDO 2026-06-25: era "sprites/gus" -> personagens_inspirados/gus.
+inline constexpr std::string_view kGusSpritesDir =
+    "sprites/personagens_inspirados/gus";
+inline constexpr std::string_view kYakovSpritesDir =
+    "sprites/personagens_inspirados/yakov";
+inline constexpr std::string_view kPyotorVanceSpritesDir =
+    "sprites/personagens_inspirados/pyotor_vance";
+inline constexpr std::string_view kBrunusVetorialSpritesDir =
+    "sprites/personagens_inspirados/brunus_vetorial";
+
+// --- companions (na RAIZ de sprites/, nao moveram) ---
+// O sub-NOME (depois de "sprites/") e o usado pelo resolve_sprites_dir generico.
+inline constexpr std::string_view kCauaSpritesDir = "sprites/caua_volt";
+inline constexpr std::string_view kJaciSpritesDir = "sprites/jaci_proxy";
+inline constexpr std::string_view kBentoSpritesDir = "sprites/bento_requiem";
+inline constexpr std::string_view kDanteSpritesDir = "sprites/dante_grid";
+inline constexpr std::string_view kLindaSpritesDir = "sprites/linda_siren";
+inline constexpr std::string_view kIaraSpritesDir = "sprites/iara_lumen";
+
+// ============================================================================
+// ICONES DA TELA DE BATALHA (sob resources/sprites/icons-m5/). NAO mudou na reorg.
+// ============================================================================
+
+// Retratos (48px / busto 3/4) usados na fila CTB e no cockpit. (retrato_gus_combate.png
+// virou 3/4; o arquivo continua nesta pasta - so o conteudo mudou.)
+inline constexpr std::string_view kRetratosDir = "sprites/icons-m5/retratos";
+
+// Icones de status effect (Stun/Poison/Shield/...), 14px.
+inline constexpr std::string_view kStatusIconsDir = "sprites/icons-m5/status";
+
+// Icones de intent (telegraph): atacar/defender/aplicar_status/ruido.
+inline constexpr std::string_view kIntentIconsDir = "sprites/icons-m5/intent";
+
+// ============================================================================
+// FONTES (sob GusEngine/assets/fonts/, asset de ENGINE versionado no repo).
+// ============================================================================
+
+// Pasta das fontes da engine (relativa: <raiz_assets_engine>/fonts).
+inline constexpr std::string_view kFontsDir = "assets/fonts";
+// Pixel Operator Mono (CC0): regular + bold.
+inline constexpr std::string_view kFontMonoRegularFile = "PixelOperatorMono.ttf";
+inline constexpr std::string_view kFontMonoBoldFile = "PixelOperatorMono-Bold.ttf";
+
+// ============================================================================
+// MAPAS (.gmap selado, sob GusEngine/assets/maps/compiled/).
+// ============================================================================
+
+// Pasta dos mapas compilados (.gmap) versionados no repo.
+inline constexpr std::string_view kMapsCompiledDir = "assets/maps/compiled";
+// 1o mapa (Distritos Inferiores).
+inline constexpr std::string_view kDistritosInferioresGmapFile =
+    "distritos_inferiores.gmap";
+
+// ============================================================================
+// TRADUCOES (catalogos i18n, sob game/translations/).
+// ============================================================================
+
+// Pasta dos catalogos de traducao.
+inline constexpr std::string_view kTranslationsDir = "game/translations";
+// Catalogo do locale dev primario (pt-br).
+inline constexpr std::string_view kTranslationPtBrFile = "pt_br.md";
+
+}  // namespace gus::core::assets
+
+#endif  // GUS_CORE_ASSET_PATHS_HPP

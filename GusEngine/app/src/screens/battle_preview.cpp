@@ -17,6 +17,7 @@
 
 #include "gus/app/screens/battle_hud_model.hpp"  // status_icon_file/index
 #include "gus/app/screens/battle_scene.hpp"
+#include "gus/core/asset_paths.hpp"             // caminhos de asset centralizados
 #include "gus/domain/combat/combat_enums.hpp"  // StatusId
 #include "gus/platform/render2d/render2d_sdl.hpp"
 
@@ -42,6 +43,23 @@ std::string join(const std::string& a, const std::string& b) {
     return a + "/" + b;
 }
 
+// Resolve um caminho RELATIVO de asset (do header central) pela ordem padrao:
+// env GUSWORLD_ASSETS > macro de compilacao (GUSWORLD_ASSETS_DIR) > relativo ao CWD.
+// A FONTE do sub-caminho e a constante; aqui so a logica de resolucao.
+std::string resolve_asset_dir(std::string_view rel) {
+    const std::string sub(rel);
+    if (const char* env = std::getenv("GUSWORLD_ASSETS")) {
+        if (env[0] != '\0') {
+            return join(env, sub);
+        }
+    }
+    const std::string compiled = GUSWORLD_ASSETS_DIR;
+    if (!compiled.empty()) {
+        return join(compiled, sub);
+    }
+    return join("resources", sub);
+}
+
 // Mapeia o id de ator de DEMO -> arquivo de retrato 48px. Os inimigos (inimigoN)
 // compartilham retrato_inimigo. Ponto unico; quando os retratos forem por-personagem
 // reais, troca-se aqui (ou vira data-driven).
@@ -59,42 +77,15 @@ std::string retrato_file_for(const std::string& actor_id) {
 }  // namespace
 
 std::string resolve_retratos_dir() {
-    if (const char* env = std::getenv("GUSWORLD_ASSETS")) {
-        if (env[0] != '\0') {
-            return join(env, "sprites/icons-m5/retratos");
-        }
-    }
-    const std::string compiled = GUSWORLD_ASSETS_DIR;
-    if (!compiled.empty()) {
-        return join(compiled, "sprites/icons-m5/retratos");
-    }
-    return "resources/sprites/icons-m5/retratos";
+    return resolve_asset_dir(gus::core::assets::kRetratosDir);
 }
 
 std::string resolve_status_icons_dir() {
-    if (const char* env = std::getenv("GUSWORLD_ASSETS")) {
-        if (env[0] != '\0') {
-            return join(env, "sprites/icons-m5/status");
-        }
-    }
-    const std::string compiled = GUSWORLD_ASSETS_DIR;
-    if (!compiled.empty()) {
-        return join(compiled, "sprites/icons-m5/status");
-    }
-    return "resources/sprites/icons-m5/status";
+    return resolve_asset_dir(gus::core::assets::kStatusIconsDir);
 }
 
 std::string resolve_intent_icons_dir() {
-    if (const char* env = std::getenv("GUSWORLD_ASSETS")) {
-        if (env[0] != '\0') {
-            return join(env, "sprites/icons-m5/intent");
-        }
-    }
-    const std::string compiled = GUSWORLD_ASSETS_DIR;
-    if (!compiled.empty()) {
-        return join(compiled, "sprites/icons-m5/intent");
-    }
-    return "resources/sprites/icons-m5/intent";
+    return resolve_asset_dir(gus::core::assets::kIntentIconsDir);
 }
 
 int run_battle_preview() {

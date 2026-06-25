@@ -8,6 +8,7 @@
 
 add_executable(gusengine_core_tests
     core_smoke_test.cpp
+    asset_paths_test.cpp
     sha256_test.cpp
     hmac_sha256_test.cpp
     key_derivation_test.cpp

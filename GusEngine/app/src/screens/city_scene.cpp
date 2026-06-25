@@ -11,6 +11,8 @@
 #include <cstdlib>  // std::getenv
 #include <utility>  // std::move
 
+#include "gus/core/asset_paths.hpp"  // caminhos de asset centralizados (mapa .gmap)
+
 // Caminho ABSOLUTO da pasta de mapas compilados do repo, embutido pelo CMake (=
 // GusEngine/assets/maps/compiled). Permite rodar do build dir sem CWD na raiz.
 #ifndef GUSWORLD_MAPS_DIR
@@ -30,9 +32,6 @@ std::string join(const std::string& a, const std::string& b) {
     }
     return a + "/" + b;
 }
-
-// Nome do arquivo do 1o mapa (Distritos Inferiores). Fonte: assets/maps/source.
-constexpr const char* kDistritosInferioresGmap = "distritos_inferiores.gmap";
 
 }  // namespace
 
@@ -62,19 +61,21 @@ OverworldTuning make_city_tuning() {
 }
 
 std::string resolve_distritos_inferiores_gmap() {
+    // Nome do arquivo + pasta vem do header central de caminhos de asset.
+    const std::string gmap(gus::core::assets::kDistritosInferioresGmapFile);
     // 1) Override por ambiente (o lider aponta pra qualquer pasta de mapas).
     if (const char* env = std::getenv("GUSWORLD_MAPS")) {
         if (env[0] != '\0') {
-            return join(env, kDistritosInferioresGmap);
+            return join(env, gmap);
         }
     }
     // 2) Caminho do repo embutido em compilacao (assets/maps/compiled do GusEngine).
     const std::string compiled = GUSWORLD_MAPS_DIR;
     if (!compiled.empty()) {
-        return join(compiled, kDistritosInferioresGmap);
+        return join(compiled, gmap);
     }
     // 3) Relativo ao CWD (rodando da raiz do GusEngine).
-    return join("assets/maps/compiled", kDistritosInferioresGmap);
+    return join(std::string(gus::core::assets::kMapsCompiledDir), gmap);
 }
 
 }  // namespace gus::app::screens

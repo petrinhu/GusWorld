@@ -12,6 +12,7 @@
 #include <cstdint>
 #include <vector>
 
+#include "gus/core/asset_paths.hpp"  // nomes dos arquivos de fonte centralizados
 #include "gus/platform/render2d/alpha_bbox.hpp"  // scan_alpha_content_bbox (POCO)
 #include "gus/platform/render2d/text_metrics.hpp"  // glyph_advance (monospace)
 #include "gus/platform/render2d/viewport_transform.hpp"
@@ -213,8 +214,9 @@ Render2dSdl::FontFace* Render2dSdl::ensure_font(bool bold) {
     }
 
     // Bake na CPU (16px nativo = multiplo de 8 da Pixel Operator, crisp ao escalar).
-    const char* file =
-        bold ? "PixelOperatorMono-Bold.ttf" : "PixelOperatorMono.ttf";
+    // Nomes dos .ttf vem do header central de caminhos de asset.
+    const std::string file(bold ? gus::core::assets::kFontMonoBoldFile
+                                 : gus::core::assets::kFontMonoRegularFile);
     face.atlas = bake_font_atlas(resolve_font_path(file), /*cell_px=*/16);
     if (!face.atlas.valid()) {
         return nullptr;  // fonte ausente: degrada (sem texto, so fallback do caller)

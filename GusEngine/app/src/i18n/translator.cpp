@@ -10,6 +10,8 @@
 #include <ios>
 #include <sstream>
 
+#include "gus/core/asset_paths.hpp"  // caminhos de asset centralizados
+
 // Raiz do repo (pai de GusEngine/) embutida pelo CMake, pra achar game/translations/
 // rodando do build dir. Override em runtime via env GUSWORLD_TRANSLATIONS.
 #ifndef GUSWORLD_TRANSLATIONS_DIR
@@ -65,11 +67,12 @@ std::string resolve_translations_path() {
             return env;  // caminho COMPLETO do .md (o lider aponta direto)
         }
     }
+    const std::string pt_br(gus::core::assets::kTranslationPtBrFile);
     const std::string compiled = GUSWORLD_TRANSLATIONS_DIR;
     if (!compiled.empty()) {
-        return join(compiled, "pt_br.md");
+        return join(compiled, pt_br);
     }
-    return "game/translations/pt_br.md";
+    return join(std::string(gus::core::assets::kTranslationsDir), pt_br);
 }
 
 std::string_view verb_label_key(BattleVerb verb) noexcept {

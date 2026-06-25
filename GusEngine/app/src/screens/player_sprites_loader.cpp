@@ -10,6 +10,7 @@
 #include <cstdlib>  // std::getenv
 
 #include "gus/app/screens/sprite_anchor.hpp"  // bottom_margin_fraction
+#include "gus/core/asset_paths.hpp"           // caminhos de asset centralizados
 
 #ifndef GUSWORLD_ASSETS_DIR
 #define GUSWORLD_ASSETS_DIR ""
@@ -147,21 +148,21 @@ PlayerSpriteSet load_player_sprites(gus::platform::render2d::IRenderer& renderer
     return set;
 }
 
-std::string resolve_sprites_dir(const char* subdir) {
-    const std::string sub = std::string("sprites/") + subdir;
-    // 1) Override por ambiente (o lider aponta pra qualquer pasta).
+std::string resolve_sprites_dir(const std::string& rel_subpath) {
+    // rel_subpath = caminho RELATIVO completo do header central (ex.: "sprites/caua_volt").
+    // 1) Override por ambiente (o lider aponta pra qualquer raiz de assets).
     if (const char* env = std::getenv("GUSWORLD_ASSETS")) {
         if (env[0] != '\0') {
-            return join(env, sub);
+            return join(env, rel_subpath);
         }
     }
-    // 2) Caminho do repo embutido em compilacao (raiz do repo).
+    // 2) Caminho do repo embutido em compilacao (raiz resources/ do repo).
     const std::string compiled = GUSWORLD_ASSETS_DIR;
     if (!compiled.empty()) {
-        return join(compiled, sub);
+        return join(compiled, rel_subpath);
     }
     // 3) Relativo ao CWD (rodando da raiz do repo).
-    return std::string("resources/") + sub;
+    return join("resources", rel_subpath);
 }
 
 // --- atalhos ----------------------------------------------------------------
@@ -170,13 +171,15 @@ PlayerSpriteSet load_gus_sprites(gus::platform::render2d::IRenderer& renderer,
                                  const std::string& base_dir) {
     return load_player_sprites(renderer, base_dir, gus_layout());
 }
-// resolve_gus_sprites_dir() NAO e definido aqui: ja existe em anim_catalog.cpp (mesma
-// raiz resources/sprites/gus). Reusado pelo main/sdl_window via anim_catalog.hpp.
+// resolve_gus_sprites_dir() NAO e definido aqui: ja existe em anim_catalog.cpp (sub-caminho
+// do header central, kGusSpritesDir). Reusado pelo main/sdl_window via anim_catalog.hpp.
 
 PlayerSpriteSet load_caua_sprites(gus::platform::render2d::IRenderer& renderer,
                                   const std::string& base_dir) {
     return load_player_sprites(renderer, base_dir, caua_layout());
 }
-std::string resolve_caua_sprites_dir() { return resolve_sprites_dir("caua_volt"); }
+std::string resolve_caua_sprites_dir() {
+    return resolve_sprites_dir(std::string(gus::core::assets::kCauaSpritesDir));
+}
 
 }  // namespace gus::app::screens

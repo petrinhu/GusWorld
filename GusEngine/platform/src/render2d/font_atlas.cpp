@@ -16,6 +16,8 @@
 #include <filesystem>  // std::filesystem::exists (escolhe o candidato que existe)
 #include <vector>
 
+#include "gus/core/asset_paths.hpp"  // caminhos de asset centralizados (kFontsDir)
+
 #define STB_TRUETYPE_IMPLEMENTATION
 #include "stb_truetype.h"
 
@@ -133,8 +135,9 @@ std::string resolve_font_path(const std::string& ttf_file) {
     if (exists(compiled)) {
         return compiled;
     }
-    // 3) Relativo ao CWD (rodando da raiz do GusEngine).
-    const std::string cwd_rel = join("assets/fonts", ttf_file);
+    // 3) Relativo ao CWD (rodando da raiz do GusEngine). Sub-caminho do header central.
+    const std::string cwd_rel =
+        join(std::string(gus::core::assets::kFontsDir), ttf_file);
     if (exists(cwd_rel)) {
         return cwd_rel;
     }

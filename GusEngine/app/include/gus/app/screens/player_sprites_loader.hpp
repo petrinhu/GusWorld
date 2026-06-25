@@ -92,13 +92,15 @@ struct SpriteLayout {
     gus::platform::render2d::IRenderer& renderer, const std::string& base_dir,
     const SpriteLayout& layout);
 
-// Resolve <base> pra um subdir (env > compilacao > CWD). Ver doc no topo.
-[[nodiscard]] std::string resolve_sprites_dir(const char* subdir);
+// Resolve um caminho RELATIVO de asset (env GUSWORLD_ASSETS > macro de compilacao > CWD).
+// rel_subpath vem do header central gus/core/asset_paths.hpp (ex.: kCauaSpritesDir =
+// "sprites/caua_volt"); NAO prefixa nada - o caminho ja vem completo. Ver doc no topo.
+[[nodiscard]] std::string resolve_sprites_dir(const std::string& rel_subpath);
 
 // --- ATALHOS (compat + conveniencia) ----------------------------------------
 // Gus e o player default do overworld agora. (A resolucao da pasta do Gus reusa
-// resolve_gus_sprites_dir() de anim_catalog.hpp - mesma raiz resources/sprites/gus,
-// nao duplicar aqui.)
+// resolve_gus_sprites_dir() de anim_catalog.hpp - sub-caminho do header central
+// gus/core/asset_paths.hpp, kGusSpritesDir; nao duplicar aqui.)
 [[nodiscard]] PlayerSpriteSet load_gus_sprites(
     gus::platform::render2d::IRenderer& renderer, const std::string& base_dir);
 

@@ -1,7 +1,8 @@
 // gus/app/src/screens/anim_catalog.cpp
 //
-// Ver header. Varredura de resources/sprites/gus/ via std::filesystem. Camada app/
-// (toca disco); nenhuma chamada SDL/GPU aqui - so monta caminhos.
+// Ver header. Varredura da pasta de sprites do Gus (caminho do header central
+// gus/core/asset_paths.hpp = kGusSpritesDir, hoje sprites/personagens_inspirados/gus) via
+// std::filesystem. Camada app/ (toca disco); nenhuma chamada SDL/GPU aqui - so monta caminhos.
 
 #include "gus/app/screens/anim_catalog.hpp"
 
@@ -10,6 +11,8 @@
 #include <filesystem>
 #include <optional>
 #include <utility>
+
+#include "gus/core/asset_paths.hpp"  // caminhos de asset centralizados (fonte unica)
 
 #ifndef GUSWORLD_ASSETS_DIR
 #define GUSWORLD_ASSETS_DIR ""
@@ -123,19 +126,22 @@ std::vector<std::string> collect_frames(const fs::path& dir, bool rotation) {
 }  // namespace
 
 std::string resolve_gus_sprites_dir() {
+    // Sub-caminho do Gus vem do header central (movido em 2026-06-25 pra
+    // sprites/personagens_inspirados/gus): editar la, nao aqui.
+    const std::string gus_sub(gus::core::assets::kGusSpritesDir);
     // 1) Override por ambiente (o lider aponta pra qualquer raiz de assets).
     if (const char* env = std::getenv("GUSWORLD_ASSETS")) {
         if (env[0] != '\0') {
-            return join(env, "sprites/gus");
+            return join(env, gus_sub);
         }
     }
     // 2) Caminho do repo embutido em compilacao (raiz resources/ do repo).
     const std::string compiled = GUSWORLD_ASSETS_DIR;
     if (!compiled.empty()) {
-        return join(compiled, "sprites/gus");
+        return join(compiled, gus_sub);
     }
     // 3) Relativo ao CWD (rodando da raiz do repo).
-    return "resources/sprites/gus";
+    return join("resources", gus_sub);
 }
 
 std::vector<AnimEntry> build_gus_anim_catalog(const std::string& gus_dir) {

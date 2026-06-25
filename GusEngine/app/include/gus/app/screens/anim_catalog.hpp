@@ -1,9 +1,10 @@
 // gus/app/screens/anim_catalog.hpp
 //
-// AnimCatalog: monta, EM RUNTIME, a lista de animacoes do Gus varrendo
-// resources/sprites/gus/. Fica em app/ por TOCAR FILESYSTEM (std::filesystem) -
-// fora da invariante pura de core/. Nao toca SDL nem GPU: so descobre os CAMINHOS
-// dos frames; quem carrega PNG e desenha e o anim_preview (via IRenderer).
+// AnimCatalog: monta, EM RUNTIME, a lista de animacoes do Gus varrendo a pasta de sprites
+// do Gus (caminho do header central gus/core/asset_paths.hpp = kGusSpritesDir, hoje
+// resources/sprites/personagens_inspirados/gus). Fica em app/ por TOCAR FILESYSTEM
+// (std::filesystem) - fora da invariante pura de core/. Nao toca SDL nem GPU: so descobre
+// os CAMINHOS dos frames; quem carrega PNG e desenha e o anim_preview (via IRenderer).
 //
 // O QUE VARRE (dinamico, le a pasta na hora - novas anims aparecem sozinhas):
 //   - anims/<NOME>/f0..fN.png        -> 1 animacao por subpasta (NOME = rotulo);
@@ -31,9 +32,10 @@ struct AnimEntry {
     std::vector<std::string> frames;  // caminhos absolutos, ja ordenados
 };
 
-// Resolve a pasta resources/sprites/gus do mesmo jeito que o loader do Caua
-// resolve a dele: env GUSWORLD_ASSETS > GUSWORLD_ASSETS_DIR (compilacao) >
-// relativo ao CWD ("resources/sprites/gus").
+// Resolve a pasta de sprites do Gus (sub-caminho = gus::core::assets::kGusSpritesDir do
+// header central) do mesmo jeito que o loader do Caua: env GUSWORLD_ASSETS >
+// GUSWORLD_ASSETS_DIR (compilacao) > relativo ao CWD. Pra trocar a pasta, edite o header
+// central, nao aqui.
 [[nodiscard]] std::string resolve_gus_sprites_dir();
 
 // Varre <gus_dir> e devolve as animacoes encontradas (anims/, walk/, turntable das
