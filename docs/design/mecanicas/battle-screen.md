@@ -94,6 +94,10 @@ Decidido no brainstorm 2026-06-23. O fim do combate e um LOG DE BUILD que imprim
     - **Quitacao automatica:** o JOGADOR escolhe o PLANO ao sair do hospital (pode reajustar): agressivo (62% do credito recebido pra divida) / medio (50%) / suave (38%); o resto fica livre. Ordem de abate: multa -> juros -> principal. Pior caso quita em ~17 encontros, sempre jogando normal.
     - Bloqueia SO compras/craft, NUNCA o hospital (curar sempre disponivel = anti-softlock).
   - Tematizacao terminal: `insufficient funds` -> `[1] safe mode (13% HP, gratis)` / `[2] recompilar a credito (ver termos)`.
+- **Build NAO-otimizado (combate RESOLVIDO sem encarar; canon 2026-06-25, combat.md §19):** quando o jogador escolhe `Resolver sem encarar` (auto-resolve opt-in), o motor roda headless com a IA sub-otima (`AutoResolveBrain`) e o terminal de resultado imprime um build `-O0`, distinto do build a mao:
+  - **Pulou e sobreviveu:** `building (no optimizations, -O0)...` -> `warning: combat resolved unattended` -> `BUILD SUCCEEDED` com loot REDUZIDO (sem rotulo de elogio de eficiencia; o `-O0` ja comunica "lento/sujo"). Penalidade de loot/dano por selo (x/y) = economia.md (economy-designer).
+  - **Pulou e deu wipe:** `building (no optimizations, -O0)...` -> `BUILD FAILED` / `core dumped` -> HOSPITAL (mesmo fluxo acima: safe mode gratis OU credito).
+  - Contraste `-O0` (pulou, sem otimizar) vs `-O2` (encarou e otimizou, blazing fast + bonus) = feedback diegetico da escolha (Pillar 2: magia=software; encarar = compilar a mao otimizando).
 
 A economia do hospital (estes parametros) deve ser integrada formalmente em [`economia.md`](economia.md) via economy-designer.
 
@@ -149,7 +153,7 @@ Os atores na arena side-view sao **sprites 2D puros**, gerados direto no **Pixel
 - Fundo de bioma (evolucao pro hibrido).
 - Animacoes de ataque ricas por familia (VFX de Pulso/Raiz/Eco...): polimento de arte posterior.
 - Transicao "assinatura" elaborada (a do M5 e funcional).
-- COMBATE-AUTOKILL (instant-win no overworld; ver INBOX do TODO): canonizar no combat.md e plugar aqui DEPOIS.
+- COMBATE-AUTOKILL + Resolver sem encarar (instant-win no overworld + auto-resolve opt-in): **mecanica CANONIZADA em combat.md §19** (eixo de dominio auto-kill/auto-resolve/encarar). A BattleScreen ja incorpora o HOLD de abertura + verbo (§5.2 D13) e o terminal `-O0` (§3.1); o auto-kill silencioso no overworld (micro-animacao por arquetipo + falas-balao) e apresentacao de OVERWORLD, fora da BattleScreen, plugada DEPOIS.
 - CARTAS-CAST-TIME (cartas lenta/rapida; ver [`combat-flavor.md`](combat-flavor.md) + INBOX do TODO): a tela ja deve PREVER o marcador de cast na fila (ex: "Gus: interpretando...") e o spinner de fases; a mecanica de motor (cast-time real) entra como extensao DEPOIS da BattleScreen base, sem refazer.
 
 ---
@@ -182,13 +186,21 @@ O playtest pegou que o combate sem RITMO atropela tudo (inimigos agem antes do j
 
 - **D8 Modelo de ritmo: HIBRIDO.** Cada turno mostra acao + numero flutuante + log, pausa ~0.8s, segue sozinho; o jogador pode APERTAR uma tecla pra acelerar/avancar pro proximo. Fluido por padrao + controle quando quer ler. A apresentacao processa UM evento de cada vez (fila de eventos drenada do motor com timing), NAO resolve tudo instantaneo.
 - **D9 Indicador de turno: banner + highlight + 'sua vez'.** Texto claro de quem joga ("TURNO DE GUS"); ator ativo com destaque forte (brilho/seta); na vez do jogador, "SUA VEZ: escolha uma acao"; na vez do inimigo, "vez do inimigo". Leitura imediata.
-- **D10 Abertura: comeca PARADA.** Ao abrir: arena monta, "BATALHA!" breve + a fila, NINGUEM agiu. Ao iniciar, os turnos animam um a um com o ritmo; se o inimigo for o 1o (maior SPD), o jogador VE ele atacar com numero+log no tempo certo. (Resolve "inimigos ja atacaram antes de eu ver".)
+- **D10 Abertura: comeca PARADA e ESPERA INPUT.** Ao abrir: arena monta, "BATALHA!" breve + a fila, NINGUEM agiu. **A abertura agora PARA e ESPERA o jogador iniciar** (decisao do criador 2026-06-25, casa com o verbo Resolver sem encarar, D13): a luta so comeca quando o jogador manda [Encarar] (Enter). Ao iniciar, os turnos animam um a um com o ritmo; se o inimigo for o 1o (maior SPD), o jogador VE ele atacar com numero+log no tempo certo. (Resolve "inimigos ja atacaram antes de eu ver": agora o 1o turno so dispara com input do jogador.)
 - **D11 Floater no ataque do INIMIGO:** com o pacing, cada ataque inimigo aparece no seu tempo com seu numero flutuante (antes batiam todos juntos e somiam).
 - **D12 Log narra a CONSEQUENCIA:** nao so "X atacou", mas "X atacou Y: Y recebeu N de dano" e o status ("Y ficou com Stun"). A apresentacao monta a linha completa a partir do dano + status que o motor ja entrega. E com o pacing, o log nao rola rapido demais (uma linha por evento no ritmo).
+- **D13 Estado de HOLD na abertura + verbo "Resolver sem encarar" (canon 2026-06-25, combat.md §19; SO TRASH).** O estado parado do D10 e um HOLD que espera o input. Opcoes apresentadas:
+  - **[Encarar] (Enter):** inicia o combate normal (caminho ja descrito em D10). Custo ZERO de atrito (default; 99% das lutas).
+  - **[Resolver sem encarar] (tecla dedicada):** SO aparece para TRASH com selo de dominio Bronze+ (gate de onboarding; combat.md §19.2). Ao apertar, abre o **aviso de consequencias** com o **rotulo de risco** (LOW / MEDIUM / HIGH, lido do Knowledge; HIGH adverte explicitamente que pode mandar a party pro Hospital). Confirmar -> roda o auto-resolve headless (`AutoResolveBrain`, combat.md §19.6) -> terminal de resultado `-O0` (§3.1). Voltar -> encara.
+  - Em luta NAO-trash ou sem selo, o verbo NAO aparece; o HOLD ainda espera [Encarar] (Enter) para iniciar (o hold de abertura e universal; o verbo de pular e condicional ao tier Trash + selo Bronze+).
+  - O atalho global para pular em massa e o **toggle "Auto-resolver" do HUD de 3 estados** (Encarar tudo / Auto so dominado [default] / Auto maximo; combat.md §19.5). O verbo per-luta e o override pontual no estado default.
+  - Consequencia arquitetural: o `PacingDirector` ganha o estado de HOLD inicial esperando input (ja existe `WaitingPlayerInput`; aqui e um hold de abertura ANTES do 1o turno, com o menu [Encarar]/[Resolver sem encarar]). O auto-resolve em si nao usa a BattleScene (roda a FSM headless); so o resultado volta pro terminal.
 
 Consequencia arquitetural: a BattleScene ganha um "diretor de pacing" (POCO testavel) que consome os eventos do motor um a um, com timing e estados (animando / esperando-input-do-jogador / esperando-delay). O motor (domain/combat) NAO muda - so a apresentacao deixa de drenar tudo de uma vez.
 
 **Status de implementacao (incremento 6, entregue 2026-06-25):** D8-D12 implementados. `PacingDirector` POCO (`gus/app/screens/battle_pacing.{hpp,cpp}`): estados Intro / WaitingDelay / WaitingPlayerInput, avanco por `tick(dt)`, `skip()` pra acelerar. A BattleScene comeca PARADA (D10), anima 1 turno por vez com delay ~0.8s (D8/D11), mostra o banner de turno (D9) e narra a consequencia (dano + status via `consequence_suffix`, D12). Cada inimigo age UMA vez por turno (1 ataque = 1 floater no seu tempo), em vez de gastar os 3 AP de uma vez. Intro `kPacingIntroSeconds` = 0.9s; delay `kPacingStepDelaySeconds` = 0.8s.
+
+**Refinamento D8: 2 BEATS no turno de inimigo (2026-06-25, do playtest):** o lider no display: "a tela aparece com o ataque ja feito" e "quando colocar a animacao isso vai ser perdido". Causa: o motor resolve o turno instantaneo e a apresentacao mostrava o ANUNCIO junto do resultado ja aplicado. Fix: o turno de inimigo agora tem 2 beats. **Beat 1 ANUNCIO** (`PacingState::AnnouncingEnemy`, `kPacingAnnounceSeconds` = 0.7s): mostra "Vez de <nome>" + highlight, NADA resolveu (HP intacto, sem floater, sem log de acao). **E o beat onde a animacao de ataque (windup) vai morar** (gancho explicito em `advance_pacing`). **Beat 2 RESOLUCAO** (`begin_enemy_step` -> `WaitingDelay`): aplica o golpe (dano + floater + queda de HP + log de consequencia), pausa ~0.8s, proximo. Vale tambem pro 1o turno apos a intro (BATALHA! -> anuncio -> resolve). O turno do JOGADOR ja pausa no menu (`WaitingPlayerInput`), entao nao precisa do beat de anuncio. Regressao travada em `battle_scene_test` (no anuncio o alvo esta intacto; so o resolve bate).
 
 ---
 

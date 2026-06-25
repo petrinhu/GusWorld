@@ -73,6 +73,74 @@ Juros simples (jamais composto) mais tetos fixos (juros 21%, multa 13 cr, dívid
 
 ---
 
+## §3.4 Auto-resolve ("Resolver sem encarar"): parâmetros econômicos
+
+**Status:** parâmetros ratificados pelo criador supremo (AskUserQuestion, 2026-06-25).
+**Cross-ref:** o DESIGN da mecânica (UX opt-in, resolução via motor headless, tematização do build sem otimização, toggle de 3 estados, restrição só-trash) é canon em [`combat.md`](combat.md) e [`battle-screen.md`](battle-screen.md). Esta seção canoniza APENAS a ECONOMIA (loot, dano, derrota). O eixo de modulação é o **selo de domínio do bestiário** (`KnowledgeKills`, combat.md §11), o MESMO que liga o auto-kill canon no selo Ouro (overworld, INBOX COMBATE-AUTOKILL).
+
+A mecânica oferece, ao iniciar um encontro de **trash**, a escolha "Iniciar batalha? [S/N]". **SIM** entra na batalha normal. **NÃO** ("não encarar") resolve a luta por cálculo, com **penalidade**: loot REDUZIDO em `x%`, dano sofrido MAJORADO em `y%`, e chance de derrota que cai no fluxo §3.3. Penalidade pela ausência de engajamento (a "preguiça") somada à falta de conhecimento do inimigo. Uma **2ª confirmação** exibe a `P(derrota)` e o `x/y` do tier ANTES de aplicar (RNG transparente, Pillar 2: nunca opaco).
+
+### 3.4.1 Escopo e gate de onboarding (regra dura)
+
+- **Só trash mobs.** Nunca elites, mini-bosses ou bosses (idêntico à restrição do auto-kill canon).
+- **Gate de onboarding:** o "Resolver sem encarar" só é OFERTADO a partir do selo **Bronze** naquele tipo de inimigo. Inimigo **sem selo** (`KnowledgeKills` baixo, ainda não dominado nem um pouco) cai **direto na batalha**, sem oferecer o pulo. Racional: você não pode pular o que nunca encarou; protege o aprendizado do combate (o coração do jogo). O selo **Ouro** já é resolvido de graça pelo auto-kill canon no overworld (nem chega a esta tela).
+- **Faixa de atuação:** esta mecânica vive no intervalo **Bronze → Prata** (o NÃO-dominado-mas-conhecido). Abaixo disso, luta; acima (Ouro), auto-kill grátis.
+
+### 3.4.2 Penalidade modulada pelo selo (x = loot cortado, y = dano majorado)
+
+Quanto MENOR o conhecimento, PIOR o auto-resolve (mais dano, menos loot, mais risco), porque você conhece menos o inimigo. Quanto MAIOR (perto do Ouro), mais brando.
+
+| Selo (Knowledge) | `x` (loot cortado) | `y` (dano majorado) | Racional |
+|---|---|---|---|
+| Sem selo | n/a | n/a | NÃO ofertado (gate §3.4.1): cai direto na batalha |
+| **Bronze** | **40%** | **+40%** | conhece pouco: resolve quase às cegas, apanha e pilha pouco |
+| **Prata** | **13%** | **+13%** (Fibonacci) | quase no Ouro: penalidade simbólica, recompensa o domínio |
+| Ouro | n/a | n/a | auto-kill canon (grátis, overworld); fora desta mecânica |
+
+> Nota sobre o tier "Sem selo": o modelo de simulação contemplava parâmetros para `Sem selo = 40%/+40%`, mas a decisão do gate de onboarding (§3.4.1) torna esse tier inacessível por esta mecânica (cai direto na luta). Os parâmetros `40%/+40%` ficam atribuídos ao **Bronze**, que é a primeira faixa de fato ofertada. A escala efetiva é **Bronze 40%/+40% → Prata 13%/+13%**.
+
+- `x` reduz a entrada de crédito do encontro (8 cr × mult de zona, §2): `cr_auto = 8 × mult × (1 − x)`.
+- `y` majora o dano sofrido pela party, que vira custo de cura no Hospital a 1 cr / 3 HP (§3.1): `cura_auto = ceil(HP_perdido × (1 + y) / 3)`.
+
+### 3.4.3 Probabilidade de derrota (cai no §3.3)
+
+Resolução estatística instantânea (não rola turno-a-turno). A chance de a party "perder" o auto-resolve é modulada pelo selo:
+
+| Selo | `P(derrota)` | Racional |
+|---|---|---|
+| **Bronze** | **8%** (Fibonacci) | espelha o `y%=8%` do auto-kill canon ("o bug resistiu / mutou") |
+| **Prata** | **3%** | quase seguro |
+
+- **Forma canônica vigente (VS):** tabela fixa por selo (8% / 3%) como placeholder honesto. Fórmula transparente plugável depois (mesmo padrão do combat.md): `P_derrota = clamp(0.03, base_selo × (1 − margem_de_poder), 0.20)`, onde `margem_de_poder` deriva de Atk da party vs HP/Def do inimigo. A `P(derrota)` é SEMPRE exibida na 2ª confirmação (Pillar 2).
+- **Se perde:** cai **direto no fluxo de derrota canon §3.3** (corta pro Hospital → safe mode grátis a 13% HP-máx OU dívida plafonada ~72 cr). **ZERO economia nova:** o auto-resolve não cria currency, sink, nem regra de Hospital própria; reusa 100% o §3.1 e o §3.3.
+
+### 3.4.4 Saldo modelado: lutar vs auto-resolver (anti-preguiça)
+
+Simulação sobre as statlines do VS (party HP-total 144; trash; dano real por tier de domínio; mult 1.0):
+
+| Selo | Lutar (saldo líquido) | Auto-resolver (saldo de vitória) | Auto-resolver (E[saldo] com `P(derrota)`) |
+|---|---|---|---|
+| Bronze | **+2 cr** | **−1 cr** | **~−3 cr** |
+| Prata | **+4 cr** | **+2 cr** | **~+1 cr** |
+
+**Invariantes econômicos (canon anti-degeneração):**
+
+1. **Auto-resolver é SEMPRE pior que lutar** (delta de saldo negativo em todo selo e toda zona, incl. mult alto). O combate nunca morre por arbitragem de skip. É a trava anti-preguiça.
+2. **Não é free-money:** o auto nunca supera o saldo de lutar; no Bronze é net-negativo absoluto.
+3. **Não é death-loop:** o pior caso é da ordem de um encontro; o §3.3 (safe mode + dívida plafonada) é o colchão anti-softlock. A multa por reincidência do §3.3 (trava em 13 cr) já desencoraja spammar auto-resolve com a party machucada.
+4. **Anti-abuso herda o §3.3.1:** perder de propósito no auto pra "ganhar HP de mercado" continua net-negativo (perde o encontro inteiro: crédito + XP + loot + Knowledge).
+5. **No Prata vira levemente positivo** (+2 cr de vitória, ~+1 cr esperado): cumpre o propósito de **agilizar trash chato já bem dominado**, sem virar rota de farm.
+
+### 3.4.5 Bônus de "lutar de verdade" (o auto-resolve nunca supera)
+
+Reforço do contrato de incentivo (canon em battle-screen.md §3.1):
+
+- **Lutar** entrega **loot / XP / Knowledge CHEIOS** (o auto corta `x%`) MAIS o **bônus de eficiência por build rápido** (`blazing fast` / `clean build`), que o auto-resolve **nunca** recebe; MAIS mestria de carta (+1 por uso) e contagem `KnowledgeKills` subindo mais rápido.
+- **Auto-resolver** dá loot / Knowledge **básicos** (consistente com o auto-kill canon: "auto dá o básico; batalha real dá bônus").
+- Gradiente contínuo Bronze → Prata → Ouro: conforme você domina, lutar fica mais limpo (menos dano sofrido) E o auto fica mais brando, até o Ouro assumir de graça. O jogador que otimiza sempre luta; o auto-resolve é uma válvula de conforto pro trash dominado, não um caminho de progressão.
+
+---
+
 ## §4. Bio-Ampola (consumível de combate)
 
 - **Cura dinâmica:** `seq_inferior(floor((HP_max − HP_atual) / 2))`  

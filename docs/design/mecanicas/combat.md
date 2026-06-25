@@ -944,4 +944,124 @@ A regra de STACKING das 3 camadas e seu cap final (`multAmbiente ∈ [0.44, 2.25
 
 ---
 
-**Última revisão:** 2026-06-22 (M5-DMG). §11 evoluída: sorteio único de canal FALHA/CRIT/COMUM sobre a variância Knowledge preservada; FALHA decai com a maestria (`round(5 × e^(-kills × 0.50))`, 0% a partir de 5 kills); CRIT com piso global 5% elevável por `card.CritChance`, dano = `round(danoBase × (1+v) × 1.5)`; imunidade `multFraqueza==0` em curto-circuito antes do RNG; ordem de consumo do RNG documentada (1 sorteio de canal, +1 só no COMUM); RNG via porta `IRandomSource` (ADR-006, domínio puro); §7 `CritChance` redefinido como piso por carta. A §11 deixa de ser paridade com o C# (que morre no M8); o motor C++ segue esta §11. Revisão anterior 2026-06-03 (D.1+N.2 Sprint 1 W2): HP +60% Trash 34→55 / Elite 89→144; AP e Mana por-ator CTB (§5); §2.1 contrato fragilidade Gus (N.2 R1, one-way door); §10 feedback ERRO DE COMPILAÇÃO (N.2 R2); §12/§13/§15 caos Perlin exclusivo Patch-Zero (N.2 R3, one-way door); §17 stats de referência pós-inflação + roda de fraqueza confirmada. Revisão 2026-05-26: §18 ambientes de combate, §11 multAmbiente + stacking 3 camadas, escopo slice item 15. Status: canônico, pronto para implementação TDD F2-E.5.
+## 19. Resolver sem encarar (auto-resolve opt-in) + Auto-kill (eixo de domínio)
+
+**Status:** canonizado pelo criador supremo em 2026-06-25 (brainstorm colaborativo, 6 decisões via AskUserQuestion + gate de onboarding + princípio ratificado). Materializa a INBOX `COMBATE-AUTOKILL` (ideia 2026-06-23) e a mecânica nova `Resolver sem encarar` (2026-06-25) como um único eixo coerente: **quanto o jogador domina um inimigo determina quanto o sistema "roda sozinho" por ele**.
+
+### 19.1 Conceito e ludonarrativa (Pillar 1 + Pillar 2)
+
+Encarar a batalha = o jogador **compila à mão, otimizando** (escolhe cartas, lê intent via Scan, monta combo no pipeline, usa Gambito). É o caminho ótimo e é onde o aesthetic Challenge/Discovery vive.
+
+`Resolver sem encarar` = o jogador manda o sistema **rodar o build sem otimização (`-O0`, sem as flags táticas dele)**. O build roda, mas é lento e sujo: a party joga no automático mínimo, toma mais dano, colhe menos loot, e pode crashar (party wipe → Hospital, §3.1 da battle-screen). Frase-conceito canônica:
+
+> **Encarar = compilar à mão, otimizando (`-O2`). Não encarar = rodar o build sem otimização (`-O0`): roda, mas lento, sujo, e pode dar core dump.**
+
+Isto reforça Pillar 1 (a lógica é literalmente o que dá o melhor resultado; abrir mão dela custa) e Pillar 2 (magia = software; o registro terminal da batalha trata a luta como uma compilação). NÃO é "force seu caminho": é "se você não usar a cabeça, o sistema resolve pior".
+
+**Princípio ratificado (one-way-ish de design, criador 2026-06-25):** **pular NUNCA pode ser a jogada ótima contra trash não-dominado.** A penalidade (loot reduzido, dano majorado, risco real de Hospital) tem que doer o bastante para que ENCARAR seja o default de quem joga bem. Se o playtest mostrar que pular vira a jogada racional contra trash não-dominado, a penalidade sobe ou a mecânica é revista. Mede-se em playtest (§19.8).
+
+### 19.2 O eixo de domínio (auto-kill × auto-resolve × encarar)
+
+As duas mecânicas vivem em pontos diferentes do espectro de Knowledge do inimigo. O selo de domínio no bestiário (Bronze/Prata/Ouro, alimentado por `KnowledgeKills`) define o comportamento:
+
+| Domínio do inimigo (selo) | O que acontece ao esbarrar | O jogo pergunta? |
+|---|---|---|
+| **Ouro** (dominado) | **Auto-kill silencioso** no overworld: NÃO monta a arena; mata com micro-animação no próprio mapa; concede loot + Knowledge BÁSICO. | Nunca (silencioso e automático) |
+| **Ouro, 8% Fibonacci** | "O bug resistiu / mutou" → cai DIRETO na batalha (monta a arena). | Não (cai direto) |
+| **Bronze ou Prata** | Monta a arena; abertura PARA e espera input; **[Resolver sem encarar] disponível** como verbo opt-in. | Só se o jogador apertar o verbo |
+| **Sem selo** (1º contato / quase nenhum kill) | Monta a arena; abertura PARA e espera input; **[Resolver sem encarar] NÃO aparece** (gate de onboarding). | Não (sem opção de pular; encara) |
+
+Leitura de design: conforme o jogador domina o inimigo, o "rodar sozinho" evolui de IMPOSSÍVEL (sem selo, encara obrigatório) → OPÇÃO custosa (Bronze/Prata, auto-resolve com penalidade) → AUTOMÁTICO grátis (Ouro, auto-kill com loot básico). É o mesmo verbo conceitual ("o sistema roda sozinho") em três níveis de maestria, casando perfeitamente com a Knowledge Progression (Pillar 1).
+
+**Gate de onboarding (canon 2026-06-25):** `Resolver sem encarar` só é oferecido a partir do selo **Bronze** naquele tipo de inimigo. Sem selo (jogador ainda não conhece o inimigo), cai direto na luta. Razão: pular às cegas um inimigo desconhecido fere Pillar 1 (informação habilita ação) e o onboarding; o jogador precisa ter lutado o suficiente para o jogo saber estimar o risco (§19.6).
+
+### 19.3 Escopo: SÓ TRASH (canon 2026-06-25)
+
+`Resolver sem encarar` e o auto-kill aplicam **somente a inimigos Trash**. Boss, mini-boss, elite e qualquer luta scriptada de história **sempre encaram**, sem opção de pular. Mesma fronteira do auto-kill original (só-trash) e do Flee (§14: bloqueado em mini-boss/boss). Em lutas não-trash o verbo simplesmente não existe na abertura.
+
+- **Por que:** elite usa `UtilityBrain` (intent complexo, multi-AP §13.1) e boss é onde o sistema brilha e a narrativa pesa; deixar pular esvaziaria o tier de maior Challenge e seria absurdo narrativo. Coerente com 3 sistemas já canônicos.
+
+### 19.4 Fluxo de UX (Opção 1B + abertura-espera-input, canon 2026-06-25)
+
+**Default é ENCARAR. Não há splash S/N em toda luta** (anti-pillar de fricção; o auto-kill canon já manda "o jogo NUNCA pergunta por inimigo"). A abertura da batalha PARA e espera o input do jogador, o que de quebra resolve o ritmo (a luta só começa quando o jogador manda).
+
+Sequência ao esbarrar num Trash não-dominado (Bronze+):
+
+1. **Transição de entrada** (battle-screen §3.3): boot/scanline ~0.5s, a arena monta.
+2. **Estado de HOLD na abertura** (battle-screen §5.2 D10, agora com espera de input): a arena monta PARADA, exibe **"BATALHA!"** + a fila CTB; NINGUÉM agiu ainda. A tela espera o jogador:
+   - **[Encarar] (Enter):** inicia o combate normal; os turnos passam a animar um a um com o `PacingDirector` (D8-D12). Custo ZERO de atrito para quem encara (99% das lutas).
+   - **[Resolver sem encarar] (tecla dedicada):** SÓ aparece para Trash com selo Bronze+. Ao apertar, abre o **aviso de consequências** (§19.6) com o rótulo de risco; o jogador confirma ou volta para encarar.
+3. Quem não aperta o verbo simplesmente encara (default). O verbo é um gesto deliberado, opt-in, nunca imposto.
+
+Notas:
+- A abertura-espera-input substitui a abertura que "começava parada e animava sozinha"; agora **o 1º turno só dispara com o input do jogador** (resolve o feedback de playtest "a tela aparece com o ataque já feito").
+- NÃO se memoriza a escolha por inimigo (comportamento implícito seria confuso). O atalho global para pular em massa é o toggle de 3 estados (§19.5).
+- Em lutas sem selo / não-trash, o verbo não aparece; a abertura ainda PARA e espera [Encarar] (Enter) para iniciar (o hold é universal; o verbo de pular é condicional).
+
+### 19.5 Toggle "Auto-resolver" do HUD: 3 estados (Opção 4B, canon 2026-06-25)
+
+O toggle do HUD previsto na INBOX do auto-kill ganha **3 estados** (em vez de liga/desliga), expressando "quanto eu deixo o sistema rodar por mim":
+
+| Estado | Comportamento | Para quem |
+|---|---|---|
+| **Encarar tudo** | Luta tudo na mão, INCLUSIVE o dominado (Ouro não é auto-killado). | Modo treino / bônus (lutar de verdade dá o bônus de eficiência, §3.1). |
+| **Auto só dominado** (DEFAULT) | Auto-kill silencioso no Ouro; abaixo de Ouro monta a arena e o jogador encara (com [Resolver sem encarar] à mão como override pontual em Bronze+). | Andar sem atrito numa tela cheia, lutando o que ainda vale. |
+| **Auto máximo / "modo pressa"** | Auto-kill no Ouro + auto-resolve AUTOMÁTICO no Bronze+ também (assume as penalidades sem perguntar caso a caso). | Atravessar uma área já grindada rápido, aceitando o custo. |
+
+- O verbo per-luta [Resolver sem encarar] (§19.4) é o override pontual no estado DEFAULT (não precisa mexer no toggle para pular UMA luta).
+- O auto-kill no Ouro é silencioso e automático em "Auto só dominado" e "Auto máximo" (nunca pergunta por inimigo, INBOX canon).
+- Trash sem selo NUNCA é pulado por nenhum estado do toggle (gate de onboarding, §19.2): só Bronze+ é elegível ao auto-resolve.
+
+### 19.6 Cálculo do auto-resolve (Opção 2C: FSM headless + IA sub-ótima, canon 2026-06-25)
+
+O auto-resolve NÃO usa fórmula fechada paralela. Roda o **próprio motor** (`CombatStateMachine`, POCO puro, já roda headless sem janela: é como os testes rodam) com uma **IA de party deliberadamente sub-ótima**. O resultado pior EMERGE da falta de otimização, não de um número mágico colado por cima.
+
+**`AutoResolveBrain` (IA de party sub-ótima, POCO testável):**
+- Só **ataque básico** (subtrativo, §11) + no MÁXIMO **1 carta single-target da família dominante** da party naquele encontro.
+- NÃO usa Gambito (sem Prever, sem Reordenar).
+- NÃO monta combos (pipeline nunca passa de 1 carta; zero `multCombo`).
+- NÃO usa Scan (logo NÃO habilita Null/Expose; perde `multExpose`).
+- NÃO lê intent (toma os golpes que viriam).
+
+Como a IA não otimiza, a simulação naturalmente: tarda mais turnos (compile time alto, §3.1), toma mais dano (sem mitigação tática), e pode terminar em party wipe contra um Trash de risco mais alto. As penalidades adicionais de loot/dano por selo ficam parametrizadas em `economia.md` (§19.7).
+
+**Determinismo / RNG:** a FSM consome o RNG injetado (`IRandomSource`, ADR-006) com a variância Knowledge real (§11). O auto-resolve usa a MESMA seed/fonte da estimativa de risco (§19.6) para que **classificação de risco e resultado nunca se contradigam** (um inimigo marcado "risco baixo" não pode acabar em wipe por divergência de cálculo: seria mentira do sistema e frustração legítima). Roda em <1ms (sem render).
+
+### 19.7 Sinalização de risco + parâmetros econômicos (Opção 6A, canon 2026-06-25)
+
+Antes de confirmar o pulo, o aviso de consequências (§19.4) mostra a **chance de derrota como rótulo qualitativo: baixa / média / alta**, derivada do Knowledge e do poder relativo party × inimigo (mesma simulação do §19.6). Tematizado no registro terminal: `risk assessment: LOW / MEDIUM / HIGH`.
+
+- **Por que rótulo e não porcentagem exata:** legível para o público-alvo (prodígio de 11 anos, Pillar 4), sem convidar o min-max frio; e uma % exata de uma simulação com variância sugere uma precisão que não existe.
+- **Risco ALTO = aviso explícito de Hospital** (canon 2026-06-25): se a chance for alta, o aviso adverte que pular pode mandar a party para o Hospital (`HIGH risk: pode mandar a party pro Hospital`) e exige confirmação consciente.
+- **Hospital ao pular** usa o MESMO fluxo do §3.1 da battle-screen (safe mode grátis OU cura a crédito); nada novo na economia. A tensão é legítima porque o jogador escolheu pular um inimigo de risco alto e confirmou ciente; o que NUNCA pode acontecer é o auto-resolve mandar ao Hospital um inimigo classificado "risco baixo" (garantido pelo cálculo único, §19.6).
+
+**Parâmetros econômicos (em `economia.md`, escritos pelo economy-designer em paralelo):**
+- `x` = redução de loot por pulo, por selo (Bronze/Prata; Ouro abaixo entra no auto-kill com loot básico).
+- `y` = dano majorado / penalidade do auto-resolve por selo.
+- Faixas de `P(derrota)` que mapeiam para os rótulos baixo/médio/alto.
+- O bônus de "lutar de verdade" (eficiência de build, §3.1) e o loot básico do auto-kill ficam calibrados lá, sob o princípio §19.1 (pular nunca é a jogada ótima contra trash não-dominado).
+
+Este documento define a MECÂNICA e o PRINCÍPIO; a calibração numérica é de `economia.md`.
+
+### 19.8 Tematização no terminal de resultado
+
+O fim de um combate pulado imprime no terminal de resultado (battle-screen §3.1) um **build NÃO-otimizado**, distinto do build à mão:
+
+- **Pulou e sobreviveu:** `building (no optimizations, -O0)...` → `warning: combat resolved unattended` → `BUILD SUCCEEDED` com loot reduzido (sem rótulo de elogio de eficiência; o `-O0` já comunica "lento/sujo").
+- **Pulou e deu wipe:** `building (no optimizations, -O0)...` → `BUILD FAILED` / `core dumped` → Hospital (fluxo §3.1).
+- **Encarou e venceu rápido:** o canon §3.1 já cobre (`clean build, -O2, blazing fast` + bônus de eficiência).
+
+O contraste `-O0` (pulou) vs `-O2` (encarou e otimizou) é o feedback diegético da escolha (Pillar 2).
+
+### 19.9 Escopo de implementação
+
+- **`AutoResolveBrain`** (POCO testável) em `domain/combat/`: heurística mínima descrita em §19.6. Isolável, testável sem janela.
+- **Função de auto-resolve**: instancia o encontro, injeta `AutoResolveBrain` na party + o mesmo brain inimigo do encontro, roda a `CombatStateMachine` headless até `CombatEnd`, devolve o payload (vitória/wipe + dano + loot bruto). PURA, sem framework.
+- **Estimativa de risco**: a mesma simulação rodada 1x (ou amostrada) classifica baixo/médio/alto antes do aviso (§19.7); compartilha a fonte de RNG com o auto-resolve real.
+- **Selo de domínio**: lê o `KnowledgeKills` do save (já portado, M3) e mapeia para Bronze/Prata/Ouro (thresholds = `economia.md` / bestiário; gate Bronze para o verbo).
+- **Apresentação** (battle-screen, `app/`): estado de HOLD na abertura com [Encarar]/[Resolver sem encarar] (§19.4 / battle-screen §5.2), aviso de consequências com rótulo de risco, toggle de 3 estados no HUD, terminal de resultado `-O0` (§19.8). O auto-kill silencioso no overworld é apresentação de overworld (micro-animação por arquétipo + falas-balão, INBOX canon), fora da BattleScreen.
+- O motor (`domain/`, `core/`) permanece POCO puro; o auto-resolve é uma chamada à FSM existente com um brain diferente, não um novo sistema de regras.
+
+---
+
+**Última revisão:** 2026-06-25 (§19 Resolver sem encarar + auto-kill, eixo de domínio). Nova seção canoniza a mecânica opt-in de pular combate de Trash (Opção 1B + abertura-espera-input), o cálculo via FSM headless com `AutoResolveBrain` sub-ótima (Opção 2C), a tematização `-O0`/`-O2` no terminal (D-C), o toggle de HUD de 3 estados (Opção 4B), escopo só-Trash (Opção 5A), rótulo de risco baixo/médio/alto com aviso de Hospital no alto (Opção 6A), o gate de onboarding em Bronze, e o princípio "pular nunca é a jogada ótima contra trash não-dominado". Parâmetros econômicos (x/y por selo, faixas de P-derrota) em `economia.md` (economy-designer, paralelo). Revisão anterior 2026-06-22 (M5-DMG). §11 evoluída: sorteio único de canal FALHA/CRIT/COMUM sobre a variância Knowledge preservada; FALHA decai com a maestria (`round(5 × e^(-kills × 0.50))`, 0% a partir de 5 kills); CRIT com piso global 5% elevável por `card.CritChance`, dano = `round(danoBase × (1+v) × 1.5)`; imunidade `multFraqueza==0` em curto-circuito antes do RNG; ordem de consumo do RNG documentada (1 sorteio de canal, +1 só no COMUM); RNG via porta `IRandomSource` (ADR-006, domínio puro); §7 `CritChance` redefinido como piso por carta. A §11 deixa de ser paridade com o C# (que morre no M8); o motor C++ segue esta §11. Revisão anterior 2026-06-03 (D.1+N.2 Sprint 1 W2): HP +60% Trash 34→55 / Elite 89→144; AP e Mana por-ator CTB (§5); §2.1 contrato fragilidade Gus (N.2 R1, one-way door); §10 feedback ERRO DE COMPILAÇÃO (N.2 R2); §12/§13/§15 caos Perlin exclusivo Patch-Zero (N.2 R3, one-way door); §17 stats de referência pós-inflação + roda de fraqueza confirmada. Revisão 2026-05-26: §18 ambientes de combate, §11 multAmbiente + stacking 3 camadas, escopo slice item 15. Status: canônico, pronto para implementação TDD F2-E.5.
