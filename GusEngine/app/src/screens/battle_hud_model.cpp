@@ -68,9 +68,14 @@ std::vector<ResourcePip> resource_pips(float x, float y, int total, int lit,
 }
 
 Rect arena_hp_bar_frame(const Rect& actor_slot) noexcept {
-    // Mesma largura do slot, centrada (slot ja e o quadro do ator), logo abaixo da base.
-    const float y = actor_slot.y + actor_slot.h + static_cast<float>(kArenaHpBarGapY);
-    return Rect{actor_slot.x, y, actor_slot.w, static_cast<float>(kArenaHpBarH)};
+    // ANCORADA NA BASE INTERNA do slot (ultimos kArenaHpBarH px DENTRO do quadro), com
+    // folga lateral (kArenaHpBarInsetX). Fica SEMPRE dentro dos limites do proprio slot,
+    // entao nunca invade o ator vizinho (de baixo ou do lado). Centrada na largura.
+    const float inset = static_cast<float>(kArenaHpBarInsetX);
+    const float x = actor_slot.x + inset;
+    const float w = actor_slot.w - 2.0f * inset;
+    const float y = actor_slot.y + actor_slot.h - static_cast<float>(kArenaHpBarH);
+    return Rect{x, y, w, static_cast<float>(kArenaHpBarH)};
 }
 
 }  // namespace gus::app::screens

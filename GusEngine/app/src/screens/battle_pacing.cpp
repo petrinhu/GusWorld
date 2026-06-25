@@ -7,11 +7,14 @@
 namespace gus::app::screens {
 
 bool PacingDirector::ready_to_step() const noexcept {
-    // Esperando o jogador: o tempo nunca libera passo (so player_acted retoma).
-    if (state_ == PacingState::WaitingPlayerInput) {
+    // Estados que esperam INPUT (nao tempo) nunca liberam passo sozinhos:
+    //   Intro              -> espera ENCARAR (begin_combat);
+    //   WaitingPlayerInput -> espera o menu (player_acted).
+    if (state_ == PacingState::Intro ||
+        state_ == PacingState::WaitingPlayerInput) {
         return false;
     }
-    // Intro/delay: liberado quando o timer zerou.
+    // Estados timed (anuncio/delay): liberado quando o timer zerou.
     return timer_ <= 0.0f;
 }
 
@@ -19,8 +22,10 @@ void PacingDirector::tick(float dt_seconds) noexcept {
     if (dt_seconds <= 0.0f) {
         return;
     }
-    if (state_ == PacingState::WaitingPlayerInput) {
-        return;  // a vez do jogador nao avanca por tempo
+    // Intro e vez-do-jogador esperam INPUT: o tempo nao avanca a abertura nem a vez.
+    if (state_ == PacingState::Intro ||
+        state_ == PacingState::WaitingPlayerInput) {
+        return;
     }
     timer_ -= dt_seconds;
     if (timer_ < 0.0f) {
@@ -29,11 +34,34 @@ void PacingDirector::tick(float dt_seconds) noexcept {
 }
 
 void PacingDirector::skip() noexcept {
-    // Acelera intro/delay; NAO pula o turno do jogador.
-    if (state_ == PacingState::WaitingPlayerInput) {
+    // Acelera APENAS a pausa de LEITURA pos-resolucao (WaitingDelay). NAO afeta:
+    //   - Intro (espera Encarar) e WaitingPlayerInput (espera o menu): saem por input;
+    //   - AnnouncingEnemy (BEAT 1): o anuncio "Vez de <nome>" SEMPRE toca seu tempo
+    //     proprio. BUG (lider no display): apertar a tecla durante o anuncio colapsava o
+    //     anuncio em 1 frame -> o ataque do inimigo seguinte saia "colado" (impressao de
+    //     ataque duplo). O anuncio e o beat onde a animacao de ataque vai morar; ele NAO
+    //     pode ser pulado, senao o golpe perde o windup. So a pausa de leitura acelera.
+    if (state_ != PacingState::WaitingDelay) {
         return;
     }
     timer_ = 0.0f;
+}
+
+void PacingDirector::begin_combat() noexcept {
+    // ENCARAR: sai da abertura PARADA e libera o 1o passo. Vai pra WaitingDelay com timer
+    // 0 (liberado JA) -> o proximo advance_pacing anuncia/inicia o 1o turno. So no Intro.
+    if (state_ != PacingState::Intro) {
+        return;
+    }
+    state_ = PacingState::WaitingDelay;
+    timer_ = 0.0f;
+}
+
+void PacingDirector::begin_enemy_announce() noexcept {
+    // BEAT 1: anuncia o turno de inimigo. Estado timed (como Intro/WaitingDelay):
+    // ready_to_step/tick/skip ja o tratam (so WaitingPlayerInput e especial).
+    state_ = PacingState::AnnouncingEnemy;
+    timer_ = kPacingAnnounceSeconds;
 }
 
 void PacingDirector::begin_enemy_step() noexcept {

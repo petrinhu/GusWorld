@@ -457,20 +457,74 @@ void BattleScene::advance_pacing() {
     // Vez do JOGADOR: nao auto-resolve - entra em espera-do-input (D9 "sua vez"). O menu
     // ja esta habilitado pelo start_active_turn. So retoma o ritmo no menu_confirm.
     if (current_actor_is_player()) {
+        enemy_announced_ = false;  // limpa o beat de anuncio (proximo inimigo re-anuncia)
         if (pacing_.state() != PacingState::WaitingPlayerInput) {
             pacing_.begin_player_turn();
         }
         return;
     }
-    // Vez do INIMIGO: resolve UM turno (com floater + log de consequencia) e segura o
-    // delay pro jogador LER (D8/D11). O proximo turno so anima apos o delay.
+
+    // Vez do INIMIGO em 2 BEATS (o lider: "a tela aparece com o ataque ja feito"):
+    if (!enemy_announced_) {
+        // BEAT 1 ANUNCIO: mostra "Vez de <nome>" + highlight forte. NADA resolveu ainda
+        // (HP intacto, sem floater, sem linha de acao no log). Pausa ~0.7s OU tecla.
+        //
+        // >>> GANCHO DE ANIMACAO (futuro): aqui entra a animacao de ataque do inimigo
+        //     (telegraph -> windup). Hoje so anuncia e espera; quando a anim existir, ela
+        //     toca NESTE beat, e o golpe "conecta" no inicio do BEAT 2 (resolucao). E
+        //     EXATAMENTE o beat que o lider disse que "vai morar a animacao". <<<
+        enemy_announced_ = true;
+        pacing_.begin_enemy_announce();
+        return;
+    }
+    // BEAT 2 RESOLUCAO: AGORA aplica a acao (dano + floater + queda de HP + log de
+    // consequencia) e segura o delay pro jogador LER (D8/D11). Limpa o flag de anuncio
+    // pro proximo turno de inimigo re-anunciar.
+    enemy_announced_ = false;
     resolve_one_turn();
     pacing_.begin_enemy_step();
 }
 
 void BattleScene::skip() {
-    // D8: acelera a intro / encurta o delay entre turnos. Nao pula o turno do jogador.
+    // D8: encurta o delay/anuncio entre turnos. NAO pula a abertura (espera Encarar) nem
+    // o turno do jogador (o PacingDirector ignora skip nesses estados).
     pacing_.skip();
+}
+
+void BattleScene::start_combat() {
+    // ENCARAR (lider 2026-06-25): sai da abertura PARADA e libera o 1o turno. Os 2 beats
+    // (anuncio -> resolucao) animam normalmente a partir do proximo update/advance_pacing.
+    pacing_.begin_combat();
+}
+
+bool BattleScene::offers_auto_resolve() const {
+    // Verbo "[Q] Resolver sem encarar" so e OFERECIDO quando TODOS os inimigos vivos sao
+    // TRASH (nao-boss). No demo todos sao trash, entao aparece. Boss/elite (is_boss)
+    // escondem o verbo (precisa encarar). So faz sentido na abertura.
+    if (!is_intro()) {
+        return false;
+    }
+    bool any_enemy = false;
+    for (const CombatActor* a : machine_->queue().order()) {
+        if (a != nullptr && !a->is_player_side() && a->is_alive()) {
+            any_enemy = true;
+            if (a->is_boss()) {
+                return false;  // tem boss/elite -> precisa encarar
+            }
+        }
+    }
+    return any_enemy;
+}
+
+void BattleScene::request_auto_resolve() {
+    // PLACEHOLDER (lider 2026-06-25): o auto-resolve real (motor headless + penalidade por
+    // selo) vira num incremento SEPARADO, apos o design ser canonizado nos docs. So plante
+    // o gancho do verbo aqui: sinaliza no log e NAO faz nada destrutivo (nem sai do Intro).
+    if (!offers_auto_resolve()) {
+        return;  // so quando oferecido (trash, na abertura)
+    }
+    ui_log_.push_back(LogLine{LogLineKind::System,
+                              "[auto-resolve: a implementar]"});
 }
 
 std::string_view BattleScene::turn_banner_key() const noexcept {
@@ -753,6 +807,26 @@ void BattleScene::render(IRenderer& renderer, float viewport_px_w,
             const float tx = (static_cast<float>(kBattleLogicalW) - tw) * 0.5f;
             renderer.draw_text(text.c_str(), tx, by + 2.0f, kBannerTextPx, col,
                                /*bold=*/true);
+
+            // ABERTURA: prompt de input abaixo do "BATALHA!" (lider 2026-06-25). A luta so
+            // comeca quando o jogador ENCARA. "[Enter] Encarar" sempre; "[Q] Resolver sem
+            // encarar" so se oferecido (TRASH). Texto menor, centrado, sob o banner.
+            if (is_intro()) {
+                float py = by + kBannerTextPx + 6.0f;
+                const auto draw_prompt = [&](const char* tr_key) {
+                    const std::string t = translator_->tr(tr_key);
+                    const float pw =
+                        gus::platform::render2d::text_width(t, kPanelTextPx);
+                    const float px = (static_cast<float>(kBattleLogicalW) - pw) * 0.5f;
+                    renderer.draw_text(t.c_str(), px, py, kPanelTextPx,
+                                       kBannerPlayerColor, /*bold=*/false);
+                    py += kPanelTextPx + 4.0f;
+                };
+                draw_prompt("COMBAT_INTRO_ENCARAR");
+                if (offers_auto_resolve()) {
+                    draw_prompt("COMBAT_INTRO_AUTORESOLVE");
+                }
+            }
         }
     }
 
@@ -817,7 +891,11 @@ void BattleScene::render(IRenderer& renderer, float viewport_px_w,
     }
 
     // --- painel do ator ativo (base): DADOS REAIS do motor (incremento 2) ---
-    {
+    // FIX (lider no display): NAO renderiza na ABERTURA (is_intro). No hold de abertura o
+    // ator ativo e o 1o da fila por SPD (o inimigo Drone), entao o painel exibia os dados
+    // do INIMIGO e o menu nao aparecia ("quadro preto sem opcoes"). A abertura mostra so
+    // CTB + arena + banner + prompt; o painel/menu so aparecem DEPOIS de Encarar.
+    if (!is_intro()) {
         const Rect p = active_panel_rect();
         renderer.draw_filled_rect(p, kPanelColor);
         renderer.draw_rect_outline(p, kHudBorderColor, 1.0f);
@@ -910,7 +988,10 @@ void BattleScene::render(IRenderer& renderer, float viewport_px_w,
     }
 
     // --- caixa de log (base): ESTRUTURA por evento (D7), 1 marca colorida por linha ---
-    {
+    // FIX (lider no display): NAO renderiza na ABERTURA - na intro o log esta vazio e a
+    // caixa virava um "quadrao preto" grande. So aparece DEPOIS de Encarar (quando ha
+    // narracao). A abertura fica limpa (CTB + arena + banner + prompt).
+    if (!is_intro()) {
         const Rect l = log_panel_rect();
         renderer.draw_filled_rect(l, kLogColor);
         renderer.draw_rect_outline(l, kHudBorderColor, 1.0f);

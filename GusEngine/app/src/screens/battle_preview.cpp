@@ -175,8 +175,10 @@ int run_battle_preview() {
                   << "\n  party=" << scene.party_count()
                   << " inimigos=" << scene.enemy_count()
                   << " fila=" << scene.queue_len() << " retratos em " << dir
-                  << "\n  Cima/Baixo: navega o menu | Enter/Espaco: na sua vez confirma o "
-                     "verbo, senao ACELERA o ritmo | Esc: sai\n";
+                  << "\n  ABERTURA: Enter = Encarar (comeca a luta) | Q = Resolver sem "
+                     "encarar (placeholder)"
+                  << "\n  COMBATE: Cima/Baixo navega o menu | Enter/Espaco: na sua vez "
+                     "confirma o verbo, senao ACELERA o ritmo | Esc: sai\n";
 
         bool running = true;
         bool have_last = false;
@@ -205,13 +207,22 @@ int run_battle_preview() {
                         case SDLK_RETURN:
                         case SDLK_KP_ENTER:  // Enter do numpad tambem confirma
                         case SDLK_SPACE:
-                            // D8/D9: na vez do jogador, confirma o verbo; fora dela
-                            // (intro/delay entre turnos), ACELERA o ritmo (pula a pausa).
-                            if (scene.waiting_player_input()) {
+                            // ABERTURA (lider 2026-06-25): na tela "BATALHA!" parada,
+                            // Enter ENCARA e comeca o combate. Depois: na vez do jogador
+                            // confirma o verbo; fora dela (anuncio/delay) ACELERA o ritmo.
+                            if (scene.is_intro()) {
+                                scene.start_combat();  // Encarar
+                            } else if (scene.waiting_player_input()) {
                                 scene.menu_confirm();
                             } else {
                                 scene.skip();
                             }
+                            break;
+                        case SDLK_Q:
+                            // "[Q] Resolver sem encarar" (verbo OPT-IN, so TRASH na
+                            // abertura). Placeholder neste incremento: a cena loga
+                            // "[auto-resolve: a implementar]" e nao faz nada destrutivo.
+                            scene.request_auto_resolve();
                             break;
                         default:
                             break;
@@ -222,15 +233,23 @@ int run_battle_preview() {
                 break;
             }
 
-            // dt real desde o ultimo frame (segundos): envelhece os numeros flutuantes.
+            // dt real desde o ultimo frame (segundos): envelhece os numeros flutuantes
+            // e dirige o pacing (2 beats por turno). CLAMP anti-salto: o 1o frame apos o
+            // setup pesado (bake do atlas de fonte + load de texturas) chega com dt
+            // ENORME (1-2s); sem teto, o pacing avancaria intro+anuncio+resolucao de uma
+            // vez e a tela "abriria com o ataque ja feito" (bug pego pelo lider 3x). O
+            // teto de 50ms (~3 frames a 60fps) garante que nenhum frame pule um beat.
             const unsigned long long now_ns = SDL_GetTicksNS();
             float dt = 0.0f;
             if (have_last) {
                 dt = static_cast<float>(now_ns - last_ns) / 1.0e9f;
+                if (dt > 0.05f) {
+                    dt = 0.05f;  // clamp anti-salto (spiral-of-death / 1o frame lento)
+                }
             }
             have_last = true;
             last_ns = now_ns;
-            scene.update(dt);  // anima os floaters (incremento 5); nao toca a FSM
+            scene.update(dt);  // anima os floaters + pacing; nao toca a FSM
 
             int pw = kWindowW, ph = kWindowH;
             SDL_GetCurrentRenderOutputSize(sdl_renderer, &pw, &ph);

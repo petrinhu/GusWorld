@@ -11,7 +11,6 @@
 
 #include "gus/app/screens/battle_pacing.hpp"
 
-using Catch::Matchers::WithinAbs;
 using gus::app::screens::kPacingIntroSeconds;
 using gus::app::screens::kPacingStepDelaySeconds;
 using gus::app::screens::PacingDirector;
@@ -24,26 +23,37 @@ TEST_CASE("pacing: comeca em INTRO parada (D10: ninguem agiu)", "[battle_pacing]
     REQUIRE_FALSE(d.ready_to_step());
 }
 
-TEST_CASE("pacing: a intro termina por tempo e libera o 1o passo", "[battle_pacing]") {
+TEST_CASE("pacing: a ABERTURA NAO auto-avanca por tempo (espera Encarar)",
+          "[battle_pacing]") {
     PacingDirector d;
-    d.tick(kPacingIntroSeconds * 0.5f);
-    REQUIRE(d.state() == PacingState::Intro);  // ainda na intro
+    REQUIRE(d.state() == PacingState::Intro);
+    REQUIRE(d.waiting_intro());
     REQUIRE_FALSE(d.ready_to_step());
-    d.tick(kPacingIntroSeconds);  // passa do tempo de intro
-    REQUIRE(d.ready_to_step());   // libera o 1o turno
+    // O tempo NAO libera a abertura (decisao do lider: fica parada no BATALHA! ate o
+    // jogador encarar). Mesmo muito tempo, continua no Intro.
+    d.tick(kPacingIntroSeconds * 5.0f);
+    REQUIRE(d.state() == PacingState::Intro);
+    REQUIRE_FALSE(d.ready_to_step());
 }
 
-TEST_CASE("pacing: skip pula a intro na hora (1a tecla)", "[battle_pacing]") {
+TEST_CASE("pacing: ENCARAR (begin_combat) sai da abertura e libera o 1o passo",
+          "[battle_pacing]") {
     PacingDirector d;
     REQUIRE_FALSE(d.ready_to_step());
+    // skip NAO pula a abertura (so o jogador encara).
     d.skip();
-    REQUIRE(d.ready_to_step());  // a tecla acelerou: libera ja
+    REQUIRE(d.state() == PacingState::Intro);
+    REQUIRE_FALSE(d.ready_to_step());
+    // Encarar: libera o 1o passo do combate.
+    d.begin_combat();
+    REQUIRE_FALSE(d.waiting_intro());
+    REQUIRE(d.ready_to_step());  // o 1o turno pode comecar a animar
 }
 
 TEST_CASE("pacing: ao animar um turno de inimigo, entra em EsperaDelay e segura ~0.8s",
           "[battle_pacing]") {
     PacingDirector d;
-    d.skip();  // sai da intro
+    d.begin_combat();  // ENCARAR: sai da abertura
     REQUIRE(d.ready_to_step());
     // A cena resolveu 1 turno de inimigo e avisa o diretor (begin_enemy_step): entra em
     // EsperaDelay (o numero/log ficam na tela pelo delay).

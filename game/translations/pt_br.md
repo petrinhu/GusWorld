@@ -179,6 +179,12 @@ Turno do inimigo
 ## COMBAT_BANNER_BATTLE
 BATALHA!
 
+## COMBAT_INTRO_ENCARAR
+[Enter] Encarar
+
+## COMBAT_INTRO_AUTORESOLVE
+[Q] Resolver sem encarar
+
 ## COMBAT_BANNER_PLAYER_TURN
 Vez de {0}
 

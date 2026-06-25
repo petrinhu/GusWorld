@@ -22,7 +22,7 @@ using Catch::Matchers::WithinAbs;
 using gus::app::screens::arena_hp_bar_frame;
 using gus::app::screens::bar_fill;
 using gus::app::screens::bar_fill_rect;
-using gus::app::screens::kArenaHpBarGapY;
+using gus::app::screens::kArenaHpBarInsetX;
 using gus::app::screens::kArenaHpBarH;
 using gus::app::screens::kPipGap;
 using gus::app::screens::kPipSize;
@@ -129,14 +129,21 @@ TEST_CASE("resource_pips: total 0 nao gera pip", "[battle_hud]") {
     REQUIRE(pips.empty());
 }
 
-TEST_CASE("arena_hp_bar_frame: centrada sob o slot, logo abaixo da base",
+TEST_CASE("arena_hp_bar_frame: DENTRO da base do slot, sem invadir o vizinho",
           "[battle_hud]") {
     const Rect slot{40.0f, 100.0f, 56.0f, 64.0f};
     const Rect bar = arena_hp_bar_frame(slot);
-    // Mesma largura e X do slot (centrada sob ele).
-    REQUIRE_THAT(bar.x, WithinAbs(slot.x, 1e-5f));
-    REQUIRE_THAT(bar.w, WithinAbs(slot.w, 1e-5f));
-    // Logo abaixo da base do sprite (base + gap).
-    REQUIRE_THAT(bar.y, WithinAbs(slot.y + slot.h + kArenaHpBarGapY, 1e-5f));
+    // Folga lateral (inset) das bordas do slot, centrada na largura.
+    REQUIRE_THAT(bar.x, WithinAbs(slot.x + kArenaHpBarInsetX, 1e-5f));
+    REQUIRE_THAT(bar.w, WithinAbs(slot.w - 2.0f * kArenaHpBarInsetX, 1e-5f));
     REQUIRE_THAT(bar.h, WithinAbs(static_cast<float>(kArenaHpBarH), 1e-5f));
+    // FIX (regressao de UI): a barra fica ANCORADA NA BASE INTERNA do slot - os ultimos
+    // kArenaHpBarH px DENTRO do quadro. Logo, esta INTEIRAMENTE dentro do slot e NUNCA
+    // ultrapassa a base (nao invade o ator de baixo nem o gap).
+    REQUIRE_THAT(bar.y, WithinAbs(slot.y + slot.h - kArenaHpBarH, 1e-5f));
+    REQUIRE(bar.y >= slot.y);                       // dentro do topo do slot
+    REQUIRE(bar.y + bar.h <= slot.y + slot.h + 1e-5f);  // NAO ultrapassa a base
+    // E a folga lateral mantem a barra dentro das bordas horizontais do slot.
+    REQUIRE(bar.x >= slot.x);
+    REQUIRE(bar.x + bar.w <= slot.x + slot.w + 1e-5f);
 }

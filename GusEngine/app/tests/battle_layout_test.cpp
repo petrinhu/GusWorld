@@ -18,10 +18,14 @@ using Catch::Matchers::WithinAbs;
 using gus::app::screens::active_panel_rect;
 using gus::app::screens::ArenaLayout;
 using gus::app::screens::arena_layout;
+using gus::app::screens::arena_slot_height;
 using gus::app::screens::battle_screen_rect;
 using gus::app::screens::ctb_strip;
 using gus::app::screens::CtbStrip;
+using gus::app::screens::kActivePanelTop;
+using gus::app::screens::kActorSlotGapY;
 using gus::app::screens::kActorSlotH;
+using gus::app::screens::kActorSlotMinH;
 using gus::app::screens::kArenaBottom;
 using gus::app::screens::kArenaTop;
 using gus::app::screens::kBattleLogicalH;
@@ -68,15 +72,16 @@ TEST_CASE("arena: party na esquerda, inimigos na direita (D2)", "[battle_layout]
     REQUIRE_THAT(a.enemies[0].rect.x, WithinAbs(static_cast<float>(kEnemyColumnX), 1e-4f));
 }
 
-TEST_CASE("arena: espacamento vertical FIXO entre slots empilhados (D2)",
+TEST_CASE("arena: espacamento vertical CONSISTENTE entre slots empilhados (D2)",
           "[battle_layout]") {
     const ArenaLayout a = arena_layout(3, 4, -1);
-    // Gap entre slots consecutivos da party e constante.
-    const float gap01 = a.party[1].rect.y - a.party[0].rect.y;
-    const float gap12 = a.party[2].rect.y - a.party[1].rect.y;
-    REQUIRE_THAT(gap12, WithinAbs(gap01, 1e-4f));
-    // E vale kActorSlotH + gap (passo de empilhamento).
-    REQUIRE(gap01 > static_cast<float>(kActorSlotH));
+    // Passo entre slots consecutivos da party e constante (= altura adaptativa + gap).
+    const float step01 = a.party[1].rect.y - a.party[0].rect.y;
+    const float step12 = a.party[2].rect.y - a.party[1].rect.y;
+    REQUIRE_THAT(step12, WithinAbs(step01, 1e-4f));
+    // O passo = altura do slot + gap (a altura e adaptativa, mas o passo a respeita).
+    REQUIRE_THAT(step01, WithinAbs(a.party[0].rect.h + kActorSlotGapY, 1e-4f));
+    REQUIRE(step01 > a.party[0].rect.h);  // gap positivo
     // Inimigos: mesmo passo entre os 4.
     REQUIRE_THAT(a.enemies[1].rect.y - a.enemies[0].rect.y,
                  WithinAbs(a.enemies[3].rect.y - a.enemies[2].rect.y, 1e-4f));
@@ -95,18 +100,47 @@ TEST_CASE("arena: colunas CENTRALIZADAS na banda vertical (D3)", "[battle_layout
     REQUIRE_THAT(mid, WithinAbs(band_center, 0.6f));
 }
 
-TEST_CASE("arena: contagens variaveis de inimigo (1..4) sem escala", "[battle_layout]") {
+TEST_CASE("arena: contagens 1..4 cabem na banda (altura adaptativa, sem transbordar)",
+          "[battle_layout]") {
+    // FIX 2026-06-25: com muitos atores a altura do slot ENCOLHE pra a coluna caber na
+    // banda [kArenaTop, kArenaBottom] - melhor que transbordar pra dentro do painel.
     for (int n = 1; n <= kMaxEnemySlots; ++n) {
         const ArenaLayout a = arena_layout(3, n, -1);
         REQUIRE(a.enemy_count == n);
+        const int expect_h = arena_slot_height(n);
         for (int i = 0; i < n; ++i) {
             REQUIRE(a.enemies[i].occupied);
-            // Sem escala dinamica: tamanho do slot constante.
-            REQUIRE_THAT(a.enemies[i].rect.h, WithinAbs(static_cast<float>(kActorSlotH),
+            // Altura adaptativa, igual pra todos do lado, dentro de [min, teto].
+            REQUIRE_THAT(a.enemies[i].rect.h, WithinAbs(static_cast<float>(expect_h),
                                                         1e-4f));
+            REQUIRE(a.enemies[i].rect.h <= static_cast<float>(kActorSlotH));
+            REQUIRE(a.enemies[i].rect.h >= static_cast<float>(kActorSlotMinH));
+            // CONTIDO na banda: nenhum slot ultrapassa kArenaBottom (-> nem o painel).
+            REQUIRE(a.enemies[i].rect.y >= static_cast<float>(kArenaTop) - 1e-4f);
+            REQUIRE(a.enemies[i].rect.y + a.enemies[i].rect.h <=
+                    static_cast<float>(kArenaBottom) + 1e-4f);
         }
         for (int i = n; i < kMaxEnemySlots; ++i) {
             REQUIRE_FALSE(a.enemies[i].occupied);
+        }
+    }
+}
+
+TEST_CASE("arena: NENHUM slot (party+inimigo, 1..4) invade o painel (kActivePanelTop)",
+          "[battle_layout]") {
+    // O teste-chave do FIX (lider pegou os inimigos transbordando pro menu): pra TODA
+    // combinacao de contagens, todo slot de ator termina ACIMA do painel.
+    for (int p = 1; p <= kMaxPartySlots; ++p) {
+        for (int e = 1; e <= kMaxEnemySlots; ++e) {
+            const ArenaLayout a = arena_layout(p, e, 0);
+            for (int i = 0; i < a.party_count; ++i) {
+                REQUIRE(a.party[i].rect.y + a.party[i].rect.h <=
+                        static_cast<float>(kActivePanelTop));
+            }
+            for (int i = 0; i < a.enemy_count; ++i) {
+                REQUIRE(a.enemies[i].rect.y + a.enemies[i].rect.h <=
+                        static_cast<float>(kActivePanelTop));
+            }
         }
     }
 }

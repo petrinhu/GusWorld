@@ -27,8 +27,7 @@ using gus::app::screens::BattleScene;
 using gus::app::screens::BattleStatusIconSet;
 using gus::app::screens::BattleVerb;
 using gus::app::screens::kFloaterLifeSeconds;
-using gus::app::screens::kPacingIntroSeconds;
-using gus::app::screens::kPacingStepDelaySeconds;
+using gus::app::screens::kPacingAnnounceSeconds;
 using gus::app::screens::LogLineKind;
 using gus::app::screens::PacingState;
 using gus::app::screens::kArenaHpBarH;
@@ -118,16 +117,20 @@ void select_verb(BattleScene& scene, BattleVerb want) {
     }
 }
 
-// PACING (incremento 6): a cena comeca PARADA (intro) e anima turno-a-turno. Pra os
-// testes de turno, "bombeia" o ritmo (skip + update) ate cair na vez do jogador ou o
-// combate acabar. Cada skip pula a intro/delay; update conduz 1 passo por vez.
+// PACING (incremento 6): a cena comeca PARADA na ABERTURA esperando o jogador ENCARAR
+// (start_combat). Pra os testes de turno, ENCARA primeiro e depois "bombeia" o ritmo
+// (skip + update) ate cair na vez do jogador ou o combate acabar. Cada skip encurta o
+// anuncio/delay; update conduz 1 beat por vez.
 void pump_to_player_turn(BattleScene& scene) {
+    if (scene.is_intro()) {
+        scene.start_combat();  // ENCARAR: sai da abertura e libera o 1o turno
+    }
     for (int i = 0; i < 200; ++i) {
         if (scene.combat_over() || scene.waiting_player_input()) {
             return;
         }
-        scene.skip();                // acelera a intro/delay corrente
-        scene.update(1.0f / 60.0f);  // conduz 1 passo (resolve 1 turno de inimigo)
+        scene.skip();                // acelera o anuncio/delay corrente
+        scene.update(1.0f / 60.0f);  // conduz 1 beat por vez
     }
 }
 
@@ -181,12 +184,14 @@ TEST_CASE("BattleScene::render desenha 1 placeholder por ator (esquerda x direit
     // Fundo + faixa CTB + 7 atores + 5 celulas CTB + painel + log = varios fills.
     REQUIRE(r.fills.size() >= 7);  // pelo menos um por ator
 
-    // Atores: 3 na metade esquerda (party) e 4 na metade direita (inimigos). Conta
-    // SO os fills no tamanho de slot (56x64) pra nao misturar com fundo/HUD.
+    // Atores: 3 na metade esquerda (party) e 4 na metade direita (inimigos). O slot tem
+    // LARGURA fixa (kActorSlotW=56) e ALTURA adaptativa (encolhe com +atores, FIX
+    // 2026-06-25). Conta os fills de largura 56 (so os slots de ator tem essa largura; a
+    // barra de HP da arena e inset=48, painel/log sao mais largos, CTB e 48).
     auto count_actor_slots = [&](float x0, float x1) {
         int n = 0;
         for (const auto& f : r.fills) {
-            if (f.rect.w == 56.0f && f.rect.h == 64.0f) {
+            if (f.rect.w == 56.0f && f.rect.h >= 30.0f) {  // slot de ator (altura adaptativa)
                 const float cx = f.rect.x + f.rect.w * 0.5f;
                 if (cx >= x0 && cx < x1) {
                     ++n;
@@ -224,6 +229,7 @@ TEST_CASE("BattleScene::render headless degrada CTB pro retangulo (sem retratos)
 TEST_CASE("painel do ator ativo desenha a barra de HP (largura kHpBarW)",
           "[battle_scene]") {
     BattleScene scene;
+    pump_to_player_turn(scene);  // o painel so renderiza FORA da abertura (apos Encarar)
     CountingRenderer r;
     scene.render(r, 640.0f, 360.0f);
     // O painel emite uma barra de HP do tamanho kHpBarW x kHpBarH (fundo) + o fill.
@@ -242,8 +248,9 @@ TEST_CASE("painel do ator ativo desenha a barra de HP (largura kHpBarW)",
 TEST_CASE("painel desenha pips de AP e Mana do ator ativo (recursos reais)",
           "[battle_scene]") {
     BattleScene scene;
-    // begin_turn() foi chamado no ctor: o ator ativo tem AP=max_ap (3) e mana=max_mana
-    // (ramp). Logo ha pips desenhados (quadradinhos kPipSize) no painel.
+    pump_to_player_turn(scene);  // o painel so renderiza na vez do jogador (apos Encarar)
+    // Na vez do jogador, o ator ativo tem AP=max_ap (3) e mana=max_mana (ramp). Logo ha
+    // pips desenhados (quadradinhos kPipSize) no painel.
     REQUIRE(scene.active_actor() != nullptr);
     REQUIRE(scene.active_actor()->max_ap() == 3);
     REQUIRE(scene.active_actor()->ap() == 3);          // recarregado no begin_turn
@@ -482,6 +489,7 @@ TEST_CASE("log: render emite o TEXTO da message de cada linha notavel (incr 3.5)
 TEST_CASE("painel: render emite os NUMEROS reais de HP/AP/Mana (incr 3.5)",
           "[battle_scene]") {
     BattleScene scene;
+    pump_to_player_turn(scene);  // o painel so renderiza FORA da abertura (apos Encarar)
     const auto* a = scene.active_actor();
     REQUIRE(a != nullptr);
     // O painel imprime "hp/max" do ator ativo (numero real lido do motor).
@@ -555,13 +563,22 @@ TEST_CASE("floater: update(dt) envelhece e poda os mortos", "[battle_scene]") {
     pump_to_player_turn(scene);
     select_verb(scene, BattleVerb::Atacar);
     scene.menu_confirm();
-    const std::size_t spawned = scene.floaters().size();
-    REQUIRE(spawned > 0);
-    // Avanca o tempo alem da vida: todos os floaters morrem e sao podados. (update tambem
-    // tica o pacing, mas o combate so anima 1 passo - os floaters do passo envelhecem.)
-    for (int i = 0; i < 5; ++i) {
-        scene.update(kFloaterLifeSeconds + 0.1f);
+    REQUIRE(scene.floaters().size() > 0);  // o ataque do jogador spawnou floater(s)
+
+    // Conduz o combate ate o FIM (no fim nao ha mais turno => o pacing nao spawna mais
+    // floater novo). So entao avancar o tempo poda TODOS os floaters restantes.
+    int guard = 0;
+    while (!scene.combat_over() && guard++ < 400) {
+        pump_to_player_turn(scene);
+        if (scene.combat_over()) {
+            break;
+        }
+        select_verb(scene, BattleVerb::Atacar);
+        scene.menu_confirm();
     }
+    REQUIRE(scene.combat_over());
+    // Combate acabou: nenhum turno novo, nenhum floater novo. Avanca alem da vida -> poda.
+    scene.update(kFloaterLifeSeconds + 0.1f);
     REQUIRE(scene.floaters().empty());
 }
 
@@ -676,35 +693,268 @@ TEST_CASE("pacing D10 REGRESSAO (BUG B): abertura 100% LIMPA - HP cheio, sem dan
     }
     REQUIRE(scene.floaters().empty());
     REQUIRE(scene.machine().log().empty());
-    // Avanca o tempo ATE QUASE o fim da intro (sem ultrapassar): ninguem agiu ainda.
-    scene.update(kPacingIntroSeconds - 0.05f);
-    REQUIRE(scene.is_intro());
-    REQUIRE(scene.machine().log().empty());   // nenhum ataque resolveu durante a intro
+    // ABERTURA INPUT-GATED (lider 2026-06-25): o TEMPO nao avanca a abertura. Por mais
+    // que rode update, fica no BATALHA! parado ate o jogador ENCARAR. Ninguem agiu.
+    for (int i = 0; i < 60; ++i) {
+        scene.update(1.0f / 60.0f);
+    }
+    REQUIRE(scene.is_intro());                // continua no BATALHA! (nao auto-avancou)
+    REQUIRE(scene.machine().log().empty());   // nenhum ataque resolveu
     REQUIRE(scene.floaters().empty());
     for (const auto* a : scene.machine().queue().order()) {
         REQUIRE(a->hp() == a->max_hp());      // HP ainda cheio
     }
-    // So DEPOIS da intro o 1o turno anima (ai sim entra no log).
-    scene.update(0.1f);
+    // ENCARAR: o jogador comeca o combate. BEAT 1 (anuncio): o 1o turno de inimigo
+    // anuncia SEM resolver (HP intacto, sem log, sem floater).
+    scene.start_combat();
+    scene.update(0.01f);  // entra no anuncio
+    REQUIRE(scene.pacing_state() == PacingState::AnnouncingEnemy);
+    REQUIRE(scene.machine().log().empty());   // anuncio: NADA resolveu ainda
+    REQUIRE(scene.floaters().empty());
+    for (const auto* a : scene.machine().queue().order()) {
+        REQUIRE(a->hp() == a->max_hp());      // HP ainda cheio no anuncio (alvo intacto)
+    }
+    // BEAT 2: so APOS o anuncio o golpe resolve (log + floater).
+    scene.update(kPacingAnnounceSeconds + 0.1f);
     REQUIRE(scene.machine().log().size() >= 1);
 }
 
 TEST_CASE("pacing D8: os turnos de inimigo animam UM DE CADA VEZ (nao todos juntos)",
           "[battle_scene]") {
     BattleScene scene;
-    // Passa a intro: o 1o turno (inimigo3, maior SPD) libera e anima 1 passo.
-    scene.update(kPacingIntroSeconds + 0.01f);
-    // Apos a intro + 1 passo, exatamente 1 turno de inimigo resolveu (1 acao logada),
-    // NAO todos os 4 inimigos de uma vez (o problema do playtest).
-    const std::size_t after_first = scene.machine().log().size();
-    REQUIRE(after_first >= 1);
-    // O ritmo agora segura o delay (nao resolve o proximo sem o tempo passar).
-    const std::size_t before_delay = scene.machine().log().size();
+    scene.start_combat();  // ENCARAR: sai da abertura parada
+    // BEAT 1 (incremento 6): o 1o turno de inimigo ANUNCIA (sem resolver nada). Nenhuma
+    // acao logada ainda - o ataque NAO foi feito (corrige "ja feito").
+    scene.update(0.01f);
+    REQUIRE(scene.pacing_state() == PacingState::AnnouncingEnemy);
+    REQUIRE(scene.machine().log().empty());  // anuncio: nada resolveu
+
+    // O anuncio segura ~kPacingAnnounceSeconds; um dt minusculo nao resolve ainda.
+    scene.update(0.01f);
+    REQUIRE(scene.machine().log().empty());
+
+    // BEAT 2: passado o anuncio, AGORA resolve UM turno (1 acao logada) - NAO todos os 4
+    // inimigos de uma vez (o problema do playtest).
+    scene.update(kPacingAnnounceSeconds + 0.01f);
+    const std::size_t after_resolve = scene.machine().log().size();
+    REQUIRE(after_resolve >= 1);
+
+    // Pos-resolucao: o ritmo segura o delay (nao anima o proximo sem o tempo passar).
     scene.update(0.01f);  // dt minusculo: nao passa o delay
-    REQUIRE(scene.machine().log().size() == before_delay);  // ainda segurando
-    // Passado o delay, o proximo turno anima.
-    scene.update(kPacingStepDelaySeconds + 0.01f);
-    REQUIRE(scene.machine().log().size() >= before_delay);  // avancou (>= , pode ter parado no jogador)
+    REQUIRE(scene.machine().log().size() == after_resolve);  // ainda segurando
+}
+
+TEST_CASE("abertura: ESPERA o jogador ENCARAR (nao auto-avanca por tempo)",
+          "[battle_scene]") {
+    // Decisao do lider (2026-06-25): a abertura fica PARADA no "BATALHA!" ate o jogador
+    // encarar. O tempo NAO inicia a luta (resolve "o intro passou antes de eu olhar").
+    BattleScene scene;
+    REQUIRE(scene.is_intro());
+    REQUIRE(scene.turn_banner_key() == std::string_view("COMBAT_BANNER_BATTLE"));
+    // Roda MUITO tempo: continua na abertura, ninguem agiu.
+    for (int i = 0; i < 600; ++i) {
+        scene.update(1.0f / 60.0f);  // 10 segundos simulados
+    }
+    REQUIRE(scene.is_intro());
+    REQUIRE(scene.machine().log().empty());
+    // ENCARAR: agora o combate comeca (sai da abertura).
+    scene.start_combat();
+    REQUIRE_FALSE(scene.is_intro());
+}
+
+TEST_CASE("abertura REGRESSAO (UI): NAO renderiza painel/menu/log na abertura",
+          "[battle_scene]") {
+    // BUG do lider no display: na abertura, o painel mostrava os dados do INIMIGO ativo,
+    // o menu nao aparecia e a caixa de log virava um "quadrao preto". Fix: nada de
+    // painel/menu/log na abertura - so CTB + arena + banner + prompt. Esta regressao
+    // trava: na abertura, ZERO barra de HP do painel (kHpBarW x kHpBarH) e ZERO pip do
+    // painel (7x7); apos ENCARAR, o painel aparece.
+    BattleScene scene;
+    gus::app::i18n::Translator tr;
+    tr.load_from_content(
+        "## COMBAT_BANNER_BATTLE\nBATALHA!\n\n## COMBAT_INTRO_ENCARAR\n[Enter] Encarar\n");
+    scene.set_translator(&tr);
+    REQUIRE(scene.is_intro());
+    CountingRenderer r0;
+    scene.render(r0, 640.0f, 360.0f);
+    int panel_hp = 0, panel_pips = 0;
+    for (const auto& f : r0.fills) {
+        if (f.rect.w == static_cast<float>(kHpBarW) &&
+            f.rect.h == static_cast<float>(kHpBarH)) {
+            ++panel_hp;  // barra de HP do painel
+        }
+        if (f.rect.w == 7.0f && f.rect.h == 7.0f && f.rect.y > 250.0f) {
+            ++panel_pips;  // pip de AP/Mana do painel
+        }
+    }
+    REQUIRE(panel_hp == 0);    // sem painel na abertura (nao expoe o inimigo)
+    REQUIRE(panel_pips == 0);  // sem pips de recurso na abertura
+    // Mas o banner "BATALHA!" + prompt aparecem (texto na abertura).
+    bool has_intro_text = false;
+    for (const auto& t : r0.texts) {
+        if (!t.text.empty()) {
+            has_intro_text = true;
+        }
+    }
+    REQUIRE(has_intro_text);
+
+    // ENCARAR: agora o painel aparece (barra de HP do painel renderizada).
+    scene.start_combat();
+    pump_to_player_turn(scene);
+    CountingRenderer r1;
+    scene.render(r1, 640.0f, 360.0f);
+    bool panel_now = false;
+    for (const auto& f : r1.fills) {
+        if (f.rect.w == static_cast<float>(kHpBarW) &&
+            f.rect.h == static_cast<float>(kHpBarH)) {
+            panel_now = true;
+        }
+    }
+    REQUIRE(panel_now);  // painel aparece DEPOIS de Encarar
+}
+
+TEST_CASE("abertura: skip NAO comeca a luta (so Encarar/start_combat)",
+          "[battle_scene]") {
+    BattleScene scene;
+    scene.skip();  // acelerar nao deve pular a abertura
+    REQUIRE(scene.is_intro());
+    REQUIRE(scene.machine().log().empty());
+}
+
+TEST_CASE("abertura: TRASH oferece '[Q] Resolver sem encarar' (placeholder nao-destrutivo)",
+          "[battle_scene]") {
+    BattleScene scene;  // demo: todos os inimigos sao trash (nao-boss)
+    REQUIRE(scene.offers_auto_resolve());  // oferecido na abertura (trash)
+
+    const std::size_t engine_log_before = scene.machine().log().size();
+    const bool intro_before = scene.is_intro();
+    scene.request_auto_resolve();  // PLACEHOLDER: so loga, nada destrutivo
+
+    // Nao mexe no motor (sem acao resolvida) e NAO sai da abertura (placeholder).
+    REQUIRE(scene.machine().log().size() == engine_log_before);
+    REQUIRE(scene.is_intro() == intro_before);
+    // Sinalizou no log de UI ("[auto-resolve: a implementar]").
+    bool has_system = false;
+    for (const auto& l : scene.log_lines(20)) {
+        if (l.kind == LogLineKind::System) {
+            has_system = true;
+        }
+    }
+    REQUIRE(has_system);
+
+    // Depois de encarar (sai da abertura), o verbo NAO e mais oferecido.
+    scene.start_combat();
+    REQUIRE_FALSE(scene.offers_auto_resolve());
+}
+
+TEST_CASE("pacing 2-BEATS REGRESSAO: no ANUNCIO o alvo esta INTACTO; so o RESOLVE bate",
+          "[battle_scene]") {
+    // O lider no display: "a tela aparece com o ataque ja feito". Fix = 2 beats no turno
+    // de inimigo. Esta regressao trava: no BEAT 1 (anuncio) NENHUM dano foi aplicado (HP
+    // do alvo intacto) e o log NAO tem a linha da acao; SO no BEAT 2 (resolve) aparecem.
+    BattleScene scene;
+    scene.start_combat();  // ENCARAR: sai da abertura (o 1o ator e inimigo3, maior SPD)
+    scene.update(0.001f);  // entra no BEAT 1 (anuncio)
+    REQUIRE(scene.pacing_state() == PacingState::AnnouncingEnemy);
+    REQUIRE(scene.turn_banner_key() == std::string_view("COMBAT_BANNER_ENEMY_TURN"));
+
+    // Snapshot do HP de TODOS no anuncio: ninguem levou dano ainda; nenhum floater; sem
+    // log de acao. O ataque NAO conectou (e aqui que a animacao de windup vai morar).
+    std::vector<int> hp_announce;
+    for (const auto* a : scene.machine().queue().order()) {
+        hp_announce.push_back(a->hp());
+        REQUIRE(a->hp() == a->max_hp());  // intacto no anuncio
+    }
+    REQUIRE(scene.machine().log().empty());
+    REQUIRE(scene.floaters().empty());
+
+    // BEAT 2: passa o anuncio -> AGORA resolve. Algum alvo perde HP, ha log e floater.
+    scene.update(kPacingAnnounceSeconds + 0.01f);
+    REQUIRE(scene.pacing_state() == PacingState::WaitingDelay);  // pos-resolucao
+    REQUIRE(scene.machine().log().size() >= 1);                  // a acao foi logada
+    REQUIRE(scene.floaters().size() >= 1);                       // dano flutuou
+    // ALGUEM perdeu HP (o alvo do golpe do inimigo) - a comparacao com o snapshot prova
+    // que o dano so aconteceu DEPOIS do anuncio.
+    bool someone_lost_hp = false;
+    int idx = 0;
+    for (const auto* a : scene.machine().queue().order()) {
+        if (idx < static_cast<int>(hp_announce.size()) &&
+            a->hp() < hp_announce[static_cast<std::size_t>(idx)]) {
+            someone_lost_hp = true;
+        }
+        ++idx;
+    }
+    REQUIRE(someone_lost_hp);
+}
+
+TEST_CASE("pacing REGRESSAO (ataque colado): skip NAO colapsa o beat de ANUNCIO",
+          "[battle_scene]") {
+    // BUG do lider no display: "o ataque seguinte sai COLADO com o do inimigo anterior,
+    // impressao de ataque duplo". Causa: apertar a tecla durante o anuncio (skip) zerava
+    // o timer do anuncio -> o anuncio durava 1 frame e o golpe resolvia colado. Fix: skip
+    // so acelera a PAUSA pos-resolucao (WaitingDelay), nunca o anuncio. Esta regressao
+    // trava: mesmo com skip TODO frame, o inimigo passa por VARIOS frames de ANUNCIO
+    // antes de resolver (o anuncio toca seu tempo proprio; o windup nunca some).
+    BattleScene scene;
+    scene.start_combat();
+    int announce_frames = 0;
+    const std::size_t log_before = scene.machine().log().size();
+    const float dt = 1.0f / 60.0f;
+    for (int f = 0; f < 120; ++f) {
+        scene.skip();  // jogador apertando a tecla a cada frame (impaciente)
+        scene.update(dt);
+        if (scene.pacing_state() == PacingState::AnnouncingEnemy) {
+            ++announce_frames;
+        }
+        // Para assim que o 1o inimigo RESOLVE (log cresceu).
+        if (scene.machine().log().size() > log_before) {
+            break;
+        }
+    }
+    // O anuncio NAO colapsou: durou MUITO mais que 1 frame, mesmo com skip todo frame.
+    // (Antes do fix era 1; agora ~kPacingAnnounceSeconds/dt ~= 42 frames.)
+    REQUIRE(announce_frames > 10);
+}
+
+TEST_CASE("pacing REGRESSAO: na fila REAL, TODO inimigo tem seu proprio ANUNCIO",
+          "[battle_scene]") {
+    // O bug so aparece rodando a FILA inteira (Drone->Caua->Sentinela->Gus->Drone->...).
+    // Trava: ao longo de varios turnos, CADA resolucao de inimigo foi precedida por um
+    // estado de ANUNCIO proprio (nenhum inimigo resolve "colado" sem anunciar). Conta os
+    // inimigos resolvidos e os que tiveram anuncio - devem bater.
+    BattleScene scene;
+    scene.start_combat();
+    const float dt = 1.0f / 60.0f;
+    bool saw_announce_since_log = false;
+    std::size_t last_log = scene.machine().log().size();
+    int enemy_resolves = 0;
+    int enemy_with_announce = 0;
+
+    for (int f = 0; f < 3000 && !scene.combat_over(); ++f) {
+        if (scene.waiting_player_input()) {
+            select_verb(scene, BattleVerb::Atacar);
+            scene.menu_confirm();
+        }
+        if (scene.pacing_state() == PacingState::AnnouncingEnemy) {
+            saw_announce_since_log = true;
+        }
+        scene.update(dt);
+        const std::size_t now = scene.machine().log().size();
+        if (now > last_log) {
+            // Houve nova entrada de log. Se foi de um INIMIGO, checa se houve anuncio.
+            const auto& e = scene.machine().log().back();
+            if (e.actor_id.rfind("inimigo", 0) == 0) {  // ids do demo: inimigo1..4
+                ++enemy_resolves;
+                if (saw_announce_since_log) {
+                    ++enemy_with_announce;
+                }
+            }
+            saw_announce_since_log = false;
+            last_log = now;
+        }
+    }
+    REQUIRE(enemy_resolves >= 2);                    // a fila resolveu varios inimigos
+    REQUIRE(enemy_with_announce == enemy_resolves);  // CADA UM teve seu anuncio
 }
 
 TEST_CASE("pacing: skip acelera a intro e chega na vez do jogador", "[battle_scene]") {
@@ -718,9 +968,9 @@ TEST_CASE("pacing: skip acelera a intro e chega na vez do jogador", "[battle_sce
 TEST_CASE("pacing D9: o banner reflete de quem e a vez (inimigo OU jogador)",
           "[battle_scene]") {
     BattleScene scene;
-    // Na intro, banner = BATALHA!.
+    // Na abertura, banner = BATALHA! (e fica ate o jogador encarar - nao auto-avanca).
     REQUIRE(scene.turn_banner_key() == std::string_view("COMBAT_BANNER_BATTLE"));
-    scene.skip();          // pula a intro
+    scene.start_combat();  // ENCARAR: sai da abertura
     scene.update(0.001f);  // anima o 1o passo (inimigo3) e prepara o proximo ator
     // O banner agora e do ATOR ATIVO: ou inimigo (proximo e inimigo) ou jogador (proximo
     // e player). Nunca mais BATALHA! (a intro acabou). Leitura imediata de quem joga (D9).

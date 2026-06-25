@@ -54,9 +54,14 @@ inline constexpr int kResourceRowGap = 4;    // espaco vertical entre linhas (HP
 inline constexpr int kStatusIconSize = 14;
 inline constexpr int kStatusIconGap = 3;
 
-// Mini-barra de HP sob cada ator NA ARENA.
+// Mini-barra de HP de cada ator NA ARENA. FIX (lider no display): antes a barra ficava
+// ABAIXO do slot (slot.y + h + gap) e encostava no slot de baixo, poluindo. Agora fica
+// ANCORADA NA BASE INTERNA do slot (ultimos kArenaHpBarH px DENTRO do quadro do ator),
+// com uma pequena margem lateral - assim NUNCA invade o vizinho (a barra esta sempre
+// dentro dos limites do proprio slot). Pra placeholders a base e vazia; pro sprite real,
+// uma barra colada nos "pes" e leitura RPG comum.
 inline constexpr int kArenaHpBarH = 4;       // altura da mini-barra
-inline constexpr int kArenaHpBarGapY = 2;    // espaco entre o sprite e a mini-barra
+inline constexpr int kArenaHpBarInsetX = 4;  // margem lateral (folga das bordas do slot)
 
 // ----------------------------------------------------------------------------
 // Mapeamento StatusId -> arquivo de icone (catalogo unico, ordem do enum).

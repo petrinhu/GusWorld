@@ -57,17 +57,23 @@ inline constexpr int kCtbStripLeft = 8;    // margem esquerda da faixa
 
 // --- Arena (centro) ---
 // Banda vertical util da arena (entre a fila CTB e o painel do ator). Os slots de
-// cada lado sao CENTRALIZADOS verticalmente DENTRO desta banda (D3).
+// cada lado sao CENTRALIZADOS verticalmente DENTRO desta banda (D3). A banda termina
+// ACIMA de kActivePanelTop: nenhum slot pode invadir o painel/menu/log (FIX 2026-06-25,
+// lider pegou a coluna de 4 inimigos transbordando pra dentro do menu).
 inline constexpr int kArenaTop = 64;       // logo abaixo da faixa CTB (48 + margens)
-inline constexpr int kArenaBottom = 250;   // logo acima do painel do ator ativo
+inline constexpr int kArenaBottom = 250;   // logo acima do painel do ator (kActivePanelTop=252)
 
 // Sprite-base do ator na arena (placeholder retangulo neste incremento; o sprite
-// PixelLab entra depois, par.3.4). Largura/altura do quadro logico de um ator.
+// PixelLab entra depois, par.3.4). Largura fixa; ALTURA e o TETO (com poucos atores).
 inline constexpr int kActorSlotW = 56;
-inline constexpr int kActorSlotH = 64;
+inline constexpr int kActorSlotH = 64;     // altura MAXIMA (1-2 atores); adapta p/ +atores
+inline constexpr int kActorSlotMinH = 36;  // piso da altura adaptativa (legibilidade)
 
 // Espacamento vertical FIXO entre slots empilhados na coluna (D2: espacamento fixo).
 inline constexpr int kActorSlotGapY = 6;
+// Margem de FOLGA dentro da banda (topo+base) pro empilhamento nao colar nas bordas da
+// banda/painel - garante que o slot mais baixo termina ACIMA de kArenaBottom com folga.
+inline constexpr int kArenaBandMargin = 4;
 
 // Coluna da party (esquerda) e dos inimigos (direita): X do canto esquerdo do slot.
 inline constexpr int kPartyColumnX = 40;
@@ -126,6 +132,13 @@ struct CtbStrip {
 
 // O retangulo logico inteiro da tela (640x360), origem (0,0). Util pro fundo/dim.
 [[nodiscard]] Rect battle_screen_rect() noexcept;
+
+// ALTURA ADAPTATIVA do slot de ator dado o numero de slots empilhados numa coluna (FIX
+// 2026-06-25): retorna kActorSlotH (teto) com poucos atores, e ENCOLHE quando count
+// cresce pra a coluna inteira (count slots + gaps + margem) caber na banda
+// [kArenaTop, kArenaBottom] - assim NENHUM slot invade o painel (kActivePanelTop). Piso
+// em kActorSlotMinH (legibilidade). count<=0 => kActorSlotH. Pura/deterministica.
+[[nodiscard]] int arena_slot_height(int count) noexcept;
 
 // Layout da arena (D2/D3): party_count slots empilhados na coluna ESQUERDA, enemy_count
 // na coluna DIREITA, ambos CENTRALIZADOS verticalmente na banda da arena, espacamento

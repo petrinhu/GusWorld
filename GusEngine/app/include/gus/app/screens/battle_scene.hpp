@@ -199,7 +199,8 @@ public:
     // Estado do ritmo (intro / espera-delay / espera-input). Leitura pro render (D9/D10).
     [[nodiscard]] PacingState pacing_state() const noexcept { return pacing_.state(); }
 
-    // true durante a abertura PARADA (D10): a casca mostra "BATALHA!" e ninguem agiu.
+    // true durante a abertura PARADA (D10): a casca mostra "BATALHA!" + o prompt e
+    // ninguem agiu. A abertura ESPERA o jogador ENCARAR (nao auto-avanca).
     [[nodiscard]] bool is_intro() const noexcept {
         return pacing_.state() == PacingState::Intro;
     }
@@ -209,8 +210,24 @@ public:
         return pacing_.waiting_player_input();
     }
 
-    // Tecla de ACELERAR/avancar (D8): pula a intro e encurta o delay entre turnos. NAO
-    // pula o turno do jogador (so o ritmo de animacao). A casca chama numa tecla.
+    // ENCARAR (decisao do lider 2026-06-25): o jogador escolheu comecar o combate na
+    // abertura. Sai do "BATALHA!" parado e o 1o turno comeca a animar (2 beats). No-op se
+    // nao esta na abertura. A casca chama em Enter/Espaco/KP_Enter.
+    void start_combat();
+
+    // RESOLVER SEM ENCARAR (verbo OPT-IN, so TRASH; placeholder neste incremento). Por
+    // ora SO sinaliza no log "[auto-resolve: a implementar]" e NAO faz nada destrutivo.
+    // O auto-resolve real (motor headless + penalidade por selo) vira num incremento
+    // SEPARADO depois que o design for canonizado. A casca chama em Q (so se oferecido).
+    void request_auto_resolve();
+
+    // true se a abertura oferece o verbo "[Q] Resolver sem encarar": SO quando todos os
+    // inimigos sao TRASH (no demo, todos sao). Boss/elite (futuro) escondem o verbo.
+    [[nodiscard]] bool offers_auto_resolve() const;
+
+    // Tecla de ACELERAR/avancar (D8): encurta o delay/anuncio entre turnos. NAO pula a
+    // abertura (espera Encarar) nem o turno do jogador (espera o menu). A casca chama
+    // numa tecla.
     void skip();
 
     // Chave i18n do banner de turno (D9): "TURNO DE <nome>" pro jogador / "vez do
@@ -307,6 +324,10 @@ private:
     // true se o INIMIGO ativo ja fez sua acao neste turno (1 ataque/turno, D11). Resetado
     // a cada novo turno (start_active_turn) pra o proximo inimigo agir uma vez.
     bool enemy_acted_this_turn_ = false;
+    // true se o turno de inimigo corrente JA passou pelo BEAT 1 (anuncio, incremento 6).
+    // false => o proximo advance_pacing ANUNCIA (sem resolver); true => RESOLVE. Limpa ao
+    // resolver, ao cair num turno de jogador, e ao avancar de ator.
+    bool enemy_announced_ = false;
 
     // NARRACAO do combate (D12): linhas de acao + dano + consequencia de status, ja
     // resolvidas (tr() no nome do status). Construidas por narrate_new_logs a partir dos
