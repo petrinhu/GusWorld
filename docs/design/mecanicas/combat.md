@@ -528,6 +528,23 @@ interface IEnemyBrain {
 
 **Vertical slice F2-E.5 entrega apenas `ScriptedBrain` + a interface `IEnemyBrain`** (com `IntentPreview`). `UtilityBrain` e a camada de ruído ficam para jogo posterior, mas a interface já contempla os três níveis.
 
+### 13.1 AP gasto por turno por tier (canon, decisão do criador 2026-06-25)
+
+A FSM permite multi-ação no turno (loop interno de `ActionSelect` consumindo AP, §3). Quanto AP cada inimigo gasta por turno escala por tier:
+
+| Tier | AP/turno (regra de design) | AP/turno no VS (entrega) |
+|---|---|---|
+| **Trash** | **1** | 1 (correto, já implementado) |
+| **Elite** | **2** | 1 (placeholder honesto) |
+| **Mini-boss** | **3** | 1 (placeholder honesto) |
+
+- **Racional:** AP por turno escala "quantas decisões o inimigo força" o jogador a antecipar (1 intent a ler no trash, até 3 no mini-boss), aprofundando Scan/Gambito-Prever onde o aesthetic Challenge importa, sem inflar o trash. O trash bate com o ataque básico subtrativo `max(1, Atk - Def)` (§11), determinístico: N AP = N golpes = N× dano, linear e sem teto suavizante. Por isso 1 AP no trash.
+- **Por que NÃO 3 AP uniforme:** um único trash a 3 AP derrubaria o Gus (HP 34, menor da party §2.1) em ~3 turnos e tornaria o encontro net-negativo na economia (cura ~15 a 20 cr no Hospital a 1 cr / 3 HP vs ~8 cr ganhos por encontro, economia.md §2 a §3), criando o death-loop econômico que o §3.3 da economia existe para evitar. Trash deve ser fácil (Pillar 1: vitória por leitura, não por aguentar burst).
+- **Interação com o auto-kill:** o trash que o jogador ENFRENTA é o NÃO-dominado (o dominado é morto no overworld), logo tem `KnowledgeKills` baixo, o que já embute do lado do jogador variância ±30% + 5% de FALHA (§11). Essa imprecisão já é a tensão da abertura; somar 3 golpes/turno do inimigo puniria o onboarding. 1 AP no trash compensa essa variância e mantém a 1ª batalha vencível sem otimizar (onboarding-vs.md).
+- **Análise Preditiva (§2.1) reservada ao elite/boss:** com trash a 1 AP o Gus quase nunca chega a golpe fatal contra trash, preservando o colchão de 1 absorção por batalha (§2.1) para os momentos elite/mini-boss/boss. Trash a 3 AP queimaria a Análise Preditiva em todo encontro trivial.
+- **Multi-ação do inimigo (2 a 3 AP) entra apenas com o `UtilityBrain`** (tabela §13): o `ScriptedBrain` resolve uma ação determinística, então 2 a 3 AP só viram decisão interessante quando o UtilityBrain escolhe QUAIS ações (bater + status, ou focar o Gus). A apresentação precisa que o `PacingDirector` (battle-screen.md §5.2) itere o loop de AP do inimigo emitindo um step pausado POR-AÇÃO (N floaters + N linhas de log no tempo certo), em vez do atual 1 ação/turno. Até lá, elite/mini-boss ficam em 1 AP.
+- **Entrega do VS:** o código do slice já entrega trash = 1 AP (correto). Elite e mini-boss ficam em 1 AP como placeholder honesto até o `UtilityBrain` + o `PacingDirector` por-ação existirem; a curva 1 / 2 / 3 é a regra de design canônica.
+
 ---
 
 ## 14. Flee (fuga)
@@ -747,12 +764,16 @@ Obs.: HP Gus (34) é o menor da party por hard cap canônico (§2.1).
 
 **Inimigos do encontro de referência:**
 
-| Inimigo | Tier | HP | Def | Tipo | Fraqueza (1.5×) | Brain (slice) |
-|---|---|---|---|---|---|---|
-| Sentinela-Bit | Trash | **55** | 8 | Cinético | Elétrico | ScriptedBrain |
-| Daemon-Guard | Elite | **144** | 14 | Cinético | Elétrico | ScriptedBrain (placeholder; UtilityBrain = jogo posterior) |
+| Inimigo | Tier | HP | Atk | Def | Tipo | Fraqueza (1.5×) | Brain (slice) | AP/turno |
+|---|---|---|---|---|---|---|---|---|
+| Sentinela-Bit | Trash | **55** | **10** (provisório) | 8 | Cinético | Elétrico | ScriptedBrain | 1 (§13.1) |
+| Daemon-Guard | Elite | **144** | TBD | 14 | Cinético | Elétrico | ScriptedBrain (placeholder; UtilityBrain = jogo posterior) | 1 no VS, 2 na regra de design (§13.1) |
 
-Notas: Atk e SPD dos inimigos = TBD (definir na implementação F2-E.5). Cauã (Elétrico) é o DPS natural deste encontro pela roda de fraqueza (§6).
+Notas:
+- **Atk do Sentinela-Bit = 10 é PROVISÓRIO** (decisão do criador 2026-06-25): dano no Gus (Def 5) = `max(1, 10-5) = 5`/golpe, ~7 turnos de sobrevida do Gus sob foco a 1 AP (TTK saudável, Pillar 4). A fechar com testes/playtest; não é valor final.
+- Atk do Daemon-Guard e SPD dos inimigos = TBD (definir na implementação / playtest).
+- AP/turno por tier segue §13.1 (Trash 1 / Elite 2 / Mini-boss 3; no VS todos a 1 AP até o UtilityBrain).
+- Cauã (Elétrico) é o DPS natural deste encontro pela roda de fraqueza (§6).
 
 ---
 
