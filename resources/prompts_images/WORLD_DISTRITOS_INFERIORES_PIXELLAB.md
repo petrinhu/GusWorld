@@ -314,3 +314,24 @@ bands. Transparent background. Designed to be tinted/animated by code.
 - Confirmar tile_size visual (sugiro 32x32 px/celula de 2.0m).
 - Decidir se quer o mood-paint-ancora da praca antes do P2 (recomendo que sim, para coesao atmosferica).
 - A decisao 2D-vs-3D da arena de batalha (pendente em outro doc) NAO afeta o overworld top-down: estes assets de cenario valem independente disso.
+
+---
+
+## 4. LOG DE GERACAO (gerados no PixelLab)
+
+**2026-06-25 (modo autonomo, lider autorizou "continue mais algumas pixel arts pra ganhar tempo").** 10 MAP OBJECTS gerados via `create_map_object` (basic mode, high top-down, cel/basic shading, fundo transparente, ~20 fichas cada). Salvos em `resources/sprites/world/distritos_inferiores/` (local; versionar se o lider quiser, igual icons-m5). Revisao: `_REVISAO_mosaico.png` na mesma pasta.
+
+| Asset | Arquivo | object_id | Tamanho |
+|---|---|---|---|
+| O1 Fonte de latao (landmark central) | fonte_latao.png | 6fa0f0e1 | 96x96 |
+| O2 Placa-lore (no de Lore) | placa_lore.png | 6ee501cc | 32x48 |
+| O3 Holograma Sterling (landmark norte) | holo_sterling.png | 468c2993 | 80x96 |
+| O4 Portao sul fechado (bloqueio puzzle) | portao_sul_fechado.png | e2b4981d | 64x48 |
+| O5 Casa ciber-gotica A (cyan) | casa_cibergotica_a.png | a9462183 | 96x96 |
+| O6 Casa ciber-gotica B (magenta, alta) | casa_cibergotica_b.png | 2ff7dce9 | 96x128 |
+| O7 Poste de neon ciano | poste_neon_ciano.png | b69b97c3 | 32x80 |
+| O8 Terminal de hack | terminal_hack.png | 42fa97f7 | 32x40 |
+| O9 Cover box da arena | cover_box.png | ee22053e | 48x48 |
+| O10 Board do puzzle (grid 7x5) | board_puzzle.png | 96425eec | 112x112 |
+
+**PENDENTE (nao gerado autonomo):** os 5 TILESETS (T0 chao, T1 parede, T2 marco, T3 entrada, T4 saida) via `create_topdown_tileset` (mais caro ~100s, async; o art-director apontou como o maior risco tecnico/auto-tiling). Deixados pro lider validar o 1o tileset acordado. + P2 (polimento) idealmente apos mood-paint.
