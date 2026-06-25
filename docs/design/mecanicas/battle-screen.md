@@ -167,6 +167,14 @@ Briefing 100% fechado pro engine-graphics-programmer (proposta do lead-game-desi
 
 ---
 
+## 5.1 Sistema de fonte (decisao do criador 2026-06-24)
+
+A engine NAO tem sistema de fonte (o IRenderer so faz rect/textura). Decisao: **manter font-free por enquanto** (HP=barra, AP/Mana=pips, status=icones PNG; tudo legivel sem texto). Decidir a fonte quando o combate EXIGIR texto de verdade. Reversivel: numeros se sobrepoem as barras sem mudar o layout POCO.
+
+**Tensao registrada (dever de contra-argumentar, NAO bloqueia):** o design da BattleScreen e CENTRADO em texto de terminal (o LOG com COMPILADO/ERRO DE COMPILACAO/as 100 frases de falha, os numeros de dano flutuante, a tela de resultado BUILD SUCCEEDED, as falas-terminal). Font-free cobre o PAINEL (incremento 2), mas o LOG e os numeros (incrementos 3-5) sao o coracao do "magia=software" e SAO texto. Consequencia pratica: ate a fonte entrar, o log/numeros ficam como PLACEHOLDER (estrutura da caixa sem conteudo legivel). Candidato pronto: `stb_truetype` ja vendorizado em `third_party/stb`. O criador decide o momento; provavel gatilho = quando o log/terminal precisar ser lido de fato.
+
+---
+
 ## 6. Pipeline de implementacao (agentes)
 
 1. **lead-game-designer**: fecha as pendencias finas do paragrafo 5 (propostas -> AskUserQuestion ao criador).
