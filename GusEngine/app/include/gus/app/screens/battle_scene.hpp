@@ -32,6 +32,7 @@
 #include <memory>
 #include <optional>
 #include <string>
+#include <string_view>
 #include <vector>
 
 #include <unordered_map>
@@ -40,6 +41,7 @@
 #include "gus/app/screens/battle_floaters.hpp"    // Floater (numeros flutuantes)
 #include "gus/app/screens/battle_log_model.hpp"   // LogLine
 #include "gus/app/screens/battle_menu.hpp"        // BattleMenu / BattleVerb
+#include "gus/app/screens/battle_pacing.hpp"      // PacingDirector (ritmo, D8)
 #include "gus/domain/combat/combat_enums.hpp"     // StatusId
 #include "gus/domain/combat/combat_records.hpp"   // CombatAction / IntentPreview
 #include "gus/domain/combat/combat_state_machine.hpp"
@@ -192,6 +194,30 @@ public:
     [[nodiscard]] std::optional<gus::domain::combat::IntentPreview> intent_for(
         const gus::domain::combat::CombatActor& enemy) const;
 
+    // ---- Ritmo / pacing (incremento 6, D8/D9/D10) ----
+
+    // Estado do ritmo (intro / espera-delay / espera-input). Leitura pro render (D9/D10).
+    [[nodiscard]] PacingState pacing_state() const noexcept { return pacing_.state(); }
+
+    // true durante a abertura PARADA (D10): a casca mostra "BATALHA!" e ninguem agiu.
+    [[nodiscard]] bool is_intro() const noexcept {
+        return pacing_.state() == PacingState::Intro;
+    }
+
+    // true quando e a vez do JOGADOR e o ritmo espera o menu (D9 "sua vez").
+    [[nodiscard]] bool waiting_player_input() const noexcept {
+        return pacing_.waiting_player_input();
+    }
+
+    // Tecla de ACELERAR/avancar (D8): pula a intro e encurta o delay entre turnos. NAO
+    // pula o turno do jogador (so o ritmo de animacao). A casca chama numa tecla.
+    void skip();
+
+    // Chave i18n do banner de turno (D9): "TURNO DE <nome>" pro jogador / "vez do
+    // inimigo" / "BATALHA!" na intro. A casca resolve via tr() + o nome do ator ativo.
+    // Devolve a CHAVE base; a casca formata. Vazio se combate acabou.
+    [[nodiscard]] std::string_view turn_banner_key() const noexcept;
+
     // Desenha o ESQUELETO da batalha (placeholders): fundo, arena (party/inimigos),
     // fila CTB, painel do ator ativo, log. viewport_px_w/h = PIXELS REAIS da janela
     // (o backend escala 640x360 por inteiro). LE a contagem/ordem do motor.
@@ -204,13 +230,18 @@ private:
     [[nodiscard]] gus::domain::combat::CombatAction take_pending_action(
         gus::domain::combat::CombatActor& actor);
 
-    // Comeca o turno do ator ativo (begin_turn) e, se ele perder o turno (Stun) ou for
-    // inimigo, auto-encadeia ate cair num turno de JOGADOR vivo ou o combate terminar.
-    void step_until_player_or_end();
+    // Resolve UM turno do ator ativo com a acao ja no mailbox (run_active_turn_to_end),
+    // spawna floaters + monta a linha de consequencia (D12), depois check_end + avanca
+    // pro proximo ator e chama begin_turn nele (deixa pronto). NAO encadeia: 1 turno.
+    void resolve_one_turn();
 
-    // Resolve UM turno do ator ativo com a acao ja no mailbox (run_active_turn_to_end +
-    // check_end + advance). Atualiza a habilitacao do menu pro proximo ator.
-    void resolve_current_turn();
+    // Prepara o ator ativo corrente pro seu turno (begin_turn: recarrega AP/Mana, tick de
+    // status). Idempotencia controlada por turn_started_ (nao re-begin no mesmo ator).
+    void start_active_turn();
+
+    // Avanca o RITMO (incremento 6): chamado por update(dt) quando o diretor libera um
+    // passo. Resolve 1 turno de inimigo (com delay depois) OU entra em espera-do-jogador.
+    void advance_pacing();
 
     // Acao automatica de um inimigo: ataque basico no 1o player vivo (POCO-ish; o alvo
     // vem de first_alive_player). Pass se nao houver player vivo.
@@ -229,6 +260,11 @@ private:
     // Drena os logs NOVOS do motor (desde log_cursor_) e spawna um numero flutuante
     // sobre o alvo pra cada dano/cura. Chamado apos cada resolucao de turno.
     void spawn_floaters_from_new_logs();
+
+    // Drena os logs NOVOS do motor (desde narration_cursor_) e monta as linhas de
+    // NARRACAO (D12): acao + dano + consequencia de status (resolvida via tr()), na cor
+    // da categoria. Empilha em narration_. Uma linha por evento, no ritmo do pacing.
+    void narrate_new_logs();
 
     // Retangulo do slot do ator na arena (party/inimigo), pelo id. nullopt se nao esta
     // vivo/visivel. Usado pra posicionar o numero flutuante e o icone de intent.
@@ -262,6 +298,22 @@ private:
     std::vector<Floater> floaters_;
     // Cursor do log do motor ja consumido pra floaters (so processa entradas NOVAS).
     std::size_t log_cursor_ = 0;
+
+    // Diretor de RITMO (incremento 6, D8): dita quando o proximo turno pode animar.
+    PacingDirector pacing_{};
+    // true se o begin_turn ja foi chamado pro ator ativo corrente (evita re-begin no
+    // mesmo ator entre frames). Resetado ao avancar pro proximo ator.
+    bool turn_started_ = false;
+    // true se o INIMIGO ativo ja fez sua acao neste turno (1 ataque/turno, D11). Resetado
+    // a cada novo turno (start_active_turn) pra o proximo inimigo agir uma vez.
+    bool enemy_acted_this_turn_ = false;
+
+    // NARRACAO do combate (D12): linhas de acao + dano + consequencia de status, ja
+    // resolvidas (tr() no nome do status). Construidas por narrate_new_logs a partir dos
+    // logs novos do motor. log_lines() mostra as ultimas N daqui (+ ui_log_).
+    std::vector<LogLine> narration_;
+    // Cursor do log do motor ja consumido pra narracao (so processa entradas NOVAS).
+    std::size_t narration_cursor_ = 0;
 };
 
 }  // namespace gus::app::screens

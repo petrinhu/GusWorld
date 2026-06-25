@@ -18,6 +18,7 @@
 #include "gus/app/screens/battle_hud_model.hpp"  // kHpBarW/kArenaHpBarH p/ casar rects
 #include "gus/app/screens/battle_log_model.hpp"  // LogLine/LogLineKind
 #include "gus/app/screens/battle_menu.hpp"       // BattleVerb
+#include "gus/app/screens/battle_pacing.hpp"     // PacingState/constantes
 #include "gus/app/screens/battle_scene.hpp"
 #include "gus/domain/combat/combat_actor.hpp"
 #include "gus/platform/render2d/i_renderer.hpp"
@@ -26,7 +27,10 @@ using gus::app::screens::BattleScene;
 using gus::app::screens::BattleStatusIconSet;
 using gus::app::screens::BattleVerb;
 using gus::app::screens::kFloaterLifeSeconds;
+using gus::app::screens::kPacingIntroSeconds;
+using gus::app::screens::kPacingStepDelaySeconds;
 using gus::app::screens::LogLineKind;
+using gus::app::screens::PacingState;
 using gus::app::screens::kArenaHpBarH;
 using gus::app::screens::kHpBarH;
 using gus::app::screens::kHpBarW;
@@ -118,10 +122,10 @@ TEST_CASE("BattleScene monta o encontro de demo e le a fila do motor",
     // 7 atores seguem vivos na demo (ataque basico nao mata em 1 hit aqui).
     REQUIRE(scene.queue_len() == 7);
     REQUIRE(scene.active_actor() != nullptr);
-    // INCREMENTO 3: a cena conduz a batalha ate o 1o turno de JOGADOR. O inimigo de
-    // maior SPD (inimigo3, 13) ja agiu; a parada e num ator do LADO DO JOGADOR vivo.
-    REQUIRE(scene.current_actor_is_player());
-    REQUIRE(scene.active_actor()->is_player_side());
+    // INCREMENTO 6 (D10): a cena comeca PARADA na intro - NINGUEM agiu ainda. O ator
+    // ativo e o de maior SPD (inimigo3, 13), mas ele so age quando o ritmo comeca.
+    REQUIRE(scene.is_intro());
+    REQUIRE(scene.active_actor()->spd() == 13);  // inimigo3 esperando o ritmo comecar
     REQUIRE_FALSE(scene.combat_over());
 }
 
@@ -321,12 +325,28 @@ void select_verb(BattleScene& scene, BattleVerb want) {
     }
 }
 
+// PACING (incremento 6): a cena comeca PARADA (intro) e anima turno-a-turno. Pra os
+// testes de turno, "bombeia" o ritmo (skip + update) ate cair na vez do jogador ou o
+// combate acabar. Cada skip pula a intro/delay; update conduz 1 passo por vez.
+void pump_to_player_turn(BattleScene& scene) {
+    for (int i = 0; i < 200; ++i) {
+        if (scene.combat_over() || scene.waiting_player_input()) {
+            return;
+        }
+        scene.skip();             // acelera a intro/delay corrente
+        scene.update(1.0f / 60.0f);  // conduz 1 passo (resolve 1 turno de inimigo)
+    }
+}
+
 }  // namespace
 
 TEST_CASE("turno: a cena para no 1o turno de JOGADOR com o menu pronto",
           "[battle_scene]") {
     BattleScene scene;
+    // PACING (incr 6): comeca PARADA (intro). Bombeia ate a vez do jogador.
+    pump_to_player_turn(scene);
     REQUIRE(scene.current_actor_is_player());
+    REQUIRE(scene.waiting_player_input());
     REQUIRE_FALSE(scene.combat_over());
     // O menu reflete o AP do ator ativo (3): todos os verbos de 1 AP habilitados.
     REQUIRE(scene.menu().is_enabled(BattleVerb::Atacar));
@@ -335,31 +355,32 @@ TEST_CASE("turno: a cena para no 1o turno de JOGADOR com o menu pronto",
 
 TEST_CASE("turno: Atacar resolve a acao e troca o ator ativo", "[battle_scene]") {
     BattleScene scene;
+    pump_to_player_turn(scene);
     const auto* before = scene.active_actor();
     REQUIRE(before != nullptr);
 
     select_verb(scene, BattleVerb::Atacar);
     scene.menu_confirm();
 
-    // Apos confirmar, OU o combate avancou pro proximo turno de jogador (ator ativo
-    // diferente do que agiu), OU terminou. Em ambos, o ator que agiu nao e mais o ativo
-    // com AP cheio "esperando".
-    if (!scene.combat_over()) {
-        REQUIRE(scene.current_actor_is_player());
-        // O motor registrou o ataque no log (entrada de Attack do atacante).
-        bool found_attack = false;
-        for (const auto& e : scene.machine().log()) {
-            if (e.actor_id == before->id() &&
-                e.action == gus::domain::combat::CombatActionType::Attack) {
-                found_attack = true;
-            }
+    // O motor registrou o ataque do jogador no log (entrada de Attack do atacante). Com
+    // o pacing, o turno do jogador resolveu na hora (menu_confirm), e o ritmo entrou em
+    // delay antes de animar os inimigos.
+    bool found_attack = false;
+    for (const auto& e : scene.machine().log()) {
+        if (e.actor_id == before->id() &&
+            e.action == gus::domain::combat::CombatActionType::Attack) {
+            found_attack = true;
         }
-        REQUIRE(found_attack);
     }
+    REQUIRE(found_attack);
+    // Bombeando o ritmo, a cena volta a uma vez de jogador OU termina (sem travar).
+    pump_to_player_turn(scene);
+    REQUIRE((scene.waiting_player_input() || scene.combat_over()));
 }
 
 TEST_CASE("turno: Compilar NAO consome o turno (so loga, incr 4)", "[battle_scene]") {
     BattleScene scene;
+    pump_to_player_turn(scene);
     const auto* actor_before = scene.active_actor();
     const int log_before = static_cast<int>(scene.machine().log().size());
 
@@ -383,6 +404,7 @@ TEST_CASE("turno: Compilar NAO consome o turno (so loga, incr 4)", "[battle_scen
 TEST_CASE("turno: Defender aplica Shield no proprio ator (acao real)",
           "[battle_scene]") {
     BattleScene scene;
+    pump_to_player_turn(scene);
     const auto* self = scene.active_actor();
     REQUIRE(self != nullptr);
     const std::string self_id = self->id();
@@ -401,20 +423,20 @@ TEST_CASE("turno: Defender aplica Shield no proprio ator (acao real)",
     REQUIRE(found_defend);
 }
 
-TEST_CASE("turno: menu_confirm e no-op fora do turno de jogador / verbo sem AP",
+TEST_CASE("turno: menu_confirm e no-op apos o fim (pacing conduz ate acabar)",
           "[battle_scene]") {
     BattleScene scene;
-    // Seleciona Atacar e zera o cenario: nao da pra forcar 0 AP sem agir, entao
-    // exercitamos o no-op por estado: apos o combate acabar, confirmar nao faz nada.
-    // Conduz a batalha ate o fim (muitos Atacar) e checa que confirmar e inerte.
+    // Conduz a batalha ate o fim no ritmo: bombeia ate a vez do jogador, ataca, repete.
+    // Cada pump anima os turnos de inimigo um a um; o Atacar resolve o do jogador.
     int guard = 0;
-    while (!scene.combat_over() && guard++ < 200) {
-        if (scene.current_actor_is_player()) {
-            select_verb(scene, BattleVerb::Atacar);
-            scene.menu_confirm();
-        } else {
-            break;  // a cena auto-encadeia inimigos; nao deveria parar em inimigo
+    while (!scene.combat_over() && guard++ < 400) {
+        pump_to_player_turn(scene);
+        if (scene.combat_over()) {
+            break;
         }
+        REQUIRE(scene.waiting_player_input());  // o ritmo parou na vez do jogador
+        select_verb(scene, BattleVerb::Atacar);
+        scene.menu_confirm();
     }
     // Eventualmente termina (vitoria ou derrota) - o ataque basico resolve a demo.
     REQUIRE(scene.combat_over());
@@ -428,8 +450,9 @@ TEST_CASE("turno: menu_confirm e no-op fora do turno de jogador / verbo sem AP",
 TEST_CASE("log: render emite o TEXTO da message de cada linha notavel (incr 3.5)",
           "[battle_scene]") {
     BattleScene scene;
-    // Forca eventos notaveis: um Atacar (gera log de ataque do jogador + o inimigo que
-    // ja agiu antes). Renderiza e checa que ha TEXTO desenhado na zona do log (y>=314).
+    pump_to_player_turn(scene);
+    // Forca eventos: um Atacar (gera log de ataque do jogador + os inimigos que ja
+    // animaram). Renderiza e checa que ha TEXTO desenhado na zona do log (y>=314).
     select_verb(scene, BattleVerb::Atacar);
     scene.menu_confirm();
 
@@ -500,6 +523,7 @@ TEST_CASE("menu: render emite o NOME (texto) de cada verbo quando ha translator"
     tr.load_from_content(
         "## COMBAT_ACTION_ATTACK\nAtacar\n\n## COMBAT_ACTION_DEFEND\nDefender\n");
     scene.set_translator(&tr);
+    pump_to_player_turn(scene);  // o menu so renderiza na vez do jogador (D9)
     CountingRenderer r;
     scene.render(r, 640.0f, 360.0f);
     bool found_atacar = false;
@@ -515,29 +539,33 @@ TEST_CASE("menu: render emite o NOME (texto) de cada verbo quando ha translator"
 
 TEST_CASE("floater: Atacar spawna um numero flutuante sobre o alvo", "[battle_scene]") {
     BattleScene scene;
-    // No ctor os inimigos de maior SPD ja agiram (auto), entao pode haver floaters dos
-    // ataques deles. Medimos o DELTA: o ataque do jogador adiciona pelo menos 1 floater.
+    pump_to_player_turn(scene);
+    // Medimos o DELTA: o ataque do jogador adiciona pelo menos 1 floater de dano.
     const std::size_t before = scene.floaters().size();
 
     select_verb(scene, BattleVerb::Atacar);
     scene.menu_confirm();
-    // O ataque do jogador (e os inimigos que agiram depois) spawnaram floaters de dano.
     REQUIRE(scene.floaters().size() > before);
 }
 
 TEST_CASE("floater: update(dt) envelhece e poda os mortos", "[battle_scene]") {
     BattleScene scene;
+    pump_to_player_turn(scene);
     select_verb(scene, BattleVerb::Atacar);
     scene.menu_confirm();
     const std::size_t spawned = scene.floaters().size();
     REQUIRE(spawned > 0);
-    // Avanca o tempo alem da vida: todos os floaters morrem e sao podados.
-    scene.update(kFloaterLifeSeconds + 0.1f);
+    // Avanca o tempo alem da vida: todos os floaters morrem e sao podados. (update tambem
+    // tica o pacing, mas o combate so anima 1 passo - os floaters do passo envelhecem.)
+    for (int i = 0; i < 5; ++i) {
+        scene.update(kFloaterLifeSeconds + 0.1f);
+    }
     REQUIRE(scene.floaters().empty());
 }
 
 TEST_CASE("floater: render desenha o numero (texto) sobre o alvo", "[battle_scene]") {
     BattleScene scene;
+    pump_to_player_turn(scene);
     select_verb(scene, BattleVerb::Atacar);
     scene.menu_confirm();
     REQUIRE(scene.floaters().size() > 0);
@@ -557,6 +585,7 @@ TEST_CASE("floater: render desenha o numero (texto) sobre o alvo", "[battle_scen
 TEST_CASE("log: D7 revisado - narra TODA acao (hit comum aparece no log)",
           "[battle_scene]") {
     BattleScene scene;
+    pump_to_player_turn(scene);
     select_verb(scene, BattleVerb::Atacar);
     scene.menu_confirm();
     // Apos um ataque, o log_lines tem >= 1 linha de Damage (o golpe narrado), mesmo que
@@ -578,6 +607,7 @@ TEST_CASE("log REGRESSAO: status do inicio NAO esconde os ataques na janela visi
     // ataque pra fora. Esta regressao trava: na janela VISIVEL (capacity ~4), as acoes
     // aparecem e NENHUMA linha de Status ocupa a caixa.
     BattleScene scene;
+    pump_to_player_turn(scene);
     select_verb(scene, BattleVerb::Atacar);
     scene.menu_confirm();
     const auto window = scene.log_lines(4);  // o que cabe na caixa
@@ -605,8 +635,90 @@ TEST_CASE("intent: cada inimigo vivo expoe um IntentPreview (telegraph)",
         }
     }
     REQUIRE(with_intent >= 1);
-    // Um player NAO tem intent (so inimigos telegrafam).
-    const auto* player = scene.active_actor();
+    // Um player NAO tem intent (so inimigos telegrafam). Acha um ator do lado do jogador
+    // na fila (o ator ATIVO na intro e o inimigo de maior SPD, nao serve aqui).
+    const gus::domain::combat::CombatActor* player = nullptr;
+    for (const auto* a : scene.machine().queue().order()) {
+        if (a != nullptr && a->is_player_side() && a->is_alive()) {
+            player = a;
+            break;
+        }
+    }
     REQUIRE(player != nullptr);
     REQUIRE_FALSE(scene.intent_for(*player).has_value());
+}
+
+// ---- INCREMENTO 6: ritmo / pacing (D8/D9/D10/D12) -----------------------------------
+
+TEST_CASE("pacing D10: comeca PARADA na intro, ninguem agiu (log vazio)",
+          "[battle_scene]") {
+    BattleScene scene;
+    REQUIRE(scene.is_intro());
+    REQUIRE(scene.pacing_state() == gus::app::screens::PacingState::Intro);
+    // Ninguem agiu: o motor nao tem nenhuma entrada de ACAO ainda (so o setup).
+    REQUIRE(scene.machine().log().empty());
+    REQUIRE(scene.log_lines(10).empty());
+    // O banner anuncia a batalha.
+    REQUIRE(scene.turn_banner_key() == std::string_view("COMBAT_BANNER_BATTLE"));
+}
+
+TEST_CASE("pacing D8: os turnos de inimigo animam UM DE CADA VEZ (nao todos juntos)",
+          "[battle_scene]") {
+    BattleScene scene;
+    // Passa a intro: o 1o turno (inimigo3, maior SPD) libera e anima 1 passo.
+    scene.update(kPacingIntroSeconds + 0.01f);
+    // Apos a intro + 1 passo, exatamente 1 turno de inimigo resolveu (1 acao logada),
+    // NAO todos os 4 inimigos de uma vez (o problema do playtest).
+    const std::size_t after_first = scene.machine().log().size();
+    REQUIRE(after_first >= 1);
+    // O ritmo agora segura o delay (nao resolve o proximo sem o tempo passar).
+    const std::size_t before_delay = scene.machine().log().size();
+    scene.update(0.01f);  // dt minusculo: nao passa o delay
+    REQUIRE(scene.machine().log().size() == before_delay);  // ainda segurando
+    // Passado o delay, o proximo turno anima.
+    scene.update(kPacingStepDelaySeconds + 0.01f);
+    REQUIRE(scene.machine().log().size() >= before_delay);  // avancou (>= , pode ter parado no jogador)
+}
+
+TEST_CASE("pacing: skip acelera a intro e chega na vez do jogador", "[battle_scene]") {
+    BattleScene scene;
+    pump_to_player_turn(scene);
+    REQUIRE(scene.waiting_player_input());
+    REQUIRE(scene.turn_banner_key() ==
+            std::string_view("COMBAT_BANNER_PLAYER_TURN"));
+}
+
+TEST_CASE("pacing D9: o banner reflete de quem e a vez (inimigo OU jogador)",
+          "[battle_scene]") {
+    BattleScene scene;
+    // Na intro, banner = BATALHA!.
+    REQUIRE(scene.turn_banner_key() == std::string_view("COMBAT_BANNER_BATTLE"));
+    scene.skip();          // pula a intro
+    scene.update(0.001f);  // anima o 1o passo (inimigo3) e prepara o proximo ator
+    // O banner agora e do ATOR ATIVO: ou inimigo (proximo e inimigo) ou jogador (proximo
+    // e player). Nunca mais BATALHA! (a intro acabou). Leitura imediata de quem joga (D9).
+    if (!scene.combat_over()) {
+        const auto key = scene.turn_banner_key();
+        REQUIRE((key == std::string_view("COMBAT_BANNER_ENEMY_TURN") ||
+                 key == std::string_view("COMBAT_BANNER_PLAYER_TURN")));
+        REQUIRE(key != std::string_view("COMBAT_BANNER_BATTLE"));
+    }
+}
+
+TEST_CASE("pacing D12: a narracao traz a CONSEQUENCIA (dano) no log", "[battle_scene]") {
+    BattleScene scene;
+    pump_to_player_turn(scene);
+    select_verb(scene, BattleVerb::Atacar);
+    scene.menu_confirm();
+    // A narracao tem a linha do ataque do jogador com o dano (a message do motor "X ataca
+    // Y por N" e a base da consequencia; o status entra quando aplicado).
+    const auto lines = scene.log_lines(20);
+    bool has_dano = false;
+    for (const auto& l : lines) {
+        if (l.kind == LogLineKind::Damage &&
+            l.text.find(" por ") != std::string::npos) {
+            has_dano = true;
+        }
+    }
+    REQUIRE(has_dano);
 }

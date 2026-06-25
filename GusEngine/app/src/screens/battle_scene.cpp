@@ -116,6 +116,13 @@ constexpr DrawColor kIntentMarkColor{0.95f, 0.75f, 0.20f, 1.0f};  // placeholder
 // display mostrou que o numero pequeno sumia). Sobe sobre o alvo e some por fade.
 constexpr float kFloaterTextPx = 16.0f;
 
+// Banner de turno (D9/D10): tamanho + cor. Texto grande e centrado abaixo da fila CTB.
+constexpr float kBannerTextPx = 16.0f;
+constexpr DrawColor kBannerBgColor{0.05f, 0.05f, 0.09f, 0.85f};   // faixa semi-opaca
+constexpr DrawColor kBannerPlayerColor{0.55f, 0.95f, 0.65f, 1.0f};  // sua vez (verde)
+constexpr DrawColor kBannerEnemyColor{0.95f, 0.55f, 0.45f, 1.0f};   // vez do inimigo
+constexpr DrawColor kBannerIntroColor{0.98f, 0.92f, 0.45f, 1.0f};   // BATALHA! (ambar)
+
 // Cor de uma linha do log pela categoria (D7).
 DrawColor log_line_color(LogLineKind k) noexcept {
     switch (k) {
@@ -276,17 +283,25 @@ BattleScene::BattleScene() {
         std::move(ptrs), std::move(provider), /*card_registry=*/nullptr,
         &brain_registry_);
 
-    // Comeca a batalha: begin_turn do 1o ator + auto-encadeia turnos de inimigo ate cair
-    // num turno de JOGADOR vivo (onde o menu opera) ou o combate terminar. O painel
-    // mostra o ator ativo (AP/Mana recarregados pelo begin_turn).
-    step_until_player_or_end();
+    // D10 ABERTURA PARADA (incremento 6): NINGUEM age no ctor. O diretor de pacing comeca
+    // em Intro ("BATALHA!"); so prepara o turno do 1o ator (begin_turn pra o painel
+    // mostrar AP/Mana), SEM resolver. Os turnos so comecam a animar quando a intro termina
+    // (update/skip), um a um com o ritmo. Resolve o problema do playtest ("inimigos ja
+    // atacaram antes de eu ver").
+    start_active_turn();
     menu_.refresh(active_actor() != nullptr ? active_actor()->ap() : 0);
 }
 
 CombatAction BattleScene::take_pending_action(CombatActor& actor) {
-    // Inimigo: ignora o mailbox e age sozinho (ataque basico). Jogador: consome o
-    // mailbox (acao do menu) e o reseta pra Pass (proxima chamada encerra o turno).
+    // Inimigo: age UMA vez por turno (1 ataque) e depois Pass. Assim cada ataque de
+    // inimigo aparece NO SEU TEMPO com seu floater (D11) - sem gastar os 3 AP de uma vez
+    // (que faria 3 ataques instantaneos num turno so). Jogador: consome o mailbox (acao
+    // do menu) e reseta pra Pass.
     if (!actor.is_player_side()) {
+        if (enemy_acted_this_turn_) {
+            return CombatAction::pass();  // ja agiu neste turno: encerra
+        }
+        enemy_acted_this_turn_ = true;
         return enemy_auto_action(actor);
     }
     CombatAction a = pending_action_;
@@ -378,18 +393,100 @@ void BattleScene::spawn_floaters_from_new_logs() {
     log_cursor_ = log.size();
 }
 
+void BattleScene::narrate_new_logs() {
+    // D12: monta a NARRACAO de cada evento NOVO do motor = a message do motor (ja diz
+    // "X ataca Y por N") + a CONSEQUENCIA de status aplicado no alvo naquele evento
+    // ("; Y ficou com <Status>"), com o nome do status resolvido via tr(). Uma linha por
+    // evento. A cor vem da categoria (classify).
+    const auto& log = machine_->log();
+    const auto& changes = machine_->status_changes();
+    for (std::size_t i = narration_cursor_; i < log.size(); ++i) {
+        const auto& e = log[i];
+        LogLine line = classify(e);  // categoria + message crua do motor
+        // Consequencia: status aplicado no alvo do golpe. consequence_suffix devolve a
+        // forma com a CHAVE i18n; resolvemos a chave via tr() pra exibir o nome.
+        if (e.target_id.has_value()) {
+            std::string sfx = consequence_suffix(*e.target_id, changes);
+            if (!sfx.empty() && translator_ != nullptr) {
+                // Troca cada STATUS_*_NAME pela traducao (a chave aparece literal no sfx).
+                for (int s = 0; s < 13; ++s) {
+                    const auto id = static_cast<gus::domain::combat::StatusId>(s);
+                    const std::string key(status_name_key(id));
+                    std::size_t pos = sfx.find(key);
+                    while (pos != std::string::npos) {
+                        sfx.replace(pos, key.size(), translator_->tr(key));
+                        pos = sfx.find(key, pos + 1);
+                    }
+                }
+            }
+            line.text += sfx;
+        }
+        narration_.push_back(std::move(line));
+    }
+    narration_cursor_ = log.size();
+}
+
 void BattleScene::update(float dt_seconds) {
     if (dt_seconds <= 0.0f) {
         return;
     }
+    // Anima os numeros flutuantes (envelhece + poda).
     for (Floater& f : floaters_) {
         f.age += dt_seconds;
     }
-    // Poda os mortos (idade > vida). erase-remove.
     floaters_.erase(
         std::remove_if(floaters_.begin(), floaters_.end(),
                        [](const Floater& f) { return !floater_alive(f.age); }),
         floaters_.end());
+
+    // RITMO (incremento 6): avanca o diretor pelo tempo; quando ele LIBERA um passo (a
+    // intro/delay terminou), conduz UM turno (de inimigo) ou entra em espera-do-jogador.
+    pacing_.tick(dt_seconds);
+    if (pacing_.ready_to_step()) {
+        advance_pacing();
+    }
+}
+
+void BattleScene::advance_pacing() {
+    if (combat_over()) {
+        return;
+    }
+    // Garante que o turno do ator ativo foi preparado (begin_turn).
+    start_active_turn();
+    if (combat_over()) {
+        return;
+    }
+    // Vez do JOGADOR: nao auto-resolve - entra em espera-do-input (D9 "sua vez"). O menu
+    // ja esta habilitado pelo start_active_turn. So retoma o ritmo no menu_confirm.
+    if (current_actor_is_player()) {
+        if (pacing_.state() != PacingState::WaitingPlayerInput) {
+            pacing_.begin_player_turn();
+        }
+        return;
+    }
+    // Vez do INIMIGO: resolve UM turno (com floater + log de consequencia) e segura o
+    // delay pro jogador LER (D8/D11). O proximo turno so anima apos o delay.
+    resolve_one_turn();
+    pacing_.begin_enemy_step();
+}
+
+void BattleScene::skip() {
+    // D8: acelera a intro / encurta o delay entre turnos. Nao pula o turno do jogador.
+    pacing_.skip();
+}
+
+std::string_view BattleScene::turn_banner_key() const noexcept {
+    // D9/D10: a casca resolve via tr() (+ nome do ator ativo pro turno do jogador).
+    if (combat_over()) {
+        return "";
+    }
+    if (is_intro()) {
+        return "COMBAT_BANNER_BATTLE";  // "BATALHA!"
+    }
+    if (current_actor_is_player()) {
+        return "COMBAT_BANNER_PLAYER_TURN";  // "TURNO DE {0}" / "SUA VEZ"
+    }
+    return "COMBAT_BANNER_ENEMY_TURN";  // "vez do inimigo"
 }
 
 std::optional<gus::domain::combat::IntentPreview> BattleScene::intent_for(
@@ -424,40 +521,36 @@ bool BattleScene::combat_over() const noexcept {
     return machine_->outcome() != gus::domain::combat::CombatOutcome::Ongoing;
 }
 
-void BattleScene::resolve_current_turn() {
+void BattleScene::start_active_turn() {
+    // Prepara o turno do ator ativo (begin_turn: recarrega AP/Mana, tick de status).
+    // Idempotente por turno: so chama begin_turn UMA vez por ator (turn_started_).
+    if (turn_started_ || combat_over()) {
+        return;
+    }
+    machine_->begin_turn();
+    turn_started_ = true;
+    enemy_acted_this_turn_ = false;  // novo turno: o inimigo (se for) pode agir 1 vez
+    // Se o begin_turn drenou status que viraram dano (Poison no TurnStart), narra/floata.
+    spawn_floaters_from_new_logs();
+    narrate_new_logs();
+    menu_.refresh(active_actor() != nullptr ? active_actor()->ap() : 0);
+}
+
+void BattleScene::resolve_one_turn() {
     // A acao ja esta no mailbox (jogador) ou sera auto (inimigo). run_active_turn_to_end
-    // consome AP ate Pass/0; depois CheckEnd e, se nao acabou, avanca pro proximo ator.
+    // consome AP ate Pass/0. Depois: floaters + narracao de consequencia (D11/D12),
+    // check_end, avanca pro proximo ator e prepara o turno dele (start_active_turn).
     if (machine_->phase() == gus::domain::combat::CombatPhase::ActionSelect) {
         machine_->run_active_turn_to_end();
     }
-    // Spawna os numeros flutuantes dos golpes deste turno (logs novos) ANTES do
-    // check_end/advance: o alvo ainda esta vivo/visivel na arena pra ancorar o numero.
+    // Floater (D11) + narracao com consequencia (D12) ANTES do advance: o alvo ainda
+    // esta vivo/visivel na arena pra ancorar o numero.
     spawn_floaters_from_new_logs();
+    narrate_new_logs();
     if (!machine_->check_end()) {
         machine_->advance_to_next_actor();
-    }
-}
-
-void BattleScene::step_until_player_or_end() {
-    // begin_turn do ator atual; se ele for inimigo (ou perder o turno), resolve e avanca
-    // ate cair num turno de JOGADOR vivo ou o combate terminar. Guarda contra loop.
-    int guard = 0;
-    const int max_steps = machine_->queue().count() * 4 + 8;
-    while (!combat_over()) {
-        if (++guard > max_steps) {
-            break;  // seguranca: nunca pendura o frame
-        }
-        // Inicia o turno do ator corrente (recarrega AP/Mana, aplica tick de status).
-        machine_->begin_turn();
-        if (combat_over()) {
-            break;
-        }
-        // Turno de JOGADOR vivo: para aqui e espera o menu (o player escolhe o verbo).
-        if (current_actor_is_player()) {
-            return;
-        }
-        // Inimigo (ou stunned): resolve automaticamente e avanca pro proximo.
-        resolve_current_turn();
+        turn_started_ = false;       // o proximo ator ainda nao teve begin_turn
+        start_active_turn();         // prepara o proximo (AP/Mana/painel) ja
     }
 }
 
@@ -531,22 +624,20 @@ void BattleScene::menu_confirm() {
             return;  // tratado acima
     }
 
-    // Submete a acao (mailbox) e conduz o turno; depois auto-encadeia turnos de inimigo
-    // ate o proximo turno de jogador ou o fim. Atualiza a habilitacao do menu.
+    // RITMO (incremento 6): submete a acao do jogador e resolve SO o turno dele (com
+    // floater + narracao de consequencia). NAO encadeia os inimigos aqui: o diretor
+    // entra em delay (player_acted) e o update(dt) anima os turnos de inimigo um a um.
     pending_action_ = std::move(action);
-    resolve_current_turn();
-    if (!combat_over()) {
-        step_until_player_or_end();
-    }
+    resolve_one_turn();
+    pacing_.player_acted();
     menu_.refresh(active_actor() != nullptr ? active_actor()->ap() : 0);
 }
 
 std::vector<LogLine> BattleScene::log_lines(int max_lines) const {
-    // Junta as linhas NOTAVEIS do motor (D7) com as linhas de UI (COMPILAR/GAMBITO
-    // sinalizados aqui), preservando a ordem: motor primeiro, UI depois (as de UI sao as
-    // mais recentes ao escolher um verbo que ainda nao age). Corta pro tamanho da caixa.
-    std::vector<LogLine> lines = build_log_lines(
-        machine_->log(), machine_->status_changes(), /*max_lines=*/0);
+    // NARRACAO do combate (D12, incremento 6): as linhas ja vem montadas em narration_
+    // (acao + dano + consequencia de status), no ritmo do pacing. Junta as linhas de UI
+    // (COMPILAR/GAMBITO sinalizados) ao fim e corta pras ULTIMAS N (a caixa rola).
+    std::vector<LogLine> lines = narration_;
     lines.insert(lines.end(), ui_log_.begin(), ui_log_.end());
     if (max_lines > 0 && static_cast<int>(lines.size()) > max_lines) {
         lines.erase(lines.begin(), lines.end() - max_lines);
@@ -630,6 +721,33 @@ void BattleScene::render(IRenderer& renderer, float viewport_px_w,
             if (cell.is_overflow) {
                 renderer.draw_rect_outline(cell.rect, kHudBorderColor, 1.0f);
             }
+        }
+    }
+
+    // --- BANNER DE TURNO (D9/D10, incremento 6): quem joga, abaixo da fila CTB ---
+    // "BATALHA!" na intro / "SUA VEZ: escolha uma acao" no jogador / "Vez do inimigo".
+    // Resolve a chave via tr() (+ nome do ator ativo no turno do jogador). Sem translator
+    // ou combate acabado, nao desenha (a casca degrada sem texto).
+    if (!combat_over() && translator_ != nullptr) {
+        const std::string_view key = turn_banner_key();
+        if (!key.empty()) {
+            std::string text = translator_->tr(std::string(key));
+            DrawColor col = kBannerIntroColor;
+            if (current_actor_is_player()) {
+                col = kBannerPlayerColor;
+            } else if (!is_intro()) {
+                col = kBannerEnemyColor;
+            }
+            // Faixa de fundo + texto centrado horizontalmente, logo abaixo da fila CTB.
+            const float by = static_cast<float>(kCtbStripTop + kCtbPortraitPx +
+                                                kCtbStripTop + 2);
+            const Rect band{0.0f, by, static_cast<float>(kBattleLogicalW),
+                            kBannerTextPx + 4.0f};
+            renderer.draw_filled_rect(band, kBannerBgColor);
+            const float tw = gus::platform::render2d::text_width(text, kBannerTextPx);
+            const float tx = (static_cast<float>(kBattleLogicalW) - tw) * 0.5f;
+            renderer.draw_text(text.c_str(), tx, by + 2.0f, kBannerTextPx, col,
+                               /*bold=*/true);
         }
     }
 

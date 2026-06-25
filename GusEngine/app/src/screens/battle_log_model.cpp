@@ -128,4 +128,41 @@ std::vector<LogLine> build_log_lines(
     return lines;
 }
 
+std::string_view status_name_key(gus::domain::combat::StatusId id) noexcept {
+    using gus::domain::combat::StatusId;
+    switch (id) {
+        case StatusId::Stun:      return "STATUS_STUN_NAME";
+        case StatusId::Poison:    return "STATUS_POISON_NAME";
+        case StatusId::Corrode:   return "STATUS_CORRODE_NAME";
+        case StatusId::Disrupt:   return "STATUS_DISRUPT_NAME";
+        case StatusId::Silence:   return "STATUS_SILENCE_NAME";
+        case StatusId::Knockback: return "STATUS_KNOCKBACK_NAME";
+        case StatusId::Break:     return "STATUS_BREAK_NAME";
+        case StatusId::Expose:    return "STATUS_EXPOSE_NAME";
+        case StatusId::Decrypt:   return "STATUS_DECRYPT_NAME";
+        case StatusId::Shield:    return "STATUS_SHIELD_NAME";
+        case StatusId::Regen:     return "STATUS_REGEN_NAME";
+        case StatusId::Haste:     return "STATUS_HASTE_NAME";
+        case StatusId::Slow:      return "STATUS_SLOW_NAME";
+    }
+    return "STATUS_STUN_NAME";  // guarda (enum coberto)
+}
+
+std::string consequence_suffix(
+    const std::string& target_id,
+    const std::vector<StatusEffectChange>& changes) {
+    std::string out;
+    for (const StatusEffectChange& c : changes) {
+        // So status APLICADO no ALVO do golpe entra na consequencia (D12). Applied so.
+        if (c.kind != StatusChangeKind::Applied || c.actor_id != target_id) {
+            continue;
+        }
+        // "; <alvo> ficou com <STATUS_KEY>". A STATUS_KEY fica literal; a casca resolve
+        // por tr() antes de exibir (o POCO nao depende de i18n).
+        out += "; " + target_id + " ficou com " +
+               std::string(status_name_key(c.id));
+    }
+    return out;
+}
+
 }  // namespace gus::app::screens

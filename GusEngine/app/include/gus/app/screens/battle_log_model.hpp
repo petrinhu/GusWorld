@@ -24,8 +24,10 @@
 #define GUS_APP_SCREENS_BATTLE_LOG_MODEL_HPP
 
 #include <string>
+#include <string_view>
 #include <vector>
 
+#include "gus/domain/combat/combat_enums.hpp"  // StatusId
 #include "gus/domain/combat/combat_records.hpp"
 
 namespace gus::app::screens {
@@ -65,6 +67,22 @@ struct LogLine {
     const std::vector<gus::domain::combat::CombatLogEntry>& log,
     const std::vector<gus::domain::combat::StatusEffectChange>& status_changes,
     int max_lines);
+
+// ---- D12: log narra a CONSEQUENCIA (incremento 6) ----
+//
+// Chave i18n do NOME de um StatusId (STATUS_<id>_NAME, ver game/translations). A UI
+// resolve via tr(); o POCO so devolve a chave (deterministico, testavel). Todo StatusId
+// do enum mapeia (sem chave vazia).
+[[nodiscard]] std::string_view status_name_key(
+    gus::domain::combat::StatusId id) noexcept;
+
+// Sufixo de CONSEQUENCIA pra a linha de um golpe (D12): "; <target> ficou com
+// <STATUS_KEY>" pra cada status APLICADO no target_id neste evento. Vazio se nenhum
+// status foi aplicado no alvo. As STATUS_KEY ficam LITERAIS (a casca substitui por tr()
+// antes de exibir; o POCO nao depende de i18n). Status aplicado em OUTRO ator nao entra.
+[[nodiscard]] std::string consequence_suffix(
+    const std::string& target_id,
+    const std::vector<gus::domain::combat::StatusEffectChange>& changes);
 
 }  // namespace gus::app::screens
 

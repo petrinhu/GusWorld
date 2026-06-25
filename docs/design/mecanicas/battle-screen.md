@@ -176,6 +176,22 @@ A engine NAO tem sistema de fonte (o IRenderer so faz rect/textura). Decisao: **
 
 ---
 
+## 5.2 Ritmo / pacing do combate (decisoes do criador 2026-06-25, do playtest no display)
+
+O playtest pegou que o combate sem RITMO atropela tudo (inimigos agem antes do jogador ver, floaters/log somem, confuso de quem e a vez). Decisoes:
+
+- **D8 Modelo de ritmo: HIBRIDO.** Cada turno mostra acao + numero flutuante + log, pausa ~0.8s, segue sozinho; o jogador pode APERTAR uma tecla pra acelerar/avancar pro proximo. Fluido por padrao + controle quando quer ler. A apresentacao processa UM evento de cada vez (fila de eventos drenada do motor com timing), NAO resolve tudo instantaneo.
+- **D9 Indicador de turno: banner + highlight + 'sua vez'.** Texto claro de quem joga ("TURNO DE GUS"); ator ativo com destaque forte (brilho/seta); na vez do jogador, "SUA VEZ: escolha uma acao"; na vez do inimigo, "vez do inimigo". Leitura imediata.
+- **D10 Abertura: comeca PARADA.** Ao abrir: arena monta, "BATALHA!" breve + a fila, NINGUEM agiu. Ao iniciar, os turnos animam um a um com o ritmo; se o inimigo for o 1o (maior SPD), o jogador VE ele atacar com numero+log no tempo certo. (Resolve "inimigos ja atacaram antes de eu ver".)
+- **D11 Floater no ataque do INIMIGO:** com o pacing, cada ataque inimigo aparece no seu tempo com seu numero flutuante (antes batiam todos juntos e somiam).
+- **D12 Log narra a CONSEQUENCIA:** nao so "X atacou", mas "X atacou Y: Y recebeu N de dano" e o status ("Y ficou com Stun"). A apresentacao monta a linha completa a partir do dano + status que o motor ja entrega. E com o pacing, o log nao rola rapido demais (uma linha por evento no ritmo).
+
+Consequencia arquitetural: a BattleScene ganha um "diretor de pacing" (POCO testavel) que consome os eventos do motor um a um, com timing e estados (animando / esperando-input-do-jogador / esperando-delay). O motor (domain/combat) NAO muda - so a apresentacao deixa de drenar tudo de uma vez.
+
+**Status de implementacao (incremento 6, entregue 2026-06-25):** D8-D12 implementados. `PacingDirector` POCO (`gus/app/screens/battle_pacing.{hpp,cpp}`): estados Intro / WaitingDelay / WaitingPlayerInput, avanco por `tick(dt)`, `skip()` pra acelerar. A BattleScene comeca PARADA (D10), anima 1 turno por vez com delay ~0.8s (D8/D11), mostra o banner de turno (D9) e narra a consequencia (dano + status via `consequence_suffix`, D12). Cada inimigo age UMA vez por turno (1 ataque = 1 floater no seu tempo), em vez de gastar os 3 AP de uma vez. Intro `kPacingIntroSeconds` = 0.9s; delay `kPacingStepDelaySeconds` = 0.8s.
+
+---
+
 ## 6. Pipeline de implementacao (agentes)
 
 1. **lead-game-designer**: fecha as pendencias finas do paragrafo 5 (propostas -> AskUserQuestion ao criador).

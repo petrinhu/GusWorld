@@ -176,6 +176,15 @@ Seu turno
 ## COMBAT_ENEMY_TURN
 Turno do inimigo
 
+## COMBAT_BANNER_BATTLE
+BATALHA!
+
+## COMBAT_BANNER_PLAYER_TURN
+SUA VEZ: escolha uma acao
+
+## COMBAT_BANNER_ENEMY_TURN
+Vez do inimigo
+
 ## COMBAT_SELECT_TARGET
 Escolha o alvo:
 

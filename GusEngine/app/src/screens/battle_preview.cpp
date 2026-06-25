@@ -172,8 +172,8 @@ int run_battle_preview() {
                   << "\n  party=" << scene.party_count()
                   << " inimigos=" << scene.enemy_count()
                   << " fila=" << scene.queue_len() << " retratos em " << dir
-                  << "\n  Cima/Baixo: navega o menu | Enter/Espaco: confirma o verbo | "
-                     "Esc: sai\n";
+                  << "\n  Cima/Baixo: navega o menu | Enter/Espaco: na sua vez confirma o "
+                     "verbo, senao ACELERA o ritmo | Esc: sai\n";
 
         bool running = true;
         bool have_last = false;
@@ -201,7 +201,13 @@ int run_battle_preview() {
                             break;
                         case SDLK_RETURN:
                         case SDLK_SPACE:
-                            scene.menu_confirm();
+                            // D8/D9: na vez do jogador, confirma o verbo; fora dela
+                            // (intro/delay entre turnos), ACELERA o ritmo (pula a pausa).
+                            if (scene.waiting_player_input()) {
+                                scene.menu_confirm();
+                            } else {
+                                scene.skip();
+                            }
                             break;
                         default:
                             break;

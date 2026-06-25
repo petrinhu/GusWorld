@@ -121,3 +121,41 @@ TEST_CASE("build_log_lines: NARRA toda ACAO; status NAO polui o rolling (bug-fix
     REQUIRE(last2.size() == 2);
     REQUIRE(last2.back().kind == LogLineKind::System);  // COMPILADO (a acao mais recente)
 }
+
+// ---- D12: log narra a CONSEQUENCIA (dano + status aplicado) -------------------------
+
+TEST_CASE("status_name_key mapeia StatusId pra a chave i18n STATUS_<id>_NAME",
+          "[battle_log]") {
+    using gus::app::screens::status_name_key;
+    REQUIRE(status_name_key(StatusId::Stun) == std::string_view("STATUS_STUN_NAME"));
+    REQUIRE(status_name_key(StatusId::Poison) == std::string_view("STATUS_POISON_NAME"));
+    REQUIRE(status_name_key(StatusId::Shield) == std::string_view("STATUS_SHIELD_NAME"));
+}
+
+TEST_CASE("consequence_suffix monta '; <alvo> ficou com <status>' so quando ha status",
+          "[battle_log]") {
+    using gus::app::screens::consequence_suffix;
+    // Sem status aplicado neste evento: sufixo vazio (a linha fica so a acao+dano).
+    std::vector<StatusEffectChange> none;
+    REQUIRE(consequence_suffix("alvo", none).empty());
+
+    // Status aplicado no ALVO neste evento: sufixo com o nome (KEY, a UI resolve via tr).
+    std::vector<StatusEffectChange> ch;
+    StatusEffectChange poison;
+    poison.actor_id = "alvo";
+    poison.id = StatusId::Poison;
+    poison.kind = StatusChangeKind::Applied;
+    ch.push_back(poison);
+    const std::string sfx = consequence_suffix("alvo", ch);
+    REQUIRE_FALSE(sfx.empty());
+    REQUIRE(sfx.find("STATUS_POISON_NAME") != std::string::npos);
+
+    // Status aplicado em OUTRO ator (nao o alvo do golpe): nao entra no sufixo do alvo.
+    std::vector<StatusEffectChange> other;
+    StatusEffectChange stun;
+    stun.actor_id = "outro";
+    stun.id = StatusId::Stun;
+    stun.kind = StatusChangeKind::Applied;
+    other.push_back(stun);
+    REQUIRE(consequence_suffix("alvo", other).empty());
+}
