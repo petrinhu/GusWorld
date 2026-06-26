@@ -28,6 +28,9 @@ add_library(gusengine_app STATIC
 
 target_include_directories(gusengine_app
     PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include
+    # stb_image_write (vendorizado header-only): captura de frame em PNG para o smoke
+    # visual do ADR-009 (battle_preview). IMPLEMENTACAO definida em battle_preview.cpp.
+    PRIVATE ${CMAKE_SOURCE_DIR}/third_party/stb
 )
 
 # Caminho ABSOLUTO da pasta resources/ do repo (raiz = pai de GusEngine/), embutido

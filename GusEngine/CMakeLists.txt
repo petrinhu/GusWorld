@@ -53,13 +53,15 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(SDL3)
 
-# --- RmlUi (UI do jogador, fase 3 do ADR-008). APENAS CONFIGURADO aqui, NAO usado
-#     ainda (nenhum target linka). Pin = 6.2. Desliga samples; FONT_ENGINE=none
-#     para nao exigir FreeType no sistema enquanto a UI nao existe (a fonte real e
-#     plugada na fase 3). Fica disponivel (target RmlUi::RmlUi) para quando a UI for
-#     construida.
+# --- RmlUi (UI/HUD do jogador, ADR-009). Pin = 6.2. Desliga samples; FONT_ENGINE=
+#     freetype (ADR-009 DECISAO 1, ratificada): caminho suportado do RmlUi, com
+#     font-effect (glow/outline) de graca; a fonte real (Pixel Operator Mono) e
+#     rasterizada pelo FreeType. RmlUi 6.2 usa find_package(Freetype) (NAO FetchContent),
+#     entao o FreeType vem do sistema (Linux: libfreetype-dev; cross-compile Windows =
+#     ponto de atencao R-font, plano B = custom stb). Static (BUILD_SHARED_LIBS=OFF).
+#     Linkado por platform/rmlui/ + app/ (NUNCA por core/ nem domain/ - GATE).
 set(RMLUI_SAMPLES OFF CACHE BOOL "" FORCE)
-set(RMLUI_FONT_ENGINE "none" CACHE STRING "" FORCE)
+set(RMLUI_FONT_ENGINE "freetype" CACHE STRING "" FORCE)
 set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
 FetchContent_Declare(
     RmlUi

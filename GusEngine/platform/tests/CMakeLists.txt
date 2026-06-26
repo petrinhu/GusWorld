@@ -14,9 +14,11 @@ add_executable(gusengine_platform_tests
     sdl_input_test.cpp
     viewport_transform_test.cpp
     render2d_sdl_test.cpp
+    render2d_gl3_test.cpp
     alpha_bbox_test.cpp
     text_metrics_test.cpp
     font_atlas_test.cpp
+    rmlui_hud_test.cpp
 )
 
 target_link_libraries(gusengine_platform_tests
