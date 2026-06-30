@@ -526,6 +526,136 @@ std::string write_baked_cockpit_rml(bool intro) {
     return out.string();
 }
 
+// ADR-010 F2b: rotulos dos verbos do menu (ordem = BattleVerb: Scan/Gambito/Atacar/
+// Defender/Compilar/Flee), em MAIUSCULA, espelhando os <span class="lbl"> do RML. Usado
+// pra alimentar o binding {{verb}} (verbo SELECIONADO no motor) a cada frame. Self-contido
+// na casca (o spike nao depende do Translator pra isto).
+constexpr std::array<std::string_view, 6> kVerbLabels = {
+    "SCAN", "GAMBITO", "ATACAR", "DEFENDER", "COMPILAR", "FUGIR"};
+
+// ADR-010 F2b: variante LIVE (data-model) do cockpit REAL pelo glintfx::UiLayer. Diferente
+// do BAKED (F2a, valores literais): aqui o RML MANTEM o data-model="hud" + os {{bindings}}
+// + os data-if(intro/!intro), e a casca alimenta os valores VIVOS por frame (set_*). REUSA
+// o RML/RCSS de load_cockpit_rml() (gradientes/glow/moldura/keyframes intactos) e so
+// TRANSFORMA por string: (1) injeta @font-face (o UiLayer nao expoe LoadFontFace); (2)
+// achata o caminho do retrato; (3) acrescenta tab-index/nav ao .verb (foco navegavel,
+// secao 5 da doc de embed) + data-class-sel por verbo (a SELECAO do motor vira a classe
+// .sel, motor = fonte de verdade); (4) troca o log hardcoded por data-for("line : log") +
+// uma now-line com {{verb}}/{{alvo}} (verbo selecionado + alvo, vivos). Copia os 4 assets
+// (2 fontes + moldura + retrato) pro stage e escreve o .rml la. Devolve o path. NAO toca
+// load_cockpit_rml (o caminho vendorizado fica intacto).
+std::string write_live_cockpit_rml() {
+    namespace fs = std::filesystem;
+    const fs::path stage = glintfx_cockpit_stage_dir();
+    std::error_code ec;
+    fs::create_directories(stage, ec);
+
+    // Copia os assets pro stage (flat). Mesma receita do BAKED (stage = doc+fontes+sprites
+    // num dir unico com refs RELATIVAS achatadas; ver write_baked_cockpit_rml).
+    auto copy_into = [&](const std::string& src, const std::string& dst_name) {
+        if (src.empty()) return;
+        fs::copy_file(src, stage / dst_name, fs::copy_options::overwrite_existing, ec);
+    };
+    std::string fonts_dir = GUSWORLD_FONTS_DIR;
+    if (const char* envf = std::getenv("GUSWORLD_FONTS")) {
+        if (envf[0] != '\0') fonts_dir = envf;
+    }
+    if (!fonts_dir.empty()) {
+        copy_into(join(fonts_dir, "PixelOperatorMono.ttf"), "PixelOperatorMono.ttf");
+        copy_into(join(fonts_dir, "PixelOperatorMono-Bold.ttf"),
+                  "PixelOperatorMono-Bold.ttf");
+    }
+    const std::string icons = cockpit_asset_base_dir();
+    copy_into(join(icons, std::string(gus::core::assets::kMolduraCartaFrameFile)),
+              "moldura_carta_frame.png");
+    copy_into(join(icons, "retratos/retrato_gus_combate_nobg.png"),
+              "retrato_gus_combate_nobg.png");
+
+    std::string rml = load_cockpit_rml();
+
+    auto replace_all = [&rml](std::string_view from, std::string_view to) {
+        std::size_t pos = 0;
+        while ((pos = rml.find(from.data(), pos, from.size())) != std::string::npos) {
+            rml.replace(pos, from.size(), to.data(), to.size());
+            pos += to.size();
+        }
+    };
+
+    // (1) @font-face logo apos <style> (o UiLayer nao expoe LoadFontFace; o doc registra a
+    // familia). Caminhos RELATIVOS achatados (os .ttf foram copiados pro stage).
+    replace_all(
+        "<style>\n",
+        "<style>\n"
+        "@font-face { font-family: \"Pixel Operator Mono\"; "
+        "src: \"PixelOperatorMono.ttf\"; }\n"
+        "@font-face { font-family: \"Pixel Operator Mono\"; font-weight: bold; "
+        "src: \"PixelOperatorMono-Bold.ttf\"; }\n");
+
+    // (2) achata o caminho do retrato (copiado flat pro stage).
+    replace_all("retratos/retrato_gus_combate_nobg.png", "retrato_gus_combate_nobg.png");
+
+    // (3a) foco navegavel: o .verb vira focavel (tab-index) + navegavel por setas (nav:auto,
+    // shorthand de nav-up/right/down/left). O glintfx ja roteia Key->foco; aqui o DOC declara
+    // os elementos focaveis (secao 5 da doc de embed). SEM estilo :focus de proposito: a
+    // selecao VISIVEL e a classe .sel dirigida pelo MOTOR (data-class-sel abaixo), pra NAO
+    // criar uma 2a fonte de verdade (o foco do glintfx fica como navegacao inerte).
+    replace_all("  color: #d6e6ef; font-size: 13dp;\n}",
+                "  color: #d6e6ef; font-size: 13dp;\n  tab-index: auto; nav: auto;\n}");
+
+    // (3b) menu de verbos data-driven: a classe .sel de cada verbo segue o indice SELECIONADO
+    // no motor (binding 'sel'), via data-class-sel="sel == N". O motor (scene.menu_) e a
+    // fonte de verdade da selecao; aqui so REFLETIMOS. (ordem N = BattleVerb).
+    replace_all(
+        "      <div class=\"menu\">\n"
+        "        <div class=\"verb\"><span class=\"glyph\"></span><span "
+        "class=\"lbl\">SCAN</span></div>\n"
+        "        <div class=\"verb\"><span class=\"glyph\"></span><span "
+        "class=\"lbl\">GAMBITO</span></div>\n"
+        "        <div class=\"verb cyan sel\"><span class=\"glyph\"></span><span "
+        "class=\"lbl\">ATACAR</span></div>\n"
+        "        <div class=\"verb\"><span class=\"glyph\"></span><span "
+        "class=\"lbl\">DEFENDER</span></div>\n"
+        "        <div class=\"verb latao\"><span class=\"glyph\"></span><span "
+        "class=\"lbl\">COMPILAR</span></div>\n"
+        "        <div class=\"verb\"><span class=\"glyph\"></span><span "
+        "class=\"lbl\">FUGIR</span></div>\n"
+        "      </div>",
+        "      <div class=\"menu\">\n"
+        "        <div class=\"verb\" data-class-sel=\"sel == 0\"><span "
+        "class=\"glyph\"></span><span class=\"lbl\">SCAN</span></div>\n"
+        "        <div class=\"verb\" data-class-sel=\"sel == 1\"><span "
+        "class=\"glyph\"></span><span class=\"lbl\">GAMBITO</span></div>\n"
+        "        <div class=\"verb cyan\" data-class-sel=\"sel == 2\"><span "
+        "class=\"glyph\"></span><span class=\"lbl\">ATACAR</span></div>\n"
+        "        <div class=\"verb\" data-class-sel=\"sel == 3\"><span "
+        "class=\"glyph\"></span><span class=\"lbl\">DEFENDER</span></div>\n"
+        "        <div class=\"verb latao\" data-class-sel=\"sel == 4\"><span "
+        "class=\"glyph\"></span><span class=\"lbl\">COMPILAR</span></div>\n"
+        "        <div class=\"verb\" data-class-sel=\"sel == 5\"><span "
+        "class=\"glyph\"></span><span class=\"lbl\">FUGIR</span></div>\n"
+        "      </div>");
+
+    // (4) log VIVO: troca as 3 linhas hardcoded por um data-for sobre a lista 'log'
+    // (scene.log_lines, ultimas N) + uma now-line com o verbo SELECIONADO e o ALVO.
+    replace_all(
+        "      <div id=\"log\">\n"
+        "        <div class=\"ln\"><span class=\"who\">Gus</span> compilou Vetor de "
+        "Defesa.</div>\n"
+        "        <div class=\"ln\">Daemon-Corrompido prepara <span "
+        "class=\"hit\">Overflow</span>.</div>\n"
+        "        <div class=\"ln now\">&gt; Selecione uma acao.</div>\n"
+        "      </div>",
+        "      <div id=\"log\">\n"
+        "        <div class=\"ln\" data-for=\"line : log\">{{line}}</div>\n"
+        "        <div class=\"ln now\">&gt; {{verb}} -&gt; {{alvo}}</div>\n"
+        "      </div>");
+
+    const fs::path out = stage / "cockpit_live.rml";
+    std::ofstream f(out);
+    f << rml;
+    return out.string();
+}
+
 // ADR-010 F1 SMOKE: ponte SDL_Event -> glintfx::UiEvent (mapa de design da doc de prep).
 // Retorna false p/ eventos sem mapeamento (nao injeta ruido). Cobre mouse-move/button,
 // teclas de navegacao, texto e resize (pixels reais via SDL_GetWindowSizeInPixels). 'Type'
@@ -734,22 +864,39 @@ int run_battle_preview() {
         bool glintfx_on = false;
 #ifdef GUSWORLD_GLINTFX
         std::optional<glintfx::UiLayer> ui;
+        bool glintfx_live = false;  // F2b: cockpit dirigido por data-model (valores vivos)
+        // F2b DEBUG: GUSWORLD_GLINTFX_DP=<float> FORCA o dp_ratio (em vez de pw/960). Util
+        // pra INSPECIONAR a coluna inteira do cockpit num shot: o canvas e autorado ~625dp
+        // de alto e o backbuffer (~1006px) so mostra ~503dp a dp_ratio=2 (a base do menu +
+        // o log caem abaixo da dobra). dp_ratio menor (ex. 1.5 => mostra ~670dp) revela o
+        // log/now-line. 0/ausente => comportamento normal (pw/960). Nao altera o motor.
+        const float glintfx_dp_override = [] {
+            const char* e = std::getenv("GUSWORLD_GLINTFX_DP");
+            return (e != nullptr && e[0] != '\0') ? static_cast<float>(std::atof(e)) : 0.0f;
+        }();
         if (want_glintfx && !rmlui_opt_out) {
-            // ADR-010 F2a: cockpit REAL pelo UiLayer com valores BAKED. RCSS autorado em
+            // ADR-010 F2b (DEFAULT): cockpit REAL pelo UiLayer dirigido por DATA-MODEL
+            // (valores VIVOS por frame: HP/nome/role/selecao-de-verbo/log). RCSS autorado em
             // 'dp' num canvas logico 960x540; o dp_ratio (= pixels reais / 960) escala pro
-            // backbuffer SEM ficar gigante (resolve a queixa "objetos imensos"). O
-            // set_viewport informa os PIXELS reais; o dp_ratio faz 1dp = (pw/960) px.
-            // GUSWORLD_GLINTFX_SMOKE=1 mantem o smoke trivial (debug do compose puro);
-            // GUSWORLD_GLINTFX_INTRO=1 baka o brasao (abertura) no lugar do combate.
+            // backbuffer. Modos de debug por env:
+            //   GUSWORLD_GLINTFX_SMOKE=1 -> smoke trivial (compose puro, sem assets).
+            //   GUSWORLD_GLINTFX_BAKED=1 -> cockpit F2a com valores LITERAIS (sem binding).
+            //   GUSWORLD_GLINTFX_INTRO=1 -> (so no BAKED) baka o brasao no lugar do combate.
             const bool glintfx_smoke = [] {
                 const char* e = std::getenv("GUSWORLD_GLINTFX_SMOKE");
+                return e != nullptr && e[0] == '1';
+            }();
+            const bool glintfx_baked = [] {
+                const char* e = std::getenv("GUSWORLD_GLINTFX_BAKED");
                 return e != nullptr && e[0] == '1';
             }();
             const bool glintfx_intro = [] {
                 const char* e = std::getenv("GUSWORLD_GLINTFX_INTRO");
                 return e != nullptr && e[0] == '1';
             }();
-            const float dp_ratio = static_cast<float>(pw0) / 960.0f;
+            const float dp_ratio = glintfx_dp_override > 0.0f
+                                       ? glintfx_dp_override
+                                       : static_cast<float>(pw0) / 960.0f;
             ui.emplace(glintfx::UiLayer::Config{/*logical_width=*/960,
                                                 /*logical_height=*/540,
                                                 /*load_gl=*/true,
@@ -759,8 +906,27 @@ int run_battle_preview() {
                 std::string base_url;
                 if (glintfx_smoke) {
                     rml_path = write_smoke_glintfx_rml();  // px puros, sem assets/base-url
-                } else {
+                } else if (glintfx_baked) {
                     rml_path = write_baked_cockpit_rml(glintfx_intro);
+                    base_url = glintfx_cockpit_stage_dir();  // dir com doc+fontes+sprites
+                } else {
+                    // LIVE: cria o data-model + LIGA os bindings ANTES do load (ordem
+                    // obrigatoria, secao 6 da doc de embed: create_data_model -> bind_* ->
+                    // load -> set_*). As views de data-binding sao compiladas no load; bind_*
+                    // apos o load retornaria false. Initials cobrem o 1o frame (intro=true);
+                    // os set_* vivos vem no loop (a cena so existe depois deste bloco).
+                    glintfx_live = true;
+                    ui->create_data_model("hud");
+                    ui->bind_bool("intro", true);
+                    ui->bind_string("nome", "Gus");
+                    ui->bind_string("role", "VETOR DO GAMBITO");
+                    ui->bind_number("hp", 55);
+                    ui->bind_number("hp_max", 55);
+                    ui->bind_number("sel", 2);  // Atacar (default do BattleMenu)
+                    ui->bind_string("verb", "ATACAR");
+                    ui->bind_string("alvo", "-");
+                    ui->bind_list("log");
+                    rml_path = write_live_cockpit_rml();
                     base_url = glintfx_cockpit_stage_dir();  // dir com doc+fontes+sprites
                 }
                 // base-url ANTES do load (pra o doc tambem resolver via ele). Caminhos
@@ -773,9 +939,11 @@ int run_battle_preview() {
                 ui->set_dp_ratio(dp_ratio);    // logico 960x540 -> pixels reais
                 glintfx_on = true;
                 std::cout << "BattlePreview: [glintfx] UiLayer ATIVO (embed, load_gl=true) "
-                          << (glintfx_smoke ? "[SMOKE]"
-                              : glintfx_intro ? "[cockpit BAKED: intro/brasao]"
-                                              : "[cockpit BAKED: combate]")
+                          << (glintfx_smoke   ? "[SMOKE]"
+                              : glintfx_baked ? (glintfx_intro
+                                                     ? "[cockpit BAKED: intro/brasao]"
+                                                     : "[cockpit BAKED: combate]")
+                                              : "[cockpit LIVE: data-model]")
                           << " viewport=" << pw0 << "x" << ph0
                           << " dp_ratio=" << dp_ratio << " RML=" << rml_path << "\n";
             } else {
@@ -1016,9 +1184,54 @@ int run_battle_preview() {
             if (glintfx_on && ui) {
                 if (pw != pw0 || ph != ph0) {
                     ui->set_viewport(pw, ph);
-                    ui->set_dp_ratio(static_cast<float>(pw) / 960.0f);  // reescala logico
+                    if (glintfx_dp_override <= 0.0f) {
+                        ui->set_dp_ratio(static_cast<float>(pw) / 960.0f);  // reescala logico
+                    }
                     pw0 = pw;
                     ph0 = ph;
+                }
+                // ADR-010 F2b: ALIMENTA o data-model com os valores VIVOS do motor (POCO),
+                // a cada frame. O MOTOR (scene) e a fonte de verdade: estado intro/combate,
+                // ator ativo (nome/HP), selecao de verbo (scene.menu().selected_index ->
+                // binding 'sel' -> classe .sel via data-class-sel), alvo, e o log narrado.
+                if (glintfx_live) {
+                    ui->set_bool("intro", scene.is_intro());
+                    if (!scene.is_intro()) {
+                        if (const auto* a = scene.active_actor(); a != nullptr) {
+                            ui->set_string("nome", a->display_name().c_str());
+                            ui->set_string("role", "VETOR DO GAMBITO");
+                            ui->set_number("hp", a->hp());
+                            ui->set_number("hp_max", a->max_hp());
+                        }
+                        // Selecao do menu (motor = autoridade). O foco do glintfx (tab/nav no
+                        // RML) e navegacao inerte; a classe .sel VISIVEL segue este indice.
+                        const int sel = scene.menu().selected_index();
+                        ui->set_number("sel", sel);
+                        ui->set_string("verb",
+                                       std::string(kVerbLabels[static_cast<std::size_t>(
+                                                       sel < 0 || sel > 5 ? 2 : sel)])
+                                           .c_str());
+                        // Alvo: 1o inimigo VIVO da fila (alvo default das acoes ofensivas,
+                        // canon 1B). "-" se nenhum. Le o motor (queue), nao inventa estado.
+                        const char* alvo = "-";
+                        std::string alvo_buf;
+                        for (const auto* act : scene.machine().queue().order()) {
+                            if (act != nullptr && !act->is_player_side() && act->is_alive()) {
+                                alvo_buf = act->display_name();
+                                alvo = alvo_buf.c_str();
+                                break;
+                            }
+                        }
+                        ui->set_string("alvo", alvo);
+                        // Log VIVO: ultimas linhas narradas pelo motor (data-for "line:log").
+                        // As strings precisam VIVER ate o set_list copiar (mantemos o vector).
+                        const std::vector<gus::app::screens::LogLine> lines =
+                            scene.log_lines(8);
+                        std::vector<const char*> ptrs;
+                        ptrs.reserve(lines.size());
+                        for (const auto& l : lines) ptrs.push_back(l.text.c_str());
+                        ui->set_list("log", ptrs.data(), ptrs.size());
+                    }
                 }
                 ui->update();
                 ui->render();  // UI por cima da arena, mesmo contexto GL
