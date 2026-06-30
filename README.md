@@ -4,7 +4,7 @@
 
 **Status:** Pivot de stack em curso (Godot/C# para C++20 com engine própria). A camada de plataforma é **SDL3** desde o re-pivot Qt6 para SDL3 ([ADR-008](docs/tech/adr/ADR-008-repivot-qt-to-sdl3.md), 2026-06-22); o Qt6 anterior foi aposentado. Migração faseada anti big-bang, Godot vivo até o decommission no marco M8. Decisão âncora da engine em [`docs/tech/pivot/engine-design.md`](docs/tech/pivot/engine-design.md), ratificada pelo líder em 2026-06-21.
 
-**Solo indie, freeware.** Petrinhu, 2026. Linux + Windows. Single-player puro. C++20 + SDL3.
+**Solo indie, freeware.** Petrinhu, 2026. Início do projeto em **2026-05-15**. Linux + Windows. Single-player puro. C++20 + SDL3.
 
 ---
 

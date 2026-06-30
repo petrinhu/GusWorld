@@ -14,6 +14,8 @@ Datas em ISO 8601 (`AAAA-MM-DD`). Idioma: pt-br.
 
 O jogo está em desenvolvimento (vertical slice da Fase 2). Nenhuma versão foi publicada. O trabalho está agrupado por marco do board de migração ([TODO.md](TODO.md)) e pelos pivôs de stack.
 
+**Início do projeto: 2026-05-15** (primeiro commit `97ed2fe`, Fase 1 concepção + deep-lore Bloco G).
+
 ### Pivôs de stack (one-way doors)
 
 Três viradas de base técnica até hoje. Cada uma reescreveu fundação; a última é a mais recente e a mais relevante.
