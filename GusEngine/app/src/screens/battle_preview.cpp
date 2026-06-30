@@ -136,7 +136,8 @@ body { font-family: "Pixel Operator Mono"; background: transparent; }
 #cockpit {
   position: absolute; top: 0dp; left: 0dp; bottom: 0dp; width: 252dp;
   decorator: vertical-gradient( #243056 #0f1322 );  /* topo mais claro -> base escura */
-  padding: 14dp 14dp 0dp 14dp;
+  /* POLISH 1: padding compacto (a coluna inteira precisa caber em 540dp). */
+  padding: 10dp 12dp 0dp 12dp;
 }
 /* filete cyan na borda direita (marca cyber) */
 #edge {
@@ -151,7 +152,9 @@ body { font-family: "Pixel Operator Mono"; background: transparent; }
    senao eles ancoram no root (0,0). Centrado na coluna com margens laterais iguais. */
 #portrait {
   display: block; position: relative;
-  width: 128dp; height: 165dp; margin-left: 48dp; margin-top: 8dp;
+  /* POLISH 1: retrato compactado (proporcao mantida 128:165 -> 104:134); margin-left
+     recentraliza na coluna (inner 228dp). pic/frame escalam junto abaixo. */
+  width: 104dp; height: 134dp; margin-left: 62dp; margin-top: 6dp;
   /* HALO neon do ator ATIVO: box-shadow cyan FORTE que PULSA (breathe). Spread POSITIVO. */
   box-shadow: #22D3EE 0dp 0dp 34dp 10dp;
   border-radius: 14dp;
@@ -162,25 +165,25 @@ body { font-family: "Pixel Operator Mono"; background: transparent; }
   to   { box-shadow: #22D3EEff 0dp 0dp 44dp 14dp; }
 }
 /* janela interna da moldura (retrato vai DENTRO), atras da moldura */
-#pic { position: absolute; top: 16dp; left: 16dp; width: 96dp; height: 130dp;
+#pic { position: absolute; top: 13dp; left: 13dp; width: 78dp; height: 106dp;
   background-color: #0c1322;
   decorator: image( )RML";
     rml += retrato;
     rml += R"RML( cover ); }
 /* a moldura (asset) POR CIMA, cobrindo o quadro inteiro */
-#frame { position: absolute; top: 0dp; left: 0dp; width: 128dp; height: 165dp;
+#frame { position: absolute; top: 0dp; left: 0dp; width: 104dp; height: 134dp;
   decorator: image( )RML";
     rml += moldura;
     rml += R"RML( ); }
 
-#name { display: block; text-align: center; margin-top: 10dp; font-size: 15dp;
+#name { display: block; text-align: center; margin-top: 6dp; font-size: 14dp;
   color: #eaf6fb; }
 #role { display: block; text-align: center; font-size: 10dp; color: #E8A33D; }
 
 /* ---- HP barra (degrade verde + glow) + numeros ---- */
-#vitals { margin-top: 8dp; }
+#vitals { margin-top: 6dp; }
 .hpbar {
-  height: 14dp; border-radius: 7dp; margin-top: 3dp;
+  height: 12dp; border-radius: 6dp; margin-top: 3dp;
   decorator: vertical-gradient( #7dffbe #2e9c63 );  /* verde claro -> verde escuro */
   box-shadow: #3FB97a 0dp 0dp 16dp 2dp;            /* glow verde, spread POSITIVO */
 }
@@ -188,7 +191,7 @@ body { font-family: "Pixel Operator Mono"; background: transparent; }
 .hpnum .v { color: #5fe3a0; }
 
 /* ---- pips AP (latao) / Mana (cyan), radiais com glow ---- */
-.pips { display: block; margin-top: 7dp; font-size: 10dp; color: #8fa6b4; }
+.pips { display: block; margin-top: 5dp; font-size: 10dp; color: #8fa6b4; }
 .pip { display: inline-block; width: 12dp; height: 12dp; border-radius: 6dp;
   margin-right: 4dp; border: 1dp #2a3450; background-color: #0c1322; }
 .pip.ap.on { decorator: radial-gradient( circle closest-side, #ffe6a8, #E8A33D );
@@ -197,15 +200,17 @@ body { font-family: "Pixel Operator Mono"; background: transparent; }
   box-shadow: #22D3EE 0dp 0dp 12dp 2dp; }
 
 /* ---- MENU de verbos: pill rococo com GLOW neon nos 3 estados ---- */
-.menu { margin-top: 16dp; }
+.menu { margin-top: 9dp; }
 .verb {
-  display: block; height: 38dp; margin-bottom: 10dp; padding: 0dp 14dp;
-  border-radius: 19dp;
+  /* POLISH 1: pill compacto (38->25dp alt, 10->5dp gap) p/ os 6 verbos + log (que QUEBRA
+     em 2 linhas) caberem na coluna dentro de 540dp. */
+  display: block; height: 25dp; margin-bottom: 5dp; padding: 0dp 14dp;
+  border-radius: 13dp;
   decorator: vertical-gradient( #2a3658 #131a2e );  /* topo mais claro (3D sutil) */
   border: 1dp #38456e;
   color: #d6e6ef; font-size: 13dp;
 }
-.verb .lbl { display: inline-block; line-height: 38dp; }
+.verb .lbl { display: inline-block; line-height: 25dp; }
 /* NORMAL: cor do verbo no glifo lateral */
 .verb .glyph { display: inline-block; width: 8dp; height: 8dp; margin-right: 10dp;
   border-radius: 2dp; background-color: #8fa6b4; }
@@ -229,8 +234,12 @@ body { font-family: "Pixel Operator Mono"; background: transparent; }
 }
 
 /* ---- LOG (terminal) ---- */
-#log { margin-top: 12dp; padding-top: 9dp; border-top: 1dp #2a3450; font-size: 11dp; }
-#log .ln { color: #6f8593; }
+/* POLISH 1: log compacto. font 11->10dp + line-height 13dp encurtam as linhas que QUEBRAM
+   em 2 (texto longo). O numero de entradas e CAPADO a 3 no alimentador (scene.log_lines(3),
+   as mais recentes) - assim a coluna inteira (header+vitals+6 verbos+log+now-line) cabe em
+   540dp, com a now-line "> verbo -> alvo" sempre visivel no rodape. */
+#log { margin-top: 7dp; padding-top: 6dp; border-top: 1dp #2a3450; font-size: 10dp; }
+#log .ln { color: #6f8593; line-height: 13dp; }
 #log .who { color: #22D3EE; }
 #log .hit { color: #E11D74; }
 #log .now { color: #cfe6ee; }
@@ -1025,7 +1034,13 @@ int run_battle_preview() {
         // sai. Sem janela interativa - serve pra COMPARAR o jogo com o mock lado a lado.
         const char* capture_path = std::getenv("GUSWORLD_RMLUI_CAPTURE");
         int frame_no = 0;
-        constexpr int kCaptureAtFrame = 20;  // ~assenta o 1o layout/fonte antes do shot
+        int capture_at_frame = 20;  // ~assenta o 1o layout/fonte antes do shot
+        // DEBUG: GUSWORLD_RMLUI_CAPTURE_FRAME=<N> adia o shot p/ o frame N (pra pegar um
+        // turno especifico - ex. jogador vs inimigo - sem driver de input). >0 sobrescreve.
+        if (const char* cf = std::getenv("GUSWORLD_RMLUI_CAPTURE_FRAME")) {
+            const int v = std::atoi(cf);
+            if (v > 0) capture_at_frame = v;
+        }
 
         // DIAGNOSTICO (ADR-009): GUSWORLD_RMLUI_FRAMES=N roda o LOOP INTERATIVO COMPLETO
         // (com Update/compose do HUD por frame) e sai apos N frames. Diferente da captura
@@ -1167,9 +1182,12 @@ int run_battle_preview() {
                 hud.set_intro(scene.is_intro());
                 if (!scene.is_intro()) {
                     if (const auto* a = scene.active_actor(); a != nullptr) {
-                        hud.set_hud_values(a->display_name(), "VETOR DO GAMBITO", a->hp(),
-                                           a->max_hp(), a->ap(), a->max_ap(), a->mana(),
-                                           a->max_mana());
+                        // POLISH 2: label segue o lado do ator (party vs inimigo). Nunca
+                        // o role de party num inimigo (paridade com o caminho glintfx).
+                        hud.set_hud_values(a->display_name(),
+                                           a->is_player_side() ? "VETOR DO GAMBITO" : "INIMIGO",
+                                           a->hp(), a->max_hp(), a->ap(), a->max_ap(),
+                                           a->mana(), a->max_mana());
                     }
                 }
                 hud.set_pixel_size(pw, ph);
@@ -1199,7 +1217,12 @@ int run_battle_preview() {
                     if (!scene.is_intro()) {
                         if (const auto* a = scene.active_actor(); a != nullptr) {
                             ui->set_string("nome", a->display_name().c_str());
-                            ui->set_string("role", "VETOR DO GAMBITO");
+                            // POLISH 2: o label segue o LADO do ator ativo. Party = role
+                            // de party ("VETOR DO GAMBITO"); inimigo = designacao generica
+                            // "INIMIGO" (o CombatActor nao expoe tipo/arquetipo - so lado).
+                            // NUNCA pintar um inimigo com o role da party. Motor = autoridade.
+                            ui->set_string("role", a->is_player_side() ? "VETOR DO GAMBITO"
+                                                                       : "INIMIGO");
                             ui->set_number("hp", a->hp());
                             ui->set_number("hp_max", a->max_hp());
                         }
@@ -1225,8 +1248,10 @@ int run_battle_preview() {
                         ui->set_string("alvo", alvo);
                         // Log VIVO: ultimas linhas narradas pelo motor (data-for "line:log").
                         // As strings precisam VIVER ate o set_list copiar (mantemos o vector).
+                        // POLISH 1: CAPADO a 3 linhas (as mais recentes) p/ a coluna +
+                        // now-line CABER em 540dp (no canvas ~503dp visivel a dp_ratio=2).
                         const std::vector<gus::app::screens::LogLine> lines =
-                            scene.log_lines(8);
+                            scene.log_lines(3);
                         std::vector<const char*> ptrs;
                         ptrs.reserve(lines.size());
                         for (const auto& l : lines) ptrs.push_back(l.text.c_str());
@@ -1240,7 +1265,7 @@ int run_battle_preview() {
 
             // SMOKE VISUAL: captura 1 PNG no frame alvo (ANTES do swap, lendo o backbuffer)
             // e encerra. Em modo interativo, o swap apresenta na janela.
-            if (capture_path != nullptr && frame_no + 1 >= kCaptureAtFrame) {
+            if (capture_path != nullptr && frame_no + 1 >= capture_at_frame) {
                 std::vector<unsigned char> buf(
                     static_cast<std::size_t>(pw) * static_cast<std::size_t>(ph) * 4);
                 if (gus::platform::rmlui::gl3_read_backbuffer_rgba(pw, ph, buf.data())) {
