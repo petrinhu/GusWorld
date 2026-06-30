@@ -390,6 +390,23 @@ std::string resolve_intent_icons_dir() {
 }
 
 #ifdef GUSWORLD_GLINTFX
+// ADR-010 F2b RETRATO-VIVO: nome FLAT do retrato da MOLDURA do cockpit para o ator ATIVO.
+// O retrato segue o ator (motor = autoridade): inimigo -> retrato_inimigo.png (a MESMA
+// cabeca generica que a fila CTB / coluna usa pros inimigos, via retrato_file_for); party
+// -> o retrato do membro. Excecao do Gus: usa a versao NO-BG (recorte sem fundo) que ja
+// encaixa limpa na moldura (a versao da fila tem fundo). O stage achata os caminhos, entao
+// devolvemos so o nome do arquivo (resolvido contra o base-url do stage). NUNCA inventa um
+// caminho novo: reusa retrato_file_for (fonte unica dos retratos da fila).
+std::string cockpit_retrato_flat_for(const gus::domain::combat::CombatActor& actor) {
+    if (!actor.is_player_side()) {
+        return "retrato_inimigo.png";  // mesma fonte da coluna/CTB pros inimigos
+    }
+    if (actor.id() == "gus") {
+        return "retrato_gus_combate_nobg.png";  // recorte sem fundo (encaixa na moldura)
+    }
+    return retrato_file_for(actor.id());  // caua/jaci/... = retrato da fila (mesma fonte)
+}
+
 // ADR-010 F1 SMOKE: escreve um RML TRIVIAL (sem assets externos, sem fonte) num tempfile e
 // devolve o path. O glintfx v0.2.1 carrega por PATH (load()) e NAO resolve base-url nem
 // carrega fonte default (so a v0.2.2) - por isso o smoke e um DIV com gradiente
@@ -579,6 +596,13 @@ std::string write_live_cockpit_rml() {
               "moldura_carta_frame.png");
     copy_into(join(icons, "retratos/retrato_gus_combate_nobg.png"),
               "retrato_gus_combate_nobg.png");
+    // RETRATO-VIVO: alem do Gus (no-bg), o stage precisa dos retratos que o ator ATIVO pode
+    // assumir, achatados. Inimigo = a MESMA cabeca generica da fila CTB (retrato_inimigo);
+    // demais membros da party = seus retratos da fila. cockpit_retrato_flat_for() escolhe
+    // qual; o data-style-decorator do #pic (abaixo) referencia o nome flat por frame.
+    copy_into(join(icons, "retratos/retrato_inimigo.png"), "retrato_inimigo.png");
+    copy_into(join(icons, "retratos/retrato_caua.png"), "retrato_caua.png");
+    copy_into(join(icons, "retratos/retrato_jaci.png"), "retrato_jaci.png");
 
     std::string rml = load_cockpit_rml();
 
@@ -602,6 +626,18 @@ std::string write_live_cockpit_rml() {
 
     // (2) achata o caminho do retrato (copiado flat pro stage).
     replace_all("retratos/retrato_gus_combate_nobg.png", "retrato_gus_combate_nobg.png");
+
+    // (2b) RETRATO-VIVO: o retrato da moldura (#pic) vira DATA-DRIVEN e segue o ator ATIVO.
+    // data-style-decorator monta a property 'decorator' por frame a partir do binding
+    // {{retrato_src}} (nome flat do retrato, alimentado por cockpit_retrato_flat_for). Mantem
+    // o fit 'cover' (encaixa sem distorcer/cropa o que sobra). O decorator ESTATICO do RCSS
+    // (#pic { ... image( retrato_gus_combate_nobg.png cover ) }) fica como fallback do 1o
+    // frame; o data-style o sobrescreve assim que o motor tem ator ativo. O '+' do interpretador
+    // de expressao do RmlUi CONCATENA strings (AnyString -> Get<String>), provado no fonte.
+    replace_all(
+        "<div id=\"pic\"></div>",
+        "<div id=\"pic\" data-style-decorator=\"'image( ' + retrato_src + ' cover )'\">"
+        "</div>");
 
     // (3a) foco navegavel: o .verb vira focavel (tab-index) + navegavel por setas (nav:auto,
     // shorthand de nav-up/right/down/left). O glintfx ja roteia Key->foco; aqui o DOC declara
@@ -934,6 +970,9 @@ int run_battle_preview() {
                     ui->bind_number("sel", 2);  // Atacar (default do BattleMenu)
                     ui->bind_string("verb", "ATACAR");
                     ui->bind_string("alvo", "-");
+                    // RETRATO-VIVO: caminho flat do retrato da moldura. Inicial = Gus no-bg
+                    // (1o frame/intro); o alimentador troca por frame conforme o ator ativo.
+                    ui->bind_string("retrato_src", "retrato_gus_combate_nobg.png");
                     ui->bind_list("log");
                     rml_path = write_live_cockpit_rml();
                     base_url = glintfx_cockpit_stage_dir();  // dir com doc+fontes+sprites
@@ -1225,6 +1264,11 @@ int run_battle_preview() {
                                                                        : "INIMIGO");
                             ui->set_number("hp", a->hp());
                             ui->set_number("hp_max", a->max_hp());
+                            // RETRATO-VIVO: a moldura segue o ator ATIVO. Inimigo -> cabeca
+                            // generica do inimigo (mesma fonte da coluna/CTB); party -> seu
+                            // retrato. Motor = autoridade (le active_actor, nao inventa).
+                            ui->set_string("retrato_src",
+                                           cockpit_retrato_flat_for(*a).c_str());
                         }
                         // Selecao do menu (motor = autoridade). O foco do glintfx (tab/nav no
                         // RML) e navegacao inerte; a classe .sel VISIVEL segue este indice.
