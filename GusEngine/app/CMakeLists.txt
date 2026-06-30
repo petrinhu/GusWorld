@@ -47,6 +47,11 @@ target_compile_definitions(gusengine_app
     # de GusEngine/). O Translator de UI le pt_br.md daqui rodando do build dir;
     # override em runtime via env GUSWORLD_TRANSLATIONS (caminho completo do .md).
     PRIVATE GUSWORLD_TRANSLATIONS_DIR="${CMAKE_SOURCE_DIR}/../game/translations"
+    # Pasta das fontes (.ttf) DENTRO de GusEngine/ (mesma macro do platform/). ADR-010
+    # F2a: o cockpit BAKED do glintfx registra a "Pixel Operator Mono" via @font-face no
+    # RCSS (o glintfx::UiLayer NAO expoe Rml::LoadFontFace - so o doc carrega fonte). Sem
+    # esta macro o app/ nao saberia o caminho absoluto da fonte. Override: env GUSWORLD_FONTS.
+    PRIVATE GUSWORLD_FONTS_DIR="${CMAKE_SOURCE_DIR}/assets/fonts"
 )
 
 # SDL3 entra aqui (a casca SdlWindow + o main tocam SDL diretamente).

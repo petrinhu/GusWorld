@@ -44,6 +44,12 @@
 #define GUSWORLD_ASSETS_DIR ""
 #endif
 
+// Pasta das fontes (.ttf), embutida pelo CMake (ADR-010 F2a). So usada no caminho glintfx
+// (cockpit BAKED): o @font-face do RCSS aponta pra ca. Fallback vazio se ausente.
+#ifndef GUSWORLD_FONTS_DIR
+#define GUSWORLD_FONTS_DIR ""
+#endif
+
 namespace gus::app::screens {
 
 namespace {
@@ -409,6 +415,117 @@ body { background: transparent; }
     return path.string();
 }
 
+// ADR-010 F2a: diretorio de STAGE dos assets do cockpit BAKED (tempfile). Por que stage:
+// o glintfx carrega o doc por PATH e o RmlUi canonicaliza os caminhos RELATIVOS contra o
+// DIR do documento ANTES de chamar o FileInterface (entao um base-url sozinho nao pega
+// caminho ja-canonicalizado, e caminho ABSOLUTO arrisca perder a barra inicial). A receita
+// robusta (= ao teste base_url_sanity do glintfx): juntar doc + assets num dir unico, com
+// referencias RELATIVAS achatadas. As fontes (GusEngine/assets/) e os sprites
+// (resources/sprites/icons-m5/) vivem em ARVORES diferentes; o stage os reune.
+std::string glintfx_cockpit_stage_dir() {
+    namespace fs = std::filesystem;
+    return (fs::temp_directory_path() / "gusworld_glintfx_cockpit").string();
+}
+
+// ADR-010 F2a: produz a variante BAKED (valores ESTATICOS) do cockpit REAL pelo
+// glintfx::UiLayer. REUSA o RML/RCSS autorado de load_cockpit_rml() (gradientes/glow/
+// molduras/keyframes intactos) e so TRANSFORMA por string: (1) injeta @font-face (o
+// UiLayer nao expoe Rml::LoadFontFace - so o doc carrega fonte); (2) remove o data-model;
+// (3) troca {{bindings}} por literais de um encontro-exemplo (Gus 55/55, papel); (4) achata
+// o caminho do retrato; (5) escolhe o estado (combate por padrao, ou intro/brasao). Copia
+// os 4 assets (2 fontes + moldura + retrato) pro stage dir e escreve o .rml la. Devolve o
+// path do .rml. NAO toca o caminho vendorizado (load_cockpit_rml fica intacto).
+std::string write_baked_cockpit_rml(bool intro) {
+    namespace fs = std::filesystem;
+    const fs::path stage = glintfx_cockpit_stage_dir();
+    std::error_code ec;
+    fs::create_directories(stage, ec);
+
+    // Copia os assets pro stage (flat). Fonte: GUSWORLD_FONTS_DIR (env GUSWORLD_FONTS tem
+    // prioridade). Sprites: cockpit_asset_base_dir() (icons-m5) + retratos/.
+    auto copy_into = [&](const std::string& src, const std::string& dst_name) {
+        if (src.empty()) return;
+        fs::copy_file(src, stage / dst_name, fs::copy_options::overwrite_existing, ec);
+    };
+    std::string fonts_dir = GUSWORLD_FONTS_DIR;
+    if (const char* envf = std::getenv("GUSWORLD_FONTS")) {
+        if (envf[0] != '\0') fonts_dir = envf;
+    }
+    if (!fonts_dir.empty()) {
+        copy_into(join(fonts_dir, "PixelOperatorMono.ttf"), "PixelOperatorMono.ttf");
+        copy_into(join(fonts_dir, "PixelOperatorMono-Bold.ttf"),
+                  "PixelOperatorMono-Bold.ttf");
+    }
+    const std::string icons = cockpit_asset_base_dir();
+    copy_into(join(icons, std::string(gus::core::assets::kMolduraCartaFrameFile)),
+              "moldura_carta_frame.png");
+    copy_into(join(icons, "retratos/retrato_gus_combate_nobg.png"),
+              "retrato_gus_combate_nobg.png");
+
+    // Pega o RML autorado e transforma.
+    std::string rml = load_cockpit_rml();
+
+    auto replace_all = [&rml](std::string_view from, std::string_view to) {
+        std::size_t pos = 0;
+        while ((pos = rml.find(from.data(), pos, from.size())) != std::string::npos) {
+            rml.replace(pos, from.size(), to.data(), to.size());
+            pos += to.size();
+        }
+    };
+
+    // (1) @font-face logo apos <style> (o UiLayer nao expoe LoadFontFace; o doc registra a
+    // familia). Caminhos RELATIVOS achatados (os .ttf foram copiados pro stage). 'src' usa
+    // a sintaxe do RmlUi.
+    replace_all(
+        "<style>\n",
+        "<style>\n"
+        "@font-face { font-family: \"Pixel Operator Mono\"; "
+        "src: \"PixelOperatorMono.ttf\"; }\n"
+        "@font-face { font-family: \"Pixel Operator Mono\"; font-weight: bold; "
+        "src: \"PixelOperatorMono-Bold.ttf\"; }\n");
+
+    // (2) remove o data-model (nao ha binding no v0.2.2 - e por isso que bakamos).
+    replace_all(" data-model=\"hud\"", "");
+
+    // (3) {{bindings}} -> literais do encontro-exemplo (decisao do lider: Gus 55/55).
+    replace_all("{{nome}}", "Gus");
+    replace_all("{{role}}", "VETOR DO GAMBITO");
+    replace_all("{{hp}}", "55");
+    replace_all("{{hp_max}}", "55");
+
+    // (4) achata o caminho do retrato (copiado flat pro stage).
+    replace_all("retratos/retrato_gus_combate_nobg.png", "retrato_gus_combate_nobg.png");
+
+    // (5) estado: o doc tem DOIS blocos mutuamente exclusivos via data-if (opening/combat).
+    // Sem data-model nao ha data-if; entao REMOVEMOS o bloco do estado nao-desejado e
+    // tiramos o atributo data-if do que fica (senao o RmlUi tenta resolver e some).
+    const std::size_t open_a = rml.find("<div id=\"opening\"");
+    const std::size_t comb_a = rml.find("<div id=\"combat\"");
+    if (intro) {
+        // INTRO (brasao): remove o bloco de combate (de #combat ate o fechamento do
+        // #cockpit) e tira o data-if do #opening.
+        const std::size_t cockpit_end = rml.find("\n  </div>\n</body>");
+        if (comb_a != std::string::npos && cockpit_end != std::string::npos &&
+            cockpit_end > comb_a) {
+            rml.erase(comb_a, cockpit_end - comb_a);
+        }
+        replace_all(" data-if=\"intro\"", "");
+    } else {
+        // COMBATE (padrao): remove o bloco do brasao (de #opening ate #combat) e tira o
+        // data-if do #combat.
+        if (open_a != std::string::npos && comb_a != std::string::npos &&
+            comb_a > open_a) {
+            rml.erase(open_a, comb_a - open_a);
+        }
+        replace_all(" data-if=\"!intro\"", "");
+    }
+
+    const fs::path out = stage / "cockpit_baked.rml";
+    std::ofstream f(out);
+    f << rml;
+    return out.string();
+}
+
 // ADR-010 F1 SMOKE: ponte SDL_Event -> glintfx::UiEvent (mapa de design da doc de prep).
 // Retorna false p/ eventos sem mapeamento (nao injeta ruido). Cobre mouse-move/button,
 // teclas de navegacao, texto e resize (pixels reais via SDL_GetWindowSizeInPixels). 'Type'
@@ -618,18 +735,49 @@ int run_battle_preview() {
 #ifdef GUSWORLD_GLINTFX
         std::optional<glintfx::UiLayer> ui;
         if (want_glintfx && !rmlui_opt_out) {
-            // logical == pixels reais (dp-ratio fica pra v0.2.2): viewport 1:1, sem escala.
-            ui.emplace(glintfx::UiLayer::Config{/*logical_width=*/pw0,
-                                                /*logical_height=*/ph0,
-                                                /*load_gl=*/true});
+            // ADR-010 F2a: cockpit REAL pelo UiLayer com valores BAKED. RCSS autorado em
+            // 'dp' num canvas logico 960x540; o dp_ratio (= pixels reais / 960) escala pro
+            // backbuffer SEM ficar gigante (resolve a queixa "objetos imensos"). O
+            // set_viewport informa os PIXELS reais; o dp_ratio faz 1dp = (pw/960) px.
+            // GUSWORLD_GLINTFX_SMOKE=1 mantem o smoke trivial (debug do compose puro);
+            // GUSWORLD_GLINTFX_INTRO=1 baka o brasao (abertura) no lugar do combate.
+            const bool glintfx_smoke = [] {
+                const char* e = std::getenv("GUSWORLD_GLINTFX_SMOKE");
+                return e != nullptr && e[0] == '1';
+            }();
+            const bool glintfx_intro = [] {
+                const char* e = std::getenv("GUSWORLD_GLINTFX_INTRO");
+                return e != nullptr && e[0] == '1';
+            }();
+            const float dp_ratio = static_cast<float>(pw0) / 960.0f;
+            ui.emplace(glintfx::UiLayer::Config{/*logical_width=*/960,
+                                                /*logical_height=*/540,
+                                                /*load_gl=*/true,
+                                                /*dp_ratio=*/dp_ratio});
             if (ui->ok()) {
-                const std::string smoke_rml = write_smoke_glintfx_rml();
-                ui->load(smoke_rml.c_str());
-                ui->set_viewport(pw0, ph0);
+                std::string rml_path;
+                std::string base_url;
+                if (glintfx_smoke) {
+                    rml_path = write_smoke_glintfx_rml();  // px puros, sem assets/base-url
+                } else {
+                    rml_path = write_baked_cockpit_rml(glintfx_intro);
+                    base_url = glintfx_cockpit_stage_dir();  // dir com doc+fontes+sprites
+                }
+                // base-url ANTES do load (pra o doc tambem resolver via ele). Caminhos
+                // relativos -> base_url/path; absolutos passam direto.
+                if (!base_url.empty()) {
+                    ui->set_asset_base_url(base_url.c_str());
+                }
+                ui->load(rml_path.c_str());
+                ui->set_viewport(pw0, ph0);    // pixels reais do backbuffer
+                ui->set_dp_ratio(dp_ratio);    // logico 960x540 -> pixels reais
                 glintfx_on = true;
                 std::cout << "BattlePreview: [glintfx] UiLayer ATIVO (embed, load_gl=true) "
-                          << "viewport=" << pw0 << "x" << ph0 << " RML=" << smoke_rml
-                          << "\n";
+                          << (glintfx_smoke ? "[SMOKE]"
+                              : glintfx_intro ? "[cockpit BAKED: intro/brasao]"
+                                              : "[cockpit BAKED: combate]")
+                          << " viewport=" << pw0 << "x" << ph0
+                          << " dp_ratio=" << dp_ratio << " RML=" << rml_path << "\n";
             } else {
                 std::cerr << "BattlePreview: [glintfx] UiLayer::ok()=false (attach falhou) "
                              "- caindo SEM UI neste run\n";
@@ -868,6 +1016,7 @@ int run_battle_preview() {
             if (glintfx_on && ui) {
                 if (pw != pw0 || ph != ph0) {
                     ui->set_viewport(pw, ph);
+                    ui->set_dp_ratio(static_cast<float>(pw) / 960.0f);  // reescala logico
                     pw0 = pw;
                     ph0 = ph;
                 }
