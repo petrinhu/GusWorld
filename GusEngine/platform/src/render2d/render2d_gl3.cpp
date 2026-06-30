@@ -74,6 +74,43 @@ void main(){
 }
 )GLSL";
 
+// ---------------------------------------------------------------------------
+// Vinheta / glow radial de fundo da arena (ADR-009 adendo). Quad full-window
+// desenhado LOGO APOS o clear e ANTES dos sprites/HUD => fica ATRAS de tudo,
+// dando profundidade (bordas mais escuras + leve clareamento no centro). NAO
+// lava os sprites (e fundo opaco; os sprites compoem por cima depois).
+//
+// AJUSTE PELO LIDER: os 6 valores abaixo sao as alavancas (cor de centro/borda
+// + foco + raio + suavidade). Paleta canonica: base #0c0f1a; centro = leve lift
+// (#141a2c); bordas mais escuras (#06080f). Tudo SUTIL: profundidade, nao holofote.
+constexpr float kVigCenterRgb[3] = {0x14, 0x1a, 0x2c};  // #141a2c lift no centro
+constexpr float kVigEdgeRgb[3] = {0x06, 0x08, 0x0f};    // #06080f bordas escuras
+constexpr float kVigFocusX = 0.50f;   // centro do glow em X (0=esq, 1=dir)
+constexpr float kVigFocusY = 0.46f;   // levemente ACIMA do meio (onde ficam os atores)
+constexpr float kVigRadius = 0.85f;   // distancia (uv) onde chega na cor de borda
+constexpr float kVigSoftness = 0.65f;  // largura do falloff (maior = mais suave)
+
+const char* kVigVertSrc = R"GLSL(#version 330 core
+layout(location=0) in vec2 a_pos;
+out vec2 v_uv;
+void main(){ v_uv = a_pos * 0.5 + 0.5; gl_Position = vec4(a_pos, 0.0, 1.0); }
+)GLSL";
+
+const char* kVigFragSrc = R"GLSL(#version 330 core
+in vec2 v_uv;
+out vec4 frag;
+uniform vec3 u_center;
+uniform vec3 u_edge;
+uniform vec2 u_focus;
+uniform float u_radius;
+uniform float u_softness;
+void main(){
+  float d = distance(v_uv, u_focus);
+  float t = smoothstep(u_radius - u_softness, u_radius, d);
+  frag = vec4(mix(u_center, u_edge, t), 1.0);
+}
+)GLSL";
+
 }  // namespace
 
 // ---------------------------------------------------------------------------
@@ -86,6 +123,14 @@ struct Render2dGl3::Impl {
     GLuint ebo = 0;
     GLint loc_use_texture = -1;
     GLint loc_tex = -1;
+
+    // Vinheta de fundo (programa proprio; reusa o vao/vbo/ebo do quad principal).
+    GLuint vig_program = 0;
+    GLint vig_loc_center = -1;
+    GLint vig_loc_edge = -1;
+    GLint vig_loc_focus = -1;
+    GLint vig_loc_radius = -1;
+    GLint vig_loc_softness = -1;
 
     int pixel_w = 0;
     int pixel_h = 0;
@@ -145,6 +190,32 @@ struct Render2dGl3::Impl {
         loc_use_texture = glGetUniformLocation(program, "u_use_texture");
         loc_tex = glGetUniformLocation(program, "u_tex");
 
+        // Programa da vinheta de fundo (radial-gradient). Falha de compile/link aqui NAO e
+        // fatal: degrada pra "sem vinheta" (vig_program == 0 => draw_vignette e no-op), a
+        // arena continua com o clear chapado.
+        GLuint vvs = compile(GL_VERTEX_SHADER, kVigVertSrc);
+        GLuint vfs = compile(GL_FRAGMENT_SHADER, kVigFragSrc);
+        if (vvs && vfs) {
+            vig_program = glCreateProgram();
+            glAttachShader(vig_program, vvs);
+            glAttachShader(vig_program, vfs);
+            glLinkProgram(vig_program);
+            GLint vlinked = 0;
+            glGetProgramiv(vig_program, GL_LINK_STATUS, &vlinked);
+            if (!vlinked) {
+                glDeleteProgram(vig_program);
+                vig_program = 0;
+            } else {
+                vig_loc_center = glGetUniformLocation(vig_program, "u_center");
+                vig_loc_edge = glGetUniformLocation(vig_program, "u_edge");
+                vig_loc_focus = glGetUniformLocation(vig_program, "u_focus");
+                vig_loc_radius = glGetUniformLocation(vig_program, "u_radius");
+                vig_loc_softness = glGetUniformLocation(vig_program, "u_softness");
+            }
+        }
+        if (vvs) glDeleteShader(vvs);
+        if (vfs) glDeleteShader(vfs);
+
         glGenVertexArrays(1, &vao);
         glGenBuffers(1, &vbo);
         glGenBuffers(1, &ebo);
@@ -197,6 +268,35 @@ struct Render2dGl3::Impl {
         } else {
             glUniform1i(loc_use_texture, 0);
         }
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
+        glBindVertexArray(0);
+    }
+
+    // Vinheta de fundo: 1 quad full-window (NDC -1..1) com radial-gradient no frag.
+    // Reusa o vao/vbo/ebo do quad principal (so o atributo de posicao importa aqui; o
+    // vertex shader da vinheta le apenas location=0). Opaco (alpha=1): substitui o clear.
+    void draw_vignette() {
+        if (vig_program == 0) return;  // degradou no init: arena fica com o clear chapado
+        const Vtx verts[4] = {
+            {-1.0f, -1.0f, 0, 0, 0, 0, 0, 0},
+            {1.0f, -1.0f, 0, 0, 0, 0, 0, 0},
+            {1.0f, 1.0f, 0, 0, 0, 0, 0, 0},
+            {-1.0f, 1.0f, 0, 0, 0, 0, 0, 0},
+        };
+        const GLuint idx[6] = {0, 1, 2, 0, 2, 3};
+        glBindVertexArray(vao);
+        glBindBuffer(GL_ARRAY_BUFFER, vbo);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(verts), verts, GL_STREAM_DRAW);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(idx), idx, GL_STREAM_DRAW);
+        glUseProgram(vig_program);
+        glUniform3f(vig_loc_center, kVigCenterRgb[0] * k1_255, kVigCenterRgb[1] * k1_255,
+                    kVigCenterRgb[2] * k1_255);
+        glUniform3f(vig_loc_edge, kVigEdgeRgb[0] * k1_255, kVigEdgeRgb[1] * k1_255,
+                    kVigEdgeRgb[2] * k1_255);
+        glUniform2f(vig_loc_focus, kVigFocusX, kVigFocusY);
+        glUniform1f(vig_loc_radius, kVigRadius);
+        glUniform1f(vig_loc_softness, kVigSoftness);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
         glBindVertexArray(0);
     }
@@ -254,6 +354,7 @@ struct Render2dGl3::Impl {
         if (ebo) glDeleteBuffers(1, &ebo);
         if (vao) glDeleteVertexArrays(1, &vao);
         if (program) glDeleteProgram(program);
+        if (vig_program) glDeleteProgram(vig_program);
     }
 };
 
@@ -287,6 +388,10 @@ void Render2dGl3::begin_frame(const gus::core::spatial::Rect& camera_world, int 
     glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
     glClearColor(24.0f * k1_255, 26.0f * k1_255, 34.0f * k1_255, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
+    // Vinheta/glow radial de fundo LOGO APOS o clear (ANTES de qualquer sprite/HUD): da
+    // profundidade (bordas escuras + leve lift no centro). E quad full-window opaco; os
+    // sprites compoem por cima sem serem lavados. Composicao arena->UI->swap inalterada.
+    impl_->draw_vignette();
 }
 
 void Render2dGl3::draw_filled_rect(const gus::core::spatial::Rect& world_rect,

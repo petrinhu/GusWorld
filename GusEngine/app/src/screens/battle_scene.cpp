@@ -744,8 +744,12 @@ void BattleScene::render(IRenderer& renderer, float viewport_px_w,
     renderer.begin_frame(screen, static_cast<int>(viewport_px_w),
                          static_cast<int>(viewport_px_h));
 
-    // --- fundo (D7: camera estatica, fundo plano no M5) ---
-    renderer.draw_filled_rect(screen, kBgColor);
+    // --- fundo (D7: camera estatica) ---
+    // O FUNDO da arena agora vem da VINHETA/glow radial do renderer (Render2dGl3 desenha
+    // um quad full-window LOGO APOS o clear, dando profundidade: bordas escuras + leve
+    // lift no centro). NAO repintamos um fill chapado #0c0f1a aqui senao ele cobriria a
+    // vinheta. (kBgColor mantido como referencia da cor-base canonica.)
+    (void)kBgColor;
 
     // ====================================================================
     // VARIANTE C "Tatico Cockpit": cockpit lateral esq + arena a direita +
