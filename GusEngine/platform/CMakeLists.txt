@@ -21,16 +21,35 @@ add_library(gusengine_platform STATIC
     # Backend OpenGL 3.3 da ARENA (ADR-009 adendo GL3): coexiste com o HUD RmlUi-GL3 no
     # mesmo contexto GL. Mesma API IRenderer do Render2dSdl (a arena/testes nao mudam).
     src/render2d/render2d_gl3.cpp
-    # --- RmlUi (UI/HUD, ADR-009): backend GL3 oficial vendorizado + sistema SDL3 + wrapper.
-    #     ADENDO GL3: o backend de RENDER passou de RmlUi_Renderer_SDL para
-    #     RmlUi_Renderer_GL3 (OpenGL 3.3, shaders: gradiente/box-shadow/blur/mask), pois o
-    #     SDL_Renderer nao faz shader (achado da F0). O RmlUi_Platform_SDL (sistema/eventos)
-    #     continua. Confinado a platform/rmlui/ (com app/ui/); core/+domain/ nao tocam (GATE).
-    rmlui/RmlUi_Renderer_GL3.cpp
-    rmlui/RmlUi_Platform_SDL.cpp
-    rmlui/rmlui_hud.cpp
+    # Loader GL (glad) da ARENA (Render2dGl3): gl3_load_functions + gl3_read_backbuffer.
+    # NAO e backend de RmlUi; a arena precisa dele nos DOIS builds (OFF e ON) => fica SEMPRE.
     rmlui/gl3_loader.cpp
 )
+
+# --- RmlUi VENDORIZADO (ADR-009): backend GL3 oficial + sistema SDL3 + wrapper. SO no build
+#     OFF (default). ADR-010 R-dup-backend (decisao do lider, Opcao 2): quando
+#     GUSWORLD_GLINTFX=ON, o backend do glintfx assume e estes TUs NAO entram - assim o
+#     RmlUi_Renderer_GL3 deixa de ficar DUPLICADO (uma copia nossa + a do glintfx, que so
+#     linkavam por ordem de link, fragil). No ON nao ha caminho de HUD vendorizado em runtime
+#     (o fallback do caminho antigo passa a ser BUILDAR COM GUSWORLD_GLINTFX=OFF).
+#       RmlUi_Renderer_GL3.cpp -> backend GL3 (shaders gradiente/box-shadow/blur/mask) E dono
+#                                 do GLAD_GL_IMPLEMENTATION (a impl do glad da arena vive aqui).
+#       RmlUi_Platform_SDL.cpp -> sistema/eventos SDL3 do HUD vendorizado (so deste caminho).
+#       rmlui_hud.cpp          -> wrapper PImpl que dirige o RmlUi via RenderInterface_GL3.
+#     Confinado a platform/rmlui/ (com app/); core/+domain/ nao tocam (GATE).
+if(NOT GUSWORLD_GLINTFX)
+    target_sources(gusengine_platform PRIVATE
+        rmlui/RmlUi_Renderer_GL3.cpp
+        rmlui/RmlUi_Platform_SDL.cpp
+        rmlui/rmlui_hud.cpp
+    )
+else()
+    # ON: o RmlUi_Renderer_GL3 vendorizado SAIU - e era o dono do GLAD_GL_IMPLEMENTATION. A
+    # arena (render2d_gl3) e o gl3_loader ainda usam o glad => o gl3_loader (que fica nos dois
+    # builds) assume a IMPLEMENTACAO do glad (antes incluia so as declaracoes). O glintfx usa
+    # gl3w (tabela de ponteiros PROPRIA), entao nao ha conflito de simbolos GL.
+    target_compile_definitions(gusengine_platform PRIVATE GUSWORLD_OWN_GLAD_IMPL=1)
+endif()
 
 # OpenGL do sistema (libGL): o backend GL3 do RmlUi e o Render2dGl3 linkam GL. O glad
 # (loader header-only) ja vem com o RmlUi_Include_GL3.h; so o link de GL e necessario.

@@ -552,7 +552,13 @@ int run_battle_preview() {
         // unico (SDL_GL_SwapWindow). Opt-out (debug do cockpit a-mao antigo):
         // GUSWORLD_RMLUI_OFF=1.
         // ====================================================================
+        // ADR-010 R-dup-backend (Opcao 2): no build GUSWORLD_GLINTFX=ON o backend RmlUi
+        // vendorizado (rmlui_hud.cpp) NAO e compilado/linkado, entao o RmlUiHud nem e
+        // instanciado aqui - o slot de compose vai 100% pro glintfx::UiLayer. No OFF
+        // (default) o caminho vendorizado fica INTACTO.
+#ifndef GUSWORLD_GLINTFX
         gus::platform::rmlui::RmlUiHud hud;
+#endif
         bool rmlui_hud_on = false;
         const bool rmlui_opt_out = [] {
             const char* e = std::getenv("GUSWORLD_RMLUI_OFF");
@@ -569,6 +575,8 @@ int run_battle_preview() {
         }
         // Quando o glintfx esta ativo (runtime), NAO inicializa o HUD vendorizado: o
         // UiLayer ocupa o slot de compose. O caminho vendorizado segue intacto e default.
+        // (Compilado SO no build OFF - no ON o rmlui_hud.cpp nem e linkado; ver bloco acima.)
+#ifndef GUSWORLD_GLINTFX
         if (!rmlui_opt_out && !want_glintfx) {
             if (hud.init(/*gl_active=*/true, pw0, ph0, /*logical_w=*/960,
                          /*logical_h=*/540)) {
@@ -596,6 +604,7 @@ int run_battle_preview() {
                              "a-mao\n";
             }
         }
+#endif  // !GUSWORLD_GLINTFX (fim do init do HUD vendorizado)
 
         // ====================================================================
         // ADR-010 F1 SMOKE: glintfx::UiLayer (embed mode) no lugar do HUD vendorizado.
@@ -835,6 +844,7 @@ int run_battle_preview() {
             } else {
                 scene.render(renderer, static_cast<float>(pw), static_cast<float>(ph));
             }
+#ifndef GUSWORLD_GLINTFX
             if (rmlui_hud_on) {
                 // (C) ESTADO abertura vs combate: na intro mostra o brasao; depois de
                 // Encarar mostra o cockpit com os valores VIVOS do ator ativo (POCO).
@@ -850,6 +860,7 @@ int run_battle_preview() {
                 hud.update();
                 hud.compose();  // HUD por cima da arena, mesmo contexto GL
             }
+#endif  // !GUSWORLD_GLINTFX (compose do HUD vendorizado)
 #ifdef GUSWORLD_GLINTFX
             // ADR-010 F1 SMOKE: glintfx compoe no MESMO slot do hud.compose() - depois da
             // arena, antes do swap. render() e compose-only (sem clear, sem swap; salva e

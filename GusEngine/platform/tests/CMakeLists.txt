@@ -18,8 +18,14 @@ add_executable(gusengine_platform_tests
     alpha_bbox_test.cpp
     text_metrics_test.cpp
     font_atlas_test.cpp
-    rmlui_hud_test.cpp
 )
+
+# Testes do HUD RmlUi VENDORIZADO (RmlUiHud): so no build OFF (default). No build
+# GUSWORLD_GLINTFX=ON o rmlui_hud.cpp nao e compilado (ADR-010 R-dup-backend), entao
+# o RmlUiHud nao existe pra testar - estes 4 TEST_CASE saem junto (a suite OFF segue 1021).
+if(NOT GUSWORLD_GLINTFX)
+    target_sources(gusengine_platform_tests PRIVATE rmlui_hud_test.cpp)
+endif()
 
 target_link_libraries(gusengine_platform_tests
     PRIVATE

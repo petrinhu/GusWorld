@@ -234,10 +234,31 @@ Proposta: `GUSWORLD_UI_BACKEND` (default `vendored`). Tabela de resolução:
 
 | `GUSWORLD_GLINTFX` (compile) | `GUSWORLD_UI_BACKEND` (runtime) | Caminho efetivo |
 |---|---|---|
-| OFF (hoje) | qualquer | HUD vendorizado (`RmlUiHud`) — único compilado |
-| ON | `vendored` (default) | HUD vendorizado (fallback) |
+| OFF (default) | qualquer | HUD vendorizado (`RmlUiHud`) — único compilado |
 | ON | `glintfx` | `glintfx::UiLayer` |
+| ON | `vendored` (ou ausente) | **sem HUD vendorizado** (ver R-dup-backend abaixo) |
 | qualquer | `GUSWORLD_RMLUI_OFF=1` | sem UI (precede o backend; comportamento atual preservado) |
+
+> **ATUALIZAÇÃO 2026-06-30 (R-dup-backend resolvido — decisão do líder, Opção 2):** o backend
+> RmlUi vendorizado (`RmlUi_Renderer_GL3.cpp` + `RmlUi_Platform_SDL.cpp` + `rmlui_hud.cpp`) agora é
+> **gateado ao build OFF**. Quando `GUSWORLD_GLINTFX=ON`, essas 3 TUs **não são compiladas/linkadas**
+> — só o backend GL3 do **glintfx** fica (eliminando a duplicação que antes só linkava por ordem de
+> link). **Consequência:** no build ON **não existe mais** o caminho de HUD vendorizado em runtime; o
+> `RmlUiHud` nem é instanciado (`battle_preview.cpp` guarda a instanciação/compose com
+> `#ifndef GUSWORLD_GLINTFX`). Logo, `GUSWORLD_UI_BACKEND=vendored` **no build ON** não tem backend
+> RmlUi (vira HUD-off). **O fallback do caminho antigo passa a ser BUILDAR COM `GUSWORLD_GLINTFX=OFF`
+> (default), que continua 100% intacto** — two-way door preservado (basta reconfigurar com a option
+> OFF pra ter o caminho vendorizado completo + suíte 1021/1021).
+>
+> **Plumbing do glad (consequência técnica obrigatória):** o `RmlUi_Renderer_GL3.cpp` vendorizado era
+> o **dono do `GLAD_GL_IMPLEMENTATION`** (a implementação do glad que a ARENA `Render2dGl3` e o
+> `gl3_loader` usam). Como ele sai no ON, o `gl3_loader.cpp` (que fica nos **dois** builds, é o loader
+> da arena) **assume a implementação do glad** quando o CMake passa `GUSWORLD_OWN_GLAD_IMPL` (só no ON).
+> No OFF nada muda: o dono do glad segue sendo o `RmlUi_Renderer_GL3.cpp`. O glintfx usa **gl3w**
+> (tabela de ponteiros própria), independente do glad — sem conflito de símbolos GL.
+>
+> Também gateado ao OFF: `platform/tests/rmlui_hud_test.cpp` (4 TEST_CASE que exercitam o `RmlUiHud`),
+> pois no ON o `RmlUiHud` não existe pra testar. Suíte OFF segue 1021/1021.
 
 ### Onde o switch entra (sem remover nada)
 
@@ -266,6 +287,14 @@ vendorizado (F3). Nenhuma linha do caminho atual é removida agora.
 
 ## NÃO PROVADO / riscos novos encontrados
 
+- **R-dup-backend — RESOLVIDO (2026-06-30, Opção 2 do líder):** o `RmlUi_Renderer_GL3.cpp`
+  duplicado (cópia nossa + a do glintfx, que só linkava por ordem de link) foi eliminado gateando o
+  backend vendorizado ao build OFF. PROVA: no `build.ninja` do ON a única TU `RmlUi_Renderer_GL3.cpp.o`
+  é a do glintfx (`_deps/glintfx-build/.../rmlui-src/Backends/`), e `nm` mostra
+  `RenderInterface_GL3::RenderInterface_GL3()` com provedor único — sem mais dependência de ordem de
+  link. Detalhe na seção (c) acima. NÃO PROVADO novo daqui: o **save/restore de estado GL** do glintfx
+  ao compor por cima da arena segue como R-gl-state abaixo (o smoke não corrompeu, mas não é prova
+  formal de paridade de estado).
 - **R-glad-owner:** quem é dono do loader GL no F1 — o `gl3_load_functions` atual
   (`battle_preview.cpp:402`) ou o `UiLayer`. Duplo-load do glad pode ser benigno (idempotente) ou
   redefinir ponteiros; **validar no F1** quem chama o quê e em que ordem (contexto já corrente em `:397`).
