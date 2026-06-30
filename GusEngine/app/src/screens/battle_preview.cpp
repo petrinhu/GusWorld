@@ -23,6 +23,17 @@
 #include "gus/platform/rmlui/gl3_loader.hpp"  // glad load + read_backbuffer (captura)
 #include "gus/platform/rmlui/rmlui_hud.hpp"  // ADR-009: HUD RmlUi-GL3 sobre a arena
 
+// ADR-010 F1 SMOKE: caminho glintfx::UiLayer (embed mode), atras do flag de compilacao
+// GUSWORLD_GLINTFX (default OFF => nada disto compila; binario = caminho vendorizado).
+// De-risk do embed mode ANTES do cockpit; two-way door, runtime gate GUSWORLD_UI_BACKEND.
+#ifdef GUSWORLD_GLINTFX
+#include <filesystem>  // tempfile do RML trivial (load() do glintfx exige um path)
+#include <fstream>
+#include <optional>
+#include <glintfx/ui_event.hpp>
+#include <glintfx/ui_layer.hpp>
+#endif
+
 // stb_image_write: captura de frame (PNG) para o SMOKE VISUAL do ADR-009 (comparar o
 // jogo com o mock). IMPLEMENTACAO definida UMA vez aqui (camada app/, fora do hot path).
 #define STB_IMAGE_WRITE_IMPLEMENTATION
@@ -363,6 +374,106 @@ std::string resolve_intent_icons_dir() {
     return resolve_asset_dir(gus::core::assets::kIntentIconsDir);
 }
 
+#ifdef GUSWORLD_GLINTFX
+// ADR-010 F1 SMOKE: escreve um RML TRIVIAL (sem assets externos, sem fonte) num tempfile e
+// devolve o path. O glintfx v0.2.1 carrega por PATH (load()) e NAO resolve base-url nem
+// carrega fonte default (so a v0.2.2) - por isso o smoke e um DIV com gradiente
+// semitransparente + glow (decorator/box-shadow nativos), SEM texto. Prova so o compose do
+// embed mode por cima da arena. Unidades em 'px' (deterministico; dp-ratio fica pra v0.2.2).
+std::string write_smoke_glintfx_rml() {
+    namespace fs = std::filesystem;
+    const fs::path path = fs::temp_directory_path() / "gusworld_glintfx_smoke.rml";
+    std::ofstream f(path);
+    f << R"RML(<rml>
+<head>
+<style>
+body { background: transparent; }
+#smoke {
+  position: absolute; top: 80px; left: 80px; width: 520px; height: 300px;
+  decorator: vertical-gradient( #22D3EE #7C3AED );
+  border-radius: 22px;
+  box-shadow: #22D3EE 0px 0px 48px 8px;
+  opacity: 0.80;
+}
+#smoke #bar {
+  position: absolute; bottom: 0px; left: 0px; right: 0px; height: 64px;
+  decorator: horizontal-gradient( #F59E0B #EF4444 );
+  border-radius: 0px 0px 22px 22px;
+}
+</style>
+</head>
+<body>
+<div id="smoke"><div id="bar"/></div>
+</body>
+</rml>)RML";
+    return path.string();
+}
+
+// ADR-010 F1 SMOKE: ponte SDL_Event -> glintfx::UiEvent (mapa de design da doc de prep).
+// Retorna false p/ eventos sem mapeamento (nao injeta ruido). Cobre mouse-move/button,
+// teclas de navegacao, texto e resize (pixels reais via SDL_GetWindowSizeInPixels). 'Type'
+// e enum class (scoped) na v0.2.1 -> UiEvent::Type::*.
+bool sdl_to_glintfx(const SDL_Event& ev, SDL_Window* window, glintfx::UiEvent* out) {
+    using K = glintfx::Key;
+    using T = glintfx::UiEvent::Type;
+    glintfx::UiEvent e{};
+    switch (ev.type) {
+        case SDL_EVENT_MOUSE_MOTION:
+            e.type = T::MouseMove;
+            e.x = ev.motion.x;
+            e.y = ev.motion.y;
+            break;
+        case SDL_EVENT_MOUSE_BUTTON_DOWN:
+        case SDL_EVENT_MOUSE_BUTTON_UP:
+            e.type = T::MouseButton;
+            e.x = ev.button.x;
+            e.y = ev.button.y;
+            e.pressed = (ev.type == SDL_EVENT_MOUSE_BUTTON_DOWN);
+            e.button = ev.button.button == SDL_BUTTON_RIGHT    ? 1
+                       : ev.button.button == SDL_BUTTON_MIDDLE ? 2
+                                                               : 0;
+            break;
+        case SDL_EVENT_KEY_DOWN:
+        case SDL_EVENT_KEY_UP:
+            e.type = T::Key;
+            e.pressed = (ev.type == SDL_EVENT_KEY_DOWN);
+            e.modifiers = ((ev.key.mod & SDL_KMOD_SHIFT) ? glintfx::Mod_Shift : 0) |
+                          ((ev.key.mod & SDL_KMOD_CTRL) ? glintfx::Mod_Ctrl : 0) |
+                          ((ev.key.mod & SDL_KMOD_ALT) ? glintfx::Mod_Alt : 0);
+            switch (ev.key.key) {
+                case SDLK_UP: e.key = K::Up; break;
+                case SDLK_DOWN: e.key = K::Down; break;
+                case SDLK_LEFT: e.key = K::Left; break;
+                case SDLK_RIGHT: e.key = K::Right; break;
+                case SDLK_RETURN:
+                case SDLK_KP_ENTER: e.key = K::Enter; break;
+                case SDLK_ESCAPE: e.key = K::Escape; break;
+                case SDLK_TAB: e.key = K::Tab; break;
+                case SDLK_SPACE: e.key = K::Space; break;
+                case SDLK_BACKSPACE: e.key = K::Backspace; break;
+                default: e.key = K::None; break;
+            }
+            break;
+        case SDL_EVENT_TEXT_INPUT:
+            e.type = T::Text;
+            e.text = ev.text.text;  // valido so no escopo do evento; process_event copia
+            break;
+        case SDL_EVENT_WINDOW_PIXEL_SIZE_CHANGED: {
+            int pw = 0, ph = 0;
+            SDL_GetWindowSizeInPixels(window, &pw, &ph);
+            e.type = T::Resize;
+            e.width = pw;
+            e.height = ph;
+            break;
+        }
+        default:
+            return false;  // sem mapeamento -> nao injeta
+    }
+    *out = e;
+    return true;
+}
+#endif  // GUSWORLD_GLINTFX
+
 int run_battle_preview() {
     if (!SDL_Init(SDL_INIT_VIDEO)) {
         std::cerr << "BattlePreview: SDL_Init falhou: " << SDL_GetError() << "\n";
@@ -418,6 +529,19 @@ int run_battle_preview() {
         return e != nullptr && e[0] == '1';
     }();
 
+    // ADR-010 F1: runtime gate do backend de UI. GUSWORLD_UI_BACKEND=glintfx ativa o
+    // glintfx::UiLayer (so se compilado com -DGUSWORLD_GLINTFX=ON); qualquer outro valor
+    // (ou ausente) mantem o caminho VENDORIZADO (RmlUiHud), que e o DEFAULT. Sem a macro
+    // de compilacao, want_glintfx e SEMPRE false (constexpr) e o glintfx some do binario.
+#ifdef GUSWORLD_GLINTFX
+    const bool want_glintfx = [] {
+        const char* e = std::getenv("GUSWORLD_UI_BACKEND");
+        return e != nullptr && std::string(e) == "glintfx";
+    }();
+#else
+    constexpr bool want_glintfx = false;
+#endif
+
     {
         gus::platform::render2d::Render2dGl3 renderer(/*gl_active=*/true);
 
@@ -443,7 +567,9 @@ int run_battle_preview() {
                       << " pixels=" << pw0 << "x" << ph0
                       << " dp_ratio=" << (static_cast<float>(pw0) / 960.0f) << "\n";
         }
-        if (!rmlui_opt_out) {
+        // Quando o glintfx esta ativo (runtime), NAO inicializa o HUD vendorizado: o
+        // UiLayer ocupa o slot de compose. O caminho vendorizado segue intacto e default.
+        if (!rmlui_opt_out && !want_glintfx) {
             if (hud.init(/*gl_active=*/true, pw0, ph0, /*logical_w=*/960,
                          /*logical_h=*/540)) {
                 // O data-model PRECISA existir ANTES de carregar o doc (o data-model="hud"
@@ -471,11 +597,43 @@ int run_battle_preview() {
             }
         }
 
+        // ====================================================================
+        // ADR-010 F1 SMOKE: glintfx::UiLayer (embed mode) no lugar do HUD vendorizado.
+        // Anexa ao contexto GL JA corrente (SDL_GL_MakeCurrent acima); compose-only no
+        // loop (sem clear, sem swap), no slot do hud.compose(). load_gl=true: o glintfx usa
+        // gl3w (tabela de ponteiros PROPRIA, independente do glad que o GusEngine carregou
+        // em gl3_load_functions); por isso PRECISA carregar a sua (false deixaria os
+        // ponteiros gl3w NULL -> crash). Ver R-glad-owner no relatorio.
+        // ====================================================================
+        bool glintfx_on = false;
+#ifdef GUSWORLD_GLINTFX
+        std::optional<glintfx::UiLayer> ui;
+        if (want_glintfx && !rmlui_opt_out) {
+            // logical == pixels reais (dp-ratio fica pra v0.2.2): viewport 1:1, sem escala.
+            ui.emplace(glintfx::UiLayer::Config{/*logical_width=*/pw0,
+                                                /*logical_height=*/ph0,
+                                                /*load_gl=*/true});
+            if (ui->ok()) {
+                const std::string smoke_rml = write_smoke_glintfx_rml();
+                ui->load(smoke_rml.c_str());
+                ui->set_viewport(pw0, ph0);
+                glintfx_on = true;
+                std::cout << "BattlePreview: [glintfx] UiLayer ATIVO (embed, load_gl=true) "
+                          << "viewport=" << pw0 << "x" << ph0 << " RML=" << smoke_rml
+                          << "\n";
+            } else {
+                std::cerr << "BattlePreview: [glintfx] UiLayer::ok()=false (attach falhou) "
+                             "- caindo SEM UI neste run\n";
+                ui.reset();
+            }
+        }
+#endif
+
         // A cena monta o encontro de demo e ja le a fila do motor.
         BattleScene scene;
-        // (A) Com o HUD externo (RmlUi) ATIVO, a cena NAO desenha o cockpit/log a mao -
-        // so arena/banner/floaters/fila. Evita os DOIS cockpits sobrepostos.
-        scene.set_hud_external(rmlui_hud_on);
+        // (A) Com um HUD externo (RmlUi vendorizado OU glintfx) ATIVO, a cena NAO desenha o
+        // cockpit/log a mao - so arena/banner/floaters/fila. Evita cockpits sobrepostos.
+        scene.set_hud_external(rmlui_hud_on || glintfx_on);
 
         // Carrega os retratos 48px da fila CTB (handles resolvidos pelo renderer) e os
         // entrega a cena. Cada id de ator -> seu retrato; ausencia degrada pro retangulo.
@@ -561,9 +719,35 @@ int run_battle_preview() {
         bool running = true;
         bool have_last = false;
         unsigned long long last_ns = 0;
+#ifdef GUSWORLD_GLINTFX
+        int glintfx_injected = 0;  // SMOKE: conta eventos injetados na UI (prova do pipeline)
+#endif
         while (running) {
             SDL_Event ev;
             while (SDL_PollEvent(&ev)) {
+#ifdef GUSWORLD_GLINTFX
+                // ADR-010 F1 SMOKE: injeta o evento na UI glintfx (caminho NOVO; o HUD
+                // vendorizado e display-only e nao recebe input). Em paralelo ao handler de
+                // cena abaixo (ambos veem o mesmo evento). Loga os PRIMEIROS eventos
+                // injetados (de qualquer tipo) + toda tecla, p/ provar que o evento SDL
+                // atravessa sdl_to_glintfx -> process_event ate o motor de UI.
+                if (glintfx_on && ui) {
+                    glintfx::UiEvent ge{};
+                    if (sdl_to_glintfx(ev, window, &ge)) {
+                        ui->process_event(ge);
+                        const bool is_key = ge.type == glintfx::UiEvent::Type::Key;
+                        if (glintfx_injected < 6 || (is_key && ge.pressed)) {
+                            std::cout << "BattlePreview: [glintfx] input injetado #"
+                                      << glintfx_injected
+                                      << " type=" << static_cast<int>(ge.type)
+                                      << " key=" << static_cast<int>(ge.key)
+                                      << " x=" << ge.x << " y=" << ge.y
+                                      << " mods=" << ge.modifiers << "\n";
+                        }
+                        ++glintfx_injected;
+                    }
+                }
+#endif
                 if (ev.type == SDL_EVENT_QUIT) {
                     running = false;
                 } else if (ev.type == SDL_EVENT_KEY_DOWN) {
@@ -666,6 +850,20 @@ int run_battle_preview() {
                 hud.update();
                 hud.compose();  // HUD por cima da arena, mesmo contexto GL
             }
+#ifdef GUSWORLD_GLINTFX
+            // ADR-010 F1 SMOKE: glintfx compoe no MESMO slot do hud.compose() - depois da
+            // arena, antes do swap. render() e compose-only (sem clear, sem swap; salva e
+            // restaura o estado GL internamente). O viewport segue os pixels reais.
+            if (glintfx_on && ui) {
+                if (pw != pw0 || ph != ph0) {
+                    ui->set_viewport(pw, ph);
+                    pw0 = pw;
+                    ph0 = ph;
+                }
+                ui->update();
+                ui->render();  // UI por cima da arena, mesmo contexto GL
+            }
+#endif
 
             // SMOKE VISUAL: captura 1 PNG no frame alvo (ANTES do swap, lendo o backbuffer)
             // e encerra. Em modo interativo, o swap apresenta na janela.

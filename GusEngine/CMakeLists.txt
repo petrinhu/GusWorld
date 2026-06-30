@@ -74,6 +74,34 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(RmlUi)
 
+# --- glintfx (ADR-010 F1+: motor de UI/HUD via EMBED mode, glintfx::UiLayer). Compilado
+#     SOMENTE quando GUSWORLD_GLINTFX=ON. Default OFF => binario do caminho VENDORIZADO
+#     (RmlUiHud), byte-a-byte o de hoje; sem <glintfx no include path, sem FetchContent dele.
+#     two-way door (ADR-010): o caminho vendorizado NAO e removido (isso e F3).
+#
+#     GLINTFX_BACKEND_GLFW=OFF (FORCE, ANTES do FetchContent) => embed-only: o glintfx NAO
+#     chama find_package(glfw3), NAO linka glfw e NAO compila App/window_glfw/RmlUi_Platform_GLFW.
+#     O glintfx FIXA o RmlUi no MESMO SHA ja declarado acima
+#     (2cd28864ae25ed345b70598751703a5433b12356) => o FetchContent_MakeAvailable e idempotente
+#     por nome: o RmlUi do GusEngine (declarado PRIMEIRO) vence e o glintfx o reusa (sem conflito
+#     de versao). Por isso este bloco vem DEPOIS do MakeAvailable(RmlUi) de proposito.
+#     Linkado SO em app/ (GATE de 4 camadas: nunca core/ nem domain/).
+option(GUSWORLD_GLINTFX "Compila o caminho glintfx::UiLayer (ADR-010 F1+, embed mode)" OFF)
+if(GUSWORLD_GLINTFX)
+    set(GLINTFX_BACKEND_GLFW OFF CACHE BOOL "" FORCE)  # embed-only (sem GLFW)
+    # SOURCE_SUBDIR glintfx: no layout v0.2.1 o CMakeLists.txt do projeto vive no subdir
+    # glintfx/ (a raiz do repo NAO tem CMakeLists.txt); e o que o consumer-example oficial
+    # do glintfx aponta (SOURCE_DIR .../glintfx). Sem isto, MakeAvailable popula mas NAO
+    # adiciona o subdir => alvo glintfx::glintfx nao existe.
+    FetchContent_Declare(
+        glintfx
+        GIT_REPOSITORY https://codeberg.org/petrinhu/glintfx
+        GIT_TAG        v0.2.1
+        SOURCE_SUBDIR  glintfx
+    )
+    FetchContent_MakeAvailable(glintfx)
+endif()
+
 # --- Testes (Catch2 v3). core/+domain/+platform/+app/ testados headless. ---
 include(CTest)        # define BUILD_TESTING (ON por padrao)
 enable_testing()
