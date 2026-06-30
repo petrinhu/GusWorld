@@ -53,21 +53,24 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(SDL3)
 
-# --- RmlUi (UI/HUD do jogador, ADR-009). Pin = 6.2. Desliga samples; FONT_ENGINE=
-#     freetype (ADR-009 DECISAO 1, ratificada): caminho suportado do RmlUi, com
-#     font-effect (glow/outline) de graca; a fonte real (Pixel Operator Mono) e
-#     rasterizada pelo FreeType. RmlUi 6.2 usa find_package(Freetype) (NAO FetchContent),
-#     entao o FreeType vem do sistema (Linux: libfreetype-dev; cross-compile Windows =
-#     ponto de atencao R-font, plano B = custom stb). Static (BUILD_SHARED_LIBS=OFF).
+# --- RmlUi (UI/HUD do jogador, ADR-009). Pin = 6.3, SHA exato do glintfx (ADR-010 F0):
+#     2cd28864ae25ed345b70598751703a5433b12356. Alinhar a ABI do RmlUi com a versao que
+#     o glintfx fixa e PRE-REQUISITO da adocao do embed mode (UiLayer) - ver ADR-010.
+#     Desliga samples; FONT_ENGINE=freetype (ADR-009 DECISAO 1, ratificada): caminho
+#     suportado do RmlUi, com font-effect (glow/outline) de graca; a fonte real (Pixel
+#     Operator Mono) e rasterizada pelo FreeType. RmlUi usa find_package(Freetype) (NAO
+#     FetchContent), entao o FreeType vem do sistema (Linux: libfreetype-dev; cross-compile
+#     Windows = ponto de atencao R-font, plano B = custom stb). Static (BUILD_SHARED_LIBS=OFF).
 #     Linkado por platform/rmlui/ + app/ (NUNCA por core/ nem domain/ - GATE).
+#     NOTA: pin por SHA e INCOMPATIVEL com GIT_SHALLOW (shallow so busca o tip do ref);
+#     por isso o GIT_SHALLOW foi removido deste Declare (fetch completo necessario p/ o SHA).
 set(RMLUI_SAMPLES OFF CACHE BOOL "" FORCE)
 set(RMLUI_FONT_ENGINE "freetype" CACHE STRING "" FORCE)
 set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
 FetchContent_Declare(
     RmlUi
     GIT_REPOSITORY https://github.com/mikke89/RmlUi.git
-    GIT_TAG        6.2
-    GIT_SHALLOW    TRUE
+    GIT_TAG        2cd28864ae25ed345b70598751703a5433b12356
 )
 FetchContent_MakeAvailable(RmlUi)
 
