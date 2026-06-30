@@ -81,14 +81,16 @@ void main(){
 // lava os sprites (e fundo opaco; os sprites compoem por cima depois).
 //
 // AJUSTE PELO LIDER: os 6 valores abaixo sao as alavancas (cor de centro/borda
-// + foco + raio + suavidade). Paleta canonica: base #0c0f1a; centro = leve lift
-// (#141a2c); bordas mais escuras (#06080f). Tudo SUTIL: profundidade, nao holofote.
-constexpr float kVigCenterRgb[3] = {0x14, 0x1a, 0x2c};  // #141a2c lift no centro
-constexpr float kVigEdgeRgb[3] = {0x06, 0x08, 0x0f};    // #06080f bordas escuras
+// + foco + raio + suavidade). Glow radial de PROFUNDIDADE VISIVEL: centro = lift
+// frio com toque de cyan (#283c62) sobre a base #0c0f1a; bordas bem escuras
+// (#04060c). Delta de luminancia centro->borda ~43 (perceptivel a olho, mas sem
+// holofote e sem lavar os sprites). radius<=dist do canto p/ a borda chegar full.
+constexpr float kVigCenterRgb[3] = {0x28, 0x3c, 0x62};  // #283c62 glow frio (toque cyan)
+constexpr float kVigEdgeRgb[3] = {0x04, 0x06, 0x0c};    // #04060c bordas bem escuras
 constexpr float kVigFocusX = 0.50f;   // centro do glow em X (0=esq, 1=dir)
 constexpr float kVigFocusY = 0.46f;   // levemente ACIMA do meio (onde ficam os atores)
-constexpr float kVigRadius = 0.85f;   // distancia (uv) onde chega na cor de borda
-constexpr float kVigSoftness = 0.65f;  // largura do falloff (maior = mais suave)
+constexpr float kVigRadius = 0.72f;   // distancia (uv) onde chega na cor de borda (~canto)
+constexpr float kVigSoftness = 0.66f;  // largura do falloff (gradiente cobre quase tudo)
 
 const char* kVigVertSrc = R"GLSL(#version 330 core
 layout(location=0) in vec2 a_pos;
