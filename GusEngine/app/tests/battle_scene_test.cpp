@@ -1380,3 +1380,104 @@ TEST_CASE("mira Scan: CONFIRMAR escaneia o alvo ESCOLHIDO", "[battle_scene]") {
     }
     REQUIRE(found_scan);
 }
+
+// ----- Previa de dano no modo-mira (feedback do lider): SO em [Atacar] -----
+// A cena LE preview_basic_attack_damage do motor e desenha "-N" no cluster de info da mira
+// (nome + HP + fraqueza). O badge standalone e EXATAMENTE "-N": linhas de log sao strings
+// completas ("a -> b -N") e floaters de dano sao "N" (sem sinal), entao "-N" isola o badge.
+
+TEST_CASE("mira [Atacar]: render mostra a PREVIA de dano ('-N') do alvo mirado",
+          "[battle_scene]") {
+    BattleScene scene;
+    pump_to_player_turn(scene);
+    select_verb(scene, BattleVerb::Atacar);
+    scene.menu_confirm();
+    REQUIRE(scene.is_aiming());
+    const auto* attacker = scene.active_actor();
+    const auto* target = scene.aim_target();
+    REQUIRE(attacker != nullptr);
+    REQUIRE(target != nullptr);
+
+    // Numero = o MESMO do motor (a cena NUNCA recalcula regra; so LE + desenha).
+    const int dano = scene.machine().preview_basic_attack_damage(*attacker, *target);
+    REQUIRE(dano >= 1);  // piso kMinDamage; a demo nao tem Shield no start
+    const std::string badge = "-" + std::to_string(dano);
+
+    CountingRenderer r;
+    scene.render(r, 960.0f, 540.0f);
+    bool found = false;
+    for (const auto& t : r.texts) {
+        if (t.text == badge) {
+            found = true;
+        }
+    }
+    REQUIRE(found);
+}
+
+TEST_CASE("mira [Atacar]: a previa REFLETE o Shield do alvo AO VIVO (absorve tudo -> -0)",
+          "[battle_scene]") {
+    BattleScene scene;
+    pump_to_player_turn(scene);
+    // Alvo pre-selecionado (D3 b) = front da fila = alive_enemy_at(0). Ponteiro MUTAVEL pra
+    // montar o cenario de Shield (a mira so LE o alvo).
+    gus::domain::combat::CombatActor* target = alive_enemy_at(scene, 0);
+    REQUIRE(target != nullptr);
+
+    // (1) baseline SEM shield: numero cru (>= 1).
+    select_verb(scene, BattleVerb::Atacar);
+    scene.menu_confirm();
+    REQUIRE(scene.aim_target() == target);
+    const auto* attacker = scene.active_actor();
+    REQUIRE(attacker != nullptr);
+    const int base = scene.machine().preview_basic_attack_damage(*attacker, *target);
+    REQUIRE(base >= 1);
+    scene.aim_cancel();  // volta ao menu SEM consumir o turno (mesmo ator ativo)
+
+    // (2) Shield que absorve TUDO: a previa deve cair pra 0 (a UI reflete a reducao AO VIVO).
+    target->add_status(gus::domain::combat::StatusEffect{
+        gus::domain::combat::StatusId::Shield, /*magnitude=*/999, /*duration=*/1,
+        gus::domain::combat::StackRule::Replace,
+        gus::domain::combat::CardFamily::Eletrico});
+    select_verb(scene, BattleVerb::Atacar);
+    scene.menu_confirm();
+    REQUIRE(scene.aim_target() == target);
+    REQUIRE(scene.machine().preview_basic_attack_damage(*attacker, *target) == 0);
+
+    CountingRenderer r;
+    scene.render(r, 960.0f, 540.0f);
+    bool found_zero = false;
+    bool found_base = false;
+    for (const auto& t : r.texts) {
+        if (t.text == "-0") {
+            found_zero = true;
+        }
+        if (t.text == "-" + std::to_string(base)) {
+            found_base = true;
+        }
+    }
+    REQUIRE(found_zero);        // badge agora "-0" (Shield absorve tudo)
+    REQUIRE_FALSE(found_base);  // o numero MUDOU vs o baseline: previa VIVA, nao estatica
+}
+
+TEST_CASE("mira [Scan]: NAO mostra previa de dano (Scan nao causa dano)",
+          "[battle_scene]") {
+    BattleScene scene;
+    pump_to_player_turn(scene);
+    select_verb(scene, BattleVerb::Scan);
+    scene.menu_confirm();
+    REQUIRE(scene.is_aiming());
+    const auto* attacker = scene.active_actor();
+    const auto* target = scene.aim_target();
+    REQUIRE(attacker != nullptr);
+    REQUIRE(target != nullptr);
+
+    // O badge "-N" (N = dano do ataque basico) NAO deve ser desenhado no modo Scan.
+    const int dano = scene.machine().preview_basic_attack_damage(*attacker, *target);
+    const std::string badge = "-" + std::to_string(dano);
+
+    CountingRenderer r;
+    scene.render(r, 960.0f, 540.0f);
+    for (const auto& t : r.texts) {
+        REQUIRE(t.text != badge);
+    }
+}

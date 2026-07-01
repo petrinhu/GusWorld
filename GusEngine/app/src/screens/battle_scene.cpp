@@ -1222,6 +1222,29 @@ void BattleScene::render(IRenderer& renderer, float viewport_px_w,
                             renderer.draw_filled_rect(fp, kBrass);
                         }
                     }
+                    // (5) PREVIA DE DANO (feedback do lider no display): SO em [Atacar]
+                    //     (Scan e utilitario, nao bate). Mostra a perda de HP PREVISTA no
+                    //     alvo mirado ANTES de confirmar, atualizando AO VIVO por alvo.
+                    //     Numero PURO do motor (preview_basic_attack_damage: dano bruto -
+                    //     absorcao de Shield, piso 0) - a cena NUNCA recalcula regra, so LE.
+                    //     "-N" = HP que sai (mesma convencao "-N" da narracao do log); cor =
+                    //     a do numero de dano COMUM do floater (destaca do HP ciano). Pillar
+                    //     4/WCAG: e NUMERO, nao so cor. Fecha o cluster de info logo ABAIXO
+                    //     do "hp/max", no lado direito do slot.
+                    if (aim_verb_ == BattleVerb::Atacar) {
+                        const CombatActor* attacker = active_actor();
+                        if (attacker != nullptr) {
+                            const int dano =
+                                machine().preview_basic_attack_damage(*attacker, *a);
+                            char dmg[24];
+                            std::snprintf(dmg, sizeof(dmg), "-%d", dano);
+                            const float hp_y = r.y + (r.h - kMiraLabelPx) * 0.5f;
+                            renderer.draw_text(
+                                dmg, r.x + r.w + 2.0f, hp_y + kMiraLabelPx + 2.0f,
+                                kMiraLabelPx, floater_color_for_channel(HitChannel::Common),
+                                /*bold=*/true);
+                        }
+                    }
                 }
             }
         };
