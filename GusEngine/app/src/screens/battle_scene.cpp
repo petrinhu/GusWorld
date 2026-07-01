@@ -82,7 +82,8 @@ constexpr DrawColor kLine{0.165f, 0.204f, 0.314f, 1.0f};           // #2a3450 bo
 constexpr DrawColor kWhite{1.0f, 1.0f, 1.0f, 1.0f};                // tint neutro
 
 // Mapeamentos semanticos sobre a paleta canonica:
-constexpr DrawColor kCtbBandColor = kBg2Color;        // faixa CTB
+// (kCtbBandColor removido: a faixa/caixa de fundo da fila CTB foi aposentada - a fila
+//  agora fica seamless sobre a vinheta da arena. Ver o bloco de render da fila CTB.)
 constexpr DrawColor kCtbCellColor = kSlotDarkColor;   // celula CTB ocupada
 constexpr DrawColor kCtbNextColor = kCyan;            // marca "proximo" (cyan)
 constexpr DrawColor kPartyColor = kCyanDim;           // placeholder party (cyan dim)
@@ -837,13 +838,15 @@ void BattleScene::render(IRenderer& renderer, float viewport_px_w,
         }
     }
 
-    // --- faixa da fila CTB (topo, a direita do cockpit; D4) ---
+    // --- fila CTB (topo, a direita do cockpit; D4) ---
+    // SEM FAIXA/CAIXA (lider 2026-06-30): a banda de fundo (kCtbBandColor = kBg2Color)
+    // foi REMOVIDA. Ela pintava um retangulo de tom distinto do fundo da arena (que agora
+    // e a VINHETA radial, nao mais o flat kBgColor), saltando como uma "caixa" de borda
+    // dura atras dos retratos. Agora as celulas/retratos da fila ficam DIRETO sobre a
+    // vinheta - seamless, igual a party e a coluna de inimigos (que nao tem faixa). As
+    // CELULAS por-retrato (kCtbCellColor), a marca de ativo/proximo (cyan) e o banner
+    // seguem intactos. kCtbBandColor deixa de ser usado aqui.
     {
-        const Rect band{static_cast<float>(kRightZoneX), 0.0f,
-                        static_cast<float>(kBattleLogicalW - kRightZoneX),
-                        static_cast<float>(kCtbStripTop + kCtbStripH)};
-        renderer.draw_filled_rect(band, kCtbBandColor);
-
         const CtbStrip strip = ctb_strip(queue_len());
         const auto& order = machine_->queue().order();
         const CombatActor* active = active_actor();
