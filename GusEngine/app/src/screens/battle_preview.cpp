@@ -291,13 +291,21 @@ body { font-family: "Pixel Operator Mono"; background: transparent; }
   animation: spin 18s linear infinite; }
 .ring.r3 { top: 34dp; left: 34dp; width: 80dp; height: 80dp; border: 1dp #E8A33D66; }
 @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-/* POLISH 1 (veredito do lider: o "V" estava feio): glifo Vetor-Dragao (brasao Vance) no
-   CENTRO dos aneis, no lugar do monograma. Caixa 72x40dp (aspecto ~1.83:1 do PNG 677x369)
-   centrada no crest (148dp): left=(148-72)/2=38, top=(148-40)/2=54 => cai DENTRO do anel
-   interno r3 (34..114 / 54..94). 'contain' preserva o aspecto (nao distorce/estoura). O
-   nome flat casa a copia pro stage (write_live/baked_cockpit_rml). */
-.mono { position: absolute; top: 54dp; left: 38dp; width: 72dp; height: 40dp;
-  decorator: image( vance_dragon_glyph.png contain ); }
+/* POLISH 2 (veredito do lider: o quadrado escuro do glifo quebrava os circulos): glifo
+   Vetor-Dragao (brasao Vance) recortado em MEDALHAO circular no centro dos aneis. O PNG
+   (677x369) e um plaque QUADRADO centrado num canvas landscape (padding lateral); logo
+   'cover' numa caixa QUADRADA center-cropa exatamente o plaque -> o dragao fica enquadrado
+   e o fundo de pedra vira o disco (medalhao aceito pelo lider). Caixa 64x64dp (quadrada,
+   senao vira elipse) centrada no crest 148dp -> top=left=(148-64)/2=42, cai dentro do anel
+   interno r3 (34..114, diametro 80dp) com ~8dp de folga. RmlUi NAO aceita % em border-radius
+   (so comprimento): metade do box (64/2=32dp) fecha o circulo completo. IMPORTANTE: no RmlUi
+   overflow:hidden recorta os FILHOS, nao o decorator do PROPRIO elemento; entao o .mono e a
+   MASCARA circular (border-radius + overflow:hidden) e o .disc FILHO carrega a imagem, que
+   fica recortada pela mascara. Nome flat casa a copia (write_live/baked_cockpit_rml). */
+.mono { position: absolute; top: 42dp; left: 42dp; width: 64dp; height: 64dp;
+  border-radius: 32dp; overflow: hidden; }
+.mono .disc { width: 64dp; height: 64dp;
+  decorator: image( vance_dragon_glyph.png cover ); }
 #otitle { font-size: 16dp; color: #cfe6ee; }
 #osub { font-size: 10dp; color: #6f8593; margin-top: 2dp; }
 #ostatus { margin-top: 16dp; font-size: 11dp; color: #22D3EE; }
@@ -315,7 +323,7 @@ body { font-family: "Pixel Operator Mono"; background: transparent; }
         <div class="ring r1"></div>
         <div class="ring r2"></div>
         <div class="ring r3"></div>
-        <div class="mono"></div>
+        <div class="mono"><div class="disc"></div></div>
       </div>
       <div id="otitle">GUSWORLD</div>
       <div id="osub">PROTOCOLO DE COMBATE</div>
