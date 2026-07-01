@@ -816,6 +816,21 @@ void battle_mouse_click(BattleScene& scene, float mx, float my, int pw, int ph) 
     if (pw < 1 || ph < 1) {
         return;
     }
+    if (scene.is_choosing_actor()) {
+        // ESCOLHA DE ATOR (§4.1): clique num SLOT da party. MESMA conversao MUNDO/arena do modo-
+        // mira (estica 960x540; Y por ph) -> reusa o hit-test do motor (actor_pick_index_at_arena,
+        // que casa arena_rect_for_actor dos slots da party). Clique unico = ESCOLHE e CONFIRMA o
+        // membro (inicia o turno dele), a mesma filosofia "aciona na hora" do A2.
+        const float wx = mx / static_cast<float>(pw) * 960.0f;
+        const float wy = my / static_cast<float>(ph) * 540.0f;
+        const int idx = scene.actor_pick_index_at_arena(wx, wy);
+        if (idx >= 0) {
+            scene.actor_picker_select(idx);   // poe o cursor no membro clicado
+            scene.actor_picker_confirm();      // clique unico = escolhe E inicia o turno dele
+        }
+        // Fora de qualquer membro elegivel: NO-OP (o picker precede o menu; nao ha o que cancelar).
+        return;
+    }
     if (scene.is_aiming()) {
         // Clique num INIMIGO (mira): coordenadas de MUNDO da arena (estica; Y por ph).
         const float wx = mx / static_cast<float>(pw) * 960.0f;
@@ -850,7 +865,22 @@ void battle_mouse_click(BattleScene& scene, float mx, float my, int pw, int ph) 
 // realce .sel do RCSS e dirigido pelo MOTOR (data-class-sel); um :hover exigiria mexer na RCSS
 // aprovada do cockpit -> fora do escopo A2 (documentado; o CLIQUE no pill ja funciona).
 void battle_mouse_hover(BattleScene& scene, float mx, float my, int pw, int ph) {
-    if (!scene.is_aiming() || pw < 1 || ph < 1) {
+    if (pw < 1 || ph < 1) {
+        return;
+    }
+    // ESCOLHA DE ATOR (§4.1): passar o mouse sobre um SLOT elegivel da party PRE-SELECIONA ele
+    // (move o cursor do picker, SEM confirmar) - o analogo do hover de mira. Checado ANTES da
+    // mira (quando is_choosing_actor(), a mira nem existe). MESMA conversao MUNDO/arena.
+    if (scene.is_choosing_actor()) {
+        const float wx = mx / static_cast<float>(pw) * 960.0f;
+        const float wy = my / static_cast<float>(ph) * 540.0f;
+        const int idx = scene.actor_pick_index_at_arena(wx, wy);
+        if (idx >= 0) {
+            scene.actor_picker_select(idx);  // hover destaca (move o cursor, SEM confirmar)
+        }
+        return;
+    }
+    if (!scene.is_aiming()) {
         return;
     }
     const float wx = mx / static_cast<float>(pw) * 960.0f;
@@ -858,6 +888,108 @@ void battle_mouse_hover(BattleScene& scene, float mx, float my, int pw, int ph) 
     const int idx = scene.aim_index_at_arena(wx, wy);
     if (idx >= 0) {
         scene.aim_select(idx);  // hover destaca (move o cursor de mira, SEM confirmar)
+    }
+}
+
+// Roteamento de TECLADO do host, EXTRAIDO do loop de eventos pra ser CHAMAVEL pelo self-test
+// sintetico (espelha battle_mouse_click, que ja e uma funcao-livre testavel). MESMA ordem e
+// semantica de antes; ADITIVO: a ESCOLHA DE ATOR (§4.1) ganha PRIORIDADE MAXIMA sobre mira/menu,
+// porque quando is_choosing_actor() o menu de verbos nem existe (begin_turn deferido). `running`
+// so vira false no Esc de TOPO (fora de qualquer sub-modo).
+void battle_key_down(BattleScene& scene, SDL_Keycode key, bool& running) {
+    switch (key) {
+        case SDLK_ESCAPE:
+            // MODO-MIRA (§3.5): Esc CANCELA a mira (volta ao menu sem consumir o turno). Na
+            // ESCOLHA DE ATOR (§4.1) NAO ha cancel (o picker precede o menu: sem AP gasto, sem
+            // verbo a desfazer) -> Esc cai no generico (sai do preview), igual ao menu de verbos.
+            // Fora de tudo: Esc sai do preview.
+            if (scene.is_aiming()) {
+                scene.aim_cancel();
+            } else {
+                running = false;
+            }
+            break;
+        // Navegacao vertical. PRIORIDADE: escolha de ator (§4.1) > mira (§3.5) > menu de verbos.
+        // A party e uma COLUNA vertical na arena -> UP/DOWN move o cursor do picker (com WRAP),
+        // a mesma linguagem da mira/menu.
+        case SDLK_UP:
+        case SDLK_W:
+            if (scene.is_choosing_actor()) {
+                scene.actor_picker_move(-1);
+            } else if (scene.is_aiming()) {
+                scene.aim_move(-1);
+            } else {
+                scene.menu_move(-1);
+            }
+            break;
+        case SDLK_DOWN:
+        case SDLK_S:
+            if (scene.is_choosing_actor()) {
+                scene.actor_picker_move(+1);
+            } else if (scene.is_aiming()) {
+                scene.aim_move(+1);
+            } else {
+                scene.menu_move(+1);
+            }
+            break;
+        // LEFT/RIGHT: aliases horizontais de navegacao na escolha de ator (§4.1) e na mira
+        // (§3.5). Fora desses modos, sem efeito (o menu de verbos e vertical).
+        case SDLK_LEFT:
+            if (scene.is_choosing_actor()) {
+                scene.actor_picker_move(-1);
+            } else if (scene.is_aiming()) {
+                scene.aim_move(-1);
+            }
+            break;
+        case SDLK_RIGHT:
+            if (scene.is_choosing_actor()) {
+                scene.actor_picker_move(+1);
+            } else if (scene.is_aiming()) {
+                scene.aim_move(+1);
+            }
+            break;
+        // TECLAS-ATALHO 1/2/3 (ESCOLHA DE ATOR, §4.1, pedido do lider): escolhem DIRETO o
+        // 1o/2o/3o membro elegivel (1-based) e CONFIRMAM na hora (sem Enter). Numpad idem.
+        // actor_picker_hotkey ja e NO-OP fora do modo (guarda interna) -> mapeamento SEGURO
+        // mesmo com o picker fechado; nao colide com outros modos (nada mais usa 1/2/3).
+        case SDLK_1:
+        case SDLK_KP_1:
+            scene.actor_picker_hotkey(1);
+            break;
+        case SDLK_2:
+        case SDLK_KP_2:
+            scene.actor_picker_hotkey(2);
+            break;
+        case SDLK_3:
+        case SDLK_KP_3:
+            scene.actor_picker_hotkey(3);
+            break;
+        case SDLK_RETURN:
+        case SDLK_KP_ENTER:  // Enter do numpad tambem confirma
+        case SDLK_SPACE:
+            // ABERTURA (lider 2026-06-25): na tela "BATALHA!" parada, Enter ENCARA. Depois, por
+            // PRIORIDADE: ESCOLHA DE ATOR (§4.1) confirma o membro sob o cursor -> inicia o turno
+            // dele; MODO-MIRA (§3.5) confirma o ALVO (resolve); vez do jogador (menu) confirma o
+            // verbo (Atacar/Scan ENTRAM na mira). Fora disso, ACELERA o ritmo.
+            if (scene.is_intro()) {
+                scene.start_combat();  // Encarar
+            } else if (scene.is_choosing_actor()) {
+                scene.actor_picker_confirm();  // confirma o membro escolhido -> comeca o turno
+            } else if (scene.is_aiming()) {
+                scene.aim_confirm();  // confirma o alvo mirado
+            } else if (scene.waiting_player_input()) {
+                scene.menu_confirm();  // Atacar/Scan -> abre a mira
+            } else {
+                scene.skip();
+            }
+            break;
+        case SDLK_Q:
+            // "[Q] Resolver sem encarar" (verbo OPT-IN, so TRASH na abertura). Placeholder
+            // neste incremento: a cena loga "[auto-resolve: a implementar]".
+            scene.request_auto_resolve();
+            break;
+        default:
+            break;
     }
 }
 
@@ -1363,6 +1495,122 @@ int run_battle_preview() {
             running = false;
         }
 
+        // DIAGNOSTICO/PROVA (Escolha de ator, §4.1): GUSWORLD_BATTLE_ACTOR_SELFTEST=1 dirige uma
+        // cena FRESCA ate a vez do BLOCO da party (onde is_choosing_actor()==true) e injeta INPUT
+        // SINTETICO pelo MESMO roteamento do host (battle_key_down / battle_mouse_click), pra
+        // PROVAR o wiring sem input fisico (dificil de simular em captura estatica):
+        //   (A) SETA (battle_key_down DOWN) MOVE o cursor do picker (SEM confirmar);
+        //   (B) CLIQUE no slot de um membro (battle_mouse_click) ESCOLHE e CONFIRMA aquele membro;
+        //   (C) TECLA 1/2/3 (battle_key_down) escolhe e CONFIRMA o n-esimo membro na hora.
+        // Cada proof usa sua PROPRIA BattleScene (o confirm consome o modo). So diagnostico:
+        // dirige pela MESMA API publica do host; nao muda o motor nem o render.
+        const bool actor_selftest = [] {
+            const char* e = std::getenv("GUSWORLD_BATTLE_ACTOR_SELFTEST");
+            return e != nullptr && e[0] == '1';
+        }();
+        if (actor_selftest) {
+            // Assenta uma cena ate o picker abrir (party-block com >1 elegivel). skip()+update()
+            // avancam os beats de inimigo/anuncio; NADA auto-confirma o picker -> para no modo.
+            auto drive_to_picker = [](BattleScene& s) {
+                if (s.is_intro()) {
+                    s.start_combat();
+                }
+                for (int i = 0; i < 600 && !s.combat_over() && !s.is_choosing_actor(); ++i) {
+                    s.skip();
+                    s.update(1.0f / 60.0f);
+                }
+            };
+            // id do i-esimo elegivel (0-based) na escolha corrente; "?" fora de faixa.
+            auto choice_id = [](const BattleScene& s, int i) -> std::string {
+                const auto cs = s.actor_choices();
+                return (i >= 0 && i < static_cast<int>(cs.size()) &&
+                        cs[static_cast<std::size_t>(i)] != nullptr)
+                           ? cs[static_cast<std::size_t>(i)]->id()
+                           : std::string("?");
+            };
+
+            // ---- (A) SETA move o cursor do picker (NAO confirma) ----
+            {
+                BattleScene sa;
+                drive_to_picker(sa);
+                bool dummy = true;
+                const int n = sa.actor_pick_count();
+                const std::string c0 =
+                    sa.actor_pick_target() != nullptr ? sa.actor_pick_target()->id() : "?";
+                battle_key_down(sa, SDLK_DOWN, dummy);  // roteamento real do host
+                const std::string c1 =
+                    sa.actor_pick_target() != nullptr ? sa.actor_pick_target()->id() : "?";
+                const bool ok = sa.is_choosing_actor() && (n < 2 || c0 != c1);
+                std::cout << "BattlePreview: [actor-selftest] (A seta) choosing="
+                          << sa.is_choosing_actor() << " elegiveis=" << n << " cursor: " << c0
+                          << " --[DOWN]--> " << c1 << "  " << (ok ? "OK" : "FALHA")
+                          << (n < 2 ? " (n<2: sem 2o alvo p/ mover)" : "") << "\n";
+            }
+
+            // ---- (B) CLIQUE no slot de um membro ESCOLHE + CONFIRMA ----
+            {
+                BattleScene sb;
+                drive_to_picker(sb);
+                const int want_idx =
+                    sb.actor_pick_count() >= 2 ? 1 : 0;  // 2o elegivel (NAO o pre-selecionado)
+                const std::string want_id = choice_id(sb, want_idx);
+                const gus::app::screens::ArenaLayout arena = gus::app::screens::arena_layout(
+                    sb.party_count(), sb.enemy_count(), sb.gus_party_index());
+                // Acha o SLOT da party cujo centro casa o elegivel want_idx pelo MESMO hit-test do
+                // host (actor_pick_index_at_arena) -> nao presume o mapeamento slot->elegivel.
+                float pxc = -1.0f, pyc = -1.0f, wcx = -1.0f, wcy = -1.0f;
+                for (int k = 0; k < sb.party_count(); ++k) {
+                    const gus::core::spatial::Rect r =
+                        arena.party[static_cast<std::size_t>(k)].rect;
+                    const float cx = r.x + r.w * 0.5f, cy = r.y + r.h * 0.5f;
+                    if (sb.actor_pick_index_at_arena(cx, cy) == want_idx) {
+                        wcx = cx;
+                        wcy = cy;
+                        pxc = cx / 960.0f * static_cast<float>(pw0);
+                        pyc = cy / 540.0f * static_cast<float>(ph0);
+                        break;
+                    }
+                }
+                if (pxc >= 0.0f) {
+                    battle_mouse_click(sb, pxc, pyc, pw0, ph0);  // roteamento real do host
+                    const std::string got =
+                        sb.active_actor() != nullptr ? sb.active_actor()->id() : "?";
+                    const bool ok = !sb.is_choosing_actor() && got == want_id;
+                    std::cout << "BattlePreview: [actor-selftest] (B clique) elegivel#" << want_idx
+                              << "=" << want_id << " world(" << wcx << "," << wcy << ") px(" << pxc
+                              << "," << pyc << ") -> choosing=" << sb.is_choosing_actor()
+                              << " ator_ativo=" << got << "  "
+                              << (ok ? "OK (escolheu+confirmou)" : "FALHA") << "\n";
+                } else {
+                    std::cout << "BattlePreview: [actor-selftest] (B clique) FALHA: nenhum slot "
+                                 "casou o elegivel #"
+                              << want_idx << " (choosing=" << sb.is_choosing_actor()
+                              << " elegiveis=" << sb.actor_pick_count() << ")\n";
+                }
+            }
+
+            // ---- (C) TECLA 1/2/3 escolhe + CONFIRMA na hora ----
+            {
+                BattleScene sc;
+                drive_to_picker(sc);
+                const int nth = sc.actor_pick_count() >= 2 ? 2 : 1;  // 2a hotkey se houver
+                const std::string want_id = choice_id(sc, nth - 1);
+                const SDL_Keycode kc = nth == 1 ? SDLK_1 : (nth == 2 ? SDLK_2 : SDLK_3);
+                bool dummy = true;
+                battle_key_down(sc, kc, dummy);  // roteamento real -> actor_picker_hotkey(nth)
+                const std::string got =
+                    sc.active_actor() != nullptr ? sc.active_actor()->id() : "?";
+                const bool ok = !sc.is_choosing_actor() && got == want_id;
+                std::cout << "BattlePreview: [actor-selftest] (C tecla " << nth << ") elegivel#"
+                          << (nth - 1) << "=" << want_id << " -> choosing=" << sc.is_choosing_actor()
+                          << " ator_ativo=" << got << "  "
+                          << (ok ? "OK (escolheu+confirmou)" : "FALHA") << "\n";
+            }
+
+            std::cout << "BattlePreview: [actor-selftest] concluido; encerrando.\n";
+            running = false;
+        }
+
         while (running) {
             SDL_Event ev;
             while (SDL_PollEvent(&ev)) {
@@ -1390,76 +1638,10 @@ int run_battle_preview() {
                 if (ev.type == SDL_EVENT_QUIT) {
                     running = false;
                 } else if (ev.type == SDL_EVENT_KEY_DOWN) {
-                    switch (ev.key.key) {
-                        case SDLK_ESCAPE:
-                            // MODO-MIRA (§3.5): Esc CANCELA a mira (volta ao menu de verbos
-                            // sem consumir o turno). Fora da mira: Esc sai do preview.
-                            if (scene.is_aiming()) {
-                                scene.aim_cancel();
-                            } else {
-                                running = false;
-                            }
-                            break;
-                        // Navegacao do menu de verbos (incremento 3). So opera no turno
-                        // de jogador (a cena ignora fora dele); a cena auto-encadeia os
-                        // turnos de inimigo ate o proximo turno de jogador ou o fim. No
-                        // MODO-MIRA (§3.5), UP/DOWN navegam os INIMIGOS (coluna vertical da
-                        // arena), nao os verbos.
-                        case SDLK_UP:
-                        case SDLK_W:
-                            if (scene.is_aiming()) {
-                                scene.aim_move(-1);
-                            } else {
-                                scene.menu_move(-1);
-                            }
-                            break;
-                        case SDLK_DOWN:
-                        case SDLK_S:
-                            if (scene.is_aiming()) {
-                                scene.aim_move(+1);
-                            } else {
-                                scene.menu_move(+1);
-                            }
-                            break;
-                        // LEFT/RIGHT: aliases de navegacao SO no modo-mira (setas
-                        // horizontais tambem servem pra alternar o alvo). Fora da mira,
-                        // sem efeito (o menu de verbos e vertical).
-                        case SDLK_LEFT:
-                            if (scene.is_aiming()) {
-                                scene.aim_move(-1);
-                            }
-                            break;
-                        case SDLK_RIGHT:
-                            if (scene.is_aiming()) {
-                                scene.aim_move(+1);
-                            }
-                            break;
-                        case SDLK_RETURN:
-                        case SDLK_KP_ENTER:  // Enter do numpad tambem confirma
-                        case SDLK_SPACE:
-                            // ABERTURA (lider 2026-06-25): na tela "BATALHA!" parada,
-                            // Enter ENCARA e comeca o combate. No MODO-MIRA (§3.5), confirma
-                            // o ALVO mirado (resolve). Na vez do jogador (menu), confirma o
-                            // verbo (Atacar/Scan ENTRAM na mira). Fora disso, ACELERA o ritmo.
-                            if (scene.is_intro()) {
-                                scene.start_combat();  // Encarar
-                            } else if (scene.is_aiming()) {
-                                scene.aim_confirm();  // confirma o alvo mirado
-                            } else if (scene.waiting_player_input()) {
-                                scene.menu_confirm();  // Atacar/Scan -> abre a mira
-                            } else {
-                                scene.skip();
-                            }
-                            break;
-                        case SDLK_Q:
-                            // "[Q] Resolver sem encarar" (verbo OPT-IN, so TRASH na
-                            // abertura). Placeholder neste incremento: a cena loga
-                            // "[auto-resolve: a implementar]" e nao faz nada destrutivo.
-                            scene.request_auto_resolve();
-                            break;
-                        default:
-                            break;
-                    }
+                    // Roteamento de teclado EXTRAIDO pra battle_key_down (funcao-livre, testavel
+                    // pelo self-test sintetico; espelha battle_mouse_click). Cobre menu de verbos,
+                    // MODO-MIRA (§3.5), ESCOLHA DE ATOR (§4.1, prioridade + teclas 1/2/3) e Esc.
+                    battle_key_down(scene, ev.key.key, running);
                 } else if (ev.type == SDL_EVENT_MOUSE_BUTTON_DOWN &&
                            ev.button.button == SDL_BUTTON_LEFT) {
                     // MOUSE (A2): clique ESQUERDO aciona verbo (menu) ou alvo (mira). ADITIVO
