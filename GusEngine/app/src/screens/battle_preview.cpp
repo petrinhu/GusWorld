@@ -1349,6 +1349,11 @@ int run_battle_preview() {
                         break;
                     }
                     if (scene.waiting_player_input()) {
+                        // W1 item 4: a vez da party abre no PICKER (§4.1); confirma o
+                        // pre-selecionado pra chegar ao menu de verbos e seguir o pump.
+                        if (scene.is_choosing_actor()) {
+                            scene.actor_picker_confirm();
+                        }
                         for (int k = 0; k < 8 &&
                                         scene.menu().selected_verb() != BattleVerb::Atacar;
                              ++k) {
@@ -1391,6 +1396,10 @@ int run_battle_preview() {
                  ++i) {
                 scene.skip();
                 scene.update(1.0f / 60.0f);
+            }
+            // W1 item 4: atravessa o PICKER de ator (§4.1) pra chegar ao menu de verbos.
+            if (scene.is_choosing_actor()) {
+                scene.actor_picker_confirm();
             }
             if (scene.waiting_player_input() && !scene.is_aiming()) {
                 for (int k = 0; k < 8 &&
@@ -1455,6 +1464,10 @@ int run_battle_preview() {
                 scene.skip();
                 scene.update(1.0f / 60.0f);
             }
+            // W1 item 4: atravessa o PICKER de ator (§4.1) pra chegar ao menu de verbos.
+            if (scene.is_choosing_actor()) {
+                scene.actor_picker_confirm();
+            }
             if (scene.waiting_player_input() && !scene.is_aiming()) {
                 for (int k = 0; k < 8 &&
                                 scene.menu().selected_verb() != BattleVerb::Atacar;
@@ -1493,6 +1506,12 @@ int run_battle_preview() {
                  ++i) {
                 scene.skip();
                 scene.update(1.0f / 60.0f);
+            }
+            // W1 item 4: a 1a vez da party agora ABRE no PICKER de ator (§4.1) antes do menu
+            // de verbos. Este diagnostico (pre-picker) espera o MENU: atravessa o picker
+            // confirmando o pre-selecionado (maior SPD) pra chegar ao menu, como antes.
+            if (scene.is_choosing_actor()) {
+                scene.actor_picker_confirm();
             }
             std::cout << "BattlePreview: [mouse-selftest] pw0xph0=" << pw0 << "x" << ph0
                       << " dp_ratio=" << dpr
