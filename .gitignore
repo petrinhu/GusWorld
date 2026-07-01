@@ -73,3 +73,10 @@ resources/gus_baby/
 
 # Manual privado dos easter eggs (NUNCA publicar: mata o segredo)
 docs/_secret/
+
+# Excecao: o glyph do brasao (medalhao do cockpit) e versionado (asset de jogo,
+# usado pelo brasao da BattleScreen). resources/images/ segue ignorado no resto
+# (modelo IDrive). Padrao: un-ignore dir -> re-ignore conteudo -> un-ignore o arquivo.
+!resources/images/
+resources/images/*
+!resources/images/vance_dragon_glyph.png
