@@ -20,12 +20,8 @@ add_executable(gusengine_platform_tests
     font_atlas_test.cpp
 )
 
-# Testes do HUD RmlUi VENDORIZADO (RmlUiHud): so no build OFF (default). No build
-# GUSWORLD_GLINTFX=ON o rmlui_hud.cpp nao e compilado (ADR-010 R-dup-backend), entao
-# o RmlUiHud nao existe pra testar - estes 4 TEST_CASE saem junto (a suite OFF segue 1021).
-if(NOT GUSWORLD_GLINTFX)
-    target_sources(gusengine_platform_tests PRIVATE rmlui_hud_test.cpp)
-endif()
+# ADR-010 F3: os testes do HUD RmlUi VENDORIZADO (rmlui_hud_test.cpp, 4 TEST_CASE) foram
+# aposentados junto do backend vendorizado - o glintfx e o unico motor de UI/HUD agora.
 
 target_link_libraries(gusengine_platform_tests
     PRIVATE

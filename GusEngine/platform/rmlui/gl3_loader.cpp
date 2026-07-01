@@ -3,18 +3,17 @@
 // Ver header. Carrega o glad (GL 3.3 core) via gladLoadGL, usando o loader de
 // proc-address da casca.
 //
-// DONO DO GLAD (ADR-010 R-dup-backend): o glad e header-only e precisa de UMA TU que defina
-// GLAD_GL_IMPLEMENTATION na lib gusengine_platform.
-//  - Build OFF (default): a impl vive no RmlUi_Renderer_GL3.cpp (backend vendorizado); aqui
-//    entram so as DECLARACOES (GLAD_API_CALL extern, resolvido no link com aquela TU).
-//  - Build GUSWORLD_GLINTFX=ON: o RmlUi_Renderer_GL3.cpp vendorizado NAO e compilado, mas a
-//    ARENA (render2d_gl3) e este loader ainda usam o glad. Como este gl3_loader fica nos DOIS
-//    builds, ele assume a IMPLEMENTACAO (CMake passa GUSWORLD_OWN_GLAD_IMPL no ON). O glintfx
-//    usa gl3w (tabela PROPRIA), entao nao ha conflito de simbolos GL.
+// DONO DO GLAD (ADR-010 F3): o glad e header-only e precisa de UMA TU que defina
+// GLAD_GL_IMPLEMENTATION na lib gusengine_platform. Antes o dono era o RmlUi_Renderer_GL3.cpp
+// vendorizado; com o backend RmlUi aposentado (F3), este gl3_loader.cpp - o loader GL da
+// ARENA (Render2dGl3), que fica SEMPRE - assume a IMPLEMENTACAO (o CMake passa sempre
+// GUSWORLD_OWN_GLAD_IMPL). O glintfx (motor de UI) usa gl3w (tabela de ponteiros PROPRIA),
+// independente do glad, entao nao ha conflito de simbolos GL.
 
 #include "gus/platform/rmlui/gl3_loader.hpp"
 
-// Declaracoes do glad (+ impl quando este loader e o dono - ver bloco acima).
+// Impl do glad (este loader e o dono unico - ver bloco acima). GUSWORLD_OWN_GLAD_IMPL vem
+// sempre do CMake; o #ifdef fica como cinto de seguranca caso a macro suma.
 #ifdef GUSWORLD_OWN_GLAD_IMPL
 #define GLAD_GL_IMPLEMENTATION
 #endif

@@ -65,13 +65,10 @@ target_link_libraries(gusengine_app
 
 target_compile_features(gusengine_app PUBLIC cxx_std_20)
 
-# ADR-010 F1: caminho glintfx::UiLayer (embed mode) atras do flag GUSWORLD_GLINTFX.
-# Linkado SO aqui em app/ (GATE de 4 camadas: nunca core/ nem domain/). Define a macro
-# GUSWORLD_GLINTFX pro #ifdef no battle_preview.cpp. Default OFF => nada disto entra.
-if(GUSWORLD_GLINTFX)
-    target_link_libraries(gusengine_app PRIVATE glintfx::glintfx)
-    target_compile_definitions(gusengine_app PRIVATE GUSWORLD_GLINTFX=1)
-endif()
+# ADR-010 F3: glintfx::UiLayer (embed mode) e o UNICO motor de UI/HUD. Linkado SEMPRE, SO
+# aqui em app/ (GATE de 4 camadas: nunca core/ nem domain/). Sem flag - o backend RmlUi
+# vendorizado foi aposentado (two-way door via historico git).
+target_link_libraries(gusengine_app PRIVATE glintfx::glintfx)
 
 # --- executavel ---
 add_executable(gusworld_app

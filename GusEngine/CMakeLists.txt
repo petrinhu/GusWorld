@@ -74,10 +74,9 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(RmlUi)
 
-# --- glintfx (ADR-010 F1+: motor de UI/HUD via EMBED mode, glintfx::UiLayer). Compilado
-#     SOMENTE quando GUSWORLD_GLINTFX=ON. Default OFF => binario do caminho VENDORIZADO
-#     (RmlUiHud), byte-a-byte o de hoje; sem <glintfx no include path, sem FetchContent dele.
-#     two-way door (ADR-010): o caminho vendorizado NAO e removido (isso e F3).
+# --- glintfx (ADR-010 F3: UNICO motor de UI/HUD via EMBED mode, glintfx::UiLayer). Compilado
+#     e linkado SEMPRE (o backend RmlUi vendorizado foi aposentado neste F3). Sem CMake option:
+#     nao ha mais caminho alternativo. two-way door via historico git.
 #
 #     GLINTFX_BACKEND_GLFW=OFF (FORCE, ANTES do FetchContent) => embed-only: o glintfx NAO
 #     chama find_package(glfw3), NAO linka glfw e NAO compila App/window_glfw/RmlUi_Platform_GLFW.
@@ -86,21 +85,17 @@ FetchContent_MakeAvailable(RmlUi)
 #     por nome: o RmlUi do GusEngine (declarado PRIMEIRO) vence e o glintfx o reusa (sem conflito
 #     de versao). Por isso este bloco vem DEPOIS do MakeAvailable(RmlUi) de proposito.
 #     Linkado SO em app/ (GATE de 4 camadas: nunca core/ nem domain/).
-option(GUSWORLD_GLINTFX "Compila o caminho glintfx::UiLayer (ADR-010 F1+, embed mode)" OFF)
-if(GUSWORLD_GLINTFX)
-    set(GLINTFX_BACKEND_GLFW OFF CACHE BOOL "" FORCE)  # embed-only (sem GLFW)
-    # SOURCE_SUBDIR glintfx: no layout v0.2.1 o CMakeLists.txt do projeto vive no subdir
-    # glintfx/ (a raiz do repo NAO tem CMakeLists.txt); e o que o consumer-example oficial
-    # do glintfx aponta (SOURCE_DIR .../glintfx). Sem isto, MakeAvailable popula mas NAO
-    # adiciona o subdir => alvo glintfx::glintfx nao existe.
-    FetchContent_Declare(
-        glintfx
-        GIT_REPOSITORY https://codeberg.org/petrinhu/glintfx
-        GIT_TAG        v0.2.4
-        SOURCE_SUBDIR  glintfx
-    )
-    FetchContent_MakeAvailable(glintfx)
-endif()
+set(GLINTFX_BACKEND_GLFW OFF CACHE BOOL "" FORCE)  # embed-only (sem GLFW)
+# SOURCE_SUBDIR glintfx: o CMakeLists.txt do projeto vive no subdir glintfx/ (a raiz do repo
+# NAO tem CMakeLists.txt); e o que o consumer-example oficial do glintfx aponta. Sem isto,
+# MakeAvailable popula mas NAO adiciona o subdir => alvo glintfx::glintfx nao existe.
+FetchContent_Declare(
+    glintfx
+    GIT_REPOSITORY https://codeberg.org/petrinhu/glintfx
+    GIT_TAG        v0.2.4
+    SOURCE_SUBDIR  glintfx
+)
+FetchContent_MakeAvailable(glintfx)
 
 # --- Testes (Catch2 v3). core/+domain/+platform/+app/ testados headless. ---
 include(CTest)        # define BUILD_TESTING (ON por padrao)

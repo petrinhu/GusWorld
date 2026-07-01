@@ -22,9 +22,9 @@
 // chamada (nao ha contexto no CI); todos os draws viram no-op contabilizado e
 // load_texture devolve kInvalidTexture. Prova que a cadeia monta e roda sem GPU.
 //
-// O .cpp inclui o loader glad (via RmlUi_Include_GL3.h, ja vendorizado) e e a UNICA outra
-// TU (alem do RmlUi_Renderer_GL3) que toca GL. O HEADER permanece limpo (sem GL nem SDL):
-// app/ ve so a interface IRenderer.
+// O .cpp inclui o loader glad (via RmlUi_Include_GL3.h) e, junto do gl3_loader.cpp (dono da
+// impl do glad, ADR-010 F3), e uma das TUs que tocam GL. O HEADER permanece limpo (sem GL
+// nem SDL): app/ ve so a interface IRenderer.
 
 #ifndef GUS_PLATFORM_RENDER2D_RENDER2D_GL3_HPP
 #define GUS_PLATFORM_RENDER2D_RENDER2D_GL3_HPP

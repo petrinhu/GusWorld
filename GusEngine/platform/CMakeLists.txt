@@ -22,37 +22,20 @@ add_library(gusengine_platform STATIC
     # mesmo contexto GL. Mesma API IRenderer do Render2dSdl (a arena/testes nao mudam).
     src/render2d/render2d_gl3.cpp
     # Loader GL (glad) da ARENA (Render2dGl3): gl3_load_functions + gl3_read_backbuffer.
-    # NAO e backend de RmlUi; a arena precisa dele nos DOIS builds (OFF e ON) => fica SEMPRE.
+    # NAO e backend de RmlUi; a arena precisa dele SEMPRE => fica.
     rmlui/gl3_loader.cpp
 )
 
-# --- RmlUi VENDORIZADO (ADR-009): backend GL3 oficial + sistema SDL3 + wrapper. SO no build
-#     OFF (default). ADR-010 R-dup-backend (decisao do lider, Opcao 2): quando
-#     GUSWORLD_GLINTFX=ON, o backend do glintfx assume e estes TUs NAO entram - assim o
-#     RmlUi_Renderer_GL3 deixa de ficar DUPLICADO (uma copia nossa + a do glintfx, que so
-#     linkavam por ordem de link, fragil). No ON nao ha caminho de HUD vendorizado em runtime
-#     (o fallback do caminho antigo passa a ser BUILDAR COM GUSWORLD_GLINTFX=OFF).
-#       RmlUi_Renderer_GL3.cpp -> backend GL3 (shaders gradiente/box-shadow/blur/mask) E dono
-#                                 do GLAD_GL_IMPLEMENTATION (a impl do glad da arena vive aqui).
-#       RmlUi_Platform_SDL.cpp -> sistema/eventos SDL3 do HUD vendorizado (so deste caminho).
-#       rmlui_hud.cpp          -> wrapper PImpl que dirige o RmlUi via RenderInterface_GL3.
-#     Confinado a platform/rmlui/ (com app/); core/+domain/ nao tocam (GATE).
-if(NOT GUSWORLD_GLINTFX)
-    target_sources(gusengine_platform PRIVATE
-        rmlui/RmlUi_Renderer_GL3.cpp
-        rmlui/RmlUi_Platform_SDL.cpp
-        rmlui/rmlui_hud.cpp
-    )
-else()
-    # ON: o RmlUi_Renderer_GL3 vendorizado SAIU - e era o dono do GLAD_GL_IMPLEMENTATION. A
-    # arena (render2d_gl3) e o gl3_loader ainda usam o glad => o gl3_loader (que fica nos dois
-    # builds) assume a IMPLEMENTACAO do glad (antes incluia so as declaracoes). O glintfx usa
-    # gl3w (tabela de ponteiros PROPRIA), entao nao ha conflito de simbolos GL.
-    target_compile_definitions(gusengine_platform PRIVATE GUSWORLD_OWN_GLAD_IMPL=1)
-endif()
+# ADR-010 F3: o backend RmlUi vendorizado (RmlUi_Renderer_GL3.cpp / RmlUi_Platform_SDL.cpp /
+# rmlui_hud.cpp) foi APOSENTADO - o glintfx (linkado em app/) provê o RenderInterface_GL3. O
+# RmlUi_Renderer_GL3 vendorizado era o dono do GLAD_GL_IMPLEMENTATION; como ele saiu, o
+# gl3_loader.cpp (loader da arena, que fica SEMPRE) assume a IMPLEMENTACAO do glad via
+# GUSWORLD_OWN_GLAD_IMPL (antes incluia so as declaracoes). O glintfx usa gl3w (tabela de
+# ponteiros PROPRIA), entao nao ha conflito de simbolos GL.
+target_compile_definitions(gusengine_platform PRIVATE GUSWORLD_OWN_GLAD_IMPL=1)
 
-# OpenGL do sistema (libGL): o backend GL3 do RmlUi e o Render2dGl3 linkam GL. O glad
-# (loader header-only) ja vem com o RmlUi_Include_GL3.h; so o link de GL e necessario.
+# OpenGL do sistema (libGL): o Render2dGl3 (arena) linka GL. O glad (loader header-only) ja
+# vem com o RmlUi_Include_GL3.h; so o link de GL e necessario.
 find_package(OpenGL REQUIRED)
 
 target_include_directories(gusengine_platform
@@ -61,35 +44,33 @@ target_include_directories(gusengine_platform
     # fonte (font_atlas) no Render2dSdl; tambem o LoadTexture do backend RmlUi (PATCH
     # GUSWORLD usa stb_image em vez de SDL_image).
     PRIVATE ${CMAKE_SOURCE_DIR}/third_party/stb
-    # Headers vendorizados do backend SDL3 do RmlUi (RmlUi_Renderer_SDL.h /
-    # RmlUi_Platform_SDL.h), incluidos pelo wrapper rmlui_hud.cpp.
+    # Header do loader glad (RmlUi_Include_GL3.h), incluido pelo gl3_loader.cpp e pelo
+    # Render2dGl3 (arena). ADR-010 F3: o unico consumidor deste dir e a ARENA (o backend
+    # RmlUi vendorizado, que tambem o usava, foi aposentado).
     PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/rmlui
 )
 
 # Pasta dos assets de fonte da engine (.ttf embarcados no repo, dentro de assets/fonts/).
 # Embutida em compilacao pra o resolver achar a fonte rodando do build dir; override em
 # runtime via env GUSWORLD_ASSETS (mesma logica do resolver de mapas/sprites).
-# GUSWORLD_FONTS_DIR e usado tanto pelo font_atlas (Render2dSdl) quanto pelo RmlUiHud
-# (FreeType carrega a Pixel Operator Mono daqui).
-# RMLUI_SDL_VERSION_MAJOR=3: o backend oficial e generico SDL2/SDL3 e seleciona o caminho
-# SDL3 por esta macro (ver RmlUi_Renderer_SDL.h / RmlUi_Platform_SDL.h).
+# GUSWORLD_FONTS_DIR e usado pelo font_atlas (Render2dSdl); o glintfx (app/) carrega a Pixel
+# Operator Mono via @font-face no RCSS a partir da mesma pasta.
 target_compile_definitions(gusengine_platform
     PRIVATE GUSWORLD_FONTS_DIR="${CMAKE_SOURCE_DIR}/assets/fonts"
-    PRIVATE RMLUI_SDL_VERSION_MAJOR=3
 )
 
-# domain/ entra aqui: input_mapper/sdl_input consomem o mapa logico puro. SDL3 e a
-# camada de plataforma. SDL3::SDL3 e o target estatico vindo do FetchContent. RmlUi::RmlUi
-# entra aqui (UI/HUD, ADR-009): o wrapper rmlui_hud + o backend vendorizado linkam o nucleo
-# do RmlUi (que ja puxa o FreeType do sistema via find_package na config raiz).
+# domain/ entra aqui: input_mapper/sdl_input consomem o mapa logico puro. SDL3 e a camada de
+# plataforma. SDL3::SDL3 e o target estatico vindo do FetchContent. RmlUi::RmlUi entra aqui
+# porque o header do loader glad (RmlUi_Include_GL3.h) vive na arvore do RmlUi; o glintfx
+# (app/) e quem linka o nucleo do RmlUi de fato (ADR-010 F3).
 target_link_libraries(gusengine_platform
     PUBLIC
         gusengine_core
         gusengine_domain
         SDL3::SDL3
         RmlUi::RmlUi
-        # OpenGL do sistema: backend GL3 do RmlUi + Render2dGl3. PUBLIC porque o backend
-        # vendorizado (compilado neste alvo) expoe simbolos GL que o app tambem resolve.
+        # OpenGL do sistema: Render2dGl3 (arena). PUBLIC porque o gl3_loader (dono do glad
+        # neste alvo) expoe simbolos GL que o app tambem resolve.
         OpenGL::GL
 )
 

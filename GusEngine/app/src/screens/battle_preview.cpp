@@ -21,18 +21,15 @@
 #include "gus/domain/combat/combat_enums.hpp"  // StatusId
 #include "gus/platform/render2d/render2d_gl3.hpp"  // ADR-009 GL3: backend OpenGL da arena
 #include "gus/platform/rmlui/gl3_loader.hpp"  // glad load + read_backbuffer (captura)
-#include "gus/platform/rmlui/rmlui_hud.hpp"  // ADR-009: HUD RmlUi-GL3 sobre a arena
 
-// ADR-010 F1 SMOKE: caminho glintfx::UiLayer (embed mode), atras do flag de compilacao
-// GUSWORLD_GLINTFX (default OFF => nada disto compila; binario = caminho vendorizado).
-// De-risk do embed mode ANTES do cockpit; two-way door, runtime gate GUSWORLD_UI_BACKEND.
-#ifdef GUSWORLD_GLINTFX
-#include <filesystem>  // tempfile do RML trivial (load() do glintfx exige um path)
+// ADR-010 F3: glintfx::UiLayer (embed mode) e o UNICO motor de UI/HUD - o backend RmlUi
+// vendorizado (RmlUiHud) foi aposentado. Compilado e linkado SEMPRE (app/ linka
+// glintfx::glintfx incondicional). A arena (Render2dGl3) e o gl3_loader continuam.
+#include <filesystem>  // tempfile do RML (load() do glintfx exige um path)
 #include <fstream>
 #include <optional>
 #include <glintfx/ui_event.hpp>
 #include <glintfx/ui_layer.hpp>
-#endif
 
 // stb_image_write: captura de frame (PNG) para o SMOKE VISUAL do ADR-009 (comparar o
 // jogo com o mock). IMPLEMENTACAO definida UMA vez aqui (camada app/, fora do hot path).
@@ -359,49 +356,6 @@ body { font-family: "Pixel Operator Mono"; background: transparent; }
     return rml;
 }
 
-// DIAGNOSTICO DE EFEITOS (#1): doc com efeitos MAXIMAMENTE OBVIOS pra provar se os
-// shaders de gradiente/box-shadow/radial chegam a tela. Cores de alto contraste (vermelho
-// -> azul, glow magenta forte). Se ISTO renderizar flat, o problema e o pipeline GL3.
-std::string load_fxtest_rml() {
-    return R"RML(<rml>
-<head>
-<style>
-  body { font-family: "Pixel Operator Mono"; background: transparent; }
-  #grad {
-    position: absolute; top: 40dp; left: 40dp; width: 300dp; height: 120dp;
-    decorator: vertical-gradient( #ff2244 #2244ff );  /* vermelho -> azul (obvio) */
-    border-radius: 16dp;
-  }
-  #shadow {
-    position: absolute; top: 200dp; left: 40dp; width: 300dp; height: 80dp;
-    background-color: #222244;
-    border-radius: 12dp;
-    box-shadow: #ff00ff 0dp 0dp 40dp 8dp;  /* glow magenta FORTE e largo */
-  }
-  #radial {
-    position: absolute; top: 320dp; left: 40dp; width: 120dp; height: 120dp;
-    decorator: radial-gradient( circle closest-side, #ffff00, #ff0000 );  /* amarelo->vermelho */
-    border-radius: 60dp;
-  }
-  #lin {
-    position: absolute; top: 320dp; left: 200dp; width: 200dp; height: 120dp;
-    decorator: horizontal-gradient( #00ff88 #8800ff );
-    border-radius: 12dp;
-  }
-  #txt { position: absolute; top: 470dp; left: 40dp; font-size: 16dp; color: #ffffff; }
-</style>
-</head>
-<body>
-  <div id="grad"></div>
-  <div id="shadow"></div>
-  <div id="radial"></div>
-  <div id="lin"></div>
-  <div id="txt">FXTEST: gradiente(V) | box-shadow magenta | radial | gradiente(H)</div>
-</body>
-</rml>
-)RML";
-}
-
 }  // namespace
 
 std::string resolve_retratos_dir() {
@@ -416,7 +370,6 @@ std::string resolve_intent_icons_dir() {
     return resolve_asset_dir(gus::core::assets::kIntentIconsDir);
 }
 
-#ifdef GUSWORLD_GLINTFX
 // ADR-010 F2b RETRATO-VIVO: nome FLAT do retrato da MOLDURA do cockpit para o ator ATIVO.
 // O retrato segue o ator (motor = autoridade): inimigo -> retrato_inimigo.png (a MESMA
 // cabeca generica que a fila CTB / coluna usa pros inimigos, via retrato_file_for); party
@@ -791,7 +744,6 @@ bool sdl_to_glintfx(const SDL_Event& ev, SDL_Window* window, glintfx::UiEvent* o
     *out = e;
     return true;
 }
-#endif  // GUSWORLD_GLINTFX
 
 int run_battle_preview() {
     if (!SDL_Init(SDL_INIT_VIDEO)) {
@@ -848,37 +800,15 @@ int run_battle_preview() {
         return e != nullptr && e[0] == '1';
     }();
 
-    // ADR-010 F1: runtime gate do backend de UI. GUSWORLD_UI_BACKEND=glintfx ativa o
-    // glintfx::UiLayer (so se compilado com -DGUSWORLD_GLINTFX=ON); qualquer outro valor
-    // (ou ausente) mantem o caminho VENDORIZADO (RmlUiHud), que e o DEFAULT. Sem a macro
-    // de compilacao, want_glintfx e SEMPRE false (constexpr) e o glintfx some do binario.
-#ifdef GUSWORLD_GLINTFX
-    const bool want_glintfx = [] {
-        const char* e = std::getenv("GUSWORLD_UI_BACKEND");
-        return e != nullptr && std::string(e) == "glintfx";
-    }();
-#else
-    constexpr bool want_glintfx = false;
-#endif
-
     {
         gus::platform::render2d::Render2dGl3 renderer(/*gl_active=*/true);
 
         // ====================================================================
-        // ADR-009 F1: HUD RmlUi-GL3 compondo POR CIMA da arena, COM efeitos nativos
-        // (gradiente/box-shadow/glow). E o caminho PADRAO (sem env). A arena desenha
-        // primeiro (backbuffer), o RmlUi compoe por cima (layer -> backbuffer), o swap e
-        // unico (SDL_GL_SwapWindow). Opt-out (debug do cockpit a-mao antigo):
-        // GUSWORLD_RMLUI_OFF=1.
+        // ADR-010 F3: glintfx::UiLayer (embed mode) e o UNICO motor de UI/HUD, compondo
+        // POR CIMA da arena com efeitos nativos (gradiente/box-shadow/glow). A arena desenha
+        // primeiro (backbuffer), o glintfx compoe por cima (layer -> backbuffer), o swap e
+        // unico (SDL_GL_SwapWindow). Opt-out (debug so-arena): GUSWORLD_RMLUI_OFF=1.
         // ====================================================================
-        // ADR-010 R-dup-backend (Opcao 2): no build GUSWORLD_GLINTFX=ON o backend RmlUi
-        // vendorizado (rmlui_hud.cpp) NAO e compilado/linkado, entao o RmlUiHud nem e
-        // instanciado aqui - o slot de compose vai 100% pro glintfx::UiLayer. No OFF
-        // (default) o caminho vendorizado fica INTACTO.
-#ifndef GUSWORLD_GLINTFX
-        gus::platform::rmlui::RmlUiHud hud;
-#endif
-        bool rmlui_hud_on = false;
         const bool rmlui_opt_out = [] {
             const char* e = std::getenv("GUSWORLD_RMLUI_OFF");
             return e != nullptr && e[0] == '1';
@@ -892,41 +822,9 @@ int run_battle_preview() {
                       << " pixels=" << pw0 << "x" << ph0
                       << " dp_ratio=" << (static_cast<float>(pw0) / 960.0f) << "\n";
         }
-        // Quando o glintfx esta ativo (runtime), NAO inicializa o HUD vendorizado: o
-        // UiLayer ocupa o slot de compose. O caminho vendorizado segue intacto e default.
-        // (Compilado SO no build OFF - no ON o rmlui_hud.cpp nem e linkado; ver bloco acima.)
-#ifndef GUSWORLD_GLINTFX
-        if (!rmlui_opt_out && !want_glintfx) {
-            if (hud.init(/*gl_active=*/true, pw0, ph0, /*logical_w=*/960,
-                         /*logical_h=*/540)) {
-                // O data-model PRECISA existir ANTES de carregar o doc (o data-model="hud"
-                // e resolvido no parse). Bind primeiro, depois load.
-                hud.bind_demo_model("hud", "Gus");
-                hud.set_intro(true);  // comeca na abertura (brasao)
-                // Base pra resolver os image() do RCSS (moldura/retrato): um .rml ficticio
-                // no diretorio dos assets do cockpit.
-                hud.set_asset_base_url(join(cockpit_asset_base_dir(), "cockpit.rml"));
-                const std::string doc_rml = fxtest ? load_fxtest_rml() : load_cockpit_rml();
-                if (hud.load_document_from_memory(doc_rml)) {
-                    rmlui_hud_on = true;
-                    if (fxtest) {
-                        hud.set_intro(false);  // o doc de FX nao usa intro
-                    }
-                    std::cout << "BattlePreview: HUD RmlUi-GL3 ATIVO ("
-                              << (fxtest ? "FXTEST" : "cockpit + abertura")
-                              << ") sobre a arena (caminho padrao)\n";
-                } else {
-                    std::cerr << "BattlePreview: falha ao carregar o RML\n";
-                }
-            } else {
-                std::cerr << "BattlePreview: RmlUi-GL3 nao inicializou; caindo no cockpit "
-                             "a-mao\n";
-            }
-        }
-#endif  // !GUSWORLD_GLINTFX (fim do init do HUD vendorizado)
 
         // ====================================================================
-        // ADR-010 F1 SMOKE: glintfx::UiLayer (embed mode) no lugar do HUD vendorizado.
+        // ADR-010 F3: glintfx::UiLayer (embed mode) - UNICO motor de UI/HUD.
         // Anexa ao contexto GL JA corrente (SDL_GL_MakeCurrent acima); compose-only no
         // loop (sem clear, sem swap), no slot do hud.compose(). load_gl=true: o glintfx usa
         // gl3w (tabela de ponteiros PROPRIA, independente do glad que o GusEngine carregou
@@ -934,7 +832,6 @@ int run_battle_preview() {
         // ponteiros gl3w NULL -> crash). Ver R-glad-owner no relatorio.
         // ====================================================================
         bool glintfx_on = false;
-#ifdef GUSWORLD_GLINTFX
         std::optional<glintfx::UiLayer> ui;
         bool glintfx_live = false;  // F2b: cockpit dirigido por data-model (valores vivos)
         // F2b DEBUG: GUSWORLD_GLINTFX_DP=<float> FORCA o dp_ratio (em vez de pw/960). Util
@@ -946,7 +843,7 @@ int run_battle_preview() {
             const char* e = std::getenv("GUSWORLD_GLINTFX_DP");
             return (e != nullptr && e[0] != '\0') ? static_cast<float>(std::atof(e)) : 0.0f;
         }();
-        if (want_glintfx && !rmlui_opt_out) {
+        if (!rmlui_opt_out) {
             // ADR-010 F2b (DEFAULT): cockpit REAL pelo UiLayer dirigido por DATA-MODEL
             // (valores VIVOS por frame: HP/nome/role/selecao-de-verbo/log). RCSS autorado em
             // 'dp' num canvas logico 960x540; o dp_ratio (= pixels reais / 960) escala pro
@@ -1027,13 +924,12 @@ int run_battle_preview() {
                 ui.reset();
             }
         }
-#endif
 
         // A cena monta o encontro de demo e ja le a fila do motor.
         BattleScene scene;
-        // (A) Com um HUD externo (RmlUi vendorizado OU glintfx) ATIVO, a cena NAO desenha o
-        // cockpit/log a mao - so arena/banner/floaters/fila. Evita cockpits sobrepostos.
-        scene.set_hud_external(rmlui_hud_on || glintfx_on);
+        // (A) Com o HUD externo (glintfx::UiLayer) ATIVO, a cena NAO desenha o cockpit/log a
+        // mao - so arena/banner/floaters/fila. Evita cockpits sobrepostos.
+        scene.set_hud_external(glintfx_on);
 
         // Carrega os retratos 48px da fila CTB (handles resolvidos pelo renderer) e os
         // entrega a cena. Cada id de ator -> seu retrato; ausencia degrada pro retangulo.
@@ -1125,15 +1021,12 @@ int run_battle_preview() {
         bool running = true;
         bool have_last = false;
         unsigned long long last_ns = 0;
-#ifdef GUSWORLD_GLINTFX
         int glintfx_injected = 0;  // SMOKE: conta eventos injetados na UI (prova do pipeline)
-#endif
         while (running) {
             SDL_Event ev;
             while (SDL_PollEvent(&ev)) {
-#ifdef GUSWORLD_GLINTFX
-                // ADR-010 F1 SMOKE: injeta o evento na UI glintfx (caminho NOVO; o HUD
-                // vendorizado e display-only e nao recebe input). Em paralelo ao handler de
+                // ADR-010 F1 SMOKE: injeta o evento na UI glintfx (caminho NOVO; a UI e
+                // display-only por ora, mas ja recebe input). Em paralelo ao handler de
                 // cena abaixo (ambos veem o mesmo evento). Loga os PRIMEIROS eventos
                 // injetados (de qualquer tipo) + toda tecla, p/ provar que o evento SDL
                 // atravessa sdl_to_glintfx -> process_event ate o motor de UI.
@@ -1153,7 +1046,6 @@ int run_battle_preview() {
                         ++glintfx_injected;
                     }
                 }
-#endif
                 if (ev.type == SDL_EVENT_QUIT) {
                     running = false;
                 } else if (ev.type == SDL_EVENT_KEY_DOWN) {
@@ -1241,30 +1133,9 @@ int run_battle_preview() {
             } else {
                 scene.render(renderer, static_cast<float>(pw), static_cast<float>(ph));
             }
-#ifndef GUSWORLD_GLINTFX
-            if (rmlui_hud_on) {
-                // (C) ESTADO abertura vs combate: na intro mostra o brasao; depois de
-                // Encarar mostra o cockpit com os valores VIVOS do ator ativo (POCO).
-                hud.set_intro(scene.is_intro());
-                if (!scene.is_intro()) {
-                    if (const auto* a = scene.active_actor(); a != nullptr) {
-                        // POLISH 2: label segue o lado do ator (party vs inimigo). Nunca
-                        // o role de party num inimigo (paridade com o caminho glintfx).
-                        hud.set_hud_values(a->display_name(),
-                                           a->is_player_side() ? "VETOR DO GAMBITO" : "INIMIGO",
-                                           a->hp(), a->max_hp(), a->ap(), a->max_ap(),
-                                           a->mana(), a->max_mana());
-                    }
-                }
-                hud.set_pixel_size(pw, ph);
-                hud.update();
-                hud.compose();  // HUD por cima da arena, mesmo contexto GL
-            }
-#endif  // !GUSWORLD_GLINTFX (compose do HUD vendorizado)
-#ifdef GUSWORLD_GLINTFX
-            // ADR-010 F1 SMOKE: glintfx compoe no MESMO slot do hud.compose() - depois da
-            // arena, antes do swap. render() e compose-only (sem clear, sem swap; salva e
-            // restaura o estado GL internamente). O viewport segue os pixels reais.
+            // ADR-010 F3: glintfx compoe no slot de HUD - depois da arena, antes do swap.
+            // render() e compose-only (sem clear, sem swap; salva e restaura o estado GL
+            // internamente). O viewport segue os pixels reais.
             if (glintfx_on && ui) {
                 if (pw != pw0 || ph != ph0) {
                     ui->set_viewport(pw, ph);
@@ -1334,7 +1205,6 @@ int run_battle_preview() {
                 ui->update();
                 ui->render();  // UI por cima da arena, mesmo contexto GL
             }
-#endif
 
             // SMOKE VISUAL: captura 1 PNG no frame alvo (ANTES do swap, lendo o backbuffer)
             // e encerra. Em modo interativo, o swap apresenta na janela.

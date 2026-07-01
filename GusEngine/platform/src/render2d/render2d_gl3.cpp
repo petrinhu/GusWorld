@@ -12,7 +12,7 @@
 // textura (uniform use_texture=0). Quad de sprite/fonte = textura NEAREST * tint.
 //
 // O .cpp inclui o loader glad via RmlUi_Include_GL3.h (header-only). A IMPLEMENTACAO do
-// glad (GLAD_GL_IMPLEMENTATION) ja e definida pelo RmlUi_Renderer_GL3.cpp - aqui so o
+// glad (GLAD_GL_IMPLEMENTATION) e definida pelo gl3_loader.cpp (ADR-010 F3) - aqui so o
 // header (declaracoes + ponteiros de funcao globais que aquele .cpp resolve). stb_image
 // idem: so o header (impl no render2d_sdl.cpp).
 
@@ -30,7 +30,7 @@
 #include "gus/platform/render2d/text_metrics.hpp"  // glyph_advance + decode_utf8
 #include "gus/platform/render2d/viewport_transform.hpp"
 
-// glad (GL 3.3 core) - so o header; a impl vem do RmlUi_Renderer_GL3.cpp (mesma TU-set).
+// glad (GL 3.3 core) - so o header; a impl vem do gl3_loader.cpp (mesma TU-set, ADR-010 F3).
 #include "RmlUi_Include_GL3.h"
 
 // stb_image - so o header (impl em render2d_sdl.cpp).
