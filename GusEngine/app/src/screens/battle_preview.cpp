@@ -139,11 +139,14 @@ body { font-family: "Pixel Operator Mono"; background: transparent; }
   /* POLISH 1: padding compacto (a coluna inteira precisa caber em 540dp). */
   padding: 10dp 12dp 0dp 12dp;
 }
-/* filete cyan na borda direita (marca cyber) */
+/* filete cyan na borda direita (marca cyber). BUG-1 FIX: a vertical-gradient concentrava
+   o cyan numa ponta e o box-shadow espalhava um BLOOM -> aparecia um "tick" cyan solto no
+   TOPO (o #edge fica em right:0 da coluna, cujo box-sizing content-box soma 24dp de padding
+   -> x~273dp). Trocado por um filete UNIFORME translucido, SEM gradiente e SEM glow: a marca
+   cyber continua (linha fina cyan na divisa cockpit/arena) mas sem concentracao/brilho. */
 #edge {
-  position: absolute; top: 0dp; right: 0dp; bottom: 0dp; width: 3dp;
-  decorator: vertical-gradient( #0c0f1a #22D3EE );
-  box-shadow: #22D3EE 0dp 0dp 16dp 2dp;
+  position: absolute; top: 0dp; right: 0dp; bottom: 0dp; width: 2dp;
+  background-color: #22D3EE55;
 }
 
 /* ---- RETRATO emoldurado (moldura TCG asset) + HALO cyan pulsante ---- */
@@ -202,15 +205,16 @@ body { font-family: "Pixel Operator Mono"; background: transparent; }
 /* ---- MENU de verbos: pill rococo com GLOW neon nos 3 estados ---- */
 .menu { margin-top: 9dp; }
 .verb {
-  /* POLISH 1: pill compacto (38->25dp alt, 10->5dp gap) p/ os 6 verbos + log (que QUEBRA
-     em 2 linhas) caberem na coluna dentro de 540dp. */
-  display: block; height: 25dp; margin-bottom: 5dp; padding: 0dp 14dp;
-  border-radius: 13dp;
+  /* BUG-3 FIX: pills COMPACTOS por escala aurea (base 8dp x 1.618: 8->13->21->34). Altura
+     no degrau 21dp (era 25), fonte 12dp, gap 6dp, padding-h 13dp, raio 11dp (~metade da
+     altura, ainda pill). O SELECIONADO ganha proeminencia (glow/contraste, regras .sel). */
+  display: block; height: 21dp; margin-bottom: 6dp; padding: 0dp 13dp;
+  border-radius: 11dp;
   decorator: vertical-gradient( #2a3658 #131a2e );  /* topo mais claro (3D sutil) */
   border: 1dp #38456e;
-  color: #d6e6ef; font-size: 13dp;
+  color: #d6e6ef; font-size: 12dp;
 }
-.verb .lbl { display: inline-block; line-height: 25dp; }
+.verb .lbl { display: inline-block; line-height: 21dp; }
 /* NORMAL: cor do verbo no glifo lateral */
 .verb .glyph { display: inline-block; width: 8dp; height: 8dp; margin-right: 10dp;
   border-radius: 2dp; background-color: #8fa6b4; }
@@ -239,7 +243,12 @@ body { font-family: "Pixel Operator Mono"; background: transparent; }
    as mais recentes) - assim a coluna inteira (header+vitals+6 verbos+log+now-line) cabe em
    540dp, com a now-line "> verbo -> alvo" sempre visivel no rodape. */
 #log { margin-top: 7dp; padding-top: 6dp; border-top: 1dp #2a3450; font-size: 10dp; }
-#log .ln { color: #6f8593; line-height: 13dp; }
+/* BUG-2 FIX: no embed do glintfx a UA-stylesheet padrao NAO e carregada -> <div> cai em
+   'inline' (nao 'block'). Sem display:block as .ln do data-for fluiam INLINE e emendavam
+   ('...por 5.COMPILAR...'), e os fragmentos inline sobrepostos com line-height apertado
+   desenhavam um risco horizontal (parecia strikethrough). Forcando block cada linha empilha
+   limpa; text-decoration:none garante zero risco. */
+#log .ln { display: block; color: #6f8593; line-height: 13dp; text-decoration: none; }
 #log .who { color: #22D3EE; }
 #log .hit { color: #E11D74; }
 #log .now { color: #cfe6ee; }
@@ -644,8 +653,8 @@ std::string write_live_cockpit_rml() {
     // os elementos focaveis (secao 5 da doc de embed). SEM estilo :focus de proposito: a
     // selecao VISIVEL e a classe .sel dirigida pelo MOTOR (data-class-sel abaixo), pra NAO
     // criar uma 2a fonte de verdade (o foco do glintfx fica como navegacao inerte).
-    replace_all("  color: #d6e6ef; font-size: 13dp;\n}",
-                "  color: #d6e6ef; font-size: 13dp;\n  tab-index: auto; nav: auto;\n}");
+    replace_all("  color: #d6e6ef; font-size: 12dp;\n}",
+                "  color: #d6e6ef; font-size: 12dp;\n  tab-index: auto; nav: auto;\n}");
 
     // (3b) menu de verbos data-driven: a classe .sel de cada verbo segue o indice SELECIONADO
     // no motor (binding 'sel'), via data-class-sel="sel == N". O motor (scene.menu_) e a
