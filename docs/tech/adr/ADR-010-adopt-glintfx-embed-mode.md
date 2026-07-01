@@ -1,7 +1,7 @@
 # ADR-010: Adotar glintfx (embed mode) como motor de UI/HUD; aposentar o backend RmlUi vendorizado à mão
 
-**Status:** Proposed
-**Data:** 2026-06-30
+**Status:** Accepted (implementado; ver "Resultado da execução")
+**Data:** 2026-06-30 (proposta) · 2026-07-01 (aceito, F0→F3 executadas)
 **Decisores:** criador supremo (petrus) + software-architect (proposta)
 **Cross-ref:** [ADR-008](ADR-008-repivot-qt-to-sdl3.md) (SDL3 como plataforma — MANTIDO), [ADR-009](ADR-009-rmlui.md) (RmlUi como UI/HUD via backend GL3 — este ADR-010 troca o COMO, não o QUÊ), glintfx `docs/adr/0008-embed-guest-mode.md` (a capacidade que viabiliza isto).
 
@@ -50,3 +50,19 @@ Two-way door no backend de UI (o `IRenderer`/arena e os view-models POCO isolam;
 - **F2:** introduzir `glintfx::UiLayer` na casca SDL atrás de um flag; portar o cockpit (`cockpit.rml`/`.rcss`) pra ele; manter o caminho antigo até paridade.
 - **F3:** atingida paridade visual + pacing/motor verdes, remover `RmlUi_Renderer_GL3.*` + `gl3_loader.*` + o miolo do `rmlui_hud`; estender o GATE pra `<glintfx`.
 - **F4:** adotar componentes da v2 do glintfx no cockpit/menus/diálogos.
+
+## Resultado da execução
+
+Executado e aceito ao vivo pelo criador em 2026-07-01. As fases planejadas rodaram assim:
+
+- **F0** — alinhou o RmlUi vendorizado ao SHA `2cd2886` (6.3), a mesma versão que o glintfx usa, fechando o risco de skew/ABI (R2). Testes verdes.
+- **F1** — smoke do embed mode atrás de flag, provando o `glintfx::UiLayer` anexado ao contexto GL que a casca SDL já cria (de-risk pré-cockpit).
+- **R-dup-backend (Opção 2)** — o backend RmlUi vendorizado foi gateado ao build `OFF`, mantido só como rede de segurança durante a transição.
+- **F2** — cockpit "Tático" portado pro `glintfx::UiLayer`, atingindo **paridade visual real** (gradientes, glow, `border-radius`, molduras nativos) e **dados vivos** via data-model (HP, verbo, alvo, log de batalha, retrato que segue o ator ativo, label do inimigo). Passou por polish e foi aprovado ao vivo pelo criador.
+- **F3** — removido o backend RmlUi vendorizado (`RmlUi_Renderer_GL3.*`, `gl3_loader.*`, o miolo de `rmlui_hud`) e **estendido o GATE das 4 camadas** pra proibir `<glintfx` em `core/`+`domain/` (junto com `<RmlUi`/`<SDL`). O glintfx passa a ser o único motor de UI/HUD.
+
+**Versão consumida:** glintfx **v0.2.4** via CMake FetchContent (`GIT_TAG v0.2.4`), com **`GLINTFX_BACKEND_GLFW=OFF`** (embed-only, sem GLFW, honrando o ADR-008/SDL3). A v0.2.4 carrega a UA-stylesheet do RmlUi (`div` = `block` por padrão). O `UiLayer` compõe sobre o FBO 0 (sem clear/swap, salva e restaura o estado GL), recebe input via `process_event(UiEvent)` e lê dados vivos via data-model (`create_data_model` → `bind_*` → `load` → `set_*`); texturas PNG via stb_image com premultiply; `dp_ratio` (960 lógico para 1080) + `asset_base_url`.
+
+**Preservado:** SDL3 (ADR-008) segue dono de janela/loop/input/gamepad/contexto GL; a arena (`Render2dGl3`, loader glad próprio) intocada; a ordem de composição arena → UI → swap; `core/`+`domain/` POCO (~1013 testes) intactos; a invariante das 4 camadas mantida (agora também barrando `<glintfx`).
+
+A **F4** (componentes da v2 do glintfx pra menus/diálogos) segue em aberto, sem bloquear esta decisão.

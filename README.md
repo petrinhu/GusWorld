@@ -87,7 +87,7 @@ A engine antiga (`game/` Godot + `engine/` C#) permanece no repo como referênci
 ### Pré-requisitos
 
 - C++20 (GCC, Clang ou MSVC/MinGW)
-- SDL3 + RmlUi (via FetchContent; o CMake baixa e fixa a versão, build reprodutível Linux + Windows)
+- SDL3 + glintfx (via FetchContent; o CMake baixa e fixa a versão, build reprodutível Linux + Windows). O glintfx (embed mode, pin `v0.2.4`, `GLINTFX_BACKEND_GLFW=OFF`) traz o RmlUi 6.3 + backend GL3 embrulhados; ver [ADR-010](docs/tech/adr/ADR-010-adopt-glintfx-embed-mode.md)
 - CMake + Ninja
 - Linux ou Windows
 - Git
@@ -118,14 +118,14 @@ Para Windows, troque o preset por `windows-release`. A lógica de `core/` e `dom
 ## Tech stack
 
 - **Linguagem:** C++20 (RAII, value semantics, `std::`). Engine própria, sem runtime de terceiros.
-- **Framework:** SDL3 (janela, loop próprio, input, gamepad nativo, eventos) na fronteira `platform/` + `app/`; `core/` + `domain/` são POCO C++ puro (zero framework, zero I/O real, auditado por grep no CI). UI do jogador via **RmlUi** (HTML/CSS-like, retido, data binding MVC; chega na Fase 3 do re-pivot, marco M5+). Áudio via **miniaudio** (vendorizado em `third_party/`).
-- **Renderer:** `SDL_Renderer` (2D, escolhe o backend de GPU disponível) para o mundo; RmlUi desenha sobre o mesmo `render2d` para UI e menus. Tudo atrás de uma interface `IRenderer` (trocar o backend = um arquivo). 2D-only.
+- **Framework:** SDL3 (janela, loop próprio, input, gamepad nativo, eventos) na fronteira `platform/` + `app/`; `core/` + `domain/` são POCO C++ puro (zero framework, zero I/O real, auditado por grep no CI). UI/HUD do jogador via **glintfx** (embed mode, `glintfx::UiLayer`), que embrulha RmlUi 6.3 + backend GL3 (HTML/CSS-like, retido, data binding MVC) atrás de uma fachada limpa; o backend RmlUi vendorizado à mão foi aposentado ([ADR-010](docs/tech/adr/ADR-010-adopt-glintfx-embed-mode.md)). Áudio via **miniaudio** (vendorizado em `third_party/`).
+- **Renderer:** `Render2dGl3` (arena 2D sobre OpenGL GL3) para o mundo; o `glintfx::UiLayer` compõe a UI/HUD por cima do mesmo contexto GL (compose-only, sem clear/swap, salva e restaura o estado GL). Ordem de composição: arena → UI → swap. Tudo atrás de uma interface `IRenderer` (trocar o backend = um arquivo). 2D-only.
 - **Câmera:** ortográfica fixa top-down (clamp ao mapa). Zoom e follow ficam para refinamento futuro (RF-3).
 - **Visual:** 2D estilizado, super-deformed (SD) 1:1:1. Pixel art à mão (estilo Zelda A Link to the Past, SNES) ou modelagem 3D no Blender baked para sprite (estilo Stardew Valley, Sea of Stars, Death's Door). O 3D é só ferramenta de produção, nunca runtime.
 - **Save format:** binário próprio com criptografia própria (SHA-256 / HMAC, zero dependência externa, validada contra vetores FIPS 180-4 e RFC 4231), migrators forward-only, schema v4, anti-tamper.
 - **RNG:** PRNG determinístico seedável e injetável (para save e replay).
 - **Localização:** loader próprio + i18n próprio. Dev em pt-br. Tradução en-intl pós-release v1.0.0.
-- **Build/Test:** CMake + CMakePresets. SDL3 + RmlUi entram via FetchContent (pin de versão); testes via `ctest` (Catch2). A camada de plataforma roda smoke headless com `SDL_VIDEODRIVER=dummy`.
+- **Build/Test:** CMake + CMakePresets. SDL3 e **glintfx** (pin `v0.2.4`, `GLINTFX_BACKEND_GLFW=OFF`, embed-only) entram via FetchContent (pin de versão); o RmlUi 6.3 chega embrulhado pelo glintfx; testes via `ctest` (Catch2). A camada de plataforma roda smoke headless com `SDL_VIDEODRIVER=dummy`.
 - **CI:** Forgejo Actions, matriz Linux + Windows.
 - **Plataformas:** Linux (AppImage + tar.gz) + Windows (sem signing em G1).
 - **Target hardware:** floor iGPU (Intel HD / AMD integrada, sem GPU dedicada); ceiling RTX 3050 Laptop 4GB.
@@ -153,7 +153,7 @@ Migração faseada anti big-bang. Cada marco fecha pelo seu critério de saída 
 | M3 (Lógica pura portada) | ✅ Auditado | Save + i18n + progression + templates portados para POCO C++ puro. 174 testes verdes, crypto bate vetores FIPS/RFC, oráculo de save semântico |
 | M2 (Input) | 🔍 Lógica feita | Eventos da plataforma para ações lógicas + porta de input_remap + persistência de controles + save v4. Falta o backend de evento (SDL) + I/O em disco |
 | M4 (Cena top-down) | 🔍 Lógica feita | Tilemap + colisão de grid + clamp de câmera (lógica pura). Falta a parte visual (tilemap render no `SDL_Renderer`, Fase 2 do re-pivot) |
-| M5 (Combate portado + tela de batalha) | 🔄 Motor portado, auditado | Motor `turn_combat` portado e endurecido (fórmula de dano §11 evoluída, auditada). Falta a BattleScreen (apresentação estilo Pokémon) |
+| M5 (Combate portado + tela de batalha) | 🔄 Motor auditado + cockpit entregue | Motor `turn_combat` portado e endurecido (fórmula de dano §11 evoluída, auditada). BattleScreen cockpit "Tático" entregue via glintfx (paridade visual + dados vivos: HP/verbo/alvo/log/retrato do ator, [ADR-010](docs/tech/adr/ADR-010-adopt-glintfx-embed-mode.md)) |
 | M6 (Áudio) | ⏳ Pendente | platform/audio sobre miniaudio + música + SFX + fade entre telas |
 | M7 (Paridade jogável) | ⏳ Pendente | Loop completo (andar, NPC, combate, save, carregar) 100% na engine nova, sem Godot |
 | M8 (Decommission) | ⏳ Pendente | Apagar Godot + C# + addons. Repo compila e roda sem nenhum bit do stack antigo |
@@ -187,7 +187,7 @@ Ou aponte a câmera do celular no QR Code:
 
 ## Licença
 
-**Código-fonte:** [GNU General Public License v3.0 (GPLv3)](LICENSE), copyleft forte. SDL3 (zlib) e RmlUi (MIT) são licenças permissivas, compatíveis com GPLv3 inclusive em static-link. _(migrado de AGPL-3.0 para GPLv3 em 2026-06-21, pivot RF-9.)_
+**Código-fonte:** [GNU General Public License v3.0 (GPLv3)](LICENSE), copyleft forte. SDL3 (zlib) é permissiva; o glintfx (MPL-2.0, copyleft fraco por arquivo) embrulha o RmlUi 6.3 (MIT) e é compatível com GPLv3 inclusive em static-link. _(migrado de AGPL-3.0 para GPLv3 em 2026-06-21, pivot RF-9.)_
 **Lore e arte (assets):** [CC-BY-SA-4.0](ASSETS-LICENSE.md), exceto os livros Vol1/Vol2 (direitos reservados, obra à parte). Atribuições de terceiros em [THIRD-PARTY-LICENSES.md](THIRD-PARTY-LICENSES.md).
 
 ---
@@ -195,7 +195,7 @@ Ou aponte a câmera do celular no QR Code:
 ## Créditos
 
 - **Direção criativa + código + arte + narrativa + tudo:** petrinhu (2026)
-- **Engine base:** SDL3 (zlib) + RmlUi (MIT) + miniaudio (MIT-0/PD) na camada de plataforma. Godot 4 (MIT) permanece como referência de leitura até o decommission no marco M8.
+- **Engine base:** SDL3 (zlib) + glintfx (MPL-2.0, motor de UI/HUD via embed mode, que traz o RmlUi 6.3 MIT + backend GL3) + miniaudio (MIT-0/PD) na camada de plataforma. Godot 4 (MIT) permanece como referência de leitura até o decommission no marco M8.
 - **Bibliotecas C++ vendorizadas:** libs header-only de licenças permissivas incorporadas em `GusEngine/third_party/` (filosofia zero-dep); lista e licenças em [THIRD-PARTY-LICENSES.md](THIRD-PARTY-LICENSES.md).
 - **Geração de imagem 2D:** [nano banana (Google Gemini)](https://gemini.google.com/) + [Grok (xAI)](https://grok.com/), a partir de prompts derivados do lore canônico.
 - **Geração 3D (ferramenta de produção):** [Tripo3D](https://www.tripo3d.ai/), image-to-3D para o pipeline de bake 3D-para-sprite. O jogo é 2D em runtime.
@@ -225,6 +225,6 @@ Aos **autores das obras que inspiraram a lore**: de Tolkien aos demais nomes do 
 
 Por fim, as ferramentas livres e as inspirações que sustentam o projeto:
 
-- **Engine e libs FOSS:** [SDL3](https://www.libsdl.org/), [RmlUi](https://github.com/mikke89/RmlUi), [miniaudio](https://miniaud.io/), [Catch2](https://github.com/catchorg/Catch2) e as bibliotecas header-only vendorizadas em `GusEngine/third_party/` (lista e licenças em [THIRD-PARTY-LICENSES.md](THIRD-PARTY-LICENSES.md)).
+- **Engine e libs FOSS:** [SDL3](https://www.libsdl.org/), [glintfx](https://codeberg.org/petrinhu/glintfx) (motor de UI/HUD, que embrulha [RmlUi](https://github.com/mikke89/RmlUi)), [miniaudio](https://miniaud.io/), [Catch2](https://github.com/catchorg/Catch2) e as bibliotecas header-only vendorizadas em `GusEngine/third_party/` (lista e licenças em [THIRD-PARTY-LICENSES.md](THIRD-PARTY-LICENSES.md)).
 - **Ferramentas de produção:** [Blender](https://www.blender.org/), [PixelLab](https://www.pixellab.ai/) (sprites) e o stack local de busca da lore ([Ollama](https://ollama.com/) + bge-m3, [LanceDB](https://lancedb.com/), `rag_maker`).
 - **Inspirações de design** (homenagem, nada copiado): Chrono Trigger, The Legend of Zelda: A Link to the Past (SNES), Stardew Valley, Sea of Stars, Sable e Death's Door.

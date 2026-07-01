@@ -42,7 +42,7 @@ A migração é faseada anti big-bang: cada marco fecha pelo seu critério de sa
 | M2 Input | 🔍 | Eventos para ações lógicas + input_remap + persistência de controles + save V4 ([ADR-007](docs/tech/adr/ADR-007-controls-json-hash128-save-v4.md)). Falta backend de evento + I/O em disco |
 | M3 Lógica pura portada | ✅ | Save + i18n + progression + templates em POCO C++ puro. 174 testes verdes, cripto bate vetores FIPS/RFC ([ADR-006](docs/tech/adr/ADR-006-crypto-hmac-formato-domain.md)), auditado |
 | M4 Cena top-down | 🔍 | Tilemap + colisão de grade + clamp de câmera (lógica pura feita). Falta a metade visual (tilemap render na plataforma) |
-| M5 Combate + tela de batalha | 🔄 | Motor `turn_combat` portado e endurecido (fórmula de dano §11 evoluída e auditada, ver M5-DMG). Falta a `BattleScreen` estilo Pokémon |
+| M5 Combate + tela de batalha | 🔄 | Motor `turn_combat` portado e endurecido (fórmula de dano §11 evoluída e auditada, ver M5-DMG). BattleScreen cockpit "Tático" entregue via glintfx (paridade visual + dados vivos, [ADR-010](docs/tech/adr/ADR-010-adopt-glintfx-embed-mode.md)) |
 | M6 Áudio | ⏳ | Camada de áudio (miniaudio) + música + SFX + fade entre telas |
 | M7 Paridade jogável | ⏳ | Loop completo (andar, NPC, combate, save, carregar) 100% na engine nova, sem Godot |
 | M8 Decommission | ⏳ | Apagar Godot + C# + addons. Repo compila e roda sem nenhum bit do stack antigo |
@@ -52,13 +52,13 @@ Ordem real de execução: M0, depois M1 e M3 em paralelo, depois M2, M4, M5, M6,
 
 ### Re-pivot da plataforma: Qt6 para SDL3 (3 fases)
 
-A camada de plataforma deixou de ser Qt6 e passou a ser SDL3 + RmlUi + miniaudio ([ADR-008](docs/tech/adr/ADR-008-repivot-qt-to-sdl3.md)). A lógica pura (`core`/`domain`) não muda; só a fronteira `platform/` + a casca `app/` são reescritas. As fases do re-pivot atravessam os marcos do board:
+A camada de plataforma deixou de ser Qt6 e passou a ser SDL3 + RmlUi + miniaudio ([ADR-008](docs/tech/adr/ADR-008-repivot-qt-to-sdl3.md)). A lógica pura (`core`/`domain`) não muda; só a fronteira `platform/` + a casca `app/` são reescritas. A UI/HUD passou a ser servida pelo glintfx (embed mode), que embrulha o RmlUi 6.3 + backend GL3; o backend vendorizado à mão foi aposentado ([ADR-010](docs/tech/adr/ADR-010-adopt-glintfx-embed-mode.md)). As fases do re-pivot atravessam os marcos do board:
 
 | Fase do re-pivot | Status | Escopo | Marco do board |
 |---|---|---|---|
 | Fase 1 (fronteira M1) | ✅ | platform/window + render2d (`SDL_Renderer`) + input com gamepad; sprite do Cauã reintegrado; smoke headless `SDL_VIDEODRIVER=dummy`; backend Qt aposentado | M1 |
 | Fase 2 (metades visuais) | 🔄 | A metade visual de M2 (input/IO) e M4 (tilemap render) nasce em SDL | M2, M4 |
-| Fase 3 (UI do jogador) | ⏳ | Menus, batalha estilo Pokémon, diálogo, inventário em RmlUi | M5+ |
+| Fase 3 (UI do jogador) | 🔄 | Menus, batalha estilo Pokémon, diálogo, inventário via glintfx (embed mode, [ADR-010](docs/tech/adr/ADR-010-adopt-glintfx-embed-mode.md)); cockpit "Tático" da batalha entregue | M5+ |
 
 ---
 
@@ -104,6 +104,7 @@ As viradas de stack e os contratos irreversíveis estão registrados em [`docs/t
 | [ADR-006](docs/tech/adr/ADR-006-crypto-hmac-formato-domain.md) | Cripto HMAC-SHA256 + formato de serialização do domain |
 | [ADR-007](docs/tech/adr/ADR-007-controls-json-hash128-save-v4.md) | Persistência de controles + save V4 anti-tamper |
 | [ADR-008](docs/tech/adr/ADR-008-repivot-qt-to-sdl3.md) | Re-pivot Qt6 para SDL3 + RmlUi + miniaudio |
+| [ADR-010](docs/tech/adr/ADR-010-adopt-glintfx-embed-mode.md) | Adotar glintfx (embed mode) como motor de UI/HUD; aposentar o backend RmlUi vendorizado |
 
 
 ---

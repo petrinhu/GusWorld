@@ -70,12 +70,19 @@ Três viradas de base técnica até hoje. Cada uma reescreveu fundação; a últ
 - Motor `turn_combat` portado de C# para C++20 em TDD (preservado, não descartado): `CombatStateMachine`, `ComboTable`, brains de inimigo, RNG injetável, atores/filas, subsistema de ambiente (`EnvironmentModifier`, ver [ADR-004](docs/tech/adr/ADR-004-environment-modifier-contract.md)).
 - Property-based + fuzz das 9 invariantes do motor.
 - **M5-DMG:** evolução da fórmula de dano §11 (decisão do líder 2026-06-22): canal de crit/falha (5% piso) sobre a variância de Knowledge. Auditada pelo `internal-auditor`: 0 críticos (dossiê `docs/auditoria/AUDIT-M5-MOTOR-2026-06-22/`).
-- Pendente: a `BattleScreen` (apresentação estilo Pokémon), que entra na Fase 3 do re-pivot (UI em RmlUi).
+- **BattleScreen cockpit "Tático" entregue** via glintfx (embed mode): paridade visual real (gradientes, glow, `border-radius`, molduras nativos) + dados vivos por data-model (HP, verbo, alvo, log de batalha, retrato que segue o ator ativo, label do inimigo). Aprovado ao vivo pelo criador. Ver a seção de UI/HUD abaixo e [ADR-010](docs/tech/adr/ADR-010-adopt-glintfx-embed-mode.md).
+
+### UI/HUD: adoção do glintfx (embed mode), 2026-07-01
+
+- **Adotado o glintfx via embed mode (`glintfx::UiLayer`) como motor de UI/HUD**, no lugar do backend RmlUi vendorizado à mão (`RmlUi_Renderer_GL3` + `RmlUi_Platform_SDL` + `rmlui_hud`). O glintfx (MPL-2.0, repo do próprio criador) embrulha RmlUi 6.3 + backend GL3 + efeitos data-driven atrás de uma fachada limpa. Decisão canônica em [ADR-010](docs/tech/adr/ADR-010-adopt-glintfx-embed-mode.md) (two-way door no backend de UI).
+- Execução faseada F0→F3: F0 alinhou o RmlUi ao SHA `2cd2886` (6.3) do glintfx; F1 provou o smoke do embed mode; F2 portou o cockpit "Tático" com paridade visual + dados vivos; **F3 removeu o backend RmlUi vendorizado e estendeu o GATE das 4 camadas** para proibir `<glintfx` em `core/`+`domain/`.
+- Consumido via CMake FetchContent (pin `v0.2.4`, `GLINTFX_BACKEND_GLFW=OFF`, embed-only sem GLFW, honrando o [ADR-008](docs/tech/adr/ADR-008-repivot-qt-to-sdl3.md)/SDL3). A v0.2.4 carrega a UA-stylesheet do RmlUi.
+- Preservado: SDL3 dono de janela/loop/input/gamepad/contexto GL; a arena (`Render2dGl3`) intocada; a ordem de composição arena → UI → swap; `core/`+`domain/` POCO (~1013 testes) intactos.
 
 ### Bibliotecas e dependências
 
 - **32 bibliotecas C++ vendorizadas** em `GusEngine/third_party/` (filosofia zero-dep): header-only de licenças permissivas (MIT/Boost/zlib/Apache/PD), incluindo miniaudio, PCG, stb, fmt, glm, EnTT, Box2D.
-- SDL3 e RmlUi entram via FetchContent/submodule com pin de versão (não são header-only); miniaudio aposenta a camada de áudio sobre Qt Multimedia que estava planejada.
+- SDL3 e **glintfx** (que traz o RmlUi 6.3 embrulhado) entram via FetchContent com pin de versão (não são header-only); miniaudio aposenta a camada de áudio sobre Qt Multimedia que estava planejada.
 
 ### Pipeline de arte por IA
 
