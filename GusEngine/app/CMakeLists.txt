@@ -20,6 +20,7 @@ add_library(gusengine_app STATIC
     src/screens/battle_menu.cpp
     src/screens/battle_log_model.cpp
     src/screens/battle_floaters.cpp
+    src/screens/battle_anim.cpp
     src/screens/battle_pacing.cpp
     src/screens/battle_scene.cpp
     src/screens/battle_preview.cpp

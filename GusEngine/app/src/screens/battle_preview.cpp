@@ -1331,6 +1331,25 @@ int run_battle_preview() {
         int hover_phase = 0;        // 0=none 1=unsel 2=sel 3=none-again
         int hover_phase_frame = 0;  // frames assentados na fase atual (antes de capturar)
 
+        // DIAGNOSTICO/PROVA (ANIMACAO DE COMBATE, W2): GUSWORLD_BATTLE_ANIM_SELFTEST=
+        // <prefixo> roda um SCRIPT POR FRAME (dt FIXO 1/60, deterministico) que captura 5
+        // PNGs num UNICO launch, provando o battle-anim.md par.2 com os placeholders:
+        //   _a_cast_travel   demo de cast (dormante): bolinha em VOO caster -> alvo
+        //   _b_cast_react    impacto do projetil: alvo no TRANCO do hit-react (cosmetico)
+        //   _c_melee_windup  [Atacar] do jogador: atacante DESLOCADO no meio do dash
+        //   _d_melee_contact contato: atacante NO alvo + floater + tranco do alvo
+        //   _e_melee_rest    recovery concluida: TODOS de volta ao repouso exato
+        // Dirige a cena pela MESMA API publica (debug_cast_demo e a UNICA porta de
+        // diagnostico, tambem publica); nao muda o motor nem o render.
+        const char* anim_selftest_prefix = std::getenv("GUSWORLD_BATTLE_ANIM_SELFTEST");
+        const bool anim_selftest =
+            anim_selftest_prefix != nullptr && anim_selftest_prefix[0] != '\0';
+        int anim_f0 = -1;              // frame do aim_confirm (inicio do windup melee)
+        std::string anim_attacker_id;  // pro log de offsets (prova textual)
+        std::string anim_target_id;
+        bool anim_done_cast = false;   // fases ja disparadas (1 vez cada)
+        bool anim_done_melee = false;
+
         // DIAGNOSTICO/CAPTURA: GUSWORLD_BATTLE_PUMP_TO=<actor_id> conduz o combate ate esse
         // ator ser o ATIVO, ANTES do loop de exibicao - pra CAPTURAR a fila CTB na vez de um
         // ator especifico (ex. um de SPD BAIXA como "jaci") sem driver de input. Encara,
@@ -1361,7 +1380,14 @@ int run_battle_preview() {
                         }
                         scene.menu_confirm();  // Atacar -> entra na mira
                         if (scene.is_aiming()) {
-                            scene.aim_confirm();  // confirma o alvo sugerido -> resolve
+                            scene.aim_confirm();  // confirma o alvo -> inicia o WINDUP
+                        }
+                        // W2 (battle-anim.md par.3.1): a resolucao do [Atacar] e
+                        // DEFERIDA ate o CONTATO (fim da aproximacao). Bombeia o
+                        // windup ate o motor resolver antes de seguir o pump.
+                        for (int k = 0; k < 120 && scene.player_action_in_flight();
+                             ++k) {
+                            scene.update(1.0f / 60.0f);
                         }
                     } else {
                         scene.skip();
@@ -1556,7 +1582,8 @@ int run_battle_preview() {
                           << ") world(" << wcx << "," << wcy << ") px(" << pxcx << "," << pxcy
                           << ") hit_idx=" << hit
                           << " -> is_aiming=" << (scene.is_aiming() ? "on" : "off")
-                          << " (esperado off: confirmou e resolveu o turno)\n";
+                          << " (esperado off: confirmou; W2 - o contato resolve no fim "
+                             "do windup)\n";
             }
             std::cout << "BattlePreview: [mouse-selftest] concluido; encerrando.\n";
             running = false;
@@ -1744,7 +1771,62 @@ int run_battle_preview() {
             }
             have_last = true;
             last_ns = now_ns;
+            // ANIM-SELFTEST: dt FIXO 1/60 (script por frame deterministico; o relogio
+            // real varia por maquina/driver e desalinharia as capturas).
+            if (anim_selftest) {
+                dt = 1.0f / 60.0f;
+            }
             scene.update(dt);  // anima os floaters + pacing; nao toca a FSM
+
+            // ANIM-SELFTEST (script de ACOES por frame; as capturas ficam no fim do
+            // frame, apos render+compose). Timeline (dt 1/60): frame 1 dispara o demo
+            // de cast (windup 0.5s -> projetil ~f31 -> impacto ~f52); frame 62 comeca o
+            // MELEE do jogador (pump ate a vez dele + [Atacar] confirmado = windup
+            // 0.7s: contato em F0+42, Return ate F0+66, delay ate F0+90).
+            if (anim_selftest) {
+                if (frame_no == 1 && !anim_done_cast) {
+                    anim_done_cast = true;
+                    scene.debug_cast_demo();  // cosmetico (intro): cast + bolinha
+                    std::cout << "BattlePreview: [anim-selftest] f1 cast demo iniciado\n";
+                }
+                if (frame_no == 62 && !anim_done_melee) {
+                    anim_done_melee = true;
+                    if (scene.is_intro()) {
+                        scene.start_combat();
+                    }
+                    for (int i = 0; i < 240 && !scene.combat_over() &&
+                                    !scene.waiting_player_input();
+                         ++i) {
+                        scene.skip();
+                        scene.update(1.0f / 60.0f);
+                    }
+                    if (scene.is_choosing_actor()) {
+                        scene.actor_picker_confirm();  // atravessa o picker (§4.1)
+                    }
+                    if (scene.waiting_player_input() && !scene.is_aiming()) {
+                        for (int k = 0; k < 8 && scene.menu().selected_verb() !=
+                                                     BattleVerb::Atacar;
+                             ++k) {
+                            scene.menu_move(+1);
+                        }
+                        const auto* atk = scene.active_actor();
+                        anim_attacker_id = atk != nullptr ? atk->id() : "?";
+                        scene.menu_confirm();  // entra na mira
+                        const auto* tgt = scene.aim_target();
+                        anim_target_id = tgt != nullptr ? tgt->id() : "?";
+                        scene.aim_confirm();  // COMANDA: windup parte agora
+                        anim_f0 = frame_no;
+                        std::cout << "BattlePreview: [anim-selftest] f" << frame_no
+                                  << " melee confirmado: atacante=" << anim_attacker_id
+                                  << " alvo=" << anim_target_id << " in_flight="
+                                  << scene.player_action_in_flight() << "\n";
+                    } else {
+                        std::cout << "BattlePreview: [anim-selftest] FALHA: nao chegou "
+                                     "na vez do jogador\n";
+                        running = false;
+                    }
+                }
+            }
 
             // DIAGNOSTICO: auto-Encarar (captura do estado de combate sem input).
             if (autostart && scene.is_intro()) {
@@ -1892,6 +1974,52 @@ int run_battle_preview() {
                     hover_phase_frame = 0;
                     if (hover_phase > 3) {
                         running = false;  // 4 fases capturadas; encerra
+                    }
+                }
+            }
+
+            // ANIM-SELFTEST (capturas): le o backbuffer ANTES do swap (mesma tecnica do
+            // hover-selftest) nos frames-chave da timeline. Loga o OFFSET do atacante
+            // (prova textual do desloca-golpeia-volta) junto de cada shot.
+            if (anim_selftest) {
+                const auto capture = [&](const char* suffix) {
+                    const std::string out = std::string(anim_selftest_prefix) + suffix;
+                    std::vector<unsigned char> buf(
+                        static_cast<std::size_t>(pw) * static_cast<std::size_t>(ph) * 4);
+                    if (gus::platform::rmlui::gl3_read_backbuffer_rgba(pw, ph,
+                                                                       buf.data())) {
+                        stbi_write_png(out.c_str(), pw, ph, 4, buf.data(), pw * 4);
+                        const auto aoff = anim_attacker_id.empty()
+                                              ? gus::core::spatial::Vec2{}
+                                              : scene.anim().offset_for(anim_attacker_id);
+                        const auto toff = anim_target_id.empty()
+                                              ? gus::core::spatial::Vec2{}
+                                              : scene.anim().offset_for(anim_target_id);
+                        std::cout << "BattlePreview: [anim-selftest] f" << frame_no
+                                  << " -> " << out << " | atacante_off=(" << aoff.x << ","
+                                  << aoff.y << ") alvo_off=(" << toff.x << "," << toff.y
+                                  << ") projeteis=" << scene.anim().projectiles().size()
+                                  << " floaters=" << scene.floaters().size() << "\n";
+                    } else {
+                        std::cerr << "BattlePreview: [anim-selftest] gl3_read_backbuffer "
+                                     "falhou\n";
+                    }
+                };
+                if (frame_no == 40) {
+                    capture("_a_cast_travel.png");  // bolinha em voo (meio da viagem)
+                } else if (frame_no == 58) {
+                    capture("_b_cast_react.png");   // alvo no tranco pos-impacto
+                }
+                if (anim_f0 > 0) {
+                    if (frame_no == anim_f0 + 21) {
+                        capture("_c_melee_windup.png");   // meio do dash (deslocado)
+                    } else if (frame_no == anim_f0 + 49) {
+                        capture("_d_melee_contact.png");  // no alvo + floater + tranco
+                    } else if (frame_no == anim_f0 + 87) {
+                        capture("_e_melee_rest.png");     // todos de volta ao repouso
+                        std::cout << "BattlePreview: [anim-selftest] concluido; "
+                                     "encerrando.\n";
+                        running = false;
                     }
                 }
             }

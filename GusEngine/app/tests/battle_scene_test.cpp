@@ -131,11 +131,23 @@ void select_verb(BattleScene& scene, BattleVerb want) {
     }
 }
 
+// CONTATO do golpe do jogador (W2, battle-anim.md par.3.1): confirmar [Atacar] inicia
+// o WINDUP (aproximacao melee) e a RESOLUCAO e DEFERIDA ate o contato (fim da
+// aproximacao). Este helper bombeia o tempo ate o motor resolver (player_action_
+// in_flight cai) - o equivalente de "esperar a animacao conectar".
+void pump_player_strike(BattleScene& scene) {
+    for (int i = 0; i < 120 && scene.player_action_in_flight(); ++i) {
+        scene.update(1.0f / 60.0f);
+    }
+}
+
 // Ataque COMPLETO do jogador no alvo pre-selecionado (D3): escolhe Atacar, entra no
 // modo-mira (menu_confirm NAO resolve mais na hora) e confirma o alvo (aim_confirm ->
-// resolve). Substitui o antigo "select_verb(Atacar)+menu_confirm" (que resolvia direto),
-// agora que Atacar abre a mira. Sem navegar, mira o alvo sugerido = first_alive_enemy
-// (D3 (b)) - o MESMO alvo do hardcode antigo, mantendo estes testes validos.
+// windup -> CONTATO resolve). Substitui o antigo "select_verb(Atacar)+menu_confirm"
+// (que resolvia direto), agora que Atacar abre a mira. Sem navegar, mira o alvo
+// sugerido = first_alive_enemy (D3 (b)) - o MESMO alvo do hardcode antigo, mantendo
+// estes testes validos. Pos-W2, bombeia o windup ate o contato resolver (a resolucao
+// e deferida pela animacao; battle-anim.md par.3.1).
 void player_attack(BattleScene& scene) {
     // Comando-livre 1B (§4.1): se a vez da party abriu no PICKER (>1 elegivel), confirma o
     // PRE-SELECIONADO (maior SPD) pra cair no menu de verbos do MESMO ator - transparente pros
@@ -146,8 +158,9 @@ void player_attack(BattleScene& scene) {
         scene.actor_picker_confirm();
     }
     select_verb(scene, BattleVerb::Atacar);
-    scene.menu_confirm();  // entra em modo-mira (NAO resolve)
-    scene.aim_confirm();   // confirma o alvo sugerido -> resolve o turno
+    scene.menu_confirm();       // entra em modo-mira (NAO resolve)
+    scene.aim_confirm();        // confirma o alvo sugerido -> inicia o windup
+    pump_player_strike(scene);  // CONTATO: o motor resolve no fim da aproximacao
 }
 
 // N-esimo inimigo VIVO na ordem de fila (ponteiro MUTAVEL: a const-ref da fila so fixa o
@@ -713,11 +726,15 @@ TEST_CASE("menu: render emite o NOME (texto) de cada verbo quando ha translator"
 TEST_CASE("floater: Atacar spawna um numero flutuante sobre o alvo", "[battle_scene]") {
     BattleScene scene;
     pump_to_player_turn(scene);
-    // Medimos o DELTA: o ataque do jogador adiciona pelo menos 1 floater de dano.
-    const std::size_t before = scene.floaters().size();
+    // Limpa os floaters ANTIGOS (dos turnos de inimigo ja animados): na espera do
+    // jogador o update so envelhece/poda (o pacing espera o menu). Baseline ZERO -
+    // necessario pos-W2 porque o windup do ataque (0.7s) podaria floaters antigos e
+    // o delta bruto (size > before) ficaria falso mesmo com o floater novo spawnado.
+    scene.update(kFloaterLifeSeconds + 0.1f);
+    REQUIRE(scene.floaters().empty());
 
-    player_attack(scene);
-    REQUIRE(scene.floaters().size() > before);
+    player_attack(scene);  // windup -> CONTATO: o floater nasce na resolucao
+    REQUIRE(scene.floaters().size() > 0);
 }
 
 TEST_CASE("floater: update(dt) envelhece e poda os mortos", "[battle_scene]") {
@@ -1335,7 +1352,8 @@ TEST_CASE("mira teclas: 1-9 miram DIRETO o N-esimo inimigo e confirmam na hora",
 
     scene.aim_hotkey(2);  // mira+confirma o 2o miravel na hora (sem navegar/Enter)
 
-    REQUIRE_FALSE(scene.is_aiming());                     // confirmou IMEDIATAMENTE
+    REQUIRE_FALSE(scene.is_aiming());  // confirmou IMEDIATAMENTE (o windup ja partiu)
+    pump_player_strike(scene);         // W2: a resolucao vem no CONTATO da aproximacao
     REQUIRE(scene.machine().log().size() > log_before);   // o golpe resolveu
     REQUIRE(second->hp() < hp_before);                    // o 2o inimigo (escolhido) levou o dano
 }
@@ -1391,6 +1409,7 @@ TEST_CASE("mira: CONFIRMAR monta a acao com o alvo ESCOLHIDO (nao mais o 1o)",
     const std::string chosen_id = chosen->id();
 
     scene.aim_confirm();
+    pump_player_strike(scene);  // W2: a resolucao vem no CONTATO da aproximacao
 
     // O motor logou o Attack do jogador no alvo ESCOLHIDO - NAO no 1o da fila (o hardcode
     // antigo sempre batia no first_alive_enemy).
@@ -2011,4 +2030,264 @@ TEST_CASE("picker: e SO da party - o enemy-block assume sozinho (nunca abre esco
     }
     REQUIRE(scene.combat_over());
     REQUIRE(enemy_turns_seen >= 1);  // inimigos agiram (automatico), todos sem picker
+}
+
+// ---- W2: ANIMACAO DE COMBATE na cena (battle-anim.md par.2/3) -----------------------
+//
+// A base funcional: melee desloca-golpeia-volta (par.2.2), hit-react do alvo (par.2.3),
+// gancho de magia/projetil dormante (par.2.1), timing pelos beats (par.3.1 - a tabela e
+// lei: windup no Beat 1, contato no inicio do Beat 2, recovery no delay do Beat 2).
+
+namespace {
+
+// Alvo MIRADO como ponteiro MUTAVEL (pra ler hp()/add_status no cenario): o aim_target
+// e const; achamos o MESMO ator na fila (identidade de ponteiro).
+gus::domain::combat::CombatActor* aimed_mutable(BattleScene& scene) {
+    for (gus::domain::combat::CombatActor* a : scene.machine().queue().order()) {
+        if (a == scene.aim_target()) {
+            return a;
+        }
+    }
+    return nullptr;
+}
+
+}  // namespace
+
+TEST_CASE("anim W2: confirmar [Atacar] inicia o windup NA HORA e NAO resolve (<100ms)",
+          "[battle_scene][anim]") {
+    using gus::app::screens::ActorAnimKind;
+    BattleScene scene;
+    pump_to_player_turn(scene);
+    scene.update(kFloaterLifeSeconds + 0.1f);  // some com floaters antigos (baseline 0)
+    const auto* self = scene.active_actor();
+    REQUIRE(self != nullptr);
+    const std::string self_id = self->id();
+
+    select_verb(scene, BattleVerb::Atacar);
+    scene.menu_confirm();  // entra na mira
+    gus::domain::combat::CombatActor* victim = aimed_mutable(scene);
+    REQUIRE(victim != nullptr);
+    const int hp_before = victim->hp();
+    const std::size_t log_before = scene.machine().log().size();
+
+    scene.aim_confirm();  // COMANDA o golpe: windup parte JA (regra de ouro < 100ms)
+    REQUIRE(scene.player_action_in_flight());
+    REQUIRE(scene.anim().kind_for(self_id) == ActorAnimKind::MeleeApproach);
+    scene.update(1.0f / 60.0f);  // 1 frame (~16ms): resposta VISIVEL (o sprite ja saiu)
+    REQUIRE(scene.anim().offset_for(self_id).x > 0.0f);  // party avanca pra DIREITA (Pillar 3)
+
+    // NADA resolveu no windup (par.3.1: a aproximacao e o anuncio; HP intacto).
+    REQUIRE(victim->hp() == hp_before);
+    REQUIRE(scene.floaters().empty());
+    REQUIRE(scene.machine().log().size() == log_before);
+}
+
+TEST_CASE("anim W2: o CONTATO resolve (dano + floater juntos) e o atacante VOLTA ao repouso EXATO",
+          "[battle_scene][anim]") {
+    using gus::app::screens::ActorAnimKind;
+    BattleScene scene;
+    pump_to_player_turn(scene);
+    scene.update(kFloaterLifeSeconds + 0.1f);
+    const std::string self_id = scene.active_actor()->id();
+
+    select_verb(scene, BattleVerb::Atacar);
+    scene.menu_confirm();
+    gus::domain::combat::CombatActor* victim = aimed_mutable(scene);
+    REQUIRE(victim != nullptr);
+    const int hp_before = victim->hp();
+
+    scene.aim_confirm();
+    pump_player_strike(scene);  // bombeia ate o CONTATO (fim da aproximacao)
+
+    // O contato resolveu: motor aplicou o dano E o floater nasceu NO MESMO instante.
+    REQUIRE_FALSE(scene.player_action_in_flight());
+    REQUIRE(victim->hp() < hp_before);
+    REQUIRE(scene.floaters().size() > 0);
+    // Recovery (par.3.1): o atacante VOLTA (Return) e termina EXATAMENTE no repouso -
+    // sem ficar deslocado (checklist par.6), dentro do delay do Beat 2.
+    REQUIRE(scene.anim().kind_for(self_id) == ActorAnimKind::MeleeReturn);
+    for (int i = 0; i < 45; ++i) {  // 0.75s > kMeleeReturnSeconds
+        scene.update(1.0f / 60.0f);
+    }
+    REQUIRE(scene.anim().offset_for(self_id).x == 0.0f);
+    REQUIRE(scene.anim().offset_for(self_id).y == 0.0f);
+}
+
+TEST_CASE("anim W2: hit-react - o alvo RECUA um tranco (pra tras) e VOLTA a battle-idle",
+          "[battle_scene][anim]") {
+    using gus::app::screens::ActorAnimKind;
+    BattleScene scene;
+    pump_to_player_turn(scene);
+    scene.update(kFloaterLifeSeconds + 0.1f);
+
+    select_verb(scene, BattleVerb::Atacar);
+    scene.menu_confirm();
+    gus::domain::combat::CombatActor* victim = aimed_mutable(scene);
+    REQUIRE(victim != nullptr);
+    const std::string victim_id = victim->id();
+
+    scene.aim_confirm();
+    pump_player_strike(scene);
+
+    // No contato o alvo entra em HIT-REACT (sofrimento + recuo, par.2.3).
+    REQUIRE(scene.anim().kind_for(victim_id) == ActorAnimKind::HitReact);
+    // Meio do tranco: recuou pra DIREITA (inimigo recua pra tras = pra longe da party).
+    for (int i = 0; i < 9; ++i) {  // ~0.15s = pico do seno
+        scene.update(1.0f / 60.0f);
+    }
+    REQUIRE(scene.anim().offset_for(victim_id).x > 0.0f);
+    // E VOLTA exata a battle-idle (offset zero) ao fim do tranco.
+    for (int i = 0; i < 30; ++i) {
+        scene.update(1.0f / 60.0f);
+    }
+    REQUIRE(scene.anim().offset_for(victim_id).x == 0.0f);
+    REQUIRE(scene.anim().kind_for(victim_id) == ActorAnimKind::None);
+}
+
+// FALHA sem hit-react (battle-anim.md par.2.3): o GANCHO existe na cena (o hit-react so
+// dispara nos canais Common/Crit de parse_hit; Fail/Heal NAO trancam o alvo), mas NAO e
+// testavel fim-a-fim HOJE: o ataque BASICO e deterministico (dano minimo >= 1 e o motor
+// loga o dano BRUTO pre-Shield) - o canal FALHA so nasce da formula de cartas (combat.md
+// par.11), que ainda e placeholder de UI. A classificacao de canal ja e coberta pelos
+// testes de parse_hit (battle_floaters_test) e o gate esta documentado em
+// spawn_floaters_from_new_logs; o teste fim-a-fim entra junto com o COMPILAR real.
+
+TEST_CASE("anim W2: turno de INIMIGO - aproximacao mora no Beat 1 ANUNCIO; contato no Beat 2",
+          "[battle_scene][anim]") {
+    using gus::app::screens::ActorAnimKind;
+    BattleScene scene;
+    scene.start_combat();
+    // Chega no 1o ANUNCIO de inimigo (skip encurta o respiro; o anuncio toca inteiro).
+    for (int i = 0; i < 600 && scene.pacing_state() != PacingState::AnnouncingEnemy;
+         ++i) {
+        scene.skip();
+        scene.update(1.0f / 60.0f);
+    }
+    REQUIRE(scene.pacing_state() == PacingState::AnnouncingEnemy);
+    const auto* atk = scene.active_actor();
+    REQUIRE(atk != nullptr);
+    REQUIRE_FALSE(atk->is_player_side());
+    const std::string atk_id = atk->id();
+    const std::size_t log_before = scene.machine().log().size();
+
+    // MEIO do anuncio: o inimigo ja se DESLOCA (pra ESQUERDA, sem flip) e NADA resolveu
+    // (HP intacto, sem floater, sem log de acao) - o telegraph do Pillar 1.
+    for (int i = 0; i < 12; ++i) {  // ~0.2s dos 0.7s do anuncio
+        scene.update(1.0f / 60.0f);
+    }
+    REQUIRE(scene.pacing_state() == PacingState::AnnouncingEnemy);
+    REQUIRE(scene.anim().offset_for(atk_id).x < 0.0f);
+    REQUIRE(scene.machine().log().size() == log_before);
+    REQUIRE(scene.floaters().empty());
+
+    // FIM do anuncio -> Beat 2: o CONTATO resolve (log + floater nascem) e o atacante
+    // entra na VOLTA (Return) dentro do delay do Beat 2.
+    for (int i = 0;
+         i < 90 && scene.pacing_state() == PacingState::AnnouncingEnemy; ++i) {
+        scene.update(1.0f / 60.0f);
+    }
+    REQUIRE(scene.machine().log().size() > log_before);
+    REQUIRE(scene.floaters().size() > 0);
+    REQUIRE(scene.anim().kind_for(atk_id) == ActorAnimKind::MeleeReturn);
+}
+
+TEST_CASE("anim W2: skip NAO colapsa o windup do jogador (menu inerte durante o voo)",
+          "[battle_scene][anim]") {
+    BattleScene scene;
+    pump_to_player_turn(scene);
+    select_verb(scene, BattleVerb::Atacar);
+    scene.menu_confirm();
+    const std::size_t log_before = scene.machine().log().size();
+    scene.aim_confirm();
+    REQUIRE(scene.player_action_in_flight());
+
+    // skip (acelera delays) NAO resolve o golpe em voo: o windup toca seu tempo proprio
+    // (mesma regra do anuncio do inimigo, par.3.2 - sem "ataque colado/duplo").
+    scene.skip();
+    scene.update(1.0f / 60.0f);
+    REQUIRE(scene.player_action_in_flight());
+    REQUIRE(scene.machine().log().size() == log_before);
+
+    // Menu INERTE durante o voo: nao navega nem re-confirma (o turno ja foi comandado).
+    const int sel = scene.menu().selected_index();
+    scene.menu_move(+1);
+    REQUIRE(scene.menu().selected_index() == sel);
+    scene.menu_confirm();
+    REQUIRE(scene.player_action_in_flight());  // nao disparou outra acao
+
+    pump_player_strike(scene);  // termina limpo
+    REQUIRE_FALSE(scene.player_action_in_flight());
+}
+
+TEST_CASE("anim W2 (dormante): cast demo conjura NO LUGAR, projetil viaja e o impacto da hit-react",
+          "[battle_scene][anim]") {
+    using gus::app::screens::ActorAnimKind;
+    // ABERTURA (intro): o demo e 100% COSMETICO (zero motor) - valida o esqueleto
+    // cast -> viagem -> impacto que o COMPILAR real vai reusar (par.2.1).
+    BattleScene scene;
+    std::string caster_id, target_id;
+    for (const auto* a : scene.machine().queue().order()) {
+        if (a == nullptr || !a->is_alive()) {
+            continue;
+        }
+        if (a->is_player_side() && caster_id.empty()) {
+            caster_id = a->id();
+        }
+        if (!a->is_player_side() && target_id.empty()) {
+            target_id = a->id();
+        }
+    }
+    REQUIRE_FALSE(caster_id.empty());
+    REQUIRE_FALSE(target_id.empty());
+    const auto* target = scene.machine().queue().order()[0];  // qualquer; hp via lookup
+    (void)target;
+    const std::size_t log_before = scene.machine().log().size();
+
+    scene.debug_cast_demo();
+    REQUIRE(scene.anim().is_casting(caster_id));
+    REQUIRE(scene.anim().offset_for(caster_id).x == 0.0f);  // conjura NO LUGAR
+
+    // Windup termina -> o projetil placeholder spawna e viaja.
+    for (int i = 0; i < 120 && scene.anim().projectiles().empty(); ++i) {
+        scene.update(1.0f / 60.0f);
+    }
+    REQUIRE(scene.anim().projectiles().size() == 1);
+    REQUIRE(scene.anim().projectiles()[0].target_id == target_id);
+
+    // Impacto: hit-react VISUAL no alvo; ZERO motor (sem dano, sem log).
+    for (int i = 0; i < 120 && !scene.anim().projectiles().empty(); ++i) {
+        scene.update(1.0f / 60.0f);
+    }
+    REQUIRE(scene.anim().kind_for(target_id) == ActorAnimKind::HitReact);
+    REQUIRE(scene.machine().log().size() == log_before);
+    // O tranco volta sozinho a battle-idle.
+    for (int i = 0; i < 30; ++i) {
+        scene.update(1.0f / 60.0f);
+    }
+    REQUIRE(scene.anim().kind_for(target_id) == ActorAnimKind::None);
+}
+
+TEST_CASE("anim W2: render desenha a bolinha do projetil (placeholder) em voo",
+          "[battle_scene][anim]") {
+    BattleScene scene;
+    scene.debug_cast_demo();
+    for (int i = 0; i < 120 && scene.anim().projectiles().empty(); ++i) {
+        scene.update(1.0f / 60.0f);
+    }
+    REQUIRE(scene.anim().projectiles().size() == 1);
+    scene.update(1.0f / 60.0f);  // avanca um tico (posicao entre caster e alvo)
+    const auto pos = scene.anim().projectiles()[0].position();
+
+    CountingRenderer r;
+    scene.render(r, 960.0f, 540.0f);
+    // Ha fill(s) CENTRADOS na posicao do projetil (a bolinha = fatias de rect).
+    int near = 0;
+    for (const auto& f : r.fills) {
+        const float cx = f.rect.x + f.rect.w * 0.5f;
+        const float cy = f.rect.y + f.rect.h * 0.5f;
+        if (std::abs(cx - pos.x) <= 6.0f && std::abs(cy - pos.y) <= 6.0f) {
+            ++near;
+        }
+    }
+    REQUIRE(near >= 3);  // as 3 fatias da bolinha
 }

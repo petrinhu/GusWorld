@@ -387,6 +387,52 @@ std::optional<gus::core::spatial::Rect> BattleScene::arena_rect_for_actor(
     return std::nullopt;
 }
 
+const CombatActor* BattleScene::actor_by_id(const std::string& id) const {
+    for (const CombatActor* a : machine_->queue().order()) {
+        if (a != nullptr && a->id() == id) {
+            return a;
+        }
+    }
+    return nullptr;
+}
+
+bool BattleScene::start_melee_toward(const std::string& attacker_id,
+                                     const std::string& target_id, float seconds) {
+    // Desloca-golpeia-volta (battle-anim.md par.2.2): o atacante anda da posicao de
+    // repouso ate ADJACENTE ao slot do alvo (folga kMeleeContactGapPx), SEM flip
+    // (Pillar 3): party avanca pra direita, inimigo pra esquerda - so translacao.
+    // Distancia = derivada dos SLOTS REAIS (arena_rect_for_actor), entao a troca
+    // placeholder -> sprite nao muda nada aqui (par.1.1/3.2).
+    const std::optional<Rect> ar = arena_rect_for_actor(attacker_id);
+    const std::optional<Rect> tr = arena_rect_for_actor(target_id);
+    const CombatActor* atk = actor_by_id(attacker_id);
+    if (!ar.has_value() || !tr.has_value() || atk == nullptr) {
+        return false;  // slot invisivel: degrada (caller resolve sem animacao)
+    }
+    const float dest_x = atk->is_player_side()
+                             ? (tr->x - ar->w - kMeleeContactGapPx)   // para a ESQ do alvo
+                             : (tr->x + tr->w + kMeleeContactGapPx);  // para a DIR do alvo
+    anim_.start_melee_approach(
+        attacker_id, Vec2{dest_x - ar->x, tr->y - ar->y}, seconds);
+    return true;
+}
+
+void BattleScene::debug_cast_demo() {
+    // DIAGNOSTICO (dormante, par.2.1): cast cosmetico do 1o player vivo no 1o inimigo
+    // vivo. O update(dt) spawna o projetil quando o windup termina; o impacto dispara o
+    // hit-react visual. ZERO motor (sem dano/log) - so o esqueleto de timing que o
+    // COMPILAR real vai reusar.
+    const CombatActor* caster = first_alive_player();
+    const CombatActor* target = first_alive_enemy();
+    if (caster == nullptr || target == nullptr) {
+        return;
+    }
+    anim_.start_cast(caster->id(), kCastWindupSeconds);
+    demo_cast_active_ = true;
+    demo_cast_caster_ = caster->id();
+    demo_cast_target_ = target->id();
+}
+
 void BattleScene::spawn_floaters_from_new_logs() {
     const auto& log = machine_->log();
     for (std::size_t i = log_cursor_; i < log.size(); ++i) {
@@ -416,6 +462,23 @@ void BattleScene::spawn_floaters_from_new_logs() {
         f.origin_y = slot->y - 2.0f;
         f.age = 0.0f;
         floaters_.push_back(std::move(f));
+
+        // HIT-REACT do alvo (W2, battle-anim.md par.2.3): TODO golpe que CONECTA da um
+        // tranco visual pra tras (cosmetico) - aqui e exatamente o CONTATO (o floater
+        // nasce junto). FALHA (canal Fail, dano 0) NAO tem hit-react (par.2.3: o efeito
+        // dissolve antes de tocar o alvo; o alvo fica em battle-idle) - GANCHO DORMANTE:
+        // o ataque basico atual e deterministico (dano minimo >= 1; o motor loga o dano
+        // BRUTO pre-Shield), entao Fail so vai nascer da formula de cartas (combat.md
+        // par.11) quando o COMPILAR ligar; o gate ja esta pronto aqui. Direcao: "pra
+        // tras" = pra longe dos oponentes (party recua pra ESQ, inimigo pra DIR). Nunca
+        // em Heal (cura nao e golpe).
+        if (hit.channel == HitChannel::Common || hit.channel == HitChannel::Crit) {
+            const CombatActor* victim = actor_by_id(*e.target_id);
+            const float dir =
+                (victim != nullptr && victim->is_player_side()) ? -1.0f : 1.0f;
+            anim_.start_hit_react(*e.target_id, dir, kHitReactSeconds,
+                                  kHitReactKnockbackPx);
+        }
     }
     log_cursor_ = log.size();
 }
@@ -462,6 +525,45 @@ void BattleScene::update(float dt_seconds) {
                        [](const Floater& f) { return !floater_alive(f.age); }),
         floaters_.end());
 
+    // ANIMACAO (W2): avanca os offsets/projeteis ANTES do pacing, pro contato do
+    // jogador (abaixo) e o beat 2 do inimigo enxergarem o estado deste frame.
+    anim_.update(dt_seconds);
+
+    // CONTATO DO JOGADOR (battle-anim.md par.3.1): a aproximacao do [Atacar] chegou ao
+    // alvo -> AGORA o motor resolve (dano + floater + hit-react nascem juntos) e o
+    // ritmo entra no delay pos-acao (player_acted). O Return do atacante e disparado
+    // dentro de resolve_one_turn (comum aos dois lados). A aproximacao FOI o anuncio.
+    if (player_strike_pending_ && anim_.melee_arrived(player_strike_attacker_)) {
+        player_strike_pending_ = false;
+        resolve_one_turn();
+        pacing_.player_acted();
+        menu_.refresh(active_actor() != nullptr ? active_actor()->ap() : 0);
+    }
+
+    // DEMO DE CAST (diagnostico, dormante): o windup terminou -> spawna o projetil
+    // placeholder do centro do caster ao centro do alvo (par.2.1: cast no lugar +
+    // bolinha viaja). Cosmetico: zero motor.
+    if (demo_cast_active_ && !anim_.is_casting(demo_cast_caster_)) {
+        demo_cast_active_ = false;
+        const std::optional<Rect> cr = arena_rect_for_actor(demo_cast_caster_);
+        const std::optional<Rect> tr = arena_rect_for_actor(demo_cast_target_);
+        if (cr.has_value() && tr.has_value()) {
+            anim_.spawn_projectile(demo_cast_target_, cr->x + cr->w * 0.5f,
+                                   cr->y + cr->h * 0.5f, tr->x + tr->w * 0.5f,
+                                   tr->y + tr->h * 0.5f, kProjectileTravelSeconds);
+        }
+    }
+
+    // IMPACTOS de projetil (mecanismo dormante da magia): cada chegada dispara o
+    // hit-react VISUAL do alvo (a resolucao de carta real vai plugar aqui quando o
+    // COMPILAR ligar; o canal FALHA entao suprimira o hit-react, par.2.3).
+    for (const std::string& id : anim_.take_impacts()) {
+        const CombatActor* victim = actor_by_id(id);
+        const float dir =
+            (victim != nullptr && victim->is_player_side()) ? -1.0f : 1.0f;
+        anim_.start_hit_react(id, dir, kHitReactSeconds, kHitReactKnockbackPx);
+    }
+
     // RITMO (incremento 6): avanca o diretor pelo tempo; quando ele LIBERA um passo (a
     // intro/delay terminou), conduz UM turno (de inimigo) ou entra em espera-do-jogador.
     pacing_.tick(dt_seconds);
@@ -494,12 +596,20 @@ void BattleScene::advance_pacing() {
         // BEAT 1 ANUNCIO: mostra "Vez de <nome>" + highlight forte. NADA resolveu ainda
         // (HP intacto, sem floater, sem linha de acao no log). Pausa ~0.7s OU tecla.
         //
-        // >>> GANCHO DE ANIMACAO (futuro): aqui entra a animacao de ataque do inimigo
-        //     (telegraph -> windup). Hoje so anuncia e espera; quando a anim existir, ela
-        //     toca NESTE beat, e o golpe "conecta" no inicio do BEAT 2 (resolucao). E
-        //     EXATAMENTE o beat que o lider disse que "vai morar a animacao". <<<
+        // ANIMACAO (W2, battle-anim.md par.3.1): o gancho previsto aqui AGORA toca - a
+        // APROXIMACAO do melee do inimigo preenche o anuncio (windup/telegraph, Pillar
+        // 1: o jogador VE o golpe vir), com duracao = o proprio beat, entao o ator
+        // CHEGA no alvo exatamente quando o Beat 2 resolve (o contato coincide com a
+        // resolucao). O alvo e o MESMO da acao auto (first_alive_player; nada resolve
+        // entre o anuncio e o beat 2, entao ele e estavel). Cosmetico: se o slot nao
+        // estiver visivel, degrada sem animacao (o beat anuncia parado, como antes).
         enemy_announced_ = true;
         pacing_.begin_enemy_announce();
+        const CombatActor* atk = active_actor();
+        const CombatActor* tgt = first_alive_player();
+        if (atk != nullptr && tgt != nullptr) {
+            start_melee_toward(atk->id(), tgt->id(), kPacingAnnounceSeconds);
+        }
         return;
     }
     // BEAT 2 RESOLUCAO: AGORA aplica a acao (dano + floater + queda de HP + log de
@@ -644,6 +754,12 @@ void BattleScene::resolve_one_turn() {
     // A acao ja esta no mailbox (jogador) ou sera auto (inimigo). run_active_turn_to_end
     // consome AP ate Pass/0. Depois: floaters + narracao de consequencia (D11/D12),
     // check_end, avanca pro proximo ator e prepara o turno dele (start_active_turn).
+    //
+    // ANIMACAO (W2): captura o id do atacante ANTES de resolver/avancar - se ele estava
+    // em aproximacao melee (jogador OU inimigo), o CONTATO e agora, e a VOLTA ao repouso
+    // (Return) toca dentro do delay pos-resolucao (par.3.1, recovery no Beat 2).
+    const CombatActor* atk_before = active_actor();
+    const std::string atk_id = atk_before != nullptr ? atk_before->id() : std::string{};
     if (machine_->phase() == gus::domain::combat::CombatPhase::ActionSelect) {
         machine_->run_active_turn_to_end();
     }
@@ -651,6 +767,11 @@ void BattleScene::resolve_one_turn() {
     // esta vivo/visivel na arena pra ancorar o numero.
     spawn_floaters_from_new_logs();
     narrate_new_logs();
+    // Recovery do melee (no-op se o atacante nao estava em aproximacao/hold - Defender/
+    // Scan/Flee nao animam; robusto a skip: parte do offset ATUAL, termina no repouso).
+    if (!atk_id.empty() && anim_.melee_in_flight(atk_id)) {
+        anim_.begin_melee_return(atk_id, kMeleeReturnSeconds);
+    }
     if (!machine_->check_end()) {
         machine_->advance_to_next_actor();
         turn_started_ = false;       // o proximo ator ainda nao teve begin_turn
@@ -665,12 +786,18 @@ void BattleScene::menu_move(int delta) noexcept {
     if (choosing_actor_) {
         return;  // escolha de ator (§4.1): o menu de verbos ainda nao existe (begin deferido)
     }
+    if (player_strike_pending_) {
+        return;  // golpe em VOO (W2): o turno ja foi comandado; menu inerte ate resolver
+    }
     menu_.move(delta);
 }
 
 void BattleScene::menu_confirm() {
     if (combat_over() || !current_actor_is_player()) {
         return;
+    }
+    if (player_strike_pending_) {
+        return;  // golpe em VOO (W2): nao aceita re-confirmar durante o windup
     }
     if (choosing_actor_) {
         return;  // escolha de ator (§4.1): confirme o ATOR primeiro (actor_picker_confirm);
@@ -882,17 +1009,36 @@ void BattleScene::aim_confirm() {
         aim_cancel();  // sem alvo valido: aborta a mira sem consumir turno
         return;
     }
+    const bool is_scan = (aim_verb_ == BattleVerb::Scan);
     // Monta a acao com o ALVO ESCOLHIDO (nao mais o hardcode first_alive_enemy).
-    CombatAction action = (aim_verb_ == BattleVerb::Scan)
-                              ? CombatAction::scan(t->id())
-                              : CombatAction::attack(t->id());
+    CombatAction action = is_scan ? CombatAction::scan(t->id())
+                                  : CombatAction::attack(t->id());
+    const std::string target_id = t->id();
     // Sai da mira ANTES de resolver (o turno avanca; o proximo turno reabre o menu).
     aiming_ = false;
     aim_index_ = 0;
     aim_candidates_.clear();
-    // Mesmo fluxo do menu_confirm antigo (pacing incr 6): resolve so o turno do jogador; o
-    // update(dt) anima os inimigos um a um depois (player_acted entra em delay).
     pending_action_ = std::move(action);
+
+    // [ATACAR] = golpe MELEE (W2, battle-anim.md par.2.2/3.1): a confirmacao inicia o
+    // WINDUP na hora (regra de ouro < 100ms: o sprite ja parte no proximo frame) e a
+    // RESOLUCAO fica DEFERIDA ate o CONTATO (fim da aproximacao; a acao espera no
+    // mailbox) - a aproximacao E o proprio anuncio do turno do jogador. O ritmo
+    // continua em WaitingPlayerInput durante o voo (o menu fica inerte pelos guards);
+    // o update(dt) resolve no contato e entra no delay (player_acted). A duracao usa
+    // kPacingAnnounceSeconds: o MESMO tempo de windup garantido ao inimigo (par.3.2).
+    // Se o slot nao estiver visivel (nunca no fluxo normal), degrada: resolve na hora.
+    if (!is_scan) {
+        const CombatActor* self = active_actor();
+        if (self != nullptr &&
+            start_melee_toward(self->id(), target_id, kPacingAnnounceSeconds)) {
+            player_strike_pending_ = true;
+            player_strike_attacker_ = self->id();
+            return;  // contato (e resolucao) vem no update(dt)
+        }
+    }
+    // Scan (utilitario, nao e golpe) e o fallback degradado resolvem NA HORA (mesmo
+    // fluxo do menu_confirm antigo): o update(dt) anima os inimigos um a um depois.
     resolve_one_turn();
     pacing_.player_acted();
     menu_.refresh(active_actor() != nullptr ? active_actor()->ap() : 0);
@@ -1169,7 +1315,10 @@ void BattleScene::render(IRenderer& renderer, float viewport_px_w,
             // MENU de verbos EMPILHADO (so no turno de jogador vivo). Suprimido durante a
             // ESCOLHA DE ATOR (§4.1): o begin_turn esta deferido, entao nao ha turno cujo
             // menu mostrar - o jogador escolhe QUEM age primeiro (destaque na arena, abaixo).
-            if (current_actor_is_player() && !combat_over() && !choosing_actor_) {
+            // Suprimido tambem com o GOLPE EM VOO (W2): o turno ja foi comandado; o menu
+            // some enquanto o sprite desloca/golpeia (re-aparece no proximo turno).
+            if (current_actor_is_player() && !combat_over() && !choosing_actor_ &&
+                !player_strike_pending_) {
                 const Rect mz = cockpit_menu_zone();
                 renderer.draw_text("ACAO", mz.x, mz.y - kCockpitLabelPx - 2.0f,
                                    kCockpitLabelPx, kInkDim, /*bold=*/false);
@@ -1331,16 +1480,23 @@ void BattleScene::render(IRenderer& renderer, float viewport_px_w,
                     continue;
                 }
                 const CombatActor* a = alive[static_cast<std::size_t>(i)];
+                // ANIMACAO (W2, battle-anim.md par.3.2): o ATOR (retrato-placeholder;
+                // sprite depois) desenha na posicao-base do slot + o OFFSET de animacao
+                // (melee/hit-react/cast). Os elementos de HUD ancorados no ator (barra
+                // de HP, status, intent, mira, picker) FICAM no slot-base: o sprite se
+                // desloca, a leitura tatica nao dança junto (camera estatica, D7).
+                const Vec2 aoff = anim_.offset_for(a->id());
+                const Rect ra{r.x + aoff.x, r.y + aoff.y, r.w, r.h};
                 // Retrato (ou slot escuro de fallback).
                 const TextureId tex = portraits_.find(a->id());
                 if (tex != kInvalidTexture) {
-                    renderer.draw_textured_rect(r, tex, UvRect{}, kWhite);
+                    renderer.draw_textured_rect(ra, tex, UvRect{}, kWhite);
                 } else {
-                    renderer.draw_filled_rect(r, kSlotDarkColor);
+                    renderer.draw_filled_rect(ra, kSlotDarkColor);
                 }
                 // Moldura: ativo = cyan grossa; senao a cor do lado, fina.
                 const bool act = (active != nullptr && a == active);
-                renderer.draw_rect_outline(r, act ? kCyan : side, act ? 2.0f : 1.0f);
+                renderer.draw_rect_outline(ra, act ? kCyan : side, act ? 2.0f : 1.0f);
                 // Mini-barra de HP sob o ator.
                 const Rect hpbar = arena_hp_bar_frame(r);
                 draw_bar(renderer, hpbar, bar_fill(a->hp(), a->max_hp()), hp_fill);
@@ -1509,6 +1665,21 @@ void BattleScene::render(IRenderer& renderer, float viewport_px_w,
                   /*is_party=*/true);
         draw_side(arena.enemy_count, arena.enemies, alive_enemies, kMagenta, kMagenta,
                   /*is_party=*/false);
+    }
+
+    // --- PROJETEIS de magia (W2, battle-anim.md par.2.1), por cima dos atores ---
+    // Bolinha placeholder NEUTRA de proposito (so valida o esqueleto de timing; o VFX
+    // por familia entra depois, vfx-combate-familias.md). O IRenderer so tem rects:
+    // a bolinha e aproximada por 3 fatias horizontais (circulo chunky pixel-art).
+    for (const auto& p : anim_.projectiles()) {
+        const Vec2 pos = p.position();
+        const float pr = kProjectileRadiusPx;
+        renderer.draw_filled_rect(
+            Rect{pos.x - pr, pos.y - pr * 0.5f, 2.0f * pr, pr}, kInk);
+        renderer.draw_filled_rect(
+            Rect{pos.x - pr * 0.6f, pos.y - pr, 1.2f * pr, pr * 0.5f}, kInk);
+        renderer.draw_filled_rect(
+            Rect{pos.x - pr * 0.6f, pos.y + pr * 0.5f, 1.2f * pr, pr * 0.5f}, kInk);
     }
 
     // --- caixa de log (base): ESTRUTURA por evento (D7), 1 marca colorida por linha ---
