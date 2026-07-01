@@ -408,32 +408,28 @@ void BattleScene::spawn_floaters_from_new_logs() {
 }
 
 void BattleScene::narrate_new_logs() {
-    // D12: monta a NARRACAO de cada evento NOVO do motor = a message do motor (ja diz
-    // "X ataca Y por N") + a CONSEQUENCIA de status aplicado no alvo naquele evento
-    // ("; Y ficou com <Status>"), com o nome do status resolvido via tr(). Uma linha por
-    // evento. A cor vem da categoria (classify).
+    // POLISH 3 (veredito do lider: log ENXUTO, estilo terminal/tatico): cada linha de dano
+    // vira a forma CURTA "<atacante> -> <alvo> -<dano>" (ex.: "inimigo3 -> caua -5") em vez
+    // da frase longa do motor ("inimigo3 ataca caua por 5.; caua ficou com Aceleracao") que
+    // estourava a coluna estreita e era truncada por reticencias. A CATEGORIA (cor) continua
+    // vindo de classify() (kind inalterado - os testes cravam kind, nao o texto). A message
+    // CRUA do motor (dominio/POCO, testada) NAO e alterada: so a APRESENTACAO monta a string
+    // curta a partir dos campos ESTRUTURADOS do evento (actor_id/target_id/value). O sufixo
+    // verboso de status ("; X ficou com Y") foi REMOVIDO do log - o status ja aparece como
+    // ICONE sob o ator (incremento 2), entao a repeticao textual e redundante e so gastava
+    // largura. Linhas nao-dano (COMPILADO/Scan/Defender...) mantem a message do motor, que ja
+    // e curta; o nowrap+ellipsis do RCSS segue como rede de seguranca.
     const auto& log = machine_->log();
-    const auto& changes = machine_->status_changes();
     for (std::size_t i = narration_cursor_; i < log.size(); ++i) {
         const auto& e = log[i];
-        LogLine line = classify(e);  // categoria + message crua do motor
-        // Consequencia: status aplicado no alvo do golpe. consequence_suffix devolve a
-        // forma com a CHAVE i18n; resolvemos a chave via tr() pra exibir o nome.
-        if (e.target_id.has_value()) {
-            std::string sfx = consequence_suffix(*e.target_id, changes);
-            if (!sfx.empty() && translator_ != nullptr) {
-                // Troca cada STATUS_*_NAME pela traducao (a chave aparece literal no sfx).
-                for (int s = 0; s < 13; ++s) {
-                    const auto id = static_cast<gus::domain::combat::StatusId>(s);
-                    const std::string key(status_name_key(id));
-                    std::size_t pos = sfx.find(key);
-                    while (pos != std::string::npos) {
-                        sfx.replace(pos, key.size(), translator_->tr(key));
-                        pos = sfx.find(key, pos + 1);
-                    }
-                }
-            }
-            line.text += sfx;
+        LogLine line = classify(e);  // categoria (cor); texto reescrito abaixo se for dano
+        // Linha de DANO (golpe com alvo): forma curta terminal "<atacante> -> <alvo> -<dano>".
+        // Usa os IDS crus do evento (curtos e INEQUIVOCOS - 2 "Drone"/2 "Sentinela" do demo
+        // colidiriam em display_name; o lider usou o id "inimigo3" no exemplo). Demais linhas
+        // ficam com a message do motor que classify() ja copiou (system/status/info, ja curtas).
+        if (line.kind == LogLineKind::Damage && e.target_id.has_value()) {
+            line.text =
+                e.actor_id + " -> " + *e.target_id + " -" + std::to_string(e.value);
         }
         narration_.push_back(std::move(line));
     }

@@ -1001,13 +1001,17 @@ TEST_CASE("pacing D12: a narracao traz a CONSEQUENCIA (dano) no log", "[battle_s
     pump_to_player_turn(scene);
     select_verb(scene, BattleVerb::Atacar);
     scene.menu_confirm();
-    // A narracao tem a linha do ataque do jogador com o dano (a message do motor "X ataca
-    // Y por N" e a base da consequencia; o status entra quando aplicado).
+    // POLISH 3 (veredito do lider: log ENXUTO estilo terminal): a linha de dano tem a forma
+    // CURTA "<atacante> -> <alvo> -<dano>" (ex.: "gus -> inimigo1 -8"), montada na APRESENTACAO
+    // a partir dos campos estruturados do evento. A message CRUA do motor ("X ataca Y por N")
+    // segue inalterada no dominio (testada la); aqui checamos so a linha APRESENTAVEL: kind
+    // Damage + a seta " -> " (assinatura da linha curta) + o "-" do dano.
     const auto lines = scene.log_lines(20);
     bool has_dano = false;
     for (const auto& l : lines) {
         if (l.kind == LogLineKind::Damage &&
-            l.text.find(" por ") != std::string::npos) {
+            l.text.find(" -> ") != std::string::npos &&
+            l.text.find(" -") != std::string::npos) {
             has_dano = true;
         }
     }
