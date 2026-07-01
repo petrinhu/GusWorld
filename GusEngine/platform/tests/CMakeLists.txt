@@ -14,10 +14,14 @@ add_executable(gusengine_platform_tests
     sdl_input_test.cpp
     viewport_transform_test.cpp
     render2d_sdl_test.cpp
+    render2d_gl3_test.cpp
     alpha_bbox_test.cpp
     text_metrics_test.cpp
     font_atlas_test.cpp
 )
+
+# ADR-010 F3: os testes do HUD RmlUi VENDORIZADO (rmlui_hud_test.cpp, 4 TEST_CASE) foram
+# aposentados junto do backend vendorizado - o glintfx e o unico motor de UI/HUD agora.
 
 target_link_libraries(gusengine_platform_tests
     PRIVATE

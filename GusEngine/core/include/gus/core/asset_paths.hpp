@@ -66,8 +66,11 @@ inline constexpr std::string_view kIaraSpritesDir = "sprites/iara_lumen";
 // ICONES DA TELA DE BATALHA (sob resources/sprites/icons-m5/). NAO mudou na reorg.
 // ============================================================================
 
-// Retratos (48px / busto 3/4) usados na fila CTB e no cockpit. (retrato_gus_combate.png
-// virou 3/4; o arquivo continua nesta pasta - so o conteudo mudou.)
+// Pasta dos icones de batalha (raiz de retratos/status/intent/molduras).
+inline constexpr std::string_view kIconsM5Dir = "sprites/icons-m5";
+
+// Retratos (48px / busto 3/4) usados na fila CTB. (retrato_gus_combate.png virou 3/4; o
+// arquivo continua nesta pasta - so o conteudo mudou.)
 inline constexpr std::string_view kRetratosDir = "sprites/icons-m5/retratos";
 
 // Icones de status effect (Stun/Poison/Shield/...), 14px.
@@ -75,6 +78,15 @@ inline constexpr std::string_view kStatusIconsDir = "sprites/icons-m5/status";
 
 // Icones de intent (telegraph): atacar/defender/aplicar_status/ruido.
 inline constexpr std::string_view kIntentIconsDir = "sprites/icons-m5/intent";
+
+// --- COCKPIT "otimo" (variante C, redesign 2026-06-25) ---
+// Moldura ornamental TCG (75x97, dourada/azul, com JANELA INTERNA TRANSPARENTE):
+// desenhada POR CIMA do retrato_nobg do ator ativo no cockpit. Em sprites/icons-m5/.
+inline constexpr std::string_view kMolduraCartaFrameFile = "moldura_carta_frame.png";
+// Retrato 3/4 do Gus SEM fundo (128x128), pra emoldurar no cockpit (vai DENTRO da janela
+// da moldura). Em sprites/icons-m5/retratos/.
+inline constexpr std::string_view kRetratoGusCombateNobgFile =
+    "retrato_gus_combate_nobg.png";
 
 // ============================================================================
 // FONTES (sob GusEngine/assets/fonts/, asset de ENGINE versionado no repo).

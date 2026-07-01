@@ -78,6 +78,27 @@ TEST_CASE("Render2dSdl frame vazio e valido (zero draws)", "[render2d_sdl]") {
     REQUIRE(r.last_draw_count() == 0);
 }
 
+TEST_CASE("Render2dSdl present diferido (ADR-009) e seguro headless e nao perde draws",
+          "[render2d_sdl]") {
+    // Composicao com RmlUi: set_defer_present(true) faz end_frame() NAO apresentar (o HUD
+    // compoe antes, e o dono do frame chama present() depois). Headless (renderer nulo)
+    // tudo e no-op contabilizado: a contagem de draws NAO muda com o defer, e present()
+    // headless e seguro. Garante que o seam de composicao nao altera a semantica de draw.
+    Render2dSdl r(nullptr);
+    REQUIRE_FALSE(r.defer_present());  // default = apresenta no end_frame (comportamento antigo)
+    r.set_defer_present(true);
+    REQUIRE(r.defer_present());
+
+    const Rect cam{0.0f, 0.0f, 32.0f, 32.0f};
+    const Rect a{0.0f, 0.0f, 8.0f, 8.0f};
+    r.begin_frame(cam, 32, 32);
+    r.draw_filled_rect(a, DrawColor{1.0f, 0.0f, 0.0f, 1.0f});
+    r.end_frame();             // com defer: nao apresenta, mas conta o draw
+    REQUIRE(r.last_draw_count() == 1);
+    r.present();               // headless: no-op seguro (nao crasha)
+    SUCCEED("present diferido headless ok");
+}
+
 TEST_CASE("Render2dSdl headless: draw_text nao crasha e conta 1 por glifo desenhavel",
           "[render2d_sdl]") {
     // Sem renderer, a fonte nao bakeia textura, mas draw_text deve degradar sem crash

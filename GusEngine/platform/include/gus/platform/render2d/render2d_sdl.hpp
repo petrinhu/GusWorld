@@ -69,6 +69,19 @@ public:
     // Numero de primitivos (quads/sprites) emitidos no ultimo frame (debug/teste).
     [[nodiscard]] int last_draw_count() const noexcept { return last_draw_count_; }
 
+    // --- COMPOSICAO COM RmlUi (ADR-009): present diferido -------------------------
+    // Por padrao end_frame() apresenta (SDL_RenderPresent) o frame. Quando o HUD do
+    // RmlUi vai compor POR CIMA da arena, o present precisa acontecer DEPOIS do RmlUi,
+    // nao no fim do desenho da arena. set_defer_present(true) faz end_frame() PARAR de
+    // apresentar; o dono do frame (app/) chama compose do RmlUi e depois present()
+    // manualmente. Sem isso, a arena daria present antes do HUD (o HUD nao apareceria).
+    void set_defer_present(bool defer) noexcept { defer_present_ = defer; }
+    [[nodiscard]] bool defer_present() const noexcept { return defer_present_; }
+
+    // Apresenta o frame manualmente (swap). Usado quando defer_present()==true: chamar
+    // depois da arena (end_frame sem present) E do compose do RmlUi. No-op headless.
+    void present();
+
 private:
     SDL_Renderer* renderer_ = nullptr;  // nao-owner; nullptr = headless
 
@@ -101,6 +114,7 @@ private:
     int pixel_h_ = 0;
     int draw_count_ = 0;       // acumulado no frame corrente
     int last_draw_count_ = 0;  // congelado em end_frame
+    bool defer_present_ = false;  // true = end_frame nao apresenta (HUD RmlUi compoe antes)
 };
 
 }  // namespace gus::platform::render2d

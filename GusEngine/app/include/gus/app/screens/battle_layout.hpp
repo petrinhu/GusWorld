@@ -82,7 +82,10 @@ inline constexpr int kCtbPortraitPx = 48;
 inline constexpr int kCtbStripTop = 10;    // y do topo da faixa CTB
 inline constexpr int kCtbStripH = 54;      // altura da faixa
 inline constexpr int kCtbCellGap = 8;      // espaco horizontal entre celulas
-inline constexpr int kCtbStripLeft = kRightZoneX;  // x do inicio (188)
+// Vao INICIAL da fila CTB: recuada a direita da borda do cockpit por ~1 retrato (48px),
+// pra nao colar/invadir a parede do cockpit (lider 2026-06-30). +95 sobre kRightZoneX.
+inline constexpr int kCtbStripOffsetX = 95;
+inline constexpr int kCtbStripLeft = kRightZoneX + kCtbStripOffsetX;  // 283
 
 // --- Faixa do BANNER de turno (acima dos atores, faixa PROPRIA) ---
 inline constexpr int kBannerBandTop = 70;  // y da faixa do banner

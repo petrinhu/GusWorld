@@ -288,6 +288,18 @@ void Render2dSdl::end_frame() {
     if (renderer_ == nullptr) {
         return;  // headless: nada a apresentar
     }
+    // ADR-009: quando o HUD do RmlUi vai compor por cima, o present e ADIADO (o dono do
+    // frame chama present() depois do compose). Sem defer, mantem o comportamento antigo.
+    if (defer_present_) {
+        return;
+    }
+    SDL_RenderPresent(renderer_);
+}
+
+void Render2dSdl::present() {
+    if (renderer_ == nullptr) {
+        return;  // headless: nada a apresentar
+    }
     SDL_RenderPresent(renderer_);
 }
 

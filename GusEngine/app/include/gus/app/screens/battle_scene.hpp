@@ -126,6 +126,14 @@ public:
         intent_icons_ = icons;
     }
 
+    // HUD EXTERNO (ADR-009): quando true, o COCKPIT (painel do ator + menu de verbos) e o
+    // LOG/terminal NAO sao desenhados a mao por esta cena - eles viram 100% RmlUi (GL3),
+    // desenhados POR CIMA. A cena segue dona de arena/fila-CTB/banner/floaters. Evita os
+    // DOIS cockpits sobrepostos (o a-mao + o RmlUi). Default false (cockpit a-mao, como
+    // antes / headless / testes). So a casca (battle_preview) liga quando o RmlUi esta on.
+    void set_hud_external(bool external) noexcept { hud_external_ = external; }
+    [[nodiscard]] bool hud_external() const noexcept { return hud_external_; }
+
     // ---- Leitura do estado do motor (pro render e pros testes) ----
 
     // Contagem de atores VIVOS por lado (alimenta arena_layout).
@@ -298,6 +306,9 @@ private:
     BattlePortraitSet portraits_{};
     BattleStatusIconSet status_icons_{};
     BattleIntentIconSet intent_icons_{};
+
+    // HUD externo (RmlUi): suprime o cockpit/log desenhados a mao (ADR-009). Default false.
+    bool hud_external_ = false;
 
     // Menu de verbos do ator ativo (incremento 3).
     BattleMenu menu_{};

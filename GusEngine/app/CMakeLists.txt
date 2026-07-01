@@ -28,6 +28,9 @@ add_library(gusengine_app STATIC
 
 target_include_directories(gusengine_app
     PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include
+    # stb_image_write (vendorizado header-only): captura de frame em PNG para o smoke
+    # visual do ADR-009 (battle_preview). IMPLEMENTACAO definida em battle_preview.cpp.
+    PRIVATE ${CMAKE_SOURCE_DIR}/third_party/stb
 )
 
 # Caminho ABSOLUTO da pasta resources/ do repo (raiz = pai de GusEngine/), embutido
@@ -44,6 +47,11 @@ target_compile_definitions(gusengine_app
     # de GusEngine/). O Translator de UI le pt_br.md daqui rodando do build dir;
     # override em runtime via env GUSWORLD_TRANSLATIONS (caminho completo do .md).
     PRIVATE GUSWORLD_TRANSLATIONS_DIR="${CMAKE_SOURCE_DIR}/../game/translations"
+    # Pasta das fontes (.ttf) DENTRO de GusEngine/ (mesma macro do platform/). ADR-010
+    # F2a: o cockpit BAKED do glintfx registra a "Pixel Operator Mono" via @font-face no
+    # RCSS (o glintfx::UiLayer NAO expoe Rml::LoadFontFace - so o doc carrega fonte). Sem
+    # esta macro o app/ nao saberia o caminho absoluto da fonte. Override: env GUSWORLD_FONTS.
+    PRIVATE GUSWORLD_FONTS_DIR="${CMAKE_SOURCE_DIR}/assets/fonts"
 )
 
 # SDL3 entra aqui (a casca SdlWindow + o main tocam SDL diretamente).
@@ -56,6 +64,11 @@ target_link_libraries(gusengine_app
 )
 
 target_compile_features(gusengine_app PUBLIC cxx_std_20)
+
+# ADR-010 F3: glintfx::UiLayer (embed mode) e o UNICO motor de UI/HUD. Linkado SEMPRE, SO
+# aqui em app/ (GATE de 4 camadas: nunca core/ nem domain/). Sem flag - o backend RmlUi
+# vendorizado foi aposentado (two-way door via historico git).
+target_link_libraries(gusengine_app PRIVATE glintfx::glintfx)
 
 # --- executavel ---
 add_executable(gusworld_app

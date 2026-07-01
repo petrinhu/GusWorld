@@ -59,19 +59,24 @@ jobs:
             libgl1-mesa-dev libegl1-mesa-dev libdrm-dev libgbm-dev \
             libpulse-dev libasound2-dev libdbus-1-3
 
-      # Gate de arquitetura (invariante ADR-008): core/ e domain/ sao POCO puro e
-      # NAO podem incluir Qt NEM SDL. Falha o CI cedo, antes de gastar build, se
-      # algum <Q...> ou <SDL...> vazar para essas camadas.
-      - name: Architecture gate (no Qt/SDL in core/domain)
+      # Gate de arquitetura (invariante ADR-008 + ADR-009 + ADR-010 F3): core/ e domain/
+      # sao POCO puro e NAO podem incluir Qt, SDL, RmlUi NEM glintfx (nem vazar os
+      # namespaces Rml::/glintfx::). Falha o CI cedo, antes de gastar build, se algo vazar
+      # para essas camadas. Sincronizado com tools/check.sh (GATE arch).
+      - name: Architecture gate (no Qt/SDL/RmlUi/glintfx in core/domain)
         run: |
           set -eu
-          if grep -rnE '#[[:space:]]*include[[:space:]]*<(Q[A-Za-z]|SDL)' \
+          if grep -rnE '#[[:space:]]*include[[:space:]]*<(Q[A-Za-z]|SDL|RmlUi|glintfx)' \
                GusEngine/core GusEngine/domain; then
-            echo "::error::include de Qt ou SDL encontrado em core/ ou domain/ (POCO)."
-            echo "core/ e domain/ devem ser headless, sem Qt nem SDL. Mover para platform/ ou app/."
+            echo "::error::include de Qt, SDL, RmlUi ou glintfx encontrado em core/ ou domain/ (POCO)."
+            echo "core/ e domain/ devem ser headless. Mover para platform/ ou app/."
             exit 1
           fi
-          echo "OK: nenhum include Qt/SDL em core/ ou domain/."
+          if grep -rnE '\b(Rml|glintfx)::' GusEngine/core GusEngine/domain; then
+            echo "::error::namespace Rml:: ou glintfx:: encontrado em core/ ou domain/ (POCO)."
+            exit 1
+          fi
+          echo "OK: nenhum include/namespace Qt/SDL/RmlUi/glintfx em core/ ou domain/."
 
       # Cache dos fontes de FetchContent (_deps: SDL3, RmlUi, Catch2). Evita
       # re-clonar a cada run. Chave amarrada ao CMakeLists (onde os pins vivem).

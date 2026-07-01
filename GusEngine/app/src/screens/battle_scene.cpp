@@ -744,8 +744,12 @@ void BattleScene::render(IRenderer& renderer, float viewport_px_w,
     renderer.begin_frame(screen, static_cast<int>(viewport_px_w),
                          static_cast<int>(viewport_px_h));
 
-    // --- fundo (D7: camera estatica, fundo plano no M5) ---
-    renderer.draw_filled_rect(screen, kBgColor);
+    // --- fundo (D7: camera estatica) ---
+    // O FUNDO da arena agora vem da VINHETA/glow radial do renderer (Render2dGl3 desenha
+    // um quad full-window LOGO APOS o clear, dando profundidade: bordas escuras + leve
+    // lift no centro). NAO repintamos um fill chapado #0c0f1a aqui senao ele cobriria a
+    // vinheta. (kBgColor mantido como referencia da cor-base canonica.)
+    (void)kBgColor;
 
     // ====================================================================
     // VARIANTE C "Tatico Cockpit": cockpit lateral esq + arena a direita +
@@ -761,7 +765,9 @@ void BattleScene::render(IRenderer& renderer, float viewport_px_w,
     // So mostra os DADOS do ator quando NAO e abertura (na abertura o ativo e o 1o da
     // fila por SPD = inimigo; o cockpit fica vazio/dim). A faixa do cockpit e sempre
     // desenhada (opaca) pra demarcar a coluna.
-    {
+    // ADR-009: quando o HUD e EXTERNO (RmlUi-GL3), o cockpit inteiro (painel/retrato/
+    // pips/menu) NAO e desenhado a mao - o RmlUi o desenha por cima. Evita 2 cockpits.
+    if (!hud_external_) {
         const Rect cp = cockpit_rect();
         renderer.draw_filled_rect(cp, kPanelColor);
         renderer.draw_rect_outline(
@@ -1026,7 +1032,8 @@ void BattleScene::render(IRenderer& renderer, float viewport_px_w,
     // FIX (lider no display): NAO renderiza na ABERTURA - na intro o log esta vazio e a
     // caixa virava um "quadrao preto" grande. So aparece DEPOIS de Encarar (quando ha
     // narracao). A abertura fica limpa (CTB + arena + banner + prompt).
-    if (!is_intro()) {
+    // ADR-009: com HUD externo (RmlUi), o log/terminal e 100% RmlUi - nao desenha a mao.
+    if (!is_intro() && !hud_external_) {
         const Rect l = log_panel_rect();
         renderer.draw_filled_rect(l, kLogColor);
         renderer.draw_rect_outline(l, kHudBorderColor, 1.0f);
