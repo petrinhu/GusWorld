@@ -22,6 +22,8 @@
 #include "gus/app/screens/battle_pacing.hpp"     // PacingState/constantes
 #include "gus/app/screens/battle_scene.hpp"
 #include "gus/domain/combat/combat_actor.hpp"
+#include "gus/domain/combat/combat_constants.hpp"  // kMultFraco (expectativa D3 no teste)
+#include "gus/domain/combat/weakness_wheel.hpp"     // WeaknessWheel (fraco = 1.5 no teste)
 #include "gus/platform/render2d/i_renderer.hpp"
 
 using gus::app::screens::BattleScene;
@@ -124,6 +126,33 @@ void select_verb(BattleScene& scene, BattleVerb want) {
     for (int i = 0; i < 12 && scene.menu().selected_verb() != want; ++i) {
         scene.menu_move(+1);
     }
+}
+
+// Ataque COMPLETO do jogador no alvo pre-selecionado (D3): escolhe Atacar, entra no
+// modo-mira (menu_confirm NAO resolve mais na hora) e confirma o alvo (aim_confirm ->
+// resolve). Substitui o antigo "select_verb(Atacar)+menu_confirm" (que resolvia direto),
+// agora que Atacar abre a mira. Sem navegar, mira o alvo sugerido = first_alive_enemy
+// (D3 (b)) - o MESMO alvo do hardcode antigo, mantendo estes testes validos.
+void player_attack(BattleScene& scene) {
+    select_verb(scene, BattleVerb::Atacar);
+    scene.menu_confirm();  // entra em modo-mira (NAO resolve)
+    scene.aim_confirm();   // confirma o alvo sugerido -> resolve o turno
+}
+
+// N-esimo inimigo VIVO na ordem de fila (ponteiro MUTAVEL: a const-ref da fila so fixa o
+// PONTEIRO; o pointee CombatActor nao e const). Deixa o teste montar cenario de mira
+// (set_scanned / take_damage) sem seam extra na cena. nullptr se nao ha n-esimo.
+gus::domain::combat::CombatActor* alive_enemy_at(BattleScene& scene, int n) {
+    int i = 0;
+    for (gus::domain::combat::CombatActor* a : scene.machine().queue().order()) {
+        if (a != nullptr && !a->is_player_side() && a->is_alive()) {
+            if (i == n) {
+                return a;
+            }
+            ++i;
+        }
+    }
+    return nullptr;
 }
 
 // PACING (incremento 6): a cena comeca PARADA na ABERTURA esperando o jogador ENCARAR
@@ -312,8 +341,7 @@ TEST_CASE("mini-barra de HP reflete dano real (apos um ataque)", "[battle_scene]
     // PARCIAL, resolvemos um ataque do jogador (o alvo perde HP) e renderizamos.
     BattleScene scene;
     pump_to_player_turn(scene);
-    select_verb(scene, BattleVerb::Atacar);
-    scene.menu_confirm();
+    player_attack(scene);
     CountingRenderer r;
     scene.render(r, 640.0f, 360.0f);
     // Existe pelo menos um FILL de HP da arena com largura < 56 (o alvo ferido). O fill
@@ -378,8 +406,7 @@ TEST_CASE("turno: Atacar resolve a acao e troca o ator ativo", "[battle_scene]")
     const auto* before = scene.active_actor();
     REQUIRE(before != nullptr);
 
-    select_verb(scene, BattleVerb::Atacar);
-    scene.menu_confirm();
+    player_attack(scene);
 
     // O motor registrou o ataque do jogador no log (entrada de Attack do atacante). Com
     // o pacing, o turno do jogador resolveu na hora (menu_confirm), e o ritmo entrou em
@@ -454,8 +481,7 @@ TEST_CASE("turno: menu_confirm e no-op apos o fim (pacing conduz ate acabar)",
             break;
         }
         REQUIRE(scene.waiting_player_input());  // o ritmo parou na vez do jogador
-        select_verb(scene, BattleVerb::Atacar);
-        scene.menu_confirm();
+        player_attack(scene);
     }
     // Eventualmente termina (vitoria ou derrota) - o ataque basico resolve a demo.
     REQUIRE(scene.combat_over());
@@ -472,8 +498,7 @@ TEST_CASE("log: render emite o TEXTO da message de cada linha notavel (incr 3.5)
     pump_to_player_turn(scene);
     // Forca eventos: um Atacar (gera log de ataque do jogador + os inimigos que ja
     // animaram). Renderiza e checa que ha TEXTO desenhado na zona do log (y>=314).
-    select_verb(scene, BattleVerb::Atacar);
-    scene.menu_confirm();
+    player_attack(scene);
 
     CountingRenderer r;
     scene.render(r, 640.0f, 360.0f);
@@ -567,16 +592,14 @@ TEST_CASE("floater: Atacar spawna um numero flutuante sobre o alvo", "[battle_sc
     // Medimos o DELTA: o ataque do jogador adiciona pelo menos 1 floater de dano.
     const std::size_t before = scene.floaters().size();
 
-    select_verb(scene, BattleVerb::Atacar);
-    scene.menu_confirm();
+    player_attack(scene);
     REQUIRE(scene.floaters().size() > before);
 }
 
 TEST_CASE("floater: update(dt) envelhece e poda os mortos", "[battle_scene]") {
     BattleScene scene;
     pump_to_player_turn(scene);
-    select_verb(scene, BattleVerb::Atacar);
-    scene.menu_confirm();
+    player_attack(scene);
     REQUIRE(scene.floaters().size() > 0);  // o ataque do jogador spawnou floater(s)
 
     // Conduz o combate ate o FIM (no fim nao ha mais turno => o pacing nao spawna mais
@@ -587,8 +610,7 @@ TEST_CASE("floater: update(dt) envelhece e poda os mortos", "[battle_scene]") {
         if (scene.combat_over()) {
             break;
         }
-        select_verb(scene, BattleVerb::Atacar);
-        scene.menu_confirm();
+        player_attack(scene);
     }
     REQUIRE(scene.combat_over());
     // Combate acabou: nenhum turno novo, nenhum floater novo. Avanca alem da vida -> poda.
@@ -599,8 +621,7 @@ TEST_CASE("floater: update(dt) envelhece e poda os mortos", "[battle_scene]") {
 TEST_CASE("floater: render desenha o numero (texto) sobre o alvo", "[battle_scene]") {
     BattleScene scene;
     pump_to_player_turn(scene);
-    select_verb(scene, BattleVerb::Atacar);
-    scene.menu_confirm();
+    player_attack(scene);
     REQUIRE(scene.floaters().size() > 0);
     // O floater mais recente tem um texto (numero/FALHA). O render emite esse texto.
     CountingRenderer r;
@@ -619,8 +640,7 @@ TEST_CASE("log: D7 revisado - narra TODA acao (hit comum aparece no log)",
           "[battle_scene]") {
     BattleScene scene;
     pump_to_player_turn(scene);
-    select_verb(scene, BattleVerb::Atacar);
-    scene.menu_confirm();
+    player_attack(scene);
     // Apos um ataque, o log_lines tem >= 1 linha de Damage (o golpe narrado), mesmo que
     // o dano nao seja "notavel" (antes o so-notavel escondia hits comuns).
     const auto lines = scene.log_lines(20);
@@ -641,8 +661,7 @@ TEST_CASE("log REGRESSAO: status do inicio NAO esconde os ataques na janela visi
     // aparecem e NENHUMA linha de Status ocupa a caixa.
     BattleScene scene;
     pump_to_player_turn(scene);
-    select_verb(scene, BattleVerb::Atacar);
-    scene.menu_confirm();
+    player_attack(scene);
     const auto window = scene.log_lines(4);  // o que cabe na caixa
     REQUIRE(window.size() >= 1);
     int damage_lines = 0;
@@ -946,8 +965,7 @@ TEST_CASE("pacing REGRESSAO: na fila REAL, TODO inimigo tem seu proprio ANUNCIO"
 
     for (int f = 0; f < 3000 && !scene.combat_over(); ++f) {
         if (scene.waiting_player_input()) {
-            select_verb(scene, BattleVerb::Atacar);
-            scene.menu_confirm();
+            player_attack(scene);
         }
         if (scene.pacing_state() == PacingState::AnnouncingEnemy) {
             saw_announce_since_log = true;
@@ -999,8 +1017,7 @@ TEST_CASE("pacing D9: o banner reflete de quem e a vez (inimigo OU jogador)",
 TEST_CASE("pacing D12: a narracao traz a CONSEQUENCIA (dano) no log", "[battle_scene]") {
     BattleScene scene;
     pump_to_player_turn(scene);
-    select_verb(scene, BattleVerb::Atacar);
-    scene.menu_confirm();
+    player_attack(scene);
     // POLISH 3 (veredito do lider: log ENXUTO estilo terminal): a linha de dano tem a forma
     // CURTA "<atacante> -> <alvo> -<dano>" (ex.: "gus -> inimigo1 -8"), montada na APRESENTACAO
     // a partir dos campos estruturados do evento. A message CRUA do motor ("X ataca Y por N")
@@ -1016,4 +1033,260 @@ TEST_CASE("pacing D12: a narracao traz a CONSEQUENCIA (dano) no log", "[battle_s
         }
     }
     REQUIRE(has_dano);
+}
+
+// ---- INCREMENTO A: modo-mira / target selection (battle-screen.md §3.5, D3) ---------
+// Zero motor: a cena so navega/confirma o ALVO; o motor ja resolve qualquer target_id.
+
+TEST_CASE("mira: [Atacar] ENTRA em modo-mira (nao resolve na hora)", "[battle_scene]") {
+    BattleScene scene;
+    pump_to_player_turn(scene);
+    const std::size_t log_before = scene.machine().log().size();
+
+    select_verb(scene, BattleVerb::Atacar);
+    scene.menu_confirm();
+
+    // Entrou na mira e NADA resolveu (fim do hardcode first_alive_enemy): o motor nao
+    // recebeu acao e o ritmo segue esperando o jogador.
+    REQUIRE(scene.is_aiming());
+    REQUIRE(scene.aim_target() != nullptr);
+    REQUIRE(scene.machine().log().size() == log_before);
+    REQUIRE(scene.waiting_player_input());
+    REQUIRE(scene.aim_count() == scene.enemy_count());  // todos os inimigos vivos miraveis
+}
+
+TEST_CASE("mira: [Scan] tambem ENTRA em modo-mira", "[battle_scene]") {
+    BattleScene scene;
+    pump_to_player_turn(scene);
+    const std::size_t log_before = scene.machine().log().size();
+
+    select_verb(scene, BattleVerb::Scan);
+    scene.menu_confirm();
+
+    REQUIRE(scene.is_aiming());
+    REQUIRE(scene.aim_target() != nullptr);
+    REQUIRE(scene.machine().log().size() == log_before);  // Scan tambem so mira aqui
+}
+
+TEST_CASE("mira: navega entre inimigos vivos com WRAP", "[battle_scene]") {
+    BattleScene scene;
+    pump_to_player_turn(scene);
+    select_verb(scene, BattleVerb::Atacar);
+    scene.menu_confirm();
+    REQUIRE(scene.is_aiming());
+    const int n = scene.aim_count();
+    REQUIRE(n >= 2);  // a demo tem 4 inimigos: da pra navegar
+
+    const auto* t0 = scene.aim_target();
+    scene.aim_move(+1);
+    REQUIRE(scene.aim_target() != t0);  // mudou de alvo
+    // WRAP: no total N passos +1 voltam ao inicio (ja demos 1; +N-1 fecha a volta).
+    for (int i = 0; i < n - 1; ++i) {
+        scene.aim_move(+1);
+    }
+    REQUIRE(scene.aim_target() == t0);
+    // -1 a partir do inicio vai pro ULTIMO (wrap pra tras).
+    scene.aim_move(-1);
+    REQUIRE(scene.aim_target() != t0);
+}
+
+TEST_CASE("mira D3 (b): SEM scan pre-seleciona o front da fila (age antes)",
+          "[battle_scene]") {
+    BattleScene scene;
+    pump_to_player_turn(scene);
+    // Nenhum inimigo escaneado no start: a sugestao cai no fallback (b) = o inimigo mais a
+    // FRENTE na fila (== o 1o inimigo vivo em queue().order()).
+    const gus::domain::combat::CombatActor* front = alive_enemy_at(scene, 0);
+    REQUIRE(front != nullptr);
+    REQUIRE_FALSE(front->is_scanned());
+
+    select_verb(scene, BattleVerb::Atacar);
+    scene.menu_confirm();
+    REQUIRE(scene.aim_target() == front);
+}
+
+TEST_CASE("mira D3 (a): COM scan pre-seleciona o inimigo FRACO a familia da acao",
+          "[battle_scene]") {
+    BattleScene scene;
+    pump_to_player_turn(scene);
+    const gus::domain::combat::CombatActor* self = scene.active_actor();
+    REQUIRE(self != nullptr);
+    const gus::domain::combat::CardFamily fam = self->family();
+
+    // Acha o 1o inimigo (na ordem de fila) FRACO a familia do ator ativo (mult 1.5) e que
+    // NAO seja ja o front (pra a sugestao (a) diferir de (b) e o teste ser inequivoco).
+    const gus::domain::combat::CombatActor* front = alive_enemy_at(scene, 0);
+    gus::domain::combat::CombatActor* weak = nullptr;
+    for (int i = 0; (weak == nullptr); ++i) {
+        gus::domain::combat::CombatActor* e = alive_enemy_at(scene, i);
+        if (e == nullptr) {
+            break;
+        }
+        if (e != front &&
+            gus::domain::combat::WeaknessWheel::multiplier(fam, e->family()) ==
+                gus::domain::combat::combat_constants::kMultFraco) {
+            weak = e;
+        }
+    }
+    REQUIRE(weak != nullptr);  // a demo garante um fraco != front (Sentinela vs Caua)
+
+    // Escaneia SO o fraco: a pre-selecao (a) deve apontar pra ele (premia o Scan), NAO pro
+    // front (b). Prova que Scan muda a sugestao de mira.
+    weak->set_scanned(true);
+    select_verb(scene, BattleVerb::Atacar);
+    scene.menu_confirm();
+    REQUIRE(scene.aim_target() == weak);
+    REQUIRE(scene.aim_target() != front);
+}
+
+TEST_CASE("mira: CONFIRMAR monta a acao com o alvo ESCOLHIDO (nao mais o 1o)",
+          "[battle_scene]") {
+    BattleScene scene;
+    pump_to_player_turn(scene);
+    const auto* self = scene.active_actor();
+    REQUIRE(self != nullptr);
+    const std::string self_id = self->id();
+
+    select_verb(scene, BattleVerb::Atacar);
+    scene.menu_confirm();
+    const auto* suggested = scene.aim_target();  // (b) front da fila
+    scene.aim_move(+1);                           // NAVEGA pra outro inimigo
+    const auto* chosen = scene.aim_target();
+    REQUIRE(chosen != suggested);                 // realmente escolheu outro alvo
+    const std::string chosen_id = chosen->id();
+
+    scene.aim_confirm();
+
+    // O motor logou o Attack do jogador no alvo ESCOLHIDO - NAO no 1o da fila (o hardcode
+    // antigo sempre batia no first_alive_enemy).
+    bool found = false;
+    for (const auto& e : scene.machine().log()) {
+        if (e.actor_id == self_id &&
+            e.action == gus::domain::combat::CombatActionType::Attack) {
+            REQUIRE(e.target_id.has_value());
+            REQUIRE(*e.target_id == chosen_id);
+            found = true;
+        }
+    }
+    REQUIRE(found);
+    REQUIRE_FALSE(scene.is_aiming());  // confirmou: saiu da mira
+}
+
+TEST_CASE("mira: CANCELAR volta ao menu SEM consumir o turno", "[battle_scene]") {
+    BattleScene scene;
+    pump_to_player_turn(scene);
+    const auto* actor_before = scene.active_actor();
+    const std::size_t log_before = scene.machine().log().size();
+
+    select_verb(scene, BattleVerb::Atacar);
+    scene.menu_confirm();
+    REQUIRE(scene.is_aiming());
+
+    scene.aim_cancel();
+
+    // Voltou ao menu: nao esta mirando, o ator ativo e o MESMO (turno nao consumido), o
+    // motor NAO recebeu acao e o ritmo segue na vez do jogador.
+    REQUIRE_FALSE(scene.is_aiming());
+    REQUIRE(scene.aim_target() == nullptr);
+    REQUIRE(scene.active_actor() == actor_before);
+    REQUIRE(scene.machine().log().size() == log_before);
+    REQUIRE(scene.waiting_player_input());
+    // E o menu volta a operar (pode escolher outro verbo e agir).
+    select_verb(scene, BattleVerb::Defender);
+    scene.menu_confirm();
+    REQUIRE(scene.active_actor() != actor_before);  // Defender resolveu -> trocou de ator
+}
+
+TEST_CASE("mira: PULA inimigos mortos (fora da lista miravel)", "[battle_scene]") {
+    BattleScene scene;
+    pump_to_player_turn(scene);
+    const int alive_before = scene.enemy_count();
+    REQUIRE(alive_before >= 2);
+
+    // Mata o inimigo do FRONT direto (hp 0). O motor so poda a fila no advance; mas a mira
+    // filtra is_alive(), entao o morto ja sai da lista miravel.
+    gus::domain::combat::CombatActor* victim = alive_enemy_at(scene, 0);
+    REQUIRE(victim != nullptr);
+    victim->take_damage(victim->max_hp());
+    REQUIRE_FALSE(victim->is_alive());
+
+    select_verb(scene, BattleVerb::Atacar);
+    scene.menu_confirm();
+    REQUIRE(scene.is_aiming());
+    REQUIRE(scene.aim_count() == alive_before - 1);  // o morto saiu da lista
+    // O alvo sugerido esta VIVO e NAO e o morto.
+    REQUIRE(scene.aim_target() != nullptr);
+    REQUIRE(scene.aim_target()->is_alive());
+    REQUIRE(scene.aim_target() != victim);
+    // Navegar por toda a lista nunca pousa no morto.
+    for (int i = 0; i < alive_before + 2; ++i) {
+        REQUIRE(scene.aim_target() != victim);
+        REQUIRE(scene.aim_target()->is_alive());
+        scene.aim_move(+1);
+    }
+}
+
+TEST_CASE("mira: destaque MULTIMODAL do alvo no render (contorno + nome), nao so cor",
+          "[battle_scene]") {
+    BattleScene scene;
+    pump_to_player_turn(scene);
+    select_verb(scene, BattleVerb::Atacar);
+    scene.menu_confirm();
+    REQUIRE(scene.is_aiming());
+    const auto* target = scene.aim_target();
+    REQUIRE(target != nullptr);
+
+    CountingRenderer r;
+    scene.render(r, 960.0f, 540.0f);
+    // (NOME) o nome do inimigo mirado e desenhado como TEXTO. Sem translator o banner nao
+    // escreve nome; o cockpit escreve o nome do ATOR ATIVO (player). Logo o nome do INIMIGO
+    // so pode vir da MIRA (pista textual = WCAG, nao depende de cor).
+    bool found_name = false;
+    for (const auto& t : r.texts) {
+        if (t.text == target->display_name()) {
+            found_name = true;
+        }
+    }
+    REQUIRE(found_name);
+
+    // (CONTORNO) a mira adiciona um reticulo (outline duplo). Cancelando e re-renderizando,
+    // o numero de outlines CAI - prova que o contorno da mira e uma pista de FORMA (nao so
+    // cor), somada ao highlight normal do ativo.
+    const std::size_t outlines_aiming = r.outlines.size();
+    scene.aim_cancel();
+    CountingRenderer r2;
+    scene.render(r2, 960.0f, 540.0f);
+    REQUIRE(outlines_aiming > r2.outlines.size());
+}
+
+TEST_CASE("mira Scan: CONFIRMAR escaneia o alvo ESCOLHIDO", "[battle_scene]") {
+    BattleScene scene;
+    pump_to_player_turn(scene);
+    const auto* self = scene.active_actor();
+    REQUIRE(self != nullptr);
+    const std::string self_id = self->id();
+
+    select_verb(scene, BattleVerb::Scan);
+    scene.menu_confirm();
+    REQUIRE(scene.is_aiming());
+    scene.aim_move(+1);  // escolhe um alvo != sugerido
+    const auto* chosen = scene.aim_target();
+    REQUIRE(chosen != nullptr);
+    const std::string chosen_id = chosen->id();
+    REQUIRE_FALSE(chosen->is_scanned());
+
+    scene.aim_confirm();
+
+    // O motor escaneou o alvo ESCOLHIDO (is_scanned) e logou um Scan com esse target_id.
+    REQUIRE(chosen->is_scanned());
+    bool found_scan = false;
+    for (const auto& e : scene.machine().log()) {
+        if (e.actor_id == self_id &&
+            e.action == gus::domain::combat::CombatActionType::Scan) {
+            REQUIRE(e.target_id.has_value());
+            REQUIRE(*e.target_id == chosen_id);
+            found_scan = true;
+        }
+    }
+    REQUIRE(found_scan);
 }

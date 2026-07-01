@@ -243,6 +243,39 @@ public:
     // Devolve a CHAVE base; a casca formata. Vazio se combate acabou.
     [[nodiscard]] std::string_view turn_banner_key() const noexcept;
 
+    // ---- Modo-mira / target selection (battle-screen.md §3.5, D3) ----
+    //
+    // APRESENTACAO PURA (zero motor): ao escolher [Atacar] ou [Scan] no menu de verbos, a
+    // cena ENTRA em modo-mira em vez de resolver na hora com o 1o inimigo (o hardcode
+    // antigo). O jogador navega entre os inimigos VIVOS e confirma; a CombatAction e
+    // montada com o ALVO ESCOLHIDO. Cancelar volta ao menu sem consumir o turno. O motor
+    // (domain/combat) ja resolve qualquer target_id (resolve_primary_target); aqui so
+    // deixamos o jogador escolher. So teclado neste incremento (mouse = item separado).
+
+    // true enquanto o modo-mira esta ativo (esperando o jogador escolher o alvo).
+    [[nodiscard]] bool is_aiming() const noexcept { return aiming_; }
+
+    // Navega o cursor de mira entre os inimigos vivos (delta -1/+1, com WRAP). No-op fora
+    // do modo-mira. A lista exclui mortos (mira nunca pousa num inimigo morto).
+    void aim_move(int delta) noexcept;
+
+    // Inimigo atualmente mirado (pro render do destaque + testes). nullptr fora da mira.
+    [[nodiscard]] const gus::domain::combat::CombatActor* aim_target() const noexcept;
+
+    // Quantidade de inimigos MIRAVEIS (vivos) na sessao de mira atual. 0 fora da mira.
+    [[nodiscard]] int aim_count() const noexcept {
+        return static_cast<int>(aim_candidates_.size());
+    }
+
+    // Confirma o alvo mirado: monta CombatAction::attack/scan com o ALVO ESCOLHIDO e
+    // resolve o turno (mesmo fluxo do menu_confirm antigo: pending_action_ +
+    // resolve_one_turn + pacing_.player_acted). No-op fora do modo-mira.
+    void aim_confirm();
+
+    // Cancela o modo-mira e volta ao menu de verbos SEM consumir o turno (Esc). No-op se
+    // nao esta mirando.
+    void aim_cancel() noexcept;
+
     // Desenha o ESQUELETO da batalha (placeholders): fundo, arena (party/inimigos),
     // fila CTB, painel do ator ativo, log. viewport_px_w/h = PIXELS REAIS da janela
     // (o backend escala 960x540 por inteiro). LE a contagem/ordem do motor.
@@ -277,6 +310,28 @@ private:
     // nenhum. Primeiro player vivo (alvo das acoes de inimigo). nullptr se nenhum.
     [[nodiscard]] gus::domain::combat::CombatActor* first_alive_enemy() const;
     [[nodiscard]] gus::domain::combat::CombatActor* first_alive_player() const;
+
+    // ---- Modo-mira (helpers privados, §3.5) ----
+
+    // Entra em modo-mira para o verbo (Atacar/Scan): (re)constroi a lista de inimigos
+    // vivos-miraveis e pre-seleciona o alvo por D3. Retorna false (e NAO entra na mira) se
+    // nao ha inimigo vivo (vitoria iminente). Chamado pelo menu_confirm.
+    bool enter_aim_mode(BattleVerb verb);
+
+    // Reconstroi aim_candidates_ = inimigos VIVOS em queue().order() (frente->tras). O
+    // i-esimo candidato casa a ordem de "quem age antes" (o [0] == first_alive_enemy).
+    void rebuild_aim_candidates();
+
+    // Indice do alvo pre-selecionado (D3): (a) se ha inimigo escaneado FRACO a familia da
+    // acao (mult 1.5), o 1o desses na fila; senao (b) o [0] (front da fila = age antes).
+    [[nodiscard]] int preselect_aim_index(BattleVerb verb) const;
+
+    // "Familia da acao" pro tier de fraqueza D3. O ataque BASICO nao usa a roda no motor
+    // (dano = atk-def) e o Scan e utilitario: FALLBACK documentado -> Atacar usa a familia
+    // do ATOR ATIVO (assinatura) pra a sugestao ser significativa; Scan nao tem familia
+    // (nullopt => branch (b) sempre). COMPILAR (carta com familia) fica fora deste incr.
+    [[nodiscard]] std::optional<gus::domain::combat::CardFamily> action_family(
+        BattleVerb verb) const;
 
     // Rotulo localizado de um verbo (tr() via translator_). Sem translator => devolve
     // string vazia (o render trata: a caixa colorida fica sem nome, mas nao crasha).
@@ -346,6 +401,17 @@ private:
     std::vector<LogLine> narration_;
     // Cursor do log do motor ja consumido pra narracao (so processa entradas NOVAS).
     std::size_t narration_cursor_ = 0;
+
+    // ---- Modo-mira / target selection (§3.5, D3) ----
+    // true enquanto o jogador escolhe o alvo (entre [Atacar]/[Scan] e o confirm/cancel).
+    bool aiming_ = false;
+    // Verbo que abriu a mira (so Atacar/Scan entram na mira neste incremento).
+    BattleVerb aim_verb_ = BattleVerb::Atacar;
+    // Cursor: indice do inimigo mirado em aim_candidates_.
+    int aim_index_ = 0;
+    // Inimigos VIVOS-miraveis (NAO-donos; vivem em actors_), em ordem de fila (frente->
+    // tras). Reconstruida ao entrar na mira; const porque a mira so LE o alvo.
+    std::vector<const gus::domain::combat::CombatActor*> aim_candidates_;
 };
 
 }  // namespace gus::app::screens

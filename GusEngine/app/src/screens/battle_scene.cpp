@@ -33,6 +33,7 @@
 #include "gus/domain/combat/combat_enums.hpp"
 #include "gus/domain/combat/combat_records.hpp"
 #include "gus/domain/combat/combat_state.hpp"  // CombatState (preview_intent)
+#include "gus/domain/combat/weakness_wheel.hpp"  // WeaknessWheel (pre-selecao D3 de mira)
 #include "gus/platform/render2d/text_metrics.hpp"  // text_width (centrar floater)
 
 namespace gus::app::screens {
@@ -131,6 +132,16 @@ constexpr DrawColor kIntentMarkColor{0.95f, 0.75f, 0.20f, 1.0f};  // placeholder
 // Pixel Operator densa/nitida e GRANDE o bastante pra o criador VER o dano no canvas
 // maior. Sobe sobre o alvo e some por fade.
 constexpr float kFloaterTextPx = 24.0f;
+
+// --- MODO-MIRA (§3.5, D3): destaque MULTIMODAL do inimigo mirado (Pillar 4/WCAG) ---
+// A mira e CYAN na paleta canonica ("party/ativo/mira/CRIT"). Mas cor NUNCA basta
+// (daltonismo): o alvo mirado ganha (1) CONTORNO reticulo (outline duplo, distinto do
+// outline simples do ativo), (2) SETA em forma pura (caret ►, a esquerda do slot), e
+// (3) NOME + HP em texto legivel. As 3 pistas sobrevivem em escala de cinza.
+constexpr DrawColor kMiraColor = kCyan;         // cor da mira (cyan canonico)
+constexpr float kMiraLabelPx = 12.0f;           // texto do nome/HP do alvo mirado
+constexpr float kMiraCaretW = 3.0f;             // largura de cada coluna do caret ►
+constexpr float kMiraFracoPipSize = 6.0f;       // pip do tier "fraco" (latao) se escaneado
 
 // Banner de turno (D9/D10): tamanho + cor. Texto grande e centrado abaixo da fila CTB.
 // 24px (1.5x os 16px do 640x360) pra dominar a tela maior na abertura.
@@ -262,6 +273,7 @@ void draw_pips(IRenderer& r, float x, float y, int total, int lit, int max_pips,
 }  // namespace
 
 // Aliases de dominio usados pelas DEFINICOES de metodo abaixo (fora do anon namespace).
+using gus::domain::combat::CardFamily;
 using gus::domain::combat::CombatAction;
 using gus::domain::combat::CombatActor;
 using gus::domain::combat::CombatOutcome;
@@ -630,9 +642,20 @@ void BattleScene::menu_confirm() {
     if (combat_over() || !current_actor_is_player()) {
         return;
     }
+    if (aiming_) {
+        return;  // ja em modo-mira: o jogador usa aim_confirm/aim_cancel, nao o menu
+    }
     const BattleVerb verb = menu_.selected_verb();
     if (!menu_.is_enabled(verb)) {
         return;  // verbo sem AP: confirm e no-op (o item fica visivel acinzentado)
+    }
+
+    // MODO-MIRA (§3.5, D3): [Atacar]/[Scan] NAO resolvem na hora (fim do hardcode
+    // first_alive_enemy). Entram em modo-mira; o jogador navega e confirma o ALVO (o
+    // motor ja resolve qualquer target_id). aim_confirm() monta a acao com o alvo escolhido.
+    if (verb == BattleVerb::Atacar || verb == BattleVerb::Scan) {
+        enter_aim_mode(verb);  // no-op se nao ha inimigo vivo (vitoria iminente)
+        return;
     }
 
     CombatActor* self = active_actor() != nullptr
@@ -650,27 +673,14 @@ void BattleScene::menu_confirm() {
         return;
     }
 
-    // Monta a CombatAction real conforme o verbo (alvo default: 1o inimigo vivo pras
-    // ofensivas; self pro Defender; sem alvo pro Flee). combat.md par.5 (custos de AP ja
-    // vem das factories).
+    // Monta a CombatAction real dos verbos SEM mira (self pro Defender; sem alvo pro Flee;
+    // Gambito ainda placeholder). Atacar/Scan sairam do switch: agora passam pelo modo-mira
+    // (acima) e resolvem no aim_confirm. combat.md par.5 (custos de AP vem das factories).
     CombatAction action = CombatAction::pass();
     switch (verb) {
-        case BattleVerb::Atacar: {
-            const CombatActor* t = first_alive_enemy();
-            if (t == nullptr) {
-                return;
-            }
-            action = CombatAction::attack(t->id());
-            break;
-        }
-        case BattleVerb::Scan: {
-            const CombatActor* t = first_alive_enemy();
-            if (t == nullptr) {
-                return;
-            }
-            action = CombatAction::scan(t->id());
-            break;
-        }
+        case BattleVerb::Atacar:
+        case BattleVerb::Scan:
+            return;  // tratados via modo-mira (enter_aim_mode acima); nunca caem aqui
         case BattleVerb::Gambito: {
             // Gambito-Prever exige IEnemyBrain registrado (a demo nao registra brains):
             // no incremento 3 sinaliza no log e NAO submete (evita excecao do motor).
@@ -692,6 +702,115 @@ void BattleScene::menu_confirm() {
     // RITMO (incremento 6): submete a acao do jogador e resolve SO o turno dele (com
     // floater + narracao de consequencia). NAO encadeia os inimigos aqui: o diretor
     // entra em delay (player_acted) e o update(dt) anima os turnos de inimigo um a um.
+    pending_action_ = std::move(action);
+    resolve_one_turn();
+    pacing_.player_acted();
+    menu_.refresh(active_actor() != nullptr ? active_actor()->ap() : 0);
+}
+
+// ---- Modo-mira / target selection (§3.5, D3) -------------------------------------
+// APRESENTACAO PURA: navega/confirma o ALVO; o motor (resolve_primary_target) ja aceita
+// qualquer target_id. Substitui o hardcode first_alive_enemy de Atacar/Scan. So teclado.
+
+void BattleScene::rebuild_aim_candidates() {
+    // Inimigos VIVOS em ordem de fila (frente->tras): o [0] == first_alive_enemy (o mais a
+    // frente = age antes, fallback D3 (b)). Exclui MORTOS (a mira nunca pousa num morto).
+    aim_candidates_.clear();
+    for (const CombatActor* a : machine_->queue().order()) {
+        if (a != nullptr && !a->is_player_side() && a->is_alive()) {
+            aim_candidates_.push_back(a);
+        }
+    }
+}
+
+std::optional<CardFamily> BattleScene::action_family(BattleVerb verb) const {
+    // FALLBACK documentado (§3.5): o motor NAO aplica a roda de fraqueza no ataque BASICO
+    // (dano = atk - def, resolve_basic_attack) e o Scan e utilitario sem familia. Pra a
+    // sugestao D3 (a) ser significativa e "premiar o Scan", ATACAR usa a familia-assinatura
+    // do ATOR ATIVO como "familia da acao". SCAN nao tem familia (nullopt): cai sempre no
+    // fallback (b) (o front da fila = ameaca iminente; escanear um ja-escaneado nao ajuda).
+    // COMPILAR (carta COM familia propria) entra num incremento futuro.
+    if (verb == BattleVerb::Atacar) {
+        const CombatActor* self = active_actor();
+        if (self != nullptr) {
+            return self->family();
+        }
+    }
+    return std::nullopt;
+}
+
+int BattleScene::preselect_aim_index(BattleVerb verb) const {
+    // D3 (a): havendo info de Scan, mira o 1o inimigo (na ordem de fila) ESCANEADO e FRACO
+    // (multFraqueza 1.5) a familia da acao. Premia o Scan (Pillar 1: info habilita acao).
+    const std::optional<CardFamily> fam = action_family(verb);
+    if (fam.has_value()) {
+        for (int i = 0; i < static_cast<int>(aim_candidates_.size()); ++i) {
+            const CombatActor* e = aim_candidates_[static_cast<std::size_t>(i)];
+            if (e->is_scanned() && !e->is_universal_compiler() &&
+                gus::domain::combat::WeaknessWheel::multiplier(*fam, e->family()) ==
+                    gus::domain::combat::combat_constants::kMultFraco) {
+                return i;
+            }
+        }
+    }
+    // D3 (b) fallback: front da fila (== first_alive_enemy) = aim_candidates_[0].
+    return 0;
+}
+
+bool BattleScene::enter_aim_mode(BattleVerb verb) {
+    rebuild_aim_candidates();
+    if (aim_candidates_.empty()) {
+        return false;  // sem inimigo vivo: nao entra na mira (vitoria iminente)
+    }
+    aim_verb_ = verb;
+    aiming_ = true;
+    aim_index_ = preselect_aim_index(verb);
+    return true;
+}
+
+void BattleScene::aim_move(int delta) noexcept {
+    if (!aiming_ || aim_candidates_.empty()) {
+        return;
+    }
+    const int n = static_cast<int>(aim_candidates_.size());
+    aim_index_ = ((aim_index_ + delta) % n + n) % n;  // WRAP nos extremos
+}
+
+const CombatActor* BattleScene::aim_target() const noexcept {
+    if (!aiming_ || aim_index_ < 0 ||
+        aim_index_ >= static_cast<int>(aim_candidates_.size())) {
+        return nullptr;
+    }
+    return aim_candidates_[static_cast<std::size_t>(aim_index_)];
+}
+
+void BattleScene::aim_cancel() noexcept {
+    // Volta ao menu de verbos SEM consumir o turno: nada resolve, o pacing segue em
+    // WaitingPlayerInput e o menu do ator ativo continua ativo.
+    aiming_ = false;
+    aim_index_ = 0;
+    aim_candidates_.clear();
+}
+
+void BattleScene::aim_confirm() {
+    if (!aiming_) {
+        return;
+    }
+    const CombatActor* t = aim_target();
+    if (t == nullptr) {
+        aim_cancel();  // sem alvo valido: aborta a mira sem consumir turno
+        return;
+    }
+    // Monta a acao com o ALVO ESCOLHIDO (nao mais o hardcode first_alive_enemy).
+    CombatAction action = (aim_verb_ == BattleVerb::Scan)
+                              ? CombatAction::scan(t->id())
+                              : CombatAction::attack(t->id());
+    // Sai da mira ANTES de resolver (o turno avanca; o proximo turno reabre o menu).
+    aiming_ = false;
+    aim_index_ = 0;
+    aim_candidates_.clear();
+    // Mesmo fluxo do menu_confirm antigo (pacing incr 6): resolve so o turno do jogador; o
+    // update(dt) anima os inimigos um a um depois (player_acted entra em delay).
     pending_action_ = std::move(action);
     resolve_one_turn();
     pacing_.player_acted();
@@ -1016,6 +1135,55 @@ void BattleScene::render(IRenderer& renderer, float viewport_px_w,
                         } else {
                             renderer.draw_filled_rect(ibox, kMagentaDim);
                             renderer.draw_rect_outline(ibox, kMagenta, 1.0f);
+                        }
+                    }
+                }
+
+                // MIRA (§3.5, D3): destaque MULTIMODAL do inimigo mirado (contorno + seta
+                // + nome/HP), NUNCA so cor (Pillar 4/WCAG). Reusa as primitivas de outline/
+                // rect/text (mesma tecnica do highlight do ativo). So o alvo mirado.
+                if (!is_party && aiming_ && a == aim_target()) {
+                    // (1) CONTORNO: reticulo = outline DUPLO (externo grosso + interno
+                    //     fino), distinto do outline simples do ator ativo.
+                    renderer.draw_rect_outline(r, kMiraColor, 3.0f);
+                    const Rect inner{r.x + 3.0f, r.y + 3.0f, r.w - 6.0f, r.h - 6.0f};
+                    renderer.draw_rect_outline(inner, kMiraColor, 1.0f);
+                    // (2) SETA: caret >> (forma PURA por rects, nao so cor), a ESQUERDA do
+                    //     slot, centrado na vertical - nao colide com o intent (acima) nem
+                    //     a barra de HP (abaixo). 3 colunas de altura decrescente = aponta
+                    //     pro slot.
+                    const float acy = r.y + r.h * 0.5f;
+                    for (int c = 0; c < 3; ++c) {
+                        const float ch = 12.0f - static_cast<float>(c) * 4.0f;  // 12,8,4
+                        const Rect bar{r.x - 12.0f + static_cast<float>(c) * kMiraCaretW,
+                                       acy - ch * 0.5f, kMiraCaretW, ch};
+                        renderer.draw_filled_rect(bar, kMiraColor);
+                    }
+                    // (3) NOME + HP do alvo em TEXTO legivel (WCAG): nome acima do slot
+                    //     (sobre o intent), "hp/max" a direita. Usa display_name direto (sem
+                    //     translator), como o cockpit faz com o ator ativo.
+                    const std::string nm = a->display_name();
+                    renderer.draw_text(nm.c_str(), r.x,
+                                       r.y - kIntentIconSize - kMiraLabelPx - 3.0f,
+                                       kMiraLabelPx, kMiraColor, /*bold=*/true);
+                    char hpn[40];
+                    std::snprintf(hpn, sizeof(hpn), "%d/%d", a->hp(), a->max_hp());
+                    renderer.draw_text(hpn, r.x + r.w + 2.0f,
+                                       r.y + (r.h - kMiraLabelPx) * 0.5f, kMiraLabelPx,
+                                       kMiraColor, /*bold=*/false);
+                    // (4) TIER DE FRAQUEZA (§3.5 "se ja escaneado, o tier vs a acao"): alvo
+                    //     ESCANEADO e FRACO a familia da acao ganha um pip LATAO (paleta:
+                    //     "latao = fraqueza"). APRESENTACAO PURA: usa o fallback de familia
+                    //     (action_family) - o ataque BASICO nao aplica a roda no motor.
+                    if (a->is_scanned()) {
+                        const std::optional<CardFamily> fam = action_family(aim_verb_);
+                        if (fam.has_value() && !a->is_universal_compiler() &&
+                            gus::domain::combat::WeaknessWheel::multiplier(
+                                *fam, a->family()) ==
+                                gus::domain::combat::combat_constants::kMultFraco) {
+                            const Rect fp{r.x + r.w + 2.0f, r.y, kMiraFracoPipSize,
+                                          kMiraFracoPipSize};
+                            renderer.draw_filled_rect(fp, kBrass);
                         }
                     }
                 }
