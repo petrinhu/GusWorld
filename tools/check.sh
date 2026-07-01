@@ -85,20 +85,21 @@ if [ "$BUILD" = "0" ]; then
 fi
 
 # ---------------------------------------------------------------- GATE
-# (a) Arquitetura: core/ e domain/ sao POCO; nenhum #include <Q...>, <SDL...> NEM
-#     <RmlUi...> (ADR-008 + ADR-009: RmlUi vive SO em platform/rmlui/ + app/ui/). O
-#     match tambem pega o namespace Rml:: vazando pra core/domain. Mesma logica do
-#     .forgejo/workflows/ci.yml (sincronia de proposito).
+# (a) Arquitetura: core/ e domain/ sao POCO; nenhum #include <Q...>, <SDL...>, <RmlUi...>
+#     NEM <glintfx...> (ADR-008 + ADR-009 + ADR-010 F3: SDL/RmlUi/glintfx vivem SO em
+#     platform/ + app/). O match tambem pega os namespaces Rml:: e glintfx:: vazando pra
+#     core/domain. Mesma logica do .forgejo/workflows/ci.yml (sincronia de proposito).
 GATE_ARCH=0
-if grep -rnE '#[[:space:]]*include[[:space:]]*<(Q[A-Za-z]|SDL|RmlUi)' \
+if grep -rnE '#[[:space:]]*include[[:space:]]*<(Q[A-Za-z]|SDL|RmlUi|glintfx)' \
         "$ENGINE/core" "$ENGINE/domain" 2>/dev/null; then
-    echo "GATE(arch): include de Qt, SDL ou RmlUi encontrado em core/ ou domain/ (POCO)."
+    echo "GATE(arch): include de Qt, SDL, RmlUi ou glintfx encontrado em core/ ou domain/ (POCO)."
     GATE_ARCH=1
-elif grep -rnE '\bRml::' "$ENGINE/core" "$ENGINE/domain" 2>/dev/null; then
-    echo "GATE(arch): uso do namespace Rml:: (RmlUi) encontrado em core/ ou domain/ (POCO)."
+elif grep -rnE '\b(Rml|glintfx)::' "$ENGINE/core" "$ENGINE/domain" 2>/dev/null; then
+    echo "GATE(arch): uso do namespace Rml:: ou glintfx:: encontrado em core/ ou domain/ (POCO)."
     GATE_ARCH=1
 else
-    [ "$QUIET" = "1" ] || echo "GATE(arch): OK (sem Qt, SDL nem RmlUi em core/ ou domain/)."
+    [ "$QUIET" = "1" ] || \
+        echo "GATE(arch): OK (sem Qt, SDL, RmlUi nem glintfx em core/ ou domain/)."
 fi
 
 # (b) Paridade i18n: tabela por locale (faltando/extra/dup reprovam; % so exibe).
