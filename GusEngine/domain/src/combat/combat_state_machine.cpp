@@ -379,6 +379,30 @@ void CombatStateMachine::resolve_action(CombatActor& actor, const CombatAction& 
     }
 }
 
+int CombatStateMachine::preview_basic_attack_damage(
+    const CombatActor& attacker, const CombatActor& target) const noexcept {
+    // Dano bruto IDENTICO a resolve_basic_attack (logo abaixo). Mantido em sincronia.
+    const int raw = std::max(combat_constants::kMinDamage, attacker.atk() - target.def());
+
+    // Absorcao de Shield espelhada de CombatActor::absorb_with_shield, SEM mutar: pega a
+    // magnitude do Shield ativo (0 se ausente) e devolve o remanescente que bateria no HP.
+    // absorbed = min(raw, magnitude); com absorbed <= 0 (sem Shield ou pool vazio) a perda
+    // e o dano bruto (espelha o early-return de absorb_with_shield). Piso 0 vem de raw -
+    // min(raw, mag) = max(0, raw - mag) quando mag > 0.
+    int shield_magnitude = 0;
+    for (const StatusEffect& s : target.status_effects()) {
+        if (s.id == StatusId::Shield) {
+            shield_magnitude = s.magnitude;
+            break;
+        }
+    }
+    const int absorbed = std::min(raw, shield_magnitude);
+    if (absorbed <= 0) {
+        return raw;
+    }
+    return raw - absorbed;
+}
+
 void CombatStateMachine::resolve_basic_attack(CombatActor& attacker,
                                               const CombatAction& action) {
     if (!action.target_id.has_value())

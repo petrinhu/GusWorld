@@ -20,6 +20,7 @@
 #include <vector>
 
 #include "gus/domain/combat/combat_actor.hpp"
+#include "gus/domain/combat/combat_constants.hpp"  // kMinDamage (piso do dano/previa)
 #include "gus/domain/combat/combat_enums.hpp"
 #include "gus/domain/combat/combat_records.hpp"
 #include "gus/domain/combat/combat_state.hpp"
@@ -256,4 +257,78 @@ TEST_CASE("fsm: inimigo morto e removido da fila", "[domain][combat][fsm]") {
     const auto ids = order_ids(sm);
     REQUIRE(std::find(ids.begin(), ids.end(), "enemy") == ids.end());
     REQUIRE_FALSE(log_has(sm, CombatActionType::Pass, "nunca"));  // sanity (no-op)
+}
+
+// ----- Previa de dano do ataque basico (modo-mira §3.5): PURA e read-only -----
+// Espelha resolve_basic_attack (dano bruto = max(kMinDamage, atk - def)) + a absorcao de
+// Shield (absorb_with_shield) SEM mutar nada. A UI mostra este numero no modo-mira antes
+// de confirmar. Ver preview_basic_attack_damage.
+
+namespace {
+// Aplica um Shield de pool `magnitude` num ator (mesmo shape do resolve_defend).
+void give_shield(CombatActor& a, int magnitude) {
+    a.add_status(StatusEffect{StatusId::Shield, magnitude, /*duration=*/1,
+                              StackRule::Replace, CardFamily::Eletrico});
+}
+}  // namespace
+
+TEST_CASE("preview: (a) SEM shield o dano previsto e atk - def", "[domain][combat][fsm]") {
+    CombatActor h = hero("gus", 30, 20, /*atk=*/8, /*def=*/2);
+    CombatActor e = foe("enemy", 30, 10, /*atk=*/6, /*def=*/3);
+    CombatStateMachine sm({&h, &e}, always_pass);
+
+    // raw = max(1, 8 - 3) = 5; sem Shield => perda de HP prevista = 5.
+    REQUIRE(sm.preview_basic_attack_damage(h, e) == 5);
+
+    // READ-ONLY: a previa NAO tocou o alvo nem a maquina (HP cheio, sem status, sem log).
+    REQUIRE(e.hp() == 30);
+    REQUIRE(e.status_effects().empty());
+    REQUIRE(sm.log().empty());
+}
+
+TEST_CASE("preview: (b) shield PARCIAL reduz a perda prevista", "[domain][combat][fsm]") {
+    CombatActor h = hero("gus", 30, 20, /*atk=*/10, /*def=*/2);
+    CombatActor e = foe("enemy", 30, 10, /*atk=*/6, /*def=*/2);
+    give_shield(e, /*magnitude=*/3);
+    CombatStateMachine sm({&h, &e}, always_pass);
+
+    // raw = max(1, 10 - 2) = 8; Shield 3 absorve => perda prevista = 8 - 3 = 5.
+    REQUIRE(sm.preview_basic_attack_damage(h, e) == 5);
+
+    // READ-ONLY: o Shield NAO foi consumido pela previa (magnitude segue 3) e o HP segue cheio.
+    const int idx = e.index_of_status(StatusId::Shield);
+    REQUIRE(idx >= 0);
+    REQUIRE(e.status_effects()[static_cast<std::size_t>(idx)].magnitude == 3);
+    REQUIRE(e.hp() == 30);
+}
+
+TEST_CASE("preview: (c) shield que ABSORVE TUDO zera a perda prevista",
+          "[domain][combat][fsm]") {
+    CombatActor h = hero("gus", 30, 20, /*atk=*/7, /*def=*/2);
+    CombatActor e = foe("enemy", 30, 10, /*atk=*/6, /*def=*/2);
+    give_shield(e, /*magnitude=*/50);
+    CombatStateMachine sm({&h, &e}, always_pass);
+
+    // raw = max(1, 7 - 2) = 5; Shield 50 >= 5 => perda prevista = max(0, 5 - 50) = 0.
+    REQUIRE(sm.preview_basic_attack_damage(h, e) == 0);
+
+    // READ-ONLY: Shield intacto (magnitude 50), HP cheio.
+    const int idx = e.index_of_status(StatusId::Shield);
+    REQUIRE(idx >= 0);
+    REQUIRE(e.status_effects()[static_cast<std::size_t>(idx)].magnitude == 50);
+    REQUIRE(e.hp() == 30);
+}
+
+TEST_CASE("preview: (d) piso kMinDamage quando atk < def", "[domain][combat][fsm]") {
+    CombatActor h = hero("gus", 30, 20, /*atk=*/5, /*def=*/2);
+    CombatActor e = foe("enemy", 30, 10, /*atk=*/6, /*def=*/99);
+    CombatStateMachine sm({&h, &e}, always_pass);
+
+    // atk 5 < def 99 => raw = max(kMinDamage, 5 - 99) = kMinDamage (1); sem Shield => 1.
+    REQUIRE(sm.preview_basic_attack_damage(h, e) == combat_constants::kMinDamage);
+    REQUIRE(sm.preview_basic_attack_damage(h, e) == 1);
+
+    // Piso + Shield: raw 1 absorvido por um Shield de 1 => perda prevista = 0.
+    give_shield(e, /*magnitude=*/1);
+    REQUIRE(sm.preview_basic_attack_damage(h, e) == 0);
 }

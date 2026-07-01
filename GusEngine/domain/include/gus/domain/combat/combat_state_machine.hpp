@@ -140,6 +140,19 @@ public:
     // => 1.0 (combate inalterado).
     [[nodiscard]] float mult_ambiente_for(CardFamily family) const;
 
+    // ---- Preview read-only pra UI (nao muta NADA) ----
+
+    // Perda de HP PREVISTA de um ataque basico de attacker contra target, exibida no
+    // modo-mira (battle-screen.md §3.5) ANTES de confirmar. Espelha, sem efeito colateral,
+    // resolve_basic_attack (dano bruto = max(kMinDamage, atk - def)) seguido da absorcao de
+    // Shield de CombatActor::absorb_with_shield (secao 9): devolve max(0, dano_bruto -
+    // magnitude_do_Shield_ativo), com piso 0. PURO e const: NAO aplica dano, NAO consome AP,
+    // NAO registra log/status - so LE atk/def/status_effects. Se a formula real (resolve_
+    // basic_attack) ou a absorcao (absorb_with_shield) mudarem, ESPELHE aqui (as duas ficam
+    // adjacentes no .cpp de proposito).
+    [[nodiscard]] int preview_basic_attack_damage(const CombatActor& attacker,
+                                                  const CombatActor& target) const noexcept;
+
     // ---- Conducao da FSM ----
 
     // TurnStart do ator corrente (secao 3/5): recarrega mana/AP, aplica tick de status.
