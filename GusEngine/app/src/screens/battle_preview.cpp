@@ -896,7 +896,38 @@ void battle_mouse_hover(BattleScene& scene, float mx, float my, int pw, int ph) 
 // semantica de antes; ADITIVO: a ESCOLHA DE ATOR (§4.1) ganha PRIORIDADE MAXIMA sobre mira/menu,
 // porque quando is_choosing_actor() o menu de verbos nem existe (begin_turn deferido). `running`
 // so vira false no Esc de TOPO (fora de qualquer sub-modo).
+// Digito 1-9 de uma tecla numerica (fileira OU numpad); 0 se nao for numerica 1-9. Fonte
+// unica do mapeamento tecla->N pros atalhos numericos (mira e escolha de ator).
+int battle_digit_for_key(SDL_Keycode key) noexcept {
+    switch (key) {
+        case SDLK_1: case SDLK_KP_1: return 1;
+        case SDLK_2: case SDLK_KP_2: return 2;
+        case SDLK_3: case SDLK_KP_3: return 3;
+        case SDLK_4: case SDLK_KP_4: return 4;
+        case SDLK_5: case SDLK_KP_5: return 5;
+        case SDLK_6: case SDLK_KP_6: return 6;
+        case SDLK_7: case SDLK_KP_7: return 7;
+        case SDLK_8: case SDLK_KP_8: return 8;
+        case SDLK_9: case SDLK_KP_9: return 9;
+        default: return 0;
+    }
+}
+
 void battle_key_down(BattleScene& scene, SDL_Keycode key, bool& running) {
+    // TECLAS-ATALHO NUMERICAS (1-9, fileira + numpad). PRIORIDADE: MODO-MIRA (§3.5) > ESCOLHA
+    // DE ATOR (§4.1). Os dois modos nunca sao simultaneos (a mira so abre no menu de verbos,
+    // ja fora do picker), mas a ordem deixa explicito: mirando, N mira+confirma o N-esimo
+    // inimigo (aim_hotkey); escolhendo ator, N escolhe+confirma o N-esimo membro
+    // (actor_picker_hotkey). Ambos ja sao NO-OP fora do seu modo / fora de faixa (guarda
+    // interna) -> mapeamento seguro. Consumidas aqui (nao caem no switch abaixo).
+    if (const int nth = battle_digit_for_key(key); nth != 0) {
+        if (scene.is_aiming()) {
+            scene.aim_hotkey(nth);
+        } else if (scene.is_choosing_actor()) {
+            scene.actor_picker_hotkey(nth);
+        }
+        return;
+    }
     switch (key) {
         case SDLK_ESCAPE:
             // MODO-MIRA (§3.5): Esc CANCELA a mira (volta ao menu sem consumir o turno). Na
@@ -948,22 +979,8 @@ void battle_key_down(BattleScene& scene, SDL_Keycode key, bool& running) {
                 scene.aim_move(+1);
             }
             break;
-        // TECLAS-ATALHO 1/2/3 (ESCOLHA DE ATOR, §4.1, pedido do lider): escolhem DIRETO o
-        // 1o/2o/3o membro elegivel (1-based) e CONFIRMAM na hora (sem Enter). Numpad idem.
-        // actor_picker_hotkey ja e NO-OP fora do modo (guarda interna) -> mapeamento SEGURO
-        // mesmo com o picker fechado; nao colide com outros modos (nada mais usa 1/2/3).
-        case SDLK_1:
-        case SDLK_KP_1:
-            scene.actor_picker_hotkey(1);
-            break;
-        case SDLK_2:
-        case SDLK_KP_2:
-            scene.actor_picker_hotkey(2);
-            break;
-        case SDLK_3:
-        case SDLK_KP_3:
-            scene.actor_picker_hotkey(3);
-            break;
+        // (As teclas-atalho numericas 1-9 sao tratadas no TOPO desta funcao, com prioridade
+        // mira > escolha-de-ator, antes deste switch.)
         case SDLK_RETURN:
         case SDLK_KP_ENTER:  // Enter do numpad tambem confirma
         case SDLK_SPACE:

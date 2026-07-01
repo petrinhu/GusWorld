@@ -1317,6 +1317,63 @@ TEST_CASE("mira D3 (a): COM scan pre-seleciona o inimigo FRACO a familia da acao
     REQUIRE(scene.aim_target() != front);
 }
 
+TEST_CASE("mira teclas: 1-9 miram DIRETO o N-esimo inimigo e confirmam na hora",
+          "[battle_scene][mira]") {
+    // Item 3 do lote W1 (pedido do lider): espelha as teclas 1/2/3 do picker de ator para a
+    // MIRA - tecla N = mira E confirma o N-esimo inimigo miravel (1-based, ordem de fila).
+    BattleScene scene;
+    pump_to_player_turn(scene);
+    select_verb(scene, BattleVerb::Atacar);
+    scene.menu_confirm();  // entra na mira (NAO resolve)
+    REQUIRE(scene.is_aiming());
+    REQUIRE(scene.aim_count() >= 2);  // a demo tem 4 inimigos vivos miraveis
+    // aim_candidates_ segue a ordem de fila dos inimigos vivos == alive_enemy_at.
+    gus::domain::combat::CombatActor* second = alive_enemy_at(scene, 1);  // tecla "2"
+    REQUIRE(second != nullptr);
+    const int hp_before = second->hp();
+    const std::size_t log_before = scene.machine().log().size();
+
+    scene.aim_hotkey(2);  // mira+confirma o 2o miravel na hora (sem navegar/Enter)
+
+    REQUIRE_FALSE(scene.is_aiming());                     // confirmou IMEDIATAMENTE
+    REQUIRE(scene.machine().log().size() > log_before);   // o golpe resolveu
+    REQUIRE(second->hp() < hp_before);                    // o 2o inimigo (escolhido) levou o dano
+}
+
+TEST_CASE("mira teclas: numero SEM inimigo miravel e no-op (nao mira, nao confirma)",
+          "[battle_scene][mira]") {
+    BattleScene scene;
+    pump_to_player_turn(scene);
+    select_verb(scene, BattleVerb::Atacar);
+    scene.menu_confirm();
+    REQUIRE(scene.is_aiming());
+    const int n = scene.aim_count();
+    const auto* cursor_before = scene.aim_target();
+    const std::size_t log_before = scene.machine().log().size();
+
+    scene.aim_hotkey(n + 1);  // "apertar N+1" com so N miraveis: fora de faixa
+    REQUIRE(scene.is_aiming());                            // NAO confirmou (segue mirando)
+    REQUIRE(scene.aim_target() == cursor_before);          // cursor intacto
+    REQUIRE(scene.machine().log().size() == log_before);   // nada resolveu
+
+    scene.aim_hotkey(0);      // 0 e invalido (o atalho e 1-based)
+    REQUIRE(scene.is_aiming());
+    REQUIRE(scene.aim_target() == cursor_before);
+    REQUIRE(scene.machine().log().size() == log_before);
+}
+
+TEST_CASE("mira teclas: aim_hotkey fora do modo-mira e no-op", "[battle_scene][mira]") {
+    // Guarda de modo (espelha actor_picker_hotkey): sem mira ativa, a tecla numerica nao faz
+    // nada (nem entra na mira, nem resolve). No menu de verbos (fora da mira) e inerte.
+    BattleScene scene;
+    pump_to_player_turn(scene);
+    REQUIRE_FALSE(scene.is_aiming());
+    const std::size_t log_before = scene.machine().log().size();
+    scene.aim_hotkey(1);
+    REQUIRE_FALSE(scene.is_aiming());
+    REQUIRE(scene.machine().log().size() == log_before);
+}
+
 TEST_CASE("mira: CONFIRMAR monta a acao com o alvo ESCOLHIDO (nao mais o 1o)",
           "[battle_scene]") {
     BattleScene scene;

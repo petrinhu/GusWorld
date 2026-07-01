@@ -857,6 +857,22 @@ void BattleScene::aim_cancel() noexcept {
     aim_candidates_.clear();
 }
 
+void BattleScene::aim_hotkey(int nth) {
+    // TECLA-ATALHO 1-9 (mira): escolhe o nth-esimo inimigo miravel (1-based) e CONFIRMA na
+    // hora. Espelha actor_picker_hotkey: no-op se fora do modo ou nth sem candidato (fora de
+    // faixa) - "apertar 5 com so 4 miraveis" nao faz nada (nem mira, nem confirma). Fonte
+    // unica do host (teclas) e dos testes.
+    if (!aiming_) {
+        return;
+    }
+    const int idx = nth - 1;  // 1-based -> 0-based
+    if (idx < 0 || idx >= static_cast<int>(aim_candidates_.size())) {
+        return;  // numero sem inimigo miravel: no-op
+    }
+    aim_index_ = idx;
+    aim_confirm();
+}
+
 void BattleScene::aim_confirm() {
     if (!aiming_) {
         return;
