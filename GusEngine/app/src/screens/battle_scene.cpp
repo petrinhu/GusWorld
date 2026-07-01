@@ -838,6 +838,36 @@ const CombatActor* BattleScene::active_actor() const noexcept {
     return machine_->active_actor();
 }
 
+std::vector<const CombatActor*> BattleScene::ctb_window() const {
+    const std::vector<CombatActor*>& order = machine_->queue().order();
+    const int n = static_cast<int>(order.size());
+    std::vector<const CombatActor*> out;
+    if (n == 0) {
+        return out;  // fila vazia (nunca em pratica): janela vazia, sem UB no cursor
+    }
+    // Indice do ator ATIVO dentro da fila. active_actor() == queue().current() ==
+    // order[cursor_] do dominio; achamos esse cursor por IDENTIDADE de ponteiro (os atores
+    // sao unicos). Assim a rotacao vive INTEIRA na camada app/ (consumidor), SEM expor o
+    // cursor do dominio nem tocar a invariante das 4 camadas (domain/ POCO intocado).
+    const CombatActor* active = active_actor();
+    int start = 0;
+    for (int i = 0; i < n; ++i) {
+        if (order[static_cast<std::size_t>(i)] == active) {
+            start = i;
+            break;  // fallback graceful (start=0) se active nao esta na fila
+        }
+    }
+    // Janela ROTACIONADA: ate kCtbVisibleCells atores consecutivos (mod n) a partir do
+    // ativo. O teto min(n, kCtbVisibleCells) garante que NENHUM ator se repete quando a fila
+    // e curta (<=5): damos no maximo uma volta PARCIAL, nunca reincluindo o slot 0.
+    const int count = std::min(n, kCtbVisibleCells);
+    out.reserve(static_cast<std::size_t>(count));
+    for (int i = 0; i < count; ++i) {
+        out.push_back(order[static_cast<std::size_t>((start + i) % n)]);
+    }
+    return out;
+}
+
 int BattleScene::gus_party_index() const {
     int idx = 0;
     for (const CombatActor* a : machine_->queue().order()) {
@@ -967,17 +997,23 @@ void BattleScene::render(IRenderer& renderer, float viewport_px_w,
     // seguem intactos. kCtbBandColor deixa de ser usado aqui.
     {
         const CtbStrip strip = ctb_strip(queue_len());
-        const auto& order = machine_->queue().order();
+        // JANELA ROTACIONADA (fix da fila CTB): os atores a mostrar vem de ctb_window(), que
+        // COMECA no ator ATIVO e segue a ordem de jogo com wrap - NAO mais os top-5 fixos por
+        // SPD (bug: atores de SPD baixa, ex. Jaci, nunca apareciam, e o destaque "ativo"
+        // ficava preso no slot de maior SPD). window[0] = ativo; window[1] = proximo; etc.
+        const std::vector<const CombatActor*> window = ctb_window();
         const CombatActor* active = active_actor();
         for (int i = 0; i < kCtbVisibleCells; ++i) {
             const CtbCell& cell = strip.cells[static_cast<std::size_t>(i)];
             if (!cell.occupied) {
                 continue;
             }
-            // O ator desta celula (a fila do motor ja exclui mortos/incapacitados, que
-            // o motor remove em advance/prune: a fila CTB reflete so quem ainda joga).
-            const CombatActor* who =
-                (i < static_cast<int>(order.size())) ? order[i] : nullptr;
+            // O ator desta celula vem da janela rotacionada (a fila do motor ja exclui
+            // mortos/incapacitados, que o motor remove em advance/prune: a fila CTB reflete
+            // so quem ainda joga).
+            const CombatActor* who = (i < static_cast<int>(window.size()))
+                                         ? window[static_cast<std::size_t>(i)]
+                                         : nullptr;
 
             // Retrato 48px se carregavel; senao retangulo da celula.
             TextureId tex = kInvalidTexture;

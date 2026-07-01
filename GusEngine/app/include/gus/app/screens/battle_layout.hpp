@@ -144,12 +144,16 @@ struct ArenaLayout {
 struct CtbCell {
     Rect rect;             // quadro 48px da celula em px logico
     bool occupied = false; // false = sem ator (fila curta) -> celula vazia
-    bool is_next = false;  // true so na 1a celula ocupada (marca de "proximo")
+    // true na celula 1 (o PROXIMO a jogar). Pos-rotacao a celula 0 e o ATOR ATIVO (turno
+    // agora), entao "proximo" e a celula 1. So marca quando ha >1 ator na janela.
+    bool is_next = false;
     bool is_overflow = false;  // true na 5a celula quando ha MAIS de 5 (marca "+N")
     int overflow_count = 0;    // N de "+N" na celula de overflow (0 se nao aplica)
 };
 
-// As 5 celulas da fila CTB (D4): proximos atores, ordem esquerda->direita.
+// As 5 celulas da fila CTB (D4): JANELA ROTACIONADA da fila, ordem esquerda->direita. O
+// consumidor (battle_scene) entrega os atores comecando no ATIVO (celula 0 = turno agora,
+// celula 1 = proximo, ...) via ctb_window(); esta struct so da a geometria + os flags.
 struct CtbStrip {
     std::array<CtbCell, kCtbVisibleCells> cells{};
 };
@@ -170,8 +174,10 @@ struct CtbStrip {
                                        int gus_party_index = 0) noexcept;
 
 // Layout da faixa CTB (D4): preenche ate 5 celulas, comecando em kCtbStripLeft (a direita
-// do cockpit). queue_len = total de atores na fila; a 1a celula ocupada vira "proximo";
-// se queue_len > 5, a 5a celula vira "+N" (overflow). Celulas alem de queue_len vazias.
+// do cockpit). queue_len = total de atores na fila; a celula 0 e o ATIVO e a celula 1 vira
+// "proximo" (is_next; so com >1 ator); se queue_len > 5, a 5a celula vira "+N" (overflow).
+// Celulas alem de queue_len ficam vazias. So GEOMETRIA + flags: quem e quem vem de
+// ctb_window() no consumidor (janela rotacionada a partir do ator ativo).
 [[nodiscard]] CtbStrip ctb_strip(int queue_len) noexcept;
 
 // --- Zonas da variante C (todas em px logico) ---

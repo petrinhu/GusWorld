@@ -144,6 +144,15 @@ public:
     // Ator ativo (turno corrente) pra o highlight (D7). Nunca nullptr com fila nao-vazia.
     [[nodiscard]] const gus::domain::combat::CombatActor* active_actor() const noexcept;
 
+    // Janela da fila CTB: os ate kCtbVisibleCells atores a mostrar na faixa do topo, na
+    // ordem esquerda->direita das celulas. Fonte UNICA consumida pelo render E pelos testes
+    // (o render nunca reimplementa esse mapeamento). A janela COMECA no ator ATIVO (turno
+    // agora, == window[0]) e segue a ordem de jogo com WRAP na fila; window[1] e o proximo a
+    // jogar, e assim por diante. Nunca repete um ator quando a fila e curta (o teto min(n,5)
+    // da no maximo uma volta parcial). Vazia se a fila esta vazia. Ponteiros NAO-DONOS (os
+    // atores vivem em actors_/na FSM). Ver docs/design/mecanicas/battle-screen.md par.5 (D4).
+    [[nodiscard]] std::vector<const gus::domain::combat::CombatActor*> ctb_window() const;
+
     // Indice na coluna da party que e o GUS (pro recuo D3). -1 se o Gus nao esta na
     // party viva. Deriva de is_universal_compiler (so o Gus e compilador universal).
     [[nodiscard]] int gus_party_index() const;

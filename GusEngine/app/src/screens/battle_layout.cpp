@@ -88,7 +88,12 @@ CtbStrip ctb_strip(int queue_len) noexcept {
         cell.rect = Rect{x, cell_y, static_cast<float>(kCtbPortraitPx),
                          static_cast<float>(kCtbPortraitPx)};
         cell.occupied = (i < occupied);
-        cell.is_next = (i == 0 && occupied > 0);
+        // CONVENCAO pos-rotacao (fix da fila CTB 2026-07-01): o consumidor entrega a fila
+        // como uma JANELA ROTACIONADA que COMECA no ator ATIVO (celula 0 = turno AGORA,
+        // marcada como "ativo" via who==active no render). Logo o "proximo" a jogar e a
+        // celula 1 (nao a 0). is_next marca a celula 1 SO quando ha mais de um ator na
+        // janela (occupied > 1); com um so ator (o ativo) nao ha "proximo".
+        cell.is_next = (i == 1 && occupied > 1);
         if (overflow && i == kCtbVisibleCells - 1) {
             cell.is_overflow = true;
             cell.overflow_count = len - (kCtbVisibleCells - 1);

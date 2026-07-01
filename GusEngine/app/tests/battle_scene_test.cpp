@@ -12,6 +12,8 @@
 
 #include <catch2/catch_test_macros.hpp>
 
+#include <algorithm>
+#include <string>
 #include <vector>
 
 #include "gus/app/screens/battle_floaters.hpp"   // Floater/HitChannel
@@ -172,6 +174,33 @@ void pump_to_player_turn(BattleScene& scene) {
     }
 }
 
+// Conduz o combate ATE o ator de id `want` ser o ATIVO (ou o combate acabar). Joga os
+// turnos de jogador com um ataque simples e bombeia o ritmo nos turnos de inimigo, entao a
+// vez circula por TODA a fila (todo ator age em uma rodada). Robusto a reordenacao por
+// Haste: so depende de a vez chegar em `want`. true se chegou; false se o combate acabou
+// antes. Usado pra testar a fila CTB na vez de um ator de SPD BAIXA (Jaci).
+bool pump_until_active(BattleScene& scene, const std::string& want) {
+    if (scene.is_intro()) {
+        scene.start_combat();
+    }
+    for (int i = 0; i < 600; ++i) {
+        const auto* a = scene.active_actor();
+        if (a != nullptr && a->id() == want) {
+            return true;
+        }
+        if (scene.combat_over()) {
+            return false;
+        }
+        if (scene.waiting_player_input()) {
+            player_attack(scene);        // resolve o turno do jogador ativo
+        } else {
+            scene.skip();
+            scene.update(1.0f / 60.0f);  // bombeia 1 beat do turno de inimigo
+        }
+    }
+    return false;
+}
+
 }  // namespace
 
 TEST_CASE("BattleScene monta o encontro de demo e le a fila do motor",
@@ -263,6 +292,67 @@ TEST_CASE("BattleScene::render headless degrada CTB pro retangulo (sem retratos)
     REQUIRE(ctb_cells == 5);
     // O ator ativo recebe um highlight (outline) na arena.
     REQUIRE(r.outlines.size() >= 1);
+}
+
+// ---- FIX da fila CTB (bug reportado pelo lider ao vivo 2026-07-01, M5) --------------
+// Dois sintomas na fila CTB (topo): (1) o destaque de "ativo" ficava PRESO no slot de
+// MAIOR SPD porque a fila mostrava os top-5 FIXOS por SPD (order[0..4]) em vez de
+// rotacionar pra comecar em quem joga AGORA; (2) um membro de SPD baixa (Jaci, rank 5 de
+// 7) NUNCA aparecia (caia fora da janela de 5). O fix: a fila e uma JANELA ROTACIONADA
+// que comeca no ator ATIVO (ctb_window()[0] == active_actor()) e segue a ordem de jogo
+// com WRAP. Prova via ctb_window() - a MESMA fonte que o render consome.
+
+TEST_CASE("CTB fix: na vez da Jaci (SPD baixa) ela LIDERA a fila e fica VISIVEL",
+          "[battle_scene][ctb]") {
+    BattleScene scene;
+    // Circula a fila ate a vez da Jaci (SPD 7, o mais baixo da party). Imune a reordenacao
+    // por Haste do Caua: so depende de a vez chegar nela (toda a fila age numa rodada).
+    REQUIRE(pump_until_active(scene, "jaci"));
+    const auto* active = scene.active_actor();
+    REQUIRE(active != nullptr);
+    REQUIRE(active->id() == "jaci");
+
+    const auto window = scene.ctb_window();
+    // Janela cheia = min(fila, 5) celulas, sem buracos.
+    REQUIRE(window.size() ==
+            static_cast<std::size_t>(std::min(scene.queue_len(), 5)));
+    // SINTOMA 1 (destaque preso no maior SPD): a 1a celula da fila e o ATOR ATIVO (Jaci),
+    // nao o de maior SPD. Antes do fix, window[0] era o topo por SPD (nunca a Jaci) -> RED.
+    REQUIRE(window[0] == active);
+    // SINTOMA 2 (Jaci nunca aparece): a Jaci ESTA na janela visivel. Antes do fix a janela
+    // eram os top-5 fixos por SPD e a Jaci (rank 5 de 7) caia fora -> RED.
+    bool jaci_visible = false;
+    for (const auto* a : window) {
+        if (a != nullptr && a->id() == "jaci") {
+            jaci_visible = true;
+        }
+    }
+    REQUIRE(jaci_visible);
+    // WRAP sem duplicar: com 7 atores e janela de 5, nenhum ator se repete (a rotacao da no
+    // maximo uma volta parcial, nunca reinclui o slot 0).
+    for (std::size_t i = 0; i < window.size(); ++i) {
+        for (std::size_t j = i + 1; j < window.size(); ++j) {
+            REQUIRE(window[i] != window[j]);
+        }
+    }
+}
+
+TEST_CASE("CTB fix: o 1o da fila ACOMPANHA o ator ativo (rotaciona por atores distintos)",
+          "[battle_scene][ctb]") {
+    BattleScene scene;
+    // A lideranca da fila deve seguir de quem e a VEZ, por atores DIFERENTES (nao travar no
+    // de maior SPD). Alcanca 3 party-members distintos (SPD alto->baixo) e confirma que cada
+    // um LIDERA a fila (window[0]) no seu turno. Antes do fix, window[0] era SEMPRE o topo por
+    // SPD (order[0]) -> falha no 1o alvo cujo turno nao e o do maior SPD.
+    for (const char* want : {"caua", "gus", "jaci"}) {
+        REQUIRE(pump_until_active(scene, want));
+        const auto* active = scene.active_actor();
+        REQUIRE(active != nullptr);
+        REQUIRE(active->id() == want);
+        const auto window = scene.ctb_window();
+        REQUIRE_FALSE(window.empty());
+        REQUIRE(window[0] == active);  // cada ator distinto lidera a fila na sua vez
+    }
 }
 
 // ---- INCREMENTO 2: painel com dados reais + barras na arena + ativo na fila --------
