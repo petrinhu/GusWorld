@@ -139,15 +139,10 @@ body { font-family: "Pixel Operator Mono"; background: transparent; }
   /* POLISH 1: padding compacto (a coluna inteira precisa caber em 540dp). */
   padding: 10dp 12dp 0dp 12dp;
 }
-/* filete cyan na borda direita (marca cyber). BUG-1 FIX: a vertical-gradient concentrava
-   o cyan numa ponta e o box-shadow espalhava um BLOOM -> aparecia um "tick" cyan solto no
-   TOPO (o #edge fica em right:0 da coluna, cujo box-sizing content-box soma 24dp de padding
-   -> x~273dp). Trocado por um filete UNIFORME translucido, SEM gradiente e SEM glow: a marca
-   cyber continua (linha fina cyan na divisa cockpit/arena) mas sem concentracao/brilho. */
-#edge {
-  position: absolute; top: 0dp; right: 0dp; bottom: 0dp; width: 2dp;
-  background-color: #22D3EE55;
-}
+/* AJUSTE (veredito do lider): o filete #edge da divisa direita foi REMOVIDO por completo.
+   Mesmo suavizado (filete translucido uniforme) ele deixava um traco teal sutil no TOPO da
+   tela. Topo agora 100% limpo, zero linha. A divisa cockpit/arena fica so pelo contraste do
+   degrade da coluna contra a arena. */
 
 /* ---- RETRATO emoldurado (moldura TCG asset) + HALO cyan pulsante ---- */
 #actor { display: block; text-align: center; }
@@ -205,16 +200,22 @@ body { font-family: "Pixel Operator Mono"; background: transparent; }
 /* ---- MENU de verbos: pill rococo com GLOW neon nos 3 estados ---- */
 .menu { margin-top: 9dp; }
 .verb {
-  /* BUG-3 FIX: pills COMPACTOS por escala aurea (base 8dp x 1.618: 8->13->21->34). Altura
-     no degrau 21dp (era 25), fonte 12dp, gap 6dp, padding-h 13dp, raio 11dp (~metade da
-     altura, ainda pill). O SELECIONADO ganha proeminencia (glow/contraste, regras .sel). */
-  display: block; height: 21dp; margin-bottom: 6dp; padding: 0dp 13dp;
-  border-radius: 11dp;
+  /* AJUSTE (veredito do lider): pills NITIDAMENTE mais enxutos. O 25->21 anterior foi
+     imperceptivel; aqui o corte e no PISO de legibilidade E no FOOTPRINT: altura 18dp (fonte
+     11dp centrada via line-height => ~3.5dp de folga vertical em cima/embaixo = o "padding
+     vertical ~4dp" pedido, sem estourar a caixa content-box), gap 4dp, padding-h 12dp, raio
+     9dp. LARGURA travada em 160dp (nao mais full-column) => o menu fica visivelmente mais
+     compacto/estreito, nao so mais baixo. Piso 18dp/11dp respeitado (nao ir abaixo). O
+     SELECIONADO segue proeminente (glow/contraste, regras .sel). O rotulo mais largo
+     (DEFENDER/COMPILAR, 8 chars a 11dp) mede ~82dp de conteudo; a caixa a 110dp deixa ~28dp
+     de folga sem clipar. */
+  display: block; width: 110dp; height: 18dp; margin-bottom: 4dp; padding: 0dp 12dp;
+  border-radius: 9dp;
   decorator: vertical-gradient( #2a3658 #131a2e );  /* topo mais claro (3D sutil) */
   border: 1dp #38456e;
-  color: #d6e6ef; font-size: 12dp;
+  color: #d6e6ef; font-size: 11dp;
 }
-.verb .lbl { display: inline-block; line-height: 21dp; }
+.verb .lbl { display: inline-block; line-height: 18dp; }
 /* NORMAL: cor do verbo no glifo lateral */
 .verb .glyph { display: inline-block; width: 8dp; height: 8dp; margin-right: 10dp;
   border-radius: 2dp; background-color: #8fa6b4; }
@@ -280,8 +281,6 @@ body { font-family: "Pixel Operator Mono"; background: transparent; }
 </head>
 <body>
   <div id="cockpit" data-model="hud">
-    <div id="edge"></div>
-
     <!-- ABERTURA (C): brasao GusWorld. So aparece quando intro (data-if). -->
     <div id="opening" data-if="intro">
       <div id="crest">
@@ -653,8 +652,8 @@ std::string write_live_cockpit_rml() {
     // os elementos focaveis (secao 5 da doc de embed). SEM estilo :focus de proposito: a
     // selecao VISIVEL e a classe .sel dirigida pelo MOTOR (data-class-sel abaixo), pra NAO
     // criar uma 2a fonte de verdade (o foco do glintfx fica como navegacao inerte).
-    replace_all("  color: #d6e6ef; font-size: 12dp;\n}",
-                "  color: #d6e6ef; font-size: 12dp;\n  tab-index: auto; nav: auto;\n}");
+    replace_all("  color: #d6e6ef; font-size: 11dp;\n}",
+                "  color: #d6e6ef; font-size: 11dp;\n  tab-index: auto; nav: auto;\n}");
 
     // (3b) menu de verbos data-driven: a classe .sel de cada verbo segue o indice SELECIONADO
     // no motor (binding 'sel'), via data-class-sel="sel == N". O motor (scene.menu_) e a
