@@ -83,6 +83,48 @@ std::string resolve_asset_dir(std::string_view rel) {
     return join("resources", sub);
 }
 
+// Carrega o SPRITE SET de batalha do GUS (W3): pra cada clip conhecido
+// (battle_sprite_anim::clip_dir_name), varre <resources>/<kGusBattleAnimsDir>/<clip>/
+// f0.png..fN.png em ordem e resolve cada frame em TextureId. fps/loop = defaults do
+// modulo POCO. Devolve nullopt se NENHUM frame existir no disco (headless/CI sem
+// assets) - a cena entao degrada pro retrato placeholder de hoje. So o Gus nesta
+// onda; os demais atores ganham set quando as anims deles existirem (PixelLab).
+std::optional<gus::app::screens::ActorSpriteSet> load_gus_sprite_set(
+    gus::platform::render2d::IRenderer& renderer) {
+    namespace fs = std::filesystem;
+    using gus::app::screens::BattleClipId;
+    const std::string base =
+        resolve_asset_dir(gus::core::assets::kGusBattleAnimsDir);
+    gus::app::screens::ActorSpriteSet set;
+    bool any = false;
+    for (int c = 0; c < gus::app::screens::kBattleClipCount; ++c) {
+        const auto id = static_cast<BattleClipId>(c);
+        const std::string dir =
+            join(base, std::string(gus::app::screens::clip_dir_name(id)));
+        auto& clip = set.clips[static_cast<std::size_t>(c)];
+        clip.fps = gus::app::screens::default_clip_fps(id);
+        clip.loop = gus::app::screens::default_clip_loop(id);
+        for (int i = 0;; ++i) {
+            const std::string path = join(dir, "f" + std::to_string(i) + ".png");
+            std::error_code ec;
+            if (!fs::exists(path, ec)) {
+                break;  // fim da sequencia (frames sao contiguos f0..fN)
+            }
+            const gus::platform::render2d::TextureId tex =
+                renderer.load_texture(path.c_str());
+            if (tex == gus::platform::render2d::kInvalidTexture) {
+                break;  // backend sem textura (Null/headless): degrada
+            }
+            clip.frames.push_back(tex);
+            any = true;
+        }
+    }
+    if (!any) {
+        return std::nullopt;
+    }
+    return set;
+}
+
 // Mapeia o id de ator de DEMO -> arquivo de retrato 48px. Os inimigos (inimigoN)
 // compartilham retrato_inimigo. Ponto unico; quando os retratos forem por-personagem
 // reais, troca-se aqui (ou vira data-driven).
@@ -1242,6 +1284,23 @@ int run_battle_preview() {
         }
         scene.set_portraits(std::move(portraits));
 
+        // SPRITE SET do GUS (W3): frames de anims/ resolvidos em TextureId e entregues
+        // a cena (mesmo padrao dos retratos). Ausencia (headless/sem assets) degrada
+        // pro retrato placeholder - a cena decide por ator.
+        if (auto gus_set = load_gus_sprite_set(renderer)) {
+            int nframes = 0;
+            for (const auto& c : gus_set->clips) {
+                nframes += static_cast<int>(c.frames.size());
+            }
+            scene.set_actor_sprites("gus", std::move(*gus_set));
+            std::cout << "BattlePreview: sprite set do Gus carregado (" << nframes
+                      << " frames de " << gus::core::assets::kGusBattleAnimsDir
+                      << ")\n";
+        } else {
+            std::cout << "BattlePreview: sprite set do Gus AUSENTE (retrato "
+                         "placeholder)\n";
+        }
+
         // Carrega os icones de status (14px), indexados por StatusId (status_icon_index),
         // e os entrega a cena. Ausencia degrada pro quadradinho placeholder.
         const std::string sdir = resolve_status_icons_dir();
@@ -1349,6 +1408,24 @@ int run_battle_preview() {
         std::string anim_target_id;
         bool anim_done_cast = false;   // fases ja disparadas (1 vez cada)
         bool anim_done_melee = false;
+
+        // DIAGNOSTICO/PROVA (SPRITE ANIMADO, W3): GUSWORLD_BATTLE_SPRITE_SELFTEST=
+        // <prefixo> roda um SCRIPT POR FRAME (dt FIXO 1/60, deterministico) que FORCA o
+        // GUS como atacante (navega o PICKER §4.1 ate ele - nao o pre-selecionado por
+        // SPD) e captura 4 PNGs num unico launch, provando a troca placeholder->sprite
+        // (battle-anim.md par.1.1/3.2) com os frames REAIS do disco:
+        //   _a_idle_rest      battle_idle no REPOUSO (antes do Encarar)
+        //   _b_run_dash       frame de RUN no MEIO do dash (ida do melee)
+        //   _c_attack_swing   attack_melee na CAUDA da aproximacao (swing -> contato)
+        //   _d_idle_back      de volta ao battle_idle no repouso exato (pos-Return)
+        // Cada captura loga o offset do director + o clip/frame do sprite (prova
+        // textual). Dirige pela MESMA API publica do jogador; zero motor/render novo.
+        const char* sprite_selftest_prefix =
+            std::getenv("GUSWORLD_BATTLE_SPRITE_SELFTEST");
+        const bool sprite_selftest =
+            sprite_selftest_prefix != nullptr && sprite_selftest_prefix[0] != '\0';
+        int sprite_f0 = -1;              // frame do aim_confirm do GUS (inicio do dash)
+        bool sprite_done_drive = false;  // drive disparado (1 vez)
 
         // DIAGNOSTICO/CAPTURA: GUSWORLD_BATTLE_PUMP_TO=<actor_id> conduz o combate ate esse
         // ator ser o ATIVO, ANTES do loop de exibicao - pra CAPTURAR a fila CTB na vez de um
@@ -1771,9 +1848,9 @@ int run_battle_preview() {
             }
             have_last = true;
             last_ns = now_ns;
-            // ANIM-SELFTEST: dt FIXO 1/60 (script por frame deterministico; o relogio
-            // real varia por maquina/driver e desalinharia as capturas).
-            if (anim_selftest) {
+            // ANIM/SPRITE-SELFTEST: dt FIXO 1/60 (script por frame deterministico; o
+            // relogio real varia por maquina/driver e desalinharia as capturas).
+            if (anim_selftest || sprite_selftest) {
                 dt = 1.0f / 60.0f;
             }
             scene.update(dt);  // anima os floaters + pacing; nao toca a FSM
@@ -1825,6 +1902,54 @@ int run_battle_preview() {
                                      "na vez do jogador\n";
                         running = false;
                     }
+                }
+            }
+
+            // SPRITE-SELFTEST (drive): apos capturar o idle-em-repouso (frame 8, na
+            // secao de capturas), o frame 10 conduz a cena ate a vez da party, navega
+            // o PICKER ate o GUS (forca ele como atacante) e confirma [Atacar] + alvo.
+            // O dash parte AGORA (sprite_f0) e as capturas seguintes provam run/golpe/
+            // volta-ao-idle. MESMA API publica do jogador (padrao dos self-tests).
+            if (sprite_selftest && frame_no == 10 && !sprite_done_drive) {
+                sprite_done_drive = true;
+                if (scene.is_intro()) {
+                    scene.start_combat();
+                }
+                for (int i = 0; i < 240 && !scene.combat_over() &&
+                                !scene.waiting_player_input();
+                     ++i) {
+                    scene.skip();
+                    scene.update(1.0f / 60.0f);
+                }
+                if (scene.is_choosing_actor()) {
+                    // Navega o cursor ate o GUS (§4.1: o jogador comanda QUEM age).
+                    for (int k = 0; k < scene.actor_pick_count() &&
+                                    (scene.actor_pick_target() == nullptr ||
+                                     scene.actor_pick_target()->id() != "gus");
+                         ++k) {
+                        scene.actor_picker_move(+1);
+                    }
+                    scene.actor_picker_confirm();
+                }
+                const auto* atk = scene.active_actor();
+                if (scene.waiting_player_input() && atk != nullptr &&
+                    atk->id() == "gus" && !scene.is_aiming()) {
+                    for (int k = 0; k < 8 && scene.menu().selected_verb() !=
+                                                 BattleVerb::Atacar;
+                         ++k) {
+                        scene.menu_move(+1);
+                    }
+                    scene.menu_confirm();  // entra na mira
+                    scene.aim_confirm();   // confirma o alvo: o dash parte AGORA
+                    sprite_f0 = frame_no;
+                    std::cout << "BattlePreview: [sprite-selftest] f" << frame_no
+                              << " melee do GUS confirmado; in_flight="
+                              << scene.player_action_in_flight() << "\n";
+                } else {
+                    std::cout << "BattlePreview: [sprite-selftest] FALHA: nao chegou "
+                                 "na vez do GUS (ativo="
+                              << (atk != nullptr ? atk->id() : "?") << ")\n";
+                    running = false;
                 }
             }
 
@@ -2018,6 +2143,54 @@ int run_battle_preview() {
                     } else if (frame_no == anim_f0 + 87) {
                         capture("_e_melee_rest.png");     // todos de volta ao repouso
                         std::cout << "BattlePreview: [anim-selftest] concluido; "
+                                     "encerrando.\n";
+                        running = false;
+                    }
+                }
+            }
+
+            // SPRITE-SELFTEST (capturas): backbuffer antes do swap (mesma tecnica dos
+            // demais self-tests) nos frames-chave, logando offset do director + clip/
+            // frame do sprite do GUS (prova textual: qual animacao esta tocando).
+            if (sprite_selftest) {
+                const auto capture = [&](const char* suffix) {
+                    const std::string out =
+                        std::string(sprite_selftest_prefix) + suffix;
+                    std::vector<unsigned char> buf(
+                        static_cast<std::size_t>(pw) * static_cast<std::size_t>(ph) *
+                        4);
+                    if (gus::platform::rmlui::gl3_read_backbuffer_rgba(pw, ph,
+                                                                       buf.data())) {
+                        stbi_write_png(out.c_str(), pw, ph, 4, buf.data(), pw * 4);
+                    } else {
+                        std::cerr << "BattlePreview: [sprite-selftest] "
+                                     "gl3_read_backbuffer falhou\n";
+                    }
+                    const auto off = scene.anim().offset_for("gus");
+                    const auto sf = scene.actor_sprite_frame("gus");
+                    std::cout << "BattlePreview: [sprite-selftest] f" << frame_no
+                              << " -> " << out << " | gus_off=(" << off.x << ","
+                              << off.y << ") kind="
+                              << static_cast<int>(scene.anim().kind_for("gus"))
+                              << " clip="
+                              << (sf.has_value()
+                                      ? std::string(gus::app::screens::clip_dir_name(
+                                            sf->first))
+                                      : std::string("<sem sprite set>"))
+                              << " frame=" << (sf.has_value() ? sf->second : -1)
+                              << "\n";
+                };
+                if (frame_no == 8) {
+                    capture("_a_idle_rest.png");     // battle_idle no repouso
+                }
+                if (sprite_f0 > 0) {
+                    if (frame_no == sprite_f0 + 15) {
+                        capture("_b_run_dash.png");      // RUN no meio do dash
+                    } else if (frame_no == sprite_f0 + 38) {
+                        capture("_c_attack_swing.png");  // attack_melee na cauda
+                    } else if (frame_no == sprite_f0 + 90) {
+                        capture("_d_idle_back.png");     // de volta ao idle no repouso
+                        std::cout << "BattlePreview: [sprite-selftest] concluido; "
                                      "encerrando.\n";
                         running = false;
                     }
