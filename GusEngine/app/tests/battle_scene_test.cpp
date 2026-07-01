@@ -1481,3 +1481,86 @@ TEST_CASE("mira [Scan]: NAO mostra previa de dano (Scan nao causa dano)",
         REQUIRE(t.text != badge);
     }
 }
+
+// ---- MOUSE (Incremento A2): hit-test de clique no inimigo (mira) + aim_select ----
+// aim_index_at_arena/aim_select sao a PONTE do clique de mouse: o host converte o clique
+// (px) pra coordenadas de MUNDO logico (960x540) e pergunta "que inimigo miravel esta aqui".
+
+TEST_CASE("mouse-mira: o CENTRO do slot de cada inimigo mapeia pro seu indice de mira",
+          "[battle_scene]") {
+    BattleScene scene;
+    pump_to_player_turn(scene);
+    select_verb(scene, BattleVerb::Atacar);
+    scene.menu_confirm();  // entra na mira; aim_candidates_ = inimigos vivos em ordem de fila
+    REQUIRE(scene.is_aiming());
+    REQUIRE(scene.aim_count() == scene.enemy_count());
+
+    // Os slots de inimigo do arena_layout seguem a MESMA ordem (i-esimo vivo -> i-esimo slot),
+    // entao o centro do slot i deve casar o candidato de mira i.
+    const gus::app::screens::ArenaLayout arena = gus::app::screens::arena_layout(
+        scene.party_count(), scene.enemy_count(), scene.gus_party_index());
+    for (int i = 0; i < scene.aim_count(); ++i) {
+        const gus::core::spatial::Rect& s = arena.enemies[static_cast<std::size_t>(i)].rect;
+        const float cx = s.x + s.w * 0.5f;
+        const float cy = s.y + s.h * 0.5f;
+        REQUIRE(scene.aim_index_at_arena(cx, cy) == i);
+    }
+}
+
+TEST_CASE("mouse-mira: clique fora de qualquer inimigo devolve -1 (nao erra alvo)",
+          "[battle_scene]") {
+    BattleScene scene;
+    pump_to_player_turn(scene);
+    select_verb(scene, BattleVerb::Atacar);
+    scene.menu_confirm();
+    REQUIRE(scene.is_aiming());
+
+    // Canto superior-esquerdo (area do cockpit/fila, longe da coluna de inimigos): -1.
+    REQUIRE(scene.aim_index_at_arena(2.0f, 2.0f) == -1);
+    // Sobre a COLUNA DA PARTY (nao e inimigo miravel): -1. Usa o slot do 1o party vivo.
+    const gus::app::screens::ArenaLayout arena = gus::app::screens::arena_layout(
+        scene.party_count(), scene.enemy_count(), scene.gus_party_index());
+    const gus::core::spatial::Rect& p0 = arena.party[0].rect;
+    REQUIRE(scene.aim_index_at_arena(p0.x + p0.w * 0.5f, p0.y + p0.h * 0.5f) == -1);
+}
+
+TEST_CASE("mouse-mira: aim_select pousa a mira DIRETO no indice (clique = mirar alvo)",
+          "[battle_scene]") {
+    BattleScene scene;
+    pump_to_player_turn(scene);
+    select_verb(scene, BattleVerb::Atacar);
+    scene.menu_confirm();
+    REQUIRE(scene.is_aiming());
+    const int n = scene.aim_count();
+    REQUIRE(n >= 2);
+
+    // aim_select(i) pousa no i-esimo inimigo vivo em ordem de fila == alive_enemy_at(scene,i)
+    // (a MESMA base de aim_candidates_). Ponteiro identico prova o mapeamento exato.
+    for (int i = 0; i < n; ++i) {
+        scene.aim_select(i);
+        REQUIRE(scene.aim_target() == alive_enemy_at(scene, i));
+    }
+    // aim_select fora de faixa e no-op (mantem o alvo corrente).
+    scene.aim_select(0);
+    const auto* t0 = scene.aim_target();
+    scene.aim_select(-1);
+    REQUIRE(scene.aim_target() == t0);
+    scene.aim_select(n + 5);
+    REQUIRE(scene.aim_target() == t0);
+}
+
+TEST_CASE("mouse-mira: FORA do modo-mira, aim_index_at_arena e sempre -1 e aim_select no-op",
+          "[battle_scene]") {
+    BattleScene scene;
+    pump_to_player_turn(scene);
+    REQUIRE_FALSE(scene.is_aiming());
+    // Sem mira: nenhum candidato -> -1 em qualquer ponto (mesmo sobre um inimigo).
+    const gus::app::screens::ArenaLayout arena = gus::app::screens::arena_layout(
+        scene.party_count(), scene.enemy_count(), scene.gus_party_index());
+    const gus::core::spatial::Rect& e0 = arena.enemies[0].rect;
+    REQUIRE(scene.aim_index_at_arena(e0.x + e0.w * 0.5f, e0.y + e0.h * 0.5f) == -1);
+    // aim_select fora da mira nao entra em mira nem quebra nada.
+    scene.aim_select(0);
+    REQUIRE_FALSE(scene.is_aiming());
+    REQUIRE(scene.aim_target() == nullptr);
+}

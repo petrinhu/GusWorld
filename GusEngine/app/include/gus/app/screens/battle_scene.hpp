@@ -268,6 +268,19 @@ public:
     // do modo-mira. A lista exclui mortos (mira nunca pousa num inimigo morto).
     void aim_move(int delta) noexcept;
 
+    // MOUSE (Incremento A2): poe a mira DIRETO no i-esimo inimigo miravel (0..aim_count()-1),
+    // sem WRAP/delta. No-op fora do modo-mira ou com index fora de faixa. Espelha o aim_move
+    // (mesma lista aim_candidates_) pro clique/hover pousar num alvo especifico.
+    void aim_select(int index) noexcept;
+
+    // MOUSE (Incremento A2): indice do inimigo miravel (0..aim_count()-1) cujo SLOT na arena
+    // contem o ponto em coordenadas de MUNDO/logicas (px logico 960x540, o mesmo espaco do
+    // arena_layout/arena_rect_for_actor); -1 se o ponto nao cai em nenhum inimigo miravel.
+    // FUNCAO PURA de leitura (nao muta a cena): decide "que alvo esse (x,y) corresponde",
+    // separada da acao (aim_select + aim_confirm ficam no host SDL). Fora do modo-mira a
+    // lista esta vazia -> sempre -1 (clicar inimigo so vale mirando). Testavel headless.
+    [[nodiscard]] int aim_index_at_arena(float world_x, float world_y) const;
+
     // Inimigo atualmente mirado (pro render do destaque + testes). nullptr fora da mira.
     [[nodiscard]] const gus::domain::combat::CombatActor* aim_target() const noexcept;
 

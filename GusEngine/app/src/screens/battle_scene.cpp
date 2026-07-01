@@ -776,6 +776,37 @@ void BattleScene::aim_move(int delta) noexcept {
     aim_index_ = ((aim_index_ + delta) % n + n) % n;  // WRAP nos extremos
 }
 
+void BattleScene::aim_select(int index) noexcept {
+    // MOUSE (Incremento A2): pousa a mira DIRETO no index (sem wrap). No-op fora da mira ou
+    // com index invalido (nao mexe no cursor corrente).
+    if (!aiming_ || index < 0 || index >= static_cast<int>(aim_candidates_.size())) {
+        return;
+    }
+    aim_index_ = index;
+}
+
+int BattleScene::aim_index_at_arena(float world_x, float world_y) const {
+    // Casa o ponto (mundo/logico) com o SLOT de cada inimigo MIRAVEL. aim_candidates_ segue a
+    // ordem de fila dos inimigos vivos, a MESMA base que arena_rect_for_actor usa pra ordenar
+    // os slots -> o i-esimo candidato casa o i-esimo slot. Fora da mira a lista e vazia (-1).
+    for (int i = 0; i < static_cast<int>(aim_candidates_.size()); ++i) {
+        const CombatActor* e = aim_candidates_[static_cast<std::size_t>(i)];
+        if (e == nullptr) {
+            continue;
+        }
+        const std::optional<gus::core::spatial::Rect> slot = arena_rect_for_actor(e->id());
+        if (!slot.has_value()) {
+            continue;  // alvo sem slot visivel (nao deveria, mira so tem vivos): pula
+        }
+        const gus::core::spatial::Rect& r = *slot;
+        if (world_x >= r.x && world_x <= r.x + r.w && world_y >= r.y &&
+            world_y <= r.y + r.h) {
+            return i;
+        }
+    }
+    return -1;
+}
+
 const CombatActor* BattleScene::aim_target() const noexcept {
     if (!aiming_ || aim_index_ < 0 ||
         aim_index_ >= static_cast<int>(aim_candidates_.size())) {
