@@ -97,7 +97,9 @@ public:
     void skip() noexcept;
 
     // ENCARAR (decisao do lider 2026-06-25): o jogador apertou Enter na abertura. Sai do
-    // Intro e LIBERA o 1o passo do combate (o 1o turno comeca a animar com os 2 beats).
+    // Intro e entra num RESPIRO INICIAL (WaitingDelay com kPacingStepDelaySeconds) antes do
+    // 1o anuncio - o mesmo delay que precede todo turno subsequente (FIX W1: sem ele, o 1o
+    // ataque inimigo conectava ~0.7s apos Encarar, "rapido demais"). skip() zera o respiro.
     // No-op se nao esta no Intro.
     void begin_combat() noexcept;
 
