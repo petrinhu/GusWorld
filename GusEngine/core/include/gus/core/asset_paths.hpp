@@ -88,6 +88,13 @@ inline constexpr std::string_view kMolduraCartaFrameFile = "moldura_carta_frame.
 inline constexpr std::string_view kRetratoGusCombateNobgFile =
     "retrato_gus_combate_nobg.png";
 
+// --- Imagens gerais (resources/images/) ---
+// Pasta das imagens de lore/UI (fundo por bucket, glifos, retratos formais).
+inline constexpr std::string_view kImagesDir = "images";
+// Glifo Vetor-Dragao (brasao Vance, 677x369, transparente): centro dos aneis do brasao da
+// ABERTURA do cockpit, no lugar do monograma "V". Em resources/images/.
+inline constexpr std::string_view kVanceDragonGlyphFile = "vance_dragon_glyph.png";
+
 // ============================================================================
 // FONTES (sob GusEngine/assets/fonts/, asset de ENGINE versionado no repo).
 // ============================================================================

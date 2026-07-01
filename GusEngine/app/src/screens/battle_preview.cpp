@@ -171,9 +171,19 @@ body { font-family: "Pixel Operator Mono"; background: transparent; }
     rml += moldura;
     rml += R"RML( ); }
 
-#name { text-align: center; margin-top: 6dp; font-size: 14dp;
-  color: #eaf6fb; }
-#role { text-align: center; font-size: 10dp; color: #E8A33D; }
+/* POLISH 2 (veredito do lider: nome/role DESLOCADOS da moldura): o #name/#role tinham
+   text-align:center MAS a caixa auto-width que o RmlUi centrava media a LARGURA DO PADDING-BOX
+   (252dp) a partir do content-left (12dp) => centro em ~138dp, enquanto o retrato (largura
+   EXPLICITA 104dp + margin-left 62dp) centra em 126dp (= centro da coluna). Medido na captura:
+   moldura=126.6dp, nome="Drone"=136.9dp (~10dp a direita). A diferenca (~12dp) = o padding
+   esquerdo, que a auto-width ignorava. FIX: dar ao nome/role LARGURA EXPLICITA (148dp, folga
+   pra "VETOR DO GAMBITO") + margin-left 40dp, ancorada no mesmo content-left do retrato =>
+   centro = 12 + 40 + 74 = 126dp, EXATAMENTE sob o eixo da moldura (mesmo truque de largura
+   explicita do #portrait). text-align:center segue centrando o texto dentro dessa caixa. */
+#name { text-align: center; margin-top: 6dp; margin-left: 40dp; width: 148dp;
+  font-size: 14dp; color: #eaf6fb; }
+#role { text-align: center; margin-left: 40dp; width: 148dp;
+  font-size: 10dp; color: #E8A33D; }
 
 /* ---- HP barra (degrade verde + glow) + numeros ---- */
 #vitals { margin-top: 6dp; }
@@ -281,9 +291,13 @@ body { font-family: "Pixel Operator Mono"; background: transparent; }
   animation: spin 18s linear infinite; }
 .ring.r3 { top: 34dp; left: 34dp; width: 80dp; height: 80dp; border: 1dp #E8A33D66; }
 @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-/* monograma V (Vance) centrado, com glow latao */
-.mono { position: absolute; top: 38dp; left: 0dp; width: 148dp; text-align: center;
-  font-size: 62dp; color: #E8A33D; }
+/* POLISH 1 (veredito do lider: o "V" estava feio): glifo Vetor-Dragao (brasao Vance) no
+   CENTRO dos aneis, no lugar do monograma. Caixa 72x40dp (aspecto ~1.83:1 do PNG 677x369)
+   centrada no crest (148dp): left=(148-72)/2=38, top=(148-40)/2=54 => cai DENTRO do anel
+   interno r3 (34..114 / 54..94). 'contain' preserva o aspecto (nao distorce/estoura). O
+   nome flat casa a copia pro stage (write_live/baked_cockpit_rml). */
+.mono { position: absolute; top: 54dp; left: 38dp; width: 72dp; height: 40dp;
+  decorator: image( vance_dragon_glyph.png contain ); }
 #otitle { font-size: 16dp; color: #cfe6ee; }
 #osub { font-size: 10dp; color: #6f8593; margin-top: 2dp; }
 #ostatus { margin-top: 16dp; font-size: 11dp; color: #22D3EE; }
@@ -301,7 +315,7 @@ body { font-family: "Pixel Operator Mono"; background: transparent; }
         <div class="ring r1"></div>
         <div class="ring r2"></div>
         <div class="ring r3"></div>
-        <div class="mono">V</div>
+        <div class="mono"></div>
       </div>
       <div id="otitle">GUSWORLD</div>
       <div id="osub">PROTOCOLO DE COMBATE</div>
@@ -467,6 +481,11 @@ std::string write_baked_cockpit_rml(bool intro) {
               "moldura_carta_frame.png");
     copy_into(join(icons, "retratos/retrato_gus_combate_nobg.png"),
               "retrato_gus_combate_nobg.png");
+    // POLISH 1: glifo Vetor-Dragao (brasao da ABERTURA). Vive em resources/images/ (arvore
+    // diferente dos sprites); o stage o achata pelo mesmo nome que o RCSS .mono referencia.
+    copy_into(join(resolve_asset_dir(gus::core::assets::kImagesDir),
+                   std::string(gus::core::assets::kVanceDragonGlyphFile)),
+              "vance_dragon_glyph.png");
 
     // Pega o RML autorado e transforma.
     std::string rml = load_cockpit_rml();
@@ -583,6 +602,11 @@ std::string write_live_cockpit_rml() {
     copy_into(join(icons, "retratos/retrato_inimigo.png"), "retrato_inimigo.png");
     copy_into(join(icons, "retratos/retrato_caua.png"), "retrato_caua.png");
     copy_into(join(icons, "retratos/retrato_jaci.png"), "retrato_jaci.png");
+    // POLISH 1: glifo Vetor-Dragao (brasao da ABERTURA), de resources/images/ (arvore
+    // separada). Achatado pro stage com o nome que o RCSS .mono referencia.
+    copy_into(join(resolve_asset_dir(gus::core::assets::kImagesDir),
+                   std::string(gus::core::assets::kVanceDragonGlyphFile)),
+              "vance_dragon_glyph.png");
 
     std::string rml = load_cockpit_rml();
 
