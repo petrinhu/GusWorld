@@ -1008,8 +1008,39 @@ int run_battle_preview() {
     SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
     SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);  // o GL3 do RmlUi usa stencil (clip mask)
 
+    // FIX W1 item 2 (lider: "maximizada, a base da cena desliza pra tras da barra de
+    // tarefas"): a janela INICIAL deve caber na AREA UTIL do desktop (que desconta a barra
+    // de tarefas/paineis via struts), senao a base (log/rodape do cockpit) nasce escondida.
+    // SDL_GetDisplayUsableBounds ja desconta os paineis. Preservamos a proporcao 16:9 (a
+    // arena estica 960x540 -> janela; 16:9 = sem distorcao) escolhendo a MAIOR janela 16:9
+    // que cabe na area util (com margem p/ a decoracao da janela), limitada ao alvo
+    // 1920x1080. Sob Xvfb/headless (sem barra) os usable bounds = display inteiro -> escala
+    // 1.0 -> janela 1920x1080 como antes (self-tests de mouse/hover intactos: as coordenadas
+    // derivam de pw0/ph0 REAIS da janela, nao de constantes). NAO ha offset de letterbox
+    // aqui -> os hit-tests de mouse (A2/picker) seguem validos sem desconto.
+    int win_w = kWindowW, win_h = kWindowH;
+    {
+        SDL_Rect usable{};
+        const SDL_DisplayID disp = SDL_GetPrimaryDisplay();
+        if (disp != 0 && SDL_GetDisplayUsableBounds(disp, &usable) && usable.w > 0 &&
+            usable.h > 0) {
+            constexpr float kMargin = 0.95f;  // folga p/ bordas/titlebar da janela
+            const float avail_w = static_cast<float>(usable.w) * kMargin;
+            const float avail_h = static_cast<float>(usable.h) * kMargin;
+            float scale = 1.0f;
+            scale = std::min(scale, avail_w / static_cast<float>(kWindowW));
+            scale = std::min(scale, avail_h / static_cast<float>(kWindowH));
+            if (scale < 1.0f) {
+                win_w = static_cast<int>(static_cast<float>(kWindowW) * scale);
+                win_h = static_cast<int>(static_cast<float>(kWindowH) * scale);
+            }
+            std::cout << "BattlePreview: [win] area util=" << usable.w << "x" << usable.h
+                      << " -> janela inicial=" << win_w << "x" << win_h << " (16:9)\n";
+        }
+    }
+
     SDL_Window* window =
-        SDL_CreateWindow("GusWorld BattlePreview (M5, GL3)", kWindowW, kWindowH,
+        SDL_CreateWindow("GusWorld BattlePreview (M5, GL3)", win_w, win_h,
                          SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
     if (window == nullptr) {
         std::cerr << "BattlePreview: SDL_CreateWindow falhou: " << SDL_GetError() << "\n";
