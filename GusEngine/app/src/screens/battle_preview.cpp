@@ -1083,29 +1083,61 @@ int run_battle_preview() {
                 } else if (ev.type == SDL_EVENT_KEY_DOWN) {
                     switch (ev.key.key) {
                         case SDLK_ESCAPE:
-                            running = false;
+                            // MODO-MIRA (§3.5): Esc CANCELA a mira (volta ao menu de verbos
+                            // sem consumir o turno). Fora da mira: Esc sai do preview.
+                            if (scene.is_aiming()) {
+                                scene.aim_cancel();
+                            } else {
+                                running = false;
+                            }
                             break;
                         // Navegacao do menu de verbos (incremento 3). So opera no turno
                         // de jogador (a cena ignora fora dele); a cena auto-encadeia os
-                        // turnos de inimigo ate o proximo turno de jogador ou o fim.
+                        // turnos de inimigo ate o proximo turno de jogador ou o fim. No
+                        // MODO-MIRA (§3.5), UP/DOWN navegam os INIMIGOS (coluna vertical da
+                        // arena), nao os verbos.
                         case SDLK_UP:
                         case SDLK_W:
-                            scene.menu_move(-1);
+                            if (scene.is_aiming()) {
+                                scene.aim_move(-1);
+                            } else {
+                                scene.menu_move(-1);
+                            }
                             break;
                         case SDLK_DOWN:
                         case SDLK_S:
-                            scene.menu_move(+1);
+                            if (scene.is_aiming()) {
+                                scene.aim_move(+1);
+                            } else {
+                                scene.menu_move(+1);
+                            }
+                            break;
+                        // LEFT/RIGHT: aliases de navegacao SO no modo-mira (setas
+                        // horizontais tambem servem pra alternar o alvo). Fora da mira,
+                        // sem efeito (o menu de verbos e vertical).
+                        case SDLK_LEFT:
+                            if (scene.is_aiming()) {
+                                scene.aim_move(-1);
+                            }
+                            break;
+                        case SDLK_RIGHT:
+                            if (scene.is_aiming()) {
+                                scene.aim_move(+1);
+                            }
                             break;
                         case SDLK_RETURN:
                         case SDLK_KP_ENTER:  // Enter do numpad tambem confirma
                         case SDLK_SPACE:
                             // ABERTURA (lider 2026-06-25): na tela "BATALHA!" parada,
-                            // Enter ENCARA e comeca o combate. Depois: na vez do jogador
-                            // confirma o verbo; fora dela (anuncio/delay) ACELERA o ritmo.
+                            // Enter ENCARA e comeca o combate. No MODO-MIRA (§3.5), confirma
+                            // o ALVO mirado (resolve). Na vez do jogador (menu), confirma o
+                            // verbo (Atacar/Scan ENTRAM na mira). Fora disso, ACELERA o ritmo.
                             if (scene.is_intro()) {
                                 scene.start_combat();  // Encarar
+                            } else if (scene.is_aiming()) {
+                                scene.aim_confirm();  // confirma o alvo mirado
                             } else if (scene.waiting_player_input()) {
-                                scene.menu_confirm();
+                                scene.menu_confirm();  // Atacar/Scan -> abre a mira
                             } else {
                                 scene.skip();
                             }
