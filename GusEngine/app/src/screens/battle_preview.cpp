@@ -1050,6 +1050,45 @@ int run_battle_preview() {
             return e != nullptr && e[0] == '1';
         }();
 
+        // DIAGNOSTICO/CAPTURA: GUSWORLD_BATTLE_PUMP_TO=<actor_id> conduz o combate ate esse
+        // ator ser o ATIVO, ANTES do loop de exibicao - pra CAPTURAR a fila CTB na vez de um
+        // ator especifico (ex. um de SPD BAIXA como "jaci") sem driver de input. Encara,
+        // bombeia o ritmo nos turnos de inimigo e AUTO-RESOLVE os turnos de jogador (Atacar
+        // no alvo sugerido) ate chegar no alvo. So diagnostico: LE/dirige a cena pela MESMA
+        // API publica do jogador, nao muda o motor.
+        if (const char* pump_to = std::getenv("GUSWORLD_BATTLE_PUMP_TO")) {
+            if (pump_to[0] != '\0') {
+                const std::string want(pump_to);
+                if (scene.is_intro()) {
+                    scene.start_combat();
+                }
+                for (int i = 0; i < 600; ++i) {
+                    const auto* a = scene.active_actor();
+                    if ((a != nullptr && a->id() == want) || scene.combat_over()) {
+                        break;
+                    }
+                    if (scene.waiting_player_input()) {
+                        for (int k = 0; k < 8 &&
+                                        scene.menu().selected_verb() != BattleVerb::Atacar;
+                             ++k) {
+                            scene.menu_move(+1);
+                        }
+                        scene.menu_confirm();  // Atacar -> entra na mira
+                        if (scene.is_aiming()) {
+                            scene.aim_confirm();  // confirma o alvo sugerido -> resolve
+                        }
+                    } else {
+                        scene.skip();
+                        scene.update(1.0f / 60.0f);  // bombeia 1 beat de inimigo
+                    }
+                }
+                const auto* a = scene.active_actor();
+                std::cout << "BattlePreview: [pump] alvo=" << want << " ator ativo agora="
+                          << (a != nullptr ? a->id() : "?")
+                          << " fila=" << scene.queue_len() << "\n";
+            }
+        }
+
         bool running = true;
         bool have_last = false;
         unsigned long long last_ns = 0;
