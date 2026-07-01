@@ -41,6 +41,7 @@
 #ifndef GUS_DOMAIN_COMBAT_COMBAT_STATE_MACHINE_HPP
 #define GUS_DOMAIN_COMBAT_COMBAT_STATE_MACHINE_HPP
 
+#include <cstdint>
 #include <functional>
 #include <optional>
 #include <string>
@@ -65,6 +66,14 @@ class IEnemyBrain;
 // a acao. O jogador (UI) ou a AI (IEnemyBrain) implementam isto no incremento 4.
 using CombatActionProvider =
     std::function<CombatAction(CombatActor& actor, const CombatState& state)>;
+
+// Lado do combate (Janela de Comando da Party, §4.1). Nao e serializado (nao entra em
+// combat_enums.hpp, que e o contrato binario do save); e so um tipo de retorno de query
+// para o host/UI decidir quem abre a rodada. Party = bloco da party; Enemy = bloco inimigo.
+enum class CombatSide : std::uint32_t {
+    Party = 0,
+    Enemy = 1,
+};
 
 // Maquina de estados do combate (secao 3).
 class CombatStateMachine {
@@ -110,6 +119,36 @@ public:
     [[nodiscard]] const std::optional<IntentPreview>& last_prediction() const noexcept {
         return last_prediction_;
     }
+
+    // ---- Janela de Comando da Party (comando livre sobre o CTB, modelo 1B, §4.1) ----
+    //
+    // Extensao ADITIVA: a FORMA da FSM nao muda. Muda a SELECAO de ator quando e a vez do
+    // bloco da party (o jogador comanda QUAL membro age e em que ordem). A SPD continua
+    // decidindo (a) qual lado abre a rodada e (b) o pre-selecionado. Nada disto consome RNG
+    // (§11): selecao de ator e input de jogador/host, nao sorteio. Se NENHUM select_party_
+    // actor for chamado, begin_turn opera no queue_.current() de sempre => motor pre-1B
+    // (forcar o topo = caso do conjunto elegivel ter 1 elemento; testes antigos intactos).
+
+    // Lado que ABRE a rodada, por comparacao de SPD entre os lados (maior SPD alive de
+    // cada lado). Empate favorece a Party (regra documentada; §4.1 nao fixa o desempate).
+    // Query pura sobre os atores vivos; reflete a SPD corrente (recomputa entre rodadas).
+    [[nodiscard]] CombatSide round_opening_side() const;
+
+    // Membros da party ELEGIVEIS nesta rodada (vivos, player-side, ainda-nao-agiram),
+    // ordenados por SPD desc (front = pre-selecionado). Query pura, derivada da fila
+    // (slots >= cursor). Vazio quando o bloco da party ja se esvaziou nesta rodada.
+    [[nodiscard]] std::vector<CombatActor*> pending_party_actors() const;
+
+    // Pre-selecionado ao abrir a Janela = o de maior SPD entre os elegiveis (front de
+    // pending_party_actors), ou nullptr se nao ha party pendente. Sugestao, nao trava.
+    [[nodiscard]] CombatActor* preselected_party_actor() const;
+
+    // Escolhe QUAL membro pendente da party entra no proximo begin_turn (comando livre do
+    // jogador/host, chamado ANTES de begin_turn). O begin_turn consome a escolha trazendo
+    // o ator para o slot do cursor. Lanca std::invalid_argument se `actor` nao e um membro
+    // elegivel da party nesta rodada (consulte pending_party_actors()). Sem chamada, o
+    // default (queue_.current()) vale.
+    void select_party_actor(CombatActor* actor);
 
     // ---- Ambiente de combate (secao 18) ----
 
@@ -206,6 +245,11 @@ private:
 
     [[nodiscard]] static bool dispel_buffs(CombatActor& actor);
 
+    // ---- Janela de Comando da Party (§4.1) ----
+    // true se `actor` e um membro elegivel da party nesta rodada (esta em
+    // pending_party_actors): vivo, player-side, ainda-nao-agiu. nullptr => false.
+    [[nodiscard]] bool is_pending_party_actor(const CombatActor* actor) const;
+
     // Registries (nao-donos) + RNG injetado (nao-dono). nullptr tratado no construtor.
     CombatActionProvider action_provider_;
     const std::unordered_map<std::string, Card>* card_registry_;
@@ -215,6 +259,11 @@ private:
     InitiativeQueue queue_;
     CombatPhase phase_ = CombatPhase::SetupPhase;
     CombatOutcome outcome_ = CombatOutcome::Ongoing;
+
+    // Janela de Comando da Party (§4.1): membro escolhido pelo host para o PROXIMO
+    // begin_turn (comando livre). nullptr = sem escolha => default (queue_.current()).
+    // One-shot: begin_turn consome e zera. Ponteiro NAO-DONO (ator vive no escopo do dono).
+    CombatActor* selected_next_party_ = nullptr;
 
     std::vector<CombatLogEntry> log_;
     std::vector<StatusEffectChange> status_changes_;

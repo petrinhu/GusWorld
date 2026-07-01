@@ -187,11 +187,89 @@ void CombatStateMachine::advance_period_clock() {
 }
 
 // ---------------------------------------------------------------------------
+// Janela de Comando da Party (comando livre sobre o CTB, modelo 1B, §4.1)
+//
+// Extensao ADITIVA: nenhuma destas funcoes consome RNG nem muda a FORMA da FSM. A selecao
+// de ator e input do jogador/host; a resolucao de acao (§11) fica intacta. Sem chamada de
+// select_party_actor, begin_turn opera no queue_.current() de sempre (motor pre-1B).
+// ---------------------------------------------------------------------------
+
+CombatSide CombatStateMachine::round_opening_side() const {
+    // A SPD do lado (maior SPD entre os vivos) decide quem abre a rodada (§4.1). Empate
+    // favorece a party: o inimigo so pega a party primeiro se for ESTRITAMENTE mais rapido.
+    int party_max = -1;
+    int enemy_max = -1;
+    for (const CombatActor* a : queue_.order()) {
+        if (!a->is_alive()) continue;
+        if (a->is_player_side())
+            party_max = std::max(party_max, a->spd());
+        else
+            enemy_max = std::max(enemy_max, a->spd());
+    }
+    return party_max >= enemy_max ? CombatSide::Party : CombatSide::Enemy;
+}
+
+std::vector<CombatActor*> CombatStateMachine::pending_party_actors() const {
+    // Elegiveis = membros da party (player-side) vivos que ainda NAO agiram nesta rodada.
+    // "Ainda nao agiu" = slot >= cursor (o cursor caminha a rodada; slots < cursor ja
+    // agiram). Derivado da fila, sem estado extra. Ordenado por SPD desc (front =
+    // pre-selecionado); stable_sort espelha o desempate por ordem de fila da §4.
+    const std::vector<CombatActor*>& order = queue_.order();
+    const int cursor = queue_.cursor();
+    std::vector<CombatActor*> out;
+    for (int i = cursor; i < static_cast<int>(order.size()); ++i) {
+        CombatActor* a = order[static_cast<std::size_t>(i)];
+        if (a->is_player_side() && a->is_alive())
+            out.push_back(a);
+    }
+    std::stable_sort(out.begin(), out.end(), [](const CombatActor* x, const CombatActor* y) {
+        return x->spd() > y->spd();
+    });
+    return out;
+}
+
+CombatActor* CombatStateMachine::preselected_party_actor() const {
+    const std::vector<CombatActor*> pending = pending_party_actors();
+    return pending.empty() ? nullptr : pending.front();
+}
+
+bool CombatStateMachine::is_pending_party_actor(const CombatActor* actor) const {
+    if (actor == nullptr) return false;
+    for (const CombatActor* a : pending_party_actors())
+        if (a == actor) return true;
+    return false;
+}
+
+void CombatStateMachine::select_party_actor(CombatActor* actor) {
+    if (!is_pending_party_actor(actor))
+        throw std::invalid_argument(
+            "select_party_actor: '" + (actor != nullptr ? actor->id() : std::string{"<null>"}) +
+            "' nao e um membro elegivel da party nesta rodada (vivo, player-side, "
+            "ainda-nao-agiu). Consulte pending_party_actors().");
+    selected_next_party_ = actor;
+}
+
+// ---------------------------------------------------------------------------
 // Conducao da FSM
 // ---------------------------------------------------------------------------
 
 bool CombatStateMachine::begin_turn() {
     phase_ = CombatPhase::TurnStart;
+
+    // Janela de Comando da Party (1B, §4.1): se o host escolheu um membro elegivel via
+    // select_party_actor, traz ele para o slot do cursor ANTES de operar (comando livre).
+    // One-shot: consome e zera. Sem selecao (selected_next_party_ == nullptr), este bloco
+    // e no-op e begin_turn opera no queue_.current() de sempre => default byte-identico ao
+    // motor pre-1B (os testes de transicao existentes assumem isto). Re-valida a
+    // elegibilidade no consumo: se o estado mudou (ator morreu, ja agiu), degrada pro
+    // default em vez de forcar. NAO consome RNG.
+    if (selected_next_party_ != nullptr) {
+        CombatActor* chosen = selected_next_party_;
+        selected_next_party_ = nullptr;
+        if (is_pending_party_actor(chosen))
+            queue_.bring_to_current(chosen);
+    }
+
     CombatActor& actor = *queue_.current();
 
     actor.refresh_resources_for_turn(queue_.round_index());

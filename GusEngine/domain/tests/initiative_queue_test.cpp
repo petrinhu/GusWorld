@@ -210,3 +210,64 @@ TEST_CASE("initiative_queue: sync_cursor_to reaponta pro ator dado",
     q.sync_cursor_to(&a);
     REQUIRE(q.current()->id() == "a");
 }
+
+// ---- cursor() + bring_to_current (Janela de Comando da Party 1B, secao 4.1) --------
+// bring_to_current traz um ator para o SLOT DO CURSOR (vira current()) SEM alterar o
+// indice do cursor nem round_index. E o primitivo que realiza a escolha do jogador dentro
+// do bloco da party (comando livre): permutacao, nao salto de cursor, entao cada ator
+// segue agindo uma vez por rodada.
+
+TEST_CASE("initiative_queue: cursor expoe o indice do turno corrente",
+          "[domain][combat][queue]") {
+    CombatActor a = actor("a", 30), b = actor("b", 20);
+    InitiativeQueue q({&a, &b});
+    REQUIRE(q.cursor() == 0);
+    q.advance();
+    REQUIRE(q.cursor() == 1);
+    q.advance();  // wrap
+    REQUIRE(q.cursor() == 0);
+}
+
+TEST_CASE("initiative_queue: bring_to_current puxa um ator de tras pro slot do cursor",
+          "[domain][combat][queue]") {
+    CombatActor a = actor("a", 30), b = actor("b", 20), c = actor("c", 10);
+    InitiativeQueue q({&a, &b, &c});  // [a, b, c], cursor 0
+    q.bring_to_current(&c);           // puxa c (idx2) pro cursor 0
+    REQUIRE(order_ids(q) == std::vector<std::string>{"c", "a", "b"});
+    REQUIRE(q.current()->id() == "c");
+    REQUIRE(q.cursor() == 0);
+    REQUIRE(q.round_index() == 0);
+}
+
+TEST_CASE("initiative_queue: bring_to_current respeita o cursor avancado",
+          "[domain][combat][queue]") {
+    CombatActor a = actor("a", 30), b = actor("b", 20), c = actor("c", 10);
+    InitiativeQueue q({&a, &b, &c});
+    q.advance();             // cursor 1 (current = b)
+    q.bring_to_current(&c);  // c (idx2) -> cursor 1; a (atras do cursor) fica intocado
+    REQUIRE(order_ids(q) == std::vector<std::string>{"a", "c", "b"});
+    REQUIRE(q.current()->id() == "c");
+    REQUIRE(q.cursor() == 1);
+}
+
+TEST_CASE("initiative_queue: bring_to_current e no-op se ja e o current ou esta atras",
+          "[domain][combat][queue]") {
+    CombatActor a = actor("a", 30), b = actor("b", 20), c = actor("c", 10);
+    InitiativeQueue q({&a, &b, &c});
+    q.advance();             // cursor 1 (current = b)
+    q.bring_to_current(&b);  // ja e o current -> no-op
+    REQUIRE(order_ids(q) == std::vector<std::string>{"a", "b", "c"});
+    q.bring_to_current(&a);  // a (idx0) esta ATRAS do cursor -> no-op (nao pula o current)
+    REQUIRE(order_ids(q) == std::vector<std::string>{"a", "b", "c"});
+    REQUIRE(q.current()->id() == "b");
+}
+
+TEST_CASE("initiative_queue: bring_to_current de ausente e no-op seguro (nao lanca)",
+          "[domain][combat][queue]") {
+    CombatActor a = actor("a", 30), b = actor("b", 20);
+    CombatActor estranho = actor("z", 99);
+    InitiativeQueue q({&a, &b});
+    q.bring_to_current(&estranho);  // ausente -> no-op
+    REQUIRE(order_ids(q) == std::vector<std::string>{"a", "b"});
+    REQUIRE(q.cursor() == 0);
+}
