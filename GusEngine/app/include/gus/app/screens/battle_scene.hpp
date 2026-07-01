@@ -298,6 +298,61 @@ public:
     // nao esta mirando.
     void aim_cancel() noexcept;
 
+    // ---- Escolha de ator / Janela de Comando da Party (comando-livre 1B, combat.md §4.1) ----
+    //
+    // APRESENTACAO PURA sobre o motor 1B (§4.1): quando e a vez do BLOCO da party e ha MAIS DE
+    // UM membro elegivel (machine().pending_party_actors()), a cena entra num modo de ESCOLHA
+    // DE ATOR ANTES do menu de verbos - o jogador comanda QUAL membro age (a SPD apenas SUGERE
+    // o pre-selecionado; §4.1 "comando livre"). O begin_turn fica DEFERIDO ate a escolha;
+    // confirmar chama machine().select_party_actor(escolhido) e SO ENTAO o turno comeca (menu
+    // de verbos do ator escolhido), prosseguindo EXATAMENTE como o fluxo de hoje. Com 1 so
+    // elegivel NAO ha escolha: a cena auto-inicia o turno (sem friccao) - o picker existe pra
+    // ESCOLHER entre varios (decisao documentada no .cpp). ADITIVO: o motor (domain/) ja faz
+    // tudo (agrupa por lado, recomputa quem abre, regroup Gambito-safe); aqui so deixamos o
+    // jogador escolher dentro de pending_party_actors. So teclado/mouse; ZERO mudanca de motor.
+
+    // true enquanto a escolha de ator esta ativa (o turno da party ainda nao comecou).
+    [[nodiscard]] bool is_choosing_actor() const noexcept { return choosing_actor_; }
+
+    // Membros da party ELEGIVEIS nesta escolha (== machine().pending_party_actors() no momento
+    // de entrar), front = pre-selecionado (maior SPD). Vazio fora do modo. Ponteiros NAO-donos
+    // (vivem em actors_/na FSM). Fonte UNICA consumida pelo render E pelos testes.
+    [[nodiscard]] std::vector<const gus::domain::combat::CombatActor*> actor_choices() const;
+
+    // Quantidade de elegiveis na escolha atual. 0 fora do modo.
+    [[nodiscard]] int actor_pick_count() const noexcept {
+        return static_cast<int>(actor_choices_.size());
+    }
+
+    // Ator sob o cursor da escolha (pre-selecionado ao entrar = maior SPD). nullptr fora do
+    // modo. Pro render do destaque + testes.
+    [[nodiscard]] const gus::domain::combat::CombatActor* actor_pick_target() const noexcept;
+
+    // Navega o cursor entre os elegiveis (delta -1/+1, com WRAP). No-op fora do modo. Espelha
+    // aim_move (setas + Enter, a mesma linguagem do menu/mira).
+    void actor_picker_move(int delta) noexcept;
+
+    // MOUSE/atalho: poe o cursor DIRETO no i-esimo elegivel (0..actor_pick_count()-1), sem
+    // WRAP. No-op fora do modo ou index fora de faixa. Espelha aim_select.
+    void actor_picker_select(int index) noexcept;
+
+    // MOUSE: indice do elegivel (0..actor_pick_count()-1) cujo SLOT na arena contem o ponto em
+    // coords de MUNDO/logicas (px logico 960x540, o mesmo espaco de arena_rect_for_actor); -1
+    // se o ponto nao cai em nenhum elegivel. FUNCAO PURA (nao muta). Espelha aim_index_at_arena,
+    // mas sobre os slots da PARTY (arena_rect_for_actor e generico por id). Fora do modo a lista
+    // esta vazia -> sempre -1. Testavel headless; reusa o pipeline de hit-test do Incremento A2.
+    [[nodiscard]] int actor_pick_index_at_arena(float world_x, float world_y) const;
+
+    // Confirma o ator sob o cursor: grava a escolha no motor (select_party_actor) e INICIA o
+    // turno dele (begin_turn + menu de verbos). No-op fora do modo. Clique de mouse e teclas
+    // 1/2/3 confirmam via este caminho (mesma filosofia "aciona na hora" do A2).
+    void actor_picker_confirm();
+
+    // TECLA-ATALHO (1/2/3, pedido do lider): escolhe DIRETO o nth-esimo elegivel (1-based) e
+    // CONFIRMA na hora. No-op se nth nao tem elegivel correspondente (fora de faixa) ou fora do
+    // modo. Fonte UNICA do host (teclas) e dos testes; encapsula o "select + confirm imediato".
+    void actor_picker_hotkey(int nth);
+
     // Desenha o ESQUELETO da batalha (placeholders): fundo, arena (party/inimigos),
     // fila CTB, painel do ator ativo, log. viewport_px_w/h = PIXELS REAIS da janela
     // (o backend escala 960x540 por inteiro). LE a contagem/ordem do motor.
@@ -347,6 +402,21 @@ private:
     // Indice do alvo pre-selecionado (D3): (a) se ha inimigo escaneado FRACO a familia da
     // acao (mult 1.5), o 1o desses na fila; senao (b) o [0] (front da fila = age antes).
     [[nodiscard]] int preselect_aim_index(BattleVerb verb) const;
+
+    // ---- Escolha de ator / Janela de Comando da Party (helpers privados, §4.1) ----
+
+    // true se e a vez de um membro da party (queue_.current player-side vivo), o combate esta
+    // rolando (nao intro, nao fim) e ha MAIS DE UM elegivel pendente - entao o jogador ESCOLHE
+    // quem age. >1: com 1 so elegivel nao ha escolha (auto-inicia, sem friccao). Gate do modo.
+    [[nodiscard]] bool should_offer_actor_picker() const;
+
+    // Entra no modo de escolha: snapshot dos elegiveis (pending_party_actors) + cursor no
+    // pre-selecionado (front = maior SPD). NAO chama begin_turn (deferido ate o confirm).
+    void enter_actor_picker();
+
+    // O "begin" real do turno ativo (begin_turn + floaters/narracao + menu.refresh), extraido
+    // de start_active_turn pra o confirm INICIAR sem re-checar o gate do picker (nao re-entra).
+    void begin_active_turn_now();
 
     // "Familia da acao" pro tier de fraqueza D3. O ataque BASICO nao usa a roda no motor
     // (dano = atk-def) e o Scan e utilitario: FALLBACK documentado -> Atacar usa a familia
@@ -434,6 +504,18 @@ private:
     // Inimigos VIVOS-miraveis (NAO-donos; vivem em actors_), em ordem de fila (frente->
     // tras). Reconstruida ao entrar na mira; const porque a mira so LE o alvo.
     std::vector<const gus::domain::combat::CombatActor*> aim_candidates_;
+
+    // ---- Escolha de ator / Janela de Comando da Party (§4.1) ----
+    // true enquanto o jogador escolhe QUAL membro da party age (begin_turn DEFERIDO ate o
+    // confirm). start_active_turn e no-op enquanto isto e true (o begin so vem no confirm).
+    bool choosing_actor_ = false;
+    // Cursor: indice do elegivel escolhido em actor_choices_ (0 = pre-selecionado ao entrar).
+    int actor_pick_index_ = 0;
+    // Elegiveis da escolha corrente (NAO-donos; vivem em actors_/na FSM), front = maior SPD
+    // (== machine().pending_party_actors()). NON-const de proposito: os MESMOS ponteiros vao
+    // pra machine_->select_party_actor (que pede CombatActor*). Preenchido ao entrar no modo,
+    // limpo ao confirmar.
+    std::vector<gus::domain::combat::CombatActor*> actor_choices_;
 };
 
 }  // namespace gus::app::screens

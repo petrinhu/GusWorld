@@ -136,6 +136,14 @@ void select_verb(BattleScene& scene, BattleVerb want) {
 // agora que Atacar abre a mira. Sem navegar, mira o alvo sugerido = first_alive_enemy
 // (D3 (b)) - o MESMO alvo do hardcode antigo, mantendo estes testes validos.
 void player_attack(BattleScene& scene) {
+    // Comando-livre 1B (§4.1): se a vez da party abriu no PICKER (>1 elegivel), confirma o
+    // PRE-SELECIONADO (maior SPD) pra cair no menu de verbos do MESMO ator - transparente pros
+    // testes que so querem "o jogador ativo ataca" (mesmo espirito do aim_confirm somado aqui
+    // quando [Atacar] passou a abrir a mira no Incremento A). Os testes DO picker navegam/
+    // confirmam explicitamente (nao usam este helper).
+    if (scene.is_choosing_actor()) {
+        scene.actor_picker_confirm();
+    }
     select_verb(scene, BattleVerb::Atacar);
     scene.menu_confirm();  // entra em modo-mira (NAO resolve)
     scene.aim_confirm();   // confirma o alvo sugerido -> resolve o turno
@@ -167,10 +175,35 @@ void pump_to_player_turn(BattleScene& scene) {
     }
     for (int i = 0; i < 200; ++i) {
         if (scene.combat_over() || scene.waiting_player_input()) {
-            return;
+            break;
         }
         scene.skip();                // acelera o anuncio/delay corrente
         scene.update(1.0f / 60.0f);  // conduz 1 beat por vez
+    }
+    // COMANDO-LIVRE 1B (§4.1): a vez da party agora ABRE com a ESCOLHA DE ATOR quando ha >1
+    // elegivel (picker), ANTES do menu de verbos. Estes testes (pre-picker) exercitam o menu
+    // de verbos do MESMO ator que agia antes (o de maior SPD = o pre-selecionado): confirmar o
+    // cursor default cai exatamente nele, mantendo o comportamento identico. Os testes DO
+    // picker param antes (pump_to_actor_picker) e navegam/confirmam explicitamente.
+    if (scene.is_choosing_actor()) {
+        scene.actor_picker_confirm();
+    }
+}
+
+// PICKER (comando-livre 1B, §4.1): bombeia ATE a ESCOLHA DE ATOR abrir (a 1a vez da party com
+// >1 elegivel), SEM confirmar - pros testes do picker inspecionarem/navegarem/confirmarem. Sai
+// tambem se o combate acabar. Ao contrario de pump_to_player_turn (que confirma o default), este
+// PARA no picker com o cursor no pre-selecionado.
+void pump_to_actor_picker(BattleScene& scene) {
+    if (scene.is_intro()) {
+        scene.start_combat();
+    }
+    for (int i = 0; i < 400; ++i) {
+        if (scene.combat_over() || scene.is_choosing_actor()) {
+            return;
+        }
+        scene.skip();
+        scene.update(1.0f / 60.0f);
     }
 }
 
@@ -1563,4 +1596,307 @@ TEST_CASE("mouse-mira: FORA do modo-mira, aim_index_at_arena e sempre -1 e aim_s
     scene.aim_select(0);
     REQUIRE_FALSE(scene.is_aiming());
     REQUIRE(scene.aim_target() == nullptr);
+}
+
+// ---- INCREMENTO B (UI): comando-livre 1B / escolha de ator (combat.md §4.1) ----------
+// A vez do BLOCO da party ABRE numa ESCOLHA DE ATOR quando ha >1 elegivel: o jogador comanda
+// QUAL membro age (a SPD so SUGERE o pre-selecionado). O motor 1B (pending_party_actors/
+// preselected_party_actor/select_party_actor) ja esta pronto e verificado; aqui provamos a
+// camada de UI: entrada no modo, navegacao, pre-selecao por SPD, override, mouse, teclas 1/2/3.
+
+TEST_CASE("picker: a vez da party ABRE na escolha de ator (>1 elegivel), ANTES do menu",
+          "[battle_scene][picker]") {
+    BattleScene scene;
+    pump_to_actor_picker(scene);
+    REQUIRE(scene.is_choosing_actor());
+    REQUIRE(scene.actor_pick_count() == 3);  // demo: party de 3 abre os 3 elegiveis
+    // E a vez do lado do jogador, mas o TURNO ainda nao comecou (begin deferido): o menu de
+    // verbos NAO opera enquanto se escolhe o ator.
+    REQUIRE(scene.current_actor_is_player());
+    const auto* before = scene.active_actor();
+    scene.menu_confirm();  // no-op durante a escolha (begin deferido)
+    REQUIRE_FALSE(scene.is_aiming());
+    REQUIRE(scene.is_choosing_actor());
+    REQUIRE(scene.active_actor() == before);
+    // Banner distinto de "sua vez": "escolha quem age".
+    REQUIRE(scene.turn_banner_key() ==
+            std::string_view("COMBAT_BANNER_CHOOSE_ACTOR"));
+}
+
+TEST_CASE("picker: o pre-selecionado e o de MAIOR SPD (SPD sugere, jogador escolhe)",
+          "[battle_scene][picker]") {
+    BattleScene scene;
+    pump_to_actor_picker(scene);
+    REQUIRE(scene.is_choosing_actor());
+    const auto* target = scene.actor_pick_target();
+    REQUIRE(target != nullptr);
+    // == o pre-selecionado do MOTOR (front de pending_party_actors, maior SPD).
+    REQUIRE(target == scene.machine().preselected_party_actor());
+    // Na demo o maior SPD da party e o Caua (12 > Gus 9 > Jaci 7).
+    REQUIRE(target->id() == "caua");
+    // Ninguem na lista tem SPD maior que o pre-selecionado (front = maior SPD).
+    for (const auto* a : scene.actor_choices()) {
+        REQUIRE(a->spd() <= target->spd());
+    }
+}
+
+TEST_CASE("picker: navegar move o cursor entre os elegiveis (WRAP)",
+          "[battle_scene][picker]") {
+    BattleScene scene;
+    pump_to_actor_picker(scene);
+    const int n = scene.actor_pick_count();
+    REQUIRE(n == 3);
+    const auto* c0 = scene.actor_pick_target();
+    scene.actor_picker_move(+1);
+    REQUIRE(scene.actor_pick_target() != c0);  // mudou de membro
+    for (int i = 0; i < n - 1; ++i) {
+        scene.actor_picker_move(+1);
+    }
+    REQUIRE(scene.actor_pick_target() == c0);  // volta completa (N passos)
+    scene.actor_picker_move(-1);
+    REQUIRE(scene.actor_pick_target() != c0);  // wrap pra tras
+}
+
+TEST_CASE("picker: confirmar o PRE-SELECIONADO inicia o turno dele (menu pronto)",
+          "[battle_scene][picker]") {
+    BattleScene scene;
+    pump_to_actor_picker(scene);
+    const auto* pre = scene.actor_pick_target();
+    REQUIRE(pre != nullptr);
+    const std::string pre_id = pre->id();
+
+    scene.actor_picker_confirm();
+
+    REQUIRE_FALSE(scene.is_choosing_actor());
+    REQUIRE(scene.active_actor() != nullptr);
+    REQUIRE(scene.active_actor()->id() == pre_id);   // o pre-selecionado virou o ATIVO
+    REQUIRE(scene.active_actor()->ap() == 3);        // begin_turn rodou (AP recarregado)
+    REQUIRE(scene.current_actor_is_player());
+    // O menu de verbos volta a operar (nao mais deferido): Atacar abre a mira normalmente.
+    select_verb(scene, BattleVerb::Atacar);
+    scene.menu_confirm();
+    REQUIRE(scene.is_aiming());
+}
+
+TEST_CASE("picker: escolher um NAO-pre-selecionado troca quem age (OVERRIDE 1B)",
+          "[battle_scene][picker]") {
+    BattleScene scene;
+    pump_to_actor_picker(scene);
+    const auto* pre = scene.actor_pick_target();
+    REQUIRE(pre != nullptr);
+    REQUIRE(scene.actor_pick_count() >= 2);
+    const std::string pre_id = pre->id();
+
+    // Poe o cursor num elegivel DIFERENTE do pre-selecionado (indice 1) e confirma.
+    scene.actor_picker_select(1);
+    const auto* chosen = scene.actor_pick_target();
+    REQUIRE(chosen != nullptr);
+    REQUIRE(chosen != pre);  // realmente outro membro
+    const std::string chosen_id = chosen->id();
+
+    scene.actor_picker_confirm();
+
+    // O motor recebeu select_party_actor(chosen): o ATIVO agora e o ESCOLHIDO, NAO o
+    // pre-selecionado de maior SPD. Prova o comando livre (override da sugestao por SPD).
+    REQUIRE_FALSE(scene.is_choosing_actor());
+    REQUIRE(scene.active_actor() != nullptr);
+    REQUIRE(scene.active_actor()->id() == chosen_id);
+    REQUIRE(scene.active_actor()->id() != pre_id);
+
+    // E o PRE-SELECIONADO (que NAO agiu) segue PENDENTE: apos o escolhido agir, a proxima
+    // escolha da party volta a inclui-lo (nao foi pulado nem consumido).
+    player_attack(scene);  // o escolhido (ja e o ativo) age
+    pump_to_actor_picker(scene);
+    if (scene.is_choosing_actor()) {
+        bool pre_still_pending = false;
+        for (const auto* a : scene.actor_choices()) {
+            if (a->id() == pre_id) {
+                pre_still_pending = true;
+            }
+        }
+        REQUIRE(pre_still_pending);
+    }
+}
+
+TEST_CASE("picker mouse: hit-test casa o slot do membro; clique confirma nele (override)",
+          "[battle_scene][picker]") {
+    BattleScene scene;
+    pump_to_actor_picker(scene);
+    REQUIRE(scene.actor_pick_count() >= 2);
+    const auto choices = scene.actor_choices();
+    // Alvo do clique = o 2o elegivel (indice 1, != pre-selecionado) pra o clique tambem
+    // provar o override. Acha o SLOT dele na arena pela MESMA ordem que o render usa (alive
+    // party em queue().order()), como arena_rect_for_actor faz internamente.
+    const std::string want = choices[1]->id();
+    const gus::app::screens::ArenaLayout arena = gus::app::screens::arena_layout(
+        scene.party_count(), scene.enemy_count(), scene.gus_party_index());
+    gus::core::spatial::Rect slot{};
+    {
+        int k = 0;
+        for (const auto* a : scene.machine().queue().order()) {
+            if (a == nullptr || !a->is_alive() || !a->is_player_side()) {
+                continue;
+            }
+            if (a->id() == want) {
+                slot = arena.party[static_cast<std::size_t>(k)].rect;
+                break;
+            }
+            ++k;
+        }
+    }
+    const float cx = slot.x + slot.w * 0.5f;
+    const float cy = slot.y + slot.h * 0.5f;
+    // O CENTRO do slot mapeia pro indice 1 em actor_choices_ (a base do clique de mouse).
+    REQUIRE(scene.actor_pick_index_at_arena(cx, cy) == 1);
+    // Fora de qualquer slot elegivel (canto do cockpit/fila) -> -1 (nao "erra" a escolha).
+    REQUIRE(scene.actor_pick_index_at_arena(2.0f, 2.0f) == -1);
+
+    // Clique = select + confirm (mesma filosofia do A2): inicia o turno do membro CLICADO.
+    scene.actor_picker_select(scene.actor_pick_index_at_arena(cx, cy));
+    scene.actor_picker_confirm();
+    REQUIRE_FALSE(scene.is_choosing_actor());
+    REQUIRE(scene.active_actor()->id() == want);
+}
+
+TEST_CASE("picker mouse: fora do modo, actor_pick_index_at_arena e sempre -1",
+          "[battle_scene][picker]") {
+    BattleScene scene;
+    pump_to_player_turn(scene);   // confirma o picker -> NAO esta mais escolhendo
+    REQUIRE_FALSE(scene.is_choosing_actor());
+    // Sem escolha ativa: nenhum candidato -> -1 mesmo sobre um slot de party.
+    const gus::app::screens::ArenaLayout arena = gus::app::screens::arena_layout(
+        scene.party_count(), scene.enemy_count(), scene.gus_party_index());
+    const gus::core::spatial::Rect& p0 = arena.party[0].rect;
+    REQUIRE(scene.actor_pick_index_at_arena(p0.x + p0.w * 0.5f,
+                                            p0.y + p0.h * 0.5f) == -1);
+    // actor_picker_select/move fora do modo sao no-op (nao entram em escolha).
+    scene.actor_picker_select(0);
+    scene.actor_picker_move(+1);
+    REQUIRE_FALSE(scene.is_choosing_actor());
+    REQUIRE(scene.actor_pick_target() == nullptr);
+}
+
+TEST_CASE("picker teclas: 1/2/3 escolhem DIRETO o N-esimo elegivel e confirmam na hora",
+          "[battle_scene][picker]") {
+    BattleScene scene;
+    pump_to_actor_picker(scene);
+    REQUIRE(scene.actor_pick_count() == 3);
+    const auto choices = scene.actor_choices();
+    const std::string second = choices[1]->id();  // o 2o elegivel (tecla "2")
+
+    scene.actor_picker_hotkey(2);
+
+    REQUIRE_FALSE(scene.is_choosing_actor());       // confirmou IMEDIATAMENTE (sem Enter)
+    REQUIRE(scene.active_actor() != nullptr);
+    REQUIRE(scene.active_actor()->id() == second);  // o 2o virou o ativo
+}
+
+TEST_CASE("picker teclas: numero SEM elegivel e no-op (nao seleciona, nao confirma)",
+          "[battle_scene][picker]") {
+    BattleScene scene;
+    pump_to_actor_picker(scene);
+    const int n = scene.actor_pick_count();
+    REQUIRE(n == 3);
+    const auto* cursor_before = scene.actor_pick_target();
+
+    scene.actor_picker_hotkey(n + 1);  // "apertar 4" com so 3 elegiveis
+    REQUIRE(scene.is_choosing_actor());                    // NAO confirmou
+    REQUIRE(scene.actor_pick_target() == cursor_before);   // cursor intacto
+
+    scene.actor_picker_hotkey(0);      // 0 e invalido (atalho e 1-based)
+    REQUIRE(scene.is_choosing_actor());
+    REQUIRE(scene.actor_pick_target() == cursor_before);
+}
+
+TEST_CASE("picker: com 1 SO elegivel a cena AUTO-inicia (sem picker) - decisao >1",
+          "[battle_scene][picker]") {
+    // DECISAO documentada: o picker so abre quando ha >1 elegivel (ha escolha a fazer). Com 1
+    // so pendente (o ULTIMO membro da party na rodada), a cena auto-inicia o turno sem friccao.
+    BattleScene scene;
+    pump_to_actor_picker(scene);          // picker com 3
+    REQUIRE(scene.actor_pick_count() == 3);
+    scene.actor_picker_confirm();         // inicia o 1o (pre-selecionado)
+    player_attack(scene);                 // 1o age
+    pump_to_actor_picker(scene);          // restam 2 -> outro picker
+    REQUIRE(scene.is_choosing_actor());
+    REQUIRE(scene.actor_pick_count() == 2);
+    scene.actor_picker_confirm();         // inicia o 2o
+    player_attack(scene);                 // 2o age
+    // Resta 1 (ultimo da party): a cena NAO abre picker; auto-inicia esse turno direto no menu.
+    pump_to_player_turn(scene);
+    if (!scene.combat_over()) {
+        REQUIRE_FALSE(scene.is_choosing_actor());  // sem escolha pro unico elegivel
+        REQUIRE(scene.current_actor_is_player());
+        REQUIRE(scene.waiting_player_input());      // menu direto (turno ja comecou)
+    }
+}
+
+TEST_CASE("picker: destaque MULTIMODAL na arena (contorno + badge numerado + nome), nao so cor",
+          "[battle_scene][picker]") {
+    BattleScene scene;
+    pump_to_actor_picker(scene);
+    REQUIRE(scene.is_choosing_actor());
+    // Poe o cursor num membro que NAO e o ativo/default do cockpit (indice 1), pra o NOME so
+    // poder vir do realce da escolha (o cockpit escreve o nome do ativo/default = indice 0).
+    scene.actor_picker_move(+1);
+    const auto* cursor = scene.actor_pick_target();
+    REQUIRE(cursor != nullptr);
+
+    CountingRenderer r;
+    scene.render(r, 960.0f, 540.0f);  // sem translator: o banner nao escreve nome
+
+    // (NOME) o membro sob o cursor tem o nome desenhado como TEXTO (pista WCAG, nao so cor).
+    bool found_name = false;
+    for (const auto& t : r.texts) {
+        if (t.text == cursor->display_name()) {
+            found_name = true;
+        }
+    }
+    REQUIRE(found_name);
+    // (BADGE = tecla-atalho) os digitos "1"/"2"/"3" aparecem como texto (multimodal + ensina
+    // a tecla). "1" so pode vir do badge do 1o elegivel (numeros do cockpit sao "hp/max").
+    bool found_badge = false;
+    for (const auto& t : r.texts) {
+        if (t.text == "1" || t.text == "2" || t.text == "3") {
+            found_badge = true;
+        }
+    }
+    REQUIRE(found_badge);
+    // (CONTORNO) o realce da escolha ADICIONA outlines: confirmando (sai do modo) e
+    // re-renderizando, o numero de outlines CAI (contorno = pista de FORMA, nao so cor).
+    const std::size_t outlines_choosing = r.outlines.size();
+    scene.actor_picker_confirm();
+    CountingRenderer r2;
+    scene.render(r2, 960.0f, 540.0f);
+    REQUIRE(outlines_choosing > r2.outlines.size());
+}
+
+TEST_CASE("picker: e SO da party - o enemy-block assume sozinho (nunca abre escolha)",
+          "[battle_scene][picker]") {
+    // Roda a batalha inteira jogando os turnos do jogador (player_attack atravessa qualquer
+    // picker) e bombeando os de inimigo. INVARIANTE: is_choosing_actor() so pode ser true
+    // quando o ATIVO e da party; em NENHUM turno de INIMIGO a escolha abre (enemy-block
+    // automatico, ja cuidado pelo motor). Prova que a UI de escolha e exclusiva da party.
+    BattleScene scene;
+    scene.start_combat();  // ENCARAR: sai da abertura parada (input-gated) e libera o 1o turno
+    int guard = 0;
+    int enemy_turns_seen = 0;
+    while (!scene.combat_over() && guard++ < 4000) {
+        if (scene.is_choosing_actor()) {
+            REQUIRE(scene.current_actor_is_player());  // escolha => ativo e da party
+        }
+        if (scene.waiting_player_input()) {
+            player_attack(scene);  // confirma o picker (se houver) + age
+        } else {
+            const auto* a = scene.active_actor();
+            if (a != nullptr && !a->is_player_side() && !scene.is_intro()) {
+                REQUIRE_FALSE(scene.is_choosing_actor());  // inimigo NUNCA abre escolha
+                ++enemy_turns_seen;
+            }
+            scene.skip();
+            scene.update(1.0f / 60.0f);
+        }
+    }
+    REQUIRE(scene.combat_over());
+    REQUIRE(enemy_turns_seen >= 1);  // inimigos agiram (automatico), todos sem picker
 }

@@ -560,6 +560,9 @@ std::string_view BattleScene::turn_banner_key() const noexcept {
     if (is_intro()) {
         return "COMBAT_BANNER_BATTLE";  // "BATALHA!"
     }
+    if (choosing_actor_) {
+        return "COMBAT_BANNER_CHOOSE_ACTOR";  // "ESCOLHA QUEM AGE" (§4.1, comando-livre 1B)
+    }
     if (current_actor_is_player()) {
         return "COMBAT_BANNER_PLAYER_TURN";  // "TURNO DE {0}" / "SUA VEZ"
     }
@@ -604,6 +607,30 @@ void BattleScene::start_active_turn() {
     if (turn_started_ || combat_over()) {
         return;
     }
+    // ESCOLHA DE ATOR (§4.1, comando-livre 1B): enquanto o picker esta aberto, o begin_turn
+    // fica DEFERIDO - so o actor_picker_confirm inicia o turno (via begin_active_turn_now).
+    if (choosing_actor_) {
+        return;
+    }
+    // E a vez do BLOCO da party com >1 elegivel? Entao NAO inicia o turno ainda: entra no modo
+    // de escolha e espera o jogador comandar QUAL membro age (a SPD so SUGERE o pre-selecionado,
+    // §4.1). O begin_turn vem depois, no confirm. Com <=1 elegivel (ou vez de inimigo/intro), o
+    // fluxo segue direto (begin_active_turn_now) => identico ao motor pre-picker.
+    if (should_offer_actor_picker()) {
+        enter_actor_picker();
+        return;
+    }
+    begin_active_turn_now();
+}
+
+void BattleScene::begin_active_turn_now() {
+    // O "begin" real do turno ativo (parte extraida de start_active_turn). Chamado por
+    // start_active_turn (quando NAO ha picker) e pelo actor_picker_confirm (apos gravar a
+    // escolha). O confirm NAO reentra por start_active_turn de proposito: aquele re-checaria
+    // should_offer_actor_picker (que ainda veria pending>1) e re-abriria o modo em loop.
+    if (turn_started_ || combat_over()) {
+        return;
+    }
     machine_->begin_turn();
     turn_started_ = true;
     enemy_acted_this_turn_ = false;  // novo turno: o inimigo (se for) pode agir 1 vez
@@ -635,12 +662,19 @@ void BattleScene::menu_move(int delta) noexcept {
     if (combat_over() || !current_actor_is_player()) {
         return;  // menu so opera no turno de jogador vivo
     }
+    if (choosing_actor_) {
+        return;  // escolha de ator (§4.1): o menu de verbos ainda nao existe (begin deferido)
+    }
     menu_.move(delta);
 }
 
 void BattleScene::menu_confirm() {
     if (combat_over() || !current_actor_is_player()) {
         return;
+    }
+    if (choosing_actor_) {
+        return;  // escolha de ator (§4.1): confirme o ATOR primeiro (actor_picker_confirm);
+                 // o turno (e o menu de verbos) so comeca depois. Guarda o begin deferido.
     }
     if (aiming_) {
         return;  // ja em modo-mira: o jogador usa aim_confirm/aim_cancel, nao o menu
@@ -848,6 +882,129 @@ void BattleScene::aim_confirm() {
     menu_.refresh(active_actor() != nullptr ? active_actor()->ap() : 0);
 }
 
+// ---- Escolha de ator / Janela de Comando da Party (§4.1, comando-livre 1B) ----------
+// APRESENTACAO PURA sobre o motor 1B: a cena so deixa o jogador ESCOLHER qual membro
+// pendente da party age; o motor (pending_party_actors/select_party_actor) faz o resto
+// (agrupar por lado, recomputar quem abre, regroup Gambito-safe). O begin_turn e DEFERIDO
+// ate o confirm (start_active_turn e no-op enquanto choosing_actor_).
+
+bool BattleScene::should_offer_actor_picker() const {
+    // Gate do modo: e a vez do bloco da party, o combate esta rolando (nao intro/nao fim) e ha
+    // MAIS DE UM elegivel. active_actor() == queue_.current(); apos o regroup por lado (§4.1) o
+    // bloco da party e contiguo, entao "current e player-side vivo" == "abriu o bloco da party".
+    //
+    // >1 (DECISAO documentada): com 1 so elegivel NAO ha escolha a fazer - a cena auto-inicia o
+    // turno (sem friccao). O picker existe pra dar AGENCIA sobre QUEM age; com um unico pendente
+    // nao ha agencia a exercer (distinto da mira, cujo confirm COMPROMETE um ataque com previa
+    // de dano). Isto reforca o modelo mental "escolho quando ha varios". Trocar pra ">= 1"
+    // (mostrar sempre, como a mira com 1 alvo) e UMA LINHA, se o lider preferir consistencia.
+    if (combat_over() || is_intro()) {
+        return false;
+    }
+    const CombatActor* a = active_actor();
+    if (a == nullptr || !a->is_player_side() || !a->is_alive()) {
+        return false;
+    }
+    return machine_->pending_party_actors().size() > 1;
+}
+
+void BattleScene::enter_actor_picker() {
+    // Snapshot dos elegiveis (maior SPD -> menor; front = pre-selecionado). Cursor no front.
+    // NAO chama begin_turn: o turno so comeca no confirm (begin_active_turn_now).
+    actor_choices_ = machine_->pending_party_actors();
+    choosing_actor_ = true;
+    actor_pick_index_ = 0;  // front de pending_party_actors == preselected_party_actor (SPD)
+}
+
+std::vector<const CombatActor*> BattleScene::actor_choices() const {
+    return std::vector<const CombatActor*>(actor_choices_.begin(), actor_choices_.end());
+}
+
+const CombatActor* BattleScene::actor_pick_target() const noexcept {
+    if (!choosing_actor_ || actor_pick_index_ < 0 ||
+        actor_pick_index_ >= static_cast<int>(actor_choices_.size())) {
+        return nullptr;
+    }
+    return actor_choices_[static_cast<std::size_t>(actor_pick_index_)];
+}
+
+void BattleScene::actor_picker_move(int delta) noexcept {
+    if (!choosing_actor_ || actor_choices_.empty()) {
+        return;
+    }
+    const int n = static_cast<int>(actor_choices_.size());
+    actor_pick_index_ = ((actor_pick_index_ + delta) % n + n) % n;  // WRAP nos extremos
+}
+
+void BattleScene::actor_picker_select(int index) noexcept {
+    // MOUSE/atalho: poe o cursor DIRETO no index (sem wrap). No-op fora do modo ou invalido.
+    if (!choosing_actor_ || index < 0 ||
+        index >= static_cast<int>(actor_choices_.size())) {
+        return;
+    }
+    actor_pick_index_ = index;
+}
+
+int BattleScene::actor_pick_index_at_arena(float world_x, float world_y) const {
+    // Casa o ponto (mundo/logico) com o SLOT de cada elegivel. arena_rect_for_actor e generico
+    // por id (trata party E inimigo), entao vale pros membros da party (confirmado: ele separa
+    // os lados e devolve o slot certo). Fora do modo a lista e vazia (-1). Mesma logica de
+    // aim_index_at_arena, sobre actor_choices_ (party) -> reusa o pipeline de hit-test do A2.
+    for (int i = 0; i < static_cast<int>(actor_choices_.size()); ++i) {
+        const CombatActor* p = actor_choices_[static_cast<std::size_t>(i)];
+        if (p == nullptr) {
+            continue;
+        }
+        const std::optional<gus::core::spatial::Rect> slot = arena_rect_for_actor(p->id());
+        if (!slot.has_value()) {
+            continue;
+        }
+        const gus::core::spatial::Rect& r = *slot;
+        if (world_x >= r.x && world_x <= r.x + r.w && world_y >= r.y &&
+            world_y <= r.y + r.h) {
+            return i;
+        }
+    }
+    return -1;
+}
+
+void BattleScene::actor_picker_confirm() {
+    if (!choosing_actor_) {
+        return;
+    }
+    if (actor_pick_index_ < 0 ||
+        actor_pick_index_ >= static_cast<int>(actor_choices_.size())) {
+        return;  // defensivo (cursor invalido): nao confirma
+    }
+    CombatActor* chosen = actor_choices_[static_cast<std::size_t>(actor_pick_index_)];
+    // Grava a escolha no motor (comando livre 1B, §4.1). machine_-> = acesso NAO-const (mesmo
+    // padrao de menu_confirm/aim_confirm; o machine() publico e const). select_party_actor
+    // lanca std::invalid_argument se `chosen` nao e elegivel; como actor_choices_ veio de
+    // pending_party_actors e nada mutou o motor no meio, ele SEMPRE e elegivel.
+    machine_->select_party_actor(chosen);
+    choosing_actor_ = false;
+    actor_choices_.clear();
+    actor_pick_index_ = 0;
+    // begin_turn consome a escolha (traz o ator ao cursor) e prossegue como hoje: menu de
+    // verbos do ATOR ESCOLHIDO. NAO reentra por start_active_turn (evita re-abrir o picker).
+    begin_active_turn_now();
+}
+
+void BattleScene::actor_picker_hotkey(int nth) {
+    // TECLA-ATALHO 1/2/3: escolhe o nth-esimo elegivel (1-based) e CONFIRMA na hora. No-op se
+    // fora do modo ou nth sem elegivel (fora de faixa) - assim "apertar 3 com so 2 pendentes"
+    // nao faz nada (nem seleciona, nem confirma). Fonte unica do host (teclas) e dos testes.
+    if (!choosing_actor_) {
+        return;
+    }
+    const int idx = nth - 1;  // 1-based -> 0-based
+    if (idx < 0 || idx >= static_cast<int>(actor_choices_.size())) {
+        return;  // numero sem elegivel: no-op
+    }
+    actor_pick_index_ = idx;
+    actor_picker_confirm();
+}
+
 std::vector<LogLine> BattleScene::log_lines(int max_lines) const {
     // NARRACAO do combate (D12, incremento 6): as linhas ja vem montadas em narration_
     // (acao + dano + consequencia de status), no ritmo do pacing. Junta as linhas de UI
@@ -993,8 +1150,10 @@ void BattleScene::render(IRenderer& renderer, float viewport_px_w,
                       a->mana(), gus::domain::combat::combat_constants::kManaCap,
                       kManaLitColor, kManaOffColor);
 
-            // MENU de verbos EMPILHADO (so no turno de jogador vivo).
-            if (current_actor_is_player() && !combat_over()) {
+            // MENU de verbos EMPILHADO (so no turno de jogador vivo). Suprimido durante a
+            // ESCOLHA DE ATOR (§4.1): o begin_turn esta deferido, entao nao ha turno cujo
+            // menu mostrar - o jogador escolhe QUEM age primeiro (destaque na arena, abaixo).
+            if (current_actor_is_player() && !combat_over() && !choosing_actor_) {
                 const Rect mz = cockpit_menu_zone();
                 renderer.draw_text("ACAO", mz.x, mz.y - kCockpitLabelPx - 2.0f,
                                    kCockpitLabelPx, kInkDim, /*bold=*/false);
@@ -1274,6 +1433,57 @@ void BattleScene::render(IRenderer& renderer, float viewport_px_w,
                                 dmg, r.x + r.w + 2.0f, hp_y + kMiraLabelPx + 2.0f,
                                 kMiraLabelPx, floater_color_for_channel(HitChannel::Common),
                                 /*bold=*/true);
+                        }
+                    }
+                }
+
+                // ESCOLHA DE ATOR (§4.1, comando-livre 1B): destaque MULTIMODAL dos membros
+                // ELEGIVEIS da party e do PRE-SELECIONADO/cursor. NUNCA so cor (Pillar 4/WCAG):
+                // (a) TODO elegivel ganha um BADGE numerado (= a tecla-atalho 1/2/3) + contorno;
+                // (b) o CURSOR ganha reticulo (outline duplo) + caret + NOME. So no lado da
+                // party. Reusa a tecnica do realce da mira (kMiraColor/caret/nome), aqui em cyan
+                // (cor da party) - sem conflito visual com a mira (inimigos, a direita).
+                if (is_party && choosing_actor_) {
+                    int choice_idx = -1;
+                    for (int ci = 0; ci < static_cast<int>(actor_choices_.size()); ++ci) {
+                        if (actor_choices_[static_cast<std::size_t>(ci)] == a) {
+                            choice_idx = ci;
+                            break;
+                        }
+                    }
+                    if (choice_idx >= 0) {
+                        const bool is_cursor = (a == actor_pick_target());
+                        // (1) CONTORNO cyan. Elegivel = fino; cursor = reticulo (outline duplo).
+                        renderer.draw_rect_outline(r, kMiraColor, is_cursor ? 3.0f : 1.0f);
+                        if (is_cursor) {
+                            const Rect inr{r.x + 3.0f, r.y + 3.0f, r.w - 6.0f, r.h - 6.0f};
+                            renderer.draw_rect_outline(inr, kMiraColor, 1.0f);
+                        }
+                        // (2) BADGE numerado (tecla-atalho): quadrado no canto sup-esq + o
+                        //     digito (i+1). Forma PURA (rect) + TEXTO (digito) => multimodal; o
+                        //     digito ENSINA a tecla 1/2/3. Cursor = badge PREENCHIDO (contraste).
+                        const Rect badge{r.x - 2.0f, r.y - 2.0f, 14.0f, 14.0f};
+                        renderer.draw_filled_rect(
+                            badge, is_cursor ? kMiraColor : kSlotDarkColor);
+                        renderer.draw_rect_outline(badge, kMiraColor, 1.0f);
+                        char num[4];
+                        std::snprintf(num, sizeof(num), "%d", choice_idx + 1);
+                        renderer.draw_text(num, badge.x + 4.0f, badge.y + 2.0f, 10.0f,
+                                           is_cursor ? kBgColor : kMiraColor, /*bold=*/true);
+                        // (3) CURSOR: caret (forma pura, 3 colunas) a ESQUERDA do slot +
+                        //     NOME (texto legivel) acima. Mesmo vocabulario da mira (WCAG).
+                        if (is_cursor) {
+                            const float acy = r.y + r.h * 0.5f;
+                            for (int c = 0; c < 3; ++c) {
+                                const float ch = 12.0f - static_cast<float>(c) * 4.0f;
+                                const Rect bar{
+                                    r.x - 12.0f + static_cast<float>(c) * kMiraCaretW,
+                                    acy - ch * 0.5f, kMiraCaretW, ch};
+                                renderer.draw_filled_rect(bar, kMiraColor);
+                            }
+                            const std::string nm = a->display_name();
+                            renderer.draw_text(nm.c_str(), r.x, r.y - kMiraLabelPx - 3.0f,
+                                               kMiraLabelPx, kMiraColor, /*bold=*/true);
                         }
                     }
                 }
