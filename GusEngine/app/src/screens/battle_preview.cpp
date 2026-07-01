@@ -1089,6 +1089,75 @@ int run_battle_preview() {
             }
         }
 
+        // DIAGNOSTICO/CAPTURA: GUSWORLD_BATTLE_AIM=1 deixa a cena PARADA no MODO-MIRA de
+        // [Atacar] do jogador ativo (assenta o pacing ate a vez do jogador, seleciona Atacar
+        // e ENTRA na mira SEM confirmar) - pra CAPTURAR a previa de dano "-N" sobre o alvo,
+        // sem driver de input. GUSWORLD_BATTLE_AIM_MOVE=<n> navega n passos entre os inimigos
+        // (mostra o "-N" ATUALIZANDO por alvo). Combina com PUMP_TO (ex.: mira na vez do Gus).
+        // Dirige pela MESMA API publica do jogador; NAO muda o motor nem o render.
+        const bool stop_in_aim = [] {
+            const char* e = std::getenv("GUSWORLD_BATTLE_AIM");
+            return e != nullptr && e[0] == '1';
+        }();
+        if (stop_in_aim) {
+            if (scene.is_intro()) {
+                scene.start_combat();  // Encarar
+            }
+            // Assenta o pacing ate um turno de JOGADOR esperando input (skip/update nao
+            // resolvem o turno do jogador; so avancam os beats de inimigo/anuncio).
+            for (int i = 0; i < 240 && !scene.combat_over() &&
+                            !scene.waiting_player_input();
+                 ++i) {
+                scene.skip();
+                scene.update(1.0f / 60.0f);
+            }
+            if (scene.waiting_player_input() && !scene.is_aiming()) {
+                for (int k = 0; k < 8 &&
+                                scene.menu().selected_verb() != BattleVerb::Atacar;
+                     ++k) {
+                    scene.menu_move(+1);
+                }
+                scene.menu_confirm();  // Atacar -> ENTRA na mira (nao confirma)
+                if (const char* mv = std::getenv("GUSWORLD_BATTLE_AIM_MOVE")) {
+                    const int steps = std::atoi(mv);
+                    for (int k = 0; k < steps && scene.is_aiming(); ++k) {
+                        scene.aim_move(+1);
+                    }
+                }
+                // GUSWORLD_BATTLE_AIM_SHIELD=<mag>: aplica um Shield de pool <mag> no ALVO
+                // mirado (ponteiro mutavel da fila) so pra CAPTURAR o "-N" REDUZIDO. Usa a
+                // MESMA API de status do jogo (add_status); nao muda o motor nem o render.
+                if (const char* sh = std::getenv("GUSWORLD_BATTLE_AIM_SHIELD")) {
+                    const int mag = std::atoi(sh);
+                    const auto* aimed = scene.aim_target();
+                    if (mag > 0 && aimed != nullptr) {
+                        for (gus::domain::combat::CombatActor* act :
+                             scene.machine().queue().order()) {
+                            if (act != nullptr && act->id() == aimed->id()) {
+                                act->add_status(gus::domain::combat::StatusEffect{
+                                    gus::domain::combat::StatusId::Shield, mag,
+                                    /*duration=*/1, gus::domain::combat::StackRule::Replace,
+                                    gus::domain::combat::CardFamily::Eletrico});
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+            const auto* t = scene.aim_target();
+            const auto* atk = scene.active_actor();
+            const int previsto =
+                (t != nullptr && atk != nullptr)
+                    ? scene.machine().preview_basic_attack_damage(*atk, *t)
+                    : -1;
+            std::cout << "BattlePreview: [aim] modo-mira="
+                      << (scene.is_aiming() ? "on" : "off")
+                      << " atacante=" << (atk != nullptr ? atk->id() : "?")
+                      << " alvo=" << (t != nullptr ? t->id() : "?")
+                      << " dano_previsto=" << previsto << " (badge deve mostrar \"-"
+                      << previsto << "\")\n";
+        }
+
         bool running = true;
         bool have_last = false;
         unsigned long long last_ns = 0;
