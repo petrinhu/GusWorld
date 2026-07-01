@@ -284,12 +284,12 @@ body { font-family: "Pixel Operator Mono"; background: transparent; }
   margin-left: 52dp; margin-bottom: 18dp; }
 .ring { position: absolute; border-radius: 74dp; }
 .ring.r1 { top: 0dp; left: 0dp; width: 148dp; height: 148dp;
-  border: 1dp #E8A33D; box-shadow: #E8A33D99 0dp 0dp 22dp -6dp; }
-/* anel cyan tracejado GIRANDO (transform animado) */
+  border: 1dp #8a94a8; box-shadow: #c9d2e044 0dp 0dp 22dp -6dp; }
+/* anel aco-azulado GIRANDO (transform animado) */
 .ring.r2 { top: 16dp; left: 16dp; width: 116dp; height: 116dp;
-  border: 1dp #22D3EE; box-shadow: #22D3EE66 0dp 0dp 16dp -6dp;
+  border: 1dp #6f7c96; box-shadow: #c9d2e033 0dp 0dp 16dp -6dp;
   animation: spin 18s linear infinite; }
-.ring.r3 { top: 34dp; left: 34dp; width: 80dp; height: 80dp; border: 1dp #E8A33D66; }
+.ring.r3 { top: 34dp; left: 34dp; width: 80dp; height: 80dp; border: 1dp #5d6a86; }
 @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 /* POLISH 2 (veredito do lider: o quadrado escuro do glifo quebrava os circulos): glifo
    Vetor-Dragao (brasao Vance) recortado em MEDALHAO circular no centro dos aneis. O PNG
