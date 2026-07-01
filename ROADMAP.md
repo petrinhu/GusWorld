@@ -42,7 +42,7 @@ A migração é faseada anti big-bang: cada marco fecha pelo seu critério de sa
 | M2 Input | 🔍 | Eventos para ações lógicas + input_remap + persistência de controles + save V4 ([ADR-007](docs/tech/adr/ADR-007-controls-json-hash128-save-v4.md)). Falta backend de evento + I/O em disco |
 | M3 Lógica pura portada | ✅ | Save + i18n + progression + templates em POCO C++ puro. 174 testes verdes, cripto bate vetores FIPS/RFC ([ADR-006](docs/tech/adr/ADR-006-crypto-hmac-formato-domain.md)), auditado |
 | M4 Cena top-down | 🔍 | Tilemap + colisão de grade + clamp de câmera (lógica pura feita). Falta a metade visual (tilemap render na plataforma) |
-| M5 Combate + tela de batalha | 🔄 | Motor `turn_combat` portado e endurecido (fórmula de dano §11 evoluída e auditada, ver M5-DMG). BattleScreen cockpit "Tático" entregue via glintfx (paridade visual + dados vivos, [ADR-010](docs/tech/adr/ADR-010-adopt-glintfx-embed-mode.md)) |
+| M5 Combate + tela de batalha | 🔄 | Motor `turn_combat` portado e endurecido (fórmula de dano §11 evoluída e auditada, ver M5-DMG). BattleScreen cockpit "Tático" entregue via glintfx (paridade visual + dados vivos + rodada de polish visual aprovada, [ADR-010](docs/tech/adr/ADR-010-adopt-glintfx-embed-mode.md)) |
 | M6 Áudio | ⏳ | Camada de áudio (miniaudio) + música + SFX + fade entre telas |
 | M7 Paridade jogável | ⏳ | Loop completo (andar, NPC, combate, save, carregar) 100% na engine nova, sem Godot |
 | M8 Decommission | ⏳ | Apagar Godot + C# + addons. Repo compila e roda sem nenhum bit do stack antigo |
