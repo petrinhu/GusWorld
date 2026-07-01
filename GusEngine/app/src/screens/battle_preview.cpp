@@ -15,7 +15,9 @@
 
 #include <SDL3/SDL.h>
 
+#include "gus/app/screens/battle_cockpit_pills.hpp"  // hit-test de mouse dos pills (A2)
 #include "gus/app/screens/battle_hud_model.hpp"  // status_icon_file/index
+#include "gus/app/screens/battle_layout.hpp"     // arena_layout (selftest de mouse A2)
 #include "gus/app/screens/battle_scene.hpp"
 #include "gus/core/asset_paths.hpp"             // caminhos de asset centralizados
 #include "gus/domain/combat/combat_enums.hpp"  // StatusId
@@ -109,6 +111,12 @@ std::string cockpit_asset_base_dir() {
 }
 
 std::string load_cockpit_rml() {
+    // SINCRONIA COM O HIT-TEST DE MOUSE (Incremento A2): a regra `.verb` (width 110dp /
+    // height 18dp / margin-bottom 4dp / padding 0dp 12dp / border 1dp) e o `#cockpit`
+    // padding-left 12dp definem a geometria dos pills que gus/app/screens/battle_cockpit_pills
+    // .hpp REPLICA pra decidir em qual pill o clique caiu. Ao mudar esses numeros AQUI,
+    // ATUALIZE battle_cockpit_pills.hpp (e RE-MEDIR a origem-Y se mexer no que vem ANTES do
+    // .menu -- retrato/nome/vitals -- que empurra o 1o pill).
     // Caminhos de asset RELATIVOS a base (cockpit_asset_base_dir): o RmlUi resolve image()
     // contra o source_url do doc. Absoluto perderia a barra inicial na canonicalizacao.
     const std::string moldura(gus::core::assets::kMolduraCartaFrameFile);
@@ -777,6 +785,66 @@ bool sdl_to_glintfx(const SDL_Event& ev, SDL_Window* window, glintfx::UiEvent* o
     return true;
 }
 
+// ADR-010 / Incremento A2 (MOUSE): o glintfx NAO expoe hit-test/geometria de elemento (so
+// data-model + process_event), entao o CLIQUE REAL e resolvido AQUI, no host, em paralelo ao
+// forward pro glintfx (que segue so pro visual/hover interno do RmlUi). Duas conversoes de
+// coordenada DISTINTAS, porque o cockpit RCSS e a arena NAO compartilham a escala vertical:
+//   - COCKPIT/pills: dp UNIFORME (dp_ratio = pw/960, o mesmo do UiLayer) -> dp = px/dp_ratio
+//     em X E Y (ambos por pw). A geometria vem do POCO puro (cockpit_pill_index_at).
+//   - ARENA/inimigos: a projecao ESTICA o mundo 960x540 pra (pw x ph), NAO-uniforme (ver
+//     viewport_transform world_to_screen) -> world_x = px/pw*960, world_y = px/ph*540 (Y por
+//     ph!). O hit-test vem do motor de cena (aim_index_at_arena, casa arena_rect_for_actor).
+// Pressuposto: mouse em px de janela == px do viewport (sem HiDPI neste alvo; MESMO pressuposto
+// do forward glintfx). Se houver escala HiDPI no futuro, converter mouse(pontos)->px antes.
+void battle_mouse_click(BattleScene& scene, float mx, float my, int pw, int ph) {
+    if (pw < 1 || ph < 1) {
+        return;
+    }
+    if (scene.is_aiming()) {
+        // Clique num INIMIGO (mira): coordenadas de MUNDO da arena (estica; Y por ph).
+        const float wx = mx / static_cast<float>(pw) * 960.0f;
+        const float wy = my / static_cast<float>(ph) * 540.0f;
+        const int idx = scene.aim_index_at_arena(wx, wy);
+        if (idx >= 0) {
+            scene.aim_select(idx);  // pousa a mira no alvo clicado
+            scene.aim_confirm();    // clique unico = mira E confirma (aciona), igual ao verbo
+        }
+        // Fora de qualquer inimigo: NO-OP (nao cancela, nao "erra" o alvo) -- escopo A2.
+        return;
+    }
+    if (scene.is_intro()) {
+        return;  // na ABERTURA os pills nao existem (so o brasao) -> clique nao aciona verbo
+    }
+    // Clique num PILL de verbo: coordenadas 'dp' do cockpit (uniforme; dp_ratio = pw/960).
+    const float dp_ratio = static_cast<float>(pw) / 960.0f;
+    const int idx = cockpit_pill_index_at(mx / dp_ratio, my / dp_ratio);
+    if (idx >= 0) {
+        // Clique = SELECIONA e CONFIRMA. menu_move (delta ate o indice) + menu_confirm; ambos
+        // ja sao NO-OP fora do turno do jogador (mesma guarda do teclado) -> seguro em turno
+        // de inimigo/combate acabado. menu_move faz WRAP, mas o delta idx-sel (ambos 0..5) cai
+        // exato no indice. menu_confirm respeita 'enabled' (verbo sem AP: seleciona, nao aciona).
+        scene.menu_move(idx - scene.menu().selected_index());
+        scene.menu_confirm();
+    }
+}
+
+// Incremento A2 (HOVER, nice-to-have): SO o inimigo. Durante a mira, mover o mouse sobre um
+// inimigo PRE-SELECIONA ele (reusa o realce multimodal do alvo do Incremento A, dirigido por
+// aim_target()). ZERO risco: nao toca RCSS nem o estado do glintfx. Pill NAO tem hover: o
+// realce .sel do RCSS e dirigido pelo MOTOR (data-class-sel); um :hover exigiria mexer na RCSS
+// aprovada do cockpit -> fora do escopo A2 (documentado; o CLIQUE no pill ja funciona).
+void battle_mouse_hover(BattleScene& scene, float mx, float my, int pw, int ph) {
+    if (!scene.is_aiming() || pw < 1 || ph < 1) {
+        return;
+    }
+    const float wx = mx / static_cast<float>(pw) * 960.0f;
+    const float wy = my / static_cast<float>(ph) * 540.0f;
+    const int idx = scene.aim_index_at_arena(wx, wy);
+    if (idx >= 0) {
+        scene.aim_select(idx);  // hover destaca (move o cursor de mira, SEM confirmar)
+    }
+}
+
 int run_battle_preview() {
     if (!SDL_Init(SDL_INIT_VIDEO)) {
         std::cerr << "BattlePreview: SDL_Init falhou: " << SDL_GetError() << "\n";
@@ -1162,6 +1230,77 @@ int run_battle_preview() {
         bool have_last = false;
         unsigned long long last_ns = 0;
         int glintfx_injected = 0;  // SMOKE: conta eventos injetados na UI (prova do pipeline)
+
+        // DIAGNOSTICO/PROVA (Incremento A2): GUSWORLD_BATTLE_MOUSE_SELFTEST=1 injeta CLIQUES
+        // SINTETICOS pelo MESMO battle_mouse_click do loop (com a janela real pw0/ph0), pra
+        // PROVAR o roteamento clique->acao sem mouse fisico (dificil de simular numa captura
+        // estatica). Assenta ate a vez do jogador, entao: (1) round-trip px->pill de cada
+        // verbo; (2) CLICA o pill [ATACAR] e mostra que entrou na MIRA; (3) CLICA o slot de um
+        // inimigo e mostra que a mira confirmou naquele alvo. So diagnostico (API publica).
+        const bool mouse_selftest = [] {
+            const char* e = std::getenv("GUSWORLD_BATTLE_MOUSE_SELFTEST");
+            return e != nullptr && e[0] == '1';
+        }();
+        if (mouse_selftest) {
+            const float dpr = static_cast<float>(pw0) / 960.0f;
+            if (scene.is_intro()) {
+                scene.start_combat();
+            }
+            for (int i = 0; i < 240 && !scene.combat_over() &&
+                            !scene.waiting_player_input();
+                 ++i) {
+                scene.skip();
+                scene.update(1.0f / 60.0f);
+            }
+            std::cout << "BattlePreview: [mouse-selftest] pw0xph0=" << pw0 << "x" << ph0
+                      << " dp_ratio=" << dpr
+                      << " waiting_player=" << scene.waiting_player_input() << "\n";
+            // (1) round-trip: centro px de cada pill -> cockpit_pill_index_at.
+            for (int v = 0; v < gus::app::screens::kCockpitPillCount; ++v) {
+                const gus::core::spatial::Rect r = gus::app::screens::cockpit_pill_rect(v);
+                const float dpcx = r.x + r.w * 0.5f, dpcy = r.y + r.h * 0.5f;
+                const float pxcx = dpcx * dpr, pxcy = dpcy * dpr;
+                const int back =
+                    gus::app::screens::cockpit_pill_index_at(pxcx / dpr, pxcy / dpr);
+                std::cout << "  pill[" << v << "] "
+                          << kVerbLabels[static_cast<std::size_t>(v)] << " dp(" << dpcx
+                          << "," << dpcy << ") px(" << pxcx << "," << pxcy
+                          << ") -> hit=" << back << (back == v ? " OK" : " MISMATCH") << "\n";
+            }
+            // (2) CLICA o pill ATACAR (indice 2). Espera: entra na mira.
+            if (scene.waiting_player_input() && !scene.is_aiming()) {
+                const gus::core::spatial::Rect r =
+                    gus::app::screens::cockpit_pill_rect(static_cast<int>(BattleVerb::Atacar));
+                const float pxcx = (r.x + r.w * 0.5f) * dpr, pxcy = (r.y + r.h * 0.5f) * dpr;
+                battle_mouse_click(scene, pxcx, pxcy, pw0, ph0);
+                std::cout << "  CLIQUE pill ATACAR px(" << pxcx << "," << pxcy
+                          << ") -> is_aiming=" << (scene.is_aiming() ? "on" : "off")
+                          << " (esperado on)\n";
+            }
+            // (3) CLICA o slot de um inimigo (o 2o miravel, se houver). Espera: confirma nele.
+            if (scene.is_aiming()) {
+                const int want = scene.aim_count() >= 2 ? 1 : 0;
+                const gus::app::screens::ArenaLayout arena = gus::app::screens::arena_layout(
+                    scene.party_count(), scene.enemy_count(), scene.gus_party_index());
+                const gus::core::spatial::Rect s =
+                    arena.enemies[static_cast<std::size_t>(want)].rect;
+                const float wcx = s.x + s.w * 0.5f, wcy = s.y + s.h * 0.5f;
+                const float pxcx = wcx / 960.0f * static_cast<float>(pw0);
+                const float pxcy = wcy / 540.0f * static_cast<float>(ph0);
+                const std::string alvo_antes =
+                    scene.aim_target() != nullptr ? scene.aim_target()->id() : "?";
+                const int hit = scene.aim_index_at_arena(wcx, wcy);
+                battle_mouse_click(scene, pxcx, pxcy, pw0, ph0);
+                std::cout << "  CLIQUE inimigo#" << want << " (alvo pre-clique=" << alvo_antes
+                          << ") world(" << wcx << "," << wcy << ") px(" << pxcx << "," << pxcy
+                          << ") hit_idx=" << hit
+                          << " -> is_aiming=" << (scene.is_aiming() ? "on" : "off")
+                          << " (esperado off: confirmou e resolveu o turno)\n";
+            }
+            std::cout << "BattlePreview: [mouse-selftest] concluido; encerrando.\n";
+            running = false;
+        }
+
         while (running) {
             SDL_Event ev;
             while (SDL_PollEvent(&ev)) {
@@ -1259,6 +1398,19 @@ int run_battle_preview() {
                         default:
                             break;
                     }
+                } else if (ev.type == SDL_EVENT_MOUSE_BUTTON_DOWN &&
+                           ev.button.button == SDL_BUTTON_LEFT) {
+                    // MOUSE (A2): clique ESQUERDO aciona verbo (menu) ou alvo (mira). ADITIVO
+                    // ao teclado (que segue igual). O forward pro glintfx (acima) ja rolou (so
+                    // visual); a ACAO real vem do hit-test do host em px de janela.
+                    int pw = kWindowW, ph = kWindowH;
+                    SDL_GetWindowSizeInPixels(window, &pw, &ph);
+                    battle_mouse_click(scene, ev.button.x, ev.button.y, pw, ph);
+                } else if (ev.type == SDL_EVENT_MOUSE_MOTION) {
+                    // MOUSE (A2, hover): na mira, passar sobre um inimigo pre-seleciona (realce).
+                    int pw = kWindowW, ph = kWindowH;
+                    SDL_GetWindowSizeInPixels(window, &pw, &ph);
+                    battle_mouse_hover(scene, ev.motion.x, ev.motion.y, pw, ph);
                 }
             }
             if (!running) {
