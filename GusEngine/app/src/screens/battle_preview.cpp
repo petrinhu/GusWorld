@@ -15,7 +15,9 @@
 
 #include <SDL3/SDL.h>
 
+#include "gus/app/screens/battle_cockpit_pills.hpp"  // hit-test de mouse dos pills (A2)
 #include "gus/app/screens/battle_hud_model.hpp"  // status_icon_file/index
+#include "gus/app/screens/battle_layout.hpp"     // arena_layout (selftest de mouse A2)
 #include "gus/app/screens/battle_scene.hpp"
 #include "gus/core/asset_paths.hpp"             // caminhos de asset centralizados
 #include "gus/domain/combat/combat_enums.hpp"  // StatusId
@@ -109,6 +111,12 @@ std::string cockpit_asset_base_dir() {
 }
 
 std::string load_cockpit_rml() {
+    // SINCRONIA COM O HIT-TEST DE MOUSE (Incremento A2): a regra `.verb` (width 110dp /
+    // height 18dp / margin-bottom 4dp / padding 0dp 12dp / border 1dp) e o `#cockpit`
+    // padding-left 12dp definem a geometria dos pills que gus/app/screens/battle_cockpit_pills
+    // .hpp REPLICA pra decidir em qual pill o clique caiu. Ao mudar esses numeros AQUI,
+    // ATUALIZE battle_cockpit_pills.hpp (e RE-MEDIR a origem-Y se mexer no que vem ANTES do
+    // .menu -- retrato/nome/vitals -- que empurra o 1o pill).
     // Caminhos de asset RELATIVOS a base (cockpit_asset_base_dir): o RmlUi resolve image()
     // contra o source_url do doc. Absoluto perderia a barra inicial na canonicalizacao.
     const std::string moldura(gus::core::assets::kMolduraCartaFrameFile);
@@ -238,6 +246,22 @@ body { font-family: "Pixel Operator Mono"; background: transparent; }
   border-radius: 2dp; background-color: #8fa6b4; }
 .verb.cyan .glyph { background-color: #22D3EE; box-shadow: #22D3EE 0dp 0dp 8dp 1dp; }
 .verb.latao .glyph { background-color: #E8A33D; box-shadow: #E8A33D 0dp 0dp 8dp 1dp; }
+/* HOVER (ADITIVO, SO-VISUAL): o ponteiro sobre o pill CLAREIA o fundo + poe uma BORDA NEUTRA
+   clara. De proposito DISCRETO: e so o feedback "o mouse esta aqui", que NAO deve competir com
+   o glow cyan FORTE do .sel (a selecao REAL, do teclado/confirmada). Sem box-shadow (zero glow
+   que dispute) e mantendo border 1dp (= .verb): NAO mexe na geometria => o hit-test de clique
+   do Incremento A2 (battle_cockpit_pills.hpp) segue valido. RmlUi 6.3 casa :hover NATIVO (o
+   MouseMove ja chega via sdl_to_glintfx -> process_event -> Context::ProcessMouseMove).
+   ORDEM PROPOSITAL: declarado ANTES de .verb.sel e .verb.fired. Como :hover conta como 1
+   pseudo-classe, .verb:hover (2) EMPATA em especificidade com .verb.sel/.verb.fired (2 classes)
+   => o empate vai pra ORDEM DE FONTE e a selecao/acionado (mais abaixo) VENCEM. Assim, num pill
+   SELECIONADO E sob o mouse, o .sel segue DOMINANTE (glow cyan intacto) e o hover nao o ofusca.
+   As cores neutras (fundo lift #384562/#171f38, borda #8a94a8) ficam na paleta canonica da
+   coluna e ficam CLARAMENTE menos vivas que o azul-cyan do .sel. */
+.verb:hover {
+  decorator: vertical-gradient( #384562 #171f38 );
+  border-color: #8a94a8;
+}
 /* SELECIONADO: borda + GLOW FORTE na cor do verbo (spread POSITIVO) + fundo mais vivo */
 .verb.sel { border: 2dp #5fe6ff; color: #ffffff;
   decorator: vertical-gradient( #2f4a7a #16213e );
@@ -777,6 +801,198 @@ bool sdl_to_glintfx(const SDL_Event& ev, SDL_Window* window, glintfx::UiEvent* o
     return true;
 }
 
+// ADR-010 / Incremento A2 (MOUSE): o glintfx NAO expoe hit-test/geometria de elemento (so
+// data-model + process_event), entao o CLIQUE REAL e resolvido AQUI, no host, em paralelo ao
+// forward pro glintfx (que segue so pro visual/hover interno do RmlUi). Duas conversoes de
+// coordenada DISTINTAS, porque o cockpit RCSS e a arena NAO compartilham a escala vertical:
+//   - COCKPIT/pills: dp UNIFORME (dp_ratio = pw/960, o mesmo do UiLayer) -> dp = px/dp_ratio
+//     em X E Y (ambos por pw). A geometria vem do POCO puro (cockpit_pill_index_at).
+//   - ARENA/inimigos: a projecao ESTICA o mundo 960x540 pra (pw x ph), NAO-uniforme (ver
+//     viewport_transform world_to_screen) -> world_x = px/pw*960, world_y = px/ph*540 (Y por
+//     ph!). O hit-test vem do motor de cena (aim_index_at_arena, casa arena_rect_for_actor).
+// Pressuposto: mouse em px de janela == px do viewport (sem HiDPI neste alvo; MESMO pressuposto
+// do forward glintfx). Se houver escala HiDPI no futuro, converter mouse(pontos)->px antes.
+void battle_mouse_click(BattleScene& scene, float mx, float my, int pw, int ph) {
+    if (pw < 1 || ph < 1) {
+        return;
+    }
+    if (scene.is_choosing_actor()) {
+        // ESCOLHA DE ATOR (§4.1): clique num SLOT da party. MESMA conversao MUNDO/arena do modo-
+        // mira (estica 960x540; Y por ph) -> reusa o hit-test do motor (actor_pick_index_at_arena,
+        // que casa arena_rect_for_actor dos slots da party). Clique unico = ESCOLHE e CONFIRMA o
+        // membro (inicia o turno dele), a mesma filosofia "aciona na hora" do A2.
+        const float wx = mx / static_cast<float>(pw) * 960.0f;
+        const float wy = my / static_cast<float>(ph) * 540.0f;
+        const int idx = scene.actor_pick_index_at_arena(wx, wy);
+        if (idx >= 0) {
+            scene.actor_picker_select(idx);   // poe o cursor no membro clicado
+            scene.actor_picker_confirm();      // clique unico = escolhe E inicia o turno dele
+        }
+        // Fora de qualquer membro elegivel: NO-OP (o picker precede o menu; nao ha o que cancelar).
+        return;
+    }
+    if (scene.is_aiming()) {
+        // Clique num INIMIGO (mira): coordenadas de MUNDO da arena (estica; Y por ph).
+        const float wx = mx / static_cast<float>(pw) * 960.0f;
+        const float wy = my / static_cast<float>(ph) * 540.0f;
+        const int idx = scene.aim_index_at_arena(wx, wy);
+        if (idx >= 0) {
+            scene.aim_select(idx);  // pousa a mira no alvo clicado
+            scene.aim_confirm();    // clique unico = mira E confirma (aciona), igual ao verbo
+        }
+        // Fora de qualquer inimigo: NO-OP (nao cancela, nao "erra" o alvo) -- escopo A2.
+        return;
+    }
+    if (scene.is_intro()) {
+        return;  // na ABERTURA os pills nao existem (so o brasao) -> clique nao aciona verbo
+    }
+    // Clique num PILL de verbo: coordenadas 'dp' do cockpit (uniforme; dp_ratio = pw/960).
+    const float dp_ratio = static_cast<float>(pw) / 960.0f;
+    const int idx = cockpit_pill_index_at(mx / dp_ratio, my / dp_ratio);
+    if (idx >= 0) {
+        // Clique = SELECIONA e CONFIRMA. menu_move (delta ate o indice) + menu_confirm; ambos
+        // ja sao NO-OP fora do turno do jogador (mesma guarda do teclado) -> seguro em turno
+        // de inimigo/combate acabado. menu_move faz WRAP, mas o delta idx-sel (ambos 0..5) cai
+        // exato no indice. menu_confirm respeita 'enabled' (verbo sem AP: seleciona, nao aciona).
+        scene.menu_move(idx - scene.menu().selected_index());
+        scene.menu_confirm();
+    }
+}
+
+// Incremento A2 (HOVER, nice-to-have): SO o inimigo. Durante a mira, mover o mouse sobre um
+// inimigo PRE-SELECIONA ele (reusa o realce multimodal do alvo do Incremento A, dirigido por
+// aim_target()). ZERO risco: nao toca RCSS nem o estado do glintfx. Pill NAO tem hover: o
+// realce .sel do RCSS e dirigido pelo MOTOR (data-class-sel); um :hover exigiria mexer na RCSS
+// aprovada do cockpit -> fora do escopo A2 (documentado; o CLIQUE no pill ja funciona).
+void battle_mouse_hover(BattleScene& scene, float mx, float my, int pw, int ph) {
+    if (pw < 1 || ph < 1) {
+        return;
+    }
+    // ESCOLHA DE ATOR (§4.1): passar o mouse sobre um SLOT elegivel da party PRE-SELECIONA ele
+    // (move o cursor do picker, SEM confirmar) - o analogo do hover de mira. Checado ANTES da
+    // mira (quando is_choosing_actor(), a mira nem existe). MESMA conversao MUNDO/arena.
+    if (scene.is_choosing_actor()) {
+        const float wx = mx / static_cast<float>(pw) * 960.0f;
+        const float wy = my / static_cast<float>(ph) * 540.0f;
+        const int idx = scene.actor_pick_index_at_arena(wx, wy);
+        if (idx >= 0) {
+            scene.actor_picker_select(idx);  // hover destaca (move o cursor, SEM confirmar)
+        }
+        return;
+    }
+    if (!scene.is_aiming()) {
+        return;
+    }
+    const float wx = mx / static_cast<float>(pw) * 960.0f;
+    const float wy = my / static_cast<float>(ph) * 540.0f;
+    const int idx = scene.aim_index_at_arena(wx, wy);
+    if (idx >= 0) {
+        scene.aim_select(idx);  // hover destaca (move o cursor de mira, SEM confirmar)
+    }
+}
+
+// Roteamento de TECLADO do host, EXTRAIDO do loop de eventos pra ser CHAMAVEL pelo self-test
+// sintetico (espelha battle_mouse_click, que ja e uma funcao-livre testavel). MESMA ordem e
+// semantica de antes; ADITIVO: a ESCOLHA DE ATOR (§4.1) ganha PRIORIDADE MAXIMA sobre mira/menu,
+// porque quando is_choosing_actor() o menu de verbos nem existe (begin_turn deferido). `running`
+// so vira false no Esc de TOPO (fora de qualquer sub-modo).
+void battle_key_down(BattleScene& scene, SDL_Keycode key, bool& running) {
+    switch (key) {
+        case SDLK_ESCAPE:
+            // MODO-MIRA (§3.5): Esc CANCELA a mira (volta ao menu sem consumir o turno). Na
+            // ESCOLHA DE ATOR (§4.1) NAO ha cancel (o picker precede o menu: sem AP gasto, sem
+            // verbo a desfazer) -> Esc cai no generico (sai do preview), igual ao menu de verbos.
+            // Fora de tudo: Esc sai do preview.
+            if (scene.is_aiming()) {
+                scene.aim_cancel();
+            } else {
+                running = false;
+            }
+            break;
+        // Navegacao vertical. PRIORIDADE: escolha de ator (§4.1) > mira (§3.5) > menu de verbos.
+        // A party e uma COLUNA vertical na arena -> UP/DOWN move o cursor do picker (com WRAP),
+        // a mesma linguagem da mira/menu.
+        case SDLK_UP:
+        case SDLK_W:
+            if (scene.is_choosing_actor()) {
+                scene.actor_picker_move(-1);
+            } else if (scene.is_aiming()) {
+                scene.aim_move(-1);
+            } else {
+                scene.menu_move(-1);
+            }
+            break;
+        case SDLK_DOWN:
+        case SDLK_S:
+            if (scene.is_choosing_actor()) {
+                scene.actor_picker_move(+1);
+            } else if (scene.is_aiming()) {
+                scene.aim_move(+1);
+            } else {
+                scene.menu_move(+1);
+            }
+            break;
+        // LEFT/RIGHT: aliases horizontais de navegacao na escolha de ator (§4.1) e na mira
+        // (§3.5). Fora desses modos, sem efeito (o menu de verbos e vertical).
+        case SDLK_LEFT:
+            if (scene.is_choosing_actor()) {
+                scene.actor_picker_move(-1);
+            } else if (scene.is_aiming()) {
+                scene.aim_move(-1);
+            }
+            break;
+        case SDLK_RIGHT:
+            if (scene.is_choosing_actor()) {
+                scene.actor_picker_move(+1);
+            } else if (scene.is_aiming()) {
+                scene.aim_move(+1);
+            }
+            break;
+        // TECLAS-ATALHO 1/2/3 (ESCOLHA DE ATOR, §4.1, pedido do lider): escolhem DIRETO o
+        // 1o/2o/3o membro elegivel (1-based) e CONFIRMAM na hora (sem Enter). Numpad idem.
+        // actor_picker_hotkey ja e NO-OP fora do modo (guarda interna) -> mapeamento SEGURO
+        // mesmo com o picker fechado; nao colide com outros modos (nada mais usa 1/2/3).
+        case SDLK_1:
+        case SDLK_KP_1:
+            scene.actor_picker_hotkey(1);
+            break;
+        case SDLK_2:
+        case SDLK_KP_2:
+            scene.actor_picker_hotkey(2);
+            break;
+        case SDLK_3:
+        case SDLK_KP_3:
+            scene.actor_picker_hotkey(3);
+            break;
+        case SDLK_RETURN:
+        case SDLK_KP_ENTER:  // Enter do numpad tambem confirma
+        case SDLK_SPACE:
+            // ABERTURA (lider 2026-06-25): na tela "BATALHA!" parada, Enter ENCARA. Depois, por
+            // PRIORIDADE: ESCOLHA DE ATOR (§4.1) confirma o membro sob o cursor -> inicia o turno
+            // dele; MODO-MIRA (§3.5) confirma o ALVO (resolve); vez do jogador (menu) confirma o
+            // verbo (Atacar/Scan ENTRAM na mira). Fora disso, ACELERA o ritmo.
+            if (scene.is_intro()) {
+                scene.start_combat();  // Encarar
+            } else if (scene.is_choosing_actor()) {
+                scene.actor_picker_confirm();  // confirma o membro escolhido -> comeca o turno
+            } else if (scene.is_aiming()) {
+                scene.aim_confirm();  // confirma o alvo mirado
+            } else if (scene.waiting_player_input()) {
+                scene.menu_confirm();  // Atacar/Scan -> abre a mira
+            } else {
+                scene.skip();
+            }
+            break;
+        case SDLK_Q:
+            // "[Q] Resolver sem encarar" (verbo OPT-IN, so TRASH na abertura). Placeholder
+            // neste incremento: a cena loga "[auto-resolve: a implementar]".
+            scene.request_auto_resolve();
+            break;
+        default:
+            break;
+    }
+}
+
 int run_battle_preview() {
     if (!SDL_Init(SDL_INIT_VIDEO)) {
         std::cerr << "BattlePreview: SDL_Init falhou: " << SDL_GetError() << "\n";
@@ -1050,10 +1266,351 @@ int run_battle_preview() {
             return e != nullptr && e[0] == '1';
         }();
 
+        // DIAGNOSTICO/PROVA (HOVER dos pills): GUSWORLD_BATTLE_HOVER_SELFTEST=<prefixo> assenta a
+        // cena ate a vez do jogador, FORCA a selecao em [ATACAR] e roda 4 FASES injetando um
+        // UiEvent::MouseMove SINTETICO (mesmo pipeline do mouse real: process_event ->
+        // Context::ProcessMouseMove -> pseudo-classe :hover), capturando 1 PNG por fase pra
+        // PROVAR o hover surgindo e SUMINDO pelo movimento do ponteiro, sem mouse fisico (que nao
+        // da pra simular numa captura estatica). Fases (sufixos do prefixo):
+        //   _a_none        ponteiro FORA do cockpit           -> nenhum pill em hover (normal)
+        //   _b_hover_unsel ponteiro sobre SCAN (nao-selec.)   -> hover PURO (fundo+borda)
+        //   _c_hover_sel   ponteiro sobre ATACAR (SELECIONADO)-> sel+hover: .sel (cyan) DOMINA
+        //   _d_none_again  ponteiro FORA de novo              -> hover REMOVIDO (== _a: toggle)
+        // So diagnostico: dirige a cena/UI pela MESMA API publica; nao muda o motor nem o render.
+        const char* hover_selftest_prefix = std::getenv("GUSWORLD_BATTLE_HOVER_SELFTEST");
+        const bool hover_selftest =
+            hover_selftest_prefix != nullptr && hover_selftest_prefix[0] != '\0';
+        int hover_phase = 0;        // 0=none 1=unsel 2=sel 3=none-again
+        int hover_phase_frame = 0;  // frames assentados na fase atual (antes de capturar)
+
+        // DIAGNOSTICO/CAPTURA: GUSWORLD_BATTLE_PUMP_TO=<actor_id> conduz o combate ate esse
+        // ator ser o ATIVO, ANTES do loop de exibicao - pra CAPTURAR a fila CTB na vez de um
+        // ator especifico (ex. um de SPD BAIXA como "jaci") sem driver de input. Encara,
+        // bombeia o ritmo nos turnos de inimigo e AUTO-RESOLVE os turnos de jogador (Atacar
+        // no alvo sugerido) ate chegar no alvo. So diagnostico: LE/dirige a cena pela MESMA
+        // API publica do jogador, nao muda o motor.
+        if (const char* pump_to = std::getenv("GUSWORLD_BATTLE_PUMP_TO")) {
+            if (pump_to[0] != '\0') {
+                const std::string want(pump_to);
+                if (scene.is_intro()) {
+                    scene.start_combat();
+                }
+                for (int i = 0; i < 600; ++i) {
+                    const auto* a = scene.active_actor();
+                    if ((a != nullptr && a->id() == want) || scene.combat_over()) {
+                        break;
+                    }
+                    if (scene.waiting_player_input()) {
+                        for (int k = 0; k < 8 &&
+                                        scene.menu().selected_verb() != BattleVerb::Atacar;
+                             ++k) {
+                            scene.menu_move(+1);
+                        }
+                        scene.menu_confirm();  // Atacar -> entra na mira
+                        if (scene.is_aiming()) {
+                            scene.aim_confirm();  // confirma o alvo sugerido -> resolve
+                        }
+                    } else {
+                        scene.skip();
+                        scene.update(1.0f / 60.0f);  // bombeia 1 beat de inimigo
+                    }
+                }
+                const auto* a = scene.active_actor();
+                std::cout << "BattlePreview: [pump] alvo=" << want << " ator ativo agora="
+                          << (a != nullptr ? a->id() : "?")
+                          << " fila=" << scene.queue_len() << "\n";
+            }
+        }
+
+        // DIAGNOSTICO/CAPTURA: GUSWORLD_BATTLE_AIM=1 deixa a cena PARADA no MODO-MIRA de
+        // [Atacar] do jogador ativo (assenta o pacing ate a vez do jogador, seleciona Atacar
+        // e ENTRA na mira SEM confirmar) - pra CAPTURAR a previa de dano "-N" sobre o alvo,
+        // sem driver de input. GUSWORLD_BATTLE_AIM_MOVE=<n> navega n passos entre os inimigos
+        // (mostra o "-N" ATUALIZANDO por alvo). Combina com PUMP_TO (ex.: mira na vez do Gus).
+        // Dirige pela MESMA API publica do jogador; NAO muda o motor nem o render.
+        const bool stop_in_aim = [] {
+            const char* e = std::getenv("GUSWORLD_BATTLE_AIM");
+            return e != nullptr && e[0] == '1';
+        }();
+        if (stop_in_aim) {
+            if (scene.is_intro()) {
+                scene.start_combat();  // Encarar
+            }
+            // Assenta o pacing ate um turno de JOGADOR esperando input (skip/update nao
+            // resolvem o turno do jogador; so avancam os beats de inimigo/anuncio).
+            for (int i = 0; i < 240 && !scene.combat_over() &&
+                            !scene.waiting_player_input();
+                 ++i) {
+                scene.skip();
+                scene.update(1.0f / 60.0f);
+            }
+            if (scene.waiting_player_input() && !scene.is_aiming()) {
+                for (int k = 0; k < 8 &&
+                                scene.menu().selected_verb() != BattleVerb::Atacar;
+                     ++k) {
+                    scene.menu_move(+1);
+                }
+                scene.menu_confirm();  // Atacar -> ENTRA na mira (nao confirma)
+                if (const char* mv = std::getenv("GUSWORLD_BATTLE_AIM_MOVE")) {
+                    const int steps = std::atoi(mv);
+                    for (int k = 0; k < steps && scene.is_aiming(); ++k) {
+                        scene.aim_move(+1);
+                    }
+                }
+                // GUSWORLD_BATTLE_AIM_SHIELD=<mag>: aplica um Shield de pool <mag> no ALVO
+                // mirado (ponteiro mutavel da fila) so pra CAPTURAR o "-N" REDUZIDO. Usa a
+                // MESMA API de status do jogo (add_status); nao muda o motor nem o render.
+                if (const char* sh = std::getenv("GUSWORLD_BATTLE_AIM_SHIELD")) {
+                    const int mag = std::atoi(sh);
+                    const auto* aimed = scene.aim_target();
+                    if (mag > 0 && aimed != nullptr) {
+                        for (gus::domain::combat::CombatActor* act :
+                             scene.machine().queue().order()) {
+                            if (act != nullptr && act->id() == aimed->id()) {
+                                act->add_status(gus::domain::combat::StatusEffect{
+                                    gus::domain::combat::StatusId::Shield, mag,
+                                    /*duration=*/1, gus::domain::combat::StackRule::Replace,
+                                    gus::domain::combat::CardFamily::Eletrico});
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+            const auto* t = scene.aim_target();
+            const auto* atk = scene.active_actor();
+            const int previsto =
+                (t != nullptr && atk != nullptr)
+                    ? scene.machine().preview_basic_attack_damage(*atk, *t)
+                    : -1;
+            std::cout << "BattlePreview: [aim] modo-mira="
+                      << (scene.is_aiming() ? "on" : "off")
+                      << " atacante=" << (atk != nullptr ? atk->id() : "?")
+                      << " alvo=" << (t != nullptr ? t->id() : "?")
+                      << " dano_previsto=" << previsto << " (badge deve mostrar \"-"
+                      << previsto << "\")\n";
+        }
+
+        // HOVER-SELFTEST (setup): assenta ate a vez do jogador (skip/update so avancam beats de
+        // inimigo/anuncio; NAO resolvem o turno do jogador) e FORCA a selecao em [ATACAR]
+        // (indice 2, verbo cyan). ATACAR e o PIOR CASO pra "hover nao ofuscar": seu .sel carrega
+        // o glow cyan mais forte (.verb.cyan.sel), entao provar que o hover-sobre-o-selecionado
+        // nao o apaga vale pros demais. A cena FICA parada em waiting_player_input (o menu segue
+        // exibido); nada no loop muda a selecao (nao injeto navegacao), so o MouseMove sintetico.
+        if (hover_selftest) {
+            if (scene.is_intro()) {
+                scene.start_combat();
+            }
+            for (int i = 0; i < 240 && !scene.combat_over() &&
+                            !scene.waiting_player_input();
+                 ++i) {
+                scene.skip();
+                scene.update(1.0f / 60.0f);
+            }
+            if (scene.waiting_player_input() && !scene.is_aiming()) {
+                for (int k = 0; k < 8 &&
+                                scene.menu().selected_verb() != BattleVerb::Atacar;
+                     ++k) {
+                    scene.menu_move(+1);
+                }
+            }
+            std::cout << "BattlePreview: [hover-selftest] waiting_player="
+                      << scene.waiting_player_input()
+                      << " sel_index=" << scene.menu().selected_index()
+                      << " (esperado 2=ATACAR); prefixo=" << hover_selftest_prefix << "\n";
+        }
+
         bool running = true;
         bool have_last = false;
         unsigned long long last_ns = 0;
         int glintfx_injected = 0;  // SMOKE: conta eventos injetados na UI (prova do pipeline)
+
+        // DIAGNOSTICO/PROVA (Incremento A2): GUSWORLD_BATTLE_MOUSE_SELFTEST=1 injeta CLIQUES
+        // SINTETICOS pelo MESMO battle_mouse_click do loop (com a janela real pw0/ph0), pra
+        // PROVAR o roteamento clique->acao sem mouse fisico (dificil de simular numa captura
+        // estatica). Assenta ate a vez do jogador, entao: (1) round-trip px->pill de cada
+        // verbo; (2) CLICA o pill [ATACAR] e mostra que entrou na MIRA; (3) CLICA o slot de um
+        // inimigo e mostra que a mira confirmou naquele alvo. So diagnostico (API publica).
+        const bool mouse_selftest = [] {
+            const char* e = std::getenv("GUSWORLD_BATTLE_MOUSE_SELFTEST");
+            return e != nullptr && e[0] == '1';
+        }();
+        if (mouse_selftest) {
+            const float dpr = static_cast<float>(pw0) / 960.0f;
+            if (scene.is_intro()) {
+                scene.start_combat();
+            }
+            for (int i = 0; i < 240 && !scene.combat_over() &&
+                            !scene.waiting_player_input();
+                 ++i) {
+                scene.skip();
+                scene.update(1.0f / 60.0f);
+            }
+            std::cout << "BattlePreview: [mouse-selftest] pw0xph0=" << pw0 << "x" << ph0
+                      << " dp_ratio=" << dpr
+                      << " waiting_player=" << scene.waiting_player_input() << "\n";
+            // (1) round-trip: centro px de cada pill -> cockpit_pill_index_at.
+            for (int v = 0; v < gus::app::screens::kCockpitPillCount; ++v) {
+                const gus::core::spatial::Rect r = gus::app::screens::cockpit_pill_rect(v);
+                const float dpcx = r.x + r.w * 0.5f, dpcy = r.y + r.h * 0.5f;
+                const float pxcx = dpcx * dpr, pxcy = dpcy * dpr;
+                const int back =
+                    gus::app::screens::cockpit_pill_index_at(pxcx / dpr, pxcy / dpr);
+                std::cout << "  pill[" << v << "] "
+                          << kVerbLabels[static_cast<std::size_t>(v)] << " dp(" << dpcx
+                          << "," << dpcy << ") px(" << pxcx << "," << pxcy
+                          << ") -> hit=" << back << (back == v ? " OK" : " MISMATCH") << "\n";
+            }
+            // (2) CLICA o pill ATACAR (indice 2). Espera: entra na mira.
+            if (scene.waiting_player_input() && !scene.is_aiming()) {
+                const gus::core::spatial::Rect r =
+                    gus::app::screens::cockpit_pill_rect(static_cast<int>(BattleVerb::Atacar));
+                const float pxcx = (r.x + r.w * 0.5f) * dpr, pxcy = (r.y + r.h * 0.5f) * dpr;
+                battle_mouse_click(scene, pxcx, pxcy, pw0, ph0);
+                std::cout << "  CLIQUE pill ATACAR px(" << pxcx << "," << pxcy
+                          << ") -> is_aiming=" << (scene.is_aiming() ? "on" : "off")
+                          << " (esperado on)\n";
+            }
+            // (3) CLICA o slot de um inimigo (o 2o miravel, se houver). Espera: confirma nele.
+            if (scene.is_aiming()) {
+                const int want = scene.aim_count() >= 2 ? 1 : 0;
+                const gus::app::screens::ArenaLayout arena = gus::app::screens::arena_layout(
+                    scene.party_count(), scene.enemy_count(), scene.gus_party_index());
+                const gus::core::spatial::Rect s =
+                    arena.enemies[static_cast<std::size_t>(want)].rect;
+                const float wcx = s.x + s.w * 0.5f, wcy = s.y + s.h * 0.5f;
+                const float pxcx = wcx / 960.0f * static_cast<float>(pw0);
+                const float pxcy = wcy / 540.0f * static_cast<float>(ph0);
+                const std::string alvo_antes =
+                    scene.aim_target() != nullptr ? scene.aim_target()->id() : "?";
+                const int hit = scene.aim_index_at_arena(wcx, wcy);
+                battle_mouse_click(scene, pxcx, pxcy, pw0, ph0);
+                std::cout << "  CLIQUE inimigo#" << want << " (alvo pre-clique=" << alvo_antes
+                          << ") world(" << wcx << "," << wcy << ") px(" << pxcx << "," << pxcy
+                          << ") hit_idx=" << hit
+                          << " -> is_aiming=" << (scene.is_aiming() ? "on" : "off")
+                          << " (esperado off: confirmou e resolveu o turno)\n";
+            }
+            std::cout << "BattlePreview: [mouse-selftest] concluido; encerrando.\n";
+            running = false;
+        }
+
+        // DIAGNOSTICO/PROVA (Escolha de ator, §4.1): GUSWORLD_BATTLE_ACTOR_SELFTEST=1 dirige uma
+        // cena FRESCA ate a vez do BLOCO da party (onde is_choosing_actor()==true) e injeta INPUT
+        // SINTETICO pelo MESMO roteamento do host (battle_key_down / battle_mouse_click), pra
+        // PROVAR o wiring sem input fisico (dificil de simular em captura estatica):
+        //   (A) SETA (battle_key_down DOWN) MOVE o cursor do picker (SEM confirmar);
+        //   (B) CLIQUE no slot de um membro (battle_mouse_click) ESCOLHE e CONFIRMA aquele membro;
+        //   (C) TECLA 1/2/3 (battle_key_down) escolhe e CONFIRMA o n-esimo membro na hora.
+        // Cada proof usa sua PROPRIA BattleScene (o confirm consome o modo). So diagnostico:
+        // dirige pela MESMA API publica do host; nao muda o motor nem o render.
+        const bool actor_selftest = [] {
+            const char* e = std::getenv("GUSWORLD_BATTLE_ACTOR_SELFTEST");
+            return e != nullptr && e[0] == '1';
+        }();
+        if (actor_selftest) {
+            // Assenta uma cena ate o picker abrir (party-block com >1 elegivel). skip()+update()
+            // avancam os beats de inimigo/anuncio; NADA auto-confirma o picker -> para no modo.
+            auto drive_to_picker = [](BattleScene& s) {
+                if (s.is_intro()) {
+                    s.start_combat();
+                }
+                for (int i = 0; i < 600 && !s.combat_over() && !s.is_choosing_actor(); ++i) {
+                    s.skip();
+                    s.update(1.0f / 60.0f);
+                }
+            };
+            // id do i-esimo elegivel (0-based) na escolha corrente; "?" fora de faixa.
+            auto choice_id = [](const BattleScene& s, int i) -> std::string {
+                const auto cs = s.actor_choices();
+                return (i >= 0 && i < static_cast<int>(cs.size()) &&
+                        cs[static_cast<std::size_t>(i)] != nullptr)
+                           ? cs[static_cast<std::size_t>(i)]->id()
+                           : std::string("?");
+            };
+
+            // ---- (A) SETA move o cursor do picker (NAO confirma) ----
+            {
+                BattleScene sa;
+                drive_to_picker(sa);
+                bool dummy = true;
+                const int n = sa.actor_pick_count();
+                const std::string c0 =
+                    sa.actor_pick_target() != nullptr ? sa.actor_pick_target()->id() : "?";
+                battle_key_down(sa, SDLK_DOWN, dummy);  // roteamento real do host
+                const std::string c1 =
+                    sa.actor_pick_target() != nullptr ? sa.actor_pick_target()->id() : "?";
+                const bool ok = sa.is_choosing_actor() && (n < 2 || c0 != c1);
+                std::cout << "BattlePreview: [actor-selftest] (A seta) choosing="
+                          << sa.is_choosing_actor() << " elegiveis=" << n << " cursor: " << c0
+                          << " --[DOWN]--> " << c1 << "  " << (ok ? "OK" : "FALHA")
+                          << (n < 2 ? " (n<2: sem 2o alvo p/ mover)" : "") << "\n";
+            }
+
+            // ---- (B) CLIQUE no slot de um membro ESCOLHE + CONFIRMA ----
+            {
+                BattleScene sb;
+                drive_to_picker(sb);
+                const int want_idx =
+                    sb.actor_pick_count() >= 2 ? 1 : 0;  // 2o elegivel (NAO o pre-selecionado)
+                const std::string want_id = choice_id(sb, want_idx);
+                const gus::app::screens::ArenaLayout arena = gus::app::screens::arena_layout(
+                    sb.party_count(), sb.enemy_count(), sb.gus_party_index());
+                // Acha o SLOT da party cujo centro casa o elegivel want_idx pelo MESMO hit-test do
+                // host (actor_pick_index_at_arena) -> nao presume o mapeamento slot->elegivel.
+                float pxc = -1.0f, pyc = -1.0f, wcx = -1.0f, wcy = -1.0f;
+                for (int k = 0; k < sb.party_count(); ++k) {
+                    const gus::core::spatial::Rect r =
+                        arena.party[static_cast<std::size_t>(k)].rect;
+                    const float cx = r.x + r.w * 0.5f, cy = r.y + r.h * 0.5f;
+                    if (sb.actor_pick_index_at_arena(cx, cy) == want_idx) {
+                        wcx = cx;
+                        wcy = cy;
+                        pxc = cx / 960.0f * static_cast<float>(pw0);
+                        pyc = cy / 540.0f * static_cast<float>(ph0);
+                        break;
+                    }
+                }
+                if (pxc >= 0.0f) {
+                    battle_mouse_click(sb, pxc, pyc, pw0, ph0);  // roteamento real do host
+                    const std::string got =
+                        sb.active_actor() != nullptr ? sb.active_actor()->id() : "?";
+                    const bool ok = !sb.is_choosing_actor() && got == want_id;
+                    std::cout << "BattlePreview: [actor-selftest] (B clique) elegivel#" << want_idx
+                              << "=" << want_id << " world(" << wcx << "," << wcy << ") px(" << pxc
+                              << "," << pyc << ") -> choosing=" << sb.is_choosing_actor()
+                              << " ator_ativo=" << got << "  "
+                              << (ok ? "OK (escolheu+confirmou)" : "FALHA") << "\n";
+                } else {
+                    std::cout << "BattlePreview: [actor-selftest] (B clique) FALHA: nenhum slot "
+                                 "casou o elegivel #"
+                              << want_idx << " (choosing=" << sb.is_choosing_actor()
+                              << " elegiveis=" << sb.actor_pick_count() << ")\n";
+                }
+            }
+
+            // ---- (C) TECLA 1/2/3 escolhe + CONFIRMA na hora ----
+            {
+                BattleScene sc;
+                drive_to_picker(sc);
+                const int nth = sc.actor_pick_count() >= 2 ? 2 : 1;  // 2a hotkey se houver
+                const std::string want_id = choice_id(sc, nth - 1);
+                const SDL_Keycode kc = nth == 1 ? SDLK_1 : (nth == 2 ? SDLK_2 : SDLK_3);
+                bool dummy = true;
+                battle_key_down(sc, kc, dummy);  // roteamento real -> actor_picker_hotkey(nth)
+                const std::string got =
+                    sc.active_actor() != nullptr ? sc.active_actor()->id() : "?";
+                const bool ok = !sc.is_choosing_actor() && got == want_id;
+                std::cout << "BattlePreview: [actor-selftest] (C tecla " << nth << ") elegivel#"
+                          << (nth - 1) << "=" << want_id << " -> choosing=" << sc.is_choosing_actor()
+                          << " ator_ativo=" << got << "  "
+                          << (ok ? "OK (escolheu+confirmou)" : "FALHA") << "\n";
+            }
+
+            std::cout << "BattlePreview: [actor-selftest] concluido; encerrando.\n";
+            running = false;
+        }
+
         while (running) {
             SDL_Event ev;
             while (SDL_PollEvent(&ev)) {
@@ -1081,44 +1638,23 @@ int run_battle_preview() {
                 if (ev.type == SDL_EVENT_QUIT) {
                     running = false;
                 } else if (ev.type == SDL_EVENT_KEY_DOWN) {
-                    switch (ev.key.key) {
-                        case SDLK_ESCAPE:
-                            running = false;
-                            break;
-                        // Navegacao do menu de verbos (incremento 3). So opera no turno
-                        // de jogador (a cena ignora fora dele); a cena auto-encadeia os
-                        // turnos de inimigo ate o proximo turno de jogador ou o fim.
-                        case SDLK_UP:
-                        case SDLK_W:
-                            scene.menu_move(-1);
-                            break;
-                        case SDLK_DOWN:
-                        case SDLK_S:
-                            scene.menu_move(+1);
-                            break;
-                        case SDLK_RETURN:
-                        case SDLK_KP_ENTER:  // Enter do numpad tambem confirma
-                        case SDLK_SPACE:
-                            // ABERTURA (lider 2026-06-25): na tela "BATALHA!" parada,
-                            // Enter ENCARA e comeca o combate. Depois: na vez do jogador
-                            // confirma o verbo; fora dela (anuncio/delay) ACELERA o ritmo.
-                            if (scene.is_intro()) {
-                                scene.start_combat();  // Encarar
-                            } else if (scene.waiting_player_input()) {
-                                scene.menu_confirm();
-                            } else {
-                                scene.skip();
-                            }
-                            break;
-                        case SDLK_Q:
-                            // "[Q] Resolver sem encarar" (verbo OPT-IN, so TRASH na
-                            // abertura). Placeholder neste incremento: a cena loga
-                            // "[auto-resolve: a implementar]" e nao faz nada destrutivo.
-                            scene.request_auto_resolve();
-                            break;
-                        default:
-                            break;
-                    }
+                    // Roteamento de teclado EXTRAIDO pra battle_key_down (funcao-livre, testavel
+                    // pelo self-test sintetico; espelha battle_mouse_click). Cobre menu de verbos,
+                    // MODO-MIRA (§3.5), ESCOLHA DE ATOR (§4.1, prioridade + teclas 1/2/3) e Esc.
+                    battle_key_down(scene, ev.key.key, running);
+                } else if (ev.type == SDL_EVENT_MOUSE_BUTTON_DOWN &&
+                           ev.button.button == SDL_BUTTON_LEFT) {
+                    // MOUSE (A2): clique ESQUERDO aciona verbo (menu) ou alvo (mira). ADITIVO
+                    // ao teclado (que segue igual). O forward pro glintfx (acima) ja rolou (so
+                    // visual); a ACAO real vem do hit-test do host em px de janela.
+                    int pw = kWindowW, ph = kWindowH;
+                    SDL_GetWindowSizeInPixels(window, &pw, &ph);
+                    battle_mouse_click(scene, ev.button.x, ev.button.y, pw, ph);
+                } else if (ev.type == SDL_EVENT_MOUSE_MOTION) {
+                    // MOUSE (A2, hover): na mira, passar sobre um inimigo pre-seleciona (realce).
+                    int pw = kWindowW, ph = kWindowH;
+                    SDL_GetWindowSizeInPixels(window, &pw, &ph);
+                    battle_mouse_hover(scene, ev.motion.x, ev.motion.y, pw, ph);
                 }
             }
             if (!running) {
@@ -1234,8 +1770,63 @@ int run_battle_preview() {
                         ui->set_list("log", ptrs.data(), ptrs.size());
                     }
                 }
+                // HOVER-SELFTEST (injecao): a cada frame, coloca o ponteiro SINTETICO onde a
+                // fase pede, ANTES do update() (o Context::Update reaplica o hover chain sob a
+                // ultima posicao). Fases 0/3: FORA do cockpit (arena, x=80% da largura) => nenhum
+                // pill em hover. Fases 1/2: no CENTRO do pill-alvo (dp * dp_ratio -> px), a mesma
+                // conversao uniforme do cockpit (dp_ratio = pw/960) usada no clique do A2.
+                if (hover_selftest) {
+                    const float dpr = static_cast<float>(pw) / 960.0f;
+                    float mx = static_cast<float>(pw) * 0.80f;  // fora da coluna (fases 0 e 3)
+                    float my = static_cast<float>(ph) * 0.50f;
+                    const int hover_pill = hover_phase == 1   ? 0    // SCAN (nao-selecionado)
+                                           : hover_phase == 2 ? 2    // ATACAR (selecionado)
+                                                              : -1;  // 0 e 3: sem pill
+                    if (hover_pill >= 0) {
+                        const gus::core::spatial::Rect r =
+                            gus::app::screens::cockpit_pill_rect(hover_pill);
+                        mx = (r.x + r.w * 0.5f) * dpr;
+                        my = (r.y + r.h * 0.5f) * dpr;
+                    }
+                    glintfx::UiEvent ge{};
+                    ge.type = glintfx::UiEvent::Type::MouseMove;
+                    ge.x = mx;
+                    ge.y = my;
+                    ui->process_event(ge);
+                }
                 ui->update();
                 ui->render();  // UI por cima da arena, mesmo contexto GL
+            }
+
+            // HOVER-SELFTEST (captura por fase): deixa ~12 frames assentarem (bake do atlas de
+            // fonte + hover chain estavel) e salva 1 PNG por fase, lendo o backbuffer ANTES do
+            // swap. Depois avanca a fase; encerra apos a 4a. Nao colide com a captura single-shot
+            // (GUSWORLD_RMLUI_CAPTURE) porque aquela so dispara com capture_path != nullptr.
+            if (hover_selftest) {
+                constexpr int kHoverSettleFrames = 12;
+                ++hover_phase_frame;
+                if (hover_phase_frame >= kHoverSettleFrames) {
+                    const char* suffix = hover_phase == 0   ? "_a_none.png"
+                                         : hover_phase == 1 ? "_b_hover_unsel.png"
+                                         : hover_phase == 2 ? "_c_hover_sel.png"
+                                                            : "_d_none_again.png";
+                    const std::string out = std::string(hover_selftest_prefix) + suffix;
+                    std::vector<unsigned char> buf(
+                        static_cast<std::size_t>(pw) * static_cast<std::size_t>(ph) * 4);
+                    if (gus::platform::rmlui::gl3_read_backbuffer_rgba(pw, ph, buf.data())) {
+                        stbi_write_png(out.c_str(), pw, ph, 4, buf.data(), pw * 4);
+                        std::cout << "BattlePreview: [hover-selftest] fase " << hover_phase
+                                  << " -> " << out << " (" << pw << "x" << ph << ")\n";
+                    } else {
+                        std::cerr
+                            << "BattlePreview: [hover-selftest] gl3_read_backbuffer falhou\n";
+                    }
+                    ++hover_phase;
+                    hover_phase_frame = 0;
+                    if (hover_phase > 3) {
+                        running = false;  // 4 fases capturadas; encerra
+                    }
+                }
             }
 
             // SMOKE VISUAL: captura 1 PNG no frame alvo (ANTES do swap, lendo o backbuffer)

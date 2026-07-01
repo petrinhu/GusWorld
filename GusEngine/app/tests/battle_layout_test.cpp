@@ -133,7 +133,7 @@ TEST_CASE("arena: contagens saturam nos maximos", "[battle_layout]") {
     REQUIRE(a.enemy_count == kMaxEnemySlots);
 }
 
-TEST_CASE("CTB: 5 celulas de 48px, primeira 'proximo', a direita do cockpit (D4)",
+TEST_CASE("CTB: 5 celulas de 48px, celula 1 = 'proximo', a direita do cockpit (D4)",
           "[battle_layout]") {
     const CtbStrip s = ctb_strip(7);
     for (int i = 0; i < kCtbVisibleCells; ++i) {
@@ -146,8 +146,10 @@ TEST_CASE("CTB: 5 celulas de 48px, primeira 'proximo', a direita do cockpit (D4)
             REQUIRE_THAT(s.cells[i].rect.y, WithinAbs(s.cells[0].rect.y, 1e-4f));
         }
     }
-    REQUIRE(s.cells[0].is_next);
-    for (int i = 1; i < kCtbVisibleCells; ++i) {
+    // Pos-rotacao: celula 0 = ATIVO (turno agora), celula 1 = "proximo". is_next SO na 1.
+    REQUIRE_FALSE(s.cells[0].is_next);
+    REQUIRE(s.cells[1].is_next);
+    for (int i = 2; i < kCtbVisibleCells; ++i) {
         REQUIRE_FALSE(s.cells[i].is_next);
     }
 }
@@ -166,10 +168,19 @@ TEST_CASE("CTB: fila curta deixa celulas vazias (sem 'proximo' se vazia)",
     REQUIRE(s.cells[0].occupied);
     REQUIRE(s.cells[1].occupied);
     REQUIRE_FALSE(s.cells[2].occupied);
-    REQUIRE(s.cells[0].is_next);
+    // 2 atores: celula 0 = ativo, celula 1 = "proximo".
+    REQUIRE_FALSE(s.cells[0].is_next);
+    REQUIRE(s.cells[1].is_next);
+    // 1 ator (so o ativo): NAO ha "proximo".
+    const CtbStrip s1 = ctb_strip(1);
+    REQUIRE(s1.cells[0].occupied);
+    REQUIRE_FALSE(s1.cells[0].is_next);
+    REQUIRE_FALSE(s1.cells[1].is_next);
+    // Fila vazia: nenhuma celula ocupada nem "proximo".
     const CtbStrip s0 = ctb_strip(0);
     REQUIRE_FALSE(s0.cells[0].occupied);
     REQUIRE_FALSE(s0.cells[0].is_next);
+    REQUIRE_FALSE(s0.cells[1].is_next);
 }
 
 TEST_CASE("zonas variante C: cockpit/arena/banner/log NAO se sobrepoem",

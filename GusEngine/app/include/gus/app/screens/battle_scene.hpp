@@ -144,6 +144,15 @@ public:
     // Ator ativo (turno corrente) pra o highlight (D7). Nunca nullptr com fila nao-vazia.
     [[nodiscard]] const gus::domain::combat::CombatActor* active_actor() const noexcept;
 
+    // Janela da fila CTB: os ate kCtbVisibleCells atores a mostrar na faixa do topo, na
+    // ordem esquerda->direita das celulas. Fonte UNICA consumida pelo render E pelos testes
+    // (o render nunca reimplementa esse mapeamento). A janela COMECA no ator ATIVO (turno
+    // agora, == window[0]) e segue a ordem de jogo com WRAP na fila; window[1] e o proximo a
+    // jogar, e assim por diante. Nunca repete um ator quando a fila e curta (o teto min(n,5)
+    // da no maximo uma volta parcial). Vazia se a fila esta vazia. Ponteiros NAO-DONOS (os
+    // atores vivem em actors_/na FSM). Ver docs/design/mecanicas/battle-screen.md par.5 (D4).
+    [[nodiscard]] std::vector<const gus::domain::combat::CombatActor*> ctb_window() const;
+
     // Indice na coluna da party que e o GUS (pro recuo D3). -1 se o Gus nao esta na
     // party viva. Deriva de is_universal_compiler (so o Gus e compilador universal).
     [[nodiscard]] int gus_party_index() const;
@@ -243,6 +252,107 @@ public:
     // Devolve a CHAVE base; a casca formata. Vazio se combate acabou.
     [[nodiscard]] std::string_view turn_banner_key() const noexcept;
 
+    // ---- Modo-mira / target selection (battle-screen.md §3.5, D3) ----
+    //
+    // APRESENTACAO PURA (zero motor): ao escolher [Atacar] ou [Scan] no menu de verbos, a
+    // cena ENTRA em modo-mira em vez de resolver na hora com o 1o inimigo (o hardcode
+    // antigo). O jogador navega entre os inimigos VIVOS e confirma; a CombatAction e
+    // montada com o ALVO ESCOLHIDO. Cancelar volta ao menu sem consumir o turno. O motor
+    // (domain/combat) ja resolve qualquer target_id (resolve_primary_target); aqui so
+    // deixamos o jogador escolher. So teclado neste incremento (mouse = item separado).
+
+    // true enquanto o modo-mira esta ativo (esperando o jogador escolher o alvo).
+    [[nodiscard]] bool is_aiming() const noexcept { return aiming_; }
+
+    // Navega o cursor de mira entre os inimigos vivos (delta -1/+1, com WRAP). No-op fora
+    // do modo-mira. A lista exclui mortos (mira nunca pousa num inimigo morto).
+    void aim_move(int delta) noexcept;
+
+    // MOUSE (Incremento A2): poe a mira DIRETO no i-esimo inimigo miravel (0..aim_count()-1),
+    // sem WRAP/delta. No-op fora do modo-mira ou com index fora de faixa. Espelha o aim_move
+    // (mesma lista aim_candidates_) pro clique/hover pousar num alvo especifico.
+    void aim_select(int index) noexcept;
+
+    // MOUSE (Incremento A2): indice do inimigo miravel (0..aim_count()-1) cujo SLOT na arena
+    // contem o ponto em coordenadas de MUNDO/logicas (px logico 960x540, o mesmo espaco do
+    // arena_layout/arena_rect_for_actor); -1 se o ponto nao cai em nenhum inimigo miravel.
+    // FUNCAO PURA de leitura (nao muta a cena): decide "que alvo esse (x,y) corresponde",
+    // separada da acao (aim_select + aim_confirm ficam no host SDL). Fora do modo-mira a
+    // lista esta vazia -> sempre -1 (clicar inimigo so vale mirando). Testavel headless.
+    [[nodiscard]] int aim_index_at_arena(float world_x, float world_y) const;
+
+    // Inimigo atualmente mirado (pro render do destaque + testes). nullptr fora da mira.
+    [[nodiscard]] const gus::domain::combat::CombatActor* aim_target() const noexcept;
+
+    // Quantidade de inimigos MIRAVEIS (vivos) na sessao de mira atual. 0 fora da mira.
+    [[nodiscard]] int aim_count() const noexcept {
+        return static_cast<int>(aim_candidates_.size());
+    }
+
+    // Confirma o alvo mirado: monta CombatAction::attack/scan com o ALVO ESCOLHIDO e
+    // resolve o turno (mesmo fluxo do menu_confirm antigo: pending_action_ +
+    // resolve_one_turn + pacing_.player_acted). No-op fora do modo-mira.
+    void aim_confirm();
+
+    // Cancela o modo-mira e volta ao menu de verbos SEM consumir o turno (Esc). No-op se
+    // nao esta mirando.
+    void aim_cancel() noexcept;
+
+    // ---- Escolha de ator / Janela de Comando da Party (comando-livre 1B, combat.md §4.1) ----
+    //
+    // APRESENTACAO PURA sobre o motor 1B (§4.1): quando e a vez do BLOCO da party e ha MAIS DE
+    // UM membro elegivel (machine().pending_party_actors()), a cena entra num modo de ESCOLHA
+    // DE ATOR ANTES do menu de verbos - o jogador comanda QUAL membro age (a SPD apenas SUGERE
+    // o pre-selecionado; §4.1 "comando livre"). O begin_turn fica DEFERIDO ate a escolha;
+    // confirmar chama machine().select_party_actor(escolhido) e SO ENTAO o turno comeca (menu
+    // de verbos do ator escolhido), prosseguindo EXATAMENTE como o fluxo de hoje. Com 1 so
+    // elegivel NAO ha escolha: a cena auto-inicia o turno (sem friccao) - o picker existe pra
+    // ESCOLHER entre varios (decisao documentada no .cpp). ADITIVO: o motor (domain/) ja faz
+    // tudo (agrupa por lado, recomputa quem abre, regroup Gambito-safe); aqui so deixamos o
+    // jogador escolher dentro de pending_party_actors. So teclado/mouse; ZERO mudanca de motor.
+
+    // true enquanto a escolha de ator esta ativa (o turno da party ainda nao comecou).
+    [[nodiscard]] bool is_choosing_actor() const noexcept { return choosing_actor_; }
+
+    // Membros da party ELEGIVEIS nesta escolha (== machine().pending_party_actors() no momento
+    // de entrar), front = pre-selecionado (maior SPD). Vazio fora do modo. Ponteiros NAO-donos
+    // (vivem em actors_/na FSM). Fonte UNICA consumida pelo render E pelos testes.
+    [[nodiscard]] std::vector<const gus::domain::combat::CombatActor*> actor_choices() const;
+
+    // Quantidade de elegiveis na escolha atual. 0 fora do modo.
+    [[nodiscard]] int actor_pick_count() const noexcept {
+        return static_cast<int>(actor_choices_.size());
+    }
+
+    // Ator sob o cursor da escolha (pre-selecionado ao entrar = maior SPD). nullptr fora do
+    // modo. Pro render do destaque + testes.
+    [[nodiscard]] const gus::domain::combat::CombatActor* actor_pick_target() const noexcept;
+
+    // Navega o cursor entre os elegiveis (delta -1/+1, com WRAP). No-op fora do modo. Espelha
+    // aim_move (setas + Enter, a mesma linguagem do menu/mira).
+    void actor_picker_move(int delta) noexcept;
+
+    // MOUSE/atalho: poe o cursor DIRETO no i-esimo elegivel (0..actor_pick_count()-1), sem
+    // WRAP. No-op fora do modo ou index fora de faixa. Espelha aim_select.
+    void actor_picker_select(int index) noexcept;
+
+    // MOUSE: indice do elegivel (0..actor_pick_count()-1) cujo SLOT na arena contem o ponto em
+    // coords de MUNDO/logicas (px logico 960x540, o mesmo espaco de arena_rect_for_actor); -1
+    // se o ponto nao cai em nenhum elegivel. FUNCAO PURA (nao muta). Espelha aim_index_at_arena,
+    // mas sobre os slots da PARTY (arena_rect_for_actor e generico por id). Fora do modo a lista
+    // esta vazia -> sempre -1. Testavel headless; reusa o pipeline de hit-test do Incremento A2.
+    [[nodiscard]] int actor_pick_index_at_arena(float world_x, float world_y) const;
+
+    // Confirma o ator sob o cursor: grava a escolha no motor (select_party_actor) e INICIA o
+    // turno dele (begin_turn + menu de verbos). No-op fora do modo. Clique de mouse e teclas
+    // 1/2/3 confirmam via este caminho (mesma filosofia "aciona na hora" do A2).
+    void actor_picker_confirm();
+
+    // TECLA-ATALHO (1/2/3, pedido do lider): escolhe DIRETO o nth-esimo elegivel (1-based) e
+    // CONFIRMA na hora. No-op se nth nao tem elegivel correspondente (fora de faixa) ou fora do
+    // modo. Fonte UNICA do host (teclas) e dos testes; encapsula o "select + confirm imediato".
+    void actor_picker_hotkey(int nth);
+
     // Desenha o ESQUELETO da batalha (placeholders): fundo, arena (party/inimigos),
     // fila CTB, painel do ator ativo, log. viewport_px_w/h = PIXELS REAIS da janela
     // (o backend escala 960x540 por inteiro). LE a contagem/ordem do motor.
@@ -277,6 +387,43 @@ private:
     // nenhum. Primeiro player vivo (alvo das acoes de inimigo). nullptr se nenhum.
     [[nodiscard]] gus::domain::combat::CombatActor* first_alive_enemy() const;
     [[nodiscard]] gus::domain::combat::CombatActor* first_alive_player() const;
+
+    // ---- Modo-mira (helpers privados, §3.5) ----
+
+    // Entra em modo-mira para o verbo (Atacar/Scan): (re)constroi a lista de inimigos
+    // vivos-miraveis e pre-seleciona o alvo por D3. Retorna false (e NAO entra na mira) se
+    // nao ha inimigo vivo (vitoria iminente). Chamado pelo menu_confirm.
+    bool enter_aim_mode(BattleVerb verb);
+
+    // Reconstroi aim_candidates_ = inimigos VIVOS em queue().order() (frente->tras). O
+    // i-esimo candidato casa a ordem de "quem age antes" (o [0] == first_alive_enemy).
+    void rebuild_aim_candidates();
+
+    // Indice do alvo pre-selecionado (D3): (a) se ha inimigo escaneado FRACO a familia da
+    // acao (mult 1.5), o 1o desses na fila; senao (b) o [0] (front da fila = age antes).
+    [[nodiscard]] int preselect_aim_index(BattleVerb verb) const;
+
+    // ---- Escolha de ator / Janela de Comando da Party (helpers privados, §4.1) ----
+
+    // true se e a vez de um membro da party (queue_.current player-side vivo), o combate esta
+    // rolando (nao intro, nao fim) e ha MAIS DE UM elegivel pendente - entao o jogador ESCOLHE
+    // quem age. >1: com 1 so elegivel nao ha escolha (auto-inicia, sem friccao). Gate do modo.
+    [[nodiscard]] bool should_offer_actor_picker() const;
+
+    // Entra no modo de escolha: snapshot dos elegiveis (pending_party_actors) + cursor no
+    // pre-selecionado (front = maior SPD). NAO chama begin_turn (deferido ate o confirm).
+    void enter_actor_picker();
+
+    // O "begin" real do turno ativo (begin_turn + floaters/narracao + menu.refresh), extraido
+    // de start_active_turn pra o confirm INICIAR sem re-checar o gate do picker (nao re-entra).
+    void begin_active_turn_now();
+
+    // "Familia da acao" pro tier de fraqueza D3. O ataque BASICO nao usa a roda no motor
+    // (dano = atk-def) e o Scan e utilitario: FALLBACK documentado -> Atacar usa a familia
+    // do ATOR ATIVO (assinatura) pra a sugestao ser significativa; Scan nao tem familia
+    // (nullopt => branch (b) sempre). COMPILAR (carta com familia) fica fora deste incr.
+    [[nodiscard]] std::optional<gus::domain::combat::CardFamily> action_family(
+        BattleVerb verb) const;
 
     // Rotulo localizado de um verbo (tr() via translator_). Sem translator => devolve
     // string vazia (o render trata: a caixa colorida fica sem nome, mas nao crasha).
@@ -346,6 +493,29 @@ private:
     std::vector<LogLine> narration_;
     // Cursor do log do motor ja consumido pra narracao (so processa entradas NOVAS).
     std::size_t narration_cursor_ = 0;
+
+    // ---- Modo-mira / target selection (§3.5, D3) ----
+    // true enquanto o jogador escolhe o alvo (entre [Atacar]/[Scan] e o confirm/cancel).
+    bool aiming_ = false;
+    // Verbo que abriu a mira (so Atacar/Scan entram na mira neste incremento).
+    BattleVerb aim_verb_ = BattleVerb::Atacar;
+    // Cursor: indice do inimigo mirado em aim_candidates_.
+    int aim_index_ = 0;
+    // Inimigos VIVOS-miraveis (NAO-donos; vivem em actors_), em ordem de fila (frente->
+    // tras). Reconstruida ao entrar na mira; const porque a mira so LE o alvo.
+    std::vector<const gus::domain::combat::CombatActor*> aim_candidates_;
+
+    // ---- Escolha de ator / Janela de Comando da Party (§4.1) ----
+    // true enquanto o jogador escolhe QUAL membro da party age (begin_turn DEFERIDO ate o
+    // confirm). start_active_turn e no-op enquanto isto e true (o begin so vem no confirm).
+    bool choosing_actor_ = false;
+    // Cursor: indice do elegivel escolhido em actor_choices_ (0 = pre-selecionado ao entrar).
+    int actor_pick_index_ = 0;
+    // Elegiveis da escolha corrente (NAO-donos; vivem em actors_/na FSM), front = maior SPD
+    // (== machine().pending_party_actors()). NON-const de proposito: os MESMOS ponteiros vao
+    // pra machine_->select_party_actor (que pede CombatActor*). Preenchido ao entrar no modo,
+    // limpo ao confirmar.
+    std::vector<gus::domain::combat::CombatActor*> actor_choices_;
 };
 
 }  // namespace gus::app::screens

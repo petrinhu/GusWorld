@@ -191,6 +191,9 @@ Vez de {0}
 ## COMBAT_BANNER_ENEMY_TURN
 Vez de {0}
 
+## COMBAT_BANNER_CHOOSE_ACTOR
+Escolha quem age
+
 ## COMBAT_SELECT_TARGET
 Escolha o alvo:
 

@@ -26,6 +26,7 @@
 #ifndef GUS_DOMAIN_COMBAT_INITIATIVE_QUEUE_HPP
 #define GUS_DOMAIN_COMBAT_INITIATIVE_QUEUE_HPP
 
+#include <functional>
 #include <vector>
 
 #include "gus/domain/combat/combat_actor.hpp"
@@ -46,6 +47,11 @@ public:
     // Ator cujo turno e o corrente.
     [[nodiscard]] CombatActor* current() const noexcept { return order_[cursor_]; }
 
+    // Indice do slot do turno corrente (0-based). Simetrico a round_index(); usado pela
+    // Janela de Comando da Party (§4.1) para saber quem ainda nao agiu nesta rodada
+    // (slots >= cursor). Leitura pura.
+    [[nodiscard]] int cursor() const noexcept { return cursor_; }
+
     // Total de atores na fila.
     [[nodiscard]] int count() const noexcept { return static_cast<int>(order_.size()); }
 
@@ -65,6 +71,29 @@ public:
     // reorder_actor no proprio tick muda a ordem mas o ator NAO perde o turno). secao 4.
     // No-op se o ator nao esta na fila.
     void sync_cursor_to(CombatActor* actor);
+
+    // Traz `actor` para o SLOT DO CURSOR (passa a ser current()) SEM mexer no indice do
+    // cursor nem em round_index. Realiza a escolha do jogador dentro do bloco da party
+    // (Janela de Comando da Party, §4.1): reordena o ator ate o slot corrente, deslocando
+    // os demais para frente. E PERMUTACAO, nao salto de cursor, logo preserva "cada ator
+    // age uma vez por rodada". No-op se o ator nao esta na fila, ja e o current(), ou esta
+    // ATRAS do cursor (ja passou nesta rodada: nao pode ser puxado sem pular o current).
+    void bring_to_current(CombatActor* actor);
+
+    // Reagrupa a fila na FRONTEIRA da rodada, movendo para a FRENTE os atores que satisfazem
+    // `first_group` (na sua ordem relativa CORRENTE) e deixando os demais atras (idem), via
+    // std::stable_partition. E o primitivo do regroup-por-lado da Janela de Comando da Party
+    // (§4.1): a rodada vira "um lado age todo, depois o outro". Como e stable_partition (NAO
+    // sort), a ordem relativa DENTRO de cada grupo e preservada => um empurrao de Gambito/
+    // knockback aplicado na rodada anterior SOBREVIVE (Gambito-safe: um SORT por SPD o
+    // desfaria). A fila nao conhece "lado": quem abre e o predicado sao decididos pelo caller
+    // (CombatStateMachine).
+    //
+    // CONTRATO DE CURSOR: operacao de INICIO de rodada. O cursor volta a 0 (o primeiro ator do
+    // primeiro grupo passa a ser current()) e round_index NAO muda. Chamar SOMENTE na fronteira
+    // da rodada (onde o cursor ja e 0); no meio da rodada quebraria "cada ator age uma vez por
+    // rodada". No-op de ordenacao quando a fila ja esta agrupada.
+    void regroup_stable(const std::function<bool(const CombatActor*)>& first_group);
 
     // Avanca o ponteiro pro proximo ator. Ao dar a volta (wrap), incrementa round_index.
     void advance();

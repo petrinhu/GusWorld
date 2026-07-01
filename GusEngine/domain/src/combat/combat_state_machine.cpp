@@ -143,7 +143,14 @@ CombatStateMachine::CombatStateMachine(
 
     phase_ = CombatPhase::SetupPhase;
     outcome_ = CombatOutcome::Ongoing;
-    // SetupPhase -> TurnStart: a fila ja esta ordenada; o primeiro ator entra.
+
+    // Regroup por lado da RODADA 0 (§4.1): a fila ja veio ordenada por SPD; agrupa "quem abre
+    // inteiro, depois o outro" (stable_partition, Gambito-safe). Fronteira da 1a rodada => o
+    // cursor fica em 0 (primeiro ator do lado que abre). As rodadas 1+ reagrupam no wrap de
+    // advance_to_next_actor.
+    regroup_round_by_side();
+
+    // SetupPhase -> TurnStart: a fila ja esta ordenada e agrupada; o primeiro ator entra.
     phase_ = CombatPhase::TurnStart;
 }
 
@@ -187,11 +194,99 @@ void CombatStateMachine::advance_period_clock() {
 }
 
 // ---------------------------------------------------------------------------
+// Janela de Comando da Party (comando livre sobre o CTB, modelo 1B, §4.1)
+//
+// Extensao ADITIVA: nenhuma destas funcoes consome RNG nem muda a FORMA da FSM. A selecao
+// de ator e input do jogador/host; a resolucao de acao (§11) fica intacta. Sem chamada de
+// select_party_actor, begin_turn opera no queue_.current() de sempre (motor pre-1B).
+// ---------------------------------------------------------------------------
+
+CombatSide CombatStateMachine::round_opening_side() const {
+    // A SPD do lado (maior SPD entre os vivos) decide quem abre a rodada (§4.1). Empate
+    // favorece a party: o inimigo so pega a party primeiro se for ESTRITAMENTE mais rapido.
+    int party_max = -1;
+    int enemy_max = -1;
+    for (const CombatActor* a : queue_.order()) {
+        if (!a->is_alive()) continue;
+        if (a->is_player_side())
+            party_max = std::max(party_max, a->spd());
+        else
+            enemy_max = std::max(enemy_max, a->spd());
+    }
+    return party_max >= enemy_max ? CombatSide::Party : CombatSide::Enemy;
+}
+
+std::vector<CombatActor*> CombatStateMachine::pending_party_actors() const {
+    // Elegiveis = membros da party (player-side) vivos que ainda NAO agiram nesta rodada.
+    // "Ainda nao agiu" = slot >= cursor (o cursor caminha a rodada; slots < cursor ja
+    // agiram). Derivado da fila, sem estado extra. Ordenado por SPD desc (front =
+    // pre-selecionado); stable_sort espelha o desempate por ordem de fila da §4.
+    const std::vector<CombatActor*>& order = queue_.order();
+    const int cursor = queue_.cursor();
+    std::vector<CombatActor*> out;
+    for (int i = cursor; i < static_cast<int>(order.size()); ++i) {
+        CombatActor* a = order[static_cast<std::size_t>(i)];
+        if (a->is_player_side() && a->is_alive())
+            out.push_back(a);
+    }
+    std::stable_sort(out.begin(), out.end(), [](const CombatActor* x, const CombatActor* y) {
+        return x->spd() > y->spd();
+    });
+    return out;
+}
+
+CombatActor* CombatStateMachine::preselected_party_actor() const {
+    const std::vector<CombatActor*> pending = pending_party_actors();
+    return pending.empty() ? nullptr : pending.front();
+}
+
+bool CombatStateMachine::is_pending_party_actor(const CombatActor* actor) const {
+    if (actor == nullptr) return false;
+    for (const CombatActor* a : pending_party_actors())
+        if (a == actor) return true;
+    return false;
+}
+
+void CombatStateMachine::select_party_actor(CombatActor* actor) {
+    if (!is_pending_party_actor(actor))
+        throw std::invalid_argument(
+            "select_party_actor: '" + (actor != nullptr ? actor->id() : std::string{"<null>"}) +
+            "' nao e um membro elegivel da party nesta rodada (vivo, player-side, "
+            "ainda-nao-agiu). Consulte pending_party_actors().");
+    selected_next_party_ = actor;
+}
+
+void CombatStateMachine::regroup_round_by_side() {
+    // Quem ABRE (por SPD corrente entre os vivos; empate favorece a party). A fila nao conhece
+    // "lado": passamos um predicado que marca o lado que abre. party_opens verdadeiro => os
+    // atores player-side vao pra frente; falso => os enemy-side vao pra frente.
+    const bool party_opens = round_opening_side() == CombatSide::Party;
+    queue_.regroup_stable([party_opens](const CombatActor* a) {
+        return a->is_player_side() == party_opens;
+    });
+}
+
+// ---------------------------------------------------------------------------
 // Conducao da FSM
 // ---------------------------------------------------------------------------
 
 bool CombatStateMachine::begin_turn() {
     phase_ = CombatPhase::TurnStart;
+
+    // Janela de Comando da Party (1B, §4.1): se o host escolheu um membro elegivel via
+    // select_party_actor, traz ele para o slot do cursor ANTES de operar (comando livre).
+    // One-shot: consome e zera. Sem selecao (selected_next_party_ == nullptr), este bloco
+    // e no-op e begin_turn opera no queue_.current() de sempre => default byte-identico ao
+    // motor pre-1B (os testes de transicao existentes assumem isto). Re-valida a
+    // elegibilidade no consumo: se o estado mudou (ator morreu, ja agiu), degrada pro
+    // default em vez de forcar. NAO consome RNG.
+    if (selected_next_party_ != nullptr) {
+        CombatActor* chosen = selected_next_party_;
+        selected_next_party_ = nullptr;
+        if (is_pending_party_actor(chosen))
+            queue_.bring_to_current(chosen);
+    }
+
     CombatActor& actor = *queue_.current();
 
     actor.refresh_resources_for_turn(queue_.round_index());
@@ -286,8 +381,15 @@ void CombatStateMachine::advance_to_next_actor() {
     while (!queue_.current()->is_alive() && safety++ < queue_.count())
         queue_.advance();
 
-    if (queue_.round_index() > round_before)
+    if (queue_.round_index() > round_before) {
+        // Fronteira da rodada (o wrap acabou de dar a volta na fila): reagrupa por lado a nova
+        // rodada (§4.1) e avanca o relogio de periodo (§18.3). O regroup so acontece AQUI, na
+        // fronteira (nunca no meio da rodada): a esta altura prune_dead ja rodou e o cursor
+        // esta em 0, entao ele so pode reordenar atores pendentes desta nova rodada. Reagrupar
+        // AQUI (e nao a cada advance) preserva o comando livre da Fase 1 dentro da rodada.
+        regroup_round_by_side();
         advance_period_clock();
+    }
 }
 
 CombatResult CombatStateMachine::run_until_end() {
@@ -377,6 +479,30 @@ void CombatStateMachine::resolve_action(CombatActor& actor, const CombatAction& 
         default:
             throw std::out_of_range("Tipo de acao de combate desconhecido.");
     }
+}
+
+int CombatStateMachine::preview_basic_attack_damage(
+    const CombatActor& attacker, const CombatActor& target) const noexcept {
+    // Dano bruto IDENTICO a resolve_basic_attack (logo abaixo). Mantido em sincronia.
+    const int raw = std::max(combat_constants::kMinDamage, attacker.atk() - target.def());
+
+    // Absorcao de Shield espelhada de CombatActor::absorb_with_shield, SEM mutar: pega a
+    // magnitude do Shield ativo (0 se ausente) e devolve o remanescente que bateria no HP.
+    // absorbed = min(raw, magnitude); com absorbed <= 0 (sem Shield ou pool vazio) a perda
+    // e o dano bruto (espelha o early-return de absorb_with_shield). Piso 0 vem de raw -
+    // min(raw, mag) = max(0, raw - mag) quando mag > 0.
+    int shield_magnitude = 0;
+    for (const StatusEffect& s : target.status_effects()) {
+        if (s.id == StatusId::Shield) {
+            shield_magnitude = s.magnitude;
+            break;
+        }
+    }
+    const int absorbed = std::min(raw, shield_magnitude);
+    if (absorbed <= 0) {
+        return raw;
+    }
+    return raw - absorbed;
 }
 
 void CombatStateMachine::resolve_basic_attack(CombatActor& attacker,

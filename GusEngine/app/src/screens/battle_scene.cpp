@@ -33,6 +33,7 @@
 #include "gus/domain/combat/combat_enums.hpp"
 #include "gus/domain/combat/combat_records.hpp"
 #include "gus/domain/combat/combat_state.hpp"  // CombatState (preview_intent)
+#include "gus/domain/combat/weakness_wheel.hpp"  // WeaknessWheel (pre-selecao D3 de mira)
 #include "gus/platform/render2d/text_metrics.hpp"  // text_width (centrar floater)
 
 namespace gus::app::screens {
@@ -131,6 +132,16 @@ constexpr DrawColor kIntentMarkColor{0.95f, 0.75f, 0.20f, 1.0f};  // placeholder
 // Pixel Operator densa/nitida e GRANDE o bastante pra o criador VER o dano no canvas
 // maior. Sobe sobre o alvo e some por fade.
 constexpr float kFloaterTextPx = 24.0f;
+
+// --- MODO-MIRA (§3.5, D3): destaque MULTIMODAL do inimigo mirado (Pillar 4/WCAG) ---
+// A mira e CYAN na paleta canonica ("party/ativo/mira/CRIT"). Mas cor NUNCA basta
+// (daltonismo): o alvo mirado ganha (1) CONTORNO reticulo (outline duplo, distinto do
+// outline simples do ativo), (2) SETA em forma pura (caret ►, a esquerda do slot), e
+// (3) NOME + HP em texto legivel. As 3 pistas sobrevivem em escala de cinza.
+constexpr DrawColor kMiraColor = kCyan;         // cor da mira (cyan canonico)
+constexpr float kMiraLabelPx = 12.0f;           // texto do nome/HP do alvo mirado
+constexpr float kMiraCaretW = 3.0f;             // largura de cada coluna do caret ►
+constexpr float kMiraFracoPipSize = 6.0f;       // pip do tier "fraco" (latao) se escaneado
 
 // Banner de turno (D9/D10): tamanho + cor. Texto grande e centrado abaixo da fila CTB.
 // 24px (1.5x os 16px do 640x360) pra dominar a tela maior na abertura.
@@ -262,6 +273,7 @@ void draw_pips(IRenderer& r, float x, float y, int total, int lit, int max_pips,
 }  // namespace
 
 // Aliases de dominio usados pelas DEFINICOES de metodo abaixo (fora do anon namespace).
+using gus::domain::combat::CardFamily;
 using gus::domain::combat::CombatAction;
 using gus::domain::combat::CombatActor;
 using gus::domain::combat::CombatOutcome;
@@ -548,6 +560,9 @@ std::string_view BattleScene::turn_banner_key() const noexcept {
     if (is_intro()) {
         return "COMBAT_BANNER_BATTLE";  // "BATALHA!"
     }
+    if (choosing_actor_) {
+        return "COMBAT_BANNER_CHOOSE_ACTOR";  // "ESCOLHA QUEM AGE" (§4.1, comando-livre 1B)
+    }
     if (current_actor_is_player()) {
         return "COMBAT_BANNER_PLAYER_TURN";  // "TURNO DE {0}" / "SUA VEZ"
     }
@@ -592,6 +607,30 @@ void BattleScene::start_active_turn() {
     if (turn_started_ || combat_over()) {
         return;
     }
+    // ESCOLHA DE ATOR (§4.1, comando-livre 1B): enquanto o picker esta aberto, o begin_turn
+    // fica DEFERIDO - so o actor_picker_confirm inicia o turno (via begin_active_turn_now).
+    if (choosing_actor_) {
+        return;
+    }
+    // E a vez do BLOCO da party com >1 elegivel? Entao NAO inicia o turno ainda: entra no modo
+    // de escolha e espera o jogador comandar QUAL membro age (a SPD so SUGERE o pre-selecionado,
+    // §4.1). O begin_turn vem depois, no confirm. Com <=1 elegivel (ou vez de inimigo/intro), o
+    // fluxo segue direto (begin_active_turn_now) => identico ao motor pre-picker.
+    if (should_offer_actor_picker()) {
+        enter_actor_picker();
+        return;
+    }
+    begin_active_turn_now();
+}
+
+void BattleScene::begin_active_turn_now() {
+    // O "begin" real do turno ativo (parte extraida de start_active_turn). Chamado por
+    // start_active_turn (quando NAO ha picker) e pelo actor_picker_confirm (apos gravar a
+    // escolha). O confirm NAO reentra por start_active_turn de proposito: aquele re-checaria
+    // should_offer_actor_picker (que ainda veria pending>1) e re-abriria o modo em loop.
+    if (turn_started_ || combat_over()) {
+        return;
+    }
     machine_->begin_turn();
     turn_started_ = true;
     enemy_acted_this_turn_ = false;  // novo turno: o inimigo (se for) pode agir 1 vez
@@ -623,6 +662,9 @@ void BattleScene::menu_move(int delta) noexcept {
     if (combat_over() || !current_actor_is_player()) {
         return;  // menu so opera no turno de jogador vivo
     }
+    if (choosing_actor_) {
+        return;  // escolha de ator (§4.1): o menu de verbos ainda nao existe (begin deferido)
+    }
     menu_.move(delta);
 }
 
@@ -630,9 +672,24 @@ void BattleScene::menu_confirm() {
     if (combat_over() || !current_actor_is_player()) {
         return;
     }
+    if (choosing_actor_) {
+        return;  // escolha de ator (§4.1): confirme o ATOR primeiro (actor_picker_confirm);
+                 // o turno (e o menu de verbos) so comeca depois. Guarda o begin deferido.
+    }
+    if (aiming_) {
+        return;  // ja em modo-mira: o jogador usa aim_confirm/aim_cancel, nao o menu
+    }
     const BattleVerb verb = menu_.selected_verb();
     if (!menu_.is_enabled(verb)) {
         return;  // verbo sem AP: confirm e no-op (o item fica visivel acinzentado)
+    }
+
+    // MODO-MIRA (§3.5, D3): [Atacar]/[Scan] NAO resolvem na hora (fim do hardcode
+    // first_alive_enemy). Entram em modo-mira; o jogador navega e confirma o ALVO (o
+    // motor ja resolve qualquer target_id). aim_confirm() monta a acao com o alvo escolhido.
+    if (verb == BattleVerb::Atacar || verb == BattleVerb::Scan) {
+        enter_aim_mode(verb);  // no-op se nao ha inimigo vivo (vitoria iminente)
+        return;
     }
 
     CombatActor* self = active_actor() != nullptr
@@ -650,27 +707,14 @@ void BattleScene::menu_confirm() {
         return;
     }
 
-    // Monta a CombatAction real conforme o verbo (alvo default: 1o inimigo vivo pras
-    // ofensivas; self pro Defender; sem alvo pro Flee). combat.md par.5 (custos de AP ja
-    // vem das factories).
+    // Monta a CombatAction real dos verbos SEM mira (self pro Defender; sem alvo pro Flee;
+    // Gambito ainda placeholder). Atacar/Scan sairam do switch: agora passam pelo modo-mira
+    // (acima) e resolvem no aim_confirm. combat.md par.5 (custos de AP vem das factories).
     CombatAction action = CombatAction::pass();
     switch (verb) {
-        case BattleVerb::Atacar: {
-            const CombatActor* t = first_alive_enemy();
-            if (t == nullptr) {
-                return;
-            }
-            action = CombatAction::attack(t->id());
-            break;
-        }
-        case BattleVerb::Scan: {
-            const CombatActor* t = first_alive_enemy();
-            if (t == nullptr) {
-                return;
-            }
-            action = CombatAction::scan(t->id());
-            break;
-        }
+        case BattleVerb::Atacar:
+        case BattleVerb::Scan:
+            return;  // tratados via modo-mira (enter_aim_mode acima); nunca caem aqui
         case BattleVerb::Gambito: {
             // Gambito-Prever exige IEnemyBrain registrado (a demo nao registra brains):
             // no incremento 3 sinaliza no log e NAO submete (evita excecao do motor).
@@ -698,6 +742,269 @@ void BattleScene::menu_confirm() {
     menu_.refresh(active_actor() != nullptr ? active_actor()->ap() : 0);
 }
 
+// ---- Modo-mira / target selection (§3.5, D3) -------------------------------------
+// APRESENTACAO PURA: navega/confirma o ALVO; o motor (resolve_primary_target) ja aceita
+// qualquer target_id. Substitui o hardcode first_alive_enemy de Atacar/Scan. So teclado.
+
+void BattleScene::rebuild_aim_candidates() {
+    // Inimigos VIVOS em ordem de fila (frente->tras): o [0] == first_alive_enemy (o mais a
+    // frente = age antes, fallback D3 (b)). Exclui MORTOS (a mira nunca pousa num morto).
+    aim_candidates_.clear();
+    for (const CombatActor* a : machine_->queue().order()) {
+        if (a != nullptr && !a->is_player_side() && a->is_alive()) {
+            aim_candidates_.push_back(a);
+        }
+    }
+}
+
+std::optional<CardFamily> BattleScene::action_family(BattleVerb verb) const {
+    // FALLBACK documentado (§3.5): o motor NAO aplica a roda de fraqueza no ataque BASICO
+    // (dano = atk - def, resolve_basic_attack) e o Scan e utilitario sem familia. Pra a
+    // sugestao D3 (a) ser significativa e "premiar o Scan", ATACAR usa a familia-assinatura
+    // do ATOR ATIVO como "familia da acao". SCAN nao tem familia (nullopt): cai sempre no
+    // fallback (b) (o front da fila = ameaca iminente; escanear um ja-escaneado nao ajuda).
+    // COMPILAR (carta COM familia propria) entra num incremento futuro.
+    if (verb == BattleVerb::Atacar) {
+        const CombatActor* self = active_actor();
+        if (self != nullptr) {
+            return self->family();
+        }
+    }
+    return std::nullopt;
+}
+
+int BattleScene::preselect_aim_index(BattleVerb verb) const {
+    // D3 (a): havendo info de Scan, mira o 1o inimigo (na ordem de fila) ESCANEADO e FRACO
+    // (multFraqueza 1.5) a familia da acao. Premia o Scan (Pillar 1: info habilita acao).
+    const std::optional<CardFamily> fam = action_family(verb);
+    if (fam.has_value()) {
+        for (int i = 0; i < static_cast<int>(aim_candidates_.size()); ++i) {
+            const CombatActor* e = aim_candidates_[static_cast<std::size_t>(i)];
+            if (e->is_scanned() && !e->is_universal_compiler() &&
+                gus::domain::combat::WeaknessWheel::multiplier(*fam, e->family()) ==
+                    gus::domain::combat::combat_constants::kMultFraco) {
+                return i;
+            }
+        }
+    }
+    // D3 (b) fallback: front da fila (== first_alive_enemy) = aim_candidates_[0].
+    return 0;
+}
+
+bool BattleScene::enter_aim_mode(BattleVerb verb) {
+    rebuild_aim_candidates();
+    if (aim_candidates_.empty()) {
+        return false;  // sem inimigo vivo: nao entra na mira (vitoria iminente)
+    }
+    aim_verb_ = verb;
+    aiming_ = true;
+    aim_index_ = preselect_aim_index(verb);
+    return true;
+}
+
+void BattleScene::aim_move(int delta) noexcept {
+    if (!aiming_ || aim_candidates_.empty()) {
+        return;
+    }
+    const int n = static_cast<int>(aim_candidates_.size());
+    aim_index_ = ((aim_index_ + delta) % n + n) % n;  // WRAP nos extremos
+}
+
+void BattleScene::aim_select(int index) noexcept {
+    // MOUSE (Incremento A2): pousa a mira DIRETO no index (sem wrap). No-op fora da mira ou
+    // com index invalido (nao mexe no cursor corrente).
+    if (!aiming_ || index < 0 || index >= static_cast<int>(aim_candidates_.size())) {
+        return;
+    }
+    aim_index_ = index;
+}
+
+int BattleScene::aim_index_at_arena(float world_x, float world_y) const {
+    // Casa o ponto (mundo/logico) com o SLOT de cada inimigo MIRAVEL. aim_candidates_ segue a
+    // ordem de fila dos inimigos vivos, a MESMA base que arena_rect_for_actor usa pra ordenar
+    // os slots -> o i-esimo candidato casa o i-esimo slot. Fora da mira a lista e vazia (-1).
+    for (int i = 0; i < static_cast<int>(aim_candidates_.size()); ++i) {
+        const CombatActor* e = aim_candidates_[static_cast<std::size_t>(i)];
+        if (e == nullptr) {
+            continue;
+        }
+        const std::optional<gus::core::spatial::Rect> slot = arena_rect_for_actor(e->id());
+        if (!slot.has_value()) {
+            continue;  // alvo sem slot visivel (nao deveria, mira so tem vivos): pula
+        }
+        const gus::core::spatial::Rect& r = *slot;
+        if (world_x >= r.x && world_x <= r.x + r.w && world_y >= r.y &&
+            world_y <= r.y + r.h) {
+            return i;
+        }
+    }
+    return -1;
+}
+
+const CombatActor* BattleScene::aim_target() const noexcept {
+    if (!aiming_ || aim_index_ < 0 ||
+        aim_index_ >= static_cast<int>(aim_candidates_.size())) {
+        return nullptr;
+    }
+    return aim_candidates_[static_cast<std::size_t>(aim_index_)];
+}
+
+void BattleScene::aim_cancel() noexcept {
+    // Volta ao menu de verbos SEM consumir o turno: nada resolve, o pacing segue em
+    // WaitingPlayerInput e o menu do ator ativo continua ativo.
+    aiming_ = false;
+    aim_index_ = 0;
+    aim_candidates_.clear();
+}
+
+void BattleScene::aim_confirm() {
+    if (!aiming_) {
+        return;
+    }
+    const CombatActor* t = aim_target();
+    if (t == nullptr) {
+        aim_cancel();  // sem alvo valido: aborta a mira sem consumir turno
+        return;
+    }
+    // Monta a acao com o ALVO ESCOLHIDO (nao mais o hardcode first_alive_enemy).
+    CombatAction action = (aim_verb_ == BattleVerb::Scan)
+                              ? CombatAction::scan(t->id())
+                              : CombatAction::attack(t->id());
+    // Sai da mira ANTES de resolver (o turno avanca; o proximo turno reabre o menu).
+    aiming_ = false;
+    aim_index_ = 0;
+    aim_candidates_.clear();
+    // Mesmo fluxo do menu_confirm antigo (pacing incr 6): resolve so o turno do jogador; o
+    // update(dt) anima os inimigos um a um depois (player_acted entra em delay).
+    pending_action_ = std::move(action);
+    resolve_one_turn();
+    pacing_.player_acted();
+    menu_.refresh(active_actor() != nullptr ? active_actor()->ap() : 0);
+}
+
+// ---- Escolha de ator / Janela de Comando da Party (§4.1, comando-livre 1B) ----------
+// APRESENTACAO PURA sobre o motor 1B: a cena so deixa o jogador ESCOLHER qual membro
+// pendente da party age; o motor (pending_party_actors/select_party_actor) faz o resto
+// (agrupar por lado, recomputar quem abre, regroup Gambito-safe). O begin_turn e DEFERIDO
+// ate o confirm (start_active_turn e no-op enquanto choosing_actor_).
+
+bool BattleScene::should_offer_actor_picker() const {
+    // Gate do modo: e a vez do bloco da party, o combate esta rolando (nao intro/nao fim) e ha
+    // MAIS DE UM elegivel. active_actor() == queue_.current(); apos o regroup por lado (§4.1) o
+    // bloco da party e contiguo, entao "current e player-side vivo" == "abriu o bloco da party".
+    //
+    // >1 (DECISAO documentada): com 1 so elegivel NAO ha escolha a fazer - a cena auto-inicia o
+    // turno (sem friccao). O picker existe pra dar AGENCIA sobre QUEM age; com um unico pendente
+    // nao ha agencia a exercer (distinto da mira, cujo confirm COMPROMETE um ataque com previa
+    // de dano). Isto reforca o modelo mental "escolho quando ha varios". Trocar pra ">= 1"
+    // (mostrar sempre, como a mira com 1 alvo) e UMA LINHA, se o lider preferir consistencia.
+    if (combat_over() || is_intro()) {
+        return false;
+    }
+    const CombatActor* a = active_actor();
+    if (a == nullptr || !a->is_player_side() || !a->is_alive()) {
+        return false;
+    }
+    return machine_->pending_party_actors().size() > 1;
+}
+
+void BattleScene::enter_actor_picker() {
+    // Snapshot dos elegiveis (maior SPD -> menor; front = pre-selecionado). Cursor no front.
+    // NAO chama begin_turn: o turno so comeca no confirm (begin_active_turn_now).
+    actor_choices_ = machine_->pending_party_actors();
+    choosing_actor_ = true;
+    actor_pick_index_ = 0;  // front de pending_party_actors == preselected_party_actor (SPD)
+}
+
+std::vector<const CombatActor*> BattleScene::actor_choices() const {
+    return std::vector<const CombatActor*>(actor_choices_.begin(), actor_choices_.end());
+}
+
+const CombatActor* BattleScene::actor_pick_target() const noexcept {
+    if (!choosing_actor_ || actor_pick_index_ < 0 ||
+        actor_pick_index_ >= static_cast<int>(actor_choices_.size())) {
+        return nullptr;
+    }
+    return actor_choices_[static_cast<std::size_t>(actor_pick_index_)];
+}
+
+void BattleScene::actor_picker_move(int delta) noexcept {
+    if (!choosing_actor_ || actor_choices_.empty()) {
+        return;
+    }
+    const int n = static_cast<int>(actor_choices_.size());
+    actor_pick_index_ = ((actor_pick_index_ + delta) % n + n) % n;  // WRAP nos extremos
+}
+
+void BattleScene::actor_picker_select(int index) noexcept {
+    // MOUSE/atalho: poe o cursor DIRETO no index (sem wrap). No-op fora do modo ou invalido.
+    if (!choosing_actor_ || index < 0 ||
+        index >= static_cast<int>(actor_choices_.size())) {
+        return;
+    }
+    actor_pick_index_ = index;
+}
+
+int BattleScene::actor_pick_index_at_arena(float world_x, float world_y) const {
+    // Casa o ponto (mundo/logico) com o SLOT de cada elegivel. arena_rect_for_actor e generico
+    // por id (trata party E inimigo), entao vale pros membros da party (confirmado: ele separa
+    // os lados e devolve o slot certo). Fora do modo a lista e vazia (-1). Mesma logica de
+    // aim_index_at_arena, sobre actor_choices_ (party) -> reusa o pipeline de hit-test do A2.
+    for (int i = 0; i < static_cast<int>(actor_choices_.size()); ++i) {
+        const CombatActor* p = actor_choices_[static_cast<std::size_t>(i)];
+        if (p == nullptr) {
+            continue;
+        }
+        const std::optional<gus::core::spatial::Rect> slot = arena_rect_for_actor(p->id());
+        if (!slot.has_value()) {
+            continue;
+        }
+        const gus::core::spatial::Rect& r = *slot;
+        if (world_x >= r.x && world_x <= r.x + r.w && world_y >= r.y &&
+            world_y <= r.y + r.h) {
+            return i;
+        }
+    }
+    return -1;
+}
+
+void BattleScene::actor_picker_confirm() {
+    if (!choosing_actor_) {
+        return;
+    }
+    if (actor_pick_index_ < 0 ||
+        actor_pick_index_ >= static_cast<int>(actor_choices_.size())) {
+        return;  // defensivo (cursor invalido): nao confirma
+    }
+    CombatActor* chosen = actor_choices_[static_cast<std::size_t>(actor_pick_index_)];
+    // Grava a escolha no motor (comando livre 1B, §4.1). machine_-> = acesso NAO-const (mesmo
+    // padrao de menu_confirm/aim_confirm; o machine() publico e const). select_party_actor
+    // lanca std::invalid_argument se `chosen` nao e elegivel; como actor_choices_ veio de
+    // pending_party_actors e nada mutou o motor no meio, ele SEMPRE e elegivel.
+    machine_->select_party_actor(chosen);
+    choosing_actor_ = false;
+    actor_choices_.clear();
+    actor_pick_index_ = 0;
+    // begin_turn consome a escolha (traz o ator ao cursor) e prossegue como hoje: menu de
+    // verbos do ATOR ESCOLHIDO. NAO reentra por start_active_turn (evita re-abrir o picker).
+    begin_active_turn_now();
+}
+
+void BattleScene::actor_picker_hotkey(int nth) {
+    // TECLA-ATALHO 1/2/3: escolhe o nth-esimo elegivel (1-based) e CONFIRMA na hora. No-op se
+    // fora do modo ou nth sem elegivel (fora de faixa) - assim "apertar 3 com so 2 pendentes"
+    // nao faz nada (nem seleciona, nem confirma). Fonte unica do host (teclas) e dos testes.
+    if (!choosing_actor_) {
+        return;
+    }
+    const int idx = nth - 1;  // 1-based -> 0-based
+    if (idx < 0 || idx >= static_cast<int>(actor_choices_.size())) {
+        return;  // numero sem elegivel: no-op
+    }
+    actor_pick_index_ = idx;
+    actor_picker_confirm();
+}
+
 std::vector<LogLine> BattleScene::log_lines(int max_lines) const {
     // NARRACAO do combate (D12, incremento 6): as linhas ja vem montadas em narration_
     // (acao + dano + consequencia de status), no ritmo do pacing. Junta as linhas de UI
@@ -717,6 +1024,36 @@ int BattleScene::queue_len() const noexcept { return machine_->queue().count(); 
 
 const CombatActor* BattleScene::active_actor() const noexcept {
     return machine_->active_actor();
+}
+
+std::vector<const CombatActor*> BattleScene::ctb_window() const {
+    const std::vector<CombatActor*>& order = machine_->queue().order();
+    const int n = static_cast<int>(order.size());
+    std::vector<const CombatActor*> out;
+    if (n == 0) {
+        return out;  // fila vazia (nunca em pratica): janela vazia, sem UB no cursor
+    }
+    // Indice do ator ATIVO dentro da fila. active_actor() == queue().current() ==
+    // order[cursor_] do dominio; achamos esse cursor por IDENTIDADE de ponteiro (os atores
+    // sao unicos). Assim a rotacao vive INTEIRA na camada app/ (consumidor), SEM expor o
+    // cursor do dominio nem tocar a invariante das 4 camadas (domain/ POCO intocado).
+    const CombatActor* active = active_actor();
+    int start = 0;
+    for (int i = 0; i < n; ++i) {
+        if (order[static_cast<std::size_t>(i)] == active) {
+            start = i;
+            break;  // fallback graceful (start=0) se active nao esta na fila
+        }
+    }
+    // Janela ROTACIONADA: ate kCtbVisibleCells atores consecutivos (mod n) a partir do
+    // ativo. O teto min(n, kCtbVisibleCells) garante que NENHUM ator se repete quando a fila
+    // e curta (<=5): damos no maximo uma volta PARCIAL, nunca reincluindo o slot 0.
+    const int count = std::min(n, kCtbVisibleCells);
+    out.reserve(static_cast<std::size_t>(count));
+    for (int i = 0; i < count; ++i) {
+        out.push_back(order[static_cast<std::size_t>((start + i) % n)]);
+    }
+    return out;
 }
 
 int BattleScene::gus_party_index() const {
@@ -813,8 +1150,10 @@ void BattleScene::render(IRenderer& renderer, float viewport_px_w,
                       a->mana(), gus::domain::combat::combat_constants::kManaCap,
                       kManaLitColor, kManaOffColor);
 
-            // MENU de verbos EMPILHADO (so no turno de jogador vivo).
-            if (current_actor_is_player() && !combat_over()) {
+            // MENU de verbos EMPILHADO (so no turno de jogador vivo). Suprimido durante a
+            // ESCOLHA DE ATOR (§4.1): o begin_turn esta deferido, entao nao ha turno cujo
+            // menu mostrar - o jogador escolhe QUEM age primeiro (destaque na arena, abaixo).
+            if (current_actor_is_player() && !combat_over() && !choosing_actor_) {
                 const Rect mz = cockpit_menu_zone();
                 renderer.draw_text("ACAO", mz.x, mz.y - kCockpitLabelPx - 2.0f,
                                    kCockpitLabelPx, kInkDim, /*bold=*/false);
@@ -848,17 +1187,23 @@ void BattleScene::render(IRenderer& renderer, float viewport_px_w,
     // seguem intactos. kCtbBandColor deixa de ser usado aqui.
     {
         const CtbStrip strip = ctb_strip(queue_len());
-        const auto& order = machine_->queue().order();
+        // JANELA ROTACIONADA (fix da fila CTB): os atores a mostrar vem de ctb_window(), que
+        // COMECA no ator ATIVO e segue a ordem de jogo com wrap - NAO mais os top-5 fixos por
+        // SPD (bug: atores de SPD baixa, ex. Jaci, nunca apareciam, e o destaque "ativo"
+        // ficava preso no slot de maior SPD). window[0] = ativo; window[1] = proximo; etc.
+        const std::vector<const CombatActor*> window = ctb_window();
         const CombatActor* active = active_actor();
         for (int i = 0; i < kCtbVisibleCells; ++i) {
             const CtbCell& cell = strip.cells[static_cast<std::size_t>(i)];
             if (!cell.occupied) {
                 continue;
             }
-            // O ator desta celula (a fila do motor ja exclui mortos/incapacitados, que
-            // o motor remove em advance/prune: a fila CTB reflete so quem ainda joga).
-            const CombatActor* who =
-                (i < static_cast<int>(order.size())) ? order[i] : nullptr;
+            // O ator desta celula vem da janela rotacionada (a fila do motor ja exclui
+            // mortos/incapacitados, que o motor remove em advance/prune: a fila CTB reflete
+            // so quem ainda joga).
+            const CombatActor* who = (i < static_cast<int>(window.size()))
+                                         ? window[static_cast<std::size_t>(i)]
+                                         : nullptr;
 
             // Retrato 48px se carregavel; senao retangulo da celula.
             TextureId tex = kInvalidTexture;
@@ -1016,6 +1361,129 @@ void BattleScene::render(IRenderer& renderer, float viewport_px_w,
                         } else {
                             renderer.draw_filled_rect(ibox, kMagentaDim);
                             renderer.draw_rect_outline(ibox, kMagenta, 1.0f);
+                        }
+                    }
+                }
+
+                // MIRA (§3.5, D3): destaque MULTIMODAL do inimigo mirado (contorno + seta
+                // + nome/HP), NUNCA so cor (Pillar 4/WCAG). Reusa as primitivas de outline/
+                // rect/text (mesma tecnica do highlight do ativo). So o alvo mirado.
+                if (!is_party && aiming_ && a == aim_target()) {
+                    // (1) CONTORNO: reticulo = outline DUPLO (externo grosso + interno
+                    //     fino), distinto do outline simples do ator ativo.
+                    renderer.draw_rect_outline(r, kMiraColor, 3.0f);
+                    const Rect inner{r.x + 3.0f, r.y + 3.0f, r.w - 6.0f, r.h - 6.0f};
+                    renderer.draw_rect_outline(inner, kMiraColor, 1.0f);
+                    // (2) SETA: caret >> (forma PURA por rects, nao so cor), a ESQUERDA do
+                    //     slot, centrado na vertical - nao colide com o intent (acima) nem
+                    //     a barra de HP (abaixo). 3 colunas de altura decrescente = aponta
+                    //     pro slot.
+                    const float acy = r.y + r.h * 0.5f;
+                    for (int c = 0; c < 3; ++c) {
+                        const float ch = 12.0f - static_cast<float>(c) * 4.0f;  // 12,8,4
+                        const Rect bar{r.x - 12.0f + static_cast<float>(c) * kMiraCaretW,
+                                       acy - ch * 0.5f, kMiraCaretW, ch};
+                        renderer.draw_filled_rect(bar, kMiraColor);
+                    }
+                    // (3) NOME + HP do alvo em TEXTO legivel (WCAG): nome acima do slot
+                    //     (sobre o intent), "hp/max" a direita. Usa display_name direto (sem
+                    //     translator), como o cockpit faz com o ator ativo.
+                    const std::string nm = a->display_name();
+                    renderer.draw_text(nm.c_str(), r.x,
+                                       r.y - kIntentIconSize - kMiraLabelPx - 3.0f,
+                                       kMiraLabelPx, kMiraColor, /*bold=*/true);
+                    char hpn[40];
+                    std::snprintf(hpn, sizeof(hpn), "%d/%d", a->hp(), a->max_hp());
+                    renderer.draw_text(hpn, r.x + r.w + 2.0f,
+                                       r.y + (r.h - kMiraLabelPx) * 0.5f, kMiraLabelPx,
+                                       kMiraColor, /*bold=*/false);
+                    // (4) TIER DE FRAQUEZA (§3.5 "se ja escaneado, o tier vs a acao"): alvo
+                    //     ESCANEADO e FRACO a familia da acao ganha um pip LATAO (paleta:
+                    //     "latao = fraqueza"). APRESENTACAO PURA: usa o fallback de familia
+                    //     (action_family) - o ataque BASICO nao aplica a roda no motor.
+                    if (a->is_scanned()) {
+                        const std::optional<CardFamily> fam = action_family(aim_verb_);
+                        if (fam.has_value() && !a->is_universal_compiler() &&
+                            gus::domain::combat::WeaknessWheel::multiplier(
+                                *fam, a->family()) ==
+                                gus::domain::combat::combat_constants::kMultFraco) {
+                            const Rect fp{r.x + r.w + 2.0f, r.y, kMiraFracoPipSize,
+                                          kMiraFracoPipSize};
+                            renderer.draw_filled_rect(fp, kBrass);
+                        }
+                    }
+                    // (5) PREVIA DE DANO (feedback do lider no display): SO em [Atacar]
+                    //     (Scan e utilitario, nao bate). Mostra a perda de HP PREVISTA no
+                    //     alvo mirado ANTES de confirmar, atualizando AO VIVO por alvo.
+                    //     Numero PURO do motor (preview_basic_attack_damage: dano bruto -
+                    //     absorcao de Shield, piso 0) - a cena NUNCA recalcula regra, so LE.
+                    //     "-N" = HP que sai (mesma convencao "-N" da narracao do log); cor =
+                    //     a do numero de dano COMUM do floater (destaca do HP ciano). Pillar
+                    //     4/WCAG: e NUMERO, nao so cor. Fecha o cluster de info logo ABAIXO
+                    //     do "hp/max", no lado direito do slot.
+                    if (aim_verb_ == BattleVerb::Atacar) {
+                        const CombatActor* attacker = active_actor();
+                        if (attacker != nullptr) {
+                            const int dano =
+                                machine().preview_basic_attack_damage(*attacker, *a);
+                            char dmg[24];
+                            std::snprintf(dmg, sizeof(dmg), "-%d", dano);
+                            const float hp_y = r.y + (r.h - kMiraLabelPx) * 0.5f;
+                            renderer.draw_text(
+                                dmg, r.x + r.w + 2.0f, hp_y + kMiraLabelPx + 2.0f,
+                                kMiraLabelPx, floater_color_for_channel(HitChannel::Common),
+                                /*bold=*/true);
+                        }
+                    }
+                }
+
+                // ESCOLHA DE ATOR (§4.1, comando-livre 1B): destaque MULTIMODAL dos membros
+                // ELEGIVEIS da party e do PRE-SELECIONADO/cursor. NUNCA so cor (Pillar 4/WCAG):
+                // (a) TODO elegivel ganha um BADGE numerado (= a tecla-atalho 1/2/3) + contorno;
+                // (b) o CURSOR ganha reticulo (outline duplo) + caret + NOME. So no lado da
+                // party. Reusa a tecnica do realce da mira (kMiraColor/caret/nome), aqui em cyan
+                // (cor da party) - sem conflito visual com a mira (inimigos, a direita).
+                if (is_party && choosing_actor_) {
+                    int choice_idx = -1;
+                    for (int ci = 0; ci < static_cast<int>(actor_choices_.size()); ++ci) {
+                        if (actor_choices_[static_cast<std::size_t>(ci)] == a) {
+                            choice_idx = ci;
+                            break;
+                        }
+                    }
+                    if (choice_idx >= 0) {
+                        const bool is_cursor = (a == actor_pick_target());
+                        // (1) CONTORNO cyan. Elegivel = fino; cursor = reticulo (outline duplo).
+                        renderer.draw_rect_outline(r, kMiraColor, is_cursor ? 3.0f : 1.0f);
+                        if (is_cursor) {
+                            const Rect inr{r.x + 3.0f, r.y + 3.0f, r.w - 6.0f, r.h - 6.0f};
+                            renderer.draw_rect_outline(inr, kMiraColor, 1.0f);
+                        }
+                        // (2) BADGE numerado (tecla-atalho): quadrado no canto sup-esq + o
+                        //     digito (i+1). Forma PURA (rect) + TEXTO (digito) => multimodal; o
+                        //     digito ENSINA a tecla 1/2/3. Cursor = badge PREENCHIDO (contraste).
+                        const Rect badge{r.x - 2.0f, r.y - 2.0f, 14.0f, 14.0f};
+                        renderer.draw_filled_rect(
+                            badge, is_cursor ? kMiraColor : kSlotDarkColor);
+                        renderer.draw_rect_outline(badge, kMiraColor, 1.0f);
+                        char num[4];
+                        std::snprintf(num, sizeof(num), "%d", choice_idx + 1);
+                        renderer.draw_text(num, badge.x + 4.0f, badge.y + 2.0f, 10.0f,
+                                           is_cursor ? kBgColor : kMiraColor, /*bold=*/true);
+                        // (3) CURSOR: caret (forma pura, 3 colunas) a ESQUERDA do slot +
+                        //     NOME (texto legivel) acima. Mesmo vocabulario da mira (WCAG).
+                        if (is_cursor) {
+                            const float acy = r.y + r.h * 0.5f;
+                            for (int c = 0; c < 3; ++c) {
+                                const float ch = 12.0f - static_cast<float>(c) * 4.0f;
+                                const Rect bar{
+                                    r.x - 12.0f + static_cast<float>(c) * kMiraCaretW,
+                                    acy - ch * 0.5f, kMiraCaretW, ch};
+                                renderer.draw_filled_rect(bar, kMiraColor);
+                            }
+                            const std::string nm = a->display_name();
+                            renderer.draw_text(nm.c_str(), r.x, r.y - kMiraLabelPx - 3.0f,
+                                               kMiraLabelPx, kMiraColor, /*bold=*/true);
                         }
                     }
                 }
