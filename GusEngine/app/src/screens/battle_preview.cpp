@@ -246,6 +246,22 @@ body { font-family: "Pixel Operator Mono"; background: transparent; }
   border-radius: 2dp; background-color: #8fa6b4; }
 .verb.cyan .glyph { background-color: #22D3EE; box-shadow: #22D3EE 0dp 0dp 8dp 1dp; }
 .verb.latao .glyph { background-color: #E8A33D; box-shadow: #E8A33D 0dp 0dp 8dp 1dp; }
+/* HOVER (ADITIVO, SO-VISUAL): o ponteiro sobre o pill CLAREIA o fundo + poe uma BORDA NEUTRA
+   clara. De proposito DISCRETO: e so o feedback "o mouse esta aqui", que NAO deve competir com
+   o glow cyan FORTE do .sel (a selecao REAL, do teclado/confirmada). Sem box-shadow (zero glow
+   que dispute) e mantendo border 1dp (= .verb): NAO mexe na geometria => o hit-test de clique
+   do Incremento A2 (battle_cockpit_pills.hpp) segue valido. RmlUi 6.3 casa :hover NATIVO (o
+   MouseMove ja chega via sdl_to_glintfx -> process_event -> Context::ProcessMouseMove).
+   ORDEM PROPOSITAL: declarado ANTES de .verb.sel e .verb.fired. Como :hover conta como 1
+   pseudo-classe, .verb:hover (2) EMPATA em especificidade com .verb.sel/.verb.fired (2 classes)
+   => o empate vai pra ORDEM DE FONTE e a selecao/acionado (mais abaixo) VENCEM. Assim, num pill
+   SELECIONADO E sob o mouse, o .sel segue DOMINANTE (glow cyan intacto) e o hover nao o ofusca.
+   As cores neutras (fundo lift #384562/#171f38, borda #8a94a8) ficam na paleta canonica da
+   coluna e ficam CLARAMENTE menos vivas que o azul-cyan do .sel. */
+.verb:hover {
+  decorator: vertical-gradient( #384562 #171f38 );
+  border-color: #8a94a8;
+}
 /* SELECIONADO: borda + GLOW FORTE na cor do verbo (spread POSITIVO) + fundo mais vivo */
 .verb.sel { border: 2dp #5fe6ff; color: #ffffff;
   decorator: vertical-gradient( #2f4a7a #16213e );
@@ -1118,6 +1134,23 @@ int run_battle_preview() {
             return e != nullptr && e[0] == '1';
         }();
 
+        // DIAGNOSTICO/PROVA (HOVER dos pills): GUSWORLD_BATTLE_HOVER_SELFTEST=<prefixo> assenta a
+        // cena ate a vez do jogador, FORCA a selecao em [ATACAR] e roda 4 FASES injetando um
+        // UiEvent::MouseMove SINTETICO (mesmo pipeline do mouse real: process_event ->
+        // Context::ProcessMouseMove -> pseudo-classe :hover), capturando 1 PNG por fase pra
+        // PROVAR o hover surgindo e SUMINDO pelo movimento do ponteiro, sem mouse fisico (que nao
+        // da pra simular numa captura estatica). Fases (sufixos do prefixo):
+        //   _a_none        ponteiro FORA do cockpit           -> nenhum pill em hover (normal)
+        //   _b_hover_unsel ponteiro sobre SCAN (nao-selec.)   -> hover PURO (fundo+borda)
+        //   _c_hover_sel   ponteiro sobre ATACAR (SELECIONADO)-> sel+hover: .sel (cyan) DOMINA
+        //   _d_none_again  ponteiro FORA de novo              -> hover REMOVIDO (== _a: toggle)
+        // So diagnostico: dirige a cena/UI pela MESMA API publica; nao muda o motor nem o render.
+        const char* hover_selftest_prefix = std::getenv("GUSWORLD_BATTLE_HOVER_SELFTEST");
+        const bool hover_selftest =
+            hover_selftest_prefix != nullptr && hover_selftest_prefix[0] != '\0';
+        int hover_phase = 0;        // 0=none 1=unsel 2=sel 3=none-again
+        int hover_phase_frame = 0;  // frames assentados na fase atual (antes de capturar)
+
         // DIAGNOSTICO/CAPTURA: GUSWORLD_BATTLE_PUMP_TO=<actor_id> conduz o combate ate esse
         // ator ser o ATIVO, ANTES do loop de exibicao - pra CAPTURAR a fila CTB na vez de um
         // ator especifico (ex. um de SPD BAIXA como "jaci") sem driver de input. Encara,
@@ -1224,6 +1257,35 @@ int run_battle_preview() {
                       << " alvo=" << (t != nullptr ? t->id() : "?")
                       << " dano_previsto=" << previsto << " (badge deve mostrar \"-"
                       << previsto << "\")\n";
+        }
+
+        // HOVER-SELFTEST (setup): assenta ate a vez do jogador (skip/update so avancam beats de
+        // inimigo/anuncio; NAO resolvem o turno do jogador) e FORCA a selecao em [ATACAR]
+        // (indice 2, verbo cyan). ATACAR e o PIOR CASO pra "hover nao ofuscar": seu .sel carrega
+        // o glow cyan mais forte (.verb.cyan.sel), entao provar que o hover-sobre-o-selecionado
+        // nao o apaga vale pros demais. A cena FICA parada em waiting_player_input (o menu segue
+        // exibido); nada no loop muda a selecao (nao injeto navegacao), so o MouseMove sintetico.
+        if (hover_selftest) {
+            if (scene.is_intro()) {
+                scene.start_combat();
+            }
+            for (int i = 0; i < 240 && !scene.combat_over() &&
+                            !scene.waiting_player_input();
+                 ++i) {
+                scene.skip();
+                scene.update(1.0f / 60.0f);
+            }
+            if (scene.waiting_player_input() && !scene.is_aiming()) {
+                for (int k = 0; k < 8 &&
+                                scene.menu().selected_verb() != BattleVerb::Atacar;
+                     ++k) {
+                    scene.menu_move(+1);
+                }
+            }
+            std::cout << "BattlePreview: [hover-selftest] waiting_player="
+                      << scene.waiting_player_input()
+                      << " sel_index=" << scene.menu().selected_index()
+                      << " (esperado 2=ATACAR); prefixo=" << hover_selftest_prefix << "\n";
         }
 
         bool running = true;
@@ -1526,8 +1588,63 @@ int run_battle_preview() {
                         ui->set_list("log", ptrs.data(), ptrs.size());
                     }
                 }
+                // HOVER-SELFTEST (injecao): a cada frame, coloca o ponteiro SINTETICO onde a
+                // fase pede, ANTES do update() (o Context::Update reaplica o hover chain sob a
+                // ultima posicao). Fases 0/3: FORA do cockpit (arena, x=80% da largura) => nenhum
+                // pill em hover. Fases 1/2: no CENTRO do pill-alvo (dp * dp_ratio -> px), a mesma
+                // conversao uniforme do cockpit (dp_ratio = pw/960) usada no clique do A2.
+                if (hover_selftest) {
+                    const float dpr = static_cast<float>(pw) / 960.0f;
+                    float mx = static_cast<float>(pw) * 0.80f;  // fora da coluna (fases 0 e 3)
+                    float my = static_cast<float>(ph) * 0.50f;
+                    const int hover_pill = hover_phase == 1   ? 0    // SCAN (nao-selecionado)
+                                           : hover_phase == 2 ? 2    // ATACAR (selecionado)
+                                                              : -1;  // 0 e 3: sem pill
+                    if (hover_pill >= 0) {
+                        const gus::core::spatial::Rect r =
+                            gus::app::screens::cockpit_pill_rect(hover_pill);
+                        mx = (r.x + r.w * 0.5f) * dpr;
+                        my = (r.y + r.h * 0.5f) * dpr;
+                    }
+                    glintfx::UiEvent ge{};
+                    ge.type = glintfx::UiEvent::Type::MouseMove;
+                    ge.x = mx;
+                    ge.y = my;
+                    ui->process_event(ge);
+                }
                 ui->update();
                 ui->render();  // UI por cima da arena, mesmo contexto GL
+            }
+
+            // HOVER-SELFTEST (captura por fase): deixa ~12 frames assentarem (bake do atlas de
+            // fonte + hover chain estavel) e salva 1 PNG por fase, lendo o backbuffer ANTES do
+            // swap. Depois avanca a fase; encerra apos a 4a. Nao colide com a captura single-shot
+            // (GUSWORLD_RMLUI_CAPTURE) porque aquela so dispara com capture_path != nullptr.
+            if (hover_selftest) {
+                constexpr int kHoverSettleFrames = 12;
+                ++hover_phase_frame;
+                if (hover_phase_frame >= kHoverSettleFrames) {
+                    const char* suffix = hover_phase == 0   ? "_a_none.png"
+                                         : hover_phase == 1 ? "_b_hover_unsel.png"
+                                         : hover_phase == 2 ? "_c_hover_sel.png"
+                                                            : "_d_none_again.png";
+                    const std::string out = std::string(hover_selftest_prefix) + suffix;
+                    std::vector<unsigned char> buf(
+                        static_cast<std::size_t>(pw) * static_cast<std::size_t>(ph) * 4);
+                    if (gus::platform::rmlui::gl3_read_backbuffer_rgba(pw, ph, buf.data())) {
+                        stbi_write_png(out.c_str(), pw, ph, 4, buf.data(), pw * 4);
+                        std::cout << "BattlePreview: [hover-selftest] fase " << hover_phase
+                                  << " -> " << out << " (" << pw << "x" << ph << ")\n";
+                    } else {
+                        std::cerr
+                            << "BattlePreview: [hover-selftest] gl3_read_backbuffer falhou\n";
+                    }
+                    ++hover_phase;
+                    hover_phase_frame = 0;
+                    if (hover_phase > 3) {
+                        running = false;  // 4 fases capturadas; encerra
+                    }
+                }
             }
 
             // SMOKE VISUAL: captura 1 PNG no frame alvo (ANTES do swap, lendo o backbuffer)
