@@ -38,6 +38,7 @@
 #include <unordered_map>
 
 #include "gus/app/i18n/translator.hpp"            // Translator (tr() de UI)
+#include "gus/app/screens/battle_anim.hpp"        // BattleAnimDirector (W2, battle-anim.md)
 #include "gus/app/screens/battle_floaters.hpp"    // Floater (numeros flutuantes)
 #include "gus/app/screens/battle_log_model.hpp"   // LogLine
 #include "gus/app/screens/battle_menu.hpp"        // BattleMenu / BattleVerb
@@ -210,6 +211,35 @@ public:
     // ou o combate acabou. Le o ScriptedBrain registrado (preview_intent).
     [[nodiscard]] std::optional<gus::domain::combat::IntentPreview> intent_for(
         const gus::domain::combat::CombatActor& enemy) const;
+
+    // ---- Animacao de combate (W2, battle-anim.md par.2/3) ----
+    //
+    // A animacao e APRESENTACAO PURA sobre o motor: OFFSETS por ator (battle_anim)
+    // somados a posicao-base do slot no render. Encaixe nos beats (par.3.1):
+    //   - INIMIGO: a aproximacao do melee toca DURANTE o Beat 1 ANUNCIO (nada resolve);
+    //     o CONTATO coincide com o Beat 2 (resolve_one_turn: dano + floater + hit-react);
+    //     a volta (Return) cabe no delay do Beat 2.
+    //   - JOGADOR: confirmar [Atacar] inicia o windup NA HORA (regra de ouro < 100ms) e
+    //     a RESOLUCAO e DEFERIDA ate o contato (fim da aproximacao) - a aproximacao E o
+    //     proprio anuncio (par.3.1). Scan/Defender/Flee seguem instantaneos (nao sao
+    //     golpe melee). E a extensao do padrao dos 2 beats: o motor resolve instantaneo,
+    //     a ANIMACAO espalha a apresentacao no tempo.
+
+    // true entre o confirm de [Atacar] e o CONTATO (resolucao deferida em voo). O host/
+    // testes bombeiam update(dt) ate cair. Menu e inerte enquanto true.
+    [[nodiscard]] bool player_action_in_flight() const noexcept {
+        return player_strike_pending_;
+    }
+
+    // Diretor de animacao (leitura pro render/testes: offsets, projeteis, estados).
+    [[nodiscard]] const BattleAnimDirector& anim() const noexcept { return anim_; }
+
+    // DIAGNOSTICO (env-gated no host; mecanismo DORMANTE da magia, par.2.1): dispara um
+    // cast COSMETICO do 1o membro vivo da party no 1o inimigo vivo - conjura no lugar,
+    // bolinha placeholder viaja e o impacto dispara o hit-react VISUAL. NAO toca o motor
+    // (zero dano/log): so valida o esqueleto cast -> viagem -> impacto que as cartas
+    // (COMPILAR) vao reusar quando sairem do placeholder de UI. No-op sem caster/alvo.
+    void debug_cast_demo();
 
     // ---- Ritmo / pacing (incremento 6, D8/D9/D10) ----
 
@@ -450,6 +480,19 @@ private:
     [[nodiscard]] std::optional<gus::core::spatial::Rect> arena_rect_for_actor(
         const std::string& actor_id) const;
 
+    // ---- Animacao de combate (helpers privados, W2) ----
+
+    // Ator (NAO-dono) pelo id na fila do motor. nullptr se ausente.
+    [[nodiscard]] const gus::domain::combat::CombatActor* actor_by_id(
+        const std::string& id) const;
+
+    // Inicia a aproximacao melee do atacante ATE perto do alvo (para adjacente ao slot,
+    // kMeleeContactGapPx de folga; party avanca pra DIREITA, inimigo pra ESQUERDA - sem
+    // flip, Pillar 3: o deslocamento e so translacao do sprite). false se algum slot nao
+    // esta visivel (degrada: o caller resolve sem animacao).
+    bool start_melee_toward(const std::string& attacker_id,
+                            const std::string& target_id, float seconds);
+
     // Atores de demo (DONOS). Declarados ANTES da FSM: vivem mais que ela.
     std::vector<std::unique_ptr<gus::domain::combat::CombatActor>> actors_;
     // Brains dos inimigos (DONOS), antes da FSM. ScriptedBrain por inimigo (telegraph).
@@ -483,6 +526,19 @@ private:
 
     // Diretor de RITMO (incremento 6, D8): dita quando o proximo turno pode animar.
     PacingDirector pacing_{};
+    // Diretor de ANIMACAO (W2): offsets por ator + projeteis; o render soma os offsets
+    // na posicao-base dos slots. update(dt) o avanca junto do resto.
+    BattleAnimDirector anim_{};
+    // true entre o confirm de [Atacar] do jogador e o CONTATO (resolucao deferida). O
+    // update(dt) resolve quando a aproximacao chega (melee_arrived).
+    bool player_strike_pending_ = false;
+    // Id do atacante do golpe em voo (pro update casar o contato + o Return).
+    std::string player_strike_attacker_;
+    // Demo de cast (diagnostico, dormante): aguardando o fim do windup pra spawnar o
+    // projetil placeholder (caster -> alvo). Cosmetico: zero motor.
+    bool demo_cast_active_ = false;
+    std::string demo_cast_caster_;
+    std::string demo_cast_target_;
     // true se o begin_turn ja foi chamado pro ator ativo corrente (evita re-begin no
     // mesmo ator entre frames). Resetado ao avancar pro proximo ator.
     bool turn_started_ = false;
