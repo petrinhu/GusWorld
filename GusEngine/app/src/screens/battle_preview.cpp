@@ -198,11 +198,16 @@ body { font-family: "Pixel Operator Mono"; background: transparent; }
   box-shadow: #22D3EE 0dp 0dp 12dp 2dp; }
 
 /* ---- MENU de verbos: pill rococo com GLOW neon nos 3 estados ---- */
-/* AJUSTE ESPACAMENTO (veredito do lider): o BLOCO inteiro de pills desce como uma unidade.
-   +18dp de folga ACIMA (gap MANA->1o botao 9dp -> 27dp). A coluna tem ~91dp livres no rodape
-   (canvas 540dp), entao os +18dp aqui + os +18dp do #log (36dp total) nao clipam nada:
-   log/now-line seguem 100% visiveis com ~55dp de folga restante. */
-.menu { margin-top: 27dp; }
+/* AJUSTE ESPACAMENTO (veredito do lider): o BLOCO inteiro de pills desce como uma unidade,
+   +18dp (= 1 altura de botao) de folga MANA->1o botao e +18dp FUGIR->log.
+   POR QUE SPACER e nao margin-top: no embed do glintfx a UA-stylesheet padrao NAO e
+   carregada, entao .menu/#log (sem 'display' explicito) caem em INLINE - e margin vertical
+   NAO aplica em elemento inline (mesma raiz do BUG-2 do strike no log). O commit anterior
+   setou .menu/#log margin-top e nao renderizou NADA. Solucao a prova de inline/collapse:
+   .gap = bloco vazio de altura FIXA, injetado entre a linha MANA e o menu, e entre o menu e
+   o log (ver <div class="gap"> no body). height:18dp num bloco SEMPRE reserva o espaco. */
+.gap { display: block; height: 18dp; }
+.menu { margin-top: 0dp; }
 .verb {
   /* AJUSTE (veredito do lider): pills NITIDAMENTE mais enxutos. O 25->21 anterior foi
      imperceptivel; aqui o corte e no PISO de legibilidade E no FOOTPRINT: altura 18dp (fonte
@@ -247,10 +252,10 @@ body { font-family: "Pixel Operator Mono"; background: transparent; }
    em 2 (texto longo). O numero de entradas e CAPADO a 3 no alimentador (scene.log_lines(3),
    as mais recentes) - assim a coluna inteira (header+vitals+6 verbos+log+now-line) cabe em
    540dp, com a now-line "> verbo -> alvo" sempre visivel no rodape. */
-/* AJUSTE ESPACAMENTO (veredito do lider): +18dp de folga entre o ultimo pill (FUGIR) e o
-   log. margin-top 7dp -> 25dp (com margin-bottom 4dp do ultimo verb, o gap real 11dp -> 29dp).
-   Combina com o +18dp do .menu; total +36dp cabe nos ~91dp livres (canvas 540dp) sem clipar. */
-#log { margin-top: 25dp; padding-top: 6dp; border-top: 1dp #2a3450; font-size: 10dp; }
+/* AJUSTE ESPACAMENTO (veredito do lider): a folga FUGIR->log vem do <div class="gap"> (bloco
+   de 18dp) injetado ACIMA do #log no body - NAO de margin-top (inline no embed = ignorado,
+   ver nota do .gap). margin-top fica 0dp; o border-top/padding-top desenham o filete do log. */
+#log { margin-top: 0dp; padding-top: 6dp; border-top: 1dp #2a3450; font-size: 10dp; }
 /* BUG-2 FIX: no embed do glintfx a UA-stylesheet padrao NAO e carregada -> <div> cai em
    'inline' (nao 'block'). Sem display:block as .ln do data-for fluiam INLINE e emendavam
    ('...por 5.COMPILAR...'), e os fragmentos inline sobrepostos com line-height apertado
@@ -325,6 +330,10 @@ body { font-family: "Pixel Operator Mono"; background: transparent; }
         </div>
       </div>
 
+      <!-- SPACER (veredito do lider): +18dp de folga MANA->1o botao. Bloco vazio de altura
+           fixa: renderiza no embed onde margin-top (inline) e ignorado. Ver nota do .gap. -->
+      <div class="gap"></div>
+
       <div class="menu">
         <div class="verb"><span class="glyph"></span><span class="lbl">SCAN</span></div>
         <div class="verb"><span class="glyph"></span><span class="lbl">GAMBITO</span></div>
@@ -333,6 +342,9 @@ body { font-family: "Pixel Operator Mono"; background: transparent; }
         <div class="verb latao"><span class="glyph"></span><span class="lbl">COMPILAR</span></div>
         <div class="verb"><span class="glyph"></span><span class="lbl">FUGIR</span></div>
       </div>
+
+      <!-- SPACER (veredito do lider): +18dp de folga FUGIR->log. Idem ao gap de cima. -->
+      <div class="gap"></div>
 
       <div id="log">
         <div class="ln"><span class="who">Gus</span> compilou Vetor de Defesa.</div>
