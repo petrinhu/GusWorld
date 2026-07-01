@@ -132,7 +132,7 @@ body { font-family: "Pixel Operator Mono"; background: transparent; }
 /* ---- COCKPIT: coluna lateral esquerda 252dp, degrade vertical ---- */
 #cockpit {
   position: absolute; top: 0dp; left: 0dp; bottom: 0dp; width: 252dp;
-  decorator: vertical-gradient( #243056 #0f1322 );  /* topo mais claro -> base escura */
+  decorator: vertical-gradient( #141a2c #0f1322 );  /* topo escurecido (some a barra clara em y=0) -> base escura */
   /* POLISH 1: padding compacto (a coluna inteira precisa caber em 540dp). */
   padding: 10dp 12dp 0dp 12dp;
 }
