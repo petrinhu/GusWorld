@@ -198,7 +198,11 @@ body { font-family: "Pixel Operator Mono"; background: transparent; }
   box-shadow: #22D3EE 0dp 0dp 12dp 2dp; }
 
 /* ---- MENU de verbos: pill rococo com GLOW neon nos 3 estados ---- */
-.menu { margin-top: 9dp; }
+/* AJUSTE ESPACAMENTO (veredito do lider): o BLOCO inteiro de pills desce como uma unidade.
+   +18dp de folga ACIMA (gap MANA->1o botao 9dp -> 27dp). A coluna tem ~91dp livres no rodape
+   (canvas 540dp), entao os +18dp aqui + os +18dp do #log (36dp total) nao clipam nada:
+   log/now-line seguem 100% visiveis com ~55dp de folga restante. */
+.menu { margin-top: 27dp; }
 .verb {
   /* AJUSTE (veredito do lider): pills NITIDAMENTE mais enxutos. O 25->21 anterior foi
      imperceptivel; aqui o corte e no PISO de legibilidade E no FOOTPRINT: altura 18dp (fonte
@@ -243,7 +247,10 @@ body { font-family: "Pixel Operator Mono"; background: transparent; }
    em 2 (texto longo). O numero de entradas e CAPADO a 3 no alimentador (scene.log_lines(3),
    as mais recentes) - assim a coluna inteira (header+vitals+6 verbos+log+now-line) cabe em
    540dp, com a now-line "> verbo -> alvo" sempre visivel no rodape. */
-#log { margin-top: 7dp; padding-top: 6dp; border-top: 1dp #2a3450; font-size: 10dp; }
+/* AJUSTE ESPACAMENTO (veredito do lider): +18dp de folga entre o ultimo pill (FUGIR) e o
+   log. margin-top 7dp -> 25dp (com margin-bottom 4dp do ultimo verb, o gap real 11dp -> 29dp).
+   Combina com o +18dp do .menu; total +36dp cabe nos ~91dp livres (canvas 540dp) sem clipar. */
+#log { margin-top: 25dp; padding-top: 6dp; border-top: 1dp #2a3450; font-size: 10dp; }
 /* BUG-2 FIX: no embed do glintfx a UA-stylesheet padrao NAO e carregada -> <div> cai em
    'inline' (nao 'block'). Sem display:block as .ln do data-for fluiam INLINE e emendavam
    ('...por 5.COMPILAR...'), e os fragmentos inline sobrepostos com line-height apertado
