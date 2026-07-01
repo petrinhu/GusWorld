@@ -896,7 +896,38 @@ void battle_mouse_hover(BattleScene& scene, float mx, float my, int pw, int ph) 
 // semantica de antes; ADITIVO: a ESCOLHA DE ATOR (§4.1) ganha PRIORIDADE MAXIMA sobre mira/menu,
 // porque quando is_choosing_actor() o menu de verbos nem existe (begin_turn deferido). `running`
 // so vira false no Esc de TOPO (fora de qualquer sub-modo).
+// Digito 1-9 de uma tecla numerica (fileira OU numpad); 0 se nao for numerica 1-9. Fonte
+// unica do mapeamento tecla->N pros atalhos numericos (mira e escolha de ator).
+int battle_digit_for_key(SDL_Keycode key) noexcept {
+    switch (key) {
+        case SDLK_1: case SDLK_KP_1: return 1;
+        case SDLK_2: case SDLK_KP_2: return 2;
+        case SDLK_3: case SDLK_KP_3: return 3;
+        case SDLK_4: case SDLK_KP_4: return 4;
+        case SDLK_5: case SDLK_KP_5: return 5;
+        case SDLK_6: case SDLK_KP_6: return 6;
+        case SDLK_7: case SDLK_KP_7: return 7;
+        case SDLK_8: case SDLK_KP_8: return 8;
+        case SDLK_9: case SDLK_KP_9: return 9;
+        default: return 0;
+    }
+}
+
 void battle_key_down(BattleScene& scene, SDL_Keycode key, bool& running) {
+    // TECLAS-ATALHO NUMERICAS (1-9, fileira + numpad). PRIORIDADE: MODO-MIRA (§3.5) > ESCOLHA
+    // DE ATOR (§4.1). Os dois modos nunca sao simultaneos (a mira so abre no menu de verbos,
+    // ja fora do picker), mas a ordem deixa explicito: mirando, N mira+confirma o N-esimo
+    // inimigo (aim_hotkey); escolhendo ator, N escolhe+confirma o N-esimo membro
+    // (actor_picker_hotkey). Ambos ja sao NO-OP fora do seu modo / fora de faixa (guarda
+    // interna) -> mapeamento seguro. Consumidas aqui (nao caem no switch abaixo).
+    if (const int nth = battle_digit_for_key(key); nth != 0) {
+        if (scene.is_aiming()) {
+            scene.aim_hotkey(nth);
+        } else if (scene.is_choosing_actor()) {
+            scene.actor_picker_hotkey(nth);
+        }
+        return;
+    }
     switch (key) {
         case SDLK_ESCAPE:
             // MODO-MIRA (§3.5): Esc CANCELA a mira (volta ao menu sem consumir o turno). Na
@@ -948,22 +979,8 @@ void battle_key_down(BattleScene& scene, SDL_Keycode key, bool& running) {
                 scene.aim_move(+1);
             }
             break;
-        // TECLAS-ATALHO 1/2/3 (ESCOLHA DE ATOR, §4.1, pedido do lider): escolhem DIRETO o
-        // 1o/2o/3o membro elegivel (1-based) e CONFIRMAM na hora (sem Enter). Numpad idem.
-        // actor_picker_hotkey ja e NO-OP fora do modo (guarda interna) -> mapeamento SEGURO
-        // mesmo com o picker fechado; nao colide com outros modos (nada mais usa 1/2/3).
-        case SDLK_1:
-        case SDLK_KP_1:
-            scene.actor_picker_hotkey(1);
-            break;
-        case SDLK_2:
-        case SDLK_KP_2:
-            scene.actor_picker_hotkey(2);
-            break;
-        case SDLK_3:
-        case SDLK_KP_3:
-            scene.actor_picker_hotkey(3);
-            break;
+        // (As teclas-atalho numericas 1-9 sao tratadas no TOPO desta funcao, com prioridade
+        // mira > escolha-de-ator, antes deste switch.)
         case SDLK_RETURN:
         case SDLK_KP_ENTER:  // Enter do numpad tambem confirma
         case SDLK_SPACE:
@@ -1008,8 +1025,39 @@ int run_battle_preview() {
     SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
     SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);  // o GL3 do RmlUi usa stencil (clip mask)
 
+    // FIX W1 item 2 (lider: "maximizada, a base da cena desliza pra tras da barra de
+    // tarefas"): a janela INICIAL deve caber na AREA UTIL do desktop (que desconta a barra
+    // de tarefas/paineis via struts), senao a base (log/rodape do cockpit) nasce escondida.
+    // SDL_GetDisplayUsableBounds ja desconta os paineis. Preservamos a proporcao 16:9 (a
+    // arena estica 960x540 -> janela; 16:9 = sem distorcao) escolhendo a MAIOR janela 16:9
+    // que cabe na area util (com margem p/ a decoracao da janela), limitada ao alvo
+    // 1920x1080. Sob Xvfb/headless (sem barra) os usable bounds = display inteiro -> escala
+    // 1.0 -> janela 1920x1080 como antes (self-tests de mouse/hover intactos: as coordenadas
+    // derivam de pw0/ph0 REAIS da janela, nao de constantes). NAO ha offset de letterbox
+    // aqui -> os hit-tests de mouse (A2/picker) seguem validos sem desconto.
+    int win_w = kWindowW, win_h = kWindowH;
+    {
+        SDL_Rect usable{};
+        const SDL_DisplayID disp = SDL_GetPrimaryDisplay();
+        if (disp != 0 && SDL_GetDisplayUsableBounds(disp, &usable) && usable.w > 0 &&
+            usable.h > 0) {
+            constexpr float kMargin = 0.95f;  // folga p/ bordas/titlebar da janela
+            const float avail_w = static_cast<float>(usable.w) * kMargin;
+            const float avail_h = static_cast<float>(usable.h) * kMargin;
+            float scale = 1.0f;
+            scale = std::min(scale, avail_w / static_cast<float>(kWindowW));
+            scale = std::min(scale, avail_h / static_cast<float>(kWindowH));
+            if (scale < 1.0f) {
+                win_w = static_cast<int>(static_cast<float>(kWindowW) * scale);
+                win_h = static_cast<int>(static_cast<float>(kWindowH) * scale);
+            }
+            std::cout << "BattlePreview: [win] area util=" << usable.w << "x" << usable.h
+                      << " -> janela inicial=" << win_w << "x" << win_h << " (16:9)\n";
+        }
+    }
+
     SDL_Window* window =
-        SDL_CreateWindow("GusWorld BattlePreview (M5, GL3)", kWindowW, kWindowH,
+        SDL_CreateWindow("GusWorld BattlePreview (M5, GL3)", win_w, win_h,
                          SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
     if (window == nullptr) {
         std::cerr << "BattlePreview: SDL_CreateWindow falhou: " << SDL_GetError() << "\n";
@@ -1301,6 +1349,11 @@ int run_battle_preview() {
                         break;
                     }
                     if (scene.waiting_player_input()) {
+                        // W1 item 4: a vez da party abre no PICKER (§4.1); confirma o
+                        // pre-selecionado pra chegar ao menu de verbos e seguir o pump.
+                        if (scene.is_choosing_actor()) {
+                            scene.actor_picker_confirm();
+                        }
                         for (int k = 0; k < 8 &&
                                         scene.menu().selected_verb() != BattleVerb::Atacar;
                              ++k) {
@@ -1343,6 +1396,10 @@ int run_battle_preview() {
                  ++i) {
                 scene.skip();
                 scene.update(1.0f / 60.0f);
+            }
+            // W1 item 4: atravessa o PICKER de ator (§4.1) pra chegar ao menu de verbos.
+            if (scene.is_choosing_actor()) {
+                scene.actor_picker_confirm();
             }
             if (scene.waiting_player_input() && !scene.is_aiming()) {
                 for (int k = 0; k < 8 &&
@@ -1407,6 +1464,10 @@ int run_battle_preview() {
                 scene.skip();
                 scene.update(1.0f / 60.0f);
             }
+            // W1 item 4: atravessa o PICKER de ator (§4.1) pra chegar ao menu de verbos.
+            if (scene.is_choosing_actor()) {
+                scene.actor_picker_confirm();
+            }
             if (scene.waiting_player_input() && !scene.is_aiming()) {
                 for (int k = 0; k < 8 &&
                                 scene.menu().selected_verb() != BattleVerb::Atacar;
@@ -1445,6 +1506,12 @@ int run_battle_preview() {
                  ++i) {
                 scene.skip();
                 scene.update(1.0f / 60.0f);
+            }
+            // W1 item 4: a 1a vez da party agora ABRE no PICKER de ator (§4.1) antes do menu
+            // de verbos. Este diagnostico (pre-picker) espera o MENU: atravessa o picker
+            // confirmando o pre-selecionado (maior SPD) pra chegar ao menu, como antes.
+            if (scene.is_choosing_actor()) {
+                scene.actor_picker_confirm();
             }
             std::cout << "BattlePreview: [mouse-selftest] pw0xph0=" << pw0 << "x" << ph0
                       << " dp_ratio=" << dpr

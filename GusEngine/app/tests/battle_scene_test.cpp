@@ -33,6 +33,7 @@ using gus::app::screens::BattleStatusIconSet;
 using gus::app::screens::BattleVerb;
 using gus::app::screens::kFloaterLifeSeconds;
 using gus::app::screens::kPacingAnnounceSeconds;
+using gus::app::screens::kPacingStepDelaySeconds;
 using gus::app::screens::LogLineKind;
 using gus::app::screens::PacingState;
 using gus::app::screens::arena_rect;
@@ -860,10 +861,15 @@ TEST_CASE("pacing D10 REGRESSAO (BUG B): abertura 100% LIMPA - HP cheio, sem dan
     for (const auto* a : scene.machine().queue().order()) {
         REQUIRE(a->hp() == a->max_hp());      // HP ainda cheio
     }
-    // ENCARAR: o jogador comeca o combate. BEAT 1 (anuncio): o 1o turno de inimigo
-    // anuncia SEM resolver (HP intacto, sem log, sem floater).
+    // ENCARAR: o jogador comeca o combate. FIX W1: o 1o beat e o RESPIRO INICIAL
+    // (WaitingDelay), NAO o anuncio - o 1o turno de inimigo ganha o mesmo delay de entrada
+    // dos demais. Nada resolveu ainda (HP intacto, sem log, sem floater).
     scene.start_combat();
-    scene.update(0.01f);  // entra no anuncio
+    scene.update(0.01f);  // respiro inicial (ainda nao anunciou)
+    REQUIRE(scene.pacing_state() == PacingState::WaitingDelay);
+    REQUIRE(scene.machine().log().empty());
+    // Passado o respiro, entra no BEAT 1 (anuncio): ainda SEM resolver.
+    scene.update(kPacingStepDelaySeconds + 0.01f);
     REQUIRE(scene.pacing_state() == PacingState::AnnouncingEnemy);
     REQUIRE(scene.machine().log().empty());   // anuncio: NADA resolveu ainda
     REQUIRE(scene.floaters().empty());
@@ -879,9 +885,10 @@ TEST_CASE("pacing D8: os turnos de inimigo animam UM DE CADA VEZ (nao todos junt
           "[battle_scene]") {
     BattleScene scene;
     scene.start_combat();  // ENCARAR: sai da abertura parada
-    // BEAT 1 (incremento 6): o 1o turno de inimigo ANUNCIA (sem resolver nada). Nenhuma
-    // acao logada ainda - o ataque NAO foi feito (corrige "ja feito").
-    scene.update(0.01f);
+    // FIX W1: o 1o beat e o RESPIRO INICIAL (WaitingDelay), depois o anuncio. Passa o
+    // respiro pra chegar ao BEAT 1 (anuncio): o 1o turno de inimigo ANUNCIA (sem resolver
+    // nada). Nenhuma acao logada ainda - o ataque NAO foi feito (corrige "ja feito").
+    scene.update(kPacingStepDelaySeconds + 0.01f);
     REQUIRE(scene.pacing_state() == PacingState::AnnouncingEnemy);
     REQUIRE(scene.machine().log().empty());  // anuncio: nada resolveu
 
@@ -1010,7 +1017,7 @@ TEST_CASE("pacing 2-BEATS REGRESSAO: no ANUNCIO o alvo esta INTACTO; so o RESOLV
     // do alvo intacto) e o log NAO tem a linha da acao; SO no BEAT 2 (resolve) aparecem.
     BattleScene scene;
     scene.start_combat();  // ENCARAR: sai da abertura (o 1o ator e inimigo3, maior SPD)
-    scene.update(0.001f);  // entra no BEAT 1 (anuncio)
+    scene.update(kPacingStepDelaySeconds + 0.001f);  // passa o respiro inicial -> BEAT 1
     REQUIRE(scene.pacing_state() == PacingState::AnnouncingEnemy);
     REQUIRE(scene.turn_banner_key() == std::string_view("COMBAT_BANNER_ENEMY_TURN"));
 
@@ -1041,6 +1048,54 @@ TEST_CASE("pacing 2-BEATS REGRESSAO: no ANUNCIO o alvo esta INTACTO; so o RESOLV
         ++idx;
     }
     REQUIRE(someone_lost_hp);
+}
+
+TEST_CASE("pacing FIX W1: o 1o ataque inimigo tem RESPIRO INICIAL antes do anuncio/golpe",
+          "[battle_scene]") {
+    // Lider no display: "ao Encarar, se o 1o a agir e um inimigo, o golpe resolve rapido
+    // demais - ja comecei apanhando". Causa: o 1o turno NAO tinha o respiro de entrada que
+    // todo turno subsequente tem (a pausa pos-resolucao do anterior). Fix: begin_combat
+    // entra no mesmo delay (kPacingStepDelaySeconds) ANTES do 1o anuncio. Esta prova crava:
+    //   (1) no INSTANTE do start_combat (dt minusculo) NINGUEM levou dano - o HP do player
+    //       nao muda junto do Encarar (era o sintoma); estamos no RESPIRO (WaitingDelay),
+    //       ainda NAO no anuncio;
+    //   (2) o golpe so conecta DEPOIS do respiro + anuncio (>= kPacingStepDelaySeconds +
+    //       kPacingAnnounceSeconds de tempo simulado), igual aos demais turnos.
+    BattleScene scene;
+    // O 1o ator do demo e um inimigo (maior SPD) - o cenario da queixa.
+    REQUIRE(scene.active_actor() != nullptr);
+    REQUIRE_FALSE(scene.active_actor()->is_player_side());
+
+    // HP total da party ANTES de Encarar (soma - robusto a qual player e o alvo).
+    auto party_hp_total = [&scene]() {
+        int t = 0;
+        for (const auto* a : scene.machine().queue().order()) {
+            if (a != nullptr && a->is_player_side()) {
+                t += a->hp();
+            }
+        }
+        return t;
+    };
+    const int hp_before = party_hp_total();
+
+    scene.start_combat();       // ENCARAR
+    scene.update(0.01f);        // INSTANTE do Encarar (dt minusculo)
+    // (1) nada resolveu junto do Encarar: HP da party intacto, log vazio, e estamos no
+    // RESPIRO (WaitingDelay), NAO no anuncio.
+    REQUIRE(scene.pacing_state() == PacingState::WaitingDelay);
+    REQUIRE(scene.machine().log().empty());
+    REQUIRE(party_hp_total() == hp_before);
+
+    // Completa o respiro -> entra no ANUNCIO (BEAT 1): ainda SEM resolver (party intacta).
+    scene.update(kPacingStepDelaySeconds);
+    REQUIRE(scene.pacing_state() == PacingState::AnnouncingEnemy);
+    REQUIRE(scene.machine().log().empty());
+    REQUIRE(party_hp_total() == hp_before);
+
+    // (2) so DEPOIS do anuncio (BEAT 2) o 1o golpe inimigo resolve.
+    scene.update(kPacingAnnounceSeconds + 0.1f);
+    REQUIRE(scene.machine().log().size() >= 1);
+    REQUIRE(party_hp_total() < hp_before);  // agora sim a party levou o golpe
 }
 
 TEST_CASE("pacing REGRESSAO (ataque colado): skip NAO colapsa o beat de ANUNCIO",
@@ -1260,6 +1315,63 @@ TEST_CASE("mira D3 (a): COM scan pre-seleciona o inimigo FRACO a familia da acao
     scene.menu_confirm();
     REQUIRE(scene.aim_target() == weak);
     REQUIRE(scene.aim_target() != front);
+}
+
+TEST_CASE("mira teclas: 1-9 miram DIRETO o N-esimo inimigo e confirmam na hora",
+          "[battle_scene][mira]") {
+    // Item 3 do lote W1 (pedido do lider): espelha as teclas 1/2/3 do picker de ator para a
+    // MIRA - tecla N = mira E confirma o N-esimo inimigo miravel (1-based, ordem de fila).
+    BattleScene scene;
+    pump_to_player_turn(scene);
+    select_verb(scene, BattleVerb::Atacar);
+    scene.menu_confirm();  // entra na mira (NAO resolve)
+    REQUIRE(scene.is_aiming());
+    REQUIRE(scene.aim_count() >= 2);  // a demo tem 4 inimigos vivos miraveis
+    // aim_candidates_ segue a ordem de fila dos inimigos vivos == alive_enemy_at.
+    gus::domain::combat::CombatActor* second = alive_enemy_at(scene, 1);  // tecla "2"
+    REQUIRE(second != nullptr);
+    const int hp_before = second->hp();
+    const std::size_t log_before = scene.machine().log().size();
+
+    scene.aim_hotkey(2);  // mira+confirma o 2o miravel na hora (sem navegar/Enter)
+
+    REQUIRE_FALSE(scene.is_aiming());                     // confirmou IMEDIATAMENTE
+    REQUIRE(scene.machine().log().size() > log_before);   // o golpe resolveu
+    REQUIRE(second->hp() < hp_before);                    // o 2o inimigo (escolhido) levou o dano
+}
+
+TEST_CASE("mira teclas: numero SEM inimigo miravel e no-op (nao mira, nao confirma)",
+          "[battle_scene][mira]") {
+    BattleScene scene;
+    pump_to_player_turn(scene);
+    select_verb(scene, BattleVerb::Atacar);
+    scene.menu_confirm();
+    REQUIRE(scene.is_aiming());
+    const int n = scene.aim_count();
+    const auto* cursor_before = scene.aim_target();
+    const std::size_t log_before = scene.machine().log().size();
+
+    scene.aim_hotkey(n + 1);  // "apertar N+1" com so N miraveis: fora de faixa
+    REQUIRE(scene.is_aiming());                            // NAO confirmou (segue mirando)
+    REQUIRE(scene.aim_target() == cursor_before);          // cursor intacto
+    REQUIRE(scene.machine().log().size() == log_before);   // nada resolveu
+
+    scene.aim_hotkey(0);      // 0 e invalido (o atalho e 1-based)
+    REQUIRE(scene.is_aiming());
+    REQUIRE(scene.aim_target() == cursor_before);
+    REQUIRE(scene.machine().log().size() == log_before);
+}
+
+TEST_CASE("mira teclas: aim_hotkey fora do modo-mira e no-op", "[battle_scene][mira]") {
+    // Guarda de modo (espelha actor_picker_hotkey): sem mira ativa, a tecla numerica nao faz
+    // nada (nem entra na mira, nem resolve). No menu de verbos (fora da mira) e inerte.
+    BattleScene scene;
+    pump_to_player_turn(scene);
+    REQUIRE_FALSE(scene.is_aiming());
+    const std::size_t log_before = scene.machine().log().size();
+    scene.aim_hotkey(1);
+    REQUIRE_FALSE(scene.is_aiming());
+    REQUIRE(scene.machine().log().size() == log_before);
 }
 
 TEST_CASE("mira: CONFIRMAR monta a acao com o alvo ESCOLHIDO (nao mais o 1o)",

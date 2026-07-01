@@ -36,7 +36,7 @@ TEST_CASE("pacing: a ABERTURA NAO auto-avanca por tempo (espera Encarar)",
     REQUIRE_FALSE(d.ready_to_step());
 }
 
-TEST_CASE("pacing: ENCARAR (begin_combat) sai da abertura e libera o 1o passo",
+TEST_CASE("pacing: ENCARAR (begin_combat) sai da abertura com RESPIRO INICIAL",
           "[battle_pacing]") {
     PacingDirector d;
     REQUIRE_FALSE(d.ready_to_step());
@@ -44,16 +44,31 @@ TEST_CASE("pacing: ENCARAR (begin_combat) sai da abertura e libera o 1o passo",
     d.skip();
     REQUIRE(d.state() == PacingState::Intro);
     REQUIRE_FALSE(d.ready_to_step());
-    // Encarar: libera o 1o passo do combate.
+    // Encarar: sai da abertura, mas NAO libera na hora (FIX W1). Entra num RESPIRO INICIAL
+    // (WaitingDelay ~kPacingStepDelaySeconds) - o mesmo delay que precede os demais turnos -
+    // pra o 1o ataque inimigo nao "sair rapido demais".
     d.begin_combat();
     REQUIRE_FALSE(d.waiting_intro());
-    REQUIRE(d.ready_to_step());  // o 1o turno pode comecar a animar
+    REQUIRE(d.state() == PacingState::WaitingDelay);
+    REQUIRE_FALSE(d.ready_to_step());          // segura o respiro inicial
+    d.tick(kPacingStepDelaySeconds + 0.01f);   // passa o respiro
+    REQUIRE(d.ready_to_step());                // AGORA o 1o turno pode comecar a animar
+}
+
+TEST_CASE("pacing FIX W1: o jogador impaciente pode PULAR o respiro inicial (skip)",
+          "[battle_pacing]") {
+    PacingDirector d;
+    d.begin_combat();  // ENCARAR -> respiro inicial (WaitingDelay)
+    REQUIRE_FALSE(d.ready_to_step());
+    d.skip();  // skip acelera a pausa de leitura/respiro (WaitingDelay) na hora
+    REQUIRE(d.ready_to_step());  // o respiro foi encurtado; o 1o turno ja pode animar
 }
 
 TEST_CASE("pacing: ao animar um turno de inimigo, entra em EsperaDelay e segura ~0.8s",
           "[battle_pacing]") {
     PacingDirector d;
-    d.begin_combat();  // ENCARAR: sai da abertura
+    d.begin_combat();  // ENCARAR: sai da abertura (com respiro inicial, FIX W1)
+    d.tick(kPacingStepDelaySeconds + 0.01f);  // passa o respiro inicial
     REQUIRE(d.ready_to_step());
     // A cena resolveu 1 turno de inimigo e avisa o diretor (begin_enemy_step): entra em
     // EsperaDelay (o numero/log ficam na tela pelo delay).

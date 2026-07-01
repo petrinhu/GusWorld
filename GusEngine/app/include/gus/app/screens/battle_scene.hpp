@@ -298,6 +298,13 @@ public:
     // nao esta mirando.
     void aim_cancel() noexcept;
 
+    // TECLA-ATALHO (1-9, pedido do lider): mira DIRETO o nth-esimo inimigo miravel (1-based,
+    // ordem de aim_candidates_) e CONFIRMA na hora - espelha EXATAMENTE actor_picker_hotkey
+    // (mira e picker nunca sao simultaneos). No-op se nth nao tem candidato (fora de faixa)
+    // ou fora do modo-mira. Fonte UNICA do host (teclas) e dos testes; encapsula o
+    // "aim_select + aim_confirm imediato".
+    void aim_hotkey(int nth);
+
     // ---- Escolha de ator / Janela de Comando da Party (comando-livre 1B, combat.md §4.1) ----
     //
     // APRESENTACAO PURA sobre o motor 1B (§4.1): quando e a vez do BLOCO da party e ha MAIS DE

@@ -48,13 +48,22 @@ void PacingDirector::skip() noexcept {
 }
 
 void PacingDirector::begin_combat() noexcept {
-    // ENCARAR: sai da abertura PARADA e libera o 1o passo. Vai pra WaitingDelay com timer
-    // 0 (liberado JA) -> o proximo advance_pacing anuncia/inicia o 1o turno. So no Intro.
+    // ENCARAR: sai da abertura PARADA. Vai pra WaitingDelay com o MESMO delay dos demais
+    // turnos (kPacingStepDelaySeconds) - um RESPIRO INICIAL antes do 1o anuncio.
+    //
+    // FIX W1 (lider: "o 1o ataque resolve rapido demais / ja comecei apanhando"): antes o
+    // timer saia 0 (liberado JA) -> o 1o turno de inimigo ANUNCIAVA no frame seguinte e o
+    // golpe conectava ~0.7s (so o anuncio) apos Encarar. TODO turno subsequente, porem, tem
+    // ANTES do anuncio a pausa pos-resolucao do turno anterior (kPacingStepDelaySeconds) =>
+    // ~1.5s de respiro antes do golpe. O 1o turno era o UNICO sem esse respiro de entrada.
+    // Dando a ele o mesmo delay, o 1o ataque inimigo passa pelo MESMO ritmo visivel
+    // (respiro -> anuncio -> resolucao) dos demais. skip() zera este respiro (impaciente).
+    // Valor: reusa kPacingStepDelaySeconds (ja usado entre turnos); nao inventa constante.
     if (state_ != PacingState::Intro) {
         return;
     }
     state_ = PacingState::WaitingDelay;
-    timer_ = 0.0f;
+    timer_ = kPacingStepDelaySeconds;
 }
 
 void PacingDirector::begin_enemy_announce() noexcept {
