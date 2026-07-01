@@ -86,6 +86,21 @@ void InitiativeQueue::bring_to_current(CombatActor* actor) {
     // cursor_ inalterado de proposito: order_[cursor_] agora e `actor` => current() == actor.
 }
 
+void InitiativeQueue::regroup_stable(
+    const std::function<bool(const CombatActor*)>& first_group) {
+    // stable_partition move os que satisfazem `first_group` para a frente PRESERVANDO a ordem
+    // relativa de AMBOS os grupos (ao contrario de std::partition, que nao garante ordem). E o
+    // que torna o regroup Gambito-safe: um empurrao intra-rodada (reorder_actor) fica gravado
+    // na ordem relativa e sobrevive ao agrupamento. NAO recomputa por SPD.
+    std::stable_partition(order_.begin(), order_.end(), first_group);
+
+    // Inicio de rodada: o cursor aponta pro primeiro ator do primeiro grupo (slot 0). Na
+    // fronteira o cursor ja e 0 (wrap de advance); zeramos explicitamente pra nao depender
+    // disso (contrato do metodo) e pra deixar current() == primeiro do lado que abre.
+    // round_index_ NAO muda: regroup nao e uma volta de fila.
+    cursor_ = 0;
+}
+
 void InitiativeQueue::advance() {
     ++cursor_;
     if (cursor_ >= static_cast<int>(order_.size())) {

@@ -271,3 +271,59 @@ TEST_CASE("initiative_queue: bring_to_current de ausente e no-op seguro (nao lan
     REQUIRE(order_ids(q) == std::vector<std::string>{"a", "b"});
     REQUIRE(q.cursor() == 0);
 }
+
+// ---- regroup_stable (regroup por lado na fronteira da rodada, secao 4.1) -----------
+// regroup_stable(pred) move os atores que satisfazem `pred` para a FRENTE, preservando a
+// ordem relativa corrente de AMBOS os grupos (std::stable_partition). E o primitivo do
+// "um lado age todo, depois o outro" (§4.1). A prova de Gambito-safe: um empurrao intra-
+// rodada (reorder_actor) fora da ordem de SPD SOBREVIVE ao regroup (stable_partition NAO
+// re-sorteia; um SORT restauraria a ordem de SPD e apagaria o empurrao).
+
+TEST_CASE("initiative_queue: regroup_stable agrupa por predicado preservando ordem relativa",
+          "[domain][combat][queue][regroup]") {
+    // 2 player-side + 2 enemy-side. Empurramos pA1 (rapido) PARA TRAS de pA2 (lento) DENTRO
+    // do grupo player => a ordem relativa do grupo fica FORA da ordem de SPD. regroup_stable
+    // agrupa player-side na frente MAS mantem pA2 antes de pA1 (prova de stable_partition;
+    // um SORT por SPD daria [pA1, pA2] e apagaria o empurrao).
+    CombatActor pA1 = actor("pA1", 30, /*player=*/true);
+    CombatActor pA2 = actor("pA2", 20, /*player=*/true);
+    CombatActor eB1 = actor("eB1", 25, /*player=*/false);
+    CombatActor eB2 = actor("eB2", 10, /*player=*/false);
+    InitiativeQueue q({&pA1, &pA2, &eB1, &eB2});  // sort SPD: [pA1, eB1, pA2, eB2]
+    REQUIRE(order_ids(q) == std::vector<std::string>{"pA1", "eB1", "pA2", "eB2"});
+
+    q.reorder_actor(&pA1, +2);  // empurra pA1 pra tras -> [eB1, pA2, pA1, eB2]
+    REQUIRE(order_ids(q) == std::vector<std::string>{"eB1", "pA2", "pA1", "eB2"});
+
+    q.regroup_stable([](const CombatActor* a) { return a->is_player_side(); });
+    // player-side na frente NA ORDEM RELATIVA CORRENTE (pA2 antes de pA1), depois enemy-side.
+    REQUIRE(order_ids(q) == std::vector<std::string>{"pA2", "pA1", "eB1", "eB2"});
+}
+
+TEST_CASE("initiative_queue: regroup_stable zera o cursor e nao toca round_index",
+          "[domain][combat][queue][regroup]") {
+    CombatActor a = actor("a", 30, /*player=*/false);  // enemy
+    CombatActor b = actor("b", 20, /*player=*/true);   // player
+    CombatActor c = actor("c", 10, /*player=*/false);  // enemy
+    InitiativeQueue q({&a, &b, &c});   // [a(e), b(p), c(e)]
+    q.advance(); q.advance(); q.advance();  // da a volta -> round_index 1, cursor 0
+    REQUIRE(q.round_index() == 1);
+
+    // enemy-first (predicado = NAO player-side): [a, c] enemigos, [b] party.
+    q.regroup_stable([](const CombatActor* x) { return !x->is_player_side(); });
+    REQUIRE(order_ids(q) == std::vector<std::string>{"a", "c", "b"});
+    REQUIRE(q.cursor() == 0);        // inicio de rodada: primeiro do lado que abre
+    REQUIRE(q.round_index() == 1);   // regroup nao conta rodada
+    REQUIRE(q.current()->id() == "a");
+}
+
+TEST_CASE("initiative_queue: regroup_stable e no-op de ordem quando ja esta agrupado",
+          "[domain][combat][queue][regroup]") {
+    CombatActor a = actor("a", 30, /*player=*/true);
+    CombatActor b = actor("b", 20, /*player=*/true);
+    CombatActor c = actor("c", 10, /*player=*/false);
+    InitiativeQueue q({&a, &b, &c});  // [a, b, c], ja player-first
+    q.regroup_stable([](const CombatActor* x) { return x->is_player_side(); });
+    REQUIRE(order_ids(q) == std::vector<std::string>{"a", "b", "c"});
+    REQUIRE(q.cursor() == 0);
+}

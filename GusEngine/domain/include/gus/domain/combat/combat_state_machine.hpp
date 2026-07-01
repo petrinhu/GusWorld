@@ -250,6 +250,13 @@ private:
     // pending_party_actors): vivo, player-side, ainda-nao-agiu. nullptr => false.
     [[nodiscard]] bool is_pending_party_actor(const CombatActor* actor) const;
 
+    // Reagrupa a fila por LADO no INICIO da rodada (§4.1): o lado que ABRE (round_opening_
+    // side, por SPD corrente) vai inteiro pra frente, o outro atras, preservando a ordem
+    // relativa DENTRO de cada lado (delega a InitiativeQueue::regroup_stable => stable_
+    // partition, NAO sort => Gambito-safe). Chamado SO na fronteira da rodada: construcao
+    // (rodada 0) e wrap de advance_to_next_actor (rodadas 1+). NAO consome RNG.
+    void regroup_round_by_side();
+
     // Registries (nao-donos) + RNG injetado (nao-dono). nullptr tratado no construtor.
     CombatActionProvider action_provider_;
     const std::unordered_map<std::string, Card>* card_registry_;

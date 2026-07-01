@@ -537,3 +537,177 @@ TEST_CASE("1B: run_until_end headless com party multi-membro roda no default (se
     const CombatResult r = sm.run_until_end();
     REQUIRE(r.outcome == CombatOutcome::Victory);
 }
+
+// ============================================================================
+// Regroup por lado na fronteira da rodada (comando livre 1B fase 2) — combat.md §4.1.
+//
+// Canon: "A rodada e 'um lado age todo, depois o outro', com a SPD decidindo a ordem dos
+// LADOS." Quando o inimigo abre com SPDs INTERCALADAS entre os lados, a ordem bruta de SPD
+// alterna os lados; o regroup por lado (std::stable_partition) agrupa "quem abre inteiro,
+// depois o outro" SEM re-sortear por SPD dentro do lado (preserva empurroes de Gambito =>
+// Gambito-safe). Aplicado NA FRONTEIRA da rodada: construcao (rodada 0) e wrap de advance
+// (rodadas 1+). ADITIVO: nao consome RNG, nao muda a FORMA da FSM, nao mexe no comando livre.
+// ============================================================================
+
+// ----- (a) Inimigo abre com SPD intercalada -> reagrupa por lado -----
+
+TEST_CASE("1B-regroup: (a) inimigo abre com SPD intercalada -> fila reagrupa por lado",
+          "[domain][combat][party1b][regroup]") {
+    // Cenario EXATO do encontro-demo: SPDs inimigo3=13, caua=12, inimigo1=11, gus=9,
+    // inimigo4=8, jaci=7, inimigo2=6. A ordem bruta de SPD intercala os lados
+    // (inimigo3, caua, inimigo1, gus, ...). Como inimigo3 (13) tem a MAIOR SPD, o inimigo
+    // ABRE. Reagrupado: TODOS os inimigos (na ordem relativa de SPD 13,11,8,6), depois TODA
+    // a party (12,9,7). O regroup NAO re-sorteia por SPD dentro do lado (aqui coincide com
+    // SPD desc porque a ordem relativa ja era SPD desc; a prova de stable_partition esta em (b)).
+    CombatActor inimigo3 = foe("inimigo3", 999, /*spd=*/13);
+    CombatActor caua = hero("caua", 55, /*spd=*/12);
+    CombatActor inimigo1 = foe("inimigo1", 999, /*spd=*/11);
+    CombatActor gus = hero("gus", 34, /*spd=*/9);
+    CombatActor inimigo4 = foe("inimigo4", 999, /*spd=*/8);
+    CombatActor jaci = hero("jaci", 55, /*spd=*/7);
+    CombatActor inimigo2 = foe("inimigo2", 999, /*spd=*/6);
+    // Ordem de ENTRADA embaralhada de proposito: a fila ordena por SPD; o regroup agrupa por lado.
+    CombatStateMachine sm({&gus, &inimigo2, &caua, &inimigo4, &jaci, &inimigo1, &inimigo3},
+                          always_pass);
+
+    REQUIRE(sm.round_opening_side() == CombatSide::Enemy);  // inimigo3 (13) e o mais rapido
+    REQUIRE(order_ids(sm) == std::vector<std::string>{"inimigo3", "inimigo1", "inimigo4",
+                                                      "inimigo2", "caua", "gus", "jaci"});
+    REQUIRE(sm.queue().cursor() == 0);
+    REQUIRE(sm.queue().round_index() == 0);
+    REQUIRE(sm.active_actor()->id() == "inimigo3");  // primeiro do lado que abre
+}
+
+// ----- (b) Gambito-Reordenar sobrevive ao regroup da rodada seguinte (stable_partition) -----
+
+TEST_CASE("1B-regroup: (b) Gambito-Reordenar DENTRO da rodada SOBREVIVE ao regroup seguinte",
+          "[domain][combat][party1b][regroup]") {
+    // Prova direta de Gambito-safe no nivel da FSM. A party abre. Na rodada 0, um
+    // Gambito-Reordenar empurra o inimigo LENTO e2 -2 (pra FRENTE), passando o membro de party
+    // p2 => a fila fica INTERCALADA [p1, e2, p2, e1] E os inimigos ficam FORA da ordem de SPD
+    // (e2 spd10 antes de e1 spd25). Na fronteira da rodada 1 o regroup por lado tem trabalho
+    // REAL (desintercalar) MAS nao pode desfazer o empurrao: stable_partition reagrupa
+    // party-first preservando a ordem relativa => inimigos ficam [e2, e1]. Um SORT restauraria
+    // [e1, e2] (SPD desc) e apagaria o Gambito (bug que o regroup Gambito-safe evita).
+    CombatActor p1 = hero("p1", 999, /*spd=*/30);
+    CombatActor p2 = hero("p2", 999, /*spd=*/20);
+    CombatActor e1 = foe("e1", 999, /*spd=*/25);
+    CombatActor e2 = foe("e2", 999, /*spd=*/10);
+    bool pushed = false;
+    CombatStateMachine sm({&p1, &p2, &e1, &e2},
+                          [&](CombatActor& a, const CombatState&) -> CombatAction {
+                              if (a.id() == "p1" && !pushed) {
+                                  pushed = true;
+                                  return CombatAction::gambit_reorder("e2", -2);  // -2 = adianta
+                              }
+                              return CombatAction::pass();
+                          });
+
+    // Rodada 0 reagrupada (party abre, 30>25): party [p1,p2], inimigos [e1,e2].
+    REQUIRE(order_ids(sm) == std::vector<std::string>{"p1", "p2", "e1", "e2"});
+
+    // p1 (primeiro a agir) empurra e2 -2 -> INTERCALA a fila: [p1, e2, p2, e1].
+    sm.begin_turn();
+    sm.run_active_turn_to_end();
+    REQUIRE(pushed);
+    REQUIRE(order_ids(sm) == std::vector<std::string>{"p1", "e2", "p2", "e1"});  // intercalado
+    REQUIRE_FALSE(sm.check_end());
+    sm.advance_to_next_actor();
+
+    // Completa a rodada 0 (e2, p2, e1 passam) ate a fronteira da rodada 1.
+    for (int i = 0; i < 3; ++i) {
+        sm.begin_turn();
+        sm.run_active_turn_to_end();
+        REQUIRE_FALSE(sm.check_end());
+        sm.advance_to_next_actor();
+    }
+
+    // Fronteira da rodada 1: regroup DESINTERCALA (party-first) mas PRESERVA o empurrao =>
+    // inimigos continuam [e2, e1] (lento antes do rapido), nao [e1, e2].
+    REQUIRE(sm.queue().round_index() == 1);
+    REQUIRE(order_ids(sm) == std::vector<std::string>{"p1", "p2", "e2", "e1"});
+    REQUIRE(sm.queue().cursor() == 0);
+    REQUIRE(sm.active_actor()->id() == "p1");
+}
+
+// ----- (c) Party abre com SPD intercalada: regroup + comando livre convivem (nao regride) -----
+
+TEST_CASE("1B-regroup: (c) party abre intercalada -> reagrupa E o comando livre segue intacto",
+          "[domain][combat][party1b][regroup]") {
+    // Party abre (p_fast=20 e o mais rapido) mas as SPDs intercalam com o inimigo e_mid=15.
+    // O regroup agrupa party-first ([p_fast, p_slow], depois [e_mid, e_slow]) E o comando
+    // livre da Fase 1 continua identico por cima: override do pre-selecionado, enemy-block em SPD.
+    CombatActor p_fast = hero("p_fast", 999, /*spd=*/20);
+    CombatActor e_mid = foe("e_mid", 999, /*spd=*/15);
+    CombatActor p_slow = hero("p_slow", 999, /*spd=*/10);
+    CombatActor e_slow = foe("e_slow", 999, /*spd=*/5);
+    std::vector<std::string> seq;
+    CombatStateMachine sm({&p_fast, &e_mid, &p_slow, &e_slow},
+                          [&](CombatActor& a, const CombatState&) {
+                              seq.push_back(a.id());
+                              return CombatAction::pass();
+                          });
+
+    // Reagrupado: party [p_fast, p_slow] antes dos inimigos [e_mid, e_slow].
+    REQUIRE(sm.round_opening_side() == CombatSide::Party);
+    REQUIRE(order_ids(sm) == std::vector<std::string>{"p_fast", "p_slow", "e_mid", "e_slow"});
+
+    // Comando livre (Fase 1) intacto: pending por SPD desc, override do pre-selecionado.
+    REQUIRE(ids_of(sm.pending_party_actors()) == std::vector<std::string>{"p_fast", "p_slow"});
+    sm.select_party_actor(&p_slow);  // override (pre-selecionado era p_fast)
+    sm.begin_turn();
+    REQUIRE(sm.active_actor()->id() == "p_slow");
+    sm.run_active_turn_to_end();
+    sm.advance_to_next_actor();
+
+    REQUIRE(ids_of(sm.pending_party_actors()) == std::vector<std::string>{"p_fast"});
+    sm.select_party_actor(&p_fast);
+    sm.begin_turn();
+    sm.run_active_turn_to_end();
+    sm.advance_to_next_actor();
+
+    REQUIRE(sm.pending_party_actors().empty());  // bloco da party terminou
+
+    // Enemy-block em ordem de SPD (e_mid 15 antes de e_slow 5).
+    REQUIRE(sm.active_actor()->id() == "e_mid");
+    sm.begin_turn();
+    sm.run_active_turn_to_end();
+    sm.advance_to_next_actor();
+    REQUIRE(sm.active_actor()->id() == "e_slow");
+    sm.begin_turn();
+    sm.run_active_turn_to_end();
+    sm.advance_to_next_actor();
+
+    // Party na ordem ESCOLHIDA (p_slow, p_fast); inimigos em SPD (e_mid, e_slow).
+    REQUIRE(seq == std::vector<std::string>{"p_slow", "p_fast", "e_mid", "e_slow"});
+    REQUIRE(sm.queue().round_index() == 1);
+    REQUIRE(sm.queue().cursor() == 0);
+}
+
+// ----- (d) cursor volta a 0 e round_index avanca em CADA fronteira (regroup estavel) -----
+
+TEST_CASE("1B-regroup: (d) cursor=0 e round_index correto em cada fronteira; ordem estavel",
+          "[domain][combat][party1b][regroup]") {
+    // Inimigo abre intercalado; sem Gambito, o regroup mantem a mesma ordem agrupada a cada
+    // rodada. Confirma o contrato de cursor (volta a 0 na fronteira) e a contagem de rodada.
+    CombatActor e_fast = foe("e_fast", 999, /*spd=*/20);
+    CombatActor p_mid = hero("p_mid", 999, /*spd=*/15);
+    CombatActor e_slow = foe("e_slow", 999, /*spd=*/10);
+    CombatActor p_slow = hero("p_slow", 999, /*spd=*/5);
+    CombatStateMachine sm({&e_fast, &p_mid, &e_slow, &p_slow}, always_pass);
+
+    const std::vector<std::string> grouped{"e_fast", "e_slow", "p_mid", "p_slow"};
+    REQUIRE(order_ids(sm) == grouped);  // rodada 0 reagrupada (inimigo abre)
+
+    for (int round = 1; round <= 2; ++round) {
+        for (int i = 0; i < 4; ++i) {
+            sm.begin_turn();
+            sm.run_active_turn_to_end();
+            sm.advance_to_next_actor();
+        }
+        REQUIRE(sm.queue().round_index() == round);
+        REQUIRE(sm.queue().cursor() == 0);
+        REQUIRE(order_ids(sm) == grouped);  // ordem agrupada estavel entre rodadas
+        REQUIRE(sm.active_actor()->id() == "e_fast");
+    }
+}

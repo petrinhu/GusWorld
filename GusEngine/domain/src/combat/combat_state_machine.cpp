@@ -143,7 +143,14 @@ CombatStateMachine::CombatStateMachine(
 
     phase_ = CombatPhase::SetupPhase;
     outcome_ = CombatOutcome::Ongoing;
-    // SetupPhase -> TurnStart: a fila ja esta ordenada; o primeiro ator entra.
+
+    // Regroup por lado da RODADA 0 (§4.1): a fila ja veio ordenada por SPD; agrupa "quem abre
+    // inteiro, depois o outro" (stable_partition, Gambito-safe). Fronteira da 1a rodada => o
+    // cursor fica em 0 (primeiro ator do lado que abre). As rodadas 1+ reagrupam no wrap de
+    // advance_to_next_actor.
+    regroup_round_by_side();
+
+    // SetupPhase -> TurnStart: a fila ja esta ordenada e agrupada; o primeiro ator entra.
     phase_ = CombatPhase::TurnStart;
 }
 
@@ -247,6 +254,16 @@ void CombatStateMachine::select_party_actor(CombatActor* actor) {
             "' nao e um membro elegivel da party nesta rodada (vivo, player-side, "
             "ainda-nao-agiu). Consulte pending_party_actors().");
     selected_next_party_ = actor;
+}
+
+void CombatStateMachine::regroup_round_by_side() {
+    // Quem ABRE (por SPD corrente entre os vivos; empate favorece a party). A fila nao conhece
+    // "lado": passamos um predicado que marca o lado que abre. party_opens verdadeiro => os
+    // atores player-side vao pra frente; falso => os enemy-side vao pra frente.
+    const bool party_opens = round_opening_side() == CombatSide::Party;
+    queue_.regroup_stable([party_opens](const CombatActor* a) {
+        return a->is_player_side() == party_opens;
+    });
 }
 
 // ---------------------------------------------------------------------------
@@ -364,8 +381,15 @@ void CombatStateMachine::advance_to_next_actor() {
     while (!queue_.current()->is_alive() && safety++ < queue_.count())
         queue_.advance();
 
-    if (queue_.round_index() > round_before)
+    if (queue_.round_index() > round_before) {
+        // Fronteira da rodada (o wrap acabou de dar a volta na fila): reagrupa por lado a nova
+        // rodada (§4.1) e avanca o relogio de periodo (§18.3). O regroup so acontece AQUI, na
+        // fronteira (nunca no meio da rodada): a esta altura prune_dead ja rodou e o cursor
+        // esta em 0, entao ele so pode reordenar atores pendentes desta nova rodada. Reagrupar
+        // AQUI (e nao a cada advance) preserva o comando livre da Fase 1 dentro da rodada.
+        regroup_round_by_side();
         advance_period_clock();
+    }
 }
 
 CombatResult CombatStateMachine::run_until_end() {
