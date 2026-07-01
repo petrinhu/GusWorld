@@ -161,6 +161,12 @@ public:
     // Anim corrente do ator (None se em repouso/desconhecido).
     [[nodiscard]] ActorAnimKind kind_for(const std::string& id) const;
 
+    // Tempo RESTANTE (s) da fase corrente do ator: duration - elapsed, clampado em
+    // >= 0. 0 em repouso/desconhecido e no MeleeHold (segura indefinido, duration 0).
+    // Gancho do SPRITE (W3): o consumidor comeca o swing do attack_melee quando a
+    // cauda do Approach cabe o clip (battle_sprite_anim::clip_for_kind).
+    [[nodiscard]] float phase_remaining_seconds(const std::string& id) const;
+
     // true se ha QUALQUER anim/projetil ativo (util pra diagnostico/captura).
     [[nodiscard]] bool any_active() const noexcept {
         return !anims_.empty() || !projectiles_.empty();

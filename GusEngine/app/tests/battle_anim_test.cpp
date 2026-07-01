@@ -231,3 +231,25 @@ TEST_CASE("anim: uma anim POR ATOR (a nova substitui a corrente); atores indepen
     REQUIRE(d.kind_for("gus") == ActorAnimKind::HitReact);
     REQUIRE_FALSE(d.melee_in_flight("gus"));
 }
+
+TEST_CASE("anim: phase_remaining_seconds conta o que FALTA da fase (gancho do sprite)",
+          "[battle_anim]") {
+    // O consumidor de SPRITE (W3) usa o tempo RESTANTE do Approach pra comecar o
+    // swing do attack_melee na CAUDA (termina exato no contato). Contrato:
+    //   - desconhecido/repouso: 0;
+    //   - fase temporizada: duration - elapsed (clampado >= 0);
+    //   - MeleeHold (segura indefinido, duration 0): 0.
+    BattleAnimDirector d;
+    REQUIRE(d.phase_remaining_seconds("ninguem") == 0.0f);
+
+    d.start_melee_approach("gus", Vec2{100.0f, 0.0f}, 0.6f);
+    REQUIRE(d.phase_remaining_seconds("gus") > 0.59f);  // acabou de partir
+    pump(d, 0.3f);
+    const float rem = d.phase_remaining_seconds("gus");
+    REQUIRE(rem > 0.25f);  // ~0.3 restando (tolerancia do passo 1/60)
+    REQUIRE(rem < 0.35f);
+
+    pump(d, 0.4f);  // passou do fim: virou Hold (segura indefinido)
+    REQUIRE(d.melee_arrived("gus"));
+    REQUIRE(d.phase_remaining_seconds("gus") == 0.0f);
+}

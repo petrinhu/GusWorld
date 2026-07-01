@@ -197,4 +197,13 @@ ActorAnimKind BattleAnimDirector::kind_for(const std::string& id) const {
     return it == anims_.end() ? ActorAnimKind::None : it->second.kind;
 }
 
+float BattleAnimDirector::phase_remaining_seconds(const std::string& id) const {
+    const auto it = anims_.find(id);
+    if (it == anims_.end()) {
+        return 0.0f;  // repouso/desconhecido
+    }
+    const float rem = it->second.duration - it->second.elapsed;
+    return rem > 0.0f ? rem : 0.0f;  // Hold (duration 0) e fase vencida clampam em 0
+}
+
 }  // namespace gus::app::screens
