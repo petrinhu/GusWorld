@@ -22,6 +22,10 @@ TEST_CASE("asset_paths: a movida do Gus esta refletida (personagens_inspirados)"
     // demais inspirados em pessoas reais).
     REQUIRE(ap::kGusSpritesDir.rfind(ap::kPersonagensInspiradosDir, 0) == 0);
     REQUIRE(ap::kYakovSpritesDir.rfind(ap::kPersonagensInspiradosDir, 0) == 0);
+    // Frames de batalha do Gus (W3): sob a pasta do Gus, em anims/.
+    REQUIRE(ap::kGusBattleAnimsDir ==
+            std::string_view("sprites/personagens_inspirados/gus/anims"));
+    REQUIRE(ap::kGusBattleAnimsDir.rfind(ap::kGusSpritesDir, 0) == 0);
     REQUIRE(ap::kPyotorVanceSpritesDir.rfind(ap::kPersonagensInspiradosDir, 0) == 0);
     REQUIRE(ap::kBrunusVetorialSpritesDir.rfind(ap::kPersonagensInspiradosDir, 0) == 0);
 }

@@ -23,6 +23,7 @@
 #include "gus/app/screens/battle_menu.hpp"       // BattleVerb
 #include "gus/app/screens/battle_pacing.hpp"     // PacingState/constantes
 #include "gus/app/screens/battle_scene.hpp"
+#include "gus/app/screens/battle_sprite_anim.hpp"  // ActorSpriteSet/BattleClipId (W3)
 #include "gus/domain/combat/combat_actor.hpp"
 #include "gus/domain/combat/combat_constants.hpp"  // kMultFraco (expectativa D3 no teste)
 #include "gus/domain/combat/weakness_wheel.hpp"     // WeaknessWheel (fraco = 1.5 no teste)
@@ -2290,4 +2291,121 @@ TEST_CASE("anim W2: render desenha a bolinha do projetil (placeholder) em voo",
         }
     }
     REQUIRE(near >= 3);  // as 3 fatias da bolinha
+}
+
+// ---- W3: SPRITE ANIMADO do ator na arena (battle_sprite_anim + wiring) --------------
+//
+// A cena recebe um ActorSpriteSet por ator (mesmo padrao de set_portraits: handles
+// prontos, cena agnostica de I/O) e o update(dt) dirige o relogio de clip pela FASE
+// do BattleAnimDirector. Clips SINTETICOS (handles falsos): zero PNG no teste.
+
+namespace {
+
+// Sprite set sintetico com os 4 clips que TOCAM nesta onda (fps default do modulo).
+gus::app::screens::ActorSpriteSet synthetic_sprite_set() {
+    using gus::app::screens::BattleClipId;
+    using gus::app::screens::default_clip_fps;
+    using gus::app::screens::default_clip_loop;
+    gus::app::screens::ActorSpriteSet set;
+    const auto fill = [&](BattleClipId id, int n, unsigned base) {
+        auto& c = set.clips[static_cast<std::size_t>(id)];
+        for (int i = 0; i < n; ++i) {
+            c.frames.push_back(base + static_cast<unsigned>(i));
+        }
+        c.fps = default_clip_fps(id);
+        c.loop = default_clip_loop(id);
+    };
+    fill(BattleClipId::Idle, 7, 100u);
+    fill(BattleClipId::Run, 7, 200u);
+    fill(BattleClipId::AttackMelee, 7, 300u);
+    fill(BattleClipId::HurtPhysical, 5, 400u);
+    return set;
+}
+
+}  // namespace
+
+TEST_CASE("sprite W3: ator com sprite set toca battle_idle no repouso (relogio anda)",
+          "[battle_scene][sprite]") {
+    using gus::app::screens::BattleClipId;
+    BattleScene scene;
+    scene.set_actor_sprites("gus", synthetic_sprite_set());
+
+    // Sem sprite set instalado -> nullopt (caua/inimigos seguem no retrato placeholder).
+    REQUIRE_FALSE(scene.actor_sprite_frame("caua").has_value());
+
+    scene.update(1.0f / 60.0f);  // instala o clip do repouso
+    const auto f0 = scene.actor_sprite_frame("gus");
+    REQUIRE(f0.has_value());
+    REQUIRE(f0->first == BattleClipId::Idle);
+    REQUIRE(f0->second == 0);
+
+    // O relogio anda: idle @ 8 fps -> depois de ~0.3s ja passou do frame 0.
+    for (int i = 0; i < 20; ++i) {
+        scene.update(1.0f / 60.0f);
+    }
+    const auto f1 = scene.actor_sprite_frame("gus");
+    REQUIRE(f1.has_value());
+    REQUIRE(f1->first == BattleClipId::Idle);
+    REQUIRE(f1->second > 0);
+}
+
+TEST_CASE("sprite W3: melee do GUS - corre na ida, saca o golpe na CAUDA, corre na "
+          "volta e volta ao idle",
+          "[battle_scene][sprite]") {
+    using gus::app::screens::ActorAnimKind;
+    using gus::app::screens::BattleClipId;
+    using gus::app::screens::kMeleeSwingSeconds;
+    BattleScene scene;
+    scene.set_actor_sprites("gus", synthetic_sprite_set());
+
+    // Dirige ate o PICKER (§4.1) e escolhe o GUS (nao o pre-selecionado por SPD).
+    pump_to_actor_picker(scene);
+    REQUIRE(scene.is_choosing_actor());
+    for (int i = 0; i < 4 && (scene.actor_pick_target() == nullptr ||
+                              scene.actor_pick_target()->id() != "gus");
+         ++i) {
+        scene.actor_picker_move(+1);
+    }
+    REQUIRE(scene.actor_pick_target() != nullptr);
+    REQUIRE(scene.actor_pick_target()->id() == "gus");
+    scene.actor_picker_confirm();
+    REQUIRE(scene.active_actor()->id() == "gus");
+
+    // [Atacar] confirmado: o windup parte JA (W2) e o sprite CORRE (run) na ida.
+    select_verb(scene, BattleVerb::Atacar);
+    scene.menu_confirm();
+    scene.aim_confirm();
+    REQUIRE(scene.player_action_in_flight());
+    scene.update(1.0f / 60.0f);
+    auto f = scene.actor_sprite_frame("gus");
+    REQUIRE(f.has_value());
+    REQUIRE(f->first == BattleClipId::Run);
+
+    // CAUDA da aproximacao (restam <= swing): o attack_melee one-shot comeca, pra
+    // terminar exatamente no contato.
+    for (int i = 0; i < 120 && scene.anim().phase_remaining_seconds("gus") >
+                                   kMeleeSwingSeconds;
+         ++i) {
+        scene.update(1.0f / 60.0f);
+    }
+    scene.update(1.0f / 60.0f);  // tick pos-transicao (o clip troca no update)
+    f = scene.actor_sprite_frame("gus");
+    REQUIRE(f.has_value());
+    REQUIRE(f->first == BattleClipId::AttackMelee);
+
+    // CONTATO resolve e o Return parte: correndo de volta.
+    pump_player_strike(scene);
+    REQUIRE(scene.anim().kind_for("gus") == ActorAnimKind::MeleeReturn);
+    f = scene.actor_sprite_frame("gus");
+    REQUIRE(f.has_value());
+    REQUIRE(f->first == BattleClipId::Run);
+
+    // A volta termina (0.4s) -> repouso: battle_idle de novo, do frame 0.
+    for (int i = 0; i < 45; ++i) {
+        scene.update(1.0f / 60.0f);
+    }
+    REQUIRE(scene.anim().kind_for("gus") == ActorAnimKind::None);
+    f = scene.actor_sprite_frame("gus");
+    REQUIRE(f.has_value());
+    REQUIRE(f->first == BattleClipId::Idle);
 }
