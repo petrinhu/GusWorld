@@ -96,7 +96,7 @@ if(GUSWORLD_GLINTFX)
     FetchContent_Declare(
         glintfx
         GIT_REPOSITORY https://codeberg.org/petrinhu/glintfx
-        GIT_TAG        v0.2.3
+        GIT_TAG        v0.2.4
         SOURCE_SUBDIR  glintfx
     )
     FetchContent_MakeAvailable(glintfx)

@@ -145,11 +145,11 @@ body { font-family: "Pixel Operator Mono"; background: transparent; }
    degrade da coluna contra a arena. */
 
 /* ---- RETRATO emoldurado (moldura TCG asset) + HALO cyan pulsante ---- */
-#actor { display: block; text-align: center; }
+#actor { text-align: center; }
 /* #portrait e o CONTEXTO de posicionamento (relative) dos filhos absolutos (pic/frame),
    senao eles ancoram no root (0,0). Centrado na coluna com margens laterais iguais. */
 #portrait {
-  display: block; position: relative;
+  position: relative;
   /* POLISH 1: retrato compactado (proporcao mantida 128:165 -> 104:134); margin-left
      recentraliza na coluna (inner 228dp). pic/frame escalam junto abaixo. */
   width: 104dp; height: 134dp; margin-left: 62dp; margin-top: 6dp;
@@ -174,14 +174,20 @@ body { font-family: "Pixel Operator Mono"; background: transparent; }
     rml += moldura;
     rml += R"RML( ); }
 
-#name { display: block; text-align: center; margin-top: 6dp; font-size: 14dp;
+#name { text-align: center; margin-top: 6dp; font-size: 14dp;
   color: #eaf6fb; }
-#role { display: block; text-align: center; font-size: 10dp; color: #E8A33D; }
+#role { text-align: center; font-size: 10dp; color: #E8A33D; }
 
 /* ---- HP barra (degrade verde + glow) + numeros ---- */
 #vitals { margin-top: 6dp; }
 .hpbar {
-  height: 12dp; border-radius: 6dp; margin-top: 3dp;
+  /* FIX largura (regressao do block-by-default da UA-sheet v0.2.4): sem 'width' o .hpbar
+     (agora BLOCK nativo) esticava ate a largura de conteudo da coluna (228dp) + o glow,
+     invadindo a arena (~260dp, alem da coluna de 252dp). CLAMP explicito em 110dp = o MESMO
+     width dos pills de verbo (.verb), left-aligned => a barra coincide com a coluna de botoes
+     abaixo e fica 100% DENTRO do cockpit (borda direita 110dp + glow ~18dp = ~128dp << 228dp
+     inner). O fill escala proporcional ao HP dentro deste width quando virar track/fill. */
+  width: 110dp; height: 12dp; border-radius: 6dp; margin-top: 3dp;
   decorator: vertical-gradient( #7dffbe #2e9c63 );  /* verde claro -> verde escuro */
   box-shadow: #3FB97a 0dp 0dp 16dp 2dp;            /* glow verde, spread POSITIVO */
 }
@@ -189,7 +195,7 @@ body { font-family: "Pixel Operator Mono"; background: transparent; }
 .hpnum .v { color: #5fe3a0; }
 
 /* ---- pips AP (latao) / Mana (cyan), radiais com glow ---- */
-.pips { display: block; margin-top: 5dp; font-size: 10dp; color: #8fa6b4; }
+.pips { margin-top: 5dp; font-size: 10dp; color: #8fa6b4; }
 .pip { display: inline-block; width: 12dp; height: 12dp; border-radius: 6dp;
   margin-right: 4dp; border: 1dp #2a3450; background-color: #0c1322; }
 .pip.ap.on { decorator: radial-gradient( circle closest-side, #ffe6a8, #E8A33D );
@@ -198,16 +204,11 @@ body { font-family: "Pixel Operator Mono"; background: transparent; }
   box-shadow: #22D3EE 0dp 0dp 12dp 2dp; }
 
 /* ---- MENU de verbos: pill rococo com GLOW neon nos 3 estados ---- */
-/* AJUSTE ESPACAMENTO (veredito do lider): o BLOCO inteiro de pills desce como uma unidade,
-   +18dp (= 1 altura de botao) de folga MANA->1o botao e +18dp FUGIR->log.
-   POR QUE SPACER e nao margin-top: no embed do glintfx a UA-stylesheet padrao NAO e
-   carregada, entao .menu/#log (sem 'display' explicito) caem em INLINE - e margin vertical
-   NAO aplica em elemento inline (mesma raiz do BUG-2 do strike no log). O commit anterior
-   setou .menu/#log margin-top e nao renderizou NADA. Solucao a prova de inline/collapse:
-   .gap = bloco vazio de altura FIXA, injetado entre a linha MANA e o menu, e entre o menu e
-   o log (ver <div class="gap"> no body). height:18dp num bloco SEMPRE reserva o espaco. */
-.gap { display: block; height: 18dp; }
-.menu { margin-top: 0dp; }
+/* ESPACAMENTO (veredito do lider): +18dp de folga MANA->1o botao (margin-top do .menu) e
+   +18dp FUGIR->log (margin-top do #log). Com a UA-stylesheet do RmlUi carregada em AMBOS os
+   modos (vendorizado sempre; glintfx a partir do v0.2.4), .menu/#log sao block por padrao =>
+   margin vertical aplica nativo. O RmlUi nao faz margin-collapsing, entao os 18dp sao exatos. */
+.menu { margin-top: 18dp; }
 .verb {
   /* AJUSTE (veredito do lider): pills NITIDAMENTE mais enxutos. O 25->21 anterior foi
      imperceptivel; aqui o corte e no PISO de legibilidade E no FOOTPRINT: altura 18dp (fonte
@@ -218,7 +219,7 @@ body { font-family: "Pixel Operator Mono"; background: transparent; }
      SELECIONADO segue proeminente (glow/contraste, regras .sel). O rotulo mais largo
      (DEFENDER/COMPILAR, 8 chars a 11dp) mede ~82dp de conteudo; a caixa a 110dp deixa ~28dp
      de folga sem clipar. */
-  display: block; width: 110dp; height: 18dp; margin-bottom: 4dp; padding: 0dp 12dp;
+  width: 110dp; height: 18dp; margin-bottom: 4dp; padding: 0dp 12dp;
   border-radius: 9dp;
   decorator: vertical-gradient( #2a3658 #131a2e );  /* topo mais claro (3D sutil) */
   border: 1dp #38456e;
@@ -248,27 +249,31 @@ body { font-family: "Pixel Operator Mono"; background: transparent; }
 }
 
 /* ---- LOG (terminal) ---- */
-/* POLISH 1: log compacto. font 11->10dp + line-height 13dp encurtam as linhas que QUEBRAM
-   em 2 (texto longo). O numero de entradas e CAPADO a 3 no alimentador (scene.log_lines(3),
-   as mais recentes) - assim a coluna inteira (header+vitals+6 verbos+log+now-line) cabe em
-   540dp, com a now-line "> verbo -> alvo" sempre visivel no rodape. */
-/* AJUSTE ESPACAMENTO (veredito do lider): a folga FUGIR->log vem do <div class="gap"> (bloco
-   de 18dp) injetado ACIMA do #log no body - NAO de margin-top (inline no embed = ignorado,
-   ver nota do .gap). margin-top fica 0dp; o border-top/padding-top desenham o filete do log. */
-#log { margin-top: 0dp; padding-top: 6dp; border-top: 1dp #2a3450; font-size: 10dp; }
-/* BUG-2 FIX: no embed do glintfx a UA-stylesheet padrao NAO e carregada -> <div> cai em
-   'inline' (nao 'block'). Sem display:block as .ln do data-for fluiam INLINE e emendavam
-   ('...por 5.COMPILAR...'), e os fragmentos inline sobrepostos com line-height apertado
-   desenhavam um risco horizontal (parecia strikethrough). Forcando block cada linha empilha
-   limpa; text-decoration:none garante zero risco. */
-#log .ln { display: block; color: #6f8593; line-height: 13dp; text-decoration: none; }
+/* POLISH 2 (veredito do lider: HP bar OK, LOG reprovado): cada entrada em UMA linha SO.
+   O problema anterior: entradas longas (ex. "inimigo3 ataca caua por 5.; caua ficou com
+   Aceleracao") QUEBRAVAM em 2 linhas visuais cada; 2 entradas => 4 linhas + now-line = 5
+   linhas, empurrando a now-line "> verbo -> alvo" pra FORA (sumia) e colando a ultima linha
+   no rodape. FIX: white-space:nowrap trava cada .ln em 1 linha; overflow:hidden +
+   text-overflow:ellipsis truncam com reticencias dentro da largura da coluna (inner ~228dp,
+   caixa definida pelo #cockpit width 252dp). Agora e DETERMINISTICO: cap 2 entradas +
+   now-line = EXATAS 3 linhas x line-height 12dp = 36dp de log. A coluna inteira
+   (header+vitals+6 verbos+log+now-line) cabe em 540dp com FOLGA generosa do rodape (~70dp),
+   a now-line SEMPRE visivel embaixo e nada cortado. */
+/* ESPACAMENTO (veredito do lider): +18dp de folga FUGIR->log via margin-top (block nativo
+   com a UA-stylesheet do RmlUi). O border-top/padding-top desenham o filete do log. */
+#log { margin-top: 18dp; padding-top: 6dp; border-top: 1dp #2a3450; font-size: 10dp; }
+/* Cada .ln e block nativo (UA) => as linhas do data-for empilham limpas, sem overlap inline
+   (o falso strikethrough era fragmentos inline sobrepostos, resolvido de raiz pelo block).
+   nowrap+overflow:hidden+ellipsis => 1 linha fixa por entrada (a now-line .ln now herda). */
+#log .ln { color: #6f8593; line-height: 12dp;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 #log .who { color: #22D3EE; }
 #log .hit { color: #E11D74; }
 #log .now { color: #cfe6ee; }
 
 /* ---- ABERTURA: brasao GusWorld (monograma V + aneis girando + AGUARDANDO ORDEM) ---- */
-#opening { display: block; text-align: center; margin-top: 90dp; }
-#crest { display: block; position: relative; width: 148dp; height: 148dp;
+#opening { text-align: center; margin-top: 90dp; }
+#crest { position: relative; width: 148dp; height: 148dp;
   margin-left: 52dp; margin-bottom: 18dp; }
 .ring { position: absolute; border-radius: 74dp; }
 .ring.r1 { top: 0dp; left: 0dp; width: 148dp; height: 148dp;
@@ -282,9 +287,9 @@ body { font-family: "Pixel Operator Mono"; background: transparent; }
 /* monograma V (Vance) centrado, com glow latao */
 .mono { position: absolute; top: 38dp; left: 0dp; width: 148dp; text-align: center;
   font-size: 62dp; color: #E8A33D; }
-#otitle { display: block; font-size: 16dp; color: #cfe6ee; }
-#osub { display: block; font-size: 10dp; color: #6f8593; margin-top: 2dp; }
-#ostatus { display: block; margin-top: 16dp; font-size: 11dp; color: #22D3EE; }
+#otitle { font-size: 16dp; color: #cfe6ee; }
+#osub { font-size: 10dp; color: #6f8593; margin-top: 2dp; }
+#ostatus { margin-top: 16dp; font-size: 11dp; color: #22D3EE; }
 #ostatus .dot { display: inline-block; width: 7dp; height: 7dp; border-radius: 4dp;
   margin-right: 8dp; background-color: #22D3EE; box-shadow: #22D3EE 0dp 0dp 8dp;
   animation: blink 1.1s step-start infinite; }
@@ -330,10 +335,7 @@ body { font-family: "Pixel Operator Mono"; background: transparent; }
         </div>
       </div>
 
-      <!-- SPACER (veredito do lider): +18dp de folga MANA->1o botao. Bloco vazio de altura
-           fixa: renderiza no embed onde margin-top (inline) e ignorado. Ver nota do .gap. -->
-      <div class="gap"></div>
-
+      <!-- +18dp de folga MANA->1o botao vem do margin-top do .menu (block nativo). -->
       <div class="menu">
         <div class="verb"><span class="glyph"></span><span class="lbl">SCAN</span></div>
         <div class="verb"><span class="glyph"></span><span class="lbl">GAMBITO</span></div>
@@ -343,9 +345,7 @@ body { font-family: "Pixel Operator Mono"; background: transparent; }
         <div class="verb"><span class="glyph"></span><span class="lbl">FUGIR</span></div>
       </div>
 
-      <!-- SPACER (veredito do lider): +18dp de folga FUGIR->log. Idem ao gap de cima. -->
-      <div class="gap"></div>
-
+      <!-- +18dp de folga FUGIR->log vem do margin-top do #log (block nativo). -->
       <div id="log">
         <div class="ln"><span class="who">Gus</span> compilou Vetor de Defesa.</div>
         <div class="ln">Daemon-Corrompido prepara <span class="hit">Overflow</span>.</div>
@@ -1319,10 +1319,12 @@ int run_battle_preview() {
                         ui->set_string("alvo", alvo);
                         // Log VIVO: ultimas linhas narradas pelo motor (data-for "line:log").
                         // As strings precisam VIVER ate o set_list copiar (mantemos o vector).
-                        // POLISH 1: CAPADO a 3 linhas (as mais recentes) p/ a coluna +
-                        // now-line CABER em 540dp (no canvas ~503dp visivel a dp_ratio=2).
+                        // CAP 2 entradas (as mais recentes) + now-line = EXATAS 3 linhas de
+                        // log. Com o RCSS white-space:nowrap+ellipsis do #log .ln cada entrada
+                        // ocupa 1 linha fixa (nao quebra mais em 2), entao 2*12dp + now-line =
+                        // 36dp e a coluna cabe em 540dp com folga do rodape; now-line visivel.
                         const std::vector<gus::app::screens::LogLine> lines =
-                            scene.log_lines(3);
+                            scene.log_lines(2);
                         std::vector<const char*> ptrs;
                         ptrs.reserve(lines.size());
                         for (const auto& l : lines) ptrs.push_back(l.text.c_str());
