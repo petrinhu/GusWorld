@@ -58,6 +58,11 @@ target_compile_definitions(gusengine_app
     # RCSS (o glintfx::UiLayer NAO expoe Rml::LoadFontFace - so o doc carrega fonte). Sem
     # esta macro o app/ nao saberia o caminho absoluto da fonte. Override: env GUSWORLD_FONTS.
     PRIVATE GUSWORLD_FONTS_DIR="${CMAKE_SOURCE_DIR}/assets/fonts"
+    # Pasta do kit CC0 de SFX (M6 F2/F3, ADR-011), na RAIZ do repo (irma de resources/ e
+    # GusEngine/ - "assets/" de origem/source do JOGO, diferente de GusEngine/assets/ que
+    # e asset DA ENGINE). O battle_preview (owner do AudioEngine) le hit_digital_
+    # provisorio.wav daqui rodando do build dir; override em runtime via env GUSWORLD_SFX.
+    PRIVATE GUSWORLD_SFX_DIR="${CMAKE_SOURCE_DIR}/../assets/sfx"
 )
 
 # SDL3 entra aqui (a casca SdlWindow + o main tocam SDL diretamente).
