@@ -43,6 +43,7 @@
 #include "gus/app/screens/battle_log_model.hpp"   // LogLine
 #include "gus/app/screens/battle_menu.hpp"        // BattleMenu / BattleVerb
 #include "gus/app/screens/battle_pacing.hpp"      // PacingDirector (ritmo, D8)
+#include "gus/app/screens/battle_sprite_anim.hpp" // ActorSpriteSet/BattleSpriteAnimator (W3)
 #include "gus/domain/combat/combat_enums.hpp"     // StatusId
 #include "gus/domain/combat/combat_records.hpp"   // CombatAction / IntentPreview
 #include "gus/domain/combat/combat_state_machine.hpp"
@@ -126,6 +127,22 @@ public:
     void set_intent_icons(BattleIntentIconSet icons) noexcept {
         intent_icons_ = icons;
     }
+
+    // SPRITE ANIMADO na arena (W3, battle-anim.md par.1.1/3.2): instala o conjunto de
+    // clips de UM ator (handles ja resolvidos pela casca, mesmo padrao de
+    // set_portraits). Com sprite set, o render desenha o FRAME CORRENTE da animacao da
+    // fase (idle/run/golpe/hurt) no slot (+offset do director); SEM set (ou clips
+    // vazios/headless), o ator segue no retrato placeholder de hoje. Nesta onda so o
+    // GUS recebe set (demais atores aguardam as anims deles).
+    void set_actor_sprites(const std::string& id, ActorSpriteSet set) {
+        sprites_[id] = std::move(set);
+    }
+
+    // Clip + frame CORRENTES do sprite do ator (leitura pro render/testes/self-test).
+    // nullopt se o ator nao tem sprite set instalado (ou o clip da fase E o fallback
+    // Idle estao ambos vazios) - o render degrada pro retrato.
+    [[nodiscard]] std::optional<std::pair<BattleClipId, int>> actor_sprite_frame(
+        const std::string& id) const;
 
     // HUD EXTERNO (ADR-009): quando true, o COCKPIT (painel do ator + menu de verbos) e o
     // LOG/terminal NAO sao desenhados a mao por esta cena - eles viram 100% RmlUi (GL3),
@@ -486,6 +503,13 @@ private:
     [[nodiscard]] const gus::domain::combat::CombatActor* actor_by_id(
         const std::string& id) const;
 
+    // Resolve o CLIP corrente do sprite de um ator: o que a fase do director pede
+    // (clip_for_kind + swing na cauda), com fallback pro Idle se o clip da fase nao
+    // tem frames. nullptr se o ator nao tem set/frames (degrada pro retrato).
+    // Fonte UNICA usada pelo render E por actor_sprite_frame (nao divergem).
+    [[nodiscard]] const SpriteClip* resolve_sprite_clip(
+        const std::string& id, BattleClipId* out_clip, float* out_elapsed) const;
+
     // Inicia a aproximacao melee do atacante ATE perto do alvo (para adjacente ao slot,
     // kMeleeContactGapPx de folga; party avanca pra DIREITA, inimigo pra ESQUERDA - sem
     // flip, Pillar 3: o deslocamento e so translacao do sprite). false se algum slot nao
@@ -529,6 +553,10 @@ private:
     // Diretor de ANIMACAO (W2): offsets por ator + projeteis; o render soma os offsets
     // na posicao-base dos slots. update(dt) o avanca junto do resto.
     BattleAnimDirector anim_{};
+    // SPRITES (W3): conjunto de clips por ator (so quem tem anima; os demais seguem no
+    // retrato) + relogio de clip por ator, dirigido no update(dt) pela fase do director.
+    std::unordered_map<std::string, ActorSpriteSet> sprites_;
+    BattleSpriteAnimator sprite_anim_{};
     // true entre o confirm de [Atacar] do jogador e o CONTATO (resolucao deferida). O
     // update(dt) resolve quando a aproximacao chega (melee_arrived).
     bool player_strike_pending_ = false;

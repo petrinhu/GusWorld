@@ -19,6 +19,7 @@ add_executable(gusengine_app_tests
     battle_log_model_test.cpp
     battle_floaters_test.cpp
     battle_anim_test.cpp
+    battle_sprite_anim_test.cpp
     battle_pacing_test.cpp
     battle_scene_test.cpp
     translator_test.cpp

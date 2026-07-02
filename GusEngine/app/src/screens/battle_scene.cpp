@@ -28,6 +28,7 @@
 #include "gus/app/screens/battle_floaters.hpp"
 #include "gus/app/screens/battle_hud_model.hpp"
 #include "gus/app/screens/battle_layout.hpp"
+#include "gus/app/screens/sprite_anchor.hpp"  // pe real do sprite (W3: bbox do idle)
 #include "gus/domain/combat/combat_actor.hpp"
 #include "gus/domain/combat/combat_constants.hpp"
 #include "gus/domain/combat/combat_enums.hpp"
@@ -396,6 +397,54 @@ const CombatActor* BattleScene::actor_by_id(const std::string& id) const {
     return nullptr;
 }
 
+const SpriteClip* BattleScene::resolve_sprite_clip(const std::string& id,
+                                                   BattleClipId* out_clip,
+                                                   float* out_elapsed) const {
+    const auto sit = sprites_.find(id);
+    if (sit == sprites_.end()) {
+        return nullptr;  // ator sem sprite set: retrato placeholder
+    }
+    const BattleSpriteAnimator::Playback pb = sprite_anim_.playback_for(id);
+    const SpriteClip* clip = sit->second.find(pb.clip);
+    BattleClipId cid = pb.clip;
+    if (clip == nullptr) {
+        // Clip da fase sem frames no disco: degrau 1 = fallback do modulo POCO
+        // (perfil ausente -> front-facing equivalente: run_east/run_west -> run;
+        // attack_melee_east -> attack_melee). O relogio corrente vale (a cadencia
+        // difere, mas o reset ja aconteceu na troca de clip).
+        cid = clip_fallback(pb.clip);
+        clip = sit->second.find(cid);
+    }
+    if (clip == nullptr) {
+        // Degrau 2: Idle (melhor um idle vivo que um buraco).
+        clip = sit->second.find(BattleClipId::Idle);
+        cid = BattleClipId::Idle;
+    }
+    if (clip == nullptr) {
+        return nullptr;  // nem Idle tem frames: retrato placeholder
+    }
+    if (out_clip != nullptr) {
+        *out_clip = cid;
+    }
+    if (out_elapsed != nullptr) {
+        *out_elapsed = pb.elapsed;
+    }
+    return clip;
+}
+
+std::optional<std::pair<BattleClipId, int>> BattleScene::actor_sprite_frame(
+    const std::string& id) const {
+    BattleClipId cid = BattleClipId::Idle;
+    float elapsed = 0.0f;
+    const SpriteClip* clip = resolve_sprite_clip(id, &cid, &elapsed);
+    if (clip == nullptr) {
+        return std::nullopt;
+    }
+    const int fi = clip_frame_index(static_cast<int>(clip->frames.size()), clip->fps,
+                                    clip->loop, elapsed);
+    return std::make_pair(cid, fi);
+}
+
 bool BattleScene::start_melee_toward(const std::string& attacker_id,
                                      const std::string& target_id, float seconds) {
     // Desloca-golpeia-volta (battle-anim.md par.2.2): o atacante anda da posicao de
@@ -569,6 +618,19 @@ void BattleScene::update(float dt_seconds) {
     pacing_.tick(dt_seconds);
     if (pacing_.ready_to_step()) {
         advance_pacing();
+    }
+
+    // SPRITES (W3): dirige o relogio de clip de cada ator COM sprite set pela fase
+    // corrente do director - POR ULTIMO, pro clip refletir o estado DESTE frame
+    // (pos-contato/pos-pacing). O swing do attack_melee entra na CAUDA do Approach
+    // (clip_for_kind; decisao documentada em battle_sprite_anim.hpp). A troca de clip
+    // reseta o relogio; o render so LE (resolve_sprite_clip).
+    for (const auto& entry : sprites_) {
+        const std::string& id = entry.first;
+        const BattleClipId clip = clip_for_kind(anim_.kind_for(id),
+                                                anim_.phase_remaining_seconds(id),
+                                                kMeleeSwingSeconds);
+        sprite_anim_.tick(id, clip, dt_seconds);
     }
 }
 
@@ -769,8 +831,15 @@ void BattleScene::resolve_one_turn() {
     narrate_new_logs();
     // Recovery do melee (no-op se o atacante nao estava em aproximacao/hold - Defender/
     // Scan/Flee nao animam; robusto a skip: parte do offset ATUAL, termina no repouso).
+    // A VOLTA e por LADO: o jogador usa kPlayerMeleeReturnSeconds (alongada, proporcional
+    // ao approach dele; cabe no delay 0.8s); o inimigo mantem kMeleeReturnSeconds (0.4s,
+    // ritmo aprovado no W1, INTOCADO). atk_before define o lado (o atacante deste turno).
     if (!atk_id.empty() && anim_.melee_in_flight(atk_id)) {
-        anim_.begin_melee_return(atk_id, kMeleeReturnSeconds);
+        const float return_seconds =
+            (atk_before != nullptr && atk_before->is_player_side())
+                ? kPlayerMeleeReturnSeconds
+                : kMeleeReturnSeconds;
+        anim_.begin_melee_return(atk_id, return_seconds);
     }
     if (!machine_->check_end()) {
         machine_->advance_to_next_actor();
@@ -1026,12 +1095,15 @@ void BattleScene::aim_confirm() {
     // mailbox) - a aproximacao E o proprio anuncio do turno do jogador. O ritmo
     // continua em WaitingPlayerInput durante o voo (o menu fica inerte pelos guards);
     // o update(dt) resolve no contato e entra no delay (player_acted). A duracao usa
-    // kPacingAnnounceSeconds: o MESMO tempo de windup garantido ao inimigo (par.3.2).
+    // kPlayerMeleeApproachSeconds (DESACOPLADA do Beat 1 do inimigo, que segue em
+    // kPacingAnnounceSeconds cru): o approach do jogador NAO tem beat de pacing atrelado
+    // (o contato e gated por anim_.melee_arrived, nao por timer), entao dura o que a
+    // LEITURA pede - o playtest (lider 2026-07-02) pediu mais tempo pra VER a corrida.
     // Se o slot nao estiver visivel (nunca no fluxo normal), degrada: resolve na hora.
     if (!is_scan) {
         const CombatActor* self = active_actor();
         if (self != nullptr &&
-            start_melee_toward(self->id(), target_id, kPacingAnnounceSeconds)) {
+            start_melee_toward(self->id(), target_id, kPlayerMeleeApproachSeconds)) {
             player_strike_pending_ = true;
             player_strike_attacker_ = self->id();
             return;  // contato (e resolucao) vem no update(dt)
@@ -1487,16 +1559,77 @@ void BattleScene::render(IRenderer& renderer, float viewport_px_w,
                 // desloca, a leitura tatica nao dança junto (camera estatica, D7).
                 const Vec2 aoff = anim_.offset_for(a->id());
                 const Rect ra{r.x + aoff.x, r.y + aoff.y, r.w, r.h};
-                // Retrato (ou slot escuro de fallback).
-                const TextureId tex = portraits_.find(a->id());
-                if (tex != kInvalidTexture) {
-                    renderer.draw_textured_rect(ra, tex, UvRect{}, kWhite);
-                } else {
-                    renderer.draw_filled_rect(ra, kSlotDarkColor);
-                }
-                // Moldura: ativo = cyan grossa; senao a cor do lado, fina.
                 const bool act = (active != nullptr && a == active);
-                renderer.draw_rect_outline(ra, act ? kCyan : side, act ? 2.0f : 1.0f);
+                // SPRITE ANIMADO (W3, battle-anim.md par.1.1/3.2): ator COM sprite set
+                // desenha o FRAME corrente da animacao da fase (idle/run/golpe/hurt),
+                // ESCALADO (frame 256x256 quadrado -> quad de kActorSpriteScale x o
+                // slot, proporcao mantida) e ANCORADO PELO PE na BASE do slot ("em pe
+                // no chao", nao centrado). O pe REAL vem do alpha-bbox do frame 0 do
+                // Idle (referencia ESTAVEL - ancorar pelo idle nao faz o tronco pular
+                // entre frames; mesma disciplina do overworld/sprite_anchor). Headless/
+                // Null (bbox invalido) degrada pro anchor legado (margem 0). O offset
+                // de animacao (aoff) desloca o sprite; o HUD ancorado (HP/status/
+                // intent/mira) SEGUE no slot-base, como no placeholder.
+                bool drew_sprite = false;
+                {
+                    BattleClipId sclip = BattleClipId::Idle;
+                    float selapsed = 0.0f;
+                    const SpriteClip* clip =
+                        resolve_sprite_clip(a->id(), &sclip, &selapsed);
+                    if (clip != nullptr) {
+                        const int fi = clip_frame_index(
+                            static_cast<int>(clip->frames.size()), clip->fps,
+                            clip->loop, selapsed);
+                        const TextureId ftex =
+                            clip->frames[static_cast<std::size_t>(fi)];
+                        if (ftex != kInvalidTexture) {
+                            const float quad = static_cast<float>(kActorSlotH) *
+                                               kActorSpriteScale;
+                            // Pe real: margem inferior transparente do Idle f0.
+                            float foot = 0.0f;
+                            const auto sit = sprites_.find(a->id());
+                            const SpriteClip* idle =
+                                sit != sprites_.end()
+                                    ? sit->second.find(BattleClipId::Idle)
+                                    : nullptr;
+                            const TextureId anchor_tex =
+                                idle != nullptr ? idle->frames.front() : ftex;
+                            const auto bbox =
+                                renderer.texture_content_bbox(anchor_tex);
+                            if (bbox.valid()) {
+                                foot = bottom_margin_fraction(bbox.bottom_margin(),
+                                                              bbox.canvas_h);
+                            }
+                            const float top_y =
+                                sprite_top_y(r.y + r.h, quad, foot,
+                                             /*manual_offset_world=*/0.0f);
+                            const Rect quad_rect{r.x + (r.w - quad) * 0.5f + aoff.x,
+                                                 top_y + aoff.y, quad, quad};
+                            renderer.draw_textured_rect(quad_rect, ftex, UvRect{},
+                                                        kWhite);
+                            // Highlight do ATIVO (D7) segue multimodal: contorno cyan
+                            // no quad do sprite. A moldura fina de "lado" do
+                            // placeholder NAO se aplica (a silhueta do sprite ja
+                            // marca o ator) - decisao W3, lider valida ao vivo.
+                            if (act) {
+                                renderer.draw_rect_outline(quad_rect, kCyan, 2.0f);
+                            }
+                            drew_sprite = true;
+                        }
+                    }
+                }
+                if (!drew_sprite) {
+                    // Retrato (ou slot escuro de fallback) - placeholder de hoje.
+                    const TextureId tex = portraits_.find(a->id());
+                    if (tex != kInvalidTexture) {
+                        renderer.draw_textured_rect(ra, tex, UvRect{}, kWhite);
+                    } else {
+                        renderer.draw_filled_rect(ra, kSlotDarkColor);
+                    }
+                    // Moldura: ativo = cyan grossa; senao a cor do lado, fina.
+                    renderer.draw_rect_outline(ra, act ? kCyan : side,
+                                               act ? 2.0f : 1.0f);
+                }
                 // Mini-barra de HP sob o ator.
                 const Rect hpbar = arena_hp_bar_frame(r);
                 draw_bar(renderer, hpbar, bar_fill(a->hp(), a->max_hp()), hp_fill);

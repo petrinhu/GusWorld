@@ -46,6 +46,12 @@ inline constexpr std::string_view kPersonagensInspiradosDir =
 // GUS (protagonista). MOVIDO 2026-06-25: era "sprites/gus" -> personagens_inspirados/gus.
 inline constexpr std::string_view kGusSpritesDir =
     "sprites/personagens_inspirados/gus";
+// Frames de animacao de BATALHA do Gus (W3, sprite na arena): 1 pasta por clip
+// (battle_idle/, run/, attack_melee/, hurt_physical/, cast/, ko/, ...) com frames
+// f0.png..fN.png (256x256 RGBA). Consumido por battle_preview (sprite set da arena);
+// os NOMES das pastas sao contrato de battle_sprite_anim::clip_dir_name.
+inline constexpr std::string_view kGusBattleAnimsDir =
+    "sprites/personagens_inspirados/gus/anims";
 inline constexpr std::string_view kYakovSpritesDir =
     "sprites/personagens_inspirados/yakov";
 inline constexpr std::string_view kPyotorVanceSpritesDir =
