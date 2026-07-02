@@ -105,6 +105,14 @@ public:
     void set_master_volume(float volume);
     [[nodiscard]] float master_volume() const noexcept;
 
+    // HOOK DE TESTE (M6 F3, ADR-011): quantos play_sfx EFETIVAMENTE dispararam (id
+    // valido + engine available() - nao conta chamadas no-op) desde a construcao. A
+    // classe e concreta (sem virtual, PImpl) por design desta onda minima; este contador
+    // e o jeito mais barato de provar HEADLESS (null-device, sem hardware) "o play
+    // disparou no evento certo" nos consumidores (ex.: BattleScene::play_hit_sfx), sem
+    // introduzir uma interface so pra permitir um spy/mock.
+    [[nodiscard]] unsigned int sfx_play_count() const noexcept;
+
 private:
     void reap_finished_sfx_instances() noexcept;
 
@@ -112,6 +120,7 @@ private:
                                    // fica confinado ao .cpp)
     std::unique_ptr<Impl> impl_;  // sempre nao-nulo (mesmo em modo indisponivel)
     float master_volume_ = 1.0f;
+    unsigned int sfx_play_count_ = 0;  // hook de teste (M6 F3) - ver sfx_play_count()
 };
 
 }  // namespace gus::platform::audio

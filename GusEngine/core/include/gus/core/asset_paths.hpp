@@ -130,6 +130,24 @@ inline constexpr std::string_view kTranslationsDir = "game/translations";
 // Catalogo do locale dev primario (pt-br).
 inline constexpr std::string_view kTranslationPtBrFile = "pt_br.md";
 
+// ============================================================================
+// AUDIO (kit CC0 provisorio, sob <raiz_repo>/assets/sfx/ e assets/music/ - M6 F2/F3,
+// ADR-011). Raiz DIFERENTE de kFontsDir/kMapsCompiledDir (essas ficam DENTRO de
+// GusEngine/assets/, versionadas com a engine): sfx/music sao asset SOURCE do JOGO,
+// na raiz do repo (irma de resources/ e GusEngine/), resolvida via env GUSWORLD_SFX >
+// macro de compilacao (GUSWORLD_SFX_DIR) > relativo ao CWD (mesmo padrao dos demais
+// resolvers - a LOGICA fica em quem consome, battle_preview.cpp).
+// ============================================================================
+
+// Pasta dos SFX curtos (WAV, decode-on-load).
+inline constexpr std::string_view kSfxDir = "assets/sfx";
+// Hit "digital/runico" (Pillar magia=software, filtro da curadoria F2): SFX de contato
+// do golpe (F3) - melee E projetil, mesmo play_sfx nos dois call-sites.
+inline constexpr std::string_view kHitSfxFile = "hit_digital_provisorio.wav";
+// Variante A/B do hit (GUSWORLD_HIT_SFX=alt troca pro lider comparar ao vivo no
+// playtest e escolher qual fica - F3, ADR-011).
+inline constexpr std::string_view kHitSfxAltFile = "hit_digital_alt_provisorio.wav";
+
 }  // namespace gus::core::assets
 
 #endif  // GUS_CORE_ASSET_PATHS_HPP

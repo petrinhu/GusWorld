@@ -62,6 +62,15 @@ TEST_CASE("asset_paths: fonte/mapa/traducao centralizados", "[core][assets]") {
     REQUIRE(ap::kTranslationPtBrFile == std::string_view("pt_br.md"));
 }
 
+TEST_CASE("asset_paths: SFX do hit (M6 F3, ADR-011) - principal + variante A/B",
+          "[core][assets]") {
+    REQUIRE(ap::kSfxDir == std::string_view("assets/sfx"));
+    REQUIRE(ap::kHitSfxFile == std::string_view("hit_digital_provisorio.wav"));
+    REQUIRE(ap::kHitSfxAltFile == std::string_view("hit_digital_alt_provisorio.wav"));
+    // Principal e variante sao arquivos DIFERENTES (o A/B so faz sentido assim).
+    REQUIRE(ap::kHitSfxFile != ap::kHitSfxAltFile);
+}
+
 TEST_CASE("asset_paths: todos os caminhos sao RELATIVOS e nao-vazios",
           "[core][assets]") {
     const std::string_view all[] = {
@@ -72,7 +81,7 @@ TEST_CASE("asset_paths: todos os caminhos sao RELATIVOS e nao-vazios",
         ap::kRetratosDir, ap::kStatusIconsDir, ap::kIntentIconsDir, ap::kFontsDir,
         ap::kFontMonoRegularFile, ap::kFontMonoBoldFile, ap::kMapsCompiledDir,
         ap::kDistritosInferioresGmapFile, ap::kTranslationsDir,
-        ap::kTranslationPtBrFile,
+        ap::kTranslationPtBrFile, ap::kSfxDir, ap::kHitSfxFile, ap::kHitSfxAltFile,
     };
     for (std::string_view p : all) {
         REQUIRE_FALSE(p.empty());

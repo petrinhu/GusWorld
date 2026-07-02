@@ -205,6 +205,7 @@ void AudioEngine::play_sfx(SoundId id) {
 
     ma_sound_start(instance.get());
     impl_->sfx_instances.push_back(std::move(instance));
+    ++sfx_play_count_;  // hook de teste (M6 F3) - so conta o caminho que TOCOU de fato
 }
 
 void AudioEngine::play_music(SoundId id, bool loop) {
@@ -256,5 +257,7 @@ void AudioEngine::set_master_volume(float volume) {
 }
 
 float AudioEngine::master_volume() const noexcept { return master_volume_; }
+
+unsigned int AudioEngine::sfx_play_count() const noexcept { return sfx_play_count_; }
 
 }  // namespace gus::platform::audio

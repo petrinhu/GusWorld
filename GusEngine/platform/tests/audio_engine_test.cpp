@@ -188,3 +188,29 @@ TEST_CASE("AudioEngine: SFX e musica sao pools independentes (mesmo id, engines 
     engine.play_music(1, true);
     SUCCEED("ids fora de alcance nos dois pools nao crasham");
 }
+
+TEST_CASE("AudioEngine sfx_play_count: conta so os play_sfx que TOCARAM de fato "
+          "(M6 F3, hook de teste headless)",
+          "[audio_engine]") {
+    AudioEngine engine(/*device_active=*/false);
+    REQUIRE(engine.sfx_play_count() == 0);
+
+    // No-op (id kInvalidSound / fora de alcance): NAO incrementa.
+    engine.play_sfx(kInvalidSound);
+    engine.play_sfx(999);
+    REQUIRE(engine.sfx_play_count() == 0);
+
+    const auto tmp =
+        std::filesystem::temp_directory_path() / "gusworld_test_sfx_count.wav";
+    write_test_tone_wav(tmp);
+    const SoundId id = engine.load_sfx(tmp.string().c_str());
+    REQUIRE(id != kInvalidSound);
+
+    engine.play_sfx(id);
+    REQUIRE(engine.sfx_play_count() == 1);
+    engine.play_sfx(id);
+    engine.play_sfx(id);
+    REQUIRE(engine.sfx_play_count() == 3);  // 1 por chamada, mesmo id repetido
+
+    std::filesystem::remove(tmp);
+}
