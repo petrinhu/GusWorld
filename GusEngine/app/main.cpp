@@ -28,6 +28,7 @@
 #include <string_view>
 #include <vector>
 
+#include "gus/app/audio_smoke.hpp"  // GUSWORLD_AUDIO_SMOKE=1 (M6 F1, ADR-011)
 #include "gus/app/sdl_window.hpp"
 #include "gus/app/screens/anim_catalog.hpp"  // resolve_gus_sprites_dir
 #include "gus/app/screens/anim_preview.hpp"
@@ -203,6 +204,14 @@ int run_smoke(int ticks) {
 }  // namespace
 
 int main(int argc, char* argv[]) {
+    // Modo DIAGNOSTICO: GUSWORLD_AUDIO_SMOKE=1 (M6 F1, ADR-011 item 5). Headless (sem
+    // SDL) - inicializa o AudioEngine com device REAL, toca um tom curto gerado e sai.
+    // Nao entra no tools/check.sh (e um smoke de HARDWARE, nao de logica); rodar a
+    // mao. Ver app/include/gus/app/audio_smoke.hpp.
+    if (gus::app::audio_smoke_requested()) {
+        return gus::app::run_audio_smoke();
+    }
+
     // Modo FERRAMENTA: compila um mapa CSV -> .gmap selado. Headless (sem SDL), I/O
     // de arquivo so aqui na fronteira app/.
     {
