@@ -26,7 +26,9 @@ using gus::app::screens::ActorSpriteSet;
 using gus::app::screens::BattleClipId;
 using gus::app::screens::BattleSpriteAnimator;
 using gus::app::screens::clip_dir_name;
+using gus::app::screens::clip_fallback;
 using gus::app::screens::clip_for_kind;
+using gus::app::screens::clip_frame_cap;
 using gus::app::screens::clip_frame_index;
 using gus::app::screens::default_clip_fps;
 using gus::app::screens::default_clip_loop;
@@ -73,31 +75,49 @@ TEST_CASE("sprite: repouso (None) toca battle_idle", "[battle_sprite]") {
             BattleClipId::Idle);
 }
 
-TEST_CASE("sprite: Approach LONGE do contato corre (run); a CAUDA vira o SWING",
+TEST_CASE("sprite: Approach LONGE do contato corre de PERFIL (run_east); a CAUDA "
+          "vira o SWING de perfil",
           "[battle_sprite]") {
-    // Longe do contato (restam 0.5s > swing 0.28s): correndo.
+    // Longe do contato (restam 0.5s > swing 0.28s): correndo ENCARANDO o inimigo
+    // (perfil-direita; clipe proprio, sem flip - Pillar 3 nativo).
     REQUIRE(clip_for_kind(ActorAnimKind::MeleeApproach, 0.5f, kMeleeSwingSeconds) ==
-            BattleClipId::Run);
-    // Cauda da aproximacao (restam <= swing): o attack_melee one-shot comeca AGORA,
-    // pra TERMINAR exatamente no contato (MeleeHold dura ~0 frame - o consumidor
+            BattleClipId::RunEast);
+    // Cauda da aproximacao (restam <= swing): o attack_melee_east one-shot comeca
+    // AGORA, pra CRAVAR no contato (MeleeHold dura ~0 frame - o consumidor
     // resolve e pede o Return no mesmo update; ver header).
     REQUIRE(clip_for_kind(ActorAnimKind::MeleeApproach, kMeleeSwingSeconds,
-                          kMeleeSwingSeconds) == BattleClipId::AttackMelee);
+                          kMeleeSwingSeconds) == BattleClipId::AttackMeleeEast);
     REQUIRE(clip_for_kind(ActorAnimKind::MeleeApproach, 0.1f, kMeleeSwingSeconds) ==
-            BattleClipId::AttackMelee);
+            BattleClipId::AttackMeleeEast);
 }
 
-TEST_CASE("sprite: Hold = attack_melee; Return = run; HitReact = hurt_physical; "
-          "Cast = cast",
+TEST_CASE("sprite: Hold = attack_melee_east; Return = run_west; HitReact = "
+          "hurt_physical; Cast = cast",
           "[battle_sprite]") {
     REQUIRE(clip_for_kind(ActorAnimKind::MeleeHold, 0.0f, kMeleeSwingSeconds) ==
-            BattleClipId::AttackMelee);
+            BattleClipId::AttackMeleeEast);
+    // A volta e um desenho PROPRIO de perfil-esquerda (nao e espelho do east).
     REQUIRE(clip_for_kind(ActorAnimKind::MeleeReturn, 0.3f, kMeleeSwingSeconds) ==
-            BattleClipId::Run);
+            BattleClipId::RunWest);
     REQUIRE(clip_for_kind(ActorAnimKind::HitReact, 0.2f, kMeleeSwingSeconds) ==
             BattleClipId::HurtPhysical);
     REQUIRE(clip_for_kind(ActorAnimKind::CastWindup, 0.4f, kMeleeSwingSeconds) ==
             BattleClipId::Cast);
+}
+
+// ---------------------------------------------------------------------------
+// Fallback direcional (clipe de perfil ausente no disco -> front-facing -> Idle)
+// ---------------------------------------------------------------------------
+
+TEST_CASE("sprite: fallback direcional degrada pro front-facing; o resto pro Idle",
+          "[battle_sprite]") {
+    REQUIRE(clip_fallback(BattleClipId::RunEast) == BattleClipId::Run);
+    REQUIRE(clip_fallback(BattleClipId::RunWest) == BattleClipId::Run);
+    REQUIRE(clip_fallback(BattleClipId::AttackMeleeEast) == BattleClipId::AttackMelee);
+    // Nao-direcionais degradam direto pro Idle (ultimo degrau da cadeia).
+    REQUIRE(clip_fallback(BattleClipId::Run) == BattleClipId::Idle);
+    REQUIRE(clip_fallback(BattleClipId::AttackMelee) == BattleClipId::Idle);
+    REQUIRE(clip_fallback(BattleClipId::Idle) == BattleClipId::Idle);
 }
 
 // ---------------------------------------------------------------------------
@@ -179,6 +199,10 @@ TEST_CASE("sprite: loop/one-shot por clip (idle/run/victory loopam; golpe/dano/k
     REQUIRE_FALSE(default_clip_loop(BattleClipId::AttackMelee));
     REQUIRE_FALSE(default_clip_loop(BattleClipId::HurtPhysical));
     REQUIRE_FALSE(default_clip_loop(BattleClipId::KO));
+    // Perfis novos (2026-07-01): corridas loopam; o murro de perfil e one-shot.
+    REQUIRE(default_clip_loop(BattleClipId::RunEast));
+    REQUIRE(default_clip_loop(BattleClipId::RunWest));
+    REQUIRE_FALSE(default_clip_loop(BattleClipId::AttackMeleeEast));
 }
 
 TEST_CASE("sprite: nomes de pasta casam o layout do disco (anims/<clip>/fN.png)",
@@ -189,6 +213,43 @@ TEST_CASE("sprite: nomes de pasta casam o layout do disco (anims/<clip>/fN.png)"
     REQUIRE(clip_dir_name(BattleClipId::HurtPhysical) == std::string("hurt_physical"));
     REQUIRE(clip_dir_name(BattleClipId::Cast) == std::string("cast"));
     REQUIRE(clip_dir_name(BattleClipId::KO) == std::string("ko"));
+    // Clipes de PERFIL (PixelLab 2026-07-01; leste/oeste sao desenhos DISTINTOS).
+    REQUIRE(clip_dir_name(BattleClipId::RunEast) == std::string("run_east"));
+    REQUIRE(clip_dir_name(BattleClipId::RunWest) == std::string("run_west"));
+    REQUIRE(clip_dir_name(BattleClipId::AttackMeleeEast) ==
+            std::string("attack_melee_east"));
+}
+
+TEST_CASE("sprite: frame cap so no attack_melee_east (f6-f8 derivados FORA)",
+          "[battle_sprite]") {
+    // O clipe do disco tem 9 frames, mas f6-f8 DERIVAM (o Gus gira pra camera).
+    // Cap = 6: o loader carrega SO f0..f5 - os derivados nunca entram na memoria,
+    // logo nunca renderizam (prova por construcao).
+    REQUIRE(clip_frame_cap(BattleClipId::AttackMeleeEast) == 6);
+    REQUIRE(clip_frame_cap(BattleClipId::RunEast) == 0);   // 0 = sem cap
+    REQUIRE(clip_frame_cap(BattleClipId::RunWest) == 0);
+    REQUIRE(clip_frame_cap(BattleClipId::AttackMelee) == 0);
+    REQUIRE(clip_frame_cap(BattleClipId::Idle) == 0);
+}
+
+TEST_CASE("sprite: o murro de perfil ESTICA e CRAVA no pico (f5) antes do contato",
+          "[battle_sprite]") {
+    // Decisao de timing (2026-07-01): 6 frames uteis @ 25 fps = 0.24s <= janela de
+    // swing 0.28s. O one-shot que comeca na cauda do Approach chega no PICO (f5,
+    // soco esticado) ~0.04s ANTES do contato e SEGURA cravado ate ele (e atraves
+    // do Hold). Frame derivado (>= f6) e inalcancavel: nem carregado, nem indexado.
+    const int cap = clip_frame_cap(BattleClipId::AttackMeleeEast);
+    const float fps = default_clip_fps(BattleClipId::AttackMeleeEast);
+    REQUIRE(static_cast<float>(cap) / fps <= kMeleeSwingSeconds + 1e-4f);
+    // No instante do contato (elapsed = janela inteira) o frame e o PICO f5.
+    REQUIRE(clip_frame_index(cap, fps, /*loop=*/false, kMeleeSwingSeconds) ==
+            cap - 1);
+    // Hold clampa no pico (robusto a jitter): muito depois, continua f5.
+    REQUIRE(clip_frame_index(cap, fps, false, 10.0f) == cap - 1);
+    // Em NENHUM instante da janela o indice passa do pico.
+    for (float t = 0.0f; t <= kMeleeSwingSeconds; t += 1.0f / 120.0f) {
+        REQUIRE(clip_frame_index(cap, fps, false, t) <= cap - 1);
+    }
 }
 
 TEST_CASE("sprite: o SWING casa a duracao natural do attack_melee (termina no contato)",

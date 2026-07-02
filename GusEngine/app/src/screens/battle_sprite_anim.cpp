@@ -20,6 +20,15 @@
 //   victory           7     10   sim   dormante (tela de resultado)
 //   dragon_victory    9     10   sim   dormante (mecanica epica)
 //   breathing_idle    5      6   sim   dormante (idle alternativo)
+//   run_east          9     18   sim   corrida de PERFIL (ida; ~0.5s/ciclo, mesma
+//                                      sensacao do run front 7@14; a ida de 0.42s
+//                                      mostra ~0.85 ciclo)
+//   run_west          9     18   sim   corrida de perfil-esquerda (volta de 0.4s)
+//   attack_melee_east 6*    25   nao   murro de perfil; *frame cap 6 (f6-f8 do disco
+//                                      DERIVAM e nao carregam). 6/25 = 0.24s <=
+//                                      kMeleeSwingSeconds (0.28s): o pico f5 crava
+//                                      ~0.04s ANTES do contato e segura (decisao
+//                                      "estica-e-crava", ver header)
 
 #include "gus/app/screens/battle_sprite_anim.hpp"
 
@@ -39,6 +48,9 @@ std::string_view clip_dir_name(BattleClipId id) noexcept {
         case BattleClipId::Victory:        return "victory";
         case BattleClipId::DragonVictory:  return "dragon_victory";
         case BattleClipId::BreathingIdle:  return "breathing_idle";
+        case BattleClipId::RunEast:        return "run_east";
+        case BattleClipId::RunWest:        return "run_west";
+        case BattleClipId::AttackMeleeEast: return "attack_melee_east";
         case BattleClipId::Count:          break;
     }
     return "battle_idle";  // fallback seguro (nunca vazio)
@@ -58,6 +70,9 @@ float default_clip_fps(BattleClipId id) noexcept {
         case BattleClipId::Victory:        return 10.0f;
         case BattleClipId::DragonVictory:  return 10.0f;
         case BattleClipId::BreathingIdle:  return 6.0f;
+        case BattleClipId::RunEast:        return 18.0f;
+        case BattleClipId::RunWest:        return 18.0f;
+        case BattleClipId::AttackMeleeEast: return 25.0f;
         case BattleClipId::Count:          break;
     }
     return 10.0f;
@@ -67,11 +82,14 @@ bool default_clip_loop(BattleClipId id) noexcept {
     switch (id) {
         case BattleClipId::Idle:
         case BattleClipId::Run:
+        case BattleClipId::RunEast:
+        case BattleClipId::RunWest:
         case BattleClipId::Victory:
         case BattleClipId::DragonVictory:
         case BattleClipId::BreathingIdle:
             return true;  // ciclos continuos
         case BattleClipId::AttackMelee:
+        case BattleClipId::AttackMeleeEast:
         case BattleClipId::Cast:
         case BattleClipId::Defend:
         case BattleClipId::HurtPhysical:
@@ -82,6 +100,24 @@ bool default_clip_loop(BattleClipId id) noexcept {
             break;
     }
     return false;  // one-shot: trava no ultimo frame
+}
+
+int clip_frame_cap(BattleClipId id) noexcept {
+    // So o murro de perfil capa: f6-f8 do disco DERIVAM (o Gus gira pra camera) e
+    // NAO carregam - o pico util e f5 (soco esticado). Ver header (timing).
+    return id == BattleClipId::AttackMeleeEast ? 6 : 0;
+}
+
+BattleClipId clip_fallback(BattleClipId id) noexcept {
+    switch (id) {
+        case BattleClipId::RunEast:
+        case BattleClipId::RunWest:
+            return BattleClipId::Run;  // perfil ausente: corrida front-facing
+        case BattleClipId::AttackMeleeEast:
+            return BattleClipId::AttackMelee;  // murro front-facing
+        default:
+            return BattleClipId::Idle;  // ultimo degrau (melhor idle vivo que buraco)
+    }
 }
 
 const SpriteClip* ActorSpriteSet::find(BattleClipId id) const noexcept {
@@ -118,14 +154,16 @@ BattleClipId clip_for_kind(ActorAnimKind kind, float remaining_seconds,
                            float swing_seconds) noexcept {
     switch (kind) {
         case ActorAnimKind::MeleeApproach:
-            // Correndo ate o alvo; na CAUDA (restam <= swing) o golpe comeca, pra
-            // terminar exatamente no contato (decisao "swing na cauda", ver header).
-            return remaining_seconds <= swing_seconds ? BattleClipId::AttackMelee
-                                                      : BattleClipId::Run;
+            // Correndo de PERFIL ate o alvo (run_east: encarando o inimigo); na
+            // CAUDA (restam <= swing) o murro de perfil comeca, pra CRAVAR no pico
+            // f5 pouco antes do contato (decisao "estica-e-crava", ver header).
+            return remaining_seconds <= swing_seconds
+                       ? BattleClipId::AttackMeleeEast
+                       : BattleClipId::RunEast;
         case ActorAnimKind::MeleeHold:
-            return BattleClipId::AttackMelee;  // cravado no alvo (one-shot clampa)
+            return BattleClipId::AttackMeleeEast;  // cravado no pico (clampa em f5)
         case ActorAnimKind::MeleeReturn:
-            return BattleClipId::Run;  // volta correndo (loop)
+            return BattleClipId::RunWest;  // volta de perfil-esquerda (loop)
         case ActorAnimKind::HitReact:
             return BattleClipId::HurtPhysical;  // tranco de golpe fisico
         case ActorAnimKind::CastWindup:

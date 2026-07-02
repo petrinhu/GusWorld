@@ -28,9 +28,20 @@
 //     de fase): Approach-cauda -> Hold mantem AttackMelee e NAO reseta (o soco nao
 //     recomeca no contato); Run -> AttackMelee reseta (o swing parte do frame 0).
 //
-// Pillar 3 (SEM flip): os clips sao DADOS; nenhum frame e espelhado em codigo. Os
-// frames do Gus (2026-07-01) sao chibi 3/4 DE FRENTE (camera-facing) - neutros de
-// direcao; se o lider pedir perfil lateral, e regeneracao de asset, zero codigo.
+// Pillar 3 (SEM flip): os clips sao DADOS; nenhum frame e espelhado em codigo.
+// PERFIS (2026-07-01): o melee ganhou clipes LATERAIS dedicados - run_east (ida,
+// encarando o inimigo a direita), attack_melee_east (murro de perfil) e run_west
+// (volta; desenho PROPRIO de perfil-esquerda, gerado da rotacao canonica 2_west -
+// NAO e espelho do east). Idle/hurt/demais seguem front-facing por ora. Clipe de
+// perfil ausente no disco degrada pro front-facing equivalente (clip_fallback) e
+// por fim pro Idle - a cena nunca mostra buraco.
+//
+// TIMING DO MURRO (decisao 2026-07-01): o clipe attack_melee_east do disco tem 9
+// frames, mas f6-f8 DERIVAM (o Gus gira pra camera). clip_frame_cap = 6: o loader
+// carrega SO f0..f5 (os derivados nem entram na memoria). 6 frames @ 25 fps =
+// 0.24s <= janela de swing 0.28s: o one-shot chega no PICO (f5, soco esticado)
+// ~0.04s ANTES do contato e CRAVA - segura o pico atraves do contato e do Hold,
+// ate o Return trocar pro run_west. Frame derivado e inalcancavel por construcao.
 //
 // Cross-ref: gus/app/screens/battle_anim.hpp (fases, W2);
 //            gus/app/screens/battle_scene.hpp (consumidor: update tick + render);
@@ -67,6 +78,10 @@ enum class BattleClipId : int {
     Victory,        // victory (DORMANTE: tela de resultado)
     DragonVictory,  // dragon_victory (DORMANTE: mecanica epica, canon Dragon Victory)
     BreathingIdle,  // breathing_idle (DORMANTE: idle alternativo/overworld)
+    // Perfis laterais (2026-07-01; desenhos DISTINTOS por direcao - Pillar 3 nativo):
+    RunEast,         // run_east (ida do melee: corre de perfil ENCARANDO o inimigo)
+    RunWest,         // run_west (volta do melee: perfil-esquerda proprio, sem espelho)
+    AttackMeleeEast, // attack_melee_east (murro de perfil; one-shot com frame cap 6)
     Count
 };
 inline constexpr int kBattleClipCount = static_cast<int>(BattleClipId::Count);
@@ -88,6 +103,17 @@ inline constexpr float kActorSpriteScale = 1.55f;
 
 // true = loop (idle/run/victory); false = one-shot que TRAVA no ultimo frame.
 [[nodiscard]] bool default_clip_loop(BattleClipId id) noexcept;
+
+// Maximo de frames a CARREGAR do disco (0 = sem cap, carrega f0..fN inteiro).
+// So attack_melee_east capa (6): f6-f8 derivam (o Gus gira pra camera) e ficam
+// FORA da memoria - nunca renderizam (ver decisao de timing no topo).
+[[nodiscard]] int clip_frame_cap(BattleClipId id) noexcept;
+
+// Degrau de fallback quando o clip nao tem frames no disco: direcional -> o
+// front-facing equivalente (run_east/run_west -> run; attack_melee_east ->
+// attack_melee); demais -> Idle (ultimo degrau; o consumidor ainda tenta Idle
+// explicitamente e por fim degrada pro retrato placeholder).
+[[nodiscard]] BattleClipId clip_fallback(BattleClipId id) noexcept;
 
 // Um clip: frames (TextureId ja resolvidos; vazio = clip ausente no disco) + cadencia.
 struct SpriteClip {
