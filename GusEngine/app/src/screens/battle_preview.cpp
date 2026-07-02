@@ -86,9 +86,13 @@ std::string resolve_asset_dir(std::string_view rel) {
 // Carrega o SPRITE SET de batalha do GUS (W3): pra cada clip conhecido
 // (battle_sprite_anim::clip_dir_name), varre <resources>/<kGusBattleAnimsDir>/<clip>/
 // f0.png..fN.png em ordem e resolve cada frame em TextureId. fps/loop = defaults do
-// modulo POCO. Devolve nullopt se NENHUM frame existir no disco (headless/CI sem
-// assets) - a cena entao degrada pro retrato placeholder de hoje. So o Gus nesta
-// onda; os demais atores ganham set quando as anims deles existirem (PixelLab).
+// modulo POCO; clip_frame_cap TRUNCA a carga (attack_melee_east: so f0..f5 entram -
+// f6-f8 derivam e nunca chegam na memoria/render; decisao 2026-07-01, ver
+// battle_sprite_anim.hpp). Devolve nullopt se NENHUM frame existir no disco
+// (headless/CI sem assets) - a cena entao degrada pro retrato placeholder de hoje.
+// So o Gus nesta onda; os demais atores ganham set quando as anims deles existirem
+// (PixelLab). Clipes de perfil (run_east/run_west/attack_melee_east) entram pelo
+// MESMO laco (o enum e a fonte); ausencia degrada via clip_fallback na cena.
 std::optional<gus::app::screens::ActorSpriteSet> load_gus_sprite_set(
     gus::platform::render2d::IRenderer& renderer) {
     namespace fs = std::filesystem;
@@ -104,7 +108,11 @@ std::optional<gus::app::screens::ActorSpriteSet> load_gus_sprite_set(
         auto& clip = set.clips[static_cast<std::size_t>(c)];
         clip.fps = gus::app::screens::default_clip_fps(id);
         clip.loop = gus::app::screens::default_clip_loop(id);
+        const int cap = gus::app::screens::clip_frame_cap(id);
         for (int i = 0;; ++i) {
+            if (cap > 0 && i >= cap) {
+                break;  // frames alem do cap sao DERIVADOS: nao carregam (nem renderizam)
+            }
             const std::string path = join(dir, "f" + std::to_string(i) + ".png");
             std::error_code ec;
             if (!fs::exists(path, ec)) {
@@ -2184,10 +2192,17 @@ int run_battle_preview() {
                     capture("_a_idle_rest.png");     // battle_idle no repouso
                 }
                 if (sprite_f0 > 0) {
+                    // Roteiro (60 fps; Approach 0.7s = 42f, Return 0.4s = 24f):
+                    // +15 = meio do dash (run_east, perfil-direita); +38 = cauda do
+                    // swing (attack_melee_east cravado em <= f5; contato em ~+42);
+                    // +54 = 12f dentro do Return (run_west, perfil-esquerda);
+                    // +90 = repouso (battle_idle front-facing).
                     if (frame_no == sprite_f0 + 15) {
-                        capture("_b_run_dash.png");      // RUN no meio do dash
+                        capture("_b_run_dash.png");      // run_east na ida
                     } else if (frame_no == sprite_f0 + 38) {
-                        capture("_c_attack_swing.png");  // attack_melee na cauda
+                        capture("_c_attack_swing.png");  // murro de perfil na cauda
+                    } else if (frame_no == sprite_f0 + 54) {
+                        capture("_e_run_back.png");      // run_west na volta
                     } else if (frame_no == sprite_f0 + 90) {
                         capture("_d_idle_back.png");     // de volta ao idle no repouso
                         std::cout << "BattlePreview: [sprite-selftest] concluido; "
