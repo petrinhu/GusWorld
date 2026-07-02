@@ -27,7 +27,13 @@
 #include "gus/domain/combat/combat_actor.hpp"
 #include "gus/domain/combat/combat_constants.hpp"  // kMultFraco (expectativa D3 no teste)
 #include "gus/domain/combat/weakness_wheel.hpp"     // WeaknessWheel (fraco = 1.5 no teste)
+#include "gus/platform/audio/audio_engine.hpp"  // AudioEngine/SoundId (M6 F3, ADR-011)
 #include "gus/platform/render2d/i_renderer.hpp"
+
+#include <cmath>
+#include <cstdint>
+#include <filesystem>
+#include <fstream>
 
 using gus::app::screens::BattleScene;
 using gus::app::screens::BattleStatusIconSet;
@@ -2349,6 +2355,238 @@ TEST_CASE("anim W2: render desenha a bolinha do projetil (placeholder) em voo",
         }
     }
     REQUIRE(near >= 3);  // as 3 fatias da bolinha
+}
+
+// ---- M6 F3: SFX no hit (ADR-011) -----------------------------------------------------
+//
+// A cena dispara play_sfx no EVENTO DE CONTATO do golpe - o MESMO instante onde o
+// hit-react visual + o floater ja nascem (spawn_floaters_from_new_logs pro melee/
+// UseCard; o consumo de anim_.take_impacts() em update() pro projetil). Prova, com o
+// null-device do AudioEngine (F1, sem hardware): (a) exatamente 1 play_sfx por hit;
+// (b) ZERO play_sfx durante Beat 1/anuncio/windup/aproximacao (o golpe ainda nao
+// conectou); (c) party E inimigo disparam, cada um no PROPRIO contato. Ancorado no
+// evento de contato via as MESMAS transicoes que os testes de hit-react acima usam
+// (melee_arrived / Beat 2 resolve / impacto de projetil) - NUNCA no "Beat 2 do pacing"
+// como proxy (o CTO revisou: isso dessincronizaria o som do baque visual).
+
+namespace {
+
+// WAV PCM16 mono minimo (tom puro) - mesmo gerador de platform/tests/audio_engine_test.cpp
+// e app/src/audio_smoke.cpp: da um SoundId REAL (nao kInvalidSound) pro null-device tocar
+// de fato (sfx_play_count so incrementa em play_sfx que TOCOU, nao em no-op).
+std::string write_hit_test_tone_wav(const std::filesystem::path& path) {
+    constexpr int kSampleRate = 22050;
+    constexpr float kDurationS = 0.05f;
+    constexpr float kFreqHz = 660.0f;
+    const auto num_samples = static_cast<std::uint32_t>(
+        static_cast<float>(kSampleRate) * kDurationS);
+    std::vector<std::int16_t> samples(num_samples);
+    for (std::uint32_t i = 0; i < num_samples; ++i) {
+        const float t = static_cast<float>(i) / static_cast<float>(kSampleRate);
+        const float s = 0.2f * std::sin(2.0f * 3.14159265f * kFreqHz * t);
+        samples[i] = static_cast<std::int16_t>(s * 32767.0f);
+    }
+    const std::uint32_t data_bytes = num_samples * sizeof(std::int16_t);
+    const std::uint32_t byte_rate = static_cast<std::uint32_t>(kSampleRate) * 2;
+    const std::uint16_t block_align = 2;
+    const std::uint16_t bits_per_sample = 16;
+    const std::uint32_t riff_size = 36 + data_bytes;
+
+    std::ofstream out(path, std::ios::binary | std::ios::trunc);
+    auto w32 = [&out](std::uint32_t v) { out.write(reinterpret_cast<const char*>(&v), 4); };
+    auto w16 = [&out](std::uint16_t v) { out.write(reinterpret_cast<const char*>(&v), 2); };
+    out.write("RIFF", 4);
+    w32(riff_size);
+    out.write("WAVE", 4);
+    out.write("fmt ", 4);
+    w32(16);
+    w16(1);  // PCM
+    w16(1);  // mono
+    w32(static_cast<std::uint32_t>(kSampleRate));
+    w32(byte_rate);
+    w16(block_align);
+    w16(bits_per_sample);
+    out.write("data", 4);
+    w32(data_bytes);
+    out.write(reinterpret_cast<const char*>(samples.data()),
+              static_cast<std::streamsize>(data_bytes));
+    return path.string();
+}
+
+}  // namespace
+
+TEST_CASE("F3 M6: contato do JOGADOR dispara 1 play_sfx; windup/aproximacao ficam MUDOS",
+          "[battle_scene][audio]") {
+    using gus::platform::audio::AudioEngine;
+    using gus::platform::audio::kInvalidSound;
+
+    AudioEngine audio(/*device_active=*/false);  // null-device: sem hardware
+    const auto tmp =
+        std::filesystem::temp_directory_path() / "gusworld_test_hit_sfx_player.wav";
+    write_hit_test_tone_wav(tmp);
+    const auto hit_id = audio.load_sfx(tmp.string().c_str());
+    REQUIRE(hit_id != kInvalidSound);
+
+    BattleScene scene;
+    scene.set_audio(&audio, hit_id);
+    pump_to_player_turn(scene);
+    scene.update(kFloaterLifeSeconds + 0.1f);
+    // BASELINE apos pump_to_player_turn: a fila e por SPD (combat.md §4.1) - inimigo(s)
+    // mais rapido(s) que a party podem ja ter agido (contato deles) ANTES do 1o turno do
+    // jogador. Por isso comparamos DELTA a partir daqui (mesmo padrao dos testes de
+    // hp_before/floaters acima), nao um valor absoluto.
+    const unsigned int baseline = audio.sfx_play_count();
+
+    select_verb(scene, BattleVerb::Atacar);
+    scene.menu_confirm();  // entra na mira: ainda MUDO
+    REQUIRE(audio.sfx_play_count() == baseline);
+
+    scene.aim_confirm();  // COMANDA o golpe: windup parte JA (o anuncio/telegraph)
+    REQUIRE(scene.player_action_in_flight());
+    REQUIRE(audio.sfx_play_count() == baseline);  // windup comandado - AINDA nao conectou
+    scene.update(1.0f / 60.0f);                   // 1 frame do voo
+    REQUIRE(audio.sfx_play_count() == baseline);  // em pleno voo - segue MUDO (b)
+
+    pump_player_strike(scene);  // bombeia ate o CONTATO (fim da aproximacao)
+    REQUIRE_FALSE(scene.player_action_in_flight());
+    // o CONTATO disparou EXATAMENTE 1 play_sfx a mais (a).
+    REQUIRE(audio.sfx_play_count() == baseline + 1);
+
+    std::filesystem::remove(tmp);
+}
+
+TEST_CASE("F3 M6: contato do INIMIGO dispara 1 play_sfx; Beat 1 anuncio fica MUDO",
+          "[battle_scene][audio]") {
+    using gus::platform::audio::AudioEngine;
+    using gus::platform::audio::kInvalidSound;
+
+    AudioEngine audio(/*device_active=*/false);
+    const auto tmp =
+        std::filesystem::temp_directory_path() / "gusworld_test_hit_sfx_enemy.wav";
+    write_hit_test_tone_wav(tmp);
+    const auto hit_id = audio.load_sfx(tmp.string().c_str());
+    REQUIRE(hit_id != kInvalidSound);
+
+    BattleScene scene;
+    scene.set_audio(&audio, hit_id);
+    scene.start_combat();
+    // Chega no 1o ANUNCIO de inimigo (Beat 1) - mesmo bombeio do teste de hit-react acima.
+    for (int i = 0; i < 600 && scene.pacing_state() != PacingState::AnnouncingEnemy;
+         ++i) {
+        scene.skip();
+        scene.update(1.0f / 60.0f);
+    }
+    REQUIRE(scene.pacing_state() == PacingState::AnnouncingEnemy);
+    REQUIRE(audio.sfx_play_count() == 0);
+
+    // MEIO do anuncio: o inimigo ja se desloca (telegraph), NADA resolveu ainda - MUDO (b).
+    for (int i = 0; i < 12; ++i) {
+        scene.update(1.0f / 60.0f);
+    }
+    REQUIRE(scene.pacing_state() == PacingState::AnnouncingEnemy);
+    REQUIRE(audio.sfx_play_count() == 0);
+
+    // FIM do anuncio -> Beat 2: o CONTATO resolve (log + floater + hit-react nascem
+    // JUNTOS) - e AGORA que o play_sfx dispara, exatamente 1 vez (a).
+    for (int i = 0;
+         i < 90 && scene.pacing_state() == PacingState::AnnouncingEnemy; ++i) {
+        scene.update(1.0f / 60.0f);
+    }
+    REQUIRE(audio.sfx_play_count() == 1);
+
+    std::filesystem::remove(tmp);
+}
+
+TEST_CASE("F3 M6: party E inimigo disparam, cada um no PROPRIO contato (2 hits = 2 plays)",
+          "[battle_scene][audio]") {
+    using gus::platform::audio::AudioEngine;
+    using gus::platform::audio::kInvalidSound;
+
+    AudioEngine audio(/*device_active=*/false);
+    const auto tmp =
+        std::filesystem::temp_directory_path() / "gusworld_test_hit_sfx_both_sides.wav";
+    write_hit_test_tone_wav(tmp);
+    const auto hit_id = audio.load_sfx(tmp.string().c_str());
+    REQUIRE(hit_id != kInvalidSound);
+
+    BattleScene scene;
+    scene.set_audio(&audio, hit_id);
+
+    // BASELINE (mesmo motivo do teste anterior): a fila e por SPD - inimigo(s) mais
+    // rapidos podem ja ter contatado a party antes do 1o turno do jogador.
+    pump_to_player_turn(scene);
+    scene.update(kFloaterLifeSeconds + 0.1f);
+    const unsigned int baseline = audio.sfx_play_count();
+
+    // (c.1) O JOGADOR ataca: 1 play_sfx a mais no contato dele.
+    select_verb(scene, BattleVerb::Atacar);
+    scene.menu_confirm();
+    scene.aim_confirm();
+    pump_player_strike(scene);
+    REQUIRE(audio.sfx_play_count() == baseline + 1);
+
+    // (c.2) Bombeia ate o proximo contato (o INIMIGO age, Beat 1 -> Beat 2) - mais 1
+    // play_sfx no contato DELE (contador acumula, nao reseta por lado).
+    for (int i = 0;
+         i < 600 && audio.sfx_play_count() < baseline + 2 && !scene.combat_over(); ++i) {
+        scene.skip();
+        scene.update(1.0f / 60.0f);
+    }
+    REQUIRE(audio.sfx_play_count() == baseline + 2);
+
+    std::filesystem::remove(tmp);
+}
+
+TEST_CASE("F3 M6: call-site do PROJETIL (impacto) dispara 1 play_sfx; conjuracao/voo mudos",
+          "[battle_scene][audio]") {
+    using gus::platform::audio::AudioEngine;
+    using gus::platform::audio::kInvalidSound;
+
+    AudioEngine audio(/*device_active=*/false);
+    const auto tmp =
+        std::filesystem::temp_directory_path() / "gusworld_test_hit_sfx_projectile.wav";
+    write_hit_test_tone_wav(tmp);
+    const auto hit_id = audio.load_sfx(tmp.string().c_str());
+    REQUIRE(hit_id != kInvalidSound);
+
+    BattleScene scene;
+    scene.set_audio(&audio, hit_id);
+
+    scene.debug_cast_demo();
+    REQUIRE(audio.sfx_play_count() == 0);  // conjuracao NO LUGAR: ainda mudo
+
+    // Windup termina -> o projetil spawna e viaja: segue mudo (o call-site so dispara
+    // quando anim_.take_impacts() devolve o alvo, ou seja, no FIM do voo).
+    for (int i = 0; i < 120 && scene.anim().projectiles().empty(); ++i) {
+        scene.update(1.0f / 60.0f);
+    }
+    REQUIRE(scene.anim().projectiles().size() == 1);
+    REQUIRE(audio.sfx_play_count() == 0);
+
+    // Impacto: o call-site do projetil dispara EXATAMENTE 1 play_sfx (mesmo hit_sfx_id_
+    // do melee).
+    for (int i = 0; i < 120 && !scene.anim().projectiles().empty(); ++i) {
+        scene.update(1.0f / 60.0f);
+    }
+    REQUIRE(scene.anim().projectiles().empty());
+    REQUIRE(audio.sfx_play_count() == 1);
+
+    std::filesystem::remove(tmp);
+}
+
+TEST_CASE("F3 M6: sem set_audio, a cena roda MUDA (no-op seguro, nunca depende de audio)",
+          "[battle_scene][audio]") {
+    // Nenhum AudioEngine plugado (default audio_engine_==nullptr) - o mesmo fluxo de
+    // ataque do jogador do 1o teste, mas sem crashar nem exigir hardware/engine.
+    BattleScene scene;
+    pump_to_player_turn(scene);
+    scene.update(kFloaterLifeSeconds + 0.1f);
+    select_verb(scene, BattleVerb::Atacar);
+    scene.menu_confirm();
+    scene.aim_confirm();
+    pump_player_strike(scene);
+    REQUIRE_FALSE(scene.player_action_in_flight());
+    SUCCEED("cena sem audio plugado resolveu o combate normalmente (degradacao graciosa)");
 }
 
 // ---- W3: SPRITE ANIMADO do ator na arena (battle_sprite_anim + wiring) --------------
