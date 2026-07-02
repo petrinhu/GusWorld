@@ -18,6 +18,7 @@ add_executable(gusengine_platform_tests
     alpha_bbox_test.cpp
     text_metrics_test.cpp
     font_atlas_test.cpp
+    audio_engine_test.cpp
 )
 
 # ADR-010 F3: os testes do HUD RmlUi VENDORIZADO (rmlui_hud_test.cpp, 4 TEST_CASE) foram

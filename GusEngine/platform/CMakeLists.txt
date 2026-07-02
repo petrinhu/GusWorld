@@ -7,6 +7,9 @@
 #             paredes); viewport_transform POCO (mundo->pixel) testavel sem GPU.
 #   input/    eventos SDL (teclado + gamepad) -> intencao cardinal (consome o
 #             InputMapper/key_translation; gamepad_mapping POCO).
+#   audio/    AudioEngine sobre miniaudio (M6 F1, ADR-011): device + mixer minimo
+#             (buses music/sfx) + API play_sfx/play_music/stop_music/set_master_volume.
+#             Degradacao graciosa (sem device -> no-op) e null-device pra testes/CI.
 
 add_library(gusengine_platform STATIC
     src/platform_info.cpp
@@ -24,6 +27,9 @@ add_library(gusengine_platform STATIC
     # Loader GL (glad) da ARENA (Render2dGl3): gl3_load_functions + gl3_read_backbuffer.
     # NAO e backend de RmlUi; a arena precisa dele SEMPRE => fica.
     rmlui/gl3_loader.cpp
+    # AudioEngine (M6 F1, ADR-011): UNICA TU que define MINIAUDIO_IMPLEMENTATION
+    # (miniaudio.h e single-header vendorizado em third_party/miniaudio/).
+    src/audio/audio_engine.cpp
 )
 
 # ADR-010 F3: o backend RmlUi vendorizado (RmlUi_Renderer_GL3.cpp / RmlUi_Platform_SDL.cpp /
@@ -38,6 +44,12 @@ target_compile_definitions(gusengine_platform PRIVATE GUSWORLD_OWN_GLAD_IMPL=1)
 # vem com o RmlUi_Include_GL3.h; so o link de GL e necessario.
 find_package(OpenGL REQUIRED)
 
+# miniaudio (M6 F1, ADR-011): no Linux o backend (ALSA/PulseAudio/JACK, decodificados em
+# runtime via dlopen) exige -lpthread -ldl -lm (miniaudio.h, secao "Building", linha ~505:
+# "The Linux build only requires linking to -ldl, -lpthread and -lm"). libm ja vem implicita
+# com o driver de link do C++ na pratica, mas listamos por completude/portabilidade.
+find_package(Threads REQUIRED)
+
 target_include_directories(gusengine_platform
     PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include
     # stb_image + stb_truetype (vendorizado header-only): load_texture e o atlas de
@@ -48,6 +60,9 @@ target_include_directories(gusengine_platform
     # Render2dGl3 (arena). ADR-010 F3: o unico consumidor deste dir e a ARENA (o backend
     # RmlUi vendorizado, que tambem o usava, foi aposentado).
     PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/rmlui
+    # miniaudio (vendorizado header-only, M6 F1 ADR-011): so audio_engine.cpp inclui
+    # miniaudio.h (e e a UNICA TU com MINIAUDIO_IMPLEMENTATION) - PRIVATE.
+    PRIVATE ${CMAKE_SOURCE_DIR}/third_party/miniaudio
 )
 
 # Pasta dos assets de fonte da engine (.ttf embarcados no repo, dentro de assets/fonts/).
@@ -73,6 +88,10 @@ target_link_libraries(gusengine_platform
         # neste alvo) expoe simbolos GL que o app tambem resolve.
         OpenGL::GL
 )
+
+# miniaudio (M6 F1, ADR-011): PRIVATE porque so audio_engine.cpp toca essas libs
+# diretamente (o resto de gusengine_platform/app nao inclui miniaudio.h).
+target_link_libraries(gusengine_platform PRIVATE Threads::Threads ${CMAKE_DL_LIBS})
 
 target_compile_features(gusengine_platform PUBLIC cxx_std_20)
 
