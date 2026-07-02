@@ -2192,18 +2192,34 @@ int run_battle_preview() {
                     capture("_a_idle_rest.png");     // battle_idle no repouso
                 }
                 if (sprite_f0 > 0) {
-                    // Roteiro (60 fps; Approach 0.7s = 42f, Return 0.4s = 24f):
-                    // +15 = meio do dash (run_east, perfil-direita); +38 = cauda do
-                    // swing (attack_melee_east cravado em <= f5; contato em ~+42);
-                    // +54 = 12f dentro do Return (run_west, perfil-esquerda);
-                    // +90 = repouso (battle_idle front-facing).
-                    if (frame_no == sprite_f0 + 15) {
-                        capture("_b_run_dash.png");      // run_east na ida
-                    } else if (frame_no == sprite_f0 + 38) {
-                        capture("_c_attack_swing.png");  // murro de perfil na cauda
-                    } else if (frame_no == sprite_f0 + 54) {
-                        capture("_e_run_back.png");      // run_west na volta
-                    } else if (frame_no == sprite_f0 + 90) {
+                    // Duracoes reais (dt fixo 1/60; +0.5f arredonda p/ evitar truncamento
+                    // de float, ex. 0.7*60 vira 41.99...): Approach kPlayerMeleeApproach
+                    // Seconds (1.3s ~= 78f), Return kPlayerMeleeReturnSeconds (0.7s ~= 42f),
+                    // delay do Beat 2 kPacingStepDelaySeconds (0.8s ~= 48f).
+                    const int approach_f = static_cast<int>(
+                        gus::app::screens::kPlayerMeleeApproachSeconds * 60.0f + 0.5f);
+                    const int return_f = static_cast<int>(
+                        gus::app::screens::kPlayerMeleeReturnSeconds * 60.0f + 0.5f);
+                    const int rel = frame_no - sprite_f0;
+                    // FLIPBOOK do APPROACH inteiro (diagnostico do lider 2026-07-02): captura
+                    // DENSA a cada 4 frames de jogo, do inicio do dash (rel 0) ao contato
+                    // (rel approach_f). ~20 quadros pra montar o flip e VER se o ciclo de
+                    // perna le pra-FRENTE (aliasing curado pela duracao maior) ou reverso
+                    // (problema real de ordem/pose). Nomes _flip_NN zero-pad p/ ordenar.
+                    if (rel >= 0 && rel <= approach_f && (rel % 4) == 0) {
+                        const int fi = rel / 4;
+                        const std::string suf = std::string("_flip_") +
+                                                (fi < 10 ? "0" : "") +
+                                                std::to_string(fi) + ".png";
+                        capture(suf.c_str());
+                    }
+                    // Marcos MACRO (nomes semanticos; rel escolhidos %4==3, nao colidem com
+                    // o flip): swing cravado na cauda, meio da volta, repouso final.
+                    if (rel == approach_f - 3) {
+                        capture("_c_attack_swing.png");  // murro de perfil cravado (<= f5)
+                    } else if (rel == approach_f + return_f / 2) {
+                        capture("_e_run_back.png");      // run_west no meio da volta
+                    } else if (rel == approach_f + return_f + 3) {
                         capture("_d_idle_back.png");     // de volta ao idle no repouso
                         std::cout << "BattlePreview: [sprite-selftest] concluido; "
                                      "encerrando.\n";
