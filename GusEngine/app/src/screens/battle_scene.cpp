@@ -831,8 +831,15 @@ void BattleScene::resolve_one_turn() {
     narrate_new_logs();
     // Recovery do melee (no-op se o atacante nao estava em aproximacao/hold - Defender/
     // Scan/Flee nao animam; robusto a skip: parte do offset ATUAL, termina no repouso).
+    // A VOLTA e por LADO: o jogador usa kPlayerMeleeReturnSeconds (alongada, proporcional
+    // ao approach dele; cabe no delay 0.8s); o inimigo mantem kMeleeReturnSeconds (0.4s,
+    // ritmo aprovado no W1, INTOCADO). atk_before define o lado (o atacante deste turno).
     if (!atk_id.empty() && anim_.melee_in_flight(atk_id)) {
-        anim_.begin_melee_return(atk_id, kMeleeReturnSeconds);
+        const float return_seconds =
+            (atk_before != nullptr && atk_before->is_player_side())
+                ? kPlayerMeleeReturnSeconds
+                : kMeleeReturnSeconds;
+        anim_.begin_melee_return(atk_id, return_seconds);
     }
     if (!machine_->check_end()) {
         machine_->advance_to_next_actor();
@@ -1088,12 +1095,15 @@ void BattleScene::aim_confirm() {
     // mailbox) - a aproximacao E o proprio anuncio do turno do jogador. O ritmo
     // continua em WaitingPlayerInput durante o voo (o menu fica inerte pelos guards);
     // o update(dt) resolve no contato e entra no delay (player_acted). A duracao usa
-    // kPacingAnnounceSeconds: o MESMO tempo de windup garantido ao inimigo (par.3.2).
+    // kPlayerMeleeApproachSeconds (DESACOPLADA do Beat 1 do inimigo, que segue em
+    // kPacingAnnounceSeconds cru): o approach do jogador NAO tem beat de pacing atrelado
+    // (o contato e gated por anim_.melee_arrived, nao por timer), entao dura o que a
+    // LEITURA pede - o playtest (lider 2026-07-02) pediu mais tempo pra VER a corrida.
     // Se o slot nao estiver visivel (nunca no fluxo normal), degrada: resolve na hora.
     if (!is_scan) {
         const CombatActor* self = active_actor();
         if (self != nullptr &&
-            start_melee_toward(self->id(), target_id, kPacingAnnounceSeconds)) {
+            start_melee_toward(self->id(), target_id, kPlayerMeleeApproachSeconds)) {
             player_strike_pending_ = true;
             player_strike_attacker_ = self->id();
             return;  // contato (e resolucao) vem no update(dt)

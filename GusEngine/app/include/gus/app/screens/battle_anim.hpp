@@ -50,8 +50,36 @@ namespace gus::app::screens {
 
 // Folga entre o atacante deslocado e o slot do alvo no contato (nao sobrepoe).
 inline constexpr float kMeleeContactGapPx = 6.0f;
-// Volta do melee ao repouso: cabe FOLGADO no delay do Beat 2 (0.8s).
+// Volta do melee do INIMIGO ao repouso: cabe FOLGADO no delay do Beat 2 (0.8s).
+// So o INIMIGO usa esta (o jogador tem a sua propria, alongada - ver abaixo).
 inline constexpr float kMeleeReturnSeconds = 0.4f;
+
+// APROXIMACAO e VOLTA do melee do JOGADOR - DESACOPLADAS do ritmo do inimigo
+// (regressao do playtest, lider 2026-07-02: "ele andou de costas" + "muito rapido,
+// quase nao vejo nada"). Diagnostico: nao era ordem de frame nem pose - era ALIASING
+// TEMPORAL (efeito roda-de-carroca): a corrida de perfil inteira (ida+soco+volta)
+// passava em ~1.1s, rapido demais pro olho ler o ciclo de perna, e o cerebro invertia
+// a leitura. A cura e DURACAO, nao arte.
+//
+// POR QUE UMA CONSTANTE PROPRIA (nao reusar kPacingAnnounceSeconds): a aproximacao do
+// jogador ANTES pegava carona no kPacingAnnounceSeconds (0.7s) so por acaso de
+// implementacao (start_melee_toward recebia a mesma duracao). Esse valor e o BEAT 1 /
+// ANUNCIO do INIMIGO (telegraph do windup), aprovado AO VIVO no W1 - alonga-lo
+// regridiria o inimigo. Ao contrario do inimigo, o approach do jogador NAO tem beat de
+// pacing atrelado (o contato e disparado por anim_.melee_arrived(), nao por um timer do
+// director - ver battle_scene::update), entao pode durar o que a LEITURA pedir sem
+// mexer no ritmo. Por isso o jogador ganha durMs proprias, e kPacingAnnounceSeconds
+// fica CRU, servindo so o inimigo.
+//
+// Valores (tuning; ajustaveis em playtest, o lider testa ao vivo): approach 1.3s
+// (~1.86x o antigo 0.7s: "quase o dobro" pedido) da tempo de ler ~2 ciclos de corrida
+// (run_east 0.5s/ciclo). Volta 0.7s (1.75x o antigo 0.4s do inimigo), mantendo a
+// proporcao ida:volta ~1.86:1 (o inimigo tem 0.7:0.4 = 1.75:1). INVARIANTE: a volta do
+// jogador CABE no delay do Beat 2 (kPacingStepDelaySeconds 0.8s) com folga (0.7 < 0.8):
+// o Gus chega ao repouso ANTES de o proximo turno comecar, sem deslizar por cima do
+// anuncio seguinte. Testado em battle_scene_test (constantes + comportamento).
+inline constexpr float kPlayerMeleeApproachSeconds = 1.3f;
+inline constexpr float kPlayerMeleeReturnSeconds = 0.7f;
 // Tranco do hit-react (recuo + volta), dentro do delay do Beat 2.
 inline constexpr float kHitReactSeconds = 0.3f;
 // Amplitude do recuo do hit-react (~1/5 do slot de 54px).

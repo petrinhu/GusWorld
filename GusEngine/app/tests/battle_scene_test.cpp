@@ -2107,7 +2107,65 @@ TEST_CASE("anim W2: o CONTATO resolve (dano + floater juntos) e o atacante VOLTA
     // Recovery (par.3.1): o atacante VOLTA (Return) e termina EXATAMENTE no repouso -
     // sem ficar deslocado (checklist par.6), dentro do delay do Beat 2.
     REQUIRE(scene.anim().kind_for(self_id) == ActorAnimKind::MeleeReturn);
-    for (int i = 0; i < 45; ++i) {  // 0.75s > kMeleeReturnSeconds
+    for (int i = 0; i < 45; ++i) {  // 0.75s > kPlayerMeleeReturnSeconds (volta do jogador)
+        scene.update(1.0f / 60.0f);
+    }
+    REQUIRE(scene.anim().offset_for(self_id).x == 0.0f);
+    REQUIRE(scene.anim().offset_for(self_id).y == 0.0f);
+}
+
+TEST_CASE("anim W3.2: aproximacao/volta do JOGADOR sao DESACOPLADAS e mais longas que o "
+          "ritmo do inimigo (regressao playtest: corrida rapida/'de-costas')",
+          "[battle_scene][anim]") {
+    // Regressao (lider 2026-07-02): a corrida de perfil do Gus passava rapido demais
+    // (~0.7s: a MESMA janela do anuncio do inimigo, por acaso de implementacao) e
+    // "parecia de costas" - aliasing temporal (roda-de-carroca), nao ordem/pose. A cura
+    // e DURACAO: o approach/volta do JOGADOR ganharam constantes proprias, mais longas,
+    // SEM tocar o Beat 1 / a volta do inimigo (ambos aprovados AO VIVO no W1).
+    using gus::app::screens::ActorAnimKind;
+    using gus::app::screens::kMeleeReturnSeconds;
+    using gus::app::screens::kPlayerMeleeApproachSeconds;
+    using gus::app::screens::kPlayerMeleeReturnSeconds;
+
+    // --- Invariantes de tuning (constantes) ---
+    // O approach do jogador e mais longo que o Beat 1 do inimigo (mais tempo pra LER).
+    REQUIRE(kPlayerMeleeApproachSeconds > kPacingAnnounceSeconds);
+    // A volta do jogador e mais longa que a do inimigo MAS cabe no delay do Beat 2 -
+    // senao o Gus deslizaria por cima do anuncio do proximo turno.
+    REQUIRE(kPlayerMeleeReturnSeconds > kMeleeReturnSeconds);
+    REQUIRE(kPlayerMeleeReturnSeconds <= kPacingStepDelaySeconds);
+    // REGRESSAO ANTI-TOQUE: o ritmo do inimigo NAO pode ter mudado (aprovado no W1).
+    REQUIRE(kPacingAnnounceSeconds == 0.7f);  // Beat 1 anuncio do inimigo, CRU
+    REQUIRE(kMeleeReturnSeconds == 0.4f);     // volta do inimigo, CRUA
+
+    // --- Comportamento: o approach do JOGADOR de fato usa a duracao propria ---
+    BattleScene scene;
+    pump_to_player_turn(scene);
+    scene.update(kFloaterLifeSeconds + 0.1f);  // some com floaters antigos
+    REQUIRE(scene.active_actor() != nullptr);
+    REQUIRE(scene.active_actor()->is_player_side());
+    const std::string self_id = scene.active_actor()->id();
+
+    select_verb(scene, BattleVerb::Atacar);
+    scene.menu_confirm();  // entra na mira
+    scene.aim_confirm();   // o windup (aproximacao) parte AGORA, sem update ainda
+    REQUIRE(scene.player_action_in_flight());
+    // A fase Approach recem-iniciada (elapsed 0) dura kPlayerMeleeApproachSeconds, NAO
+    // kPacingAnnounceSeconds - prova comportamental do desacoplamento (nao pegou a carona).
+    const float rem = scene.anim().phase_remaining_seconds(self_id);
+    REQUIRE(rem > kPacingAnnounceSeconds);  // > 0.7s: nao e mais a janela do inimigo
+    REQUIRE(rem > kPlayerMeleeApproachSeconds - 0.02f);
+    REQUIRE(rem < kPlayerMeleeApproachSeconds + 0.02f);
+
+    // --- A volta do jogador usa kPlayerMeleeReturnSeconds e cabe no delay do Beat 2 ---
+    pump_player_strike(scene);  // bombeia ate o CONTATO (fim da aproximacao)
+    REQUIRE(scene.anim().kind_for(self_id) == ActorAnimKind::MeleeReturn);
+    const float ret = scene.anim().phase_remaining_seconds(self_id);
+    REQUIRE(ret > kPlayerMeleeReturnSeconds - 0.02f);
+    REQUIRE(ret < kPlayerMeleeReturnSeconds + 0.02f);
+    // Ao longo do delay INTEIRO do Beat 2 a volta (0.7s < 0.8s) termina no repouso EXATO.
+    const int delay_frames = static_cast<int>(kPacingStepDelaySeconds * 60.0f) + 1;
+    for (int i = 0; i < delay_frames; ++i) {
         scene.update(1.0f / 60.0f);
     }
     REQUIRE(scene.anim().offset_for(self_id).x == 0.0f);
