@@ -408,8 +408,15 @@ const SpriteClip* BattleScene::resolve_sprite_clip(const std::string& id,
     const SpriteClip* clip = sit->second.find(pb.clip);
     BattleClipId cid = pb.clip;
     if (clip == nullptr) {
-        // Clip da fase sem frames no disco: degrada pro Idle (melhor um idle vivo
-        // que um buraco); o relogio corrente vale (idle e loop, qualquer frame serve).
+        // Clip da fase sem frames no disco: degrau 1 = fallback do modulo POCO
+        // (perfil ausente -> front-facing equivalente: run_east/run_west -> run;
+        // attack_melee_east -> attack_melee). O relogio corrente vale (a cadencia
+        // difere, mas o reset ja aconteceu na troca de clip).
+        cid = clip_fallback(pb.clip);
+        clip = sit->second.find(cid);
+    }
+    if (clip == nullptr) {
+        // Degrau 2: Idle (melhor um idle vivo que um buraco).
         clip = sit->second.find(BattleClipId::Idle);
         cid = BattleClipId::Idle;
     }

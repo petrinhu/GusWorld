@@ -2301,7 +2301,9 @@ TEST_CASE("anim W2: render desenha a bolinha do projetil (placeholder) em voo",
 
 namespace {
 
-// Sprite set sintetico com os 4 clips que TOCAM nesta onda (fps default do modulo).
+// Sprite set sintetico FRONT-ONLY (sem os clipes de perfil): exercita o degrau de
+// FALLBACK direcional da cena (run_east/run_west -> run; attack_melee_east ->
+// attack_melee) - o cenario de um ator cujas anims de perfil ainda nao existem.
 gus::app::screens::ActorSpriteSet synthetic_sprite_set() {
     using gus::app::screens::BattleClipId;
     using gus::app::screens::default_clip_fps;
@@ -2319,6 +2321,28 @@ gus::app::screens::ActorSpriteSet synthetic_sprite_set() {
     fill(BattleClipId::Run, 7, 200u);
     fill(BattleClipId::AttackMelee, 7, 300u);
     fill(BattleClipId::HurtPhysical, 5, 400u);
+    return set;
+}
+
+// Sprite set sintetico COMPLETO (2026-07-01): front-facing + os 3 clipes de PERFIL
+// do melee. Frame count espelha o disco POS-cap do loader (attack_melee_east = 6:
+// f6-f8 derivados nao carregam - clip_frame_cap).
+gus::app::screens::ActorSpriteSet synthetic_sprite_set_with_profiles() {
+    using gus::app::screens::BattleClipId;
+    using gus::app::screens::default_clip_fps;
+    using gus::app::screens::default_clip_loop;
+    gus::app::screens::ActorSpriteSet set = synthetic_sprite_set();
+    const auto fill = [&](BattleClipId id, int n, unsigned base) {
+        auto& c = set.clips[static_cast<std::size_t>(id)];
+        for (int i = 0; i < n; ++i) {
+            c.frames.push_back(base + static_cast<unsigned>(i));
+        }
+        c.fps = default_clip_fps(id);
+        c.loop = default_clip_loop(id);
+    };
+    fill(BattleClipId::RunEast, 9, 500u);
+    fill(BattleClipId::RunWest, 9, 600u);
+    fill(BattleClipId::AttackMeleeEast, 6, 700u);  // = cap do loader (f0..f5)
     return set;
 }
 
@@ -2349,8 +2373,8 @@ TEST_CASE("sprite W3: ator com sprite set toca battle_idle no repouso (relogio a
     REQUIRE(f1->second > 0);
 }
 
-TEST_CASE("sprite W3: melee do GUS - corre na ida, saca o golpe na CAUDA, corre na "
-          "volta e volta ao idle",
+TEST_CASE("sprite W3: melee do GUS com set FRONT-ONLY - fallback direcional degrada "
+          "pro run/attack_melee (perfis ausentes)",
           "[battle_scene][sprite]") {
     using gus::app::screens::ActorAnimKind;
     using gus::app::screens::BattleClipId;
@@ -2401,6 +2425,77 @@ TEST_CASE("sprite W3: melee do GUS - corre na ida, saca o golpe na CAUDA, corre 
     REQUIRE(f->first == BattleClipId::Run);
 
     // A volta termina (0.4s) -> repouso: battle_idle de novo, do frame 0.
+    for (int i = 0; i < 45; ++i) {
+        scene.update(1.0f / 60.0f);
+    }
+    REQUIRE(scene.anim().kind_for("gus") == ActorAnimKind::None);
+    f = scene.actor_sprite_frame("gus");
+    REQUIRE(f.has_value());
+    REQUIRE(f->first == BattleClipId::Idle);
+}
+
+TEST_CASE("sprite W3.1: melee do GUS com PERFIS - run_east na ida, murro de perfil "
+          "CRAVA em <= f5 no contato, run_west na volta",
+          "[battle_scene][sprite]") {
+    using gus::app::screens::ActorAnimKind;
+    using gus::app::screens::BattleClipId;
+    using gus::app::screens::kMeleeSwingSeconds;
+    BattleScene scene;
+    scene.set_actor_sprites("gus", synthetic_sprite_set_with_profiles());
+
+    pump_to_actor_picker(scene);
+    REQUIRE(scene.is_choosing_actor());
+    for (int i = 0; i < 4 && (scene.actor_pick_target() == nullptr ||
+                              scene.actor_pick_target()->id() != "gus");
+         ++i) {
+        scene.actor_picker_move(+1);
+    }
+    REQUIRE(scene.actor_pick_target() != nullptr);
+    REQUIRE(scene.actor_pick_target()->id() == "gus");
+    scene.actor_picker_confirm();
+    REQUIRE(scene.active_actor()->id() == "gus");
+
+    // IDA: corrida de PERFIL encarando o inimigo (run_east; clipe proprio, sem flip).
+    select_verb(scene, BattleVerb::Atacar);
+    scene.menu_confirm();
+    scene.aim_confirm();
+    REQUIRE(scene.player_action_in_flight());
+    scene.update(1.0f / 60.0f);
+    auto f = scene.actor_sprite_frame("gus");
+    REQUIRE(f.has_value());
+    REQUIRE(f->first == BattleClipId::RunEast);
+
+    // CAUDA: o murro de perfil (attack_melee_east) parte e, ate o CONTATO, o frame
+    // NUNCA passa do pico f5 (frames derivados f6-f8 nem existem no set - cap do
+    // loader). Varre TODO update da aproximacao provando o invariante; o ultimo
+    // update do loop ja pode resolver o contato e emendar no Return (o consumidor
+    // resolve Hold ~0 no mesmo update - decisao "swing na cauda").
+    bool saw_swing = false;
+    int swing_peak = -1;
+    for (int i = 0; i < 120 && scene.anim().kind_for("gus") ==
+                                   ActorAnimKind::MeleeApproach;
+         ++i) {
+        scene.update(1.0f / 60.0f);
+        f = scene.actor_sprite_frame("gus");
+        REQUIRE(f.has_value());
+        if (f->first == BattleClipId::AttackMeleeEast) {
+            saw_swing = true;
+            swing_peak = f->second;
+            REQUIRE(f->second <= 5);  // estica ate f5 e crava; derivado inalcancavel
+        }
+    }
+    // O swing de fato apareceu na cauda e CRAVOU no pico f5 antes do contato.
+    REQUIRE(saw_swing);
+    REQUIRE(swing_peak == 5);
+
+    // CONTATO resolve e o Return parte: volta de perfil-esquerda (run_west).
+    pump_player_strike(scene);
+    REQUIRE(scene.anim().kind_for("gus") == ActorAnimKind::MeleeReturn);
+    f = scene.actor_sprite_frame("gus");
+    REQUIRE(f.has_value());
+    REQUIRE(f->first == BattleClipId::RunWest);
+
+    // Volta termina -> repouso front-facing (battle_idle).
     for (int i = 0; i < 45; ++i) {
         scene.update(1.0f / 60.0f);
     }
