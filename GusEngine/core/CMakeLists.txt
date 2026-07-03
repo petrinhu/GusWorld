@@ -21,6 +21,7 @@ add_library(gusengine_core STATIC
     src/time/fixed_timestep.cpp
     src/anim/anim_clock.cpp
     src/anim/breath_oscillator.cpp
+    src/anim/fade_transition.cpp
     src/player/stamina.cpp
     src/player/winded_timer.cpp
 )

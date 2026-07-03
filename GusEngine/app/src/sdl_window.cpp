@@ -181,7 +181,9 @@ bool SdlWindow::reacquire_renderer() {
     return true;
 }
 
-bool SdlWindow::step() {
+bool SdlWindow::step() { return step_with_fade(0.0f); }
+
+bool SdlWindow::step_with_fade(float overlay_alpha) {
     // 1) INPUT: drena os eventos SDL (teclado + gamepad). false = fechar.
     if (!input_.pump_events()) {
         return false;
@@ -211,8 +213,26 @@ bool SdlWindow::step() {
     if (render2d_ != nullptr && renderer_ != nullptr) {
         int pw = kWindowW, ph = kWindowH;
         SDL_GetCurrentRenderOutputSize(renderer_, &pw, &ph);
+        // M7-COSTURA Inc 2: overlay_alpha>0 adia o present (mesmo mecanismo do HUD
+        // RmlUi, ADR-009) pra desenhar o retangulo preto DEPOIS da cena e ANTES do
+        // swap. overlay_alpha<=0 nao mexe em defer_present - BYTE-IDENTICO ao step()
+        // de sempre (nenhuma chamada extra, nenhum present() manual).
+        const bool has_overlay = overlay_alpha > 0.0f;
+        if (has_overlay) {
+            render2d_->set_defer_present(true);
+        }
         sim_->render(*render2d_, static_cast<float>(pw), static_cast<float>(ph),
                      static_cast<float>(steps.alpha));
+        if (has_overlay) {
+            const float clamped = overlay_alpha > 1.0f ? 1.0f : overlay_alpha;
+            const gus::core::spatial::CameraView cam =
+                sim_->camera_view(static_cast<float>(pw), static_cast<float>(ph));
+            render2d_->draw_filled_rect(
+                cam.rect,
+                gus::platform::render2d::DrawColor{0.0f, 0.0f, 0.0f, clamped});
+            render2d_->present();
+            render2d_->set_defer_present(false);  // restaura o default pro step() normal
+        }
     }
     return true;
 }

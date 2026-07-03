@@ -7,9 +7,17 @@
 #include <catch2/catch_approx.hpp>
 #include <catch2/catch_test_macros.hpp>
 
+#include <cmath>
+#include <cstdint>
+#include <filesystem>
+#include <fstream>
+#include <string>
+#include <vector>
+
 #include "gus/app/maestro_logic.hpp"
 
 using gus::app::aabb_overlaps;
+using gus::app::crossfade_music;
 using gus::app::EncounterId;
 using gus::app::enemy_sprite_footprint_aabb;
 using gus::app::outcome_marks_enemy_defeated;
@@ -20,6 +28,9 @@ using gus::app::should_trigger_battle_on_edge;
 using gus::core::spatial::Aabb;
 using gus::core::spatial::TileGrid;
 using gus::domain::combat::CombatOutcome;
+using gus::platform::audio::AudioEngine;
+using gus::platform::audio::kInvalidSound;
+using gus::platform::audio::SoundId;
 
 TEST_CASE("aabb_overlaps: sobreposicao franca", "[maestro][logic]") {
     const Aabb a{0.0f, 0.0f, 10.0f, 10.0f};
@@ -562,4 +573,102 @@ TEST_CASE("should_trigger_battle_on_edge: apos FUGA/DERROTA (inimigo permanece, 
 
     // 4) jogador RE-ENCOSTA - agora SIM redispara (rising edge legitimo do encontro fixo).
     CHECK(should_trigger_battle_on_edge(/*overlap=*/true, was) == true);
+}
+
+// ============================================================================
+// M7-COSTURA Inc 2 (ADR-012 decisao 5 + paga a divida do ADR-011 "fade entre telas"):
+// crossfade_music - o MECANISMO que cruza a musica cronometrado com o fade preto (a
+// tela fica 100% preta no instante em que o chamador dispara isto). Testado headless
+// com AudioEngine em modo null-device (device_active=false) - mesma receita de
+// platform/tests/audio_engine_test.cpp (WAV sintetico em tempfile).
+// ============================================================================
+
+namespace {
+// Mesmo gerador minimo de WAV PCM16 mono do audio_engine_test.cpp (duplicado de
+// proposito: este e um teste da camada app/, que nao deveria depender de um util de
+// teste de platform/ so por isto - a duplicacao e barata, 1 tom curto).
+std::string write_crossfade_test_tone_wav(const std::filesystem::path& path) {
+    constexpr int kSampleRate = 22050;
+    constexpr float kDurationS = 0.1f;
+    constexpr float kFreqHz = 440.0f;
+    const auto num_samples = static_cast<std::uint32_t>(kSampleRate * kDurationS);
+    std::vector<std::int16_t> samples(num_samples);
+    for (std::uint32_t i = 0; i < num_samples; ++i) {
+        const float t = static_cast<float>(i) / static_cast<float>(kSampleRate);
+        const float s = 0.2f * std::sin(2.0f * 3.14159265f * kFreqHz * t);
+        samples[i] = static_cast<std::int16_t>(s * 32767.0f);
+    }
+    const std::uint32_t data_bytes = num_samples * sizeof(std::int16_t);
+    const std::uint32_t byte_rate = static_cast<std::uint32_t>(kSampleRate) * 2;
+    const std::uint16_t block_align = 2;
+    const std::uint16_t bits_per_sample = 16;
+    const std::uint32_t riff_size = 36 + data_bytes;
+
+    std::ofstream out(path, std::ios::binary | std::ios::trunc);
+    auto w32 = [&out](std::uint32_t v) { out.write(reinterpret_cast<const char*>(&v), 4); };
+    auto w16 = [&out](std::uint16_t v) { out.write(reinterpret_cast<const char*>(&v), 2); };
+    out.write("RIFF", 4);
+    w32(riff_size);
+    out.write("WAVE", 4);
+    out.write("fmt ", 4);
+    w32(16);
+    w16(1);
+    w16(1);
+    w32(static_cast<std::uint32_t>(kSampleRate));
+    w32(byte_rate);
+    w16(block_align);
+    w16(bits_per_sample);
+    out.write("data", 4);
+    w32(data_bytes);
+    out.write(reinterpret_cast<const char*>(samples.data()),
+              static_cast<std::streamsize>(data_bytes));
+    return path.string();
+}
+}  // namespace
+
+TEST_CASE("crossfade_music: engine nullptr e no-op seguro (nunca crasha)",
+          "[maestro][logic][audio][m7_costura]") {
+    crossfade_music(nullptr, /*next_id=*/1, /*loop=*/true, /*fade_seconds=*/0.5f);
+    SUCCEED("no-op com engine nulo nao crashou");
+}
+
+TEST_CASE("crossfade_music: dispara stop_music + play_music da PROXIMA faixa "
+          "(mecanismo do fade preto, M7-COSTURA Inc 2)",
+          "[maestro][logic][audio][m7_costura]") {
+    AudioEngine engine(/*device_active=*/false);
+    const auto tmp =
+        std::filesystem::temp_directory_path() / "gusworld_test_crossfade_music.wav";
+    write_crossfade_test_tone_wav(tmp);
+
+    const SoundId id = engine.load_music(tmp.string().c_str());
+    REQUIRE(id != kInvalidSound);
+
+    // Faixa ja tocando ANTES do crossfade (simula a musica corrente da cidade/batalha).
+    engine.play_music(id, /*loop=*/true, /*fade_in_seconds=*/0.0f);
+    REQUIRE(engine.music_is_playing());
+    REQUIRE(engine.music_play_count() == 1);
+
+    // O crossfade cruza pra faixa dada (aqui, a MESMA - o kit CC0 desta onda so tem 1
+    // faixa, ver asset_paths.hpp/kCityThemeFile) - stop_music(fade) + play_music(fade).
+    crossfade_music(&engine, id, /*loop=*/true, /*fade_seconds=*/0.6f);
+
+    // stop_music NAO decrementa music_play_count (so conta plays); play_music CONTA
+    // mais 1 (a faixa que o crossfade acabou de tocar) e a musica segue tocando.
+    CHECK(engine.music_play_count() == 2);
+    CHECK(engine.music_is_playing());
+
+    std::filesystem::remove(tmp);
+}
+
+TEST_CASE("crossfade_music: kInvalidSound como next_id nao incrementa music_play_count "
+          "(degradacao segura - kit sem faixa carregada)",
+          "[maestro][logic][audio][m7_costura]") {
+    AudioEngine engine(/*device_active=*/false);
+    REQUIRE(engine.music_play_count() == 0);
+
+    crossfade_music(&engine, /*next_id=*/kInvalidSound, /*loop=*/true,
+                     /*fade_seconds=*/0.5f);
+
+    CHECK(engine.music_play_count() == 0);
+    CHECK_FALSE(engine.music_is_playing());
 }

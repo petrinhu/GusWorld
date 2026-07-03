@@ -30,6 +30,7 @@
 
 #include "gus/app/screens/battle_scene.hpp"
 #include "gus/domain/combat/combat_enums.hpp"  // CombatOutcome (out-param do embedded)
+#include "gus/platform/audio/audio_engine.hpp"  // AudioEngine externo (M7-COSTURA Inc 2)
 
 namespace gus::app::screens {
 
@@ -41,6 +42,13 @@ namespace gus::app::screens {
 // Resolve a pasta dos icones de status (resources/sprites/icons-m5/status), na mesma
 // ordem do resolver de retratos. So monta a STRING (nao abre arquivo).
 [[nodiscard]] std::string resolve_status_icons_dir();
+
+// M7-COSTURA Inc 2: resolve o caminho da MUSICA (kCityThemeFile), mesma receita/ordem
+// de resolve_retratos_dir (env GUSWORLD_MUSIC > macro embutida GUSWORLD_MUSIC_DIR >
+// relativo ao CWD). Exposto pra a Maestro carregar o tema da cidade UMA vez em
+// init() (dona do AudioEngine agora - ver gus/app/maestro.hpp), sem duplicar a logica
+// de resolucao aqui e la.
+[[nodiscard]] std::string resolve_music_path();
 
 // Digito 1-9 de uma tecla numerica (fileira OU numpad); 0 se nao for numerica 1-9. Fonte
 // unica do mapeamento tecla->N pros atalhos numericos (mira e escolha de ator). Exposto
@@ -73,9 +81,32 @@ void battle_key_down(BattleScene& scene, SDL_Keycode key, bool& running);
 // decidir "encerrar o app" (nao "voltar pra cidade"). Devolve 0 ok, !=0 se a criacao do
 // contexto GL ou o load de funcoes GL falhar (a janela segue viva - quem chamou decide o
 // que fazer).
-int run_battle_preview_embedded(SDL_Window* window,
-                                 gus::domain::combat::CombatOutcome* out_outcome,
-                                 bool* out_quit_requested = nullptr);
+//
+// M7-COSTURA Inc 2 (ADR-012 decisao 5, paga a divida do ADR-011 "AudioEngine e dono da
+// battle_preview"):
+//   external_audio: nullptr (default) = comportamento de SEMPRE - cria/possui um
+//     AudioEngine LOCAL (destruido ao sair; o kit CC0 de musica/SFX toca/para aqui
+//     mesmo, com fade-in/fade-out proprios) - o caminho do --battle STANDALONE
+//     (run_battle_preview() abaixo) e de todo selftest/captura, INTOCADOS. Nao-nulo =
+//     a Maestro passa o SEU AudioEngine (dono real, M7-COSTURA Inc 2) - esta funcao
+//     SO usa (ponteiro nao-dono, mesmo padrao de BattleScene::set_audio), NUNCA toca
+//     musica (a Maestro cronometra o crossfade com o fade preto por fora, ver
+//     gus/app/maestro_logic.hpp::crossfade_music) - so carrega/dispara o SFX do hit
+//     no engine externo (preserva a variante A/B GUSWORLD_HIT_SFX=alt).
+//   fade_in_seconds/fade_out_seconds: <=0 (default) = SEM fade visual (comportamento
+//     de sempre). >0 = desenha o overlay preto (gus/core/anim/fade_transition.hpp) por
+//     cima da arena+HUD na ENTRADA (kIn, tela clareando sobre o 1o frame pronto, antes
+//     do loop interativo comecar) e na SAIDA (kOut, tela escurecendo sobre o ULTIMO
+//     frame congelado, depois que o loop interativo termina) - SO a Maestro pede isto
+//     (o --battle standalone e os selftests pedem 0, preservando 100% o comportamento
+//     anterior). O fade de SAIDA e PULADO se o motivo foi o jogador fechar a janela
+//     (quit_requested) - fechar e imediato, sem segurar o jogador pra um fade que ele
+//     nao pediu.
+int run_battle_preview_embedded(
+    SDL_Window* window, gus::domain::combat::CombatOutcome* out_outcome,
+    bool* out_quit_requested = nullptr,
+    gus::platform::audio::AudioEngine* external_audio = nullptr,
+    float fade_in_seconds = 0.0f, float fade_out_seconds = 0.0f);
 
 // Roda o viewer da BattleScene: SDL_Init proprio, janela PROPRIA, loop de render do
 // esqueleto (camera logica 960x540 escalada por inteiro x2 = 1080p), Esc/fechar encerra.

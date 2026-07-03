@@ -16,16 +16,31 @@
 //
 // ESCOPO DO INCREMENTO 1 (esqueleto do loop, NAO o milestone inteiro): 1 inimigo FIXO no
 // mapa; colisao dispara a batalha; Victory some o inimigo (flag em memoria); Defeat/Fled
-// voltam pra cidade com o inimigo intacto (pode tentar de novo). NAO inclui (fica pros
-// Incrementos 2/3, ver ADR-012): fade preto + crossfade de musica (corte seco por ora); a
-// posse do AudioEngine subir pra ca (continua em battle_preview.cpp); o flavor da derrota
-// (reboot/bark/tela-xadrez) nem a regra Gus-centric de fim de combate.
+// voltam pra cidade com o inimigo intacto (pode tentar de novo). NAO incluiu (pago no
+// Incremento 2, ver abaixo): fade preto + crossfade de musica (era corte seco); a posse
+// do AudioEngine subindo pra ca. Incremento 3 (ainda pendente): o flavor da derrota
+// (reboot/bark/tela-xadrez) e a regra Gus-centric de fim de combate.
+//
+// ESCOPO DO INCREMENTO 2 (M7-COSTURA, ADR-012 decisao 5 + paga a divida do ADR-011
+// "AudioEngine e dono da battle_preview"): a Maestro agora e DONA de 1 unica instancia
+// do AudioEngine (audio_ abaixo), viva pro loop inteiro (cidade + todas as entradas/
+// saidas de batalha - o device nao e mais reaberto a cada entrada). Toca o tema da
+// cidade em loop enquanto na cidade; na troca cidade<->batalha, desenha um fade preto
+// curto (gus/core/anim/fade_transition.hpp) POR CIMA da tela ATUAL e, no pico da
+// opacidade (tela 100% preta), dispara o CROSSFADE de musica (gus/app/maestro_logic.hpp
+// ::crossfade_music) - fecha o criterio de saida do M6 ("fade entre telas"). A
+// battle_preview_embedded RECEBE o ponteiro do AudioEngine da Maestro (nao-dono, mesmo
+// padrao de BattleScene::set_audio) e so o usa pro SFX do hit + o fade visual da
+// PROPRIA tela de batalha - nunca toca musica quando chamada pela Maestro (ver o header
+// de battle_preview.hpp).
 //
 // Cross-ref: gus/app/maestro_logic.hpp (a logica PURA/testavel que este orquestrador
 //            consome); gus/app/sdl_window.hpp (a casca da cidade, agora com modo
-//            "anexado" a uma janela externa); gus/app/screens/battle_preview.hpp
-//            (run_battle_preview_embedded); docs/tech/adr/ADR-012-m7-paridade-jogavel-
-//            plano.md (o plano completo do M7).
+//            "anexado" a uma janela externa + step_with_fade); gus/app/screens/
+//            battle_preview.hpp (run_battle_preview_embedded); gus/core/anim/
+//            fade_transition.hpp (a curva do overlay preto); gus/platform/audio/
+//            audio_engine.hpp (AudioEngine, agora possuido aqui); docs/tech/adr/
+//            ADR-012-m7-paridade-jogavel-plano.md (o plano completo do M7).
 
 #ifndef GUS_APP_MAESTRO_HPP
 #define GUS_APP_MAESTRO_HPP
@@ -36,8 +51,10 @@
 
 #include "gus/app/maestro_logic.hpp"
 #include "gus/app/sdl_window.hpp"
+#include "gus/core/anim/fade_transition.hpp"
 #include "gus/domain/combat/combat_enums.hpp"
 #include "gus/domain/save/save_data.hpp"
+#include "gus/platform/audio/audio_engine.hpp"
 
 namespace gus::app {
 
@@ -78,8 +95,30 @@ private:
     // should_trigger_battle); Defeat/Fled nao marcam (o inimigo continua la).
     void on_battle_result(gus::domain::combat::CombatOutcome outcome);
 
+    // M7-COSTURA Inc 2 (ADR-012 decisao 5): roda o FADE PRETO sobre a CIDADE
+    // (city_->step_with_fade, um frame real por vez - a cidade continua VIVA/animada
+    // durante o fade, so com o overlay preto crescendo/decrescendo por cima) pela
+    // duracao dada, na direcao pedida. Devolve false se o jogador fechou a janela
+    // DURANTE o fade (o chamador propaga como quit, mesmo contrato de to_battle()).
+    // duration_seconds<=0 e um no-op que devolve true na hora (sem rodar nenhum frame
+    // extra) - symmetrico ao fade_overlay_alpha(duration<=0) do core.
+    [[nodiscard]] bool run_city_fade(gus::core::anim::FadeDirection direction,
+                                      float duration_seconds);
+
     SDL_Window* window_ = nullptr;         // dono (a UNICA janela do app)
     std::unique_ptr<SdlWindow> city_;      // a cidade (OverworldSim vive aqui, sempre)
+
+    // AUDIO (M7-COSTURA Inc 2): a Maestro e DONA - 1 instancia viva pro loop inteiro
+    // (paga a divida do ADR-011 "AudioEngine e dono da battle_preview" - o device nao
+    // e mais reaberto a cada entrada na batalha). device_active=true tenta o hardware
+    // real; degrada com seguranca se indisponivel (mesma API no-op de sempre).
+    gus::platform::audio::AudioEngine audio_{/*device_active=*/true};
+    // Tema da cidade (kCityThemeFile), carregado UMA vez em init(). O crossfade
+    // (maestro_logic.hpp::crossfade_music) cruza PRA este id nos dois sentidos - o kit
+    // CC0 desta onda so tem 1 faixa (ver a nota honesta em core/asset_paths.hpp), entao
+    // o mecanismo cruza pra ELA MESMA (riqueza musical fica pra onda de audio dedicada).
+    gus::platform::audio::SoundId city_music_id_ =
+        gus::platform::audio::kInvalidSound;
 
     // Inimigo FIXO (item 1 do escopo, ver maestro_logic.hpp): AABB + estado "derrotado"
     // em memoria. dado de app/ - NAO toca o formato .gmap/TileMap.

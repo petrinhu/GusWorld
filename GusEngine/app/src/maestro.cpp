@@ -37,6 +37,25 @@ constexpr int kEnemyOffsetTilesY = 4;
 // EncounterId::kFixedEnemy1 (unico valor desta onda) - quando houver mais encontros, a
 // chave vira derivada do id (ponto unico a trocar).
 constexpr std::string_view kEnemy1DefeatedFlag = "encounter_fixed_enemy1_defeated";
+
+// M7-COSTURA Inc 2 (ADR-012 decisao 5, "fade preto curto ~0.3-0.5s cada lado"): duracao
+// de CADA metade visual da transicao (fade-out sobre a tela de saida + fade-in sobre a
+// tela de entrada). Usada nos DOIS sentidos (cidade->batalha e volta) e em AMBOS os
+// lados (cidade via run_city_fade; batalha via os parametros fade_in/fade_out_seconds
+// de run_battle_preview_embedded) - um unico valor, sem duplicar o numero em 4 lugares.
+constexpr float kTransitionFadeSeconds = 0.4f;
+
+// Duracao do CROSSFADE de audio (stop_music+play_music, maestro_logic.hpp::
+// crossfade_music), disparado no PICO da opacidade (tela 100% preta). Um pouco mais
+// longo que kTransitionFadeSeconds de proposito: a musica cruza enquanto a tela SEGUE
+// preta (o resto do fade-in da tela NOVA) - suaviza o corte sem estender o fade visual
+// em si. Heuristica inicial; o lider ajusta ao vivo se sentir curto/longo demais.
+constexpr float kAudioCrossfadeSeconds = 0.8f;
+
+// Fade-in de BOOT (cidade, ao ligar o app): mais generoso que o da costura - nao ha
+// pressa nenhuma no boot, e um fade suave "acordando" o tema evita o pop abrupto de
+// volume cheio no frame 1. Nao faz parte do fade preto (nao ha tela preta no boot).
+constexpr float kBootMusicFadeInSeconds = 1.0f;
 }  // namespace
 
 Maestro::Maestro() = default;
@@ -72,6 +91,21 @@ bool Maestro::init() {
         SDL_Log("Maestro: falha ao inicializar o renderer/cidade.");
         return false;
     }
+
+    // AUDIO (M7-COSTURA Inc 2, ADR-012 decisao 5 + paga a divida do ADR-011 "AudioEngine
+    // e dono da battle_preview"): a Maestro carrega o tema da cidade UMA vez aqui (audio_
+    // ja construida no default-member-initializer do header) e toca em LOOP - critério
+    // "musica da CIDADE toca enquanto na cidade". Fade-in de boot suave (nao ha tela
+    // preta no boot, entao nao e o mesmo fade da costura - so evita o pop de volume).
+    const std::string city_music_path = gus::app::screens::resolve_music_path();
+    city_music_id_ = audio_.load_music(city_music_path.c_str());
+    audio_.play_music(city_music_id_, /*loop=*/true, kBootMusicFadeInSeconds);
+    std::cout << "Maestro: [audio] device "
+              << (audio_.available() ? "disponivel" : "INDISPONIVEL (mudo)")
+              << " - tema da cidade "
+              << (city_music_id_ != gus::platform::audio::kInvalidSound ? "carregado"
+                                                                         : "AUSENTE")
+              << ".\n";
 
     // M7-COSTURA fix BUG-1 (playtest ao vivo do lider: "a batalha so ativou vindo do
     // sul"): pick_fixed_enemy_position devolve so o ANCHOR (celula-alvo, AABB minusculo
@@ -133,23 +167,62 @@ void Maestro::run() {
     }
 }
 
+bool Maestro::run_city_fade(gus::core::anim::FadeDirection direction,
+                             float duration_seconds) {
+    if (duration_seconds <= 0.0f) {
+        return true;  // no-op: nenhum frame extra (simetrico a fade_overlay_alpha)
+    }
+    const unsigned long long start_ns = SDL_GetTicksNS();
+    while (true) {
+        const float elapsed =
+            static_cast<float>(SDL_GetTicksNS() - start_ns) / 1.0e9f;
+        const float alpha =
+            gus::core::anim::fade_overlay_alpha(direction, elapsed, duration_seconds);
+        if (!city_->step_with_fade(alpha)) {
+            return false;  // janela fechada durante o fade - propaga quit (mesmo
+                            // contrato de to_battle/run())
+        }
+        if (elapsed >= duration_seconds) {
+            break;
+        }
+    }
+    return true;
+}
+
 bool Maestro::to_battle(EncounterId id) {
     (void)id;  // so 1 valor nesta onda (kFixedEnemy1) - o parametro ja existe pro futuro
 
     std::cout << "Maestro: [costura] esbarrou no inimigo -> ENTRANDO na batalha "
-                 "(trocando SDL_Renderer da cidade por contexto GL, mesma janela)...\n";
+                 "(fade preto + crossfade de musica, M7-COSTURA Inc 2)...\n";
 
-    // TROCA ESCONDIDA ATRAS DO PRETO (corte seco neste incremento - fade/crossfade sao o
-    // Incremento 2): libera o SDL_Renderer da cidade pra deixar a janela livre pro
-    // contexto GL da batalha (a MESMA SDL_Window - decisao do lider, viabilidade
-    // validada empiricamente na Onda 1).
+    // FADE-OUT sobre a CIDADE (tela escurece, ~kTransitionFadeSeconds) - M7-COSTURA
+    // Inc 2 (ADR-012 decisao 5). Se o jogador fechar a janela DURANTE o fade, propaga
+    // quit igual ao resto do fluxo (nunca chega a entrar na batalha).
+    if (!run_city_fade(gus::core::anim::FadeDirection::kOut, kTransitionFadeSeconds)) {
+        return true;
+    }
+
+    // CROSSFADE DE MUSICA cronometrado com o escurinho (tela 100% preta aqui): para a
+    // faixa corrente com fade-out e toca a PROXIMA com fade-in (M7-COSTURA Inc 2, paga
+    // a divida do ADR-011 "fade entre telas"). NOTA HONESTA (mesma de kCityThemeFile):
+    // o kit CC0 desta onda so tem 1 faixa - cruza pra ELA MESMA (o MECANISMO fica
+    // provado; riqueza musical fica pra onda de audio dedicada).
+    crossfade_music(&audio_, city_music_id_, /*loop=*/true, kAudioCrossfadeSeconds);
+
+    // TROCA ESCONDIDA ATRAS DO PRETO: libera o SDL_Renderer da cidade pra deixar a
+    // janela livre pro contexto GL da batalha (a MESMA SDL_Window - decisao do lider,
+    // viabilidade validada empiricamente na Onda 1). A tela ja esta 100% preta aqui.
     city_->release_renderer();
 
     gus::domain::combat::CombatOutcome outcome =
         gus::domain::combat::CombatOutcome::Ongoing;
     bool quit_requested = false;
+    // M7-COSTURA Inc 2: passa o AudioEngine DELA (ponteiro nao-dono - a battle_preview
+    // so usa pro SFX do hit + o fade visual PROPRIO da tela de batalha, nunca musica) +
+    // os DOIS fades visuais da batalha (entrada clareando, saida escurecendo).
     const int rc = gus::app::screens::run_battle_preview_embedded(
-        window_, &outcome, &quit_requested);
+        window_, &outcome, &quit_requested, &audio_, kTransitionFadeSeconds,
+        kTransitionFadeSeconds);
     if (rc != 0) {
         SDL_Log(
             "Maestro: run_battle_preview_embedded devolveu %d (contexto GL/glad "
@@ -174,6 +247,15 @@ bool Maestro::to_battle(EncounterId id) {
         SDL_Log(
             "Maestro: falha ao reconstruir o renderer da cidade apos a batalha - a "
             "cidade segue rodando SEM desenhar (degradacao segura, sem crash).");
+    }
+
+    // CROSSFADE DE VOLTA + FADE-IN sobre a CIDADE (Inc 2): mesma receita, sentido
+    // inverso - a batalha ja fez o SEU fade-out (kOut, dentro de
+    // run_battle_preview_embedded, tela preta ao voltar aqui); o crossfade dispara
+    // agora (ainda preto, cidade acabou de reconstruir o renderer) e a cidade clareia.
+    crossfade_music(&audio_, city_music_id_, /*loop=*/true, kAudioCrossfadeSeconds);
+    if (!run_city_fade(gus::core::anim::FadeDirection::kIn, kTransitionFadeSeconds)) {
+        return true;  // fechou a janela durante o fade de volta - mesmo contrato
     }
 
     std::cout << "Maestro: [costura] VOLTANDO pra cidade no mesmo ponto ("

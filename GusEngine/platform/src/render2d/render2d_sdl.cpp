@@ -82,6 +82,14 @@ void Render2dSdl::draw_filled_rect(const gus::core::spatial::Rect& world_rect,
     }
     const QuadScreen q =
         build_quad_screen(world_rect, camera_, pixel_w_, pixel_h_);
+    // M7-COSTURA Inc 2: BLENDMODE_BLEND explicito - o overlay preto do fade preto
+    // (Maestro::run_city_fade, ADR-012 decisao 5) depende de alpha<255 realmente
+    // compor com o frame ja desenhado. O blend mode do SDL_Renderer nao muda sozinho
+    // entre draws (default NONE em SDL3); com alpha=255 (opaco, o uso de sempre ate
+    // aqui - nenhum draw_filled_rect do jogo usava alpha<1 antes desta onda)
+    // BLENDMODE_BLEND produz o MESMO resultado byte-a-byte de BLENDMODE_NONE
+    // (dst = src*1 + dst*0), entao nao ha regressao visual nos usos opacos existentes.
+    SDL_SetRenderDrawBlendMode(renderer_, SDL_BLENDMODE_BLEND);
     SDL_SetRenderDrawColor(renderer_, to_byte(color.r), to_byte(color.g),
                            to_byte(color.b), to_byte(color.a));
     SDL_FRect dst{q.x, q.y, q.w, q.h};

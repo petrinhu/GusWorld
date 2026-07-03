@@ -21,6 +21,7 @@ add_executable(gusengine_core_tests
     stamina_test.cpp
     winded_timer_test.cpp
     breath_oscillator_test.cpp
+    fade_transition_test.cpp
 )
 
 target_link_libraries(gusengine_core_tests

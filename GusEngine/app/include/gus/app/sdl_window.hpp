@@ -72,6 +72,19 @@ public:
     // renderer da cidade ativo.
     [[nodiscard]] bool step();
 
+    // M7-COSTURA Inc 2 (ADR-012 decisao 5, "fade preto curto"): MESMO passo de step()
+    // (poll -> N updates fixos -> 1 render), com um retangulo PRETO full-screen
+    // desenhado POR CIMA do frame ja renderizado, ANTES do present - o overlay do fade
+    // preto da transicao cidade<->batalha. overlay_alpha<=0.0f e BYTE-IDENTICO a
+    // step() (nenhum overlay, nenhum present adiado): step() e literalmente
+    // `return step_with_fade(0.0f);`. overlay_alpha>0 clampa em [0,1] e usa o mesmo
+    // present-diferido (ADR-009, set_defer_present) que o HUD RmlUi ja usa pra compor
+    // por cima da arena - aqui e o Maestro quem compoe o preto por cima, sem HUD. A
+    // curva do alpha (crescente/decrescente ao longo do tempo) e responsabilidade do
+    // CHAMADOR (gus::core::anim::fade_overlay_alpha); esta funcao so DESENHA o alpha
+    // dado num frame. Mesmo contrato de retorno de step() (false = janela fechou).
+    [[nodiscard]] bool step_with_fade(float overlay_alpha);
+
     // Roda o loop ate o usuario fechar a janela (pump_events devolver false). Cada
     // iteracao: poll de input -> N updates fixos (FixedTimestep) -> 1 render. O
     // lider joga: move o Caua com WASD/setas/gamepad, desliza nas paredes, camera

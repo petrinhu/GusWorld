@@ -19,6 +19,7 @@
 #include "gus/app/screens/battle_hud_model.hpp"  // status_icon_file/index
 #include "gus/app/screens/battle_layout.hpp"     // arena_layout (selftest de mouse A2)
 #include "gus/app/screens/battle_scene.hpp"
+#include "gus/core/anim/fade_transition.hpp"  // fade_overlay_alpha (M7-COSTURA Inc 2)
 #include "gus/core/asset_paths.hpp"             // caminhos de asset centralizados
 #include "gus/domain/combat/combat_enums.hpp"  // StatusId
 #include "gus/platform/audio/audio_engine.hpp"     // AudioEngine (M6 F3, ADR-011)
@@ -122,22 +123,10 @@ std::string resolve_hit_sfx_path() {
     return join(std::string(gus::core::assets::kSfxDir), file);
 }
 
-// Resolve o caminho da MUSICA (M6 F4, ADR-011): env GUSWORLD_MUSIC > macro embutida
-// (GUSWORLD_MUSIC_DIR = repo_root/assets/music) > relativo ao CWD (kMusicDir). Mesma
-// receita de resolve_hit_sfx_path, sem variante A/B (so 1 faixa no kit provisorio).
-std::string resolve_music_path() {
-    const std::string file(gus::core::assets::kCityThemeFile);
-    if (const char* env = std::getenv("GUSWORLD_MUSIC")) {
-        if (env[0] != '\0') {
-            return join(env, file);
-        }
-    }
-    const std::string compiled = GUSWORLD_MUSIC_DIR;
-    if (!compiled.empty()) {
-        return join(compiled, file);
-    }
-    return join(std::string(gus::core::assets::kMusicDir), file);
-}
+// resolve_music_path() MOVIDA pra fora do namespace anonimo (M7-COSTURA Inc 2) -
+// agora EXPORTADA em gus::app::screens (ver declaracao no header + definicao abaixo,
+// mesmo padrao de resolve_retratos_dir): a Maestro passa a chama-la direto (dona do
+// AudioEngine agora), sem duplicar a logica de resolucao.
 
 // Carrega o SPRITE SET de batalha do GUS (W3): pra cada clip conhecido
 // (battle_sprite_anim::clip_dir_name), varre <resources>/<kGusBattleAnimsDir>/<clip>/
@@ -522,6 +511,24 @@ std::string resolve_retratos_dir() {
 
 std::string resolve_status_icons_dir() {
     return resolve_asset_dir(gus::core::assets::kStatusIconsDir);
+}
+
+// M7-COSTURA Inc 2: resolve o caminho da MUSICA (M6 F4, ADR-011), env GUSWORLD_MUSIC >
+// macro embutida (GUSWORLD_MUSIC_DIR = repo_root/assets/music) > relativo ao CWD
+// (kMusicDir). EXPORTADA (fora do namespace anonimo, ver header) - a Maestro chama isto
+// direto pra carregar o tema da cidade UMA vez em init() (dona do AudioEngine agora).
+std::string resolve_music_path() {
+    const std::string file(gus::core::assets::kCityThemeFile);
+    if (const char* env = std::getenv("GUSWORLD_MUSIC")) {
+        if (env[0] != '\0') {
+            return join(env, file);
+        }
+    }
+    const std::string compiled = GUSWORLD_MUSIC_DIR;
+    if (!compiled.empty()) {
+        return join(compiled, file);
+    }
+    return join(std::string(gus::core::assets::kMusicDir), file);
 }
 
 std::string resolve_intent_icons_dir() {
@@ -1184,7 +1191,9 @@ void battle_key_down(BattleScene& scene, SDL_Keycode key, bool& running) {
 // SDL_Renderer no retorno (ver Maestro::reacquire_city_renderer em maestro.cpp).
 int run_battle_preview_embedded(SDL_Window* window,
                                  gus::domain::combat::CombatOutcome* out_outcome,
-                                 bool* out_quit_requested) {
+                                 bool* out_quit_requested,
+                                 gus::platform::audio::AudioEngine* external_audio,
+                                 float fade_in_seconds, float fade_out_seconds) {
     // FIX BUG-3 (playtest ao vivo do lider: fechar a janela durante a batalha reabria a
     // cidade em LOOP INFINITO): comeca false; so vira true no MESMO handler de
     // SDL_EVENT_QUIT que ja existia (ver o `while (running)` abaixo) - um sinal DISTINTO
@@ -1353,47 +1362,65 @@ int run_battle_preview_embedded(SDL_Window* window,
             }
         }
 
-        // AUDIO (M6 F3, ADR-011): o AudioEngine e DONO da CASCA (aqui, mais longeva que a
-        // BattleScene - re-entradas futuras recriam a cena sem recriar o device nem
-        // redecodificar o SFX). device_active=true tenta o hardware real; falha degrada
-        // graciosa (available()==false, API vira no-op - a cena roda muda, nunca crasha
-        // por falta de placa de som). load_sfx UMA vez aqui (NUNCA no frame do contato -
-        // decodificar e caro, o motivo de load_sfx existir separado de play_sfx).
-        gus::platform::audio::AudioEngine audio_engine(/*device_active=*/true);
+        // AUDIO (M6 F3/F4, ADR-011; ownership revisada M7-COSTURA Inc 2, ADR-012 decisao
+        // 5): dois modos.
+        //   external_audio == nullptr (--battle STANDALONE + todo selftest/captura, ver
+        //     header): o AudioEngine e DONO da CASCA (comportamento de SEMPRE, INTOCADO)
+        //     - local_audio_engine construido AQUI, device_active=true tenta o hardware
+        //     real, degradacao graciosa se indisponivel. Toca a musica (loop+fade-in) e
+        //     para no choke-point de saida (ver mais abaixo).
+        //   external_audio != nullptr (a Maestro, M7-COSTURA Inc 2): usa o engine DELA
+        //     (ponteiro nao-dono) - NAO cria device novo (a divida do ADR-011 "AudioEngine
+        //     e dono da battle_preview" fica paga: o device nao e mais reaberto a cada
+        //     entrada na batalha) e NAO toca/para musica aqui - a Maestro cronometra o
+        //     crossfade com o fade preto por fora (gus/app/maestro_logic.hpp::
+        //     crossfade_music), ANTES/DEPOIS desta funcao rodar.
+        std::optional<gus::platform::audio::AudioEngine> local_audio_engine;
+        gus::platform::audio::AudioEngine* audio_ptr = external_audio;
+        if (audio_ptr == nullptr) {
+            local_audio_engine.emplace(/*device_active=*/true);
+            audio_ptr = &(*local_audio_engine);
+        }
+
+        // SFX do hit (M6 F3): load_sfx UMA vez por entrada na batalha (NUNCA no frame do
+        // contato - decodificar e caro), em AMBOS os modos - preserva a variante A/B
+        // GUSWORLD_HIT_SFX=alt mesmo com o engine EXTERNO.
         const std::string hit_sfx_path = resolve_hit_sfx_path();
         const gus::platform::audio::SoundId hit_sfx_id =
-            audio_engine.load_sfx(hit_sfx_path.c_str());
+            audio_ptr->load_sfx(hit_sfx_path.c_str());
         std::cout << "BattlePreview: [audio] device "
-                  << (audio_engine.available() ? "disponivel" : "INDISPONIVEL (mudo)")
+                  << (audio_ptr->available() ? "disponivel" : "INDISPONIVEL (mudo)")
                   << " - SFX de hit "
                   << (hit_sfx_id != gus::platform::audio::kInvalidSound
                           ? "carregado"
                           : "AUSENTE (silencioso)")
-                  << " de " << hit_sfx_path << "\n";
+                  << " de " << hit_sfx_path
+                  << (external_audio != nullptr ? " [engine EXTERNO, Maestro]"
+                                                 : " [engine LOCAL, standalone]")
+                  << "\n";
 
-        // MUSICA (M6 F4, ADR-011): mesmo AudioEngine dono da casca, mesmo padrao de
-        // pre-load do SFX (load_music UMA vez aqui - o stream real so comeca em
-        // play_music). Toca em LOOP com FADE-IN ao ENTRAR na batalha - este viewer
-        // (--battle) E a batalha; e o ponto de "entrada" que este fluxo isolado permite
-        // exercitar (ver nota de escopo do fade-out, no fim do loop, sobre o crossfade
-        // tela-a-tela completo). MA_SOUND_FLAG_STREAM + looping nativo (audio_engine.cpp)
-        // garante loop SEM GAP (o miniaudio reinicia o stream internamente).
+        // MUSICA (M6 F4, ADR-011): SO no modo LOCAL (standalone) - toca em LOOP com
+        // FADE-IN ao entrar, comportamento INTOCADO. No modo EXTERNO (Maestro), a
+        // musica e responsabilidade INTEIRA da Maestro (crossfade cronometrado com o
+        // fade preto) - tocar/parar aqui de novo brigaria com esse crossfade.
         //
         // NOTA HONESTA (kCityThemeFile, ver comentario em asset_paths.hpp): e um tema de
         // CIDADE tocando na BATALHA porque e a UNICA faixa do kit CC0 provisorio (F2) -
         // serve pra PROVAR loop+fade tecnicamente, NAO pra vender o feel de combate. NAO
         // mudar o timbre/curadoria aqui (fora de escopo desta fase, ADR-011).
-        const std::string music_path = resolve_music_path();
-        const gus::platform::audio::SoundId music_id =
-            audio_engine.load_music(music_path.c_str());
-        constexpr float kMusicFadeInSeconds = 2.0f;
-        audio_engine.play_music(music_id, /*loop=*/true, kMusicFadeInSeconds);
-        std::cout << "BattlePreview: [audio] musica "
-                  << (music_id != gus::platform::audio::kInvalidSound
-                          ? "carregada (loop, fade-in " +
-                                std::to_string(kMusicFadeInSeconds) + "s)"
-                          : "AUSENTE (silenciosa)")
-                  << " de " << music_path << "\n";
+        if (external_audio == nullptr) {
+            const std::string music_path = resolve_music_path();
+            const gus::platform::audio::SoundId music_id =
+                audio_ptr->load_music(music_path.c_str());
+            constexpr float kMusicFadeInSeconds = 2.0f;
+            audio_ptr->play_music(music_id, /*loop=*/true, kMusicFadeInSeconds);
+            std::cout << "BattlePreview: [audio] musica "
+                      << (music_id != gus::platform::audio::kInvalidSound
+                              ? "carregada (loop, fade-in " +
+                                    std::to_string(kMusicFadeInSeconds) + "s)"
+                              : "AUSENTE (silenciosa)")
+                      << " de " << music_path << "\n";
+        }
 
         // A cena monta o encontro de demo e ja le a fila do motor.
         BattleScene scene;
@@ -1401,7 +1428,7 @@ int run_battle_preview_embedded(SDL_Window* window,
         // dispara play_sfx no evento de CONTATO do golpe (F3) - nunca decodifica, nunca
         // possui o engine. hit_sfx_id pode ser kInvalidSound (asset ausente/device
         // indisponivel) - play_sfx() ja degrada com seguranca nesse caso.
-        scene.set_audio(&audio_engine, hit_sfx_id);
+        scene.set_audio(audio_ptr, hit_sfx_id);
         // (A) Com o HUD externo (glintfx::UiLayer) ATIVO, a cena NAO desenha o cockpit/log a
         // mao - so arena/banner/floaters/fila. Evita cockpits sobrepostos.
         scene.set_hud_external(glintfx_on);
@@ -1931,6 +1958,64 @@ int run_battle_preview_embedded(SDL_Window* window,
             running = false;
         }
 
+        // M7-COSTURA Inc 2 (ADR-012 decisao 5): FADE-IN de ENTRADA - a tela CLAREIA
+        // (overlay preto 1->0) sobre o 1o frame REAL da arena+HUD ja prontos (nao um
+        // placeholder). SO roda quando quem chamou pediu (fade_in_seconds>0 - a Maestro
+        // pede; o --battle standalone e todo selftest/captura acima pedem 0, ver os
+        // defaults do header) E a cena ainda esta RODANDO (nenhum selftest ja zerou
+        // `running` e encerrou tudo antes do 1o frame interativo). Pump de eventos
+        // LIMITADO a SDL_EVENT_QUIT - a batalha ainda nao "comecou" pro jogador enquanto
+        // a tela esta preta (teclado/mouse ficam mudos ate o fade acabar e o loop
+        // principal comecar).
+        if (fade_in_seconds > 0.0f && running) {
+            const unsigned long long fade_start_ns = SDL_GetTicksNS();
+            bool fading = true;
+            while (fading) {
+                SDL_Event fev;
+                while (SDL_PollEvent(&fev)) {
+                    if (fev.type == SDL_EVENT_QUIT) {
+                        running = false;
+                        quit_requested = true;
+                    }
+                }
+                if (!running) {
+                    break;
+                }
+                int fpw = kWindowW, fph = kWindowH;
+                SDL_GetWindowSizeInPixels(window, &fpw, &fph);
+                if (fpw < 1 || fph < 1) {
+                    SDL_Delay(16);
+                    continue;
+                }
+                const float elapsed =
+                    static_cast<float>(SDL_GetTicksNS() - fade_start_ns) / 1.0e9f;
+                scene.render(renderer, static_cast<float>(fpw), static_cast<float>(fph));
+                if (glintfx_on && ui) {
+                    if (fpw != pw0 || fph != ph0) {
+                        ui->set_viewport(fpw, fph);
+                        if (glintfx_dp_override <= 0.0f) {
+                            ui->set_dp_ratio(static_cast<float>(fpw) / 960.0f);
+                        }
+                        pw0 = fpw;
+                        ph0 = fph;
+                    }
+                    ui->update();
+                    ui->render();
+                }
+                renderer.draw_filled_rect(
+                    gus::app::screens::battle_screen_rect(),
+                    gus::platform::render2d::DrawColor{
+                        0.0f, 0.0f, 0.0f,
+                        gus::core::anim::fade_overlay_alpha(
+                            gus::core::anim::FadeDirection::kIn, elapsed,
+                            fade_in_seconds)});
+                SDL_GL_SwapWindow(window);
+                fading = elapsed < fade_in_seconds;
+            }
+            std::cout << "BattlePreview: [fade] entrada (kIn) concluido em "
+                      << fade_in_seconds << "s.\n";
+        }
+
         while (running) {
             SDL_Event ev;
             while (SDL_PollEvent(&ev)) {
@@ -2424,6 +2509,64 @@ int run_battle_preview_embedded(SDL_Window* window,
             }
         }
 
+        // M7-COSTURA Inc 2 (ADR-012 decisao 5): FADE-OUT de SAIDA - a tela ESCURECE
+        // (overlay preto 0->1) sobre o ULTIMO ESTADO congelado da arena+HUD (sem avancar
+        // logica de jogo, so re-desenha o mesmo frame com alpha crescente). SO roda
+        // quando quem chamou pediu (fade_out_seconds>0 - a Maestro pede; o --battle
+        // standalone e todo selftest/captura pedem 0, ver os defaults do header) E o
+        // motivo da saida NAO foi o jogador fechando a JANELA (quit_requested) - fechar
+        // deve ser IMEDIATO, sem segurar o jogador pra um fade que ele nao pediu. Pump de
+        // eventos LIMITADO a SDL_EVENT_QUIT (se o jogador fechar DURANTE o proprio fade,
+        // interrompe o fade e marca quit_requested - o choke-point abaixo ja usa a
+        // variavel atualizada).
+        if (fade_out_seconds > 0.0f && !quit_requested) {
+            const unsigned long long fade_start_ns = SDL_GetTicksNS();
+            bool fading = true;
+            while (fading) {
+                SDL_Event fev;
+                while (SDL_PollEvent(&fev)) {
+                    if (fev.type == SDL_EVENT_QUIT) {
+                        quit_requested = true;
+                    }
+                }
+                if (quit_requested) {
+                    break;
+                }
+                int fpw = kWindowW, fph = kWindowH;
+                SDL_GetWindowSizeInPixels(window, &fpw, &fph);
+                if (fpw < 1 || fph < 1) {
+                    SDL_Delay(16);
+                    continue;
+                }
+                const float elapsed =
+                    static_cast<float>(SDL_GetTicksNS() - fade_start_ns) / 1.0e9f;
+                scene.render(renderer, static_cast<float>(fpw), static_cast<float>(fph));
+                if (glintfx_on && ui) {
+                    if (fpw != pw0 || fph != ph0) {
+                        ui->set_viewport(fpw, fph);
+                        if (glintfx_dp_override <= 0.0f) {
+                            ui->set_dp_ratio(static_cast<float>(fpw) / 960.0f);
+                        }
+                        pw0 = fpw;
+                        ph0 = fph;
+                    }
+                    ui->update();
+                    ui->render();
+                }
+                renderer.draw_filled_rect(
+                    gus::app::screens::battle_screen_rect(),
+                    gus::platform::render2d::DrawColor{
+                        0.0f, 0.0f, 0.0f,
+                        gus::core::anim::fade_overlay_alpha(
+                            gus::core::anim::FadeDirection::kOut, elapsed,
+                            fade_out_seconds)});
+                SDL_GL_SwapWindow(window);
+                fading = elapsed < fade_out_seconds;
+            }
+            std::cout << "BattlePreview: [fade] saida (kOut) concluido em "
+                      << fade_out_seconds << "s.\n";
+        }
+
         // M7-COSTURA (ADR-012 Onda 1): MESMO choke-point (comentario original abaixo) -
         // grava o CombatOutcome final pra Maestro decidir vitoria/derrota/fuga. Se a
         // janela foi fechada no meio do combate (Esc/fechar), a FSM nunca chegou a
@@ -2439,33 +2582,26 @@ int run_battle_preview_embedded(SDL_Window* window,
             *out_quit_requested = quit_requested;
         }
 
-        // MUSICA: fade-out ao SAIR da batalha (M6 F4, ADR-011). Unico CHOKE-POINT de saida
-        // do loop `while (running)` acima, qualquer que seja o motivo (Esc/fechar janela/
-        // limite de --frames/selftest concluido) - todos convergem pra `running = false`
-        // e caem aqui, entao um so ponto cobre "sair da batalha" sem precisar duplicar em
-        // cada handler de saida.
-        //
-        // ESCOPO "fade entre telas" (veredito honesto, ADR-011 F4): este viewer roda a
-        // BATALHA ISOLADA - nao ha tela anterior/posterior real neste fluxo (--battle nao
-        // tem overworld<->batalha; esse loop de cena e trabalho do M5/M7). Os PRIMITIVOS
-        // de fade estao implementados e provados aqui (fade-in acima ao entrar, fade-out
-        // abaixo ao sair - API play_music(..., fade_in_seconds) + stop_music(fade)); o
-        // CROSSFADE completo tela-a-tela (musica A esmaecendo enquanto musica B sobe) so
-        // fica exercitavel quando o loop de cena overworld<->batalha existir - limitacao
-        // de INTEGRACAO (nao existe segunda tela pra crossfade contra), nao de audio.
-        const bool music_was_playing_before_exit = audio_engine.music_is_playing();
-        constexpr float kMusicFadeOutSeconds = 1.5f;
-        audio_engine.stop_music(kMusicFadeOutSeconds);
-        std::cout << "BattlePreview: [audio] musica: play_music count="
-                  << audio_engine.music_play_count() << " estava_tocando_ao_sair="
-                  << (music_was_playing_before_exit ? "sim" : "nao") << " fade-out de "
-                  << kMusicFadeOutSeconds << "s disparado.\n";
+        // MUSICA: fade-out ao SAIR da batalha (M6 F4, ADR-011) - SO no modo LOCAL
+        // (standalone); no modo EXTERNO (Maestro) a musica e 100% dela (crossfade
+        // cronometrado com o fade preto, disparado por FORA desta funcao - ver
+        // gus/app/maestro_logic.hpp::crossfade_music). O CROSSFADE completo tela-a-tela
+        // (M7-COSTURA Inc 2) fecha o M6 - ver ADR-012 e o relatorio do Inc 2.
+        if (external_audio == nullptr) {
+            const bool music_was_playing_before_exit = audio_ptr->music_is_playing();
+            constexpr float kMusicFadeOutSeconds = 1.5f;
+            audio_ptr->stop_music(kMusicFadeOutSeconds);
+            std::cout << "BattlePreview: [audio] musica: play_music count="
+                      << audio_ptr->music_play_count() << " estava_tocando_ao_sair="
+                      << (music_was_playing_before_exit ? "sim" : "nao") << " fade-out de "
+                      << kMusicFadeOutSeconds << "s disparado.\n";
+        }
 
         // DIAGNOSTICO (M6 F3, ADR-011): quantos SFX de hit TOCARAM de fato nesta sessao -
         // prova rapida no console (sem precisar ouvir) de que o gancho disparou no evento
         // de contato certo, tanto em playtest manual quanto sob os selftests acima.
         std::cout << "BattlePreview: [audio] play_sfx(hit) disparou "
-                  << audio_engine.sfx_play_count() << "x nesta sessao.\n";
+                  << audio_ptr->sfx_play_count() << "x nesta sessao.\n";
     }  // Render2dGl3 destruido (libera recursos GL) antes de destruir o contexto
 
     // M7-COSTURA: SO o contexto GL e desta funcao (criado no topo). A janela e o SDL_Init/

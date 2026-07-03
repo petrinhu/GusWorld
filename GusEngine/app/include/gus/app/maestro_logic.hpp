@@ -21,6 +21,7 @@
 #include "gus/core/spatial/grid_collision.hpp"  // Aabb
 #include "gus/core/spatial/tile_grid.hpp"       // TileGrid (posicionamento do inimigo)
 #include "gus/domain/combat/combat_enums.hpp"   // CombatOutcome
+#include "gus/platform/audio/audio_engine.hpp"  // AudioEngine/SoundId (M7-COSTURA Inc 2)
 
 namespace gus::app {
 
@@ -125,6 +126,20 @@ enum class EncounterId : int {
     bool overlapping_now, bool was_overlapping_previous_frame) noexcept {
     return overlapping_now && !was_overlapping_previous_frame;
 }
+
+// CROSSFADE DE MUSICA (M7-COSTURA Inc 2, ADR-012 decisao 5 + paga a divida do ADR-011
+// "fade entre telas"): para a faixa CORRENTE com fade-out e toca next_id com fade-in,
+// cronometrados com o "escurinho" - o CHAMADOR (Maestro) dispara isto no instante em
+// que o overlay preto (gus/core/anim/fade_transition.hpp) atinge alpha=1 (tela 100%
+// preta), ANTES de trocar a tela por baixo. MECANISMO GENERICO: next_id pode ser a
+// MESMA faixa que ja tocava (o kit CC0 provisorio desta onda so tem 1 - ver a nota
+// honesta em core/asset_paths.hpp/kCityThemeFile) ou uma faixa DIFERENTE quando o kit
+// crescer; esta funcao nao assume qual. engine e ponteiro NAO-DONO (mesmo padrao de
+// BattleScene::set_audio) - nullptr e no-op seguro (degradacao graciosa, o jogo nunca
+// depende de audio pra rodar).
+void crossfade_music(gus::platform::audio::AudioEngine* engine,
+                      gus::platform::audio::SoundId next_id, bool loop,
+                      float fade_seconds);
 
 }  // namespace gus::app
 

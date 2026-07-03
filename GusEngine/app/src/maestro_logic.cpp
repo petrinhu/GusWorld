@@ -180,4 +180,17 @@ gus::core::spatial::Aabb enemy_sprite_footprint_aabb(
     return fp;
 }
 
+void crossfade_music(gus::platform::audio::AudioEngine* engine,
+                      gus::platform::audio::SoundId next_id, bool loop,
+                      float fade_seconds) {
+    if (engine == nullptr) {
+        return;  // no-op seguro (mesma degradacao graciosa do resto da fronteira de audio)
+    }
+    // stop_music (fade-out da faixa corrente) + play_music (fade-in de next_id) - ambos
+    // usam o fader NATIVO do miniaudio (ja provado no M6 F4/ADR-011), so cronometrados
+    // pelo CHAMADOR pra coincidir com o overlay preto no pico da opacidade.
+    engine->stop_music(fade_seconds);
+    engine->play_music(next_id, loop, fade_seconds);
+}
+
 }  // namespace gus::app
