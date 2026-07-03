@@ -16,6 +16,7 @@ add_library(gusengine_app STATIC
     src/screens/city_loader.cpp
     src/screens/battle_layout.cpp
     src/screens/battle_cockpit_pills.cpp
+    src/screens/battle_cockpit_verb_ids.cpp
     src/screens/battle_hud_model.cpp
     src/screens/battle_menu.cpp
     src/screens/battle_log_model.cpp

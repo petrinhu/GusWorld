@@ -9,6 +9,7 @@
 #include <catch2/matchers/catch_matchers_floating_point.hpp>
 
 #include "gus/app/screens/battle_cockpit_pills.hpp"
+#include "gus/app/screens/battle_cockpit_verb_ids.hpp"  // GLINTFX-CLICK: gate de equivalencia
 #include "gus/app/screens/battle_menu.hpp"  // BattleVerb (ordem dos pills)
 
 using Catch::Matchers::WithinAbs;
@@ -112,4 +113,34 @@ TEST_CASE("hit-test: fora da coluna/pilha devolve -1 (o clique nao 'erra')",
     // A direita do border-box (cockpit vazio, x > 148dp): -1.
     REQUIRE(cockpit_pill_index_at(kCockpitPillLeftDp + kCockpitPillBorderBoxWidthDp + 2.0f,
                                   cy(r0)) == -1);
+}
+
+// ============================================================================
+// GLINTFX-CLICK: RED/GREEN DE EQUIVALENCIA (o contrato que autoriza a delecao deste
+// arquivo). PROVA, ANTES de qualquer wiring ou delecao, que o caminho NOVO (o `id` que
+// UiLayer::set_click_callback devolveria pro pill i, resolvido por
+// cockpit_verb_index_for_click_id) resolve pro MESMO indice de verbo que a geometria
+// manual (cockpit_pill_index_at no CENTRO de cockpit_pill_rect(i)) ja resolvia -- pra
+// CADA um dos 6 pills. So depois deste teste ficar VERDE e que battle_preview.cpp trocou
+// o wiring pro callback e este arquivo (a geometria manual) foi deletado; a permanencia
+// da equivalencia dai em diante e coberta por battle_cockpit_verb_ids_test.cpp (que nao
+// depende mais da geometria antiga).
+// ============================================================================
+TEST_CASE("GLINTFX-CLICK equivalencia: id-do-callback == indice-da-geometria-manual, "
+          "p/ cada 1 dos 6 pills",
+          "[cockpit_pills][glintfx_click_equivalence]") {
+    for (int i = 0; i < kCockpitPillCount; ++i) {
+        // Caminho ANTIGO (a divida): centro do retangulo medido -> indice via geometria.
+        const Rect r = cockpit_pill_rect(i);
+        const int indice_geometria_antiga = cockpit_pill_index_at(cx(r), cy(r));
+        REQUIRE(indice_geometria_antiga == i);  // sanity (ja provado acima; documenta o baseline)
+
+        // Caminho NOVO (o que fica): o `id` que o pill i carrega no RML (fonte unica em
+        // gus/app/screens/battle_cockpit_verb_ids.hpp) -> indice via strcmp puro.
+        const int indice_novo_callback = gus::app::screens::cockpit_verb_index_for_click_id(
+            gus::app::screens::kCockpitVerbElementIds[i]);
+
+        // A EQUIVALENCIA: os dois caminhos concordam, pill a pill.
+        REQUIRE(indice_novo_callback == indice_geometria_antiga);
+    }
 }

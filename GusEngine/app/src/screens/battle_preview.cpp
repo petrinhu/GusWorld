@@ -485,13 +485,17 @@ body { font-family: "Pixel Operator Mono"; background: transparent; }
       </div>
 
       <!-- +18dp de folga MANA->1o botao vem do margin-top do .menu (block nativo). -->
+      <!-- GLINTFX-CLICK: `id` ESTAVEL por pill (gus/app/screens/battle_cockpit_verb_ids.hpp
+           e a fonte unica do mapeamento id->indice; ordem = BattleVerb). SO ADITIVO: nao
+           mexe em classe/estrutura/geometria - UiLayer::set_click_callback (v0.2.5) usa
+           estes ids pro hit-test, substituindo a geometria manual aposentada. -->
       <div class="menu">
-        <div class="verb"><span class="glyph"></span><span class="lbl">SCAN</span></div>
-        <div class="verb"><span class="glyph"></span><span class="lbl">GAMBITO</span></div>
-        <div class="verb cyan sel"><span class="glyph"></span><span class="lbl">ATACAR</span></div>
-        <div class="verb"><span class="glyph"></span><span class="lbl">DEFENDER</span></div>
-        <div class="verb latao"><span class="glyph"></span><span class="lbl">COMPILAR</span></div>
-        <div class="verb"><span class="glyph"></span><span class="lbl">FUGIR</span></div>
+        <div class="verb" id="verb-scan"><span class="glyph"></span><span class="lbl">SCAN</span></div>
+        <div class="verb" id="verb-gambito"><span class="glyph"></span><span class="lbl">GAMBITO</span></div>
+        <div class="verb cyan sel" id="verb-atacar"><span class="glyph"></span><span class="lbl">ATACAR</span></div>
+        <div class="verb" id="verb-defender"><span class="glyph"></span><span class="lbl">DEFENDER</span></div>
+        <div class="verb latao" id="verb-compilar"><span class="glyph"></span><span class="lbl">COMPILAR</span></div>
+        <div class="verb" id="verb-flee"><span class="glyph"></span><span class="lbl">FUGIR</span></div>
       </div>
 
       <!-- +18dp de folga FUGIR->log vem do margin-top do #log (block nativo). -->
@@ -792,33 +796,36 @@ std::string write_live_cockpit_rml() {
     // (3b) menu de verbos data-driven: a classe .sel de cada verbo segue o indice SELECIONADO
     // no motor (binding 'sel'), via data-class-sel="sel == N". O motor (scene.menu_) e a
     // fonte de verdade da selecao; aqui so REFLETIMOS. (ordem N = BattleVerb).
+    // GLINTFX-CLICK: a string de origem casa a saida ATUAL de load_cockpit_rml() (que ja
+    // carrega o `id="verb-*"` estavel de cada pill, ver F1 acima); o destino PRESERVA esses
+    // ids (o click_callback do UiLayer os usa pro hit-test) e SO ACRESCENTA data-class-sel.
     replace_all(
         "      <div class=\"menu\">\n"
-        "        <div class=\"verb\"><span class=\"glyph\"></span><span "
+        "        <div class=\"verb\" id=\"verb-scan\"><span class=\"glyph\"></span><span "
         "class=\"lbl\">SCAN</span></div>\n"
-        "        <div class=\"verb\"><span class=\"glyph\"></span><span "
+        "        <div class=\"verb\" id=\"verb-gambito\"><span class=\"glyph\"></span><span "
         "class=\"lbl\">GAMBITO</span></div>\n"
-        "        <div class=\"verb cyan sel\"><span class=\"glyph\"></span><span "
-        "class=\"lbl\">ATACAR</span></div>\n"
-        "        <div class=\"verb\"><span class=\"glyph\"></span><span "
+        "        <div class=\"verb cyan sel\" id=\"verb-atacar\"><span "
+        "class=\"glyph\"></span><span class=\"lbl\">ATACAR</span></div>\n"
+        "        <div class=\"verb\" id=\"verb-defender\"><span class=\"glyph\"></span><span "
         "class=\"lbl\">DEFENDER</span></div>\n"
-        "        <div class=\"verb latao\"><span class=\"glyph\"></span><span "
-        "class=\"lbl\">COMPILAR</span></div>\n"
-        "        <div class=\"verb\"><span class=\"glyph\"></span><span "
+        "        <div class=\"verb latao\" id=\"verb-compilar\"><span "
+        "class=\"glyph\"></span><span class=\"lbl\">COMPILAR</span></div>\n"
+        "        <div class=\"verb\" id=\"verb-flee\"><span class=\"glyph\"></span><span "
         "class=\"lbl\">FUGIR</span></div>\n"
         "      </div>",
         "      <div class=\"menu\">\n"
-        "        <div class=\"verb\" data-class-sel=\"sel == 0\"><span "
+        "        <div class=\"verb\" id=\"verb-scan\" data-class-sel=\"sel == 0\"><span "
         "class=\"glyph\"></span><span class=\"lbl\">SCAN</span></div>\n"
-        "        <div class=\"verb\" data-class-sel=\"sel == 1\"><span "
+        "        <div class=\"verb\" id=\"verb-gambito\" data-class-sel=\"sel == 1\"><span "
         "class=\"glyph\"></span><span class=\"lbl\">GAMBITO</span></div>\n"
-        "        <div class=\"verb cyan\" data-class-sel=\"sel == 2\"><span "
+        "        <div class=\"verb cyan\" id=\"verb-atacar\" data-class-sel=\"sel == 2\"><span "
         "class=\"glyph\"></span><span class=\"lbl\">ATACAR</span></div>\n"
-        "        <div class=\"verb\" data-class-sel=\"sel == 3\"><span "
+        "        <div class=\"verb\" id=\"verb-defender\" data-class-sel=\"sel == 3\"><span "
         "class=\"glyph\"></span><span class=\"lbl\">DEFENDER</span></div>\n"
-        "        <div class=\"verb latao\" data-class-sel=\"sel == 4\"><span "
-        "class=\"glyph\"></span><span class=\"lbl\">COMPILAR</span></div>\n"
-        "        <div class=\"verb\" data-class-sel=\"sel == 5\"><span "
+        "        <div class=\"verb latao\" id=\"verb-compilar\" data-class-sel=\"sel == "
+        "4\"><span class=\"glyph\"></span><span class=\"lbl\">COMPILAR</span></div>\n"
+        "        <div class=\"verb\" id=\"verb-flee\" data-class-sel=\"sel == 5\"><span "
         "class=\"glyph\"></span><span class=\"lbl\">FUGIR</span></div>\n"
         "      </div>");
 
