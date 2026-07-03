@@ -48,6 +48,7 @@
 #include "gus/domain/combat/combat_records.hpp"   // CombatAction / IntentPreview
 #include "gus/domain/combat/combat_state_machine.hpp"
 #include "gus/domain/combat/scripted_brain.hpp"   // ScriptedBrain (telegraph)
+#include "gus/platform/audio/audio_engine.hpp"    // AudioEngine/SoundId (M6 F3, ADR-011)
 #include "gus/platform/render2d/i_renderer.hpp"
 
 namespace gus::domain::combat {
@@ -126,6 +127,24 @@ public:
     // marca placeholder sobre o inimigo (fallback headless).
     void set_intent_icons(BattleIntentIconSet icons) noexcept {
         intent_icons_ = icons;
+    }
+
+    // AUDIO (M6 F3, ADR-011): plugga o AudioEngine DONO (vive na CASCA/main - battle_
+    // preview.cpp - mais longeva que a cena; re-entradas futuras recriam a BattleScene
+    // sem recriar/decodificar o device nem o SFX de novo) + o SoundId do hit ja
+    // pre-carregado (load_sfx UMA vez no owner). Ponteiro NAO-DONO (mesmo padrao de
+    // set_translator): engine==nullptr (default) = sem audio, a cena roda MUDA e
+    // silenciosa (nunca depende de audio pra rodar - mesma degradacao graciosa do
+    // AudioEngine em si). O disparo acontece SO no evento de CONTATO do golpe (o MESMO
+    // instante onde o hit-react visual + o floater ja nascem hoje): melee via
+    // spawn_floaters_from_new_logs (canais Common/Crit) e projetil via o impacto
+    // (anim_.take_impacts(), consumido em update()) - os dois call-sites tocam o MESMO
+    // play_sfx(hit_sfx_id_). Beat 1/anuncio/windup/aproximacao seguem MUDOS de proposito
+    // (o golpe ainda nao conectou).
+    void set_audio(gus::platform::audio::AudioEngine* engine,
+                   gus::platform::audio::SoundId hit_sfx_id) noexcept {
+        audio_engine_ = engine;
+        hit_sfx_id_ = hit_sfx_id;
     }
 
     // SPRITE ANIMADO na arena (W3, battle-anim.md par.1.1/3.2): instala o conjunto de
@@ -442,6 +461,13 @@ private:
     [[nodiscard]] gus::domain::combat::CombatActor* first_alive_enemy() const;
     [[nodiscard]] gus::domain::combat::CombatActor* first_alive_player() const;
 
+    // Dispara o SFX de hit (M6 F3, ADR-011) no evento de CONTATO. No-op seguro se
+    // set_audio nunca foi chamado (audio_engine_==nullptr) - a cena roda muda sem
+    // depender de audio. Chamado dos MESMOS 2 pontos onde start_hit_react ja dispara
+    // (spawn_floaters_from_new_logs para melee/UseCard; o consumo de anim_.take_impacts
+    // em update() para projetil), nunca antes do contato.
+    void play_hit_sfx();
+
     // ---- Modo-mira (helpers privados, §3.5) ----
 
     // Entra em modo-mira para o verbo (Atacar/Scan): (re)constroi a lista de inimigos
@@ -541,6 +567,10 @@ private:
     std::vector<LogLine> ui_log_;
     // Translator de UI (NAO-DONO). nullptr = sem traducao (fallback no render).
     const gus::app::i18n::Translator* translator_ = nullptr;
+    // AUDIO (M6 F3, ADR-011): AudioEngine NAO-DONO (vive na casca/main) + o SoundId do
+    // hit ja carregado. nullptr = sem audio (fallback silencioso, ver set_audio).
+    gus::platform::audio::AudioEngine* audio_engine_ = nullptr;
+    gus::platform::audio::SoundId hit_sfx_id_ = gus::platform::audio::kInvalidSound;
 
     // Numeros flutuantes ATIVOS (incremento 5). update(dt) envelhece e poda; render
     // desenha sobre o alvo. Spawnados de logs NOVOS do motor (spawn_floaters_from_new_logs).

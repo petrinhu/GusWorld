@@ -27,6 +27,9 @@ add_library(gusengine_app STATIC
     src/screens/battle_preview.cpp
     src/i18n/translator.cpp
     src/sdl_window.cpp
+    # Diagnostico opcional de device de audio real (M6 F1, ADR-011 item 5).
+    # GUSWORLD_AUDIO_SMOKE=1: ver app/include/gus/app/audio_smoke.hpp.
+    src/audio_smoke.cpp
 )
 
 target_include_directories(gusengine_app
@@ -55,6 +58,15 @@ target_compile_definitions(gusengine_app
     # RCSS (o glintfx::UiLayer NAO expoe Rml::LoadFontFace - so o doc carrega fonte). Sem
     # esta macro o app/ nao saberia o caminho absoluto da fonte. Override: env GUSWORLD_FONTS.
     PRIVATE GUSWORLD_FONTS_DIR="${CMAKE_SOURCE_DIR}/assets/fonts"
+    # Pasta do kit CC0 de SFX (M6 F2/F3, ADR-011), na RAIZ do repo (irma de resources/ e
+    # GusEngine/ - "assets/" de origem/source do JOGO, diferente de GusEngine/assets/ que
+    # e asset DA ENGINE). O battle_preview (owner do AudioEngine) le hit_digital_
+    # provisorio.wav daqui rodando do build dir; override em runtime via env GUSWORLD_SFX.
+    PRIVATE GUSWORLD_SFX_DIR="${CMAKE_SOURCE_DIR}/../assets/sfx"
+    # Pasta da musica CC0 (M6 F4, ADR-011), irma de assets/sfx/ (mesma raiz "assets/" do
+    # JOGO). O battle_preview le cidade_tema_provisorio.mp3 daqui; override em runtime
+    # via env GUSWORLD_MUSIC.
+    PRIVATE GUSWORLD_MUSIC_DIR="${CMAKE_SOURCE_DIR}/../assets/music"
 )
 
 # SDL3 entra aqui (a casca SdlWindow + o main tocam SDL diretamente).

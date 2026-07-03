@@ -482,6 +482,17 @@ void BattleScene::debug_cast_demo() {
     demo_cast_target_ = target->id();
 }
 
+void BattleScene::play_hit_sfx() {
+    // M6 F3 (ADR-011): no-op seguro se set_audio nunca foi chamado - a cena roda muda,
+    // NUNCA depende de audio (mesmo espirito de degradacao graciosa do AudioEngine e do
+    // resto da fronteira headless-first do jogo). O AudioEngine::play_sfx por si so ja
+    // e no-op seguro pra kInvalidSound/engine indisponivel; o ponteiro nulo aqui cobre o
+    // caso "ninguem plugou audio nesta cena" (testes headless, viewers antigos).
+    if (audio_engine_ != nullptr) {
+        audio_engine_->play_sfx(hit_sfx_id_);
+    }
+}
+
 void BattleScene::spawn_floaters_from_new_logs() {
     const auto& log = machine_->log();
     for (std::size_t i = log_cursor_; i < log.size(); ++i) {
@@ -527,6 +538,11 @@ void BattleScene::spawn_floaters_from_new_logs() {
                 (victim != nullptr && victim->is_player_side()) ? -1.0f : 1.0f;
             anim_.start_hit_react(*e.target_id, dir, kHitReactSeconds,
                                   kHitReactKnockbackPx);
+            // M6 F3 (ADR-011): o SOM do hit nasce no MESMO instante do hit-react visual
+            // (o contato ja resolveu: dano aplicado, floater nascido) - cobre TANTO o
+            // atacante da party QUANTO o inimigo (esta funcao processa o log dos dois
+            // lados igual, resolve_one_turn e chamada nos dois caminhos de contato).
+            play_hit_sfx();
         }
     }
     log_cursor_ = log.size();
@@ -611,6 +627,9 @@ void BattleScene::update(float dt_seconds) {
         const float dir =
             (victim != nullptr && victim->is_player_side()) ? -1.0f : 1.0f;
         anim_.start_hit_react(id, dir, kHitReactSeconds, kHitReactKnockbackPx);
+        // M6 F3 (ADR-011): call-site do PROJETIL - mesmo play_sfx do melee, disparado no
+        // IMPACTO real (fim do voo), nunca no windup/conjuracao.
+        play_hit_sfx();
     }
 
     // RITMO (incremento 6): avanca o diretor pelo tempo; quando ele LIBERA um passo (a
