@@ -15,7 +15,7 @@
 
 #include <SDL3/SDL.h>
 
-#include "gus/app/screens/battle_cockpit_pills.hpp"  // hit-test de mouse dos pills (A2)
+#include "gus/app/screens/battle_cockpit_verb_ids.hpp"  // GLINTFX-CLICK: id->indice de verbo
 #include "gus/app/screens/battle_hud_model.hpp"  // status_icon_file/index
 #include "gus/app/screens/battle_layout.hpp"     // arena_layout (selftest de mouse A2)
 #include "gus/app/screens/battle_scene.hpp"
@@ -217,12 +217,14 @@ std::string cockpit_asset_base_dir() {
 }
 
 std::string load_cockpit_rml() {
-    // SINCRONIA COM O HIT-TEST DE MOUSE (Incremento A2): a regra `.verb` (width 110dp /
-    // height 18dp / margin-bottom 4dp / padding 0dp 12dp / border 1dp) e o `#cockpit`
-    // padding-left 12dp definem a geometria dos pills que gus/app/screens/battle_cockpit_pills
-    // .hpp REPLICA pra decidir em qual pill o clique caiu. Ao mudar esses numeros AQUI,
-    // ATUALIZE battle_cockpit_pills.hpp (e RE-MEDIR a origem-Y se mexer no que vem ANTES do
-    // .menu -- retrato/nome/vitals -- que empurra o 1o pill).
+    // GLINTFX-CLICK (v0.2.5): cada pill de verbo (`.verb`, na div `.menu` abaixo) carrega um
+    // `id="verb-*"` ESTAVEL (fonte unica gus/app/screens/battle_cockpit_verb_ids.hpp) que o
+    // UiLayer::set_click_callback devolve no clique. ZERO geometria manual pra sincronizar
+    // aqui - so os ids precisam bater com o mapeamento id->indice de battle_cockpit_verb_ids
+    // .hpp (um teste dedicado prova isso; battle_cockpit_verb_ids_test.cpp). Historico: ate
+    // a v0.2.4 o glintfx nao expunha hit-test de elemento, entao a geometria da regra `.verb`
+    // (width/height/margin/padding/border) era ESPELHADA A MAO num modulo separado
+    // (battle_cockpit_pills.hpp, aposentado neste incremento - ver historico git).
     // Caminhos de asset RELATIVOS a base (cockpit_asset_base_dir): o RmlUi resolve image()
     // contra o source_url do doc. Absoluto perderia a barra inicial na canonicalizacao.
     const std::string moldura(gus::core::assets::kMolduraCartaFrameFile);
@@ -355,8 +357,8 @@ body { font-family: "Pixel Operator Mono"; background: transparent; }
 /* HOVER (ADITIVO, SO-VISUAL): o ponteiro sobre o pill CLAREIA o fundo + poe uma BORDA NEUTRA
    clara. De proposito DISCRETO: e so o feedback "o mouse esta aqui", que NAO deve competir com
    o glow cyan FORTE do .sel (a selecao REAL, do teclado/confirmada). Sem box-shadow (zero glow
-   que dispute) e mantendo border 1dp (= .verb): NAO mexe na geometria => o hit-test de clique
-   do Incremento A2 (battle_cockpit_pills.hpp) segue valido. RmlUi 6.3 casa :hover NATIVO (o
+   que dispute) e mantendo border 1dp (= .verb): NAO mexe na geometria nem no `id="verb-*"`
+   (GLINTFX-CLICK) => o hit-test de clique segue valido. RmlUi 6.3 casa :hover NATIVO (o
    MouseMove ja chega via sdl_to_glintfx -> process_event -> Context::ProcessMouseMove).
    ORDEM PROPOSITAL: declarado ANTES de .verb.sel e .verb.fired. Como :hover conta como 1
    pseudo-classe, .verb:hover (2) EMPATA em especificidade com .verb.sel/.verb.fired (2 classes)
@@ -485,13 +487,17 @@ body { font-family: "Pixel Operator Mono"; background: transparent; }
       </div>
 
       <!-- +18dp de folga MANA->1o botao vem do margin-top do .menu (block nativo). -->
+      <!-- GLINTFX-CLICK: `id` ESTAVEL por pill (gus/app/screens/battle_cockpit_verb_ids.hpp
+           e a fonte unica do mapeamento id->indice; ordem = BattleVerb). SO ADITIVO: nao
+           mexe em classe/estrutura/geometria - UiLayer::set_click_callback (v0.2.5) usa
+           estes ids pro hit-test, substituindo a geometria manual aposentada. -->
       <div class="menu">
-        <div class="verb"><span class="glyph"></span><span class="lbl">SCAN</span></div>
-        <div class="verb"><span class="glyph"></span><span class="lbl">GAMBITO</span></div>
-        <div class="verb cyan sel"><span class="glyph"></span><span class="lbl">ATACAR</span></div>
-        <div class="verb"><span class="glyph"></span><span class="lbl">DEFENDER</span></div>
-        <div class="verb latao"><span class="glyph"></span><span class="lbl">COMPILAR</span></div>
-        <div class="verb"><span class="glyph"></span><span class="lbl">FUGIR</span></div>
+        <div class="verb" id="verb-scan"><span class="glyph"></span><span class="lbl">SCAN</span></div>
+        <div class="verb" id="verb-gambito"><span class="glyph"></span><span class="lbl">GAMBITO</span></div>
+        <div class="verb cyan sel" id="verb-atacar"><span class="glyph"></span><span class="lbl">ATACAR</span></div>
+        <div class="verb" id="verb-defender"><span class="glyph"></span><span class="lbl">DEFENDER</span></div>
+        <div class="verb latao" id="verb-compilar"><span class="glyph"></span><span class="lbl">COMPILAR</span></div>
+        <div class="verb" id="verb-flee"><span class="glyph"></span><span class="lbl">FUGIR</span></div>
       </div>
 
       <!-- +18dp de folga FUGIR->log vem do margin-top do #log (block nativo). -->
@@ -792,33 +798,36 @@ std::string write_live_cockpit_rml() {
     // (3b) menu de verbos data-driven: a classe .sel de cada verbo segue o indice SELECIONADO
     // no motor (binding 'sel'), via data-class-sel="sel == N". O motor (scene.menu_) e a
     // fonte de verdade da selecao; aqui so REFLETIMOS. (ordem N = BattleVerb).
+    // GLINTFX-CLICK: a string de origem casa a saida ATUAL de load_cockpit_rml() (que ja
+    // carrega o `id="verb-*"` estavel de cada pill, ver F1 acima); o destino PRESERVA esses
+    // ids (o click_callback do UiLayer os usa pro hit-test) e SO ACRESCENTA data-class-sel.
     replace_all(
         "      <div class=\"menu\">\n"
-        "        <div class=\"verb\"><span class=\"glyph\"></span><span "
+        "        <div class=\"verb\" id=\"verb-scan\"><span class=\"glyph\"></span><span "
         "class=\"lbl\">SCAN</span></div>\n"
-        "        <div class=\"verb\"><span class=\"glyph\"></span><span "
+        "        <div class=\"verb\" id=\"verb-gambito\"><span class=\"glyph\"></span><span "
         "class=\"lbl\">GAMBITO</span></div>\n"
-        "        <div class=\"verb cyan sel\"><span class=\"glyph\"></span><span "
-        "class=\"lbl\">ATACAR</span></div>\n"
-        "        <div class=\"verb\"><span class=\"glyph\"></span><span "
+        "        <div class=\"verb cyan sel\" id=\"verb-atacar\"><span "
+        "class=\"glyph\"></span><span class=\"lbl\">ATACAR</span></div>\n"
+        "        <div class=\"verb\" id=\"verb-defender\"><span class=\"glyph\"></span><span "
         "class=\"lbl\">DEFENDER</span></div>\n"
-        "        <div class=\"verb latao\"><span class=\"glyph\"></span><span "
-        "class=\"lbl\">COMPILAR</span></div>\n"
-        "        <div class=\"verb\"><span class=\"glyph\"></span><span "
+        "        <div class=\"verb latao\" id=\"verb-compilar\"><span "
+        "class=\"glyph\"></span><span class=\"lbl\">COMPILAR</span></div>\n"
+        "        <div class=\"verb\" id=\"verb-flee\"><span class=\"glyph\"></span><span "
         "class=\"lbl\">FUGIR</span></div>\n"
         "      </div>",
         "      <div class=\"menu\">\n"
-        "        <div class=\"verb\" data-class-sel=\"sel == 0\"><span "
+        "        <div class=\"verb\" id=\"verb-scan\" data-class-sel=\"sel == 0\"><span "
         "class=\"glyph\"></span><span class=\"lbl\">SCAN</span></div>\n"
-        "        <div class=\"verb\" data-class-sel=\"sel == 1\"><span "
+        "        <div class=\"verb\" id=\"verb-gambito\" data-class-sel=\"sel == 1\"><span "
         "class=\"glyph\"></span><span class=\"lbl\">GAMBITO</span></div>\n"
-        "        <div class=\"verb cyan\" data-class-sel=\"sel == 2\"><span "
+        "        <div class=\"verb cyan\" id=\"verb-atacar\" data-class-sel=\"sel == 2\"><span "
         "class=\"glyph\"></span><span class=\"lbl\">ATACAR</span></div>\n"
-        "        <div class=\"verb\" data-class-sel=\"sel == 3\"><span "
+        "        <div class=\"verb\" id=\"verb-defender\" data-class-sel=\"sel == 3\"><span "
         "class=\"glyph\"></span><span class=\"lbl\">DEFENDER</span></div>\n"
-        "        <div class=\"verb latao\" data-class-sel=\"sel == 4\"><span "
-        "class=\"glyph\"></span><span class=\"lbl\">COMPILAR</span></div>\n"
-        "        <div class=\"verb\" data-class-sel=\"sel == 5\"><span "
+        "        <div class=\"verb latao\" id=\"verb-compilar\" data-class-sel=\"sel == "
+        "4\"><span class=\"glyph\"></span><span class=\"lbl\">COMPILAR</span></div>\n"
+        "        <div class=\"verb\" id=\"verb-flee\" data-class-sel=\"sel == 5\"><span "
         "class=\"glyph\"></span><span class=\"lbl\">FUGIR</span></div>\n"
         "      </div>");
 
@@ -907,15 +916,48 @@ bool sdl_to_glintfx(const SDL_Event& ev, SDL_Window* window, glintfx::UiEvent* o
     return true;
 }
 
-// ADR-010 / Incremento A2 (MOUSE): o glintfx NAO expoe hit-test/geometria de elemento (so
-// data-model + process_event), entao o CLIQUE REAL e resolvido AQUI, no host, em paralelo ao
-// forward pro glintfx (que segue so pro visual/hover interno do RmlUi). Duas conversoes de
-// coordenada DISTINTAS, porque o cockpit RCSS e a arena NAO compartilham a escala vertical:
-//   - COCKPIT/pills: dp UNIFORME (dp_ratio = pw/960, o mesmo do UiLayer) -> dp = px/dp_ratio
-//     em X E Y (ambos por pw). A geometria vem do POCO puro (cockpit_pill_index_at).
-//   - ARENA/inimigos: a projecao ESTICA o mundo 960x540 pra (pw x ph), NAO-uniforme (ver
-//     viewport_transform world_to_screen) -> world_x = px/pw*960, world_y = px/ph*540 (Y por
-//     ph!). O hit-test vem do motor de cena (aim_index_at_arena, casa arena_rect_for_actor).
+// GLINTFX-CLICK (v0.2.5): aciona o verbo do PILL cujo `id` RCSS (fonte unica em
+// gus/app/screens/battle_cockpit_verb_ids.hpp) bate. Wired como o callback de
+// glintfx::UiLayer::set_click_callback (ver setup do loop abaixo) -- o GLINTFX faz o
+// hit-test ele mesmo (o MESMO que ja move o :hover nativo) e devolve so o `id`; aqui so
+// traduzimos esse id pra acao do motor (BattleScene). Extraida em funcao-livre (nao inline
+// no lambda do callback) pra ser chamavel DIRETO pelo self-test sintetico
+// (GUSWORLD_BATTLE_MOUSE_SELFTEST) sem precisar simular pixel/evento SDL algum -- o
+// glintfx ja resolveu o pixel; o self-test so precisa saber que id->verbo bate.
+//
+// GUARDA: replica, byte a byte, a MESMA ordem de prioridade que battle_mouse_click usa pro
+// resto do cockpit (escolha-de-ator > mira > menu). O motivo: os pills SEGUEM no DOM
+// (RmlUi data-if="!intro") mesmo durante a escolha de ator ou a mira -- um clique sobre a
+// coluna do cockpit nesses estados dispararia este callback EM PARALELO ao hit-test de
+// mundo/arena de battle_mouse_click (sao dois listeners INDEPENDENTES, nao mutuamente
+// exclusivos como a cadeia if/else antiga). Sem esta guarda, clicar sobre o cockpit
+// enquanto mira/escolhe ator selecionaria um verbo por baixo -- regressao. Na ABERTURA
+// (is_intro()) o bloco #combat inteiro (pills inclusos) nem existe no DOM -- o id nunca
+// bateria mesmo sem a guarda, mas ela fica explicita por clareza/defesa-em-profundidade.
+void battle_cockpit_verb_click(BattleScene& scene, const char* element_id) {
+    if (scene.is_choosing_actor() || scene.is_aiming() || scene.is_intro()) {
+        return;
+    }
+    const int idx = gus::app::screens::cockpit_verb_index_for_click_id(element_id);
+    if (idx < 0) {
+        return;  // id de outro elemento do cockpit (#combat/#vitals/#log/...) ou "" -> NO-OP
+    }
+    // Clique = SELECIONA e CONFIRMA. menu_move (delta ate o indice) + menu_confirm; ambos
+    // ja sao NO-OP fora do turno do jogador (mesma guarda do teclado) -> seguro em turno
+    // de inimigo/combate acabado. menu_move faz WRAP, mas o delta idx-sel (ambos 0..5) cai
+    // exato no indice. menu_confirm respeita 'enabled' (verbo sem AP: seleciona, nao aciona).
+    scene.menu_move(idx - scene.menu().selected_index());
+    scene.menu_confirm();
+}
+
+// ADR-010 / Incremento A2 (MOUSE), revisado GLINTFX-CLICK: hit-tests de MUNDO/ARENA
+// (escolha de ator + mira de alvo) resolvidos AQUI, no host, em coordenadas de MUNDO
+// (a projecao ESTICA 960x540 pra pw x ph, NAO-uniforme -- ver viewport_transform
+// world_to_screen -> world_x = px/pw*960, world_y = px/ph*540, Y por ph!). O hit-test vem
+// do motor de cena (actor_pick_index_at_arena / aim_index_at_arena, casam
+// arena_rect_for_actor). O clique nos PILLS DE VERBO NAO passa mais por aqui -- resolvido
+// pelo callback do glintfx (battle_cockpit_verb_click acima), que roda em paralelo a esta
+// funcao pro MESMO evento SDL (ver o loop de eventos: ambos os caminhos recebem o clique).
 // Pressuposto: mouse em px de janela == px do viewport (sem HiDPI neste alvo; MESMO pressuposto
 // do forward glintfx). Se houver escala HiDPI no futuro, converter mouse(pontos)->px antes.
 void battle_mouse_click(BattleScene& scene, float mx, float my, int pw, int ph) {
@@ -949,20 +991,9 @@ void battle_mouse_click(BattleScene& scene, float mx, float my, int pw, int ph) 
         // Fora de qualquer inimigo: NO-OP (nao cancela, nao "erra" o alvo) -- escopo A2.
         return;
     }
-    if (scene.is_intro()) {
-        return;  // na ABERTURA os pills nao existem (so o brasao) -> clique nao aciona verbo
-    }
-    // Clique num PILL de verbo: coordenadas 'dp' do cockpit (uniforme; dp_ratio = pw/960).
-    const float dp_ratio = static_cast<float>(pw) / 960.0f;
-    const int idx = cockpit_pill_index_at(mx / dp_ratio, my / dp_ratio);
-    if (idx >= 0) {
-        // Clique = SELECIONA e CONFIRMA. menu_move (delta ate o indice) + menu_confirm; ambos
-        // ja sao NO-OP fora do turno do jogador (mesma guarda do teclado) -> seguro em turno
-        // de inimigo/combate acabado. menu_move faz WRAP, mas o delta idx-sel (ambos 0..5) cai
-        // exato no indice. menu_confirm respeita 'enabled' (verbo sem AP: seleciona, nao aciona).
-        scene.menu_move(idx - scene.menu().selected_index());
-        scene.menu_confirm();
-    }
+    // Fora de escolha-de-ator/mira: nao ha mais hit-test de MUNDO a fazer aqui (a ABERTURA
+    // tambem nao tem nada clicavel em coordenadas de mundo). O clique nos pills de verbo e'
+    // resolvido pelo callback do glintfx (battle_cockpit_verb_click), nao por esta funcao.
 }
 
 // Incremento A2 (HOVER, nice-to-have): SO o inimigo. Durante a mira, mover o mouse sobre um
@@ -1380,6 +1411,19 @@ int run_battle_preview() {
         // mao - so arena/banner/floaters/fila. Evita cockpits sobrepostos.
         scene.set_hud_external(glintfx_on);
 
+        // GLINTFX-CLICK (v0.2.5): registra o callback de clique da UI - o glintfx faz o
+        // hit-test ele mesmo (o MESMO que ja move o :hover) e devolve o `id` do elemento
+        // clicado; battle_cockpit_verb_click traduz esse id pra acao do motor (ver defs
+        // acima). Sem restricao de ordem vs load() (a doc do glintfx garante isso) - registra
+        // aqui, DEPOIS da BattleScene existir, porque o callback CAPTURA `scene` por
+        // referencia (nao dava pra registrar antes, no bloco de setup do UiLayer, onde a
+        // cena ainda nao existia). `scene` sobrevive ate o fim deste escopo, junto com `ui`.
+        if (glintfx_on && ui) {
+            ui->set_click_callback([&scene](const char* element_id) {
+                battle_cockpit_verb_click(scene, element_id);
+            });
+        }
+
         // Carrega os retratos 48px da fila CTB (handles resolvidos pelo renderer) e os
         // entrega a cena. Cada id de ator -> seu retrato; ausencia degrada pro retangulo.
         const std::string dir = resolve_retratos_dir();
@@ -1700,18 +1744,20 @@ int run_battle_preview() {
         unsigned long long last_ns = 0;
         int glintfx_injected = 0;  // SMOKE: conta eventos injetados na UI (prova do pipeline)
 
-        // DIAGNOSTICO/PROVA (Incremento A2): GUSWORLD_BATTLE_MOUSE_SELFTEST=1 injeta CLIQUES
-        // SINTETICOS pelo MESMO battle_mouse_click do loop (com a janela real pw0/ph0), pra
-        // PROVAR o roteamento clique->acao sem mouse fisico (dificil de simular numa captura
-        // estatica). Assenta ate a vez do jogador, entao: (1) round-trip px->pill de cada
-        // verbo; (2) CLICA o pill [ATACAR] e mostra que entrou na MIRA; (3) CLICA o slot de um
-        // inimigo e mostra que a mira confirmou naquele alvo. So diagnostico (API publica).
+        // DIAGNOSTICO/PROVA (GLINTFX-CLICK, ex-Incremento A2): GUSWORLD_BATTLE_MOUSE_SELFTEST=1
+        // exercita o roteamento clique->acao SEM mouse fisico. O clique nos pills de verbo ja
+        // NAO passa por hit-test de pixel algum (o glintfx resolve o `id` internamente, o mesmo
+        // hit-test que move o :hover); entao (1) prova o round-trip id->indice pra cada um dos 6
+        // verbos chamando battle_cockpit_verb_click DIRETO (a MESMA funcao que o
+        // set_click_callback do UiLayer chama no clique real); (2) CHAMA o pill [ATACAR] e mostra
+        // que entrou na MIRA; (3) CLICA o slot de um inimigo (esse SIM em coordenadas de MUNDO,
+        // via battle_mouse_click) e mostra que a mira confirmou naquele alvo. So diagnostico
+        // (API publica).
         const bool mouse_selftest = [] {
             const char* e = std::getenv("GUSWORLD_BATTLE_MOUSE_SELFTEST");
             return e != nullptr && e[0] == '1';
         }();
         if (mouse_selftest) {
-            const float dpr = static_cast<float>(pw0) / 960.0f;
             if (scene.is_intro()) {
                 scene.start_combat();
             }
@@ -1728,29 +1774,26 @@ int run_battle_preview() {
                 scene.actor_picker_confirm();
             }
             std::cout << "BattlePreview: [mouse-selftest] pw0xph0=" << pw0 << "x" << ph0
-                      << " dp_ratio=" << dpr
                       << " waiting_player=" << scene.waiting_player_input() << "\n";
-            // (1) round-trip: centro px de cada pill -> cockpit_pill_index_at.
-            for (int v = 0; v < gus::app::screens::kCockpitPillCount; ++v) {
-                const gus::core::spatial::Rect r = gus::app::screens::cockpit_pill_rect(v);
-                const float dpcx = r.x + r.w * 0.5f, dpcy = r.y + r.h * 0.5f;
-                const float pxcx = dpcx * dpr, pxcy = dpcy * dpr;
-                const int back =
-                    gus::app::screens::cockpit_pill_index_at(pxcx / dpr, pxcy / dpr);
+            // (1) round-trip: o `id` de cada pill (fonte unica: kCockpitVerbElementIds, ordem
+            // = BattleVerb) -> cockpit_verb_index_for_click_id -> deve devolver o MESMO indice.
+            for (int v = 0; v < gus::app::screens::kBattleVerbCount; ++v) {
+                const char* id = gus::app::screens::kCockpitVerbElementIds[v];
+                const int back = gus::app::screens::cockpit_verb_index_for_click_id(id);
                 std::cout << "  pill[" << v << "] "
-                          << kVerbLabels[static_cast<std::size_t>(v)] << " dp(" << dpcx
-                          << "," << dpcy << ") px(" << pxcx << "," << pxcy
-                          << ") -> hit=" << back << (back == v ? " OK" : " MISMATCH") << "\n";
+                          << kVerbLabels[static_cast<std::size_t>(v)] << " id=" << id
+                          << " -> indice=" << back << (back == v ? " OK" : " MISMATCH") << "\n";
             }
-            // (2) CLICA o pill ATACAR (indice 2). Espera: entra na mira.
+            // (2) ACIONA o pill ATACAR (o MESMO caminho do callback real). Espera: entra na
+            // MIRA. Chama battle_cockpit_verb_click DIRETO (nao ha pixel/evento SDL a simular:
+            // o glintfx ja teria resolvido o id antes de chamar o callback registrado).
             if (scene.waiting_player_input() && !scene.is_aiming()) {
-                const gus::core::spatial::Rect r =
-                    gus::app::screens::cockpit_pill_rect(static_cast<int>(BattleVerb::Atacar));
-                const float pxcx = (r.x + r.w * 0.5f) * dpr, pxcy = (r.y + r.h * 0.5f) * dpr;
-                battle_mouse_click(scene, pxcx, pxcy, pw0, ph0);
-                std::cout << "  CLIQUE pill ATACAR px(" << pxcx << "," << pxcy
-                          << ") -> is_aiming=" << (scene.is_aiming() ? "on" : "off")
-                          << " (esperado on)\n";
+                battle_cockpit_verb_click(
+                    scene,
+                    gus::app::screens::kCockpitVerbElementIds[static_cast<int>(
+                        BattleVerb::Atacar)]);
+                std::cout << "  CLIQUE (callback) pill ATACAR -> is_aiming="
+                          << (scene.is_aiming() ? "on" : "off") << " (esperado on)\n";
             }
             // (3) CLICA o slot de um inimigo (o 2o miravel, se houver). Espera: confirma nele.
             if (scene.is_aiming()) {
@@ -2158,20 +2201,25 @@ int run_battle_preview() {
                 // HOVER-SELFTEST (injecao): a cada frame, coloca o ponteiro SINTETICO onde a
                 // fase pede, ANTES do update() (o Context::Update reaplica o hover chain sob a
                 // ultima posicao). Fases 0/3: FORA do cockpit (arena, x=80% da largura) => nenhum
-                // pill em hover. Fases 1/2: no CENTRO do pill-alvo (dp * dp_ratio -> px), a mesma
-                // conversao uniforme do cockpit (dp_ratio = pw/960) usada no clique do A2.
+                // pill em hover. Fases 1/2: no CENTRO do pill-alvo. GLINTFX-CLICK: a posicao vem
+                // de UiLayer::get_element_box (v0.2.5, geometria REAL do doc carregado) em vez da
+                // geometria manual aposentada (mais precisa: o glintfx sabe onde o pill
+                // REALMENTE esta, nao uma copia espelhada da RCSS) -- ESTE diagnostico e' o UNICO
+                // uso de get_element_box no projeto (o hit-test de CLIQUE usa o id direto via
+                // set_click_callback, nunca geometria; ver battle_cockpit_verb_click).
                 if (hover_selftest) {
-                    const float dpr = static_cast<float>(pw) / 960.0f;
                     float mx = static_cast<float>(pw) * 0.80f;  // fora da coluna (fases 0 e 3)
                     float my = static_cast<float>(ph) * 0.50f;
                     const int hover_pill = hover_phase == 1   ? 0    // SCAN (nao-selecionado)
                                            : hover_phase == 2 ? 2    // ATACAR (selecionado)
                                                               : -1;  // 0 e 3: sem pill
                     if (hover_pill >= 0) {
-                        const gus::core::spatial::Rect r =
-                            gus::app::screens::cockpit_pill_rect(hover_pill);
-                        mx = (r.x + r.w * 0.5f) * dpr;
-                        my = (r.y + r.h * 0.5f) * dpr;
+                        const glintfx::ElementBox box = ui->get_element_box(
+                            gus::app::screens::kCockpitVerbElementIds[hover_pill]);
+                        if (box.found) {
+                            mx = box.x + box.w * 0.5f;
+                            my = box.y + box.h * 0.5f;
+                        }
                     }
                     glintfx::UiEvent ge{};
                     ge.type = glintfx::UiEvent::Type::MouseMove;
