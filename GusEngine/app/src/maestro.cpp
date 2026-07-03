@@ -102,21 +102,34 @@ void Maestro::run() {
             running = false;
             break;
         }
-        if (should_trigger_battle(city_->player_aabb(), enemy_aabb_,
-                                   enemy_defeated_)) {
+        // EDGE-TRIGGER (BUG-6, playtest ao vivo do lider: fugir/perder re-disparava a
+        // batalha na hora, pois o jogador volta pra cidade AINDA sobre o inimigo, que
+        // PERMANECE em fuga/derrota, e should_trigger_battle - LEVEL-triggered - voltava
+        // true enquanto houvesse overlap). A batalha so dispara na TRANSICAO nao-overlap
+        // -> overlap (rising edge): overlap AGORA e NAO no frame anterior.
+        const bool overlapping_now =
+            should_trigger_battle(city_->player_aabb(), enemy_aabb_, enemy_defeated_);
+        if (should_trigger_battle_on_edge(overlapping_now, was_overlapping_enemy_)) {
             // FIX BUG-3 (playtest ao vivo do lider: "cliquei no X pra fechar, a janela
             // reabre na dungeon e em poucos ms vira batalha de novo; precisei pkill"):
             // to_battle() devolve true SO quando o jogador pediu pra fechar a janela
             // DURANTE a batalha - um sinal DISTINTO de qualquer CombatOutcome. Antes,
             // esse quit era absorvido dentro de to_battle() (o SDL_EVENT_QUIT so parava
-            // o loop da BATALHA) e a Maestro voltava pra cidade como se fosse Ongoing -
-            // o jogador ainda sobre o inimigo, should_trigger_battle voltava true, e o
-            // loop reabria a batalha (LOOP INFINITO ate o pkill). Agora o quit propaga:
-            // encerra o `while (running)` da CIDADE tambem, sem re-renderizar nada.
+            // o loop da BATALHA) e a Maestro voltava pra cidade como se fosse Ongoing.
+            // Agora o quit propaga: encerra o `while (running)` da CIDADE tambem.
             if (should_stop_running_after_battle(to_battle(EncounterId::kFixedEnemy1))) {
                 running = false;
             }
         }
+        // Atualiza o estado de overlap DEPOIS de (eventualmente) rodar a batalha, com a
+        // posicao/estado ATUAIS: se o inimigo foi DERROTADO (Victory), enemy_defeated_
+        // agora torna should_trigger_battle false -> was_overlapping=false (o jogador fica
+        // onde esta em paz). Se foi FUGA/DERROTA (inimigo permanece e o jogador segue em
+        // cima), fica true -> o proximo disparo exige SAIR e RE-ENTRAR na hitbox (senao
+        // re-dispararia em loop, o BUG-6). Sem batalha, so acompanha o overlap do
+        // movimento normal (o rising edge dispara no proximo frame que ENTRAR na hitbox).
+        was_overlapping_enemy_ =
+            should_trigger_battle(city_->player_aabb(), enemy_aabb_, enemy_defeated_);
     }
 }
 

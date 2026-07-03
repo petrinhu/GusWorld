@@ -16,6 +16,7 @@ using gus::app::outcome_marks_enemy_defeated;
 using gus::app::pick_fixed_enemy_position;
 using gus::app::should_stop_running_after_battle;
 using gus::app::should_trigger_battle;
+using gus::app::should_trigger_battle_on_edge;
 using gus::core::spatial::Aabb;
 using gus::core::spatial::TileGrid;
 using gus::domain::combat::CombatOutcome;
@@ -496,4 +497,69 @@ TEST_CASE("should_stop_running_after_battle: false (Victory/Defeat/Fled/Ongoing)
           "loop da cidade CONTINUA (comportamento de sempre, nao regride)",
           "[maestro][logic][bug3]") {
     CHECK_FALSE(should_stop_running_after_battle(/*battle_requested_quit=*/false));
+}
+
+// ============================================================================
+// BUG-6 (playtest ao vivo do lider, M7-COSTURA): "apertei fugir, apareceu rapidamente a
+// dungeon (eu estava tocando o inimigo) e automaticamente reabriu a arena". A batalha
+// deve disparar so na TRANSICAO nao-overlap -> overlap (rising edge), nao ENQUANTO o
+// jogador permanece dentro da hitbox - senao a fuga/derrota (que NAO remove o inimigo, e
+// devolve o jogador em cima dele) re-dispara em loop. should_trigger_battle_on_edge e a
+// funcao PURA; o Maestro guarda o estado do frame anterior (was_overlapping_enemy_).
+// ============================================================================
+
+TEST_CASE("should_trigger_battle_on_edge: dispara SO no rising edge (fora->dentro), "
+          "NAO enquanto permanece dentro da hitbox",
+          "[maestro][logic][bug6]") {
+    // Sequencia de frames de overlap conforme o jogador ANDA ate o inimigo e fica em
+    // cima: fora, fora, ENTRA, dentro, dentro, SAI, fora, RE-ENTRA.
+    // Espera: dispara SO nos 2 rising edges (entrar e re-entrar), nunca no "dentro".
+    struct Frame { bool overlap; bool expect_trigger; };
+    const Frame frames[] = {
+        {false, false},  // longe
+        {false, false},  // longe
+        {true, true},    // ENTROU -> dispara
+        {true, false},   // ainda dentro -> NAO redispara (o BUG-6 disparava aqui)
+        {true, false},   // ainda dentro -> NAO
+        {false, false},  // saiu
+        {false, false},  // longe
+        {true, true},    // RE-ENTROU -> dispara de novo (encontro fixo correto)
+    };
+    bool was = false;  // estado inicial do Maestro (jogador nasce longe do inimigo)
+    for (const Frame& f : frames) {
+        const bool trig = should_trigger_battle_on_edge(f.overlap, was);
+        CHECK(trig == f.expect_trigger);
+        was = f.overlap;  // o Maestro atualiza o estado a cada frame
+    }
+}
+
+TEST_CASE("should_trigger_battle_on_edge: apos FUGA/DERROTA (inimigo permanece, jogador "
+          "volta EM CIMA), o trigger fica SUPRIMIDO ate SAIR e RE-ENTRAR",
+          "[maestro][logic][bug6]") {
+    // Reproduz o roteamento REAL do Maestro::run() (BUG-6): o jogador ENTRA na hitbox
+    // (dispara a batalha), FOGE, e volta pra cidade AINDA sobre o inimigo (overlap segue
+    // true, pois fuga/derrota NAO removem o inimigo). O Maestro, apos a batalha
+    // nao-vitoriosa, seta was_overlapping = should_trigger_battle(...) = TRUE (jogador em
+    // cima). Provamos que dai em diante o overlap continuo NAO redispara ate virar false
+    // e true de novo.
+    bool was = false;
+
+    // 1) jogador ENTRA na hitbox -> rising edge -> dispara.
+    CHECK(should_trigger_battle_on_edge(/*overlap=*/true, was) == true);
+    // Maestro roda a batalha (FUGA) e, como o inimigo permanece e o jogador segue em
+    // cima, atualiza was = should_trigger_battle(...) = true.
+    was = true;
+
+    // 2) proximos frames: jogador AINDA sobre o inimigo (overlap true) -> NUNCA redispara.
+    for (int i = 0; i < 5; ++i) {
+        CHECK(should_trigger_battle_on_edge(/*overlap=*/true, was) == false);
+        was = true;  // segue em cima
+    }
+
+    // 3) jogador SAI da hitbox (anda pra longe) - sem disparo, e o estado vira false.
+    CHECK(should_trigger_battle_on_edge(/*overlap=*/false, was) == false);
+    was = false;
+
+    // 4) jogador RE-ENCOSTA - agora SIM redispara (rising edge legitimo do encontro fixo).
+    CHECK(should_trigger_battle_on_edge(/*overlap=*/true, was) == true);
 }

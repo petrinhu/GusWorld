@@ -108,6 +108,24 @@ enum class EncounterId : int {
     return battle_requested_quit;
 }
 
+// EDGE-TRIGGER (M7-COSTURA BUG-6, playtest ao vivo do lider: "apertei fugir, apareceu
+// rapidamente a dungeon - eu estava tocando o inimigo - e automaticamente reabriu a
+// arena"). Causa: should_trigger_battle acima e LEVEL-triggered - dispara ENQUANTO
+// houver overlap. Na VITORIA nao importa (o inimigo e removido/enemy_defeated_). Mas na
+// FUGA e na DERROTA o inimigo PERMANECE e o jogador volta pra cidade AINDA DENTRO da
+// hitbox -> should_trigger_battle volta true na hora -> to_battle de novo -> loop.
+//
+// FIX: a batalha so dispara na TRANSICAO nao-overlap -> overlap (rising edge) - ou seja,
+// SO quando ha overlap AGORA e NAO havia no frame anterior. Depois de uma batalha que
+// NAO remove o inimigo (fuga/derrota), o chamador (Maestro) marca "was_overlapping=true"
+// (o jogador esta em cima), entao o proximo disparo exige SAIR da hitbox e RE-ENTRAR -
+// comportamento correto de encontro fixo (fugir, andar em paz, re-encostar redispara).
+// POCO puro; o ESTADO (bool do frame anterior) vive no Maestro (maestro.hpp).
+[[nodiscard]] constexpr bool should_trigger_battle_on_edge(
+    bool overlapping_now, bool was_overlapping_previous_frame) noexcept {
+    return overlapping_now && !was_overlapping_previous_frame;
+}
+
 }  // namespace gus::app
 
 #endif  // GUS_APP_MAESTRO_LOGIC_HPP

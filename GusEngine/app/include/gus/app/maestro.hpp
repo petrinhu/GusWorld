@@ -86,6 +86,15 @@ private:
     gus::core::spatial::Aabb enemy_aabb_{};
     bool enemy_defeated_ = false;
 
+    // EDGE-TRIGGER (M7-COSTURA BUG-6): estado "havia overlap jogador x inimigo no frame
+    // ANTERIOR". A batalha so dispara na TRANSICAO nao-overlap -> overlap (rising edge,
+    // ver should_trigger_battle_on_edge em maestro_logic.hpp) - senao, na FUGA/DERROTA (o
+    // inimigo PERMANECE e o jogador volta pra cidade AINDA sobre ele) o overlap
+    // continuo re-dispararia a batalha em loop. Comeca false (o jogador nasce longe do
+    // inimigo, ver o offset em init()); apos uma batalha que NAO remove o inimigo, e
+    // forcado a true (o jogador esta em cima) pra exigir SAIR e RE-ENTRAR na hitbox.
+    bool was_overlapping_enemy_ = false;
+
     // "Save" desta onda: so uma instancia em MEMORIA (a persistencia real em disco e
     // M2-SAVE-IO, ADR-012 Onda 2). Usa SaveData::flags (ja existe, domain/save) em vez
     // de inventar um formato novo pra "inimigo1_derrotado".
