@@ -2009,6 +2009,143 @@ TEST_CASE("picker: destaque MULTIMODAL na arena (contorno + badge numerado + nom
     REQUIRE(outlines_choosing > r2.outlines.size());
 }
 
+// ---- FIX bug1/bug2 (playtest do lider, comando-livre 1B): PREVIEW deferido + Esc empilhado --
+//
+// Bug1 relatado ao vivo: "escolho um personagem e depois nao consigo tirar a selecao/trocar -
+// fica FIXO". Causa-raiz (Caetano/CTO): actor_picker_confirm chamava begin_turn NA HORA, que
+// inclui apply_status_tick (IRREVERSIVEL) colado a simples SELECAO do ator. FIX: o confirm do
+// picker agora so entra num PREVIEW (menu de verbos do escolhido, motor intocado); o commit
+// real (select_party_actor + begin_turn, com o tick) fica pra 1a ACAO de fato resolvida
+// (commit_previewed_actor(), chamado por menu_confirm/aim_confirm). Estes 5 testes prova a
+// timing (motor intocado no preview, troca livre, commit so na 1a acao, Esc desempilha 1
+// nivel, sem volta pos-acao) - TDD escrito ANTES do fix (item de maior risco da sessao, toca a
+// FSM de combate: RIGOR MAXIMO).
+
+TEST_CASE("PREVIEW (bug1): confirmar o ator no picker NAO aplica tick de status (motor intocado)",
+          "[battle_scene][picker][preview]") {
+    // Caua (pre-selecionado, maior SPD=12 na demo) tem Haste (magnitude 2) como condicao
+    // INICIAL (make_demo_actors) - o 1o apply_status_tick dele soma +2 ao spd (12 -> 14, one-
+    // shot via apply_stat_delta). Observavel PERFEITO pra provar "tick NAO rodou": spd() deve
+    // seguir em 12 logo apos o confirm do picker (antes so isso ja disparava o begin_turn).
+    BattleScene scene;
+    pump_to_actor_picker(scene);
+    const auto* pre = scene.actor_pick_target();
+    REQUIRE(pre != nullptr);
+    REQUIRE(pre->id() == "caua");
+    REQUIRE(pre->spd() == 12);  // base, ANTES de qualquer tick
+
+    scene.actor_picker_confirm();
+
+    REQUIRE(scene.is_actor_preview());       // entrou no PREVIEW (estagio 2)
+    REQUIRE_FALSE(scene.is_choosing_actor());
+    REQUIRE(scene.active_actor() == pre);
+    // O TICK (Haste) NAO rodou: motor 100% intocado pela simples selecao/confirm.
+    REQUIRE(scene.active_actor()->spd() == 12);
+    // pending_party_actors() AINDA inclui o Caua: select_party_actor/begin_turn nao rodaram
+    // (se tivessem, o motor o teria consumido do bloco pendente da rodada).
+    const auto pending = scene.machine().pending_party_actors();
+    REQUIRE(std::find(pending.begin(), pending.end(), pre) != pending.end());
+}
+
+TEST_CASE("PREVIEW (bug1): trocar de ator e LIVRE ate a 1a acao - nenhum e comprometido antes",
+          "[battle_scene][picker][preview]") {
+    BattleScene scene;
+    pump_to_actor_picker(scene);
+    const auto* caua = scene.actor_pick_target();
+    REQUIRE(caua != nullptr);
+    REQUIRE(caua->id() == "caua");
+
+    scene.actor_picker_confirm();  // preview do Caua
+    REQUIRE(scene.is_actor_preview());
+    REQUIRE(scene.active_actor() == caua);
+
+    scene.actor_preview_cancel();  // Esc (bug2): volta a LISTA, sem custo
+    REQUIRE(scene.is_choosing_actor());
+    REQUIRE_FALSE(scene.is_actor_preview());
+
+    // Escolhe um MEMBRO DIFERENTE (indice 1, != Caua) e confirma - a troca de ator e LIVRE
+    // enquanto nada foi comprometido (nenhuma acao resolvida ainda).
+    REQUIRE(scene.actor_pick_count() >= 2);
+    scene.actor_picker_select(1);
+    const auto* other = scene.actor_pick_target();
+    REQUIRE(other != nullptr);
+    REQUIRE(other != caua);
+
+    scene.actor_picker_confirm();  // preview do OUTRO
+    REQUIRE(scene.is_actor_preview());
+    REQUIRE(scene.active_actor() == other);
+
+    // O Caua (nunca comprometido) segue INTACTO: spd base, ainda pendente na rodada.
+    REQUIRE(caua->spd() == 12);
+    const auto pending = scene.machine().pending_party_actors();
+    REQUIRE(std::find(pending.begin(), pending.end(), caua) != pending.end());
+}
+
+TEST_CASE("PREVIEW (bug1): a 1a ACAO e o commit - o tick de status roda SO agora (uma vez)",
+          "[battle_scene][picker][preview]") {
+    BattleScene scene;
+    pump_to_actor_picker(scene);
+    const auto* pre = scene.actor_pick_target();
+    REQUIRE(pre->id() == "caua");
+    scene.actor_picker_confirm();
+    REQUIRE(scene.active_actor()->spd() == 12);  // ainda sem tick (so preview)
+
+    // Defender resolve NA HORA (sem modo-mira/windup): o commit acontece dentro do proprio
+    // menu_confirm, antes de montar/resolver a CombatAction (ver comentario no .cpp).
+    select_verb(scene, BattleVerb::Defender);
+    scene.menu_confirm();  // PONTO-DE-NAO-RETORNO: commit_previewed_actor + begin_turn REAL
+
+    REQUIRE_FALSE(scene.is_actor_preview());  // comprometido
+    REQUIRE_FALSE(scene.is_choosing_actor());
+    // O tick de Haste rodou EXATAMENTE agora (spd 12 -> 14, one-shot via apply_stat_delta) -
+    // le pelo ponteiro original `pre` (mesmo objeto CombatActor, sobrevive ao avanco de turno).
+    REQUIRE(pre->spd() == 14);
+}
+
+TEST_CASE("PREVIEW (bug2): Esc (actor_preview_cancel) volta ao picker sem commitar nada",
+          "[battle_scene][picker][preview]") {
+    BattleScene scene;
+    pump_to_actor_picker(scene);
+    const auto* pre = scene.actor_pick_target();
+    scene.actor_picker_confirm();
+    REQUIRE(scene.is_actor_preview());
+
+    scene.actor_preview_cancel();
+
+    REQUIRE(scene.is_choosing_actor());
+    REQUIRE_FALSE(scene.is_actor_preview());
+    // A lista foi RECONSTRUIDA do zero (enter_actor_picker), mas como nada mudou no motor
+    // (o preview nunca comprometeu nada) ela e IDENTICA: o cursor volta ao MESMO pre-
+    // selecionado (maior SPD) de antes.
+    REQUIRE(scene.actor_pick_target() == pre);
+    REQUIRE(scene.actor_pick_count() == 3);
+    // No-op fora do preview (ja de volta no picker): chamar de novo nao muda nada.
+    scene.actor_preview_cancel();
+    REQUIRE(scene.is_choosing_actor());
+    REQUIRE(scene.actor_pick_target() == pre);
+}
+
+TEST_CASE("PREVIEW (bug2 invariante): apos a acao resolvida, nao ha volta (cancel e no-op)",
+          "[battle_scene][picker][preview]") {
+    BattleScene scene;
+    pump_to_actor_picker(scene);
+    scene.actor_picker_confirm();
+    select_verb(scene, BattleVerb::Defender);
+    scene.menu_confirm();  // commit + resolve: o ator AGIU
+
+    REQUIRE_FALSE(scene.is_actor_preview());
+    // Captura o estado APOS a acao (a cena pode ja ter avancado pro proximo ator/picker) -
+    // prova que actor_preview_cancel() NAO MEXE em nada daqui pra frente.
+    const bool choosing_before = scene.is_choosing_actor();
+    const auto* active_before = scene.active_actor();
+
+    scene.actor_preview_cancel();  // no-op: a acao ja resolveu, nao ha preview a desfazer
+
+    REQUIRE(scene.is_choosing_actor() == choosing_before);
+    REQUIRE(scene.active_actor() == active_before);
+    REQUIRE_FALSE(scene.is_actor_preview());
+}
+
 TEST_CASE("picker: e SO da party - o enemy-block assume sozinho (nunca abre escolha)",
           "[battle_scene][picker]") {
     // Roda a batalha inteira jogando os turnos do jogador (player_attack atravessa qualquer

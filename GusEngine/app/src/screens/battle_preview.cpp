@@ -968,13 +968,15 @@ void battle_mouse_click(BattleScene& scene, float mx, float my, int pw, int ph) 
         // ESCOLHA DE ATOR (§4.1): clique num SLOT da party. MESMA conversao MUNDO/arena do modo-
         // mira (estica 960x540; Y por ph) -> reusa o hit-test do motor (actor_pick_index_at_arena,
         // que casa arena_rect_for_actor dos slots da party). Clique unico = ESCOLHE e CONFIRMA o
-        // membro (inicia o turno dele), a mesma filosofia "aciona na hora" do A2.
+        // membro - entra no PREVIEW dele (menu de verbos, motor ainda intocado; o turno real so
+        // comeca na 1a acao, ver commit_previewed_actor/bug1), a mesma filosofia "aciona na hora"
+        // do A2.
         const float wx = mx / static_cast<float>(pw) * 960.0f;
         const float wy = my / static_cast<float>(ph) * 540.0f;
         const int idx = scene.actor_pick_index_at_arena(wx, wy);
         if (idx >= 0) {
             scene.actor_picker_select(idx);   // poe o cursor no membro clicado
-            scene.actor_picker_confirm();      // clique unico = escolhe E inicia o turno dele
+            scene.actor_picker_confirm();      // clique unico = escolhe E ENTRA no preview dele
         }
         // Fora de qualquer membro elegivel: NO-OP (o picker precede o menu; nao ha o que cancelar).
         return;
@@ -1029,10 +1031,11 @@ void battle_mouse_hover(BattleScene& scene, float mx, float my, int pw, int ph) 
 }
 
 // Roteamento de TECLADO do host, EXTRAIDO do loop de eventos pra ser CHAMAVEL pelo self-test
-// sintetico (espelha battle_mouse_click, que ja e uma funcao-livre testavel). MESMA ordem e
-// semantica de antes; ADITIVO: a ESCOLHA DE ATOR (§4.1) ganha PRIORIDADE MAXIMA sobre mira/menu,
-// porque quando is_choosing_actor() o menu de verbos nem existe (begin_turn deferido). `running`
-// so vira false no Esc de TOPO (fora de qualquer sub-modo).
+// sintetico E pelos testes Catch2 (battle_key_routing_test.cpp; ambos headless, sem SDL_Init -
+// ver declaracao em battle_preview.hpp). Espelha battle_mouse_click, que ja e uma funcao-livre
+// testavel. MESMA ordem e semantica de antes; ADITIVO: a ESCOLHA DE ATOR (§4.1) ganha
+// PRIORIDADE MAXIMA sobre mira/menu, porque quando is_choosing_actor() o menu de verbos nem
+// existe (begin_turn deferido).
 // Digito 1-9 de uma tecla numerica (fileira OU numpad); 0 se nao for numerica 1-9. Fonte
 // unica do mapeamento tecla->N pros atalhos numericos (mira e escolha de ator).
 int battle_digit_for_key(SDL_Keycode key) noexcept {
@@ -1067,12 +1070,30 @@ void battle_key_down(BattleScene& scene, SDL_Keycode key, bool& running) {
     }
     switch (key) {
         case SDLK_ESCAPE:
-            // MODO-MIRA (§3.5): Esc CANCELA a mira (volta ao menu sem consumir o turno). Na
-            // ESCOLHA DE ATOR (§4.1) NAO ha cancel (o picker precede o menu: sem AP gasto, sem
-            // verbo a desfazer) -> Esc cai no generico (sai do preview), igual ao menu de verbos.
-            // Fora de tudo: Esc sai do preview.
+            // PILHA DE MODAIS (FIX bug2 do playtest do lider 2026-07: "aperto Esc e FECHA A
+            // TELA" com um picker/preview aberto). Antes o Esc so conhecia 2 estados (mira ->
+            // cancel; qualquer outra coisa, INCLUSIVE o picker/menu de verbos -> sai do
+            // viewer), entao Esc durante a escolha de ator fechava a janela - o bug. Agora
+            // DESEMPILHA UM NIVEL por vez, do mais aninhado pro mais externo:
+            //   (1) MODO-MIRA (§3.5): cancela a mira, volta ao menu/preview de verbos (sem
+            //       consumir o turno) - COMPORTAMENTO INTACTO, so reordenado na pilha.
+            //   (2) PREVIEW DE ATOR (§4.1, estagio 2: menu de verbos do escolhido, motor
+            //       ainda intocado) - volta a LISTA (estagio 1). Nada foi comprometido (sem
+            //       begin_turn/tick), entao isto e SEMPRE seguro (ver actor_preview_cancel).
+            //   (3) LISTA (§4.1, estagio 1: badges na arena) - TOPO da pilha quando so a
+            //       lista esta aberta. NO-OP (decisao documentada: nao ha nivel anterior pra
+            //       desempilhar - a rodada da party PRECISA de alguem escolhido pra avancar;
+            //       Esc != Enter, entao NAO aceita o pre-selecionado por engano).
+            //   (4) PILHA VAZIA (nenhum modal aberto): sai do viewer (running=false), como
+            //       sempre. TODO(menu-de-pause): no JOGO REAL este e o gancho pro MENU DE
+            //       PAUSE (Esc abriria pause em vez de fechar a janela) - fora de escopo
+            //       deste fix (que e so o STACK do Esc dentro do combate).
             if (scene.is_aiming()) {
                 scene.aim_cancel();
+            } else if (scene.is_actor_preview()) {
+                scene.actor_preview_cancel();
+            } else if (scene.is_choosing_actor()) {
+                // (3) no-op, ver comentario acima.
             } else {
                 running = false;
             }
@@ -1122,13 +1143,15 @@ void battle_key_down(BattleScene& scene, SDL_Keycode key, bool& running) {
         case SDLK_KP_ENTER:  // Enter do numpad tambem confirma
         case SDLK_SPACE:
             // ABERTURA (lider 2026-06-25): na tela "BATALHA!" parada, Enter ENCARA. Depois, por
-            // PRIORIDADE: ESCOLHA DE ATOR (§4.1) confirma o membro sob o cursor -> inicia o turno
-            // dele; MODO-MIRA (§3.5) confirma o ALVO (resolve); vez do jogador (menu) confirma o
-            // verbo (Atacar/Scan ENTRAM na mira). Fora disso, ACELERA o ritmo.
+            // PRIORIDADE: ESCOLHA DE ATOR (§4.1) confirma o membro sob o cursor -> ENTRA no
+            // preview dele (menu de verbos, motor intocado; o turno real so comeca na 1a acao,
+            // bug1); MODO-MIRA (§3.5) confirma o ALVO (resolve, e o commit se ainda em preview);
+            // vez do jogador (menu) confirma o verbo (Atacar/Scan ENTRAM na mira; Defender/Flee
+            // resolvem - e o commit se ainda em preview). Fora disso, ACELERA o ritmo.
             if (scene.is_intro()) {
                 scene.start_combat();  // Encarar
             } else if (scene.is_choosing_actor()) {
-                scene.actor_picker_confirm();  // confirma o membro escolhido -> comeca o turno
+                scene.actor_picker_confirm();  // confirma o membro -> entra no preview dele
             } else if (scene.is_aiming()) {
                 scene.aim_confirm();  // confirma o alvo mirado
             } else if (scene.waiting_player_input()) {
