@@ -18,6 +18,10 @@
 
 #include <string>
 
+#include <SDL3/SDL.h>  // SDL_Keycode (roteamento de teclado, testavel headless - ver abaixo)
+
+#include "gus/app/screens/battle_scene.hpp"
+
 namespace gus::app::screens {
 
 // Resolve a pasta dos retratos 48px (resources/sprites/icons-m5/retratos), na MESMA
@@ -28,6 +32,19 @@ namespace gus::app::screens {
 // Resolve a pasta dos icones de status (resources/sprites/icons-m5/status), na mesma
 // ordem do resolver de retratos. So monta a STRING (nao abre arquivo).
 [[nodiscard]] std::string resolve_status_icons_dir();
+
+// Digito 1-9 de uma tecla numerica (fileira OU numpad); 0 se nao for numerica 1-9. Fonte
+// unica do mapeamento tecla->N pros atalhos numericos (mira e escolha de ator). Exposto
+// (implementacao em battle_preview.cpp) pra ser CHAMAVEL pelo self-test sintetico E pelos
+// testes Catch2 do roteamento de teclado (battle_key_routing_test.cpp) - headless, sem SDL_Init.
+[[nodiscard]] int battle_digit_for_key(SDL_Keycode key) noexcept;
+
+// Roteamento de TECLADO do host (extraido do loop de eventos - ver definicao/comentario
+// completo em battle_preview.cpp). Esc DESEMPILHA 1 nivel de modal por vez (FIX bug2 do
+// playtest do lider: "Esc fecha a tela" com um picker/preview aberto) - mira > preview de
+// ator > picker > (pilha vazia) sai do viewer. `running` so vira false na pilha vazia.
+// Exposto pra ser testavel headless (Catch2), sem abrir janela SDL nem chamar SDL_Init.
+void battle_key_down(BattleScene& scene, SDL_Keycode key, bool& running);
 
 // Roda o viewer da BattleScene: SDL_Init proprio, janela, loop de render do esqueleto
 // (camera logica 960x540 escalada por inteiro x2 = 1080p), Esc/fechar encerra. Devolve 0 ok.
