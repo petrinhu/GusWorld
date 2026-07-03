@@ -39,18 +39,63 @@ public:
     SdlWindow& operator=(const SdlWindow&) = delete;
 
     // Cria janela + renderer SDL + carrega os sprites do Caua. Devolve false se o
-    // SDL/janela/renderer falharem (o main reporta e sai != 0).
+    // SDL/janela/renderer falharem (o main reporta e sai != 0). A SdlWindow POSSUI a
+    // janela criada aqui (o dtor a destroi).
     [[nodiscard]] bool init();
+
+    // M7-COSTURA (ADR-012 Onda 1): cria SO o renderer (Render2dSdl) numa janela JA
+    // CRIADA por quem chama (a Maestro, dona da janela COMPARTILHADA entre cidade e
+    // batalha - "trocar escondido atras do preto"). A SdlWindow NAO possui a janela
+    // neste modo: o dtor NUNCA a destroi. Carrega a cidade + os sprites do Gus, como
+    // init() faz. Devolve false se a criacao do renderer falhar.
+    [[nodiscard]] bool init_attached(SDL_Window* window);
+
+    // M7-COSTURA: solta o SDL_Renderer/Render2dSdl (a janela NAO e tocada) - chamado ao
+    // ENTRAR na batalha, pra liberar a janela pro contexto GL da BattleScene (o design
+    // de troca-de-backend na MESMA janela). O OverworldSim (posicao/animacao do Gus)
+    // segue intacto - so os handles de textura (TextureId) que ele guarda ficam
+    // OBSOLETOS ate reacquire_renderer() recarrega-los.
+    void release_renderer();
+
+    // M7-COSTURA: reconstroi o SDL_Renderer/Render2dSdl na MESMA janela (apos
+    // release_renderer, ao VOLTAR da batalha) e RECARREGA os sprites do Gus - os
+    // TextureId antigos nao sobrevivem a destruicao do renderer anterior (handles de
+    // uma tabela de texturas que nao existe mais; custo aceito do design, documentado
+    // no relatorio da Onda 1). Devolve false se SDL_CreateRenderer falhar.
+    [[nodiscard]] bool reacquire_renderer();
+
+    // Um FRAME do loop (poll -> N updates fixos -> 1 render), extraido de run() pra
+    // permitir que a Maestro intercale a checagem de colisao/trigger de batalha entre
+    // frames. Devolve false quando o usuario fechou a janela (pump_events devolveu
+    // false) - o chamador encerra o app nesse caso. NAO renderiza (so faz poll+update)
+    // se o renderer foi liberado (release_renderer) - a Maestro so chama step() com o
+    // renderer da cidade ativo.
+    [[nodiscard]] bool step();
 
     // Roda o loop ate o usuario fechar a janela (pump_events devolver false). Cada
     // iteracao: poll de input -> N updates fixos (FixedTimestep) -> 1 render. O
     // lider joga: move o Caua com WASD/setas/gamepad, desliza nas paredes, camera
-    // presa ao mapa, animacao de walk por distancia.
+    // presa ao mapa, animacao de walk por distancia. Equivale a `while (step()) {}`.
     void run();
 
+    // Posicao ATUAL do jogador (leitura) - a Maestro checa colisao com o inimigo fixo
+    // contra isto, sem precisar conhecer o OverworldSim por dentro.
+    [[nodiscard]] const gus::core::spatial::Aabb& player_aabb() const noexcept;
+
+    // Grade de colisao da cidade corrente (leitura) - a Maestro usa isto SO na
+    // inicializacao, pra escolher uma celula LIVRE pro inimigo fixo (nunca dentro de
+    // parede, qualquer que seja o mapa real/fallback carregado).
+    [[nodiscard]] const gus::core::spatial::TileGrid& grid() const noexcept;
+
 private:
-    SDL_Window* window_ = nullptr;      // owner
-    SDL_Renderer* renderer_ = nullptr;  // owner
+    // Carrega os sprites do Gus no renderer_ corrente e os entrega ao sim_. Extraido
+    // de init() pra ser reusado por init_attached() e reacquire_renderer() (mesma
+    // receita, 3 pontos de chamada).
+    void load_player_sprites();
+
+    SDL_Window* window_ = nullptr;      // dono SO se owns_window_ (ver init() vs init_attached())
+    SDL_Renderer* renderer_ = nullptr;  // sempre owner (destruido em release_renderer/dtor)
+    bool owns_window_ = false;
 
     std::unique_ptr<gus::platform::render2d::Render2dSdl> render2d_;
     std::unique_ptr<gus::app::screens::OverworldSim> sim_;
