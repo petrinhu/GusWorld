@@ -208,13 +208,13 @@ void AudioEngine::play_sfx(SoundId id) {
     ++sfx_play_count_;  // hook de teste (M6 F3) - so conta o caminho que TOCOU de fato
 }
 
-void AudioEngine::play_music(SoundId id, bool loop) {
+void AudioEngine::play_music(SoundId id, bool loop, float fade_in_seconds) {
     if (!available() || id == kInvalidSound || id > impl_->music_paths.size()) {
         return;
     }
 
-    // Troca de faixa: para/descarta a musica corrente IMEDIATAMENTE, sem fade (o
-    // fade e so em stop_music, por decisao explicita do ADR-011).
+    // Troca de faixa: para/descarta a musica corrente IMEDIATAMENTE, sem fade (a
+    // ANTERIOR nunca recebe fade-out aqui - so a NOVA pode entrar com fade-in).
     if (impl_->current_music) {
         ma_sound_uninit(impl_->current_music.get());
         impl_->current_music.reset();
@@ -231,9 +231,22 @@ void AudioEngine::play_music(SoundId id, bool loop) {
         return;
     }
 
+    // MA_SOUND_FLAG_STREAM + looping nativo (ma_sound_set_looping): o miniaudio reinicia
+    // o stream internamente no fim da faixa, sem gap/silencio entre o ultimo frame e o
+    // primeiro do proximo ciclo (loop e responsabilidade do decoder, nao do host).
     ma_sound_set_looping(sound.get(), loop ? MA_TRUE : MA_FALSE);
+
+    // FADE-IN (M6 F4, ADR-011): fader nativo do miniaudio, mesmo padrao de stop_music.
+    // <= 0 (inclui o default 0.0f) = pula o fade -> volume cheio imediato, identico ao
+    // comportamento anterior (F1/F3) sem essa chamada.
+    if (fade_in_seconds > 0.0f) {
+        const auto fade_ms = static_cast<ma_uint64>(fade_in_seconds * 1000.0f);
+        ma_sound_set_fade_in_milliseconds(sound.get(), 0.0f, 1.0f, fade_ms);
+    }
+
     ma_sound_start(sound.get());
     impl_->current_music = std::move(sound);
+    ++music_play_count_;  // hook de teste (M6 F4) - so conta o caminho que TOCOU de fato
 }
 
 void AudioEngine::stop_music(float fade_seconds) {
@@ -259,5 +272,14 @@ void AudioEngine::set_master_volume(float volume) {
 float AudioEngine::master_volume() const noexcept { return master_volume_; }
 
 unsigned int AudioEngine::sfx_play_count() const noexcept { return sfx_play_count_; }
+
+unsigned int AudioEngine::music_play_count() const noexcept { return music_play_count_; }
+
+bool AudioEngine::music_is_playing() const noexcept {
+    if (!available() || !impl_->current_music) {
+        return false;
+    }
+    return ma_sound_is_playing(impl_->current_music.get()) == MA_TRUE;
+}
 
 }  // namespace gus::platform::audio

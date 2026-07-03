@@ -88,10 +88,19 @@ public:
     void play_sfx(SoundId id);
 
     // Toca uma musica, SUBSTITUINDO a que estiver tocando (para a anterior imediata,
-    // sem fade - o fade e so em stop_music, por decisao do ADR-011). loop=true repete a
-    // faixa (ma_sound_set_looping nativo). No-op seguro se id invalido/de SFX ou engine
+    // sem fade - a ANTERIOR nunca recebe fade-out aqui, so a NOVA pode entrar com
+    // fade-in). loop=true repete a faixa (ma_sound_set_looping nativo, MA_SOUND_FLAG_
+    // STREAM ja garante loop sem gap - o miniaudio reinicia o stream internamente, sem
+    // silencio entre o fim e o reinicio). No-op seguro se id invalido/de SFX ou engine
     // indisponivel.
-    void play_music(SoundId id, bool loop);
+    //
+    // fade_in_seconds (M6 F4, ADR-011; extensao ADITIVA prevista no criterio de saida
+    // "fade entre telas" - NAO quebra chamadas antigas de play_music(id, loop)): <= 0
+    // (default 0.0f) = volume cheio IMEDIATO, byte-identico ao comportamento da F1/F3.
+    // > 0 = fade-in nativo do miniaudio (ma_sound_set_fade_in_milliseconds, volume 0 ->
+    // 1 ao longo de fade_in_seconds) - mesmo espirito de "usar o fader da lib, nao
+    // reinventar" do stop_music.
+    void play_music(SoundId id, bool loop, float fade_in_seconds = 0.0f);
 
     // Para a musica corrente com FADE-OUT nativo do miniaudio (ma_sound_stop_with_fade_
     // in_milliseconds - fader da propria lib, nao reinventado). fade_seconds <= 0 =
@@ -113,6 +122,19 @@ public:
     // introduzir uma interface so pra permitir um spy/mock.
     [[nodiscard]] unsigned int sfx_play_count() const noexcept;
 
+    // HOOK DE TESTE (M6 F4, ADR-011): quantos play_music EFETIVAMENTE tocaram (id
+    // valido + engine available() - nao conta chamadas no-op) desde a construcao. Mesmo
+    // espirito de sfx_play_count(), agora pro lado de musica - prova HEADLESS que
+    // "entrar na batalha tocou musica exatamente 1 vez" nos consumidores.
+    [[nodiscard]] unsigned int music_play_count() const noexcept;
+
+    // HOOK DE TESTE (M6 F4, ADR-011): true se ha musica tocando AGORA (ma_sound_is_
+    // playing no ma_sound corrente - reflete o node state, independe do device real
+    // estar consumindo audio, entao funciona identico em null-device). Usado pra provar
+    // headless que o loop nao para sozinho e que SFX/musica coexistem (tocar o hit nao
+    // para a musica - grupos music/sfx independentes desde a F1).
+    [[nodiscard]] bool music_is_playing() const noexcept;
+
 private:
     void reap_finished_sfx_instances() noexcept;
 
@@ -120,7 +142,8 @@ private:
                                    // fica confinado ao .cpp)
     std::unique_ptr<Impl> impl_;  // sempre nao-nulo (mesmo em modo indisponivel)
     float master_volume_ = 1.0f;
-    unsigned int sfx_play_count_ = 0;  // hook de teste (M6 F3) - ver sfx_play_count()
+    unsigned int sfx_play_count_ = 0;    // hook de teste (M6 F3) - ver sfx_play_count()
+    unsigned int music_play_count_ = 0;  // hook de teste (M6 F4) - ver music_play_count()
 };
 
 }  // namespace gus::platform::audio

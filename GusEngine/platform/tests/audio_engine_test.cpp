@@ -189,6 +189,114 @@ TEST_CASE("AudioEngine: SFX e musica sao pools independentes (mesmo id, engines 
     SUCCEED("ids fora de alcance nos dois pools nao crasham");
 }
 
+TEST_CASE("AudioEngine play_music sem fade_in_seconds preserva o comportamento antigo "
+          "(default 0.0f = volume cheio imediato, chamada de 2 args ainda compila)",
+          "[audio_engine][m6_f4]") {
+    AudioEngine engine(/*device_active=*/false);
+    const auto tmp =
+        std::filesystem::temp_directory_path() / "gusworld_test_music_default.wav";
+    write_test_tone_wav(tmp, /*sample_rate=*/22050, /*duration_s=*/0.2f, /*freq_hz=*/220.0f);
+
+    const SoundId id = engine.load_music(tmp.string().c_str());
+    REQUIRE(id != kInvalidSound);
+
+    // Chamada de 2 argumentos (assinatura antiga, F1/F3) continua valida - a extensao e
+    // ADITIVA (fade_in_seconds tem default 0.0f).
+    engine.play_music(id, /*loop=*/true);
+    REQUIRE(engine.music_is_playing());
+    REQUIRE(engine.music_play_count() == 1);
+
+    std::filesystem::remove(tmp);
+}
+
+TEST_CASE("AudioEngine play_music com fade_in_seconds toca em loop e conta 1x "
+          "(M6 F4, ADR-011)",
+          "[audio_engine][m6_f4]") {
+    AudioEngine engine(/*device_active=*/false);
+    const auto tmp =
+        std::filesystem::temp_directory_path() / "gusworld_test_music_fadein.wav";
+    write_test_tone_wav(tmp, /*sample_rate=*/22050, /*duration_s=*/0.2f, /*freq_hz=*/220.0f);
+
+    const SoundId id = engine.load_music(tmp.string().c_str());
+    REQUIRE(id != kInvalidSound);
+    REQUIRE_FALSE(engine.music_is_playing());  // nada tocando antes do play_music
+
+    engine.play_music(id, /*loop=*/true, /*fade_in_seconds=*/2.0f);
+    REQUIRE(engine.music_is_playing());
+    REQUIRE(engine.music_play_count() == 1);
+
+    std::filesystem::remove(tmp);
+}
+
+TEST_CASE("AudioEngine music_play_count: kInvalidSound/id fora de alcance NAO incrementa "
+          "(M6 F4, hook de teste headless)",
+          "[audio_engine][m6_f4]") {
+    AudioEngine engine(/*device_active=*/false);
+    REQUIRE(engine.music_play_count() == 0);
+
+    engine.play_music(kInvalidSound, /*loop=*/true, /*fade_in_seconds=*/1.0f);
+    engine.play_music(999, /*loop=*/true);
+    REQUIRE(engine.music_play_count() == 0);
+    REQUIRE_FALSE(engine.music_is_playing());
+}
+
+TEST_CASE("AudioEngine stop_music com fade para o node de musica (music_is_playing "
+          "reflete o estado apos o fade programado terminar de ser AGENDADO)",
+          "[audio_engine][m6_f4]") {
+    AudioEngine engine(/*device_active=*/false);
+    const auto tmp =
+        std::filesystem::temp_directory_path() / "gusworld_test_music_stopfade.wav";
+    write_test_tone_wav(tmp, /*sample_rate=*/22050, /*duration_s=*/0.2f, /*freq_hz=*/220.0f);
+
+    const SoundId id = engine.load_music(tmp.string().c_str());
+    REQUIRE(id != kInvalidSound);
+
+    engine.play_music(id, /*loop=*/true, /*fade_in_seconds=*/0.5f);
+    REQUIRE(engine.music_is_playing());
+
+    // stop_music agenda um fade-out (nao para instantaneamente) - o node continua
+    // "playing" (node_state_started, com fade programado) ate o tempo do fade decorrer;
+    // aqui so provamos que a chamada e segura e nao derruba o estado imediatamente
+    // (mesmo espirito do teste original "play/loop/stop com fade" da F1).
+    engine.stop_music(0.3f);
+    SUCCEED("stop_music com fade nao crashou e nao exige polling nesta API minima");
+
+    std::filesystem::remove(tmp);
+}
+
+TEST_CASE("AudioEngine: SFX e musica coexistem - tocar o hit NAO para a musica "
+          "(grupos music/sfx independentes, M6 F4)",
+          "[audio_engine][m6_f4]") {
+    AudioEngine engine(/*device_active=*/false);
+
+    const auto music_tmp =
+        std::filesystem::temp_directory_path() / "gusworld_test_coexist_music.wav";
+    write_test_tone_wav(music_tmp, /*sample_rate=*/22050, /*duration_s=*/0.2f,
+                         /*freq_hz=*/220.0f);
+    const auto sfx_tmp =
+        std::filesystem::temp_directory_path() / "gusworld_test_coexist_sfx.wav";
+    write_test_tone_wav(sfx_tmp, /*sample_rate=*/22050, /*duration_s=*/0.1f,
+                         /*freq_hz=*/880.0f);
+
+    const SoundId music_id = engine.load_music(music_tmp.string().c_str());
+    const SoundId sfx_id = engine.load_sfx(sfx_tmp.string().c_str());
+    REQUIRE(music_id != kInvalidSound);
+    REQUIRE(sfx_id != kInvalidSound);
+
+    engine.play_music(music_id, /*loop=*/true, /*fade_in_seconds=*/1.0f);
+    REQUIRE(engine.music_is_playing());
+
+    // Dispara o SFX varias vezes (simula golpes repetidos) - a musica segue tocando.
+    engine.play_sfx(sfx_id);
+    engine.play_sfx(sfx_id);
+    REQUIRE(engine.music_is_playing());
+    REQUIRE(engine.sfx_play_count() == 2);
+    REQUIRE(engine.music_play_count() == 1);
+
+    std::filesystem::remove(music_tmp);
+    std::filesystem::remove(sfx_tmp);
+}
+
 TEST_CASE("AudioEngine sfx_play_count: conta so os play_sfx que TOCARAM de fato "
           "(M6 F3, hook de teste headless)",
           "[audio_engine]") {

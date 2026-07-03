@@ -148,6 +148,17 @@ inline constexpr std::string_view kHitSfxFile = "hit_digital_provisorio.wav";
 // playtest e escolher qual fica - F3, ADR-011).
 inline constexpr std::string_view kHitSfxAltFile = "hit_digital_alt_provisorio.wav";
 
+// Pasta da musica (MP3, streaming - M6 F4, ADR-011). Raiz assets/music/ (irma de
+// assets/sfx/, mesmo padrao/resolvedor - ver comentario de kSfxDir acima).
+inline constexpr std::string_view kMusicDir = "assets/music";
+// Tema provisorio "GusWorld City cyber-gotica" (curadoria F2, filtro = bíblia de
+// leitmotivs R7). NOTA HONESTA (M6 F4): esta e a UNICA faixa do kit provisorio - por
+// isso toca na tela de BATALHA nesta onda, mesmo sendo um tema de CIDADE. Serve pra
+// PROVAR loop+fade tecnicamente (streaming sem gap, fade-in/fade-out via miniaudio),
+// NAO pra vender o feel de combate - a faixa/producao certa de combate fica pra onda
+// de audio dedicada (audio-designer-composer). NAO trocar o timbre/curadoria aqui.
+inline constexpr std::string_view kCityThemeFile = "cidade_tema_provisorio.mp3";
+
 }  // namespace gus::core::assets
 
 #endif  // GUS_CORE_ASSET_PATHS_HPP

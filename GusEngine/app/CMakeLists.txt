@@ -63,6 +63,10 @@ target_compile_definitions(gusengine_app
     # e asset DA ENGINE). O battle_preview (owner do AudioEngine) le hit_digital_
     # provisorio.wav daqui rodando do build dir; override em runtime via env GUSWORLD_SFX.
     PRIVATE GUSWORLD_SFX_DIR="${CMAKE_SOURCE_DIR}/../assets/sfx"
+    # Pasta da musica CC0 (M6 F4, ADR-011), irma de assets/sfx/ (mesma raiz "assets/" do
+    # JOGO). O battle_preview le cidade_tema_provisorio.mp3 daqui; override em runtime
+    # via env GUSWORLD_MUSIC.
+    PRIVATE GUSWORLD_MUSIC_DIR="${CMAKE_SOURCE_DIR}/../assets/music"
 )
 
 # SDL3 entra aqui (a casca SdlWindow + o main tocam SDL diretamente).

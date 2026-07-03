@@ -57,6 +57,12 @@
 #define GUSWORLD_SFX_DIR ""
 #endif
 
+// Pasta da musica CC0 (M6 F4, ADR-011), irma de GUSWORLD_SFX_DIR (repo_root/assets/
+// music). Override em runtime via env GUSWORLD_MUSIC.
+#ifndef GUSWORLD_MUSIC_DIR
+#define GUSWORLD_MUSIC_DIR ""
+#endif
+
 namespace gus::app::screens {
 
 namespace {
@@ -114,6 +120,23 @@ std::string resolve_hit_sfx_path() {
         return join(compiled, file);
     }
     return join(std::string(gus::core::assets::kSfxDir), file);
+}
+
+// Resolve o caminho da MUSICA (M6 F4, ADR-011): env GUSWORLD_MUSIC > macro embutida
+// (GUSWORLD_MUSIC_DIR = repo_root/assets/music) > relativo ao CWD (kMusicDir). Mesma
+// receita de resolve_hit_sfx_path, sem variante A/B (so 1 faixa no kit provisorio).
+std::string resolve_music_path() {
+    const std::string file(gus::core::assets::kCityThemeFile);
+    if (const char* env = std::getenv("GUSWORLD_MUSIC")) {
+        if (env[0] != '\0') {
+            return join(env, file);
+        }
+    }
+    const std::string compiled = GUSWORLD_MUSIC_DIR;
+    if (!compiled.empty()) {
+        return join(compiled, file);
+    }
+    return join(std::string(gus::core::assets::kMusicDir), file);
 }
 
 // Carrega o SPRITE SET de batalha do GUS (W3): pra cada clip conhecido
@@ -1322,6 +1345,30 @@ int run_battle_preview() {
                           : "AUSENTE (silencioso)")
                   << " de " << hit_sfx_path << "\n";
 
+        // MUSICA (M6 F4, ADR-011): mesmo AudioEngine dono da casca, mesmo padrao de
+        // pre-load do SFX (load_music UMA vez aqui - o stream real so comeca em
+        // play_music). Toca em LOOP com FADE-IN ao ENTRAR na batalha - este viewer
+        // (--battle) E a batalha; e o ponto de "entrada" que este fluxo isolado permite
+        // exercitar (ver nota de escopo do fade-out, no fim do loop, sobre o crossfade
+        // tela-a-tela completo). MA_SOUND_FLAG_STREAM + looping nativo (audio_engine.cpp)
+        // garante loop SEM GAP (o miniaudio reinicia o stream internamente).
+        //
+        // NOTA HONESTA (kCityThemeFile, ver comentario em asset_paths.hpp): e um tema de
+        // CIDADE tocando na BATALHA porque e a UNICA faixa do kit CC0 provisorio (F2) -
+        // serve pra PROVAR loop+fade tecnicamente, NAO pra vender o feel de combate. NAO
+        // mudar o timbre/curadoria aqui (fora de escopo desta fase, ADR-011).
+        const std::string music_path = resolve_music_path();
+        const gus::platform::audio::SoundId music_id =
+            audio_engine.load_music(music_path.c_str());
+        constexpr float kMusicFadeInSeconds = 2.0f;
+        audio_engine.play_music(music_id, /*loop=*/true, kMusicFadeInSeconds);
+        std::cout << "BattlePreview: [audio] musica "
+                  << (music_id != gus::platform::audio::kInvalidSound
+                          ? "carregada (loop, fade-in " +
+                                std::to_string(kMusicFadeInSeconds) + "s)"
+                          : "AUSENTE (silenciosa)")
+                  << " de " << music_path << "\n";
+
         // A cena monta o encontro de demo e ja le a fila do motor.
         BattleScene scene;
         // Ponteiro NAO-DONO (mesmo padrao de set_translator/set_portraits): a cena so
@@ -2309,6 +2356,28 @@ int run_battle_preview() {
                 running = false;
             }
         }
+
+        // MUSICA: fade-out ao SAIR da batalha (M6 F4, ADR-011). Unico CHOKE-POINT de saida
+        // do loop `while (running)` acima, qualquer que seja o motivo (Esc/fechar janela/
+        // limite de --frames/selftest concluido) - todos convergem pra `running = false`
+        // e caem aqui, entao um so ponto cobre "sair da batalha" sem precisar duplicar em
+        // cada handler de saida.
+        //
+        // ESCOPO "fade entre telas" (veredito honesto, ADR-011 F4): este viewer roda a
+        // BATALHA ISOLADA - nao ha tela anterior/posterior real neste fluxo (--battle nao
+        // tem overworld<->batalha; esse loop de cena e trabalho do M5/M7). Os PRIMITIVOS
+        // de fade estao implementados e provados aqui (fade-in acima ao entrar, fade-out
+        // abaixo ao sair - API play_music(..., fade_in_seconds) + stop_music(fade)); o
+        // CROSSFADE completo tela-a-tela (musica A esmaecendo enquanto musica B sobe) so
+        // fica exercitavel quando o loop de cena overworld<->batalha existir - limitacao
+        // de INTEGRACAO (nao existe segunda tela pra crossfade contra), nao de audio.
+        const bool music_was_playing_before_exit = audio_engine.music_is_playing();
+        constexpr float kMusicFadeOutSeconds = 1.5f;
+        audio_engine.stop_music(kMusicFadeOutSeconds);
+        std::cout << "BattlePreview: [audio] musica: play_music count="
+                  << audio_engine.music_play_count() << " estava_tocando_ao_sair="
+                  << (music_was_playing_before_exit ? "sim" : "nao") << " fade-out de "
+                  << kMusicFadeOutSeconds << "s disparado.\n";
 
         // DIAGNOSTICO (M6 F3, ADR-011): quantos SFX de hit TOCARAM de fato nesta sessao -
         // prova rapida no console (sem precisar ouvir) de que o gancho disparou no evento
