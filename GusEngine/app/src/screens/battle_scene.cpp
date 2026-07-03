@@ -798,15 +798,21 @@ void BattleScene::start_active_turn() {
     if (turn_started_ || combat_over()) {
         return;
     }
-    // ESCOLHA DE ATOR (§4.1, comando-livre 1B): enquanto o picker esta aberto, o begin_turn
-    // fica DEFERIDO - so o actor_picker_confirm inicia o turno (via begin_active_turn_now).
-    if (choosing_actor_) {
+    // ESCOLHA DE ATOR (§4.1, comando-livre 1B): enquanto o picker (LISTA, estagio 1) OU o
+    // PREVIEW do escolhido (estagio 2, motor ainda intocado) estao abertos, o begin_turn fica
+    // DEFERIDO - so commit_previewed_actor() (chamado pela 1a acao de fato resolvida) inicia o
+    // turno real (via begin_active_turn_now). SEM este guard, advance_pacing() (que chama
+    // start_active_turn TODO FRAME) reabriria o picker do zero em cima do preview (bug: o
+    // should_offer_actor_picker abaixo tambem veria o ator em preview como "ativo" via
+    // active_actor(), ainda com pending_party_actors().size()>1).
+    if (choosing_actor_ || actor_preview_) {
         return;
     }
     // E a vez do BLOCO da party com >1 elegivel? Entao NAO inicia o turno ainda: entra no modo
     // de escolha e espera o jogador comandar QUAL membro age (a SPD so SUGERE o pre-selecionado,
-    // §4.1). O begin_turn vem depois, no confirm. Com <=1 elegivel (ou vez de inimigo/intro), o
-    // fluxo segue direto (begin_active_turn_now) => identico ao motor pre-picker.
+    // §4.1). O begin_turn vem depois, no commit real (commit_previewed_actor, na 1a acao). Com
+    // <=1 elegivel (ou vez de inimigo/intro), o fluxo segue direto (begin_active_turn_now) =>
+    // identico ao motor pre-picker (sem picker, sem preview).
     if (should_offer_actor_picker()) {
         enter_actor_picker();
         return;
@@ -947,6 +953,12 @@ void BattleScene::menu_confirm() {
         case BattleVerb::Compilar:
             return;  // tratado acima
     }
+
+    // PONTO-DE-NAO-RETORNO (bug1, §4.1): Defender/Flee chegaram ate aqui = a acao VAI
+    // resolver agora. Se o ator ainda esta em PREVIEW (picker, motor intocado), este e o
+    // commit: grava a escolha + roda o begin_turn REAL (tick de status incluso) ANTES de
+    // resolver. No-op se ja commitado (sem picker, ou preview ja resolvido antes).
+    commit_previewed_actor();
 
     // RITMO (incremento 6): submete a acao do jogador e resolve SO o turno dele (com
     // floater + narracao de consequencia). NAO encadeia os inimigos aqui: o diretor
@@ -1097,6 +1109,12 @@ void BattleScene::aim_confirm() {
         aim_cancel();  // sem alvo valido: aborta a mira sem consumir turno
         return;
     }
+
+    // PONTO-DE-NAO-RETORNO (bug1, §4.1): confirmar o ALVO resolve o turno (Atacar/Scan) - a
+    // mira em si (enter_aim_mode/aim_move/aim_cancel) NUNCA commita, so aqui. Se o ator ainda
+    // esta em PREVIEW, este e o commit: grava a escolha + begin_turn REAL (tick incluso) ANTES
+    // de montar/resolver a acao. No-op se ja commitado.
+    commit_previewed_actor();
     const bool is_scan = (aim_verb_ == BattleVerb::Scan);
     // Monta a acao com o ALVO ESCOLHIDO (nao mais o hardcode first_alive_enemy).
     CombatAction action = is_scan ? CombatAction::scan(t->id())
@@ -1163,7 +1181,9 @@ bool BattleScene::should_offer_actor_picker() const {
 
 void BattleScene::enter_actor_picker() {
     // Snapshot dos elegiveis (maior SPD -> menor; front = pre-selecionado). Cursor no front.
-    // NAO chama begin_turn: o turno so comeca no confirm (begin_active_turn_now).
+    // NAO chama begin_turn: o confirm so entra no PREVIEW (estagio 2); o turno real so
+    // comeca no commit_previewed_actor (1a acao resolvida). Chamada tambem por
+    // actor_preview_cancel (Esc no preview reabre a lista do zero, mesma fonte).
     actor_choices_ = machine_->pending_party_actors();
     choosing_actor_ = true;
     actor_pick_index_ = 0;  // front de pending_party_actors == preselected_party_actor (SPD)
@@ -1230,17 +1250,69 @@ void BattleScene::actor_picker_confirm() {
         return;  // defensivo (cursor invalido): nao confirma
     }
     CombatActor* chosen = actor_choices_[static_cast<std::size_t>(actor_pick_index_)];
-    // Grava a escolha no motor (comando livre 1B, §4.1). machine_-> = acesso NAO-const (mesmo
-    // padrao de menu_confirm/aim_confirm; o machine() publico e const). select_party_actor
-    // lanca std::invalid_argument se `chosen` nao e elegivel; como actor_choices_ veio de
-    // pending_party_actors e nada mutou o motor no meio, ele SEMPRE e elegivel.
-    machine_->select_party_actor(chosen);
+
+    // FIX bug1 (playtest do lider 2026-07: "escolho e nao consigo trocar - fica FIXO"): NAO
+    // grava a escolha no motor nem chama begin_turn aqui. Antes o confirm chamava
+    // begin_active_turn_now() na hora, que faz apply_status_tick (IRREVERSIVEL) colado a
+    // simples SELECAO do ator - por isso "travava". Agora so entra no estagio (2) PREVIEW: o
+    // menu de verbos DELE aparece (AP/mana corretos, ver refresh abaixo), mas o motor segue
+    // 100% intocado (sem select_party_actor, sem begin_turn, sem tick). O commit real fica pra
+    // commit_previewed_actor() (chamado so quando a 1a acao de fato resolve - menu_confirm ou
+    // aim_confirm). Ate la, Esc (actor_preview_cancel) reabre esta MESMA lista do zero e o
+    // jogador troca de ator sem custo algum.
     choosing_actor_ = false;
     actor_choices_.clear();
     actor_pick_index_ = 0;
-    // begin_turn consome a escolha (traz o ator ao cursor) e prossegue como hoje: menu de
-    // verbos do ATOR ESCOLHIDO. NAO reentra por start_active_turn (evita re-abrir o picker).
+    actor_preview_ = true;
+    preview_actor_ = chosen;
+
+    // AP/MANA no PREVIEW: sem isto o cockpit mostraria ap()==0 (o campo so e populado por
+    // refresh_resources_for_turn, chamado ate agora SO dentro do begin_turn) e TODO verbo
+    // apareceria desabilitado - preview inutil. refresh_resources_for_turn e INOCUO/
+    // IDEMPOTENTE (sem RNG; so recarrega ap_/mana_ pela formula deterministica de
+    // round_index) e e chamado de novo, com o MESMO round_index, dentro do begin_turn REAL em
+    // commit_previewed_actor() - byte-identico, sem efeito duplicado observavel. Isto e o
+    // unico ponto onde a cena toca um metodo do ATOR (POCO ja publico) fora do begin_turn do
+    // motor; NENHUM arquivo de domain/ foi alterado (combat_state_machine/combat_actor
+    // intocados) - reportado como checkpoint (a) da tarefa.
+    chosen->refresh_resources_for_turn(machine_->queue().round_index());
+    menu_.refresh(chosen->ap());
+}
+
+void BattleScene::commit_previewed_actor() {
+    if (!actor_preview_) {
+        return;  // sem preview pendente: <=1 elegivel (begin_active_turn_now ja rodou direto
+                 // em start_active_turn) OU este ator ja foi commitado antes. No-op seguro -
+                 // chamado incondicionalmente no topo de toda resolucao real de acao.
+    }
+    // PONTO-DE-NAO-RETORNO (bug1, regra fechada Caetano+lider): grava a escolha no motor
+    // (select_party_actor) e sai do preview ANTES de chamar begin_active_turn_now - assim
+    // active_actor() ja cai no caminho normal (machine_->active_actor()) dentro dele, que o
+    // proprio begin_turn alinha via bring_to_current(chosen). select_party_actor lanca
+    // std::invalid_argument se `preview_actor_` nao e mais elegivel; como nada mutou o motor
+    // entre o confirm e este commit (o preview e 100% apresentacao), ele SEMPRE e elegivel.
+    machine_->select_party_actor(preview_actor_);
+    actor_preview_ = false;
+    preview_actor_ = nullptr;
+    // O begin_turn REAL: bring_to_current + refresh (idempotente, ja rodou uma vez no
+    // preview) + o TICK DE STATUS - agora sim IRREVERSIVEL (Poison floata, Haste/Slow
+    // aplicam, etc). turn_started_ segue false ate aqui (garantido por start_active_turn
+    // nunca ter chamado begin_active_turn_now enquanto actor_preview_ era true).
     begin_active_turn_now();
+}
+
+void BattleScene::actor_preview_cancel() noexcept {
+    if (!actor_preview_) {
+        return;  // fora do preview: nada a desfazer (picker fechado, ou ja commitado - nao ha
+                 // volta apos a 1a acao, ver commit_previewed_actor).
+    }
+    actor_preview_ = false;
+    preview_actor_ = nullptr;
+    // Reabre a LISTA do zero (mesma fonte, pending_party_actors()): como o preview NUNCA
+    // tocou o motor, a lista e IDENTICA a de antes (nao precisamos guardar/restaurar nada).
+    // should_offer_actor_picker() nao e re-checado de proposito (mesmo padrao do confirm): sabemos
+    // que havia >1 elegivel quando este preview abriu, e nada consumiu nenhum deles.
+    enter_actor_picker();
 }
 
 void BattleScene::actor_picker_hotkey(int nth) {
@@ -1276,6 +1348,16 @@ int BattleScene::enemy_count() const { return count_alive(*machine_, false); }
 int BattleScene::queue_len() const noexcept { return machine_->queue().count(); }
 
 const CombatActor* BattleScene::active_actor() const noexcept {
+    // PREVIEW (estagio 2, §4.1 bug1): enquanto o ator escolhido no picker ainda nao foi
+    // commitado (motor intocado - o queue_.current() do motor NAO e o escolhido ate o
+    // bring_to_current dentro de begin_turn, que so roda em commit_previewed_actor), a cena
+    // PROJETA o escolhido como "ativo" pra TUDO que le active_actor() (cockpit, banner,
+    // current_actor_is_player, ctb highlight, menu). Fonte UNICA: nenhum destes precisa saber
+    // sobre preview_ separadamente. Apos o commit, actor_preview_ cai e este cai no caminho de
+    // sempre (que ja aponta pro MESMO ator, alinhado pelo bring_to_current).
+    if (actor_preview_ && preview_actor_ != nullptr) {
+        return preview_actor_;
+    }
     return machine_->active_actor();
 }
 

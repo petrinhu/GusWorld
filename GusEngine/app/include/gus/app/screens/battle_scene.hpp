@@ -376,16 +376,36 @@ public:
     // APRESENTACAO PURA sobre o motor 1B (§4.1): quando e a vez do BLOCO da party e ha MAIS DE
     // UM membro elegivel (machine().pending_party_actors()), a cena entra num modo de ESCOLHA
     // DE ATOR ANTES do menu de verbos - o jogador comanda QUAL membro age (a SPD apenas SUGERE
-    // o pre-selecionado; §4.1 "comando livre"). O begin_turn fica DEFERIDO ate a escolha;
-    // confirmar chama machine().select_party_actor(escolhido) e SO ENTAO o turno comeca (menu
-    // de verbos do ator escolhido), prosseguindo EXATAMENTE como o fluxo de hoje. Com 1 so
-    // elegivel NAO ha escolha: a cena auto-inicia o turno (sem friccao) - o picker existe pra
-    // ESCOLHER entre varios (decisao documentada no .cpp). ADITIVO: o motor (domain/) ja faz
-    // tudo (agrupa por lado, recomputa quem abre, regroup Gambito-safe); aqui so deixamos o
-    // jogador escolher dentro de pending_party_actors. So teclado/mouse; ZERO mudanca de motor.
+    // o pre-selecionado; §4.1 "comando livre"). Com 1 so elegivel NAO ha escolha: a cena
+    // auto-inicia o turno (sem friccao) - o picker existe pra ESCOLHER entre varios (decisao
+    // documentada no .cpp). ADITIVO: o motor (domain/) ja faz tudo (agrupa por lado, recomputa
+    // quem abre, regroup Gambito-safe); aqui so deixamos o jogador escolher dentro de
+    // pending_party_actors. So teclado/mouse.
+    //
+    // 2 ESTAGIOS pos-picker (FIX do bug "trava a selecao", playtest do lider 2026-07):
+    //   (1) is_choosing_actor(): a LISTA de elegiveis (badges na arena). Confirmar aqui NAO
+    //       chama begin_turn - so entra no estagio (2).
+    //   (2) is_actor_preview(): o menu de VERBOS do escolhido, em PREVIEW - mostrado (com
+    //       AP/mana corretos, ver commit_previewed_actor) mas o MOTOR segue 100% intocado
+    //       (nenhum tick de status, nada comprometido). Nada foi commitado: Esc volta ao
+    //       estagio (1) via actor_preview_cancel() (re-abre a lista do zero, mesma fonte
+    //       pending_party_actors() - nada mudou no motor, entao a lista e IDENTICA). So a 1a
+    //       ACAO de fato resolvida (Defender/Flee em menu_confirm, Atacar/Scan em aim_confirm)
+    //       e o PONTO-DE-NAO-RETORNO: commit_previewed_actor() grava a escolha no motor
+    //       (select_party_actor) e chama o begin_turn REAL (bring_to_current + refresh de
+    //       recursos + o TICK de status, agora sim IRREVERSIVEL). Ate o commit, o jogador pode
+    //       trocar de ator livremente (Esc + escolher outro na lista) sem custo algum.
 
-    // true enquanto a escolha de ator esta ativa (o turno da party ainda nao comecou).
+    // true enquanto a LISTA de elegiveis esta aberta (estagio 1; ver acima). false durante o
+    // preview do menu de verbos (estagio 2) ou apos o commit.
     [[nodiscard]] bool is_choosing_actor() const noexcept { return choosing_actor_; }
+
+    // true enquanto o menu de verbos de um ator ESCOLHIDO esta em PREVIEW (estagio 2: apos
+    // actor_picker_confirm, antes da 1a acao resolvida) - o motor ainda nao comprometeu esse
+    // ator (sem begin_turn, sem tick de status). false fora do picker OU ja comprometido (pos-
+    // commit_previewed_actor). active_actor()/current_actor_is_player() ja refletem o ator em
+    // preview (ver active_actor() no .cpp) - o menu de verbos opera normalmente sobre ele.
+    [[nodiscard]] bool is_actor_preview() const noexcept { return actor_preview_; }
 
     // Membros da party ELEGIVEIS nesta escolha (== machine().pending_party_actors() no momento
     // de entrar), front = pre-selecionado (maior SPD). Vazio fora do modo. Ponteiros NAO-donos
@@ -416,15 +436,27 @@ public:
     // esta vazia -> sempre -1. Testavel headless; reusa o pipeline de hit-test do Incremento A2.
     [[nodiscard]] int actor_pick_index_at_arena(float world_x, float world_y) const;
 
-    // Confirma o ator sob o cursor: grava a escolha no motor (select_party_actor) e INICIA o
-    // turno dele (begin_turn + menu de verbos). No-op fora do modo. Clique de mouse e teclas
-    // 1/2/3 confirmam via este caminho (mesma filosofia "aciona na hora" do A2).
+    // Confirma o ator sob o cursor: sai do estagio (1) LISTA e entra no estagio (2) PREVIEW -
+    // mostra o menu de verbos DELE (com AP/mana corretos), mas NAO grava a escolha no motor
+    // nem chama begin_turn ainda (ver bloco de comentario acima de is_choosing_actor/
+    // is_actor_preview). O commit real fica pra commit_previewed_actor(), chamado so quando a
+    // 1a acao de fato resolve. No-op fora do estagio (1). Clique de mouse e teclas 1/2/3
+    // confirmam via este caminho (mesma filosofia "aciona na hora" do A2).
     void actor_picker_confirm();
 
     // TECLA-ATALHO (1/2/3, pedido do lider): escolhe DIRETO o nth-esimo elegivel (1-based) e
-    // CONFIRMA na hora. No-op se nth nao tem elegivel correspondente (fora de faixa) ou fora do
-    // modo. Fonte UNICA do host (teclas) e dos testes; encapsula o "select + confirm imediato".
+    // CONFIRMA na hora (entra no PREVIEW dele). No-op se nth nao tem elegivel correspondente
+    // (fora de faixa) ou fora do modo. Fonte UNICA do host (teclas) e dos testes; encapsula o
+    // "select + confirm imediato".
     void actor_picker_hotkey(int nth);
+
+    // Esc no PREVIEW (estagio 2, is_actor_preview()==true): desiste do ator escolhido SEM
+    // custo (nada foi commitado no motor) e VOLTA ao estagio (1) LISTA - re-abre a escolha do
+    // zero (mesma fonte pending_party_actors(); a lista e IDENTICA porque nada mudou no
+    // motor). No-op fora do preview (FIX do bug "Esc fecha a tela", playtest do lider 2026-07:
+    // antes o Esc so via 2 estados, mira e "generico" -> sai do viewer; agora desempilha 1
+    // nivel por vez, ver battle_key_down em battle_preview.cpp).
+    void actor_preview_cancel() noexcept;
 
     // Desenha o ESQUELETO da batalha (placeholders): fundo, arena (party/inimigos),
     // fila CTB, painel do ator ativo, log. viewport_px_w/h = PIXELS REAIS da janela
@@ -491,12 +523,24 @@ private:
     [[nodiscard]] bool should_offer_actor_picker() const;
 
     // Entra no modo de escolha: snapshot dos elegiveis (pending_party_actors) + cursor no
-    // pre-selecionado (front = maior SPD). NAO chama begin_turn (deferido ate o confirm).
+    // pre-selecionado (front = maior SPD). NAO chama begin_turn (deferido ate o commit real).
     void enter_actor_picker();
 
     // O "begin" real do turno ativo (begin_turn + floaters/narracao + menu.refresh), extraido
-    // de start_active_turn pra o confirm INICIAR sem re-checar o gate do picker (nao re-entra).
+    // de start_active_turn pra commit_previewed_actor()/o caminho sem picker INICIAREM sem
+    // re-checar o gate do picker (nao re-entra).
     void begin_active_turn_now();
+
+    // PONTO-DE-NAO-RETORNO do comando-livre 1B (bug1 do playtest, regra fechada Caetano+lider):
+    // se o ator ativo ainda esta em PREVIEW (is_actor_preview()==true), grava a escolha no
+    // motor (machine_->select_party_actor) e chama begin_active_turn_now() - o begin_turn REAL,
+    // com o tick de status IRREVERSIVEL incluso. No-op seguro se NAO ha preview pendente (sem
+    // picker, ou <=1 elegivel: o caminho de sempre ja chamou begin_active_turn_now direto em
+    // start_active_turn). Chamado no INICIO de toda resolucao real de acao - menu_confirm()
+    // (Defender/Flee, que resolvem na hora) e aim_confirm() (Atacar/Scan, apos o alvo
+    // escolhido) - NUNCA ao so abrir o menu de verbos ou entrar na mira (essas etapas
+    // continuam DESFAZIVEIS: Esc/troca de ator livre ate aqui).
+    void commit_previewed_actor();
 
     // "Familia da acao" pro tier de fraqueza D3. O ataque BASICO nao usa a roda no motor
     // (dano = atk-def) e o Scan e utilitario: FALLBACK documentado -> Atacar usa a familia
@@ -627,16 +671,24 @@ private:
     std::vector<const gus::domain::combat::CombatActor*> aim_candidates_;
 
     // ---- Escolha de ator / Janela de Comando da Party (§4.1) ----
-    // true enquanto o jogador escolhe QUAL membro da party age (begin_turn DEFERIDO ate o
-    // confirm). start_active_turn e no-op enquanto isto e true (o begin so vem no confirm).
+    // true enquanto o estagio (1) LISTA esta aberto (badges na arena). start_active_turn e
+    // no-op enquanto isto e true (o begin so vem no commit real, ver actor_preview_/
+    // commit_previewed_actor).
     bool choosing_actor_ = false;
     // Cursor: indice do elegivel escolhido em actor_choices_ (0 = pre-selecionado ao entrar).
     int actor_pick_index_ = 0;
-    // Elegiveis da escolha corrente (NAO-donos; vivem em actors_/na FSM), front = maior SPD
+    // Elegiveis da LISTA corrente (NAO-donos; vivem em actors_/na FSM), front = maior SPD
     // (== machine().pending_party_actors()). NON-const de proposito: os MESMOS ponteiros vao
-    // pra machine_->select_party_actor (que pede CombatActor*). Preenchido ao entrar no modo,
-    // limpo ao confirmar.
+    // pra machine_->select_party_actor (que pede CombatActor*). Preenchido ao entrar no modo
+    // (enter_actor_picker), limpo ao confirmar (actor_picker_confirm entra no PREVIEW).
     std::vector<gus::domain::combat::CombatActor*> actor_choices_;
+    // true enquanto o estagio (2) PREVIEW esta aberto (menu de verbos do escolhido, motor
+    // intocado). Ver bloco de comentario de is_choosing_actor()/is_actor_preview() acima.
+    bool actor_preview_ = false;
+    // O ator escolhido no picker, em PREVIEW (NAO-dono; vive em actors_/na FSM). Fonte que
+    // active_actor() devolve enquanto actor_preview_==true (o motor ainda nao trouxe este
+    // ator pro cursor - ver active_actor() no .cpp). nullptr fora do preview.
+    gus::domain::combat::CombatActor* preview_actor_ = nullptr;
 };
 
 }  // namespace gus::app::screens
