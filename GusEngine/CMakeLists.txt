@@ -89,10 +89,20 @@ set(GLINTFX_BACKEND_GLFW OFF CACHE BOOL "" FORCE)  # embed-only (sem GLFW)
 # SOURCE_SUBDIR glintfx: o CMakeLists.txt do projeto vive no subdir glintfx/ (a raiz do repo
 # NAO tem CMakeLists.txt); e o que o consumer-example oficial do glintfx aponta. Sem isto,
 # MakeAvailable popula mas NAO adiciona o subdir => alvo glintfx::glintfx nao existe.
+#
+# BUMP v0.2.4 -> v0.2.5 (decisao Caetano/CTO 2026-07-02, higiene pre-M7): a v0.2.5 entrega
+# UiLayer::set_click_callback (hit-test de elemento NATIVO do glintfx, reportando o id do
+# elemento clicado) - mata a divida do hit-test manual dos 6 pills de verbo do cockpit
+# (gus/app/screens/battle_cockpit_pills.hpp, aposentado neste bump). O 5-arg set_viewport
+# (letterbox) tambem veio nesta versao mas FICA NO BACKLOG (GLINTFX-LETTERBOX no TODO.md;
+# so o callback de clique entra agora). get_element_box (2a API nova) tambem NAO e usado
+# pro hit-test de clique aqui - so pro reposicionamento do cursor sintetico do
+# GUSWORLD_BATTLE_HOVER_SELFTEST (diagnostico preexistente que dependia da geometria
+# manual aposentada; ver battle_preview.cpp).
 FetchContent_Declare(
     glintfx
     GIT_REPOSITORY https://codeberg.org/petrinhu/glintfx
-    GIT_TAG        v0.2.4
+    GIT_TAG        v0.2.5
     SOURCE_SUBDIR  glintfx
 )
 FetchContent_MakeAvailable(glintfx)
