@@ -269,6 +269,83 @@ TEST_CASE(
     CHECK(cy == 1);
 }
 
+TEST_CASE(
+    "pick_fixed_enemy_position: mapa REAL (distritos_inferiores) - offset "
+    "(-5,+4) poe o inimigo no SALAO principal esquerdo, NAO no portal "
+    "entrada_norte",
+    "[maestro][logic][regressao-sala-fechada]") {
+    // Reproducao FIEL de GusEngine/assets/maps/source/distritos_inferiores.csv (30x20,
+    // tile_size 2.0; '#' == Parede/id 1, '.' == qualquer outro id: Chao/Marco/
+    // Entrada/Saida, nenhum deles bloqueia - ver TileKind::is_tile_blocking). Prova
+    // dupla, pedida pelo lider:
+    //   1) o offset ANTIGO (3,0) - celula-alvo (18,1) - cai numa saleta isolada (canto
+    //      sup-direito, cols17-28/rows1-2, so ligada ao resto do mapa por um caminho
+    //      longo) e o fallback da espiral (alcancabilidade) senta na celula alcancavel
+    //      mais proxima: (15,0), EM CIMA do portal entrada_norte. Feio, mas nao mais um
+    //      "sala fechada" (a alcancabilidade ja protegia disso) - so um mau lugar.
+    //   2) o offset NOVO (-5,+4) - celula-alvo (10,5) - e Chao aberto, ja alcancavel
+    //      DIRETO (a espiral senta exatamente nele, sem fallback), bem no meio do
+    //      salao principal esquerdo (onde o jogador cai ao descer do spawn), a 5
+    //      celulas (chebyshev) do spawn - nem em cima do jogador, nem longe demais.
+    const TileGrid grid = TileGrid::from_rows(
+        {
+            "##############..##############",
+            "#............#..#............#",
+            "#............#..#............#",
+            "#............#..##########...#",
+            "#........................#...#",
+            "#........................#...#",
+            "#........................#...#",
+            "#........................#...#",
+            "#................##########..#",
+            "#.........................#..#",
+            "##############...#############",
+            "#.........................#..#",
+            "#.......................#.#..#",
+            "#...........#.....#.....###..#",
+            "#............................#",
+            "#............................#",
+            "#############.....############",
+            "#............................#",
+            "#............................#",
+            "##############..##############",
+        },
+        2.0f);
+
+    // Spawn real (#spawn 15 1 no CSV): centro da celula (15,1).
+    const Aabb player_start{15.0f * 2.0f + 1.0f, 1.0f * 2.0f + 1.0f, 1.0f, 1.0f};
+
+    // 1) offset ANTIGO (3,0): NAO senta na celula-alvo isolada (18,1) nem sobra la -
+    // cai no fallback alcancavel mais proximo, que e o portal (15,0). Documenta POR
+    // QUE o offset antigo era ruim (motivou trocar pra (-5,+4)), sem reintroduzir o
+    // bug de sala fechada (ja coberto pelos testes sinteticos acima).
+    const Aabb enemy_old =
+        pick_fixed_enemy_position(grid, player_start, /*offset_tiles_x=*/3,
+                                   /*offset_tiles_y=*/0);
+    const int old_cx = grid.world_to_cell(enemy_old.x + enemy_old.w * 0.5f);
+    const int old_cy = grid.world_to_cell(enemy_old.y + enemy_old.h * 0.5f);
+    CHECK(old_cx == 15);
+    CHECK(old_cy == 0);  // em cima do portal entrada_norte - por isso foi trocado
+
+    // 2) offset NOVO (-5,+4): senta EXATAMENTE no alvo (10,5) - Chao aberto do salao,
+    // alcancavel direto (sem precisar de fallback).
+    const Aabb enemy_new =
+        pick_fixed_enemy_position(grid, player_start, /*offset_tiles_x=*/-5,
+                                   /*offset_tiles_y=*/4);
+    const int new_cx = grid.world_to_cell(enemy_new.x + enemy_new.w * 0.5f);
+    const int new_cy = grid.world_to_cell(enemy_new.y + enemy_new.h * 0.5f);
+    CHECK(new_cx == 10);
+    CHECK(new_cy == 5);
+    CHECK_FALSE(grid.is_blocked(new_cx, new_cy));
+
+    // Nunca mais no portal, nem na passagem estreita (cols 13-16, rows 0-3) por onde o
+    // jogador desce ate o salao.
+    const bool on_portal = (new_cx == 15 && new_cy == 0);
+    const bool in_passagem = (new_cx >= 13 && new_cx <= 16 && new_cy <= 3);
+    CHECK_FALSE(on_portal);
+    CHECK_FALSE(in_passagem);
+}
+
 TEST_CASE("EncounterId: kFixedEnemy1 existe (item 1 do escopo M7-COSTURA)",
           "[maestro][logic]") {
     constexpr auto id = EncounterId::kFixedEnemy1;

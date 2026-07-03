@@ -18,12 +18,20 @@ namespace {
 constexpr int kWindowW = 1280;
 constexpr int kWindowH = 720;
 
-// Offset cardinal (em CELULAS) do inimigo fixo em relacao ao spawn do jogador: alguns
-// tiles a LESTE, uma distancia curta o bastante pra o lider esbarrar nele logo ao
-// iniciar o playtest ao vivo. pick_fixed_enemy_position (maestro_logic) varre pra
-// celula livre mais proxima caso este offset caia em parede.
-constexpr int kEnemyOffsetTilesX = 3;
-constexpr int kEnemyOffsetTilesY = 0;
+// Offset cardinal (em CELULAS) do inimigo fixo em relacao ao spawn do jogador (celula
+// (15,1), passagem estreita logo abaixo do portal entrada_norte). O offset antigo (3,0)
+// mirava a celula (18,1) - uma saleta isolada (canto sup-direito do mapa) - e a
+// alcancabilidade (pick_fixed_enemy_position/flood-fill) caia de volta no fallback mais
+// proximo: a celula (15,0), EM CIMA do proprio portal entrada_norte. Feio (decisao do
+// lider, M7-COSTURA): trocado para (-5,+4), que mira a celula (10,5) - Chao aberto,
+// alcancavel DIRETO (sem fallback), bem no meio do SALAO PRINCIPAL ESQUERDO onde o
+// jogador cai ao descer a passagem central (cols1-13, rows1-9 de
+// distritos_inferiores.csv) - a 5 celulas (chebyshev) do spawn, perto o bastante pra o
+// lider esbarrar nele cedo no playtest ao vivo, longe o bastante do portal e da
+// passagem estreita. Ver app/tests/maestro_logic_test.cpp (regressao com reproducao
+// fiel do mapa real) para a prova headless de ambos os offsets.
+constexpr int kEnemyOffsetTilesX = -5;
+constexpr int kEnemyOffsetTilesY = 4;
 
 // Chave da flag (SaveData::flags) que registra o inimigo fixo derrotado. Espelha o
 // EncounterId::kFixedEnemy1 (unico valor desta onda) - quando houver mais encontros, a
