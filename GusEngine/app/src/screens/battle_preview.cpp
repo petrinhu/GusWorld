@@ -1183,7 +1183,13 @@ void battle_key_down(BattleScene& scene, SDL_Keycode key, bool& running) {
 // destruicao do renderer - a Maestro RECARREGA os sprites da cidade ao reconstruir o
 // SDL_Renderer no retorno (ver Maestro::reacquire_city_renderer em maestro.cpp).
 int run_battle_preview_embedded(SDL_Window* window,
-                                 gus::domain::combat::CombatOutcome* out_outcome) {
+                                 gus::domain::combat::CombatOutcome* out_outcome,
+                                 bool* out_quit_requested) {
+    // FIX BUG-3 (playtest ao vivo do lider: fechar a janela durante a batalha reabria a
+    // cidade em LOOP INFINITO): comeca false; so vira true no MESMO handler de
+    // SDL_EVENT_QUIT que ja existia (ver o `while (running)` abaixo) - um sinal DISTINTO
+    // de qualquer CombatOutcome, gravado no choke-point de saida junto do outcome.
+    bool quit_requested = false;
     // ADR-009 adendo GL3: a janela usa contexto OpenGL 3.3 core (nao SDL_Renderer), pois o
     // HUD RmlUi-GL3 precisa de shaders (gradiente/box-shadow/blur). A arena (Render2dGl3) e
     // o HUD compartilham o MESMO contexto GL; swap unico (SDL_GL_SwapWindow).
@@ -1950,7 +1956,13 @@ int run_battle_preview_embedded(SDL_Window* window,
                     }
                 }
                 if (ev.type == SDL_EVENT_QUIT) {
+                    // FIX BUG-3: o jogador clicou no X da janela DURANTE a batalha. Isto
+                    // NAO e um CombatOutcome (nao e vitoria/derrota/fuga) - e um pedido
+                    // pra encerrar o PROGRAMA INTEIRO. Sinaliza via quit_requested (grava
+                    // no choke-point de saida, junto do outcome) - a Maestro usa isto pra
+                    // NAO voltar a cidade (ver run_battle_preview_embedded no header).
                     running = false;
+                    quit_requested = true;
                 } else if (ev.type == SDL_EVENT_KEY_DOWN) {
                     // Roteamento de teclado EXTRAIDO pra battle_key_down (funcao-livre, testavel
                     // pelo self-test sintetico; espelha battle_mouse_click). Cobre menu de verbos,
@@ -1997,6 +2009,24 @@ int run_battle_preview_embedded(SDL_Window* window,
                 dt = 1.0f / 60.0f;
             }
             scene.update(dt);  // anima os floaters + pacing; nao toca a FSM
+
+            // FIX BUG-2 (playtest ao vivo do lider: "perdi a batalha e ficou preso, so
+            // tocando musica e mais nada"): o loop ANTES so saia via Esc explicito
+            // (SDLK_ESCAPE, ver battle_key_down) ou fechando a janela - Victory/Defeat/
+            // Fled NUNCA eram checados aqui, entao ao perder (ou fugir) a tela ficava
+            // PARADA esperando um Esc que o jogador nao sabia que precisava apertar (a
+            // musica seguia tocando pq nada disparava o choke-point de saida/fade-out
+            // abaixo). FIX SIMETRICO: qualquer desfecho TERMINAL (Victory/Defeat/Fled -
+            // scene.combat_over(), ver BattleScene::combat_over) encerra o loop sozinho.
+            // O ultimo frame (com o floater/narracao da acao final, ja tocados durante o
+            // proprio turno em BattleScene::resolve_one_turn) ainda RENDERIZA e faz o
+            // SWAP mais abaixo nesta MESMA iteracao antes do loop checar `running` de
+            // novo - nao corta o quadro final no meio. NAO interfere nos self-tests
+            // acima: todos eles usam scripts que param de propósito ANTES de
+            // scene.combat_over() virar true (`for (...&& !scene.combat_over()...)`).
+            if (scene.combat_over()) {
+                running = false;
+            }
 
             // ANIM-SELFTEST (script de ACOES por frame; as capturas ficam no fim do
             // frame, apos render+compose). Timeline (dt 1/60): frame 1 dispara o demo
@@ -2401,6 +2431,12 @@ int run_battle_preview_embedded(SDL_Window* window,
         // nao como derrota (ver maestro.cpp).
         if (out_outcome != nullptr) {
             *out_outcome = scene.machine().outcome();
+        }
+        // FIX BUG-3: grava se o motivo da saida foi ESPECIFICAMENTE o jogador fechando a
+        // janela (distinto de qualquer CombatOutcome - ver o handler de SDL_EVENT_QUIT
+        // acima e o comentario no header). Default false (nullptr-safe).
+        if (out_quit_requested != nullptr) {
+            *out_quit_requested = quit_requested;
         }
 
         // MUSICA: fade-out ao SAIR da batalha (M6 F4, ADR-011). Unico CHOKE-POINT de saida

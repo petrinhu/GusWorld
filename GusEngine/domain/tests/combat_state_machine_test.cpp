@@ -232,6 +232,63 @@ TEST_CASE("fsm: CheckEnd fled quando fuga bem-sucedida", "[domain][combat][fsm]"
     REQUIRE(sm.outcome() == CombatOutcome::Fled);
 }
 
+// ----- CheckEnd: GUS-CENTRIC (canon, decisao do lider, M7-COSTURA BUG-4) -----
+//
+// "O Rei caiu = fim": o Gus (CombatActor::is_universal_compiler()==true) a HP 0 encerra
+// o combate em Defeat IMEDIATO, MESMO com companions ainda vivos - substitui o
+// wipe-total SO quando algum ator tem a flag setada (FSMs que nunca a setam preservam o
+// wipe-total legado de sempre, ver os testes acima, todos intactos).
+
+TEST_CASE("fsm: GUS-CENTRIC - Gus (is_universal_compiler) a HP 0 com companion AINDA "
+          "VIVO -> Defeat IMEDIATO (nao espera o wipe-total)",
+          "[domain][combat][fsm][bug4][gus-centric]") {
+    CombatActor gus("gus", "gus", /*max_hp=*/10, /*atk=*/1, /*def=*/2, /*spd=*/20,
+                     CardFamily::Eletrico, /*is_player_side=*/true, /*is_boss=*/false,
+                     /*knowledge_kills=*/0, /*is_universal_compiler=*/true);
+    CombatActor companion = hero("caua", /*hp=*/30, /*spd=*/15, /*atk=*/1, /*def=*/2);
+    CombatActor e = foe("enemy", /*hp=*/999, /*spd=*/1, /*atk=*/50, /*def=*/0);
+
+    CombatStateMachine sm({&gus, &companion, &e}, [&](CombatActor& a, const CombatState&) {
+        // O inimigo mira SEMPRE o Gus (dano 48/hit, 1-shot nos 10 hp); gus/companion so
+        // passam (nao importa quem ataca quem pra provar a condicao de fim).
+        return &a == &e ? CombatAction::attack(gus.id()) : CombatAction::pass();
+    });
+    sm.run_until_end();
+
+    REQUIRE(sm.outcome() == CombatOutcome::Defeat);
+    REQUIRE_FALSE(gus.is_alive());
+    // O companion NAO morreu (o inimigo so mirou o Gus) - prova que o Defeat veio da
+    // condicao GUS-CENTRIC, nao de um wipe-total coincidente.
+    REQUIRE(companion.is_alive());
+}
+
+TEST_CASE("fsm: SEM is_universal_compiler setado (legado), o id \"gus\" sozinho NAO "
+          "encerra o combate ao cair - wipe-total de sempre preservado (nao regride)",
+          "[domain][combat][fsm][bug4][gus-centric][regressao]") {
+    // hero() (helper deste arquivo) NAO seta is_universal_compiler (default false do
+    // construtor) - mesmo com id="gus", a flag fica false. Documenta que a condicao
+    // GUS-CENTRIC e disparada pela FLAG, nao pelo id-string "gus".
+    // spd: enemy(99) > h "gus"(20) > companion(15) - o inimigo age PRIMEIRO na rodada e
+    // 1-shota "gus" antes que companion tenha a chance de matar o inimigo (senao o
+    // combate acabaria em Victory ANTES de "gus" apanhar, sem provar nada).
+    CombatActor h = hero("gus", /*hp=*/10, /*spd=*/20, /*atk=*/1, /*def=*/2);
+    CombatActor companion = hero("caua", /*hp=*/30, /*spd=*/15, /*atk=*/1000, /*def=*/2);
+    CombatActor e = foe("enemy", /*hp=*/30, /*spd=*/99, /*atk=*/50, /*def=*/0);
+
+    CombatStateMachine sm({&h, &companion, &e}, [&](CombatActor& a, const CombatState&) {
+        if (&a == &e) return CombatAction::attack(h.id());       // sempre mira "gus"
+        if (&a == &companion) return CombatAction::attack(e.id());  // companion mata o inimigo
+        return CombatAction::pass();                                // "gus" so apanha
+    });
+    sm.run_until_end();
+
+    REQUIRE_FALSE(h.is_alive());  // "gus" (sem a flag) caiu no meio do combate
+    // Combate NAO terminou em Defeat so pq "gus" caiu - o companion seguiu lutando e
+    // venceu (wipe-total legado: so termina quando TODA a party cai, ou todos os
+    // inimigos caem).
+    REQUIRE(sm.outcome() == CombatOutcome::Victory);
+}
+
 // ----- CombatEnd -----
 
 TEST_CASE("fsm: CombatEnd produz resultado com outcome e log",

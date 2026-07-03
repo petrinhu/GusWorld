@@ -73,8 +73,16 @@ bool Maestro::init() {
         return false;
     }
 
-    enemy_aabb_ = pick_fixed_enemy_position(city_->grid(), city_->player_aabb(),
-                                             kEnemyOffsetTilesX, kEnemyOffsetTilesY);
+    // M7-COSTURA fix BUG-1 (playtest ao vivo do lider: "a batalha so ativou vindo do
+    // sul"): pick_fixed_enemy_position devolve so o ANCHOR (celula-alvo, AABB minusculo
+    // do tamanho do jogador); enemy_sprite_footprint_aabb deriva o AABB REAL (colisao E
+    // visual) usando a MESMA formula que o marcador desenha o quad do androide - hitbox
+    // e sprite visivel passam a COINCIDIR exatamente (ver maestro_logic.hpp).
+    const gus::core::spatial::Aabb enemy_anchor = pick_fixed_enemy_position(
+        city_->grid(), city_->player_aabb(), kEnemyOffsetTilesX, kEnemyOffsetTilesY);
+    enemy_aabb_ = enemy_sprite_footprint_aabb(
+        enemy_anchor, city_->tuning().player_sprite_height_tiles,
+        city_->grid().tile_size());
     enemy_defeated_ = false;
     // M7-COSTURA Inc 2: o inimigo fixo agora e VISIVEL no mapa - o mesmo placeholder de
     // androide (retrato_inimigo.png) que a tela de BATALHA ja usa pros inimigos (ver
@@ -96,12 +104,23 @@ void Maestro::run() {
         }
         if (should_trigger_battle(city_->player_aabb(), enemy_aabb_,
                                    enemy_defeated_)) {
-            to_battle(EncounterId::kFixedEnemy1);
+            // FIX BUG-3 (playtest ao vivo do lider: "cliquei no X pra fechar, a janela
+            // reabre na dungeon e em poucos ms vira batalha de novo; precisei pkill"):
+            // to_battle() devolve true SO quando o jogador pediu pra fechar a janela
+            // DURANTE a batalha - um sinal DISTINTO de qualquer CombatOutcome. Antes,
+            // esse quit era absorvido dentro de to_battle() (o SDL_EVENT_QUIT so parava
+            // o loop da BATALHA) e a Maestro voltava pra cidade como se fosse Ongoing -
+            // o jogador ainda sobre o inimigo, should_trigger_battle voltava true, e o
+            // loop reabria a batalha (LOOP INFINITO ate o pkill). Agora o quit propaga:
+            // encerra o `while (running)` da CIDADE tambem, sem re-renderizar nada.
+            if (should_stop_running_after_battle(to_battle(EncounterId::kFixedEnemy1))) {
+                running = false;
+            }
         }
     }
 }
 
-void Maestro::to_battle(EncounterId id) {
+bool Maestro::to_battle(EncounterId id) {
     (void)id;  // so 1 valor nesta onda (kFixedEnemy1) - o parametro ja existe pro futuro
 
     std::cout << "Maestro: [costura] esbarrou no inimigo -> ENTRANDO na batalha "
@@ -115,13 +134,25 @@ void Maestro::to_battle(EncounterId id) {
 
     gus::domain::combat::CombatOutcome outcome =
         gus::domain::combat::CombatOutcome::Ongoing;
-    const int rc =
-        gus::app::screens::run_battle_preview_embedded(window_, &outcome);
+    bool quit_requested = false;
+    const int rc = gus::app::screens::run_battle_preview_embedded(
+        window_, &outcome, &quit_requested);
     if (rc != 0) {
         SDL_Log(
             "Maestro: run_battle_preview_embedded devolveu %d (contexto GL/glad "
             "falhou) - outcome fica Ongoing, o inimigo NAO e marcado derrotado.",
             rc);
+    }
+
+    if (quit_requested) {
+        // FIX BUG-3: o jogador fechou a janela DENTRO da batalha. NAO volta pra cidade
+        // (on_battle_result/reacquire_renderer sao PULADOS de proposito - a janela vai
+        // ser destruida pelo dtor da Maestro de qualquer jeito, reconstruir o renderer
+        // da cidade agora so pra descarta-lo em seguida seria trabalho inutil). O
+        // outcome fica descartado (nao importa mais: o programa esta encerrando).
+        std::cout << "Maestro: [costura] janela fechada DURANTE a batalha -> "
+                     "encerrando o programa (sem voltar pra cidade).\n";
+        return true;
     }
 
     on_battle_result(outcome);
@@ -135,6 +166,7 @@ void Maestro::to_battle(EncounterId id) {
     std::cout << "Maestro: [costura] VOLTANDO pra cidade no mesmo ponto ("
               << city_->player_aabb().x << ", " << city_->player_aabb().y
               << "); inimigo_derrotado=" << (enemy_defeated_ ? "sim" : "nao") << ".\n";
+    return false;
 }
 
 void Maestro::on_battle_result(gus::domain::combat::CombatOutcome outcome) {

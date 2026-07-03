@@ -11,8 +11,10 @@
 
 using gus::app::aabb_overlaps;
 using gus::app::EncounterId;
+using gus::app::enemy_sprite_footprint_aabb;
 using gus::app::outcome_marks_enemy_defeated;
 using gus::app::pick_fixed_enemy_position;
+using gus::app::should_stop_running_after_battle;
 using gus::app::should_trigger_battle;
 using gus::core::spatial::Aabb;
 using gus::core::spatial::TileGrid;
@@ -350,4 +352,148 @@ TEST_CASE("EncounterId: kFixedEnemy1 existe (item 1 do escopo M7-COSTURA)",
           "[maestro][logic]") {
     constexpr auto id = EncounterId::kFixedEnemy1;
     CHECK(static_cast<int>(id) == 0);
+}
+
+// ============================================================================
+// BUG-1 (playtest ao vivo do lider, M7-COSTURA): "a tela de batalha so ativou
+// quando toquei o inimigo pelo sul". Ver o comentario de enemy_sprite_footprint_aabb
+// em maestro_logic.hpp pra causa raiz. Estes testes travam o FIX: o AABB derivado
+// coincide com o retangulo que o marcador visual desenha (mesma formula) e
+// should_trigger_battle dispara por QUALQUER direcao de contato.
+// ============================================================================
+
+TEST_CASE("enemy_sprite_footprint_aabb: quad quadrado, base=base do anchor, "
+          "centrado em X sobre o anchor",
+          "[maestro][logic][bug1]") {
+    // anchor tipico de pick_fixed_enemy_position: AABB minusculo (0.6 tile,
+    // tile_size=2.0 -> 1.2 unidades) centrado na celula (5,5).
+    const Aabb anchor{5.0f * 2.0f + 1.0f - 0.6f, 5.0f * 2.0f + 1.0f - 0.6f, 1.2f, 1.2f};
+    const float sprite_height_tiles = 2.75f;
+    const float tile_size = 2.0f;
+
+    const Aabb fp = enemy_sprite_footprint_aabb(anchor, sprite_height_tiles, tile_size);
+
+    const float expected_side = sprite_height_tiles * tile_size;  // 5.5
+    CHECK(fp.w == Catch::Approx(expected_side));
+    CHECK(fp.h == Catch::Approx(expected_side));
+    // base do quad == base do anchor (bottom_fraction=0, sem foot-inset).
+    CHECK(fp.y + fp.h == Catch::Approx(anchor.y + anchor.h));
+    // centrado em X sobre o anchor.
+    CHECK(fp.x + fp.w * 0.5f == Catch::Approx(anchor.x + anchor.w * 0.5f));
+}
+
+TEST_CASE("enemy_sprite_footprint_aabb: IDEMPOTENTE - realimentar o resultado na "
+          "MESMA formula de desenho reproduz o MESMO retangulo (hitbox == sprite "
+          "visivel, prova matematica de coincidencia)",
+          "[maestro][logic][bug1]") {
+    const Aabb anchor{12.3f, -4.7f, 1.2f, 1.2f};
+    const float sprite_height_tiles = 2.75f;
+    const float tile_size = 2.0f;
+
+    const Aabb fp = enemy_sprite_footprint_aabb(anchor, sprite_height_tiles, tile_size);
+    // Realimenta fp como se fosse o proprio anchor - overworld_sim.cpp faz exatamente
+    // isto ao desenhar (ea = enemy_aabb_, ja o footprint apos o fix).
+    const Aabb fp2 = enemy_sprite_footprint_aabb(fp, sprite_height_tiles, tile_size);
+
+    CHECK(fp2.x == Catch::Approx(fp.x));
+    CHECK(fp2.y == Catch::Approx(fp.y));
+    CHECK(fp2.w == Catch::Approx(fp.w));
+    CHECK(fp2.h == Catch::Approx(fp.h));
+}
+
+TEST_CASE("should_trigger_battle: com o AABB do footprint (FIX bug1), o jogador "
+          "dispara a batalha encostando por N, S, L OU O - nao so pelo sul",
+          "[maestro][logic][bug1]") {
+    // Reproduz a geometria real: anchor minusculo (0.6 tile = 1.2 unidades,
+    // tile_size=2.0) centrado na celula (10,10); jogador do MESMO tamanho do
+    // anchor (a hitbox real do jogador, city_scene.cpp kPlayerHitboxTileFraction).
+    const float tile_size = 2.0f;
+    const float sprite_height_tiles = 2.75f;
+    const float player_side = 0.6f * tile_size;  // 1.2 (mesma fracao do jogo real)
+
+    const Aabb anchor{10.0f * tile_size + tile_size * 0.5f - player_side * 0.5f,
+                       10.0f * tile_size + tile_size * 0.5f - player_side * 0.5f,
+                       player_side, player_side};
+    const Aabb enemy = enemy_sprite_footprint_aabb(anchor, sprite_height_tiles, tile_size);
+
+    const float cx = enemy.x + enemy.w * 0.5f;  // centro X do sprite visivel
+    const float cy = enemy.y + enemy.h * 0.5f;  // centro Y do sprite visivel
+
+    // Jogador chegando por cada direcao cardinal, parado BEM no meio do sprite
+    // visivel (onde o lider efetivamente esbarraria olhando pro androide na tela) -
+    // ANTES do fix, so o SUL (jogador colado na base = perto do anchor antigo)
+    // disparava; os outros 3 ficavam fantasmas (sem overlap).
+    const Aabb player_from_north{cx - player_side * 0.5f, enemy.y - player_side * 0.5f,
+                                  player_side, player_side};
+    const Aabb player_from_south{cx - player_side * 0.5f,
+                                  enemy.y + enemy.h - player_side * 0.5f, player_side,
+                                  player_side};
+    const Aabb player_from_west{enemy.x - player_side * 0.5f, cy - player_side * 0.5f,
+                                 player_side, player_side};
+    const Aabb player_from_east{enemy.x + enemy.w - player_side * 0.5f,
+                                 cy - player_side * 0.5f, player_side, player_side};
+    const Aabb player_center{cx - player_side * 0.5f, cy - player_side * 0.5f,
+                              player_side, player_side};
+
+    CHECK(should_trigger_battle(player_from_north, enemy, /*enemy_defeated=*/false));
+    CHECK(should_trigger_battle(player_from_south, enemy, /*enemy_defeated=*/false));
+    CHECK(should_trigger_battle(player_from_west, enemy, /*enemy_defeated=*/false));
+    CHECK(should_trigger_battle(player_from_east, enemy, /*enemy_defeated=*/false));
+    CHECK(should_trigger_battle(player_center, enemy, /*enemy_defeated=*/false));
+}
+
+TEST_CASE("should_trigger_battle: com o AABB ANTIGO (anchor cru, sem o fix), o "
+          "jogador vindo do NORTE/LESTE/OESTE NAO dispara - documenta o bug real "
+          "que motivou o fix (regressao)",
+          "[maestro][logic][bug1][regressao]") {
+    // MESMO anchor minusculo do teste acima, mas usado DIRETO como hitbox (o
+    // comportamento ANTES do fix - o que a Maestro fazia ate M7-COSTURA Inc 1).
+    const float tile_size = 2.0f;
+    const float sprite_height_tiles = 2.75f;
+    const float player_side = 0.6f * tile_size;
+
+    const Aabb anchor{10.0f * tile_size + tile_size * 0.5f - player_side * 0.5f,
+                       10.0f * tile_size + tile_size * 0.5f - player_side * 0.5f,
+                       player_side, player_side};
+    // O footprint so serve aqui pra achar onde o SPRITE VISIVEL fica (pra
+    // posicionar o jogador "olhando pro androide na tela", como o lider faria) -
+    // o hitbox testado abaixo e o `anchor` cru, nao o footprint.
+    const Aabb visible = enemy_sprite_footprint_aabb(anchor, sprite_height_tiles,
+                                                      tile_size);
+    const float cx = visible.x + visible.w * 0.5f;
+
+    // Jogador no meio do sprite visivel, vindo do norte (varios tiles acima do
+    // anchor minusculo) - visualmente "tocando" o androide, mas o anchor antigo
+    // (colado nos "pes", perto da base) fica longe demais: SEM overlap.
+    const Aabb player_from_north{cx - player_side * 0.5f, visible.y - player_side * 0.5f,
+                                  player_side, player_side};
+    CHECK_FALSE(should_trigger_battle(player_from_north, anchor,
+                                       /*enemy_defeated=*/false));
+
+    // Vindo do SUL (aproximando por baixo, sobrepondo a base do anchor - onde o
+    // hitbox antigo realmente morava): DISPARA - e por isso que o lider so
+    // conseguia entrar em batalha encostando por ali.
+    const Aabb player_from_south{anchor.x, anchor.y + anchor.h * 0.5f, anchor.w,
+                                  anchor.h};
+    CHECK(should_trigger_battle(player_from_south, anchor, /*enemy_defeated=*/false));
+}
+
+// ============================================================================
+// BUG-3 (playtest ao vivo do lider, M7-COSTURA): "cliquei no X pra fechar durante a
+// batalha; a janela reabriu na dungeon e em poucos ms virou batalha de novo; precisei
+// pkill". Trava o CONTRATO de roteamento do run() da Maestro: SO o quit_requested vindo
+// da batalha encerra o loop da cidade; qualquer outro motivo de retorno (Victory/
+// Defeat/Fled/Ongoing) mantem o loop rodando.
+// ============================================================================
+
+TEST_CASE("should_stop_running_after_battle: quit_requested=true -> encerra o loop da "
+          "cidade (fix bug3: fechar a janela na batalha nao pode reabrir a cidade)",
+          "[maestro][logic][bug3]") {
+    CHECK(should_stop_running_after_battle(/*battle_requested_quit=*/true));
+}
+
+TEST_CASE("should_stop_running_after_battle: false (Victory/Defeat/Fled/Ongoing) -> o "
+          "loop da cidade CONTINUA (comportamento de sempre, nao regride)",
+          "[maestro][logic][bug3]") {
+    CHECK_FALSE(should_stop_running_after_battle(/*battle_requested_quit=*/false));
 }

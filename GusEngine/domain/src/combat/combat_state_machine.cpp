@@ -144,6 +144,18 @@ CombatStateMachine::CombatStateMachine(
     phase_ = CombatPhase::SetupPhase;
     outcome_ = CombatOutcome::Ongoing;
 
+    // GUS-CENTRIC (BUG-4): cacheia o ator com is_universal_compiler()==true (o Gus), se
+    // algum foi passado - AQUI, em SetupPhase, ANTES de qualquer prune_dead() (a fila
+    // ainda tem TODOS os atores). check_end() consulta gus_actor_ diretamente (nao a
+    // fila) pra sobreviver ao prune. nullptr se nenhum ator tiver a flag (comportamento
+    // legado de wipe-total preservado).
+    for (CombatActor* a : queue_.order()) {
+        if (a->is_player_side() && a->is_universal_compiler()) {
+            gus_actor_ = a;
+            break;
+        }
+    }
+
     // Regroup por lado da RODADA 0 (§4.1): a fila ja veio ordenada por SPD; agrupa "quem abre
     // inteiro, depois o outro" (stable_partition, Gambito-safe). Fronteira da 1a rodada => o
     // cursor fica em 0 (primeiro ator do lado que abre). As rodadas 1+ reagrupam no wrap de
@@ -357,6 +369,19 @@ bool CombatStateMachine::check_end() {
 
     if (outcome_ == CombatOutcome::Fled)
         return true;  // fuga ja registrada na resolucao
+
+    // GUS-CENTRIC (canon, decisao do lider, M7-COSTURA BUG-4): "o Rei caiu = fim". O Gus
+    // (is_universal_compiler()==true) a HP 0 encerra o combate em Defeat IMEDIATO, MESMO
+    // com companions ainda vivos - a party recua com ele. Companions caidos sozinhos NAO
+    // encerram o combate (ficam incapacitados, canon Pillar 4); so o Gus domina esta
+    // condicao - por isso o check vem ANTES (e independente) do wipe-total abaixo.
+    // gus_actor_ (cacheado no construtor, sobrevive ao prune_dead() acima) e nullptr se
+    // nenhum ator tiver a flag - nesse caso o comportamento legado de wipe-total segue
+    // 100% intacto (nenhuma regressao pras FSMs headless/testes que nunca a setam).
+    if (gus_actor_ != nullptr && !gus_actor_->is_alive()) {
+        outcome_ = CombatOutcome::Defeat;
+        return true;
+    }
 
     if (!any_player_alive) {
         outcome_ = CombatOutcome::Defeat;

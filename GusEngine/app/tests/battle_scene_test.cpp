@@ -26,6 +26,7 @@
 #include "gus/app/screens/battle_sprite_anim.hpp"  // ActorSpriteSet/BattleClipId (W3)
 #include "gus/domain/combat/combat_actor.hpp"
 #include "gus/domain/combat/combat_constants.hpp"  // kMultFraco (expectativa D3 no teste)
+#include "gus/domain/combat/combat_enums.hpp"       // CombatOutcome (BUG-5, equilibrio)
 #include "gus/domain/combat/weakness_wheel.hpp"     // WeaknessWheel (fraco = 1.5 no teste)
 #include "gus/platform/audio/audio_engine.hpp"  // AudioEngine/SoundId (M6 F3, ADR-011)
 #include "gus/platform/render2d/i_renderer.hpp"
@@ -261,15 +262,18 @@ TEST_CASE("BattleScene monta o encontro de demo e le a fila do motor",
           "[battle_scene]") {
     BattleScene scene;
     REQUIRE(scene.party_count() == 3);
-    REQUIRE(scene.enemy_count() == 4);
+    // M7-COSTURA BUG-5 (rebalanceamento): 2 inimigos (ERA 4 - impossivel de vencer com
+    // o GUS-CENTRIC do BUG-4). Ver o comentario de make_demo_actors (battle_scene.cpp).
+    REQUIRE(scene.enemy_count() == 2);
     // Pode haver dano (inimigo de maior SPD age primeiro no incremento 3), mas todos os
-    // 7 atores seguem vivos na demo (ataque basico nao mata em 1 hit aqui).
-    REQUIRE(scene.queue_len() == 7);
+    // 5 atores (3 party + 2 inimigos) seguem vivos na demo (ataque basico nao mata em 1
+    // hit aqui).
+    REQUIRE(scene.queue_len() == 5);
     REQUIRE(scene.active_actor() != nullptr);
     // INCREMENTO 6 (D10): a cena comeca PARADA na intro - NINGUEM agiu ainda. O ator
-    // ativo e o de maior SPD (inimigo3, 13), mas ele so age quando o ritmo comeca.
+    // ativo e o de maior SPD (inimigo2/Drone, 13), mas ele so age quando o ritmo comeca.
     REQUIRE(scene.is_intro());
-    REQUIRE(scene.active_actor()->spd() == 13);  // inimigo3 esperando o ritmo comecar
+    REQUIRE(scene.active_actor()->spd() == 13);  // inimigo2/Drone esperando o ritmo comecar
     REQUIRE_FALSE(scene.combat_over());
 }
 
@@ -279,6 +283,70 @@ TEST_CASE("BattleScene acha o Gus na party pelo compilador universal",
     const int gi = scene.gus_party_index();
     REQUIRE(gi >= 0);
     REQUIRE(gi < scene.party_count());
+}
+
+// ============================================================================
+// BUG-5 (M7-COSTURA, playtest ao vivo do lider): "o encontro de demo e IMPOSSIVEL de
+// vencer" (4 inimigos vs 3 party + GUS-CENTRIC do BUG-4 = derrota garantida). PROVA
+// EMPIRICA (nao so aritmetica de papel) via a API PUBLICA da BattleScene - a MESMA que
+// o cockpit real usa - de que o encontro REBALANCEADO (2 inimigos, ver make_demo_actors
+// em battle_scene.cpp) e EQUILIBRADO: joga bem -> Victory; joga PASSIVO -> Defeat.
+// ============================================================================
+
+TEST_CASE("BUG-5: encontro de demo rebalanceado - focus-fire (jogar bem) -> VICTORY, "
+          "o Gus sobrevive ate o fim",
+          "[battle_scene][bug5]") {
+    BattleScene scene;
+    // player_attack mira o alvo SUGERIDO (D3, first_alive_enemy) - repeti-lo a cada vez
+    // que e a vez de um membro da party e o FOCUS-FIRE natural (todo mundo bate no
+    // MESMO inimigo ate ele cair, so entao o alvo sugerido migra pro proximo). Mesmo
+    // padrao de "conduz o combate ate o fim" ja usado alhures neste arquivo (guard-loop).
+    int guard = 0;
+    while (!scene.combat_over() && guard++ < 400) {
+        pump_to_player_turn(scene);
+        if (scene.combat_over()) {
+            break;
+        }
+        player_attack(scene);
+    }
+    REQUIRE(scene.combat_over());
+    REQUIRE(scene.machine().outcome() == gus::domain::combat::CombatOutcome::Victory);
+    // O Gus (compilador universal, id "gus") chegou VIVO ao fim - a vitoria veio de
+    // LIMPAR os 2 inimigos, nao de sorte/timing (se o Gus tivesse caido, o outcome
+    // seria Defeat IMEDIATO por GUS-CENTRIC - BUG-4 - independente do estado dos
+    // inimigos). Acha o Gus pela fila (pode ter sido podado se morto - so sobra vivo).
+    bool gus_found_alive = false;
+    for (const gus::domain::combat::CombatActor* a : scene.machine().queue().order()) {
+        if (a != nullptr && a->id() == "gus") {
+            gus_found_alive = a->is_alive();
+        }
+    }
+    REQUIRE(gus_found_alive);
+}
+
+TEST_CASE("BUG-5: encontro de demo rebalanceado - jogo PASSIVO (Defender sempre, "
+          "nunca ataca) -> DEFEAT (o Gus cai primeiro, GUS-CENTRIC domina)",
+          "[battle_scene][bug5]") {
+    BattleScene scene;
+    // Nenhum membro da party ataca em NENHUM turno - os 2 inimigos nunca morrem, o
+    // relogio corre so numa direcao (dano neles). ScriptedBrain mira SEMPRE o alvo de
+    // maior SPD vivo (ver scripted_brain.cpp): Caua (spd 12) primeiro; quando ele cai,
+    // migra pro Gus (spd 9 > Jaci spd 7) - o Gus cai a seguir e o combate acaba em
+    // Defeat IMEDIATO (BUG-4), sem esperar o wipe-total da party inteira.
+    int guard = 0;
+    while (!scene.combat_over() && guard++ < 400) {
+        pump_to_player_turn(scene);
+        if (scene.combat_over()) {
+            break;
+        }
+        if (scene.is_choosing_actor()) {
+            scene.actor_picker_confirm();  // atravessa o picker (§4.1), nao ataca
+        }
+        select_verb(scene, BattleVerb::Defender);
+        scene.menu_confirm();  // Defender resolve na hora (sem mira/windup)
+    }
+    REQUIRE(scene.combat_over());
+    REQUIRE(scene.machine().outcome() == gus::domain::combat::CombatOutcome::Defeat);
 }
 
 TEST_CASE("BattleScene::render abre/fecha 1 frame com camera logica 960x540",
@@ -302,10 +370,11 @@ TEST_CASE("BattleScene::render desenha 1 placeholder por ator (esquerda x direit
     CountingRenderer r;
     scene.render(r, 640.0f, 360.0f);
 
-    // Fundo + faixa CTB + 7 atores + 5 celulas CTB + painel + log = varios fills.
-    REQUIRE(r.fills.size() >= 7);  // pelo menos um por ator
+    // Fundo + faixa CTB + 5 atores (3 party + 2 inimigos, BUG-5) + celulas CTB + painel
+    // + log = varios fills.
+    REQUIRE(r.fills.size() >= 5);  // pelo menos um por ator
 
-    // Atores: 3 na metade esquerda (party) e 4 na metade direita (inimigos). O slot tem
+    // Atores: 3 na metade esquerda (party) e 2 na metade direita (inimigos, BUG-5). O slot tem
     // LARGURA e ALTURA FIXAS (kActorSlotW x kActorSlotH, sem escala dinamica - D3, 960x540
     // lider 2026-06-25). Conta os fills de largura kActorSlotW (so os slots de ator tem
     // essa largura; a barra de HP da arena e mais estreita, painel/log mais largos, CTB e
@@ -325,7 +394,7 @@ TEST_CASE("BattleScene::render desenha 1 placeholder por ator (esquerda x direit
         return n;
     };
     REQUIRE(count_actor_slots(0.0f, mid_x) == 3);  // party esquerda
-    REQUIRE(count_actor_slots(mid_x, static_cast<float>(kBattleLogicalW)) == 4);  // inimigos
+    REQUIRE(count_actor_slots(mid_x, static_cast<float>(kBattleLogicalW)) == 2);  // inimigos (BUG-5)
     (void)fills_in_x_band;  // helper disponivel pra evolucao do teste
 }
 
@@ -460,7 +529,8 @@ TEST_CASE("arena desenha 1 mini-barra de HP por ator vivo (7 barras)",
     // (largura <= 56) na MESMA posicao (x,y). Como party (x=40) e inimigos (x=544) ficam
     // centralizados na MESMA banda, varios Y coincidem entre os lados; o que e unico por
     // ator e o par (x,y). Contar pares (x,y) distintos entre os fills de altura
-    // kArenaHpBarH da exatamente 1 barra por ator (7), sem depender de cor.
+    // kArenaHpBarH da exatamente 1 barra por ator (5, BUG-5: 3 party + 2 inimigos),
+    // sem depender de cor.
     std::vector<std::pair<float, float>> bar_pos;
     for (const auto& f : r.fills) {
         if (f.rect.h == static_cast<float>(kArenaHpBarH)) {
@@ -477,7 +547,7 @@ TEST_CASE("arena desenha 1 mini-barra de HP por ator vivo (7 barras)",
             }
         }
     }
-    REQUIRE(bar_pos.size() == 7);  // 3 party (x=40) + 4 inimigos (x=544)
+    REQUIRE(bar_pos.size() == 5);  // 3 party (x=40) + 2 inimigos (x=544), BUG-5
 }
 
 TEST_CASE("mini-barra de HP reflete dano real (apos um ataque)", "[battle_scene]") {

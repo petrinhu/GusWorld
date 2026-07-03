@@ -194,27 +194,54 @@ int count_alive(const gus::domain::combat::CombatStateMachine& m, bool player_si
     return n;
 }
 
-// Encontro de DEMO (M5 navegavel): party de 3 (Gus + Caua + Jaci) vs 4 inimigos. Stats
-// arbitrarios so pra dar SPD distinta (a fila ordena por SPD desc) e exercitar o
-// is_universal_compiler do Gus (recuo D3). NAO e balanceamento: e cenario de tela.
+// Encontro de DEMO (M5 navegavel; REBALANCEADO M7-COSTURA BUG-5, playtest ao vivo do
+// lider): party de 3 (Gus + Caua + Jaci) vs 2 inimigos (ERA 4 - "impossivel de
+// vencer": 4 inimigos = 4 acoes/rodada contra so 3 da party, empilhado com o GUS-
+// CENTRIC do BUG-4 (Gus a HP 0 = Defeat IMEDIATO) deixava o lider SEMPRE perdendo).
+// NAO e balanceamento CANONICO do jogo - e placeholder de QA, so pra este encontro de
+// tela ser EQUILIBRADO (vencivel jogando bem, perdivel jogando mal). Ver o teste
+// empirico "make_demo_actors: equilibrio" em battle_scene_test.cpp (BUG-5) - simula os
+// 2 estilos de jogo pela API PUBLICA da BattleScene (nao reimplementa a formula).
+//
+// NUMEROS FINAIS (dano = max(1, atk-def), secao 11):
+//   Party: Gus  hp=55 atk=11 def=5 spd=9  (compilador universal - GUS-CENTRIC)
+//          Caua hp=60 atk=11 def=6 spd=12 (maior SPD da party -> ScriptedBrain mira ELE
+//                                          primeiro, NUNCA o Gus, enquanto vivo - ver
+//                                          scripted_brain.cpp: alvo = alive_players().
+//                                          front(), que segue a fila ordenada por SPD)
+//          Jaci hp=50 atk=9  def=5 spd=7
+//   Inimigos: Sentinela hp=28 atk=13 def=4 spd=11
+//             Drone     hp=22 atk=11 def=3 spd=13
+//   Dano da party (focus-fire, "jogando bem"): Gus/Caua ~7-8, Jaci ~5-6 por hit; os 2
+//   inimigos (28+22=50 hp) caem em ~2-3 rodadas de fila focada.
+//   Dano dos inimigos (SEMPRE em Caua, o alvo de maior SPD, enquanto ele viver):
+//   ~14-15/rodada -> Caua (60 hp) cairia em ~4 rodadas SE ninguem revidasse - tempo de
+//   sobra pra limpar os 2 inimigos ANTES disso jogando ativamente (vitoria). So jogando
+//   PASSIVO (nunca atacar - Defender/Scan o combate inteiro) o relogio vence: Caua cai
+//   (~4 rodadas), os inimigos entao migram pro proximo maior SPD vivo (Gus, 9 > Jaci,
+//   7) e o Gus cai pouco depois - Defeat IMEDIATO (BUG-4).
 std::vector<std::unique_ptr<CombatActor>> make_demo_actors() {
     std::vector<std::unique_ptr<CombatActor>> v;
-    auto add = [&v](std::string id, std::string name, int hp, int spd,
+    auto add = [&v](std::string id, std::string name, int hp, int atk, int def, int spd,
                     CardFamily fam, bool player, bool gus) {
         v.push_back(std::make_unique<CombatActor>(
-            std::move(id), std::move(name), hp, /*atk=*/10, /*def=*/5, spd, fam,
-            player, /*is_boss=*/false, /*knowledge_kills=*/0,
+            std::move(id), std::move(name), hp, atk, def, spd, fam, player,
+            /*is_boss=*/false, /*knowledge_kills=*/0,
             /*is_universal_compiler=*/gus));
     };
     // Party (player_side = true). Gus = compilador universal.
-    add("gus", "Gus", 55, 9, CardFamily::Criptografico, true, true);
-    add("caua", "Caua", 60, 12, CardFamily::Eletrico, true, false);
-    add("jaci", "Jaci", 50, 7, CardFamily::Bioquimico, true, false);
-    // Inimigos (player_side = false). SPD variada pra intercalar a fila.
-    add("inimigo1", "Sentinela", 40, 11, CardFamily::Cinetico, false, false);
-    add("inimigo2", "Sentinela", 40, 6, CardFamily::Cinetico, false, false);
-    add("inimigo3", "Drone", 30, 13, CardFamily::Sonico, false, false);
-    add("inimigo4", "Drone", 30, 8, CardFamily::Sonico, false, false);
+    add("gus", "Gus", 55, /*atk=*/11, /*def=*/5, /*spd=*/9, CardFamily::Criptografico,
+        true, true);
+    add("caua", "Caua", 60, /*atk=*/11, /*def=*/6, /*spd=*/12, CardFamily::Eletrico,
+        true, false);
+    add("jaci", "Jaci", 50, /*atk=*/9, /*def=*/5, /*spd=*/7, CardFamily::Bioquimico,
+        true, false);
+    // Inimigos (player_side = false). 2 (ERA 4, BUG-5) - SPD variada pra intercalar a
+    // fila.
+    add("inimigo1", "Sentinela", 28, /*atk=*/13, /*def=*/4, /*spd=*/11,
+        CardFamily::Cinetico, false, false);
+    add("inimigo2", "Drone", 22, /*atk=*/11, /*def=*/3, /*spd=*/13, CardFamily::Sonico,
+        false, false);
 
     // ABERTURA LIMPA (incremento 6, BUG B): os atores comecam com HP CHEIO - "ninguem
     // agiu" (D10). Antes o demo pre-aplicava dano (HP parcial) pra exibir as barras, mas

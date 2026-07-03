@@ -87,6 +87,15 @@ public:
     // parede, qualquer que seja o mapa real/fallback carregado).
     [[nodiscard]] const gus::core::spatial::TileGrid& grid() const noexcept;
 
+    // Tuning vigente do OverworldSim (leitura) - a Maestro usa isto (M7-COSTURA, fix
+    // BUG-1 do playtest ao vivo: "a hitbox do inimigo so ativa vindo do sul") pra
+    // derivar o AABB REAL do inimigo (colisao) a partir do MESMO player_sprite_height_
+    // tiles que o marcador visual usa pra desenhar o quad do androide (overworld_sim.cpp,
+    // MARCADOR DE INIMIGO FIXO) - so assim hitbox e sprite COINCIDEM. Reexpoe
+    // OverworldSim::tuning() (ja publico) sem a Maestro precisar conhecer o OverworldSim
+    // por dentro (mesmo espirito de player_aabb/grid acima).
+    [[nodiscard]] const gus::app::screens::OverworldTuning& tuning() const noexcept;
+
     // M7-COSTURA Inc 2 (o inimigo fixo agora e VISIVEL): define/reposiciona o marcador
     // visual do inimigo fixo em `aabb` - carrega (ou recarrega) a MESMA textura de
     // androide que a tela de BATALHA usa pros inimigos (retrato_inimigo.png,

@@ -231,4 +231,8 @@ const gus::core::spatial::TileGrid& SdlWindow::grid() const noexcept {
     return sim_->grid();
 }
 
+const gus::app::screens::OverworldTuning& SdlWindow::tuning() const noexcept {
+    return sim_->tuning();
+}
+
 }  // namespace gus::app

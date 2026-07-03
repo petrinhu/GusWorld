@@ -267,6 +267,15 @@ private:
     CombatPhase phase_ = CombatPhase::SetupPhase;
     CombatOutcome outcome_ = CombatOutcome::Ongoing;
 
+    // GUS-CENTRIC (canon, decisao do lider, M7-COSTURA BUG-4): ponteiro NAO-DONO pro ator
+    // com is_player_side() && is_universal_compiler()==true (o Gus), cacheado no
+    // construtor (SetupPhase, antes de qualquer prune). check_end() consulta ISTO (nao a
+    // fila, ja podada) pra saber se o Gus caiu, mesmo depois de prune_dead() te-lo
+    // removido de queue_ (prune so tira da FILA de iniciativa - o objeto CombatActor
+    // continua vivo no escopo do dono, o ponteiro segue valido). nullptr se nenhum ator
+    // tem a flag (FSMs headless/testes que nunca a setam preservam o wipe-total legado).
+    CombatActor* gus_actor_ = nullptr;
+
     // Janela de Comando da Party (§4.1): membro escolhido pelo host para o PROXIMO
     // begin_turn (comando livre). nullptr = sem escolha => default (queue_.current()).
     // One-shot: begin_turn consome e zera. Ponteiro NAO-DONO (ator vive no escopo do dono).

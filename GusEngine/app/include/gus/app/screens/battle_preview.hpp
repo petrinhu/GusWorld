@@ -58,13 +58,24 @@ void battle_key_down(BattleScene& scene, SDL_Keycode key, bool& running);
 // M7-COSTURA: roda o loop de batalha (mesma BattleScene/mesmo esqueleto) numa janela JA
 // CRIADA por quem chama (a Maestro). NAO chama SDL_Init/SDL_Quit nem cria/destroi a
 // janela - so o CONTEXTO GL (criado na entrada, destruido na saida; ver ADR-012 Onda 1,
-// "trocar escondido atras do preto"). Esc/fechar a janela encerra o loop; qualquer saida
-// converge no MESMO choke-point, que grava o CombatOutcome final (Victory/Defeat/Fled/
-// Ongoing se a janela foi fechada no meio) em *out_outcome, se nao-nulo. Devolve 0 ok, !=0
-// se a criacao do contexto GL ou o load de funcoes GL falhar (a janela segue viva - quem
-// chamou decide o que fazer).
+// "trocar escondido atras do preto"). O loop sai por 3 motivos DISTINTOS: (1) o combate
+// chegou a um desfecho TERMINAL (Victory/Defeat/Fled - fix BUG-2 do playtest ao vivo do
+// lider: "perdi a batalha e ficou preso, so tocando musica" - o loop antigo so saia via
+// Esc explicito, entao Defeat/Fled nunca eram detectados aqui e a tela ficava parada);
+// (2) o jogador apertou Esc (pilha de modais vazia); (3) o jogador FECHOU A JANELA
+// (SDL_EVENT_QUIT) - este ultimo e um sinal DISTINTO de qualquer CombatOutcome (fechar a
+// janela nao e "vitoria/derrota/fuga", e "encerrar o PROGRAMA INTEIRO"; fix BUG-3: sem
+// isto o quit era absorvido aqui e a Maestro reabria a cidade num LOOP INFINITO se o
+// jogador ainda estivesse sobre o inimigo). Todos os 3 motivos convergem no MESMO
+// choke-point: grava o CombatOutcome final (Victory/Defeat/Fled/Ongoing se a janela foi
+// fechada no meio) em *out_outcome (se nao-nulo) E se o motivo foi especificamente (3) em
+// *out_quit_requested (se nao-nulo; default false). A Maestro usa out_quit_requested pra
+// decidir "encerrar o app" (nao "voltar pra cidade"). Devolve 0 ok, !=0 se a criacao do
+// contexto GL ou o load de funcoes GL falhar (a janela segue viva - quem chamou decide o
+// que fazer).
 int run_battle_preview_embedded(SDL_Window* window,
-                                 gus::domain::combat::CombatOutcome* out_outcome);
+                                 gus::domain::combat::CombatOutcome* out_outcome,
+                                 bool* out_quit_requested = nullptr);
 
 // Roda o viewer da BattleScene: SDL_Init proprio, janela PROPRIA, loop de render do
 // esqueleto (camera logica 960x540 escalada por inteiro x2 = 1080p), Esc/fechar encerra.

@@ -71,6 +71,43 @@ enum class EncounterId : int {
     const gus::core::spatial::Aabb& player_start, int offset_tiles_x,
     int offset_tiles_y) noexcept;
 
+// FIX BUG-1 (playtest ao vivo do lider, M7-COSTURA: "a tela de batalha so ativou
+// quando toquei o inimigo pelo sul"). Causa raiz: `pick_fixed_enemy_position` devolve
+// um AABB MINUSCULO (mesmo w/h do jogador, ~0.6 tile) centrado na celula-alvo - esse
+// AABB minusculo era usado DIRETO como hitbox de colisao, mas o SPRITE VISIVEL do
+// androide (overworld_sim.cpp, MARCADOR DE INIMIGO FIXO) e desenhado bem maior
+// (quad quadrado de player_sprite_height_tiles*tile_size, ~2.75 tiles) com a BASE do
+// quad = base do anchor e centrado em X sobre ele - o corpo visivel "vaza" pra cima
+// do anchor. So encostar bem no pe do androide (vindo do sul, onde o anchor mora)
+// disparava; vindo de qualquer outro lado o jogador via o corpo mas nao tocava a
+// hitbox (fantasma).
+//
+// Esta funcao deriva o AABB REAL (colisao E visual) usando a MESMA formula que o
+// desenho usa (ver overworld_sim.cpp: ex = anchor.x + anchor.w*0.5 - esprite_w*0.5;
+// ey = sprite_top_y(anchor.y+anchor.h, esprite_h, 0, 0) = base do anchor - esprite_h)
+// - por construcao, hitbox e sprite desenhado COINCIDEM exatamente (prova matematica:
+// e IDEMPOTENTE re-alimentar este resultado de volta no mesmo calculo de desenho, ver
+// maestro_logic_test.cpp). NAO maior que o sprite (evita disparar de longe), NAO menor
+// (evita o fantasma) - literalmente o retangulo que o jogador VE.
+[[nodiscard]] gus::core::spatial::Aabb enemy_sprite_footprint_aabb(
+    const gus::core::spatial::Aabb& anchor, float sprite_height_tiles,
+    float tile_size) noexcept;
+
+// FIX BUG-3 (playtest ao vivo do lider: "fechei a janela DURANTE a batalha e ela
+// reabriu a cidade, virou LOOP INFINITO ate eu dar pkill"). Contrato do run() da
+// Maestro: `while (running) { ...; if (should_stop_running_after_battle(to_battle(id)))
+// running = false; }`. Extraido como funcao PURA (em vez de deixar so a linha inline em
+// maestro.cpp) pra travar o roteamento com um teste headless, sem precisar de janela/
+// SDL_Init - Maestro::to_battle() devolve `battle_requested_quit=true` UNICAMENTE
+// quando run_battle_preview_embedded sinalizou out_quit_requested (o jogador fechou a
+// janela DENTRO da batalha - um sinal DISTINTO de qualquer CombatOutcome); QUALQUER
+// outro desfecho (Victory/Defeat/Fled/Ongoing) devolve false daquela funcao, entao esta
+// aqui devolve false tambem e o loop da cidade CONTINUA (comportamento de sempre).
+[[nodiscard]] constexpr bool should_stop_running_after_battle(
+    bool battle_requested_quit) noexcept {
+    return battle_requested_quit;
+}
+
 }  // namespace gus::app
 
 #endif  // GUS_APP_MAESTRO_LOGIC_HPP

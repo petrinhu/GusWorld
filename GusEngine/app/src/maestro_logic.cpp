@@ -10,6 +10,8 @@
 #include <utility> // std::pair
 #include <vector>
 
+#include "gus/app/screens/sprite_anchor.hpp"  // sprite_top_y - MESMA formula do desenho
+
 namespace gus::app {
 
 namespace {
@@ -156,6 +158,26 @@ gus::core::spatial::Aabb pick_fixed_enemy_position(
     enemy.x = (static_cast<float>(best_cx) + 0.5f) * ts - enemy.w * 0.5f;
     enemy.y = (static_cast<float>(best_cy) + 0.5f) * ts - enemy.h * 0.5f;
     return enemy;
+}
+
+gus::core::spatial::Aabb enemy_sprite_footprint_aabb(
+    const gus::core::spatial::Aabb& anchor, float sprite_height_tiles,
+    float tile_size) noexcept {
+    // MESMA formula de overworld_sim.cpp (MARCADOR DE INIMIGO FIXO): quad quadrado,
+    // centrado em X sobre o anchor, base do quad = base do anchor (bottom_fraction=0,
+    // manual_offset=0 - sem foot-inset, e um busto/icone, nao um sprite de corpo com
+    // pes medidos).
+    const float esprite_h = sprite_height_tiles * tile_size;
+    const float esprite_w = esprite_h;  // retrato quadrado
+
+    gus::core::spatial::Aabb fp;
+    fp.w = esprite_w;
+    fp.h = esprite_h;
+    fp.x = anchor.x + anchor.w * 0.5f - esprite_w * 0.5f;
+    fp.y = gus::app::screens::sprite_top_y(anchor.y + anchor.h, esprite_h,
+                                            /*bottom_fraction=*/0.0f,
+                                            /*manual_offset_world=*/0.0f);
+    return fp;
 }
 
 }  // namespace gus::app

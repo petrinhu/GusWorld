@@ -64,8 +64,14 @@ private:
     // contexto GL), roda o loop da BattleScene na MESMA janela ate o jogador
     // resolver/fugir/fechar, le o outcome final e chama on_battle_result. Ao final,
     // reconstroi o renderer da cidade (recarrega sprites - handles antigos nao
-    // sobrevivem, ver sdl_window.hpp/reacquire_renderer).
-    void to_battle(EncounterId id);
+    // sobrevivem, ver sdl_window.hpp/reacquire_renderer). FIX BUG-3 (playtest ao vivo do
+    // lider: fechar a janela DURANTE a batalha reabria a cidade em LOOP INFINITO):
+    // devolve true se o jogador pediu pra FECHAR A JANELA durante a batalha (sinal
+    // DISTINTO de qualquer CombatOutcome) - o chamador (run()) DEVE encerrar o programa
+    // na hora, sem voltar a renderizar a cidade (por isso on_battle_result/
+    // reacquire_renderer sao PULADOS nesse caso: a janela esta fechando de qualquer
+    // jeito). false = retorno normal pra cidade (Victory/Defeat/Fled/Ongoing).
+    [[nodiscard]] bool to_battle(EncounterId id);
 
     // Roteamento outcome->acao (delega a logica pura pra maestro_logic.hpp): Victory
     // marca o inimigo derrotado (flag em memoria + some do mapa - nao dispara mais
