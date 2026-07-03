@@ -1170,12 +1170,20 @@ void battle_key_down(BattleScene& scene, SDL_Keycode key, bool& running) {
     }
 }
 
-int run_battle_preview() {
-    if (!SDL_Init(SDL_INIT_VIDEO)) {
-        std::cerr << "BattlePreview: SDL_Init falhou: " << SDL_GetError() << "\n";
-        return 1;
-    }
-
+// M7-COSTURA (ADR-012 Onda 1): "trocar escondido atras do preto" - viabilidade validada
+// EMPIRICAMENTE (probes standalone fora da arvore, nao commitados) num build SDL3 real
+// (X11/Mesa, GL 4.6 core): destruir o SDL_Renderer da cidade, criar um contexto GL na
+// MESMA janela (mesmo sem SDL_WINDOW_OPENGL setado na criacao original), rodar a
+// batalha, destruir o contexto, recriar o SDL_Renderer - tudo na MESMA SDL_Window, em
+// ciclo repetido (cidade->batalha->cidade->batalha), sem crash/hang. Os atributos GL
+// (profile/versao/stencil) sao setados de novo a CADA entrada na batalha (nao precisam
+// ter sido setados na criacao da janela) - por isso run_battle_preview_embedded() os
+// seta aqui, e nao so no wrapper standalone. Custo real aceito (nao e "pesadelo
+// tecnico", e um tradeoff conhecido): TextureId da SDL_Renderer antiga NAO sobrevivem a
+// destruicao do renderer - a Maestro RECARREGA os sprites da cidade ao reconstruir o
+// SDL_Renderer no retorno (ver Maestro::reacquire_city_renderer em maestro.cpp).
+int run_battle_preview_embedded(SDL_Window* window,
+                                 gus::domain::combat::CombatOutcome* out_outcome) {
     // ADR-009 adendo GL3: a janela usa contexto OpenGL 3.3 core (nao SDL_Renderer), pois o
     // HUD RmlUi-GL3 precisa de shaders (gradiente/box-shadow/blur). A arena (Render2dGl3) e
     // o HUD compartilham o MESMO contexto GL; swap unico (SDL_GL_SwapWindow).
@@ -1185,51 +1193,10 @@ int run_battle_preview() {
     SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
     SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);  // o GL3 do RmlUi usa stencil (clip mask)
 
-    // FIX W1 item 2 (lider: "maximizada, a base da cena desliza pra tras da barra de
-    // tarefas"): a janela INICIAL deve caber na AREA UTIL do desktop (que desconta a barra
-    // de tarefas/paineis via struts), senao a base (log/rodape do cockpit) nasce escondida.
-    // SDL_GetDisplayUsableBounds ja desconta os paineis. Preservamos a proporcao 16:9 (a
-    // arena estica 960x540 -> janela; 16:9 = sem distorcao) escolhendo a MAIOR janela 16:9
-    // que cabe na area util (com margem p/ a decoracao da janela), limitada ao alvo
-    // 1920x1080. Sob Xvfb/headless (sem barra) os usable bounds = display inteiro -> escala
-    // 1.0 -> janela 1920x1080 como antes (self-tests de mouse/hover intactos: as coordenadas
-    // derivam de pw0/ph0 REAIS da janela, nao de constantes). NAO ha offset de letterbox
-    // aqui -> os hit-tests de mouse (A2/picker) seguem validos sem desconto.
-    int win_w = kWindowW, win_h = kWindowH;
-    {
-        SDL_Rect usable{};
-        const SDL_DisplayID disp = SDL_GetPrimaryDisplay();
-        if (disp != 0 && SDL_GetDisplayUsableBounds(disp, &usable) && usable.w > 0 &&
-            usable.h > 0) {
-            constexpr float kMargin = 0.95f;  // folga p/ bordas/titlebar da janela
-            const float avail_w = static_cast<float>(usable.w) * kMargin;
-            const float avail_h = static_cast<float>(usable.h) * kMargin;
-            float scale = 1.0f;
-            scale = std::min(scale, avail_w / static_cast<float>(kWindowW));
-            scale = std::min(scale, avail_h / static_cast<float>(kWindowH));
-            if (scale < 1.0f) {
-                win_w = static_cast<int>(static_cast<float>(kWindowW) * scale);
-                win_h = static_cast<int>(static_cast<float>(kWindowH) * scale);
-            }
-            std::cout << "BattlePreview: [win] area util=" << usable.w << "x" << usable.h
-                      << " -> janela inicial=" << win_w << "x" << win_h << " (16:9)\n";
-        }
-    }
-
-    SDL_Window* window =
-        SDL_CreateWindow("GusWorld BattlePreview (M5, GL3)", win_w, win_h,
-                         SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
-    if (window == nullptr) {
-        std::cerr << "BattlePreview: SDL_CreateWindow falhou: " << SDL_GetError() << "\n";
-        SDL_Quit();
-        return 1;
-    }
     SDL_GLContext gl = SDL_GL_CreateContext(window);
     if (gl == nullptr) {
         std::cerr << "BattlePreview: SDL_GL_CreateContext falhou: " << SDL_GetError()
                   << "\n";
-        SDL_DestroyWindow(window);
-        SDL_Quit();
         return 1;
     }
     SDL_GL_MakeCurrent(window, gl);
@@ -1237,12 +1204,11 @@ int run_battle_preview() {
 
     // Carrega os ponteiros de funcao GL (glad, via o backend GL3 do RmlUi). PRECISA vir
     // depois do contexto corrente e ANTES de qualquer chamada GL (Render2dGl3/RmlUiHud).
+    // Chamado a CADA entrada na batalha (o contexto e recriado toda vez - ver nota acima).
     if (!gus::platform::rmlui::gl3_load_functions(
             reinterpret_cast<void* (*)(const char*)>(SDL_GL_GetProcAddress))) {
         std::cerr << "BattlePreview: falha ao carregar funcoes OpenGL (glad)\n";
         SDL_GL_DestroyContext(gl);
-        SDL_DestroyWindow(window);
-        SDL_Quit();
         return 1;
     }
 
@@ -2428,6 +2394,15 @@ int run_battle_preview() {
             }
         }
 
+        // M7-COSTURA (ADR-012 Onda 1): MESMO choke-point (comentario original abaixo) -
+        // grava o CombatOutcome final pra Maestro decidir vitoria/derrota/fuga. Se a
+        // janela foi fechada no meio do combate (Esc/fechar), a FSM nunca chegou a
+        // CombatEnd e outcome() ainda e Ongoing - a Maestro trata isso como "abortou",
+        // nao como derrota (ver maestro.cpp).
+        if (out_outcome != nullptr) {
+            *out_outcome = scene.machine().outcome();
+        }
+
         // MUSICA: fade-out ao SAIR da batalha (M6 F4, ADR-011). Unico CHOKE-POINT de saida
         // do loop `while (running)` acima, qualquer que seja o motivo (Esc/fechar janela/
         // limite de --frames/selftest concluido) - todos convergem pra `running = false`
@@ -2457,10 +2432,68 @@ int run_battle_preview() {
                   << audio_engine.sfx_play_count() << "x nesta sessao.\n";
     }  // Render2dGl3 destruido (libera recursos GL) antes de destruir o contexto
 
+    // M7-COSTURA: SO o contexto GL e desta funcao (criado no topo). A janela e o SDL_Init/
+    // Quit pertencem a quem chamou (a Maestro, dona da janela compartilhada; ou o wrapper
+    // run_battle_preview() abaixo, no uso standalone --battle).
     SDL_GL_DestroyContext(gl);
+    return 0;
+}
+
+// M7-COSTURA (ADR-012 Onda 1): wrapper fino do --battle STANDALONE. Cria SUA PROPRIA
+// janela (escalada 16:9 pra caber na area util do desktop) + SDL_Init/Quit, delega o
+// loop inteiro pra run_battle_preview_embedded (outcome descartado - nada consome fora
+// deste fluxo isolado) e destroi a janela ao sair. Preserva o comportamento de sempre.
+int run_battle_preview() {
+    if (!SDL_Init(SDL_INIT_VIDEO)) {
+        std::cerr << "BattlePreview: SDL_Init falhou: " << SDL_GetError() << "\n";
+        return 1;
+    }
+
+    // FIX W1 item 2 (lider: "maximizada, a base da cena desliza pra tras da barra de
+    // tarefas"): a janela INICIAL deve caber na AREA UTIL do desktop (que desconta a barra
+    // de tarefas/paineis via struts), senao a base (log/rodape do cockpit) nasce escondida.
+    // SDL_GetDisplayUsableBounds ja desconta os paineis. Preservamos a proporcao 16:9 (a
+    // arena estica 960x540 -> janela; 16:9 = sem distorcao) escolhendo a MAIOR janela 16:9
+    // que cabe na area util (com margem p/ a decoracao da janela), limitada ao alvo
+    // 1920x1080. Sob Xvfb/headless (sem barra) os usable bounds = display inteiro -> escala
+    // 1.0 -> janela 1920x1080 como antes (self-tests de mouse/hover intactos: as coordenadas
+    // derivam de pw0/ph0 REAIS da janela, nao de constantes). NAO ha offset de letterbox
+    // aqui -> os hit-tests de mouse (A2/picker) seguem validos sem desconto.
+    int win_w = kWindowW, win_h = kWindowH;
+    {
+        SDL_Rect usable{};
+        const SDL_DisplayID disp = SDL_GetPrimaryDisplay();
+        if (disp != 0 && SDL_GetDisplayUsableBounds(disp, &usable) && usable.w > 0 &&
+            usable.h > 0) {
+            constexpr float kMargin = 0.95f;  // folga p/ bordas/titlebar da janela
+            const float avail_w = static_cast<float>(usable.w) * kMargin;
+            const float avail_h = static_cast<float>(usable.h) * kMargin;
+            float scale = 1.0f;
+            scale = std::min(scale, avail_w / static_cast<float>(kWindowW));
+            scale = std::min(scale, avail_h / static_cast<float>(kWindowH));
+            if (scale < 1.0f) {
+                win_w = static_cast<int>(static_cast<float>(kWindowW) * scale);
+                win_h = static_cast<int>(static_cast<float>(kWindowH) * scale);
+            }
+            std::cout << "BattlePreview: [win] area util=" << usable.w << "x" << usable.h
+                      << " -> janela inicial=" << win_w << "x" << win_h << " (16:9)\n";
+        }
+    }
+
+    SDL_Window* window =
+        SDL_CreateWindow("GusWorld BattlePreview (M5, GL3)", win_w, win_h,
+                         SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
+    if (window == nullptr) {
+        std::cerr << "BattlePreview: SDL_CreateWindow falhou: " << SDL_GetError() << "\n";
+        SDL_Quit();
+        return 1;
+    }
+
+    const int rc = run_battle_preview_embedded(window, /*out_outcome=*/nullptr);
+
     SDL_DestroyWindow(window);
     SDL_Quit();
-    return 0;
+    return rc;
 }
 
 }  // namespace gus::app::screens

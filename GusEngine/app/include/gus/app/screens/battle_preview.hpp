@@ -10,8 +10,16 @@
 // ao shell). Quando o loop de telas (Overworld<->Battle) existir (incremento futuro), a
 // transicao real par.3.3 substitui este atalho; por ora ele isola a tela pra inspecao.
 //
+// M7-COSTURA (ADR-012 Onda 1): run_battle_preview_embedded() e a forma REUSAVEL que a
+// Maestro chama - roda a MESMA BattleScene/loop numa janela JA EXISTENTE (a da cidade,
+// no design "trocar escondido atras do preto": SDL_Renderer <-> contexto GL na MESMA
+// janela) e devolve o CombatOutcome final via out-param. run_battle_preview() (o
+// --battle standalone) virou um WRAPPER fino: cria sua PROPRIA janela + SDL_Init/Quit e
+// delega pra run_battle_preview_embedded (outcome descartado - ninguem consome aqui).
+//
 // Cross-ref: gus/app/screens/battle_scene.hpp (a cena renderizada);
-//            gus/app/screens/anim_preview.hpp (viewer irmao, mesmo padrao).
+//            gus/app/screens/anim_preview.hpp (viewer irmao, mesmo padrao);
+//            gus/app/maestro.hpp (dono da janela compartilhada, M7-COSTURA).
 
 #ifndef GUS_APP_SCREENS_BATTLE_PREVIEW_HPP
 #define GUS_APP_SCREENS_BATTLE_PREVIEW_HPP
@@ -21,6 +29,7 @@
 #include <SDL3/SDL.h>  // SDL_Keycode (roteamento de teclado, testavel headless - ver abaixo)
 
 #include "gus/app/screens/battle_scene.hpp"
+#include "gus/domain/combat/combat_enums.hpp"  // CombatOutcome (out-param do embedded)
 
 namespace gus::app::screens {
 
@@ -46,8 +55,20 @@ namespace gus::app::screens {
 // Exposto pra ser testavel headless (Catch2), sem abrir janela SDL nem chamar SDL_Init.
 void battle_key_down(BattleScene& scene, SDL_Keycode key, bool& running);
 
-// Roda o viewer da BattleScene: SDL_Init proprio, janela, loop de render do esqueleto
-// (camera logica 960x540 escalada por inteiro x2 = 1080p), Esc/fechar encerra. Devolve 0 ok.
+// M7-COSTURA: roda o loop de batalha (mesma BattleScene/mesmo esqueleto) numa janela JA
+// CRIADA por quem chama (a Maestro). NAO chama SDL_Init/SDL_Quit nem cria/destroi a
+// janela - so o CONTEXTO GL (criado na entrada, destruido na saida; ver ADR-012 Onda 1,
+// "trocar escondido atras do preto"). Esc/fechar a janela encerra o loop; qualquer saida
+// converge no MESMO choke-point, que grava o CombatOutcome final (Victory/Defeat/Fled/
+// Ongoing se a janela foi fechada no meio) em *out_outcome, se nao-nulo. Devolve 0 ok, !=0
+// se a criacao do contexto GL ou o load de funcoes GL falhar (a janela segue viva - quem
+// chamou decide o que fazer).
+int run_battle_preview_embedded(SDL_Window* window,
+                                 gus::domain::combat::CombatOutcome* out_outcome);
+
+// Roda o viewer da BattleScene: SDL_Init proprio, janela PROPRIA, loop de render do
+// esqueleto (camera logica 960x540 escalada por inteiro x2 = 1080p), Esc/fechar encerra.
+// WRAPPER fino sobre run_battle_preview_embedded (outcome descartado). Devolve 0 ok.
 int run_battle_preview();
 
 }  // namespace gus::app::screens
