@@ -5,9 +5,77 @@
 
 #include "gus/app/maestro_logic.hpp"
 
-#include <cmath>  // std::abs
+#include <cmath>   // std::abs
+#include <cstddef> // std::size_t
+#include <utility> // std::pair
+#include <vector>
 
 namespace gus::app {
+
+namespace {
+
+// BUG real (lider, playtest ao vivo): a espiral antiga parava na PRIMEIRA celula
+// LIVRE (is_blocked==false) mais proxima do alvo, mas "livre" != "alcancavel a pe" -
+// uma celula pode ser chao solto numa SALA FECHADA, isolada do spawn por paredes (o
+// caso de distritos_inferiores.gmap: o offset caia numa sala sem porta). Corrigido
+// filtrando por ALCANCABILIDADE (mesma componente conectada do spawn), nao so
+// ausencia de parede.
+//
+// Flood-fill 4-conectado (mesma nocao de "andavel" que o movimento real do jogador
+// usa: TileGrid::is_blocked, consumida por resolve_move[_with_corner_assist] em
+// overworld_sim.cpp - MESMA fonte de verdade, sem divergencia). Devolve um vetor
+// flat width*height (row-major, index = y*width+x); true = alcancavel a pe partindo
+// de (start_cx,start_cy). Se a propria celula de partida estiver fora dos limites ou
+// bloqueada (nao deveria acontecer - e onde o jogador nasceu), devolve tudo false.
+// Deterministico (BFS classico, ordem fixa de vizinhos E/S/O/N).
+std::vector<bool> flood_fill_reachable(const gus::core::spatial::TileGrid& grid,
+                                        int start_cx, int start_cy) {
+    const int w = grid.width();
+    const int h = grid.height();
+    std::vector<bool> reachable(static_cast<std::size_t>(w) * static_cast<std::size_t>(h),
+                                 false);
+    if (w <= 0 || h <= 0) {
+        return reachable;
+    }
+    if (start_cx < 0 || start_cx >= w || start_cy < 0 || start_cy >= h) {
+        return reachable;
+    }
+    if (grid.is_blocked(start_cx, start_cy)) {
+        return reachable;
+    }
+
+    auto index = [w](int x, int y) -> std::size_t {
+        return static_cast<std::size_t>(y) * static_cast<std::size_t>(w) +
+               static_cast<std::size_t>(x);
+    };
+
+    std::vector<std::pair<int, int>> queue;
+    queue.reserve(static_cast<std::size_t>(w) * static_cast<std::size_t>(h));
+    reachable[index(start_cx, start_cy)] = true;
+    queue.emplace_back(start_cx, start_cy);
+
+    static constexpr int kDx[4] = {1, 0, -1, 0};  // E, S, O, N - ordem fixa
+    static constexpr int kDy[4] = {0, 1, 0, -1};
+
+    for (std::size_t head = 0; head < queue.size(); ++head) {
+        const auto [cx, cy] = queue[head];
+        for (int i = 0; i < 4; ++i) {
+            const int nx = cx + kDx[i];
+            const int ny = cy + kDy[i];
+            if (nx < 0 || nx >= w || ny < 0 || ny >= h) {
+                continue;
+            }
+            if (reachable[index(nx, ny)] || grid.is_blocked(nx, ny)) {
+                continue;
+            }
+            reachable[index(nx, ny)] = true;
+            queue.emplace_back(nx, ny);
+        }
+    }
+    return reachable;
+}
+
+}  // namespace
 
 bool aabb_overlaps(const gus::core::spatial::Aabb& a,
                     const gus::core::spatial::Aabb& b) noexcept {
@@ -39,14 +107,31 @@ gus::core::spatial::Aabb pick_fixed_enemy_position(
     const int target_cx = spawn_cx + offset_tiles_x;
     const int target_cy = spawn_cy + offset_tiles_y;
 
+    // Alcancabilidade PRIMEIRO (flood-fill a partir do spawn) - so entao a espiral
+    // escolhe, DENTRE as celulas alcancaveis, a mais proxima do alvo. Isto e o que
+    // garante que o inimigo nunca cai numa sala fechada/isolada (ver comentario do
+    // flood_fill_reachable acima).
+    const std::vector<bool> reachable = flood_fill_reachable(grid, spawn_cx, spawn_cy);
+    const int grid_w = grid.width();
+    const int grid_h = grid.height();
+    const auto is_reachable = [&](int cx, int cy) -> bool {
+        if (cx < 0 || cx >= grid_w || cy < 0 || cy >= grid_h) {
+            return false;
+        }
+        return reachable[static_cast<std::size_t>(cy) * static_cast<std::size_t>(grid_w) +
+                          static_cast<std::size_t>(cx)];
+    };
+
     // Espiral de raio crescente ao redor do alvo (varre o quadrado [-r,r]x[-r,r] a cada
-    // raio, mas so os pontos NOVOS daquele anel - suficiente pra um mapa pequeno/medio;
-    // determinismo total: sempre varre na MESMA ordem). Para no primeiro livre.
-    constexpr int kMaxRadius = 12;
-    int best_cx = spawn_cx;  // fallback: a propria celula de spawn (garantida livre)
+    // raio, mas so os pontos NOVOS daquele anel - determinismo total: sempre varre na
+    // MESMA ordem). Para na primeira celula ALCANCAVEL (nao so "sem parede"). Raio
+    // maximo cobre a grade inteira (w+h e suficiente pra alcancar qualquer celula a
+    // partir de qualquer alvo, dentro ou fora dos limites do mapa).
+    const int max_radius = grid_w + grid_h;
+    int best_cx = spawn_cx;  // fallback: a propria celula de spawn (garantida alcancavel)
     int best_cy = spawn_cy;
     bool found = false;
-    for (int r = 0; r <= kMaxRadius && !found; ++r) {
+    for (int r = 0; r <= max_radius && !found; ++r) {
         for (int dy = -r; dy <= r && !found; ++dy) {
             for (int dx = -r; dx <= r && !found; ++dx) {
                 // So o ANEL deste raio (bordas do quadrado) - pula pontos ja varridos
@@ -56,7 +141,7 @@ gus::core::spatial::Aabb pick_fixed_enemy_position(
                 }
                 const int cx = target_cx + dx;
                 const int cy = target_cy + dy;
-                if (!grid.is_blocked(cx, cy)) {
+                if (is_reachable(cx, cy)) {
                     best_cx = cx;
                     best_cy = cy;
                     found = true;

@@ -53,13 +53,19 @@ enum class EncounterId : int {
 
 // Escolhe a posicao do inimigo FIXO: parte da celula de (player_start.x+w/2,
 // player_start.y+h/2) + o offset cardinal (offset_tiles_x, offset_tiles_y) em CELULAS, e
-// VARRE em espiral (raio crescente) pela celula LIVRE mais proxima daquele alvo -
-// portanto NUNCA cai dentro de parede, qualquer que seja o mapa carregado (real ou
-// fallback). Se nao achar nenhuma celula livre num raio razoavel, cai de volta na
-// propria celula de spawn do jogador (garantidamente livre - e onde ele nasceu).
-// Devolve a AABB do inimigo com o MESMO w/h de player_start, centrada na celula
-// escolhida. POCO puro (so consome TileGrid::is_blocked/world_to_cell, ja permitido em
-// app/).
+// VARRE em espiral (raio crescente) pela celula ALCANCAVEL A PE mais proxima daquele
+// alvo - "alcancavel" = mesma componente conectada do spawn (flood-fill 4-conectado
+// sobre TileGrid::is_blocked, a MESMA nocao de "andavel" que o movimento real do
+// jogador usa via resolve_move/resolve_move_with_corner_assist). Isto e MAIS FORTE que
+// so "celula sem parede": uma celula pode ser chao livre mas estar isolada numa sala
+// sem porta (bug real corrigido no M7-COSTURA - o offset caia dentro de uma sala
+// fechada de distritos_inferiores.gmap, impossivel de alcancar andando); agora o
+// inimigo NUNCA cai numa celula que o jogador nao consiga pisar partindo do proprio
+// spawn. Se nao houver NENHUMA celula alcancavel alem do proprio spawn (mapa
+// degenerado), cai de volta na propria celula de spawn do jogador (garantidamente
+// alcancavel - e onde ele nasceu). Devolve a AABB do inimigo com o MESMO w/h de
+// player_start, centrada na celula escolhida. POCO puro (so consome
+// TileGrid::is_blocked/world_to_cell/width/height, ja permitido em app/).
 [[nodiscard]] gus::core::spatial::Aabb pick_fixed_enemy_position(
     const gus::core::spatial::TileGrid& grid,
     const gus::core::spatial::Aabb& player_start, int offset_tiles_x,

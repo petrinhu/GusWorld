@@ -130,6 +130,145 @@ TEST_CASE("pick_fixed_enemy_position: tudo bloqueado ao redor -> cai no spawn (l
     CHECK_FALSE(grid.is_blocked(cx, cy));
 }
 
+TEST_CASE(
+    "pick_fixed_enemy_position: alvo cai numa SALA FECHADA isolada -> nao senta "
+    "la dentro, cai em celula ALCANCAVEL a pe a partir do spawn",
+    "[maestro][logic][regressao-sala-fechada]") {
+    // Reproducao minima do bug real (lider, playtest ao vivo em
+    // distritos_inferiores.gmap): uma sala fechada (chao livre, mas SEM porta) senta
+    // exatamente onde o offset alvo aponta. A sala fechada e livre (is_blocked ==
+    // false), entao a espiral antiga (so "sem parede") caia direto nela; a nova
+    // (alcancabilidade via flood-fill) tem que desviar.
+    //
+    // Layout (8 linhas x 12 colunas, tile_size=2.0):
+    //   y0: ############   <- borda solida
+    //   y1: #.....##...#   <- spawn mora aqui (col1-5, livres); col6/7 = separador
+    //                         solido; col8-10 = SALA FECHADA (livre, mas sem porta)
+    //   y2: #.....##...#   <- mesmo padrao (sala fechada tem 2 linhas de altura)
+    //   y3: #.....######   <- sala fechada SELADA por baixo tambem (sem porta em
+    //   y4: #.....######      lugar nenhum: cercada em todos os 4 lados)
+    //   y5: #.....######
+    //   y6: #.....######
+    //   y7: ############
+    const TileGrid grid = TileGrid::from_rows(
+        {
+            "############",
+            "#.....##...#",
+            "#.....##...#",
+            "#.....######",
+            "#.....######",
+            "#.....######",
+            "#.....######",
+            "############",
+        },
+        2.0f);
+
+    // Spawn no meio da sala grande (celula (1,1), dentro da area livre col1-5).
+    const Aabb player_start{2.5f, 2.5f, 1.0f, 1.0f};
+
+    // Offset (7,0) a partir do spawn (1,1) -> celula-alvo (8,1): CAI DENTRO da sala
+    // fechada (col8-10, y1-2) - exatamente o cenario do bug real.
+    const Aabb enemy =
+        pick_fixed_enemy_position(grid, player_start, /*offset_tiles_x=*/7,
+                                   /*offset_tiles_y=*/0);
+
+    const int cx = grid.world_to_cell(enemy.x + enemy.w * 0.5f);
+    const int cy = grid.world_to_cell(enemy.y + enemy.h * 0.5f);
+
+    // NUNCA dentro da sala fechada (col8-10, y1-2).
+    const bool inside_sala_fechada = (cx >= 8 && cx <= 10 && cy >= 1 && cy <= 2);
+    CHECK_FALSE(inside_sala_fechada);
+
+    // A celula escolhida tem que estar na area GRANDE (alcancavel a pe do spawn):
+    // col1-5, y1-6.
+    CHECK(cx >= 1);
+    CHECK(cx <= 5);
+    CHECK(cy >= 1);
+    CHECK(cy <= 6);
+    CHECK_FALSE(grid.is_blocked(cx, cy));
+}
+
+TEST_CASE(
+    "pick_fixed_enemy_position: alvo alcancavel so por um DESVIO (contorna parede) "
+    "-> ainda assim senta EXATAMENTE no alvo (distancia/direcao do offset "
+    "preservadas)",
+    "[maestro][logic]") {
+    // Layout (5 linhas x 7 colunas, tile_size=2.0): uma parede no meio da sala
+    // (coluna 3, linhas 1-2) separa o lado do spawn (col1-2) do lado do alvo
+    // (col4-5), mas a linha 3 esta ABERTA - da pra contornar por baixo. O alvo
+    // (offset 3,0 a partir do spawn (1,1) -> celula (4,1)) e alcancavel, so que via
+    // um caminho mais longo (nao em linha reta).
+    //   y0: #######
+    //   y1: #..#..#   <- spawn(1,1) do lado esquerdo; parede na col3; alvo(4,1) do
+    //                     lado direito
+    //   y2: #..#..#   <- mesma parede continua
+    //   y3: #.....#   <- linha ABERTA: da pra contornar (col1-5 livres)
+    //   y4: #######
+    const TileGrid grid = TileGrid::from_rows(
+        {
+            "#######",
+            "#..#..#",
+            "#..#..#",
+            "#.....#",
+            "#######",
+        },
+        2.0f);
+
+    const Aabb player_start{2.5f, 2.5f, 1.0f, 1.0f};  // celula (1,1)
+
+    const Aabb enemy =
+        pick_fixed_enemy_position(grid, player_start, /*offset_tiles_x=*/3,
+                                   /*offset_tiles_y=*/0);
+
+    // Celula-alvo = (1+3, 1) = (4,1): alcancavel via desvio (linha y3) -> senta
+    // EXATAMENTE nela, como se estivesse em campo aberto (a distancia do caminho nao
+    // importa, so a ALCANCABILIDADE).
+    const float expected_cx = (4.0f + 0.5f) * 2.0f;
+    const float expected_cy = (1.0f + 0.5f) * 2.0f;
+    CHECK(enemy.x == Catch::Approx(expected_cx - enemy.w * 0.5f));
+    CHECK(enemy.y == Catch::Approx(expected_cy - enemy.h * 0.5f));
+}
+
+TEST_CASE(
+    "pick_fixed_enemy_position: alvo cai numa ilha LIVRE mas totalmente ISOLADA (sem "
+    "NENHUMA conexao) -> nao senta na ilha (bug antigo), cai no fallback (spawn)",
+    "[maestro][logic][regressao-sala-fechada]") {
+    // Prova direta da regressao: com a espiral ANTIGA (so "sem parede"), esta celula
+    // livre-mas-isolada seria escolhida (e o bug relatado pelo lider). Aqui o spawn
+    // esta sozinho numa cela 1x1 (sem vizinhos livres) e a celula-alvo do offset e
+    // OUTRA cela 1x1 livre, tambem totalmente isolada - nenhuma das duas tem QUALQUER
+    // conexao com a outra. O flood-fill garante que so o spawn e "alcancavel" (ele
+    // mesmo), entao o resultado tem que ser o fallback (spawn), NUNCA a ilha.
+    //   y0: ########
+    //   y1: #.####.#   <- spawn na col1 (isolado); ilha livre na col6 (isolada)
+    //   y2: ########
+    const TileGrid grid = TileGrid::from_rows(
+        {
+            "########",
+            "#.####.#",
+            "########",
+        },
+        2.0f);
+
+    const Aabb player_start{2.5f, 2.5f, 1.0f, 1.0f};  // celula (1,1), a UNICA vizinha
+
+    // Offset (5,0) a partir do spawn (1,1) -> celula-alvo (6,1): a ILHA livre (o bug
+    // antigo cairia exatamente aqui, pois a celula e is_blocked==false).
+    const Aabb enemy =
+        pick_fixed_enemy_position(grid, player_start, /*offset_tiles_x=*/5,
+                                   /*offset_tiles_y=*/0);
+
+    const int cx = grid.world_to_cell(enemy.x + enemy.w * 0.5f);
+    const int cy = grid.world_to_cell(enemy.y + enemy.h * 0.5f);
+
+    // NAO pode ter caido na ilha isolada (6,1) - essa era a assinatura do bug.
+    CHECK_FALSE((cx == 6 && cy == 1));
+
+    // Fallback: cai exatamente na propria celula de spawn (1,1), a unica alcancavel.
+    CHECK(cx == 1);
+    CHECK(cy == 1);
+}
+
 TEST_CASE("EncounterId: kFixedEnemy1 existe (item 1 do escopo M7-COSTURA)",
           "[maestro][logic]") {
     constexpr auto id = EncounterId::kFixedEnemy1;
