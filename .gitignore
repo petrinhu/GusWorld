@@ -71,6 +71,12 @@ resources/sprites/*
 # Fotos pessoais (do filho do criador): NUNCA versionar (o repo e publico)
 resources/gus_baby/
 
+# Modelos 3D .glb (binarios pesados ~50-60MB cada; modelo IDrive, fora do git;
+# repo e publico e git-normal guardaria no historico pra sempre). Decisao do
+# lider 2026-07-02. Se um dia reintroduzir 3D e quiser versionar: Git LFS +
+# workaround Codeberg (lfs.sshtransfer never). Cross-ref candidata tinygltf.
+resources/glb/
+
 # Manual privado dos easter eggs (NUNCA publicar: mata o segredo)
 docs/_secret/
 
