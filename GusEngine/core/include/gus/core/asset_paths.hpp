@@ -158,12 +158,17 @@ inline constexpr std::string_view kHitSfxAltFile = "hit_digital_alt_provisorio.w
 // assets/sfx/, mesmo padrao/resolvedor - ver comentario de kSfxDir acima).
 inline constexpr std::string_view kMusicDir = "assets/music";
 // Tema provisorio "GusWorld City cyber-gotica" (curadoria F2, filtro = bíblia de
-// leitmotivs R7). NOTA HONESTA (M6 F4): esta e a UNICA faixa do kit provisorio - por
-// isso toca na tela de BATALHA nesta onda, mesmo sendo um tema de CIDADE. Serve pra
-// PROVAR loop+fade tecnicamente (streaming sem gap, fade-in/fade-out via miniaudio),
-// NAO pra vender o feel de combate - a faixa/producao certa de combate fica pra onda
-// de audio dedicada (audio-designer-composer). NAO trocar o timbre/curadoria aqui.
+// leitmotivs R7). NOTA HISTORICA (M6 F4, superada pelo M7-COSTURA Inc 3 abaixo): quando
+// so existia ESTA faixa, ela tocava tambem na tela de BATALHA (a UNICA do kit
+// provisorio) so pra PROVAR loop+fade tecnicamente. Desde kBattleThemeFile existir, a
+// batalha usa a faixa DELA - esta aqui volta a ser so o tema da CIDADE.
 inline constexpr std::string_view kCityThemeFile = "cidade_tema_provisorio.mp3";
+// Tema de ARENA/batalha (M7-COSTURA Inc 3, ADR-012): gerada via Suno IA pelo lider
+// 2026-07-03, prompt ancorado na biblia de leitmotivs do time - fecha o "NOTA HONESTA"
+// acima (kCityThemeFile parava de ser so tema de cidade por falta de 2a faixa). Ainda
+// PROVISORIA (kit CC0/IA, nao a producao final) ate a onda de audio dedicada
+// (audio-designer-composer) substituir. Ver assets/AUDIO_KIT_PROVISORIO.md.
+inline constexpr std::string_view kBattleThemeFile = "Arena_GusWorld.mp3";
 
 }  // namespace gus::core::assets
 

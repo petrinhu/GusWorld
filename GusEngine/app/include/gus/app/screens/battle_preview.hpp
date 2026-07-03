@@ -25,10 +25,12 @@
 #define GUS_APP_SCREENS_BATTLE_PREVIEW_HPP
 
 #include <string>
+#include <string_view>
 
 #include <SDL3/SDL.h>  // SDL_Keycode (roteamento de teclado, testavel headless - ver abaixo)
 
 #include "gus/app/screens/battle_scene.hpp"
+#include "gus/core/asset_paths.hpp"             // kCityThemeFile (default de resolve_music_path)
 #include "gus/domain/combat/combat_enums.hpp"  // CombatOutcome (out-param do embedded)
 #include "gus/platform/audio/audio_engine.hpp"  // AudioEngine externo (M7-COSTURA Inc 2)
 
@@ -43,12 +45,15 @@ namespace gus::app::screens {
 // ordem do resolver de retratos. So monta a STRING (nao abre arquivo).
 [[nodiscard]] std::string resolve_status_icons_dir();
 
-// M7-COSTURA Inc 2: resolve o caminho da MUSICA (kCityThemeFile), mesma receita/ordem
-// de resolve_retratos_dir (env GUSWORLD_MUSIC > macro embutida GUSWORLD_MUSIC_DIR >
-// relativo ao CWD). Exposto pra a Maestro carregar o tema da cidade UMA vez em
-// init() (dona do AudioEngine agora - ver gus/app/maestro.hpp), sem duplicar a logica
-// de resolucao aqui e la.
-[[nodiscard]] std::string resolve_music_path();
+// M7-COSTURA Inc 2/3: resolve o caminho de uma faixa de MUSICA, mesma receita/ordem de
+// resolve_retratos_dir (env GUSWORLD_MUSIC > macro embutida GUSWORLD_MUSIC_DIR >
+// relativo ao CWD) + o NOME do arquivo dado em `file` (default kCityThemeFile, o
+// comportamento de sempre - todo call-site existente sem argumento continua
+// identico). Inc 3: a Maestro chama com `file=kBattleThemeFile` pra resolver a faixa
+// da ARENA tambem (mesma pasta kMusicDir, so o nome do arquivo muda) - generalizacao
+// MINIMA (so o parametro, zero env nova) em vez de duplicar a funcao inteira.
+[[nodiscard]] std::string resolve_music_path(
+    std::string_view file = gus::core::assets::kCityThemeFile);
 
 // Digito 1-9 de uma tecla numerica (fileira OU numpad); 0 se nao for numerica 1-9. Fonte
 // unica do mapeamento tecla->N pros atalhos numericos (mira e escolha de ator). Exposto

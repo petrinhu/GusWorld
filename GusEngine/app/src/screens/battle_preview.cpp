@@ -513,22 +513,23 @@ std::string resolve_status_icons_dir() {
     return resolve_asset_dir(gus::core::assets::kStatusIconsDir);
 }
 
-// M7-COSTURA Inc 2: resolve o caminho da MUSICA (M6 F4, ADR-011), env GUSWORLD_MUSIC >
-// macro embutida (GUSWORLD_MUSIC_DIR = repo_root/assets/music) > relativo ao CWD
-// (kMusicDir). EXPORTADA (fora do namespace anonimo, ver header) - a Maestro chama isto
-// direto pra carregar o tema da cidade UMA vez em init() (dona do AudioEngine agora).
-std::string resolve_music_path() {
-    const std::string file(gus::core::assets::kCityThemeFile);
+// M7-COSTURA Inc 2/3: resolve o caminho de uma faixa de MUSICA (M6 F4, ADR-011), env
+// GUSWORLD_MUSIC > macro embutida (GUSWORLD_MUSIC_DIR = repo_root/assets/music) >
+// relativo ao CWD (kMusicDir). EXPORTADA (fora do namespace anonimo, ver header) - a
+// Maestro chama isto direto pra carregar o tema da cidade E o da arena (Inc 3, so o
+// nome do arquivo muda) em init(), dona do AudioEngine.
+std::string resolve_music_path(std::string_view file) {
+    const std::string file_str(file);
     if (const char* env = std::getenv("GUSWORLD_MUSIC")) {
         if (env[0] != '\0') {
-            return join(env, file);
+            return join(env, file_str);
         }
     }
     const std::string compiled = GUSWORLD_MUSIC_DIR;
     if (!compiled.empty()) {
-        return join(compiled, file);
+        return join(compiled, file_str);
     }
-    return join(std::string(gus::core::assets::kMusicDir), file);
+    return join(std::string(gus::core::assets::kMusicDir), file_str);
 }
 
 std::string resolve_intent_icons_dir() {

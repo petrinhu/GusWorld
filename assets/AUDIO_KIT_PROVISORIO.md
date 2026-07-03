@@ -50,6 +50,15 @@ Todas as fontes abaixo são **estritamente CC0 / domínio público** (nenhuma CC
 - **Checagem técnica de loop (ffmpeg `volumedetect`, sem ouvido humano):** volume médio dos primeiros 3s = **-22.7 dB**, dos últimos 3s = **-23.1 dB** (praticamente idêntico) — sinal de que início e fim têm energia sonora parecida, favorável a um loop sem salto abrupto perceptível de volume. **Não há fade-out no final** (ao contrário do candidato alternativo abaixo) — a faixa mantém presença sonora constante até o corte, então não sofre do problema "silêncio morto antes do loop reiniciar".
 - **Limitação honesta:** BPM exato (~55) e a tonalidade (Lá menor harmônico) **não foram verificados por análise de áudio nem por ouvido humano** — a curadoria foi feita pela descrição textual da fonte + inspeção técnica de volume (ffmpeg), não por audição. O criador precisa validar o "feel" real no playtest; se o BPM/tom não bater bem o suficiente, é candidato a troca já mapeada abaixo.
 
+### `assets/music/Arena_GusWorld.mp3` — tema provisório de ARENA/batalha (loop)
+
+- **Fonte:** gerada via **Suno (IA de composição musical)** pelo criador (petrus) em **2026-07-03**, a partir de um prompt do time ancorado na bíblia de leitmotivs (`docs/narrative/deep/ontologia/leitmotivs-musicais-detalhados.md`) — diferente das duas faixas acima (curadoria de banco CC0), esta é geração original por IA, não uma peça pré-existente de terceiro.
+- **Autor/licença:** IA generativa (Suno) sob a conta do criador; sem terceiro/atribuição a gerenciar (mesmo critério de simplicidade de licenciamento do resto do kit).
+- **Duração:** 4:40.9 (280.9s)
+- **Formato:** MP3, MPEG-1 Layer III, 48kHz, estéreo, 64kbps CBR (ID3v2.4.0). Arquivo final: 6.4MB.
+- **Ponto na engine (M7-COSTURA Inc 3):** liga o `kBattleThemeFile` (`GusEngine/core/include/gus/core/asset_paths.hpp`) — a `Maestro` (`GusEngine/app/src/maestro.cpp`) carrega esta faixa em `init()` (`battle_music_id_`) e o crossfade em `to_battle()` cruza pra ela de verdade (antes cruzava pra a mesma faixa da cidade, por falta desta 2ª). Fecha o critério de saída do M6 "fade entre telas" com DUAS faixas distintas na tela preta cidade↔arena.
+- **Status:** **provisória**, como o resto do kit — substituição/expansão real (assinatura sonora do combate, produção final) fica para a onda de áudio dedicada (`audio-designer-composer`). O criador valida o feel real ao vivo no playtest (crossfade audível não é verificável headless).
+
 ---
 
 ## Candidato alternativo de música considerado e descartado (documentado para referência futura)

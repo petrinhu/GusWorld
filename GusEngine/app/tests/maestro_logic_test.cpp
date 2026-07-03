@@ -17,6 +17,7 @@
 #include "gus/app/maestro_logic.hpp"
 
 using gus::app::aabb_overlaps;
+using gus::app::battle_crossfade_target;
 using gus::app::crossfade_music;
 using gus::app::EncounterId;
 using gus::app::enemy_sprite_footprint_aabb;
@@ -671,4 +672,37 @@ TEST_CASE("crossfade_music: kInvalidSound como next_id nao incrementa music_play
 
     CHECK(engine.music_play_count() == 0);
     CHECK_FALSE(engine.music_is_playing());
+}
+
+// ============================================================================
+// M7-COSTURA Inc 3 (liga a faixa de batalha REAL, Arena_GusWorld.mp3): agora que a
+// Maestro carrega DUAS faixas (city_music_id_ + battle_music_id_), o crossfade
+// cidade->batalha em Maestro::to_battle() precisa mirar a faixa da ARENA de verdade,
+// nao mais a mesma faixa da cidade. battle_crossfade_target e o POCO que decide isso -
+// testado headless (SoundId e so um inteiro tipado, sem precisar de AudioEngine real).
+// ============================================================================
+
+TEST_CASE("battle_crossfade_target: prefere o id da BATALHA quando o load deu certo "
+          "(as duas faixas sao DIFERENTES - Inc 3, Arena_GusWorld.mp3)",
+          "[maestro][logic][audio][m7_costura]") {
+    constexpr SoundId kCityId = 1;
+    constexpr SoundId kBattleId = 2;
+    CHECK(battle_crossfade_target(kBattleId, kCityId) == kBattleId);
+    // As duas faixas continuam DISTINTAS (a prova de que o crossfade cruza pra uma
+    // faixa de verdade, nao pra "ela mesma" como antes de Arena_GusWorld.mp3 existir).
+    CHECK(battle_crossfade_target(kBattleId, kCityId) != kCityId);
+}
+
+TEST_CASE("battle_crossfade_target: kInvalidSound como battle_id cai de volta pro "
+          "id da cidade (degradacao segura - load da arena falhou)",
+          "[maestro][logic][audio][m7_costura]") {
+    constexpr SoundId kCityId = 1;
+    CHECK(battle_crossfade_target(kInvalidSound, kCityId) == kCityId);
+}
+
+TEST_CASE("battle_crossfade_target: os dois ids invalidos devolve invalido "
+          "(degradacao segura ate o fim da cadeia - crossfade_music/play_music ja "
+          "no-opam com kInvalidSound, nunca crasha)",
+          "[maestro][logic][audio][m7_costura]") {
+    CHECK(battle_crossfade_target(kInvalidSound, kInvalidSound) == kInvalidSound);
 }

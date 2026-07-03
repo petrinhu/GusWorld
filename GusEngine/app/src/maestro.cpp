@@ -97,7 +97,8 @@ bool Maestro::init() {
     // ja construida no default-member-initializer do header) e toca em LOOP - critério
     // "musica da CIDADE toca enquanto na cidade". Fade-in de boot suave (nao ha tela
     // preta no boot, entao nao e o mesmo fade da costura - so evita o pop de volume).
-    const std::string city_music_path = gus::app::screens::resolve_music_path();
+    const std::string city_music_path = gus::app::screens::resolve_music_path(
+        gus::core::assets::kCityThemeFile);
     city_music_id_ = audio_.load_music(city_music_path.c_str());
     audio_.play_music(city_music_id_, /*loop=*/true, kBootMusicFadeInSeconds);
     std::cout << "Maestro: [audio] device "
@@ -105,6 +106,21 @@ bool Maestro::init() {
               << " - tema da cidade "
               << (city_music_id_ != gus::platform::audio::kInvalidSound ? "carregado"
                                                                          : "AUSENTE")
+              << ".\n";
+
+    // M7-COSTURA Inc 3: carrega TAMBEM o tema da ARENA (kBattleThemeFile) - mesmo
+    // padrao do load acima, so o nome do arquivo muda (resolve_music_path
+    // generalizado, ver battle_preview.hpp). NAO toca ainda (so a cidade toca no
+    // boot); o crossfade em to_battle() dispara este id. Se o load falhar
+    // (kInvalidSound), degrada com seguranca: os crossfades caem de volta pra
+    // city_music_id_ (ver to_battle/on_battle_result abaixo) em vez de tocar silencio.
+    const std::string battle_music_path = gus::app::screens::resolve_music_path(
+        gus::core::assets::kBattleThemeFile);
+    battle_music_id_ = audio_.load_music(battle_music_path.c_str());
+    std::cout << "Maestro: [audio] tema da arena "
+              << (battle_music_id_ != gus::platform::audio::kInvalidSound
+                      ? "carregado"
+                      : "AUSENTE (crossfade cai de volta pro tema da cidade)")
               << ".\n";
 
     // M7-COSTURA fix BUG-1 (playtest ao vivo do lider: "a batalha so ativou vindo do
@@ -204,10 +220,13 @@ bool Maestro::to_battle(EncounterId id) {
 
     // CROSSFADE DE MUSICA cronometrado com o escurinho (tela 100% preta aqui): para a
     // faixa corrente com fade-out e toca a PROXIMA com fade-in (M7-COSTURA Inc 2, paga
-    // a divida do ADR-011 "fade entre telas"). NOTA HONESTA (mesma de kCityThemeFile):
-    // o kit CC0 desta onda so tem 1 faixa - cruza pra ELA MESMA (o MECANISMO fica
-    // provado; riqueza musical fica pra onda de audio dedicada).
-    crossfade_music(&audio_, city_music_id_, /*loop=*/true, kAudioCrossfadeSeconds);
+    // a divida do ADR-011 "fade entre telas"). Inc 3: cruza pro tema da ARENA de
+    // verdade (battle_music_id_ via battle_crossfade_target, POCO testavel headless em
+    // maestro_logic.hpp) - se o load falhou, cai de volta pro tema da cidade
+    // (degradacao segura, nunca crasha; o mecanismo de crossfade continua provado
+    // mesmo sem a 2a faixa).
+    crossfade_music(&audio_, battle_crossfade_target(battle_music_id_, city_music_id_),
+                     /*loop=*/true, kAudioCrossfadeSeconds);
 
     // TROCA ESCONDIDA ATRAS DO PRETO: libera o SDL_Renderer da cidade pra deixar a
     // janela livre pro contexto GL da batalha (a MESMA SDL_Window - decisao do lider,
@@ -253,6 +272,8 @@ bool Maestro::to_battle(EncounterId id) {
     // inverso - a batalha ja fez o SEU fade-out (kOut, dentro de
     // run_battle_preview_embedded, tela preta ao voltar aqui); o crossfade dispara
     // agora (ainda preto, cidade acabou de reconstruir o renderer) e a cidade clareia.
+    // Inc 3: sempre mira city_music_id_ (o tema da cidade, existe desde sempre) -
+    // mesma degradacao segura de antes se estiver invalido (no-op silencioso).
     crossfade_music(&audio_, city_music_id_, /*loop=*/true, kAudioCrossfadeSeconds);
     if (!run_city_fade(gus::core::anim::FadeDirection::kIn, kTransitionFadeSeconds)) {
         return true;  // fechou a janela durante o fade de volta - mesmo contrato

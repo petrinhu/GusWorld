@@ -141,6 +141,19 @@ void crossfade_music(gus::platform::audio::AudioEngine* engine,
                       gus::platform::audio::SoundId next_id, bool loop,
                       float fade_seconds);
 
+// ALVO do crossfade cidade->batalha (M7-COSTURA Inc 3, ADR-012): prefere battle_id (o
+// tema da ARENA, kBattleThemeFile) quando o load deu certo; cai de volta pra city_id
+// (o tema da cidade, que ja esta carregado e tocando de qualquer forma) se battle_id
+// veio kInvalidSound - degradacao segura, o mesmo padrao de "nunca crasha por audio
+// ausente" do resto da fronteira (crossfade_music/play_music ja no-opam com
+// kInvalidSound). POCO puro, extraido pra ser testavel headless SEM SDL_Init/janela
+// (a classe Maestro so consome, ver maestro.hpp::to_battle()).
+[[nodiscard]] constexpr gus::platform::audio::SoundId battle_crossfade_target(
+    gus::platform::audio::SoundId battle_id,
+    gus::platform::audio::SoundId city_id) noexcept {
+    return (battle_id != gus::platform::audio::kInvalidSound) ? battle_id : city_id;
+}
+
 }  // namespace gus::app
 
 #endif  // GUS_APP_MAESTRO_LOGIC_HPP

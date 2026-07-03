@@ -28,7 +28,10 @@
 // cidade em loop enquanto na cidade; na troca cidade<->batalha, desenha um fade preto
 // curto (gus/core/anim/fade_transition.hpp) POR CIMA da tela ATUAL e, no pico da
 // opacidade (tela 100% preta), dispara o CROSSFADE de musica (gus/app/maestro_logic.hpp
-// ::crossfade_music) - fecha o criterio de saida do M6 ("fade entre telas"). A
+// ::crossfade_music) - fecha o criterio de saida do M6 ("fade entre telas"). Inc 3
+// (M7-COSTURA, mesma onda): a Maestro carrega TAMBEM o tema da arena (kBattleThemeFile,
+// gerado via Suno pelo lider) - o crossfade agora cruza pra uma faixa DE VERDADE
+// diferente em cada sentido (antes cruzava pra ela mesma, por falta da 2a faixa). A
 // battle_preview_embedded RECEBE o ponteiro do AudioEngine da Maestro (nao-dono, mesmo
 // padrao de BattleScene::set_audio) e so o usa pro SFX do hit + o fade visual da
 // PROPRIA tela de batalha - nunca toca musica quando chamada pela Maestro (ver o header
@@ -113,11 +116,18 @@ private:
     // e mais reaberto a cada entrada na batalha). device_active=true tenta o hardware
     // real; degrada com seguranca se indisponivel (mesma API no-op de sempre).
     gus::platform::audio::AudioEngine audio_{/*device_active=*/true};
-    // Tema da cidade (kCityThemeFile), carregado UMA vez em init(). O crossfade
-    // (maestro_logic.hpp::crossfade_music) cruza PRA este id nos dois sentidos - o kit
-    // CC0 desta onda so tem 1 faixa (ver a nota honesta em core/asset_paths.hpp), entao
-    // o mecanismo cruza pra ELA MESMA (riqueza musical fica pra onda de audio dedicada).
+    // Tema da cidade (kCityThemeFile) e tema da arena (kBattleThemeFile, M7-COSTURA
+    // Inc 3), ambos carregados UMA vez em init(). O crossfade (maestro_logic.hpp::
+    // crossfade_music) cruza cidade->battle_music_id_ em to_battle() e volta
+    // battle->city_music_id_ em on_battle_result() - as DUAS faixas agora sao
+    // DIFERENTES de verdade (antes, sem a 2a faixa, cruzava pra ela mesma). Se
+    // battle_music_id_ ficar invalido (load falhou - arquivo ausente/corrompido), a
+    // Maestro cai de volta pra city_music_id_ nos dois sentidos (mesma degradacao
+    // segura que ja existia pra city_music_id_ invalido - crossfade_music/play_music
+    // com kInvalidSound e no-op silencioso, nunca crasha).
     gus::platform::audio::SoundId city_music_id_ =
+        gus::platform::audio::kInvalidSound;
+    gus::platform::audio::SoundId battle_music_id_ =
         gus::platform::audio::kInvalidSound;
 
     // Inimigo FIXO (item 1 do escopo, ver maestro_logic.hpp): AABB + estado "derrotado"
