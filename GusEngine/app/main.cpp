@@ -3,9 +3,12 @@
 // casca de plataforma e SDL3 (nos possuimos o loop), nao mais Qt.
 //
 // DOIS MODOS:
-//   (1) normal (sem args): SDL_Init -> SdlWindow (janela + renderer + loop proprio)
-//       -> o lider joga (move o Caua com WASD/setas/GAMEPAD, desliza nas paredes,
-//       camera presa ao mapa, animacao de walk por distancia).
+//   (1) normal (sem args): M7-COSTURA (ADR-012 Onda 1) - gus::app::Maestro possui
+//       SDL_Init + a JANELA UNICA + o loop cidade<->batalha ("trocar escondido atras do
+//       preto": SDL_Renderer da cidade <-> contexto GL da batalha, MESMA janela). O
+//       lider joga: anda na cidade (WASD/setas/GAMEPAD, desliza nas paredes, camera
+//       presa ao mapa), esbarra no inimigo fixo -> entra na batalha -> resolve -> volta
+//       pro MESMO ponto (a cidade nunca e destruida/recarregada).
 //   (2) --smoke[=N]: modo HEADLESS pro CI/hook. Inicializa tudo, roda N ticks do
 //       loop logico (default 120) com input roteirizado, faz 1 render OFFSCREEN
 //       (Render2dSdl em modo headless - renderer nulo, sem display nem GPU),
@@ -29,7 +32,7 @@
 #include <vector>
 
 #include "gus/app/audio_smoke.hpp"  // GUSWORLD_AUDIO_SMOKE=1 (M6 F1, ADR-011)
-#include "gus/app/sdl_window.hpp"
+#include "gus/app/maestro.hpp"      // M7-COSTURA (ADR-012 Onda 1): modo normal
 #include "gus/app/screens/anim_catalog.hpp"  // resolve_gus_sprites_dir
 #include "gus/app/screens/anim_preview.hpp"
 #include "gus/app/screens/battle_preview.hpp"  // run_battle_preview (viewer M5)
@@ -246,23 +249,14 @@ int main(int argc, char* argv[]) {
         return run_smoke(ticks);
     }
 
-    // Modo normal: inicializa SDL (video + gamepad), abre a janela e roda o loop.
-    if (!SDL_Init(SDL_INIT_VIDEO | SDL_INIT_GAMEPAD)) {
-        std::cerr << "SDL_Init falhou: " << SDL_GetError() << "\n";
+    // Modo normal: M7-COSTURA (ADR-012 Onda 1) - a Maestro possui SDL_Init/janela/loop
+    // (cidade<->batalha na MESMA janela). O lider joga: anda na cidade, esbarra no
+    // inimigo fixo, entra na batalha, resolve, volta pro MESMO ponto.
+    gus::app::Maestro maestro;
+    if (!maestro.init()) {
+        std::cerr << "Falha ao inicializar a Maestro (SDL/janela/cidade).\n";
         return 1;
     }
-
-    int rc = 0;
-    {
-        gus::app::SdlWindow window;
-        if (!window.init()) {
-            std::cerr << "Falha ao inicializar a janela SDL.\n";
-            rc = 1;
-        } else {
-            window.run();  // o lider joga; retorna ao fechar a janela
-        }
-    }  // window destruido antes do SDL_Quit
-
-    SDL_Quit();
-    return rc;
+    maestro.run();  // o lider joga; retorna ao fechar a janela
+    return 0;
 }

@@ -27,6 +27,9 @@ add_library(gusengine_app STATIC
     src/screens/battle_preview.cpp
     src/i18n/translator.cpp
     src/sdl_window.cpp
+    # M7-COSTURA (ADR-012 Onda 1): maestro leve cidade<->batalha (ver maestro.hpp).
+    src/maestro_logic.cpp
+    src/maestro.cpp
     # Diagnostico opcional de device de audio real (M6 F1, ADR-011 item 5).
     # GUSWORLD_AUDIO_SMOKE=1: ver app/include/gus/app/audio_smoke.hpp.
     src/audio_smoke.cpp

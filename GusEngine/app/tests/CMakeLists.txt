@@ -24,6 +24,7 @@ add_executable(gusengine_app_tests
     battle_scene_test.cpp
     battle_key_routing_test.cpp
     translator_test.cpp
+    maestro_logic_test.cpp
 )
 
 target_link_libraries(gusengine_app_tests
