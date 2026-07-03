@@ -1,6 +1,6 @@
 # ADR-012: Plano do M7 (paridade jogável) — costura, save e diálogo
 
-**Status:** Proposed (decisões fechadas em brainstorm; aguardando aprovação final do criador antes de disparar a 1ª peça)
+**Status:** Accepted (decisões fechadas em brainstorm; aprovado pelo criador em 2026-07-03 com ordem de disparar a 1ª peça, `M7-COSTURA`)
 **Data:** 2026-07-03
 **Decisores:** criador supremo (petrus) + Caetano (CTO). A estrutura fina do maestro e os contratos do runtime de diálogo serão levados ao `software-architect` no modo colaborativo na hora de implementar cada peça.
 **Cross-ref:** [ADR-006](ADR-006-crypto-hmac-formato-domain.md) (crypto SHA-256/HMAC própria, reusada pelo compilador de conteúdo), [ADR-007](ADR-007-controls-json-hash128-save-v4.md) (fork `load_save`/`deserialize_save`, decisão herdada não reaberta), [ADR-008](ADR-008-repivot-qt-to-sdl3.md) (SDL3), [ADR-010](ADR-010-adopt-glintfx-embed-mode.md) (glintfx/UI), [ADR-011](ADR-011-m6-audio-onda1-plano.md) (áudio onda 1, dívida da `battle_preview` que este ADR paga), `docs/design/narrativa/dialogue-tree-npc-intro.md` (blueprint do diálogo), memória `project_i18n_canonico` (i18n-ready desde o dia 1), memória `reference_formato_mapa_gmap` (padrão fonte→compilador→artefato selado, reusado aqui)
