@@ -7,15 +7,54 @@
 
 #include "gus/app/sdl_window.hpp"
 
+#include <cstdlib>  // std::getenv (resolve_retratos_dir_local)
+#include <string>
+
 #include "gus/app/screens/anim_catalog.hpp"  // resolve_gus_sprites_dir
 #include "gus/app/screens/city_loader.hpp"   // load_city_or_fallback
 #include "gus/app/screens/player_sprites_loader.hpp"
+#include "gus/core/asset_paths.hpp"  // kRetratosDir/kRetratoInimigoFile (marcador do inimigo)
+
+// Raiz resources/ do repo, embutida pelo CMake (mesma macro que anim_catalog.cpp/
+// battle_preview.cpp resolvem - PRIVATE no CMakeLists do target app, ver GusEngine/app/
+// CMakeLists.txt). Guard defensivo caso este .cpp compile fora desse target um dia.
+#ifndef GUSWORLD_ASSETS_DIR
+#define GUSWORLD_ASSETS_DIR ""
+#endif
 
 namespace gus::app {
 
 namespace {
 constexpr int kWindowW = 1280;
 constexpr int kWindowH = 720;
+
+std::string join_asset_path(const std::string& a, const std::string& b) {
+    if (a.empty()) {
+        return b;
+    }
+    if (a.back() == '/') {
+        return a + b;
+    }
+    return a + "/" + b;
+}
+
+// Resolve a pasta dos retratos de batalha (sprites/icons-m5/retratos), MESMA receita de
+// resolve_gus_sprites_dir (anim_catalog.cpp): env GUSWORLD_ASSETS > macro de compilacao
+// GUSWORLD_ASSETS_DIR > relativo ao CWD (resources/). O sub-caminho vem do header central
+// (kRetratosDir) - nao hardcoded aqui.
+std::string resolve_retratos_dir_local() {
+    const std::string sub(gus::core::assets::kRetratosDir);
+    if (const char* env = std::getenv("GUSWORLD_ASSETS")) {
+        if (env[0] != '\0') {
+            return join_asset_path(env, sub);
+        }
+    }
+    const std::string compiled = GUSWORLD_ASSETS_DIR;
+    if (!compiled.empty()) {
+        return join_asset_path(compiled, sub);
+    }
+    return join_asset_path("resources", sub);
+}
 }  // namespace
 
 SdlWindow::SdlWindow() : clock_(1.0 / 60.0, 5) {
@@ -91,6 +130,32 @@ bool SdlWindow::init_attached(SDL_Window* window) {
     return true;
 }
 
+void SdlWindow::load_enemy_marker_texture() {
+    if (!enemy_marker_aabb_.has_value()) {
+        return;  // nenhum marcador definido ainda (uso standalone/sem Maestro)
+    }
+    const std::string path = join_asset_path(
+        resolve_retratos_dir_local(),
+        std::string(gus::core::assets::kRetratoInimigoFile));
+    enemy_marker_tex_ = render2d_->load_texture(path.c_str());
+    if (enemy_marker_tex_ != gus::platform::render2d::kInvalidTexture) {
+        sim_->set_enemy_marker(*enemy_marker_aabb_, enemy_marker_tex_);
+    } else {
+        // Asset ausente/headless: degrada sem deixar um TextureId obsoleto no sim_.
+        sim_->clear_enemy_marker();
+    }
+}
+
+void SdlWindow::set_enemy_marker(const gus::core::spatial::Aabb& aabb) {
+    enemy_marker_aabb_ = aabb;
+    load_enemy_marker_texture();
+}
+
+void SdlWindow::clear_enemy_marker() {
+    enemy_marker_aabb_.reset();
+    sim_->clear_enemy_marker();
+}
+
 void SdlWindow::release_renderer() {
     render2d_.reset();
     if (renderer_ != nullptr) {
@@ -110,6 +175,9 @@ bool SdlWindow::reacquire_renderer() {
         std::make_unique<gus::platform::render2d::Render2dSdl>(renderer_);
     // Os TextureId anteriores nao sobrevivem ao SDL_Renderer destruido - recarrega.
     load_player_sprites();
+    // Idem pro marcador de inimigo (M7-COSTURA Inc 2): so recarrega se ja havia um
+    // definido (no-op seguro se enemy_marker_aabb_ nunca foi setada).
+    load_enemy_marker_texture();
     return true;
 }
 

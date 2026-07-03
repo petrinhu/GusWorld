@@ -87,11 +87,32 @@ public:
     // parede, qualquer que seja o mapa real/fallback carregado).
     [[nodiscard]] const gus::core::spatial::TileGrid& grid() const noexcept;
 
+    // M7-COSTURA Inc 2 (o inimigo fixo agora e VISIVEL): define/reposiciona o marcador
+    // visual do inimigo fixo em `aabb` - carrega (ou recarrega) a MESMA textura de
+    // androide que a tela de BATALHA usa pros inimigos (retrato_inimigo.png,
+    // kRetratoInimigoFile) no renderer_ CORRENTE e a entrega ao OverworldSim (mesmo
+    // padrao de load_player_sprites: os TextureId sao locais ao SDL_Renderer vivo). A
+    // Maestro chama isto apos calcular a posicao logica do inimigo (pick_fixed_enemy_
+    // position). Asset ausente/headless => nada e desenhado (degradacao segura).
+    void set_enemy_marker(const gus::core::spatial::Aabb& aabb);
+
+    // Some com o marcador (Victory, item 4 do escopo M7: "o inimigo derrotado some do
+    // mapa"). No-op se nao havia marcador.
+    void clear_enemy_marker();
+
 private:
     // Carrega os sprites do Gus no renderer_ corrente e os entrega ao sim_. Extraido
     // de init() pra ser reusado por init_attached() e reacquire_renderer() (mesma
     // receita, 3 pontos de chamada).
     void load_player_sprites();
+
+    // (Re)carrega a textura do marcador de inimigo no renderer_ CORRENTE e a reaplica ao
+    // sim_ (ver set_enemy_marker no header publico). No-op se enemy_marker_aabb_ ainda
+    // nao foi definida (uso standalone da cidade sem Maestro, ou antes do 1o
+    // set_enemy_marker) - o mesmo motivo de load_player_sprites nao depender de posicao.
+    // Chamado por set_enemy_marker() e por reacquire_renderer() (os handles de textura
+    // NAO sobrevivem a troca de SDL_Renderer, mesmo racional do Gus).
+    void load_enemy_marker_texture();
 
     SDL_Window* window_ = nullptr;      // dono SO se owns_window_ (ver init() vs init_attached())
     SDL_Renderer* renderer_ = nullptr;  // sempre owner (destruido em release_renderer/dtor)
@@ -103,6 +124,13 @@ private:
     gus::core::time::FixedTimestep clock_;
     bool have_last_time_ = false;
     unsigned long long last_ns_ = 0;
+
+    // MARCADOR DE INIMIGO FIXO (M7-COSTURA Inc 2): AABB logica (dada pela Maestro) +
+    // TextureId cacheado (local ao renderer_ vivo). nullopt = nenhum marcador definido
+    // ainda (uso standalone/sem Maestro).
+    std::optional<gus::core::spatial::Aabb> enemy_marker_aabb_{};
+    gus::platform::render2d::TextureId enemy_marker_tex_ =
+        gus::platform::render2d::kInvalidTexture;
 };
 
 }  // namespace gus::app

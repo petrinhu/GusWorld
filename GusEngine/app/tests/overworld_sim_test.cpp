@@ -237,6 +237,56 @@ TEST_CASE("overworld: render emite paredes e jogador", "[overworld]") {
     REQUIRE(r.player_cmd() != nullptr);
 }
 
+// MARCADOR DE INIMIGO FIXO (M7-COSTURA Inc 2): o placeholder do androide (a MESMA
+// textura da tela de batalha) desenhado por cima do mapa, na MESMA escala/ancoragem do
+// Gus (player_sprite_height_tiles) - o lider precisa VER o inimigo pra esbarrar nele de
+// proposito. Ver overworld_sim.hpp/set_enemy_marker.
+TEST_CASE("overworld: marcador de inimigo desenha na posicao/escala certas", "[overworld][enemy-marker]") {
+    TileGrid g = make_map();
+    OverworldSim sim(g, Aabb{16.0f, 16.0f, 8.0f, 8.0f}, tuning_no_zoom_for_tile16());
+    const Aabb enemy{48.0f, 16.0f, 8.0f, 8.0f};
+    sim.set_enemy_marker(enemy, /*tex=*/7);
+    REQUIRE(sim.has_enemy_marker());
+
+    FakeRenderer r;
+    sim.render(r, 80.0f, 80.0f, 0.0f);
+    // So o marcador (o jogador, sem set_player_sprites, cai no contorno - draw_rect_outline,
+    // nao draw_textured_rect).
+    REQUIRE(r.sprites.size() == 1);
+    REQUIRE(r.sprites[0].texture == 7);
+    // Tamanho = MESMA escala do sprite do Gus (player_sprite_height_tiles * tile_size).
+    const float expected_h = OverworldTuning{}.player_sprite_height_tiles * 16.0f;
+    REQUIRE_THAT(r.sprites[0].rect.w, WithinAbs(expected_h, kEps));
+    REQUIRE_THAT(r.sprites[0].rect.h, WithinAbs(expected_h, kEps));
+    // Centrado em X sobre a AABB do inimigo.
+    REQUIRE_THAT(r.sprites[0].rect.x + r.sprites[0].rect.w * 0.5f,
+                WithinAbs(enemy.x + enemy.w * 0.5f, kEps));
+    // Base do quad == base da AABB (bottom_fraction 0, sem foot-inset: e um busto/icone).
+    REQUIRE_THAT(r.sprites[0].rect.y + r.sprites[0].rect.h,
+                WithinAbs(enemy.y + enemy.h, kEps));
+}
+
+TEST_CASE("overworld: sem marcador (default), textura invalida ou apos clear -> nada desenhado",
+         "[overworld][enemy-marker]") {
+    TileGrid g = make_map();
+    OverworldSim sim(g, Aabb{16.0f, 16.0f, 8.0f, 8.0f}, tuning_no_zoom_for_tile16());
+    REQUIRE_FALSE(sim.has_enemy_marker());  // default: nenhum marcador
+
+    sim.set_enemy_marker(Aabb{48.0f, 16.0f, 8.0f, 8.0f}, kInvalidTexture);
+    REQUIRE_FALSE(sim.has_enemy_marker());  // textura invalida nao conta como "ativo"
+    FakeRenderer r1;
+    sim.render(r1, 80.0f, 80.0f, 0.0f);
+    REQUIRE(r1.sprites.empty());
+
+    sim.set_enemy_marker(Aabb{48.0f, 16.0f, 8.0f, 8.0f}, /*tex=*/9);
+    REQUIRE(sim.has_enemy_marker());
+    sim.clear_enemy_marker();
+    REQUIRE_FALSE(sim.has_enemy_marker());  // Victory (item 4 do escopo): some do mapa
+    FakeRenderer r2;
+    sim.render(r2, 80.0f, 80.0f, 0.0f);
+    REQUIRE(r2.sprites.empty());
+}
+
 TEST_CASE("overworld: render interpola posicao do jogador", "[overworld]") {
     TileGrid g = make_map();
     OverworldSim sim(g, Aabb{16.0f, 16.0f, 8.0f, 8.0f}, 60.0f);

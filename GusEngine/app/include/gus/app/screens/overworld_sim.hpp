@@ -183,6 +183,35 @@ public:
     //     Gus 5 = breathing), tocado por TEMPO no step_fixed (loop em loop).
     void set_player_sprites(const PlayerSpriteSet& sprites) noexcept;
 
+    // MARCADOR DE INIMIGO FIXO (M7-COSTURA Inc 2): posiciona (ou reposiciona) um
+    // marcador visivel de inimigo ESTATICO no mapa, desenhado por cima do chao na MESMA
+    // escala/ancoragem do sprite do Gus (tuning_.player_sprite_height_tiles), pra ficar
+    // do tamanho certo e visivel na celula. `tex` e o TextureId JA RESOLVIDO pela casca
+    // SDL (mesmo padrao de set_player_sprites) - a MESMA textura (retrato_inimigo.png)
+    // que a tela de BATALHA usa pros inimigos, pra o jogador reconhecer "e o mesmo
+    // bicho". kInvalidTexture => nada e desenhado (fallback seguro/headless). A Maestro
+    // (dona da posicao logica do inimigo) chama isto apos calcular a posicao; NAO muda a
+    // colisao/regra de jogo, so o desenho.
+    void set_enemy_marker(const gus::core::spatial::Aabb& aabb,
+                          gus::platform::render2d::TextureId tex) noexcept {
+        enemy_marker_aabb_ = aabb;
+        enemy_marker_tex_ = tex;
+    }
+
+    // Some com o marcador (Victory, item 4 do escopo M7 Inc 1: "o inimigo derrotado some
+    // do mapa"). No-op seguro se nao havia marcador.
+    void clear_enemy_marker() noexcept {
+        enemy_marker_aabb_.reset();
+        enemy_marker_tex_ = gus::platform::render2d::kInvalidTexture;
+    }
+
+    // true se ha um marcador de inimigo ATIVO e desenhavel (AABB definida + textura
+    // valida). Leitura/teste.
+    [[nodiscard]] bool has_enemy_marker() const noexcept {
+        return enemy_marker_aabb_.has_value() &&
+               enemy_marker_tex_ != gus::platform::render2d::kInvalidTexture;
+    }
+
     // Direcao e quadro de walk correntes (leitura/teste).
     [[nodiscard]] Direction facing() const noexcept { return facing_; }
     [[nodiscard]] const WalkCycle& walk_cycle() const noexcept { return walk_; }
@@ -234,6 +263,13 @@ private:
     Direction facing_ = Direction::South;
     WalkCycle walk_;
     PlayerSpriteSet sprites_{};
+
+    // MARCADOR DE INIMIGO FIXO (M7-COSTURA Inc 2): AABB + textura do marcador visivel
+    // (ver set_enemy_marker acima). nullopt/kInvalidTexture = nada desenhado (default,
+    // headless/sem Maestro).
+    std::optional<gus::core::spatial::Aabb> enemy_marker_aabb_{};
+    gus::platform::render2d::TextureId enemy_marker_tex_ =
+        gus::platform::render2d::kInvalidTexture;
 
     // IDLE OFEGANTE (cansado): troca os QUADROS do breathing por TEMPO (AnimClock),
     // num ritmo RAPIDO (idle_tired_breaths_per_minute). So e mostrado quando parado E

@@ -78,6 +78,12 @@ inline constexpr std::string_view kIconsM5Dir = "sprites/icons-m5";
 // Retratos (48px / busto 3/4) usados na fila CTB. (retrato_gus_combate.png virou 3/4; o
 // arquivo continua nesta pasta - so o conteudo mudou.)
 inline constexpr std::string_view kRetratosDir = "sprites/icons-m5/retratos";
+// Retrato GENERICO do androide-inimigo (busto ciber-gotico magenta/cinza): usado na tela
+// de BATALHA pra qualquer inimigo sem retrato proprio (retrato_file_for em
+// battle_preview.cpp) E, desde M7-COSTURA Inc 2, como o MESMO marcador visivel do
+// inimigo FIXO no OVERWORLD (overworld_sim.cpp/sdl_window.cpp) - consistencia "o inimigo
+// visto no mapa = o mesmo enfrentado na batalha" (pedido do lider). Em kRetratosDir.
+inline constexpr std::string_view kRetratoInimigoFile = "retrato_inimigo.png";
 
 // Icones de status effect (Stun/Poison/Shield/...), 14px.
 inline constexpr std::string_view kStatusIconsDir = "sprites/icons-m5/status";

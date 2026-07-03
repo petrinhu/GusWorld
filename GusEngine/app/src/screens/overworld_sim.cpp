@@ -279,6 +279,33 @@ void OverworldSim::render(gus::platform::render2d::IRenderer& renderer,
         }
     }
 
+    // MARCADOR DE INIMIGO FIXO (M7-COSTURA Inc 2): o placeholder do androide (a MESMA
+    // textura que a tela de BATALHA usa pros inimigos), desenhado ANTES do jogador (se
+    // as pegadas se sobrepuserem, o Gus fica por cima - leitura tatica, o jogador nunca
+    // "some atras" do marcador). MESMA escala/ancoragem do sprite do Gus
+    // (player_sprite_height_tiles): quad quadrado, centrado em X sobre a AABB do
+    // inimigo, base do quad = base da AABB (sem foot-inset - e um busto/icone, nao um
+    // sprite de corpo com pes medidos). Culling: so desenha se a AABB cruza a janela da
+    // camera (mesmo espirito do culling de tile acima). kInvalidTexture/sem AABB (ver
+    // has_enemy_marker) => nada e desenhado (fallback seguro).
+    if (has_enemy_marker()) {
+        const gus::core::spatial::Aabb& ea = *enemy_marker_aabb_;
+        const gus::core::spatial::Rect enemy_footprint{ea.x, ea.y, ea.w, ea.h};
+        if (overlaps(enemy_footprint, view.rect)) {
+            const float esprite_h =
+                tuning_.player_sprite_height_tiles * grid_.tile_size();
+            const float esprite_w = esprite_h;  // retrato quadrado
+            const float ex = ea.x + ea.w * 0.5f - esprite_w * 0.5f;
+            const float ey = sprite_top_y(ea.y + ea.h, esprite_h,
+                                          /*bottom_fraction=*/0.0f,
+                                          /*manual_offset_world=*/0.0f);
+            const gus::core::spatial::Rect enemy_rect{ex, ey, esprite_w, esprite_h};
+            const gus::platform::render2d::UvRect euv{0.0f, 0.0f, 1.0f, 1.0f};
+            const gus::platform::render2d::DrawColor ewhite{1.0f, 1.0f, 1.0f, 1.0f};
+            renderer.draw_textured_rect(enemy_rect, enemy_marker_tex_, euv, ewhite);
+        }
+    }
+
     // Jogador por cima, na posicao interpolada.
     if (sprites_.loaded()) {
         // SPRITE ancorado nos PES sobre a AABB de colisao. A AABB e a hitbox dos

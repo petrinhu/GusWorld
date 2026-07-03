@@ -68,6 +68,11 @@ bool Maestro::init() {
     enemy_aabb_ = pick_fixed_enemy_position(city_->grid(), city_->player_aabb(),
                                              kEnemyOffsetTilesX, kEnemyOffsetTilesY);
     enemy_defeated_ = false;
+    // M7-COSTURA Inc 2: o inimigo fixo agora e VISIVEL no mapa - o mesmo placeholder de
+    // androide (retrato_inimigo.png) que a tela de BATALHA ja usa pros inimigos (ver
+    // sdl_window.hpp/set_enemy_marker + overworld_sim.hpp). Sem isto, a colisao
+    // continuava disparando a batalha "as cegas" (nada pro lider esbarrar de proposito).
+    city_->set_enemy_marker(enemy_aabb_);
     std::cout << "Maestro: inimigo fixo (kFixedEnemy1) em (" << enemy_aabb_.x << ", "
               << enemy_aabb_.y << "); jogador em (" << city_->player_aabb().x << ", "
               << city_->player_aabb().y << ").\n";
@@ -137,6 +142,10 @@ void Maestro::on_battle_result(gus::domain::combat::CombatOutcome outcome) {
     if (outcome_marks_enemy_defeated(outcome)) {
         enemy_defeated_ = true;
         save_.flags[std::string(kEnemy1DefeatedFlag)] = true;
+        // O marcador VISUAL some junto (M7-COSTURA Inc 2) - senao o androide continuaria
+        // desenhado no mapa mesmo com should_trigger_battle ja desarmado (enemy_defeated_),
+        // um fantasma visual que nao bate mais.
+        city_->clear_enemy_marker();
         std::cout << "Maestro: [costura] inimigo kFixedEnemy1 DERROTADO - some do "
                      "mapa (flag '"
                   << kEnemy1DefeatedFlag << "'=true em memoria).\n";
