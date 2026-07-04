@@ -66,10 +66,11 @@
 //     filter: drop-shadow (nao box-shadow: precisa abracar o contorno
 //     hexagonal, nao desenhar sombra retangular atras dele). Posicao agora
 //     POSITIVA (top/left/right/bottom: 8dp) - INTEIRA DENTRO do painel, perto
-//     de cada quina mas sem cruzar a moldura. AINDA SOLIDO (sem volume/gradiente -
-//     ver o TODO no proprio bloco .corner abaixo: a API polygon() do glintfx so
-//     pinta 1 cor solida hoje; gradiente/volume no hexagono e um pedido em aberto
-//     ao dev da lib, NAO resolvido aqui).
+//     de cada quina mas sem cruzar a moldura. FECHADO (glintfx v0.3.1, bump
+//     nesta onda): polygon() ganhou fill radial-gradient(...)/linear-gradient(...)
+//     real (per-pixel), entao .corner agora e polygon(6, radial-gradient(circle
+//     at 40% 35%, #F0D98C, #C9A24B 55%, #7A5A2E 100%)) - volume de "parafuso de
+//     latao com luz" igual ao mock original, sem hexagonos duplicados.
 //   .verb-pill / .verb-pill.focused (glow neon do selecionado)
 //     -> MESMA receita de .verb/.verb.sel do cockpit (border + box-shadow spread
 //        positivo + decorator: vertical-gradient). Padding/largura reduzidos em
@@ -168,18 +169,18 @@ body { font-family: "Pixel Operator Mono"; background: transparent; width: 100%;
   box-shadow: #22D3EE1a 0dp 0dp 50dp 0dp;
 }
 
-/* CANTOS HEXAGONAIS: decorator: polygon(6, <cor>) do glintfx v0.3.0 (verificado
-   empiricamente, probe Xvfb :99, glReadPixels confirmou geometria hexagonal real -
-   ver header deste arquivo). AINDA SOLIDO/PROVISORIO: a API so pinta 1 cor (sem
-   gradiente nem stroke separado) - o volume/gradiente do mock (radial, latao com
-   luz) fica de fora nesta versao.
-   TODO(glintfx): hexagono solido provisorio; trocar por
-   polygon(6, radial-gradient(...)) (ou API equivalente de gradiente dentro de
-   polygon()) quando o glintfx >v0.3.0 ganhar essa feature (pedido feito ao dev da
-   lib - NAO mexer na lib por aqui, so consumir o pin quando a tag sair). */
+/* CANTOS HEXAGONAIS: decorator: polygon(6, <fill>) do glintfx v0.3.1 (bump
+   ver CMakeLists.txt/GIT_TAG). O fill agora aceita radial-gradient(...) real
+   (per-pixel, mesmo shader do radial-gradient nativo do RmlUi - ver
+   docs/effects.md do glintfx vendorizado, secao "a polygon with a gradient
+   fill"), reproduzindo o "parafuso de latao com luz" do mock original
+   (01-menu-sistema-proposta-a-console-centralizado.html, radial-gradient num
+   circulo). "at 40% 35%" desloca o highlight pra cima-esquerda (luz
+   off-center); o ultimo stop (100%) cai exatamente na borda do circulo
+   inscrito do hexagono. */
 .corner {
   position: absolute; width: 20dp; height: 20dp;
-  decorator: polygon( 6, #C9A24B );
+  decorator: polygon( 6, radial-gradient( circle at 40% 35%, #F0D98C, #C9A24B 55%, #7A5A2E 100% ) );
   filter: drop-shadow( #00000080 0dp 1dp 3dp );
 }
 .corner.tl { top: 8dp; left: 8dp; }
