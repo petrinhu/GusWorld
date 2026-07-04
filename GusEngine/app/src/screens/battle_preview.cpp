@@ -308,14 +308,29 @@ body { font-family: "Pixel Operator Mono"; background: transparent; }
 .hpnum { font-size: 10dp; color: #8fa6b4; }
 .hpnum .v { color: #5fe3a0; }
 
-/* ---- pips AP (latao) / Mana (cyan), radiais com glow ---- */
-.pips { margin-top: 5dp; font-size: 10dp; color: #8fa6b4; }
-.pip { display: inline-block; width: 12dp; height: 12dp; border-radius: 6dp;
-  margin-right: 4dp; border: 1dp #2a3450; background-color: #0c1322; }
-.pip.ap.on { decorator: radial-gradient( circle closest-side, #ffe6a8, #E8A33D );
-  box-shadow: #E8A33D 0dp 0dp 12dp 2dp; }
-.pip.mana.on { decorator: radial-gradient( circle closest-side, #c2f6ff, #22D3EE );
-  box-shadow: #22D3EE 0dp 0dp 12dp 2dp; }
+/* ---- barras AP (latao) / Mana (cyan) — COCKPIT-BARRAS-MANA-AP (pedido do lider ao vivo
+   2026-07-03): antes eram pips/bolinhas (.pip.ap/.pip.mana, radiais com glow); agora
+   reusam a MESMA familia visual da .hpbar (geometria IDENTICA: width/height/border-radius/
+   margin-top) — so o decorator (gradiente) e o box-shadow trocam de tema, igual o .pip.ap/
+   .pip.mana ja faziam (latao vs cyan). NAO e barra proporcional (a .hpbar tambem nao e —
+   ver comentario acima; escala real e trabalho futuro reportado la). O rotulo ganha o
+   numero (mesma familia do .hpnum/.v) pra nao perder a leitura discreta "3 de 4" que o
+   pip dava — NOTA DE UX pendente do lider: ele quer TESTAR barra tambem pro AP (sabendo
+   que pip costuma ler melhor pra contagem em relance); reverter .apbar/.apnum pro
+   .pip.ap antigo (preservado no historico git) e trivial se ele preferir ao vivo. */
+.apnum, .mananum { margin-top: 5dp; font-size: 10dp; color: #8fa6b4; }
+.apnum .v { color: #E8A33D; }
+.mananum .v { color: #22D3EE; }
+.apbar {
+  width: 110dp; height: 12dp; border-radius: 6dp; margin-top: 3dp;
+  decorator: vertical-gradient( #ffe6a8 #E8A33D );  /* latao: creme -> ambar (tema AP) */
+  box-shadow: #E8A33D 0dp 0dp 16dp 2dp;
+}
+.manabar {
+  width: 110dp; height: 12dp; border-radius: 6dp; margin-top: 3dp;
+  decorator: vertical-gradient( #c2f6ff #22D3EE );  /* cyan: gelo -> cyan (tema Mana) */
+  box-shadow: #22D3EE 0dp 0dp 16dp 2dp;
+}
 
 /* ---- MENU de verbos: pill rococo com GLOW neon nos 3 estados ---- */
 /* ESPACAMENTO (veredito do lider): +18dp de folga MANA->1o botao (margin-top do .menu) e
@@ -467,14 +482,10 @@ body { font-family: "Pixel Operator Mono"; background: transparent; }
       <div id="vitals">
         <div class="hpnum">HP <span class="v">{{hp}}</span> / {{hp_max}}</div>
         <div class="hpbar"></div>
-        <div class="pips">
-          AP
-          <span class="pip ap on"></span><span class="pip ap on"></span><span class="pip ap on"></span><span class="pip ap"></span>
-        </div>
-        <div class="pips">
-          MANA
-          <span class="pip mana on"></span><span class="pip mana on"></span><span class="pip mana"></span><span class="pip mana"></span><span class="pip mana"></span>
-        </div>
+        <div class="apnum">AP <span class="v">3</span> / 4</div>
+        <div class="apbar"></div>
+        <div class="mananum">MANA <span class="v">2</span> / 5</div>
+        <div class="manabar"></div>
       </div>
 
       <!-- +18dp de folga MANA->1o botao vem do margin-top do .menu (block nativo). -->
