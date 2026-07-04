@@ -1,10 +1,18 @@
 // GusEngine/app/tests/system_menu_test.cpp
 //
-// Catch2 (TEST-FIRST) da logica PURA do menu de sistema (pausa + config de som,
-// MENU-PAUSA-CONFIG-SOM, M7-COSTURA): POCO 100% testavel sem SDL/janela/glintfx -
-// mesmo espirito de app/tests/battle_key_routing_test.cpp e maestro_logic_test.cpp.
-// A UI (RML/RCSS) e a integracao com AudioEngine/persistencia SO CONSOMEM este
-// estado; aqui so a navegacao/selecao/ajuste de volume.
+// Catch2 (TEST-FIRST) da logica PURA do menu de sistema (pausa + config de som/
+// video/lingua/save, arvore hierarquica, MENU-PAUSA-CONFIG-SOM, M7-COSTURA): POCO
+// 100% testavel sem SDL/janela/glintfx - mesmo espirito de
+// app/tests/battle_key_routing_test.cpp e maestro_logic_test.cpp. A UI (RML/RCSS)
+// e a integracao com AudioEngine/persistencia SO CONSOMEM este estado; aqui so a
+// navegacao/selecao/ajuste de volume da arvore inteira:
+//
+//   Pause (Continuar/Salvar/Configuracoes/Sair)
+//     Save            -> placeholder
+//     ConfigCategories (Audio/Video/Lingua/Voltar)
+//       Audio         -> Musica/SFX/Voltar (sliders)
+//       Video         -> placeholder
+//       Language      -> placeholder
 
 #include <catch2/catch_approx.hpp>
 #include <catch2/catch_test_macros.hpp>
@@ -15,13 +23,29 @@
 
 using namespace gus::app::screens;
 
+namespace {
+
+// Helpers de navegacao (evitam repetir a sequencia de teclas em todo TEST_CASE).
+void goto_config_categories(SystemMenuState& state) {
+    system_menu_open(state);
+    system_menu_key_down(state, SDLK_DOWN);
+    system_menu_key_down(state, SDLK_DOWN);    // Pause: foco = Configuracoes (2)
+    system_menu_key_down(state, SDLK_RETURN);  // entra em ConfigCategories
+}
+
+void goto_audio(SystemMenuState& state) {
+    goto_config_categories(state);
+    system_menu_key_down(state, SDLK_RETURN);  // ConfigCategories: foco=Audio(0) -> entra
+}
+
+}  // namespace
+
 TEST_CASE("SystemMenuState: comeca Hidden (menu fechado)", "[system_menu]") {
     SystemMenuState state;
     REQUIRE(state.screen == SystemMenuScreen::Hidden);
 }
 
-TEST_CASE("system_menu_open: abre em Pause com foco inicial em Continuar (item 0, "
-          "mock: 'foco inicial CONTINUAR')",
+TEST_CASE("system_menu_open: abre em Pause com foco inicial em Continuar (item 0)",
           "[system_menu]") {
     SystemMenuState state;
     system_menu_open(state);
@@ -29,7 +53,23 @@ TEST_CASE("system_menu_open: abre em Pause com foco inicial em Continuar (item 0
     REQUIRE(state.pause_selected == 0);
 }
 
-TEST_CASE("Pause: UP/DOWN navega os 3 itens com WRAP (Continuar/Configuracoes/Sair)",
+TEST_CASE("parent_screen_of: cada tela da arvore aponta pro pai correto",
+          "[system_menu]") {
+    REQUIRE(parent_screen_of(SystemMenuScreen::Save) == SystemMenuScreen::Pause);
+    REQUIRE(parent_screen_of(SystemMenuScreen::ConfigCategories) ==
+            SystemMenuScreen::Pause);
+    REQUIRE(parent_screen_of(SystemMenuScreen::Audio) ==
+            SystemMenuScreen::ConfigCategories);
+    REQUIRE(parent_screen_of(SystemMenuScreen::Video) ==
+            SystemMenuScreen::ConfigCategories);
+    REQUIRE(parent_screen_of(SystemMenuScreen::Language) ==
+            SystemMenuScreen::ConfigCategories);
+}
+
+// ---------------------------------------------------------------- Pause
+
+TEST_CASE("Pause: UP/DOWN navega os 4 itens com WRAP (Continuar/Salvar/"
+          "Configuracoes/Sair)",
           "[system_menu]") {
     SystemMenuState state;
     system_menu_open(state);
@@ -39,11 +79,13 @@ TEST_CASE("Pause: UP/DOWN navega os 3 itens com WRAP (Continuar/Configuracoes/Sa
     REQUIRE(state.pause_selected == 1);
     system_menu_key_down(state, SDLK_DOWN);
     REQUIRE(state.pause_selected == 2);
+    system_menu_key_down(state, SDLK_DOWN);
+    REQUIRE(state.pause_selected == 3);
     system_menu_key_down(state, SDLK_DOWN);  // wrap pro topo
     REQUIRE(state.pause_selected == 0);
 
     system_menu_key_down(state, SDLK_UP);  // wrap pro fim
-    REQUIRE(state.pause_selected == 2);
+    REQUIRE(state.pause_selected == 3);
 }
 
 TEST_CASE("Pause: ENTER em Continuar (item 0) devolve action Continue",
@@ -54,67 +96,221 @@ TEST_CASE("Pause: ENTER em Continuar (item 0) devolve action Continue",
     REQUIRE(action == SystemMenuAction::Continue);
 }
 
-TEST_CASE("Pause: ESC (volta ao jogo) devolve action Continue - mesmo efeito de "
-          "confirmar Continuar (footer do mock: 'ESC volta ao jogo')",
+TEST_CASE("Pause: ESC (volta ao jogo) devolve action Continue - RAIZ da arvore, "
+          "footer 'ESC volta ao jogo'",
           "[system_menu]") {
     SystemMenuState state;
     system_menu_open(state);
-    system_menu_key_down(state, SDLK_DOWN);  // move pro item 1 (Configuracoes)
+    system_menu_key_down(state, SDLK_DOWN);  // move pro item 1 (Salvar)
     const SystemMenuAction action = system_menu_key_down(state, SDLK_ESCAPE);
     REQUIRE(action == SystemMenuAction::Continue);
 }
 
-TEST_CASE("Pause: ENTER em Configuracoes (item 1) abre a tela de Config",
+TEST_CASE("Pause: ENTER em Salvar (item 1) abre a tela Save (placeholder)",
           "[system_menu]") {
     SystemMenuState state;
     system_menu_open(state);
-    system_menu_key_down(state, SDLK_DOWN);  // item 1 = Configuracoes
+    system_menu_key_down(state, SDLK_DOWN);  // item 1 = Salvar
     const SystemMenuAction action = system_menu_key_down(state, SDLK_RETURN);
-    REQUIRE(action == SystemMenuAction::OpenSettings);
-    REQUIRE(state.screen == SystemMenuScreen::Config);
-    REQUIRE(state.config_selected == 0);  // foco inicial = Musica
+    REQUIRE(action == SystemMenuAction::Navigated);
+    REQUIRE(state.screen == SystemMenuScreen::Save);
 }
 
-TEST_CASE("Pause: ENTER em Sair (item 2) devolve action RequestQuit sem fechar "
+TEST_CASE("Pause: ENTER em Configuracoes (item 2) abre ConfigCategories, foco "
+          "inicial = Audio",
+          "[system_menu]") {
+    SystemMenuState state;
+    system_menu_open(state);
+    system_menu_key_down(state, SDLK_DOWN);
+    system_menu_key_down(state, SDLK_DOWN);  // item 2 = Configuracoes
+    const SystemMenuAction action = system_menu_key_down(state, SDLK_RETURN);
+    REQUIRE(action == SystemMenuAction::Navigated);
+    REQUIRE(state.screen == SystemMenuScreen::ConfigCategories);
+    REQUIRE(state.config_categories_selected == 0);  // foco inicial = Audio
+}
+
+TEST_CASE("Pause: ENTER em Sair (item 3) devolve action RequestQuit sem fechar "
           "o menu sozinho (o chamador decide encerrar o programa)",
           "[system_menu]") {
     SystemMenuState state;
     system_menu_open(state);
     system_menu_key_down(state, SDLK_DOWN);
-    system_menu_key_down(state, SDLK_DOWN);  // item 2 = Sair
+    system_menu_key_down(state, SDLK_DOWN);
+    system_menu_key_down(state, SDLK_DOWN);  // item 3 = Sair
     const SystemMenuAction action = system_menu_key_down(state, SDLK_RETURN);
     REQUIRE(action == SystemMenuAction::RequestQuit);
 }
 
-TEST_CASE("Config: UP/DOWN navega os 3 itens com WRAP (Musica/SFX/Voltar)",
+TEST_CASE("Pause: A/D nao fazem nada (sem eixo horizontal na tela Pause)",
           "[system_menu]") {
     SystemMenuState state;
     system_menu_open(state);
-    system_menu_key_down(state, SDLK_DOWN);
-    system_menu_key_down(state, SDLK_RETURN);  // entra em Config
-    REQUIRE(state.config_selected == 0);
-
-    system_menu_key_down(state, SDLK_DOWN);
-    REQUIRE(state.config_selected == 1);
-    system_menu_key_down(state, SDLK_DOWN);
-    REQUIRE(state.config_selected == 2);
-    system_menu_key_down(state, SDLK_DOWN);  // wrap
-    REQUIRE(state.config_selected == 0);
+    const int before = state.pause_selected;
+    REQUIRE(system_menu_key_down(state, SDLK_A) == SystemMenuAction::None);
+    REQUIRE(system_menu_key_down(state, SDLK_D) == SystemMenuAction::None);
+    REQUIRE(state.pause_selected == before);
 }
 
-TEST_CASE("Config: LEFT/RIGHT no item Musica ajusta music_volume clampado [0,1]",
+// ---------------------------------------------------------------- Save (placeholder)
+
+TEST_CASE("Save (placeholder): ESC ou ENTER voltam pro Pause preservando a "
+          "selecao anterior de Pause",
+          "[system_menu]") {
+    SystemMenuState state;
+    system_menu_open(state);
+    system_menu_key_down(state, SDLK_DOWN);    // Pause: foco = Salvar (1)
+    system_menu_key_down(state, SDLK_RETURN);  // entra em Save
+    REQUIRE(state.screen == SystemMenuScreen::Save);
+
+    const SystemMenuAction action = system_menu_key_down(state, SDLK_ESCAPE);
+    REQUIRE(action == SystemMenuAction::Navigated);
+    REQUIRE(state.screen == SystemMenuScreen::Pause);
+    REQUIRE(state.pause_selected == 1);  // ainda em Salvar, nao resetou
+}
+
+TEST_CASE("Save (placeholder): UP/DOWN/LEFT/RIGHT nao fazem nada (sem controle, "
+          "so 'em breve' + Voltar)",
           "[system_menu]") {
     SystemMenuState state;
     system_menu_open(state);
     system_menu_key_down(state, SDLK_DOWN);
-    system_menu_key_down(state, SDLK_RETURN);  // Config, foco = Musica (0)
+    system_menu_key_down(state, SDLK_RETURN);  // Save
+    REQUIRE(system_menu_key_down(state, SDLK_UP) == SystemMenuAction::None);
+    REQUIRE(system_menu_key_down(state, SDLK_DOWN) == SystemMenuAction::None);
+    REQUIRE(system_menu_key_down(state, SDLK_LEFT) == SystemMenuAction::None);
+    REQUIRE(state.screen == SystemMenuScreen::Save);
+}
+
+// ---------------------------------------------------------------- ConfigCategories
+
+TEST_CASE("ConfigCategories: UP/DOWN navega os 4 itens com WRAP (Audio/Video/"
+          "Lingua/Voltar)",
+          "[system_menu]") {
+    SystemMenuState state;
+    goto_config_categories(state);
+    REQUIRE(state.config_categories_selected == 0);
+
+    system_menu_key_down(state, SDLK_DOWN);
+    REQUIRE(state.config_categories_selected == 1);
+    system_menu_key_down(state, SDLK_DOWN);
+    REQUIRE(state.config_categories_selected == 2);
+    system_menu_key_down(state, SDLK_DOWN);
+    REQUIRE(state.config_categories_selected == 3);
+    system_menu_key_down(state, SDLK_DOWN);  // wrap
+    REQUIRE(state.config_categories_selected == 0);
+}
+
+TEST_CASE("ConfigCategories: ENTER em Audio (item 0) abre a tela Audio, foco "
+          "inicial = Musica",
+          "[system_menu]") {
+    SystemMenuState state;
+    goto_config_categories(state);
+    const SystemMenuAction action = system_menu_key_down(state, SDLK_RETURN);
+    REQUIRE(action == SystemMenuAction::Navigated);
+    REQUIRE(state.screen == SystemMenuScreen::Audio);
+    REQUIRE(state.audio_selected == 0);
+}
+
+TEST_CASE("ConfigCategories: ENTER em Video (item 1) abre a tela Video "
+          "(placeholder)",
+          "[system_menu]") {
+    SystemMenuState state;
+    goto_config_categories(state);
+    system_menu_key_down(state, SDLK_DOWN);  // item 1 = Video
+    const SystemMenuAction action = system_menu_key_down(state, SDLK_RETURN);
+    REQUIRE(action == SystemMenuAction::Navigated);
+    REQUIRE(state.screen == SystemMenuScreen::Video);
+}
+
+TEST_CASE("ConfigCategories: ENTER em Lingua (item 2) abre a tela Language "
+          "(placeholder)",
+          "[system_menu]") {
+    SystemMenuState state;
+    goto_config_categories(state);
+    system_menu_key_down(state, SDLK_DOWN);
+    system_menu_key_down(state, SDLK_DOWN);  // item 2 = Lingua
+    const SystemMenuAction action = system_menu_key_down(state, SDLK_RETURN);
+    REQUIRE(action == SystemMenuAction::Navigated);
+    REQUIRE(state.screen == SystemMenuScreen::Language);
+}
+
+TEST_CASE("ConfigCategories: ESC ou ENTER em Voltar (item 3) voltam pro Pause "
+          "preservando a selecao anterior de Pause (Configuracoes)",
+          "[system_menu]") {
+    SystemMenuState state;
+    goto_config_categories(state);
+    const SystemMenuAction esc_action = system_menu_key_down(state, SDLK_ESCAPE);
+    REQUIRE(esc_action == SystemMenuAction::Navigated);
+    REQUIRE(state.screen == SystemMenuScreen::Pause);
+    REQUIRE(state.pause_selected == 2);  // ainda em Configuracoes
+
+    // De novo, desta vez confirmando com ENTER no item Voltar.
+    goto_config_categories(state);
+    system_menu_key_down(state, SDLK_DOWN);
+    system_menu_key_down(state, SDLK_DOWN);
+    system_menu_key_down(state, SDLK_DOWN);  // item 3 = Voltar
+    const SystemMenuAction back_action = system_menu_key_down(state, SDLK_RETURN);
+    REQUIRE(back_action == SystemMenuAction::Navigated);
+    REQUIRE(state.screen == SystemMenuScreen::Pause);
+}
+
+// ---------------------------------------------------------------- Video/Language (placeholder)
+
+TEST_CASE("Video (placeholder): ESC volta pra ConfigCategories preservando a "
+          "selecao anterior (Video)",
+          "[system_menu]") {
+    SystemMenuState state;
+    goto_config_categories(state);
+    system_menu_key_down(state, SDLK_DOWN);    // foco = Video (1)
+    system_menu_key_down(state, SDLK_RETURN);  // entra em Video
+    REQUIRE(state.screen == SystemMenuScreen::Video);
+
+    const SystemMenuAction action = system_menu_key_down(state, SDLK_ESCAPE);
+    REQUIRE(action == SystemMenuAction::Navigated);
+    REQUIRE(state.screen == SystemMenuScreen::ConfigCategories);
+    REQUIRE(state.config_categories_selected == 1);  // ainda em Video
+}
+
+TEST_CASE("Language (placeholder): ENTER volta pra ConfigCategories",
+          "[system_menu]") {
+    SystemMenuState state;
+    goto_config_categories(state);
+    system_menu_key_down(state, SDLK_DOWN);
+    system_menu_key_down(state, SDLK_DOWN);    // foco = Lingua (2)
+    system_menu_key_down(state, SDLK_RETURN);  // entra em Language
+    REQUIRE(state.screen == SystemMenuScreen::Language);
+
+    const SystemMenuAction action = system_menu_key_down(state, SDLK_RETURN);
+    REQUIRE(action == SystemMenuAction::Navigated);
+    REQUIRE(state.screen == SystemMenuScreen::ConfigCategories);
+}
+
+// ---------------------------------------------------------------- Audio (sliders)
+
+TEST_CASE("Audio: UP/DOWN navega os 3 itens com WRAP (Musica/SFX/Voltar)",
+          "[system_menu]") {
+    SystemMenuState state;
+    goto_audio(state);
+    REQUIRE(state.audio_selected == 0);
+
+    system_menu_key_down(state, SDLK_DOWN);
+    REQUIRE(state.audio_selected == 1);
+    system_menu_key_down(state, SDLK_DOWN);
+    REQUIRE(state.audio_selected == 2);
+    system_menu_key_down(state, SDLK_DOWN);  // wrap
+    REQUIRE(state.audio_selected == 0);
+}
+
+TEST_CASE("Audio: LEFT/RIGHT no item Musica ajusta music_volume clampado [0,1]",
+          "[system_menu]") {
+    SystemMenuState state;
+    goto_audio(state);
     REQUIRE(state.music_volume == Catch::Approx(1.0f));
 
     const SystemMenuAction a1 = system_menu_key_down(state, SDLK_LEFT);
     REQUIRE(a1 == SystemMenuAction::VolumeChanged);
     REQUIRE(state.music_volume < 1.0f);
 
-    // Repete LEFT ate esbarrar no piso 0.0 (nunca fica negativo).
     for (int i = 0; i < 30; ++i) system_menu_key_down(state, SDLK_LEFT);
     REQUIRE(state.music_volume == Catch::Approx(0.0f));
 
@@ -122,31 +318,27 @@ TEST_CASE("Config: LEFT/RIGHT no item Musica ajusta music_volume clampado [0,1]"
     REQUIRE(state.music_volume == Catch::Approx(1.0f));
 }
 
-TEST_CASE("Config: LEFT/RIGHT no item SFX (indice 1) ajusta sfx_volume, NAO "
+TEST_CASE("Audio: LEFT/RIGHT no item SFX (indice 1) ajusta sfx_volume, NAO "
           "music_volume",
           "[system_menu]") {
     SystemMenuState state;
-    system_menu_open(state);
-    system_menu_key_down(state, SDLK_DOWN);
-    system_menu_key_down(state, SDLK_RETURN);  // Config
-    system_menu_key_down(state, SDLK_DOWN);    // foco = SFX (1)
-    REQUIRE(state.config_selected == 1);
+    goto_audio(state);
+    system_menu_key_down(state, SDLK_DOWN);  // foco = SFX (1)
+    REQUIRE(state.audio_selected == 1);
 
     system_menu_key_down(state, SDLK_LEFT);
     REQUIRE(state.sfx_volume < 1.0f);
     REQUIRE(state.music_volume == Catch::Approx(1.0f));  // intocado
 }
 
-TEST_CASE("Config: LEFT/RIGHT no item Voltar (indice 2) NAO produz VolumeChanged "
+TEST_CASE("Audio: LEFT/RIGHT no item Voltar (indice 2) NAO produz VolumeChanged "
           "(nao e um slider)",
           "[system_menu]") {
     SystemMenuState state;
-    system_menu_open(state);
-    system_menu_key_down(state, SDLK_DOWN);
-    system_menu_key_down(state, SDLK_RETURN);  // Config
+    goto_audio(state);
     system_menu_key_down(state, SDLK_DOWN);
     system_menu_key_down(state, SDLK_DOWN);  // foco = Voltar (2)
-    REQUIRE(state.config_selected == 2);
+    REQUIRE(state.audio_selected == 2);
 
     const SystemMenuAction action = system_menu_key_down(state, SDLK_LEFT);
     REQUIRE(action != SystemMenuAction::VolumeChanged);
@@ -154,40 +346,48 @@ TEST_CASE("Config: LEFT/RIGHT no item Voltar (indice 2) NAO produz VolumeChanged
     REQUIRE(state.sfx_volume == Catch::Approx(1.0f));
 }
 
-TEST_CASE("Config: ENTER/ESC em Voltar (ou ESC de qualquer foco) volta pra Pause "
-          "(BackToPause), preservando a selecao anterior de Pause",
+TEST_CASE("Audio: A/D ajustam volume igual LEFT/RIGHT (WASD completo)",
           "[system_menu]") {
     SystemMenuState state;
-    system_menu_open(state);
-    system_menu_key_down(state, SDLK_DOWN);  // Pause: foco = Configuracoes (1)
-    system_menu_key_down(state, SDLK_RETURN);  // entra em Config
+    goto_audio(state);
+    REQUIRE(state.music_volume == Catch::Approx(1.0f));
 
-    const SystemMenuAction action = system_menu_key_down(state, SDLK_ESCAPE);
-    REQUIRE(action == SystemMenuAction::BackToPause);
-    REQUIRE(state.screen == SystemMenuScreen::Pause);
-    REQUIRE(state.pause_selected == 1);  // ainda em Configuracoes, nao resetou
+    const SystemMenuAction a_action = system_menu_key_down(state, SDLK_A);
+    REQUIRE(a_action == SystemMenuAction::VolumeChanged);
+    REQUIRE(state.music_volume < 1.0f);
+    const float after_a = state.music_volume;
+
+    const SystemMenuAction d_action = system_menu_key_down(state, SDLK_D);
+    REQUIRE(d_action == SystemMenuAction::VolumeChanged);
+    REQUIRE(state.music_volume > after_a);
+    REQUIRE(state.music_volume == Catch::Approx(1.0f));
 }
 
-TEST_CASE("Config: ENTER no item Voltar tambem devolve BackToPause (nao so ESC)",
+TEST_CASE("Audio: ESC ou ENTER em Voltar voltam pra ConfigCategories "
+          "preservando a selecao anterior (Audio)",
           "[system_menu]") {
     SystemMenuState state;
-    system_menu_open(state);
-    system_menu_key_down(state, SDLK_DOWN);
-    system_menu_key_down(state, SDLK_RETURN);  // Config
+    goto_audio(state);
+    const SystemMenuAction action = system_menu_key_down(state, SDLK_ESCAPE);
+    REQUIRE(action == SystemMenuAction::Navigated);
+    REQUIRE(state.screen == SystemMenuScreen::ConfigCategories);
+    REQUIRE(state.config_categories_selected == 0);  // ainda em Audio
+
+    goto_audio(state);
     system_menu_key_down(state, SDLK_DOWN);
     system_menu_key_down(state, SDLK_DOWN);  // foco = Voltar
-
-    const SystemMenuAction action = system_menu_key_down(state, SDLK_RETURN);
-    REQUIRE(action == SystemMenuAction::BackToPause);
-    REQUIRE(state.screen == SystemMenuScreen::Pause);
+    const SystemMenuAction back_action = system_menu_key_down(state, SDLK_RETURN);
+    REQUIRE(back_action == SystemMenuAction::Navigated);
+    REQUIRE(state.screen == SystemMenuScreen::ConfigCategories);
 }
 
-TEST_CASE("system_menu_close: fecha de qualquer tela (Pause ou Config) para Hidden",
+// ---------------------------------------------------------------- Genericos
+
+TEST_CASE("system_menu_close: fecha de qualquer tela (mesmo funda na arvore) "
+          "para Hidden",
           "[system_menu]") {
     SystemMenuState state;
-    system_menu_open(state);
-    system_menu_key_down(state, SDLK_DOWN);
-    system_menu_key_down(state, SDLK_RETURN);  // Config
+    goto_audio(state);
     system_menu_close(state);
     REQUIRE(state.screen == SystemMenuScreen::Hidden);
 }
@@ -203,34 +403,7 @@ TEST_CASE("Teclas fora do conjunto conhecido (ex.: SDLK_Q) nao mudam estado nem 
     REQUIRE(state.pause_selected == before);
 }
 
-TEST_CASE("Config: A/D ajustam volume igual LEFT/RIGHT (WASD completo)",
-          "[system_menu]") {
-    SystemMenuState state;
-    system_menu_open(state);
-    system_menu_key_down(state, SDLK_DOWN);
-    system_menu_key_down(state, SDLK_RETURN);  // Config, foco = Musica (0)
-    REQUIRE(state.music_volume == Catch::Approx(1.0f));
-
-    const SystemMenuAction a_action = system_menu_key_down(state, SDLK_A);
-    REQUIRE(a_action == SystemMenuAction::VolumeChanged);
-    REQUIRE(state.music_volume < 1.0f);
-    const float after_a = state.music_volume;
-
-    const SystemMenuAction d_action = system_menu_key_down(state, SDLK_D);
-    REQUIRE(d_action == SystemMenuAction::VolumeChanged);
-    REQUIRE(state.music_volume > after_a);
-    REQUIRE(state.music_volume == Catch::Approx(1.0f));
-}
-
-TEST_CASE("Pause: A/D nao fazem nada (sem eixo horizontal na tela Pause)",
-          "[system_menu]") {
-    SystemMenuState state;
-    system_menu_open(state);
-    const int before = state.pause_selected;
-    REQUIRE(system_menu_key_down(state, SDLK_A) == SystemMenuAction::None);
-    REQUIRE(system_menu_key_down(state, SDLK_D) == SystemMenuAction::None);
-    REQUIRE(state.pause_selected == before);
-}
+// ---------------------------------------------------------------- Mouse (click_option)
 
 TEST_CASE("system_menu_click_option (Pause): clicar numa pill seleciona E "
           "confirma na hora (equivalente a focar + ENTER)",
@@ -241,14 +414,19 @@ TEST_CASE("system_menu_click_option (Pause): clicar numa pill seleciona E "
     SystemMenuState continuar = state;
     REQUIRE(system_menu_click_option(continuar, 0) == SystemMenuAction::Continue);
 
+    SystemMenuState save = state;
+    const SystemMenuAction save_action = system_menu_click_option(save, 1);
+    REQUIRE(save_action == SystemMenuAction::Navigated);
+    REQUIRE(save.screen == SystemMenuScreen::Save);
+
     SystemMenuState config = state;
-    const SystemMenuAction cfg_action = system_menu_click_option(config, 1);
-    REQUIRE(cfg_action == SystemMenuAction::OpenSettings);
-    REQUIRE(config.screen == SystemMenuScreen::Config);
-    REQUIRE(config.config_selected == 0);  // foco inicial = Musica
+    const SystemMenuAction cfg_action = system_menu_click_option(config, 2);
+    REQUIRE(cfg_action == SystemMenuAction::Navigated);
+    REQUIRE(config.screen == SystemMenuScreen::ConfigCategories);
+    REQUIRE(config.config_categories_selected == 0);  // foco inicial = Audio
 
     SystemMenuState sair = state;
-    REQUIRE(system_menu_click_option(sair, 2) == SystemMenuAction::RequestQuit);
+    REQUIRE(system_menu_click_option(sair, 3) == SystemMenuAction::RequestQuit);
 
     // indice invalido: no-op defensivo, nao muda pause_selected.
     SystemMenuState invalido = state;
@@ -257,22 +435,63 @@ TEST_CASE("system_menu_click_option (Pause): clicar numa pill seleciona E "
     REQUIRE(invalido.pause_selected == before);
 }
 
-TEST_CASE("system_menu_click_option (Config): clicar em Musica/SFX SO FOCA "
-          "(nao muda volume); clicar em Voltar confirma (BackToPause)",
+TEST_CASE("system_menu_click_option (ConfigCategories): clicar em qualquer "
+          "categoria confirma na hora (Audio/Video/Lingua/Voltar)",
           "[system_menu]") {
     SystemMenuState state;
-    system_menu_open(state);
-    system_menu_key_down(state, SDLK_DOWN);
-    system_menu_key_down(state, SDLK_RETURN);  // Config, foco = Musica (0)
+    goto_config_categories(state);
+
+    SystemMenuState audio = state;
+    const SystemMenuAction audio_action = system_menu_click_option(audio, 0);
+    REQUIRE(audio_action == SystemMenuAction::Navigated);
+    REQUIRE(audio.screen == SystemMenuScreen::Audio);
+
+    SystemMenuState video = state;
+    REQUIRE(system_menu_click_option(video, 1) == SystemMenuAction::Navigated);
+    REQUIRE(video.screen == SystemMenuScreen::Video);
+
+    SystemMenuState lang = state;
+    REQUIRE(system_menu_click_option(lang, 2) == SystemMenuAction::Navigated);
+    REQUIRE(lang.screen == SystemMenuScreen::Language);
+
+    SystemMenuState back = state;
+    REQUIRE(system_menu_click_option(back, 3) == SystemMenuAction::Navigated);
+    REQUIRE(back.screen == SystemMenuScreen::Pause);
+}
+
+TEST_CASE("system_menu_click_option (Audio): clicar em Musica/SFX SO FOCA "
+          "(nao muda volume); clicar em Voltar confirma (Navigated)",
+          "[system_menu]") {
+    SystemMenuState state;
+    goto_audio(state);
 
     const SystemMenuAction sfx_action = system_menu_click_option(state, 1);
     REQUIRE(sfx_action == SystemMenuAction::None);  // so foca, nao e VolumeChanged
-    REQUIRE(state.config_selected == 1);
+    REQUIRE(state.audio_selected == 1);
     REQUIRE(state.music_volume == Catch::Approx(1.0f));  // intocado
     REQUIRE(state.sfx_volume == Catch::Approx(1.0f));    // intocado (so focou)
 
     const SystemMenuAction back_action = system_menu_click_option(state, 2);
-    REQUIRE(back_action == SystemMenuAction::BackToPause);
+    REQUIRE(back_action == SystemMenuAction::Navigated);
+    REQUIRE(state.screen == SystemMenuScreen::ConfigCategories);
+}
+
+TEST_CASE("system_menu_click_option (placeholder): so kPlaceholderBackIndex "
+          "confirma; qualquer outro indice e no-op",
+          "[system_menu]") {
+    SystemMenuState state;
+    system_menu_open(state);
+    system_menu_key_down(state, SDLK_DOWN);
+    system_menu_key_down(state, SDLK_RETURN);  // Save
+    REQUIRE(state.screen == SystemMenuScreen::Save);
+
+    SystemMenuState invalido = state;
+    REQUIRE(system_menu_click_option(invalido, 5) == SystemMenuAction::None);
+    REQUIRE(invalido.screen == SystemMenuScreen::Save);
+
+    const SystemMenuAction action =
+        system_menu_click_option(state, kPlaceholderBackIndex);
+    REQUIRE(action == SystemMenuAction::Navigated);
     REQUIRE(state.screen == SystemMenuScreen::Pause);
 }
 
@@ -282,14 +501,12 @@ TEST_CASE("system_menu_click_option: Hidden (menu fechado) e no-op defensivo",
     REQUIRE(system_menu_click_option(state, 0) == SystemMenuAction::None);
 }
 
-TEST_CASE("system_menu_mouse_slider_ratio: converte fracao de mouse [0,1] em "
+TEST_CASE("system_menu_set_slider_ratio: converte fracao de mouse [0,1] em "
           "volume, alimentando VolumeChanged via drag/click (item 0=musica, "
           "1=sfx)",
           "[system_menu]") {
     SystemMenuState state;
-    system_menu_open(state);
-    system_menu_key_down(state, SDLK_DOWN);
-    system_menu_key_down(state, SDLK_RETURN);  // Config
+    goto_audio(state);
 
     system_menu_set_slider_ratio(state, /*item=*/0, /*ratio=*/0.3f);
     REQUIRE(state.music_volume == Catch::Approx(0.3f));

@@ -6,6 +6,15 @@
 // logica PURA testavel ja fica em system_menu.hpp/system_menu_test.cpp e
 // system_menu_rml.hpp/system_menu_rml_test.cpp; este .cpp so orquestra SDL/GL em
 // torno dela).
+//
+// EFEITO DE PRESS (MENU-PAUSA-CONFIG-SOM, onda arvore): quando o jogador aciona
+// uma pill/categoria/Voltar (Enter/Espaco no TECLADO ou clique de MOUSE), o loop
+// renderiza ALGUNS FRAMES com a classe "pressed" no item ativado (flash cyan
+// intenso, ver .verb-pill.pressed/.btn-back.pressed em system_menu_rml.cpp) ANTES
+// de aplicar a transicao de fato (trocar de tela/fechar o menu/pedir Sair). Isto e
+// deliberadamente um efeito NOSSO (nao do glintfx - a lib nao tem estado "active"
+// disparado por teclado, so :focus/:hover via classe) - flash_pressed() abaixo e o
+// UNICO lugar que gera esse frame extra.
 
 #include "gus/app/screens/system_menu_loop.hpp"
 
@@ -57,9 +66,11 @@ std::string menu_stage_dir() {
 // @font-face, MESMA receita de write_baked_cockpit_rml/write_live_cockpit_rml em
 // battle_preview.cpp). Copia as 2 fontes pro stage (fonte: GUSWORLD_FONTS_DIR, env
 // GUSWORLD_FONTS tem prioridade - mesma ordem de resolucao de asset do resto do
-// app/). Devolve o path do .rml escrito.
+// app/). Devolve o path do .rml escrito. `pressed_index` repassado direto pra
+// build_system_menu_rml (ver seu header) - default -1 (nenhum item pressionado).
 std::string write_system_menu_rml_file(const SystemMenuState& state,
-                                        const gus::app::i18n::Translator& tr) {
+                                        const gus::app::i18n::Translator& tr,
+                                        int pressed_index = -1) {
     const fs::path stage = menu_stage_dir();
     std::error_code ec;
     fs::create_directories(stage, ec);
@@ -77,7 +88,7 @@ std::string write_system_menu_rml_file(const SystemMenuState& state,
                       fs::copy_options::overwrite_existing, ec);
     }
 
-    std::string rml = build_system_menu_rml(state, tr);
+    std::string rml = build_system_menu_rml(state, tr, pressed_index);
     const std::string needle = "<style>\n";
     const std::size_t pos = rml.find(needle);
     if (pos != std::string::npos) {
@@ -110,20 +121,26 @@ void apply_and_persist(const SystemMenuState& state,
     }
 }
 
-// Track ids (system_menu_rml.cpp: "slider-track-<indice>", indice = ConfigItem).
+// Track ids (system_menu_rml.cpp: "slider-track-<indice>", indice = AudioItem).
 std::string track_id_for_item(int item) {
     return "slider-track-" + std::to_string(item);
 }
 
-// Ids das PILLS do Pause / dos campos do Config (system_menu_rml.cpp:
-// "pause-item-<indice>" e "config-item-<indice>" - MENU-PAUSA-CONFIG-SOM,
-// clique de mouse aciona/foca a opcao).
+// Ids das PILLS do Pause / categorias de ConfigCategories / campos+Voltar do
+// Audio (system_menu_rml.cpp: "pause-item-<indice>"/"category-item-<indice>"/
+// "audio-item-<indice>" - clique de mouse aciona/foca a opcao). O Voltar das 3
+// telas placeholder usa 1 UNICO id fixo ("placeholder-back", ver
+// build_placeholder_body): so 1 placeholder fica carregado por vez.
 std::string pause_item_id(int item) {
     return "pause-item-" + std::to_string(item);
 }
-std::string config_item_id(int item) {
-    return "config-item-" + std::to_string(item);
+std::string category_item_id(int item) {
+    return "category-item-" + std::to_string(item);
 }
+std::string audio_item_id(int item) {
+    return "audio-item-" + std::to_string(item);
+}
+constexpr const char* kPlaceholderBackId = "placeholder-back";
 
 // Hit-test simples: cursor (x,y, espaco-janela) dentro da caixa border-box
 // devolvida por glintfx::UiLayer::get_element_box (MESMO espaco de coordenadas
@@ -169,6 +186,8 @@ SystemMenuLoopOutcome run_system_menu_loop_gl_current(
     ui.set_viewport(pw, ph);
     ui.set_dp_ratio(dp_ratio);
 
+    gus::platform::render2d::Render2dGl3 backdrop(/*gl_active=*/true);
+
     // Reconstroi o RML/reflete no glintfx apos QUALQUER mutacao de estado (navegacao,
     // troca de tela, volume) - ver o comentario de build_system_menu_rml/
     // write_system_menu_rml_file: reload-on-change e simples e barato o bastante
@@ -180,15 +199,43 @@ SystemMenuLoopOutcome run_system_menu_loop_gl_current(
         ui.set_dp_ratio(dp_ratio);
     };
 
-    gus::platform::render2d::Render2dGl3 backdrop(/*gl_active=*/true);
+    // Desenha um frame do backdrop+UI e apresenta (MESMA sequencia do corpo do
+    // loop principal abaixo) - fatorado pra ser reusado pelo flash de PRESS.
+    auto present_frame = [&] {
+        const gus::core::spatial::Rect cam{0.0f, 0.0f, static_cast<float>(pw),
+                                            static_cast<float>(ph)};
+        backdrop.begin_frame(cam, pw, ph);  // clear + vinheta radial (fundo abstrato)
+        backdrop.end_frame();
+        ui.update();
+        ui.render();
+        SDL_GL_SwapWindow(window);
+    };
+
+    // EFEITO DE PRESS (ver comentario do topo do arquivo): renderiza a tela
+    // `pre_action_state` (snapshot tirado ANTES da mutacao que ja aconteceu em
+    // `state`) com o item `item_index` marcado ".pressed", por ~100ms (4 frames
+    // de ~25ms - varios swaps garantem que o compositor/driver apresente pelo
+    // menos 1 frame do flash mesmo sob vsync), e SO DEPOIS devolve - o chamador
+    // segue com handle_action/reload usando o `state` JA MUTADO (a transicao
+    // real acontece normalmente no proximo reload/return).
+    auto flash_pressed = [&](const SystemMenuState& pre_action_state, int item_index) {
+        rml_path = write_system_menu_rml_file(pre_action_state, translator, item_index);
+        ui.load(rml_path.c_str());
+        ui.set_viewport(pw, ph);
+        ui.set_dp_ratio(dp_ratio);
+        for (int frame = 0; frame < 4; ++frame) {
+            present_frame();
+            SDL_Delay(25);
+        }
+    };
 
     int drag_item = -1;  // -1 = nenhum arrasto em curso; 0=Music, 1=Sfx
 
     // Roteia UMA action (vinda do teclado OU de um clique de mouse) pro mesmo
     // efeito de mundo (persistir volume, recarregar o RML) - compartilhado
     // pelos dois canais de entrada pra nao duplicar a logica de
-    // Continue/RequestQuit/VolumeChanged. Devolve true se o CHAMADOR deve
-    // retornar `outcome` na hora (Continue/RequestQuit ja setaram outcome).
+    // Continue/RequestQuit/VolumeChanged/Navigated. Devolve true se o CHAMADOR
+    // deve retornar `outcome` na hora (Continue/RequestQuit ja setaram outcome).
     auto handle_action = [&](SystemMenuAction action) -> bool {
         if (action == SystemMenuAction::Continue) {
             return true;  // quit_app=false: retoma a cena
@@ -200,10 +247,20 @@ SystemMenuLoopOutcome run_system_menu_loop_gl_current(
         if (action == SystemMenuAction::VolumeChanged) {
             apply_and_persist(state, audio, settings_dir);
         }
-        // None/OpenSettings/BackToPause: o ESTADO pode ter mudado mesmo assim
-        // (navegacao/foco move e devolve None) - reload sempre.
+        // None/Navigated: o ESTADO pode ter mudado mesmo assim (navegacao/foco
+        // move e devolve None, ou trocou de tela e devolve Navigated) - reload
+        // sempre.
         reload();
         return false;
+    };
+
+    // Confirma se `action` merece o flash de PRESS (ver topo do arquivo): SO as
+    // acoes que de fato "acionam uma opcao" (pill/categoria/Voltar) - nunca
+    // VolumeChanged (drag de slider nao pisca) nem None (nao aconteceu nada).
+    auto is_confirming = [](SystemMenuAction action) {
+        return action == SystemMenuAction::Continue ||
+               action == SystemMenuAction::RequestQuit ||
+               action == SystemMenuAction::Navigated;
     };
 
     while (true) {
@@ -224,28 +281,78 @@ SystemMenuLoopOutcome run_system_menu_loop_gl_current(
                 continue;
             }
             if (ev.type == SDL_EVENT_KEY_DOWN && !ev.key.repeat) {
-                const SystemMenuAction action =
-                    system_menu_key_down(state, ev.key.key);
-                if (handle_action(action)) return outcome;
+                const bool is_confirm_key = (ev.key.key == SDLK_RETURN ||
+                                              ev.key.key == SDLK_KP_ENTER ||
+                                              ev.key.key == SDLK_SPACE);
+                if (is_confirm_key) {
+                    // Enter/Espaco: captura a tela+item ATUAIS (antes da mutacao)
+                    // pra poder desenhar o flash de PRESS na tela DE ORIGEM caso a
+                    // action resultante confirme algo (ver is_confirming acima).
+                    const SystemMenuState pre_action_state = state;
+                    int item_index = -1;
+                    switch (state.screen) {
+                        case SystemMenuScreen::Pause:
+                            item_index = state.pause_selected;
+                            break;
+                        case SystemMenuScreen::ConfigCategories:
+                            item_index = state.config_categories_selected;
+                            break;
+                        case SystemMenuScreen::Audio:
+                            item_index = state.audio_selected;
+                            break;
+                        case SystemMenuScreen::Save:
+                        case SystemMenuScreen::Video:
+                        case SystemMenuScreen::Language:
+                            item_index = kPlaceholderBackIndex;
+                            break;
+                        case SystemMenuScreen::Hidden:
+                            break;
+                    }
+                    const SystemMenuAction action =
+                        system_menu_key_down(state, ev.key.key);
+                    if (is_confirming(action)) flash_pressed(pre_action_state, item_index);
+                    if (handle_action(action)) return outcome;
+                } else {
+                    const SystemMenuAction action =
+                        system_menu_key_down(state, ev.key.key);
+                    if (handle_action(action)) return outcome;
+                }
             } else if (ev.type == SDL_EVENT_MOUSE_BUTTON_DOWN &&
                        ev.button.button == SDL_BUTTON_LEFT) {
                 bool handled = false;
                 if (state.screen == SystemMenuScreen::Pause) {
-                    // Clicar numa pill (Continuar/Configuracoes/Sair) SELECIONA E
-                    // ACIONA na hora - equivalente a focar + ENTER.
+                    // Clicar numa pill (Continuar/Salvar/Configuracoes/Sair)
+                    // SELECIONA E ACIONA na hora - equivalente a focar + ENTER.
                     for (int item = 0; item < kPauseItemCount && !handled; ++item) {
                         const glintfx::ElementBox box =
                             ui.get_element_box(pause_item_id(item).c_str());
                         if (!hit_test(box, ev.button.x, ev.button.y)) continue;
                         handled = true;
+                        const SystemMenuState pre_action_state = state;
                         const SystemMenuAction action =
                             system_menu_click_option(state, item);
+                        if (is_confirming(action)) flash_pressed(pre_action_state, item);
                         if (handle_action(action)) return outcome;
                     }
-                } else if (state.screen == SystemMenuScreen::Config) {
+                } else if (state.screen == SystemMenuScreen::ConfigCategories) {
+                    // Categorias (Audio/Video/Lingua/Voltar) - botoes simples, SEM
+                    // slider: clicar SEMPRE seleciona E aciona na hora.
+                    for (int item = 0; item < kConfigCategoriesItemCount && !handled;
+                         ++item) {
+                        const glintfx::ElementBox box =
+                            ui.get_element_box(category_item_id(item).c_str());
+                        if (!hit_test(box, ev.button.x, ev.button.y)) continue;
+                        handled = true;
+                        const SystemMenuState pre_action_state = state;
+                        const SystemMenuAction action =
+                            system_menu_click_option(state, item);
+                        if (is_confirming(action)) flash_pressed(pre_action_state, item);
+                        if (handle_action(action)) return outcome;
+                    }
+                } else if (state.screen == SystemMenuScreen::Audio) {
                     // (1) Tracks dos sliders (drag-start, receita PRE-EXISTENTE) -
                     // checado PRIMEIRO porque a caixa do track fica DENTRO da
-                    // caixa do campo/rotulo (config-item-<i>, ver (3) abaixo) - o
+                    // caixa do campo/rotulo (audio-item-<i>, ver (3) abaixo) - o
                     // mais especifico tem que vencer quando o clique cai nos dois.
                     for (int item = 0; item < 2 && !handled; ++item) {
                         const glintfx::ElementBox box =
@@ -253,7 +360,7 @@ SystemMenuLoopOutcome run_system_menu_loop_gl_current(
                         if (!hit_test(box, ev.button.x, ev.button.y)) continue;
                         handled = true;
                         drag_item = item;
-                        state.config_selected = item;
+                        state.audio_selected = item;
                         if (box.w > 0.0f) {
                             const float ratio = (ev.button.x - box.x) / box.w;
                             system_menu_set_slider_ratio(state, item, ratio);
@@ -263,12 +370,17 @@ SystemMenuLoopOutcome run_system_menu_loop_gl_current(
                     }
                     // (2) Botao Voltar - ACIONA na hora (equivalente a focar + ENTER).
                     if (!handled) {
+                        const int back_index = static_cast<int>(AudioItem::Back);
                         const glintfx::ElementBox box =
-                            ui.get_element_box("config-back");
+                            ui.get_element_box(audio_item_id(back_index).c_str());
                         if (hit_test(box, ev.button.x, ev.button.y)) {
                             handled = true;
-                            const SystemMenuAction action = system_menu_click_option(
-                                state, static_cast<int>(ConfigItem::Back));
+                            const SystemMenuState pre_action_state = state;
+                            const SystemMenuAction action =
+                                system_menu_click_option(state, back_index);
+                            if (is_confirming(action)) {
+                                flash_pressed(pre_action_state, back_index);
+                            }
                             if (handle_action(action)) return outcome;
                         }
                     }
@@ -276,11 +388,26 @@ SystemMenuLoopOutcome run_system_menu_loop_gl_current(
                     // ajusta volume - isso e papel exclusivo do track, ver (1)).
                     for (int item = 0; item < 2 && !handled; ++item) {
                         const glintfx::ElementBox box =
-                            ui.get_element_box(config_item_id(item).c_str());
+                            ui.get_element_box(audio_item_id(item).c_str());
                         if (!hit_test(box, ev.button.x, ev.button.y)) continue;
                         handled = true;
                         const SystemMenuAction action =
                             system_menu_click_option(state, item);
+                        if (handle_action(action)) return outcome;
+                    }
+                } else if (state.screen == SystemMenuScreen::Save ||
+                           state.screen == SystemMenuScreen::Video ||
+                           state.screen == SystemMenuScreen::Language) {
+                    // Placeholder ("em breve"): so o Voltar e clicavel.
+                    const glintfx::ElementBox box = ui.get_element_box(kPlaceholderBackId);
+                    if (hit_test(box, ev.button.x, ev.button.y)) {
+                        handled = true;
+                        const SystemMenuState pre_action_state = state;
+                        const SystemMenuAction action = system_menu_click_option(
+                            state, kPlaceholderBackIndex);
+                        if (is_confirming(action)) {
+                            flash_pressed(pre_action_state, kPlaceholderBackIndex);
+                        }
                         if (handle_action(action)) return outcome;
                     }
                 }
@@ -299,13 +426,7 @@ SystemMenuLoopOutcome run_system_menu_loop_gl_current(
             }
         }
 
-        const gus::core::spatial::Rect cam{0.0f, 0.0f, static_cast<float>(pw),
-                                            static_cast<float>(ph)};
-        backdrop.begin_frame(cam, pw, ph);  // clear + vinheta radial (fundo abstrato)
-        backdrop.end_frame();
-        ui.update();
-        ui.render();
-        SDL_GL_SwapWindow(window);
+        present_frame();
     }
 }
 

@@ -448,3 +448,6 @@ Volume da Música
 
 ## SETTINGS_SFX_VOLUME
 Volume dos Efeitos (SFX)
+
+## MENU_PLACEHOLDER_TEXT
+Em breve.

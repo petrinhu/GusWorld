@@ -1,35 +1,19 @@
 // gus/app/screens/system_menu_rml.hpp
 //
-// RML/RCSS do MENU DE SISTEMA (pausa + config de som), MENU-PAUSA-CONFIG-SOM
-// (M7-COSTURA). Traduz o mock APROVADO
-// (docs/design/mockups/01-menu-sistema-proposta-a-console-centralizado.html,
-// "Console Centralizado") pro RCSS do glintfx, no MESMO estilo de autoria de
+// RML/RCSS do MENU DE SISTEMA (pausa + config de som/video/lingua/save),
+// MENU-PAUSA-CONFIG-SOM (M7-COSTURA, onda arvore). Traduz a arvore de telas
+// aprovada AO VIVO pelo lider (ver system_menu.hpp para o diagrama completo)
+// pro RCSS do glintfx, no MESMO estilo de autoria de
 // gus/app/screens/battle_preview.cpp::load_cockpit_rml() (RML/RCSS como string
 // C++, efeitos nativos do backend GL3: vertical-gradient/radial-gradient/
-// box-shadow-glow/border-radius/animation).
+// box-shadow-glow/border-radius/animation/polygon).
 //
-// DUAS TELAS num UNICO documento (data-if, mesmo padrao de opening/combat do
-// cockpit): "pause" (3 verb-pills: Continuar/Configuracoes/Sair) e "config" (2
-// sliders: Musica/SFX + Voltar). O SystemMenuState (system_menu.hpp) e a UNICA
-// fonte de verdade da selecao/volume - esta funcao SO GERA a string RML a partir
-// dele (nao decide nada).
-//
-// >>> DIVERGENCIA CONHECIDA DO MOCK (reportada ao lider, NAO resolvida em
-// silencio - ver o relatorio da tarefa MENU-PAUSA-CONFIG-SOM): o mock desenha o
-// "no" (thumb) do slider como um HEXAGONO (SVG <polygon>, 6 lados, contorno
-// cyan + preenchimento escuro + drop-shadow). RmlUi 6.3 / glintfx NAO tem
-// decorator de poligono/vetor arbitrario (so retangulo com border-radius,
-// elipse/circulo via radial-gradient, sem clip-path nem SVG inline - conferido
-// no fonte vendorizado, Source/Core/Decorator*.cpp). Esta funcao usa um CIRCULO
-// (native, border-radius + box-shadow glow, MESMA cor/tamanho/glow do mock) como
-// place-holder EXPLICITO ate o lider decidir entre: (a) aceitar o circulo como
-// forma final (baixo esforco, ja funciona); (b) encomendar um asset PNG do
-// hexagono (como o medalhao .mono/.disc do brasao em load_cockpit_rml - decorator:
-// image(), MESMA tecnica ja usada e aprovada no cockpit) e trocar so a regra
-// #slider-node abaixo; (c) aceitar uma outra forma nativa (ex.: losango via
-// transform: rotate(45deg) num quadrado). NENHUMA das 3 foi escolhida por mim -
-// o circulo abaixo e so pra o menu ficar FUNCIONALMENTE testavel (drag/clique)
-// enquanto a decisao de forma final nao vem.
+// 7 TELAS num UNICO documento por chamada (so a tela ATIVA de `state.screen`
+// gera corpo - Hidden gera documento vazio): Pause (4 pills), ConfigCategories
+// (4 pills: Audio/Video/Lingua/Voltar), Audio (2 sliders + Voltar, a antiga
+// tela "Config"), e 3 placeholders (Save/Video/Language - "em breve" + Voltar).
+// O SystemMenuState (system_menu.hpp) e a UNICA fonte de verdade da selecao/
+// volume - esta funcao SO GERA a string RML a partir dele (nao decide nada).
 //
 // Cross-ref: gus/app/screens/system_menu.hpp (o estado/logica pura);
 //            gus/app/screens/battle_preview.cpp (load_cockpit_rml, MESMO estilo
@@ -57,14 +41,21 @@ namespace gus::app::screens {
 // do data-model live (bind_number/set_number) que o cockpit usa pro HUD de
 // combate (que muda a cada frame de simulacao).
 //
+// `pressed_index` (default -1 = nenhum): quando >= 0, o item de indice
+// `pressed_index` DA TELA ATUAL (mesma convencao de indices de
+// system_menu_click_option: PauseItem em Pause, ConfigCategoryItem em
+// ConfigCategories, AudioItem em Audio, kPlaceholderBackIndex nas telas
+// placeholder) ganha a classe extra "pressed" (flash visual de PRESS, efeito
+// NOSSO - ver system_menu_loop.cpp - NAO e feedback nativo do glintfx). Usado
+// pelo loop pra renderizar alguns frames de "pressionado" ANTES de executar a
+// transicao de fato (Enter/Espaco/clique numa pill/categoria/Voltar).
+//
 // Devolve a string RML completa (com <style> embutido). NAO inclui @font-face
 // (o CHAMADOR injeta, mesma receita de string-replace de write_baked_cockpit_rml/
-// write_live_cockpit_rml em battle_preview.cpp) nem resolve caminhos de asset
-// (moldura latao reusa a MESMA imagem de moldura_carta_frame.png do cockpit, se
-// o lider optar por manter a moldura de latao identica a carta-retrato - ver
-// comentario da regra .corner abaixo).
+// write_live_cockpit_rml em battle_preview.cpp) nem resolve caminhos de asset.
 [[nodiscard]] std::string build_system_menu_rml(
-    const SystemMenuState& state, const gus::app::i18n::Translator& translator);
+    const SystemMenuState& state, const gus::app::i18n::Translator& translator,
+    int pressed_index = -1);
 
 }  // namespace gus::app::screens
 
