@@ -15,6 +15,21 @@
 // deliberadamente um efeito NOSSO (nao do glintfx - a lib nao tem estado "active"
 // disparado por teclado, so :focus/:hover via classe) - flash_pressed() abaixo e o
 // UNICO lugar que gera esse frame extra.
+//
+// HOVER NATIVO + SOM DE HOVER/CLIQUE (retoque ao vivo do lider, pos-ONDA ARVORE):
+// o VISUAL do hover e 100% :hover nativo do glintfx (RCSS em system_menu_rml.cpp) -
+// so precisamos injetar UiEvent::MouseMove em TODO SDL_EVENT_MOUSE_MOTION (nao so
+// durante o arrasto do slider, como antes), MESMO pipeline ja em producao no
+// cockpit da batalha (battle_preview.cpp: sdl_to_glintfx -> process_event ->
+// Context::ProcessMouseMove -> :hover). O SOM, ao contrario, NAO tem equivalente
+// nativo - handle_mouse_motion() abaixo faz hit-test leve (current_hover_index)
+// nas MESMAS caixas/ids do clique, e so dispara audio.play_sfx(hover_sfx_id_)
+// quando o item hovered MUDA pra um NOVO item valido (edge-detect PURO/testavel:
+// system_menu_hover_index + system_menu_hover_entered_new_item em
+// system_menu.hpp/.cpp - ver system_menu_test.cpp). O som de CLIQUE
+// (click_sfx_id_) dispara dentro de flash_pressed() - o MESMO choke-point que ja
+// gera o flash visual .pressed pra CONFIRMACAO de teclado OU mouse, garantindo 1
+// unico lugar pros dois canais de entrada (sem duplicar a logica).
 
 #include "gus/app/screens/system_menu_loop.hpp"
 
@@ -29,6 +44,7 @@
 
 #include "gus/app/screens/system_menu.hpp"
 #include "gus/app/screens/system_menu_rml.hpp"
+#include "gus/core/asset_paths.hpp"            // kMenuHoverSfxFile/kMenuClickSfxFile/kSfxDir
 #include "gus/core/spatial/camera_clamp.hpp"  // gus::core::spatial::Rect
 #include "gus/domain/settings/system_settings.hpp"
 #include "gus/platform/fs/settings_file_store.hpp"
@@ -39,6 +55,13 @@
 // ja usa - PRIVATE no CMakeLists do target app, aplica a TODO .cpp do target).
 #ifndef GUSWORLD_FONTS_DIR
 #define GUSWORLD_FONTS_DIR ""
+#endif
+
+// Pasta do kit CC0 de SFX (M6 F2/F3, ADR-011; hover/click do menu reusam a MESMA
+// macro/raiz de battle_preview.cpp - repo_root/assets/sfx, NAO GusEngine/assets/).
+// Override em runtime via env GUSWORLD_SFX.
+#ifndef GUSWORLD_SFX_DIR
+#define GUSWORLD_SFX_DIR ""
 #endif
 
 namespace gus::app::screens {
@@ -151,6 +174,53 @@ bool hit_test(const glintfx::ElementBox& box, float x, float y) {
     return x >= box.x && x <= box.x + box.w && y >= box.y && y <= box.y + box.h;
 }
 
+// Resolve o caminho de um SFX do menu (hover/click) - MESMA ordem de
+// resolve_hit_sfx_path em battle_preview.cpp: env GUSWORLD_SFX > macro embutida
+// (GUSWORLD_SFX_DIR) > relativo ao CWD (kSfxDir).
+std::string resolve_menu_sfx_path(std::string_view file) {
+    const std::string filename(file);
+    if (const char* env = std::getenv("GUSWORLD_SFX")) {
+        if (env[0] != '\0') return join(env, filename);
+    }
+    const std::string compiled = GUSWORLD_SFX_DIR;
+    if (!compiled.empty()) return join(compiled, filename);
+    return join(std::string(gus::core::assets::kSfxDir), filename);
+}
+
+// Preenche `boxes` com a geometria dos itens NAVEGAVEIS da tela ATUAL
+// (MESMOS ids do hit-test de clique acima - pause_item_id/category_item_id/
+// audio_item_id/kPlaceholderBackId) e devolve o indice hovered via
+// system_menu_hover_index (POCO, testado em system_menu_test.cpp). So a
+// CONSULTA a UI (get_element_box, GL-heavy) mora aqui; a decisao "qual bateu"
+// e pura.
+int current_hover_index(const glintfx::UiLayer& ui, const SystemMenuState& state,
+                         float mouse_x, float mouse_y) {
+    SystemMenuHoverBox boxes[kSystemMenuMaxHoverItems];
+    auto fill = [&](int idx, const std::string& id) {
+        const glintfx::ElementBox box = ui.get_element_box(id.c_str());
+        boxes[idx] = SystemMenuHoverBox{box.found, box.x, box.y, box.w, box.h};
+    };
+    switch (state.screen) {
+        case SystemMenuScreen::Pause:
+            for (int i = 0; i < kPauseItemCount; ++i) fill(i, pause_item_id(i));
+            break;
+        case SystemMenuScreen::ConfigCategories:
+            for (int i = 0; i < kConfigCategoriesItemCount; ++i) fill(i, category_item_id(i));
+            break;
+        case SystemMenuScreen::Audio:
+            for (int i = 0; i < kAudioItemCount; ++i) fill(i, audio_item_id(i));
+            break;
+        case SystemMenuScreen::Save:
+        case SystemMenuScreen::Video:
+        case SystemMenuScreen::Language:
+            fill(0, kPlaceholderBackId);
+            break;
+        case SystemMenuScreen::Hidden:
+            break;  // sem itens - system_menu_hover_index devolve -1 de qualquer jeito
+    }
+    return system_menu_hover_index(state, mouse_x, mouse_y, boxes);
+}
+
 }  // namespace
 
 SystemMenuLoopOutcome run_system_menu_loop_gl_current(
@@ -188,6 +258,18 @@ SystemMenuLoopOutcome run_system_menu_loop_gl_current(
 
     gus::platform::render2d::Render2dGl3 backdrop(/*gl_active=*/true);
 
+    // SFX de hover/clique (retoque ao vivo do lider): load_sfx UMA VEZ por sessao de
+    // menu (a cada Esc que abre o menu de novo, ver o header - MESMO padrao de
+    // hit_sfx_id em battle_preview.cpp, "load_sfx NUNCA no frame"). audio.available()
+    // false (device indisponivel/CI) degrada com seguranca - play_sfx(id invalido)
+    // ja e no-op, ver AudioEngine::play_sfx.
+    const std::string hover_sfx_path =
+        resolve_menu_sfx_path(gus::core::assets::kMenuHoverSfxFile);
+    const std::string click_sfx_path =
+        resolve_menu_sfx_path(gus::core::assets::kMenuClickSfxFile);
+    const gus::platform::audio::SoundId hover_sfx_id = audio.load_sfx(hover_sfx_path.c_str());
+    const gus::platform::audio::SoundId click_sfx_id = audio.load_sfx(click_sfx_path.c_str());
+
     // Reconstroi o RML/reflete no glintfx apos QUALQUER mutacao de estado (navegacao,
     // troca de tela, volume) - ver o comentario de build_system_menu_rml/
     // write_system_menu_rml_file: reload-on-change e simples e barato o bastante
@@ -217,8 +299,13 @@ SystemMenuLoopOutcome run_system_menu_loop_gl_current(
     // de ~25ms - varios swaps garantem que o compositor/driver apresente pelo
     // menos 1 frame do flash mesmo sob vsync), e SO DEPOIS devolve - o chamador
     // segue com handle_action/reload usando o `state` JA MUTADO (a transicao
-    // real acontece normalmente no proximo reload/return).
+    // real acontece normalmente no proximo reload/return). SOM DE CLIQUE (retoque
+    // ao vivo do lider): dispara AQUI, no MESMO choke-point do flash visual - e o
+    // UNICO lugar chamado tanto por confirmacao de TECLADO (Enter/Espaco) quanto
+    // por CLIQUE de mouse (ver is_confirming mais abaixo), entao 1 play_sfx cobre
+    // os dois canais sem duplicar logica.
     auto flash_pressed = [&](const SystemMenuState& pre_action_state, int item_index) {
+        audio.play_sfx(click_sfx_id);
         rml_path = write_system_menu_rml_file(pre_action_state, translator, item_index);
         ui.load(rml_path.c_str());
         ui.set_viewport(pw, ph);
@@ -229,7 +316,41 @@ SystemMenuLoopOutcome run_system_menu_loop_gl_current(
         }
     };
 
-    int drag_item = -1;  // -1 = nenhum arrasto em curso; 0=Music, 1=Sfx
+    int drag_item = -1;      // -1 = nenhum arrasto em curso; 0=Music, 1=Sfx
+    int hovered_index = -1;  // -1 = mouse fora de qualquer item navegavel (ver
+                             // handle_mouse_motion abaixo - edge-detect do SFX de hover)
+
+    // HOVER (mouse) - PEDIDO 2a/2b: injeta o MouseMove no glintfx (visual :hover
+    // NATIVO, MESMO pipeline do cockpit da batalha) e faz o hit-test/edge-detect do
+    // SOM de hover (current_hover_index + system_menu_hover_entered_new_item, ambas
+    // POCO testadas em system_menu_test.cpp). Fatorada em lambda pra ser chamada
+    // tanto pelo SDL_EVENT_MOUSE_MOTION real (abaixo) quanto pelo self-test
+    // headless (GUSWORLD_SYSMENU_HOVER_SELFTEST, ver mais abaixo) - MESMO caminho
+    // de codigo prova o comportamento real, sem duplicar.
+    auto handle_mouse_motion = [&](float mx, float my) {
+        glintfx::UiEvent hover_ev{};
+        hover_ev.type = glintfx::UiEvent::Type::MouseMove;
+        hover_ev.x = mx;
+        hover_ev.y = my;
+        ui.process_event(hover_ev);
+
+        const int new_hover = current_hover_index(ui, state, mx, my);
+        if (system_menu_hover_entered_new_item(hovered_index, new_hover)) {
+            audio.play_sfx(hover_sfx_id);
+        }
+        hovered_index = new_hover;
+
+        if (drag_item >= 0) {
+            const std::string id = track_id_for_item(drag_item);
+            const glintfx::ElementBox box = ui.get_element_box(id.c_str());
+            if (box.found && box.w > 0.0f) {
+                const float ratio = (mx - box.x) / box.w;
+                system_menu_set_slider_ratio(state, drag_item, ratio);
+                apply_and_persist(state, audio, settings_dir);
+                reload();
+            }
+        }
+    };
 
     // Roteia UMA action (vinda do teclado OU de um clique de mouse) pro mesmo
     // efeito de mundo (persistir volume, recarregar o RML) - compartilhado
@@ -262,6 +383,52 @@ SystemMenuLoopOutcome run_system_menu_loop_gl_current(
                action == SystemMenuAction::RequestQuit ||
                action == SystemMenuAction::Navigated;
     };
+
+    // DIAGNOSTICO/PROVA (SOM DE HOVER/CLIQUE): GUSWORLD_SYSMENU_HOVER_SELFTEST=1
+    // entra na tela Pause (ja aberta acima), MOVE o mouse SINTETICO sequencialmente
+    // pelos 4 pills (item0->1->2->3->0 de novo, provando que sair-e-voltar redispara
+    // o hover - MESMA logica de system_menu_hover_entered_new_item) via
+    // handle_mouse_motion (o MESMO codigo do SDL_EVENT_MOUSE_MOTION real acima, sem
+    // duplicar), e SIMULA 1 clique confirmando "Continuar" (system_menu_click_option
+    // + flash_pressed, o MESMO caminho de um clique real) - tudo SEM SDL_PushEvent,
+    // SEM input real, SEM tocar hardware de audio (o CHAMADOR decide device_active
+    // do AudioEngine - este self-test so EXERCITA os call-sites; sfx_play_count() e
+    // o hook de prova, ver AudioEngine::sfx_play_count). Imprime a contagem
+    // observada e retorna ANTES do loop interativo (bypassa por completo - nunca
+    // abre pra input real). MESMO espirito de GUSWORLD_BATTLE_HOVER_SELFTEST em
+    // battle_preview.cpp (auto-contido, headless, Xvfb).
+    const char* sysmenu_selftest = std::getenv("GUSWORLD_SYSMENU_HOVER_SELFTEST");
+    if (sysmenu_selftest != nullptr && sysmenu_selftest[0] != '\0') {
+        present_frame();  // assenta o layout (get_element_box precisa de 1 update())
+
+        // Centro de cada pill (item0..3), na ORDEM 0,1,2,3,0 (o ultimo "0" de novo
+        // prova o re-trigger apos sair pro item 3).
+        const int hover_sequence[] = {0, 1, 2, 3, 0};
+        for (const int item : hover_sequence) {
+            const glintfx::ElementBox box = ui.get_element_box(pause_item_id(item).c_str());
+            const float cx = box.found ? box.x + box.w * 0.5f : -1.0f;
+            const float cy = box.found ? box.y + box.h * 0.5f : -1.0f;
+            handle_mouse_motion(cx, cy);
+            present_frame();
+        }
+        std::cout << "SystemMenuLoop: [selftest] hover_sfx_play_count apos 5 "
+                     "moves (0,1,2,3,0 - 5 entradas NOVAS esperadas) = "
+                  << audio.sfx_play_count() << "\n";
+
+        const int click_baseline = static_cast<int>(audio.sfx_play_count());
+        const SystemMenuState pre_click_state = state;
+        const SystemMenuAction click_action =
+            system_menu_click_option(state, static_cast<int>(PauseItem::Continue));
+        if (is_confirming(click_action)) {
+            flash_pressed(pre_click_state, static_cast<int>(PauseItem::Continue));
+        }
+        std::cout << "SystemMenuLoop: [selftest] click_sfx disparou "
+                  << (static_cast<int>(audio.sfx_play_count()) - click_baseline)
+                  << "x (esperado 1) - total sfx_play_count()=" << audio.sfx_play_count()
+                  << "\n";
+        (void)handle_action(click_action);  // fecha o menu (Continuar) - outcome ja refletido
+        return outcome;
+    }
 
     while (true) {
         SDL_Event ev;
@@ -411,15 +578,11 @@ SystemMenuLoopOutcome run_system_menu_loop_gl_current(
                         if (handle_action(action)) return outcome;
                     }
                 }
-            } else if (ev.type == SDL_EVENT_MOUSE_MOTION && drag_item >= 0) {
-                const std::string id = track_id_for_item(drag_item);
-                const glintfx::ElementBox box = ui.get_element_box(id.c_str());
-                if (box.found && box.w > 0.0f) {
-                    const float ratio = (ev.motion.x - box.x) / box.w;
-                    system_menu_set_slider_ratio(state, drag_item, ratio);
-                    apply_and_persist(state, audio, settings_dir);
-                    reload();
-                }
+            } else if (ev.type == SDL_EVENT_MOUSE_MOTION) {
+                // SEMPRE (nao so durante o arrasto, PEDIDO 2a): hover NATIVO (:hover
+                // RCSS) + edge-detect do SOM de hover; o arrasto de slider (se
+                // drag_item>=0) continua tratado DENTRO de handle_mouse_motion.
+                handle_mouse_motion(ev.motion.x, ev.motion.y);
             } else if (ev.type == SDL_EVENT_MOUSE_BUTTON_UP &&
                        ev.button.button == SDL_BUTTON_LEFT) {
                 drag_item = -1;

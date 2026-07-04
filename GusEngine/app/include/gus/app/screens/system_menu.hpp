@@ -194,6 +194,60 @@ void system_menu_set_slider_ratio(SystemMenuState& state, int item,
 [[nodiscard]] SystemMenuAction system_menu_click_option(SystemMenuState& state,
                                                          int index) noexcept;
 
+// ---------------------------------------------------------------- HOVER (mouse)
+//
+// SOM DE HOVER (retoque ao vivo do lider, pos-ONDA ARVORE): o visual do hover e
+// NATIVO do glintfx (RCSS :hover, ver system_menu_rml.cpp) - so o SOM precisa de
+// logica PROPRIA de edge-detection (tocar so quando o item hovered MUDA, nao a
+// cada frame parado sobre o mesmo item). As duas funcoes abaixo sao a fatia
+// PURA/testavel dessa logica (o CHAMADOR - system_menu_loop.cpp - faz a consulta
+// GL-heavy via glintfx::UiLayer::get_element_box e converte pro tipo local
+// SystemMenuHoverBox abaixo, DE PROPOSITO sem depender de glintfx neste header -
+// mesmo espirito POCO documentado no topo do arquivo).
+
+// Caixa retangular MINIMA pro hit-test de hover - MESMO layout de campos que
+// glintfx::ElementBox (found/x/y/w/h, ver glintfx/element_box.hpp), mas um tipo
+// PROPRIO: este arquivo continua testavel sem incluir glintfx/GL/janela. O
+// CHAMADOR converte glintfx::ElementBox -> SystemMenuHoverBox campo a campo
+// (trivial) antes de chamar system_menu_hover_index.
+struct SystemMenuHoverBox {
+    bool found = false;
+    float x = 0.0f, y = 0.0f, w = 0.0f, h = 0.0f;
+};
+
+// Numero MAXIMO de itens hover-testaveis numa unica tela (Pause/
+// ConfigCategories tem 4 cada, o maior das 4 telas com item(ns) navegaveis;
+// Audio tem 3, Save/Video/Language tem 1) - dimensiona o array fixo de
+// system_menu_hover_index abaixo. Posicoes do array alem do count relevante da
+// tela atual sao ignoradas (o CHAMADOR so preenche as que importam).
+inline constexpr int kSystemMenuMaxHoverItems = 4;
+
+// HOVER (mouse, SEM clique): dado o mouse (mouse_x,mouse_y, espaco-janela) e as
+// caixas dos itens NAVEGAVEIS da tela ATUAL (state.screen decide QUANTAS
+// posicoes de `boxes` sao relevantes - Pause/ConfigCategories usam as 4,
+// Audio usa as 3 primeiras (Musica/SFX/Voltar), Save/Video/Language usa so
+// boxes[0] (Voltar); Hidden nao tem itens), devolve o INDICE (0..count-1) do
+// PRIMEIRO item cuja caixa contem o ponto, ou -1 se nenhum bater (ou
+// screen==Hidden). MESMO contrato de "found=false conta como fora" do hit-test
+// de clique (system_menu_loop.cpp) - generalizado pra N caixas de uma vez e
+// 100% testavel sem GL/janela (a QUERY GL-heavy - get_element_box - fica no
+// CHAMADOR; aqui so a decisao geometrica "qual bateu").
+[[nodiscard]] int system_menu_hover_index(
+    const SystemMenuState& state, float mouse_x, float mouse_y,
+    const SystemMenuHoverBox boxes[kSystemMenuMaxHoverItems]) noexcept;
+
+// EDGE-DETECT: devolve true quando o hover ENTROU num item NOVO e VALIDO
+// (current_index >= 0 && current_index != previous_index) - usado pelo
+// chamador pra decidir se toca o SFX de hover SO na TRANSICAO. Parado sobre o
+// MESMO item (current==previous) nao dispara de novo (evita o som repetir a
+// cada frame/MouseMove parado). SAIR de um item pra fora de qualquer um
+// (current_index==-1) tambem NAO dispara (so ENTRAR soa - mesmo espirito de
+// "OnPointerEnter" das engines de UI convencionais, que nao tocam som no
+// "OnPointerExit"). Sair e depois voltar pro MESMO item (com -1 no meio) volta
+// a disparar - a "memoria" e so o ULTIMO indice visto, nao um historico.
+[[nodiscard]] bool system_menu_hover_entered_new_item(int previous_index,
+                                                       int current_index) noexcept;
+
 }  // namespace gus::app::screens
 
 #endif  // GUS_APP_SCREENS_SYSTEM_MENU_HPP

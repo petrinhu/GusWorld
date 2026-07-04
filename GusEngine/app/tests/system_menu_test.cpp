@@ -520,3 +520,106 @@ TEST_CASE("system_menu_set_slider_ratio: converte fracao de mouse [0,1] em "
     system_menu_set_slider_ratio(state, /*item=*/1, /*ratio=*/5.0f);
     REQUIRE(state.sfx_volume == Catch::Approx(1.0f));
 }
+
+// -------------------------------------------------------- HOVER (mouse, SOM)
+
+namespace {
+
+// 4 caixas empilhadas verticalmente, sem sobreposicao (mesmo espirito de
+// pills reais - 100dp de altura cada, y crescente), pra testar
+// system_menu_hover_index sem depender de layout RCSS de verdade.
+void make_boxes_into(SystemMenuHoverBox (&boxes)[kSystemMenuMaxHoverItems]) {
+    for (int i = 0; i < kSystemMenuMaxHoverItems; ++i) {
+        boxes[i] = SystemMenuHoverBox{/*found=*/true, /*x=*/10.0f,
+                                       /*y=*/static_cast<float>(i * 100),
+                                       /*w=*/200.0f, /*h=*/100.0f};
+    }
+}
+
+}  // namespace
+
+TEST_CASE("system_menu_hover_index: Pause (4 itens) acha o indice sob o mouse",
+          "[system_menu][hover]") {
+    SystemMenuState state;
+    system_menu_open(state);  // screen=Pause
+    SystemMenuHoverBox boxes[kSystemMenuMaxHoverItems];
+    make_boxes_into(boxes);
+
+    REQUIRE(system_menu_hover_index(state, 50.0f, 50.0f, boxes) == 0);   // dentro do item 0
+    REQUIRE(system_menu_hover_index(state, 50.0f, 150.0f, boxes) == 1);  // item 1
+    REQUIRE(system_menu_hover_index(state, 50.0f, 250.0f, boxes) == 2);  // item 2
+    REQUIRE(system_menu_hover_index(state, 50.0f, 350.0f, boxes) == 3);  // item 3
+}
+
+TEST_CASE("system_menu_hover_index: mouse fora de qualquer caixa devolve -1",
+          "[system_menu][hover]") {
+    SystemMenuState state;
+    system_menu_open(state);
+    SystemMenuHoverBox boxes[kSystemMenuMaxHoverItems];
+    make_boxes_into(boxes);
+
+    REQUIRE(system_menu_hover_index(state, 9999.0f, 9999.0f, boxes) == -1);
+    REQUIRE(system_menu_hover_index(state, -5.0f, -5.0f, boxes) == -1);
+}
+
+TEST_CASE("system_menu_hover_index: found=false conta como fora (MESMO contrato "
+          "do hit-test de clique)",
+          "[system_menu][hover]") {
+    SystemMenuState state;
+    system_menu_open(state);
+    SystemMenuHoverBox boxes[kSystemMenuMaxHoverItems];
+    make_boxes_into(boxes);
+    boxes[0].found = false;  // elemento ainda nao resolvido pelo glintfx
+
+    // Mouse dentro da GEOMETRIA do item 0, mas found=false -> nao bate; cai
+    // pro proximo item que bater (nenhum aqui, pois y=50 so cai no item 0).
+    REQUIRE(system_menu_hover_index(state, 50.0f, 50.0f, boxes) == -1);
+}
+
+TEST_CASE("system_menu_hover_index: Audio (3 itens) e placeholder (1 item) "
+          "respeitam o count da tela atual",
+          "[system_menu][hover]") {
+    SystemMenuHoverBox boxes[kSystemMenuMaxHoverItems];
+    make_boxes_into(boxes);
+
+    SystemMenuState audio_state;
+    goto_audio(audio_state);  // screen=Audio, kAudioItemCount=3
+    REQUIRE(system_menu_hover_index(audio_state, 50.0f, 250.0f, boxes) == 2);
+    // boxes[3] existe geometricamente mas Audio so testa os 3 primeiros.
+    REQUIRE(system_menu_hover_index(audio_state, 50.0f, 350.0f, boxes) == -1);
+
+    SystemMenuState save_state;
+    system_menu_open(save_state);
+    save_state.screen = SystemMenuScreen::Save;  // placeholder, kPlaceholderItemCount=1
+    REQUIRE(system_menu_hover_index(save_state, 50.0f, 50.0f, boxes) == 0);
+    REQUIRE(system_menu_hover_index(save_state, 50.0f, 150.0f, boxes) == -1);
+}
+
+TEST_CASE("system_menu_hover_index: Hidden (menu fechado) sempre devolve -1",
+          "[system_menu][hover]") {
+    SystemMenuState state;  // screen == Hidden por default
+    SystemMenuHoverBox boxes[kSystemMenuMaxHoverItems];
+    make_boxes_into(boxes);
+    REQUIRE(system_menu_hover_index(state, 50.0f, 50.0f, boxes) == -1);
+}
+
+TEST_CASE("system_menu_hover_entered_new_item: dispara so ao ENTRAR num item "
+          "NOVO e valido",
+          "[system_menu][hover]") {
+    // -1 (nenhum) -> item 0: entrou, dispara.
+    REQUIRE(system_menu_hover_entered_new_item(-1, 0) == true);
+    // item 0 -> item 0 (parado no mesmo item): NAO redispara.
+    REQUIRE(system_menu_hover_entered_new_item(0, 0) == false);
+    // item 0 -> item 1: mudou de item, dispara.
+    REQUIRE(system_menu_hover_entered_new_item(0, 1) == true);
+    // item 1 -> -1 (saiu pra fora): NAO dispara (so ENTRAR soa).
+    REQUIRE(system_menu_hover_entered_new_item(1, -1) == false);
+    // -1 -> -1 (fora, continua fora): NAO dispara.
+    REQUIRE(system_menu_hover_entered_new_item(-1, -1) == false);
+    // Sair (vira -1) e voltar pro MESMO item de antes: redispara (a "memoria"
+    // e so o ULTIMO indice visto, o -1 no meio zera o historico). Sequencia:
+    // hovered=2 -> sai (novo=-1, nao dispara) -> reentra no MESMO item 2
+    // (novo=2 != previous=-1, dispara de novo).
+    REQUIRE(system_menu_hover_entered_new_item(2, -1) == false);  // saiu do item 2
+    REQUIRE(system_menu_hover_entered_new_item(-1, 2) == true);  // reentrou no 2: dispara
+}

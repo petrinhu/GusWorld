@@ -88,6 +88,25 @@
 //     (so box-shadow/drop-shadow em CAIXAS, nao em glifos de texto - o glow do
 //     TITULO em si fica de fora nesta versao; o resto do painel mantem o glow
 //     neon completo). Nota secundaria, reportada mas nao bloqueia.
+//
+// CENTRALIZACAO REAL de .verb-pill/.btn-back (retoque ao vivo do lider, pos-ONDA
+// ARVORE): a causa raiz era `width:340dp` FIXO sem `margin-left/right:auto` - o
+// item ficava flush-LEFT dentro do content-box de #sysmenu-panel (420dp - 2*28dp
+// padding - 2*1dp border = 362dp, box-sizing:border-box), sobrando 22dp de folga
+// TODA a direita. Ao lado das barras cheias do slider (tela Audio) a assimetria
+// aparecia (reportado ao vivo). CONFIRMADO por leitura do FONTE do RmlUi
+// vendorizado (nao so probe empirico desta vez): LayoutDetails::BuildBoxWidth
+// (Source/Core/Layout/LayoutDetails.cpp, glintfx-src/build) resolve margin auto
+// para block-boxes NORMAIS (nao so absolutamente posicionados) - quando o width
+// e explicito (nao-auto) e ha margens 'auto' declaradas, o metodo distribui
+// `(containing_block.x - width) / num_auto_margins` entre elas (linhas ~447-457):
+// com containing_block.x=362dp e width=340dp, margin-left=margin-right=11dp cada
+// - centralizacao EXATA, generica pra qualquer largura de painel/janela (nao um
+// valor -Xdp hardcoded feito a mao, como o `margin-left:-210dp` do
+// #sysmenu-panel acima - aqui um `auto` de verdade basta, confirmado pelo motor
+// de layout aceitar a keyword nas 4 propriedades margin-* via
+// StyleSheetSpecification.cpp). FIX: `margin-left: auto; margin-right: auto;`
+// em .verb-pill/.btn-back (preservando margin-bottom/margin-top existentes).
 
 #include "gus/app/screens/system_menu_rml.hpp"
 
@@ -214,11 +233,27 @@ body { font-family: "Pixel Operator Mono"; background: transparent; width: 100%;
    padding+border), nao so o conteudo, pra bater exatamente com .btn-back. */
 .verb-pill {
   box-sizing: border-box;
-  position: relative; width: 340dp; padding: 7dp 16dp; margin-bottom: 6dp;
+  position: relative; width: 340dp; padding: 7dp 16dp;
+  margin-top: 0dp; margin-bottom: 6dp; margin-left: auto; margin-right: auto;
   text-align: center;
   decorator: vertical-gradient( #3A4566 #1B2238 );
   border: 1dp #ffffff12; border-radius: 999dp;
   font-size: 13dp; color: #E7ECF5; letter-spacing: 2dp;
+}
+/* HOVER (mouse, PEDIDO 2a - MESMA receita/ORDEM de .verb:hover em
+   battle_preview.cpp:352-360, ver o comentario de la): DECLARADO ANTES de
+   .focused/.danger/.pressed abaixo de proposito. :hover conta como 1
+   pseudo-classe - a MESMA especificidade de uma classe (.focused/.danger/
+   .pressed tem cada 2: .verb-pill + a propria), entao .verb-pill:hover (tambem
+   2: .verb-pill + :hover) EMPATA com elas; o empate cai pra ORDEM DE FONTE, e
+   quem vem DEPOIS vence. Declarando :hover PRIMEIRO garante que
+   focado/pressionado sempre "ganham" o hover simultaneo (o glow FORTE da
+   selecao real nunca e ofuscado pelo feedback discreto do mouse). Fundo mais
+   claro + borda neutra clara, SEM box-shadow (zero glow que dispute com o
+   .focused) - mesma paleta discreta usada no cockpit. */
+.verb-pill:hover {
+  decorator: vertical-gradient( #47547a #232b46 );
+  border-color: #5a6a92;
 }
 .verb-pill.focused {
   color: #ffffff; border: 1dp #22D3EE;
@@ -296,10 +331,15 @@ body { font-family: "Pixel Operator Mono"; background: transparent; width: 100%;
    cor mais apagada) continua distinto. */
 .btn-back {
   box-sizing: border-box;
-  text-align: center; width: 340dp; padding: 7dp 16dp; margin-top: 6dp;
+  text-align: center; width: 340dp; padding: 7dp 16dp;
+  margin-top: 6dp; margin-left: auto; margin-right: auto;
   border: 1dp #3A4566; border-radius: 999dp; color: #9AA5C0;
   font-size: 12dp; letter-spacing: 2dp;
 }
+/* HOVER (mouse, PEDIDO 2a) - MESMA ordem/logica de .verb-pill:hover acima
+   (declarado ANTES de .focused/.pressed pra empate de especificidade cair a
+   favor do foco/press real). */
+.btn-back:hover { color: #c3cadb; border-color: #6a7aa2; }
 .btn-back.focused { color: #ffffff; border: 1dp #22D3EE; box-shadow: #22D3EE 0dp 0dp 18dp 1dp; }
 .btn-back.pressed {
   decorator: vertical-gradient( #22D3EE #0EA5C9 );

@@ -316,4 +316,40 @@ SystemMenuAction system_menu_click_option(SystemMenuState& state,
     return SystemMenuAction::None;
 }
 
+int system_menu_hover_index(const SystemMenuState& state, float mouse_x, float mouse_y,
+                             const SystemMenuHoverBox boxes[kSystemMenuMaxHoverItems]) noexcept {
+    int count = 0;
+    switch (state.screen) {
+        case SystemMenuScreen::Pause:
+            count = kPauseItemCount;
+            break;
+        case SystemMenuScreen::ConfigCategories:
+            count = kConfigCategoriesItemCount;
+            break;
+        case SystemMenuScreen::Audio:
+            count = kAudioItemCount;
+            break;
+        case SystemMenuScreen::Save:
+        case SystemMenuScreen::Video:
+        case SystemMenuScreen::Language:
+            count = kPlaceholderItemCount;
+            break;
+        case SystemMenuScreen::Hidden:
+            return -1;  // menu fechado: nenhum item hover-testavel
+    }
+    for (int i = 0; i < count; ++i) {
+        const SystemMenuHoverBox& box = boxes[i];
+        if (!box.found) continue;  // MESMO contrato do hit_test de clique
+        if (mouse_x >= box.x && mouse_x <= box.x + box.w && mouse_y >= box.y &&
+            mouse_y <= box.y + box.h) {
+            return i;
+        }
+    }
+    return -1;
+}
+
+bool system_menu_hover_entered_new_item(int previous_index, int current_index) noexcept {
+    return current_index >= 0 && current_index != previous_index;
+}
+
 }  // namespace gus::app::screens
