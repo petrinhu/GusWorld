@@ -396,7 +396,19 @@ std::string build_pause_body(const SystemMenuState& state,
              << "</div>";
     }
 
-    body << "<div class=\"footer-hint\">" << tr.tr("MENU_PAUSE_HINT") << "</div>";
+    // MENU_PAUSE_HINT tem 2 placeholders posicionais ("{0} confirma, {1} volta ao
+    // jogo" no catalogo pt_br) - o Translator::tr(key) so resolve KEY->string, NAO
+    // interpola (mesma limitacao de COMBAT_DEFEAT_BARK). Mesmo padrao manual
+    // find/replace usado em battle_scene.cpp:2071 pro bark de derrota (AUD-M7-COSTURA
+    // ACH-2: sem isso o jogador via os tokens "{0}/{1}" crus no rodape).
+    std::string hint = tr.tr("MENU_PAUSE_HINT");
+    if (const auto pos0 = hint.find("{0}"); pos0 != std::string::npos) {
+        hint.replace(pos0, 3, "Enter");
+    }
+    if (const auto pos1 = hint.find("{1}"); pos1 != std::string::npos) {
+        hint.replace(pos1, 3, "Esc");
+    }
+    body << "<div class=\"footer-hint\">" << hint << "</div>";
     body << "</div>";  // #sysmenu-panel
     return body.str();
 }

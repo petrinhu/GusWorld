@@ -34,7 +34,10 @@ Translator make_translator() {
         "## SETTINGS_LANGUAGE\nIdioma\n\n"
         "## MENU_SYSTEM_KICKER\nSistema\n\n"
         "## MENU_PAUSE_TITLE\nPausado\n\n"
-        "## MENU_PAUSE_HINT\nEnter confirma, ESC volta\n\n"
+        // Placeholders posicionais de proposito (espelha o catalogo real pt_br.md,
+        // AUD-M7-COSTURA ACH-2): a fixture ANTIGA nao tinha "{0}/{1}" e por isso nao
+        // pegava o bug de interpolacao faltando no call-site.
+        "## MENU_PAUSE_HINT\n{0} confirma, {1} volta ao jogo\n\n"
         "## MENU_PLACEHOLDER_TEXT\nEm breve.\n\n"
         "## SETTINGS_MUSIC_VOLUME\nVolume da Musica\n\n"
         "## SETTINGS_SFX_VOLUME\nVolume dos Efeitos (SFX)\n\n");
@@ -58,6 +61,20 @@ TEST_CASE("build_system_menu_rml: tela Pause contem os 4 verb-pills traduzidos "
     REQUIRE(rml.find("Configuracoes") != std::string::npos);
     REQUIRE(rml.find("Sair") != std::string::npos);
     REQUIRE(rml.find("Pausado") != std::string::npos);
+}
+
+TEST_CASE("build_system_menu_rml: footer-hint de Pause interpola os placeholders "
+          "posicionais de MENU_PAUSE_HINT (AUD-M7-COSTURA ACH-2) - sem isso o "
+          "jogador veria '{0}/{1}' crus no rodape",
+          "[system_menu_rml]") {
+    SystemMenuState state;
+    system_menu_open(state);
+    const Translator tr = make_translator();
+
+    const std::string rml = build_system_menu_rml(state, tr);
+    REQUIRE(rml.find("{0}") == std::string::npos);
+    REQUIRE(rml.find("{1}") == std::string::npos);
+    REQUIRE(rml.find("Enter confirma, Esc volta ao jogo") != std::string::npos);
 }
 
 TEST_CASE("build_system_menu_rml: item selecionado de Pause ganha a classe "
