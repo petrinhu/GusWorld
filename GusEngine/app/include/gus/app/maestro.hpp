@@ -58,6 +58,7 @@
 
 #include <SDL3/SDL.h>
 
+#include "gus/app/i18n/translator.hpp"
 #include "gus/app/maestro_logic.hpp"
 #include "gus/app/sdl_window.hpp"
 #include "gus/core/anim/fade_transition.hpp"
@@ -114,6 +115,18 @@ private:
     [[nodiscard]] bool run_city_fade(gus::core::anim::FadeDirection direction,
                                       float duration_seconds);
 
+    // MENU-PAUSA-CONFIG-SOM (M7-COSTURA, INTEGRACAO FINAL): Esc na CIDADE (fora de
+    // qualquer modal - a cidade nao tem pilha como a batalha, ver SdlWindow::
+    // consume_escape_pressed) abre o MENU DE PAUSA. A cidade roda 100% em
+    // Render2dSdl (SEM GL) - REUSA a MESMA tecnica de "trocar escondido atras do
+    // preto" ja provada empiricamente por to_battle(): solta o SDL_Renderer da
+    // cidade, cria um contexto GL PROPRIO so pro menu (gus/app/screens/
+    // system_menu_loop.hpp::run_system_menu_loop_owning_gl), destroi o contexto,
+    // reconstroi o SDL_Renderer. Devolve true se o jogador confirmou "Sair" no
+    // menu OU fechou a janela DURANTE ele - o chamador (run()) encerra o programa
+    // (mesmo contrato/nome de intencao de should_stop_running_after_battle).
+    [[nodiscard]] bool open_pause_from_city();
+
     SDL_Window* window_ = nullptr;         // dono (a UNICA janela do app)
     std::unique_ptr<SdlWindow> city_;      // a cidade (OverworldSim vive aqui, sempre)
 
@@ -154,6 +167,14 @@ private:
     // M2-SAVE-IO, ADR-012 Onda 2). Usa SaveData::flags (ja existe, domain/save) em vez
     // de inventar um formato novo pra "inimigo1_derrotado".
     gus::domain::save::SaveData save_{};
+
+    // MENU-PAUSA-CONFIG-SOM (INTEGRACAO FINAL): Translator de UI carregado 1 VEZ no
+    // boot (init()) e reusado em toda abertura do menu de pausa (cidade OU batalha
+    // ja tem o SEU proprio translator local - este e SO da cidade, ver
+    // open_pause_from_city). Mesma receita de carga de battle_preview.cpp (Translator
+    // + resolve_translations_path), so que vivendo pelo loop INTEIRO em vez de por
+    // entrada-de-batalha.
+    gus::app::i18n::Translator translator_{};
 };
 
 }  // namespace gus::app

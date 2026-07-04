@@ -28,6 +28,9 @@ add_library(gusengine_app STATIC
     # MENU-PAUSA-CONFIG-SOM (M7-COSTURA): logica pura do menu de pausa + config de som.
     src/screens/system_menu.cpp
     src/screens/system_menu_rml.cpp
+    # MENU-PAUSA-CONFIG-SOM (INTEGRACAO FINAL): o loop interativo GL/glintfx (Esc na
+    # cidade E na batalha abrem o mesmo menu - ver system_menu_loop.hpp).
+    src/screens/system_menu_loop.cpp
     src/i18n/translator.cpp
     src/sdl_window.cpp
     # M7-COSTURA (ADR-012 Onda 1): maestro leve cidade<->batalha (ver maestro.hpp).

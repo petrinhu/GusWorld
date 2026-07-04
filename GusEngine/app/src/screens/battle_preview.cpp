@@ -20,9 +20,11 @@
 #include "gus/app/screens/battle_layout.hpp"     // arena_layout (selftest de mouse A2)
 #include "gus/app/boot_pixel_overlay.hpp"  // sequencia de frames da transicao (M7-COSTURA Inc 2c)
 #include "gus/app/screens/battle_scene.hpp"
+#include "gus/app/screens/system_menu_loop.hpp"  // MENU-PAUSA-CONFIG-SOM: Esc na pilha vazia
 #include "gus/core/asset_paths.hpp"             // caminhos de asset centralizados
 #include "gus/domain/combat/combat_enums.hpp"  // StatusId
 #include "gus/platform/audio/audio_engine.hpp"     // AudioEngine (M6 F3, ADR-011)
+#include "gus/platform/fs/settings_file_store.hpp"  // MENU-PAUSA-CONFIG-SOM: resolve_settings_dir
 #include "gus/platform/render2d/render2d_gl3.hpp"  // ADR-009 GL3: backend OpenGL da arena
 #include "gus/platform/rmlui/gl3_loader.hpp"  // glad load + read_backbuffer (captura)
 
@@ -1061,7 +1063,16 @@ int battle_digit_for_key(SDL_Keycode key) noexcept {
     }
 }
 
-void battle_key_down(BattleScene& scene, SDL_Keycode key, bool& running) {
+void battle_key_down(BattleScene& scene, SDL_Keycode key, bool& running,
+                      BattleEscEffect* out_effect) {
+    // MENU-PAUSA-CONFIG-SOM: limpa o out-param NO INICIO da funcao (contrato "sempre
+    // escrito" - o CHAMADOR nao precisa lembrar de resetar antes de cada chamada; so
+    // o ramo Esc-na-pilha-vazia, mais abaixo, o reescreve pra OpenPauseMenu). Cobre
+    // TAMBEM os retornos antecipados (teclas-atalho numericas abaixo) - qualquer
+    // tecla que nao seja "Esc na pilha vazia" deixa *out_effect == None.
+    if (out_effect != nullptr) {
+        *out_effect = BattleEscEffect::None;
+    }
     // TECLAS-ATALHO NUMERICAS (1-9, fileira + numpad). PRIORIDADE: MODO-MIRA (§3.5) > ESCOLHA
     // DE ATOR (§4.1). Os dois modos nunca sao simultaneos (a mira so abre no menu de verbos,
     // ja fora do picker), mas a ordem deixa explicito: mirando, N mira+confirma o N-esimo
@@ -1102,6 +1113,18 @@ void battle_key_down(BattleScene& scene, SDL_Keycode key, bool& running) {
                 scene.actor_preview_cancel();
             } else if (scene.is_choosing_actor()) {
                 // (3) no-op, ver comentario acima.
+            } else if (out_effect != nullptr) {
+                // MENU-PAUSA-CONFIG-SOM (INTEGRACAO FINAL): o gancho do TODO(menu-de-
+                // pause) acima virou real. O HOST REAL passa out_effect nao-nulo: NAO
+                // mexe em running (o viewer continua rodando por baixo do menu) - so
+                // sinaliza o pedido; quem decide o resto (abrir o loop do menu, e so
+                // entao considerar running=false se o jogador confirmar Sair ou
+                // fechar a janela DURANTE o menu) e o CHAMADOR (run_battle_preview_
+                // embedded). Callers com out_effect==nullptr (todo o resto: os 8 testes
+                // de battle_key_routing_test.cpp, o --battle standalone via wrapper e
+                // os self-tests sinteticos que passam `dummy`) preservam o
+                // comportamento ANTIGO no ramo else abaixo.
+                *out_effect = BattleEscEffect::OpenPauseMenu;
             } else {
                 running = false;
             }
@@ -2070,7 +2093,32 @@ int run_battle_preview_embedded(SDL_Window* window,
                     // Roteamento de teclado EXTRAIDO pra battle_key_down (funcao-livre, testavel
                     // pelo self-test sintetico; espelha battle_mouse_click). Cobre menu de verbos,
                     // MODO-MIRA (§3.5), ESCOLHA DE ATOR (§4.1, prioridade + teclas 1/2/3) e Esc.
-                    battle_key_down(scene, ev.key.key, running);
+                    // MENU-PAUSA-CONFIG-SOM: passa &esc_effect - este e o HOST REAL (nao um
+                    // self-test/teste), entao o Esc na PILHA VAZIA nao fecha mais o viewer na
+                    // hora (ver battle_key_down); abre o MENU DE PAUSA logo abaixo.
+                    BattleEscEffect esc_effect = BattleEscEffect::None;
+                    battle_key_down(scene, ev.key.key, running, &esc_effect);
+                    if (esc_effect == BattleEscEffect::OpenPauseMenu) {
+                        // MESMO contexto GL JA CORRENTE desta funcao (nested loop, ver
+                        // system_menu_loop.hpp) - a arena/HUD do combate ficam PAUSADOS
+                        // (nada de scene.update()/ui->render() roda) enquanto o menu
+                        // esta aberto; ao voltar (Continuar), o loop de fora retoma
+                        // exatamente de onde parou (nada foi mutado na BattleScene).
+                        const std::string settings_dir =
+                            gus::platform::fs::resolve_settings_dir();
+                        const gus::app::screens::SystemMenuLoopOutcome pause_outcome =
+                            gus::app::screens::run_system_menu_loop_gl_current(
+                                window, *audio_ptr, translator, settings_dir);
+                        if (pause_outcome.quit_app) {
+                            // "Sair" confirmado no menu OU o jogador fechou a janela
+                            // DURANTE o menu - MESMO sinal/contrato de quit_requested
+                            // (SDL_EVENT_QUIT acima): a Maestro NAO volta pra cidade.
+                            running = false;
+                            quit_requested = true;
+                        }
+                        // senao (Continuar): running/quit_requested intocados - o loop
+                        // de fora simplesmente segue rodando a batalha.
+                    }
                 } else if (ev.type == SDL_EVENT_MOUSE_BUTTON_DOWN &&
                            ev.button.button == SDL_BUTTON_LEFT) {
                     // MOUSE (A2): clique ESQUERDO aciona verbo (menu) ou alvo (mira). ADITIVO

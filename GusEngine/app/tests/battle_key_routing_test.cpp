@@ -21,6 +21,7 @@
 #include "gus/app/screens/battle_scene.hpp"
 
 using gus::app::screens::battle_key_down;
+using gus::app::screens::BattleEscEffect;
 using gus::app::screens::BattleScene;
 using gus::app::screens::BattleVerb;
 
@@ -175,4 +176,66 @@ TEST_CASE("Esc FIX bug2 invariante: apos a acao resolvida (comprometido), Esc vo
         battle_key_down(scene, SDLK_ESCAPE, running);
         REQUIRE_FALSE(running);
     }
+}
+
+// MENU-PAUSA-CONFIG-SOM (M7-COSTURA, INTEGRACAO FINAL): out_effect (4o parametro,
+// default nullptr) e o gancho novo do menu de pausa. Os 8 TEST_CASEs acima chamam
+// battle_key_down com 3 args (out_effect implicito = nullptr) - continuam intactos,
+// comportamento ANTIGO preservado byte a byte (running=false na pilha vazia). Estes
+// casos NOVOS cobrem o 4o arg explicitamente.
+
+TEST_CASE("Esc na pilha VAZIA com out_effect: sinaliza OpenPauseMenu e NAO mexe em running",
+          "[battle_key_routing]") {
+    BattleScene scene;
+    bool running = true;
+    BattleEscEffect effect = BattleEscEffect::None;
+    battle_key_down(scene, SDLK_ESCAPE, running, &effect);
+
+    REQUIRE(running);  // NAO fechou o viewer (diferente do baseline sem out_effect)
+    REQUIRE(effect == BattleEscEffect::OpenPauseMenu);
+}
+
+TEST_CASE("Esc na MIRA com out_effect: cancela a mira, effect fica None (pilha nao-vazia)",
+          "[battle_key_routing]") {
+    // A PRIORIDADE da pilha (mira > preview > picker > pilha-vazia) e IGUAL com ou sem
+    // out_effect - so o passo FINAL (pilha vazia) muda de comportamento.
+    BattleScene scene;
+    pump_to_actor_picker(scene);
+    scene.actor_picker_confirm();
+    select_verb(scene, BattleVerb::Atacar);
+    scene.menu_confirm();  // mira aberta
+    REQUIRE(scene.is_aiming());
+
+    bool running = true;
+    BattleEscEffect effect = BattleEscEffect::OpenPauseMenu;  // valor-sentinela: prova que MUDOU pra None
+    battle_key_down(scene, SDLK_ESCAPE, running, &effect);
+
+    REQUIRE(running);
+    REQUIRE_FALSE(scene.is_aiming());
+    REQUIRE(effect == BattleEscEffect::None);  // pilha NAO estava vazia - sem efeito de pausa
+}
+
+TEST_CASE("Esc no PICKER (LISTA) com out_effect: continua NO-OP, effect fica None",
+          "[battle_key_routing]") {
+    BattleScene scene;
+    pump_to_actor_picker(scene);
+    REQUIRE(scene.is_choosing_actor());
+
+    bool running = true;
+    BattleEscEffect effect = BattleEscEffect::OpenPauseMenu;  // sentinela
+    battle_key_down(scene, SDLK_ESCAPE, running, &effect);
+
+    REQUIRE(running);
+    REQUIRE(scene.is_choosing_actor());
+    REQUIRE(effect == BattleEscEffect::None);
+}
+
+TEST_CASE("Esc na pilha VAZIA SEM out_effect (nullptr, default): comportamento ANTIGO intacto",
+          "[battle_key_routing]") {
+    // Prova explicita da retro-compatibilidade: chamar com o 4o arg OMITIDO (default
+    // nullptr) e IDENTICO ao 1o TEST_CASE deste arquivo (running vira false).
+    BattleScene scene;
+    bool running = true;
+    battle_key_down(scene, SDLK_ESCAPE, running);  // out_effect omitido = nullptr
+    REQUIRE_FALSE(running);
 }

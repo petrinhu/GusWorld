@@ -7,7 +7,10 @@
 #include <iostream>
 #include <string>
 
-#include "gus/app/screens/battle_preview.hpp"  // run_battle_preview_embedded
+#include "gus/app/screens/battle_preview.hpp"    // run_battle_preview_embedded
+#include "gus/app/screens/system_menu_loop.hpp"  // MENU-PAUSA-CONFIG-SOM: Esc na cidade
+#include "gus/domain/settings/system_settings.hpp"
+#include "gus/platform/fs/settings_file_store.hpp"
 
 namespace gus::app {
 
@@ -92,6 +95,26 @@ bool Maestro::init() {
         return false;
     }
 
+    // MENU-PAUSA-CONFIG-SOM (INTEGRACAO FINAL): carrega settings.json (ou os DEFAULTS
+    // se for a 1a execucao/arquivo ausente/corrompido - load_system_settings degrada
+    // com seguranca) e aplica o volume no AudioEngine ANTES de tocar qualquer musica
+    // logo abaixo - senao o boot tocaria 1 frame em volume cheio (100%) antes do
+    // valor salvo "chegar", um pop perceptivel se o jogador tinha baixado o volume.
+    const std::string settings_dir = gus::platform::fs::resolve_settings_dir();
+    const gus::domain::settings::SystemSettings loaded_settings =
+        gus::platform::fs::load_system_settings(settings_dir);
+    audio_.set_music_volume(loaded_settings.music_volume);
+    audio_.set_sfx_volume(loaded_settings.sfx_volume);
+    std::cout << "Maestro: [settings] carregado de " << settings_dir
+              << " - music_volume=" << loaded_settings.music_volume
+              << " sfx_volume=" << loaded_settings.sfx_volume << "\n";
+
+    // Traducao (i18n) do MENU DE PAUSA/CONFIG - carregada 1 vez aqui, reusada em toda
+    // abertura do menu pela CIDADE (open_pause_from_city). Ausencia => fallback (o
+    // Translator devolve a propria chave), mesma degradacao do resto do app/.
+    const std::string tr_path = gus::app::i18n::resolve_translations_path();
+    translator_.load_from_file(tr_path);
+
     // AUDIO (M7-COSTURA Inc 2, ADR-012 decisao 5 + paga a divida do ADR-011 "AudioEngine
     // e dono da battle_preview"): a Maestro carrega o tema da cidade UMA vez aqui (audio_
     // ja construida no default-member-initializer do header) e toca em LOOP - critério
@@ -145,12 +168,57 @@ bool Maestro::init() {
     return true;
 }
 
+bool Maestro::open_pause_from_city() {
+    std::cout << "Maestro: [costura] Esc na cidade -> abrindo MENU DE PAUSA (troca "
+                 "escondida pro contexto GL, MENU-PAUSA-CONFIG-SOM).\n";
+
+    // MESMA tecnica de to_battle() (comprovada empiricamente): solta o SDL_Renderer
+    // da cidade pra deixar a janela livre pro contexto GL do menu.
+    city_->release_renderer();
+
+    const std::string settings_dir = gus::platform::fs::resolve_settings_dir();
+    gus::app::screens::SystemMenuLoopOutcome outcome{};
+    const bool ok = gus::app::screens::run_system_menu_loop_owning_gl(
+        window_, audio_, translator_, settings_dir, &outcome);
+    if (!ok) {
+        SDL_Log(
+            "Maestro: falha ao abrir o menu de pausa (contexto GL/glad) - voltando "
+            "pra cidade sem mostrar o menu (degradacao segura).");
+    }
+
+    // Reconstroi o SDL_Renderer da cidade INCONDICIONALMENTE (mesmo se ok==false) -
+    // senao a cidade fica sem desenhar pro resto da sessao. Mesmo padrao de
+    // to_battle()/reacquire_renderer.
+    if (!city_->reacquire_renderer()) {
+        SDL_Log(
+            "Maestro: falha ao reconstruir o renderer da cidade apos o menu de pausa "
+            "- a cidade segue rodando SEM desenhar (degradacao segura, sem crash).");
+    }
+
+    // outcome so e valido quando ok==true (run_system_menu_loop_owning_gl deixa
+    // *out_outcome no default quit_app=false se a criacao do contexto GL falhar) -
+    // o "&&" ja cobre isso sem precisar de um guard extra.
+    return ok && outcome.quit_app;
+}
+
 void Maestro::run() {
     bool running = true;
     while (running) {
         if (!city_->step()) {
             running = false;
             break;
+        }
+        // MENU-PAUSA-CONFIG-SOM (INTEGRACAO FINAL): Esc na cidade abre o MENU DE
+        // PAUSA (a cidade nao tem pilha de modais como a batalha - e o gancho UNICO
+        // pra Esc aqui). O jogador fica parado (o overworld nao tem 'update' rodando
+        // dentro do menu) - ao fechar (Continuar), a cidade retoma exatamente de onde
+        // parou. Sair/fechar-a-janela-durante-o-menu encerra o programa (mesmo
+        // contrato de should_stop_running_after_battle, ver to_battle()).
+        if (city_->consume_escape_pressed()) {
+            if (open_pause_from_city()) {
+                running = false;
+                break;
+            }
         }
         // EDGE-TRIGGER (BUG-6, playtest ao vivo do lider: fugir/perder re-disparava a
         // batalha na hora, pois o jogador volta pra cidade AINDA sobre o inimigo, que

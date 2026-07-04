@@ -136,6 +136,14 @@ public:
     // mapa"). No-op se nao havia marcador.
     void clear_enemy_marker();
 
+    // MENU-PAUSA-CONFIG-SOM: repassa o EDGE do Esc drenado pelo input_ (ver
+    // SdlInput::consume_escape_pressed) - o gancho unico do MENU DE PAUSA na
+    // CIDADE (que, ao contrario da batalha, nao tem pilha de modais pra Esc
+    // desempilhar antes). Chamar apos step()/step_with_fade() (que ja bombeou os
+    // eventos deste frame via input_.pump_events()). Consome: uma 2a chamada sem
+    // novo press devolve false.
+    [[nodiscard]] bool consume_escape_pressed() noexcept;
+
 private:
     // Carrega os sprites do Gus no renderer_ corrente e os entrega ao sim_. Extraido
     // de init() pra ser reusado por init_attached() e reacquire_renderer() (mesma

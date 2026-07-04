@@ -35,12 +35,25 @@ SdlInput::~SdlInput() {
 }
 
 void SdlInput::process_key(int sdl_keycode, bool pressed) {
+    // MENU-PAUSA-CONFIG-SOM: arma o EDGE do Esc ANTES da traducao pro InputMapper
+    // (Esc nao e mapeado a movimento nenhum - default_controls() nao o usa - entao
+    // isto e ADITIVO, nunca interfere no dx/dy/run). So no PRESS (release nao
+    // dispara o menu).
+    if (pressed && sdl_keycode == SDLK_ESCAPE) {
+        escape_pressed_ = true;
+    }
     const long long code = sdl_key_to_godot_keycode(sdl_keycode);
     if (pressed) {
         mapper_.press(code);
     } else {
         mapper_.release(code);
     }
+}
+
+bool SdlInput::consume_escape_pressed() noexcept {
+    const bool was_pressed = escape_pressed_;
+    escape_pressed_ = false;
+    return was_pressed;
 }
 
 void SdlInput::clear() noexcept {

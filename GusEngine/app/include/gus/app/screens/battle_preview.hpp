@@ -61,12 +61,32 @@ namespace gus::app::screens {
 // testes Catch2 do roteamento de teclado (battle_key_routing_test.cpp) - headless, sem SDL_Init.
 [[nodiscard]] int battle_digit_for_key(SDL_Keycode key) noexcept;
 
+// MENU-PAUSA-CONFIG-SOM (M7-COSTURA, INTEGRACAO FINAL): sinal devolvido por
+// battle_key_down (out-param opcional) quando o Esc bateu na PILHA VAZIA (nenhum
+// modal de combate aberto). None = nada disso aconteceu (tecla sem esse efeito
+// especifico). OpenPauseMenu = o Esc pediu o MENU DE PAUSA - so reportado quando o
+// CHAMADOR passa um `out_effect` nao-nulo (ver battle_key_down); nesse caso
+// `running` NAO e mexido (o viewer continua rodando; o chamador decide o que fazer
+// com o pedido, tipicamente abrindo gus/app/screens/system_menu_loop.hpp).
+enum class BattleEscEffect {
+    None,
+    OpenPauseMenu,
+};
+
 // Roteamento de TECLADO do host (extraido do loop de eventos - ver definicao/comentario
 // completo em battle_preview.cpp). Esc DESEMPILHA 1 nivel de modal por vez (FIX bug2 do
 // playtest do lider: "Esc fecha a tela" com um picker/preview aberto) - mira > preview de
-// ator > picker > (pilha vazia) sai do viewer. `running` so vira false na pilha vazia.
+// ator > picker > (pilha vazia). NA PILHA VAZIA, o comportamento depende de `out_effect`:
+//   out_effect == nullptr (default - PRESERVA TODO call-site existente, inclusive os 8
+//     casos de app/tests/battle_key_routing_test.cpp e o --battle STANDALONE/selftests):
+//     `running` vira false (sai do viewer), COMPORTAMENTO INTACTO de sempre.
+//   out_effect != nullptr (o HOST REAL, run_battle_preview_embedded): `running` NAO
+//     muda; `*out_effect` vira OpenPauseMenu - o chamador abre o menu de pausa (nested
+//     loop) e so entao decide se running deve virar false (ex.: o jogador escolheu Sair
+//     ou fechou a janela DURANTE o menu).
 // Exposto pra ser testavel headless (Catch2), sem abrir janela SDL nem chamar SDL_Init.
-void battle_key_down(BattleScene& scene, SDL_Keycode key, bool& running);
+void battle_key_down(BattleScene& scene, SDL_Keycode key, bool& running,
+                      BattleEscEffect* out_effect = nullptr);
 
 // M7-COSTURA: roda o loop de batalha (mesma BattleScene/mesmo esqueleto) numa janela JA
 // CRIADA por quem chama (a Maestro). NAO chama SDL_Init/SDL_Quit nem cria/destroi a

@@ -43,11 +43,24 @@ public:
     // --- caminho TESTAVEL (sem SDL) ----------------------------------------
     // Aplica uma transicao de tecla (SDL_Keycode cru -> traducao -> InputMapper).
     // pressed=true e press; false e release. Auto-repeat e idempotente (conjunto).
+    // MENU-PAUSA-CONFIG-SOM: alem da traducao pro InputMapper (movimento), tambem
+    // arma o EDGE do Esc (ver consume_escape_pressed) quando sdl_keycode ==
+    // SDLK_ESCAPE && pressed - a MESMA porta de injecao dos testes, sem duplicar
+    // logica entre pump_events() (caminho real) e o teste.
     void process_key(int sdl_keycode, bool pressed);
     // Acesso ao estado do gamepad (o teste injeta; o pump_events preenche).
     [[nodiscard]] GamepadState& mutable_gamepad() noexcept { return pad_; }
     // Solta tudo (teclado + gamepad), ex.: ao perder foco da janela.
     void clear() noexcept;
+
+    // MENU-PAUSA-CONFIG-SOM: EDGE (press unico, nao auto-repeat - pump_events ja
+    // filtra e.key.repeat antes de chamar process_key) do Esc desde a ULTIMA
+    // chamada a este metodo. Devolve true UMA vez por press (consome o flag: a
+    // 2a chamada seguida, sem novo press, devolve false) - o padrao "consume"
+    // evita que o chamador (SdlWindow/Maestro) precise gerenciar o proprio
+    // estado de "ja processei este press". A CIDADE (sem pilha de modais como a
+    // batalha) usa isto como o gancho unico do MENU DE PAUSA: Esc == abrir.
+    [[nodiscard]] bool consume_escape_pressed() noexcept;
 
     // --- intencao FUNDIDA (teclado + gamepad), clampada em {-1,0,1} ---------
     [[nodiscard]] int dx() const noexcept;
@@ -58,6 +71,9 @@ private:
     InputMapper mapper_;  // teclado -> acao (mapa logico puro)
     GamepadState pad_;    // estado cru do gamepad
     void* gamepad_ = nullptr;  // SDL_Gamepad* opaco (so o .cpp conhece o tipo)
+    // MENU-PAUSA-CONFIG-SOM: flag EDGE do Esc, setada em process_key (press) e
+    // consumida (lida + zerada) por consume_escape_pressed().
+    bool escape_pressed_ = false;
 };
 
 }  // namespace gus::platform::input

@@ -22,6 +22,7 @@ constexpr int kKeyD = 'd';        // SDLK_d
 constexpr int kKeyA = 'a';        // SDLK_a
 constexpr int kKeyW = 'w';        // SDLK_w
 constexpr int kSdlLShift = 0x400000E1;  // SDLK_LSHIFT
+constexpr int kSdlEscape = 0x1B;        // SDLK_ESCAPE ('\x1B' == 27, ver SDL_keycode.h)
 constexpr int kAxisMax = 32767;
 }  // namespace
 
@@ -81,4 +82,31 @@ TEST_CASE("SdlInput clear solta tudo", "[sdl_input]") {
     in.clear();
     REQUIRE(in.dy() == 0);
     REQUIRE(in.run() == false);
+}
+
+// MENU-PAUSA-CONFIG-SOM: consume_escape_pressed() e o gancho da CIDADE pro menu de
+// pausa (Esc == abrir, sem pilha de modais como a batalha). EDGE + consumo: 1
+// press = 1 true, e so 1 - a proxima chamada sem novo press devolve false.
+TEST_CASE("SdlInput Esc arma o edge e consume_escape_pressed consome uma vez",
+          "[sdl_input]") {
+    SdlInput in;
+    REQUIRE(in.consume_escape_pressed() == false);  // nada pressionado ainda
+    in.process_key(kSdlEscape, /*pressed=*/true);
+    REQUIRE(in.consume_escape_pressed() == true);   // 1o consumo: pega o press
+    REQUIRE(in.consume_escape_pressed() == false);  // 2o consumo: ja foi drenado
+}
+
+TEST_CASE("SdlInput Esc release nao arma o edge", "[sdl_input]") {
+    SdlInput in;
+    in.process_key(kSdlEscape, /*pressed=*/false);
+    REQUIRE(in.consume_escape_pressed() == false);
+}
+
+TEST_CASE("SdlInput Esc nao interfere no movimento (aditivo)", "[sdl_input]") {
+    SdlInput in;
+    in.process_key(kSdlEscape, /*pressed=*/true);
+    REQUIRE(in.dx() == 0);
+    REQUIRE(in.dy() == 0);
+    REQUIRE(in.run() == false);
+    REQUIRE(in.consume_escape_pressed() == true);  // o edge ainda foi armado
 }

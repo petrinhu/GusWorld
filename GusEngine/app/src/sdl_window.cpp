@@ -281,4 +281,8 @@ const gus::app::screens::OverworldTuning& SdlWindow::tuning() const noexcept {
     return sim_->tuning();
 }
 
+bool SdlWindow::consume_escape_pressed() noexcept {
+    return input_.consume_escape_pressed();
+}
+
 }  // namespace gus::app

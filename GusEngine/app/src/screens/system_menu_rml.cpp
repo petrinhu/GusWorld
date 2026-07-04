@@ -1,10 +1,28 @@
 // gus/app/src/screens/system_menu_rml.cpp
 //
-// Implementacao de build_system_menu_rml. Ver header para o contrato + a nota de
-// DIVERGENCIA CONHECIDA (no hexagonal do slider -> circulo place-holder).
+// Implementacao de build_system_menu_rml. Ver header para o contrato.
 //
-// Traducao do mock (docs/design/mockups/
-// 01-menu-sistema-proposta-a-console-centralizado.html) pro RCSS do glintfx:
+// HEXAGONO DO SLIDER (MENU-PAUSA-CONFIG-SOM, glintfx v0.3.0): a DIVERGENCIA antiga
+// (circulo place-holder, glintfx v0.2.5 nao tinha decorator de poligono) esta
+// FECHADA - `decorator: polygon(<sides>, <color>[, <rotation>])` chegou na v0.3.0
+// (ver docs/effects.md do glintfx vendorizado). O `.slider-node` agora e um
+// hexagono NATIVO fiel ao mock (docs/design/mockups/
+// 01-menu-sistema-proposta-a-console-centralizado.html: SVG <polygon
+// points="11,2 19,7 19,15 11,20 3,15 3,7" fill="#0A0E1A" stroke="#22D3EE"
+// stroke-width="1.6">, vertice apontando pra cima - MESMA orientacao default do
+// polygon() do glintfx). Como o decorator so pinta 1 cor SOLIDA (sem stroke
+// separado - a API deliberadamente NAO duplica isso, ver docs/effects.md "no
+// separate polygon-glow or polygon-clip API"), o "contorno cyan + preenchimento
+// escuro" do mock e reproduzido com DOIS hexagonos CONCENTRICOS (mesmo truque que
+// um border-radius de 2 camadas faria com retangulos): `.slider-node` (o de FORA,
+// 22dp, cor cyan/branco conforme foco - faz as vezes do "stroke") e
+// `.slider-node-hex-inner` (o de DENTRO, 18dp, centralizado com 2dp de inset por
+// lado - faz as vezes do "fill" escuro). `filter: drop-shadow(...)` no hexagono de
+// FORA da o glow que contorna a forma exata (nao um retangulo) - zero API nova,
+// exatamente a receita do proprio docs/effects.md ("glow que abraca o contorno do
+// hexagono").
+//
+// Traducao do mock pro RCSS do glintfx:
 //   .panel (gradiente vertical 3-stop + borda latao + box-shadow glow cyan sutil)
 //     -> decorator: linear-gradient(180deg, ...) (native RmlUi, MESMA familia de
 //        shader do radial-gradient ja shipado no cockpit - ver DecoratorGradient.cpp)
@@ -16,12 +34,12 @@
 //        positivo + decorator: vertical-gradient)
 //   .track/.fill (slider) -> decorator: vertical-gradient (track escuro) +
 //     horizontal-gradient (fill cyan) + box-shadow glow
-//   .node (thumb hexagonal) -> DIVERGENCIA (ver header) - circulo nativo aqui.
+//   .slider-node/.slider-node-hex-inner (thumb hexagonal) -> decorator: polygon()
+//     em 2 camadas concentricas, ver acima.
 //   .title-glow (text-shadow neon no titulo) -> RmlUi nao tem 'text-shadow' CSS
 //     (so box-shadow/drop-shadow em CAIXAS, nao em glifos de texto - o glow do
 //     TITULO em si fica de fora nesta versao; o resto do painel mantem o glow
-//     neon completo). Nota secundaria, MENOR que a do hexagono - reportada
-//     tambem, mas nao bloqueia.
+//     neon completo). Nota secundaria, reportada mas nao bloqueia.
 
 #include "gus/app/screens/system_menu_rml.hpp"
 
@@ -99,17 +117,22 @@ body { font-family: "Pixel Operator Mono"; background: transparent; }
   decorator: horizontal-gradient( #0891A8 #22D3EE );
   box-shadow: #22D3EE8c 0dp 0dp 12dp 0dp;
 }
-/* DIVERGENCIA (ver header): o mock usa um HEXAGONO (SVG polygon) aqui. RmlUi/
-   glintfx nao tem decorator de poligono arbitrario - este e um CIRCULO nativo
-   (border-radius 50%) com o MESMO glow/cor, ate o lider decidir entre aceitar o
-   circulo, encomendar um asset PNG do hexagono (tecnica ja usada no medalhao do
-   brasao, load_cockpit_rml/.mono), ou uma forma alternativa (losango). */
+/* HEXAGONO NATIVO (glintfx v0.3.0, ver header): 2 camadas concentricas - a de FORA
+   (cyan/branco conforme foco) faz as vezes do "stroke" do mock, a de DENTRO
+   (.slider-node-hex-inner, escura, 18dp/2dp de inset) faz as vezes do "fill". */
 .slider-node {
   position: absolute; top: -4dp; width: 22dp; height: 22dp; margin-left: -11dp;
-  border-radius: 11dp; background-color: #0A0E1A; border: 2dp #22D3EE;
-  box-shadow: #22D3EEd9 0dp 0dp 6dp 0dp;
+  decorator: polygon( 6, #22D3EE );
+  filter: drop-shadow( #22D3EEd9 0dp 0dp 6dp );
 }
-.slider-node.focused { border: 2dp #ffffff; box-shadow: #22D3EEff 0dp 0dp 10dp 1dp; }
+.slider-node.focused {
+  decorator: polygon( 6, #ffffff );
+  filter: drop-shadow( #22D3EEff 0dp 0dp 10dp );
+}
+.slider-node-hex-inner {
+  position: absolute; top: 2dp; left: 2dp; width: 18dp; height: 18dp;
+  decorator: polygon( 6, #0A0E1A );
+}
 
 .btn-back {
   text-align: center; width: 364dp; padding: 13dp; margin-top: 8dp;
@@ -183,7 +206,9 @@ std::string build_config_body(const SystemMenuState& state,
              << "<div class=\"fill\" style=\"width:" << pct << ";\"></div>"
              << "<div class=\"slider-node" << (focused ? " focused" : "")
              << "\" id=\"slider-node-" << row.index << "\" style=\"left:" << pct
-             << ";\"></div>"
+             << ";\">"
+             << "<div class=\"slider-node-hex-inner\"></div>"
+             << "</div>"
              << "</div></div>";
     }
 
