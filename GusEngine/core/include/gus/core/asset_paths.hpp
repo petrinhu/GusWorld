@@ -153,6 +153,12 @@ inline constexpr std::string_view kHitSfxFile = "hit_digital_provisorio.wav";
 // Variante A/B do hit (GUSWORLD_HIT_SFX=alt troca pro lider comparar ao vivo no
 // playtest e escolher qual fica - F3, ADR-011).
 inline constexpr std::string_view kHitSfxAltFile = "hit_digital_alt_provisorio.wav";
+// Blips de UI do menu de sistema (MENU-PAUSA-CONFIG-SOM, M7-COSTURA): sintese pura
+// (tools/gen_menu_ui_sfx.py, sem lib externa), formato alinhado ao hit acima (PCM16,
+// 44100Hz, estereo). Hover = bip curto/agudo/discreto (nao cansa navegando o menu
+// rapido); click = confirmacao 2-tons ascendente (mais presente que o hover).
+inline constexpr std::string_view kMenuHoverSfxFile = "menu_hover_provisorio.wav";
+inline constexpr std::string_view kMenuClickSfxFile = "menu_click_provisorio.wav";
 
 // Pasta da musica (MP3, streaming - M6 F4, ADR-011). Raiz assets/music/ (irma de
 // assets/sfx/, mesmo padrao/resolvedor - ver comentario de kSfxDir acima).
