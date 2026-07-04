@@ -429,3 +429,22 @@ Varredura Básica
 
 ## CARD_RAIZ_CURA_NAME
 Raiz Curativa
+
+---
+
+## §9. Menu de sistema (pausa + config de som, MENU-PAUSA-CONFIG-SOM)
+
+## MENU_SYSTEM_KICKER
+Sistema
+
+## MENU_PAUSE_TITLE
+Pausado
+
+## MENU_PAUSE_HINT
+{0} confirma, {1} volta ao jogo
+
+## SETTINGS_MUSIC_VOLUME
+Volume da Música
+
+## SETTINGS_SFX_VOLUME
+Volume dos Efeitos (SFX)

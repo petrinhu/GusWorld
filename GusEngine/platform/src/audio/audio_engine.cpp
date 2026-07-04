@@ -271,6 +271,24 @@ void AudioEngine::set_master_volume(float volume) {
 
 float AudioEngine::master_volume() const noexcept { return master_volume_; }
 
+void AudioEngine::set_music_volume(float volume) {
+    music_volume_ = std::clamp(volume, 0.0f, 1.0f);
+    if (available()) {
+        ma_sound_group_set_volume(&impl_->music_group, music_volume_);
+    }
+}
+
+float AudioEngine::music_volume() const noexcept { return music_volume_; }
+
+void AudioEngine::set_sfx_volume(float volume) {
+    sfx_volume_ = std::clamp(volume, 0.0f, 1.0f);
+    if (available()) {
+        ma_sound_group_set_volume(&impl_->sfx_group, sfx_volume_);
+    }
+}
+
+float AudioEngine::sfx_volume() const noexcept { return sfx_volume_; }
+
 unsigned int AudioEngine::sfx_play_count() const noexcept { return sfx_play_count_; }
 
 unsigned int AudioEngine::music_play_count() const noexcept { return music_play_count_; }

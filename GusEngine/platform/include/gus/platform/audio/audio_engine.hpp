@@ -114,6 +114,17 @@ public:
     void set_master_volume(float volume);
     [[nodiscard]] float master_volume() const noexcept;
 
+    // Volume POR GRUPO (MENU-PAUSA-CONFIG-SOM, M7-COSTURA): musica e SFX
+    // independentes, em [0,1] (clampado), via ma_sound_group_set_volume nos 2
+    // ma_sound_group ja existentes (music_group/sfx_group, ADR-011 item 3). ADITIVO -
+    // NAO substitui set_master_volume (os dois multiplicam na cadeia do miniaudio:
+    // volume_efetivo = master * grupo). Guardado mesmo se available()==false (o
+    // slider de config funciona sem hardware, mesmo padrao de master_volume acima).
+    void set_music_volume(float volume);
+    [[nodiscard]] float music_volume() const noexcept;
+    void set_sfx_volume(float volume);
+    [[nodiscard]] float sfx_volume() const noexcept;
+
     // HOOK DE TESTE (M6 F3, ADR-011): quantos play_sfx EFETIVAMENTE dispararam (id
     // valido + engine available() - nao conta chamadas no-op) desde a construcao. A
     // classe e concreta (sem virtual, PImpl) por design desta onda minima; este contador
@@ -142,6 +153,8 @@ private:
                                    // fica confinado ao .cpp)
     std::unique_ptr<Impl> impl_;  // sempre nao-nulo (mesmo em modo indisponivel)
     float master_volume_ = 1.0f;
+    float music_volume_ = 1.0f;  // MENU-PAUSA-CONFIG-SOM: volume do grupo music_group
+    float sfx_volume_ = 1.0f;    // MENU-PAUSA-CONFIG-SOM: volume do grupo sfx_group
     unsigned int sfx_play_count_ = 0;    // hook de teste (M6 F3) - ver sfx_play_count()
     unsigned int music_play_count_ = 0;  // hook de teste (M6 F4) - ver music_play_count()
 };

@@ -297,6 +297,59 @@ TEST_CASE("AudioEngine: SFX e musica coexistem - tocar o hit NAO para a musica "
     std::filesystem::remove(sfx_tmp);
 }
 
+TEST_CASE("AudioEngine set_music_volume/set_sfx_volume clampam para [0,1] e sao "
+          "independentes do master (MENU-PAUSA-CONFIG-SOM)",
+          "[audio_engine][menu_pausa_config_som]") {
+    AudioEngine engine(/*device_active=*/false);
+
+    // Defaults = 1.0f (volume cheio), mesmo padrao de master_volume().
+    REQUIRE(engine.music_volume() == Catch::Approx(1.0f));
+    REQUIRE(engine.sfx_volume() == Catch::Approx(1.0f));
+
+    engine.set_music_volume(-5.0f);
+    REQUIRE(engine.music_volume() == Catch::Approx(0.0f));
+    engine.set_music_volume(5.0f);
+    REQUIRE(engine.music_volume() == Catch::Approx(1.0f));
+    engine.set_music_volume(0.72f);
+    REQUIRE(engine.music_volume() == Catch::Approx(0.72f));
+
+    engine.set_sfx_volume(-1.0f);
+    REQUIRE(engine.sfx_volume() == Catch::Approx(0.0f));
+    engine.set_sfx_volume(2.0f);
+    REQUIRE(engine.sfx_volume() == Catch::Approx(1.0f));
+    engine.set_sfx_volume(0.45f);
+    REQUIRE(engine.sfx_volume() == Catch::Approx(0.45f));
+
+    // Independentes entre si e do master (aditivo - nao quebra set_master_volume).
+    engine.set_master_volume(0.3f);
+    REQUIRE(engine.master_volume() == Catch::Approx(0.3f));
+    REQUIRE(engine.music_volume() == Catch::Approx(0.72f));
+    REQUIRE(engine.sfx_volume() == Catch::Approx(0.45f));
+}
+
+TEST_CASE("AudioEngine set_music_volume/set_sfx_volume no null-device (sem hardware) "
+          "guardam o valor e nao crasham - o slider de config funciona sem placa de som",
+          "[audio_engine][menu_pausa_config_som]") {
+    AudioEngine engine(/*device_active=*/false);
+    REQUIRE(engine.available());  // null-device sempre sobe
+    engine.set_music_volume(0.6f);
+    engine.set_sfx_volume(0.2f);
+    REQUIRE(engine.music_volume() == Catch::Approx(0.6f));
+    REQUIRE(engine.sfx_volume() == Catch::Approx(0.2f));
+    SUCCEED("set_music_volume/set_sfx_volume disponiveis (null-device) nao crasharam");
+}
+
+TEST_CASE("AudioEngine set_music_volume/set_sfx_volume com device real (indisponivel "
+          "ou nao) nunca crasham - degradacao graciosa (mesma familia do master)",
+          "[audio_engine][menu_pausa_config_som]") {
+    AudioEngine engine(/*device_active=*/true);
+    engine.set_music_volume(0.5f);
+    engine.set_sfx_volume(0.5f);
+    REQUIRE(engine.music_volume() == Catch::Approx(0.5f));
+    REQUIRE(engine.sfx_volume() == Catch::Approx(0.5f));
+    SUCCEED("device real nao crashou (com ou sem hardware)");
+}
+
 TEST_CASE("AudioEngine sfx_play_count: conta so os play_sfx que TOCARAM de fato "
           "(M6 F3, hook de teste headless)",
           "[audio_engine]") {

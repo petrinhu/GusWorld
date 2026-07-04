@@ -25,6 +25,9 @@ add_library(gusengine_app STATIC
     src/screens/battle_pacing.cpp
     src/screens/battle_scene.cpp
     src/screens/battle_preview.cpp
+    # MENU-PAUSA-CONFIG-SOM (M7-COSTURA): logica pura do menu de pausa + config de som.
+    src/screens/system_menu.cpp
+    src/screens/system_menu_rml.cpp
     src/i18n/translator.cpp
     src/sdl_window.cpp
     # M7-COSTURA (ADR-012 Onda 1): maestro leve cidade<->batalha (ver maestro.hpp).

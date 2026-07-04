@@ -26,6 +26,9 @@ add_executable(gusengine_app_tests
     translator_test.cpp
     maestro_logic_test.cpp
     boot_pixel_overlay_test.cpp
+    # MENU-PAUSA-CONFIG-SOM (M7-COSTURA): logica pura do menu de pausa + config de som.
+    system_menu_test.cpp
+    system_menu_rml_test.cpp
 )
 
 target_link_libraries(gusengine_app_tests

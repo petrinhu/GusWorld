@@ -30,6 +30,8 @@ add_library(gusengine_platform STATIC
     # AudioEngine (M6 F1, ADR-011): UNICA TU que define MINIAUDIO_IMPLEMENTATION
     # (miniaudio.h e single-header vendorizado em third_party/miniaudio/).
     src/audio/audio_engine.cpp
+    # MENU-PAUSA-CONFIG-SOM (M7-COSTURA): I/O real de ~/.gusworld/settings.json.
+    src/fs/settings_file_store.cpp
 )
 
 # ADR-010 F3: o backend RmlUi vendorizado (RmlUi_Renderer_GL3.cpp / RmlUi_Platform_SDL.cpp /

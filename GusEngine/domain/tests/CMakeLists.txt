@@ -73,6 +73,9 @@ add_executable(gusengine_domain_tests
     controls_name_sanitize_test.cpp
     controls_restore_test.cpp
     save_v4_test.cpp
+    # MENU-PAUSA-CONFIG-SOM (M7-COSTURA): settings.json proprio (mesmo padrao JSON
+    # dep-free de controls_json.hpp), so volume musica/SFX nesta onda.
+    system_settings_json_test.cpp
 )
 
 # Os testes do combate incluem helpers de teste headers-only (fixed_random.hpp).
