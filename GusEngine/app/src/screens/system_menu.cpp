@@ -8,6 +8,8 @@
 
 #include <algorithm>  // std::clamp
 
+#include "gus/app/screens/ui_hover.hpp"  // COCKPIT-SFX-HOVER-CLIQUE: POCO de hover generico (delegacao)
+
 namespace gus::app::screens {
 
 namespace {
@@ -337,19 +339,20 @@ int system_menu_hover_index(const SystemMenuState& state, float mouse_x, float m
         case SystemMenuScreen::Hidden:
             return -1;  // menu fechado: nenhum item hover-testavel
     }
+    // COCKPIT-SFX-HOVER-CLIQUE: DELEGA a decisao geometrica pro POCO generico
+    // (ui_hover.hpp) - o menu so decide QUANTAS caixas sao relevantes (count, pela
+    // tela). SystemMenuHoverBox e UiHoverBox tem os MESMOS campos; converte in-place.
+    UiHoverBox generic[kSystemMenuMaxHoverItems];
     for (int i = 0; i < count; ++i) {
-        const SystemMenuHoverBox& box = boxes[i];
-        if (!box.found) continue;  // MESMO contrato do hit_test de clique
-        if (mouse_x >= box.x && mouse_x <= box.x + box.w && mouse_y >= box.y &&
-            mouse_y <= box.y + box.h) {
-            return i;
-        }
+        generic[i] = UiHoverBox{boxes[i].found, boxes[i].x, boxes[i].y, boxes[i].w,
+                                boxes[i].h};
     }
-    return -1;
+    return ui_hover_index(mouse_x, mouse_y, generic, count);
 }
 
 bool system_menu_hover_entered_new_item(int previous_index, int current_index) noexcept {
-    return current_index >= 0 && current_index != previous_index;
+    // COCKPIT-SFX-HOVER-CLIQUE: edge-detect e identico entre menu e cockpit -> delega.
+    return ui_hover_entered_new_item(previous_index, current_index);
 }
 
 }  // namespace gus::app::screens

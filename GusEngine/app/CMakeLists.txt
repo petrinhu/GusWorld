@@ -16,6 +16,9 @@ add_library(gusengine_app STATIC
     src/screens/city_loader.cpp
     src/screens/battle_layout.cpp
     src/screens/battle_cockpit_verb_ids.cpp
+    # COCKPIT-SFX-HOVER-CLIQUE: POCO generico de "som de hover" de botoes (menu E
+    # cockpit delegam pra ca - ver gus/app/screens/ui_hover.hpp).
+    src/screens/ui_hover.cpp
     src/screens/battle_hud_model.cpp
     src/screens/battle_menu.cpp
     src/screens/battle_log_model.cpp

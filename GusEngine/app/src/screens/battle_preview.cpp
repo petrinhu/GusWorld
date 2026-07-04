@@ -21,6 +21,7 @@
 #include "gus/app/boot_pixel_overlay.hpp"  // sequencia de frames da transicao (M7-COSTURA Inc 2c)
 #include "gus/app/screens/battle_scene.hpp"
 #include "gus/app/screens/system_menu_loop.hpp"  // MENU-PAUSA-CONFIG-SOM: Esc na pilha vazia
+#include "gus/app/screens/ui_hover.hpp"  // COCKPIT-SFX-HOVER-CLIQUE: edge-detect POCO do som de hover
 #include "gus/core/asset_paths.hpp"             // caminhos de asset centralizados
 #include "gus/domain/combat/combat_enums.hpp"  // StatusId
 #include "gus/platform/audio/audio_engine.hpp"     // AudioEngine (M6 F3, ADR-011)
@@ -123,6 +124,27 @@ std::string resolve_hit_sfx_path() {
         return join(compiled, file);
     }
     return join(std::string(gus::core::assets::kSfxDir), file);
+}
+
+// COCKPIT-SFX-HOVER-CLIQUE: resolve o caminho de um SFX de UI (hover/click) - MESMA
+// ordem/raiz de resolve_hit_sfx_path (env GUSWORLD_SFX > macro GUSWORLD_SFX_DIR >
+// relativo kSfxDir), so que o NOME do arquivo vem por parametro (os 2 blips do menu:
+// kMenuHoverSfxFile/kMenuClickSfxFile). REUSA os MESMOS 2 arquivos do menu de sistema
+// (mesma identidade sonora de UI - pedido do lider ao vivo, nao gerar novos). Espelha
+// resolve_menu_sfx_path de system_menu_loop.cpp (nao da pra compartilhar: aquele e
+// static de outra TU; a duplicacao aqui e MINIMA - so a ordem de resolucao de path).
+std::string resolve_ui_sfx_path(std::string_view file) {
+    const std::string filename(file);
+    if (const char* env = std::getenv("GUSWORLD_SFX")) {
+        if (env[0] != '\0') {
+            return join(env, filename);
+        }
+    }
+    const std::string compiled = GUSWORLD_SFX_DIR;
+    if (!compiled.empty()) {
+        return join(compiled, filename);
+    }
+    return join(std::string(gus::core::assets::kSfxDir), filename);
 }
 
 // resolve_music_path() MOVIDA pra fora do namespace anonimo (M7-COSTURA Inc 2) -
@@ -955,13 +977,17 @@ bool sdl_to_glintfx(const SDL_Event& ev, SDL_Window* window, glintfx::UiEvent* o
 // enquanto mira/escolhe ator selecionaria um verbo por baixo -- regressao. Na ABERTURA
 // (is_intro()) o bloco #combat inteiro (pills inclusos) nem existe no DOM -- o id nunca
 // bateria mesmo sem a guarda, mas ela fica explicita por clareza/defesa-em-profundidade.
-void battle_cockpit_verb_click(BattleScene& scene, const char* element_id) {
+// COCKPIT-SFX-HOVER-CLIQUE: devolve true SE o clique de fato ACIONOU um pill de verbo
+// valido (id resolvido + estado que aceita clique de pill) - o callback do glintfx usa
+// isso pra tocar o SFX de clique SO quando uma pill foi acionada (nunca em id de outro
+// elemento do cockpit nem durante mira/escolha-de-ator/abertura). false = no-op.
+bool battle_cockpit_verb_click(BattleScene& scene, const char* element_id) {
     if (scene.is_choosing_actor() || scene.is_aiming() || scene.is_intro()) {
-        return;
+        return false;
     }
     const int idx = gus::app::screens::cockpit_verb_index_for_click_id(element_id);
     if (idx < 0) {
-        return;  // id de outro elemento do cockpit (#combat/#vitals/#log/...) ou "" -> NO-OP
+        return false;  // id de outro elemento do cockpit (#combat/#vitals/#log/...) ou "" -> NO-OP
     }
     // Clique = SELECIONA e CONFIRMA. menu_move (delta ate o indice) + menu_confirm; ambos
     // ja sao NO-OP fora do turno do jogador (mesma guarda do teclado) -> seguro em turno
@@ -969,6 +995,7 @@ void battle_cockpit_verb_click(BattleScene& scene, const char* element_id) {
     // exato no indice. menu_confirm respeita 'enabled' (verbo sem AP: seleciona, nao aciona).
     scene.menu_move(idx - scene.menu().selected_index());
     scene.menu_confirm();
+    return true;  // acionou um pill de verbo -> o chamador pode tocar o SFX de clique
 }
 
 // ADR-010 / Incremento A2 (MOUSE), revisado GLINTFX-CLICK: hit-tests de MUNDO/ARENA
@@ -1431,6 +1458,29 @@ int run_battle_preview_embedded(SDL_Window* window,
         const std::string hit_sfx_path = resolve_hit_sfx_path();
         const gus::platform::audio::SoundId hit_sfx_id =
             audio_ptr->load_sfx(hit_sfx_path.c_str());
+
+        // COCKPIT-SFX-HOVER-CLIQUE: blips de UI do cockpit (hover + clique nos pills de
+        // verbo) - REUSA os MESMOS 2 arquivos do menu de sistema (kMenuHoverSfxFile/
+        // kMenuClickSfxFile: identidade sonora unica de UI, pedido do lider). load_sfx UMA
+        // VEZ por entrada na batalha (NUNCA no frame - decodificar e caro), MESMO padrao do
+        // hit acima e do menu (system_menu_loop.cpp). Em AMBOS os modos de audio (local/
+        // externo). kInvalidSound degrada com seguranca (play_sfx no-op).
+        const std::string ui_hover_sfx_path =
+            resolve_ui_sfx_path(gus::core::assets::kMenuHoverSfxFile);
+        const std::string ui_click_sfx_path =
+            resolve_ui_sfx_path(gus::core::assets::kMenuClickSfxFile);
+        const gus::platform::audio::SoundId ui_hover_sfx_id =
+            audio_ptr->load_sfx(ui_hover_sfx_path.c_str());
+        const gus::platform::audio::SoundId ui_click_sfx_id =
+            audio_ptr->load_sfx(ui_click_sfx_path.c_str());
+        std::cout << "BattlePreview: [audio] SFX de UI (cockpit) hover "
+                  << (ui_hover_sfx_id != gus::platform::audio::kInvalidSound ? "carregado"
+                                                                             : "AUSENTE")
+                  << " / clique "
+                  << (ui_click_sfx_id != gus::platform::audio::kInvalidSound ? "carregado"
+                                                                             : "AUSENTE")
+                  << " (reuso dos blips do menu de sistema)\n";
+
         std::cout << "BattlePreview: [audio] device "
                   << (audio_ptr->available() ? "disponivel" : "INDISPONIVEL (mudo)")
                   << " - SFX de hit "
@@ -1484,9 +1534,18 @@ int run_battle_preview_embedded(SDL_Window* window,
         // referencia (nao dava pra registrar antes, no bloco de setup do UiLayer, onde a
         // cena ainda nao existia). `scene` sobrevive ate o fim deste escopo, junto com `ui`.
         if (glintfx_on && ui) {
-            ui->set_click_callback([&scene](const char* element_id) {
-                battle_cockpit_verb_click(scene, element_id);
-            });
+            // COCKPIT-SFX-HOVER-CLIQUE: o glintfx JA fez o hit-test nativo (o mesmo do
+            // :hover) e devolveu o `id`; aqui so somamos o SFX de CLIQUE quando a pill de
+            // fato ACIONOU um verbo (battle_cockpit_verb_click devolve true). NAO duplica
+            // hit-test - o unico choke-point do clique real E deste callback. audio_ptr/
+            // ui_click_sfx_id capturados por valor (ponteiro nao-dono + handle); vivem ate
+            // o fim deste escopo, junto de `scene`/`ui`.
+            ui->set_click_callback(
+                [&scene, audio_ptr, ui_click_sfx_id](const char* element_id) {
+                    if (battle_cockpit_verb_click(scene, element_id)) {
+                        audio_ptr->play_sfx(ui_click_sfx_id);
+                    }
+                });
         }
 
         // Carrega os retratos 48px da fila CTB (handles resolvidos pelo renderer) e os
@@ -1609,6 +1668,22 @@ int run_battle_preview_embedded(SDL_Window* window,
             hover_selftest_prefix != nullptr && hover_selftest_prefix[0] != '\0';
         int hover_phase = 0;        // 0=none 1=unsel 2=sel 3=none-again
         int hover_phase_frame = 0;  // frames assentados na fase atual (antes de capturar)
+
+        // DIAGNOSTICO/PROVA (COCKPIT-SFX-HOVER-CLIQUE): GUSWORLD_BATTLE_UI_SFX_SELFTEST=1 prova
+        // HEADLESS, sem mouse fisico nem SDL_PushEvent, que (1) o SOM DE HOVER dispara com
+        // EDGE-DETECT (1 play por pill NOVO; parado no mesmo pill NAO repica; sair-e-voltar
+        // redispara) e (2) o SOM DE CLIQUE dispara ao acionar uma pill. Roda DENTRO do loop
+        // (get_element_box exige a geometria assentada por >=1 ui->update()): apos ~12 frames
+        // varre um MouseMove SINTETICO pelos 6 pills via handle_cockpit_hover (o MESMO caminho
+        // do mouse real) e aciona o callback de clique (o MESMO do glintfx), imprimindo
+        // sfx_play_count() (hook de prova, AudioEngine) - N hovers => N plays. Analogo ao
+        // GUSWORLD_SYSMENU_HOVER_SELFTEST do menu; encerra ao terminar (running=false).
+        const bool ui_sfx_selftest = [] {
+            const char* e = std::getenv("GUSWORLD_BATTLE_UI_SFX_SELFTEST");
+            return e != nullptr && e[0] == '1';
+        }();
+        int ui_sfx_settle_frame = 0;  // frames assentados antes de disparar a varredura
+        bool ui_sfx_done = false;     // varredura ja rodou (1 vez so)
 
         // DIAGNOSTICO/PROVA (ANIMACAO DE COMBATE, W2): GUSWORLD_BATTLE_ANIM_SELFTEST=
         // <prefixo> roda um SCRIPT POR FRAME (dt FIXO 1/60, deterministico) que captura 5
@@ -1804,10 +1879,67 @@ int run_battle_preview_embedded(SDL_Window* window,
                       << " (esperado 2=ATACAR); prefixo=" << hover_selftest_prefix << "\n";
         }
 
+        // COCKPIT-SFX-HOVER-CLIQUE (setup do self-test de SOM): MESMA assent do hover-selftest
+        // visual - assenta ate a vez do jogador (menu de verbos interativo) pra o gate de
+        // handle_cockpit_hover liberar o som. A varredura em si roda no loop (get_element_box).
+        if (ui_sfx_selftest) {
+            if (scene.is_intro()) {
+                scene.start_combat();
+            }
+            for (int i = 0; i < 240 && !scene.combat_over() &&
+                            !scene.waiting_player_input();
+                 ++i) {
+                scene.skip();
+                scene.update(1.0f / 60.0f);
+            }
+            if (scene.is_choosing_actor()) {
+                scene.actor_picker_confirm();  // atravessa o picker (§4.1) ate o menu de verbos
+            }
+            std::cout << "BattlePreview: [ui-sfx-selftest] waiting_player="
+                      << scene.waiting_player_input()
+                      << " (menu de verbos interativo esperado)\n";
+        }
+
         bool running = true;
         bool have_last = false;
         unsigned long long last_ns = 0;
         int glintfx_injected = 0;  // SMOKE: conta eventos injetados na UI (prova do pipeline)
+
+        // COCKPIT-SFX-HOVER-CLIQUE: ULTIMO pill de verbo sob o ponteiro (-1 = fora de
+        // qualquer pill). Alimenta o edge-detect do SOM de hover (toca so ao ENTRAR num
+        // pill NOVO, nunca a cada frame parado sobre o mesmo - ui_hover_entered_new_item).
+        int hovered_verb = -1;
+
+        // Hit-test/edge-detect do SOM de hover dos pills de verbo, fatorado em lambda pra ser
+        // chamado tanto pelo SDL_EVENT_MOUSE_MOTION real quanto pelo self-test headless
+        // (GUSWORLD_BATTLE_UI_SFX_SELFTEST) - MESMO caminho de codigo prova o comportamento,
+        // sem duplicar (espelha handle_mouse_motion de system_menu_loop.cpp). O VISUAL do
+        // hover ja e' nativo do glintfx (process_event(MouseMove) mais abaixo); AQUI so o SOM.
+        // Consulta a geometria REAL de cada pill via UiLayer::get_element_box (ids estaveis
+        // kCockpitVerbElementIds) e delega a decisao "qual bateu" ao POCO ui_hover_index.
+        // GATE: so soa quando o MENU DE VERBOS esta de fato interativo (vez do jogador, sem
+        // mira/escolha-de-ator/abertura) - mesma condicao em que a pill responde ao clique;
+        // evita blip de hover durante turno de inimigo / animacao.
+        auto handle_cockpit_hover = [&](float mx, float my) {
+            if (!glintfx_on || !ui) return;
+            if (!scene.waiting_player_input() || scene.is_aiming() ||
+                scene.is_choosing_actor() || scene.is_intro()) {
+                hovered_verb = -1;  // menu nao-interativo: zera (nao "prende" o ultimo pill)
+                return;
+            }
+            gus::app::screens::UiHoverBox boxes[gus::app::screens::kBattleVerbCount];
+            for (int i = 0; i < gus::app::screens::kBattleVerbCount; ++i) {
+                const glintfx::ElementBox b =
+                    ui->get_element_box(gus::app::screens::kCockpitVerbElementIds[i]);
+                boxes[i] = gus::app::screens::UiHoverBox{b.found, b.x, b.y, b.w, b.h};
+            }
+            const int new_hover = gus::app::screens::ui_hover_index(
+                mx, my, boxes, gus::app::screens::kBattleVerbCount);
+            if (gus::app::screens::ui_hover_entered_new_item(hovered_verb, new_hover)) {
+                audio_ptr->play_sfx(ui_hover_sfx_id);
+            }
+            hovered_verb = new_hover;
+        };
 
         // DIAGNOSTICO/PROVA (GLINTFX-CLICK, ex-Incremento A2): GUSWORLD_BATTLE_MOUSE_SELFTEST=1
         // exercita o roteamento clique->acao SEM mouse fisico. O clique nos pills de verbo ja
@@ -2143,6 +2275,11 @@ int run_battle_preview_embedded(SDL_Window* window,
                     int pw = kWindowW, ph = kWindowH;
                     SDL_GetWindowSizeInPixels(window, &pw, &ph);
                     battle_mouse_hover(scene, ev.motion.x, ev.motion.y, pw, ph);
+                    // COCKPIT-SFX-HOVER-CLIQUE: SOM de hover dos pills de verbo (visual :hover
+                    // ja saiu no process_event nativo acima). Edge-detect: toca so ao ENTRAR
+                    // num pill NOVO. Em px de janela == px do viewport (sem HiDPI neste alvo,
+                    // mesmo pressuposto do forward glintfx / battle_mouse_click).
+                    handle_cockpit_hover(ev.motion.x, ev.motion.y);
                 }
             }
             if (!running) {
@@ -2449,6 +2586,84 @@ int run_battle_preview_embedded(SDL_Window* window,
                     if (hover_phase > 3) {
                         running = false;  // 4 fases capturadas; encerra
                     }
+                }
+            }
+
+            // COCKPIT-SFX-HOVER-CLIQUE (self-test HEADLESS): apos a geometria assentar (~12
+            // frames de ui->update, como o hover-selftest visual), varre um MouseMove SINTETICO
+            // pelos 6 pills e prova o edge-detect do SOM DE HOVER + o SOM DE CLIQUE, medindo
+            // sfx_play_count() (hook do AudioEngine). MESMOS caminhos de codigo do mouse real
+            // (handle_cockpit_hover + o callback de clique). Roda 1 vez e encerra.
+            if (ui_sfx_selftest && !ui_sfx_done) {
+                constexpr int kUiSfxSettleFrames = 12;
+                ++ui_sfx_settle_frame;
+                if (ui_sfx_settle_frame >= kUiSfxSettleFrames && glintfx_on && ui) {
+                    ui_sfx_done = true;
+
+                    // Centro de cada pill via get_element_box (geometria REAL do doc).
+                    auto pill_center = [&](int v, float& cx, float& cy) -> bool {
+                        const glintfx::ElementBox b = ui->get_element_box(
+                            gus::app::screens::kCockpitVerbElementIds[v]);
+                        if (!b.found) return false;
+                        cx = b.x + b.w * 0.5f;
+                        cy = b.y + b.h * 0.5f;
+                        return true;
+                    };
+
+                    // (1) HOVER: varre os 6 pills 0..5 (6 ENTRADAS novas => 6 plays).
+                    const unsigned int hover_base = audio_ptr->sfx_play_count();
+                    hovered_verb = -1;  // comeca fora de qualquer pill
+                    int swept = 0;
+                    for (int v = 0; v < gus::app::screens::kBattleVerbCount; ++v) {
+                        float cx = 0.0f, cy = 0.0f;
+                        if (!pill_center(v, cx, cy)) continue;
+                        handle_cockpit_hover(cx, cy);
+                        ++swept;
+                    }
+                    const unsigned int after_sweep = audio_ptr->sfx_play_count();
+
+                    // (2) REPIQUE: parado no ULTIMO pill 2x seguidas => 0 plays extras.
+                    float lx = 0.0f, ly = 0.0f;
+                    if (pill_center(gus::app::screens::kBattleVerbCount - 1, lx, ly)) {
+                        handle_cockpit_hover(lx, ly);
+                        handle_cockpit_hover(lx, ly);
+                    }
+                    const unsigned int after_still = audio_ptr->sfx_play_count();
+
+                    // (3) SAIR-E-VOLTAR: fora (arena, x=80%) e reentra no pill 0 => +1 play.
+                    handle_cockpit_hover(static_cast<float>(pw) * 0.80f,
+                                         static_cast<float>(ph) * 0.50f);
+                    float z0x = 0.0f, z0y = 0.0f;
+                    if (pill_center(0, z0x, z0y)) handle_cockpit_hover(z0x, z0y);
+                    const unsigned int after_reenter = audio_ptr->sfx_play_count();
+
+                    // (4) CLIQUE: aciona ATACAR pelo MESMO caminho do callback do glintfx
+                    // (battle_cockpit_verb_click + play_sfx do click), => +1 play.
+                    const unsigned int click_base = audio_ptr->sfx_play_count();
+                    if (scene.waiting_player_input() && !scene.is_aiming()) {
+                        if (battle_cockpit_verb_click(
+                                scene, gus::app::screens::kCockpitVerbElementIds[static_cast<int>(
+                                           BattleVerb::Atacar)])) {
+                            audio_ptr->play_sfx(ui_click_sfx_id);
+                        }
+                    }
+                    const unsigned int after_click = audio_ptr->sfx_play_count();
+
+                    std::cout
+                        << "BattlePreview: [ui-sfx-selftest] hover: " << swept
+                        << " pills varridos, " << (after_sweep - hover_base)
+                        << " plays (esperado " << swept << " = N hovers -> N plays)\n"
+                        << "  repique (parado 2x no mesmo pill): "
+                        << (after_still - after_sweep) << " plays extras (esperado 0)\n"
+                        << "  sair-e-voltar ao pill 0: " << (after_reenter - after_still)
+                        << " play (esperado 1)\n"
+                        << "  clique ATACAR: " << (after_click - click_base)
+                        << " play (esperado 1); is_aiming="
+                        << (scene.is_aiming() ? "on" : "off") << "\n"
+                        << "  device audio="
+                        << (audio_ptr->available() ? "disponivel" : "INDISPONIVEL (mudo)")
+                        << " sfx_play_count total=" << after_click << "\n";
+                    running = false;  // prova concluida; encerra
                 }
             }
 

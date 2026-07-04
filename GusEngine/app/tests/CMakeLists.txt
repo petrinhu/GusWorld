@@ -14,6 +14,8 @@ add_executable(gusengine_app_tests
     city_scene_test.cpp
     battle_layout_test.cpp
     battle_cockpit_verb_ids_test.cpp
+    # COCKPIT-SFX-HOVER-CLIQUE: POCO generico de "som de hover" de botoes.
+    ui_hover_test.cpp
     battle_hud_model_test.cpp
     battle_menu_test.cpp
     battle_log_model_test.cpp
