@@ -188,16 +188,33 @@ body { font-family: "Pixel Operator Mono"; background: transparent; width: 100%;
 .corner.br { bottom: 8dp; right: 8dp; }
 
 .kicker { text-align: center; color: #9AA5C0; font-size: 11dp; letter-spacing: 4dp; margin-bottom: 2dp; }
-.title { text-align: center; font-size: 26dp; color: #ffffff; margin: 2dp 0dp 18dp 0dp; letter-spacing: 4dp; }
+/* line-height 36dp (era o default herdado "1.2", ~31dp) + padding-top 4dp
+   (achado da analise das capturas headless 2026-07-04, PROBLEMA 2): maiuscula
+   acentuada ("Á" de "Áudio", ver menu_audio.png) tinha o topo do acento CORTADO
+   - a caixa da linha nao tinha folga suficiente acima do cap-height pro
+   diacritico da fonte pixel (Pixel Operator Mono) render inteiro. Aumentar
+   line-height da folga vertical ao redor da linha (RmlUi distribui o excesso
+   simetricamente acima/abaixo da baseline - RegisterProperty("line-height")
+   em StyleSheetSpecification.cpp) e o padding-top da uma folga adicional fixa
+   SO no topo (onde o corte acontecia) sem mexer no espacamento existente
+   ate o divider (margin-bottom:18dp preservado - nao desalinha o resto). */
+.title { text-align: center; font-size: 26dp; line-height: 36dp; color: #ffffff; margin: 2dp 0dp 18dp 0dp; padding-top: 4dp; letter-spacing: 4dp; }
 .divider { height: 1dp; background-color: #ffffff2e; margin-bottom: 20dp; }
 
 /* BOTOES COMPACTOS, 2a LEVA (ONDA ARVORE (2), ver header): 340dp de largura
    (era 364dp) + padding vertical 7dp (era 9dp) + margin-bottom 6dp (era 8dp) -
    Pause/ConfigCategories agora tem 4 itens (era 3), a economia de altura por
    pill importa mais. Reusada pelas categorias de ConfigCategories tambem (MESMO
-   estilo de "pill de acao" que os verbos de Pause). */
+   estilo de "pill de acao" que os verbos de Pause).
+   text-align:center + box-sizing:border-box (retoque ao vivo do lider): rotulo
+   centralizado (era esquerda) pra ficar uniforme com .btn-back (que ja nasceu
+   centralizado); border-box pelo MESMO motivo documentado em #sysmenu-panel
+   acima - garante que "width:340dp" seja a caixa RENDERIZADA final (incluindo
+   padding+border), nao so o conteudo, pra bater exatamente com .btn-back. */
 .verb-pill {
+  box-sizing: border-box;
   position: relative; width: 340dp; padding: 7dp 16dp; margin-bottom: 6dp;
+  text-align: center;
   decorator: vertical-gradient( #3A4566 #1B2238 );
   border: 1dp #ffffff12; border-radius: 999dp;
   font-size: 13dp; color: #E7ECF5; letter-spacing: 2dp;
@@ -220,6 +237,22 @@ body { font-family: "Pixel Operator Mono"; background: transparent; width: 100%;
 .footer-hint { text-align: center; color: #9AA5C0; font-size: 11dp; margin-top: 6dp; }
 
 .field { margin-bottom: 20dp; }
+/* .field-row (achado da analise das capturas headless 2026-07-04, PROBLEMA 3):
+   nome do campo e percentual vinham COLADOS (ex. "70%" grudado no rotulo
+   sem nenhum espaco visivel, ver menu_audio.png) - o espaco literal entre os
+   2 <span> no RML nao bastava (padrao de tela de configuracao pede
+   nome-esquerda/valor-direita claramente separados, nao so 1 espaco).
+   display:flex + justify-content:
+   space-between joga o nome pra ESQUERDA e o valor pra DIREITA da linha (a
+   largura cheia do .field, MESMA API flexbox ja suportada pelo RmlUi 6.3 -
+   RegisterProperty("justify-content") em StyleSheetSpecification.cpp inclui
+   "space-between"); align-items:baseline alinha as duas fontes de tamanho
+   diferente (11dp/13dp) pela linha de base, nao pelo topo/centro da caixa.
+   Wrapper PROPRIO (nao o .field inteiro) porque .field tambem e pai do
+   .track/slider logo abaixo - se o flex fosse no .field, o track viraria um
+   3o item da MESMA linha flex (quebraria o layout vertical nome+valor / barra
+   embaixo). */
+.field-row { display: flex; justify-content: space-between; align-items: baseline; }
 .field .name { color: #9AA5C0; font-size: 11dp; letter-spacing: 1dp; }
 .field .val { color: #22D3EE; font-size: 13dp; }
 .track {
@@ -250,9 +283,19 @@ body { font-family: "Pixel Operator Mono"; background: transparent; width: 100%;
 }
 
 /* Voltar (Audio/ConfigCategories/placeholders) - MESMA leva de compactacao do
-   .verb-pill acima (largura 340dp, padding 7dp). */
+   .verb-pill acima (largura 340dp, padding 7dp).
+   box-sizing:border-box + padding horizontal 16dp (retoque ao vivo do lider):
+   antes o padding era so "7dp" (7dp nos 4 lados, 7dp de horizontal) contra os
+   "7dp 16dp" (16dp de horizontal) do .verb-pill - em content-box (default) as
+   duas caixas RENDERIZADAS ficavam com larguras totais diferentes (356dp vs
+   374dp) mesmo com o mesmo "width:340dp" declarado, entao a coluna nao
+   alinhava (Voltar parecia mais estreito/deslocado). Copiando box-sizing +
+   padding horizontal do .verb-pill garante caixa IDENTICA (mesma borda
+   esquerda/direita) - so o estilo (border mais sutil, sem preenchimento,
+   cor mais apagada) continua distinto. */
 .btn-back {
-  text-align: center; width: 340dp; padding: 7dp; margin-top: 6dp;
+  box-sizing: border-box;
+  text-align: center; width: 340dp; padding: 7dp 16dp; margin-top: 6dp;
   border: 1dp #3A4566; border-radius: 999dp; color: #9AA5C0;
   font-size: 12dp; letter-spacing: 2dp;
 }
@@ -368,9 +411,15 @@ std::string build_audio_body(const SystemMenuState& state,
         // loop faz hit-test nisto SO SE o clique nao caiu no track
         // (slider-track-<indice>, ja tratado a parte) - clicar no rotulo FOCA o
         // item (system_menu_click_option), nao ajusta volume.
+        // .field-row envolve SO nome+valor (ver comentario do .field-row no
+        // <style>): o .track do slider fica DE FORA dele, como IRMAO seguinte
+        // dentro do MESMO .field - preserva a pilha vertical "nome+valor" em
+        // cima / "barra" embaixo.
         body << "<div class=\"field\" id=\"audio-item-" << row.index << "\">"
-             << "<span class=\"name\">" << tr.tr(row.name_key) << "</span> "
+             << "<div class=\"field-row\">"
+             << "<span class=\"name\">" << tr.tr(row.name_key) << "</span>"
              << "<span class=\"val\">" << pct << "</span>"
+             << "</div>"
              << "<div class=\"track\" id=\"slider-track-" << row.index << "\">"
              << "<div class=\"fill\" style=\"width:" << pct << ";\"></div>"
              << "<div class=\"slider-node" << (focused ? " focused" : "")
