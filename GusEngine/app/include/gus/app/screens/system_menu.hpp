@@ -117,6 +117,24 @@ void system_menu_close(SystemMenuState& state) noexcept;
 void system_menu_set_slider_ratio(SystemMenuState& state, int item,
                                    float ratio) noexcept;
 
+// MOUSE (clique numa OPCAO/pill/botao, roteado pelo hit-test de geometria do
+// host via glintfx::UiLayer::get_element_box - ver system_menu_loop.cpp): trata
+// o clique em `index` como "focar + confirmar" (EQUIVALENTE a mover o foco pra
+// `index` e apertar ENTER), interpretado pela tela ATUAL (state.screen) -
+// MESMA convencao de indices de system_menu_key_down:
+//   Pause: index em PauseItem (0=Continuar, 1=Configuracoes, 2=Sair) - SEMPRE
+//     confirma na hora (mesma action de ENTER: Continue/OpenSettings/
+//     RequestQuit).
+//   Config: index em ConfigItem (0=Musica, 1=SFX, 2=Voltar) - Voltar confirma
+//     na hora (BackToPause, mesmo efeito de ENTER); Musica/SFX SO FOCAM (index
+//     vira state.config_selected, devolve None) - clicar no NOME/rotulo de um
+//     slider nao ajusta o volume (isso e papel do clique/arrasto no TRACK via
+//     system_menu_set_slider_ratio); focar so muda o destaque visual/rota do
+//     teclado (LEFT/RIGHT/A/D passam a mexer naquele item).
+// Hidden ou index fora do intervalo valido da tela atual: no-op (None).
+[[nodiscard]] SystemMenuAction system_menu_click_option(SystemMenuState& state,
+                                                         int index) noexcept;
+
 }  // namespace gus::app::screens
 
 #endif  // GUS_APP_SCREENS_SYSTEM_MENU_HPP

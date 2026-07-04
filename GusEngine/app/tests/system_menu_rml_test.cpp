@@ -107,3 +107,22 @@ TEST_CASE("build_system_menu_rml: ids estaveis dos sliders para hit-test de "
     REQUIRE(rml.find("id=\"slider-track-0\"") != std::string::npos);  // musica
     REQUIRE(rml.find("id=\"slider-track-1\"") != std::string::npos);  // sfx
 }
+
+TEST_CASE("build_system_menu_rml: ids estaveis das PILLS/campos/Voltar para "
+          "clique de mouse (MENU-PAUSA-CONFIG-SOM, click-to-activate)",
+          "[system_menu_rml]") {
+    SystemMenuState pause_state;
+    pause_state.screen = SystemMenuScreen::Pause;
+    const Translator tr = make_translator();
+    const std::string pause_rml = build_system_menu_rml(pause_state, tr);
+    REQUIRE(pause_rml.find("id=\"pause-item-0\"") != std::string::npos);
+    REQUIRE(pause_rml.find("id=\"pause-item-1\"") != std::string::npos);
+    REQUIRE(pause_rml.find("id=\"pause-item-2\"") != std::string::npos);
+
+    SystemMenuState config_state;
+    config_state.screen = SystemMenuScreen::Config;
+    const std::string config_rml = build_system_menu_rml(config_state, tr);
+    REQUIRE(config_rml.find("id=\"config-item-0\"") != std::string::npos);  // musica
+    REQUIRE(config_rml.find("id=\"config-item-1\"") != std::string::npos);  // sfx
+    REQUIRE(config_rml.find("id=\"config-back\"") != std::string::npos);
+}

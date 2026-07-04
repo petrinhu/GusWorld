@@ -59,7 +59,34 @@ std::string pct_string(float v01) {
 // Header RCSS comum as duas telas (paleta canonica + moldura latao + pills).
 // dp = px logico do mock (canvas 960x540, mesma convencao do cockpit).
 constexpr const char* kSharedStyle = R"RCSS(
-body { font-family: "Pixel Operator Mono"; background: transparent; }
+/* CAUSA RAIZ DO DESLOCAMENTO (MENU-PAUSA-CONFIG-SOM, achado por probe headless
+   2026-07-04): o <body> do RmlUi, quando so tem filhos position:absolute e NAO
+   declara a propria largura/altura, colapsa pra uma content-box de tamanho 0dp x
+   0dp (shrink-to-fit sem conteudo em fluxo normal - confirmado lendo
+   ElementDocument::UpdateLayout, que usa GetParentNode()->GetBox() como
+   containing block do body, mas o body em si so herda ESSE tamanho se tiver uma
+   regra de largura/altura que o force a preenche-lo). Com isso, QUALQUER
+   porcentagem resolvida contra o body (containing block dos filhos absolutos,
+   ja que body fica position:static) vira 0: `left: 50%` = 50% de 0dp = 0dp - so
+   o `margin-left: -210dp` (valor FIXO, nao percentual) sobra, empurrando o
+   painel todo pra fora da borda esquerda (exatamente o bug relatado ao vivo: o
+   centro do painel caindo perto do x=0 da janela, cortado). O cockpit da
+   batalha (battle_preview.cpp) NUNCA bateu nesse caminho porque todo elemento
+   dele usa offsets FIXOS em dp (ex. "top:20dp;left:20dp") - nao percentual nem
+   0dp+0dp simetrico - entao o bug ficou latente e invisivel ate aqui. Provado
+   por probe standalone (glintfx::UiLayer isolado, Xvfb headless, 3 larguras de
+   janela): com body sem width/height, left:50% sempre resolvia a 0
+   independente de dp_ratio/viewport; com width:100%;height:100% no body, o
+   mesmo RCSS centraliza EXATO em qualquer largura testada (960/1330/1920px).
+   FIX: dar ao body a largura/altura cheia do viewport (100%, contra o ROOT que
+   SetDimensions() ja tamanho corretamente) - assim ele vira o containing block
+   correto pros filhos absolutos, com ou sem porcentagem. Bonus: o
+   #sysmenu-scrim (left/right/top/bottom:0dp, pensado pra cobrir a tela toda)
+   sofria do MESMO bug (virava 0x0, invisivel) - corrigido de graca pelo mesmo
+   fix, sem mexer na regra dele. NAO e bug do glintfx: e uso incompleto do RCSS
+   deste documento (falta de width/height no body) - nao ha nada a reportar ao
+   dev da lib. */
+body { font-family: "Pixel Operator Mono"; background: transparent; width: 100%; height: 100%; }
 
 #sysmenu-scrim {
   position: absolute; top: 0dp; left: 0dp; right: 0dp; bottom: 0dp;
@@ -67,6 +94,14 @@ body { font-family: "Pixel Operator Mono"; background: transparent; }
 }
 
 #sysmenu-panel {
+  /* box-sizing:border-box (residuo do MESMO probe acima): sem isto, "width:420dp" e
+     CONTEUDO (default content-box), e a border(1dp*2)+padding(28dp*2) somam 58dp que o
+     "margin-left:-210dp" (metade de 420, nao de 478) nao compensa - o centro ficava
+     ~29-58px a DIREITA do centro real da janela (escalando com dp_ratio), pequeno mas
+     mensuravel. border-box faz "width:420dp" jah incluir border+padding, batendo com a
+     conta de metade (210dp) usada no margin-left - centralizacao exata confirmada pelo
+     probe headless (delta < 0.01px em 960/1330/1920/800px de janela). */
+  box-sizing: border-box;
   position: absolute; top: 90dp; left: 50%; margin-left: -210dp;
   width: 420dp;
   decorator: linear-gradient( 180deg, #3A4566 0%, #1B2238 42%, #0A0E1A 100% );
@@ -199,7 +234,11 @@ std::string build_config_body(const SystemMenuState& state,
     for (const Row& row : rows) {
         const bool focused = (state.config_selected == row.index);
         const std::string pct = pct_string(row.volume);
-        body << "<div class=\"field\">"
+        // id="config-item-<indice>" (MENU-PAUSA-CONFIG-SOM, clique de mouse no
+        // NOME/rotulo do slider): o loop faz hit-test nisto SO SE o clique nao
+        // caiu no track (slider-track-<indice>, ja tratado a parte) - clicar no
+        // rotulo FOCA o item (system_menu_click_option), nao ajusta volume.
+        body << "<div class=\"field\" id=\"config-item-" << row.index << "\">"
              << "<span class=\"name\">" << tr.tr(row.name_key) << "</span> "
              << "<span class=\"val\">" << pct << "</span>"
              << "<div class=\"track\" id=\"slider-track-" << row.index << "\">"

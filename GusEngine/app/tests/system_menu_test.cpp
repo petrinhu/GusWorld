@@ -203,6 +203,85 @@ TEST_CASE("Teclas fora do conjunto conhecido (ex.: SDLK_Q) nao mudam estado nem 
     REQUIRE(state.pause_selected == before);
 }
 
+TEST_CASE("Config: A/D ajustam volume igual LEFT/RIGHT (WASD completo)",
+          "[system_menu]") {
+    SystemMenuState state;
+    system_menu_open(state);
+    system_menu_key_down(state, SDLK_DOWN);
+    system_menu_key_down(state, SDLK_RETURN);  // Config, foco = Musica (0)
+    REQUIRE(state.music_volume == Catch::Approx(1.0f));
+
+    const SystemMenuAction a_action = system_menu_key_down(state, SDLK_A);
+    REQUIRE(a_action == SystemMenuAction::VolumeChanged);
+    REQUIRE(state.music_volume < 1.0f);
+    const float after_a = state.music_volume;
+
+    const SystemMenuAction d_action = system_menu_key_down(state, SDLK_D);
+    REQUIRE(d_action == SystemMenuAction::VolumeChanged);
+    REQUIRE(state.music_volume > after_a);
+    REQUIRE(state.music_volume == Catch::Approx(1.0f));
+}
+
+TEST_CASE("Pause: A/D nao fazem nada (sem eixo horizontal na tela Pause)",
+          "[system_menu]") {
+    SystemMenuState state;
+    system_menu_open(state);
+    const int before = state.pause_selected;
+    REQUIRE(system_menu_key_down(state, SDLK_A) == SystemMenuAction::None);
+    REQUIRE(system_menu_key_down(state, SDLK_D) == SystemMenuAction::None);
+    REQUIRE(state.pause_selected == before);
+}
+
+TEST_CASE("system_menu_click_option (Pause): clicar numa pill seleciona E "
+          "confirma na hora (equivalente a focar + ENTER)",
+          "[system_menu]") {
+    SystemMenuState state;
+    system_menu_open(state);
+
+    SystemMenuState continuar = state;
+    REQUIRE(system_menu_click_option(continuar, 0) == SystemMenuAction::Continue);
+
+    SystemMenuState config = state;
+    const SystemMenuAction cfg_action = system_menu_click_option(config, 1);
+    REQUIRE(cfg_action == SystemMenuAction::OpenSettings);
+    REQUIRE(config.screen == SystemMenuScreen::Config);
+    REQUIRE(config.config_selected == 0);  // foco inicial = Musica
+
+    SystemMenuState sair = state;
+    REQUIRE(system_menu_click_option(sair, 2) == SystemMenuAction::RequestQuit);
+
+    // indice invalido: no-op defensivo, nao muda pause_selected.
+    SystemMenuState invalido = state;
+    const int before = invalido.pause_selected;
+    REQUIRE(system_menu_click_option(invalido, 99) == SystemMenuAction::None);
+    REQUIRE(invalido.pause_selected == before);
+}
+
+TEST_CASE("system_menu_click_option (Config): clicar em Musica/SFX SO FOCA "
+          "(nao muda volume); clicar em Voltar confirma (BackToPause)",
+          "[system_menu]") {
+    SystemMenuState state;
+    system_menu_open(state);
+    system_menu_key_down(state, SDLK_DOWN);
+    system_menu_key_down(state, SDLK_RETURN);  // Config, foco = Musica (0)
+
+    const SystemMenuAction sfx_action = system_menu_click_option(state, 1);
+    REQUIRE(sfx_action == SystemMenuAction::None);  // so foca, nao e VolumeChanged
+    REQUIRE(state.config_selected == 1);
+    REQUIRE(state.music_volume == Catch::Approx(1.0f));  // intocado
+    REQUIRE(state.sfx_volume == Catch::Approx(1.0f));    // intocado (so focou)
+
+    const SystemMenuAction back_action = system_menu_click_option(state, 2);
+    REQUIRE(back_action == SystemMenuAction::BackToPause);
+    REQUIRE(state.screen == SystemMenuScreen::Pause);
+}
+
+TEST_CASE("system_menu_click_option: Hidden (menu fechado) e no-op defensivo",
+          "[system_menu]") {
+    SystemMenuState state;  // screen == Hidden por default
+    REQUIRE(system_menu_click_option(state, 0) == SystemMenuAction::None);
+}
+
 TEST_CASE("system_menu_mouse_slider_ratio: converte fracao de mouse [0,1] em "
           "volume, alimentando VolumeChanged via drag/click (item 0=musica, "
           "1=sfx)",

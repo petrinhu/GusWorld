@@ -91,8 +91,16 @@ SystemMenuAction handle_config_key(SystemMenuState& state, SDL_Keycode key) noex
             }
             return SystemMenuAction::None;  // ENTER num slider nao faz nada
         case SDLK_LEFT:
-        case SDLK_RIGHT: {
-            const float delta = (key == SDLK_LEFT) ? -kVolumeStep : kVolumeStep;
+        case SDLK_A:
+        case SDLK_RIGHT:
+        case SDLK_D: {
+            // WASD completo (pedido do lider, MENU-PAUSA-CONFIG-SOM): A=D no
+            // eixo horizontal do Config espelha LEFT/RIGHT (A=esquerda/diminui,
+            // D=direita/aumenta) - mesmo par que W/S ja espelha UP/DOWN acima.
+            // No Pause nao ha eixo horizontal (sem case LEFT/RIGHT/A/D la) -
+            // A/D cai no default=None, exatamente como o pedido permite.
+            const float delta =
+                (key == SDLK_LEFT || key == SDLK_A) ? -kVolumeStep : kVolumeStep;
             switch (static_cast<ConfigItem>(state.config_selected)) {
                 case ConfigItem::Music:
                     state.music_volume =
@@ -136,6 +144,56 @@ void system_menu_set_slider_ratio(SystemMenuState& state, int item,
         state.sfx_volume = clamped;
     }
     // item==Back (ou qualquer outro) e no-op: nao e um slider.
+}
+
+namespace {
+
+SystemMenuAction click_pause_option(SystemMenuState& state, int index) noexcept {
+    if (index < 0 || index >= kPauseItemCount) return SystemMenuAction::None;
+    state.pause_selected = index;
+    // MESMA logica de handle_pause_key/SDLK_RETURN acima - clicar numa pill do
+    // Pause SEMPRE confirma na hora (nao ha estado "so foco, sem confirmar").
+    switch (static_cast<PauseItem>(index)) {
+        case PauseItem::Continue:
+            return SystemMenuAction::Continue;
+        case PauseItem::Settings:
+            state.screen = SystemMenuScreen::Config;
+            state.config_selected = static_cast<int>(ConfigItem::Music);
+            return SystemMenuAction::OpenSettings;
+        case PauseItem::Quit:
+            return SystemMenuAction::RequestQuit;
+    }
+    return SystemMenuAction::None;
+}
+
+SystemMenuAction click_config_option(SystemMenuState& state, int index) noexcept {
+    if (index < 0 || index >= kConfigItemCount) return SystemMenuAction::None;
+    state.config_selected = index;
+    if (static_cast<ConfigItem>(index) == ConfigItem::Back) {
+        // MESMA logica de handle_config_key/SDLK_RETURN em Voltar - confirma na
+        // hora (BackToPause).
+        state.screen = SystemMenuScreen::Pause;
+        return SystemMenuAction::BackToPause;
+    }
+    // Musica/SFX: clicar no NOME/rotulo so foca (config_selected ja mudou
+    // acima) - o volume so muda por drag/clique no TRACK
+    // (system_menu_set_slider_ratio), nao por clicar no rotulo.
+    return SystemMenuAction::None;
+}
+
+}  // namespace
+
+SystemMenuAction system_menu_click_option(SystemMenuState& state,
+                                           int index) noexcept {
+    switch (state.screen) {
+        case SystemMenuScreen::Hidden:
+            return SystemMenuAction::None;  // menu fechado: no-op defensivo
+        case SystemMenuScreen::Pause:
+            return click_pause_option(state, index);
+        case SystemMenuScreen::Config:
+            return click_config_option(state, index);
+    }
+    return SystemMenuAction::None;
 }
 
 }  // namespace gus::app::screens

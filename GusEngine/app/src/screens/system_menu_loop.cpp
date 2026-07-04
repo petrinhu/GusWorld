@@ -115,6 +115,25 @@ std::string track_id_for_item(int item) {
     return "slider-track-" + std::to_string(item);
 }
 
+// Ids das PILLS do Pause / dos campos do Config (system_menu_rml.cpp:
+// "pause-item-<indice>" e "config-item-<indice>" - MENU-PAUSA-CONFIG-SOM,
+// clique de mouse aciona/foca a opcao).
+std::string pause_item_id(int item) {
+    return "pause-item-" + std::to_string(item);
+}
+std::string config_item_id(int item) {
+    return "config-item-" + std::to_string(item);
+}
+
+// Hit-test simples: cursor (x,y, espaco-janela) dentro da caixa border-box
+// devolvida por glintfx::UiLayer::get_element_box (MESMO espaco de coordenadas
+// - ver docs/embed-integration.md secao 10, ja citado em outros comentarios
+// deste arquivo). box.found=false conta como "fora".
+bool hit_test(const glintfx::ElementBox& box, float x, float y) {
+    if (!box.found) return false;
+    return x >= box.x && x <= box.x + box.w && y >= box.y && y <= box.y + box.h;
+}
+
 }  // namespace
 
 SystemMenuLoopOutcome run_system_menu_loop_gl_current(
@@ -165,6 +184,28 @@ SystemMenuLoopOutcome run_system_menu_loop_gl_current(
 
     int drag_item = -1;  // -1 = nenhum arrasto em curso; 0=Music, 1=Sfx
 
+    // Roteia UMA action (vinda do teclado OU de um clique de mouse) pro mesmo
+    // efeito de mundo (persistir volume, recarregar o RML) - compartilhado
+    // pelos dois canais de entrada pra nao duplicar a logica de
+    // Continue/RequestQuit/VolumeChanged. Devolve true se o CHAMADOR deve
+    // retornar `outcome` na hora (Continue/RequestQuit ja setaram outcome).
+    auto handle_action = [&](SystemMenuAction action) -> bool {
+        if (action == SystemMenuAction::Continue) {
+            return true;  // quit_app=false: retoma a cena
+        }
+        if (action == SystemMenuAction::RequestQuit) {
+            outcome.quit_app = true;
+            return true;
+        }
+        if (action == SystemMenuAction::VolumeChanged) {
+            apply_and_persist(state, audio, settings_dir);
+        }
+        // None/OpenSettings/BackToPause: o ESTADO pode ter mudado mesmo assim
+        // (navegacao/foco move e devolve None) - reload sempre.
+        reload();
+        return false;
+    };
+
     while (true) {
         SDL_Event ev;
         while (SDL_PollEvent(&ev)) {
@@ -185,39 +226,63 @@ SystemMenuLoopOutcome run_system_menu_loop_gl_current(
             if (ev.type == SDL_EVENT_KEY_DOWN && !ev.key.repeat) {
                 const SystemMenuAction action =
                     system_menu_key_down(state, ev.key.key);
-                if (action == SystemMenuAction::Continue) {
-                    return outcome;  // quit_app=false: retoma a cena
-                }
-                if (action == SystemMenuAction::RequestQuit) {
-                    outcome.quit_app = true;
-                    return outcome;
-                }
-                if (action == SystemMenuAction::VolumeChanged) {
-                    apply_and_persist(state, audio, settings_dir);
-                }
-                // None/OpenSettings/BackToPause: o ESTADO pode ter mudado mesmo assim
-                // (navegacao UP/DOWN move o foco e devolve None) - reload sempre.
-                reload();
+                if (handle_action(action)) return outcome;
             } else if (ev.type == SDL_EVENT_MOUSE_BUTTON_DOWN &&
-                       ev.button.button == SDL_BUTTON_LEFT &&
-                       state.screen == SystemMenuScreen::Config) {
-                for (int item = 0; item < 2; ++item) {
-                    const std::string id = track_id_for_item(item);
-                    const glintfx::ElementBox box = ui.get_element_box(id.c_str());
-                    if (!box.found) continue;
-                    if (ev.button.x < box.x || ev.button.x > box.x + box.w ||
-                        ev.button.y < box.y || ev.button.y > box.y + box.h) {
-                        continue;
+                       ev.button.button == SDL_BUTTON_LEFT) {
+                bool handled = false;
+                if (state.screen == SystemMenuScreen::Pause) {
+                    // Clicar numa pill (Continuar/Configuracoes/Sair) SELECIONA E
+                    // ACIONA na hora - equivalente a focar + ENTER.
+                    for (int item = 0; item < kPauseItemCount && !handled; ++item) {
+                        const glintfx::ElementBox box =
+                            ui.get_element_box(pause_item_id(item).c_str());
+                        if (!hit_test(box, ev.button.x, ev.button.y)) continue;
+                        handled = true;
+                        const SystemMenuAction action =
+                            system_menu_click_option(state, item);
+                        if (handle_action(action)) return outcome;
                     }
-                    drag_item = item;
-                    state.config_selected = item;
-                    if (box.w > 0.0f) {
-                        const float ratio = (ev.button.x - box.x) / box.w;
-                        system_menu_set_slider_ratio(state, item, ratio);
-                        apply_and_persist(state, audio, settings_dir);
+                } else if (state.screen == SystemMenuScreen::Config) {
+                    // (1) Tracks dos sliders (drag-start, receita PRE-EXISTENTE) -
+                    // checado PRIMEIRO porque a caixa do track fica DENTRO da
+                    // caixa do campo/rotulo (config-item-<i>, ver (3) abaixo) - o
+                    // mais especifico tem que vencer quando o clique cai nos dois.
+                    for (int item = 0; item < 2 && !handled; ++item) {
+                        const glintfx::ElementBox box =
+                            ui.get_element_box(track_id_for_item(item).c_str());
+                        if (!hit_test(box, ev.button.x, ev.button.y)) continue;
+                        handled = true;
+                        drag_item = item;
+                        state.config_selected = item;
+                        if (box.w > 0.0f) {
+                            const float ratio = (ev.button.x - box.x) / box.w;
+                            system_menu_set_slider_ratio(state, item, ratio);
+                            apply_and_persist(state, audio, settings_dir);
+                        }
+                        reload();
                     }
-                    reload();
-                    break;
+                    // (2) Botao Voltar - ACIONA na hora (equivalente a focar + ENTER).
+                    if (!handled) {
+                        const glintfx::ElementBox box =
+                            ui.get_element_box("config-back");
+                        if (hit_test(box, ev.button.x, ev.button.y)) {
+                            handled = true;
+                            const SystemMenuAction action = system_menu_click_option(
+                                state, static_cast<int>(ConfigItem::Back));
+                            if (handle_action(action)) return outcome;
+                        }
+                    }
+                    // (3) Campo/rotulo do slider (fora do track) - SO FOCA (nao
+                    // ajusta volume - isso e papel exclusivo do track, ver (1)).
+                    for (int item = 0; item < 2 && !handled; ++item) {
+                        const glintfx::ElementBox box =
+                            ui.get_element_box(config_item_id(item).c_str());
+                        if (!hit_test(box, ev.button.x, ev.button.y)) continue;
+                        handled = true;
+                        const SystemMenuAction action =
+                            system_menu_click_option(state, item);
+                        if (handle_action(action)) return outcome;
+                    }
                 }
             } else if (ev.type == SDL_EVENT_MOUSE_MOTION && drag_item >= 0) {
                 const std::string id = track_id_for_item(drag_item);
