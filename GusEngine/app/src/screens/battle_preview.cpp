@@ -18,9 +18,8 @@
 #include "gus/app/screens/battle_cockpit_verb_ids.hpp"  // GLINTFX-CLICK: id->indice de verbo
 #include "gus/app/screens/battle_hud_model.hpp"  // status_icon_file/index
 #include "gus/app/screens/battle_layout.hpp"     // arena_layout (selftest de mouse A2)
-#include "gus/app/glitch_overlay.hpp"  // draw_glitch_overlay (M7-COSTURA Inc 2b)
+#include "gus/app/boot_pixel_overlay.hpp"  // sequencia de frames da transicao (M7-COSTURA Inc 2c)
 #include "gus/app/screens/battle_scene.hpp"
-#include "gus/core/anim/fade_transition.hpp"  // fade_overlay_alpha (M7-COSTURA Inc 2)
 #include "gus/core/asset_paths.hpp"             // caminhos de asset centralizados
 #include "gus/domain/combat/combat_enums.hpp"  // StatusId
 #include "gus/platform/audio/audio_engine.hpp"     // AudioEngine (M6 F3, ADR-011)
@@ -1242,6 +1241,14 @@ int run_battle_preview_embedded(SDL_Window* window,
     {
         gus::platform::render2d::Render2dGl3 renderer(/*gl_active=*/true);
 
+        // M7-COSTURA Inc 2c: sequencia de frames do boot pixelizado (substitui o
+        // glitch procedural - o lider VETOU o visual ao vivo, "pareceu bug").
+        // Carregada UMA VEZ por entrada na batalha (TextureId locais a ESTE
+        // Render2dGl3, recriado a cada entrada - ver o comentario da funcao) e
+        // reusada nos 2 loops de fade abaixo (entrada kIn + saida kOut).
+        gus::app::BootPixelOverlay boot_overlay;
+        boot_overlay.load(renderer, resolve_asset_dir(gus::core::assets::kVfxBootPixelDir));
+
         // ====================================================================
         // ADR-010 F3: glintfx::UiLayer (embed mode) e o UNICO motor de UI/HUD, compondo
         // POR CIMA da arena com efeitos nativos (gradiente/box-shadow/glow). A arena desenha
@@ -2004,13 +2011,22 @@ int run_battle_preview_embedded(SDL_Window* window,
                     ui->update();
                     ui->render();
                 }
-                // M7-COSTURA Inc 2b: GLITCH DIGITAL/"PROCESSANDO" no lugar do
-                // retangulo preto liso - MESMO envelope (fade_overlay_alpha), so o
-                // DESENHO mudou (ver gus/app/glitch_overlay.hpp).
-                gus::app::draw_glitch_overlay(
-                    renderer, gus::app::screens::battle_screen_rect(),
-                    gus::core::anim::fade_overlay_alpha(
-                        gus::core::anim::FadeDirection::kIn, elapsed, fade_in_seconds));
+                // M7-COSTURA Inc 2c: sequencia de frames do boot pixelizado - esta E
+                // a metade "Revealing indo pra batalha" da transicao inteira (a arena
+                // aparecendo; continua de onde o lado da CIDADE parou - ver o header
+                // extenso em gus/core/anim/boot_pixel_sequence.hpp) no lugar do
+                // glitch procedural (aposentado - o lider VETOU o visual, "pareceu
+                // bug"). `t` = elapsed/fade_in_seconds, a MESMA fracao que
+                // fade_overlay_alpha usava internamente antes do flip de kIn (ver
+                // gus/app/boot_pixel_overlay.hpp).
+                {
+                    const float t = fade_in_seconds > 0.0f
+                                        ? std::min(1.0f, elapsed / fade_in_seconds)
+                                        : 1.0f;
+                    boot_overlay.draw(renderer, gus::app::screens::battle_screen_rect(),
+                                      gus::core::anim::BootPixelLeg::kToBattleRevealing,
+                                      t);
+                }
                 SDL_GL_SwapWindow(window);
                 fading = elapsed < fade_in_seconds;
             }
@@ -2555,14 +2571,22 @@ int run_battle_preview_embedded(SDL_Window* window,
                     ui->update();
                     ui->render();
                 }
-                // M7-COSTURA Inc 2b: GLITCH DIGITAL/"PROCESSANDO" no lugar do
-                // retangulo preto liso - MESMO envelope (fade_overlay_alpha), so o
-                // DESENHO mudou (ver gus/app/glitch_overlay.hpp).
-                gus::app::draw_glitch_overlay(
-                    renderer, gus::app::screens::battle_screen_rect(),
-                    gus::core::anim::fade_overlay_alpha(
-                        gus::core::anim::FadeDirection::kOut, elapsed,
-                        fade_out_seconds));
+                // M7-COSTURA Inc 2c: sequencia de frames do boot pixelizado - esta E
+                // a metade "Darkening voltando pra cidade" da transicao inteira (a
+                // arena escurecendo; continua REVERSO de onde a proxima metade - a
+                // cidade revelando - vai pegar, ver o header extenso em gus/core/anim/
+                // boot_pixel_sequence.hpp) no lugar do glitch procedural (aposentado -
+                // o lider VETOU o visual, "pareceu bug"). `t` = elapsed/
+                // fade_out_seconds, a MESMA fracao que fade_overlay_alpha usava
+                // internamente pra kOut (ver gus/app/boot_pixel_overlay.hpp).
+                {
+                    const float t = fade_out_seconds > 0.0f
+                                        ? std::min(1.0f, elapsed / fade_out_seconds)
+                                        : 1.0f;
+                    boot_overlay.draw(renderer, gus::app::screens::battle_screen_rect(),
+                                      gus::core::anim::BootPixelLeg::kFromBattleDarkening,
+                                      t);
+                }
                 SDL_GL_SwapWindow(window);
                 fading = elapsed < fade_out_seconds;
             }

@@ -25,7 +25,7 @@ add_executable(gusengine_app_tests
     battle_key_routing_test.cpp
     translator_test.cpp
     maestro_logic_test.cpp
-    glitch_overlay_test.cpp
+    boot_pixel_overlay_test.cpp
 )
 
 target_link_libraries(gusengine_app_tests

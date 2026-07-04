@@ -22,7 +22,7 @@ add_executable(gusengine_core_tests
     winded_timer_test.cpp
     breath_oscillator_test.cpp
     fade_transition_test.cpp
-    glitch_dissolve_test.cpp
+    boot_pixel_sequence_test.cpp
 )
 
 target_link_libraries(gusengine_core_tests

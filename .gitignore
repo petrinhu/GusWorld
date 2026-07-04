@@ -88,4 +88,5 @@ resources/images/*
 !resources/images/vance_dragon_glyph.png
 
 # Frames brutos de VFX/transicao (pesados; so os pixelizados/finais entram, sob curadoria)
-resources/vfx/
+resources/vfx/*
+!resources/vfx/boot_pixel/

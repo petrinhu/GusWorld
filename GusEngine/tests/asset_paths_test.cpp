@@ -82,10 +82,16 @@ TEST_CASE("asset_paths: todos os caminhos sao RELATIVOS e nao-vazios",
         ap::kFontMonoRegularFile, ap::kFontMonoBoldFile, ap::kMapsCompiledDir,
         ap::kDistritosInferioresGmapFile, ap::kTranslationsDir,
         ap::kTranslationPtBrFile, ap::kSfxDir, ap::kHitSfxFile, ap::kHitSfxAltFile,
+        ap::kVfxBootPixelDir,
     };
     for (std::string_view p : all) {
         REQUIRE_FALSE(p.empty());
         REQUIRE(p.front() != '/');   // relativo (sem raiz absoluta)
         REQUIRE(p.back() != '/');    // sem barra final (o join cuida do separador)
     }
+}
+
+TEST_CASE("asset_paths: pasta do boot pixelizado (M7-COSTURA Inc 2c)",
+          "[core][assets]") {
+    REQUIRE(ap::kVfxBootPixelDir == std::string_view("vfx/boot_pixel"));
 }

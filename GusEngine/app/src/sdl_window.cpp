@@ -7,10 +7,9 @@
 
 #include "gus/app/sdl_window.hpp"
 
-#include <cstdlib>  // std::getenv (resolve_retratos_dir_local)
+#include <cstdlib>  // std::getenv (resolve_assets_subdir_local)
 #include <string>
 
-#include "gus/app/glitch_overlay.hpp"  // draw_glitch_overlay (M7-COSTURA Inc 2b)
 #include "gus/app/screens/anim_catalog.hpp"  // resolve_gus_sprites_dir
 #include "gus/app/screens/city_loader.hpp"   // load_city_or_fallback
 #include "gus/app/screens/player_sprites_loader.hpp"
@@ -39,12 +38,14 @@ std::string join_asset_path(const std::string& a, const std::string& b) {
     return a + "/" + b;
 }
 
-// Resolve a pasta dos retratos de batalha (sprites/icons-m5/retratos), MESMA receita de
-// resolve_gus_sprites_dir (anim_catalog.cpp): env GUSWORLD_ASSETS > macro de compilacao
-// GUSWORLD_ASSETS_DIR > relativo ao CWD (resources/). O sub-caminho vem do header central
-// (kRetratosDir) - nao hardcoded aqui.
-std::string resolve_retratos_dir_local() {
-    const std::string sub(gus::core::assets::kRetratosDir);
+// Resolve um SUB-CAMINHO relativo de asset (do header central, ex.: kRetratosDir ou
+// kVfxBootPixelDir) pela MESMA receita de resolve_gus_sprites_dir (anim_catalog.cpp):
+// env GUSWORLD_ASSETS > macro de compilacao GUSWORLD_ASSETS_DIR > relativo ao CWD
+// (resources/). Generalizada de "resolve_retratos_dir_local" (M7-COSTURA Inc 2c: o
+// boot pixelizado precisa da MESMA receita de resolucao, so muda o sub-caminho) - a
+// FONTE do sub-caminho continua so a constante do chamador, nao hardcoded aqui.
+std::string resolve_assets_subdir_local(std::string_view rel) {
+    const std::string sub(rel);
     if (const char* env = std::getenv("GUSWORLD_ASSETS")) {
         if (env[0] != '\0') {
             return join_asset_path(env, sub);
@@ -109,6 +110,7 @@ bool SdlWindow::init() {
     input_.open_gamepads();
 
     load_player_sprites();
+    load_boot_pixel_frames();
     return true;
 }
 
@@ -128,6 +130,7 @@ bool SdlWindow::init_attached(SDL_Window* window) {
 
     input_.open_gamepads();
     load_player_sprites();
+    load_boot_pixel_frames();
     return true;
 }
 
@@ -136,7 +139,7 @@ void SdlWindow::load_enemy_marker_texture() {
         return;  // nenhum marcador definido ainda (uso standalone/sem Maestro)
     }
     const std::string path = join_asset_path(
-        resolve_retratos_dir_local(),
+        resolve_assets_subdir_local(gus::core::assets::kRetratosDir),
         std::string(gus::core::assets::kRetratoInimigoFile));
     enemy_marker_tex_ = render2d_->load_texture(path.c_str());
     if (enemy_marker_tex_ != gus::platform::render2d::kInvalidTexture) {
@@ -145,6 +148,11 @@ void SdlWindow::load_enemy_marker_texture() {
         // Asset ausente/headless: degrada sem deixar um TextureId obsoleto no sim_.
         sim_->clear_enemy_marker();
     }
+}
+
+void SdlWindow::load_boot_pixel_frames() {
+    boot_overlay_.load(*render2d_,
+                        resolve_assets_subdir_local(gus::core::assets::kVfxBootPixelDir));
 }
 
 void SdlWindow::set_enemy_marker(const gus::core::spatial::Aabb& aabb) {
@@ -179,12 +187,16 @@ bool SdlWindow::reacquire_renderer() {
     // Idem pro marcador de inimigo (M7-COSTURA Inc 2): so recarrega se ja havia um
     // definido (no-op seguro se enemy_marker_aabb_ nunca foi setada).
     load_enemy_marker_texture();
+    // Idem pro boot pixelizado (M7-COSTURA Inc 2c): os 20 TextureId antigos tambem
+    // nao sobrevivem a troca de SDL_Renderer.
+    load_boot_pixel_frames();
     return true;
 }
 
 bool SdlWindow::step() { return step_with_fade(0.0f); }
 
-bool SdlWindow::step_with_fade(float overlay_alpha) {
+bool SdlWindow::step_with_fade(float overlay_alpha,
+                                gus::core::anim::FadeDirection direction) {
     // 1) INPUT: drena os eventos SDL (teclado + gamepad). false = fechar.
     if (!input_.pump_events()) {
         return false;
@@ -228,12 +240,22 @@ bool SdlWindow::step_with_fade(float overlay_alpha) {
             const float clamped = overlay_alpha > 1.0f ? 1.0f : overlay_alpha;
             const gus::core::spatial::CameraView cam =
                 sim_->camera_view(static_cast<float>(pw), static_cast<float>(ph));
-            // M7-COSTURA Inc 2b: GLITCH DIGITAL/"PROCESSANDO" (dissolve em blocos +
-            // franja cyan/magenta + scanlines + scan beam) no lugar do retangulo
-            // preto liso - MESMO alpha, MESMA janela temporal, MESMO invariante de
-            // seguranca (alpha>=1 continua cobrindo tudo, opaco). Ver gus/app/
-            // glitch_overlay.hpp.
-            gus::app::draw_glitch_overlay(*render2d_, cam.rect, clamped);
+            // M7-COSTURA Inc 2c: sequencia de frames pre-renderizada (boot
+            // pixelizado) no lugar do glitch procedural (aposentado - o lider VETOU
+            // o visual ao vivo, "pareceu bug"). A CIDADE so toca 2 das 4 pernas da
+            // transicao inteira (ver gus/core/anim/boot_pixel_sequence.hpp): kOut =
+            // kToBattleDarkening (t=clamped, o MESMO valor que ja era o alpha
+            // original pra essa perna); kIn = kFromBattleRevealing (t=1-clamped,
+            // pois fade_overlay_alpha(kIn,...) ja devolve 1-t). MESMA janela
+            // temporal, MESMO invariante de seguranca (extremo continua cobrindo
+            // tudo, opaco). Ver gus/app/boot_pixel_overlay.hpp.
+            const bool going_to_battle =
+                direction == gus::core::anim::FadeDirection::kOut;
+            const auto leg = going_to_battle
+                                  ? gus::core::anim::BootPixelLeg::kToBattleDarkening
+                                  : gus::core::anim::BootPixelLeg::kFromBattleRevealing;
+            const float t = going_to_battle ? clamped : (1.0f - clamped);
+            boot_overlay_.draw(*render2d_, cam.rect, leg, t);
             render2d_->present();
             render2d_->set_defer_present(false);  // restaura o default pro step() normal
         }

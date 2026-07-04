@@ -170,6 +170,19 @@ inline constexpr std::string_view kCityThemeFile = "cidade_tema_provisorio.mp3";
 // (audio-designer-composer) substituir. Ver assets/AUDIO_KIT_PROVISORIO.md.
 inline constexpr std::string_view kBattleThemeFile = "Arena_GusWorld.mp3";
 
+// ============================================================================
+// VFX (efeitos visuais pre-renderizados, sob resources/vfx/). M7-COSTURA Inc 2c:
+// substitui o glitch procedural (vetado pelo lider ao vivo - "pareceu bug") por uma
+// sequencia de frames pre-renderizada aprovada (boot de sistema pixelizado, Pillar
+// "magia = software" - o sistema runico do Gus REBOOTANDO pro combate).
+// ============================================================================
+
+// Pasta dos kBootPixelFrameCount (20) frames do boot pixelizado (frame_00.png..
+// frame_19.png, 320x180, RGB opaco). Ver gus/app/boot_pixel_overlay.hpp (quem
+// carrega/desenha, nos 2 backends) e gus/core/anim/boot_pixel_sequence.hpp
+// (kBootPixelFrameCount + o indice POCO progresso->frame).
+inline constexpr std::string_view kVfxBootPixelDir = "vfx/boot_pixel";
+
 }  // namespace gus::core::assets
 
 #endif  // GUS_CORE_ASSET_PATHS_HPP

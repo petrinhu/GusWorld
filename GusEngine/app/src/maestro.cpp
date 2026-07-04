@@ -194,7 +194,10 @@ bool Maestro::run_city_fade(gus::core::anim::FadeDirection direction,
             static_cast<float>(SDL_GetTicksNS() - start_ns) / 1.0e9f;
         const float alpha =
             gus::core::anim::fade_overlay_alpha(direction, elapsed, duration_seconds);
-        if (!city_->step_with_fade(alpha)) {
+        // M7-COSTURA Inc 2c: `direction` tambem escolhe a PERNA do boot pixelizado
+        // que a cidade desenha (ver gus/app/sdl_window.hpp::step_with_fade) - o MESMO
+        // direction que ja escolhia kOut/kIn pro alpha acima.
+        if (!city_->step_with_fade(alpha, direction)) {
             return false;  // janela fechada durante o fade - propaga quit (mesmo
                             // contrato de to_battle/run())
         }

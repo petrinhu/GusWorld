@@ -23,7 +23,9 @@
 
 #include <SDL3/SDL.h>
 
+#include "gus/app/boot_pixel_overlay.hpp"  // sequencia de frames da transicao (M7-COSTURA Inc 2c)
 #include "gus/app/screens/overworld_sim.hpp"
+#include "gus/core/anim/fade_transition.hpp"  // FadeDirection (qual perna do boot pixelizado)
 #include "gus/core/time/fixed_timestep.hpp"
 #include "gus/platform/input/sdl_input.hpp"
 #include "gus/platform/render2d/render2d_sdl.hpp"
@@ -72,18 +74,30 @@ public:
     // renderer da cidade ativo.
     [[nodiscard]] bool step();
 
-    // M7-COSTURA Inc 2 (ADR-012 decisao 5, "fade preto curto"): MESMO passo de step()
-    // (poll -> N updates fixos -> 1 render), com um retangulo PRETO full-screen
-    // desenhado POR CIMA do frame ja renderizado, ANTES do present - o overlay do fade
-    // preto da transicao cidade<->batalha. overlay_alpha<=0.0f e BYTE-IDENTICO a
+    // M7-COSTURA Inc 2 (ADR-012 decisao 5, "fade preto curto") / Inc 2c (sequencia de
+    // frames pre-renderizada no lugar do glitch procedural vetado pelo lider): MESMO
+    // passo de step() (poll -> N updates fixos -> 1 render), com o overlay da
+    // transicao (BootPixelOverlay - retangulo solido de seguranca + o frame corrente
+    // do boot pixelizado) desenhado POR CIMA do frame ja renderizado, ANTES do
+    // present. overlay_alpha<=0.0f e BYTE-IDENTICO a
     // step() (nenhum overlay, nenhum present adiado): step() e literalmente
     // `return step_with_fade(0.0f);`. overlay_alpha>0 clampa em [0,1] e usa o mesmo
     // present-diferido (ADR-009, set_defer_present) que o HUD RmlUi ja usa pra compor
     // por cima da arena - aqui e o Maestro quem compoe o preto por cima, sem HUD. A
     // curva do alpha (crescente/decrescente ao longo do tempo) e responsabilidade do
     // CHAMADOR (gus::core::anim::fade_overlay_alpha); esta funcao so DESENHA o alpha
-    // dado num frame. Mesmo contrato de retorno de step() (false = janela fechou).
-    [[nodiscard]] bool step_with_fade(float overlay_alpha);
+    // dado num frame. `direction` (Inc 2c, NOVO): a CIDADE serve as DUAS pernas do
+    // boot pixelizado que tocam no lado dela (kOut = cidade escurecendo indo pra
+    // batalha = BootPixelLeg::kToBattleDarkening; kIn = cidade revelando voltando da
+    // batalha = BootPixelLeg::kFromBattleRevealing - ver o header do POCO
+    // boot_pixel_sequence.hpp pro desenho completo das 4 pernas) - o valor default
+    // (kOut) e inofensivo quando overlay_alpha<=0 (o direction nem chega a ser usado,
+    // preserva o contrato "byte-identico" de step() acima). Mesmo contrato de retorno
+    // de step() (false = janela fechou).
+    [[nodiscard]] bool step_with_fade(
+        float overlay_alpha,
+        gus::core::anim::FadeDirection direction =
+            gus::core::anim::FadeDirection::kOut);
 
     // Roda o loop ate o usuario fechar a janela (pump_events devolver false). Cada
     // iteracao: poll de input -> N updates fixos (FixedTimestep) -> 1 render. O
@@ -136,6 +150,14 @@ private:
     // NAO sobrevivem a troca de SDL_Renderer, mesmo racional do Gus).
     void load_enemy_marker_texture();
 
+    // Carrega os 20 frames do boot pixelizado (BootPixelOverlay, M7-COSTURA Inc 2c) no
+    // renderer_ CORRENTE. Chamado por init()/init_attached() (1a carga) e por
+    // reacquire_renderer() (os TextureId antigos nao sobrevivem a troca de
+    // SDL_Renderer, mesmo motivo de load_player_sprites/load_enemy_marker_texture).
+    // Asset ausente/headless: BootPixelOverlay::load() devolve false e step_with_fade
+    // degrada com seguranca pro retangulo solido (ver o header do overlay).
+    void load_boot_pixel_frames();
+
     SDL_Window* window_ = nullptr;      // dono SO se owns_window_ (ver init() vs init_attached())
     SDL_Renderer* renderer_ = nullptr;  // sempre owner (destruido em release_renderer/dtor)
     bool owns_window_ = false;
@@ -153,6 +175,12 @@ private:
     std::optional<gus::core::spatial::Aabb> enemy_marker_aabb_{};
     gus::platform::render2d::TextureId enemy_marker_tex_ =
         gus::platform::render2d::kInvalidTexture;
+
+    // M7-COSTURA Inc 2c: sequencia de frames do boot pixelizado (substitui o glitch
+    // procedural vetado pelo lider). Carregada em init()/init_attached()/
+    // reacquire_renderer() (load_boot_pixel_frames) - handles locais ao renderer_
+    // vivo, mesmo racional do marcador de inimigo/sprites do Gus acima.
+    gus::app::BootPixelOverlay boot_overlay_;
 };
 
 }  // namespace gus::app

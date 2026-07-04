@@ -22,7 +22,9 @@ add_library(gusengine_core STATIC
     src/anim/anim_clock.cpp
     src/anim/breath_oscillator.cpp
     src/anim/fade_transition.cpp
-    src/anim/glitch_dissolve.cpp
+    # M7-COSTURA Inc 2c: sequencia de frames pre-renderizada (boot pixelizado) no
+    # lugar do glitch procedural (aposentado - o lider VETOU o visual, "pareceu bug").
+    src/anim/boot_pixel_sequence.cpp
     src/player/stamina.cpp
     src/player/winded_timer.cpp
 )
