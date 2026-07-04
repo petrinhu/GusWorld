@@ -21,6 +21,8 @@ add_executable(gusengine_platform_tests
     audio_engine_test.cpp
     # MENU-PAUSA-CONFIG-SOM (M7-COSTURA): I/O real de settings.json em disco.
     settings_file_store_test.cpp
+    # M2-SAVE-IO (ADR-012 Onda 2): I/O real do save em disco (~/.gusworld/saves).
+    save_file_store_test.cpp
 )
 
 # ADR-010 F3: os testes do HUD RmlUi VENDORIZADO (rmlui_hud_test.cpp, 4 TEST_CASE) foram
