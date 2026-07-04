@@ -1,0 +1,270 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GusWorld - Mock Menu de Sistema - Proposta A: Console Centralizado</title>
+<style>
+  :root{
+    /* tokens extraidos de docs/art/style-guide.md secao 4.1 (paleta City) + latao observado no cockpit ja shippado */
+    --bg-deep:#0A0E1A;
+    --bg-mid:#1B2238;
+    --bg-light:#3A4566;
+    --neutral:#6B6F7A;
+    --cyan:#22D3EE;
+    --magenta:#E11D74;
+    --violet:#7C3AED;
+    --hot:#FACC15;
+    --brass:#C9A24B;
+    --brass-dark:#7A5A2E;
+    --brass-light:#F0D98C;
+    --text-1:#E7ECF5;
+    --text-2:#9AA5C0;
+    --font-ui:"Courier New", ui-monospace, "Consolas", monospace;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    background:#05070c;
+    color:var(--text-1);
+    font-family:var(--font-ui);
+    display:flex;flex-direction:column;align-items:center;gap:20px;
+    padding:32px 12px 64px;
+  }
+  .doc-head{max-width:960px;text-align:center;margin-bottom:4px}
+  .doc-head .kicker{color:var(--cyan);letter-spacing:3px;font-size:11px;text-transform:uppercase}
+  .doc-head h1{font-size:18px;margin:6px 0 4px;letter-spacing:1px;color:var(--text-1)}
+  .doc-head p{color:var(--text-2);font-size:12px;margin:0;line-height:1.6}
+
+  .frame-label{width:960px;display:flex;align-items:baseline;justify-content:space-between;color:var(--text-2);font-size:11px;letter-spacing:2px;text-transform:uppercase;padding:0 2px}
+  .frame-label b{color:var(--cyan);font-size:12px;letter-spacing:2px}
+
+  .screen{
+    position:relative;width:960px;height:540px;overflow:hidden;
+    border-radius:6px;
+    box-shadow:0 0 0 1px #000, 0 24px 70px rgba(0,0,0,.65);
+    background:radial-gradient(ellipse 900px 500px at 50% -8%, var(--bg-light) 0%, var(--bg-mid) 45%, var(--bg-deep) 100%);
+  }
+
+  /* backdrop honesto: jogo pausado atras (abstrato, NAO promete conversao 1:1) */
+  .game-backdrop{position:absolute;inset:0;filter:blur(2.5px) saturate(.7);opacity:.55}
+  .gb-portrait{position:absolute;left:24px;top:24px;width:90px;height:90px;border-radius:10px;background:linear-gradient(160deg,var(--bg-light),var(--bg-deep));border:2px solid var(--brass-dark)}
+  .gb-pill{position:absolute;left:24px;width:210px;height:44px;border-radius:999px;background:linear-gradient(180deg,var(--bg-light),var(--bg-mid));opacity:.8}
+  .gb-pill.p1{top:150px}.gb-pill.p2{top:204px}.gb-pill.p3{top:258px;box-shadow:0 0 20px rgba(34,211,238,.5);border:1px solid var(--cyan)}.gb-pill.p4{top:312px}
+  .gb-enemy{position:absolute;right:40px;width:70px;height:80px;border-radius:6px;background:linear-gradient(160deg,var(--bg-light),var(--bg-mid));border:1px solid var(--magenta)}
+  .gb-enemy.e1{top:40px}.gb-enemy.e2{top:140px}.gb-enemy.e3{top:240px}
+  .gb-topstrip{position:absolute;top:0;left:0;right:0;height:5px;background:linear-gradient(90deg,transparent,var(--bg-light),transparent)}
+  .scrim{position:absolute;inset:0;background:rgba(5,7,12,.66)}
+
+  /* painel centralizado, moldura latao (nod ao frame da carta-retrato ja existente) */
+  .panel{
+    position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+    width:420px;
+    background:linear-gradient(180deg, var(--bg-light) 0%, var(--bg-mid) 42%, var(--bg-deep) 100%);
+    border:1px solid var(--brass-dark);
+    border-radius:20px;
+    padding:30px 28px 24px;
+    box-shadow:0 0 0 1px rgba(0,0,0,.5), 0 0 50px rgba(34,211,238,.10), inset 0 1px 0 rgba(255,255,255,.05);
+  }
+  .corner{position:absolute;width:20px;height:20px;border-radius:50%;
+    background:radial-gradient(circle at 35% 30%, var(--brass-light), var(--brass) 55%, var(--brass-dark) 100%);
+    box-shadow:0 1px 3px rgba(0,0,0,.7);}
+  .corner.tl{top:-10px;left:-10px}
+  .corner.tr{top:-10px;right:-10px}
+  .corner.bl{bottom:-10px;left:-10px}
+  .corner.br{bottom:-10px;right:-10px}
+
+  .kicker-2{color:var(--text-2);font-size:11px;letter-spacing:4px;text-transform:uppercase;text-align:center;margin-bottom:2px}
+  .title-glow{
+    text-align:center;font-size:26px;letter-spacing:4px;text-transform:uppercase;
+    color:#fff;margin:2px 0 18px;
+    text-shadow:0 0 6px var(--cyan), 0 0 22px rgba(34,211,238,.6), 0 0 44px rgba(34,211,238,.35);
+  }
+  .divider{height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.18),transparent);margin:0 0 20px}
+
+  .verb-pill{
+    position:relative;display:flex;align-items:center;gap:14px;width:100%;
+    padding:14px 18px;margin-bottom:12px;
+    background:linear-gradient(180deg, var(--bg-light) 0%, var(--bg-mid) 100%);
+    border:1px solid rgba(255,255,255,.07);
+    border-radius:999px;
+    font-family:var(--font-ui);text-transform:uppercase;letter-spacing:2.5px;font-size:14px;color:var(--text-1);
+  }
+  .verb-pill .dot{flex:0 0 auto;width:10px;height:10px;border-radius:3px;background:var(--bg-deep);border:1px solid var(--text-2)}
+  .verb-pill .ic{flex:0 0 auto;width:20px;height:20px;display:flex;align-items:center;justify-content:center;color:var(--text-2)}
+  .verb-pill .lbl{flex:1}
+  .verb-pill .hint{font-size:10px;color:var(--text-2);letter-spacing:1px;text-transform:none}
+
+  .verb-pill.focused{
+    color:#fff;border-color:var(--cyan);
+    box-shadow:0 0 0 1px var(--cyan), 0 0 22px 2px rgba(34,211,238,.55), inset 0 0 14px rgba(34,211,238,.15);
+  }
+  .verb-pill.focused .dot{background:var(--cyan);box-shadow:0 0 8px var(--cyan)}
+  .verb-pill.focused .ic{color:var(--cyan)}
+
+  .verb-pill.danger{border-color:rgba(225,29,116,.35)}
+  .verb-pill.danger .dot{background:rgba(225,29,116,.55)}
+  .verb-pill.danger .ic{color:var(--magenta)}
+
+  .footer-hint{text-align:center;color:var(--text-2);font-size:11px;letter-spacing:1px;margin-top:6px}
+  .footer-hint b{color:var(--cyan)}
+
+  /* config screen: sliders horizontais */
+  .field{margin-bottom:24px}
+  .field .row{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px}
+  .field .row .name{font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-2)}
+  .field .row .val{font-size:13px;color:var(--cyan);letter-spacing:1px}
+  .track{position:relative;height:14px;border-radius:999px;
+    background:linear-gradient(180deg,var(--bg-deep),#000);
+    box-shadow:inset 0 2px 5px rgba(0,0,0,.7), 0 0 0 1px rgba(255,255,255,.05);}
+  .fill{position:absolute;left:0;top:0;bottom:0;border-radius:999px;
+    background:linear-gradient(90deg,#0891A8,var(--cyan));
+    box-shadow:0 0 12px rgba(34,211,238,.55);}
+  .node{position:absolute;top:50%;width:22px;height:22px;transform:translate(-50%,-50%);
+    filter:drop-shadow(0 0 6px rgba(34,211,238,.85));}
+
+  .btn-back{
+    display:flex;align-items:center;justify-content:center;gap:10px;width:100%;
+    padding:13px;margin-top:8px;
+    border:1px solid var(--bg-light);border-radius:999px;background:transparent;
+    color:var(--text-2);text-transform:uppercase;letter-spacing:2.5px;font-size:12px;
+  }
+  .btn-back svg{color:var(--text-2)}
+
+  .legend{width:960px;display:flex;gap:18px;flex-wrap:wrap;color:var(--text-2);font-size:11px;padding:8px 2px 0}
+  .legend span{display:inline-flex;align-items:center;gap:6px}
+  .swatch{width:12px;height:12px;border-radius:3px;display:inline-block}
+
+  @media (prefers-reduced-motion:no-preference){
+    .verb-pill.focused{animation:pulse 2.4s ease-in-out infinite}
+  }
+  @keyframes pulse{
+    0%,100%{box-shadow:0 0 0 1px var(--cyan), 0 0 18px 2px rgba(34,211,238,.45), inset 0 0 12px rgba(34,211,238,.12);}
+    50%{box-shadow:0 0 0 1px var(--cyan), 0 0 28px 4px rgba(34,211,238,.7), inset 0 0 16px rgba(34,211,238,.2);}
+  }
+</style>
+</head>
+<body>
+
+  <div class="doc-head">
+    <div class="kicker">GusWorld - Menu de Sistema - Mock renderizado</div>
+    <h1>Proposta A: "Console Centralizado"</h1>
+    <p>Painel unico, ancorado ao centro da tela, moldura latao identica a da carta-retrato do cockpit de batalha ja aprovado.
+    Sliders de som sao pills horizontais com no hexagonal (linguagem VFX runica secao 11.1 do style-guide).
+    Resolucao logica 960x540 (16:9). Fundo = representacao abstrata do jogo pausado atras do overlay, nao e conversao 1:1.</p>
+  </div>
+
+  <div class="frame-label"><span>Tela 1</span><b>PAUSA</b><span>foco inicial: CONTINUAR</span></div>
+  <div class="screen">
+    <div class="game-backdrop">
+      <div class="gb-topstrip"></div>
+      <div class="gb-portrait"></div>
+      <div class="gb-pill p1"></div>
+      <div class="gb-pill p2"></div>
+      <div class="gb-pill p3"></div>
+      <div class="gb-pill p4"></div>
+      <div class="gb-enemy e1"></div>
+      <div class="gb-enemy e2"></div>
+      <div class="gb-enemy e3"></div>
+    </div>
+    <div class="scrim"></div>
+
+    <div class="panel">
+      <div class="corner tl"></div><div class="corner tr"></div><div class="corner bl"></div><div class="corner br"></div>
+      <div class="kicker-2">Sistema</div>
+      <div class="title-glow">Pausado</div>
+      <div class="divider"></div>
+
+      <div class="verb-pill focused">
+        <span class="dot"></span>
+        <span class="ic">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M4 2.5 L13 8 L4 13.5 Z" fill="currentColor"/></svg>
+        </span>
+        <span class="lbl">Continuar</span>
+      </div>
+
+      <div class="verb-pill">
+        <span class="dot"></span>
+        <span class="ic">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4">
+            <circle cx="8" cy="8" r="2.6"/>
+            <path d="M8 1.5v2M8 12.5v2M1.5 8h2M12.5 8h2M3.3 3.3l1.4 1.4M11.3 11.3l1.4 1.4M3.3 12.7l1.4-1.4M11.3 4.7l1.4-1.4"/>
+          </svg>
+        </span>
+        <span class="lbl">Configuracoes</span>
+      </div>
+
+      <div class="verb-pill danger">
+        <span class="dot"></span>
+        <span class="ic">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4">
+            <path d="M6.5 2.5H3.5v11h3"/>
+            <path d="M6.5 8H13.5M13.5 8L10.5 5M13.5 8L10.5 11"/>
+          </svg>
+        </span>
+        <span class="lbl">Sair</span>
+      </div>
+
+      <div class="footer-hint"><b>ENTER</b> confirma, <b>ESC</b> volta ao jogo</div>
+    </div>
+  </div>
+
+  <div class="frame-label"><span>Tela 2</span><b>CONFIGURACOES - SOM</b><span>v1: so volume musica + SFX</span></div>
+  <div class="screen">
+    <div class="game-backdrop">
+      <div class="gb-topstrip"></div>
+      <div class="gb-portrait"></div>
+      <div class="gb-pill p1"></div>
+      <div class="gb-pill p2"></div>
+      <div class="gb-pill p3"></div>
+      <div class="gb-pill p4"></div>
+      <div class="gb-enemy e1"></div>
+      <div class="gb-enemy e2"></div>
+      <div class="gb-enemy e3"></div>
+    </div>
+    <div class="scrim"></div>
+
+    <div class="panel">
+      <div class="corner tl"></div><div class="corner tr"></div><div class="corner bl"></div><div class="corner br"></div>
+      <div class="kicker-2">Sistema</div>
+      <div class="title-glow">Configuracoes</div>
+      <div class="divider"></div>
+
+      <div class="field">
+        <div class="row"><span class="name">Volume da Musica</span><span class="val">72%</span></div>
+        <div class="track">
+          <div class="fill" style="width:72%"></div>
+          <div class="node" style="left:72%">
+            <svg width="22" height="22" viewBox="0 0 22 22"><polygon points="11,2 19,7 19,15 11,20 3,15 3,7" fill="#0A0E1A" stroke="#22D3EE" stroke-width="1.6"/></svg>
+          </div>
+        </div>
+      </div>
+
+      <div class="field">
+        <div class="row"><span class="name">Volume dos Efeitos (SFX)</span><span class="val">45%</span></div>
+        <div class="track">
+          <div class="fill" style="width:45%"></div>
+          <div class="node" style="left:45%">
+            <svg width="22" height="22" viewBox="0 0 22 22"><polygon points="11,2 19,7 19,15 11,20 3,15 3,7" fill="#0A0E1A" stroke="#22D3EE" stroke-width="1.6"/></svg>
+          </div>
+        </div>
+      </div>
+
+      <div class="btn-back">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M10 3 L5 8 L10 13"/></svg>
+        Voltar
+      </div>
+    </div>
+  </div>
+
+  <div class="legend">
+    <span><span class="swatch" style="background:#0A0E1A"></span>bg-deep #0A0E1A</span>
+    <span><span class="swatch" style="background:#1B2238"></span>bg-mid #1B2238</span>
+    <span><span class="swatch" style="background:#3A4566"></span>bg-light #3A4566</span>
+    <span><span class="swatch" style="background:#22D3EE"></span>cyan #22D3EE (ativo/scan)</span>
+    <span><span class="swatch" style="background:#E11D74"></span>magenta #E11D74 (saida/perigo)</span>
+    <span><span class="swatch" style="background:#C9A24B"></span>latao #C9A24B (moldura, herdado do cockpit)</span>
+  </div>
+
+</body>
+</html>
