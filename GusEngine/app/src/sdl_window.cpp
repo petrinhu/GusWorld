@@ -10,6 +10,7 @@
 #include <cstdlib>  // std::getenv (resolve_retratos_dir_local)
 #include <string>
 
+#include "gus/app/glitch_overlay.hpp"  // draw_glitch_overlay (M7-COSTURA Inc 2b)
 #include "gus/app/screens/anim_catalog.hpp"  // resolve_gus_sprites_dir
 #include "gus/app/screens/city_loader.hpp"   // load_city_or_fallback
 #include "gus/app/screens/player_sprites_loader.hpp"
@@ -227,9 +228,12 @@ bool SdlWindow::step_with_fade(float overlay_alpha) {
             const float clamped = overlay_alpha > 1.0f ? 1.0f : overlay_alpha;
             const gus::core::spatial::CameraView cam =
                 sim_->camera_view(static_cast<float>(pw), static_cast<float>(ph));
-            render2d_->draw_filled_rect(
-                cam.rect,
-                gus::platform::render2d::DrawColor{0.0f, 0.0f, 0.0f, clamped});
+            // M7-COSTURA Inc 2b: GLITCH DIGITAL/"PROCESSANDO" (dissolve em blocos +
+            // franja cyan/magenta + scanlines + scan beam) no lugar do retangulo
+            // preto liso - MESMO alpha, MESMA janela temporal, MESMO invariante de
+            // seguranca (alpha>=1 continua cobrindo tudo, opaco). Ver gus/app/
+            // glitch_overlay.hpp.
+            gus::app::draw_glitch_overlay(*render2d_, cam.rect, clamped);
             render2d_->present();
             render2d_->set_defer_present(false);  // restaura o default pro step() normal
         }

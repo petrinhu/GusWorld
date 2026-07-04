@@ -22,6 +22,7 @@ add_library(gusengine_core STATIC
     src/anim/anim_clock.cpp
     src/anim/breath_oscillator.cpp
     src/anim/fade_transition.cpp
+    src/anim/glitch_dissolve.cpp
     src/player/stamina.cpp
     src/player/winded_timer.cpp
 )

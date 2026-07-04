@@ -18,6 +18,7 @@
 #include "gus/app/screens/battle_cockpit_verb_ids.hpp"  // GLINTFX-CLICK: id->indice de verbo
 #include "gus/app/screens/battle_hud_model.hpp"  // status_icon_file/index
 #include "gus/app/screens/battle_layout.hpp"     // arena_layout (selftest de mouse A2)
+#include "gus/app/glitch_overlay.hpp"  // draw_glitch_overlay (M7-COSTURA Inc 2b)
 #include "gus/app/screens/battle_scene.hpp"
 #include "gus/core/anim/fade_transition.hpp"  // fade_overlay_alpha (M7-COSTURA Inc 2)
 #include "gus/core/asset_paths.hpp"             // caminhos de asset centralizados
@@ -2003,13 +2004,13 @@ int run_battle_preview_embedded(SDL_Window* window,
                     ui->update();
                     ui->render();
                 }
-                renderer.draw_filled_rect(
-                    gus::app::screens::battle_screen_rect(),
-                    gus::platform::render2d::DrawColor{
-                        0.0f, 0.0f, 0.0f,
-                        gus::core::anim::fade_overlay_alpha(
-                            gus::core::anim::FadeDirection::kIn, elapsed,
-                            fade_in_seconds)});
+                // M7-COSTURA Inc 2b: GLITCH DIGITAL/"PROCESSANDO" no lugar do
+                // retangulo preto liso - MESMO envelope (fade_overlay_alpha), so o
+                // DESENHO mudou (ver gus/app/glitch_overlay.hpp).
+                gus::app::draw_glitch_overlay(
+                    renderer, gus::app::screens::battle_screen_rect(),
+                    gus::core::anim::fade_overlay_alpha(
+                        gus::core::anim::FadeDirection::kIn, elapsed, fade_in_seconds));
                 SDL_GL_SwapWindow(window);
                 fading = elapsed < fade_in_seconds;
             }
@@ -2554,13 +2555,14 @@ int run_battle_preview_embedded(SDL_Window* window,
                     ui->update();
                     ui->render();
                 }
-                renderer.draw_filled_rect(
-                    gus::app::screens::battle_screen_rect(),
-                    gus::platform::render2d::DrawColor{
-                        0.0f, 0.0f, 0.0f,
-                        gus::core::anim::fade_overlay_alpha(
-                            gus::core::anim::FadeDirection::kOut, elapsed,
-                            fade_out_seconds)});
+                // M7-COSTURA Inc 2b: GLITCH DIGITAL/"PROCESSANDO" no lugar do
+                // retangulo preto liso - MESMO envelope (fade_overlay_alpha), so o
+                // DESENHO mudou (ver gus/app/glitch_overlay.hpp).
+                gus::app::draw_glitch_overlay(
+                    renderer, gus::app::screens::battle_screen_rect(),
+                    gus::core::anim::fade_overlay_alpha(
+                        gus::core::anim::FadeDirection::kOut, elapsed,
+                        fade_out_seconds));
                 SDL_GL_SwapWindow(window);
                 fading = elapsed < fade_out_seconds;
             }
