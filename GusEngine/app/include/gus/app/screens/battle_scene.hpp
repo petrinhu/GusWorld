@@ -216,6 +216,25 @@ public:
     // true se o combate JA terminou (Victory/Defeat/Fled). O menu nao opera mais.
     [[nodiscard]] bool combat_over() const noexcept;
 
+    // ---- Flavor da derrota (M7-COSTURA Inc 3, "reboot de sistema" nao-canonico) ----
+    //
+    // O Gus NUNCA morre (echo Batman; coerente com Pillar 1 "magia = software"): ao
+    // Defeat (Gus-centric, ver combat_state_machine.cpp::check_end, OU wipe-total), a
+    // tela NAO some na hora. Por kDefeatFlavorSeconds (battle_scene.cpp), o render
+    // sobrepoe um veu quase-opaco com 3 linhas: (1) o "kernel panic" (pool de literais
+    // TECNICOS nao-traduziveis, docs/design/mecanicas/combat-flavor.md §3b "Derrota" -
+    // mesma convencao §4 do codigo de erro autentico), (2) a falinha blase de um
+    // companion vivo (tr() COMBAT_DEFEAT_BARK, ou _GENERIC se ninguem sobrou pra falar),
+    // (3) a nota-xadrez (tr() COMBAT_DEFEAT_CHESS_NOTE) explicando o Gus-centric ("o Rei
+    // caiu, a partida acaba"). SO TIMER, sem input (anti-OE: nao e cutscene) - o host
+    // (battle_preview) mantem o loop rodando (render+update) enquanto isto e true, so
+    // ENTAO trata como combat_over() de fato (mesmo padrao "ultimo frame" do BUG-2).
+    // false pra Victory/Fled (o gate abaixo so liga em CombatOutcome::Defeat) e false
+    // apos o timer esgotar. CONEXAO CANONICA (nao implementada aqui): esta mesma falinha
+    // e o SETUP do Dragon Victory no climax (ver project_dragon_victory_canon) - por isso
+    // fica LEVE/nao-dramatica de proposito, protegendo o payoff do climax.
+    [[nodiscard]] bool defeat_flavor_active() const noexcept;
+
     // O menu de verbos do ator ativo (leitura, pro render).
     [[nodiscard]] const BattleMenu& menu() const noexcept { return menu_; }
 
@@ -647,6 +666,13 @@ private:
     // true se o INIMIGO ativo ja fez sua acao neste turno (1 ataque/turno, D11). Resetado
     // a cada novo turno (start_active_turn) pra o proximo inimigo agir uma vez.
     bool enemy_acted_this_turn_ = false;
+
+    // FLAVOR DE DERROTA (M7-COSTURA Inc 3): segundos decorridos desde que outcome() virou
+    // Defeat. Envelhecido em update(dt) SO enquanto Defeat (Victory/Fled nunca tocam
+    // isto); trava em kDefeatFlavorSeconds (nao ultrapassa, sem no-op extra no caller).
+    // Nao serializado: existe so enquanto esta BattleScene vive (a Maestro reconstroi a
+    // cena do zero a cada batalha nova).
+    float defeat_flavor_elapsed_ = 0.0f;
     // true se o turno de inimigo corrente JA passou pelo BEAT 1 (anuncio, incremento 6).
     // false => o proximo advance_pacing ANUNCIA (sem resolver); true => RESOLVE. Limpa ao
     // resolver, ao cair num turno de jogador, e ao avancar de ator.

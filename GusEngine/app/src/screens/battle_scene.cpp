@@ -152,6 +152,35 @@ constexpr DrawColor kBannerPlayerColor{0.55f, 0.95f, 0.65f, 1.0f};  // sua vez (
 constexpr DrawColor kBannerEnemyColor{0.95f, 0.55f, 0.45f, 1.0f};   // vez do inimigo
 constexpr DrawColor kBannerIntroColor{0.98f, 0.92f, 0.45f, 1.0f};   // BATALHA! (ambar)
 
+// --- FLAVOR DE DERROTA (M7-COSTURA Inc 3, docs/design/mecanicas/combat-flavor.md §3b
+//     "Derrota"): o Gus reboota, nao morre (echo Batman, Pillar 1 "magia = software"). ---
+// Duracao do overlay: 5.0s (Fibonacci - canon do easter egg pervasivo do projeto,
+// project_fibonacci_easter_egg - nunca anunciado, so um numero da sequencia onde um
+// timing generico serviria igual). SO TIMER (sem input): anti-OE, nao e cutscene.
+constexpr float kDefeatFlavorSeconds = 5.0f;
+constexpr DrawColor kDefeatVeilColor{0.008f, 0.008f, 0.012f, 0.90f};  // veu quase-opaco
+constexpr float kDefeatRebootPx = 20.0f;  // "kernel panic" (literal, en fake-terminal)
+constexpr float kDefeatBarkPx = 14.0f;    // falinha blase do companion
+constexpr float kDefeatNotePx = 12.0f;    // nota-xadrez (explica o Gus-centric)
+
+// Pool do "reboot de sistema": strings TECNICAS LITERAIS, NAO traduziveis (mesma
+// convencao §4 do doc: o codigo de erro e autentico em qualquer locale - so o subtitulo
+// pro leigo, aqui a nota-xadrez, passa por tr()). Subconjunto de §3b "Derrota" que LE
+// como reboot/kill sistemico (nao erro de sintaxe de UMA carta, que e o acervo §3).
+constexpr std::array<std::string_view, 4> kDefeatRebootLines{
+    "Kernel panic - not syncing: Attempted to kill init",
+    "Killed (signal 9: SIGKILL)",
+    "No more processes left to schedule. System halted.",
+    "Process finished with exit code 137",
+};
+
+// Alterna deterministicamente por um "seed" estavel do encontro (tamanho do log de
+// combate ao fim da luta) - NAO consome IRandomSource do dominio (a UI nao sorteia nada
+// do motor); so da variedade sem RNG novo nem estado extra pra guardar/testar.
+std::string_view pick_defeat_reboot_line(std::size_t seed) noexcept {
+    return kDefeatRebootLines[seed % kDefeatRebootLines.size()];
+}
+
 // Cor de uma linha do log pela categoria (D7).
 DrawColor log_line_color(LogLineKind k) noexcept {
     switch (k) {
@@ -608,6 +637,15 @@ void BattleScene::update(float dt_seconds) {
     if (dt_seconds <= 0.0f) {
         return;
     }
+    // FLAVOR DE DERROTA (M7-COSTURA Inc 3): envelhece o overlay SO enquanto Defeat -
+    // Victory/Fled nunca avancam (defeat_flavor_active ja os exclui pela checagem de
+    // outcome). Trava em kDefeatFlavorSeconds (o if evita crescer pra sempre; nao muda
+    // o resultado de defeat_flavor_active apos travado).
+    if (machine_->outcome() == gus::domain::combat::CombatOutcome::Defeat &&
+        defeat_flavor_elapsed_ < kDefeatFlavorSeconds) {
+        defeat_flavor_elapsed_ += dt_seconds;
+    }
+
     // Anima os numeros flutuantes (envelhece + poda).
     for (Floater& f : floaters_) {
         f.age += dt_seconds;
@@ -817,6 +855,11 @@ bool BattleScene::current_actor_is_player() const noexcept {
 
 bool BattleScene::combat_over() const noexcept {
     return machine_->outcome() != gus::domain::combat::CombatOutcome::Ongoing;
+}
+
+bool BattleScene::defeat_flavor_active() const noexcept {
+    return machine_->outcome() == gus::domain::combat::CombatOutcome::Defeat &&
+           defeat_flavor_elapsed_ < kDefeatFlavorSeconds;
 }
 
 void BattleScene::start_active_turn() {
@@ -1995,6 +2038,54 @@ void BattleScene::render(IRenderer& renderer, float viewport_px_w,
         const float fy = f.origin_y + floater_offset_y(f.age);  // sobe
         const bool bold = f.channel == HitChannel::Crit;
         renderer.draw_text(f.text.c_str(), fx, fy, kFloaterTextPx, col, bold);
+    }
+
+    // --- FLAVOR DE DERROTA (M7-COSTURA Inc 3), POR CIMA de tudo (ultimo bloco) ---
+    // O Gus reboota, nao morre (Pillar 1 "magia = software"). 3 linhas centradas sobre um
+    // veu quase-opaco: (1) o "kernel panic" (literal tecnico do pool, NAO traduzido -
+    // mesma convencao §4 de combat-flavor.md); (2) a falinha blase de um companion vivo
+    // (tr(), ou a variante _GENERIC se ninguem sobrou pra falar - wipe-total tambem e
+    // Defeat, ver check_end); (3) a nota-xadrez explicando o Gus-centric ao jogador.
+    if (defeat_flavor_active()) {
+        const Rect full = battle_screen_rect();
+        renderer.draw_filled_rect(full, kDefeatVeilColor);
+
+        const float cx = full.x + full.w * 0.5f;
+        float ty = full.y + full.h * 0.5f - 40.0f;
+
+        const std::string_view reboot =
+            pick_defeat_reboot_line(machine_->log().size());
+        const float rw = gus::platform::render2d::text_width(reboot, kDefeatRebootPx);
+        renderer.draw_text(std::string(reboot).c_str(), cx - rw * 0.5f, ty,
+                           kDefeatRebootPx, kErr, /*bold=*/true);
+        ty += kDefeatRebootPx + 16.0f;
+
+        if (translator_ != nullptr) {
+            // (2) falinha blase: nomeia o 1o companion AINDA vivo (o Gus, caido pelo
+            // Gus-centric, nunca e ele mesmo aqui). Sem ninguem vivo (wipe-total), cai
+            // pra variante SEM nome (nao ha quem falar).
+            const CombatActor* speaker = first_alive_player();
+            std::string bark;
+            if (speaker != nullptr) {
+                bark = translator_->tr("COMBAT_DEFEAT_BARK");
+                const auto pos = bark.find("{0}");
+                if (pos != std::string::npos) {
+                    bark.replace(pos, 3, speaker->display_name());
+                }
+            } else {
+                bark = translator_->tr("COMBAT_DEFEAT_BARK_GENERIC");
+            }
+            const float bw = gus::platform::render2d::text_width(bark, kDefeatBarkPx);
+            renderer.draw_text(bark.c_str(), cx - bw * 0.5f, ty, kDefeatBarkPx, kInk,
+                               /*bold=*/false);
+            ty += kDefeatBarkPx + 12.0f;
+
+            // (3) nota-xadrez: "o Rei caiu, a partida acaba" - explica o Gus-centric.
+            const std::string note = translator_->tr("COMBAT_DEFEAT_CHESS_NOTE");
+            const float nw = gus::platform::render2d::text_width(note, kDefeatNotePx);
+            renderer.draw_text(note.c_str(), cx - nw * 0.5f, ty, kDefeatNotePx, kInkDim,
+                               /*bold=*/false);
+        }
     }
 
     renderer.end_frame();

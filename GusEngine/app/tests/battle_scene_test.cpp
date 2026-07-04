@@ -2246,6 +2246,222 @@ TEST_CASE("picker: e SO da party - o enemy-block assume sozinho (nunca abre esco
     REQUIRE(enemy_turns_seen >= 1);  // inimigos agiram (automatico), todos sem picker
 }
 
+// ---- FLAVOR DE DERROTA (M7-COSTURA Inc 3): overlay "reboot de sistema" --------------
+//
+// O Gus reboota, nao morre (Pillar 1 "magia = software"). Ao Defeat (Gus-centric, BUG-4),
+// a tela NAO some na hora: defeat_flavor_active() fica true por um tempo (kernel panic +
+// bark do companion + nota-xadrez, battle_scene.hpp/cpp) - so DEPOIS o host (battle_
+// preview) trata como combate encerrado de fato. Reusa o cenario JA PROVADO do BUG-5 (jogo
+// PASSIVO -> Defeat IMEDIATO pelo Gus-centric, companions Caua/Jaci ainda vivos).
+
+TEST_CASE("defeat flavor: ATIVO na hora que o Defeat acontece (Gus-centric, companions "
+          "vivos)",
+          "[battle_scene][defeat_flavor]") {
+    BattleScene scene;
+    int guard = 0;
+    while (!scene.combat_over() && guard++ < 400) {
+        pump_to_player_turn(scene);
+        if (scene.combat_over()) {
+            break;
+        }
+        if (scene.is_choosing_actor()) {
+            scene.actor_picker_confirm();  // atravessa o picker (§4.1), nao ataca
+        }
+        select_verb(scene, BattleVerb::Defender);
+        scene.menu_confirm();  // jogo PASSIVO (BUG-5): Defender sempre, nunca ataca
+    }
+    REQUIRE(scene.combat_over());
+    REQUIRE(scene.machine().outcome() == gus::domain::combat::CombatOutcome::Defeat);
+    // O overlay comeca ATIVO no exato frame em que o outcome vira Defeat (elapsed=0) -
+    // nao precisa de nenhum update(dt) extra pra "ligar".
+    REQUIRE(scene.defeat_flavor_active());
+}
+
+TEST_CASE("defeat flavor: o timer SO envelhece com Defeat e TRAVA (nao ultrapassa) - "
+          "apos esgotar, active vira false e nao religa",
+          "[battle_scene][defeat_flavor]") {
+    BattleScene scene;
+    int guard = 0;
+    while (!scene.combat_over() && guard++ < 400) {
+        pump_to_player_turn(scene);
+        if (scene.combat_over()) {
+            break;
+        }
+        if (scene.is_choosing_actor()) {
+            scene.actor_picker_confirm();
+        }
+        select_verb(scene, BattleVerb::Defender);
+        scene.menu_confirm();
+    }
+    REQUIRE(scene.machine().outcome() == gus::domain::combat::CombatOutcome::Defeat);
+    REQUIRE(scene.defeat_flavor_active());
+
+    scene.update(1.0f);  // bem menos que qualquer duracao sensata de overlay
+    REQUIRE(scene.defeat_flavor_active());
+
+    scene.update(20.0f);  // MUITO alem de qualquer duracao sensata - esgota o timer
+    REQUIRE_FALSE(scene.defeat_flavor_active());
+
+    // Uma vez esgotado, mais update() nao religa (trava, nao oscila).
+    scene.update(5.0f);
+    REQUIRE_FALSE(scene.defeat_flavor_active());
+}
+
+TEST_CASE("defeat flavor: Victory NUNCA ativa o overlay (o gate e por CombatOutcome::"
+          "Defeat)",
+          "[battle_scene][defeat_flavor]") {
+    BattleScene scene;
+    int guard = 0;
+    while (!scene.combat_over() && guard++ < 400) {
+        pump_to_player_turn(scene);
+        if (scene.combat_over()) {
+            break;
+        }
+        player_attack(scene);
+    }
+    REQUIRE(scene.machine().outcome() == gus::domain::combat::CombatOutcome::Victory);
+    REQUIRE_FALSE(scene.defeat_flavor_active());
+    scene.update(1.0f / 60.0f);
+    REQUIRE_FALSE(scene.defeat_flavor_active());
+}
+
+TEST_CASE("defeat flavor: render desenha o reboot (pool literal), a falinha do "
+          "companion VIVO (nome interpolado) e a nota-xadrez, SO enquanto active",
+          "[battle_scene][defeat_flavor]") {
+    BattleScene scene;
+    gus::app::i18n::Translator tr;
+    tr.load_from_content(
+        "## COMBAT_DEFEAT_BARK\n{0}: Opa. Reboot em 3, 2...\n\n"
+        "## COMBAT_DEFEAT_BARK_GENERIC\nReboot em 3, 2...\n\n"
+        "## COMBAT_DEFEAT_CHESS_NOTE\nNo xadrez, quando o rei cai, a partida acaba.\n");
+    scene.set_translator(&tr);
+
+    int guard = 0;
+    while (!scene.combat_over() && guard++ < 400) {
+        pump_to_player_turn(scene);
+        if (scene.combat_over()) {
+            break;
+        }
+        if (scene.is_choosing_actor()) {
+            scene.actor_picker_confirm();
+        }
+        select_verb(scene, BattleVerb::Defender);
+        scene.menu_confirm();
+    }
+    REQUIRE(scene.machine().outcome() == gus::domain::combat::CombatOutcome::Defeat);
+    REQUIRE(scene.defeat_flavor_active());
+
+    // O companion sobrevivente (Caua ou Jaci - o Gus-centric encerra ANTES do wipe-total,
+    // ver BUG-5) e quem "fala" a falinha - acha quem ainda esta vivo pra montar a
+    // expectativa do NOME interpolado.
+    std::string speaker_name;
+    for (const gus::domain::combat::CombatActor* a : scene.machine().queue().order()) {
+        if (a != nullptr && a->is_player_side() && a->is_alive()) {
+            speaker_name = a->display_name();
+            break;
+        }
+    }
+    REQUIRE_FALSE(speaker_name.empty());  // BUG-5: Caua/Jaci sobrevivem ao Gus cair
+
+    const std::vector<std::string> expected_reboot_lines{
+        "Kernel panic - not syncing: Attempted to kill init",
+        "Killed (signal 9: SIGKILL)",
+        "No more processes left to schedule. System halted.",
+        "Process finished with exit code 137",
+    };
+    const std::string expected_bark = speaker_name + ": Opa. Reboot em 3, 2...";
+    const std::string expected_note = "No xadrez, quando o rei cai, a partida acaba.";
+
+    CountingRenderer r;
+    scene.render(r, 1920.0f, 1080.0f);
+    bool found_reboot = false;
+    bool found_bark = false;
+    bool found_note = false;
+    for (const auto& t : r.texts) {
+        for (const auto& line : expected_reboot_lines) {
+            if (t.text == line) {
+                found_reboot = true;
+            }
+        }
+        if (t.text == expected_bark) {
+            found_bark = true;
+        }
+        if (t.text == expected_note) {
+            found_note = true;
+        }
+    }
+    REQUIRE(found_reboot);
+    REQUIRE(found_bark);
+    REQUIRE(found_note);
+
+    // Esgota o timer: o overlay some do render (as 3 linhas nao aparecem mais).
+    scene.update(20.0f);
+    REQUIRE_FALSE(scene.defeat_flavor_active());
+    CountingRenderer r2;
+    scene.render(r2, 1920.0f, 1080.0f);
+    bool still_has_note = false;
+    for (const auto& t : r2.texts) {
+        if (t.text == expected_note) {
+            still_has_note = true;
+        }
+    }
+    REQUIRE_FALSE(still_has_note);
+}
+
+TEST_CASE("defeat flavor: SEM companion vivo pra falar, a bark cai pra variante GENERIC "
+          "(sem nome interpolado)",
+          "[battle_scene][defeat_flavor]") {
+    BattleScene scene;
+    gus::app::i18n::Translator tr;
+    tr.load_from_content(
+        "## COMBAT_DEFEAT_BARK\n{0}: Opa. Reboot em 3, 2...\n\n"
+        "## COMBAT_DEFEAT_BARK_GENERIC\nReboot em 3, 2...\n\n"
+        "## COMBAT_DEFEAT_CHESS_NOTE\nNo xadrez, quando o rei cai, a partida acaba.\n");
+    scene.set_translator(&tr);
+
+    int guard = 0;
+    while (!scene.combat_over() && guard++ < 400) {
+        pump_to_player_turn(scene);
+        if (scene.combat_over()) {
+            break;
+        }
+        if (scene.is_choosing_actor()) {
+            scene.actor_picker_confirm();
+        }
+        select_verb(scene, BattleVerb::Defender);
+        scene.menu_confirm();
+    }
+    REQUIRE(scene.machine().outcome() == gus::domain::combat::CombatOutcome::Defeat);
+
+    // Cenario EXTRA (nao alcancavel pelo balanceamento atual do demo - BUG-5 documenta que
+    // o Gus-centric SEMPRE encerra ANTES do wipe-total): forca os companions restantes a
+    // 0 HP DEPOIS do combate ja ter acabado (seguro - nada mais chama check_end aqui), so
+    // pra exercitar o fallback SEM falante do render.
+    for (gus::domain::combat::CombatActor* a : scene.machine().queue().order()) {
+        if (a != nullptr && a->is_player_side() && a->is_alive()) {
+            a->take_damage(9999);
+        }
+    }
+    bool anyone_alive = false;
+    for (const gus::domain::combat::CombatActor* a : scene.machine().queue().order()) {
+        if (a != nullptr && a->is_player_side() && a->is_alive()) {
+            anyone_alive = true;
+        }
+    }
+    REQUIRE_FALSE(anyone_alive);
+    REQUIRE(scene.defeat_flavor_active());  // outcome ja era Defeat; o timer segue intacto
+
+    CountingRenderer r;
+    scene.render(r, 1920.0f, 1080.0f);
+    bool found_generic = false;
+    for (const auto& t : r.texts) {
+        if (t.text == "Reboot em 3, 2...") {
+            found_generic = true;
+        }
+    }
+    REQUIRE(found_generic);
+}
+
 // ---- W2: ANIMACAO DE COMBATE na cena (battle-anim.md par.2/3) -----------------------
 //
 // A base funcional: melee desloca-golpeia-volta (par.2.2), hit-react do alvo (par.2.3),

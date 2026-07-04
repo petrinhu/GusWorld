@@ -203,6 +203,15 @@ Vitória.
 ## COMBAT_DEFEAT
 Derrota.
 
+## COMBAT_DEFEAT_BARK
+{0}: Opa. Reboot em 3, 2...
+
+## COMBAT_DEFEAT_BARK_GENERIC
+Reboot em 3, 2...
+
+## COMBAT_DEFEAT_CHESS_NOTE
+No xadrez, quando o rei cai, a partida acaba.
+
 ## COMBAT_FLEE
 Fugir
 

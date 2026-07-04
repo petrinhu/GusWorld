@@ -12,8 +12,9 @@
 //   - colisao jogador<->inimigo dispara a troca cidade->batalha.
 //   - Victory marca o inimigo derrotado (some do mapa); Defeat/Fled/Ongoing (janela
 //     fechada no meio) NAO marcam - o inimigo continua la, o jogador tenta de novo. O
-//     FLAVOR da derrota (reboot/bark/tela-xadrez, Incremento 3) fica pra depois; aqui e
-//     so o roteamento binario "o inimigo some ou nao".
+//     FLAVOR da derrota (reboot/bark/tela-xadrez, M7-COSTURA Inc 3, FECHADO) vive na
+//     BattleScene/battle_preview (gus/app/screens/battle_scene.hpp::defeat_flavor_active)
+//     - AQUI e so o roteamento binario "o inimigo some ou nao", que nunca mudou.
 
 #ifndef GUS_APP_MAESTRO_LOGIC_HPP
 #define GUS_APP_MAESTRO_LOGIC_HPP

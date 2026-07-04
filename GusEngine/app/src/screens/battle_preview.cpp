@@ -2127,7 +2127,16 @@ int run_battle_preview_embedded(SDL_Window* window,
             // novo - nao corta o quadro final no meio. NAO interfere nos self-tests
             // acima: todos eles usam scripts que param de propósito ANTES de
             // scene.combat_over() virar true (`for (...&& !scene.combat_over()...)`).
-            if (scene.combat_over()) {
+            //
+            // M7-COSTURA Inc 3 (flavor da derrota): com Defeat, `defeat_flavor_active()`
+            // segura este `running=false` por kDefeatFlavorSeconds (battle_scene.cpp) -
+            // o loop CONTINUA rodando (scene.update/render acima ja envelhecem e desenham
+            // o overlay "reboot" sozinhos, nao precisa de nada extra aqui) ate o timer
+            // esgotar; SO ENTAO trata como combat_over() de fato e sai (mesmo choke-point
+            // de saida/fade-out da Maestro, agora um pouco mais tarde). Victory/Fled nunca
+            // ativam defeat_flavor_active (gate por CombatOutcome::Defeat em si), entao
+            // saem IMEDIATOS como sempre - comportamento inalterado pros dois outcomes.
+            if (scene.combat_over() && !scene.defeat_flavor_active()) {
                 running = false;
             }
 

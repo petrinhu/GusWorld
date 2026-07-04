@@ -18,8 +18,14 @@
 // mapa; colisao dispara a batalha; Victory some o inimigo (flag em memoria); Defeat/Fled
 // voltam pra cidade com o inimigo intacto (pode tentar de novo). NAO incluiu (pago no
 // Incremento 2, ver abaixo): fade preto + crossfade de musica (era corte seco); a posse
-// do AudioEngine subindo pra ca. Incremento 3 (ainda pendente): o flavor da derrota
-// (reboot/bark/tela-xadrez) e a regra Gus-centric de fim de combate.
+// do AudioEngine subindo pra ca. A regra GUS-CENTRIC de fim de combate (o Rei cai = fim
+// IMEDIATO, mesmo com companions vivos) ja vivia no motor desde o BUG-4 (ver
+// combat_state_machine.cpp::check_end). Incremento 3 (M7-COSTURA, FECHADO): o FLAVOR da
+// derrota - overlay "reboot de sistema" (kernel panic + bark do companion + nota-xadrez,
+// ver gus/app/screens/battle_scene.hpp::defeat_flavor_active) que segura a tela por um
+// tempo ANTES do corte de volta pra cidade (a Maestro so ve o combate como encerrado
+// quando battle_preview::run_battle_preview_embedded devolve, o que agora espera o
+// overlay - ver o comentario do FIX BUG-2 em battle_preview.cpp).
 //
 // ESCOPO DO INCREMENTO 2 (M7-COSTURA, ADR-012 decisao 5 + paga a divida do ADR-011
 // "AudioEngine e dono da battle_preview"): a Maestro agora e DONA de 1 unica instancia
