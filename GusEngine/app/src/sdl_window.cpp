@@ -226,6 +226,21 @@ bool SdlWindow::step_with_fade(float overlay_alpha,
     if (render2d_ != nullptr && renderer_ != nullptr) {
         int pw = kWindowW, ph = kWindowH;
         SDL_GetCurrentRenderOutputSize(renderer_, &pw, &ph);
+        // DUNGEON-SCALING (fix do letterbox ao maximizar, achado do lider ao vivo
+        // 2026-07-03): o ZOOM (quanto mundo a camera mostra) fica FIXO no viewport
+        // LOGICO de referencia (kWindowW x kWindowH - a resolucao onde
+        // camera_zoom_px_per_tile foi calibrado, ver overworld_tuning.hpp); pw/ph REAIS
+        // (que crescem ao maximizar) so entram como o TAMANHO DE TELA pra onde esse
+        // enquadramento e esticado (render()/screen_px_w-h, novo). Antes, pw/ph reais
+        // alimentavam TAMBEM o zoom: maximizar pedia mais MUNDO (nao mais TELA); quando
+        // a visao pedida ficava maior que o mapa (60x40 unidades), clamp_camera nao
+        // tinha pra onde rolar e a area alem do mapa ficava sem tile nenhum - o clear
+        // color escuro aparecendo como as "margens pretas" relatadas (nao era um
+        // letterbox de fato, SDL_SetRenderLogicalPresentation nunca era chamado). Agora
+        // a cidade estica pro tamanho real da janela, mesma tecnica da batalha
+        // (Render2dGl3: camera fixa 960x540 D1 mapeada pros pixels reais).
+        const float kLogicalViewportW = static_cast<float>(kWindowW);
+        const float kLogicalViewportH = static_cast<float>(kWindowH);
         // M7-COSTURA Inc 2: overlay_alpha>0 adia o present (mesmo mecanismo do HUD
         // RmlUi, ADR-009) pra desenhar o retangulo preto DEPOIS da cena e ANTES do
         // swap. overlay_alpha<=0 nao mexe em defer_present - BYTE-IDENTICO ao step()
@@ -234,12 +249,17 @@ bool SdlWindow::step_with_fade(float overlay_alpha,
         if (has_overlay) {
             render2d_->set_defer_present(true);
         }
-        sim_->render(*render2d_, static_cast<float>(pw), static_cast<float>(ph),
-                     static_cast<float>(steps.alpha));
+        sim_->render(*render2d_, kLogicalViewportW, kLogicalViewportH,
+                     static_cast<float>(steps.alpha), static_cast<float>(pw),
+                     static_cast<float>(ph));
         if (has_overlay) {
             const float clamped = overlay_alpha > 1.0f ? 1.0f : overlay_alpha;
+            // camera_view() so devolve o RETANGULO DE MUNDO (nao mexe em pixel de
+            // tela) - precisa da MESMA dupla (kLogicalViewportW/H) que render() usou
+            // pro zoom, senao o overlay full-screen do boot pixelizado desalinharia do
+            // enquadramento que a cena acabou de desenhar.
             const gus::core::spatial::CameraView cam =
-                sim_->camera_view(static_cast<float>(pw), static_cast<float>(ph));
+                sim_->camera_view(kLogicalViewportW, kLogicalViewportH);
             // M7-COSTURA Inc 2c: sequencia de frames pre-renderizada (boot
             // pixelizado) no lugar do glitch procedural (aposentado - o lider VETOU
             // o visual ao vivo, "pareceu bug"). A CIDADE so toca 2 das 4 pernas da

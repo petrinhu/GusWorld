@@ -155,8 +155,21 @@ public:
     // visiveis (preenchidas) e o jogador (interpolado por alpha em [0,1] entre a
     // posicao anterior e a atual), fecha. viewport_px_w/h em PIXELS de tela (o zoom
     // do tuning os converte pra unidades de mundo da visao).
+    //
+    // DUNGEON-SCALING (fix do letterbox ao maximizar): screen_px_w/h (NOVO, opcional)
+    // e o tamanho REAL da tela pra onde o retangulo de camera e mapeado (begin_frame) -
+    // DESACOPLADO de viewport_px_w/h (que so alimenta o ZOOM/quanto-mundo-mostra).
+    // Default (<=0, sentinela) = usa viewport_px_w/h pros dois papeis, o comportamento
+    // LEGADO byte-identico (TODOS os testes/chamadores existentes, que passam so 1
+    // tamanho de viewport, continuam identicos). O caller de producao (SdlWindow)
+    // passa um viewport LOGICO FIXO (kWindowW/kWindowH, a resolucao onde o zoom foi
+    // calibrado, ver overworld_tuning.hpp) + o screen_px_w/h REAL da janela (que cresce
+    // ao maximizar) - a camera nunca revela MAIS mundo (nao esbarra no limite do mapa e
+    // sobra preto), so ESTICA o mesmo enquadramento pro tamanho real da tela, igual a
+    // tela de batalha (Render2dGl3, camera fixa 960x540 D1 esticada pra janela).
     void render(gus::platform::render2d::IRenderer& renderer, float viewport_px_w,
-                float viewport_px_h, float alpha) const;
+                float viewport_px_h, float alpha, float screen_px_w = -1.0f,
+                float screen_px_h = -1.0f) const;
 
     // Fator de conversao do zoom: PIXELS de tela por UNIDADE de mundo (=
     // camera_zoom_px_per_tile / tile_size do mapa). Leitura/teste. Guarda tile_size<=0.

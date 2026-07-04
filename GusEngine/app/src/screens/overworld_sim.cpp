@@ -232,8 +232,8 @@ gus::core::spatial::Aabb OverworldSim::interpolated_player(float alpha) const no
 }
 
 void OverworldSim::render(gus::platform::render2d::IRenderer& renderer,
-                          float viewport_px_w, float viewport_px_h,
-                          float alpha) const {
+                          float viewport_px_w, float viewport_px_h, float alpha,
+                          float screen_px_w, float screen_px_h) const {
     // Camera centrada no jogador INTERPOLADO (camera segue suave junto do boneco).
     const gus::core::spatial::Aabb shown = interpolated_player(alpha);
     const float map_w = static_cast<float>(grid_.width()) * grid_.tile_size();
@@ -251,8 +251,13 @@ void OverworldSim::render(gus::platform::render2d::IRenderer& renderer,
     const gus::core::spatial::CameraView view = gus::core::spatial::clamp_camera(
         cam_center, world_w, world_h, map_w, map_h);
 
-    renderer.begin_frame(view.rect, static_cast<int>(viewport_px_w),
-                         static_cast<int>(viewport_px_h));
+    // DUNGEON-SCALING: screen_px_w/h (se>0) e o tamanho REAL da janela - o retangulo de
+    // camera (calculado acima a partir de viewport_px_w/h, o zoom LOGICO) e mapeado pra
+    // ele em vez de pra viewport_px_w/h. Sentinela <=0 (default) preserva o legado
+    // (screen == viewport, o MESMO tamanho pros dois papeis).
+    const float out_w = screen_px_w > 0.0f ? screen_px_w : viewport_px_w;
+    const float out_h = screen_px_h > 0.0f ? screen_px_h : viewport_px_h;
+    renderer.begin_frame(view.rect, static_cast<int>(out_w), static_cast<int>(out_h));
 
     // TILES: so as celulas que intersectam a janela da camera (culling simples; a
     // camera ja clampa). Duas vias:

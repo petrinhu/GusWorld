@@ -237,6 +237,52 @@ TEST_CASE("overworld: render emite paredes e jogador", "[overworld]") {
     REQUIRE(r.player_cmd() != nullptr);
 }
 
+// DUNGEON-SCALING (PI8, fix do letterbox ao maximizar): sem os 2 parametros novos
+// (screen_px_w/h), begin_frame recebe o MESMO tamanho passado como viewport - o
+// comportamento LEGADO, byte-identico ao caso acima (sentinela -1.0f).
+TEST_CASE("overworld: render sem screen_px usa viewport_px pro begin_frame (legado)",
+         "[overworld][dungeon-scaling]") {
+    TileGrid g = make_map();
+    OverworldSim sim(g, Aabb{36.0f, 36.0f, 8.0f, 8.0f}, tuning_no_zoom_for_tile16());
+    FakeRenderer r;
+    sim.render(r, 80.0f, 80.0f, 0.0f);
+    REQUIRE(r.last_px == 80);
+    REQUIRE(r.last_py == 80);
+}
+
+// DUNGEON-SCALING: com screen_px_w/h informados (a JANELA REAL, maximizada), o
+// ENQUADRAMENTO da camera continua vindo de viewport_px_w/h (o zoom LOGICO, fixo -
+// nao muda so porque a janela cresceu), mas begin_frame recebe o tamanho de TELA
+// REAL - e o retangulo de camera (mundo) e ESTICADO pra ele, nunca sobra mundo alem
+// do mapa (o "letterbox" reportado pelo lider: antes, screen==viewport pedia MAIS
+// MUNDO ao maximizar, esbarrava no limite do mapa 80x80 e a area alem do mapa ficava
+// sem tile - a cor de fundo aparecendo como margem preta).
+TEST_CASE("overworld: render com screen_px maior estica o MESMO enquadramento (nao revela mais mundo)",
+         "[overworld][dungeon-scaling]") {
+    TileGrid g = make_map();  // mapa 80x80 unidades (tile_size 16, 5x5 celulas)
+    OverworldSim sim(g, Aabb{36.0f, 36.0f, 8.0f, 8.0f}, tuning_no_zoom_for_tile16());
+
+    FakeRenderer window_size;
+    sim.render(window_size, 80.0f, 80.0f, 0.0f);  // viewport == screen (default janela)
+    const Rect logical_camera = window_size.last_camera;
+
+    FakeRenderer maximized;
+    // JANELA MAXIMIZADA pra 3x o tamanho (240x240 px reais) - viewport LOGICO
+    // (80x80, o mesmo de sempre) continua ditando o ZOOM/enquadramento.
+    sim.render(maximized, 80.0f, 80.0f, 0.0f, /*screen_px_w=*/240.0f,
+              /*screen_px_h=*/240.0f);
+
+    // begin_frame recebeu o tamanho de TELA REAL (esticar), nao o viewport logico.
+    REQUIRE(maximized.last_px == 240);
+    REQUIRE(maximized.last_py == 240);
+    // O retangulo de MUNDO da camera e IDENTICO ao da janela default - a camera NAO
+    // revelou mais mundo so porque a tela cresceu (o bug antigo).
+    REQUIRE_THAT(maximized.last_camera.x, WithinAbs(logical_camera.x, kEps));
+    REQUIRE_THAT(maximized.last_camera.y, WithinAbs(logical_camera.y, kEps));
+    REQUIRE_THAT(maximized.last_camera.w, WithinAbs(logical_camera.w, kEps));
+    REQUIRE_THAT(maximized.last_camera.h, WithinAbs(logical_camera.h, kEps));
+}
+
 // MARCADOR DE INIMIGO FIXO (M7-COSTURA Inc 2): o placeholder do androide (a MESMA
 // textura da tela de batalha) desenhado por cima do mapa, na MESMA escala/ancoragem do
 // Gus (player_sprite_height_tiles) - o lider precisa VER o inimigo pra esbarrar nele de
