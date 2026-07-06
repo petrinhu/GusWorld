@@ -13,7 +13,7 @@
 #include "gus/app/screens/anim_catalog.hpp"  // resolve_gus_sprites_dir
 #include "gus/app/screens/city_loader.hpp"   // load_city_or_fallback
 #include "gus/app/screens/player_sprites_loader.hpp"
-#include "gus/core/asset_paths.hpp"  // kRetratosDir/kRetratoInimigoFile (marcador do inimigo)
+#include "gus/core/asset_paths.hpp"  // kRetratosDir/kRetratoInimigoFile (marcador do inimigo); kBertoldoSpritesDir/kBertoldoSpriteSouthFile (marcador do Bertoldo)
 
 // Raiz resources/ do repo, embutida pelo CMake (mesma macro que anim_catalog.cpp/
 // battle_preview.cpp resolvem - PRIVATE no CMakeLists do target app, ver GusEngine/app/
@@ -165,6 +165,33 @@ void SdlWindow::clear_enemy_marker() {
     sim_->clear_enemy_marker();
 }
 
+void SdlWindow::load_npc_bertoldo_marker_texture() {
+    if (!npc_bertoldo_marker_aabb_.has_value()) {
+        return;  // nenhum marcador definido ainda (uso standalone/sem Maestro)
+    }
+    const std::string path = join_asset_path(
+        resolve_assets_subdir_local(gus::core::assets::kBertoldoSpritesDir),
+        std::string(gus::core::assets::kBertoldoSpriteSouthFile));
+    npc_bertoldo_marker_tex_ = render2d_->load_texture(path.c_str());
+    if (npc_bertoldo_marker_tex_ != gus::platform::render2d::kInvalidTexture) {
+        sim_->set_npc_bertoldo_marker(*npc_bertoldo_marker_aabb_,
+                                      npc_bertoldo_marker_tex_);
+    } else {
+        // Asset ausente/headless: degrada sem deixar um TextureId obsoleto no sim_.
+        sim_->clear_npc_bertoldo_marker();
+    }
+}
+
+void SdlWindow::set_npc_bertoldo_marker(const gus::core::spatial::Aabb& aabb) {
+    npc_bertoldo_marker_aabb_ = aabb;
+    load_npc_bertoldo_marker_texture();
+}
+
+void SdlWindow::clear_npc_bertoldo_marker() {
+    npc_bertoldo_marker_aabb_.reset();
+    sim_->clear_npc_bertoldo_marker();
+}
+
 void SdlWindow::release_renderer() {
     render2d_.reset();
     if (renderer_ != nullptr) {
@@ -187,6 +214,9 @@ bool SdlWindow::reacquire_renderer() {
     // Idem pro marcador de inimigo (M7-COSTURA Inc 2): so recarrega se ja havia um
     // definido (no-op seguro se enemy_marker_aabb_ nunca foi setada).
     load_enemy_marker_texture();
+    // Idem pro marcador do Bertoldo (M7-DIALOGO, integracao do sprite): mesmo
+    // racional, no-op seguro se npc_bertoldo_marker_aabb_ nunca foi setada.
+    load_npc_bertoldo_marker_texture();
     // Idem pro boot pixelizado (M7-COSTURA Inc 2c): os 20 TextureId antigos tambem
     // nao sobrevivem a troca de SDL_Renderer.
     load_boot_pixel_frames();

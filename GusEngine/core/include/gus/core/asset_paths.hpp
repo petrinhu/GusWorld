@@ -68,6 +68,15 @@ inline constexpr std::string_view kDanteSpritesDir = "sprites/dante_grid";
 inline constexpr std::string_view kLindaSpritesDir = "sprites/linda_siren";
 inline constexpr std::string_view kIaraSpritesDir = "sprites/iara_lumen";
 
+// --- NPC fixo (M7-DIALOGO, NPC-MVP): Seu Bertoldo Caim ---
+// Sprite ESTATICO (parado, sem locomocao) do NPC introdutorio (F2-N.1). As 4
+// direcoes (south/east/north/west.png, 180x180) existem no disco, mas o overworld
+// SO consome "south" (a pose de frente pro jogador/camera) - o Bertoldo nao anda,
+// nao precisa de walk/idle nem das outras 3 direcoes nesta onda. Em
+// resources/sprites/seu_bertoldo_caim/.
+inline constexpr std::string_view kBertoldoSpritesDir = "sprites/seu_bertoldo_caim";
+inline constexpr std::string_view kBertoldoSpriteSouthFile = "south.png";
+
 // ============================================================================
 // ICONES DA TELA DE BATALHA (sob resources/sprites/icons-m5/). NAO mudou na reorg.
 // ============================================================================

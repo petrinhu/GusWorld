@@ -333,6 +333,85 @@ TEST_CASE("overworld: sem marcador (default), textura invalida ou apos clear -> 
     REQUIRE(r2.sprites.empty());
 }
 
+// MARCADOR DO NPC BERTOLDO (M7-DIALOGO, NPC-MVP - integracao do sprite): o sprite
+// ESTATICO do Seu Bertoldo Caim (south.png) desenhado por cima do mapa, na MESMA
+// escala/ancoragem "busto simples" do marcador de inimigo (slot PROPRIO, distinto do
+// enemy_marker_* - nao compartilha textura/posicao). Ver overworld_sim.hpp/
+// set_npc_bertoldo_marker.
+TEST_CASE("overworld: marcador do NPC Bertoldo desenha na posicao/escala certas",
+         "[overworld][npc-bertoldo-marker]") {
+    TileGrid g = make_map();
+    OverworldSim sim(g, Aabb{16.0f, 16.0f, 8.0f, 8.0f}, tuning_no_zoom_for_tile16());
+    const Aabb bertoldo{48.0f, 16.0f, 8.0f, 8.0f};
+    sim.set_npc_bertoldo_marker(bertoldo, /*tex=*/7);
+    REQUIRE(sim.has_npc_bertoldo_marker());
+
+    FakeRenderer r;
+    sim.render(r, 80.0f, 80.0f, 0.0f);
+    // So o marcador (o jogador, sem set_player_sprites, cai no contorno).
+    REQUIRE(r.sprites.size() == 1);
+    REQUIRE(r.sprites[0].texture == 7);
+    // Tamanho = MESMA escala do sprite do Gus (player_sprite_height_tiles * tile_size).
+    const float expected_h = OverworldTuning{}.player_sprite_height_tiles * 16.0f;
+    REQUIRE_THAT(r.sprites[0].rect.w, WithinAbs(expected_h, kEps));
+    REQUIRE_THAT(r.sprites[0].rect.h, WithinAbs(expected_h, kEps));
+    // Centrado em X sobre a AABB do Bertoldo.
+    REQUIRE_THAT(r.sprites[0].rect.x + r.sprites[0].rect.w * 0.5f,
+                WithinAbs(bertoldo.x + bertoldo.w * 0.5f, kEps));
+    // Base do quad == base da AABB (bottom_fraction 0, sem foot-inset: NPC parado).
+    REQUIRE_THAT(r.sprites[0].rect.y + r.sprites[0].rect.h,
+                WithinAbs(bertoldo.y + bertoldo.h, kEps));
+}
+
+TEST_CASE("overworld: sem marcador do Bertoldo (default), textura invalida ou apos "
+         "clear -> nada desenhado",
+         "[overworld][npc-bertoldo-marker]") {
+    TileGrid g = make_map();
+    OverworldSim sim(g, Aabb{16.0f, 16.0f, 8.0f, 8.0f}, tuning_no_zoom_for_tile16());
+    REQUIRE_FALSE(sim.has_npc_bertoldo_marker());  // default: nenhum marcador
+
+    sim.set_npc_bertoldo_marker(Aabb{48.0f, 16.0f, 8.0f, 8.0f}, kInvalidTexture);
+    REQUIRE_FALSE(sim.has_npc_bertoldo_marker());  // textura invalida nao conta
+    FakeRenderer r1;
+    sim.render(r1, 80.0f, 80.0f, 0.0f);
+    REQUIRE(r1.sprites.empty());
+
+    sim.set_npc_bertoldo_marker(Aabb{48.0f, 16.0f, 8.0f, 8.0f}, /*tex=*/9);
+    REQUIRE(sim.has_npc_bertoldo_marker());
+    sim.clear_npc_bertoldo_marker();
+    REQUIRE_FALSE(sim.has_npc_bertoldo_marker());
+    FakeRenderer r2;
+    sim.render(r2, 80.0f, 80.0f, 0.0f);
+    REQUIRE(r2.sprites.empty());
+}
+
+// Os DOIS marcadores (inimigo + Bertoldo) sao slots INDEPENDENTES: ambos ativos ao
+// mesmo tempo desenham 2 sprites distintos, sem um pisar no estado do outro.
+TEST_CASE("overworld: marcador de inimigo e do Bertoldo coexistem sem se pisarem",
+         "[overworld][npc-bertoldo-marker][enemy-marker]") {
+    TileGrid g = make_map();
+    OverworldSim sim(g, Aabb{16.0f, 16.0f, 8.0f, 8.0f}, tuning_no_zoom_for_tile16());
+    sim.set_enemy_marker(Aabb{40.0f, 16.0f, 8.0f, 8.0f}, /*tex=*/3);
+    sim.set_npc_bertoldo_marker(Aabb{48.0f, 40.0f, 8.0f, 8.0f}, /*tex=*/7);
+    REQUIRE(sim.has_enemy_marker());
+    REQUIRE(sim.has_npc_bertoldo_marker());
+
+    FakeRenderer r;
+    sim.render(r, 80.0f, 80.0f, 0.0f);
+    REQUIRE(r.sprites.size() == 2);
+    REQUIRE(r.sprites[0].texture == 3);  // inimigo desenhado primeiro
+    REQUIRE(r.sprites[1].texture == 7);  // Bertoldo em seguida
+
+    // clear_enemy_marker nao afeta o marcador do Bertoldo.
+    sim.clear_enemy_marker();
+    REQUIRE_FALSE(sim.has_enemy_marker());
+    REQUIRE(sim.has_npc_bertoldo_marker());
+    FakeRenderer r2;
+    sim.render(r2, 80.0f, 80.0f, 0.0f);
+    REQUIRE(r2.sprites.size() == 1);
+    REQUIRE(r2.sprites[0].texture == 7);
+}
+
 TEST_CASE("overworld: render interpola posicao do jogador", "[overworld]") {
     TileGrid g = make_map();
     OverworldSim sim(g, Aabb{16.0f, 16.0f, 8.0f, 8.0f}, 60.0f);

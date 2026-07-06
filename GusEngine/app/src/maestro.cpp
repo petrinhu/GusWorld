@@ -180,20 +180,22 @@ bool Maestro::init() {
               << city_->player_aabb().y << ").\n";
 
     // M7-DIALOGO (NPC-MVP): MESMA tecnica de posicionamento do inimigo acima (offset
-    // diferente - ver kNpcBertoldoOffsetTilesX/Y), so que o Bertoldo NAO tem marcador
-    // visual nesta onda (o slot de marcador do SdlWindow/OverworldSim e dedicado ao
-    // inimigo - ver enemy_marker_aabb_ - reusa-lo pintaria o Bertoldo com o MESMO
-    // sprite de android hostil, sinal narrativo errado para um NPC amigavel; a arte
-    // do Bertoldo fica para a onda de arte/3d-artist-rigger). A hitbox INVISIVEL ja
-    // e suficiente pra provar o ciclo de dialogo (criterio de saida do M7-DIALOGO).
+    // diferente - ver kNpcBertoldoOffsetTilesX/Y). O Bertoldo agora TEM sprite
+    // proprio (south.png - a pose de frente pro jogador/camera; NPC parado, sem
+    // walk/4-direcoes) num slot de marcador PROPRIO no SdlWindow/OverworldSim
+    // (set_npc_bertoldo_marker, distinto de enemy_marker_* - nao reusa o placeholder
+    // do androide, entao nao ha mais confusao "inimigo vs NPC amigavel"). Sem isto a
+    // hitbox continuava disparando o dialogo "as cegas" (nada pro lider ver antes de
+    // esbarrar).
     const gus::core::spatial::Aabb npc_anchor = pick_fixed_enemy_position(
         city_->grid(), city_->player_aabb(), kNpcBertoldoOffsetTilesX,
         kNpcBertoldoOffsetTilesY);
     npc_bertoldo_aabb_ = enemy_sprite_footprint_aabb(
         npc_anchor, city_->tuning().player_sprite_height_tiles,
         city_->grid().tile_size());
+    city_->set_npc_bertoldo_marker(npc_bertoldo_aabb_);
     std::cout << "Maestro: [dialogo] Bertoldo (NPC-MVP) em (" << npc_bertoldo_aabb_.x
-              << ", " << npc_bertoldo_aabb_.y << ") - SEM marcador visual nesta onda.\n";
+              << ", " << npc_bertoldo_aabb_.y << ").\n";
 
     // Carrega o grafo de dialogo do Bertoldo (.dlg.txt real, I/O na fronteira app/ -
     // ver gus/app/dialogue/npc_dialogue_catalog.hpp). O parser e FAIL-FAST por design

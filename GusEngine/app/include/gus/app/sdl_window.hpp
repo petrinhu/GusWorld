@@ -138,6 +138,21 @@ public:
     // mapa"). No-op se nao havia marcador.
     void clear_enemy_marker();
 
+    // M7-DIALOGO (NPC-MVP, integracao do sprite): define/reposiciona o marcador
+    // visual do Bertoldo em `aabb` - carrega (ou recarrega) a textura ESTATICA
+    // south.png (kBertoldoSpritesDir/kBertoldoSpriteSouthFile, a pose "de frente pro
+    // jogador/camera" - o NPC nao anda, so essa 1 direcao e usada) no renderer_
+    // CORRENTE e a entrega ao OverworldSim (mesmo padrao de set_enemy_marker acima,
+    // slot PROPRIO no sim_ - ver OverworldSim::set_npc_bertoldo_marker). A Maestro
+    // chama isto apos calcular a posicao logica do Bertoldo. Asset ausente/headless
+    // => nada e desenhado (degradacao segura, mesmo racional do marcador de inimigo).
+    void set_npc_bertoldo_marker(const gus::core::spatial::Aabb& aabb);
+
+    // Some com o marcador do Bertoldo. No-op se nao havia marcador (paridade com
+    // clear_enemy_marker acima; sem uso previsto hoje - o Bertoldo nunca "derrota" -
+    // mas mantido por simetria/futuro-proofing barato).
+    void clear_npc_bertoldo_marker();
+
     // M7-DIALOGO (NPC-MVP): desenha 1 frame ESTATICO da cidade (NAO avanca
     // step_fixed - o jogador fica PARADO durante o dialogo, mesma alpha=1.0 sempre,
     // sem interpolar) com um overlay funcional SIMPLES de texto (caixa semi-opaca +
@@ -174,6 +189,14 @@ private:
     // NAO sobrevivem a troca de SDL_Renderer, mesmo racional do Gus).
     void load_enemy_marker_texture();
 
+    // (Re)carrega a textura ESTATICA do marcador do Bertoldo (south.png) no renderer_
+    // CORRENTE e a reaplica ao sim_ (ver set_npc_bertoldo_marker no header publico).
+    // No-op se npc_bertoldo_marker_aabb_ ainda nao foi definida. Chamado por
+    // set_npc_bertoldo_marker() e por reacquire_renderer() (mesmo racional de
+    // load_enemy_marker_texture acima - os TextureId nao sobrevivem a troca de
+    // SDL_Renderer).
+    void load_npc_bertoldo_marker_texture();
+
     // Carrega os 20 frames do boot pixelizado (BootPixelOverlay, M7-COSTURA Inc 2c) no
     // renderer_ CORRENTE. Chamado por init()/init_attached() (1a carga) e por
     // reacquire_renderer() (os TextureId antigos nao sobrevivem a troca de
@@ -198,6 +221,14 @@ private:
     // ainda (uso standalone/sem Maestro).
     std::optional<gus::core::spatial::Aabb> enemy_marker_aabb_{};
     gus::platform::render2d::TextureId enemy_marker_tex_ =
+        gus::platform::render2d::kInvalidTexture;
+
+    // MARCADOR DO NPC BERTOLDO (M7-DIALOGO, NPC-MVP): AABB logica (dada pela
+    // Maestro) + TextureId cacheado (local ao renderer_ vivo). nullopt = nenhum
+    // marcador definido ainda (uso standalone/sem Maestro). Slot PROPRIO, distinto
+    // do marcador de inimigo acima.
+    std::optional<gus::core::spatial::Aabb> npc_bertoldo_marker_aabb_{};
+    gus::platform::render2d::TextureId npc_bertoldo_marker_tex_ =
         gus::platform::render2d::kInvalidTexture;
 
     // M7-COSTURA Inc 2c: sequencia de frames do boot pixelizado (substitui o glitch

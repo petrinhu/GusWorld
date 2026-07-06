@@ -225,6 +225,35 @@ public:
                enemy_marker_tex_ != gus::platform::render2d::kInvalidTexture;
     }
 
+    // MARCADOR DO NPC BERTOLDO (M7-DIALOGO, NPC-MVP): posiciona/reposiciona o sprite
+    // ESTATICO do Seu Bertoldo Caim (south.png, sem locomocao/direcao dinamica) no
+    // mapa. Slot PROPRIO (`npc_bertoldo_marker_*`, NAO compartilha AABB/textura com
+    // enemy_marker_* acima) - o Bertoldo e um NPC amigavel, sprite distinto do
+    // androide-inimigo (mesmo motivo do comentario original da Maestro sobre nao
+    // reusar o marcador do inimigo). MESMA escala/ancoragem "busto simples" do
+    // marcador de inimigo (quad quadrado centrado em X, base do quad = base da AABB,
+    // SEM foot-inset medido - o NPC nao anda, nao precisa da ancoragem-por-pes do
+    // jogador). `tex` ja resolvido pela casca SDL (mesmo padrao de set_enemy_marker).
+    void set_npc_bertoldo_marker(const gus::core::spatial::Aabb& aabb,
+                                 gus::platform::render2d::TextureId tex) noexcept {
+        npc_bertoldo_marker_aabb_ = aabb;
+        npc_bertoldo_marker_tex_ = tex;
+    }
+
+    // Some com o marcador (asset ausente/headless degrada com seguranca). No-op se
+    // nao havia marcador.
+    void clear_npc_bertoldo_marker() noexcept {
+        npc_bertoldo_marker_aabb_.reset();
+        npc_bertoldo_marker_tex_ = gus::platform::render2d::kInvalidTexture;
+    }
+
+    // true se o marcador do Bertoldo esta ATIVO e desenhavel (AABB definida +
+    // textura valida). Leitura/teste.
+    [[nodiscard]] bool has_npc_bertoldo_marker() const noexcept {
+        return npc_bertoldo_marker_aabb_.has_value() &&
+               npc_bertoldo_marker_tex_ != gus::platform::render2d::kInvalidTexture;
+    }
+
     // Direcao e quadro de walk correntes (leitura/teste).
     [[nodiscard]] Direction facing() const noexcept { return facing_; }
     [[nodiscard]] const WalkCycle& walk_cycle() const noexcept { return walk_; }
@@ -282,6 +311,14 @@ private:
     // headless/sem Maestro).
     std::optional<gus::core::spatial::Aabb> enemy_marker_aabb_{};
     gus::platform::render2d::TextureId enemy_marker_tex_ =
+        gus::platform::render2d::kInvalidTexture;
+
+    // MARCADOR DO NPC BERTOLDO (M7-DIALOGO, NPC-MVP): AABB + textura do sprite
+    // ESTATICO (ver set_npc_bertoldo_marker acima). nullopt/kInvalidTexture = nada
+    // desenhado (default, headless/sem Maestro) - slot PROPRIO, distinto do
+    // enemy_marker_* acima.
+    std::optional<gus::core::spatial::Aabb> npc_bertoldo_marker_aabb_{};
+    gus::platform::render2d::TextureId npc_bertoldo_marker_tex_ =
         gus::platform::render2d::kInvalidTexture;
 
     // IDLE OFEGANTE (cansado): troca os QUADROS do breathing por TEMPO (AnimClock),

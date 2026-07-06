@@ -311,6 +311,32 @@ void OverworldSim::render(gus::platform::render2d::IRenderer& renderer,
         }
     }
 
+    // MARCADOR DO NPC BERTOLDO (M7-DIALOGO, NPC-MVP): sprite ESTATICO (Seu Bertoldo
+    // Caim, pose "south" - de frente pro jogador/camera, sem locomocao) na posicao
+    // fixa calculada pela Maestro (npc_bertoldo_aabb_). MESMA formula/escala/culling
+    // do marcador de inimigo acima ("busto simples": quad quadrado, centrado em X,
+    // base do quad = base da AABB, sem foot-inset - o NPC nao anda). Desenhado ANTES
+    // do jogador (mesma leitura tatica de nao "sumir atras" do Gus). Slot PROPRIO
+    // (npc_bertoldo_marker_*), independente do marcador de inimigo.
+    if (has_npc_bertoldo_marker()) {
+        const gus::core::spatial::Aabb& na = *npc_bertoldo_marker_aabb_;
+        const gus::core::spatial::Rect npc_footprint{na.x, na.y, na.w, na.h};
+        if (overlaps(npc_footprint, view.rect)) {
+            const float nsprite_h =
+                tuning_.player_sprite_height_tiles * grid_.tile_size();
+            const float nsprite_w = nsprite_h;  // sprite quadrado
+            const float nx = na.x + na.w * 0.5f - nsprite_w * 0.5f;
+            const float ny = sprite_top_y(na.y + na.h, nsprite_h,
+                                          /*bottom_fraction=*/0.0f,
+                                          /*manual_offset_world=*/0.0f);
+            const gus::core::spatial::Rect npc_rect{nx, ny, nsprite_w, nsprite_h};
+            const gus::platform::render2d::UvRect nuv{0.0f, 0.0f, 1.0f, 1.0f};
+            const gus::platform::render2d::DrawColor nwhite{1.0f, 1.0f, 1.0f, 1.0f};
+            renderer.draw_textured_rect(npc_rect, npc_bertoldo_marker_tex_, nuv,
+                                        nwhite);
+        }
+    }
+
     // Jogador por cima, na posicao interpolada.
     if (sprites_.loaded()) {
         // SPRITE ancorado nos PES sobre a AABB de colisao. A AABB e a hitbox dos
