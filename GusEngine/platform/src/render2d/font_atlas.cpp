@@ -10,21 +10,14 @@
 
 #include "gus/platform/render2d/font_atlas.hpp"
 
-#include <cstdio>      // std::fopen/fread/fclose
-#include <cstdlib>     // std::getenv
 #include <cstring>     // std::memset
-#include <filesystem>  // std::filesystem::exists (escolhe o candidato que existe)
 #include <vector>
 
-#include "gus/core/asset_paths.hpp"  // caminhos de asset centralizados (kFontsDir)
+#include "gus/core/asset_paths.hpp"             // caminhos de asset centralizados (kFontsDir)
+#include "gus/platform/assets/asset_source.hpp"  // ASSETS-VFS-F1 (ADR-013): porteiro
 
 #define STB_TRUETYPE_IMPLEMENTATION
 #include "stb_truetype.h"
-
-// Pasta dos .ttf embarcados, embutida pelo CMake (= GusEngine/assets/fonts).
-#ifndef GUSWORLD_FONTS_DIR
-#define GUSWORLD_FONTS_DIR ""
-#endif
 
 namespace gus::platform::render2d {
 
@@ -40,26 +33,22 @@ std::string join(const std::string& a, const std::string& b) {
     return a + "/" + b;
 }
 
-// Le um arquivo binario inteiro pra um vetor de bytes. Vazio se nao abrir.
+// Le um arquivo binario inteiro pra um vetor de bytes. Vazio se nao abrir. ASSETS-VFS-F1
+// (ADR-013): delega pro primitivo compartilhado gus::platform::assets::read_raw_file (o
+// MESMO usado por FilesystemAssetSource::read() depois de resolver um id) - preserva o
+// contrato "aceita QUALQUER path, inclusive arbitrario/inexistente" que
+// bake_font_atlas ja tinha (travado em font_atlas_test.cpp: "bake degrada sem crash
+// quando o arquivo nao existe" passa um path literal fora de qualquer id conhecido).
 std::vector<unsigned char> read_file(const std::string& path) {
-    std::vector<unsigned char> bytes;
-    std::FILE* f = std::fopen(path.c_str(), "rb");
-    if (f == nullptr) {
-        return bytes;
+    const auto bytes = gus::platform::assets::read_raw_file(path);
+    if (!bytes.has_value()) {
+        return {};
     }
-    std::fseek(f, 0, SEEK_END);
-    const long size = std::ftell(f);
-    std::fseek(f, 0, SEEK_SET);
-    if (size > 0) {
-        bytes.resize(static_cast<std::size_t>(size));
-        const std::size_t got =
-            std::fread(bytes.data(), 1, static_cast<std::size_t>(size), f);
-        if (got != static_cast<std::size_t>(size)) {
-            bytes.clear();  // leitura incompleta: trata como falha
-        }
+    std::vector<unsigned char> out(bytes->size());
+    for (std::size_t i = 0; i < bytes->size(); ++i) {
+        out[i] = static_cast<unsigned char>(bytes.value()[i]);
     }
-    std::fclose(f);
-    return bytes;
+    return out;
 }
 
 }  // namespace
@@ -112,37 +101,15 @@ bool FontAtlas::glyph_has_ink(int codepoint) const noexcept {
 }
 
 std::string resolve_font_path(const std::string& ttf_file) {
-    // Tenta os candidatos EM ORDEM e retorna o PRIMEIRO QUE EXISTE no disco. A fonte
-    // vive em GusEngine/assets/fonts (asset de engine), separada dos sprites/icons que
-    // ficam em <GUSWORLD_ASSETS>/. Por isso checamos existencia: setar GUSWORLD_ASSETS
-    // (pra arte) nao pode "sequestrar" a fonte pra um <assets>/fonts inexistente.
-    std::error_code ec;
-    const auto exists = [&ec](const std::string& p) {
-        return !p.empty() && std::filesystem::exists(p, ec);
-    };
-
-    // 1) Override por ambiente, SE a fonte de fato estiver la (<GUSWORLD_ASSETS>/fonts).
-    if (const char* env = std::getenv("GUSWORLD_ASSETS")) {
-        if (env[0] != '\0') {
-            const std::string p = join(join(env, "fonts"), ttf_file);
-            if (exists(p)) {
-                return p;
-            }
-        }
-    }
-    // 2) Pasta de fontes do repo embutida em compilacao (= GusEngine/assets/fonts).
-    const std::string compiled = join(GUSWORLD_FONTS_DIR, ttf_file);
-    if (exists(compiled)) {
-        return compiled;
-    }
-    // 3) Relativo ao CWD (rodando da raiz do GusEngine). Sub-caminho do header central.
-    const std::string cwd_rel =
+    // ASSETS-VFS-F1 (ADR-013): a cadeia `env GUSWORLD_ASSETS+"/fonts" (com exists(), pra
+    // nao "sequestrar" a fonte) > macro GUSWORLD_FONTS_DIR > CWD (kFontsDir)` foi
+    // CONSOLIDADA em FilesystemAssetSource::resolve_path (familia FONTES, dispatch pelo
+    // prefixo "assets/fonts/" do id). Contrato/assinatura desta funcao INTOCADOS (segue
+    // aceitando so o nome do arquivo e devolvendo um caminho de disco resolvido) -
+    // paridade provada em platform/tests/asset_source_test.cpp.
+    const std::string id =
         join(std::string(gus::core::assets::kFontsDir), ttf_file);
-    if (exists(cwd_rel)) {
-        return cwd_rel;
-    }
-    // Nenhum existe: devolve o melhor chute (compilado) pra o erro ser claro no log.
-    return compiled.empty() ? cwd_rel : compiled;
+    return gus::platform::assets::FilesystemAssetSource().resolve_path(id);
 }
 
 FontAtlas bake_font_atlas(const std::string& ttf_path, int cell_px) {
