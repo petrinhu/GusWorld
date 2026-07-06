@@ -37,8 +37,8 @@
 
 ### 3.3 Derrota (party wipe): safe mode e dívida
 
-**Status:** parâmetros ratificados pelo criador supremo (AskUserQuestion, 2026-06-24).
-**Cross-ref:** [`battle-screen.md`](battle-screen.md) §3.1 (tela de resultado `BUILD FAILED` que corta pro Hospital), [`combat.md`](combat.md) §2.1 (HP de Gus = menor da party; Análise Preditiva absorve 1 golpe fatal por batalha) e §16 (`ActorIncapacitated` / `ActorDefeated` aciona este fluxo).
+**Status:** parâmetros ratificados pelo criador supremo (AskUserQuestion, 2026-06-24). Item de tabela de pendências: `ECONOMIA-HOSPITAL-DOC` (canonização formal do brainstorm economy-designer + criador de 2026-06-23).
+**Cross-ref:** [`battle-screen.md`](battle-screen.md) §3.1 (tela de resultado `BUILD FAILED` que corta pro Hospital), [`combat-flavor.md`](combat-flavor.md) §3b (acervo de frases de vitória/derrota/performance da tela de resultado), [`combat.md`](combat.md) §2.1 (HP de Gus = menor da party; Análise Preditiva absorve 1 golpe fatal por batalha) e §16 (`ActorIncapacitated` / `ActorDefeated` aciona este fluxo), e [`pillars.md`](../pillars.md) Pillar 4 (Prodígio de 11 anos: "Companions — imortais com incapacitação" — cura gratuita demora, cura paga é rápida — e "Game over": derrota de Gus na party nunca é reload puro no fluxo de wipe abaixo, é custo econômico via Hospital).
 
 A derrota NÃO é game-over e NÃO perde progresso: é um **custo econômico** (Pillar 4). O wipe corta pro Hospital, que cura pelo custo proporcional da §3.1 (1 cr / 3 HP) e reativa incapacitados pela §3.1 (multa Fibonacci `seq_acima(HP_max)`). Se o jogador não tem crédito pra cura completa, ele **ESCOLHE** (anti-softlock, nunca trava):
 
@@ -138,6 +138,21 @@ Reforço do contrato de incentivo (canon em battle-screen.md §3.1):
 - **Lutar** entrega **loot / XP / Knowledge CHEIOS** (o auto corta `x%`) MAIS o **bônus de eficiência por build rápido** (`blazing fast` / `clean build`), que o auto-resolve **nunca** recebe; MAIS mestria de carta (+1 por uso) e contagem `KnowledgeKills` subindo mais rápido.
 - **Auto-resolver** dá loot / Knowledge **básicos** (consistente com o auto-kill canon: "auto dá o básico; batalha real dá bônus").
 - Gradiente contínuo Bronze → Prata → Ouro: conforme você domina, lutar fica mais limpo (menos dano sofrido) E o auto fica mais brando, até o Ouro assumir de graça. O jogador que otimiza sempre luta; o auto-resolve é uma válvula de conforto pro trash dominado, não um caminho de progressão.
+
+---
+
+## §3.5 Vitória: a contraparte econômica (faucet) do wipe (sink)
+
+**Status:** canonização formal (item `ECONOMIA-HOSPITAL-DOC`); nenhum número novo — consolida o que já é canon em [`battle-screen.md`](battle-screen.md) §3.1 e [`combat-flavor.md`](combat-flavor.md) §3b.
+
+Todo faucet/sink deste documento tem sua contraparte: o Hospital (§3.3) é o **sink** da derrota; a vitória em combate é o **faucet** equivalente. A tela de resultado imprime `BUILD SUCCEEDED` / `exit 0` (frases do acervo em combat-flavor.md §3b) e concede:
+
+- **Crédito do encontro** — já quantificado em §2 (`8 cr × mult(zona)`).
+- **XP, loot e Knowledge** (o selo do bestiário sobe — ver [`knowledge-progression.md`](knowledge-progression.md)) mais **mestria de carta** (+1 por uso, Pillar 1). Sistema de progressão paralelo à economia de crédito; não duplicado aqui.
+- **Métrica de build (turnos = "compile time"):** build **rápido** ganha rótulo de elogio (`blazing fast` / `clean build`, acervo em combat-flavor.md §3b) **mais bônus de eficiência de loot/XP**; build **lento** recebe rótulo **NEUTRO** (`Build complete` / `Compiled` / `Done` / `Finished`) — **nunca xinga o jogador**, só constata.
+- Este bônus de eficiência é o mesmo referenciado em §3.4.5 como o que o auto-resolve **nunca** alcança (reforça: lutar de verdade > pular > perder).
+
+A derrota (§3.3) NUNCA anula os ganhos de vitórias anteriores — o wipe é um evento pontual e reversível, não um confisco retroativo.
 
 ---
 
@@ -289,4 +304,4 @@ Anti-grind: ingredientes raros/épicos vêm de Knowledge-gated drops (inimigos-m
 
 ---
 
-**Última revisão:** 2026-05-30. Economia mínima = canon VS. Craft = spec F3-Alpha.
+**Última revisão:** 2026-07-06 (canonização `ECONOMIA-HOSPITAL-DOC`: cross-refs explícitos §3.3 + §3.5 vitória, sem números novos). Economia mínima = canon VS. Craft = spec F3-Alpha.
