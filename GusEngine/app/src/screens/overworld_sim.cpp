@@ -313,17 +313,27 @@ void OverworldSim::render(gus::platform::render2d::IRenderer& renderer,
 
     // MARCADOR DO NPC BERTOLDO (M7-DIALOGO, NPC-MVP): sprite ESTATICO (Seu Bertoldo
     // Caim, pose "south" - de frente pro jogador/camera, sem locomocao) na posicao
-    // fixa calculada pela Maestro (npc_bertoldo_aabb_). MESMA formula/escala/culling
-    // do marcador de inimigo acima ("busto simples": quad quadrado, centrado em X,
-    // base do quad = base da AABB, sem foot-inset - o NPC nao anda). Desenhado ANTES
-    // do jogador (mesma leitura tatica de nao "sumir atras" do Gus). Slot PROPRIO
-    // (npc_bertoldo_marker_*), independente do marcador de inimigo.
+    // fixa calculada pela Maestro (npc_bertoldo_aabb_). MESMA formula/culling do
+    // marcador de inimigo acima ("busto simples": quad quadrado, centrado em X,
+    // base do quad = base da AABB, sem foot-inset - o NPC nao anda), so que com
+    // ESCALA PROPRIA (tuning_.npc_bertoldo_sprite_height_tiles, NAO player_sprite_
+    // height_tiles - FIX BUG do lider "Bertoldo menor que o Gus": o retrato do
+    // Bertoldo tem margem transparente maior que o do Gus, reusar a mesma altura-
+    // de-canvas do jogador fazia o adulto renderizar mais baixo que a crianca; ver
+    // o comentario completo em overworld_tuning.hpp). Desenhado ANTES do jogador
+    // (mesma leitura tatica de nao "sumir atras" do Gus). Slot PROPRIO
+    // (npc_bertoldo_marker_*), independente do marcador de inimigo. `na` (a AABB
+    // recebida) e EXATAMENTE a mesma que a Maestro usa pra disparar o dialogo
+    // (aabb_overlaps) - o quad abaixo e derivado dela pela MESMA formula
+    // (sprite_top_y) que a Maestro usou pra computa-la (enemy_sprite_footprint_
+    // aabb), entao trigger e visual COINCIDEM por construcao (nao ha 2 formulas
+    // divergentes pra manter em sincronia).
     if (has_npc_bertoldo_marker()) {
         const gus::core::spatial::Aabb& na = *npc_bertoldo_marker_aabb_;
         const gus::core::spatial::Rect npc_footprint{na.x, na.y, na.w, na.h};
         if (overlaps(npc_footprint, view.rect)) {
             const float nsprite_h =
-                tuning_.player_sprite_height_tiles * grid_.tile_size();
+                tuning_.npc_bertoldo_sprite_height_tiles * grid_.tile_size();
             const float nsprite_w = nsprite_h;  // sprite quadrado
             const float nx = na.x + na.w * 0.5f - nsprite_w * 0.5f;
             const float ny = sprite_top_y(na.y + na.h, nsprite_h,

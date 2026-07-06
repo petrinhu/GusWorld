@@ -335,8 +335,9 @@ TEST_CASE("overworld: sem marcador (default), textura invalida ou apos clear -> 
 
 // MARCADOR DO NPC BERTOLDO (M7-DIALOGO, NPC-MVP - integracao do sprite): o sprite
 // ESTATICO do Seu Bertoldo Caim (south.png) desenhado por cima do mapa, na MESMA
-// escala/ancoragem "busto simples" do marcador de inimigo (slot PROPRIO, distinto do
-// enemy_marker_* - nao compartilha textura/posicao). Ver overworld_sim.hpp/
+// ancoragem "busto simples" do marcador de inimigo (quad quadrado, centrado em X,
+// base = base da AABB), so que com ESCALA PROPRIA (slot PROPRIO, distinto do
+// enemy_marker_* - nao compartilha textura/posicao/escala). Ver overworld_sim.hpp/
 // set_npc_bertoldo_marker.
 TEST_CASE("overworld: marcador do NPC Bertoldo desenha na posicao/escala certas",
          "[overworld][npc-bertoldo-marker]") {
@@ -351,10 +352,18 @@ TEST_CASE("overworld: marcador do NPC Bertoldo desenha na posicao/escala certas"
     // So o marcador (o jogador, sem set_player_sprites, cai no contorno).
     REQUIRE(r.sprites.size() == 1);
     REQUIRE(r.sprites[0].texture == 7);
-    // Tamanho = MESMA escala do sprite do Gus (player_sprite_height_tiles * tile_size).
-    const float expected_h = OverworldTuning{}.player_sprite_height_tiles * 16.0f;
+    // Tamanho = escala PROPRIA do Bertoldo (npc_bertoldo_sprite_height_tiles *
+    // tile_size) - FIX BUG do lider "Bertoldo menor que o Gus" (M7-DIALOGO):
+    // NAO reusa mais player_sprite_height_tiles (ver overworld_tuning.hpp pro
+    // porque: o retrato do Bertoldo tem margem transparente maior que o do Gus).
+    const float expected_h =
+        OverworldTuning{}.npc_bertoldo_sprite_height_tiles * 16.0f;
     REQUIRE_THAT(r.sprites[0].rect.w, WithinAbs(expected_h, kEps));
     REQUIRE_THAT(r.sprites[0].rect.h, WithinAbs(expected_h, kEps));
+    // A escala do Bertoldo e DIFERENTE (maior) da escala do jogador - prova que os
+    // dois NAO estao mais acoplados no mesmo numero (regressao do bug original).
+    REQUIRE(OverworldTuning{}.npc_bertoldo_sprite_height_tiles >
+            OverworldTuning{}.player_sprite_height_tiles);
     // Centrado em X sobre a AABB do Bertoldo.
     REQUIRE_THAT(r.sprites[0].rect.x + r.sprites[0].rect.w * 0.5f,
                 WithinAbs(bertoldo.x + bertoldo.w * 0.5f, kEps));

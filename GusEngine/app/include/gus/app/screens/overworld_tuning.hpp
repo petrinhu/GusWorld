@@ -94,6 +94,28 @@ struct OverworldTuning {
     // PNG (quadrado 68x68 -> mesma altura). Ajustavel pelo lider.
     float player_sprite_height_tiles = 2.75f;
 
+    // --- SPRITE DO NPC BERTOLDO (M7-DIALOGO, bug do lider "Bertoldo menor que o
+    // Gus") -----------------------------------------------------------------
+    // BUG (playtest ao vivo do lider): o marcador do Bertoldo reusava CEGAMENTE
+    // player_sprite_height_tiles (2.75 tiles) - a MESMA altura de QUADRO/CANVAS do
+    // Gus. So que o retrato do Bertoldo (south.png, 180x180) tem uma margem
+    // transparente BEM maior ao redor do corpo do que o sprite do Gus: medindo o
+    // alpha-bbox de cada PNG (ferramenta engine-graphics, nao um numero magico) -
+    //   Gus (breathing_idle/f0.png, 256x256): conteudo ocupa ~88.3% da ALTURA do
+    //     canvas (bbox y=[13,239]).
+    //   Bertoldo (south.png, 180x180): conteudo ocupa so ~76.7% da ALTURA do
+    //     canvas (bbox y=[20,158]) - CANVAS mais "espacoso" ao redor do corpo.
+    // Com os DOIS no MESMO player_sprite_height_tiles, o Bertoldo RENDERIZAVA
+    // ~13% mais baixo que o Gus (0.767/0.883 do quadro) - um adulto de 62 anos
+    // aparecendo mais BAIXO que uma crianca de 11 (errado). FIX: campo PROPRIO
+    // (nao mexe no inimigo fixo nem no Gus, que ja estao calibrados/OK),
+    // compensando a razao de conteudo medida E somando uma folga (~5%) pra ficar
+    // LIGEIRAMENTE maior (adulto >= crianca, nunca menor): 2.75 * (0.883/0.767) *
+    // 1.05 ~= 3.3 tiles. O marcador continua QUADRADO (largura = altura), entao a
+    // proporcao do PNG nunca distorce - so o TAMANHO GERAL do quadro cresce.
+    // Ajustavel pelo lider vendo o display (mesmo espirito de player_sprite_height_tiles).
+    float npc_bertoldo_sprite_height_tiles = 3.3f;
+
     // AJUSTE FINO da ancoragem dos pes (M1-BUG.SUL, lider 2026-06-22). O grosso e
     // AUTOMATICO: o jogo MEDE a sobra transparente embaixo de cada sprite (alpha-bbox
     // no load) e desce o desenho ate o PE REAL encostar na base da hitbox - por

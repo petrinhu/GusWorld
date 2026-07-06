@@ -189,11 +189,20 @@ bool Maestro::init() {
     // do androide, entao nao ha mais confusao "inimigo vs NPC amigavel"). Sem isto a
     // hitbox continuava disparando o dialogo "as cegas" (nada pro lider ver antes de
     // esbarrar).
+    //
+    // FIX BUG (playtest ao vivo do lider, "Bertoldo aparece menor que o Gus"):
+    // escala PROPRIA (tuning().npc_bertoldo_sprite_height_tiles, ver overworld_
+    // tuning.hpp) em vez de player_sprite_height_tiles - o retrato do Bertoldo
+    // (south.png) tem uma margem transparente maior que o do Gus; reusar a MESMA
+    // altura-de-CANVAS fazia o adulto renderizar visivelmente mais baixo que a
+    // crianca. A hitbox de trigger (npc_bertoldo_aabb_, usada abaixo em
+    // aabb_overlaps) e o quad desenhado (overworld_sim.cpp) usam a MESMA constante
+    // nova - continuam coincidindo exatamente, so num tamanho maior/correto.
     const gus::core::spatial::Aabb npc_anchor = pick_fixed_enemy_position(
         city_->grid(), city_->player_aabb(), kNpcBertoldoOffsetTilesX,
         kNpcBertoldoOffsetTilesY);
     npc_bertoldo_aabb_ = enemy_sprite_footprint_aabb(
-        npc_anchor, city_->tuning().player_sprite_height_tiles,
+        npc_anchor, city_->tuning().npc_bertoldo_sprite_height_tiles,
         city_->grid().tile_size());
     city_->set_npc_bertoldo_marker(npc_bertoldo_aabb_);
     std::cout << "Maestro: [dialogo] Bertoldo (NPC-MVP) em (" << npc_bertoldo_aabb_.x
