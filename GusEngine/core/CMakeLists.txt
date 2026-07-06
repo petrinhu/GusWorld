@@ -17,6 +17,7 @@ add_library(gusengine_core STATIC
     src/crypto/key_derivation.cpp
     src/spatial/tile_grid.cpp
     src/spatial/grid_collision.cpp
+    src/spatial/depth_sort.cpp
     src/spatial/camera_clamp.cpp
     src/time/fixed_timestep.cpp
     src/anim/anim_clock.cpp

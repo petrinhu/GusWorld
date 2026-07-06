@@ -289,6 +289,36 @@ struct OverworldTuning {
     float winded_max_seconds = 8.0f;        // teto da ofegancia (corrida longa). CANON: 8 s.
     float winded_run_for_max_seconds = 8.0f;  // correr este tanto (s) atinge o teto.
     float winded_run_threshold_seconds = 2.0f;  // correr menos que isso e parar nao ofega.
+
+    // --- COLISAO SOLIDA de NPC/inimigo (M7-COSTURA/M7-DIALOGO) --------------
+    // BUG (playtest ao vivo do lider): o Gus andava POR CIMA/ATRAVES do Bertoldo (o
+    // NPC sumia embaixo do sprite do jogador ao aproximar pelo norte) - so existia a
+    // hitbox de TRIGGER (kFeetTriggerWidthTiles/HeightTiles, maestro_logic.hpp - uma
+    // faixa FINA nos pes, pensada so pra "quando ativa dialogo/combate"). DECISAO DO
+    // LIDER (pesquisa de padrao de industria aprovada, Zelda/Stardew): colisao SOLIDA
+    // NOVA e SEPARADA - o corpo do NPC/inimigo bloqueia o MOVIMENTO como uma "parede
+    // pontual" (ver gus/core/spatial/grid_collision.hpp::ObstacleSpan), NAO como
+    // parte do tilemap estatico.
+    //
+    // TAMANHO (DECISAO SINALIZADA pelo engine-graphics ao implementar, nao e
+    // one-way-door - e uma constante ajustavel, mesmo espirito das outras deste
+    // arquivo): o lider pediu "aproximadamente do tamanho do footprint VISUAL", mas
+    // o footprint visual LITERAL (o quad alto usado so pro DESENHO -
+    // player_sprite_height_tiles ~2.75 / npc_bertoldo_sprite_height_tiles ~3.3 tiles,
+    // que "vaza" bem acima da cabeca do personagem por causa da margem transparente
+    // do retrato) sairia um bloqueador GIGANTE se usado cru - travaria o jogador a
+    // VARIOS tiles de distancia, o oposto de "obstaculo pontual, jogador contorna
+    // livre" que o lider pediu no mesmo pedido. Interpretacao adotada: o footprint
+    // REAL que o personagem ocupa NO CHAO (a area que ele fisicamente esta "em pe"),
+    // nao o retangulo alto do sprite - por isso ~1 tile (a MESMA ordem de grandeza da
+    // propria hitbox do jogador, kPlayerHitboxTileFraction=0.6, so que um pouco maior
+    // pra ler como "corpo solido" e nao "so os pes"). Ancorado igual ao
+    // feet_trigger_aabb (centro em X do footprint, base = base do footprint) - so o
+    // TAMANHO difere (maior que o trigger 0.8x0.4, MUITO menor que o footprint visual
+    // 2.75-3.3 tiles). O lider ajusta vendo o playtest (faixa util sugerida ~0.7..1.3
+    // tile: menor = mais "furta-corpo" e pode revivir o bug de sumir; maior = comeca
+    // a travar o corredor).
+    float npc_solid_box_tiles = 1.0f;
 };
 
 }  // namespace gus::app::screens

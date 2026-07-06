@@ -45,58 +45,110 @@ struct AxisOutcome {
     bool hit = false;
 };
 
+// true se os retangulos (px,py,w,h) e o obstaculo `ob` se sobrepoem (AABB-vs-AABB
+// comum, meio-aberto - NAO e alinhado a grade, entao sem o epsilon de celula de
+// overlaps_blocked acima).
+bool overlaps_aabb(float px, float py, float w, float h, const Aabb& ob) noexcept {
+    return px < ob.x + ob.w && px + w > ob.x && py < ob.y + ob.h && py + h > ob.y;
+}
+
 // Resolve no eixo X. cur_x/cur_y = posicao atual; tile = tamanho da celula.
+// `obstacles` (opcional): obstaculos PONTUAIS adicionais (NPC/inimigo parado - ver
+// ObstacleSpan no header), tratados como paredes extras, avaliados TODOS contra o
+// alvo CRU (target) - a grade e cada obstaculo sao bloqueadores independentes; o
+// candidato de encosto MAIS RESTRITIVO (menor deslocamento a partir de cur_x)
+// vence, ordem-independente e deterministico.
 AxisOutcome resolve_x(const TileGrid& grid, float cur_x, float cur_y, float w,
-                      float h, float dx) noexcept {
+                      float h, float dx, ObstacleSpan obstacles = {}) noexcept {
     AxisOutcome out{cur_x, false};
     if (dx == 0.0f) {
         return out;
     }
     const float target = cur_x + dx;
-    if (!overlaps_blocked(grid, target, cur_y, w, h)) {
-        out.coord = target;
-        return out;
+    float best = target;  // so vale se NENHUM bloqueador (hit permanece false).
+    bool hit = false;
+
+    if (overlaps_blocked(grid, target, cur_y, w, h)) {
+        // Colidiu com a GRADE: candidato de encosto na borda da parede. tile_size >
+        // 0 garantido pela grade.
+        const float tile = grid.tile_size();
+        float wall_candidate;
+        if (dx > 0.0f) {
+            // Movendo para a direita: a borda direita (x+w) bate na face esquerda
+            // da primeira coluna bloqueada alcancada. Essa face e cell*tile.
+            const int blocking_cell = grid.world_to_cell(target + w - 1e-4f);
+            wall_candidate = static_cast<float>(blocking_cell) * tile - w;
+        } else {
+            // Movendo para a esquerda: a borda esquerda (x) bate na face direita da
+            // coluna bloqueada, que e (cell+1)*tile.
+            const int blocking_cell = grid.world_to_cell(target);
+            wall_candidate = static_cast<float>(blocking_cell + 1) * tile;
+        }
+        best = wall_candidate;
+        hit = true;
     }
 
-    // Colidiu: encosta na borda da parede. tile_size > 0 garantido pela grade.
-    const float tile = grid.tile_size();
-    out.hit = true;
-    if (dx > 0.0f) {
-        // Movendo para a direita: a borda direita (x+w) bate na face esquerda
-        // da primeira coluna bloqueada alcancada. Essa face e cell*tile.
-        const int blocking_cell = grid.world_to_cell(target + w - 1e-4f);
-        out.coord = static_cast<float>(blocking_cell) * tile - w;
-    } else {
-        // Movendo para a esquerda: a borda esquerda (x) bate na face direita da
-        // coluna bloqueada, que e (cell+1)*tile.
-        const int blocking_cell = grid.world_to_cell(target);
-        out.coord = static_cast<float>(blocking_cell + 1) * tile;
+    // Obstaculos pontuais: cada um que colidiria com o alvo CRU contribui seu
+    // proprio candidato de encosto (borda REAL do obstaculo, nao alinhada a
+    // celula); fica-se com o MAIS RESTRITIVO entre TODOS ja vistos (parede +
+    // obstaculos).
+    for (int i = 0; i < obstacles.count; ++i) {
+        const Aabb& ob = obstacles.items[i];
+        if (!overlaps_aabb(target, cur_y, w, h, ob)) {
+            continue;
+        }
+        const float candidate = (dx > 0.0f) ? (ob.x - w) : (ob.x + ob.w);
+        if (!hit || (dx > 0.0f ? candidate < best : candidate > best)) {
+            best = candidate;
+            hit = true;
+        }
     }
+
+    out.coord = best;
+    out.hit = hit;
     return out;
 }
 
-// Resolve no eixo Y, dado o X ja resolvido (fixed_x).
+// Resolve no eixo Y, dado o X ja resolvido (fixed_x). `obstacles` (opcional): ver
+// resolve_x acima (mesma tecnica, so que no eixo Y).
 AxisOutcome resolve_y(const TileGrid& grid, float fixed_x, float cur_y, float w,
-                      float h, float dy) noexcept {
+                      float h, float dy, ObstacleSpan obstacles = {}) noexcept {
     AxisOutcome out{cur_y, false};
     if (dy == 0.0f) {
         return out;
     }
     const float target = cur_y + dy;
-    if (!overlaps_blocked(grid, fixed_x, target, w, h)) {
-        out.coord = target;
-        return out;
+    float best = target;
+    bool hit = false;
+
+    if (overlaps_blocked(grid, fixed_x, target, w, h)) {
+        const float tile = grid.tile_size();
+        float wall_candidate;
+        if (dy > 0.0f) {
+            const int blocking_cell = grid.world_to_cell(target + h - 1e-4f);
+            wall_candidate = static_cast<float>(blocking_cell) * tile - h;
+        } else {
+            const int blocking_cell = grid.world_to_cell(target);
+            wall_candidate = static_cast<float>(blocking_cell + 1) * tile;
+        }
+        best = wall_candidate;
+        hit = true;
     }
 
-    const float tile = grid.tile_size();
-    out.hit = true;
-    if (dy > 0.0f) {
-        const int blocking_cell = grid.world_to_cell(target + h - 1e-4f);
-        out.coord = static_cast<float>(blocking_cell) * tile - h;
-    } else {
-        const int blocking_cell = grid.world_to_cell(target);
-        out.coord = static_cast<float>(blocking_cell + 1) * tile;
+    for (int i = 0; i < obstacles.count; ++i) {
+        const Aabb& ob = obstacles.items[i];
+        if (!overlaps_aabb(fixed_x, target, w, h, ob)) {
+            continue;
+        }
+        const float candidate = (dy > 0.0f) ? (ob.y - h) : (ob.y + ob.h);
+        if (!hit || (dy > 0.0f ? candidate < best : candidate > best)) {
+            best = candidate;
+            hit = true;
+        }
     }
+
+    out.coord = best;
+    out.hit = hit;
     return out;
 }
 
@@ -108,8 +160,12 @@ AxisOutcome resolve_y(const TileGrid& grid, float fixed_x, float cur_y, float w,
 // Devolve o empurrao com menor |p| (preferindo o lado que destrava antes); 0 se
 // nenhum destrava. `horizontal` = true se o movimento principal e em X (empurra em
 // Y); false se e em Y (empurra em X). `main_delta` = dx ou dy (o sinal do passo).
+// `obstacles` (opcional): obstaculos pontuais - o empurrao tambem NAO pode meter o
+// corpo num obstaculo, e o passo do eixo principal so "destrava" se estiver livre
+// da grade E dos obstaculos (mesmo criterio de resolve_x/resolve_y).
 float find_corner_push(const TileGrid& grid, const Aabb& box, bool horizontal,
-                       float main_delta, float max_assist) noexcept {
+                       float main_delta, float max_assist,
+                       ObstacleSpan obstacles = {}) noexcept {
     if (max_assist <= 0.0f) {
         return 0.0f;
     }
@@ -119,19 +175,32 @@ float find_corner_push(const TileGrid& grid, const Aabb& box, bool horizontal,
         return 0.0f;
     }
 
+    const auto blocked_here = [&](float px, float py) -> bool {
+        if (overlaps_blocked(grid, px, py, box.w, box.h)) {
+            return true;
+        }
+        for (int i = 0; i < obstacles.count; ++i) {
+            if (overlaps_aabb(px, py, box.w, box.h, obstacles.items[i])) {
+                return true;
+            }
+        }
+        return false;
+    };
+
     // Testa se, empurrando o eixo perpendicular por `push`, o eixo principal
-    // passa a estar livre (sem sobrepor parede) E o empurrao em si e livre.
+    // passa a estar livre (sem sobrepor parede/obstaculo) E o empurrao em si e
+    // livre.
     auto destrava = [&](float push) -> bool {
         const float bx = horizontal ? box.x : box.x + push;
         const float by = horizontal ? box.y + push : box.y;
-        // (a) o empurrao perpendicular nao pode meter o corpo numa parede.
-        if (overlaps_blocked(grid, bx, by, box.w, box.h)) {
+        // (a) o empurrao perpendicular nao pode meter o corpo numa parede/obstaculo.
+        if (blocked_here(bx, by)) {
             return false;
         }
         // (b) a partir da posicao empurrada, o passo do eixo principal e livre.
         const float tx = horizontal ? bx + main_delta : bx;
         const float ty = horizontal ? by : by + main_delta;
-        return !overlaps_blocked(grid, tx, ty, box.w, box.h);
+        return !blocked_here(tx, ty);
     };
 
     // Varre |p| crescente; nos dois sentidos no mesmo nivel, pegando o que
@@ -149,12 +218,13 @@ float find_corner_push(const TileGrid& grid, const Aabb& box, bool horizontal,
 
 }  // namespace
 
-MoveResult resolve_move(const TileGrid& grid, const Aabb& box, float dx,
-                        float dy) noexcept {
+MoveResult resolve_move(const TileGrid& grid, const Aabb& box, float dx, float dy,
+                        ObstacleSpan obstacles) noexcept {
     // Eixo X primeiro, a partir da posicao corrente.
-    const AxisOutcome rx = resolve_x(grid, box.x, box.y, box.w, box.h, dx);
+    const AxisOutcome rx = resolve_x(grid, box.x, box.y, box.w, box.h, dx, obstacles);
     // Eixo Y depois, com o X ja resolvido (slide).
-    const AxisOutcome ry = resolve_y(grid, rx.coord, box.y, box.w, box.h, dy);
+    const AxisOutcome ry =
+        resolve_y(grid, rx.coord, box.y, box.w, box.h, dy, obstacles);
 
     MoveResult result;
     result.box = Aabb{rx.coord, ry.coord, box.w, box.h};
@@ -165,9 +235,10 @@ MoveResult resolve_move(const TileGrid& grid, const Aabb& box, float dx,
 
 MoveResult resolve_move_with_corner_assist(const TileGrid& grid, const Aabb& box,
                                            float dx, float dy,
-                                           const CornerAssistOptions& opts) noexcept {
+                                           const CornerAssistOptions& opts,
+                                           ObstacleSpan obstacles) noexcept {
     // Resolve normal primeiro: e a base e tambem o fallback se nada destravar.
-    const MoveResult base = resolve_move(grid, box, dx, dy);
+    const MoveResult base = resolve_move(grid, box, dx, dy, obstacles);
     if (!opts.enabled || opts.max_assist_fraction <= 0.0f) {
         return base;
     }
@@ -184,7 +255,8 @@ MoveResult resolve_move_with_corner_assist(const TileGrid& grid, const Aabb& box
     }
 
     const float main_delta = horizontal ? dx : dy;
-    const float push = find_corner_push(grid, box, horizontal, main_delta, max_assist);
+    const float push =
+        find_corner_push(grid, box, horizontal, main_delta, max_assist, obstacles);
     if (push == 0.0f) {
         return base;  // nenhuma abertura dentro do limite: trava como hoje
     }
@@ -196,8 +268,10 @@ MoveResult resolve_move_with_corner_assist(const TileGrid& grid, const Aabb& box
                                    : Aabb{box.x + push, box.y, box.w, box.h};
     if (horizontal) {
         // Resolve Y (o empurrao, encostando na borda) e depois X (o movimento).
-        const AxisOutcome ry = resolve_y(grid, pushed.x, box.y, box.w, box.h, push);
-        const AxisOutcome rx = resolve_x(grid, pushed.x, ry.coord, box.w, box.h, main_delta);
+        const AxisOutcome ry =
+            resolve_y(grid, pushed.x, box.y, box.w, box.h, push, obstacles);
+        const AxisOutcome rx = resolve_x(grid, pushed.x, ry.coord, box.w, box.h,
+                                         main_delta, obstacles);
         MoveResult result;
         result.box = Aabb{rx.coord, ry.coord, box.w, box.h};
         result.hit_x = rx.hit;
@@ -205,8 +279,10 @@ MoveResult resolve_move_with_corner_assist(const TileGrid& grid, const Aabb& box
         return result;
     }
     // vertical: empurra em X, depois move em Y.
-    const AxisOutcome rx = resolve_x(grid, box.x, pushed.y, box.w, box.h, push);
-    const AxisOutcome ry = resolve_y(grid, rx.coord, box.y, box.w, box.h, main_delta);
+    const AxisOutcome rx =
+        resolve_x(grid, box.x, pushed.y, box.w, box.h, push, obstacles);
+    const AxisOutcome ry = resolve_y(grid, rx.coord, box.y, box.w, box.h, main_delta,
+                                     obstacles);
     MoveResult result;
     result.box = Aabb{rx.coord, ry.coord, box.w, box.h};
     result.hit_x = false;

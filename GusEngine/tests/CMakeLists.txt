@@ -14,7 +14,9 @@ add_executable(gusengine_core_tests
     key_derivation_test.cpp
     tile_grid_test.cpp
     grid_collision_test.cpp
+    obstacle_collision_test.cpp
     corner_assist_test.cpp
+    depth_sort_test.cpp
     camera_clamp_test.cpp
     fixed_timestep_test.cpp
     anim_clock_test.cpp

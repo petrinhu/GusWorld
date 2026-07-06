@@ -205,17 +205,27 @@ public:
     // bicho". kInvalidTexture => nada e desenhado (fallback seguro/headless). A Maestro
     // (dona da posicao logica do inimigo) chama isto apos calcular a posicao; NAO muda a
     // colisao/regra de jogo, so o desenho.
+    // COLISAO SOLIDA (M7-COSTURA, ver overworld_tuning.hpp::npc_solid_box_tiles):
+    // toda vez que o marcador e (re)definido, deriva TAMBEM a caixa de bloqueio
+    // FISICO (enemy_solid_aabb_) a partir do footprint visual recebido - mesma
+    // ancoragem do feet_trigger_aabb (centro em X, base = base do footprint), so
+    // que MAIOR (~1 tile, nao a faixa fina do trigger). step_fixed passa essa caixa
+    // como ObstacleSpan pro resolve_move_with_corner_assist: o jogador NUNCA mais
+    // ocupa a mesma posicao do inimigo (mas contorna livre pelos tiles adjacentes).
     void set_enemy_marker(const gus::core::spatial::Aabb& aabb,
                           gus::platform::render2d::TextureId tex) noexcept {
         enemy_marker_aabb_ = aabb;
         enemy_marker_tex_ = tex;
+        enemy_solid_aabb_ = solid_obstacle_from_footprint(aabb);
     }
 
     // Some com o marcador (Victory, item 4 do escopo M7 Inc 1: "o inimigo derrotado some
-    // do mapa"). No-op seguro se nao havia marcador.
+    // do mapa"). No-op seguro se nao havia marcador. TAMBEM libera o bloqueio FISICO
+    // (o inimigo derrotado nao deve mais colidir com o jogador).
     void clear_enemy_marker() noexcept {
         enemy_marker_aabb_.reset();
         enemy_marker_tex_ = gus::platform::render2d::kInvalidTexture;
+        enemy_solid_aabb_.reset();
     }
 
     // true se ha um marcador de inimigo ATIVO e desenhavel (AABB definida + textura
@@ -234,17 +244,21 @@ public:
     // marcador de inimigo (quad quadrado centrado em X, base do quad = base da AABB,
     // SEM foot-inset medido - o NPC nao anda, nao precisa da ancoragem-por-pes do
     // jogador). `tex` ja resolvido pela casca SDL (mesmo padrao de set_enemy_marker).
+    // COLISAO SOLIDA (M7-DIALOGO, ver comentario espelho em set_enemy_marker acima):
+    // MESMA tecnica - deriva npc_bertoldo_solid_aabb_ do footprint recebido.
     void set_npc_bertoldo_marker(const gus::core::spatial::Aabb& aabb,
                                  gus::platform::render2d::TextureId tex) noexcept {
         npc_bertoldo_marker_aabb_ = aabb;
         npc_bertoldo_marker_tex_ = tex;
+        npc_bertoldo_solid_aabb_ = solid_obstacle_from_footprint(aabb);
     }
 
     // Some com o marcador (asset ausente/headless degrada com seguranca). No-op se
-    // nao havia marcador.
+    // nao havia marcador. TAMBEM libera o bloqueio FISICO.
     void clear_npc_bertoldo_marker() noexcept {
         npc_bertoldo_marker_aabb_.reset();
         npc_bertoldo_marker_tex_ = gus::platform::render2d::kInvalidTexture;
+        npc_bertoldo_solid_aabb_.reset();
     }
 
     // true se o marcador do Bertoldo esta ATIVO e desenhavel (AABB definida +
@@ -289,6 +303,16 @@ private:
     // Posicao do jogador interpolada entre prev_ e curr_ por alpha.
     [[nodiscard]] gus::core::spatial::Aabb interpolated_player(float alpha) const noexcept;
 
+    // COLISAO SOLIDA (M7-COSTURA/M7-DIALOGO): deriva a caixa de bloqueio FISICO de
+    // um NPC/inimigo a partir do seu footprint VISUAL (o mesmo AABB passado a
+    // set_enemy_marker/set_npc_bertoldo_marker) - MESMA ancoragem do feet_trigger_
+    // aabb (maestro_logic.hpp): centrada em X sobre o footprint, base = base do
+    // footprint. Tamanho = tuning_.npc_solid_box_tiles (ver rationale la, NAO o
+    // footprint visual inteiro - isso bloquearia tiles demais). Usa grid_.tile_size()
+    // e tuning_ (membros da propria classe) - por isso e metodo, nao funcao livre.
+    [[nodiscard]] gus::core::spatial::Aabb solid_obstacle_from_footprint(
+        const gus::core::spatial::Aabb& footprint) const noexcept;
+
     gus::core::spatial::TileGrid grid_;
     // MAPA REAL opcional: presente quando construido do TileMap. Da ao render a
     // identidade (TileKind) de cada celula pra pintar por cor (graybox). Ausente
@@ -312,6 +336,11 @@ private:
     std::optional<gus::core::spatial::Aabb> enemy_marker_aabb_{};
     gus::platform::render2d::TextureId enemy_marker_tex_ =
         gus::platform::render2d::kInvalidTexture;
+    // COLISAO SOLIDA do inimigo (M7-COSTURA): derivada de enemy_marker_aabb_ em
+    // set_enemy_marker (ver solid_obstacle_from_footprint acima). nullopt = sem
+    // bloqueio (nenhum marcador ativo/inimigo derrotado) - step_fixed le isto pra
+    // montar o ObstacleSpan passado ao resolve_move_with_corner_assist.
+    std::optional<gus::core::spatial::Aabb> enemy_solid_aabb_{};
 
     // MARCADOR DO NPC BERTOLDO (M7-DIALOGO, NPC-MVP): AABB + textura do sprite
     // ESTATICO (ver set_npc_bertoldo_marker acima). nullopt/kInvalidTexture = nada
@@ -320,6 +349,8 @@ private:
     std::optional<gus::core::spatial::Aabb> npc_bertoldo_marker_aabb_{};
     gus::platform::render2d::TextureId npc_bertoldo_marker_tex_ =
         gus::platform::render2d::kInvalidTexture;
+    // COLISAO SOLIDA do Bertoldo (M7-DIALOGO): idem enemy_solid_aabb_ acima.
+    std::optional<gus::core::spatial::Aabb> npc_bertoldo_solid_aabb_{};
 
     // IDLE OFEGANTE (cansado): troca os QUADROS do breathing por TEMPO (AnimClock),
     // num ritmo RAPIDO (idle_tired_breaths_per_minute). So e mostrado quando parado E

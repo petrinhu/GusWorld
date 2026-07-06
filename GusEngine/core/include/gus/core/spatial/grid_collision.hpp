@@ -38,10 +38,39 @@ struct MoveResult {
     bool hit_y = false;  // movimento em Y foi limitado por parede
 };
 
+// ---------------------------------------------------------------------------
+// Obstaculos PONTUAIS (M7-COSTURA/M7-DIALOGO, colisao solida de personagem) -
+// EXTENSAO de resolve_move/resolve_move_with_corner_assist abaixo.
+// ---------------------------------------------------------------------------
+//
+// CONTEXTO (playtest ao vivo do lider): o Gus atravessava POR CIMA de NPCs/inimigos
+// parados (Bertoldo sumia embaixo do sprite do jogador) - so existia a hitbox de
+// TRIGGER (dialogo/combate), nunca uma colisao FISICA que bloqueasse ocupar a mesma
+// posicao. Padrao canonico (Zelda/Stardew): o corpo do NPC bloqueia o movimento como
+// uma "parede pontual" pequena; o jogador contorna pelos tiles adjacentes.
+//
+// Estes obstaculos NAO fazem parte do tilemap estatico (a TileGrid do mapa/.gmap
+// continua intocada) - sao AABBs adicionais, avulsas, passadas a cada chamada.
+// Tratados EXATAMENTE como uma parede (mesma resolucao por eixo, "desliza" ao
+// redor): um obstaculo que bloquearia o deslocamento clampa o alvo daquele eixo pra
+// encostar na borda do obstaculo, escolhendo (entre TODOS os bloqueadores - paredes
+// da grade E obstaculos) o que resulta no MENOR deslocamento (o mais restritivo
+// vence, ordem-independente). Como sao AABBs livres (nao alinhados a celula), a
+// borda de encosto e a borda REAL do obstaculo (obstacle.x/obstacle.x+obstacle.w),
+// nao uma face de celula.
+struct ObstacleSpan {
+    const Aabb* items = nullptr;  // vetor de AABBs de obstaculo (nao possui os dados).
+    int count = 0;                // numero de itens validos em `items`.
+};
+
 // Resolve um deslocamento desejado (dx,dy) contra a grade, deslizando nas
 // paredes (resolucao por eixo: X primeiro, depois Y). Deterministico.
-MoveResult resolve_move(const TileGrid& grid, const Aabb& box, float dx,
-                        float dy) noexcept;
+// `obstacles` (opcional, default vazio): obstaculos PONTUAIS adicionais (ver
+// ObstacleSpan acima) tratados como paredes extras naquele eixo. Vazio (default)
+// reproduz o comportamento LEGADO byte-identico (todo chamador/teste existente,
+// que nao passa obstaculos, continua identico).
+MoveResult resolve_move(const TileGrid& grid, const Aabb& box, float dx, float dy,
+                        ObstacleSpan obstacles = {}) noexcept;
 
 // ---------------------------------------------------------------------------
 // Corner-correction (corner-assist) - EXTENSAO do resolve_move (M1, feel do lider)
@@ -72,10 +101,14 @@ struct CornerAssistOptions {
 };
 
 // Igual ao resolve_move, mas com corner-assist (ver acima). Deterministico.
-// Com opts.enabled == false, identico a resolve_move(grid, box, dx, dy).
+// Com opts.enabled == false, identico a resolve_move(grid, box, dx, dy, obstacles).
+// `obstacles` (opcional, default vazio): MESMOS obstaculos pontuais de resolve_move
+// (ver ObstacleSpan acima) - o corner-assist tambem NAO empurra atraves deles (o
+// empurrao perpendicular e validado contra grade E obstaculos).
 MoveResult resolve_move_with_corner_assist(const TileGrid& grid, const Aabb& box,
                                            float dx, float dy,
-                                           const CornerAssistOptions& opts) noexcept;
+                                           const CornerAssistOptions& opts,
+                                           ObstacleSpan obstacles = {}) noexcept;
 
 }  // namespace gus::core::spatial
 

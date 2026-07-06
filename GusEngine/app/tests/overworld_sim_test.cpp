@@ -421,6 +421,152 @@ TEST_CASE("overworld: marcador de inimigo e do Bertoldo coexistem sem se pisarem
     REQUIRE(r2.sprites[0].texture == 7);
 }
 
+// COLISAO SOLIDA (M7-COSTURA/M7-DIALOGO, playtest ao vivo do lider: "o Gus anda POR
+// CIMA/ATRAVES do Bertoldo, o NPC fica escondido debaixo do sprite ao aproximar pelo
+// norte"). set_enemy_marker/set_npc_bertoldo_marker agora TAMBEM derivam uma caixa de
+// bloqueio FISICO (~1 tile, ver overworld_tuning.hpp::npc_solid_box_tiles) a partir do
+// footprint recebido; step_fixed passa essa caixa como ObstacleSpan extra pro
+// resolve_move_with_corner_assist - o jogador NUNCA mais ocupa a mesma posicao do
+// marcador (mas contorna livre pelos tiles adjacentes, SEM travar o corredor inteiro).
+TEST_CASE("overworld: colisao solida bloqueia o jogador na posicao do marcador do inimigo",
+          "[overworld][enemy-marker][solid-collision]") {
+    // Grade ABERTA (10x10, tile 16) SEM nenhuma parede da grade nas proximidades - a
+    // UNICA coisa que pode bloquear o jogador aqui e o obstaculo pontual do marcador.
+    TileGrid g(10, 10, 16.0f);
+    OverworldTuning t;
+    t.corner.enabled = false;  // desliga corner-assist p/ o resultado ser 100% analitico
+    // Jogador comeca a esquerda, na MESMA faixa Y do obstaculo (overlap total em Y).
+    OverworldSim sim(g, Aabb{20.0f, 58.0f, 8.0f, 8.0f}, t);
+
+    // Footprint VISUAL do inimigo (o quad grande desenhado) - arbitrario, so serve de
+    // entrada pra derivar a caixa solida (~1 tile = 16 unidades neste tile_size).
+    sim.set_enemy_marker(Aabb{100.0f, 50.0f, 20.0f, 20.0f}, /*tex=*/7);
+    // Caixa solida esperada (MESMA formula de solid_obstacle_from_footprint): centro
+    // em X do footprint (110), base = base do footprint (70), tamanho 16.
+    //   solid.x = 110 - 8 = 102; solid.y = 70 - 16 = 54 (x:[102,118) y:[54,70)).
+    constexpr float kSolidX = 102.0f;
+    constexpr float kSolidW = 16.0f;
+
+    // Anda pra DIREITA repetidamente com passo PEQUENO por frame (evita tunneling,
+    // documentado como limite conhecido do resolve_move para deltas grandes demais).
+    for (int i = 0; i < 200; ++i) {
+        sim.step_fixed(1, 0, false, 1.0f / 60.0f);
+    }
+
+    // O jogador NUNCA deve ultrapassar a borda esquerda do obstaculo (encosta e para,
+    // exatamente como uma parede) - a borda direita da hitbox <= kSolidX.
+    REQUIRE(sim.player().x + sim.player().w <= kSolidX + kEps);
+    // Prova que REALMENTE tentou entrar no obstaculo (nao parou longe por acidente):
+    // chegou pertinho da borda de encosto esperada.
+    REQUIRE_THAT(sim.player().x, WithinAbs(kSolidX - sim.player().w, 0.05));
+    (void)kSolidW;
+}
+
+TEST_CASE("overworld: jogador contorna o marcador SEM travar o corredor inteiro",
+          "[overworld][enemy-marker][solid-collision]") {
+    // MESMO obstaculo do teste acima, mas o jogador anda numa faixa Y que NAO se
+    // sobrepoe ao obstaculo (contornando por baixo) - deve atravessar livremente por
+    // cima de onde o obstaculo fica em X, sem NENHUM bloqueio (prova que a colisao e
+    // PONTUAL, nao uma parede que cobre o corredor inteiro).
+    TileGrid g(10, 10, 16.0f);
+    OverworldTuning t;
+    t.corner.enabled = false;
+    // Jogador comeca BEM abaixo da faixa Y do obstaculo (solido em y:[54,70)).
+    OverworldSim sim(g, Aabb{20.0f, 120.0f, 8.0f, 8.0f}, t);
+    sim.set_enemy_marker(Aabb{100.0f, 50.0f, 20.0f, 20.0f}, /*tex=*/7);
+
+    const float x0 = sim.player().x;
+    for (int i = 0; i < 200; ++i) {
+        sim.step_fixed(1, 0, false, 1.0f / 60.0f);
+    }
+    // Andou livre, bem alem de onde o obstaculo fica em X (nao foi barrado).
+    REQUIRE(sim.player().x > x0 + 100.0f);
+}
+
+TEST_CASE("overworld: colisao solida do Bertoldo (NPC) tambem bloqueia o jogador",
+          "[overworld][npc-bertoldo-marker][solid-collision]") {
+    // MESMA garantia do inimigo acima, agora pro slot PROPRIO do Bertoldo (obstaculos
+    // independentes - ver step_fixed, array de ate 2).
+    TileGrid g(10, 10, 16.0f);
+    OverworldTuning t;
+    t.corner.enabled = false;
+    OverworldSim sim(g, Aabb{20.0f, 58.0f, 8.0f, 8.0f}, t);
+    sim.set_npc_bertoldo_marker(Aabb{100.0f, 50.0f, 20.0f, 20.0f}, /*tex=*/9);
+    constexpr float kSolidX = 102.0f;
+
+    for (int i = 0; i < 200; ++i) {
+        sim.step_fixed(1, 0, false, 1.0f / 60.0f);
+    }
+    REQUIRE(sim.player().x + sim.player().w <= kSolidX + kEps);
+    REQUIRE_THAT(sim.player().x, WithinAbs(kSolidX - sim.player().w, 0.05));
+}
+
+TEST_CASE("overworld: inimigo derrotado (clear_enemy_marker) libera o bloqueio fisico",
+          "[overworld][enemy-marker][solid-collision]") {
+    // Victory (item 4 do escopo M7): o inimigo some do mapa E para de bloquear -
+    // clear_enemy_marker reseta enemy_solid_aabb_ (ver header).
+    TileGrid g(10, 10, 16.0f);
+    OverworldTuning t;
+    t.corner.enabled = false;
+    OverworldSim sim(g, Aabb{20.0f, 58.0f, 8.0f, 8.0f}, t);
+    sim.set_enemy_marker(Aabb{100.0f, 50.0f, 20.0f, 20.0f}, /*tex=*/7);
+    sim.clear_enemy_marker();
+
+    const float x0 = sim.player().x;
+    for (int i = 0; i < 200; ++i) {
+        sim.step_fixed(1, 0, false, 1.0f / 60.0f);
+    }
+    // Sem o marcador, o jogador atravessa livremente por onde o obstaculo estaria.
+    REQUIRE(sim.player().x > x0 + 100.0f);
+}
+
+// Y-SORT no render REAL (M7-COSTURA, ver depth_sort_test.cpp para a prova da funcao
+// pura de ordenacao). Aqui a integracao: OverworldSim::render() consome sort_by_depth
+// pra decidir a SEQUENCIA de desenho - jogador, inimigo e NPC entram na MESMA lista
+// ordenavel por profundidade (base/pe = aabb.y+aabb.h). set_player_sprites faz o
+// jogador desenhar via draw_textured_rect (MESMO vetor `sprites` dos marcadores),
+// entao a ORDEM em r.sprites reflete diretamente a sequencia de desenho real.
+TEST_CASE("overworld: Y-sort real - jogador ACIMA dos marcadores desenha primeiro (atras)",
+          "[overworld][depth-sort]") {
+    TileGrid g(10, 10, 16.0f);
+    OverworldSim sim(g, Aabb{20.0f, 10.0f, 8.0f, 8.0f}, OverworldTuning{});
+    PlayerSpriteSet sprites = make_fake_sprites();
+    sim.set_player_sprites(sprites);
+    sim.set_enemy_marker(Aabb{40.0f, 60.0f, 8.0f, 8.0f}, /*tex=*/100);       // base=68
+    sim.set_npc_bertoldo_marker(Aabb{60.0f, 70.0f, 8.0f, 8.0f}, /*tex=*/101);  // base=78
+
+    FakeRenderer r;
+    sim.render(r, 800.0f, 800.0f, 0.0f);  // viewport GRANDE: garante que nada e cullado
+    REQUIRE(r.sprites.size() == 3);
+
+    const TextureId player_tex = sprites.idle[static_cast<int>(Direction::South)];
+    // Jogador (base = 10+8 = 18, o MENOR dos 3) desenha PRIMEIRO (indice 0).
+    REQUIRE(r.sprites[0].texture == player_tex);
+    REQUIRE(r.sprites[1].texture == 100);  // inimigo (base 68) em seguida
+    REQUIRE(r.sprites[2].texture == 101);  // Bertoldo (base 78) por ultimo (na frente)
+}
+
+TEST_CASE("overworld: Y-sort real - jogador ABAIXO dos marcadores desenha por ultimo (frente)",
+          "[overworld][depth-sort]") {
+    TileGrid g(10, 10, 16.0f);
+    OverworldSim sim(g, Aabb{20.0f, 150.0f, 8.0f, 8.0f}, OverworldTuning{});
+    PlayerSpriteSet sprites = make_fake_sprites();
+    sim.set_player_sprites(sprites);
+    sim.set_enemy_marker(Aabb{40.0f, 60.0f, 8.0f, 8.0f}, /*tex=*/100);       // base=68
+    sim.set_npc_bertoldo_marker(Aabb{60.0f, 70.0f, 8.0f, 8.0f}, /*tex=*/101);  // base=78
+
+    FakeRenderer r;
+    sim.render(r, 800.0f, 800.0f, 0.0f);
+    REQUIRE(r.sprites.size() == 3);
+
+    const TextureId player_tex = sprites.idle[static_cast<int>(Direction::South)];
+    REQUIRE(r.sprites[0].texture == 100);  // inimigo (base 68) primeiro
+    REQUIRE(r.sprites[1].texture == 101);  // Bertoldo (base 78) em seguida
+    // Jogador (base = 150+8 = 158, o MAIOR dos 3) desenha por ULTIMO (fica na frente)
+    // - o INVERSO da ordem fixa legada (jogador SEMPRE por cima, independente do Y).
+    REQUIRE(r.sprites[2].texture == player_tex);
+}
+
 TEST_CASE("overworld: render interpola posicao do jogador", "[overworld]") {
     TileGrid g = make_map();
     OverworldSim sim(g, Aabb{16.0f, 16.0f, 8.0f, 8.0f}, 60.0f);
