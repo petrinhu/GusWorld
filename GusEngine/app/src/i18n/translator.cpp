@@ -5,18 +5,8 @@
 
 #include "gus/app/i18n/translator.hpp"
 
-#include <cstdlib>  // std::getenv
-#include <fstream>
-#include <ios>
-#include <sstream>
-
-#include "gus/core/asset_paths.hpp"  // caminhos de asset centralizados
-
-// Raiz do repo (pai de GusEngine/) embutida pelo CMake, pra achar game/translations/
-// rodando do build dir. Override em runtime via env GUSWORLD_TRANSLATIONS.
-#ifndef GUSWORLD_TRANSLATIONS_DIR
-#define GUSWORLD_TRANSLATIONS_DIR ""
-#endif
+#include "gus/core/asset_paths.hpp"               // caminhos de asset centralizados
+#include "gus/platform/assets/asset_source.hpp"   // ASSETS-VFS-F1 (ADR-013): porteiro
 
 namespace gus::app::i18n {
 
@@ -39,15 +29,16 @@ void Translator::load_from_content(std::string_view md_content) {
 }
 
 bool Translator::load_from_file(const std::string& path) {
-    std::ifstream in(path, std::ios::binary);
-    if (!in) {
-        return false;
+    // ASSETS-VFS-F1 (ADR-013): delega pro primitivo compartilhado read_raw_file (o MESMO
+    // usado por FilesystemAssetSource::read() apos resolver um id) - aceita qualquer path
+    // (literal ou ja resolvido), preservando o contrato public de load_from_file.
+    const auto bytes = gus::platform::assets::read_raw_file(path);
+    if (!bytes.has_value() || bytes->empty()) {
+        return false;  // ausente/ilegivel/vazio: fallback (mostra a chave)
     }
-    std::ostringstream buf;
-    buf << in.rdbuf();
-    const std::string content = buf.str();
-    if (content.empty()) {
-        return false;
+    std::string content(bytes->size(), '\0');
+    for (std::size_t i = 0; i < bytes->size(); ++i) {
+        content[i] = static_cast<char>(bytes.value()[i]);
     }
     load_from_content(content);
     return true;
@@ -62,17 +53,15 @@ std::string Translator::tr(const std::string& key) const {
 }
 
 std::string resolve_translations_path() {
-    if (const char* env = std::getenv("GUSWORLD_TRANSLATIONS")) {
-        if (env[0] != '\0') {
-            return env;  // caminho COMPLETO do .md (o lider aponta direto)
-        }
-    }
-    const std::string pt_br(gus::core::assets::kTranslationPtBrFile);
-    const std::string compiled = GUSWORLD_TRANSLATIONS_DIR;
-    if (!compiled.empty()) {
-        return join(compiled, pt_br);
-    }
-    return join(std::string(gus::core::assets::kTranslationsDir), pt_br);
+    // ASSETS-VFS-F1 (ADR-013): a cadeia `env GUSWORLD_TRANSLATIONS = override LITERAL >
+    // macro GUSWORLD_TRANSLATIONS_DIR > CWD (kTranslationsDir)` foi CONSOLIDADA em
+    // FilesystemAssetSource::resolve_path (familia I18N, dispatch pelo prefixo
+    // "game/translations/" do id). Assinatura/contrato INTOCADOS - paridade provada em
+    // platform/tests/asset_source_test.cpp.
+    const std::string id =
+        join(std::string(gus::core::assets::kTranslationsDir),
+             std::string(gus::core::assets::kTranslationPtBrFile));
+    return gus::platform::assets::FilesystemAssetSource().resolve_path(id);
 }
 
 std::string_view verb_label_key(BattleVerb verb) noexcept {
