@@ -1138,22 +1138,35 @@ void battle_key_down(BattleScene& scene, SDL_Keycode key, bool& running,
             //       ainda intocado) - volta a LISTA (estagio 1). Nada foi comprometido (sem
             //       begin_turn/tick), entao isto e SEMPRE seguro (ver actor_preview_cancel).
             //   (3) LISTA (§4.1, estagio 1: badges na arena) - TOPO da pilha quando so a
-            //       lista esta aberta. NO-OP (decisao documentada: nao ha nivel anterior pra
-            //       desempilhar - a rodada da party PRECISA de alguem escolhido pra avancar;
-            //       Esc != Enter, entao NAO aceita o pre-selecionado por engano).
-            //   (4) PILHA VAZIA (nenhum modal aberto): sai do viewer (running=false), como
-            //       sempre. TODO(menu-de-pause): no JOGO REAL este e o gancho pro MENU DE
-            //       PAUSE (Esc abriria pause em vez de fechar a janela) - fora de escopo
-            //       deste fix (que e so o STACK do Esc dentro do combate).
+            //       lista esta aberta. NAO ha nivel anterior pra desempilhar (a rodada da
+            //       party PRECISA de alguem escolhido pra avancar; Esc != Enter, entao NAO
+            //       aceita o pre-selecionado por engano) - MAS e um dos DOIS pontos que abrem
+            //       o MENU DE PAUSA (FIX bug do lider 2026-07-05: "o menu de pausa nunca abre
+            //       durante o combate normal" - o jogador SEMPRE esta neste estagio OU no (2)
+            //       durante o turno, entao a pilha-vazia do estagio (4) nunca era alcancada
+            //       na pratica). MESMA logica condicional do estagio (4): com out_effect
+            //       nao-nulo (HOST REAL), sinaliza OpenPauseMenu; com out_effect==nullptr
+            //       (os 8 testes de battle_key_routing_test.cpp, o --battle standalone via
+            //       wrapper, os self-tests sinteticos que passam `dummy`), preserva o NO-OP
+            //       ANTIGO - ZERO regressao nesses call-sites.
+            //   (4) PILHA VAZIA (nenhum modal aberto): com out_effect nao-nulo, sinaliza
+            //       OpenPauseMenu (MENU-PAUSA-CONFIG-SOM, gancho ja integrado); com
+            //       out_effect==nullptr, sai do viewer (running=false), como sempre.
             if (scene.is_aiming()) {
                 scene.aim_cancel();
             } else if (scene.is_actor_preview()) {
                 scene.actor_preview_cancel();
             } else if (scene.is_choosing_actor()) {
-                // (3) no-op, ver comentario acima.
+                // (3) LISTA DE ATOR: mesma condicional do estagio (4) - ver comentario acima.
+                // O HOST REAL (out_effect != nullptr) abre o menu de pausa aqui TAMBEM, porque
+                // e o estagio onde o jogador passa a maior parte do turno. Callers com
+                // out_effect == nullptr mantem o no-op ANTIGO (nada muda pra eles).
+                if (out_effect != nullptr) {
+                    *out_effect = BattleEscEffect::OpenPauseMenu;
+                }
             } else if (out_effect != nullptr) {
                 // MENU-PAUSA-CONFIG-SOM (INTEGRACAO FINAL): o gancho do TODO(menu-de-
-                // pause) acima virou real. O HOST REAL passa out_effect nao-nulo: NAO
+                // pause) antigo virou real. O HOST REAL passa out_effect nao-nulo: NAO
                 // mexe em running (o viewer continua rodando por baixo do menu) - so
                 // sinaliza o pedido; quem decide o resto (abrir o loop do menu, e so
                 // entao considerar running=false se o jogador confirmar Sair ou

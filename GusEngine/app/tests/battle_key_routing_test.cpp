@@ -215,19 +215,42 @@ TEST_CASE("Esc na MIRA com out_effect: cancela a mira, effect fica None (pilha n
     REQUIRE(effect == BattleEscEffect::None);  // pilha NAO estava vazia - sem efeito de pausa
 }
 
-TEST_CASE("Esc no PICKER (LISTA) com out_effect: continua NO-OP, effect fica None",
+// BATTLE-ESC-PAUSE-ACTOR-LIST (fix ao vivo do lider 2026-07-05: "o menu de pausa nunca abre
+// durante o combate normal"). CAUSA RAIZ: o jogador esta SEMPRE em LISTA (estagio 1) ou
+// PREVIEW (estagio 2) durante o turno - a pilha-vazia (estagio 4, unico ponto que abria
+// pausa) nunca era alcancada na pratica. FIX: a LISTA (estagio 1) TAMBEM abre o menu de
+// pausa quando out_effect != nullptr, IGUAL a pilha vazia. Com out_effect == nullptr
+// (os demais TEST_CASEs deste arquivo, o --battle standalone, os self-tests sinteticos),
+// o no-op ANTIGO continua intacto - ZERO regressao.
+TEST_CASE("Esc no PICKER (LISTA) com out_effect: AGORA sinaliza OpenPauseMenu (fix 2026-07-05)",
           "[battle_key_routing]") {
     BattleScene scene;
     pump_to_actor_picker(scene);
     REQUIRE(scene.is_choosing_actor());
 
     bool running = true;
-    BattleEscEffect effect = BattleEscEffect::OpenPauseMenu;  // sentinela
+    BattleEscEffect effect = BattleEscEffect::None;
     battle_key_down(scene, SDLK_ESCAPE, running, &effect);
 
-    REQUIRE(running);
+    REQUIRE(running);                    // NAO mexe em running (mesmo contrato da pilha vazia)
+    REQUIRE(scene.is_choosing_actor());  // a LISTA continua aberta por baixo do menu de pausa
+    REQUIRE(effect == BattleEscEffect::OpenPauseMenu);
+}
+
+TEST_CASE("Esc no PICKER (LISTA) SEM out_effect (nullptr): NO-OP preservado - ZERO regressao",
+          "[battle_key_routing]") {
+    // Prova explicita: os call-sites com out_effect == nullptr (os 8 testes originais deste
+    // arquivo, o --battle standalone via wrapper, os self-tests sinteticos que passam
+    // `dummy`) NAO sao afetados pelo fix acima - o no-op ANTIGO da LISTA segue byte a byte.
+    BattleScene scene;
+    pump_to_actor_picker(scene);
     REQUIRE(scene.is_choosing_actor());
-    REQUIRE(effect == BattleEscEffect::None);
+
+    bool running = true;
+    battle_key_down(scene, SDLK_ESCAPE, running, nullptr);
+
+    REQUIRE(running);
+    REQUIRE(scene.is_choosing_actor());  // no-op: nada desempilhou, nada fechou
 }
 
 TEST_CASE("Esc na pilha VAZIA SEM out_effect (nullptr, default): comportamento ANTIGO intacto",
