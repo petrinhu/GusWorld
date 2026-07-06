@@ -162,13 +162,16 @@ gus::core::spatial::Aabb pick_fixed_enemy_position(
 
 gus::core::spatial::Aabb enemy_sprite_footprint_aabb(
     const gus::core::spatial::Aabb& anchor, float sprite_height_tiles,
-    float tile_size) noexcept {
-    // MESMA formula de overworld_sim.cpp (MARCADOR DE INIMIGO FIXO): quad quadrado,
-    // centrado em X sobre o anchor, base do quad = base do anchor (bottom_fraction=0,
-    // manual_offset=0 - sem foot-inset, e um busto/icone, nao um sprite de corpo com
-    // pes medidos).
+    float tile_size, float sprite_width_fraction) noexcept {
+    // MESMA formula de overworld_sim.cpp (MARCADOR DE INIMIGO FIXO): quad centrado em
+    // X sobre o anchor, base do quad = base do anchor (bottom_fraction=0, manual_
+    // offset=0 - sem foot-inset, e um busto/icone, nao um sprite de corpo com pes
+    // medidos). sprite_width_fraction (default 1.0 = quadrado) encolhe SO a largura
+    // pra retratos cujo conteudo visivel nao preenche o canvas quadrado inteiro (ver
+    // BUG-7/M7-DIALOGO no header) - o CENTRO em X permanece sobre o anchor mesmo
+    // quando esprite_w < esprite_h (fp.x abaixo ja centra por construcao).
     const float esprite_h = sprite_height_tiles * tile_size;
-    const float esprite_w = esprite_h;  // retrato quadrado
+    const float esprite_w = esprite_h * sprite_width_fraction;
 
     gus::core::spatial::Aabb fp;
     fp.w = esprite_w;

@@ -15,6 +15,7 @@
 #include <vector>
 
 #include "gus/app/maestro_logic.hpp"
+#include "gus/app/screens/overworld_tuning.hpp"  // BUG-7: OverworldTuning::npc_bertoldo_*
 
 using gus::app::aabb_overlaps;
 using gus::app::battle_crossfade_target;
@@ -771,4 +772,93 @@ TEST_CASE("battle_crossfade_target: os dois ids invalidos devolve invalido "
           "no-opam com kInvalidSound, nunca crasha)",
           "[maestro][logic][audio][m7_costura]") {
     CHECK(battle_crossfade_target(kInvalidSound, kInvalidSound) == kInvalidSound);
+}
+
+// ============================================================================
+// BUG-7 (M7-DIALOGO, playtest ao vivo do lider APOS o fix do BUG-1: "nao mudou. Ja de
+// longe o dialogo e ativado"). O repro anterior so provou que a hitbox de trigger
+// (npc_bertoldo_aabb_) COINCIDE com o quad desenhado - verdade, mas irrelevante: o quad
+// desenhado em si e um retrato QUADRADO (south.png, 180x180) com o corpo do Bertoldo
+// ocupando so ~31.7% da LARGURA do canvas (alpha-bbox medido: x=[62,119]) contra ~76.7%
+// da ALTURA (y=[20,158]) - um busto ESTREITO com muito espaco TRANSPARENTE nas laterais.
+// enemy_sprite_footprint_aabb forcava esprite_w = esprite_h (quadrado), entao a hitbox de
+// dialogo sobrava ~1.1 tile de ar em cada lado do corpo REALMENTE visivel - o jogador
+// disparava o dialogo ainda visualmente longe (nas laterais). Estes testes travam o FIX
+// (sprite_width_fraction, ver maestro_logic.hpp + overworld_tuning.hpp::npc_bertoldo_
+// sprite_width_fraction): a hitbox fica mais ESTREITA que o canvas do retrato, e um
+// jogador na zona lateral que ANTES disparava (dentro do quadrado antigo, fora da faixa
+// estreita nova) deixa de disparar.
+// ============================================================================
+
+TEST_CASE("enemy_sprite_footprint_aabb: sprite_width_fraction < 1 encolhe SO a "
+          "largura (altura/base do quad INALTERADAS), mantendo o centro em X sobre "
+          "o anchor",
+          "[maestro][logic][bug7]") {
+    const Aabb anchor{5.0f * 2.0f + 1.0f - 0.6f, 5.0f * 2.0f + 1.0f - 0.6f, 1.2f, 1.2f};
+    const float sprite_height_tiles = 3.3f;
+    const float tile_size = 2.0f;
+    const float width_fraction = 0.36f;
+
+    const Aabb square = enemy_sprite_footprint_aabb(anchor, sprite_height_tiles,
+                                                     tile_size);  // default 1.0 (legado)
+    const Aabb narrow = enemy_sprite_footprint_aabb(anchor, sprite_height_tiles,
+                                                     tile_size, width_fraction);
+
+    // Altura e base do quad NAO mudam (mesma formula/posicao vertical de sempre).
+    CHECK(narrow.h == Catch::Approx(square.h));
+    CHECK(narrow.y == Catch::Approx(square.y));
+    CHECK(narrow.y + narrow.h == Catch::Approx(anchor.y + anchor.h));
+
+    // Largura encolhe pela fracao pedida; o centro em X continua sobre o anchor
+    // (fp.x = anchor.x + anchor.w*0.5 - esprite_w*0.5 ja centra por construcao).
+    CHECK(narrow.w == Catch::Approx(square.w * width_fraction));
+    CHECK(narrow.x + narrow.w * 0.5f == Catch::Approx(anchor.x + anchor.w * 0.5f));
+    CHECK(narrow.w < square.w);
+}
+
+TEST_CASE("BUG-7: com os numeros REAIS do Bertoldo (height_tiles=3.3, "
+          "width_fraction=0.36, tile_size=2.0), um jogador na zona lateral que o "
+          "quad QUADRADO antigo disparava (visualmente LONGE do corpo do retrato) "
+          "NAO dispara mais o dialogo com a hitbox estreita",
+          "[maestro][logic][bug7][regressao]") {
+    const gus::app::screens::OverworldTuning tuning{};  // valores canonicos do jogo
+    const float tile_size = 2.0f;
+    const float player_side = 0.6f * tile_size;  // hitbox real do jogador
+
+    const Aabb anchor{10.0f * tile_size + tile_size * 0.5f - player_side * 0.5f,
+                       10.0f * tile_size + tile_size * 0.5f - player_side * 0.5f,
+                       player_side, player_side};
+
+    const Aabb square = enemy_sprite_footprint_aabb(
+        anchor, tuning.npc_bertoldo_sprite_height_tiles, tile_size);  // 1.0 (bug antigo)
+    const Aabb narrow = enemy_sprite_footprint_aabb(
+        anchor, tuning.npc_bertoldo_sprite_height_tiles, tile_size,
+        tuning.npc_bertoldo_sprite_width_fraction);  // fix
+
+    const float cy = narrow.y + narrow.h * 0.5f;
+
+    // Jogador parado BEM na quina lateral do quadrado ANTIGO (extremo do quad
+    // quadrado de 3.3 tiles), na mesma altura Y do centro do Bertoldo - visualmente
+    // isto e ar transparente ao lado do retrato (o corpo real so vai ate narrow.x/
+    // narrow.x+narrow.w), nao o boneco. ANTES do fix, o quad quadrado (square) ia
+    // disparar (o jogador esta dentro dele); DEPOIS do fix, esta fora da hitbox
+    // estreita (narrow).
+    const Aabb player_lateral_far{square.x + 0.05f, cy - player_side * 0.5f,
+                                   player_side, player_side};
+
+    CHECK(aabb_overlaps(player_lateral_far, square));       // bug antigo: disparava
+    CHECK_FALSE(aabb_overlaps(player_lateral_far, narrow));  // fix: nao dispara mais
+
+    // Controle: o jogador ENCOSTADO na lateral do corpo REALMENTE visivel (borda da
+    // hitbox estreita) continua disparando - o fix nao criou um fantasma (nao afeta
+    // aproximacao genuina).
+    const Aabb player_touching_body{narrow.x - player_side * 0.5f + 0.05f,
+                                     cy - player_side * 0.5f, player_side, player_side};
+    CHECK(aabb_overlaps(player_touching_body, narrow));
+
+    // Controle: bem no meio do retrato (onde o corpo de fato esta) sempre disparou e
+    // continua disparando.
+    const Aabb player_center{narrow.x + narrow.w * 0.5f - player_side * 0.5f,
+                              cy - player_side * 0.5f, player_side, player_side};
+    CHECK(aabb_overlaps(player_center, narrow));
 }

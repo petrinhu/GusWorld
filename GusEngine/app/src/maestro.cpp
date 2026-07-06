@@ -198,12 +198,22 @@ bool Maestro::init() {
     // crianca. A hitbox de trigger (npc_bertoldo_aabb_, usada abaixo em
     // aabb_overlaps) e o quad desenhado (overworld_sim.cpp) usam a MESMA constante
     // nova - continuam coincidindo exatamente, so num tamanho maior/correto.
+    //
+    // FIX BUG-7 (M7-DIALOGO, playtest ao vivo do lider APOS o fix acima: "nao mudou.
+    // Ja de longe o dialogo e ativado"): sprite_width_fraction (tuning().npc_
+    // bertoldo_sprite_width_fraction, ver overworld_tuning.hpp) encolhe SO a LARGURA
+    // do footprint pra bater com o corpo REALMENTE visivel do retrato (busto estreito
+    // com muito ar transparente nas laterais - o quad QUADRADO antigo sobrava ~1.1
+    // tile de trigger fantasma pra cada lado). A altura/base continuam iguais (o
+    // retrato desenhado NAO muda de tamanho, so a hitbox de colisao/dialogo fica mais
+    // fiel ao que o jogador VE).
     const gus::core::spatial::Aabb npc_anchor = pick_fixed_enemy_position(
         city_->grid(), city_->player_aabb(), kNpcBertoldoOffsetTilesX,
         kNpcBertoldoOffsetTilesY);
     npc_bertoldo_aabb_ = enemy_sprite_footprint_aabb(
         npc_anchor, city_->tuning().npc_bertoldo_sprite_height_tiles,
-        city_->grid().tile_size());
+        city_->grid().tile_size(),
+        city_->tuning().npc_bertoldo_sprite_width_fraction);
     city_->set_npc_bertoldo_marker(npc_bertoldo_aabb_);
     std::cout << "Maestro: [dialogo] Bertoldo (NPC-MVP) em (" << npc_bertoldo_aabb_.x
               << ", " << npc_bertoldo_aabb_.y << ").\n";

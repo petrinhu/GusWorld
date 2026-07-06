@@ -91,9 +91,31 @@ enum class EncounterId : int {
 // e IDEMPOTENTE re-alimentar este resultado de volta no mesmo calculo de desenho, ver
 // maestro_logic_test.cpp). NAO maior que o sprite (evita disparar de longe), NAO menor
 // (evita o fantasma) - literalmente o retangulo que o jogador VE.
+//
+// FIX BUG-7 (M7-DIALOGO, playtest ao vivo do lider APOS o fix acima: "nao mudou. Ja
+// de longe o dialogo e ativado"). Causa raiz DISTINTA do BUG-1: o quad acima e sempre
+// QUADRADO (esprite_w = esprite_h = sprite_height_tiles*tile_size) - hipotese correta
+// para um retrato cujo CONTEUDO visivel (alpha-bbox) preenche a LARGURA do canvas na
+// mesma proporcao que a ALTURA. Medindo o alpha-bbox real do south.png do Bertoldo
+// (180x180): o corpo ocupa so ~31.7% da LARGURA do canvas (bbox x=[62,119]) contra
+// ~76.7% da ALTURA (bbox y=[20,158]) - um retrato estreito (busto centralizado com
+// MUITO espaco vazio nas laterais), nao um quadrado cheio. Forcar esprite_w = esprite_h
+// fazia a hitbox de trigger (e o quad desenhado) sobrarem ~1.1 tile de ar TRANSPARENTE
+// pra cada lado do corpo visivel do Bertoldo (canvas 3.3 tiles de lado, corpo real so
+// ~1.05 tile de largura) - o jogador encostava na hitbox bem antes de chegar perto do
+// corpo, exatamente o "de longe" relatado. sprite_width_fraction (default 1.0 = quadrado,
+// preserva o comportamento LEGADO do marcador de inimigo fixo, cujo retrato e bem mais
+// proximo de quadrado - 57%/81% - e NAO tem bug relatado) permite encolher SO a LARGURA
+// do footprint para uma fracao da altura, mantendo o centro em X sobre o anchor (a
+// formula de fp.x ja centra por construcao, entao encolher esprite_w NAO desloca o
+// footprint) e sem tocar no calculo de fp.y/base (inalterado). O desenho em
+// overworld_sim.cpp recalcula o quad VISUAL a partir do tuning (independente de fp.w),
+// entao o retrato continua sendo desenhado no MESMO tamanho de sempre - so a hitbox de
+// colisao/dialogo fica mais fiel ao corpo REALMENTE visivel. Ver
+// overworld_tuning.hpp::npc_bertoldo_sprite_width_fraction.
 [[nodiscard]] gus::core::spatial::Aabb enemy_sprite_footprint_aabb(
     const gus::core::spatial::Aabb& anchor, float sprite_height_tiles,
-    float tile_size) noexcept;
+    float tile_size, float sprite_width_fraction = 1.0f) noexcept;
 
 // FIX BUG-3 (playtest ao vivo do lider: "fechei a janela DURANTE a batalha e ela
 // reabriu a cidade, virou LOOP INFINITO ate eu dar pkill"). Contrato do run() da
