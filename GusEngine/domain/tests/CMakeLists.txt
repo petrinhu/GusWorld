@@ -76,6 +76,10 @@ add_executable(gusengine_domain_tests
     # MENU-PAUSA-CONFIG-SOM (M7-COSTURA): settings.json proprio (mesmo padrao JSON
     # dep-free de controls_json.hpp), so volume musica/SFX nesta onda.
     system_settings_json_test.cpp
+    # M7-DIALOGO (ADR-014): grafo/validate(), parser do formato-texto, runtime.
+    dialogue_graph_test.cpp
+    dialogue_text_test.cpp
+    dialogue_runtime_test.cpp
 )
 
 # Os testes do combate incluem helpers de teste headers-only (fixed_random.hpp).

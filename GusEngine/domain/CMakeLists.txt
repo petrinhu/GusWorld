@@ -51,6 +51,11 @@ add_library(gusengine_domain STATIC
     # MENU-PAUSA-CONFIG-SOM (M7-COSTURA): settings.json proprio (mesmo padrao JSON
     # dep-free de controls_json.cpp), so volume musica/SFX nesta onda.
     src/settings/system_settings_json.cpp
+    # M7-DIALOGO (ADR-014): runtime de dialogo POCO (grafo + parser do
+    # formato-texto proprio + motor enter/current/choose/advance/finished).
+    src/dialogue/dialogue_graph.cpp
+    src/dialogue/dialogue_text.cpp
+    src/dialogue/dialogue_runtime.cpp
 )
 
 target_include_directories(gusengine_domain
