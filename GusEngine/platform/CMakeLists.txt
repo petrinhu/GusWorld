@@ -35,6 +35,12 @@ add_library(gusengine_platform STATIC
     # M2-SAVE-IO (ADR-012 Onda 2): I/O real de ~/.gusworld/saves/*.sav (save V4
     # binario, consumido via load_save nao-lancante).
     src/fs/save_file_store.cpp
+    # ASSETS-VFS-F1 (ADR-013): o "porteiro" unico de leitura de asset (AssetSource +
+    # FilesystemAssetSource). Fase 1 = so indirecao sobre o filesystem, consolidando a
+    # cadeia `env > macro > CWD` que estava duplicada em 6+ resolvers (font_atlas,
+    # translator, player_sprites_loader, anim_catalog, sdl_window, battle_preview,
+    # system_menu_loop).
+    src/assets/asset_source.cpp
 )
 
 # ADR-010 F3: o backend RmlUi vendorizado (RmlUi_Renderer_GL3.cpp / RmlUi_Platform_SDL.cpp /
@@ -75,8 +81,23 @@ target_include_directories(gusengine_platform
 # runtime via env GUSWORLD_ASSETS (mesma logica do resolver de mapas/sprites).
 # GUSWORLD_FONTS_DIR e usado pelo font_atlas (Render2dSdl); o glintfx (app/) carrega a Pixel
 # Operator Mono via @font-face no RCSS a partir da mesma pasta.
+#
+# ASSETS-VFS-F1 (ADR-013): as 4 macros abaixo (ASSETS/SFX/MUSIC/TRANSLATIONS_DIR) MIGRAM
+# pra ca (antes so em app/CMakeLists.txt) porque a cadeia de resolucao `env > macro > CWD`
+# por familia de asset agora mora DENTRO de FilesystemAssetSource (platform/assets/), nao
+# mais duplicada em cada consumidor de app/. Valores IDENTICOS aos ja definidos em
+# app/CMakeLists.txt (mesma raiz ${CMAKE_SOURCE_DIR} = GusEngine/ nos dois alvos - definir
+# nos dois nao diverge, e o mesmo padrao ja usado por GUSWORLD_FONTS_DIR).
 target_compile_definitions(gusengine_platform
     PRIVATE GUSWORLD_FONTS_DIR="${CMAKE_SOURCE_DIR}/assets/fonts"
+    # Raiz resources/ do repo (irma de GusEngine/) - familia GENERICA (sprites/images/vfx).
+    PRIVATE GUSWORLD_ASSETS_DIR="${CMAKE_SOURCE_DIR}/../resources"
+    # Kit CC0 de SFX, na raiz do repo (irma de resources/ e GusEngine/, M6 ADR-011).
+    PRIVATE GUSWORLD_SFX_DIR="${CMAKE_SOURCE_DIR}/../assets/sfx"
+    # Musica CC0, irma de assets/sfx/ (M6 ADR-011).
+    PRIVATE GUSWORLD_MUSIC_DIR="${CMAKE_SOURCE_DIR}/../assets/music"
+    # Catalogos de traducao (game/translations/), raiz = pai de GusEngine/.
+    PRIVATE GUSWORLD_TRANSLATIONS_DIR="${CMAKE_SOURCE_DIR}/../game/translations"
 )
 
 # domain/ entra aqui: input_mapper/sdl_input consomem o mapa logico puro. SDL3 e a camada de
