@@ -95,7 +95,7 @@ O fundo real congelado do menu de pausa (`open_pause_from_city`, linha 276-287) 
 
 ## AC-E8 — Arquivos soltos não-rastreados na raiz do projeto
 
-**Achado.** Na raiz: `Sistema_Luta_RPG_Teoria_dos_Jogos_Completo.txt` (não-rastreado; aparenta ser o insumo do item `COMBATE-TEORIA-JOGOS` de PI9) e `scratchpad_caps/` (não-rastreado, capturas soltas). A memória do projeto (`feedback_arquivos_importantes_pasta_projeto`) manda material importante ficar em pasta canônica E commitado; a raiz do repo só carrega os arquivos canônicos (CLAUDE/TODO/CHARS/PLACES/sinopse/manuais).
+**Achado.** Na raiz: `Sistema_Luta_RPG_Teoria_dos_Jogos_Completo.txt` (não-rastreado; aparenta ser o insumo do item `COMBATE-TEORIA-JOGOS` de PI9) e `scratchpad_caps/` (não-rastreado, capturas soltas). Também não-rastreado: `GusEngine/app/tools/` (4 probes de dev: `frozen_bg_probe.cpp`, `npcdlg_hover_probe.cpp`, `npcdlg_screenshot_probe.cpp`, `repro_bertoldo.cpp` — utilidades de diagnóstico das sessões M7 que nunca entraram no git; decidir se commitam como tooling ou se descartam). A memória do projeto (`feedback_arquivos_importantes_pasta_projeto`) manda material importante ficar em pasta canônica E commitado; a raiz do repo só carrega os arquivos canônicos (CLAUDE/TODO/CHARS/PLACES/sinopse/manuais).
 
 **Classificação: (A) FIX DIRETO, com decisão do líder via AskUserQuestion ANTES.** Perguntar: (a) o .txt é insumo do COMBATE-TEORIA-JOGOS? Se sim, mover para `docs/design/mecanicas/` (ou `resources/`) e commitar citando COMBATE-TEORIA-JOGOS; (b) `scratchpad_caps/`: descartar (efêmero) ou mover o que importa pra `docs/design/mockups/` e commitar. Sem decisão, ao menos adicionar `scratchpad_caps/` ao `.gitignore` pra não sujar o status.
 
