@@ -9,7 +9,9 @@
 
 #include "gus/app/dialogue/npc_dialogue_catalog.hpp"  // M7-DIALOGO: I/O do .dlg.txt
 #include "gus/app/screens/battle_preview.hpp"    // run_battle_preview_embedded
-#include "gus/app/screens/npc_dialogue_loop.hpp"  // M7-DIALOGO: loop do dialogo do Bertoldo
+// DIALOGO-TERMINAL: loop GL real (caixa quente com retrato) - substitui o overlay
+// funcional simples de texto (npc_dialogue_loop.hpp, aposentado - ver seu header).
+#include "gus/app/screens/npc_dialogue_loop_gl.hpp"
 #include "gus/app/screens/system_menu_loop.hpp"  // MENU-PAUSA-CONFIG-SOM: Esc na cidade
 #include "gus/domain/dialogue/dialogue_runtime.hpp"
 #include "gus/domain/settings/system_settings.hpp"
@@ -432,7 +434,7 @@ bool Maestro::to_npc_dialogue() {
         return false;
     }
     std::cout << "Maestro: [dialogo] esbarrou no Bertoldo -> abrindo conversa "
-                 "(overlay funcional simples, M7-DIALOGO NPC-MVP).\n";
+                 "(caixa quente com retrato real, DIALOGO-TERMINAL).\n";
 
     // DialogueRuntime opera sobre save_.flags POR REFERENCIA (domain/dialogue NAO
     // depende de domain/save - ver dialogue_runtime.hpp): a MESMA instancia de
@@ -443,8 +445,20 @@ bool Maestro::to_npc_dialogue() {
     // prova de round-trip vive no teste headless de integracao, ver TODO.md).
     gus::domain::dialogue::DialogueRuntime runtime(*npc_bertoldo_graph_, save_.flags);
     runtime.enter();
-    const bool quit_requested =
-        gus::app::screens::run_npc_dialogue_loop(*city_, runtime, translator_);
+
+    // DIALOGO-TERMINAL: MESMA tecnica de open_pause_from_city (contexto GL PROPRIO,
+    // criado so aqui/destruido ao sair) - solta o SDL_Renderer da cidade ANTES (a
+    // janela precisa ficar livre pro contexto GL) e reconstroi DEPOIS,
+    // INCONDICIONALMENTE (mesmo se o contexto GL falhar - degradacao segura, a
+    // cidade nunca fica sem desenhar pro resto da sessao).
+    city_->release_renderer();
+    const bool quit_requested = gus::app::screens::run_npc_dialogue_loop_gl(
+        window_, *city_, runtime, translator_);
+    if (!city_->reacquire_renderer()) {
+        SDL_Log(
+            "Maestro: falha ao reconstruir o renderer da cidade apos o dialogo - a "
+            "cidade segue rodando SEM desenhar (degradacao segura, sem crash).");
+    }
 
     const auto it = save_.flags.find("npc_intro.met");
     std::cout << "Maestro: [dialogo] conversa encerrada (npc_intro.met="

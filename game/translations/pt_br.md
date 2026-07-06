@@ -444,6 +444,9 @@ Cauã
 ## ACTOR_JACI
 Jaci
 
+## ACTOR_BERTOLDO
+Seu Bertoldo
+
 ## ACTOR_SENTINELA_BIT
 Sentinela Bit
 

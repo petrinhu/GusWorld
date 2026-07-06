@@ -24,6 +24,16 @@
 
 namespace gus::app::screens {
 
+// Resolve o ROTULO DE EXIBICAO do falante: tenta "ACTOR_<ID EM MAIUSCULO>" no
+// catalogo (MESMA convencao de ACTOR_GUS/ACTOR_CAUA em pt_br.md §8); se a chave
+// estiver ausente, cai pro proprio `speaker_id` em minusculo (fallback = nunca
+// mostra uma chave crua tipo "ACTOR_XPTO" na tela). Reusada TANTO pelo overlay de
+// texto simples (npc_dialogue_overlay_lines abaixo) QUANTO pela caixa RCSS
+// "quente" (npc_dialogue_rml.hpp) - 1 unica fonte de verdade pro nome exibido, as
+// duas apresentacoes NUNCA divergem.
+[[nodiscard]] std::string npc_dialogue_actor_display_name(
+    const std::string& speaker_id, const gus::app::i18n::Translator& translator);
+
 // Move a selecao por `delta` (+1 = baixo, -1 = cima) dentre `option_count` opcoes,
 // com WRAP (desce do ultimo item volta pro 0; sobe do 0 vai pro ultimo).
 // option_count<=0 e defensivo (devolve 0, nunca UB/divisao por zero).

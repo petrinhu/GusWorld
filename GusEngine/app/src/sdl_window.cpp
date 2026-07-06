@@ -335,6 +335,8 @@ bool SdlWindow::consume_escape_pressed() noexcept {
     return input_.consume_escape_pressed();
 }
 
+void SdlWindow::clear_input() noexcept { input_.clear(); }
+
 void SdlWindow::render_dialogue_overlay_frame(const std::vector<std::string>& lines) {
     if (render2d_ == nullptr || renderer_ == nullptr) {
         return;  // renderer liberado (uso incorreto/degradacao segura) - no-op

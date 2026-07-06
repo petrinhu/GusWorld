@@ -39,6 +39,11 @@ add_library(gusengine_app STATIC
     # fronteira app/, domain/dialogue permanece ZERO I/O.
     src/dialogue/npc_dialogue_catalog.cpp
     src/screens/npc_dialogue_overlay.cpp
+    # DIALOGO-TERMINAL (caixa quente com retrato real, RCSS/glintfx): gerador de
+    # RML puro + o loop GL dedicado (MESMA receita de contexto GL owning do
+    # system_menu_loop.cpp, ver npc_dialogue_loop_gl.hpp).
+    src/screens/npc_dialogue_rml.cpp
+    src/screens/npc_dialogue_loop_gl.cpp
     src/screens/npc_dialogue_loop.cpp
     src/sdl_window.cpp
     # M7-COSTURA (ADR-012 Onda 1): maestro leve cidade<->batalha (ver maestro.hpp).

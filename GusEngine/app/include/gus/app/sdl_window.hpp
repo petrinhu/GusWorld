@@ -175,6 +175,26 @@ public:
     // novo press devolve false.
     [[nodiscard]] bool consume_escape_pressed() noexcept;
 
+    // FIX BUG (playtest ao vivo do lider, M7-DIALOGO NPC-MVP: "Gus anda sozinho
+    // apos fechar o dialogo com o Bertoldo"): solta TODA tecla de movimento
+    // segurada no estado de input da cidade (mesmo efeito de SDL_EVENT_WINDOW_
+    // FOCUS_LOST -> SdlInput::clear(), ver sdl_input.hpp). CAUSA RAIZ: qualquer
+    // loop MODAL que faz o proprio SDL_PollEvent independente (dialogo, menu de
+    // pausa - ver npc_dialogue_loop.cpp/npc_dialogue_loop_gl.cpp/system_menu_loop.cpp)
+    // NUNCA repassa os eventos pro input_ desta SdlWindow (input_.pump_events() so
+    // roda dentro de step()/step_with_fade(), que a Maestro NAO chama enquanto o
+    // modal esta aberto). Se o jogador estava segurando uma tecla de movimento ao
+    // entrar no modal e a SOLTA durante a conversa, o SDL_EVENT_KEY_UP correspondente
+    // e descartado pelo loop modal (nunca chega em input_) - o estado interno
+    // continua "pressionada" para sempre, e o Gus retoma andando na cidade ate
+    // esbarrar em algo. Chamar isto ao ENTRAR (congela o movimento em "nada
+    // pressionado", coerente com o jogador olhando pra uma caixa de dialogo/menu -
+    // nao faz sentido ele estar "tentando mover" nesse momento) E ao SAIR (garante
+    // que o estado comeca limpo ao retomar a cidade, mesmo se algo mudasse
+    // input_ no meio do caminho) fecha o bug pela raiz, sem exigir que cada loop
+    // modal reimplemente o roteamento de KEY_UP.
+    void clear_input() noexcept;
+
 private:
     // Carrega os sprites do Gus no renderer_ corrente e os entrega ao sim_. Extraido
     // de init() pra ser reusado por init_attached() e reacquire_renderer() (mesma

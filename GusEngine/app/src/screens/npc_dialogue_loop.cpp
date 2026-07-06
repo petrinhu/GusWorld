@@ -19,6 +19,13 @@ bool run_npc_dialogue_loop(gus::app::SdlWindow& city,
                             const gus::app::i18n::Translator& translator) {
     int selected_option = 0;
 
+    // FIX BUG (playtest ao vivo do lider: "Gus anda sozinho apos fechar o dialogo") -
+    // ver o comentario completo em SdlWindow::clear_input(). Este loop faz o proprio
+    // SDL_PollEvent (abaixo) e NUNCA repassa eventos pro input_ da cidade - qualquer
+    // tecla de movimento segurada ao ENTRAR (ou cujo KEY_UP acontecesse DURANTE a
+    // conversa) ficaria "presa" pressionada pra sempre sem isto.
+    city.clear_input();
+
     // Desenha o frame INICIAL (no de entrada, ja posicionado por runtime.enter() no
     // chamador) antes do 1o poll - senao a caixa so apareceria apos a 1a tecla.
     city.render_dialogue_overlay_frame(
@@ -62,6 +69,11 @@ bool run_npc_dialogue_loop(gus::app::SdlWindow& city,
                 runtime.current(), translator, selected_option));
         }
     }
+    // Robustez extra (defense-in-depth): garante estado limpo ao RETOMAR a cidade,
+    // mesmo que uma mudanca futura neste loop passe a tocar input_ no meio do
+    // caminho - hoje redundante com o clear_input() de entrada (nada mais mexe em
+    // input_ aqui), mas barato e documenta o invariante no ponto de saida tambem.
+    city.clear_input();
     return false;  // conversa encerrada (@exit) - a cidade retoma de onde estava
 }
 

@@ -110,3 +110,26 @@ TEST_CASE("SdlInput Esc nao interfere no movimento (aditivo)", "[sdl_input]") {
     REQUIRE(in.run() == false);
     REQUIRE(in.consume_escape_pressed() == true);  // o edge ainda foi armado
 }
+
+// FIX BUG (playtest ao vivo do lider, M7-DIALOGO NPC-MVP: "Gus anda sozinho apos
+// fechar o dialogo com o Bertoldo") - reproduz a causa raiz EXATA: o jogador segura
+// D (leste) ao esbarrar no NPC; o loop MODAL do dialogo (npc_dialogue_loop.cpp/
+// npc_dialogue_loop_gl.cpp) faz o proprio SDL_PollEvent, independente de
+// SdlInput::pump_events - o SDL_EVENT_KEY_UP de D, se acontecer DURANTE a
+// conversa, e descartado (nunca chega em process_key). Sem o fix (SdlWindow::
+// clear_input(), que so repassa pra este SdlInput::clear() ja testado acima em
+// "SdlInput clear solta tudo"), D continuaria "pressionada" pra sempre - o Gus
+// retomaria andando na cidade sozinho ate esbarrar em algo. Este caso E O MESMO
+// mecanismo (KEY_DOWN SEM o KEY_UP correspondente chegar), so nomeado pelo bug
+// real para deixar a regressao rastreavel.
+TEST_CASE("SdlInput: KEY_DOWN sem KEY_UP correspondente (tecla 'presa' durante um "
+          "loop modal) nao sobrevive a um clear() na saida",
+          "[sdl_input][regressao-dialogo]") {
+    SdlInput in;
+    in.process_key(kKeyD, /*pressed=*/true);  // segura D antes de entrar no modal
+    REQUIRE(in.dx() == 1);
+    // ... o loop modal roda aqui: o KEY_UP fisico de D (se acontecer) e descartado,
+    // NUNCA chega em process_key (e o que reproduz o bug relatado ao vivo) ...
+    in.clear();  // o que SdlWindow::clear_input() faz ao ENTRAR/SAIR do modal
+    REQUIRE(in.dx() == 0);  // D nao fica "presa": o Gus nao anda sozinho ao retomar
+}

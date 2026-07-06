@@ -23,16 +23,23 @@ std::string actor_key_for(const std::string& speaker_id) {
 
 }  // namespace
 
+std::string npc_dialogue_actor_display_name(
+    const std::string& speaker_id, const gus::app::i18n::Translator& translator) {
+    const std::string actor_key = actor_key_for(speaker_id);
+    std::string speaker_label = translator.tr(actor_key);
+    if (speaker_label == actor_key) {
+        speaker_label = speaker_id;  // fallback: id em minusculo (chave ausente)
+    }
+    return speaker_label;
+}
+
 std::vector<std::string> npc_dialogue_overlay_lines(
     const gus::domain::dialogue::DialogueNode& node,
     const gus::app::i18n::Translator& translator, int selected_option) {
     std::vector<std::string> lines;
 
-    const std::string actor_key = actor_key_for(node.speaker_id);
-    std::string speaker_label = translator.tr(actor_key);
-    if (speaker_label == actor_key) {
-        speaker_label = node.speaker_id;  // fallback: id em minusculo (chave ausente)
-    }
+    const std::string speaker_label =
+        npc_dialogue_actor_display_name(node.speaker_id, translator);
     lines.push_back(speaker_label + ":");
     lines.push_back(translator.tr(node.text_key));
 
