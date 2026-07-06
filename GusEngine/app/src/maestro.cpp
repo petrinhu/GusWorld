@@ -177,14 +177,22 @@ bool Maestro::init() {
 
     // M7-COSTURA fix BUG-1 (playtest ao vivo do lider: "a batalha so ativou vindo do
     // sul"): pick_fixed_enemy_position devolve so o ANCHOR (celula-alvo, AABB minusculo
-    // do tamanho do jogador); enemy_sprite_footprint_aabb deriva o AABB REAL (colisao E
-    // visual) usando a MESMA formula que o marcador desenha o quad do androide - hitbox
-    // e sprite visivel passam a COINCIDIR exatamente (ver maestro_logic.hpp).
+    // do tamanho do jogador); enemy_sprite_footprint_aabb deriva o footprint VISUAL
+    // (o quad desenhado) usando a MESMA formula que o marcador do androide usa - o
+    // sprite desenhado NAO muda com esta mudanca (mesmo tamanho/posicao de sempre).
+    //
+    // SOLUCAO ARQUITETURAL (BUG-7 revisitado, decisao do lider: "ancorar as hitboxes de
+    // ATIVACAO nos PES" - ver maestro_logic.hpp::feet_trigger_aabb): a hitbox que decide
+    // "perto o bastante pra ENTRAR EM BATALHA" (should_trigger_battle, run() abaixo) NAO
+    // e mais o footprint visual inteiro - e uma caixa PEQUENA ancorada na base do
+    // footprint, DESACOPLADA do tamanho do sprite (mesma tecnica de Zelda/Stardew
+    // Valley). enemy_trigger_aabb_ e derivada do footprint (enemy_aabb_) UMA vez aqui.
     const gus::core::spatial::Aabb enemy_anchor = pick_fixed_enemy_position(
         city_->grid(), city_->player_aabb(), kEnemyOffsetTilesX, kEnemyOffsetTilesY);
     enemy_aabb_ = enemy_sprite_footprint_aabb(
         enemy_anchor, city_->tuning().player_sprite_height_tiles,
         city_->grid().tile_size());
+    enemy_trigger_aabb_ = feet_trigger_aabb(enemy_aabb_, city_->grid().tile_size());
     enemy_defeated_ = false;
     // M7-COSTURA Inc 2: o inimigo fixo agora e VISIVEL no mapa - o mesmo placeholder de
     // androide (retrato_inimigo.png) que a tela de BATALHA ja usa pros inimigos (ver
@@ -209,25 +217,24 @@ bool Maestro::init() {
     // tuning.hpp) em vez de player_sprite_height_tiles - o retrato do Bertoldo
     // (south.png) tem uma margem transparente maior que o do Gus; reusar a MESMA
     // altura-de-CANVAS fazia o adulto renderizar visivelmente mais baixo que a
-    // crianca. A hitbox de trigger (npc_bertoldo_aabb_, usada abaixo em
-    // aabb_overlaps) e o quad desenhado (overworld_sim.cpp) usam a MESMA constante
-    // nova - continuam coincidindo exatamente, so num tamanho maior/correto.
+    // crianca. Isto e SO o footprint VISUAL (quad desenhado, set_npc_bertoldo_marker
+    // abaixo) - INALTERADO por esta mudanca.
     //
-    // FIX BUG-7 (M7-DIALOGO, playtest ao vivo do lider APOS o fix acima: "nao mudou.
-    // Ja de longe o dialogo e ativado"): sprite_width_fraction (tuning().npc_
-    // bertoldo_sprite_width_fraction, ver overworld_tuning.hpp) encolhe SO a LARGURA
-    // do footprint pra bater com o corpo REALMENTE visivel do retrato (busto estreito
-    // com muito ar transparente nas laterais - o quad QUADRADO antigo sobrava ~1.1
-    // tile de trigger fantasma pra cada lado). A altura/base continuam iguais (o
-    // retrato desenhado NAO muda de tamanho, so a hitbox de colisao/dialogo fica mais
-    // fiel ao que o jogador VE).
+    // SOLUCAO ARQUITETURAL (BUG-7 revisitado - ver o comentario espelho no inimigo
+    // fixo acima): npc_bertoldo_trigger_aabb_ e a MESMA caixa-de-pes
+    // (feet_trigger_aabb), reusada aqui SEM duplicar logica - substitui o remendo
+    // anterior (sprite_width_fraction, que media o alpha-bbox do retrato pra
+    // compensar o busto estreito do Bertoldo) por uma solucao generica, independente
+    // do sprite: a caixa de ativacao do dialogo agora nunca precisa saber quanta
+    // margem transparente cada retrato tem.
     const gus::core::spatial::Aabb npc_anchor = pick_fixed_enemy_position(
         city_->grid(), city_->player_aabb(), kNpcBertoldoOffsetTilesX,
         kNpcBertoldoOffsetTilesY);
     npc_bertoldo_aabb_ = enemy_sprite_footprint_aabb(
         npc_anchor, city_->tuning().npc_bertoldo_sprite_height_tiles,
-        city_->grid().tile_size(),
-        city_->tuning().npc_bertoldo_sprite_width_fraction);
+        city_->grid().tile_size());
+    npc_bertoldo_trigger_aabb_ =
+        feet_trigger_aabb(npc_bertoldo_aabb_, city_->grid().tile_size());
     city_->set_npc_bertoldo_marker(npc_bertoldo_aabb_);
     std::cout << "Maestro: [dialogo] Bertoldo (NPC-MVP) em (" << npc_bertoldo_aabb_.x
               << ", " << npc_bertoldo_aabb_.y << ").\n";
@@ -323,8 +330,12 @@ void Maestro::run() {
         // PERMANECE em fuga/derrota, e should_trigger_battle - LEVEL-triggered - voltava
         // true enquanto houvesse overlap). A batalha so dispara na TRANSICAO nao-overlap
         // -> overlap (rising edge): overlap AGORA e NAO no frame anterior.
-        const bool overlapping_now =
-            should_trigger_battle(city_->player_aabb(), enemy_aabb_, enemy_defeated_);
+        // FIX BUG-7 revisitado (feet_trigger_aabb, ver init()): a colisao/ativacao
+        // usa enemy_trigger_aabb_ (caixa pequena ancorada nos pes), NAO mais o
+        // footprint visual inteiro (enemy_aabb_, que continua servindo SO o quad
+        // desenhado via set_enemy_marker em init()).
+        const bool overlapping_now = should_trigger_battle(
+            city_->player_aabb(), enemy_trigger_aabb_, enemy_defeated_);
         if (should_trigger_battle_on_edge(overlapping_now, was_overlapping_enemy_)) {
             // FIX BUG-3 (playtest ao vivo do lider: "cliquei no X pra fechar, a janela
             // reabre na dungeon e em poucos ms vira batalha de novo; precisei pkill"):
@@ -344,8 +355,8 @@ void Maestro::run() {
         // cima), fica true -> o proximo disparo exige SAIR e RE-ENTRAR na hitbox (senao
         // re-dispararia em loop, o BUG-6). Sem batalha, so acompanha o overlap do
         // movimento normal (o rising edge dispara no proximo frame que ENTRAR na hitbox).
-        was_overlapping_enemy_ =
-            should_trigger_battle(city_->player_aabb(), enemy_aabb_, enemy_defeated_);
+        was_overlapping_enemy_ = should_trigger_battle(
+            city_->player_aabb(), enemy_trigger_aabb_, enemy_defeated_);
 
         // M7-DIALOGO (NPC-MVP): MESMA tecnica de edge-trigger do inimigo acima
         // (aabb_overlaps + should_trigger_battle_on_edge, ambas ja PUBLICAS/genericas
@@ -353,8 +364,12 @@ void Maestro::run() {
         // "derrotado": aabb_overlaps sozinho ja da o "overlapping_now". Sem isto, sair
         // da conversa AINDA sobre a hitbox reabriria o dialogo no mesmo frame (mesmo
         // BUG-6 do inimigo) - por isso o rising-edge.
+        // FIX BUG-7 revisitado (feet_trigger_aabb, ver init()): idem ao inimigo acima -
+        // npc_bertoldo_trigger_aabb_ (caixa pequena ancorada nos pes) decide "perto o
+        // bastante pra abrir o dialogo", NAO mais npc_bertoldo_aabb_ (footprint visual
+        // inteiro, que continua servindo SO o quad desenhado).
         const bool overlapping_npc_now =
-            aabb_overlaps(city_->player_aabb(), npc_bertoldo_aabb_);
+            aabb_overlaps(city_->player_aabb(), npc_bertoldo_trigger_aabb_);
         if (should_trigger_battle_on_edge(overlapping_npc_now,
                                            was_overlapping_npc_bertoldo_)) {
             if (to_npc_dialogue()) {
@@ -362,7 +377,7 @@ void Maestro::run() {
             }
         }
         was_overlapping_npc_bertoldo_ =
-            aabb_overlaps(city_->player_aabb(), npc_bertoldo_aabb_);
+            aabb_overlaps(city_->player_aabb(), npc_bertoldo_trigger_aabb_);
     }
 }
 

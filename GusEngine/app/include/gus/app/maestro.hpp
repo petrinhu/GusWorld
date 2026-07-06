@@ -162,8 +162,14 @@ private:
         gus::platform::audio::kInvalidSound;
 
     // Inimigo FIXO (item 1 do escopo, ver maestro_logic.hpp): AABB + estado "derrotado"
-    // em memoria. dado de app/ - NAO toca o formato .gmap/TileMap.
+    // em memoria. dado de app/ - NAO toca o formato .gmap/TileMap. enemy_aabb_ e o
+    // FOOTPRINT VISUAL inteiro (usado SO pro quad desenhado, set_enemy_marker abaixo -
+    // NAO muda de tamanho/posicao nesta mudanca); enemy_trigger_aabb_ (solucao
+    // ARQUITETURAL do lider pos-playtest, ver maestro_logic.hpp::feet_trigger_aabb) e a
+    // caixa PEQUENA ancorada nos PES, DESACOPLADA do footprint - e a que decide "perto o
+    // bastante pra ativar a batalha" (should_trigger_battle em run(), abaixo).
     gus::core::spatial::Aabb enemy_aabb_{};
+    gus::core::spatial::Aabb enemy_trigger_aabb_{};
     bool enemy_defeated_ = false;
 
     // EDGE-TRIGGER (M7-COSTURA BUG-6): estado "havia overlap jogador x inimigo no frame
@@ -181,7 +187,12 @@ private:
     // .gmap/TileMap, que nao tem nocao de NPC), com o MESMO edge-trigger
     // (should_trigger_battle_on_edge) - so que sem "derrotado": o Bertoldo nunca
     // some, esbarrar de novo (sair e re-entrar na hitbox) abre a conversa de novo.
+    // npc_bertoldo_aabb_ e o FOOTPRINT VISUAL (quad desenhado, set_npc_bertoldo_marker
+    // abaixo - INALTERADO); npc_bertoldo_trigger_aabb_ e a MESMA tecnica de caixa-de-pes
+    // do inimigo acima (feet_trigger_aabb), reusada aqui SEM duplicar logica - e ela que
+    // decide "perto o bastante pra abrir o dialogo" (aabb_overlaps em run(), abaixo).
     gus::core::spatial::Aabb npc_bertoldo_aabb_{};
+    gus::core::spatial::Aabb npc_bertoldo_trigger_aabb_{};
     bool was_overlapping_npc_bertoldo_ = false;
 
     // Grafo de dialogo do Bertoldo, parseado 1 vez no boot (init(), a partir do

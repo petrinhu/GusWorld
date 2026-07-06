@@ -116,28 +116,15 @@ struct OverworldTuning {
     // Ajustavel pelo lider vendo o display (mesmo espirito de player_sprite_height_tiles).
     float npc_bertoldo_sprite_height_tiles = 3.3f;
 
-    // FIX BUG-7 (M7-DIALOGO, playtest ao vivo do lider APOS o fix acima: "nao mudou.
-    // Ja de longe o dialogo e ativado"). O footprint de trigger/visual (ver
-    // maestro_logic.hpp::enemy_sprite_footprint_aabb) ate aqui era sempre QUADRADO
-    // (largura = altura = npc_bertoldo_sprite_height_tiles*tile_size). Isso e correto
-    // SO se o conteudo visivel (alpha-bbox) do retrato preencher a largura do canvas
-    // na mesma proporcao que a altura - NAO e o caso do Bertoldo: medindo o alpha-bbox
-    // real de south.png (180x180, ferramenta engine-graphics): o corpo ocupa so
-    // ~31.7% da LARGURA do canvas (bbox x=[62,119]) contra ~76.7% da ALTURA (bbox
-    // y=[20,158]) - um busto ESTREITO, centralizado, com MUITO espaco transparente nas
-    // laterais. Com a hitbox quadrada (3.3 tiles de lado), o corpo real (~1.05 tile de
-    // largura) sobrava ~1.1 tile de ar TRANSPARENTE disparando o dialogo pra CADA lado
-    // - o jogador via o Bertoldo "de longe" e o dialogo ja ativava. FIX: fracao PROPRIA
-    // que encolhe SO a largura do footprint (fp.h/posicao vertical INALTERADOS - o
-    // desenho em overworld_sim.cpp recalcula o quad visual a partir do tuning,
-    // independente da largura da hitbox, entao o retrato continua do MESMO tamanho de
-    // sempre). Valor: fracao medida (0.317) + ~15% de folga de toque (nao pixel-
-    // perfeito - o jogador ainda precisa sentir que "encostou", nao acertar o pixel
-    // exato do corpo) ~= 0.36. Ajustavel pelo lider vendo o display (mesmo espirito
-    // dos demais campos deste arquivo). NAO afeta o marcador do inimigo fixo
-    // (enemy_sprite_footprint_aabb chamado com o default 1.0/quadrado em maestro.cpp -
-    // o retrato do androide e bem mais proximo de quadrado, 57%/81%, sem bug relatado).
-    float npc_bertoldo_sprite_width_fraction = 0.36f;
+    // NOTA HISTORICA (BUG-7, M7-DIALOGO): este arquivo teve um campo
+    // `npc_bertoldo_sprite_width_fraction` (encolhia SO a largura do footprint de
+    // trigger pra compensar o busto estreito do retrato do Bertoldo - o corpo ocupava
+    // so ~31.7% da largura do canvas contra ~76.7% da altura, um remendo que exigia
+    // MEDIR o alpha-bbox de cada retrato novo). Removido: a solucao ARQUITETURAL
+    // (decisao do lider apos novo playtest ao vivo, "ancorar as hitboxes de ATIVACAO
+    // nos PES") substitui o remendo por-sprite por uma caixa de trigger PEQUENA e
+    // GENERICA, ancorada na base do footprint, independente do formato/transparencia
+    // de qualquer PNG - ver gus/app/maestro_logic.hpp::feet_trigger_aabb.
 
     // AJUSTE FINO da ancoragem dos pes (M1-BUG.SUL, lider 2026-06-22). O grosso e
     // AUTOMATICO: o jogo MEDE a sobra transparente embaixo de cada sprite (alpha-bbox

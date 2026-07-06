@@ -22,6 +22,7 @@ using gus::app::battle_crossfade_target;
 using gus::app::crossfade_music;
 using gus::app::EncounterId;
 using gus::app::enemy_sprite_footprint_aabb;
+using gus::app::feet_trigger_aabb;
 using gus::app::outcome_marks_enemy_defeated;
 using gus::app::pick_fixed_enemy_position;
 using gus::app::should_stop_running_after_battle;
@@ -776,50 +777,70 @@ TEST_CASE("battle_crossfade_target: os dois ids invalidos devolve invalido "
 
 // ============================================================================
 // BUG-7 (M7-DIALOGO, playtest ao vivo do lider APOS o fix do BUG-1: "nao mudou. Ja de
-// longe o dialogo e ativado"). O repro anterior so provou que a hitbox de trigger
-// (npc_bertoldo_aabb_) COINCIDE com o quad desenhado - verdade, mas irrelevante: o quad
-// desenhado em si e um retrato QUADRADO (south.png, 180x180) com o corpo do Bertoldo
-// ocupando so ~31.7% da LARGURA do canvas (alpha-bbox medido: x=[62,119]) contra ~76.7%
-// da ALTURA (y=[20,158]) - um busto ESTREITO com muito espaco TRANSPARENTE nas laterais.
-// enemy_sprite_footprint_aabb forcava esprite_w = esprite_h (quadrado), entao a hitbox de
-// dialogo sobrava ~1.1 tile de ar em cada lado do corpo REALMENTE visivel - o jogador
-// disparava o dialogo ainda visualmente longe (nas laterais). Estes testes travam o FIX
-// (sprite_width_fraction, ver maestro_logic.hpp + overworld_tuning.hpp::npc_bertoldo_
-// sprite_width_fraction): a hitbox fica mais ESTREITA que o canvas do retrato, e um
-// jogador na zona lateral que ANTES disparava (dentro do quadrado antigo, fora da faixa
-// estreita nova) deixa de disparar.
+// longe o dialogo e ativado") - REVISITADO. A geracao anterior de fix (sprite_
+// width_fraction, ja removida) media o alpha-bbox do retrato do Bertoldo pra encolher
+// SO a largura do footprint de trigger - funcionava, mas exigia medir cada sprite novo
+// (ja mordeu o projeto 2x). O lider testou ao vivo de novo e viu o MESMO sintoma ("Gus
+// visivelmente distante do Bertoldo quando o dialogo ja disparou") - a causa raiz de
+// FUNDO era usar o FOOTPRINT VISUAL (o retangulo que cobre o sprite inteiro) como
+// hitbox de ativacao, ponto. A solucao ARQUITETURAL (feet_trigger_aabb, ver
+// maestro_logic.hpp): uma caixa PEQUENA ancorada na BASE do footprint, DESACOPLADA do
+// tamanho/formato de qualquer sprite - a MESMA tecnica de Zelda/Stardew Valley. Estes
+// testes travam essa solucao: (a) a caixa de pes e MUITO menor que o footprint visual
+// completo; (b) so dispara perto da BASE, nao das bordas largas do footprint antigo;
+// (c) inimigo fixo e Bertoldo usam a MESMA funcao (sem duplicar logica); (d) o footprint
+// VISUAL (o que e desenhado) nao muda de tamanho/posicao com esta mudanca.
 // ============================================================================
 
-TEST_CASE("enemy_sprite_footprint_aabb: sprite_width_fraction < 1 encolhe SO a "
-          "largura (altura/base do quad INALTERADAS), mantendo o centro em X sobre "
-          "o anchor",
+TEST_CASE("feet_trigger_aabb: caixa de pes e SIGNIFICATIVAMENTE menor que o footprint "
+          "visual completo (area e largura/altura), ancorada na BASE e centrada em X "
+          "sobre o footprint",
           "[maestro][logic][bug7]") {
     const Aabb anchor{5.0f * 2.0f + 1.0f - 0.6f, 5.0f * 2.0f + 1.0f - 0.6f, 1.2f, 1.2f};
-    const float sprite_height_tiles = 3.3f;
+    const float sprite_height_tiles = 3.3f;  // numeros reais do Bertoldo
     const float tile_size = 2.0f;
-    const float width_fraction = 0.36f;
 
-    const Aabb square = enemy_sprite_footprint_aabb(anchor, sprite_height_tiles,
-                                                     tile_size);  // default 1.0 (legado)
-    const Aabb narrow = enemy_sprite_footprint_aabb(anchor, sprite_height_tiles,
-                                                     tile_size, width_fraction);
+    const Aabb footprint =
+        enemy_sprite_footprint_aabb(anchor, sprite_height_tiles, tile_size);
+    const Aabb trigger = feet_trigger_aabb(footprint, tile_size);
 
-    // Altura e base do quad NAO mudam (mesma formula/posicao vertical de sempre).
-    CHECK(narrow.h == Catch::Approx(square.h));
-    CHECK(narrow.y == Catch::Approx(square.y));
-    CHECK(narrow.y + narrow.h == Catch::Approx(anchor.y + anchor.h));
+    // Muito menor em cada eixo (nao so em area) - a caixa de pes nunca deveria chegar
+    // perto do tamanho do sprite inteiro (footprint 6.6x6.6 tiles no mundo).
+    CHECK(trigger.w < footprint.w * 0.5f);
+    CHECK(trigger.h < footprint.h * 0.5f);
+    // Area MUITO menor (ordem de grandeza menor - documenta "caixa pequena", nao so
+    // "um pouco menor").
+    CHECK(trigger.w * trigger.h < (footprint.w * footprint.h) * 0.1f);
 
-    // Largura encolhe pela fracao pedida; o centro em X continua sobre o anchor
-    // (fp.x = anchor.x + anchor.w*0.5 - esprite_w*0.5 ja centra por construcao).
-    CHECK(narrow.w == Catch::Approx(square.w * width_fraction));
-    CHECK(narrow.x + narrow.w * 0.5f == Catch::Approx(anchor.x + anchor.w * 0.5f));
-    CHECK(narrow.w < square.w);
+    // Base da caixa de trigger == base do footprint (mesma formula de base que o
+    // desenho ja usa - nao inventa uma 2a nocao de "onde o personagem esta parado").
+    CHECK(trigger.y + trigger.h == Catch::Approx(footprint.y + footprint.h));
+    // Centrada em X sobre o footprint (que ja e centrado sobre o anchor original).
+    CHECK(trigger.x + trigger.w * 0.5f == Catch::Approx(footprint.x + footprint.w * 0.5f));
 }
 
-TEST_CASE("BUG-7: com os numeros REAIS do Bertoldo (height_tiles=3.3, "
-          "width_fraction=0.36, tile_size=2.0), um jogador na zona lateral que o "
-          "quad QUADRADO antigo disparava (visualmente LONGE do corpo do retrato) "
-          "NAO dispara mais o dialogo com a hitbox estreita",
+TEST_CASE("feet_trigger_aabb: e da MESMA ordem de grandeza da hitbox REAL do jogador "
+          "(kPlayerHitboxTileFraction=0.6 tile) - nem gigante (BUG-7), nem minuscula "
+          "(fantasma do BUG-1)",
+          "[maestro][logic][bug7]") {
+    const Aabb anchor{0.0f, 0.0f, 1.2f, 1.2f};
+    const float tile_size = 2.0f;
+    const Aabb footprint = enemy_sprite_footprint_aabb(anchor, 2.75f, tile_size);
+    const Aabb trigger = feet_trigger_aabb(footprint, tile_size);
+
+    const float player_side_world = 0.6f * tile_size;  // city_scene.hpp
+    // Largura/altura da caixa de pes na mesma ORDEM DE GRANDEZA do lado do jogador
+    // (nao 10x maior nem 10x menor) - a prova de que "PEQUENA" foi levada a serio.
+    CHECK(trigger.w > player_side_world * 0.5f);
+    CHECK(trigger.w < player_side_world * 3.0f);
+    CHECK(trigger.h > player_side_world * 0.25f);
+    CHECK(trigger.h < player_side_world * 2.0f);
+}
+
+TEST_CASE("BUG-7 revisitado: com os numeros REAIS do Bertoldo (height_tiles=3.3, "
+          "tile_size=2.0), um jogador na quina lateral distante do footprint QUADRADO "
+          "inteiro (visualmente LONGE do corpo real) NAO dispara mais o dialogo com a "
+          "caixa de pes - so dispara perto da BASE",
           "[maestro][logic][bug7][regressao]") {
     const gus::app::screens::OverworldTuning tuning{};  // valores canonicos do jogo
     const float tile_size = 2.0f;
@@ -829,36 +850,85 @@ TEST_CASE("BUG-7: com os numeros REAIS do Bertoldo (height_tiles=3.3, "
                        10.0f * tile_size + tile_size * 0.5f - player_side * 0.5f,
                        player_side, player_side};
 
-    const Aabb square = enemy_sprite_footprint_aabb(
-        anchor, tuning.npc_bertoldo_sprite_height_tiles, tile_size);  // 1.0 (bug antigo)
-    const Aabb narrow = enemy_sprite_footprint_aabb(
-        anchor, tuning.npc_bertoldo_sprite_height_tiles, tile_size,
-        tuning.npc_bertoldo_sprite_width_fraction);  // fix
+    const Aabb footprint = enemy_sprite_footprint_aabb(
+        anchor, tuning.npc_bertoldo_sprite_height_tiles, tile_size);
+    const Aabb trigger = feet_trigger_aabb(footprint, tile_size);
 
-    const float cy = narrow.y + narrow.h * 0.5f;
+    const float cy = footprint.y + footprint.h * 0.5f;  // meio vertical do footprint
 
-    // Jogador parado BEM na quina lateral do quadrado ANTIGO (extremo do quad
-    // quadrado de 3.3 tiles), na mesma altura Y do centro do Bertoldo - visualmente
-    // isto e ar transparente ao lado do retrato (o corpo real so vai ate narrow.x/
-    // narrow.x+narrow.w), nao o boneco. ANTES do fix, o quad quadrado (square) ia
-    // disparar (o jogador esta dentro dele); DEPOIS do fix, esta fora da hitbox
-    // estreita (narrow).
-    const Aabb player_lateral_far{square.x + 0.05f, cy - player_side * 0.5f,
+    // Jogador parado BEM na quina lateral do footprint QUADRADO inteiro (extremo do
+    // quad de 3.3 tiles), na altura do MEIO do retrato - exatamente o cenario do
+    // BUG-7 original: visualmente longe do corpo real, mas dentro do footprint
+    // inteiro. Com a hitbox antiga (o proprio footprint) isto disparava; com a caixa
+    // de pes (pequena, ancorada na base), nao dispara mais.
+    const Aabb player_lateral_far{footprint.x + 0.05f, cy - player_side * 0.5f,
                                    player_side, player_side};
+    CHECK(aabb_overlaps(player_lateral_far, footprint));       // bug antigo: disparava
+    CHECK_FALSE(aabb_overlaps(player_lateral_far, trigger));   // fix: nao dispara mais
 
-    CHECK(aabb_overlaps(player_lateral_far, square));       // bug antigo: disparava
-    CHECK_FALSE(aabb_overlaps(player_lateral_far, narrow));  // fix: nao dispara mais
+    // Controle: jogador BEM na base/centro (onde a caixa de pes realmente mora)
+    // continua disparando - o fix nao criou um fantasma na aproximacao genuina.
+    const Aabb player_at_feet{trigger.x + trigger.w * 0.5f - player_side * 0.5f,
+                               trigger.y + trigger.h * 0.5f - player_side * 0.5f,
+                               player_side, player_side};
+    CHECK(aabb_overlaps(player_at_feet, trigger));
+}
 
-    // Controle: o jogador ENCOSTADO na lateral do corpo REALMENTE visivel (borda da
-    // hitbox estreita) continua disparando - o fix nao criou um fantasma (nao afeta
-    // aproximacao genuina).
-    const Aabb player_touching_body{narrow.x - player_side * 0.5f + 0.05f,
-                                     cy - player_side * 0.5f, player_side, player_side};
-    CHECK(aabb_overlaps(player_touching_body, narrow));
+TEST_CASE("feet_trigger_aabb: MESMA funcao serve o inimigo fixo E o Bertoldo (sem "
+          "duplicar logica), mesmo com footprints de ALTURA diferente "
+          "(player_sprite_height_tiles=2.75 vs npc_bertoldo_sprite_height_tiles=3.3)",
+          "[maestro][logic][bug7]") {
+    const gus::app::screens::OverworldTuning tuning{};
+    const float tile_size = 2.0f;
+    const Aabb anchor{20.0f, 8.0f, 1.2f, 1.2f};
 
-    // Controle: bem no meio do retrato (onde o corpo de fato esta) sempre disparou e
-    // continua disparando.
-    const Aabb player_center{narrow.x + narrow.w * 0.5f - player_side * 0.5f,
-                              cy - player_side * 0.5f, player_side, player_side};
-    CHECK(aabb_overlaps(player_center, narrow));
+    const Aabb enemy_footprint = enemy_sprite_footprint_aabb(
+        anchor, tuning.player_sprite_height_tiles, tile_size);
+    const Aabb bertoldo_footprint = enemy_sprite_footprint_aabb(
+        anchor, tuning.npc_bertoldo_sprite_height_tiles, tile_size);
+
+    // Footprints diferentes (Bertoldo e maior/mais alto que o Gus - FIX BUG "Bertoldo
+    // menor que o Gus").
+    REQUIRE(bertoldo_footprint.h != Catch::Approx(enemy_footprint.h));
+
+    const Aabb enemy_trigger = feet_trigger_aabb(enemy_footprint, tile_size);
+    const Aabb bertoldo_trigger = feet_trigger_aabb(bertoldo_footprint, tile_size);
+
+    // MESMA funcao, MESMOS parametros de tamanho (defaults) - a caixa de pes fica
+    // IDENTICA em w/h para os dois (a diferenca de altura do sprite NAO vaza pra
+    // dentro da caixa de trigger - e exatamente o ponto de desacoplar as duas
+    // responsabilidades).
+    CHECK(enemy_trigger.w == Catch::Approx(bertoldo_trigger.w));
+    CHECK(enemy_trigger.h == Catch::Approx(bertoldo_trigger.h));
+
+    // As duas ficam ancoradas na BASE de cada footprint (mesmo anchor original, mesmo
+    // X - so a base Y do footprint muda, pois o Bertoldo e mais alto e "vaza" mais pra
+    // cima; a base em si, porem, e a MESMA - anchor.y+anchor.h - entao as duas caixas
+    // de trigger coincidem exatamente aqui, ja que ambas partem do MESMO anchor).
+    CHECK(enemy_trigger.y == Catch::Approx(bertoldo_trigger.y));
+    CHECK(enemy_trigger.x == Catch::Approx(bertoldo_trigger.x));
+}
+
+TEST_CASE("enemy_sprite_footprint_aabb: footprint VISUAL (o quad desenhado) NAO muda "
+          "de tamanho/posicao com a introducao de feet_trigger_aabb - continua "
+          "QUADRADO, mesma formula/base de sempre (BUG-1 preservado)",
+          "[maestro][logic][bug1][bug7]") {
+    const gus::app::screens::OverworldTuning tuning{};
+    const Aabb anchor{5.0f * 2.0f + 1.0f - 0.6f, 5.0f * 2.0f + 1.0f - 0.6f, 1.2f, 1.2f};
+    const float tile_size = 2.0f;
+
+    const Aabb bertoldo_fp = enemy_sprite_footprint_aabb(
+        anchor, tuning.npc_bertoldo_sprite_height_tiles, tile_size);
+
+    // Continua QUADRADO (largura == altura) - a arte desenhada (overworld_sim.cpp)
+    // sempre recalcula esprite_w = esprite_h a partir do tuning, entao o footprint
+    // devolvido aqui deve refletir isso: o retrato do Bertoldo continua no MESMO
+    // tamanho de tela de sempre, nunca mais estreito.
+    const float expected_side = tuning.npc_bertoldo_sprite_height_tiles * tile_size;
+    CHECK(bertoldo_fp.w == Catch::Approx(expected_side));
+    CHECK(bertoldo_fp.h == Catch::Approx(expected_side));
+    // Base/centro-X inalterados (mesma formula de sempre).
+    CHECK(bertoldo_fp.y + bertoldo_fp.h == Catch::Approx(anchor.y + anchor.h));
+    CHECK(bertoldo_fp.x + bertoldo_fp.w * 0.5f ==
+          Catch::Approx(anchor.x + anchor.w * 0.5f));
 }

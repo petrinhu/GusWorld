@@ -92,30 +92,56 @@ enum class EncounterId : int {
 // maestro_logic_test.cpp). NAO maior que o sprite (evita disparar de longe), NAO menor
 // (evita o fantasma) - literalmente o retangulo que o jogador VE.
 //
-// FIX BUG-7 (M7-DIALOGO, playtest ao vivo do lider APOS o fix acima: "nao mudou. Ja
-// de longe o dialogo e ativado"). Causa raiz DISTINTA do BUG-1: o quad acima e sempre
-// QUADRADO (esprite_w = esprite_h = sprite_height_tiles*tile_size) - hipotese correta
-// para um retrato cujo CONTEUDO visivel (alpha-bbox) preenche a LARGURA do canvas na
-// mesma proporcao que a ALTURA. Medindo o alpha-bbox real do south.png do Bertoldo
-// (180x180): o corpo ocupa so ~31.7% da LARGURA do canvas (bbox x=[62,119]) contra
-// ~76.7% da ALTURA (bbox y=[20,158]) - um retrato estreito (busto centralizado com
-// MUITO espaco vazio nas laterais), nao um quadrado cheio. Forcar esprite_w = esprite_h
-// fazia a hitbox de trigger (e o quad desenhado) sobrarem ~1.1 tile de ar TRANSPARENTE
-// pra cada lado do corpo visivel do Bertoldo (canvas 3.3 tiles de lado, corpo real so
-// ~1.05 tile de largura) - o jogador encostava na hitbox bem antes de chegar perto do
-// corpo, exatamente o "de longe" relatado. sprite_width_fraction (default 1.0 = quadrado,
-// preserva o comportamento LEGADO do marcador de inimigo fixo, cujo retrato e bem mais
-// proximo de quadrado - 57%/81% - e NAO tem bug relatado) permite encolher SO a LARGURA
-// do footprint para uma fracao da altura, mantendo o centro em X sobre o anchor (a
-// formula de fp.x ja centra por construcao, entao encolher esprite_w NAO desloca o
-// footprint) e sem tocar no calculo de fp.y/base (inalterado). O desenho em
-// overworld_sim.cpp recalcula o quad VISUAL a partir do tuning (independente de fp.w),
-// entao o retrato continua sendo desenhado no MESMO tamanho de sempre - so a hitbox de
-// colisao/dialogo fica mais fiel ao corpo REALMENTE visivel. Ver
-// overworld_tuning.hpp::npc_bertoldo_sprite_width_fraction.
+// NOTA HISTORICA (BUG-7, M7-DIALOGO): entre este fix e o de baixo (feet_trigger_aabb),
+// existiu uma geracao intermediaria de patch pontual aqui: um parametro opcional
+// `sprite_width_fraction` que encolhia SO a LARGURA deste footprint pra compensar o
+// alpha-bbox estreito do retrato do Bertoldo (busto centralizado com muito ar
+// transparente nas laterais - south.png ocupava so ~31.7% da largura do canvas contra
+// ~76.7% da altura). Funcionava, mas era um REMENDO por-sprite: exigia MEDIR o
+// alpha-bbox de cada retrato novo (ja mordeu o projeto 2x - o proprio Bertoldo). O
+// lider propos a solucao ARQUITETURAL de verdade (ver feet_trigger_aabb abaixo):
+// desacoplar de vez a hitbox de ATIVACAO (trigger de combate/dialogo) do footprint
+// VISUAL (o retangulo que cobre o sprite inteiro, usado SO pro quad desenhado). Esta
+// funcao agora SO serve o footprint visual (sempre quadrado, sprite_height_tiles em
+// ambos os eixos) - a responsabilidade de "quando ativa" mudou de dono.
 [[nodiscard]] gus::core::spatial::Aabb enemy_sprite_footprint_aabb(
     const gus::core::spatial::Aabb& anchor, float sprite_height_tiles,
-    float tile_size, float sprite_width_fraction = 1.0f) noexcept;
+    float tile_size) noexcept;
+
+// SOLUCAO ARQUITETURAL (BUG-7 revisitado, decisao do lider apos playtest ao vivo:
+// "o Gus visivelmente distante do Bertoldo quando o dialogo ja disparou" mesmo com o
+// remendo `sprite_width_fraction` acima). Causa raiz de FUNDO, comum a BUG-1 E BUG-7:
+// usar o FOOTPRINT VISUAL inteiro (o retangulo que cobre o corpo/retrato desenhado)
+// como hitbox de ATIVACAO confunde DUAS responsabilidades que deveriam ser
+// independentes - "o que o jogador VE" (pode ser alto, largo, com margem transparente,
+// varia por sprite/pose) e "quando o jogador esta PERTO O BASTANTE pra interagir" (uma
+// nocao de PROXIMIDADE FISICA, que nao deveria depender de quanto ar transparente o PNG
+// tem ao redor do corpo). A tecnica canonica de RPGs 2D top-down (Zelda, Stardew
+// Valley): a area de interacao/colisao-de-encontro e sempre uma caixa PEQUENA ancorada
+// nos PES (a base onde o personagem realmente "esta parado" no grid), DESACOPLADA da
+// largura/altura do sprite - resolve de vez o problema de precisar medir a
+// transparencia de cada sprite individualmente (o que ja mordeu o projeto 2x com o
+// Bertoldo: primeiro a escala, depois a largura).
+//
+// Esta funcao deriva essa caixa a partir do FOOTPRINT VISUAL ja calculado (o mesmo
+// `enemy_sprite_footprint_aabb`/anchor usado pro desenho, INALTERADO - nenhuma mudanca
+// no tamanho/posicao do sprite na tela) - reusa so a BASE (footprint.y+footprint.h, a
+// mesma formula de base que o desenho ja usa) e o CENTRO em X (footprint.x+footprint.w
+// *0.5, ja centrado por construcao). kFeetTriggerWidthTiles/kFeetTriggerHeightTiles sao
+// da MESMA ordem de grandeza da hitbox real do jogador (ver city_scene.hpp::
+// kPlayerHitboxTileFraction=0.6 tile) - nem tao grande quanto o footprint inteiro
+// (evitaria o BUG-7 de novo, disparar "de longe"), nem minusculo a ponto de reviver o
+// fantasma do BUG-1 (a caixa cobre uma faixa ao redor da base, alcancavel vindo de
+// qualquer direcao cardinal, nao so do sul). GENERICA: a MESMA funcao serve o inimigo
+// fixo (combate) e o Bertoldo (dialogo) - sem duplicar logica entre os dois call-sites
+// (ver maestro.cpp).
+inline constexpr float kFeetTriggerWidthTiles = 0.8f;
+inline constexpr float kFeetTriggerHeightTiles = 0.4f;
+
+[[nodiscard]] gus::core::spatial::Aabb feet_trigger_aabb(
+    const gus::core::spatial::Aabb& sprite_footprint, float tile_size,
+    float trigger_width_tiles = kFeetTriggerWidthTiles,
+    float trigger_height_tiles = kFeetTriggerHeightTiles) noexcept;
 
 // FIX BUG-3 (playtest ao vivo do lider: "fechei a janela DURANTE a batalha e ela
 // reabriu a cidade, virou LOOP INFINITO ate eu dar pkill"). Contrato do run() da

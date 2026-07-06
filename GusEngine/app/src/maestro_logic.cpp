@@ -162,16 +162,15 @@ gus::core::spatial::Aabb pick_fixed_enemy_position(
 
 gus::core::spatial::Aabb enemy_sprite_footprint_aabb(
     const gus::core::spatial::Aabb& anchor, float sprite_height_tiles,
-    float tile_size, float sprite_width_fraction) noexcept {
-    // MESMA formula de overworld_sim.cpp (MARCADOR DE INIMIGO FIXO): quad centrado em
-    // X sobre o anchor, base do quad = base do anchor (bottom_fraction=0, manual_
-    // offset=0 - sem foot-inset, e um busto/icone, nao um sprite de corpo com pes
-    // medidos). sprite_width_fraction (default 1.0 = quadrado) encolhe SO a largura
-    // pra retratos cujo conteudo visivel nao preenche o canvas quadrado inteiro (ver
-    // BUG-7/M7-DIALOGO no header) - o CENTRO em X permanece sobre o anchor mesmo
-    // quando esprite_w < esprite_h (fp.x abaixo ja centra por construcao).
+    float tile_size) noexcept {
+    // MESMA formula de overworld_sim.cpp (MARCADOR DE INIMIGO FIXO/BERTOLDO): quad
+    // QUADRADO centrado em X sobre o anchor, base do quad = base do anchor
+    // (bottom_fraction=0, manual_offset=0 - sem foot-inset, e um busto/icone, nao um
+    // sprite de corpo com pes medidos). Este e SO o footprint VISUAL (o retangulo que
+    // cobre o sprite inteiro pro DESENHO) - a hitbox de ATIVACAO (combate/dialogo) vem
+    // de feet_trigger_aabb abaixo, DESACOPLADA deste tamanho (ver header).
     const float esprite_h = sprite_height_tiles * tile_size;
-    const float esprite_w = esprite_h * sprite_width_fraction;
+    const float esprite_w = esprite_h;  // quadrado - sem fracao de largura por-sprite
 
     gus::core::spatial::Aabb fp;
     fp.w = esprite_w;
@@ -181,6 +180,23 @@ gus::core::spatial::Aabb enemy_sprite_footprint_aabb(
                                             /*bottom_fraction=*/0.0f,
                                             /*manual_offset_world=*/0.0f);
     return fp;
+}
+
+gus::core::spatial::Aabb feet_trigger_aabb(
+    const gus::core::spatial::Aabb& sprite_footprint, float tile_size,
+    float trigger_width_tiles, float trigger_height_tiles) noexcept {
+    // Caixa PEQUENA ancorada na BASE do footprint visual (mesma base/centro-X que o
+    // desenho ja usa - ver enemy_sprite_footprint_aabb acima) - PURA geometria, sem
+    // nenhuma nocao de sprite/PNG/alpha-bbox (ver header pra rationale completo).
+    const float w = trigger_width_tiles * tile_size;
+    const float h = trigger_height_tiles * tile_size;
+
+    gus::core::spatial::Aabb trig;
+    trig.w = w;
+    trig.h = h;
+    trig.x = sprite_footprint.x + sprite_footprint.w * 0.5f - w * 0.5f;
+    trig.y = (sprite_footprint.y + sprite_footprint.h) - h;
+    return trig;
 }
 
 void crossfade_music(gus::platform::audio::AudioEngine* engine,
