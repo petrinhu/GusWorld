@@ -16,11 +16,15 @@
 #include <fstream>
 #include <string>
 
+#include <glintfx/element_box.hpp>
 #include <glintfx/ui_layer.hpp>
 
 #include "gus/app/screens/npc_dialogue_overlay.hpp"
 #include "gus/app/screens/npc_dialogue_rml.hpp"
-#include "gus/core/asset_paths.hpp"  // kRetratosDir
+#include "gus/app/screens/ui_hover.hpp"  // COCKPIT-SFX-HOVER-CLIQUE: fatia GENERICA de
+                                         // edge-detect de hover, REUSADA aqui (MESMA
+                                         // que o menu de sistema/cockpit ja usam)
+#include "gus/core/asset_paths.hpp"  // kRetratosDir/kSfxDir/kMenuHoverSfxFile/kMenuClickSfxFile
 #include "gus/core/spatial/camera_clamp.hpp"  // gus::core::spatial::Rect
 #include "gus/platform/render2d/render2d_gl3.hpp"
 #include "gus/platform/rmlui/gl3_loader.hpp"  // glad load (variante owning_gl)
@@ -35,6 +39,13 @@
 // battle_preview.cpp resolvem).
 #ifndef GUSWORLD_ASSETS_DIR
 #define GUSWORLD_ASSETS_DIR ""
+#endif
+
+// Pasta do kit CC0 de SFX (M6 F2/F3, ADR-011) - MESMA macro que
+// system_menu_loop.cpp/battle_preview.cpp ja usam (raiz do repo, irma de
+// GusEngine/ e resources/). Override em runtime via env GUSWORLD_SFX.
+#ifndef GUSWORLD_SFX_DIR
+#define GUSWORLD_SFX_DIR ""
 #endif
 
 namespace gus::app::screens {
@@ -63,6 +74,32 @@ std::string resolve_assets_subdir(std::string_view rel) {
     return join("resources", sub);
 }
 
+// Id fixo do botao "Continuar" (npc_dialogue_rml.cpp: "npcdlg-continue-btn") - so
+// 1 no LINEAR fica carregado por vez (MESMO racional de kPlaceholderBackId em
+// system_menu_loop.cpp), entao 1 id fixo basta pro hit-test de hover/clique.
+constexpr const char* kContinueBtnId = "npcdlg-continue-btn";
+
+// Hit-test simples: cursor (x,y, espaco-janela) dentro da caixa border-box
+// devolvida por glintfx::UiLayer::get_element_box - MESMA receita/contrato de
+// hit_test em system_menu_loop.cpp (box.found=false conta como "fora").
+bool hit_test(const glintfx::ElementBox& box, float x, float y) {
+    if (!box.found) return false;
+    return x >= box.x && x <= box.x + box.w && y >= box.y && y <= box.y + box.h;
+}
+
+// Resolve o caminho de um SFX (hover/click do botao "Continuar") - MESMA ordem
+// de resolve_menu_sfx_path em system_menu_loop.cpp: env GUSWORLD_SFX > macro
+// embutida (GUSWORLD_SFX_DIR) > relativo ao CWD (kSfxDir).
+std::string resolve_dialogue_sfx_path(std::string_view file) {
+    const std::string filename(file);
+    if (const char* env = std::getenv("GUSWORLD_SFX")) {
+        if (env[0] != '\0') return join(env, filename);
+    }
+    const std::string compiled = GUSWORLD_SFX_DIR;
+    if (!compiled.empty()) return join(compiled, filename);
+    return join(std::string(gus::core::assets::kSfxDir), filename);
+}
+
 // Diretorio de STAGE do dialogo (tempfile) - MESMA receita/motivo de
 // menu_stage_dir (system_menu_loop.cpp)/glintfx_cockpit_stage_dir
 // (battle_preview.cpp): o glintfx carrega o doc por PATH e resolve os
@@ -86,7 +123,8 @@ std::string npc_dialogue_stage_dir() {
 // MESMA degradacao segura do resto do app/ (nunca crasha).
 std::string write_npc_dialogue_rml_file(
     const gus::domain::dialogue::DialogueNode& node,
-    const gus::app::i18n::Translator& tr, int selected_option) {
+    const gus::app::i18n::Translator& tr, int selected_option,
+    bool continue_pressed = false) {
     const fs::path stage = npc_dialogue_stage_dir();
     std::error_code ec;
     fs::create_directories(stage, ec);
@@ -110,7 +148,8 @@ std::string write_npc_dialogue_rml_file(
     fs::copy_file(join(retratos_dir, portrait_file), stage / portrait_file,
                   fs::copy_options::overwrite_existing, ec);
 
-    std::string rml = build_npc_dialogue_rml(node, tr, selected_option, portrait_file);
+    std::string rml = build_npc_dialogue_rml(node, tr, selected_option, portrait_file,
+                                              continue_pressed);
     const std::string needle = "<style>\n";
     const std::size_t pos = rml.find(needle);
     if (pos != std::string::npos) {
@@ -131,7 +170,8 @@ std::string write_npc_dialogue_rml_file(
 
 bool run_npc_dialogue_loop_gl(SDL_Window* window, gus::app::SdlWindow& city,
                                gus::domain::dialogue::DialogueRuntime& runtime,
-                               const gus::app::i18n::Translator& translator) {
+                               const gus::app::i18n::Translator& translator,
+                               gus::platform::audio::AudioEngine& audio) {
     // FIX BUG (ver header) - solta qualquer tecla de movimento segurada ANTES de
     // entrar no modal (o jogador nao pode estar "tentando mover" olhando pra uma
     // caixa de dialogo).
@@ -212,6 +252,78 @@ bool run_npc_dialogue_loop_gl(SDL_Window* window, gus::app::SdlWindow& city,
                 SDL_GL_SwapWindow(window);
             };
 
+            // SFX de hover/clique do botao "Continuar" (pedido do lider): MESMOS 2
+            // arquivos que o menu de sistema/cockpit ja usam (kMenuHoverSfxFile/
+            // kMenuClickSfxFile) - load_sfx UMA VEZ por sessao de dialogo (MESMO
+            // padrao de hover_sfx_id/click_sfx_id em system_menu_loop.cpp,
+            // "load_sfx NUNCA no frame"). audio.available()==false (device
+            // indisponivel/CI) degrada com seguranca - play_sfx(id invalido) ja e
+            // no-op.
+            const std::string hover_sfx_path =
+                resolve_dialogue_sfx_path(gus::core::assets::kMenuHoverSfxFile);
+            const std::string click_sfx_path =
+                resolve_dialogue_sfx_path(gus::core::assets::kMenuClickSfxFile);
+            const gus::platform::audio::SoundId hover_sfx_id =
+                audio.load_sfx(hover_sfx_path.c_str());
+            const gus::platform::audio::SoundId click_sfx_id =
+                audio.load_sfx(click_sfx_path.c_str());
+
+            int hovered_index = -1;  // -1 = mouse fora do botao "Continuar" (so
+                                     // existe 1 - ui_hover_index/count=1 abaixo);
+                                     // edge-detect PURO do SOM de hover (ver
+                                     // ui_hover.hpp), MESMA logica do menu/cockpit.
+
+            // HOVER (mouse) - injeta o MouseMove no glintfx (visual :hover NATIVO,
+            // MESMO pipeline do menu de sistema/cockpit) e faz o hit-test/edge-
+            // detect do SOM de hover no botao "Continuar" - SO existe em no LINEAR
+            // (node.options.empty()); em no de ESCOLHA nao ha botao, hovered_index
+            // fica preso em -1 (nao "vaza" hover de uma tela pra outra). Fatorada
+            // em lambda pra ser chamada tanto pelo SDL_EVENT_MOUSE_MOTION real
+            // (abaixo) quanto pelo self-test headless (GUSWORLD_NPCDLG_HOVER_
+            // SELFTEST) - MESMO caminho de codigo prova o comportamento real.
+            auto handle_mouse_motion = [&](float mx, float my) {
+                glintfx::UiEvent hover_ev{};
+                hover_ev.type = glintfx::UiEvent::Type::MouseMove;
+                hover_ev.x = mx;
+                hover_ev.y = my;
+                ui.process_event(hover_ev);
+
+                int new_hover = -1;
+                if (runtime.current().options.empty()) {
+                    const glintfx::ElementBox box = ui.get_element_box(kContinueBtnId);
+                    const UiHoverBox hb{box.found, box.x, box.y, box.w, box.h};
+                    new_hover = ui_hover_index(mx, my, &hb, 1);
+                }
+                if (ui_hover_entered_new_item(hovered_index, new_hover)) {
+                    audio.play_sfx(hover_sfx_id);
+                }
+                hovered_index = new_hover;
+            };
+
+            // EFEITO DE PRESS (MESMO padrao de flash_pressed() em
+            // system_menu_loop.cpp, ver header): renderiza o no ATUAL (ainda NAO
+            // avancado - o CHAMADOR chama isto ANTES de apply_npc_dialogue_input)
+            // com o botao "Continuar" marcado ".pressed", por ~100ms (4 frames de
+            // ~25ms), e SO DEPOIS devolve - o chamador segue avancando o dialogo
+            // normalmente. SOM DE CLIQUE: dispara AQUI, no MESMO choke-point
+            // chamado tanto por CLIQUE de mouse quanto por Enter/Espaco de
+            // TECLADO (ver o loop abaixo) - 1 play_sfx cobre os dois canais sem
+            // duplicar logica. SO faz sentido em no LINEAR (options.empty()) - o
+            // CHAMADOR so invoca isto nesse caso (ha um botao pra marcar).
+            auto flash_pressed = [&] {
+                audio.play_sfx(click_sfx_id);
+                rml_path = write_npc_dialogue_rml_file(runtime.current(), translator,
+                                                        selected_option,
+                                                        /*continue_pressed=*/true);
+                ui.load(rml_path.c_str());
+                ui.set_viewport(pw, ph);
+                ui.set_dp_ratio(dp_ratio);
+                for (int frame = 0; frame < 4; ++frame) {
+                    present_frame();
+                    SDL_Delay(25);
+                }
+            };
+
             present_frame();
 
             // DIAGNOSTICO/PROVA (MESMO padrao de GUSWORLD_SYSMENU_HOVER_SELFTEST em
@@ -249,6 +361,63 @@ bool run_npc_dialogue_loop_gl(SDL_Window* window, gus::app::SdlWindow& city,
                     "finished()=%d em %d nos visitados (guard=%d) - GL/glintfx/stage "
                     "dir OK, sem crash.",
                     runtime.finished() ? 1 : 0, nodes_visited, guard);
+            } else if (const char* hover_selftest =
+                           std::getenv("GUSWORLD_NPCDLG_HOVER_SELFTEST");
+                       hover_selftest != nullptr && hover_selftest[0] != '\0') {
+                // DIAGNOSTICO/PROVA (HOVER/CLIQUE do botao "Continuar", ver header):
+                // MESMO espirito de GUSWORLD_SYSMENU_HOVER_SELFTEST (system_menu_
+                // loop.cpp) - move o mouse SINTETICO fora->dentro->dentro(repete)->
+                // fora->dentro do botao (prova ui_hover_entered_new_item: 2 entradas
+                // NOVAS esperadas, a repeticao sobre o MESMO item nao redispara) via
+                // handle_mouse_motion (O MESMO codigo do SDL_EVENT_MOUSE_MOTION real
+                // abaixo, sem duplicar), e SIMULA 1 clique (flash_pressed + avanca o
+                // dialogo) - tudo SEM SDL_PushEvent/xdotool/wmctrl, SEM tocar
+                // hardware de audio (audio.available() decide - este self-test so
+                // EXERCITA os call-sites; sfx_play_count() e o hook de prova).
+                // Degrada com seguranca se o no ATUAL nao for LINEAR (sem botao pra
+                // achar - kContinueBtnId nao existe no doc) - nunca crasha.
+                present_frame();  // assenta o layout (get_element_box precisa de 1 update())
+
+                if (runtime.current().options.empty()) {
+                    const glintfx::ElementBox box = ui.get_element_box(kContinueBtnId);
+                    const float cx = box.found ? box.x + box.w * 0.5f : -1.0f;
+                    const float cy = box.found ? box.y + box.h * 0.5f : -1.0f;
+
+                    handle_mouse_motion(-100.0f, -100.0f);  // fora de qualquer botao
+                    present_frame();
+                    handle_mouse_motion(cx, cy);  // ENTRA - 1a entrada NOVA
+                    present_frame();
+                    handle_mouse_motion(cx, cy);  // MESMO item - nao redispara
+                    present_frame();
+                    handle_mouse_motion(-100.0f, -100.0f);  // sai
+                    present_frame();
+                    handle_mouse_motion(cx, cy);  // volta - 2a entrada NOVA
+                    present_frame();
+                    SDL_Log(
+                        "NpcDialogueLoopGl: [hover-selftest] hover_sfx_play_count apos "
+                        "fora->dentro->dentro(repete)->fora->dentro (2 entradas NOVAS "
+                        "esperadas) = %u",
+                        audio.sfx_play_count());
+
+                    const unsigned int click_baseline = audio.sfx_play_count();
+                    const std::string node_before = runtime.current().id;
+                    flash_pressed();
+                    selected_option = apply_npc_dialogue_input(
+                        runtime, NpcDialogueInputAction::Confirm, selected_option);
+                    SDL_Log(
+                        "NpcDialogueLoopGl: [hover-selftest] click_sfx disparou %u x "
+                        "(esperado 1) - total sfx_play_count()=%u; no avancou de "
+                        "'%s' para '%s' (finished()=%d)",
+                        audio.sfx_play_count() - click_baseline, audio.sfx_play_count(),
+                        node_before.c_str(),
+                        runtime.finished() ? "(fim)" : runtime.current().id.c_str(),
+                        runtime.finished() ? 1 : 0);
+                } else {
+                    SDL_Log(
+                        "NpcDialogueLoopGl: [hover-selftest] no ATUAL e de ESCOLHA "
+                        "(sem botao 'Continuar') - nada a provar aqui, encerrando "
+                        "sem crash (degradacao segura).");
+                }
             } else {
 
             while (!runtime.finished()) {
@@ -269,35 +438,69 @@ bool run_npc_dialogue_loop_gl(SDL_Window* window, gus::app::SdlWindow& city,
                         ui.set_dp_ratio(dp_ratio);
                         continue;
                     }
-                    if (ev.type != SDL_EVENT_KEY_DOWN || ev.key.repeat) {
-                        continue;
-                    }
-                    NpcDialogueInputAction action = NpcDialogueInputAction::None;
-                    switch (ev.key.key) {
-                        case SDLK_UP:
-                        case SDLK_W:
-                            action = NpcDialogueInputAction::MoveUp;
+                    if (ev.type == SDL_EVENT_KEY_DOWN && !ev.key.repeat) {
+                        NpcDialogueInputAction action = NpcDialogueInputAction::None;
+                        switch (ev.key.key) {
+                            case SDLK_UP:
+                            case SDLK_W:
+                                action = NpcDialogueInputAction::MoveUp;
+                                break;
+                            case SDLK_DOWN:
+                            case SDLK_S:
+                                action = NpcDialogueInputAction::MoveDown;
+                                break;
+                            case SDLK_RETURN:
+                            case SDLK_KP_ENTER:
+                            case SDLK_SPACE:
+                                action = NpcDialogueInputAction::Confirm;
+                                break;
+                            default:
+                                break;
+                        }
+                        if (action == NpcDialogueInputAction::None) {
+                            continue;
+                        }
+                        // FLASH DE CLIQUE (teclado): SO em no LINEAR (ha um botao
+                        // "Continuar" pra marcar) E so na confirmacao (Confirm) - MoveUp/
+                        // MoveDown (navegacao de opcoes) nunca pisca. Choke-point UNICO
+                        // com o clique de mouse abaixo (flash_pressed), MESMA razao de
+                        // ser de is_confirming/flash_pressed em system_menu_loop.cpp.
+                        const bool is_continue_confirm =
+                            action == NpcDialogueInputAction::Confirm &&
+                            runtime.current().options.empty();
+                        if (is_continue_confirm) {
+                            flash_pressed();
+                        }
+                        selected_option =
+                            apply_npc_dialogue_input(runtime, action, selected_option);
+                        changed = true;
+                        if (runtime.finished()) {
                             break;
-                        case SDLK_DOWN:
-                        case SDLK_S:
-                            action = NpcDialogueInputAction::MoveDown;
-                            break;
-                        case SDLK_RETURN:
-                        case SDLK_KP_ENTER:
-                        case SDLK_SPACE:
-                            action = NpcDialogueInputAction::Confirm;
-                            break;
-                        default:
-                            break;
-                    }
-                    if (action == NpcDialogueInputAction::None) {
-                        continue;
-                    }
-                    selected_option =
-                        apply_npc_dialogue_input(runtime, action, selected_option);
-                    changed = true;
-                    if (runtime.finished()) {
-                        break;
+                        }
+                    } else if (ev.type == SDL_EVENT_MOUSE_MOTION) {
+                        // SEMPRE (nao so em no LINEAR - handle_mouse_motion ja decide
+                        // internamente se ha botao pra hover): hover NATIVO (:hover
+                        // RCSS) + edge-detect do SOM de hover.
+                        handle_mouse_motion(ev.motion.x, ev.motion.y);
+                    } else if (ev.type == SDL_EVENT_MOUSE_BUTTON_DOWN &&
+                               ev.button.button == SDL_BUTTON_LEFT) {
+                        // CLIQUE no botao "Continuar" - SO existe em no LINEAR (ver
+                        // npc_dialogue_rml.cpp: node.options.empty()). Equivalente a
+                        // Enter/Espaco de teclado - MESMO choke-point (flash_pressed).
+                        if (runtime.current().options.empty()) {
+                            const glintfx::ElementBox box =
+                                ui.get_element_box(kContinueBtnId);
+                            if (hit_test(box, ev.button.x, ev.button.y)) {
+                                flash_pressed();
+                                selected_option = apply_npc_dialogue_input(
+                                    runtime, NpcDialogueInputAction::Confirm,
+                                    selected_option);
+                                changed = true;
+                                if (runtime.finished()) {
+                                    break;
+                                }
+                            }
+                        }
                     }
                 }
                 if (window_closed || runtime.finished()) {

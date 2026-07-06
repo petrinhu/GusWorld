@@ -30,6 +30,21 @@
 // texto puro pra RCSS). Simples e coerente com o resto do documento (nenhuma
 // API nova); ajustavel ao vivo se o lider preferir outra disposicao.
 //
+// BOTAO "Continuar" (pedido do lider, pos-DIALOGO-TERMINAL): o no LINEAR (sem
+// opcoes) mostrava so um textinho pequeno (`.warm-continue-hint`, so avancava
+// por Enter/Espaco) - virou um BOTAO DE VERDADE (`.warm-continue-btn`,
+// id="npcdlg-continue-btn"), MESMA receita visual/estrutural de .btn-back
+// (system_menu_rml.cpp): box-sizing:border-box, `:hover` nativo do glintfx
+// DECLARADO ANTES de `.pressed` (mesma ordem/motivo documentado la - o empate
+// de especificidade cai a favor do estado real), `.pressed` = flash da moldura
+// de latao (borda+fundo dourados) tocado pelo CHAMADOR (npc_dialogue_loop_gl.cpp,
+// MESMO padrao de flash_pressed() do menu - efeito NOSSO, nao nativo do
+// glintfx). DECISAO DE POSICAO NAO COBERTA PELO MOCK (so o texto existia):
+// mantido na MESMA posicao/lugar do antigo hint (fim do #npcdlg-body, so
+// virando `<div>` clicavel) - simples e coerente, ajustavel ao vivo se o lider
+// preferir outro lugar. `continue_pressed` so importa em no LINEAR (mesma
+// condicao de `options.empty()` que decide mostrar o botao).
+//
 // Cross-ref: gus/app/screens/npc_dialogue_overlay.hpp (logica pura reusada);
 //            gus/app/screens/npc_dialogue_loop_gl.hpp (o loop GL que gera o
 //            stage dir, copia o retrato e chama esta funcao a cada mudanca de no);
@@ -68,12 +83,16 @@ namespace gus::app::screens {
 // npc_dialogue_portrait_file - esta funcao so o REFERENCIA num `decorator: image(
 // <portrait_file> cover )`, MESMA tecnica ja usada pro retrato do cockpit
 // (battle_preview.cpp, #pic). `selected_option` so importa em no de ESCOLHA
-// (node.options nao vazio); em no LINEAR mostra tr("DIALOGUE_CONTINUE") como dica
-// de confirmar.
+// (node.options nao vazio); em no LINEAR mostra tr("DIALOGUE_CONTINUE") num
+// BOTAO de verdade (id="npcdlg-continue-btn", classe "warm-continue-btn" - ver
+// header). `continue_pressed` (default false) marca o botao com ".pressed"
+// (flash de confirmacao, MESMO padrao de pressed_index em
+// build_system_menu_rml/system_menu_rml.hpp) - so tem efeito visual em no
+// LINEAR (nao ha botao pra marcar em no de ESCOLHA).
 [[nodiscard]] std::string build_npc_dialogue_rml(
     const gus::domain::dialogue::DialogueNode& node,
     const gus::app::i18n::Translator& translator, int selected_option,
-    const std::string& portrait_file);
+    const std::string& portrait_file, bool continue_pressed = false);
 
 }  // namespace gus::app::screens
 

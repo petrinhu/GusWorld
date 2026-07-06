@@ -453,7 +453,7 @@ bool Maestro::to_npc_dialogue() {
     // cidade nunca fica sem desenhar pro resto da sessao).
     city_->release_renderer();
     const bool quit_requested = gus::app::screens::run_npc_dialogue_loop_gl(
-        window_, *city_, runtime, translator_);
+        window_, *city_, runtime, translator_, audio_);
     if (!city_->reacquire_renderer()) {
         SDL_Log(
             "Maestro: falha ao reconstruir o renderer da cidade apos o dialogo - a "

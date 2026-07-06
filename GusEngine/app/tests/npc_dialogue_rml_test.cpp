@@ -158,3 +158,48 @@ TEST_CASE("build_npc_dialogue_rml: no de ESCOLHA nao mostra o hint de "
         node, tr, /*selected_option=*/0, npc_dialogue_portrait_file("bertoldo"));
     REQUIRE(rml.find("(continuar)") == std::string::npos);
 }
+
+// --------------------------------------------- botao "Continuar" (pedido do lider)
+
+TEST_CASE("build_npc_dialogue_rml: no LINEAR renderiza o BOTAO 'Continuar' de "
+          "verdade (id + classe clicavel), NAO pressionado por default",
+          "[npc_dialogue_rml]") {
+    const Translator tr = make_translator();
+    const DialogueNode node = make_linear_node("bertoldo");
+    const std::string rml = build_npc_dialogue_rml(
+        node, tr, /*selected_option=*/-1, npc_dialogue_portrait_file("bertoldo"));
+
+    REQUIRE(rml.find("id=\"npcdlg-continue-btn\"") != std::string::npos);
+    REQUIRE(rml.find("class=\"warm-continue-btn\"") != std::string::npos);
+    // Sem o parametro continue_pressed (default false), a classe "pressed" NAO
+    // aparece.
+    REQUIRE(rml.find("warm-continue-btn pressed") == std::string::npos);
+    // O CSS do botao (hover+pressed, ver npc_dialogue_rml.cpp) existe no <style>.
+    REQUIRE(rml.find(".warm-continue-btn:hover") != std::string::npos);
+    REQUIRE(rml.find(".warm-continue-btn.pressed") != std::string::npos);
+}
+
+TEST_CASE("build_npc_dialogue_rml: continue_pressed=true marca o botao com a "
+          "classe '.pressed' (flash de confirmacao, MESMO padrao de "
+          "pressed_index do menu de sistema)",
+          "[npc_dialogue_rml]") {
+    const Translator tr = make_translator();
+    const DialogueNode node = make_linear_node("bertoldo");
+    const std::string rml = build_npc_dialogue_rml(
+        node, tr, /*selected_option=*/-1, npc_dialogue_portrait_file("bertoldo"),
+        /*continue_pressed=*/true);
+
+    REQUIRE(rml.find("class=\"warm-continue-btn pressed\"") != std::string::npos);
+    REQUIRE(rml.find("id=\"npcdlg-continue-btn\"") != std::string::npos);
+}
+
+TEST_CASE("build_npc_dialogue_rml: no de ESCOLHA NAO renderiza o botao "
+          "'Continuar' (so nos LINEARES tem botao - sem opcao pra confundir "
+          "hit-test)",
+          "[npc_dialogue_rml]") {
+    const Translator tr = make_translator();
+    const DialogueNode node = make_choice_node("bertoldo");
+    const std::string rml = build_npc_dialogue_rml(
+        node, tr, /*selected_option=*/0, npc_dialogue_portrait_file("bertoldo"));
+    REQUIRE(rml.find("npcdlg-continue-btn") == std::string::npos);
+}

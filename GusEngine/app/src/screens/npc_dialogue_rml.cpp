@@ -83,8 +83,36 @@ body { font-family: "Pixel Operator Mono"; background: transparent; width: 100%;
 }
 .warm-choice.selected { color: #F3E9DD; }
 
-.warm-continue-hint {
-  margin-top: 10dp; font-size: 11dp; color: #B9A392; letter-spacing: .5dp;
+/* BOTAO "Continuar" (pedido do lider - ver header): MESMA receita de .btn-back
+   (system_menu_rml.cpp) - box-sizing:border-box, display:inline-block (a
+   caixa fica do tamanho do texto+padding, nao ocupa a linha toda como o
+   antigo .warm-continue-hint - mantem o "botao pequeno" que ja existia
+   visualmente, so agora clicavel/reativo). Paleta QUENTE (latao/dourado da
+   moldura, #7A5A2E/#C9A24B/#E9A33D/#F3E9DD), coerente com .warm-box/
+   .warm-corner acima (NAO a paleta cyan do menu de sistema). */
+.warm-continue-btn {
+  box-sizing: border-box;
+  display: inline-block;
+  margin-top: 10dp; padding: 5dp 16dp;
+  border: 1dp #7A5A2E; border-radius: 999dp;
+  decorator: vertical-gradient( #2A1D14 #170F0B );
+  color: #B9A392; font-size: 11dp; letter-spacing: .5dp;
+}
+/* HOVER (mouse) - MESMA ordem/motivo de .btn-back:hover (system_menu_rml.cpp):
+   declarado ANTES de .pressed pra empate de especificidade cair a favor do
+   estado de PRESS real, caso os dois coincidam no mesmo frame. */
+.warm-continue-btn:hover {
+  color: #F3E9DD; border-color: #C9A24B;
+  decorator: vertical-gradient( #3A2A1C #201409 );
+}
+/* PRESS (flash de confirmacao, NOSSO - nao nativo do glintfx, MESMO padrao de
+   .btn-back.pressed): fundo dourado solido + texto escuro + glow claro,
+   tocado pelo CHAMADOR (npc_dialogue_loop_gl.cpp) por alguns frames ANTES de
+   avancar o dialogo de fato. */
+.warm-continue-btn.pressed {
+  decorator: vertical-gradient( #E9A33D #C9A24B );
+  color: #170F0B; border: 1dp #F3E9DD;
+  box-shadow: #F3E9DD 0dp 0dp 22dp 2dp;
 }
 )RCSS";
 
@@ -105,7 +133,7 @@ std::string npc_dialogue_portrait_file(const std::string& speaker_id) {
 std::string build_npc_dialogue_rml(
     const gus::domain::dialogue::DialogueNode& node,
     const gus::app::i18n::Translator& translator, int selected_option,
-    const std::string& portrait_file) {
+    const std::string& portrait_file, bool continue_pressed) {
     const std::string speaker_label =
         npc_dialogue_actor_display_name(node.speaker_id, translator);
 
@@ -122,7 +150,12 @@ std::string build_npc_dialogue_rml(
     body << "<div id=\"npcdlg-line\">" << translator.tr(node.text_key) << "</div>";
 
     if (node.options.empty()) {
-        body << "<div class=\"warm-continue-hint\">" << translator.tr("DIALOGUE_CONTINUE")
+        // BOTAO "Continuar" (pedido do lider - ver header): id fixo (so 1 no LINEAR
+        // fica carregado por vez, MESMO racional de "placeholder-back" em
+        // system_menu_rml.cpp) - o CHAMADOR (npc_dialogue_loop_gl.cpp) faz
+        // get_element_box("npcdlg-continue-btn") pro hit-test de hover/clique.
+        body << "<div class=\"warm-continue-btn" << (continue_pressed ? " pressed" : "")
+             << "\" id=\"npcdlg-continue-btn\">" << translator.tr("DIALOGUE_CONTINUE")
              << "</div>";
     } else {
         body << "<div class=\"warm-choices\">";
