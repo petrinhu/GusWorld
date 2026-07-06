@@ -15,6 +15,7 @@
 #include <filesystem>
 #include <fstream>
 #include <string>
+#include <vector>
 
 #include <glintfx/element_box.hpp>
 #include <glintfx/ui_layer.hpp>
@@ -79,6 +80,14 @@ std::string resolve_assets_subdir(std::string_view rel) {
 // system_menu_loop.cpp), entao 1 id fixo basta pro hit-test de hover/clique.
 constexpr const char* kContinueBtnId = "npcdlg-continue-btn";
 
+// Id de uma opcao (npc_dialogue_rml.cpp: "npcdlg-choice-<indice>", MESMA
+// convencao de id-por-indice de pause_item_id/category_item_id em
+// system_menu_loop.cpp) - fonte UNICA do nome pro hit-test de clique/hover POR
+// OPCAO abaixo (evita o id divergir entre quem GERA o RML e quem CONSULTA).
+std::string npc_dialogue_choice_id(int index) {
+    return "npcdlg-choice-" + std::to_string(index);
+}
+
 // Hit-test simples: cursor (x,y, espaco-janela) dentro da caixa border-box
 // devolvida por glintfx::UiLayer::get_element_box - MESMA receita/contrato de
 // hit_test em system_menu_loop.cpp (box.found=false conta como "fora").
@@ -124,7 +133,7 @@ std::string npc_dialogue_stage_dir() {
 std::string write_npc_dialogue_rml_file(
     const gus::domain::dialogue::DialogueNode& node,
     const gus::app::i18n::Translator& tr, int selected_option,
-    bool continue_pressed = false) {
+    bool continue_pressed = false, int pressed_option = -1) {
     const fs::path stage = npc_dialogue_stage_dir();
     std::error_code ec;
     fs::create_directories(stage, ec);
@@ -149,7 +158,7 @@ std::string write_npc_dialogue_rml_file(
                   fs::copy_options::overwrite_existing, ec);
 
     std::string rml = build_npc_dialogue_rml(node, tr, selected_option, portrait_file,
-                                              continue_pressed);
+                                              continue_pressed, pressed_option);
     const std::string needle = "<style>\n";
     const std::size_t pos = rml.find(needle);
     if (pos != std::string::npos) {
@@ -168,10 +177,30 @@ std::string write_npc_dialogue_rml_file(
 
 }  // namespace
 
+// Digito 1-9 de uma tecla numerica (fileira OU numpad); 0 se nao for numerica
+// 1-9. MESMA tecnica de gus::app::screens::battle_digit_for_key (battle_
+// preview.cpp) - ver o header (npc_dialogue_loop_gl.hpp) pro motivo de
+// duplicar em vez de reusar (peso de include de battle_scene.hpp).
+int npc_dialogue_digit_for_key(SDL_Keycode key) noexcept {
+    switch (key) {
+        case SDLK_1: case SDLK_KP_1: return 1;
+        case SDLK_2: case SDLK_KP_2: return 2;
+        case SDLK_3: case SDLK_KP_3: return 3;
+        case SDLK_4: case SDLK_KP_4: return 4;
+        case SDLK_5: case SDLK_KP_5: return 5;
+        case SDLK_6: case SDLK_KP_6: return 6;
+        case SDLK_7: case SDLK_KP_7: return 7;
+        case SDLK_8: case SDLK_KP_8: return 8;
+        case SDLK_9: case SDLK_KP_9: return 9;
+        default: return 0;
+    }
+}
+
 bool run_npc_dialogue_loop_gl(SDL_Window* window, gus::app::SdlWindow& city,
                                gus::domain::dialogue::DialogueRuntime& runtime,
                                const gus::app::i18n::Translator& translator,
-                               gus::platform::audio::AudioEngine& audio) {
+                               gus::platform::audio::AudioEngine& audio,
+                               const std::string& frozen_background_png) {
     // FIX BUG (ver header) - solta qualquer tecla de movimento segurada ANTES de
     // entrar no modal (o jogador nao pode estar "tentando mover" olhando pra uma
     // caixa de dialogo).
@@ -232,6 +261,16 @@ bool run_npc_dialogue_loop_gl(SDL_Window* window, gus::app::SdlWindow& city,
 
             gus::platform::render2d::Render2dGl3 backdrop(/*gl_active=*/true);
 
+            // FUNDO REAL CONGELADO (retoque do lider via AskUserQuestion,
+            // M7-DIALOGO): carrega a textura UMA VEZ (mesmo racional de
+            // "load_texture NUNCA no frame" ja documentado pros SFX abaixo) -
+            // kInvalidTexture (path vazio/asset ausente/backend headless) degrada
+            // com seguranca pra vinheta de sempre (ver present_frame).
+            const gus::platform::render2d::TextureId frozen_bg_tex =
+                frozen_background_png.empty()
+                    ? gus::platform::render2d::kInvalidTexture
+                    : backdrop.load_texture(frozen_background_png.c_str());
+
             auto reload = [&] {
                 rml_path = write_npc_dialogue_rml_file(runtime.current(), translator,
                                                         selected_option);
@@ -243,9 +282,23 @@ bool run_npc_dialogue_loop_gl(SDL_Window* window, gus::app::SdlWindow& city,
             auto present_frame = [&] {
                 const gus::core::spatial::Rect cam{0.0f, 0.0f, static_cast<float>(pw),
                                                     static_cast<float>(ph)};
-                backdrop.begin_frame(cam, pw, ph);  // clear + vinheta radial (fundo
-                                                     // abstrato, MESMO padrao do
-                                                     // menu de pausa)
+                backdrop.begin_frame(cam, pw, ph);  // clear + vinheta radial (fallback
+                                                     // abstrato)
+                if (frozen_bg_tex != gus::platform::render2d::kInvalidTexture) {
+                    // FUNDO REAL CONGELADO (decisao do lider): cobre a vinheta com
+                    // a CENA REAL da cidade (1 frame estatico, capturado pela
+                    // Maestro ANTES de abrir - ver Maestro::to_npc_dialogue/
+                    // SdlWindow::capture_frame_to_png), full-screen e opaca -
+                    // mesmo padrao de Chrono Trigger/Zelda/Stardew Valley (o mundo
+                    // "pausa" atras da UI). O #npcdlg-scrim do RML (npc_dialogue_
+                    // rml.cpp, ~40% preto) segue desenhado por CIMA disto pelo
+                    // glintfx (ui.render() abaixo) - a legibilidade da caixa nao
+                    // muda.
+                    backdrop.draw_textured_rect(
+                        cam, frozen_bg_tex,
+                        gus::platform::render2d::UvRect{0.0f, 0.0f, 1.0f, 1.0f},
+                        gus::platform::render2d::DrawColor{1.0f, 1.0f, 1.0f, 1.0f});
+                }
                 backdrop.end_frame();
                 ui.update();
                 ui.render();
@@ -268,19 +321,23 @@ bool run_npc_dialogue_loop_gl(SDL_Window* window, gus::app::SdlWindow& city,
             const gus::platform::audio::SoundId click_sfx_id =
                 audio.load_sfx(click_sfx_path.c_str());
 
-            int hovered_index = -1;  // -1 = mouse fora do botao "Continuar" (so
-                                     // existe 1 - ui_hover_index/count=1 abaixo);
-                                     // edge-detect PURO do SOM de hover (ver
-                                     // ui_hover.hpp), MESMA logica do menu/cockpit.
+            int hovered_index = -1;  // -1 = mouse fora de qualquer item navegavel
+                                     // (botao "Continuar" OU 1 das opcoes, ver
+                                     // abaixo); edge-detect PURO do SOM de hover
+                                     // (ver ui_hover.hpp), MESMA logica do
+                                     // menu/cockpit.
 
             // HOVER (mouse) - injeta o MouseMove no glintfx (visual :hover NATIVO,
             // MESMO pipeline do menu de sistema/cockpit) e faz o hit-test/edge-
-            // detect do SOM de hover no botao "Continuar" - SO existe em no LINEAR
-            // (node.options.empty()); em no de ESCOLHA nao ha botao, hovered_index
-            // fica preso em -1 (nao "vaza" hover de uma tela pra outra). Fatorada
-            // em lambda pra ser chamada tanto pelo SDL_EVENT_MOUSE_MOTION real
-            // (abaixo) quanto pelo self-test headless (GUSWORLD_NPCDLG_HOVER_
-            // SELFTEST) - MESMO caminho de codigo prova o comportamento real.
+            // detect do SOM de hover: no LINEAR (node.options.empty()) so ha o
+            // botao "Continuar" (1 caixa); no de ESCOLHA (pedido do lider) ha 1
+            // caixa POR OPCAO ("npcdlg-choice-<indice>", ver npc_dialogue_rml.hpp) -
+            // MESMA dupla ui_hover_index/UiHoverBox do menu/cockpit, so com N>1
+            // caixas dinamico (options.size(), nao um maximo fixo). Fatorada em
+            // lambda pra ser chamada tanto pelo SDL_EVENT_MOUSE_MOTION real
+            // (abaixo) quanto pelos self-tests headless (GUSWORLD_NPCDLG_HOVER_
+            // SELFTEST/GUSWORLD_NPCDLG_OPTIONS_SELFTEST) - MESMO caminho de
+            // codigo prova o comportamento real.
             auto handle_mouse_motion = [&](float mx, float my) {
                 glintfx::UiEvent hover_ev{};
                 hover_ev.type = glintfx::UiEvent::Type::MouseMove;
@@ -293,6 +350,16 @@ bool run_npc_dialogue_loop_gl(SDL_Window* window, gus::app::SdlWindow& city,
                     const glintfx::ElementBox box = ui.get_element_box(kContinueBtnId);
                     const UiHoverBox hb{box.found, box.x, box.y, box.w, box.h};
                     new_hover = ui_hover_index(mx, my, &hb, 1);
+                } else {
+                    const auto& options = runtime.current().options;
+                    std::vector<UiHoverBox> boxes(options.size());
+                    for (std::size_t i = 0; i < options.size(); ++i) {
+                        const glintfx::ElementBox box = ui.get_element_box(
+                            npc_dialogue_choice_id(static_cast<int>(i)).c_str());
+                        boxes[i] = UiHoverBox{box.found, box.x, box.y, box.w, box.h};
+                    }
+                    new_hover =
+                        ui_hover_index(mx, my, boxes.data(), static_cast<int>(boxes.size()));
                 }
                 if (ui_hover_entered_new_item(hovered_index, new_hover)) {
                     audio.play_sfx(hover_sfx_id);
@@ -303,18 +370,24 @@ bool run_npc_dialogue_loop_gl(SDL_Window* window, gus::app::SdlWindow& city,
             // EFEITO DE PRESS (MESMO padrao de flash_pressed() em
             // system_menu_loop.cpp, ver header): renderiza o no ATUAL (ainda NAO
             // avancado - o CHAMADOR chama isto ANTES de apply_npc_dialogue_input)
-            // com o botao "Continuar" marcado ".pressed", por ~100ms (4 frames de
-            // ~25ms), e SO DEPOIS devolve - o chamador segue avancando o dialogo
-            // normalmente. SOM DE CLIQUE: dispara AQUI, no MESMO choke-point
-            // chamado tanto por CLIQUE de mouse quanto por Enter/Espaco de
-            // TECLADO (ver o loop abaixo) - 1 play_sfx cobre os dois canais sem
-            // duplicar logica. SO faz sentido em no LINEAR (options.empty()) - o
-            // CHAMADOR so invoca isto nesse caso (ha um botao pra marcar).
+            // com o item que vai ser confirmado marcado ".pressed", por ~100ms
+            // (4 frames de ~25ms), e SO DEPOIS devolve - o chamador segue
+            // avancando o dialogo normalmente. SOM DE CLIQUE: dispara AQUI, no
+            // MESMO choke-point chamado por CLIQUE de mouse, TECLA DE NUMERO OU
+            // Enter/Espaco de TECLADO (ver o loop abaixo) - 1 play_sfx cobre os
+            // 3 canais sem duplicar logica. GENERALIZADO (pedido do lider,
+            // opcoes clicaveis): olha o no ATUAL pra decidir QUEM marcar - no
+            // LINEAR marca o botao "Continuar" (continue_pressed=true), no de
+            // ESCOLHA marca a opcao `selected_option` (pressed_option) - o
+            // CHAMADOR so precisa garantir que `selected_option` ja aponta pra
+            // opcao certa ANTES de chamar isto (ver confirm_choice abaixo).
             auto flash_pressed = [&] {
                 audio.play_sfx(click_sfx_id);
-                rml_path = write_npc_dialogue_rml_file(runtime.current(), translator,
-                                                        selected_option,
-                                                        /*continue_pressed=*/true);
+                const bool is_linear = runtime.current().options.empty();
+                rml_path = write_npc_dialogue_rml_file(
+                    runtime.current(), translator, selected_option,
+                    /*continue_pressed=*/is_linear,
+                    /*pressed_option=*/is_linear ? -1 : selected_option);
                 ui.load(rml_path.c_str());
                 ui.set_viewport(pw, ph);
                 ui.set_dp_ratio(dp_ratio);
@@ -322,6 +395,67 @@ bool run_npc_dialogue_loop_gl(SDL_Window* window, gus::app::SdlWindow& city,
                     present_frame();
                     SDL_Delay(25);
                 }
+            };
+
+            // CONFIRMA DIRETO uma opcao do no de ESCOLHA (indice `option_index`,
+            // pedido do lider): seleciona (selected_option = option_index, MESMO
+            // efeito de navegar ate ela por Up/Down) e confirma no MESMO
+            // choke-point de flash+som acima (flash_pressed, ja generalizado).
+            // Usada pelo CLIQUE de mouse numa `.warm-choice`, pela TECLA DE
+            // NUMERO (handle_number_key abaixo) e pelos self-tests headless -
+            // MESMO caminho de codigo pros 3 canais, sem duplicar logica (MESMA
+            // razao de ser de handle_mouse_motion acima).
+            auto confirm_choice = [&](int option_index) {
+                selected_option = option_index;
+                flash_pressed();
+                selected_option = apply_npc_dialogue_input(
+                    runtime, NpcDialogueInputAction::Confirm, selected_option);
+            };
+
+            // TECLA DE NUMERO (1-9, fileira+numpad - pedido do lider): SO no de
+            // ESCOLHA (node.options nao vazio), SELECIONA e CONFIRMA DIRETO a
+            // N-esima opcao (sem precisar navegar com Up/Down antes) via
+            // confirm_choice acima. Devolve false (NO-OP explicito, nada
+            // mexido) se o no ATUAL for LINEAR (sem opcoes - so o botao
+            // "Continuar", que nao tem atalho numerico) OU se o digito estiver
+            // FORA do range disponivel (ex. tecla "9" com so 3 opcoes - guarda
+            // pedida pelo lider). Fatorada em lambda pra ser chamada tanto pelo
+            // SDL_EVENT_KEY_DOWN real (abaixo) quanto pelo self-test headless
+            // (GUSWORLD_NPCDLG_OPTIONS_SELFTEST) - MESMO caminho de codigo
+            // prova o comportamento real, MESMO espirito de handle_mouse_motion.
+            auto handle_number_key = [&](SDL_Keycode key) -> bool {
+                if (runtime.current().options.empty()) return false;
+                const int nth = npc_dialogue_digit_for_key(key);
+                const int option_count =
+                    static_cast<int>(runtime.current().options.size());
+                if (nth < 1 || nth > option_count) return false;
+                confirm_choice(nth - 1);
+                return true;
+            };
+
+            // CLIQUE numa opcao (pedido do lider): hit-test POR OPCAO
+            // ("npcdlg-choice-<indice>") - a PRIMEIRA caixa que bater SELECIONA
+            // e CONFIRMA a opcao DIRETO via confirm_choice acima (MESMO
+            // comportamento "1 clique ja aciona" de uma pill do menu de
+            // sistema). Devolve false (NO-OP) se o clique cair fora de
+            // qualquer caixa - o CHAMADOR (evento real abaixo) so invoca isto
+            // quando runtime.current().options nao esta vazio (ha caixas pra
+            // testar). Fatorada em lambda pra ser chamada tanto pelo
+            // SDL_EVENT_MOUSE_BUTTON_DOWN real (abaixo) quanto pelo self-test
+            // headless (GUSWORLD_NPCDLG_OPTIONS_SELFTEST) - MESMO caminho de
+            // codigo prova o comportamento real, MESMO espirito de
+            // handle_mouse_motion/handle_number_key.
+            auto handle_choice_click = [&](float x, float y) -> bool {
+                const auto& options = runtime.current().options;
+                for (std::size_t i = 0; i < options.size(); ++i) {
+                    const glintfx::ElementBox box = ui.get_element_box(
+                        npc_dialogue_choice_id(static_cast<int>(i)).c_str());
+                    if (hit_test(box, x, y)) {
+                        confirm_choice(static_cast<int>(i));
+                        return true;
+                    }
+                }
+                return false;
             };
 
             present_frame();
@@ -418,6 +552,168 @@ bool run_npc_dialogue_loop_gl(SDL_Window* window, gus::app::SdlWindow& city,
                         "(sem botao 'Continuar') - nada a provar aqui, encerrando "
                         "sem crash (degradacao segura).");
                 }
+            } else if (const char* options_selftest =
+                           std::getenv("GUSWORLD_NPCDLG_OPTIONS_SELFTEST");
+                       options_selftest != nullptr && options_selftest[0] != '\0') {
+                // DIAGNOSTICO/PROVA (as 3 melhorias de OPCOES clicaveis - pedido
+                // do lider, ver header): entra em n0_greet (LINEAR, ja aberto
+                // acima), avanca DIRETO via apply_npc_dialogue_input (MESMA
+                // funcao pura ja testada - o botao "Continuar" ja tem PROVA
+                // propria em HOVER_SELFTEST, nao repetida aqui) ate n1_hook (no
+                // de ESCOLHA, 3 opcoes reais do grafo do Bertoldo) - dai
+                // exercita HOVER multi-opcao + edge-detect (2), a GUARDA de
+                // tecla-numero fora do range e o CLIQUE/tecla-de-numero
+                // confirmando a opcao CORRETA (1/3), tudo via os MESMOS
+                // handle_mouse_motion/handle_number_key/confirm_choice do
+                // caminho real - SEM SDL_PushEvent/xdotool/wmctrl, SEM tocar
+                // hardware de audio (sfx_play_count() e o hook de prova).
+                present_frame();  // assenta o layout inicial (n0_greet)
+
+                if (!runtime.current().options.empty()) {
+                    SDL_Log(
+                        "NpcDialogueLoopGl: [options-selftest] entry node JA e de "
+                        "ESCOLHA (esperava LINEAR n0_greet) - grafo mudou, "
+                        "abortando self-test sem crash.");
+                } else {
+                    // Avanca n0_greet -> n1_hook SEM flash/som (prova propria ja
+                    // em HOVER_SELFTEST) - so posiciona o runtime no de ESCOLHA.
+                    selected_option = apply_npc_dialogue_input(
+                        runtime, NpcDialogueInputAction::Confirm, selected_option);
+                    reload();
+                    present_frame();  // assenta o layout do no de ESCOLHA
+
+                    const int option_count =
+                        static_cast<int>(runtime.current().options.size());
+                    if (option_count < 3) {
+                        SDL_Log(
+                            "NpcDialogueLoopGl: [options-selftest] n1_hook tem %d "
+                            "opcoes (esperava 3) - grafo do Bertoldo mudou, "
+                            "self-test parcial.",
+                            option_count);
+                    }
+
+                    // (1) HOVER multi-opcao + edge-detect (item 2 - pedido do
+                    // lider): fora->0->1->2->2(repete)->fora->0, MESMO espirito
+                    // de hover_sequence={0,1,2,3,0} em
+                    // GUSWORLD_SYSMENU_HOVER_SELFTEST (system_menu_loop.cpp) - 4
+                    // entradas NOVAS esperadas (0,1,2,0-de-novo); a repeticao
+                    // sobre o item 2 e a saida pro vazio NAO disparam.
+                    auto choice_center = [&](int idx, float* out_x, float* out_y) {
+                        const glintfx::ElementBox box =
+                            ui.get_element_box(npc_dialogue_choice_id(idx).c_str());
+                        *out_x = box.found ? box.x + box.w * 0.5f : -100.0f;
+                        *out_y = box.found ? box.y + box.h * 0.5f : -100.0f;
+                    };
+                    const int hover_sequence[] = {0, 1, 2, 2, -1, 0};
+                    for (const int idx : hover_sequence) {
+                        if (idx < 0) {
+                            handle_mouse_motion(-100.0f, -100.0f);
+                        } else {
+                            float cx = -100.0f, cy = -100.0f;
+                            choice_center(idx, &cx, &cy);
+                            handle_mouse_motion(cx, cy);
+                        }
+                        present_frame();
+                    }
+                    SDL_Log(
+                        "NpcDialogueLoopGl: [options-selftest] hover_sfx_play_count "
+                        "apos 0->1->2->2(repete)->fora->0 (4 entradas NOVAS "
+                        "esperadas) = %u",
+                        audio.sfx_play_count());
+
+                    // (2) CLIQUE de mouse (item 1 - pedido do lider) NUMA CAIXA
+                    // FORA de qualquer opcao PRIMEIRO (ex. canto vazio da tela) -
+                    // handle_choice_click devolve false, NADA e confirmado (prova
+                    // que o clique NAO dispara em falso fora das caixas).
+                    const unsigned int miss_baseline = audio.sfx_play_count();
+                    const std::string node_before_miss = runtime.current().id;
+                    const bool consumed_miss = handle_choice_click(1.0f, 1.0f);
+                    SDL_Log(
+                        "NpcDialogueLoopGl: [options-selftest] clique FORA de "
+                        "qualquer opcao (canto 1,1) consumed=%d (esperado 0), no "
+                        "continua '%s' (era '%s'), click_sfx tocou %u x "
+                        "(esperado 0)",
+                        consumed_miss ? 1 : 0, runtime.current().id.c_str(),
+                        node_before_miss.c_str(),
+                        audio.sfx_play_count() - miss_baseline);
+
+                    // (3) CLIQUE de mouse NA CAIXA da opcao de INDICE 1
+                    // (pragmatico, NAO a 0 - prova que confirma a CORRETA, nao
+                    // sempre a primeira) SELECIONA e CONFIRMA DIRETO (item 1) -
+                    // 1 clique ja aciona, sem passo de foco separado.
+                    float cx1 = -100.0f, cy1 = -100.0f;
+                    choice_center(1, &cx1, &cy1);
+                    const unsigned int click_baseline = audio.sfx_play_count();
+                    const std::string node_before_confirm = runtime.current().id;
+                    const bool consumed = handle_choice_click(cx1, cy1);
+                    SDL_Log(
+                        "NpcDialogueLoopGl: [options-selftest] clique na opcao "
+                        "indice 1 (pragmatico) consumed=%d (esperado 1), no "
+                        "avancou de '%s' para '%s' (esperava 'n2b_pragmatico'), "
+                        "click_sfx tocou %u x (esperado 1), finished()=%d",
+                        consumed ? 1 : 0, node_before_confirm.c_str(),
+                        runtime.finished() ? "(fim)" : runtime.current().id.c_str(),
+                        audio.sfx_play_count() - click_baseline,
+                        runtime.finished() ? 1 : 0);
+                }
+            } else if (const char* hotkey_selftest =
+                           std::getenv("GUSWORLD_NPCDLG_OPTIONS_HOTKEY_SELFTEST");
+                       hotkey_selftest != nullptr && hotkey_selftest[0] != '\0') {
+                // DIAGNOSTICO/PROVA (item 3 - TECLA DE NUMERO, pedido do lider):
+                // MESMO roteiro de entrada de GUSWORLD_NPCDLG_OPTIONS_SELFTEST
+                // (n0_greet -> n1_hook), execucao SEPARADA (env var propria,
+                // MESMA independencia de GUSWORLD_NPCDLG_SELFTEST vs
+                // GUSWORLD_NPCDLG_HOVER_SELFTEST) porque o grafo do Bertoldo so
+                // permite UMA confirmacao real de n1_hook por execucao - aqui a
+                // confirmacao "de verdade" e gasta pela TECLA DE NUMERO (o
+                // CLIQUE de mouse ja tem a sua propria acima).
+                present_frame();
+
+                if (!runtime.current().options.empty()) {
+                    SDL_Log(
+                        "NpcDialogueLoopGl: [hotkey-selftest] entry node JA e de "
+                        "ESCOLHA (esperava LINEAR n0_greet) - grafo mudou, "
+                        "abortando self-test sem crash.");
+                } else {
+                    selected_option = apply_npc_dialogue_input(
+                        runtime, NpcDialogueInputAction::Confirm, selected_option);
+                    reload();
+                    present_frame();
+
+                    const int option_count =
+                        static_cast<int>(runtime.current().options.size());
+
+                    // (1) GUARDA: tecla "9" fora do range disponivel (so ha 3
+                    // opcoes) - handle_number_key devolve false, NADA e
+                    // selecionado/confirmado (o no continua n1_hook, sem som).
+                    const unsigned int guard_baseline = audio.sfx_play_count();
+                    const std::string node_before_guard = runtime.current().id;
+                    const bool consumed_out_of_range = handle_number_key(SDLK_9);
+                    SDL_Log(
+                        "NpcDialogueLoopGl: [hotkey-selftest] tecla '9' (fora do "
+                        "range, so ha %d opcoes) consumed=%d (esperado 0), no "
+                        "continua '%s' (era '%s'), click_sfx tocou %u x "
+                        "(esperado 0)",
+                        option_count, consumed_out_of_range ? 1 : 0,
+                        runtime.current().id.c_str(), node_before_guard.c_str(),
+                        audio.sfx_play_count() - guard_baseline);
+
+                    // (2) TECLA "2" SELECIONA e CONFIRMA DIRETO a opcao de
+                    // INDICE 1 (pragmatico, NAO a 0) sem navegar com Up/Down
+                    // antes - o pedido central do item 3.
+                    const unsigned int click_baseline = audio.sfx_play_count();
+                    const std::string node_before_confirm = runtime.current().id;
+                    const bool consumed = handle_number_key(SDLK_2);
+                    SDL_Log(
+                        "NpcDialogueLoopGl: [hotkey-selftest] tecla '2' "
+                        "consumed=%d (esperado 1), no avancou de '%s' para '%s' "
+                        "(esperava 'n2b_pragmatico'), click_sfx tocou %u x "
+                        "(esperado 1), finished()=%d",
+                        consumed ? 1 : 0, node_before_confirm.c_str(),
+                        runtime.finished() ? "(fim)" : runtime.current().id.c_str(),
+                        audio.sfx_play_count() - click_baseline,
+                        runtime.finished() ? 1 : 0);
+                }
             } else {
 
             while (!runtime.finished()) {
@@ -439,6 +735,22 @@ bool run_npc_dialogue_loop_gl(SDL_Window* window, gus::app::SdlWindow& city,
                         continue;
                     }
                     if (ev.type == SDL_EVENT_KEY_DOWN && !ev.key.repeat) {
+                        // TECLA DE NUMERO (1-9, fileira+numpad - pedido do lider):
+                        // testada ANTES do switch generico de Up/Down/Enter -
+                        // handle_number_key ja e NO-OP seguro (devolve false) em no
+                        // LINEAR ou fora do range de opcoes disponiveis, entao cai
+                        // pro switch abaixo sem efeito nenhum (nenhuma tecla
+                        // numerica mapeia pra uma NpcDialogueInputAction de
+                        // qualquer forma - MESMA prioridade de battle_digit_for_key
+                        // em battle_key_down, battle_preview.cpp).
+                        if (handle_number_key(ev.key.key)) {
+                            changed = true;
+                            if (runtime.finished()) {
+                                break;
+                            }
+                            continue;
+                        }
+
                         NpcDialogueInputAction action = NpcDialogueInputAction::None;
                         switch (ev.key.key) {
                             case SDLK_UP:
@@ -460,15 +772,15 @@ bool run_npc_dialogue_loop_gl(SDL_Window* window, gus::app::SdlWindow& city,
                         if (action == NpcDialogueInputAction::None) {
                             continue;
                         }
-                        // FLASH DE CLIQUE (teclado): SO em no LINEAR (ha um botao
-                        // "Continuar" pra marcar) E so na confirmacao (Confirm) - MoveUp/
-                        // MoveDown (navegacao de opcoes) nunca pisca. Choke-point UNICO
-                        // com o clique de mouse abaixo (flash_pressed), MESMA razao de
-                        // ser de is_confirming/flash_pressed em system_menu_loop.cpp.
-                        const bool is_continue_confirm =
-                            action == NpcDialogueInputAction::Confirm &&
-                            runtime.current().options.empty();
-                        if (is_continue_confirm) {
+                        // FLASH DE CLIQUE (teclado): na CONFIRMACAO (Enter/Espaco),
+                        // TANTO no LINEAR (botao "Continuar") QUANTO no de ESCOLHA (a
+                        // opcao ja navegada por Up/Down, `selected_option`) -
+                        // flash_pressed() generalizado decide QUEM marcar olhando o
+                        // no ATUAL (ver comentario la). MoveUp/MoveDown (navegacao)
+                        // nunca piscam. MESMO choke-point do clique de mouse/tecla de
+                        // numero abaixo, MESMA razao de ser de is_confirming/
+                        // flash_pressed em system_menu_loop.cpp.
+                        if (action == NpcDialogueInputAction::Confirm) {
                             flash_pressed();
                         }
                         selected_option =
@@ -479,15 +791,16 @@ bool run_npc_dialogue_loop_gl(SDL_Window* window, gus::app::SdlWindow& city,
                         }
                     } else if (ev.type == SDL_EVENT_MOUSE_MOTION) {
                         // SEMPRE (nao so em no LINEAR - handle_mouse_motion ja decide
-                        // internamente se ha botao pra hover): hover NATIVO (:hover
-                        // RCSS) + edge-detect do SOM de hover.
+                        // internamente se ha botao OU opcoes pra hover): hover NATIVO
+                        // (:hover RCSS) + edge-detect do SOM de hover.
                         handle_mouse_motion(ev.motion.x, ev.motion.y);
                     } else if (ev.type == SDL_EVENT_MOUSE_BUTTON_DOWN &&
                                ev.button.button == SDL_BUTTON_LEFT) {
-                        // CLIQUE no botao "Continuar" - SO existe em no LINEAR (ver
-                        // npc_dialogue_rml.cpp: node.options.empty()). Equivalente a
-                        // Enter/Espaco de teclado - MESMO choke-point (flash_pressed).
                         if (runtime.current().options.empty()) {
+                            // CLIQUE no botao "Continuar" - SO existe em no LINEAR
+                            // (ver npc_dialogue_rml.cpp: node.options.empty()).
+                            // Equivalente a Enter/Espaco de teclado - MESMO
+                            // choke-point (flash_pressed).
                             const glintfx::ElementBox box =
                                 ui.get_element_box(kContinueBtnId);
                             if (hit_test(box, ev.button.x, ev.button.y)) {
@@ -499,6 +812,17 @@ bool run_npc_dialogue_loop_gl(SDL_Window* window, gus::app::SdlWindow& city,
                                 if (runtime.finished()) {
                                     break;
                                 }
+                            }
+                        } else {
+                            // CLIQUE numa opcao (pedido do lider): delega pro
+                            // MESMO handle_choice_click chamado pelo self-test
+                            // headless (ver acima, MESMO espirito de
+                            // handle_mouse_motion/handle_number_key).
+                            if (handle_choice_click(ev.button.x, ev.button.y)) {
+                                changed = true;
+                            }
+                            if (runtime.finished()) {
+                                break;
                             }
                         }
                     }

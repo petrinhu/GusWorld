@@ -203,3 +203,77 @@ TEST_CASE("build_npc_dialogue_rml: no de ESCOLHA NAO renderiza o botao "
         node, tr, /*selected_option=*/0, npc_dialogue_portrait_file("bertoldo"));
     REQUIRE(rml.find("npcdlg-continue-btn") == std::string::npos);
 }
+
+// --------------------------------- OPCOES CLICAVEIS + NUMERADAS (pedido do lider)
+
+TEST_CASE("build_npc_dialogue_rml: cada opcao ganha id proprio "
+          "'npcdlg-choice-<indice>' (pro CHAMADOR fazer hit-test de "
+          "clique/hover POR OPCAO)",
+          "[npc_dialogue_rml]") {
+    const Translator tr = make_translator();
+    const DialogueNode node = make_choice_node("bertoldo");
+    const std::string rml = build_npc_dialogue_rml(
+        node, tr, /*selected_option=*/0, npc_dialogue_portrait_file("bertoldo"));
+
+    REQUIRE(rml.find("id=\"npcdlg-choice-0\"") != std::string::npos);
+    REQUIRE(rml.find("id=\"npcdlg-choice-1\"") != std::string::npos);
+    // So 2 opcoes neste no (make_choice_node) - a 3a NAO existe.
+    REQUIRE(rml.find("id=\"npcdlg-choice-2\"") == std::string::npos);
+}
+
+TEST_CASE("build_npc_dialogue_rml: cada opcao mostra um badge numerico "
+          "visivel ('1.'/'2.' - pedido do lider) ANTES do texto, na ORDEM das "
+          "opcoes",
+          "[npc_dialogue_rml]") {
+    const Translator tr = make_translator();
+    const DialogueNode node = make_choice_node("bertoldo");
+    const std::string rml = build_npc_dialogue_rml(
+        node, tr, /*selected_option=*/0, npc_dialogue_portrait_file("bertoldo"));
+
+    REQUIRE(rml.find("warm-choice-num") != std::string::npos);
+    const std::size_t num1_pos = rml.find(">1.</span>");
+    const std::size_t num2_pos = rml.find(">2.</span>");
+    const std::size_t curioso_pos = rml.find("O desenho ali nao fecha.");
+    const std::size_t pragmatico_pos = rml.find("E perigoso?");
+    REQUIRE(num1_pos != std::string::npos);
+    REQUIRE(num2_pos != std::string::npos);
+    // "1." vem ANTES do texto da 1a opcao, "2." ANTES do texto da 2a - a
+    // numeracao acompanha a ORDEM real das opcoes (nao esta fixa/embaralhada).
+    REQUIRE(num1_pos < curioso_pos);
+    REQUIRE(num2_pos < pragmatico_pos);
+    REQUIRE(num1_pos < num2_pos);
+}
+
+TEST_CASE("build_npc_dialogue_rml: pressed_option marca a opcao "
+          "correspondente com a classe '.pressed' (flash de confirmacao via "
+          "clique/tecla de numero) - as demais NAO marcadas",
+          "[npc_dialogue_rml]") {
+    const Translator tr = make_translator();
+    const DialogueNode node = make_choice_node("bertoldo");
+
+    const std::string rml = build_npc_dialogue_rml(
+        node, tr, /*selected_option=*/0, npc_dialogue_portrait_file("bertoldo"),
+        /*continue_pressed=*/false, /*pressed_option=*/1);
+
+    REQUIRE(rml.find("id=\"npcdlg-choice-1\"") != std::string::npos);
+    // A opcao de indice 1 (marcada) ganha "warm-choice ... pressed" (NAO
+    // "selected", que segue selected_option=0 nesta chamada - os dois estados
+    // sao INDEPENDENTES).
+    const std::size_t choice1_div_pos = rml.find("id=\"npcdlg-choice-1\"");
+    const std::size_t class_before_id =
+        rml.rfind("<div class=\"warm-choice", choice1_div_pos);
+    REQUIRE(class_before_id != std::string::npos);
+    const std::string choice1_tag =
+        rml.substr(class_before_id, choice1_div_pos - class_before_id);
+    REQUIRE(choice1_tag.find(" pressed") != std::string::npos);
+}
+
+TEST_CASE("build_npc_dialogue_rml: pressed_option default (-1) nao marca "
+          "NENHUMA opcao com '.pressed' (estado normal, sem flash em curso)",
+          "[npc_dialogue_rml]") {
+    const Translator tr = make_translator();
+    const DialogueNode node = make_choice_node("bertoldo");
+    const std::string rml = build_npc_dialogue_rml(
+        node, tr, /*selected_option=*/0, npc_dialogue_portrait_file("bertoldo"));
+    REQUIRE(rml.find(" pressed\"") == std::string::npos);
+}

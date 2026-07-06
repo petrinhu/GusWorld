@@ -225,7 +225,8 @@ int current_hover_index(const glintfx::UiLayer& ui, const SystemMenuState& state
 
 SystemMenuLoopOutcome run_system_menu_loop_gl_current(
     SDL_Window* window, gus::platform::audio::AudioEngine& audio,
-    const gus::app::i18n::Translator& translator, const std::string& settings_dir) {
+    const gus::app::i18n::Translator& translator, const std::string& settings_dir,
+    const std::string& frozen_background_png) {
     SystemMenuLoopOutcome outcome;
 
     SystemMenuState state;
@@ -258,6 +259,17 @@ SystemMenuLoopOutcome run_system_menu_loop_gl_current(
 
     gus::platform::render2d::Render2dGl3 backdrop(/*gl_active=*/true);
 
+    // FUNDO REAL CONGELADO (retoque do lider via AskUserQuestion, MENU-PAUSA-
+    // CONFIG-SOM): carrega a textura UMA VEZ (mesmo racional de "load_texture
+    // NUNCA no frame" ja documentado pros SFX abaixo) - kInvalidTexture (path
+    // vazio/asset ausente/backend headless) degrada com seguranca pra vinheta de
+    // sempre (ver present_frame). Independe do reload() de estado (a imagem NAO
+    // muda durante a sessao do menu).
+    const gus::platform::render2d::TextureId frozen_bg_tex =
+        frozen_background_png.empty()
+            ? gus::platform::render2d::kInvalidTexture
+            : backdrop.load_texture(frozen_background_png.c_str());
+
     // SFX de hover/clique (retoque ao vivo do lider): load_sfx UMA VEZ por sessao de
     // menu (a cada Esc que abre o menu de novo, ver o header - MESMO padrao de
     // hit_sfx_id em battle_preview.cpp, "load_sfx NUNCA no frame"). audio.available()
@@ -286,7 +298,19 @@ SystemMenuLoopOutcome run_system_menu_loop_gl_current(
     auto present_frame = [&] {
         const gus::core::spatial::Rect cam{0.0f, 0.0f, static_cast<float>(pw),
                                             static_cast<float>(ph)};
-        backdrop.begin_frame(cam, pw, ph);  // clear + vinheta radial (fundo abstrato)
+        backdrop.begin_frame(cam, pw, ph);  // clear + vinheta radial (fallback abstrato)
+        if (frozen_bg_tex != gus::platform::render2d::kInvalidTexture) {
+            // FUNDO REAL CONGELADO (decisao do lider): cobre a vinheta com a CENA
+            // REAL da cidade (1 frame estatico, capturado pela Maestro ANTES de
+            // abrir - ver Maestro::open_pause_from_city/SdlWindow::capture_frame_
+            // to_png), full-screen e opaca - mesmo padrao de Chrono Trigger/Zelda/
+            // Stardew Valley (o mundo "pausa" atras da UI). O #sysmenu-scrim do
+            // RML (system_menu_rml.cpp, ~66% preto) segue desenhado por CIMA disto
+            // pelo glintfx (ui.render() abaixo) - a legibilidade do painel nao muda.
+            backdrop.draw_textured_rect(
+                cam, frozen_bg_tex, gus::platform::render2d::UvRect{0.0f, 0.0f, 1.0f, 1.0f},
+                gus::platform::render2d::DrawColor{1.0f, 1.0f, 1.0f, 1.0f});
+        }
         backdrop.end_frame();
         ui.update();
         ui.render();
@@ -597,7 +621,8 @@ bool run_system_menu_loop_owning_gl(SDL_Window* window,
                                      gus::platform::audio::AudioEngine& audio,
                                      const gus::app::i18n::Translator& translator,
                                      const std::string& settings_dir,
-                                     SystemMenuLoopOutcome* out_outcome) {
+                                     SystemMenuLoopOutcome* out_outcome,
+                                     const std::string& frozen_background_png) {
     // MESMA receita de run_battle_preview_embedded (battle_preview.cpp): os
     // atributos GL sao setados a CADA entrada (nao precisam ter sido setados na
     // criacao da janela) - viabilidade ja provada empiricamente pela troca
@@ -624,8 +649,8 @@ bool run_system_menu_loop_owning_gl(SDL_Window* window,
         return false;
     }
 
-    const SystemMenuLoopOutcome outcome =
-        run_system_menu_loop_gl_current(window, audio, translator, settings_dir);
+    const SystemMenuLoopOutcome outcome = run_system_menu_loop_gl_current(
+        window, audio, translator, settings_dir, frozen_background_png);
     if (out_outcome != nullptr) {
         *out_outcome = outcome;
     }

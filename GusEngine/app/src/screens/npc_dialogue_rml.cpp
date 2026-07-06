@@ -79,9 +79,33 @@ body { font-family: "Pixel Operator Mono"; background: transparent; width: 100%;
 
 .warm-choices { margin-top: 14dp; }
 .warm-choice {
+  box-sizing: border-box;
+  padding: 3dp 8dp; border-radius: 8dp;
   font-size: 15dp; line-height: 1.7; color: #B9A392;
 }
+/* NUMERACAO (pedido do lider - "1."/"2."/"3." visivel): badge discreto ANTES do
+   marcador de selecao/texto, dourado da moldura (#C9A24B, MESMA cor de
+   .warm-corner/#npcdlg-name) pra destacar sem competir com o texto da opcao. */
+.warm-choice-num { color: #C9A24B; }
+/* HOVER (mouse, pedido do lider - MESMA ordem/motivo de .verb-pill:hover em
+   system_menu_rml.cpp): declarado ANTES de .selected/.pressed pra empate de
+   especificidade cair a favor do estado REAL (cursor de teclado / flash de
+   confirmacao) quando os dois coincidem no mesmo frame. */
+.warm-choice:hover {
+  color: #F3E9DD;
+  background-color: #ffffff0d;
+}
 .warm-choice.selected { color: #F3E9DD; }
+/* PRESS (flash de confirmacao, pedido do lider - MESMO papel de
+   .warm-continue-btn.pressed acima): tocado pelo CHAMADOR
+   (npc_dialogue_loop_gl.cpp) por alguns frames ANTES de confirmar a escolha -
+   MESMO choke-point pros 3 canais de entrada (clique de mouse, tecla de
+   numero, Enter/Espaco no item navegado por teclado). */
+.warm-choice.pressed {
+  decorator: vertical-gradient( #E9A33D #C9A24B );
+  color: #170F0B;
+  box-shadow: #F3E9DD 0dp 0dp 14dp 1dp;
+}
 
 /* BOTAO "Continuar" (pedido do lider - ver header): MESMA receita de .btn-back
    (system_menu_rml.cpp) - box-sizing:border-box, display:inline-block (a
@@ -133,7 +157,8 @@ std::string npc_dialogue_portrait_file(const std::string& speaker_id) {
 std::string build_npc_dialogue_rml(
     const gus::domain::dialogue::DialogueNode& node,
     const gus::app::i18n::Translator& translator, int selected_option,
-    const std::string& portrait_file, bool continue_pressed) {
+    const std::string& portrait_file, bool continue_pressed,
+    int pressed_option) {
     const std::string speaker_label =
         npc_dialogue_actor_display_name(node.speaker_id, translator);
 
@@ -161,8 +186,18 @@ std::string build_npc_dialogue_rml(
         body << "<div class=\"warm-choices\">";
         for (std::size_t i = 0; i < node.options.size(); ++i) {
             const bool is_selected = static_cast<int>(i) == selected_option;
+            const bool is_pressed = static_cast<int>(i) == pressed_option;
+            // id="npcdlg-choice-<indice>" (pedido do lider - clique/hover POR
+            // OPCAO): o CHAMADOR (npc_dialogue_loop_gl.cpp) faz get_element_box
+            // deste id pro hit-test, MESMA convencao de id-por-indice de
+            // pause-item-<n>/category-item-<n> em system_menu_rml.cpp. Badge
+            // numerico ("1."/"2."/"3.") ANTES do marcador de selecao/texto -
+            // mesmo numero que a tecla 1/2/3 confirma direto (ver loop_gl.cpp).
             body << "<div class=\"warm-choice" << (is_selected ? " selected" : "")
-                 << "\">" << (is_selected ? "&gt; " : "&nbsp;&nbsp;")
+                 << (is_pressed ? " pressed" : "") << "\" id=\"npcdlg-choice-" << i
+                 << "\">"
+                 << "<span class=\"warm-choice-num\">" << (i + 1) << ".</span>&nbsp;"
+                 << (is_selected ? "&gt; " : "&nbsp;&nbsp;")
                  << translator.tr(node.options[i].label_key) << "</div>";
         }
         body << "</div>";  // .warm-choices

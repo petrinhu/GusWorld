@@ -15,6 +15,14 @@
 #include "gus/app/screens/player_sprites_loader.hpp"
 #include "gus/core/asset_paths.hpp"  // kRetratosDir/kRetratoInimigoFile (marcador do inimigo); kBertoldoSpritesDir/kBertoldoSpriteSouthFile (marcador do Bertoldo)
 
+// stb_image_write: SO o header aqui (mesma receita de stb_image.h em render2d_gl3.cpp -
+// ver seu comentario de topo) - a IMPLEMENTACAO (STB_IMAGE_WRITE_IMPLEMENTATION) ja e
+// definida UMA vez em screens/battle_preview.cpp, NESTE MESMO alvo estatico
+// (gusengine_app, ver CMakeLists.txt) - definir de novo aqui daria symbol duplicado no
+// link. Usado por capture_frame_to_png (fundo real congelado do dialogo/menu de pausa,
+// M7-DIALOGO/MENU-PAUSA-CONFIG-SOM).
+#include "stb_image_write.h"
+
 // Raiz resources/ do repo, embutida pelo CMake (mesma macro que anim_catalog.cpp/
 // battle_preview.cpp resolvem - PRIVATE no CMakeLists do target app, ver GusEngine/app/
 // CMakeLists.txt). Guard defensivo caso este .cpp compile fora desse target um dia.
@@ -380,6 +388,66 @@ void SdlWindow::render_dialogue_overlay_frame(const std::vector<std::string>& li
 
     render2d_->present();
     render2d_->set_defer_present(false);  // restaura o default pro step() normal
+}
+
+bool SdlWindow::capture_frame_to_png(const std::string& out_path) {
+    if (render2d_ == nullptr || renderer_ == nullptr) {
+        return false;  // renderer liberado - nada a capturar (degradacao segura)
+    }
+    int pw = kWindowW, ph = kWindowH;
+    SDL_GetCurrentRenderOutputSize(renderer_, &pw, &ph);
+    const float kLogicalViewportW = static_cast<float>(kWindowW);
+    const float kLogicalViewportH = static_cast<float>(kWindowH);
+
+    // FUNDO REAL CONGELADO (M7-DIALOGO/MENU-PAUSA-CONFIG-SOM, decisao do lider): a
+    // caixa de dialogo do NPC e o menu de pausa passam a mostrar a CENA REAL da
+    // cidade (ultimo frame antes de abrir), nao mais a vinheta abstrata - mesmo
+    // padrao de Chrono Trigger/Zelda/Stardew Valley (o mundo "pausa" atras da UI).
+    //
+    // TECNICA: redesenha o MESMO frame (sim_ NAO avanca - nenhum step_fixed aqui,
+    // alpha=1.0 sem interpolar, MESMA receita de render_dialogue_overlay_frame
+    // acima) com present ADIADO (ADR-009, set_defer_present) e le o backbuffer via
+    // SDL_RenderReadPixels ANTES de apresentar - a doc da SDL3 so garante o
+    // conteudo do frame ATUAL nessa janela (entre o desenho e o SDL_RenderPresent);
+    // ler DEPOIS do swap seria conteudo indefinido em backends com double-buffer
+    // real (opengl/vulkan/d3d, onde o backbuffer troca de lugar com o front no
+    // present). MESMA tecnica ja provada empiricamente sob Xvfb (ver
+    // app/tools/repro_bertoldo.cpp, que le OK sem nenhum present). Depois de ler,
+    // presenta o MESMO frame normalmente - byte-identico ao que o jogador ja
+    // estava vendo, so desenhado 1x a mais (custo desprezivel: 1 captura pontual
+    // por ABERTURA de tela, nao por frame).
+    render2d_->set_defer_present(true);
+    sim_->render(*render2d_, kLogicalViewportW, kLogicalViewportH, /*alpha=*/1.0f,
+                 static_cast<float>(pw), static_cast<float>(ph));
+
+    SDL_Surface* surface = SDL_RenderReadPixels(renderer_, nullptr);
+    render2d_->present();
+    render2d_->set_defer_present(false);  // restaura o default pro step() normal
+
+    if (surface == nullptr) {
+        SDL_Log("SdlWindow: capture_frame_to_png - SDL_RenderReadPixels falhou: %s",
+                SDL_GetError());
+        return false;
+    }
+    // Converte pro formato RGBA32 tightly-defined (o formato NATIVO devolvido por
+    // SDL_RenderReadPixels varia por backend/driver - normalizar antes de escrever
+    // o PNG, mesma receita de repro_bertoldo.cpp).
+    SDL_Surface* converted = SDL_ConvertSurface(surface, SDL_PIXELFORMAT_RGBA32);
+    SDL_DestroySurface(surface);
+    if (converted == nullptr) {
+        SDL_Log("SdlWindow: capture_frame_to_png - SDL_ConvertSurface falhou: %s",
+                SDL_GetError());
+        return false;
+    }
+    const int ok = stbi_write_png(out_path.c_str(), converted->w, converted->h,
+                                  /*comp=*/4, converted->pixels, converted->pitch);
+    SDL_DestroySurface(converted);
+    if (ok == 0) {
+        SDL_Log("SdlWindow: capture_frame_to_png - stbi_write_png falhou (%s)",
+                out_path.c_str());
+        return false;
+    }
+    return true;
 }
 
 }  // namespace gus::app

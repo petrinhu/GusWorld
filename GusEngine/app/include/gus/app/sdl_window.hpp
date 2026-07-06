@@ -167,6 +167,19 @@ public:
     // desenho (mas nao crasha) se o renderer estiver liberado (release_renderer).
     void render_dialogue_overlay_frame(const std::vector<std::string>& lines);
 
+    // FUNDO REAL CONGELADO (M7-DIALOGO/MENU-PAUSA-CONFIG-SOM, decisao do lider):
+    // captura o frame ATUAL da cidade (o que esta na tela agora, sim_ PARADO -
+    // nenhum step_fixed) em RGBA e escreve num PNG em `out_path` (SDL_
+    // RenderReadPixels no SDL_Renderer vivo + stbi_write_png, ver .cpp pra a
+    // tecnica completa). Chamar SEMPRE ANTES de release_renderer() (a captura
+    // exige o SDL_Renderer da cidade ainda vivo) - a Maestro usa isto em
+    // to_npc_dialogue()/open_pause_from_city() pra dar aos loops GL (dialogo/menu
+    // de pausa) a CENA REAL da cidade como fundo estatico, no lugar da vinheta
+    // abstrata (mesmo padrao de Chrono Trigger/Zelda/Stardew Valley). Devolve
+    // false se o renderer estiver liberado ou a captura/escrita falhar
+    // (degradacao segura - o chamador cai pro fundo abstrato de sempre).
+    [[nodiscard]] bool capture_frame_to_png(const std::string& out_path);
+
     // MENU-PAUSA-CONFIG-SOM: repassa o EDGE do Esc drenado pelo input_ (ver
     // SdlInput::consume_escape_pressed) - o gancho unico do MENU DE PAUSA na
     // CIDADE (que, ao contrario da batalha, nao tem pilha de modais pra Esc

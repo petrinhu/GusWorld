@@ -34,6 +34,10 @@ add_executable(gusengine_app_tests
     npc_dialogue_save_roundtrip_test.cpp
     # DIALOGO-TERMINAL: gerador de RML da caixa quente (retrato real).
     npc_dialogue_rml_test.cpp
+    # DIALOGO-TERMINAL (opcoes clicaveis + numeradas): fatia PURA exposta do
+    # loop GL (npc_dialogue_digit_for_key), MESMO racional de
+    # battle_key_routing_test.cpp.
+    npc_dialogue_loop_gl_test.cpp
     # MENU-PAUSA-CONFIG-SOM (M7-COSTURA): logica pura do menu de pausa + config de som.
     system_menu_test.cpp
     system_menu_rml_test.cpp

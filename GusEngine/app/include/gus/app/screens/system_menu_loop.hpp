@@ -21,10 +21,15 @@
 //     REUSANDO a MESMA tecnica de "trocar escondido atras do preto" ja provada
 //     empiricamente pela troca cidade<->batalha, ver maestro.cpp::to_battle).
 //
-// FUNDO: deliberadamente ABSTRATO/ESTATICO (decisao do lider - o mock ja assume "o
-// jogo pausado atras" sem exigir captura do frame real). Reusa Render2dGl3::
-// begin_frame (clear + vinheta radial, MESMA ambientacao usada na arena) em vez de
-// tentar capturar/borrar o frame de cidade/batalha - zero codigo novo de captura.
+// FUNDO (retoque do lider via AskUserQuestion, M7-DIALOGO/MENU-PAUSA-CONFIG-SOM):
+// quando o CHAMADOR fornece `frozen_background_png` (PNG de 1 frame, capturado por
+// SdlWindow::capture_frame_to_png ANTES de abrir o menu - ver Maestro::open_pause_
+// from_city), o loop desenha essa CENA REAL da cidade CONGELADA como fundo
+// estatico, cobrindo a vinheta - mesmo padrao de Chrono Trigger/Zelda/Stardew
+// Valley (o mundo "pausa" visualmente atras da UI). `frozen_background_png` vazio
+// (default, uso de dentro da BATALHA hoje inexistente na producao - ver
+// battle_preview.cpp) degrada pro fundo ABSTRATO de sempre: Render2dGl3::
+// begin_frame (clear + vinheta radial, MESMA ambientacao usada na arena).
 //
 // Cross-ref: gus/app/screens/system_menu.hpp (a maquina de estado pura);
 //            gus/app/screens/system_menu_rml.hpp (o RML/RCSS gerado do estado);
@@ -63,12 +68,16 @@ struct SystemMenuLoopOutcome {
 // set_sfx_volume) e persiste em settings_dir via save_system_settings - o ouvinte
 // escuta a mudanca em tempo real, sem esperar fechar o menu. `translator` resolve
 // os rotulos i18n (o chamador mantem vivo; nao-dono, mesmo padrao de
-// BattleScene::set_translator). Sai (devolve) quando o jogador confirma
-// Continuar/ESC na tela Pause (quit_app=false), confirma Sair (quit_app=true), ou
-// fecha a janela (quit_app=true).
+// BattleScene::set_translator). `frozen_background_png` (ver o header, NOVO):
+// caminho de um PNG de 1 frame capturado pelo chamador (ex.: cidade CONGELADA) pra
+// desenhar como fundo estatico; vazio (default) = fundo abstrato de sempre (a
+// vinheta radial). Sai (devolve) quando o jogador confirma Continuar/ESC na tela
+// Pause (quit_app=false), confirma Sair (quit_app=true), ou fecha a janela
+// (quit_app=true).
 [[nodiscard]] SystemMenuLoopOutcome run_system_menu_loop_gl_current(
     SDL_Window* window, gus::platform::audio::AudioEngine& audio,
-    const gus::app::i18n::Translator& translator, const std::string& settings_dir);
+    const gus::app::i18n::Translator& translator, const std::string& settings_dir,
+    const std::string& frozen_background_png = std::string());
 
 // Variante DONA do contexto GL (ver header) - cria/destroi por conta propria. O
 // CHAMADOR (Maestro) e responsavel por release_renderer()/reacquire_renderer() do
@@ -78,10 +87,15 @@ struct SystemMenuLoopOutcome {
 // no default quit_app=false - o chamador decide como degradar, mesmo contrato de
 // run_battle_preview_embedded). `out_outcome` pode ser nullptr se o chamador nao
 // precisar do desfecho (nao ha uso previsto, mas mantido por simetria).
+// `frozen_background_png` (ver o header, NOVO): repassado direto pra
+// run_system_menu_loop_gl_current (ver seu comentario) - a Maestro (unica chamadora
+// de producao desta variante) passa o PNG da cidade CONGELADA (Maestro::open_pause_
+// from_city); vazio (default) = fundo abstrato de sempre.
 [[nodiscard]] bool run_system_menu_loop_owning_gl(
     SDL_Window* window, gus::platform::audio::AudioEngine& audio,
     const gus::app::i18n::Translator& translator, const std::string& settings_dir,
-    SystemMenuLoopOutcome* out_outcome);
+    SystemMenuLoopOutcome* out_outcome,
+    const std::string& frozen_background_png = std::string());
 
 }  // namespace gus::app::screens
 

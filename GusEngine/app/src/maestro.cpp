@@ -4,6 +4,7 @@
 
 #include "gus/app/maestro.hpp"
 
+#include <filesystem>
 #include <iostream>
 #include <string>
 
@@ -74,6 +75,19 @@ constexpr float kAudioCrossfadeSeconds = 0.8f;
 // pressa nenhuma no boot, e um fade suave "acordando" o tema evita o pop abrupto de
 // volume cheio no frame 1. Nao faz parte do fade preto (nao ha tela preta no boot).
 constexpr float kBootMusicFadeInSeconds = 1.0f;
+
+// FUNDO REAL CONGELADO (M7-DIALOGO/MENU-PAUSA-CONFIG-SOM, decisao do lider via
+// AskUserQuestion): caminho do PNG onde a Maestro deixa o ultimo frame da cidade
+// (SdlWindow::capture_frame_to_png) ANTES de abrir o dialogo do NPC ou o menu de
+// pausa - os dois loops GL leem o MESMO arquivo (nunca simultaneamente: sao modais
+// exclusivos, orquestrados em serie por Maestro::run(), o 2o capture sempre
+// sobrescreve o 1o antes de ser lido de novo). tempfile (fs::temp_directory_path,
+// MESMA pasta que os stage dirs do glintfx ja usam) - nao e asset versionado, so um
+// scratch de 1 frame por abertura de tela (nao versionado, nao commitado).
+std::string frozen_city_snapshot_path() {
+    return (std::filesystem::temp_directory_path() / "gusworld_frozen_city.png")
+        .string();
+}
 }  // namespace
 
 Maestro::Maestro() = default;
@@ -245,6 +259,16 @@ bool Maestro::open_pause_from_city() {
     std::cout << "Maestro: [costura] Esc na cidade -> abrindo MENU DE PAUSA (troca "
                  "escondida pro contexto GL, MENU-PAUSA-CONFIG-SOM).\n";
 
+    // FUNDO REAL CONGELADO (decisao do lider): captura o frame ATUAL da cidade
+    // ANTES de soltar o renderer (a captura exige o SDL_Renderer vivo - ver
+    // SdlWindow::capture_frame_to_png) - o menu de pausa desenha essa cena REAL
+    // como fundo estatico, no lugar da vinheta abstrata (mesmo padrao de Chrono
+    // Trigger/Zelda/Stardew Valley). frozen_ok==false (asset/GPU indisponivel) cai
+    // de volta pra vinheta de sempre (degradacao segura, ver run_system_menu_loop_
+    // owning_gl - string vazia == "sem fundo capturado").
+    const std::string frozen_bg_path = frozen_city_snapshot_path();
+    const bool frozen_ok = city_->capture_frame_to_png(frozen_bg_path);
+
     // MESMA tecnica de to_battle() (comprovada empiricamente): solta o SDL_Renderer
     // da cidade pra deixar a janela livre pro contexto GL do menu.
     city_->release_renderer();
@@ -252,7 +276,8 @@ bool Maestro::open_pause_from_city() {
     const std::string settings_dir = gus::platform::fs::resolve_settings_dir();
     gus::app::screens::SystemMenuLoopOutcome outcome{};
     const bool ok = gus::app::screens::run_system_menu_loop_owning_gl(
-        window_, audio_, translator_, settings_dir, &outcome);
+        window_, audio_, translator_, settings_dir, &outcome,
+        frozen_ok ? frozen_bg_path : std::string());
     if (!ok) {
         SDL_Log(
             "Maestro: falha ao abrir o menu de pausa (contexto GL/glad) - voltando "
@@ -465,6 +490,14 @@ bool Maestro::to_npc_dialogue() {
     gus::domain::dialogue::DialogueRuntime runtime(*npc_bertoldo_graph_, save_.flags);
     runtime.enter();
 
+    // FUNDO REAL CONGELADO (decisao do lider): MESMA tecnica de open_pause_from_
+    // city - captura o frame ATUAL da cidade ANTES de soltar o renderer; a caixa
+    // de dialogo desenha essa cena REAL como fundo estatico, no lugar da vinheta
+    // abstrata (mesmo padrao de Chrono Trigger/Zelda/Stardew Valley). frozen_ok==
+    // false degrada pra vinheta de sempre (ver run_npc_dialogue_loop_gl).
+    const std::string frozen_bg_path = frozen_city_snapshot_path();
+    const bool frozen_ok = city_->capture_frame_to_png(frozen_bg_path);
+
     // DIALOGO-TERMINAL: MESMA tecnica de open_pause_from_city (contexto GL PROPRIO,
     // criado so aqui/destruido ao sair) - solta o SDL_Renderer da cidade ANTES (a
     // janela precisa ficar livre pro contexto GL) e reconstroi DEPOIS,
@@ -472,7 +505,8 @@ bool Maestro::to_npc_dialogue() {
     // cidade nunca fica sem desenhar pro resto da sessao).
     city_->release_renderer();
     const bool quit_requested = gus::app::screens::run_npc_dialogue_loop_gl(
-        window_, *city_, runtime, translator_, audio_);
+        window_, *city_, runtime, translator_, audio_,
+        frozen_ok ? frozen_bg_path : std::string());
     if (!city_->reacquire_renderer()) {
         SDL_Log(
             "Maestro: falha ao reconstruir o renderer da cidade apos o dialogo - a "

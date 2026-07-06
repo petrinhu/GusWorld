@@ -45,6 +45,24 @@
 // preferir outro lugar. `continue_pressed` so importa em no LINEAR (mesma
 // condicao de `options.empty()` que decide mostrar o botao).
 //
+// OPCOES CLICAVEIS + NUMERADAS (pedido do lider, pos-DIALOGO-TERMINAL): cada
+// `.warm-choice` (no de ESCOLHA, node.options.size()>=2) ganha id PROPRIO
+// ("npcdlg-choice-<indice>", MESMA convencao de id-por-indice de
+// pause-item-<n>/category-item-<n> em system_menu_rml.cpp) pro CHAMADOR
+// (npc_dialogue_loop_gl.cpp) fazer hit-test de clique/hover POR OPCAO (nao so
+// 1 caixa fixa como o botao "Continuar"), um badge numerico visivel
+// ("1."/"2."/"3." - `.warm-choice-num`) ANTES do marcador de selecao/texto
+// (pro jogador ver de cara QUAL tecla numerica confirma qual opcao), `:hover`
+// nativo do glintfx (MESMA ordem/motivo de `.verb-pill:hover` em
+// system_menu_rml.cpp - declarado ANTES de `.selected`/`.pressed`) e
+// `.pressed` (flash de confirmacao, MESMO padrao de `.warm-continue-btn.
+// pressed` acima) tocado pelo CHAMADOR tanto por clique de mouse quanto por
+// tecla de numero OU Enter/Espaco no item navegado por teclado (MESMO
+// choke-point unificado - ver flash_pressed() no .cpp do loop). `pressed_option`
+// (novo parametro, default -1) so importa em no de ESCOLHA (options nao
+// vazio) - o indice marcado ganha a classe ".pressed"; nenhuma opcao marcada
+// (-1) e o estado normal (nenhuma tecla acabou de confirmar nada).
+//
 // Cross-ref: gus/app/screens/npc_dialogue_overlay.hpp (logica pura reusada);
 //            gus/app/screens/npc_dialogue_loop_gl.hpp (o loop GL que gera o
 //            stage dir, copia o retrato e chama esta funcao a cada mudanca de no);
@@ -89,10 +107,15 @@ namespace gus::app::screens {
 // (flash de confirmacao, MESMO padrao de pressed_index em
 // build_system_menu_rml/system_menu_rml.hpp) - so tem efeito visual em no
 // LINEAR (nao ha botao pra marcar em no de ESCOLHA).
+// `pressed_option` (ver header acima) so tem efeito visual em no de ESCOLHA
+// (marca a opcao `pressed_option` com ".pressed" - flash de confirmacao,
+// MESMO papel de `continue_pressed` no no LINEAR); -1 (default) = nenhuma
+// opcao marcada.
 [[nodiscard]] std::string build_npc_dialogue_rml(
     const gus::domain::dialogue::DialogueNode& node,
     const gus::app::i18n::Translator& translator, int selected_option,
-    const std::string& portrait_file, bool continue_pressed = false);
+    const std::string& portrait_file, bool continue_pressed = false,
+    int pressed_option = -1);
 
 }  // namespace gus::app::screens
 
