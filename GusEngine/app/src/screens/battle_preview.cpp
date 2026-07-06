@@ -20,7 +20,12 @@
 #include "gus/app/screens/battle_layout.hpp"     // arena_layout (selftest de mouse A2)
 #include "gus/app/boot_pixel_overlay.hpp"  // sequencia de frames da transicao (M7-COSTURA Inc 2c)
 #include "gus/app/screens/battle_scene.hpp"
-#include "gus/app/screens/system_menu_loop.hpp"  // MENU-PAUSA-CONFIG-SOM: Esc na pilha vazia
+// REVERT (BATTLE-ESC-PAUSE-ACTOR-LIST, 2026-07-05): o HOST REAL nao chama mais
+// run_system_menu_loop_gl_current() (crash real ao vivo, 2o UiLayer RmlUi aninhado - ver
+// battle_key_down abaixo). Include MANTIDO de proposito (nao-orfao, sem warning/erro de
+// build - so um header, nao gera unused-var): o modulo system_menu_loop.* fica intacto e
+// reutilizavel se o nesting da lib for resolvido no futuro.
+#include "gus/app/screens/system_menu_loop.hpp"
 #include "gus/app/screens/ui_hover.hpp"  // COCKPIT-SFX-HOVER-CLIQUE: edge-detect POCO do som de hover
 #include "gus/core/asset_paths.hpp"             // caminhos de asset centralizados
 #include "gus/domain/combat/combat_enums.hpp"  // StatusId
@@ -2249,32 +2254,25 @@ int run_battle_preview_embedded(SDL_Window* window,
                     // Roteamento de teclado EXTRAIDO pra battle_key_down (funcao-livre, testavel
                     // pelo self-test sintetico; espelha battle_mouse_click). Cobre menu de verbos,
                     // MODO-MIRA (§3.5), ESCOLHA DE ATOR (§4.1, prioridade + teclas 1/2/3) e Esc.
-                    // MENU-PAUSA-CONFIG-SOM: passa &esc_effect - este e o HOST REAL (nao um
-                    // self-test/teste), entao o Esc na PILHA VAZIA nao fecha mais o viewer na
-                    // hora (ver battle_key_down); abre o MENU DE PAUSA logo abaixo.
-                    BattleEscEffect esc_effect = BattleEscEffect::None;
-                    battle_key_down(scene, ev.key.key, running, &esc_effect);
-                    if (esc_effect == BattleEscEffect::OpenPauseMenu) {
-                        // MESMO contexto GL JA CORRENTE desta funcao (nested loop, ver
-                        // system_menu_loop.hpp) - a arena/HUD do combate ficam PAUSADOS
-                        // (nada de scene.update()/ui->render() roda) enquanto o menu
-                        // esta aberto; ao voltar (Continuar), o loop de fora retoma
-                        // exatamente de onde parou (nada foi mutado na BattleScene).
-                        const std::string settings_dir =
-                            gus::platform::fs::resolve_settings_dir();
-                        const gus::app::screens::SystemMenuLoopOutcome pause_outcome =
-                            gus::app::screens::run_system_menu_loop_gl_current(
-                                window, *audio_ptr, translator, settings_dir);
-                        if (pause_outcome.quit_app) {
-                            // "Sair" confirmado no menu OU o jogador fechou a janela
-                            // DURANTE o menu - MESMO sinal/contrato de quit_requested
-                            // (SDL_EVENT_QUIT acima): a Maestro NAO volta pra cidade.
-                            running = false;
-                            quit_requested = true;
-                        }
-                        // senao (Continuar): running/quit_requested intocados - o loop
-                        // de fora simplesmente segue rodando a batalha.
-                    }
+                    //
+                    // REVERT (BATTLE-ESC-PAUSE-ACTOR-LIST, 2026-07-05): o HOST REAL volta a
+                    // chamar SEM `out_effect` (nullptr implicito) - o comportamento ORIGINAL de
+                    // sempre, pre-integracao do menu de pausa: mira cancela / preview volta pra
+                    // lista / lista e no-op / PILHA VAZIA fecha o viewer (running=false). O
+                    // CRASH real ao vivo (lider testou): abrir o menu de pausa AQUI criava um
+                    // SEGUNDO contexto/UiLayer RmlUi (run_system_menu_loop_gl_current) ANINHADO
+                    // enquanto o cockpit da batalha (o PRIMEIRO UiLayer, `ui` acima) ainda estava
+                    // VIVO - RmlUi tem estado global (element pool) que NAO suporta 2 contextos
+                    // simultaneos no mesmo processo; o log capturado foi "Element meta pool not
+                    // empty on shutdown, 75 object(s) leaked" ao fechar/trocar de contexto. Isto
+                    // e um LIMITE DE NESTING DA LIB, nao um bug de logica nossa - decisao do lider:
+                    // reverter, SEM menu de pausa na arena por ora (ver TODO.md). A FUNCAO
+                    // battle_key_down/BattleEscEffect/OpenPauseMenu CONTINUAM existindo e
+                    // funcionando (testadas em battle_key_routing_test.cpp com out_effect
+                    // explicito) - so este HOST DE PRODUCAO para de passar o ponteiro. O caminho
+                    // da CIDADE (Maestro::open_pause_from_city) usa uma tecnica DIFERENTE (contexto
+                    // GL proprio e dedicado, nao aninhado sobre um UiLayer vivo) e NAO foi tocado.
+                    battle_key_down(scene, ev.key.key, running);
                 } else if (ev.type == SDL_EVENT_MOUSE_BUTTON_DOWN &&
                            ev.button.button == SDL_BUTTON_LEFT) {
                     // MOUSE (A2): clique ESQUERDO aciona verbo (menu) ou alvo (mira). ADITIVO

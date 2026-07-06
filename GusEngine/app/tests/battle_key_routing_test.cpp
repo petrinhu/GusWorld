@@ -262,3 +262,28 @@ TEST_CASE("Esc na pilha VAZIA SEM out_effect (nullptr, default): comportamento A
     battle_key_down(scene, SDLK_ESCAPE, running);  // out_effect omitido = nullptr
     REQUIRE_FALSE(running);
 }
+
+// REVERT (BATTLE-ESC-PAUSE-ACTOR-LIST, 2026-07-05): o lider testou o menu de pausa AO VIVO
+// e o jogo CRASHOU ao fechar/trocar de contexto ("Element meta pool not empty on shutdown,
+// 75 object(s) leaked") - abrir run_system_menu_loop_gl_current() (2o UiLayer RmlUi) por
+// cima do cockpit de batalha (1o UiLayer, ja vivo) estoura um LIMITE DE NESTING da lib
+// (element pool e estado global; RmlUi nao suporta 2 contextos simultaneos no processo).
+// Decisao do lider: reverter o HOST REAL (run_battle_preview_embedded, battle_preview.cpp)
+// pra chamar battle_key_down(scene, key, running) SEM o 4o argumento - volta ao
+// comportamento ORIGINAL pre-integracao do menu de pausa (mira cancela / preview volta pra
+// lista / lista e no-op / PILHA VAZIA fecha o viewer), sem NUNCA abrir um 2o contexto RmlUi.
+//
+// A FUNCAO battle_key_down/BattleEscEffect/OpenPauseMenu e os TEST_CASEs acima (linhas
+// 181-264, incluindo os 2 que provam OpenPauseMenu na LISTA/pilha-vazia com out_effect
+// explicito) CONTINUAM validos - eles documentam que a FUNCAO ainda suporta o recurso
+// (testavel headless), so o HOST DE PRODUCAO parou de passar o ponteiro. O teste abaixo
+// prova exatamente o que o call-site real agora faz: chama SEM out_effect (3 args), na
+// PILHA VAZIA (o unico estagio que o Esc alcancava na pratica antes do fix da LISTA) -
+// running vira false, fecha o viewer, ZERO chance de um 2o UiLayer RmlUi ser criado.
+TEST_CASE("Esc: HOST REAL (producao) chama SEM out_effect - nunca abre 2o contexto RmlUi",
+          "[battle_key_routing]") {
+    BattleScene scene;
+    bool running = true;
+    battle_key_down(scene, SDLK_ESCAPE, running);  // == chamada real de run_battle_preview_embedded
+    REQUIRE_FALSE(running);  // fecha o viewer direto - nenhum menu de pausa e aberto
+}
