@@ -295,7 +295,7 @@ AP {0}/{1} | Mana {2}/{3}
 ## §6. Dialogue (placeholders, expandir conforme arcos)
 
 ## DIALOGUE_CONTINUE
-(continuar)
+Continuar
 
 ## DIALOGUE_CHOICE_PROMPT
 Escolha:

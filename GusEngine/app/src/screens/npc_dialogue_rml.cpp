@@ -96,7 +96,7 @@ body { font-family: "Pixel Operator Mono"; background: transparent; width: 100%;
   margin-top: 10dp; padding: 5dp 16dp;
   border: 1dp #7A5A2E; border-radius: 999dp;
   decorator: vertical-gradient( #2A1D14 #170F0B );
-  color: #B9A392; font-size: 11dp; letter-spacing: .5dp;
+  color: #B9A392; font-size: 12dp; letter-spacing: .5dp;
 }
 /* HOVER (mouse) - MESMA ordem/motivo de .btn-back:hover (system_menu_rml.cpp):
    declarado ANTES de .pressed pra empate de especificidade cair a favor do
