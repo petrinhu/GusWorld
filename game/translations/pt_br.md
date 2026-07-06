@@ -307,34 +307,35 @@ Meus óculos táticos detectaram uma anomalia. Sterling está fazendo algo errad
 Onze anos não é jovem demais pra perceber que os adultos mentem.
 
 ### NPC Bertoldo (M7-DIALOGO, npc_intro, blueprint F2-N.1 docs/design/narrativa/dialogue-tree-npc-intro.md)
-### Prosa placeholder (transcrição dos stubs de intent do blueprint) — polimento final = narrative-writer.
+### Prosa final de voz (narrative-writer, polimento pos-playtest ao vivo do lider): velho tecnico de praca,
+### seco-afetuoso, meia-frase, respeita a inteligencia do Gus (P4). Grafo/estrutura inalterados (§2 blueprint).
 
 ## DIALOGUE_NPC_INTRO_N0_GREET
-Ainda cedo pra andar sozinho por aqui, garoto. Mas essa cidade nunca foi de dormir direito.
+Cedo pra rua, moço. Essa cidade... nunca soube dormir direito.
 
 ## DIALOGUE_NPC_INTRO_N1_HOOK
-Aquilo ali, ninguém mais para pra ler. Você reparou — isso já diz algo sobre você.
+Aquilo ali, ninguém mais para pra olhar. Você parou. Isso já diz alguma coisa sobre você.
 
 ## DIALOGUE_NPC_INTRO_CHOICE_CURIOSO
-O padrão daquilo não fecha.
+O desenho ali não fecha. Tem um padrão, eu sei que tem.
 
 ## DIALOGUE_NPC_INTRO_CHOICE_PRAGMATICO
-Por onde se anda por aqui?
+É perigoso? Por onde eu sigo?
 
 ## DIALOGUE_NPC_INTRO_CHOICE_SECO
-(Acenar e seguir.)
+(Só aceno e sigo andando.)
 
 ## DIALOGUE_NPC_INTRO_N2A_CURIOSO
-Se eu dissesse, tirava a graça de você descobrir. Olha com cuidado.
+Se eu contasse, estragava a graça. Olha direito, moço.
 
 ## DIALOGUE_NPC_INTRO_N2B_PRAGMATICO
-Perigoso, tudo é um pouco. Segue reto — o resto se mostra sozinho.
+Perigo tem em toda esquina. Segue reto que o resto se mostra.
 
 ## DIALOGUE_NPC_INTRO_N2C_SECO
-Também não sou de muita conversa. Vai.
+Também não sou de conversa fiada. Vai.
 
 ## DIALOGUE_NPC_INTRO_N3_RECONVERGE
-Vai andando, garoto. Essa praça já viu gente demais ir e não voltar do jeito que saiu.
+Vai andando. Essa praça já viu gente demais sair, e não voltar do jeito que foi.
 
 ---
 
