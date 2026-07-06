@@ -55,6 +55,7 @@
 #define GUS_APP_MAESTRO_HPP
 
 #include <memory>
+#include <optional>
 
 #include <SDL3/SDL.h>
 
@@ -63,6 +64,7 @@
 #include "gus/app/sdl_window.hpp"
 #include "gus/core/anim/fade_transition.hpp"
 #include "gus/domain/combat/combat_enums.hpp"
+#include "gus/domain/dialogue/dialogue_graph.hpp"  // M7-DIALOGO (NPC-MVP)
 #include "gus/domain/save/save_data.hpp"
 #include "gus/platform/audio/audio_engine.hpp"
 
@@ -127,6 +129,16 @@ private:
     // (mesmo contrato/nome de intencao de should_stop_running_after_battle).
     [[nodiscard]] bool open_pause_from_city();
 
+    // M7-DIALOGO (NPC-MVP): esbarrou no Bertoldo (rising edge, MESMA tecnica de
+    // to_battle() acima) -> abre o loop de dialogo (overlay funcional simples,
+    // SEM troca de contexto GL/glintfx - fica no SDL_Renderer da cidade, ver
+    // gus/app/screens/npc_dialogue_loop.hpp). Devolve true SO se o jogador fechou a
+    // JANELA durante a conversa (mesmo contrato de to_battle()/
+    // open_pause_from_city() - o chamador encerra o programa). Grafo AUSENTE/
+    // invalido (degradacao segura, ver init()) -> no-op, devolve false (o
+    // esbarrão e ignorado, a cidade continua rodando normalmente).
+    [[nodiscard]] bool to_npc_dialogue();
+
     SDL_Window* window_ = nullptr;         // dono (a UNICA janela do app)
     std::unique_ptr<SdlWindow> city_;      // a cidade (OverworldSim vive aqui, sempre)
 
@@ -162,6 +174,21 @@ private:
     // inimigo, ver o offset em init()); apos uma batalha que NAO remove o inimigo, e
     // forcado a true (o jogador esta em cima) pra exigir SAIR e RE-ENTRAR na hitbox.
     bool was_overlapping_enemy_ = false;
+
+    // NPC FIXO (M7-DIALOGO, NPC-MVP): Seu Bertoldo Caim (F2-N.1) - MESMA tecnica do
+    // inimigo fixo acima (AABB hardcoded em app/, posicionada via pick_fixed_enemy_
+    // position + enemy_sprite_footprint_aabb sobre o mapa REAL - NAO toca o formato
+    // .gmap/TileMap, que nao tem nocao de NPC), com o MESMO edge-trigger
+    // (should_trigger_battle_on_edge) - so que sem "derrotado": o Bertoldo nunca
+    // some, esbarrar de novo (sair e re-entrar na hitbox) abre a conversa de novo.
+    gus::core::spatial::Aabb npc_bertoldo_aabb_{};
+    bool was_overlapping_npc_bertoldo_ = false;
+
+    // Grafo de dialogo do Bertoldo, parseado 1 vez no boot (init(), a partir do
+    // .dlg.txt real via gus::app::dialogue::load_dialogue_graph_from_file).
+    // nullopt = arquivo ausente/malformado (degradacao segura, mesmo espirito de
+    // battle_music_id_ invalido acima) - to_npc_dialogue() vira no-op nesse caso.
+    std::optional<gus::domain::dialogue::DialogueGraph> npc_bertoldo_graph_{};
 
     // "Save" desta onda: so uma instancia em MEMORIA (a persistencia real em disco e
     // M2-SAVE-IO, ADR-012 Onda 2). Usa SaveData::flags (ja existe, domain/save) em vez

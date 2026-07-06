@@ -137,6 +137,18 @@ inline constexpr std::string_view kTranslationsDir = "game/translations";
 inline constexpr std::string_view kTranslationPtBrFile = "pt_br.md";
 
 // ============================================================================
+// DIALOGO (grafos .dlg.txt do formato-texto proprio, ADR-014, sob game/dialogues/
+// - mesma raiz irma de kTranslationsDir, conteudo de JOGO editavel pelo narrative-
+// designer/narrative-writer).
+// ============================================================================
+
+// Pasta dos grafos de dialogo (.dlg.txt).
+inline constexpr std::string_view kDialoguesDir = "game/dialogues";
+// Grafo do NPC introdutorio do VS (M7-DIALOGO/NPC-MVP, Seu Bertoldo Caim, F2-N.1).
+inline constexpr std::string_view kNpcIntroBertoldoDlgFile =
+    "npc_intro_bertoldo.dlg.txt";
+
+// ============================================================================
 // AUDIO (kit CC0 provisorio, sob <raiz_repo>/assets/sfx/ e assets/music/ - M6 F2/F3,
 // ADR-011). Raiz DIFERENTE de kFontsDir/kMapsCompiledDir (essas ficam DENTRO de
 // GusEngine/assets/, versionadas com a engine): sfx/music sao asset SOURCE do JOGO,

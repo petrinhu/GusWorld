@@ -7,8 +7,11 @@
 #include <iostream>
 #include <string>
 
+#include "gus/app/dialogue/npc_dialogue_catalog.hpp"  // M7-DIALOGO: I/O do .dlg.txt
 #include "gus/app/screens/battle_preview.hpp"    // run_battle_preview_embedded
+#include "gus/app/screens/npc_dialogue_loop.hpp"  // M7-DIALOGO: loop do dialogo do Bertoldo
 #include "gus/app/screens/system_menu_loop.hpp"  // MENU-PAUSA-CONFIG-SOM: Esc na cidade
+#include "gus/domain/dialogue/dialogue_runtime.hpp"
 #include "gus/domain/settings/system_settings.hpp"
 #include "gus/platform/fs/settings_file_store.hpp"
 
@@ -35,6 +38,16 @@ constexpr int kWindowH = 720;
 // fiel do mapa real) para a prova headless de ambos os offsets.
 constexpr int kEnemyOffsetTilesX = -5;
 constexpr int kEnemyOffsetTilesY = 4;
+
+// M7-DIALOGO (NPC-MVP): offset cardinal (em CELULAS) do Bertoldo em relacao ao
+// spawn do jogador (celula (15,1) - MESMA base do inimigo acima). Mira a celula
+// (10,14): Chao aberto da SALA SUL de distritos_inferiores.gmap (alcancavel via a
+// passagem estreita cols14-16/row10 que liga o salao principal - rows1-9 - a essa
+// sala), DISTANTE da celula do inimigo fixo (10,5) - nenhum dos dois marcadores
+// disputa a mesma area. Ver app/tests/maestro_logic_test.cpp (reproducao fiel do
+// mapa real) pra a prova headless de reachability/distincao.
+constexpr int kNpcBertoldoOffsetTilesX = -5;
+constexpr int kNpcBertoldoOffsetTilesY = 13;
 
 // Chave da flag (SaveData::flags) que registra o inimigo fixo derrotado. Espelha o
 // EncounterId::kFixedEnemy1 (unico valor desta onda) - quando houver mais encontros, a
@@ -165,6 +178,43 @@ bool Maestro::init() {
     std::cout << "Maestro: inimigo fixo (kFixedEnemy1) em (" << enemy_aabb_.x << ", "
               << enemy_aabb_.y << "); jogador em (" << city_->player_aabb().x << ", "
               << city_->player_aabb().y << ").\n";
+
+    // M7-DIALOGO (NPC-MVP): MESMA tecnica de posicionamento do inimigo acima (offset
+    // diferente - ver kNpcBertoldoOffsetTilesX/Y), so que o Bertoldo NAO tem marcador
+    // visual nesta onda (o slot de marcador do SdlWindow/OverworldSim e dedicado ao
+    // inimigo - ver enemy_marker_aabb_ - reusa-lo pintaria o Bertoldo com o MESMO
+    // sprite de android hostil, sinal narrativo errado para um NPC amigavel; a arte
+    // do Bertoldo fica para a onda de arte/3d-artist-rigger). A hitbox INVISIVEL ja
+    // e suficiente pra provar o ciclo de dialogo (criterio de saida do M7-DIALOGO).
+    const gus::core::spatial::Aabb npc_anchor = pick_fixed_enemy_position(
+        city_->grid(), city_->player_aabb(), kNpcBertoldoOffsetTilesX,
+        kNpcBertoldoOffsetTilesY);
+    npc_bertoldo_aabb_ = enemy_sprite_footprint_aabb(
+        npc_anchor, city_->tuning().player_sprite_height_tiles,
+        city_->grid().tile_size());
+    std::cout << "Maestro: [dialogo] Bertoldo (NPC-MVP) em (" << npc_bertoldo_aabb_.x
+              << ", " << npc_bertoldo_aabb_.y << ") - SEM marcador visual nesta onda.\n";
+
+    // Carrega o grafo de dialogo do Bertoldo (.dlg.txt real, I/O na fronteira app/ -
+    // ver gus/app/dialogue/npc_dialogue_catalog.hpp). O parser e FAIL-FAST por design
+    // (ADR-014: formato/estrutura malformada = erro de autoria) - capturado aqui pra
+    // o BOOT nunca crashar por causa de um .dlg.txt quebrado (mesma degradacao segura
+    // de asset ausente do resto do init(): o esbarrao no Bertoldo vira no-op).
+    const std::string dlg_path =
+        gus::app::dialogue::resolve_npc_intro_bertoldo_dialogue_path();
+    try {
+        npc_bertoldo_graph_ =
+            gus::app::dialogue::load_dialogue_graph_from_file(dlg_path);
+    } catch (const std::exception& e) {
+        std::cerr << "Maestro: [dialogo] grafo do Bertoldo malformado (" << dlg_path
+                  << "): " << e.what()
+                  << " - degradando (esbarrao no NPC vira no-op).\n";
+        npc_bertoldo_graph_.reset();
+    }
+    std::cout << "Maestro: [dialogo] grafo do Bertoldo "
+              << (npc_bertoldo_graph_.has_value() ? "carregado (" : "AUSENTE (")
+              << dlg_path << ").\n";
+
     return true;
 }
 
@@ -248,6 +298,23 @@ void Maestro::run() {
         // movimento normal (o rising edge dispara no proximo frame que ENTRAR na hitbox).
         was_overlapping_enemy_ =
             should_trigger_battle(city_->player_aabb(), enemy_aabb_, enemy_defeated_);
+
+        // M7-DIALOGO (NPC-MVP): MESMA tecnica de edge-trigger do inimigo acima
+        // (aabb_overlaps + should_trigger_battle_on_edge, ambas ja PUBLICAS/genericas
+        // em maestro_logic.hpp - sem duplicar logica). O Bertoldo nao tem conceito de
+        // "derrotado": aabb_overlaps sozinho ja da o "overlapping_now". Sem isto, sair
+        // da conversa AINDA sobre a hitbox reabriria o dialogo no mesmo frame (mesmo
+        // BUG-6 do inimigo) - por isso o rising-edge.
+        const bool overlapping_npc_now =
+            aabb_overlaps(city_->player_aabb(), npc_bertoldo_aabb_);
+        if (should_trigger_battle_on_edge(overlapping_npc_now,
+                                           was_overlapping_npc_bertoldo_)) {
+            if (to_npc_dialogue()) {
+                running = false;
+            }
+        }
+        was_overlapping_npc_bertoldo_ =
+            aabb_overlaps(city_->player_aabb(), npc_bertoldo_aabb_);
     }
 }
 
@@ -354,6 +421,33 @@ bool Maestro::to_battle(EncounterId id) {
               << city_->player_aabb().x << ", " << city_->player_aabb().y
               << "); inimigo_derrotado=" << (enemy_defeated_ ? "sim" : "nao") << ".\n";
     return false;
+}
+
+bool Maestro::to_npc_dialogue() {
+    if (!npc_bertoldo_graph_.has_value()) {
+        std::cout << "Maestro: [dialogo] esbarrao no Bertoldo ignorado - grafo "
+                     "AUSENTE/invalido (degradacao segura).\n";
+        return false;
+    }
+    std::cout << "Maestro: [dialogo] esbarrou no Bertoldo -> abrindo conversa "
+                 "(overlay funcional simples, M7-DIALOGO NPC-MVP).\n";
+
+    // DialogueRuntime opera sobre save_.flags POR REFERENCIA (domain/dialogue NAO
+    // depende de domain/save - ver dialogue_runtime.hpp): a MESMA instancia de
+    // SaveData em memoria que ja guarda a flag do inimigo derrotado (on_battle_
+    // result acima) - persistencia REAL em disco fica a cargo de quem chamar
+    // gus::platform::fs::save_game(save_, slot, dir) (M2-SAVE-IO, ja disponivel;
+    // a integracao do MENU "Salvar" com esta instancia e item separado - aqui a
+    // prova de round-trip vive no teste headless de integracao, ver TODO.md).
+    gus::domain::dialogue::DialogueRuntime runtime(*npc_bertoldo_graph_, save_.flags);
+    runtime.enter();
+    const bool quit_requested =
+        gus::app::screens::run_npc_dialogue_loop(*city_, runtime, translator_);
+
+    const auto it = save_.flags.find("npc_intro.met");
+    std::cout << "Maestro: [dialogo] conversa encerrada (npc_intro.met="
+              << (it != save_.flags.end() && it->second ? "true" : "false") << ").\n";
+    return quit_requested;
 }
 
 void Maestro::on_battle_result(gus::domain::combat::CombatOutcome outcome) {

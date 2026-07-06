@@ -306,6 +306,36 @@ Meus óculos táticos detectaram uma anomalia. Sterling está fazendo algo errad
 ## DIALOGUE_GUS_INTRO_002
 Onze anos não é jovem demais pra perceber que os adultos mentem.
 
+### NPC Bertoldo (M7-DIALOGO, npc_intro, blueprint F2-N.1 docs/design/narrativa/dialogue-tree-npc-intro.md)
+### Prosa placeholder (transcrição dos stubs de intent do blueprint) — polimento final = narrative-writer.
+
+## DIALOGUE_NPC_INTRO_N0_GREET
+Ainda cedo pra andar sozinho por aqui, garoto. Mas essa cidade nunca foi de dormir direito.
+
+## DIALOGUE_NPC_INTRO_N1_HOOK
+Aquilo ali, ninguém mais para pra ler. Você reparou — isso já diz algo sobre você.
+
+## DIALOGUE_NPC_INTRO_CHOICE_CURIOSO
+O padrão daquilo não fecha.
+
+## DIALOGUE_NPC_INTRO_CHOICE_PRAGMATICO
+Por onde se anda por aqui?
+
+## DIALOGUE_NPC_INTRO_CHOICE_SECO
+(Acenar e seguir.)
+
+## DIALOGUE_NPC_INTRO_N2A_CURIOSO
+Se eu dissesse, tirava a graça de você descobrir. Olha com cuidado.
+
+## DIALOGUE_NPC_INTRO_N2B_PRAGMATICO
+Perigoso, tudo é um pouco. Segue reto — o resto se mostra sozinho.
+
+## DIALOGUE_NPC_INTRO_N2C_SECO
+Também não sou de muita conversa. Vai.
+
+## DIALOGUE_NPC_INTRO_N3_RECONVERGE
+Vai andando, garoto. Essa praça já viu gente demais ir e não voltar do jeito que saiu.
+
 ---
 
 ## §7. Errors + mensagens sistema

@@ -361,6 +361,72 @@ TEST_CASE(
     CHECK_FALSE(in_passagem);
 }
 
+TEST_CASE(
+    "pick_fixed_enemy_position: mapa REAL (distritos_inferiores) - offset "
+    "(-5,+13) do Bertoldo (M7-DIALOGO NPC-MVP) e ALCANCAVEL e DISTINTO da "
+    "celula do inimigo fixo (10,5)",
+    "[maestro][logic][npc_dialogue]") {
+    // MESMA reproducao FIEL do mapa real usada no teste do inimigo fixo acima
+    // (GusEngine/assets/maps/source/distritos_inferiores.csv, 30x20, tile_size 2.0).
+    // Prova que a MESMA tecnica de posicionamento (pick_fixed_enemy_position +
+    // flood-fill de alcancabilidade) reusada para o Bertoldo (offset DIFERENTE,
+    // kNpcBertoldoOffsetTilesX/Y em maestro.cpp) senta numa celula andavel, e nao
+    // colide com a celula do inimigo fixo (nem com o portal/passagem estreita).
+    const TileGrid grid = TileGrid::from_rows(
+        {
+            "##############..##############",
+            "#............#..#............#",
+            "#............#..#............#",
+            "#............#..##########...#",
+            "#........................#...#",
+            "#........................#...#",
+            "#........................#...#",
+            "#........................#...#",
+            "#................##########..#",
+            "#.........................#..#",
+            "##############...#############",
+            "#.........................#..#",
+            "#.......................#.#..#",
+            "#...........#.....#.....###..#",
+            "#............................#",
+            "#............................#",
+            "#############.....############",
+            "#............................#",
+            "#............................#",
+            "##############..##############",
+        },
+        2.0f);
+
+    // Spawn real (#spawn 15 1 no CSV): centro da celula (15,1) - MESMO ponto de
+    // partida do inimigo fixo.
+    const Aabb player_start{15.0f * 2.0f + 1.0f, 1.0f * 2.0f + 1.0f, 1.0f, 1.0f};
+
+    const Aabb npc_bertoldo =
+        pick_fixed_enemy_position(grid, player_start, /*offset_tiles_x=*/-5,
+                                   /*offset_tiles_y=*/13);
+    const int npc_cx = grid.world_to_cell(npc_bertoldo.x + npc_bertoldo.w * 0.5f);
+    const int npc_cy = grid.world_to_cell(npc_bertoldo.y + npc_bertoldo.h * 0.5f);
+
+    // Alcancavel (chao livre - flood-fill nunca cai fora do mapa/numa parede).
+    CHECK_FALSE(grid.is_blocked(npc_cx, npc_cy));
+
+    // DISTINTO da celula do inimigo fixo (10,5) - os dois marcadores nao disputam
+    // a mesma area (mesmo offset -5,+4 usado pelo teste do inimigo acima).
+    const Aabb enemy = pick_fixed_enemy_position(grid, player_start,
+                                                  /*offset_tiles_x=*/-5,
+                                                  /*offset_tiles_y=*/4);
+    const int enemy_cx = grid.world_to_cell(enemy.x + enemy.w * 0.5f);
+    const int enemy_cy = grid.world_to_cell(enemy.y + enemy.h * 0.5f);
+    const bool same_cell_as_enemy = (npc_cx == enemy_cx) && (npc_cy == enemy_cy);
+    CHECK_FALSE(same_cell_as_enemy);
+
+    // Nunca no portal nem na passagem estreita (cols13-16, rows0-3).
+    const bool on_portal = (npc_cx == 15 && npc_cy == 0);
+    const bool in_passagem = (npc_cx >= 13 && npc_cx <= 16 && npc_cy <= 3);
+    CHECK_FALSE(on_portal);
+    CHECK_FALSE(in_passagem);
+}
+
 TEST_CASE("EncounterId: kFixedEnemy1 existe (item 1 do escopo M7-COSTURA)",
           "[maestro][logic]") {
     constexpr auto id = EncounterId::kFixedEnemy1;

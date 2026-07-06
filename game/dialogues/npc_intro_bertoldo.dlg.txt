@@ -1,0 +1,75 @@
+// npc_intro_bertoldo.dlg.txt
+//
+// NPC introdutorio do Vertical Slice: Seu Bertoldo Caim (CHARS.md §7, ambient).
+// Formato-texto proprio (ADR-014, gus/domain/dialogue/dialogue_text.hpp) - o
+// SUCESSOR consumido pelo runtime C++ (DialogueRuntime/parse_text_to_dialogue_graph).
+//
+// O irmao "npc_intro_bertoldo.dialogue" (sintaxe DialogueManager, Godot) que vive
+// nesta MESMA pasta e um ARTEFATO HISTORICO do stub F2-E.6/ADR-003 - obsoleto pos-
+// ADR-008 (DA-2 do blueprint abaixo), preservado como historico, NAO consumido pelo
+// engine C++ atual. Este arquivo (.dlg.txt) e a fonte editavel de verdade.
+//
+// Blueprint canonico (roteiro/flags/reconvergencia): docs/design/narrativa/
+// dialogue-tree-npc-intro.md (F2-N.1, ratificado 2026-06-03).
+//
+// ESCOPO M7-DIALOGO/NPC-MVP (ADR-014 decisao 3, TODO.md): SO o fluxo FIRST-VISIT
+// minimo do blueprint (saudacao -> gancho -> 3 escolhas -> reconvergencia -> saida).
+// SEM n7_revisit_hub nem os gates de combate/puzzle (blueprint §7) - ficam para
+// quando o resto do VS existir (combate/puzzle ainda nao escrevem essas flags).
+//
+// REGISTRO: warm (caixa quente + retrato) - Bertoldo e humano, "o coracao fala"
+// (combat-flavor.md §5; DIALOGO-TERMINAL usa o Bertoldo como exemplo canonico de
+// caixa quente no mock aprovado, docs/design/mockups/03-.../04-...).
+//
+// FLAGS ESCRITAS (ADR-014 decisao 4: SaveData::flags, bools, SEM bump de schema):
+//   npc_intro.met                 (on_enter de n0_greet, 1a entrada na conversa)
+//   npc_intro.choice_curioso      (escolher o ramo curioso em n1_hook)
+//   npc_intro.choice_pragmatico   (escolher o ramo pragmatico em n1_hook)
+//   npc_intro.choice_seco         (escolher o ramo seco em n1_hook)
+// Todas as demais flags do blueprint (lore_node_1.deciphered, combat_sentinela.
+// cleared, puzzle_patrol.cleared - lidas pelo n7_revisit_hub, fora de escopo aqui)
+// NAO sao tocadas por este grafo (contrato do blueprint §4: o NPC reage ao mundo,
+// nao o controla).
+//
+// Prosa das falas (chaves DIALOGUE_NPC_INTRO_*, game/translations/pt_br.md §6):
+// transcricao dos stubs de intent do blueprint (§2 tabela de nos), dentro do
+// orcamento de tempo do blueprint §8 (≤30-45s, ~5-6 linhas curtas). Polimento
+// final de voz (narrative-writer) fica para onda de redacao dedicada - mesmo
+// status das demais chaves DIALOGUE_GUS_INTRO_* ja no catalogo (placeholder).
+
+#meta dialogue_id npc_intro_bertoldo
+#meta default_register warm
+#meta entry n0_greet
+
+@node n0_greet
+speaker: bertoldo
+text: DIALOGUE_NPC_INTRO_N0_GREET
+on_enter: npc_intro.met=true
+-> n1_hook
+
+@node n1_hook
+speaker: bertoldo
+text: DIALOGUE_NPC_INTRO_N1_HOOK
+- [DIALOGUE_NPC_INTRO_CHOICE_CURIOSO] -> n2a_curioso flag:npc_intro.choice_curioso=true
+- [DIALOGUE_NPC_INTRO_CHOICE_PRAGMATICO] -> n2b_pragmatico flag:npc_intro.choice_pragmatico=true
+- [DIALOGUE_NPC_INTRO_CHOICE_SECO] -> n2c_seco flag:npc_intro.choice_seco=true
+
+@node n2a_curioso
+speaker: bertoldo
+text: DIALOGUE_NPC_INTRO_N2A_CURIOSO
+-> n3_reconverge
+
+@node n2b_pragmatico
+speaker: bertoldo
+text: DIALOGUE_NPC_INTRO_N2B_PRAGMATICO
+-> n3_reconverge
+
+@node n2c_seco
+speaker: bertoldo
+text: DIALOGUE_NPC_INTRO_N2C_SECO
+-> n3_reconverge
+
+@node n3_reconverge
+speaker: bertoldo
+text: DIALOGUE_NPC_INTRO_N3_RECONVERGE
+-> @exit

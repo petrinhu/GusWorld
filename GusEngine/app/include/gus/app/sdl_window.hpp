@@ -20,6 +20,8 @@
 #define GUS_APP_SDL_WINDOW_HPP
 
 #include <memory>
+#include <string>
+#include <vector>
 
 #include <SDL3/SDL.h>
 
@@ -135,6 +137,20 @@ public:
     // Some com o marcador (Victory, item 4 do escopo M7: "o inimigo derrotado some do
     // mapa"). No-op se nao havia marcador.
     void clear_enemy_marker();
+
+    // M7-DIALOGO (NPC-MVP): desenha 1 frame ESTATICO da cidade (NAO avanca
+    // step_fixed - o jogador fica PARADO durante o dialogo, mesma alpha=1.0 sempre,
+    // sem interpolar) com um overlay funcional SIMPLES de texto (caixa semi-opaca +
+    // `lines`, ancorada no rodape do enquadramento visivel via camera_view/cam.rect
+    // - MESMA tecnica de composicao/present-diferido de step_with_fade, SEM GL/
+    // glintfx) desenhado por cima via IRenderer::draw_filled_rect/draw_text. A
+    // apresentacao visual FINA (RCSS terminal/caixa-quente) e o item paralelo
+    // DIALOGO-TERMINAL; isto aqui so prova o CICLO. NAO pumpa eventos - o chamador
+    // (o loop de dialogo, ver gus/app/screens/npc_dialogue_loop.hpp) faz o proprio
+    // poll de tecla, MESMO padrao independente de SdlInput que system_menu_loop.cpp
+    // ja usa pro menu de pausa (navegacao de UI != movimento do jogador). No-op de
+    // desenho (mas nao crasha) se o renderer estiver liberado (release_renderer).
+    void render_dialogue_overlay_frame(const std::vector<std::string>& lines);
 
     // MENU-PAUSA-CONFIG-SOM: repassa o EDGE do Esc drenado pelo input_ (ver
     // SdlInput::consume_escape_pressed) - o gancho unico do MENU DE PAUSA na

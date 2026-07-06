@@ -305,4 +305,49 @@ bool SdlWindow::consume_escape_pressed() noexcept {
     return input_.consume_escape_pressed();
 }
 
+void SdlWindow::render_dialogue_overlay_frame(const std::vector<std::string>& lines) {
+    if (render2d_ == nullptr || renderer_ == nullptr) {
+        return;  // renderer liberado (uso incorreto/degradacao segura) - no-op
+    }
+    int pw = kWindowW, ph = kWindowH;
+    SDL_GetCurrentRenderOutputSize(renderer_, &pw, &ph);
+    const float kLogicalViewportW = static_cast<float>(kWindowW);
+    const float kLogicalViewportH = static_cast<float>(kWindowH);
+
+    // M7-DIALOGO (NPC-MVP): mesmo mecanismo de present-diferido de step_with_fade -
+    // desenha a cidade PARADA (alpha=1.0, sem interpolar - sim_ nao avancou
+    // step_fixed enquanto o dialogo esta aberto) e compoe o overlay POR CIMA antes
+    // do present manual.
+    render2d_->set_defer_present(true);
+    sim_->render(*render2d_, kLogicalViewportW, kLogicalViewportH, /*alpha=*/1.0f,
+                 static_cast<float>(pw), static_cast<float>(ph));
+
+    const gus::core::spatial::CameraView cam =
+        sim_->camera_view(kLogicalViewportW, kLogicalViewportH);
+
+    // Caixa de texto SIMPLES (overlay funcional, nao a apresentacao fina RCSS de
+    // DIALOGO-TERMINAL): ancorada no rodape do enquadramento visivel ATUAL
+    // (cam.rect, o MESMO retangulo de mundo que boot_overlay_ ja usa pra se
+    // alinhar ao enquadramento - ver step_with_fade acima).
+    const float box_h = cam.rect.h * 0.34f;
+    const gus::core::spatial::Rect box{cam.rect.x, cam.rect.y + cam.rect.h - box_h,
+                                        cam.rect.w, box_h};
+    render2d_->draw_filled_rect(
+        box, gus::platform::render2d::DrawColor{0.02f, 0.04f, 0.06f, 0.82f});
+
+    const float px_size = cam.rect.h * 0.028f;
+    const float pad = cam.rect.w * 0.02f;
+    float ty = box.y + pad;
+    for (const std::string& line : lines) {
+        render2d_->draw_text(line.c_str(), box.x + pad, ty, px_size,
+                              gus::platform::render2d::DrawColor{0.85f, 0.95f, 0.9f,
+                                                                  1.0f},
+                              /*bold=*/false);
+        ty += px_size * 1.4f;
+    }
+
+    render2d_->present();
+    render2d_->set_defer_present(false);  // restaura o default pro step() normal
+}
+
 }  // namespace gus::app

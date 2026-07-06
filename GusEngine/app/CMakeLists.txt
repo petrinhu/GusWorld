@@ -35,6 +35,11 @@ add_library(gusengine_app STATIC
     # cidade E na batalha abrem o mesmo menu - ver system_menu_loop.hpp).
     src/screens/system_menu_loop.cpp
     src/i18n/translator.cpp
+    # M7-DIALOGO (NPC-MVP): I/O do grafo de dialogo do Bertoldo (.dlg.txt) -
+    # fronteira app/, domain/dialogue permanece ZERO I/O.
+    src/dialogue/npc_dialogue_catalog.cpp
+    src/screens/npc_dialogue_overlay.cpp
+    src/screens/npc_dialogue_loop.cpp
     src/sdl_window.cpp
     # M7-COSTURA (ADR-012 Onda 1): maestro leve cidade<->batalha (ver maestro.hpp).
     src/maestro_logic.cpp
@@ -69,6 +74,10 @@ target_compile_definitions(gusengine_app
     # de GusEngine/). O Translator de UI le pt_br.md daqui rodando do build dir;
     # override em runtime via env GUSWORLD_TRANSLATIONS (caminho completo do .md).
     PRIVATE GUSWORLD_TRANSLATIONS_DIR="${CMAKE_SOURCE_DIR}/../game/translations"
+    # Pasta dos grafos de dialogo (.dlg.txt, M7-DIALOGO) DENTRO do repo (raiz = pai
+    # de GusEngine/), MESMA receita/raiz-irma de GUSWORLD_TRANSLATIONS_DIR acima.
+    # Override em runtime via env GUSWORLD_DIALOGUES (caminho completo do .dlg.txt).
+    PRIVATE GUSWORLD_DIALOGUES_DIR="${CMAKE_SOURCE_DIR}/../game/dialogues"
     # Pasta das fontes (.ttf) DENTRO de GusEngine/ (mesma macro do platform/). ADR-010
     # F2a: o cockpit BAKED do glintfx registra a "Pixel Operator Mono" via @font-face no
     # RCSS (o glintfx::UiLayer NAO expoe Rml::LoadFontFace - so o doc carrega fonte). Sem
