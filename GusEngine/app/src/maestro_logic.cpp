@@ -184,18 +184,24 @@ gus::core::spatial::Aabb enemy_sprite_footprint_aabb(
 
 gus::core::spatial::Aabb feet_trigger_aabb(
     const gus::core::spatial::Aabb& sprite_footprint, float tile_size,
-    float trigger_width_tiles, float trigger_height_tiles) noexcept {
-    // Caixa PEQUENA ancorada na BASE do footprint visual (mesma base/centro-X que o
-    // desenho ja usa - ver enemy_sprite_footprint_aabb acima) - PURA geometria, sem
-    // nenhuma nocao de sprite/PNG/alpha-bbox (ver header pra rationale completo).
-    const float w = trigger_width_tiles * tile_size;
-    const float h = trigger_height_tiles * tile_size;
+    float solid_box_tiles, float margin_tiles) noexcept {
+    // FIX BUG-8 revisitado (ver header pra causa raiz/rationale completo): a caixa
+    // SOLIDA equivalente primeiro (MESMA formula/ancoragem de overworld_sim.cpp::
+    // solid_obstacle_from_footprint - centro em X sobre o footprint, base = base do
+    // footprint, lado = solid_box_tiles*tile_size), depois INFLADA por margin_tiles
+    // em CADA um dos 4 lados (esquerda/direita/cima/baixo) - o trigger passa a
+    // ENVOLVER o solido com folga, em vez de nascer contido dentro dele.
+    const float solid_side = solid_box_tiles * tile_size;
+    const float solid_cx = sprite_footprint.x + sprite_footprint.w * 0.5f;
+    const float solid_base = sprite_footprint.y + sprite_footprint.h;
+    const float solid_top = solid_base - solid_side;
+    const float margin_world = margin_tiles * tile_size;
 
     gus::core::spatial::Aabb trig;
-    trig.w = w;
-    trig.h = h;
-    trig.x = sprite_footprint.x + sprite_footprint.w * 0.5f - w * 0.5f;
-    trig.y = (sprite_footprint.y + sprite_footprint.h) - h;
+    trig.w = solid_side + margin_world * 2.0f;
+    trig.h = solid_side + margin_world * 2.0f;
+    trig.x = solid_cx - solid_side * 0.5f - margin_world;
+    trig.y = solid_top - margin_world;
     return trig;
 }
 

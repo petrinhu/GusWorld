@@ -127,21 +127,52 @@ enum class EncounterId : int {
 // `enemy_sprite_footprint_aabb`/anchor usado pro desenho, INALTERADO - nenhuma mudanca
 // no tamanho/posicao do sprite na tela) - reusa so a BASE (footprint.y+footprint.h, a
 // mesma formula de base que o desenho ja usa) e o CENTRO em X (footprint.x+footprint.w
-// *0.5, ja centrado por construcao). kFeetTriggerWidthTiles/kFeetTriggerHeightTiles sao
-// da MESMA ordem de grandeza da hitbox real do jogador (ver city_scene.hpp::
-// kPlayerHitboxTileFraction=0.6 tile) - nem tao grande quanto o footprint inteiro
-// (evitaria o BUG-7 de novo, disparar "de longe"), nem minusculo a ponto de reviver o
-// fantasma do BUG-1 (a caixa cobre uma faixa ao redor da base, alcancavel vindo de
-// qualquer direcao cardinal, nao so do sul). GENERICA: a MESMA funcao serve o inimigo
-// fixo (combate) e o Bertoldo (dialogo) - sem duplicar logica entre os dois call-sites
-// (ver maestro.cpp).
-inline constexpr float kFeetTriggerWidthTiles = 0.8f;
-inline constexpr float kFeetTriggerHeightTiles = 0.4f;
+// *0.5, ja centrado por construcao).
+//
+// REGRESSAO BUG-8 (playtest ao vivo do lider, mesmo dia: "esbarrar no androide NAO
+// aciona mais a batalha, encostar no Bertoldo NAO abre mais o dialogo" - o LOOP CENTRAL
+// do jogo quebrou). CAUSA RAIZ: no MESMO incremento, BUG-8 (ver grid_collision.hpp::
+// ObstacleSpan + OverworldTuning::npc_solid_box_tiles) deu ao NPC/inimigo um corpo
+// SOLIDO que bloqueia FISICAMENTE o jogador - ancorado EXATAMENTE igual a este trigger
+// (mesmo centro em X, mesma base do footprint - ver overworld_sim.cpp::
+// solid_obstacle_from_footprint), so que MAIOR (npc_solid_box_tiles=1.0) que o trigger
+// antigo (0.8x0.4, contido INTEIRO dentro do solido, do mesmo lado da base). Como a
+// colisao FISICA para o jogador exatamente na borda do solido (resolve_x/resolve_y em
+// grid_collision.cpp encostam SEM folga - "wall_candidate" e o encosto exato), o
+// jogador NUNCA mais alcancava o trigger antigo (que ficava mais pra DENTRO, atras da
+// face do solido) - aabb_overlaps(player, trigger) parava de dar true, nos 4 lados
+// (N/S/L/O: o solido e maior que o trigger em toda direcao a partir do mesmo anchor).
+// Bordas encostadas (parede-a-parede) tambem NUNCA contam como overlap (meio-aberto,
+// ver aabb_overlaps acima) - "tocar" virou, na pratica, indistinguivel de "nao tocar".
+//
+// FIX (mesmo padrao "interaction range > solid body" de Zelda/Stardew, aplicado desta
+// vez ao PAR trigger/solido): o trigger deixa de ser uma caixa PEQUENA e nascer DENTRO
+// do solido - passa a ser a propria caixa SOLIDA (mesma formula/ancoragem de
+// `solid_obstacle_from_footprint`: centro em X, base = base do footprint, lado =
+// `solid_box_tiles` * tile_size) ENVOLVIDA por `margin_tiles` em TODOS os 4 lados
+// (esquerda/direita/cima/BAIXO - nao so pra cima, como o trigger antigo fazia). Ao
+// encostar na face do solido de QUALQUER direcao cardinal, o jogador AGORA fica com
+// folga de sobra DENTRO do trigger, em vez de exatamente na borda. kFeetTriggerMargin
+// Tiles (0.4 tile) = METADE da hitbox real do jogador (kPlayerHitboxTileFraction=0.6
+// tile, ver city_scene.hpp) + ~0.1 tile de folga extra (imprecisao de ponto flutuante/
+// corner-assist) - generoso o bastante pra nunca mais depender de tocar a borda exata.
+// Resultado (com os numeros canonicos solid_box_tiles=1.0): trigger ~1.8 tile de lado -
+// ainda BEM menor que o footprint visual inteiro (2.75-3.3 tiles), preservando a
+// garantia original do BUG-7 (nao dispara "de longe" visualmente).
+//
+// `solid_box_tiles` NAO tem default aqui de proposito: o chamador (Maestro) DEVE
+// passar o MESMO valor usado pela colisao fisica real (city_->tuning().
+// npc_solid_box_tiles) - um numero duplicado e hardcoded aqui seria reintroduzir a
+// MESMA classe de bug desta regressao (dois sistemas com numeros independentes que
+// podem divergir de novo se o lider reajustar npc_solid_box_tiles vendo o playtest).
+//
+// GENERICA: a MESMA funcao serve o inimigo fixo (combate) e o Bertoldo (dialogo) - sem
+// duplicar logica entre os dois call-sites (ver maestro.cpp).
+inline constexpr float kFeetTriggerMarginTiles = 0.4f;
 
 [[nodiscard]] gus::core::spatial::Aabb feet_trigger_aabb(
     const gus::core::spatial::Aabb& sprite_footprint, float tile_size,
-    float trigger_width_tiles = kFeetTriggerWidthTiles,
-    float trigger_height_tiles = kFeetTriggerHeightTiles) noexcept;
+    float solid_box_tiles, float margin_tiles = kFeetTriggerMarginTiles) noexcept;
 
 // FIX BUG-3 (playtest ao vivo do lider: "fechei a janela DURANTE a batalha e ela
 // reabriu a cidade, virou LOOP INFINITO ate eu dar pkill"). Contrato do run() da

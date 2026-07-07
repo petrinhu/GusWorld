@@ -23,12 +23,15 @@ using gus::app::crossfade_music;
 using gus::app::EncounterId;
 using gus::app::enemy_sprite_footprint_aabb;
 using gus::app::feet_trigger_aabb;
+using gus::app::kFeetTriggerMarginTiles;
 using gus::app::outcome_marks_enemy_defeated;
 using gus::app::pick_fixed_enemy_position;
 using gus::app::should_stop_running_after_battle;
 using gus::app::should_trigger_battle;
 using gus::app::should_trigger_battle_on_edge;
 using gus::core::spatial::Aabb;
+using gus::core::spatial::ObstacleSpan;
+using gus::core::spatial::resolve_move;
 using gus::core::spatial::TileGrid;
 using gus::domain::combat::CombatOutcome;
 using gus::platform::audio::AudioEngine;
@@ -792,49 +795,69 @@ TEST_CASE("battle_crossfade_target: os dois ids invalidos devolve invalido "
 // VISUAL (o que e desenhado) nao muda de tamanho/posicao com esta mudanca.
 // ============================================================================
 
-TEST_CASE("feet_trigger_aabb: caixa de pes e SIGNIFICATIVAMENTE menor que o footprint "
-          "visual completo (area e largura/altura), ancorada na BASE e centrada em X "
-          "sobre o footprint",
-          "[maestro][logic][bug7]") {
+TEST_CASE("feet_trigger_aabb: mesmo ENVOLVENDO a caixa solida com folga (fix BUG-8), "
+          "continua BEM menor que o footprint visual completo, centrada em X sobre o "
+          "footprint e ancorada na BASE (+ folga simetrica pra baixo)",
+          "[maestro][logic][bug7][bug8]") {
     const Aabb anchor{5.0f * 2.0f + 1.0f - 0.6f, 5.0f * 2.0f + 1.0f - 0.6f, 1.2f, 1.2f};
     const float sprite_height_tiles = 3.3f;  // numeros reais do Bertoldo
     const float tile_size = 2.0f;
+    const float solid_box_tiles = 1.0f;  // OverworldTuning::npc_solid_box_tiles (default)
 
     const Aabb footprint =
         enemy_sprite_footprint_aabb(anchor, sprite_height_tiles, tile_size);
-    const Aabb trigger = feet_trigger_aabb(footprint, tile_size);
+    const Aabb trigger = feet_trigger_aabb(footprint, tile_size, solid_box_tiles);
 
-    // Muito menor em cada eixo (nao so em area) - a caixa de pes nunca deveria chegar
-    // perto do tamanho do sprite inteiro (footprint 6.6x6.6 tiles no mundo).
-    CHECK(trigger.w < footprint.w * 0.5f);
-    CHECK(trigger.h < footprint.h * 0.5f);
-    // Area MUITO menor (ordem de grandeza menor - documenta "caixa pequena", nao so
-    // "um pouco menor").
-    CHECK(trigger.w * trigger.h < (footprint.w * footprint.h) * 0.1f);
+    // Ainda BEM menor em cada eixo que o sprite inteiro (footprint 6.6x6.6 tiles no
+    // mundo; trigger novo ~3.6x3.6 - preserva a garantia original do BUG-7: nao
+    // dispara "de longe" visualmente).
+    CHECK(trigger.w < footprint.w * 0.7f);
+    CHECK(trigger.h < footprint.h * 0.7f);
+    CHECK(trigger.w * trigger.h < (footprint.w * footprint.h) * 0.5f);
 
-    // Base da caixa de trigger == base do footprint (mesma formula de base que o
-    // desenho ja usa - nao inventa uma 2a nocao de "onde o personagem esta parado").
-    CHECK(trigger.y + trigger.h == Catch::Approx(footprint.y + footprint.h));
-    // Centrada em X sobre o footprint (que ja e centrado sobre o anchor original).
+    // Base da caixa de trigger AGORA vaza kFeetTriggerMarginTiles*tile_size PARA
+    // BAIXO da base do footprint (fix BUG-8: precisa ENVOLVER o solido, nao so
+    // encostar nele por cima) - deixou de ser exatamente igual de proposito.
+    const float margin_world = kFeetTriggerMarginTiles * tile_size;
+    CHECK(trigger.y + trigger.h ==
+          Catch::Approx((footprint.y + footprint.h) + margin_world));
+    // Centrada em X sobre o footprint (que ja e centrado sobre o anchor original) -
+    // isto NAO mudou com o fix.
     CHECK(trigger.x + trigger.w * 0.5f == Catch::Approx(footprint.x + footprint.w * 0.5f));
 }
 
-TEST_CASE("feet_trigger_aabb: e da MESMA ordem de grandeza da hitbox REAL do jogador "
-          "(kPlayerHitboxTileFraction=0.6 tile) - nem gigante (BUG-7), nem minuscula "
-          "(fantasma do BUG-1)",
-          "[maestro][logic][bug7]") {
+TEST_CASE("feet_trigger_aabb: ENVOLVE a caixa SOLIDA equivalente com folga em TODOS os "
+          "4 lados, em vez de nascer CONTIDA dentro dela (causa raiz da regressao "
+          "BUG-8: o trigger antigo era MENOR que o solido, nunca alcancavel)",
+          "[maestro][logic][bug7][bug8]") {
     const Aabb anchor{0.0f, 0.0f, 1.2f, 1.2f};
     const float tile_size = 2.0f;
+    const float solid_box_tiles = 1.0f;
     const Aabb footprint = enemy_sprite_footprint_aabb(anchor, 2.75f, tile_size);
-    const Aabb trigger = feet_trigger_aabb(footprint, tile_size);
+    const Aabb trigger = feet_trigger_aabb(footprint, tile_size, solid_box_tiles);
 
-    const float player_side_world = 0.6f * tile_size;  // city_scene.hpp
-    // Largura/altura da caixa de pes na mesma ORDEM DE GRANDEZA do lado do jogador
-    // (nao 10x maior nem 10x menor) - a prova de que "PEQUENA" foi levada a serio.
-    CHECK(trigger.w > player_side_world * 0.5f);
-    CHECK(trigger.w < player_side_world * 3.0f);
-    CHECK(trigger.h > player_side_world * 0.25f);
-    CHECK(trigger.h < player_side_world * 2.0f);
+    // Caixa SOLIDA equivalente, calculada com a MESMA formula/ancoragem de
+    // overworld_sim.cpp::solid_obstacle_from_footprint (mirror de teste, nao chama a
+    // producao - ela e privada ao OverworldSim).
+    const float solid_side = solid_box_tiles * tile_size;
+    const Aabb solid{footprint.x + footprint.w * 0.5f - solid_side * 0.5f,
+                      (footprint.y + footprint.h) - solid_side, solid_side, solid_side};
+
+    // O trigger precisa CONTER o solido inteiro com folga estrita nos 4 lados -
+    // exatamente o oposto do bug (onde o trigger 0.8x0.4 ficava contido DENTRO do
+    // solido 1.0x1.0).
+    CHECK(trigger.x < solid.x);
+    CHECK(trigger.x + trigger.w > solid.x + solid.w);
+    CHECK(trigger.y < solid.y);
+    CHECK(trigger.y + trigger.h > solid.y + solid.h);
+
+    // A folga e EXATAMENTE kFeetTriggerMarginTiles*tile_size em cada lado (nao so
+    // "um pouco maior" - o valor exato que a formula promete).
+    const float margin_world = kFeetTriggerMarginTiles * tile_size;
+    CHECK(solid.x - trigger.x == Catch::Approx(margin_world));
+    CHECK((trigger.x + trigger.w) - (solid.x + solid.w) == Catch::Approx(margin_world));
+    CHECK(solid.y - trigger.y == Catch::Approx(margin_world));
+    CHECK((trigger.y + trigger.h) - (solid.y + solid.h) == Catch::Approx(margin_world));
 }
 
 TEST_CASE("BUG-7 revisitado: com os numeros REAIS do Bertoldo (height_tiles=3.3, "
@@ -852,7 +875,8 @@ TEST_CASE("BUG-7 revisitado: com os numeros REAIS do Bertoldo (height_tiles=3.3,
 
     const Aabb footprint = enemy_sprite_footprint_aabb(
         anchor, tuning.npc_bertoldo_sprite_height_tiles, tile_size);
-    const Aabb trigger = feet_trigger_aabb(footprint, tile_size);
+    const Aabb trigger =
+        feet_trigger_aabb(footprint, tile_size, tuning.npc_solid_box_tiles);
 
     const float cy = footprint.y + footprint.h * 0.5f;  // meio vertical do footprint
 
@@ -891,10 +915,13 @@ TEST_CASE("feet_trigger_aabb: MESMA funcao serve o inimigo fixo E o Bertoldo (se
     // menor que o Gus").
     REQUIRE(bertoldo_footprint.h != Catch::Approx(enemy_footprint.h));
 
-    const Aabb enemy_trigger = feet_trigger_aabb(enemy_footprint, tile_size);
-    const Aabb bertoldo_trigger = feet_trigger_aabb(bertoldo_footprint, tile_size);
+    const Aabb enemy_trigger =
+        feet_trigger_aabb(enemy_footprint, tile_size, tuning.npc_solid_box_tiles);
+    const Aabb bertoldo_trigger =
+        feet_trigger_aabb(bertoldo_footprint, tile_size, tuning.npc_solid_box_tiles);
 
-    // MESMA funcao, MESMOS parametros de tamanho (defaults) - a caixa de pes fica
+    // MESMA funcao, MESMO solid_box_tiles (o mesmo valor real que a colisao fisica
+    // usa) - a caixa de pes fica
     // IDENTICA em w/h para os dois (a diferenca de altura do sprite NAO vaza pra
     // dentro da caixa de trigger - e exatamente o ponto de desacoplar as duas
     // responsabilidades).
@@ -931,4 +958,176 @@ TEST_CASE("enemy_sprite_footprint_aabb: footprint VISUAL (o quad desenhado) NAO 
     CHECK(bertoldo_fp.y + bertoldo_fp.h == Catch::Approx(anchor.y + anchor.h));
     CHECK(bertoldo_fp.x + bertoldo_fp.w * 0.5f ==
           Catch::Approx(anchor.x + anchor.w * 0.5f));
+}
+
+// ============================================================================
+// REGRESSAO BUG-8 (playtest ao vivo do lider, MESMO DIA em que a colisao SOLIDA de
+// BUG-8 entrou: "esbarrar no androide NAO aciona mais a batalha, encostar no
+// Bertoldo NAO abre mais o dialogo" - o LOOP CENTRAL do jogo quebrou). CAUSA RAIZ
+// confirmada (ver rationale completo em maestro_logic.hpp::feet_trigger_aabb): o
+// trigger antigo (0.8x0.4 tile) nascia CONTIDO dentro do corpo SOLIDO novo (~1.0
+// tile, MESMA ancoragem centro-X/base) - a colisao FISICA para o jogador exatamente
+// na borda do solido (resolve_move/resolve_move_with_corner_assist encostam SEM
+// folga), que fica sempre "mais pra fora" que a borda do trigger antigo. O jogador
+// nunca mais alcancava overlap real, nas 4 direcoes cardeais.
+//
+// Estes testes provam, com resolve_move REAL (a MESMA funcao que overworld_sim.cpp::
+// step_fixed usa em producao, contra um ObstacleSpan) e os NUMEROS REAIS do jogo
+// (tile_size=2.0 do .gmap, solid_box_tiles=1.0 = OverworldTuning::npc_solid_box_tiles,
+// player_side=0.6 tile = kPlayerHitboxTileFraction): (a) o NOVO feet_trigger_aabb
+// dispara nas 4 direcoes exatamente na posicao onde o jogador e PARADO pela colisao
+// solida - o fix real; (b) documenta que o trigger ANTIGO (0.8x0.4) NAO disparava em
+// NENHUMA das 4 direcoes nessas mesmas posicoes - a regressao relatada ao vivo.
+// ============================================================================
+
+TEST_CASE("BUG-8 revisitado: jogador PARADO pela colisao SOLIDA (resolve_move real, "
+          "numeros REAIS do jogo) fica DENTRO do NOVO trigger nas 4 direcoes cardeais "
+          "- fix da regressao 'esbarrar nao aciona mais a batalha/dialogo'",
+          "[maestro][logic][bug8][regressao]") {
+    const float tile_size = 2.0f;                // .gmap real
+    const float solid_box_tiles = 1.0f;          // OverworldTuning::npc_solid_box_tiles
+    const float player_side = 0.6f * tile_size;  // kPlayerHitboxTileFraction (city_scene.hpp)
+
+    // Footprint arbitrario (representa o quad visual grande, ~2.75 tiles) - so fixa o
+    // CENTRO-X e a BASE que TANTO a colisao solida real QUANTO o trigger usam (mesma
+    // ancoragem de overworld_sim.cpp::solid_obstacle_from_footprint).
+    const Aabb anchor{50.0f - 0.6f, 50.0f - 0.6f, 1.2f, 1.2f};
+    const Aabb footprint = enemy_sprite_footprint_aabb(anchor, 2.75f, tile_size);
+
+    // Caixa SOLIDA real (MESMA formula que overworld_sim.cpp::
+    // solid_obstacle_from_footprint usa - metodo privado do OverworldSim; mirror de
+    // teste, mesmo padrao ja usado em overworld_sim_test.cpp).
+    const float solid_side = solid_box_tiles * tile_size;
+    const Aabb solid{footprint.x + footprint.w * 0.5f - solid_side * 0.5f,
+                      (footprint.y + footprint.h) - solid_side, solid_side, solid_side};
+    const ObstacleSpan obstacles{&solid, 1};
+
+    // Trigger NOVO (o fix desta regressao).
+    const Aabb trigger = feet_trigger_aabb(footprint, tile_size, solid_box_tiles);
+
+    // Grade grande e 100% ABERTA (sem NENHUMA parede da grade) - a UNICA coisa que
+    // bloqueia o jogador aqui e a caixa solida do NPC/inimigo, exatamente como no
+    // playtest real do lider (mapa aberto, sem parede por perto do encontro).
+    const TileGrid g(50, 50, tile_size);
+
+    const float solid_cx = solid.x + solid.w * 0.5f;
+    const float solid_cy = solid.y + solid.h * 0.5f;
+    // Pouso-alvo CENTRADO dentro do solido (garante overlap do "target" cru com o
+    // obstaculo, qualquer que seja a origem - resolve_move so detecta colisao se o
+    // deslocamento CRU pedido sobrepoe o obstaculo; um delta grande demais que
+    // ATRAVESSASSE o obstaculo inteiro sem nunca sobrepo-lo faria "tunneling" e
+    // hit_x/hit_y ficaria false, limite conhecido do resolve_move de passo unico -
+    // ver overworld_sim_test.cpp). Pousar bem no centro elimina esse risco.
+    const float target_x_centered = solid_cx - player_side * 0.5f;
+    const float target_y_centered = solid_cy - player_side * 0.5f;
+
+    // --- OESTE: jogador vem da esquerda, andando pra DIREITA (dx>0) ---------------
+    {
+        const Aabb start{10.0f, target_y_centered, player_side, player_side};
+        const auto result =
+            resolve_move(g, start, /*dx=*/target_x_centered - start.x, /*dy=*/0.0f, obstacles);
+        REQUIRE(result.hit_x);
+        CHECK_FALSE(aabb_overlaps(result.box, solid));  // colisao solida intacta (nao regrediu)
+        CHECK(aabb_overlaps(result.box, trigger));      // FIX: agora dispara
+        CHECK(should_trigger_battle(result.box, trigger, /*enemy_defeated=*/false));
+    }
+
+    // --- LESTE: jogador vem da direita, andando pra ESQUERDA (dx<0) ---------------
+    {
+        const Aabb start{90.0f, target_y_centered, player_side, player_side};
+        const auto result =
+            resolve_move(g, start, /*dx=*/target_x_centered - start.x, /*dy=*/0.0f, obstacles);
+        REQUIRE(result.hit_x);
+        CHECK_FALSE(aabb_overlaps(result.box, solid));
+        CHECK(aabb_overlaps(result.box, trigger));
+        CHECK(should_trigger_battle(result.box, trigger, /*enemy_defeated=*/false));
+    }
+
+    // --- NORTE: jogador vem de cima, andando pra BAIXO (dy>0) ---------------------
+    {
+        const Aabb start{target_x_centered, 10.0f, player_side, player_side};
+        const auto result =
+            resolve_move(g, start, /*dx=*/0.0f, /*dy=*/target_y_centered - start.y, obstacles);
+        REQUIRE(result.hit_y);
+        CHECK_FALSE(aabb_overlaps(result.box, solid));
+        CHECK(aabb_overlaps(result.box, trigger));
+        CHECK(should_trigger_battle(result.box, trigger, /*enemy_defeated=*/false));
+    }
+
+    // --- SUL: jogador vem de baixo, andando pra CIMA (dy<0) - o caso que ficava -----
+    // 100% quebrado ANTES do fix: a base do trigger antigo == a base do solido
+    // (mesmo anchor), entao o jogador vindo do sul SEMPRE encostava borda-a-borda
+    // (nunca overlap), INDEPENDENTE do tamanho do trigger antigo - o pior caso da
+    // regressao.
+    {
+        const Aabb start{target_x_centered, 90.0f, player_side, player_side};
+        const auto result =
+            resolve_move(g, start, /*dx=*/0.0f, /*dy=*/target_y_centered - start.y, obstacles);
+        REQUIRE(result.hit_y);
+        CHECK_FALSE(aabb_overlaps(result.box, solid));
+        CHECK(aabb_overlaps(result.box, trigger));
+        CHECK(should_trigger_battle(result.box, trigger, /*enemy_defeated=*/false));
+    }
+}
+
+TEST_CASE("BUG-8 revisitado: com o trigger ANTIGO (0.8x0.4 tile, contido dentro do "
+          "solido), o jogador PARADO pela MESMA colisao solida NAO disparava em "
+          "NENHUMA das 4 direcoes - documenta a regressao real relatada ao vivo",
+          "[maestro][logic][bug8][regressao]") {
+    const float tile_size = 2.0f;
+    const float solid_box_tiles = 1.0f;
+    const float player_side = 0.6f * tile_size;
+
+    const Aabb anchor{50.0f - 0.6f, 50.0f - 0.6f, 1.2f, 1.2f};
+    const Aabb footprint = enemy_sprite_footprint_aabb(anchor, 2.75f, tile_size);
+
+    const float solid_side = solid_box_tiles * tile_size;
+    const Aabb solid{footprint.x + footprint.w * 0.5f - solid_side * 0.5f,
+                      (footprint.y + footprint.h) - solid_side, solid_side, solid_side};
+    const ObstacleSpan obstacles{&solid, 1};
+
+    // Trigger ANTIGO (pre-fix): caixa pequena 0.8x0.4 tile, MESMA ancoragem
+    // centro-X/base do footprint que o trigger novo usa - reproduzido aqui
+    // manualmente (a funcao de producao ja NAO tem mais este comportamento, de
+    // proposito - este teste documenta o COMPORTAMENTO ANTIGO, nao chama
+    // feet_trigger_aabb).
+    constexpr float kOldTriggerWidthTiles = 0.8f;
+    constexpr float kOldTriggerHeightTiles = 0.4f;
+    const float old_w = kOldTriggerWidthTiles * tile_size;
+    const float old_h = kOldTriggerHeightTiles * tile_size;
+    const Aabb old_trigger{footprint.x + footprint.w * 0.5f - old_w * 0.5f,
+                           (footprint.y + footprint.h) - old_h, old_w, old_h};
+
+    const TileGrid g(50, 50, tile_size);
+    const float solid_cx = solid.x + solid.w * 0.5f;
+    const float solid_cy = solid.y + solid.h * 0.5f;
+    // MESMO pouso-alvo centrado do teste irmao acima (evita tunneling do resolve_move
+    // de passo unico - garante que o jogador REALMENTE bateu no solido, hit_x/hit_y
+    // checado abaixo, antes de provar que o trigger antigo NAO disparava ali).
+    const float target_x_centered = solid_cx - player_side * 0.5f;
+    const float target_y_centered = solid_cy - player_side * 0.5f;
+
+    const Aabb west_start{10.0f, target_y_centered, player_side, player_side};
+    const auto west_result = resolve_move(g, west_start, target_x_centered - west_start.x,
+                                           0.0f, obstacles);
+    REQUIRE(west_result.hit_x);
+    CHECK_FALSE(aabb_overlaps(west_result.box, old_trigger));
+
+    const Aabb east_start{90.0f, target_y_centered, player_side, player_side};
+    const auto east_result = resolve_move(g, east_start, target_x_centered - east_start.x,
+                                           0.0f, obstacles);
+    REQUIRE(east_result.hit_x);
+    CHECK_FALSE(aabb_overlaps(east_result.box, old_trigger));
+
+    const Aabb north_start{target_x_centered, 10.0f, player_side, player_side};
+    const auto north_result = resolve_move(g, north_start, 0.0f,
+                                            target_y_centered - north_start.y, obstacles);
+    REQUIRE(north_result.hit_y);
+    CHECK_FALSE(aabb_overlaps(north_result.box, old_trigger));
+
+    const Aabb south_start{target_x_centered, 90.0f, player_side, player_side};
+    const auto south_result = resolve_move(g, south_start, 0.0f,
+                                            target_y_centered - south_start.y, obstacles);
+    REQUIRE(south_result.hit_y);
+    CHECK_FALSE(aabb_overlaps(south_result.box, old_trigger));
 }

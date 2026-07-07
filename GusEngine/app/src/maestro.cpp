@@ -209,7 +209,13 @@ bool Maestro::init() {
     enemy_aabb_ = enemy_sprite_footprint_aabb(
         enemy_anchor, city_->tuning().player_sprite_height_tiles,
         city_->grid().tile_size());
-    enemy_trigger_aabb_ = feet_trigger_aabb(enemy_aabb_, city_->grid().tile_size());
+    // FIX BUG-8 revisitado (regressao "esbarrar nao aciona mais a batalha" - ver
+    // maestro_logic.hpp::feet_trigger_aabb): solid_box_tiles PRECISA ser o MESMO
+    // valor usado pela colisao FISICA real (OverworldSim::solid_obstacle_from_
+    // footprint via tuning_.npc_solid_box_tiles) - nunca um numero duplicado aqui,
+    // senao os dois sistemas podem divergir de novo.
+    enemy_trigger_aabb_ = feet_trigger_aabb(enemy_aabb_, city_->grid().tile_size(),
+                                             city_->tuning().npc_solid_box_tiles);
     enemy_defeated_ = false;
     // M7-COSTURA Inc 2: o inimigo fixo agora e VISIVEL no mapa - o mesmo placeholder de
     // androide (retrato_inimigo.png) que a tela de BATALHA ja usa pros inimigos (ver
@@ -250,8 +256,11 @@ bool Maestro::init() {
     npc_bertoldo_aabb_ = enemy_sprite_footprint_aabb(
         npc_anchor, city_->tuning().npc_bertoldo_sprite_height_tiles,
         city_->grid().tile_size());
-    npc_bertoldo_trigger_aabb_ =
-        feet_trigger_aabb(npc_bertoldo_aabb_, city_->grid().tile_size());
+    // FIX BUG-8 revisitado (idem ao inimigo fixo acima - MESMA regra: solid_box_tiles
+    // vem SEMPRE do tuning real, nunca duplicado aqui).
+    npc_bertoldo_trigger_aabb_ = feet_trigger_aabb(
+        npc_bertoldo_aabb_, city_->grid().tile_size(),
+        city_->tuning().npc_solid_box_tiles);
     city_->set_npc_bertoldo_marker(npc_bertoldo_aabb_);
     std::cout << "Maestro: [dialogo] Bertoldo (NPC-MVP) em (" << npc_bertoldo_aabb_.x
               << ", " << npc_bertoldo_aabb_.y << ").\n";
