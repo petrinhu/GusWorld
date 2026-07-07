@@ -29,6 +29,7 @@
 #include "gus/app/screens/ui_hover.hpp"  // COCKPIT-SFX-HOVER-CLIQUE: edge-detect POCO do som de hover
 #include "gus/core/asset_paths.hpp"             // caminhos de asset centralizados
 #include "gus/domain/combat/combat_enums.hpp"  // StatusId
+#include "gus/platform/assets/asset_source.hpp"     // ASSETS-VFS-F1 (ADR-013): porteiro
 #include "gus/platform/audio/audio_engine.hpp"     // AudioEngine (M6 F3, ADR-011)
 #include "gus/platform/fs/settings_file_store.hpp"  // MENU-PAUSA-CONFIG-SOM: resolve_settings_dir
 #include "gus/platform/render2d/render2d_gl3.hpp"  // ADR-009 GL3: backend OpenGL da arena
@@ -48,28 +49,13 @@
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "stb_image_write.h"
 
-// Raiz resources/ do repo, embutida pelo CMake (mesma macro do resolver de sprites).
-#ifndef GUSWORLD_ASSETS_DIR
-#define GUSWORLD_ASSETS_DIR ""
-#endif
-
 // Pasta das fontes (.ttf), embutida pelo CMake (ADR-010 F2a). So usada no caminho glintfx
 // (cockpit BAKED): o @font-face do RCSS aponta pra ca. Fallback vazio se ausente.
+// (GUSWORLD_ASSETS_DIR/GUSWORLD_SFX_DIR/GUSWORLD_MUSIC_DIR foram REMOVIDOS daqui -
+// ASSETS-VFS-F1/ADR-013: a resolucao dessas 3 raizes agora mora dentro de
+// FilesystemAssetSource, platform/assets/; este arquivo so consome via resolve_path().)
 #ifndef GUSWORLD_FONTS_DIR
 #define GUSWORLD_FONTS_DIR ""
-#endif
-
-// Pasta do kit CC0 de SFX (M6 F3, ADR-011), raiz DIFERENTE de GUSWORLD_ASSETS_DIR
-// (repo_root/assets/sfx, nao resources/ - ver gus/core/asset_paths.hpp). Override em
-// runtime via env GUSWORLD_SFX.
-#ifndef GUSWORLD_SFX_DIR
-#define GUSWORLD_SFX_DIR ""
-#endif
-
-// Pasta da musica CC0 (M6 F4, ADR-011), irma de GUSWORLD_SFX_DIR (repo_root/assets/
-// music). Override em runtime via env GUSWORLD_MUSIC.
-#ifndef GUSWORLD_MUSIC_DIR
-#define GUSWORLD_MUSIC_DIR ""
 #endif
 
 namespace gus::app::screens {
@@ -89,29 +75,19 @@ std::string join(const std::string& a, const std::string& b) {
     return a + "/" + b;
 }
 
-// Resolve um caminho RELATIVO de asset (do header central) pela ordem padrao:
-// env GUSWORLD_ASSETS > macro de compilacao (GUSWORLD_ASSETS_DIR) > relativo ao CWD.
-// A FONTE do sub-caminho e a constante; aqui so a logica de resolucao.
+// Resolve um caminho RELATIVO de asset (do header central) - familia GENERICA (sprites/
+// images/vfx sob resources/). ASSETS-VFS-F1 (ADR-013): CONSOLIDADO em
+// FilesystemAssetSource::resolve_path (o `rel` JA E o id logico, sem prefixo de familia
+// especifica - cai no dispatch generico). Assinatura INTOCADA.
 std::string resolve_asset_dir(std::string_view rel) {
-    const std::string sub(rel);
-    if (const char* env = std::getenv("GUSWORLD_ASSETS")) {
-        if (env[0] != '\0') {
-            return join(env, sub);
-        }
-    }
-    const std::string compiled = GUSWORLD_ASSETS_DIR;
-    if (!compiled.empty()) {
-        return join(compiled, sub);
-    }
-    return join("resources", sub);
+    return gus::platform::assets::FilesystemAssetSource().resolve_path(rel);
 }
 
-// Resolve o caminho do SFX de hit (M6 F3, ADR-011): env GUSWORLD_SFX > macro embutida
-// (GUSWORLD_SFX_DIR = repo_root/assets/sfx) > relativo ao CWD (kSfxDir). Raiz DIFERENTE
-// de resolve_asset_dir (essa e resources/; sfx/music vivem em assets/ na raiz do repo -
-// ver o comentario de kSfxDir em core/asset_paths.hpp). GUSWORLD_HIT_SFX=alt troca pro
-// arquivo alternativo (A/B pro lider comparar e escolher ao vivo no playtest); qualquer
-// outro valor (ou ausente) usa o principal.
+// Resolve o caminho do SFX de hit (M6 F3, ADR-011). ASSETS-VFS-F1: a cadeia `env
+// GUSWORLD_SFX > macro GUSWORLD_SFX_DIR > CWD (kSfxDir)` foi CONSOLIDADA em
+// FilesystemAssetSource (familia SFX, dispatch pelo prefixo "assets/sfx/"). O A/B
+// GUSWORLD_HIT_SFX=alt continua decidido AQUI (e escolha de QUAL arquivo/id, nao de
+// resolucao de raiz) - qualquer outro valor (ou ausente) usa o principal.
 std::string resolve_hit_sfx_path() {
     const bool alt = [] {
         const char* e = std::getenv("GUSWORLD_HIT_SFX");
@@ -119,37 +95,19 @@ std::string resolve_hit_sfx_path() {
     }();
     const std::string file = alt ? std::string(gus::core::assets::kHitSfxAltFile)
                                   : std::string(gus::core::assets::kHitSfxFile);
-    if (const char* env = std::getenv("GUSWORLD_SFX")) {
-        if (env[0] != '\0') {
-            return join(env, file);
-        }
-    }
-    const std::string compiled = GUSWORLD_SFX_DIR;
-    if (!compiled.empty()) {
-        return join(compiled, file);
-    }
-    return join(std::string(gus::core::assets::kSfxDir), file);
+    const std::string id = join(std::string(gus::core::assets::kSfxDir), file);
+    return gus::platform::assets::FilesystemAssetSource().resolve_path(id);
 }
 
 // COCKPIT-SFX-HOVER-CLIQUE: resolve o caminho de um SFX de UI (hover/click) - MESMA
-// ordem/raiz de resolve_hit_sfx_path (env GUSWORLD_SFX > macro GUSWORLD_SFX_DIR >
-// relativo kSfxDir), so que o NOME do arquivo vem por parametro (os 2 blips do menu:
-// kMenuHoverSfxFile/kMenuClickSfxFile). REUSA os MESMOS 2 arquivos do menu de sistema
-// (mesma identidade sonora de UI - pedido do lider ao vivo, nao gerar novos). Espelha
-// resolve_menu_sfx_path de system_menu_loop.cpp (nao da pra compartilhar: aquele e
-// static de outra TU; a duplicacao aqui e MINIMA - so a ordem de resolucao de path).
+// familia SFX de resolve_hit_sfx_path (agora ambos delegam pro MESMO porteiro, ASSETS-
+// VFS-F1 elimina a duplicacao que o comentario anterior descrevia como "minima"), so que
+// o NOME do arquivo vem por parametro (os 2 blips do menu: kMenuHoverSfxFile/
+// kMenuClickSfxFile). REUSA os MESMOS 2 arquivos do menu de sistema (mesma identidade
+// sonora de UI - pedido do lider ao vivo, nao gerar novos).
 std::string resolve_ui_sfx_path(std::string_view file) {
-    const std::string filename(file);
-    if (const char* env = std::getenv("GUSWORLD_SFX")) {
-        if (env[0] != '\0') {
-            return join(env, filename);
-        }
-    }
-    const std::string compiled = GUSWORLD_SFX_DIR;
-    if (!compiled.empty()) {
-        return join(compiled, filename);
-    }
-    return join(std::string(gus::core::assets::kSfxDir), filename);
+    const std::string id = join(std::string(gus::core::assets::kSfxDir), std::string(file));
+    return gus::platform::assets::FilesystemAssetSource().resolve_path(id);
 }
 
 // resolve_music_path() MOVIDA pra fora do namespace anonimo (M7-COSTURA Inc 2) -
@@ -553,23 +511,16 @@ std::string resolve_status_icons_dir() {
     return resolve_asset_dir(gus::core::assets::kStatusIconsDir);
 }
 
-// M7-COSTURA Inc 2/3: resolve o caminho de uma faixa de MUSICA (M6 F4, ADR-011), env
-// GUSWORLD_MUSIC > macro embutida (GUSWORLD_MUSIC_DIR = repo_root/assets/music) >
-// relativo ao CWD (kMusicDir). EXPORTADA (fora do namespace anonimo, ver header) - a
+// M7-COSTURA Inc 2/3: resolve o caminho de uma faixa de MUSICA (M6 F4, ADR-011).
+// ASSETS-VFS-F1 (ADR-013): a cadeia `env GUSWORLD_MUSIC > macro GUSWORLD_MUSIC_DIR >
+// CWD (kMusicDir)` foi CONSOLIDADA em FilesystemAssetSource (familia MUSICA, dispatch
+// pelo prefixo "assets/music/"). EXPORTADA (fora do namespace anonimo, ver header) - a
 // Maestro chama isto direto pra carregar o tema da cidade E o da arena (Inc 3, so o
-// nome do arquivo muda) em init(), dona do AudioEngine.
+// nome do arquivo muda) em init(), dona do AudioEngine. Assinatura INTOCADA.
 std::string resolve_music_path(std::string_view file) {
-    const std::string file_str(file);
-    if (const char* env = std::getenv("GUSWORLD_MUSIC")) {
-        if (env[0] != '\0') {
-            return join(env, file_str);
-        }
-    }
-    const std::string compiled = GUSWORLD_MUSIC_DIR;
-    if (!compiled.empty()) {
-        return join(compiled, file_str);
-    }
-    return join(std::string(gus::core::assets::kMusicDir), file_str);
+    const std::string id =
+        join(std::string(gus::core::assets::kMusicDir), std::string(file));
+    return gus::platform::assets::FilesystemAssetSource().resolve_path(id);
 }
 
 std::string resolve_intent_icons_dir() {

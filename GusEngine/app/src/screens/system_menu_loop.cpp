@@ -47,21 +47,17 @@
 #include "gus/core/asset_paths.hpp"            // kMenuHoverSfxFile/kMenuClickSfxFile/kSfxDir
 #include "gus/core/spatial/camera_clamp.hpp"  // gus::core::spatial::Rect
 #include "gus/domain/settings/system_settings.hpp"
+#include "gus/platform/assets/asset_source.hpp"  // ASSETS-VFS-F1 (ADR-013): porteiro
 #include "gus/platform/fs/settings_file_store.hpp"
 #include "gus/platform/render2d/render2d_gl3.hpp"
 #include "gus/platform/rmlui/gl3_loader.hpp"  // glad load (variante owning_gl)
 
 // Pasta das fontes (.ttf), embutida pelo CMake (mesma macro que battle_preview.cpp
-// ja usa - PRIVATE no CMakeLists do target app, aplica a TODO .cpp do target).
+// ja usa - PRIVATE no CMakeLists do target app, aplica a TODO .cpp do target). SO usada
+// pelo staging de fonte pro glintfx (write_system_menu_rml_file) - FORA do escopo do
+// retrofit ASSETS-VFS-F1 (ADR-013 marca esse staging como ESCRITA, nao leitura).
 #ifndef GUSWORLD_FONTS_DIR
 #define GUSWORLD_FONTS_DIR ""
-#endif
-
-// Pasta do kit CC0 de SFX (M6 F2/F3, ADR-011; hover/click do menu reusam a MESMA
-// macro/raiz de battle_preview.cpp - repo_root/assets/sfx, NAO GusEngine/assets/).
-// Override em runtime via env GUSWORLD_SFX.
-#ifndef GUSWORLD_SFX_DIR
-#define GUSWORLD_SFX_DIR ""
 #endif
 
 namespace gus::app::screens {
@@ -174,17 +170,13 @@ bool hit_test(const glintfx::ElementBox& box, float x, float y) {
     return x >= box.x && x <= box.x + box.w && y >= box.y && y <= box.y + box.h;
 }
 
-// Resolve o caminho de um SFX do menu (hover/click) - MESMA ordem de
-// resolve_hit_sfx_path em battle_preview.cpp: env GUSWORLD_SFX > macro embutida
-// (GUSWORLD_SFX_DIR) > relativo ao CWD (kSfxDir).
+// Resolve o caminho de um SFX do menu (hover/click) - familia SFX, MESMO destino de
+// resolve_hit_sfx_path em battle_preview.cpp. ASSETS-VFS-F1 (ADR-013): a cadeia `env
+// GUSWORLD_SFX > macro GUSWORLD_SFX_DIR > CWD (kSfxDir)` foi CONSOLIDADA em
+// FilesystemAssetSource (dispatch pelo prefixo "assets/sfx/"). Assinatura INTOCADA.
 std::string resolve_menu_sfx_path(std::string_view file) {
-    const std::string filename(file);
-    if (const char* env = std::getenv("GUSWORLD_SFX")) {
-        if (env[0] != '\0') return join(env, filename);
-    }
-    const std::string compiled = GUSWORLD_SFX_DIR;
-    if (!compiled.empty()) return join(compiled, filename);
-    return join(std::string(gus::core::assets::kSfxDir), filename);
+    const std::string id = join(std::string(gus::core::assets::kSfxDir), std::string(file));
+    return gus::platform::assets::FilesystemAssetSource().resolve_path(id);
 }
 
 // Preenche `boxes` com a geometria dos itens NAVEGAVEIS da tela ATUAL
