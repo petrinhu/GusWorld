@@ -1,6 +1,6 @@
 # Brunus "Vetorial" Solveckt: Boticário-Médico Itinerante (NPC mentor, guardião da memória)
 
-> **Status:** Canônico (rascunho para revisão do criador supremo). Criado 2026-06-24 a partir de outline aprovado.
+> **Status:** Canônico (revisado pelo criador supremo, 2026-07-03). Criado 2026-06-24 a partir de outline aprovado.
 >
 > **Tipo:** NPC adulto independente (NÃO party). **Idade aparente:** ~40 (congelada). **Idade real:** ~700+ anos. **Facção:** nenhuma (homem livre, itinerante). **Linguagem-âncora:** não-mágica de combate; opera química, medicina e tecnologia como ofícios acoplados.
 >
@@ -161,7 +161,7 @@ A química antinatural cobra o preço depois da vitória. Brunus sucumbe, não e
 - Não dar a ele linguagem mágica de combate, nem na transformação prateada do clímax. É química e corpo levados ao extremo, o próprio ofício virado contra si mesmo, nunca conjuro.
 - Não nomear ideologias modernas em fala dele. Mostrar o princípio, não rotulá-lo.
 - Não declará-lo imortal nem mortal de forma fechada. O mistério ("será que é imortal?") fica em aberto: nem ele sabe.
-- Não romantizar a solidão dele como tragédia bonita gratuita (Pillar 4: toda escuridão serve a propósito). A solidão é estrutura do personagem, não estética.
+- Não romantizar a solidão dele como tragédia bonita gratuita (pillars.md, princípio anti-dark-gratuito da visão: toda escuridão serve a propósito; e Pillar 4). A solidão é estrutura do personagem, não estética.
 
 ---
 
@@ -191,4 +191,4 @@ Na rota da fronteira-Selve, Brunus atende um médico itinerante ferido, descobre
 
 ---
 
-**Última revisão:** 2026-07-03. Adicionado o arco do clímax (Dragon Victory, exclusivo do branch do perdão a Dante); ver seção "Arco no clímax (Dragon Victory)". Canônico (rascunho para revisão do criador supremo).
+**Última revisão:** 2026-07-03. Adicionado o arco do clímax (Dragon Victory, exclusivo do branch do perdão a Dante); ver seção "Arco no clímax (Dragon Victory)". Canônico (revisado pelo criador supremo, 2026-07-03).
