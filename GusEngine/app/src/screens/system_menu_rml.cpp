@@ -452,11 +452,60 @@ body { font-family: "Pixel Operator Mono"; background: transparent; width: 100%;
 .ctrl-row .c-act { flex: 1; color: #E7ECF5; font-size: 12dp; }
 .ctrl-row .c-key { width: 130dp; text-align: center; }
 .ctrl-row .c-pad { width: 100dp; text-align: center; }
+/* CONTORNO INSET (M2, achado por probe Xvfb :99 nesta investigacao - bug do
+   contorno ciano "cortado"): `.ctrl-list` (overflow-y:auto) so declara
+   `padding-right:4dp` - top/left/bottom ficam com 0dp de padding, entao o
+   CLIP de overflow (RmlUi clip_area=BoxArea::Padding, ver Element.cpp) cai
+   EXATAMENTE na borda de conteudo da lista nesses 3 lados (zero folga). O
+   box-shadow ORIGINAL (`#22D3EE 0dp 0dp 0dp 1dp`, sem `inset`) e um anel
+   EXTERNO - spread positivo empurra 1dp pra FORA do border-box da linha
+   (GeometryBoxShadow::Resolve usa BoxArea::Border pro anel externo) - e
+   "fora" so cabe se houver folga na direcao certa. QUALQUER linha
+   selecionada/capturada e SEMPRE realinhada ao TOPO do recorte por
+   `UiLayer::scroll_element_into_view(id)` (chamado incondicionalmente a cada
+   reload() em system_menu_loop.cpp, `align_with_top=true` por default -
+   RmlUi::ScrollAlignment::Start SEMPRE forca o alinhamento, mesmo quando a
+   linha ja estava visivel - Element::GetScrollOffsetDelta, caso Start
+   devolve begin_offset incondicional, NUNCA "so se precisar"). O efeito:
+   toda linha .sel/.capturing acaba com o TOPO do proprio border-box colado
+   no topo do recorte de `.ctrl-list` (0dp de folga) - o 1dp do anel externo
+   que deveria desenhar ACIMA da linha e cortado pelo clip, sobrando so os
+   3 outros lados (achado CONFIRMADO por leitura de pixel real via
+   glReadPixels: linha reta do topo cai de ~736px cyan pra 6px, os outros 3
+   lados continuam 100% solidos - screenshot headless comparativo
+   before/after, Xvfb :99). FIX: `inset` no box-shadow - GeometryBoxShadow
+   usa BoxArea::Padding e spread NEGATIVO pro anel inset (desenha 1dp PRA
+   DENTRO do proprio padding-box, nunca sai da caixa da linha) - o anel fica
+   IMUNE ao clip do ancestral, em QUALQUER posicao de scroll (topo, meio,
+   fim), sem tocar `.ctrl-list`/scroll/glintfx. MESMA identidade visual (cor/
+   opacidade), so o lado do desenho muda (dentro em vez de fora) -
+   `.ctrl-row.sel` recebeu o MESMO tratamento (idêntico problema estrutural,
+   so menos visivel pela cor gold/opacidade mais baixa que a captura ciano
+   que o lider circulou).
+
+   SPREAD 2dp (nao 1dp): a linha 0 (a PRIMEIRA da lista) e um caso-limite
+   RESIDUAL do mesmo mecanismo - quando ELA e o alvo do align-to-top,
+   `ScrollAlignment::Start` (Element.cpp) por vezes fecha com um residuo
+   sub-pixel (~0.3px medido no probe, arredondamento de float acumulado do
+   `.ctrl-group` acima dela) que deixa o proprio TOPO do border-box da linha
+   (nao so o anel) uma fresta ACIMA do clip - `padding-top` em `.ctrl-list`
+   NAO resolve isso (tentado e descartado nesta investigacao): o alvo do
+   scroll usa `GetClientTop()` no calculo de `ScrollIntoView`, que segue a
+   convencao DOM (largura da BORDA, nao do padding) - qualquer padding-top
+   so desloca o conteudo em repouso, e o align-to-top persegue o MESMO ponto
+   de recorte de qualquer forma, "engolindo" o padding via scroll (medido:
+   list.h cresceu com o padding, mas controls-item-0.y pos-scroll ficou
+   IDENTICO). Como o anel INSET desenha relativo a PROPRIA borda da linha
+   (imune ao jogo de scroll), aumentar o spread pra 2dp da ~1dp/1.3px REAL de
+   folga a mais entre a borda da linha e o traco do anel - >4x o residuo de
+   0.3px medido, cobre a linha 0 (e qualquer residuo futuro semelhante) sem
+   depender de padding do container. Confirmado por probe (linhas 0/1/5/15/
+   25/29 - PRIMEIRA e ULTIMA incluidas - todas com os 4 lados fechados). */
 .ctrl-row.sel {
-  box-shadow: #C9A24B66 0dp 0dp 0dp 1dp; decorator: vertical-gradient( #C9A24B24 #C9A24B0a );
+  box-shadow: #C9A24B66 0dp 0dp 0dp 2dp inset; decorator: vertical-gradient( #C9A24B24 #C9A24B0a );
 }
 .ctrl-row.capturing {
-  box-shadow: #22D3EE 0dp 0dp 0dp 1dp; decorator: vertical-gradient( #22D3EE1a #22D3EE0a );
+  box-shadow: #22D3EE 0dp 0dp 0dp 2dp inset; decorator: vertical-gradient( #22D3EE1a #22D3EE0a );
 }
 .ctrl-row.capturing .ctrl-capture-text { color: #22D3EE; font-size: 11dp; }
 .ctrl-conflict { color: #F43F5E; font-size: 10dp; margin-top: 2dp; }
