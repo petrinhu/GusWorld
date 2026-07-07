@@ -9,6 +9,9 @@
 #include <algorithm>  // std::clamp
 
 #include "gus/app/screens/ui_hover.hpp"  // COCKPIT-SFX-HOVER-CLIQUE: POCO de hover generico (delegacao)
+#include "gus/domain/input/action_registry.hpp"        // ActionRegistry (label i18n do swap)
+#include "gus/domain/input/controls_remap_apply.hpp"   // apply_key_remap (swap-on-conflict)
+#include "gus/domain/input/controls_restore.hpp"       // default_controls (Restaurar padrao)
 
 namespace gus::app::screens {
 
@@ -30,6 +33,7 @@ SystemMenuScreen parent_screen_of(SystemMenuScreen screen) noexcept {
             return SystemMenuScreen::Pause;
         case SystemMenuScreen::Audio:
         case SystemMenuScreen::Video:
+        case SystemMenuScreen::Controls:
         case SystemMenuScreen::Language:
             return SystemMenuScreen::ConfigCategories;
         case SystemMenuScreen::Hidden:
@@ -37,6 +41,75 @@ SystemMenuScreen parent_screen_of(SystemMenuScreen screen) noexcept {
             return screen;  // sem pai na arvore (defensivo - nao deveria ser chamado aqui)
     }
     return screen;
+}
+
+namespace {
+
+// Ordem CURADA/AGRUPADA das 30 actions na tela Controles (Movimento/Mundo/
+// Combate/Menu&Dialogo - MESMOS grupos do mock docs/design/mockups/
+// 06-controles-remap.html, estendidos para cobrir as 30 actions do
+// ActionRegistry - o mock so ilustrava um subconjunto). Fonte UNICA da ordem:
+// controls_selected (0..kControlsActionCount-1) indexa este array; render
+// (system_menu_rml.cpp) e captura (system_menu_controls_capture_key) usam a
+// MESMA fonte, nunca duplicam a lista.
+struct ControlsRow {
+    const char* action_name;
+    int group;  // 0=Movimento, 1=Mundo, 2=Combate, 3=Menu & Dialogo
+};
+
+constexpr ControlsRow kControlsRows[kControlsActionCount] = {
+    // Movimento (5) - ActionCategory::Movement do registry.
+    {"move_forward", 0},
+    {"move_backward", 0},
+    {"move_left", 0},
+    {"move_right", 0},
+    {"move_run", 0},
+    // Mundo (4) - Interact + Inventory + Diary do registry, agrupados pelo mock
+    // sob "Mundo" (interagir/abrir inventario/abrir diario sao todas acoes de
+    // MUNDO, nao de menu). inventory_close somado (mock so ilustrava
+    // inventory_open) - decisao de cobertura completa das 30 actions.
+    {"interact", 1},
+    {"inventory_open", 1},
+    {"inventory_close", 1},
+    {"diary_open", 1},
+    // Combate (7) - ActionCategory::Combat completo (mock so ilustrava 4 das
+    // 7; card_1/2/3 somadas aqui pela mesma razao de cobertura completa).
+    {"combat_attack_basic", 2},
+    {"combat_defend", 2},
+    {"combat_cast", 2},
+    {"combat_card_1", 2},
+    {"combat_card_2", 2},
+    {"combat_card_3", 2},
+    {"combat_end_turn", 2},
+    // Menu & Dialogo (14) - ActionCategory::Menu + Dialogue completos (mock so
+    // ilustrava 3 das 14; nav_up/down/left/right + open/close + choice_1..4
+    // somadas pela mesma razao).
+    {"menu_open", 3},
+    {"menu_close", 3},
+    {"menu_confirm", 3},
+    {"menu_cancel", 3},
+    {"menu_nav_up", 3},
+    {"menu_nav_down", 3},
+    {"menu_nav_left", 3},
+    {"menu_nav_right", 3},
+    {"dialogue_continue", 3},
+    {"dialogue_skip", 3},
+    {"dialogue_choice_1", 3},
+    {"dialogue_choice_2", 3},
+    {"dialogue_choice_3", 3},
+    {"dialogue_choice_4", 3},
+};
+
+}  // namespace
+
+std::string_view controls_action_name_at(int index) noexcept {
+    if (index < 0 || index >= kControlsActionCount) return std::string_view{};
+    return kControlsRows[index].action_name;
+}
+
+int controls_group_at(int index) noexcept {
+    if (index < 0 || index >= kControlsActionCount) return -1;
+    return kControlsRows[index].group;
 }
 
 void system_menu_open(SystemMenuState& state) noexcept {
@@ -118,6 +191,12 @@ SystemMenuAction handle_config_categories_key(SystemMenuState& state,
                 case ConfigCategoryItem::Video:
                     state.screen = SystemMenuScreen::Video;
                     return SystemMenuAction::Navigated;
+                case ConfigCategoryItem::Controls:
+                    state.screen = SystemMenuScreen::Controls;
+                    state.controls_selected = 0;
+                    state.controls_capturing = false;
+                    state.controls_confirming_restore = false;
+                    return SystemMenuAction::Navigated;
                 case ConfigCategoryItem::Language:
                     state.screen = SystemMenuScreen::Language;
                     return SystemMenuAction::Navigated;
@@ -127,6 +206,87 @@ SystemMenuAction handle_config_categories_key(SystemMenuState& state,
             }
             return SystemMenuAction::None;
         }
+        default:
+            return SystemMenuAction::None;
+    }
+}
+
+// Tela Controles (M2): navegacao NORMAL (30 actions curadas + Restaurar padrao +
+// Voltar) e o sub-fluxo de CONFIRMACAO do restaurar-padrao (decisao 4 do lider:
+// pede confirmacao antes de resetar). O MODO DE CAPTURA (controls_capturing==
+// true) NAO e tratado aqui - o CHAMADOR (loop) roteia pra
+// system_menu_controls_capture_key nesse caso (ver o header, o motivo de nao
+// reusar este roteador generico: toda tecla vira candidata a binding).
+SystemMenuAction handle_controls_key(SystemMenuState& state, SDL_Keycode key) noexcept {
+    if (state.controls_capturing) {
+        // Defensivo: o chamador nao deveria rotear aqui neste modo; no-op.
+        return SystemMenuAction::None;
+    }
+
+    if (state.controls_confirming_restore) {
+        switch (key) {
+            case SDLK_UP:
+            case SDLK_DOWN:
+            case SDLK_LEFT:
+            case SDLK_RIGHT:
+            case SDLK_W:
+            case SDLK_S:
+            case SDLK_A:
+            case SDLK_D:
+                // 2 escolhas (Sim/Nao): qualquer eixo alterna entre elas.
+                state.controls_restore_confirm_selected =
+                    1 - state.controls_restore_confirm_selected;
+                return SystemMenuAction::None;
+            case SDLK_ESCAPE:
+                state.controls_confirming_restore = false;  // cancela, sem mudar config
+                return SystemMenuAction::None;
+            case SDLK_RETURN:
+            case SDLK_KP_ENTER:
+            case SDLK_SPACE:
+                state.controls_confirming_restore = false;
+                if (state.controls_restore_confirm_selected == 0) {  // Sim
+                    state.controls_config = gus::domain::input::default_controls();
+                    state.controls_last_action_swapped = false;
+                    state.controls_last_swapped_with_action.clear();
+                    state.controls_last_swapped_with_label_key.clear();
+                    return SystemMenuAction::ControlsChanged;
+                }
+                return SystemMenuAction::None;  // Nao: cancela sem mudar nada
+            default:
+                return SystemMenuAction::None;
+        }
+    }
+
+    switch (key) {
+        case SDLK_UP:
+        case SDLK_W:
+            state.controls_selected = wrap_move(state.controls_selected, -1, kControlsItemCount);
+            state.controls_last_action_swapped = false;  // navegar limpa o aviso de troca
+            return SystemMenuAction::None;
+        case SDLK_DOWN:
+        case SDLK_S:
+            state.controls_selected = wrap_move(state.controls_selected, +1, kControlsItemCount);
+            state.controls_last_action_swapped = false;
+            return SystemMenuAction::None;
+        case SDLK_ESCAPE:
+            state.screen = parent_screen_of(SystemMenuScreen::Controls);  // ConfigCategories
+            return SystemMenuAction::Navigated;
+        case SDLK_RETURN:
+        case SDLK_KP_ENTER:
+        case SDLK_SPACE:
+            if (state.controls_selected < kControlsActionCount) {
+                state.controls_capturing = true;
+                state.controls_last_action_swapped = false;
+                return SystemMenuAction::None;
+            }
+            if (state.controls_selected == kControlsRestoreIndex) {
+                state.controls_confirming_restore = true;
+                state.controls_restore_confirm_selected = 1;  // default seguro = Nao
+                return SystemMenuAction::None;
+            }
+            // kControlsBackIndex
+            state.screen = parent_screen_of(SystemMenuScreen::Controls);
+            return SystemMenuAction::Navigated;
         default:
             return SystemMenuAction::None;
     }
@@ -211,12 +371,56 @@ SystemMenuAction system_menu_key_down(SystemMenuState& state,
             return handle_config_categories_key(state, key);
         case SystemMenuScreen::Audio:
             return handle_audio_key(state, key);
+        case SystemMenuScreen::Controls:
+            return handle_controls_key(state, key);
         case SystemMenuScreen::Save:
         case SystemMenuScreen::Video:
         case SystemMenuScreen::Language:
             return handle_placeholder_key(state, key);
     }
     return SystemMenuAction::None;
+}
+
+SystemMenuAction system_menu_controls_capture_key(SystemMenuState& state, bool is_escape,
+                                                   long long godot_keycode) noexcept {
+    if (!state.controls_capturing) {
+        return SystemMenuAction::None;  // defensivo: nao deveria ser chamado fora do modo
+    }
+    if (is_escape) {
+        state.controls_capturing = false;  // "Esc cancela a captura" (footer do mock)
+        return SystemMenuAction::None;
+    }
+    if (godot_keycode == 0) {
+        // Tecla sem correspondente conhecido (ver key_translation.hpp) - ignora,
+        // permanece capturando (o jogador tenta outra tecla).
+        return SystemMenuAction::None;
+    }
+
+    const std::string_view action_name = controls_action_name_at(state.controls_selected);
+    if (action_name.empty()) {
+        state.controls_capturing = false;  // defensivo: indice invalido
+        return SystemMenuAction::None;
+    }
+
+    const gus::domain::input::KeyBinding new_key{
+        .keycode = godot_keycode, .ctrl_pressed = false, .shift_pressed = false, .alt_pressed = false};
+    const gus::domain::input::KeyRemapResult result =
+        gus::domain::input::apply_key_remap(state.controls_config, std::string(action_name), new_key);
+
+    state.controls_capturing = false;
+    if (!result.changed) {
+        // No-op (mesma tecla de antes): nada a persistir, sem aviso de troca.
+        state.controls_last_action_swapped = false;
+        state.controls_last_swapped_with_action.clear();
+        state.controls_last_swapped_with_label_key.clear();
+        return SystemMenuAction::None;
+    }
+
+    state.controls_config = result.config;
+    state.controls_last_action_swapped = result.swapped;
+    state.controls_last_swapped_with_action = result.swapped_with_action_name;
+    state.controls_last_swapped_with_label_key = result.swapped_with_label_i18n_key;
+    return SystemMenuAction::ControlsChanged;
 }
 
 void system_menu_set_slider_ratio(SystemMenuState& state, int item,
@@ -266,6 +470,12 @@ SystemMenuAction click_config_categories_option(SystemMenuState& state, int inde
         case ConfigCategoryItem::Video:
             state.screen = SystemMenuScreen::Video;
             return SystemMenuAction::Navigated;
+        case ConfigCategoryItem::Controls:
+            state.screen = SystemMenuScreen::Controls;
+            state.controls_selected = 0;
+            state.controls_capturing = false;
+            state.controls_confirming_restore = false;
+            return SystemMenuAction::Navigated;
         case ConfigCategoryItem::Language:
             state.screen = SystemMenuScreen::Language;
             return SystemMenuAction::Navigated;
@@ -297,6 +507,50 @@ SystemMenuAction click_placeholder_option(SystemMenuState& state, int index) noe
     return SystemMenuAction::Navigated;
 }
 
+// Tela Controles (mouse): enquanto capturando, clique nao faz sentido (o
+// jogador precisa apertar uma tecla FISICA - ver system_menu_controls_capture_key)
+// - no-op. Enquanto confirmando o restaurar-padrao, `index` e reinterpretado
+// como a escolha do prompt (0=Sim, 1=Nao - MESMA convencao de
+// controls_restore_confirm_selected), clicavel nas 2 pills do mini-dialogo.
+// Caso contrario, `index` e a lista normal (0..kControlsActionCount-1 =
+// action, kControlsRestoreIndex/kControlsBackIndex = rodape) - clicar SEMPRE
+// foca+confirma na hora (equivalente a focar + ENTER), MESMA convencao das
+// outras telas.
+SystemMenuAction click_controls_option(SystemMenuState& state, int index) noexcept {
+    if (state.controls_capturing) return SystemMenuAction::None;
+
+    if (state.controls_confirming_restore) {
+        if (index != 0 && index != 1) return SystemMenuAction::None;
+        state.controls_restore_confirm_selected = index;
+        state.controls_confirming_restore = false;
+        if (index == 0) {  // Sim
+            state.controls_config = gus::domain::input::default_controls();
+            state.controls_last_action_swapped = false;
+            state.controls_last_swapped_with_action.clear();
+            state.controls_last_swapped_with_label_key.clear();
+            return SystemMenuAction::ControlsChanged;
+        }
+        return SystemMenuAction::None;  // Nao: cancela
+    }
+
+    if (index < 0 || index >= kControlsItemCount) return SystemMenuAction::None;
+    state.controls_selected = index;
+    state.controls_last_action_swapped = false;
+
+    if (index < kControlsActionCount) {
+        state.controls_capturing = true;
+        return SystemMenuAction::None;
+    }
+    if (index == kControlsRestoreIndex) {
+        state.controls_confirming_restore = true;
+        state.controls_restore_confirm_selected = 1;  // default seguro = Nao
+        return SystemMenuAction::None;
+    }
+    // kControlsBackIndex
+    state.screen = parent_screen_of(SystemMenuScreen::Controls);
+    return SystemMenuAction::Navigated;
+}
+
 }  // namespace
 
 SystemMenuAction system_menu_click_option(SystemMenuState& state,
@@ -310,6 +564,8 @@ SystemMenuAction system_menu_click_option(SystemMenuState& state,
             return click_config_categories_option(state, index);
         case SystemMenuScreen::Audio:
             return click_audio_option(state, index);
+        case SystemMenuScreen::Controls:
+            return click_controls_option(state, index);
         case SystemMenuScreen::Save:
         case SystemMenuScreen::Video:
         case SystemMenuScreen::Language:
@@ -330,6 +586,20 @@ int system_menu_hover_index(const SystemMenuState& state, float mouse_x, float m
             break;
         case SystemMenuScreen::Audio:
             count = kAudioItemCount;
+            break;
+        case SystemMenuScreen::Controls:
+            // Capturando: nada e hover-testavel (o jogador precisa apertar uma
+            // tecla FISICA, o mouse nao participa desse modo). Confirmando o
+            // restaurar-padrao: so as 2 pills do mini-dialogo (Sim/Nao, MESMA
+            // convencao de indice de click_controls_option). Caso contrario: a
+            // lista normal inteira (30 actions + Restaurar + Voltar).
+            if (state.controls_capturing) {
+                count = 0;
+            } else if (state.controls_confirming_restore) {
+                count = 2;
+            } else {
+                count = kControlsItemCount;
+            }
             break;
         case SystemMenuScreen::Save:
         case SystemMenuScreen::Video:

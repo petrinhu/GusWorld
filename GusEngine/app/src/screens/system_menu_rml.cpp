@@ -424,12 +424,15 @@ std::string build_config_categories_body(const SystemMenuState& state,
         const char* key;
         bool is_back;
     };
-    // Ordem da arvore aprovada: Audio / Video / Lingua / Voltar.
+    // Ordem da arvore aprovada: Audio / Video / Controles / Lingua / Voltar
+    // (Controles inserido entre Video e Lingua, M2 - ver ConfigCategoryItem no
+    // header pro racional de posicionamento).
     const Item items[kConfigCategoriesItemCount] = {
         {0, "SETTINGS_AUDIO", false},
         {1, "SETTINGS_VIDEO", false},
-        {2, "SETTINGS_LANGUAGE", false},
-        {3, "SETTINGS_BACK", true},
+        {2, "SETTINGS_CONTROLS", false},
+        {3, "SETTINGS_LANGUAGE", false},
+        {4, "SETTINGS_BACK", true},
     };
     for (const Item& item : items) {
         const bool focused = (state.config_categories_selected == item.index);

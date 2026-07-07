@@ -17,9 +17,15 @@
 #include <catch2/catch_approx.hpp>
 #include <catch2/catch_test_macros.hpp>
 
+#include <algorithm>
+#include <string>
+#include <vector>
+
 #include <SDL3/SDL.h>  // SDL_Keycode - mesmo padrao de battle_key_down (app/ ja usa SDL)
 
 #include "gus/app/screens/system_menu.hpp"
+#include "gus/domain/input/action_registry.hpp"
+#include "gus/domain/input/controls_restore.hpp"
 
 using namespace gus::app::screens;
 
@@ -36,6 +42,13 @@ void goto_config_categories(SystemMenuState& state) {
 void goto_audio(SystemMenuState& state) {
     goto_config_categories(state);
     system_menu_key_down(state, SDLK_RETURN);  // ConfigCategories: foco=Audio(0) -> entra
+}
+
+void goto_controls(SystemMenuState& state) {
+    goto_config_categories(state);
+    system_menu_key_down(state, SDLK_DOWN);
+    system_menu_key_down(state, SDLK_DOWN);    // ConfigCategories: foco=Controles(2)
+    system_menu_key_down(state, SDLK_RETURN);  // entra em Controls
 }
 
 }  // namespace
@@ -61,6 +74,8 @@ TEST_CASE("parent_screen_of: cada tela da arvore aponta pro pai correto",
     REQUIRE(parent_screen_of(SystemMenuScreen::Audio) ==
             SystemMenuScreen::ConfigCategories);
     REQUIRE(parent_screen_of(SystemMenuScreen::Video) ==
+            SystemMenuScreen::ConfigCategories);
+    REQUIRE(parent_screen_of(SystemMenuScreen::Controls) ==
             SystemMenuScreen::ConfigCategories);
     REQUIRE(parent_screen_of(SystemMenuScreen::Language) ==
             SystemMenuScreen::ConfigCategories);
@@ -183,8 +198,8 @@ TEST_CASE("Save (placeholder): UP/DOWN/LEFT/RIGHT nao fazem nada (sem controle, 
 
 // ---------------------------------------------------------------- ConfigCategories
 
-TEST_CASE("ConfigCategories: UP/DOWN navega os 4 itens com WRAP (Audio/Video/"
-          "Lingua/Voltar)",
+TEST_CASE("ConfigCategories: UP/DOWN navega os 5 itens com WRAP (Audio/Video/"
+          "Controles/Lingua/Voltar)",
           "[system_menu]") {
     SystemMenuState state;
     goto_config_categories(state);
@@ -196,8 +211,25 @@ TEST_CASE("ConfigCategories: UP/DOWN navega os 4 itens com WRAP (Audio/Video/"
     REQUIRE(state.config_categories_selected == 2);
     system_menu_key_down(state, SDLK_DOWN);
     REQUIRE(state.config_categories_selected == 3);
+    system_menu_key_down(state, SDLK_DOWN);
+    REQUIRE(state.config_categories_selected == 4);
     system_menu_key_down(state, SDLK_DOWN);  // wrap
     REQUIRE(state.config_categories_selected == 0);
+}
+
+TEST_CASE("ConfigCategories: ENTER em Controles (item 2, M2) abre a tela "
+          "Controls, foco inicial = primeira action",
+          "[system_menu]") {
+    SystemMenuState state;
+    goto_config_categories(state);
+    system_menu_key_down(state, SDLK_DOWN);
+    system_menu_key_down(state, SDLK_DOWN);  // item 2 = Controles
+    const SystemMenuAction action = system_menu_key_down(state, SDLK_RETURN);
+    REQUIRE(action == SystemMenuAction::Navigated);
+    REQUIRE(state.screen == SystemMenuScreen::Controls);
+    REQUIRE(state.controls_selected == 0);
+    REQUIRE_FALSE(state.controls_capturing);
+    REQUIRE_FALSE(state.controls_confirming_restore);
 }
 
 TEST_CASE("ConfigCategories: ENTER em Audio (item 0) abre a tela Audio, foco "
@@ -222,19 +254,20 @@ TEST_CASE("ConfigCategories: ENTER em Video (item 1) abre a tela Video "
     REQUIRE(state.screen == SystemMenuScreen::Video);
 }
 
-TEST_CASE("ConfigCategories: ENTER em Lingua (item 2) abre a tela Language "
+TEST_CASE("ConfigCategories: ENTER em Lingua (item 3) abre a tela Language "
           "(placeholder)",
           "[system_menu]") {
     SystemMenuState state;
     goto_config_categories(state);
     system_menu_key_down(state, SDLK_DOWN);
-    system_menu_key_down(state, SDLK_DOWN);  // item 2 = Lingua
+    system_menu_key_down(state, SDLK_DOWN);
+    system_menu_key_down(state, SDLK_DOWN);  // item 3 = Lingua
     const SystemMenuAction action = system_menu_key_down(state, SDLK_RETURN);
     REQUIRE(action == SystemMenuAction::Navigated);
     REQUIRE(state.screen == SystemMenuScreen::Language);
 }
 
-TEST_CASE("ConfigCategories: ESC ou ENTER em Voltar (item 3) voltam pro Pause "
+TEST_CASE("ConfigCategories: ESC ou ENTER em Voltar (item 4) voltam pro Pause "
           "preservando a selecao anterior de Pause (Configuracoes)",
           "[system_menu]") {
     SystemMenuState state;
@@ -248,7 +281,8 @@ TEST_CASE("ConfigCategories: ESC ou ENTER em Voltar (item 3) voltam pro Pause "
     goto_config_categories(state);
     system_menu_key_down(state, SDLK_DOWN);
     system_menu_key_down(state, SDLK_DOWN);
-    system_menu_key_down(state, SDLK_DOWN);  // item 3 = Voltar
+    system_menu_key_down(state, SDLK_DOWN);
+    system_menu_key_down(state, SDLK_DOWN);  // item 4 = Voltar
     const SystemMenuAction back_action = system_menu_key_down(state, SDLK_RETURN);
     REQUIRE(back_action == SystemMenuAction::Navigated);
     REQUIRE(state.screen == SystemMenuScreen::Pause);
@@ -276,7 +310,8 @@ TEST_CASE("Language (placeholder): ENTER volta pra ConfigCategories",
     SystemMenuState state;
     goto_config_categories(state);
     system_menu_key_down(state, SDLK_DOWN);
-    system_menu_key_down(state, SDLK_DOWN);    // foco = Lingua (2)
+    system_menu_key_down(state, SDLK_DOWN);
+    system_menu_key_down(state, SDLK_DOWN);    // foco = Lingua (3)
     system_menu_key_down(state, SDLK_RETURN);  // entra em Language
     REQUIRE(state.screen == SystemMenuScreen::Language);
 
@@ -381,6 +416,318 @@ TEST_CASE("Audio: ESC ou ENTER em Voltar voltam pra ConfigCategories "
     REQUIRE(state.screen == SystemMenuScreen::ConfigCategories);
 }
 
+// ---------------------------------------------------------------- Controls (M2)
+
+TEST_CASE("controls_action_name_at/controls_group_at: as 30 posicoes cobrem "
+          "EXATAMENTE o ActionRegistry (sem repetir, sem faltar), grupos em "
+          "ordem nao-decrescente 0..3",
+          "[system_menu][controls]") {
+    std::vector<std::string> seen;
+    int last_group = -1;
+    for (int i = 0; i < kControlsActionCount; ++i) {
+        const std::string_view name = controls_action_name_at(i);
+        REQUIRE_FALSE(name.empty());
+        REQUIRE(gus::domain::input::ActionRegistry::get_by_name(name) != nullptr);
+        seen.emplace_back(name);
+
+        const int group = controls_group_at(i);
+        REQUIRE(group >= 0);
+        REQUIRE(group <= 3);
+        REQUIRE(group >= last_group);  // nao-decrescente (agrupado)
+        last_group = group;
+    }
+    // Sem repeticao.
+    std::sort(seen.begin(), seen.end());
+    REQUIRE(std::adjacent_find(seen.begin(), seen.end()) == seen.end());
+    // Cobre TODAS as actions do registry (mesma cardinalidade + mesmo conteudo).
+    REQUIRE(static_cast<int>(seen.size()) ==
+            gus::domain::input::ActionRegistry::count());
+    for (const auto& def : gus::domain::input::ActionRegistry::actions()) {
+        REQUIRE(std::binary_search(seen.begin(), seen.end(), def.action_name));
+    }
+}
+
+TEST_CASE("controls_action_name_at/controls_group_at: indice fora do intervalo "
+          "e defensivo (vazio/-1)",
+          "[system_menu][controls]") {
+    REQUIRE(controls_action_name_at(-1).empty());
+    REQUIRE(controls_action_name_at(kControlsActionCount).empty());
+    REQUIRE(controls_group_at(-1) == -1);
+    REQUIRE(controls_group_at(kControlsActionCount) == -1);
+}
+
+TEST_CASE("Controls: UP/DOWN navega os 32 itens com WRAP (30 actions + "
+          "Restaurar padrao + Voltar)",
+          "[system_menu][controls]") {
+    SystemMenuState state;
+    goto_controls(state);
+    REQUIRE(state.screen == SystemMenuScreen::Controls);
+    REQUIRE(state.controls_selected == 0);
+
+    for (int i = 1; i < kControlsItemCount; ++i) {
+        system_menu_key_down(state, SDLK_DOWN);
+        REQUIRE(state.controls_selected == i);
+    }
+    system_menu_key_down(state, SDLK_DOWN);  // wrap
+    REQUIRE(state.controls_selected == 0);
+
+    system_menu_key_down(state, SDLK_UP);  // wrap pro fim
+    REQUIRE(state.controls_selected == kControlsBackIndex);
+}
+
+TEST_CASE("Controls: ESC na navegacao normal volta pra ConfigCategories "
+          "preservando a selecao (Controles)",
+          "[system_menu][controls]") {
+    SystemMenuState state;
+    goto_controls(state);
+    const SystemMenuAction action = system_menu_key_down(state, SDLK_ESCAPE);
+    REQUIRE(action == SystemMenuAction::Navigated);
+    REQUIRE(state.screen == SystemMenuScreen::ConfigCategories);
+    REQUIRE(state.config_categories_selected == static_cast<int>(ConfigCategoryItem::Controls));
+}
+
+TEST_CASE("Controls: ENTER numa action entra em modo CAPTURA (nao muda de "
+          "tela)",
+          "[system_menu][controls]") {
+    SystemMenuState state;
+    goto_controls(state);
+    const SystemMenuAction action = system_menu_key_down(state, SDLK_RETURN);
+    REQUIRE(action == SystemMenuAction::None);
+    REQUIRE(state.controls_capturing);
+    REQUIRE(state.screen == SystemMenuScreen::Controls);
+}
+
+TEST_CASE("Controls: ENQUANTO capturando, system_menu_key_down normal e "
+          "no-op defensivo (o CHAMADOR deve rotear pra "
+          "system_menu_controls_capture_key)",
+          "[system_menu][controls]") {
+    SystemMenuState state;
+    goto_controls(state);
+    system_menu_key_down(state, SDLK_RETURN);  // entra em captura
+    REQUIRE(state.controls_capturing);
+
+    const SystemMenuAction action = system_menu_key_down(state, SDLK_DOWN);
+    REQUIRE(action == SystemMenuAction::None);
+    REQUIRE(state.controls_selected == 0);  // nao navegou
+    REQUIRE(state.controls_capturing);      // continua capturando
+}
+
+TEST_CASE("system_menu_controls_capture_key: Esc CANCELA a captura sem mudar "
+          "o config",
+          "[system_menu][controls]") {
+    SystemMenuState state;
+    goto_controls(state);
+    state.controls_config = gus::domain::input::default_controls();
+    const gus::domain::input::InputRemapConfig before = state.controls_config;
+    system_menu_key_down(state, SDLK_RETURN);  // entra em captura (action 0 = move_forward)
+    REQUIRE(state.controls_capturing);
+
+    const SystemMenuAction action =
+        system_menu_controls_capture_key(state, /*is_escape=*/true, /*godot_keycode=*/0);
+    REQUIRE(action == SystemMenuAction::None);
+    REQUIRE_FALSE(state.controls_capturing);
+    REQUIRE(state.controls_config == before);
+}
+
+TEST_CASE("system_menu_controls_capture_key: tecla LIVRE aplica o remap e "
+          "devolve ControlsChanged",
+          "[system_menu][controls]") {
+    SystemMenuState state;
+    goto_controls(state);
+    state.controls_config = gus::domain::input::default_controls();
+    system_menu_key_down(state, SDLK_RETURN);  // captura action 0 = move_forward (default 'W')
+    REQUIRE(state.controls_capturing);
+
+    const SystemMenuAction action =
+        system_menu_controls_capture_key(state, /*is_escape=*/false, /*godot_keycode=*/'K');
+    REQUIRE(action == SystemMenuAction::ControlsChanged);
+    REQUIRE_FALSE(state.controls_capturing);
+    REQUIRE_FALSE(state.controls_last_action_swapped);
+
+    const auto& actions = state.controls_config.actions;
+    const auto it = std::find_if(actions.begin(), actions.end(), [](const auto& a) {
+        return a.action_name == "move_forward";
+    });
+    REQUIRE(it != actions.end());
+    REQUIRE(it->keys.front().keycode == 'K');
+}
+
+TEST_CASE("system_menu_controls_capture_key: CONFLITO troca com a outra "
+          "action e preenche o aviso de swap",
+          "[system_menu][controls]") {
+    SystemMenuState state;
+    goto_controls(state);
+    state.controls_config = gus::domain::input::default_controls();
+    system_menu_key_down(state, SDLK_RETURN);  // captura action 0 = move_forward ('W')
+
+    // move_backward e 'S' por default (action 1 da lista curada).
+    const SystemMenuAction action =
+        system_menu_controls_capture_key(state, /*is_escape=*/false, /*godot_keycode=*/'S');
+    REQUIRE(action == SystemMenuAction::ControlsChanged);
+    REQUIRE(state.controls_last_action_swapped);
+    REQUIRE(state.controls_last_swapped_with_action == "move_backward");
+    REQUIRE_FALSE(state.controls_last_swapped_with_label_key.empty());
+
+    const auto& actions = state.controls_config.actions;
+    auto find_action = [&](const char* name) {
+        return std::find_if(actions.begin(), actions.end(),
+                             [&](const auto& a) { return a.action_name == name; });
+    };
+    REQUIRE(find_action("move_forward")->keys.front().keycode == 'S');
+    REQUIRE(find_action("move_backward")->keys.front().keycode == 'W');
+}
+
+TEST_CASE("system_menu_controls_capture_key: keycode SENTINELA (0, tecla sem "
+          "correspondente) e ignorado - permanece capturando",
+          "[system_menu][controls]") {
+    SystemMenuState state;
+    goto_controls(state);
+    state.controls_config = gus::domain::input::default_controls();
+    const gus::domain::input::InputRemapConfig before = state.controls_config;
+    system_menu_key_down(state, SDLK_RETURN);
+
+    const SystemMenuAction action =
+        system_menu_controls_capture_key(state, /*is_escape=*/false, /*godot_keycode=*/0);
+    REQUIRE(action == SystemMenuAction::None);
+    REQUIRE(state.controls_capturing);  // continua capturando
+    REQUIRE(state.controls_config == before);
+}
+
+TEST_CASE("system_menu_controls_capture_key: chamado FORA do modo captura e "
+          "no-op defensivo",
+          "[system_menu][controls]") {
+    SystemMenuState state;
+    goto_controls(state);
+    state.controls_config = gus::domain::input::default_controls();
+    const gus::domain::input::InputRemapConfig before = state.controls_config;
+    REQUIRE_FALSE(state.controls_capturing);
+
+    const SystemMenuAction action =
+        system_menu_controls_capture_key(state, /*is_escape=*/false, /*godot_keycode=*/'K');
+    REQUIRE(action == SystemMenuAction::None);
+    REQUIRE(state.controls_config == before);
+}
+
+TEST_CASE("Controls: ENTER em Restaurar padrao (kControlsRestoreIndex) abre o "
+          "prompt de confirmacao SEM mudar o config ainda",
+          "[system_menu][controls]") {
+    SystemMenuState state;
+    goto_controls(state);
+    state.controls_config = gus::domain::input::default_controls();
+    // Rebind move_forward pra 'K' - deve SOBREVIVER ate a confirmacao de fato.
+    system_menu_key_down(state, SDLK_RETURN);
+    system_menu_controls_capture_key(state, false, 'K');
+
+    state.controls_selected = kControlsRestoreIndex;
+    const SystemMenuAction action = system_menu_key_down(state, SDLK_RETURN);
+    REQUIRE(action == SystemMenuAction::None);
+    REQUIRE(state.controls_confirming_restore);
+    REQUIRE(state.controls_restore_confirm_selected == 1);  // default seguro = Nao
+
+    const auto& actions = state.controls_config.actions;
+    const auto it = std::find_if(actions.begin(), actions.end(), [](const auto& a) {
+        return a.action_name == "move_forward";
+    });
+    REQUIRE(it->keys.front().keycode == 'K');  // ainda nao restaurou
+}
+
+TEST_CASE("Controls: confirmar restaurar (Sim) aplica default_controls() e "
+          "devolve ControlsChanged; Esc/Nao CANCELA sem mudar nada",
+          "[system_menu][controls]") {
+    // Caminho Nao/Esc: cancela, config customizado sobrevive.
+    {
+        SystemMenuState state;
+        goto_controls(state);
+        state.controls_config = gus::domain::input::default_controls();
+        system_menu_key_down(state, SDLK_RETURN);
+        system_menu_controls_capture_key(state, false, 'K');
+        const gus::domain::input::InputRemapConfig customizado = state.controls_config;
+
+        state.controls_selected = kControlsRestoreIndex;
+        system_menu_key_down(state, SDLK_RETURN);  // abre o prompt
+        REQUIRE(state.controls_confirming_restore);
+
+        const SystemMenuAction esc_action = system_menu_key_down(state, SDLK_ESCAPE);
+        REQUIRE(esc_action == SystemMenuAction::None);
+        REQUIRE_FALSE(state.controls_confirming_restore);
+        REQUIRE(state.controls_config == customizado);  // intacto
+    }
+
+    // Caminho Sim: LEFT/RIGHT alterna pra Sim (indice 0), ENTER confirma.
+    {
+        SystemMenuState state;
+        goto_controls(state);
+        state.controls_config = gus::domain::input::default_controls();
+        system_menu_key_down(state, SDLK_RETURN);
+        system_menu_controls_capture_key(state, false, 'K');  // customiza
+
+        state.controls_selected = kControlsRestoreIndex;
+        system_menu_key_down(state, SDLK_RETURN);  // abre o prompt (default = Nao)
+        REQUIRE(state.controls_restore_confirm_selected == 1);
+        system_menu_key_down(state, SDLK_LEFT);  // alterna pra Sim (0)
+        REQUIRE(state.controls_restore_confirm_selected == 0);
+
+        const SystemMenuAction action = system_menu_key_down(state, SDLK_RETURN);
+        REQUIRE(action == SystemMenuAction::ControlsChanged);
+        REQUIRE_FALSE(state.controls_confirming_restore);
+        REQUIRE(state.controls_config == gus::domain::input::default_controls());
+    }
+}
+
+TEST_CASE("Controls: ENTER em Voltar (kControlsBackIndex) volta pra "
+          "ConfigCategories",
+          "[system_menu][controls]") {
+    SystemMenuState state;
+    goto_controls(state);
+    state.controls_selected = kControlsBackIndex;
+    const SystemMenuAction action = system_menu_key_down(state, SDLK_RETURN);
+    REQUIRE(action == SystemMenuAction::Navigated);
+    REQUIRE(state.screen == SystemMenuScreen::ConfigCategories);
+}
+
+TEST_CASE("system_menu_click_option (Controls): clicar numa action foca+entra "
+          "em captura; clicar em Restaurar/Voltar confirma na hora",
+          "[system_menu][controls]") {
+    SystemMenuState state;
+    goto_controls(state);
+
+    SystemMenuState action_click = state;
+    REQUIRE(system_menu_click_option(action_click, 3) == SystemMenuAction::None);
+    REQUIRE(action_click.controls_selected == 3);
+    REQUIRE(action_click.controls_capturing);
+
+    SystemMenuState restore_click = state;
+    REQUIRE(system_menu_click_option(restore_click, kControlsRestoreIndex) ==
+            SystemMenuAction::None);
+    REQUIRE(restore_click.controls_confirming_restore);
+
+    SystemMenuState back_click = state;
+    REQUIRE(system_menu_click_option(back_click, kControlsBackIndex) ==
+            SystemMenuAction::Navigated);
+    REQUIRE(back_click.screen == SystemMenuScreen::ConfigCategories);
+}
+
+TEST_CASE("system_menu_click_option (Controls): durante confirmar-restaurar, "
+          "indice reinterpretado como Sim(0)/Nao(1)",
+          "[system_menu][controls]") {
+    SystemMenuState state;
+    goto_controls(state);
+    state.controls_config = gus::domain::input::default_controls();
+    state.controls_selected = kControlsRestoreIndex;
+    system_menu_key_down(state, SDLK_RETURN);  // abre o prompt
+    REQUIRE(state.controls_confirming_restore);
+
+    SystemMenuState click_yes = state;
+    const SystemMenuAction yes_action = system_menu_click_option(click_yes, 0);
+    REQUIRE(yes_action == SystemMenuAction::ControlsChanged);
+    REQUIRE_FALSE(click_yes.controls_confirming_restore);
+
+    SystemMenuState click_no = state;
+    const SystemMenuAction no_action = system_menu_click_option(click_no, 1);
+    REQUIRE(no_action == SystemMenuAction::None);
+    REQUIRE_FALSE(click_no.controls_confirming_restore);
+}
+
 // ---------------------------------------------------------------- Genericos
 
 TEST_CASE("system_menu_close: fecha de qualquer tela (mesmo funda na arvore) "
@@ -436,7 +783,7 @@ TEST_CASE("system_menu_click_option (Pause): clicar numa pill seleciona E "
 }
 
 TEST_CASE("system_menu_click_option (ConfigCategories): clicar em qualquer "
-          "categoria confirma na hora (Audio/Video/Lingua/Voltar)",
+          "categoria confirma na hora (Audio/Video/Controles/Lingua/Voltar)",
           "[system_menu]") {
     SystemMenuState state;
     goto_config_categories(state);
@@ -450,12 +797,16 @@ TEST_CASE("system_menu_click_option (ConfigCategories): clicar em qualquer "
     REQUIRE(system_menu_click_option(video, 1) == SystemMenuAction::Navigated);
     REQUIRE(video.screen == SystemMenuScreen::Video);
 
+    SystemMenuState controls = state;
+    REQUIRE(system_menu_click_option(controls, 2) == SystemMenuAction::Navigated);
+    REQUIRE(controls.screen == SystemMenuScreen::Controls);
+
     SystemMenuState lang = state;
-    REQUIRE(system_menu_click_option(lang, 2) == SystemMenuAction::Navigated);
+    REQUIRE(system_menu_click_option(lang, 3) == SystemMenuAction::Navigated);
     REQUIRE(lang.screen == SystemMenuScreen::Language);
 
     SystemMenuState back = state;
-    REQUIRE(system_menu_click_option(back, 3) == SystemMenuAction::Navigated);
+    REQUIRE(system_menu_click_option(back, 4) == SystemMenuAction::Navigated);
     REQUIRE(back.screen == SystemMenuScreen::Pause);
 }
 
