@@ -1243,3 +1243,87 @@ TEST_CASE("controls_row_visible_in_list: linhas exatamente ADJACENTES (fim de "
     REQUIRE(controls_row_visible_in_list(/*row_top=*/135.0f, /*row_h=*/33.2f,
                                           /*list_top=*/168.2f, /*list_h=*/220.0f) == false);
 }
+
+// ------------------------------------------- SCROLL (M2/GLINTFX-SCROLL v0.4.0)
+
+TEST_CASE("controls_scroll_target_index: fora da tela Controles devolve -1 "
+          "(nenhuma das outras telas tem lista rolavel)",
+          "[system_menu][controls][scroll]") {
+    SystemMenuState state;
+    system_menu_open(state);  // screen = Pause
+    REQUIRE(controls_scroll_target_index(state) == -1);
+}
+
+TEST_CASE("controls_scroll_target_index: navegacao normal em Controles devolve "
+          "controls_selected (indice->id via controls_item_id no CHAMADOR)",
+          "[system_menu][controls][scroll]") {
+    SystemMenuState state;
+    goto_controls(state);
+    for (int i = 0; i < 25; ++i) {
+        system_menu_key_down(state, SDLK_DOWN);
+    }
+    REQUIRE(state.controls_selected == 25);
+    REQUIRE(controls_scroll_target_index(state) == 25);
+}
+
+TEST_CASE("controls_scroll_target_index: capturando tecla (mesma linha de "
+          "antes de entrar em captura) ainda devolve o indice - scroll de novo "
+          "pra uma linha ja visivel e no-op seguro",
+          "[system_menu][controls][scroll]") {
+    SystemMenuState state;
+    goto_controls(state);
+    system_menu_key_down(state, SDLK_DOWN);  // controls_selected = 1
+    system_menu_key_down(state, SDLK_RETURN);  // entra em captura
+    REQUIRE(state.controls_capturing == true);
+    REQUIRE(controls_scroll_target_index(state) == 1);
+}
+
+TEST_CASE("controls_scroll_target_index: mini-dialogo Restaurar padrao aberto "
+          "devolve -1 (pills Sim/Nao ficam FORA de .ctrl-list - a lista por "
+          "baixo nao deve pular de posicao)",
+          "[system_menu][controls][scroll]") {
+    SystemMenuState state;
+    goto_controls(state);
+    for (int i = 0; i < kControlsRestoreIndex; ++i) {
+        system_menu_key_down(state, SDLK_DOWN);
+    }
+    system_menu_key_down(state, SDLK_RETURN);  // abre o prompt "tem certeza?"
+    REQUIRE(state.controls_confirming_restore == true);
+    REQUIRE(controls_scroll_target_index(state) == -1);
+}
+
+TEST_CASE("controls_scroll_target_index: mini-dialogo Descartar alteracoes "
+          "aberto devolve -1 (MESMA mecanica do Restaurar acima)",
+          "[system_menu][controls][scroll]") {
+    SystemMenuState state;
+    goto_controls(state);
+    state.controls_confirming_discard = true;
+    REQUIRE(controls_scroll_target_index(state) == -1);
+}
+
+TEST_CASE("system_menu_wheel_delta_to_rmlui: rolar a roda pra CIMA (SDL "
+          "wheel.y positivo) produz delta NEGATIVO pro RmlUi (rola pra cima = "
+          "revela conteudo acima = scrollTop diminui)",
+          "[system_menu][controls][scroll]") {
+    REQUIRE(system_menu_wheel_delta_to_rmlui(1.0f, /*flipped=*/false) == Catch::Approx(-1.0f));
+}
+
+TEST_CASE("system_menu_wheel_delta_to_rmlui: rolar a roda pra BAIXO (SDL "
+          "wheel.y negativo) produz delta POSITIVO pro RmlUi",
+          "[system_menu][controls][scroll]") {
+    REQUIRE(system_menu_wheel_delta_to_rmlui(-1.0f, /*flipped=*/false) == Catch::Approx(1.0f));
+}
+
+TEST_CASE("system_menu_wheel_delta_to_rmlui: SDL_MOUSEWHEEL_FLIPPED inverte o "
+          "sinal ANTES de aplicar a convencao do RmlUi (dobra a inversao)",
+          "[system_menu][controls][scroll]") {
+    REQUIRE(system_menu_wheel_delta_to_rmlui(1.0f, /*flipped=*/true) == Catch::Approx(1.0f));
+    REQUIRE(system_menu_wheel_delta_to_rmlui(-1.0f, /*flipped=*/true) == Catch::Approx(-1.0f));
+}
+
+TEST_CASE("system_menu_wheel_delta_to_rmlui: valores fracionarios (trackpad) "
+          "preservam magnitude, so o sinal inverte",
+          "[system_menu][controls][scroll]") {
+    REQUIRE(system_menu_wheel_delta_to_rmlui(0.35f, /*flipped=*/false) ==
+            Catch::Approx(-0.35f));
+}

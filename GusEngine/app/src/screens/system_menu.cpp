@@ -696,6 +696,17 @@ bool controls_row_visible_in_list(float row_top, float row_h, float list_top,
     return row_top < (list_top + list_h) && (row_top + row_h) > list_top;
 }
 
+int controls_scroll_target_index(const SystemMenuState& state) noexcept {
+    if (state.screen != SystemMenuScreen::Controls) return -1;
+    if (state.controls_confirming_restore || state.controls_confirming_discard) return -1;
+    return state.controls_selected;
+}
+
+float system_menu_wheel_delta_to_rmlui(float sdl_wheel_y, bool flipped) noexcept {
+    const float dy = flipped ? -sdl_wheel_y : sdl_wheel_y;
+    return -dy;  // SDL: positivo = rolar pra cima; RmlUi: positivo rola pra baixo.
+}
+
 int system_menu_hover_index(const SystemMenuState& state, float mouse_x, float mouse_y,
                              const SystemMenuHoverBox boxes[kSystemMenuMaxHoverItems]) noexcept {
     int count = 0;

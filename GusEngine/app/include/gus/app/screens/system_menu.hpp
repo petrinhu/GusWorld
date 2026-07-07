@@ -396,6 +396,46 @@ struct SystemMenuHoverBox {
 [[nodiscard]] bool controls_row_visible_in_list(float row_top, float row_h,
                                                  float list_top, float list_h) noexcept;
 
+// ------------------------------------------------ SCROLL (M2/GLINTFX-SCROLL)
+//
+// A v0.4.0 do glintfx entrega scroll DE VERDADE em embed mode
+// (UiLayer::scroll_element_into_view + UiEvent::Type::MouseWheel) - antes
+// disso `.ctrl-list` (overflow-y:auto) nunca rolava de fato (scrollTop ficava
+// sempre 0), so ~6 das 30 actions eram alcancaveis por teclado/mouse (o resto
+// ficava fora do recorte visivel de 220dp, ver controls_row_visible_in_list
+// acima). As 2 funcoes abaixo sao a fatia PURA/testavel da integracao (o
+// CHAMADOR - system_menu_loop.cpp - faz as chamadas GL-heavy de verdade:
+// glintfx::UiLayer::scroll_element_into_view/process_event).
+
+// Devolve o INDICE (0..kControlsItemCount-1) da linha que o CHAMADOR deve
+// rolar pra dentro da vista via UiLayer::scroll_element_into_view (mapeando
+// indice->id via controls_item_id, a MESMA convencao "controls-item-<indice>"
+// ja usada pelo hit-test de clique em system_menu_loop.cpp), ou -1 quando
+// nenhuma rolagem programatica faz sentido no estado ATUAL. -1 em 2 casos:
+// (1) screen != Controls (as demais telas nao tem lista rolavel); (2) um dos
+// mini-dialogos modais esta aberto (controls_confirming_restore/
+// controls_confirming_discard) - as pills Sim/Nao desses prompts ficam FORA
+// de `.ctrl-list` (ver system_menu_rml.cpp), entao a lista de actions por
+// baixo NAO deve pular de posicao enquanto o prompt esta em foco. Fora desses
+// 2 casos (inclui controls_capturing=true - "Pressione uma tecla...", MESMA
+// linha state.controls_selected de antes de entrar em captura): devolve
+// state.controls_selected - chamar scroll_element_into_view de novo pra uma
+// linha que ja esta visivel e um no-op seguro (RmlUi so move o scroll quando
+// precisa), entao nao ha necessidade de mais um caso especial aqui.
+[[nodiscard]] int controls_scroll_target_index(const SystemMenuState& state) noexcept;
+
+// Converte o delta de wheel do SDL (SDL_MouseWheelEvent.y - positivo = "away
+// from user", rolar a roda pra CIMA no sentido tradicional) pro delta que o
+// glintfx::UiEvent::Type::MouseWheel espera (positivo ROLA PRA BAIXO - ver o
+// doc-comment do enum na v0.4.0, que cita Rml::Context::ProcessMouseWheel).
+// Rolar a roda pra cima deve revelar conteudo ACIMA (scrollTop diminui, delta
+// NEGATIVO no RmlUi) - por isso o sinal invertido. `flipped` cobre
+// SDL_MOUSEWHEEL_FLIPPED (device/driver que inverte X/Y - a doc do SDL3
+// manda multiplicar por -1 pra desfazer ANTES de aplicar qualquer outra
+// convencao). Pura o bastante pra nao precisar de SDL_Event completo - so os
+// 2 campos que importam pro calculo.
+[[nodiscard]] float system_menu_wheel_delta_to_rmlui(float sdl_wheel_y, bool flipped) noexcept;
+
 // Numero MAXIMO de itens hover-testaveis numa unica tela (M2: Controles tem
 // kControlsItemCount=33, agora a MAIOR de todas - era Pause/ConfigCategories
 // com 4 cada antes da tela Controles existir; Audio tem 3, Save/Video/Language
