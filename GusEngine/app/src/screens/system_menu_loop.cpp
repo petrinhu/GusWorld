@@ -501,6 +501,114 @@ SystemMenuLoopOutcome run_system_menu_loop_gl_current(
         return outcome;
     }
 
+    // DIAGNOSTICO/PROVA (TELA CONTROLES, M2, 3 bugs ao vivo reportados pelo lider):
+    // GUSWORLD_SYSMENU_CONTROLS_SELFTEST=1 entra em Controles (navegacao REAL via
+    // system_menu_key_down, MESMO caminho de codigo do teclado de producao - SEM
+    // SDL_PushEvent, MESMO espirito do GUSWORLD_SYSMENU_HOVER_SELFTEST acima) e
+    // MEDE/EXERCITA os 3 pontos que quebraram:
+    //   BUG-1 (painel estourava a viewport, rodape cortado): confere que o
+    //     bottom do #sysmenu-panel cabe dentro de `ph` (achado por probe Xvfb :99:
+    //     `top:90dp` herdado + `.ctrl-list{height:270dp}` somavam ~525dp de
+    //     conteudo, estourando o canvas de 540dp - FIX: `.wide{top:20dp}` +
+    //     `.ctrl-list{height:220dp}`, ver os comentarios no <style> acima).
+    //   BUG-A (achado NOVO nesta investigacao, causa raiz do "mouse nao
+    //     seleciona nada"): `.ctrl-row` (display:flex, filho de `.ctrl-list` que
+    //     tem `overflow-y:auto`) colapsava pra ~16px de largura (so o padding -
+    //     o conteudo flex ficava com largura 0) em vez de ~750px - a caixa de
+    //     hit-test (get_element_box, MESMA que o mouse do loop usa) ficava uma
+    //     fresta de 12dp perto da borda esquerda; qualquer clique no resto da
+    //     linha (onde o jogador VE o texto, que so visualmente transbordava a
+    //     caixa colapsada) errava o hit-test. FIX: `box-sizing:border-box;
+    //     width:558dp` explicito em .ctrl-row (sidesteps o bug de
+    //     overflow-auto+flex sem width explicita - width:100% tambem falhava,
+    //     so um comprimento ABSOLUTO fixou). Confere que a largura medida e
+    //     grande o bastante pro clique acertar a linha inteira.
+    //   BUG-2 (coluna Teclado mostrava "-" em vez de "W"): NAO reproduziu nem no
+    //     teste unitario (system_menu_rml_test.cpp) nem neste self-test ao vivo -
+    //     o keycap correto ("W") sempre apareceu no RML gerado com
+    //     default_controls(). Mantido aqui como guarda de regressao (BUG-A podia
+    //     ser a causa visual: com a linha colapsada a 16px, "W"/"-" ficavam
+    //     espremidos quase um em cima do outro perto da borda esquerda - com a
+    //     largura corrigida, as 3 colunas ficam nos offsets certos, sem overlap).
+    const char* controls_selftest = std::getenv("GUSWORLD_SYSMENU_CONTROLS_SELFTEST");
+    if (controls_selftest != nullptr && controls_selftest[0] != '\0') {
+        // Pause -> ConfigCategories -> Controls (navegacao REAL via system_menu_key_down).
+        system_menu_key_down(state, SDLK_DOWN);    // Continue->Save
+        system_menu_key_down(state, SDLK_DOWN);    // Save->Settings
+        system_menu_key_down(state, SDLK_RETURN);  // entra ConfigCategories
+        system_menu_key_down(state, SDLK_DOWN);    // Audio->Video
+        system_menu_key_down(state, SDLK_DOWN);    // Video->Controls
+        system_menu_key_down(state, SDLK_RETURN);  // entra Controls
+        reload();
+        present_frame();
+        present_frame();  // 2o update() por seguranca (layout assentado)
+
+        // BUG-1: o painel (e o rodape Restaurar/Voltar) tem que caber na viewport.
+        const glintfx::ElementBox panel = ui.get_element_box("sysmenu-panel");
+        const glintfx::ElementBox back_btn =
+            ui.get_element_box(controls_item_id(kControlsBackIndex).c_str());
+        std::cout << "SystemMenuLoop: [selftest][BUG-1] viewport ph=" << ph
+                  << " panel_bottom=" << (panel.y + panel.h)
+                  << " (esperado <= " << ph << ") - "
+                  << ((panel.y + panel.h) <= static_cast<float>(ph) ? "OK" : "FALHOU")
+                  << "\n";
+        std::cout << "SystemMenuLoop: [selftest][BUG-1] botao Voltar do rodape: found="
+                  << back_btn.found << " bottom=" << (back_btn.y + back_btn.h)
+                  << " (esperado found=1 e <= " << ph << ") - "
+                  << (back_btn.found && (back_btn.y + back_btn.h) <= static_cast<float>(ph)
+                          ? "OK"
+                          : "FALHOU")
+                  << "\n";
+
+        // BUG-A: a caixa de hit-test da linha 0 precisa cobrir a linha INTEIRA
+        // (nao so os ~16px de padding do bug original).
+        const glintfx::ElementBox row0 = ui.get_element_box(controls_item_id(0).c_str());
+        std::cout << "SystemMenuLoop: [selftest][BUG-A] largura hit-test da linha 0: w="
+                  << row0.w << " (esperado > 400px, era ~16px no bug) - "
+                  << (row0.w > 400.0f ? "OK" : "FALHOU") << "\n";
+
+        // BUG-2: o keycap de move_forward (1a linha) tem que mostrar "W" (default_controls()).
+        {
+            std::ifstream rml_in(rml_path);
+            std::ostringstream ss;
+            ss << rml_in.rdbuf();
+            const std::string txt = ss.str();
+            const bool has_w_keycap = txt.find(">W<") != std::string::npos;
+            std::cout << "SystemMenuLoop: [selftest][BUG-2] keycap 'W' de move_forward "
+                         "presente no RML: "
+                      << (has_w_keycap ? "OK" : "FALHOU") << "\n";
+        }
+
+        // BUG-3 (teclado): DOWN 3x tem que avancar controls_selected 0->3 (WRAP
+        // testado a parte em system_menu_test.cpp - aqui so prova o caminho REAL
+        // do loop, com reload() reconstruindo o RML a cada passo).
+        for (int i = 0; i < 3; ++i) {
+            system_menu_key_down(state, SDLK_DOWN);
+        }
+        reload();
+        present_frame();
+        std::cout << "SystemMenuLoop: [selftest][BUG-3 teclado] apos 3x DOWN: "
+                     "controls_selected="
+                  << state.controls_selected << " (esperado 3) - "
+                  << (state.controls_selected == 3 ? "OK" : "FALHOU") << "\n";
+
+        // BUG-3 (mouse): hit-test + clique na linha 5 (MESMO par get_element_box +
+        // system_menu_click_option que o handler de SDL_EVENT_MOUSE_BUTTON_DOWN
+        // do while(true) de producao usa - so sem passar pela fila de eventos).
+        const glintfx::ElementBox row5 = ui.get_element_box(controls_item_id(5).c_str());
+        const SystemMenuAction click_action = system_menu_click_option(state, 5);
+        std::cout << "SystemMenuLoop: [selftest][BUG-3 mouse] hit-test linha 5: found="
+                  << row5.found << " w=" << row5.w << "; apos clique: controls_selected="
+                  << state.controls_selected << " controls_capturing="
+                  << state.controls_capturing << " (esperado selected=5, capturing=1) - "
+                  << (state.controls_selected == 5 && state.controls_capturing ? "OK"
+                                                                                : "FALHOU")
+                  << "\n";
+        (void)click_action;
+
+        return outcome;
+    }
+
     while (true) {
         SDL_Event ev;
         while (SDL_PollEvent(&ev)) {

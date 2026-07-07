@@ -359,11 +359,21 @@ body { font-family: "Pixel Operator Mono"; background: transparent; width: 100%;
 
 /* TELA CONTROLES (M2, mock docs/design/mockups/06-controles-remap.html): painel
    MAIS LARGO (o mock usa 3 colunas Acao/Teclado/Controle - nao cabe nos 420dp
-   das demais 7 telas). #sysmenu-panel.wide sobrescreve so width/margin-left
-   (mesma formula -metade da largura, ver o comentario de #sysmenu-panel acima);
-   o resto (gradiente/borda/padding/box-shadow/corner) e herdado sem duplicar. */
+   das demais 7 telas). #sysmenu-panel.wide sobrescreve width/margin-left
+   (mesma formula -metade da largura, ver o comentario de #sysmenu-panel acima).
+   ALTURA (BUG-1 ao vivo, achado por probe headless Xvfb :99): as 7 outras telas
+   usam auto-height (cabem sobrando) e top:90dp fixo; a tela Controles, com
+   cabecalho de colunas + lista + rodape, tinha altura de conteudo ~525dp -
+   ESTOURANDO o canvas de 540dp quando somada ao top:90dp herdado (bottom ~615dp,
+   75dp ALEM do rodape do canvas - os botoes Restaurar/Voltar ficavam fora da
+   viewport, EXATAMENTE o bug relatado ao vivo pelo lider: "botoes do rodape fora
+   da tela"). FIX: `top: 20dp` (em vez do 90dp herdado - o painel largo precisa de
+   mais espaco vertical, nao faz sentido comecar tao baixo) + `.ctrl-list` com
+   altura REDUZIDA (270dp -> 220dp, ver abaixo) - o total passa a caber com folga
+   dentro do canvas 540dp (medido empiricamente: bottom final < 500dp, > 30dp de
+   folga antes do fim do canvas). */
 #sysmenu-panel.wide {
-  width: 620dp; margin-left: -310dp;
+  width: 620dp; margin-left: -310dp; top: 20dp;
 }
 
 .ctrl-cols-head {
@@ -378,16 +388,37 @@ body { font-family: "Pixel Operator Mono"; background: transparent; width: 100%;
    espirito do mock, mas com ALTURA FIXA em vez de flex:1 - o #sysmenu-panel
    das outras telas usa fluxo de bloco normal, nao flexbox, entao "flex:1"
    nao teria container flex pra resolver contra; altura fixa e mais simples e
-   coerente com o resto do arquivo). */
+   coerente com o resto do arquivo). ALTURA 220dp (era 270dp, BUG-1 ao vivo, ver
+   o comentario de #sysmenu-panel.wide acima) - reduzida pra o painel inteiro
+   caber no canvas 540dp com o novo `top:20dp`. */
 .ctrl-list {
-  height: 270dp; overflow-y: auto; margin-top: 4dp; padding-right: 4dp;
+  height: 220dp; overflow-x: hidden; overflow-y: auto; margin-top: 4dp; padding-right: 4dp;
 }
 .ctrl-group {
   color: #C9A24B; font-size: 10dp; letter-spacing: 2dp; text-transform: uppercase;
   margin: 10dp 0dp 4dp 6dp; opacity: 0.8;
 }
+/* CAUSA RAIZ DO "MOUSE NAO SELECIONA NADA" (BUG-A, achado NOVO por probe Xvfb
+   :99 nesta investigacao - nao era um dos 3 relatados originalmente, mas era a
+   causa raiz de um deles): SEM `width` explicita, `.ctrl-row` (display:flex,
+   filho de `.ctrl-list` que tem `overflow-y:auto`) colapsava pra ~16px de
+   largura (so o padding esquerdo+direito, 6dp+6dp=12dp*dp_ratio - o CONTEUDO
+   flex ficava com largura 0) em vez de ~750px (a largura real disponivel,
+   confirmada medindo `.ctrl-cols-head` - MESMO display:flex, MESMA largura de
+   conteudo, mas FORA do `overflow-y:auto` - la o flex funcionava normal). A
+   caixa de hit-test que o mouse do loop usa (get_element_box) reportava essa
+   MESMA largura colapsada - qualquer clique fora da fresta de 12dp perto da
+   borda esquerda ERRAVA o hit-test (o texto da linha so aparecia visualmente
+   porque o conteudo flex TRANSBORDAVA a caixa colapsada, sem overflow:hidden
+   na propria .ctrl-row - por isso a linha "parecia" normal na tela mas o
+   clique nao registrava em quase nenhum ponto dela). `width:100%` (percentual)
+   tambem falhou (mesmo colapso) - so um comprimento ABSOLUTO (558dp, a largura
+   de conteudo real de #sysmenu-panel.wide menos padding/border/gutter da
+   lista) contornou o bug. `box-sizing:border-box` pareia com o padding:6dp
+   (mesma receita de .verb-pill/.btn-back acima - width JA inclui padding). */
 .ctrl-row {
   display: flex; align-items: center; padding: 6dp 6dp; border-radius: 6dp;
+  box-sizing: border-box; width: 558dp;
 }
 .ctrl-row .c-act { flex: 1; color: #E7ECF5; font-size: 12dp; }
 .ctrl-row .c-key { width: 130dp; text-align: center; }
@@ -645,13 +676,13 @@ std::string build_controls_body(const SystemMenuState& state,
         return body.str();
     }
 
-    body << "<div class=\"ctrl-cols-head\">"
+    body << "<div class=\"ctrl-cols-head\" id=\"ctrl-cols-head\">"
          << "<span class=\"c-act\">" << tr.tr("CONTROLS_COL_ACTION") << "</span>"
          << "<span class=\"c-key\">" << tr.tr("CONTROLS_COL_KEYBOARD") << "</span>"
          << "<span class=\"c-pad\">" << tr.tr("CONTROLS_COL_GAMEPAD") << "</span>"
          << "</div>";
 
-    body << "<div class=\"ctrl-list\">";
+    body << "<div class=\"ctrl-list\" id=\"ctrl-list\">";
     static constexpr const char* kGroupKeys[4] = {
         "CONTROLS_GROUP_MOVEMENT",
         "CONTROLS_GROUP_WORLD",
