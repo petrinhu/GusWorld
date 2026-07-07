@@ -538,6 +538,15 @@ Sim, restaurar
 ## CONTROLS_RESTORE_CONFIRM_NO
 Cancelar
 
+## CONTROLS_DISCARD_CONFIRM_TITLE
+Descartar as alterações não aplicadas?
+
+## CONTROLS_DISCARD_CONFIRM_YES
+Sim, descartar
+
+## CONTROLS_DISCARD_CONFIRM_NO
+Cancelar
+
 ## CONTROLS_NO_BINDING
 —
 

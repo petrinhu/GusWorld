@@ -211,12 +211,30 @@ SystemMenuAction handle_config_categories_key(SystemMenuState& state,
     }
 }
 
-// Tela Controles (M2): navegacao NORMAL (30 actions curadas + Restaurar padrao +
-// Voltar) e o sub-fluxo de CONFIRMACAO do restaurar-padrao (decisao 4 do lider:
-// pede confirmacao antes de resetar). O MODO DE CAPTURA (controls_capturing==
-// true) NAO e tratado aqui - o CHAMADOR (loop) roteia pra
-// system_menu_controls_capture_key nesse caso (ver o header, o motivo de nao
-// reusar este roteador generico: toda tecla vira candidata a binding).
+// Sobe pro pai (ConfigCategories) SE nao houver mudanca staged nao aplicada;
+// caso contrario abre o mini-dialogo de descarte (M2 STAGED CHANGES, ver o
+// comentario grande em system_menu.hpp acima de kControlsItemCount) e devolve
+// None (a navegacao de fato so acontece se o jogador confirmar "Sim" no
+// dialogo). Compartilhado por Voltar (kControlsBackIndex) e por Esc na
+// navegacao normal - MESMO gate, um so lugar decide.
+SystemMenuAction leave_controls_screen_or_confirm_discard(SystemMenuState& state) noexcept {
+    if (state.controls_dirty) {
+        state.controls_confirming_discard = true;
+        state.controls_discard_confirm_selected = 1;  // default seguro = Nao (fica editando)
+        return SystemMenuAction::None;
+    }
+    state.screen = parent_screen_of(SystemMenuScreen::Controls);
+    return SystemMenuAction::Navigated;
+}
+
+// Tela Controles (M2 -> M2 STAGED CHANGES): navegacao NORMAL (30 actions
+// curadas + Restaurar padrao + Aplicar + Voltar) e os 2 sub-fluxos de
+// CONFIRMACAO (restaurar-padrao, decisao 4 do lider; e descartar-alteracoes,
+// reforma STAGED CHANGES - MESMA mecanica de prompt "tem certeza?"). O MODO DE
+// CAPTURA (controls_capturing==true) NAO e tratado aqui - o CHAMADOR (loop)
+// roteia pra system_menu_controls_capture_key nesse caso (ver o header, o
+// motivo de nao reusar este roteador generico: toda tecla vira candidata a
+// binding).
 SystemMenuAction handle_controls_key(SystemMenuState& state, SDL_Keycode key) noexcept {
     if (state.controls_capturing) {
         // Defensivo: o chamador nao deveria rotear aqui neste modo; no-op.
@@ -245,13 +263,58 @@ SystemMenuAction handle_controls_key(SystemMenuState& state, SDL_Keycode key) no
             case SDLK_SPACE:
                 state.controls_confirming_restore = false;
                 if (state.controls_restore_confirm_selected == 0) {  // Sim
+                    // STAGED (M2): so muta a COPIA DE TRABALHO + marca dirty -
+                    // controls_applied_config (a baseline) fica intocado ate o
+                    // jogador confirmar "Aplicar" (ver ControlsApplied abaixo).
                     state.controls_config = gus::domain::input::default_controls();
+                    state.controls_dirty = true;
                     state.controls_last_action_swapped = false;
                     state.controls_last_swapped_with_action.clear();
                     state.controls_last_swapped_with_label_key.clear();
                     return SystemMenuAction::ControlsChanged;
                 }
                 return SystemMenuAction::None;  // Nao: cancela sem mudar nada
+            default:
+                return SystemMenuAction::None;
+        }
+    }
+
+    if (state.controls_confirming_discard) {
+        switch (key) {
+            case SDLK_UP:
+            case SDLK_DOWN:
+            case SDLK_LEFT:
+            case SDLK_RIGHT:
+            case SDLK_W:
+            case SDLK_S:
+            case SDLK_A:
+            case SDLK_D:
+                // 2 escolhas (Sim/Nao): qualquer eixo alterna entre elas (MESMA
+                // convencao do prompt de restaurar-padrao acima).
+                state.controls_discard_confirm_selected =
+                    1 - state.controls_discard_confirm_selected;
+                return SystemMenuAction::None;
+            case SDLK_ESCAPE:
+                state.controls_confirming_discard = false;  // cancela, fica editando
+                return SystemMenuAction::None;
+            case SDLK_RETURN:
+            case SDLK_KP_ENTER:
+            case SDLK_SPACE:
+                state.controls_confirming_discard = false;
+                if (state.controls_discard_confirm_selected == 0) {  // Sim, descartar
+                    // Reverte a copia de trabalho pra ultima BASELINE (carregada
+                    // do disco OU aplicada com sucesso) - controls.json em si
+                    // nunca foi tocado (INVARIANTE: nada muda ate Aplicar), entao
+                    // nao ha nada a persistir aqui - so o estado em MEMORIA.
+                    state.controls_config = state.controls_applied_config;
+                    state.controls_dirty = false;
+                    state.controls_last_action_swapped = false;
+                    state.controls_last_swapped_with_action.clear();
+                    state.controls_last_swapped_with_label_key.clear();
+                    state.screen = parent_screen_of(SystemMenuScreen::Controls);
+                    return SystemMenuAction::Navigated;
+                }
+                return SystemMenuAction::None;  // Nao: fica editando, dirty intocado
             default:
                 return SystemMenuAction::None;
         }
@@ -269,8 +332,10 @@ SystemMenuAction handle_controls_key(SystemMenuState& state, SDL_Keycode key) no
             state.controls_last_action_swapped = false;
             return SystemMenuAction::None;
         case SDLK_ESCAPE:
-            state.screen = parent_screen_of(SystemMenuScreen::Controls);  // ConfigCategories
-            return SystemMenuAction::Navigated;
+            // MESMO gate do Voltar (kControlsBackIndex, abaixo): Esc so sobe de
+            // fato se nao houver mudanca staged pendente (M2 STAGED CHANGES) -
+            // ver leave_controls_screen_or_confirm_discard acima.
+            return leave_controls_screen_or_confirm_discard(state);
         case SDLK_RETURN:
         case SDLK_KP_ENTER:
         case SDLK_SPACE:
@@ -284,9 +349,17 @@ SystemMenuAction handle_controls_key(SystemMenuState& state, SDL_Keycode key) no
                 state.controls_restore_confirm_selected = 1;  // default seguro = Nao
                 return SystemMenuAction::None;
             }
+            if (state.controls_selected == kControlsApplyIndex) {
+                // "Aplicar" (M2 STAGED CHANGES): a copia de trabalho vira a nova
+                // BASELINE (em MEMORIA); o CHAMADOR (loop) persiste de fato em
+                // controls.json ao ver ControlsApplied. A tela NAO fecha (screen
+                // intocado) - o jogador pode seguir remapeando.
+                state.controls_applied_config = state.controls_config;
+                state.controls_dirty = false;
+                return SystemMenuAction::ControlsApplied;
+            }
             // kControlsBackIndex
-            state.screen = parent_screen_of(SystemMenuScreen::Controls);
-            return SystemMenuAction::Navigated;
+            return leave_controls_screen_or_confirm_discard(state);
         default:
             return SystemMenuAction::None;
     }
@@ -409,14 +482,19 @@ SystemMenuAction system_menu_controls_capture_key(SystemMenuState& state, bool i
 
     state.controls_capturing = false;
     if (!result.changed) {
-        // No-op (mesma tecla de antes): nada a persistir, sem aviso de troca.
+        // No-op (mesma tecla de antes): nada mudou na copia de trabalho, dirty
+        // fica intocado (pode ja estar true de um remap anterior nesta mesma
+        // sessao - um no-op NAO limpa dirty), sem aviso de troca.
         state.controls_last_action_swapped = false;
         state.controls_last_swapped_with_action.clear();
         state.controls_last_swapped_with_label_key.clear();
         return SystemMenuAction::None;
     }
 
+    // STAGED (M2): so muta a COPIA DE TRABALHO + marca dirty -
+    // controls_applied_config (a baseline) fica intocado ate "Aplicar".
     state.controls_config = result.config;
+    state.controls_dirty = true;
     state.controls_last_action_swapped = result.swapped;
     state.controls_last_swapped_with_action = result.swapped_with_action_name;
     state.controls_last_swapped_with_label_key = result.swapped_with_label_i18n_key;
@@ -509,13 +587,14 @@ SystemMenuAction click_placeholder_option(SystemMenuState& state, int index) noe
 
 // Tela Controles (mouse): enquanto capturando, clique nao faz sentido (o
 // jogador precisa apertar uma tecla FISICA - ver system_menu_controls_capture_key)
-// - no-op. Enquanto confirmando o restaurar-padrao, `index` e reinterpretado
-// como a escolha do prompt (0=Sim, 1=Nao - MESMA convencao de
-// controls_restore_confirm_selected), clicavel nas 2 pills do mini-dialogo.
-// Caso contrario, `index` e a lista normal (0..kControlsActionCount-1 =
-// action, kControlsRestoreIndex/kControlsBackIndex = rodape) - clicar SEMPRE
-// foca+confirma na hora (equivalente a focar + ENTER), MESMA convencao das
-// outras telas.
+// - no-op. Enquanto confirmando o restaurar-padrao OU o descarte (M2 STAGED
+// CHANGES), `index` e reinterpretado como a escolha do prompt (0=Sim, 1=Nao -
+// MESMA convencao de controls_restore_confirm_selected/
+// controls_discard_confirm_selected), clicavel nas 2 pills do mini-dialogo
+// correspondente. Caso contrario, `index` e a lista normal (0..
+// kControlsActionCount-1 = action, kControlsRestoreIndex/kControlsApplyIndex/
+// kControlsBackIndex = rodape) - clicar SEMPRE foca+confirma na hora
+// (equivalente a focar + ENTER), MESMA convencao das outras telas.
 SystemMenuAction click_controls_option(SystemMenuState& state, int index) noexcept {
     if (state.controls_capturing) return SystemMenuAction::None;
 
@@ -524,13 +603,32 @@ SystemMenuAction click_controls_option(SystemMenuState& state, int index) noexce
         state.controls_restore_confirm_selected = index;
         state.controls_confirming_restore = false;
         if (index == 0) {  // Sim
+            // STAGED (M2): so a copia de trabalho muda + dirty - ver o
+            // comentario identico em handle_controls_key acima.
             state.controls_config = gus::domain::input::default_controls();
+            state.controls_dirty = true;
             state.controls_last_action_swapped = false;
             state.controls_last_swapped_with_action.clear();
             state.controls_last_swapped_with_label_key.clear();
             return SystemMenuAction::ControlsChanged;
         }
         return SystemMenuAction::None;  // Nao: cancela
+    }
+
+    if (state.controls_confirming_discard) {
+        if (index != 0 && index != 1) return SystemMenuAction::None;
+        state.controls_discard_confirm_selected = index;
+        state.controls_confirming_discard = false;
+        if (index == 0) {  // Sim, descartar
+            state.controls_config = state.controls_applied_config;
+            state.controls_dirty = false;
+            state.controls_last_action_swapped = false;
+            state.controls_last_swapped_with_action.clear();
+            state.controls_last_swapped_with_label_key.clear();
+            state.screen = parent_screen_of(SystemMenuScreen::Controls);
+            return SystemMenuAction::Navigated;
+        }
+        return SystemMenuAction::None;  // Nao: fica editando, dirty intocado
     }
 
     if (index < 0 || index >= kControlsItemCount) return SystemMenuAction::None;
@@ -546,7 +644,20 @@ SystemMenuAction click_controls_option(SystemMenuState& state, int index) noexce
         state.controls_restore_confirm_selected = 1;  // default seguro = Nao
         return SystemMenuAction::None;
     }
+    if (index == kControlsApplyIndex) {
+        // "Aplicar" (M2 STAGED CHANGES) - MESMO efeito de
+        // handle_controls_key/SDLK_RETURN acima: persistencia real fica com o
+        // CHAMADOR ao ver ControlsApplied.
+        state.controls_applied_config = state.controls_config;
+        state.controls_dirty = false;
+        return SystemMenuAction::ControlsApplied;
+    }
     // kControlsBackIndex
+    if (state.controls_dirty) {
+        state.controls_confirming_discard = true;
+        state.controls_discard_confirm_selected = 1;  // default seguro = Nao
+        return SystemMenuAction::None;
+    }
     state.screen = parent_screen_of(SystemMenuScreen::Controls);
     return SystemMenuAction::Navigated;
 }
@@ -601,12 +712,13 @@ int system_menu_hover_index(const SystemMenuState& state, float mouse_x, float m
         case SystemMenuScreen::Controls:
             // Capturando: nada e hover-testavel (o jogador precisa apertar uma
             // tecla FISICA, o mouse nao participa desse modo). Confirmando o
-            // restaurar-padrao: so as 2 pills do mini-dialogo (Sim/Nao, MESMA
-            // convencao de indice de click_controls_option). Caso contrario: a
-            // lista normal inteira (30 actions + Restaurar + Voltar).
+            // restaurar-padrao OU o descarte (M2 STAGED CHANGES): so as 2
+            // pills do mini-dialogo correspondente (Sim/Nao, MESMA convencao
+            // de indice de click_controls_option). Caso contrario: a lista
+            // normal inteira (30 actions + Restaurar + Aplicar + Voltar).
             if (state.controls_capturing) {
                 count = 0;
-            } else if (state.controls_confirming_restore) {
+            } else if (state.controls_confirming_restore || state.controls_confirming_discard) {
                 count = 2;
             } else {
                 count = kControlsItemCount;

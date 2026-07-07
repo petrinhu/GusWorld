@@ -73,13 +73,58 @@ inline constexpr int kConfigCategoriesItemCount = 5;  // Audio/Video/Controles/L
 inline constexpr int kAudioItemCount = 3;             // Musica/SFX/Voltar
 inline constexpr int kPlaceholderItemCount = 1;       // so Voltar (Save/Video/Language)
 
-// Tela Controles (M2): 30 actions curadas/agrupadas (Movimento/Mundo/Combate/
-// Menu&Dialogo - ver controls_action_name_at/controls_group_at abaixo) + os 2
-// itens de rodape do mock (Restaurar padrao, Voltar).
+// Tela Controles (M2 -> M2 STAGED CHANGES, reforma de UX aprovada pelo lider):
+// 30 actions curadas/agrupadas (Movimento/Mundo/Combate/Menu&Dialogo - ver
+// controls_action_name_at/controls_group_at abaixo) + os 3 itens de rodape
+// (Restaurar padrao, Aplicar - NOVO, Voltar). O rodape passou de 2 pra 3
+// botoes: "aplica na hora" foi trocado por STAGED CHANGES (ver o comentario
+// grande logo abaixo, secao STAGED CHANGES) - o jogador agora precisa
+// confirmar "Aplicar" pra valer no jogo/disco; "Voltar" so descarta.
 inline constexpr int kControlsActionCount = 30;         // ActionRegistry::count()
 inline constexpr int kControlsRestoreIndex = 30;         // item de rodape "Restaurar padrao"
-inline constexpr int kControlsBackIndex = 31;            // item de rodape "Voltar"
-inline constexpr int kControlsItemCount = 32;            // 30 actions + Restaurar + Voltar
+inline constexpr int kControlsApplyIndex = 31;           // item de rodape "Aplicar" (NOVO, STAGED CHANGES)
+inline constexpr int kControlsBackIndex = 32;            // item de rodape "Voltar"
+inline constexpr int kControlsItemCount = 33;            // 30 actions + Restaurar + Aplicar + Voltar
+
+// ---------------------------------------------------------------- STAGED CHANGES (M2)
+//
+// Reforma de UX aprovada pelo lider na tela Controles: o modelo antigo
+// "aplica na hora" (cada tecla capturada persistia em controls.json E valia
+// no jogo imediatamente) foi TROCADO por "mudancas preparadas + Aplicar
+// explicito", resolvendo a ambiguidade do "Voltar" sozinho (o jogador nao
+// sabia se sair da tela desfazia ou nao o remap que acabou de fazer).
+//
+// Modelo novo (INVARIANTE central: NADA muda no jogo/disco ate Aplicar):
+//   1. Ao ENTRAR na tela (chamador carrega controls.json, ver
+//      system_menu_loop.cpp), controls_config = a COPIA DE TRABALHO (staged)
+//      e controls_applied_config = o MESMO valor, a BASELINE (o que esta de
+//      fato em disco/valendo no jogo agora). As duas comecam IGUAIS.
+//   2. Remapear uma tecla (system_menu_controls_capture_key) OU confirmar
+//      "Restaurar padrao" muta SO controls_config (a copia de trabalho) e
+//      marca controls_dirty=true. controls_applied_config fica INTOCADO -
+//      nada persiste em disco, nada aplica no input vivo do jogo.
+//   3. "Aplicar" (kControlsApplyIndex): controls_applied_config =
+//      controls_config (a copia de trabalho vira a nova baseline) e
+//      controls_dirty=false. Devolve SystemMenuAction::ControlsApplied - o
+//      CHAMADOR (loop) e quem de fato persiste em controls.json (esta funcao
+//      so muta estado em MEMORIA, sem I/O). A tela NAO fecha (screen
+//      intocado) - o jogador pode continuar remapeando.
+//   4. "Voltar" (kControlsBackIndex) OU Esc na navegacao normal: se
+//      controls_dirty, NAO navega ainda - abre controls_confirming_discard
+//      (mini-dialogo "descartar alteracoes?", MESMA mecanica visual/de fluxo
+//      de controls_confirming_restore). Se NAO dirty, navega direto pro pai
+//      (comportamento de sempre, sem perguntar nada).
+//   5. Confirmando o descarte: Sim reverte controls_config =
+//      controls_applied_config (desfaz a copia de trabalho pra ultima
+//      baseline aplicada/carregada), zera controls_dirty, e SO ENTAO navega
+//      pro pai. Nao/Esc cancela o dialogo e permanece em Controles com a
+//      copia de trabalho (e o dirty) intocados - o jogador pode continuar
+//      editando ou tentar Voltar de novo.
+//
+// Os campos concretos (controls_dirty/controls_applied_config/
+// controls_confirming_discard/controls_discard_confirm_selected) estao
+// documentados junto dos demais campos de Controles em SystemMenuState, logo
+// abaixo.
 
 // Indices dos itens de Pause (ordem da arvore aprovada: Continuar, Salvar,
 // Configuracoes, Sair).
@@ -170,6 +215,18 @@ inline constexpr float kVolumeStep = 0.05f;
 // controls_last_swapped_with_*: transiente, populado logo apos um remap com
 // troca (ver system_menu_controls_capture_key) pra UI mostrar o aviso "trocou
 // com X" (decisao 1 do lider); limpo ao navegar pra outra linha.
+//
+// STAGED CHANGES (M2, ver o comentario grande acima de kControlsItemCount):
+// controls_config e SEMPRE a COPIA DE TRABALHO agora (o que a UI mostra e o
+// que captura/restaurar mutam) - controls_applied_config e a BASELINE (ultimo
+// valor carregado do disco OU aplicado com sucesso, alvo do REVERT ao
+// descartar). controls_dirty=true = ha mutacao na copia de trabalho ainda NAO
+// aplicada (liga/desliga o brilho do botao Aplicar e o gate do dialogo de
+// descarte no Voltar/Esc). controls_confirming_discard/
+// controls_discard_confirm_selected: MESMA mecanica de
+// controls_confirming_restore/controls_restore_confirm_selected acima, so
+// que pro prompt "descartar alteracoes nao aplicadas?" (Voltar/Esc com
+// dirty=true); default 1=Nao (fica editando) pela MESMA razao de seguranca.
 struct SystemMenuState {
     SystemMenuScreen screen = SystemMenuScreen::Hidden;
     int pause_selected = 0;               // indice em PauseItem, valido em Pause
@@ -178,12 +235,16 @@ struct SystemMenuState {
     float music_volume = 1.0f;
     float sfx_volume = 1.0f;
 
-    // ---- Controles (M2) ----
-    gus::domain::input::InputRemapConfig controls_config;  // carregado do disco pelo chamador
+    // ---- Controles (M2 -> M2 STAGED CHANGES) ----
+    gus::domain::input::InputRemapConfig controls_config;  // COPIA DE TRABALHO (staged) - carregada do disco pelo chamador no boot da tela
+    gus::domain::input::InputRemapConfig controls_applied_config;  // BASELINE (ultimo carregado/aplicado) - alvo do revert ao descartar
+    bool controls_dirty = false;                   // true = controls_config tem mudanca staged nao aplicada ainda
     int controls_selected = 0;                    // 0..kControlsItemCount-1, valido em Controls
     bool controls_capturing = false;               // aguardando a proxima tecla real
-    bool controls_confirming_restore = false;      // mostrando o prompt "tem certeza?"
+    bool controls_confirming_restore = false;      // mostrando o prompt "tem certeza?" (restaurar padrao)
     int controls_restore_confirm_selected = 1;     // 0=Sim, 1=Nao (default seguro)
+    bool controls_confirming_discard = false;      // mostrando o prompt "descartar alteracoes?" (Voltar/Esc com dirty)
+    int controls_discard_confirm_selected = 1;     // 0=Sim (descarta), 1=Nao (default seguro, fica editando)
     bool controls_last_action_swapped = false;     // ultimo remap aplicado trocou com outra action?
     std::string controls_last_swapped_with_action;      // nome da OUTRA action (vazio se !swapped)
     std::string controls_last_swapped_with_label_key;    // label i18n dela
@@ -204,9 +265,18 @@ enum class SystemMenuAction {
                  // precisa recarregar o RML (mesmo efeito pratico de OpenX/
                  // BackToX de antes da arvore - unificado numa unica action
                  // generica porque o loop ja trata todas elas igual: reload).
-    ControlsChanged,  // controls_config mudou (remap aplicado OU restaurado pro
-                      // padrao) - persista em controls.json (ver
-                      // gus/platform/fs/controls_file_store.hpp).
+    ControlsChanged,  // controls_config (COPIA DE TRABALHO, M2 STAGED CHANGES)
+                      // mudou (remap aplicado OU restaurado pro padrao NA
+                      // COPIA STAGED) - so recarregue o RML (controls_dirty
+                      // ja ficou true); NAO persista em disco ainda (isso e
+                      // papel EXCLUSIVO de ControlsApplied, abaixo).
+    ControlsApplied,  // "Aplicar" confirmado - controls_applied_config ja foi
+                      // atualizado pra controls_config e controls_dirty ja
+                      // ficou false (efeito em MEMORIA, feito por esta
+                      // camada); persista controls_config em controls.json
+                      // (ver gus/platform/fs/controls_file_store.hpp) - o
+                      // UNICO ponto que escreve em disco nesta tela agora. A
+                      // tela NAO fecha (screen intocado).
 };
 
 // Abre o menu na tela PAUSA com foco inicial em Continuar (item 0, arvore). NAO
@@ -327,7 +397,7 @@ struct SystemMenuHoverBox {
                                                  float list_top, float list_h) noexcept;
 
 // Numero MAXIMO de itens hover-testaveis numa unica tela (M2: Controles tem
-// kControlsItemCount=32, agora a MAIOR de todas - era Pause/ConfigCategories
+// kControlsItemCount=33, agora a MAIOR de todas - era Pause/ConfigCategories
 // com 4 cada antes da tela Controles existir; Audio tem 3, Save/Video/Language
 // tem 1) - dimensiona o array fixo de system_menu_hover_index abaixo. Posicoes
 // do array alem do count relevante da tela atual sao ignoradas (o CHAMADOR so

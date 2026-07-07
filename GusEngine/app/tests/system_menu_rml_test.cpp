@@ -45,6 +45,7 @@ Translator make_translator() {
         // Tela Controles (M2).
         "## SETTINGS_CONTROLS\nControles\n\n"
         "## SETTINGS_RESET_DEFAULTS\nRestaurar padroes\n\n"
+        "## SETTINGS_APPLY\nAplicar\n\n"
         "## CONTROLS_HINT\nSelecione uma acao\n\n"
         "## CONTROLS_CAPTURE_PROMPT\nPressione uma tecla...\n\n"
         "## CONTROLS_COL_ACTION\nAcao\n\n"
@@ -59,6 +60,9 @@ Translator make_translator() {
         "## CONTROLS_RESTORE_CONFIRM_TITLE\nTem certeza?\n\n"
         "## CONTROLS_RESTORE_CONFIRM_YES\nSim restaurar\n\n"
         "## CONTROLS_RESTORE_CONFIRM_NO\nCancelar\n\n"
+        "## CONTROLS_DISCARD_CONFIRM_TITLE\nDescartar alteracoes?\n\n"
+        "## CONTROLS_DISCARD_CONFIRM_YES\nSim descartar\n\n"
+        "## CONTROLS_DISCARD_CONFIRM_NO\nCancelar\n\n"
         "## CONTROLS_NO_BINDING\nsem tecla\n\n"
         "## ACTION_MOVE_FORWARD\nAndar para frente\n\n"
         "## ACTION_MOVE_BACKWARD\nAndar para tras\n\n");
@@ -253,6 +257,63 @@ TEST_CASE("build_system_menu_rml: tela Controls mostra o titulo, cabecalhos de "
     REQUIRE(rml.find("id=\"controls-item-29\"") != std::string::npos);  // ultima action
     REQUIRE(rml.find("Restaurar padroes") != std::string::npos);
     REQUIRE(rml.find("sysmenu-panel\" class=\"wide\"") != std::string::npos);
+    // M2 STAGED CHANGES: rodape agora tem 3 botoes (Restaurar/Aplicar/Voltar).
+    REQUIRE(rml.find("id=\"controls-item-" + std::to_string(kControlsRestoreIndex) + "\"") !=
+            std::string::npos);
+    REQUIRE(rml.find("id=\"controls-item-" + std::to_string(kControlsApplyIndex) + "\"") !=
+            std::string::npos);
+    REQUIRE(rml.find("id=\"controls-item-" + std::to_string(kControlsBackIndex) + "\"") !=
+            std::string::npos);
+    REQUIRE(rml.find("Aplicar") != std::string::npos);  // SETTINGS_APPLY
+}
+
+TEST_CASE("build_system_menu_rml: botao Aplicar ganha a classe 'disabled' "
+          "quando NAO ha mudanca staged (controls_dirty=false), e a perde "
+          "quando dirty=true",
+          "[system_menu_rml][controls][staged]") {
+    SystemMenuState state;
+    state.screen = SystemMenuScreen::Controls;
+    state.controls_config = gus::domain::input::default_controls();
+    const Translator tr = make_translator();
+
+    REQUIRE_FALSE(state.controls_dirty);
+    const std::string rml_clean = build_system_menu_rml(state, tr);
+    const auto pos_clean = rml_clean.find("id=\"controls-item-" +
+                                           std::to_string(kControlsApplyIndex) + "\"");
+    REQUIRE(pos_clean != std::string::npos);
+    const std::string around_clean = rml_clean.substr(pos_clean > 60 ? pos_clean - 60 : 0, 90);
+    REQUIRE(around_clean.find("disabled") != std::string::npos);
+
+    state.controls_dirty = true;
+    const std::string rml_dirty = build_system_menu_rml(state, tr);
+    const auto pos_dirty = rml_dirty.find("id=\"controls-item-" +
+                                          std::to_string(kControlsApplyIndex) + "\"");
+    REQUIRE(pos_dirty != std::string::npos);
+    const std::string around_dirty = rml_dirty.substr(pos_dirty > 60 ? pos_dirty - 60 : 0, 90);
+    REQUIRE(around_dirty.find("disabled") == std::string::npos);
+}
+
+TEST_CASE("build_system_menu_rml: controls_confirming_discard SUBSTITUI a "
+          "lista pelo prompt de descarte com Sim/Nao (M2 STAGED CHANGES)",
+          "[system_menu_rml][controls][staged]") {
+    SystemMenuState state;
+    state.screen = SystemMenuScreen::Controls;
+    state.controls_config = gus::domain::input::default_controls();
+    state.controls_confirming_discard = true;
+    state.controls_discard_confirm_selected = 1;  // Nao focado
+    const Translator tr = make_translator();
+    const std::string rml = build_system_menu_rml(state, tr);
+
+    REQUIRE(rml.find("Descartar alteracoes?") != std::string::npos);
+    REQUIRE(rml.find("Sim descartar") != std::string::npos);
+    REQUIRE(rml.find("id=\"controls-discard-confirm-0\"") != std::string::npos);
+    REQUIRE(rml.find("id=\"controls-discard-confirm-1\"") != std::string::npos);
+    // A lista de actions NAO aparece (foi substituida).
+    REQUIRE(rml.find("id=\"controls-item-0\"") == std::string::npos);
+
+    const auto pos = rml.find("id=\"controls-discard-confirm-1\"");
+    const std::string around = rml.substr(pos > 30 ? pos - 30 : 0, 60);
+    REQUIRE(around.find("focused") != std::string::npos);  // Nao e o default focado
 }
 
 TEST_CASE("build_system_menu_rml: item selecionado de Controls ganha 'sel'",

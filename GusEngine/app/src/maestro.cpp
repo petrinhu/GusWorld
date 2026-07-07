@@ -343,13 +343,15 @@ bool Maestro::open_pause_from_city() {
             "- a cidade segue rodando SEM desenhar (degradacao segura, sem crash).");
     }
 
-    // M2 (GAP FINAL): RELE o controls.json e realimenta o SdlInput da cidade -
-    // aplica o remap SEM exigir restart. O jogador pode ter passado por
-    // Controles (persist_controls, dentro do menu) e voltado direto pra
-    // Continuar; INCONDICIONAL (mesmo se ok==false / nada mudou) porque
-    // load_controls e barato e sempre degrada com seguranca (arquivo ausente/
-    // corrompido -> default_controls(), nunca lanca) - reler de mais nunca
-    // corrompe nada, so confirma o estado do disco.
+    // M2 (GAP FINAL) -> M2 STAGED CHANGES: RELE o controls.json e realimenta o
+    // SdlInput da cidade - aplica o remap SEM exigir restart. O jogador pode
+    // ter passado por Controles, confirmado "Aplicar" (persist_controls, so
+    // ESSE botao escreve em controls.json agora - ver system_menu_loop.cpp) e
+    // voltado direto pra Continuar; INCONDICIONAL (mesmo se ok==false / nada
+    // mudou/nada aplicado) porque load_controls e barato e sempre degrada com
+    // seguranca (arquivo ausente/corrompido -> default_controls(), nunca
+    // lanca) - reler de mais nunca corrompe nada, so confirma o estado do
+    // disco (que so mudou se o jogador de fato aplicou).
     city_->set_controls(gus::platform::fs::load_controls(
         settings_dir, std::string(gus::domain::input::kDefaultProfile)));
 

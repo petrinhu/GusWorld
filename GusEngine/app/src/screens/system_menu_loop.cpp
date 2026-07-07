@@ -144,16 +144,21 @@ void apply_and_persist(const SystemMenuState& state,
 }
 
 // Persiste state.controls_config em "<perfil>_controls.json" (tela Controles,
-// M2 - MESMO padrao best-effort de apply_and_persist acima: falha de I/O so
-// loga, a config em MEMORIA continua valendo pro resto da sessao). Perfil UNICO
-// "default" nesta onda (nao ha selecao de jogador na UI ainda - ADR-007 fork 3
-// preve multi-perfil, mas a tela nao expoe essa escolha; residuo sinalizado).
+// M2 STAGED CHANGES - MESMO padrao best-effort de apply_and_persist acima:
+// falha de I/O so loga, a copia de trabalho em MEMORIA continua valendo pro
+// resto da sessao). Chamada SO quando o CHAMADOR ve SystemMenuAction::
+// ControlsApplied ("Aplicar" confirmado, ver handle_action) - remap/
+// restaurar-padrao isolados (ControlsChanged) NAO chegam mais aqui (o modelo
+// antigo "aplica na hora" foi trocado por mudancas preparadas + Aplicar
+// explicito). Perfil UNICO "default" nesta onda (nao ha selecao de jogador na
+// UI ainda - ADR-007 fork 3 preve multi-perfil, mas a tela nao expoe essa
+// escolha; residuo sinalizado).
 void persist_controls(const SystemMenuState& state, const std::string& settings_dir) {
     if (!gus::platform::fs::save_controls(
             state.controls_config, settings_dir,
             std::string(gus::domain::input::kDefaultProfile))) {
-        std::cerr << "[system_menu] aviso: falha ao salvar controls.json (remap "
-                     "vale nesta sessao, mas nao persistiu)\n";
+        std::cerr << "[system_menu] aviso: falha ao salvar controls.json (Aplicar "
+                     "vale nesta sessao/em memoria, mas nao persistiu em disco)\n";
     }
 }
 
@@ -179,14 +184,20 @@ std::string audio_item_id(int item) {
 constexpr const char* kPlaceholderBackId = "placeholder-back";
 
 // Ids da tela Controles (system_menu_rml.cpp: build_controls_body):
-// "controls-item-<indice>" (0..kControlsActionCount-1 = action, kControlsRestoreIndex/
-// kControlsBackIndex = rodape) na navegacao normal; "controls-confirm-<0|1>"
-// (Sim/Nao) no mini-dialogo de restaurar-padrao.
+// "controls-item-<indice>" (0..kControlsActionCount-1 = action,
+// kControlsRestoreIndex/kControlsApplyIndex/kControlsBackIndex = rodape) na
+// navegacao normal; "controls-confirm-<0|1>" (Sim/Nao) no mini-dialogo de
+// restaurar-padrao; "controls-discard-confirm-<0|1>" (Sim/Nao, M2 STAGED
+// CHANGES) no mini-dialogo de descartar alteracoes nao aplicadas (Voltar/Esc
+// com mudanca pendente).
 std::string controls_item_id(int item) {
     return "controls-item-" + std::to_string(item);
 }
 std::string controls_confirm_id(int item) {
     return "controls-confirm-" + std::to_string(item);
+}
+std::string controls_discard_confirm_id(int item) {
+    return "controls-discard-confirm-" + std::to_string(item);
 }
 
 // Id de `.ctrl-list` (system_menu_rml.cpp: build_controls_body) - consultado
@@ -258,10 +269,14 @@ int current_hover_index(const glintfx::UiLayer& ui, const SystemMenuState& state
         case SystemMenuScreen::Controls:
             // Capturando: nenhum item hover-testavel (system_menu_hover_index ja
             // devolve count=0 pra essa combinacao - nada a preencher aqui).
-            // Confirmando o restaurar-padrao: so as 2 pills do mini-dialogo.
+            // Confirmando o restaurar-padrao OU o descarte (M2 STAGED CHANGES):
+            // so as 2 pills do mini-dialogo correspondente.
             if (state.controls_confirming_restore) {
                 fill(0, controls_confirm_id(0));
                 fill(1, controls_confirm_id(1));
+            } else if (state.controls_confirming_discard) {
+                fill(0, controls_discard_confirm_id(0));
+                fill(1, controls_discard_confirm_id(1));
             } else if (!state.controls_capturing) {
                 // BUG-A: filtra as 30 actions (nao o rodape) pelo recorte
                 // visivel de `.ctrl-list` - ver filter_offscreen_controls_row.
@@ -295,13 +310,19 @@ SystemMenuLoopOutcome run_system_menu_loop_gl_current(
     SystemMenuState state;
     state.music_volume = audio.music_volume();
     state.sfx_volume = audio.sfx_volume();
-    // Tela Controles (M2): carrega o remap persistido (ou default_controls() se
-    // ausente/corrompido, ver controls_file_store.hpp) - MESMO espirito de
-    // music_volume/sfx_volume acima (semeado do estado JA carregado no boot,
-    // nao resetado por system_menu_open). Perfil UNICO "default" nesta onda (ver
-    // persist_controls acima - nao ha selecao de jogador na UI ainda).
+    // Tela Controles (M2 -> M2 STAGED CHANGES): carrega o remap persistido (ou
+    // default_controls() se ausente/corrompido, ver controls_file_store.hpp) -
+    // MESMO espirito de music_volume/sfx_volume acima (semeado do estado JA
+    // carregado no boot, nao resetado por system_menu_open). Perfil UNICO
+    // "default" nesta onda (ver persist_controls acima - nao ha selecao de
+    // jogador na UI ainda). controls_applied_config = a MESMA leitura -
+    // BASELINE (o que ja vale no jogo/disco agora, alvo do revert ao
+    // descartar, ver o comentario STAGED CHANGES em system_menu.hpp); as duas
+    // copias comecam IGUAIS, so controls_config (a copia de trabalho) muda com
+    // remap/restaurar ate o jogador confirmar "Aplicar".
     state.controls_config = gus::platform::fs::load_controls(
         settings_dir, std::string(gus::domain::input::kDefaultProfile));
+    state.controls_applied_config = state.controls_config;
     system_menu_open(state);
 
     int pw = 0, ph = 0;
@@ -462,7 +483,16 @@ SystemMenuLoopOutcome run_system_menu_loop_gl_current(
         if (action == SystemMenuAction::VolumeChanged) {
             apply_and_persist(state, audio, settings_dir);
         }
-        if (action == SystemMenuAction::ControlsChanged) {
+        // ControlsChanged (M2 STAGED CHANGES): remap/restaurar-padrao mutou SO
+        // a COPIA DE TRABALHO (controls_config) - controls_dirty ja ficou true
+        // do lado puro (system_menu.cpp). NAO persiste mais em disco aqui (era
+        // o modelo antigo "aplica na hora") - so ControlsApplied persiste,
+        // abaixo. O reload() generico no fim ja cobre a UI (botao Aplicar
+        // acende, linha mostra o novo binding).
+        if (action == SystemMenuAction::ControlsApplied) {
+            // UNICO ponto de escrita em disco da tela Controles agora: a copia
+            // de trabalho (ja promovida a baseline em controls_applied_config
+            // pelo lado puro) e o que persiste.
             persist_controls(state, settings_dir);
         }
         // None/Navigated: o ESTADO pode ter mudado mesmo assim (navegacao/foco
@@ -473,18 +503,22 @@ SystemMenuLoopOutcome run_system_menu_loop_gl_current(
     };
 
     // Confirma se `action` merece o flash de PRESS (ver topo do arquivo): SO as
-    // acoes que de fato "acionam uma opcao" (pill/categoria/Voltar) - nunca
-    // VolumeChanged (drag de slider nao pisca) nem None (nao aconteceu nada).
-    // ControlsChanged (M2) SOMA aqui: confirmar "Sim" no restaurar-padrao e uma
-    // acao destrutiva (reseta o remap do jogador) - merece o mesmo flash de
-    // confirmacao das demais (entrar em modo CAPTURA tambem devolve None, entao
-    // nao pisca - o feedback dela e a propria linha ciano "Pressione uma
-    // tecla...", ja imediato via reload()).
+    // acoes que de fato "acionam uma opcao" (pill/categoria/Voltar/Aplicar) -
+    // nunca VolumeChanged (drag de slider nao pisca) nem None (nao aconteceu
+    // nada). ControlsChanged (M2) SOMA aqui: confirmar "Sim" no
+    // restaurar-padrao e uma acao destrutiva (reseta a copia de trabalho) -
+    // merece o mesmo flash de confirmacao das demais (entrar em modo CAPTURA
+    // tambem devolve None, entao nao pisca - o feedback dela e a propria linha
+    // ciano "Pressione uma tecla...", ja imediato via reload()).
+    // ControlsApplied (M2 STAGED CHANGES) SOMA aqui tambem: clicar/confirmar
+    // "Aplicar" e a acao mais importante da tela (persiste de fato) - merece o
+    // mesmo flash.
     auto is_confirming = [](SystemMenuAction action) {
         return action == SystemMenuAction::Continue ||
                action == SystemMenuAction::RequestQuit ||
                action == SystemMenuAction::Navigated ||
-               action == SystemMenuAction::ControlsChanged;
+               action == SystemMenuAction::ControlsChanged ||
+               action == SystemMenuAction::ControlsApplied;
     };
 
     // DIAGNOSTICO/PROVA (SOM DE HOVER/CLIQUE): GUSWORLD_SYSMENU_HOVER_SELFTEST=1
@@ -759,13 +793,19 @@ SystemMenuLoopOutcome run_system_menu_loop_gl_current(
                             item_index = state.audio_selected;
                             break;
                         case SystemMenuScreen::Controls:
-                            // Confirmando o restaurar-padrao: o item pressionado e a
-                            // pill Sim/Nao do mini-dialogo (0|1); caso contrario, a
-                            // acao/rodape selecionado normalmente. controls_capturing
-                            // nunca chega aqui (interceptado acima, ver o `continue`).
-                            item_index = state.controls_confirming_restore
-                                             ? state.controls_restore_confirm_selected
-                                             : state.controls_selected;
+                            // Confirmando o restaurar-padrao OU o descarte (M2 STAGED
+                            // CHANGES): o item pressionado e a pill Sim/Nao do
+                            // mini-dialogo correspondente (0|1); caso contrario, a
+                            // acao/rodape selecionado normalmente (inclui Aplicar,
+                            // kControlsApplyIndex). controls_capturing nunca chega
+                            // aqui (interceptado acima, ver o `continue`).
+                            if (state.controls_confirming_restore) {
+                                item_index = state.controls_restore_confirm_selected;
+                            } else if (state.controls_confirming_discard) {
+                                item_index = state.controls_discard_confirm_selected;
+                            } else {
+                                item_index = state.controls_selected;
+                            }
                             break;
                         case SystemMenuScreen::Save:
                         case SystemMenuScreen::Video:
@@ -875,6 +915,20 @@ SystemMenuLoopOutcome run_system_menu_loop_gl_current(
                         for (int item = 0; item < 2 && !handled; ++item) {
                             const glintfx::ElementBox box =
                                 ui.get_element_box(controls_confirm_id(item).c_str());
+                            if (!hit_test(box, ev.button.x, ev.button.y)) continue;
+                            handled = true;
+                            const SystemMenuState pre_action_state = state;
+                            const SystemMenuAction action = system_menu_click_option(state, item);
+                            if (is_confirming(action)) flash_pressed(pre_action_state, item);
+                            if (handle_action(action)) return outcome;
+                        }
+                    } else if (state.controls_confirming_discard) {
+                        // Mini-dialogo "descartar alteracoes?" (M2 STAGED
+                        // CHANGES) - MESMA mecanica do restaurar-padrao acima,
+                        // ids proprios (controls_discard_confirm_id).
+                        for (int item = 0; item < 2 && !handled; ++item) {
+                            const glintfx::ElementBox box =
+                                ui.get_element_box(controls_discard_confirm_id(item).c_str());
                             if (!hit_test(box, ev.button.x, ev.button.y)) continue;
                             handled = true;
                             const SystemMenuState pre_action_state = state;

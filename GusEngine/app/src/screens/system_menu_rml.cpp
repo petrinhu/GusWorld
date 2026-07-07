@@ -468,15 +468,33 @@ body { font-family: "Pixel Operator Mono"; background: transparent; width: 100%;
 .keycap.pad { border: 1dp #3a2e18; background-color: #1a140b; color: #F0D98C; }
 .keycap.none { color: #6B6F7A; border: 1dp #3a4256; }
 
+/* RODAPE (M2 STAGED CHANGES, reforma de UX aprovada pelo lider): passou de 2
+   pra 3 botoes - Restaurar padrao (ESQUERDA, sozinho) + Aplicar/Voltar
+   (DIREITA, agrupados) - "aplica na hora" foi trocado por mudancas preparadas
+   + Aplicar explicito (ver o comentario STAGED CHANGES em system_menu.hpp).
+   .ctrl-foot continua space-between (Restaurar de um lado, o GRUPO
+   Aplicar+Voltar do outro); .ctrl-foot-right e um flex ANINHADO (gap nativo do
+   RmlUi 6.3 - shorthand "row-gap, column-gap", ver StyleSheetSpecification.cpp)
+   so pra manter Aplicar e Voltar coladinhos, sem competir com o
+   space-between externo. */
 .ctrl-foot {
   display: flex; justify-content: space-between; align-items: center;
   margin-top: 10dp; padding-top: 10dp; border-top: 1dp #33281a;
 }
+.ctrl-foot-right { display: flex; gap: 8dp; align-items: center; }
 .ctrl-btn {
   font-size: 11dp; letter-spacing: 1dp; padding: 6dp 14dp; border-radius: 8dp;
   border: 1dp #7A5A2E; decorator: vertical-gradient( #2a2113 #1a140b ); color: #F0D98C;
 }
 .ctrl-btn.ghost { color: #9AA5C0; border: 1dp #3a4256; }
+/* "Aplicar" (M2 STAGED CHANGES): cor cyan (mesma familia do resto da UI de
+   confirmacao/foco) pra se destacar como a acao PRIMARIA do rodape - e o
+   UNICO botao que de fato persiste em disco/vale no jogo. */
+.ctrl-btn.apply { color: #22D3EE; border: 1dp #0e6a7d; }
+/* Sinal visual (OPCIONAL, ver o pedido) de "nada a aplicar ainda" -
+   esmaece o botao quando !controls_dirty; continua clicavel (no-op seguro,
+   persistir a MESMA config que ja esta em disco nao faz mal nenhum). */
+.ctrl-btn.apply.disabled { opacity: 0.45; }
 .ctrl-btn.focused { border: 1dp #22D3EE; box-shadow: #22D3EE 0dp 0dp 14dp 1dp; color: #ffffff; }
 .ctrl-btn.pressed {
   decorator: vertical-gradient( #22D3EE #0EA5C9 ); color: #071019; border: 1dp #ffffff;
@@ -484,8 +502,9 @@ body { font-family: "Pixel Operator Mono"; background: transparent; width: 100%;
 }
 
 /* Mini-dialogo de confirmacao do Restaurar padrao (decisao 4 do lider: pede
-   confirmacao). Substitui a lista por um prompt + 2 pills (reusa .verb-pill/
-   .focused do resto do arquivo - MESMA linguagem visual). */
+   confirmacao) E do descarte de alteracoes nao aplicadas (M2 STAGED CHANGES,
+   MESMA mecanica/linguagem visual). Substitui a lista por um prompt + 2 pills
+   (reusa .verb-pill/.focused do resto do arquivo). */
 .ctrl-confirm-title {
   text-align: center; color: #E7ECF5; font-size: 13dp; line-height: 20dp;
   margin: 20dp 0dp 20dp 0dp;
@@ -673,18 +692,21 @@ std::string keyboard_label_for(const gus::domain::input::InputRemapConfig& confi
     return std::string();
 }
 
-// Corpo da tela Controles (M2, mock docs/design/mockups/06-controles-remap.html):
-// painel LARGO (".wide") com 3 colunas (Acao/Teclado/Controle) e as 30 actions
-// curadas/agrupadas (controls_action_name_at/controls_group_at, ver
-// system_menu.hpp) + rodape (Restaurar padrao/Voltar). A coluna "Controle"
-// (gamepad) SEMPRE mostra CONTROLS_NO_BINDING nesta onda: decisao 2 do lider
-// ("so teclado agora, controle fica read-only") + default_controls() nao
-// popula NENHUM gamepad_buttons ainda (nao ha o que exibir de verdade; inventar
-// um glifo seria mentir sobre o dado). Enquanto state.controls_confirming_restore
-// (decisao 4 do lider: pede confirmacao antes de restaurar), a lista inteira e
-// SUBSTITUIDA por um mini-dialogo "tem certeza?" com 2 pills (Sim/Nao) - mais
-// simples que sobrepor um modal por cima da lista, mesma linguagem visual
-// (.verb-pill/.btn-back) ja usada no resto do arquivo.
+// Corpo da tela Controles (M2 -> M2 STAGED CHANGES, mock docs/design/mockups/
+// 06-controles-remap.html): painel LARGO (".wide") com 3 colunas (Acao/
+// Teclado/Controle) e as 30 actions curadas/agrupadas
+// (controls_action_name_at/controls_group_at, ver system_menu.hpp) + rodape
+// (Restaurar padrao / Aplicar - NOVO / Voltar). A coluna "Controle" (gamepad)
+// SEMPRE mostra CONTROLS_NO_BINDING nesta onda: decisao 2 do lider ("so
+// teclado agora, controle fica read-only") + default_controls() nao popula
+// NENHUM gamepad_buttons ainda (nao ha o que exibir de verdade; inventar um
+// glifo seria mentir sobre o dado). Enquanto state.controls_confirming_restore
+// (decisao 4 do lider: pede confirmacao antes de restaurar) OU
+// state.controls_confirming_discard (reforma STAGED CHANGES: pede
+// confirmacao antes de descartar mudancas nao aplicadas ao Voltar/Esc), a
+// lista inteira e SUBSTITUIDA por um mini-dialogo "tem certeza?" com 2 pills
+// (Sim/Nao) - mais simples que sobrepor um modal por cima da lista, mesma
+// linguagem visual (.verb-pill/.btn-back) ja usada no resto do arquivo.
 std::string build_controls_body(const SystemMenuState& state,
                                  const gus::app::i18n::Translator& tr, int pressed_index) {
     std::ostringstream body;
@@ -701,6 +723,25 @@ std::string build_controls_body(const SystemMenuState& state,
         body << "<div class=\"btn-back" << (no_focused ? " focused" : "")
              << pressed_class(1, pressed_index) << "\" id=\"controls-confirm-1\">"
              << tr.tr("CONTROLS_RESTORE_CONFIRM_NO") << "</div>";
+        body << "</div>";  // #sysmenu-panel
+        return body.str();
+    }
+
+    // M2 STAGED CHANGES: mini-dialogo "descartar alteracoes nao aplicadas?"
+    // (Voltar/Esc com controls_dirty=true) - MESMA estrutura visual do
+    // restaurar-padrao acima, ids PROPRIOS ("controls-discard-confirm-<0|1>")
+    // pra nao colidir (embora mutuamente exclusivos - so 1 dialogo por vez).
+    if (state.controls_confirming_discard) {
+        body << "<div class=\"ctrl-confirm-title\">"
+             << tr.tr("CONTROLS_DISCARD_CONFIRM_TITLE") << "</div>";
+        const bool yes_focused = (state.controls_discard_confirm_selected == 0);
+        const bool no_focused = (state.controls_discard_confirm_selected == 1);
+        body << "<div class=\"verb-pill" << (yes_focused ? " focused" : "")
+             << pressed_class(0, pressed_index) << "\" id=\"controls-discard-confirm-0\">"
+             << tr.tr("CONTROLS_DISCARD_CONFIRM_YES") << "</div>";
+        body << "<div class=\"btn-back" << (no_focused ? " focused" : "")
+             << pressed_class(1, pressed_index) << "\" id=\"controls-discard-confirm-1\">"
+             << tr.tr("CONTROLS_DISCARD_CONFIRM_NO") << "</div>";
         body << "</div>";  // #sysmenu-panel
         return body.str();
     }
@@ -779,15 +820,27 @@ std::string build_controls_body(const SystemMenuState& state,
     }
     body << "</div>";  // .ctrl-list
 
+    // RODAPE (M2 STAGED CHANGES): Restaurar padrao sozinho a ESQUERDA;
+    // Aplicar+Voltar agrupados a DIREITA (.ctrl-foot-right, ver <style>) -
+    // layout aprovado pelo lider pro novo botao "Aplicar".
     body << "<div class=\"ctrl-foot\">";
     const bool restore_focused = (state.controls_selected == kControlsRestoreIndex);
+    const bool apply_focused = (state.controls_selected == kControlsApplyIndex);
     const bool back_focused = (state.controls_selected == kControlsBackIndex);
     body << "<div class=\"ctrl-btn ghost" << (restore_focused ? " focused" : "")
          << pressed_class(kControlsRestoreIndex, pressed_index) << "\" id=\"controls-item-"
          << kControlsRestoreIndex << "\">" << tr.tr("SETTINGS_RESET_DEFAULTS") << "</div>";
+    body << "<div class=\"ctrl-foot-right\">";
+    // "Aplicar" esmaecido (sinal visual OPCIONAL) quando nao ha mudanca staged
+    // pendente (!controls_dirty) - continua clicavel (no-op seguro).
+    body << "<div class=\"ctrl-btn apply" << (state.controls_dirty ? "" : " disabled")
+         << (apply_focused ? " focused" : "") << pressed_class(kControlsApplyIndex, pressed_index)
+         << "\" id=\"controls-item-" << kControlsApplyIndex << "\">" << tr.tr("SETTINGS_APPLY")
+         << "</div>";
     body << "<div class=\"ctrl-btn" << (back_focused ? " focused" : "")
          << pressed_class(kControlsBackIndex, pressed_index) << "\" id=\"controls-item-"
          << kControlsBackIndex << "\">" << tr.tr("SETTINGS_BACK") << "</div>";
+    body << "</div>";  // .ctrl-foot-right
     body << "</div>";  // .ctrl-foot
 
     body << "<div class=\"footer-hint\">" << tr.tr("CONTROLS_NAV_HINT") << "</div>";

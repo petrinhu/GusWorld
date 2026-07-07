@@ -456,8 +456,8 @@ TEST_CASE("controls_action_name_at/controls_group_at: indice fora do intervalo "
     REQUIRE(controls_group_at(kControlsActionCount) == -1);
 }
 
-TEST_CASE("Controls: UP/DOWN navega os 32 itens com WRAP (30 actions + "
-          "Restaurar padrao + Voltar)",
+TEST_CASE("Controls: UP/DOWN navega os 33 itens com WRAP (30 actions + "
+          "Restaurar padrao + Aplicar + Voltar, M2 STAGED CHANGES)",
           "[system_menu][controls]") {
     SystemMenuState state;
     goto_controls(state);
@@ -543,6 +543,9 @@ TEST_CASE("system_menu_controls_capture_key: tecla LIVRE aplica o remap e "
     REQUIRE(action == SystemMenuAction::ControlsChanged);
     REQUIRE_FALSE(state.controls_capturing);
     REQUIRE_FALSE(state.controls_last_action_swapped);
+    // M2 STAGED CHANGES: remapear marca dirty na COPIA DE TRABALHO - a
+    // baseline (controls_applied_config) fica intocada ate "Aplicar".
+    REQUIRE(state.controls_dirty);
 
     const auto& actions = state.controls_config.actions;
     const auto it = std::find_if(actions.begin(), actions.end(), [](const auto& a) {
@@ -675,14 +678,225 @@ TEST_CASE("Controls: confirmar restaurar (Sim) aplica default_controls() e "
 }
 
 TEST_CASE("Controls: ENTER em Voltar (kControlsBackIndex) volta pra "
-          "ConfigCategories",
+          "ConfigCategories SEM dirty (M2 STAGED CHANGES: nada pra confirmar)",
           "[system_menu][controls]") {
     SystemMenuState state;
     goto_controls(state);
+    REQUIRE_FALSE(state.controls_dirty);  // estado fresco, nada staged ainda
     state.controls_selected = kControlsBackIndex;
     const SystemMenuAction action = system_menu_key_down(state, SDLK_RETURN);
     REQUIRE(action == SystemMenuAction::Navigated);
     REQUIRE(state.screen == SystemMenuScreen::ConfigCategories);
+    REQUIRE_FALSE(state.controls_confirming_discard);
+}
+
+// ------------------------------------------------- M2 STAGED CHANGES (Aplicar/Voltar)
+//
+// Reforma de UX aprovada pelo lider: "aplica na hora" trocado por copia de
+// trabalho + Aplicar explicito (ver o comentario STAGED CHANGES em
+// system_menu.hpp). Helper local: semeia controls_config E
+// controls_applied_config com a MESMA baseline conhecida (MESMO padrao de
+// seeding que o CHAMADOR real faz em system_menu_loop.cpp apos load_controls).
+namespace {
+void seed_controls_baseline(SystemMenuState& state) {
+    goto_controls(state);
+    state.controls_config = gus::domain::input::default_controls();
+    state.controls_applied_config = state.controls_config;
+}
+}  // namespace
+
+TEST_CASE("Controls: kControlsApplyIndex + ENTER promove a copia de trabalho a "
+          "baseline, limpa dirty, devolve ControlsApplied e NAO fecha a tela",
+          "[system_menu][controls][staged]") {
+    SystemMenuState state;
+    seed_controls_baseline(state);
+
+    // Remapeia move_forward -> 'K' (staged, ainda nao aplicado).
+    system_menu_key_down(state, SDLK_RETURN);
+    system_menu_controls_capture_key(state, /*is_escape=*/false, /*godot_keycode=*/'K');
+    REQUIRE(state.controls_dirty);
+    const gus::domain::input::InputRemapConfig staged = state.controls_config;
+    REQUIRE_FALSE(state.controls_applied_config == staged);  // baseline AINDA nao mudou
+
+    state.controls_selected = kControlsApplyIndex;
+    const SystemMenuAction action = system_menu_key_down(state, SDLK_RETURN);
+    REQUIRE(action == SystemMenuAction::ControlsApplied);
+    REQUIRE_FALSE(state.controls_dirty);                  // dirty limpo
+    REQUIRE(state.controls_applied_config == staged);      // baseline PROMOVIDA
+    REQUIRE(state.screen == SystemMenuScreen::Controls);   // tela NAO fecha
+}
+
+TEST_CASE("Controls: Voltar (kControlsBackIndex) COM dirty abre o dialogo de "
+          "descarte em vez de navegar direto",
+          "[system_menu][controls][staged]") {
+    SystemMenuState state;
+    seed_controls_baseline(state);
+    system_menu_key_down(state, SDLK_RETURN);
+    system_menu_controls_capture_key(state, false, 'K');  // remap staged, dirty=true
+    REQUIRE(state.controls_dirty);
+
+    state.controls_selected = kControlsBackIndex;
+    const SystemMenuAction action = system_menu_key_down(state, SDLK_RETURN);
+    REQUIRE(action == SystemMenuAction::None);              // ainda NAO navegou
+    REQUIRE(state.controls_confirming_discard);
+    REQUIRE(state.controls_discard_confirm_selected == 1);  // default seguro = Nao
+    REQUIRE(state.screen == SystemMenuScreen::Controls);
+    REQUIRE(state.controls_dirty);                          // config staged intocada
+}
+
+TEST_CASE("Controls: Esc na navegacao normal COM dirty tem o MESMO gate de "
+          "Voltar (abre confirmar-descarte, nao navega direto)",
+          "[system_menu][controls][staged]") {
+    SystemMenuState state;
+    seed_controls_baseline(state);
+    system_menu_key_down(state, SDLK_RETURN);
+    system_menu_controls_capture_key(state, false, 'K');
+    REQUIRE(state.controls_dirty);
+
+    const SystemMenuAction action = system_menu_key_down(state, SDLK_ESCAPE);
+    REQUIRE(action == SystemMenuAction::None);
+    REQUIRE(state.controls_confirming_discard);
+    REQUIRE(state.screen == SystemMenuScreen::Controls);
+}
+
+TEST_CASE("Controls: confirmar descarte (Sim) reverte a copia de trabalho pra "
+          "baseline, limpa dirty e SO ENTAO navega pro pai",
+          "[system_menu][controls][staged]") {
+    SystemMenuState state;
+    seed_controls_baseline(state);
+    const gus::domain::input::InputRemapConfig baseline = state.controls_applied_config;
+    system_menu_key_down(state, SDLK_RETURN);
+    system_menu_controls_capture_key(state, false, 'K');  // customiza (staged)
+    REQUIRE_FALSE(state.controls_config == baseline);
+
+    state.controls_selected = kControlsBackIndex;
+    system_menu_key_down(state, SDLK_RETURN);  // abre o dialogo de descarte
+    REQUIRE(state.controls_confirming_discard);
+    system_menu_key_down(state, SDLK_LEFT);    // alterna pra Sim (indice 0)
+    REQUIRE(state.controls_discard_confirm_selected == 0);
+
+    const SystemMenuAction action = system_menu_key_down(state, SDLK_RETURN);
+    REQUIRE(action == SystemMenuAction::Navigated);
+    REQUIRE(state.screen == SystemMenuScreen::ConfigCategories);
+    REQUIRE_FALSE(state.controls_confirming_discard);
+    REQUIRE_FALSE(state.controls_dirty);
+    REQUIRE(state.controls_config == baseline);  // revertido - controls.json NUNCA foi tocado
+}
+
+TEST_CASE("Controls: confirmar descarte (Nao/Esc) cancela o dialogo e "
+          "permanece em Controles com a copia de trabalho (e dirty) intocados",
+          "[system_menu][controls][staged]") {
+    // Caminho Esc: cancela o dialogo, config customizado sobrevive.
+    {
+        SystemMenuState state;
+        seed_controls_baseline(state);
+        system_menu_key_down(state, SDLK_RETURN);
+        system_menu_controls_capture_key(state, false, 'K');
+        const gus::domain::input::InputRemapConfig customizado = state.controls_config;
+
+        state.controls_selected = kControlsBackIndex;
+        system_menu_key_down(state, SDLK_RETURN);  // abre o dialogo
+        REQUIRE(state.controls_confirming_discard);
+
+        const SystemMenuAction esc_action = system_menu_key_down(state, SDLK_ESCAPE);
+        REQUIRE(esc_action == SystemMenuAction::None);
+        REQUIRE_FALSE(state.controls_confirming_discard);
+        REQUIRE(state.screen == SystemMenuScreen::Controls);  // NAO navegou
+        REQUIRE(state.controls_config == customizado);        // intacto
+        REQUIRE(state.controls_dirty);                        // dirty sobrevive
+    }
+
+    // Caminho Nao (ENTER com o default 1=Nao ja selecionado): mesmo efeito.
+    {
+        SystemMenuState state;
+        seed_controls_baseline(state);
+        system_menu_key_down(state, SDLK_RETURN);
+        system_menu_controls_capture_key(state, false, 'K');
+
+        state.controls_selected = kControlsBackIndex;
+        system_menu_key_down(state, SDLK_RETURN);  // abre o dialogo (default = Nao)
+        REQUIRE(state.controls_discard_confirm_selected == 1);
+
+        const SystemMenuAction no_action = system_menu_key_down(state, SDLK_RETURN);
+        REQUIRE(no_action == SystemMenuAction::None);
+        REQUIRE_FALSE(state.controls_confirming_discard);
+        REQUIRE(state.screen == SystemMenuScreen::Controls);
+        REQUIRE(state.controls_dirty);
+    }
+}
+
+TEST_CASE("system_menu_click_option (Controls): clicar em Aplicar promove a "
+          "baseline e devolve ControlsApplied; clicar em Voltar com dirty abre "
+          "o dialogo de descarte (mouse, MESMA logica do teclado)",
+          "[system_menu][controls][staged]") {
+    SystemMenuState state;
+    seed_controls_baseline(state);
+    system_menu_key_down(state, SDLK_RETURN);
+    system_menu_controls_capture_key(state, false, 'K');
+    REQUIRE(state.controls_dirty);
+    const gus::domain::input::InputRemapConfig staged = state.controls_config;
+
+    SystemMenuState apply_click = state;
+    REQUIRE(system_menu_click_option(apply_click, kControlsApplyIndex) ==
+            SystemMenuAction::ControlsApplied);
+    REQUIRE_FALSE(apply_click.controls_dirty);
+    REQUIRE(apply_click.controls_applied_config == staged);
+    REQUIRE(apply_click.screen == SystemMenuScreen::Controls);
+
+    SystemMenuState back_click = state;
+    REQUIRE(system_menu_click_option(back_click, kControlsBackIndex) ==
+            SystemMenuAction::None);
+    REQUIRE(back_click.controls_confirming_discard);
+    REQUIRE(back_click.screen == SystemMenuScreen::Controls);
+}
+
+TEST_CASE("system_menu_click_option (Controls): durante confirmar-descarte, "
+          "indice reinterpretado como Sim(0)/Nao(1)",
+          "[system_menu][controls][staged]") {
+    SystemMenuState state;
+    seed_controls_baseline(state);
+    const gus::domain::input::InputRemapConfig baseline = state.controls_applied_config;
+    system_menu_key_down(state, SDLK_RETURN);
+    system_menu_controls_capture_key(state, false, 'K');
+    state.controls_selected = kControlsBackIndex;
+    system_menu_key_down(state, SDLK_RETURN);  // abre o dialogo
+    REQUIRE(state.controls_confirming_discard);
+
+    SystemMenuState click_yes = state;
+    const SystemMenuAction yes_action = system_menu_click_option(click_yes, 0);
+    REQUIRE(yes_action == SystemMenuAction::Navigated);
+    REQUIRE_FALSE(click_yes.controls_confirming_discard);
+    REQUIRE_FALSE(click_yes.controls_dirty);
+    REQUIRE(click_yes.controls_config == baseline);
+    REQUIRE(click_yes.screen == SystemMenuScreen::ConfigCategories);
+
+    SystemMenuState click_no = state;
+    const SystemMenuAction no_action = system_menu_click_option(click_no, 1);
+    REQUIRE(no_action == SystemMenuAction::None);
+    REQUIRE_FALSE(click_no.controls_confirming_discard);
+    REQUIRE(click_no.controls_dirty);  // fica editando, nada revertido
+    REQUIRE(click_no.screen == SystemMenuScreen::Controls);
+}
+
+TEST_CASE("Controls: confirmar Restaurar padrao (Sim) marca dirty na copia de "
+          "trabalho SEM tocar a baseline (M2 STAGED CHANGES)",
+          "[system_menu][controls][staged]") {
+    SystemMenuState state;
+    seed_controls_baseline(state);
+    system_menu_key_down(state, SDLK_RETURN);
+    system_menu_controls_capture_key(state, false, 'K');  // customiza move_forward
+    const gus::domain::input::InputRemapConfig baseline_antes = state.controls_applied_config;
+
+    state.controls_selected = kControlsRestoreIndex;
+    system_menu_key_down(state, SDLK_RETURN);  // abre o prompt (default = Nao)
+    system_menu_key_down(state, SDLK_LEFT);    // alterna pra Sim (0)
+    const SystemMenuAction action = system_menu_key_down(state, SDLK_RETURN);
+
+    REQUIRE(action == SystemMenuAction::ControlsChanged);
+    REQUIRE(state.controls_dirty);  // restaurar tambem e staged - ainda precisa de Aplicar
+    REQUIRE(state.controls_config == gus::domain::input::default_controls());
+    REQUIRE(state.controls_applied_config == baseline_antes);  // baseline INTOCADA
+    REQUIRE(state.screen == SystemMenuScreen::Controls);
 }
 
 TEST_CASE("system_menu_click_option (Controls): clicar numa action foca+entra "
