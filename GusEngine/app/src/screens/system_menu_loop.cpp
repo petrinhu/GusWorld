@@ -46,9 +46,12 @@
 #include "gus/app/screens/system_menu_rml.hpp"
 #include "gus/core/asset_paths.hpp"            // kMenuHoverSfxFile/kMenuClickSfxFile/kSfxDir
 #include "gus/core/spatial/camera_clamp.hpp"  // gus::core::spatial::Rect
+#include "gus/domain/input/controls_name.hpp"     // kDefaultProfile (tela Controles, M2)
 #include "gus/domain/settings/system_settings.hpp"
 #include "gus/platform/assets/asset_source.hpp"  // ASSETS-VFS-F1 (ADR-013): porteiro
+#include "gus/platform/fs/controls_file_store.hpp"  // load_controls/save_controls (M2)
 #include "gus/platform/fs/settings_file_store.hpp"
+#include "gus/platform/input/key_translation.hpp"  // sdl_key_to_godot_keycode (captura, M2)
 #include "gus/platform/render2d/render2d_gl3.hpp"
 #include "gus/platform/rmlui/gl3_loader.hpp"  // glad load (variante owning_gl)
 
@@ -140,6 +143,20 @@ void apply_and_persist(const SystemMenuState& state,
     }
 }
 
+// Persiste state.controls_config em "<perfil>_controls.json" (tela Controles,
+// M2 - MESMO padrao best-effort de apply_and_persist acima: falha de I/O so
+// loga, a config em MEMORIA continua valendo pro resto da sessao). Perfil UNICO
+// "default" nesta onda (nao ha selecao de jogador na UI ainda - ADR-007 fork 3
+// preve multi-perfil, mas a tela nao expoe essa escolha; residuo sinalizado).
+void persist_controls(const SystemMenuState& state, const std::string& settings_dir) {
+    if (!gus::platform::fs::save_controls(
+            state.controls_config, settings_dir,
+            std::string(gus::domain::input::kDefaultProfile))) {
+        std::cerr << "[system_menu] aviso: falha ao salvar controls.json (remap "
+                     "vale nesta sessao, mas nao persistiu)\n";
+    }
+}
+
 // Track ids (system_menu_rml.cpp: "slider-track-<indice>", indice = AudioItem).
 std::string track_id_for_item(int item) {
     return "slider-track-" + std::to_string(item);
@@ -160,6 +177,17 @@ std::string audio_item_id(int item) {
     return "audio-item-" + std::to_string(item);
 }
 constexpr const char* kPlaceholderBackId = "placeholder-back";
+
+// Ids da tela Controles (system_menu_rml.cpp: build_controls_body):
+// "controls-item-<indice>" (0..kControlsActionCount-1 = action, kControlsRestoreIndex/
+// kControlsBackIndex = rodape) na navegacao normal; "controls-confirm-<0|1>"
+// (Sim/Nao) no mini-dialogo de restaurar-padrao.
+std::string controls_item_id(int item) {
+    return "controls-item-" + std::to_string(item);
+}
+std::string controls_confirm_id(int item) {
+    return "controls-confirm-" + std::to_string(item);
+}
 
 // Hit-test simples: cursor (x,y, espaco-janela) dentro da caixa border-box
 // devolvida por glintfx::UiLayer::get_element_box (MESMO espaco de coordenadas
@@ -202,6 +230,17 @@ int current_hover_index(const glintfx::UiLayer& ui, const SystemMenuState& state
         case SystemMenuScreen::Audio:
             for (int i = 0; i < kAudioItemCount; ++i) fill(i, audio_item_id(i));
             break;
+        case SystemMenuScreen::Controls:
+            // Capturando: nenhum item hover-testavel (system_menu_hover_index ja
+            // devolve count=0 pra essa combinacao - nada a preencher aqui).
+            // Confirmando o restaurar-padrao: so as 2 pills do mini-dialogo.
+            if (state.controls_confirming_restore) {
+                fill(0, controls_confirm_id(0));
+                fill(1, controls_confirm_id(1));
+            } else if (!state.controls_capturing) {
+                for (int i = 0; i < kControlsItemCount; ++i) fill(i, controls_item_id(i));
+            }
+            break;
         case SystemMenuScreen::Save:
         case SystemMenuScreen::Video:
         case SystemMenuScreen::Language:
@@ -224,6 +263,13 @@ SystemMenuLoopOutcome run_system_menu_loop_gl_current(
     SystemMenuState state;
     state.music_volume = audio.music_volume();
     state.sfx_volume = audio.sfx_volume();
+    // Tela Controles (M2): carrega o remap persistido (ou default_controls() se
+    // ausente/corrompido, ver controls_file_store.hpp) - MESMO espirito de
+    // music_volume/sfx_volume acima (semeado do estado JA carregado no boot,
+    // nao resetado por system_menu_open). Perfil UNICO "default" nesta onda (ver
+    // persist_controls acima - nao ha selecao de jogador na UI ainda).
+    state.controls_config = gus::platform::fs::load_controls(
+        settings_dir, std::string(gus::domain::input::kDefaultProfile));
     system_menu_open(state);
 
     int pw = 0, ph = 0;
@@ -384,6 +430,9 @@ SystemMenuLoopOutcome run_system_menu_loop_gl_current(
         if (action == SystemMenuAction::VolumeChanged) {
             apply_and_persist(state, audio, settings_dir);
         }
+        if (action == SystemMenuAction::ControlsChanged) {
+            persist_controls(state, settings_dir);
+        }
         // None/Navigated: o ESTADO pode ter mudado mesmo assim (navegacao/foco
         // move e devolve None, ou trocou de tela e devolve Navigated) - reload
         // sempre.
@@ -394,10 +443,16 @@ SystemMenuLoopOutcome run_system_menu_loop_gl_current(
     // Confirma se `action` merece o flash de PRESS (ver topo do arquivo): SO as
     // acoes que de fato "acionam uma opcao" (pill/categoria/Voltar) - nunca
     // VolumeChanged (drag de slider nao pisca) nem None (nao aconteceu nada).
+    // ControlsChanged (M2) SOMA aqui: confirmar "Sim" no restaurar-padrao e uma
+    // acao destrutiva (reseta o remap do jogador) - merece o mesmo flash de
+    // confirmacao das demais (entrar em modo CAPTURA tambem devolve None, entao
+    // nao pisca - o feedback dela e a propria linha ciano "Pressione uma
+    // tecla...", ja imediato via reload()).
     auto is_confirming = [](SystemMenuAction action) {
         return action == SystemMenuAction::Continue ||
                action == SystemMenuAction::RequestQuit ||
-               action == SystemMenuAction::Navigated;
+               action == SystemMenuAction::Navigated ||
+               action == SystemMenuAction::ControlsChanged;
     };
 
     // DIAGNOSTICO/PROVA (SOM DE HOVER/CLIQUE): GUSWORLD_SYSMENU_HOVER_SELFTEST=1
@@ -464,6 +519,26 @@ SystemMenuLoopOutcome run_system_menu_loop_gl_current(
                 continue;
             }
             if (ev.type == SDL_EVENT_KEY_DOWN && !ev.key.repeat) {
+                // MODO DE CAPTURA (tela Controles, M2): intercepta ANTES do
+                // roteamento generico abaixo - toda tecla (nao so UP/DOWN/
+                // ENTER/ESC com o significado especial de navegacao) e
+                // candidata a virar o novo binding. Esc CANCELA (nao vira
+                // binding); qualquer outra tecla e traduzida pro esquema Godot
+                // (sdl_key_to_godot_keycode, MESMA tabela que o InputMapper de
+                // gameplay usa) e aplicada via system_menu_controls_capture_key
+                // (swap-on-conflict + persistencia se ControlsChanged).
+                if (state.screen == SystemMenuScreen::Controls && state.controls_capturing) {
+                    const bool is_escape = (ev.key.key == SDLK_ESCAPE);
+                    const long long godot_keycode =
+                        is_escape ? 0
+                                  : gus::platform::input::sdl_key_to_godot_keycode(
+                                        static_cast<int>(ev.key.key));
+                    const SystemMenuAction action =
+                        system_menu_controls_capture_key(state, is_escape, godot_keycode);
+                    if (handle_action(action)) return outcome;
+                    continue;
+                }
+
                 const bool is_confirm_key = (ev.key.key == SDLK_RETURN ||
                                               ev.key.key == SDLK_KP_ENTER ||
                                               ev.key.key == SDLK_SPACE);
@@ -482,6 +557,15 @@ SystemMenuLoopOutcome run_system_menu_loop_gl_current(
                             break;
                         case SystemMenuScreen::Audio:
                             item_index = state.audio_selected;
+                            break;
+                        case SystemMenuScreen::Controls:
+                            // Confirmando o restaurar-padrao: o item pressionado e a
+                            // pill Sim/Nao do mini-dialogo (0|1); caso contrario, a
+                            // acao/rodape selecionado normalmente. controls_capturing
+                            // nunca chega aqui (interceptado acima, ver o `continue`).
+                            item_index = state.controls_confirming_restore
+                                             ? state.controls_restore_confirm_selected
+                                             : state.controls_selected;
                             break;
                         case SystemMenuScreen::Save:
                         case SystemMenuScreen::Video:
@@ -577,6 +661,42 @@ SystemMenuLoopOutcome run_system_menu_loop_gl_current(
                         const SystemMenuAction action =
                             system_menu_click_option(state, item);
                         if (handle_action(action)) return outcome;
+                    }
+                } else if (state.screen == SystemMenuScreen::Controls) {
+                    // Capturando: mouse NAO participa (o jogador precisa apertar
+                    // uma tecla FISICA - ver a interceptacao no ramo KEY_DOWN
+                    // acima) - clique nao faz nada nesse modo.
+                    if (state.controls_capturing) {
+                        // no-op
+                    } else if (state.controls_confirming_restore) {
+                        // Mini-dialogo "tem certeza?": so as 2 pills Sim/Nao
+                        // (system_menu_click_option reinterpreta o indice como
+                        // 0=Sim/1=Nao neste sub-modo, ver system_menu.cpp).
+                        for (int item = 0; item < 2 && !handled; ++item) {
+                            const glintfx::ElementBox box =
+                                ui.get_element_box(controls_confirm_id(item).c_str());
+                            if (!hit_test(box, ev.button.x, ev.button.y)) continue;
+                            handled = true;
+                            const SystemMenuState pre_action_state = state;
+                            const SystemMenuAction action = system_menu_click_option(state, item);
+                            if (is_confirming(action)) flash_pressed(pre_action_state, item);
+                            if (handle_action(action)) return outcome;
+                        }
+                    } else {
+                        // Navegacao normal: clicar numa action FOCA+ENTRA em
+                        // captura (system_menu_click_option, MESMA convencao
+                        // "focar+ENTER" das outras telas); clicar em Restaurar
+                        // abre o mini-dialogo; clicar em Voltar confirma na hora.
+                        for (int item = 0; item < kControlsItemCount && !handled; ++item) {
+                            const glintfx::ElementBox box =
+                                ui.get_element_box(controls_item_id(item).c_str());
+                            if (!hit_test(box, ev.button.x, ev.button.y)) continue;
+                            handled = true;
+                            const SystemMenuState pre_action_state = state;
+                            const SystemMenuAction action = system_menu_click_option(state, item);
+                            if (is_confirming(action)) flash_pressed(pre_action_state, item);
+                            if (handle_action(action)) return outcome;
+                        }
                     }
                 } else if (state.screen == SystemMenuScreen::Save ||
                            state.screen == SystemMenuScreen::Video ||
