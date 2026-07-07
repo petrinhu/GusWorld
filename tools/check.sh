@@ -117,15 +117,19 @@ GATE=0
 echo "GATE=$GATE"
 
 # ---------------------------------------------------------------- SUITE
+# Log completo do ctest vai pra um caminho FIXO dentro do build dir (sobrescrito a
+# cada rodada, nao precisa de remocao): antes ia pra /tmp/.gusworld_ctest.$$ e era
+# descartado via `gio trash` a cada execucao do hook PostToolUse - centenas de
+# arquivos por sessao de trabalho poluindo o Lixo do usuario (AC-E6).
+CTEST_LOG="$ENGINE/build/$PRESET/last_ctest.log"
 SUITE=0
 if [ "$BUILD" = "0" ]; then
     set +e
     # outputOnFailure ja vem do testPreset; aqui so capturamos o resumo.
-    ( cd "$ENGINE" && ctest --preset "$PRESET" 2>&1 ) | tee /tmp/.gusworld_ctest.$$ \
+    ( cd "$ENGINE" && ctest --preset "$PRESET" 2>&1 ) | tee "$CTEST_LOG" \
         | grep -E "tests passed|tests failed|Total Test" || true
     SUITE=${PIPESTATUS[0]}
     set -e
-    gio trash /tmp/.gusworld_ctest.$$ 2>/dev/null || true
 fi
 echo "SUITE=$SUITE"
 
