@@ -1542,14 +1542,18 @@ void BattleScene::render(IRenderer& renderer, float viewport_px_w,
 
             // AP pips (latao) + rotulo "AP".
             const Vec2 apo = cockpit_ap_pips_origin();
-            renderer.draw_text("AP", apo.x, apo.y - kCockpitLabelPx - 1.0f,
+            const std::string ap_label =
+                translator_ != nullptr ? translator_->tr("HUD_AP_LABEL") : std::string("AP");
+            renderer.draw_text(ap_label.c_str(), apo.x, apo.y - kCockpitLabelPx - 1.0f,
                                kCockpitLabelPx, kInkDim, /*bold=*/false);
             draw_pips(renderer, apo.x + kCockpitResLabelW, apo.y, a->max_ap(), a->ap(),
                       gus::domain::combat::combat_constants::kBaseApPerTurn,
                       kApLitColor, kApOffColor);
             // Mana pips (cyan) + rotulo "MANA".
             const Vec2 mno = cockpit_mana_pips_origin();
-            renderer.draw_text("MANA", mno.x, mno.y - kCockpitLabelPx - 1.0f,
+            const std::string mana_label =
+                translator_ != nullptr ? translator_->tr("HUD_MANA_LABEL") : std::string("MANA");
+            renderer.draw_text(mana_label.c_str(), mno.x, mno.y - kCockpitLabelPx - 1.0f,
                                kCockpitLabelPx, kInkDim, /*bold=*/false);
             draw_pips(renderer, mno.x + kCockpitResLabelW, mno.y, a->max_mana(),
                       a->mana(), gus::domain::combat::combat_constants::kManaCap,
@@ -1563,7 +1567,10 @@ void BattleScene::render(IRenderer& renderer, float viewport_px_w,
             if (current_actor_is_player() && !combat_over() && !choosing_actor_ &&
                 !player_strike_pending_) {
                 const Rect mz = cockpit_menu_zone();
-                renderer.draw_text("ACAO", mz.x, mz.y - kCockpitLabelPx - 2.0f,
+                const std::string action_label = translator_ != nullptr
+                                                      ? translator_->tr("HUD_ACTION_LABEL")
+                                                      : std::string("ACAO");
+                renderer.draw_text(action_label.c_str(), mz.x, mz.y - kCockpitLabelPx - 2.0f,
                                    kCockpitLabelPx, kInkDim, /*bold=*/false);
                 const auto items = menu_.layout(mz);
                 for (int i = 0; i < kBattleVerbCount; ++i) {
