@@ -114,6 +114,9 @@
 #include <sstream>
 #include <string>
 
+#include "gus/domain/input/action_registry.hpp"  // ActionDefinition (label i18n key + categoria)
+#include "gus/domain/input/controls_diff.hpp"    // human_label_for_keycode (rotulo legivel da tecla)
+
 namespace gus::app::screens {
 
 namespace {
@@ -353,6 +356,80 @@ body { font-family: "Pixel Operator Mono"; background: transparent; width: 100%;
   text-align: center; color: #9AA5C0; font-size: 13dp;
   margin: 24dp 0dp 30dp 0dp;
 }
+
+/* TELA CONTROLES (M2, mock docs/design/mockups/06-controles-remap.html): painel
+   MAIS LARGO (o mock usa 3 colunas Acao/Teclado/Controle - nao cabe nos 420dp
+   das demais 7 telas). #sysmenu-panel.wide sobrescreve so width/margin-left
+   (mesma formula -metade da largura, ver o comentario de #sysmenu-panel acima);
+   o resto (gradiente/borda/padding/box-shadow/corner) e herdado sem duplicar. */
+#sysmenu-panel.wide {
+  width: 620dp; margin-left: -310dp;
+}
+
+.ctrl-cols-head {
+  display: flex; color: #9AA5C0; font-size: 10dp; letter-spacing: 2dp;
+  text-transform: uppercase; padding: 0dp 6dp 6dp 6dp; border-bottom: 1dp #33281a;
+}
+.ctrl-cols-head .c-act { flex: 1; }
+.ctrl-cols-head .c-key { width: 130dp; text-align: center; }
+.ctrl-cols-head .c-pad { width: 100dp; text-align: center; }
+
+/* Lista ROLAVEL (30 actions nao cabem sem scroll - overflow-y:auto, MESMO
+   espirito do mock, mas com ALTURA FIXA em vez de flex:1 - o #sysmenu-panel
+   das outras telas usa fluxo de bloco normal, nao flexbox, entao "flex:1"
+   nao teria container flex pra resolver contra; altura fixa e mais simples e
+   coerente com o resto do arquivo). */
+.ctrl-list {
+  height: 270dp; overflow-y: auto; margin-top: 4dp; padding-right: 4dp;
+}
+.ctrl-group {
+  color: #C9A24B; font-size: 10dp; letter-spacing: 2dp; text-transform: uppercase;
+  margin: 10dp 0dp 4dp 6dp; opacity: 0.8;
+}
+.ctrl-row {
+  display: flex; align-items: center; padding: 6dp 6dp; border-radius: 6dp;
+}
+.ctrl-row .c-act { flex: 1; color: #E7ECF5; font-size: 12dp; }
+.ctrl-row .c-key { width: 130dp; text-align: center; }
+.ctrl-row .c-pad { width: 100dp; text-align: center; }
+.ctrl-row.sel {
+  box-shadow: #C9A24B66 0dp 0dp 0dp 1dp; decorator: vertical-gradient( #C9A24B24 #C9A24B0a );
+}
+.ctrl-row.capturing {
+  box-shadow: #22D3EE 0dp 0dp 0dp 1dp; decorator: vertical-gradient( #22D3EE1a #22D3EE0a );
+}
+.ctrl-row.capturing .ctrl-capture-text { color: #22D3EE; font-size: 11dp; }
+.ctrl-conflict { color: #F43F5E; font-size: 10dp; margin-top: 2dp; }
+
+.keycap {
+  display: inline-block; min-width: 40dp; padding: 3dp 8dp; border-radius: 5dp;
+  background-color: #0d1320; border: 1dp #33405e; color: #E7ECF5; font-size: 11dp;
+}
+.keycap.pad { border: 1dp #3a2e18; background-color: #1a140b; color: #F0D98C; }
+.keycap.none { color: #6B6F7A; border: 1dp #3a4256; }
+
+.ctrl-foot {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-top: 10dp; padding-top: 10dp; border-top: 1dp #33281a;
+}
+.ctrl-btn {
+  font-size: 11dp; letter-spacing: 1dp; padding: 6dp 14dp; border-radius: 8dp;
+  border: 1dp #7A5A2E; decorator: vertical-gradient( #2a2113 #1a140b ); color: #F0D98C;
+}
+.ctrl-btn.ghost { color: #9AA5C0; border: 1dp #3a4256; }
+.ctrl-btn.focused { border: 1dp #22D3EE; box-shadow: #22D3EE 0dp 0dp 14dp 1dp; color: #ffffff; }
+.ctrl-btn.pressed {
+  decorator: vertical-gradient( #22D3EE #0EA5C9 ); color: #071019; border: 1dp #ffffff;
+  box-shadow: #ffffff 0dp 0dp 22dp 3dp;
+}
+
+/* Mini-dialogo de confirmacao do Restaurar padrao (decisao 4 do lider: pede
+   confirmacao). Substitui a lista por um prompt + 2 pills (reusa .verb-pill/
+   .focused do resto do arquivo - MESMA linguagem visual). */
+.ctrl-confirm-title {
+  text-align: center; color: #E7ECF5; font-size: 13dp; line-height: 20dp;
+  margin: 20dp 0dp 20dp 0dp;
+}
 )RCSS";
 
 // Corpo dos 4 pontos de latao (idempotente entre as telas).
@@ -360,12 +437,15 @@ constexpr const char* kCorners =
     "<div class=\"corner tl\"></div><div class=\"corner tr\"></div>"
     "<div class=\"corner bl\"></div><div class=\"corner br\"></div>";
 
-// Preambulo comum (scrim + abertura do painel + kicker/titulo/divisor) - as 7
+// Preambulo comum (scrim + abertura do painel + kicker/titulo/divisor) - as 8
 // telas repetem esta moldura, so o CONTEUDO abaixo do divisor muda.
+// `extra_panel_class` (default vazio): classe extra no #sysmenu-panel - so a
+// tela Controles usa (".wide", ver kSharedStyle) pra caber as 3 colunas do
+// mock (Acao/Teclado/Controle) sem espremer o texto.
 void append_panel_open(std::ostringstream& body, const gus::app::i18n::Translator& tr,
-                        const char* title_key) {
+                        const char* title_key, const char* extra_panel_class = "") {
     body << "<div id=\"sysmenu-scrim\"></div>";
-    body << "<div id=\"sysmenu-panel\">" << kCorners;
+    body << "<div id=\"sysmenu-panel\" class=\"" << extra_panel_class << "\">" << kCorners;
     body << "<div class=\"kicker\">" << tr.tr("MENU_SYSTEM_KICKER") << "</div>";
     body << "<div class=\"title\">" << tr.tr(title_key) << "</div>";
     body << "<div class=\"divider\"></div>";
@@ -516,6 +596,146 @@ std::string build_placeholder_body(const gus::app::i18n::Translator& tr,
     return body.str();
 }
 
+// Rotulo legivel do PRIMEIRO key binding de `action_name` dentro de `config`
+// (string vazia se a action nao existe ali ou nao tem nenhuma key - "sem
+// tecla", renderizado como CONTROLS_NO_BINDING pelo chamador). Reusa a tabela
+// PURA de controls_diff.hpp (human_label_for_keycode) - duplicar aqui a busca
+// linear por nome (em vez de expor a funcao interna do domain) e barato o
+// bastante (30 actions, 1x por render).
+std::string keyboard_label_for(const gus::domain::input::InputRemapConfig& config,
+                                std::string_view action_name) {
+    for (const auto& a : config.actions) {
+        if (a.action_name == action_name) {
+            if (a.keys.empty()) return std::string();
+            return gus::domain::input::human_label_for_keycode(a.keys.front().keycode);
+        }
+    }
+    return std::string();
+}
+
+// Corpo da tela Controles (M2, mock docs/design/mockups/06-controles-remap.html):
+// painel LARGO (".wide") com 3 colunas (Acao/Teclado/Controle) e as 30 actions
+// curadas/agrupadas (controls_action_name_at/controls_group_at, ver
+// system_menu.hpp) + rodape (Restaurar padrao/Voltar). A coluna "Controle"
+// (gamepad) SEMPRE mostra CONTROLS_NO_BINDING nesta onda: decisao 2 do lider
+// ("so teclado agora, controle fica read-only") + default_controls() nao
+// popula NENHUM gamepad_buttons ainda (nao ha o que exibir de verdade; inventar
+// um glifo seria mentir sobre o dado). Enquanto state.controls_confirming_restore
+// (decisao 4 do lider: pede confirmacao antes de restaurar), a lista inteira e
+// SUBSTITUIDA por um mini-dialogo "tem certeza?" com 2 pills (Sim/Nao) - mais
+// simples que sobrepor um modal por cima da lista, mesma linguagem visual
+// (.verb-pill/.btn-back) ja usada no resto do arquivo.
+std::string build_controls_body(const SystemMenuState& state,
+                                 const gus::app::i18n::Translator& tr, int pressed_index) {
+    std::ostringstream body;
+    append_panel_open(body, tr, "SETTINGS_CONTROLS", "wide");
+
+    if (state.controls_confirming_restore) {
+        body << "<div class=\"ctrl-confirm-title\">"
+             << tr.tr("CONTROLS_RESTORE_CONFIRM_TITLE") << "</div>";
+        const bool yes_focused = (state.controls_restore_confirm_selected == 0);
+        const bool no_focused = (state.controls_restore_confirm_selected == 1);
+        body << "<div class=\"verb-pill" << (yes_focused ? " focused" : "")
+             << pressed_class(0, pressed_index) << "\" id=\"controls-confirm-0\">"
+             << tr.tr("CONTROLS_RESTORE_CONFIRM_YES") << "</div>";
+        body << "<div class=\"btn-back" << (no_focused ? " focused" : "")
+             << pressed_class(1, pressed_index) << "\" id=\"controls-confirm-1\">"
+             << tr.tr("CONTROLS_RESTORE_CONFIRM_NO") << "</div>";
+        body << "</div>";  // #sysmenu-panel
+        return body.str();
+    }
+
+    body << "<div class=\"ctrl-cols-head\">"
+         << "<span class=\"c-act\">" << tr.tr("CONTROLS_COL_ACTION") << "</span>"
+         << "<span class=\"c-key\">" << tr.tr("CONTROLS_COL_KEYBOARD") << "</span>"
+         << "<span class=\"c-pad\">" << tr.tr("CONTROLS_COL_GAMEPAD") << "</span>"
+         << "</div>";
+
+    body << "<div class=\"ctrl-list\">";
+    static constexpr const char* kGroupKeys[4] = {
+        "CONTROLS_GROUP_MOVEMENT",
+        "CONTROLS_GROUP_WORLD",
+        "CONTROLS_GROUP_COMBAT",
+        "CONTROLS_GROUP_MENU_DIALOGUE",
+    };
+    int last_group = -1;
+    for (int i = 0; i < kControlsActionCount; ++i) {
+        const int group = controls_group_at(i);
+        if (group != last_group && group >= 0 && group < 4) {
+            body << "<div class=\"ctrl-group\">" << tr.tr(kGroupKeys[group]) << "</div>";
+            last_group = group;
+        }
+
+        const std::string_view action_name = controls_action_name_at(i);
+        const gus::domain::input::ActionDefinition* def =
+            gus::domain::input::ActionRegistry::get_by_name(action_name);
+        const std::string label =
+            (def != nullptr) ? tr.tr(def->label_i18n_key) : std::string(action_name);
+
+        const bool selected = (state.controls_selected == i);
+        const bool capturing_here = selected && state.controls_capturing;
+        const std::string key_label = keyboard_label_for(state.controls_config, action_name);
+
+        std::string row_class = "ctrl-row";
+        if (capturing_here) {
+            row_class += " capturing";
+        } else if (selected) {
+            row_class += " sel";
+        }
+
+        body << "<div class=\"" << row_class << "\" id=\"controls-item-" << i << "\">";
+        body << "<span class=\"c-act\">" << label;
+        if (selected && state.controls_last_action_swapped) {
+            // Aviso de troca (decisao 1 do lider): CONTROLS_SWAP_NOTICE tem 1
+            // placeholder posicional "{0}" (mesmo padrao manual de MENU_PAUSE_HINT
+            // acima) - substitui pelo rotulo traduzido da OUTRA action.
+            std::string notice = tr.tr("CONTROLS_SWAP_NOTICE");
+            const std::string other = tr.tr(state.controls_last_swapped_with_label_key);
+            if (const auto pos = notice.find("{0}"); pos != std::string::npos) {
+                notice.replace(pos, 3, other);
+            }
+            body << "<span class=\"ctrl-conflict\">" << notice << "</span>";
+        }
+        body << "</span>";
+
+        body << "<span class=\"c-key\">";
+        if (capturing_here) {
+            body << "<span class=\"ctrl-capture-text\">" << tr.tr("CONTROLS_CAPTURE_PROMPT")
+                 << "</span>";
+        } else if (key_label.empty()) {
+            body << "<span class=\"keycap none\">" << tr.tr("CONTROLS_NO_BINDING") << "</span>";
+        } else {
+            body << "<span class=\"keycap\">" << key_label << "</span>";
+        }
+        body << "</span>";
+
+        // Controle (gamepad): SEMPRE "sem binding" nesta onda (ver comentario da
+        // funcao acima - decisao 2 do lider + default_controls() nao popula
+        // gamepad ainda).
+        body << "<span class=\"c-pad\"><span class=\"keycap none\">"
+             << tr.tr("CONTROLS_NO_BINDING") << "</span></span>";
+
+        body << "</div>";  // .ctrl-row
+    }
+    body << "</div>";  // .ctrl-list
+
+    body << "<div class=\"ctrl-foot\">";
+    const bool restore_focused = (state.controls_selected == kControlsRestoreIndex);
+    const bool back_focused = (state.controls_selected == kControlsBackIndex);
+    body << "<div class=\"ctrl-btn ghost" << (restore_focused ? " focused" : "")
+         << pressed_class(kControlsRestoreIndex, pressed_index) << "\" id=\"controls-item-"
+         << kControlsRestoreIndex << "\">" << tr.tr("SETTINGS_RESET_DEFAULTS") << "</div>";
+    body << "<div class=\"ctrl-btn" << (back_focused ? " focused" : "")
+         << pressed_class(kControlsBackIndex, pressed_index) << "\" id=\"controls-item-"
+         << kControlsBackIndex << "\">" << tr.tr("SETTINGS_BACK") << "</div>";
+    body << "</div>";  // .ctrl-foot
+
+    body << "<div class=\"footer-hint\">" << tr.tr("CONTROLS_NAV_HINT") << "</div>";
+
+    body << "</div>";  // #sysmenu-panel
+    return body.str();
+}
+
 }  // namespace
 
 std::string build_system_menu_rml(const SystemMenuState& state,
@@ -531,6 +751,9 @@ std::string build_system_menu_rml(const SystemMenuState& state,
             break;
         case SystemMenuScreen::Audio:
             body = build_audio_body(state, translator, pressed_index);
+            break;
+        case SystemMenuScreen::Controls:
+            body = build_controls_body(state, translator, pressed_index);
             break;
         case SystemMenuScreen::Save:
             body = build_placeholder_body(translator, "MENU_SAVE_GAME", pressed_index);
