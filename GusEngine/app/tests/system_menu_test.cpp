@@ -974,3 +974,58 @@ TEST_CASE("system_menu_hover_entered_new_item: dispara so ao ENTRAR num item "
     REQUIRE(system_menu_hover_entered_new_item(2, -1) == false);  // saiu do item 2
     REQUIRE(system_menu_hover_entered_new_item(-1, 2) == true);  // reentrou no 2: dispara
 }
+
+// ------------------------------------------------- BUG-A (Voltar morto, M2)
+//
+// controls_row_visible_in_list: filtra linhas de `.ctrl-list` (overflow-y:auto)
+// ROLADAS PRA FORA da vista, cuja geometria de layout (get_element_box) pode
+// coincidir com a posicao do rodape Restaurar/Voltar - ver o comentario extenso
+// no header (system_menu.hpp). Casos medidos EMPIRICAMENTE no probe headless
+// Xvfb :99 que reproduziu o bug ao vivo: `.ctrl-list` com y=168.2/h=220 (recorte
+// visivel [168.2, 388.2]); a linha 6 ("Abrir inventario", ja rolada pra fora)
+// tinha y=419.4/h=33.2 - SEM sobreposicao com o recorte (o CASO que rouba o
+// clique do rodape em y=[409.2, 436.4] antes do fix).
+
+TEST_CASE("controls_row_visible_in_list: linha DENTRO do recorte visivel "
+          "(sobreposicao total) conta como visivel",
+          "[system_menu][controls][bug-a]") {
+    // Lista MEDIDA no probe: y=168.2, h=220 (recorte [168.2, 388.2]).
+    REQUIRE(controls_row_visible_in_list(/*row_top=*/194.2f, /*row_h=*/33.2f,
+                                          /*list_top=*/168.2f, /*list_h=*/220.0f) == true);
+}
+
+TEST_CASE("controls_row_visible_in_list: linha ROLADA PRA FORA (sem nenhuma "
+          "sobreposicao, MESMA geometria que roubava o clique do rodape em "
+          "BUG-A) NAO conta como visivel",
+          "[system_menu][controls][bug-a]") {
+    // Linha 6 medida no probe (ja fora da vista): y=419.4, h=33.2 - o recorte
+    // termina em 388.2, a linha comeca DEPOIS (419.4 > 388.2): zero overlap.
+    REQUIRE(controls_row_visible_in_list(/*row_top=*/419.4f, /*row_h=*/33.2f,
+                                          /*list_top=*/168.2f, /*list_h=*/220.0f) == false);
+}
+
+TEST_CASE("controls_row_visible_in_list: linha ACIMA do recorte (rolagem pra "
+          "cima, caso simetrico) tambem NAO conta como visivel",
+          "[system_menu][controls][bug-a]") {
+    REQUIRE(controls_row_visible_in_list(/*row_top=*/50.0f, /*row_h=*/33.2f,
+                                          /*list_top=*/168.2f, /*list_h=*/220.0f) == false);
+}
+
+TEST_CASE("controls_row_visible_in_list: sobreposicao PARCIAL (linha cortada "
+          "na borda do recorte) ainda conta como visivel - so overlap ZERO "
+          "e excluido",
+          "[system_menu][controls][bug-a]") {
+    // Linha comeca 2dp ANTES do fim do recorte (388.2) - so uma fresta
+    // visivel, mas overlap > 0: ainda interativa (nao e o bug).
+    REQUIRE(controls_row_visible_in_list(/*row_top=*/386.2f, /*row_h=*/33.2f,
+                                          /*list_top=*/168.2f, /*list_h=*/220.0f) == true);
+}
+
+TEST_CASE("controls_row_visible_in_list: linhas exatamente ADJACENTES (fim de "
+          "uma == inicio do recorte, sem overlap de verdade) NAO contam",
+          "[system_menu][controls][bug-a]") {
+    // row_top+row_h == list_top exatamente: intervalos [a,b) e [b,c) nao se
+    // sobrepoem (meia-aberta) - fronteira conta como FORA.
+    REQUIRE(controls_row_visible_in_list(/*row_top=*/135.0f, /*row_h=*/33.2f,
+                                          /*list_top=*/168.2f, /*list_h=*/220.0f) == false);
+}

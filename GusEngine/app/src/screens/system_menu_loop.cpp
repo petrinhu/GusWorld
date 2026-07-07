@@ -189,6 +189,31 @@ std::string controls_confirm_id(int item) {
     return "controls-confirm-" + std::to_string(item);
 }
 
+// Id de `.ctrl-list` (system_menu_rml.cpp: build_controls_body) - consultado
+// pra filtrar hit-test/hover das 30 actions pelo recorte VISIVEL da lista
+// rolavel (ver controls_row_visible_in_list/BUG-A no header de system_menu.hpp).
+constexpr const char* kControlsListId = "ctrl-list";
+
+// BUG-A (ver o comentario extenso de controls_row_visible_in_list em
+// system_menu.hpp): filtra `box` pra "nao encontrado" (found=false) se `index`
+// e uma ACTION da lista rolavel (0..kControlsActionCount-1 - o rodape,
+// kControlsRestoreIndex/kControlsBackIndex, fica FORA da lista e nunca e
+// filtrado) E a caixa REAL nao tem nenhuma sobreposicao com o recorte visivel
+// de `.ctrl-list` no momento (linha rolada pra fora da vista, cuja geometria
+// de layout pode coincidir com a posicao do rodape - ver o achado empirico no
+// header). Devolve `box` inalterado se list_box.found==false (defensivo - sem
+// referencia, nao filtra nada) ou se `index` for do rodape.
+glintfx::ElementBox filter_offscreen_controls_row(int index, glintfx::ElementBox box,
+                                                   const glintfx::ElementBox& list_box) {
+    if (index >= kControlsActionCount || !box.found || !list_box.found) {
+        return box;  // rodape (sempre valido) OU ja nao encontrado OU sem lista pra comparar
+    }
+    if (!controls_row_visible_in_list(box.y, box.h, list_box.y, list_box.h)) {
+        box.found = false;  // rolada pra fora da vista - nao conta hit-test/hover (BUG-A)
+    }
+    return box;
+}
+
 // Hit-test simples: cursor (x,y, espaco-janela) dentro da caixa border-box
 // devolvida por glintfx::UiLayer::get_element_box (MESMO espaco de coordenadas
 // - ver docs/embed-integration.md secao 10, ja citado em outros comentarios
@@ -238,7 +263,14 @@ int current_hover_index(const glintfx::UiLayer& ui, const SystemMenuState& state
                 fill(0, controls_confirm_id(0));
                 fill(1, controls_confirm_id(1));
             } else if (!state.controls_capturing) {
-                for (int i = 0; i < kControlsItemCount; ++i) fill(i, controls_item_id(i));
+                // BUG-A: filtra as 30 actions (nao o rodape) pelo recorte
+                // visivel de `.ctrl-list` - ver filter_offscreen_controls_row.
+                const glintfx::ElementBox list_box = ui.get_element_box(kControlsListId);
+                for (int i = 0; i < kControlsItemCount; ++i) {
+                    const glintfx::ElementBox raw = ui.get_element_box(controls_item_id(i).c_str());
+                    const glintfx::ElementBox box = filter_offscreen_controls_row(i, raw, list_box);
+                    boxes[i] = SystemMenuHoverBox{box.found, box.x, box.y, box.w, box.h};
+                }
             }
             break;
         case SystemMenuScreen::Save:
@@ -606,6 +638,66 @@ SystemMenuLoopOutcome run_system_menu_loop_gl_current(
                   << "\n";
         (void)click_action;
 
+        // BUG-A (Voltar morto pro mouse, achado NOVO nesta investigacao - ver o
+        // comentario extenso de controls_row_visible_in_list em
+        // system_menu.hpp): cancela a captura aberta pelo teste BUG-3 acima (Esc,
+        // nao muda config) antes de prosseguir.
+        system_menu_controls_capture_key(state, /*is_escape=*/true, 0);
+        {
+            const glintfx::ElementBox list_box = ui.get_element_box(kControlsListId);
+            const glintfx::ElementBox raw_row6 =
+                ui.get_element_box(controls_item_id(6).c_str());
+            std::cout << "SystemMenuLoop: [selftest][BUG-A] linha 6 (rolada pra fora "
+                         "da vista) - caixa REAL: y="
+                      << raw_row6.y << " h=" << raw_row6.h << "; recorte visivel de "
+                         "ctrl-list: y="
+                      << list_box.y << " h=" << list_box.h << " (linha 6 fora do "
+                         "recorte, MESMA geometria que roubava o clique do rodape "
+                         "antes do fix)\n";
+
+            // Centro da caixa REAL de Voltar (kControlsBackIndex, rodape - sempre
+            // fora da lista rolavel) - a coordenada de clique que o jogador
+            // fisicamente usaria.
+            const glintfx::ElementBox raw_back =
+                ui.get_element_box(controls_item_id(kControlsBackIndex).c_str());
+            const float cx = raw_back.found ? raw_back.x + raw_back.w * 0.5f : -1.0f;
+            const float cy = raw_back.found ? raw_back.y + raw_back.h * 0.5f : -1.0f;
+
+            // REPLICA o loop de producao (SDL_EVENT_MOUSE_BUTTON_DOWN, ramo
+            // Controles/navegacao normal acima): itera 0..kControlsItemCount-1 EM
+            // ORDEM, filtra pelo recorte visivel (filter_offscreen_controls_row) e
+            // para no PRIMEIRO que bater - prova QUAL indice de fato vence o
+            // clique na posicao REAL de Voltar (antes do fix, era o indice 6, nao
+            // o 31 esperado - ver o comentario do header).
+            int winner = -1;
+            for (int item = 0; item < kControlsItemCount; ++item) {
+                const glintfx::ElementBox raw =
+                    ui.get_element_box(controls_item_id(item).c_str());
+                const glintfx::ElementBox box =
+                    filter_offscreen_controls_row(item, raw, list_box);
+                if (hit_test(box, cx, cy)) {
+                    winner = item;
+                    break;
+                }
+            }
+            const SystemMenuAction back_action =
+                (winner == kControlsBackIndex) ? system_menu_click_option(state, winner)
+                                                : SystemMenuAction::None;
+            const bool ok = winner == kControlsBackIndex &&
+                             state.screen == SystemMenuScreen::ConfigCategories &&
+                             back_action == SystemMenuAction::Navigated;
+            std::cout << "SystemMenuLoop: [selftest][BUG-A] clique na posicao REAL de "
+                         "Voltar (loop de producao replicado 0.."
+                      << (kControlsItemCount - 1) << "): indice vencedor=" << winner
+                      << " (esperado " << kControlsBackIndex << ") screen_apos="
+                      << (state.screen == SystemMenuScreen::ConfigCategories
+                              ? "ConfigCategories"
+                              : "outro")
+                      << " action=" << static_cast<int>(back_action)
+                      << " (esperado screen=ConfigCategories action=Navigated) - "
+                      << (ok ? "OK" : "FALHOU") << "\n";
+        }
+
         return outcome;
     }
 
@@ -795,9 +887,17 @@ SystemMenuLoopOutcome run_system_menu_loop_gl_current(
                         // captura (system_menu_click_option, MESMA convencao
                         // "focar+ENTER" das outras telas); clicar em Restaurar
                         // abre o mini-dialogo; clicar em Voltar confirma na hora.
+                        // BUG-A: filtra as 30 actions (nao o rodape) pelo
+                        // recorte visivel de `.ctrl-list` ANTES do hit-test -
+                        // sem isto, uma linha rolada pra fora da vista podia
+                        // roubar o clique de Restaurar/Voltar (ver
+                        // filter_offscreen_controls_row/controls_row_visible_in_list).
+                        const glintfx::ElementBox list_box = ui.get_element_box(kControlsListId);
                         for (int item = 0; item < kControlsItemCount && !handled; ++item) {
-                            const glintfx::ElementBox box =
+                            const glintfx::ElementBox raw =
                                 ui.get_element_box(controls_item_id(item).c_str());
+                            const glintfx::ElementBox box =
+                                filter_offscreen_controls_row(item, raw, list_box);
                             if (!hit_test(box, ev.button.x, ev.button.y)) continue;
                             handled = true;
                             const SystemMenuState pre_action_state = state;

@@ -512,7 +512,7 @@ Teclado
 Controle
 
 ## CONTROLS_NAV_HINT
-▲▼ navega · Enter remapeia · Esc volta
+Cima/Baixo navega · Enter remapeia · Esc volta
 
 ## CONTROLS_GROUP_MOVEMENT
 Movimento

@@ -371,9 +371,38 @@ body { font-family: "Pixel Operator Mono"; background: transparent; width: 100%;
    mais espaco vertical, nao faz sentido comecar tao baixo) + `.ctrl-list` com
    altura REDUZIDA (270dp -> 220dp, ver abaixo) - o total passa a caber com folga
    dentro do canvas 540dp (medido empiricamente: bottom final < 500dp, > 30dp de
-   folga antes do fim do canvas). */
+   folga antes do fim do canvas).
+
+   BUG-B (moldura "totalmente errada", achado por probe headless Xvfb :99 nesta
+   investigacao M2 - NAO era um dos 3 bugs originais, mas a causa raiz do
+   "painel de Controles parece diferente das telas irmas"): o #sysmenu-panel
+   herda `box-shadow: #22D3EE1a 0dp 0dp 50dp 0dp` (glow suave, ver a regra
+   acima) - nas 7 telas normais (top:90dp, painel raso ~315dp de altura) esse
+   glow cabe folgado dentro do canvas 540dp. No painel LARGO (top:20dp, altura
+   ~477dp - quase o canvas inteiro, ver o paragrafo acima), o MESMO blur de
+   50dp faz RmlUi pedir uma textura de sombra de ~627px de altura
+   (GeometryBoxShadow::Resolve: extend = 1.5*blur_radius = 75px pra cada lado)
+   contra um canvas de so 540px - RmlUi ENTAO CLAMPA a textura pro tamanho da
+   janela (RenderManager::GetScissorRegion, log "desired box-shadow texture
+   dimensions (770, 627) are larger than the current window region (770,
+   540)") e o resultado sai CORROMPIDO (cantos hexagonais topo/base
+   deformados + uma emenda vertical visivel na borda esquerda - achado
+   comparando screenshot headless Controles vs Audio lado a lado, PROVADO
+   fechando o box-shadow do painel largo e vendo o artefato sumir). NAO e bug
+   do glintfx nem do RmlUi (comportamento documentado - a lib avisa e clampa
+   em vez de crashar); e o MESMO glow generico batendo num painel geometricamente
+   incompativel (alto demais perto da borda do canvas). FIX: box-shadow PROPRIO
+   pro painel largo com blur REDUZIDO (10dp em vez de 50dp - extend=15px, cabe
+   com folga nos 20dp de margem acima do painel) - MESMA cor/alpha (#22D3EE1a,
+   10% opacidade) e MESMO offset/spread (0dp/0dp) da regra original, so o raio
+   do blur muda (a 10% de opacidade o glow ja e quase imperceptivel nas telas
+   normais - reduzir o raio no painel largo nao muda a leitura visual "moldura
+   consistente", so elimina o clamp/corrupcao). Corners/borda/gradiente/header
+   continuam 100% herdados de #sysmenu-panel, INTOCADOS - so este 1 valor
+   (box-shadow) precisou de override. */
 #sysmenu-panel.wide {
   width: 620dp; margin-left: -310dp; top: 20dp;
+  box-shadow: #22D3EE1a 0dp 0dp 10dp 0dp;
 }
 
 .ctrl-cols-head {

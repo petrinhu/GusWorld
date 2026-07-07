@@ -299,6 +299,33 @@ struct SystemMenuHoverBox {
     float x = 0.0f, y = 0.0f, w = 0.0f, h = 0.0f;
 };
 
+// BUG-A (achado NOVO por probe headless Xvfb :99 nesta investigacao M2 - causa
+// raiz do "botao Voltar da tela Controles morto pro mouse"): `.ctrl-list` (M2,
+// system_menu_rml.cpp) e `overflow-y:auto` com ALTURA FIXA (220dp) - o
+// overflow SO CLIPA O PAINT (o que aparece na tela), NAO a geometria que
+// get_element_box devolve. Com 30 actions e so ~6 linhas visiveis por vez, as
+// linhas ROLADAS PRA FORA da janela visivel continuam tendo uma caixa REAL
+// (posicao/tamanho de layout), que pode coincidir NUMERICAMENTE com a posicao
+// do RODAPE (`.ctrl-foot`, Restaurar padrao/Voltar) - ele fica LOGO ABAIXO da
+// altura reservada de 220dp da lista, e uma linha invisivel "ainda dentro" do
+// fluxo de layout pode cair exatamente ali (medido empiricamente: a linha do
+// item 6 - "Abrir inventario", ja rolada pra fora da vista - tinha uma caixa
+// y=[419.4, 452.6] contra Voltar em y=[409.2, 436.4] - SOBREPOSICAO real). O
+// hit-test/hover do CHAMADOR (system_menu_loop.cpp) testa os indices em ORDEM
+// (0..31) e para no PRIMEIRO que bater - a linha invisivel (indice menor)
+// ROUBA o clique/hover ANTES de chegar no rodape (indice 30/31), fazendo
+// Voltar (e potencialmente Restaurar) parecerem MORTOS. FIX:
+// controls_row_visible_in_list abaixo (POCO, 100% testavel) - o CHAMADOR
+// consulta a caixa de `ctrl-list` UMA VEZ e filtra as 30 linhas de action
+// (indices 0..kControlsActionCount-1, NUNCA o rodape - esse fica FORA da
+// lista, sempre valido) por essa funcao ANTES de hit-test/hover-test:
+// linhas sem NENHUMA sobreposicao vertical com o recorte visivel da lista
+// nao contam mais como candidatas (elimina o roubo de clique/hover sem
+// exigir scroll/windowing novo - so filtra o hit-test pela geometria ja
+// existente).
+[[nodiscard]] bool controls_row_visible_in_list(float row_top, float row_h,
+                                                 float list_top, float list_h) noexcept;
+
 // Numero MAXIMO de itens hover-testaveis numa unica tela (M2: Controles tem
 // kControlsItemCount=32, agora a MAIOR de todas - era Pause/ConfigCategories
 // com 4 cada antes da tela Controles existir; Audio tem 3, Save/Video/Language

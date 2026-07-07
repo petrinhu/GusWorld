@@ -574,6 +574,17 @@ SystemMenuAction system_menu_click_option(SystemMenuState& state,
     return SystemMenuAction::None;
 }
 
+bool controls_row_visible_in_list(float row_top, float row_h, float list_top,
+                                   float list_h) noexcept {
+    // Sobreposicao de intervalos 1D [row_top, row_top+row_h) x [list_top,
+    // list_top+list_h) - MESMA formula classica de overlap de segmentos (nao
+    // ha overlap sse um termina antes do outro comecar). Qualquer sobreposicao
+    // (mesmo parcial, ex. linha cortada na borda do recorte) conta como
+    // "visivel o bastante pra interagir" - so linhas SEM NENHUMA sobreposicao
+    // (ver BUG-A no header) sao excluidas.
+    return row_top < (list_top + list_h) && (row_top + row_h) > list_top;
+}
+
 int system_menu_hover_index(const SystemMenuState& state, float mouse_x, float mouse_y,
                              const SystemMenuHoverBox boxes[kSystemMenuMaxHoverItems]) noexcept {
     int count = 0;
