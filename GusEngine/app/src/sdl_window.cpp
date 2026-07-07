@@ -7,13 +7,13 @@
 
 #include "gus/app/sdl_window.hpp"
 
-#include <cstdlib>  // std::getenv (resolve_assets_subdir_local)
 #include <string>
 
 #include "gus/app/screens/anim_catalog.hpp"  // resolve_gus_sprites_dir
 #include "gus/app/screens/city_loader.hpp"   // load_city_or_fallback
 #include "gus/app/screens/player_sprites_loader.hpp"
 #include "gus/core/asset_paths.hpp"  // kRetratosDir/kRetratoInimigoFile (marcador do inimigo); kBertoldoSpritesDir/kBertoldoSpriteSouthFile (marcador do Bertoldo)
+#include "gus/platform/assets/asset_source.hpp"  // ASSETS-VFS-F1 (ADR-013): porteiro
 
 // stb_image_write: SO o header aqui (mesma receita de stb_image.h em render2d_gl3.cpp -
 // ver seu comentario de topo) - a IMPLEMENTACAO (STB_IMAGE_WRITE_IMPLEMENTATION) ja e
@@ -23,47 +23,19 @@
 // M7-DIALOGO/MENU-PAUSA-CONFIG-SOM).
 #include "stb_image_write.h"
 
-// Raiz resources/ do repo, embutida pelo CMake (mesma macro que anim_catalog.cpp/
-// battle_preview.cpp resolvem - PRIVATE no CMakeLists do target app, ver GusEngine/app/
-// CMakeLists.txt). Guard defensivo caso este .cpp compile fora desse target um dia.
-#ifndef GUSWORLD_ASSETS_DIR
-#define GUSWORLD_ASSETS_DIR ""
-#endif
-
 namespace gus::app {
 
 namespace {
 constexpr int kWindowW = 1280;
 constexpr int kWindowH = 720;
 
-std::string join_asset_path(const std::string& a, const std::string& b) {
-    if (a.empty()) {
-        return b;
-    }
-    if (a.back() == '/') {
-        return a + b;
-    }
-    return a + "/" + b;
-}
-
 // Resolve um SUB-CAMINHO relativo de asset (do header central, ex.: kRetratosDir ou
-// kVfxBootPixelDir) pela MESMA receita de resolve_gus_sprites_dir (anim_catalog.cpp):
-// env GUSWORLD_ASSETS > macro de compilacao GUSWORLD_ASSETS_DIR > relativo ao CWD
-// (resources/). Generalizada de "resolve_retratos_dir_local" (M7-COSTURA Inc 2c: o
-// boot pixelizado precisa da MESMA receita de resolucao, so muda o sub-caminho) - a
-// FONTE do sub-caminho continua so a constante do chamador, nao hardcoded aqui.
+// kVfxBootPixelDir) - familia GENERICA. ASSETS-VFS-F1 (ADR-013): a cadeia `env
+// GUSWORLD_ASSETS > macro GUSWORLD_ASSETS_DIR > CWD (resources/)` foi CONSOLIDADA em
+// FilesystemAssetSource (mesmo destino de resolve_gus_sprites_dir em anim_catalog.cpp).
+// Assinatura INTOCADA.
 std::string resolve_assets_subdir_local(std::string_view rel) {
-    const std::string sub(rel);
-    if (const char* env = std::getenv("GUSWORLD_ASSETS")) {
-        if (env[0] != '\0') {
-            return join_asset_path(env, sub);
-        }
-    }
-    const std::string compiled = GUSWORLD_ASSETS_DIR;
-    if (!compiled.empty()) {
-        return join_asset_path(compiled, sub);
-    }
-    return join_asset_path("resources", sub);
+    return gus::platform::assets::FilesystemAssetSource().resolve_path(rel);
 }
 }  // namespace
 
@@ -146,9 +118,12 @@ void SdlWindow::load_enemy_marker_texture() {
     if (!enemy_marker_aabb_.has_value()) {
         return;  // nenhum marcador definido ainda (uso standalone/sem Maestro)
     }
-    const std::string path = join_asset_path(
-        resolve_assets_subdir_local(gus::core::assets::kRetratosDir),
-        std::string(gus::core::assets::kRetratoInimigoFile));
+    // ASSETS-VFS-F1: monta o id RELATIVO completo (subdir + arquivo) e resolve UMA vez
+    // (era resolver so o subdir e concatenar o arquivo depois - equivalente, mas agora o
+    // porteiro resolve o caminho inteiro de uma vez, mesmo padrao dos demais consumidores).
+    const std::string id = std::string(gus::core::assets::kRetratosDir) + "/" +
+                            std::string(gus::core::assets::kRetratoInimigoFile);
+    const std::string path = resolve_assets_subdir_local(id);
     enemy_marker_tex_ = render2d_->load_texture(path.c_str());
     if (enemy_marker_tex_ != gus::platform::render2d::kInvalidTexture) {
         sim_->set_enemy_marker(*enemy_marker_aabb_, enemy_marker_tex_);
@@ -177,9 +152,9 @@ void SdlWindow::load_npc_bertoldo_marker_texture() {
     if (!npc_bertoldo_marker_aabb_.has_value()) {
         return;  // nenhum marcador definido ainda (uso standalone/sem Maestro)
     }
-    const std::string path = join_asset_path(
-        resolve_assets_subdir_local(gus::core::assets::kBertoldoSpritesDir),
-        std::string(gus::core::assets::kBertoldoSpriteSouthFile));
+    const std::string id = std::string(gus::core::assets::kBertoldoSpritesDir) + "/" +
+                            std::string(gus::core::assets::kBertoldoSpriteSouthFile);
+    const std::string path = resolve_assets_subdir_local(id);
     npc_bertoldo_marker_tex_ = render2d_->load_texture(path.c_str());
     if (npc_bertoldo_marker_tex_ != gus::platform::render2d::kInvalidTexture) {
         sim_->set_npc_bertoldo_marker(*npc_bertoldo_marker_aabb_,

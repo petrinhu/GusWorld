@@ -7,14 +7,10 @@
 #include "gus/app/screens/player_sprites_loader.hpp"
 
 #include <array>
-#include <cstdlib>  // std::getenv
 
 #include "gus/app/screens/sprite_anchor.hpp"  // bottom_margin_fraction
 #include "gus/core/asset_paths.hpp"           // caminhos de asset centralizados
-
-#ifndef GUSWORLD_ASSETS_DIR
-#define GUSWORLD_ASSETS_DIR ""
-#endif
+#include "gus/platform/assets/asset_source.hpp"  // ASSETS-VFS-F1 (ADR-013): porteiro
 
 namespace gus::app::screens {
 
@@ -150,19 +146,10 @@ PlayerSpriteSet load_player_sprites(gus::platform::render2d::IRenderer& renderer
 
 std::string resolve_sprites_dir(const std::string& rel_subpath) {
     // rel_subpath = caminho RELATIVO completo do header central (ex.: "sprites/caua_volt").
-    // 1) Override por ambiente (o lider aponta pra qualquer raiz de assets).
-    if (const char* env = std::getenv("GUSWORLD_ASSETS")) {
-        if (env[0] != '\0') {
-            return join(env, rel_subpath);
-        }
-    }
-    // 2) Caminho do repo embutido em compilacao (raiz resources/ do repo).
-    const std::string compiled = GUSWORLD_ASSETS_DIR;
-    if (!compiled.empty()) {
-        return join(compiled, rel_subpath);
-    }
-    // 3) Relativo ao CWD (rodando da raiz do repo).
-    return join("resources", rel_subpath);
+    // ASSETS-VFS-F1 (ADR-013): a cadeia `env GUSWORLD_ASSETS > macro GUSWORLD_ASSETS_DIR >
+    // CWD (resources/)` foi CONSOLIDADA em FilesystemAssetSource (familia GENERICA).
+    // Assinatura INTOCADA.
+    return gus::platform::assets::FilesystemAssetSource().resolve_path(rel_subpath);
 }
 
 // --- atalhos ----------------------------------------------------------------
