@@ -7,6 +7,7 @@
 #include <filesystem>
 #include <iostream>
 #include <string>
+#include <system_error>
 
 #include "gus/app/dialogue/npc_dialogue_catalog.hpp"  // M7-DIALOGO: I/O do .dlg.txt
 #include "gus/app/screens/battle_preview.hpp"    // run_battle_preview_embedded
@@ -81,12 +82,28 @@ constexpr float kBootMusicFadeInSeconds = 1.0f;
 // (SdlWindow::capture_frame_to_png) ANTES de abrir o dialogo do NPC ou o menu de
 // pausa - os dois loops GL leem o MESMO arquivo (nunca simultaneamente: sao modais
 // exclusivos, orquestrados em serie por Maestro::run(), o 2o capture sempre
-// sobrescreve o 1o antes de ser lido de novo). tempfile (fs::temp_directory_path,
-// MESMA pasta que os stage dirs do glintfx ja usam) - nao e asset versionado, so um
-// scratch de 1 frame por abertura de tela (nao versionado, nao commitado).
+// sobrescreve o 1o antes de ser lido de novo).
+//
+// AC-E3 (AUDITORIA-COMPLETA-2026-07-06): antes vivia em /tmp compartilhado com nome
+// FIXO (gusworld_frozen_city.png) - em maquina multiusuario, outro usuario podia
+// pre-criar o arquivo ou um symlink com esse nome (classe classica de vulnerabilidade
+// de /tmp), alem de colidir entre 2 instancias do jogo. Agora vive dentro do
+// diretorio de settings do jogador (gus::platform::fs::resolve_settings_dir(),
+// MESMA politica 0700 - rwx so o dono - de settings_file_store.cpp/
+// save_file_store.cpp, LGPD leve): dado PRIVADO do jogador, o risco de symlink
+// desaparece. create_directories/permissions aqui (nao so em save/settings) porque a
+// captura pode acontecer ANTES de qualquer save ou settings.json terem sido
+// gravados (1a execucao do jogo).
 std::string frozen_city_snapshot_path() {
-    return (std::filesystem::temp_directory_path() / "gusworld_frozen_city.png")
-        .string();
+    const std::string dir = gus::platform::fs::resolve_settings_dir();
+    std::error_code ec;
+    std::filesystem::create_directories(dir, ec);
+    std::filesystem::permissions(dir, std::filesystem::perms::owner_all,
+                                  std::filesystem::perm_options::replace, ec);
+    // Falha silenciosa aqui (ec ignorado de proposito): se o diretorio nao puder
+    // ser criado/permissionado, a captura seguinte (capture_frame_to_png) falha
+    // sozinha e degrada pra vinheta (frozen_ok==false) - mesmo contrato de sempre.
+    return (std::filesystem::path(dir) / "frozen_city.png").string();
 }
 }  // namespace
 
@@ -298,6 +315,16 @@ bool Maestro::open_pause_from_city() {
         SDL_Log(
             "Maestro: falha ao reconstruir o renderer da cidade apos o menu de pausa "
             "- a cidade segue rodando SEM desenhar (degradacao segura, sem crash).");
+    }
+
+    // Higiene (AC-E3): apaga o snapshot congelado ao fechar o menu - a proxima
+    // abertura sobrescreve de qualquer forma (dentro do dir 0700 o risco de symlink
+    // ja nao existe), mas nao ha motivo pra deixar o PNG do ultimo frame parado em
+    // disco entre uma abertura e outra. Falha silenciosa (arquivo pode nao existir
+    // se frozen_ok==false).
+    if (frozen_ok) {
+        std::error_code remove_ec;
+        std::filesystem::remove(frozen_bg_path, remove_ec);
     }
 
     // outcome so e valido quando ok==true (run_system_menu_loop_owning_gl deixa
@@ -526,6 +553,13 @@ bool Maestro::to_npc_dialogue() {
         SDL_Log(
             "Maestro: falha ao reconstruir o renderer da cidade apos o dialogo - a "
             "cidade segue rodando SEM desenhar (degradacao segura, sem crash).");
+    }
+
+    // Higiene (AC-E3): mesma limpeza pos-uso do menu de pausa (ver open_pause_from_
+    // city) - o snapshot congelado nao precisa sobreviver alem do dialogo que o leu.
+    if (frozen_ok) {
+        std::error_code remove_ec;
+        std::filesystem::remove(frozen_bg_path, remove_ec);
     }
 
     const auto it = save_.flags.find("npc_intro.met");
