@@ -377,11 +377,35 @@ SystemMenuLoopOutcome run_system_menu_loop_gl_current(
     // troca de tela, volume) - ver o comentario de build_system_menu_rml/
     // write_system_menu_rml_file: reload-on-change e simples e barato o bastante
     // (o menu muda so em input do jogador, nao a cada frame).
+    //
+    // SCROLL SEGUE A SELECAO (M2/GLINTFX-SCROLL, glintfx v0.4.0): apos QUALQUER
+    // reload (navegacao por teclado UP/DOWN/W/S, entrar/sair de Controles,
+    // Restaurar padrao, etc - TODOS passam por aqui), garante que a linha
+    // state.controls_selected fique DENTRO do recorte visivel de `.ctrl-list`
+    // via UiLayer::scroll_element_into_view - controls_scroll_target_index
+    // (system_menu.hpp, POCO/testavel) decide SE deve rolar (so na tela
+    // Controles, fora dos mini-dialogos Restaurar/Descartar - ver seu
+    // comentario). 1 ui.update() extra ANTES do scroll: o load() acabou de
+    // trocar de DOCUMENTO (novo Rml::ElementDocument) - a geometria precisa de
+    // 1 passo de layout assentado antes de ScrollIntoView le-la (MESMO
+    // racional do "2o update() por seguranca" do self-test BUG-1 mais abaixo,
+    // que ja fazia 2x present_frame() por desconfianca da mesma janela).
+    // scroll_element_into_view(id, align_with_top=true) e no-op seguro quando
+    // a linha ja esta visivel (RmlUi so escreve scrollTop quando precisa) -
+    // por isso um UNICO ponto de chamada cobre tanto "linha nova entrando na
+    // vista" (navegacao) quanto "linha que ja estava visivel" (sem custo
+    // extra perceptivel).
     auto reload = [&] {
         rml_path = write_system_menu_rml_file(state, translator);
         ui.load(rml_path.c_str());
         ui.set_viewport(pw, ph);
         ui.set_dp_ratio(dp_ratio);
+
+        const int scroll_target = controls_scroll_target_index(state);
+        if (scroll_target >= 0) {
+            ui.update();
+            ui.scroll_element_into_view(controls_item_id(scroll_target).c_str());
+        }
     };
 
     // Desenha um frame do backdrop+UI e apresenta (MESMA sequencia do corpo do
@@ -732,6 +756,124 @@ SystemMenuLoopOutcome run_system_menu_loop_gl_current(
                       << (ok ? "OK" : "FALHOU") << "\n";
         }
 
+        // GLINTFX-SCROLL (M2, bump v0.3.1 -> v0.4.0): a v0.4.0 entrega scroll DE
+        // VERDADE em embed mode - antes disso `.ctrl-list` nunca rolava (scrollTop
+        // sempre 0), so ~6 das 30 actions eram alcancaveis (ver BUG-A acima, que so
+        // filtrava o HIT-TEST das linhas invisiveis, sem trazer nenhuma pra vista).
+        // Re-entra em Controles (config_categories_selected ainda aponta pra ela -
+        // ver o comentario de heranca de selecao no topo do arquivo/header, so 1
+        // RETURN, sem repetir os DOWN/DOWN - Voltar em leave_controls_screen_or_
+        // confirm_discard nunca mexe em config_categories_selected).
+        system_menu_key_down(state, SDLK_RETURN);
+        reload();
+        present_frame();
+        present_frame();
+
+        // (b) WHEEL: a roda rola o elemento em HOVER (nao o com foco - ver o
+        // comentario extenso de UiEvent::Type::MouseWheel no ui_event.hpp
+        // vendorizado) - posiciona o cursor sintetico sobre `.ctrl-list`
+        // (handle_mouse_motion, MESMO caminho do SDL_EVENT_MOUSE_MOTION real) e
+        // mede scroll_top ANTES/DEPOIS de um MouseWheel sintetico
+        // (system_menu_wheel_delta_to_rmlui, MESMA conversao do loop de producao).
+        // Roda ANTES da navegacao por teclado abaixo (lista ainda no topo,
+        // scrollTop=0 - controls_selected==0 acabou de reentrar - garante espaco
+        // pra rolar PRA BAIXO sem bater no limite do fim do conteudo).
+        {
+            const glintfx::ElementBox list_box = ui.get_element_box(kControlsListId);
+            const float hover_x = list_box.found ? list_box.x + list_box.w * 0.5f : -1.0f;
+            const float hover_y = list_box.found ? list_box.y + list_box.h * 0.5f : -1.0f;
+            handle_mouse_motion(hover_x, hover_y);
+
+            float scroll_before = -1.0f;
+            ui.get_element_scroll_top(kControlsListId, scroll_before);
+
+            const float wheel_dy =
+                system_menu_wheel_delta_to_rmlui(/*sdl_wheel_y=*/-3.0f, /*flipped=*/false);
+            glintfx::UiEvent wheel_ev{};
+            wheel_ev.type = glintfx::UiEvent::Type::MouseWheel;
+            wheel_ev.x = 0.0f;
+            wheel_ev.y = wheel_dy;
+            ui.process_event(wheel_ev);
+            present_frame();
+
+            float scroll_after = -1.0f;
+            ui.get_element_scroll_top(kControlsListId, scroll_after);
+            std::cout << "SystemMenuLoop: [selftest][GLINTFX-SCROLL][wheel] "
+                         "scroll_top antes="
+                      << scroll_before << " depois=" << scroll_after
+                      << " (esperado depois > antes - wheel_dy=" << wheel_dy << ") - "
+                      << (scroll_after > scroll_before ? "OK" : "FALHOU") << "\n";
+        }
+
+        // (a) TECLADO: navega ATE uma action perto do FIM da lista (25a, dentro de
+        // kControlsActionCount=30) - PROVA que scroll_element_into_view (chamado
+        // DENTRO de reload(), ver seu comentario) traz a linha selecionada pra
+        // dentro do recorte visivel de `.ctrl-list`, mesmo ela comecando MUITO
+        // alem das ~6 linhas visiveis por vez (220dp de altura). reload() a CADA
+        // DOWN (nao 1 so no fim) - MESMO caminho incremental que o loop de
+        // producao roda a cada tecla real.
+        for (int i = 0; i < 25; ++i) {
+            system_menu_key_down(state, SDLK_DOWN);
+            reload();
+        }
+        present_frame();
+        present_frame();
+        {
+            const glintfx::ElementBox list_box = ui.get_element_box(kControlsListId);
+            const glintfx::ElementBox row25 = ui.get_element_box(controls_item_id(25).c_str());
+            const bool visible = row25.found && list_box.found &&
+                                  controls_row_visible_in_list(row25.y, row25.h,
+                                                                list_box.y, list_box.h);
+            std::cout << "SystemMenuLoop: [selftest][GLINTFX-SCROLL][teclado] apos "
+                         "DOWN x25: controls_selected="
+                      << state.controls_selected << " (esperado 25); linha 25 - y="
+                      << row25.y << " h=" << row25.h << "; recorte de ctrl-list - y="
+                      << list_box.y << " h=" << list_box.h << " - "
+                      << (state.controls_selected == 25 && visible ? "OK" : "FALHOU")
+                      << "\n";
+        }
+
+        // (c) RECONCILIACAO com o hit-test de mouse: a linha 25, agora DENTRO do
+        // recorte visivel (scroll_element_into_view ja rolou pra ela), tem que
+        // continuar clicavel na sua posicao REAL (JA ROLADA) - get_element_box
+        // reflete a geometria POS-scroll (a mesma que filter_offscreen_controls_
+        // row/controls_row_visible_in_list consultam); nao mudou algoritmo, so a
+        // geometria que ele filtra passou a ser DINAMICA (antes do scroll de
+        // verdade, linhas fora da vista tinham uma posicao FIXA "de coluna longa"
+        // que podia coincidir com o rodape - ver BUG-A acima; agora refletem
+        // onde a linha REALMENTE esta, dentro ou fora do recorte).
+        {
+            const glintfx::ElementBox list_box = ui.get_element_box(kControlsListId);
+            const glintfx::ElementBox row25 = ui.get_element_box(controls_item_id(25).c_str());
+            const float cx = row25.found ? row25.x + row25.w * 0.5f : -1.0f;
+            const float cy = row25.found ? row25.y + row25.h * 0.5f : -1.0f;
+
+            int winner = -1;
+            for (int item = 0; item < kControlsItemCount; ++item) {
+                const glintfx::ElementBox raw = ui.get_element_box(controls_item_id(item).c_str());
+                const glintfx::ElementBox box = filter_offscreen_controls_row(item, raw, list_box);
+                if (hit_test(box, cx, cy)) {
+                    winner = item;
+                    break;
+                }
+            }
+            const SystemMenuAction click_action25 =
+                (winner == 25) ? system_menu_click_option(state, winner) : SystemMenuAction::None;
+            std::cout << "SystemMenuLoop: [selftest][GLINTFX-SCROLL][clique "
+                         "pos-scroll] indice vencedor="
+                      << winner << " (esperado 25); apos clique: controls_selected="
+                      << state.controls_selected << " controls_capturing="
+                      << state.controls_capturing << " (esperado selected=25 "
+                         "capturing=1) - "
+                      << (winner == 25 && state.controls_selected == 25 &&
+                                  state.controls_capturing
+                              ? "OK"
+                              : "FALHOU")
+                      << "\n";
+            (void)click_action25;
+            system_menu_controls_capture_key(state, /*is_escape=*/true, 0);  // cancela
+        }
+
         return outcome;
     }
 
@@ -984,6 +1126,41 @@ SystemMenuLoopOutcome run_system_menu_loop_gl_current(
             } else if (ev.type == SDL_EVENT_MOUSE_BUTTON_UP &&
                        ev.button.button == SDL_BUTTON_LEFT) {
                 drag_item = -1;
+            } else if (ev.type == SDL_EVENT_MOUSE_WHEEL) {
+                // WHEEL FORWARDING (M2/GLINTFX-SCROLL, glintfx v0.4.0): rola o
+                // elemento em HOVER (NAO o com foco - ver o comentario extenso de
+                // glintfx::UiEvent::Type::MouseWheel no vendored ui_event.hpp).
+                // GOTCHA CRITICO da release note: um MouseWheel sem MouseMove
+                // recente sobre o alvo e um no-op silencioso (hover fica o que o
+                // ULTIMO MouseMove deixou - possivelmente nenhum, ex. logo apos
+                // reload() trocar de DOCUMENTO, que reseta o hover interno do
+                // RmlUi, ou o cursor parado ha varios frames sem novo
+                // SDL_EVENT_MOUSE_MOTION). Nao contamos com "o loop ja manda
+                // MouseMove todo frame" pra garantir isso (so manda em
+                // SDL_EVENT_MOUSE_MOTION de verdade, nao a cada frame) - por
+                // isso, SEMPRE mandamos 1 MouseMove sintetico pra posicao ATUAL
+                // do cursor (SDL_GetMouseState, nao um cache proprio - pega o
+                // valor mais fresco possivel) IMEDIATAMENTE antes do
+                // MouseWheel, via handle_mouse_motion (o MESMO caminho de
+                // codigo do SDL_EVENT_MOUSE_MOTION real acima - reusa hover
+                // visual + som de hover + arrasto de slider, sem duplicar
+                // logica). Hover fora de container overflow:auto (ou hover
+                // nenhum) e um no-op seguro do lado do RmlUi (GetClosestScrollable
+                // Container devolve nullptr) - nao gated por tela de proposito
+                // (a tela Controles e a UNICA com lista rolavel hoje, mas
+                // encaminhar sempre, incondicional, cobre qualquer lista rolavel
+                // futura de graca).
+                float mouse_x = 0.0f, mouse_y = 0.0f;
+                SDL_GetMouseState(&mouse_x, &mouse_y);
+                handle_mouse_motion(mouse_x, mouse_y);
+
+                const float wheel_dy = system_menu_wheel_delta_to_rmlui(
+                    ev.wheel.y, ev.wheel.direction == SDL_MOUSEWHEEL_FLIPPED);
+                glintfx::UiEvent wheel_ev{};
+                wheel_ev.type = glintfx::UiEvent::Type::MouseWheel;
+                wheel_ev.x = 0.0f;
+                wheel_ev.y = wheel_dy;
+                ui.process_event(wheel_ev);
             }
         }
 
