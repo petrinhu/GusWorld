@@ -12,8 +12,13 @@
 
 #include <catch2/catch_test_macros.hpp>
 
+#include "gus/domain/input/controls_restore.hpp"
+#include "gus/domain/input/input_binding.hpp"
 #include "gus/platform/input/sdl_input.hpp"
 
+using gus::domain::input::default_controls;
+using gus::domain::input::InputRemapConfig;
+using gus::domain::input::KeyBinding;
 using gus::platform::input::SdlInput;
 
 namespace {
@@ -21,10 +26,95 @@ namespace {
 constexpr int kKeyD = 'd';        // SDLK_d
 constexpr int kKeyA = 'a';        // SDLK_a
 constexpr int kKeyW = 'w';        // SDLK_w
+constexpr int kKeyJ = 'j';        // SDLK_j (usado no remap de move_forward abaixo)
 constexpr int kSdlLShift = 0x400000E1;  // SDLK_LSHIFT
 constexpr int kSdlEscape = 0x1B;        // SDLK_ESCAPE ('\x1B' == 27, ver SDL_keycode.h)
 constexpr int kAxisMax = 32767;
+
+// Devolve default_controls() com move_forward REMAPEADO de W (default de
+// fabrica) pra J - unico binding, sem manter W (prova que o remap SUBSTITUI, nao
+// so ADICIONA). Espelha o que a tela Controles faz (system_menu_controls_capture_
+// key) e o que persist_controls grava em controls.json - aqui construido direto,
+// sem depender de I/O/app/ (teste headless, so platform+domain).
+InputRemapConfig config_with_move_forward_remapped_to_j() {
+    InputRemapConfig cfg = default_controls();
+    for (auto& action : cfg.actions) {
+        if (action.action_name == "move_forward") {
+            action.keys = {KeyBinding{.keycode = 74}};  // 'J' maiusculo (esquema Godot)
+        }
+    }
+    return cfg;
+}
 }  // namespace
+
+// M2 (GAP FINAL: liga a tela Controles ao input REAL) - prova o WIRING que
+// Maestro::init()/open_pause_from_city() dependem: um SdlInput construido com um
+// InputRemapConfig DIFERENTE do default traduz a tecla certa pra acao certa (e
+// NAO mais a tecla de fabrica). Sem isto (o bug fechado aqui), SdlInput SEMPRE
+// usava gus::domain::input::default_controls() hardcoded, ignorando qualquer
+// remap persistido/carregado.
+TEST_CASE("SdlInput(config): config remapeado muda tecla->acao (J move_forward, "
+          "nao mais W)",
+          "[sdl_input][m2-controles]") {
+    SdlInput in(config_with_move_forward_remapped_to_j());
+
+    // A tecla NOVA (J) agora aciona move_forward (dy=-1).
+    in.process_key(kKeyJ, /*pressed=*/true);
+    REQUIRE(in.dy() == -1);
+    in.process_key(kKeyJ, /*pressed=*/false);
+    REQUIRE(in.dy() == 0);
+
+    // A tecla de FABRICA (W) NAO aciona mais move_forward - prova que o remap
+    // SUBSTITUIU o binding, nao ficou aditivo/fantasma.
+    in.process_key(kKeyW, /*pressed=*/true);
+    REQUIRE(in.dy() == 0);
+}
+
+// Construtor default (SdlInput()) continua EQUIVALENTE a construir explicitamente
+// com default_controls() - nao-regressao dos call-sites existentes (produção via
+// SdlWindow's member default-initializer, e todo o resto desta suite acima/abaixo
+// que usa `SdlInput in;` sem argumento).
+TEST_CASE("SdlInput(): construtor default equivale a SdlInput(default_controls())",
+          "[sdl_input][m2-controles]") {
+    SdlInput default_ctor;
+    SdlInput explicit_ctor(default_controls());
+
+    default_ctor.process_key(kKeyW, /*pressed=*/true);
+    explicit_ctor.process_key(kKeyW, /*pressed=*/true);
+    REQUIRE(default_ctor.dy() == explicit_ctor.dy());
+
+    default_ctor.process_key(kKeyD, /*pressed=*/true);
+    explicit_ctor.process_key(kKeyD, /*pressed=*/true);
+    REQUIRE(default_ctor.dx() == explicit_ctor.dx());
+
+    default_ctor.process_key(kSdlLShift, /*pressed=*/true);
+    explicit_ctor.process_key(kSdlLShift, /*pressed=*/true);
+    REQUIRE(default_ctor.run() == explicit_ctor.run());
+}
+
+// set_controls() (troca em RUNTIME, sem reconstruir o SdlInput) - o gancho que
+// Maestro::open_pause_from_city() usa ao FECHAR o menu de pausa (rele o
+// controls.json e realimenta o SdlInput vivo da cidade, aplicando o remap SEM
+// exigir restart).
+TEST_CASE("SdlInput::set_controls troca o mapa em runtime (mesma instancia)",
+          "[sdl_input][m2-controles]") {
+    SdlInput in;  // nasce com default_controls() (W move_forward)
+    in.process_key(kKeyW, /*pressed=*/true);
+    REQUIRE(in.dy() == -1);
+
+    in.set_controls(config_with_move_forward_remapped_to_j());
+
+    // W (ainda fisicamente "pressionado" antes da troca) NAO fica "preso": o
+    // InputMapper novo comeca com pressed_ vazio.
+    REQUIRE(in.dy() == 0);
+
+    // A tecla nova (J) agora move; W sozinho nao move mais.
+    in.process_key(kKeyJ, /*pressed=*/true);
+    REQUIRE(in.dy() == -1);
+    in.process_key(kKeyJ, /*pressed=*/false);
+    in.process_key(kKeyW, /*pressed=*/true);
+    REQUIRE(in.dy() == 0);
+}
 
 TEST_CASE("SdlInput sem nada nao move", "[sdl_input]") {
     SdlInput in;

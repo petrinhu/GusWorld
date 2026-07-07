@@ -8,6 +8,7 @@
 #include "gus/app/sdl_window.hpp"
 
 #include <string>
+#include <utility>  // std::move (set_controls)
 
 #include "gus/app/screens/anim_catalog.hpp"  // resolve_gus_sprites_dir
 #include "gus/app/screens/city_loader.hpp"   // load_city_or_fallback
@@ -319,6 +320,10 @@ bool SdlWindow::consume_escape_pressed() noexcept {
 }
 
 void SdlWindow::clear_input() noexcept { input_.clear(); }
+
+void SdlWindow::set_controls(gus::domain::input::InputRemapConfig config) {
+    input_.set_controls(std::move(config));
+}
 
 void SdlWindow::render_dialogue_overlay_frame(const std::vector<std::string>& lines) {
     if (render2d_ == nullptr || renderer_ == nullptr) {

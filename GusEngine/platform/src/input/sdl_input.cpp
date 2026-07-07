@@ -8,6 +8,8 @@
 
 #include <SDL3/SDL.h>
 
+#include <utility>  // std::move
+
 #include "gus/domain/input/controls_restore.hpp"
 #include "gus/platform/input/key_translation.hpp"
 
@@ -25,7 +27,10 @@ SDL_Gamepad* as_pad(void* p) noexcept { return static_cast<SDL_Gamepad*>(p); }
 
 }  // namespace
 
-SdlInput::SdlInput() : mapper_(gus::domain::input::default_controls()) {}
+SdlInput::SdlInput() : SdlInput(gus::domain::input::default_controls()) {}
+
+SdlInput::SdlInput(gus::domain::input::InputRemapConfig config)
+    : mapper_(std::move(config)) {}
 
 SdlInput::~SdlInput() {
     if (gamepad_ != nullptr) {
@@ -48,6 +53,14 @@ void SdlInput::process_key(int sdl_keycode, bool pressed) {
     } else {
         mapper_.release(code);
     }
+}
+
+void SdlInput::set_controls(gus::domain::input::InputRemapConfig config) {
+    // Reconstroi o InputMapper com o esquema novo - pressed_ comeca vazio (nenhuma
+    // tecla "presa" sobrevive a troca), independente do que estava fisicamente
+    // pressionado no esquema anterior. gamepad_/pad_ nao mudam (o InputMapper so
+    // cobre o teclado).
+    mapper_ = InputMapper(std::move(config));
 }
 
 bool SdlInput::consume_escape_pressed() noexcept {

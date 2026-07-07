@@ -16,7 +16,9 @@
 #include "gus/app/screens/npc_dialogue_loop_gl.hpp"
 #include "gus/app/screens/system_menu_loop.hpp"  // MENU-PAUSA-CONFIG-SOM: Esc na cidade
 #include "gus/domain/dialogue/dialogue_runtime.hpp"
+#include "gus/domain/input/controls_name.hpp"  // kDefaultProfile (M2: liga a tela Controles ao input real)
 #include "gus/domain/settings/system_settings.hpp"
+#include "gus/platform/fs/controls_file_store.hpp"  // load_controls (M2)
 #include "gus/platform/fs/settings_file_store.hpp"
 
 namespace gus::app {
@@ -154,6 +156,21 @@ bool Maestro::init() {
     std::cout << "Maestro: [settings] carregado de " << settings_dir
               << " - music_volume=" << loaded_settings.music_volume
               << " sfx_volume=" << loaded_settings.sfx_volume << "\n";
+
+    // M2 (GAP FINAL: liga a tela Controles ao input REAL) - carrega o remap
+    // persistido em "<perfil>_controls.json" (ou default_controls() se ausente/
+    // corrompido - load_controls degrada com seguranca, NUNCA lanca) e alimenta o
+    // SdlInput VIVO dentro da cidade. Antes deste fix, city_ SEMPRE nascia com
+    // gus::domain::input::default_controls() hardcoded (SdlInput::SdlInput()) -
+    // remapear na tela Controles gravava o disco certinho, mas o WASD real nunca
+    // lia esse arquivo. Perfil UNICO "default" nesta onda (MESMO perfil que
+    // system_menu_loop.cpp::persist_controls usa pra salvar).
+    const gus::domain::input::InputRemapConfig loaded_controls =
+        gus::platform::fs::load_controls(settings_dir,
+                                          std::string(gus::domain::input::kDefaultProfile));
+    city_->set_controls(loaded_controls);
+    std::cout << "Maestro: [controles] carregado de " << settings_dir
+              << " (perfil '" << gus::domain::input::kDefaultProfile << "').\n";
 
     // Traducao (i18n) do MENU DE PAUSA/CONFIG - carregada 1 vez aqui, reusada em toda
     // abertura do menu pela CIDADE (open_pause_from_city). Ausencia => fallback (o
@@ -325,6 +342,16 @@ bool Maestro::open_pause_from_city() {
             "Maestro: falha ao reconstruir o renderer da cidade apos o menu de pausa "
             "- a cidade segue rodando SEM desenhar (degradacao segura, sem crash).");
     }
+
+    // M2 (GAP FINAL): RELE o controls.json e realimenta o SdlInput da cidade -
+    // aplica o remap SEM exigir restart. O jogador pode ter passado por
+    // Controles (persist_controls, dentro do menu) e voltado direto pra
+    // Continuar; INCONDICIONAL (mesmo se ok==false / nada mudou) porque
+    // load_controls e barato e sempre degrada com seguranca (arquivo ausente/
+    // corrompido -> default_controls(), nunca lanca) - reler de mais nunca
+    // corrompe nada, so confirma o estado do disco.
+    city_->set_controls(gus::platform::fs::load_controls(
+        settings_dir, std::string(gus::domain::input::kDefaultProfile)));
 
     // Higiene (AC-E3): apaga o snapshot congelado ao fechar o menu - a proxima
     // abertura sobrescreve de qualquer forma (dentro do dir 0700 o risco de symlink

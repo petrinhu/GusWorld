@@ -208,6 +208,16 @@ public:
     // modal reimplemente o roteamento de KEY_UP.
     void clear_input() noexcept;
 
+    // M2 (ligando a tela Controles ao input REAL): repassa `config` pro
+    // SdlInput::set_controls interno - a Maestro chama isto (1) no BOOT, com o
+    // controls.json carregado do disco (ou default_controls() se ausente/
+    // corrompido), e (2) ao FECHAR o menu de pausa (Esc -> Controles -> remapear
+    // -> Voltar), com o controls.json RELIDO do disco - assim o remap do
+    // jogador vale IMEDIATAMENTE, sem reiniciar o jogo. Ver
+    // gus::platform::input::SdlInput::set_controls pro efeito exato (reconstroi
+    // o InputMapper; nenhuma tecla de movimento fica "presa" na troca).
+    void set_controls(gus::domain::input::InputRemapConfig config);
+
 private:
     // Carrega os sprites do Gus no renderer_ corrente e os entrega ao sim_. Extraido
     // de init() pra ser reusado por init_attached() e reacquire_renderer() (mesma

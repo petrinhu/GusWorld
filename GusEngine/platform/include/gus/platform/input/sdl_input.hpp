@@ -26,7 +26,18 @@ class SdlInput {
 public:
     // Constroi com o esquema de fabrica (default_controls()). NAO abre gamepad
     // aqui (precisa do subsistema SDL inicializado): chame open_gamepads() depois.
+    // Delega pro ctor explicito abaixo (mesmo esquema, so a fonte muda) - NENHUM
+    // call-site existente (produção OU testes) precisa mudar.
     SdlInput();
+
+    // M2 (ligando a tela Controles ao input REAL): constroi com um esquema de
+    // controles EXPLICITO (ex.: carregado do disco via gus::platform::fs::
+    // load_controls, ou default_controls() se preferir ser explicito). Permite ao
+    // MAESTRO alimentar o remap persistido do jogador no BOOT, em vez de sempre
+    // cair no hardcoded default_controls() - sem duplicar a logica de fusao
+    // teclado+gamepad/traducao daqui.
+    explicit SdlInput(gus::domain::input::InputRemapConfig config);
+
     ~SdlInput();
 
     SdlInput(const SdlInput&) = delete;
@@ -61,6 +72,16 @@ public:
     // estado de "ja processei este press". A CIDADE (sem pilha de modais como a
     // batalha) usa isto como o gancho unico do MENU DE PAUSA: Esc == abrir.
     [[nodiscard]] bool consume_escape_pressed() noexcept;
+
+    // M2 (ligando a tela Controles ao input REAL): troca o esquema de controles em
+    // RUNTIME (reconstroi o InputMapper interno com `config`) - usado pelo MAESTRO
+    // ao voltar do menu de pausa (Esc -> Controles -> remapear -> Voltar): sem
+    // isto, o remap so valeria depois de reiniciar o jogo. Solta toda tecla
+    // pressionada de propósito (o InputMapper novo comeca com pressed_ vazio) -
+    // evita "tecla presa" caso o keycode que estava fisicamente pressionado nao
+    // tenha mais o mesmo papel no esquema novo. NAO mexe no gamepad (pad_/
+    // gamepad_ sao independentes do InputMapper).
+    void set_controls(gus::domain::input::InputRemapConfig config);
 
     // --- intencao FUNDIDA (teclado + gamepad), clampada em {-1,0,1} ---------
     [[nodiscard]] int dx() const noexcept;
