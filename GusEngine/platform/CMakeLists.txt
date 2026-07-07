@@ -32,6 +32,8 @@ add_library(gusengine_platform STATIC
     src/audio/audio_engine.cpp
     # MENU-PAUSA-CONFIG-SOM (M7-COSTURA): I/O real de ~/.gusworld/settings.json.
     src/fs/settings_file_store.cpp
+    # Tela Controles (remap, M2): I/O real de ~/.gusworld/<perfil>_controls.json.
+    src/fs/controls_file_store.cpp
     # M2-SAVE-IO (ADR-012 Onda 2): I/O real de ~/.gusworld/saves/*.sav (save V4
     # binario, consumido via load_save nao-lancante).
     src/fs/save_file_store.cpp

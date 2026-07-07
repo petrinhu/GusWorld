@@ -21,6 +21,8 @@ add_executable(gusengine_platform_tests
     audio_engine_test.cpp
     # MENU-PAUSA-CONFIG-SOM (M7-COSTURA): I/O real de settings.json em disco.
     settings_file_store_test.cpp
+    # Tela Controles (remap, M2): I/O real de "<perfil>_controls.json" em disco.
+    controls_file_store_test.cpp
     # M2-SAVE-IO (ADR-012 Onda 2): I/O real do save em disco (~/.gusworld/saves).
     save_file_store_test.cpp
     # ASSETS-VFS-F1 (ADR-013): AssetSource/FilesystemAssetSource, por familia de asset.
