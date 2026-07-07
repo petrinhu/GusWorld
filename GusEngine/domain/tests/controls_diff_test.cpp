@@ -25,6 +25,7 @@
 #include <string>
 
 #include "gus/domain/input/controls_diff.hpp"
+#include "gus/domain/input/controls_restore.hpp"  // default_controls() - reproducao EXATA do boot
 #include "gus/domain/input/input_binding.hpp"
 
 using namespace gus::domain::input;
@@ -142,4 +143,38 @@ TEST_CASE("controls_diff: keycode sem rotulo conhecido tem fallback legivel",
     const auto diff = diff_controls(was, now);
     REQUIRE(diff.changes.size() == 1);
     REQUIRE_FALSE(diff.changes[0].now_human.empty());  // nunca vazio
+}
+
+// ---- KEY_SHIFT tem rotulo real (M2, bug ao vivo: coluna Teclado mostrava um
+// fallback numerico em vez da tecla) -----------------------------------------
+
+TEST_CASE("controls_diff: KEY_SHIFT (Godot 4194325) mostra 'Shift', nao fallback numerico",
+          "[domain][input][controls_diff]") {
+    REQUIRE(human_label_for_keycode(4194325) == "Shift");
+}
+
+// ---- REGRESSAO M2: TODAS as bindings de teclado de default_controls() (o MESMO
+// InputRemapConfig que o boot carrega quando controls.json esta ausente/corrompido
+// - ver controls_file_store.cpp::load_controls) tem que resolver pra um rotulo
+// REAL (nao-vazio, diferente do fallback "Tecla <codigo>" e diferente do rotulo de
+// "sem binding" que a UI usa quando o rotulo vem vazio). Esta e a prova que uma
+// investigacao anterior NAO fez (so checava move_forward="W" isolado) - o bug
+// verdadeiro (KEY_SHIFT sem case) estava em move_run, a 5a action.
+TEST_CASE("controls_diff: TODAS as bindings de teclado de default_controls() tem "
+          "rotulo humano real (regressao M2 - coluna Teclado)",
+          "[domain][input][controls_diff][regression]") {
+    const InputRemapConfig defaults = gus::domain::input::default_controls();
+    REQUIRE_FALSE(defaults.actions.empty());
+
+    for (const auto& action : defaults.actions) {
+        INFO("action=" << action.action_name);
+        REQUIRE_FALSE(action.keys.empty());  // default_controls() da >=1 key a toda action
+
+        const std::string label = human_label_for_keycode(action.keys.front().keycode);
+        INFO("keycode=" << action.keys.front().keycode << " label='" << label << "'");
+        REQUIRE_FALSE(label.empty());
+        REQUIRE(label != "-");
+        REQUIRE(label != "\xe2\x80\x94");             // em-dash U+2014 ("-" da UI, sem binding)
+        REQUIRE(label.rfind("Tecla ", 0) != 0);       // nao pode cair no fallback numerico
+    }
 }

@@ -316,6 +316,48 @@ TEST_CASE("build_system_menu_rml: sem tecla nenhuma, mostra CONTROLS_NO_BINDING"
     REQUIRE(rml.find("sem tecla") != std::string::npos);
 }
 
+// ---- REGRESSAO M2 (bug ao vivo reportado pelo lider: coluna "Teclado" mostrava
+// "-" em vez da tecla real) - a causa raiz era KEY_SHIFT (usado pelo default de
+// move_run/"Correr") sem case em human_label_for_keycode, caindo no fallback
+// numerico "Tecla 4194325" (nao literalmente "-", mas igualmente NAO a tecla real
+// - ver controls_diff_test.cpp pra prova isolada da funcao pura). Investigacao
+// anterior so checava move_forward="W" (1a linha) e nunca reproduziu porque
+// nenhuma outra linha foi conferida. Este teste itera as 30 ACOES CURADAS
+// (controls_action_name_at, MESMA fonte que build_controls_body usa) com
+// EXATAMENTE default_controls() (sem nenhuma modificacao - reproduz o boot 1a
+// execucao/controls.json ausente) e afirma que NENHUMA linha cai no rotulo de
+// "sem binding" (CONTROLS_NO_BINDING, "sem tecla" neste fixture).
+TEST_CASE("build_system_menu_rml: TODAS as 30 acoes de default_controls() mostram "
+          "um keycap real, nenhuma cai em CONTROLS_NO_BINDING (regressao M2)",
+          "[system_menu_rml][controls][regression]") {
+    SystemMenuState state;
+    state.screen = SystemMenuScreen::Controls;
+    state.controls_config = gus::domain::input::default_controls();  // MESMO do boot
+    const Translator tr = make_translator();
+    const std::string rml = build_system_menu_rml(state, tr);
+
+    // move_run (5a acao curada, indice 4) usa KEY_SHIFT no default - a linha que
+    // estava quebrada antes do fix.
+    REQUIRE(rml.find(">Shift<") != std::string::npos);
+
+    for (int i = 0; i < kControlsActionCount; ++i) {
+        INFO("controls-item-" << i << " (" << controls_action_name_at(i) << ")");
+        const auto id_pos = rml.find("id=\"controls-item-" + std::to_string(i) + "\"");
+        REQUIRE(id_pos != std::string::npos);
+        // Isola SO a coluna "Teclado" (span.c-key) da linha - a coluna "Controle"
+        // (span.c-pad), logo depois, SEMPRE mostra "keycap none"/"sem tecla" por
+        // decisao de design (decisao 2 do lider: gamepad read-only nesta onda) e
+        // NAO pode ser confundida com o bug da coluna Teclado.
+        const auto key_col_start = rml.find("class=\"c-key\">", id_pos);
+        REQUIRE(key_col_start != std::string::npos);
+        const auto key_col_end = rml.find("class=\"c-pad\"", key_col_start);
+        REQUIRE(key_col_end != std::string::npos);
+        const std::string key_col = rml.substr(key_col_start, key_col_end - key_col_start);
+        REQUIRE(key_col.find("keycap none") == std::string::npos);  // "sem tecla"/CONTROLS_NO_BINDING
+        REQUIRE(key_col.find("sem tecla") == std::string::npos);
+    }
+}
+
 TEST_CASE("build_system_menu_rml: controls_confirming_restore SUBSTITUI a "
           "lista pelo prompt 'tem certeza?' com Sim/Nao",
           "[system_menu_rml][controls]") {

@@ -73,6 +73,12 @@ std::string human_label_for_keycode(long long keycode) {
         case 4194320: return "Cima";     // KEY_UP
         case 4194322: return "Baixo";    // KEY_DOWN
         case 4194306: return "Backspace";
+        // KEY_SHIFT (Godot 4) - usado pelo default de move_run (correr). Faltava
+        // aqui: caia no fallback numerico "Tecla 4194325" em vez de um rotulo real
+        // (M2, bug ao vivo reportado pelo lider na coluna "Teclado" da tela
+        // Controles - ver controls_diff_test.cpp e system_menu_rml_test.cpp para a
+        // prova com TODAS as bindings de default_controls()).
+        case 4194325: return "Shift";
         default: break;
     }
     // Letras A..Z (Godot usa o ASCII maiusculo).
