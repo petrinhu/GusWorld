@@ -5,7 +5,10 @@
 // Paridade total de casos.
 //
 // ESCOPO (fronteira POCO vs backend de evento Qt): igual ao C#.
-//   - ActionRegistry (POCO static, 37 actions): contagem, lookup, categorias.
+//   - ActionRegistry (POCO static, 30 actions): contagem, lookup, categorias.
+//     (higiene M2/higiene-controles-godot removeu as 7 actions de camera orbital
+//     3/4 da era Godot, mortas pos-ADR-008: jogo 2D top-down nunca teve essa
+//     camera. O ActionCategory::Camera correspondente tambem foi removido.)
 //   - InputBinding records (POCO): igualdade por valor sensivel a modifier
 //     (Ctrl/Shift/Alt) -- a PRIMITIVA em que a deteccao de conflito se apoia.
 //   - InputRemapConfig: estrutura/versao.
@@ -33,9 +36,9 @@ using namespace gus::domain::input;
 
 // ---- ActionRegistry: contagem e integridade ----
 
-TEST_CASE("Registry_Has37CanonicalActions", "[input_remap][registry]") {
-    REQUIRE(ActionRegistry::count() == 37);
-    REQUIRE(ActionRegistry::actions().size() == 37);
+TEST_CASE("Registry_Has30CanonicalActions", "[input_remap][registry]") {
+    REQUIRE(ActionRegistry::count() == 30);
+    REQUIRE(ActionRegistry::actions().size() == 30);
 }
 
 TEST_CASE("Registry_ActionNames_AreUnique", "[input_remap][registry]") {
@@ -74,7 +77,6 @@ TEST_CASE("GetByName_KnownAction_ReturnsCorrectCategory", "[input_remap][registr
     };
     const std::vector<Case> cases = {
         {"move_forward", ActionCategory::Movement},
-        {"camera_reset_view", ActionCategory::Camera},
         {"interact", ActionCategory::Interact},
         {"combat_card_1", ActionCategory::Combat},
         {"dialogue_continue", ActionCategory::Dialogue},
@@ -109,13 +111,13 @@ TEST_CASE("GetByCategory_Combat_Returns7Actions", "[input_remap][registry]") {
     REQUIRE(combat.size() == 7);
 }
 
-TEST_CASE("GetByCategory_CoversAllActions_SumEquals37", "[input_remap][registry]") {
+TEST_CASE("GetByCategory_CoversAllActions_SumEquals30", "[input_remap][registry]") {
     // Soma das categorias = total (cada action em exatamente uma categoria).
     int total = 0;
     for (const auto cat : all_action_categories()) {
         total += static_cast<int>(ActionRegistry::get_by_category(cat).size());
     }
-    REQUIRE(total == 37);
+    REQUIRE(total == 30);
 }
 
 TEST_CASE("GetByCategory_DiaryValue_ReturnsSingle", "[input_remap][registry]") {

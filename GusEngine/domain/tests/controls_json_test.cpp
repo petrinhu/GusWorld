@@ -173,6 +173,33 @@ TEST_CASE("controls_json: action_name desconhecida e ignorada (forward-compat)",
     REQUIRE(r.config.actions[0].keys[0].keycode == 70);
 }
 
+// ---- forward-compat: controls.json ANTIGO com camera action removida -------
+
+TEST_CASE("controls_json: controls.json antigo com camera_rotate_left "
+          "(action removida na higiene M2/higiene-controles-godot) continua "
+          "carregando, so ignora a action desconhecida",
+          "[domain][input][controls_json][forward-compat]") {
+    // Regressao-alvo: um jogador com save antigo (era Godot/ADR-002, camera
+    // orbital 3/4) pode ter um controls.json no disco contendo as 7 actions de
+    // camera que existiam entao. Pos-higiene elas NAO estao mais no
+    // ActionRegistry; o parser deve tratar como "action_name desconhecido" (regra
+    // forward-compat ja documentada no cabecalho deste arquivo) e IGNORAR, nunca
+    // falhar/lancar.
+    const std::string json =
+        "{ \"config_version\": 1, \"actions\": ["
+        "  { \"action_name\": \"camera_rotate_left\", \"keys\": [ { \"keycode\": 81 } ] },"
+        "  { \"action_name\": \"camera_zoom_in\", \"keys\": [ { \"keycode\": 82 } ] },"
+        "  { \"action_name\": \"interact\", \"keys\": [ { \"keycode\": 70 } ] }"
+        "] }";
+    const auto r = parse_controls(json);
+    REQUIRE(r.error == ControlsParseError::None);
+    // As duas actions de camera caem fora; so a conhecida (interact) sobrevive.
+    REQUIRE(r.config.actions.size() == 1);
+    REQUIRE(r.config.actions[0].action_name == "interact");
+    REQUIRE(r.config.actions[0].keys.size() == 1);
+    REQUIRE(r.config.actions[0].keys[0].keycode == 70);
+}
+
 // ---- forward-compat: chave JSON desconhecida ignorada ----------------------
 
 TEST_CASE("controls_json: chaves JSON desconhecidas sao ignoradas (forward-compat)",

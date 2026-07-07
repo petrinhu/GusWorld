@@ -2,7 +2,14 @@
 //
 // Registry canonico de actions GusWorld, portado de
 // engine/foundation/input_remap/ActionRegistry.cs (pos-ADR-002 + F2-E.7).
-// Lista immutable de 37 actions canonicas, cada uma com categoria e label i18n.
+// Lista immutable de 30 actions canonicas, cada uma com categoria e label i18n.
+//
+// HIGIENE (M2, higiene-controles-godot): as 7 actions de camera orbital 3/4 (era
+// Godot/ADR-002: camera_rotate_left/right, camera_zoom_in/out, camera_pitch_up/down,
+// camera_reset_view) foram removidas. O jogo pos-ADR-008 e 2D top-down e nunca teve
+// essa camera; eram mortas (grep confirmou zero uso fora deste registry + a fabrica
+// de defaults). O C# espelhado (engine/foundation/, submodule Godot legado) NAO foi
+// tocado -- fora do escopo deste porte C++.
 //
 // POCO puro, ZERO Qt (invariante de domain/, engine-design.md secao 2). E o lado
 // canonico/estatico do mapa logico de input (o "mapa acao->tecla e puro";
@@ -32,10 +39,12 @@
 namespace gus::domain::input {
 
 // Categoria de action (pra UI agrupamento). Espelha ActionCategory do C# na
-// MESMA ordem de declaracao (valores subjacentes 0..7).
+// MESMA ordem de declaracao (valores subjacentes 0..6).
+//
+// Camera removida na higiene M2/higiene-controles-godot (era orbital 3/4 morta
+// pos-ADR-008): nenhuma action usa mais essa categoria.
 enum class ActionCategory {
     Movement,
-    Camera,
     Interact,
     Menu,
     Combat,
@@ -46,11 +55,11 @@ enum class ActionCategory {
 
 // Todas as categorias, na ordem de declaracao. Espelha Enum.GetValues<ActionCategory>()
 // do C# (usado pela spec para somar as actions por categoria).
-[[nodiscard]] inline constexpr std::array<ActionCategory, 8> all_action_categories() {
+[[nodiscard]] inline constexpr std::array<ActionCategory, 7> all_action_categories() {
     return {
-        ActionCategory::Movement,  ActionCategory::Camera,    ActionCategory::Interact,
-        ActionCategory::Menu,      ActionCategory::Combat,    ActionCategory::Dialogue,
-        ActionCategory::Inventory, ActionCategory::Diary,
+        ActionCategory::Movement, ActionCategory::Interact,  ActionCategory::Menu,
+        ActionCategory::Combat,   ActionCategory::Dialogue,  ActionCategory::Inventory,
+        ActionCategory::Diary,
     };
 }
 

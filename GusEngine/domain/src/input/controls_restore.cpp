@@ -29,8 +29,6 @@ constexpr long long kKeyRight = 4194321;
 constexpr long long kKeyUp = 4194320;
 constexpr long long kKeyDown = 4194322;
 constexpr long long kKeyShift = 4194325;
-constexpr long long kKeyQ = 'Q';
-constexpr long long kKeyE = 'E';
 constexpr long long kKeySpace = 32;
 
 ActionBindings key_action(const std::string& name, long long keycode,
@@ -53,15 +51,6 @@ ActionBindings default_for(const std::string& name) {
     if (name == "move_left") return key_action(name, 'A');
     if (name == "move_right") return key_action(name, 'D');
     if (name == "move_run") return key_action(name, kKeyShift);
-
-    // Camera.
-    if (name == "camera_rotate_left") return key_action(name, kKeyQ);
-    if (name == "camera_rotate_right") return key_action(name, kKeyE);
-    if (name == "camera_zoom_in") return key_action(name, 'R');
-    if (name == "camera_zoom_out") return key_action(name, 'F');
-    if (name == "camera_pitch_up") return key_action(name, 'T');
-    if (name == "camera_pitch_down") return key_action(name, 'G');
-    if (name == "camera_reset_view") return key_action(name, 'C');
 
     // Interact.
     if (name == "interact") return key_action(name, kKeyEnter);
@@ -102,7 +91,7 @@ ActionBindings default_for(const std::string& name) {
 
     // Defesa: action canonica sem default explicito ainda recebe um binding neutro
     // (o teste exige >=1 binding por action). Nunca deve acontecer em producao (o
-    // mapa acima cobre as 37); se uma action nova entrar no registry sem default
+    // mapa acima cobre as 30); se uma action nova entrar no registry sem default
     // aqui, ela cai neste fallback e o dev deve corrigir.
     return key_action(name, kKeySpace);
 }

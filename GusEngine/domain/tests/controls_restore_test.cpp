@@ -5,8 +5,9 @@
 //
 // Contrato:
 //   - default_controls() -> InputRemapConfig: fonte UNICA do esquema de fabrica.
-//     Determinismo (mesma fabrica sempre); cobre as 37 actions do ActionRegistry;
-//     config_version = 1.
+//     Determinismo (mesma fabrica sempre); cobre as 30 actions do ActionRegistry
+//     (higiene M2/higiene-controles-godot removeu as 7 actions de camera orbital
+//     3/4 da era Godot, mortas pos-ADR-008); config_version = 1.
 //   - restore_from_save(save) -> save.input_remap_backup (o backup embutido no save).
 //
 // O backup viaja em TODO save (ADR-007 item 3): restore_from_save apenas devolve o
@@ -45,7 +46,7 @@ TEST_CASE("controls_restore: default_controls tem config_version 1",
     REQUIRE(default_controls().config_version == 1);
 }
 
-TEST_CASE("controls_restore: default cobre todas as 37 actions canonicas",
+TEST_CASE("controls_restore: default cobre todas as 30 actions canonicas",
           "[domain][input][controls_restore]") {
     const auto cfg = default_controls();
     REQUIRE(cfg.actions.size() == static_cast<std::size_t>(ActionRegistry::count()));
