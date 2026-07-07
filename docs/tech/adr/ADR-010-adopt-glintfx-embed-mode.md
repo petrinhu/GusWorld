@@ -66,3 +66,5 @@ Executado e aceito ao vivo pelo criador em 2026-07-01. As fases planejadas rodar
 **Preservado:** SDL3 (ADR-008) segue dono de janela/loop/input/gamepad/contexto GL; a arena (`Render2dGl3`, loader glad próprio) intocada; a ordem de composição arena → UI → swap; `core/`+`domain/` POCO (~1013 testes) intactos; a invariante das 4 camadas mantida (agora também barrando `<glintfx`).
 
 A **F4** (componentes da v2 do glintfx pra menus/diálogos) segue em aberto, sem bloquear esta decisão.
+
+**Nota (adendo, AC-E9 AUDITORIA-COMPLETA-2026-07-06):** o corpo acima registra o pin da época (v0.2.4); pins subsequentes (v0.2.5, v0.3.0, v0.3.1) chegaram via commits de bump dedicados (`db2d643`, `69b7e96`, `d8f103f`) e não reescrevem este registro histórico. O pin REAL em vigor sempre vive em `GusEngine/CMakeLists.txt` (`GIT_TAG`); README.md e CLAUDE.md apontam pra lá em vez de repetir o número, pra não se defasarem de novo a cada bump.

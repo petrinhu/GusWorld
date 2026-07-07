@@ -42,7 +42,7 @@ Bloco "Modo de operação" inserido em cada agent em `~/.claude/agents/`.
 - **Localização:** Godot `tr()` + CSV. ICU recusado pra G1.
 - **CI:** Forgejo Actions (esqueleto em `docs/tech/build.md`).
 - **Plataformas:** Linux (AppImage/.tar.gz) + Windows (sem signing em G1).
-- **UI/HUD (pós-pivot C++/SDL3):** servida pelo **glintfx** via embed mode (`glintfx::UiLayer`), que embrulha RmlUi 6.3 + backend GL3 e compõe sobre o contexto GL da casca SDL; o backend RmlUi vendorizado à mão foi aposentado. Consumido via FetchContent (pin `v0.2.4`, `GLINTFX_BACKEND_GLFW=OFF`). Ver `docs/tech/adr/ADR-010-adopt-glintfx-embed-mode.md`. _(Os bullets de engine/visual/arquitetura acima são da era Godot/C# e ficaram defasados pelo pivot para C++20 + SDL3; ver README.md, ROADMAP.md e ADR-008/ADR-010 para o estado atual.)_
+- **UI/HUD (pós-pivot C++/SDL3):** servida pelo **glintfx** via embed mode (`glintfx::UiLayer`), que embrulha RmlUi 6.3 + backend GL3 e compõe sobre o contexto GL da casca SDL; o backend RmlUi vendorizado à mão foi aposentado. Consumido via FetchContent (pin atual em `GusEngine/CMakeLists.txt`, `GLINTFX_BACKEND_GLFW=OFF`). Ver `docs/tech/adr/ADR-010-adopt-glintfx-embed-mode.md`. _(Os bullets de engine/visual/arquitetura acima são da era Godot/C# e ficaram defasados pelo pivot para C++20 + SDL3; ver README.md, ROADMAP.md e ADR-008/ADR-010 para o estado atual.)_
 
 ### Documentos canônicos (Fase 1)
 

@@ -4,7 +4,7 @@
 
 **Status:** Pivot de stack em curso (Godot/C# para C++20 com engine própria). A camada de plataforma é **SDL3** desde o re-pivot Qt6 para SDL3 ([ADR-008](docs/tech/adr/ADR-008-repivot-qt-to-sdl3.md), 2026-06-22); o Qt6 anterior foi aposentado. Migração faseada anti big-bang, Godot vivo até o decommission no marco M8. Decisão âncora da engine em [`docs/tech/pivot/engine-design.md`](docs/tech/pivot/engine-design.md), ratificada pelo líder em 2026-06-21.
 
-**Solo indie, freeware.** Petrinhu, 2026. Início do projeto em **2026-05-15**. Linux + Windows. Single-player puro. C++20 + SDL3.
+**Solo indie, freeware.** Petrinhu, 2026. Início do projeto em **2026-05-15**. Linux no ship de v1.0.0 (Windows preparado, suporte pós-v1). Single-player puro. C++20 + SDL3.
 
 ---
 
@@ -48,7 +48,7 @@ gusworld/
 ├── game/                (projeto Godot legado, referência de leitura até M8)
 ├── engine/              (engine C# legada, referência de leitura até M8)
 ├── assets/              (sources arte/som: Blender, Krita, Aseprite, audio raw)
-└── build/               (outputs export Linux + Windows)
+└── build/               (outputs export: Linux no ship v1.0.0; Windows pós-v1)
 ```
 
 A engine antiga (`game/` Godot + `engine/` C#) permanece no repo como referência de leitura durante o porte e é apagada no marco M8 (decommission).
@@ -87,9 +87,9 @@ A engine antiga (`game/` Godot + `engine/` C#) permanece no repo como referênci
 ### Pré-requisitos
 
 - C++20 (GCC, Clang ou MSVC/MinGW)
-- SDL3 + glintfx (via FetchContent; o CMake baixa e fixa a versão, build reprodutível Linux + Windows). O glintfx (embed mode, pin `v0.2.4`, `GLINTFX_BACKEND_GLFW=OFF`) traz o RmlUi 6.3 + backend GL3 embrulhados; ver [ADR-010](docs/tech/adr/ADR-010-adopt-glintfx-embed-mode.md)
+- SDL3 + glintfx (via FetchContent; o CMake baixa e fixa a versão, build reprodutível). O glintfx (embed mode, pin atual em `GusEngine/CMakeLists.txt`, `GLINTFX_BACKEND_GLFW=OFF`) traz o RmlUi 6.3 + backend GL3 embrulhados; ver [ADR-010](docs/tech/adr/ADR-010-adopt-glintfx-embed-mode.md)
 - CMake + Ninja
-- Linux ou Windows
+- Linux (ship de v1.0.0). Windows preparado (preset `windows-release`), mas o build nunca foi validado: suporte fica pós-v1
 - Git
 
 ### Desenvolvimento local
@@ -111,7 +111,7 @@ cmake --build --preset linux-release
 ctest --preset linux-release
 ```
 
-Para Windows, troque o preset por `windows-release`. A lógica de `core/` e `domain/` roda headless (sem abrir janela). Detalhes em [`docs/tech/pivot/engine-design.md`](docs/tech/pivot/engine-design.md).
+O preset `windows-release` existe (esboço, pin CMake compatível), mas o build Windows nunca foi validado e fica fora do escopo de ship da v1.0.0 (Linux-only em G1; Windows pós-v1). A lógica de `core/` e `domain/` roda headless (sem abrir janela). Detalhes em [`docs/tech/pivot/engine-design.md`](docs/tech/pivot/engine-design.md).
 
 ---
 
@@ -125,9 +125,9 @@ Para Windows, troque o preset por `windows-release`. A lógica de `core/` e `dom
 - **Save format:** binário próprio com criptografia própria (SHA-256 / HMAC, zero dependência externa, validada contra vetores FIPS 180-4 e RFC 4231), migrators forward-only, schema v4, anti-tamper.
 - **RNG:** PRNG determinístico seedável e injetável (para save e replay).
 - **Localização:** loader próprio + i18n próprio. Dev em pt-br. Tradução en-intl pós-release v1.0.0.
-- **Build/Test:** CMake + CMakePresets. SDL3 e **glintfx** (pin `v0.2.4`, `GLINTFX_BACKEND_GLFW=OFF`, embed-only) entram via FetchContent (pin de versão); o RmlUi 6.3 chega embrulhado pelo glintfx; testes via `ctest` (Catch2). A camada de plataforma roda smoke headless com `SDL_VIDEODRIVER=dummy`.
-- **CI:** Forgejo Actions, matriz Linux + Windows.
-- **Plataformas:** Linux (AppImage + tar.gz) + Windows (sem signing em G1).
+- **Build/Test:** CMake + CMakePresets. SDL3 e **glintfx** (pin atual em `GusEngine/CMakeLists.txt`, `GLINTFX_BACKEND_GLFW=OFF`, embed-only) entram via FetchContent (pin de versão); o RmlUi 6.3 chega embrulhado pelo glintfx; testes via `ctest` (Catch2). A camada de plataforma roda smoke headless com `SDL_VIDEODRIVER=dummy`.
+- **CI:** Forgejo Actions. Job Linux ativo; job Windows fica esboçado e adiado até haver runner Windows disponível (ver `.forgejo/workflows/ci.yml`).
+- **Plataformas:** Linux (AppImage + tar.gz) no ship de v1.0.0. Windows preparado (preset `windows-release`, sem signing), mas o build nunca foi validado: fica pós-v1.
 - **Target hardware:** floor iGPU (Intel HD / AMD integrada, sem GPU dedicada); ceiling RTX 3050 Laptop 4GB.
 
 Motivação do pivot Godot/C# para C++20: máxima performance em máquinas modestas. C++ é AOT por natureza, o que elimina toda a complexidade de AOT do .NET da fase anterior (ADR-002).
