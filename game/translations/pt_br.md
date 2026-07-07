@@ -491,3 +491,146 @@ Volume dos Efeitos (SFX)
 
 ## MENU_PLACEHOLDER_TEXT
 Em breve.
+
+---
+
+## §10. Controles (tela de remap de teclado, M2)
+
+## CONTROLS_HINT
+Selecione uma ação e pressione a nova tecla · Esc cancela a captura
+
+## CONTROLS_CAPTURE_PROMPT
+Pressione uma tecla…
+
+## CONTROLS_COL_ACTION
+Ação
+
+## CONTROLS_COL_KEYBOARD
+Teclado
+
+## CONTROLS_COL_GAMEPAD
+Controle
+
+## CONTROLS_NAV_HINT
+▲▼ navega · Enter remapeia · Esc volta
+
+## CONTROLS_GROUP_MOVEMENT
+Movimento
+
+## CONTROLS_GROUP_WORLD
+Mundo
+
+## CONTROLS_GROUP_COMBAT
+Combate
+
+## CONTROLS_GROUP_MENU_DIALOGUE
+Menu & Diálogo
+
+## CONTROLS_SWAP_NOTICE
+(!) trocou de tecla com: {0}
+
+## CONTROLS_RESTORE_CONFIRM_TITLE
+Restaurar os controles para o padrão de fábrica?
+
+## CONTROLS_RESTORE_CONFIRM_YES
+Sim, restaurar
+
+## CONTROLS_RESTORE_CONFIRM_NO
+Cancelar
+
+## CONTROLS_NO_BINDING
+—
+
+### Rótulos das 30 ações (ACTION_<nome> = ActionDefinition::label_i18n_key,
+### gus/domain/input/action_registry.cpp - NÃO renomear as chaves sem atualizar
+### o registry em C++)
+
+## ACTION_MOVE_FORWARD
+Andar para frente
+
+## ACTION_MOVE_BACKWARD
+Andar para trás
+
+## ACTION_MOVE_LEFT
+Andar para a esquerda
+
+## ACTION_MOVE_RIGHT
+Andar para a direita
+
+## ACTION_MOVE_RUN
+Correr
+
+## ACTION_INTERACT
+Interagir / Falar
+
+## ACTION_MENU_OPEN
+Abrir menu
+
+## ACTION_MENU_CLOSE
+Fechar menu
+
+## ACTION_MENU_CONFIRM
+Confirmar
+
+## ACTION_MENU_CANCEL
+Cancelar / Voltar
+
+## ACTION_MENU_NAV_UP
+Navegar para cima
+
+## ACTION_MENU_NAV_DOWN
+Navegar para baixo
+
+## ACTION_MENU_NAV_LEFT
+Navegar para a esquerda
+
+## ACTION_MENU_NAV_RIGHT
+Navegar para a direita
+
+## ACTION_COMBAT_ATTACK_BASIC
+Ataque básico
+
+## ACTION_COMBAT_DEFEND
+Defender
+
+## ACTION_COMBAT_CAST
+Conjurar (carta)
+
+## ACTION_COMBAT_CARD_1
+Carta 1
+
+## ACTION_COMBAT_CARD_2
+Carta 2
+
+## ACTION_COMBAT_CARD_3
+Carta 3
+
+## ACTION_COMBAT_END_TURN
+Encerrar turno
+
+## ACTION_DIALOGUE_CONTINUE
+Continuar diálogo
+
+## ACTION_DIALOGUE_SKIP
+Pular diálogo
+
+## ACTION_DIALOGUE_CHOICE_1
+Escolha 1
+
+## ACTION_DIALOGUE_CHOICE_2
+Escolha 2
+
+## ACTION_DIALOGUE_CHOICE_3
+Escolha 3
+
+## ACTION_DIALOGUE_CHOICE_4
+Escolha 4
+
+## ACTION_INVENTORY_OPEN
+Abrir inventário
+
+## ACTION_INVENTORY_CLOSE
+Fechar inventário
+
+## ACTION_DIARY_OPEN
+Abrir diário
