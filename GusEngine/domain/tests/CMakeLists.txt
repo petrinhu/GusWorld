@@ -72,6 +72,8 @@ add_executable(gusengine_domain_tests
     controls_diff_test.cpp
     controls_name_sanitize_test.cpp
     controls_restore_test.cpp
+    # Tela Controles (remap, M2): swap-on-conflict PURO ("avisa e troca").
+    controls_remap_apply_test.cpp
     save_v4_test.cpp
     # MENU-PAUSA-CONFIG-SOM (M7-COSTURA): settings.json proprio (mesmo padrao JSON
     # dep-free de controls_json.hpp), so volume musica/SFX nesta onda.

@@ -48,6 +48,8 @@ add_library(gusengine_domain STATIC
     src/input/controls_hash.cpp
     src/input/controls_diff.cpp
     src/input/controls_restore.cpp
+    # Tela Controles (remap, M2): swap-on-conflict PURO ("avisa e troca").
+    src/input/controls_remap_apply.cpp
     # MENU-PAUSA-CONFIG-SOM (M7-COSTURA): settings.json proprio (mesmo padrao JSON
     # dep-free de controls_json.cpp), so volume musica/SFX nesta onda.
     src/settings/system_settings_json.cpp
