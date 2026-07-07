@@ -99,10 +99,20 @@ set(GLINTFX_BACKEND_GLFW OFF CACHE BOOL "" FORCE)  # embed-only (sem GLFW)
 # pro hit-test de clique aqui - so pro reposicionamento do cursor sintetico do
 # GUSWORLD_BATTLE_HOVER_SELFTEST (diagnostico preexistente que dependia da geometria
 # manual aposentada; ver battle_preview.cpp).
+#
+# BUMP v0.3.1 -> v0.4.0 (M2/GLINTFX-SCROLL, commit glintfx 7ee1bc7): a v0.4.0 entrega
+# SCROLL de verdade em embed mode - UiEvent::Type::MouseWheel (forward da roda do
+# mouse pro elemento em HOVER) e UiLayer::scroll_element_into_view(id, align_with_top)
+# (scroll programatico pra acompanhar selecao de teclado). Antes so ~6 das 30 acoes
+# da tela Controles eram alcancaveis (sem scroll, a lista transbordava e nao rolava).
+# Ver system_menu_loop.cpp (wheel forwarding + scroll_element_into_view no
+# handle_mouse_motion/navegacao) - controls_row_visible_in_list (BUG-A, filtro de
+# hit-test por recorte visivel) RECONCILIADO com a geometria JA ROLADA que
+# get_element_box passa a devolver.
 FetchContent_Declare(
     glintfx
     GIT_REPOSITORY https://codeberg.org/petrinhu/glintfx
-    GIT_TAG        v0.3.1
+    GIT_TAG        v0.4.0
     SOURCE_SUBDIR  glintfx
 )
 FetchContent_MakeAvailable(glintfx)
