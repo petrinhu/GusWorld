@@ -99,13 +99,86 @@ jobs:
         run: ctest --preset linux-release
 
       # Smoke headless: o app roda N ticks + 1 render offscreen com os drivers DUMMY
-      # do SDL (sem display/audio no runner) e sai 0.
+      # do SDL (sem display/audio no runner) e sai 0. timeout como cinto de
+      # seguranca (mesma logica do tools/check.sh): se travar, falha rapido em vez
+      # de pendurar o job.
       - name: Smoke (headless, SDL dummy)
         working-directory: GusEngine
         run: |
           set -eux
           SDL_VIDEODRIVER=dummy SDL_AUDIODRIVER=dummy \
-            ./build/linux-release/app/gusworld_app --smoke
+            timeout 60 ./build/linux-release/app/gusworld_app --smoke
+
+      # Gate de paridade i18n (tools/i18n_parity.py): mesma checagem estrutural do
+      # tools/check.sh (estagio GATE). Reprova em chave faltando/extra/duplicada;
+      # cobertura de conteudo (%) so e exibida, nao reprova (en_intl e debito
+      # deliberado ate pos-v1.0.0, CUT.9).
+      - name: i18n parity gate
+        run: python3 tools/i18n_parity.py
+
+  asan:
+    name: ASan/UBSan (core+domain+app)
+    runs-on: codeberg-medium
+    container:
+      image: ghcr.io/catthehacker/ubuntu:act-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install toolchain + SDL build deps
+        run: |
+          set -eux
+          apt-get update -qq
+          apt-get install -y --no-install-recommends \
+            cmake ninja-build g++ build-essential git \
+            python3 python3-pip python3-venv \
+            libx11-dev libxext-dev libxrandr-dev libxcursor-dev libxi-dev \
+            libxfixes-dev libxss-dev libxtst-dev \
+            libxkbcommon-dev libwayland-dev wayland-protocols libdecor-0-dev \
+            libgl1-mesa-dev libegl1-mesa-dev libdrm-dev libgbm-dev \
+            libpulse-dev libasound2-dev libdbus-1-3
+
+      - name: Cache FetchContent deps (asan)
+        uses: actions/cache@v4
+        with:
+          path: GusEngine/build/asan/_deps
+          key: deps-asan-${{ hashFiles('GusEngine/CMakeLists.txt') }}
+
+      # Build dir proprio (fora dos presets do CMakePresets.json): Debug +
+      # -fsanitize=address,undefined, mesma parametrizacao usada localmente no
+      # dossie AUDIT-M7-COSTURA (foi o ASan local que achou o AUD-MINIAUDIO-UAF).
+      - name: Configure (ASan/UBSan)
+        run: |
+          cmake -S GusEngine -B GusEngine/build/asan -G Ninja \
+            -DCMAKE_BUILD_TYPE=Debug \
+            -DCMAKE_CXX_FLAGS="-fsanitize=address,undefined -fno-omit-frame-pointer -g" \
+            -DCMAKE_EXE_LINKER_FLAGS="-fsanitize=address,undefined"
+
+      - name: Build (ASan/UBSan)
+        run: cmake --build GusEngine/build/asan
+
+      # NOTA (AUD-MINIAUDIO-UAF): a suite platform/ ABORTA sob ASan por causa de um
+      # heap-use-after-free na lib miniaudio vendorizada (trilha de falha de carga).
+      # Item aberto no TODO.md, obrigatorio antes do gate T4/ASan de v1.0.0. Ate
+      # fechar, platform/ fica FORA deste job; core/domain/app rodam normalmente.
+      - name: Test core/ under ASan/UBSan
+        run: |
+          set -eux
+          ASAN_OPTIONS=detect_leaks=1 UBSAN_OPTIONS=print_stacktrace=1,halt_on_error=1 \
+            ./GusEngine/build/asan/tests/gusengine_core_tests
+
+      - name: Test domain/ under ASan/UBSan
+        run: |
+          set -eux
+          ASAN_OPTIONS=detect_leaks=1 UBSAN_OPTIONS=print_stacktrace=1,halt_on_error=1 \
+            ./GusEngine/build/asan/domain/tests/gusengine_domain_tests
+
+      - name: Test app/ under ASan/UBSan
+        run: |
+          set -eux
+          ASAN_OPTIONS=detect_leaks=1 UBSAN_OPTIONS=print_stacktrace=1,halt_on_error=1 \
+            ./GusEngine/build/asan/app/tests/gusengine_app_tests
 
 # ---------------------------------------------------------------------------
 # ESBOCO ADIADO: job Windows (MSVC). Habilitar quando houver runner Windows
