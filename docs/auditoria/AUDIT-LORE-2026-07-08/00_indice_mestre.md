@@ -2,6 +2,9 @@
 
 > **Dono do dossiê:** internal-auditor. **Executores:** revisor-textual (conteúdo, lotes L1/L5/L6/L8a/L8b/L9) + Cosimo (memórias + organização, fatias M1/M2), disparados pela thread principal. **Fase atual: CONSOLIDADA** (relatórios brutos preservados em `raw/`).
 > Predecessora: F5-BK.AUDIT.FULL T1-T10 v2 (2026-05-22, `docs/auditoria/AUDIT-T*-V2.md`) + tracker vivo `docs/narrative/INCOHERENCES.md`.
+>
+> ## ✅ REMEDIAÇÃO CONCLUÍDA 2026-07-08
+> Todas as 5 ondas executadas (11 decisões do criador em `DECISOES-CRIADOR.md`). **Onda 1** mecânico (CHARS/PLACES/timeline/CLAUDE.md/_INDEX/rename npcs-antagonistas/C20). **Onda 2** 13 memórias stale + promoção da regra GUI-médico a global + Gus "Dragon" reconciliado. **Onda 3** prosa deep (~35 fixes de cronologia/nome) + fusão D2 (morte do Aldebrando = Catedral Menor de Atelaiá + Sterling, expedição do arco preservada). **Onda 4** terminologia: Deck Rúnico→Codex de Conjuros + Beat Ten→Etapa 1/Beat 8 (~22 docs). **Onda 5** delabelização: Fibonacci→"sequência numérica recorrente", abelha-espiral, esquadro/compasso→"instrumentos de medida pareados", olho-no-triângulo→"símbolo ocular cerimonial" (narrativa+design+book). **Verificação final:** 0 rótulos de easter egg em docs públicos; residuais só meta-docs do rename + sub-beat "Ten" legítimo. **Decisões-leve do criador:** manter o cross-ref do nome de memória no backlog (risco baixo) e manter as citações "Dan Brown" no book (bibliografia declarada). Estado Auditado de todos os capítulos: ✓ remediado.
 
 ## SUMÁRIO EXECUTIVO
 
