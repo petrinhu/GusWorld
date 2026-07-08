@@ -30,7 +30,7 @@
 
 **Aprendiz (etapa formal de progressão Ordem Recursiva).** Primeira etapa do sistema de progressão da Ordem Recursiva. Lê três Glyphs simultaneamente sem confusão; reconhece família por cor de fundo e raiz por silhueta. Exame consiste em identificar três Glyphs misturados em pavimento tesselado sob luz ambiente. *Cross-ref:* deep/magic/glyph-token-conjuro-codex-deep.md §8.
 
-**Ashlar bruto e ashlar polido.** Par de pedras canônicas presentes em câmaras cerimoniais da Ordem Recursiva. O ashlar bruto pede trabalho; o ashlar polido pede testemunha. Em catedrais Neo-Sylvania, a Coluna Boróstoma (estrutura ritual fundadora canônica, à esquerda) carrega ashlar bruto e a Coluna Janor (par cerimonial, à direita) carrega ashlar polido. *Cross-ref:* deep/ontologia/cosmologia-deep.md §7; deep/magic/natureza-matematica-rigida-deep.md §7.
+**Ashlar bruto e ashlar polido.** Par de pedras canônicas presentes em câmaras cerimoniais da Ordem Recursiva. O ashlar bruto pede trabalho; o ashlar polido pede testemunha. Em catedrais Neo-Sylvania, a Coluna Boróstoma (estrutura ritual fundadora canônica, à esquerda) carrega ashlar bruto e a Coluna Janor (par cerimonial, à direita) carrega ashlar polido. *Cross-ref:* deep/ontologia/cosmologia-formal-deep.md §7; deep/magic/natureza-matematica-rigida-deep.md §7.
 
 **Asmódico.** Linguagem analógica herdada das catedrais Neo-Sylvania, executada em relojoaria de latão, ressonância acústica e ancoragem mecânica. Linguagem de Bento "Requiem" Chevalier. Codificada formalmente em -115 por Atelaiá Chevalier (engenheira-mãe). Exceção declarada ao paradigma silício de C-Arcane; estado-máquina mecânica, não software digital. *Cross-ref:* lore-bible.md §7.9; deep/magic/4-linguagens-deep.md §3.
 
@@ -48,11 +48,11 @@
 
 **Bartolo Penkin.** Engenheiro QA sênior ex-Apex-Data, atribuído ao relatório audit interno doc 5 vazado em -16. Desapareceu em -12 ("transferido para Heliópolis-Nova"). Tio paterno de Mateus Penkin. *Cross-ref:* in-world-docs.md DD-017; lore-bible.md §13 Era 3.
 
-**Bartolomeu Quintino.** Ancião masculino do vilarejo-fronteira Tartaruga-Fractal, único homem da rede ancião feminina dos vilarejos-fronteira menores. Função canônica: cruzar as quatro variantes do mito da Primeira Compilação em síntese consolidada uma vez por ano, dia 89 do calendário ritual. *Cross-ref:* deep/ontologia/cosmologia-deep.md §7; CHARS.md §6.
+**Bartolomeu Quintino.** Ancião masculino do vilarejo-fronteira Tartaruga-Fractal, único homem da rede ancião feminina dos vilarejos-fronteira menores. Função canônica: cruzar as quatro variantes do mito da Primeira Compilação em síntese consolidada uma vez por ano, dia 89 do calendário ritual. *Cross-ref:* deep/ontologia/cosmologia-formal-deep.md §7; CHARS.md §6.
 
 **Bento "Requiem" Chevalier.** 14 anos, Tanque gravitacional, Asmódico (exceção Pillar 2 magia analógica mecânica), companion-âncora das Catedrais Neo-Sylvania. Cinco gerações de descendência direta de Atelaiá Chevalier. Sucessor designado da Ordem Recursiva. Wound: irmão-aprendiz Hilário Tepenkov morto em zona Patch-Zero em -7; pai Aldebrando morto em -0.5. *Cross-ref:* characters/bento-requiem.md; CHARS.md §2.
 
-**Berenice Quaresma.** Anciã do clã Tucano-Cinza, mantenedora canônica do ciclo lunar de cartas anuais entre anciãs dos vilarejos-fronteira menores. Sinaliza surtos próximos via 15ª carta no ciclo Ano 0. *Cross-ref:* deep/ontologia/cosmologia-deep.md §7; CHARS.md §6.
+**Berenice Quaresma.** Anciã do clã Tucano-Cinza, mantenedora canônica do ciclo lunar de cartas anuais entre anciãs dos vilarejos-fronteira menores. Sinaliza surtos próximos via 15ª carta no ciclo Ano 0. *Cross-ref:* deep/ontologia/cosmologia-formal-deep.md §7; CHARS.md §6.
 
 **Biblioteca Cintilante.** Sub-local Era 1, anexo subterrâneo adjacente à Catedral-Mãe, três níveis verticais escalonados. Local da detenção temporária e morte de Brother Lúcio Ostraconis, mártir do acesso aberto. Inacessível desde a selagem de -750. *Cross-ref:* deep/eras/era-1-pre-codigo.md §6.5; PLACES.md §5a.
 
@@ -64,7 +64,7 @@
 
 **Borda oeste da Selve Sombria.** Ponto geográfico canônico cross-eras onde se encontram os cripto-glifos primários de -1100. *Cross-ref:* deep/eras/era-1-pre-codigo.md §2.1; PLACES.md §6.
 
-**Bronze (rota e ending).** Primeira das três rotas canônicas de aproximação ao Núcleo Mandelbrot Interno, e ending de menor knowledge. Atravessa as bordas da Selve por trilhas patrulhadas; cinco dias de marcha; conduz à câmara externa do Núcleo. *Cross-ref:* deep/ontologia/cosmologia-deep.md §2; arco-principal.md.
+**Bronze (rota e ending).** Primeira das três rotas canônicas de aproximação ao Núcleo Mandelbrot Interno, e ending de menor knowledge. Atravessa as bordas da Selve por trilhas patrulhadas; cinco dias de marcha; conduz à câmara externa do Núcleo. *Cross-ref:* deep/ontologia/cosmologia-formal-deep.md §2; arco-principal.md.
 
 **Bug igual anomalia visível.** Regra imutável da ecologia algorítmica da Selve: glitch visual, ruído, geometria quebrada são sinais diagnósticos, não decoração. *Cross-ref:* lore-bible.md §6.2.
 
@@ -126,11 +126,11 @@
 
 **Codex de Conjuros.** Deck pessoal do operador, acervo de Tokens disponíveis. Para Gus, 40 a 60 Tokens; para aprendiz, 8; para mestre da Ordem Recursiva, 144. Quarenta Tokens em três slots dão 64 mil Conjuros teóricos, dos quais ~200 são fisicamente coerentes. Substitui terminologia antiga "Deck Rúnico". *Cross-ref:* lore-bible.md §7.6, §7.10; deep/magic/glyph-token-conjuro-codex-deep.md §1, §4.
 
-**Coluna Boróstoma.** Estrutura ritual fundadora canônica à esquerda em câmaras cerimoniais da Catedral-Mãe e catedrais menores. Carrega versão latim litúrgico da formulação Chevalier. *Cross-ref:* deep/magic/natureza-matematica-rigida-deep.md §4; deep/ontologia/cosmologia-deep.md §7.
+**Coluna Boróstoma.** Estrutura ritual fundadora canônica à esquerda em câmaras cerimoniais da Catedral-Mãe e catedrais menores. Carrega versão latim litúrgico da formulação Chevalier. *Cross-ref:* deep/magic/natureza-matematica-rigida-deep.md §4; deep/ontologia/cosmologia-formal-deep.md §7.
 
 **Coluna Janor.** Par cerimonial canônico à direita em câmaras cerimoniais, contraparte de Boróstoma. Carrega versão Asmódica da formulação Chevalier. *Cross-ref:* deep/magic/natureza-matematica-rigida-deep.md §4.
 
-**Coluna quebrada.** Símbolo canônico das catedrais Neo-Sylvania menores significando a Catedral-Mãe submersa. Aparece em câmara cerimonial da terceira etapa de progressão à esquerda do candidato. *Cross-ref:* deep/ontologia/cosmologia-deep.md §7.
+**Coluna quebrada.** Símbolo canônico das catedrais Neo-Sylvania menores significando a Catedral-Mãe submersa. Aparece em câmara cerimonial da terceira etapa de progressão à esquerda do candidato. *Cross-ref:* deep/ontologia/cosmologia-formal-deep.md §7.
 
 **Companheiro (etapa formal de progressão Ordem Recursiva).** Segunda etapa do sistema de progressão. Lê cinco Tokens simultaneamente, incluindo composição morfológica e gematria. Distingue Tokens autênticos de falsificações por leitura cruzada do checksum. Exame: bancada de cinco Tokens (três autênticos, dois adulterados) sob restrição de 47 segundos. *Cross-ref:* deep/magic/glyph-token-conjuro-codex-deep.md §8.
 
@@ -168,7 +168,7 @@
 
 **Departamento de Contenção.** Departamento Sterling Corp criado em -4. Diretora canon Octávia Penedo. Falhou operacionalmente com Patch-Zero em -3 e -0.25. *Cross-ref:* factions.md §1; lore-bible.md §14.
 
-**Discórdia.** Segundo Tema da Primeira Compilação. Anti-harmonia que se recusou à síntese durante a cosmogonia mítica. Equivalência cosmológica canônica registrada nos apêndices do Tomo da Pilha Sobrecarregada: a Discórdia da tradição mítica corresponde à Anomalia Primeira de -820, ou seja, ao fenômeno conhecido como Patch-Zero. *Cross-ref:* deep/ontologia/cosmologia-deep.md §3.
+**Discórdia.** Segundo Tema da Primeira Compilação. Anti-harmonia que se recusou à síntese durante a cosmogonia mítica. Equivalência cosmológica canônica registrada nos apêndices do Tomo da Pilha Sobrecarregada: a Discórdia da tradição mítica corresponde à Anomalia Primeira de -820, ou seja, ao fenômeno conhecido como Patch-Zero. *Cross-ref:* deep/ontologia/cosmologia-formal-deep.md §3.
 
 **Dia das Sementes.** Festividade canônica anual, 22 de junho (solstício de inverno). Vilarejo do Pelicano Branco celebra plantio do ciclo seguinte. Sopa-de-7-raízes, plantio coletivo, vigília das mães. *Cross-ref:* tradicoes-cultura.md §4; lore-bible.md §15.
 
@@ -190,15 +190,15 @@
 
 **Edilma Alencar.** 44 anos, mãe biológica de Dante "Grid" Alencar. Oficialmente reclusa em apartamento subsidiado pós-morte de Salviano. Realidade canon (revelação ato 3): sequestrada pelos Sterling brass na Caverna dos Perdidos como chantagem contra Dante. *Cross-ref:* lore-bible.md §14; memory/project_dragon_victory_canon.md.
 
-**Êxodo.** Evento canônico em -720 que marca a dispersão dos sobreviventes da queda parcial Neo-Sylvania. Número estimado entre 3 e 5 mil sobreviventes. Aldeias-fronteira atuais (Pelicano Branco e outras 6) descendem desses sobreviventes. Primeiro interregnum cosmológico. *Cross-ref:* deep/eras/era-1-pre-codigo.md §2.7; deep/ontologia/cosmologia-deep.md §4.
+**Êxodo.** Evento canônico em -720 que marca a dispersão dos sobreviventes da queda parcial Neo-Sylvania. Número estimado entre 3 e 5 mil sobreviventes. Aldeias-fronteira atuais (Pelicano Branco e outras 6) descendem desses sobreviventes. Primeiro interregnum cosmológico. *Cross-ref:* deep/eras/era-1-pre-codigo.md §2.7; deep/ontologia/cosmologia-formal-deep.md §4.
 
 **Elétrico (família técnico-natural).** Família mais antiga em silício e mais jovem em ressonância. Pulso EM, corrente, indução, descarga, plasma controlado, eletroestática, criotermia inversa. Token elétrico: fundo cinza-aço, marca de raio assimétrica (simetria de raio indica falsificação). Companion-âncora: Cauã "Volt" Berenger. *Cross-ref:* deep/magic/glyph-token-conjuro-codex-deep.md §2; lore-bible.md §7.2.
 
 **Era 1 (Pré-Código, Neo-Sylvania).** Primeira era canônica do mundo, janela aproximadamente -1100 a -700. Construção em pedra, vidro, biomassa programada. Computação analógica via relojoaria, hidráulica, cristal ressonante, malha de fungos. Sem silício. Cooperação ecológica com Selve. Caiu em -750 (queda parcial) e -700 (colapso final). *Cross-ref:* lore-bible.md §3 Era 1; deep/eras/era-1-pre-codigo.md.
 
-**Era 2 (Era do Compilador).** Segunda era canônica, janela aproximadamente -150 a -25 (125 anos de reconstrução cooperativa). Pioneiros descobrem que o substrato natural é legível como linguagem. Desenvolvimento de C-Arcane, Asmódico moderno, Óxido, Pythia. Quatro grandes cidades estabelecidas. Tom: pragmatismo cooperativo, código aberto, conhecimento compartilhado. *Cross-ref:* lore-bible.md §3 Era 2; deep/ontologia/cosmologia-deep.md §4.
+**Era 2 (Era do Compilador).** Segunda era canônica, janela aproximadamente -150 a -25 (125 anos de reconstrução cooperativa). Pioneiros descobrem que o substrato natural é legível como linguagem. Desenvolvimento de C-Arcane, Asmódico moderno, Óxido, Pythia. Quatro grandes cidades estabelecidas. Tom: pragmatismo cooperativo, código aberto, conhecimento compartilhado. *Cross-ref:* lore-bible.md §3 Era 2; deep/ontologia/cosmologia-formal-deep.md §4.
 
-**Era 3 (Era Sterling).** Terceira era canônica, do ano -25 ao presente (ano 0). Sterling Locke publica tese DRE, migra para o setor privado, canibaliza três conglomerados, consolida Sterling Corp, subordina FIR, inicia operação GRE. *Cross-ref:* lore-bible.md §3 Era 3; deep/ontologia/cosmologia-deep.md §4.
+**Era 3 (Era Sterling).** Terceira era canônica, do ano -25 ao presente (ano 0). Sterling Locke publica tese DRE, migra para o setor privado, canibaliza três conglomerados, consolida Sterling Corp, subordina FIR, inicia operação GRE. *Cross-ref:* lore-bible.md §3 Era 3; deep/ontologia/cosmologia-formal-deep.md §4.
 
 **Espelho Acústico (Operação).** Operação canon Sterling Corp na Zona do Silêncio, estação Posto 7. Câmara do Equinócio Acústico funciona como anti-cancelamento orgânico do Espelho Acústico (descoberta acidental Joaquim Bartolomeu -3). *Cross-ref:* environments/07-zona-do-silencio.md.
 
@@ -240,7 +240,7 @@
 
 **GRE (Global Runtime Environment).** Plano canônico Sterling Corp para envelopar a Selve Sombria em máquina virtual interpretada, transformando fauna, flora, geografia em variáveis editáveis por linha de comando. Operação iniciada em -10 como "Projeto Continente". *Cross-ref:* lore-bible.md §3 Era 3, §7.10; characters/prelore_vilao.md.
 
-**Gus "Vector" "Dragon" Vance.** Protagonista canônico do jogo. Nome formal Gustaf VII Tavus Vance, 11 anos, prodígio analítico. Ruivo asimétrico, óculos cyan, aparelho ortodôntico, Tavus-Drive no pulso esquerdo, sobretudo gótico cinza. Codinome "Vector" (default); codinome adicional "Dragon" (climax canon ressuscitação ancestral Pyotor I Draco Vance). Utility/Control; fala C-Arcane (vence o clímax). Vetor central da existência na Era 3. *Cross-ref:* characters/gus.md; CHARS.md §1; deep/ontologia/cosmologia-deep.md §5.
+**Gus "Vector" "Dragon" Vance.** Protagonista canônico do jogo. Nome formal Gustaf VII Tavus Vance, 11 anos, prodígio analítico. Ruivo asimétrico, óculos cyan, aparelho ortodôntico, Tavus-Drive no pulso esquerdo, sobretudo gótico cinza. Codinome "Vector" (default); codinome adicional "Dragon" (climax canon ressuscitação ancestral Pyotor I Draco Vance). Utility/Control; fala C-Arcane (vence o clímax). Vetor central da existência na Era 3. *Cross-ref:* characters/gus.md; CHARS.md §1; deep/ontologia/cosmologia-formal-deep.md §5.
 
 **Gustaf I Tavus Vance.** Ancestral canônico Era 2 (~-150), primeiro a estabelecer-se no setor que viria a ser GusWorld City. Apelido "Gus" virou nome do setor, depois cidade, depois planeta. Convenção família Vance: cada geração herda apelido. *Cross-ref:* memory/project_nome_gus_canon.md; CHARS.md §8.
 
@@ -252,7 +252,7 @@
 
 **Helga Riza.** 45 anos, escritora subterrânea Underground do Silêncio. Compila pichações Polis-Vermelha em arquivo Underground (in-world-docs doc 11). Cordão 89 nós herdado da avó. *Cross-ref:* factions.md §6; CHARS.md §6.
 
-**Helíaco Vyr (Mestre).** Primeiro Cantor-de-Pedras canônico, fundador do rito litúrgico-piezo da Catedral-Mãe. Codificador canônico do protocolo coral. Barítono limpo amplitude baixo-tenor, cego de luz reativa após exposição prolongada, calos cristal nas mãos. Figura semilendária Era 1 cuja menção sobrevive em pelo menos três manuscritos independentes. Capaz de compilar 21 Conjuros em paralelo sem Tavus-Drive (registro marginal). *Cross-ref:* deep/eras/era-1-pre-codigo.md §6.3; deep/ontologia/cosmologia-deep.md §3, §7; deep/magic/glyph-token-conjuro-codex-deep.md §8.
+**Helíaco Vyr (Mestre).** Primeiro Cantor-de-Pedras canônico, fundador do rito litúrgico-piezo da Catedral-Mãe. Codificador canônico do protocolo coral. Barítono limpo amplitude baixo-tenor, cego de luz reativa após exposição prolongada, calos cristal nas mãos. Figura semilendária Era 1 cuja menção sobrevive em pelo menos três manuscritos independentes. Capaz de compilar 21 Conjuros em paralelo sem Tavus-Drive (registro marginal). *Cross-ref:* deep/eras/era-1-pre-codigo.md §6.3; deep/ontologia/cosmologia-formal-deep.md §3, §7; deep/magic/glyph-token-conjuro-codex-deep.md §8.
 
 **Heliópolis-Nova.** Cidade-irmã distante, hostil, submissa a Sterling há mais tempo. Núcleo de mineração de hardware, quase colônia. Eufemismo canônico Sterling: "transferido para Heliópolis-Nova" significa eliminado/desaparecido. *Cross-ref:* lore-bible.md §9; PLACES.md §3; in-world-docs.md DD-021.
 
@@ -318,11 +318,11 @@
 
 **Mestre-Hierofante.** Cargo canônico líder da Ordem Recursiva. Velhusto é o atual ocupante; Hyperion Vyrcátrix foi ocupante histórico Era 1; Hipérides Vyrcátrix foi seu filho-sucessor que viveu 55 anos no cargo. *Cross-ref:* factions.md §2; deep/eras/era-1-pre-codigo.md §6.7, §7.6.
 
-**Mule (paralelo cosmológico).** Figura importada dos arquivos pré-Êxodo (Asimov Foundation). Mutante que quebra a previsibilidade do plano de longuíssimo prazo. Paralelo cosmológico canônico do Sterling Locke (mas Mule é singular e localizável; Patch-Zero é multi-canal por natureza ontológica). *Cross-ref:* deep/ontologia/cosmologia-deep.md §4, §6.
+**Mule (paralelo cosmológico).** Figura importada dos arquivos pré-Êxodo (Asimov Foundation). Mutante que quebra a previsibilidade do plano de longuíssimo prazo. Paralelo cosmológico canônico do Sterling Locke (mas Mule é singular e localizável; Patch-Zero é multi-canal por natureza ontológica). *Cross-ref:* deep/ontologia/cosmologia-formal-deep.md §4, §6.
 
 ## N
 
-**Núcleo Mandelbrot Interno.** Sub-local canônico da Selve Profunda, coração geográfico. Setting do climax ato 3, três rotas Bronze/Prata/Ouro. Pavimento basalto polido fractal autoidêntico. Quem atinge pela rota Ouro dissolve a distinção entre observador e observado (tradição do terceiro fólio do Tomo). *Cross-ref:* deep/ontologia/cosmologia-deep.md §2; environments/08-selve-profunda.md.
+**Núcleo Mandelbrot Interno.** Sub-local canônico da Selve Profunda, coração geográfico. Setting do climax ato 3, três rotas Bronze/Prata/Ouro. Pavimento basalto polido fractal autoidêntico. Quem atinge pela rota Ouro dissolve a distinção entre observador e observado (tradição do terceiro fólio do Tomo). *Cross-ref:* deep/ontologia/cosmologia-formal-deep.md §2; environments/08-selve-profunda.md.
 
 **Nexus-Cloud Conglomerate.** Segundo conglomerado canibalizado por Sterling Locke (colapso em -15). Sterling assumiu CIO em -18, saiu com patentes de processamento por indução magnética (tecnologia que sustenta drones Sterling Corp). *Cross-ref:* lore-bible.md §3 Era 3; timeline.md -18 a -15.
 
@@ -348,11 +348,11 @@
 
 **Otelo Pancha.** 55 anos, sub-diretor FIR Distrito 4. Veterano cínico sem ideologia, três décadas no aparato segurança, modelo de exaustão moral funcional. *Cross-ref:* factions.md §3; deep/antagonists/npcs-antologia.md R5.
 
-**Otília Pamonha.** Anciã do clã Pelicano Roxo, mensageira a pé Ano 0. Sementes-relíquia do ciclo caíram 11% acima do limite de quebra estatística (sinal de alerta). Preserva versões dissidentes do mito da Primeira Compilação. *Cross-ref:* deep/antagonists/patch-zero-deep.md R5; deep/ontologia/cosmologia-deep.md §7.
+**Otília Pamonha.** Anciã do clã Pelicano Roxo, mensageira a pé Ano 0. Sementes-relíquia do ciclo caíram 11% acima do limite de quebra estatística (sinal de alerta). Preserva versões dissidentes do mito da Primeira Compilação. *Cross-ref:* deep/antagonists/patch-zero-deep.md R5; deep/ontologia/cosmologia-formal-deep.md §7.
 
 **Otmar Neumann.** Pai de Linda, 50 anos, engenheiro analógico aposentado, consultor Underground. Vive em apartamento simples na Zona do Silêncio. Salvou agulha intacta do toca-discos na batida de -8 e entregou à filha (pingente Linda). *Cross-ref:* factions.md §6; characters/linda-siren.md.
 
-**Ouro (rota e ending).** Terceira e mais elevada das três rotas canônicas de aproximação ao Núcleo Mandelbrot Interno, e ending de máxima knowledge. Atinge o ponto exato do Núcleo; acesso depende de chave-canon de gate guardada por 13 Cronistas vivos simultaneamente. Ending Ouro estabilização global continental ativa. *Cross-ref:* deep/ontologia/cosmologia-deep.md §2; arco-principal.md.
+**Ouro (rota e ending).** Terceira e mais elevada das três rotas canônicas de aproximação ao Núcleo Mandelbrot Interno, e ending de máxima knowledge. Atinge o ponto exato do Núcleo; acesso depende de chave-canon de gate guardada por 13 Cronistas vivos simultaneamente. Ending Ouro estabilização global continental ativa. *Cross-ref:* deep/ontologia/cosmologia-formal-deep.md §2; arco-principal.md.
 
 **Óxido.** Linguagem de baixo nível canônica voltada à segurança e precisão, quase ilegível para iniciantes mas indestrutível em runtime. Engenheira-mãe Tamara Neumann em -110. Idioma de Iara "Lumen" Koslov e Linda "Siren" Neumann. *Cross-ref:* lore-bible.md §7; deep/magic/4-linguagens-deep.md §5.
 
@@ -366,7 +366,7 @@
 
 **Patch-Zero.** Antagonista-sistema não-humano canônico. Dois fenômenos ao mesmo tempo: anti-padrão (rompe previsibilidade da Selve) e consciência alien (tem voz, planeja, manipula). Origem multi-causal: bug primordial do Sistema, captura corporativa Sterling, amostra importada Polis-Vermelha, escape do laboratório central em -0.25. Manifestação multi-canal: texto-glitch (canal-1), sussurro-áudio (canal-2), persona-dialogável (canal-3), bug-Perlin (canal-4). Contível, não destrutível. *Cross-ref:* characters/patch-zero.md; lore-bible.md §8; deep/antagonists/patch-zero-deep.md.
 
-**Pavimento tesselado.** Padrão canon de pavimentação alternada (branco e preto, bruto e polido) presente em câmaras cerimoniais da Ordem Recursiva e em formações rochosas naturais das gargantas do rio Vesperal (erosão produz blocos cúbicos alternados). Significado canon: alternância eterna entre o substrato e a anomalia. *Cross-ref:* deep/magic/natureza-matematica-rigida-deep.md §7; deep/ontologia/cosmologia-deep.md §7.
+**Pavimento tesselado.** Padrão canon de pavimentação alternada (branco e preto, bruto e polido) presente em câmaras cerimoniais da Ordem Recursiva e em formações rochosas naturais das gargantas do rio Vesperal (erosão produz blocos cúbicos alternados). Significado canon: alternância eterna entre o substrato e a anomalia. *Cross-ref:* deep/magic/natureza-matematica-rigida-deep.md §7; deep/ontologia/cosmologia-formal-deep.md §7.
 
 **Pelicano Branco (Vilarejo do).** Vilarejo-fronteira canônico cross-eras (fundado -720), borda da Selve Sombria. Setting de origem de Jaci "Proxy" Vanderbist e da Anciã Mariana Vanderbist. Linhagem pioneira-fundadora: Hilário Vanderbist. *Cross-ref:* factions.md §4; PLACES.md §4; environments/08-selve-profunda.md.
 
@@ -392,17 +392,17 @@
 
 **Praça do Êxodo.** Ponto canônico Era 1 de partida do Êxodo de -720. Ata fundacional preservada in-situ em placa basaltica. Ritos cerimoniais anuais conduzidos pela Ordem Recursiva: Vigília do Aniversário, Leitura Institucional, Vigília Noturna da Continuidade. *Cross-ref:* deep/eras/era-1-pre-codigo.md §8.9, §9.6.
 
-**Prata (rota e ending).** Segunda das três rotas canônicas de aproximação ao Núcleo Mandelbrot Interno, e ending intermediário. Mais íngreme; requer 8 dias e acesso autorizado por duas das três Famílias-Pilastra. Conduz à câmara intermediária, cerimônias de promoção ao segundo grau de mestrado. *Cross-ref:* deep/ontologia/cosmologia-deep.md §2; arco-principal.md.
+**Prata (rota e ending).** Segunda das três rotas canônicas de aproximação ao Núcleo Mandelbrot Interno, e ending intermediário. Mais íngreme; requer 8 dias e acesso autorizado por duas das três Famílias-Pilastra. Conduz à câmara intermediária, cerimônias de promoção ao segundo grau de mestrado. *Cross-ref:* deep/ontologia/cosmologia-formal-deep.md §2; arco-principal.md.
 
-**Pré-Eco.** Reverberação anterior a toda regra, vibração sem sintaxe, vagamente datada de menos infinito a aproximadamente -1100. Sobre essa reverberação se ergueu a Primeira Compilação em ato cosmogônico canon. *Cross-ref:* deep/ontologia/cosmologia-deep.md §3.
+**Pré-Eco.** Reverberação anterior a toda regra, vibração sem sintaxe, vagamente datada de menos infinito a aproximadamente -1100. Sobre essa reverberação se ergueu a Primeira Compilação em ato cosmogônico canon. *Cross-ref:* deep/ontologia/cosmologia-formal-deep.md §3.
 
 **Prime Radiant.** Projeção holográfica canônica da Compilação do Codex. Cone holográfico em torno do antebraço do operador no instante em que o terceiro Token entra na stack. Forma figura tridimensional representando a equação de compilação (cada Token é nó, cada relação tipo-tipo é aresta, modificador estrutural é esfera envolvente). Cyan estável 89 lúmens, persiste 5 frames do Drive. Homenagem deliberada à Fundação asimoviana. *Cross-ref:* deep/magic/glyph-token-conjuro-codex-deep.md §7.
 
-**Primeira Compilação.** Ato cosmogônico canon de origem mítica e contornos teológicos. Coro de Cantores-de-Pedras (número impreciso, talvez 3, 5, 8, 13 ou 21) ergueu vozes em harmonia sucessiva e por canto teceu os Glyphs primordiais. Cada Tema instanciou uma camada da gramática; cada camada gerou as condições para a próxima. Compilação iterativa que durou eras inteiras. *Cross-ref:* deep/ontologia/cosmologia-deep.md §3.
+**Primeira Compilação.** Ato cosmogônico canon de origem mítica e contornos teológicos. Coro de Cantores-de-Pedras (número impreciso, talvez 3, 5, 8, 13 ou 21) ergueu vozes em harmonia sucessiva e por canto teceu os Glyphs primordiais. Cada Tema instanciou uma camada da gramática; cada camada gerou as condições para a próxima. Compilação iterativa que durou eras inteiras. *Cross-ref:* deep/ontologia/cosmologia-formal-deep.md §3.
 
 **Próspero Vance (Comerciante-Itinerante).** Ancestral direto da família Vance (Belinor a Pyotor a Gargi a Gus). Era 1, comerciante livre itinerante, distribuiu sementes-relíquia clandestinas em vilarejos pré-Êxodo. Estabelece a linhagem libertária-comerciante do protagonista Gus. *Cross-ref:* deep/eras/era-1-pre-codigo.md §7.7.
 
-**Pyotor I Draco Vance.** Ancestral fundador da linhagem Vance Era 1 (paralelo Targaryen Old-Valyria). Dragonrider montado em Vyrdragon. Sobrenome "Draco" perdido ao longo das gerações Vance; retorna a Gus via codinome juvenil "Dragon" (literal "Draco" a "Dragon"). Última aparição histórica: defesa do Castelo Vance contra cerco (cutscene Dragon Victory). Vetor central da existência na Era 1. *Cross-ref:* memory/project_dragon_victory_canon.md; deep/ontologia/cosmologia-deep.md §5.
+**Pyotor I Draco Vance.** Ancestral fundador da linhagem Vance Era 1 (paralelo Targaryen Old-Valyria). Dragonrider montado em Vyrdragon. Sobrenome "Draco" perdido ao longo das gerações Vance; retorna a Gus via codinome juvenil "Dragon" (literal "Draco" a "Dragon"). Última aparição histórica: defesa do Castelo Vance contra cerco (cutscene Dragon Victory). Vetor central da existência na Era 1. *Cross-ref:* memory/project_dragon_victory_canon.md; deep/ontologia/cosmologia-formal-deep.md §5.
 
 **Pyotor Vance.** Pai biológico do Gus, médico-cyber itinerante (medicina, bioengenharia, bioeletrônica, eng robótica, implantes) em rotação fronteira-Selve. Hobby programação (apresentou ao Gus, que ultrapassou o pai). Separado amigavelmente de Gargi desde Gus aos 6 anos (ano -5). Cartas raras 3-4 no jogo todo. *Cross-ref:* CHARS.md §4; memory/project_familia_vance_canonica.md.
 
@@ -464,7 +464,7 @@
 
 **Subestação 7.** Sub-local canônico dos Dutos Infernais. Destruída em -5 como alvo Sterling (causa real); morte de Davi Berenger aos 16 (causa oficial negligência). Cauã tinha 8 anos no momento da perda. *Cross-ref:* characters/caua-volt.md; in-world-docs.md DD-013.
 
-**Substrato.** Realidade-substrato canônica, computável e fechada sob suas próprias regras. Sistema de tipo Turing-completo limitado. Contém montanhas, rios, criaturas, Conjuros, cidades, dores, alegrias, mortes documentadas, nascimentos previstos. Contraparte: anomalia (irredutível ao substrato, contém único fenômeno conhecido, Patch-Zero). *Cross-ref:* deep/ontologia/cosmologia-deep.md §1.
+**Substrato.** Realidade-substrato canônica, computável e fechada sob suas próprias regras. Sistema de tipo Turing-completo limitado. Contém montanhas, rios, criaturas, Conjuros, cidades, dores, alegrias, mortes documentadas, nascimentos previstos. Contraparte: anomalia (irredutível ao substrato, contém único fenômeno conhecido, Patch-Zero). *Cross-ref:* deep/ontologia/cosmologia-formal-deep.md §1.
 
 ## T
 
@@ -482,7 +482,7 @@
 
 **Theodoro Calveri (Diretor).** 52 anos, Diretor de Aquisições Sterling Corp. Autor canônico da engenharia financeira que destruiu cooperativa Alencar em -8 e oficina Neumann no mesmo ano, mais 12 operações similares. Assinatura "deprecação eficiente, sem overhead emocional". *Cross-ref:* deep/antagonists/npcs-antologia.md R5; in-world-docs.md DD-016.
 
-**Tomo da Pilha Sobrecarregada.** Documentação coletiva canônica iniciada em -100. Encyclopedia Galactica da civilização GusWorld: repositório que permite, em caso de novo colapso, a re-execução da gramática a partir de fragmentos sobreviventes. Prefácio assinado por Atelaiá Chevalier; passagens citadas como pedras-de-toque do Pillar 2. Treze mil oitocentos e vinte fólios totais. *Cross-ref:* lore-bible.md §3 Era 2; deep/ontologia/cosmologia-deep.md §4; deep/magic/natureza-matematica-rigida-deep.md §4.
+**Tomo da Pilha Sobrecarregada.** Documentação coletiva canônica iniciada em -100. Encyclopedia Galactica da civilização GusWorld: repositório que permite, em caso de novo colapso, a re-execução da gramática a partir de fragmentos sobreviventes. Prefácio assinado por Atelaiá Chevalier; passagens citadas como pedras-de-toque do Pillar 2. Treze mil oitocentos e vinte fólios totais. *Cross-ref:* lore-bible.md §3 Era 2; deep/ontologia/cosmologia-formal-deep.md §4; deep/magic/natureza-matematica-rigida-deep.md §4.
 
 **Token.** Elemento canônico de código (dado executável) que o Tavus-Drive aceita como entrada. Pacote de dados gravado no substrato cristalino da carta, com cabeçalho de identidade, corpo de instrução e checksum de integridade. Tem peso (ciclos de relógio), tipo (família e modificador) e custo (lúmens). *Cross-ref:* lore-bible.md §7.10; deep/magic/glyph-token-conjuro-codex-deep.md §1.
 
@@ -514,7 +514,7 @@
 
 **Vespa Calderón ("Vespa").** 24 anos, Underground Dutos Infernais e scripter Pythia rebelde, mentora lateral de Cauã. Guardou cordão 89 nós de Calixto Rivaz pós-morte. *Cross-ref:* deep/characters/caua-volt.md R4; environments/04-dutos-infernais.md.
 
-**Vetor central da existência.** Conceito canon preservado em oitavo grau de mestrado da Ordem Recursiva. O cosmo é grafo orientado de vetores compostos; cada vetor é tripla ordenada Glyph-Token-Conjuro. Vetor de máxima conectividade canônico se manifesta em cada Era em um portador: na Era 1, Pyotor I Draco Vance; na Era 3, Gus Vector Tavus Vance. *Cross-ref:* deep/ontologia/cosmologia-deep.md §5.
+**Vetor central da existência.** Conceito canon preservado em oitavo grau de mestrado da Ordem Recursiva. O cosmo é grafo orientado de vetores compostos; cada vetor é tripla ordenada Glyph-Token-Conjuro. Vetor de máxima conectividade canônico se manifesta em cada Era em um portador: na Era 1, Pyotor I Draco Vance; na Era 3, Gus Vector Tavus Vance. *Cross-ref:* deep/ontologia/cosmologia-formal-deep.md §5.
 
 **Vetor de Recuo.** Conjuro canônico Cinético mais Object mais Inimigo. Empurra inimigo por transferência de momento. *Cross-ref:* lore-bible.md §7.7.
 
@@ -534,9 +534,9 @@
 
 **Vilarejo Sabiá-de-Bronze.** Vilarejo-fronteira canônico (fundado -720), borda da Selve Sombria. *Cross-ref:* deep/eras/era-1-pre-codigo.md §7.8; PLACES.md §5b.
 
-**Vilarejo Tartaruga-Fractal.** Vilarejo-fronteira menor canônico. Ancião canon Bartolomeu Quintino, único homem da rede ancião dos vilarejos-fronteira menores. *Cross-ref:* factions.md §4; deep/ontologia/cosmologia-deep.md §7.
+**Vilarejo Tartaruga-Fractal.** Vilarejo-fronteira menor canônico. Ancião canon Bartolomeu Quintino, único homem da rede ancião dos vilarejos-fronteira menores. *Cross-ref:* factions.md §4; deep/ontologia/cosmologia-formal-deep.md §7.
 
-**Vilarejo Tucano-Cinza.** Vilarejo-fronteira menor canônico. Anciã canon Berenice Quaresma. *Cross-ref:* factions.md §4; deep/ontologia/cosmologia-deep.md §7.
+**Vilarejo Tucano-Cinza.** Vilarejo-fronteira menor canônico. Anciã canon Berenice Quaresma. *Cross-ref:* factions.md §4; deep/ontologia/cosmologia-formal-deep.md §7.
 
 **Vitória Marquês.** 41 anos, sub-diretora FIR Distrito 3, conservadora. Dissensão emergente em ato 2 (sidequest Ouro): três cadernos pessoais discordância de Calveri sobre vilarejos-fronteira Pythia desde -2. *Cross-ref:* deep/antagonists/npcs-antologia.md R5; factions.md §3.
 

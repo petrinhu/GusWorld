@@ -100,7 +100,7 @@ VOLUME 1: BÍBLIA WORLDBUILDING
 
 | # | Sub-capítulo | Fonte | Palavras | Páginas | Nota revisão |
 |---|---|---|---|---|---|
-| 3.1 | Pós-apocalipse digital sem meta-simulação | `lore-bible.md` §4 + `deep/ontologia/cosmologia-deep.md` | ~5k | ~17 | consolidar duas fontes; remover duplicação |
+| 3.1 | Pós-apocalipse digital sem meta-simulação | `lore-bible.md` §4 + `deep/ontologia/cosmologia-formal-deep.md` | ~5k | ~17 | consolidar duas fontes; remover duplicação |
 | 3.2 | A tese de Neo-Sylvania: o mundo já era programável | `deep/eras/era-1-pre-codigo.md` §1 (frontispício), extrato | ~3k | ~10 | extrato editorial (1ª pessoa do cronista) |
 | 3.3 | Substratos suportados (silício, latão, proteína, mineral ressonante) | `deep/ontologia/tech-3-eras-deep.md` §1-3 | ~5k | ~17 | extrair com adaptação |
 | 3.4 | Limites do sistema (custo, escopo, tipo, terminação) | `deep/magic/glyph-token-conjuro-codex-deep.md` §sistema formal | ~4k | ~13 | extrair |
