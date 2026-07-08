@@ -24,6 +24,8 @@
 // M7-DIALOGO/MENU-PAUSA-CONFIG-SOM).
 #include "stb_image_write.h"
 
+#include "gus/app/app_icon.hpp"  // APP-ICON: set_window_icon_if_available
+
 namespace gus::app {
 
 namespace {
@@ -38,6 +40,7 @@ constexpr int kWindowH = 720;
 std::string resolve_assets_subdir_local(std::string_view rel) {
     return gus::platform::assets::FilesystemAssetSource().resolve_path(rel);
 }
+
 }  // namespace
 
 SdlWindow::SdlWindow() : clock_(1.0 / 60.0, 5) {
@@ -87,6 +90,13 @@ bool SdlWindow::init() {
     render2d_ =
         std::make_unique<gus::platform::render2d::Render2dSdl>(renderer_);
 
+    // APP-ICON: esta SdlWindow e dona da janela (owns_window_) - aplica aqui pela
+    // simetria "quem cria a janela decide o icone". NOTA: no modo normal (main.cpp),
+    // quem cria a UNICA janela e a Maestro (nao esta SdlWindow, que so entra via
+    // init_attached na janela ja existente e ja com icone - ver Maestro::init) -
+    // este init() e o caminho STANDALONE (sem Maestro), usado por testes/uso
+    // avulso da SdlWindow. Chamar aqui de novo nesse caminho e correto e barato.
+
     // Abre gamepad ja conectado + arma hot-plug.
     input_.open_gamepads();
 
@@ -108,6 +118,9 @@ bool SdlWindow::init_attached(SDL_Window* window) {
 
     render2d_ =
         std::make_unique<gus::platform::render2d::Render2dSdl>(renderer_);
+
+    // APP-ICON: a janela e da Maestro (dona real, ver init() acima) - ela ja aplica o
+    // icone na criacao; nada a fazer aqui alem de nao duplicar.
 
     input_.open_gamepads();
     load_player_sprites();

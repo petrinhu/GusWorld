@@ -100,6 +100,23 @@ inline constexpr std::string_view kStatusIconsDir = "sprites/icons-m5/status";
 // Icones de intent (telegraph): atacar/defender/aplicar_status/ruido.
 inline constexpr std::string_view kIntentIconsDir = "sprites/icons-m5/intent";
 
+// --- ICONE DO APP (APP-ICON, opcao C do mock docs/design/mockups/08-app-icon.html:
+// "Combate + glow cyan" - Gus de combate/fundo transparente sobre glow cyan + fundo
+// escuro, cantos arredondados). Composto DETERMINISTICO via Pillow (sem IA) a partir
+// da MESMA arte ja existente de kRetratoGusCombateNobgFile (ver o script efemero
+// citado no relatorio da onda) - NENHUMA arte nova gerada, so tratamento. Consumido
+// por SdlWindow::init()/init_attached() (SDL_SetWindowIcon), degradacao segura se
+// ausente/headless (a janela so fica sem icone, nunca crasha). Em sprites/icons-m5/
+// app_icon/ (dentro da excecao !resources/sprites/icons-m5/ do .gitignore).
+// ============================================================================
+
+inline constexpr std::string_view kAppIconDir = "sprites/icons-m5/app_icon";
+// 256x256 - suficiente pro window icon (SDL_SetWindowIcon aceita 1 surface; o WM
+// redimensiona). 128/64/48/32 tambem gerados no disco (qualidade em tamanhos
+// menores) para o FOLLOW-UP de empacotamento .desktop/.ico (fora do escopo desta
+// onda - so o window icon).
+inline constexpr std::string_view kAppIconFile256 = "app_icon_256.png";
+
 // --- COCKPIT "otimo" (variante C, redesign 2026-06-25) ---
 // Moldura ornamental TCG (75x97, dourada/azul, com JANELA INTERNA TRANSPARENTE):
 // desenhada POR CIMA do retrato_nobg do ator ativo no cockpit. Em sprites/icons-m5/.

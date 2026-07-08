@@ -46,6 +46,10 @@ add_library(gusengine_app STATIC
     src/screens/npc_dialogue_loop_gl.cpp
     src/screens/npc_dialogue_loop.cpp
     src/sdl_window.cpp
+    # APP-ICON: aplica o icone do app (opcao C do mock, Gus combate + glow cyan) na
+    # SDL_Window - chamado por SdlWindow::init() E por Maestro::init() (a dona da
+    # UNICA janela do modo normal, ver maestro.hpp/app_icon.hpp).
+    src/app_icon.cpp
     # M7-COSTURA (ADR-012 Onda 1): maestro leve cidade<->batalha (ver maestro.hpp).
     src/maestro_logic.cpp
     src/maestro.cpp

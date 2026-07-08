@@ -9,6 +9,7 @@
 #include <string>
 #include <system_error>
 
+#include "gus/app/app_icon.hpp"  // APP-ICON: set_window_icon_if_available
 #include "gus/app/dialogue/npc_dialogue_catalog.hpp"  // M7-DIALOGO: I/O do .dlg.txt
 #include "gus/app/screens/battle_preview.hpp"    // run_battle_preview_embedded
 // DIALOGO-TERMINAL: loop GL real (caixa quente com retrato) - substitui o overlay
@@ -136,6 +137,12 @@ bool Maestro::init() {
         SDL_Log("Maestro: SDL_CreateWindow falhou: %s", SDL_GetError());
         return false;
     }
+
+    // APP-ICON: a Maestro e a DONA da UNICA janela do modo normal (ver o comentario
+    // do header) - este e o ponto real que o jogador roda (main.cpp -> Maestro::init,
+    // nao a SdlWindow standalone). Degradacao segura embutida na propria funcao (asset
+    // ausente/decode falhou/SDL recusou -> loga e segue sem icone, nunca crasha).
+    set_window_icon_if_available(window_);
 
     city_ = std::make_unique<SdlWindow>();
     if (!city_->init_attached(window_)) {
