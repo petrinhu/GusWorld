@@ -423,6 +423,40 @@ body { font-family: "Pixel Operator Mono"; background: transparent; width: 100%;
 .ctrl-list {
   height: 220dp; overflow-x: hidden; overflow-y: auto; margin-top: 4dp; padding-right: 4dp;
 }
+/* SCROLLBAR ESTILIZADA (M2, GLINTFX-SCROLL, glintfx v0.6.0): a v0.6.0 do
+   glintfx passou a embutir defaults de UA-stylesheet pra scrollbarvertical/
+   slidertrack/sliderbar/sliderarrowdec/sliderarrowinc (antes eram tamanho 0,
+   invisiveis - ver CHANGELOG glintfx [0.6.0]) - sem isto a lista de 30 actions
+   rolava mas SEM NENHUM indicador visual de posicao/tamanho. O default vem
+   generico (cinza) - fora da paleta azul+latao do resto do painel; override
+   abaixo pinta o thumb/track na MESMA identidade visual (latao/brass sobre
+   fundo escuro), coerente com `.keycap.pad`/`.corner`/`.ctrl-btn`.
+
+   PEGADINHA DE ESPECIFICIDADE (documentada no CHANGELOG glintfx [0.6.0] e em
+   docs/effects.md "How-to: style scrollbars" do glintfx vendorizado): os
+   defaults da UA usam seletor COMPOSTO de 2 tags (ex. `scrollbarvertical
+   sliderbar`, ~20000 de especificidade) - um override de 1 tag ISOLADA
+   (`sliderbar { ... }` solto, ~10000) PERDE pro default e simplesmente NAO
+   aplicaria (RmlUi resolve por especificidade, nao por "autor vs. builtin").
+   Por isso toda regra abaixo usa `#ctrl-list scrollbarvertical ...`
+   (id + composto de 2 tags - especificidade MAIOR que o default generico,
+   nunca perde). CONFIRMADO que o override PEGA de verdade por probe headless
+   (Xvfb :99, screenshot antes/depois: thumb generico cinza -> thumb
+   latao/brass translucido). */
+#ctrl-list scrollbarvertical { width: 8dp; }
+#ctrl-list scrollbarvertical slidertrack {
+  background-color: #0A0E1A80; border-radius: 999dp;
+}
+#ctrl-list scrollbarvertical sliderbar {
+  background-color: #C9A24Bb3; border-radius: 999dp; min-height: 24dp;
+}
+#ctrl-list scrollbarvertical sliderbar:hover { background-color: #C9A24Bff; }
+/* Setas ESCONDIDAS (height:0dp): o par decremento/incremento generico da UA
+   nao combina com a paleta latao/brass e e ruido visual desnecessario - a
+   lista ja rola por wheel/drag-do-thumb/teclado (setas Cima/Baixo, ver
+   CONTROLS_NAV_HINT), track+thumb discretos bastam. */
+#ctrl-list scrollbarvertical sliderarrowdec,
+#ctrl-list scrollbarvertical sliderarrowinc { height: 0dp; }
 .ctrl-group {
   color: #C9A24B; font-size: 10dp; letter-spacing: 2dp; text-transform: uppercase;
   margin: 10dp 0dp 4dp 6dp; opacity: 0.8;
