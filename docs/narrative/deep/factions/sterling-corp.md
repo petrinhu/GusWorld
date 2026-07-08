@@ -90,7 +90,7 @@ Ano sete negativo. Catedral Menor de Atelaiá contaminada. Aprendiz Hilário Tep
 
 Ano três negativo. Catedral de São Vargas saqueada. Sterling Corp adquire treze cripto-glifos Era 1 em leilão privado fechado, leilão cujos vendedores foram subsidiariamente identificados, três anos depois, como Departamento de Aquisições atuando sob fachada de coletivo independente. O ciclo se fecha sobre si mesmo. A empresa vende a si mesma o que tirou de outro.
 
-Ano zero vírgula cinco negativo. Aldebrando Chevalier, pai de Bento, eliminado em catedral perdida durante incursão Sterling. Bento tem treze anos. A wound do Tanque é registrada em pedra.
+Ano zero vírgula cinco negativo. Aldebrando Chevalier, pai de Bento, eliminado na Catedral Menor de Atelaiá, durante Vigília restrita de doze mestres da qual apenas onze voltam. Registro oficial: queda em ruína. Registro real, recuperado do diário do próprio Aldebrando: interferência ressonante calibrada, introduzida pela Sterling Corp para silenciar o mestre que decifrava, cedo demais, o rastro dela nos cripto-glifos Era 1. Bento tem treze anos. A wound do Tanque é registrada em pedra.
 
 Ano zero vírgula vinte e cinco negativo. Patch-Zero escapa do laboratório central de contenção. Octávia Penedo recebe medalha na semana seguinte. O escape é o catalyst do jogo. Três meses depois do escape, Gus entra em ação.
 

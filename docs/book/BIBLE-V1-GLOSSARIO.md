@@ -10,7 +10,7 @@
 
 **Adila Murmúrio (Hierofante).** 40 anos, líder facção pró-Sterling do Cult Mirage. Manipulou Iara desde criança; antagonista intermediária do arco Iara. Filha biológica de Sonja Murmúrio (co-fundadora original Cult, morta em -34 em circunstâncias nunca esclarecidas; Adila assumiu liderança facção pró-Sterling no mesmo ano sob tutela transitória aos 6 anos; consolidou tutela plena em -6). *Cross-ref:* factions.md §5; characters/iara-lumen.md.
 
-**Aldebrando Chevalier.** Pai biológico de Bento "Requiem" Chevalier, mestre-Asmódico da Ordem Recursiva, morto em -0.5 em incursão à catedral perdida. Causa oficial queda; causa real eliminação por descobrir interferência precoce Sterling em cripto-glifo profundo. Diário pessoal preservado por Velhusto e entregue a Bento no início do jogo. *Cross-ref:* timeline.md -0.5; characters/bento-requiem.md.
+**Aldebrando Chevalier.** Pai biológico de Bento "Requiem" Chevalier, mestre-Asmódico da Ordem Recursiva, morto em -0.5 na Catedral Menor de Atelaiá, durante Vigília restrita de doze mestres da qual apenas onze voltaram. Causa oficial queda em ruína; causa real, interferência ressonante calibrada introduzida pela Sterling Corp para silenciá-lo depois que ele descobriu, em cripto-glifo Era 1 profundo, o rastro precoce da corporação. Diário pessoal preservado por Velhusto e entregue a Bento no início do jogo. *Cross-ref:* timeline.md -0.5; characters/bento-requiem.md.
 
 **Anaximandro Vyrcátrix.** Irmão de Hyperion Vyrcátrix, Era 1, comissário-centralizador, executor da absorção dos vilarejos cooperativos pelo banco central. Trajetória paralela ao irmão místico. *Cross-ref:* deep/eras/era-1-pre-codigo.md §7.5.
 
@@ -432,7 +432,7 @@
 
 **Salomão Tessar Vyrcátrix.** Arquivista-chefe Era 1 do Codex Cantata, neto direto de Helíaco Vyr. Consolidou cifra musical em quatro estratos (frequência, polifonia, luz, cifra). Quarenta sistemas criptográficos maiores e dez menores estudados. *Cross-ref:* deep/eras/era-1-pre-codigo.md §6.4.
 
-**Salviano Alencar.** Pai morto de Dante, mestre cooperativo Era 2. Cooperativa familiar Alencar destruída por engenharia financeira FIR-Sterling em -8; Salviano morre por overdose-medicação seis meses depois (oficialmente acidente, comunidade suspeita suicídio). Ferro de solda "S.A." na bancada (in-world-docs DD-016). *Cross-ref:* foreshadowing.md F129; in-world-docs.md DD-016.
+**Salviano Alencar.** Pai morto de Dante, mestre cooperativo Era 2. Cooperativa familiar Alencar destruída por engenharia financeira FIR-Sterling em -8; Salviano morre seis meses depois, causa oficial registrada como insuficiência cardíaca (comunidade suspeita que a causa real foi outra, nunca provada). Ferro de solda "S.A." na bancada (in-world-docs DD-016). *Cross-ref:* foreshadowing.md F129; in-world-docs.md DD-016.
 
 **São Camilo (Catedral Menor de).** Catedral menor Neo-Sylvania derivada, subroutine acústica. Em uso ativo pela Ordem Recursiva. Local da Tragédia da Catedral Menor de São Camilo em -80 (17 mestres mortos por contaminação anomalia). Câmara comemorativa de Lúcio Ostraconis em uso. *Cross-ref:* deep/eras/era-1-pre-codigo.md §2.2, §6.2; PLACES.md §2.
 

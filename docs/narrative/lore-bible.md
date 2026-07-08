@@ -508,7 +508,7 @@ Hospital cobra crédito por cura rápida (Pillar 4 / hospital + economia). Cura 
 - **-3**: Sterling Corp localiza bug primordial Patch-Zero. Tentativa de captura. Falha parcial. **Catedral Menor de São Vargas saqueada** por Sterling Corp. Mestres **Ardenia Falke** e **Cândido Rui** desaparecem. Wound institucional Ordem Recursiva.
 - **-2**: Cross-contamination via amostra Polis-Vermelha. **Polis-Vermelha cai.** **Padrinho Tiago** sai da aposentadoria.
 - **-1**: **Iara deserta do Cult Mirage** aos 11 anos.
-- **-0.5**: **Aldebrando Chevalier (pai Bento) morre** na Catedral Menor de Atelaiá, durante Vigília restrita de doze mestres: interferência ressonante calibrada na câmara central (onze mestres sobrevivem; Aldebrando não). Eliminação atribuída a contrato Sterling Corp não verbalizado em fólio público. Diário pessoal de Aldebrando preservado por Velhusto, entregue a Bento no início do jogo.
+- **-0.5**: **Aldebrando Chevalier (pai Bento) morre** na Catedral Menor de Atelaiá, durante Vigília restrita de doze mestres: interferência ressonante calibrada que a Sterling Corp introduziu na câmara central para silenciá-lo, depois que ele descobriu o rastro precoce da corporação em cripto-glifo Era 1 profundo (onze mestres sobrevivem; Aldebrando não). Registro oficial: queda em ruína. Eliminação real atribuída a contrato Sterling Corp não verbalizado em fólio público. Diário pessoal de Aldebrando preservado por Velhusto, entregue a Bento no início do jogo.
 - **-0.25 (3 meses antes)**: **Patch-Zero escapa do laboratório central Sterling.** Catalyst macro.
 
 ---

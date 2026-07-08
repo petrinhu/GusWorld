@@ -125,7 +125,7 @@ Cor institucional: branco-estéril + cromo + acento vermelho-laser.
 - **-3**: Catedral de São Vargas saqueada.
 - **-3**: Captura tentada Patch-Zero. Falha parcial.
 - **-2**: Cross-contamination Polis-Vermelha. Cidade-irmã cai.
-- **-0.5**: Eliminação **Aldebrando Chevalier** (pai Bento) na Catedral Menor de Atelaiá, Vigília de doze mestres, interferência ressonante calibrada (onze sobreviveram).
+- **-0.5**: Eliminação **Aldebrando Chevalier** (pai Bento) na Catedral Menor de Atelaiá, Vigília de doze mestres, interferência ressonante calibrada introduzida pela própria Sterling Corp (onze sobreviveram) para silenciar a descoberta dele nos cripto-glifos Era 1. Registro oficial: queda em ruína. Diário do mestre sobreviveu, preservado por Velhusto.
 - **-0.25**: Patch-Zero escapa do laboratório central. Catalyst do jogo.
 
 ### Não fazer

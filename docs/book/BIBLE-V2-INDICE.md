@@ -203,8 +203,8 @@
 | Fundação Sterling Corp (Apex-Data → Nexus-Cloud → Core-Synth) | -12 | 08 (plano interno revelado pós-rejeição), 09 (lacre cera Calveri) |
 | Câmara do Equinócio Acústico · decifração Joaquim Bartolomeu | -3 | 05 (referenciada, "não saiu inteiro") |
 | Padim Tércio Almagre comprou galpão Alencar por preço demolição | -7 | 06 (placa não trocada) |
-| Salviano Alencar morto (overdose-medicação 6 meses pós destruição cooperativa) | -7.5 (atribuído -7 funeral) | 06 (3 quadros funeral), 09 (Vorto observa do poste queimado) |
-| Aldebrando Chevalier morto (contaminado, interferência cripto-glifo profundo) | -0.5 | 04 (Bento 13.5 anos) |
+| Salviano Alencar morto (causa oficial insuficiência cardíaca, 6 meses pós destruição cooperativa; causa real suspeita, nunca provada) | -7.5 (atribuído -7 funeral) | 06 (3 quadros funeral), 09 (Vorto observa do poste queimado) |
+| Aldebrando Chevalier morto (Catedral Menor de Atelaiá, Vigília restrita de 12 mestres, 11 sobreviveram; causa oficial queda em ruína, causa real interferência ressonante calibrada da Sterling Corp por descoberta em cripto-glifo profundo) | -0.5 | 04 (Bento 13.5 anos) |
 | Vorto inicia recrutamento Dante (envelope codinome "Grid") | -5 (Dante 8 anos) → -2 (Dante 11 anos) | 09 (terceira aproximação) |
 | Calveri instrui diligência preliminar Vance Atelaiá (Gus 11 anos, prazo 5 meses) | -2 | 09 (envelope cera vermelha) |
 | Pyotor Vance opera olho Jaci (implante cyan, médico-cyber itinerante) | -2 (Jaci 3 anos? cronologia interna conta 07 indica anterior) | 07 (Jaci memória pedaços) |

@@ -151,7 +151,7 @@ Cada companion tem ficha com 3 estados de Knowledge canônicos:
 
 **Knowledge alta:**
 
-- Wound canônico: pai **Aldebrando Chevalier** (mestre Asmódico, 38) morto em -0.5 em incursão à catedral perdida. Causa oficial: queda em ruína. Causa real (entregue a Bento via Velhusto): eliminado por descobrir interferência precoce Sterling em cripto-glifo profundo. Diário pessoal preservado ([[entries-docs-descobriveis|doc 9]]).
+- Wound canônico: pai **Aldebrando Chevalier** (mestre Asmódico, 38) morto em -0.5 na Catedral Menor de Atelaiá, durante uma Vigília restrita de 12 mestres da qual só 11 voltaram. Causa oficial: queda em ruína. Causa real (entregue a Bento via Velhusto): eliminado pela Sterling Corp, que introduziu uma interferência ressonante calibrada para silenciá-lo depois que ele descobriu, nos cripto-glifos Era 1 profundos que copiava, o rastro precoce da própria Sterling. Diário pessoal preservado ([[entries-docs-descobriveis|doc 9]]).
 - Trauma anterior: testemunhou aos 7 anos a contaminação Patch-Zero da Catedral Menor de Atelaiá em -7. Hilário Tepenkov (Mestre-Aprendiz, 14 na época) morto. Bento sobreviveu por estar perto do escudo do Mestre-Hierofante Velhusto.
 - Linhagem direta: Atelaiá Chevalier (-115, codificador-mãe Asmódico) → 5 gerações → Aldebrando → Bento.
 - Aprendiz atual: Beatriz Pólvora (16, [[03-catedrais-neo-sylvania|bancada da Beatriz]]). Bento ensina enquanto ele próprio se forma.
