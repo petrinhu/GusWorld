@@ -291,7 +291,7 @@
 > **Convenção:** SÓ entradas NÃO presentes em `BIBLE-V1-GLOSSARIO.md`. Termos exclusivos dos 14 contos (neologismos, nomes ambientais novos, motivos específicos), agrupados por categoria.
 > **Status:** ✅ canônico (gravado na fonte) · 🟡 candidato (mencionado em conto sem definição formal; consolidação pendente em GLOSSARIO Vol 1 R2).
 
-### G.1 Termos canônicos exclusivos contos · técnico-rúnico
+### G.1 Termos canônicos exclusivos contos · técnico de conjuros
 
 | Termo | Definição compacta | Origem (conto) | Status |
 |---|---|---|---|
@@ -302,7 +302,7 @@
 | **Cripto-glifo Era 1** | Sistema de escrita em grade 3×3 + X sobreposto (4 setores diagonais) + presença/ausência de pontos por célula; 26 posições combinatórias, alfabeto Era 1 + 3 sinais terminais; chave transmitida em sucessão matrilinear oral | 04 Bento, 13 Verônica | ✅ canônico |
 | **Ressonância Plena (Exceção Chevalier)** | Modo do cronômetro de latão Bento: três circuitos paralelos (47/89/144 BPM) em batimento de fase produzem interferência construtiva estável, "ar mais denso" | 04 Bento | ✅ canônico |
 | **DRE · Dynamic Runtime Evaluation** | Paradigma fundador Sterling (-25): inverter relação compilação/execução; contratos reavaliados a cada ponto de decisão; ética como função de estado executável | 08 Sterling | ✅ canônico |
-| **GRE · Global Runtime Environment** | Direção subsequente da tese DRE (capítulo final, deal-breaker para banca): ambiente único runtime estendido a toda infraestrutura rúnica do continente | 08 Sterling | ✅ canônico |
+| **GRE · Global Runtime Environment** | Direção subsequente da tese DRE (capítulo final, deal-breaker para banca): ambiente único runtime estendido a toda infraestrutura de conjuros do continente | 08 Sterling | ✅ canônico |
 | **Câmara do Equinócio Acústico** | Cavidade subterrânea da Zona do Silêncio decifrada por Joaquim Bartolomeu em -3 (equinócio); qualquer som emitido encontra cancelamento orgânico pela geometria; quem sobrevive ao próprio cancelamento sai sabendo coisas | 05 Linda | ✅ canônico |
 | **Última Frequência** | Ritual sônico anual da Zona do Silêncio (Noite Calada); 55 BPM, BPM do coração descansando; "memória de quem não voltou" segundo Brígida Neumann | 05 Linda | ✅ canônico |
 | **Tablete da Pancada de Neve** | Documento sumeriano arcaico traduzido por Camila Neumann (~-21) e revisado por Brígida Neumann (~-13); especificação técnica de "linguagem que infecta substrato runtime"; circulação restrita Underground | 05 Linda | ✅ canônico |
@@ -415,7 +415,7 @@
 - Apêndice D · Índice de Contos: 14 contos + 4 arcos coletivos = 18 entradas (Tomo 1: 7 / Tomo 2: 7 / sumário polifônico: 4)
 - Apêndice E · Cross-Ref Vol 1: 47 personagens cross-ref (7 party + 4 antagonistas + 17 família + 9 facções + 14 históricos Era 1-2) + 11 NPCs candidatos novos + 30 lugares cross-ref + 21 eventos cronológicos = ~109 entradas
 - Apêndice F · Citações Memoráveis: 25 citações canon (T1: 11 / T2: 14) + 8 leitmotivs canon cross-Vol = 33 entradas
-- Apêndice G · Glossário Compacto: 71 entradas únicas (21 técnico-rúnico + 15 lugares + 19 nomes próprios + 16 conceitos + manifestações de motivos catalogadas)
+- Apêndice G · Glossário Compacto: 71 entradas únicas (21 técnico de conjuros + 15 lugares + 19 nomes próprios + 16 conceitos + manifestações de motivos catalogadas)
 
 **Zero em-dash:** confirmado por inspeção. Hífens "-" em medidas (5-pétalas, 3-5-7, etc.) preservados. Travessões longos e en-dash ausentes do documento. (Exceção canônica de em-dash aplica-se apenas a `docs/narrative/in-world-docs.md` per memória `project_em_dash_excecao`.)
 

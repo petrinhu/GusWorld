@@ -12,7 +12,7 @@ O Salão 3 da Faculdade de Engenharia Recursiva tem trinta e quatro lugares para
 
 Ajusto o monóculo. O vidro é vermelho cromado, ligeiramente espelhado pelo lado externo, transparente pelo interno. Foi calibrado para corrigir astigmatismo discreto no olho direito e simultaneamente filtrar comprimentos de onda azul abaixo de quatrocentos e oitenta nanômetros, o que reduz fadiga de leitura em ambientes de iluminação fluorescente como este. O Salão 3 tem oito lâmpadas tubulares no teto. Cinco acesas. Três queimadas. A administração da faculdade não substitui lâmpadas em ciclos regulares. Registro a ineficiência sem comentário oral.
 
-A bancada está coberta por feltro verde. Sobre o feltro, três cópias impressas da minha tese, encadernação preta, lombada de cinco centímetros. Oitocentas e noventa páginas. O título consta em letras prateadas: *Dynamic Runtime Evaluation, Paradigma para Reavaliação Permanente de Contrato em Sistemas Rúnicos Abertos*. Abaixo do título, em letra menor, meu nome.
+A bancada está coberta por feltro verde. Sobre o feltro, três cópias impressas da minha tese, encadernação preta, lombada de cinco centímetros. Oitocentas e noventa páginas. O título consta em letras prateadas: *Dynamic Runtime Evaluation, Paradigma para Reavaliação Permanente de Contrato em Sistemas de Conjuração Abertos*. Abaixo do título, em letra menor, meu nome.
 
 Heris Marçal Vüldenberg abre a sessão. A voz dela é seca. Diz, para efeito de ata, a hora, a data, o nome do candidato, o título da tese, e a composição da banca. Pede que eu apresente em até cinquenta e cinco minutos a defesa oral. Concordo com a cabeça. Subo ao palco baixo. Acendo o projetor de slides. O primeiro slide carrega.
 
@@ -22,11 +22,11 @@ Começo.
 
 ## 2. Apresentação
 
-"Banca examinadora," digo, "a tese que apresento propõe deslocar o paradigma corrente de compilação estática de contratos rúnicos para um paradigma de avaliação dinâmica em tempo de execução. Doravante DRE. Dynamic Runtime Evaluation."
+"Banca examinadora," digo, "a tese que apresento propõe deslocar o paradigma corrente de compilação estática de contratos de conjuro para um paradigma de avaliação dinâmica em tempo de execução. Doravante DRE. Dynamic Runtime Evaluation."
 
 Pauso por dois segundos. Não para efeito retórico. Para sincronizar com a transição do segundo slide.
 
-"O paradigma vigente, herdado da escola de Atelaiá Chevalier e consolidado por sucessivas gerações de praticantes desta faculdade, assume que um contrato rúnico deve ser verificado em sua totalidade antes da execução. Verificado contra invariantes morais, invariantes ontológicas, invariantes de custo, e invariantes de consentimento entre as partes vinculadas. Esta verificação é onerosa. Estimo, com base em dados coletados ao longo dos últimos treze anos em treze laboratórios institucionais, que oitenta e nove por cento do tempo computacional gasto em sistemas rúnicos pertence a esta verificação prévia. Apenas onze por cento gera trabalho útil."
+"O paradigma vigente, herdado da escola de Atelaiá Chevalier e consolidado por sucessivas gerações de praticantes desta faculdade, assume que um contrato de conjuro deve ser verificado em sua totalidade antes da execução. Verificado contra invariantes morais, invariantes ontológicas, invariantes de custo, e invariantes de consentimento entre as partes vinculadas. Esta verificação é onerosa. Estimo, com base em dados coletados ao longo dos últimos treze anos em treze laboratórios institucionais, que oitenta e nove por cento do tempo computacional gasto em sistemas de conjuração pertence a esta verificação prévia. Apenas onze por cento gera trabalho útil."
 
 Avanço o slide. Aparece um gráfico de barras. As barras vermelhas dominam. As barras azuis são finas.
 
@@ -38,7 +38,7 @@ Cláudio Vance Atelaiá apoia o queixo na mão. O cenho dele se contrai discreta
 
 Avanço o slide. Aparece um diagrama. Três círculos concêntricos. No centro, a palavra *runtime*. Em torno, *contexto*, *agente*, *capital*.
 
-"O horizonte de aplicação que proponho excede o escopo desta tese. Mencionei brevemente, no capítulo final, oitavo, a possibilidade de um Global Runtime Environment. Doravante GRE. Um ambiente único de execução estendido a toda infraestrutura rúnica da megacidade e potencialmente a toda infraestrutura rúnica do continente. Sob GRE, qualquer agente conectado opera sob o mesmo runtime reavaliador, com o mesmo conjunto de contratos vivos, sob a mesma autoridade compartilhada de reavaliação. A eficiência sistêmica resultante é difícil de superestimar. A presente tese, no entanto, restringe-se à formalização do paradigma DRE em escala laboratorial, deixando GRE como direção de pesquisa subsequente."
+"O horizonte de aplicação que proponho excede o escopo desta tese. Mencionei brevemente, no capítulo final, oitavo, a possibilidade de um Global Runtime Environment. Doravante GRE. Um ambiente único de execução estendido a toda infraestrutura de conjuração da megacidade e potencialmente a toda infraestrutura de conjuração do continente. Sob GRE, qualquer agente conectado opera sob o mesmo runtime reavaliador, com o mesmo conjunto de contratos vivos, sob a mesma autoridade compartilhada de reavaliação. A eficiência sistêmica resultante é difícil de superestimar. A presente tese, no entanto, restringe-se à formalização do paradigma DRE em escala laboratorial, deixando GRE como direção de pesquisa subsequente."
 
 Olho para a banca. Os três rostos estão imóveis. Heris Marçal Vüldenberg toma notas. Octavia Pelicano Branco lê uma página marcada. Cláudio Vance Atelaiá não escreve.
 
@@ -116,7 +116,7 @@ Retornei ao salão.
 
 Heris Marçal Vüldenberg leu o veredito.
 
-"A banca, em votação por unanimidade, três votos contra zero, abstenções zero, rejeita a tese intitulada *Dynamic Runtime Evaluation, Paradigma para Reavaliação Permanente de Contrato em Sistemas Rúnicos Abertos*, apresentada pelo doutorando Sterling Locke, por três motivos formais. Primeiro, paradigma adversarial às fundações éticas institucionais desta faculdade. Segundo, runtime sem instrumentação adequada de segurança em tempo de compilação. Terceiro, explicitação no capítulo final de objetivo corporativo, GRE, incompatível com missão acadêmica desta cadeira. A banca recomenda ao candidato revisão profunda do paradigma, supressão integral do capítulo final, e reapresentação após período mínimo de cinco anos. A banca encerra a sessão."
+"A banca, em votação por unanimidade, três votos contra zero, abstenções zero, rejeita a tese intitulada *Dynamic Runtime Evaluation, Paradigma para Reavaliação Permanente de Contrato em Sistemas de Conjuração Abertos*, apresentada pelo doutorando Sterling Locke, por três motivos formais. Primeiro, paradigma adversarial às fundações éticas institucionais desta faculdade. Segundo, runtime sem instrumentação adequada de segurança em tempo de compilação. Terceiro, explicitação no capítulo final de objetivo corporativo, GRE, incompatível com missão acadêmica desta cadeira. A banca recomenda ao candidato revisão profunda do paradigma, supressão integral do capítulo final, e reapresentação após período mínimo de cinco anos. A banca encerra a sessão."
 
 Registrei o veredito. Não sorri. Não me ergui em protesto. Não solicitei direito de réplica, embora o regimento o permita. A réplica não alteraria três votos contra zero. Réplica em condição de derrota unânime é desperdício de recurso afetivo, e recurso afetivo é recurso como qualquer outro.
 

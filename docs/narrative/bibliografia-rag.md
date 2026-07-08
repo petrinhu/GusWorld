@@ -51,7 +51,7 @@ Saga e materiais filológicos de J.R.R. (e Christopher) Tolkien:
 - **Menores / contos:** *Tales from the Perilous Realm*, *Farmer Giles of Ham*, *Roverandom*, *Leaf by Niggle*, *Smith / Tom Bombadil*, *Bilbo's Last Song*, *Letters from Father Christmas*, *The Legend of Sigurd and Gudrún*, *The Homecoming of Beorhtnoth*, *Pictures by J.R.R. Tolkien*.
 - **Filologia (chave para lore de língua):** *A Middle English Vocabulary*, *Songs for the Philologists*, *Finn and Hengest*, *The Lays of Beleriand*.
 
-**Como inspira:** modelo máximo de **worldbuilding profundo com camadas de tempo** (cronologia em eras, versões in-world divergentes de um mesmo mito), alimenta a estrutura de 3 eras do GusWorld e os docs descobríveis (`in-world-docs.md`). A vertente filológica é a referência direta para a **lore de língua/conlang** que o criador quer construir: como inventar idiomas com história interna e deriva fonética coerente. Conecta ao pillar **Magia = software** (linguagens rúnicas compiladas como artefatos com gramática e versão) e aos padrões numéricos recorrentes em proporções/datações.
+**Como inspira:** modelo máximo de **worldbuilding profundo com camadas de tempo** (cronologia em eras, versões in-world divergentes de um mesmo mito), alimenta a estrutura de 3 eras do GusWorld e os docs descobríveis (`in-world-docs.md`). A vertente filológica é a referência direta para a **lore de língua/conlang** que o criador quer construir: como inventar idiomas com história interna e deriva fonética coerente. Conecta ao pillar **Magia = software** (linguagens de conjuro compiladas como artefatos com gramática e versão) e aos padrões numéricos recorrentes em proporções/datações.
 
 ### 2. Asimov, ficção científica e ciência popular (171 obras)
 

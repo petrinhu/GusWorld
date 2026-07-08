@@ -84,7 +84,7 @@ Wireframe ASCII (paisagem, 16:9):
 | > Cena Beat Sho |  Eu fiquei dois minutos olhando. A mãe       |
 |   (lido)        |  perguntou se eu tinha ido no banheiro       |
 |                 |  porque eu tava com cara de quem viu coisa.  |
-| > Cena Beat Ten |                                              |
+| > Cena Clímax   |                                              |
 |   (lido)        |  Eu vi coisa. Não da que ela acha."          |
 |                 |                                              |
 | ---             |  [esboço cursiva: fonte com setas marcando   |

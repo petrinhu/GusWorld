@@ -124,13 +124,13 @@ Mapeamento sistemático de conflitos canon detectados via cross-validation deep-
 ### C10. Edilma Alencar: viva reclusa vs presa Caverna dos Perdidos [RESOLVIDO 2026-05-30]
 
 - `lore-bible.md:521` + `factions.md` §1 (-8): Edilma "sobrevive, hoje vive **reclusa em apartamento subsidiado**".
-- `PLACES.md:76` Caverna dos Perdidos (Dragon Victory canon): "Família Dante (mãe **Edilma Alencar) presa lá** pra chantagear Dante (canon arco Dante Beat Ten reveal)."
+- `PLACES.md:76` Caverna dos Perdidos (Dragon Victory canon): "Família Dante (mãe **Edilma Alencar) presa lá** pra chantagear Dante (canon arco Dante, Etapa 1 mini-boss Dante, reveal)."
 
 **Conflito:** estado canônico atual da Edilma.
 
 **Cascata fix:** distinguir aparência pública (reclusa em apartamento) vs estado real (sequestrada por Sterling brass na Caverna).
 
-**RESOLVIDO (cascata F1-DL.REFAC):** canonizado modelo **dual-state** (aparência pública vs estado real). Aparência pública: reclusa em apartamento subsidiado, fachada FIR rotacionando indicadores de habitação ativa. Estado real (revelação arco Dante Beat Ten + Dragon Victory): sequestrada em -8 por Cassiano Vorto sob ordem Sterling, mantida em cela da Caverna dos Perdidos (nordeste Pântano Markov, Selve Sombria profunda), chantagem psicológica permanente sobre Dante. Canonizado em `lore-bible.md:525` §14 + `factions.md:305` §3 FIR (entry Edilma completa, cross-ref "INCOHERENCES C10 resolvido") + `timeline.md:124` (-8 retrofit dual-state). Cross-ref `PLACES.md:76` (Caverna dos Perdidos) + `characters/dante-grid.md:117`.
+**RESOLVIDO (cascata F1-DL.REFAC):** canonizado modelo **dual-state** (aparência pública vs estado real). Aparência pública: reclusa em apartamento subsidiado, fachada FIR rotacionando indicadores de habitação ativa. Estado real (revelação arco Dante, Etapa 1 mini-boss Dante, + Dragon Victory): sequestrada em -8 por Cassiano Vorto sob ordem Sterling, mantida em cela da Caverna dos Perdidos (nordeste Pântano Markov, Selve Sombria profunda), chantagem psicológica permanente sobre Dante. Canonizado em `lore-bible.md:525` §14 + `factions.md:305` §3 FIR (entry Edilma completa, cross-ref "INCOHERENCES C10 resolvido") + `timeline.md:124` (-8 retrofit dual-state). Cross-ref `PLACES.md:76` (Caverna dos Perdidos) + `characters/dante-grid.md:117`.
 
 ---
 

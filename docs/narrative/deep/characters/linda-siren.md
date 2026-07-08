@@ -52,7 +52,7 @@ Expressão facial reservada com olhar lateral persistente, escaneamento de ambie
 
 ## 4. Hardware e habilidades
 
-O role mecânico é Crowd Control sônico. Linda emite ondas infra-sônicas calibradas que atordoam alvos biológicos por interferência vestibular e geram micro-fissuras em hardware e blindagem por ressonância dimensionada à frequência natural do material. A linguagem-âncora operacional é Óxido aplicado a som, e cada Conjuro dela é composto em Glyph rúnico que codifica padrão sônico em três a cinco pulsos de modulação por amplitude, compilado em ar por Token de execução que sai dos fones industriais via amplificador portátil de bolso.
+O role mecânico é Crowd Control sônico. Linda emite ondas infra-sônicas calibradas que atordoam alvos biológicos por interferência vestibular e geram micro-fissuras em hardware e blindagem por ressonância dimensionada à frequência natural do material. A linguagem-âncora operacional é Óxido aplicado a som, e cada Conjuro dela é composto em Glyph que codifica padrão sônico em três a cinco pulsos de modulação por amplitude, compilado em ar por Token de execução que sai dos fones industriais via amplificador portátil de bolso.
 
 O Conjuro de abertura é SILÊNCIO de área, que estabelece envelope de cancelamento ativo num raio variável calibrado entre três e oito metros, dependendo do investimento de carga, e que opera reduzindo o espectro sonoro do alvo a faixa estreita inferior ao limiar de orientação espacial. Inimigo dentro do envelope perde referência acústica e sofre penalidade de precisão. O Conjuro custa um Token de Óxido por turno sustentado e exige atenção contínua de Linda, que opera o amplificador portátil em ajuste fino.
 

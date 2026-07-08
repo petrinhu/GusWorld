@@ -28,7 +28,7 @@ Ordem de prioridade:
 
 1. **Challenge** — puzzle/combat exigem leitura de sistema, não reflexo.
 2. **Discovery** — Selve Sombria como espaço de leis matemáticas a decifrar; cidade como rede de segredos a hackear.
-3. **Expression** — montagem de deck rúnico e build de Gus é assinatura do jogador.
+3. **Expression** — montagem do Codex de Conjuros e build de Gus é assinatura do jogador.
 
 Secundárias toleradas (não decisórias): Narrative, Fantasy. Ignoradas: Sensation, Fellowship, Submission.
 
@@ -75,11 +75,11 @@ Em **puzzle/aventura**, scan revela padrão matemático do bioma (sequência num
 
 Upgrade-tree no vértice Matriz: ganho de range (escuta ecolocalização de longe), filtros (ignora ruído eletromagnético da cidade), e modo "sonar maxilar" passivo que destaca anomalias no minimapa. Pillar servido: 1, 2, 3.
 
-### 6.2 Compilação de Deck Rúnico (TCG-style combat)
+### 6.2 Compilação do Codex (TCG-style combat)
 
 **Verb:** compilar/jogar. **Vértice:** Tavus-Drive executa.
 
-Em **combate turn-based**, Gus tem deck de 40-60 cartas totais, 15 em campo, rúnicas. Cada carta = `tipo + modificador + alvo` (sintaxe diegética legível: ex. `RAIZ.elétrica → área-3x3`). Por turno: saca 3, joga 1-2 dependendo de mana (recurso de compilação). Cartas combinam: `Código de Raiz` + `Pulso Elétrico` = armadilha elétrica em área; combos são receitas determinísticas, não RNG.
+Em **combate turn-based**, Gus tem deck de 40-60 cartas-token totais, 15 em campo. Cada carta = `tipo + modificador + alvo` (sintaxe diegética legível: ex. `RAIZ.elétrica → área-3x3`). Por turno: saca 3, joga 1-2 dependendo de mana (recurso de compilação). Cartas combinam: `Código de Raiz` + `Pulso Elétrico` = armadilha elétrica em área; combos são receitas determinísticas, não RNG.
 
 Deck é construído fora de combate. Cartas obtidas por progresso narrativo (não loot drop aleatório). Trade-off: deck especializado (4 cópias da mesma carta) vs versátil (variedade).
 

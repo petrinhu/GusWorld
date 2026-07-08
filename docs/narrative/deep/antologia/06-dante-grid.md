@@ -20,7 +20,7 @@ A mochila dele estava pesada hoje. Eu sei porque a alça arrastava pro lado. Pes
 
 A gente caminhou pelo corredor de pé direito alto até a sala 213, que fica no segundo andar do bloco leste, e que tem aquela acústica esquisita que devolve o som das vozes em cinco cantos diferentes da sala. Eu sento na carteira do lado da janela, terceira fileira. O Gus senta na mesma fileira, duas carteiras à frente. Ele vira pra trás às vezes durante a aula pra me mostrar uma anotação rabiscada no caderno. Não diz nada. Só vira, mostra, espera eu rir ou aprovar com a cabeça, e volta. Hoje ele virou uma vez só. Mostrou um desenho de uma engrenagem com vinte e um dentes encaixando noutra engrenagem de trinta e quatro. Eu aprovei com a cabeça. Ele voltou.
 
-A aula era de oficina rúnica básica. O professor tava explicando token de fortificação em sintaxe Asmódico, que é o que eu uso. Eu já sei, claro. Aprendi com onze. Mas escuto, porque escutar uma coisa que já se sabe é uma forma de descansar a cabeça sem parecer que se está descansando.
+A aula era de oficina de Compilação básica. O professor tava explicando token de fortificação em sintaxe Asmódico, que é o que eu uso. Eu já sei, claro. Aprendi com onze. Mas escuto, porque escutar uma coisa que já se sabe é uma forma de descansar a cabeça sem parecer que se está descansando.
 
 ---
 

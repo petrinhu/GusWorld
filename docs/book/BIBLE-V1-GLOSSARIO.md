@@ -108,7 +108,7 @@
 
 **Catedrais de Silício.** Sede de Sterling Corp em ato 3, exterior do mesmo setting que abriga a Cúpula Sterling. Torres híbridas onde Sterling tentou fundir arquitetura cidade e biomassa Selve. Falhou. Resultado: estrutura morta-viva, mistura repulsiva e tecnicamente fascinante. Cresce como tumor entre Núcleo Metropolitano e Anel Verde. *Cross-ref:* lore-bible.md §5.2; PLACES.md §5.
 
-**Caverna dos Perdidos.** Sub-local subterrâneo profundo da Selve Sombria, nordeste do Pântano de Markov, abaixo de raízes ancestrais. Passagem secreta conhecida só pelo brass Sterling. Local onde Edilma Alencar (mãe de Dante) está presa como chantagem contra Dante. Cenário do reveal do arco Dante (Beat Ten) e da cutscene Dragon Victory. *Cross-ref:* deep/characters/dante-grid.md; memory/project_dragon_victory_canon.md.
+**Caverna dos Perdidos.** Sub-local subterrâneo profundo da Selve Sombria, nordeste do Pântano de Markov, abaixo de raízes ancestrais. Passagem secreta conhecida só pelo brass Sterling. Local onde Edilma Alencar (mãe de Dante) está presa como chantagem contra Dante. Cenário do reveal do arco Dante (Etapa 1, mini-boss Dante) e da cutscene Dragon Victory. *Cross-ref:* deep/characters/dante-grid.md; memory/project_dragon_victory_canon.md.
 
 **Cidades-Gêmeas (Norte e Sul).** Cidade-irmã distante. Saudável aparentemente; Underground forte. Escritório administrativo Sterling. Aliada potencial via Underground do Silêncio. Coordenadores: Lazar Tovrov (Norte), Penha Cintra (Sul). *Cross-ref:* lore-bible.md §9; PLACES.md §3.
 
@@ -124,7 +124,7 @@
 
 **Codex Cantata.** Cifra musical canônica da Era 1, consolidada em quatro estratos (frequência, polifonia, luz, cifra) por Salomão Tessar Vyrcátrix, arquivista-chefe e neto direto de Helíaco Vyr. Quarenta sistemas criptográficos maiores mais dez menores estudados. *Cross-ref:* deep/eras/era-1-pre-codigo.md §6.4.
 
-**Codex de Conjuros.** Deck pessoal do operador, acervo de Tokens disponíveis. Para Gus, 40 a 60 Tokens; para aprendiz, 8; para mestre da Ordem Recursiva, 144. Quarenta Tokens em três slots dão 64 mil Conjuros teóricos, dos quais ~200 são fisicamente coerentes. Substitui terminologia antiga "Deck Rúnico". *Cross-ref:* lore-bible.md §7.6, §7.10; deep/magic/glyph-token-conjuro-codex-deep.md §1, §4.
+**Codex de Conjuros.** Deck pessoal do operador, acervo de Tokens disponíveis. Para Gus, 40 a 60 Tokens; para aprendiz, 8; para mestre da Ordem Recursiva, 144. Quarenta Tokens em três slots dão 64 mil Conjuros teóricos, dos quais ~200 são fisicamente coerentes. Substitui nomenclatura anterior descontinuada. *Cross-ref:* lore-bible.md §7.6, §7.10; deep/magic/glyph-token-conjuro-codex-deep.md §1, §4.
 
 **Coluna Boróstoma.** Estrutura ritual fundadora canônica à esquerda em câmaras cerimoniais da Catedral-Mãe e catedrais menores. Carrega versão latim litúrgico da formulação Chevalier. *Cross-ref:* deep/magic/natureza-matematica-rigida-deep.md §4; deep/ontologia/cosmologia-formal-deep.md §7.
 
@@ -136,7 +136,7 @@
 
 **Compilação (leitmotiv principal).** Tema musical wagner-like que abre o jogo, atravessa transições entre eras, fecha cada ending. Três frases sucessivas em compassos 3/4, 5/4 e 8/4, totalizando 16 tempos por exposição. Modos dórico (Era 1), mixolídio (Era 2) e eólio (Era 3). Aparece em sub-bass de quase todos os outros leitmotivs. *Cross-ref:* deep/ontologia/leitmotivs-deep.md §6.
 
-**Compilação do Codex.** Ato canônico mecânico de combinar Tokens no Tavus-Drive em campo de batalha para gerar Conjuro executável. Três operações: selecionar três Tokens do acervo ativo, inseri-los na stack na ordem desejada, executar. Drive responde pulso cyan (êxito) ou vermelho um quinto de segundo (falha). Substitui terminologia "Compilação de Deck Rúnico". *Cross-ref:* lore-bible.md §7.6; deep/magic/glyph-token-conjuro-codex-deep.md §4.
+**Compilação do Codex.** Ato canônico mecânico de combinar Tokens no Tavus-Drive em campo de batalha para gerar Conjuro executável. Três operações: selecionar três Tokens do acervo ativo, inseri-los na stack na ordem desejada, executar. Drive responde pulso cyan (êxito) ou vermelho um quinto de segundo (falha). Substitui nomenclatura anterior descontinuada. *Cross-ref:* lore-bible.md §7.6; deep/magic/glyph-token-conjuro-codex-deep.md §4.
 
 **Conjuro.** Resultado executável da compilação de exatamente três Tokens em sequência ordenada no Tavus-Drive. Processo (não dado persistente): nasce no terceiro Token, executa em frações de segundo, morre quando o efeito físico se exauriu. *Cross-ref:* lore-bible.md §7.10; deep/magic/glyph-token-conjuro-codex-deep.md §1.
 
@@ -224,7 +224,7 @@
 
 **Gematria de Tokens.** Sistema canônico de valoração numérica em lúmens. Tokens de família simples custam 1 lúmen; Tokens articulados custam até 8. Conjuros compostos somam gematrias dos três Tokens. Escala secundária para Tokens raros: 13, 21, 34. Tokens lendários atingem 89 ou 144 lúmens (apenas Drives com upgrade significativo executam). *Cross-ref:* deep/magic/glyph-token-conjuro-codex-deep.md §8.
 
-**Glyph.** Imagem rúnica visível desenhada na face da carta-token, identidade gráfica. Signo composicional (não decoração) com raiz semântica composta; aglutinação de raízes produz Tokens compostos. Cada Glyph base mapeia exatamente uma letra do alfabeto cifrado do cripto-glifo Era 1. *Cross-ref:* lore-bible.md §7.10; deep/magic/glyph-token-conjuro-codex-deep.md §1, §6.
+**Glyph.** Imagem visível desenhada na face da carta-token, identidade gráfica. Signo composicional (não decoração) com raiz semântica composta; aglutinação de raízes produz Tokens compostos. Cada Glyph base mapeia exatamente uma letra do alfabeto cifrado do cripto-glifo Era 1. *Cross-ref:* lore-bible.md §7.10; deep/magic/glyph-token-conjuro-codex-deep.md §1, §6.
 
 **Glyph-do.** Raiz canônica "objeto", presente em Conjuros Object. Cognato direto do Pythia *do* (coisa nomeada). Aparece em 13 dos 40 Tokens base de objeto. *Cross-ref:* deep/magic/glyph-token-conjuro-codex-deep.md §6.
 

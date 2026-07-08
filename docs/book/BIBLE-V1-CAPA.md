@@ -20,7 +20,7 @@ Sobre a Catedral-Mãe submersa, parcialmente sobreposto ao céu, paira translúc
 
 ### Iconografia secundária
 
-No quadrante superior esquerdo, ornamento marginal discreto contém o cripto-glifo Era 1 (grade três por três mais X mais pontos, cifra canônica fundadora). O ornamento parece runa decorativa para o leigo e palavra cifrada para o leitor instruído.
+No quadrante superior esquerdo, ornamento marginal discreto contém o cripto-glifo Era 1 (grade três por três mais X mais pontos, cifra canônica fundadora). O ornamento parece Glyph decorativo para o leigo e palavra cifrada para o leitor instruído.
 
 No quadrante superior direito, espelhando o cripto-glifo, ornamento contém o Selo dos Quatro Instrumentos canônico C-Arcane (esquadro, compasso, cinzel e martelo entrelaçados em geometria razão acaceiro), com régua-T cruzando a base.
 
@@ -60,13 +60,13 @@ Background: skyline noturno de GusWorld City, arranha-céus angulares ciber-gót
 
 Midground: Vyrdragon emerge agora em pose ativa, asas totalmente abertas em envergadura horizontal, cabeça erguida em rugido silencioso, cor vermelho carmesim plena (não mais translúcida como no Tomo 1). Dragão atravessa o céu noturno em diagonal ascendente da esquerda inferior para direita superior, deixando rastro de partículas vermelho-cyan misturadas (canon Dragon Victory aura gradient). Em torno do dragão, oito esferas pequenas cyan giram em trajetória orbital (canon: Fireball certeiro pós-Dragon Victory).
 
-Foreground: silhueta da party em sete figuras, alinhadas na base da capa em formação Kishōtenketsu invertida. Da esquerda para direita: Jaci Vanderbist (cajado biológico, halo verde-bio na mão direita), Linda Siren (microfone na mão esquerda, ondas sonoras estilizadas em arco), Bento Requiem (escudo gótico nas costas, silhueta mais alta da formação), Gus Vector centralizado (sobretudo gótico cinza, Tavus-Drive cyan ativo elevado em direção ao Vyrdragon, postura de invocação), Cauã Volt (lança rúnica diagonal apontada para cima), Iara Lumen (capuz baixo, lâmina curta), Dante Grid (à direita extrema, cabeça parcialmente virada para fora da formação, sutil indicação visual do traidor sem entregar narrativamente). Todos em silhueta predominante com toques de cor identitária (verde-bio Jaci, branco-prata Linda, cinza-escuro Bento, cyan Gus, vermelho-cobre Cauã, lavanda escura Iara, ambíguo Dante).
+Foreground: silhueta da party em sete figuras, alinhadas na base da capa em formação Kishōtenketsu invertida. Da esquerda para direita: Jaci Vanderbist (cajado biológico, halo verde-bio na mão direita), Linda Siren (microfone na mão esquerda, ondas sonoras estilizadas em arco), Bento Requiem (escudo gótico nas costas, silhueta mais alta da formação), Gus Vector centralizado (sobretudo gótico cinza, Tavus-Drive cyan ativo elevado em direção ao Vyrdragon, postura de invocação), Cauã Volt (lança de conjuro diagonal apontada para cima), Iara Lumen (capuz baixo, lâmina curta), Dante Grid (à direita extrema, cabeça parcialmente virada para fora da formação, sutil indicação visual do traidor sem entregar narrativamente). Todos em silhueta predominante com toques de cor identitária (verde-bio Jaci, branco-prata Linda, cinza-escuro Bento, cyan Gus, vermelho-cobre Cauã, lavanda escura Iara, ambíguo Dante).
 
 À direita da party, descolado em plano ligeiramente mais profundo, Sterling Locke em silhueta corporativa monolítica, terno brass-cinza angular, monóculo direito refletindo vermelho carmesim (canon), bengala de mogno na vertical perfeita. Postura imóvel, antagônica por contraste estático contra dinamismo do Vyrdragon.
 
 ### Iconografia secundária
 
-Ornamentos marginais espelham Tomo 1 mas progressão temporal está marcada: o cripto-glifo no quadrante superior esquerdo agora aparece parcialmente sobreposto por circuitos integrados estilizados, sugerindo a transição de Era 1 rúnica para Era 3 computável (canon: magia é software).
+Ornamentos marginais espelham Tomo 1 mas progressão temporal está marcada: o cripto-glifo no quadrante superior esquerdo agora aparece parcialmente sobreposto por circuitos integrados estilizados, sugerindo a transição de Era 1 de conjuros para Era 3 computável (canon: magia é software).
 
 Ashlar polido predomina sobre ashlar bruto neste tomo (canon maçom: pedra trabalhada como evolução civilizatória, embora aqui ambígua pois civilização Era 3 também distorce).
 
@@ -124,7 +124,7 @@ Sinopse worldbuilding (cerca de 230 palavras):
 
 "GusWorld é um mundo onde magia é software e natureza é matemática rígida. A megacidade ciber-gótica GusWorld City paira sobre uma Selve Sombria fractal, separadas por séculos de evolução civilizatória que ora floresceu, ora corrompeu. Este Volume 1 da Bíblia Worldbuilding documenta o mundo em três Eras: Pré-Código, Consolidação Catedrática e o Presente Computável.
 
-Tomo 1 cobre o Frontispício do projeto, a Cosmologia fundacional e Era 1 Pré-Código integral. O leitor encontra a Catedral-Mãe antes de seu colapso, as Famílias-Pilastra ascendentes, os primeiros conjuradores rúnicos antes que o termo conjurador existisse, e a fundação da linhagem Vance que culminará sete gerações depois em Gustaf VII Tavus Vance, prodígio analítico de onze anos canônicos.
+Tomo 1 cobre o Frontispício do projeto, a Cosmologia fundacional e Era 1 Pré-Código integral. O leitor encontra a Catedral-Mãe antes de seu colapso, as Famílias-Pilastra ascendentes, os primeiros conjuradores de token antes que o termo conjurador existisse, e a fundação da linhagem Vance que culminará sete gerações depois em Gustaf VII Tavus Vance, prodígio analítico de onze anos canônicos.
 
 Os cinco pillars do projeto orientam toda decisão narrativa: lógica vence força, sistema formal é computável, triângulo de hardware ortodôntico-óculos-Tavus-Drive define mecânica de combate, prodígio de onze anos não é power-fantasy adulta, setting bipartido entre megacidade e Selve permanece deliberado até o ato final.
 
@@ -142,11 +142,11 @@ Código de barras placeholder no canto inferior direito.
 
 Sinopse worldbuilding (cerca de 230 palavras):
 
-"Tomo 2 da Bíblia Worldbuilding GusWorld Volume 1 cobre as Eras 2 Consolidação Catedrática e 3 Presente Computável, a Magia formalizada como linguagem rúnica de baixo nível, os Personagens canônicos da party Gus Vector e seus seis companions, as Linhagens Vance e correlatas, os oito Settings de GusWorld City e da Selve Sombria, as sete Facções políticas ativas, os Antagonistas Sterling Locke e Patch-Zero, o Stinger final e os Apêndices técnicos.
+"Tomo 2 da Bíblia Worldbuilding GusWorld Volume 1 cobre as Eras 2 Consolidação Catedrática e 3 Presente Computável, a Magia formalizada como linguagem de conjuro de baixo nível, os Personagens canônicos da party Gus Vector e seus seis companions, as Linhagens Vance e correlatas, os oito Settings de GusWorld City e da Selve Sombria, as sete Facções políticas ativas, os Antagonistas Sterling Locke e Patch-Zero, o Stinger final e os Apêndices técnicos.
 
 Sterling Corp dominou o século presente com capitalismo de compadrio que distorce livres trocas legítimas. Contra ele se levantam as Famílias-Pilastra remanescentes, o Pelicano Branco resistente e a linhagem Vance que volta ao centro através de um menino de onze anos.
 
-A magia neste mundo se compila em runas que executam funções verificáveis. Bugs existem. Vírus existem. Quem programa errado morre certo.
+A magia neste mundo se compila em Glyphs que executam funções verificáveis. Bugs existem. Vírus existem. Quem programa errado morre certo.
 
 Dragon Victory é canon: Gustaf VII Tavus Vance, codinome Vector, herda o codinome Dragon de seu ancestral Pyotor I Draco Vance através do Vyrdragon. O destino dessa herança se decide em combate contra Sterling Locke, e a condição é o perdão prévio de Dante Grid.
 

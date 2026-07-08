@@ -69,7 +69,7 @@ Atribuição: liturgia Cordó-Cristal, refrão canon Era 1 §6.2. Cross-ref cano
 
 > *"Compilo, logo respondo."*
 
-Atribuição: **Bento "Requiem" Chevalier**, frase canônica em registro asmódico. Cross-ref canon: R9 conto 4. Função semântica: paródia escolástica filtrada por linguagem mágica. A frase faz humor em dupla camada: invoca Descartes para subverter o cogito (existir cede lugar a compilar), e ao mesmo tempo demarca a identidade de Bento como tanque por temporização, não por força bruta. O verbo *compilar* é tecnicamente preciso: Bento converte intenção em bytecode rúnico antes de qualquer outro membro da party.
+Atribuição: **Bento "Requiem" Chevalier**, frase canônica em registro asmódico. Cross-ref canon: R9 conto 4. Função semântica: paródia escolástica filtrada por linguagem mágica. A frase faz humor em dupla camada: invoca Descartes para subverter o cogito (existir cede lugar a compilar), e ao mesmo tempo demarca a identidade de Bento como tanque por temporização, não por força bruta. O verbo *compilar* é tecnicamente preciso: Bento converte intenção em bytecode de conjuro antes de qualquer outro membro da party.
 
 ### Citação 10
 

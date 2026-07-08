@@ -43,7 +43,7 @@ Toda feature do jogo responde: "qual pillar serve?". Não serve = corta.
 
 - **Active turn-based** sem timer no turno do jogador; **timed inputs opcionais** dão bônus (skipável sem punição).
 - **Wait-mode toggle** (acessibilidade): user pode ligar/desligar pressão temporal.
-- **Compilação de Deck Rúnico** com 40-60 cartas curadas, deck 15 em campo, mestria por uso.
+- **Compilação do Codex** com 40-60 cartas curadas, deck 15 em campo, mestria por uso.
 - **Telegrafia condicional**: 1º encontro com inimigo = surpresa. 2º+ = óculos táticos revelam próximo ataque **consumindo recurso** (energia/AP/turno parcial). Vetor do Gambito complementa.
 - **RNG calibrado**: hit/dodge/crit com % visível; Gambito permite forçar re-roll ou cancelar; RNG **decai com knowledge** (Knowledge Progression).
 - **Puzzles ambientais** que ensinam o sistema.

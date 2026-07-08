@@ -2,7 +2,7 @@
 
 **Status:** Canônico. Decisões ratificadas pelo criador supremo em 2026-05-26 (proposta de combate aprovada integralmente, sem reabertura). Spec de produção para implementação TDD da Fase 2 (vertical slice F2-E.5). **Evolução 2026-06-22 (M5-DMG):** §11 ganhou o sorteio de canal FALHA/CRIT/COMUM sobre a variância Knowledge; a §11 deixa de ser paridade com o C# (que morre no M8) e passa a ser o contrato do motor C++.
 
-**Cross-ref pillars:** este sistema materializa GDD §6.1 (Sintonização Ortodôntica / Scan), §6.2 (Compilação de Deck Rúnico) e §6.3 (Vetores do Gambito), e serve diretamente Pillar 1 (Lógica vence força), Pillar 2 (Magia é sistema formal computável), Pillar 3 (Triângulo de hardware é a interface) e Pillar 4 (Prodígio de 11 anos, vulnerabilidade física + vitória por descoberta).
+**Cross-ref pillars:** este sistema materializa GDD §6.1 (Sintonização Ortodôntica / Scan), §6.2 (Compilação do Codex) e §6.3 (Vetores do Gambito), e serve diretamente Pillar 1 (Lógica vence força), Pillar 2 (Magia é sistema formal computável), Pillar 3 (Triângulo de hardware é a interface) e Pillar 4 (Prodígio de 11 anos, vulnerabilidade física + vitória por descoberta).
 
 **Convenção de escrita:** pt-br. Termos técnicos de game-dev no original (turn-based, core loop, FSM, intent, telegraph, knockback etc). Sem em-dash; usa ponto, vírgula, parênteses, dois-pontos.
 
