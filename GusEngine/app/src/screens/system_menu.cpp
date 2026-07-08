@@ -759,4 +759,27 @@ bool system_menu_hover_entered_new_item(int previous_index, int current_index) n
     return ui_hover_entered_new_item(previous_index, current_index);
 }
 
+int system_menu_keyboard_focus_index(const SystemMenuState& state) noexcept {
+    switch (state.screen) {
+        case SystemMenuScreen::Pause:
+            return state.pause_selected;
+        case SystemMenuScreen::ConfigCategories:
+            return state.config_categories_selected;
+        case SystemMenuScreen::Audio:
+            return state.audio_selected;
+        case SystemMenuScreen::Controls:
+            if (state.controls_capturing) return -1;
+            if (state.controls_confirming_restore) return state.controls_restore_confirm_selected;
+            if (state.controls_confirming_discard) return state.controls_discard_confirm_selected;
+            return state.controls_selected;
+        case SystemMenuScreen::Save:
+        case SystemMenuScreen::Video:
+        case SystemMenuScreen::Language:
+            return kPlaceholderBackIndex;
+        case SystemMenuScreen::Hidden:
+            return -1;
+    }
+    return -1;
+}
+
 }  // namespace gus::app::screens

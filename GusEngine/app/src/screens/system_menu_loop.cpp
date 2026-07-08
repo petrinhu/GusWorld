@@ -526,6 +526,45 @@ SystemMenuLoopOutcome run_system_menu_loop_gl_current(
         return false;
     };
 
+    // NAVEGACAO POR TECLADO (nao confirm-key: setas/WASD/LEFT/RIGHT/ESC) - SOM
+    // DE HOVER PARIDADE (retoque ao vivo do lider, pos-tela Controles
+    // aprovada): move a selecao (system_menu_key_down) e, SO quando a selecao
+    // mudou pra um item NOVO na MESMA tela (edge-detect via
+    // system_menu_keyboard_focus_index + system_menu_hover_entered_new_item -
+    // AS MESMAS 2 funcoes puras que handle_mouse_motion acima ja usa pro
+    // hover de MOUSE, NADA duplicado), toca hover_sfx no MESMO choke-point
+    // (audio.play_sfx(hover_sfx_id)) que o mouse ja usa. O guard `state.screen
+    // == screen_before` barra TROCA DE TELA (ex.: ESC subindo um nivel, ou
+    // ESC abrindo o mini-dialogo de descarte NAO muda de tela, entao esse
+    // caso especifico passa pelo guard normalmente): trocar de tela NAO e
+    // "navegar pra um item novo" (ela ja tem seu proprio feedback - o flash
+    // .pressed de Enter/click, quando aplicavel; ESC hoje nao tem flash, fora
+    // de escopo mudar aqui) e comparar indices ENTRE telas diferentes nao
+    // faz sentido (pause_selected=2 e "Configuracoes", config_categories_
+    // selected=2 e "Controles" - numeros iguais, significados diferentes).
+    // LEFT/RIGHT/A/D no slider da tela Audio (ajusta volume, NAO navega -
+    // audio_selected fica intocado) naturalmente NAO dispara (indice
+    // antes==depois, edge-detect nao acha "item novo"). Fatorada em lambda
+    // pra ser o UNICO choke-point tanto do SDL_EVENT_KEY_DOWN real (ramo
+    // nao-confirm mais abaixo) quanto do self-test headless
+    // (GUSWORLD_SYSMENU_KEYBOARD_HOVER_SELFTEST, ver mais abaixo) - MESMA
+    // receita de handle_mouse_motion/flash_pressed acima (1 unico lugar,
+    // reusado pelos dois canais/caminhos, sem duplicar logica de som).
+    // Devolve o mesmo bool de handle_action (true = o CHAMADOR deve retornar
+    // `outcome` na hora).
+    auto handle_navigation_key = [&](SDL_Keycode key) -> bool {
+        const SystemMenuScreen screen_before = state.screen;
+        const int kb_index_before = system_menu_keyboard_focus_index(state);
+        const SystemMenuAction action = system_menu_key_down(state, key);
+        if (state.screen == screen_before) {
+            const int kb_index_after = system_menu_keyboard_focus_index(state);
+            if (system_menu_hover_entered_new_item(kb_index_before, kb_index_after)) {
+                audio.play_sfx(hover_sfx_id);
+            }
+        }
+        return handle_action(action);
+    };
+
     // Confirma se `action` merece o flash de PRESS (ver topo do arquivo): SO as
     // acoes que de fato "acionam uma opcao" (pill/categoria/Voltar/Aplicar) -
     // nunca VolumeChanged (drag de slider nao pisca) nem None (nao aconteceu
@@ -588,6 +627,117 @@ SystemMenuLoopOutcome run_system_menu_loop_gl_current(
                   << "x (esperado 1) - total sfx_play_count()=" << audio.sfx_play_count()
                   << "\n";
         (void)handle_action(click_action);  // fecha o menu (Continuar) - outcome ja refletido
+        return outcome;
+    }
+
+    // DIAGNOSTICO/PROVA (PARIDADE SOM DE HOVER TECLADO x MOUSE, retoque ao vivo
+    // do lider pos-tela Controles aprovada):
+    // GUSWORLD_SYSMENU_KEYBOARD_HOVER_SELFTEST=1 prova que handle_navigation_key
+    // (MESMO caminho de codigo do SDL_EVENT_KEY_DOWN nao-confirm real acima) toca
+    // hover_sfx EXATAMENTE quando a navegacao por TECLADO move a selecao pra um
+    // item NOVO na MESMA tela (edge-detect), e NAO toca em (a) no-op de
+    // navegacao (tecla sem efeito na selecao, ex. LEFT em Pause), (b) ajuste de
+    // slider (LEFT/RIGHT no Audio muda volume, nao indice), nem (c) troca de
+    // TELA (ESC subindo de nivel) - tudo SEM SDL_PushEvent/input real, headless,
+    // SEM tocar hardware de audio, sfx_play_count() como hook de prova. MESMO
+    // espirito de GUSWORLD_SYSMENU_HOVER_SELFTEST acima (canal MOUSE) - aqui o
+    // canal e TECLADO.
+    const char* keyboard_hover_selftest =
+        std::getenv("GUSWORLD_SYSMENU_KEYBOARD_HOVER_SELFTEST");
+    if (keyboard_hover_selftest != nullptr && keyboard_hover_selftest[0] != '\0') {
+        present_frame();  // assenta o layout (mesma cautela dos demais self-tests)
+
+        // Pause (4 itens, item 0 "Continuar" selecionado por system_menu_open ja
+        // chamado acima): 3x DOWN move 0->1->2->3 - 3 itens NOVOS, 3 sons.
+        const unsigned int baseline_down3 = audio.sfx_play_count();
+        for (int i = 0; i < 3; ++i) {
+            if (handle_navigation_key(SDLK_DOWN)) return outcome;
+        }
+        const unsigned int after_down3 = audio.sfx_play_count() - baseline_down3;
+        std::cout << "SystemMenuLoop: [selftest][KEYBOARD-HOVER] Pause 3x DOWN: "
+                     "pause_selected="
+                  << state.pause_selected << " (esperado 3); hover_sfx tocou "
+                  << after_down3 << "x (esperado 3) - "
+                  << (state.pause_selected == 3 && after_down3 == 3 ? "OK" : "FALHOU")
+                  << "\n";
+
+        // NO-OP: LEFT nao tem efeito de navegacao em Pause (handle_pause_key so
+        // trata UP/DOWN/ESC/RETURN/SPACE - default case, sem mudar
+        // pause_selected) - selecao intocada, hover_sfx NAO deve tocar.
+        const unsigned int baseline_left = audio.sfx_play_count();
+        if (handle_navigation_key(SDLK_LEFT)) return outcome;
+        const unsigned int after_left = audio.sfx_play_count() - baseline_left;
+        std::cout << "SystemMenuLoop: [selftest][KEYBOARD-HOVER] Pause LEFT "
+                     "(no-op, sem efeito de navegacao): pause_selected="
+                  << state.pause_selected << " (esperado 3, intocado); hover_sfx "
+                     "tocou "
+                  << after_left << "x (esperado 0) - "
+                  << (state.pause_selected == 3 && after_left == 0 ? "OK" : "FALHOU")
+                  << "\n";
+
+        // WRAP: mais 1 DOWN (3->0) - AINDA um item NOVO (diferente do anterior) -
+        // edge-detect continua disparando atraves do wrap-around (wrap_move nunca
+        // repete o indice anterior quando count>1).
+        const unsigned int baseline_wrap = audio.sfx_play_count();
+        if (handle_navigation_key(SDLK_DOWN)) return outcome;
+        const unsigned int after_wrap = audio.sfx_play_count() - baseline_wrap;
+        std::cout << "SystemMenuLoop: [selftest][KEYBOARD-HOVER] Pause DOWN (wrap "
+                     "3->0): pause_selected="
+                  << state.pause_selected << " (esperado 0); hover_sfx tocou "
+                  << after_wrap << "x (esperado 1) - "
+                  << (state.pause_selected == 0 && after_wrap == 1 ? "OK" : "FALHOU")
+                  << "\n";
+
+        // TROCA DE TELA nao conta como navegacao: forca "Configuracoes"
+        // selecionado e ENTER (confirm-key, FORA de handle_navigation_key - MESMO
+        // roteamento do while(true) de producao, ver o ramo is_confirm_key acima)
+        // pra entrar em ConfigCategories.
+        state.pause_selected = static_cast<int>(PauseItem::Settings);
+        (void)handle_action(system_menu_key_down(state, SDLK_RETURN));
+        const bool entered_config = state.screen == SystemMenuScreen::ConfigCategories;
+
+        // ESC (NAO e confirm-key - passa por handle_navigation_key igual a
+        // qualquer seta) sobe de volta pra Pause: TROCA DE TELA - o guard
+        // `state.screen == screen_before` (dentro de handle_navigation_key) barra
+        // o hover_sfx mesmo que os indices numericos difiram entre as duas telas
+        // (comparar entre telas diferentes nao faz sentido, ver o comentario da
+        // lambda acima).
+        const unsigned int baseline_esc = audio.sfx_play_count();
+        if (handle_navigation_key(SDLK_ESCAPE)) return outcome;
+        const unsigned int after_esc = audio.sfx_play_count() - baseline_esc;
+        std::cout << "SystemMenuLoop: [selftest][KEYBOARD-HOVER] ESC troca de "
+                     "tela (ConfigCategories->Pause, entrou_em_config="
+                  << entered_config << "): screen_apos="
+                  << (state.screen == SystemMenuScreen::Pause ? "Pause" : "outro")
+                  << " hover_sfx tocou " << after_esc
+                  << "x (esperado 0, guard de tela barra) - "
+                  << (entered_config && state.screen == SystemMenuScreen::Pause &&
+                              after_esc == 0
+                          ? "OK"
+                          : "FALHOU")
+                  << "\n";
+
+        // SLIDER (Audio): LEFT/RIGHT ajustam volume (VolumeChanged), NAO navegam
+        // (audio_selected fica intocado) - hover_sfx NAO deve tocar. Entra em
+        // Configuracoes (Audio ja selecionado, indice 0 - reset por
+        // handle_pause_key/SDLK_RETURN acima) -> Audio (Musica, indice 0), ambos
+        // ENTER (confirm-key, fora de handle_navigation_key).
+        (void)handle_action(system_menu_key_down(state, SDLK_RETURN));  // -> ConfigCategories
+        (void)handle_action(system_menu_key_down(state, SDLK_RETURN));  // -> Audio
+        const bool entered_audio = state.screen == SystemMenuScreen::Audio;
+        const unsigned int baseline_slider = audio.sfx_play_count();
+        if (handle_navigation_key(SDLK_LEFT)) return outcome;
+        const unsigned int after_slider = audio.sfx_play_count() - baseline_slider;
+        std::cout << "SystemMenuLoop: [selftest][KEYBOARD-HOVER] Audio LEFT "
+                     "(ajusta volume, nao navega, entrou_em_audio="
+                  << entered_audio << "): audio_selected=" << state.audio_selected
+                  << " (esperado 0, Musica); hover_sfx tocou " << after_slider
+                  << "x (esperado 0, e slider, nao navegacao) - "
+                  << (entered_audio && state.audio_selected == 0 && after_slider == 0
+                          ? "OK"
+                          : "FALHOU")
+                  << "\n";
+
         return outcome;
     }
 
@@ -962,9 +1112,10 @@ SystemMenuLoopOutcome run_system_menu_loop_gl_current(
                     if (is_confirming(action)) flash_pressed(pre_action_state, item_index);
                     if (handle_action(action)) return outcome;
                 } else {
-                    const SystemMenuAction action =
-                        system_menu_key_down(state, ev.key.key);
-                    if (handle_action(action)) return outcome;
+                    // Nao-confirm-key (setas/WASD/LEFT/RIGHT/ESC): handle_navigation_key
+                    // (ver seu comentario acima) ja cobre system_menu_key_down +
+                    // handle_action + o SOM DE HOVER PARIDADE na navegacao.
+                    if (handle_navigation_key(ev.key.key)) return outcome;
                 }
             } else if (ev.type == SDL_EVENT_MOUSE_BUTTON_DOWN &&
                        ev.button.button == SDL_BUTTON_LEFT) {

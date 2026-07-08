@@ -1189,6 +1189,103 @@ TEST_CASE("system_menu_hover_entered_new_item: dispara so ao ENTRAR num item "
     REQUIRE(system_menu_hover_entered_new_item(-1, 2) == true);  // reentrou no 2: dispara
 }
 
+// ------------------------------------- system_menu_keyboard_focus_index (paridade SFX)
+//
+// SOM DE HOVER PARIDADE TECLADO x MOUSE (retoque ao vivo do lider): a funcao e
+// PURA (so LE o campo *_selected relevante da tela ATUAL) - ver o comentario
+// extenso no header. Testes cobrem as 4 telas com mais de 1 item + os 2
+// mini-dialogos de Controles + controls_capturing + placeholder + Hidden.
+
+TEST_CASE("system_menu_keyboard_focus_index: Pause devolve pause_selected",
+          "[system_menu][keyboard-hover]") {
+    SystemMenuState state;
+    system_menu_open(state);  // screen=Pause, pause_selected=0
+    REQUIRE(system_menu_keyboard_focus_index(state) == 0);
+    state.pause_selected = static_cast<int>(PauseItem::Quit);
+    REQUIRE(system_menu_keyboard_focus_index(state) == static_cast<int>(PauseItem::Quit));
+}
+
+TEST_CASE("system_menu_keyboard_focus_index: ConfigCategories devolve "
+          "config_categories_selected",
+          "[system_menu][keyboard-hover]") {
+    SystemMenuState state;
+    state.screen = SystemMenuScreen::ConfigCategories;
+    state.config_categories_selected = static_cast<int>(ConfigCategoryItem::Controls);
+    REQUIRE(system_menu_keyboard_focus_index(state) ==
+            static_cast<int>(ConfigCategoryItem::Controls));
+}
+
+TEST_CASE("system_menu_keyboard_focus_index: Audio devolve audio_selected",
+          "[system_menu][keyboard-hover]") {
+    SystemMenuState state;
+    state.screen = SystemMenuScreen::Audio;
+    state.audio_selected = static_cast<int>(AudioItem::Sfx);
+    REQUIRE(system_menu_keyboard_focus_index(state) == static_cast<int>(AudioItem::Sfx));
+}
+
+TEST_CASE("system_menu_keyboard_focus_index: Controls navegacao normal "
+          "devolve controls_selected",
+          "[system_menu][keyboard-hover]") {
+    SystemMenuState state;
+    state.screen = SystemMenuScreen::Controls;
+    state.controls_selected = 12;
+    REQUIRE(system_menu_keyboard_focus_index(state) == 12);
+}
+
+TEST_CASE("system_menu_keyboard_focus_index: Controls capturando tecla "
+          "devolve -1 (sem navegacao nesse modo)",
+          "[system_menu][keyboard-hover]") {
+    SystemMenuState state;
+    state.screen = SystemMenuScreen::Controls;
+    state.controls_selected = 5;
+    state.controls_capturing = true;
+    REQUIRE(system_menu_keyboard_focus_index(state) == -1);
+}
+
+TEST_CASE("system_menu_keyboard_focus_index: Controls confirmando "
+          "restaurar-padrao devolve a pill Sim/Nao (nao controls_selected)",
+          "[system_menu][keyboard-hover]") {
+    SystemMenuState state;
+    state.screen = SystemMenuScreen::Controls;
+    state.controls_selected = 5;  // deve ser IGNORADO enquanto o dialogo estiver aberto
+    state.controls_confirming_restore = true;
+    state.controls_restore_confirm_selected = 0;  // Sim
+    REQUIRE(system_menu_keyboard_focus_index(state) == 0);
+    state.controls_restore_confirm_selected = 1;  // Nao
+    REQUIRE(system_menu_keyboard_focus_index(state) == 1);
+}
+
+TEST_CASE("system_menu_keyboard_focus_index: Controls confirmando descarte "
+          "devolve a pill Sim/Nao (nao controls_selected)",
+          "[system_menu][keyboard-hover]") {
+    SystemMenuState state;
+    state.screen = SystemMenuScreen::Controls;
+    state.controls_selected = 7;  // deve ser IGNORADO enquanto o dialogo estiver aberto
+    state.controls_confirming_discard = true;
+    state.controls_discard_confirm_selected = 0;  // Sim
+    REQUIRE(system_menu_keyboard_focus_index(state) == 0);
+    state.controls_discard_confirm_selected = 1;  // Nao
+    REQUIRE(system_menu_keyboard_focus_index(state) == 1);
+}
+
+TEST_CASE("system_menu_keyboard_focus_index: placeholders (Save/Video/"
+          "Language) sempre devolvem kPlaceholderBackIndex",
+          "[system_menu][keyboard-hover]") {
+    SystemMenuState state;
+    state.screen = SystemMenuScreen::Save;
+    REQUIRE(system_menu_keyboard_focus_index(state) == kPlaceholderBackIndex);
+    state.screen = SystemMenuScreen::Video;
+    REQUIRE(system_menu_keyboard_focus_index(state) == kPlaceholderBackIndex);
+    state.screen = SystemMenuScreen::Language;
+    REQUIRE(system_menu_keyboard_focus_index(state) == kPlaceholderBackIndex);
+}
+
+TEST_CASE("system_menu_keyboard_focus_index: Hidden (menu fechado) devolve -1",
+          "[system_menu][keyboard-hover]") {
+    SystemMenuState state;  // screen == Hidden por default
+    REQUIRE(system_menu_keyboard_focus_index(state) == -1);
+}
+
 // ------------------------------------------------- BUG-A (Voltar morto, M2)
 //
 // controls_row_visible_in_list: filtra linhas de `.ctrl-list` (overflow-y:auto)

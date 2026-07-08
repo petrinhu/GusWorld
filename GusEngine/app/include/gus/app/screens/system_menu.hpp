@@ -470,6 +470,42 @@ inline constexpr int kSystemMenuMaxHoverItems = kControlsItemCount;
 [[nodiscard]] bool system_menu_hover_entered_new_item(int previous_index,
                                                        int current_index) noexcept;
 
+// ------------------------------------------------ NAVEGACAO POR TECLADO (paridade de SFX)
+//
+// SOM DE HOVER PARIDADE TECLADO x MOUSE (retoque ao vivo do lider, pos-tela
+// Controles aprovada): navegar por TECLADO/gamepad (mudar a selecao com
+// setas/WASD, SEM confirmar) deve tocar o MESMO SFX de hover que o mouse ja
+// toca ao entrar num item novo (ver system_menu_hover_entered_new_item acima).
+// Diferente do hover de mouse (que precisa de uma consulta GL -
+// glintfx::UiLayer::get_element_box - pra saber ONDE o cursor esta), o foco de
+// TECLADO e 100% estado: cada tela ja guarda seu proprio indice selecionado
+// (pause_selected/config_categories_selected/audio_selected/
+// controls_selected, ou a pill Sim/Nao de um mini-dialogo aberto). Por isso a
+// funcao abaixo e PURA desde sempre (sem contraparte GL-heavy no CHAMADOR, ao
+// contrario de current_hover_index/system_menu_hover_index em
+// system_menu_loop.cpp) - so LE o campo relevante da tela ATUAL.
+
+// Indice do item ATUALMENTE com foco de TECLADO na tela state.screen - MESMA
+// convencao de indices de system_menu_click_option: Pause=pause_selected,
+// ConfigCategories=config_categories_selected, Audio=audio_selected,
+// Controls= a pill do mini-dialogo ativo
+// (controls_restore_confirm_selected/controls_discard_confirm_selected) OU
+// controls_selected na navegacao normal - EXCETO controls_capturing==true
+// (aguardando uma tecla FISICA virar binding - nao ha "navegacao" nesse modo,
+// devolve -1 defensivamente, MESMO valor que "fora de qualquer item" no
+// hover de mouse). Save/Video/Language (placeholder, 1 unico item) devolvem
+// SEMPRE kPlaceholderBackIndex (nunca dispara edge-detect - nao ha pra onde
+// "entrar", o unico item ja esta sempre focado). Hidden devolve -1 (menu
+// fechado). Usado pelo CHAMADOR (system_menu_loop.cpp) junto com
+// system_menu_hover_entered_new_item pra decidir quando tocar o SFX de hover
+// na navegacao por teclado (MESMO choke-point audio.play_sfx(hover_sfx_id)
+// que o hover de mouse ja usa - sem duplicar logica de som). O CHAMADOR e
+// responsavel por so comparar indices ANTES/DEPOIS de uma MESMA tela (troca
+// de tela muda o SIGNIFICADO do indice - comparar entre telas diferentes nao
+// faz sentido, ver o guard `state.screen == screen_before` em
+// system_menu_loop.cpp).
+[[nodiscard]] int system_menu_keyboard_focus_index(const SystemMenuState& state) noexcept;
+
 }  // namespace gus::app::screens
 
 #endif  // GUS_APP_SCREENS_SYSTEM_MENU_HPP
