@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GusWorld - Mock Icone do App (opcoes com Gus pixelado)</title>
+<style>
+  :root{
+    --bg-deep:#0A0E1A; --bg-mid:#1B2238; --bg-light:#3A4566;
+    --cyan:#22D3EE; --brass:#C9A24B; --brass-dark:#7A5A2E; --brass-light:#F0D98C;
+    --text-1:#E7ECF5; --text-2:#9AA5C0;
+    --font-ui:"Courier New", ui-monospace, "Consolas", monospace;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{background:#0b0f1a;color:var(--text-1);font-family:var(--font-ui);padding:30px 20px 60px}
+  .doc-head{max-width:1100px;margin:0 auto 24px;text-align:center}
+  .doc-head .kicker{color:var(--brass);letter-spacing:3px;font-size:11px;text-transform:uppercase}
+  .doc-head h1{font-size:18px;margin:6px 0 4px;color:#fff}
+  .doc-head p{color:var(--text-2);font-size:12px;line-height:1.6;margin:0}
+  .doc-head b{color:var(--brass-light)}
+  img{image-rendering:pixelated}
+
+  .grid{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:18px}
+  .card{background:#121a2e;border:1px solid #2a3450;border-radius:10px;padding:16px;display:flex;flex-direction:column;align-items:center;gap:10px}
+  .card .opt{color:var(--brass-light);font-size:12px;letter-spacing:1px}
+  .card .desc{color:var(--text-2);font-size:10px;text-align:center;line-height:1.5;min-height:28px}
+  .big{width:112px;height:112px;display:flex;align-items:center;justify-content:center;overflow:hidden}
+  .big img{width:100%;height:100%;object-fit:contain}
+  /* previews em tamanhos reais de icone */
+  .sizes{display:flex;align-items:flex-end;gap:14px;margin-top:2px}
+  .sz{display:flex;flex-direction:column;align-items:center;gap:3px}
+  .sz .lbl{color:var(--text-2);font-size:9px}
+  .i48{width:48px;height:48px} .i32{width:32px;height:32px} .i16{width:16px;height:16px}
+  .sz .box{display:flex;align-items:center;justify-content:center;overflow:hidden}
+  .sz .box img{width:100%;height:100%;object-fit:contain}
+
+  /* tratamentos */
+  .t-raw{background:transparent}
+  .t-dark{background:radial-gradient(circle at 50% 35%,#1b2238,#0a0e1a)}
+  .t-brass{background:radial-gradient(circle at 50% 35%,#2a2113,#15100a);border:2px solid var(--brass);border-radius:14px}
+  .t-cyan{background:radial-gradient(circle at 50% 35%,#0e2230,#0a0e1a);box-shadow:inset 0 0 22px rgba(34,211,238,.35)}
+  .t-round{border-radius:22%}
+  .t-round-mini{border-radius:22%}
+
+  .barsim{max-width:1100px;margin:26px auto 0;background:#10172a;border:1px solid #2a3450;border-radius:8px;padding:14px 18px}
+  .barsim h3{color:var(--text-1);font-size:12px;margin:0 0 10px}
+  .taskbar{display:flex;align-items:center;gap:8px;background:#1c1c22;border-radius:6px;padding:6px 10px;width:fit-content}
+  .taskbar .tb{width:28px;height:28px;border-radius:5px;overflow:hidden;display:flex;align-items:center;justify-content:center;background:#0a0e1a}
+  .taskbar .tb img{width:100%;height:100%;object-fit:contain;image-rendering:pixelated}
+  .taskbar .tb.generic{background:#e8e8e8;color:#333;font-weight:bold;font-family:sans-serif;font-size:16px}
+
+  .note{max-width:1100px;margin:20px auto 0;background:#10172a;border:1px solid #2a3450;border-radius:8px;padding:14px 18px;color:var(--text-2);font-size:12px;line-height:1.7}
+  .note b{color:#fff}
+  .P{--img:""}
+</style>
+</head>
+<body>
+
+  <div class="doc-head">
+    <div class="kicker">GusWorld - Icone do App (janela / barra de tarefas)</div>
+    <h1>Opcoes de icone usando os PNGs pixelados do Gus (ja existentes)</h1>
+    <p>Hoje o app abre com o <b>"W" generico</b> (sem icone). Aqui varias opcoes reusando arte do Gus que ja temos, cada uma
+    mostrada GRANDE + nos tamanhos REAIS de icone (48 / 32 / 16 px), que e o que aparece na barra de tarefas. <b>Nenhuma imagem nova gerada</b>: so tratamento.</p>
+  </div>
+
+  <div class="grid">
+
+    <!-- A: retrato busto, fundo escuro, cantos arredondados -->
+    <div class="card">
+      <div class="opt">A - Retrato + fundo escuro</div>
+      <div class="big t-dark t-round"><img src="../../../resources/sprites/icons-m5/retratos/retrato_gus.png" alt=""></div>
+      <div class="desc">Busto do Gus sobre gradiente escuro, cantos arredondados. Rosto = reconhecivel mesmo pequeno.</div>
+      <div class="sizes">
+        <div class="sz"><div class="box i48 t-dark t-round-mini"><img src="../../../resources/sprites/icons-m5/retratos/retrato_gus.png"></div><span class="lbl">48</span></div>
+        <div class="sz"><div class="box i32 t-dark t-round-mini"><img src="../../../resources/sprites/icons-m5/retratos/retrato_gus.png"></div><span class="lbl">32</span></div>
+        <div class="sz"><div class="box i16 t-dark"><img src="../../../resources/sprites/icons-m5/retratos/retrato_gus.png"></div><span class="lbl">16</span></div>
+      </div>
+    </div>
+
+    <!-- B: retrato feliz, fundo latao com moldura -->
+    <div class="card">
+      <div class="opt">B - Retrato feliz + moldura latao</div>
+      <div class="big t-brass"><img src="../../../resources/sprites/icons-m5/retratos/retrato_gus_feliz.png" alt=""></div>
+      <div class="desc">Gus sorrindo, moldura de latao (identidade visual do jogo). Convidativo.</div>
+      <div class="sizes">
+        <div class="sz"><div class="box i48 t-brass"><img src="../../../resources/sprites/icons-m5/retratos/retrato_gus_feliz.png"></div><span class="lbl">48</span></div>
+        <div class="sz"><div class="box i32 t-brass"><img src="../../../resources/sprites/icons-m5/retratos/retrato_gus_feliz.png"></div><span class="lbl">32</span></div>
+        <div class="sz"><div class="box i16"><img src="../../../resources/sprites/icons-m5/retratos/retrato_gus_feliz.png"></div><span class="lbl">16</span></div>
+      </div>
+    </div>
+
+    <!-- C: retrato combate sem bg + glow cyan -->
+    <div class="card">
+      <div class="opt">C - Combate + glow cyan</div>
+      <div class="big t-cyan t-round"><img src="../../../resources/sprites/icons-m5/retratos/retrato_gus_combate_nobg.png" alt=""></div>
+      <div class="desc">Gus em pose de combate (fundo transparente) sobre glow cyan (a cor-tema tech). Mais "de acao".</div>
+      <div class="sizes">
+        <div class="sz"><div class="box i48 t-cyan t-round-mini"><img src="../../../resources/sprites/icons-m5/retratos/retrato_gus_combate_nobg.png"></div><span class="lbl">48</span></div>
+        <div class="sz"><div class="box i32 t-cyan t-round-mini"><img src="../../../resources/sprites/icons-m5/retratos/retrato_gus_combate_nobg.png"></div><span class="lbl">32</span></div>
+        <div class="sz"><div class="box i16 t-cyan"><img src="../../../resources/sprites/icons-m5/retratos/retrato_gus_combate_nobg.png"></div><span class="lbl">16</span></div>
+      </div>
+    </div>
+
+    <!-- D: sprite corpo inteiro sobre fundo -->
+    <div class="card">
+      <div class="opt">D - Sprite corpo inteiro</div>
+      <div class="big t-dark t-round"><img src="../../../resources/sprites/personagens_inspirados/gus/gus_front_pixel.png" alt=""></div>
+      <div class="desc">O sprite de frente (corpo inteiro) do overworld. Mais "personagem de jogo", mas fica pequeno no 16px.</div>
+      <div class="sizes">
+        <div class="sz"><div class="box i48 t-dark t-round-mini"><img src="../../../resources/sprites/personagens_inspirados/gus/gus_front_pixel.png"></div><span class="lbl">48</span></div>
+        <div class="sz"><div class="box i32 t-dark t-round-mini"><img src="../../../resources/sprites/personagens_inspirados/gus/gus_front_pixel.png"></div><span class="lbl">32</span></div>
+        <div class="sz"><div class="box i16 t-dark"><img src="../../../resources/sprites/personagens_inspirados/gus/gus_front_pixel.png"></div><span class="lbl">16</span></div>
+      </div>
+    </div>
+
+    <!-- E: retrato 3/4 sobre fundo escuro quadrado -->
+    <div class="card">
+      <div class="opt">E - Retrato 3/4 quadrado</div>
+      <div class="big t-dark"><img src="../../../resources/sprites/personagens_inspirados/gus/retrato_gus_3q.png" alt=""></div>
+      <div class="desc">Busto 3/4 (angulo do jogo), quadrado sem arredondar. Classico e limpo.</div>
+      <div class="sizes">
+        <div class="sz"><div class="box i48 t-dark"><img src="../../../resources/sprites/personagens_inspirados/gus/retrato_gus_3q.png"></div><span class="lbl">48</span></div>
+        <div class="sz"><div class="box i32 t-dark"><img src="../../../resources/sprites/personagens_inspirados/gus/retrato_gus_3q.png"></div><span class="lbl">32</span></div>
+        <div class="sz"><div class="box i16 t-dark"><img src="../../../resources/sprites/personagens_inspirados/gus/retrato_gus_3q.png"></div><span class="lbl">16</span></div>
+      </div>
+    </div>
+
+    <!-- F: retrato conjurando + glow cyan round -->
+    <div class="card">
+      <div class="opt">F - Conjurando + glow cyan</div>
+      <div class="big t-cyan t-round"><img src="../../../resources/sprites/icons-m5/retratos/retrato_gus_conjurando.png" alt=""></div>
+      <div class="desc">Gus conjurando (magia=software). Glow cyan. Comunica o tema tech-magico.</div>
+      <div class="sizes">
+        <div class="sz"><div class="box i48 t-cyan t-round-mini"><img src="../../../resources/sprites/icons-m5/retratos/retrato_gus_conjurando.png"></div><span class="lbl">48</span></div>
+        <div class="sz"><div class="box i32 t-cyan t-round-mini"><img src="../../../resources/sprites/icons-m5/retratos/retrato_gus_conjurando.png"></div><span class="lbl">32</span></div>
+        <div class="sz"><div class="box i16 t-cyan"><img src="../../../resources/sprites/icons-m5/retratos/retrato_gus_conjurando.png"></div><span class="lbl">16</span></div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="barsim">
+    <h3>Como aparece na barra de tarefas (28px) - hoje vs opcoes</h3>
+    <div class="taskbar">
+      <div class="tb generic">W</div>
+      <div class="tb"><img src="../../../resources/sprites/icons-m5/retratos/retrato_gus.png"></div>
+      <div class="tb"><img src="../../../resources/sprites/icons-m5/retratos/retrato_gus_feliz.png"></div>
+      <div class="tb"><img src="../../../resources/sprites/icons-m5/retratos/retrato_gus_combate_nobg.png"></div>
+      <div class="tb"><img src="../../../resources/sprites/personagens_inspirados/gus/gus_front_pixel.png"></div>
+      <div class="tb"><img src="../../../resources/sprites/personagens_inspirados/gus/retrato_gus_3q.png"></div>
+    </div>
+  </div>
+
+  <div class="note">
+    <b>Notas:</b> se alguma imagem nao carregar aqui, e caminho relativo (o Firefox le do disco); me avisa que ajusto.
+    Escolhida a opcao, a implementacao poe o icone na JANELA (SDL: <code>SDL_SetWindowIcon</code>) e gera o arquivo de icone do app
+    (Linux: .png + .desktop; Windows depois: .ico). <b>Decisoes suas:</b> (1) qual opcao (A-F)? (2) fundo escuro / latao / cyan / transparente?
+    (3) cantos arredondados ou quadrado? (4) o Gus sozinho, ou quer que eu tente compor com um simbolo/nome (ex.: "GW") num brainstorm proprio?
+  </div>
+
+</body>
+</html>
