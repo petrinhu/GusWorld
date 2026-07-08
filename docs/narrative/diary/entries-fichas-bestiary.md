@@ -221,7 +221,7 @@ Cada companion tem ficha com 3 estados de Knowledge canônicos:
 
 **Knowledge alta (pós-reveal):**
 
-- Wound canônico declarado: cooperativa familiar Alencar destruída por engenharia financeira FIR-Sterling em -8. Pai **Salviano Alencar** (mecânico independente) morre 6 meses depois de overdose-medicação (oficialmente "acidente"; comunidade suspeita suicídio). Mãe **Edilma Alencar** (44, operária têxtil): aparência pública canon vive reclusa em apartamento subsidiado; estado real (Beat Ten) sequestrada na Caverna dos Perdidos como chantagem Sterling contra Dante. Cross-ref [[lore-bible]]:525 + [[PLACES]]:76.
+- Wound canônico declarado: cooperativa familiar Alencar destruída por engenharia financeira FIR-Sterling em -8. Pai **Salviano Alencar** (mecânico independente) morre 6 meses depois, oficialmente por insuficiência cardíaca (comunidade suspeita que a causa real foi outra). Mãe **Edilma Alencar** (44, operária têxtil): aparência pública canon vive reclusa em apartamento subsidiado; estado real (Beat Ten) sequestrada na Caverna dos Perdidos como chantagem Sterling contra Dante. Cross-ref [[lore-bible]]:525 + [[PLACES]]:76.
 - Wound canônico real: aliciado em -5 por **Diretor Cassiano Vorto** (FIR, 50). Subordinado de fato a Sterling Locke. Handler: Vorto remotamente.
 - "Saída pública em rivalidade com a FIR" foi encenação. Dante continua reportando.
 - Mestor de Periferia: **Padim Tércio Almagre** (58, "tragédia silenciosa"; sente algo mas não verbaliza, [[06-periferia|Periferia §6]]). Vizinhos: **Mestre Hilário Murch** (64, cético) + **Senhor Mateus Penkin** (62, fofoqueiro).

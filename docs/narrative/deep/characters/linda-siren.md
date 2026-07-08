@@ -88,7 +88,7 @@ Com Padrinho Tiago Sevroski, vínculo mentor distante que opera como pai-figura 
 
 Com Mara Bento, vínculo de irmandade operacional. Mara é dezesseis anos mais velha, opera sub-célula Norte, transcreve transmissões em caderno de capa preta. Ensina a Linda a discriminar sinal de ruído em canal degradado. Linda admira a economia dela.
 
-Com Joaquim Bartolomeu, vínculo de oficina. Joaquim restaura toca-discos artesanais, modifica fones industriais, mede tampo de caixa de ressonância com compasso e esquadro de luthieria herdados da bisavó. Linda passa horas em oficina dele observando o ritmo das mãos. Aprende mais ali do que em livro.
+Com Joaquim Bartolomeu, vínculo de oficina. Joaquim restaura toca-discos artesanais, modifica fones industriais, mede tampo de caixa de ressonância com compasso e esquadro de luthieria herdados do bisavô. Linda passa horas em oficina dele observando o ritmo das mãos. Aprende mais ali do que em livro.
 
 Com Helga Riza, vínculo de leitura. Helga compila pichações de Polis-Vermelha em arquivo interno e datilografa em máquina de carro. Linda lê os arquivos em rotação semanal. Discutem em frases curtas. Helga reconhece em Linda a próxima geração que vai sustentar o arquivo.
 

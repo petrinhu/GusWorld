@@ -13,9 +13,9 @@ A sensação dominante é a de uma cidade que **funciona apesar de si mesma**. O
 
 ## 2. Landmarks (5)
 
-**Praça da Compilação (Núcleo Metropolitano).** Centro civil. Pedra Neo-Sylvania pavimenta o chão sob asfalto Era 2 que rachou e expôs blocos hexagonais incrustados de cripto-glifos. No centro, **fonte da Engrenagem-Mestra**: mecanismo de latão Era 1 ainda gira a água numa cadência de razão recorrente. Placa cerimonial Era 2 (nomes dos 4 engenheiros da primeira linha C-Arcane) na lateral. Pedestal Era 3 vazio do lado oposto, "reservado para futuro monumento Sterling Corp" (placa diz; está lá há 8 anos).
+**Praça da Compilação (Núcleo Metropolitano).** Centro civil. Pedra Neo-Sylvania pavimenta o chão sob asfalto Era 2 que rachou e expôs blocos hexagonais incrustados de cripto-glifos. No centro, **fonte da Engrenagem-Mestra**: mecanismo de latão Era 1 ainda gira a água numa cadência de razão recorrente. Pedestal Era 3 vazio do lado oposto, "reservado para futuro monumento Sterling Corp" (placa diz; está lá há 8 anos).
 *Primeira impressão:* fonte de latão antiga girando perfeita no meio de praça enquanto holograma Sterling pisca atrás dela.
-*Gancho exploratório:* placa Era 2 lista 4 nomes; player que decodifica cripto-glifo Era 1 sob o chão descobre 7 nomes em pedra que ninguém mais lê.
+*Gancho exploratório:* placa cerimonial Era 2 no átrio da Universidade Pública (ver landmark Edifício Vance/Núcleo) lista 4 nomes; player que decodifica cripto-glifo Era 1 sob o chão da praça descobre 7 nomes em pedra que ninguém mais lê.
 
 **Tetra-Torre Janelarum (Núcleo Metropolitano, lado norte).** Sede operacional do sistema operacional. Quatro torres geminadas de 12 andares com fachada de painéis de tela que mostram simultaneamente o mesmo conteúdo travando em pacotes de 1 segundo. À noite vira lampejo ciano fantasmagórico sobre o setor. Drones Sterling Corp circulam o último andar.
 *Primeira impressão:* todas as quatro torres mostrando o mesmo erro de carregamento ao mesmo tempo, depois a mesma cena de propaganda 0.3 segundos fora de sincronia.
@@ -40,7 +40,7 @@ A sensação dominante é a de uma cidade que **funciona apesar de si mesma**. O
 | Vitral Neo-Sylvania embutido em parede de banco corporativo | Núcleo Metropolitano, fachada do Banco Central | Era 1 reaproveitada como decoração; Sterling Corp ressignifica antigo como exótico. |
 | Cripto-glifo coberto por cartaz "Sterling Corp parabeniza você" | Anel Verde, base de coluna | Sobreposição literal: presente apaga passado. Cartaz sai com 1 input; cripto-glifo revela coordenada irrelevante (red herring deliberado). |
 | Cronômetro de latão da fonte Engrenagem-Mestra ainda batendo | Praça da Compilação | 700 anos de continuidade analógica. Sons de tique sincronizado em ambient. |
-| Placa cerimonial dos 4 engenheiros C-Arcane | Praça da Compilação | Marco Era 2. Discurso da Pilha acontece aqui anualmente ([[tradicoes-cultura]] §1). |
+| Placa cerimonial dos 4 engenheiros C-Arcane | Átrio da Universidade Pública, Núcleo Metropolitano | Marco Era 2. Discurso da Pilha anual ([[tradicoes-cultura]] §1) referencia a placa. |
 | Pedestal Era 3 vazio "reservado para futuro monumento Sterling Corp" | Praça da Compilação, lado oposto | Espera de 8 anos. Sterling não vai pagar; já comprou a Festa. |
 | Pichação "Compila com a gente" em estêncil preto | Beco entre Núcleo e Periferia | Mesma frase da pichação Polis-Vermelha ([[in-world-docs]] doc 11). Eco. |
 | Bancada solta com placa-mãe Apex-Data Systems sendo dessoldada | Mercado da Sucata Honesta | Era 2 corporativa morta sendo extraída por mão pequena. Inácia Berenger ([[factions]] §1 + [[in-world-docs]] doc 2) ainda guarda peças. |

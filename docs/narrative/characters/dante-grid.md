@@ -157,15 +157,15 @@ Rootkit progride em ondas:
 
 Salviano deixa Dante mexer nas ferramentas. "Cuidado com a torquês: ela morde." Dante pega torquês, finge morder. Salviano ri. Edilma (mãe) chega com café. "Esse menino vai ser mecânico melhor que o pai." Salviano: "ainda bem. eu sou ruim." Dante ri. Cresce na oficina. *Importa porque:* origem aparente do amor pelo trabalho técnico. Família afetuosa, oficina familiar, infância simples e digna.
 
-#### Aos 8 anos, dia da destruição da cooperativa familiar (canônico -8)
+#### Aos 5 anos, dia da destruição da cooperativa familiar (canônico -8)
 
-FIR aparece com "auditoria fiscal". Em 3 horas, fecham a oficina. Salviano não consegue articular. Edilma chora baixo. Dante vê tudo. Aos 6 meses, Salviano morre por "overdose-medicação" (oficialmente acidente; vizinhos suspeitam suicídio). Edilma se isola. Dante (8) começa a passar tempo em garagem improvisada, sozinho. Aos 8, é "encontrado" por Diretor Vorto que oferece "oportunidade de aprendizado técnico subsidiado". Dante aceita. *Importa porque (aparente):* tragédia que justifica desconfiança institucional + necessidade pragmática de aceitar a única oferta disponível.
+FIR aparece com "auditoria fiscal". Em 3 horas, fecham a oficina. Salviano não consegue articular. Edilma chora baixo. Dante vê tudo. Aos 6 meses, Salviano morre (oficialmente insuficiência cardíaca; vizinhos suspeitam suicídio). Edilma se isola. Dante (8) começa a passar tempo em garagem improvisada, sozinho. Aos 8, é "encontrado" por Diretor Vorto que oferece "oportunidade de aprendizado técnico subsidiado". Dante aceita. *Importa porque (aparente):* tragédia que justifica desconfiança institucional + necessidade pragmática de aceitar a única oferta disponível.
 
 ### CAMADA REVELADA: o que player com Knowledge alta cruza retroativamente
 
-#### Aos 8 anos (reinterpretação), no enterro de Salviano
+#### Aos 5 anos (reinterpretação), no enterro de Salviano
 
-Cena que Dante apaga da memória aparente. Edilma soluçando. Dante quieto. Mas no fim da cerimônia, **Vorto** aparece (Dante não esperava). Vorto fica afastado, vestido formal. Quando todos saem, Vorto se aproxima e diz a Dante (8 anos): "se você quiser justiça, eu posso ensinar como funciona." Dante olha. Não responde naquele momento. *Importa porque:* primeira aproximação Vorto-Dante foi no funeral, não 1 ano depois como Dante conta. Vorto já estava de olho. Aliciamento começou enquanto a sepultura ainda estava fresca. Dante sabe disso; mente sobre o cronograma porque doa demais admitir. (Doc 8 [[in-world-docs]] sugere Vorto coordenou patrulha pra "ser salvo" pelo Gus; o padrão é antigo: Vorto orquestra encontros.)
+Cena que Dante apaga da memória aparente. Edilma soluçando. Dante quieto. Mas no fim da cerimônia, **Vorto** aparece (Dante não esperava). Vorto fica afastado, vestido formal. Quando todos saem, Vorto se aproxima e diz a Dante (5 anos): "se você quiser justiça, eu posso ensinar como funciona." Dante olha. Não responde naquele momento. *Importa porque:* primeira aproximação Vorto-Dante foi no funeral, não 1 ano depois como Dante conta. Vorto já estava de olho. Aliciamento começou enquanto a sepultura ainda estava fresca. Dante sabe disso; mente sobre o cronograma porque doa demais admitir. (Doc 8 [[in-world-docs]] sugere Vorto coordenou patrulha pra "ser salvo" pelo Gus; o padrão é antigo: Vorto orquestra encontros.)
 
 #### Aos 10 anos (reinterpretação), primeira "promoção" oferecida por Sterling pessoalmente
 

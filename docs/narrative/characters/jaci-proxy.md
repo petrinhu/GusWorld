@@ -24,7 +24,7 @@
 
 ## Interno
 
-- **Wound:** mãe e pai mortos por surto há 3 anos (causa não confirmada in-world; player atento percebe ligação Sterling Corp tardiamente). Criada pela Anciã Mariana (avó; `factions.md` §4).
+- **Wound:** mãe e pai mortos por surto há 8 anos (causa não confirmada in-world; player atento percebe ligação Sterling Corp tardiamente). Criada pela Anciã Mariana (avó; `factions.md` §4).
 - **Want:** continuar farmacopeia familiar; salvar vilarejo de extinção.
 - **Need:** entender que ela **não consegue curar tudo, e está tudo bem**. Aceitar limites do cuidado. Jaci tende a se sobrecarregar (off-by-one da Cena 9 é metáfora: perde-se contando o que pode salvar).
 - **Belief:** "se eu sintetizar o antídoto certo, ninguém precisa morrer."

@@ -27,7 +27,7 @@ Tom dominante: **densidade orgânica matemática invadida**. Biolúmen contínuo
 
 ### 2.1 Vilarejo do Pelicano Branco
 
-Centro de presença humana da Selve Profunda na borda norte. Aldeia de fronteira aproximadamente quarenta casas baixas de adobe e madeira, telhado de palma trançada num padrão de razão recorrente visível (uma das três visíveis daqui de cima do morro lateral). Praça central com poço, casa da farmacopeia com janelas voltadas pra leste (Jaci trabalha em luz natural quando dá), cabana da Anciã Mariana Vanderbist na ponta sul olhando pra fronteira-Selve. Plantação comunitária ao longo do córrego. Casa-índice da família Vanderbist é a sexta da rua principal (Jaci ainda mora ali com Mariana). Hub canônico do arco Jaci.
+Centro de presença humana da Selve Profunda na borda norte. Aldeia de fronteira com vinte e uma famílias, casas baixas de adobe e madeira, telhado de palma trançada num padrão de razão recorrente visível (uma das três visíveis daqui de cima do morro lateral). Praça central com poço, casa da farmacopeia com janelas voltadas pra leste (Jaci trabalha em luz natural quando dá), cabana da Anciã Mariana Vanderbist na ponta sul olhando pra fronteira-Selve. Plantação comunitária ao longo do córrego. Casa-índice da família Vanderbist é a sexta da rua principal (Jaci ainda mora ali com Mariana). Hub canônico do arco Jaci.
 
 ### 2.2 Trilha de Latão dos Pioneiros
 

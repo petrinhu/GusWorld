@@ -267,7 +267,7 @@ Marca pessoal de cada novo membro Underground. Não é data fixa coletiva; cada 
 
 ### Origem
 
-Cada catedral ativa tem aniversário próprio (data de re-abertura na Era 2). 5 catedrais ativas conhecidas, 5 datas:
+Cada catedral ativa tem aniversário próprio (data de re-abertura na Era 2), exceto a Quinta, cujo nome próprio se perdeu junto à inscrição parcial que a identifica (e a data de fundação junto com ele). 5 catedrais conhecidas (3 ativas + 2 saqueadas), 4 datas registradas:
 
 Canon F5-BK.AUDIT T2-C2 resolução "aliases folk = PLACES canonical": nomes folk preservados em uso popular Era 3 mapeiam a entidades canon PLACES.md §2.
 
@@ -277,7 +277,7 @@ Canon F5-BK.AUDIT T2-C2 resolução "aliases folk = PLACES canonical": nomes fol
 | **Catedral Menor de Atelaiá** | = Catedral de Atelaiá (saqueada -3, contaminada -7/-0.5) | 27 julho | Borda Selve, Norte |
 | **Catedral de São Vargas** | = Catedral de São Vargas (saqueada -3, reocupada parcial) | 19 setembro | (aniversário hoje é vigília) |
 | **Catedral do Equinócio** | = Catedral Quarta (sede informal, ofício cronométrico Era 2) | 21 março (mesma da Vigília) | Combinada |
-| **Catedral Submersa** | = Catedral-Mãe (lendária submersa lacrada -750) | 3 outubro | Próxima a Anel Verde (memorial cerimonial; Mãe propriamente em região Selve Profunda desconhecida) |
+| **A Quinta** | = Catedral Quinta (sede informal, subroutine calendário; em uso ativo Ordem Recursiva) | data perdida (sem registro público) | Dentro da Selve, sítio de inscrição parcial |
 
 ### Tradições
 

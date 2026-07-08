@@ -125,7 +125,7 @@ Cor institucional: branco-estéril + cromo + acento vermelho-laser.
 - **-3**: Catedral de São Vargas saqueada.
 - **-3**: Captura tentada Patch-Zero. Falha parcial.
 - **-2**: Cross-contamination Polis-Vermelha. Cidade-irmã cai.
-- **-0.5**: Eliminação **Aldebrando Chevalier** (pai Bento) em catedral perdida.
+- **-0.5**: Eliminação **Aldebrando Chevalier** (pai Bento) na Catedral Menor de Atelaiá, Vigília de doze mestres, interferência ressonante calibrada (onze sobreviveram).
 - **-0.25**: Patch-Zero escapa do laboratório central. Catalyst do jogo.
 
 ### Não fazer
@@ -412,7 +412,7 @@ Cor institucional: verde-ciano biolúmen + marrom-húmus + branco-fungo.
 
 ### Eventos históricos onde a facção atuou
 
-- **Pré-Era 2**: Aldeias-fronteira atuais descendem de sobreviventes Êxodo Neo-Sylvania (~-720).
+- **Pré-Era 2**: Pelicano Branco descende de sobreviventes do Êxodo Neo-Sylvania (~-720). Os clãs menores do anel oriental tributário (Tucano-Cinza, Pelicano Roxo, Tartaruga-Fractal) têm origem antropológica distinta, Era 1 não-Êxodo (PLACES §4b), e não vêm da mesma leva de refugiados.
 - **-95**: **Anhuera Vanderbist** co-autora Pythia. Aliança fundadora Berenger-Vanderbist consolidada.
 - **-45**: Vilarejo do Pelicano Branco formalizado. **Soraia Vanderbist** lidera.
 - **-8**: Surto silencioso. **Lia e Solano Vanderbist** + **Mestre Loanis Penãoso** + 2 outros não nomeados morrem. Jaci órfã. Mariana assume guarda.

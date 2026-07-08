@@ -8,6 +8,8 @@
 
 ## 1. Origem & biografia
 
+Gustaf VII "Gus" Vector Tavus Vance carrega o nome formal que sete gerações da linhagem repassam desde Gustaf I, o apelido "Gus" estabilizado aos cinco anos como a criança sempre foi chamada em casa. Em campo, quando o Vyrdragon vermelho acorda, é pelo codinome de combate "Dragon" que a party e os inimigos o reconhecem, eco direto do ancestral Pyotor I Draco Vance.
+
 A linhagem Vance é vetor longo de mercadoria livre. Onze gerações documentadas no arquivo restrito da Catedral de São Camilo descem do Comerciante-Itinerante Próspero Vance (Era 1, ~-720), o que distribuía sementes-relíquia clandestinas em vilarejos pré-Êxodo e cruzou o regime calcificado de Hipérides Vyrcátrix com uma sacola de couro e três rotas de fuga memorizadas. A documentação convencional registra a família como Linhagem Próspero Vance (Próspero I, II, Próspera III, e assim por diante até Próspera XI a Comerciante-Itinerante), cruzada em Era 2 com a Linhagem Boroshova-Vance (8 gerações intermediárias, terminando em Yvette Boroshova-Vance, ano -230), o que finalmente convergiu nos contemporâneos: Pyotor Vance, Yakov Vance, e a criança que herda os dois ramos por inteiro, Gus.
 
 Em Era 2, o ramo prosperou. A documentação canônica situa os Vance entre as famílias-pilastra de segunda ordem da Praça da Compilação durante o boom C-Arcane (entre -144 e -89, datações que o arquivo da Catedral mantém em pergaminho duplo, contagem dupla deliberada). Eram donos de uma oficina de bancada na rua que hoje atravessa o Núcleo Metropolitano, e mantinham antena de rádio caseira no telhado, hábito que sobreviveu três gerações até o avô materno do Gus, e ainda mais uma, pois Pyotor montou a sua própria antena no telhado do Edifício Vance antes da separação.
