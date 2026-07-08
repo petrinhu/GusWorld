@@ -6,7 +6,7 @@
 
 Documento leve de delivery. Não é PMO. Autoridade de escopo permanece no GDD (`docs/design/gdd.md`) e nos pillars. Aqui ficam só: critério de pronto por milestone, sequência crítica, riscos e política de buffer.
 
-**Meta VS:** 4-6 meses para um slice coeso jogável de 5-10min que prova os 3 pilares-âncora (Scan, Compilação de Deck, Vetor do Gambito) em uma área-cidade com 1 combate e 1 puzzle.
+**Meta VS:** 4-6 meses para um slice coeso jogável de 5-10min que prova os 3 pilares-âncora (Scan, Compilação do Codex, Vetor do Gambito) em uma área-cidade com 1 combate e 1 puzzle.
 **Time:** solo (Petrus). **Floor de perf canônico (W0):** iGPU Intel HD / AMD integrada (teto RTX 3050 4GB).
 
 ---
