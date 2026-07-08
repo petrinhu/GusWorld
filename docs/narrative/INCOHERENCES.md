@@ -232,7 +232,7 @@ Nenhuma cascata fix em lore-bible/timeline. Apenas reconhecimento explícito do 
    - §8.4 sobrenomes Tarsila/Felícia (matrilinear composto)
    - §9.5 patrilineares (4 nomes: Antoneto + Dmitri + Casimiro + Aldebrando)
    - §8.7 + §9.2 + §11.1 remover "Polis-Vermelha -45" → "deriva séculos"
-5. ⏳ era-2-boom-tecnico.md (R10): drift sobrenomes Tarsila/Felícia alinhar
+5. ✅ era-2-boom-tecnico.md (R10): drift Tarsila/Felícia alinhado (AUDITORIA-COMPLETA-2026-07-06 AC-L1, 2026-07-07): L719 datas -90/-20/+5 → -110/-25/-8; L1057 "tetravó"→"avó" + Antoneta inserida como 1ª geração + Tarsila/Felícia reconciliadas com -25/-8; L1049 + L1151 "quinto grau"/"tetravó" corrigidos junto (mesmo erro, achado durante a correção). L919 conferido: "cinco gerações" da janela Verônica→aprendiz não conflita com a cadeia de 6 a partir de Atelaiá, sem necessidade de fix.
 
 **Status piloto:** PROTOCOLO VALIDADO. ROI revisão proativa confirmado empiricamente. 13 críticos que cascateariam pra docs futuros + custo audit final 3-5× maior se adiados.
 
