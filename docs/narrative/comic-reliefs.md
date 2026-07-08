@@ -968,13 +968,13 @@ Achievement banner aparece com fundo de quadrados neon piscando.
 
 ### Stardew Valley (2)
 
-**EE-13: A Fazenda do Avô**
+**EE-13: A Fazenda da Avó**
 
 No vilarejo da Jaci (fronteira-Selve), terreno abandonado com casa rústica. NPC mais velha:
-> "Era do seu avô. Você pode plantar nela, se quiser."
+> "Era da sua avó. Você pode plantar nela, se quiser."
 
 Mini-sistema opcional: Gus pode plantar sementes Token-comum durante uma noite no vilarejo, colher de manhã (in-game time skip). Drop: **Cristal-de-Colheita** (Token raro de cura). NPC entrega carta:
-> *"Seu avô deixou isto. Ele dizia que toda lógica começa numa horta."*
+> *"Sua avó deixou isto. Ela dizia que toda lógica começa numa horta."*
 
 **EE-14: O Pelicano**
 

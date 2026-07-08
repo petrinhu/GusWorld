@@ -254,7 +254,7 @@ VOLUME 1: BÍBLIA WORLDBUILDING
 | 10.1 | Sterling Locke, perfil integral | `characters/sterling-locke.md` + `deep/antagonists/sterling-locke-deep.md` | ~10k | ~33 | consolidar (235 + 61 linhas; doc canônico largo) |
 | 10.2 | Pre-lore vilão (formação acadêmica, rejeição, migração) | `characters/prelore_vilao.md` | ~2k | ~7 | extrair íntegra |
 | 10.3 | Patch-Zero, antagonista-sistema (anti-padrão + 4 canais) | `characters/patch-zero.md` + `deep/antagonists/patch-zero-deep.md` | ~8k | ~27 | consolidar |
-| 10.4 | NPCs antagonistas menores (FIR-vassalos, executivos Sterling Corp) | `deep/antagonists/npcs-antologia.md` | ~4k | ~13 | extrair |
+| 10.4 | NPCs antagonistas menores (FIR-vassalos, executivos Sterling Corp) | `deep/antagonists/npcs-antagonistas.md` | ~4k | ~13 | extrair |
 
 **Subtotal Cap 10:** ~24k pal / ~80 pp
 

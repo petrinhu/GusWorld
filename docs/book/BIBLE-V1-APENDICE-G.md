@@ -99,7 +99,7 @@ Atribuição: canon R7 cosmologia §5. Cross-ref canon: ficha protagonista (Gus 
 
 > *"Deprecação eficiente, sem overhead emocional."*
 
-Atribuição: **Diretor Theodoro Calveri**, alta gerência Sterling Corp. Cross-ref canon: R5 npcs-antologia e DD-016 (memorando interno). Função semântica: enunciado paradigmático da estética administrativa do antagonismo. A frase resume, em linguagem técnica de gestão de software, a ética da Sterling Corp diante de funcionários, ativos e fornecedores. Deprecar, aqui, significa eliminar com mínimo de fricção contábil. O *overhead emocional* é o luto.
+Atribuição: **Diretor Theodoro Calveri**, alta gerência Sterling Corp. Cross-ref canon: R5 npcs-antagonistas e DD-016 (memorando interno). Função semântica: enunciado paradigmático da estética administrativa do antagonismo. A frase resume, em linguagem técnica de gestão de software, a ética da Sterling Corp diante de funcionários, ativos e fornecedores. Deprecar, aqui, significa eliminar com mínimo de fricção contábil. O *overhead emocional* é o luto.
 
 ### Citação 15
 

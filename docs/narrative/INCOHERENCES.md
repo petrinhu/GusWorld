@@ -95,7 +95,7 @@ Mapeamento sistemático de conflitos canon detectados via cross-validation deep-
 
 **Cascata fix:** decidir versão canônica + propagar.
 
-**RESOLVIDO (cascata F1-DL.REFAC):** idades unificadas com a versão CHARS (deep-lore R5 npcs-antologia). Octávia Penedo **55** (`lore-bible.md:533` = `CHARS.md:94`); Theodoro Calveri **52** (`lore-bible.md:534` = `CHARS.md:96`); Solange Vix **46** (`lore-bible.md:535` = `CHARS.md:95`). Verificação 2026-05-30: lore-bible §14 alinhado a CHARS em todos os três. Cross-ref `AUDIT-T3-CRONOLOGIA-V2` MÉDIOS (Octávia/Theodoro/Solange trinity consistente) + `AUDIT-T9-VOZ-NPC-V2` MD-T9v2-04 (Calveri CHARS:96 consistente).
+**RESOLVIDO (cascata F1-DL.REFAC):** idades unificadas com a versão CHARS (deep-lore R5 npcs-antagonistas). Octávia Penedo **55** (`lore-bible.md:533` = `CHARS.md:94`); Theodoro Calveri **52** (`lore-bible.md:534` = `CHARS.md:96`); Solange Vix **46** (`lore-bible.md:535` = `CHARS.md:95`). Verificação 2026-05-30: lore-bible §14 alinhado a CHARS em todos os três. Cross-ref `AUDIT-T3-CRONOLOGIA-V2` MÉDIOS (Octávia/Theodoro/Solange trinity consistente) + `AUDIT-T9-VOZ-NPC-V2` MD-T9v2-04 (Calveri CHARS:96 consistente).
 
 ---
 
@@ -251,3 +251,10 @@ A cadeia "10 nomes / 8 séculos" não podia ser fila biológica de mentoria (elo
 
 **C19. Oscilação "seiscentos" vs "oito séculos" — RESOLVIDO 2026-05-30.**
 Padronizado em "oito séculos / oitocentos anos" (ancorado no Êxodo -720). 9 ocorrências da duração da linhagem corrigidas; 3 "seiscentos" legítimos mantidos (radicais paleográficos L122, escadaria física L4163, janela de placa L4285). **Status:** RESOLVIDO.
+
+---
+
+## RESOLUÇÃO CANON 2026-07-08 (AUD-LORE, dossiê AUDIT-LORE-2026-07-08)
+
+**C20. Morte de Aldebrando Chevalier (pai do Bento): "catedral perdida / queda em ruína" vs deep-lore. RESOLVIDO 2026-07-08.**
+`timeline.md:140` ("incursão à catedral perdida... causa oficial: queda em ruína"), `lore-bible.md:511` e `factions.md:128` descreviam a morte de Aldebrando com uma causa oficial genérica que não batia com o deep-lore de detalhe. Canon fechado (decisão do criador, D2 em `docs/auditoria/AUDIT-LORE-2026-07-08/DECISOES-CRIADOR.md`): **Catedral Menor de Atelaiá, Vigília restrita de 12 mestres, interferência ressonante calibrada (onze sobreviveram)**. Aldebrando é o único morto dos doze; a interferência ressonante calibrada é a causa real, coberta publicamente como acidente. **Status:** RESOLVIDO (decisão canonizada). **Retrofit prosa pendente:** `timeline.md:140`, `lore-bible.md:511`, `factions.md:128` ainda usam a redação antiga ("catedral perdida / queda em ruína"); serão retrofitados na onda de prosa (Onda 3, `narrative-writer`), não nesta remediação mecânica.

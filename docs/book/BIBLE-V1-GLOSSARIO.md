@@ -218,7 +218,7 @@
 
 **Filomena Garda.** Adepta Cult Mirage, cataloga sem decifrar gradient violeta-magenta-cyan. NPC ambiental das Catacumbas Cult. *Cross-ref:* deep/characters/iara-lumen.md R4; CHARS.md §6.
 
-**Florín Estopa.** 38 anos, hierofante-artista Cult Mirage, resistência passiva interna. Aliado canon party pós-arco Iara se sabotagem do Festival preservar a facção artista. *Cross-ref:* factions.md §5; deep/antagonists/npcs-antologia.md R5.
+**Florín Estopa.** 38 anos, hierofante-artista Cult Mirage, resistência passiva interna. Aliado canon party pós-arco Iara se sabotagem do Festival preservar a facção artista. *Cross-ref:* factions.md §5; deep/antagonists/npcs-antagonistas.md R5.
 
 ## G
 
@@ -336,7 +336,7 @@
 
 **Óculos Táticos.** Vértice canônico do triângulo de hardware do Gus. Input/scan diegético; decompõe Perlin reverso e cruza com base de equações paramétricas catalogadas. Sobrepõe texto holográfico cyan a 89 lúmens revelando equação do bioma, criatura ou objeto. Não decodifica Patch-Zero (retorna string de erro vermelho 21 lúmens). *Cross-ref:* pillars.md Pillar 3; deep/magic/natureza-matematica-rigida-deep.md §6.
 
-**Octávia Penedo (Diretora).** 55 anos, Diretora de Contenção Sterling Corp, formação mista arquitetura sistemas e psicometria forense. Recrutada em -11 fase Core-Synth, ratificada Diretora pós-2º escape Patch-Zero em -0.25. Aparece como holograma corporativo, jamais em pessoa. *Cross-ref:* deep/antagonists/npcs-antologia.md R5; factions.md §1.
+**Octávia Penedo (Diretora).** 55 anos, Diretora de Contenção Sterling Corp, formação mista arquitetura sistemas e psicometria forense. Recrutada em -11 fase Core-Synth, ratificada Diretora pós-2º escape Patch-Zero em -0.25. Aparece como holograma corporativo, jamais em pessoa. *Cross-ref:* deep/antagonists/npcs-antagonistas.md R5; factions.md §1.
 
 **Olafsson Argéndia "o Recuperador".** Cronista-fundador Era 2 primeiro canonizado, paleógrafo-cartógrafo, Vilarejo do Acaceiro Antigo, datação -500 a -440. Descendência institucional direta da Família-Pilastra Argéndia (cinco gerações pós Albertina). *Cross-ref:* deep/eras/era-1-pre-codigo.md §9.7.
 
@@ -346,7 +346,7 @@
 
 **Orla Recursiva.** Região canon da Selve Sombria, faixa de transição entre Selve média e Selve Profunda. Biomas paramétricos densos catalogados por Anhuera Vanderbist (-95/-89). 144 organismos catalogados. Inclui três rios canon Verdor, Vesperal e Lentíssimo. *Cross-ref:* deep/magic/natureza-matematica-rigida-deep.md §2.1; PLACES.md §5.
 
-**Otelo Pancha.** 55 anos, sub-diretor FIR Distrito 4. Veterano cínico sem ideologia, três décadas no aparato segurança, modelo de exaustão moral funcional. *Cross-ref:* factions.md §3; deep/antagonists/npcs-antologia.md R5.
+**Otelo Pancha.** 55 anos, sub-diretor FIR Distrito 4. Veterano cínico sem ideologia, três décadas no aparato segurança, modelo de exaustão moral funcional. *Cross-ref:* factions.md §3; deep/antagonists/npcs-antagonistas.md R5.
 
 **Otília Pamonha.** Anciã do clã Pelicano Roxo, mensageira a pé Ano 0. Sementes-relíquia do ciclo caíram 11% acima do limite de quebra estatística (sinal de alerta). Preserva versões dissidentes do mito da Primeira Compilação. *Cross-ref:* deep/antagonists/patch-zero-deep.md R5; deep/ontologia/cosmologia-formal-deep.md §7.
 
@@ -448,7 +448,7 @@
 
 **Sementes-relíquia.** Bancos canônicos de DNA preservados em câmaras herméticas dentro das catedrais Era 1. Jaci usa algumas dessas sementes na sua farmacopeia. Distribuídas clandestinamente por Próspero Vance pré-Êxodo; preservadas até hoje no Pelicano Branco. *Cross-ref:* lore-bible.md §3 Era 1; deep/eras/era-1-pre-codigo.md §7.
 
-**Solange Vix (Diretora).** 46 anos, Diretora de Imagem Pública Sterling Corp. Roteirista da holografia corporativa, autora canônica de 14 campanhas Sterling em 13 anos (inclui "Sustento Eficiente, Cidadania Tranquila"). Nunca aparece em pessoa, holograma ou voz. *Cross-ref:* deep/antagonists/npcs-antologia.md R5; in-world-docs.md doc 12.
+**Solange Vix (Diretora).** 46 anos, Diretora de Imagem Pública Sterling Corp. Roteirista da holografia corporativa, autora canônica de 14 campanhas Sterling em 13 anos (inclui "Sustento Eficiente, Cidadania Tranquila"). Nunca aparece em pessoa, holograma ou voz. *Cross-ref:* deep/antagonists/npcs-antagonistas.md R5; in-world-docs.md doc 12.
 
 **Sônico (família técnico-natural).** Família que opera por onda mecânica em meio elástico (ar, água, metal, biomassa programada). Inclui infrassom, ultrassom, ressonância estrutural não-audível. Token sônico: fundo violeta-noturno, padrão de onda senoidal em três ciclos visíveis. Companion-âncora: Linda "Siren" Neumann. *Cross-ref:* deep/magic/glyph-token-conjuro-codex-deep.md §2.
 
@@ -472,7 +472,7 @@
 
 **Tamara Neumann.** Engenheira-mãe Era 2 (~-110), criadora canônica de Óxido. Revisora-editora 2ª edição manual referência C-Arcane em -89. Redescobridora canon da álgebra booleana via cinco manuscritos sobreviventes Neo-Sylvania (treze anos de trabalho silencioso). Autora dos Manuscritos de Investigação (Investigation Laws Thought, homenagem a George Boole). Ancestral direta linhagem Neumann (Brígida, Linda). *Cross-ref:* lore-bible.md §3.2; deep/magic/glyph-token-conjuro-codex-deep.md §5.
 
-**Tâmela Brida.** 44 anos, hierofante Cult Mirage especializada em ressonância sensorial. Extração biométrica via frequências sub-perceptíveis. *Cross-ref:* deep/antagonists/npcs-antologia.md R5; factions.md §5.
+**Tâmela Brida.** 44 anos, hierofante Cult Mirage especializada em ressonância sensorial. Extração biométrica via frequências sub-perceptíveis. *Cross-ref:* deep/antagonists/npcs-antagonistas.md R5; factions.md §5.
 
 **Tartaruga-Voronoi (*Testudo voronoiensis*).** Espécie canônica Selve. Casco com diagrama de Voronoi único por indivíduo, gerado de 8 a 13 sementes-pontos no embrião. HP 55, dano 5, longevidade 144 estações. Animal-totem informal da Academia Recursiva (sobre ela formulada a Proposição 47 de Atelaiá). *Cross-ref:* deep/magic/natureza-matematica-rigida-deep.md §3.5.
 
@@ -480,7 +480,7 @@
 
 **Tetra-Torre Janelarum.** Sub-local canônico do Núcleo Metropolitano, lado norte. *Cross-ref:* environments/01-cidade-cyber-gotica.md; PLACES.md §5.
 
-**Theodoro Calveri (Diretor).** 52 anos, Diretor de Aquisições Sterling Corp. Autor canônico da engenharia financeira que destruiu cooperativa Alencar em -8 e oficina Neumann no mesmo ano, mais 12 operações similares. Assinatura "deprecação eficiente, sem overhead emocional". *Cross-ref:* deep/antagonists/npcs-antologia.md R5; in-world-docs.md DD-016.
+**Theodoro Calveri (Diretor).** 52 anos, Diretor de Aquisições Sterling Corp. Autor canônico da engenharia financeira que destruiu cooperativa Alencar em -8 e oficina Neumann no mesmo ano, mais 12 operações similares. Assinatura "deprecação eficiente, sem overhead emocional". *Cross-ref:* deep/antagonists/npcs-antagonistas.md R5; in-world-docs.md DD-016.
 
 **Tomo da Pilha Sobrecarregada.** Documentação coletiva canônica iniciada em -100. Encyclopedia Galactica da civilização GusWorld: repositório que permite, em caso de novo colapso, a re-execução da gramática a partir de fragmentos sobreviventes. Prefácio assinado por Atelaiá Chevalier; passagens citadas como pedras-de-toque do Pillar 2. Treze mil oitocentos e vinte fólios totais. *Cross-ref:* lore-bible.md §3 Era 2; deep/ontologia/cosmologia-formal-deep.md §4; deep/magic/natureza-matematica-rigida-deep.md §4.
 
@@ -538,7 +538,7 @@
 
 **Vilarejo Tucano-Cinza.** Vilarejo-fronteira menor canônico. Anciã canon Berenice Quaresma. *Cross-ref:* factions.md §4; deep/ontologia/cosmologia-formal-deep.md §7.
 
-**Vitória Marquês.** 41 anos, sub-diretora FIR Distrito 3, conservadora. Dissensão emergente em ato 2 (sidequest Ouro): três cadernos pessoais discordância de Calveri sobre vilarejos-fronteira Pythia desde -2. *Cross-ref:* deep/antagonists/npcs-antologia.md R5; factions.md §3.
+**Vitória Marquês.** 41 anos, sub-diretora FIR Distrito 3, conservadora. Dissensão emergente em ato 2 (sidequest Ouro): três cadernos pessoais discordância de Calveri sobre vilarejos-fronteira Pythia desde -2. *Cross-ref:* deep/antagonists/npcs-antagonistas.md R5; factions.md §3.
 
 **Vorto (Diretor Cassiano).** Ver Cassiano Vorto.
 

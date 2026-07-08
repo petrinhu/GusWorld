@@ -67,7 +67,7 @@ Canon F5-BK.AUDIT T2-C3 resolução "modelo dois-anéis": 10 vilarejos pós-Êxo
 
 | Nome | Tipo | Era | Localização canon | Status | Cross-ref |
 |---|---|---|---|---|---|
-| **Tucano-Cinza** | Clã vilarejo-fronteira menor | Era 1 (origem antropológica não-Êxodo) | Norte Selve oriental tributária | ✅ canônico (Berenice Quaresma anciã) | `factions.md:399-401` + `environments/02-selve-sombria.md` + `environments/08-selve-profunda.md` + `pelicano-branco.md` + `cosmologia-deep.md:67` |
+| **Tucano-Cinza** | Clã vilarejo-fronteira menor | Era 1 (origem antropológica não-Êxodo) | Norte Selve oriental tributária | ✅ canônico (Berenice Quaresma anciã) | `factions.md:399-401` + `environments/02-selve-sombria.md` + `environments/08-selve-profunda.md` + `pelicano-branco.md` + `deep/eras/cosmologia-origem-deep.md` |
 | **Pelicano Roxo** | Clã vilarejo-fronteira menor | Era 1 (origem antropológica não-Êxodo) | Oeste Selve oriental tributária | ✅ canônico (Otília Pamonha anciã) | `factions.md:399-401` + `environments/02-selve-sombria.md` + `environments/08-selve-profunda.md` + `pelicano-branco.md` |
 | **Tartaruga-Fractal** | Clã vilarejo-fronteira menor | Era 1 (origem antropológica não-Êxodo) | Sul Selve oriental tributária | ✅ canônico (Bartolomeu Quintino ancião) | `factions.md:399-401` + `environments/02-selve-sombria.md` + `environments/08-selve-profunda.md` + `pelicano-branco.md` |
 
@@ -115,6 +115,7 @@ Canon F5-BK.AUDIT T2-C3 resolução "modelo dois-anéis": 10 vilarejos pós-Êxo
 | **Câmara Neo-Sylvania de Coleta de DNA** | Sub-local (Selve Profunda) | 1 | Selve Profunda | ✅ canônico (sementes-relíquia) | `environments/08-selve-profunda.md` |
 | **Trilha das Sementes** | Sub-local (Selve Profunda) | 1-2-3 | Principal entre 13 caminhos entrada Pelicano Branco → Núcleo Mandelbrot | ✅ canônico (117 placas latão Era 2, 23 desaparecidas, canon F5-BK.AUDIT T2-M10 resolução) | `deep/settings/08-selve-profunda.md:21` |
 | **Distrito V (Distrito 5)** | Sub-local (Periferia) | 3 | Bunker FIR canon, pavimento tesselado profanado | ✅ canônico (sede FIR operacional, canon F5-BK.AUDIT T2-L3 resolução) | `dante-grid.md:165` + `factions.md:301` + `foreshadowing.md` F005 + `diary/entries-fichas-bestiary.md:228-229` |
+| **Universidade Pública** | Sub-local (Núcleo) | 2 + 3 | Lado leste do Núcleo Metropolitano. Placa cerimonial dos 4 engenheiros (Lin Tórun, Rosaria Galp, Henrique Pira, Marcela Sívo) no átrio; ala de estudos Asmódico ativa (Ordem Recursiva); fachada com inscrição parcial da 47ª proposição, hoje coberta por holografia Sterling | ✅ canônico | `environments/01-cidade-cyber-gotica.md` + `deep/settings/01-cidade.md` + `tradicoes-cultura.md` + `environments/07-zona-do-silencio.md` + `environments/08-selve-profunda.md` |
 
 ## 5a. Sub-locais Era 1 (canon §6 deep-lore, Ordem Recursiva)
 

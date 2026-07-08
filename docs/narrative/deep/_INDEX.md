@@ -12,7 +12,7 @@
 > - Canon Bloco F: `docs/narrative/environments/*` (8 settings)
 > - Canon Bloco H: `docs/narrative/diary/*` (Diário Gus)
 > - Canon Bloco I: `docs/narrative/foreshadowing.md` (130 plants)
-> - Character canon: `docs/narrative/characters/*` (10 docs) + `Resources/gusworld/character-spec-*.md` (8 specs visuais)
+> - Character canon: `docs/narrative/characters/*` (13 docs no disco) + `Resources/gusworld/character-spec-*.md` (8 specs visuais)
 
 ---
 
@@ -30,61 +30,74 @@ Camada **complementar e não-substitutiva**. Cada doc deep:
 
 ## Estrutura da pasta
 
+> Árvore regravada 2026-07-08 (AUD-LORE) a partir do `find docs/narrative/deep/` real. Nomes de arquivo abaixo são os do disco, não os planejados na versão anterior deste índice.
+
 ```
 docs/narrative/deep/
-├── _INDEX.md                       # este doc
-├── eras/                           # 3 eras + transições (~18k palavras)
-│   ├── era-1-pre-codigo.md         # Neo-Sylvania (~5k)
-│   ├── era-2-compilador.md         # Era do Compilador (~5k)
-│   ├── era-3-sterling.md           # Era Sterling presente (~5k)
-│   └── transicoes-entre-eras.md    # Quedas, hiatos, restos (~3k)
-├── factions/                       # 6 facções principais + menores (~20k)
-│   ├── sterling-corp.md            # (~3k)
-│   ├── fir.md                      # Federação Industrial de Reciclagem (~3k)
-│   ├── ordem-recursiva.md          # (~3k)
-│   ├── cult-mirage-reality.md      # (~3k)
-│   ├── underground-silencio.md     # (~3k)
-│   ├── pelicano-branco.md          # (~3k)
-│   └── facoes-menores.md           # (~2k)
-├── settings/                       # 8 locais deep (~26k)
-│   ├── 01-cidade.md                # (~4k crítico)
-│   ├── 02-selve-sombria.md         # (~4k crítico)
-│   ├── 03-catedrais.md             # (~3k)
-│   ├── 04-dutos.md                 # (~3k)
-│   ├── 05-mirage.md                # (~3k)
-│   ├── 06-periferia.md             # (~3k)
-│   ├── 07-silencio.md              # (~2k)
-│   └── 08-selve-profunda.md        # (~4k crítico, climax)
-├── characters/                     # Gus + 6 companions + Sterling + PZ + NPCs (~47k)
-│   ├── gus-dragon.md               # Gus "Dragon" Vector Tavus Vance (~5k crítico)
-│   ├── caua-volt.md                # Cauã "Volt" Berenger (~5k)
-│   ├── iara-lumen.md               # Iara "Lumen" Koslov (~5k)
-│   ├── bento-requiem.md            # Bento "Requiem" Chevalier (~5k)
-│   ├── linda-siren.md              # Linda "Siren" Neumann (~5k)
-│   ├── dante-grid.md               # Dante "Grid" Alencar, TRAIDOR (~5k crítico)
-│   ├── jaci-proxy.md               # Jaci "Proxy" Vanderbist (~5k)
-│   ├── sterling-locke.md           # Antagonista (~5k crítico)
-│   ├── patch-zero.md               # Antagonista-sistema (~4k)
-│   └── npcs-secundarios.md         # Antologia de NPCs nomeados (~3k)
-├── magic/                          # Sistema mágico formal (~10k)
-│   ├── glyph-token-conjuro-codex.md   # Metafísica formal (~3k)
-│   ├── linguagens-magicas.md          # C-Arcane/Asmódico/Óxido/Pythia deep (~4k)
-│   └── natureza-matematica.md         # Pillar 2 expansão fractais/sequência recorrente/ruído (~3k)
-├── ontologia/                      # Conceito macro (~8k)
-│   ├── tecnologia-3-eras.md        # Hardware/substrato 3 eras (~3k)
-│   ├── cosmologia-formal-deep.md   # Cosmovisão de superfície: gramática computável, vetor central, Patch-Zero (~3k)
-│   │                               #   companheiro: ../eras/cosmologia-origem-deep.md (origem/verdade enterrada: Estilhaçamento + ecos convergentes)
-│   └── leitmotivs-temas.md         # Themes recorrentes (~2k)
-├── stinger/                        # Sequel hooks (~4k)
-│   ├── sequel-hooks.md             # (~2k)
-│   └── post-credits-narrativos.md  # (~2k)
-└── antologia/                      # Volume 2, 14 contos in-character (~42k)
-    ├── _PLANO.md                   # outline dos 14 contos
-    ├── ANT-001 ... ANT-014.md      # 1 conto por arco (1 por companion + 2 antag + 3 era + 2 NPC)
+├── _INDEX.md                            # este doc
+├── eras/                                # 3 eras + transições + cosmologia-origem
+│   ├── era-1-pre-codigo.md              # Neo-Sylvania, §§1-10 (maior doc da camada, ~318k pal)
+│   ├── era-2-boom-tecnico.md            # Era do Compilador
+│   ├── era-3-sterling.md                # Era Sterling presente
+│   ├── transicoes-entre-eras.md         # Quedas, hiatos, restos
+│   └── cosmologia-origem-deep.md        # origem/verdade enterrada: Estilhaçamento + ecos convergentes; companheiro de ontologia/cosmologia-formal-deep.md
+├── factions/                            # 6 facções principais + menores
+│   ├── sterling-corp.md
+│   ├── fir.md                           # Federação Industrial de Reciclagem
+│   ├── ordem-recursiva.md
+│   ├── cult-mirage.md
+│   ├── underground-silencio.md
+│   ├── pelicano-branco.md
+│   └── facoes-menores.md
+├── settings/                            # 8 locais deep
+│   ├── 01-cidade.md                     # crítico
+│   ├── 02-selve-sombria.md              # crítico
+│   ├── 03-catedrais.md
+│   ├── 04-dutos.md
+│   ├── 05-mirage.md
+│   ├── 06-periferia.md
+│   ├── 07-silencio.md
+│   └── 08-selve-profunda.md             # crítico, climax
+├── characters/                          # Gus + companions (Sterling/Patch-Zero/NPCs viraram antagonists/)
+│   ├── gus-dragon.md                    # Gus "Dragon" Vector Tavus Vance, crítico
+│   ├── caua-volt.md                     # Cauã "Volt" Berenger
+│   ├── iara-lumen.md                    # Iara "Lumen" Koslov
+│   ├── bento-requiem.md                 # Bento "Requiem" Chevalier
+│   ├── linda-siren.md                   # Linda "Siren" Neumann
+│   ├── dante-grid.md                    # Dante "Grid" Alencar, TRAIDOR, crítico
+│   └── jaci-proxy.md                    # Jaci "Proxy" Vanderbist
+├── antagonists/                         # Sterling + Patch-Zero + NPCs antagonistas (pasta antes invisível neste índice)
+│   ├── sterling-locke-deep.md           # antagonista principal, crítico
+│   ├── patch-zero-deep.md               # antagonista-sistema
+│   └── npcs-antagonistas.md             # NPCs antagonistas nomeados (renomeado de npcs-antologia.md, AUD-LORE D11, tira colisão com antologia/)
+├── magic/                               # Sistema mágico formal
+│   ├── glyph-token-conjuro-codex-deep.md   # Metafísica formal
+│   ├── 4-linguagens-deep.md             # C-Arcane/Asmódico/Óxido/Pythia deep
+│   └── natureza-matematica-rigida-deep.md  # Pillar 2 expansão fractais/sequência recorrente/ruído
+├── ontologia/                           # Conceito macro
+│   ├── tech-3-eras-deep.md              # Hardware/substrato 3 eras
+│   ├── cosmologia-formal-deep.md        # Cosmovisão de superfície: gramática computável, vetor central, Patch-Zero
+│   ├── leitmotivs-deep.md               # Temas recorrentes
+│   └── leitmotivs-musicais-detalhados.md   # Bíblia de leitmotivs musicais por personagem/facção
+├── stinger/                             # Sequel hooks
+│   ├── sequel-hooks-deep.md
+│   └── post-credits-deep.md
+└── antologia/                           # Volume 2, 14 contos in-character
+    ├── 01-gus-gustaf-vii.md
+    ├── 02-caua-volt.md
+    ├── 03-iara-lumen.md
+    ├── 04-bento-requiem.md
+    ├── 05-linda-siren.md
+    ├── 06-dante-grid.md
+    ├── 07-jaci-proxy.md
+    ├── 08-sterling-locke.md
+    ├── 09-cassiano-vorto.md
+    ├── 10-pyotor-vance-pai.md
+    ├── 11-gargi-vance-mae.md
+    ├── 12-ancia-mariana-vanderbist.md
+    ├── 13-veronica-atelaia.md
+    └── 14-heliaco-vyr-era-1.md
 ```
-
-**Total estimado Volume 1:** ~133k palavras (~500 páginas A4).
-**Total estimado Volume 2:** ~42k palavras.
 
 ---
 
@@ -163,16 +176,16 @@ user fecha decisões macro da rodada
 
 | Rodada | Conteúdo | Status |
 |---|---|---|
-| R1 (Eras) | era-1, era-2, era-3, transicoes (4 docs) | ✅ Concluído (2026-05-26) |
-| R2 (Facções) | 6 principais + menores (7 docs, ~20k) | ⏳ Pendente |
-| R3 (Settings) | 8 settings deep (8 docs, ~26k) | ⏳ Pendente |
-| R4 (Characters) | Gus + 6 companions (7 docs, ~35k) | ⏳ Pendente |
-| R5 (Antagonistas + NPCs) | Sterling + Patch-Zero + NPCs antologia (3 docs, ~12k) | ⏳ Pendente |
-| R6 (Magic) | Glyph/Token + linguagens + nat-mat (3 docs, ~10k) | ⏳ Pendente |
-| R7 (Ontologia) | Tech/cosmologia/leitmotivs (3 docs, ~8k) | ⏳ Pendente |
-| R8 (Stinger) | Sequel hooks + post-credits (2 docs, ~4k) | ⏳ Pendente |
-| R9 (Antologia Vol 2) | 14 contos in-character (14 docs, ~42k) | ⏳ Pendente |
-| R10 (Consolidação livro) | Vol 1 + Vol 2 com prefacio, sumário, glossário, índice | ⏳ Pendente |
+| R1 (Eras) | era-1, era-2, era-3, transicoes, cosmologia-origem (5 docs) | ✅ Concluído (2026-05-26) |
+| R2 (Facções) | 6 principais + menores (7 docs) | ✅ Concluído (arquivos presentes no disco) |
+| R3 (Settings) | 8 settings deep (8 docs) | ✅ Concluído (arquivos presentes no disco) |
+| R4 (Characters) | Gus + 6 companions (7 docs) | ✅ Concluído (arquivos presentes no disco) |
+| R5 (Antagonistas + NPCs) | Sterling + Patch-Zero + NPCs antagonistas, pasta `antagonists/` (3 docs) | ✅ Concluído (arquivos presentes no disco) |
+| R6 (Magic) | Glyph/Token + linguagens + nat-mat (3 docs) | ✅ Concluído (arquivos presentes no disco) |
+| R7 (Ontologia) | Tech/cosmologia/leitmotivs (4 docs) | ✅ Concluído (arquivos presentes no disco) |
+| R8 (Stinger) | Sequel hooks + post-credits (2 docs) | ✅ Concluído (arquivos presentes no disco) |
+| R9 (Antologia Vol 2) | 14 contos in-character (14 docs) | ✅ Concluído (arquivos presentes no disco) |
+| R10 (Consolidação livro) | Vol 1 + Vol 2 com capa, prefácio, sumário, glossário, apêndices (`docs/book/`) | ✅ Concluído (arquivos presentes no disco) |
 
 ---
 
@@ -182,11 +195,11 @@ user fecha decisões macro da rodada
 - [[../lore-bible]]: Bloco G fundação
 - [[../arco-principal]]: 8 beats Kishōtenketsu + 3 endings
 - [[../foreshadowing]]: 130 plants
-- [[../characters/_INDEX]] (se houver) ou docs/narrative/characters/: 10 docs canon
+- [[../characters/_INDEX]] (se houver) ou docs/narrative/characters/: 13 docs canon no disco
 - [[../environments/_INDEX]]: Bloco F 9 docs
 - [[../diary/_INDEX]]: Bloco H 8 docs
 - Memórias: [[../../../../memory/project_pillars_canonicos]] [[../../../../memory/project_personagens]] [[../../../../memory/feedback_nomes_personagens_canonicos]] [[../../../../memory/project_terminologia]] [[../../../../memory/project_i18n_canonico]]
 
 ---
 
-**Última revisão:** 2026-05-16. Camada deep-lore inicializada. Aguardando R1 (Eras).
+**Última revisão:** 2026-07-08 (AUD-LORE, remediação Onda 1). Árvore regravada a partir do disco real; todas as 10 rodadas R1-R10 têm arquivos presentes.

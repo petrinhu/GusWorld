@@ -49,8 +49,8 @@ Bloco "Modo de operação" inserido em cada agent em `~/.claude/agents/`.
 ```
 docs/
 ├── design/
-│   ├── pillars.md          # 5 pillars testáveis (SIM/NÃO) — AGUARDA REVISÃO USER
-│   └── gdd.md              # 1-page GDD — AGUARDA REVISÃO USER
+│   ├── pillars.md          # Revisão 1, concluída em sessão colaborativa (2026-05-15). Canônico.
+│   └── gdd.md              # v0.2 (pré-produção, F1.12-REFRESH 2026-06-02, higienização de stack 2026-06-23)
 ├── narrative/
 │   ├── lore-bible.md            # REVISÃO 1 — canônico (expansão Bloco G: eventos cross-eras, NPCs, tradições)
 │   ├── arco-principal.md        # REVISÃO 1 — canônico (3 atos, 8 beats Kishōtenketsu, Dante traidor, 3 endings)
@@ -59,7 +59,8 @@ docs/
 │   ├── timeline.md              # REVISÃO 1 — canônico (expansão Bloco G: cronologia 3 eras, 50+ eventos)
 │   ├── in-world-docs.md         # REVISÃO 1 — canônico (expansão Bloco G: 15 docs descobríveis, 3 gate Ouro)
 │   ├── tradicoes-cultura.md     # REVISÃO 1 — canônico (expansão Bloco G: 9 tradições, calendário, costumes)
-│   └── characters/              # REVISÃO 1 — canônico (expansão Bloco G: + "Memórias formativas")
+│   ├── deep/                    # deep-lore paralelo (eras, facções, settings, characters, antagonists, antologia; ver deep/_INDEX.md)
+│   └── characters/              # REVISÃO 1 — canônico (expansão Bloco G: + "Memórias formativas"); 13 docs no disco
 │       ├── party.md             # ÍNDICE + resumo + dinâmicas + matriz linguagens
 │       ├── gus.md               # protagonista (narrativo — NÃO confundir com art/characters/gus.md de produção)
 │       ├── caua-volt.md         # Striker (Pythia, Dutos Infernais)
@@ -69,13 +70,16 @@ docs/
 │       ├── dante-grid.md        # TRAIDOR (Asmódico→C-Arcane, Periferia, FIR vassalo) — memórias double-layer
 │       ├── jaci-proxy.md        # Healer biológica (Pythia, Selve Sombria)
 │       ├── sterling-locke.md    # antagonista adulto (DRE, GRE, predador corporativo)
-│       └── patch-zero.md        # antagonista-sistema (anti-padrão + 4-canais)
+│       ├── patch-zero.md        # antagonista-sistema (anti-padrão + 4-canais)
+│       ├── prelore_vilao.md     # backstory integral Sterling Locke pré-jogo
+│       ├── brunus-vetorial.md   # NPC mentor-boticário (Era 3, ~700 anos, ligação Dragon Victory)
+│       └── brunus-vetorial-conto.md  # conto do Brunus Vetorial
 ├── art/
 │   └── style-guide.md      # REVISADO: SD 1:1:1, cel-shading, exceções normal/specular
 └── tech/
-    ├── architecture.md     # AGUARDA REVISÃO USER
-    ├── engine-modules.md   # AGUARDA REVISÃO USER
-    └── build.md            # AGUARDA REVISÃO USER
+    ├── architecture.md     # SUPERADO 2026-06-23 (era Godot/C#; fonte atual: docs/tech/pivot/engine-design.md)
+    ├── engine-modules.md   # SUPERADO 2026-06-23 (era Godot/C#; fonte atual: docs/tech/pivot/engine-design.md)
+    └── build.md            # SUPERADO 2026-06-23 (era Godot/C#; build atual: CMake + Ninja + CMakePresets, ver README)
 ```
 
 ### Specs canônicas externas (Resources do vault)
@@ -95,9 +99,11 @@ Imutáveis sem aprovação user.
 
 Base canônica imutável: `sinopse.md` (worldbuilding + protagonista) + `Resources/gusworld/character-spec-gus.md`. NUNCA contradizer.
 
-**Status de revisão:** docs marcados "AGUARDA REVISÃO USER" foram gerados em modo autônomo na primeira passada (antes da reforma do squad). User vai revisar ponto-a-ponto antes de validar como canônicos.
+**Status de revisão:** todos os docs listados acima já saíram do estado "AGUARDA REVISÃO USER" da primeira passada autônoma (antes da reforma do squad); pillars.md e gdd.md são canônicos (Revisão 1 / v0.2), architecture.md/engine-modules.md/build.md foram formalmente marcados SUPERADO em 2026-06-23 pelo pivot pra C++20 + SDL3.
 
 ### Estrutura de repositório
+
+Stack vigente: **C++20 + SDL3** (pivot ADR-008, 2026-06-22). `engine/` e `game/` (Godot/C#) são **legado dormente até M8**; não usar como referência de código atual.
 
 ```
 gusworld/
@@ -105,17 +111,31 @@ gusworld/
 ├── TODO.md              # backlog canônico (skill tab_pendencias)
 ├── CHARS.md             # inventário canônico de TODOS personagens nomeados (atualizar sempre que criar novo)
 ├── PLACES.md            # inventário canônico de TODOS lugares nomeados (settings/cidades/catedrais/sub-locais; atualizar sempre que criar novo)
+├── CONTRACT.md          # contrato de qualidade/processo do projeto
+├── TESTES.md            # plano de testes não-unitários
+├── AUDITORIAS.md        # rastreio de auditorias aplicáveis ao stack
+├── ROADMAP.md           # marcos M0-M9+
+├── README.md            # build/run atual (CMake + Ninja + CMakePresets)
 ├── sinopse.md           # base canônica imutável
-├── docs/                # ver acima
-├── engine/              # módulos Godot reutilizáveis (orbital_camera, turn-based, dialogue, save)
-├── game/                # projeto Godot do jogo (project.godot, scenes, scripts game-specific)
-├── assets/              # sources arte/som (Blender, Krita, Aseprite, audio raw)
-│   ├── models/
-│   ├── textures/
-│   ├── sprites/
-│   ├── sfx/
-│   └── music/
-└── build/               # outputs export (linux/, windows/, v<X.Y.Z>/)
+├── docs/                # ver acima (design, narrative, art, tech, auditoria, book)
+├── GusEngine/            # engine + jogo em C++20 + SDL3 (stack vigente)
+│   ├── core/            # POCO puro: time, rng, ecs_lite, resource, events
+│   ├── domain/           # POCO puro: save, i18n, progression, templates, combat
+│   ├── platform/         # única fronteira SDL3/GL/RmlUi (window, render2d, input, audio, fs)
+│   ├── app/              # gameplay + telas + UI (screens/, tools/)
+│   ├── third_party/      # libs vendorizadas (FetchContent sob demanda)
+│   └── build/            # builds locais (não versionado como release)
+├── resources/            # ativos versionados fora do código
+│   ├── sprites/          # sprites PixelLab por personagem
+│   ├── livros/           # corpus RAG (bibliografia)
+│   ├── prompts_images/   # prompts de geração de imagem (nano banana / PixelLab)
+│   ├── maps/             # mapas .gmap
+│   ├── pers_3d/          # arte conceitual 3D (glb) para os livros futuros
+│   ├── glb/, images/, vfx/
+├── engine/              # LEGADO Godot C# (dormente até M8; não editar como se fosse vigente)
+├── game/                # LEGADO projeto Godot (dormente até M8)
+├── assets/              # sources arte/som legados (Blender, Krita, Aseprite, audio raw)
+└── build/               # outputs export legados
 ```
 
 ## Pilares criativos (regras de consistência narrativa — imutáveis)
