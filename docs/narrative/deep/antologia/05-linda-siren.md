@@ -20,7 +20,7 @@ Aos quatro anos eu também tinha lembrado, mas de um jeito que machuca. O toca-d
 
 A batida foi rápida. Eu sei o tempo porque depois, aos oito, eu reconstruí a cronologia com a Brígida sentada do meu lado e ela me ajudando a respirar entre os números. Da batida na porta até os passos chegarem ao quarto, vinte e sete segundos. Do quarto até a sala com o toca-discos suspenso pelas três mãos da FIR, mais ou menos cento e quarenta segundos. Tempo total dentro de casa, em torno de seis minutos. Quando saíram, levaram o toca-discos e deixaram os discos. Acho que os discos não interessavam pra eles, ou acho que eles quiseram que doesse de um jeito específico, deixando o que sobra inútil pelo que falta. Eu não escolho entre as duas hipóteses. Já não dá.
 
-Os discos caíram no chão depois que a porta bateu, porque a estante onde eles estavam encostada à parede que segurava o toca-discos balançou no empurrão dos botinões da FIR e perdeu o equilíbrio na hora errada. Caíram em padrão. Eu lembro do padrão. Um disco isolado. Outro disco isolado, a uma distância igual. Dois discos juntos, encostados como folha dobrada. Três discos juntos um pouco adiante. Cinco discos espalhados em leque. Oito discos amontoados perto do batente da porta. Eu não sabia somar Fibonacci aos quatro. Eu só sabia que a queda tinha sido bonita de um jeito errado, e a Brígida me abraçou tanto tempo que eu cheguei a sentir o coração dela acelerar e desacelerar três vezes seguidas, como se ela estivesse aprendendo a respirar em ciclos.
+Os discos caíram no chão depois que a porta bateu, porque a estante onde eles estavam encostada à parede que segurava o toca-discos balançou no empurrão dos botinões da FIR e perdeu o equilíbrio na hora errada. Caíram em padrão. Eu lembro do padrão. Um disco isolado. Outro disco isolado, a uma distância igual. Dois discos juntos, encostados como folha dobrada. Três discos juntos um pouco adiante. Cinco discos espalhados em leque. Oito discos amontoados perto do batente da porta. Eu não sabia somar a sequência aos quatro. Eu só sabia que a queda tinha sido bonita de um jeito errado, e a Brígida me abraçou tanto tempo que eu cheguei a sentir o coração dela acelerar e desacelerar três vezes seguidas, como se ela estivesse aprendendo a respirar em ciclos.
 
 O Otmar veio depois. Tinha conseguido desparafusar a agulha antes da FIR entrar no quarto. Pôs a agulha no meu pescoço, com uma corrente vazia que ele já carregava pra esse caso. Ajoelhou. Não falou. Eu sabia que ele tinha treinado o gesto de tirar a agulha mil vezes (trinta segundos, ele dizia, trinta segundos é o máximo que eu tenho), mas o gesto de pôr no meu pescoço ele não tinha treinado, e mesmo assim saiu como se tivesse. Acho que algumas coisas a gente treina sem saber.
 
@@ -28,13 +28,13 @@ A agulha está aqui agora, no meu pescoço. Eu sinto o peso dela quando inclino 
 
 ---
 
-A Mara chegou às seis e treze. Ela sempre chega em horários esquisitos, e quando eu perguntei por que, ela disse que chegar em horário redondo é entregar previsibilidade de graça pra quem não merece. Seis e treze é um número Fibonacci só pela metade, ela disse, e isso me agradava. Ri sem rir.
+A Mara chegou às seis e treze. Ela sempre chega em horários esquisitos, e quando eu perguntei por que, ela disse que chegar em horário redondo é entregar previsibilidade de graça pra quem não merece. Seis e treze está na sequência só pela metade, ela disse, e isso me agradava. Ri sem rir.
 
 A Mara tem vinte e oito anos. Dezesseis a mais que eu. Quando eu nasci, ela tinha dezesseis. Quando eu fiz quatro, ela tinha vinte, e foi ela que apareceu lá em casa no dia seguinte à batida, antes mesmo dos vizinhos. Não sei como ela soube. A Mara sabe coisas antes das coisas acontecerem com clareza completa, e eu já desisti de perguntar.
 
 Ela tirou o caderno preto da mochila. O caderno preto tem capa de couro, e o couro é avental velho cortado e recosturado, e o cheiro disso é uma mistura de animal e tempo. Dentro, listras de tinta que eu não entendo metade. Mara escreve em código sobreposto, cifra em cima de cifra, e diz que é treino e que um dia eu vou ler. Talvez sim.
 
-Pendurado no caderno, o cordão. Eu já contei os nós oitenta e nove vezes. Sempre dá oitenta e nove. Da primeira vez que contei, eu tinha dez. A Mara me deixou contar e não falou nada. Quando terminei, ela disse "agora você sabe", e foi tudo. Não perguntei o que era pra saber. Sabia que se ela quisesse contar, contaria, e ela ainda não quis. Mas dá pra construir hipóteses, e eu construo. Oitenta e nove é Fibonacci. Oitenta e nove é primo. Oitenta e nove são os anos que separam, sei lá, uma coisa de outra. Cordão é coisa de quem precisa lembrar de uma sequência exata sem escrever em lugar onde a FIR possa ler. Mara mexe nos nós às vezes, devagar, com o polegar e o indicador, e o gesto é igual aos rosários de oração que a vó dela tinha, mas o conteúdo é outro.
+Pendurado no caderno, o cordão. Eu já contei os nós oitenta e nove vezes. Sempre dá oitenta e nove. Da primeira vez que contei, eu tinha dez. A Mara me deixou contar e não falou nada. Quando terminei, ela disse "agora você sabe", e foi tudo. Não perguntei o que era pra saber. Sabia que se ela quisesse contar, contaria, e ela ainda não quis. Mas dá pra construir hipóteses, e eu construo. Oitenta e nove está na sequência. Oitenta e nove é primo. Oitenta e nove são os anos que separam, sei lá, uma coisa de outra. Cordão é coisa de quem precisa lembrar de uma sequência exata sem escrever em lugar onde a FIR possa ler. Mara mexe nos nós às vezes, devagar, com o polegar e o indicador, e o gesto é igual aos rosários de oração que a vó dela tinha, mas o conteúdo é outro.
 
 Ela sentou na pedra esquadrejada que a gente trouxe pro Posto 7 no inverno passado, uma pedra polida que ficou ao lado da pedra bruta que já estava aqui antes da gente chegar. Eu olho pras duas pedras e penso que elas conversam entre si. Uma diz "eu fui trabalhada", a outra diz "eu estou aqui", e juntas dizem que pra fazer alguma coisa em pé é preciso as duas. A Brígida foi quem me ensinou a olhar pras pedras assim. Disse que era jeito antigo. Eu acreditei.
 
@@ -120,11 +120,11 @@ A Câmara do Equinócio Acústico. Joaquim Bartolomeu decifrou três anos atrás
 
 Eu peguei o esquadro e o compasso que ficavam debaixo do banco. Eram do bisavô da Mara, o luthier, e antes dele tinham sido de mais alguém, e antes de mais alguém ainda. O esquadro era de latão escurecido nas pontas. O compasso tinha a ponta de aço e a outra ponta com um lápis muito gasto. Eu uso eles pra marcar no chão do Posto 7 os ângulos em que o som rebate melhor. Faz parte do treino. A Mara me ensinou.
 
-Tracei um ângulo de cinquenta e cinco graus a partir da pedra polida. Cinquenta e cinco é Fibonacci. Cinquenta e cinco é também o BPM da Última Frequência, que toca uma vez por ano, na Noite Calada, e que eu já ouvi sete vezes na vida e que eu vou ouvir mais quantas eu conseguir. Cinquenta e cinco BPM é o tempo do coração descansando. É um número que cabe.
+Tracei um ângulo de cinquenta e cinco graus a partir da pedra polida. Cinquenta e cinco está na sequência. Cinquenta e cinco é também o BPM da Última Frequência, que toca uma vez por ano, na Noite Calada, e que eu já ouvi sete vezes na vida e que eu vou ouvir mais quantas eu conseguir. Cinquenta e cinco BPM é o tempo do coração descansando. É um número que cabe.
 
 Encostei na linha. Abri a boca. Cantei.
 
-Não foi um lá dessa vez. Foi um melisma. A Mara tinha me ensinado a técnica nas últimas duas semanas, em sessões de uma hora cada (três sessões por semana, oito sessões no total). Melisma é uma sílaba que se quebra em várias notas. A voz desliza, e o deslizar é o ponto. Eu cantei a sílaba *ah*, mas não foi *ah*, foi *aaa-aa-aa-aaa-aaaa-aaaaaaaa*. Eu segurei oito tempos no compasso oito por oito, com cada tempo tendo duração própria, em sequência Fibonacci microscópica que eu nem precisei contar de propósito porque o corpo já sabia (um tempo, um tempo, dois tempos, três tempos, cinco tempos, oito tempos, e fim).
+Não foi um lá dessa vez. Foi um melisma. A Mara tinha me ensinado a técnica nas últimas duas semanas, em sessões de uma hora cada (três sessões por semana, oito sessões no total). Melisma é uma sílaba que se quebra em várias notas. A voz desliza, e o deslizar é o ponto. Eu cantei a sílaba *ah*, mas não foi *ah*, foi *aaa-aa-aa-aaa-aaaa-aaaaaaaa*. Eu segurei oito tempos no compasso oito por oito, com cada tempo tendo duração própria, em sequência microscópica (um, um, dois, três, cinco, oito) que eu nem precisei contar de propósito porque o corpo já sabia (um tempo, um tempo, dois tempos, três tempos, cinco tempos, oito tempos, e fim).
 
 O Posto 7 escutou. O teto curvo segurou o som. Devolveu.
 
@@ -150,7 +150,7 @@ A agulha do meu pescoço pesou um pouquinho, do jeito que ela pesa quando eu inc
 
 O cordão da Mara desapareceu na curva da trilha oeste. O vento continuou.
 
-Aos doze anos eu não sei tudo o que minha família sabe. Aos doze anos eu sei que existe uma família, que existe uma sabedoria, e que existe um lugar onde o teto curvo devolve em Fibonacci o que eu mando em melisma. É bastante. É, por hoje, exato.
+Aos doze anos eu não sei tudo o que minha família sabe. Aos doze anos eu sei que existe uma família, que existe uma sabedoria, e que existe um lugar onde o teto curvo devolve na sequência o que eu mando em melisma. É bastante. É, por hoje, exato.
 
 Cheguei em casa às doze e treze. A Brígida já estava lá.
 
