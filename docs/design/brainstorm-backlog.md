@@ -1,0 +1,52 @@
+# Brainstorm backlog: seeds de lore e design (a decidir depois)
+
+> Captura FIEL de insights do criador supremo, para NÃO esquecer e decidir depois. NADA aqui é canon fechado ainda: são sementes para brainstorm dirigido futuro (workflow colaborativo, nunca decidir sozinho). Cada seed vira, quando priorizado, um brainstorm proprio (opus + criador) e SÓ ENTÃO entra na lore/GDD canonicos. Regra transversal do criador (seed 9): tudo isto DEVE ser sempre confrontado com a lore existente e acrescentado a ela.
+>
+> Primeira leva: 2026-07-08 (10 seeds, ao fechar a mecânica de save/dungeon/Faraday).
+
+Cross-refs vivos: memoria `project_save_dungeon_pem_faraday` (mecânica de save por local), `project_axiologia_canonica` (Hayek/Mises = boa evolução), `project_fibonacci_easter_egg` (Fibonacci pervasivo), pillars (`docs/design/pillars.md`), `sinopse.md` (base canônica), itens do INBOX `SAVE-LOAD-UI` e `DUNGEON-PEM-ITEM-BRAINSTORM`.
+
+---
+
+## 1. Origem multiversal + pessoas reais no mundo (por que conhecem Faraday?)
+GusWorld se passa no planeta **Terra**, mas uma Terra que é **um dos vários multiversos criados num ACIDENTE** envolvendo um **mago-tech poderoso** (maligno? desastrado? indefinido). Por isso pessoas historicamente importantes do nosso mundo **também existiram lá** (explica conhecerem Faraday, a Gaiola de Faraday etc.).
+- **Brainstorm:** QUE acidente foi esse (natureza, intenção do mago-tech, consequências).
+- **Brainstorm extenso:** QUAIS outras pessoas reais existiram nesse mundo. Sementes citadas: **Faraday, Maxwell, Einstein, Elon Musk, Hayek, Mises**. Ampliar com matemáticos, físicos, visionários, ocultistas, economistas.
+- Cross-ref: axiologia canônica já usa econ. austríaca (Hayek/Mises) como "boa evolução"; a magia=software e o eletromagnetismo (Faraday/Maxwell) casam com os pillars.
+
+## 2. Dungeons = "Faraday" (renomear) + revestimento de gaiola
+Chamar as **dungeons de "faraday"** (nome do local), já sugerindo o uso da carta **Gaiola de Faraday**. Refinamento da mecânica: a **própria dungeon é revestida por uma gaiola de Faraday**, que CONTÉM o PEM/EMP dentro dela (não propaga o pulso pro resto da localidade — só afeta quem está dentro).
+- Refina a memoria `project_save_dungeon_pem_faraday`.
+
+## 3. Combate final: cartas de Gaiola de Faraday perdidas
+No **combate final**, os personagens estão SEM as cartas Gaiola de Faraday (perdidas — batalha? gastas? roubo? a definir) e precisam chegar ao chefe final atravessando **áreas sem save**, sob influência de **dispositivos de PEM escondidos** (quebráveis se encontrados) que desativam o save numa área qualquer.
+- **UX/dica canônica:** o jogador observa o MENU DE SAVE pra saber se está sob influência de PEM (save disponível ou não = sinal diegético).
+- Cross-ref: memoria `project_save_dungeon_pem_faraday`, `project_dragon_victory_canon` (clímax).
+
+## 4. Origens do REINO na lore (brainstorm intenso)
+Brainstorm intenso sobre as **origens do reino** na lore, **incluindo a seed 1** (a origem multiversal / o acidente do mago-tech). Fundação de worldbuilding.
+
+## 5. Quantidade de áreas abertas no mundo (Fibonacci) + ecossistemas
+Definir a **quantidade de áreas abertas pelo mundo** seguindo **Fibonacci** (easter egg pervasivo). E **(re)discutir os tipos de ecossistema** das áreas.
+
+## 6. Quantidade de dungeons por área (Fibonacci) + tipos de dungeon
+Quantidade de **dungeons por área** também em **Fibonacci** (brainstorm). **Tipos de dungeon:** ensinando a jogar (tutorial), puzzle puro, só batalhas, labirintos, mistas. Definir também a **quantidade de áreas secretas não obrigatórias por dungeon**.
+
+## 7. Topologia de acesso: tudo acessível desde o começo, dificuldade por distância
+As **áreas principais são TODAS acessíveis desde o começo** do jogo, PORÉM quanto **mais distantes da origem**, mais difíceis (ecossistema + inimigos mais duros). Há **áreas especiais contornáveis** só acessíveis com **algo diferenciado** (item/carta/habilidade), que **virarão atalhos** entre dois pontos no futuro; elas **NUNCA restringem alcançar outras áreas** (open desde o início), mas podem **dificultar bastante** o caminho.
+- Princípio: mundo aberto por design; gating por DIFICULDADE, não por barreira dura.
+
+## 8. Como o Gus começa (sozinho, mas onde?)
+O Gus **começa sozinho**. ONDE/como é a abertura? Sementes a brainstormar (extenso): em casa? desmaiado com amnésia? preso? na escola? (outras hipóteses no brainstorm).
+- Cross-ref: `sinopse.md`, arco-principal, família Vance canônica.
+
+## 9. REGRA TRANSVERSAL: tudo sempre confrontado e acrescentado à lore
+Todo insight/decisão de design DEVE sempre ser **confrontado com a lore existente** (consistência canônica) e **acrescentado a ela**. Nada de mecânica solta sem raiz narrativa. Esta é uma regra de método que vale para todos os seeds acima e futuros.
+
+## 10. Carta Gaiola de Faraday = item-chave básico (brainstorm próprio) + outros itens do tipo
+A carta **Gaiola de Faraday** merece **brainstorm próprio**: como funciona (efeito passivo já canon), ONDE e COMO é obtida. Ela deve ser um **item-chave BÁSICO** (obtido relativamente cedo? a definir). Discutir também **outros itens do tipo** (itens-chave que destravam mecânicas/atalhos, cf. seed 7) num brainstorm de itens-chave.
+- Cross-ref: item `DUNGEON-PEM-ITEM-BRAINSTORM` (o item que acessa o PEM, distinto da carta Faraday), memoria `project_save_dungeon_pem_faraday`.
+
+---
+
+**Como usar este backlog:** quando o criador priorizar um seed, rodar o brainstorm dirigido (opus + criador, workflow colaborativo, RAG visível se aplicável), canonizar o resultado no doc de lore/GDD apropriado, e marcar o seed aqui como "canonizado em <doc>". Ordem sugerida de dependência: seed 1/4 (origem multiversal + reino) são fundacionais e alimentam quase todos os outros; seeds 5/6/7 (topologia de mundo) dependem de 1/4; seeds 2/3/10 (Faraday/PEM/itens) já têm base na mecânica de save e podem andar em paralelo; seed 8 (abertura do Gus) depende da origem do reino.
