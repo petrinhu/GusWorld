@@ -121,27 +121,34 @@
     <div class="panel slots-panel">
       <div class="corner tl"></div><div class="corner tr"></div><div class="corner bl"></div><div class="corner br"></div>
       <div class="panel-title">Salvar</div>
-      <div class="panel-sub">Escolha um espaco - gravar por cima pede confirmacao</div>
+      <div class="panel-sub">6 espacos (lista rola) - gravar por cima pede confirmacao - o espaco Auto e so-leitura</div>
+      <div class="slot" style="border-color:var(--brass-dark);opacity:.85">
+        <div class="slot-num" style="color:var(--cyan)">A</div>
+        <div class="slot-body">
+          <div class="slot-title">Auto <span class="loc">- Praca da Compilacao</span> <span style="color:var(--neutral);font-size:11px">(so-leitura)</span></div>
+          <div class="slot-meta">08/07/2026 01:20  -  0h 55m  -  Nv. 7  -  Cap. 1</div>
+        </div>
+      </div>
       <div class="slot sel">
         <div class="slot-num">1</div>
         <div class="slot-body">
           <div class="slot-title">Espaco 1 <span class="loc">- Praca da Compilacao</span></div>
-          <div class="slot-meta">07/07/2026 20:14  -  tempo jogado 0h 42m</div>
+          <div class="slot-meta">07/07/2026 20:14  -  0h 42m  -  Nv. 6  -  Cap. 1</div>
         </div>
       </div>
       <div class="slot">
         <div class="slot-num">2</div>
         <div class="slot-body">
           <div class="slot-title">Espaco 2 <span class="loc">- Dutos Infernais</span></div>
-          <div class="slot-meta">06/07/2026 23:51  -  tempo jogado 1h 18m</div>
+          <div class="slot-meta">06/07/2026 23:51  -  1h 18m  -  Nv. 9  -  Cap. 1</div>
         </div>
       </div>
       <div class="slot empty">
         <div class="slot-num">3</div>
-        <div class="slot-body"><div class="slot-empty-label">Espaco 3 - vazio</div></div>
+        <div class="slot-body"><div class="slot-empty-label">Espaco 3 - vazio  (4, 5, 6 abaixo, role para ver)</div></div>
       </div>
       <div class="slots-foot">
-        <span class="hint">Cima/Baixo navega  -  Enter grava aqui  -  Esc volta</span>
+        <span class="hint">Cima/Baixo navega (roda tambem)  -  Enter grava aqui  -  Esc volta</span>
         <button class="btn">Voltar</button>
       </div>
     </div>
@@ -154,34 +161,41 @@
     <div class="panel slots-panel">
       <div class="corner tl"></div><div class="corner tr"></div><div class="corner bl"></div><div class="corner br"></div>
       <div class="panel-title">Carregar</div>
-      <div class="panel-sub">Escolha um save para continuar</div>
+      <div class="panel-sub">6 espacos + Auto (lista rola) - espaco vazio nao selecionavel</div>
       <div class="slot">
-        <div class="slot-num">1</div>
+        <div class="slot-num" style="color:var(--cyan)">A</div>
         <div class="slot-body">
-          <div class="slot-title">Espaco 1 <span class="loc">- Praca da Compilacao</span></div>
-          <div class="slot-meta">07/07/2026 20:14  -  tempo jogado 0h 42m</div>
+          <div class="slot-title">Auto <span class="loc">- Praca da Compilacao</span></div>
+          <div class="slot-meta">08/07/2026 01:20  -  0h 55m  -  Nv. 7  -  Cap. 1</div>
         </div>
       </div>
       <div class="slot sel">
+        <div class="slot-num">1</div>
+        <div class="slot-body">
+          <div class="slot-title">Espaco 1 <span class="loc">- Praca da Compilacao</span></div>
+          <div class="slot-meta">07/07/2026 20:14  -  0h 42m  -  Nv. 6  -  Cap. 1</div>
+        </div>
+      </div>
+      <div class="slot">
         <div class="slot-num">2</div>
         <div class="slot-body">
           <div class="slot-title">Espaco 2 <span class="loc">- Dutos Infernais</span></div>
-          <div class="slot-meta">06/07/2026 23:51  -  tempo jogado 1h 18m</div>
+          <div class="slot-meta">06/07/2026 23:51  -  1h 18m  -  Nv. 9  -  Cap. 1</div>
         </div>
       </div>
       <div class="slot empty">
         <div class="slot-num">3</div>
-        <div class="slot-body"><div class="slot-empty-label">Espaco 3 - vazio (nao selecionavel)</div></div>
+        <div class="slot-body"><div class="slot-empty-label">Espaco 3 - vazio (nao selecionavel)  (4, 5, 6 abaixo)</div></div>
       </div>
       <div class="slots-foot">
-        <span class="hint">Cima/Baixo navega  -  Enter carrega  -  Esc volta</span>
+        <span class="hint">Cima/Baixo navega (roda tambem)  -  Enter carrega  -  Esc volta</span>
         <button class="btn">Voltar</button>
       </div>
     </div>
   </div>
 
-  <!-- 4. AVISO -->
-  <div class="frame-label">Tela 4 - <b>AVISO</b> (residuo do M2) - save incompativel / controles diferentes</div>
+  <!-- 4a. AVISO versao/corrompido -->
+  <div class="frame-label">Tela 4a - <b>AVISO: versao / corrompido</b> (residuo do M2)</div>
   <div class="screen">
     <div class="city-blur"></div><div class="scrim"></div>
     <div class="panel slots-panel" style="filter:blur(1px) brightness(.7)">
@@ -192,7 +206,7 @@
     <div class="warn-wrap">
       <div class="warn-box">
         <div class="warn-title">Aviso</div>
-        <div class="warn-msg">Este save e de uma versao mais nova do jogo (v5) do que a instalada (v4). Carregar pode nao funcionar corretamente. Deseja tentar mesmo assim?</div>
+        <div class="warn-msg">Este save e de uma versao mais nova do jogo (v5) do que a instalada (v4). Carregar pode nao funcionar corretamente. Deseja tentar mesmo assim?<br><span style="color:var(--text-2);font-size:12px">(save corrompido usaria o mesmo estilo: "Este save esta danificado e nao pode ser carregado." + so Cancelar)</span></div>
         <div class="warn-btns">
           <button class="warn-btn">Cancelar</button>
           <button class="warn-btn danger">Tentar carregar</button>
@@ -201,13 +215,34 @@
     </div>
   </div>
 
+  <!-- 4b. AVISO controles diferentes -->
+  <div class="frame-label">Tela 4b - <b>AVISO: controles diferentes</b> (o save tem mapeamento de teclas diferente do atual)</div>
+  <div class="screen">
+    <div class="city-blur"></div><div class="scrim"></div>
+    <div class="panel slots-panel" style="filter:blur(1px) brightness(.7)">
+      <div class="corner tl"></div><div class="corner tr"></div><div class="corner bl"></div><div class="corner br"></div>
+      <div class="panel-title">Carregar</div><div class="panel-sub">...</div>
+      <div class="slot" style="opacity:.5"><div class="slot-num">2</div><div class="slot-body"><div class="slot-title">Espaco 2</div></div></div>
+    </div>
+    <div class="warn-wrap">
+      <div class="warn-box" style="border-color:var(--brass);box-shadow:0 0 0 1px #000,0 0 40px rgba(201,162,75,.15)">
+        <div class="warn-title" style="color:var(--brass-light)">Controles diferentes</div>
+        <div class="warn-msg">Este save foi criado com um mapeamento de teclas diferente do atual:<br>
+          <span style="color:var(--text-2);font-size:12px">Andar para frente: save = <b style="color:#fff">Seta Cima</b>, atual = <b style="color:#fff">W</b> &nbsp;·&nbsp; Interagir: save = <b style="color:#fff">F</b>, atual = <b style="color:#fff">E</b></span><br>
+          Quer usar os controles do save, ou manter os seus atuais?</div>
+        <div class="warn-btns">
+          <button class="warn-btn">Manter os atuais</button>
+          <button class="warn-btn" style="border-color:var(--brass);color:#fff">Usar os do save</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div class="callouts">
-    <b>Pontos pra sua decisao:</b><br>
-    1. <span class="q">Quantos espacos de save?</span> O mock mostra 3. Pode ser mais (ex.: 6) ou menos. O motor aguenta N.<br>
-    2. <span class="q">Autosave?</span> Alem do save manual, quer um save automatico (ex.: ao entrar em area / apos batalha) num espaco reservado, ou so save manual por agora?<br>
-    3. <span class="q">Gravar por cima:</span> o mock pede confirmacao ("tem certeza?") ao salvar num espaco ja ocupado. Mantem?<br>
-    4. <span class="q">Aviso de controles diferentes:</span> o mock 4 mostra o caso "versao". O outro caso (o save tem mapeamento de teclas diferente do atual) mostraria um diff "usar os controles do save / manter os atuais". Fazer os dois avisos?<br>
-    5. <span class="q">O que mostrar no espaco:</span> local + data/hora + tempo jogado (o mock). Quer algo a mais (ex.: nivel do Gus, capitulo)?
+    <b>Decisoes ja fechadas (refletidas no mock):</b> 6 espacos + Auto (lista rola, scroll glintfx v0.4.1) · autosave + manual · os 2 avisos (versao/corrompido + controles diferentes) · slot mostra local + data/hora + tempo + <b>Nv.</b> + <b>Cap.</b> · gravar por cima pede confirmacao.<br><br>
+    <b>2 implicacoes que preciso sinalizar antes de implementar:</b><br>
+    1. <span class="q">Autosave - QUANDO dispara?</span> O espaco Auto grava sozinho em pontos-chave. Preciso saber quais: ao entrar/sair de area? apos cada batalha? ao salvar manual tambem? (Menos gatilhos = mais simples e previsivel.)<br>
+    2. <span class="q">Nivel / Capitulo no slot = pode exigir mexer no formato do save.</span> O SaveData atual guarda local (cena), data/hora, tempo jogado e flags/quest_progress - mas NAO tem um campo explicito de "nivel do Gus" nem "capitulo". Mostrar isso ou (a) deriva de dados que ja existem (ex.: capitulo = a partir das flags de progresso; nivel = do XP se estiver no save), ou (b) exige ADICIONAR campos ao save (bump de versao V4->V5 + migrator). Vou confirmar o que da pra derivar; se precisar de campo novo, e um passo a mais.
   </div>
 
 </body>
