@@ -53,7 +53,7 @@ Padrão de pelagem reproduz o conjunto de Mandelbrot literal em escala dorsal; a
 
 A face é literalmente uma espiral fractal aninhada; ornitólogos da Era 2 levaram 13 anos para aceitar que o padrão não era ilusão de óptica, e sim biologia. O scan dos óculos táticos retorna a equação paramétrica da espiral facial como string legível em cyan, com erro inferior a 0,001 em parâmetro fractal. HP 13, dano 5. Caça em silêncio total; sua presença é detectável apenas pelo padrão Perlin da brisa que ela perturba ao planar.
 
-### 3.3 Símio-Fibonacci (*Pan recursivensis*)
+### 3.3 Símio-recursivo (*Pan recursivensis*)
 
 Novo canon. Vivem em grupos cuja contagem por clearing obedece estritamente à sequência recorrente: solitários em clareira de borda (1), pares estáveis em segunda fronteira (1), trios em terça (2), e assim por diante até bandos máximos de 89 indivíduos em clareiras-mãe profundas (raras, três conhecidas em toda a Orla Recursiva). Indivíduos isolados são jovens em rito de dispersão; bandos de 5 são unidades expedicionárias adultas; bandos de 8 ou 13 incluem ancião. HP 34, dano 13. A 47ª proposição (pitágoras três-quatro-cinco) é o triângulo de posicionamento defensivo natural que assumem quando ameaçados, e a cronista-cataloguista que primeiro mediu o ângulo, **Anhuera Vanderbist** (co-autora canônica do Pythia, pioneira bio-hacker, expedição de catalogação -95 a -89 na Orla Recursiva profunda), deixou registro de campo que mais tarde se descobriu coincidir com a geometria sacra dos canteiros de obra Neo-Sylvania Era 1. Coincidência improvável; canonicamente, evidência de continuidade biocultural entre matemática profunda da Selve e arquitetura cerimonial Pré-Código.
 

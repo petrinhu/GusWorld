@@ -2,7 +2,7 @@
 
 Status: sabor e esqueleto APROVADOS pelo lider 2026-06-23. Embasado no RAG-elfico (`rag_elvish`): Pedin Edhellen (Sindarin, Thorsten Renk), Quetin i lambe eldaiva (Quenya), artigos de acento e deriva historica (Tengwestie), cursos PT (licao1, licaosind3). Detalhe fino (inventario exato, regras completas de mutacao) sera fechado junto do lexico e da gramatica.
 
-**Ajuste 2026-07-07 (auditoria AC-L5c):** o inventario consonantal listava 18 sons mas declarava contagem-alvo 13 (numero Fibonacci, canon). Correcao: reclassificados 5 sons (h, th, dh, lh, nh) de "fonema-base" para "alofone / realizacao de mutacao" (ver subsecao dedicada abaixo). Nenhum som foi cortado da lingua falada, nenhuma regra de mutacao mudou, nenhuma palavra ja gerada (*hylvi*, *davsi*) ou raiz do lexico-semente (`02-lexico-semente.md`) foi invalidada. So mudou o ESTATUTO desses 5 sons no inventario-base.
+**Ajuste 2026-07-07 (auditoria AC-L5c):** o inventario consonantal listava 18 sons mas declarava contagem-alvo 13 (numero da sequencia recorrente, canon). Correcao: reclassificados 5 sons (h, th, dh, lh, nh) de "fonema-base" para "alofone / realizacao de mutacao" (ver subsecao dedicada abaixo). Nenhum som foi cortado da lingua falada, nenhuma regra de mutacao mudou, nenhuma palavra ja gerada (*hylvi*, *davsi*) ou raiz do lexico-semente (`02-lexico-semente.md`) foi invalidada. So mudou o ESTATUTO desses 5 sons no inventario-base.
 
 ## Sabor sonoro
 Equilibrio: a melodia do Quenya (vogais puras) na base + aspereza pontual do Sindarin (th/dh) + portugues forte por cima (nasais, lh/nh). Soa familiar a um brasileiro e exotico ao mesmo tempo: um "portugues elfico arcaico". (Nota: th/dh/lh/nh sao alofones no inventario-base, ver "Consoantes" abaixo - continuam soando na lingua, so nao contam como fonema independente.)
@@ -15,7 +15,7 @@ Equilibrio: a melodia do Quenya (vogais puras) na base + aspereza pontual do Sin
 
 ## Consoantes
 
-### Inventario-base: 13 fonemas (Fibonacci, fechado)
+### Inventario-base: 13 fonemas (numero da sequencia recorrente, fechado)
 - Liquidas: **l, r**.
 - Nasais: **m, n**.
 - Aproximante: **v**.

@@ -130,10 +130,10 @@ Cada mapa segue padrão fixo:
 
 **Anotações Gus (margem):**
 
-- "ramificações Orla Recursiva: padrão L-system. cada galho 2 sub-galhos, ângulo Fibonacci, 3 níveis recursivos. Pillar 2 visível na primeira floresta." (Knowledge baixa)
+- "ramificações Orla Recursiva: padrão L-system. cada galho 2 sub-galhos, ângulo recorrente, 3 níveis recursivos. Pillar 2 visível na primeira floresta." (Knowledge baixa)
 - "Pântano não é caótico. É estocástico em pequena escala. esperar 30 segundos no mesmo ponto e o padrão repete. (Markov.)" (Knowledge média)
 - "Tatauín disse: 'se você ver a copa parar de respirar, você não estava na floresta. estava no que ela não é.' (anotei. foreshadow Patch-Zero pessoal.)" (Knowledge alta)
-- "raposa-fractal de pelo errado: Fibonacci corrompido. primeiro sintoma Patch-Zero local que eu pego sozinho." (foreshadow F-055)
+- "raposa-fractal de pelo errado: padrão recorrente corrompido. primeiro sintoma Patch-Zero local que eu pego sozinho." (foreshadow F-055)
 
 **Cross-ref Bloco I:**
 
@@ -177,7 +177,7 @@ Cada mapa segue padrão fixo:
 
 - "vitrais reagem a temperatura. mestre Lavínia Sevra disse que era padrão. eles tinham especificação técnica. (perdi a referência da especificação. ela disse 'também não tá no Tomo'.)" (Knowledge alta)
 - "Bento sincroniza cronômetro toda vez que entra na nave. ele acha que é tradição. eu acho que é compulsão calibrada por trauma. (sticky-note: parece com a minha pausa de 1 segundo.)" (Knowledge alta)
-- "12 dentes assimétricos engrenagem Ordem Recursiva = Fibonacci truncada. ninguém me explicou; eu contei." (Knowledge média)
+- "12 dentes assimétricos engrenagem Ordem Recursiva = sequência recorrente truncada. ninguém me explicou; eu contei." (Knowledge média)
 - "cronômetro do peito de Bento (peitoral mecânico) tique-taca = mesmo intervalo do tique da fonte Engrenagem-Mestra Praça da Compilação. (700 anos depois, mesma freqüência. continuidade analógica.)" (Knowledge alta)
 
 **Cross-ref Bloco I:**

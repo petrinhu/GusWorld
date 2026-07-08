@@ -506,7 +506,7 @@ Cada facção tem ficha visual + texto. Knowledge cresce em 3 estados como nos c
 | Inimigos | Sterling Corp (extração), FIR (predação), Patch-Zero (corrompe) |
 | Setting | [[02-selve-sombria|Selve Sombria]] + [[08-selve-profunda|Selve Profunda]] |
 | Knowledge baixa | "floresta. fauna estranha. cogumelos brilham." |
-| Knowledge média | "Fibonacci. fractais. Pântano de Markov estocástico. fauna comporta-se em padrão." |
+| Knowledge média | "1, 1, 2, 3, 5, 8. fractais. Pântano de Markov estocástico. fauna comporta-se em padrão." |
 | Knowledge alta | "L-systems Orla Recursiva, cadeias de Markov Pântano, Mandelbrot Núcleo. fauna corrompida = Patch-Zero local. sementes-relíquia preservadas em câmaras Era 1 dentro das catedrais." |
 
 ### 4.5 Cult Mirage

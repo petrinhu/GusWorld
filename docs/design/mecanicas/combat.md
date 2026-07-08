@@ -1045,7 +1045,7 @@ As duas mecânicas vivem em pontos diferentes do espectro de Knowledge do inimig
 | Domínio do inimigo (selo) | O que acontece ao esbarrar | O jogo pergunta? |
 |---|---|---|
 | **Ouro** (dominado) | **Auto-kill silencioso** no overworld: NÃO monta a arena; mata com micro-animação no próprio mapa; concede loot + Knowledge BÁSICO. | Nunca (silencioso e automático) |
-| **Ouro, 8% Fibonacci** | "O bug resistiu / mutou" → cai DIRETO na batalha (monta a arena). | Não (cai direto) |
+| **Ouro, 8% (sequência numérica recorrente)** | "O bug resistiu / mutou" → cai DIRETO na batalha (monta a arena). | Não (cai direto) |
 | **Bronze ou Prata** | Monta a arena; abertura PARA e espera input; **[Resolver sem encarar] disponível** como verbo opt-in. | Só se o jogador apertar o verbo |
 | **Sem selo** (1º contato / quase nenhum kill) | Monta a arena; abertura PARA e espera input; **[Resolver sem encarar] NÃO aparece** (gate de onboarding). | Não (sem opção de pular; encara) |
 

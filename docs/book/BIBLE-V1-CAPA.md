@@ -22,7 +22,7 @@ Sobre a Catedral-Mãe submersa, parcialmente sobreposto ao céu, paira translúc
 
 No quadrante superior esquerdo, ornamento marginal discreto contém o cripto-glifo Era 1 (grade três por três mais X mais pontos, cifra canônica fundadora). O ornamento parece Glyph decorativo para o leigo e palavra cifrada para o leitor instruído.
 
-No quadrante superior direito, espelhando o cripto-glifo, ornamento contém o Selo dos Quatro Instrumentos canônico C-Arcane (esquadro, compasso, cinzel e martelo entrelaçados em geometria razão acaceiro), com régua-T cruzando a base.
+No quadrante superior direito, espelhando o cripto-glifo, ornamento contém o Selo dos Quatro Instrumentos canônico C-Arcane (dois instrumentos de medida pareados, cinzel e martelo entrelaçados em geometria razão acaceiro), com régua-T cruzando a base.
 
 Aos lados inferiores, duas pequenas colunas estilizadas Boróstoma à esquerda (capitel ondulado, base sólida) e Janor à direita (capitel angular, base estriada), paralelo canon Jachin e Boaz. As colunas têm aproximadamente um terço da altura de Gus, posicionadas como marcadores de entrada ao pavimento tesselado.
 
@@ -68,7 +68,7 @@ Foreground: silhueta da party em sete figuras, alinhadas na base da capa em form
 
 Ornamentos marginais espelham Tomo 1 mas progressão temporal está marcada: o cripto-glifo no quadrante superior esquerdo agora aparece parcialmente sobreposto por circuitos integrados estilizados, sugerindo a transição de Era 1 de conjuros para Era 3 computável (canon: magia é software).
 
-Ashlar polido predomina sobre ashlar bruto neste tomo (canon maçom: pedra trabalhada como evolução civilizatória, embora aqui ambígua pois civilização Era 3 também distorce).
+Ashlar polido predomina sobre ashlar bruto neste tomo (motivo cerimonial fundador: pedra trabalhada como evolução civilizatória, embora aqui ambígua pois civilização Era 3 também distorce).
 
 A coluna quebrada do Tomo 1 não reaparece literalmente. Em seu lugar, no quadrante inferior esquerdo, uma única ladrilha do pavimento tesselado está rachada em formato fractal, detalhe sutil indicando que o legado de Era 1 segue presente sob a urbanidade Era 3.
 
@@ -222,7 +222,7 @@ Logo "GUSWORLD" sans-serif geométrica bold cyan é idêntico nos três volumes,
 
 Selo Glyph-vyr hot stamping cyan aparece em todos os três volumes na mesma posição relativa (canto inferior direito da capa frontal, base da lombada). Selo é assinatura visual da edição canônica.
 
-Lombadas dos três volumes alinhadas na estante formam padrão visual contínuo: gradientes verticais cyan (Tomo 1), vermelho (Tomo 2) e ouro Dragon-Victory (Volume 2 Antologia, sugestão para artista validar em brief próprio). Base das três lombadas continua a tesselagem preto-e-branco maçom totalizando 89 ladrilhas brancas combinadas.
+Lombadas dos três volumes alinhadas na estante formam padrão visual contínuo: gradientes verticais cyan (Tomo 1), vermelho (Tomo 2) e ouro Dragon-Victory (Volume 2 Antologia, sugestão para artista validar em brief próprio). Base das três lombadas continua a tesselagem preto-e-branco cerimonial fundadora totalizando 89 ladrilhas brancas combinadas.
 
 Sobrecapas removíveis dos três volumes, quando posicionadas lado a lado abertas (frente, lombada, contracapa estendidas em superfície plana), formam mural panorâmico horizontal: Catedral-Mãe submersa à esquerda extrema (Tomo 1), skyline GusWorld City no meio com Vyrdragon atravessando (Tomo 2), e cena culminante a definir do Volume 2 Antologia à direita. Artista deve projetar a continuidade horizontal explicitamente.
 

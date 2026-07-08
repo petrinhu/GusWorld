@@ -12,7 +12,7 @@ Hoje é manhã de Ano 0, três meses (mais ou menos) antes daquilo que vocês ad
 
 ## II
 
-Desço os trinta e quatro degraus. Conto cinco, depois oito, depois treze, depois vinte e um, depois trinta e quatro. Fibonacci é tipo, sei lá, um vício de família. Meu pai media tudo em Fibonacci e jurava que não percebia, conforme a Inácia conta (ela diz que era constante, que Salvador anotava espessura de fio, número de voltas de bobina, intervalo de pulso em sequência que ela só foi reconhecer depois de viúva, abrindo as cadernetas dele). Minha mãe, a Inácia, mede tudo em peso de sucata e jura que percebe demais.
+Desço os trinta e quatro degraus. Conto cinco, depois oito, depois treze, depois vinte e um, depois trinta e quatro. A sequência é tipo, sei lá, um vício de família. Meu pai media tudo pela mesma sequência e jurava que não percebia, conforme a Inácia conta (ela diz que era constante, que Salvador anotava espessura de fio, número de voltas de bobina, intervalo de pulso em sequência que ela só foi reconhecer depois de viúva, abrindo as cadernetas dele). Minha mãe, a Inácia, mede tudo em peso de sucata e jura que percebe demais.
 
 Cheguei no piso. Os Dutos Infernais não são exatamente "infernais"; o nome é uma piada que pegou. Ficaram conhecidos assim porque há uns quarenta anos um pastor pelicano achou que os relés de plasma faziam barulho de demônio. O nome ficou. A gente da Periferia ostensiva (essa parte da cidade onde a Catedral Asmódica não consegue por câmera porque os campos magnéticos detonam a calibragem) curte o nome. Aceita-se a herança e segue. Periferia ostensiva é assim: o que não pode mudar, vira marca.
 
@@ -126,7 +126,7 @@ Guardo o nó no bolso interno da jaqueta, do lado esquerdo, perto do peito. Não
 
 Volto pra casa pela rua dos cabos aéreos. Essa rua eu gosto porque os cabos aéreos formam uma malha que, vista de baixo, parece partitura. Eu já tentei ler a partitura como se fosse música de verdade. Não dá certo, mas quase dá. O ritmo dos cabos no vento, se você fechar um olho e ouvir com o outro, bate em compasso treze-por-dezesseis. Compasso esquisito, irregular, daqueles que só músico ruim ou músico muito bom usa. Eu sou músico ruim. Bato esse compasso no peito quando ando, porque é o compasso da raiva que eu cataloguei aos zero anos e nunca soltei.
 
-Treze por dezesseis. Treze anos eu tenho. Treze anos atrás meu irmão morreu. Treze não é Fibonacci? É, treze é Fibonacci. Eu sou um número Fibonacci ambulante. Meu irmão é um número Fibonacci morto. A gente é uma família que se conta sozinha.
+Treze por dezesseis. Treze anos eu tenho. Treze anos atrás meu irmão morreu. Treze não está na sequência? Está, treze está na sequência. Eu sou um número da sequência ambulante. Meu irmão é um número da sequência morto. A gente é uma família que se conta sozinha.
 
 Eu não choro. Aos treze a gente não chora, a gente cataloga. Tem hora pra chorar, vai ter, mas não é hoje, não é manhã de quarta-feira de Ano 0 com conector C-89 no bolso direito e nó de oitenta e nove no bolso esquerdo.
 
@@ -138,9 +138,9 @@ Depois do almoço, eu subo pro meu quarto. Quarto pequeno, três metros por cinc
 
 Eu abro o terminal. Carrego o ambiente Pythia. Pythia é a linguagem bio-elétrica que minha gente usa, é o que eu falo melhor que português, é a linguagem que o Iremar Berenger meu tataravô ajudou a co-escrever lá em -95. Eu não tenho orgulho disso, porque orgulho de coisa antiga é coisa de adulto. Eu tenho costume. É a minha língua materna técnica.
 
-Hoje eu vou tentar um script novo. Um script bio-elétrico simples: oscilação controlada em frequência fixa, oitenta e nove hertz, modulada por envelope Fibonacci nas primeiras oito amostras. Eu venho tentando esse script faz duas semanas. Nunca compilou direito, sempre dava erro de fase no terceiro passo.
+Hoje eu vou tentar um script novo. Um script bio-elétrico simples: oscilação controlada em frequência fixa, oitenta e nove hertz, modulada por envelope recorrente nas primeiras oito amostras. Eu venho tentando esse script faz duas semanas. Nunca compilou direito, sempre dava erro de fase no terceiro passo.
 
-Digito. Compilo. Espera de oito segundos (o terminal velho é lento). Resultado: compilou. Plasma simulado no painel oscila exatamente como eu queria. Envelope Fibonacci nas primeiras oito amostras: uma, uma, duas, três, cinco, oito, treze, vinte e uma. Plateau em vinte e uma. Oitenta e nove hertz limpos.
+Digito. Compilo. Espera de oito segundos (o terminal velho é lento). Resultado: compilou. Plasma simulado no painel oscila exatamente como eu queria. Envelope recorrente nas primeiras oito amostras: uma, uma, duas, três, cinco, oito, treze, vinte e uma. Plateau em vinte e uma. Oitenta e nove hertz limpos.
 
 Eu sorrio. Sorriso de verdade, dos amplos, daqueles que aos treze a gente acha que perdeu mas não perdeu, só guardou. Caramba, eu sorrio. Funcionou. Funcionou.
 
@@ -164,7 +164,7 @@ Cobertura. Concreto bruto, antena velha de TV de uma época em que ainda existia
 
 Daqui dá pra ver GusWorld City inteira do lado leste. Periferia ostensiva atrás de mim, Núcleo na frente, Catedrais Neo-Sylvania mais ao fundo (essas eu vejo só de noite, quando iluminam, hoje só silhueta). O Núcleo é onde fica o colégio técnico em que eu estudo três vezes por semana, por bolsa do Pelicano Branco. No colégio técnico tem um menino chamado Gus Vector Tavus Vance, onze anos, prodígio analítico, filho do Pyotor e da Gargi (separados quando ele tinha seis, mas convivência boa, modelo libertário-empresarial família funcional descentralizada, como minha mãe diria se quisesse explicar e ela nunca quer). Gus joga xadrez bem demais. Gus resolve puzzle de Vetor do Gambito em metade do tempo que eu levo. Gus é tipo um irmão mais novo que eu não pedi, e que eu não posso devolver, e que (caçamba) eu acho que eu gosto.
 
-Eu olho a cidade. Vento alto bate em compasso que eu não consigo identificar de cara, mas que se eu prestar atenção bate em padrão Fibonacci também: rajada curta, curta, média, longa, mais longa, plateau. Vento Fibonacci. Tudo é Fibonacci nessa caçamba de cidade se você fica olhando tempo demais.
+Eu olho a cidade. Vento alto bate em compasso que eu não consigo identificar de cara, mas que se eu prestar atenção bate em padrão recorrente também: rajada curta, curta, média, longa, mais longa, plateau. Vento recorrente. Tudo é recorrente nessa caçamba de cidade se você fica olhando tempo demais.
 
 Eu digo em voz baixa, pra ninguém ouvir, pra mim mesmo:
 

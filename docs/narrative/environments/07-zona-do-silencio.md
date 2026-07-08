@@ -154,7 +154,7 @@ A primeira coisa que Gus nota é o som dos próprios passos. Audível, normal, q
 
 ### Vinheta 2: Câmara do Equinócio Acústico, primeira visita
 
-Linda passa primeiro. Gus atrás. Joaquim segura a porta de pedra polida e fecha quando os dois entram. Por três segundos, silêncio completo. Depois Linda fala "frequência boa." A voz dela bate no cristal da parede oposta, volta, bate no cristal atrás, volta de novo. Gus ouve a voz da Linda quatro vezes em duas linhas. A última eco é mais quente que a primeira. Linda olha pra ele e sorri muito de leve. "Aqui o som existe." Gus sente o ar tremer levemente quando ela aciona o vetor sônico Óxido a 47Hz, e a câmara reage: os cristais começam a brilhar muito fraco, em padrão Fibonacci na ordem 1, 1, 2, 3, 5, 8. Linda observa. "Eu não comandei isso." Joaquim, do lado de fora, ouve o som da câmara pela primeira vez em três anos vazar pela porta. Para. Encosta a orelha no batente. Não conta a ninguém depois.
+Linda passa primeiro. Gus atrás. Joaquim segura a porta de pedra polida e fecha quando os dois entram. Por três segundos, silêncio completo. Depois Linda fala "frequência boa." A voz dela bate no cristal da parede oposta, volta, bate no cristal atrás, volta de novo. Gus ouve a voz da Linda quatro vezes em duas linhas. A última eco é mais quente que a primeira. Linda olha pra ele e sorri muito de leve. "Aqui o som existe." Gus sente o ar tremer levemente quando ela aciona o vetor sônico Óxido a 47Hz, e a câmara reage: os cristais começam a brilhar muito fraco, em padrão recorrente na ordem 1, 1, 2, 3, 5, 8. Linda observa. "Eu não comandei isso." Joaquim, do lado de fora, ouve o som da câmara pela primeira vez em três anos vazar pela porta. Para. Encosta a orelha no batente. Não conta a ninguém depois.
 
 ---
 

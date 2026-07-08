@@ -40,11 +40,11 @@
 **Status:** parâmetros ratificados pelo criador supremo (AskUserQuestion, 2026-06-24). Item de tabela de pendências: `ECONOMIA-HOSPITAL-DOC` (canonização formal do brainstorm economy-designer + criador de 2026-06-23).
 **Cross-ref:** [`battle-screen.md`](battle-screen.md) §3.1 (tela de resultado `BUILD FAILED` que corta pro Hospital), [`combat-flavor.md`](combat-flavor.md) §3b (acervo de frases de vitória/derrota/performance da tela de resultado), [`combat.md`](combat.md) §2.1 (HP de Gus = menor da party; Análise Preditiva absorve 1 golpe fatal por batalha) e §16 (`ActorIncapacitated` / `ActorDefeated` aciona este fluxo), e [`pillars.md`](../pillars.md) Pillar 4 (Prodígio de 11 anos: "Companions — imortais com incapacitação" — cura gratuita demora, cura paga é rápida — e "Game over": derrota de Gus na party nunca é reload puro no fluxo de wipe abaixo, é custo econômico via Hospital).
 
-A derrota NÃO é game-over e NÃO perde progresso: é um **custo econômico** (Pillar 4). O wipe corta pro Hospital, que cura pelo custo proporcional da §3.1 (1 cr / 3 HP) e reativa incapacitados pela §3.1 (multa Fibonacci `seq_acima(HP_max)`). Se o jogador não tem crédito pra cura completa, ele **ESCOLHE** (anti-softlock, nunca trava):
+A derrota NÃO é game-over e NÃO perde progresso: é um **custo econômico** (Pillar 4). O wipe corta pro Hospital, que cura pelo custo proporcional da §3.1 (1 cr / 3 HP) e reativa incapacitados pela §3.1 (multa da sequência numérica recorrente `seq_acima(HP_max)`). Se o jogador não tem crédito pra cura completa, ele **ESCOLHE** (anti-softlock, nunca trava):
 
 #### 3.3.1 Safe mode (grátis)
 
-- Revive a party a **13% do HP-máximo por ator** (Fibonacci; arredonda pra baixo; **piso 1 HP**). Ex: HP-max 34 → 4 HP, HP-max 55 → 7 HP.
+- Revive a party a **13% do HP-máximo por ator** (sequência numérica recorrente; arredonda pra baixo; **piso 1 HP**). Ex: HP-max 34 → 4 HP, HP-max 55 → 7 HP.
 - Como o HP de Gus é o menor da party (combat.md §2.1), o % incide sobre statlines desiguais e **preserva a hierarquia de fragilidade** (companion tanky revive com mais HP absoluto; Gus segue o mais frágil).
 - Sai capenga, mas SEM death-loop: a **Análise Preditiva** (combat.md §2.1, recarrega por batalha) cobre o próximo golpe fatal, garantindo um colchão.
 - **Só ofertado em wipe REAL** (party toda incapacitada). Nunca acionável voluntariamente estando vivo.
@@ -94,7 +94,7 @@ Quanto MENOR o conhecimento, PIOR o auto-resolve (mais dano, menos loot, mais ri
 |---|---|---|---|
 | Sem selo | n/a | n/a | NÃO ofertado (gate §3.4.1): cai direto na batalha |
 | **Bronze** | **40%** | **+40%** | conhece pouco: resolve quase às cegas, apanha e pilha pouco |
-| **Prata** | **13%** | **+13%** (Fibonacci) | quase no Ouro: penalidade simbólica, recompensa o domínio |
+| **Prata** | **13%** | **+13%** (sequência numérica recorrente) | quase no Ouro: penalidade simbólica, recompensa o domínio |
 | Ouro | n/a | n/a | auto-kill canon (grátis, overworld); fora desta mecânica |
 
 > Nota sobre o tier "Sem selo": o modelo de simulação contemplava parâmetros para `Sem selo = 40%/+40%`, mas a decisão do gate de onboarding (§3.4.1) torna esse tier inacessível por esta mecânica (cai direto na luta). Os parâmetros `40%/+40%` ficam atribuídos ao **Bronze**, que é a primeira faixa de fato ofertada. A escala efetiva é **Bronze 40%/+40% → Prata 13%/+13%**.
@@ -108,7 +108,7 @@ Resolução estatística instantânea (não rola turno-a-turno). A chance de a p
 
 | Selo | `P(derrota)` | Racional |
 |---|---|---|
-| **Bronze** | **8%** (Fibonacci) | espelha o `y%=8%` do auto-kill canon ("o bug resistiu / mutou") |
+| **Bronze** | **8%** (sequência numérica recorrente) | espelha o `y%=8%` do auto-kill canon ("o bug resistiu / mutou") |
 | **Prata** | **3%** | quase seguro |
 
 - **Forma canônica vigente (VS):** tabela fixa por selo (8% / 3%) como placeholder honesto. Fórmula transparente plugável depois (mesmo padrão do combat.md): `P_derrota = clamp(0.03, base_selo × (1 − margem_de_poder), 0.20)`, onde `margem_de_poder` deriva de Atk da party vs HP/Def do inimigo. A `P(derrota)` é SEMPRE exibida na 2ª confirmação (Pillar 2).

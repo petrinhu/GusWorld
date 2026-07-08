@@ -34,7 +34,7 @@ A tabela abaixo cataloga, conto a conto, a tríade de referências autorais que 
 | 01 | Gus | Tolkien Hobbit Frodo + Daenerys dragon prophecy + Eco Adso afetuoso |
 | 02 | Cauã | Snow Crash Hiro POV + Bruce Sterling Piratas subcultura + Children of Dune trauma |
 | 03 | Iara | Bene Gesserit voice + Snow Crash Hiro + Dan Brown Símbolo Perdido iniciação |
-| 04 | Bento | Eco Adso retrospection + Beren e Lúthien Silmarillion + Dan Brown maçom |
+| 04 | Bento | Eco Adso retrospection + Beren e Lúthien Silmarillion + Dan Brown Símbolo Perdido |
 | 05 | Linda | Bene Gesserit voice training + Snow Crash Asherah + Eco Adso |
 | 06 | Dante | Bruce Sterling Piratas handler espelho + Snow Crash + Bene Gesserit |
 | 07 | Jaci | Children of Dune trauma genético + Eco Adso + Tolkien Silmarillion |

@@ -122,7 +122,7 @@ Vou medir com termopar amanhã.
 
 Da janela vi a fonte da Praça do Compilador. As gotas que caem
 do bico fazem padrão. Contei. 1, 1, 2, 3, 5, 8. Sequência
-Fibonacci. Vou contar de novo amanhã pra ver se é casualidade
+recorrente. Vou contar de novo amanhã pra ver se é casualidade
 ou regularidade.
 
 A mãe perguntou se eu dormi bem. Eu disse sim. Não disse que

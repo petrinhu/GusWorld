@@ -254,7 +254,7 @@ Tom autoral por origem:
   Plantar é matemática que respeita o vento.
 
   [página 4]
-  Eucalipto-fractal: ramifica em Fibonacci limpo até a 7ª
+  Eucalipto-fractal: ramifica em padrão numérico recorrente limpo até a 7ª
   iteração. A partir da 8ª começa a ramificar fora do padrão.
   Hipótese da Mãe Soraia (in memoriam): a 8ª é onde a planta
   pergunta. A 9ª é onde a planta decide.

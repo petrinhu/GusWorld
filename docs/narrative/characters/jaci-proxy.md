@@ -104,7 +104,7 @@ Mariana coloca os ingredientes na bancada. "Faz." Jaci hesita. Mariana: "se erra
 
 ### Aos 8 anos, primeira vez vê fauna corrompida na Selve Profunda
 
-Acompanhou Tatauín Branca (caçadora-coletora) numa expedição autorizada. Encontram uma raposa-fractal cujo padrão de pelagem está **errado**. Não é Fibonacci; é arbitrário. Tatauín para o grupo. "Não chega perto. Não toca." Jaci pergunta: "ela tá doente?" Tatauín: "tá sendo OUTRA COISA pela primeira vez. A Selve faz isso de vez em quando. A gente respeita." Voltam sem caçar. Jaci anota mentalmente o padrão arbitrário. *Importa porque:* primeira vez que Jaci vê Patch-Zero (em forma embrionária, sem nome). Origem da intuição que ela vai trazer no arco dela (ela reconhece quando algo "deixou de ser sistema"). Mariana, quando Jaci conta, fica em silêncio longo; Mariana já tinha visto. Não comentou na época pra não assustar.
+Acompanhou Tatauín Branca (caçadora-coletora) numa expedição autorizada. Encontram uma raposa-fractal cujo padrão de pelagem está **errado**. Não segue a sequência recorrente; é arbitrário. Tatauín para o grupo. "Não chega perto. Não toca." Jaci pergunta: "ela tá doente?" Tatauín: "tá sendo OUTRA COISA pela primeira vez. A Selve faz isso de vez em quando. A gente respeita." Voltam sem caçar. Jaci anota mentalmente o padrão arbitrário. *Importa porque:* primeira vez que Jaci vê Patch-Zero (em forma embrionária, sem nome). Origem da intuição que ela vai trazer no arco dela (ela reconhece quando algo "deixou de ser sistema"). Mariana, quando Jaci conta, fica em silêncio longo; Mariana já tinha visto. Não comentou na época pra não assustar.
 
 ### Aos 10 anos, primeiro funeral comunitário que conduz
 

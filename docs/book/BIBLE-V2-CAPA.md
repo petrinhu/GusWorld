@@ -22,7 +22,7 @@ A formação coletiva preserva a regra canônica de proporção SD 1:1:1 (ver `R
 
 No quadrante superior esquerdo, ornamento marginal discreto contém o cripto-glifo Era 1 (grade três por três mais X mais pontos, cifra canônica fundadora). Ornamento idêntico ao Volume 1 Tomo 1, preservando assinatura visual cross-volume.
 
-No quadrante superior direito, espelhando o cripto-glifo, ornamento contém esquadro e compasso entrelaçados estilizados como instrumento de engenharia de conjuros. Idêntico ao Volume 1.
+No quadrante superior direito, espelhando o cripto-glifo, ornamento contém dois instrumentos de medida entrelaçados estilizados como instrumento de engenharia de conjuros. Idêntico ao Volume 1.
 
 Aos lados inferiores, duas pequenas colunas estilizadas Boróstoma à esquerda (capitel ondulado) e Janor à direita (capitel angular), paralelo canon Jachin e Boaz, posicionadas como marcadores de entrada ao pavimento. As colunas têm aproximadamente um terço da altura de Gus na formação.
 
@@ -70,7 +70,7 @@ Pyotor Vance (pai de Gus) está deliberadamente ausente da formação visual, re
 
 No quadrante superior esquerdo, cripto-glifo Era 1 idêntico aos três outros livros, preservando assinatura visual cross-edição.
 
-No quadrante superior direito, esquadro e compasso entrelaçados, agora com uma sutil variante: o esquadro está parcialmente sobreposto por circuitos integrados estilizados (ecoando o Volume 1 Tomo 2), sugerindo que o Tomo 2 da antologia abriga vozes que atravessam Eras 1 e 3 sem mediação direta da party Era 3.
+No quadrante superior direito, os dois instrumentos de medida entrelaçados, agora com uma sutil variante: um deles está parcialmente sobreposto por circuitos integrados estilizados (ecoando o Volume 1 Tomo 2), sugerindo que o Tomo 2 da antologia abriga vozes que atravessam Eras 1 e 3 sem mediação direta da party Era 3.
 
 Ashlar polido predomina sobre ashlar bruto neste tomo, espelhando relação Vol 1 Tomo 1 e Tomo 2 mas em escala menor.
 
@@ -212,7 +212,7 @@ Tipografia títulos de conto: sans-serif geométrica Inter Bold ou Helvetica Neu
 
 Tipografia citações in-character (embedded nos contos): itálico serif Garamond Italic, corpo 11pt, recuo lateral 1.5cm.
 
-Espaço entre contos: cesura tipográfica deliberadamente variada por bloco temático. Contos 1 a 7 (party Tomo 1) usam miniatura Tavus-Drive estilizada como separador. Contos 8 a 9 (Sterling e Vorto antagonistas no Tomo 2) usam esquadro maçom miniatura como separador. Contos 10 a 14 (Pyotor, Gargi, Mariana, Verônica, Helíaco no Tomo 2) usam datações cronísticas em formato canônico Era e ano como separador (exemplo: "Era 1 ano menos 47").
+Espaço entre contos: cesura tipográfica deliberadamente variada por bloco temático. Contos 1 a 7 (party Tomo 1) usam miniatura Tavus-Drive estilizada como separador. Contos 8 a 9 (Sterling e Vorto antagonistas no Tomo 2) usam esquadro miniatura como separador. Contos 10 a 14 (Pyotor, Gargi, Mariana, Verônica, Helíaco no Tomo 2) usam datações cronísticas em formato canônico Era e ano como separador (exemplo: "Era 1 ano menos 47").
 
 Cabeçalho de página par: nome do conto em sans-serif light corpo 9pt, alinhado à esquerda.
 
