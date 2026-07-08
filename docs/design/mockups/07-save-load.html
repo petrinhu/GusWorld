@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GusWorld - Mock Save/Load (titulo + slots + aviso)</title>
+<style>
+  :root{
+    --bg-deep:#0A0E1A; --bg-mid:#1B2238; --bg-light:#3A4566;
+    --neutral:#6B6F7A; --cyan:#22D3EE; --hot:#FACC15; --warn:#F43F5E;
+    --brass:#C9A24B; --brass-dark:#7A5A2E; --brass-light:#F0D98C;
+    --text-1:#E7ECF5; --text-2:#9AA5C0;
+    --font-ui:"Courier New", ui-monospace, "Consolas", monospace;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{background:#05070c;color:var(--text-1);font-family:var(--font-ui);
+    display:flex;flex-direction:column;align-items:center;gap:26px;padding:30px 12px 64px}
+  .doc-head{max-width:1000px;text-align:center}
+  .doc-head .kicker{color:var(--brass);letter-spacing:3px;font-size:11px;text-transform:uppercase}
+  .doc-head h1{font-size:18px;margin:6px 0 4px;color:#fff}
+  .doc-head p{color:var(--text-2);font-size:12px;line-height:1.6;margin:0}
+  .doc-head b{color:var(--brass-light)}
+  .frame-label{width:980px;color:#9AA5C0;font-size:11px;letter-spacing:2px;text-transform:uppercase;text-align:left;padding-left:4px}
+  .frame-label b{color:var(--cyan)}
+
+  .screen{position:relative;width:980px;height:560px;overflow:hidden;border-radius:6px;
+    box-shadow:0 0 0 1px #000,0 20px 60px rgba(0,0,0,.6);
+    background:radial-gradient(ellipse 980px 560px at 50% -10%, var(--bg-light) 0%, var(--bg-mid) 45%, var(--bg-deep) 100%)}
+  .city-blur{position:absolute;inset:0;opacity:.32;filter:blur(3px) saturate(.5);
+    background:repeating-linear-gradient(90deg,#1c2440 0 70px,#141b30 70px 140px)}
+  .scrim{position:absolute;inset:0;background:rgba(5,7,12,.5)}
+
+  .panel{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+    background:linear-gradient(180deg,#2a3550,#141b2e);
+    border:1px solid var(--brass-dark);border-radius:14px;
+    box-shadow:0 0 0 1px #000,0 0 46px rgba(201,162,75,.08);padding:24px 28px}
+  .corner{position:absolute;width:15px;height:15px;
+    background:radial-gradient(circle at 35% 30%,var(--brass-light),var(--brass) 55%,var(--brass-dark) 100%);
+    clip-path:polygon(25% 3%,75% 3%,97% 50%,75% 97%,25% 97%,3% 50%);box-shadow:0 1px 3px rgba(0,0,0,.7)}
+  .corner.tl{top:-8px;left:-8px}.corner.tr{top:-8px;right:-8px}
+  .corner.bl{bottom:-8px;left:-8px}.corner.br{bottom:-8px;right:-8px}
+
+  /* ===== TELA DE TITULO ===== */
+  .title-panel{width:440px;text-align:center}
+  .game-logo{font-size:40px;letter-spacing:4px;color:#fff;margin:8px 0 2px;
+    text-shadow:0 0 18px rgba(34,211,238,.35)}
+  .game-logo .w{color:var(--brass-light)}
+  .game-sub{color:var(--text-2);font-size:11px;letter-spacing:3px;text-transform:uppercase;margin-bottom:26px}
+  .title-item{display:block;width:260px;margin:9px auto;padding:11px 0;border-radius:9px;
+    border:1px solid var(--brass-dark);background:linear-gradient(180deg,#1e2740,#141b2e);
+    color:var(--text-1);font-size:15px;letter-spacing:2px}
+  .title-item.sel{border-color:var(--cyan);box-shadow:inset 0 0 0 1px var(--cyan),0 0 16px rgba(34,211,238,.15);color:#fff}
+  .title-item.disabled{color:var(--neutral);border-style:dashed}
+  .title-foot{color:var(--text-2);font-size:10px;margin-top:20px;letter-spacing:.5px}
+
+  /* ===== TELA DE SLOTS ===== */
+  .slots-panel{width:720px}
+  .panel-title{color:var(--brass-light);letter-spacing:4px;font-size:15px;text-transform:uppercase;text-align:center;margin-bottom:2px}
+  .panel-sub{color:var(--text-2);font-size:10px;letter-spacing:1px;text-align:center;margin-bottom:16px}
+  .slot{display:flex;align-items:center;gap:16px;padding:14px 16px;margin:10px 0;border-radius:10px;
+    border:1px solid #33405e;background:linear-gradient(180deg,#1a2butt,#141b2e)}
+  .slot{background:linear-gradient(180deg,#1a2238,#141b2e)}
+  .slot.sel{border-color:var(--cyan);box-shadow:inset 0 0 0 1px var(--cyan)}
+  .slot.empty{border-style:dashed;color:var(--neutral)}
+  .slot-num{flex:0 0 auto;width:40px;height:40px;border-radius:8px;display:flex;align-items:center;justify-content:center;
+    background:#0d1320;border:1px solid var(--brass-dark);color:var(--brass-light);font-size:16px}
+  .slot-body{flex:1}
+  .slot-title{font-size:14px;color:var(--text-1);margin-bottom:3px}
+  .slot-title .loc{color:var(--brass-light)}
+  .slot-meta{font-size:11px;color:var(--text-2)}
+  .slot-empty-label{font-size:13px;color:var(--neutral);font-style:italic}
+  .slots-foot{display:flex;justify-content:space-between;align-items:center;margin-top:14px;padding-top:12px;border-top:1px solid #2a3450}
+  .hint{color:var(--text-2);font-size:10px}
+  .btn{font-family:var(--font-ui);font-size:12px;letter-spacing:1px;padding:7px 16px;border-radius:8px;
+    border:1px solid var(--brass-dark);background:linear-gradient(180deg,#2a2113,#1a140b);color:var(--brass-light)}
+
+  /* ===== DIALOGO DE AVISO ===== */
+  .warn-wrap{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(5,7,12,.55)}
+  .warn-box{width:520px;background:linear-gradient(180deg,#2a1c1c,#171010);border:1px solid var(--warn);border-radius:14px;
+    padding:22px 26px;box-shadow:0 0 0 1px #000,0 0 40px rgba(244,63,94,.18)}
+  .warn-title{color:var(--warn);font-size:13px;letter-spacing:2px;text-transform:uppercase;margin-bottom:10px}
+  .warn-msg{color:var(--text-1);font-size:14px;line-height:1.55;margin-bottom:16px}
+  .warn-btns{display:flex;gap:12px;justify-content:flex-end}
+  .warn-btn{font-family:var(--font-ui);font-size:13px;padding:8px 18px;border-radius:8px;border:1px solid var(--brass-dark);
+    background:linear-gradient(180deg,#2a2113,#1a140b);color:var(--brass-light)}
+  .warn-btn.danger{border-color:var(--warn);color:#ffd7de;background:linear-gradient(180deg,#3a1620,#25101a)}
+
+  .callouts{width:980px;background:#10172a;border:1px solid #2a3450;border-radius:8px;padding:14px 18px;font-size:12px;color:var(--text-2);line-height:1.7}
+  .callouts b{color:var(--text-1)} .callouts .q{color:var(--hot)}
+</style>
+</head>
+<body>
+
+  <div class="doc-head">
+    <div class="kicker">GusWorld - Save / Load (rumo ao M7 paridade)</div>
+    <h1>Mock: tela de titulo + selecao de slots (salvar/carregar) + aviso</h1>
+    <p>Motor de save JA existe (multi-slot + backup + timestamp/playtime/local). Faltam estas telas. Mesmo visual azul+latao
+    do menu de sistema aprovado. Decisoes do lider: <b>varios slots</b>, <b>tela de titulo (Novo/Continuar/Sair) + save/load no menu de pausa</b>, <b>aviso de save corrompido/versao/controles</b>.</p>
+  </div>
+
+  <!-- 1. TITULO -->
+  <div class="frame-label">Tela 1 - <b>TITULO</b> (ao ligar o jogo)</div>
+  <div class="screen">
+    <div class="city-blur"></div><div class="scrim"></div>
+    <div class="panel title-panel">
+      <div class="corner tl"></div><div class="corner tr"></div><div class="corner bl"></div><div class="corner br"></div>
+      <div class="game-logo">Gus<span class="w">World</span></div>
+      <div class="game-sub">vertical slice</div>
+      <div class="title-item sel">Continuar</div>
+      <div class="title-item">Novo Jogo</div>
+      <div class="title-item">Sair</div>
+      <div class="title-foot">Cima/Baixo navega  -  Enter seleciona</div>
+    </div>
+  </div>
+
+  <!-- 2. SALVAR -->
+  <div class="frame-label">Tela 2 - <b>SALVAR</b> (menu de pausa &gt; Salvar) - escolher onde gravar</div>
+  <div class="screen">
+    <div class="city-blur"></div><div class="scrim"></div>
+    <div class="panel slots-panel">
+      <div class="corner tl"></div><div class="corner tr"></div><div class="corner bl"></div><div class="corner br"></div>
+      <div class="panel-title">Salvar</div>
+      <div class="panel-sub">Escolha um espaco - gravar por cima pede confirmacao</div>
+      <div class="slot sel">
+        <div class="slot-num">1</div>
+        <div class="slot-body">
+          <div class="slot-title">Espaco 1 <span class="loc">- Praca da Compilacao</span></div>
+          <div class="slot-meta">07/07/2026 20:14  -  tempo jogado 0h 42m</div>
+        </div>
+      </div>
+      <div class="slot">
+        <div class="slot-num">2</div>
+        <div class="slot-body">
+          <div class="slot-title">Espaco 2 <span class="loc">- Dutos Infernais</span></div>
+          <div class="slot-meta">06/07/2026 23:51  -  tempo jogado 1h 18m</div>
+        </div>
+      </div>
+      <div class="slot empty">
+        <div class="slot-num">3</div>
+        <div class="slot-body"><div class="slot-empty-label">Espaco 3 - vazio</div></div>
+      </div>
+      <div class="slots-foot">
+        <span class="hint">Cima/Baixo navega  -  Enter grava aqui  -  Esc volta</span>
+        <button class="btn">Voltar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. CARREGAR -->
+  <div class="frame-label">Tela 3 - <b>CARREGAR</b> (titulo &gt; Continuar, ou pausa &gt; Carregar) - espaco vazio nao selecionavel</div>
+  <div class="screen">
+    <div class="city-blur"></div><div class="scrim"></div>
+    <div class="panel slots-panel">
+      <div class="corner tl"></div><div class="corner tr"></div><div class="corner bl"></div><div class="corner br"></div>
+      <div class="panel-title">Carregar</div>
+      <div class="panel-sub">Escolha um save para continuar</div>
+      <div class="slot">
+        <div class="slot-num">1</div>
+        <div class="slot-body">
+          <div class="slot-title">Espaco 1 <span class="loc">- Praca da Compilacao</span></div>
+          <div class="slot-meta">07/07/2026 20:14  -  tempo jogado 0h 42m</div>
+        </div>
+      </div>
+      <div class="slot sel">
+        <div class="slot-num">2</div>
+        <div class="slot-body">
+          <div class="slot-title">Espaco 2 <span class="loc">- Dutos Infernais</span></div>
+          <div class="slot-meta">06/07/2026 23:51  -  tempo jogado 1h 18m</div>
+        </div>
+      </div>
+      <div class="slot empty">
+        <div class="slot-num">3</div>
+        <div class="slot-body"><div class="slot-empty-label">Espaco 3 - vazio (nao selecionavel)</div></div>
+      </div>
+      <div class="slots-foot">
+        <span class="hint">Cima/Baixo navega  -  Enter carrega  -  Esc volta</span>
+        <button class="btn">Voltar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. AVISO -->
+  <div class="frame-label">Tela 4 - <b>AVISO</b> (residuo do M2) - save incompativel / controles diferentes</div>
+  <div class="screen">
+    <div class="city-blur"></div><div class="scrim"></div>
+    <div class="panel slots-panel" style="filter:blur(1px) brightness(.7)">
+      <div class="corner tl"></div><div class="corner tr"></div><div class="corner bl"></div><div class="corner br"></div>
+      <div class="panel-title">Carregar</div><div class="panel-sub">...</div>
+      <div class="slot" style="opacity:.5"><div class="slot-num">1</div><div class="slot-body"><div class="slot-title">Espaco 1</div></div></div>
+    </div>
+    <div class="warn-wrap">
+      <div class="warn-box">
+        <div class="warn-title">Aviso</div>
+        <div class="warn-msg">Este save e de uma versao mais nova do jogo (v5) do que a instalada (v4). Carregar pode nao funcionar corretamente. Deseja tentar mesmo assim?</div>
+        <div class="warn-btns">
+          <button class="warn-btn">Cancelar</button>
+          <button class="warn-btn danger">Tentar carregar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="callouts">
+    <b>Pontos pra sua decisao:</b><br>
+    1. <span class="q">Quantos espacos de save?</span> O mock mostra 3. Pode ser mais (ex.: 6) ou menos. O motor aguenta N.<br>
+    2. <span class="q">Autosave?</span> Alem do save manual, quer um save automatico (ex.: ao entrar em area / apos batalha) num espaco reservado, ou so save manual por agora?<br>
+    3. <span class="q">Gravar por cima:</span> o mock pede confirmacao ("tem certeza?") ao salvar num espaco ja ocupado. Mantem?<br>
+    4. <span class="q">Aviso de controles diferentes:</span> o mock 4 mostra o caso "versao". O outro caso (o save tem mapeamento de teclas diferente do atual) mostraria um diff "usar os controles do save / manter os atuais". Fazer os dois avisos?<br>
+    5. <span class="q">O que mostrar no espaco:</span> local + data/hora + tempo jogado (o mock). Quer algo a mais (ex.: nivel do Gus, capitulo)?
+  </div>
+
+</body>
+</html>
