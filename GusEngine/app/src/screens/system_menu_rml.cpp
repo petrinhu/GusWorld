@@ -405,9 +405,20 @@ body { font-family: "Pixel Operator Mono"; background: transparent; width: 100%;
   box-shadow: #22D3EE1a 0dp 0dp 10dp 0dp;
 }
 
+/* padding-right 6dp->18dp (GLINTFX-SCROLL, corredor da scrollbar, ver o comentario
+   completo em cima de `.ctrl-row` abaixo): `.ctrl-row` perdeu 12dp de largura pra
+   nao colidir mais com o thumb da scrollbar - sem este ajuste EQUIVALENTE aqui, o
+   cabecalho de colunas (fora de `.ctrl-list`, nao encolhe sozinho) ficaria 12dp
+   mais LARGO que as linhas de baixo, desalinhando "Teclado"/"Controle" do
+   cabecalho contra os keycaps das linhas (a coluna .c-act, flex:1, absorve
+   qualquer diferenca de largura total entre cabecalho/linha - MESMA logica que
+   fez o cabecalho ficar 4dp mais largo que a linha ANTES desta onda, ver o -4dp
+   ja existente aqui vs a antiga width:558dp de baixo). +12dp de padding-right
+   preserva esse MESMO gap relativo de 4dp (nao desfaz o alinhamento pre-existente,
+   so acompanha o corte novo da linha). */
 .ctrl-cols-head {
   display: flex; color: #9AA5C0; font-size: 10dp; letter-spacing: 2dp;
-  text-transform: uppercase; padding: 0dp 6dp 6dp 6dp; border-bottom: 1dp #33281a;
+  text-transform: uppercase; padding: 0dp 18dp 6dp 6dp; border-bottom: 1dp #33281a;
 }
 .ctrl-cols-head .c-act { flex: 1; }
 .ctrl-cols-head .c-key { width: 130dp; text-align: center; }
@@ -479,9 +490,35 @@ body { font-family: "Pixel Operator Mono"; background: transparent; width: 100%;
    de conteudo real de #sysmenu-panel.wide menos padding/border/gutter da
    lista) contornou o bug. `box-sizing:border-box` pareia com o padding:6dp
    (mesma receita de .verb-pill/.btn-back acima - width JA inclui padding). */
+/* CORREDOR DA SCROLLBAR (GLINTFX-SCROLL, bug reportado ao vivo pelo lider: o
+   thumb dourado da scrollbar SOBREPUNHA o contorno de selecao/captura da linha
+   em foco): `.ctrl-list` (overflow-y:auto) reserva o `#ctrl-list scrollbarvertical
+   { width: 8dp; }` (regra acima) DENTRO do proprio padding-box do container - a
+   LayoutDetails::GetContainingBlock do RmlUi confirma isto subtraindo
+   GetScrollbarSize(VERTICAL) do containing block usado por filhos static/relative
+   (Source/Core/Layout/LayoutDetails.cpp:178-188, lido no vendorizado) - MAS essa
+   subtracao so vale pra filhos com largura AUTO/percentual; `.ctrl-row` usa um
+   valor ABSOLUTO fixo (558dp, ver BUG-A acima - width:100%/auto colapsava o
+   flex) que NUNCA reagia a essa reserva. Nas contas: `.ctrl-list` tem
+   padding-box=562dp e padding-right:4dp -> content-box=558dp (o `width:558dp`
+   antigo enchia esse content-box INTEIRO); o thumb (8dp), ancorado na borda
+   DIREITA do padding-box, ocupa a faixa [554dp, 562dp] - 4dp dela CAIA
+   dentro do content-box (554 a 558), exatamente onde `.ctrl-row` (e o
+   box-shadow inset de selecao/captura, desenhado na PROPRIA borda da linha)
+   terminava - confirmado por probe headless (Xvfb :99, zoom em pixel real: o
+   contorno dourado da linha 0 selecionada se FUNDIA com o thumb dourado no
+   canto superior-direito, virando 1 blob so).
+   FIX: `width: 546dp` (558dp - 12dp = 8dp do thumb + 4dp de folga extra, MESMA
+   margem de seguranca pedida - nao so o minimo matematico) - a linha (e seu anel
+   de selecao/captura) agora sempre termina 8dp ANTES do inicio do corredor do
+   thumb, em QUALQUER posicao de scroll (o calculo acima nao depende de onde a
+   lista esta rolada, so da largura fixa do container/scrollbar). `.ctrl-cols-head`
+   (cabecalho de colunas, IRMAO de `.ctrl-list`, NAO um filho dela - nao reage a
+   esse corredor sozinho) ganhou o padding-right EQUIVALENTE (+12dp, ver acima)
+   pra as colunas Teclado/Controle continuarem alinhadas com os keycaps de baixo. */
 .ctrl-row {
   display: flex; align-items: center; padding: 6dp 6dp; border-radius: 6dp;
-  box-sizing: border-box; width: 558dp;
+  box-sizing: border-box; width: 546dp;
 }
 .ctrl-row .c-act { flex: 1; color: #E7ECF5; font-size: 12dp; }
 .ctrl-row .c-key { width: 130dp; text-align: center; }
