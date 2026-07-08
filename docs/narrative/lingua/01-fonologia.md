@@ -2,8 +2,10 @@
 
 Status: sabor e esqueleto APROVADOS pelo lider 2026-06-23. Embasado no RAG-elfico (`rag_elvish`): Pedin Edhellen (Sindarin, Thorsten Renk), Quetin i lambe eldaiva (Quenya), artigos de acento e deriva historica (Tengwestie), cursos PT (licao1, licaosind3). Detalhe fino (inventario exato, regras completas de mutacao) sera fechado junto do lexico e da gramatica.
 
+**Ajuste 2026-07-07 (auditoria AC-L5c):** o inventario consonantal listava 18 sons mas declarava contagem-alvo 13 (numero Fibonacci, canon). Correcao: reclassificados 5 sons (h, th, dh, lh, nh) de "fonema-base" para "alofone / realizacao de mutacao" (ver subsecao dedicada abaixo). Nenhum som foi cortado da lingua falada, nenhuma regra de mutacao mudou, nenhuma palavra ja gerada (*hylvi*, *davsi*) ou raiz do lexico-semente (`02-lexico-semente.md`) foi invalidada. So mudou o ESTATUTO desses 5 sons no inventario-base.
+
 ## Sabor sonoro
-Equilibrio: a melodia do Quenya (vogais puras) na base + aspereza pontual do Sindarin (th/dh) + portugues forte por cima (nasais, lh/nh). Soa familiar a um brasileiro e exotico ao mesmo tempo: um "portugues elfico arcaico".
+Equilibrio: a melodia do Quenya (vogais puras) na base + aspereza pontual do Sindarin (th/dh) + portugues forte por cima (nasais, lh/nh). Soa familiar a um brasileiro e exotico ao mesmo tempo: um "portugues elfico arcaico". (Nota: th/dh/lh/nh sao alofones no inventario-base, ver "Consoantes" abaixo - continuam soando na lingua, so nao contam como fonema independente.)
 
 ## Vogais
 - Puras: **a e i o u** (como no portugues / Quenya), claras e abertas.
@@ -12,14 +14,35 @@ Equilibrio: a melodia do Quenya (vogais puras) na base + aspereza pontual do Sin
 - Ditongos (conjunto fechado): ai, au, ei, oi, eu (5).
 
 ## Consoantes
-- Nucleo melodico/liquido: **l r m n v s** (sons que fluem).
-- Tipicamente nossas: **lh, nh** (portugues).
-- Aspereza pontual (Sindarin): **th** (como em "think"), **dh** (como o "th" de "this").
-- Demais de apoio: p t c/k b d g f h. Contagem-alvo do inventario consonantal: 13.
+
+### Inventario-base: 13 fonemas (Fibonacci, fechado)
+- Liquidas: **l, r**.
+- Nasais: **m, n**.
+- Aproximante: **v**.
+- Fricativas surdas: **f, s**.
+- Oclusivas surdas: **p, t, c/k**.
+- Oclusivas sonoras: **b, d, g**.
+
+(l r m n v f s p t c/k b d g = 13 fonemas-base. c/k conta como 1 fonema, duas grafias do mesmo som.)
+
+### Alofones / realizacoes de mutacao (superficie - NAO contam no inventario-base)
+Cinco sons continuam soando na lingua falada, mas cada um so aparece como SAIDA de um processo fonologico regular - mutacao gramatical (ver `03-gramatica-nucleo.md`) e/ou fricativizacao/palatalizacao lexicalizada -, nunca como consoante inicial independente de uma raiz nova. Por isso saem da contagem-base sem sumir do idioma:
+
+| Alofone | Fonema-base | Processo | Onde aparece |
+| :--- | :--- | :--- | :--- |
+| **h** | /s/ | lenicao (s -> h) | *sylva* -> *hylvi* |
+| **th** | /t/ | mutacao nasal (t -> th) | tabela de mutacao |
+| **dh** | /d/ | lenicao (d -> dh) + fricativizacao lexicalizada medial | raiz *ondh-* |
+| **lh** | /l/ | palatalizacao (digrafo herdado do portugues) | raiz *lhin-* |
+| **nh** | /n/ | palatalizacao (digrafo herdado do portugues) | raizes *nenh-*, *anh-* |
+
+A "aspereza pontual" (Sindarin: th/dh) e o sabor palatal (portugues: lh/nh) sobrevivem inteiros no som falado - so mudam de ESTATUTO, de fonema-base pra alofone/realizacao regular. E por isso a raiz *ondh-* (que tem "dh" no meio da palavra, nao no inicio mutavel) continua valida: ela usa o fonema-base /d/, so grafado/realizado como "dh" nessa posicao - exatamente o mesmo processo que a mutacao de lenicao usa pra transformar d -> dh no inicio de outras palavras. Mesma logica pra *lhin-*, *nenh-*, *anh-* (base /l/ e /n/, realizados lh/nh).
+
+(Duas saidas adicionais da tabela de mutacao, g -> gh e c/k -> ch, ainda nao tem raiz nenhuma que as use; ficam so como regra em `03-gramatica-nucleo.md`, sem simbolo dedicado aqui, ate que alguma palavra as precise.)
 
 ## Estrutura silabica
 - Padrao **(C)V(C)**, com forte preferencia por silaba ABERTA (consoante+vogal), o que da fluidez.
-- Silabas fechadas (terminadas em consoante: l, r, n, s, th) sao permitidas e dao o "peso de pedra" pontual (toque Sindarin).
+- Silabas fechadas (terminadas em consoante: l, r, n, s; tambem no alofone th quando a mutacao o produz) sao permitidas e dao o "peso de pedra" pontual (toque Sindarin).
 - Encontros consonantais iniciais limitados (ex.: br, gl, th + liquida); sem clusters pesados.
 
 ## Acento

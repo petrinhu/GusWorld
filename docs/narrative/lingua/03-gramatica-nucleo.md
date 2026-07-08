@@ -21,6 +21,8 @@ Gatilhos: depois do artigo definido, adjetivo posposto, objeto direto, 2o elemen
 
 (8 mapeamentos no total.) As demais consoantes (l, r, n, v, lh, nh, th, dh, f, h) nao mutam na lenicao.
 
+**Nota de reconciliacao (AC-L5c, 2026-07-07):** dh, th e h nesta tabela sao ALOFONES (realizacoes de superficie de /d/, /t/ e /s/), nao fonemas-base independentes; lh e nh tambem sao alofones (de /l/ e /n/, palatalizacao lexicalizada). O inventario-base fechado em 13 fonemas esta em `01-fonologia.md` ("Consoantes" -> "Alofones / realizacoes de mutacao"). Isso nao muda nenhum mapeamento desta tabela nem das palavras ja geradas (*sylva* -> *hylvi*, *tavus* -> *davsi*) - so formaliza que as SAIDAS de mutacao (b, d, g, v, dh, gh, h / f, th, ch) podem ser alofone ou fonema-base, sem restricao.
+
 ### Outras classes (resumo; detalhar depois)
 - **Mutacao nasal** (depois de prefixo/preposicao nasal *an-*, *in-*): p->f, t->th, c->ch.
 - **Mutacao mista** (depois de preposicoes terminadas em consoante): combina as duas.
