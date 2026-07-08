@@ -213,7 +213,7 @@ Este jogo existe por causa de muita gente. Primeiro, as pessoas:
 - **El Iagows (meu irmão):** inspiração do Yakov. Engenheiro de computação que me deu várias dicas de arquitetura e stack, e me orientou no uso de SDL e de spritesheets para o movimento. Criador de uma das melhores libs de rolagem de dados (800+ downloads): [@iagows/3d-dice-ts no npm](https://www.npmjs.com/package/@iagows/3d-dice-ts) ([código no GitLab](https://gitlab.com/iagows/3d-dice-ts)).
 - **Od Fuinha Minduim, Thiago MadDog e Thiago Arcanjo:** profissionais de primeira classe em TI, que deram inúmeras dicas de testes, arquitetura, QA, segurança, CI e RAG, e me puseram para estudar.
 - **A galera do grupo #metaleiros-PE** (hoje no WhatsApp, uma amizade que vem do mIRC desde ~1997): pela parceria de sempre.
-- **Bruno Vettore:** deu a sugestão de criar uma língua para o jogo, numa conversa sobre Tolkien e repórteres intrometidos e inconvenientes, ao ver meus protótipos. O Sylvarin nasceu daí.
+- **Bruno Vettore:** deu a sugestão de criar uma língua para o jogo, numa conversa sobre Tolkien e repórteres intrometidos e inconvenientes, ao ver meus protótipos. O Sylvarin nasceu daí. Também inspirou o personagem **Brunus "Vetorial" Solveckt**, o boticário-médico itinerante mentor do Gus.
 
 E as ferramentas de IA que ajudaram a construir o GusWorld:
 
