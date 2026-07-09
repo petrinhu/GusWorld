@@ -92,6 +92,11 @@ target_include_directories(gusengine_platform
 # nos dois nao diverge, e o mesmo padrao ja usado por GUSWORLD_FONTS_DIR).
 # ASSETS-VFS-F1b: GUSWORLD_DIALOGUES_DIR migra pra ca pela MESMA razao (familia DIALOGUES
 # nova no dispatcher, retrofit de npc_dialogue_catalog.cpp).
+# ASSETS-VFS-F1c: GUSWORLD_MAPS_DIR migra pra ca pela MESMA razao (familia MAPS nova no
+# dispatcher, retrofit de city_scene.cpp::resolve_distritos_inferiores_gmap). Valor
+# IDENTICO ao ja definido em app/CMakeLists.txt (${CMAKE_SOURCE_DIR} = GusEngine/ nos dois
+# alvos - deixado tambem la, mesmo precedente de GUSWORLD_TRANSLATIONS_DIR/
+# GUSWORLD_DIALOGUES_DIR, so unused agora que city_scene.cpp delega pro porteiro).
 target_compile_definitions(gusengine_platform
     PRIVATE GUSWORLD_FONTS_DIR="${CMAKE_SOURCE_DIR}/assets/fonts"
     # Raiz resources/ do repo (irma de GusEngine/) - familia GENERICA (sprites/images/vfx).
@@ -105,6 +110,8 @@ target_compile_definitions(gusengine_platform
     # Grafos de dialogo (game/dialogues/), raiz-irma de GUSWORLD_TRANSLATIONS_DIR acima
     # (M7-DIALOGO, ASSETS-VFS-F1b).
     PRIVATE GUSWORLD_DIALOGUES_DIR="${CMAKE_SOURCE_DIR}/../game/dialogues"
+    # Mapas .gmap compilados, DENTRO de GusEngine/ (versionados com a engine, ASSETS-VFS-F1c).
+    PRIVATE GUSWORLD_MAPS_DIR="${CMAKE_SOURCE_DIR}/assets/maps/compiled"
 )
 
 # domain/ entra aqui: input_mapper/sdl_input consomem o mapa logico puro. SDL3 e a camada de

@@ -83,6 +83,11 @@ public:
 //                CWD (id).
 //   - musica    (prefixo "assets/music/"):      GUSWORLD_MUSIC > macro
 //                GUSWORLD_MUSIC_DIR > CWD (id).
+//   - mapas     (prefixo "assets/maps/compiled/"): GUSWORLD_MAPS > macro
+//                GUSWORLD_MAPS_DIR > CWD (id). MESMO padrao de SFX/MUSICA (env e uma
+//                PASTA juntada so ao NOME do arquivo, NAO override literal do id
+//                inteiro - paridade com city_scene.cpp::resolve_distritos_inferiores_gmap,
+//                ASSETS-VFS-F1c).
 //   - generico (sprites/images/vfx/...): GUSWORLD_ASSETS > macro GUSWORLD_ASSETS_DIR >
 //                relativo a "resources/" (CWD).
 // SO a familia de FONTES verifica existencia em cada candidato (paridade com o

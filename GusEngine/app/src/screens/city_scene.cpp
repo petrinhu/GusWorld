@@ -1,23 +1,16 @@
 // gus/app/src/screens/city_scene.cpp
 //
 // Ver header. Montagem PURA da cena da cidade a partir de um TileMap + resolucao do
-// CAMINHO do .gmap (env GUSWORLD_MAPS > macro embutido > relativo ao CWD, igual ao
-// resolver de sprites do Caua/Gus). O I/O de BYTES do .gmap (ler o arquivo, load_map)
-// fica na fronteira de quem chama (city_loader/main): aqui so montamos a STRING do
-// caminho; nao abrimos arquivo nem tocamos SDL.
+// CAMINHO do .gmap. O I/O de BYTES do .gmap (ler o arquivo, load_map) fica na fronteira
+// de quem chama (city_loader/main): aqui so montamos a STRING do caminho; nao abrimos
+// arquivo nem tocamos SDL.
 
 #include "gus/app/screens/city_scene.hpp"
 
-#include <cstdlib>  // std::getenv
 #include <utility>  // std::move
 
 #include "gus/core/asset_paths.hpp"  // caminhos de asset centralizados (mapa .gmap)
-
-// Caminho ABSOLUTO da pasta de mapas compilados do repo, embutido pelo CMake (=
-// GusEngine/assets/maps/compiled). Permite rodar do build dir sem CWD na raiz.
-#ifndef GUSWORLD_MAPS_DIR
-#define GUSWORLD_MAPS_DIR ""
-#endif
+#include "gus/platform/assets/asset_source.hpp"  // ASSETS-VFS-F1c (ADR-013): porteiro
 
 namespace gus::app::screens {
 
@@ -61,21 +54,17 @@ OverworldTuning make_city_tuning() {
 }
 
 std::string resolve_distritos_inferiores_gmap() {
-    // Nome do arquivo + pasta vem do header central de caminhos de asset.
-    const std::string gmap(gus::core::assets::kDistritosInferioresGmapFile);
-    // 1) Override por ambiente (o lider aponta pra qualquer pasta de mapas).
-    if (const char* env = std::getenv("GUSWORLD_MAPS")) {
-        if (env[0] != '\0') {
-            return join(env, gmap);
-        }
-    }
-    // 2) Caminho do repo embutido em compilacao (assets/maps/compiled do GusEngine).
-    const std::string compiled = GUSWORLD_MAPS_DIR;
-    if (!compiled.empty()) {
-        return join(compiled, gmap);
-    }
-    // 3) Relativo ao CWD (rodando da raiz do GusEngine).
-    return join(std::string(gus::core::assets::kMapsCompiledDir), gmap);
+    // ASSETS-VFS-F1c (ADR-013): a cadeia `env GUSWORLD_MAPS (pasta, junta so ao NOME do
+    // arquivo) > macro GUSWORLD_MAPS_DIR > CWD (kMapsCompiledDir)` foi CONSOLIDADA em
+    // FilesystemAssetSource::resolve_path (familia MAPS, dispatch pelo prefixo
+    // "assets/maps/compiled/" do id, mesmo padrao das familias SFX/MUSICA). Assinatura/
+    // contrato INTOCADOS - paridade provada em platform/tests/asset_source_test.cpp e
+    // reforcada pelo smoke da cidade (city_loader.cpp carrega o .gmap real via o path
+    // resolvido).
+    const std::string id =
+        join(std::string(gus::core::assets::kMapsCompiledDir),
+             std::string(gus::core::assets::kDistritosInferioresGmapFile));
+    return gus::platform::assets::FilesystemAssetSource().resolve_path(id);
 }
 
 }  // namespace gus::app::screens

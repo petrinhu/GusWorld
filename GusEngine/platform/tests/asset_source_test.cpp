@@ -42,6 +42,9 @@
 #ifndef GUSWORLD_DIALOGUES_DIR
 #define GUSWORLD_DIALOGUES_DIR ""
 #endif
+#ifndef GUSWORLD_MAPS_DIR
+#define GUSWORLD_MAPS_DIR ""
+#endif
 
 namespace fs = std::filesystem;
 using gus::platform::assets::AssetInfo;
@@ -338,6 +341,29 @@ TEST_CASE("FilesystemAssetSource familia MUSICA: sem env cai no macro/CWD",
     const std::string compiled = GUSWORLD_MUSIC_DIR;
     const std::string expected =
         !compiled.empty() ? join(compiled, "cidade_tema_provisorio.mp3") : id;
+    REQUIRE(src.resolve_path(id) == expected);
+}
+
+// ---------------------------------------------------------------- familia MAPAS
+TEST_CASE(
+    "FilesystemAssetSource familia MAPAS: env GUSWORLD_MAPS prefixa so o NOME do "
+    "arquivo",
+    "[asset_source]") {
+    ScopedEnv env("GUSWORLD_MAPS", "/tmp/gusworld_maps_root_nao_usado_de_verdade");
+    FilesystemAssetSource src;
+    REQUIRE(src.resolve_path("assets/maps/compiled/distritos_inferiores.gmap") ==
+            join("/tmp/gusworld_maps_root_nao_usado_de_verdade",
+                 "distritos_inferiores.gmap"));
+}
+
+TEST_CASE("FilesystemAssetSource familia MAPAS: sem env cai no macro/CWD",
+          "[asset_source]") {
+    ScopedUnsetEnv no_env("GUSWORLD_MAPS");
+    FilesystemAssetSource src;
+    const std::string id = "assets/maps/compiled/distritos_inferiores.gmap";
+    const std::string compiled = GUSWORLD_MAPS_DIR;
+    const std::string expected =
+        !compiled.empty() ? join(compiled, "distritos_inferiores.gmap") : id;
     REQUIRE(src.resolve_path(id) == expected);
 }
 

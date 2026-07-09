@@ -8,9 +8,10 @@
 // resolve_hit_sfx_path/resolve_ui_sfx_path (battle_preview) e resolve_menu_sfx_path
 // (system_menu_loop), resolve_music_path (battle_preview),
 // resolve_npc_intro_bertoldo_dialogue_path (npc_dialogue_catalog) e
-// resolve_assets_subdir/resolve_dialogue_sfx_path (npc_dialogue_loop_gl). Estes agora
-// DELEGAM pra ca (retrofit ASSETS-VFS-F1/ASSETS-VFS-F1b) - ver cada um deles pro
-// comentario "MESMA logica que FilesystemAssetSource".
+// resolve_assets_subdir/resolve_dialogue_sfx_path (npc_dialogue_loop_gl), e
+// resolve_distritos_inferiores_gmap (city_scene, familia MAPS, ASSETS-VFS-F1c). Estes
+// agora DELEGAM pra ca (retrofit ASSETS-VFS-F1/ASSETS-VFS-F1b/ASSETS-VFS-F1c) - ver cada
+// um deles pro comentario "MESMA logica que FilesystemAssetSource".
 
 #include "gus/platform/assets/asset_source.hpp"
 
@@ -39,6 +40,9 @@
 #endif
 #ifndef GUSWORLD_DIALOGUES_DIR
 #define GUSWORLD_DIALOGUES_DIR ""
+#endif
+#ifndef GUSWORLD_MAPS_DIR
+#define GUSWORLD_MAPS_DIR ""
 #endif
 
 namespace gus::platform::assets {
@@ -85,6 +89,7 @@ constexpr std::string_view kTranslationsPrefix = "game/translations/";
 constexpr std::string_view kDialoguesPrefix = "game/dialogues/";
 constexpr std::string_view kSfxPrefix = "assets/sfx/";
 constexpr std::string_view kMusicPrefix = "assets/music/";
+constexpr std::string_view kMapsPrefix = "assets/maps/compiled/";
 
 bool starts_with(std::string_view s, std::string_view prefix) {
     return s.size() >= prefix.size() && s.substr(0, prefix.size()) == prefix;
@@ -178,6 +183,25 @@ std::string resolve_music(std::string_view id) {
     return std::string(id);
 }
 
+// --- FAMILIA MAPAS (paridade com city_scene.cpp::resolve_distritos_inferiores_gmap,
+// ASSETS-VFS-F1c) -------------------------------------------------------------------
+// MESMO padrao de SFX/MUSICA: env e uma PASTA (juntada so ao NOME do arquivo, via
+// strip_prefix), NAO um override literal do id inteiro (diferente de I18N/DIALOGUES).
+// Nenhuma checagem de exists (paridade com o resolver original, que tambem nunca
+// verificava o disco).
+std::string resolve_maps(std::string_view id) {
+    const std::string filename = strip_prefix(id, kMapsPrefix);
+    const std::string env = env_or_empty("GUSWORLD_MAPS");
+    if (!env.empty()) {
+        return join(env, filename);
+    }
+    const std::string compiled = std::string(GUSWORLD_MAPS_DIR);
+    if (!compiled.empty()) {
+        return join(compiled, filename);
+    }
+    return std::string(id);
+}
+
 // --- FAMILIA GENERICA (paridade com resolve_sprites_dir/resolve_gus_sprites_dir/
 // resolve_assets_subdir_local/resolve_asset_dir) - sprites/images/vfx sob resources/. ---
 std::string resolve_generic(std::string_view id) {
@@ -208,6 +232,9 @@ std::string resolve_by_family(std::string_view id) {
     }
     if (starts_with(id, kMusicPrefix)) {
         return resolve_music(id);
+    }
+    if (starts_with(id, kMapsPrefix)) {
+        return resolve_maps(id);
     }
     return resolve_generic(id);
 }
