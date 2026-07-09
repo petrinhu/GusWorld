@@ -2,6 +2,8 @@
 
 > **Pedido do consumidor (GusWorld) pro dev do glintfx.** GusWorld NUNCA mexe na lib glintfx; só consome e pede. Este doc registra a "dor" + a spec técnica pra o dev avaliar. Fallback documentado no fim (não bloqueia o GusWorld).
 
+> **RESOLVIDO (dev do glintfx, 2026-07-09):** o **modo 1 (multiply) JA E NATIVO** = propriedade RCSS **`image-color`** (confirmado no source do RmlUi 6.3; `DecoratorTiled`: `quad_colour = image_color().ToPremultiplied(opacity)`). Usar HOJE, sem release. Sintaxe: aplicar `image-color: var(--domain);` no MESMO elemento que tem o `decorator: image(...)`. E MULTIPLY premultiplicado (out.rgb=texel.rgb x tint.rgb), aceita `var()`, e **interpolavel** (`transition: image-color .4s;` / keyframes), default `white` = no-op. LIMITE: multiply UNIFORME (tinge o ouro tambem). O **modo 2 (luminance-key)** NAO e nativo (shader custom) e ja esta **SEMEADO no INBOX do glintfx** com o esboco GL3 abaixo; **pull-based**: se o ouro-tingido incomodar no teste real, o GusWorld reporta e o dev implementa (v0.7.0). ACAO PENDENTE GusWorld: testar `image-color` na base neutra real (via glintfx/RmlUi), julgar as 6 + a lendaria, e decidir (a) resolveu / (b) puxar luminance-key.
+
 ## A dor (use case real)
 
 GusWorld usa glintfx (RmlUi 6.3 + backend GL3, embed mode) na UI. Estou compondo as cartas do "Codex de Conjuros" num modelo HÍBRIDO: uma **textura base de moldura** (pixel-art gerada no PixelLab: pedra gótica + **runas brancas neutras** + estrutura de ouro) entra como `decorator`/`background-image` de um elemento RML, e o glintfx sobrepõe **a cor do domínio + o glow**.

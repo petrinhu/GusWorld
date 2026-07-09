@@ -35,3 +35,13 @@
 ## Cross-refs
 
 `docs/design/brainstorm-backlog.md` (seção Fase B, decisões do roster), `docs/design/roster-analogos/*.md`, `project_rmlui_ui_stack`, ADR-010 (glintfx embed), `reference_pixellab_mcp`, `reference_glintfx_api`.
+
+
+## Recolor por dominio — mecanismo confirmado (2026-07-09)
+
+**`image-color` (RCSS nativo do glintfx/RmlUi 6.3)** faz o recolor. UMA base neutra (runas brancas) -> 6 dominios trocando 1 variavel:
+```css
+.card { decorator: image( frame_neutral_arched.png ); image-color: var(--domain); transition: image-color .4s; }
+.card.eletromag { --domain: #22D3EE; }  /* fisica #A78BFA, matematica #34D399, computacao #60A5FA, oculto #F43F5E, economia #F59E0B */
+```
+Multiply premultiplicado, interpolavel (anima com o glow), default white=no-op. **LIMITE:** tinge o ouro junto (multiply uniforme). Se incomodar no teste real -> **puxar** o luminance-key (semente no INBOX do glintfx, ver `docs/tech/glintfx-requests/REQ-decorator-image-tint.md`). Base neutra gerada: `resources/images/card-frame-tests/pixellab-frame-neutral-arched-v2.png`. **PENDENTE:** montar um render minimo glintfx (RML+RCSS) da carta pra testar o recolor de verdade e julgar o ouro.
