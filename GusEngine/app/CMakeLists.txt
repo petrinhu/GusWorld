@@ -80,10 +80,10 @@ target_include_directories(gusengine_app
 # env GUSWORLD_ASSETS. ${CMAKE_SOURCE_DIR} = GusEngine/ (raiz do projeto CMake).
 target_compile_definitions(gusengine_app
     PRIVATE GUSWORLD_ASSETS_DIR="${CMAKE_SOURCE_DIR}/../resources"
-    # Pasta dos mapas compilados (.gmap) DENTRO do repo (versionada), nao em
-    # resources/. O resolver de city_scene usa isto pra achar o .gmap rodando do
-    # build dir; override em runtime via env GUSWORLD_MAPS.
-    PRIVATE GUSWORLD_MAPS_DIR="${CMAKE_SOURCE_DIR}/assets/maps/compiled"
+    # ASSETS-VFS-F1c: GUSWORLD_MAPS_DIR NAO fica mais aqui - o resolver de mapas migrou
+    # pro porteiro (FilesystemAssetSource, familia MAPS em platform/), que carrega a macro
+    # do gusengine_platform. city_scene.cpp agora delega pro porteiro, entao nenhuma TU de
+    # app/ lia esta def (era leftover inofensivo, removido na higiene pos-verificacao).
     # Pasta dos catalogos de traducao (game/translations/) DENTRO do repo (raiz = pai
     # de GusEngine/). O Translator de UI le pt_br.md daqui rodando do build dir;
     # override em runtime via env GUSWORLD_TRANSLATIONS (caminho completo do .md).
