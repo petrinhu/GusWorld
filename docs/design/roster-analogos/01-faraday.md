@@ -53,6 +53,8 @@ Enigma parcial, aponta uma pista pro local de início da missão-capstone do Hel
 
 Prompt (figura interior, NÃO gerar ainda; proporção SD 1:1:1.2 de NPC adulto, cf. style-guide): "retrato pixel-art cel-shaded de um cientista-artesão do início do século 19, feições determinadas e olhar curioso, cabelo grisalho penteado pra trás, colarinho alto e casaco escuro simples de artesão-eletricista (sem opulência, origem humilde), segurando um anel de indução de cobre com faíscas azuis suaves ao redor; ao fundo, uma malha metálica sutil (gaiola) com pequenos arcos elétricos e linhas de força curvas desenhadas no ar, como num caderno de anotações; paleta fria (cobre + azul elétrico), fundo simples pra encaixar na moldura comum de carta; sem texto." (Moldura comum reutilizável é decisão de design própria, gerada/salva à parte.)
 
+**Imagem-referência (web):** https://commons.wikimedia.org/wiki/File:M_Faraday_Th_Phillips_oil_1842.jpg (direto: https://upload.wikimedia.org/wikipedia/commons/8/88/M_Faraday_Th_Phillips_oil_1842.jpg) — busto/meio-corpo, diagonal (pintura a óleo de Thomas Phillips, 1842), fonte Wikimedia Commons (National Portrait Gallery, domínio público). Segunda opção: https://commons.wikimedia.org/wiki/File:Michael_faraday_707957642_b5644r755_dl_full_size.jpg (direto: https://upload.wikimedia.org/wikipedia/commons/6/6b/Michael_faraday_707957642_b5644r755_dl_full_size.jpg) — busto/meio-corpo, diagonal (litografia de Thomas Herbert Maguire, 1851, Faraday jovem olhando pra esquerda com a mão na cintura), fonte Wikimedia Commons (Science History Institute, domínio público). (Alimenta o PixelLab image-to-pixelart; o orquestrador confere a imagem antes de gerar.)
+
 ---
 
 **Fontes consultadas (pesquisa web, 2026-07-08):**
