@@ -107,7 +107,7 @@ TEST_CASE("build_save_load_menu_rml: mini-dialogo de sobrescrita substitui a lis
           "[save_load_menu_rml]") {
     SaveLoadMenuState state;
     save_load_menu_open(state, SaveLoadMode::Save, make_slots_mock_like());
-    save_load_menu_key_down(state, SDLK_RETURN);  // slot 1 ocupado -> abre o dialogo
+    (void)save_load_menu_key_down(state, SDLK_RETURN);  // slot 1 ocupado -> abre o dialogo
     REQUIRE(state.confirming_overwrite);
 
     const std::string rml = build_save_load_menu_rml(state, make_translator());

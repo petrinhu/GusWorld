@@ -235,7 +235,7 @@ TEST_CASE("save_load_menu_key_down: mini-dialogo - Enter com Nao devolve "
     for (int i = 0; i < kSlotCount; ++i) slots[static_cast<std::size_t>(i)] = empty_slot_preview(i);
     slots[1] = build_slot_preview(make_save_data(100), 1);
     save_load_menu_open(state, SaveLoadMode::Save, slots);
-    save_load_menu_key_down(state, SDLK_RETURN);  // abre o dialogo
+    (void)save_load_menu_key_down(state, SDLK_RETURN);  // abre o dialogo
 
     REQUIRE(save_load_menu_key_down(state, SDLK_RETURN) ==
             SaveLoadMenuAction::OverwriteCancelled);
@@ -250,7 +250,7 @@ TEST_CASE("save_load_menu_key_down: mini-dialogo - alternar pra Sim e confirmar 
     for (int i = 0; i < kSlotCount; ++i) slots[static_cast<std::size_t>(i)] = empty_slot_preview(i);
     slots[1] = build_slot_preview(make_save_data(100), 1);
     save_load_menu_open(state, SaveLoadMode::Save, slots);
-    save_load_menu_key_down(state, SDLK_RETURN);  // abre o dialogo
+    (void)save_load_menu_key_down(state, SDLK_RETURN);  // abre o dialogo
 
     REQUIRE(save_load_menu_key_down(state, SDLK_LEFT) == SaveLoadMenuAction::None);
     REQUIRE(state.confirm_selected == 0);
@@ -266,7 +266,7 @@ TEST_CASE("save_load_menu_key_down: mini-dialogo - Esc equivale a Nao (seguranca
     for (int i = 0; i < kSlotCount; ++i) slots[static_cast<std::size_t>(i)] = empty_slot_preview(i);
     slots[1] = build_slot_preview(make_save_data(100), 1);
     save_load_menu_open(state, SaveLoadMode::Save, slots);
-    save_load_menu_key_down(state, SDLK_RETURN);  // abre o dialogo
+    (void)save_load_menu_key_down(state, SDLK_RETURN);  // abre o dialogo
 
     REQUIRE(save_load_menu_key_down(state, SDLK_ESCAPE) ==
             SaveLoadMenuAction::OverwriteCancelled);

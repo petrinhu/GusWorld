@@ -23,7 +23,6 @@ namespace gus::app::screens {
 
 namespace {
 
-using gus::domain::save::kAutosaveSlot;
 using gus::domain::save::kSlotCount;
 
 // Monta o envelope RML completo (<rml><head><style>kSharedStyle</style></head>
