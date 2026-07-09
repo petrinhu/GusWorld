@@ -41,6 +41,9 @@ add_executable(gusengine_app_tests
     # MENU-PAUSA-CONFIG-SOM (M7-COSTURA): logica pura do menu de pausa + config de som.
     system_menu_test.cpp
     system_menu_rml_test.cpp
+    # SAVE-LOAD-UI (PI9): logica pura da tela de salvar/carregar + gerador de RML.
+    save_load_menu_test.cpp
+    save_load_menu_rml_test.cpp
 )
 
 target_link_libraries(gusengine_app_tests

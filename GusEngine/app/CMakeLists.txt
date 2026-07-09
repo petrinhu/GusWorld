@@ -34,6 +34,11 @@ add_library(gusengine_app STATIC
     # MENU-PAUSA-CONFIG-SOM (INTEGRACAO FINAL): o loop interativo GL/glintfx (Esc na
     # cidade E na batalha abrem o mesmo menu - ver system_menu_loop.hpp).
     src/screens/system_menu_loop.cpp
+    # SAVE-LOAD-UI (PI9, peca que desbloqueia o M7): logica pura da tela de
+    # salvar/carregar (slots + preview XP/capitulo/timestamp + confirmacao de
+    # sobrescrita) - ver gus/app/screens/save_load_menu.hpp.
+    src/screens/save_load_menu.cpp
+    src/screens/save_load_menu_rml.cpp
     src/i18n/translator.cpp
     # M7-DIALOGO (NPC-MVP): I/O do grafo de dialogo do Bertoldo (.dlg.txt) -
     # fronteira app/, domain/dialogue permanece ZERO I/O.

@@ -121,11 +121,22 @@ Fundo opaco nas legendas
 
 ## §4. Save / Load
 
+# SAVE_SLOT_EMPTY/SAVE_SLOT_LABEL: wording alinhado ao mock APROVADO
+# (docs/design/mockups/07-save-load.html, "Espaço N"/"Espaço N - vazio") na
+# dispatch SAVE-LOAD-UI - as chaves nasceram como placeholder ("Slot") ANTES do
+# mock existir e ainda não tinham consumidor em código (grep confirmado antes
+# da mudança), então o reword é seguro (zero regressão de call-site real).
 ## SAVE_SLOT_EMPTY
-Slot vazio
+Espaço {0} - vazio
 
 ## SAVE_SLOT_LABEL
-Slot {0}
+Espaço {0}
+
+## SAVE_SLOT_AUTO_NAME
+Auto
+
+## SAVE_SLOT_READONLY_TAG
+(só-leitura)
 
 ## SAVE_TIMESTAMP_LABEL
 Salvo em {0}
@@ -136,8 +147,38 @@ Local: {0}
 ## SAVE_PLAYTIME_LABEL
 Tempo de jogo: {0}
 
+## SAVE_XP_LABEL
+XP {0}
+
+## SAVE_CHAPTER_LABEL
+Cap. {0}
+
+## SAVE_SCREEN_TITLE_SAVE
+Salvar
+
+## SAVE_SCREEN_TITLE_LOAD
+Carregar
+
+## SAVE_SCREEN_SUBTITLE_SAVE
+{0} espaços (lista rola) - gravar por cima pede confirmação - o espaço Auto é só-leitura
+
+## SAVE_SCREEN_SUBTITLE_LOAD
+{0} espaços (lista rola) - espaço vazio não selecionável
+
+## SAVE_SCREEN_FOOTER_SAVE
+Cima/Baixo navega (roda também) - Enter grava aqui - Esc volta
+
+## SAVE_SCREEN_FOOTER_LOAD
+Cima/Baixo navega (roda também) - Enter carrega - Esc volta
+
 ## SAVE_CONFIRM_OVERWRITE
 Sobrescrever este slot?
+
+## SAVE_OVERWRITE_CONFIRM_YES
+Sim, sobrescrever
+
+## SAVE_OVERWRITE_CONFIRM_NO
+Cancelar
 
 ## SAVE_SUCCESS
 Jogo salvo.
@@ -156,6 +197,12 @@ Falha ao carregar save. Arquivo pode estar corrompido.
 
 ## LOAD_MIGRATION_REQUIRED
 Save em versão anterior. Migrando...
+
+## LOCATION_PRACA_COMPILACAO
+Praça da Compilação
+
+## LOCATION_UNKNOWN
+Local desconhecido
 
 ---
 
