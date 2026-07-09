@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+<meta charset="utf-8">
+<style>
+  *{box-sizing:border-box;margin:0}
+  body{background:#0a0e17;display:flex;align-items:center;justify-content:center;min-height:820px;font-family:Georgia,serif}
+  .card{position:relative;width:400px;height:717px}
+  .frame{position:absolute;inset:0;width:100%;height:100%;image-rendering:auto}
+  /* fundo escuro sutil atras da figura, dentro da janela de arte, pra a gaiola destacar */
+  .artbg{position:absolute;left:50%;top:49.3%;transform:translate(-50%,-50%);width:56%;height:27%;border-radius:50%;
+         background:radial-gradient(ellipse at center,#0a0d18dd 45%,#0a0d1877 72%,transparent);}
+  .cage{position:absolute;left:50%;top:49.3%;transform:translate(-50%,-50%);width:44%;height:auto;image-rendering:pixelated;
+        filter:drop-shadow(0 3px 6px #0009)}
+  .name{position:absolute;left:8%;right:8%;top:16.1%;transform:translateY(-50%);text-align:center;color:#f0e8d6;
+        font-variant:small-caps;letter-spacing:1px;font-size:17px;text-shadow:0 1px 2px #000}
+  .sigil{position:absolute;left:20.83%;top:24.27%;transform:translate(-50%,-50%);width:30px;height:30px;
+         display:flex;align-items:center;justify-content:center}
+  .sigil svg{width:20px;height:20px;filter:drop-shadow(0 0 5px #22d3ee)}
+  .cost{position:absolute;left:83.72%;top:24.27%;transform:translate(-50%,-50%);width:30px;height:30px;
+        display:flex;align-items:center;justify-content:center;font-size:17px;line-height:1;font-weight:bold;color:#f0e6d0;font-family:"Consolas",monospace}
+  .type{position:absolute;left:0;right:0;top:74.5%;text-align:center;color:#22D3EE;font-family:"Consolas",monospace;
+        font-size:11px;letter-spacing:2px;text-shadow:0 0 6px #22d3ee66}
+  .fx{position:absolute;left:17%;right:17%;top:83.2%;transform:translateY(-50%);
+      text-align:center;color:#eae2d0;font-size:12px;line-height:1.34}
+  .foot{position:absolute;left:0;right:0;top:92.5%;display:flex;justify-content:space-between;padding:0 16%;
+        font-size:9px;color:#9a8a6a;font-family:"Consolas",monospace}
+</style>
+</head>
+<body>
+  <div class="card">
+    <img class="frame" src="../../../resources/images/card-frame-tests/cards/clean-eletromag.png" alt="frame">
+    <div class="artbg"></div>
+    <img class="cage" src="../../../resources/images/card-frame-tests/cards/faraday-cage-t.png" alt="gaiola">
+    <div class="name">Gaiola de Faraday</div>
+    <div class="sigil"><svg viewBox="5 2 13.5 20" preserveAspectRatio="xMidYMid meet"><path fill="#22D3EE" d="M13 2 L5 13 L10.2 13 L8 22 L18.5 9.5 L12.4 9.5 Z"/></svg></div>
+    <div class="cost">0</div>
+    <div class="type">passiva // chave</div>
+    <div class="fx">Anula o PEM (mantem save/autosave em dungeon) e da imunidade a debuff eletrico/EMP em combate.</div>
+    <div class="foot"><span>comum</span><span>Faraday</span></div>
+  </div>
+</body>
+</html>

@@ -49,3 +49,17 @@ Multiply premultiplicado, interpolavel (anima com o glow), default white=no-op. 
 **DECISAO (criador, 2026-07-09, pos-teste empirico):** o `image-color` multiply tinge o ouro junto (perde o "ouro constante"). => **PUXADO o luminance-key do glintfx** (so as runas mudam, ouro/pedra ficam). Ate sair (v0.7.0), a moldura fica em standby pro recolor final; a base neutra arqueada (`pixellab-frame-neutral-arched-v2.png`) e o texto do pull estao prontos. Ver `docs/tech/glintfx-requests/REQ-decorator-image-tint.md`.
 
 **FECHADO (2026-07-09): glintfx v0.7.0 = luminance-key.** Recolor por dominio resolvido a partir de 1 base neutra: `decorator: image-tint(pixellab-frame-neutral-arched-v2.png); image-tint-color: var(--domain); image-tint-mode: luminance-multiply; image-tint-threshold: 0.70;`. Threshold **0.70** preserva o ouro 100% (medido na base real) e tinge so as runas. Pin bumpado v0.7.0, suite 1517/1517 verde. Proximo (engenharia UI): componente glintfx da carta que compoe base+figura+texto+glow, com `--domain` por dominio + variante lendaria do Tusk (glow pulsante via keyframes na cor).
+
+## CARTA-AMOSTRA FARADAY — CANONIZADA (criador, 2026-07-09)
+
+Pipeline da carta APROVADO e validado ponta a ponta na "Gaiola de Faraday". Molde para as outras 20.
+
+**Camadas (data-driven):** (1) base neutra de slots VAZIOS gerada no PixelLab (`pixellab-frame-clean-v1.png`, arco gotico, runas brancas); (2) recolor por dominio via glintfx `image-tint` luminance-key threshold **0.70** (ouro preservado; aqui `clean-eletromag.png` = ciano); (3) figura interior no PixelLab (`faraday-cage-t.png`, a gaiola anti-PEM, fundo transparente); (4) textos por dado: nome, custo, tipo, efeito, sigilo, raridade; (5) **sigilo = SVG vetorial NA COR DO DOMINIO** (nao emoji). Mock: `docs/design/mockups/25-carta-faraday.html`; amostra: `resources/images/card-frame-tests/cards/CARTA-gaiola-faraday-amostra.png`.
+
+**Centros de slot medidos (base 384x688, = % do card):** circulo/sigilo (20.83, 24.27); quadrado/custo (83.72, 24.27) [ASSIMETRICO, nao e espelho do circulo]; janela de arte centro (50, 46); banner/nome y~16.1; plaqueta/efeito y~83.2.
+
+**LICOES DE MONTAGEM DO MOCK (pra as proximas cartas):**
+1. O card div renderiza a **CY0=51px** no headless (`body{min-height:820}` faz o body ter 820, nao os 900 da janela; a carta centra no body de 820). MEDIR a bbox real da carta no print, nunca assumir a posicao.
+2. Medir os centros de slot por **cv2** (HoughCircles no circulo, findContours no quadrado). **NAO assumir simetria** (o quadrado do custo e assimetrico em relacao ao circulo).
+3. **Sigilos = SVG vetorial** com `viewBox` = bbox exata do desenho + `preserveAspectRatio xMidYMid meet`, centrado por construcao. NUNCA emoji (assimetrico + metrica de fonte propria = descentraliza).
+4. No **componente glintfx real** (CARTAS-PRODUCAO) o alinhamento e NATIVO (flex/align RCSS) — toda essa medicao e so pra o mock HTML sobre raster ser fiel.
