@@ -181,6 +181,30 @@ TEST_CASE("overworld: nao atravessa a borda do mapa", "[overworld]") {
     REQUIRE(sim.player().x >= 16.0f - kEps);
 }
 
+// SAVE-LOAD-UI etapa 6 (Carregar REAL): set_player_position teleporta SEM
+// interpolacao fantasma - player() reflete o novo AABB na hora, e o PROXIMO
+// step_fixed (que interpola de prev_ pra curr_) nao "desliza" de volta pro
+// ponto antigo (prova: 1 passo minusculo apos o teleporte ainda fica pertinho
+// do destino, nao do ponto pre-teleporte).
+TEST_CASE("overworld: set_player_position teleporta sem interpolar do ponto antigo",
+          "[overworld]") {
+    TileGrid g = make_map();
+    OverworldSim sim(g, Aabb{16.0f, 16.0f, 8.0f, 8.0f}, 4.0f);
+    sim.step_fixed(1, 0, false, 1.0f / 60.0f);  // anda um pouco, so pra sujar prev_/curr_
+
+    const Aabb destino{64.0f, 48.0f, 8.0f, 8.0f};
+    sim.set_player_position(destino);
+    REQUIRE_THAT(sim.player().x, WithinAbs(destino.x, kEps));
+    REQUIRE_THAT(sim.player().y, WithinAbs(destino.y, kEps));
+
+    // 1 passo SEM input (dx=dy=0): se prev_ ainda apontasse pro ponto antigo, a
+    // interpolacao do render veria um salto; aqui so confirmamos que a posicao
+    // logica pos-teleporte fica ESTAVEL (nao volta sozinha pro ponto antigo).
+    sim.step_fixed(0, 0, false, 1.0f / 60.0f);
+    REQUIRE_THAT(sim.player().x, WithinAbs(destino.x, kEps));
+    REQUIRE_THAT(sim.player().y, WithinAbs(destino.y, kEps));
+}
+
 // Tuning que neutraliza o ZOOM (1 px == 1 unidade de mundo) para os testes de CLAMP
 // e CULLING que raciocinam em unidades de mundo. Com tile_size 16 do make_map(),
 // camera_zoom_px_per_tile = 16 => px-por-unidade = 16/16 = 1.0. Assim camera_view e

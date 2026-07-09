@@ -201,10 +201,21 @@ private:
     // battle_music_id_ invalido acima) - to_npc_dialogue() vira no-op nesse caso.
     std::optional<gus::domain::dialogue::DialogueGraph> npc_bertoldo_graph_{};
 
-    // "Save" desta onda: so uma instancia em MEMORIA (a persistencia real em disco e
-    // M2-SAVE-IO, ADR-012 Onda 2). Usa SaveData::flags (ja existe, domain/save) em vez
-    // de inventar um formato novo pra "inimigo1_derrotado".
+    // "Save" desta onda: instancia em MEMORIA (a persistencia REAL em disco e
+    // SAVE-LOAD-UI etapa 6, ver open_pause_from_city/build_current_save_data/
+    // apply_loaded_save_data em maestro.cpp). Usa SaveData::flags (ja existe,
+    // domain/save) em vez de inventar um formato novo pra "inimigo1_derrotado".
     gus::domain::save::SaveData save_{};
+
+    // SAVE-LOAD-UI etapa 6 (playtime REAL, nao fingido): playtime_seconds no
+    // instante de um Salvar = playtime_base_seconds_ + (SDL_GetTicksNS() -
+    // playtime_anchor_ns_)/1e9. playtime_anchor_ns_ e RESETADO pra "agora" (e
+    // playtime_base_seconds_ pro playtime_seconds do save) toda vez que um Load
+    // aplica com sucesso - assim o acumulo segue correto mesmo apos carregar um
+    // save de uma sessao anterior (o relogio da SESSAO ATUAL sempre comeca do
+    // zero, SDL_GetTicksNS() e desde o boot do processo, nao desde o save).
+    unsigned long long playtime_anchor_ns_ = 0;
+    double playtime_base_seconds_ = 0.0;
 
     // MENU-PAUSA-CONFIG-SOM (INTEGRACAO FINAL): Translator de UI carregado 1 VEZ no
     // boot (init()) e reusado em toda abertura do menu de pausa (cidade OU batalha

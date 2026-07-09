@@ -320,6 +320,10 @@ const gus::core::spatial::Aabb& SdlWindow::player_aabb() const noexcept {
     return sim_->player();
 }
 
+void SdlWindow::set_player_position(const gus::core::spatial::Aabb& aabb) noexcept {
+    sim_->set_player_position(aabb);
+}
+
 const gus::core::spatial::TileGrid& SdlWindow::grid() const noexcept {
     return sim_->grid();
 }

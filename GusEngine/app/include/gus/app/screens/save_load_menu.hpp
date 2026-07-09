@@ -76,26 +76,46 @@ inline constexpr int kChapterCount = 6;
 // Capitulo DERIVADO (NUNCA "nivel" - GusWorld nao tem nivel numerico, GDD §5.4/
 // Meta loop: progressao e por modulos de hardware + cartas + capitulos, sem
 // "Gus Lv 47"). Fonte: SaveData::quest_progress (TODO.md, decisao (d):
-// "Capitulo derivado de flags/quest_progress"). REGRA MINIMA-VIAVEL adotada
-// AGORA (nenhuma quest real ainda escreve em quest_progress - grep confirmou
-// ZERO consumidor em app/gameplay nesta dispatch; o campo existe so no schema,
-// aguardando o sistema de quests futuro): chave "main_story" e o marco de
-// progresso principal (stage index, 0-based); capitulo = 1 + esse valor,
-// CLAMPADO em [1, kChapterCount]. Chave ausente (o caso de TODO save existente
-// hoje) devolve 1 - EXATAMENTE o que o mock aprovado mostra em todo slot ("Cap.
-// 1"), sem inventar nenhum dado novo. Forward-compat: quando quests reais
-// comecarem a gravar quest_progress["main_story"], este calculo passa a
-// devolver capitulos maiores SEM precisar de nenhum retrabalho aqui.
+// "Capitulo derivado de flags/quest_progress").
 //
-// SINALIZADO AO LIDER (nao e a MESMA formula do texto da dispatch - "Capitulo
-// DERIVADO do XP" - que citava XP como fonte; o TODO.md original pede derivar
-// de flags/quest_progress. Adotada a leitura do TODO.md por ser a que exige
-// ZERO invencao de limiar novo (quest_progress esta sempre vazio hoje = Cap. 1
-// para todo save, fielmente igual ao mock). CONFIRMAR com o lider se a fonte
-// certa e quest_progress (como aqui) ou um limiar de XP dedicado antes de
-// content real de capitulos existir.
+// REGRA (decisao do lider, SAVE-LOAD-UI etapa 6 - fecha o SINALIZADO abaixo):
+// HISTORIA MANDA, XP e so o ESTIMADOR quando NAO ha historia ainda.
+//   - quest_progress["main_story"] PRESENTE: capitulo = 1 + esse valor (stage
+//     index, 0-based), CLAMPADO em [1, kChapterCount]. `xp` e IGNORADO neste
+//     caso (a historia e AUTORIDADE; XP nunca ultrapassa - respeita o pillar
+//     "sem grind, nao farmavel" do GDD §7).
+//   - quest_progress["main_story"] AUSENTE (o caso de TODO save existente
+//     hoje - nenhuma quest real ainda escreve nesta chave, grep confirmou ZERO
+//     consumidor em app/gameplay): capitulo = chapter_from_xp_fallback(xp)
+//     abaixo - um ESTIMADOR COLINEAR (o jogo e LINEAR: XP acompanha a
+//     historia) por FAIXAS de XP PROVISORIAS (ver kChapterXpThresholds - a
+//     curva de XP ainda nao fechou, PROVISORIO ate o CARTAS-BALANCEAMENTO/
+//     economia). xp=0 (save recem-criado, sem character_states) cai na 1a
+//     faixa = Cap. 1 - EXATAMENTE o que o mock aprovado mostra em todo slot
+//     hoje, sem inventar dado novo.
+//
+// Forward-compat: quando quests reais comecarem a gravar
+// quest_progress["main_story"], este calculo passa a devolver capitulos
+// derivados da HISTORIA (a fonte definitiva) automaticamente, sem retrabalho
+// aqui - o estimador de XP so serve de PONTE ate la.
 [[nodiscard]] int chapter_from_quest_progress(
-    const std::map<std::string, int>& quest_progress) noexcept;
+    const std::map<std::string, int>& quest_progress, int xp) noexcept;
+
+// Numero de LIMIARES de XP (kChapterCount-1 fronteiras entre kChapterCount
+// faixas). PROVISORIO — afinar no CARTAS-BALANCEAMENTO/economia (a curva de
+// XP real ainda nao fechou); valores monotonicamente crescentes, so servem de
+// estimador ENQUANTO quest_progress["main_story"] nao esta gravado (ver
+// chapter_from_quest_progress acima). Nomeados (nao magic numbers soltos) pra
+// ficarem faceis de re-tunar num lugar so quando a economia fechar.
+inline constexpr int kChapterXpThresholds[kChapterCount - 1] = {100, 300, 600,
+                                                                  1000, 1500};
+
+// Estimador de capitulo por XP (PROVISORIO, ver kChapterXpThresholds acima):
+// conta quantos limiares `xp` ja cruzou, +1 (base = capitulo 1), clampado em
+// [1, kChapterCount]. Usado SO por chapter_from_quest_progress quando
+// quest_progress["main_story"] esta ausente - nunca chamado direto pela tela
+// (exposto pra ser testavel isoladamente).
+[[nodiscard]] int chapter_from_xp_fallback(int xp) noexcept;
 
 // XP para EXIBICAO no slot (nunca "nivel"). Fonte: CharacterSaveState::xp do Gus
 // (character_states.at("gus")) - Gus e sempre o protagonista/sempre presente na

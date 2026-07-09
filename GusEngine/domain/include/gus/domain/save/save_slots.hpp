@@ -3,14 +3,22 @@
 // POLITICA DE SLOTS do save (camada PURA, ZERO Qt, ZERO disco). Decisao do lider
 // (ADR-006, 2026-06-21): 1 slot de AUTO-SAVE + 5 slots de save MANUAL = 6 no total.
 //
-// IDs de slot (int): 0 = autosave; 1..5 = manuais. O auto-save sobrescreve o
-// proprio slot (0); os 5 manuais o jogador escolhe. Mapeamento slot -> NOME LOGICO
-// ("autosave", "save_1".."save_5") e a fronteira estavel: a camada de I/O (platform/,
+// BUMP ADITIVO (SAVE-LOAD-UI etapa 6, decisao do lider): 5->6 slots manuais (7 no
+// total), pra fechar a divergencia sinalizada em save_load_menu.hpp contra o mock
+// docs/design/mockups/07-save-load.html ("6 espacos + Auto"). Aditivo por
+// construcao: NAO muda o formato do save nem o serializer (save_serializer.hpp/
+// save_backup.hpp nao referenciam kManualSlotCount) - so o TETO de slot valido
+// (is_valid_slot/kSlotCount) cresce; saves ja gravados nos slots 1..5 continuam
+// lendo normalmente, o slot 6 novo nasce vazio.
+//
+// IDs de slot (int): 0 = autosave; 1..6 = manuais. O auto-save sobrescreve o
+// proprio slot (0); os 6 manuais o jogador escolhe. Mapeamento slot -> NOME LOGICO
+// ("autosave", "save_1".."save_6") e a fronteira estavel: a camada de I/O (platform/,
 // futura) traduz o nome logico para caminho de arquivo. Aqui NAO ha path de disco.
 //
 // ADAPTACAO do C#: game/scripts/foundation/save_system/SaveManager.cs usava 1
 // autosave (slot 0) + 4 manuais (slots 1..4), nomes "slot_autosave"/"slot_N". Aqui
-// e 1 + 5 (slots 1..5), nomes "autosave"/"save_N" (sem o prefixo "slot_", que era
+// e 1 + 6 (slots 1..6), nomes "autosave"/"save_N" (sem o prefixo "slot_", que era
 // detalhe de arquivo do C#).
 //
 // Cross-ref: game/scripts/foundation/save_system/SaveManager.cs (ref, adaptada),
@@ -26,13 +34,13 @@ namespace gus::domain::save {
 // Slot canonico do auto-save (sobrescreve a si mesmo).
 inline constexpr int kAutosaveSlot = 0;
 
-// Quantidade de slots manuais que o jogador escolhe (1..5).
-inline constexpr int kManualSlotCount = 5;
+// Quantidade de slots manuais que o jogador escolhe (1..6).
+inline constexpr int kManualSlotCount = 6;
 
-// Total de slots = 1 auto + 5 manuais.
+// Total de slots = 1 auto + 6 manuais.
 inline constexpr int kSlotCount = 1 + kManualSlotCount;
 
-// true se id e um slot valido (0..5).
+// true se id e um slot valido (0..6).
 [[nodiscard]] constexpr bool is_valid_slot(int slot) noexcept {
     return slot >= 0 && slot < kSlotCount;
 }

@@ -660,12 +660,15 @@ std::string build_pause_body(const SystemMenuState& state,
         const char* key;
         const char* extra_class;
     };
-    // Ordem da arvore aprovada: Continuar / Salvar / Configuracoes / Sair.
+    // Ordem SAVE-LOAD-UI etapa 6: Continuar / Salvar / Carregar / Configuracoes /
+    // Sair (MENU_LOAD_GAME ja existia no catalogo, ate agora so consumida pela
+    // tela de titulo legada - reusada aqui sem duplicar chave).
     const Item items[kPauseItemCount] = {
         {0, "MENU_CONTINUE", ""},
         {1, "MENU_SAVE_GAME", ""},
-        {2, "SETTINGS_TITLE", ""},
-        {3, "MENU_QUIT", " danger"},
+        {2, "MENU_LOAD_GAME", ""},
+        {3, "SETTINGS_TITLE", ""},
+        {4, "MENU_QUIT", " danger"},
     };
     for (const Item& item : items) {
         const bool focused = (state.pause_selected == item.index);
@@ -987,9 +990,6 @@ std::string build_system_menu_rml(const SystemMenuState& state,
             break;
         case SystemMenuScreen::Controls:
             body = build_controls_body(state, translator, pressed_index);
-            break;
-        case SystemMenuScreen::Save:
-            body = build_placeholder_body(translator, "MENU_SAVE_GAME", pressed_index);
             break;
         case SystemMenuScreen::Video:
             body = build_placeholder_body(translator, "SETTINGS_VIDEO", pressed_index);

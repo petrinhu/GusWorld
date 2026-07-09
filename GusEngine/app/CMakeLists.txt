@@ -39,6 +39,10 @@ add_library(gusengine_app STATIC
     # sobrescrita) - ver gus/app/screens/save_load_menu.hpp.
     src/screens/save_load_menu.cpp
     src/screens/save_load_menu_rml.cpp
+    # SAVE-LOAD-UI etapa 6 (wiring REAL): o loop interativo GL/glintfx que faz o
+    # I/O de disco de fato (has_save/save_game/load_game) - ver
+    # gus/app/screens/save_load_menu_loop.hpp.
+    src/screens/save_load_menu_loop.cpp
     src/i18n/translator.cpp
     # M7-DIALOGO (NPC-MVP): I/O do grafo de dialogo do Bertoldo (.dlg.txt) -
     # fronteira app/, domain/dialogue permanece ZERO I/O.

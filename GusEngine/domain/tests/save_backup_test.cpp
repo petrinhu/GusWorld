@@ -124,6 +124,8 @@ TEST_CASE("backup: rotacao de um slot nao afeta outro slot",
 TEST_CASE("backup: gravar em slot invalido lanca",
           "[domain][save][backup]") {
     InMemorySaveStore store;
-    REQUIRE_THROWS_AS(write_with_backup_rotation(store, 6, gen(0x00)),
+    // 7 (nao mais 6 - bump SAVE-LOAD-UI etapa 6, kManualSlotCount 5->6 tornou o
+    // slot 6 VALIDO, ver save_slots.hpp): o 1o slot fora do teto agora.
+    REQUIRE_THROWS_AS(write_with_backup_rotation(store, 7, gen(0x00)),
                       std::out_of_range);
 }

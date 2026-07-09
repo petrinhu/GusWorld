@@ -178,6 +178,21 @@ public:
     // Posicao ATUAL do jogador (canto sup-esq + w/h).
     [[nodiscard]] const gus::core::spatial::Aabb& player() const noexcept { return curr_; }
 
+    // TELEPORTE (SAVE-LOAD-UI etapa 6, wiring do Carregar REAL no menu de pausa):
+    // reposiciona o jogador INSTANTANEAMENTE pra `aabb`, SEM interpolacao visual -
+    // curr_ E prev_ recebem o MESMO valor, entao o proximo render() nao produz
+    // nenhum "deslize" fantasma do ponto antigo pro novo (a interpolacao normal de
+    // step_fixed so faz sentido entre 2 posicoes de UM MESMO passo de movimento).
+    // Usado pelo CHAMADOR (Maestro) SO ao aplicar um SaveData carregado do disco -
+    // NUNCA durante o step_fixed normal de gameplay. NAO mexe em facing_/walk_/
+    // stamina_ (o save nao guarda direcao/animacao - o jogador aparece parado na
+    // pose corrente, mesma degradacao "sem info extra" de outros campos ausentes
+    // do SaveData).
+    void set_player_position(const gus::core::spatial::Aabb& aabb) noexcept {
+        curr_ = aabb;
+        prev_ = aabb;
+    }
+
     // Mapa (pra inspecao/desenho externo, se preciso).
     [[nodiscard]] const gus::core::spatial::TileGrid& grid() const noexcept { return grid_; }
 

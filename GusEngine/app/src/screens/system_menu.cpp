@@ -28,7 +28,6 @@ int wrap_move(int current, int delta, int count) noexcept {
 
 SystemMenuScreen parent_screen_of(SystemMenuScreen screen) noexcept {
     switch (screen) {
-        case SystemMenuScreen::Save:
         case SystemMenuScreen::ConfigCategories:
             return SystemMenuScreen::Pause;
         case SystemMenuScreen::Audio:
@@ -147,8 +146,11 @@ SystemMenuAction handle_pause_key(SystemMenuState& state, SDL_Keycode key) noexc
                 case PauseItem::Continue:
                     return SystemMenuAction::Continue;
                 case PauseItem::Save:
-                    state.screen = SystemMenuScreen::Save;
-                    return SystemMenuAction::Navigated;
+                    // SAVE-LOAD-UI etapa 6: NAO navega mais (sem SystemMenuScreen::
+                    // Save) - o CHAMADOR abre a tela REAL de save/load, ANINHADA.
+                    return SystemMenuAction::OpenSaveLoadSave;
+                case PauseItem::Load:
+                    return SystemMenuAction::OpenSaveLoadLoad;
                 case PauseItem::Settings:
                     state.screen = SystemMenuScreen::ConfigCategories;
                     state.config_categories_selected =
@@ -446,7 +448,6 @@ SystemMenuAction system_menu_key_down(SystemMenuState& state,
             return handle_audio_key(state, key);
         case SystemMenuScreen::Controls:
             return handle_controls_key(state, key);
-        case SystemMenuScreen::Save:
         case SystemMenuScreen::Video:
         case SystemMenuScreen::Language:
             return handle_placeholder_key(state, key);
@@ -523,8 +524,11 @@ SystemMenuAction click_pause_option(SystemMenuState& state, int index) noexcept 
         case PauseItem::Continue:
             return SystemMenuAction::Continue;
         case PauseItem::Save:
-            state.screen = SystemMenuScreen::Save;
-            return SystemMenuAction::Navigated;
+            // SAVE-LOAD-UI etapa 6: MESMA mudanca de handle_pause_key acima - sem
+            // navegar, o CHAMADOR abre a tela REAL de save/load.
+            return SystemMenuAction::OpenSaveLoadSave;
+        case PauseItem::Load:
+            return SystemMenuAction::OpenSaveLoadLoad;
         case PauseItem::Settings:
             state.screen = SystemMenuScreen::ConfigCategories;
             state.config_categories_selected = static_cast<int>(ConfigCategoryItem::Audio);
@@ -677,7 +681,6 @@ SystemMenuAction system_menu_click_option(SystemMenuState& state,
             return click_audio_option(state, index);
         case SystemMenuScreen::Controls:
             return click_controls_option(state, index);
-        case SystemMenuScreen::Save:
         case SystemMenuScreen::Video:
         case SystemMenuScreen::Language:
             return click_placeholder_option(state, index);
@@ -735,7 +738,6 @@ int system_menu_hover_index(const SystemMenuState& state, float mouse_x, float m
                 count = kControlsItemCount;
             }
             break;
-        case SystemMenuScreen::Save:
         case SystemMenuScreen::Video:
         case SystemMenuScreen::Language:
             count = kPlaceholderItemCount;
@@ -772,7 +774,6 @@ int system_menu_keyboard_focus_index(const SystemMenuState& state) noexcept {
             if (state.controls_confirming_restore) return state.controls_restore_confirm_selected;
             if (state.controls_confirming_discard) return state.controls_discard_confirm_selected;
             return state.controls_selected;
-        case SystemMenuScreen::Save:
         case SystemMenuScreen::Video:
         case SystemMenuScreen::Language:
             return kPlaceholderBackIndex;

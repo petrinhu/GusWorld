@@ -27,6 +27,7 @@ Translator make_translator() {
     tr.load_from_content(
         "## MENU_CONTINUE\nContinuar\n\n"
         "## MENU_SAVE_GAME\nSalvar\n\n"
+        "## MENU_LOAD_GAME\nCarregar\n\n"
         "## SETTINGS_TITLE\nConfiguracoes\n\n"
         "## MENU_QUIT\nSair\n\n"
         "## SETTINGS_BACK\nVoltar\n\n"
@@ -73,8 +74,8 @@ Translator make_translator() {
 
 // ---------------------------------------------------------------- Pause
 
-TEST_CASE("build_system_menu_rml: tela Pause contem os 4 verb-pills traduzidos "
-          "(Continuar/Salvar/Configuracoes/Sair)",
+TEST_CASE("build_system_menu_rml: tela Pause contem os 5 verb-pills traduzidos "
+          "(Continuar/Salvar/Carregar/Configuracoes/Sair, SAVE-LOAD-UI etapa 6)",
           "[system_menu_rml]") {
     SystemMenuState state;
     system_menu_open(state);
@@ -83,6 +84,8 @@ TEST_CASE("build_system_menu_rml: tela Pause contem os 4 verb-pills traduzidos "
     const std::string rml = build_system_menu_rml(state, tr);
     REQUIRE(rml.find("Continuar") != std::string::npos);
     REQUIRE(rml.find("Salvar") != std::string::npos);
+    REQUIRE(rml.find("Carregar") != std::string::npos);
+    REQUIRE(rml.find("id=\"pause-item-2\"") != std::string::npos);  // Carregar
     REQUIRE(rml.find("Configuracoes") != std::string::npos);
     REQUIRE(rml.find("Sair") != std::string::npos);
     REQUIRE(rml.find("Pausado") != std::string::npos);
@@ -111,7 +114,7 @@ TEST_CASE("build_system_menu_rml: item selecionado de Pause ganha a classe "
 
     const std::string rml = build_system_menu_rml(state, tr);
     const auto continue_pos = rml.find("id=\"pause-item-0\"");
-    const auto quit_pos = rml.find("id=\"pause-item-3\"");
+    const auto quit_pos = rml.find("id=\"pause-item-4\"");  // Sair (SAVE-LOAD-UI etapa 6: +1)
     REQUIRE(continue_pos != std::string::npos);
     REQUIRE(quit_pos != std::string::npos);
     const std::string around_continue =
@@ -157,20 +160,10 @@ TEST_CASE("build_system_menu_rml: pressed_index default (-1) nao marca nenhum "
     REQUIRE(rml.find("pressed\"") == std::string::npos);
 }
 
-// ---------------------------------------------------------------- Save (placeholder)
-
-TEST_CASE("build_system_menu_rml: tela Save mostra o titulo Salvar, o texto "
-          "placeholder e o Voltar",
-          "[system_menu_rml]") {
-    SystemMenuState state;
-    state.screen = SystemMenuScreen::Save;
-    const Translator tr = make_translator();
-    const std::string rml = build_system_menu_rml(state, tr);
-    REQUIRE(rml.find("Salvar") != std::string::npos);
-    REQUIRE(rml.find("Em breve.") != std::string::npos);
-    REQUIRE(rml.find("Voltar") != std::string::npos);
-    REQUIRE(rml.find("id=\"placeholder-back\"") != std::string::npos);
-}
+// Save (placeholder): APOSENTADO na SAVE-LOAD-UI etapa 6 - SystemMenuScreen::Save
+// foi removido do enum (Salvar agora e a tela REAL, ver save_load_menu_rml_test.cpp);
+// o teste antigo ("tela Save mostra titulo/placeholder/Voltar") nao tem mais
+// contraparte no codigo, removido junto.
 
 // ---------------------------------------------------------------- ConfigCategories
 

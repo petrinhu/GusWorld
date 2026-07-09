@@ -4,6 +4,7 @@
 
 #include "gus/app/maestro.hpp"
 
+#include <chrono>
 #include <filesystem>
 #include <iostream>
 #include <string>
@@ -20,6 +21,7 @@
 #include "gus/domain/input/controls_name.hpp"  // kDefaultProfile (M2: liga a tela Controles ao input real)
 #include "gus/domain/settings/system_settings.hpp"
 #include "gus/platform/fs/controls_file_store.hpp"  // load_controls (M2)
+#include "gus/platform/fs/save_file_store.hpp"  // SAVE-LOAD-UI etapa 6: resolve_saves_dir
 #include "gus/platform/fs/settings_file_store.hpp"
 
 namespace gus::app {
@@ -149,6 +151,11 @@ bool Maestro::init() {
         SDL_Log("Maestro: falha ao inicializar o renderer/cidade.");
         return false;
     }
+
+    // SAVE-LOAD-UI etapa 6: ancora do relogio de playtime (ver o comentario do
+    // campo em maestro.hpp) - comeca no boot do processo, base 0 (nenhum save
+    // carregado ainda).
+    playtime_anchor_ns_ = SDL_GetTicksNS();
 
     // MENU-PAUSA-CONFIG-SOM (INTEGRACAO FINAL): carrega settings.json (ou os DEFAULTS
     // se for a 1a execucao/arquivo ausente/corrompido - load_system_settings degrada
@@ -331,10 +338,75 @@ bool Maestro::open_pause_from_city() {
     city_->release_renderer();
 
     const std::string settings_dir = gus::platform::fs::resolve_settings_dir();
+
+    // SAVE-LOAD-UI etapa 6 (wiring REAL): os 2 callbacks que dao a tela de save/
+    // load acesso ao SaveData VIVO - so a Maestro conhece flags/posicao/tempo de
+    // jogo de verdade, entao SO ela pode montar/aplicar um SaveData de fato (ver
+    // o header de system_menu_loop.hpp e save_load_menu_loop.hpp pro contrato).
+    const auto build_current_save_data = [this]() -> gus::domain::save::SaveData {
+        gus::domain::save::SaveData data = save_;  // flags ja acumuladas na sessao
+        const gus::core::spatial::Aabb& player = city_->player_aabb();
+        data.player_position = gus::domain::save::Vec3{
+            static_cast<double>(player.x), static_cast<double>(player.y), 0.0};
+        // scene_path SEM extensao (mesma convencao de location_key_for_scene em
+        // save_load_menu_rml.cpp) - UNICO mapa desta vertical slice (M4).
+        data.current_scene_path = "distritos_inferiores";
+        data.timestamp_ms = static_cast<std::int64_t>(
+            std::chrono::duration_cast<std::chrono::milliseconds>(
+                std::chrono::system_clock::now().time_since_epoch())
+                .count());
+        data.playtime_seconds =
+            playtime_base_seconds_ +
+            static_cast<double>(SDL_GetTicksNS() - playtime_anchor_ns_) / 1.0e9;
+        return data;
+    };
+    const auto apply_loaded_save_data =
+        [this](const gus::domain::save::SaveData& data) {
+            save_ = data;
+            // Reposiciona o jogador (SAVE-LOAD-UI etapa 6: o "ponto de risco" que o
+            // lider sinalizou - resolvido via OverworldSim::set_player_position,
+            // ADITIVO/novo, ver overworld_sim.hpp). Preserva w/h ATUAIS (o sprite
+            // nao muda de tamanho; so x/y vem do save).
+            gus::core::spatial::Aabb pos = city_->player_aabb();
+            pos.x = static_cast<float>(data.player_position.x);
+            pos.y = static_cast<float>(data.player_position.y);
+            city_->set_player_position(pos);
+
+            // Re-deriva enemy_defeated_/marcador visual a partir da flag carregada
+            // (MESMA chave que on_battle_result grava) - um save de ANTES do
+            // inimigo ser derrotado deve TRAZER o inimigo de volta visualmente
+            // (ex.: o jogador carregou um slot antigo apos ja te-lo vencido nesta
+            // sessao).
+            const auto it = data.flags.find(std::string(kEnemy1DefeatedFlag));
+            enemy_defeated_ = (it != data.flags.end() && it->second);
+            if (enemy_defeated_) {
+                city_->clear_enemy_marker();
+            } else {
+                city_->set_enemy_marker(enemy_aabb_);
+            }
+            // EDGE-TRIGGER (mesma cautela de on_battle_result abaixo): forca SAIR
+            // e RE-ENTRAR nas hitboxes antes de re-disparar batalha/dialogo -
+            // o jogador pode ter sido teleportado PRA CIMA do inimigo/NPC.
+            was_overlapping_enemy_ = false;
+            was_overlapping_npc_bertoldo_ = false;
+
+            // SAVE-LOAD-UI etapa 6 (playtime REAL): re-ancora o relogio da SESSAO
+            // ATUAL na base do playtime do save carregado - dali em diante o
+            // acumulo (build_current_save_data acima) soma o tempo REAL desta
+            // sessao por cima do que o save trazia.
+            playtime_base_seconds_ = data.playtime_seconds;
+            playtime_anchor_ns_ = SDL_GetTicksNS();
+
+            std::cout << "Maestro: [save-load] Load aplicado - posicao=(" << pos.x
+                      << ", " << pos.y << ") enemy_defeated=" << enemy_defeated_
+                      << " playtime_seconds=" << playtime_base_seconds_ << "\n";
+        };
+
     gus::app::screens::SystemMenuLoopOutcome outcome{};
     const bool ok = gus::app::screens::run_system_menu_loop_owning_gl(
-        window_, audio_, translator_, settings_dir, &outcome,
-        frozen_ok ? frozen_bg_path : std::string());
+        window_, audio_, translator_, settings_dir,
+        gus::platform::fs::resolve_saves_dir(), &outcome, build_current_save_data,
+        apply_loaded_save_data, frozen_ok ? frozen_bg_path : std::string());
     if (!ok) {
         SDL_Log(
             "Maestro: falha ao abrir o menu de pausa (contexto GL/glad) - voltando "
@@ -379,6 +451,20 @@ bool Maestro::open_pause_from_city() {
 }
 
 void Maestro::run() {
+    // DIAGNOSTICO/PROVA (SAVE-LOAD-UI etapa 6, prova visual headless Xvfb :99):
+    // GUSWORLD_SAVELOAD_SCREENSHOT_DIR=<dir> abre o MENU DE PAUSA diretamente no
+    // boot (sem esperar um Esc real do jogador - Xvfb nao tem jogador nenhum) -
+    // o proprio open_pause_from_city() carrega o self-test de screenshot mais
+    // fundo (ver o comentario grande em system_menu_loop.cpp), que gera os 2 PNGs
+    // (save_load_save.png/save_load_load.png) e retorna. Sai do processo logo em
+    // seguida (bypassa por completo o loop interativo normal).
+    if (const char* saveload_screenshot_dir =
+            std::getenv("GUSWORLD_SAVELOAD_SCREENSHOT_DIR");
+        saveload_screenshot_dir != nullptr && saveload_screenshot_dir[0] != '\0') {
+        (void)open_pause_from_city();
+        return;
+    }
+
     bool running = true;
     while (running) {
         if (!city_->step()) {

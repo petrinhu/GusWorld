@@ -7,8 +7,9 @@
 // e a integracao com AudioEngine/persistencia SO CONSOMEM este estado; aqui so a
 // navegacao/selecao/ajuste de volume da arvore inteira:
 //
-//   Pause (Continuar/Salvar/Configuracoes/Sair)
-//     Save            -> placeholder
+//   Pause (Continuar/Salvar/Carregar/Configuracoes/Sair - SAVE-LOAD-UI etapa 6:
+//          Salvar/Carregar NAO navegam mais, disparam OpenSaveLoadSave/
+//          OpenSaveLoadLoad - ver save_load_menu_test.cpp pra tela real)
 //     ConfigCategories (Audio/Video/Lingua/Voltar)
 //       Audio         -> Musica/SFX/Voltar (sliders)
 //       Video         -> placeholder
@@ -35,7 +36,10 @@ namespace {
 void goto_config_categories(SystemMenuState& state) {
     system_menu_open(state);
     system_menu_key_down(state, SDLK_DOWN);
-    system_menu_key_down(state, SDLK_DOWN);    // Pause: foco = Configuracoes (2)
+    system_menu_key_down(state, SDLK_DOWN);
+    system_menu_key_down(state, SDLK_DOWN);    // Pause: foco = Configuracoes (3,
+                                                // SAVE-LOAD-UI etapa 6 - Carregar
+                                                // inserido no meio deslocou +1)
     system_menu_key_down(state, SDLK_RETURN);  // entra em ConfigCategories
 }
 
@@ -68,7 +72,6 @@ TEST_CASE("system_menu_open: abre em Pause com foco inicial em Continuar (item 0
 
 TEST_CASE("parent_screen_of: cada tela da arvore aponta pro pai correto",
           "[system_menu]") {
-    REQUIRE(parent_screen_of(SystemMenuScreen::Save) == SystemMenuScreen::Pause);
     REQUIRE(parent_screen_of(SystemMenuScreen::ConfigCategories) ==
             SystemMenuScreen::Pause);
     REQUIRE(parent_screen_of(SystemMenuScreen::Audio) ==
@@ -83,7 +86,7 @@ TEST_CASE("parent_screen_of: cada tela da arvore aponta pro pai correto",
 
 // ---------------------------------------------------------------- Pause
 
-TEST_CASE("Pause: UP/DOWN navega os 4 itens com WRAP (Continuar/Salvar/"
+TEST_CASE("Pause: UP/DOWN navega os 5 itens com WRAP (Continuar/Salvar/Carregar/"
           "Configuracoes/Sair)",
           "[system_menu]") {
     SystemMenuState state;
@@ -96,11 +99,13 @@ TEST_CASE("Pause: UP/DOWN navega os 4 itens com WRAP (Continuar/Salvar/"
     REQUIRE(state.pause_selected == 2);
     system_menu_key_down(state, SDLK_DOWN);
     REQUIRE(state.pause_selected == 3);
+    system_menu_key_down(state, SDLK_DOWN);
+    REQUIRE(state.pause_selected == 4);
     system_menu_key_down(state, SDLK_DOWN);  // wrap pro topo
     REQUIRE(state.pause_selected == 0);
 
     system_menu_key_down(state, SDLK_UP);  // wrap pro fim
-    REQUIRE(state.pause_selected == 3);
+    REQUIRE(state.pause_selected == 4);
 }
 
 TEST_CASE("Pause: ENTER em Continuar (item 0) devolve action Continue",
@@ -121,37 +126,51 @@ TEST_CASE("Pause: ESC (volta ao jogo) devolve action Continue - RAIZ da arvore, 
     REQUIRE(action == SystemMenuAction::Continue);
 }
 
-TEST_CASE("Pause: ENTER em Salvar (item 1) abre a tela Save (placeholder)",
+TEST_CASE("Pause: ENTER em Salvar (item 1) devolve OpenSaveLoadSave SEM navegar "
+          "(SAVE-LOAD-UI etapa 6 - Save nao e mais tela desta arvore)",
           "[system_menu]") {
     SystemMenuState state;
     system_menu_open(state);
     system_menu_key_down(state, SDLK_DOWN);  // item 1 = Salvar
     const SystemMenuAction action = system_menu_key_down(state, SDLK_RETURN);
-    REQUIRE(action == SystemMenuAction::Navigated);
-    REQUIRE(state.screen == SystemMenuScreen::Save);
+    REQUIRE(action == SystemMenuAction::OpenSaveLoadSave);
+    REQUIRE(state.screen == SystemMenuScreen::Pause);  // screen INTOCADO
 }
 
-TEST_CASE("Pause: ENTER em Configuracoes (item 2) abre ConfigCategories, foco "
+TEST_CASE("Pause: ENTER em Carregar (item 2) devolve OpenSaveLoadLoad SEM navegar",
+          "[system_menu]") {
+    SystemMenuState state;
+    system_menu_open(state);
+    system_menu_key_down(state, SDLK_DOWN);
+    system_menu_key_down(state, SDLK_DOWN);  // item 2 = Carregar
+    const SystemMenuAction action = system_menu_key_down(state, SDLK_RETURN);
+    REQUIRE(action == SystemMenuAction::OpenSaveLoadLoad);
+    REQUIRE(state.screen == SystemMenuScreen::Pause);
+}
+
+TEST_CASE("Pause: ENTER em Configuracoes (item 3) abre ConfigCategories, foco "
           "inicial = Audio",
           "[system_menu]") {
     SystemMenuState state;
     system_menu_open(state);
     system_menu_key_down(state, SDLK_DOWN);
-    system_menu_key_down(state, SDLK_DOWN);  // item 2 = Configuracoes
+    system_menu_key_down(state, SDLK_DOWN);
+    system_menu_key_down(state, SDLK_DOWN);  // item 3 = Configuracoes
     const SystemMenuAction action = system_menu_key_down(state, SDLK_RETURN);
     REQUIRE(action == SystemMenuAction::Navigated);
     REQUIRE(state.screen == SystemMenuScreen::ConfigCategories);
     REQUIRE(state.config_categories_selected == 0);  // foco inicial = Audio
 }
 
-TEST_CASE("Pause: ENTER em Sair (item 3) devolve action RequestQuit sem fechar "
+TEST_CASE("Pause: ENTER em Sair (item 4) devolve action RequestQuit sem fechar "
           "o menu sozinho (o chamador decide encerrar o programa)",
           "[system_menu]") {
     SystemMenuState state;
     system_menu_open(state);
     system_menu_key_down(state, SDLK_DOWN);
     system_menu_key_down(state, SDLK_DOWN);
-    system_menu_key_down(state, SDLK_DOWN);  // item 3 = Sair
+    system_menu_key_down(state, SDLK_DOWN);
+    system_menu_key_down(state, SDLK_DOWN);  // item 4 = Sair
     const SystemMenuAction action = system_menu_key_down(state, SDLK_RETURN);
     REQUIRE(action == SystemMenuAction::RequestQuit);
 }
@@ -166,35 +185,9 @@ TEST_CASE("Pause: A/D nao fazem nada (sem eixo horizontal na tela Pause)",
     REQUIRE(state.pause_selected == before);
 }
 
-// ---------------------------------------------------------------- Save (placeholder)
-
-TEST_CASE("Save (placeholder): ESC ou ENTER voltam pro Pause preservando a "
-          "selecao anterior de Pause",
-          "[system_menu]") {
-    SystemMenuState state;
-    system_menu_open(state);
-    system_menu_key_down(state, SDLK_DOWN);    // Pause: foco = Salvar (1)
-    system_menu_key_down(state, SDLK_RETURN);  // entra em Save
-    REQUIRE(state.screen == SystemMenuScreen::Save);
-
-    const SystemMenuAction action = system_menu_key_down(state, SDLK_ESCAPE);
-    REQUIRE(action == SystemMenuAction::Navigated);
-    REQUIRE(state.screen == SystemMenuScreen::Pause);
-    REQUIRE(state.pause_selected == 1);  // ainda em Salvar, nao resetou
-}
-
-TEST_CASE("Save (placeholder): UP/DOWN/LEFT/RIGHT nao fazem nada (sem controle, "
-          "so 'em breve' + Voltar)",
-          "[system_menu]") {
-    SystemMenuState state;
-    system_menu_open(state);
-    system_menu_key_down(state, SDLK_DOWN);
-    system_menu_key_down(state, SDLK_RETURN);  // Save
-    REQUIRE(system_menu_key_down(state, SDLK_UP) == SystemMenuAction::None);
-    REQUIRE(system_menu_key_down(state, SDLK_DOWN) == SystemMenuAction::None);
-    REQUIRE(system_menu_key_down(state, SDLK_LEFT) == SystemMenuAction::None);
-    REQUIRE(state.screen == SystemMenuScreen::Save);
-}
+// Save/Load (placeholder): APOSENTADO na SAVE-LOAD-UI etapa 6 - Salvar/Carregar
+// nao navegam mais pra uma tela desta arvore (ver os 2 testes OpenSaveLoad*
+// acima); a tela REAL vive em save_load_menu_test.cpp/save_load_menu_loop.hpp.
 
 // ---------------------------------------------------------------- ConfigCategories
 
@@ -275,7 +268,7 @@ TEST_CASE("ConfigCategories: ESC ou ENTER em Voltar (item 4) voltam pro Pause "
     const SystemMenuAction esc_action = system_menu_key_down(state, SDLK_ESCAPE);
     REQUIRE(esc_action == SystemMenuAction::Navigated);
     REQUIRE(state.screen == SystemMenuScreen::Pause);
-    REQUIRE(state.pause_selected == 2);  // ainda em Configuracoes
+    REQUIRE(state.pause_selected == 3);  // ainda em Configuracoes (SAVE-LOAD-UI etapa 6)
 
     // De novo, desta vez confirmando com ENTER no item Voltar.
     goto_config_categories(state);
@@ -977,17 +970,22 @@ TEST_CASE("system_menu_click_option (Pause): clicar numa pill seleciona E "
 
     SystemMenuState save = state;
     const SystemMenuAction save_action = system_menu_click_option(save, 1);
-    REQUIRE(save_action == SystemMenuAction::Navigated);
-    REQUIRE(save.screen == SystemMenuScreen::Save);
+    REQUIRE(save_action == SystemMenuAction::OpenSaveLoadSave);
+    REQUIRE(save.screen == SystemMenuScreen::Pause);  // screen INTOCADO
+
+    SystemMenuState load = state;
+    const SystemMenuAction load_action = system_menu_click_option(load, 2);
+    REQUIRE(load_action == SystemMenuAction::OpenSaveLoadLoad);
+    REQUIRE(load.screen == SystemMenuScreen::Pause);
 
     SystemMenuState config = state;
-    const SystemMenuAction cfg_action = system_menu_click_option(config, 2);
+    const SystemMenuAction cfg_action = system_menu_click_option(config, 3);
     REQUIRE(cfg_action == SystemMenuAction::Navigated);
     REQUIRE(config.screen == SystemMenuScreen::ConfigCategories);
     REQUIRE(config.config_categories_selected == 0);  // foco inicial = Audio
 
     SystemMenuState sair = state;
-    REQUIRE(system_menu_click_option(sair, 3) == SystemMenuAction::RequestQuit);
+    REQUIRE(system_menu_click_option(sair, 4) == SystemMenuAction::RequestQuit);
 
     // indice invalido: no-op defensivo, nao muda pause_selected.
     SystemMenuState invalido = state;
@@ -1044,20 +1042,22 @@ TEST_CASE("system_menu_click_option (Audio): clicar em Musica/SFX SO FOCA "
 TEST_CASE("system_menu_click_option (placeholder): so kPlaceholderBackIndex "
           "confirma; qualquer outro indice e no-op",
           "[system_menu]") {
+    // Video (placeholder, alcancado via ConfigCategories - Save/Load nao sao mais
+    // telas desta arvore, SAVE-LOAD-UI etapa 6, ver os testes OpenSaveLoad* acima).
     SystemMenuState state;
-    system_menu_open(state);
-    system_menu_key_down(state, SDLK_DOWN);
-    system_menu_key_down(state, SDLK_RETURN);  // Save
-    REQUIRE(state.screen == SystemMenuScreen::Save);
+    goto_config_categories(state);
+    system_menu_key_down(state, SDLK_DOWN);    // Audio -> Video
+    system_menu_key_down(state, SDLK_RETURN);  // entra em Video
+    REQUIRE(state.screen == SystemMenuScreen::Video);
 
     SystemMenuState invalido = state;
     REQUIRE(system_menu_click_option(invalido, 5) == SystemMenuAction::None);
-    REQUIRE(invalido.screen == SystemMenuScreen::Save);
+    REQUIRE(invalido.screen == SystemMenuScreen::Video);
 
     const SystemMenuAction action =
         system_menu_click_option(state, kPlaceholderBackIndex);
     REQUIRE(action == SystemMenuAction::Navigated);
-    REQUIRE(state.screen == SystemMenuScreen::Pause);
+    REQUIRE(state.screen == SystemMenuScreen::ConfigCategories);  // pai do Video
 }
 
 TEST_CASE("system_menu_click_option: Hidden (menu fechado) e no-op defensivo",
@@ -1153,11 +1153,11 @@ TEST_CASE("system_menu_hover_index: Audio (3 itens) e placeholder (1 item) "
     // boxes[3] existe geometricamente mas Audio so testa os 3 primeiros.
     REQUIRE(system_menu_hover_index(audio_state, 50.0f, 350.0f, boxes) == -1);
 
-    SystemMenuState save_state;
-    system_menu_open(save_state);
-    save_state.screen = SystemMenuScreen::Save;  // placeholder, kPlaceholderItemCount=1
-    REQUIRE(system_menu_hover_index(save_state, 50.0f, 50.0f, boxes) == 0);
-    REQUIRE(system_menu_hover_index(save_state, 50.0f, 150.0f, boxes) == -1);
+    SystemMenuState video_state;
+    system_menu_open(video_state);
+    video_state.screen = SystemMenuScreen::Video;  // placeholder, kPlaceholderItemCount=1
+    REQUIRE(system_menu_hover_index(video_state, 50.0f, 50.0f, boxes) == 0);
+    REQUIRE(system_menu_hover_index(video_state, 50.0f, 150.0f, boxes) == -1);
 }
 
 TEST_CASE("system_menu_hover_index: Hidden (menu fechado) sempre devolve -1",
@@ -1268,11 +1268,11 @@ TEST_CASE("system_menu_keyboard_focus_index: Controls confirmando descarte "
     REQUIRE(system_menu_keyboard_focus_index(state) == 1);
 }
 
-TEST_CASE("system_menu_keyboard_focus_index: placeholders (Save/Video/"
-          "Language) sempre devolvem kPlaceholderBackIndex",
+TEST_CASE("system_menu_keyboard_focus_index: placeholders (Video/Language) "
+          "sempre devolvem kPlaceholderBackIndex",
           "[system_menu][keyboard-hover]") {
     SystemMenuState state;
-    state.screen = SystemMenuScreen::Save;
+    state.screen = SystemMenuScreen::Video;
     REQUIRE(system_menu_keyboard_focus_index(state) == kPlaceholderBackIndex);
     state.screen = SystemMenuScreen::Video;
     REQUIRE(system_menu_keyboard_focus_index(state) == kPlaceholderBackIndex);

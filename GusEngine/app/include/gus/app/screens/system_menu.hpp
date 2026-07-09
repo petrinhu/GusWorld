@@ -12,13 +12,25 @@
 // vivo pelo lider - substitui as 2 telas planas originais Pause/Config por uma
 // navegacao em 4 niveis):
 //
-//   Pause (Continuar / Salvar / Configuracoes / Sair)
-//     Save            -> placeholder "em breve"
+//   Pause (Continuar / Salvar / Carregar / Configuracoes / Sair)
 //     ConfigCategories (Audio / Video / Lingua / Voltar)
 //       Audio         -> Volume da Musica + Volume dos Efeitos + Voltar (a
 //                         MESMA tela de sliders que antes se chamava "Config")
 //       Video         -> placeholder "em breve"
 //       Language      -> placeholder "em breve"
+//
+// SAVE-LOAD-UI etapa 6 (wiring REAL, fecha o nucleo do M7): "Salvar" e
+// "Carregar" NAO SAO MAIS filhas desta arvore (o antigo SystemMenuScreen::Save
+// placeholder "em breve" foi APOSENTADO - removido do enum, ver o comentario
+// historico em git blame se precisar arqueologia). Confirmar qualquer um dos
+// dois dispara SystemMenuAction::OpenSaveLoadSave/OpenSaveLoadLoad (state.screen
+// permanece em Pause, SEM navegar) - o CHAMADOR (system_menu_loop.cpp) intercepta
+// essa action e abre a tela REAL de save/load (gus/app/screens/save_load_menu.hpp
+// + save_load_menu_loop.hpp, um documento glintfx PROPRIO, ANINHADO no MESMO
+// contexto GL - mesma tecnica de aninhamento ja usada por este proprio menu
+// dentro da batalha). Ao voltar (Esc/Voltar na lista de slots, ou apos um Load
+// bem-sucedido fechar o jogo inteiro pro gameplay), o Pause reaparece do jeito
+// que estava (pause_selected preservado, nenhuma navegacao de estado ocorreu).
 //
 // Cada tela (exceto Pause, a raiz) tem um PAI fixo (ver parent_screen_of
 // abaixo); "Voltar"/ESC sobe exatamente um nivel pro pai, preservando a
@@ -33,11 +45,13 @@
 // system_menu_key_down.
 //
 // Cross-ref: gus/app/screens/system_menu_rml.hpp (RML/RCSS data-driven deste
-//            estado); gus/platform/audio/audio_engine.hpp (set_music_volume/
-//            set_sfx_volume, consumidos pelo CHAMADOR quando VolumeChanged);
-//            gus/platform/fs/settings_file_store.hpp (persistencia, idem);
-//            gus/app/screens/battle_preview.hpp (battle_key_down, pilha de Esc
-//            do combate - o Esc na PILHA VAZIA e o gancho que abre este menu).
+//            estado); gus/app/screens/save_load_menu.hpp/save_load_menu_loop.hpp
+//            (Salvar/Carregar REAIS, SAVE-LOAD-UI etapa 6); gus/platform/audio/
+//            audio_engine.hpp (set_music_volume/set_sfx_volume, consumidos pelo
+//            CHAMADOR quando VolumeChanged); gus/platform/fs/settings_file_store.hpp
+//            (persistencia, idem); gus/app/screens/battle_preview.hpp
+//            (battle_key_down, pilha de Esc do combate - o Esc na PILHA VAZIA e
+//            o gancho que abre este menu).
 
 #ifndef GUS_APP_SCREENS_SYSTEM_MENU_HPP
 #define GUS_APP_SCREENS_SYSTEM_MENU_HPP
@@ -52,14 +66,15 @@
 namespace gus::app::screens {
 
 // Tela ativa do menu de sistema. Hidden = menu fechado (jogo roda normal).
-// Save/Video/Language sao PLACEHOLDER ("em breve" - as features reais sao
-// pecas futuras: save real = M2-SAVE-IO, video/idioma ainda sem spec). Controls
-// (M2, "a ponte pro jogador" - o motor de remap ja existia em domain/input/) e
-// a UNICA das filhas de ConfigCategories que NAO e placeholder.
+// Video/Language sao PLACEHOLDER ("em breve" - video/idioma ainda sem spec).
+// Controls (M2, "a ponte pro jogador" - o motor de remap ja existia em
+// domain/input/) e a UNICA das filhas de ConfigCategories que NAO e placeholder.
+// SAVE-LOAD-UI etapa 6: NAO ha mais SystemMenuScreen::Save aqui - "Salvar"/
+// "Carregar" abrem uma tela REAL/ANINHADA fora desta arvore (ver o comentario
+// grande no topo do arquivo) - state.screen fica em Pause o tempo todo.
 enum class SystemMenuScreen {
     Hidden,
     Pause,
-    Save,              // placeholder, pai = Pause
     ConfigCategories,  // Audio/Video/Controles/Lingua/Voltar, pai = Pause
     Audio,             // sliders Musica/SFX (a antiga tela "Config"), pai = ConfigCategories
     Video,             // placeholder, pai = ConfigCategories
@@ -68,10 +83,10 @@ enum class SystemMenuScreen {
 };
 
 // Numero de itens navegaveis de cada tela (fonte unica do wrap de navegacao).
-inline constexpr int kPauseItemCount = 4;             // Continuar/Salvar/Configuracoes/Sair
+inline constexpr int kPauseItemCount = 5;  // Continuar/Salvar/Carregar/Configuracoes/Sair
 inline constexpr int kConfigCategoriesItemCount = 5;  // Audio/Video/Controles/Lingua/Voltar
 inline constexpr int kAudioItemCount = 3;             // Musica/SFX/Voltar
-inline constexpr int kPlaceholderItemCount = 1;       // so Voltar (Save/Video/Language)
+inline constexpr int kPlaceholderItemCount = 1;       // so Voltar (Video/Language)
 
 // Tela Controles (M2 -> M2 STAGED CHANGES, reforma de UX aprovada pelo lider):
 // 30 actions curadas/agrupadas (Movimento/Mundo/Combate/Menu&Dialogo - ver
@@ -126,13 +141,15 @@ inline constexpr int kControlsItemCount = 33;            // 30 actions + Restaur
 // documentados junto dos demais campos de Controles em SystemMenuState, logo
 // abaixo.
 
-// Indices dos itens de Pause (ordem da arvore aprovada: Continuar, Salvar,
-// Configuracoes, Sair).
+// Indices dos itens de Pause (ordem SAVE-LOAD-UI etapa 6: Continuar, Salvar,
+// Carregar, Configuracoes, Sair - "Carregar" inserido logo apos "Salvar",
+// deslocando Configuracoes/Sair +1 - ver kPauseItemCount=5).
 enum class PauseItem : int {
     Continue = 0,
     Save = 1,
-    Settings = 2,
-    Quit = 3,
+    Load = 2,
+    Settings = 3,
+    Quit = 4,
 };
 
 // Indices dos itens de ConfigCategories (ordem da arvore aprovada: Audio,
@@ -277,6 +294,12 @@ enum class SystemMenuAction {
                       // (ver gus/platform/fs/controls_file_store.hpp) - o
                       // UNICO ponto que escreve em disco nesta tela agora. A
                       // tela NAO fecha (screen intocado).
+    OpenSaveLoadSave,  // "Salvar" confirmado no Pause (SAVE-LOAD-UI etapa 6) -
+                       // state.screen NAO muda (fica em Pause); o CHAMADOR
+                       // (system_menu_loop.cpp) abre a tela REAL de save/load em
+                       // modo Save (gus/app/screens/save_load_menu_loop.hpp),
+                       // ANINHADA no MESMO contexto GL.
+    OpenSaveLoadLoad,  // "Carregar" confirmado no Pause - idem, modo Load.
 };
 
 // Abre o menu na tela PAUSA com foco inicial em Continuar (item 0, arvore). NAO

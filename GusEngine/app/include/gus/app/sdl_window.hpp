@@ -111,6 +111,12 @@ public:
     // contra isto, sem precisar conhecer o OverworldSim por dentro.
     [[nodiscard]] const gus::core::spatial::Aabb& player_aabb() const noexcept;
 
+    // TELEPORTE (SAVE-LOAD-UI etapa 6, Carregar REAL): reexpoe OverworldSim::
+    // set_player_position (ja publico) sem a Maestro precisar conhecer o
+    // OverworldSim por dentro (mesmo espirito de player_aabb acima). A Maestro
+    // chama isto SO ao aplicar um SaveData carregado do disco.
+    void set_player_position(const gus::core::spatial::Aabb& aabb) noexcept;
+
     // Grade de colisao da cidade corrente (leitura) - a Maestro usa isto SO na
     // inicializacao, pra escolher uma celula LIVRE pro inimigo fixo (nunca dentro de
     // parede, qualquer que seja o mapa real/fallback carregado).

@@ -73,7 +73,11 @@ TEST_CASE("build_save_load_menu_rml: modo Save mostra titulo Salvar e rotulo do 
     REQUIRE(rml.find("Salvar") != std::string::npos);
     REQUIRE(rml.find("id=\"slmenu-slot-1\"") != std::string::npos);
     REQUIRE(rml.find("XP 340") != std::string::npos);
-    REQUIRE(rml.find("Cap. 1") != std::string::npos);
+    // Cap. 3 (nao mais Cap. 1): SAVE-LOAD-UI etapa 6, chapter_from_quest_progress
+    // agora estima o capitulo por XP quando main_story esta ausente (ver
+    // save_load_menu.hpp/kChapterXpThresholds) - make_save_data() acima nao seta
+    // quest_progress, entao xp=340 cai na banda [300,600) = Cap. 3.
+    REQUIRE(rml.find("Cap. 3") != std::string::npos);
     REQUIRE(rml.find("Praca da Compilacao") != std::string::npos);
 }
 

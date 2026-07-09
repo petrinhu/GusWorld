@@ -32,11 +32,24 @@ bool is_right_key(SDL_Keycode key) noexcept { return key == SDLK_RIGHT || key ==
 
 }  // namespace
 
-int chapter_from_quest_progress(const std::map<std::string, int>& quest_progress) noexcept {
-    const auto it = quest_progress.find("main_story");
-    const int stage = (it != quest_progress.end()) ? it->second : 0;
-    const int chapter = 1 + stage;
+int chapter_from_xp_fallback(int xp) noexcept {
+    int chapter = 1;
+    for (const int threshold : kChapterXpThresholds) {
+        if (xp >= threshold) ++chapter;
+    }
     return std::clamp(chapter, 1, kChapterCount);
+}
+
+int chapter_from_quest_progress(const std::map<std::string, int>& quest_progress,
+                                 int xp) noexcept {
+    const auto it = quest_progress.find("main_story");
+    if (it != quest_progress.end()) {
+        // HISTORIA MANDA: xp e ignorado (ver o comentario do header).
+        const int chapter = 1 + it->second;
+        return std::clamp(chapter, 1, kChapterCount);
+    }
+    // main_story ausente: estimador PROVISORIO por faixas de XP.
+    return chapter_from_xp_fallback(xp);
 }
 
 int save_xp_for_display(const gus::domain::save::SaveData& data) noexcept {
@@ -95,7 +108,7 @@ SaveSlotPreview build_slot_preview(const gus::domain::save::SaveData& data, int 
     preview.timestamp_ms = data.timestamp_ms;
     preview.playtime_seconds = data.playtime_seconds;
     preview.xp = save_xp_for_display(data);
-    preview.chapter = chapter_from_quest_progress(data.quest_progress);
+    preview.chapter = chapter_from_quest_progress(data.quest_progress, preview.xp);
     return preview;
 }
 

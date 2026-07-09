@@ -30,28 +30,72 @@ SaveData make_save_data(int gus_xp, int main_story_stage_or_absent = -1) {
 }  // namespace
 
 // ---------------------------------------------------------------- chapter_from_quest_progress
+//
+// HISTORIA MANDA: main_story PRESENTE ignora xp por completo (passamos xp=999999
+// em alguns casos abaixo de proposito, pra provar que NAO influencia o resultado).
 
-TEST_CASE("chapter_from_quest_progress: quest_progress vazio devolve Cap. 1 (mesmo do mock, "
-          "nenhuma quest real grava ainda)",
+TEST_CASE("chapter_from_quest_progress: quest_progress vazio + xp=0 devolve Cap. 1 (mesmo "
+          "do mock, nenhuma quest real grava ainda e nenhum char state tem xp)",
           "[save_load_menu]") {
-    REQUIRE(chapter_from_quest_progress({}) == 1);
+    REQUIRE(chapter_from_quest_progress({}, /*xp=*/0) == 1);
 }
 
-TEST_CASE("chapter_from_quest_progress: main_story=0 devolve Cap. 1", "[save_load_menu]") {
-    REQUIRE(chapter_from_quest_progress({{"main_story", 0}}) == 1);
+TEST_CASE("chapter_from_quest_progress: main_story=0 devolve Cap. 1 (xp ignorado)",
+          "[save_load_menu]") {
+    REQUIRE(chapter_from_quest_progress({{"main_story", 0}}, /*xp=*/999999) == 1);
 }
 
-TEST_CASE("chapter_from_quest_progress: main_story=3 devolve Cap. 4", "[save_load_menu]") {
-    REQUIRE(chapter_from_quest_progress({{"main_story", 3}}) == 4);
+TEST_CASE("chapter_from_quest_progress: main_story=3 devolve Cap. 4 (xp ignorado)",
+          "[save_load_menu]") {
+    REQUIRE(chapter_from_quest_progress({{"main_story", 3}}, /*xp=*/0) == 4);
 }
 
-TEST_CASE("chapter_from_quest_progress: clampa no teto kChapterCount (6)", "[save_load_menu]") {
-    REQUIRE(chapter_from_quest_progress({{"main_story", 99}}) == kChapterCount);
+TEST_CASE("chapter_from_quest_progress: clampa no teto kChapterCount (6), xp ignorado",
+          "[save_load_menu]") {
+    REQUIRE(chapter_from_quest_progress({{"main_story", 99}}, /*xp=*/0) == kChapterCount);
 }
 
 TEST_CASE("chapter_from_quest_progress: main_story negativo (defensivo) clampa em 1",
           "[save_load_menu]") {
-    REQUIRE(chapter_from_quest_progress({{"main_story", -5}}) == 1);
+    REQUIRE(chapter_from_quest_progress({{"main_story", -5}}, /*xp=*/0) == 1);
+}
+
+// ---------------------------------------------------------------- chapter_from_xp_fallback
+//
+// PROVISORIO (kChapterXpThresholds = {100, 300, 600, 1000, 1500}, ver header) -
+// so entra em jogo quando main_story esta AUSENTE (coberto acima via
+// chapter_from_quest_progress({}, xp) - aqui testamos a funcao isolada).
+
+TEST_CASE("chapter_from_xp_fallback: bandas monotonicamente crescentes",
+          "[save_load_menu]") {
+    REQUIRE(chapter_from_xp_fallback(0) == 1);
+    REQUIRE(chapter_from_xp_fallback(99) == 1);
+    REQUIRE(chapter_from_xp_fallback(100) == 2);
+    REQUIRE(chapter_from_xp_fallback(299) == 2);
+    REQUIRE(chapter_from_xp_fallback(300) == 3);
+    REQUIRE(chapter_from_xp_fallback(599) == 3);
+    REQUIRE(chapter_from_xp_fallback(600) == 4);
+    REQUIRE(chapter_from_xp_fallback(999) == 4);
+    REQUIRE(chapter_from_xp_fallback(1000) == 5);
+    REQUIRE(chapter_from_xp_fallback(1499) == 5);
+    REQUIRE(chapter_from_xp_fallback(1500) == 6);
+}
+
+TEST_CASE("chapter_from_xp_fallback: clampa no teto kChapterCount mesmo com xp gigante",
+          "[save_load_menu]") {
+    REQUIRE(chapter_from_xp_fallback(999999) == kChapterCount);
+}
+
+TEST_CASE("chapter_from_xp_fallback: xp negativo (defensivo) fica no piso 1",
+          "[save_load_menu]") {
+    REQUIRE(chapter_from_xp_fallback(-50) == 1);
+}
+
+TEST_CASE("chapter_from_quest_progress: main_story ausente cai no estimador de xp "
+          "(forward-compat com build_slot_preview)",
+          "[save_load_menu]") {
+    REQUIRE(chapter_from_quest_progress({}, /*xp=*/340) == 3);
+    REQUIRE(chapter_from_quest_progress({{"outra_quest", 5}}, /*xp=*/1500) == 6);
 }
 
 // ---------------------------------------------------------------- save_xp_for_display

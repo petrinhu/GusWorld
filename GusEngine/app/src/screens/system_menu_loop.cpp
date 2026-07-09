@@ -37,11 +37,13 @@
 #include <filesystem>
 #include <fstream>
 #include <iostream>
+#include <optional>
 #include <string>
 
 #include <glintfx/element_box.hpp>
 #include <glintfx/ui_layer.hpp>
 
+#include "gus/app/screens/save_load_menu_loop.hpp"  // SAVE-LOAD-UI etapa 6: tela real
 #include "gus/app/screens/system_menu.hpp"
 #include "gus/app/screens/system_menu_rml.hpp"
 #include "gus/core/asset_paths.hpp"            // kMenuHoverSfxFile/kMenuClickSfxFile/kSfxDir
@@ -50,6 +52,7 @@
 #include "gus/domain/settings/system_settings.hpp"
 #include "gus/platform/assets/asset_source.hpp"  // ASSETS-VFS-F1 (ADR-013): porteiro
 #include "gus/platform/fs/controls_file_store.hpp"  // load_controls/save_controls (M2)
+#include "gus/platform/fs/save_file_store.hpp"  // SAVE-LOAD-UI etapa 6: save_game (selftest)
 #include "gus/platform/fs/settings_file_store.hpp"
 #include "gus/platform/input/key_translation.hpp"  // sdl_key_to_godot_keycode (captura, M2)
 #include "gus/platform/render2d/render2d_gl3.hpp"
@@ -288,7 +291,6 @@ int current_hover_index(const glintfx::UiLayer& ui, const SystemMenuState& state
                 }
             }
             break;
-        case SystemMenuScreen::Save:
         case SystemMenuScreen::Video:
         case SystemMenuScreen::Language:
             fill(0, kPlaceholderBackId);
@@ -304,6 +306,10 @@ int current_hover_index(const glintfx::UiLayer& ui, const SystemMenuState& state
 SystemMenuLoopOutcome run_system_menu_loop_gl_current(
     SDL_Window* window, gus::platform::audio::AudioEngine& audio,
     const gus::app::i18n::Translator& translator, const std::string& settings_dir,
+    const std::string& saves_dir,
+    const std::function<gus::domain::save::SaveData()>& build_current_save_data,
+    const std::function<void(const gus::domain::save::SaveData&)>&
+        apply_loaded_save_data,
     const std::string& frozen_background_png) {
     SystemMenuLoopOutcome outcome;
 
@@ -331,22 +337,31 @@ SystemMenuLoopOutcome run_system_menu_loop_gl_current(
     if (ph < 1) ph = 1;
     float dp_ratio = static_cast<float>(pw) / 960.0f;
 
-    glintfx::UiLayer ui(glintfx::UiLayer::Config{/*logical_width=*/960,
-                                                  /*logical_height=*/540,
-                                                  /*load_gl=*/true,
-                                                  /*dp_ratio=*/dp_ratio});
-    if (!ui.ok()) {
+    // SAVE-LOAD-UI etapa 6 (FIX critico, ver o comentario grande no ramo
+    // OpenSaveLoadSave/Load de handle_action mais abaixo): `ui` vive num
+    // std::optional (NAO um glintfx::UiLayer direto) porque a tela de save/load
+    // precisa abrir seu PROPRIO glintfx::UiLayer - e RmlUi NAO SUPORTA 2
+    // contextos/UiLayer simultaneos no MESMO processo (crash real ja documentado,
+    // ver o comentario historico em app/tests/battle_key_routing_test.cpp,
+    // "Element meta pool not empty on shutdown" - MESMO sintoma reproduzido ao
+    // vivo por este agente antes do fix). Por isso `ui` e DESTRUIDO (ui_opt.reset())
+    // ANTES de abrir a tela de save/load e RECRIADO (ui_opt.emplace(...) + reload())
+    // so DEPOIS dela fechar - nunca 2 instancias vivas ao mesmo tempo.
+    std::optional<glintfx::UiLayer> ui_opt(glintfx::UiLayer::Config{
+        /*logical_width=*/960, /*logical_height=*/540, /*load_gl=*/true,
+        /*dp_ratio=*/dp_ratio});
+    if (!ui_opt->ok()) {
         std::cerr << "SystemMenuLoop: glintfx::UiLayer::ok()=false (attach falhou) - "
                      "fechando o menu sem desenhar nada (degradacao segura).\n";
         return outcome;  // quit_app=false: o chamador so retoma a cena
     }
 
     const std::string stage = menu_stage_dir();
-    ui.set_asset_base_url(stage.c_str());
+    ui_opt->set_asset_base_url(stage.c_str());
     std::string rml_path = write_system_menu_rml_file(state, translator);
-    ui.load(rml_path.c_str());
-    ui.set_viewport(pw, ph);
-    ui.set_dp_ratio(dp_ratio);
+    ui_opt->load(rml_path.c_str());
+    ui_opt->set_viewport(pw, ph);
+    ui_opt->set_dp_ratio(dp_ratio);
 
     gus::platform::render2d::Render2dGl3 backdrop(/*gl_active=*/true);
 
@@ -385,7 +400,7 @@ SystemMenuLoopOutcome run_system_menu_loop_gl_current(
     // via UiLayer::scroll_element_into_view - controls_scroll_target_index
     // (system_menu.hpp, POCO/testavel) decide SE deve rolar (so na tela
     // Controles, fora dos mini-dialogos Restaurar/Descartar - ver seu
-    // comentario). 1 ui.update() extra ANTES do scroll: o load() acabou de
+    // comentario). 1 ui_opt->update() extra ANTES do scroll: o load() acabou de
     // trocar de DOCUMENTO (novo Rml::ElementDocument) - a geometria precisa de
     // 1 passo de layout assentado antes de ScrollIntoView le-la (MESMO
     // racional do "2o update() por seguranca" do self-test BUG-1 mais abaixo,
@@ -397,14 +412,14 @@ SystemMenuLoopOutcome run_system_menu_loop_gl_current(
     // extra perceptivel).
     auto reload = [&] {
         rml_path = write_system_menu_rml_file(state, translator);
-        ui.load(rml_path.c_str());
-        ui.set_viewport(pw, ph);
-        ui.set_dp_ratio(dp_ratio);
+        ui_opt->load(rml_path.c_str());
+        ui_opt->set_viewport(pw, ph);
+        ui_opt->set_dp_ratio(dp_ratio);
 
         const int scroll_target = controls_scroll_target_index(state);
         if (scroll_target >= 0) {
-            ui.update();
-            ui.scroll_element_into_view(controls_item_id(scroll_target).c_str());
+            ui_opt->update();
+            ui_opt->scroll_element_into_view(controls_item_id(scroll_target).c_str());
         }
     };
 
@@ -421,14 +436,14 @@ SystemMenuLoopOutcome run_system_menu_loop_gl_current(
             // to_png), full-screen e opaca - mesmo padrao de Chrono Trigger/Zelda/
             // Stardew Valley (o mundo "pausa" atras da UI). O #sysmenu-scrim do
             // RML (system_menu_rml.cpp, ~66% preto) segue desenhado por CIMA disto
-            // pelo glintfx (ui.render() abaixo) - a legibilidade do painel nao muda.
+            // pelo glintfx (ui_opt->render() abaixo) - a legibilidade do painel nao muda.
             backdrop.draw_textured_rect(
                 cam, frozen_bg_tex, gus::platform::render2d::UvRect{0.0f, 0.0f, 1.0f, 1.0f},
                 gus::platform::render2d::DrawColor{1.0f, 1.0f, 1.0f, 1.0f});
         }
         backdrop.end_frame();
-        ui.update();
-        ui.render();
+        ui_opt->update();
+        ui_opt->render();
         SDL_GL_SwapWindow(window);
     };
 
@@ -446,9 +461,9 @@ SystemMenuLoopOutcome run_system_menu_loop_gl_current(
     auto flash_pressed = [&](const SystemMenuState& pre_action_state, int item_index) {
         audio.play_sfx(click_sfx_id);
         rml_path = write_system_menu_rml_file(pre_action_state, translator, item_index);
-        ui.load(rml_path.c_str());
-        ui.set_viewport(pw, ph);
-        ui.set_dp_ratio(dp_ratio);
+        ui_opt->load(rml_path.c_str());
+        ui_opt->set_viewport(pw, ph);
+        ui_opt->set_dp_ratio(dp_ratio);
         for (int frame = 0; frame < 4; ++frame) {
             present_frame();
             SDL_Delay(25);
@@ -471,9 +486,9 @@ SystemMenuLoopOutcome run_system_menu_loop_gl_current(
         hover_ev.type = glintfx::UiEvent::Type::MouseMove;
         hover_ev.x = mx;
         hover_ev.y = my;
-        ui.process_event(hover_ev);
+        ui_opt->process_event(hover_ev);
 
-        const int new_hover = current_hover_index(ui, state, mx, my);
+        const int new_hover = current_hover_index(*ui_opt, state, mx, my);
         if (system_menu_hover_entered_new_item(hovered_index, new_hover)) {
             audio.play_sfx(hover_sfx_id);
         }
@@ -481,7 +496,7 @@ SystemMenuLoopOutcome run_system_menu_loop_gl_current(
 
         if (drag_item >= 0) {
             const std::string id = track_id_for_item(drag_item);
-            const glintfx::ElementBox box = ui.get_element_box(id.c_str());
+            const glintfx::ElementBox box = ui_opt->get_element_box(id.c_str());
             if (box.found && box.w > 0.0f) {
                 const float ratio = (mx - box.x) / box.w;
                 system_menu_set_slider_ratio(state, drag_item, ratio);
@@ -518,6 +533,45 @@ SystemMenuLoopOutcome run_system_menu_loop_gl_current(
             // de trabalho (ja promovida a baseline em controls_applied_config
             // pelo lado puro) e o que persiste.
             persist_controls(state, settings_dir);
+        }
+        // SAVE-LOAD-UI etapa 6: "Salvar"/"Carregar" confirmados no Pause abrem a
+        // tela REAL, ANINHADA no MESMO contexto GL (state.screen continua Pause -
+        // ver o comentario grande em system_menu.hpp). Ao voltar: BackToPause so
+        // recarrega o Pause (fica no while(true) deste loop); ClosedAfterLoad
+        // fecha o menu de pausa INTEIRO igual a Continuar (o Load ja aplicou no
+        // jogo vivo, via apply_loaded_save_data, ANTES de devolver); QuitApp
+        // propaga o fechamento da janela.
+        if (action == SystemMenuAction::OpenSaveLoadSave ||
+            action == SystemMenuAction::OpenSaveLoadLoad) {
+            const SaveLoadMode mode = (action == SystemMenuAction::OpenSaveLoadSave)
+                                           ? SaveLoadMode::Save
+                                           : SaveLoadMode::Load;
+            // FIX CRITICO (crash real reproduzido ao vivo por este agente, MESMO
+            // sintoma ja documentado em battle_key_routing_test.cpp - "Element
+            // meta pool not empty on shutdown"): RmlUi NAO SUPORTA 2 UiLayer
+            // simultaneos no processo. DESTROI o UiLayer do Pause ANTES de abrir
+            // o da tela de save/load (que cria o SEU PROPRIO) - nunca 2 vivos ao
+            // mesmo tempo.
+            ui_opt.reset();
+            const SaveLoadLoopExit exit = run_save_load_menu_loop_gl_current(
+                window, translator, mode, saves_dir, build_current_save_data,
+                apply_loaded_save_data, frozen_background_png);
+            switch (exit) {
+                case SaveLoadLoopExit::QuitApp:
+                    outcome.quit_app = true;
+                    return true;
+                case SaveLoadLoopExit::ClosedAfterLoad:
+                    return true;  // quit_app=false: MESMO efeito de Continuar
+                case SaveLoadLoopExit::BackToPause:
+                    // RECRIA o UiLayer do Pause (a tela de save/load ja destruiu
+                    // o dela ao retornar) ANTES do reload() generico abaixo, que
+                    // dereferencia ui_opt.
+                    ui_opt.emplace(glintfx::UiLayer::Config{
+                        /*logical_width=*/960, /*logical_height=*/540,
+                        /*load_gl=*/true, /*dp_ratio=*/dp_ratio});
+                    ui_opt->set_asset_base_url(stage.c_str());
+                    break;  // so recarrega o Pause abaixo, segue no while(true)
+            }
         }
         // None/Navigated: o ESTADO pode ter mudado mesmo assim (navegacao/foco
         // move e devolve None, ou trocou de tela e devolve Navigated) - reload
@@ -605,7 +659,7 @@ SystemMenuLoopOutcome run_system_menu_loop_gl_current(
         // prova o re-trigger apos sair pro item 3).
         const int hover_sequence[] = {0, 1, 2, 3, 0};
         for (const int item : hover_sequence) {
-            const glintfx::ElementBox box = ui.get_element_box(pause_item_id(item).c_str());
+            const glintfx::ElementBox box = ui_opt->get_element_box(pause_item_id(item).c_str());
             const float cx = box.found ? box.x + box.w * 0.5f : -1.0f;
             const float cy = box.found ? box.y + box.h * 0.5f : -1.0f;
             handle_mouse_motion(cx, cy);
@@ -784,9 +838,9 @@ SystemMenuLoopOutcome run_system_menu_loop_gl_current(
         present_frame();  // 2o update() por seguranca (layout assentado)
 
         // BUG-1: o painel (e o rodape Restaurar/Voltar) tem que caber na viewport.
-        const glintfx::ElementBox panel = ui.get_element_box("sysmenu-panel");
+        const glintfx::ElementBox panel = ui_opt->get_element_box("sysmenu-panel");
         const glintfx::ElementBox back_btn =
-            ui.get_element_box(controls_item_id(kControlsBackIndex).c_str());
+            ui_opt->get_element_box(controls_item_id(kControlsBackIndex).c_str());
         std::cout << "SystemMenuLoop: [selftest][BUG-1] viewport ph=" << ph
                   << " panel_bottom=" << (panel.y + panel.h)
                   << " (esperado <= " << ph << ") - "
@@ -802,7 +856,7 @@ SystemMenuLoopOutcome run_system_menu_loop_gl_current(
 
         // BUG-A: a caixa de hit-test da linha 0 precisa cobrir a linha INTEIRA
         // (nao so os ~16px de padding do bug original).
-        const glintfx::ElementBox row0 = ui.get_element_box(controls_item_id(0).c_str());
+        const glintfx::ElementBox row0 = ui_opt->get_element_box(controls_item_id(0).c_str());
         std::cout << "SystemMenuLoop: [selftest][BUG-A] largura hit-test da linha 0: w="
                   << row0.w << " (esperado > 400px, era ~16px no bug) - "
                   << (row0.w > 400.0f ? "OK" : "FALHOU") << "\n";
@@ -835,7 +889,7 @@ SystemMenuLoopOutcome run_system_menu_loop_gl_current(
         // BUG-3 (mouse): hit-test + clique na linha 5 (MESMO par get_element_box +
         // system_menu_click_option que o handler de SDL_EVENT_MOUSE_BUTTON_DOWN
         // do while(true) de producao usa - so sem passar pela fila de eventos).
-        const glintfx::ElementBox row5 = ui.get_element_box(controls_item_id(5).c_str());
+        const glintfx::ElementBox row5 = ui_opt->get_element_box(controls_item_id(5).c_str());
         const SystemMenuAction click_action = system_menu_click_option(state, 5);
         std::cout << "SystemMenuLoop: [selftest][BUG-3 mouse] hit-test linha 5: found="
                   << row5.found << " w=" << row5.w << "; apos clique: controls_selected="
@@ -852,9 +906,9 @@ SystemMenuLoopOutcome run_system_menu_loop_gl_current(
         // nao muda config) antes de prosseguir.
         system_menu_controls_capture_key(state, /*is_escape=*/true, 0);
         {
-            const glintfx::ElementBox list_box = ui.get_element_box(kControlsListId);
+            const glintfx::ElementBox list_box = ui_opt->get_element_box(kControlsListId);
             const glintfx::ElementBox raw_row6 =
-                ui.get_element_box(controls_item_id(6).c_str());
+                ui_opt->get_element_box(controls_item_id(6).c_str());
             std::cout << "SystemMenuLoop: [selftest][BUG-A] linha 6 (rolada pra fora "
                          "da vista) - caixa REAL: y="
                       << raw_row6.y << " h=" << raw_row6.h << "; recorte visivel de "
@@ -867,7 +921,7 @@ SystemMenuLoopOutcome run_system_menu_loop_gl_current(
             // fora da lista rolavel) - a coordenada de clique que o jogador
             // fisicamente usaria.
             const glintfx::ElementBox raw_back =
-                ui.get_element_box(controls_item_id(kControlsBackIndex).c_str());
+                ui_opt->get_element_box(controls_item_id(kControlsBackIndex).c_str());
             const float cx = raw_back.found ? raw_back.x + raw_back.w * 0.5f : -1.0f;
             const float cy = raw_back.found ? raw_back.y + raw_back.h * 0.5f : -1.0f;
 
@@ -880,7 +934,7 @@ SystemMenuLoopOutcome run_system_menu_loop_gl_current(
             int winner = -1;
             for (int item = 0; item < kControlsItemCount; ++item) {
                 const glintfx::ElementBox raw =
-                    ui.get_element_box(controls_item_id(item).c_str());
+                    ui_opt->get_element_box(controls_item_id(item).c_str());
                 const glintfx::ElementBox box =
                     filter_offscreen_controls_row(item, raw, list_box);
                 if (hit_test(box, cx, cy)) {
@@ -929,13 +983,13 @@ SystemMenuLoopOutcome run_system_menu_loop_gl_current(
         // scrollTop=0 - controls_selected==0 acabou de reentrar - garante espaco
         // pra rolar PRA BAIXO sem bater no limite do fim do conteudo).
         {
-            const glintfx::ElementBox list_box = ui.get_element_box(kControlsListId);
+            const glintfx::ElementBox list_box = ui_opt->get_element_box(kControlsListId);
             const float hover_x = list_box.found ? list_box.x + list_box.w * 0.5f : -1.0f;
             const float hover_y = list_box.found ? list_box.y + list_box.h * 0.5f : -1.0f;
             handle_mouse_motion(hover_x, hover_y);
 
             float scroll_before = -1.0f;
-            ui.get_element_scroll_top(kControlsListId, scroll_before);
+            ui_opt->get_element_scroll_top(kControlsListId, scroll_before);
 
             const float wheel_dy =
                 system_menu_wheel_delta_to_rmlui(/*sdl_wheel_y=*/-3.0f, /*flipped=*/false);
@@ -943,11 +997,11 @@ SystemMenuLoopOutcome run_system_menu_loop_gl_current(
             wheel_ev.type = glintfx::UiEvent::Type::MouseWheel;
             wheel_ev.x = 0.0f;
             wheel_ev.y = wheel_dy;
-            ui.process_event(wheel_ev);
+            ui_opt->process_event(wheel_ev);
             present_frame();
 
             float scroll_after = -1.0f;
-            ui.get_element_scroll_top(kControlsListId, scroll_after);
+            ui_opt->get_element_scroll_top(kControlsListId, scroll_after);
             std::cout << "SystemMenuLoop: [selftest][GLINTFX-SCROLL][wheel] "
                          "scroll_top antes="
                       << scroll_before << " depois=" << scroll_after
@@ -969,8 +1023,8 @@ SystemMenuLoopOutcome run_system_menu_loop_gl_current(
         present_frame();
         present_frame();
         {
-            const glintfx::ElementBox list_box = ui.get_element_box(kControlsListId);
-            const glintfx::ElementBox row25 = ui.get_element_box(controls_item_id(25).c_str());
+            const glintfx::ElementBox list_box = ui_opt->get_element_box(kControlsListId);
+            const glintfx::ElementBox row25 = ui_opt->get_element_box(controls_item_id(25).c_str());
             const bool visible = row25.found && list_box.found &&
                                   controls_row_visible_in_list(row25.y, row25.h,
                                                                 list_box.y, list_box.h);
@@ -993,14 +1047,14 @@ SystemMenuLoopOutcome run_system_menu_loop_gl_current(
         // que podia coincidir com o rodape - ver BUG-A acima; agora refletem
         // onde a linha REALMENTE esta, dentro ou fora do recorte).
         {
-            const glintfx::ElementBox list_box = ui.get_element_box(kControlsListId);
-            const glintfx::ElementBox row25 = ui.get_element_box(controls_item_id(25).c_str());
+            const glintfx::ElementBox list_box = ui_opt->get_element_box(kControlsListId);
+            const glintfx::ElementBox row25 = ui_opt->get_element_box(controls_item_id(25).c_str());
             const float cx = row25.found ? row25.x + row25.w * 0.5f : -1.0f;
             const float cy = row25.found ? row25.y + row25.h * 0.5f : -1.0f;
 
             int winner = -1;
             for (int item = 0; item < kControlsItemCount; ++item) {
-                const glintfx::ElementBox raw = ui.get_element_box(controls_item_id(item).c_str());
+                const glintfx::ElementBox raw = ui_opt->get_element_box(controls_item_id(item).c_str());
                 const glintfx::ElementBox box = filter_offscreen_controls_row(item, raw, list_box);
                 if (hit_test(box, cx, cy)) {
                     winner = item;
@@ -1027,6 +1081,41 @@ SystemMenuLoopOutcome run_system_menu_loop_gl_current(
         return outcome;
     }
 
+    // DIAGNOSTICO/PROVA (SAVE-LOAD-UI etapa 6, prova visual headless Xvfb :99):
+    // GUSWORLD_SAVELOAD_SCREENSHOT_DIR=<dir> abre a tela REAL de save/load (a
+    // MESMA alcancada pelo jogador via Pause > Salvar/Carregar) em modo Save
+    // (semeando o slot 1 de verdade em disco, save_game() real - pra o modo Load
+    // seguinte mostrar um slot OCUPADO de verdade, nao um mock) e depois em modo
+    // Load, salvando 1 PNG de cada (save_load_save.png/save_load_load.png, ver
+    // save_load_menu_loop.cpp) - bypassa por completo o jogo real (nunca abre pra
+    // input real), MESMO espirito dos demais self-tests acima.
+    const char* saveload_screenshot_dir =
+        std::getenv("GUSWORLD_SAVELOAD_SCREENSHOT_DIR");
+    if (saveload_screenshot_dir != nullptr && saveload_screenshot_dir[0] != '\0') {
+        // MESMO fix critico do ramo OpenSaveLoadSave/Load de handle_action acima
+        // (RmlUi nao suporta 2 UiLayer simultaneos) - destroi o UiLayer do Pause
+        // (ainda vivo desde a construcao no topo desta funcao) ANTES de abrir a
+        // tela de save/load. Sem re-emplace depois: este ramo so retorna
+        // (nenhum reload()/present_frame() do Pause roda mais nesta chamada).
+        ui_opt.reset();
+        (void)run_save_load_menu_loop_gl_current(window, translator, SaveLoadMode::Save,
+                                                  saves_dir, build_current_save_data,
+                                                  apply_loaded_save_data,
+                                                  frozen_background_png);
+        if (build_current_save_data) {
+            // Semeia o slot 1 de verdade (I/O real, MESMO save_game que o
+            // jogador aciona) - o modo Load abaixo mostra esse slot OCUPADO.
+            gus::domain::save::SaveData seed = build_current_save_data();
+            seed.slot_id = 1;
+            (void)gus::platform::fs::save_game(seed, 1, saves_dir);
+        }
+        (void)run_save_load_menu_loop_gl_current(window, translator, SaveLoadMode::Load,
+                                                  saves_dir, build_current_save_data,
+                                                  apply_loaded_save_data,
+                                                  frozen_background_png);
+        return outcome;
+    }
+
     while (true) {
         SDL_Event ev;
         while (SDL_PollEvent(&ev)) {
@@ -1040,8 +1129,8 @@ SystemMenuLoopOutcome run_system_menu_loop_gl_current(
                 if (pw < 1) pw = 1;
                 if (ph < 1) ph = 1;
                 dp_ratio = static_cast<float>(pw) / 960.0f;
-                ui.set_viewport(pw, ph);
-                ui.set_dp_ratio(dp_ratio);
+                ui_opt->set_viewport(pw, ph);
+                ui_opt->set_dp_ratio(dp_ratio);
                 continue;
             }
             if (ev.type == SDL_EVENT_KEY_DOWN && !ev.key.repeat) {
@@ -1099,7 +1188,6 @@ SystemMenuLoopOutcome run_system_menu_loop_gl_current(
                                 item_index = state.controls_selected;
                             }
                             break;
-                        case SystemMenuScreen::Save:
                         case SystemMenuScreen::Video:
                         case SystemMenuScreen::Language:
                             item_index = kPlaceholderBackIndex;
@@ -1125,7 +1213,7 @@ SystemMenuLoopOutcome run_system_menu_loop_gl_current(
                     // SELECIONA E ACIONA na hora - equivalente a focar + ENTER.
                     for (int item = 0; item < kPauseItemCount && !handled; ++item) {
                         const glintfx::ElementBox box =
-                            ui.get_element_box(pause_item_id(item).c_str());
+                            ui_opt->get_element_box(pause_item_id(item).c_str());
                         if (!hit_test(box, ev.button.x, ev.button.y)) continue;
                         handled = true;
                         const SystemMenuState pre_action_state = state;
@@ -1140,7 +1228,7 @@ SystemMenuLoopOutcome run_system_menu_loop_gl_current(
                     for (int item = 0; item < kConfigCategoriesItemCount && !handled;
                          ++item) {
                         const glintfx::ElementBox box =
-                            ui.get_element_box(category_item_id(item).c_str());
+                            ui_opt->get_element_box(category_item_id(item).c_str());
                         if (!hit_test(box, ev.button.x, ev.button.y)) continue;
                         handled = true;
                         const SystemMenuState pre_action_state = state;
@@ -1156,7 +1244,7 @@ SystemMenuLoopOutcome run_system_menu_loop_gl_current(
                     // mais especifico tem que vencer quando o clique cai nos dois.
                     for (int item = 0; item < 2 && !handled; ++item) {
                         const glintfx::ElementBox box =
-                            ui.get_element_box(track_id_for_item(item).c_str());
+                            ui_opt->get_element_box(track_id_for_item(item).c_str());
                         if (!hit_test(box, ev.button.x, ev.button.y)) continue;
                         handled = true;
                         drag_item = item;
@@ -1172,7 +1260,7 @@ SystemMenuLoopOutcome run_system_menu_loop_gl_current(
                     if (!handled) {
                         const int back_index = static_cast<int>(AudioItem::Back);
                         const glintfx::ElementBox box =
-                            ui.get_element_box(audio_item_id(back_index).c_str());
+                            ui_opt->get_element_box(audio_item_id(back_index).c_str());
                         if (hit_test(box, ev.button.x, ev.button.y)) {
                             handled = true;
                             const SystemMenuState pre_action_state = state;
@@ -1188,7 +1276,7 @@ SystemMenuLoopOutcome run_system_menu_loop_gl_current(
                     // ajusta volume - isso e papel exclusivo do track, ver (1)).
                     for (int item = 0; item < 2 && !handled; ++item) {
                         const glintfx::ElementBox box =
-                            ui.get_element_box(audio_item_id(item).c_str());
+                            ui_opt->get_element_box(audio_item_id(item).c_str());
                         if (!hit_test(box, ev.button.x, ev.button.y)) continue;
                         handled = true;
                         const SystemMenuAction action =
@@ -1207,7 +1295,7 @@ SystemMenuLoopOutcome run_system_menu_loop_gl_current(
                         // 0=Sim/1=Nao neste sub-modo, ver system_menu.cpp).
                         for (int item = 0; item < 2 && !handled; ++item) {
                             const glintfx::ElementBox box =
-                                ui.get_element_box(controls_confirm_id(item).c_str());
+                                ui_opt->get_element_box(controls_confirm_id(item).c_str());
                             if (!hit_test(box, ev.button.x, ev.button.y)) continue;
                             handled = true;
                             const SystemMenuState pre_action_state = state;
@@ -1221,7 +1309,7 @@ SystemMenuLoopOutcome run_system_menu_loop_gl_current(
                         // ids proprios (controls_discard_confirm_id).
                         for (int item = 0; item < 2 && !handled; ++item) {
                             const glintfx::ElementBox box =
-                                ui.get_element_box(controls_discard_confirm_id(item).c_str());
+                                ui_opt->get_element_box(controls_discard_confirm_id(item).c_str());
                             if (!hit_test(box, ev.button.x, ev.button.y)) continue;
                             handled = true;
                             const SystemMenuState pre_action_state = state;
@@ -1239,10 +1327,10 @@ SystemMenuLoopOutcome run_system_menu_loop_gl_current(
                         // sem isto, uma linha rolada pra fora da vista podia
                         // roubar o clique de Restaurar/Voltar (ver
                         // filter_offscreen_controls_row/controls_row_visible_in_list).
-                        const glintfx::ElementBox list_box = ui.get_element_box(kControlsListId);
+                        const glintfx::ElementBox list_box = ui_opt->get_element_box(kControlsListId);
                         for (int item = 0; item < kControlsItemCount && !handled; ++item) {
                             const glintfx::ElementBox raw =
-                                ui.get_element_box(controls_item_id(item).c_str());
+                                ui_opt->get_element_box(controls_item_id(item).c_str());
                             const glintfx::ElementBox box =
                                 filter_offscreen_controls_row(item, raw, list_box);
                             if (!hit_test(box, ev.button.x, ev.button.y)) continue;
@@ -1253,11 +1341,10 @@ SystemMenuLoopOutcome run_system_menu_loop_gl_current(
                             if (handle_action(action)) return outcome;
                         }
                     }
-                } else if (state.screen == SystemMenuScreen::Save ||
-                           state.screen == SystemMenuScreen::Video ||
+                } else if (state.screen == SystemMenuScreen::Video ||
                            state.screen == SystemMenuScreen::Language) {
                     // Placeholder ("em breve"): so o Voltar e clicavel.
-                    const glintfx::ElementBox box = ui.get_element_box(kPlaceholderBackId);
+                    const glintfx::ElementBox box = ui_opt->get_element_box(kPlaceholderBackId);
                     if (hit_test(box, ev.button.x, ev.button.y)) {
                         handled = true;
                         const SystemMenuState pre_action_state = state;
@@ -1311,7 +1398,7 @@ SystemMenuLoopOutcome run_system_menu_loop_gl_current(
                 wheel_ev.type = glintfx::UiEvent::Type::MouseWheel;
                 wheel_ev.x = 0.0f;
                 wheel_ev.y = wheel_dy;
-                ui.process_event(wheel_ev);
+                ui_opt->process_event(wheel_ev);
             }
         }
 
@@ -1319,12 +1406,14 @@ SystemMenuLoopOutcome run_system_menu_loop_gl_current(
     }
 }
 
-bool run_system_menu_loop_owning_gl(SDL_Window* window,
-                                     gus::platform::audio::AudioEngine& audio,
-                                     const gus::app::i18n::Translator& translator,
-                                     const std::string& settings_dir,
-                                     SystemMenuLoopOutcome* out_outcome,
-                                     const std::string& frozen_background_png) {
+bool run_system_menu_loop_owning_gl(
+    SDL_Window* window, gus::platform::audio::AudioEngine& audio,
+    const gus::app::i18n::Translator& translator, const std::string& settings_dir,
+    const std::string& saves_dir, SystemMenuLoopOutcome* out_outcome,
+    const std::function<gus::domain::save::SaveData()>& build_current_save_data,
+    const std::function<void(const gus::domain::save::SaveData&)>&
+        apply_loaded_save_data,
+    const std::string& frozen_background_png) {
     // MESMA receita de run_battle_preview_embedded (battle_preview.cpp): os
     // atributos GL sao setados a CADA entrada (nao precisam ter sido setados na
     // criacao da janela) - viabilidade ja provada empiricamente pela troca
@@ -1352,7 +1441,8 @@ bool run_system_menu_loop_owning_gl(SDL_Window* window,
     }
 
     const SystemMenuLoopOutcome outcome = run_system_menu_loop_gl_current(
-        window, audio, translator, settings_dir, frozen_background_png);
+        window, audio, translator, settings_dir, saves_dir, build_current_save_data,
+        apply_loaded_save_data, frozen_background_png);
     if (out_outcome != nullptr) {
         *out_outcome = outcome;
     }

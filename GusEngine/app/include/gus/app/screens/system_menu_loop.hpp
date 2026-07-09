@@ -31,21 +31,33 @@
 // battle_preview.cpp) degrada pro fundo ABSTRATO de sempre: Render2dGl3::
 // begin_frame (clear + vinheta radial, MESMA ambientacao usada na arena).
 //
+// SAVE-LOAD-UI etapa 6 (wiring REAL): "Salvar"/"Carregar" confirmados no Pause
+// (SystemMenuAction::OpenSaveLoadSave/OpenSaveLoadLoad) abrem a tela REAL de
+// save/load (gus/app/screens/save_load_menu_loop.hpp), ANINHADA no MESMO
+// contexto GL (MESMA tecnica do proprio menu de sistema quando aninhado dentro
+// da batalha). `saves_dir` + os 2 callbacks abaixo sao repassados direto pra
+// essa tela - ela e quem faz o I/O de disco de fato; este loop so intercepta a
+// action e delega.
+//
 // Cross-ref: gus/app/screens/system_menu.hpp (a maquina de estado pura);
 //            gus/app/screens/system_menu_rml.hpp (o RML/RCSS gerado do estado);
-//            gus/app/screens/battle_preview.cpp (run_battle_preview_embedded, o
-//            chamador da variante gl_current - Esc na pilha vazia do combate);
-//            gus/app/maestro.cpp (o chamador da variante owning_gl - Esc na cidade);
-//            gus/platform/fs/settings_file_store.hpp (I/O real do settings.json).
+//            gus/app/screens/save_load_menu_loop.hpp (a tela REAL de save/load,
+//            SAVE-LOAD-UI etapa 6); gus/app/screens/battle_preview.cpp
+//            (run_battle_preview_embedded, o chamador da variante gl_current -
+//            Esc na pilha vazia do combate); gus/app/maestro.cpp (o chamador da
+//            variante owning_gl - Esc na cidade); gus/platform/fs/
+//            settings_file_store.hpp (I/O real do settings.json).
 
 #ifndef GUS_APP_SCREENS_SYSTEM_MENU_LOOP_HPP
 #define GUS_APP_SCREENS_SYSTEM_MENU_LOOP_HPP
 
+#include <functional>
 #include <string>
 
 #include <SDL3/SDL.h>
 
 #include "gus/app/i18n/translator.hpp"
+#include "gus/domain/save/save_data.hpp"
 #include "gus/platform/audio/audio_engine.hpp"
 
 namespace gus::app::screens {
@@ -74,9 +86,22 @@ struct SystemMenuLoopOutcome {
 // vinheta radial). Sai (devolve) quando o jogador confirma Continuar/ESC na tela
 // Pause (quit_app=false), confirma Sair (quit_app=true), ou fecha a janela
 // (quit_app=true).
+// `saves_dir` (SAVE-LOAD-UI etapa 6): diretorio real dos saves (gus::platform::
+// fs::resolve_saves_dir(), MESMA convencao de injecao de settings_dir acima -
+// testabilidade/override). `build_current_save_data`/`apply_loaded_save_data`
+// (default vazio = "sem capacidade de save/load" nesta entrada - hoje so a
+// Maestro na CIDADE fornece os 2; a entrada futura de dentro da BATALHA, se
+// vier a existir, pode legitimamente deixar vazio e "Salvar"/"Carregar" viram
+// no-op degradado, NUNCA fingem persistir): repassados direto pra
+// run_save_load_menu_loop_gl_current (ver seu header pro contrato de cada um).
 [[nodiscard]] SystemMenuLoopOutcome run_system_menu_loop_gl_current(
     SDL_Window* window, gus::platform::audio::AudioEngine& audio,
     const gus::app::i18n::Translator& translator, const std::string& settings_dir,
+    const std::string& saves_dir,
+    const std::function<gus::domain::save::SaveData()>& build_current_save_data =
+        {},
+    const std::function<void(const gus::domain::save::SaveData&)>&
+        apply_loaded_save_data = {},
     const std::string& frozen_background_png = std::string());
 
 // Variante DONA do contexto GL (ver header) - cria/destroi por conta propria. O
@@ -91,10 +116,17 @@ struct SystemMenuLoopOutcome {
 // run_system_menu_loop_gl_current (ver seu comentario) - a Maestro (unica chamadora
 // de producao desta variante) passa o PNG da cidade CONGELADA (Maestro::open_pause_
 // from_city); vazio (default) = fundo abstrato de sempre.
+// `saves_dir`/`build_current_save_data`/`apply_loaded_save_data` (SAVE-LOAD-UI
+// etapa 6): repassados direto pra run_system_menu_loop_gl_current (ver seu
+// comentario acima) - a Maestro (unica chamadora de producao) fornece os 3.
 [[nodiscard]] bool run_system_menu_loop_owning_gl(
     SDL_Window* window, gus::platform::audio::AudioEngine& audio,
     const gus::app::i18n::Translator& translator, const std::string& settings_dir,
-    SystemMenuLoopOutcome* out_outcome,
+    const std::string& saves_dir, SystemMenuLoopOutcome* out_outcome,
+    const std::function<gus::domain::save::SaveData()>& build_current_save_data =
+        {},
+    const std::function<void(const gus::domain::save::SaveData&)>&
+        apply_loaded_save_data = {},
     const std::string& frozen_background_png = std::string());
 
 }  // namespace gus::app::screens
