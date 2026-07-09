@@ -63,3 +63,7 @@ Pipeline da carta APROVADO e validado ponta a ponta na "Gaiola de Faraday". Mold
 2. Medir os centros de slot por **cv2** (HoughCircles no circulo, findContours no quadrado). **NAO assumir simetria** (o quadrado do custo e assimetrico em relacao ao circulo).
 3. **Sigilos = SVG vetorial** com `viewBox` = bbox exata do desenho + `preserveAspectRatio xMidYMid meet`, centrado por construcao. NUNCA emoji (assimetrico + metrica de fonte propria = descentraliza).
 4. No **componente glintfx real** (CARTAS-PRODUCAO) o alinhamento e NATIVO (flex/align RCSS) — toda essa medicao e so pra o mock HTML sobre raster ser fiel.
+
+
+## Código/ID de carta (criador 2026-07-09)
+Rodape esquerdo = **`DOM-NN-R_vM.m`** (id interno, dispensa o nome): DOM=dominio 3 letras (ELM/FIS/MAT/CMP/OCU/ECO/CAP), NN=ordem no dominio, R=raridade C/R/L, vM.m=versao. Rodape direito = nome da figura. Faraday = `ELM-01-C_v1.0`. Tabela dos 21 IDs em `reference_carta_mock_posicoes`. Gaiola (figura interior) centrada em top:53% (o arco puxa o centro geometrico pra cima).
