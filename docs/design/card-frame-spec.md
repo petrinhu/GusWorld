@@ -45,3 +45,5 @@
 .card.eletromag { --domain: #22D3EE; }  /* fisica #A78BFA, matematica #34D399, computacao #60A5FA, oculto #F43F5E, economia #F59E0B */
 ```
 Multiply premultiplicado, interpolavel (anima com o glow), default white=no-op. **LIMITE:** tinge o ouro junto (multiply uniforme). Se incomodar no teste real -> **puxar** o luminance-key (semente no INBOX do glintfx, ver `docs/tech/glintfx-requests/REQ-decorator-image-tint.md`). Base neutra gerada: `resources/images/card-frame-tests/pixellab-frame-neutral-arched-v2.png`. **PENDENTE:** montar um render minimo glintfx (RML+RCSS) da carta pra testar o recolor de verdade e julgar o ouro.
+
+**DECISAO (criador, 2026-07-09, pos-teste empirico):** o `image-color` multiply tinge o ouro junto (perde o "ouro constante"). => **PUXADO o luminance-key do glintfx** (so as runas mudam, ouro/pedra ficam). Ate sair (v0.7.0), a moldura fica em standby pro recolor final; a base neutra arqueada (`pixellab-frame-neutral-arched-v2.png`) e o texto do pull estao prontos. Ver `docs/tech/glintfx-requests/REQ-decorator-image-tint.md`.
