@@ -1,6 +1,6 @@
 # Reconciliações do Roster de Análogos (LORE-ORIGEM-MULTIVERSO)
 
-> **STATUS: PROPOSTA.** Não é canon. Nenhum doc canônico foi alterado para produzir este documento (auditoria read-only). Mapeia toda ponta solta detectada nos 21 pacotes de `docs/design/roster-analogos/01..21*.md` que toca canon já fechado (`CHARS.md`, `PLACES.md`, `docs/narrative/lore-bible.md`, `docs/narrative/factions.md`, `docs/narrative/deep/*`) e precisa de decisão explícita do criador antes de qualquer canonização. Formato por item: (a) conflito exato com citação, (b) 1-2 resoluções propostas com prós/contras, (c) docs que precisariam de ajuste se aprovada, (d) severidade. Nenhuma prosa canônica é escrita aqui; isso cabe ao `narrative-writer` só depois de decisão.
+> **STATUS: DECIDIDO pelo criador em 2026-07-09.** As 9 pontas foram resolvidas (ver linha "DECIDIDO" em cada item). As decisões que exigem redação foram **aplicadas nos docs de design do roster** (`13-von-neumann.md`, `12-turing.md`, `15-john-dee.md`, `19-menger.md`, `14-giordano-bruno.md`); nenhum doc canônico (`CHARS.md`, `PLACES.md`, `docs/narrative/*`) foi tocado nesta rodada. A canonização efetiva no deep-lore (com os cross-refs marcados) fica para o `narrative-writer`, quando o criador mandar canonizar o roster. Formato por item: (a) conflito exato com citação, (b) resoluções propostas com prós/contras, (c) docs a ajustar, (d) severidade, (e) **DECIDIDO**.
 
 ## Sumário executivo
 
@@ -32,9 +32,9 @@ Mas o backlog fonte já registra a decisão oposta, tomada pelo criador:
 
 > `docs/design/brainstorm-backlog.md` (bloco Fase B, cluster computação): "**DECISAO CANON (criador): LIGAR von Neumann a linhagem NEUMANN/OXIDO** (ancestral da familia da Linda Siren = Linda Neumann; heranca tecnica da Oxido traca ao analogo, estilo sangue-dragon Vance). CUIDADO de timeline com a Tamara Neumann canonica (Era 2 criadora do Oxido) - reconciliar via narrative-designer; **atualizar 13-von-neumann.md**."
 
-Ou seja: o pacote 13, como está redigido hoje, ainda não implementa a própria decisão que o criador já tomou. Isso NÃO é uma escolha em aberto no sentido de "qual das duas" — é uma tarefa de execução pendente ("atualizar 13-von-neumann.md" é literal no backlog) que toca canon estabelecido em dois pontos:
+Ou seja: o pacote 13, como está redigido hoje, ainda não implementa a própria decisão que o criador já tomou. Isso NÃO é uma escolha em aberto no sentido de "qual das duas": é uma tarefa de execução pendente ("atualizar 13-von-neumann.md" é literal no backlog) que toca canon estabelecido em dois pontos:
 
-- `CHARS.md` (§5, linha ~71): "**Tamara Neumann** — Engenheira-mãe Era 2 (~-110), criadora canônica de Óxido (...) Ancestral direta linhagem Neumann (Brígida, Linda)."
+- `CHARS.md` (§5, linha ~71): entrada "**Tamara Neumann**", "Engenheira-mãe Era 2 (~-110), criadora canônica de Óxido (...) Ancestral direta linhagem Neumann (Brígida, Linda)."
 - `docs/narrative/deep/magic/4-linguagens-deep.md` (§5): "Óxido é a linguagem da paranoia produtiva (...) projetada por Tamara Neumann (...) no ano de -110 (...) Tamara é mãe-fundadora canon de Óxido, autoria sem disputa em toda historiografia séria." E mais adiante: "A Ordem Recursiva, casa Vance, casa Berenger, casa Vanderbist, **casa Neumann**, todas as quatro linhagens fundadoras das quatro linguagens vivas (...)."
 
 Isto é: "casa Neumann" não é só uma família qualquer, é uma das **quatro casas fundadoras das quatro linguagens vivas** do jogo (paralela a casa Vance/C-Arcane). Ligar von Neumann como ancestral dessa casa é uma amarração de alto peso estrutural, não um detalhe cosmético. É por isso que merece confirmação explícita de execução antes de canonizar, mesmo a decisão já estando tomada em princípio.
@@ -60,6 +60,8 @@ Prós: cumpre a decisão do criador já registrada; reforça o padrão "sangue-d
 
 Bloqueia a canonização do **pacote 13 especificamente** até a reescrita (a decisão em si já foi tomada; falta só a redação consistente). Não bloqueia os outros 20 pacotes do roster.
 
+**DECIDIDO (criador 2026-07-09):** Opção A COM o flourish. von Neumann é ancestral de sangue e nome da casa Neumann/Óxido; Tamara Neumann segue autora única e indiscutível de Óxido (ele não cria linguagem, padrão "sangue-dragon Vance"); gap -150→-110 comporta 1-2 gerações; o "von" (título nobiliárquico comprado) se perde ao longo das gerações, sobrando só "Neumann" a partir de Tamara (casa com o tema "ordem espontânea > título concedido" do cluster economia). **APLICADO** em `13-von-neumann.md` §2 (bloco "ALERTA DE COLISÃO DE NOME" substituído por "AMARRAÇÃO DE LINHAGEM"). Pendente na canonização: cross-ref "ancestral remoto: von Neumann" em `CHARS.md` §5 (Tamara), a fazer pelo `narrative-writer`.
+
 ---
 
 ## 2. Núcleo Mandelbrot: origem do nome
@@ -82,6 +84,8 @@ Bloqueia a canonização do **pacote 13 especificamente** até a reescrita (a de
 ### (d) Severidade
 
 Cosmética. Já reconhecida como aberta pelo próprio autor do pacote 08; não bloqueia nada. É puramente uma escolha de quanto payoff dramático o criador quer.
+
+**DECIDIDO (criador 2026-07-09):** SEM mudança. Mantido como está (origem do nome deliberadamente aberta, Opção A). Nenhuma edição em `08-mandelbrot.md`.
 
 ---
 
@@ -115,6 +119,8 @@ Isso encosta direto no canon já fechado sobre a natureza ATUAL do Crédito:
 
 Média, mas resolve com facilidade textual, sem exigir nenhuma mudança de fato em canon já fechado.
 
+**DECIDIDO (criador 2026-07-09):** Opção A. Adicionadas frases explícitas ligando o "crédito gerido por Sterling Corp" de hoje (lore-bible §11.4) à captura corporativa que o pacote já menciona, e o token-rádio do Underground como eco moderno da troca livre exilada. **APLICADO** em `19-menger.md` §2 (novo sub-bullet "Amarração com o canon central"). `lore-bible.md` não tocada.
+
 ---
 
 ## 4. Giordano Bruno: fogueira vs. ostracismo (tom do final)
@@ -136,6 +142,8 @@ Nenhum, além do próprio `14-giordano-bruno.md` (já escrito na direção da Op
 ### (d) Severidade
 
 Baixa. Decisão de sabor já resolvida na prática pelo autor do pacote, só falta ratificar.
+
+**DECIDIDO (criador 2026-07-09):** Opção A ratificada (leitura dura: Bruno foi queimado), ambiguidade só no registro in-world. **APLICADO** em `14-giordano-bruno.md` §2 (o "Decisão de tom deixada ao criador" virou "DECIDIDO pelo criador 2026-07-09: leitura dura (fogueira)").
 
 ---
 
@@ -160,6 +168,8 @@ Baixa. Decisão de sabor já resolvida na prática pelo autor do pacote, só fal
 
 Baixa. Já isolado como opcional pelo próprio autor.
 
+**DECIDIDO (criador 2026-07-09):** ACEITAR o flourish. O adorno do espelho negro que "ouvia" ruído vazando do Estilhaçamento deixa de ser opcional e vira parte do núcleo (Dee = quase-testemunha acidental da fratura, sem confirmar em prosa acessível ao jogador casual). **APLICADO** em `15-john-dee.md` §2 ("Nota opcional" virou "A quase-testemunha acidental da fratura"). `cosmologia-origem-deep.md` não tocada.
+
 ---
 
 ## 6. Turing: "enclave pré-Ordem Recursiva" precisa de identidade institucional clara
@@ -183,6 +193,8 @@ Baixa. Já isolado como opcional pelo próprio autor.
 
 Média (toca a identidade de uma instituição central do jogo), mas resolve-se só com clareza de redação, sem exigir nenhuma mudança factual.
 
+**DECIDIDO (criador 2026-07-09):** Opção A. O "enclave" É a própria Ordem Recursiva numa fase histórica mais dura/centralizada/intolerante (hoje mais plural, com dissidentes como Vitória Marquês); não é facção nova, não contradiz a linhagem ininterrupta. **APLICADO** em `12-turing.md` §2 (o bloco "A perseguição" reescrito afirmando ser a própria Ordem).
+
 ---
 
 ## 7. Helion Tusk / Forja do Vértice: novo consórcio sem registro em `factions.md`
@@ -203,6 +215,8 @@ Média (toca a identidade de uma instituição central do jogo), mas resolve-se 
 ### (d) Severidade
 
 Baixa/administrativa. Não bloqueia nada agora; é só uma tarefa de registro para quando (e se) o pacote 21 for aprovado.
+
+**DECIDIDO (criador 2026-07-09): pendente de execução na canonização.** Quando o pacote 21 for canonizado, criar entrada nova em `docs/narrative/factions.md` (consórcio de Helion Tusk) e em `PLACES.md` §5 ("Forja do Vértice"), via `narrative-writer`. Nada a editar no roster agora.
 
 ---
 
@@ -226,6 +240,8 @@ Baixa/administrativa. Não bloqueia nada agora; é só uma tarefa de registro pa
 
 Cosmética. Puramente estética, sem risco real de confusão.
 
+**DECIDIDO (criador 2026-07-09):** SEM mudança. "Forja do Vértice" mantido (Opção A). Nenhuma edição em `21-helion-tusk.md`.
+
 ---
 
 ## 9. Newton/Einstein: gates de puzzle sobrepostos (nota mecânica, não é lore)
@@ -237,6 +253,8 @@ Cosmética. Puramente estética, sem risco real de confusão.
 ### (b)-(d)
 
 Não se aplica formato de resolução binária aqui: é só um lembrete de sequenciamento pra fase de implementação de mundo, sem necessidade de decisão do criador nesta rodada. Severidade: informativa.
+
+**DECIDIDO (criador 2026-07-09): delegar ao `level-designer`.** O sequenciamento real dos gates (Newton depois de Einstein na ordem narrativa de descoberta, dentro do princípio "tudo acessível desde o início, dificuldade por distância") fica com o `level-designer`/`lead-game-designer` na fase de implementação de mundo. Nada a editar no roster agora.
 
 ---
 
