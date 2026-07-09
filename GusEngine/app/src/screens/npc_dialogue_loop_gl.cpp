@@ -27,27 +27,22 @@
                                          // que o menu de sistema/cockpit ja usam)
 #include "gus/core/asset_paths.hpp"  // kRetratosDir/kSfxDir/kMenuHoverSfxFile/kMenuClickSfxFile
 #include "gus/core/spatial/camera_clamp.hpp"  // gus::core::spatial::Rect
+#include "gus/platform/assets/asset_source.hpp"  // ASSETS-VFS-F1b (ADR-013): porteiro
 #include "gus/platform/render2d/render2d_gl3.hpp"
 #include "gus/platform/rmlui/gl3_loader.hpp"  // glad load (variante owning_gl)
 
 // Pasta das fontes (.ttf), embutida pelo CMake (mesma macro que battle_preview.cpp/
-// system_menu_loop.cpp ja usam - PRIVATE no CMakeLists do target app).
+// system_menu_loop.cpp ja usam - PRIVATE no CMakeLists do target app). Fica FORA do
+// escopo do retrofit ASSETS-VFS-F1/F1b (ADR-013 marca o staging de fonte pro glintfx,
+// abaixo em write_npc_dialogue_rml_file, como ESCRITA - fs::copy_file - nao leitura;
+// MESMA excecao ja registrada em battle_preview.cpp/system_menu_loop.cpp).
 #ifndef GUSWORLD_FONTS_DIR
 #define GUSWORLD_FONTS_DIR ""
 #endif
-
-// Raiz ABSOLUTA de resources/ do repo (mesma macro que sdl_window.cpp/
-// battle_preview.cpp resolvem).
-#ifndef GUSWORLD_ASSETS_DIR
-#define GUSWORLD_ASSETS_DIR ""
-#endif
-
-// Pasta do kit CC0 de SFX (M6 F2/F3, ADR-011) - MESMA macro que
-// system_menu_loop.cpp/battle_preview.cpp ja usam (raiz do repo, irma de
-// GusEngine/ e resources/). Override em runtime via env GUSWORLD_SFX.
-#ifndef GUSWORLD_SFX_DIR
-#define GUSWORLD_SFX_DIR ""
-#endif
+// (GUSWORLD_ASSETS_DIR/GUSWORLD_SFX_DIR foram REMOVIDOS daqui - ASSETS-VFS-F1b/
+// ADR-013: a resolucao dessas 2 raizes agora mora dentro de FilesystemAssetSource,
+// platform/assets/; este arquivo so consome via resolve_path(), MESMO padrao ja
+// aplicado em battle_preview.cpp/system_menu_loop.cpp.)
 
 namespace gus::app::screens {
 
@@ -61,18 +56,14 @@ std::string join(const std::string& a, const std::string& b) {
     return a + "/" + b;
 }
 
-// Resolve a pasta resources/ (env GUSWORLD_ASSETS > macro de compilacao > CWD) -
-// MESMA receita de resolve_assets_subdir_local (sdl_window.cpp)/resolve_asset_dir
-// (battle_preview.cpp), duplicada aqui pra este arquivo ficar self-contained
-// (MESMO padrao dos demais .cpp desta suite).
+// Resolve a pasta resources/ (id relativo, familia GENERICA). ASSETS-VFS-F1b
+// (ADR-013): a cadeia `env GUSWORLD_ASSETS > macro de compilacao > CWD ("resources/")`
+// foi CONSOLIDADA em FilesystemAssetSource::resolve_path (o `rel` JA E o id logico, sem
+// prefixo de familia especifica - cai no dispatch generico, MESMO padrao de
+// resolve_asset_dir em battle_preview.cpp/resolve_assets_subdir_local em
+// sdl_window.cpp). Assinatura INTOCADA.
 std::string resolve_assets_subdir(std::string_view rel) {
-    const std::string sub(rel);
-    if (const char* env = std::getenv("GUSWORLD_ASSETS")) {
-        if (env[0] != '\0') return join(env, sub);
-    }
-    const std::string compiled = GUSWORLD_ASSETS_DIR;
-    if (!compiled.empty()) return join(compiled, sub);
-    return join("resources", sub);
+    return gus::platform::assets::FilesystemAssetSource().resolve_path(rel);
 }
 
 // Id fixo do botao "Continuar" (npc_dialogue_rml.cpp: "npcdlg-continue-btn") - so
@@ -96,17 +87,14 @@ bool hit_test(const glintfx::ElementBox& box, float x, float y) {
     return x >= box.x && x <= box.x + box.w && y >= box.y && y <= box.y + box.h;
 }
 
-// Resolve o caminho de um SFX (hover/click do botao "Continuar") - MESMA ordem
-// de resolve_menu_sfx_path em system_menu_loop.cpp: env GUSWORLD_SFX > macro
-// embutida (GUSWORLD_SFX_DIR) > relativo ao CWD (kSfxDir).
+// Resolve o caminho de um SFX (hover/click do botao "Continuar") - MESMA familia SFX
+// de resolve_menu_sfx_path (system_menu_loop.cpp)/resolve_ui_sfx_path
+// (battle_preview.cpp). ASSETS-VFS-F1b (ADR-013): a cadeia `env GUSWORLD_SFX > macro
+// GUSWORLD_SFX_DIR > CWD (kSfxDir)` foi CONSOLIDADA em FilesystemAssetSource (dispatch
+// pelo prefixo "assets/sfx/" do id). Assinatura INTOCADA.
 std::string resolve_dialogue_sfx_path(std::string_view file) {
-    const std::string filename(file);
-    if (const char* env = std::getenv("GUSWORLD_SFX")) {
-        if (env[0] != '\0') return join(env, filename);
-    }
-    const std::string compiled = GUSWORLD_SFX_DIR;
-    if (!compiled.empty()) return join(compiled, filename);
-    return join(std::string(gus::core::assets::kSfxDir), filename);
+    const std::string id = join(std::string(gus::core::assets::kSfxDir), std::string(file));
+    return gus::platform::assets::FilesystemAssetSource().resolve_path(id);
 }
 
 // Diretorio de STAGE do dialogo (tempfile) - MESMA receita/motivo de

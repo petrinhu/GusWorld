@@ -6,9 +6,11 @@
 // resolve_sprites_dir/resolve_gus_sprites_dir/resolve_assets_subdir_local/
 // resolve_asset_dir (player_sprites_loader/anim_catalog/sdl_window/battle_preview),
 // resolve_hit_sfx_path/resolve_ui_sfx_path (battle_preview) e resolve_menu_sfx_path
-// (system_menu_loop), resolve_music_path (battle_preview). Estes agora DELEGAM pra ca
-// (retrofit ASSETS-VFS-F1) - ver cada um deles pro comentario "MESMA logica que
-// FilesystemAssetSource".
+// (system_menu_loop), resolve_music_path (battle_preview),
+// resolve_npc_intro_bertoldo_dialogue_path (npc_dialogue_catalog) e
+// resolve_assets_subdir/resolve_dialogue_sfx_path (npc_dialogue_loop_gl). Estes agora
+// DELEGAM pra ca (retrofit ASSETS-VFS-F1/ASSETS-VFS-F1b) - ver cada um deles pro
+// comentario "MESMA logica que FilesystemAssetSource".
 
 #include "gus/platform/assets/asset_source.hpp"
 
@@ -34,6 +36,9 @@
 #endif
 #ifndef GUSWORLD_TRANSLATIONS_DIR
 #define GUSWORLD_TRANSLATIONS_DIR ""
+#endif
+#ifndef GUSWORLD_DIALOGUES_DIR
+#define GUSWORLD_DIALOGUES_DIR ""
 #endif
 
 namespace gus::platform::assets {
@@ -77,6 +82,7 @@ std::string strip_prefix(std::string_view id, std::string_view prefix) {
 
 constexpr std::string_view kFontsPrefix = "assets/fonts/";
 constexpr std::string_view kTranslationsPrefix = "game/translations/";
+constexpr std::string_view kDialoguesPrefix = "game/dialogues/";
 constexpr std::string_view kSfxPrefix = "assets/sfx/";
 constexpr std::string_view kMusicPrefix = "assets/music/";
 
@@ -119,6 +125,24 @@ std::string resolve_translations(std::string_view id) {
     }
     const std::string filename = strip_prefix(id, kTranslationsPrefix);
     const std::string compiled = std::string(GUSWORLD_TRANSLATIONS_DIR);
+    if (!compiled.empty()) {
+        return join(compiled, filename);
+    }
+    return std::string(id);
+}
+
+// --- FAMILIA DIALOGUES (paridade com resolve_npc_intro_bertoldo_dialogue_path,
+// npc_dialogue_catalog.cpp, M7-DIALOGO/ASSETS-VFS-F1b) -----------------------------
+// env e OVERRIDE LITERAL (ignora o id por completo) - MESMO padrao da familia I18N
+// (so existe 1 grafo hoje, o lider aponta o .dlg.txt inteiro). Nenhuma checagem de
+// exists.
+std::string resolve_dialogues(std::string_view id) {
+    const std::string env = env_or_empty("GUSWORLD_DIALOGUES");
+    if (!env.empty()) {
+        return env;
+    }
+    const std::string filename = strip_prefix(id, kDialoguesPrefix);
+    const std::string compiled = std::string(GUSWORLD_DIALOGUES_DIR);
     if (!compiled.empty()) {
         return join(compiled, filename);
     }
@@ -175,6 +199,9 @@ std::string resolve_by_family(std::string_view id) {
     }
     if (starts_with(id, kTranslationsPrefix)) {
         return resolve_translations(id);
+    }
+    if (starts_with(id, kDialoguesPrefix)) {
+        return resolve_dialogues(id);
     }
     if (starts_with(id, kSfxPrefix)) {
         return resolve_sfx(id);

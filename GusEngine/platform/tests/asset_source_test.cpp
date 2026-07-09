@@ -39,6 +39,9 @@
 #ifndef GUSWORLD_TRANSLATIONS_DIR
 #define GUSWORLD_TRANSLATIONS_DIR ""
 #endif
+#ifndef GUSWORLD_DIALOGUES_DIR
+#define GUSWORLD_DIALOGUES_DIR ""
+#endif
 
 namespace fs = std::filesystem;
 using gus::platform::assets::AssetInfo;
@@ -260,6 +263,38 @@ TEST_CASE(
     const std::string id = "game/translations/pt_br.md";
     const std::string compiled = GUSWORLD_TRANSLATIONS_DIR;
     const std::string expected = !compiled.empty() ? join(compiled, "pt_br.md") : id;
+    REQUIRE(src.resolve_path(id) == expected);
+}
+
+// ------------------------------------------------------------ familia DIALOGUES (M7-DIALOGO)
+TEST_CASE(
+    "FilesystemAssetSource familia DIALOGUES: env e OVERRIDE LITERAL completo (ignora "
+    "o id)",
+    "[asset_source]") {
+    TempDir dir;
+    const fs::path literal = dir.path() / "qualquer_grafo.dlg.txt";
+    write_file(literal, "@dialogue npc_intro_bertoldo\n");
+    ScopedEnv env("GUSWORLD_DIALOGUES", literal.string());
+    FilesystemAssetSource src;
+    // Mesmo pedindo um id de OUTRO arquivo, o override literal manda (paridade com
+    // resolve_npc_intro_bertoldo_dialogue_path: devolve o env AS-IS, sem juntar com o
+    // id).
+    REQUIRE(src.resolve_path("game/dialogues/npc_intro_bertoldo.dlg.txt") ==
+            literal.string());
+    const auto bytes = src.read("game/dialogues/npc_intro_bertoldo.dlg.txt");
+    REQUIRE(bytes.has_value());
+}
+
+TEST_CASE(
+    "FilesystemAssetSource familia DIALOGUES: sem env usa macro/CWD + nome do arquivo "
+    "do id",
+    "[asset_source]") {
+    ScopedUnsetEnv no_env("GUSWORLD_DIALOGUES");
+    FilesystemAssetSource src;
+    const std::string id = "game/dialogues/npc_intro_bertoldo.dlg.txt";
+    const std::string compiled = GUSWORLD_DIALOGUES_DIR;
+    const std::string expected =
+        !compiled.empty() ? join(compiled, "npc_intro_bertoldo.dlg.txt") : id;
     REQUIRE(src.resolve_path(id) == expected);
 }
 

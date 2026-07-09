@@ -90,6 +90,8 @@ target_include_directories(gusengine_platform
 # mais duplicada em cada consumidor de app/. Valores IDENTICOS aos ja definidos em
 # app/CMakeLists.txt (mesma raiz ${CMAKE_SOURCE_DIR} = GusEngine/ nos dois alvos - definir
 # nos dois nao diverge, e o mesmo padrao ja usado por GUSWORLD_FONTS_DIR).
+# ASSETS-VFS-F1b: GUSWORLD_DIALOGUES_DIR migra pra ca pela MESMA razao (familia DIALOGUES
+# nova no dispatcher, retrofit de npc_dialogue_catalog.cpp).
 target_compile_definitions(gusengine_platform
     PRIVATE GUSWORLD_FONTS_DIR="${CMAKE_SOURCE_DIR}/assets/fonts"
     # Raiz resources/ do repo (irma de GusEngine/) - familia GENERICA (sprites/images/vfx).
@@ -100,6 +102,9 @@ target_compile_definitions(gusengine_platform
     PRIVATE GUSWORLD_MUSIC_DIR="${CMAKE_SOURCE_DIR}/../assets/music"
     # Catalogos de traducao (game/translations/), raiz = pai de GusEngine/.
     PRIVATE GUSWORLD_TRANSLATIONS_DIR="${CMAKE_SOURCE_DIR}/../game/translations"
+    # Grafos de dialogo (game/dialogues/), raiz-irma de GUSWORLD_TRANSLATIONS_DIR acima
+    # (M7-DIALOGO, ASSETS-VFS-F1b).
+    PRIVATE GUSWORLD_DIALOGUES_DIR="${CMAKE_SOURCE_DIR}/../game/dialogues"
 )
 
 # domain/ entra aqui: input_mapper/sdl_input consomem o mapa logico puro. SDL3 e a camada de

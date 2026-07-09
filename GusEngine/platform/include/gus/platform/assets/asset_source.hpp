@@ -75,6 +75,10 @@ public:
 //   - traducoes (prefixo "game/translations/"): GUSWORLD_TRANSLATIONS = override
 //                LITERAL completo (ignora o id, mesmo comportamento de hoje) > macro
 //                GUSWORLD_TRANSLATIONS_DIR+nome-do-arquivo > CWD (id).
+//   - dialogos  (prefixo "game/dialogues/"):    GUSWORLD_DIALOGUES = override LITERAL
+//                completo (mesmo padrao da familia TRADUCOES - so existe 1 grafo hoje,
+//                ADR-013/ASSETS-VFS-F1b, M7-DIALOGO) > macro GUSWORLD_DIALOGUES_DIR+
+//                nome-do-arquivo > CWD (id).
 //   - sfx       (prefixo "assets/sfx/"):        GUSWORLD_SFX > macro GUSWORLD_SFX_DIR >
 //                CWD (id).
 //   - musica    (prefixo "assets/music/"):      GUSWORLD_MUSIC > macro
@@ -84,9 +88,10 @@ public:
 // SO a familia de FONTES verifica existencia em cada candidato (paridade com o
 // comportamento anterior de font_atlas::resolve_font_path); as demais usam o PRIMEIRO
 // candidato com raiz nao-vazia, sem checar o disco (paridade com resolve_sprites_dir/
-// resolve_hit_sfx_path/resolve_music_path/resolve_translations_path, que tambem nunca
-// verificavam existencia - read()/stat() e quem acaba falhando se o caminho estiver
-// errado, exatamente como o comportamento de hoje).
+// resolve_hit_sfx_path/resolve_music_path/resolve_translations_path/
+// resolve_npc_intro_bertoldo_dialogue_path, que tambem nunca verificavam existencia -
+// read()/stat() e quem acaba falhando se o caminho estiver errado, exatamente como o
+// comportamento de hoje).
 class FilesystemAssetSource final : public AssetSource {
 public:
     [[nodiscard]] std::optional<std::vector<std::byte>> read(

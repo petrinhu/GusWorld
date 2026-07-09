@@ -42,14 +42,16 @@ target_link_libraries(gusengine_platform_tests
 
 target_compile_features(gusengine_platform_tests PRIVATE cxx_std_20)
 
-# ASSETS-VFS-F1: espelha as MESMAS 4 macros do alvo gusengine_platform (compile
-# definitions sao PRIVATE, nao propagam por link) - so pra asset_source_test.cpp poder
-# computar o valor esperado do fallback "sem env" sem depender do layout real do repo.
+# ASSETS-VFS-F1/ASSETS-VFS-F1b: espelha as MESMAS 5 macros do alvo gusengine_platform
+# (compile definitions sao PRIVATE, nao propagam por link) - so pra asset_source_test.cpp
+# poder computar o valor esperado do fallback "sem env" sem depender do layout real do
+# repo.
 target_compile_definitions(gusengine_platform_tests
     PRIVATE GUSWORLD_ASSETS_DIR="${CMAKE_SOURCE_DIR}/../resources"
     PRIVATE GUSWORLD_SFX_DIR="${CMAKE_SOURCE_DIR}/../assets/sfx"
     PRIVATE GUSWORLD_MUSIC_DIR="${CMAKE_SOURCE_DIR}/../assets/music"
     PRIVATE GUSWORLD_TRANSLATIONS_DIR="${CMAKE_SOURCE_DIR}/../game/translations"
+    PRIVATE GUSWORLD_DIALOGUES_DIR="${CMAKE_SOURCE_DIR}/../game/dialogues"
 )
 
 catch_discover_tests(gusengine_platform_tests)
