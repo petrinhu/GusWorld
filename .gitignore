@@ -91,3 +91,4 @@ resources/images/*
 resources/vfx/*
 !resources/vfx/boot_pixel/
 scratchpad_caps/
+docs/design/mockups/refs-eletromag/
