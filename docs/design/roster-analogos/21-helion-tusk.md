@@ -110,3 +110,18 @@ Cada uma das 20 entradas de diário já grava, em vocabulário do próprio domí
 - [Tesla's Master Plans: From Clear Roadmap To Vague Abundance, CleanTechnica](https://cleantechnica.com/2025/09/04/teslas-master-plans-from-clear-roadmap-to-vague-abundance/) e [The Secret Tesla Motors Master Plan, Tesla](https://www.tesla.com/secret-master-plan), sequência de produto (esportivo caro a carro de massa) e evolução da missão declarada.
 - [Inside Elon Musk's AI Ecosystem: How xAI, Tesla, X, Neuralink, and SpaceX Are Converging, eWeek](https://www.eweek.com/news/elon-musk-ai-ecosystem-xai-tesla-neuralink-spacex/), convergência de dados/computação/autonomia entre as frentes de IA, robótica (Optimus) e interface neural (Neuralink).
 - [File:Elon Musk Royal Society (crop1).jpg, Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Elon_Musk_Royal_Society_(crop1).jpg), imagem-referência de sprite, licença CC BY-SA 4.0.
+
+
+## Canon de missão (criador, 2026-07-09)
+
+**Nome canonico da carta: "A Carta Perdida de Tusk".** Efeito = C "Consorcio" (passiva potencia as 20 outras cartas + ativa suprema rara).
+
+**A carta NAO esta com o Tusk** (difere de TODAS as outras: as dos outros 20 sao entregues DIRETAMENTE pelo proprio personagem, apos a missao que leva ate ele). Fluxo da carta do Tusk:
+1. UNLOCK: so depois de recolher as 20 outras cartas.
+2. Missao para CHEGAR ao Tusk: passa por sub-missoes menores de PUZZLE e de LUTA.
+3. Primeiro encontro: a party FALA com o Tusk (a missao de falar com ele fica liberada).
+4. A carta e ENCONTRADA depois de falar com ele (nao entregue por ele; a party vai atras dela).
+5. Reencontro: o Tusk SOME (muito ocupado, vive saindo de lugar). Missao "Em Busca do Mega-Empresario": a party percorre as EMPRESAS de que ele e dono.
+6. Ele e achado DORMINDO na linha de montagem de uma de suas empresas, no comeco da manha: a **montadora de carros tecnologicos eletricos magicos flutuantes inovadores**.
+
+(A ordenacao fina entre "encontrar a carta" e "reencontrar o Tusk dormindo" fica a afinar com o narrative-designer; os beats do criador estao registrados fielmente aqui.)
