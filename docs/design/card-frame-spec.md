@@ -30,6 +30,8 @@
 - **Trilha 2 (fallback, provável para a moldura):** se o PixelLab não reproduzir bem, a **moldura é renderizada pelo glintfx** (RCSS já faz gradiente + glow + animação + recolor por domínio via variável; os mocks são literalmente CSS/RCSS-like; o glow pulsante do Tusk é animação nativa) e o **PixelLab faz SÓ as figuras internas das cartas + os sprites** das figuras no mundo. (Consumir o glintfx apenas; NÃO mexer na lib.)
 - Em ambas: **PixelLab sempre faz as figuras internas + os sprites**; a dúvida é só quem faz a MOLDURA.
 
+**DECISAO DO CRIADOR (2026-07-09): TRILHA HIBRIDA.** O **PixelLab gera a TEXTURA base da moldura** (a pedra gotica + runas + estrutura de ouro, em pixel-art nativo; teste `create_ui_asset` provou que sai lindo e on-brand, ver `resources/images/card-frame-tests/pixellab-frame-cyan-v1.png`). O **glintfx (RCSS) sobrepoe**: a COR do dominio (tint/recolor por 1 variavel), o **GLOW dourado PULSANTE** do Tusk (animacao nativa), os ESTADOS (hover/selecionada/desabilitada), e compoe a figura interior + nome + custo + texto de efeito + sigilo + raridade. Implicacao de pipeline: gerar a base PixelLab de forma RECOLORIVEL (runas/energia em tom neutro/claro que o glintfx tinge; ou base pedra+ouro neutra + canal de energia adicionado pelo glintfx). Implementacao = tarefa de engenharia UI (consumir glintfx, NAO mexer na lib; ver `reference_glintfx_api`), em GusEngine/app. PixelLab sempre faz as figuras internas + os sprites.
+
 ## Cross-refs
 
 `docs/design/brainstorm-backlog.md` (seção Fase B, decisões do roster), `docs/design/roster-analogos/*.md`, `project_rmlui_ui_stack`, ADR-010 (glintfx embed), `reference_pixellab_mcp`, `reference_glintfx_api`.
