@@ -12,6 +12,10 @@ add_executable(gusengine_core_tests
     sha256_test.cpp
     hmac_sha256_test.cpp
     key_derivation_test.cpp
+    # ADR-015 Onda 1 (SAVE-CRYPTO-V2-VENDOR): wrappers sobre o Monocypher vendorizado.
+    secure_zero_test.cpp
+    argon2id_test.cpp
+    aead_xchacha20poly1305_test.cpp
     tile_grid_test.cpp
     grid_collision_test.cpp
     obstacle_collision_test.cpp

@@ -19,6 +19,11 @@ project(GusEngine
     LANGUAGES CXX
 )
 
+# Monocypher (ADR-015 Onda 1, SAVE-CRYPTO-V2-VENDOR) e C99 puro, nao C++: habilita
+# a linguagem C so para compilar esse UNICO vendor (third_party/monocypher/). Nao
+# afeta o resto do projeto (100% C++20).
+enable_language(C)
+
 # C++20 idiomatico, sem extensoes de compilador (portavel Linux/Windows).
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -131,6 +136,10 @@ FetchContent_MakeAvailable(Catch2)
 # disponibiliza o helper catch_discover_tests (integra Catch2 ao ctest)
 list(APPEND CMAKE_MODULE_PATH ${catch2_SOURCE_DIR}/extras)
 include(Catch)
+
+# --- Vendor com build proprio (ADR-015 Onda 1: Monocypher e 2 arquivos C, nao
+#     header-only como o resto de third_party/; precisa de um alvo compilado). ---
+add_subdirectory(third_party/monocypher)
 
 # --- Camadas ---
 # Ordem importa: core e base de domain; platform usa core; app usa todos.

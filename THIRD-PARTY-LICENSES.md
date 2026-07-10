@@ -61,6 +61,7 @@ Codigo-fonte incorporado no repo (filosofia zero-dep), cada lib com seu arquivo 
 | entityplus | BSL-1.0 (Boost) | github.com/Yelnats321/EntityPlus |
 | entityx | MIT | github.com/alecthomas/entityx |
 | box2d | MIT | github.com/erincatto/box2d |
+| monocypher | CC0-1.0 ou BSD-2-Clause (dupla) | github.com/LoupVaillant/Monocypher | ADR-015 (SAVE-CRYPTO-V2). Tag 4.0.3, commit `ab2b16dd619ad5f6979a4fbe69cfa324a6fcc35f`. UNICO vendor com build proprio (2 arquivos C, compilado via `third_party/monocypher/CMakeLists.txt`); os demais desta tabela sao header-only. AEAD XChaCha20-Poly1305 + Argon2id do envelope de save v2. |
 
 Nota de compatibilidade: todas permissivas e compativeis com o GPLv3 do jogo (Apache-2.0 e compativel com GPLv3, nao com GPLv2; public-domain usar o fallback explicito MIT/Unlicense).
 

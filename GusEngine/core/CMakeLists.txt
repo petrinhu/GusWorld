@@ -15,6 +15,12 @@ add_library(gusengine_core STATIC
     src/crypto/sha256.cpp
     src/crypto/hmac_sha256.cpp
     src/crypto/key_derivation.cpp
+    # ADR-015 Onda 1 (SAVE-CRYPTO-V2-VENDOR): wrappers proprios sobre o Monocypher
+    # vendorizado (third_party/monocypher/). AEAD (XChaCha20-Poly1305) + Argon2id +
+    # zeragem segura anti-otimizador.
+    src/crypto/aead_xchacha20poly1305.cpp
+    src/crypto/argon2id.cpp
+    src/crypto/secure_zero.cpp
     src/spatial/tile_grid.cpp
     src/spatial/grid_collision.cpp
     src/spatial/depth_sort.cpp
@@ -35,5 +41,12 @@ target_include_directories(gusengine_core
 )
 
 target_compile_features(gusengine_core PUBLIC cxx_std_20)
+
+# monocypher (ADR-015 Onda 1): dependencia de IMPLEMENTACAO, nao de interface -
+# nenhum header PUBLICO de gusengine_core inclui monocypher.h (os wrappers
+# aead_xchacha20poly1305.hpp/argon2id.hpp/secure_zero.hpp escondem a lib
+# vendorizada atras da API propria, mesmo padrao do sha256.hpp/hmac_sha256.hpp).
+# PRIVATE: consumidores de gusengine_core nao herdam o include path do Monocypher.
+target_link_libraries(gusengine_core PRIVATE monocypher)
 
 # Sem target_link_libraries(... Qt6::*/SDL3::*) por design. Camada pura.
