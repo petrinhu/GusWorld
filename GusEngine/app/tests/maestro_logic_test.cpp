@@ -26,6 +26,7 @@ using gus::app::feet_trigger_aabb;
 using gus::app::kFeetTriggerMarginTiles;
 using gus::app::outcome_marks_enemy_defeated;
 using gus::app::pick_fixed_enemy_position;
+using gus::app::should_autosave_after_battle;
 using gus::app::should_stop_running_after_battle;
 using gus::app::should_trigger_battle;
 using gus::app::should_trigger_battle_on_edge;
@@ -83,6 +84,26 @@ TEST_CASE("outcome_marks_enemy_defeated: so Victory marca", "[maestro][logic]") 
     CHECK_FALSE(outcome_marks_enemy_defeated(CombatOutcome::Defeat));
     CHECK_FALSE(outcome_marks_enemy_defeated(CombatOutcome::Fled));
     CHECK_FALSE(outcome_marks_enemy_defeated(CombatOutcome::Ongoing));
+}
+
+// SAVE-LOAD-UI etapa 5 (AUTOSAVE), ajuste do lider pos-entrega: o gatilho de
+// RETORNO da batalha so autosava em Victory - Defeat/Fled/Ongoing NAO (encosta
+// no sistema de morte canonico ainda nao implementado, ver o comentario do
+// predicado em maestro_logic.hpp).
+TEST_CASE("should_autosave_after_battle: so Victory autosava no retorno",
+          "[maestro][logic]") {
+    CHECK(should_autosave_after_battle(CombatOutcome::Victory));
+    CHECK_FALSE(should_autosave_after_battle(CombatOutcome::Defeat));
+    CHECK_FALSE(should_autosave_after_battle(CombatOutcome::Fled));
+    CHECK_FALSE(should_autosave_after_battle(CombatOutcome::Ongoing));
+}
+
+TEST_CASE("should_autosave_after_battle: e constexpr (avaliavel em tempo de "
+          "compilacao)",
+          "[maestro][logic]") {
+    static_assert(should_autosave_after_battle(CombatOutcome::Victory));
+    static_assert(!should_autosave_after_battle(CombatOutcome::Defeat));
+    SUCCEED();
 }
 
 TEST_CASE("pick_fixed_enemy_position: celula-alvo livre -> senta exatamente nela",

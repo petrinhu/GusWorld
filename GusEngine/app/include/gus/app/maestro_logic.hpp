@@ -53,6 +53,27 @@ enum class EncounterId : int {
 [[nodiscard]] bool outcome_marks_enemy_defeated(
     gus::domain::combat::CombatOutcome outcome) noexcept;
 
+// SAVE-LOAD-UI etapa 5 (AUTOSAVE), ajuste do lider pos-entrega (via
+// AskUserQuestion): o gatilho de RETORNO da batalha so autosava em Victory -
+// Defeat/Fled/Ongoing (janela fechada no meio) NAO. Motivo: este ponto encosta
+// no sistema de morte canonico ainda NAO implementado (memoria
+// project_morte_dificuldade_canon - Facil=reload/Medio=hospital/Dificil=
+// respawn deslocado/Hardcore=permadeath) - autosavar o estado POS-DERROTA
+// agora pre-comprometeria um momento que a mecanica de morte futura ainda vai
+// tratar. O gatilho de ENTRADA (entrando_em_batalha, "trocar de area" pro lado
+// cidade->batalha) continua incondicional - ja e o ponto de restauro seguro
+// pre-batalha, independente do desfecho.
+//
+// COINCIDE hoje com outcome_marks_enemy_defeated (ambas so Victory), mas sao
+// DECISOES DISTINTAS que podem divergir no futuro (uma decide se o inimigo
+// some do mapa; esta decide se persiste em disco - ex.: o handler de morte
+// podendo justificar autosave em Defeat mais adiante, sem o inimigo deixar de
+// existir) - por isso um predicado PROPRIO, nao um reuso coincidental.
+[[nodiscard]] constexpr bool should_autosave_after_battle(
+    gus::domain::combat::CombatOutcome outcome) noexcept {
+    return outcome == gus::domain::combat::CombatOutcome::Victory;
+}
+
 // Escolhe a posicao do inimigo FIXO: parte da celula de (player_start.x+w/2,
 // player_start.y+h/2) + o offset cardinal (offset_tiles_x, offset_tiles_y) em CELULAS, e
 // VARRE em espiral (raio crescente) pela celula ALCANCAVEL A PE mais proxima daquele

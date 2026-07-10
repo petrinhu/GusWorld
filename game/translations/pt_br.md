@@ -206,6 +206,31 @@ Local desconhecido
 
 ---
 
+## §4b. Tela de título (SAVE-LOAD-UI etapa 4)
+
+## TITLE_LOGO_PREFIX
+Gus
+
+## TITLE_LOGO_SUFFIX
+World
+
+## TITLE_SUBTITLE
+vertical slice
+
+## TITLE_FOOTER_HINT
+Cima/Baixo navega  -  Enter seleciona
+
+## TITLE_NEW_GAME_CONFIRM
+Começar novo jogo? O Auto será sobrescrito conforme você jogar.
+
+## TITLE_NEW_GAME_CONFIRM_YES
+Sim, começar
+
+## TITLE_NEW_GAME_CONFIRM_NO
+Cancelar
+
+---
+
 ## §5. HUD + combate (placeholders)
 
 ## HUD_HP_LABEL

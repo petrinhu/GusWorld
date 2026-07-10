@@ -43,6 +43,13 @@ add_library(gusengine_app STATIC
     # I/O de disco de fato (has_save/save_game/load_game) - ver
     # gus/app/screens/save_load_menu_loop.hpp.
     src/screens/save_load_menu_loop.cpp
+    # SAVE-LOAD-UI etapa 4 (TELA DE TITULO): logica pura + gerador de RML + o
+    # loop GL/glintfx dono do proprio contexto (owning, MESMA receita de
+    # system_menu_loop.cpp::run_system_menu_loop_owning_gl) - ver
+    # gus/app/screens/title_menu_loop.hpp.
+    src/screens/title_menu.cpp
+    src/screens/title_menu_rml.cpp
+    src/screens/title_menu_loop.cpp
     src/i18n/translator.cpp
     # M7-DIALOGO (NPC-MVP): I/O do grafo de dialogo do Bertoldo (.dlg.txt) -
     # fronteira app/, domain/dialogue permanece ZERO I/O.

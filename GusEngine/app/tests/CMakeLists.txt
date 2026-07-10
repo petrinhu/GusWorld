@@ -44,6 +44,10 @@ add_executable(gusengine_app_tests
     # SAVE-LOAD-UI (PI9): logica pura da tela de salvar/carregar + gerador de RML.
     save_load_menu_test.cpp
     save_load_menu_rml_test.cpp
+    # SAVE-LOAD-UI etapa 4 (TELA DE TITULO): logica pura de navegacao/confirmacao +
+    # gerador de RML.
+    title_menu_test.cpp
+    title_menu_rml_test.cpp
 )
 
 target_link_libraries(gusengine_app_tests

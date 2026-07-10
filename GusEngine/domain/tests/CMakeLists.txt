@@ -75,6 +75,9 @@ add_executable(gusengine_domain_tests
     # Tela Controles (remap, M2): swap-on-conflict PURO ("avisa e troca").
     controls_remap_apply_test.cpp
     save_v4_test.cpp
+    # SAVE-LOAD-UI etapa 5 (AUTOSAVE): predicado puro de politica por local
+    # (cidade sempre ON; dungeon so ON com PEM descoberto OU carta Faraday).
+    save_policy_test.cpp
     # MENU-PAUSA-CONFIG-SOM (M7-COSTURA): settings.json proprio (mesmo padrao JSON
     # dep-free de controls_json.hpp), so volume musica/SFX nesta onda.
     system_settings_json_test.cpp

@@ -139,6 +139,46 @@ private:
     // esbarrão e ignorado, a cidade continua rodando normalmente).
     [[nodiscard]] bool to_npc_dialogue();
 
+    // SAVE-LOAD-UI etapa 4 (TELA DE TITULO): chamada UMA vez no INICIO de run(),
+    // ANTES do loop cidade<->batalha (o boot MUDOU: nao entra mais direto na
+    // cidade). MESMA tecnica de "trocar escondido atras do preto" ja provada por
+    // open_pause_from_city()/to_battle() - captura o frame congelado, solta o
+    // SDL_Renderer da cidade, roda o loop DONO de contexto GL proprio
+    // (gus::app::screens::run_title_menu_loop_owning_gl), reconstroi o renderer.
+    // "Continuar" aplica o save mais recente via apply_loaded_save_data(); "Novo
+    // Jogo" e um no-op (o estado FRESCO que init() ja deixou pronto ja serve).
+    // Devolve true SO se o jogador escolheu "Sair" na tela de titulo OU fechou a
+    // JANELA durante ela - o chamador (run()) encerra o programa IMEDIATAMENTE,
+    // SEM entrar no loop de jogo (nada foi jogado ainda, nenhum autosave faz
+    // sentido nesse caso).
+    [[nodiscard]] bool show_title_screen();
+
+    // Monta o SaveData VIVO da sessao ATUAL (flags acumuladas + posicao real do
+    // jogador + timestamp/playtime frescos) - EXTRAIDO da lambda local que
+    // open_pause_from_city() usava (SAVE-LOAD-UI etapa 6), agora reusado TAMBEM
+    // por maybe_autosave() (etapa 5): so a Maestro conhece o SaveData de verdade,
+    // entao so ela pode montar um snapshot fiel. Sem efeito colateral (const).
+    [[nodiscard]] gus::domain::save::SaveData build_current_save_data() const;
+
+    // Aplica um SaveData JA CARREGADO no jogo VIVO (reposiciona o jogador,
+    // re-deriva o marcador/estado do inimigo fixo, re-ancora o relogio de
+    // playtime) - EXTRAIDO da lambda local que open_pause_from_city() usava
+    // (SAVE-LOAD-UI etapa 6), agora reusado TAMBEM por show_title_screen()
+    // ("Continuar" na tela de titulo, etapa 4).
+    void apply_loaded_save_data(const gus::domain::save::SaveData& data);
+
+    // SAVE-LOAD-UI etapa 5 (AUTOSAVE): consulta o hook de politica por local
+    // (gus::domain::save::autosave_allowed_at, ver save_policy.hpp) e, se
+    // permitido, grava build_current_save_data() no slot Auto
+    // (gus::domain::save::kAutosaveSlot) via gus::platform::fs::save_game - o
+    // MESMO save_game real da etapa 6, nao um caminho separado. Nesta fatia SO
+    // existe cidade (LocationKind::City, sempre ON) - os 2 overrides (PEM
+    // descoberto/carta Gaiola de Faraday) ficam hardcoded false ATE a 1a dungeon
+    // real existir (ver o comentario do proprio hook). `trigger_label` e SO
+    // diagnostico (aparece no log, ex. "entrando_em_batalha"/
+    // "retornando_da_batalha"/"saindo_do_jogo") - nao afeta a decisao.
+    void maybe_autosave(const char* trigger_label);
+
     SDL_Window* window_ = nullptr;         // dono (a UNICA janela do app)
     std::unique_ptr<SdlWindow> city_;      // a cidade (OverworldSim vive aqui, sempre)
 

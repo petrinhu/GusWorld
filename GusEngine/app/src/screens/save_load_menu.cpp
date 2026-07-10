@@ -112,6 +112,20 @@ SaveSlotPreview build_slot_preview(const gus::domain::save::SaveData& data, int 
     return preview;
 }
 
+int most_recent_occupied_slot(
+    const std::array<SaveSlotPreview, kSlotCount>& slots) noexcept {
+    int best = -1;
+    for (int i = 0; i < kSlotCount; ++i) {
+        const SaveSlotPreview& slot = slots[static_cast<std::size_t>(i)];
+        if (!slot.occupied) continue;
+        if (best == -1 ||
+            slot.timestamp_ms > slots[static_cast<std::size_t>(best)].timestamp_ms) {
+            best = i;
+        }
+    }
+    return best;
+}
+
 bool slot_selectable(const SaveLoadMenuState& state, int index) noexcept {
     if (index < 0 || index >= kSlotCount) return false;
     const SaveSlotPreview& slot = state.slots[static_cast<std::size_t>(index)];

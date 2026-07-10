@@ -188,6 +188,16 @@ struct SaveLoadMenuState {
 // vazios). index fora do intervalo devolve false (defensivo).
 [[nodiscard]] bool slot_selectable(const SaveLoadMenuState& state, int index) noexcept;
 
+// SAVE-LOAD-UI etapa 4 (TELA DE TITULO): indice do slot OCUPADO com o MAIOR
+// timestamp_ms entre `slots` (Auto E manuais concorrem igualmente - "Continuar"
+// carrega o save mais recente da PARTIDA, nao um slot escolhido a dedo). Empate no
+// timestamp: o PRIMEIRO indice (ordem crescente 0..kSlotCount-1) vence (defensivo,
+// raro na pratica - timestamps sao milissegundos de wall clock). Devolve -1 se
+// NENHUM slot estiver ocupado (a tela de titulo NAO deveria oferecer "Continuar"
+// nesse caso).
+[[nodiscard]] int most_recent_occupied_slot(
+    const std::array<SaveSlotPreview, gus::domain::save::kSlotCount>& slots) noexcept;
+
 // Abre a tela no modo dado, com os previews ja construidos pelo CHAMADOR (via
 // build_slot_preview/empty_slot_preview - esta funcao NAO le disco). Selecao
 // inicial = o PRIMEIRO slot selecionavel (ordem crescente de indice,

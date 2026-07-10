@@ -338,3 +338,61 @@ TEST_CASE("save_load_menu_key_down: Esc fora do mini-dialogo devolve Back",
 
     REQUIRE(save_load_menu_key_down(state, SDLK_ESCAPE) == SaveLoadMenuAction::Back);
 }
+
+// ---------------------------------------------------------------- most_recent_occupied_slot
+//
+// SAVE-LOAD-UI etapa 4 (TELA DE TITULO): "Continuar" carrega o save mais recente
+// entre TODOS os slots ocupados (Auto + manuais) por timestamp_ms - nao um slot
+// escolhido a dedo.
+
+TEST_CASE("most_recent_occupied_slot: nenhum slot ocupado devolve -1", "[save_load_menu]") {
+    std::array<SaveSlotPreview, kSlotCount> slots{};
+    for (int i = 0; i < kSlotCount; ++i) slots[static_cast<std::size_t>(i)] = empty_slot_preview(i);
+    REQUIRE(most_recent_occupied_slot(slots) == -1);
+}
+
+TEST_CASE("most_recent_occupied_slot: unico slot ocupado vence por definicao",
+          "[save_load_menu]") {
+    std::array<SaveSlotPreview, kSlotCount> slots{};
+    for (int i = 0; i < kSlotCount; ++i) slots[static_cast<std::size_t>(i)] = empty_slot_preview(i);
+    SaveData data = make_save_data(100);
+    data.timestamp_ms = 1000;
+    slots[3] = build_slot_preview(data, 3);
+    REQUIRE(most_recent_occupied_slot(slots) == 3);
+}
+
+TEST_CASE("most_recent_occupied_slot: escolhe o MAIOR timestamp_ms entre varios "
+          "ocupados (inclui o autosave concorrendo)",
+          "[save_load_menu]") {
+    std::array<SaveSlotPreview, kSlotCount> slots{};
+    for (int i = 0; i < kSlotCount; ++i) slots[static_cast<std::size_t>(i)] = empty_slot_preview(i);
+
+    SaveData auto_data = make_save_data(550);
+    auto_data.timestamp_ms = 1783461600000LL;  // 08/07/2026 01:20 (mock)
+    slots[kAutosaveSlot] = build_slot_preview(auto_data, kAutosaveSlot);
+
+    SaveData slot1 = make_save_data(340);
+    slot1.timestamp_ms = 1783455240000LL;  // 07/07/2026 20:14 (mock, mais antigo)
+    slots[1] = build_slot_preview(slot1, 1);
+
+    SaveData slot2 = make_save_data(810);
+    slot2.timestamp_ms = 1783378260000LL;  // 06/07/2026 23:51 (mock, mais antigo ainda)
+    slots[2] = build_slot_preview(slot2, 2);
+
+    // O Auto e o MAIS RECENTE dos 3 - Continuar deve mirar nele.
+    REQUIRE(most_recent_occupied_slot(slots) == kAutosaveSlot);
+}
+
+TEST_CASE("most_recent_occupied_slot: empate no timestamp - o PRIMEIRO indice "
+          "(ordem crescente) vence (defensivo)",
+          "[save_load_menu]") {
+    std::array<SaveSlotPreview, kSlotCount> slots{};
+    for (int i = 0; i < kSlotCount; ++i) slots[static_cast<std::size_t>(i)] = empty_slot_preview(i);
+    SaveData a = make_save_data(1);
+    a.timestamp_ms = 5000;
+    SaveData b = make_save_data(2);
+    b.timestamp_ms = 5000;
+    slots[2] = build_slot_preview(a, 2);
+    slots[4] = build_slot_preview(b, 4);
+    REQUIRE(most_recent_occupied_slot(slots) == 2);
+}

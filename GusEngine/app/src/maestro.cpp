@@ -17,8 +17,11 @@
 // funcional simples de texto (npc_dialogue_loop.hpp, aposentado - ver seu header).
 #include "gus/app/screens/npc_dialogue_loop_gl.hpp"
 #include "gus/app/screens/system_menu_loop.hpp"  // MENU-PAUSA-CONFIG-SOM: Esc na cidade
+#include "gus/app/screens/title_menu_loop.hpp"  // SAVE-LOAD-UI etapa 4: TELA DE TITULO no boot
 #include "gus/domain/dialogue/dialogue_runtime.hpp"
 #include "gus/domain/input/controls_name.hpp"  // kDefaultProfile (M2: liga a tela Controles ao input real)
+#include "gus/domain/save/save_policy.hpp"  // SAVE-LOAD-UI etapa 5: autosave_allowed_at
+#include "gus/domain/save/save_slots.hpp"  // kAutosaveSlot
 #include "gus/domain/settings/system_settings.hpp"
 #include "gus/platform/fs/controls_file_store.hpp"  // load_controls (M2)
 #include "gus/platform/fs/save_file_store.hpp"  // SAVE-LOAD-UI etapa 6: resolve_saves_dir
@@ -319,6 +322,146 @@ bool Maestro::init() {
     return true;
 }
 
+gus::domain::save::SaveData Maestro::build_current_save_data() const {
+    gus::domain::save::SaveData data = save_;  // flags ja acumuladas na sessao
+    const gus::core::spatial::Aabb& player = city_->player_aabb();
+    data.player_position = gus::domain::save::Vec3{
+        static_cast<double>(player.x), static_cast<double>(player.y), 0.0};
+    // scene_path SEM extensao (mesma convencao de location_key_for_scene em
+    // save_load_menu_rml.cpp) - UNICO mapa desta vertical slice (M4).
+    data.current_scene_path = "distritos_inferiores";
+    data.timestamp_ms = static_cast<std::int64_t>(
+        std::chrono::duration_cast<std::chrono::milliseconds>(
+            std::chrono::system_clock::now().time_since_epoch())
+            .count());
+    data.playtime_seconds = playtime_base_seconds_ +
+                             static_cast<double>(SDL_GetTicksNS() - playtime_anchor_ns_) /
+                                 1.0e9;
+    return data;
+}
+
+void Maestro::apply_loaded_save_data(const gus::domain::save::SaveData& data) {
+    save_ = data;
+    // Reposiciona o jogador (SAVE-LOAD-UI etapa 6: o "ponto de risco" que o
+    // lider sinalizou - resolvido via OverworldSim::set_player_position,
+    // ADITIVO/novo, ver overworld_sim.hpp). Preserva w/h ATUAIS (o sprite
+    // nao muda de tamanho; so x/y vem do save).
+    gus::core::spatial::Aabb pos = city_->player_aabb();
+    pos.x = static_cast<float>(data.player_position.x);
+    pos.y = static_cast<float>(data.player_position.y);
+    city_->set_player_position(pos);
+
+    // Re-deriva enemy_defeated_/marcador visual a partir da flag carregada
+    // (MESMA chave que on_battle_result grava) - um save de ANTES do
+    // inimigo ser derrotado deve TRAZER o inimigo de volta visualmente
+    // (ex.: o jogador carregou um slot antigo apos ja te-lo vencido nesta
+    // sessao).
+    const auto it = data.flags.find(std::string(kEnemy1DefeatedFlag));
+    enemy_defeated_ = (it != data.flags.end() && it->second);
+    if (enemy_defeated_) {
+        city_->clear_enemy_marker();
+    } else {
+        city_->set_enemy_marker(enemy_aabb_);
+    }
+    // EDGE-TRIGGER (mesma cautela de on_battle_result abaixo): forca SAIR
+    // e RE-ENTRAR nas hitboxes antes de re-disparar batalha/dialogo -
+    // o jogador pode ter sido teleportado PRA CIMA do inimigo/NPC.
+    was_overlapping_enemy_ = false;
+    was_overlapping_npc_bertoldo_ = false;
+
+    // SAVE-LOAD-UI etapa 6 (playtime REAL): re-ancora o relogio da SESSAO
+    // ATUAL na base do playtime do save carregado - dali em diante o
+    // acumulo (build_current_save_data acima) soma o tempo REAL desta
+    // sessao por cima do que o save trazia.
+    playtime_base_seconds_ = data.playtime_seconds;
+    playtime_anchor_ns_ = SDL_GetTicksNS();
+
+    std::cout << "Maestro: [save-load] Load aplicado - posicao=(" << pos.x << ", "
+              << pos.y << ") enemy_defeated=" << enemy_defeated_
+              << " playtime_seconds=" << playtime_base_seconds_ << "\n";
+}
+
+void Maestro::maybe_autosave(const char* trigger_label) {
+    // SAVE-LOAD-UI etapa 5 (AUTOSAVE): hook de politica por local (ver
+    // gus/domain/save/save_policy.hpp, memoria project_save_dungeon_pem_faraday).
+    // Nesta fatia (vertical slice, M4) SO EXISTE CIDADE - os 2 overrides ficam
+    // hardcoded false POR ORA (o predicado ja esta pronto/testado pro dia em que
+    // a 1a dungeon existir; SO a chamada muda entao, nunca o hook em si).
+    const bool allowed = gus::domain::save::autosave_allowed_at(
+        gus::domain::save::LocationKind::City, /*has_pem_discovered=*/false,
+        /*has_faraday_card=*/false);
+    if (!allowed) {
+        std::cout << "Maestro: [autosave][" << trigger_label
+                  << "] bloqueado pela politica de local (dungeon sem PEM/carta "
+                     "Faraday).\n";
+        return;
+    }
+
+    gus::domain::save::SaveData data = build_current_save_data();
+    data.slot_id = gus::domain::save::kAutosaveSlot;
+    const std::string saves_dir = gus::platform::fs::resolve_saves_dir();
+    const bool ok = gus::platform::fs::save_game(data, gus::domain::save::kAutosaveSlot,
+                                                  saves_dir);
+    std::cout << "Maestro: [autosave][" << trigger_label << "] "
+              << (ok ? "OK" : "FALHOU (I/O - disco cheio/permissao?)")
+              << " - slot Auto (" << gus::domain::save::kAutosaveSlot << ") em "
+              << saves_dir << ".\n";
+}
+
+bool Maestro::show_title_screen() {
+    std::cout << "Maestro: [costura] boot -> TELA DE TITULO (SAVE-LOAD-UI etapa "
+                 "4, boot MUDOU - nao entra mais direto na cidade).\n";
+
+    // MESMA tecnica de open_pause_from_city/to_battle: captura o frame ATUAL da
+    // cidade (o boot ja deixou sim_ pronto em init(), mesmo sem nenhum step()
+    // ainda - capture_frame_to_png redesenha o estado CORRENTE, nao exige um
+    // frame anterior) ANTES de soltar o renderer.
+    const std::string frozen_bg_path = frozen_city_snapshot_path();
+    const bool frozen_ok = city_->capture_frame_to_png(frozen_bg_path);
+    city_->release_renderer();
+
+    gus::app::screens::TitleLoopExit exit = gus::app::screens::TitleLoopExit::QuitApp;
+    gus::domain::save::SaveData loaded{};
+    const bool ok = gus::app::screens::run_title_menu_loop_owning_gl(
+        window_, translator_, gus::platform::fs::resolve_saves_dir(), &exit, &loaded,
+        frozen_ok ? frozen_bg_path : std::string());
+
+    if (!city_->reacquire_renderer()) {
+        SDL_Log(
+            "Maestro: falha ao reconstruir o renderer da cidade apos a tela de "
+            "titulo - a cidade segue rodando SEM desenhar (degradacao segura, sem "
+            "crash).");
+    }
+    if (frozen_ok) {
+        std::error_code remove_ec;
+        std::filesystem::remove(frozen_bg_path, remove_ec);
+    }
+
+    if (!ok) {
+        SDL_Log(
+            "Maestro: falha ao abrir a tela de titulo (contexto GL/glad) - "
+            "comecando NOVO JOGO direto (degradacao segura, nao fecha o app).");
+        return false;
+    }
+
+    switch (exit) {
+        case gus::app::screens::TitleLoopExit::QuitApp:
+            std::cout << "Maestro: [costura] Sair na tela de titulo (ou janela "
+                         "fechada) - encerrando SEM jogar (nenhum autosave).\n";
+            return true;
+        case gus::app::screens::TitleLoopExit::NewGame:
+            std::cout << "Maestro: [costura] Novo Jogo - estado FRESCO ja pronto "
+                         "desde init() (sem retrabalho).\n";
+            return false;
+        case gus::app::screens::TitleLoopExit::ContinueGame:
+            std::cout << "Maestro: [costura] Continuar - aplicando o save mais "
+                         "recente entre todos os slots ocupados.\n";
+            apply_loaded_save_data(loaded);
+            return false;
+    }
+    return false;
+}
+
 bool Maestro::open_pause_from_city() {
     std::cout << "Maestro: [costura] Esc na cidade -> abrindo MENU DE PAUSA (troca "
                  "escondida pro contexto GL, MENU-PAUSA-CONFIG-SOM).\n";
@@ -343,64 +486,13 @@ bool Maestro::open_pause_from_city() {
     // load acesso ao SaveData VIVO - so a Maestro conhece flags/posicao/tempo de
     // jogo de verdade, entao SO ela pode montar/aplicar um SaveData de fato (ver
     // o header de system_menu_loop.hpp e save_load_menu_loop.hpp pro contrato).
-    const auto build_current_save_data = [this]() -> gus::domain::save::SaveData {
-        gus::domain::save::SaveData data = save_;  // flags ja acumuladas na sessao
-        const gus::core::spatial::Aabb& player = city_->player_aabb();
-        data.player_position = gus::domain::save::Vec3{
-            static_cast<double>(player.x), static_cast<double>(player.y), 0.0};
-        // scene_path SEM extensao (mesma convencao de location_key_for_scene em
-        // save_load_menu_rml.cpp) - UNICO mapa desta vertical slice (M4).
-        data.current_scene_path = "distritos_inferiores";
-        data.timestamp_ms = static_cast<std::int64_t>(
-            std::chrono::duration_cast<std::chrono::milliseconds>(
-                std::chrono::system_clock::now().time_since_epoch())
-                .count());
-        data.playtime_seconds =
-            playtime_base_seconds_ +
-            static_cast<double>(SDL_GetTicksNS() - playtime_anchor_ns_) / 1.0e9;
-        return data;
+    // EXTRAIDOS pra metodos (build_current_save_data/apply_loaded_save_data,
+    // SAVE-LOAD-UI etapa 4/5): maybe_autosave() e show_title_screen() ("Continuar"
+    // na tela de titulo) reusam a MESMA logica, sem duplicar.
+    const auto build_current_save_data = [this] { return this->build_current_save_data(); };
+    const auto apply_loaded_save_data = [this](const gus::domain::save::SaveData& data) {
+        this->apply_loaded_save_data(data);
     };
-    const auto apply_loaded_save_data =
-        [this](const gus::domain::save::SaveData& data) {
-            save_ = data;
-            // Reposiciona o jogador (SAVE-LOAD-UI etapa 6: o "ponto de risco" que o
-            // lider sinalizou - resolvido via OverworldSim::set_player_position,
-            // ADITIVO/novo, ver overworld_sim.hpp). Preserva w/h ATUAIS (o sprite
-            // nao muda de tamanho; so x/y vem do save).
-            gus::core::spatial::Aabb pos = city_->player_aabb();
-            pos.x = static_cast<float>(data.player_position.x);
-            pos.y = static_cast<float>(data.player_position.y);
-            city_->set_player_position(pos);
-
-            // Re-deriva enemy_defeated_/marcador visual a partir da flag carregada
-            // (MESMA chave que on_battle_result grava) - um save de ANTES do
-            // inimigo ser derrotado deve TRAZER o inimigo de volta visualmente
-            // (ex.: o jogador carregou um slot antigo apos ja te-lo vencido nesta
-            // sessao).
-            const auto it = data.flags.find(std::string(kEnemy1DefeatedFlag));
-            enemy_defeated_ = (it != data.flags.end() && it->second);
-            if (enemy_defeated_) {
-                city_->clear_enemy_marker();
-            } else {
-                city_->set_enemy_marker(enemy_aabb_);
-            }
-            // EDGE-TRIGGER (mesma cautela de on_battle_result abaixo): forca SAIR
-            // e RE-ENTRAR nas hitboxes antes de re-disparar batalha/dialogo -
-            // o jogador pode ter sido teleportado PRA CIMA do inimigo/NPC.
-            was_overlapping_enemy_ = false;
-            was_overlapping_npc_bertoldo_ = false;
-
-            // SAVE-LOAD-UI etapa 6 (playtime REAL): re-ancora o relogio da SESSAO
-            // ATUAL na base do playtime do save carregado - dali em diante o
-            // acumulo (build_current_save_data acima) soma o tempo REAL desta
-            // sessao por cima do que o save trazia.
-            playtime_base_seconds_ = data.playtime_seconds;
-            playtime_anchor_ns_ = SDL_GetTicksNS();
-
-            std::cout << "Maestro: [save-load] Load aplicado - posicao=(" << pos.x
-                      << ", " << pos.y << ") enemy_defeated=" << enemy_defeated_
-                      << " playtime_seconds=" << playtime_base_seconds_ << "\n";
-        };
 
     gus::app::screens::SystemMenuLoopOutcome outcome{};
     const bool ok = gus::app::screens::run_system_menu_loop_owning_gl(
@@ -462,6 +554,49 @@ void Maestro::run() {
             std::getenv("GUSWORLD_SAVELOAD_SCREENSHOT_DIR");
         saveload_screenshot_dir != nullptr && saveload_screenshot_dir[0] != '\0') {
         (void)open_pause_from_city();
+        return;
+    }
+
+    // DIAGNOSTICO/PROVA (SAVE-LOAD-UI etapa 5, AUTOSAVE): GUSWORLD_AUTOSAVE_
+    // SELFTEST=1 exercita maybe_autosave() DIRETO (bypassa a tela de titulo e o
+    // loop de jogo por completo) - prova via log + has_save() ANTES/DEPOIS que
+    // um gatilho de fato cria o arquivo do slot Auto (headless, sem input real).
+    // Rodar com GUSWORLD_HOME apontando pra um dir de SCRATCH (nao os saves reais
+    // do jogador).
+    if (const char* autosave_selftest = std::getenv("GUSWORLD_AUTOSAVE_SELFTEST");
+        autosave_selftest != nullptr && autosave_selftest[0] != '\0') {
+        const std::string saves_dir = gus::platform::fs::resolve_saves_dir();
+        std::cout << "Maestro: [autosave][selftest] ANTES: has_save(Auto)="
+                  << gus::platform::fs::has_save(gus::domain::save::kAutosaveSlot,
+                                                  saves_dir)
+                  << " em " << saves_dir << "\n";
+        maybe_autosave("selftest");
+        std::cout << "Maestro: [autosave][selftest] DEPOIS: has_save(Auto)="
+                  << gus::platform::fs::has_save(gus::domain::save::kAutosaveSlot,
+                                                  saves_dir)
+                  << "\n";
+        return;
+    }
+
+    // DIAGNOSTICO/PROVA (SAVE-LOAD-UI etapa 4, prova visual headless Xvfb :99):
+    // GUSWORLD_TITLE_SCREENSHOT_DIR=<dir> mostra a TELA DE TITULO diretamente no
+    // boot (o proprio show_title_screen()/run_title_menu_loop_owning_gl carrega o
+    // self-test de screenshot, ver title_menu_loop.cpp) e retorna - bypassa por
+    // completo o loop de jogo. Rodar 2x com 2 GUSWORLD_HOME diferentes (1 com
+    // save gravado, 1 vazio) produz os 2 PNGs pedidos (Continuar habilitado vs
+    // desabilitado), cada um com nome PROPRIO (nao colidem).
+    if (const char* title_screenshot_dir = std::getenv("GUSWORLD_TITLE_SCREENSHOT_DIR");
+        title_screenshot_dir != nullptr && title_screenshot_dir[0] != '\0') {
+        (void)show_title_screen();
+        return;
+    }
+
+    // SAVE-LOAD-UI etapa 4: o boot MUDOU - a TELA DE TITULO mostra ANTES do loop
+    // cidade<->batalha (nao entra mais direto na cidade). "Sair" na tela de
+    // titulo (ou fechar a janela durante ela) encerra o programa NA HORA, SEM
+    // entrar no loop de jogo - nada foi jogado ainda, nenhum autosave faz
+    // sentido nesse caso (ver o comentario de show_title_screen()).
+    if (show_title_screen()) {
         return;
     }
 
@@ -537,6 +672,14 @@ void Maestro::run() {
         was_overlapping_npc_bertoldo_ =
             aabb_overlaps(city_->player_aabb(), npc_bertoldo_trigger_aabb_);
     }
+
+    // SAVE-LOAD-UI etapa 5 (AUTOSAVE), gatilho (c) "ao sair pra tela de titulo /
+    // fechar o jogo": chegar AQUI so acontece depois que show_title_screen() ja
+    // devolveu false acima (o jogador de fato ENTROU a jogar) - cobre TODAS as
+    // formas de encerrar (Sair no menu de pausa, fechar a janela na cidade/
+    // batalha/dialogo, etc.), unificadas num UNICO ponto (nao precisa duplicar
+    // em cada `running = false` acima).
+    maybe_autosave("saindo_do_jogo");
 }
 
 bool Maestro::run_city_fade(gus::core::anim::FadeDirection direction,
@@ -569,6 +712,13 @@ bool Maestro::to_battle(EncounterId id) {
 
     std::cout << "Maestro: [costura] esbarrou no inimigo -> ENTRANDO na batalha "
                  "(fade preto + crossfade de musica, M7-COSTURA Inc 2)...\n";
+
+    // SAVE-LOAD-UI etapa 5 (AUTOSAVE), gatilho (b) "ao trocar de area
+    // entrar/sair": nesta fatia a UNICA fronteira de area e cidade<->batalha -
+    // aqui e o lado "sair da cidade". Disparado ANTES de qualquer fade/troca de
+    // renderer (city_ ainda 100% intacto) pra capturar o estado mais recente
+    // possivel mesmo se o jogador fechar a janela no meio da transicao abaixo.
+    maybe_autosave("entrando_em_batalha");
 
     // FADE-OUT sobre a CIDADE (tela escurece, ~kTransitionFadeSeconds) - M7-COSTURA
     // Inc 2 (ADR-012 decisao 5). Se o jogador fechar a janela DURANTE o fade, propaga
@@ -620,6 +770,19 @@ bool Maestro::to_battle(EncounterId id) {
     }
 
     on_battle_result(outcome);
+
+    // SAVE-LOAD-UI etapa 5 (AUTOSAVE), gatilho (a) "apos cada batalha VENCIDA":
+    // AJUSTE do lider (pos-entrega, via AskUserQuestion) - o predicado PURO/
+    // testavel should_autosave_after_battle (maestro_logic.hpp) decide: SO
+    // Victory autosava no retorno; Defeat/Fled/Ongoing (janela fechada) NAO. O
+    // gatilho de ENTRADA (entrando_em_batalha, acima) continua incondicional -
+    // ja cobre o "trocar de area" (b) pro lado cidade->batalha independente do
+    // desfecho, entao NAO ha lacuna de cobertura em (b) ao restringir este aqui
+    // a Victory. Ver o comentario do predicado pro racional completo (sistema
+    // de morte canonico ainda nao implementado).
+    if (should_autosave_after_battle(outcome)) {
+        maybe_autosave("retornando_da_batalha_vitoria");
+    }
 
     if (!city_->reacquire_renderer()) {
         SDL_Log(

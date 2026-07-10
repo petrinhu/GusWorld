@@ -144,6 +144,24 @@
 
 ---
 
+## §4b. Title screen (SAVE-LOAD-UI step 4)
+
+## TITLE_LOGO_PREFIX
+
+## TITLE_LOGO_SUFFIX
+
+## TITLE_SUBTITLE
+
+## TITLE_FOOTER_HINT
+
+## TITLE_NEW_GAME_CONFIRM
+
+## TITLE_NEW_GAME_CONFIRM_YES
+
+## TITLE_NEW_GAME_CONFIRM_NO
+
+---
+
 ## §5. HUD + combat (placeholders)
 
 ## HUD_HP_LABEL
