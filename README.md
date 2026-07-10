@@ -1,101 +1,205 @@
 # GusWorld
 
-> RPG turn-based 2D estilizado. Prodígio-hacker de 11 anos contra megacorporação ciber-gótica.
+> A stylized turn-based 2D RPG: an 11-year-old hacker prodigy against a cyber-gothic megacorporation.
 
-**Status:** Pivot de stack em curso (Godot/C# para C++20 com engine própria). A camada de plataforma é **SDL3** desde o re-pivot Qt6 para SDL3 ([ADR-008](docs/tech/adr/ADR-008-repivot-qt-to-sdl3.md), 2026-06-22); o Qt6 anterior foi aposentado. Migração faseada anti big-bang, Godot vivo até o decommission no marco M8. Decisão âncora da engine em [`docs/tech/pivot/engine-design.md`](docs/tech/pivot/engine-design.md), ratificada pelo líder em 2026-06-21.
-
-**Solo indie, freeware.** Petrinhu, 2026. Início do projeto em **2026-05-15**. Linux no ship de v1.0.0 (Windows preparado, suporte pós-v1). Single-player puro. C++20 + SDL3.
+**Solo indie, freeware.** Built by petrinhu, started 2026-05-15. C++20 + SDL3, with a small engine written from scratch (`GusEngine/`). Currently a **vertical slice in active development**: see [Status](#status) below.
 
 ---
 
-## Pilares criativos (imutáveis)
+## Table of contents
 
-1. **Magia = software.** Feitiços são scripts rúnicos compilados (Glyph/Token/Conjuro/Codex).
-2. **Natureza é matemática rígida**, não caos (sequências numéricas recorrentes, fractais, ruído coerente).
-3. **Hardware loop:** Óculos táticos + Matriz Ortodôntica + Tavus-Drive.
-4. **Idade canônica 11 anos.** Prodígio analítico, não power-fantasy adulta.
-5. **Setting bipartido:** megacidade ciber-gótica versus Selve Sombria.
-
-Detalhes em [`docs/design/pillars.md`](docs/design/pillars.md).
-
----
-
-## Estrutura
-
-```
-gusworld/
-├── CLAUDE.md            (estado atual + decisões fechadas)
-├── CONTRACT.md          (disciplinas técnicas canon)
-├── TODO.md              (backlog canônico via skill tab_pendencias)
-├── TESTES.md            (T-sections + A-sections)
-├── CHANGELOG.md         (Keep a Changelog)
-├── CHARS.md             (inventário canônico de personagens nomeados)
-├── PLACES.md            (inventário canônico de lugares nomeados)
-├── sinopse.md           (base canônica imutável)
-├── docs/
-│   ├── design/          (pillars, GDD, mecânicas)
-│   ├── narrative/       (lore-bible, characters, factions, timeline + deep-lore)
-│   ├── art/             (style guide)
-│   └── tech/            (architecture, ADRs, pivot/engine-design.md)
-├── GusEngine/           (engine própria C++20, em 4 camadas)
-│   ├── core/            (POCO C++ puro: time, rng, ecs_lite, resource, events)
-│   ├── domain/          (POCO C++ puro: save, i18n, progression, templates, combat)
-│   ├── platform/        (única fronteira SDL3: window, render2d, input, audio, fs)
-│   ├── app/             (GusWorld-specific: screens, main)
-│   ├── tests/           (Catch2)
-│   ├── CMakeLists.txt
-│   └── CMakePresets.json
-├── game/                (projeto Godot legado, referência de leitura até M8)
-├── engine/              (engine C# legada, referência de leitura até M8)
-├── assets/              (sources arte/som: Blender, Krita, Aseprite, audio raw)
-└── build/               (outputs export: Linux no ship v1.0.0; Windows pós-v1)
-```
-
-A engine antiga (`game/` Godot + `engine/` C#) permanece no repo como referência de leitura durante o porte e é apagada no marco M8 (decommission).
+- [About](#about)
+- [Status](#status)
+- [Creative pillars](#creative-pillars)
+- [Tech stack](#tech-stack)
+- [Building and running](#building-and-running)
+- [Roadmap](#roadmap)
+- [Documentation](#documentation)
+- [Contributing](#contributing)
+- [Support the project](#support-the-project)
+- [License](#license)
+- [Credits and acknowledgments](#credits-and-acknowledgments)
 
 ---
 
-## Documentos canônicos
+## About
 
-| Doc | Autoridade |
-|---|---|
-| [CLAUDE.md](CLAUDE.md) | Estado atual + decisões fechadas |
-| [CONTRACT.md](CONTRACT.md) | Disciplinas técnicas (RFC 2119, Conventional Commits, branching, DoD, perf budget, a11y) |
-| [TODO.md](TODO.md) | Backlog canônico + board do pivot M0-M9 (skill `tab_pendencias`) |
-| [TESTES.md](TESTES.md) | Suíte de testes + auditorias (T+A sections) |
-| [CHANGELOG.md](CHANGELOG.md) | Histórico de releases (Keep a Changelog) |
-| [CHARS.md](CHARS.md) | Inventário canônico de personagens nomeados |
-| [PLACES.md](PLACES.md) | Inventário canônico de lugares nomeados |
-| [sinopse.md](sinopse.md) | Worldbuilding + protagonista (imutável) |
-| [docs/design/pillars.md](docs/design/pillars.md) | 5 pillars canon |
-| [docs/design/gdd.md](docs/design/gdd.md) | Game Design Document 1-page |
-| [docs/narrative/bibliografia-rag.md](docs/narrative/bibliografia-rag.md) | Bibliografia de inspiração da lore: ~306 obras no RAG principal + corpus élfico no RAG da conlang |
-| [docs/tech/pivot/engine-design.md](docs/tech/pivot/engine-design.md) | Design da engine do pivot C++20 (4 camadas; plataforma superada pelo [ADR-008](docs/tech/adr/ADR-008-repivot-qt-to-sdl3.md)) |
-| [docs/tech/adr/](docs/tech/adr/) | Architecture Decision Records |
+GusWorld is a single-player, turn-based RPG with puzzle and adventure elements. You play as Gus, an 11-year-old analytical prodigy, navigating a world split between a cyber-gothic megacity and a wild, mathematically precise forest called the Selve Sombria. Combat, exploration and puzzles all lean on the same idea: the world is a system to be understood and reasoned about, not brute-forced.
 
----
+It's a one-person project: design, code, art direction and writing are all done by a single solo developer, with an AI-assisted production pipeline for art and a lot of help from the open-source ecosystem (see [Credits and acknowledgments](#credits-and-acknowledgments)).
 
-## Por onde o projeto anda
+## Status
 
-- [ROADMAP.md](ROADMAP.md): o caminho do projeto (Fase 1 lore concluída, Fase 2 vertical slice em andamento com marcos M0-M9, re-pivot SDL em 3 fases, trilha de arte, pós-VS).
-- [CHANGELOG.md](CHANGELOG.md): histórico de mudanças, com destaque para os pivôs de stack (Godot/C# para C++/Qt6 e o re-pivot Qt6 para SDL3).
+GusWorld is **in active development**, currently building its first **vertical slice**: one small city area, one turn-based combat encounter, and one puzzle, all playable end-to-end on the new C++/SDL3 engine. The project has already gone through two stack pivots (from Godot/C# to Qt6, then from Qt6 to SDL3) as the team (of one) converged on the stack that best serves the performance target: smooth play on modest, integrated-GPU hardware.
 
----
+The full milestone board (M0 through M9) lives in [ROADMAP.md](ROADMAP.md).
 
-## Build / Run
+## Creative pillars
 
-### Pré-requisitos
+Five pillars keep the design honest:
 
-- C++20 (GCC, Clang ou MSVC/MinGW)
-- SDL3 + glintfx (via FetchContent; o CMake baixa e fixa a versão, build reprodutível). O glintfx (embed mode, pin atual em `GusEngine/CMakeLists.txt`, `GLINTFX_BACKEND_GLFW=OFF`) traz o RmlUi 6.3 + backend GL3 embrulhados; ver [ADR-010](docs/tech/adr/ADR-010-adopt-glintfx-embed-mode.md)
-- CMake + Ninja
-- Linux (ship de v1.0.0). Windows preparado (preset `windows-release`), mas o build nunca foi validado: suporte fica pós-v1
-- Git
+1. **Magic is software.** Spells are compiled runic scripts; in-world programming languages follow real low-level programming analogies.
+2. **Nature is rigid math, not chaos.** Flora and fauna in the Selve Sombria follow sequences, fractals and recursive functions.
+3. **Abilities are tied to hardware.** Tactical glasses, an orthodontic antenna, and a wrist-mounted card executor form a closed triangle of gear-driven abilities.
+4. **Age 11 is canon.** Gus is an analytical prodigy, not an adult power fantasy: he solves problems with logic (chess, TCGs, optimization), not brute force.
+5. **A world split in two.** A cyber-gothic megacity versus the Selve Sombria, kept in deliberate visual and tonal contrast.
 
-### Desenvolvimento local
+Full design detail lives in [`docs/design/pillars.md`](docs/design/pillars.md).
+
+## Tech stack
+
+GusWorld is built on a small, deliberately chosen set of open-source technologies:
+
+- **[SDL3](https://www.libsdl.org/)**: window, main loop, input, gamepad and audio device, at the single platform boundary of the engine.
+- **[glintfx](https://codeberg.org/petrinhu/glintfx)** ([GitHub](https://github.com/petrinhu/glintfx)): the UI/HUD engine, used in embed mode. It wraps [RmlUi](https://github.com/mikke89/RmlUi) 6.3 and a GL3 backend behind a clean, compose-only facade, so HTML/CSS-like menus and HUD (gradients, glow, data binding) render straight over the game's own OpenGL context.
+- **[RmlUi](https://github.com/mikke89/RmlUi)**: the retained-mode UI library underneath glintfx, by [Michael R. P. Ragazzon (mikke89)](https://github.com/mikke89). See [Credits and acknowledgments](#credits-and-acknowledgments) for why we're so happy to be building on it.
+- **[miniaudio](https://miniaud.io/)**: single-header audio engine (music, SFX, fades), vendored in `GusEngine/third_party/`.
+- **[Monocypher](https://monocypher.org/)**: modern, auditable cryptography (AEAD) protecting save files.
+- **[Catch2](https://github.com/catchorg/Catch2)**: the test framework behind the engine's automated test suite.
+- A curated **toolkit of modern, header-only C++ libraries** ([glm](https://github.com/g-truc/glm), [EnTT](https://github.com/skypjack/entt), [Box2D](https://github.com/erincatto/box2d), [stb](https://github.com/nothings/stb), [fmt](https://github.com/fmtlib/fmt), and more) vendored in `GusEngine/third_party/`.
+
+The full story (what each dependency does, its license, and a proper thank-you) is in [`ACKNOWLEDGMENTS.md`](ACKNOWLEDGMENTS.md) and on the wiki's [Tech Stack & Credits](https://codeberg.org/petrinhu/gusworld/wiki/Tech-Stack-and-Credits) page.
+
+The engine (`GusEngine/`) is organized in four layers: `core/` and `domain/` are plain, framework-free C++ (POCO); `platform/` is the only layer that touches SDL3; `app/` is the GusWorld-specific game and screens layer.
+
+## Building and running
+
+Prerequisites: a C++20 compiler (GCC, Clang or MSVC/MinGW), CMake, Ninja, and Git. SDL3, RmlUi, glintfx and Catch2 are fetched and pinned automatically by CMake (`FetchContent`), no manual install needed for those.
 
 ```bash
-# Entrar na engine (onde vivem o CMakeLists e o CMakePresets)
+cd GusEngine
+
+# Configure (first run; generates build/linux-release/)
+cmake --preset linux-release
+
+# Build
+cmake --build --preset linux-release
+
+# Run the game
+./build/linux-release/app/gusworld_app
+
+# Run the test suite
+ctest --preset linux-release
+```
+
+Linux is the target platform for the v1.0.0 release; a Windows preset exists (`windows-release`) and is planned for a post-v1.0.0 release. Full details and troubleshooting on the wiki's [Building and Running](https://codeberg.org/petrinhu/gusworld/wiki/Building-and-Running) page.
+
+## Roadmap
+
+The project moves through a milestone board (M0 to M9) covering the engine port, gameplay loop, combat, audio and final polish, on the way to the vertical slice and beyond. See [ROADMAP.md](ROADMAP.md) for the full board and [CHANGELOG.md](CHANGELOG.md) for what has already shipped.
+
+## Documentation
+
+- [ROADMAP.md](ROADMAP.md): where the project stands and where it's going.
+- [CHANGELOG.md](CHANGELOG.md): release history (Keep a Changelog format).
+- [`docs/design/pillars.md`](docs/design/pillars.md): the five creative pillars.
+- [`docs/tech/adr/`](docs/tech/adr/): architecture decision records behind the engine's design choices.
+- Wiki: [Home](https://codeberg.org/petrinhu/gusworld/wiki/Home) · [Building and Running](https://codeberg.org/petrinhu/gusworld/wiki/Building-and-Running) · [Tech Stack & Credits](https://codeberg.org/petrinhu/gusworld/wiki/Tech-Stack-and-Credits) · [Contributing](https://codeberg.org/petrinhu/gusworld/wiki/Contributing).
+
+## Contributing
+
+GusWorld is a **solo project** and isn't accepting external pull requests during this development phase. Bug reports and feedback are always welcome via [Codeberg issues](https://codeberg.org/petrinhu/gusworld/issues). See the wiki's [Contributing](https://codeberg.org/petrinhu/gusworld/wiki/Contributing) page for details.
+
+## Support the project
+
+GusWorld is **freeware** (free, forever). If you enjoy it and want to help keep development going (including the AI tooling that helps build the game):
+
+[![Buy me a coffee and some AI tokens](resources/buymecoffe.png)](https://www.paypal.com/donate/?business=9XNZQ4RND67KL&no_recurring=0&currency_code=BRL)
+
+**Buy me a coffee and some AI tokens.** Via [PayPal](https://www.paypal.com/donate/?business=9XNZQ4RND67KL&no_recurring=0&currency_code=BRL) *(entirely optional, never required)*.
+
+Or scan the QR code with your phone's camera:
+
+![PayPal donation QR code](resources/QRCode.png)
+
+## License
+
+**Source code:** [GNU General Public License v3.0 (GPLv3)](LICENSE), strong copyleft. SDL3 (zlib) is permissive; glintfx (MPL-2.0, weak copyleft per-file) wraps RmlUi 6.3 (MIT); all of it is compatible with GPLv3, including static linking.
+
+**Lore and art (assets):** [CC-BY-SA-4.0](ASSETS-LICENSE.md), except the Vol. 1 / Vol. 2 books (all rights reserved, a separate work). Full third-party attributions in [THIRD-PARTY-LICENSES.md](THIRD-PARTY-LICENSES.md).
+
+## Credits and acknowledgments
+
+- **Creative direction, code, art and writing:** petrinhu (2026).
+- **Engine foundation:** SDL3 (zlib) + glintfx (MPL-2.0, UI/HUD engine wrapping RmlUi 6.3 MIT + GL3 backend) + miniaudio (Public Domain / MIT-0) at the platform layer.
+- **Vendored C++ libraries:** header-only libraries under permissive licenses, listed with full attribution in [THIRD-PARTY-LICENSES.md](THIRD-PARTY-LICENSES.md).
+- **2D image generation:** [Gemini (nano banana)](https://gemini.google.com/) and [Grok (xAI)](https://grok.com/), from prompts derived from the game's lore.
+- **3D generation (production tool only):** [Tripo3D](https://www.tripo3d.ai/), image-to-3D for the bake-to-sprite pipeline. The game itself is 2D at runtime.
+- **Pixel art / sprites:** [PixelLab](https://www.pixellab.ai/), AI-assisted pixel art generation (multi-direction characters + animation from a single image).
+- **AI pair programming:** [Claude Code (Anthropic)](https://claude.com/claude-code), used throughout development.
+- **Design inspirations** (homage, nothing copied): Chrono Trigger, The Legend of Zelda: A Link to the Past, Stardew Valley, Sea of Stars, Sable, and Death's Door.
+
+The full acknowledgments (including a proper thank-you to the RmlUi and glintfx projects that make the game's UI possible) live in [`ACKNOWLEDGMENTS.md`](ACKNOWLEDGMENTS.md).
+
+---
+
+## 🇧🇷 Português
+
+### GusWorld
+
+> Um RPG 2D estilizado com combate por turnos: um prodígio-hacker de 11 anos contra uma megacorporação ciber-gótica.
+
+**Solo indie, freeware.** Feito por petrinhu, iniciado em 2026-05-15. C++20 + SDL3, com uma engine própria escrita do zero (`GusEngine/`). Atualmente um **vertical slice em desenvolvimento ativo**: veja [Status](#status-1) abaixo.
+
+### Sumário
+
+- [Sobre](#sobre)
+- [Status](#status-1)
+- [Pilares criativos](#pilares-criativos)
+- [Stack técnica](#stack-técnica)
+- [Build e execução](#build-e-execução)
+- [Roadmap](#roadmap-1)
+- [Documentação](#documentação)
+- [Contribuindo](#contribuindo)
+- [Apoie o projeto](#apoie-o-projeto)
+- [Licença](#licença)
+- [Créditos e agradecimentos](#créditos-e-agradecimentos)
+
+### Sobre
+
+GusWorld é um RPG single-player com combate por turnos e elementos de puzzle e aventura. Você joga como Gus, um prodígio analítico de 11 anos, navegando por um mundo dividido entre uma megacidade ciber-gótica e uma floresta selvagem e matematicamente precisa chamada Selve Sombria. Combate, exploração e puzzles seguem a mesma ideia: o mundo é um sistema para entender e raciocinar, não para vencer na força bruta.
+
+É um projeto de uma pessoa só: design, código, direção de arte e roteiro são feitos por um único desenvolvedor solo, com um pipeline de produção de arte assistido por IA e muita ajuda do ecossistema open-source (veja [Créditos e agradecimentos](#créditos-e-agradecimentos)).
+
+### Status
+
+GusWorld está **em desenvolvimento ativo**, construindo agora seu primeiro **vertical slice**: uma pequena área de cidade, um encontro de combate por turnos e um puzzle, tudo jogável de ponta a ponta na nova engine C++/SDL3. O projeto já passou por dois pivôs de stack (de Godot/C# para Qt6, depois de Qt6 para SDL3) enquanto o time (de uma pessoa) convergia para a stack que melhor serve a meta de performance: rodar bem em hardware modesto, com GPU integrada.
+
+O board completo de marcos (M0 a M9) vive em [ROADMAP.md](ROADMAP.md).
+
+### Pilares criativos
+
+Cinco pilares mantêm o design coerente:
+
+1. **Magia é software.** Feitiços são scripts rúnicos compilados; as linguagens de programação in-world seguem analogias reais de programação de baixo nível.
+2. **Natureza é matemática rígida, não caos.** Flora e fauna da Selve Sombria seguem sequências, fractais e funções recursivas.
+3. **Habilidades acopladas a hardware.** Óculos táticos, uma antena ortodôntica e um executor de cartões no pulso formam um triângulo fechado de habilidades ligadas ao equipamento.
+4. **Idade 11 anos é canônica.** Gus é um prodígio analítico, não uma fantasia de poder adulta: ele resolve problemas com lógica (xadrez, TCGs, otimização), não com força bruta.
+5. **Um mundo dividido em dois.** Megacidade ciber-gótica versus Selve Sombria, mantidas em contraste visual e tonal deliberado.
+
+Detalhes completos de design em [`docs/design/pillars.md`](docs/design/pillars.md).
+
+### Stack técnica
+
+GusWorld é construído sobre um conjunto pequeno e deliberado de tecnologias open-source:
+
+- **[SDL3](https://www.libsdl.org/)**: janela, loop principal, input, gamepad e dispositivo de áudio, na única fronteira de plataforma da engine.
+- **[glintfx](https://codeberg.org/petrinhu/glintfx)** ([GitHub](https://github.com/petrinhu/glintfx)): o motor de UI/HUD, usado em embed mode. Ele embrulha o [RmlUi](https://github.com/mikke89/RmlUi) 6.3 e um backend GL3 atrás de uma fachada limpa e compose-only, permitindo que menus e HUD HTML/CSS-like (degradês, glow, data binding) renderizem direto sobre o mesmo contexto OpenGL do jogo.
+- **[RmlUi](https://github.com/mikke89/RmlUi)**: a biblioteca de UI retida por trás do glintfx, de [Michael R. P. Ragazzon (mikke89)](https://github.com/mikke89). Veja [Créditos e agradecimentos](#créditos-e-agradecimentos) pra entender por que estamos tão felizes de construir em cima dela.
+- **[miniaudio](https://miniaud.io/)**: motor de áudio single-header (música, SFX, fades), vendorizado em `GusEngine/third_party/`.
+- **[Monocypher](https://monocypher.org/)**: criptografia moderna e auditável (AEAD) protegendo os arquivos de save.
+- **[Catch2](https://github.com/catchorg/Catch2)**: o framework de testes por trás da suíte de testes automatizados da engine.
+- Um **kit selecionado de bibliotecas C++ modernas, header-only** ([glm](https://github.com/g-truc/glm), [EnTT](https://github.com/skypjack/entt), [Box2D](https://github.com/erincatto/box2d), [stb](https://github.com/nothings/stb), [fmt](https://github.com/fmtlib/fmt), entre outras) vendorizadas em `GusEngine/third_party/`.
+
+A história completa (o que cada dependência faz, sua licença, e um agradecimento como manda o figurino) está em [`ACKNOWLEDGMENTS.md`](ACKNOWLEDGMENTS.md) e na página [Tech Stack & Credits](https://codeberg.org/petrinhu/gusworld/wiki/Tech-Stack-and-Credits) da wiki.
+
+A engine (`GusEngine/`) é organizada em quatro camadas: `core/` e `domain/` são C++ puro, sem framework (POCO); `platform/` é a única camada que toca SDL3; `app/` é a camada de jogo e telas específica do GusWorld.
+
+### Build e execução
+
+Pré-requisitos: um compilador C++20 (GCC, Clang ou MSVC/MinGW), CMake, Ninja e Git. SDL3, RmlUi, glintfx e Catch2 são baixados e fixados automaticamente pelo CMake (`FetchContent`), sem instalação manual necessária pra eles.
+
+```bash
 cd GusEngine
 
 # Configurar (primeira vez; gera build/linux-release/)
@@ -107,124 +211,59 @@ cmake --build --preset linux-release
 # Rodar o jogo
 ./build/linux-release/app/gusworld_app
 
-# Rodar a suíte de testes (Catch2)
+# Rodar a suíte de testes
 ctest --preset linux-release
 ```
 
-O preset `windows-release` existe (esboço, pin CMake compatível), mas o build Windows nunca foi validado e fica fora do escopo de ship da v1.0.0 (Linux-only em G1; Windows pós-v1). A lógica de `core/` e `domain/` roda headless (sem abrir janela). Detalhes em [`docs/tech/pivot/engine-design.md`](docs/tech/pivot/engine-design.md).
+Linux é a plataforma alvo do lançamento v1.0.0; existe um preset Windows (`windows-release`) planejado para um lançamento pós-v1.0.0. Detalhes completos e resolução de problemas na página [Building and Running](https://codeberg.org/petrinhu/gusworld/wiki/Building-and-Running) da wiki.
 
----
+### Roadmap
 
-## Tech stack
+O projeto avança por um board de marcos (M0 a M9) cobrindo o porte da engine, o loop de jogo, combate, áudio e polish final, a caminho do vertical slice e além. Veja [ROADMAP.md](ROADMAP.md) para o board completo e [CHANGELOG.md](CHANGELOG.md) para o que já foi lançado.
 
-- **Linguagem:** C++20 (RAII, value semantics, `std::`). Engine própria, sem runtime de terceiros.
-- **Framework:** SDL3 (janela, loop próprio, input, gamepad nativo, eventos) na fronteira `platform/` + `app/`; `core/` + `domain/` são POCO C++ puro (zero framework, zero I/O real, auditado por grep no CI). UI/HUD do jogador via **glintfx** (embed mode, `glintfx::UiLayer`), que embrulha RmlUi 6.3 + backend GL3 (HTML/CSS-like, retido, data binding MVC) atrás de uma fachada limpa; o backend RmlUi vendorizado à mão foi aposentado ([ADR-010](docs/tech/adr/ADR-010-adopt-glintfx-embed-mode.md)). Áudio via **miniaudio** (vendorizado em `third_party/`).
-- **Renderer:** `Render2dGl3` (arena 2D sobre OpenGL GL3) para o mundo; o `glintfx::UiLayer` compõe a UI/HUD por cima do mesmo contexto GL (compose-only, sem clear/swap, salva e restaura o estado GL). Ordem de composição: arena → UI → swap. Tudo atrás de uma interface `IRenderer` (trocar o backend = um arquivo). 2D-only.
-- **Câmera:** ortográfica fixa top-down (clamp ao mapa). Zoom e follow ficam para refinamento futuro (RF-3).
-- **Visual:** 2D estilizado, super-deformed (SD) 1:1:1. Pixel art à mão (estilo Zelda A Link to the Past, SNES) ou modelagem 3D no Blender baked para sprite (estilo Stardew Valley, Sea of Stars, Death's Door). O 3D é só ferramenta de produção, nunca runtime.
-- **Save format:** binário próprio com criptografia própria (SHA-256 / HMAC, zero dependência externa, validada contra vetores FIPS 180-4 e RFC 4231), migrators forward-only, schema v4, anti-tamper.
-- **RNG:** PRNG determinístico seedável e injetável (para save e replay).
-- **Localização:** loader próprio + i18n próprio. Dev em pt-br. Tradução en-intl pós-release v1.0.0.
-- **Build/Test:** CMake + CMakePresets. SDL3 e **glintfx** (pin atual em `GusEngine/CMakeLists.txt`, `GLINTFX_BACKEND_GLFW=OFF`, embed-only) entram via FetchContent (pin de versão); o RmlUi 6.3 chega embrulhado pelo glintfx; testes via `ctest` (Catch2). A camada de plataforma roda smoke headless com `SDL_VIDEODRIVER=dummy`.
-- **CI:** Forgejo Actions. Job Linux ativo; job Windows fica esboçado e adiado até haver runner Windows disponível (ver `.forgejo/workflows/ci.yml`).
-- **Plataformas:** Linux (AppImage + tar.gz) no ship de v1.0.0. Windows preparado (preset `windows-release`, sem signing), mas o build nunca foi validado: fica pós-v1.
-- **Target hardware:** floor iGPU (Intel HD / AMD integrada, sem GPU dedicada); ceiling RTX 3050 Laptop 4GB.
+### Documentação
 
-Motivação do pivot Godot/C# para C++20: máxima performance em máquinas modestas. C++ é AOT por natureza, o que elimina toda a complexidade de AOT do .NET da fase anterior (ADR-002).
+- [ROADMAP.md](ROADMAP.md): onde o projeto está e para onde vai.
+- [CHANGELOG.md](CHANGELOG.md): histórico de lançamentos (formato Keep a Changelog).
+- [`docs/design/pillars.md`](docs/design/pillars.md): os cinco pilares criativos.
+- [`docs/tech/adr/`](docs/tech/adr/): registros de decisão de arquitetura por trás das escolhas de design da engine.
+- Wiki: [Home](https://codeberg.org/petrinhu/gusworld/wiki/Home) · [Building and Running](https://codeberg.org/petrinhu/gusworld/wiki/Building-and-Running) · [Tech Stack & Credits](https://codeberg.org/petrinhu/gusworld/wiki/Tech-Stack-and-Credits) · [Contributing](https://codeberg.org/petrinhu/gusworld/wiki/Contributing).
 
-Motivação do re-pivot Qt6 para SDL3 ([ADR-008](docs/tech/adr/ADR-008-repivot-qt-to-sdl3.md)): gamepad nativo de classe AAA (o Qt6 removeu o módulo QtGamepad), binário e deploy ~10x menores (licença zlib), fim do risco do Qt RHI (API semi-privada, agora substituída pelo `SDL_Renderer` público e estável) e portabilidade para mobile e console (caminho fechado no Qt). A lógica pura (`core`/`domain`, ~590 testes auditados) não muda no re-pivot: só a fronteira `platform/` + a casca `app/` foram reescritas.
+### Contribuindo
 
----
+GusWorld é um **projeto solo** e não aceita pull requests externos nesta fase de desenvolvimento. Relatos de bug e feedback são sempre bem-vindos via [issues do Codeberg](https://codeberg.org/petrinhu/gusworld/issues). Veja a página [Contributing](https://codeberg.org/petrinhu/gusworld/wiki/Contributing) da wiki para detalhes.
 
-## Pipeline de arte
+### Apoie o projeto
 
-GusWorld é feito por uma pessoa só, então a produção de assets se apoia num pipeline assistido por IA, do lore ao sprite final. O Claude transforma o lore canônico (lore-bible, character specs) em prompts visuais detalhados e fiéis a cada personagem. Esses prompts alimentam a geração de imagem 2D no [nano banana (Google Gemini)](https://gemini.google.com/) e no [Grok (xAI)](https://grok.com/), que produzem as imagens-base dos personagens. Quando um asset pede volume 3D, o [Tripo3D](https://www.tripo3d.ai/) faz image-to-3D, convertendo a imagem-base num modelo 3D que alimenta o pipeline de bake. Vale o lembrete: **o jogo é 2D** (sprites desenhados pelo `SDL_Renderer` em runtime); o 3D existe apenas como ferramenta de produção (modelar ou gerar em 3D, renderizar e converter em sprite 2D), nunca em runtime. Por fim, o [PixelLab](https://www.pixellab.ai/) gera e anima os sprites multi-direção (personagem em várias direções + ciclos de animação a partir de uma imagem). Um agradecimento às camadas gratuitas dessas ferramentas, que ajudam muito um projeto solo e freeware a produzir arte.
-
----
-
-## Roadmap (pivot C++20, marcos M0-M9)
-
-Migração faseada anti big-bang. Cada marco fecha pelo seu critério de saída testável; o Godot legado só é apagado no M8, depois que a engine nova provar paridade jogável (M7). Board completo e critérios de saída em [TODO.md](TODO.md); design dos marcos em [`docs/tech/pivot/engine-design.md`](docs/tech/pivot/engine-design.md).
-
-| Marco | Status | Descrição |
-|---|---|---|
-| M0 (Andaime) | 🔍 Em validação | Repo C++ + CMake + presets + framework de teste. Build Linux verde + testes ctest passando |
-| M1 (Janela + loop + sprite) | 🔍 Em validação | Janela SDL3 + render2d (`SDL_Renderer`) + loop de tempo fixo + ponte de input com gamepad. Boneco-placeholder anda no mapa, câmera ortográfica presa ao mapa. Fronteira já reescrita em SDL3 (Fase 1 do re-pivot, [ADR-008](docs/tech/adr/ADR-008-repivot-qt-to-sdl3.md)) |
-| M3 (Lógica pura portada) | ✅ Auditado | Save + i18n + progression + templates portados para POCO C++ puro. 174 testes verdes, crypto bate vetores FIPS/RFC, oráculo de save semântico |
-| M2 (Input) | 🔍 Lógica feita | Eventos da plataforma para ações lógicas + porta de input_remap + persistência de controles + save v4. Falta o backend de evento (SDL) + I/O em disco |
-| M4 (Cena top-down) | 🔍 Lógica feita | Tilemap + colisão de grid + clamp de câmera (lógica pura). Falta a parte visual (tilemap render no `SDL_Renderer`, Fase 2 do re-pivot) |
-| M5 (Combate portado + tela de batalha) | 🔄 Motor auditado + cockpit entregue | Motor `turn_combat` portado e endurecido (fórmula de dano §11 evoluída, auditada). BattleScreen cockpit "Tático" entregue via glintfx (paridade visual + dados vivos: HP/verbo/alvo/log/retrato do ator, [ADR-010](docs/tech/adr/ADR-010-adopt-glintfx-embed-mode.md)) |
-| M6 (Áudio) | ⏳ Pendente | platform/audio sobre miniaudio + música + SFX + fade entre telas |
-| M7 (Paridade jogável) | ⏳ Pendente | Loop completo (andar, NPC, combate, save, carregar) 100% na engine nova, sem Godot |
-| M8 (Decommission) | ⏳ Pendente | Apagar Godot + C# + addons. Repo compila e roda sem nenhum bit do stack antigo |
-| M9 (Higienização) | ⏳ Pendente | Limpar a árvore pós-porte, remover resíduo do stack antigo, normalizar `GusEngine/` |
-
-Meta: vertical slice jogável (1 área cidade + 1 encontro turn-based + 1 puzzle Vetor do Gambito).
-
----
-
-## Contribuição
-
-**Solo indie.** Não aceita PRs externos durante G1.
-
-Bug reports + feedback (pós-release) via issues Codeberg: <https://codeberg.org/petrinhu/gusworld/issues>
-
----
-
-## ☕ Apoie o projeto
-
-GusWorld é **freeware** (de graça, pra sempre). Se curtir e quiser ajudar a tocar o desenvolvimento (inclusive os tokens de IA que ajudam a construir o jogo):
+GusWorld é **freeware** (de graça, pra sempre). Se você curte o projeto e quer ajudar a manter o desenvolvimento (inclusive os tokens de IA que ajudam a construir o jogo):
 
 [![Buy me a coffee and some AI tokens](resources/buymecoffe.png)](https://www.paypal.com/donate/?business=9XNZQ4RND67KL&no_recurring=0&currency_code=BRL)
 
-**Buy me a coffee and some AI tokens.** Via [PayPal](https://www.paypal.com/donate/?business=9XNZQ4RND67KL&no_recurring=0&currency_code=BRL) _(totalmente opcional, nunca obrigatório)._
+**Buy me a coffee and some AI tokens.** Via [PayPal](https://www.paypal.com/donate/?business=9XNZQ4RND67KL&no_recurring=0&currency_code=BRL) *(totalmente opcional, nunca obrigatório)*.
 
 Ou aponte a câmera do celular no QR Code:
 
 ![QR Code de doação PayPal](resources/QRCode.png)
 
+### Licença
+
+**Código-fonte:** [GNU General Public License v3.0 (GPLv3)](LICENSE), copyleft forte. SDL3 (zlib) é permissiva; o glintfx (MPL-2.0, copyleft fraco por arquivo) embrulha o RmlUi 6.3 (MIT); tudo compatível com GPLv3, inclusive em link estático.
+
+**Lore e arte (assets):** [CC-BY-SA-4.0](ASSETS-LICENSE.md), exceto os livros Vol. 1 / Vol. 2 (direitos reservados, obra à parte). Atribuições completas de terceiros em [THIRD-PARTY-LICENSES.md](THIRD-PARTY-LICENSES.md).
+
+### Créditos e agradecimentos
+
+- **Direção criativa, código, arte e roteiro:** petrinhu (2026).
+- **Base da engine:** SDL3 (zlib) + glintfx (MPL-2.0, motor de UI/HUD que embrulha RmlUi 6.3 MIT + backend GL3) + miniaudio (Domínio Público / MIT-0) na camada de plataforma.
+- **Bibliotecas C++ vendorizadas:** bibliotecas header-only sob licenças permissivas, listadas com atribuição completa em [THIRD-PARTY-LICENSES.md](THIRD-PARTY-LICENSES.md).
+- **Geração de imagem 2D:** [Gemini (nano banana)](https://gemini.google.com/) e [Grok (xAI)](https://grok.com/), a partir de prompts derivados da lore do jogo.
+- **Geração 3D (só ferramenta de produção):** [Tripo3D](https://www.tripo3d.ai/), image-to-3D para o pipeline de bake-para-sprite. O jogo em si é 2D em runtime.
+- **Pixel art / sprites:** [PixelLab](https://www.pixellab.ai/), geração de pixel art assistida por IA (personagens multi-direção + animação a partir de uma única imagem).
+- **Par de programação IA:** [Claude Code (Anthropic)](https://claude.com/claude-code), usado ao longo de todo o desenvolvimento.
+- **Inspirações de design** (homenagem, nada copiado): Chrono Trigger, The Legend of Zelda: A Link to the Past, Stardew Valley, Sea of Stars, Sable e Death's Door.
+
+Os agradecimentos completos (incluindo um agradecimento como manda o figurino aos projetos RmlUi e glintfx que tornam a UI do jogo possível) vivem em [`ACKNOWLEDGMENTS.md`](ACKNOWLEDGMENTS.md).
+
 ---
 
-## Licença
-
-**Código-fonte:** [GNU General Public License v3.0 (GPLv3)](LICENSE), copyleft forte. SDL3 (zlib) é permissiva; o glintfx (MPL-2.0, copyleft fraco por arquivo) embrulha o RmlUi 6.3 (MIT) e é compatível com GPLv3 inclusive em static-link. _(migrado de AGPL-3.0 para GPLv3 em 2026-06-21, pivot RF-9.)_
-**Lore e arte (assets):** [CC-BY-SA-4.0](ASSETS-LICENSE.md), exceto os livros Vol1/Vol2 (direitos reservados, obra à parte). Atribuições de terceiros em [THIRD-PARTY-LICENSES.md](THIRD-PARTY-LICENSES.md).
-
----
-
-## Créditos
-
-- **Direção criativa + código + arte + narrativa + tudo:** petrinhu (2026)
-- **Engine base:** SDL3 (zlib) + glintfx (MPL-2.0, motor de UI/HUD via embed mode, que traz o RmlUi 6.3 MIT + backend GL3) + miniaudio (MIT-0/PD) na camada de plataforma. Godot 4 (MIT) permanece como referência de leitura até o decommission no marco M8.
-- **Bibliotecas C++ vendorizadas:** libs header-only de licenças permissivas incorporadas em `GusEngine/third_party/` (filosofia zero-dep); lista e licenças em [THIRD-PARTY-LICENSES.md](THIRD-PARTY-LICENSES.md).
-- **Geração de imagem 2D:** [nano banana (Google Gemini)](https://gemini.google.com/) + [Grok (xAI)](https://grok.com/), a partir de prompts derivados do lore canônico.
-- **Geração 3D (ferramenta de produção):** [Tripo3D](https://www.tripo3d.ai/), image-to-3D para o pipeline de bake 3D-para-sprite. O jogo é 2D em runtime.
-- **Pixel art / sprites:** [PixelLab](https://www.pixellab.ai/), gerador de pixel art por IA (personagem multi-direção + animação a partir de imagem). Agradecimento pela generosa camada gratuita, que ajuda muito um projeto solo e freeware a produzir sprites.
-- **Lore-bible canon (~365k pal):** Era 1 §§1-10 + R2 Facções + R3 Settings + Bloco F/G/H/I
-- **Apoio técnico narrativo:** Squad Claude Code (narrative-writer, narrative-designer, software-architect, etc) sob direção do criador supremo
-
----
-
-## Agradecimentos
-
-Este jogo existe por causa de muita gente. Primeiro, as pessoas:
-
-- **Gus Dragon (meu filho):** inspiração do protagonista, na aparência e nos gostos. Parceiro nas decisões sobre o jogo e meu tester principal.
-- **El Iagows (meu irmão):** inspiração do Yakov. Engenheiro de computação que me deu várias dicas de arquitetura e stack, e me orientou no uso de SDL e de spritesheets para o movimento. Criador de uma das melhores libs de rolagem de dados (800+ downloads): [@iagows/3d-dice-ts no npm](https://www.npmjs.com/package/@iagows/3d-dice-ts) ([código no GitLab](https://gitlab.com/iagows/3d-dice-ts)).
-- **Od Fuinha Minduim, Thiago MadDog e Thiago Arcanjo:** profissionais de primeira classe em TI, que deram inúmeras dicas de testes, arquitetura, QA, segurança, CI e RAG, e me puseram para estudar.
-- **A galera do grupo #metaleiros-PE** (hoje no WhatsApp, uma amizade que vem do mIRC desde ~1997): pela parceria de sempre.
-- **Bruno Vettore:** deu a sugestão de criar uma língua para o jogo, numa conversa sobre Tolkien e repórteres intrometidos e inconvenientes, ao ver meus protótipos. O Sylvarin nasceu daí. Também inspirou o personagem **Brunus "Vetorial" Solveckt**, o boticário-médico itinerante mentor do Gus.
-
-E as ferramentas de IA que ajudaram a construir o GusWorld:
-
-- **[Claude Code (Anthropic)](https://claude.com/claude-code):** par de programação e a constelação de agentes ao longo de todo o desenvolvimento. Cerca de 800 milhões de tokens usados até aqui (estimativa), em torno de 15% do projeto concluído antes do lançamento.
-- **[Gemini (nano banana)](https://gemini.google.com/) e [Grok (xAI)](https://grok.com/):** geração de imagem conceitual 2D.
-- **[Tripo3D](https://www.tripo3d.ai/):** criação de arte conceitual em 3D.
-
-Aos **autores das obras que inspiraram a lore**: de Tolkien aos demais nomes do corpus, cujos livros alimentaram o worldbuilding do GusWorld. A bibliografia completa (cerca de 306 obras no RAG principal, mais o corpus élfico da conlang) está em [docs/narrative/bibliografia-rag.md](docs/narrative/bibliografia-rag.md). O índice de busca semântica reúne **165.432 chunks** (163.443 do corpus principal + 1.989 do élfico), fatiados em ~2000 caracteres com 500 de sobreposição (janela de interposição), via `bge-m3` (1024 dimensões) + LanceDB. Nenhum texto foi copiado: serviram de inspiração e referência.
-
-Por fim, as ferramentas livres e as inspirações que sustentam o projeto:
-
-- **Engine e libs FOSS:** [SDL3](https://www.libsdl.org/), [glintfx](https://codeberg.org/petrinhu/glintfx) (motor de UI/HUD, que embrulha [RmlUi](https://github.com/mikke89/RmlUi)), [miniaudio](https://miniaud.io/), [Catch2](https://github.com/catchorg/Catch2) e as bibliotecas header-only vendorizadas em `GusEngine/third_party/` (lista e licenças em [THIRD-PARTY-LICENSES.md](THIRD-PARTY-LICENSES.md)).
-- **Ferramentas de produção:** [Blender](https://www.blender.org/), [PixelLab](https://www.pixellab.ai/) (sprites) e o stack local de busca da lore ([Ollama](https://ollama.com/) + bge-m3, [LanceDB](https://lancedb.com/), `rag_maker`).
-- **Inspirações de design** (homenagem, nada copiado): Chrono Trigger, The Legend of Zelda: A Link to the Past (SNES), Stardew Valley, Sea of Stars, Sable e Death's Door.
+*Last updated / última atualização: 2026-07-10.*
