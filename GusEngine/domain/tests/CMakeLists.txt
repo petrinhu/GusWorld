@@ -85,6 +85,10 @@ add_executable(gusengine_domain_tests
     dialogue_graph_test.cpp
     dialogue_text_test.cpp
     dialogue_runtime_test.cpp
+    # COMBATE-TEORIA-JOGOS [1]: harness de balanceamento OFFLINE (N batalhas headless
+    # via o motor ja existente + ScriptedBrain; agregacao win-rate/duracao/dominancia).
+    # balance_harness.hpp e header-only (ver target_include_directories abaixo).
+    balance_harness_test.cpp
 )
 
 # Os testes do combate incluem helpers de teste headers-only (fixed_random.hpp).
