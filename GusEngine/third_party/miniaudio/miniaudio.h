@@ -70790,6 +70790,7 @@ static ma_result ma_resource_manager_data_buffer_node_acquire(ma_resource_manage
     ma_bool32 nodeAlreadyExists = MA_FALSE;
     ma_resource_manager_data_buffer_node* pDataBufferNode = NULL;
     ma_resource_manager_inline_notification initNotification;   /* Used when the WAIT_INIT flag is set. */
+    ma_bool32 isDataOwnedByResourceManager = MA_FALSE; /* GUSWORLD PATCH (AUD-MINIAUDIO-UAF): snapshot de pDataBufferNode->isDataOwnedByResourceManager, ver captura abaixo. */
 
     if (ppDataBufferNode != NULL) {
         *ppDataBufferNode = NULL;   /* Safety. */
@@ -70838,6 +70839,20 @@ static ma_result ma_resource_manager_data_buffer_node_acquire(ma_resource_manage
             return result;
         }
     }
+
+    /*
+    GUSWORLD PATCH (AUD-MINIAUDIO-UAF): captura isDataOwnedByResourceManager AGORA, enquanto
+    pDataBufferNode ainda esta garantidamente vivo (nao foi liberado). No ramo de falha la embaixo
+    (label "done", nodeAlreadyExists == MA_FALSE), pDataBufferNode e passado pra ma_free() e o
+    codigo original em seguida DEREFERENCIAVA o ponteiro ja liberado pra reler esse mesmo campo
+    (heap-use-after-free upstream em ma_resource_manager_data_buffer_node_acquire, trilha de falha
+    de load; confirmado ainda presente no miniaudio master em 2026-07-10, mesmo numero de linha,
+    funcao byte-a-byte identica -- nao ha fix upstream pra portar). Aqui pDataBufferNode e sempre
+    nao-nulo e valido (ver ma_resource_manager_data_buffer_node_acquire_critical_section: so
+    retorna MA_SUCCESS/MA_ALREADY_EXISTS com o ponteiro setado). Ver
+    docs/auditoria/AUDIT-M7-COSTURA-2026-07-04/. Reaplicar/dropar este patch em bump da miniaudio.
+    */
+    isDataOwnedByResourceManager = pDataBufferNode->isDataOwnedByResourceManager;
 
     /*
     If we're loading synchronously, we'll need to load everything now. When loading asynchronously,
@@ -70923,7 +70938,10 @@ done:
     The init notification needs to be uninitialized. This will be used if the node does not already
     exist, and we've specified ASYNC | WAIT_INIT.
     */
-    if (nodeAlreadyExists == MA_FALSE && pDataBufferNode->isDataOwnedByResourceManager && (flags & MA_RESOURCE_MANAGER_DATA_SOURCE_FLAG_ASYNC) != 0) {
+    /* GUSWORLD PATCH (AUD-MINIAUDIO-UAF): usa o snapshot capturado acima em vez de reler
+       pDataBufferNode->isDataOwnedByResourceManager, que pode ja ter sido liberado por ma_free()
+       no bloco "done" logo acima quando result != MA_SUCCESS. Ver comentario da captura. */
+    if (nodeAlreadyExists == MA_FALSE && isDataOwnedByResourceManager && (flags & MA_RESOURCE_MANAGER_DATA_SOURCE_FLAG_ASYNC) != 0) {
         if ((flags & MA_RESOURCE_MANAGER_DATA_SOURCE_FLAG_WAIT_INIT) != 0) {
             ma_resource_manager_inline_notification_uninit(&initNotification);
         }
