@@ -123,6 +123,37 @@ NeutralRandom& neutral_random() {
     return nullptr;
 }
 
+// Dano do canal COMUM (secao 11): rolled = base * (1 + (v*2*r - v)), r em [0,1). Extraido
+// pra ser COMPARTILHADO entre resolve_use_card (r = rng_->next_double() real) e
+// estimate_card_damage (r = 0.0/1.0, faixa PURA sem RNG algum) - garante que o preview seja
+// BIT-IDENTICO ao pior/melhor caso real, nunca uma formula paralela que possa divergir.
+[[nodiscard]] float comum_channel_damage(float base_damage, float v, double r) {
+    return base_damage * static_cast<float>(1.0 + (static_cast<double>(v) * 2.0 * r -
+                                                    static_cast<double>(v)));
+}
+
+// Dano do canal CRIT (secao 11): round(base * (1+v) * 1.5). Compartilhado pelo mesmo motivo
+// (resolve_use_card e estimate_card_damage chamam a MESMA formula).
+[[nodiscard]] float crit_channel_damage(float base_damage, float v) {
+    return base_damage * (1.0f + v) * 1.5f;
+}
+
+// Perda de HP apos absorcao de Shield (secao 9), SEM mutar nada: espelha CombatActor::
+// absorb_with_shield (perda = raw - min(raw, magnitude_do_Shield_ativo), piso 0 quando ha
+// absorcao). Compartilhado por preview_basic_attack_damage e estimate_card_damage (ambos
+// previews PUROS pra UI, secao 11 e modo-mira).
+[[nodiscard]] int shield_absorbed_loss(int raw_damage, const CombatActor& target) {
+    int shield_magnitude = 0;
+    for (const StatusEffect& s : target.status_effects()) {
+        if (s.id == StatusId::Shield) {
+            shield_magnitude = s.magnitude;
+            break;
+        }
+    }
+    const int absorbed = std::min(raw_damage, shield_magnitude);
+    return absorbed <= 0 ? raw_damage : raw_damage - absorbed;
+}
+
 }  // namespace
 
 CombatStateMachine::CombatStateMachine(
@@ -510,24 +541,86 @@ int CombatStateMachine::preview_basic_attack_damage(
     const CombatActor& attacker, const CombatActor& target) const noexcept {
     // Dano bruto IDENTICO a resolve_basic_attack (logo abaixo). Mantido em sincronia.
     const int raw = std::max(combat_constants::kMinDamage, attacker.atk() - target.def());
+    // Absorcao de Shield espelhada de CombatActor::absorb_with_shield, SEM mutar (helper
+    // compartilhado com estimate_card_damage, ver namespace anonimo acima).
+    return shield_absorbed_loss(raw, target);
+}
 
-    // Absorcao de Shield espelhada de CombatActor::absorb_with_shield, SEM mutar: pega a
-    // magnitude do Shield ativo (0 se ausente) e devolve o remanescente que bateria no HP.
-    // absorbed = min(raw, magnitude); com absorbed <= 0 (sem Shield ou pool vazio) a perda
-    // e o dano bruto (espelha o early-return de absorb_with_shield). Piso 0 vem de raw -
-    // min(raw, mag) = max(0, raw - mag) quando mag > 0.
-    int shield_magnitude = 0;
+CardDamageEstimate CombatStateMachine::estimate_card_damage(
+    const CombatActor& attacker, const CombatActor& target, const Card& card,
+    float mult_combo) const noexcept {
+    CardDamageEstimate est;
+
+    // Fraqueza (secao 6.1): alvo universal (compilador universal) = mult neutro, MESMA
+    // regra de resolve_use_card.
+    est.mult_fraqueza = target.is_universal_compiler()
+                             ? 1.0f
+                             : WeaknessWheel::multiplier(card.family, target.family());
+
+    // Curto-circuito de imunidade (secao 11): dano 0 em tudo, ANTES de qualquer canal. O
+    // motor tambem nao sorteia roll aqui (early-return em resolve_use_card) - o preview
+    // reflete a MESMA regra sem nunca ter consumido RNG pra chegar ate este ponto.
+    if (est.mult_fraqueza == 0.0f) {
+        est.immune = true;
+        return est;
+    }
+
+    constexpr float mult_mod = 1.0f;  // Stream distribui no jogo posterior; slice = 1.0
+
+    // Expose (secao 9/11): LE o status do ALVO (nao muta, nao consome).
+    float mult_expose = 1.0f;
     for (const StatusEffect& s : target.status_effects()) {
-        if (s.id == StatusId::Shield) {
-            shield_magnitude = s.magnitude;
+        if (s.id == StatusId::Expose) {
+            mult_expose = 1.0f + static_cast<float>(s.magnitude) / 100.0f;
             break;
         }
     }
-    const int absorbed = std::min(raw, shield_magnitude);
-    if (absorbed <= 0) {
-        return raw;
+
+    // Disrupt (secao 9/11): LE o status do ATACANTE. resolve_use_card so CONSOME (remove) o
+    // Disrupt na resolucao real de fato jogada; o preview apenas LE o multiplicador vigente,
+    // sem remove_status - nao muta nada (contrato PURO deste metodo).
+    float mult_disrupt = 1.0f;
+    for (const StatusEffect& s : attacker.status_effects()) {
+        if (s.id == StatusId::Disrupt) {
+            mult_disrupt = std::max(0.0f, 1.0f - static_cast<float>(s.magnitude) / 100.0f);
+            break;
+        }
     }
-    return raw - absorbed;
+
+    const float mult_ambiente = mult_ambiente_for(card.family);
+
+    // 1. Cadeia divisiva IDENTICA a resolve_use_card (secao 11).
+    const float base_damage =
+        static_cast<float>(card.power + attacker.atk()) *
+        (100.0f / (100.0f + static_cast<float>(target.def()))) * est.mult_fraqueza *
+        mult_mod * mult_combo * mult_expose * mult_disrupt * mult_ambiente;
+
+    // 2. Variancia Knowledge (secao 11), IDENTICA: v = max(0.05, 0.30*exp(-kills*0.10)).
+    const int kills = target.knowledge_kills();
+    const float v = std::max(0.05f, 0.30f * std::exp(-static_cast<float>(kills) * 0.10f));
+
+    // 3. Chances dos canais (secao 11): formulas deterministicas sobre kills/CritChance -
+    //    ZERO consumo de RNG (o sorteio de canal so acontece em resolve_use_card).
+    est.fumble_chance_pct =
+        static_cast<int>(std::lround(5.0 * std::exp(-static_cast<double>(kills) * 0.50)));
+    est.crit_chance_pct = std::max(5, card.crit_chance);
+
+    // 4. Faixa do canal COMUM: r=0 (piso) e r=1 (teto), MESMO helper comum_channel_damage de
+    //    resolve_use_card - so troca o r real do rng_ por 0.0/1.0 fixos (sem sortear nada).
+    //    CRIT: MESMO helper crit_channel_damage.
+    const int comum_floor =
+        static_cast<int>(std::lround(comum_channel_damage(base_damage, v, 0.0)));
+    const int comum_ceil =
+        static_cast<int>(std::lround(comum_channel_damage(base_damage, v, 1.0)));
+    const int crit_raw =
+        static_cast<int>(std::lround(crit_channel_damage(base_damage, v)));
+
+    // 5. Perda de HP PREVISTA por canal, ja com a absorcao de Shield do alvo (MESMO helper
+    //    de preview_basic_attack_damage).
+    est.min_damage = shield_absorbed_loss(comum_floor, target);
+    est.max_damage = shield_absorbed_loss(comum_ceil, target);
+    est.crit_damage = shield_absorbed_loss(crit_raw, target);
+    return est;
 }
 
 void CombatStateMachine::resolve_basic_attack(CombatActor& attacker,
@@ -787,15 +880,15 @@ void CombatStateMachine::resolve_use_card(CombatActor& actor, const CombatAction
             channel_suffix = " FALHA DE COMPILACAO";
         } else if (roll < fumble_chance + crit_chance) {
             // CRIT: round(maxArma * 1.5) = round(danoBase * (1 + v) * 1.5). 1 consumo RNG.
-            const float crit_damage = base_damage * (1.0f + v) * 1.5f;
+            // Helper compartilhado com estimate_card_damage (preview PURO) - mesma formula.
+            const float crit_damage = crit_channel_damage(base_damage, v);
             damage = static_cast<int>(std::lround(crit_damage));
             channel_suffix = " [CRITICO]";
         } else {
-            // COMUM: 2o consumo de RNG (next_double); aplica a variancia normal.
+            // COMUM: 2o consumo de RNG (next_double); aplica a variancia normal. Helper
+            // compartilhado com estimate_card_damage (preview PURO) - mesma formula.
             const double r = rng_->next_double();
-            const float rolled = base_damage * static_cast<float>(
-                                                   1.0 + (static_cast<double>(v) * 2.0 * r -
-                                                          static_cast<double>(v)));
+            const float rolled = comum_channel_damage(base_damage, v, r);
             damage = static_cast<int>(std::lround(rolled));
         }
 

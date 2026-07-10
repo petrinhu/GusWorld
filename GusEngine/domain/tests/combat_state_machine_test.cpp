@@ -16,7 +16,9 @@
 #include <catch2/catch_test_macros.hpp>
 
 #include <algorithm>
+#include <memory>
 #include <string>
+#include <unordered_map>
 #include <vector>
 
 #include "gus/domain/combat/combat_actor.hpp"
@@ -388,6 +390,260 @@ TEST_CASE("preview: (d) piso kMinDamage quando atk < def", "[domain][combat][fsm
     // Piso + Shield: raw 1 absorvido por um Shield de 1 => perda prevista = 0.
     give_shield(e, /*magnitude=*/1);
     REQUIRE(sm.preview_basic_attack_damage(h, e) == 0);
+}
+
+// ----- Previa de dano de CARTA (COMBATE-TEORIA-JOGOS item [2]): PURA, ZERO RNG -----
+// estimate_card_damage estende a previa (acima, so ataque basico) pra UseCard: faixa do
+// canal COMUM (min/max), dano do canal CRIT, %falha/%crit e mult-fraqueza, TUDO sem
+// sortear/consumir RNG (secao 11 intocada) e sem mutar nada (nao aplica dano/status/mana/
+// AP). Cross-valida contra o motor REAL: forca o RNG do combate real pro mesmo extremo/
+// canal (FixedRandomSm) e confere que o dano RESOLVIDO bate com a estimativa PURA -
+// comum_channel_damage/crit_channel_damage/shield_absorbed_loss sao os MESMOS helpers dos
+// dois lados (nao ha formula paralela).
+
+namespace {
+
+Card make_estimate_card(CardFamily family, int power, int crit_chance = 0) {
+    Card c;
+    c.id = "carta_estimativa";
+    c.display_name = c.id;
+    c.family = family;
+    c.base_type = CardBaseType::Pulso;
+    c.mana_cost = 1;
+    c.ap_cost = 1;
+    c.power = power;
+    c.target_shape = TargetShape::Single;
+    c.crit_chance = crit_chance;
+    return c;
+}
+
+std::unordered_map<std::string, Card> single_card_registry(const Card& c) {
+    std::unordered_map<std::string, Card> reg;
+    reg.emplace(c.id, c);
+    return reg;
+}
+
+// Provider que joga UMA UseCard player-side (card_id contra target_id) e depois passa.
+CombatActionProvider play_card_once(const std::string& card_id, const std::string& target_id) {
+    auto done = std::make_shared<bool>(false);
+    return [card_id, target_id, done](CombatActor& a, const CombatState&) -> CombatAction {
+        if (!a.is_player_side() || *done) return CombatAction::pass();
+        *done = true;
+        return CombatAction::use_card(card_id, target_id);
+    };
+}
+
+// RNG fixo QUE CONTA consumos (mesmo padrao de combat_formula_test.cpp::CountingRandom;
+// duplicado aqui pra manter este arquivo self-contido, seguindo a convencao ja usada entre
+// os arquivos de teste deste diretorio - hero()/foe() tambem sao duplicados).
+class CountingRandomSm final : public IRandomSource {
+public:
+    explicit CountingRandomSm(double next_double = 0.5, int next_int = 99)
+        : next_double_(next_double), next_int_(next_int) {}
+    double next_double() override { ++double_calls; return next_double_; }
+    int next(int max_value) override {
+        ++int_calls;
+        return max_value <= 0 ? 0 : std::min(next_int_, max_value - 1);
+    }
+    int int_calls = 0;
+    int double_calls = 0;
+
+private:
+    double next_double_;
+    int next_int_;
+};
+
+// Roda o turno corrente jogando `card` de h contra f e devolve o dano RESOLVIDO (max_hp -
+// hp do alvo). Usado pra cross-validar a estimativa PURA contra o motor REAL.
+int resolved_card_damage(CombatActor& h, CombatActor& f, const Card& card,
+                         IRandomSource& rng) {
+    auto reg = single_card_registry(card);
+    CombatStateMachine sm({&h, &f}, play_card_once(card.id, f.id()), &reg, nullptr, &rng);
+    sm.begin_turn();
+    sm.run_active_turn_to_end();
+    return f.max_hp() - f.hp();
+}
+
+}  // namespace
+
+TEST_CASE("estimate carta: ZERO consumo de RNG (secao 11 intocada)", "[domain][combat][fsm]") {
+    CombatActor h = hero("gus", 30, 20, /*atk=*/10, /*def=*/2);
+    CombatActor e = foe("enemy", 500, 10, /*atk=*/6, /*def=*/0);
+    CountingRandomSm rng;
+    CombatStateMachine sm({&h, &e}, always_pass, nullptr, nullptr, &rng);
+
+    const Card card = make_estimate_card(CardFamily::Eletrico, /*power=*/20);
+    const CardDamageEstimate est = sm.estimate_card_damage(h, e, card);
+    (void)est;
+
+    REQUIRE(rng.int_calls == 0);
+    REQUIRE(rng.double_calls == 0);
+}
+
+TEST_CASE("estimate carta: bate com o exemplo numerico canonico do combat.md §11 (kills=0)",
+          "[domain][combat][fsm]") {
+    // Mesmo cenario do combat.md §11 "Exemplo numerico": Power=20, Atk=10, Def=0, fraqueza
+    // ativa (multFraqueza=1.5) => danoBase=45; kills=0 => v=0.30, fumble=5%, crit=5%.
+    CombatActor h = hero("gus", 30, 20, /*atk=*/10, /*def=*/2);
+    CombatActor e = foe("enemy", 500, 10, /*atk=*/6, /*def=*/0);
+    CombatStateMachine sm({&h, &e}, always_pass);
+
+    const Card card = make_estimate_card(CardFamily::Eletrico, /*power=*/20);
+    const CardDamageEstimate est = sm.estimate_card_damage(h, e, card);
+
+    REQUIRE(est.mult_fraqueza == combat_constants::kMultFraco);
+    REQUIRE_FALSE(est.immune);
+    REQUIRE(est.fumble_chance_pct == 5);
+    REQUIRE(est.crit_chance_pct == 5);
+    REQUIRE(est.min_damage == 32);   // round(45 * (1 - 0.30)) = round(31.5) = 32
+    REQUIRE(est.max_damage == 58);   // round(45 * (1 + 0.30)) = round(58.499996) = 58 (float32)
+    REQUIRE(est.crit_damage == 88);  // round(45 * 1.30 * 1.5) = round(87.74999) = 88 (float32)
+
+    // READ-ONLY: nada mutou (HP cheio, sem status, sem log, sem mana/AP gastos).
+    REQUIRE(e.hp() == e.max_hp());
+    REQUIRE(e.status_effects().empty());
+    REQUIRE(sm.log().empty());
+}
+
+TEST_CASE("estimate carta: bate com o exemplo numerico do combat.md §11 (kills=6, farmado)",
+          "[domain][combat][fsm]") {
+    CombatActor h = hero("gus", 30, 20, /*atk=*/10, /*def=*/2);
+    // foe() nao expoe knowledge_kills (helper deste arquivo, kills=0 fixo); construtor
+    // direto (mesma family Cinetico do foe() default, so pra poder passar kills=6).
+    CombatActor e("enemy", "enemy", /*max_hp=*/500, /*atk=*/6, /*def=*/0, /*spd=*/10,
+                  CardFamily::Cinetico, /*is_player_side=*/false, /*is_boss=*/false,
+                  /*knowledge_kills=*/6);
+    CombatStateMachine sm({&h, &e}, always_pass);
+
+    const Card card = make_estimate_card(CardFamily::Eletrico, /*power=*/20);
+    const CardDamageEstimate est = sm.estimate_card_damage(h, e, card);
+
+    REQUIRE(est.fumble_chance_pct == 0);  // decaiu a 0% a partir de 5 kills
+    REQUIRE(est.crit_chance_pct == 5);    // piso global inalterado por kills
+    REQUIRE(est.min_damage == 38);
+    REQUIRE(est.max_damage == 52);
+    REQUIRE(est.crit_damage == 79);
+}
+
+TEST_CASE("estimate carta: cross-valida contra o motor REAL nas fronteiras do canal COMUM",
+          "[domain][combat][fsm]") {
+    // Forca o motor real pro PISO (r=0.0) e pro TETO (r->1.0) do canal COMUM (roll=99, fora
+    // de fumble+crit=10) e confere que o dano RESOLVIDO bate com a estimativa PURA. Prova
+    // que a estimativa NAO e uma formula paralela (mesmos helpers dos dois lados).
+    auto make_pair = [] {
+        return std::pair<CombatActor, CombatActor>{
+            hero("gus", 30, 20, /*atk=*/10, /*def=*/2),
+            foe("enemy", 500, 10, /*atk=*/6, /*def=*/0)};
+    };
+    const Card card = make_estimate_card(CardFamily::Eletrico, /*power=*/20);
+
+    auto [h1, e1] = make_pair();
+    CombatStateMachine sm_est({&h1, &e1}, always_pass);
+    const CardDamageEstimate est = sm_est.estimate_card_damage(h1, e1, card);
+
+    auto [h2, e2] = make_pair();
+    CountingRandomSm rng_floor(/*next_double=*/0.0, /*next_int=*/99);
+    REQUIRE(resolved_card_damage(h2, e2, card, rng_floor) == est.min_damage);
+
+    auto [h3, e3] = make_pair();
+    CountingRandomSm rng_ceil(/*next_double=*/1.0, /*next_int=*/99);
+    REQUIRE(resolved_card_damage(h3, e3, card, rng_ceil) == est.max_damage);
+}
+
+TEST_CASE("estimate carta: cross-valida contra o motor REAL no canal CRIT",
+          "[domain][combat][fsm]") {
+    CombatActor h1 = hero("gus", 30, 20, /*atk=*/10, /*def=*/2);
+    CombatActor e1 = foe("enemy", 500, 10, /*atk=*/6, /*def=*/0);
+    const Card card = make_estimate_card(CardFamily::Eletrico, /*power=*/20);
+    CombatStateMachine sm_est({&h1, &e1}, always_pass);
+    const CardDamageEstimate est = sm_est.estimate_card_damage(h1, e1, card);
+
+    CombatActor h2 = hero("gus", 30, 20, /*atk=*/10, /*def=*/2);
+    CombatActor e2 = foe("enemy", 500, 10, /*atk=*/6, /*def=*/0);
+    // kills=0 => fumble=5, crit=5 => CRIT em roll in [5,10). next_int=5 cai ali.
+    CountingRandomSm rng_crit(/*next_double=*/0.5, /*next_int=*/5);
+    REQUIRE(resolved_card_damage(h2, e2, card, rng_crit) == est.crit_damage);
+}
+
+TEST_CASE("estimate carta: mult_fraqueza reflete a roda (fraco/neutro/resistente)",
+          "[domain][combat][fsm]") {
+    CombatActor h = hero("gus", 30, 20, /*atk=*/10, /*def=*/2);
+    const Card card = make_estimate_card(CardFamily::Eletrico, /*power=*/20);
+    CombatStateMachine sm({&h}, always_pass);
+
+    CombatActor fraco("fraco", "fraco", 500, 6, 0, 10, CardFamily::Cinetico, /*player=*/false);
+    REQUIRE(sm.estimate_card_damage(h, fraco, card).mult_fraqueza ==
+            combat_constants::kMultFraco);
+
+    CombatActor neutro("neutro", "neutro", 500, 6, 0, 10, CardFamily::Sonico, /*player=*/false);
+    REQUIRE(sm.estimate_card_damage(h, neutro, card).mult_fraqueza ==
+            combat_constants::kMultNeutro);
+
+    CombatActor resistente("resistente", "resistente", 500, 6, 0, 10, CardFamily::Bioquimico,
+                           /*player=*/false);
+    REQUIRE(sm.estimate_card_damage(h, resistente, card).mult_fraqueza ==
+            combat_constants::kMultResistente);
+}
+
+TEST_CASE("estimate carta: Shield reduz a perda prevista nos 3 canais, piso 0",
+          "[domain][combat][fsm]") {
+    CombatActor h = hero("gus", 30, 20, /*atk=*/10, /*def=*/2);
+    CombatActor e = foe("enemy", 500, 10, /*atk=*/6, /*def=*/0);
+    const Card card = make_estimate_card(CardFamily::Eletrico, /*power=*/20);
+    CombatStateMachine sm({&h, &e}, always_pass);
+
+    const CardDamageEstimate sem_shield = sm.estimate_card_damage(h, e, card);
+
+    give_shield(e, /*magnitude=*/10);
+    const CardDamageEstimate com_shield = sm.estimate_card_damage(h, e, card);
+    REQUIRE(com_shield.min_damage == std::max(0, sem_shield.min_damage - 10));
+    REQUIRE(com_shield.max_damage == std::max(0, sem_shield.max_damage - 10));
+    REQUIRE(com_shield.crit_damage == std::max(0, sem_shield.crit_damage - 10));
+
+    give_shield(e, /*magnitude=*/9999);  // absorve tudo => piso 0 nos 3 canais
+    const CardDamageEstimate shield_total = sm.estimate_card_damage(h, e, card);
+    REQUIRE(shield_total.min_damage == 0);
+    REQUIRE(shield_total.max_damage == 0);
+    REQUIRE(shield_total.crit_damage == 0);
+}
+
+TEST_CASE("estimate carta: Expose no alvo amplia a estimativa (cross-valida com o motor)",
+          "[domain][combat][fsm]") {
+    CombatActor h1 = hero("gus", 30, 20, /*atk=*/10, /*def=*/2);
+    CombatActor e1 = foe("enemy", 500, 10, /*atk=*/6, /*def=*/0);
+    e1.add_status(StatusEffect{StatusId::Expose, /*magnitude=*/30, /*duration=*/3,
+                               StackRule::Replace, CardFamily::Criptografico});
+    const Card card = make_estimate_card(CardFamily::Eletrico, /*power=*/20);
+    CombatStateMachine sm_est({&h1, &e1}, always_pass);
+    const CardDamageEstimate est = sm_est.estimate_card_damage(h1, e1, card);
+
+    // Sem Expose o teto seria 58 (teste canonico acima); com Expose (1.3x) o teto sobe.
+    REQUIRE(est.max_damage > 58);
+
+    CombatActor h2 = hero("gus", 30, 20, /*atk=*/10, /*def=*/2);
+    CombatActor e2 = foe("enemy", 500, 10, /*atk=*/6, /*def=*/0);
+    e2.add_status(StatusEffect{StatusId::Expose, /*magnitude=*/30, /*duration=*/3,
+                               StackRule::Replace, CardFamily::Criptografico});
+    CountingRandomSm rng_ceil(/*next_double=*/1.0, /*next_int=*/99);
+    REQUIRE(resolved_card_damage(h2, e2, card, rng_ceil) == est.max_damage);
+}
+
+TEST_CASE("estimate carta: NAO consome/remove o Disrupt do atacante (so LE)",
+          "[domain][combat][fsm]") {
+    CombatActor h = hero("gus", 30, 20, /*atk=*/10, /*def=*/2);
+    CombatActor e = foe("enemy", 500, 10, /*atk=*/6, /*def=*/0);
+    h.add_status(StatusEffect{StatusId::Disrupt, /*magnitude=*/50, /*duration=*/1,
+                              StackRule::Replace, CardFamily::Sonico});
+    const Card card = make_estimate_card(CardFamily::Eletrico, /*power=*/20);
+    CombatStateMachine sm({&h, &e}, always_pass);
+
+    const CardDamageEstimate est = sm.estimate_card_damage(h, e, card);
+
+    // Disrupt 50 => mult_disrupt 0.5: teto vira ~29 (metade de 58), NAO 58.
+    REQUIRE(est.max_damage < 58);
+    // READ-ONLY: o Disrupt do atacante segue intacto (a previa NAO o consome; so
+    // resolve_use_card de fato jogada remove).
+    REQUIRE(h.index_of_status(StatusId::Disrupt) >= 0);
 }
 
 // ============================================================================

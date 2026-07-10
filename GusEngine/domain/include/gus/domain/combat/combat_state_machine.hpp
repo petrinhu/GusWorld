@@ -75,6 +75,25 @@ enum class CombatSide : std::uint32_t {
     Enemy = 1,
 };
 
+// Estimativa PURA de UseCard (COMBATE-TEORIA-JOGOS item [2]; secao 11), devolvida por
+// CombatStateMachine::estimate_card_damage. Nao e serializada (query de UI, nao contrato de
+// save). Perda de HP PREVISTA por canal, ja com a absorcao de Shield do alvo (mesma tecnica
+// de preview_basic_attack_damage).
+struct CardDamageEstimate {
+    int min_damage = 0;    // piso do canal COMUM (perda de HP, pos-Shield)
+    int max_damage = 0;    // teto do canal COMUM (perda de HP, pos-Shield)
+    int crit_damage = 0;   // dano do canal CRIT (perda de HP, pos-Shield)
+    int fumble_chance_pct = 0;
+    int crit_chance_pct = 0;
+    float mult_fraqueza = 1.0f;
+    // true quando multFraqueza == 0 (curto-circuito de imunidade, secao 11): os 3 danos
+    // acima ficam 0 e as chances perdem sentido (o motor tambem nao sorteia canal nesse
+    // caso, ver resolve_use_card).
+    bool immune = false;
+
+    [[nodiscard]] bool operator==(const CardDamageEstimate&) const = default;
+};
+
 // Maquina de estados do combate (secao 3).
 class CombatStateMachine {
 public:
@@ -191,6 +210,23 @@ public:
     // adjacentes no .cpp de proposito).
     [[nodiscard]] int preview_basic_attack_damage(const CombatActor& attacker,
                                                   const CombatActor& target) const noexcept;
+
+    // Estimativa PURA de UseCard de `card` (attacker -> target) ANTES de confirmar
+    // (COMBATE-TEORIA-JOGOS item [2]; Pillar 4: dano esperado x custo visivel antes de
+    // comprometer a acao). Espelha, SEM efeito colateral, a cadeia divisiva + as chances de
+    // canal de resolve_use_card (secao 11): NAO chama rng_->next()/next_double() (o sorteio
+    // de canal e a variancia SO acontecem na resolucao real - contador de RNG intocado),
+    // NAO aplica dano/status/mana/AP, NAO consome Disrupt do atacante (so LE) - so LE atk/
+    // def/family/status_effects/knowledge_kills. `mult_combo` e do CALLER (a UI, se ja sabe
+    // que o pipeline fecharia um combo); default 1.0 (a estimativa NAO resolve pipeline
+    // sozinha, isso e ComboTable::match, fora do escopo do preview de uma carta). Reusa os
+    // MESMOS helpers de canal (comum_channel_damage/crit_channel_damage) e a MESMA absorcao
+    // de Shield (shield_absorbed_loss) que resolve_use_card/preview_basic_attack_damage -
+    // nao ha formula paralela pra divergir.
+    [[nodiscard]] CardDamageEstimate estimate_card_damage(const CombatActor& attacker,
+                                                          const CombatActor& target,
+                                                          const Card& card,
+                                                          float mult_combo = 1.0f) const noexcept;
 
     // ---- Conducao da FSM ----
 
