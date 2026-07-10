@@ -1,0 +1,61 @@
+# lsan.supp - suppressions ESTREITAS de LeakSanitizer (LSan) pro GusEngine.
+#
+# Politica: cada linha so entra aqui com PROVA (stack real reproduzido) de que o leak
+# e de uma biblioteca de TERCEIROS, nao do GusWorld, e com o match MAIS ESTREITO
+# possivel (nunca `leak:ma_*`/`leak:AudioEngine`/wildcard largo que possa esconder um
+# leak nosso). Ver TODO.md/docs/auditoria pro dossie de cada item.
+#
+# ---------------------------------------------------------------------------------
+# AUD-MINIAUDIO-ALSA-LEAK (2026-07-10)
+# ---------------------------------------------------------------------------------
+# Leak pre-existente DENTRO do backend ALSA do libasound (nao e codigo GusWorld, nao
+# e regressao de nenhum milestone), disparado ao abrir o device real de audio
+# (`AudioEngine::AudioEngine(true)`, platform/src/audio/audio_engine.cpp:81, via
+# `ma_engine_init` -> `ma_device_init_ex` -> `ma_device_init` ->
+# `ma_device_init_by_type__alsa` -> `ma_context_open_pcm__alsa`,
+# GusEngine/third_party/miniaudio/miniaudio.h:28740/29250). ~17KB/18 allocs (17359
+# bytes / 18 allocations, reproduzido byte-a-byte) alocados via strdup/calloc durante
+# o parsing de `snd_config` e a resolucao do device "default" (dlopen de plugins ALSA
+# como pcm_pipewire neste host) dentro de `snd_pcm_open` -> `snd_pcm_open_noupdate` ->
+# `snd_pcm_open_conf` (libasound.so.2, confirmado por symbol match). alsa-lib nunca
+# libera esse estado global/thread-local de config - comportamento conhecido da lib,
+# nao um leak "reachable" do nosso codigo (o dtor `AudioEngine::~AudioEngine()` ja
+# chama `ma_engine_uninit` corretamente nos dois caminhos, feliz e de falha).
+#
+# POR QUE o match e `ma_context_open_pcm__alsa` e NAO `leak:snd_pcm_open`/
+# `leak:snd_config*` (que seria o match "ideal" mais proximo do libasound em si):
+# miniaudio NAO linka libasound em tempo de build - ele faz `dlopen("libasound.so.2")`
+# em RUNTIME (ver platform/CMakeLists.txt, comentario da secao de link: "runtime via
+# dlopen"; confirmado com `ldd` no binario real - libasound NAO aparece como
+# dependencia). Empiricamente (reproduzido nesta auditoria com um probe standalone
+# `-lasound` linkado direto vs. o binario real do projeto): quando libasound e
+# CARREGADO EM RUNTIME via dlopen (como no binario de producao/CI), o LSan symbolizer
+# NAO resolve os frames DENTRO de libasound.so.2 no momento do leak-check-at-exit
+# (aparecem como "<unknown module>" - o modulo dlopen'd nao fica disponivel pro
+# symbolizer nesse ponto). Confirmamos isso rodando com `leak:snd_pcm_open` /
+# `leak:snd_pcm_open_noupdate` / `leak:snd_pcm_open_conf` como suppression: NAO
+# suprime nada no binario real (36 allocations continuam vazando), mesmo esses
+# simbolos resolvendo perfeitamente num probe que linka libasound direto
+# (`-lasound`, eager load) via `__lsan_do_recoverable_leak_check()` antes do dtor.
+# `ma_context_open_pcm__alsa` e o frame mais PROXIMO do libasound que ainda pertence
+# ao NOSSO binario (compilado estaticamente, sempre resolvivel) - e uma funcao
+# ESPECIFICA (nao wildcard) que faz EXATAMENTE uma coisa: abrir o device PCM real via
+# ALSA. Nenhum leak de qualquer OUTRA funcao miniaudio (ma_sound_init, ma_engine_uninit,
+# grupos, etc.) ou do nosso `gus::platform::audio` cai nesse match - confirmado por
+# mutation testing (ver abaixo).
+#
+# PROVA DE ESTREITEZA (mutation testing, 2026-07-10): injetado temporariamente um
+# `new int[100]` sem free dentro de um TEST_CASE em
+# platform/tests/audio_engine_test.cpp (commit local desta auditoria, revertido no
+# mesmo commit - `git diff` limpo). Rodando com esta suppression ATIVA: o leak do
+# libasound (36 allocations / 34718 bytes) foi suprimido, MAS o leak injetado (400
+# bytes, `operator new[]`, frame em audio_engine_test.cpp) AINDA foi acusado pelo
+# LSan (exit 1, "SUMMARY: AddressSanitizer: 400 byte(s) leaked in 1 allocation(s)").
+# Confirma que a suppression NAO esconde leak nosso.
+#
+# Reproducao local: como este host roda PipeWire (servidor pulse-compatible sempre
+# ativo), miniaudio escolhe o backend pulseaudio por padrao e NUNCA cai no ALSA puro
+# - por isso `PULSE_SERVER=/nonexistent-socket` e necessario pra forcar o fallback
+# pro backend ALSA real (mesma situacao do runner de CI, que nao tem pulseaudio/
+# pipewire rodando, so libasound2-dev instalado).
+leak:ma_context_open_pcm__alsa

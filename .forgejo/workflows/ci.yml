@@ -158,10 +158,6 @@ jobs:
       - name: Build (ASan/UBSan)
         run: cmake --build GusEngine/build/asan
 
-      # NOTA (AUD-MINIAUDIO-UAF): a suite platform/ ABORTA sob ASan por causa de um
-      # heap-use-after-free na lib miniaudio vendorizada (trilha de falha de carga).
-      # Item aberto no TODO.md, obrigatorio antes do gate T4/ASan de v1.0.0. Ate
-      # fechar, platform/ fica FORA deste job; core/domain/app rodam normalmente.
       - name: Test core/ under ASan/UBSan
         run: |
           set -eux
@@ -173,6 +169,21 @@ jobs:
           set -eux
           ASAN_OPTIONS=detect_leaks=1 UBSAN_OPTIONS=print_stacktrace=1,halt_on_error=1 \
             ./GusEngine/build/asan/domain/tests/gusengine_domain_tests
+
+      # AUD-MINIAUDIO-UAF (fechado 2026-07-10, commit 317a2e9): patch cirurgico no
+      # miniaudio vendorizado eliminou o heap-use-after-free que abortava esta suite
+      # sob ASan. AUD-MINIAUDIO-ALSA-LEAK (fechado 2026-07-10): o leak restante
+      # (~17KB/18 allocs em ma_context_open_pcm__alsa, device ALSA real aberto no
+      # ctor do AudioEngine) e do libasound (nao do GusWorld) - suprimido via
+      # tools/lsan.supp (suppression ESTREITA, ver comentarios do arquivo + prova de
+      # estreiteza por mutation testing). LSAN_OPTIONS aponta pro arquivo de
+      # suppression (caminho relativo a raiz do repo, cwd do job).
+      - name: Test platform/ under ASan/UBSan
+        run: |
+          set -eux
+          ASAN_OPTIONS=detect_leaks=1 UBSAN_OPTIONS=print_stacktrace=1,halt_on_error=1 \
+            LSAN_OPTIONS=suppressions=tools/lsan.supp \
+            ./GusEngine/build/asan/platform/tests/gusengine_platform_tests
 
       - name: Test app/ under ASan/UBSan
         run: |
