@@ -162,6 +162,20 @@ bool save_game(const gus::domain::save::SaveData& data, int slot, const std::str
     }
 }
 
+bool delete_save(int slot, const std::string& dir) {
+    // Fail-fast (nao e I/O): slot invalido propaga std::out_of_range.
+    const std::string primary = gus::domain::save::primary_logical_name(slot);
+    FsSaveStore store(dir);
+    store.remove(primary);
+    for (int k = 1; k <= gus::domain::save::kBackupChainDepth; ++k) {
+        store.remove(gus::domain::save::backup_logical_name(slot, k));
+    }
+    // Confirma que o primario de fato sumiu (degradacao segura: permissao negada
+    // deixaria o arquivo vivo - o CHAMADOR decide o que avisar, MESMO espirito de
+    // save_game/load_game).
+    return !store.exists(primary);
+}
+
 std::optional<gus::domain::save::LoadOutcome> load_game(int slot, const std::string& dir) {
     // Fail-fast (nao e I/O): slot invalido propaga std::out_of_range.
     const std::string name = gus::domain::save::primary_logical_name(slot);

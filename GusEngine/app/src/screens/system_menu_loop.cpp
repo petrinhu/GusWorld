@@ -554,7 +554,7 @@ SystemMenuLoopOutcome run_system_menu_loop_gl_current(
             // mesmo tempo.
             ui_opt.reset();
             const SaveLoadLoopExit exit = run_save_load_menu_loop_gl_current(
-                window, translator, mode, saves_dir, build_current_save_data,
+                window, audio, translator, mode, saves_dir, build_current_save_data,
                 apply_loaded_save_data, frozen_background_png);
             switch (exit) {
                 case SaveLoadLoopExit::QuitApp:
@@ -1098,7 +1098,7 @@ SystemMenuLoopOutcome run_system_menu_loop_gl_current(
         // tela de save/load. Sem re-emplace depois: este ramo so retorna
         // (nenhum reload()/present_frame() do Pause roda mais nesta chamada).
         ui_opt.reset();
-        (void)run_save_load_menu_loop_gl_current(window, translator, SaveLoadMode::Save,
+        (void)run_save_load_menu_loop_gl_current(window, audio, translator, SaveLoadMode::Save,
                                                   saves_dir, build_current_save_data,
                                                   apply_loaded_save_data,
                                                   frozen_background_png);
@@ -1109,7 +1109,7 @@ SystemMenuLoopOutcome run_system_menu_loop_gl_current(
             seed.slot_id = 1;
             (void)gus::platform::fs::save_game(seed, 1, saves_dir);
         }
-        (void)run_save_load_menu_loop_gl_current(window, translator, SaveLoadMode::Load,
+        (void)run_save_load_menu_loop_gl_current(window, audio, translator, SaveLoadMode::Load,
                                                   saves_dir, build_current_save_data,
                                                   apply_loaded_save_data,
                                                   frozen_background_png);

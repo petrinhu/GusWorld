@@ -30,6 +30,10 @@ bool is_down_key(SDL_Keycode key) noexcept { return key == SDLK_DOWN || key == S
 bool is_left_key(SDL_Keycode key) noexcept { return key == SDLK_LEFT || key == SDLK_A; }
 bool is_right_key(SDL_Keycode key) noexcept { return key == SDLK_RIGHT || key == SDLK_D; }
 
+// Delete (tecla dedicada da feature "Apagar") - propositalmente SEPARADA de
+// is_back_key/is_confirm_key (nenhuma tecla de navegacao existente e reaproveitada).
+bool is_delete_key(SDL_Keycode key) noexcept { return key == SDLK_DELETE; }
+
 }  // namespace
 
 int chapter_from_xp_fallback(int xp) noexcept {
@@ -159,6 +163,9 @@ void save_load_menu_open(
     state.slots = slots;
     state.confirming_overwrite = false;
     state.confirm_selected = 1;
+    state.confirming_delete = false;
+    state.delete_confirm_selected = 1;
+    state.delete_target_slot = -1;
 
     // Selecao inicial: o PRIMEIRO slot selecionavel a partir do slot logo apos o
     // autosave (mock: slot 1 "sel", nunca o Auto) - reusa next_selectable partindo
@@ -168,8 +175,100 @@ void save_load_menu_open(
     state.selected = next_selectable(state, kAutosaveSlot, +1);
 }
 
+void save_load_menu_reselect_if_needed(SaveLoadMenuState& state) noexcept {
+    if (slot_selectable(state, state.selected)) return;
+    state.selected = next_selectable(state, state.selected, +1);
+}
+
+void save_load_menu_request_delete(SaveLoadMenuState& state, int slot) noexcept {
+    if (slot < 0 || slot >= kSlotCount) return;                      // defensivo
+    if (state.confirming_overwrite || state.confirming_delete) return;  // ja tem dialogo aberto
+    const SaveSlotPreview& preview = state.slots[static_cast<std::size_t>(slot)];
+    if (!preview.occupied) return;  // nada a apagar
+
+    state.confirming_delete = true;
+    state.delete_confirm_selected = 1;  // default seguro = Nao
+    state.delete_target_slot = slot;
+}
+
+namespace {
+
+// Aplica a regra de confirmacao do slot ATUALMENTE focado (state.selected) -
+// EXTRAIDO do corpo do ramo is_confirm_key de save_load_menu_key_down pra ser
+// reusado por save_load_menu_click_slot (clique de mouse = "focar + Enter", MESMA
+// convencao de system_menu_click_option).
+SaveLoadMenuAction confirm_selected_slot(SaveLoadMenuState& state) noexcept {
+    if (!slot_selectable(state, state.selected)) return SaveLoadMenuAction::None;
+    const SaveSlotPreview& slot = state.slots[static_cast<std::size_t>(state.selected)];
+    if (state.mode == SaveLoadMode::Save && slot.occupied) {
+        // Slot manual OCUPADO em modo Save: pede confirmacao (decisao (e)).
+        state.confirming_overwrite = true;
+        state.confirm_selected = 1;  // default seguro = Nao
+        return SaveLoadMenuAction::None;
+    }
+    return SaveLoadMenuAction::SlotChosen;
+}
+
+}  // namespace
+
+SaveLoadMenuAction save_load_menu_click_slot(SaveLoadMenuState& state, int slot) noexcept {
+    if (slot < 0 || slot >= kSlotCount) return SaveLoadMenuAction::None;
+    if (state.confirming_overwrite || state.confirming_delete) {
+        return SaveLoadMenuAction::None;  // dialogo aberto - clique na lista nao se aplica
+    }
+    if (!slot_selectable(state, slot)) return SaveLoadMenuAction::None;
+    state.selected = slot;
+    return confirm_selected_slot(state);
+}
+
+SaveLoadMenuAction save_load_menu_click_overwrite_confirm(SaveLoadMenuState& state,
+                                                           int pill) noexcept {
+    if (!state.confirming_overwrite) return SaveLoadMenuAction::None;
+    if (pill != 0 && pill != 1) return SaveLoadMenuAction::None;  // defensivo
+    const bool yes = (pill == 0);
+    state.confirming_overwrite = false;
+    state.confirm_selected = 1;
+    return yes ? SaveLoadMenuAction::OverwriteConfirmed : SaveLoadMenuAction::OverwriteCancelled;
+}
+
+SaveLoadMenuAction save_load_menu_click_delete_confirm(SaveLoadMenuState& state,
+                                                        int pill) noexcept {
+    if (!state.confirming_delete) return SaveLoadMenuAction::None;
+    if (pill != 0 && pill != 1) return SaveLoadMenuAction::None;  // defensivo
+    const bool yes = (pill == 0);
+    state.confirming_delete = false;
+    state.delete_confirm_selected = 1;
+    return yes ? SaveLoadMenuAction::DeleteConfirmed : SaveLoadMenuAction::DeleteCancelled;
+}
+
 SaveLoadMenuAction save_load_menu_key_down(SaveLoadMenuState& state,
                                             SDL_Keycode key) noexcept {
+    if (state.confirming_delete) {
+        if (is_back_key(key)) {
+            // Esc no mini-dialogo = "Nao" (MESMA seguranca de confirming_overwrite/
+            // controls_confirming_discard em system_menu.cpp).
+            state.confirming_delete = false;
+            state.delete_confirm_selected = 1;
+            return SaveLoadMenuAction::DeleteCancelled;
+        }
+        if (is_left_key(key) || is_right_key(key) || is_up_key(key) || is_down_key(key)) {
+            state.delete_confirm_selected = (state.delete_confirm_selected == 0) ? 1 : 0;
+            return SaveLoadMenuAction::None;
+        }
+        if (is_confirm_key(key)) {
+            const bool yes = (state.delete_confirm_selected == 0);
+            state.confirming_delete = false;
+            state.delete_confirm_selected = 1;
+            // delete_target_slot fica SETADO (nao resetado) quando Sim: o CHAMADOR
+            // le state.delete_target_slot logo apos receber DeleteConfirmed pra
+            // saber QUAL slot apagar de fato em disco (mesmo espirito de
+            // state.selected em OverwriteConfirmed).
+            return yes ? SaveLoadMenuAction::DeleteConfirmed
+                       : SaveLoadMenuAction::DeleteCancelled;
+        }
+        return SaveLoadMenuAction::None;
+    }
+
     if (state.confirming_overwrite) {
         if (is_back_key(key)) {
             // Esc no mini-dialogo = "Nao" (MESMA seguranca de
@@ -203,18 +302,16 @@ SaveLoadMenuAction save_load_menu_key_down(SaveLoadMenuState& state,
         return SaveLoadMenuAction::None;
     }
 
-    if (is_confirm_key(key)) {
-        if (!slot_selectable(state, state.selected)) return SaveLoadMenuAction::None;
-        const SaveSlotPreview& slot =
-            state.slots[static_cast<std::size_t>(state.selected)];
-        if (state.mode == SaveLoadMode::Save && slot.occupied) {
-            // Slot manual OCUPADO em modo Save: pede confirmacao (decisao (e)).
-            state.confirming_overwrite = true;
-            state.confirm_selected = 1;  // default seguro = Nao
-            return SaveLoadMenuAction::None;
-        }
-        return SaveLoadMenuAction::SlotChosen;
+    if (is_delete_key(key)) {
+        // Alvo = o slot ATUALMENTE focado (o clique de mouse no icone por-linha
+        // usa save_load_menu_request_delete direto, targeting a linha clicada -
+        // ver save_load_menu_loop.cpp). No-op silencioso (via o guard interno de
+        // save_load_menu_request_delete) se vazio/ja tem dialogo aberto.
+        save_load_menu_request_delete(state, state.selected);
+        return SaveLoadMenuAction::None;
     }
+
+    if (is_confirm_key(key)) return confirm_selected_slot(state);
 
     return SaveLoadMenuAction::None;
 }

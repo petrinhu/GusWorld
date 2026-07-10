@@ -181,6 +181,16 @@ struct SaveLoadMenuState {
     // mecanica visual/de fluxo de controls_confirming_restore (system_menu.hpp).
     bool confirming_overwrite = false;
     int confirm_selected = 1; // 0=Sim (sobrescreve), 1=Nao (default seguro)
+
+    // Mini-dialogo de confirmacao de EXCLUSAO (feature "Apagar", aprovada pelo
+    // lider) - MESMA mecanica visual/de fluxo do overwrite acima, campos PROPRIOS
+    // (os dois dialogos nunca abrem ao mesmo tempo - ver save_load_menu_request_
+    // delete). delete_target_slot e o slot ALVO da confirmacao - PODE divergir de
+    // `selected` (clique no icone de apagar de uma linha NAO focada tambem
+    // funciona, ver save_load_menu_loop.cpp); -1 = nenhuma exclusao em curso.
+    bool confirming_delete = false;
+    int delete_confirm_selected = 1; // 0=Sim (apaga), 1=Nao (default seguro)
+    int delete_target_slot = -1;
 };
 
 // true se o slot em `index` (0..kSlotCount-1) e SELECIONAVEL no modo ATUAL de
@@ -221,18 +231,69 @@ enum class SaveLoadMenuAction {
                         // e o slot; o CHAMADOR grava por cima de fato
     OverwriteCancelled, // o mini-dialogo fechou com "Nao"/Esc - permanece na lista,
                         // NENHUM I/O
+    DeleteConfirmed,    // o mini-dialogo de EXCLUSAO fechou com "Sim" -
+                        // state.delete_target_slot e o slot; o CHAMADOR apaga de fato
+                        // (gus::platform::fs::delete_save) e atualiza o preview local
+    DeleteCancelled,    // o mini-dialogo de exclusao fechou com "Nao"/Esc - permanece
+                        // na lista, NENHUM I/O
 };
 
-// Roteia UMA tecla pelo estado ATUAL (lista de slots OU mini-dialogo de
-// sobrescrita aberto). Sobe/desce SO por slots selecionaveis (slot_selectable),
-// com wrap-around; Enter delega para a regra de confirmacao documentada no
-// header (slot vazio ou modo Load = SlotChosen direto; slot manual ocupado em
-// modo Save = abre o mini-dialogo). Dentro do mini-dialogo, LEFT/RIGHT/UP/DOWN
-// alternam confirm_selected (0/1) e ENTER confirma a escolha atual; ESC no
-// mini-dialogo equivale a "Nao" (OverwriteCancelled, mesma seguranca de
-// controls_confirming_discard). ESC/Voltar fora do mini-dialogo devolve Back.
+// Roteia UMA tecla pelo estado ATUAL (lista de slots OU um dos 2 mini-dialogos
+// abertos - sobrescrita OU exclusao, NUNCA os dois ao mesmo tempo). Sobe/desce SO
+// por slots selecionaveis (slot_selectable), com wrap-around; Enter delega para a
+// regra de confirmacao documentada no header (slot vazio ou modo Load =
+// SlotChosen direto; slot manual ocupado em modo Save = abre o mini-dialogo de
+// sobrescrita). Delete (tecla dedicada, SDLK_DELETE) sobre um slot OCUPADO abre o
+// mini-dialogo de EXCLUSAO (ver save_load_menu_request_delete) - alvo = state.
+// selected (o clique do MOUSE no icone por-linha usa save_load_menu_click_slot/
+// save_load_menu_request_delete direto, targeting a linha clicada). Dentro de
+// QUALQUER mini-dialogo, LEFT/RIGHT/UP/DOWN alternam a pill selecionada (0/1) e
+// ENTER confirma a escolha atual; ESC equivale a "Nao" (mesma seguranca de
+// controls_confirming_discard, system_menu.hpp). ESC/Voltar fora de ambos os
+// mini-dialogos devolve Back.
 [[nodiscard]] SaveLoadMenuAction save_load_menu_key_down(SaveLoadMenuState& state,
                                                           SDL_Keycode key) noexcept;
+
+// Clique de MOUSE num slot da lista (fora de qualquer mini-dialogo, ver
+// save_load_menu_loop.cpp): equivalente a "focar + Enter" (MESMA convencao de
+// system_menu_click_option, system_menu.hpp). No-op (None) se `slot` fora do
+// intervalo, se algum mini-dialogo ja estiver aberto (o clique na LISTA nao se
+// aplica enquanto um dialogo cobre a tela), ou se o slot nao for selecionavel
+// (readonly/vazio conforme o modo, ver slot_selectable) - caso contrario, foca o
+// slot (state.selected = slot) e aplica a MESMA regra de confirmacao do Enter.
+[[nodiscard]] SaveLoadMenuAction save_load_menu_click_slot(SaveLoadMenuState& state,
+                                                            int slot) noexcept;
+
+// Abre o mini-dialogo de confirmacao de EXCLUSAO tendo `slot` como ALVO - tecla
+// dedicada (Delete, targeting state.selected) OU clique no icone de apagar
+// por-linha (targeting a linha clicada, que pode divergir de state.selected).
+// No-op defensivo (nao muta nada) se `slot` fora do intervalo, se `slot` estiver
+// VAZIO (nada a apagar), ou se algum mini-dialogo (sobrescrita OU exclusao) ja
+// estiver aberto (nunca 2 dialogos simultaneos).
+void save_load_menu_request_delete(SaveLoadMenuState& state, int slot) noexcept;
+
+// Se state.selected NAO for mais selecionavel (ex.: o slot focado acabou de ser
+// APAGADO - ver SaveLoadMenuAction::DeleteConfirmed - e ficou vazio em modo Load),
+// move para o PROXIMO slot selecionavel (mesma busca de save_load_menu_open,
+// wrap-around). No-op se state.selected ainda for valido; se NENHUM slot for
+// selecionavel, fica inalterado (mesmo caso de borda defensivo de next_selectable).
+// Chamado pelo CHAMADOR logo apos um delete de fato em disco (a mutacao de
+// state.slots[slot] pra vazio e responsabilidade do CHAMADOR, que sabe o I/O real
+// - esta funcao so re-ancora a selecao).
+void save_load_menu_reselect_if_needed(SaveLoadMenuState& state) noexcept;
+
+// Clique de MOUSE numa das 2 pills do mini-dialogo de SOBRESCRITA (0=Sim/
+// sobrescreve, 1=Nao) - equivalente a focar aquela pill + Enter. No-op (None) se
+// o dialogo NAO estiver aberto (confirming_overwrite==false) ou `pill` fora de
+// {0,1} (defensivo).
+[[nodiscard]] SaveLoadMenuAction save_load_menu_click_overwrite_confirm(
+    SaveLoadMenuState& state, int pill) noexcept;
+
+// Idem para o mini-dialogo de EXCLUSAO (0=Sim/apaga, 1=Nao) - MESMO contrato de
+// save_load_menu_click_overwrite_confirm acima, campos proprios
+// (confirming_delete/delete_confirm_selected).
+[[nodiscard]] SaveLoadMenuAction save_load_menu_click_delete_confirm(
+    SaveLoadMenuState& state, int pill) noexcept;
 
 }  // namespace gus::app::screens
 

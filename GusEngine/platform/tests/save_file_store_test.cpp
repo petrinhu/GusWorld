@@ -23,6 +23,7 @@
 
 using gus::domain::save::LoadResult;
 using gus::domain::save::SaveData;
+using gus::platform::fs::delete_save;
 using gus::platform::fs::FsSaveStore;
 using gus::platform::fs::has_save;
 using gus::platform::fs::load_game;
@@ -251,6 +252,72 @@ TEST_CASE("load_game: slot invalido lanca std::out_of_range (fail-fast, nao "
           "[platform][fs][save]") {
     const auto dir = make_temp_dir("slot_invalido_load");
     REQUIRE_THROWS_AS(load_game(99, dir.string()), std::out_of_range);
+    std::filesystem::remove_all(dir);
+}
+
+// ---- delete_save (feature "Apagar", SAVE-LOAD-UI etapa 6) --------------------
+
+TEST_CASE("delete_save: apaga o primario + a cadeia INTEIRA de backup em disco "
+          "(slot fica vazio de fato, nao so o primario)",
+          "[platform][fs][save]") {
+    const auto dir = make_temp_dir("delete_com_backup");
+    SaveData first = make_valid_save(1);
+    first.playtime_seconds = 1.0;
+    REQUIRE(save_game(first, 1, dir.string()));
+    SaveData second = make_valid_save(1);
+    second.playtime_seconds = 2.0;
+    REQUIRE(save_game(second, 1, dir.string()));  // gera save_1.backup1.sav
+    REQUIRE(std::filesystem::exists(dir / "save_1.sav"));
+    REQUIRE(std::filesystem::exists(dir / "save_1.backup1.sav"));
+
+    REQUIRE(delete_save(1, dir.string()));
+
+    REQUIRE_FALSE(std::filesystem::exists(dir / "save_1.sav"));
+    REQUIRE_FALSE(std::filesystem::exists(dir / "save_1.backup1.sav"));
+    REQUIRE_FALSE(has_save(1, dir.string()));
+    REQUIRE_FALSE(load_game(1, dir.string()).has_value());  // volta a "slot vazio"
+
+    std::filesystem::remove_all(dir);
+}
+
+TEST_CASE("delete_save: slot ja vazio e no-op seguro (idempotente, devolve true)",
+          "[platform][fs][save]") {
+    const auto dir = make_temp_dir("delete_ja_vazio");
+    REQUIRE_FALSE(has_save(1, dir.string()));
+    REQUIRE(delete_save(1, dir.string()));
+    REQUIRE_FALSE(has_save(1, dir.string()));
+    std::filesystem::remove_all(dir);
+}
+
+TEST_CASE("delete_save: apaga o autosave (slot 0) igual a qualquer manual (decisao "
+          "do lider: Auto tambem apagavel)",
+          "[platform][fs][save]") {
+    const auto dir = make_temp_dir("delete_autosave");
+    const SaveData data = make_valid_save(gus::domain::save::kAutosaveSlot);
+    REQUIRE(save_game(data, gus::domain::save::kAutosaveSlot, dir.string()));
+    REQUIRE(delete_save(gus::domain::save::kAutosaveSlot, dir.string()));
+    REQUIRE_FALSE(has_save(gus::domain::save::kAutosaveSlot, dir.string()));
+    std::filesystem::remove_all(dir);
+}
+
+TEST_CASE("delete_save: nao mexe em OUTROS slots (so o alvo)",
+          "[platform][fs][save]") {
+    const auto dir = make_temp_dir("delete_isola_outros_slots");
+    REQUIRE(save_game(make_valid_save(1), 1, dir.string()));
+    REQUIRE(save_game(make_valid_save(2), 2, dir.string()));
+
+    REQUIRE(delete_save(1, dir.string()));
+
+    REQUIRE_FALSE(has_save(1, dir.string()));
+    REQUIRE(has_save(2, dir.string()));
+    std::filesystem::remove_all(dir);
+}
+
+TEST_CASE("delete_save: slot invalido lanca std::out_of_range (fail-fast, nao "
+          "degradacao de I/O)",
+          "[platform][fs][save]") {
+    const auto dir = make_temp_dir("delete_slot_invalido");
+    REQUIRE_THROWS_AS(delete_save(99, dir.string()), std::out_of_range);
     std::filesystem::remove_all(dir);
 }
 

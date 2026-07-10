@@ -1,7 +1,13 @@
 # Testes da camada app/ (Catch2 v3, headless). O OverworldSim e desenhado num
 # IRenderer FALSO (sem GPU), e o movimento/colisao/camera/interpolacao/sprite sao
 # exercitados deterministicamente. A LOGICA de animacao (sprite_animation) e POCO
-# pura. NAO linka Qt nem SDL: tudo roda sem abrir janela.
+# pura. NAO linka Qt: a MAIORIA roda sem abrir janela nenhuma.
+#
+# EXCECAO: save_load_menu_interaction_test.cpp ABRE uma janela SDL ESCONDIDA +
+# contexto GL real (Xvfb :99 ou equivalente) pra exercitar glintfx::UiLayer de
+# verdade (harness de POSICIONAMENTO/INTERACAO, SAVE-LOAD-UI) - degrada seguro
+# (0 assercoes, NUNCA falha) se GL/display estiver indisponivel no host que roda
+# o ctest, ver o comentario no topo daquele arquivo.
 #
 # Um executavel agregado + catch_discover_tests, no padrao de core/+domain/.
 
@@ -48,6 +54,11 @@ add_executable(gusengine_app_tests
     # gerador de RML.
     title_menu_test.cpp
     title_menu_rml_test.cpp
+    # SAVE-LOAD-UI (retoque ao vivo do lider, bugs 1-9 + feature "Apagar"): harness
+    # HEADLESS com GL real (Xvfb :99) de POSICIONAMENTO/INTERACAO - degrada seguro
+    # (0 assercoes) se GL/display indisponivel. ui_box_assertions.hpp e so header
+    # (helpers genericos), nao entra aqui.
+    save_load_menu_interaction_test.cpp
 )
 
 target_link_libraries(gusengine_app_tests
@@ -57,6 +68,23 @@ target_link_libraries(gusengine_app_tests
         gusengine_domain
         gusengine_platform
         Catch2::Catch2WithMain
+)
+
+# save_load_menu_interaction_test.cpp inclui <glintfx/ui_layer.hpp> direto (harness
+# GL) - gusengine_app ja linka glintfx::glintfx PRIVATE (nao propaga includes pra
+# quem so linka gusengine_app), entao o teste precisa do link PROPRIO aqui, MESMA
+# fronteira "so em app/" do GATE de arquitetura (glintfx nunca em core/domain/).
+target_link_libraries(gusengine_app_tests PRIVATE glintfx::glintfx)
+
+# GUSWORLD_FONTS_DIR: o harness de interacao precisa injetar a MESMA fonte real
+# que save_load_menu_loop.cpp injeta em producao (achado empirico: SEM a fonte
+# real, o fallback do RmlUi tem metricas DIFERENTES -> altura de linha diferente
+# -> a posicao medida pelo harness diverge da posicao real que o loop usa,
+# fazendo o teste medir um alvo ERRADO). MESMO valor/receita de app/CMakeLists.txt
+# e platform/CMakeLists.txt (CMAKE_SOURCE_DIR = raiz GusEngine/, NAO
+# CMAKE_CURRENT_SOURCE_DIR - as fontes vivem em GusEngine/assets/fonts).
+target_compile_definitions(gusengine_app_tests
+    PRIVATE GUSWORLD_FONTS_DIR="${CMAKE_SOURCE_DIR}/assets/fonts"
 )
 
 target_compile_features(gusengine_app_tests PRIVATE cxx_std_20)

@@ -339,6 +339,327 @@ TEST_CASE("save_load_menu_key_down: Esc fora do mini-dialogo devolve Back",
     REQUIRE(save_load_menu_key_down(state, SDLK_ESCAPE) == SaveLoadMenuAction::Back);
 }
 
+// ---------------------------------------------------------------- save_load_menu_click_slot
+//
+// Clique de mouse (fora de qualquer mini-dialogo): "focar + Enter" (MESMA
+// convencao de system_menu_click_option).
+
+TEST_CASE("save_load_menu_click_slot: clique num slot selecionavel foca e aplica a "
+          "mesma regra do Enter (vazio em Save = SlotChosen direto)",
+          "[save_load_menu]") {
+    SaveLoadMenuState state;
+    std::array<SaveSlotPreview, kSlotCount> slots{};
+    for (int i = 0; i < kSlotCount; ++i) slots[static_cast<std::size_t>(i)] = empty_slot_preview(i);
+    save_load_menu_open(state, SaveLoadMode::Save, slots);
+    REQUIRE(state.selected == 1);
+
+    REQUIRE(save_load_menu_click_slot(state, 3) == SaveLoadMenuAction::SlotChosen);
+    REQUIRE(state.selected == 3);  // o clique MOVEU o foco pro slot clicado
+}
+
+TEST_CASE("save_load_menu_click_slot: clique num slot manual OCUPADO em modo Save "
+          "abre o mini-dialogo de sobrescrita (mesmo efeito do Enter)",
+          "[save_load_menu]") {
+    SaveLoadMenuState state;
+    std::array<SaveSlotPreview, kSlotCount> slots{};
+    for (int i = 0; i < kSlotCount; ++i) slots[static_cast<std::size_t>(i)] = empty_slot_preview(i);
+    slots[3] = build_slot_preview(make_save_data(100), 3);
+    save_load_menu_open(state, SaveLoadMode::Save, slots);
+
+    REQUIRE(save_load_menu_click_slot(state, 3) == SaveLoadMenuAction::None);
+    REQUIRE(state.confirming_overwrite);
+    REQUIRE(state.selected == 3);
+}
+
+TEST_CASE("save_load_menu_click_slot: clique no autosave em modo Save (nao "
+          "selecionavel, so-leitura) e no-op",
+          "[save_load_menu]") {
+    SaveLoadMenuState state;
+    std::array<SaveSlotPreview, kSlotCount> slots{};
+    for (int i = 0; i < kSlotCount; ++i) slots[static_cast<std::size_t>(i)] = empty_slot_preview(i);
+    slots[kAutosaveSlot] = build_slot_preview(make_save_data(550), kAutosaveSlot);
+    save_load_menu_open(state, SaveLoadMode::Save, slots);
+    const int before = state.selected;
+
+    REQUIRE(save_load_menu_click_slot(state, kAutosaveSlot) == SaveLoadMenuAction::None);
+    REQUIRE(state.selected == before);  // foco NAO mudou (readonly nao clicavel)
+}
+
+TEST_CASE("save_load_menu_click_slot: index fora do intervalo e no-op (defensivo)",
+          "[save_load_menu]") {
+    SaveLoadMenuState state;
+    std::array<SaveSlotPreview, kSlotCount> slots{};
+    for (int i = 0; i < kSlotCount; ++i) slots[static_cast<std::size_t>(i)] = empty_slot_preview(i);
+    save_load_menu_open(state, SaveLoadMode::Save, slots);
+    REQUIRE(save_load_menu_click_slot(state, -1) == SaveLoadMenuAction::None);
+    REQUIRE(save_load_menu_click_slot(state, kSlotCount) == SaveLoadMenuAction::None);
+}
+
+TEST_CASE("save_load_menu_click_slot: clique na lista e no-op enquanto um "
+          "mini-dialogo (sobrescrita) ja esta aberto",
+          "[save_load_menu]") {
+    SaveLoadMenuState state;
+    std::array<SaveSlotPreview, kSlotCount> slots{};
+    for (int i = 0; i < kSlotCount; ++i) slots[static_cast<std::size_t>(i)] = empty_slot_preview(i);
+    slots[1] = build_slot_preview(make_save_data(100), 1);
+    slots[2] = build_slot_preview(make_save_data(200), 2);
+    save_load_menu_open(state, SaveLoadMode::Save, slots);
+    (void)save_load_menu_key_down(state, SDLK_RETURN);  // abre overwrite no slot 1
+    REQUIRE(state.confirming_overwrite);
+
+    REQUIRE(save_load_menu_click_slot(state, 2) == SaveLoadMenuAction::None);
+    REQUIRE(state.selected == 1);  // clique na lista ignorado, foco NAO mudou pro 2
+}
+
+// ---------------------------------------------------------------- exclusao (feature "Apagar")
+
+TEST_CASE("save_load_menu_request_delete: slot OCUPADO abre o mini-dialogo com "
+          "delete_target_slot correto e default seguro = Nao",
+          "[save_load_menu]") {
+    SaveLoadMenuState state;
+    std::array<SaveSlotPreview, kSlotCount> slots{};
+    for (int i = 0; i < kSlotCount; ++i) slots[static_cast<std::size_t>(i)] = empty_slot_preview(i);
+    slots[2] = build_slot_preview(make_save_data(100), 2);
+    save_load_menu_open(state, SaveLoadMode::Save, slots);
+
+    save_load_menu_request_delete(state, 2);
+    REQUIRE(state.confirming_delete);
+    REQUIRE(state.delete_confirm_selected == 1);
+    REQUIRE(state.delete_target_slot == 2);
+}
+
+TEST_CASE("save_load_menu_request_delete: slot VAZIO e no-op (nada a apagar)",
+          "[save_load_menu]") {
+    SaveLoadMenuState state;
+    std::array<SaveSlotPreview, kSlotCount> slots{};
+    for (int i = 0; i < kSlotCount; ++i) slots[static_cast<std::size_t>(i)] = empty_slot_preview(i);
+    save_load_menu_open(state, SaveLoadMode::Save, slots);
+
+    save_load_menu_request_delete(state, 2);
+    REQUIRE_FALSE(state.confirming_delete);
+}
+
+TEST_CASE("save_load_menu_request_delete: autosave OCUPADO tambem abre o dialogo "
+          "(decisao do lider: Auto tambem apagavel)",
+          "[save_load_menu]") {
+    SaveLoadMenuState state;
+    std::array<SaveSlotPreview, kSlotCount> slots{};
+    for (int i = 0; i < kSlotCount; ++i) slots[static_cast<std::size_t>(i)] = empty_slot_preview(i);
+    slots[kAutosaveSlot] = build_slot_preview(make_save_data(550), kAutosaveSlot);
+    save_load_menu_open(state, SaveLoadMode::Save, slots);
+
+    save_load_menu_request_delete(state, kAutosaveSlot);
+    REQUIRE(state.confirming_delete);
+    REQUIRE(state.delete_target_slot == kAutosaveSlot);
+}
+
+TEST_CASE("save_load_menu_request_delete: index fora do intervalo e no-op (defensivo)",
+          "[save_load_menu]") {
+    SaveLoadMenuState state;
+    std::array<SaveSlotPreview, kSlotCount> slots{};
+    for (int i = 0; i < kSlotCount; ++i) slots[static_cast<std::size_t>(i)] = empty_slot_preview(i);
+    save_load_menu_open(state, SaveLoadMode::Save, slots);
+
+    save_load_menu_request_delete(state, -1);
+    REQUIRE_FALSE(state.confirming_delete);
+    save_load_menu_request_delete(state, kSlotCount);
+    REQUIRE_FALSE(state.confirming_delete);
+}
+
+TEST_CASE("save_load_menu_request_delete: no-op se o dialogo de sobrescrita ja "
+          "estiver aberto (nunca 2 dialogos simultaneos)",
+          "[save_load_menu]") {
+    SaveLoadMenuState state;
+    std::array<SaveSlotPreview, kSlotCount> slots{};
+    for (int i = 0; i < kSlotCount; ++i) slots[static_cast<std::size_t>(i)] = empty_slot_preview(i);
+    slots[1] = build_slot_preview(make_save_data(100), 1);
+    slots[2] = build_slot_preview(make_save_data(200), 2);
+    save_load_menu_open(state, SaveLoadMode::Save, slots);
+    (void)save_load_menu_key_down(state, SDLK_RETURN);  // abre overwrite no slot 1
+    REQUIRE(state.confirming_overwrite);
+
+    save_load_menu_request_delete(state, 2);
+    REQUIRE_FALSE(state.confirming_delete);  // ignorado - overwrite ja aberto
+}
+
+TEST_CASE("save_load_menu_key_down: Delete sobre o slot focado (ocupado) abre o "
+          "mini-dialogo de exclusao",
+          "[save_load_menu]") {
+    SaveLoadMenuState state;
+    std::array<SaveSlotPreview, kSlotCount> slots{};
+    for (int i = 0; i < kSlotCount; ++i) slots[static_cast<std::size_t>(i)] = empty_slot_preview(i);
+    slots[1] = build_slot_preview(make_save_data(100), 1);
+    save_load_menu_open(state, SaveLoadMode::Save, slots);
+    REQUIRE(state.selected == 1);
+
+    REQUIRE(save_load_menu_key_down(state, SDLK_DELETE) == SaveLoadMenuAction::None);
+    REQUIRE(state.confirming_delete);
+    REQUIRE(state.delete_target_slot == 1);
+}
+
+TEST_CASE("save_load_menu_key_down: mini-dialogo de exclusao - Enter com Nao "
+          "devolve DeleteCancelled e fecha o dialogo",
+          "[save_load_menu]") {
+    SaveLoadMenuState state;
+    std::array<SaveSlotPreview, kSlotCount> slots{};
+    for (int i = 0; i < kSlotCount; ++i) slots[static_cast<std::size_t>(i)] = empty_slot_preview(i);
+    slots[1] = build_slot_preview(make_save_data(100), 1);
+    save_load_menu_open(state, SaveLoadMode::Save, slots);
+    (void)save_load_menu_key_down(state, SDLK_DELETE);  // abre o dialogo
+
+    REQUIRE(save_load_menu_key_down(state, SDLK_RETURN) == SaveLoadMenuAction::DeleteCancelled);
+    REQUIRE_FALSE(state.confirming_delete);
+}
+
+TEST_CASE("save_load_menu_key_down: mini-dialogo de exclusao - alternar pra Sim e "
+          "confirmar devolve DeleteConfirmed com o slot certo",
+          "[save_load_menu]") {
+    SaveLoadMenuState state;
+    std::array<SaveSlotPreview, kSlotCount> slots{};
+    for (int i = 0; i < kSlotCount; ++i) slots[static_cast<std::size_t>(i)] = empty_slot_preview(i);
+    slots[1] = build_slot_preview(make_save_data(100), 1);
+    save_load_menu_open(state, SaveLoadMode::Save, slots);
+    (void)save_load_menu_key_down(state, SDLK_DELETE);  // abre o dialogo
+
+    REQUIRE(save_load_menu_key_down(state, SDLK_LEFT) == SaveLoadMenuAction::None);
+    REQUIRE(state.delete_confirm_selected == 0);
+    REQUIRE(save_load_menu_key_down(state, SDLK_RETURN) == SaveLoadMenuAction::DeleteConfirmed);
+    REQUIRE_FALSE(state.confirming_delete);
+    REQUIRE(state.delete_target_slot == 1);  // o CHAMADOR ainda le o alvo apos confirmar
+}
+
+TEST_CASE("save_load_menu_key_down: mini-dialogo de exclusao - Esc equivale a Nao "
+          "(seguranca)",
+          "[save_load_menu]") {
+    SaveLoadMenuState state;
+    std::array<SaveSlotPreview, kSlotCount> slots{};
+    for (int i = 0; i < kSlotCount; ++i) slots[static_cast<std::size_t>(i)] = empty_slot_preview(i);
+    slots[1] = build_slot_preview(make_save_data(100), 1);
+    save_load_menu_open(state, SaveLoadMode::Save, slots);
+    (void)save_load_menu_key_down(state, SDLK_DELETE);  // abre o dialogo
+
+    REQUIRE(save_load_menu_key_down(state, SDLK_ESCAPE) == SaveLoadMenuAction::DeleteCancelled);
+    REQUIRE_FALSE(state.confirming_delete);
+}
+
+TEST_CASE("save_load_menu_key_down: Delete sobre slot VAZIO/nao-selecionavel e "
+          "no-op (nao abre dialogo)",
+          "[save_load_menu]") {
+    SaveLoadMenuState state;
+    std::array<SaveSlotPreview, kSlotCount> slots{};
+    for (int i = 0; i < kSlotCount; ++i) slots[static_cast<std::size_t>(i)] = empty_slot_preview(i);
+    save_load_menu_open(state, SaveLoadMode::Save, slots);
+
+    REQUIRE(save_load_menu_key_down(state, SDLK_DELETE) == SaveLoadMenuAction::None);
+    REQUIRE_FALSE(state.confirming_delete);
+}
+
+// ---------------------------------------------------------------- click nas pills dos mini-dialogos
+
+TEST_CASE("save_load_menu_click_overwrite_confirm: clique em 'Sim' (pill 0) "
+          "devolve OverwriteConfirmed e fecha o dialogo",
+          "[save_load_menu]") {
+    SaveLoadMenuState state;
+    std::array<SaveSlotPreview, kSlotCount> slots{};
+    for (int i = 0; i < kSlotCount; ++i) slots[static_cast<std::size_t>(i)] = empty_slot_preview(i);
+    slots[1] = build_slot_preview(make_save_data(100), 1);
+    save_load_menu_open(state, SaveLoadMode::Save, slots);
+    (void)save_load_menu_key_down(state, SDLK_RETURN);  // abre o dialogo
+    REQUIRE(state.confirming_overwrite);
+
+    REQUIRE(save_load_menu_click_overwrite_confirm(state, 0) ==
+            SaveLoadMenuAction::OverwriteConfirmed);
+    REQUIRE_FALSE(state.confirming_overwrite);
+}
+
+TEST_CASE("save_load_menu_click_overwrite_confirm: clique em 'Nao' (pill 1) "
+          "devolve OverwriteCancelled",
+          "[save_load_menu]") {
+    SaveLoadMenuState state;
+    std::array<SaveSlotPreview, kSlotCount> slots{};
+    for (int i = 0; i < kSlotCount; ++i) slots[static_cast<std::size_t>(i)] = empty_slot_preview(i);
+    slots[1] = build_slot_preview(make_save_data(100), 1);
+    save_load_menu_open(state, SaveLoadMode::Save, slots);
+    (void)save_load_menu_key_down(state, SDLK_RETURN);  // abre o dialogo
+
+    REQUIRE(save_load_menu_click_overwrite_confirm(state, 1) ==
+            SaveLoadMenuAction::OverwriteCancelled);
+    REQUIRE_FALSE(state.confirming_overwrite);
+}
+
+TEST_CASE("save_load_menu_click_overwrite_confirm: no-op se o dialogo nao estiver "
+          "aberto (defensivo)",
+          "[save_load_menu]") {
+    SaveLoadMenuState state;
+    std::array<SaveSlotPreview, kSlotCount> slots{};
+    for (int i = 0; i < kSlotCount; ++i) slots[static_cast<std::size_t>(i)] = empty_slot_preview(i);
+    save_load_menu_open(state, SaveLoadMode::Save, slots);
+    REQUIRE(save_load_menu_click_overwrite_confirm(state, 0) == SaveLoadMenuAction::None);
+}
+
+TEST_CASE("save_load_menu_click_delete_confirm: clique em 'Sim' (pill 0) devolve "
+          "DeleteConfirmed mantendo delete_target_slot; 'Nao' devolve "
+          "DeleteCancelled",
+          "[save_load_menu]") {
+    SaveLoadMenuState state;
+    std::array<SaveSlotPreview, kSlotCount> slots{};
+    for (int i = 0; i < kSlotCount; ++i) slots[static_cast<std::size_t>(i)] = empty_slot_preview(i);
+    slots[2] = build_slot_preview(make_save_data(100), 2);
+    save_load_menu_open(state, SaveLoadMode::Save, slots);
+    save_load_menu_request_delete(state, 2);
+    REQUIRE(state.confirming_delete);
+
+    REQUIRE(save_load_menu_click_delete_confirm(state, 0) ==
+            SaveLoadMenuAction::DeleteConfirmed);
+    REQUIRE_FALSE(state.confirming_delete);
+    REQUIRE(state.delete_target_slot == 2);
+
+    save_load_menu_request_delete(state, 2);
+    REQUIRE(save_load_menu_click_delete_confirm(state, 1) ==
+            SaveLoadMenuAction::DeleteCancelled);
+}
+
+TEST_CASE("save_load_menu_click_delete_confirm: no-op se o dialogo nao estiver "
+          "aberto (defensivo)",
+          "[save_load_menu]") {
+    SaveLoadMenuState state;
+    std::array<SaveSlotPreview, kSlotCount> slots{};
+    for (int i = 0; i < kSlotCount; ++i) slots[static_cast<std::size_t>(i)] = empty_slot_preview(i);
+    save_load_menu_open(state, SaveLoadMode::Save, slots);
+    REQUIRE(save_load_menu_click_delete_confirm(state, 0) == SaveLoadMenuAction::None);
+}
+
+// ---------------------------------------------------------------- save_load_menu_reselect_if_needed
+
+TEST_CASE("save_load_menu_reselect_if_needed: slot selecionado ainda valido - no-op",
+          "[save_load_menu]") {
+    SaveLoadMenuState state;
+    std::array<SaveSlotPreview, kSlotCount> slots{};
+    for (int i = 0; i < kSlotCount; ++i) slots[static_cast<std::size_t>(i)] = empty_slot_preview(i);
+    save_load_menu_open(state, SaveLoadMode::Save, slots);
+    const int before = state.selected;
+
+    save_load_menu_reselect_if_needed(state);
+    REQUIRE(state.selected == before);
+}
+
+TEST_CASE("save_load_menu_reselect_if_needed: slot selecionado ficou vazio (apos "
+          "delete) em modo Load - move para o PROXIMO ocupado",
+          "[save_load_menu]") {
+    SaveLoadMenuState state;
+    std::array<SaveSlotPreview, kSlotCount> slots{};
+    for (int i = 0; i < kSlotCount; ++i) slots[static_cast<std::size_t>(i)] = empty_slot_preview(i);
+    slots[1] = build_slot_preview(make_save_data(100), 1);
+    slots[2] = build_slot_preview(make_save_data(200), 2);
+    save_load_menu_open(state, SaveLoadMode::Load, slots);
+    REQUIRE(state.selected == 1);
+
+    // Simula o CHAMADOR ja tendo apagado o slot 1 em disco e atualizado o preview.
+    state.slots[1] = empty_slot_preview(1);
+    save_load_menu_reselect_if_needed(state);
+    REQUIRE(state.selected == 2);
+}
+
 // ---------------------------------------------------------------- most_recent_occupied_slot
 //
 // SAVE-LOAD-UI etapa 4 (TELA DE TITULO): "Continuar" carrega o save mais recente

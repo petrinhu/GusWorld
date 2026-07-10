@@ -186,6 +186,20 @@ Jogo salvo.
 ## SAVE_FAILED
 Falha ao salvar. Verifique espaço em disco.
 
+# SAVE_DELETE_*: feature "Apagar" (aprovada pelo líder) - mini-diálogo Sim/Não
+# próprio por slot OCUPADO (mesma mecânica do SAVE_CONFIRM_OVERWRITE acima).
+## SAVE_CONFIRM_DELETE
+Apagar este espaço? Esta ação não pode ser desfeita.
+
+## SAVE_DELETE_CONFIRM_YES
+Sim, apagar
+
+## SAVE_DELETE_CONFIRM_NO
+Cancelar
+
+## SAVE_DELETE_BUTTON_LABEL
+Apagar
+
 ## LOAD_CONFIRM
 Carregar este save? Progresso não salvo será perdido.
 

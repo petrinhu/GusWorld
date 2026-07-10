@@ -110,6 +110,20 @@ class FsSaveStore final : public gus::domain::save::SaveStore {
 [[nodiscard]] std::optional<gus::domain::save::LoadOutcome> load_game(
     int slot, const std::string& dir);
 
+// Apaga TODO o save do slot: o arquivo PRIMARIO + a cadeia INTEIRA de backup
+// (backup1..backup{kBackupChainDepth}, save_backup.hpp) - o slot fica completamente
+// vazio (nao sobra rastro pra um load acidental reviver via backup depois, feature
+// "Apagar" aprovada pelo lider, SAVE-LOAD-UI etapa 6). Idempotente: nomes ja ausentes
+// (slot ja vazio, ou so o primario apagado mas backups nao) sao no-op seguro em cada
+// um (mesmo contrato de FsSaveStore::remove).
+//
+// Degradacao segura (NUNCA lanca por causa de I/O): devolve true se o PRIMARIO nao
+// existe mais ao final (VERIFICADO via exists(), nao so "tentei remover") - false
+// sinaliza que a remocao nao pegou (permissao negada etc., raro); o CHAMADOR decide
+// o que avisar. Fail-fast (propaga, nao e I/O): slot invalido lanca std::out_of_range
+// (mesmo contrato de has_save/save_game/load_game).
+[[nodiscard]] bool delete_save(int slot, const std::string& dir);
+
 }  // namespace gus::platform::fs
 
 #endif  // GUS_PLATFORM_FS_SAVE_FILE_STORE_HPP

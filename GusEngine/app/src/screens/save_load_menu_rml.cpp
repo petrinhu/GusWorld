@@ -11,6 +11,13 @@
 // proprio, sem incluir system_menu_rml.cpp - MESMO espirito de nao-acoplamento
 // que separa battle_preview.cpp de system_menu_rml.cpp, cada um com seu
 // <style> completo).
+//
+// FEATURE "APAGAR" (aprovada pelo lider, retoque ao vivo pos-bugs 1-9): cada slot
+// OCUPADO ganha um icone/pill ".slot-delete" (id "slmenu-delete-<i>", proprio -
+// clicavel mesmo numa linha NAO focada) e um mini-dialogo Sim/Nao PROPRIO
+// (state.confirming_delete, ids "slmenu-delete-confirm-yes/no") - MESMA mecanica
+// do overwrite acima, campos/ids separados (nunca os 2 dialogos abertos ao
+// mesmo tempo, ver save_load_menu.hpp::save_load_menu_request_delete).
 
 #include "gus/app/screens/save_load_menu_rml.hpp"
 
@@ -97,7 +104,7 @@ body { font-family: "Pixel Operator Mono"; background: transparent; width: 100%;
 .corner.br { bottom: 8dp; right: 8dp; }
 .title { text-align: center; font-size: 20dp; line-height: 30dp; color: #F0D98C; margin: 2dp 0dp 4dp 0dp; padding-top: 4dp; letter-spacing: 3dp; }
 .subtitle { text-align: center; color: #9AA5C0; font-size: 10dp; line-height: 15dp; margin-bottom: 14dp; }
-.slot-list { height: 300dp; overflow-x: hidden; overflow-y: auto; margin-top: 2dp; padding-right: 6dp; }
+.slot-list { height: 300dp; overflow-x: hidden; overflow-y: auto; margin-top: 2dp; padding-right: 10dp; }
 #slmenu-list scrollbarvertical { width: 8dp; }
 #slmenu-list scrollbarvertical slidertrack { background-color: #0A0E1A80; border-radius: 999dp; }
 #slmenu-list scrollbarvertical sliderbar { background-color: #C9A24Bb3; border-radius: 999dp; min-height: 24dp; }
@@ -106,7 +113,13 @@ body { font-family: "Pixel Operator Mono"; background: transparent; width: 100%;
 #slmenu-list scrollbarvertical sliderarrowinc { height: 0dp; }
 .slot {
   box-sizing: border-box; display: flex; align-items: center;
-  width: 400dp; padding: 10dp 12dp; margin: 6dp 0dp; border-radius: 10dp;
+  /* LAYOUT slot x scrollbar (bug 2/8, retoque ao vivo do lider): largura reduzida
+     (era 400dp) - com .slot-list.padding-right:10dp (era 6dp) sobre o conteudo de
+     408dp de #slmenu-panel (460dp - 2x26dp de padding), o slot fica com ~12dp de
+     folga do inicio da faixa de 8dp da scrollbar (nao mais "encostado" nela) -
+     provado pelo harness headless (save_load_menu_interaction_test.cpp,
+     assert_no_horizontal_overlap). */
+  width: 388dp; padding: 10dp 12dp; margin: 6dp 0dp; border-radius: 10dp;
   decorator: vertical-gradient( #1a2238 #141b2e );
   border: 1dp #33405e;
 }
@@ -131,6 +144,13 @@ body { font-family: "Pixel Operator Mono"; background: transparent; width: 100%;
 .slot-title .ro { color: #6B6F7A; font-size: 10dp; }
 .slot-meta { color: #9AA5C0; font-size: 10dp; }
 .slot-empty-label { color: #6B6F7A; font-size: 11dp; }
+.slot-delete {
+  flex: 0 0 auto; box-sizing: border-box; margin-left: 8dp; padding: 5dp 9dp;
+  border-radius: 6dp; text-align: center; font-size: 9dp; letter-spacing: 1dp;
+  color: #E2555A; border: 1dp #5A3238;
+  decorator: vertical-gradient( #2A1620 #1A1015 );
+}
+.slot-delete:hover { color: #ffffff; border: 1dp #E2555A; box-shadow: #E2555A 0dp 0dp 10dp 1dp; }
 .footer {
   display: flex; justify-content: space-between; align-items: center;
   margin-top: 12dp; padding-top: 10dp; border-top: 1dp #33281a;
@@ -202,6 +222,22 @@ std::string build_save_load_menu_rml(const SaveLoadMenuState& state,
         return wrap_document(body.str());
     }
 
+    if (state.confirming_delete) {
+        // Mini-dialogo Sim/Nao da feature "Apagar" (aprovada pelo lider) - MESMA
+        // mecanica de confirming_overwrite acima (ids proprios, so 1 dialogo por
+        // vez, ver save_load_menu_request_delete).
+        body << "<div class=\"confirm-title\">" << tr.tr("SAVE_CONFIRM_DELETE")
+             << "</div>";
+        body << "<div class=\"confirm-pill" << (state.delete_confirm_selected == 0 ? " focused" : "")
+             << "\" id=\"slmenu-delete-confirm-yes\">" << tr.tr("SAVE_DELETE_CONFIRM_YES")
+             << "</div>";
+        body << "<div class=\"confirm-pill" << (state.delete_confirm_selected == 1 ? " focused" : "")
+             << "\" id=\"slmenu-delete-confirm-no\">" << tr.tr("SAVE_DELETE_CONFIRM_NO")
+             << "</div>";
+        body << "</div>";  // #slmenu-panel
+        return wrap_document(body.str());
+    }
+
     body << "<div class=\"slot-list\" id=\"slmenu-list\">";
     for (int i = 0; i < kSlotCount; ++i) {
         const SaveSlotPreview& slot = state.slots[static_cast<std::size_t>(i)];
@@ -242,6 +278,14 @@ std::string build_save_load_menu_rml(const SaveLoadMenuState& state,
                  << "</div>";
         }
         body << "</div>";  // .slot-body
+        if (slot.occupied) {
+            // Affordance "Apagar" (feature aprovada pelo lider) - so em slots
+            // OCUPADOS (readonly/Auto INCLUSO, decisao do lider: Auto tambem
+            // apagavel). id proprio por linha (independente de state.selected -
+            // clicavel mesmo numa linha NAO focada, ver save_load_menu_loop.cpp).
+            body << "<div class=\"slot-delete\" id=\"slmenu-delete-" << i << "\">"
+                 << tr.tr("SAVE_DELETE_BUTTON_LABEL") << "</div>";
+        }
         body << "</div>";  // .slot
     }
     body << "</div>";  // .slot-list

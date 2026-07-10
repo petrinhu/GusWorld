@@ -38,6 +38,10 @@ Translator make_translator() {
         "## SAVE_CONFIRM_OVERWRITE\nSobrescrever este slot?\n\n"
         "## SAVE_OVERWRITE_CONFIRM_YES\nSim, sobrescrever\n\n"
         "## SAVE_OVERWRITE_CONFIRM_NO\nCancelar\n\n"
+        "## SAVE_CONFIRM_DELETE\nApagar este espaco?\n\n"
+        "## SAVE_DELETE_CONFIRM_YES\nSim, apagar\n\n"
+        "## SAVE_DELETE_CONFIRM_NO\nCancelar\n\n"
+        "## SAVE_DELETE_BUTTON_LABEL\nApagar\n\n"
         "## SETTINGS_BACK\nVoltar\n\n"
         "## LOCATION_PRACA_COMPILACAO\nPraca da Compilacao\n\n"
         "## LOCATION_UNKNOWN\nLocal desconhecido\n\n");
@@ -135,4 +139,38 @@ TEST_CASE("build_save_load_menu_rml: pressed_index marca o slot certo com a clas
     REQUIRE(pos != std::string::npos);
     const auto div_start = rml.rfind("<div class=\"", pos);
     REQUIRE(rml.substr(div_start, pos - div_start).find("pressed") != std::string::npos);
+}
+
+// ---------------------------------------------------------------- feature "Apagar"
+
+TEST_CASE("build_save_load_menu_rml: slots OCUPADOS (inclusive Auto) ganham o icone "
+          "de apagar; slot vazio NAO ganha",
+          "[save_load_menu_rml]") {
+    SaveLoadMenuState state;
+    save_load_menu_open(state, SaveLoadMode::Save, make_slots_mock_like());
+
+    const std::string rml = build_save_load_menu_rml(state, make_translator());
+    REQUIRE(rml.find("id=\"slmenu-delete-0\"") != std::string::npos);  // autosave ocupado
+    REQUIRE(rml.find("id=\"slmenu-delete-1\"") != std::string::npos);  // manual ocupado
+    REQUIRE(rml.find("id=\"slmenu-delete-2\"") == std::string::npos);  // vazio - sem icone
+}
+
+TEST_CASE("build_save_load_menu_rml: mini-dialogo de EXCLUSAO substitui a lista "
+          "(ids proprios, default seguro = Nao)",
+          "[save_load_menu_rml]") {
+    SaveLoadMenuState state;
+    save_load_menu_open(state, SaveLoadMode::Save, make_slots_mock_like());
+    save_load_menu_request_delete(state, 1);
+    REQUIRE(state.confirming_delete);
+
+    const std::string rml = build_save_load_menu_rml(state, make_translator());
+    REQUIRE(rml.find("Apagar este espaco?") != std::string::npos);
+    REQUIRE(rml.find("id=\"slmenu-delete-confirm-yes\"") != std::string::npos);
+    REQUIRE(rml.find("id=\"slmenu-delete-confirm-no\"") != std::string::npos);
+    // Nao aparece a LISTA de slots enquanto o dialogo esta aberto.
+    REQUIRE(rml.find("id=\"slmenu-list\"") == std::string::npos);
+
+    const auto pos_no = rml.find("id=\"slmenu-delete-confirm-no\"");
+    const auto div_start = rml.rfind("<div class=\"", pos_no);
+    REQUIRE(rml.substr(div_start, pos_no - div_start).find("focused") != std::string::npos);
 }

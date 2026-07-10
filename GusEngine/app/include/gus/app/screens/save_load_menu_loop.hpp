@@ -31,13 +31,24 @@
 // jogador nao volta pro menu de pausa, vai direto jogar (mesmo padrao "Carregar"
 // de qualquer RPG).
 //
+// MOUSE + SFX (retoque ao vivo do lider, bugs 1/3/6/9 + paridade de som):
+// hit-test de slot/icone-de-apagar/Voltar via glintfx::UiLayer::get_element_box
+// (MESMA receita de system_menu_loop.cpp), hover NATIVO (:hover RCSS, injecao de
+// UiEvent::MouseMove em TODO SDL_EVENT_MOUSE_MOTION) + SOM de hover/clique
+// (edge-detect, MESMO choke-point/padrao de system_menu_loop.cpp), e forwarding
+// de SDL_EVENT_MOUSE_WHEEL pra `.slot-list` (MESMA tecnica de scroll de
+// system_menu_loop.cpp::Controls). `audio` (NOVO parametro): o AudioEngine VIVO
+// do chamador (system_menu_loop.cpp ja o tem em escopo) - toca hover_sfx/click_sfx
+// (gus/core/asset_paths.hpp::kMenuHoverSfxFile/kMenuClickSfxFile), MESMOS arquivos
+// dos demais menus.
+//
 // Cross-ref: gus/app/screens/save_load_menu.hpp (estado/navegacao PURA);
 //            gus/app/screens/save_load_menu_rml.hpp (RML/RCSS data-driven);
-//            gus/platform/fs/save_file_store.hpp (has_save/save_game/load_game,
-//            JA EXISTENTES, M2-SAVE-IO); gus/app/screens/system_menu_loop.hpp
-//            (o CHAMADOR, mesma tecnica de aninhamento no MESMO contexto GL);
-//            gus/app/maestro.cpp (fornece os 2 callbacks - unico dono do SaveData
-//            e da posicao VIVOS do jogo).
+//            gus/platform/fs/save_file_store.hpp (has_save/save_game/load_game/
+//            delete_save, JA EXISTENTES, M2-SAVE-IO); gus/app/screens/
+//            system_menu_loop.hpp (o CHAMADOR, mesma tecnica de aninhamento no
+//            MESMO contexto GL); gus/app/maestro.cpp (fornece os 2 callbacks -
+//            unico dono do SaveData e da posicao VIVOS do jogo).
 
 #ifndef GUS_APP_SCREENS_SAVE_LOAD_MENU_LOOP_HPP
 #define GUS_APP_SCREENS_SAVE_LOAD_MENU_LOOP_HPP
@@ -50,6 +61,7 @@
 #include "gus/app/i18n/translator.hpp"
 #include "gus/app/screens/save_load_menu.hpp"
 #include "gus/domain/save/save_data.hpp"
+#include "gus/platform/audio/audio_engine.hpp"
 
 namespace gus::app::screens {
 
@@ -82,8 +94,9 @@ enum class SaveLoadLoopExit {
 //   de run_system_menu_loop_gl_current (PNG de 1 frame capturado ANTES de abrir o
 //   Pause) - vazio degrada pro fundo abstrato (vinheta radial).
 [[nodiscard]] SaveLoadLoopExit run_save_load_menu_loop_gl_current(
-    SDL_Window* window, const gus::app::i18n::Translator& translator,
-    SaveLoadMode mode, const std::string& saves_dir,
+    SDL_Window* window, gus::platform::audio::AudioEngine& audio,
+    const gus::app::i18n::Translator& translator, SaveLoadMode mode,
+    const std::string& saves_dir,
     const std::function<gus::domain::save::SaveData()>& build_current_save_data,
     const std::function<void(const gus::domain::save::SaveData&)>&
         apply_loaded_save_data,
