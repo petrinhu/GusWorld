@@ -131,10 +131,14 @@ Habilidade "vinda do nada"; magia sem origem técnica; upgrade genérico "+10% d
 
 Arc clássica de iniciação heroica: perde → recupera → integra.
 
-### Game over
+### Game over — 4 modos escalonados por dificuldade
 
-- **Normal default**: game over puro (HP=0 → reload save).
-- **Hard mode (unlock pós-zerar)**: permadeath + **kernel panic puzzle** ao chegar HP=0 (sequência puzzle pra reboot; falhar = game over real).
+A morte de Gus tem consequência mecânica distinta por nível (default = **Médio**; dificuldade **fixa por save**; detalhe canônico em `docs/design/mecanicas/modos-morte.md`, decisões do líder 2026-07-03/10):
+
+- **Fácil**: HP=0 → reload do último save (game over JRPG clássico).
+- **Médio** *(default)*: HP=0 → whiteout no Hospital com perdas (economia Fibonacci, `economia.md` §3).
+- **Difícil**: HP=0 → respawn deslocado + stats quase-zero (Selve Sombria se criatura matou / casa destruída se humano), recuperação por marcos. Enquadramento **técnico** (fail-safe corrompido, log glitchado, sem testemunha nem reconhecimento de "quase-morte") — protege a exclusividade do Dragon Victory.
+- **Hardcore/Hell** *(unlock pós-zerar o Difícil, preso à máquina)*: HP=0 → **kernel panic puzzle** como ÚLTIMA CHANCE (resolve = sobrevive; falha = **permadeath** real). Save isolado, cifrado+selado (ADR-015), destruído de forma irrecuperável na morte (wipe seguro).
 
 ### Companions — imortais com incapacitação
 
@@ -246,10 +250,10 @@ Wiki in-game paginada que registra Knowledge Progression. Sub-seções:
 
 Uma por personagem da party (Gus + 6 companions). Auto-mode + manual. XP individual em combate + boost narrativo offscreen.
 
-### Dificuldade Normal / Hard
+### Dificuldade — 4 modos (Fácil / Médio / Difícil / Hardcore)
 
-- **Normal default**: game over reload (acessível).
-- **Hard unlock pós-zerar**: permadeath + kernel panic puzzle.
+- **4 níveis**, cada um com consequência de morte própria (default = **Médio**; **fixa por save**). Detalhe canônico: `docs/design/mecanicas/modos-morte.md` + seção "Game over — 4 modos" acima.
+- **Hardcore/Hell** (unlock pós-zerar o Difícil, preso à máquina): kernel panic puzzle última chance → permadeath; save cifrado/selado (ADR-015) destruído irrecuperável na morte.
 
 ### Foreshadow Dante traidor
 
