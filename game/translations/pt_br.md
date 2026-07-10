@@ -200,6 +200,36 @@ Cancelar
 ## SAVE_DELETE_BUTTON_LABEL
 Apagar
 
+# SAVE_LOAD_*: aviso #1 (SAVE-LOAD-AVISOS, mock docs/design/mockups/07-save-
+# load.html Tela 4a) - selecionar um espaço presente-mas-ilegível em Carregar
+# abre um destes 2 avisos. Danificado é recuperável via "Tentar recuperar"
+# (tenta a cadeia de backup); versão incompatível NÃO é (motor forward-only, só
+# Cancelar). PREFIXO "!" (não "⚠"): a fonte pixel do jogo (PixelOperatorMono,
+# assets/fonts/) NÃO cobre U+26A0 (WARNING SIGN) - renderiza como tofu/caixa
+# vazia (achado ao vivo via prova visual headless, SAVE-LOAD-AVISOS). "!" é
+# ASCII puro, garantido em qualquer fonte, e a cor vermelha da linha já carrega
+# a severidade.
+## SAVE_LOAD_WARN_DAMAGED
+Este save está danificado.
+
+## SAVE_LOAD_WARN_VERSION
+Este save é de uma versão mais nova e não pode ser carregado nesta versão do jogo.
+
+## SAVE_LOAD_RECOVER_TRY
+Tentar recuperar
+
+## SAVE_LOAD_RECOVER_FAILED
+Não foi possível recuperar (nenhum backup válido).
+
+## SAVE_LOAD_SLOT_DAMAGED_LABEL
+! Danificado
+
+## SAVE_LOAD_SLOT_VERSION_LABEL
+! Versão incompatível
+
+## SAVE_LOAD_WARN_CANCEL
+Cancelar
+
 ## LOAD_CONFIRM
 Carregar este save? Progresso não salvo será perdido.
 

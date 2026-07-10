@@ -104,11 +104,18 @@ SaveSlotPreview empty_slot_preview(int slot_id) noexcept {
     return preview;
 }
 
-SaveSlotPreview unreadable_slot_preview(int slot_id) noexcept {
+SaveSlotPreview unreadable_slot_preview(int slot_id,
+                                         gus::domain::save::LoadResult result) noexcept {
     SaveSlotPreview preview;
     preview.slot_id = slot_id;
     preview.occupied = false;         // CRIT-1: mesmo visual de vazio ("Vazio N")
     preview.present_unreadable = true; // ... mas GATEIA a confirmacao de sobrescrita
+    // SAVE-LOAD-AVISOS: so VersionTooNew e Version (irrecuperavel, forward-only);
+    // qualquer outro motivo (HmacInvalid/Corrupt/Invalid/WrongSlot) e Damaged
+    // (RECUPERAVEL via "Tentar recuperar"/load_game_from_backup).
+    preview.unreadable_reason = (result == gus::domain::save::LoadResult::VersionTooNew)
+                                     ? UnreadableReason::VersionTooNew
+                                     : UnreadableReason::Damaged;
     preview.is_autosave = is_autosave(slot_id);
     return preview;
 }
@@ -147,8 +154,10 @@ bool slot_selectable(const SaveLoadMenuState& state, int index) noexcept {
         // Auto e so-leitura em modo Save (mock Tela 2: "o espaco Auto e so-leitura").
         return !slot.is_autosave;
     }
-    // Load: qualquer slot OCUPADO e selecionavel (inclusive o autosave); vazio nao.
-    return slot.occupied;
+    // Load: OCUPADO (inclusive autosave) OU present_unreadable (SAVE-LOAD-AVISOS -
+    // selecionar um slot ilegivel abre o aviso dedicado, ver confirm_selected_slot)
+    // e selecionavel; GENUINAMENTE vazio (nem um nem outro) nao.
+    return slot.occupied || slot.present_unreadable;
 }
 
 namespace {
@@ -176,6 +185,8 @@ void save_load_menu_open(
     state.confirming_delete = false;
     state.delete_confirm_selected = 1;
     state.delete_target_slot = -1;
+    state.warning_kind = SaveLoadMenuState::WarningKind::None;
+    state.warning_selected = 1;
 
     // Selecao inicial: o PRIMEIRO slot selecionavel a partir do slot logo apos o
     // autosave (mock: slot 1 "sel", nunca o Auto) - reusa next_selectable partindo
@@ -192,7 +203,10 @@ void save_load_menu_reselect_if_needed(SaveLoadMenuState& state) noexcept {
 
 void save_load_menu_request_delete(SaveLoadMenuState& state, int slot) noexcept {
     if (slot < 0 || slot >= kSlotCount) return;                      // defensivo
-    if (state.confirming_overwrite || state.confirming_delete) return;  // ja tem dialogo aberto
+    if (state.confirming_overwrite || state.confirming_delete ||
+        state.warning_kind != SaveLoadMenuState::WarningKind::None) {
+        return;  // ja tem dialogo/aviso aberto
+    }
     const SaveSlotPreview& preview = state.slots[static_cast<std::size_t>(slot)];
     if (!preview.occupied) return;  // nada a apagar
 
@@ -223,6 +237,17 @@ SaveLoadMenuAction confirm_selected_slot(SaveLoadMenuState& state) noexcept {
         state.confirm_selected = 1;  // default seguro = Nao
         return SaveLoadMenuAction::None;
     }
+    // SAVE-LOAD-AVISOS (aviso #1): slot present_unreadable em modo Load abre o
+    // AVISO dedicado em vez de fingir um SlotChosen (que carregaria dados
+    // invalidos/nao existentes) - o motivo (Damaged/VersionTooNew) ja veio
+    // pronto do CHAMADOR via unreadable_slot_preview.
+    if (state.mode == SaveLoadMode::Load && slot.present_unreadable) {
+        state.warning_kind = (slot.unreadable_reason == UnreadableReason::VersionTooNew)
+                                  ? SaveLoadMenuState::WarningKind::Version
+                                  : SaveLoadMenuState::WarningKind::Damaged;
+        state.warning_selected = 1;  // default seguro = Cancelar
+        return SaveLoadMenuAction::None;
+    }
     return SaveLoadMenuAction::SlotChosen;
 }
 
@@ -230,8 +255,9 @@ SaveLoadMenuAction confirm_selected_slot(SaveLoadMenuState& state) noexcept {
 
 SaveLoadMenuAction save_load_menu_click_slot(SaveLoadMenuState& state, int slot) noexcept {
     if (slot < 0 || slot >= kSlotCount) return SaveLoadMenuAction::None;
-    if (state.confirming_overwrite || state.confirming_delete) {
-        return SaveLoadMenuAction::None;  // dialogo aberto - clique na lista nao se aplica
+    if (state.confirming_overwrite || state.confirming_delete ||
+        state.warning_kind != SaveLoadMenuState::WarningKind::None) {
+        return SaveLoadMenuAction::None;  // dialogo/aviso aberto - clique na lista nao se aplica
     }
     if (!slot_selectable(state, slot)) return SaveLoadMenuAction::None;
     state.selected = slot;
@@ -258,8 +284,48 @@ SaveLoadMenuAction save_load_menu_click_delete_confirm(SaveLoadMenuState& state,
     return yes ? SaveLoadMenuAction::DeleteConfirmed : SaveLoadMenuAction::DeleteCancelled;
 }
 
+SaveLoadMenuAction save_load_menu_click_warning_recover(SaveLoadMenuState& state) noexcept {
+    // O botao "Tentar recuperar" SO EXISTE quando warning_kind==Damaged (ver a
+    // doc de save_load_menu_click_warning_recover no header) - qualquer outro
+    // caso (aviso fechado, Version, RecoverFailed) e no-op defensivo.
+    if (state.warning_kind != SaveLoadMenuState::WarningKind::Damaged) {
+        return SaveLoadMenuAction::None;
+    }
+    state.warning_kind = SaveLoadMenuState::WarningKind::None;
+    state.warning_selected = 1;
+    return SaveLoadMenuAction::RecoverRequested;
+}
+
+SaveLoadMenuAction save_load_menu_click_warning_cancel(SaveLoadMenuState& state) noexcept {
+    if (state.warning_kind == SaveLoadMenuState::WarningKind::None) {
+        return SaveLoadMenuAction::None;
+    }
+    state.warning_kind = SaveLoadMenuState::WarningKind::None;
+    state.warning_selected = 1;
+    return SaveLoadMenuAction::WarningCancelled;
+}
+
 SaveLoadMenuAction save_load_menu_key_down(SaveLoadMenuState& state,
                                             SDL_Keycode key) noexcept {
+    if (state.warning_kind != SaveLoadMenuState::WarningKind::None) {
+        // Damaged tem 2 botoes (0=Tentar recuperar, 1=Cancelar); Version/
+        // RecoverFailed tem SO Cancelar (nao ha pill 0 pra alternar - ver a doc
+        // de WarningKind no header).
+        const bool two_buttons = (state.warning_kind == SaveLoadMenuState::WarningKind::Damaged);
+        if (is_back_key(key)) return save_load_menu_click_warning_cancel(state);
+        if (two_buttons &&
+            (is_left_key(key) || is_right_key(key) || is_up_key(key) || is_down_key(key))) {
+            state.warning_selected = (state.warning_selected == 0) ? 1 : 0;
+            return SaveLoadMenuAction::None;
+        }
+        if (is_confirm_key(key)) {
+            return (two_buttons && state.warning_selected == 0)
+                       ? save_load_menu_click_warning_recover(state)
+                       : save_load_menu_click_warning_cancel(state);
+        }
+        return SaveLoadMenuAction::None;
+    }
+
     if (state.confirming_delete) {
         if (is_back_key(key)) {
             // Esc no mini-dialogo = "Nao" (MESMA seguranca de confirming_overwrite/

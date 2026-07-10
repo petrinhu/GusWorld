@@ -65,13 +65,17 @@ std::string save_load_stage_dir() {
 // Ids (save_load_menu_rml.cpp): "slmenu-slot-<i>" (linha do slot), "slmenu-delete-
 // <i>" (icone de apagar por-linha, so em slots OCUPADOS), "slmenu-back" (Voltar,
 // id fixo), "slmenu-confirm-yes/no" (mini-dialogo de sobrescrita), "slmenu-delete-
-// confirm-yes/no" (mini-dialogo de exclusao).
+// confirm-yes/no" (mini-dialogo de exclusao), "slmenu-warn-recover"/"slmenu-warn-
+// cancel" (AVISO de slot ilegivel, SAVE-LOAD-AVISOS - o botao recover so existe
+// quando warning_kind==Damaged, ver save_load_menu_rml.cpp).
 std::string slot_item_id(int slot) { return "slmenu-slot-" + std::to_string(slot); }
 std::string delete_item_id(int slot) { return "slmenu-delete-" + std::to_string(slot); }
 constexpr const char* kBackId = "slmenu-back";
 constexpr const char* kOverwriteConfirmId[2] = {"slmenu-confirm-yes", "slmenu-confirm-no"};
 constexpr const char* kDeleteConfirmId[2] = {"slmenu-delete-confirm-yes",
                                               "slmenu-delete-confirm-no"};
+constexpr const char* kWarnRecoverId = "slmenu-warn-recover";
+constexpr const char* kWarnCancelId = "slmenu-warn-cancel";
 
 // Hit-test simples: cursor (x,y, espaco-janela) dentro da caixa border-box
 // devolvida por glintfx::UiLayer::get_element_box (MESMA receita de
@@ -89,13 +93,22 @@ std::string resolve_menu_sfx_path(std::string_view file) {
 }
 
 // Indice de hover LINEAR (pra edge-detect do SOM, mesma logica de
-// system_menu_hover_entered_new_item): fora de qualquer mini-dialogo, 0..
+// system_menu_hover_entered_new_item): fora de qualquer mini-dialogo/aviso, 0..
 // kSlotCount-1 = linha do slot (so conta se slot_selectable - MESMO conjunto
 // navegavel por teclado); kSlotCount..2*kSlotCount-1 = icone de apagar da linha
 // correspondente (so conta se OCUPADO); 2*kSlotCount = Voltar. Dentro de um
-// mini-dialogo, 0/1 = a pill Sim/Nao dele. -1 = mouse fora de qualquer alvo.
+// mini-dialogo/aviso, 0/1 = a pill Sim/Nao (ou Tentar recuperar/Cancelar) dele.
+// -1 = mouse fora de qualquer alvo.
 int current_hover_index(const glintfx::UiLayer& ui, const SaveLoadMenuState& state,
                          float mouse_x, float mouse_y) {
+    if (state.warning_kind != SaveLoadMenuState::WarningKind::None) {
+        // Damaged tem 2 botoes (0=recover, 1=cancel); Version/RecoverFailed so
+        // tem o Cancelar (o id recover nem existe na RML, hit_test falha com
+        // found=false e cai no cancel abaixo).
+        if (hit_test(ui.get_element_box(kWarnRecoverId), mouse_x, mouse_y)) return 0;
+        if (hit_test(ui.get_element_box(kWarnCancelId), mouse_x, mouse_y)) return 1;
+        return -1;
+    }
     if (state.confirming_delete) {
         for (int i = 0; i < 2; ++i) {
             if (hit_test(ui.get_element_box(kDeleteConfirmId[i]), mouse_x, mouse_y)) return i;
@@ -163,14 +176,14 @@ std::string write_save_load_rml_file(const SaveLoadMenuState& state,
 // Le TODOS os slots do disco e monta os previews + (modo Load) um cache do
 // SaveData ja carregado por slot (evita ler o arquivo 2x ao confirmar). Um save
 // PRESENTE mas NAO Ok (HmacInvalid/Corrupt/VersionTooNew/Invalid/WrongSlot)
-// degrada VISUALMENTE como slot VAZIO ("Vazio N", os 2 avisos dedicados de
-// conteudo pro jogador seguem etapa futura, fora do nucleo desta onda, ver
-// TODO.md) - logado pra nao silenciar o caso. CRIT-1 (auditoria AUD-SAVE-LOAD-
-// UI-2026-07-09): usa unreadable_slot_preview (NAO empty_slot_preview) pra
-// marcar present_unreadable=true - isto NAO muda o visual (occupied continua
-// false), mas fecha o buraco de data-loss silenciosa: confirm_selected_slot
-// (save_load_menu.cpp) agora PEDE confirmacao de sobrescrita nesses slots
-// tambem, protegendo a cadeia de backup de erosao silenciosa.
+// continua "occupied=false" (a lista NUNCA mostra dado nao confiavel) mas ganha
+// unreadable_slot_preview com o LoadResult REAL - CRIT-1 (auditoria AUD-SAVE-
+// LOAD-UI-2026-07-09): present_unreadable=true PEDE confirmacao de sobrescrita
+// em modo Save; SAVE-LOAD-AVISOS (aviso #1): em modo Load, o slot vira
+// SELECIONAVEL com o rotulo "! Danificado"/"! Versao incompativel" e, ao ser
+// confirmado, abre o aviso dedicado (ver save_load_menu.hpp::confirm_selected_
+// slot) - "Tentar recuperar" e tratado em handle_action abaixo via
+// gus::platform::fs::load_game_from_backup.
 std::array<SaveSlotPreview, gus::domain::save::kSlotCount> build_previews_and_cache(
     const std::string& saves_dir,
     std::array<std::optional<gus::domain::save::SaveData>, gus::domain::save::kSlotCount>&
@@ -189,13 +202,20 @@ std::array<SaveSlotPreview, gus::domain::save::kSlotCount> build_previews_and_ca
                 build_slot_preview(outcome->data, slot);
             loaded_cache[static_cast<std::size_t>(slot)] = outcome->data;
         } else {
+            // SAVE-LOAD-AVISOS: o motivo REAL (LoadResult) alimenta o aviso
+            // dedicado - VersionTooNew vira o aviso "so Cancelar" (forward-only);
+            // qualquer outro (inclusive o degradado por falha de I/O pura, sem
+            // outcome, tratado como Corrupt) vira "Danificado" (RECUPERAVEL via
+            // "Tentar recuperar", ver load_game_from_backup).
+            const gus::domain::save::LoadResult reason =
+                outcome.has_value() ? outcome->result : gus::domain::save::LoadResult::Corrupt;
             std::cerr << "[save_load_menu_loop] aviso: slot " << slot
                       << " tem arquivo mas NAO carregou Ok (adulterado/corrompido/"
-                         "versao incompativel/slot trocado) - degradando VISUAL "
-                         "como vazio nesta onda (avisos dedicados sao etapa "
-                         "futura), mas marcado present_unreadable=true (CRIT-1: "
-                         "sobrescrita ainda pede confirmacao).\n";
-            previews[static_cast<std::size_t>(slot)] = unreadable_slot_preview(slot);
+                         "versao incompativel/slot trocado) - marcado "
+                         "present_unreadable=true (CRIT-1: sobrescrita pede "
+                         "confirmacao; SAVE-LOAD-AVISOS: selecionavel em Load, "
+                         "abre o aviso dedicado).\n";
+            previews[static_cast<std::size_t>(slot)] = unreadable_slot_preview(slot, reason);
         }
     }
     return previews;
@@ -319,6 +339,31 @@ SaveLoadLoopExit run_save_load_menu_loop_gl_current(
         save_load_menu_reselect_if_needed(state);
     };
 
+    // SAVE-LOAD-AVISOS: "Tentar recuperar" do aviso Damaged - tenta a cadeia de
+    // backup de fato (gus::platform::fs::load_game_from_backup, JA prova a 1a
+    // geracao Ok). Sucesso: MESMO caminho de um Load normal bem-sucedido
+    // (apply_loaded_save_data + fecha a tela, ClosedAfterLoad) - o jogador nao
+    // precisa saber que veio do backup, so que o jogo carregou. Falha: NENHUMA
+    // geracao de backup era Ok - transita state.warning_kind pra RecoverFailed
+    // (mensagem "nao foi possivel recuperar", so Cancelar) e MANTEM a tela
+    // aberta (reload, nao fecha) - devolve nullopt igual aos outros ramos que
+    // "so tratam e continuam".
+    auto do_recover = [&](int slot) -> std::optional<SaveLoadLoopExit> {
+        const auto recovered = gus::platform::fs::load_game_from_backup(slot, saves_dir);
+        if (recovered.has_value() && recovered->result == gus::domain::save::LoadResult::Ok &&
+            apply_loaded_save_data) {
+            apply_loaded_save_data(recovered->data);
+            return SaveLoadLoopExit::ClosedAfterLoad;
+        }
+        std::cerr << "[save_load_menu_loop] recuperacao do slot " << slot
+                  << " falhou (nenhuma geracao de backup carregou Ok) - abrindo "
+                     "o aviso RecoverFailed.\n";
+        state.warning_kind = SaveLoadMenuState::WarningKind::RecoverFailed;
+        state.warning_selected = 1;
+        reload();
+        return std::nullopt;
+    };
+
     // Roteia UMA SaveLoadMenuAction (vinda do teclado OU de um clique de mouse)
     // pro MESMO efeito de mundo - compartilhado pelos dois canais de entrada pra
     // nao duplicar do_save/do_delete/reload (MESMO racional de handle_action em
@@ -367,6 +412,11 @@ SaveLoadLoopExit run_save_load_menu_loop_gl_current(
                 reload();
                 return std::nullopt;
             case SaveLoadMenuAction::DeleteCancelled:
+                reload();
+                return std::nullopt;
+            case SaveLoadMenuAction::RecoverRequested:
+                return do_recover(state.selected);
+            case SaveLoadMenuAction::WarningCancelled:
                 reload();
                 return std::nullopt;
         }
@@ -447,7 +497,26 @@ SaveLoadLoopExit run_save_load_menu_loop_gl_current(
                 // ANTES do handle_action generico abaixo, ver o comentario dele)
                 // marca este flag pra o trailer nao tocar 2x.
                 bool played_click_sfx = false;
-                if (state.confirming_delete) {
+                if (state.warning_kind != SaveLoadMenuState::WarningKind::None) {
+                    // "Tentar recuperar" (so existe quando Damaged) - checado
+                    // ANTES do Cancelar, MESMO padrao "mais especifico vence" do
+                    // icone de apagar abaixo (aqui nao ha sobreposicao real, mas
+                    // mantem a ordem consistente).
+                    if (hit_test(ui.get_element_box(kWarnRecoverId), ev.button.x, ev.button.y)) {
+                        handled = true;
+                        if (const auto exit =
+                                handle_action(save_load_menu_click_warning_recover(state))) {
+                            return *exit;
+                        }
+                    } else if (hit_test(ui.get_element_box(kWarnCancelId), ev.button.x,
+                                         ev.button.y)) {
+                        handled = true;
+                        if (const auto exit =
+                                handle_action(save_load_menu_click_warning_cancel(state))) {
+                            return *exit;
+                        }
+                    }
+                } else if (state.confirming_delete) {
                     for (int i = 0; i < 2 && !handled; ++i) {
                         if (!hit_test(ui.get_element_box(kDeleteConfirmId[i]), ev.button.x,
                                        ev.button.y)) {

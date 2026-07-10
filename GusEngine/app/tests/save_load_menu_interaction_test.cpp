@@ -193,6 +193,13 @@ gus::app::i18n::Translator make_translator() {
         "## SAVE_XP_LABEL\nXP {0}\n\n"
         "## SAVE_CHAPTER_LABEL\nCap. {0}\n\n"
         "## SAVE_DELETE_BUTTON_LABEL\nApagar\n\n"
+        "## SAVE_LOAD_WARN_DAMAGED\nEste save esta danificado.\n\n"
+        "## SAVE_LOAD_WARN_VERSION\nEste save e de uma versao mais nova.\n\n"
+        "## SAVE_LOAD_RECOVER_TRY\nTentar recuperar\n\n"
+        "## SAVE_LOAD_RECOVER_FAILED\nNao foi possivel recuperar.\n\n"
+        "## SAVE_LOAD_SLOT_DAMAGED_LABEL\n! Danificado\n\n"
+        "## SAVE_LOAD_SLOT_VERSION_LABEL\n! Versao incompativel\n\n"
+        "## SAVE_LOAD_WARN_CANCEL\nCancelar\n\n"
         "## SETTINGS_BACK\nVoltar\n\n"
         "## LOCATION_PRACA_COMPILACAO\nx\n\n"
         "## LOCATION_UNKNOWN\nx\n\n");
@@ -377,6 +384,142 @@ TEST_CASE("save_load_menu (harness headless): clique de mouse REAL (SDL_PushEven
     REQUIRE(exit == SaveLoadLoopExit::BackToPause);
     REQUIRE(build_called);
     REQUIRE(gus::platform::fs::has_save(1, saves_dir.string()));
+
+    std::filesystem::remove_all(saves_dir);
+}
+
+// ---------------------------------------------------------------- (e) SAVE-LOAD-AVISOS:
+// clique real no slot Danificado -> aviso abre -> clique real em "Tentar recuperar" ->
+// load_game_from_backup de fato recupera (fluxo COMPLETO ao vivo, nao so a logica pura).
+
+TEST_CASE("save_load_menu (harness headless): clique de mouse REAL num slot "
+          "Danificado abre o aviso, e clicar 'Tentar recuperar' recupera via "
+          "backup de fato (SAVE-LOAD-AVISOS)",
+          "[save_load_menu_interaction][gl][save-load-avisos]") {
+    GlTestEnv env = try_boot_gl();
+    if (!env.ok) {
+        INFO("GL/display indisponivel - harness pulado (rode com Xvfb :99).");
+        return;
+    }
+
+    const gus::app::i18n::Translator translator = make_translator();
+
+    const std::filesystem::path saves_dir = std::filesystem::temp_directory_path() /
+                                             "gusworld_save_load_interaction_recover_saves";
+    std::filesystem::remove_all(saves_dir);  // hermetico
+
+    // Grava 2x no slot 1 (a 1a gravacao vira backup1) e corrompe o PRIMARIO - so
+    // o backup fica Ok (MESMO repro de CRIT-1/save_file_store_test.cpp).
+    gus::domain::save::SaveData first;
+    first.current_scene_path = "city_intro";
+    first.party_roster = {"gus"};
+    first.party_active = {"gus"};
+    first.slot_id = 1;
+    first.playtime_seconds = 1.0;
+    REQUIRE(gus::platform::fs::save_game(first, 1, saves_dir.string()));
+    gus::domain::save::SaveData second = first;
+    second.playtime_seconds = 2.0;
+    REQUIRE(gus::platform::fs::save_game(second, 1, saves_dir.string()));  // first -> backup1
+    {
+        std::fstream f(saves_dir / "save_1.sav", std::ios::in | std::ios::out | std::ios::binary);
+        REQUIRE(f.is_open());
+        char byte = 0;
+        f.seekg(10);
+        f.read(&byte, 1);
+        byte = static_cast<char>(byte ^ 0xFF);
+        f.seekp(10);
+        f.write(&byte, 1);
+    }
+    const auto primary_outcome = gus::platform::fs::load_game(1, saves_dir.string());
+    REQUIRE(primary_outcome.has_value());
+    REQUIRE(primary_outcome->result != gus::domain::save::LoadResult::Ok);
+
+    std::array<SaveSlotPreview, kSlotCount> slots{};
+    for (int i = 0; i < kSlotCount; ++i) slots[static_cast<std::size_t>(i)] = empty_slot_preview(i);
+    slots[1] = unreadable_slot_preview(1, primary_outcome->result);
+
+    // Probe #1: posicao REAL da linha do slot 1 em modo Load (MESMO documento/
+    // viewport/dp_ratio que o loop de producao monta internamente).
+    SaveLoadMenuState probe1;
+    save_load_menu_open(probe1, SaveLoadMode::Load, slots);
+    float slot1_cx = 0.0f, slot1_cy = 0.0f;
+    {
+        auto probe_ui = load_ui(probe1, translator);
+        REQUIRE(probe_ui.has_value());
+        const glintfx::ElementBox box = probe_ui->get_element_box("slmenu-slot-1");
+        REQUIRE(box_hittable(box, kWinW, kWinH));
+        slot1_cx = box.x + box.w * 0.5f;
+        slot1_cy = box.y + box.h * 0.5f;
+        // FECHA a sondagem ANTES da proxima (RmlUi nao suporta 2 UiLayer
+        // simultaneos no processo, ver o comentario extenso no teste (d) acima).
+    }
+
+    // Probe #2: posicao REAL do botao "Tentar recuperar" no aviso Damaged JA
+    // ABERTO (o MESMO estado que o clique real no slot 1 produz - confirmado via
+    // save_load_menu_click_slot, a logica PURA ja provada em save_load_menu_test.cpp).
+    SaveLoadMenuState probe2;
+    save_load_menu_open(probe2, SaveLoadMode::Load, slots);
+    (void)save_load_menu_click_slot(probe2, 1);
+    REQUIRE(probe2.warning_kind == SaveLoadMenuState::WarningKind::Damaged);
+    float recover_cx = 0.0f, recover_cy = 0.0f;
+    {
+        auto probe_ui = load_ui(probe2, translator);
+        REQUIRE(probe_ui.has_value());
+        const glintfx::ElementBox box = probe_ui->get_element_box("slmenu-warn-recover");
+        REQUIRE(box_hittable(box, kWinW, kWinH));
+        recover_cx = box.x + box.w * 0.5f;
+        recover_cy = box.y + box.h * 0.5f;
+    }
+
+    // Injeta a sequencia REAL na fila do SDL (MESMA fila que o loop de producao
+    // consome): motion+click no slot 1 (abre o aviso), motion+click em "Tentar
+    // recuperar" (confirma) - tudo ANTES de chamar o loop, MESMA receita do
+    // teste (d) acima. Sem Esc no fim: RecoverRequested bem-sucedido fecha a
+    // tela sozinho (ClosedAfterLoad), o loop retorna por conta propria.
+    SDL_Event motion1_ev{};
+    motion1_ev.type = SDL_EVENT_MOUSE_MOTION;
+    motion1_ev.motion.x = slot1_cx;
+    motion1_ev.motion.y = slot1_cy;
+    REQUIRE(SDL_PushEvent(&motion1_ev));
+
+    SDL_Event click1_ev{};
+    click1_ev.type = SDL_EVENT_MOUSE_BUTTON_DOWN;
+    click1_ev.button.button = SDL_BUTTON_LEFT;
+    click1_ev.button.x = slot1_cx;
+    click1_ev.button.y = slot1_cy;
+    REQUIRE(SDL_PushEvent(&click1_ev));
+
+    SDL_Event motion2_ev{};
+    motion2_ev.type = SDL_EVENT_MOUSE_MOTION;
+    motion2_ev.motion.x = recover_cx;
+    motion2_ev.motion.y = recover_cy;
+    REQUIRE(SDL_PushEvent(&motion2_ev));
+
+    SDL_Event click2_ev{};
+    click2_ev.type = SDL_EVENT_MOUSE_BUTTON_DOWN;
+    click2_ev.button.button = SDL_BUTTON_LEFT;
+    click2_ev.button.x = recover_cx;
+    click2_ev.button.y = recover_cy;
+    REQUIRE(SDL_PushEvent(&click2_ev));
+
+    std::optional<gus::domain::save::SaveData> applied;
+    const std::function<void(const gus::domain::save::SaveData&)> apply_data =
+        [&](const gus::domain::save::SaveData& data) { applied = data; };
+
+    gus::platform::audio::AudioEngine audio(/*device_active=*/false);  // sem hardware no CI
+    const SaveLoadLoopExit exit = run_save_load_menu_loop_gl_current(
+        env.window, audio, translator, SaveLoadMode::Load, saves_dir.string(),
+        /*build_current_save_data=*/{}, apply_data);
+
+    // ANTES desta onda (sem RecoverRequested/do_recover): o clique no botao
+    // "Tentar recuperar" nao existia (nem o botao, nem o handler) - este teste
+    // teria FALHADO nos 3 REQUIRE seguintes.
+    REQUIRE(exit == SaveLoadLoopExit::ClosedAfterLoad);
+    REQUIRE(applied.has_value());
+    // playtime_seconds==1.0 = "first" (a geracao do BACKUP1), NAO 2.0 ("second",
+    // a geracao corrompida do primario) - prova que a recuperacao usou o backup
+    // de fato, nao fingiu um load.
+    REQUIRE(applied->playtime_seconds == 1.0);
 
     std::filesystem::remove_all(saves_dir);
 }

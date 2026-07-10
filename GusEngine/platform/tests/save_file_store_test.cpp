@@ -27,6 +27,7 @@ using gus::platform::fs::delete_save;
 using gus::platform::fs::FsSaveStore;
 using gus::platform::fs::has_save;
 using gus::platform::fs::load_game;
+using gus::platform::fs::load_game_from_backup;
 using gus::platform::fs::save_game;
 
 namespace {
@@ -318,6 +319,104 @@ TEST_CASE("delete_save: slot invalido lanca std::out_of_range (fail-fast, nao "
           "[platform][fs][save]") {
     const auto dir = make_temp_dir("delete_slot_invalido");
     REQUIRE_THROWS_AS(delete_save(99, dir.string()), std::out_of_range);
+    std::filesystem::remove_all(dir);
+}
+
+// ---- load_game_from_backup (SAVE-LOAD-AVISOS, "Tentar recuperar") ------------
+
+TEST_CASE("load_game_from_backup: primario corrompido + backup1 bom recupera "
+          "via backup1 (1a geracao boa, a mais fresca)",
+          "[platform][fs][save][save-load-avisos]") {
+    const auto dir = make_temp_dir("recover_backup1_bom");
+    SaveData first = make_valid_save(1);
+    first.playtime_seconds = 1.0;
+    REQUIRE(save_game(first, 1, dir.string()));  // vira backup1 na 2a gravacao
+
+    SaveData second = make_valid_save(1);
+    second.playtime_seconds = 2.0;
+    REQUIRE(save_game(second, 1, dir.string()));  // gera save_1.backup1.sav (= first)
+
+    // Corrompe o PRIMARIO (mesma tecnica de "adulteracao: HMAC nao bate" acima).
+    {
+        std::fstream f(dir / "save_1.sav", std::ios::in | std::ios::out | std::ios::binary);
+        REQUIRE(f.is_open());
+        char byte = 0;
+        f.seekg(10);
+        f.read(&byte, 1);
+        byte = static_cast<char>(byte ^ 0xFF);
+        f.seekp(10);
+        f.write(&byte, 1);
+    }
+    REQUIRE(load_game(1, dir.string())->result != LoadResult::Ok);  // confirma a falha do primario
+
+    const auto recovered = load_game_from_backup(1, dir.string());
+    REQUIRE(recovered.has_value());
+    REQUIRE(recovered->result == LoadResult::Ok);
+    REQUIRE(recovered->data.playtime_seconds == 1.0);  // backup1 = a geracao ANTERIOR (first)
+
+    std::filesystem::remove_all(dir);
+}
+
+TEST_CASE("load_game_from_backup: backup1 TAMBEM corrompido cai pro backup2 bom",
+          "[platform][fs][save][save-load-avisos]") {
+    const auto dir = make_temp_dir("recover_backup2_bom");
+    SaveData gen1 = make_valid_save(1);
+    gen1.playtime_seconds = 1.0;
+    REQUIRE(save_game(gen1, 1, dir.string()));
+
+    SaveData gen2 = make_valid_save(1);
+    gen2.playtime_seconds = 2.0;
+    REQUIRE(save_game(gen2, 1, dir.string()));  // gen1 -> backup1
+
+    SaveData gen3 = make_valid_save(1);
+    gen3.playtime_seconds = 3.0;
+    REQUIRE(save_game(gen3, 1, dir.string()));  // gen2 -> backup1, gen1 -> backup2
+
+    // Corrompe o PRIMARIO (gen3) e o backup1 (gen2) - so o backup2 (gen1) segue Ok.
+    for (const char* name : {"save_1.sav", "save_1.backup1.sav"}) {
+        std::fstream f(dir / name, std::ios::in | std::ios::out | std::ios::binary);
+        REQUIRE(f.is_open());
+        char byte = 0;
+        f.seekg(10);
+        f.read(&byte, 1);
+        byte = static_cast<char>(byte ^ 0xFF);
+        f.seekp(10);
+        f.write(&byte, 1);
+    }
+
+    const auto recovered = load_game_from_backup(1, dir.string());
+    REQUIRE(recovered.has_value());
+    REQUIRE(recovered->result == LoadResult::Ok);
+    REQUIRE(recovered->data.playtime_seconds == 1.0);  // backup2 = gen1
+
+    std::filesystem::remove_all(dir);
+}
+
+TEST_CASE("load_game_from_backup: TODAS as geracoes ruins (ou ausentes) devolve "
+          "nullopt (recuperacao falhou)",
+          "[platform][fs][save][save-load-avisos]") {
+    const auto dir = make_temp_dir("recover_falha_total");
+    const SaveData data = make_valid_save(1);
+    REQUIRE(save_game(data, 1, dir.string()));  // so o primario existe, sem backup ainda
+
+    REQUIRE_FALSE(load_game_from_backup(1, dir.string()).has_value());
+
+    std::filesystem::remove_all(dir);
+}
+
+TEST_CASE("load_game_from_backup: slot sem NENHUM arquivo (nem primario) devolve "
+          "nullopt",
+          "[platform][fs][save][save-load-avisos]") {
+    const auto dir = make_temp_dir("recover_slot_vazio");
+    REQUIRE_FALSE(load_game_from_backup(1, dir.string()).has_value());
+    std::filesystem::remove_all(dir);
+}
+
+TEST_CASE("load_game_from_backup: slot invalido lanca std::out_of_range "
+          "(fail-fast, nao degradacao de I/O)",
+          "[platform][fs][save][save-load-avisos]") {
+    const auto dir = make_temp_dir("recover_slot_invalido");
+    REQUIRE_THROWS_AS(load_game_from_backup(99, dir.string()), std::out_of_range);
     std::filesystem::remove_all(dir);
 }
 

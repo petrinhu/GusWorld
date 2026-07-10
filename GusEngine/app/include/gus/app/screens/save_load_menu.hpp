@@ -13,11 +13,17 @@
 // em quais slots sao SELECIONAVEIS e no que Enter faz. NAO cobre (etapas
 // remanescentes do item SAVE-LOAD-UI, ver TODO.md): tela de TITULO (etapa 4),
 // gatilhos de AUTOSAVE (etapa 5), wiring real Salvar/Carregar no Maestro/menu de
-// pausa (etapa 6), nem os 2 AVISOS (versao-incompativel/corrompido e
-// controles-diferentes-do-save) - esses dependem de INSPECIONAR o resultado real
-// de gus::domain::save::load_save (LoadOutcome), que so existe DEPOIS de uma
-// tentativa de leitura em disco (fora do escopo de estado PURO desta tela; o
-// CHAMADOR monta esses avisos a partir do LoadOutcome, fluxo separado).
+// pausa (etapa 6), nem o AVISO #2 (controles-diferentes-do-save, FORA desta
+// onda).
+//
+// SAVE-LOAD-AVISOS (aviso #1, mock Tela 4a): um slot PRESENTE-mas-ILEGIVEL
+// (present_unreadable=true, ver SaveSlotPreview) agora e SELECIONAVEL em modo
+// Load (era invisivel/tratado como vazio antes desta onda) e, ao ser
+// confirmado (Enter/clique), abre um AVISO dedicado em vez de fingir um
+// SlotChosen - ver SaveLoadWarningKind/state.warning_kind abaixo. O CHAMADOR
+// (save_load_menu_loop.cpp) monta o motivo (UnreadableReason) a partir do
+// gus::domain::save::LoadResult real (JA existente, so nao era inspecionado
+// pra alem de "!= Ok" ate aqui).
 //
 // POLITICA DE SLOTS (ADR-006, save_slots.hpp, JA EXISTENTE — reusada sem
 // alteracao): kSlotCount slots no total (kAutosaveSlot=0 + kManualSlotCount
@@ -64,6 +70,7 @@
 #include <SDL3/SDL.h>  // SDL_Keycode
 
 #include "gus/domain/save/save_data.hpp"
+#include "gus/domain/save/save_serializer.hpp"  // LoadResult (motivo do unreadable_slot_preview)
 #include "gus/domain/save/save_slots.hpp"
 
 namespace gus::app::screens {
@@ -134,6 +141,15 @@ inline constexpr int kChapterXpThresholds[kChapterCount - 1] = {100, 300, 600,
 // tratados como 0 defensivamente.
 [[nodiscard]] std::string format_playtime_seconds(double playtime_seconds);
 
+// SAVE-LOAD-AVISOS (aviso #1): POR QUE um slot ficou present_unreadable (ver
+// SaveSlotPreview abaixo) - so significativo quando present_unreadable==true
+// (default None caso contrario). Distingue os 2 avisos (mock Tela 4a): Damaged
+// (LoadResult HmacInvalid/Corrupt/Invalid/WrongSlot - RECUPERAVEL via "Tentar
+// recuperar", ver load_game_from_backup em save_file_store.hpp) de
+// VersionTooNew (save de versao futura - motor e forward-only, NUNCA
+// recuperavel aqui, so Cancelar).
+enum class UnreadableReason { None, Damaged, VersionTooNew };
+
 // Preview de UM slot - o que a tela precisa saber para desenhar 1 linha (mock:
 // numero/letra do slot, local, timestamp, playtime, XP, capitulo, ocupado/vazio/
 // autosave). Dado PURO; build_slot_preview/empty_slot_preview constroem a
@@ -157,6 +173,9 @@ struct SaveSlotPreview {
     // parava de erodir uma gravacao "inocente" de cada vez ate perder o dado bom
     // recuperavel).
     bool present_unreadable = false;
+    // Motivo de present_unreadable (ver UnreadableReason acima) - None quando
+    // present_unreadable==false.
+    UnreadableReason unreadable_reason = UnreadableReason::None;
     std::string scene_path;   // SaveData::current_scene_path (so valido se occupied)
     std::int64_t timestamp_ms = 0;   // SaveData::timestamp_ms (so valido se occupied)
     double playtime_seconds = 0.0;   // SaveData::playtime_seconds (so valido se occupied)
@@ -171,10 +190,16 @@ struct SaveSlotPreview {
 // Preview de um slot PRESENTE em disco (has_save()==true) mas ILEGIVEL (LoadResult
 // != Ok) - CRIT-1 acima. occupied=false (a tela mostra "Vazio", MESMO visual de
 // empty_slot_preview - nao exibe metadado falso), present_unreadable=true (gateia a
-// confirmacao de sobrescrita). Demais campos default/irrelevantes, MESMO formato de
+// confirmacao de sobrescrita EM MODO SAVE, e a selecionabilidade/o aviso dedicado
+// EM MODO LOAD - ver slot_selectable/SaveLoadWarningKind abaixo, SAVE-LOAD-AVISOS).
+// `result` e o LoadResult REAL devolvido por gus::domain::save::load_save
+// (VersionTooNew vira unreadable_reason=VersionTooNew; qualquer outro motivo
+// -HmacInvalid/Corrupt/Invalid/WrongSlot- vira Damaged, RECUPERAVEL via "Tentar
+// recuperar"). Demais campos default/irrelevantes, MESMO formato de
 // empty_slot_preview - o CHAMADOR (build_previews_and_cache) decide quando usar esta
 // versus empty_slot_preview a partir do LoadOutcome real.
-[[nodiscard]] SaveSlotPreview unreadable_slot_preview(int slot_id) noexcept;
+[[nodiscard]] SaveSlotPreview unreadable_slot_preview(
+    int slot_id, gus::domain::save::LoadResult result) noexcept;
 
 // Preview de um slot OCUPADO a partir do SaveData ja carregado (occupied=true).
 // slot_id deve ser o slot FISICO de onde `data` foi lido (nao necessariamente
@@ -213,11 +238,25 @@ struct SaveLoadMenuState {
     bool confirming_delete = false;
     int delete_confirm_selected = 1; // 0=Sim (apaga), 1=Nao (default seguro)
     int delete_target_slot = -1;
+
+    // SAVE-LOAD-AVISOS (aviso #1, mock Tela 4a) - aberto ao confirmar (Enter/
+    // clique) um slot present_unreadable EM MODO LOAD (ver confirm_selected_slot/
+    // slot_selectable). Kind::None = fechado. warning_selected so importa em
+    // Damaged (2 botoes: 0=Tentar recuperar, 1=Cancelar); Version/RecoverFailed
+    // tem SO Cancelar (nao ha pill 0 pra focar - forward-only/recuperacao ja
+    // falhou, nao ha "tentar" de novo). O slot ALVO e SEMPRE state.selected (o
+    // aviso so abre a partir do slot focado, sem icone por-linha separado como
+    // Apagar).
+    enum class WarningKind { None, Damaged, Version, RecoverFailed };
+    WarningKind warning_kind = WarningKind::None;
+    int warning_selected = 1; // 0=Tentar recuperar (so em Damaged), 1=Cancelar (default seguro)
 };
 
 // true se o slot em `index` (0..kSlotCount-1) e SELECIONAVEL no modo ATUAL de
 // `state` (ver a doc do header: Save exclui o autosave; Load exclui slots
-// vazios). index fora do intervalo devolve false (defensivo).
+// GENUINAMENTE vazios - MAS inclui slots present_unreadable, SAVE-LOAD-AVISOS:
+// selecionar um deles abre o aviso dedicado em vez de um SlotChosen fingido).
+// index fora do intervalo devolve false (defensivo).
 [[nodiscard]] bool slot_selectable(const SaveLoadMenuState& state, int index) noexcept;
 
 // SAVE-LOAD-UI etapa 4 (TELA DE TITULO): indice do slot OCUPADO com o MAIOR
@@ -258,31 +297,46 @@ enum class SaveLoadMenuAction {
                         // (gus::platform::fs::delete_save) e atualiza o preview local
     DeleteCancelled,    // o mini-dialogo de exclusao fechou com "Nao"/Esc - permanece
                         // na lista, NENHUM I/O
+    RecoverRequested,   // aviso "Danificado" - "Tentar recuperar" confirmado -
+                        // state.selected e o slot; o CHAMADOR tenta
+                        // gus::platform::fs::load_game_from_backup de fato (Ok = aplica
+                        // o load, como um Load bem-sucedido normal; falha = o CHAMADOR
+                        // muta state.warning_kind pra RecoverFailed e re-renderiza, ver
+                        // save_load_menu_loop.cpp)
+    WarningCancelled,   // qualquer um dos 3 avisos (Damaged/Version/RecoverFailed)
+                        // fechou com "Cancelar"/Esc - permanece na lista, NENHUM I/O
 };
 
-// Roteia UMA tecla pelo estado ATUAL (lista de slots OU um dos 2 mini-dialogos
-// abertos - sobrescrita OU exclusao, NUNCA os dois ao mesmo tempo). Sobe/desce SO
-// por slots selecionaveis (slot_selectable), com wrap-around; Enter delega para a
-// regra de confirmacao documentada no header (slot vazio ou modo Load =
-// SlotChosen direto; slot manual ocupado em modo Save = abre o mini-dialogo de
-// sobrescrita). Delete (tecla dedicada, SDLK_DELETE) sobre um slot OCUPADO abre o
-// mini-dialogo de EXCLUSAO (ver save_load_menu_request_delete) - alvo = state.
-// selected (o clique do MOUSE no icone por-linha usa save_load_menu_click_slot/
-// save_load_menu_request_delete direto, targeting a linha clicada). Dentro de
-// QUALQUER mini-dialogo, LEFT/RIGHT/UP/DOWN alternam a pill selecionada (0/1) e
-// ENTER confirma a escolha atual; ESC equivale a "Nao" (mesma seguranca de
-// controls_confirming_discard, system_menu.hpp). ESC/Voltar fora de ambos os
-// mini-dialogos devolve Back.
+// Roteia UMA tecla pelo estado ATUAL (lista de slots OU um dos mini-dialogos/
+// avisos abertos - sobrescrita, exclusao OU aviso, NUNCA mais de um ao mesmo
+// tempo). Sobe/desce SO por slots selecionaveis (slot_selectable), com
+// wrap-around; Enter delega para a regra de confirmacao documentada no header
+// (slot vazio ou OCUPADO em modo Load = SlotChosen direto; slot manual ocupado
+// em modo Save = abre o mini-dialogo de sobrescrita; slot present_unreadable em
+// modo Load = abre o AVISO dedicado, SAVE-LOAD-AVISOS). Delete (tecla dedicada,
+// SDLK_DELETE) sobre um slot OCUPADO abre o mini-dialogo de EXCLUSAO (ver
+// save_load_menu_request_delete) - alvo = state.selected (o clique do MOUSE no
+// icone por-linha usa save_load_menu_click_slot/save_load_menu_request_delete
+// direto, targeting a linha clicada). Dentro do mini-dialogo de sobrescrita/
+// exclusao, LEFT/RIGHT/UP/DOWN alternam a pill selecionada (0/1) e ENTER
+// confirma a escolha atual; ESC equivale a "Nao" (mesma seguranca de
+// controls_confirming_discard, system_menu.hpp). Dentro do AVISO, LEFT/RIGHT/UP/
+// DOWN so tem efeito quando warning_kind==Damaged (alterna warning_selected 0/1);
+// ENTER confirma (Damaged com warning_selected==0 devolve RecoverRequested;
+// qualquer outro caso devolve WarningCancelled); ESC sempre equivale a Cancelar
+// (WarningCancelled). ESC/Voltar fora de QUALQUER dialogo/aviso devolve Back.
 [[nodiscard]] SaveLoadMenuAction save_load_menu_key_down(SaveLoadMenuState& state,
                                                           SDL_Keycode key) noexcept;
 
-// Clique de MOUSE num slot da lista (fora de qualquer mini-dialogo, ver
+// Clique de MOUSE num slot da lista (fora de qualquer mini-dialogo/aviso, ver
 // save_load_menu_loop.cpp): equivalente a "focar + Enter" (MESMA convencao de
 // system_menu_click_option, system_menu.hpp). No-op (None) se `slot` fora do
-// intervalo, se algum mini-dialogo ja estiver aberto (o clique na LISTA nao se
-// aplica enquanto um dialogo cobre a tela), ou se o slot nao for selecionavel
-// (readonly/vazio conforme o modo, ver slot_selectable) - caso contrario, foca o
-// slot (state.selected = slot) e aplica a MESMA regra de confirmacao do Enter.
+// intervalo, se algum mini-dialogo/aviso ja estiver aberto (o clique na LISTA
+// nao se aplica enquanto um dialogo cobre a tela), ou se o slot nao for
+// selecionavel (readonly/vazio conforme o modo, ver slot_selectable) - caso
+// contrario, foca o slot (state.selected = slot) e aplica a MESMA regra de
+// confirmacao do Enter (INCLUSIVE abrir o aviso, se present_unreadable em modo
+// Load).
 [[nodiscard]] SaveLoadMenuAction save_load_menu_click_slot(SaveLoadMenuState& state,
                                                             int slot) noexcept;
 
@@ -316,6 +370,23 @@ void save_load_menu_reselect_if_needed(SaveLoadMenuState& state) noexcept;
 // (confirming_delete/delete_confirm_selected).
 [[nodiscard]] SaveLoadMenuAction save_load_menu_click_delete_confirm(
     SaveLoadMenuState& state, int pill) noexcept;
+
+// Clique de MOUSE no botao "Tentar recuperar" do AVISO (SAVE-LOAD-AVISOS) -
+// equivalente a focar a pill 0 + Enter. FUNCAO PROPRIA (nao "pill index"
+// generico como os 2 mini-dialogos acima) porque o botao SO EXISTE quando
+// warning_kind==Damaged (Version/RecoverFailed sao so-Cancelar, forward-only/
+// recuperacao ja tentada - a RML nem desenha o botao nesses casos, ver
+// save_load_menu_rml.cpp). No-op (None) se o aviso nao estiver aberto ou nao for
+// Damaged (defensivo - a RML ja nao renderiza o botao, mas o CHAMADOR nao
+// deveria conseguir clicar num id que nao existe de qualquer forma).
+[[nodiscard]] SaveLoadMenuAction save_load_menu_click_warning_recover(
+    SaveLoadMenuState& state) noexcept;
+
+// Clique de MOUSE no botao "Cancelar" do AVISO (SAVE-LOAD-AVISOS) - equivalente
+// a focar a pill de Cancelar + Enter, PRESENTE em QUALQUER warning_kind != None
+// (Damaged/Version/RecoverFailed). No-op (None) se o aviso nao estiver aberto.
+[[nodiscard]] SaveLoadMenuAction save_load_menu_click_warning_cancel(
+    SaveLoadMenuState& state) noexcept;
 
 }  // namespace gus::app::screens
 

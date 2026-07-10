@@ -42,6 +42,13 @@ Translator make_translator() {
         "## SAVE_DELETE_CONFIRM_YES\nSim, apagar\n\n"
         "## SAVE_DELETE_CONFIRM_NO\nCancelar\n\n"
         "## SAVE_DELETE_BUTTON_LABEL\nApagar\n\n"
+        "## SAVE_LOAD_WARN_DAMAGED\nEste save esta danificado.\n\n"
+        "## SAVE_LOAD_WARN_VERSION\nEste save e de uma versao mais nova.\n\n"
+        "## SAVE_LOAD_RECOVER_TRY\nTentar recuperar\n\n"
+        "## SAVE_LOAD_RECOVER_FAILED\nNao foi possivel recuperar.\n\n"
+        "## SAVE_LOAD_SLOT_DAMAGED_LABEL\n! Danificado\n\n"
+        "## SAVE_LOAD_SLOT_VERSION_LABEL\n! Versao incompativel\n\n"
+        "## SAVE_LOAD_WARN_CANCEL\nCancelar\n\n"
         "## SETTINGS_BACK\nVoltar\n\n"
         "## LOCATION_PRACA_COMPILACAO\nPraca da Compilacao\n\n"
         "## LOCATION_UNKNOWN\nLocal desconhecido\n\n");
@@ -173,4 +180,125 @@ TEST_CASE("build_save_load_menu_rml: mini-dialogo de EXCLUSAO substitui a lista 
     const auto pos_no = rml.find("id=\"slmenu-delete-confirm-no\"");
     const auto div_start = rml.rfind("<div class=\"", pos_no);
     REQUIRE(rml.substr(div_start, pos_no - div_start).find("focused") != std::string::npos);
+}
+
+// ---------------------------------------------------------------- SAVE-LOAD-AVISOS
+// (aviso #1, mock Tela 4a: warn-box/warn-btn.danger)
+
+std::array<SaveSlotPreview, kSlotCount> make_slots_with_unreadable(
+    int slot, gus::domain::save::LoadResult result) {
+    std::array<SaveSlotPreview, kSlotCount> slots{};
+    for (int i = 0; i < kSlotCount; ++i) slots[static_cast<std::size_t>(i)] = empty_slot_preview(i);
+    slots[static_cast<std::size_t>(slot)] = unreadable_slot_preview(slot, result);
+    return slots;
+}
+
+TEST_CASE("build_save_load_menu_rml: modo Load rotula um slot Danificado com "
+          "'! Danificado' (nao 'vazio')",
+          "[save_load_menu_rml][save-load-avisos]") {
+    SaveLoadMenuState state;
+    save_load_menu_open(state, SaveLoadMode::Load,
+                         make_slots_with_unreadable(1, gus::domain::save::LoadResult::HmacInvalid));
+
+    const std::string rml = build_save_load_menu_rml(state, make_translator());
+    REQUIRE(rml.find("Danificado") != std::string::npos);
+    REQUIRE(rml.find("Espaco 1 - vazio") == std::string::npos);  // NAO mostra "vazio"
+}
+
+TEST_CASE("build_save_load_menu_rml: modo Load rotula um slot de Versao "
+          "incompativel com '! Versao incompativel'",
+          "[save_load_menu_rml][save-load-avisos]") {
+    SaveLoadMenuState state;
+    save_load_menu_open(
+        state, SaveLoadMode::Load,
+        make_slots_with_unreadable(1, gus::domain::save::LoadResult::VersionTooNew));
+
+    const std::string rml = build_save_load_menu_rml(state, make_translator());
+    REQUIRE(rml.find("Versao incompativel") != std::string::npos);
+}
+
+TEST_CASE("build_save_load_menu_rml: modo Save NAO usa o rotulo dedicado (CRIT-1 "
+          "intocado - continua mostrando 'vazio')",
+          "[save_load_menu_rml][save-load-avisos]") {
+    SaveLoadMenuState state;
+    save_load_menu_open(state, SaveLoadMode::Save,
+                         make_slots_with_unreadable(1, gus::domain::save::LoadResult::HmacInvalid));
+
+    const std::string rml = build_save_load_menu_rml(state, make_translator());
+    REQUIRE(rml.find("Espaco 1 - vazio") != std::string::npos);
+    REQUIRE(rml.find("Danificado") == std::string::npos);
+}
+
+TEST_CASE("build_save_load_menu_rml: aviso Damaged substitui a lista e mostra os "
+          "2 botoes (Tentar recuperar + Cancelar), Cancelar focado por padrao",
+          "[save_load_menu_rml][save-load-avisos]") {
+    SaveLoadMenuState state;
+    save_load_menu_open(state, SaveLoadMode::Load,
+                         make_slots_with_unreadable(1, gus::domain::save::LoadResult::Corrupt));
+    (void)save_load_menu_key_down(state, SDLK_RETURN);  // abre o aviso Damaged
+    REQUIRE(state.warning_kind == SaveLoadMenuState::WarningKind::Damaged);
+
+    const std::string rml = build_save_load_menu_rml(state, make_translator());
+    REQUIRE(rml.find("Este save esta danificado.") != std::string::npos);
+    REQUIRE(rml.find("id=\"slmenu-warn-recover\"") != std::string::npos);
+    REQUIRE(rml.find("id=\"slmenu-warn-cancel\"") != std::string::npos);
+    REQUIRE(rml.find("id=\"slmenu-list\"") == std::string::npos);  // lista NAO aparece
+
+    const auto pos_cancel = rml.find("id=\"slmenu-warn-cancel\"");
+    const auto div_start = rml.rfind("<div class=\"", pos_cancel);
+    REQUIRE(rml.substr(div_start, pos_cancel - div_start).find("focused") != std::string::npos);
+}
+
+TEST_CASE("build_save_load_menu_rml: aviso Damaged - alternar pra 'Tentar "
+          "recuperar' move o foco pra ele (Cancelar perde o foco)",
+          "[save_load_menu_rml][save-load-avisos]") {
+    SaveLoadMenuState state;
+    save_load_menu_open(state, SaveLoadMode::Load,
+                         make_slots_with_unreadable(1, gus::domain::save::LoadResult::Corrupt));
+    (void)save_load_menu_key_down(state, SDLK_RETURN);
+    (void)save_load_menu_key_down(state, SDLK_LEFT);  // alterna pra "Tentar recuperar"
+    REQUIRE(state.warning_selected == 0);
+
+    const std::string rml = build_save_load_menu_rml(state, make_translator());
+    const auto pos_recover = rml.find("id=\"slmenu-warn-recover\"");
+    const auto div_start = rml.rfind("<div class=\"", pos_recover);
+    REQUIRE(rml.substr(div_start, pos_recover - div_start).find("focused") != std::string::npos);
+
+    const auto pos_cancel = rml.find("id=\"slmenu-warn-cancel\"");
+    const auto div_start_cancel = rml.rfind("<div class=\"", pos_cancel);
+    REQUIRE(rml.substr(div_start_cancel, pos_cancel - div_start_cancel).find("focused") ==
+            std::string::npos);
+}
+
+TEST_CASE("build_save_load_menu_rml: aviso Version so mostra Cancelar (SEM "
+          "'Tentar recuperar' - forward-only, botao nem existe)",
+          "[save_load_menu_rml][save-load-avisos]") {
+    SaveLoadMenuState state;
+    save_load_menu_open(
+        state, SaveLoadMode::Load,
+        make_slots_with_unreadable(1, gus::domain::save::LoadResult::VersionTooNew));
+    (void)save_load_menu_key_down(state, SDLK_RETURN);
+    REQUIRE(state.warning_kind == SaveLoadMenuState::WarningKind::Version);
+
+    const std::string rml = build_save_load_menu_rml(state, make_translator());
+    REQUIRE(rml.find("Este save e de uma versao mais nova.") != std::string::npos);
+    REQUIRE(rml.find("id=\"slmenu-warn-recover\"") == std::string::npos);  // botao NAO existe
+    REQUIRE(rml.find("id=\"slmenu-warn-cancel\"") != std::string::npos);
+}
+
+TEST_CASE("build_save_load_menu_rml: aviso RecoverFailed mostra a mensagem de "
+          "falha e so Cancelar (mesmo contrato de Version)",
+          "[save_load_menu_rml][save-load-avisos]") {
+    SaveLoadMenuState state;
+    save_load_menu_open(state, SaveLoadMode::Load,
+                         make_slots_with_unreadable(1, gus::domain::save::LoadResult::Corrupt));
+    (void)save_load_menu_key_down(state, SDLK_RETURN);
+    // Simula o CHAMADOR transitando pra RecoverFailed apos load_game_from_backup
+    // falhar (mesmo padrao ja usado por build_previews_and_cache/do_delete).
+    state.warning_kind = SaveLoadMenuState::WarningKind::RecoverFailed;
+
+    const std::string rml = build_save_load_menu_rml(state, make_translator());
+    REQUIRE(rml.find("Nao foi possivel recuperar.") != std::string::npos);
+    REQUIRE(rml.find("id=\"slmenu-warn-recover\"") == std::string::npos);
+    REQUIRE(rml.find("id=\"slmenu-warn-cancel\"") != std::string::npos);
 }

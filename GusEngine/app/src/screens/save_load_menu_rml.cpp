@@ -173,6 +173,14 @@ body { font-family: "Pixel Operator Mono"; background: transparent; width: 100%;
   border: 1dp #ffffff12; border-radius: 999dp; font-size: 12dp; color: #E7ECF5; letter-spacing: 1dp;
 }
 .confirm-pill.focused { color: #ffffff; border: 1dp #22D3EE; box-shadow: #22D3EE 0dp 0dp 18dp 1dp; }
+/* SAVE-LOAD-AVISOS (aviso #1, mock Tela 4a "warn-box"/"warn-btn.danger"): reusa
+   .confirm-title/.confirm-pill (MESMO layout/foco cyan das outras 2 confirmacoes
+   acima) - so o titulo (vermelho, severidade) e o botao PERIGOSO ("Tentar
+   recuperar") ganham o tingimento var(--warn) do mock, via as classes abaixo. */
+.warn-title { text-align: center; color: #F43F5E; font-size: 13dp; line-height: 20dp; margin: 20dp 0dp 20dp 0dp; }
+.confirm-pill.danger { border: 1dp #F43F5E; color: #ffd7de; decorator: vertical-gradient( #3a1620 #25101a ); }
+.slot-empty-label.unreadable { color: #F43F5E; }
+.slot.unreadable { border: 1dp #F43F5E55; }
 )RCSS";
 
 std::string wrap_document(const std::string& body_html) {
@@ -206,6 +214,37 @@ std::string build_save_load_menu_rml(const SaveLoadMenuState& state,
                                        : "SAVE_SCREEN_SUBTITLE_LOAD"),
                         std::to_string(kSlotCount))
          << "</div>";
+
+    if (state.warning_kind != SaveLoadMenuState::WarningKind::None) {
+        // Aviso dedicado (SAVE-LOAD-AVISOS, mock Tela 4a) - substitui a lista
+        // enquanto aberto, MESMA mecanica de confirming_overwrite/confirming_delete
+        // abaixo (title + pill(s), tingido de vermelho via .warn-title/.confirm-
+        // pill.danger). Damaged tem 2 botoes ("Tentar recuperar" + Cancelar);
+        // Version/RecoverFailed tem SO Cancelar (forward-only/recuperacao ja
+        // tentada - nao ha pill 0 pra desenhar).
+        const bool damaged = (state.warning_kind == SaveLoadMenuState::WarningKind::Damaged);
+        const bool version = (state.warning_kind == SaveLoadMenuState::WarningKind::Version);
+        const char* msg_key = damaged   ? "SAVE_LOAD_WARN_DAMAGED"
+                              : version ? "SAVE_LOAD_WARN_VERSION"
+                                        : "SAVE_LOAD_RECOVER_FAILED";
+        body << "<div class=\"warn-title\">" << tr.tr(msg_key) << "</div>";
+        if (damaged) {
+            body << "<div class=\"confirm-pill danger"
+                 << (state.warning_selected == 0 ? " focused" : "")
+                 << "\" id=\"slmenu-warn-recover\">" << tr.tr("SAVE_LOAD_RECOVER_TRY")
+                 << "</div>";
+        }
+        // Cancelar: sempre presente. So-1-botao (Version/RecoverFailed) fica SEMPRE
+        // focado (nao ha outra pill pra disputar o foco); em Damaged, so quando
+        // warning_selected==1 (default seguro).
+        body << "<div class=\"confirm-pill" << ((!damaged || state.warning_selected == 1)
+                                                     ? " focused"
+                                                     : "")
+             << "\" id=\"slmenu-warn-cancel\">" << tr.tr("SAVE_LOAD_WARN_CANCEL")
+             << "</div>";
+        body << "</div>";  // #slmenu-panel
+        return wrap_document(body.str());
+    }
 
     if (state.confirming_overwrite) {
         // Mini-dialogo Sim/Nao (MESMA mecanica de controls_confirming_restore em
@@ -243,10 +282,17 @@ std::string build_save_load_menu_rml(const SaveLoadMenuState& state,
         const SaveSlotPreview& slot = state.slots[static_cast<std::size_t>(i)];
         const bool focused = (state.selected == i) && slot_selectable(state, i);
         const bool readonly = (state.mode == SaveLoadMode::Save) && slot.is_autosave;
+        // SAVE-LOAD-AVISOS: o rotulo dedicado ("! Danificado"/"! Versao
+        // incompativel") so aparece em modo LOAD - em modo Save o slot
+        // present_unreadable continua mostrando "Vazio" (CRIT-1, comportamento
+        // de Salvar INTOCADO nesta onda).
+        const bool show_unreadable_label =
+            slot.present_unreadable && state.mode == SaveLoadMode::Load;
 
         std::string classes = "slot";
         if (readonly) classes += " readonly";
         if (!slot.occupied) classes += " empty";
+        if (show_unreadable_label) classes += " unreadable";
         if (focused) classes += " focused";
         classes += pressed_class(i, pressed_index);
 
@@ -255,7 +301,14 @@ std::string build_save_load_menu_rml(const SaveLoadMenuState& state,
              << (slot.is_autosave ? tr.tr("SAVE_SLOT_AUTO_NAME") : std::to_string(i))
              << "</div>";
         body << "<div class=\"slot-body\">";
-        if (!slot.occupied) {
+        if (show_unreadable_label) {
+            const bool version_incompativel =
+                slot.unreadable_reason == UnreadableReason::VersionTooNew;
+            body << "<div class=\"slot-empty-label unreadable\">"
+                 << tr.tr(version_incompativel ? "SAVE_LOAD_SLOT_VERSION_LABEL"
+                                                : "SAVE_LOAD_SLOT_DAMAGED_LABEL")
+                 << "</div>";
+        } else if (!slot.occupied) {
             body << "<div class=\"slot-empty-label\">"
                  << interpolate(tr.tr("SAVE_SLOT_EMPTY"), std::to_string(i)) << "</div>";
         } else {

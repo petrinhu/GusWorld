@@ -110,6 +110,29 @@ class FsSaveStore final : public gus::domain::save::SaveStore {
 [[nodiscard]] std::optional<gus::domain::save::LoadOutcome> load_game(
     int slot, const std::string& dir);
 
+// SAVE-LOAD-AVISOS (aviso #1, "Tentar recuperar"): tenta carregar o slot a
+// partir da CADEIA DE BACKUP (backup_logical_name(slot, 1..kBackupChainDepth),
+// save_backup.hpp), NAO do primario - uso: o primario ja falhou (load_game
+// devolveu HmacInvalid/Corrupt/VersionTooNew/Invalid/WrongSlot) e o jogador
+// pediu recuperacao explicita. Percorre as geracoes NA ORDEM (backup1 = mais
+// recente, ate kBackupChainDepth = mais antiga) e devolve o LoadOutcome da
+// PRIMEIRA que carregar Ok - a recuperacao para no primeiro sucesso, nao
+// procura "a melhor" entre varias Ok (backup1 e sempre a mais fresca das
+// boas).
+//
+// Devolve std::nullopt se NENHUMA geracao de backup carregar Ok (todas
+// ausentes, OU presentes mas tambem corrompidas/versao-incompativel/etc.) - o
+// CHAMADOR trata como "recuperacao falhou" (mensagem dedicada, ver
+// save_load_menu.hpp), DIFERENTE do nullopt de load_game (que significa "slot
+// vazio"). Degradacao segura identica a load_game: falha de I/O ao ler um
+// backup PRESENTE conta como aquela geracao reprovando (segue pra proxima),
+// nunca lanca por causa disso.
+//
+// Fail-fast (propaga, nao e I/O): slot invalido lanca std::out_of_range
+// (mesmo contrato de load_game/save_game/delete_save).
+[[nodiscard]] std::optional<gus::domain::save::LoadOutcome> load_game_from_backup(
+    int slot, const std::string& dir);
+
 // Apaga TODO o save do slot: o arquivo PRIMARIO + a cadeia INTEIRA de backup
 // (backup1..backup{kBackupChainDepth}, save_backup.hpp) - o slot fica completamente
 // vazio (nao sobra rastro pra um load acidental reviver via backup depois, feature

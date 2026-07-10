@@ -165,15 +165,39 @@ TEST_CASE("empty_slot_preview: occupied=false, present_unreadable=false, is_auto
 TEST_CASE("unreadable_slot_preview (CRIT-1): occupied=false (MESMO visual de "
           "vazio) mas present_unreadable=true",
           "[save_load_menu][CRIT-1]") {
-    const SaveSlotPreview manual = unreadable_slot_preview(1);
+    const SaveSlotPreview manual =
+        unreadable_slot_preview(1, gus::domain::save::LoadResult::Corrupt);
     REQUIRE_FALSE(manual.occupied);
     REQUIRE(manual.present_unreadable);
     REQUIRE_FALSE(manual.is_autosave);
     REQUIRE(manual.slot_id == 1);
 
-    const SaveSlotPreview autosave = unreadable_slot_preview(kAutosaveSlot);
+    const SaveSlotPreview autosave =
+        unreadable_slot_preview(kAutosaveSlot, gus::domain::save::LoadResult::HmacInvalid);
     REQUIRE(autosave.is_autosave);
     REQUIRE(autosave.present_unreadable);
+}
+
+// ---------------------------------------------------------------- unreadable_slot_preview:
+// motivo (SAVE-LOAD-AVISOS)
+
+TEST_CASE("unreadable_slot_preview: LoadResult::VersionTooNew vira "
+          "UnreadableReason::VersionTooNew (irrecuperavel, forward-only)",
+          "[save_load_menu][save-load-avisos]") {
+    const SaveSlotPreview preview =
+        unreadable_slot_preview(1, gus::domain::save::LoadResult::VersionTooNew);
+    REQUIRE(preview.unreadable_reason == UnreadableReason::VersionTooNew);
+}
+
+TEST_CASE("unreadable_slot_preview: qualquer OUTRO LoadResult != Ok vira "
+          "UnreadableReason::Damaged (recuperavel via backup)",
+          "[save_load_menu][save-load-avisos]") {
+    using gus::domain::save::LoadResult;
+    for (const LoadResult r :
+         {LoadResult::HmacInvalid, LoadResult::Corrupt, LoadResult::Invalid,
+          LoadResult::WrongSlot}) {
+        REQUIRE(unreadable_slot_preview(1, r).unreadable_reason == UnreadableReason::Damaged);
+    }
 }
 
 TEST_CASE("build_slot_preview: preenche xp/capitulo/timestamp/playtime/scene a partir do "
@@ -224,6 +248,22 @@ TEST_CASE("slot_selectable: index fora do intervalo devolve false (defensivo)",
     SaveLoadMenuState state;
     REQUIRE_FALSE(slot_selectable(state, -1));
     REQUIRE_FALSE(slot_selectable(state, kSlotCount));
+}
+
+TEST_CASE("slot_selectable (SAVE-LOAD-AVISOS): modo Load TAMBEM inclui slots "
+          "present_unreadable (danificado/versao) - so o GENUINAMENTE vazio "
+          "fica fora",
+          "[save_load_menu][save-load-avisos]") {
+    SaveLoadMenuState state;
+    std::array<SaveSlotPreview, kSlotCount> slots{};
+    slots[1] = unreadable_slot_preview(1, gus::domain::save::LoadResult::HmacInvalid);
+    slots[2] = unreadable_slot_preview(2, gus::domain::save::LoadResult::VersionTooNew);
+    slots[3] = empty_slot_preview(3);
+    save_load_menu_open(state, SaveLoadMode::Load, slots);
+
+    REQUIRE(slot_selectable(state, 1));
+    REQUIRE(slot_selectable(state, 2));
+    REQUIRE_FALSE(slot_selectable(state, 3));
 }
 
 // ---------------------------------------------------------------- save_load_menu_open
@@ -797,7 +837,7 @@ TEST_CASE("CRIT-1: slot com primario presente-mas-corrompido PEDE confirmacao de
     // caso (has_save=true + load != Ok -> unreadable_slot_preview).
     std::array<SaveSlotPreview, kSlotCount> slots{};
     for (int i = 0; i < kSlotCount; ++i) slots[static_cast<std::size_t>(i)] = empty_slot_preview(i);
-    slots[1] = unreadable_slot_preview(1);
+    slots[1] = unreadable_slot_preview(1, outcome->result);
     REQUIRE_FALSE(slots[1].occupied);       // visual continua "Vazio" (nao muda, deliberado)
     REQUIRE(slots[1].present_unreadable);   // ... mas marcado ilegivel
 
@@ -839,12 +879,12 @@ TEST_CASE("CRIT-1: MESMO cenario via teclado (Enter, nao so clique de mouse) "
         f.seekp(10);
         f.write(&byte, 1);
     }
-    REQUIRE(gus::platform::fs::load_game(1, dir.string())->result !=
-            gus::domain::save::LoadResult::Ok);
+    const auto outcome = gus::platform::fs::load_game(1, dir.string());
+    REQUIRE(outcome->result != gus::domain::save::LoadResult::Ok);
 
     std::array<SaveSlotPreview, kSlotCount> slots{};
     for (int i = 0; i < kSlotCount; ++i) slots[static_cast<std::size_t>(i)] = empty_slot_preview(i);
-    slots[1] = unreadable_slot_preview(1);
+    slots[1] = unreadable_slot_preview(1, outcome->result);
 
     SaveLoadMenuState state;
     save_load_menu_open(state, SaveLoadMode::Save, slots);
@@ -852,6 +892,282 @@ TEST_CASE("CRIT-1: MESMO cenario via teclado (Enter, nao so clique de mouse) "
 
     REQUIRE(save_load_menu_key_down(state, SDLK_RETURN) == SaveLoadMenuAction::None);
     REQUIRE(state.confirming_overwrite);
+
+    std::filesystem::remove_all(dir);
+}
+
+// ---------------------------------------------------------------- SAVE-LOAD-AVISOS
+// (aviso #1, mock Tela 4a): selecionar um slot present_unreadable EM MODO LOAD abre
+// o aviso dedicado (Damaged com "Tentar recuperar"/Cancelar, Version so-Cancelar) em
+// vez de fingir um SlotChosen.
+
+namespace {
+
+std::array<SaveSlotPreview, kSlotCount> slots_with_unreadable(
+    int slot, gus::domain::save::LoadResult result) {
+    std::array<SaveSlotPreview, kSlotCount> slots{};
+    for (int i = 0; i < kSlotCount; ++i) slots[static_cast<std::size_t>(i)] = empty_slot_preview(i);
+    slots[static_cast<std::size_t>(slot)] = unreadable_slot_preview(slot, result);
+    return slots;
+}
+
+}  // namespace
+
+TEST_CASE("save_load_menu_key_down: Enter num slot Danificado em modo Load abre "
+          "o aviso Damaged (2 botoes, default seguro = Cancelar)",
+          "[save_load_menu][save-load-avisos]") {
+    SaveLoadMenuState state;
+    save_load_menu_open(state, SaveLoadMode::Load,
+                         slots_with_unreadable(1, gus::domain::save::LoadResult::HmacInvalid));
+    REQUIRE(state.selected == 1);
+
+    REQUIRE(save_load_menu_key_down(state, SDLK_RETURN) == SaveLoadMenuAction::None);
+    REQUIRE(state.warning_kind == SaveLoadMenuState::WarningKind::Damaged);
+    REQUIRE(state.warning_selected == 1);  // default seguro = Cancelar
+}
+
+TEST_CASE("save_load_menu_key_down: Enter num slot de Versao incompativel em "
+          "modo Load abre o aviso Version (so Cancelar)",
+          "[save_load_menu][save-load-avisos]") {
+    SaveLoadMenuState state;
+    save_load_menu_open(
+        state, SaveLoadMode::Load,
+        slots_with_unreadable(1, gus::domain::save::LoadResult::VersionTooNew));
+
+    REQUIRE(save_load_menu_key_down(state, SDLK_RETURN) == SaveLoadMenuAction::None);
+    REQUIRE(state.warning_kind == SaveLoadMenuState::WarningKind::Version);
+}
+
+TEST_CASE("save_load_menu_click_slot: clique num slot Danificado em modo Load "
+          "abre o mesmo aviso Damaged (mesmo efeito do Enter)",
+          "[save_load_menu][save-load-avisos]") {
+    SaveLoadMenuState state;
+    save_load_menu_open(state, SaveLoadMode::Load,
+                         slots_with_unreadable(1, gus::domain::save::LoadResult::Corrupt));
+
+    REQUIRE(save_load_menu_click_slot(state, 1) == SaveLoadMenuAction::None);
+    REQUIRE(state.warning_kind == SaveLoadMenuState::WarningKind::Damaged);
+    REQUIRE(state.selected == 1);
+}
+
+TEST_CASE("save_load_menu_key_down: aviso Damaged - Esc equivale a Cancelar "
+          "(WarningCancelled, fecha o aviso)",
+          "[save_load_menu][save-load-avisos]") {
+    SaveLoadMenuState state;
+    save_load_menu_open(state, SaveLoadMode::Load,
+                         slots_with_unreadable(1, gus::domain::save::LoadResult::HmacInvalid));
+    (void)save_load_menu_key_down(state, SDLK_RETURN);  // abre o aviso
+
+    REQUIRE(save_load_menu_key_down(state, SDLK_ESCAPE) == SaveLoadMenuAction::WarningCancelled);
+    REQUIRE(state.warning_kind == SaveLoadMenuState::WarningKind::None);
+}
+
+TEST_CASE("save_load_menu_key_down: aviso Damaged - Enter com Cancelar focado "
+          "(default) devolve WarningCancelled, sem alterar o slot",
+          "[save_load_menu][save-load-avisos]") {
+    SaveLoadMenuState state;
+    save_load_menu_open(state, SaveLoadMode::Load,
+                         slots_with_unreadable(1, gus::domain::save::LoadResult::HmacInvalid));
+    (void)save_load_menu_key_down(state, SDLK_RETURN);  // abre o aviso
+
+    REQUIRE(save_load_menu_key_down(state, SDLK_RETURN) == SaveLoadMenuAction::WarningCancelled);
+    REQUIRE(state.warning_kind == SaveLoadMenuState::WarningKind::None);
+}
+
+TEST_CASE("save_load_menu_key_down: aviso Damaged - alternar pra 'Tentar "
+          "recuperar' e confirmar devolve RecoverRequested com o slot certo",
+          "[save_load_menu][save-load-avisos]") {
+    SaveLoadMenuState state;
+    save_load_menu_open(state, SaveLoadMode::Load,
+                         slots_with_unreadable(2, gus::domain::save::LoadResult::Corrupt));
+    (void)save_load_menu_click_slot(state, 2);  // foca e abre o aviso no slot 2
+    REQUIRE(state.warning_kind == SaveLoadMenuState::WarningKind::Damaged);
+
+    REQUIRE(save_load_menu_key_down(state, SDLK_LEFT) == SaveLoadMenuAction::None);
+    REQUIRE(state.warning_selected == 0);
+    REQUIRE(save_load_menu_key_down(state, SDLK_RETURN) == SaveLoadMenuAction::RecoverRequested);
+    REQUIRE(state.warning_kind == SaveLoadMenuState::WarningKind::None);
+    REQUIRE(state.selected == 2);  // o CHAMADOR ainda le state.selected apos RecoverRequested
+}
+
+TEST_CASE("save_load_menu_key_down: aviso Version - LEFT/RIGHT/UP/DOWN nao "
+          "fazem nada (so 1 botao) e Enter equivale a Cancelar",
+          "[save_load_menu][save-load-avisos]") {
+    SaveLoadMenuState state;
+    save_load_menu_open(
+        state, SaveLoadMode::Load,
+        slots_with_unreadable(1, gus::domain::save::LoadResult::VersionTooNew));
+    (void)save_load_menu_key_down(state, SDLK_RETURN);  // abre o aviso Version
+
+    REQUIRE(save_load_menu_key_down(state, SDLK_LEFT) == SaveLoadMenuAction::None);
+    REQUIRE(state.warning_kind == SaveLoadMenuState::WarningKind::Version);  // ainda aberto
+
+    REQUIRE(save_load_menu_key_down(state, SDLK_RETURN) == SaveLoadMenuAction::WarningCancelled);
+    REQUIRE(state.warning_kind == SaveLoadMenuState::WarningKind::None);
+}
+
+TEST_CASE("save_load_menu_click_warning_recover: no-op se o aviso nao for "
+          "Damaged (fechado, Version ou RecoverFailed)",
+          "[save_load_menu][save-load-avisos]") {
+    SaveLoadMenuState state;  // warning_kind default = None
+    REQUIRE(save_load_menu_click_warning_recover(state) == SaveLoadMenuAction::None);
+
+    save_load_menu_open(
+        state, SaveLoadMode::Load,
+        slots_with_unreadable(1, gus::domain::save::LoadResult::VersionTooNew));
+    (void)save_load_menu_key_down(state, SDLK_RETURN);  // abre Version
+    REQUIRE(save_load_menu_click_warning_recover(state) == SaveLoadMenuAction::None);
+    REQUIRE(state.warning_kind == SaveLoadMenuState::WarningKind::Version);  // intocado
+}
+
+TEST_CASE("save_load_menu_click_warning_recover: clique direto (sem passar pelo "
+          "teclado) devolve RecoverRequested quando Damaged",
+          "[save_load_menu][save-load-avisos]") {
+    SaveLoadMenuState state;
+    save_load_menu_open(state, SaveLoadMode::Load,
+                         slots_with_unreadable(3, gus::domain::save::LoadResult::HmacInvalid));
+    (void)save_load_menu_click_slot(state, 3);
+    REQUIRE(state.warning_kind == SaveLoadMenuState::WarningKind::Damaged);
+
+    REQUIRE(save_load_menu_click_warning_recover(state) == SaveLoadMenuAction::RecoverRequested);
+    REQUIRE(state.warning_kind == SaveLoadMenuState::WarningKind::None);
+}
+
+TEST_CASE("save_load_menu_click_warning_cancel: fecha QUALQUER warning_kind "
+          "aberto (Damaged/Version); no-op se ja fechado",
+          "[save_load_menu][save-load-avisos]") {
+    SaveLoadMenuState state;
+    REQUIRE(save_load_menu_click_warning_cancel(state) == SaveLoadMenuAction::None);
+
+    save_load_menu_open(state, SaveLoadMode::Load,
+                         slots_with_unreadable(1, gus::domain::save::LoadResult::Corrupt));
+    (void)save_load_menu_click_slot(state, 1);
+    REQUIRE(save_load_menu_click_warning_cancel(state) == SaveLoadMenuAction::WarningCancelled);
+    REQUIRE(state.warning_kind == SaveLoadMenuState::WarningKind::None);
+}
+
+TEST_CASE("save_load_menu_click_slot/save_load_menu_request_delete: no-op "
+          "enquanto o AVISO esta aberto (nunca 2 dialogos simultaneos)",
+          "[save_load_menu][save-load-avisos]") {
+    SaveLoadMenuState state;
+    std::array<SaveSlotPreview, kSlotCount> slots =
+        slots_with_unreadable(1, gus::domain::save::LoadResult::HmacInvalid);
+    slots[2] = build_slot_preview(make_save_data(100), 2);
+    save_load_menu_open(state, SaveLoadMode::Load, slots);
+    (void)save_load_menu_click_slot(state, 1);  // abre o aviso no slot 1
+    REQUIRE(state.warning_kind == SaveLoadMenuState::WarningKind::Damaged);
+
+    REQUIRE(save_load_menu_click_slot(state, 2) == SaveLoadMenuAction::None);
+    REQUIRE(state.selected == 1);  // foco NAO mudou pro 2, aviso ainda cobre a tela
+
+    save_load_menu_request_delete(state, 2);
+    REQUIRE_FALSE(state.confirming_delete);  // ignorado - aviso ja aberto
+}
+
+// SAVE-LOAD-AVISOS end-to-end: "Tentar recuperar" -> load_game_from_backup real,
+// MESMO estilo de repro do CRIT-1 acima (grava 2x em disco, corrompe o primario,
+// confirma via load_game que reprova, monta o preview via unreadable_slot_preview,
+// abre o aviso, e prova o ramo de SUCESSO/FALHA da recuperacao via a funcao real
+// gus::platform::fs::load_game_from_backup - o CHAMADOR real, save_load_menu_loop.
+// cpp, e quem invoca isso ao receber RecoverRequested; aqui testamos que a funcao
+// devolve o dado certo pro CHAMADOR aplicar).
+
+TEST_CASE("SAVE-LOAD-AVISOS: RecoverRequested + load_game_from_backup real "
+          "recupera o backup bom (fluxo completo ate o ponto que o CHAMADOR usa)",
+          "[save_load_menu][save-load-avisos]") {
+    const auto dir =
+        std::filesystem::temp_directory_path() / "gusworld_avisos_recover_sucesso_test";
+    std::filesystem::remove_all(dir);
+
+    gus::domain::save::SaveData first;
+    first.current_scene_path = "city_intro";
+    first.party_roster = {"gus"};
+    first.party_active = {"gus"};
+    first.slot_id = 1;
+    first.playtime_seconds = 1.0;
+    REQUIRE(gus::platform::fs::save_game(first, 1, dir.string()));
+
+    gus::domain::save::SaveData second = first;
+    second.playtime_seconds = 2.0;
+    REQUIRE(gus::platform::fs::save_game(second, 1, dir.string()));  // first -> backup1
+
+    {
+        std::fstream f(dir / "save_1.sav", std::ios::in | std::ios::out | std::ios::binary);
+        REQUIRE(f.is_open());
+        char byte = 0;
+        f.seekg(10);
+        f.read(&byte, 1);
+        byte = static_cast<char>(byte ^ 0xFF);
+        f.seekp(10);
+        f.write(&byte, 1);
+    }
+    const auto primary_outcome = gus::platform::fs::load_game(1, dir.string());
+    REQUIRE(primary_outcome->result != gus::domain::save::LoadResult::Ok);
+
+    SaveLoadMenuState state;
+    save_load_menu_open(state, SaveLoadMode::Load,
+                         slots_with_unreadable(1, primary_outcome->result));
+    (void)save_load_menu_click_slot(state, 1);
+    REQUIRE(state.warning_kind == SaveLoadMenuState::WarningKind::Damaged);
+
+    REQUIRE(save_load_menu_click_warning_recover(state) == SaveLoadMenuAction::RecoverRequested);
+    // O CHAMADOR (save_load_menu_loop.cpp) faria isto agora - provamos aqui que
+    // devolve o dado BOM (backup1 = a geracao anterior, "first").
+    const auto recovered = gus::platform::fs::load_game_from_backup(1, dir.string());
+    REQUIRE(recovered.has_value());
+    REQUIRE(recovered->result == gus::domain::save::LoadResult::Ok);
+    REQUIRE(recovered->data.playtime_seconds == 1.0);
+
+    std::filesystem::remove_all(dir);
+}
+
+TEST_CASE("SAVE-LOAD-AVISOS: RecoverRequested + load_game_from_backup real "
+          "FALHA (nenhum backup bom) - o CHAMADOR transita pra RecoverFailed",
+          "[save_load_menu][save-load-avisos]") {
+    const auto dir =
+        std::filesystem::temp_directory_path() / "gusworld_avisos_recover_falha_test";
+    std::filesystem::remove_all(dir);
+
+    gus::domain::save::SaveData data;
+    data.current_scene_path = "city_intro";
+    data.party_roster = {"gus"};
+    data.party_active = {"gus"};
+    data.slot_id = 1;
+    REQUIRE(gus::platform::fs::save_game(data, 1, dir.string()));  // so o primario, sem backup
+
+    {
+        std::fstream f(dir / "save_1.sav", std::ios::in | std::ios::out | std::ios::binary);
+        REQUIRE(f.is_open());
+        char byte = 0;
+        f.seekg(10);
+        f.read(&byte, 1);
+        byte = static_cast<char>(byte ^ 0xFF);
+        f.seekp(10);
+        f.write(&byte, 1);
+    }
+    const auto primary_outcome = gus::platform::fs::load_game(1, dir.string());
+    REQUIRE(primary_outcome->result != gus::domain::save::LoadResult::Ok);
+
+    SaveLoadMenuState state;
+    save_load_menu_open(state, SaveLoadMode::Load,
+                         slots_with_unreadable(1, primary_outcome->result));
+    (void)save_load_menu_click_slot(state, 1);
+    REQUIRE(save_load_menu_click_warning_recover(state) == SaveLoadMenuAction::RecoverRequested);
+
+    REQUIRE_FALSE(gus::platform::fs::load_game_from_backup(1, dir.string()).has_value());
+    // O CHAMADOR muta state.warning_kind pra RecoverFailed neste caso (mutacao
+    // direta de campo publico, MESMO padrao ja usado por build_previews_and_cache/
+    // do_delete em save_load_menu_loop.cpp) - provamos so o estado RESULTANTE
+    // esperado (a mutacao em si e trivial, nao ha logica de dominio nela).
+    state.warning_kind = SaveLoadMenuState::WarningKind::RecoverFailed;
+    state.warning_selected = 1;
+    REQUIRE(state.warning_kind == SaveLoadMenuState::WarningKind::RecoverFailed);
+
+    // O aviso RecoverFailed tambem so tem Cancelar (mesmo contrato de Version).
+    REQUIRE(save_load_menu_key_down(state, SDLK_LEFT) == SaveLoadMenuAction::None);
+    REQUIRE(state.warning_kind == SaveLoadMenuState::WarningKind::RecoverFailed);  // intocado
+    REQUIRE(save_load_menu_key_down(state, SDLK_RETURN) == SaveLoadMenuAction::WarningCancelled);
+    REQUIRE(state.warning_kind == SaveLoadMenuState::WarningKind::None);
 
     std::filesystem::remove_all(dir);
 }

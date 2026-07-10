@@ -193,4 +193,29 @@ std::optional<gus::domain::save::LoadOutcome> load_game(int slot, const std::str
     }
 }
 
+std::optional<gus::domain::save::LoadOutcome> load_game_from_backup(int slot,
+                                                                     const std::string& dir) {
+    // Fail-fast (nao e I/O): slot invalido propaga std::out_of_range (mesmo
+    // contrato de load_game - primary_logical_name ja valida).
+    (void)gus::domain::save::primary_logical_name(slot);
+    FsSaveStore store(dir);
+
+    for (int k = 1; k <= gus::domain::save::kBackupChainDepth; ++k) {
+        const std::string name = gus::domain::save::backup_logical_name(slot, k);
+        try {
+            if (!store.exists(name)) continue;  // esta geracao nunca existiu
+            const auto bytes = store.read(name);
+            const auto outcome = gus::domain::save::load_save(bytes, slot);
+            if (outcome.result == gus::domain::save::LoadResult::Ok) return outcome;
+            // Geracao presente mas tambem ilegivel (corrompida/versao/etc.) -
+            // segue tentando a proxima (mais antiga), nao desiste na 1a falha.
+        } catch (const std::exception& e) {
+            std::cerr << "save_file_store: falha de I/O ao ler backup '" << name
+                      << "' do slot " << slot << ": " << e.what()
+                      << " - tentando a proxima geracao (degradacao segura)\n";
+        }
+    }
+    return std::nullopt;  // nenhuma geracao de backup carregou Ok
+}
+
 }  // namespace gus::platform::fs
