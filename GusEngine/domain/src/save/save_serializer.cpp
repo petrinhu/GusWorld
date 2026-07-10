@@ -390,18 +390,47 @@ void read_controls_hash(Reader& r, SaveData& s) {
         s.controls_hash128[i] = r.read_u8();
 }
 
-// Monta o payload no layout corrente (V4): u32 schema_version || comuns ||
-// character_states || enemy_knowledge || input_remap_backup || controls_hash128 ||
-// i32 slot_id.
-std::vector<std::uint8_t> build_payload_current(const SaveData& data) {
-    std::vector<std::uint8_t> payload;
-    put_u32(payload, static_cast<std::uint32_t>(current_schema_version()));
+// Bloco COMUM aos layouts V4 e V5 (idêntico até slot_id inclusive) - fatorado pra
+// nao duplicar entre build_payload_v4 (fixture de migracao) e build_payload_current
+// (V5, que so acrescenta o bloco de dificuldade por cima).
+void write_v4_tail(std::vector<std::uint8_t>& payload, const SaveData& data) {
     write_common_payload(payload, data);
     write_character_states(payload, data);
     write_enemy_knowledge(payload, data);
     write_input_remap_backup(payload, data);
     write_controls_hash(payload, data);
     put_i32(payload, data.slot_id);
+}
+
+// V5 (MODOS-MORTE Fase 0): u32 difficulty | i32 difficult_recovery_stage.
+void write_difficulty_fields(std::vector<std::uint8_t>& payload, const SaveData& s) {
+    put_u32(payload, static_cast<std::uint32_t>(s.difficulty));
+    put_i32(payload, s.difficult_recovery_stage);
+}
+
+void read_difficulty_fields(Reader& r, SaveData& s) {
+    s.difficulty = static_cast<DifficultyLevel>(r.read_u32());
+    s.difficult_recovery_stage = r.read_i32();
+}
+
+// Monta o payload no layout corrente (V5): u32 schema_version || comuns ||
+// character_states || enemy_knowledge || input_remap_backup || controls_hash128 ||
+// i32 slot_id || u32 difficulty || i32 difficult_recovery_stage.
+std::vector<std::uint8_t> build_payload_current(const SaveData& data) {
+    std::vector<std::uint8_t> payload;
+    put_u32(payload, static_cast<std::uint32_t>(current_schema_version()));
+    write_v4_tail(payload, data);
+    write_difficulty_fields(payload, data);
+    return payload;
+}
+
+// Monta o payload no layout V4 (comuns || character_states || enemy_knowledge ||
+// input_remap_backup || controls_hash128 || slot_id, SEM os campos V5:
+// difficulty/difficult_recovery_stage), para a fixture de migracao V4->V5.
+std::vector<std::uint8_t> build_payload_v4(const SaveData& data) {
+    std::vector<std::uint8_t> payload;
+    put_u32(payload, 4u);
+    write_v4_tail(payload, data);
     return payload;
 }
 
@@ -533,6 +562,7 @@ SaveData deserialize_save(const std::vector<std::uint8_t>& data) {
         read_controls_hash(r, decoded);
         decoded.slot_id = r.read_i32();
     }
+    if (version >= 5) read_difficulty_fields(r, decoded);
     r.expect_end();
 
     // 5. Sobe pela chain ate a versao atual (no-op se ja == atual).
@@ -559,6 +589,10 @@ std::vector<std::uint8_t> serialize_save_v2(const SaveData& data) {
 
 std::vector<std::uint8_t> serialize_save_v3(const SaveData& data) {
     return pack_save(build_payload_v3(data));
+}
+
+std::vector<std::uint8_t> serialize_save_v4(const SaveData& data) {
+    return pack_save(build_payload_v4(data));
 }
 
 std::vector<std::uint8_t> make_v1_payload(int version) {

@@ -147,6 +147,30 @@ class FsSaveStore final : public gus::domain::save::SaveStore {
 // (mesmo contrato de has_save/save_game/load_game).
 [[nodiscard]] bool delete_save(int slot, const std::string& dir);
 
+// MODOS-MORTE Fase 0 (Camada 3 essencial, docs/design/mecanicas/modos-morte.md
+// §2.3): sobrescreve o SELO do envelope GDS2 (MAGIC+LENGTH no INICIO + HMAC no
+// FIM, ver save_serializer.hpp) do PRIMARIO + da cadeia INTEIRA de backup
+// (backup1..backup{kBackupChainDepth}) - torna cada arquivo INCARREGAVEL (o
+// load_save/load_game_from_backup JA rejeita qualquer payload sem selo valido,
+// comportamento EXISTENTE hoje - nao precisa de codigo novo de rejeicao). Depois
+// do overwrite: UNLINK dos 4 arquivos (nao sobra nem o rastro incarregavel em
+// disco) + ZERA o buffer em RAM que leu o conteudo antigo (nao deixa o payload
+// sensivel residente na memoria do processo).
+//
+// NAO e o crypto-shred do ADR-014 (AEAD/machine-binding/ancora out-of-band) - isso
+// e fase FUTURA (Hardcore, so buildavel pos-fim-de-jogo, ver modos-morte.md §6
+// Fase 4). Isto aqui e a versao byte-overwrite sobre o selo HMAC ATUAL (GDS2),
+// disponivel JA (memoria project_morte_dificuldade_canon).
+//
+// Degradacao segura (NUNCA lanca por causa de I/O, MESMO espirito de
+// save_game/load_game/delete_save): um arquivo AUSENTE em qualquer nome logico e
+// no-op seguro (nada a apagar - idempotente). Devolve true se, ao final, NENHUM
+// dos 4 arquivos (primario + N backups) existe mais em disco - false sinaliza que
+// algum sobrou (permissao negada etc., raro); o CHAMADOR decide o que avisar.
+// Fail-fast (propaga, nao e I/O): slot invalido lanca std::out_of_range (mesmo
+// contrato de delete_save/has_save/save_game/load_game).
+[[nodiscard]] bool secure_wipe_save(int slot, const std::string& dir);
+
 }  // namespace gus::platform::fs
 
 #endif  // GUS_PLATFORM_FS_SAVE_FILE_STORE_HPP

@@ -56,6 +56,20 @@ SaveData migrate_v3_to_v4(SaveData data) {
     return data;
 }
 
+// Passo V4 -> V5 (MODOS-MORTE Fase 0, docs/design/mecanicas/modos-morte.md §3.2):
+// adiciona difficulty + difficult_recovery_stage. Semantica honesta de um save V4:
+// "nao havia escolha de dificuldade ainda" - sobe como Medio (default canonico
+// §2.1, o "meio-termo" que nao pune nem trivializa saves legados), MESMA forma dos
+// passos anteriores (campo novo com valor neutro honesto). difficult_recovery_stage
+// = 0 (sem penalidade ativa - so relevante no modo Dificil, que nao existia ainda
+// pra este save). Funcao pura.
+SaveData migrate_v4_to_v5(SaveData data) {
+    data.difficulty = DifficultyLevel::Medio;
+    data.difficult_recovery_stage = 0;
+    data.schema_version = 5;
+    return data;
+}
+
 }  // namespace
 
 int current_schema_version() noexcept {
@@ -87,6 +101,10 @@ SaveData migrate_to_current(SaveData data, int from_version) {
             case 3:
                 data = migrate_v3_to_v4(std::move(data));
                 version = 4;
+                break;
+            case 4:
+                data = migrate_v4_to_v5(std::move(data));
+                version = 5;
                 break;
             default:
                 // GAP na chain: versao sem migrator registrado. Bug de schema.

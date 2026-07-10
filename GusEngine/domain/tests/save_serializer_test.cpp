@@ -69,6 +69,10 @@ SaveData rich_fixture() {
     // V3: conhecimento de bestiario por TIPO (enemy_type_id -> kills). std::map =
     // serializacao deterministica (selo estavel).
     s.enemy_knowledge = {{"sentinela_bit", 8}, {"daemon_fork", 13}};
+    // V5 (MODOS-MORTE Fase 0): valor NAO-default, pra provar que roundtrippa de
+    // verdade (nao so por acaso bater com o default do campo).
+    s.difficulty = gus::domain::save::DifficultyLevel::Dificil;
+    s.difficult_recovery_stage = 2;
     return s;
 }
 
@@ -130,6 +134,51 @@ TEST_CASE("save: conhecimento diferente muda o selo (determinismo por campo)",
     auto b = rich_fixture();
     b.enemy_knowledge["sentinela_bit"] = 9;  // delta de 1 kill
     REQUIRE(serialize_save(a) != serialize_save(b));
+}
+
+// ---- V5 (MODOS-MORTE Fase 0): difficulty + difficult_recovery_stage --------
+
+TEST_CASE("save: difficulty + difficult_recovery_stage roundtrippam (V5)",
+          "[domain][save][serializer][v5]") {
+    auto original = rich_fixture();
+    original.difficulty = gus::domain::save::DifficultyLevel::Hardcore;
+    original.difficult_recovery_stage = 4;
+    const auto restored = deserialize_save(serialize_save(original));
+    REQUIRE(restored.difficulty == gus::domain::save::DifficultyLevel::Hardcore);
+    REQUIRE(restored.difficult_recovery_stage == 4);
+}
+
+TEST_CASE("save: save novo (minimal_fixture) nasce em Medio (default §2.1)",
+          "[domain][save][serializer][v5]") {
+    const auto restored = deserialize_save(serialize_save(minimal_fixture()));
+    REQUIRE(restored.difficulty == gus::domain::save::DifficultyLevel::Medio);
+    REQUIRE(restored.difficult_recovery_stage == 0);
+}
+
+TEST_CASE("save: dificuldade diferente muda o selo (determinismo por campo)",
+          "[domain][save][serializer][v5]") {
+    auto a = rich_fixture();
+    auto b = rich_fixture();
+    b.difficulty = gus::domain::save::DifficultyLevel::Facil;
+    REQUIRE(serialize_save(a) != serialize_save(b));
+}
+
+TEST_CASE("save: difficulty com ordinal fora do dominio rejeitado no load (forjado)",
+          "[domain][save][serializer][v5]") {
+    // MESMO padrao de hardening de EnemyTemplate::validate() (A1) - um payload
+    // selado mas schema-divergente nao passa silenciosamente.
+    auto s = rich_fixture();
+    s.difficulty = static_cast<gus::domain::save::DifficultyLevel>(99u);
+    const auto bytes = gus::domain::save::serialize_save_unchecked(s);
+    REQUIRE_THROWS_AS(deserialize_save(bytes), std::invalid_argument);
+}
+
+TEST_CASE("save: difficult_recovery_stage fora de [0,4] rejeitado no load (forjado)",
+          "[domain][save][serializer][v5]") {
+    auto s = rich_fixture();
+    s.difficult_recovery_stage = 5;
+    const auto bytes = gus::domain::save::serialize_save_unchecked(s);
+    REQUIRE_THROWS_AS(deserialize_save(bytes), std::invalid_argument);
 }
 
 // ---- header binario valido -------------------------------------------------

@@ -54,6 +54,10 @@ add_executable(gusengine_app_tests
     # gerador de RML.
     title_menu_test.cpp
     title_menu_rml_test.cpp
+    # MODOS-MORTE Fase 0 (decisao do lider 2026-07-10): tela de selecao de
+    # dificuldade - logica pura de navegacao/confirmacao + gerador de RML.
+    difficulty_menu_test.cpp
+    difficulty_menu_rml_test.cpp
     # SAVE-LOAD-UI (retoque ao vivo do lider, bugs 1-9 + feature "Apagar"): harness
     # HEADLESS com GL real (Xvfb :99) de POSICIONAMENTO/INTERACAO - degrada seguro
     # (0 assercoes) se GL/display indisponivel. ui_box_assertions.hpp e so header

@@ -7,6 +7,7 @@
 
 #include "gus/platform/fs/save_file_store.hpp"
 
+#include <algorithm>  // std::fill (secure_wipe_save)
 #include <cstdlib>  // std::getenv
 #include <filesystem>
 #include <fstream>
@@ -20,6 +21,15 @@
 namespace gus::platform::fs {
 
 namespace {
+
+// MODOS-MORTE Fase 0 (secure_wipe_save): offsets do envelope GDS2
+// (gus/domain/save/save_serializer.hpp) - MAGIC(4)+LENGTH(4) no INICIO, HMAC(32,
+// SHA-256) no FIM. ESTAVEIS desde o V1 (o envelope em si nunca mudou, so o
+// PAYLOAD interno cresceu V1..V5) - duplicados aqui de proposito: platform/ nao
+// inclui o codec interno do domain/, so a FORMA do envelope, ja documentada e
+// publica no header do serializer.
+constexpr std::size_t kEnvelopeHeaderLen = 8;  // MAGIC(4) + LENGTH(4)
+constexpr std::size_t kEnvelopeHmacLen = 32;   // HMAC-SHA256
 
 std::string join(const std::string& a, const std::string& b) {
     if (a.empty()) return b;
@@ -174,6 +184,67 @@ bool delete_save(int slot, const std::string& dir) {
     // deixaria o arquivo vivo - o CHAMADOR decide o que avisar, MESMO espirito de
     // save_game/load_game).
     return !store.exists(primary);
+}
+
+namespace {
+
+// Sobrescreve o selo (header + HMAC, ver kEnvelopeHeaderLen/kEnvelopeHmacLen no
+// topo do arquivo) de UM arquivo (nome logico) e unlinka. Devolve true se, ao
+// final, o arquivo NAO existe mais (ausente de inicio conta como sucesso - no-op
+// idempotente, mesmo contrato de delete_save/FsSaveStore::remove).
+bool wipe_one(FsSaveStore& store, const std::string& name) {
+    if (!store.exists(name)) return true;  // nada a apagar (idempotente)
+
+    std::vector<std::uint8_t> bytes;
+    try {
+        bytes = store.read(name);
+    } catch (const std::exception& e) {
+        std::cerr << "save_file_store: [secure_wipe] falha ao ler '" << name
+                  << "' antes do wipe: " << e.what()
+                  << " (degradacao segura: nao progride sobre arquivo ilegivel)\n";
+        return false;
+    }
+
+    if (bytes.size() >= kEnvelopeHeaderLen + kEnvelopeHmacLen) {
+        // Corrompe MAGIC+LENGTH (inicio) e o bloco HMAC (fim) - o resto do
+        // payload fica intacto em disco, mas SEM selo valido o load ja rejeita
+        // (SaveCorruptError/SaveIntegrityError, comportamento EXISTENTE hoje).
+        std::fill(bytes.begin(),
+                  bytes.begin() + static_cast<std::ptrdiff_t>(kEnvelopeHeaderLen),
+                  std::uint8_t{0xFF});
+        std::fill(bytes.end() - static_cast<std::ptrdiff_t>(kEnvelopeHmacLen),
+                  bytes.end(), std::uint8_t{0x00});
+        try {
+            store.write(name, bytes);
+        } catch (const std::exception& e) {
+            std::cerr << "save_file_store: [secure_wipe] falha ao sobrescrever o "
+                         "selo de '"
+                      << name << "': " << e.what()
+                      << " (segue pro unlink mesmo assim)\n";
+        }
+    }
+    // Zera o buffer em RAM (nao deixa o payload antigo residente na memoria do
+    // processo) ANTES do unlink.
+    std::fill(bytes.begin(), bytes.end(), std::uint8_t{0});
+
+    store.remove(name);
+    return !store.exists(name);
+}
+
+}  // namespace
+
+bool secure_wipe_save(int slot, const std::string& dir) {
+    // Fail-fast (nao e I/O): slot invalido propaga std::out_of_range (mesmo
+    // contrato de delete_save/has_save/save_game/load_game).
+    const std::string primary = gus::domain::save::primary_logical_name(slot);
+    FsSaveStore store(dir);
+
+    bool all_gone = wipe_one(store, primary);
+    for (int k = 1; k <= gus::domain::save::kBackupChainDepth; ++k) {
+        const bool gone = wipe_one(store, gus::domain::save::backup_logical_name(slot, k));
+        all_gone = all_gone && gone;
+    }
+    return all_gone;
 }
 
 std::optional<gus::domain::save::LoadOutcome> load_game(int slot, const std::string& dir) {

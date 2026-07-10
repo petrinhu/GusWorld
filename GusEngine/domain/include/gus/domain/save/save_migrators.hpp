@@ -4,7 +4,7 @@
 // arvore JSON (como era o C#). Cada bump de schema (VN -> VN+1) e um passo da chain;
 // CurrentVersion = maior versao alcancavel = gus::domain::kSaveSchemaVersion.
 //
-// Schema atual = V4 (fonte unica: gus::domain::kSaveSchemaVersion). NAO confiar
+// Schema atual = V5 (fonte unica: gus::domain::kSaveSchemaVersion). NAO confiar
 // neste comentario como autoridade da versao; a ancora kSaveSchemaVersion e que manda.
 //   V1 = inicial, SEM character_states (per-character).
 //   V2 = + character_states. MigrateV1ToV2 popula character_states VAZIO (semantica
@@ -13,6 +13,11 @@
 //   V4 = + input_remap_backup + controls_hash128 + slot_id (ADR-007). MigrateV3ToV4
 //        popula backup = default canonico, hash = hash do default, slot_id = o slot
 //        lido (passado no load).
+//   V5 = + difficulty + difficult_recovery_stage (MODOS-MORTE Fase 0, docs/design/
+//        mecanicas/modos-morte.md §3.2). MigrateV4ToV5 popula difficulty = Medio
+//        (default canonico §2.1: saves pre-dificuldade sobem no "meio-termo", nao
+//        havia escolha explicita antes) e difficult_recovery_stage = 0 (sem
+//        penalidade ativa).
 //
 // A chain e extensivel: somar o passo VN->VN+1 + bumpar a ancora quando o marco
 // chegar (test-guarda current_schema_version()==kSaveSchemaVersion trava o esquecimento).
@@ -64,6 +69,13 @@ namespace gus::domain::save {
 // selado. Representa a "geracao V3" do jogo, para a fixture de migracao V3->V4. NAO
 // valida invariantes de V4.
 [[nodiscard]] std::vector<std::uint8_t> serialize_save_v3(const SaveData& data);
+
+// Serializa um SaveData no layout do payload V4 (comuns + character_states +
+// enemy_knowledge + input_remap_backup + controls_hash128 + slot_id, SEM os campos
+// V5: difficulty/difficult_recovery_stage) dentro do envelope selado. Representa a
+// "geracao V4" do jogo (ADR-007, pre-MODOS-MORTE), para a fixture de migracao
+// V4->V5. NAO valida invariantes de V5.
+[[nodiscard]] std::vector<std::uint8_t> serialize_save_v4(const SaveData& data);
 
 // Forja um envelope selado (HMAC valido) cujo payload declara schema_version =
 // version, com o restante dos campos minimos (layout V1). Usado para testar a

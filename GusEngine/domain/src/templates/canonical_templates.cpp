@@ -53,7 +53,10 @@ EnemyTemplate sentinela_bit() {
         /*family=*/CardFamily::Cinetico,
         /*brain=*/BrainKind::Scripted,
         /*is_boss=*/false,
-        /*base_deck=*/{}};
+        /*base_deck=*/{},
+        // MODOS-MORTE Fase 0 (§3.1): construto digital, nao humano - fauna/sentinela
+        // da Selve/dos Dutos, mesma classe diegetica de daemon_guard abaixo.
+        /*kind=*/EnemyKind::Creature};
 }
 
 EnemyTemplate daemon_guard() {
@@ -66,7 +69,9 @@ EnemyTemplate daemon_guard() {
         /*family=*/CardFamily::Cinetico,
         /*brain=*/BrainKind::Scripted,
         /*is_boss=*/false,
-        /*base_deck=*/{}};
+        /*base_deck=*/{},
+        // MODOS-MORTE Fase 0 (§3.1): daemon = construto/processo, nao humano.
+        /*kind=*/EnemyKind::Creature};
 }
 
 std::vector<CharacterTemplate> all_characters() {

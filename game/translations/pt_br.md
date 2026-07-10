@@ -275,6 +275,47 @@ Cancelar
 
 ---
 
+## §4c. Tela de seleção de dificuldade (MODOS-MORTE Fase 0 - RASCUNHO do lead-game-designer, docs/design/mecanicas/modos-morte.md §2.2; copy final vem do ux-writer numa onda futura)
+
+## SAVE_DIFFICULTY_TITLE
+Escolha a dificuldade
+
+## SAVE_DIFFICULTY_LEGEND
+Essa escolha vale pra sempre nesse jogo salvo. Depois de começar, não dá pra trocar de dificuldade aqui, só criando um save novo.
+
+## SAVE_DIFFICULTY_FACIL_LABEL
+Fácil
+
+## SAVE_DIFFICULTY_FACIL_DESC
+Se você perder, volta pro seu último save.
+
+## SAVE_DIFFICULTY_MEDIO_LABEL
+Médio (recomendado)
+
+## SAVE_DIFFICULTY_MEDIO_DESC
+Se você perder, acorda no Hospital. Custa um pouco de crédito.
+
+## SAVE_DIFFICULTY_DIFICIL_LABEL
+Difícil
+
+## SAVE_DIFFICULTY_DIFICIL_DESC
+Se você perder, acorda longe e bem fraco. Precisa se recuperar aos poucos.
+
+## SAVE_DIFFICULTY_CONFIRM_TITLE_PREFIX
+Confirmar dificuldade: [
+
+## SAVE_DIFFICULTY_CONFIRM_BODY
+Você não vai poder trocar de dificuldade nesse jogo salvo depois de começar. Se quiser jogar de outro jeito mais tarde, é só começar um save novo.
+
+## SAVE_DIFFICULTY_CONFIRM_YES
+Confirmar
+
+## SAVE_DIFFICULTY_CONFIRM_NO
+Cancelar
+
+## SAVE_DIFFICULTY_FOOTER_HINT
+Cima/Baixo navega  -  Enter seleciona
+
 ## §5. HUD + combate (placeholders)
 
 ## HUD_HP_LABEL

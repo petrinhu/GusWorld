@@ -21,7 +21,9 @@
 //   EnemyTemplate:
 //     u32 id_len | id[id_len] | i32 max_hp | i32 atk | i32 def | i32 spd |
 //     u32 family | u32 brain | u8 is_boss | u32 deck_count |
-//       (u32 card_len | card[card_len])*deck_count
+//       (u32 card_len | card[card_len])*deck_count | u32 kind
+//     (kind = MODOS-MORTE Fase 0, EnemyKind: Creature/Human - campo aditivo no
+//     FINAL do payload, ver enemy_template.hpp)
 //
 // O int32 e gravado como 4 bytes LE do bit-pattern (stats sao >= 0 por invariante,
 // mas o codec e fiel ao tipo). Chave de integridade FIXA embutida (integridade

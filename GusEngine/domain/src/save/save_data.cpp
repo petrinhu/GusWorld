@@ -42,6 +42,15 @@ void SaveData::validate() const {
             throw std::invalid_argument(
                 "SaveData: kills de enemy_knowledge deve ser >= 0.");
     }
+    // V5 (MODOS-MORTE Fase 0): hardening de ordinal, MESMO padrao de
+    // EnemyTemplate::validate() (A1, auditoria M3) - um payload selado mas
+    // schema-divergente nao e aceito silenciosamente.
+    if (static_cast<std::uint32_t>(difficulty) >= kDifficultyLevelCount)
+        throw std::invalid_argument(
+            "SaveData: difficulty fora do dominio (ordinal invalido).");
+    if (difficult_recovery_stage < 0 || difficult_recovery_stage > 4)
+        throw std::invalid_argument(
+            "SaveData: difficult_recovery_stage deve estar em [0, 4].");
 }
 
 }  // namespace gus::domain::save

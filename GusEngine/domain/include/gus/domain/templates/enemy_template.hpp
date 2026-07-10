@@ -39,6 +39,20 @@ enum class BrainKind : std::uint32_t {
 // definido aqui (conceito so-de-template; a FSM/brains do combate nao o usam).
 inline constexpr std::uint32_t kBrainKindCount = 2;
 
+// Natureza DIEGETICA do inimigo (MODOS-MORTE Fase 0, docs/design/mecanicas/
+// modos-morte.md §3.1): decide o LOCAL de respawn na morte de Gus no modo Dificil
+// (criatura -> Selve Sombria; humano -> casa destruida) - a LEITURA/consumo dessa
+// decisao no combate e fase futura (§6 Fase 3), aqui e so o dado persistido no
+// template. Ordinal EXPLICITO (contrato binario, mesmo padrao de BrainKind).
+enum class EnemyKind : std::uint32_t {
+    Creature = 0,  // default - a maioria dos encontros do VS e fauna da Selve
+    Human = 1,
+};
+
+// Numero de valores canonicos de EnemyKind (0..kEnemyKindCount-1). Usado pela
+// validacao de ordinal (mesmo padrao de kBrainKindCount acima).
+inline constexpr std::uint32_t kEnemyKindCount = 2;
+
 // Template imutavel de inimigo. Source de stats + identidade de AI (secao 13/17).
 struct EnemyTemplate {
     // Identidade estavel (chave de repositorio/i18n). Invariante: nao vazia.
@@ -67,6 +81,12 @@ struct EnemyTemplate {
 
     // Deck base do inimigo: IDs de carta. Lista vazia e valida. Sem id vazio.
     std::vector<std::string> base_deck;
+
+    // Natureza diegetica (MODOS-MORTE Fase 0, ver EnemyKind acima). Campo NOVO no
+    // FINAL da struct (nao no meio) de proposito: preserva os aggregate-inits
+    // posicionais existentes de canonical_templates.cpp/testes (9 campos
+    // explicitos continuam validos, este 10o usa o default).
+    EnemyKind kind = EnemyKind::Creature;
 
     // Igualdade por valor (semantica de record do C#).
     [[nodiscard]] bool operator==(const EnemyTemplate&) const = default;

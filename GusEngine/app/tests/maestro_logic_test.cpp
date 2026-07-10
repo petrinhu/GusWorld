@@ -106,6 +106,29 @@ TEST_CASE("should_autosave_after_battle: e constexpr (avaliavel em tempo de "
     SUCCEED();
 }
 
+// MODOS-MORTE Fase 0: so Facil reloada o ultimo save numa Defeat; os outros 3
+// niveis caem no placeholder atual do M7 ate suas fases proprias existirem.
+TEST_CASE("should_reload_last_save_on_defeat: so Facil, ponta-a-ponta nesta Fase",
+          "[maestro][logic][modos-morte]") {
+    using gus::app::should_reload_last_save_on_defeat;
+    using gus::domain::save::DifficultyLevel;
+
+    CHECK(should_reload_last_save_on_defeat(DifficultyLevel::Facil));
+    CHECK_FALSE(should_reload_last_save_on_defeat(DifficultyLevel::Medio));
+    CHECK_FALSE(should_reload_last_save_on_defeat(DifficultyLevel::Dificil));
+    CHECK_FALSE(should_reload_last_save_on_defeat(DifficultyLevel::Hardcore));
+}
+
+TEST_CASE("should_reload_last_save_on_defeat: e constexpr (avaliavel em tempo de "
+          "compilacao)",
+          "[maestro][logic][modos-morte]") {
+    static_assert(gus::app::should_reload_last_save_on_defeat(
+        gus::domain::save::DifficultyLevel::Facil));
+    static_assert(!gus::app::should_reload_last_save_on_defeat(
+        gus::domain::save::DifficultyLevel::Medio));
+    SUCCEED();
+}
+
 TEST_CASE("pick_fixed_enemy_position: celula-alvo livre -> senta exatamente nela",
           "[maestro][logic]") {
     // Grade 10x10 tudo livre, tile_size=2.0. Spawn no canto sup-esq (celula 1,1).

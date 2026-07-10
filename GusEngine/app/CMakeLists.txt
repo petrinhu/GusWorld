@@ -50,6 +50,13 @@ add_library(gusengine_app STATIC
     src/screens/title_menu.cpp
     src/screens/title_menu_rml.cpp
     src/screens/title_menu_loop.cpp
+    # MODOS-MORTE Fase 0 (decisao do lider 2026-07-10): tela de selecao de
+    # dificuldade no fluxo de Novo Jogo - logica pura + RML + loop ANINHADO no
+    # MESMO contexto GL da tela de titulo (MESMA receita de
+    # run_save_load_menu_loop_gl_current) - ver gus/app/screens/difficulty_menu.hpp.
+    src/screens/difficulty_menu.cpp
+    src/screens/difficulty_menu_rml.cpp
+    src/screens/difficulty_menu_loop.cpp
     src/i18n/translator.cpp
     # M7-DIALOGO (NPC-MVP): I/O do grafo de dialogo do Bertoldo (.dlg.txt) -
     # fronteira app/, domain/dialogue permanece ZERO I/O.

@@ -179,6 +179,18 @@ private:
     // "retornando_da_batalha"/"saindo_do_jogo") - nao afeta a decisao.
     void maybe_autosave(const char* trigger_label);
 
+    // MODOS-MORTE Fase 0 (docs/design/mecanicas/modos-morte.md §3.3, dispatcher
+    // central de morte): reload do save MAIS RECENTE entre TODOS os slots
+    // ocupados - o MESMO conceito de "Continuar" na tela de titulo
+    // (most_recent_occupied_slot, gus/app/screens/save_load_menu.hpp), reusado
+    // aqui em vez de inventar uma 2a nocao de "ultimo save" (ex.: so o
+    // autosave). Chamado por on_battle_result SO quando outcome==Defeat E
+    // should_reload_last_save_on_defeat(save_.difficulty) (Facil, Fase 0
+    // ponta-a-ponta). Degradacao segura: nenhum save Ok gravado ainda (jogo
+    // recem-comecado) e no-op (loga e segue no placeholder atual do M7 - o
+    // inimigo permanece, o jogador volta pro mesmo ponto).
+    void reload_most_recent_save_on_defeat();
+
     SDL_Window* window_ = nullptr;         // dono (a UNICA janela do app)
     std::unique_ptr<SdlWindow> city_;      // a cidade (OverworldSim vive aqui, sempre)
 

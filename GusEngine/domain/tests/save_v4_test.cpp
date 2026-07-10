@@ -77,12 +77,14 @@ SaveData rich_v4() {
 
 }  // namespace
 
-// ---- ancora: kSaveSchemaVersion subiu para 4 ------------------------------
+// ---- ancora: kSaveSchemaVersion (V4 nasceu aqui; hoje aponta pro topo V5,
+//      MODOS-MORTE Fase 0 - o teste segue a ancora, nao um numero fixo) --------
 
-TEST_CASE("save_v4: kSaveSchemaVersion == 4 (ancora bumpada)",
+TEST_CASE("save_v4: kSaveSchemaVersion aponta pro topo da chain (ancora)",
           "[domain][save][v4]") {
-    REQUIRE(gus::domain::kSaveSchemaVersion == 4);
-    REQUIRE(gus::domain::save::current_schema_version() == 4);
+    REQUIRE(gus::domain::kSaveSchemaVersion == 5);
+    REQUIRE(gus::domain::save::current_schema_version() ==
+            gus::domain::kSaveSchemaVersion);
 }
 
 // ---- (a) roundtrip dos campos V4 (oraculo) ---------------------------------
@@ -148,8 +150,11 @@ TEST_CASE("save_v4: save V3 carregado sobe para V4 (backup=default, hash=hash de
     v3.enemy_knowledge = {{"sentinela_bit", 8}};
     const auto bytes_v3 = serialize_save_v3(v3);  // envelope V3 selado
 
+    // O load version-aware sobe ATE o topo (V3->V4->V5, MODOS-MORTE Fase 0) - a
+    // materializacao intermediaria V4 (backup/hash default) continua acontecendo,
+    // so o schema_version final ja e o atual.
     const auto loaded = deserialize_save(bytes_v3);
-    REQUIRE(loaded.schema_version == 4);
+    REQUIRE(loaded.schema_version == gus::domain::kSaveSchemaVersion);
     // backup = default canonico
     REQUIRE(loaded.input_remap_backup == default_controls());
     // hash = hash 128 do default canonico
@@ -171,7 +176,7 @@ TEST_CASE("save_v4: migrator V3->V4 popula slot_id com o slot do proprio save",
 
     const auto outcome = load_save(bytes_v3, /*expected_slot=*/2);
     REQUIRE(outcome.result == LoadResult::Ok);
-    REQUIRE(outcome.data.schema_version == 4);
+    REQUIRE(outcome.data.schema_version == gus::domain::kSaveSchemaVersion);
     REQUIRE(outcome.data.slot_id == 2);
 }
 

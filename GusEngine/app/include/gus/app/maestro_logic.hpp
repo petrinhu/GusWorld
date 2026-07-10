@@ -22,6 +22,7 @@
 #include "gus/core/spatial/grid_collision.hpp"  // Aabb
 #include "gus/core/spatial/tile_grid.hpp"       // TileGrid (posicionamento do inimigo)
 #include "gus/domain/combat/combat_enums.hpp"   // CombatOutcome
+#include "gus/domain/save/save_data.hpp"        // DifficultyLevel (MODOS-MORTE Fase 0)
 #include "gus/platform/audio/audio_engine.hpp"  // AudioEngine/SoundId (M7-COSTURA Inc 2)
 
 namespace gus::app {
@@ -52,6 +53,20 @@ enum class EncounterId : int {
 // combate) NAO marca.
 [[nodiscard]] bool outcome_marks_enemy_defeated(
     gus::domain::combat::CombatOutcome outcome) noexcept;
+
+// MODOS-MORTE Fase 0 (docs/design/mecanicas/modos-morte.md §3.3, dispatcher
+// central de morte): true se, numa Defeat, o modo de morte deste `difficulty` e
+// "reload do ultimo save" (Facil, unico dos 4 niveis ponta-a-ponta nesta Fase -
+// GDS2 game over classico JRPG, §1). Medio/Dificil/Hardcore devolvem false: caem
+// no placeholder ATUAL do M7 (o inimigo permanece, o jogador volta pro mesmo
+// ponto) ate suas fases proprias serem construidas (Medio depende do motor de
+// Hospital; Dificil depende de level design; Hardcore depende do fim-de-jogo -
+// ver §6). O CHAMADOR (Maestro::on_battle_result) so entra neste ramo quando
+// outcome==Defeat; esta funcao nao inspeciona outcome, so a dificuldade.
+[[nodiscard]] constexpr bool should_reload_last_save_on_defeat(
+    gus::domain::save::DifficultyLevel difficulty) noexcept {
+    return difficulty == gus::domain::save::DifficultyLevel::Facil;
+}
 
 // SAVE-LOAD-UI etapa 5 (AUTOSAVE), ajuste do lider pos-entrega (via
 // AskUserQuestion): o gatilho de RETORNO da batalha so autosava em Victory -

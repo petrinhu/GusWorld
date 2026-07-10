@@ -322,6 +322,107 @@ TEST_CASE("delete_save: slot invalido lanca std::out_of_range (fail-fast, nao "
     std::filesystem::remove_all(dir);
 }
 
+// ---- secure_wipe_save (MODOS-MORTE Fase 0, Camada 3 essencial) ---------------
+
+TEST_CASE("secure_wipe_save: apaga primario + cadeia INTEIRA de backup - "
+          "load_game e load_game_from_backup NAO recuperam mais",
+          "[platform][fs][save][secure_wipe]") {
+    using gus::platform::fs::secure_wipe_save;
+
+    const auto dir = make_temp_dir("secure_wipe_com_backup");
+    SaveData first = make_valid_save(1);
+    first.playtime_seconds = 1.0;
+    REQUIRE(save_game(first, 1, dir.string()));
+    SaveData second = make_valid_save(1);
+    second.playtime_seconds = 2.0;
+    REQUIRE(save_game(second, 1, dir.string()));  // gera save_1.backup1.sav
+    REQUIRE(std::filesystem::exists(dir / "save_1.sav"));
+    REQUIRE(std::filesystem::exists(dir / "save_1.backup1.sav"));
+    // sanity ANTES do wipe: o slot carrega normalmente (prova que o teste nao
+    // esta testando um slot ja quebrado por outro motivo).
+    REQUIRE(load_game(1, dir.string()).has_value());
+    REQUIRE(load_game(1, dir.string())->result == LoadResult::Ok);
+
+    REQUIRE(secure_wipe_save(1, dir.string()));
+
+    // Os 4 arquivos (primario + os N backups, so 1 gerado aqui) sumiram de disco.
+    REQUIRE_FALSE(std::filesystem::exists(dir / "save_1.sav"));
+    REQUIRE_FALSE(std::filesystem::exists(dir / "save_1.backup1.sav"));
+    REQUIRE_FALSE(has_save(1, dir.string()));
+    // O CORE do pedido: nem o load direto nem a recuperacao via backup revivem o
+    // slot depois do wipe (a morte no Hardcore e final).
+    REQUIRE_FALSE(load_game(1, dir.string()).has_value());
+    REQUIRE_FALSE(load_game_from_backup(1, dir.string()).has_value());
+
+    std::filesystem::remove_all(dir);
+}
+
+TEST_CASE("secure_wipe_save: cadeia de backup completa (3 geracoes) some inteira",
+          "[platform][fs][save][secure_wipe]") {
+    using gus::platform::fs::secure_wipe_save;
+
+    const auto dir = make_temp_dir("secure_wipe_cadeia_completa");
+    // 4 gravacoes sucessivas: primario + backup1 + backup2 + backup3 (a cadeia
+    // inteira, kBackupChainDepth=3) ficam ocupados.
+    for (int i = 0; i < 4; ++i) {
+        SaveData s = make_valid_save(1);
+        s.playtime_seconds = static_cast<double>(i);
+        REQUIRE(save_game(s, 1, dir.string()));
+    }
+    REQUIRE(std::filesystem::exists(dir / "save_1.sav"));
+    REQUIRE(std::filesystem::exists(dir / "save_1.backup1.sav"));
+    REQUIRE(std::filesystem::exists(dir / "save_1.backup2.sav"));
+    REQUIRE(std::filesystem::exists(dir / "save_1.backup3.sav"));
+
+    REQUIRE(secure_wipe_save(1, dir.string()));
+
+    REQUIRE_FALSE(std::filesystem::exists(dir / "save_1.sav"));
+    REQUIRE_FALSE(std::filesystem::exists(dir / "save_1.backup1.sav"));
+    REQUIRE_FALSE(std::filesystem::exists(dir / "save_1.backup2.sav"));
+    REQUIRE_FALSE(std::filesystem::exists(dir / "save_1.backup3.sav"));
+    REQUIRE_FALSE(load_game_from_backup(1, dir.string()).has_value());
+
+    std::filesystem::remove_all(dir);
+}
+
+TEST_CASE("secure_wipe_save: slot ja vazio e no-op seguro (idempotente, devolve "
+          "true)",
+          "[platform][fs][save][secure_wipe]") {
+    using gus::platform::fs::secure_wipe_save;
+
+    const auto dir = make_temp_dir("secure_wipe_ja_vazio");
+    REQUIRE_FALSE(has_save(1, dir.string()));
+    REQUIRE(secure_wipe_save(1, dir.string()));
+    REQUIRE_FALSE(has_save(1, dir.string()));
+    std::filesystem::remove_all(dir);
+}
+
+TEST_CASE("secure_wipe_save: nao mexe em OUTROS slots (so o alvo)",
+          "[platform][fs][save][secure_wipe]") {
+    using gus::platform::fs::secure_wipe_save;
+
+    const auto dir = make_temp_dir("secure_wipe_isola_outros_slots");
+    REQUIRE(save_game(make_valid_save(1), 1, dir.string()));
+    REQUIRE(save_game(make_valid_save(2), 2, dir.string()));
+
+    REQUIRE(secure_wipe_save(1, dir.string()));
+
+    REQUIRE_FALSE(has_save(1, dir.string()));
+    REQUIRE(has_save(2, dir.string()));
+    REQUIRE(load_game(2, dir.string()).has_value());
+    std::filesystem::remove_all(dir);
+}
+
+TEST_CASE("secure_wipe_save: slot invalido lanca std::out_of_range (fail-fast, "
+          "nao degradacao de I/O)",
+          "[platform][fs][save][secure_wipe]") {
+    using gus::platform::fs::secure_wipe_save;
+
+    const auto dir = make_temp_dir("secure_wipe_slot_invalido");
+    REQUIRE_THROWS_AS(secure_wipe_save(99, dir.string()), std::out_of_range);
+    std::filesystem::remove_all(dir);
+}
+
 // ---- load_game_from_backup (SAVE-LOAD-AVISOS, "Tentar recuperar") ------------
 
 TEST_CASE("load_game_from_backup: primario corrompido + backup1 bom recupera "

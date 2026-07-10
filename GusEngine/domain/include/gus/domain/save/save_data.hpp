@@ -1,6 +1,6 @@
 // gus/domain/save/save_data.hpp
 //
-// Estado de SAVE versionado (schema atual V4 = gus::domain::kSaveSchemaVersion).
+// Estado de SAVE versionado (schema atual V5 = gus::domain::kSaveSchemaVersion).
 // Dado PURO, ZERO Qt. Portado de engine/foundation/save_system/SaveDataV1.cs +
 // CharacterSaveState.cs (sealed records C#); campos V4 (input_remap_backup,
 // controls_hash128, slot_id) sao novos do ADR-007 (sem origem C#).
@@ -43,6 +43,25 @@
 
 namespace gus::domain::save {
 
+// MODOS-MORTE Fase 0 (docs/design/mecanicas/modos-morte.md §2.2/§3.2): dificuldade
+// FIXA do save, escolhida 1x na criacao (Novo Jogo) e NUNCA reescrita depois -
+// nenhuma funcao de dominio deve expor um "setter" pos-criacao (a unica escrita
+// legitima e no momento de StartNewGame, antes do 1o save_game). Hardcore nao
+// aparece na tela de selecao (§2.3, e unlock separado, fase futura) mas ja tem
+// ordinal reservado aqui (contrato binario estavel, mesmo padrao de BrainKind). A
+// ORDEM e contrato binario (ordinal explicito 0..3).
+enum class DifficultyLevel : std::uint32_t {
+    Facil = 0,
+    Medio = 1,     // default canonico (§2.1): jogo novo nasce aqui
+    Dificil = 2,
+    Hardcore = 3,
+};
+
+// Numero de valores canonicos de DifficultyLevel (0..kDifficultyLevelCount-1).
+// Usado pela validacao de ordinal (mesmo padrao de kBrainKindCount/kCardFamilyCount
+// em enemy_template.hpp): rejeita dificuldade fora do dominio no validate().
+inline constexpr std::uint32_t kDifficultyLevelCount = 4;
+
 // Vetor 3D POCO (substitui Godot.Vector3 do C#; ZERO dependencia). Igualdade exata
 // por valor (roundtrip binario fiel: gravamos o bit-pattern dos doubles).
 struct Vec3 {
@@ -74,7 +93,7 @@ struct CharacterSaveState {
 struct SaveData {
     // Versao do schema deste save. Save novo nasce na versao atual
     // (kSaveSchemaVersion); saves antigos sobem pela chain antes de materializar.
-    int schema_version = 4;
+    int schema_version = 5;
 
     // CARIMBO injetado (epoch ms). Metadado de listagem/ordenacao (ADR-006 item 4).
     std::int64_t timestamp_ms = 0;
@@ -134,11 +153,29 @@ struct SaveData {
     // -1 = origem desconhecida (save importado / legado pre-V4 sem slot conhecido).
     int slot_id = -1;
 
+    // ---- campos V5 (MODOS-MORTE Fase 0) -----------------------------------
+
+    // Dificuldade FIXA deste save (§2.2) - setada 1x na criacao, NUNCA reescrita
+    // depois. Migrator V4->V5: saves antigos (pre-dificuldade) sobem como Medio
+    // (default canonico §2.1 - nao havia escolha explicita antes, Medio e o
+    // "meio-termo" mais coerente pra nao punir nem trivializar saves legados).
+    DifficultyLevel difficulty = DifficultyLevel::Medio;
+
+    // Estagio de recuperacao pos-morte no Dificil (§2.4). 0 = sem penalidade ativa
+    // (ou modo != Dificil); 1 = acabou de respawnar (5%); 2 = cruzou Marco 1 (34%);
+    // 3 = cruzou Marco 2 (89%); 4 = Marco 3 completo, 100%, volta a 0 (sem
+    // penalidade). Irrelevante fora do modo Dificil. A LEITURA/consumo dos marcos
+    // e fase futura (§6 Fase 3) - aqui e so o campo persistido.
+    int difficult_recovery_stage = 0;
+
     [[nodiscard]] bool operator==(const SaveData&) const = default;
 
     // Valida invariantes (fail-fast): timestamp_ms>=0; playtime>=0; cada
-    // CharacterSaveState valido; enemy_knowledge sem chave vazia e com kills>=0.
-    // Lanca std::invalid_argument.
+    // CharacterSaveState valido; enemy_knowledge sem chave vazia e com kills>=0;
+    // difficulty com ordinal no dominio canonico (V5, hardening MESMO padrao de
+    // BrainKind/CardFamily em enemy_template.hpp); difficult_recovery_stage em
+    // [0, 4] (V5, os 5 estagios documentados no campo acima). Lanca
+    // std::invalid_argument.
     void validate() const;
 };
 

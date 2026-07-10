@@ -74,6 +74,13 @@ enum class TitleLoopExit {
 //   TitleLoopExit::ContinueGame`; ignorado/intocado nos demais casos. Pode ser
 //   nullptr SE o chamador so precisar saber QUE o jogador quer continuar (sem
 //   uso previsto - o unico chamador de producao sempre fornece).
+// `out_new_game_difficulty` (MODOS-MORTE Fase 0): SO valido (preenchido) quando
+//   `*out_exit == TitleLoopExit::NewGame` - "Novo Jogo" agora passa pela TELA DE
+//   SELECAO DE DIFICULDADE (gus/app/screens/difficulty_menu_loop.hpp, ANINHADA no
+//   MESMO contexto GL, disparada ao confirmar StartNewGame - ver o .cpp) ANTES de
+//   devolver NewGame; a dificuldade ESCOLHIDA sai aqui. Ignorado/intocado nos
+//   demais casos. Pode ser nullptr (degrada: o CHAMADOR usa o default Medio do
+//   proprio SaveData).
 // `frozen_background_png` (default vazio): MESMA tecnica de fundo real congelado
 //   das demais telas (PNG de 1 frame capturado pelo chamador ANTES de abrir) -
 //   vazio degrada pro fundo abstrato (a vinheta/scrim do proprio painel).
@@ -87,6 +94,7 @@ enum class TitleLoopExit {
     SDL_Window* window, gus::platform::audio::AudioEngine& audio,
     const gus::app::i18n::Translator& translator, const std::string& saves_dir,
     TitleLoopExit* out_exit, gus::domain::save::SaveData* out_loaded_save,
+    gus::domain::save::DifficultyLevel* out_new_game_difficulty = nullptr,
     const std::string& frozen_background_png = std::string());
 
 }  // namespace gus::app::screens

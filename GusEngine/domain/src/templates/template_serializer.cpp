@@ -268,6 +268,10 @@ std::vector<std::uint8_t> serialize_enemy(const EnemyTemplate& tpl) {
     put_u32(payload, static_cast<std::uint32_t>(tpl.brain));
     payload.push_back(tpl.is_boss ? 1u : 0u);
     put_deck(payload, tpl.base_deck);
+    // MODOS-MORTE Fase 0: campo NOVO no FINAL do payload (mesmo espirito do campo
+    // na struct - nao ha .gdt em disco hoje pra quebrar, mas ficar no fim mantem o
+    // formato extensivel do mesmo jeito).
+    put_u32(payload, static_cast<std::uint32_t>(tpl.kind));
 
     return pack(payload);
 }
@@ -286,6 +290,7 @@ EnemyTemplate deserialize_enemy(const std::vector<std::uint8_t>& data) {
     tpl.brain = static_cast<BrainKind>(r.read_u32());
     tpl.is_boss = (r.read_u8() != 0);
     tpl.base_deck = r.read_deck();
+    tpl.kind = static_cast<EnemyKind>(r.read_u32());
     r.expect_end();
 
     tpl.validate();

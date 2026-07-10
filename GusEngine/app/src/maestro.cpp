@@ -4,6 +4,7 @@
 
 #include "gus/app/maestro.hpp"
 
+#include <array>
 #include <chrono>
 #include <filesystem>
 #include <iostream>
@@ -16,6 +17,7 @@
 // DIALOGO-TERMINAL: loop GL real (caixa quente com retrato) - substitui o overlay
 // funcional simples de texto (npc_dialogue_loop.hpp, aposentado - ver seu header).
 #include "gus/app/screens/npc_dialogue_loop_gl.hpp"
+#include "gus/app/screens/save_load_menu.hpp"  // MODOS-MORTE Fase 0: most_recent_occupied_slot
 #include "gus/app/screens/system_menu_loop.hpp"  // MENU-PAUSA-CONFIG-SOM: Esc na cidade
 #include "gus/app/screens/title_menu_loop.hpp"  // SAVE-LOAD-UI etapa 4: TELA DE TITULO no boot
 #include "gus/domain/dialogue/dialogue_runtime.hpp"
@@ -422,9 +424,14 @@ bool Maestro::show_title_screen() {
 
     gus::app::screens::TitleLoopExit exit = gus::app::screens::TitleLoopExit::QuitApp;
     gus::domain::save::SaveData loaded{};
+    // MODOS-MORTE Fase 0: default Medio (§2.1) - so e sobrescrito de fato quando
+    // exit==NewGame (a tela de selecao de dificuldade sempre roda nesse caminho,
+    // ver title_menu_loop.cpp).
+    gus::domain::save::DifficultyLevel new_game_difficulty =
+        gus::domain::save::DifficultyLevel::Medio;
     const bool ok = gus::app::screens::run_title_menu_loop_owning_gl(
         window_, audio_, translator_, gus::platform::fs::resolve_saves_dir(), &exit,
-        &loaded, frozen_ok ? frozen_bg_path : std::string());
+        &loaded, &new_game_difficulty, frozen_ok ? frozen_bg_path : std::string());
 
     if (!city_->reacquire_renderer()) {
         SDL_Log(
@@ -452,6 +459,13 @@ bool Maestro::show_title_screen() {
         case gus::app::screens::TitleLoopExit::NewGame:
             std::cout << "Maestro: [costura] Novo Jogo - estado FRESCO ja pronto "
                          "desde init() (sem retrabalho).\n";
+            // MODOS-MORTE Fase 0 (§3.2): grava a dificuldade ESCOLHIDA na tela de
+            // selecao (fixa por save, nunca reescrita depois - a UNICA escrita
+            // legitima e aqui, antes do 1o save_game deste save novo).
+            save_.difficulty = new_game_difficulty;
+            std::cout << "Maestro: [modos-morte] dificuldade escolhida = "
+                      << static_cast<unsigned>(save_.difficulty) << " (0=Facil "
+                         "1=Medio 2=Dificil 3=Hardcore).\n";
             return false;
         case gus::app::screens::TitleLoopExit::ContinueGame:
             std::cout << "Maestro: [costura] Continuar - aplicando o save mais "
@@ -578,6 +592,46 @@ void Maestro::run() {
         return;
     }
 
+    // DIAGNOSTICO/PROVA (MODOS-MORTE Fase 0, Facil ponta-a-ponta): GUSWORLD_
+    // FACIL_RELOAD_SELFTEST=1 exercita on_battle_result(Defeat) DIRETO (bypassa a
+    // tela de titulo/dificuldade e o loop de jogo por completo) - prova, via
+    // log + posicao do jogador ANTES/DEPOIS, que uma Defeat em modo Facil
+    // reload o save mais recente (gravado com uma posicao DISTINTA da posicao
+    // "vivida" na hora da derrota simulada). Headless, sem GL/input real. Rodar
+    // com GUSWORLD_HOME apontando pra um dir de SCRATCH.
+    if (const char* facil_reload_selftest = std::getenv("GUSWORLD_FACIL_RELOAD_SELFTEST");
+        facil_reload_selftest != nullptr && facil_reload_selftest[0] != '\0') {
+        const std::string saves_dir = gus::platform::fs::resolve_saves_dir();
+
+        // Simula um save PRE-EXISTENTE (posicao (111,222)) - o "ultimo save" que
+        // o reload do Facil deve restaurar.
+        gus::domain::save::SaveData pre_existing = build_current_save_data();
+        pre_existing.difficulty = gus::domain::save::DifficultyLevel::Facil;
+        pre_existing.player_position = gus::domain::save::Vec3{111.0, 222.0, 0.0};
+        pre_existing.slot_id = gus::domain::save::kAutosaveSlot;
+        gus::platform::fs::save_game(pre_existing, gus::domain::save::kAutosaveSlot,
+                                      saves_dir);
+
+        // Estado VIVO diverge do save (o jogador "andou" ate (999,999) depois de
+        // salvar, e entao MORREU ali) - simula a sessao real entre o save e a
+        // derrota.
+        save_.difficulty = gus::domain::save::DifficultyLevel::Facil;
+        gus::core::spatial::Aabb moved = city_->player_aabb();
+        moved.x = 999.0f;
+        moved.y = 999.0f;
+        city_->set_player_position(moved);
+
+        std::cout << "Maestro: [modos-morte][selftest] ANTES (posicao vivida no "
+                     "momento da derrota): player=("
+                  << city_->player_aabb().x << ", " << city_->player_aabb().y << ")\n";
+        on_battle_result(gus::domain::combat::CombatOutcome::Defeat);
+        std::cout << "Maestro: [modos-morte][selftest] DEPOIS (reload do ultimo "
+                     "save aplicado): player=("
+                  << city_->player_aabb().x << ", " << city_->player_aabb().y
+                  << ") esperado=(111, 222)\n";
+        return;
+    }
+
     // DIAGNOSTICO/PROVA (SAVE-LOAD-UI etapa 4, prova visual headless Xvfb :99):
     // GUSWORLD_TITLE_SCREENSHOT_DIR=<dir> mostra a TELA DE TITULO diretamente no
     // boot (o proprio show_title_screen()/run_title_menu_loop_owning_gl carrega o
@@ -587,6 +641,20 @@ void Maestro::run() {
     // desabilitado), cada um com nome PROPRIO (nao colidem).
     if (const char* title_screenshot_dir = std::getenv("GUSWORLD_TITLE_SCREENSHOT_DIR");
         title_screenshot_dir != nullptr && title_screenshot_dir[0] != '\0') {
+        (void)show_title_screen();
+        return;
+    }
+
+    // DIAGNOSTICO/PROVA (MODOS-MORTE Fase 0, prova visual headless Xvfb :99):
+    // GUSWORLD_DIFFICULTY_SCREENSHOT_DIR=<dir> mostra a TELA DE SELECAO DE
+    // DIFICULDADE diretamente no boot - show_title_screen() cria o contexto GL
+    // owning normal (run_title_menu_loop_owning_gl), que detecta a MESMA
+    // variavel e pula reto pra tela de dificuldade (ANINHADA, ver
+    // title_menu_loop.cpp) ANTES de sequer montar a tela de titulo - bypassa por
+    // completo o loop de jogo, MESMO espirito de GUSWORLD_TITLE_SCREENSHOT_DIR.
+    if (const char* difficulty_screenshot_dir =
+            std::getenv("GUSWORLD_DIFFICULTY_SCREENSHOT_DIR");
+        difficulty_screenshot_dir != nullptr && difficulty_screenshot_dir[0] != '\0') {
         (void)show_title_screen();
         return;
     }
@@ -882,11 +950,68 @@ void Maestro::on_battle_result(gus::domain::combat::CombatOutcome outcome) {
         std::cout << "Maestro: [costura] inimigo kFixedEnemy1 DERROTADO - some do "
                      "mapa (flag '"
                   << kEnemy1DefeatedFlag << "'=true em memoria).\n";
+    } else if (outcome == gus::domain::combat::CombatOutcome::Defeat &&
+               should_reload_last_save_on_defeat(save_.difficulty)) {
+        // MODOS-MORTE Fase 0 (docs/design/mecanicas/modos-morte.md §3.3): dispatcher
+        // central de morte, ramo Facil - substitui o placeholder do M7 SO pra este
+        // modo. Medio/Dificil/Hardcore (should_reload_last_save_on_defeat==false)
+        // caem no comentario abaixo (placeholder inalterado).
+        reload_most_recent_save_on_defeat();
     }
-    // Defeat/Fled/Ongoing (janela fechada no meio): NAO marca - o inimigo continua no
-    // mapa, o jogador volta pro MESMO ponto (o OverworldSim nunca foi destruido/
-    // recarregado - ficou vivo e pausado durante a batalha) e pode tentar de novo. O
-    // flavor da derrota (reboot/bark/tela-xadrez) e o Incremento 3.
+    // Fled/Ongoing (janela fechada no meio)/Defeat em Medio-Dificil-Hardcore: NAO
+    // marca - o inimigo continua no mapa, o jogador volta pro MESMO ponto (o
+    // OverworldSim nunca foi destruido/recarregado - ficou vivo e pausado durante a
+    // batalha) e pode tentar de novo. O flavor da derrota (reboot/bark/tela-xadrez) e
+    // o Incremento 3; os modos de morte proprios de Medio/Dificil/Hardcore sao fases
+    // futuras (modos-morte.md §6).
+}
+
+void Maestro::reload_most_recent_save_on_defeat() {
+    const std::string saves_dir = gus::platform::fs::resolve_saves_dir();
+
+    // MESMA varredura de disco de show_title_screen()/"Continuar" (TitleDiskScan em
+    // title_menu_loop.cpp, nao exportada) - reusa most_recent_occupied_slot em vez
+    // de inventar uma 2a nocao de "ultimo save" (ex.: so o autosave). Um save
+    // PRESENTE mas nao Ok degrada como vazio (MESMA politica da tela de titulo).
+    std::array<gus::app::screens::SaveSlotPreview, gus::domain::save::kSlotCount>
+        previews{};
+    std::array<std::optional<gus::domain::save::SaveData>,
+               gus::domain::save::kSlotCount>
+        loaded{};
+    for (int slot = 0; slot < gus::domain::save::kSlotCount; ++slot) {
+        if (!gus::platform::fs::has_save(slot, saves_dir)) {
+            previews[static_cast<std::size_t>(slot)] =
+                gus::app::screens::empty_slot_preview(slot);
+            continue;
+        }
+        const auto outcome = gus::platform::fs::load_game(slot, saves_dir);
+        if (outcome.has_value() &&
+            outcome->result == gus::domain::save::LoadResult::Ok) {
+            previews[static_cast<std::size_t>(slot)] =
+                gus::app::screens::build_slot_preview(outcome->data, slot);
+            loaded[static_cast<std::size_t>(slot)] = outcome->data;
+        } else {
+            previews[static_cast<std::size_t>(slot)] =
+                gus::app::screens::empty_slot_preview(slot);
+        }
+    }
+
+    const int best_slot = gus::app::screens::most_recent_occupied_slot(previews);
+    if (best_slot < 0 || !loaded[static_cast<std::size_t>(best_slot)].has_value()) {
+        // Degradacao segura: jogo recem-comecado, nenhum save Ok gravado ainda -
+        // nao ha "ultimo save" pra reload. Segue no placeholder atual (o inimigo
+        // permanece, o jogador volta pro mesmo ponto - o Defeat ja rodou o flavor
+        // da derrota antes de chegar aqui).
+        std::cout << "Maestro: [modos-morte][Facil] Defeat sem nenhum save Ok "
+                     "gravado ainda - sem 'ultimo save' pra reload, segue no "
+                     "placeholder atual.\n";
+        return;
+    }
+
+    std::cout << "Maestro: [modos-morte][Facil] Defeat -> reload do save mais "
+                 "recente (slot "
+              << best_slot << ").\n";
+    apply_loaded_save_data(*loaded[static_cast<std::size_t>(best_slot)]);
 }
 
 }  // namespace gus::app

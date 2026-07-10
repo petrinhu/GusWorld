@@ -35,6 +35,7 @@ using gus::domain::templates::CardFamily;
 using gus::domain::templates::CharacterTemplate;
 using gus::domain::templates::deserialize_character;
 using gus::domain::templates::deserialize_enemy;
+using gus::domain::templates::EnemyKind;
 using gus::domain::templates::EnemyTemplate;
 using gus::domain::templates::pack;
 using gus::domain::templates::serialize_character;
@@ -96,6 +97,27 @@ TEST_CASE("serializer: enemy roundtrip preserva todos os campos",
         const auto restored = deserialize_enemy(bytes);
         REQUIRE(restored == original);
     }
+}
+
+// ---- MODOS-MORTE Fase 0: EnemyKind ----------------------------------------
+
+TEST_CASE("serializer: EnemyKind::Human roundtrippa (default e Creature)",
+          "[domain][templates][serializer][modos-morte]") {
+    auto original = daemon_fixture();
+    REQUIRE(original.kind == EnemyKind::Creature);  // default, sem consumidor ainda
+    original.kind = EnemyKind::Human;
+    const auto restored = deserialize_enemy(serialize_enemy(original));
+    REQUIRE(restored.kind == EnemyKind::Human);
+    REQUIRE(restored == original);
+}
+
+TEST_CASE("serializer: EnemyTemplate.kind com ordinal fora do dominio rejeitado",
+          "[domain][templates][serializer][modos-morte]") {
+    // MESMO hardening de family/brain (A1) aplicado ao campo novo.
+    auto tpl = daemon_fixture();
+    REQUIRE_NOTHROW(tpl.validate());  // sanity: valido hoje
+    tpl.kind = static_cast<EnemyKind>(99u);
+    REQUIRE_THROWS_AS(tpl.validate(), std::invalid_argument);
 }
 
 // ---- header binario valido ------------------------------------------------
