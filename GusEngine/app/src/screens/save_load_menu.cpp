@@ -99,6 +99,16 @@ SaveSlotPreview empty_slot_preview(int slot_id) noexcept {
     SaveSlotPreview preview;
     preview.slot_id = slot_id;
     preview.occupied = false;
+    preview.present_unreadable = false;
+    preview.is_autosave = is_autosave(slot_id);
+    return preview;
+}
+
+SaveSlotPreview unreadable_slot_preview(int slot_id) noexcept {
+    SaveSlotPreview preview;
+    preview.slot_id = slot_id;
+    preview.occupied = false;         // CRIT-1: mesmo visual de vazio ("Vazio N")
+    preview.present_unreadable = true; // ... mas GATEIA a confirmacao de sobrescrita
     preview.is_autosave = is_autosave(slot_id);
     return preview;
 }
@@ -200,8 +210,15 @@ namespace {
 SaveLoadMenuAction confirm_selected_slot(SaveLoadMenuState& state) noexcept {
     if (!slot_selectable(state, state.selected)) return SaveLoadMenuAction::None;
     const SaveSlotPreview& slot = state.slots[static_cast<std::size_t>(state.selected)];
-    if (state.mode == SaveLoadMode::Save && slot.occupied) {
-        // Slot manual OCUPADO em modo Save: pede confirmacao (decisao (e)).
+    // CRIT-1 (auditoria AUD-SAVE-LOAD-UI-2026-07-09): gateia a confirmacao de
+    // sobrescrita em `occupied || present_unreadable`, NAO so `occupied` - um slot
+    // presente-mas-ilegivel (arquivo primario existe, LoadResult != Ok) tambem PRECISA
+    // de confirmacao antes de gravar por cima (senao 1 clique/Enter regravava DIRETO,
+    // erodindo silenciosamente a cadeia de backup em direcao a perda definitiva de
+    // dado recuperavel - ver o comentario de present_unreadable em save_load_menu.hpp).
+    if (state.mode == SaveLoadMode::Save && (slot.occupied || slot.present_unreadable)) {
+        // Slot manual OCUPADO (ou presente-mas-ilegivel) em modo Save: pede
+        // confirmacao (decisao (e) do lider, extensao CRIT-1).
         state.confirming_overwrite = true;
         state.confirm_selected = 1;  // default seguro = Nao
         return SaveLoadMenuAction::None;

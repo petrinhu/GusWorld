@@ -163,8 +163,14 @@ std::string write_save_load_rml_file(const SaveLoadMenuState& state,
 // Le TODOS os slots do disco e monta os previews + (modo Load) um cache do
 // SaveData ja carregado por slot (evita ler o arquivo 2x ao confirmar). Um save
 // PRESENTE mas NAO Ok (HmacInvalid/Corrupt/VersionTooNew/Invalid/WrongSlot)
-// degrada, POR ORA, como slot VAZIO (os avisos dedicados sao etapa futura, fora
-// do nucleo desta onda, ver TODO.md) - logado pra nao silenciar o caso.
+// degrada VISUALMENTE como slot VAZIO ("Vazio N", os 2 avisos dedicados de
+// conteudo pro jogador seguem etapa futura, fora do nucleo desta onda, ver
+// TODO.md) - logado pra nao silenciar o caso. CRIT-1 (auditoria AUD-SAVE-LOAD-
+// UI-2026-07-09): usa unreadable_slot_preview (NAO empty_slot_preview) pra
+// marcar present_unreadable=true - isto NAO muda o visual (occupied continua
+// false), mas fecha o buraco de data-loss silenciosa: confirm_selected_slot
+// (save_load_menu.cpp) agora PEDE confirmacao de sobrescrita nesses slots
+// tambem, protegendo a cadeia de backup de erosao silenciosa.
 std::array<SaveSlotPreview, gus::domain::save::kSlotCount> build_previews_and_cache(
     const std::string& saves_dir,
     std::array<std::optional<gus::domain::save::SaveData>, gus::domain::save::kSlotCount>&
@@ -185,9 +191,11 @@ std::array<SaveSlotPreview, gus::domain::save::kSlotCount> build_previews_and_ca
         } else {
             std::cerr << "[save_load_menu_loop] aviso: slot " << slot
                       << " tem arquivo mas NAO carregou Ok (adulterado/corrompido/"
-                         "versao incompativel/slot trocado) - degradando como "
-                         "vazio nesta onda (avisos dedicados sao etapa futura).\n";
-            previews[static_cast<std::size_t>(slot)] = empty_slot_preview(slot);
+                         "versao incompativel/slot trocado) - degradando VISUAL "
+                         "como vazio nesta onda (avisos dedicados sao etapa "
+                         "futura), mas marcado present_unreadable=true (CRIT-1: "
+                         "sobrescrita ainda pede confirmacao).\n";
+            previews[static_cast<std::size_t>(slot)] = unreadable_slot_preview(slot);
         }
     }
     return previews;

@@ -50,7 +50,7 @@ inline constexpr int kSlotCount = 1 + kManualSlotCount;
     return slot == kAutosaveSlot;
 }
 
-// Nome logico do slot: "autosave" (0) ou "save_1".."save_5" (1..5). Estavel: a
+// Nome logico do slot: "autosave" (0) ou "save_1".."save_6" (1..6). Estavel: a
 // camada de I/O traduz para path. Lanca std::out_of_range se slot invalido.
 [[nodiscard]] std::string slot_logical_name(int slot);
 

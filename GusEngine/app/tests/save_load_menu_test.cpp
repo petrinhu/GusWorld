@@ -3,10 +3,21 @@
 // Catch2 (TEST-FIRST) de save_load_menu.hpp (SAVE-LOAD-UI). Cobre: derivacao de
 // capitulo/XP, formatacao de timestamp/playtime, preview de slot vazio/ocupado,
 // selecionabilidade por modo, e navegacao/confirmacao de sobrescrita.
+//
+// CRIT-1 (auditoria AUD-SAVE-LOAD-UI-2026-07-09): a secao dedicada mais abaixo
+// toca DISCO de proposito (gus/platform/fs/save_file_store.hpp, mesmo estilo de
+// platform/tests/save_file_store_test.cpp) - reproduz FIELMENTE o repro do
+// dossie (grava, corrompe 1 byte do primario, monta o preview EXATAMENTE como
+// build_previews_and_cache faria) pra provar que a confirmacao de sobrescrita
+// nao pula mais nesse cenario.
 
 #include <catch2/catch_test_macros.hpp>
 
+#include <filesystem>
+#include <fstream>
+
 #include "gus/app/screens/save_load_menu.hpp"
+#include "gus/platform/fs/save_file_store.hpp"
 
 using namespace gus::app::screens;
 using gus::domain::save::kAutosaveSlot;
@@ -138,14 +149,31 @@ TEST_CASE("format_playtime_seconds: negativo (defensivo) vira '0h 00m'", "[save_
 
 // ---------------------------------------------------------------- previews
 
-TEST_CASE("empty_slot_preview: occupied=false, is_autosave correto", "[save_load_menu]") {
+TEST_CASE("empty_slot_preview: occupied=false, present_unreadable=false, is_autosave "
+          "correto",
+          "[save_load_menu]") {
     const SaveSlotPreview manual = empty_slot_preview(1);
     REQUIRE_FALSE(manual.occupied);
+    REQUIRE_FALSE(manual.present_unreadable);
     REQUIRE_FALSE(manual.is_autosave);
     REQUIRE(manual.slot_id == 1);
 
     const SaveSlotPreview autosave = empty_slot_preview(kAutosaveSlot);
     REQUIRE(autosave.is_autosave);
+}
+
+TEST_CASE("unreadable_slot_preview (CRIT-1): occupied=false (MESMO visual de "
+          "vazio) mas present_unreadable=true",
+          "[save_load_menu][CRIT-1]") {
+    const SaveSlotPreview manual = unreadable_slot_preview(1);
+    REQUIRE_FALSE(manual.occupied);
+    REQUIRE(manual.present_unreadable);
+    REQUIRE_FALSE(manual.is_autosave);
+    REQUIRE(manual.slot_id == 1);
+
+    const SaveSlotPreview autosave = unreadable_slot_preview(kAutosaveSlot);
+    REQUIRE(autosave.is_autosave);
+    REQUIRE(autosave.present_unreadable);
 }
 
 TEST_CASE("build_slot_preview: preenche xp/capitulo/timestamp/playtime/scene a partir do "
@@ -716,4 +744,114 @@ TEST_CASE("most_recent_occupied_slot: empate no timestamp - o PRIMEIRO indice "
     slots[2] = build_slot_preview(a, 2);
     slots[4] = build_slot_preview(b, 4);
     REQUIRE(most_recent_occupied_slot(slots) == 2);
+}
+
+// ---------------------------------------------------------------- CRIT-1 (auditoria
+// AUD-SAVE-LOAD-UI-2026-07-09, docs/auditoria/AUDIT-SAVE-LOAD-UI-2026-07-09/
+// auditoria_integridade_dados_save.md): repro END-TO-END, MESMO ESTILO/PASSOS do
+// programa de verificacao efemero do dossie - grava 2x em disco (gera backup1),
+// corrompe 1 byte do PRIMARIO, confirma via load_game que o LoadResult != Ok, monta o
+// preview EXATAMENTE como build_previews_and_cache faria pra este caso
+// (unreadable_slot_preview, NAO empty_slot_preview), abre a tela em modo Save e clica
+// no slot (save_load_menu_click_slot, a MESMA funcao que o mouse real dispara em
+// save_load_menu_loop.cpp) - PROVA que a confirmacao de sobrescrita agora abre (ANTES
+// do fix: action==SlotChosen, gravava DIRETO sem aviso nenhum).
+
+TEST_CASE("CRIT-1: slot com primario presente-mas-corrompido PEDE confirmacao de "
+          "sobrescrita em modo Save (nao regrava direto por cima, protege a cadeia "
+          "de backup)",
+          "[save_load_menu][CRIT-1]") {
+    const auto dir = std::filesystem::temp_directory_path() / "gusworld_crit1_overwrite_test";
+    std::filesystem::remove_all(dir);
+
+    gus::domain::save::SaveData first;
+    first.current_scene_path = "city_intro";
+    first.party_roster = {"gus"};
+    first.party_active = {"gus"};
+    first.slot_id = 1;
+    REQUIRE(gus::platform::fs::save_game(first, 1, dir.string()));
+
+    gus::domain::save::SaveData second = first;
+    second.playtime_seconds = 5.0;
+    REQUIRE(gus::platform::fs::save_game(second, 1, dir.string()));  // gera save_1.backup1.sav
+
+    // Corrompe 1 byte do PRIMARIO (adulteracao/bit-rot - MESMO metodo de
+    // platform/tests/save_file_store_test.cpp::"byte do envelope adulterado").
+    {
+        std::fstream f(dir / "save_1.sav", std::ios::in | std::ios::out | std::ios::binary);
+        REQUIRE(f.is_open());
+        char byte = 0;
+        f.seekg(10);
+        f.read(&byte, 1);
+        byte = static_cast<char>(byte ^ 0xFF);
+        f.seekp(10);
+        f.write(&byte, 1);
+    }
+
+    REQUIRE(gus::platform::fs::has_save(1, dir.string()));  // arquivo AINDA existe
+    const auto outcome = gus::platform::fs::load_game(1, dir.string());
+    REQUIRE(outcome.has_value());  // presente != ausente
+    REQUIRE(outcome->result != gus::domain::save::LoadResult::Ok);  // HmacInvalid
+
+    // Monta o preview EXATAMENTE como build_previews_and_cache decidiria pra este
+    // caso (has_save=true + load != Ok -> unreadable_slot_preview).
+    std::array<SaveSlotPreview, kSlotCount> slots{};
+    for (int i = 0; i < kSlotCount; ++i) slots[static_cast<std::size_t>(i)] = empty_slot_preview(i);
+    slots[1] = unreadable_slot_preview(1);
+    REQUIRE_FALSE(slots[1].occupied);       // visual continua "Vazio" (nao muda, deliberado)
+    REQUIRE(slots[1].present_unreadable);   // ... mas marcado ilegivel
+
+    SaveLoadMenuState state;
+    save_load_menu_open(state, SaveLoadMode::Save, slots);
+
+    // Clica no slot 1 - MESMA funcao (save_load_menu_click_slot) que o mouse real
+    // dispara em save_load_menu_loop.cpp.
+    const SaveLoadMenuAction action = save_load_menu_click_slot(state, 1);
+
+    // ANTES do fix (reproduzido no dossie): action==SlotChosen (grava DIRETO, sem
+    // dialogo). DEPOIS do fix: action==None + confirming_overwrite==true.
+    REQUIRE(action == SaveLoadMenuAction::None);
+    REQUIRE(state.confirming_overwrite);
+    REQUIRE(state.confirm_selected == 1);  // default seguro = Nao
+
+    std::filesystem::remove_all(dir);
+}
+
+TEST_CASE("CRIT-1: MESMO cenario via teclado (Enter, nao so clique de mouse) "
+          "tambem pede confirmacao",
+          "[save_load_menu][CRIT-1]") {
+    const auto dir = std::filesystem::temp_directory_path() / "gusworld_crit1_keyboard_test";
+    std::filesystem::remove_all(dir);
+
+    gus::domain::save::SaveData data;
+    data.current_scene_path = "city_intro";
+    data.party_roster = {"gus"};
+    data.party_active = {"gus"};
+    data.slot_id = 1;
+    REQUIRE(gus::platform::fs::save_game(data, 1, dir.string()));
+    {
+        std::fstream f(dir / "save_1.sav", std::ios::in | std::ios::out | std::ios::binary);
+        REQUIRE(f.is_open());
+        char byte = 0;
+        f.seekg(10);
+        f.read(&byte, 1);
+        byte = static_cast<char>(byte ^ 0xFF);
+        f.seekp(10);
+        f.write(&byte, 1);
+    }
+    REQUIRE(gus::platform::fs::load_game(1, dir.string())->result !=
+            gus::domain::save::LoadResult::Ok);
+
+    std::array<SaveSlotPreview, kSlotCount> slots{};
+    for (int i = 0; i < kSlotCount; ++i) slots[static_cast<std::size_t>(i)] = empty_slot_preview(i);
+    slots[1] = unreadable_slot_preview(1);
+
+    SaveLoadMenuState state;
+    save_load_menu_open(state, SaveLoadMode::Save, slots);
+    REQUIRE(state.selected == 1);  // 1o slot selecionavel apos o autosave
+
+    REQUIRE(save_load_menu_key_down(state, SDLK_RETURN) == SaveLoadMenuAction::None);
+    REQUIRE(state.confirming_overwrite);
+
+    std::filesystem::remove_all(dir);
 }

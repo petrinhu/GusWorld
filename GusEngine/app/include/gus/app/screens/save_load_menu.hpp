@@ -144,6 +144,19 @@ struct SaveSlotPreview {
     int slot_id = 0;          // 0..kSlotCount-1 (save_slots.hpp)
     bool occupied = false;    // false = slot vazio (novo jogo ainda nao gravou aqui)
     bool is_autosave = false; // slot_id == kAutosaveSlot (cache de is_autosave(slot_id))
+    // CRIT-1 (auditoria AUD-SAVE-LOAD-UI-2026-07-09, docs/auditoria/AUDIT-SAVE-LOAD-
+    // UI-2026-07-09/auditoria_integridade_dados_save.md): true quando o slot tem um
+    // arquivo PRIMARIO presente em disco (has_save()==true) mas NAO carregou Ok
+    // (LoadResult HmacInvalid/Corrupt/VersionTooNew/Invalid/WrongSlot) - DISTINTO de
+    // "genuinamente vazio" (has_save()==false). `occupied` continua false neste caso
+    // (a tela AINDA exibe "Vazio" - o aviso dedicado de conteudo pro jogador segue
+    // etapa futura, fora do escopo deste fix), mas confirm_selected_slot (save_load_
+    // menu.cpp) GATEIA a confirmacao de sobrescrita em `occupied || present_
+    // unreadable`: gravar por cima de um slot presente-mas-ilegivel agora PEDE
+    // confirmacao, fechando o buraco de data-loss silenciosa (a cadeia de backup N=3
+    // parava de erodir uma gravacao "inocente" de cada vez ate perder o dado bom
+    // recuperavel).
+    bool present_unreadable = false;
     std::string scene_path;   // SaveData::current_scene_path (so valido se occupied)
     std::int64_t timestamp_ms = 0;   // SaveData::timestamp_ms (so valido se occupied)
     double playtime_seconds = 0.0;   // SaveData::playtime_seconds (so valido se occupied)
@@ -151,8 +164,17 @@ struct SaveSlotPreview {
     int chapter = 1; // chapter_from_quest_progress(data.quest_progress) (so valido se occupied)
 };
 
-// Preview de um slot VAZIO (occupied=false; demais campos default/irrelevantes).
+// Preview de um slot VAZIO (occupied=false, present_unreadable=false; demais campos
+// default/irrelevantes) - NENHUM arquivo primario em disco (has_save()==false).
 [[nodiscard]] SaveSlotPreview empty_slot_preview(int slot_id) noexcept;
+
+// Preview de um slot PRESENTE em disco (has_save()==true) mas ILEGIVEL (LoadResult
+// != Ok) - CRIT-1 acima. occupied=false (a tela mostra "Vazio", MESMO visual de
+// empty_slot_preview - nao exibe metadado falso), present_unreadable=true (gateia a
+// confirmacao de sobrescrita). Demais campos default/irrelevantes, MESMO formato de
+// empty_slot_preview - o CHAMADOR (build_previews_and_cache) decide quando usar esta
+// versus empty_slot_preview a partir do LoadOutcome real.
+[[nodiscard]] SaveSlotPreview unreadable_slot_preview(int slot_id) noexcept;
 
 // Preview de um slot OCUPADO a partir do SaveData ja carregado (occupied=true).
 // slot_id deve ser o slot FISICO de onde `data` foi lido (nao necessariamente
