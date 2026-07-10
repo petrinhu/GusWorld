@@ -188,27 +188,50 @@
 
 ## SAVE_DIFFICULTY_TITLE
 
-## SAVE_DIFFICULTY_LEGEND
+## SAVE_DIFFICULTY_HINT
+This choice is permanent for this save. To play differently, start a new save.
 
 ## SAVE_DIFFICULTY_FACIL_LABEL
 
 ## SAVE_DIFFICULTY_FACIL_DESC
+If you lose, you return to your last save.
 
 ## SAVE_DIFFICULTY_MEDIO_LABEL
 
+## SAVE_DIFFICULTY_MEDIO_BADGE
+Recommended
+
 ## SAVE_DIFFICULTY_MEDIO_DESC
+If you lose, you wake up at the Hospital. Costs a bit of credit.
 
 ## SAVE_DIFFICULTY_DIFICIL_LABEL
 
 ## SAVE_DIFFICULTY_DIFICIL_DESC
+If you lose, you wake up far away and badly weakened. You recover gradually.
 
-## SAVE_DIFFICULTY_CONFIRM_TITLE_PREFIX
+## SAVE_DIFFICULTY_CONFIRM_TITLE_FACIL
+Play on Easy?
+
+## SAVE_DIFFICULTY_CONFIRM_TITLE_MEDIO
+Play on Normal?
+
+## SAVE_DIFFICULTY_CONFIRM_TITLE_DIFICIL
+Play on Hard?
 
 ## SAVE_DIFFICULTY_CONFIRM_BODY
+This applies to the whole save and never changes once you start. To play differently, just start a new save anytime.
 
-## SAVE_DIFFICULTY_CONFIRM_YES
+## SAVE_DIFFICULTY_CONFIRM_YES_FACIL
+Yes, play on Easy
+
+## SAVE_DIFFICULTY_CONFIRM_YES_MEDIO
+Yes, play on Normal
+
+## SAVE_DIFFICULTY_CONFIRM_YES_DIFICIL
+Yes, play on Hard
 
 ## SAVE_DIFFICULTY_CONFIRM_NO
+Cancel
 
 ## SAVE_DIFFICULTY_FOOTER_HINT
 

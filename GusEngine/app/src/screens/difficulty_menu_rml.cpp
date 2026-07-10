@@ -65,8 +65,13 @@ body { font-family: "Pixel Operator Mono"; background: transparent; width: 100%;
 .difficulty-item:hover { border: 1dp #22D3EE88; }
 .difficulty-item-label { color: #E7ECF5; font-size: 13dp; letter-spacing: 1dp; margin-bottom: 3dp; }
 .difficulty-item.sel .difficulty-item-label { color: #ffffff; }
+.difficulty-badge {
+  display: inline-block; margin-left: 8dp; padding: 1dp 7dp; border-radius: 999dp;
+  decorator: vertical-gradient( #22D3EE #0EA5C9 ); font-size: 8dp; color: #071019;
+  letter-spacing: 0.5dp;
+}
 .difficulty-item-desc { color: #9AA5C0; font-size: 10dp; line-height: 14dp; }
-.difficulty-legend { color: #9AA5C0; font-size: 9dp; line-height: 13dp; margin-top: 16dp; }
+.difficulty-hint { color: #9AA5C0; font-size: 9dp; line-height: 13dp; margin-top: 16dp; }
 .difficulty-foot { color: #9AA5C0; font-size: 9dp; margin-top: 10dp; letter-spacing: 0.5dp; }
 .confirm-title { color: #E7ECF5; font-size: 13dp; line-height: 18dp; margin: 10dp 0dp 10dp 0dp; }
 .confirm-body { color: #9AA5C0; font-size: 10dp; line-height: 15dp; margin: 0dp 0dp 18dp 0dp; }
@@ -97,6 +102,19 @@ constexpr std::array<const char*, kDifficultyItemCount> kDescKeys = {
     "SAVE_DIFFICULTY_FACIL_DESC", "SAVE_DIFFICULTY_MEDIO_DESC",
     "SAVE_DIFFICULTY_DIFICIL_DESC"};
 
+// Copy final aprovada pelo lider (2026-07-10, via ux-writer): o splash de
+// confirmacao (Aviso #2) tem TITULO e botao "Sim" PROPRIOS por dificuldade (o
+// parser i18n NAO interpola placeholders - "Jogar no Fácil?"/"Sim, jogar no
+// Fácil" sao chaves INTEIRAS, nao um prefixo+label concatenado como no
+// rascunho). O corpo (SAVE_DIFFICULTY_CONFIRM_BODY) e o "Cancelar"
+// (SAVE_DIFFICULTY_CONFIRM_NO) sao UNICOS, independem da dificuldade.
+constexpr std::array<const char*, kDifficultyItemCount> kConfirmTitleKeys = {
+    "SAVE_DIFFICULTY_CONFIRM_TITLE_FACIL", "SAVE_DIFFICULTY_CONFIRM_TITLE_MEDIO",
+    "SAVE_DIFFICULTY_CONFIRM_TITLE_DIFICIL"};
+constexpr std::array<const char*, kDifficultyItemCount> kConfirmYesKeys = {
+    "SAVE_DIFFICULTY_CONFIRM_YES_FACIL", "SAVE_DIFFICULTY_CONFIRM_YES_MEDIO",
+    "SAVE_DIFFICULTY_CONFIRM_YES_DIFICIL"};
+
 }  // namespace
 
 std::string build_difficulty_menu_rml(const DifficultyMenuState& state,
@@ -112,21 +130,21 @@ std::string build_difficulty_menu_rml(const DifficultyMenuState& state,
          << "</div>";
 
     if (state.confirming) {
-        // Splash Aviso #2 (§2.2): titulo "Confirmar dificuldade: [X]" + corpo +
-        // Confirmar/Cancelar - substitui a lista enquanto aberto (MESMA mecanica
-        // de confirming_new_game em title_menu_rml.cpp).
-        const std::string chosen_label = translator.tr(kLabelKeys[static_cast<std::size_t>(
+        // Splash Aviso #2 (§2.2): titulo/botao "Sim" PROPRIOS da dificuldade
+        // escolhida ("Jogar no Fácil?"/"Sim, jogar no Fácil") + corpo unico +
+        // Cancelar - substitui a lista enquanto aberto (MESMA mecanica de
+        // confirming_new_game em title_menu_rml.cpp).
+        const std::size_t idx = static_cast<std::size_t>(
             state.selected >= 0 && state.selected < kDifficultyItemCount
                 ? state.selected
-                : static_cast<int>(DifficultyMenuItem::Medio))]);
-        body << "<div class=\"confirm-title\">"
-             << translator.tr("SAVE_DIFFICULTY_CONFIRM_TITLE_PREFIX") << chosen_label
-             << "]</div>";
+                : static_cast<int>(DifficultyMenuItem::Medio));
+        body << "<div class=\"confirm-title\">" << translator.tr(kConfirmTitleKeys[idx])
+             << "</div>";
         body << "<div class=\"confirm-body\">"
              << translator.tr("SAVE_DIFFICULTY_CONFIRM_BODY") << "</div>";
         body << "<div class=\"confirm-pill" << (state.confirm_selected == 0 ? " focused" : "")
-             << "\" id=\"difficulty-confirm-0\">"
-             << translator.tr("SAVE_DIFFICULTY_CONFIRM_YES") << "</div>";
+             << "\" id=\"difficulty-confirm-0\">" << translator.tr(kConfirmYesKeys[idx])
+             << "</div>";
         body << "<div class=\"confirm-pill" << (state.confirm_selected == 1 ? " focused" : "")
              << "\" id=\"difficulty-confirm-1\">"
              << translator.tr("SAVE_DIFFICULTY_CONFIRM_NO") << "</div>";
@@ -142,13 +160,19 @@ std::string build_difficulty_menu_rml(const DifficultyMenuState& state,
 
         body << "<div class=\"" << classes << "\" id=\"difficulty-item-" << i << "\">";
         body << "<div class=\"difficulty-item-label\">"
-             << translator.tr(kLabelKeys[static_cast<std::size_t>(i)]) << "</div>";
+             << translator.tr(kLabelKeys[static_cast<std::size_t>(i)]);
+        // Badge "Recomendado" SO no Medio (§2.1 default canonico).
+        if (static_cast<DifficultyMenuItem>(i) == DifficultyMenuItem::Medio) {
+            body << "<span class=\"difficulty-badge\">"
+                 << translator.tr("SAVE_DIFFICULTY_MEDIO_BADGE") << "</span>";
+        }
+        body << "</div>";
         body << "<div class=\"difficulty-item-desc\">"
              << translator.tr(kDescKeys[static_cast<std::size_t>(i)]) << "</div>";
         body << "</div>";
     }
-    // Aviso #1 (§2.2): legenda fixa, sempre visivel enquanto navega a lista.
-    body << "<div class=\"difficulty-legend\">" << translator.tr("SAVE_DIFFICULTY_LEGEND")
+    // Aviso #1 (§2.2): aviso fixo, sempre visivel enquanto navega a lista.
+    body << "<div class=\"difficulty-hint\">" << translator.tr("SAVE_DIFFICULTY_HINT")
          << "</div>";
     body << "<div class=\"difficulty-foot\">"
          << translator.tr("SAVE_DIFFICULTY_FOOTER_HINT") << "</div>";

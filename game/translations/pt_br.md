@@ -275,40 +275,55 @@ Cancelar
 
 ---
 
-## §4c. Tela de seleção de dificuldade (MODOS-MORTE Fase 0 - RASCUNHO do lead-game-designer, docs/design/mecanicas/modos-morte.md §2.2; copy final vem do ux-writer numa onda futura)
+## §4c. Tela de seleção de dificuldade (MODOS-MORTE Fase 0, docs/design/mecanicas/modos-morte.md §2.2 - copy final aprovada pelo líder via ux-writer, 2026-07-10)
 
 ## SAVE_DIFFICULTY_TITLE
 Escolha a dificuldade
 
-## SAVE_DIFFICULTY_LEGEND
-Essa escolha vale pra sempre nesse jogo salvo. Depois de começar, não dá pra trocar de dificuldade aqui, só criando um save novo.
+## SAVE_DIFFICULTY_HINT
+Essa escolha é definitiva pra este save. Pra jogar diferente, crie um save novo.
 
 ## SAVE_DIFFICULTY_FACIL_LABEL
 Fácil
 
 ## SAVE_DIFFICULTY_FACIL_DESC
-Se você perder, volta pro seu último save.
+Se perder, volta pro seu último save.
 
 ## SAVE_DIFFICULTY_MEDIO_LABEL
-Médio (recomendado)
+Médio
+
+## SAVE_DIFFICULTY_MEDIO_BADGE
+Recomendado
 
 ## SAVE_DIFFICULTY_MEDIO_DESC
-Se você perder, acorda no Hospital. Custa um pouco de crédito.
+Se perder, acorda no Hospital. Custa um pouco de crédito.
 
 ## SAVE_DIFFICULTY_DIFICIL_LABEL
 Difícil
 
 ## SAVE_DIFFICULTY_DIFICIL_DESC
-Se você perder, acorda longe e bem fraco. Precisa se recuperar aos poucos.
+Se perder, acorda longe e bem fraco. Recupera aos poucos.
 
-## SAVE_DIFFICULTY_CONFIRM_TITLE_PREFIX
-Confirmar dificuldade: [
+## SAVE_DIFFICULTY_CONFIRM_TITLE_FACIL
+Jogar no Fácil?
+
+## SAVE_DIFFICULTY_CONFIRM_TITLE_MEDIO
+Jogar no Médio?
+
+## SAVE_DIFFICULTY_CONFIRM_TITLE_DIFICIL
+Jogar no Difícil?
 
 ## SAVE_DIFFICULTY_CONFIRM_BODY
-Você não vai poder trocar de dificuldade nesse jogo salvo depois de começar. Se quiser jogar de outro jeito mais tarde, é só começar um save novo.
+Vale pra este save inteiro e não muda depois de começar. Pra jogar diferente, é só criar um save novo quando quiser.
 
-## SAVE_DIFFICULTY_CONFIRM_YES
-Confirmar
+## SAVE_DIFFICULTY_CONFIRM_YES_FACIL
+Sim, jogar no Fácil
+
+## SAVE_DIFFICULTY_CONFIRM_YES_MEDIO
+Sim, jogar no Médio
+
+## SAVE_DIFFICULTY_CONFIRM_YES_DIFICIL
+Sim, jogar no Difícil
 
 ## SAVE_DIFFICULTY_CONFIRM_NO
 Cancelar
