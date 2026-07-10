@@ -69,13 +69,36 @@ FetchContent_MakeAvailable(SDL3)
 #     Linkado por platform/rmlui/ + app/ (NUNCA por core/ nem domain/ - GATE).
 #     NOTA: pin por SHA e INCOMPATIVEL com GIT_SHALLOW (shallow so busca o tip do ref);
 #     por isso o GIT_SHALLOW foi removido deste Declare (fetch completo necessario p/ o SHA).
+#
+#     PATCH_COMMAND (APP-ASAN-RMLUI-UBSAN, 2026-07-10): o glintfx aplica
+#     glintfx/patches/rmlui-2cd28864-teardown-ub.patch (2 UBs genuinos de ordem-de-teardown
+#     no proprio RmlUi - vptr:ElementDocument + vptr:*WidgetScroll.cpp*/vptr:*RemoveEventListener*,
+#     ver docs/embed-integration.md secao 18 do glintfx) via PATCH_COMMAND na PROPRIA
+#     FetchContent_Declare(RmlUi ...) dele - mas o glintfx so e fetchado DEPOIS deste bloco
+#     (linha ~120 abaixo). Como o FetchContent e idempotente-por-nome (a 1a Declare/
+#     MakeAvailable de um nome vence; populacoes seguintes so reusam a arvore ja populada,
+#     sem rerodar PATCH_COMMAND), a NOSSA Declare(RmlUi) - que vem primeiro - e quem decide
+#     se o patch entra ou nao: sem PATCH_COMMAND aqui, o PATCH_COMMAND do glintfx nunca
+#     chega a rodar (a populacao ja aconteceu do nosso lado, sem patch), confirmado por
+#     leitura direta do rmlui-src fetchado (Element.cpp identico ao upstream com UB).
+#     Fix: vendorizar a MESMA copia do patch em GusEngine/patches/ (consumo legitimo -
+#     nao e modificar a lib glintfx, so aplicar o patch dela do nosso lado, exatamente como
+#     a secao 18 do embed-integration.md prescreve para "host declara RmlUi primeiro") e
+#     repetir aqui o mesmo idiom de probe idempotente que o glintfx usa (git apply
+#     --reverse --check | git apply) para o PATCH_COMMAND sobreviver a reconfiguracoes
+#     limpas que encontram o source ja populado E ja patcheado.
+#     Reverificar sempre que o GIT_TAG acima for bumpado (o patch pode deixar de aplicar
+#     limpo, ja estar corrigido a montante, ou ainda ser necessario - mesma disciplina do
+#     glintfx/patches/README.md).
 set(RMLUI_SAMPLES OFF CACHE BOOL "" FORCE)
 set(RMLUI_FONT_ENGINE "freetype" CACHE STRING "" FORCE)
 set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
+set(_gusengine_rmlui_patch ${CMAKE_CURRENT_SOURCE_DIR}/patches/rmlui-2cd28864-teardown-ub.patch)
 FetchContent_Declare(
     RmlUi
     GIT_REPOSITORY https://github.com/mikke89/RmlUi.git
     GIT_TAG        2cd28864ae25ed345b70598751703a5433b12356
+    PATCH_COMMAND  sh -c "git apply --reverse --check '${_gusengine_rmlui_patch}' >/dev/null 2>&1 || git apply '${_gusengine_rmlui_patch}'"
 )
 FetchContent_MakeAvailable(RmlUi)
 
@@ -90,6 +113,18 @@ FetchContent_MakeAvailable(RmlUi)
 #     por nome: o RmlUi do GusEngine (declarado PRIMEIRO) vence e o glintfx o reusa (sem conflito
 #     de versao). Por isso este bloco vem DEPOIS do MakeAvailable(RmlUi) de proposito.
 #     Linkado SO em app/ (GATE de 4 camadas: nunca core/ nem domain/).
+#
+#     APP-ASAN-RMLUI-UBSAN (2026-07-10): esta mesma idempotencia-por-nome e o motivo pelo
+#     qual o PATCH_COMMAND do glintfx (dentro do proprio glintfx/CMakeLists.txt, no bloco
+#     FetchContent_Declare(RmlUi ...) DELE) nunca chega a rodar aqui - quando o glintfx e
+#     fetchado (MakeAvailable(glintfx) abaixo), o RmlUi ja foi POPULADO pela nossa Declare
+#     de cima, entao a Declare/MakeAvailable(RmlUi) interna do glintfx e um no-op (reusa a
+#     arvore ja populada, sem rerodar PATCH_COMMAND algum). Por isso o patch tem que estar
+#     no PATCH_COMMAND da NOSSA Declare(RmlUi) (ver acima) - vendorizado em
+#     GusEngine/patches/rmlui-2cd28864-teardown-ub.patch a partir da copia do glintfx -
+#     nao no bloco do glintfx. O SHA/patch dos dois lados e o mesmo, entao o resultado final
+#     (arvore RmlUi patcheada) e identico ao que o glintfx entregaria sozinho; so muda QUEM
+#     efetivamente aplica.
 set(GLINTFX_BACKEND_GLFW OFF CACHE BOOL "" FORCE)  # embed-only (sem GLFW)
 # SOURCE_SUBDIR glintfx: o CMakeLists.txt do projeto vive no subdir glintfx/ (a raiz do repo
 # NAO tem CMakeLists.txt); e o que o consumer-example oficial do glintfx aponta. Sem isto,
@@ -117,7 +152,7 @@ set(GLINTFX_BACKEND_GLFW OFF CACHE BOOL "" FORCE)  # embed-only (sem GLFW)
 FetchContent_Declare(
     glintfx
     GIT_REPOSITORY https://codeberg.org/petrinhu/glintfx
-    GIT_TAG        v0.9.0
+    GIT_TAG        v0.9.1
     SOURCE_SUBDIR  glintfx
 )
 FetchContent_MakeAvailable(glintfx)
