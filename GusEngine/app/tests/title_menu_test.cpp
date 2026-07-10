@@ -203,3 +203,87 @@ TEST_CASE("title_menu_click_option: no mini-dialogo, index reinterpreta como Sim
     REQUIRE(title_menu_click_option(state, 0) == TitleMenuAction::StartNewGame);
     REQUIRE_FALSE(state.confirming_new_game);
 }
+
+// ---------------------------------------------------------- title_keyboard_focus_index (COCKPIT-SFX-HOVER-CLIQUE)
+
+TEST_CASE("title_keyboard_focus_index: fora do mini-dialogo devolve state.selected",
+          "[title_menu]") {
+    TitleMenuState state;
+    title_menu_open(state, /*any_save_exists=*/true);
+    REQUIRE(title_keyboard_focus_index(state) ==
+            static_cast<int>(TitleMenuItem::Continue));
+
+    (void)title_menu_key_down(state, SDLK_DOWN);
+    REQUIRE(title_keyboard_focus_index(state) ==
+            static_cast<int>(TitleMenuItem::NewGame));
+}
+
+TEST_CASE("title_keyboard_focus_index: no mini-dialogo devolve confirm_selected",
+          "[title_menu]") {
+    TitleMenuState state;
+    title_menu_open(state, /*any_save_exists=*/true);
+    state.selected = static_cast<int>(TitleMenuItem::NewGame);
+    (void)title_menu_key_down(state, SDLK_RETURN);  // abre o dialogo (confirm_selected=1)
+    REQUIRE(state.confirming_new_game);
+    REQUIRE(title_keyboard_focus_index(state) == 1);
+
+    (void)title_menu_key_down(state, SDLK_LEFT);  // alterna pra Sim (indice 0)
+    REQUIRE(title_keyboard_focus_index(state) == 0);
+}
+
+// ---------------------------------------------------------------- title_hover_index (COCKPIT-SFX-HOVER-CLIQUE)
+
+namespace {
+
+// 3 caixas empilhadas verticalmente, sem sobreposicao (MESMO espirito de
+// make_boxes_into em system_menu_test.cpp) - serve tanto a lista de 3 itens
+// quanto (usando so as 2 primeiras) o mini-dialogo.
+void make_title_boxes_into(UiHoverBox (&boxes)[kTitleItemCount]) {
+    for (int i = 0; i < kTitleItemCount; ++i) {
+        boxes[i] = UiHoverBox{/*found=*/true, /*x=*/10.0f,
+                               /*y=*/static_cast<float>(i * 100), /*w=*/200.0f,
+                               /*h=*/100.0f};
+    }
+}
+
+}  // namespace
+
+TEST_CASE("title_hover_index: fora do mini-dialogo, acha o indice sob o mouse "
+          "entre os 3 itens",
+          "[title_menu][hover]") {
+    TitleMenuState state;
+    title_menu_open(state, /*any_save_exists=*/true);
+    UiHoverBox boxes[kTitleItemCount];
+    make_title_boxes_into(boxes);
+
+    REQUIRE(title_hover_index(state, 50.0f, 50.0f, boxes) == 0);
+    REQUIRE(title_hover_index(state, 50.0f, 150.0f, boxes) == 1);
+    REQUIRE(title_hover_index(state, 50.0f, 250.0f, boxes) == 2);
+}
+
+TEST_CASE("title_hover_index: mouse fora de qualquer caixa devolve -1",
+          "[title_menu][hover]") {
+    TitleMenuState state;
+    title_menu_open(state, /*any_save_exists=*/true);
+    UiHoverBox boxes[kTitleItemCount];
+    make_title_boxes_into(boxes);
+
+    REQUIRE(title_hover_index(state, 9999.0f, 9999.0f, boxes) == -1);
+}
+
+TEST_CASE("title_hover_index: no mini-dialogo, SO as 2 primeiras caixas contam "
+          "(a 3a e ignorada mesmo se 'found')",
+          "[title_menu][hover]") {
+    TitleMenuState state;
+    title_menu_open(state, /*any_save_exists=*/true);
+    state.selected = static_cast<int>(TitleMenuItem::NewGame);
+    (void)title_menu_key_down(state, SDLK_RETURN);  // abre o dialogo
+    REQUIRE(state.confirming_new_game);
+
+    UiHoverBox boxes[kTitleItemCount];
+    make_title_boxes_into(boxes);  // boxes[2] tambem "found", mas fora do count=2
+
+    REQUIRE(title_hover_index(state, 50.0f, 50.0f, boxes) == 0);    // pill Sim
+    REQUIRE(title_hover_index(state, 50.0f, 150.0f, boxes) == 1);   // pill Nao
+    REQUIRE(title_hover_index(state, 50.0f, 250.0f, boxes) == -1);  // boxes[2] ignorada
+}

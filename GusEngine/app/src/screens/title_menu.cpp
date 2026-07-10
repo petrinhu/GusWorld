@@ -144,4 +144,14 @@ TitleMenuAction title_menu_click_option(TitleMenuState& state, int index) noexce
     return TitleMenuAction::None;
 }
 
+int title_keyboard_focus_index(const TitleMenuState& state) noexcept {
+    return state.confirming_new_game ? state.confirm_selected : state.selected;
+}
+
+int title_hover_index(const TitleMenuState& state, float mouse_x, float mouse_y,
+                       const UiHoverBox boxes[kTitleItemCount]) noexcept {
+    const int count = state.confirming_new_game ? 2 : kTitleItemCount;
+    return ui_hover_index(mouse_x, mouse_y, boxes, count);
+}
+
 }  // namespace gus::app::screens

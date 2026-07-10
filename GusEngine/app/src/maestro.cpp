@@ -423,8 +423,8 @@ bool Maestro::show_title_screen() {
     gus::app::screens::TitleLoopExit exit = gus::app::screens::TitleLoopExit::QuitApp;
     gus::domain::save::SaveData loaded{};
     const bool ok = gus::app::screens::run_title_menu_loop_owning_gl(
-        window_, translator_, gus::platform::fs::resolve_saves_dir(), &exit, &loaded,
-        frozen_ok ? frozen_bg_path : std::string());
+        window_, audio_, translator_, gus::platform::fs::resolve_saves_dir(), &exit,
+        &loaded, frozen_ok ? frozen_bg_path : std::string());
 
     if (!city_->reacquire_renderer()) {
         SDL_Log(

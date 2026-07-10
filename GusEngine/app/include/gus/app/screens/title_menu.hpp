@@ -45,6 +45,8 @@
 
 #include <SDL3/SDL.h>  // SDL_Keycode
 
+#include "gus/app/screens/ui_hover.hpp"  // COCKPIT-SFX-HOVER-CLIQUE: UiHoverBox/ui_hover_index
+
 namespace gus::app::screens {
 
 // Indices dos 3 itens da tela (ordem fiel ao mock: Continuar, Novo Jogo, Sair).
@@ -123,6 +125,28 @@ enum class TitleMenuAction {
 // fora do intervalo valido: no-op (None).
 [[nodiscard]] TitleMenuAction title_menu_click_option(TitleMenuState& state,
                                                        int index) noexcept;
+
+// COCKPIT-SFX-HOVER-CLIQUE: indice de FOCO por teclado da tela ATUAL (lista de
+// itens OU mini-dialogo de Novo Jogo) - MESMO papel de
+// system_menu_keyboard_focus_index (system_menu.hpp): o CHAMADOR (title_menu_
+// loop.cpp) compara este indice ANTES/DEPOIS de title_menu_key_down (SO quando
+// o MODO nao mudou - trocar de lista pra mini-dialogo, ou vice-versa, nao conta
+// como "hover num item novo") pra decidir se toca o SOM DE HOVER na navegacao
+// por teclado (paridade com o hover de mouse, ui_hover_entered_new_item).
+[[nodiscard]] int title_keyboard_focus_index(const TitleMenuState& state) noexcept;
+
+// COCKPIT-SFX-HOVER-CLIQUE: hit-test de HOVER (mouse) 100% PURO/testavel - o
+// CHAMADOR (title_menu_loop.cpp) preenche `boxes` via glintfx::UiLayer::
+// get_element_box (GL-heavy, fica SO no loop) e chama esta funcao pra decidir
+// QUAL indice esta sob o mouse; a decisao geometrica em si delega pro POCO
+// generico ui_hover_index (gus/app/screens/ui_hover.hpp). `boxes` tem
+// kTitleItemCount posicoes (o maior dos dois modos) - fora do mini-dialogo, as 3
+// primeiras (0..2) correspondem aos itens (title-item-0..2); dentro dele, SO as
+// 2 primeiras (0..1) sao relevantes (title-confirm-0/1, o resto de `boxes` e
+// ignorado). Devolve -1 se nenhuma bater (MESMO contrato de ui_hover_index).
+[[nodiscard]] int title_hover_index(const TitleMenuState& state, float mouse_x,
+                                     float mouse_y,
+                                     const UiHoverBox boxes[kTitleItemCount]) noexcept;
 
 }  // namespace gus::app::screens
 

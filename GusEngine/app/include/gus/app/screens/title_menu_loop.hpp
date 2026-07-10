@@ -36,6 +36,7 @@
 
 #include "gus/app/i18n/translator.hpp"
 #include "gus/domain/save/save_data.hpp"
+#include "gus/platform/audio/audio_engine.hpp"  // COCKPIT-SFX-HOVER-CLIQUE: paridade sonora
 
 namespace gus::app::screens {
 
@@ -59,6 +60,11 @@ enum class TitleLoopExit {
 // double-buffer, stencil 8), carrega o glad, roda o loop, e DESTROI o contexto
 // ao sair.
 //
+// `audio`: AudioEngine da Maestro (nao-dono, MESMO padrao de injecao de
+//   run_system_menu_loop_owning_gl/BattleScene::set_audio) - COCKPIT-SFX-HOVER-
+//   CLIQUE: hover (edge-detect via gus/app/screens/ui_hover.hpp) e clique nos
+//   botoes/pills da tela, MESMOS sons do menu de pausa (kMenuHoverSfxFile/
+//   kMenuClickSfxFile) - paridade sonora entre TODOS os menus de botoes.
 // `saves_dir`: diretorio real dos saves (o CHAMADOR passa gus::platform::fs::
 //   resolve_saves_dir() - MESMA convencao de injecao de outros loops,
 //   testabilidade/override via GUSWORLD_HOME).
@@ -78,9 +84,9 @@ enum class TitleLoopExit {
 // "sem tela de titulo, comeca fresco" em vez de fechar o app, ver
 // Maestro::show_title_screen).
 [[nodiscard]] bool run_title_menu_loop_owning_gl(
-    SDL_Window* window, const gus::app::i18n::Translator& translator,
-    const std::string& saves_dir, TitleLoopExit* out_exit,
-    gus::domain::save::SaveData* out_loaded_save,
+    SDL_Window* window, gus::platform::audio::AudioEngine& audio,
+    const gus::app::i18n::Translator& translator, const std::string& saves_dir,
+    TitleLoopExit* out_exit, gus::domain::save::SaveData* out_loaded_save,
     const std::string& frozen_background_png = std::string());
 
 }  // namespace gus::app::screens

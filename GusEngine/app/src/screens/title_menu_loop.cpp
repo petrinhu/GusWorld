@@ -23,8 +23,11 @@
 
 #include "gus/app/screens/save_load_menu.hpp"  // SaveSlotPreview/most_recent_occupied_slot
 #include "gus/app/screens/title_menu_rml.hpp"
+#include "gus/app/screens/ui_hover.hpp"  // COCKPIT-SFX-HOVER-CLIQUE: edge-detect generico
+#include "gus/core/asset_paths.hpp"  // kMenuHoverSfxFile/kMenuClickSfxFile/kSfxDir
 #include "gus/core/spatial/camera_clamp.hpp"  // gus::core::spatial::Rect
 #include "gus/domain/save/save_serializer.hpp"  // LoadResult
+#include "gus/platform/assets/asset_source.hpp"  // FilesystemAssetSource (resolve do SFX)
 #include "gus/platform/fs/save_file_store.hpp"  // has_save/load_game
 #include "gus/platform/render2d/render2d_gl3.hpp"
 #include "gus/platform/rmlui/gl3_loader.hpp"  // glad load + gl3_read_backbuffer_rgba
@@ -101,6 +104,39 @@ bool hit_test(const glintfx::ElementBox& box, float x, float y) {
     return x >= box.x && x <= box.x + box.w && y >= box.y && y <= box.y + box.h;
 }
 
+// Resolve o caminho de um SFX do menu (hover/click) - MESMA familia de
+// resolve_menu_sfx_path em system_menu_loop.cpp (paridade sonora: os DOIS
+// menus de botoes resolvem pelo MESMO caminho/arquivo).
+std::string resolve_menu_sfx_path(std::string_view file) {
+    const std::string id = join(std::string(gus::core::assets::kSfxDir), std::string(file));
+    return gus::platform::assets::FilesystemAssetSource().resolve_path(id);
+}
+
+// COCKPIT-SFX-HOVER-CLIQUE: preenche as caixas dos botoes NAVEGAVEIS da tela
+// ATUAL (lista de itens OU as 2 pills do mini-dialogo de Novo Jogo, MESMOS ids
+// do hit-test de clique) - a QUERY GL-heavy (get_element_box) fica SO aqui; a
+// DECISAO geometrica (qual indice bate) delega pro POCO title_hover_index
+// (title_menu.hpp/title_menu_test.cpp, 100% testavel sem GL/janela).
+int title_current_hover_index(const glintfx::UiLayer& ui, const TitleMenuState& state,
+                               float mouse_x, float mouse_y) {
+    UiHoverBox boxes[kTitleItemCount]{};  // kTitleItemCount(3) cobre os 2 do mini-dialogo tambem
+    auto fill = [&](int idx, const std::string& id) {
+        const glintfx::ElementBox box = ui.get_element_box(id.c_str());
+        boxes[idx] = UiHoverBox{box.found, box.x, box.y, box.w, box.h};
+    };
+    if (state.confirming_new_game) {
+        fill(0, "title-confirm-0");
+        fill(1, "title-confirm-1");
+    } else {
+        for (int i = 0; i < kTitleItemCount; ++i) fill(i, "title-item-" + std::to_string(i));
+    }
+    return title_hover_index(state, mouse_x, mouse_y, boxes);
+}
+
+// title_keyboard_focus_index agora e PUBLICA/testavel (title_menu.hpp/.cpp,
+// COCKPIT-SFX-HOVER-CLIQUE) - MESMO racional de system_menu_keyboard_focus_index;
+// nao duplicada aqui.
+
 // Varredura de disco (o UNICO I/O desta tela): monta os previews de TODOS os
 // slots + um cache do SaveData ja carregado por slot (evita ler o arquivo 2x ao
 // confirmar "Continuar") + any_save_exists + most_recent_occupied_slot. MESMA
@@ -144,6 +180,7 @@ TitleDiskScan scan_saves(const std::string& saves_dir) {
 }  // namespace
 
 bool run_title_menu_loop_owning_gl(SDL_Window* window,
+                                    gus::platform::audio::AudioEngine& audio,
                                     const gus::app::i18n::Translator& translator,
                                     const std::string& saves_dir,
                                     TitleLoopExit* out_exit,
@@ -216,6 +253,23 @@ bool run_title_menu_loop_owning_gl(SDL_Window* window,
                 ? gus::platform::render2d::kInvalidTexture
                 : backdrop.load_texture(frozen_background_png.c_str());
 
+        // COCKPIT-SFX-HOVER-CLIQUE: SFX de hover/clique - load_sfx UMA VEZ por
+        // sessao desta tela (MESMA cautela de "load_sfx NUNCA no frame" ja
+        // documentada em system_menu_loop.cpp/battle_preview.cpp). MESMOS
+        // arquivos do menu de pausa (kMenuHoverSfxFile/kMenuClickSfxFile) -
+        // paridade sonora entre os menus de botoes. audio.available()==false
+        // (device indisponivel/CI) degrada com seguranca (play_sfx com id
+        // invalido ja e no-op, ver AudioEngine::play_sfx).
+        const std::string hover_sfx_path =
+            resolve_menu_sfx_path(gus::core::assets::kMenuHoverSfxFile);
+        const std::string click_sfx_path =
+            resolve_menu_sfx_path(gus::core::assets::kMenuClickSfxFile);
+        const gus::platform::audio::SoundId hover_sfx_id =
+            audio.load_sfx(hover_sfx_path.c_str());
+        const gus::platform::audio::SoundId click_sfx_id =
+            audio.load_sfx(click_sfx_path.c_str());
+        int hovered_index = -1;  // -1 = mouse fora de qualquer botao (edge-detect)
+
         auto reload = [&] {
             rml_path = write_title_rml_file(state, translator);
             ui.load(rml_path.c_str());
@@ -239,6 +293,25 @@ bool run_title_menu_loop_owning_gl(SDL_Window* window,
             SDL_GL_SwapWindow(window);
         };
 
+        // HOVER (mouse) - COCKPIT-SFX-HOVER-CLIQUE: injeta o MouseMove no glintfx
+        // (visual :hover NATIVO, ver title_menu_rml.cpp) e faz o edge-detect do
+        // SOM de hover (title_current_hover_index + ui_hover_entered_new_item) -
+        // MESMA receita de handle_mouse_motion em system_menu_loop.cpp. Fatorada
+        // em lambda pra ser o UNICO choke-point do SDL_EVENT_MOUSE_MOTION real.
+        auto handle_mouse_motion = [&](float mx, float my) {
+            glintfx::UiEvent hover_ev{};
+            hover_ev.type = glintfx::UiEvent::Type::MouseMove;
+            hover_ev.x = mx;
+            hover_ev.y = my;
+            ui.process_event(hover_ev);
+
+            const int new_hover = title_current_hover_index(ui, state, mx, my);
+            if (ui_hover_entered_new_item(hovered_index, new_hover)) {
+                audio.play_sfx(hover_sfx_id);
+            }
+            hovered_index = new_hover;
+        };
+
         // Confirma "Continuar": o save mais recente JA esta no cache (scan_saves) -
         // nao le o disco de novo. Defensivo (nunca deveria acontecer - Continuar
         // so e selecionavel quando any_save_exists, que implica most_recent_slot
@@ -260,6 +333,28 @@ bool run_title_menu_loop_owning_gl(SDL_Window* window,
                              "um load que nao aconteceu).\n";
                 *out_exit = TitleLoopExit::NewGame;
             }
+        };
+
+        // Roteia UMA TitleMenuAction pro efeito de mundo comum aos pontos de
+        // entrada (Enter, clique em item) - devolve true se o CHAMADOR deve
+        // retornar de run_body NA HORA (ContinueGame/StartNewGame/RequestQuit ja
+        // setaram *out_exit ou chamaram confirm_continue()).
+        auto route_title_action = [&](TitleMenuAction action) -> bool {
+            switch (action) {
+                case TitleMenuAction::None:
+                    reload();
+                    return false;
+                case TitleMenuAction::ContinueGame:
+                    confirm_continue();
+                    return true;
+                case TitleMenuAction::StartNewGame:
+                    *out_exit = TitleLoopExit::NewGame;
+                    return true;
+                case TitleMenuAction::RequestQuit:
+                    *out_exit = TitleLoopExit::QuitApp;
+                    return true;
+            }
+            return false;
         };
 
         // DIAGNOSTICO/PROVA (SAVE-LOAD-UI etapa 4, prova visual headless Xvfb
@@ -309,21 +404,38 @@ bool run_title_menu_loop_owning_gl(SDL_Window* window,
                     continue;
                 }
                 if (ev.type == SDL_EVENT_KEY_DOWN && !ev.key.repeat) {
-                    const TitleMenuAction action =
-                        title_menu_key_down(state, ev.key.key);
-                    switch (action) {
-                        case TitleMenuAction::None:
-                            reload();
-                            break;
-                        case TitleMenuAction::ContinueGame:
-                            confirm_continue();
-                            return;
-                        case TitleMenuAction::StartNewGame:
-                            *out_exit = TitleLoopExit::NewGame;
-                            return;
-                        case TitleMenuAction::RequestQuit:
-                            *out_exit = TitleLoopExit::QuitApp;
-                            return;
+                    const bool is_confirm_key = (ev.key.key == SDLK_RETURN ||
+                                                  ev.key.key == SDLK_KP_ENTER ||
+                                                  ev.key.key == SDLK_SPACE);
+                    if (is_confirm_key) {
+                        // SOM DE CLIQUE (COCKPIT-SFX-HOVER-CLIQUE): Enter/Espaco e
+                        // sempre uma confirmacao intencional de item/pill - MESMO
+                        // choke-point de flash_pressed em system_menu_loop.cpp (a
+                        // tela de titulo nao tem flash visual, so o som).
+                        audio.play_sfx(click_sfx_id);
+                        const TitleMenuAction action =
+                            title_menu_key_down(state, ev.key.key);
+                        if (route_title_action(action)) return;
+                    } else {
+                        // Navegacao (setas/WASD/ESC) - SOM DE HOVER PARIDADE
+                        // TECLADO x MOUSE (MESMA tecnica de handle_navigation_key
+                        // em system_menu_loop.cpp): move a selecao e, SO se o
+                        // MODO (lista vs mini-dialogo) NAO mudou E moveu pra um
+                        // item NOVO, toca hover_sfx no MESMO choke-point do mouse.
+                        // Trocar de MODO (ex.: ESC fechando o mini-dialogo de Novo
+                        // Jogo) NAO conta como "hover num item novo" - MESMO guard
+                        // de `state.screen == screen_before` do menu de pausa.
+                        const bool confirming_before = state.confirming_new_game;
+                        const int kb_index_before = title_keyboard_focus_index(state);
+                        const TitleMenuAction action =
+                            title_menu_key_down(state, ev.key.key);
+                        if (state.confirming_new_game == confirming_before) {
+                            const int kb_index_after = title_keyboard_focus_index(state);
+                            if (ui_hover_entered_new_item(kb_index_before, kb_index_after)) {
+                                audio.play_sfx(hover_sfx_id);
+                            }
+                        }
+                        if (route_title_action(action)) return;
                     }
                 } else if (ev.type == SDL_EVENT_MOUSE_BUTTON_DOWN &&
                            ev.button.button == SDL_BUTTON_LEFT) {
@@ -334,13 +446,12 @@ bool run_title_menu_loop_owning_gl(SDL_Window* window,
                                 ("title-confirm-" + std::to_string(i)).c_str());
                             if (!hit_test(box, ev.button.x, ev.button.y)) continue;
                             handled = true;
+                            // as 2 pills do mini-dialogo sao SEMPRE validas (sem
+                            // conceito de "desabilitada" aqui) - som sempre toca.
+                            audio.play_sfx(click_sfx_id);
                             const TitleMenuAction action =
                                 title_menu_click_option(state, i);
-                            if (action == TitleMenuAction::StartNewGame) {
-                                *out_exit = TitleLoopExit::NewGame;
-                                return;
-                            }
-                            reload();  // Nao/cancelou - permanece na tela
+                            if (route_title_action(action)) return;
                         }
                     } else {
                         for (int i = 0; i < kTitleItemCount && !handled; ++i) {
@@ -348,34 +459,19 @@ bool run_title_menu_loop_owning_gl(SDL_Window* window,
                                 ("title-item-" + std::to_string(i)).c_str());
                             if (!hit_test(box, ev.button.x, ev.button.y)) continue;
                             handled = true;
+                            // Clicar num item DESABILITADO (Continuar sem save) e
+                            // no-op TOTAL (ver title_menu_click_option) - sem som
+                            // tambem, MESMA semantica "nao reage a nada".
+                            if (title_item_selectable(state, i)) {
+                                audio.play_sfx(click_sfx_id);
+                            }
                             const TitleMenuAction action =
                                 title_menu_click_option(state, i);
-                            switch (action) {
-                                case TitleMenuAction::None:
-                                    reload();
-                                    break;
-                                case TitleMenuAction::ContinueGame:
-                                    confirm_continue();
-                                    return;
-                                case TitleMenuAction::StartNewGame:
-                                    *out_exit = TitleLoopExit::NewGame;
-                                    return;
-                                case TitleMenuAction::RequestQuit:
-                                    *out_exit = TitleLoopExit::QuitApp;
-                                    return;
-                            }
+                            if (route_title_action(action)) return;
                         }
                     }
                 } else if (ev.type == SDL_EVENT_MOUSE_MOTION) {
-                    // Hover NATIVO (:hover RCSS, ver title_menu_rml.cpp) - MESMO
-                    // pipeline de encaminhamento das demais telas. Sem SFX aqui
-                    // (a tela de titulo nao recebe AudioEngine - fora do escopo
-                    // desta dispatch, ver TODO.md).
-                    glintfx::UiEvent hover_ev{};
-                    hover_ev.type = glintfx::UiEvent::Type::MouseMove;
-                    hover_ev.x = ev.motion.x;
-                    hover_ev.y = ev.motion.y;
-                    ui.process_event(hover_ev);
+                    handle_mouse_motion(ev.motion.x, ev.motion.y);
                 }
             }
             present_frame();
