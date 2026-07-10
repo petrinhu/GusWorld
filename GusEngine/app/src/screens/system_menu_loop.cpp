@@ -16,20 +16,29 @@
 // disparado por teclado, so :focus/:hover via classe) - flash_pressed() abaixo e o
 // UNICO lugar que gera esse frame extra.
 //
-// HOVER NATIVO + SOM DE HOVER/CLIQUE (retoque ao vivo do lider, pos-ONDA ARVORE):
-// o VISUAL do hover e 100% :hover nativo do glintfx (RCSS em system_menu_rml.cpp) -
+// HOVER NATIVO + SOM DE HOVER/CLIQUE (retoque ao vivo do lider, pos-ONDA ARVORE;
+// SOM DE HOVER de MOUSE migrado pro callback NATIVO em SFX-MIGRATE-V0.9): o
+// VISUAL do hover e 100% :hover nativo do glintfx (RCSS em system_menu_rml.cpp) -
 // so precisamos injetar UiEvent::MouseMove em TODO SDL_EVENT_MOUSE_MOTION (nao so
 // durante o arrasto do slider, como antes), MESMO pipeline ja em producao no
 // cockpit da batalha (battle_preview.cpp: sdl_to_glintfx -> process_event ->
-// Context::ProcessMouseMove -> :hover). O SOM, ao contrario, NAO tem equivalente
-// nativo - handle_mouse_motion() abaixo faz hit-test leve (current_hover_index)
-// nas MESMAS caixas/ids do clique, e so dispara audio.play_sfx(hover_sfx_id_)
-// quando o item hovered MUDA pra um NOVO item valido (edge-detect PURO/testavel:
-// system_menu_hover_index + system_menu_hover_entered_new_item em
-// system_menu.hpp/.cpp - ver system_menu_test.cpp). O som de CLIQUE
-// (click_sfx_id_) dispara dentro de flash_pressed() - o MESMO choke-point que ja
-// gera o flash visual .pressed pra CONFIRMACAO de teclado OU mouse, garantindo 1
-// unico lugar pros dois canais de entrada (sem duplicar a logica).
+// Context::ProcessMouseMove -> :hover). O SOM DE HOVER (mouse) agora usa
+// glintfx::UiLayer::set_hover_callback (v0.9.0, ver hover_cb mais abaixo) - a
+// glintfx JA deduplica o proprio fan-out de Mouseover internamente
+// (current_hover_id_, ver o doc-comment vendorizado em ui_layer.hpp/
+// bootstrap.hpp) e so invoca o callback na TRANSICAO real; is_navigable_hover_id
+// (POCO, abaixo) filtra pra so os ids de item NAVEGAVEL da tela ATUAL soarem (o
+// hover nativo tambem resolve containers como #sysmenu-panel/.ctrl-list/
+// slider-track-N, que NUNCA devem soar). O antigo hit-test manual
+// (current_hover_index, um get_element_box por item SO pra decidir o som) foi
+// REMOVIDO nesta migracao - o CLIQUE continua no MESMO get_element_box+hit_test
+// de sempre, intocado. O hover de TECLADO (sem mouse) continua na MESMA dupla
+// system_menu_hover_entered_new_item/system_menu_keyboard_focus_index de antes
+// (nao ha callback nativo pra foco de teclado dirigido por dado - ver
+// handle_navigation_key mais abaixo). O som de CLIQUE (click_sfx_id_) dispara
+// dentro de flash_pressed() - o MESMO choke-point que ja gera o flash visual
+// .pressed pra CONFIRMACAO de teclado OU mouse, garantindo 1 unico lugar pros
+// dois canais de entrada (sem duplicar a logica).
 
 #include "gus/app/screens/system_menu_loop.hpp"
 
@@ -246,59 +255,63 @@ std::string resolve_menu_sfx_path(std::string_view file) {
     return gus::platform::assets::FilesystemAssetSource().resolve_path(id);
 }
 
-// Preenche `boxes` com a geometria dos itens NAVEGAVEIS da tela ATUAL
-// (MESMOS ids do hit-test de clique acima - pause_item_id/category_item_id/
-// audio_item_id/kPlaceholderBackId) e devolve o indice hovered via
-// system_menu_hover_index (POCO, testado em system_menu_test.cpp). So a
-// CONSULTA a UI (get_element_box, GL-heavy) mora aqui; a decisao "qual bateu"
-// e pura.
-int current_hover_index(const glintfx::UiLayer& ui, const SystemMenuState& state,
-                         float mouse_x, float mouse_y) {
-    SystemMenuHoverBox boxes[kSystemMenuMaxHoverItems];
-    auto fill = [&](int idx, const std::string& id) {
-        const glintfx::ElementBox box = ui.get_element_box(id.c_str());
-        boxes[idx] = SystemMenuHoverBox{box.found, box.x, box.y, box.w, box.h};
-    };
+// COCKPIT-SFX-HOVER-CLIQUE / SFX-MIGRATE-V0.9: filtro NAVEGAVEL pro callback
+// NATIVO de hover (glintfx::UiLayer::set_hover_callback) - dado o `id` que o
+// hover nativo reportou (entered=true) e a tela ATUAL, devolve true SO se `id`
+// e um dos itens hover-testaveis por CLIQUE (MESMOS ids de pause_item_id/
+// category_item_id/audio_item_id/kPlaceholderBackId/controls_item_id/
+// controls_confirm_id/controls_discard_confirm_id) - o hover nativo do RmlUi
+// tambem resolve ids de CONTAINER (#sysmenu-panel, .ctrl-list, slider-track-N,
+// ver system_menu_rml.cpp) que NUNCA devem tocar o SFX de hover. Diferente do
+// antigo current_hover_index (removido nesta migracao), NAO precisa filtrar
+// linhas roladas pra fora da vista (BUG-A): o hover NATIVO so resolve `id` pra
+// um elemento de fato PINTADO sob o cursor - uma linha clipada pelo
+// overflow:auto de `.ctrl-list` literalmente nao pode ser hovered de verdade
+// (ao contrario do get_element_box usado pelo hit-test de CLIQUE, que le
+// geometria de LAYOUT crua e por isso PRECISA do filtro, ver
+// filter_offscreen_controls_row logo abaixo - esse continua intocado). 100%
+// string/estado, sem GL.
+bool is_navigable_hover_id(const SystemMenuState& state, const std::string& id) {
     switch (state.screen) {
         case SystemMenuScreen::Pause:
-            for (int i = 0; i < kPauseItemCount; ++i) fill(i, pause_item_id(i));
-            break;
-        case SystemMenuScreen::ConfigCategories:
-            for (int i = 0; i < kConfigCategoriesItemCount; ++i) fill(i, category_item_id(i));
-            break;
-        case SystemMenuScreen::Audio:
-            for (int i = 0; i < kAudioItemCount; ++i) fill(i, audio_item_id(i));
-            break;
-        case SystemMenuScreen::Controls:
-            // Capturando: nenhum item hover-testavel (system_menu_hover_index ja
-            // devolve count=0 pra essa combinacao - nada a preencher aqui).
-            // Confirmando o restaurar-padrao OU o descarte (M2 STAGED CHANGES):
-            // so as 2 pills do mini-dialogo correspondente.
-            if (state.controls_confirming_restore) {
-                fill(0, controls_confirm_id(0));
-                fill(1, controls_confirm_id(1));
-            } else if (state.controls_confirming_discard) {
-                fill(0, controls_discard_confirm_id(0));
-                fill(1, controls_discard_confirm_id(1));
-            } else if (!state.controls_capturing) {
-                // BUG-A: filtra as 30 actions (nao o rodape) pelo recorte
-                // visivel de `.ctrl-list` - ver filter_offscreen_controls_row.
-                const glintfx::ElementBox list_box = ui.get_element_box(kControlsListId);
-                for (int i = 0; i < kControlsItemCount; ++i) {
-                    const glintfx::ElementBox raw = ui.get_element_box(controls_item_id(i).c_str());
-                    const glintfx::ElementBox box = filter_offscreen_controls_row(i, raw, list_box);
-                    boxes[i] = SystemMenuHoverBox{box.found, box.x, box.y, box.w, box.h};
-                }
+            for (int i = 0; i < kPauseItemCount; ++i) {
+                if (id == pause_item_id(i)) return true;
             }
-            break;
+            return false;
+        case SystemMenuScreen::ConfigCategories:
+            for (int i = 0; i < kConfigCategoriesItemCount; ++i) {
+                if (id == category_item_id(i)) return true;
+            }
+            return false;
+        case SystemMenuScreen::Audio:
+            for (int i = 0; i < kAudioItemCount; ++i) {
+                if (id == audio_item_id(i)) return true;
+            }
+            return false;
+        case SystemMenuScreen::Controls:
+            // Confirmando o restaurar-padrao OU o descarte (M2 STAGED CHANGES):
+            // so as 2 pills do mini-dialogo correspondente. Capturando: nenhum
+            // item navegavel ("Pressione uma tecla..." - MESMO caso que
+            // current_hover_index tratava como count=0).
+            if (state.controls_confirming_restore) {
+                return id == controls_confirm_id(0) || id == controls_confirm_id(1);
+            }
+            if (state.controls_confirming_discard) {
+                return id == controls_discard_confirm_id(0) ||
+                       id == controls_discard_confirm_id(1);
+            }
+            if (state.controls_capturing) return false;
+            for (int i = 0; i < kControlsItemCount; ++i) {
+                if (id == controls_item_id(i)) return true;
+            }
+            return false;
         case SystemMenuScreen::Video:
         case SystemMenuScreen::Language:
-            fill(0, kPlaceholderBackId);
-            break;
+            return id == kPlaceholderBackId;
         case SystemMenuScreen::Hidden:
-            break;  // sem itens - system_menu_hover_index devolve -1 de qualquer jeito
+            return false;  // menu fechado - nada navegavel
     }
-    return system_menu_hover_index(state, mouse_x, mouse_y, boxes);
+    return false;
 }
 
 }  // namespace
@@ -362,6 +375,17 @@ SystemMenuLoopOutcome run_system_menu_loop_gl_current(
     ui_opt->load(rml_path.c_str());
     ui_opt->set_viewport(pw, ph);
     ui_opt->set_dp_ratio(dp_ratio);
+    // SFX-MIGRATE-V0.9: 1 update() de "assentamento" AQUI, ANTES do while(true) -
+    // achado EMPIRICO (harness headless de save_load_menu_loop.cpp, MESMA
+    // receita replicada aqui por consistencia): o hover NATIVO (Context::
+    // ProcessMouseMove -> UpdateHoverChain -> GetElementAtPoint, fonte pinada do
+    // RmlUi) so resolve elemento sob o cursor DEPOIS de pelo menos 1 Context::
+    // Update() ter rodado pro documento RECEM-carregado (diferente de
+    // get_element_box, que ja funciona logo apos load()). Sem isto, um
+    // MouseMove que chegue ANTES do 1o present_frame() desta tela (raro mas
+    // real) cairia num hover_cb mudo ate o PROXIMO MouseMove. Idempotente/
+    // barato (present_frame() ja chama ui_opt->update() de novo a cada frame).
+    ui_opt->update();
 
     gus::platform::render2d::Render2dGl3 backdrop(/*gl_active=*/true);
 
@@ -400,25 +424,35 @@ SystemMenuLoopOutcome run_system_menu_loop_gl_current(
     // via UiLayer::scroll_element_into_view - controls_scroll_target_index
     // (system_menu.hpp, POCO/testavel) decide SE deve rolar (so na tela
     // Controles, fora dos mini-dialogos Restaurar/Descartar - ver seu
-    // comentario). 1 ui_opt->update() extra ANTES do scroll: o load() acabou de
-    // trocar de DOCUMENTO (novo Rml::ElementDocument) - a geometria precisa de
-    // 1 passo de layout assentado antes de ScrollIntoView le-la (MESMO
-    // racional do "2o update() por seguranca" do self-test BUG-1 mais abaixo,
-    // que ja fazia 2x present_frame() por desconfianca da mesma janela).
-    // scroll_element_into_view(id, align_with_top=true) e no-op seguro quando
-    // a linha ja esta visivel (RmlUi so escreve scrollTop quando precisa) -
-    // por isso um UNICO ponto de chamada cobre tanto "linha nova entrando na
-    // vista" (navegacao) quanto "linha que ja estava visivel" (sem custo
-    // extra perceptivel).
+    // comentario). scroll_element_into_view(id, align_with_top=true) e no-op
+    // seguro quando a linha ja esta visivel (RmlUi so escreve scrollTop quando
+    // precisa) - por isso um UNICO ponto de chamada cobre tanto "linha nova
+    // entrando na vista" (navegacao) quanto "linha que ja estava visivel" (sem
+    // custo extra perceptivel).
+    //
+    // ui_opt->update() logo apos load() (SFX-MIGRATE-V0.9, generalizado a
+    // TODO reload - antes so rodava condicional ao scroll de Controles): o
+    // load() troca de DOCUMENTO (novo Rml::ElementDocument) - a geometria
+    // precisa de 1 passo de layout assentado antes de QUALQUER consulta que
+    // dependa de Context::Update() ter rodado. Ja valia pra
+    // scroll_element_into_view (motivo original desta linha); SFX-MIGRATE-V0.9
+    // estendeu o mesmo racional pro hover NATIVO (Context::ProcessMouseMove ->
+    // UpdateHoverChain -> GetElementAtPoint, fonte pinada do RmlUi) - inclusive
+    // no UiLayer RECRIADO no retorno da tela de Salvar/Carregar (BackToPause,
+    // que so recria a instancia e cai NESTE reload() generico pra carregar o
+    // Pause de volta, sem load() proprio) - sem update() incondicional aqui, um
+    // MouseMove chegando logo apos qualquer reload/recriacao (raro mas real)
+    // cairia num hover_cb mudo ate o PROXIMO MouseMove. Idempotente/barato
+    // (present_frame() ja chama ui_opt->update() de novo a cada frame).
     auto reload = [&] {
         rml_path = write_system_menu_rml_file(state, translator);
         ui_opt->load(rml_path.c_str());
         ui_opt->set_viewport(pw, ph);
         ui_opt->set_dp_ratio(dp_ratio);
+        ui_opt->update();
 
         const int scroll_target = controls_scroll_target_index(state);
         if (scroll_target >= 0) {
-            ui_opt->update();
             ui_opt->scroll_element_into_view(controls_item_id(scroll_target).c_str());
         }
     };
@@ -470,29 +504,54 @@ SystemMenuLoopOutcome run_system_menu_loop_gl_current(
         }
     };
 
-    int drag_item = -1;      // -1 = nenhum arrasto em curso; 0=Music, 1=Sfx
-    int hovered_index = -1;  // -1 = mouse fora de qualquer item navegavel (ver
-                             // handle_mouse_motion abaixo - edge-detect do SFX de hover)
+    int drag_item = -1;  // -1 = nenhum arrasto em curso; 0=Music, 1=Sfx
+
+    // SOM DE HOVER (mouse) - SFX-MIGRATE-V0.9: hover_cb e o callback NATIVO
+    // (glintfx::UiLayer::set_hover_callback, v0.9.0) - a glintfx despacha
+    // entered=true/false JA deduplicado por id (current_hover_id_ interno, ver o
+    // doc-comment vendorizado em ui_layer.hpp/bootstrap.hpp: so invoca o
+    // callback quando o id hovered de fato MUDA). `last_hover_sfx_id` e uma 2a
+    // camada de dedup NOSSA (defesa em profundidade, redundante mas barata com
+    // a da glintfx) - sincronizada nos DOIS sentidos (entered=false TAMBEM
+    // atualiza, senao sair-e-voltar pro MESMO item nunca redispararia, ja que a
+    // glintfx nao invocaria o callback de novo pro id que ja era o "last"
+    // daqui). `id` (const char*) so e valido DURANTE esta chamada (contrato do
+    // glintfx) - convertido pra std::string ANTES de qualquer outra coisa.
+    // is_navigable_hover_id() filtra os containers (#sysmenu-panel, .ctrl-list,
+    // slider-track-N) que o hover nativo TAMBEM resolve mas nunca devem soar.
+    // REGISTRO: precisa ser re-chamado em CADA glintfx::UiLayer NOVA (o
+    // callback vive no Bootstrap::Impl da instancia, nao sobrevive a
+    // ui_opt.reset()+emplace() - ver o ramo BackToPause de handle_action
+    // abaixo, que reregistra apos recriar o UiLayer do Pause).
+    std::string last_hover_sfx_id;
+    auto hover_cb = [&](const char* raw_id, bool entered) {
+        const std::string id = raw_id != nullptr ? raw_id : "";
+        if (!entered) {
+            if (id == last_hover_sfx_id) last_hover_sfx_id.clear();
+            return;
+        }
+        if (id == last_hover_sfx_id || !is_navigable_hover_id(state, id)) return;
+        last_hover_sfx_id = id;
+        audio.play_sfx(hover_sfx_id);
+    };
+    ui_opt->set_hover_callback(hover_cb);
 
     // HOVER (mouse) - PEDIDO 2a/2b: injeta o MouseMove no glintfx (visual :hover
-    // NATIVO, MESMO pipeline do cockpit da batalha) e faz o hit-test/edge-detect do
-    // SOM de hover (current_hover_index + system_menu_hover_entered_new_item, ambas
-    // POCO testadas em system_menu_test.cpp). Fatorada em lambda pra ser chamada
-    // tanto pelo SDL_EVENT_MOUSE_MOTION real (abaixo) quanto pelo self-test
-    // headless (GUSWORLD_SYSMENU_HOVER_SELFTEST, ver mais abaixo) - MESMO caminho
-    // de codigo prova o comportamento real, sem duplicar.
+    // NATIVO, MESMO pipeline do cockpit da batalha, e o QUE dispara hover_cb
+    // acima por baixo dos panos, ver Context::ProcessMouseMove/UpdateHoverChain
+    // no source pinado do RmlUi). O SOM de hover agora e 100% responsabilidade
+    // do callback nativo (hover_cb) - esta lambda so injeta o evento + trata o
+    // arrasto de slider (drag_item), logica DIFERENTE (nada a ver com
+    // hover-SFX). Fatorada em lambda pra ser chamada tanto pelo
+    // SDL_EVENT_MOUSE_MOTION real (abaixo) quanto pelo self-test headless
+    // (GUSWORLD_SYSMENU_HOVER_SELFTEST, ver mais abaixo) - MESMO caminho de
+    // codigo prova o comportamento real, sem duplicar.
     auto handle_mouse_motion = [&](float mx, float my) {
         glintfx::UiEvent hover_ev{};
         hover_ev.type = glintfx::UiEvent::Type::MouseMove;
         hover_ev.x = mx;
         hover_ev.y = my;
         ui_opt->process_event(hover_ev);
-
-        const int new_hover = current_hover_index(*ui_opt, state, mx, my);
-        if (system_menu_hover_entered_new_item(hovered_index, new_hover)) {
-            audio.play_sfx(hover_sfx_id);
-        }
-        hovered_index = new_hover;
 
         if (drag_item >= 0) {
             const std::string id = track_id_for_item(drag_item);
@@ -570,6 +629,13 @@ SystemMenuLoopOutcome run_system_menu_loop_gl_current(
                         /*logical_width=*/960, /*logical_height=*/540,
                         /*load_gl=*/true, /*dp_ratio=*/dp_ratio});
                     ui_opt->set_asset_base_url(stage.c_str());
+                    // SFX-MIGRATE-V0.9: REREGISTRA hover_cb - o callback nativo
+                    // vive no Bootstrap::Impl da INSTANCIA de UiLayer (ver o
+                    // comentario de hover_cb acima), e esta e uma instancia NOVA
+                    // (a anterior morreu no ui_opt.reset() antes de abrir
+                    // save/load) - sem isto, o hover de mouse do Pause voltaria
+                    // mudo apos qualquer ida-e-volta pela tela de save/load.
+                    ui_opt->set_hover_callback(hover_cb);
                     break;  // so recarrega o Pause abaixo, segue no while(true)
             }
         }
@@ -641,7 +707,8 @@ SystemMenuLoopOutcome run_system_menu_loop_gl_current(
     // DIAGNOSTICO/PROVA (SOM DE HOVER/CLIQUE): GUSWORLD_SYSMENU_HOVER_SELFTEST=1
     // entra na tela Pause (ja aberta acima), MOVE o mouse SINTETICO sequencialmente
     // pelos 4 pills (item0->1->2->3->0 de novo, provando que sair-e-voltar redispara
-    // o hover - MESMA logica de system_menu_hover_entered_new_item) via
+    // o hover - SFX-MIGRATE-V0.9: agora e o proprio dedup nativo da glintfx
+    // (current_hover_id_, hover_cb acima) que garante isto) via
     // handle_mouse_motion (o MESMO codigo do SDL_EVENT_MOUSE_MOTION real acima, sem
     // duplicar), e SIMULA 1 clique confirmando "Continuar" (system_menu_click_option
     // + flash_pressed, o MESMO caminho de um clique real) - tudo SEM SDL_PushEvent,

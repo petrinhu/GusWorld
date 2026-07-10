@@ -388,6 +388,88 @@ TEST_CASE("save_load_menu (harness headless): clique de mouse REAL (SDL_PushEven
     std::filesystem::remove_all(saves_dir);
 }
 
+// ---------------------------------------------------------------- (d.1) SFX-MIGRATE-V0.9:
+// hover NATIVO (glintfx::UiLayer::set_hover_callback) toca o SFX de hover, e NAO
+// redispara num 2o motion sobre o MESMO item.
+
+TEST_CASE("save_load_menu (harness headless): hover NATIVO (set_hover_callback) toca "
+          "o SFX de hover ao entrar num item, e NAO redispara num 2o motion sobre o "
+          "MESMO item (SFX-MIGRATE-V0.9)",
+          "[save_load_menu_interaction][gl]") {
+    GlTestEnv env = try_boot_gl();
+    if (!env.ok) {
+        INFO("GL/display indisponivel - harness pulado (rode com Xvfb :99).");
+        return;
+    }
+
+    const gus::app::i18n::Translator translator = make_translator();
+
+    const std::filesystem::path saves_dir =
+        std::filesystem::temp_directory_path() / "gusworld_save_load_interaction_hover_saves";
+    std::filesystem::remove_all(saves_dir);  // hermetico (nunca o $HOME real do host)
+
+    // Pre-mede a posicao REAL de "slmenu-back" (id FIXO, presente em QUALQUER
+    // estado da lista normal - MESMO documento/viewport/dp_ratio que
+    // run_save_load_menu_loop_gl_current monta INTERNAMENTE, ver o comentario
+    // de load_ui acima).
+    SaveLoadMenuState probe_state;
+    std::array<SaveSlotPreview, kSlotCount> empty_slots{};
+    for (int i = 0; i < kSlotCount; ++i) {
+        empty_slots[static_cast<std::size_t>(i)] = empty_slot_preview(i);
+    }
+    save_load_menu_open(probe_state, SaveLoadMode::Load, empty_slots);
+    float back_cx = 0.0f, back_cy = 0.0f;
+    {
+        auto probe_ui = load_ui(probe_state, translator);
+        REQUIRE(probe_ui.has_value());
+        const glintfx::ElementBox back_box = probe_ui->get_element_box("slmenu-back");
+        REQUIRE(box_hittable(back_box, kWinW, kWinH));
+        back_cx = back_box.x + back_box.w * 0.5f;
+        back_cy = back_box.y + back_box.h * 0.5f;
+        // FECHA a UiLayer de sondagem ANTES do loop real abrir a SUA PROPRIA
+        // (RmlUi NAO suporta 2 UiLayer simultaneos no processo, ver o comentario
+        // extenso no teste (d) acima).
+    }
+
+    // 2 MOUSE_MOTION IDENTICOS sobre "slmenu-back" (MESMA posicao): o 1o e a
+    // ENTRADA (deve tocar hover_sfx 1x, via set_hover_callback -> hover_cb em
+    // save_load_menu_loop.cpp); o 2o e um "motion parado" sobre o MESMO item -
+    // NAO deve redisparar (dedup por id, tanto o interno da glintfx quanto o
+    // nosso, ver o comentario de hover_cb). Sem clique nenhum aqui (so hover) -
+    // Esc fecha a tela pra a chamada RETORNAR.
+    SDL_Event motion1{};
+    motion1.type = SDL_EVENT_MOUSE_MOTION;
+    motion1.motion.x = back_cx;
+    motion1.motion.y = back_cy;
+    REQUIRE(SDL_PushEvent(&motion1));
+
+    SDL_Event motion2 = motion1;  // MESMA posicao/id - "parado sobre o mesmo item"
+    REQUIRE(SDL_PushEvent(&motion2));
+
+    SDL_Event esc_ev{};
+    esc_ev.type = SDL_EVENT_KEY_DOWN;
+    esc_ev.key.key = SDLK_ESCAPE;
+    esc_ev.key.repeat = 0;
+    REQUIRE(SDL_PushEvent(&esc_ev));
+
+    gus::platform::audio::AudioEngine audio(/*device_active=*/false);  // sem hardware no CI
+    const SaveLoadLoopExit exit = run_save_load_menu_loop_gl_current(
+        env.window, audio, translator, SaveLoadMode::Load, saves_dir.string(),
+        /*build_current_save_data=*/{}, /*apply_loaded_save_data=*/{});
+
+    // ANTES desta onda (hover-SFX via hit-test manual current_hover_index): a
+    // migracao pro callback nativo poderia silenciosamente "emudecer" o hover
+    // (regressao sonora que print/screenshot NAO pegam) OU redisparar a cada
+    // Mouseover cru do fan-out do RmlUi (ver o doc-comment de
+    // set_hover_callback) - este REQUIRE prova, headless e objetivo (via
+    // AudioEngine::sfx_play_count(), NAO julgamento visual), que nenhum dos 2
+    // aconteceu: exatamente 1 play pros 2 motions sobre o MESMO item.
+    REQUIRE(exit == SaveLoadLoopExit::BackToPause);
+    REQUIRE(audio.sfx_play_count() == 1);
+
+    std::filesystem::remove_all(saves_dir);
+}
+
 // ---------------------------------------------------------------- (e) SAVE-LOAD-AVISOS:
 // clique real no slot Danificado -> aviso abre -> clique real em "Tentar recuperar" ->
 // load_game_from_backup de fato recupera (fluxo COMPLETO ao vivo, nao so a logica pura).

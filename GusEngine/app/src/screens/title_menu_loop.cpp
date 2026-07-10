@@ -112,25 +112,22 @@ std::string resolve_menu_sfx_path(std::string_view file) {
     return gus::platform::assets::FilesystemAssetSource().resolve_path(id);
 }
 
-// COCKPIT-SFX-HOVER-CLIQUE: preenche as caixas dos botoes NAVEGAVEIS da tela
-// ATUAL (lista de itens OU as 2 pills do mini-dialogo de Novo Jogo, MESMOS ids
-// do hit-test de clique) - a QUERY GL-heavy (get_element_box) fica SO aqui; a
-// DECISAO geometrica (qual indice bate) delega pro POCO title_hover_index
-// (title_menu.hpp/title_menu_test.cpp, 100% testavel sem GL/janela).
-int title_current_hover_index(const glintfx::UiLayer& ui, const TitleMenuState& state,
-                               float mouse_x, float mouse_y) {
-    UiHoverBox boxes[kTitleItemCount]{};  // kTitleItemCount(3) cobre os 2 do mini-dialogo tambem
-    auto fill = [&](int idx, const std::string& id) {
-        const glintfx::ElementBox box = ui.get_element_box(id.c_str());
-        boxes[idx] = UiHoverBox{box.found, box.x, box.y, box.w, box.h};
-    };
+// SFX-MIGRATE-V0.9: filtro NAVEGAVEL pro callback NATIVO de hover
+// (glintfx::UiLayer::set_hover_callback) - dado o `id` que o hover nativo
+// reportou (entered=true) e o estado ATUAL, devolve true SO se `id` e um dos
+// botoes hover-testaveis por CLIQUE (lista de itens OU as 2 pills do
+// mini-dialogo de Novo Jogo, MESMOS ids do hit-test de clique mais abaixo).
+// Substitui o antigo title_current_hover_index (que devolvia um INDICE via
+// title_hover_index/ui_hover_index) - o dedup agora e por ID, interno ao
+// proprio hover nativo (ver hover_cb mais abaixo). 100% string/estado, sem GL.
+bool is_navigable_hover_id(const TitleMenuState& state, const std::string& id) {
     if (state.confirming_new_game) {
-        fill(0, "title-confirm-0");
-        fill(1, "title-confirm-1");
-    } else {
-        for (int i = 0; i < kTitleItemCount; ++i) fill(i, "title-item-" + std::to_string(i));
+        return id == "title-confirm-0" || id == "title-confirm-1";
     }
-    return title_hover_index(state, mouse_x, mouse_y, boxes);
+    for (int i = 0; i < kTitleItemCount; ++i) {
+        if (id == "title-item-" + std::to_string(i)) return true;
+    }
+    return false;
 }
 
 // title_keyboard_focus_index agora e PUBLICA/testavel (title_menu.hpp/.cpp,
@@ -246,6 +243,17 @@ bool run_title_menu_loop_owning_gl(SDL_Window* window,
         ui.load(rml_path.c_str());
         ui.set_viewport(pw, ph);
         ui.set_dp_ratio(dp_ratio);
+        // SFX-MIGRATE-V0.9: 1 update() de "assentamento" AQUI, ANTES do
+        // while(true) - achado EMPIRICO (harness headless de
+        // save_load_menu_loop.cpp, MESMA receita replicada aqui): o hover
+        // NATIVO (Context::ProcessMouseMove -> UpdateHoverChain ->
+        // GetElementAtPoint, fonte pinada do RmlUi) so resolve elemento sob o
+        // cursor DEPOIS de pelo menos 1 Context::Update() ter rodado pro
+        // documento RECEM-carregado. Sem isto, um MouseMove que chegue ANTES
+        // do 1o present_frame() desta tela cairia num hover_cb mudo ate o
+        // PROXIMO MouseMove. Idempotente/barato (present_frame() ja chama
+        // ui.update() de novo a cada frame).
+        ui.update();
 
         gus::platform::render2d::Render2dGl3 backdrop(/*gl_active=*/true);
         const gus::platform::render2d::TextureId frozen_bg_tex =
@@ -268,13 +276,16 @@ bool run_title_menu_loop_owning_gl(SDL_Window* window,
             audio.load_sfx(hover_sfx_path.c_str());
         const gus::platform::audio::SoundId click_sfx_id =
             audio.load_sfx(click_sfx_path.c_str());
-        int hovered_index = -1;  // -1 = mouse fora de qualquer botao (edge-detect)
-
         auto reload = [&] {
             rml_path = write_title_rml_file(state, translator);
             ui.load(rml_path.c_str());
             ui.set_viewport(pw, ph);
             ui.set_dp_ratio(dp_ratio);
+            // SFX-MIGRATE-V0.9: MESMO update() de assentamento da construcao
+            // inicial acima (ver o comentario la) - QUALQUER reload() troca de
+            // DOCUMENTO, entao o hover NATIVO precisa do mesmo "layout
+            // assentado" de novo a cada troca, nao so na primeira.
+            ui.update();
         };
 
         auto present_frame = [&] {
@@ -293,23 +304,44 @@ bool run_title_menu_loop_owning_gl(SDL_Window* window,
             SDL_GL_SwapWindow(window);
         };
 
+        // SOM DE HOVER (mouse) - SFX-MIGRATE-V0.9: hover_cb e o callback NATIVO
+        // (glintfx::UiLayer::set_hover_callback, v0.9.0) - a glintfx despacha
+        // entered=true/false JA deduplicado por id (current_hover_id_ interno,
+        // ver o doc-comment vendorizado em ui_layer.hpp/bootstrap.hpp: so invoca
+        // o callback quando o id hovered de fato MUDA). `last_hover_sfx_id` e
+        // uma 2a camada de dedup NOSSA (defesa em profundidade, redundante mas
+        // barata com a da glintfx) - sincronizada nos DOIS sentidos
+        // (entered=false TAMBEM atualiza, senao sair-e-voltar pro MESMO item
+        // nunca redispararia). `id` (const char*) so e valido DURANTE esta
+        // chamada (contrato do glintfx) - convertido pra std::string ANTES de
+        // qualquer outra coisa. is_navigable_hover_id() filtra os ids que o
+        // hover nativo TAMBEM resolve mas nunca devem soar. Registrado UMA VEZ
+        // (`ui` aqui e uma UNICA glintfx::UiLayer pra vida inteira da tela).
+        std::string last_hover_sfx_id;
+        auto hover_cb = [&](const char* raw_id, bool entered) {
+            const std::string id = raw_id != nullptr ? raw_id : "";
+            if (!entered) {
+                if (id == last_hover_sfx_id) last_hover_sfx_id.clear();
+                return;
+            }
+            if (id == last_hover_sfx_id || !is_navigable_hover_id(state, id)) return;
+            last_hover_sfx_id = id;
+            audio.play_sfx(hover_sfx_id);
+        };
+        ui.set_hover_callback(hover_cb);
+
         // HOVER (mouse) - COCKPIT-SFX-HOVER-CLIQUE: injeta o MouseMove no glintfx
-        // (visual :hover NATIVO, ver title_menu_rml.cpp) e faz o edge-detect do
-        // SOM de hover (title_current_hover_index + ui_hover_entered_new_item) -
-        // MESMA receita de handle_mouse_motion em system_menu_loop.cpp. Fatorada
-        // em lambda pra ser o UNICO choke-point do SDL_EVENT_MOUSE_MOTION real.
+        // (visual :hover NATIVO, ver title_menu_rml.cpp - e o QUE dispara
+        // hover_cb acima por baixo dos panos). O SOM de hover agora e 100%
+        // responsabilidade do callback nativo - esta lambda so injeta o evento.
+        // Fatorada em lambda pra ser o UNICO choke-point do SDL_EVENT_MOUSE_MOTION
+        // real.
         auto handle_mouse_motion = [&](float mx, float my) {
             glintfx::UiEvent hover_ev{};
             hover_ev.type = glintfx::UiEvent::Type::MouseMove;
             hover_ev.x = mx;
             hover_ev.y = my;
             ui.process_event(hover_ev);
-
-            const int new_hover = title_current_hover_index(ui, state, mx, my);
-            if (ui_hover_entered_new_item(hovered_index, new_hover)) {
-                audio.play_sfx(hover_sfx_id);
-            }
-            hovered_index = new_hover;
         };
 
         // Confirma "Continuar": o save mais recente JA esta no cache (scan_saves) -
