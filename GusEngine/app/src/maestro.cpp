@@ -609,8 +609,8 @@ void Maestro::run() {
         pre_existing.difficulty = gus::domain::save::DifficultyLevel::Facil;
         pre_existing.player_position = gus::domain::save::Vec3{111.0, 222.0, 0.0};
         pre_existing.slot_id = gus::domain::save::kAutosaveSlot;
-        gus::platform::fs::save_game(pre_existing, gus::domain::save::kAutosaveSlot,
-                                      saves_dir);
+        (void)gus::platform::fs::save_game(pre_existing, gus::domain::save::kAutosaveSlot,
+                                            saves_dir);
 
         // Estado VIVO diverge do save (o jogador "andou" ate (999,999) depois de
         // salvar, e entao MORREU ali) - simula a sessao real entre o save e a

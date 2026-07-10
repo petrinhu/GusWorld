@@ -243,11 +243,23 @@ DifficultyLoopExit run_difficulty_menu_loop_gl_current(
     // GUSWORLD_TITLE_SCREENSHOT_DIR em title_menu_loop.cpp).
     const char* screenshot_dir = std::getenv("GUSWORLD_DIFFICULTY_SCREENSHOT_DIR");
     if (screenshot_dir != nullptr && screenshot_dir[0] != '\0') {
+        // GUSWORLD_DIFFICULTY_SCREENSHOT_CONFIRM=1 (opcional): captura o SPLASH
+        // de confirmacao (Aviso #2) em vez da lista - abre via a MESMA
+        // maquina de estado PURA (Enter na lista, mesma logica de um clique
+        // real) antes do reload() que gera o RML novo.
+        const char* confirm_flag = std::getenv("GUSWORLD_DIFFICULTY_SCREENSHOT_CONFIRM");
+        const bool want_confirm = confirm_flag != nullptr && confirm_flag[0] != '\0';
+        if (want_confirm) {
+            (void)difficulty_menu_key_down(state, SDLK_RETURN);  // abre o splash
+            reload();
+        }
         for (int i = 0; i < 6; ++i) present_frame();
         std::vector<unsigned char> buf(static_cast<std::size_t>(pw) *
                                         static_cast<std::size_t>(ph) * 4);
         if (gus::platform::rmlui::gl3_read_backbuffer_rgba(pw, ph, buf.data())) {
-            const std::string out = join(std::string(screenshot_dir), "difficulty_menu.png");
+            const std::string filename =
+                want_confirm ? "difficulty_menu_confirm.png" : "difficulty_menu.png";
+            const std::string out = join(std::string(screenshot_dir), filename);
             stbi_write_png(out.c_str(), pw, ph, 4, buf.data(), pw * 4);
             std::cout << "DifficultyMenuLoop: [screenshot] " << out << " (" << pw << "x"
                       << ph << ")\n";
