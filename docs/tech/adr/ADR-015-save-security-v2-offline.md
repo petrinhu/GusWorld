@@ -76,6 +76,7 @@ Um unico arquivo selado por instalacao, `~/.gusworld/.integrity/anchor.bin` (070
 ```
 rollback_ctr     u64      contador monotonico do slot Hardcore (0 = nunca usado)
 run_dead         u8       0/1, permadeath ja consumiu a run Hardcore vigente
+puzzle_used      u8       0/1, o kernel-panic puzzle (chance UNICA, modos-morte.md §2.3a) ja foi usado nesta run Hardcore (decisao do lider 2026-07-10). Setado ao RESOLVER o puzzle; a partir dai HP=0 = permadeath direto. Reseta (junto de rollback_ctr/run_dead) ao iniciar uma NOVA run Hardcore
 milestones       map<string,u8>   nome->0/1, extensivel (comeca com so "hardcore_unlocked")
 ```
 
