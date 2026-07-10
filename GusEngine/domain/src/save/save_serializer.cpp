@@ -1,8 +1,9 @@
 // gus/domain/src/save/save_serializer.cpp
 //
-// Serializer binario proprio + HMAC-SHA256 (core/) do estado de save. Ver header
-// para envelope e layout. POCO puro, ZERO Qt. HMAC de gus::core::crypto (proprio,
-// validado contra FIPS/RFC). ADR-006.
+// Serializer binario proprio + AEAD XChaCha20-Poly1305 (core/, sobre o Monocypher
+// vendorizado) do estado de save. Ver header para envelope e layout. POCO puro,
+// ZERO Qt. ADR-015 (SAVE-CRYPTO-V2-ENVELOPE): envelope GDS3 substitui o GDS2/HMAC
+// do ADR-006 SO no save (templates continuam GDS2/HMAC, fora de escopo).
 //
 // Este .cpp tambem define os helpers de FIXTURE de migracao declarados em
 // save_migrators.hpp (serialize_save_v1 / make_v1_payload): eles dependem do MESMO
@@ -20,8 +21,8 @@
 #include <utility>
 #include <vector>
 
-#include "gus/core/crypto/hmac_sha256.hpp"
-#include "gus/core/crypto/key_derivation.hpp"
+#include "gus/core/crypto/aead_xchacha20poly1305.hpp"
+#include "gus/core/crypto/argon2id.hpp"
 #include "gus/domain/save/save_migrators.hpp"
 
 namespace gus::domain::save {
@@ -30,31 +31,48 @@ namespace {
 
 namespace crypto = gus::core::crypto;
 
-// MAGIC "GDS2" (GusDragon Save). O sufixo do magic NAO e a versao do schema (a
-// versao vive no payload, u32 inicial); distingue de templates ("GDT1").
-constexpr std::array<std::uint8_t, 4> kMagic = {'G', 'D', 'S', '2'};
-constexpr std::size_t kMagicLen = 4;
-constexpr std::size_t kLengthFieldLen = 4;
-constexpr std::size_t kHmacLen = crypto::kSha256DigestSize;       // 32
-constexpr std::size_t kHeaderLen = kMagicLen + kLengthFieldLen;   // 8
+// MAGIC "GDS3" (GusDragon Save v3, ADR-015). O sufixo do magic NAO e a versao do
+// schema (a versao vive no payload, u32 inicial); distingue de templates ("GDT1",
+// que segue INTOCADO no formato GDS2/HMAC).
+constexpr std::array<std::uint8_t, 4> kMagic = {'G', 'D', 'S', '3'};
+constexpr std::uint16_t kEnvelopeVersion = 1;  // versao do FORMATO do envelope
 
-// Chave de integridade DERIVADA (ADR-006 T2.2): em vez de embutida CRUA, a chave do
-// HMAC do save e derivada de um segredo-base + um contexto ("save-hmac"). Transparente
-// ao layout (so muda o VALOR do HMAC). NAO e sigilo (o segredo-base vive no binario,
-// extraivel por decompile): e soberania da ORIGEM da chave (nao aparece literal). O
-// contexto da separacao de dominio (save != templates). PROPRIA do SAVE.
-const std::vector<std::uint8_t>& embedded_key() {
-    static const std::vector<std::uint8_t> k = [] {
+constexpr std::size_t kMagicLen = 4;
+constexpr std::size_t kEnvelopeVerLen = 2;
+constexpr std::size_t kSlotIdLen = 4;
+constexpr std::size_t kRollbackCtrLen = 8;
+// AAD = magic || envelope_ver || slot_id || rollback_ctr (ADR-015 decisao 2).
+constexpr std::size_t kAadLen =
+    kMagicLen + kEnvelopeVerLen + kSlotIdLen + kRollbackCtrLen;  // 18
+constexpr std::size_t kNonceLen = crypto::kAeadNonceSize;        // 24
+constexpr std::size_t kCiphertextLenFieldLen = 4;
+constexpr std::size_t kTagLen = crypto::kAeadTagSize;  // 16
+// AAD || nonce || ciphertext_len, ANTES do ciphertext em si.
+constexpr std::size_t kHeaderLen = kAadLen + kNonceLen + kCiphertextLenFieldLen;  // 46
+
+// Chave AEAD derivada via Argon2id (ADR-015 decisao 3, piso OWASP default do
+// wrapper: m=19456 KiB/t=2/p=1) do MESMO segredo-base embutido do ADR-006/T2.2 +
+// sal fixo "gusworld-save-v2" (o contexto que o ADR chama de "sal"). SEM
+// fingerprint de maquina nesta onda (saves normais portaveis cross-PC; o slot
+// Hardcore machine-bound e a Onda 3). Cache estatico: a derivacao (custo de
+// dezenas de ms por design, memory-hard) roda uma vez por processo, nao por save.
+const std::array<std::uint8_t, crypto::kAeadKeySize>& aead_key() {
+    static const std::array<std::uint8_t, crypto::kAeadKeySize> k = [] {
         static const std::string base = "gusengine-cpp-2026-integrity-base-secret";
-        static const std::string ctx = "save-hmac";
-        return crypto::derive_key(
+        static const std::string salt = "gusworld-save-v2";
+        return crypto::derive_key_argon2id(
             reinterpret_cast<const std::uint8_t*>(base.data()), base.size(),
-            reinterpret_cast<const std::uint8_t*>(ctx.data()), ctx.size());
+            reinterpret_cast<const std::uint8_t*>(salt.data()), salt.size());
     }();
     return k;
 }
 
 // ---- writer binario (little-endian) ---------------------------------------
+
+void put_u16(std::vector<std::uint8_t>& out, std::uint16_t v) {
+    out.push_back(static_cast<std::uint8_t>(v & 0xFFu));
+    out.push_back(static_cast<std::uint8_t>((v >> 8) & 0xFFu));
+}
 
 void put_u32(std::vector<std::uint8_t>& out, std::uint32_t v) {
     out.push_back(static_cast<std::uint8_t>(v & 0xFFu));
@@ -467,75 +485,108 @@ std::vector<std::uint8_t> build_payload_v2(const SaveData& data) {
 
 }  // namespace
 
-// ---- envelope (pack/unpack) ------------------------------------------------
+// ---- envelope GDS3 (pack/unpack), ADR-015 decisao 2 -------------------------
 
-std::vector<std::uint8_t> pack_save(const std::vector<std::uint8_t>& payload) {
+std::vector<std::uint8_t> pack_save(const std::vector<std::uint8_t>& payload,
+                                    std::int32_t slot_id,
+                                    std::uint64_t rollback_ctr) {
+    // AAD = magic || envelope_ver || slot_id || rollback_ctr (os primeiros
+    // kAadLen bytes do envelope final - amarra esses campos NA TAG mesmo sem
+    // cifra-los, ADR-015 decisao 2).
+    std::vector<std::uint8_t> aad;
+    aad.reserve(kAadLen);
+    aad.insert(aad.end(), kMagic.begin(), kMagic.end());
+    put_u16(aad, kEnvelopeVersion);
+    put_i32(aad, slot_id);
+    put_u64(aad, rollback_ctr);
+
+    const auto nonce = crypto::generate_nonce();  // CSPRNG, nunca reusado
+    const auto locked = crypto::aead_lock(aead_key(), nonce, aad.data(), aad.size(),
+                                          payload.data(), payload.size());
+
     std::vector<std::uint8_t> buffer;
-    buffer.reserve(kHeaderLen + payload.size() + kHmacLen);
-
-    buffer.insert(buffer.end(), kMagic.begin(), kMagic.end());
-    put_u32(buffer, static_cast<std::uint32_t>(payload.size()));
-    buffer.insert(buffer.end(), payload.begin(), payload.end());
-
-    const auto tag = crypto::hmac_sha256(embedded_key().data(),
-                                         embedded_key().size(), buffer.data(),
-                                         buffer.size());
-    buffer.insert(buffer.end(), tag.begin(), tag.end());
+    buffer.reserve(kHeaderLen + locked.cipher_text.size() + kTagLen);
+    buffer.insert(buffer.end(), aad.begin(), aad.end());
+    buffer.insert(buffer.end(), nonce.begin(), nonce.end());
+    put_u32(buffer, static_cast<std::uint32_t>(locked.cipher_text.size()));
+    buffer.insert(buffer.end(), locked.cipher_text.begin(), locked.cipher_text.end());
+    buffer.insert(buffer.end(), locked.tag.begin(), locked.tag.end());
     return buffer;
 }
 
 std::vector<std::uint8_t> unpack_save(const std::vector<std::uint8_t>& data) {
-    if (data.size() < kHeaderLen + kHmacLen)
-        throw SaveCorruptError("Dados de save curtos demais (header + hmac).");
+    // Minimo: AAD(18) + nonce(24) + ciphertext_len(4) + ciphertext(>=0) + tag(16).
+    if (data.size() < kHeaderLen + kTagLen)
+        throw SaveCorruptError("Dados de save curtos demais (header + nonce + tag).");
 
     for (std::size_t i = 0; i < kMagicLen; ++i) {
         if (data[i] != kMagic[i])
-            throw SaveCorruptError("Magic bytes invalidos: nao e um save 'GDS2'.");
+            throw SaveCorruptError("Magic bytes invalidos: nao e um save 'GDS3'.");
     }
 
-    const std::uint32_t payload_len =
-        static_cast<std::uint32_t>(data[kMagicLen]) |
-        (static_cast<std::uint32_t>(data[kMagicLen + 1]) << 8) |
-        (static_cast<std::uint32_t>(data[kMagicLen + 2]) << 16) |
-        (static_cast<std::uint32_t>(data[kMagicLen + 3]) << 24);
+    const std::uint16_t envelope_ver =
+        static_cast<std::uint16_t>(data[kMagicLen]) |
+        (static_cast<std::uint16_t>(data[kMagicLen + 1]) << 8);
+    if (envelope_ver != kEnvelopeVersion)
+        throw SaveCorruptError("Versao de envelope desconhecida: " +
+                               std::to_string(envelope_ver));
+
+    // slot_id (i32) e rollback_ctr (u64) NAO precisam de leitura separada aqui:
+    // ja fazem parte dos primeiros kAadLen bytes usados como AAD abaixo. Qualquer
+    // adulteracao desses campos quebra a verificacao AEAD (nao um memcmp a parte,
+    // ADR-015 decisao 2 - simplifica o antigo T1.2 do ADR-007).
+
+    const std::size_t ciphertext_len_off = kAadLen + kNonceLen;
+    const std::uint32_t ciphertext_len =
+        static_cast<std::uint32_t>(data[ciphertext_len_off]) |
+        (static_cast<std::uint32_t>(data[ciphertext_len_off + 1]) << 8) |
+        (static_cast<std::uint32_t>(data[ciphertext_len_off + 2]) << 16) |
+        (static_cast<std::uint32_t>(data[ciphertext_len_off + 3]) << 24);
 
     const std::uint64_t expected_total =
-        static_cast<std::uint64_t>(kHeaderLen) + payload_len + kHmacLen;
+        static_cast<std::uint64_t>(kHeaderLen) + ciphertext_len + kTagLen;
     if (expected_total != data.size())
         throw SaveCorruptError(
             "Length inconsistente: total declarado != tamanho real.");
 
-    const std::size_t payload_end = kHeaderLen + payload_len;
+    std::array<std::uint8_t, kNonceLen> nonce{};
+    std::memcpy(nonce.data(), data.data() + kAadLen, kNonceLen);
 
-    const auto expected = crypto::hmac_sha256(embedded_key().data(),
-                                              embedded_key().size(), data.data(),
-                                              payload_end);
-    std::array<std::uint8_t, kHmacLen> actual{};
-    std::memcpy(actual.data(), data.data() + payload_end, kHmacLen);
-    if (!crypto::fixed_time_equals(expected, actual))
-        throw SaveIntegrityError("HMAC mismatch: save adulterado ou corrompido.");
+    const std::size_t ciphertext_off = kHeaderLen;
+    const std::size_t tag_off = ciphertext_off + ciphertext_len;
+    std::array<std::uint8_t, kTagLen> tag{};
+    std::memcpy(tag.data(), data.data() + tag_off, kTagLen);
 
-    return std::vector<std::uint8_t>(
-        data.begin() + static_cast<std::ptrdiff_t>(kHeaderLen),
-        data.begin() + static_cast<std::ptrdiff_t>(payload_end));
+    std::vector<std::uint8_t> plain;
+    const bool ok = crypto::aead_unlock(plain, aead_key(), nonce, data.data(),
+                                        kAadLen, data.data() + ciphertext_off, tag,
+                                        ciphertext_len);
+    if (!ok)
+        throw SaveIntegrityError(
+            "Tag AEAD nao bate: save adulterado ou corrompido.");
+
+    return plain;
 }
 
 // ---- serialize -------------------------------------------------------------
 
 std::vector<std::uint8_t> serialize_save(const SaveData& data) {
     data.validate();  // fail-fast antes de empacotar (std::invalid_argument)
-    return pack_save(build_payload_current(data));
+    // slot_id do envelope (AAD) = data.slot_id (mesmo valor selado dentro do
+    // payload); rollback_ctr = 0 (saves normais, ADR-015 Onda 2).
+    return pack_save(build_payload_current(data), data.slot_id);
 }
 
 std::vector<std::uint8_t> serialize_save_unchecked(const SaveData& data) {
-    return pack_save(build_payload_current(data));  // SO testes (sem validate)
+    // SO testes (sem validate).
+    return pack_save(build_payload_current(data), data.slot_id);
 }
 
 // ---- deserialize (version-aware, forward-only) -----------------------------
 
 SaveData deserialize_save(const std::vector<std::uint8_t>& data) {
-    // 1. Integridade primeiro: HMAC mismatch lanca SaveIntegrityError aqui, ANTES
-    //    de ler versao ou migrar (nunca migra bytes adulterados, CONTRACT §7).
+    // 1. Integridade primeiro: tag AEAD invalida lanca SaveIntegrityError aqui,
+    //    ANTES de ler versao ou migrar (nunca migra bytes adulterados, CONTRACT §7).
     const auto payload = unpack_save(data);
 
     // 2. Le a versao do payload validado (fonte canonica).
@@ -568,7 +619,7 @@ SaveData deserialize_save(const std::vector<std::uint8_t>& data) {
     // 5. Sobe pela chain ate a versao atual (no-op se ja == atual).
     SaveData migrated = migrate_to_current(std::move(decoded), version);
 
-    // 6. Defesa em profundidade: valida invariantes mesmo apos HMAC valido
+    // 6. Defesa em profundidade: valida invariantes mesmo apos tag AEAD valida
     //    (schema drift e possivel; payload forjado com chave vazada).
     migrated.validate();
     return migrated;
@@ -580,25 +631,25 @@ SaveData deserialize_save(const std::vector<std::uint8_t>& data) {
 // interno. A logica da chain fica em save_migrators.cpp.
 
 std::vector<std::uint8_t> serialize_save_v1(const SaveData& data) {
-    return pack_save(build_payload_v1(data, 1));
+    return pack_save(build_payload_v1(data, 1), data.slot_id);
 }
 
 std::vector<std::uint8_t> serialize_save_v2(const SaveData& data) {
-    return pack_save(build_payload_v2(data));
+    return pack_save(build_payload_v2(data), data.slot_id);
 }
 
 std::vector<std::uint8_t> serialize_save_v3(const SaveData& data) {
-    return pack_save(build_payload_v3(data));
+    return pack_save(build_payload_v3(data), data.slot_id);
 }
 
 std::vector<std::uint8_t> serialize_save_v4(const SaveData& data) {
-    return pack_save(build_payload_v4(data));
+    return pack_save(build_payload_v4(data), data.slot_id);
 }
 
 std::vector<std::uint8_t> make_v1_payload(int version) {
     SaveData minimal;
     minimal.current_scene_path = "res://forged.tscn";
-    return pack_save(build_payload_v1(minimal, version));
+    return pack_save(build_payload_v1(minimal, version), minimal.slot_id);
 }
 
 // ---- load_save (T1.1 detect-and-respond, NAO-lancante) ---------------------

@@ -125,13 +125,14 @@ TEST_CASE("tpl/fuzz: cada byte de magic corrompido rejeita como corrupcao",
     }
 }
 
-TEST_CASE("tpl/fuzz: magic de save (GDS2) num template rejeita (dominio cruzado)",
+TEST_CASE("tpl/fuzz: magic de save (GDS3, ADR-015) num template rejeita "
+          "(dominio cruzado)",
           "[domain][templates][fuzz]") {
     auto bytes = serialize_character(char_fixture());
     bytes[0] = 'G';
     bytes[1] = 'D';
     bytes[2] = 'S';
-    bytes[3] = '2';
+    bytes[3] = '3';
     REQUIRE_THROWS_AS(deserialize_character(bytes), TemplateCorruptError);
 }
 

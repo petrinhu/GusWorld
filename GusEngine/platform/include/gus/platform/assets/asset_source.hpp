@@ -49,7 +49,7 @@ struct AssetInfo {
 };
 
 // Interface do porteiro. So-leitura por decisao (ADR-013): staging de fonte pro glintfx
-// e save (envelope GDS2 proprio) NAO passam por aqui.
+// e save (envelope GDS3 proprio, ADR-015) NAO passam por aqui.
 class AssetSource {
 public:
     virtual ~AssetSource() = default;

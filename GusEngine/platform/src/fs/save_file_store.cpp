@@ -22,14 +22,20 @@ namespace gus::platform::fs {
 
 namespace {
 
-// MODOS-MORTE Fase 0 (secure_wipe_save): offsets do envelope GDS2
-// (gus/domain/save/save_serializer.hpp) - MAGIC(4)+LENGTH(4) no INICIO, HMAC(32,
-// SHA-256) no FIM. ESTAVEIS desde o V1 (o envelope em si nunca mudou, so o
-// PAYLOAD interno cresceu V1..V5) - duplicados aqui de proposito: platform/ nao
-// inclui o codec interno do domain/, so a FORMA do envelope, ja documentada e
-// publica no header do serializer.
-constexpr std::size_t kEnvelopeHeaderLen = 8;  // MAGIC(4) + LENGTH(4)
-constexpr std::size_t kEnvelopeHmacLen = 32;   // HMAC-SHA256
+// MODOS-MORTE Fase 0 (secure_wipe_save): escrito ANTES do envelope virar GDS3
+// (ADR-015 Onda 2). Estes offsets (8/32) eram MAGIC(4)+LENGTH(4) no INICIO e
+// HMAC(32, SHA-256) no FIM do GDS2 - NAO correspondem mais ao layout real do GDS3
+// (magic+envelope_ver+slot_id+rollback_ctr = 18 bytes no inicio; tag AEAD = 16
+// bytes no fim). NAO E UM REGRESSAO SILENCIOSA: corromper os primeiros 8 bytes de
+// QUALQUER envelope GDS3 ainda corrompe o MAGIC "GDS3" inteiro (bytes[0..4)),
+// e o unpack_save rejeita magic invalido como primeiro passo (SaveCorruptError)
+// antes mesmo de tentar decifrar - entao o wipe AINDA funciona (o arquivo fica
+// inutilizavel), so que por corromper o magic em vez de mirar precisamente a tag
+// AEAD. O crypto-shred APROPRIADO (sobrescrever SO nonce+tag, ADR-015 decisao 5)
+// e escopo da Onda 5 (SAVE-CRYPTO-V2-WIPE); ate la este wipe funciona mas nao usa
+// a vantagem "matematicamente irrecuperavel na hora" que o AEAD oferece.
+constexpr std::size_t kEnvelopeHeaderLen = 8;  // corrompe o MAGIC GDS3 (suficiente p/ rejeitar no load; nao mira o AAD/nonce inteiro)
+constexpr std::size_t kEnvelopeHmacLen = 32;   // corrompe a TAG AEAD (16) + parte do fim do ciphertext (16)
 
 std::string join(const std::string& a, const std::string& b) {
     if (a.empty()) return b;
@@ -188,10 +194,11 @@ bool delete_save(int slot, const std::string& dir) {
 
 namespace {
 
-// Sobrescreve o selo (header + HMAC, ver kEnvelopeHeaderLen/kEnvelopeHmacLen no
-// topo do arquivo) de UM arquivo (nome logico) e unlinka. Devolve true se, ao
-// final, o arquivo NAO existe mais (ausente de inicio conta como sucesso - no-op
-// idempotente, mesmo contrato de delete_save/FsSaveStore::remove).
+// Sobrescreve o selo (inicio + fim do envelope, ver kEnvelopeHeaderLen/
+// kEnvelopeHmacLen no topo do arquivo) de UM arquivo (nome logico) e unlinka.
+// Devolve true se, ao final, o arquivo NAO existe mais (ausente de inicio conta
+// como sucesso - no-op idempotente, mesmo contrato de delete_save/
+// FsSaveStore::remove).
 bool wipe_one(FsSaveStore& store, const std::string& name) {
     if (!store.exists(name)) return true;  // nada a apagar (idempotente)
 
@@ -206,8 +213,8 @@ bool wipe_one(FsSaveStore& store, const std::string& name) {
     }
 
     if (bytes.size() >= kEnvelopeHeaderLen + kEnvelopeHmacLen) {
-        // Corrompe MAGIC+LENGTH (inicio) e o bloco HMAC (fim) - o resto do
-        // payload fica intacto em disco, mas SEM selo valido o load ja rejeita
+        // Corrompe o MAGIC (inicio) e a regiao da tag AEAD (fim) - o resto do
+        // ciphertext fica intacto em disco, mas SEM selo valido o load ja rejeita
         // (SaveCorruptError/SaveIntegrityError, comportamento EXISTENTE hoje).
         std::fill(bytes.begin(),
                   bytes.begin() + static_cast<std::ptrdiff_t>(kEnvelopeHeaderLen),

@@ -4,7 +4,8 @@
 // permissoes 0700 (diretorio) / 0600 (arquivo), mesma tecnica de degradacao segura do
 // gus/platform/fs/settings_file_store.hpp (settings.json), aplicada aqui ao save de
 // verdade. DIFERENCA DE FORMATO deliberada: settings.json e texto JSON legivel (config
-// de conforto); o SAVE e BINARIO proprio (envelope GDS2 + HMAC, ADR-006) - o consumo e
+// de conforto); o SAVE e BINARIO proprio (envelope GDS3 + AEAD XChaCha20-Poly1305,
+// ADR-015 - era GDS2+HMAC/ADR-006 antes da Onda 2) - o consumo e
 // via gus::domain::save::load_save (nao-lancante, ADR-007 T1.1), NUNCA
 // gus::domain::save::deserialize_save (lancante, reservado a testes legados/uso
 // interno do proprio load_save).
@@ -148,8 +149,8 @@ class FsSaveStore final : public gus::domain::save::SaveStore {
 [[nodiscard]] bool delete_save(int slot, const std::string& dir);
 
 // MODOS-MORTE Fase 0 (Camada 3 essencial, docs/design/mecanicas/modos-morte.md
-// §2.3): sobrescreve o SELO do envelope GDS2 (MAGIC+LENGTH no INICIO + HMAC no
-// FIM, ver save_serializer.hpp) do PRIMARIO + da cadeia INTEIRA de backup
+// §2.3): sobrescreve o SELO do envelope (INICIO + FIM do arquivo, ver
+// save_serializer.hpp) do PRIMARIO + da cadeia INTEIRA de backup
 // (backup1..backup{kBackupChainDepth}) - torna cada arquivo INCARREGAVEL (o
 // load_save/load_game_from_backup JA rejeita qualquer payload sem selo valido,
 // comportamento EXISTENTE hoje - nao precisa de codigo novo de rejeicao). Depois
@@ -157,10 +158,15 @@ class FsSaveStore final : public gus::domain::save::SaveStore {
 // disco) + ZERA o buffer em RAM que leu o conteudo antigo (nao deixa o payload
 // sensivel residente na memoria do processo).
 //
-// NAO e o crypto-shred do ADR-014 (AEAD/machine-binding/ancora out-of-band) - isso
-// e fase FUTURA (Hardcore, so buildavel pos-fim-de-jogo, ver modos-morte.md §6
-// Fase 4). Isto aqui e a versao byte-overwrite sobre o selo HMAC ATUAL (GDS2),
-// disponivel JA (memoria project_morte_dificuldade_canon).
+// NAO e o crypto-shred do ADR-015 decisao 5 (mirar SO nonce+tag do envelope GDS3
+// pra tornar a destruicao criptograficamente instantanea) - isso e a Onda 5
+// (SAVE-CRYPTO-V2-WIPE), fase FUTURA (Hardcore, so buildavel pos-fim-de-jogo, ver
+// modos-morte.md §6 Fase 4). Isto aqui e a versao byte-overwrite ANTERIOR ao
+// ADR-015 (escrita quando o envelope ainda era GDS2+HMAC do ADR-006; hoje
+// funciona por acidente feliz - corromper o INICIO do arquivo corrompe o MAGIC do
+// GDS3, que o unpack_save ja rejeita ANTES de tentar decifrar - mas nao mira a
+// tag AEAD com precisao, ver comentario de kEnvelopeHeaderLen/kEnvelopeHmacLen em
+// save_file_store.cpp), disponivel JA (memoria project_morte_dificuldade_canon).
 //
 // Degradacao segura (NUNCA lanca por causa de I/O, MESMO espirito de
 // save_game/load_game/delete_save): um arquivo AUSENTE em qualquer nome logico e

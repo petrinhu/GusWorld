@@ -127,15 +127,15 @@ TEST_CASE("save_v4: slot_id diferente muda o selo",
 
 // ---- (b) tamper nas regioes novas quebra o selo ----------------------------
 
-TEST_CASE("save_v4: byte-flip em qualquer parte do payload rejeita (HMAC)",
+TEST_CASE("save_v4: byte-flip em qualquer parte do ciphertext rejeita (AEAD)",
           "[domain][save][v4]") {
-    // O backup e o hash sao os ULTIMOS campos do payload; um flip perto do fim
-    // (antes do bloco HMAC) cai na regiao nova. O envelope cobre tudo.
+    // O backup e o hash sao os ULTIMOS campos do payload (cifrado); um flip no
+    // ultimo byte do ciphertext (imediatamente antes da tag, ADR-015 GDS3) cai na
+    // regiao nova. A tag AEAD cobre o ciphertext inteiro.
     auto bytes = serialize_save(rich_v4());
-    const std::size_t hmac_len = 32;
-    REQUIRE(bytes.size() > hmac_len + 4);
-    // flip num byte do payload imediatamente antes do bloco HMAC (regiao do hash128).
-    bytes[bytes.size() - hmac_len - 1] ^= 0xFF;
+    const std::size_t tag_len = 16;  // ADR-015: tag Poly1305 (16 bytes no fim)
+    REQUIRE(bytes.size() > tag_len + 4);
+    bytes[bytes.size() - tag_len - 1] ^= 0xFF;  // ultimo byte do ciphertext
     REQUIRE_THROWS_AS(deserialize_save(bytes), SaveIntegrityError);
 }
 

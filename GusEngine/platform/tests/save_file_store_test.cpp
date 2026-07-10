@@ -148,7 +148,7 @@ TEST_CASE("load_game: arquivo PRESENTE mas corrompido devolve LoadResult::Corrup
     std::filesystem::create_directories(dir);
     {
         std::ofstream out(dir / "save_1.sav", std::ios::binary | std::ios::trunc);
-        out << "isso nao e um envelope GDS2 valido";
+        out << "isso nao e um envelope de save valido";
     }
 
     const auto outcome = load_game(1, dir.string());

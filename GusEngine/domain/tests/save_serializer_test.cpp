@@ -1,20 +1,26 @@
 // save_serializer_test.cpp
 //
-// Spec executavel (Catch2 v3) do SaveSerializer (envelope BINARIO PROPRIO +
-// HMAC-SHA256 do core/, ADR-006). Portado de
+// Spec executavel (Catch2 v3) do SaveSerializer (envelope BINARIO PROPRIO + AEAD
+// XChaCha20-Poly1305 do core/, ADR-015 GDS3 - substitui o GDS2/HMAC-SHA256 do
+// ADR-006 SO no save). Portado de
 // engine/foundation/save_system/SaveSerializer.cs (C#: JSON + HMAC) com ORACULO DE
 // EQUIVALENCIA SEMANTICA: o formato e NOSSO (binario compacto), NAO o JSON do C#.
 // NAO ha leitura de bytes do C#.
 //
-// Oraculo (ADR-006 decisao 3):
+// Oraculo (ADR-006 decisao 3, item (c) revisado pelo ADR-015):
 //   (a) roundtrip: SaveData -> serialize -> deserialize -> SaveData IDENTICO;
-//   (b) tamper: flip de 1 byte (magic/length/payload/hmac) -> REJEITA;
-//   (c) determinismo: mesmo objeto + mesma chave -> mesmo selo (bytes identicos);
+//   (b) tamper: flip de 1 byte (magic/envelope_ver/slot_id/rollback_ctr/nonce/
+//       ciphertext/tag) -> REJEITA;
+//   (c) determinismo SEMANTICO (NAO byte-a-byte): mesmo objeto serializado 2x
+//       produz bytes DIFERENTES (nonce aleatorio por escrita, ADR-015 decisao 1 -
+//       nunca reusar nonce), mas ambos decodificam pro MESMO SaveData;
 //   (d) validate no load: payload bem-formado mas schema-divergente -> rejeita.
 //
-// Envelope (little-endian): MAGIC "GDS2" || LENGTH(uint32) || PAYLOAD || HMAC(32),
-// HMAC sobre MAGIC||LENGTH||PAYLOAD. Payload = binario compacto proprio, inicia com
-// u32 schema_version (V2 atual, gus::domain::kSaveSchemaVersion).
+// Envelope GDS3 (little-endian): MAGIC "GDS3" || ENVELOPE_VER(u16) || SLOT_ID(i32)
+// || ROLLBACK_CTR(u64) || NONCE(24) || CIPHERTEXT_LEN(u32) || CIPHERTEXT ||
+// TAG(16). AAD = magic||envelope_ver||slot_id||rollback_ctr. Payload = binario
+// compacto proprio (cifrado), inicia com u32 schema_version (V5 atual,
+// gus::domain::kSaveSchemaVersion).
 //
 // CARIMBO (ADR-006 item 4): SaveData carrega timestamp_ms (data+hora+ms) como
 // metadado, INJETADO (nunca chama relogio dentro do domain). Roundtrippa intacto.
@@ -22,11 +28,14 @@
 // Subsistema: domain/save (marco M3). POCO puro, ZERO Qt, headless.
 //
 // Cross-ref: engine/foundation/save_system/SaveSerializer.cs (ref semantica),
-//            docs/tech/adr/ADR-006-crypto-hmac-formato-domain.md.
+//            docs/tech/adr/ADR-006-crypto-hmac-formato-domain.md,
+//            docs/tech/adr/ADR-015-save-security-v2-offline.md.
 
 #include <catch2/catch_test_macros.hpp>
 
+#include <algorithm>
 #include <cstdint>
+#include <set>
 #include <stdexcept>
 #include <string>
 #include <vector>
@@ -183,57 +192,144 @@ TEST_CASE("save: difficult_recovery_stage fora de [0,4] rejeitado no load (forja
 
 // ---- header binario valido -------------------------------------------------
 
-TEST_CASE("save: layout magic 'GDS2' || length || payload || hmac",
+TEST_CASE("save: layout magic 'GDS3' || envelope_ver || slot_id || rollback_ctr "
+          "|| nonce || ciphertext_len || ciphertext || tag",
           "[domain][save][serializer]") {
     const auto bytes = serialize_save(minimal_fixture());
 
     REQUIRE(bytes[0] == 'G');
     REQUIRE(bytes[1] == 'D');
     REQUIRE(bytes[2] == 'S');
-    REQUIRE(bytes[3] == '2');
+    REQUIRE(bytes[3] == '3');
 
-    const std::uint32_t declared = static_cast<std::uint32_t>(bytes[4]) |
-                                   (static_cast<std::uint32_t>(bytes[5]) << 8) |
-                                   (static_cast<std::uint32_t>(bytes[6]) << 16) |
-                                   (static_cast<std::uint32_t>(bytes[7]) << 24);
-    REQUIRE(declared == bytes.size() - 8u - 32u);
+    // envelope_ver (u16 LE, offset 4) == 1 (unica versao existente ate aqui).
+    const std::uint16_t envelope_ver =
+        static_cast<std::uint16_t>(bytes[4]) |
+        (static_cast<std::uint16_t>(bytes[5]) << 8);
+    REQUIRE(envelope_ver == 1);
+
+    // ciphertext_len (u32 LE, offset 18+24=42) + header(46) + tag(16) == total.
+    constexpr std::size_t kCiphertextLenOff = 42;
+    constexpr std::size_t kHeaderLen = 46;  // aad(18) + nonce(24) + len-field(4)
+    constexpr std::size_t kTagLen = 16;
+    const std::uint32_t ciphertext_len =
+        static_cast<std::uint32_t>(bytes[kCiphertextLenOff]) |
+        (static_cast<std::uint32_t>(bytes[kCiphertextLenOff + 1]) << 8) |
+        (static_cast<std::uint32_t>(bytes[kCiphertextLenOff + 2]) << 16) |
+        (static_cast<std::uint32_t>(bytes[kCiphertextLenOff + 3]) << 24);
+    REQUIRE(ciphertext_len == bytes.size() - kHeaderLen - kTagLen);
 }
 
 // ---- (b) tamper: byte-flip rejeitado em qualquer regiao --------------------
 
-TEST_CASE("save: flip no payload rejeita (HMAC nao bate)",
+TEST_CASE("save: flip no ciphertext rejeita (tag AEAD nao bate)",
           "[domain][save][serializer]") {
     auto bytes = serialize_save(rich_fixture());
     bytes[bytes.size() / 2] ^= 0xFF;
     REQUIRE_THROWS_AS(deserialize_save(bytes), SaveIntegrityError);
 }
 
-TEST_CASE("save: flip no bloco HMAC rejeita",
+TEST_CASE("save: flip no bloco da tag AEAD rejeita",
           "[domain][save][serializer]") {
     auto bytes = serialize_save(rich_fixture());
     bytes.back() ^= 0xFF;
     REQUIRE_THROWS_AS(deserialize_save(bytes), SaveIntegrityError);
 }
 
-TEST_CASE("save: flip no magic rejeita como corrupcao (antes do HMAC)",
+TEST_CASE("save: flip no magic rejeita como corrupcao (antes da verificacao AEAD)",
           "[domain][save][serializer]") {
     auto bytes = serialize_save(rich_fixture());
     bytes[0] ^= 0xFF;
     REQUIRE_THROWS_AS(deserialize_save(bytes), SaveCorruptError);
 }
 
-TEST_CASE("save: flip no campo length rejeita como corrupcao",
+TEST_CASE("save: flip no campo envelope_ver rejeita como corrupcao",
           "[domain][save][serializer]") {
     auto bytes = serialize_save(rich_fixture());
     bytes[4] ^= 0xFF;
     REQUIRE_THROWS_AS(deserialize_save(bytes), SaveCorruptError);
 }
 
-// ---- (c) determinismo ------------------------------------------------------
+// ---- (c) determinismo SEMANTICO (nao byte-a-byte, ADR-015) -----------------
+//
+// AEAD com nonce aleatorio (ADR-015 decisao 1): a MESMA chamada 2x NAO produz os
+// mesmos bytes (nonce diferente a cada escrita, por design - reuso de nonce e o
+// bug de crypto #1). O oraculo correto e semantico: os bytes DIFEREM, mas ambos
+// decodificam pro MESMO SaveData.
 
-TEST_CASE("save: serializacao deterministica (mesmo selo)",
+TEST_CASE("save: 2 serializacoes do MESMO objeto produzem bytes DIFERENTES "
+          "(nonce nunca reusado)",
           "[domain][save][serializer]") {
-    REQUIRE(serialize_save(rich_fixture()) == serialize_save(rich_fixture()));
+    const auto a = serialize_save(rich_fixture());
+    const auto b = serialize_save(rich_fixture());
+    REQUIRE(a != b);  // nonce aleatorio: nunca o mesmo ciphertext p/ o mesmo input
+    REQUIRE(deserialize_save(a) == deserialize_save(b));  // mas o MESMO conteudo
+
+    // Prova mais forte: o campo NONCE em si (offset [18,42), ADR-015 GDS3) difere
+    // entre as 2 escritas - nao e so o ciphertext que difere por acaso.
+    constexpr std::size_t kNonceOff = 18;
+    constexpr std::size_t kNonceLen = 24;
+    const bool nonce_equal = std::equal(a.begin() + kNonceOff,
+                                        a.begin() + kNonceOff + kNonceLen,
+                                        b.begin() + kNonceOff);
+    REQUIRE_FALSE(nonce_equal);
+}
+
+TEST_CASE("save: N serializacoes seguidas do MESMO objeto nunca repetem nonce",
+          "[domain][save][serializer]") {
+    // ADR-015 "Riscos/atencao" (a): reuso de nonce e o bug de crypto #1 (quebra
+    // confidencialidade E abre forjamento do MAC). 50 escritas seguidas do MESMO
+    // SaveData - o nonce (CSPRNG) nunca deve repetir.
+    constexpr std::size_t kNonceOff = 18;
+    constexpr std::size_t kNonceLen = 24;
+    std::set<std::vector<std::uint8_t>> seen_nonces;
+    for (int i = 0; i < 50; ++i) {
+        const auto bytes = serialize_save(rich_fixture());
+        const std::vector<std::uint8_t> nonce(bytes.begin() + kNonceOff,
+                                               bytes.begin() + kNonceOff + kNonceLen);
+        REQUIRE(seen_nonces.find(nonce) == seen_nonces.end());
+        seen_nonces.insert(nonce);
+    }
+    REQUIRE(seen_nonces.size() == 50u);
+}
+
+TEST_CASE("save: serializacao deterministica NO CONTEUDO decodificado",
+          "[domain][save][serializer]") {
+    REQUIRE(deserialize_save(serialize_save(rich_fixture())) ==
+            deserialize_save(serialize_save(rich_fixture())));
+}
+
+// ---- AAD binding (ADR-015 decisao 2): slot_id/rollback_ctr no header ------
+
+TEST_CASE("save: trocar o slot_id do HEADER (reusar save de outro slot) quebra "
+          "a tag AEAD (nao um memcmp a parte)",
+          "[domain][save][serializer][aad]") {
+    // pack_save embute slot_id=2 no header (AAD). Um atacante que reescreve so o
+    // campo slot_id do envelope (sem tocar ciphertext/nonce/tag) - simulando
+    // "renomear o arquivo de outro slot" - quebra a verificacao AEAD, porque o
+    // slot_id faz parte do AAD amarrado na tag (ADR-015 decisao 2), mesmo sendo
+    // um campo em CLARO (nao cifrado).
+    auto s = rich_fixture();
+    s.slot_id = 2;
+    auto bytes = serialize_save(s);
+
+    // slot_id (i32 LE) fica no offset [6,10) do envelope (magic[4]+envelope_ver[2]).
+    constexpr std::size_t kSlotIdOff = 6;
+    bytes[kSlotIdOff] ^= 0xFF;  // slot_id vira outro valor (ex.: 2 -> algo != 2)
+
+    REQUIRE_THROWS_AS(deserialize_save(bytes), SaveIntegrityError);
+}
+
+TEST_CASE("save: header intacto (slot_id nao tocado) decodifica normalmente",
+          "[domain][save][serializer][aad]") {
+    // Controle negativo do teste acima: sem tocar em nada, o roundtrip funciona
+    // (prova que o teste anterior falha PELA adulteracao do slot_id, nao por
+    // outro motivo).
+    auto s = rich_fixture();
+    s.slot_id = 2;
+    const auto bytes = serialize_save(s);
+    const auto restored = deserialize_save(bytes);
+    REQUIRE(restored.slot_id == 2);
 }
 
 TEST_CASE("save: objetos diferentes geram envelopes diferentes",
@@ -258,19 +354,19 @@ TEST_CASE("save: dados truncados rejeitam como corrupcao",
     REQUIRE_THROWS_AS(unpack_save(bytes), SaveCorruptError);
 }
 
-TEST_CASE("save: payload lixo com HMAC valido rejeita como corrupcao",
+TEST_CASE("save: payload lixo com tag AEAD valida rejeita como corrupcao",
           "[domain][save][serializer]") {
     const std::vector<std::uint8_t> garbage{0xDE, 0xAD, 0xBE, 0xEF};
-    const auto packed = pack_save(garbage);  // HMAC valido sobre lixo
+    const auto packed = pack_save(garbage);  // tag AEAD valida sobre lixo
     REQUIRE_THROWS_AS(deserialize_save(packed), SaveCorruptError);
 }
 
-// ---- (d) validate no load: schema-divergente apos HMAC valido --------------
+// ---- (d) validate no load: schema-divergente apos tag AEAD valida ----------
 
 TEST_CASE("save: load valida invariantes (HP negativo em payload forjado)",
           "[domain][save][serializer]") {
     // Um save normal recusaria HP negativo no fail-fast; um payload forjado com
-    // HMAC valido (chave vazou) ainda deve ser rejeitado no load por validate().
+    // tag AEAD valida (chave vazou) ainda deve ser rejeitado no load por validate().
     auto s = rich_fixture();
     // Forja HP negativo direto na struct, serializa SEM validar (helper de teste),
     // e prova que o LOAD rejeita.

@@ -23,8 +23,8 @@ namespace {
 
 namespace crypto = gus::core::crypto;
 
-// MAGIC "GMAP". Distingue de save("GDS2") e templates("GDT1"). O sufixo do magic
-// NAO e a versao (que vive no payload, u32 inicial).
+// MAGIC "GMAP". Distingue de save("GDS3", ADR-015) e templates("GDT1"). O sufixo
+// do magic NAO e a versao (que vive no payload, u32 inicial).
 constexpr std::array<std::uint8_t, 4> kMagic = {'G', 'M', 'A', 'P'};
 constexpr std::size_t kMagicLen = 4;
 constexpr std::size_t kLengthFieldLen = 4;

@@ -1,6 +1,6 @@
 // save_serializer_fuzz_test.cpp
 //
-// REFORCO DE QA (nao-bloqueante) do DECODER de save GDS2. O deserialize binario
+// REFORCO DE QA (nao-bloqueante) do DECODER de save GDS3 (ADR-015). O deserialize binario
 // recebe bytes NAO-CONFIAVEIS (arquivo no disco do user, possivelmente truncado,
 // corrompido por FS, ou adulterado de proposito). Este teste alimenta entradas
 // MALFORMADAS e exige REJEICAO com ERRO TIPADO (SaveCorruptError / SaveIntegrityError
@@ -11,7 +11,7 @@
 //
 // Tecnica: boundary values (truncamento em cada offset), equivalence partitioning
 // (magic / length / version), e fuzzing dirigido (bytes aleatorios deterministicos +
-// payloads HMAC-validos com campos invalidos / counts gigantes).
+// payloads AEAD-validos com campos invalidos / counts gigantes).
 //
 // NAO altera codigo de producao. Se um caso AQUI provar crash/UB/aceitacao-de-lixo,
 // e um achado para a thread principal levar ao lider (ver
@@ -84,10 +84,11 @@ TEST_CASE("save/fuzz: buffer vazio rejeita tipado", "[domain][save][fuzz]") {
     REQUIRE_THROWS_AS(deserialize_save({}), SaveCorruptError);
 }
 
-TEST_CASE("save/fuzz: buffers menores que header+hmac rejeitam tipado",
+TEST_CASE("save/fuzz: buffers menores que header+nonce+tag rejeitam tipado",
           "[domain][save][fuzz]") {
-    // header(8) + hmac(32) = 40 bytes minimos. Tudo abaixo e corrupcao estrutural.
-    for (std::size_t n = 1; n < 40; ++n) {
+    // ADR-015 GDS3: aad(18) + nonce(24) + ciphertext_len(4) + tag(16) = 62 bytes
+    // minimos (ciphertext vazio). Tudo abaixo e corrupcao estrutural.
+    for (std::size_t n = 1; n < 62; ++n) {
         std::vector<std::uint8_t> buf(n, 0xABu);
         REQUIRE_THROWS_AS(deserialize_save(buf), SaveCorruptError);
     }
@@ -133,50 +134,69 @@ TEST_CASE("save/fuzz: magic de template (GDT1) num save rejeita",
 
 // ---- length: gigante / zero / overflow (equivalence + boundary) ------------
 
-TEST_CASE("save/fuzz: length declarado gigante (0xFFFFFFFF) rejeita sem alocar",
+// Offsets fixos do envelope GDS3 (ADR-015): aad(18) = magic(4)+envelope_ver(2)+
+// slot_id(4)+rollback_ctr(8); nonce(24) logo apos; ciphertext_len(u32) no offset
+// 18+24=42; ciphertext depois; tag(16) no fim. Espelha save_serializer.cpp (o
+// teste NAO inclui o header real de producao: monta os bytes crus pra provar a
+// rejeicao ANTES de qualquer AEAD).
+constexpr std::size_t kAadLen = 18;
+constexpr std::size_t kNonceLenFuzz = 24;
+constexpr std::size_t kCiphertextLenOff = kAadLen + kNonceLenFuzz;  // 42
+constexpr std::size_t kHeaderLenFuzz = kCiphertextLenOff + 4;       // 46
+constexpr std::size_t kTagLenFuzz = 16;
+
+TEST_CASE("save/fuzz: ciphertext_len declarado gigante (0xFFFFFFFF) rejeita sem "
+          "alocar",
           "[domain][save][fuzz]") {
-    // Constroi um buffer pequeno cujo campo LENGTH afirma ~4 GiB de payload. O
-    // unpack deve detectar a inconsistencia (expected_total != data.size()) ANTES
-    // de qualquer leitura/alocacao guiada por esse length.
-    std::vector<std::uint8_t> buf = {'G', 'D', 'S', '2'};
-    put_u32_le(buf, 0xFFFFFFFFu);          // LENGTH gigante
-    buf.insert(buf.end(), 32, 0x00u);       // hmac placeholder (tamanho minimo)
+    // Constroi um envelope GDS3 pequeno cujo campo CIPHERTEXT_LEN afirma ~4 GiB.
+    // O unpack deve detectar a inconsistencia (expected_total != data.size())
+    // ANTES de qualquer leitura/alocacao guiada por esse length.
+    std::vector<std::uint8_t> buf = {'G', 'D', 'S', '3'};
+    buf.resize(kAadLen, 0x00u);                  // envelope_ver+slot_id+rollback_ctr
+    buf.resize(kAadLen + kNonceLenFuzz, 0x00u);  // nonce placeholder
+    put_u32_le(buf, 0xFFFFFFFFu);                 // CIPHERTEXT_LEN gigante
+    buf.insert(buf.end(), kTagLenFuzz, 0x00u);    // tag placeholder (tamanho minimo)
     REQUIRE_THROWS_AS(deserialize_save(buf), SaveCorruptError);
 }
 
-TEST_CASE("save/fuzz: length declarado zero num buffer maior rejeita",
+TEST_CASE("save/fuzz: ciphertext_len declarado zero num buffer maior rejeita",
           "[domain][save][fuzz]") {
-    std::vector<std::uint8_t> buf = {'G', 'D', 'S', '2'};
-    put_u32_le(buf, 0u);                     // LENGTH = 0 mas ha payload real
-    buf.insert(buf.end(), 16, 0x11u);        // bytes a mais
-    buf.insert(buf.end(), 32, 0x00u);        // hmac placeholder
+    std::vector<std::uint8_t> buf = {'G', 'D', 'S', '3'};
+    buf.resize(kAadLen, 0x00u);
+    buf.resize(kAadLen + kNonceLenFuzz, 0x00u);
+    put_u32_le(buf, 0u);                      // CIPHERTEXT_LEN = 0 mas ha payload real
+    buf.insert(buf.end(), 16, 0x11u);          // bytes a mais
+    buf.insert(buf.end(), kTagLenFuzz, 0x00u); // tag placeholder
     REQUIRE_THROWS_AS(deserialize_save(buf), SaveCorruptError);
 }
 
-TEST_CASE("save/fuzz: length off-by-one (real-1 e real+1) rejeita",
+TEST_CASE("save/fuzz: ciphertext_len off-by-one (real-1 e real+1) rejeita",
           "[domain][save][fuzz]") {
     const auto good = serialize_save(seed_fixture());
-    const std::uint32_t real_len = static_cast<std::uint32_t>(good.size() - 8u - 32u);
+    const std::uint32_t real_len = static_cast<std::uint32_t>(
+        good.size() - kHeaderLenFuzz - kTagLenFuzz);
     for (std::uint32_t delta : {static_cast<std::uint32_t>(real_len - 1u),
                                 static_cast<std::uint32_t>(real_len + 1u)}) {
         auto bytes = good;
-        bytes[4] = static_cast<std::uint8_t>(delta & 0xFFu);
-        bytes[5] = static_cast<std::uint8_t>((delta >> 8) & 0xFFu);
-        bytes[6] = static_cast<std::uint8_t>((delta >> 16) & 0xFFu);
-        bytes[7] = static_cast<std::uint8_t>((delta >> 24) & 0xFFu);
-        INFO("length declarado=" << delta << " real=" << real_len);
+        bytes[kCiphertextLenOff] = static_cast<std::uint8_t>(delta & 0xFFu);
+        bytes[kCiphertextLenOff + 1] = static_cast<std::uint8_t>((delta >> 8) & 0xFFu);
+        bytes[kCiphertextLenOff + 2] =
+            static_cast<std::uint8_t>((delta >> 16) & 0xFFu);
+        bytes[kCiphertextLenOff + 3] =
+            static_cast<std::uint8_t>((delta >> 24) & 0xFFu);
+        INFO("ciphertext_len declarado=" << delta << " real=" << real_len);
         REQUIRE_THROWS_AS(deserialize_save(bytes), SaveCorruptError);
     }
 }
 
-// ---- HMAC valido mas payload com COUNT/LEN interno gigante ------------------
+// ---- tag AEAD valida mas payload com COUNT/LEN interno gigante ------------------
 //
-// O caso mais perigoso: o envelope e CONSISTENTE (length casa, HMAC bate sobre o
+// O caso mais perigoso: o envelope e CONSISTENTE (length casa, tag AEAD bate sobre o
 // payload mentiroso) mas um count interno (ex.: tamanho de uma string ou de uma
 // lista) afirma bilhoes de elementos. O reader DEVE rejeitar via require()
 // (truncamento) e nao tentar reservar/alocar memoria absurda guiada pelo count.
 
-TEST_CASE("save/fuzz: payload HMAC-valido com string-len gigante rejeita",
+TEST_CASE("save/fuzz: payload AEAD-valido com string-len gigante rejeita",
           "[domain][save][fuzz]") {
     // Payload: u32 version(1) | i64 timestamp | f64 playtime | u32 scene_len GIGANTE
     // ... o reader le scene_len e o require() deve falhar (faltam bytes), lancando
@@ -188,12 +208,12 @@ TEST_CASE("save/fuzz: payload HMAC-valido com string-len gigante rejeita",
     put_u32_le(payload, 0xFFFFFFF0u);        // current_scene_path len GIGANTE
     // (sem os bytes da string: require() deve barrar)
 
-    const auto packed = pack_save(payload);  // HMAC valido sobre o payload mentiroso
+    const auto packed = pack_save(payload);  // tag AEAD valida sobre o payload mentiroso
     REQUIRE(rejects_with_any_exception(
         [&] { (void)deserialize_save(packed); }));
 }
 
-TEST_CASE("save/fuzz: payload HMAC-valido com list-count gigante rejeita",
+TEST_CASE("save/fuzz: payload AEAD-valido com list-count gigante rejeita",
           "[domain][save][fuzz]") {
     // Apos os campos escalares, party_roster e um list<str> cujo COUNT u32 afirma
     // ~4 bilhoes de strings. O reader nao deve travar/alocar; deve rejeitar quando
@@ -215,7 +235,7 @@ TEST_CASE("save/fuzz: payload HMAC-valido com list-count gigante rejeita",
 // ---- IMP-01: count interno gigante rejeita TIPADO ANTES de alocar ----------
 //
 // Defesa em profundidade (auditoria_seguranca_crypto.md IMP-01, CWE-789): um save
-// SELADO (HMAC VALIDO, o atacante tem a chave embarcada por design) cujo COUNT
+// SELADO (TAG AEAD VALIDA, o atacante tem a chave embarcada por design) cujo COUNT
 // interno de um list<str> afirma ~4 bilhoes de elementos. Antes do fix, o decoder
 // chamava reserve(count) ANTES de checar bytes restantes -> bad_alloc/length_error
 // (crash em vez de "save corrompido"). Apos o fix, bounded_count rejeita com
@@ -244,7 +264,7 @@ TEST_CASE("save/fuzz: version futura rejeita tipado (forward-only)",
           "[domain][save][fuzz]") {
     std::vector<std::uint8_t> payload;
     put_u32_le(payload, 9999u);              // version muito futura
-    const auto packed = pack_save(payload);  // HMAC valido; version ilegal
+    const auto packed = pack_save(payload);  // tag AEAD valida; version ilegal
     REQUIRE_THROWS_AS(deserialize_save(packed), SaveVersionTooNewError);
 }
 
@@ -267,9 +287,9 @@ TEST_CASE("save/fuzz: version 0xFFFFFFFF (negativa como int) rejeita tipado",
         [&] { (void)deserialize_save(packed); }));
 }
 
-// ---- HMAC valido + version OK mas payload truncado no meio dos campos -------
+// ---- tag AEAD valida + version OK mas payload truncado no meio dos campos -------
 
-TEST_CASE("save/fuzz: payload HMAC-valido truncado apos version rejeita",
+TEST_CASE("save/fuzz: payload AEAD-valido truncado apos version rejeita",
           "[domain][save][fuzz]") {
     // So a version, sem nenhum campo comum. require() para o 1o read deve barrar.
     std::vector<std::uint8_t> payload;
@@ -305,11 +325,11 @@ TEST_CASE("save/fuzz: 2000 buffers aleatorios (seed fixa) nunca crasham",
     SUCCEED("2000 iteracoes aleatorias sem crash/UB");
 }
 
-// ---- bytes aleatorios DENTRO de um envelope HMAC-valido --------------------
+// ---- bytes aleatorios DENTRO de um envelope AEAD-valido --------------------
 
-TEST_CASE("save/fuzz: payloads aleatorios HMAC-validos nunca crasham",
+TEST_CASE("save/fuzz: payloads aleatorios AEAD-validos nunca crasham",
           "[domain][save][fuzz]") {
-    // Aqui o envelope SEMPRE passa no HMAC (pack_save sela um payload aleatorio),
+    // Aqui o envelope SEMPRE passa na verificacao AEAD (pack_save sela um payload aleatorio),
     // forcando o DECODER DO PAYLOAD a lidar com lixo bem-selado. E o caminho que
     // mais exercita o Reader (version/strings/maps/counts arbitrarios).
     std::mt19937 rng(kSeed ^ 0x1234u);
@@ -335,5 +355,5 @@ TEST_CASE("save/fuzz: payloads aleatorios HMAC-validos nunca crasham",
     // Documenta quantos lixos passaram (esperado ~0). Nao falha o teste: provar
     // ausencia de CRASH e o objetivo. accepted>0 seria material p/ analise manual.
     INFO("payloads aleatorios aceitos como save valido: " << accepted);
-    SUCCEED("2000 payloads aleatorios HMAC-validos sem crash/UB");
+    SUCCEED("2000 payloads aleatorios AEAD-validos sem crash/UB");
 }

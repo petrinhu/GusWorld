@@ -5,8 +5,11 @@
 // atravessar parede; quem altera a matriz quebra o selo. POCO puro, ZERO Qt/SDL,
 // ZERO I/O (opera sobre bytes; o I/O de arquivo fica na fronteira app/).
 //
-// ENVELOPE (little-endian), identico em estrutura ao do save:
-//   [4]      MAGIC   = "GMAP" (Gus MAP). Distingue de save("GDS2")/templates("GDT1").
+// ENVELOPE (little-endian), identico em estrutura ao envelope de templates
+// ("GDT1") e ao envelope ANTIGO do save (GDS2/HMAC, ADR-006; o save trocou pra
+// AEAD no GDS3, ADR-015 - map/templates continuam neste padrao mais simples,
+// integridade sem sigilo, fora do escopo do ADR-015):
+//   [4]      MAGIC   = "GMAP" (Gus MAP). Distingue de save("GDS3")/templates("GDT1").
 //   [4]      LENGTH  = uint32 LE = tamanho do PAYLOAD em bytes.
 //   [LENGTH] PAYLOAD = serializacao binaria propria do TileMap (abaixo).
 //   [32]     HMAC    = HMAC-SHA256( MAGIC || LENGTH || PAYLOAD ), chave DERIVADA
