@@ -258,6 +258,16 @@ As rodadas anteriores (personas Opus, escores v1 e v2) ficam preservadas no hist
 
 Padrão: sob os pesos do jogo, só figuras de ideologia econômica explícita cravam um lado (os 4 austríacos à direita; os 2 socialistas à esquerda). Os 14 restantes (cientistas, matemáticos, ocultistas) são econ-moderados OU conservadores-autoritários cujo econ-direita é neutralizado pelo peso Liberty, e caem no centro. Isso é fiel (a maioria dos gênios históricos não tinha política extrema) e reproduzível. A decisão final de enquadramento in-fiction (centro puro = puzzle, ou desempate por eixo secundário) é do criador, em lote.
 
+**Classificação final in-fiction (decisão do criador em lote, AMB-09, 2026-07-11).** Os 14 centros foram desempatados pelo eixo secundário. Critério: **conservador forte = Authority ≥ 65% E Tradition ≥ 60%** (no bloco descritivo do engine) → **DIREITA/bom** (desafio de ajuda: vila/escolta/tesouro), pois conservador = bom na axiologia canônica; caso contrário → **CENTRO/neutro** (desafio de puzzle). Os civil-libertários fortes NÃO viram esquerda/mau (mesmo espírito da salvaguarda de herói). Resultado final:
+
+| Enquadramento in-fiction | Figuras | Desafio |
+| :--- | :--- | :--- |
+| **DIREITA / bom (11)** | Mises, Bastiat, Hayek, Menger (austríacos, direita direta) + Newton, Dee, Pitágoras, Volta, Euler, Maxwell, Planck (centros conservadores desempatados) | ajuda (vila / escolta / tesouro) |
+| **CENTRO / neutro (7)** | Faraday, Mandelbrot, Gödel, Ada, Turing, von Neumann, Bruno | puzzle (lógica) |
+| **ESQUERDA, herói, deferido (2)** | Einstein, Tesla | enquadramento decidido caso a caso na prosa/sidequest (não auto-vilão) |
+
+Total 20 figuras (Tusk fica de fora por fiat, blindado). Distribuição de sidequest: 11 ajuda, 7 puzzle, 2 deferido. A axiologia (direita/conservador = bom) e a salvaguarda de herói governam; o algoritmo dá a base econômica, o desempate por tradição/autoridade resolve o centro.
+
 **A "zona Einstein" (salvaguarda de figura heroica), re-ancorada.** A zona é definida como **±10 pontos em torno do escore do Einstein sob a fórmula vigente**. Sob v2 o Einstein pontua `rightness 0.287`, então a zona é `rightness` dentro de **[0.187, 0.387]**. Uma figura do roster de **reputação culturalmente heroica / amada** cujo escore caia nessa banda **não é automaticamente transformada em vilã**: sua classificação de espectro fica registrada, mas o enquadramento in-fiction (bom/mau/neutro) e o desafio da sidequest são **deferidos ao criador, decididos caso a caso**. Note a elegância: o Tesla (v2 0.354) agora cai dentro da zona, então o deferimento dele, originalmente concedido como decisão pontual do criador, vira aplicação de regra. Fora da banda vale a axiologia normal, embora o mesmo bom-senso de "herói não vira vilão" ainda possa disparar uma consulta ao criador.
 
 Para ser explícito mais uma vez: esses limiares, esse escalar, e toda essa calibração existem para tornar uma **categoria interna de design de jogo** consistente e reproduzível. Nada disso é, ou pretende ser, uma medição precisa do que qualquer pessoa real de fato acreditava.
@@ -313,6 +323,8 @@ Entries set **by authorial fiat** (no algorithm run) state so explicitly and lea
 ### Pending doubtful cases / Casos duvidosos pendentes (decidir no final)
 
 Creator directive (2026-07-11): during the v3 full re-run, **do not stop for each doubtful case; accumulate them here and decide them all together at the end.** A case is doubtful if it lands center (0.401-0.599), if a heroic figure lands left (Einstein zone or nearby), or if a former-fiat figure surprises. Each row gets a final creator decision in one batch, then migrates to the Ambiguity decision log. / Diretriz do criador: no reteste v3, **não parar por caso; acumular aqui e decidir tudo junto no final.**
+
+**RESOLVIDO / RESOLVED (2026-07-11, AMB-09):** todos os casos abaixo foram decididos em lote no fim do reteste v3. Os 14 centros: 7 conservadores (Newton, Dee, Pitágoras, Volta, Euler, Maxwell, Planck) viraram DIREITA/bom pelo desempate; 7 (Faraday, Mandelbrot, Gödel, Ada, Turing, von Neumann, Bruno) ficaram CENTRO/puzzle. Menger = direita-limiar aceita (direita/bom). Tesla = esquerda, herói, deferido. Ver a **tabela de classificação final in-fiction** e o **AMB-09** no log. A tabela abaixo fica como histórico do que foi acumulado. / All rows below were decided in one batch (AMB-09); table kept as history.
 
 | Case / Caso | v3 result / Resultado v3 | Why doubtful / Por que duvidoso | Options sketch / Esboço de opções |
 | :--- | :--- | :--- | :--- |
@@ -384,6 +396,12 @@ Corpo em pt-br (língua de trabalho); cada entrada = caso ambíguo levado ao cri
 - Opção 2, reforçar o Hayek com +2 rodadas (mediana das 5) antes de validar.
 - Opção 3, investigar Opus vs Fable a fundo antes de aceitar Fable como modelo dos personas (medo de compressão sistemática pro centro).
 - **Decisão do criador: aceitar (mediana 0.601); método validado sob Fable, seguir pro roster.**
+
+**AMB-09 (2026-07-11): tratamento dos 14 centros do roster (v3), decidido em lote no fim do reteste.** Todos os 14 confirmaram centro por redo 2x (nenhum flipou).
+- Opção 1, desempate conservador: centros com Authority ≥65% E Tradition ≥60% viram DIREITA/bom (desafio de ajuda; conservador=bom pela axiologia); civil-libertários/moderados ficam CENTRO/puzzle; nenhum civil-libertário vira mau (espírito da salvaguarda de herói). Dá variedade de sidequest.
+- Opção 2, todos centro/puzzle: escalar literal, 14 puzzles (pouca variedade).
+- Opção 3, desempate bidirecional: conservadores→direita, civil-libertários fortes→deferido como heróis, resto→centro.
+- **Decisão do criador: opção 1 (desempate conservador).** Resultado: 7 conservadores (Newton, Dee, Pitágoras, Volta, Euler, Maxwell, Planck) → DIREITA/bom; 7 (Faraday, Mandelbrot, Gödel, Ada, Turing, von Neumann, Bruno) → CENTRO/puzzle. Ver a tabela de classificação final in-fiction na seção do reteste v3.
 
 ### Filled records (by fiat) / Registros preenchidos (por fiat)
 
