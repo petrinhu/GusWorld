@@ -260,7 +260,7 @@ The figures below are classified via the full persona + 8values + triple-check p
 | OCU-02 | John Dee | pending / pendente | to fill per round / a preencher conforme rodada |
 | OCU-03 | Pythagoras / Pitágoras | pending / pendente | to fill per round / a preencher conforme rodada |
 | ECO-01 | Hayek | pending / pendente | right-leaning **calibration anchor** / **âncora de calibração** de direita |
-| ECO-02 | Mises | **done / feito** | RIGHT/DIREITA, rightness 0.846 — see Computed records above / ver Registros computados acima; calibration anchor ✓ |
+| ECO-02 | Mises | **done / feito** | RIGHT/DIREITA, rightness 0.846 (see Computed records above / ver Registros computados acima); calibration anchor ✓ |
 
 External calibration-only figures (Marx, Mao Zedong) are **not** part of the game roster and get no in-game record; they exist solely as known-left controls in the calibration test. / Figuras externas só-de-calibração (Marx, Mao Tsé-tung) **não** fazem parte do roster do jogo e não têm registro in-game; existem apenas como controles conhecidos de esquerda no teste de calibração.
 
