@@ -475,6 +475,12 @@ Corpo em pt-br (língua de trabalho); cada entrada = caso ambíguo levado ao cri
 
 **AMB-15 (2026-07-11, loop de prosa, Planck FIS-03): exceção de formato (o §3 pode variar de tema quando o design doc do mestre justificar).** Nos pilotos o §3 trata da relação com AUTORIDADE INSTITUCIONAL; no Planck o §3 é humildade epistêmica (o design doc `07-planck.md` crava isso como ângulo central) e o tema de autoridade migrou pro §4 (o mando ilegítimo). Ruling do CPO: **ACEITAR a variação** (paridade é formato, não camisa-de-força; realinhar seria over-fitting). **Decisão AUTÔNOMA; confirmar retroativamente.** Vale pros 16 docs seguintes: variação de §3 permitida quando o design doc do mestre justificar.
 
+**AMB-16 (2026-07-11, loop de prosa, Gödel MAT-03): dose de velado do elo Gödel↔segredo do endgame (a "exceção irredutível que só se contém, não se elimina").** O design doc `10-godel.md` amarra a incompletude ao Patch-Zero / Anomalia Primeira / protocolo de contenção (cosmologia SECRETA). Capitolino recomendou Nível 2 e ESCALOU ao líder (one-way door narrativo: semear o endgame em prosa de repo público).
+- Nível 1: só o teorema + déjà-vu; zero "gerações depois" (fecho mais frio).
+- Nível 2: o §6 alude, velado e sem nomear, que estudiosos usaram o teorema pra entender por que algo que não cabia em sistema nenhum só podia ser contido de fora, nunca eliminado (padrão do fecho do Euler).
+- Nível 3: nomear Patch-Zero (VETADO pelo CPO; spoila o endgame).
+- **Decisão do líder (AskUserQuestion, 2026-07-11): Nível 2.** UMA frase no §6, sem nomear o quê/quem/quando/quantas camadas. Grep de segredo (Patch-Zero/Anomalia/-820/vetor central/contenção/cinco camadas/oitenta e nove) deve dar 0.
+
 **Convenções do loop de prosa (registradas p/ não reincidir):** (1) **métrica de banda de palavras = SÓ o corpo** (§1 ao fim da §6, excluindo blockquote de status e rodapé de grounding); pilotos 1162-1344, teto de série ~1580 de corpo. (2) **Citação de pares:** nomes SIM, ordem temporal NÃO (permitido "na mesma rede que também abrigou Faraday, Maxwell e Volta"; proibido "antes/depois/uma geração/viria a" e linhagem mestre-a-mestre). (3) Remediação de prosa SEMPRE volta ao `narrative-writer` (nunca inline); cap de 3 rodadas por figura, senão escala ao CPO.
 
 ### Per-character records (sorted by domain/ID) / Registros por personagem (ordenados por domínio/ID)
