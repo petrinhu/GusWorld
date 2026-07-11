@@ -313,6 +313,15 @@ Creator directive (2026-07-11): during the v3 full re-run, **do not stop for eac
 | ECO-03 Menger | rightness_v2 **0.601** (Classical Liberalism) | direita, mas na exata margem (0.601, igual ao Hayek) | aceitar direita-limiar · confirmar |
 | FIS-02 Newton | rightness_v2 **0.556** (Right-Wing Populism) | econ/tradição/nação direita, mas Authority 77% (Liberty 23%) puxa ao centro | centro/puzzle · direita/bom por desempate conservador |
 | FIS-03 Planck | rightness_v2 **0.464** (centro) | econ centrista + autoritário 70% + nação 61%; conservador prussiano | centro/puzzle · direita/bom por desempate conservador |
+| MAT-01 Mandelbrot | rightness_v2 **0.487** (Liberalism) | econ centro + civil-libertário; refugiado anti-establishment | centro/puzzle · redo 2x |
+| MAT-02 Euler | rightness_v2 **0.480** (Right-Wing Populism) | econ centro + autoritário 73% + tradição 66% (calvinista servo de monarcas) | centro/puzzle · direita/desempate · redo 2x |
+| MAT-03 Gödel | rightness_v2 **0.497** (Centrist) | quase 50/50 em tudo (apolítico, teísta-platonista) | centro/puzzle · redo 2x |
+| CMP-01 Ada | rightness_v2 **0.586** (Neo-Liberalism) | econ direita 70% mas Authority 61% (aristocrata Whig) | centro/puzzle · direita/desempate · redo 2x |
+| CMP-02 Turing | rightness_v2 **0.451** (Social Democracy) | econ centro-esq + civil-libertário 71% (perseguido pelo Estado) | centro/puzzle · redo 2x |
+| CMP-03 von Neumann | rightness_v2 **0.562** (Neo-Liberalism) | econ dir 66% + nação 65% mas Liberty modera (anti-comunista hawk) | centro/puzzle · direita/desempate · redo 2x |
+| OCU-01 Bruno | rightness_v2 **0.481** (Social Democracy) | econ centro + civil-libertário radical (livre-pensador queimado) | centro/puzzle · redo 2x |
+| OCU-02 Dee | rightness_v2 **0.470** (Right-Wing Populism) | econ centro + autoritário 79% + tradição 65% (monarquista imperialista) | centro/puzzle · direita/desempate · redo 2x |
+| OCU-03 Pitágoras | rightness_v2 **0.445** (Theocratic Distributism) | econ centro + autoritário 78% + tradição 68% (aristocrata-hierárquico) | centro/puzzle · direita/desempate · redo 2x |
 
 ### Ambiguity decision log / Registro de decisões de ambiguidade
 
