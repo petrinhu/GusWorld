@@ -101,7 +101,9 @@ std::array<std::uint8_t, kSha256DigestSize> sha256(const std::uint8_t* data,
     // comprimento da mensagem em BITS como big-endian de 64 bits.
     std::uint8_t tail[2 * kSha256BlockSize] = {0};
     const std::size_t rem = size - offset;
-    std::memcpy(tail, data + offset, rem);
+    if (rem > 0) {
+        std::memcpy(tail, data + offset, rem);
+    }
     tail[rem] = 0x80;
 
     // Se nao couber o length de 8 bytes no bloco atual (rem >= 56), usa 2 blocos.

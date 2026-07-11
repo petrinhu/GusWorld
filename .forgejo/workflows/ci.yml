@@ -185,10 +185,26 @@ jobs:
             LSAN_OPTIONS=suppressions=tools/lsan.supp \
             ./GusEngine/build/asan/platform/tests/gusengine_platform_tests
 
+      # APP-ASAN-RMLUI-UBSAN (fechado 2026-07-10, commit ae10d61): patch vendorizado
+      # (glintfx v0.9.1/rmlui-2cd28864-teardown-ub.patch) eliminou o UB de teardown do
+      # RmlUi (vptr findings = 0). O leak residual (~6.5-6.8KB/153 allocs, one-time na
+      # criacao do 1o contexto GL, driver GLVND/EGL - libEGL_nvidia.so.LoadVendors
+      # neste host de dev) NAO se reproduz no CONTAINER real do CI: reproduzido
+      # byte-a-byte via `docker run ghcr.io/catthehacker/ubuntu:act-latest` (mesma
+      # imagem deste job) SEM Xvfb/DISPLAY/dev-dri (== ambiente real deste job) - o
+      # unico teste que abre GL real (save_load_menu_interaction_test.cpp) degrada
+      # GRACIOSAMENTE (SDL nao acha X11/Wayland/kmsdrm; "assertions: - none -" nos 4
+      # TEST_CASE do harness) e a suite fecha 0 leaks, exit 0 (4428 assertions/650
+      # test cases). LSAN_OPTIONS aqui e defensivo/consistente com o step platform/
+      # (mesmo arquivo de suppression, hoje so cobre AUD-MINIAUDIO-ALSA-LEAK) - NAO
+      # foi adicionada nenhuma linha nova a tools/lsan.supp pro leak GL/EGL porque ele
+      # nao ocorre nas condicoes reais deste job (nao ha frame real de CI pra provar
+      # um match estreito contra).
       - name: Test app/ under ASan/UBSan
         run: |
           set -eux
           ASAN_OPTIONS=detect_leaks=1 UBSAN_OPTIONS=print_stacktrace=1,halt_on_error=1 \
+            LSAN_OPTIONS=suppressions=tools/lsan.supp \
             ./GusEngine/build/asan/app/tests/gusengine_app_tests
 
 # ---------------------------------------------------------------------------
