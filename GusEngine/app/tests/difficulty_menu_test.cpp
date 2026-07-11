@@ -41,7 +41,8 @@ TEST_CASE("difficulty_menu_open: foco inicial = Medio (default canonico §2.1)",
 
 // ---------------------------------------------------------------- navegacao (todos selecionaveis)
 
-TEST_CASE("difficulty_menu_key_down: Baixo/Cima visitam os 3 itens com wrap",
+TEST_CASE("difficulty_menu_key_down: Baixo/Cima visitam os 4 itens com wrap "
+          "(Hardcore INCLUSO, navegavel mesmo bloqueado)",
           "[difficulty_menu]") {
     DifficultyMenuState state;
     difficulty_menu_open(state);
@@ -50,9 +51,11 @@ TEST_CASE("difficulty_menu_key_down: Baixo/Cima visitam os 3 itens com wrap",
     REQUIRE(difficulty_menu_key_down(state, SDLK_DOWN) == DifficultyMenuAction::None);
     REQUIRE(state.selected == static_cast<int>(DifficultyMenuItem::Dificil));
     REQUIRE(difficulty_menu_key_down(state, SDLK_DOWN) == DifficultyMenuAction::None);
+    REQUIRE(state.selected == static_cast<int>(DifficultyMenuItem::Hardcore));
+    REQUIRE(difficulty_menu_key_down(state, SDLK_DOWN) == DifficultyMenuAction::None);
     REQUIRE(state.selected == static_cast<int>(DifficultyMenuItem::Facil));  // wrap
     REQUIRE(difficulty_menu_key_down(state, SDLK_UP) == DifficultyMenuAction::None);
-    REQUIRE(state.selected == static_cast<int>(DifficultyMenuItem::Dificil));
+    REQUIRE(state.selected == static_cast<int>(DifficultyMenuItem::Hardcore));
 }
 
 TEST_CASE("difficulty_menu_key_down: WASD espelha as setas", "[difficulty_menu]") {
@@ -121,6 +124,63 @@ TEST_CASE("difficulty_menu_key_down: ESC na LISTA (fora do splash) devolve "
     DifficultyMenuState state;
     difficulty_menu_open(state);
     REQUIRE(difficulty_menu_key_down(state, SDLK_ESCAPE) == DifficultyMenuAction::Cancelled);
+}
+
+// ---------------------------------------------------------------- Hardcore BLOQUEADO (scope-add 2026-07-10)
+
+TEST_CASE("difficulty_item_selectable: Facil/Medio/Dificil sempre selecionaveis; "
+          "Hardcore SO se hardcore_unlocked",
+          "[difficulty_menu]") {
+    DifficultyMenuState state;
+    difficulty_menu_open(state);  // hardcore_unlocked=false (default Fase 0)
+    REQUIRE(difficulty_item_selectable(state, static_cast<int>(DifficultyMenuItem::Facil)));
+    REQUIRE(difficulty_item_selectable(state, static_cast<int>(DifficultyMenuItem::Medio)));
+    REQUIRE(difficulty_item_selectable(state, static_cast<int>(DifficultyMenuItem::Dificil)));
+    REQUIRE_FALSE(
+        difficulty_item_selectable(state, static_cast<int>(DifficultyMenuItem::Hardcore)));
+    REQUIRE_FALSE(difficulty_item_selectable(state, -1));
+    REQUIRE_FALSE(difficulty_item_selectable(state, 99));
+
+    difficulty_menu_open(state, /*hardcore_unlocked=*/true);
+    REQUIRE(
+        difficulty_item_selectable(state, static_cast<int>(DifficultyMenuItem::Hardcore)));
+}
+
+TEST_CASE("difficulty_menu_key_down: Enter no Hardcore BLOQUEADO e no-op TOTAL "
+          "(nao abre o splash)",
+          "[difficulty_menu]") {
+    DifficultyMenuState state;
+    difficulty_menu_open(state);  // hardcore_unlocked=false
+    state.selected = static_cast<int>(DifficultyMenuItem::Hardcore);
+    REQUIRE(difficulty_menu_key_down(state, SDLK_RETURN) == DifficultyMenuAction::None);
+    REQUIRE_FALSE(state.confirming);
+    REQUIRE(state.selected == static_cast<int>(DifficultyMenuItem::Hardcore));  // foco preservado
+}
+
+TEST_CASE("difficulty_menu_click_option: clicar no Hardcore BLOQUEADO e no-op "
+          "TOTAL (nem o foco muda)",
+          "[difficulty_menu]") {
+    DifficultyMenuState state;
+    difficulty_menu_open(state);  // hardcore_unlocked=false, foco em Medio
+    REQUIRE(difficulty_menu_click_option(
+                state, static_cast<int>(DifficultyMenuItem::Hardcore)) ==
+            DifficultyMenuAction::None);
+    REQUIRE_FALSE(state.confirming);
+    REQUIRE(state.selected == static_cast<int>(DifficultyMenuItem::Medio));  // intocado
+}
+
+TEST_CASE("difficulty_menu_key_down: com hardcore_unlocked=true, Hardcore "
+          "confirma normalmente (Chosen)",
+          "[difficulty_menu]") {
+    DifficultyMenuState state;
+    difficulty_menu_open(state, /*hardcore_unlocked=*/true);
+    state.selected = static_cast<int>(DifficultyMenuItem::Hardcore);
+    REQUIRE(difficulty_menu_key_down(state, SDLK_RETURN) == DifficultyMenuAction::None);
+    REQUIRE(state.confirming);
+    REQUIRE(difficulty_menu_key_down(state, SDLK_LEFT) == DifficultyMenuAction::None);
+    REQUIRE(state.confirm_selected == 0);
+    REQUIRE(difficulty_menu_key_down(state, SDLK_RETURN) == DifficultyMenuAction::Chosen);
+    REQUIRE(difficulty_level_for_item(state.selected) == DifficultyLevel::Hardcore);
 }
 
 // ---------------------------------------------------------------- mouse (click)

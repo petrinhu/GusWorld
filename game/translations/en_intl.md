@@ -209,6 +209,12 @@ If you lose, you wake up at the Hospital. Costs a bit of credit.
 ## SAVE_DIFFICULTY_DIFICIL_DESC
 If you lose, you wake up far away and badly weakened. You recover gradually.
 
+## SAVE_DIFFICULTY_HARDCORE_LABEL
+
+## SAVE_DIFFICULTY_HARDCORE_DESC_LOCKED
+
+## SAVE_DIFFICULTY_HARDCORE_DESC_UNLOCKED
+
 ## SAVE_DIFFICULTY_CONFIRM_TITLE_FACIL
 Play on Easy?
 

@@ -129,8 +129,17 @@ DifficultyLoopExit run_difficulty_menu_loop_gl_current(
     const gus::app::i18n::Translator& translator,
     gus::domain::save::DifficultyLevel* out_difficulty,
     const std::string& frozen_background_png) {
+    // TODO Fase 4 - ler da ANCORA selada (ADR-015 + modos-morte.md
+    // §2.3b: o unlock do Hardcore mora DENTRO da mesma ancora selada+
+    // machine-bound do save-crypto, setado na vitoria do Dificil - nao ha
+    // profile.json/flag soft, proposta rejeitada pelo lider). Nesta Fase 0 e o
+    // UNICO estado alcancavel: hardcoded false - Hardcore fica visivel mas
+    // SEMPRE bloqueado (scope-add REVISAO 2026-07-10, "cenoura" - ver o
+    // comentario grande em difficulty_menu.hpp).
+    constexpr bool kHardcoreUnlockedFase0 = false;
+
     DifficultyMenuState state;
-    difficulty_menu_open(state);
+    difficulty_menu_open(state, kHardcoreUnlockedFase0);
 
     int pw = 0, ph = 0;
     SDL_GetWindowSizeInPixels(window, &pw, &ph);
@@ -330,7 +339,14 @@ DifficultyLoopExit run_difficulty_menu_loop_gl_current(
                             ("difficulty-item-" + std::to_string(i)).c_str());
                         if (!hit_test(box, ev.button.x, ev.button.y)) continue;
                         handled = true;
-                        audio.play_sfx(click_sfx_id);  // todos os 3 sempre selecionaveis
+                        // Clicar no Hardcore BLOQUEADO e no-op TOTAL (ver
+                        // difficulty_menu_click_option) - sem som tambem, MESMA
+                        // semantica "nao reage a nada" de title_menu_loop.cpp
+                        // pra "Continuar" desabilitado (Facil/Medio/Dificil
+                        // sempre selecionaveis, som sempre toca).
+                        if (difficulty_item_selectable(state, i)) {
+                            audio.play_sfx(click_sfx_id);
+                        }
                         const DifficultyMenuAction action =
                             difficulty_menu_click_option(state, i);
                         if (const auto exit = route_action(action)) return *exit;

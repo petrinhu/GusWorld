@@ -34,6 +34,9 @@ Translator make_translator() {
         "## SAVE_DIFFICULTY_MEDIO_DESC\nAcorda no Hospital\n\n"
         "## SAVE_DIFFICULTY_DIFICIL_LABEL\nDificil\n\n"
         "## SAVE_DIFFICULTY_DIFICIL_DESC\nAcorda longe e fraco\n\n"
+        "## SAVE_DIFFICULTY_HARDCORE_LABEL\nHardcore\n\n"
+        "## SAVE_DIFFICULTY_HARDCORE_DESC_LOCKED\nAlgo sombrio aguarda\n\n"
+        "## SAVE_DIFFICULTY_HARDCORE_DESC_UNLOCKED\nSo para os valorosos\n\n"
         "## SAVE_DIFFICULTY_CONFIRM_TITLE_FACIL\nJogar no Facil?\n\n"
         "## SAVE_DIFFICULTY_CONFIRM_TITLE_MEDIO\nJogar no Medio?\n\n"
         "## SAVE_DIFFICULTY_CONFIRM_TITLE_DIFICIL\nJogar no Dificil?\n\n"
@@ -141,4 +144,42 @@ TEST_CASE("build_difficulty_menu_rml: pressed_index marca o item certo com a "
     const auto pos = rml.find("id=\"difficulty-item-2\"");
     const auto div_start = rml.rfind("<div class=\"", pos);
     REQUIRE(rml.substr(div_start, pos - div_start).find("pressed") != std::string::npos);
+}
+
+// ---------------------------------------------------------------- Hardcore BLOQUEADO (scope-add 2026-07-10)
+
+TEST_CASE("build_difficulty_menu_rml: 4o card Hardcore aparece SEMPRE, com "
+          "classe 'locked', badge [BLOQUEADO] e a DESC locked",
+          "[difficulty_menu_rml]") {
+    DifficultyMenuState state;
+    difficulty_menu_open(state);  // hardcore_unlocked=false (Fase 0)
+
+    const std::string rml = build_difficulty_menu_rml(state, make_translator());
+    REQUIRE(rml.find("id=\"difficulty-item-3\"") != std::string::npos);
+    REQUIRE(rml.find("Hardcore") != std::string::npos);
+    REQUIRE(rml.find("Algo sombrio aguarda") != std::string::npos);
+    REQUIRE(rml.find("So para os valorosos") == std::string::npos);  // desc unlocked NAO aparece
+    REQUIRE(rml.find("[BLOQUEADO]") != std::string::npos);
+
+    const auto pos3 = rml.find("id=\"difficulty-item-3\"");
+    const auto div3 = rml.rfind("<div class=\"", pos3);
+    const std::string card3 = rml.substr(div3, pos3 - div3);
+    REQUIRE(card3.find("locked") != std::string::npos);
+    REQUIRE(card3.find("sel") == std::string::npos);  // foco inicial e Medio, nao Hardcore
+}
+
+TEST_CASE("build_difficulty_menu_rml: hardcore_unlocked=true mostra a DESC "
+          "unlocked e NAO marca 'locked' nem o badge",
+          "[difficulty_menu_rml]") {
+    DifficultyMenuState state;
+    difficulty_menu_open(state, /*hardcore_unlocked=*/true);
+
+    const std::string rml = build_difficulty_menu_rml(state, make_translator());
+    REQUIRE(rml.find("So para os valorosos") != std::string::npos);
+    REQUIRE(rml.find("Algo sombrio aguarda") == std::string::npos);
+    REQUIRE(rml.find("[BLOQUEADO]") == std::string::npos);
+
+    const auto pos3 = rml.find("id=\"difficulty-item-3\"");
+    const auto div3 = rml.rfind("<div class=\"", pos3);
+    REQUIRE(rml.substr(div3, pos3 - div3).find("locked") == std::string::npos);
 }

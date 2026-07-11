@@ -287,7 +287,7 @@ Essa escolha é definitiva pra este save. Pra jogar diferente, crie um save novo
 Fácil
 
 ## SAVE_DIFFICULTY_FACIL_DESC
-Se perder, volta pro seu último save.
+Uma experiência tranquila, só pra curtir o lore e os cenários.
 
 ## SAVE_DIFFICULTY_MEDIO_LABEL
 Médio
@@ -296,13 +296,22 @@ Médio
 Recomendado
 
 ## SAVE_DIFFICULTY_MEDIO_DESC
-Se perder, acorda no Hospital. Custa um pouco de crédito.
+O risco é de verdade, mas nunca trava sua jornada.
 
 ## SAVE_DIFFICULTY_DIFICIL_LABEL
 Difícil
 
 ## SAVE_DIFFICULTY_DIFICIL_DESC
-Se perder, acorda longe e bem fraco. Recupera aos poucos.
+Uma experiência tensa e desafiadora.
+
+## SAVE_DIFFICULTY_HARDCORE_LABEL
+Hardcore
+
+## SAVE_DIFFICULTY_HARDCORE_DESC_LOCKED
+Algo mais sombrio aguarda além do Difícil. Vença-o pra desbloquear.
+
+## SAVE_DIFFICULTY_HARDCORE_DESC_UNLOCKED
+Apenas para os mais valorosos, que arriscam tudo numa vida só. NÃO TEM SAVE AQUI. Jogue por sua conta e risco.
 
 ## SAVE_DIFFICULTY_CONFIRM_TITLE_FACIL
 Jogar no Fácil?

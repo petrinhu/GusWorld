@@ -30,12 +30,12 @@ body { font-family: "Pixel Operator Mono"; background: transparent; width: 100%;
 }
 #difficulty-panel {
   box-sizing: border-box;
-  position: absolute; top: 50%; left: 50%; margin-left: -220dp; margin-top: -190dp;
+  position: absolute; top: 50%; left: 50%; margin-left: -220dp; margin-top: -228dp;
   width: 440dp;
   decorator: linear-gradient( 180deg, #3A4566 0%, #1B2238 42%, #0A0E1A 100% );
   border: 1dp #7A5A2E;
   border-radius: 20dp;
-  padding: 26dp 22dp 20dp 22dp;
+  padding: 20dp 22dp 14dp 22dp;
   text-align: center;
   box-shadow: #22D3EE1a 0dp 0dp 20dp 0dp;
 }
@@ -48,9 +48,9 @@ body { font-family: "Pixel Operator Mono"; background: transparent; width: 100%;
 .corner.tr { top: 8dp; right: 8dp; }
 .corner.bl { bottom: 8dp; left: 8dp; }
 .corner.br { bottom: 8dp; right: 8dp; }
-.difficulty-title { font-size: 18dp; letter-spacing: 2dp; color: #ffffff; margin: 4dp 0dp 18dp 0dp; }
+.difficulty-title { font-size: 18dp; letter-spacing: 2dp; color: #ffffff; margin: 2dp 0dp 12dp 0dp; }
 .difficulty-item {
-  box-sizing: border-box; display: block; width: 100%; margin: 8dp 0dp; padding: 10dp 14dp;
+  box-sizing: border-box; display: block; width: 100%; margin: 6dp 0dp; padding: 8dp 14dp;
   border-radius: 9dp; border: 1dp #7A5A2E;
   decorator: vertical-gradient( #1e2740 #141b2e );
   text-align: left;
@@ -71,8 +71,20 @@ body { font-family: "Pixel Operator Mono"; background: transparent; width: 100%;
   letter-spacing: 0.5dp;
 }
 .difficulty-item-desc { color: #9AA5C0; font-size: 10dp; line-height: 14dp; }
-.difficulty-hint { color: #9AA5C0; font-size: 9dp; line-height: 13dp; margin-top: 16dp; }
-.difficulty-foot { color: #9AA5C0; font-size: 9dp; margin-top: 10dp; letter-spacing: 0.5dp; }
+.difficulty-hint { color: #9AA5C0; font-size: 9dp; line-height: 13dp; margin-top: 10dp; }
+.difficulty-foot { color: #9AA5C0; font-size: 9dp; margin-top: 6dp; letter-spacing: 0.5dp; }
+.difficulty-item.locked {
+  decorator: vertical-gradient( #171d30 #10141f ); border: 1dp #33281a;
+  cursor: default;
+}
+.difficulty-item.locked .difficulty-item-label { color: #6B6F7A; }
+.difficulty-item.locked .difficulty-item-desc { color: #565C6E; }
+.difficulty-item.locked:hover { border: 1dp #33281a; }
+.difficulty-badge-locked {
+  display: inline-block; margin-left: 8dp; padding: 1dp 7dp; border-radius: 999dp;
+  decorator: vertical-gradient( #4a4f5c #333740 ); font-size: 8dp; color: #C7CBD6;
+  letter-spacing: 0.5dp;
+}
 .confirm-title { color: #E7ECF5; font-size: 13dp; line-height: 18dp; margin: 10dp 0dp 10dp 0dp; }
 .confirm-body { color: #9AA5C0; font-size: 10dp; line-height: 15dp; margin: 0dp 0dp 18dp 0dp; }
 .confirm-pill {
@@ -94,13 +106,28 @@ std::string pressed_class(int index, int pressed_index) {
     return (pressed_index >= 0 && index == pressed_index) ? " pressed" : "";
 }
 
-// Chave i18n do LABEL + DESC de cada item, na MESMA ordem de DifficultyMenuItem.
+// Chave i18n do LABEL de cada item, na MESMA ordem de DifficultyMenuItem.
 constexpr std::array<const char*, kDifficultyItemCount> kLabelKeys = {
     "SAVE_DIFFICULTY_FACIL_LABEL", "SAVE_DIFFICULTY_MEDIO_LABEL",
-    "SAVE_DIFFICULTY_DIFICIL_LABEL"};
-constexpr std::array<const char*, kDifficultyItemCount> kDescKeys = {
-    "SAVE_DIFFICULTY_FACIL_DESC", "SAVE_DIFFICULTY_MEDIO_DESC",
-    "SAVE_DIFFICULTY_DIFICIL_DESC"};
+    "SAVE_DIFFICULTY_DIFICIL_LABEL", "SAVE_DIFFICULTY_HARDCORE_LABEL"};
+
+// A DESC do Hardcore alterna LOCKED/UNLOCKED conforme state.hardcore_unlocked
+// (as outras 3 sao fixas) - por isso NAO cabe num array constexpr simples,
+// resolvida por funcao (scope-add REVISAO 2026-07-10).
+const char* desc_key_for_item(int index, bool hardcore_unlocked) {
+    switch (static_cast<DifficultyMenuItem>(index)) {
+        case DifficultyMenuItem::Facil:
+            return "SAVE_DIFFICULTY_FACIL_DESC";
+        case DifficultyMenuItem::Medio:
+            return "SAVE_DIFFICULTY_MEDIO_DESC";
+        case DifficultyMenuItem::Dificil:
+            return "SAVE_DIFFICULTY_DIFICIL_DESC";
+        case DifficultyMenuItem::Hardcore:
+            return hardcore_unlocked ? "SAVE_DIFFICULTY_HARDCORE_DESC_UNLOCKED"
+                                      : "SAVE_DIFFICULTY_HARDCORE_DESC_LOCKED";
+    }
+    return "SAVE_DIFFICULTY_MEDIO_DESC";  // defensivo
+}
 
 // Copy final aprovada pelo lider (2026-07-10, via ux-writer): o splash de
 // confirmacao (Aviso #2) tem TITULO e botao "Sim" PROPRIOS por dificuldade (o
@@ -108,12 +135,24 @@ constexpr std::array<const char*, kDifficultyItemCount> kDescKeys = {
 // Fácil" sao chaves INTEIRAS, nao um prefixo+label concatenado como no
 // rascunho). O corpo (SAVE_DIFFICULTY_CONFIRM_BODY) e o "Cancelar"
 // (SAVE_DIFFICULTY_CONFIRM_NO) sao UNICOS, independem da dificuldade.
+//
+// Hardcore (indice 3): INALCANCAVEL nesta Fase 0 (state.hardcore_unlocked
+// hardcoded false no CHAMADOR - Hardcore NUNCA e selecionavel, ver
+// difficulty_item_selectable, entao o splash NUNCA abre com state.selected==
+// Hardcore). Os 2 entries abaixo SO existem pra manter os arrays do TAMANHO de
+// kDifficultyItemCount (evita indexacao fora do limite se algum bug futuro
+// deixar o splash abrir mesmo assim) - fallback REUSA a copy do Dificil, NAO e
+// texto real do Hardcore. TODO Fase 4: trocar por
+// SAVE_DIFFICULTY_CONFIRM_TITLE_HARDCORE/CONFIRM_YES_HARDCORE (o aviso denso
+// de permadeath, splash .danger, ja apurado e APROVADO pelo lider em
+// modos-morte.md §2.3 - HARDCORE_WARN_* - so falta entrar no catalogo i18n
+// quando o Hardcore for construido de verdade).
 constexpr std::array<const char*, kDifficultyItemCount> kConfirmTitleKeys = {
     "SAVE_DIFFICULTY_CONFIRM_TITLE_FACIL", "SAVE_DIFFICULTY_CONFIRM_TITLE_MEDIO",
-    "SAVE_DIFFICULTY_CONFIRM_TITLE_DIFICIL"};
+    "SAVE_DIFFICULTY_CONFIRM_TITLE_DIFICIL", "SAVE_DIFFICULTY_CONFIRM_TITLE_DIFICIL"};
 constexpr std::array<const char*, kDifficultyItemCount> kConfirmYesKeys = {
     "SAVE_DIFFICULTY_CONFIRM_YES_FACIL", "SAVE_DIFFICULTY_CONFIRM_YES_MEDIO",
-    "SAVE_DIFFICULTY_CONFIRM_YES_DIFICIL"};
+    "SAVE_DIFFICULTY_CONFIRM_YES_DIFICIL", "SAVE_DIFFICULTY_CONFIRM_YES_DIFICIL"};
 
 }  // namespace
 
@@ -154,8 +193,13 @@ std::string build_difficulty_menu_rml(const DifficultyMenuState& state,
 
     for (int i = 0; i < kDifficultyItemCount; ++i) {
         const bool focused = (state.selected == i);
+        const bool is_hardcore = (static_cast<DifficultyMenuItem>(i) ==
+                                   DifficultyMenuItem::Hardcore);
+        const bool locked = is_hardcore && !state.hardcore_unlocked;
+
         std::string classes = "difficulty-item";
         if (focused) classes += " sel";
+        if (locked) classes += " locked";
         classes += pressed_class(i, pressed_index);
 
         body << "<div class=\"" << classes << "\" id=\"difficulty-item-" << i << "\">";
@@ -166,9 +210,17 @@ std::string build_difficulty_menu_rml(const DifficultyMenuState& state,
             body << "<span class=\"difficulty-badge\">"
                  << translator.tr("SAVE_DIFFICULTY_MEDIO_BADGE") << "</span>";
         }
+        // Afordancia de bloqueio (scope-add REVISAO 2026-07-10, "cenoura"
+        // visivel-travada): badge de TEXTO, nao glifo de cadeado unicode - a
+        // fonte pixel do jogo (PixelOperatorMono.ttf, cmap verificado) NAO tem
+        // o glifo U+1F512 (renderizaria tofu/vazio) - texto e determinístico
+        // em qualquer plataforma/fonte.
+        if (locked) {
+            body << "<span class=\"difficulty-badge-locked\">[BLOQUEADO]</span>";
+        }
         body << "</div>";
         body << "<div class=\"difficulty-item-desc\">"
-             << translator.tr(kDescKeys[static_cast<std::size_t>(i)]) << "</div>";
+             << translator.tr(desc_key_for_item(i, state.hardcore_unlocked)) << "</div>";
         body << "</div>";
     }
     // Aviso #1 (§2.2): aviso fixo, sempre visivel enquanto navega a lista.
