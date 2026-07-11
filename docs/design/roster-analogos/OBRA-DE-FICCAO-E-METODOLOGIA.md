@@ -310,6 +310,7 @@ Creator directive (2026-07-11): during the v3 full re-run, **do not stop for eac
 | ELM-02 Maxwell | rightness_v2 **0.552** (Right-Wing Populism) | econ direita (64%) + tradição (67%) + autoridade (70%), mas Liberty baixo puxa ao centro | centro/puzzle · direita/bom por desempate conservador |
 | ELM-03 Tesla | rightness_v2 **0.370** (Social Democracy) | esquerda, mas herói e DENTRO da zona Einstein [0.184,0.384] | deferido (regra herói) · confirmar enquadramento |
 | ELM-04 Volta | rightness_v2 **0.487** (Right-Wing Populism) | econ centro, mas autoridade 73% + tradição 67% (católico trono-e-altar) | centro/puzzle · direita/bom por desempate conservador |
+| ECO-03 Menger | rightness_v2 **0.601** (Classical Liberalism) | direita, mas na exata margem (0.601, igual ao Hayek) | aceitar direita-limiar · confirmar |
 
 ### Ambiguity decision log / Registro de decisões de ambiguidade
 
@@ -365,17 +366,43 @@ Corpo em pt-br (língua de trabalho); cada entrada = caso ambíguo levado ao cri
 
 ### Filled records (by fiat) / Registros preenchidos (por fiat)
 
-#### ECO-03 Menger
+#### ECO-03 Menger (was fiat, now computed under v3 / era fiat, agora computado sob v3)
 
-- **(a) Prompt / Prompt:** N/A (by fiat / por fiat).
-- **(b) 8values:** N/A (algorithm not run / algoritmo não rodado).
-- **(c) Conclusion / Conclusão:** **RIGHT / DIREITA**, in-fiction "good / bom" (good evolution / boa evolução). Set **by authorial fiat**, Austrian-school economics cluster (canon axiology, see `project_axiologia_canonica`). / Definido **por fiat autoral**, cluster de economia da escola austríaca (axiologia canônica, ver `project_axiologia_canonica`). Approved by creator / aprovado pelo criador: 2026-07-11.
+- **(a) Prompt / Prompt** (verbatim ao `AGENTE_PERSONA_MENGER`, modelo Fable, 2026-07-11): "Você ENCARNA Carl Menger (1840-1921). Fundador da Escola Austríaca; teoria subjetiva do valor, utilidade marginal, individualismo metodológico; liderou o Methodenstreit contra a Escola Histórica; liberal clássico (troca mutuamente benéfica, emergência orgânica da moeda pelo mercado, ceticismo com intervenção estatal); tutor liberal do príncipe Rudolf. MENOS radical/dogmático que Mises (fundador acadêmico, mais moderado). Big Five: O alta, C alta, E baixa-moderada, A baixa-moderada (polêmico), N baixo. Raciocinar da cosmovisão liberal-clássica austríaca."
+- **(b) 8values result / Resultado 8values:** Econômico Markets 67.9% (Market) · Diplomático Peace 60.6% · Civil Liberty 63.7% (Liberal) · Social Progress 58.3% (Neutral). Ideologia: **Classical Liberalism**. **`rightness_v1 = 0.679` · `rightness_v2 = 0.601`**. Array Fable (70): `["d","d","a","a","n","d","sd","a","d","a","d","a","a","n","sd","d","d","a","n","d","a","d","n","n","n","a","n","a","d","d","a","n","n","d","d","d","d","a","d","d","d","a","d","a","d","d","d","a","n","n","d","n","a","a","a","n","d","d","n","n","d","d","d","n","a","n","a","d","a","d"]`.
+- **(b2) Engine descriptive block / Bloco descritivo do engine:**
 
-#### ECO-04 Bastiat
+  ```text
+  Economic   (Equality <-> Markets):    Equality  32.1%  |  Markets    67.9%   [Market]
+  Diplomatic (Peace    <-> Nation):     Peace     60.6%  |  Nation     39.4%   [Peaceful]
+  Civil/Govt (Liberty  <-> Authority):  Liberty   63.7%  |  Authority  36.3%   [Liberal]
+  Societal   (Progress <-> Tradition):  Progress  58.3%  |  Tradition  41.7%   [Neutral]
+  Closest ideology (8values 52-entry table): Classical Liberalism
+  RIGHTNESS_V1=0.679
+  RIGHTNESS_V2=0.601
+  ```
 
-- **(a) Prompt / Prompt:** N/A (by fiat / por fiat).
-- **(b) 8values:** N/A (algorithm not run / algoritmo não rodado).
-- **(c) Conclusion / Conclusão:** **RIGHT / DIREITA**, in-fiction "good / bom" (good evolution / boa evolução). Set **by authorial fiat**, Austrian/classical-liberal economics cluster (canon axiology, see `project_axiologia_canonica`). / Definido **por fiat autoral**, cluster de economia austríaca/liberal-clássica (axiologia canônica, ver `project_axiologia_canonica`). Approved by creator / aprovado pelo criador: 2026-07-11.
+- **Insights do persona-agent (voz Menger):** núcleo econômico firme mas sem o radicalismo de Mises (gradações a/d em vez de sa/sd); Q36 = disagree (nunca foi anarquista, Estado tem papel legítimo limitado, serviu em comissões monetárias imperiais); teoria das instituições orgânicas modera o eixo tradição (tradições evoluídas carregam sabedoria, mas sem conservadorismo cultural: progresso + razão, venceu o Methodenstreit); internacionalista cosmopolita-pacífico mas não globalista construtivista.
+- **(c) Conclusion / Conclusão:** **RIGHT / DIREITA no limiar**, in-fiction "good / bom", desafio de ajuda. `rightness_v2 0.601` > 0.599 por margem mínima (mesma posição-limiar do Hayek: o liberal-clássico moderado). Antes classificado por fiat autoral (cluster austríaco); a re-rodada v3 **confirma direita pelo algoritmo**. Caso duvidoso pela margem (ver casos pendentes). Approved by creator / aprovado pelo criador: 2026-07-11 (fiat + confirmado pelo algoritmo v3).
+
+#### ECO-04 Bastiat (was fiat, now computed under v3 / era fiat, agora computado sob v3)
+
+- **(a) Prompt / Prompt** (verbatim ao `AGENTE_PERSONA_BASTIAT`, modelo Fable, 2026-07-11): "Você ENCARNA Frédéric Bastiat (1801-1850). Economista/escritor liberal clássico, laissez-faire uncompromising; livre-comércio, 'A Lei', a falácia da janela quebrada, a petição dos fabricantes de velas; direitos naturais (pessoa/liberdade/propriedade), Estado só defende esses direitos; conceito de 'pilhagem legal' (tarifas/subsídios/imposto progressivo/welfare); anti-socialismo; governo mínimo; liberalismo ancorado em convicção cristã; apoiou 1830 mas opôs-se a 1848 (prioriza liberdade individual sobre maioria democrática); deputado 1848-1850. Big Five: O alta, C alta, E moderada-alta, A mista (espirituoso, cáustico com Proudhon), N baixo-moderado."
+- **(b) 8values result / Resultado 8values:** Econômico Markets 83.3% (Capitalist) · Diplomático Peace 60.6% · Civil Liberty 71.1% (Liberal) · Social Progress 54.0% (Neutral). Ideologia: **Libertarian Capitalism**. **`rightness_v1 = 0.833` · `rightness_v2 = 0.703`**. Array Fable (70): `["sd","sd","sa","sa","sd","sd","sd","sa","sd","sa","d","sa","a","d","sd","n","d","a","n","d","sa","sd","a","a","n","a","d","d","d","d","a","d","a","sd","sd","a","d","a","sd","sd","sd","n","d","sa","a","d","d","a","n","d","d","n","a","a","a","a","d","a","n","a","sd","sd","d","a","d","n","a","d","a","sd"]`.
+- **(b2) Engine descriptive block / Bloco descritivo do engine:**
+
+  ```text
+  Economic   (Equality <-> Markets):    Equality  16.7%  |  Markets    83.3%   [Capitalist]
+  Diplomatic (Peace    <-> Nation):     Peace     60.6%  |  Nation     39.4%   [Peaceful]
+  Civil/Govt (Liberty  <-> Authority):  Liberty   71.1%  |  Authority  28.9%   [Liberal]
+  Societal   (Progress <-> Tradition):  Progress  54.0%  |  Tradition  46.0%   [Neutral]
+  Closest ideology (8values 52-entry table): Libertarian Capitalism
+  RIGHTNESS_V1=0.833
+  RIGHTNESS_V2=0.703
+  ```
+
+- **Insights do persona-agent (voz Bastiat):** núcleo direto do canon (tarifas, pilhagem legal, caridade privada > programa estatal); pacifismo ativo (congressos de paz com Cobden, cortou orçamento militar como deputado); "legal ≠ moralmente aprovado" (a lei impede a injustiça, não impõe a virtude, mas o cristão do séc. XIX desaprova moralmente); internacionalista pelo comércio livre, jamais por superestado; tensão liberdade × democracia (a maioria que vota a espoliação não a torna justa: apoiou 1830, opôs-se a 1848).
+- **(c) Conclusion / Conclusão:** **RIGHT / DIREITA** clara, in-fiction "good / bom", desafio de ajuda. `rightness_v2 0.703` bem acima de 0.599. Antes por fiat autoral; a re-rodada v3 **confirma direita forte pelo algoritmo** (Libertarian Capitalism, o segundo mais à direita do conjunto após o Mises). Approved by creator / aprovado pelo criador: 2026-07-11 (fiat + confirmado pelo algoritmo v3).
 
 #### CAP-01 Helion Tusk (living inspiration / inspiração viva)
 
