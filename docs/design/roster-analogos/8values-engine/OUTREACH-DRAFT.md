@@ -1,4 +1,4 @@
-# 8VALUES-OUTREACH — draft message (creator sends, not the agent)
+# 8VALUES-OUTREACH: draft message (creator sends, not the agent)
 
 **Status:** DRAFT for the creator (petrus) to review and send. External communication is sent by the creator, never by the agent. Suggested channel: a polite issue or discussion on `github.com/8values/8values.github.io`, or a direct message if the authors list a contact.
 
@@ -25,7 +25,7 @@ A few things I want to be transparent about:
 Repository (Codeberg): https://codeberg.org/petrinhu/gusworld
 The port and attribution: `docs/design/roster-analogos/8values-engine/`
 
-If anything about the attribution or the way I've described 8values isn't to your liking, please let me know and I'll adjust it right away. Mostly I just wanted to say thanks — the quiz was a great, well-designed foundation to build a game mechanic on.
+If anything about the attribution or the way I've described 8values isn't to your liking, please let me know and I'll adjust it right away. Mostly I just wanted to say thanks: the quiz was a great, well-designed foundation to build a game mechanic on.
 
 Best,
 petrus (GusWorld)
