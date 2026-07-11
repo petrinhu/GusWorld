@@ -1,8 +1,6 @@
 # 8VALUES-OUTREACH: draft message (creator sends, not the agent)
 
-**Status:** DRAFT for the creator (petrus) to review and send. External communication is sent by the creator, never by the agent. Suggested channel: a polite issue or discussion on `github.com/8values/8values.github.io`, or a direct message if the authors list a contact. Note: the creator prefers to be reached on Codeberg (see the message body).
-
-**Do not send as-is without the creator's review.** Adjust tone/wording to taste.
+**Status: SENT (2026-07-11).** The creator sent this outreach as an issue on the 8values repository: **https://github.com/8values/8values.github.io/issues/185**. The text below is the draft that was used (kept as record). External communication was sent by the creator, not by the agent.
 
 ---
 

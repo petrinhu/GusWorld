@@ -729,7 +729,7 @@ Feat de fecho pedido pelo criador: confrontar este doc com TODOS os pedidos feit
 | 10 | Resultados + insights dos persona-agents no doc, commit cada mudança | ✅ | Insights por figura; ~18 commits ao longo da maratona |
 | 11 | Documentar detalhes (pessoas reais, transparência) | ✅ | Disclaimer de ficção + registros detalhados + nota da figura viva |
 | 12 | Persona-agents repassam ordens ao main, não executam | ✅ | Cláusula de repasse em todo prompt; memória `feedback_persona_agents_relay_only` |
-| 13 | Engine 8values canonizado como fork + comunicar ao autor + mencionado nos docs | ✅ / ⏳ | Fork em `8values-engine/` (ATTRIBUTION + LICENSE); **outreach ao autor PENDENTE** (rascunho, criador envia) |
+| 13 | Engine 8values canonizado como fork + comunicar ao autor + mencionado nos docs | ✅ | Fork em `8values-engine/` (ATTRIBUTION + LICENSE); outreach ENVIADO pelo criador em 2026-07-11 (issue [#185](https://github.com/8values/8values.github.io/issues/185)) |
 | 14 | Parar o emoji de bateria | ✅ | Cessado |
 | 15 | Herói não vira vilão automático, consultar com opções | ✅ | Salvaguarda de herói + AMB-01/02; memória `feedback_heroi_nao_vira_vilao` |
 | 16 | Einstein como calibragem de pendentes, banda de ±% (zona Einstein) | ✅ | "Zona Einstein" ±10pp, re-ancorada à fórmula vigente; AMB-03 |
@@ -746,7 +746,7 @@ Feat de fecho pedido pelo criador: confrontar este doc com TODOS os pedidos feit
 | 27 | Centros → braço de redo 2× | ✅ | 14 centros × redo 2× (mediana de 3 rodadas); todos confirmados |
 | 28 | Fazer 4 por vez (cautela OOM) | ✅ | Lotes de 4 personas a partir da instrução |
 
-**Achados da auto-auditoria:** (a) **8VALUES-OUTREACH pendente** (item 13): o fork está atribuído no repo, mas o aviso ao autor original do 8values ainda é um rascunho a ser enviado pelo criador (comunicação externa). (b) **Prosa deep-lore pendente**: a classificação está completa, mas a prosa de cada figura (via `narrative-writer`, colaborativa) ainda não começou. (c) **Cosmético:** a tabela "Pending records" no apêndice ficou com rótulos "pending" desatualizados (a fonte de verdade é a "tabela de classificação final in-fiction"); manter como histórico ou higienizar numa passada futura. Fora esses, todos os 28 pedidos foram realizados e documentados.
+**Achados da auto-auditoria (atualizado 2026-07-11):** (a) **8VALUES-OUTREACH ENVIADO** (item 13): o criador enviou o aviso ao autor original do 8values via issue [#185](https://github.com/8values/8values.github.io/issues/185); item fechado. (b) **Prosa deep-lore pendente**: a classificação está completa, mas a prosa de cada figura (via `narrative-writer`, colaborativa) ainda não começou. (c) **Cosmético:** a tabela "Pending records" no apêndice ficou com rótulos "pending" desatualizados (a fonte de verdade é a "tabela de classificação final in-fiction"); manter como histórico ou higienizar numa passada futura. Todos os 28 pedidos foram realizados e documentados; a única frente restante da maratona é a prosa deep-lore (colaborativa).
 
 ---
 
