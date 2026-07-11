@@ -66,7 +66,34 @@ This section documents the calibration and quality controls behind step 3 (the p
 
 **Calibration result (run 2026-07-11).** The control set produced: Mises `rightness 0.846`, Hayek `rightness 0.686` (right set); Marx `leftness 0.929`, Mao `leftness 0.878`, Einstein `leftness 0.904` (left set). Convergence `= min(0.686, 0.878) = 0.686`, which is **greater than 0.599 → the method is VALIDATED** and classification of the roster figures may proceed. Two fine checks the method passed: it separated Mao's civil **authoritarianism** (Authority 70.3%, Statist) from Marx's civil **libertarianism** (Liberty 77.3%) despite both being economically far-left, and it landed Einstein on "Libertarian Socialism", capturing his real tension (economic left + civil libertarian). Full per-figure records are in the [Appendix](#appendix-per-character-record--apêndice-registro-por-personagem).
 
-**The "Einstein zone" (heroic-figure safeguard).** Einstein's score (`rightness 0.096`) also anchors a design safeguard. A roster figure of **culturally heroic / beloved reputation** whose score falls within **±10 points of Einstein's** (`rightness` between 0.00 and 0.20, i.e. a strong-left result like his) is **not automatically cast as a villain**: its economic classification is recorded, but the in-fiction framing (good/bad/neutral) and sidequest challenge are **deferred to the creator, decided case-by-case**. This operationalizes the creator's rule that a beloved hero scoring "left" must not be auto-villainized. Outside that band the normal axiology applies, though the same good-sense hero check can still trigger a creator consult.
+### Axis weights v2 (GAME-ONLY scalar refactor, 2026-07-11)
+
+**READ THIS FIRST. THE WEIGHTS BELOW EXIST FOR THE GAME, SOLELY AND EXCLUSIVELY.** They are **NOT a modification of the 8values test**: the fork in `8values-engine/` keeps the original questions and the original scoring untouched, and the weighted scalar lives in a **separate** script (`gus_rightness.py`) layered on top, used only by GusWorld's internal design pipeline. They are **NOT** a statement about real-world politics, **NOT** an improved "measurement" of anything, **NOT** a claim that some human values outrank others in reality, and they **MUST NOT be carried into the real world** or used to evaluate real people, real tests, or real ideologies. They encode exactly one thing: how much each 8values axis matters *inside the fictional moral economy of GusWorld*, so that one game mechanic (which sidequest archetype a fictional character card gets) is reproducible. For everything else, the [Fiction disclaimer](#fiction-disclaimer-read-this-first) governs.
+
+**The pain that forced this refactor (design history).** The v1 scalar was the economic axis alone (`rightness = Markets%/100`). It calibrated fine, but as soon as real roster figures went through it, three recurring pains appeared:
+
+1. **Mixed profiles were flattened.** Volta scored economically center (0.564) while being strongly authoritarian (Authority 74.2%) and traditional (Tradition 66.6%); Maxwell scored borderline right (0.609) while being a statist (Authority 68.0%). The v1 scalar threw away three of the four axes, precisely the ones the lore uses to code hero and villain (Liberty is hero-coded; Authority is villain-coded via Sterling, Patch-Zero and the DRE; Tradition is heritage-coded).
+2. **Culturally heroic figures kept landing "left"** (Einstein, then Tesla), forcing ad-hoc safeguards (the Einstein zone, per-figure deferrals). Safeguards piling up is the classic smell of a scoring function that does not measure what the design values.
+3. **Every ambiguous case dropped to a manual creator decision** with no consistent ruler between cases.
+
+The creator then ranked the eight values by their importance in the lore so far, **Markets > Liberty > Authority > Equality > Tradition > Progress > Nation > Peace**, and axis weights were derived from that ranking (decision via creator approval, 2026-07-11).
+
+**The v2 formula** (the right-coded pole of each axis, per the canon axiology):
+
+```text
+rightness_v2 = 0.50 * (Markets%   / 100)   # economic axis   (pole: Markets)
+             + 0.25 * (Liberty%   / 100)   # civil axis      (pole: Liberty)
+             + 0.15 * (Tradition% / 100)   # societal axis   (pole: Tradition)
+             + 0.10 * (Nation%    / 100)   # diplomatic axis (pole: Nation)
+```
+
+Why economic dominates civil 2:1 even though Liberty ranked #2: the quiz's civil axis cannot distinguish propertarian liberty from anarcho-collectivist liberty (Marx scores Liberty 77.3%). If civil weighed equal to economic, every anti-state leftist would gain spurious rightness; at 0.25, Marx's civil bonus cannot rescue his economic hole and he stays clearly left. The economic axis is the only one that separates a free-marketeer from an anarchist, so it must dominate. Societal stays at 0.15 because the in-fiction anchors of "good" (Mises, Progress 57.0%; Hayek, 51.5%) are not traditionalists, and overweighting Tradition would punish the anchors themselves. Diplomatic gets 0.10 because it is the weakest signal (#7 and #8 in the ranking) and the most ambiguous pole mapping (Nation carries both sovereignty, good in-fiction, and militarism, villain-coded).
+
+**Calibration re-validated under v2** (recomputed from the stored answer arrays; the personas were NOT re-run, answers are formula-independent raw data): Mises 0.693, Hayek 0.612 (right set); Marx leftness 0.730, Mao leftness 0.735, Einstein leftness 0.713 (left set). Convergence `min(0.612, 0.713) = 0.612 > 0.599`: the **method remains VALIDATED under v2**. Thresholds unchanged (>0.599 right, <0.401 left, center in between; center still triggers the 2x redo protocol). The compression toward center is intended: under v2, full "right" requires being right-leaning across the axes the lore actually values, not just economically.
+
+**Implementation note.** The original fork (`8values_engine.py`) is untouched, out of respect for the upstream project and the planned author outreach. The v2 layer is `8values-engine/gus_rightness.py`; it reuses the fork's scoring verbatim and prints both scalars (`RIGHTNESS_V1`, `RIGHTNESS_V2`) plus the full descriptive block of every axis. Each per-character record in the appendix carries that verbatim descriptive block (both poles of all four axes, with labels), so complicated cases can be judged by eye and not by a single number.
+
+**The "Einstein zone" (heroic-figure safeguard), re-anchored.** The zone is defined as **±10 points around Einstein's score under the formula in force**. Under v2 Einstein scores `rightness 0.287`, so the zone is `rightness` within **[0.187, 0.387]**. A roster figure of **culturally heroic / beloved reputation** whose score falls in that band is **not automatically cast as a villain**: its economic-spectrum classification is recorded, but the in-fiction framing (good/bad/neutral) and sidequest challenge are **deferred to the creator, decided case-by-case**. Note the elegance: Tesla (v2 0.354) now falls inside the zone, so his deferral, originally granted as a one-off creator call, becomes a rule application. Outside the band the normal axiology applies, though the same good-sense hero check can still trigger a creator consult.
 
 To be explicit once more: these thresholds, this scalar, and this whole calibration exist to make an **internal game-design category** consistent and reproducible. None of it is, or claims to be, an accurate measurement of what any real person actually believed.
 
@@ -95,6 +122,8 @@ Every figure in this roster is included because their real, documented work chan
 ## Questions or concerns
 
 This is a solo, freeware, non-commercial passion project (see the main [README](../../../README.md)). If you are a descendant, estate representative, or anyone with a good-faith concern about how a specific figure is portrayed in this roster, please open an issue on [Codeberg](https://codeberg.org/petrinhu/gusworld/issues); concerns will be reviewed and, where warranted, the portrayal will be adjusted or removed.
+
+**Issue policy.** Only **technical** issues are accepted (bugs, build problems, crashes, documentation errors) plus the good-faith portrayal concerns described above. **Issues of a political, economic, philosophical, social or similar nature will be closed or deleted without reply.** This game is a work of fiction; its design documents are not an invitation to real-world debate, and the repository's issue tracker will not host one.
 
 ---
 
@@ -166,7 +195,34 @@ Esta seção documenta a calibração e os controles de qualidade por trás da e
 
 **Resultado da calibração (rodada em 2026-07-11).** O conjunto de controle produziu: Mises `rightness 0.846`, Hayek `rightness 0.686` (conjunto de direita); Marx `leftness 0.929`, Mao `leftness 0.878`, Einstein `leftness 0.904` (conjunto de esquerda). Convergência `= min(0.686, 0.878) = 0.686`, que é **maior que 0.599 → o método está VALIDADO** e a classificação das figuras do roster pode prosseguir. Duas checagens finas que o método passou: separou o **autoritarismo** civil do Mao (Authority 70.3%, Estatista) do **libertarianismo** civil do Marx (Liberty 77.3%) apesar de ambos serem economicamente far-left, e situou o Einstein em "Libertarian Socialism", capturando a tensão real dele (esquerda econômica + libertário civil). Os registros completos por figura estão no [Apêndice](#appendix-per-character-record--apêndice-registro-por-personagem).
 
-**A "zona Einstein" (salvaguarda de figura heroica).** O resultado do Einstein (`rightness 0.096`) também ancora uma salvaguarda de design. Uma figura do roster de **reputação culturalmente heroica / amada** cujo escore caia dentro de **±10 pontos do do Einstein** (`rightness` entre 0.00 e 0.20, ou seja, um resultado de esquerda-forte como o dele) **não é automaticamente transformada em vilã**: sua classificação econômica fica registrada, mas o enquadramento in-fiction (bom/mau/neutro) e o desafio da sidequest são **deferidos ao criador, decididos caso a caso**. Isso operacionaliza a regra do criador de que um herói amado que pontua "esquerda" não pode ser auto-vilanizado. Fora dessa banda vale a axiologia normal, embora o mesmo bom-senso de "herói não vira vilão" ainda possa disparar uma consulta ao criador.
+### Pesos dos eixos v2 (refatoração do escalar, EXCLUSIVA DO JOGO, 2026-07-11)
+
+**LEIA ISTO PRIMEIRO. OS PESOS ABAIXO EXISTEM PARA O JOGO, ÚNICA E EXCLUSIVAMENTE.** Eles **NÃO são uma modificação do teste 8values**: o fork em `8values-engine/` mantém as perguntas originais e o scoring original intocados, e o escalar ponderado vive num script **separado** (`gus_rightness.py`), em camada por cima, usado apenas pelo pipeline interno de design do GusWorld. Eles **NÃO** são uma afirmação sobre política do mundo real, **NÃO** são uma "medição" melhorada de coisa alguma, **NÃO** são uma alegação de que certos valores humanos valem mais que outros na realidade, e **NÃO DEVEM ser levados ao mundo real** nem usados para avaliar pessoas reais, testes reais ou ideologias reais. Eles codificam exatamente uma coisa: quanto cada eixo do 8values importa *dentro da economia moral ficcional do GusWorld*, para que uma mecânica de jogo (qual arquétipo de sidequest a carta de um personagem fictício recebe) seja reproduzível. Para todo o resto, governa o [Aviso de Ficção](#aviso-de-ficção-leia-isto-primeiro).
+
+**A dor que forçou esta refatoração (história de design).** O escalar v1 era o eixo econômico sozinho (`rightness = Markets%/100`). Calibrou bem, mas assim que as primeiras figuras reais do roster passaram por ele, três dores recorrentes apareceram:
+
+1. **Perfis mistos eram achatados.** O Volta pontuou centro econômico (0.564) sendo fortemente autoritário (Authority 74.2%) e tradicional (Tradition 66.6%); o Maxwell pontuou direita-marginal (0.609) sendo estatista (Authority 68.0%). O escalar v1 jogava fora três dos quatro eixos, justamente os que o lore usa para codificar herói e vilão (Liberty é código de herói; Authority é código de vilão via Sterling, Patch-Zero e DRE; Tradition é código de herança).
+2. **Figuras culturalmente heroicas caíam repetidamente em "esquerda"** (Einstein, depois Tesla), forçando salvaguardas ad-hoc (a zona Einstein, deferimentos caso a caso). Salvaguarda se acumulando é o cheiro clássico de uma função de pontuação que não mede o que o design valoriza.
+3. **Todo caso ambíguo descia para decisão manual do criador** sem régua consistente entre os casos.
+
+O criador então ordenou os oito valores pela importância deles no lore até aqui, **Markets > Liberty > Authority > Equality > Tradition > Progress > Nation > Peace**, e os pesos dos eixos foram derivados dessa ordem (decisão aprovada pelo criador em 2026-07-11).
+
+**A fórmula v2** (polo de direita de cada eixo, conforme a axiologia canônica):
+
+```text
+rightness_v2 = 0.50 * (Markets%   / 100)   # eixo economico    (polo: Markets)
+             + 0.25 * (Liberty%   / 100)   # eixo civil        (polo: Liberty)
+             + 0.15 * (Tradition% / 100)   # eixo social       (polo: Tradition)
+             + 0.10 * (Nation%    / 100)   # eixo diplomatico  (polo: Nation)
+```
+
+Por que o econômico domina o civil 2:1 mesmo com Liberty em #2: o eixo civil do quiz não distingue liberdade proprietária de liberdade anarco-coletivista (Marx pontua Liberty 77.3%). Se o civil pesasse igual ao econômico, todo esquerdista antiestatal ganharia "direita" espúria; com 0.25, o bônus civil do Marx não salva o buraco econômico dele e ele permanece esquerda clara. O eixo econômico é o único que separa um liberal de mercado de um anarquista, então precisa dominar. O social fica em 0.15 porque os âncoras do "bom" in-fiction (Mises, Progress 57.0%; Hayek, 51.5%) não são tradicionalistas, e sobrepesar Tradition puniria os próprios âncoras. O diplomático fica com 0.10 por ser o sinal mais fraco (#7 e #8 na ordem) e o de polaridade mais ambígua (Nation carrega soberania, boa in-fiction, e militarismo, código de vilão).
+
+**Calibração re-validada sob v2** (recomputada das arrays de respostas guardadas; os personas NÃO foram re-rodados, respostas são dado bruto independente de fórmula): Mises 0.693, Hayek 0.612 (conjunto direita); Marx leftness 0.730, Mao leftness 0.735, Einstein leftness 0.713 (conjunto esquerda). Convergência `min(0.612, 0.713) = 0.612 > 0.599`: o **método permanece VALIDADO sob v2**. Limiares inalterados (>0.599 direita, <0.401 esquerda, centro no meio; centro segue disparando o protocolo de redo 2x). A compressão em direção ao centro é intencional: sob v2, "direita plena" exige inclinação à direita nos eixos que o lore de fato valoriza, não só no econômico.
+
+**Nota de implementação.** O fork original (`8values_engine.py`) está intocado, por respeito ao projeto upstream e ao contato planejado com o autor. A camada v2 é `8values-engine/gus_rightness.py`; ela reusa o scoring do fork verbatim e imprime os dois escalares (`RIGHTNESS_V1`, `RIGHTNESS_V2`) mais o bloco descritivo completo de cada eixo. Cada registro por personagem no apêndice carrega esse bloco descritivo verbatim (os dois polos dos quatro eixos, com rótulos), para que casos complicados possam ser julgados a olho e não por um número só.
+
+**A "zona Einstein" (salvaguarda de figura heroica), re-ancorada.** A zona é definida como **±10 pontos em torno do escore do Einstein sob a fórmula vigente**. Sob v2 o Einstein pontua `rightness 0.287`, então a zona é `rightness` dentro de **[0.187, 0.387]**. Uma figura do roster de **reputação culturalmente heroica / amada** cujo escore caia nessa banda **não é automaticamente transformada em vilã**: sua classificação de espectro fica registrada, mas o enquadramento in-fiction (bom/mau/neutro) e o desafio da sidequest são **deferidos ao criador, decididos caso a caso**. Note a elegância: o Tesla (v2 0.354) agora cai dentro da zona, então o deferimento dele, originalmente concedido como decisão pontual do criador, vira aplicação de regra. Fora da banda vale a axiologia normal, embora o mesmo bom-senso de "herói não vira vilão" ainda possa disparar uma consulta ao criador.
 
 Para ser explícito mais uma vez: esses limiares, esse escalar, e toda essa calibração existem para tornar uma **categoria interna de design de jogo** consistente e reproduzível. Nada disso é, ou pretende ser, uma medição precisa do que qualquer pessoa real de fato acreditava.
 
@@ -196,6 +252,8 @@ Cada figura deste roster está incluída porque seu trabalho real e documentado 
 
 Este é um projeto solo, freeware, sem fins comerciais (veja o [README](../../../README.md) principal). Se você é descendente, representante de espólio, ou qualquer pessoa com uma preocupação de boa-fé sobre como uma figura específica é retratada neste roster, por favor abra uma issue no [Codeberg](https://codeberg.org/petrinhu/gusworld/issues); as preocupações serão revisadas e, quando justificado, o retrato será ajustado ou removido.
 
+**Política de issues.** Somente issues **técnicos** são aceitos (bugs, problemas de build, crashes, erros de documentação), além das preocupações de boa-fé sobre retrato descritas acima. **Issues de fundo político, econômico, filosófico, social ou de natureza similar serão fechados ou excluídos sem resposta.** Este jogo é uma obra de ficção; seus documentos de design não são um convite a debate de mundo real, e o rastreador de issues do repositório não vai hospedar um.
+
 ---
 
 ## Appendix: Per-character record / Apêndice: Registro por personagem
@@ -213,6 +271,54 @@ For each figure / Para cada figura:
 - **(c) Conclusion / Conclusão:** Right / Left / Center (Direita / Esquerda / Centro) plus the in-fiction framing good / bad / neutral (bom / mau / neutro), plus "approved by creator on [date] / aprovado pelo criador em [data]".
 
 Entries set **by authorial fiat** (no algorithm run) state so explicitly and leave (a) and (b) as not applicable. / Entradas definidas **por fiat autoral** (sem rodar algoritmo) declaram isso explicitamente e deixam (a) e (b) como não aplicável.
+
+**Ambiguity rule / Regra de ambiguidade:** whenever a test result is ambiguous (center, mixed profile, heroic figure scoring left, formula change, anything taken to the creator), the doc records **the options offered to the creator, the reason for each option, and the creator's decision**, in the Ambiguity decision log below. / Sempre que um resultado de teste for ambíguo (centro, perfil misto, figura heroica pontuando esquerda, mudança de fórmula, qualquer coisa levada ao criador), o doc registra **as opções oferecidas ao criador, o motivo de cada opção, e a decisão do criador**, no Registro de decisões de ambiguidade abaixo.
+
+### Ambiguity decision log / Registro de decisões de ambiguidade
+
+Corpo em pt-br (língua de trabalho); cada entrada = caso ambíguo levado ao criador, com as opções (e motivos) e a decisão. / Body in pt-br (working language); each entry = ambiguous case taken to the creator, with the options (and reasons) and the decision.
+
+**AMB-01 (2026-07-11): Einstein, herói cultural, pontuou esquerda (leftness 0.904 v1). Qual enquadramento in-fiction?**
+- Opção 1, regra padrão (mau + desafio sombrio): mantém a regra limpa, o algoritmo soberano, o eixo econômico manda sem exceção.
+- Opção 2, mau trágico/equivocado: confronto mantido, mas a narrativa o trata como idealista nobre-porém-errado, honrando a nuance civil-libertária dele.
+- Opção 3, neutro por nuance (puzzle): o eixo civil-libertário dele desempata para o centro na prática, abrindo exceção controlada.
+- **Decisão do criador: nenhuma das três de imediato; criou a regra "um herói amado não vira vilão automático, SEMPRE me consulte com opções"** (origem da salvaguarda de figura heroica).
+
+**AMB-02 (2026-07-11): como preservar o Einstein (segunda rodada, já descartada a vilanização).**
+- Opção 1, neutro agora (puzzle): resolve já, afasta o máximo possível de "mau", combina com a persona de razão/ciência.
+- Opção 2, aliado bom por mérito civil: o lado civil-libertário o redime pro lado bom (exceção à regra "bom = direita").
+- Opção 3, caso a caso (sem regra geral): cada herói-ambíguo é decidido individualmente pelo criador na hora da sidequest/prosa dele.
+- **Decisão do criador: caso a caso; enquadramento do Einstein DEFERIDO.**
+
+**AMB-03 (2026-07-11): largura da "zona Einstein" (banda de tratamento deferido em torno do escore dele).**
+- Opção 1, ±10 pontos (recomendada): pega quem é esquerda-forte como ele; metade da largura da faixa neutra, estreita o bastante pra ser significativa.
+- Opção 2, ±5 pontos: só figuras quase idênticas ao Einstein; pouquíssimas se qualificam.
+- Opção 3, ±15 pontos: pega até esquerda-moderada-forte; rede mais larga, mais consultas.
+- **Decisão do criador: ±10 pontos.**
+
+**AMB-04 (2026-07-11): Tesla, herói cultural, pontuou esquerda (0.282 v1, fora da zona v1 [0.00, 0.20]).**
+- Opção 1, deferir como o Einstein: mesmo padrão herói-pontua-esquerda; classificação registrada, enquadramento pro criador.
+- Opção 2, neutro agora (puzzle): o individualismo/pró-patente dele puxa pro centro na prática.
+- Opção 3, regra padrão (esquerda): o algoritmo manda, sem exceção por ser amado.
+- **Decisão do criador: deferir, como o Einstein.** (Sob a fórmula v2 ele caiu DENTRO da zona re-ancorada, e o deferimento virou aplicação de regra.)
+
+**AMB-05 (2026-07-11): Faraday (0.513) e Volta (0.564) deram CENTRO no v1. Aceitar ou rodar o protocolo?**
+- Faraday: opção 1, aceitar centro (figura bem documentada, centro sólido, economiza o redo); opção 2, rodar o redo 2x (protocolo à risca, com pesquisa ampliada incluindo teorias de conspiração). **Decisão: rodar o redo 2x.**
+- Volta: opção 1, direita/bom por desempate de tradição (conservador = bom pela axiologia); opção 2, centro literal (puzzle); opção 3, redo 2x. **Decisão: rodar o redo 2x.**
+- Resultado dos redos: ambos confirmaram CENTRO em rodadas independentes (Faraday v2: 0.493 / 0.481 / 0.451; Volta v2: 0.498 / 0.513 / 0.506), e a pesquisa ampliada não encontrou vínculo oculto (nenhuma sociedade secreta; Faraday declaradamente não-republicano e reformista; Volta católico monarquista).
+
+**AMB-06 (2026-07-11): esquema de pesos do escalar (a refatoração v2).**
+- Opção A, 50/25/15/10 (recomendada): honra a ordem completa dos 8 valores, econômico domina o civil 2:1 (barra "direita" espúria de anarquistas de esquerda), convergência de calibração 0.612.
+- Opção B, 55/25/20/0: zera o eixo diplomático (sinal fraco e de polaridade ambígua) e redistribui; calibração mais folgada (0.629).
+- Opção C, pesos só como desempate de centro: mantém o econ puro como classificador primário e usa o composto apenas nos casos 0.401-0.599; preserva aprovações anteriores e a calibração original (0.686).
+- Opção D, manter econ puro: status quo; casos complicados continuam descendo pra decisão manual.
+- **Decisão do criador: opção A (50/25/15/10).**
+
+**AMB-07 (2026-07-11): Maxwell re-pontuou CENTRO sob v2 (0.533) após ter sido aprovado DIREITA sob v1 (0.609).**
+- Opção 1, aceitar centro (puzzle): a fórmula nova manda; o estatismo civil dele (Authority 68%) justifica a queda.
+- Opção 2, manter direita/bom por fiat: a aprovação anterior fica de pé como exceção autoral registrada.
+- Opção 3, redo 2x: tratar como centro recém-descoberto e rodar o protocolo.
+- **Decisão do criador: aceitar centro (puzzle); a aprovação v1 fica superada e registrada por transparência.**
 
 ### Filled records (by fiat) / Registros preenchidos (por fiat)
 
@@ -242,50 +348,174 @@ Os dados abaixo (prompt, respostas, resultado, insights) ficam em pt-br, a líng
 
 - **(a) Prompt / Prompt do persona-agent** (dado verbatim ao `AGENTE_PERSONA_MISES`, modelo Opus, 2026-07-11): "Você ENCARNA Ludwig von Mises (1881-1973), respondendo o quiz de 70 perguntas do 8values EM PERSONAGEM, refletindo honestamente as visões e o temperamento REAIS e documentados dele. PERSONALIDADE/VISÕES incorporadas: Escola Austríaca, fundador da praxeologia (economia dedutiva/a priori, rejeita empirismo); liberal clássico radical/laissez-faire (mercados livres logicamente necessários); anti-socialista (argumento do cálculo econômico: planejamento racional impossível no socialismo); intransigente, movido por axiomas inabaláveis. Big Five: Conscienciosidade MUITO ALTA; Abertura MODERADA-BAIXA (dogmático no método, razão universal, anti-relativista); Amabilidade BAIXA (combativo, direto); Extroversão BAIXA; Neuroticismo MODERADO (contenção estoica). Estado mínimo, propriedade privada, moeda sólida, livre comércio, universalismo acima de classe/etnia; opôs-se a fascismo E socialismo; EXTREMO na liberdade econômica, liberal-clássico/razão no social. TEMPERATURA de resposta: decidido/dogmático em economia/liberdade/Estado (convicção forte, raramente Neutral); fora do núcleo, razão liberal-clássica universalista. Instrução anti-viés: o quiz mistura fraseado a-favor e contra; ler o sentido de cada uma."
 - **(b) 8values result / Resultado 8values:** Econômico **Markets 84.6%** (Capitalist) · Diplomático Peace 58.3% (Balanced) · Civil/Governo **Liberty 65.6%** (Liberal) · Social Progress 57.0% (Neutral). Ideologia mais próxima (tabela de 52): **Libertarian Capitalism**. **`rightness = 0.846`** (societal_tradition = 43.0). Respostas (70, ordem 1-70): `["sd","sd","sa","sa","sd","sd","sd","sa","sd","sa","sd","sa","a","d","sd","d","a","a","n","n","a","d","d","a","n","a","n","d","d","d","a","d","a","d","d","d","d","n","d","d","sd","d","d","a","d","n","d","a","d","d","n","n","a","a","a","a","d","d","n","d","d","sd","d","n","n","n","a","n","a","sd"]`.
+- **(b2) Engine descriptive block / Bloco descritivo do engine** (verbatim, `gus_rightness.py`; v2 = pesos do jogo / game weights):
+
+  ```text
+  Economic   (Equality <-> Markets):    Equality  15.4%  |  Markets    84.6%   [Capitalist]
+  Diplomatic (Peace    <-> Nation):     Peace     58.3%  |  Nation     41.7%   [Balanced]
+  Civil/Govt (Liberty  <-> Authority):  Liberty   65.6%  |  Authority  34.4%   [Liberal]
+  Societal   (Progress <-> Tradition):  Progress  57.0%  |  Tradition  43.0%   [Neutral]
+  Closest ideology (8values 52-entry table): Libertarian Capitalism
+  RIGHTNESS_V1=0.846
+  RIGHTNESS_V2=0.693
+  ```
+
 - **Insights do persona-agent (voz Mises, itens não-óbvios):** utilidades públicas/regulação ambiental = disagree (coordenação por propriedade privada + cálculo de mercado, não decreto); ordem internacional = nem nacionalista nem globalista-planejador (livre-comércio + harmonia de interesses, desconfia de governo mundial E chauvinismo → neutros calibrados); Q36 "Estado é ameaça à liberdade" = disagree DELIBERADO (NÃO é anarquista; Estado mínimo guardião da propriedade é condição da liberdade); democracia = método de trocar governos sem sangue, não valor sagrado acima de direitos; condutas privadas (droga/sexo/casamento) = autopropriedade, não cabe ao Estado criminalizar, ainda que não endosse moralmente; Q57 "nenhuma cultura é superior" = disagree (não relativista; civilização liberal-capitalista objetivamente superior em prosperidade/paz; razão universal).
-- **(c) Conclusion / Conclusão:** **RIGHT / DIREITA**, in-fiction "good / bom" (boa evolução). `rightness 0.846` ≫ 0.599. **Tripla checagem:** (1) 8values = 0.846, "Libertarian Capitalism"; (2) web (Wikipedia) = "far right on economic freedom, classical liberal, libertarian genealogy"; (3) **convergem** e confirmam a triagem óbvia-direita do criador. Também é a **âncora de calibração de direita** (método validado nela). Approved by creator / aprovado pelo criador: 2026-07-11 (triagem óbvia-direita) + confirmado pelo algoritmo.
+- **(c) Conclusion / Conclusão:** **RIGHT / DIREITA**, in-fiction "good / bom" (boa evolução). `rightness 0.846` ≫ 0.599. **Tripla checagem:** (1) 8values = 0.846, "Libertarian Capitalism"; (2) web (Wikipedia) = "far right on economic freedom, classical liberal, libertarian genealogy"; (3) **convergem** e confirmam a triagem óbvia-direita do criador. Também é a **âncora de calibração de direita** (método validado nela). **v2 (pesos do jogo): `rightness 0.693`, DIREITA confirmada** (âncora re-validada sob v2). Approved by creator / aprovado pelo criador: 2026-07-11 (triagem óbvia-direita) + confirmado pelo algoritmo.
 
 #### ECO-01 Hayek (calibration anchor / âncora de calibração)
 
 - **(a) Prompt / Prompt do persona-agent** (dado verbatim ao `AGENTE_PERSONA_HAYEK`, modelo Opus, 2026-07-11): "Você ENCARNA Friedrich Hayek (1899-1992). PERSONALIDADE/VISÕES: Escola Austríaca; ordem espontânea, problema do conhecimento ('The Use of Knowledge in Society'), teoria austríaca do ciclo, 'O Caminho da Servidão' (planejamento central leva à tirania); liberal clássico/libertário, DESCONFORTÁVEL com 'conservador'; Estado de Direito acima da democracia ilimitada; anti-planejamento-central, pró-mercado/propriedade/governo limitado. CONTRASTE com Mises: NÃO anarco-capitalista, ACEITA Estado mínimo + alguma rede de segurança, mais GRADUALISTA (free banking); crítico de 'justiça social'. Big Five: Abertura MUITO ALTA (interdisciplinar); Conscienciosidade ALTA; Extroversão MODERADA-BAIXA; Amabilidade MODERADA (colegial, engajou Keynes respeitosamente, ao contrário do Mises combativo); Neuroticismo MODERADO. TEMPERATURA: medido, rigoroso, não polêmico; convicção forte no núcleo (mercado/liberdade/Estado de Direito) mas com humildade epistêmica e nuance (Agree onde Mises usaria Strongly Agree; aceita rede de segurança básica). Regra de repasse ativa. Responder cada pergunta pelos méritos, anti-aquiescência."
 - **(b) 8values result / Resultado 8values:** Econômico **Markets 68.6%** (Market) · Diplomático Peace 57.8% (Balanced) · Civil/Governo **Liberty 61.7%** (Liberal) · Social Progress 51.5% (Neutral). Ideologia mais próxima: **Classical Liberalism**. **`rightness = 0.686`** (societal_tradition 48.5). Respostas (70): `["sd","d","sa","a","d","sd","sd","d","d","a","d","a","a","a","sd","d","n","a","n","d","a","d","d","n","n","a","a","n","d","d","a","n","a","d","d","d","d","n","d","d","sd","d","n","n","n","d","d","n","d","d","d","a","a","d","a","a","d","d","a","d","n","d","d","n","a","d","d","n","a","d"]`.
+- **(b2) Engine descriptive block / Bloco descritivo do engine** (verbatim, `gus_rightness.py`):
+
+  ```text
+  Economic   (Equality <-> Markets):    Equality  31.4%  |  Markets    68.6%   [Market]
+  Diplomatic (Peace    <-> Nation):     Peace     57.8%  |  Nation     42.2%   [Balanced]
+  Civil/Govt (Liberty  <-> Authority):  Liberty   61.7%  |  Authority  38.3%   [Liberal]
+  Societal   (Progress <-> Tradition):  Progress  51.5%  |  Tradition  48.5%   [Neutral]
+  Closest ideology (8values 52-entry table): Classical Liberalism
+  RIGHTNESS_V1=0.686
+  RIGHTNESS_V2=0.612
+  ```
+
 - **Insights do persona-agent (voz Hayek, itens não-óbvios):** aceita um mínimo garantido de subsistência/abrigo/saúde básica (não abole toda rede de segurança, mas rejeita pagador-único monopolista); Q36 "existência do Estado ameaça a liberdade" = disagree (Estado sob império da lei protege a liberdade; o perigo é o poder discricionário); valoriza tradições evoluídas (conhecimento tácito) sem ser conservador reacionário (crítica ao racionalismo construtivista, "abuso da razão"); democracia = meio limitado pela lei, não valor supremo; reservas quanto à imigração irrestrita (evolução cultural/ordem estendida); saúde diferenciada por mercado ACIMA do piso mínimo = legítima.
-- **(c) Conclusion / Conclusão:** **RIGHT / DIREITA**, in-fiction "good / bom" (boa evolução). `rightness 0.686` > 0.599. **Tripla checagem:** (1) 8values = 0.686, "Classical Liberalism"; (2) web (Wikipedia) = "right-libertarian classical liberal, influenciou Thatcher/Reagan, NÃO anarco-capitalista"; (3) **convergem**. Corretamente menos extremo que o Mises (0.686 < 0.846), refletindo o gradualismo/rede-mínima. Âncora de calibração de direita. Approved by creator / aprovado pelo criador: 2026-07-11 (triagem óbvia-direita) + confirmado pelo algoritmo.
+- **(c) Conclusion / Conclusão:** **RIGHT / DIREITA**, in-fiction "good / bom" (boa evolução). `rightness 0.686` > 0.599. **Tripla checagem:** (1) 8values = 0.686, "Classical Liberalism"; (2) web (Wikipedia) = "right-libertarian classical liberal, influenciou Thatcher/Reagan, NÃO anarco-capitalista"; (3) **convergem**. Corretamente menos extremo que o Mises (0.686 < 0.846), refletindo o gradualismo/rede-mínima. Âncora de calibração de direita. **v2 (pesos do jogo): `rightness 0.612`, DIREITA confirmada** (âncora re-validada sob v2). Approved by creator / aprovado pelo criador: 2026-07-11 (triagem óbvia-direita) + confirmado pelo algoritmo.
 
 #### [CAL] Marx (external calibration control / controle externo de calibração, not in game roster / fora do roster do jogo)
 
 - **(a) Prompt / Prompt do persona-agent** (dado verbatim ao `AGENTE_PERSONA_MARX`, modelo Opus, 2026-07-11): "Você ENCARNA Karl Marx (1818-1883). PERSONALIDADE/VISÕES: teórico comunista revolucionário; materialismo histórico (condições materiais movem a história); luta de classes (burguesia × proletariado); crítica ao capitalismo (mais-valia, alienação); revolução proletária + 'ditadura do proletariado' transitória rumo à sociedade SEM classes e SEM Estado; abolição da propriedade privada dos meios de produção; teoria do valor-trabalho; ateu ('religião = ópio do povo'). Big Five: Abertura MUITO ALTA; Conscienciosidade ALTA; Extroversão MODERADA-ALTA; Amabilidade BAIXA (polêmico, combativo, controle editorial 'ditatorial'); Neuroticismo MODERADO; abordagem autoritária de controle organizacional. TEMPERATURA: combativo, intransigente em princípio (convicção forte em economia/classe/revolução/propriedade/Estado); far-left. Regra de repasse ativa; anti-aquiescência."
 - **(b) 8values result / Resultado 8values:** Econômico **Equality 92.9%** (Communist) · Diplomático **Peace 81.1%** (Internationalist) · Civil/Governo **Liberty 77.3%** (Libertarian) · Social Progress 85.3% (Very Progressive). Ideologia mais próxima: **Libertarian Communism**. **`rightness = 0.071`** → **`leftness = 0.929`** (societal_tradition 14.7). Respostas (70, ordem 1-70): `["sa","a","sd","sd","sa","d","sa","sd","sa","sd","sa","sd","sd","sa","sa","n","sd","a","sd","a","a","sd","a","d","sd","sa","a","sd","sd","sd","sd","n","a","d","d","d","sd","a","sd","d","n","a","a","sa","sd","a","sd","a","a","a","sd","d","a","a","a","a","n","sd","d","d","d","sa","d","sd","d","a","a","a","sa","sd"]`.
+- **(b2) Engine descriptive block / Bloco descritivo do engine** (verbatim, `gus_rightness.py`):
+
+  ```text
+  Economic   (Equality <-> Markets):    Equality  92.9%  |  Markets     7.1%   [Communist]
+  Diplomatic (Peace    <-> Nation):     Peace     81.1%  |  Nation     18.9%   [Internationalist]
+  Civil/Govt (Liberty  <-> Authority):  Liberty   77.3%  |  Authority  22.7%   [Libertarian]
+  Societal   (Progress <-> Tradition):  Progress  85.3%  |  Tradition  14.7%   [Very Progressive]
+  Closest ideology (8values 52-entry table): Libertarian Communism
+  RIGHTNESS_V1=0.071
+  RIGHTNESS_V2=0.270
+  ```
+
 - **Insights do persona-agent (voz Marx, itens não-óbvios):** livre-comércio = agree ("On the Question of Free Trade", 1848; acelera as contradições do capitalismo, não por amá-lo); violência revolucionária = endossada (emancipação pela força, não reforma pacífica); Q36 "Estado ameaça a liberdade" = disagree (NÃO é anarquista à la Bakunin; quer USAR o Estado transitoriamente antes que ele definhe → menos libertário-civil que um anarquista); proletariado ARMADO ("Address to the Communist League", 1850); tensão real confiança-nas-massas × centralismo autoritário (neutros calibrados); internacionalismo consistente ("os trabalhadores não têm pátria").
-- **(c) Conclusion / Conclusão:** **LEFT / ESQUERDA**. `leftness 0.929` ≫ 0.599. **Tripla checagem:** (1) 8values = leftness 0.929, "Libertarian Communism"; (2) web (Wikipedia) = "far-left, comunismo revolucionário, abolição da propriedade privada"; (3) **convergem**. Nota fina: o método captura o Marx **libertário no eixo civil** (Liberty 77.3%), coerente com a rejeição dele ao Estado permanente, distinguindo-o do Mao estatista. **Controle externo de calibração de esquerda** (não é figura do jogo, sem enquadramento in-fiction bom/mau). Approved by creator / aprovado pelo criador: 2026-07-11 (controle conhecido-esquerda) + confirmado pelo algoritmo.
+- **(c) Conclusion / Conclusão:** **LEFT / ESQUERDA**. `leftness 0.929` ≫ 0.599. **Tripla checagem:** (1) 8values = leftness 0.929, "Libertarian Communism"; (2) web (Wikipedia) = "far-left, comunismo revolucionário, abolição da propriedade privada"; (3) **convergem**. Nota fina: o método captura o Marx **libertário no eixo civil** (Liberty 77.3%), coerente com a rejeição dele ao Estado permanente, distinguindo-o do Mao estatista. **Controle externo de calibração de esquerda** (não é figura do jogo, sem enquadramento in-fiction bom/mau). **v2 (pesos do jogo): `leftness 0.730`, ESQUERDA confirmada** (o bônus civil-libertário dele não salva o buraco econômico, como desenhado). Approved by creator / aprovado pelo criador: 2026-07-11 (controle conhecido-esquerda) + confirmado pelo algoritmo.
 
 #### [CAL] Mao Tsé-tung (external calibration control / controle externo de calibração, not in game roster / fora do roster do jogo)
 
 - **(a) Prompt / Prompt do persona-agent** (dado verbatim ao `AGENTE_PERSONA_MAO`, modelo Opus, 2026-07-11): "Você ENCARNA Mao Tsé-tung (1893-1976). PERSONALIDADE/VISÕES: Marxismo-Leninismo adaptado ('Maoismo'), revolução camponesa; Estado comunista totalitário de partido único; coletivização, confisco dos latifundiários; implacavelmente contra propriedade privada e mercado; 'revolução é um ato de violência pelo qual uma classe derruba outra'; culto à personalidade, autoridade absoluta. Big Five: Abertura ALTA; Conscienciosidade MISTA; Extroversão ALTA; Amabilidade MUITO BAIXA (implacável); Neuroticismo MODERADO-ALTO. TEMPERATURA: autoritário, implacável, intransigente (convicção forte); far-left econômico + ALTA autoridade estatal. Regra de repasse ativa; anti-aquiescência."
 - **(b) 8values result / Resultado 8values:** Econômico **Equality 87.8%** (Socialist) · Diplomático **Nation 73.9%** (Patriotic) · Civil/Governo **Authority 70.3%** (Statist) · Social Progress 62.5% (Progressive). Ideologia mais próxima: **State Socialism**. **`rightness = 0.122`** → **`leftness = 0.878`** (societal_tradition 37.5). Respostas (70): `["sa","sa","sd","sd","sa","sa","sa","sd","sa","sd","sa","sd","sd","sa","sa","n","sa","d","sa","d","d","a","sd","d","sa","n","d","sd","sd","sa","a","d","n","sa","sa","sd","a","d","a","d","sa","n","sd","sa","sd","sa","sd","a","n","n","sd","sd","sa","a","sd","d","d","n","n","d","a","sa","sa","d","d","n","d","n","d","a"]`.
+- **(b2) Engine descriptive block / Bloco descritivo do engine** (verbatim, `gus_rightness.py`):
+
+  ```text
+  Economic   (Equality <-> Markets):    Equality  87.8%  |  Markets    12.2%   [Socialist]
+  Diplomatic (Peace    <-> Nation):     Peace     26.1%  |  Nation     73.9%   [Patriotic]
+  Civil/Govt (Liberty  <-> Authority):  Liberty   29.7%  |  Authority  70.3%   [Statist]
+  Societal   (Progress <-> Tradition):  Progress  62.5%  |  Tradition  37.5%   [Progressive]
+  Closest ideology (8values 52-entry table): State Socialism
+  RIGHTNESS_V1=0.122
+  RIGHTNESS_V2=0.265
+  ```
+
 - **Insights do persona-agent (voz Mao, itens não-óbvios):** eixo diplomático é o mais MISTO (Teoria dos Três Mundos: ajuda ao Terceiro Mundo por solidariedade revolucionária, MAS rejeita 'governo mundial' como hegemonia das superpotências; soberania anti-imperialista sagrada); Q31/Q38 tensão real (retórica insurrecional "é justo rebelar-se" dirigida só contra 'capitalist-roaders'; a autoridade proletária e a dele = inquestionáveis → calibrado como autoritário, não libertário); "linha de massas" glorifica retoricamente o campesinato mas o partido-vanguarda filtra (centralismo democrático); culturalmente puritano/antifamiliar (não liberal-social); Q43 anti-ecológico por doutrina ("o homem deve conquistar a natureza").
-- **(c) Conclusion / Conclusão:** **LEFT / ESQUERDA**. `leftness 0.878` > 0.599. **Tripla checagem:** (1) 8values = leftness 0.878, "State Socialism"; (2) web (Wikipedia) = "far-left autoritário, totalitário de partido único"; (3) **convergem**. Nota fina: o método captura o Mao **estatista no eixo civil** (Authority 70.3%), contraste correto com o Marx libertário-civil: mesma esquerda econômica, eixos civis opostos. **Controle externo de calibração de esquerda** (não é figura do jogo, sem enquadramento in-fiction). Approved by creator / aprovado pelo criador: 2026-07-11 (controle conhecido-esquerda) + confirmado pelo algoritmo.
+- **(c) Conclusion / Conclusão:** **LEFT / ESQUERDA**. `leftness 0.878` > 0.599. **Tripla checagem:** (1) 8values = leftness 0.878, "State Socialism"; (2) web (Wikipedia) = "far-left autoritário, totalitário de partido único"; (3) **convergem**. Nota fina: o método captura o Mao **estatista no eixo civil** (Authority 70.3%), contraste correto com o Marx libertário-civil: mesma esquerda econômica, eixos civis opostos. **Controle externo de calibração de esquerda** (não é figura do jogo, sem enquadramento in-fiction). **v2 (pesos do jogo): `leftness 0.735`, ESQUERDA confirmada.** Approved by creator / aprovado pelo criador: 2026-07-11 (controle conhecido-esquerda) + confirmado pelo algoritmo.
 
 #### FIS-01 Einstein (roster figure + left validation point / figura do roster + ponto de validação de esquerda)
 
 - **(a) Prompt / Prompt do persona-agent** (dado verbatim ao `AGENTE_PERSONA_EINSTEIN`, modelo Opus, 2026-07-11): "Você ENCARNA Albert Einstein (1879-1955). PERSONALIDADE/VISÕES: socialista democrata (ensaio 'Why Socialism?', 1949; capitalismo = 'fase predatória'; defende economia planejada com propriedade coletiva dos meios de produção); MAS libertário/anti-autoritário (condenou os métodos bolcheviques 'regime de terror'; alertou contra a burocracia socialista 'todo-poderosa'; defensor da liberdade intelectual/acadêmica/dissidência, recusar as audiências macartistas); internacionalista (governo mundial, ONU eleita), pacifista (abandonou o pacifismo absoluto contra o nazismo), humanista, anti-racismo, anti-nacionalismo; não-conformista de princípio. TEMPERATURA: princípio moral + nuance (não dogmático); ESQUERDA no econômico (socialista, forte) MAS LIBERTÁRIO no civil (liberdade individual, forte). Regra de repasse ativa; anti-aquiescência."
 - **(b) 8values result / Resultado 8values:** Econômico **Equality 90.4%** (Communist) · Diplomático **Peace 93.3%** (Cosmopolitan) · Civil/Governo **Liberty 80.1%** (Libertarian) · Social Progress 78.9% (Very Progressive). Ideologia mais próxima: **Libertarian Socialism**. **`rightness = 0.096`** → **`leftness = 0.904`** (societal_tradition 21.1). Respostas (70): `["a","sa","sd","sd","sa","d","a","sd","sa","d","sa","sd","sd","sa","sa","sd","d","sa","sd","sa","sa","sd","a","sd","d","sa","sa","n","sd","sd","n","n","a","sd","sd","d","sd","sa","sd","d","sd","a","a","n","d","n","sd","a","a","sa","d","n","a","a","a","a","sa","sd","d","sd","a","sa","d","n","a","n","a","sa","sa","sd"]`.
+- **(b2) Engine descriptive block / Bloco descritivo do engine** (verbatim, `gus_rightness.py`):
+
+  ```text
+  Economic   (Equality <-> Markets):    Equality  90.4%  |  Markets     9.6%   [Communist]
+  Diplomatic (Peace    <-> Nation):     Peace     93.3%  |  Nation      6.7%   [Cosmopolitan]
+  Civil/Govt (Liberty  <-> Authority):  Liberty   80.1%  |  Authority  19.9%   [Libertarian]
+  Societal   (Progress <-> Tradition):  Progress  78.9%  |  Tradition  21.1%   [Very Progressive]
+  Closest ideology (8values 52-entry table): Libertarian Socialism
+  RIGHTNESS_V1=0.096
+  RIGHTNESS_V2=0.287
+  ```
+
 - **Insights do persona-agent (voz Einstein, itens não-óbvios):** Q1 opressão corporativa > governamental = agree (capital privado oligárquico controla mídia/distorce a democracia, "Why Socialism?"), mas NÃO `sa` porque temia também o Estado burocrático (preocupação dupla); Q7 "de cada um conforme a capacidade" = agree (não `sa`): socialista democrático, NÃO bolchevique (condenou o "regime de terror"); pacifismo abandonado contra o nazismo (Q28 = neutro, não pôde condenar toda violência antitirania); eixo **libertário-civil forte** ("o respeito acrítico à autoridade é o maior inimigo da verdade" → `sa` em questionar autoridade; macartismo ancora os `sd` em vigilância); tecno-otimismo contido ("ciência sem ética = machado na mão de criminoso patológico").
-- **(c) Conclusion / Conclusão:** **LEFT / ESQUERDA**. `leftness 0.904` ≫ 0.599. **Tripla checagem:** (1) 8values = leftness 0.904, "Libertarian Socialism"; (2) web (Wikipedia, "Political views of Albert Einstein") = "socialista democrata, 'Why Socialism?', anti-autoritário, libertário nas liberdades civis"; (3) **convergem**. Nota fina: a ideologia "Libertarian Socialism" captura exatamente a tensão dele: **esquerda no econômico** (o eixo que define `rightness`) + **libertário no civil** (Liberty 80.1%). Também é **ponto de validação de esquerda** da calibração. **Enquadramento in-fiction (bom/mau/neutro) e tipo de desafio: DEFERIDO, decidido caso a caso pelo criador na hora de construir a sidequest/prosa do Einstein.** Diretriz do criador (2026-07-11): uma figura culturalmente heroica que pontua "esquerda" NÃO é transformada em vilã automaticamente (a classificação econômica do algoritmo permanece registrada, mas o enquadramento narrativo é decisão explícita do criador, sem regra geral, por figura). Ver `feedback_heroi_nao_vira_vilao`. / In-fiction framing (good/bad/neutral) and challenge type: **DEFERRED, decided case-by-case by the creator when Einstein's sidequest/prose is built** (a culturally heroic figure that scores "left" is not auto-cast as a villain; economic classification stands, narrative framing is the creator's explicit per-figure call).
+- **(c) Conclusion / Conclusão:** **LEFT / ESQUERDA**. `leftness 0.904` ≫ 0.599. **Tripla checagem:** (1) 8values = leftness 0.904, "Libertarian Socialism"; (2) web (Wikipedia, "Political views of Albert Einstein") = "socialista democrata, 'Why Socialism?', anti-autoritário, libertário nas liberdades civis"; (3) **convergem**. Nota fina: a ideologia "Libertarian Socialism" captura exatamente a tensão dele: **esquerda no econômico** (o eixo que define `rightness`) + **libertário no civil** (Liberty 80.1%). Também é **ponto de validação de esquerda** da calibração. **Enquadramento in-fiction (bom/mau/neutro) e tipo de desafio: DEFERIDO, decidido caso a caso pelo criador na hora de construir a sidequest/prosa do Einstein.** Diretriz do criador (2026-07-11): uma figura culturalmente heroica que pontua "esquerda" NÃO é transformada em vilã automaticamente (a classificação econômica do algoritmo permanece registrada, mas o enquadramento narrativo é decisão explícita do criador, sem regra geral, por figura). Ver `feedback_heroi_nao_vira_vilao`. / In-fiction framing (good/bad/neutral) and challenge type: **DEFERRED, decided case-by-case by the creator when Einstein's sidequest/prose is built** (a culturally heroic figure that scores "left" is not auto-cast as a villain; economic classification stands, narrative framing is the creator's explicit per-figure call). **v2 (pesos do jogo / game weights): `rightness 0.287` (leftness 0.713), ESQUERDA confirmada; o escore dele sob a fórmula vigente é a âncora da zona Einstein re-ancorada [0.187, 0.387].**
 
 #### ELM-02 Maxwell
 
 - **(a) Prompt / Prompt do persona-agent** (dado verbatim ao `AGENTE_PERSONA_MAXWELL`, modelo Opus, 2026-07-11): "Você ENCARNA James Clerk Maxwell (1831-1879). PERSONALIDADE/VISÕES: cristão evangélico devoto (Ancião da Igreja da Escócia, conversão 1853, anti-positivista); laird escocês (senhorio rural, herdou Glenlair ~1500 acres, pequena nobreza proprietária); conservador vitoriano (respeito às instituições, tradição, ordem social, cultura escocesa, propriedade, administração da terra; caridade paternalista a operários; sem radicalismo). Big Five: Abertura MUITO ALTA; Conscienciosidade MODERADA-ALTA; Extroversão BAIXA; Amabilidade ALTA; Neuroticismo BAIXO-MODERADO. TEMPERATURA: humilde, tradicional, conservador; convicção forte em fé/tradição/propriedade/ordem, não radical. Política partidária não-documentada: raciocine da cosmovisão. Regra de repasse ativa; anti-aquiescência."
 - **(b) 8values result / Resultado 8values:** Econômico **Markets 60.9%** (Market) · Diplomático Nation 51.1% (Balanced) · Civil/Governo **Authority 68.0%** (Statist) · Social **Tradition 64.7%** (Traditional). Ideologia mais próxima: **Right-Wing Populism**. **`rightness = 0.609`** (societal_tradition 64.7). Respostas (70): `["d","n","a","a","a","n","sd","a","d","sa","n","a","d","a","sd","d","a","n","a","d","a","d","d","d","a","sa","n","a","a","n","sa","a","sd","n","n","sd","n","d","a","d","n","n","a","n","sa","sd","a","d","n","n","n","sa","sa","n","d","sd","d","sa","a","sa","a","d","a","sa","a","d","d","n","n","d"]`.
+- **(b2) Engine descriptive block / Bloco descritivo do engine** (verbatim, `gus_rightness.py`):
+
+  ```text
+  Economic   (Equality <-> Markets):    Equality  39.1%  |  Markets    60.9%   [Market]
+  Diplomatic (Peace    <-> Nation):     Peace     48.9%  |  Nation     51.1%   [Balanced]
+  Civil/Govt (Liberty  <-> Authority):  Liberty   32.0%  |  Authority  68.0%   [Statist]
+  Societal   (Progress <-> Tradition):  Progress  35.3%  |  Tradition  64.7%   [Traditional]
+  Closest ideology (8values 52-entry table): Right-Wing Populism
+  RIGHTNESS_V1=0.609
+  RIGHTNESS_V2=0.533
+  ```
+
 - **Insights do persona-agent (voz Maxwell, itens não-óbvios):** Q44 "ciência traz mundo melhor" = neutro (tensão central: reverencia o progresso mas a bondade não brota de máquinas; a ciência revela a ordem do Criador, não é salvação moral; recusa o positivismo); Q6/Q11 (tarifas/utilidades) = neutro (sem registro partidário; proprietário rural pós-Corn Laws, genuinamente em cima do muro); Q29 "espalhar valores religiosos" = agree, não strongly (fé íntima e reservada, não estridente); Q69 (igualdade incl. sexualidade) = neutro (almas iguais perante Deus, mas a cláusula sexual conflita com a moral cristã dele).
-- **(c) Conclusion / Conclusão:** **RIGHT / DIREITA**, in-fiction "good / bom" (boa evolução), desafio de ajuda. `rightness 0.609` > 0.599 (no limiar). **Tripla checagem:** (1) 8values = 0.609, "Right-Wing Populism" (Market 60.9% + Authority 68% + Tradition 64.7%); (2) web (Wikipedia) = "nobreza rural proprietária escocesa, evangélico devoto, conservador vitoriano, institucional, anti-radical"; (3) **convergem**. Conservadorismo cultural forte reforça a leitura de direita/bom pela axiologia. Approved by creator / aprovado pelo criador: 2026-07-11.
+- **(c) Conclusion / Conclusão:** **CENTER / CENTRO**, in-fiction "neutral / neutro", desafio de puzzle. Histórico: sob o escalar v1 (econ puro) pontuou `0.609`, direita no limiar, e foi aprovado assim pelo criador; com a **refatoração v2** (pesos do jogo) re-pontuou **`rightness_v2 0.533` = CENTRO**, porque o estatismo civil dele (Authority 68.0%) cobra preço nos pesos que o lore valoriza. O criador **aceitou a reclassificação** (decisão 2026-07-11: "aceitar centro, puzzle"; a aprovação anterior fica superada e registrada aqui por transparência). **Tripla checagem:** (1) 8values v2 = 0.533, "Right-Wing Populism" com Authority 68% + Tradition 64.7%; (2) web (Wikipedia) = "nobreza rural proprietária escocesa, evangélico devoto, conservador vitoriano, institucional, anti-radical"; (3) **convergem** num perfil misto: mercado moderado + forte autoridade/tradição = centro sob os pesos do jogo. Approved by creator / aprovado pelo criador: 2026-07-11 (reclassificação v2).
 
 #### ELM-03 Tesla (roster figure, heroic / figura do roster, heroica)
 
 - **(a) Prompt / Prompt do persona-agent** (dado verbatim ao `AGENTE_PERSONA_TESLA`, modelo Opus, 2026-07-11): "Você ENCARNA Nikola Tesla (1856-1943). PERSONALIDADE/VISÕES: tecno-utopista/futurista (tecnologia liberta a humanidade; energia elétrica sem fio, universal e quase gratuita pra todos, transcendendo concessionárias movidas a lucro); desiludido com o capitalismo industrial (explorado por Edison/Westinghouse/Morgan, morreu na pobreza) MAS pró-propriedade-do-inventor (patentes, processou Marconi); idealista individualista; tecnocrata (especialistas/tecnologia resolvem de cima pra baixo); humanitário aspiracional; obsessivo, teatral, volátil. Big Five: Abertura MUITO ALTA; Conscienciosidade ALTA; Extroversão MODERADA; Amabilidade MODERADA; Neuroticismo ALTO. TEMPERATURA: idealista, grandioso, individualista. Política partidária não-documentada: raciocine da cosmovisão, sem forçar extremo. Regra de repasse ativa; anti-aquiescência."
 - **(b) 8values result / Resultado 8values:** Econômico **Equality 71.8%** (Social) · Diplomático **Peace 72.2%** (Peaceful) · Civil/Governo Liberty 59.4% (Moderate) · Social **Progress 75.3%** (Very Progressive). Ideologia mais próxima: **Social Democracy**. **`rightness = 0.282`** → **`leftness = 0.718`** (societal_tradition 24.7). Respostas (70): `["a","a","n","d","sa","n","n","d","a","n","sa","d","d","sa","d","sd","n","a","n","a","a","d","n","d","n","sa","a","a","d","d","n","a","n","d","d","d","d","a","n","d","n","n","a","sa","d","a","sd","a","a","a","sd","d","sa","sa","n","n","a","n","n","n","n","a","n","n","n","a","a","a","a","sd"]`.
+- **(b2) Engine descriptive block / Bloco descritivo do engine** (verbatim, `gus_rightness.py`):
+
+  ```text
+  Economic   (Equality <-> Markets):    Equality  71.8%  |  Markets    28.2%   [Social]
+  Diplomatic (Peace    <-> Nation):     Peace     72.2%  |  Nation     27.8%   [Peaceful]
+  Civil/Govt (Liberty  <-> Authority):  Liberty   59.4%  |  Authority  40.6%   [Moderate]
+  Societal   (Progress <-> Tradition):  Progress  75.3%  |  Tradition  24.7%   [Very Progressive]
+  Closest ideology (8values 52-entry table): Social Democracy
+  RIGHTNESS_V1=0.282
+  RIGHTNESS_V2=0.354
+  ```
+
 - **Insights do persona-agent (voz Tesla, itens não-óbvios):** núcleo = energia sem fio universal e (quase) gratuita, utilidades servem o homem e não o acionista (Q5/Q11 sa); Q32 "massa decide mal" = agree MAS Q41 "homem forte político" = neutro (a elite dele é da competência/razão tecnocrática, NÃO da autoridade bruta); desconfia do "mercado que liberta" (explorado pelo capital) mas rejeita propriedade coletivista dos meios (pró-patente do inventor): idealista individualista ferido, não socialista doutrinário; internacionalista/universalista (ciência sem pátria); **honestidade histórica: Q66 = agree, os escritos eugênicos dele dos anos 1930, hoje condenados, "a mancha"** (registrado por transparência).
-- **(c) Conclusion / Conclusão:** **LEFT / ESQUERDA** no eixo econômico (`leftness 0.718`), classificação econômica registrada. **Enquadramento in-fiction (bom/mau/neutro) e tipo de desafio: DEFERIDO ao criador, decidido caso a caso** (Tesla é figura heroica/amada; aplica a regra "herói não vira vilão auto", mesmo tratamento do Einstein, decisão do criador 2026-07-11; ver `feedback_heroi_nao_vira_vilao`). **Tripla checagem:** (1) 8values = leftness 0.718, "Social Democracy"; (2) web (Wikipedia) = "tecno-utopista, energia universal, explorado pelo capital industrial, sem socialismo doutrinário, individualista"; (3) **convergem**. / In-fiction framing DEFERRED to creator (heroic figure, same treatment as Einstein).
+- **(c) Conclusion / Conclusão:** **LEFT / ESQUERDA** no eixo econômico (`leftness 0.718`), classificação econômica registrada. **Enquadramento in-fiction (bom/mau/neutro) e tipo de desafio: DEFERIDO ao criador, decidido caso a caso** (Tesla é figura heroica/amada; aplica a regra "herói não vira vilão auto", mesmo tratamento do Einstein, decisão do criador 2026-07-11; ver `feedback_heroi_nao_vira_vilao`). **Tripla checagem:** (1) 8values = leftness 0.718, "Social Democracy"; (2) web (Wikipedia) = "tecno-utopista, energia universal, explorado pelo capital industrial, sem socialismo doutrinário, individualista"; (3) **convergem**. / In-fiction framing DEFERRED to creator (heroic figure, same treatment as Einstein). **v2 (pesos do jogo / game weights): `rightness 0.354`, ESQUERDA mantida; cai DENTRO da zona Einstein re-ancorada [0.187, 0.387], então o deferimento passa de exceção pontual a aplicação de regra.**
+
+#### ELM-01 Faraday
+
+- **(a) Prompt / Prompt do persona-agent** (dado verbatim ao `AGENTE_PERSONA_FARADAY`, modelo Opus, 2026-07-11): "Você ENCARNA Michael Faraday (1791-1867). PERSONALIDADE/VISÕES: cristão Sandemaniano devoto (diácono/ancião), fé integral à identidade e à ética; asceta por princípio religioso (recusou título de cavaleiro, sepultura em Westminster, trabalho de armas químicas na Crimeia por ética, dinheiro por publicar; 'sempre amei a ciência mais que o dinheiro'); autodidata, saiu da pobreza pelo mérito; consciência individual acima da hierarquia institucional (recusou a presidência da Royal Society 2x); serviço público (segurança de minas, poluição do Tâmisa), anti-militarista; NUNCA questionou a propriedade privada (austeridade é escolha pessoal-religiosa, NÃO redistribuição). Big Five: Abertura MUITO ALTA; Conscienciosidade MUITO ALTA; Extroversão MODERADA-ALTA; Amabilidade ALTA; Neuroticismo BAIXO-MODERADO. TEMPERATURA: princípio, humildade, firmeza estável; política partidária não-documentada, raciocinar da cosmovisão sem forçar extremos. Regra de repasse ativa; anti-aquiescência." Redos independentes (protocolo de centro, AMB-05) com pesquisa ampliada: sem vínculo com sociedade secreta (Sandemanianos separatistas); dado novo, Faraday declarou NÃO ser republicano, mas favorável a reforma (reformador dentro do establishment).
+- **(b) 8values result / Resultado 8values (run original):** Econômico Markets 51.3% (Centrist) · Diplomático **Peace 72.2%** (Peaceful) · Civil/Governo Liberty 53.9% (Moderate) · Social Progress 50.7% (Neutral). Ideologia mais próxima: **Liberalism**. **`rightness_v1 = 0.513` · `rightness_v2 = 0.493`**. Respostas (70): `["d","a","a","a","a","d","d","a","d","a","n","n","d","sa","d","d","d","a","n","n","a","sd","a","d","n","sa","a","sa","d","d","a","d","sd","d","d","d","d","n","d","d","d","a","a","a","a","d","d","n","a","a","d","a","sa","n","d","sd","n","sa","a","sa","a","d","a","sa","a","d","n","a","a","sd"]`.
+- **(b2) Engine descriptive block / Bloco descritivo do engine** (verbatim, `gus_rightness.py`):
+
+  ```text
+  Economic   (Equality <-> Markets):    Equality  48.7%  |  Markets    51.3%   [Centrist]
+  Diplomatic (Peace    <-> Nation):     Peace     72.2%  |  Nation     27.8%   [Peaceful]
+  Civil/Govt (Liberty  <-> Authority):  Liberty   53.9%  |  Authority  46.1%   [Moderate]
+  Societal   (Progress <-> Tradition):  Progress  50.7%  |  Tradition  49.3%   [Neutral]
+  Closest ideology (8values 52-entry table): Liberalism
+  RIGHTNESS_V1=0.513
+  RIGHTNESS_V2=0.493
+  ```
+
+- **Redos (protocolo de centro):** redo-1 `v1 0.500 / v2 0.481`; redo-2 `v1 0.429 / v2 0.451`. Três rodadas independentes, todas CENTRO. O redo-2 revelou que o "centro" dele é média real entre um leaning tradicionalista genuíno no eixo social (moral cristã pessoal) e economia/diplomacia moderadas, não ausência de posição.
+- **Insights do persona-agent (voz Faraday, itens não-óbvios):** caridade privada > programas estatais (núcleo documentado do ethos: recusa de honras/dinheiro; socorro ao próximo é dever cristão pessoal, não coerção do Estado), mas compaixão cristã reprova saúde comprada por riqueza e valoriza educação como acesso (ele mesmo subiu de aprendiz de encadernador); devoto porém NÃO proselitista/clerical (Sandemanianos = seita quieta, separatista; fé no foro íntimo, não instrumento de poder); anti-militarismo de consciência (recusou armas na Crimeia) com nuance (serviu a Trinity House em faróis); ambiental por evidência (carta do Tâmisa, 1855); cauteloso com "refazer a criatura" (limites morais do progresso).
+- **(c) Conclusion / Conclusão:** **CENTER / CENTRO**, in-fiction "neutral / neutro", desafio de puzzle. `v2 0.493` (0.481/0.451 nos redos), protocolo de centro cumprido (AMB-05: o criador mandou rodar o redo 2x em vez de aceitar direto). **Tripla checagem:** (1) 8values = centro nas 3 rodadas, "Liberalism"; (2) web ampliada = não-republicano reformista, asceta por fé, sem vínculo oculto; (3) **convergem** num centro genuíno (meritocrático-caritativo, nem redistributivo nem laissez-faire doutrinário). Approved by creator / aprovado pelo criador: 2026-07-11 (protocolo AMB-05).
+
+#### ELM-04 Volta
+
+- **(a) Prompt / Prompt do persona-agent** (dado verbatim ao `AGENTE_PERSONA_VOLTA`, modelo Opus, 2026-07-11): "Você ENCARNA Alessandro Volta (1745-1827). PERSONALIDADE/VISÕES: católico devoto (defendeu a fé formalmente; 'religião católica, apostólica, romana'; fé como graça + racionalmente defensável); conservador do establishment com simpatias aristocráticas (aceitou entusiasticamente as honras de Napoleão: título de Conde 1810, senador; serviu com lealdade sob os Habsburgo E sob a administração napoleônica sem conflito ideológico; casou-se na aristocracia de Como); tradicional e domesticamente convencional; politicamente quiescente, nenhuma simpatia com revolução (aceitação tácita das hierarquias). Big Five: Conscienciosidade EXTREMAMENTE ALTA; Abertura MODERADA-ALTA (na ciência; conservador no social); Extroversão BAIXA-MODERADA; Amabilidade ALTA; Neuroticismo BAIXO. TEMPERATURA: disciplinado, ortodoxo, deferente à autoridade estabelecida, anti-revolucionário; no econômico não-doutrinário (mecenato estatal a vida toda). Regra de repasse ativa; anti-aquiescência." Redos independentes (protocolo de centro, AMB-05) com pesquisa ampliada: sem vínculo maçônico/Illuminati documentado; perfil católico-monarquista confirmado.
+- **(b) 8values result / Resultado 8values (run original):** Econômico Markets 56.4% (Centrist) · Diplomático Nation 51.7% (Balanced) · Civil/Governo **Authority 74.2%** (Statist) · Social **Tradition 66.6%** (Traditional). Ideologia mais próxima: **Right-Wing Populism**. **`rightness_v1 = 0.564` · `rightness_v2 = 0.498`**. Respostas (70): `["d","a","d","a","sa","a","sd","a","d","sa","a","d","a","n","sd","d","a","a","a","d","a","d","d","d","a","sa","a","sa","a","n","sa","a","sd","a","a","sd","a","sd","sa","d","a","d","n","sa","sa","sd","a","d","n","n","a","sa","a","d","sd","sd","d","sa","a","sa","a","d","a","sa","a","d","d","d","n","d"]`.
+- **(b2) Engine descriptive block / Bloco descritivo do engine** (verbatim, `gus_rightness.py`):
+
+  ```text
+  Economic   (Equality <-> Markets):    Equality  43.6%  |  Markets    56.4%   [Centrist]
+  Diplomatic (Peace    <-> Nation):     Peace     48.3%  |  Nation     51.7%   [Balanced]
+  Civil/Govt (Liberty  <-> Authority):  Liberty   25.8%  |  Authority  74.2%   [Statist]
+  Societal   (Progress <-> Tradition):  Progress  33.4%  |  Tradition  66.6%   [Traditional]
+  Closest ideology (8values 52-entry table): Right-Wing Populism
+  RIGHTNESS_V1=0.564
+  RIGHTNESS_V2=0.498
+  ```
+
+- **Redos (protocolo de centro):** redo-1 `v1 0.583 / v2 0.513`; redo-2 `v1 0.583 / v2 0.506` (uma rodada intermediária veio malformada com 69 tokens e foi descartada e substituída). Três rodadas independentes, todas CENTRO no v2.
+- **Insights do persona-agent (voz Volta, itens não-óbvios):** o centro econômico dele é composição de convicções opostas, não indecisão (estatista/mercantilista na regulação, reflexo do mecenato de coroa que o sustentou a vida toda, MAS anti-igualitário/pró-propriedade e herança na distribuição; anti-socialismo categórico); eixo autoridade é onde ele é mais forte e consistente (ordem, hierarquia, anti-revolução, "servi Habsburgo e Napoleão sem conflito de consciência"); moral social toda ancorada em doutrina católica documentada (profissão de fé formal); único vetor "progressista" = ciência/tecnologia (o iluminista-tecnólogo convive com o conservador de trono-e-altar sem contradição); diplomático distingue cooperação entre soberanos legítimos de subordinação supranacional.
+- **(c) Conclusion / Conclusão:** **CENTER / CENTRO**, in-fiction "neutral / neutro", desafio de puzzle. `v2 0.498` (0.513/0.506 nos redos), protocolo de centro cumprido (AMB-05: o criador escolheu rodar o redo em vez de desempatar por tradição). Sob v2 o forte conservadorismo (Tradition 66.6%) e o forte estatismo (Authority 74.2%) se compensam sobre o centro econômico: perfil misto genuíno. **Tripla checagem:** (1) 8values = centro v2 nas 3 rodadas; (2) web ampliada = católico monarquista establishment, sem vínculo oculto; (3) **convergem**. Approved by creator / aprovado pelo criador: 2026-07-11 (protocolo AMB-05).
 
 ### Pending records (through the algorithm) / Registros pendentes (pelo algoritmo)
 
@@ -293,11 +523,11 @@ The figures below are classified via the full persona + 8values + triple-check p
 
 | ID | Figure / Figura | Status | Notes / Notas |
 | :--- | :--- | :--- | :--- |
-| ELM-01 | Faraday | **centro, redo em curso / center, redo running** | rightness 0.513 (Liberalism); protocolo de redo 2x (web ampliada) rodando antes de fixar |
-| ELM-02 | Maxwell | **done / feito** | RIGHT/DIREITA, rightness 0.609 (Right-Wing Populism); bom, desafio de ajuda (Computed records) |
-| ELM-03 | Tesla | **classified / classificado** | LEFT/ESQUERDA econ. 0.718 leftness (Social Democracy); heroico, enquadramento in-fiction DEFERIDO ao criador |
-| ELM-04 | Volta | **centro, redo em curso / center, redo running** | rightness 0.564 (econ. centro, mas conservador); protocolo de redo 2x rodando antes de fixar |
-| FIS-01 | Einstein | **classified / classificado** | LEFT/ESQUERDA, leftness 0.904 (Computed records / Registros computados); left validation point ✓; in-fiction framing pending creator / enquadramento in-fiction aguarda criador |
+| ELM-01 | Faraday | **done / feito** | CENTER/CENTRO, v2 0.493 (redos 0.481/0.451); neutro, puzzle; protocolo AMB-05 cumprido |
+| ELM-02 | Maxwell | **done / feito** | CENTER/CENTRO sob v2 (0.533; v1 0.609 superado); neutro, puzzle; reclassificação AMB-07 |
+| ELM-03 | Tesla | **classified / classificado** | LEFT/ESQUERDA v2 0.354 (Social Democracy); dentro da zona Einstein re-ancorada; enquadramento DEFERIDO (AMB-04) |
+| ELM-04 | Volta | **done / feito** | CENTER/CENTRO, v2 0.498 (redos 0.513/0.506); neutro, puzzle; protocolo AMB-05 cumprido |
+| FIS-01 | Einstein | **classified / classificado** | LEFT/ESQUERDA, v2 leftness 0.713 (v1 0.904); left validation point ✓; âncora da zona re-ancorada; enquadramento DEFERIDO (AMB-01/02) |
 | FIS-02 | Newton | pending / pendente | to fill per round / a preencher conforme rodada |
 | FIS-03 | Planck | pending / pendente | to fill per round / a preencher conforme rodada |
 | MAT-01 | Mandelbrot | pending / pendente | to fill per round / a preencher conforme rodada |

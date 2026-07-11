@@ -16,12 +16,28 @@ eixo, a formula de scoring e a tabela de 52 ideologias sao do 8values
 
 - `8values_engine.py` -- o engine (dados + logica + CLI). Ver docstring do
   modulo para a formula de scoring completa.
+- `gus_rightness.py` -- camada v2 SEPARADA, EXCLUSIVA DO JOGO (ver aviso
+  abaixo). NAO modifica o engine: importa o scoring dele verbatim e imprime
+  os dois escalares (`RIGHTNESS_V1`, `RIGHTNESS_V2`) + bloco descritivo.
 - `PERGUNTAS.md` -- as 70 perguntas (texto EN original), numeradas 1-70,
   para dar a um persona-agent responder.
 - `ATTRIBUTION.md` -- creditos ao 8values original + o que o GusWorld
   adicionou.
 - `LICENSE_8VALUES_ORIGINAL.txt` -- copia verbatim da MIT License do repo
   8values original.
+
+## AVISO: `gus_rightness.py` e EXCLUSIVO DO JOGO (nao e o 8values)
+
+O script `gus_rightness.py` aplica pesos por eixo
+(`0.50*Markets + 0.25*Liberty + 0.15*Tradition + 0.10*Nation`) que refletem
+a importancia de cada eixo DENTRO DA FICCAO do GusWorld, unica e
+exclusivamente (mecanica de jogo: qual arquetipo de sidequest uma carta de
+personagem ficticio recebe). **NAO e uma modificacao do teste 8values** (o
+scoring original em `8values_engine.py` permanece intocado), **NAO e uma
+afirmacao sobre politica do mundo real** e **NAO deve ser levado ao mundo
+real** nem usado para avaliar pessoas, testes ou ideologias reais.
+Racional completo, historia da refatoracao e log de decisoes:
+`../OBRA-DE-FICCAO-E-METODOLOGIA.md` (secao "Pesos dos eixos v2").
 
 ## Como usar (fluxo persona-agent -> engine)
 

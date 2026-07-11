@@ -102,6 +102,8 @@ The project moves through a milestone board (M0 to M9) covering the engine port,
 
 GusWorld is a **solo project** and isn't accepting external pull requests during this development phase. Bug reports and feedback are always welcome via [Codeberg issues](https://codeberg.org/petrinhu/gusworld/issues). See the wiki's [Contributing](https://codeberg.org/petrinhu/gusworld/wiki/Contributing) page for details.
 
+**Issue policy:** only **technical** issues are accepted (bugs, build problems, crashes, documentation errors). Issues of a political, economic, philosophical, social or similar nature will be **closed or deleted without reply**. GusWorld is a work of fiction (see the [Fiction disclaimer](docs/design/roster-analogos/OBRA-DE-FICCAO-E-METODOLOGIA.md)); its design documents are not an invitation to real-world debate.
+
 ## Support the project
 
 GusWorld is **freeware** (free, forever). If you enjoy it and want to help keep development going (including the AI tooling that helps build the game):
@@ -236,6 +238,8 @@ O projeto avança por um board de marcos (M0 a M9) cobrindo o porte da engine, o
 ### Contribuindo
 
 GusWorld é um **projeto solo** e não aceita pull requests externos nesta fase de desenvolvimento. Relatos de bug e feedback são sempre bem-vindos via [issues do Codeberg](https://codeberg.org/petrinhu/gusworld/issues). Veja a página [Contributing](https://codeberg.org/petrinhu/gusworld/wiki/Contributing) da wiki para detalhes.
+
+**Política de issues:** somente issues **técnicos** são aceitos (bugs, problemas de build, crashes, erros de documentação). Issues de fundo político, econômico, filosófico, social ou de natureza similar serão **fechados ou excluídos sem resposta**. GusWorld é uma obra de ficção (veja o [Aviso de Ficção](docs/design/roster-analogos/OBRA-DE-FICCAO-E-METODOLOGIA.md)); seus documentos de design não são um convite a debate de mundo real.
 
 ### Apoie o projeto
 
