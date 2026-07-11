@@ -711,4 +711,43 @@ External calibration-only figures (Marx, Mao Zedong) are **not** part of the gam
 
 ---
 
+## ROSTER-AUDIT-FINAL / Auto-auditoria da maratona (2026-07-11)
+
+Feat de fecho pedido pelo criador: confrontar este doc com TODOS os pedidos feitos ao longo da maratona ROSTER-CANONIZE e confirmar se foram realizados e documentados. Confrontação abaixo (o orquestrador se auto-audita; achados de pendência marcados). / Creator-requested closing feat: confront this doc against every request made during the marathon.
+
+| # | Pedido do criador | Status | Onde no doc / evidência |
+| :--- | :--- | :--- | :--- |
+| 1 | Metodologia de espectro (direita=bom, esquerda=mau, centro=puzzle; pesquisa→Big Five→persona→8values→tripla checagem; mostrar o algoritmo pra aprovar) | ✅ | Seções "Methodology" e "Method calibration"; engine em `8values-engine/` |
+| 2 | Calibração (Mises/Hayek direita, Marx/Mao esquerda externos, Einstein) com convergência >0.599 | ✅ | "Method calibration" + resultado v1/v2/v3; convergência registrada |
+| 3 | Rodar o algoritmo no Einstein | ✅ | Registro FIS-01 Einstein (computado) |
+| 4 | Registrar resultado 8values + conclusão (dir/esq/centro) por personagem no doc | ✅ | Apêndice "Computed records" + notas de rodada vigente por figura |
+| 5 | Descrever o mecanismo de calibragem em detalhe no doc | ✅ | "Method calibration" (fórmula, limiares, convergência, tripla checagem) |
+| 6 | Prompts dos persona-agents no doc, por agente | ✅ | Cada registro traz o prompt (a) verbatim; centros trazem prompt condensado |
+| 7 | Linkar o doc no README | ✅ | README (en linha ~31, pt ~166): "Fiction disclaimer and methodology" |
+| 8 | Registros do agente no doc | ✅ | Apêndice: prompt + array + bloco descritivo + insights + conclusão |
+| 9 | Feat de auto-auditoria (esta tabela) | ✅ | Esta seção |
+| 10 | Resultados + insights dos persona-agents no doc, commit cada mudança | ✅ | Insights por figura; ~18 commits ao longo da maratona |
+| 11 | Documentar detalhes (pessoas reais, transparência) | ✅ | Disclaimer de ficção + registros detalhados + nota da figura viva |
+| 12 | Persona-agents repassam ordens ao main, não executam | ✅ | Cláusula de repasse em todo prompt; memória `feedback_persona_agents_relay_only` |
+| 13 | Engine 8values canonizado como fork + comunicar ao autor + mencionado nos docs | ✅ / ⏳ | Fork em `8values-engine/` (ATTRIBUTION + LICENSE); **outreach ao autor PENDENTE** (rascunho, criador envia) |
+| 14 | Parar o emoji de bateria | ✅ | Cessado |
+| 15 | Herói não vira vilão automático, consultar com opções | ✅ | Salvaguarda de herói + AMB-01/02; memória `feedback_heroi_nao_vira_vilao` |
+| 16 | Einstein como calibragem de pendentes, banda de ±% (zona Einstein) | ✅ | "Zona Einstein" ±10pp, re-ancorada à fórmula vigente; AMB-03 |
+| 17 | Pesos aos valores pela ordem de importância; redefinir calibração; refazer testes | ✅ | "Pesos dos eixos v2"; AMB-06; reteste v3 completo |
+| 18 | Documentar a refatoração + a dor que levou a ela | ✅ | "Pesos dos eixos v2" (a dor: perfis achatados, heróis-esquerda, tudo manual) |
+| 19 | EXTREMAMENTE claro que os pesos são DO JOGO, não do mundo real, não modificam o teste | ✅ | "Pesos dos eixos v2" (disclaimer em caixa-alta EN+PT) + README do engine |
+| 20 | Sempre registrar ambiguidades (opções + motivos + decisão) | ✅ | "Ambiguity decision log" AMB-01..09; memória `feedback_registro_ambiguidades_doc` |
+| 21 | Política de issues (só técnicos; político/econ/filosófico/social = fechado sem resposta) no README + doc | ✅ | README (en+pt) + "Questions or concerns" / "Dúvidas ou preocupações" |
+| 22 | Resultado descritivo do engine explícito no doc (equality/nation etc) | ✅ | Bloco `(b2)` descritivo verbatim em cada registro |
+| 23 | Persona-agents = Fable, não Opus | ✅ | Reteste v3 todo em Fable; "O reteste completo v3" documenta a troca |
+| 24 | Refazer resultado de todos (exceto Tusk) sob a refatoração, reusar pesquisa, re-rodar agentes | ✅ | Reteste v3: 20 figuras + 28 redos; Tusk blindado por fiat |
+| 25 | Registrar o reteste + motivos + a troca Fable no doc | ✅ | "O reteste completo v3" (4 motivos) |
+| 26 | Casos duvidosos decididos todos no final | ✅ | "Pending doubtful cases" resolvido em lote; AMB-09 |
+| 27 | Centros → braço de redo 2× | ✅ | 14 centros × redo 2× (mediana de 3 rodadas); todos confirmados |
+| 28 | Fazer 4 por vez (cautela OOM) | ✅ | Lotes de 4 personas a partir da instrução |
+
+**Achados da auto-auditoria:** (a) **8VALUES-OUTREACH pendente** (item 13): o fork está atribuído no repo, mas o aviso ao autor original do 8values ainda é um rascunho a ser enviado pelo criador (comunicação externa). (b) **Prosa deep-lore pendente**: a classificação está completa, mas a prosa de cada figura (via `narrative-writer`, colaborativa) ainda não começou. (c) **Cosmético:** a tabela "Pending records" no apêndice ficou com rótulos "pending" desatualizados (a fonte de verdade é a "tabela de classificação final in-fiction"); manter como histórico ou higienizar numa passada futura. Fora esses, todos os 28 pedidos foram realizados e documentados.
+
+---
+
 *Recomendação técnica de compliance; validar com jurídico antes de qualquer decisão vinculante. This is a technical compliance recommendation; validate with legal counsel before any binding decision.*
