@@ -28,6 +28,8 @@ GusWorld is a single-player, turn-based RPG with puzzle and adventure elements. 
 
 It's a one-person project: design, code, art direction and writing are all done by a single solo developer, with an AI-assisted production pipeline for art and a lot of help from the open-source ecosystem (see [Credits and acknowledgments](#credits-and-acknowledgments)).
 
+**Historical figures:** GusWorld reimagines real, deceased historical figures (Faraday, Ada Lovelace, Hayek, and others) as fictional in-game characters, plus one fictional character inspired by a living contemporary figure. See the [Fiction disclaimer and methodology](docs/design/roster-analogos/OBRA-DE-FICCAO-E-METODOLOGIA.md) notice for what this is, and isn't.
+
 ## Status
 
 GusWorld is **in active development**, currently building its first **vertical slice**: one small city area, one turn-based combat encounter, and one puzzle, all playable end-to-end on the new C++/SDL3 engine. The project has already gone through two stack pivots (from Godot/C# to Qt6, then from Qt6 to SDL3) as the team (of one) converged on the stack that best serves the performance target: smooth play on modest, integrated-GPU hardware.
@@ -160,6 +162,8 @@ The full acknowledgments (including a proper thank-you to the RmlUi and glintfx 
 GusWorld é um RPG single-player com combate por turnos e elementos de puzzle e aventura. Você joga como Gus, um prodígio analítico de 11 anos, navegando por um mundo dividido entre uma megacidade ciber-gótica e uma floresta selvagem e matematicamente precisa chamada Selve Sombria. Combate, exploração e puzzles seguem a mesma ideia: o mundo é um sistema para entender e raciocinar, não para vencer na força bruta.
 
 É um projeto de uma pessoa só: design, código, direção de arte e roteiro são feitos por um único desenvolvedor solo, com um pipeline de produção de arte assistido por IA e muita ajuda do ecossistema open-source (veja [Créditos e agradecimentos](#créditos-e-agradecimentos)).
+
+**Figuras históricas:** GusWorld reimagina figuras históricas reais e falecidas (Faraday, Ada Lovelace, Hayek, entre outras) como personagens ficcionais in-game, mais um personagem fictício inspirado numa figura contemporânea viva. Veja o aviso de [Ficção e metodologia](docs/design/roster-analogos/OBRA-DE-FICCAO-E-METODOLOGIA.md) para entender o que isso é, e o que não é.
 
 ### Status
 
