@@ -311,6 +311,8 @@ Creator directive (2026-07-11): during the v3 full re-run, **do not stop for eac
 | ELM-03 Tesla | rightness_v2 **0.370** (Social Democracy) | esquerda, mas herói e DENTRO da zona Einstein [0.184,0.384] | deferido (regra herói) · confirmar enquadramento |
 | ELM-04 Volta | rightness_v2 **0.487** (Right-Wing Populism) | econ centro, mas autoridade 73% + tradição 67% (católico trono-e-altar) | centro/puzzle · direita/bom por desempate conservador |
 | ECO-03 Menger | rightness_v2 **0.601** (Classical Liberalism) | direita, mas na exata margem (0.601, igual ao Hayek) | aceitar direita-limiar · confirmar |
+| FIS-02 Newton | rightness_v2 **0.556** (Right-Wing Populism) | econ/tradição/nação direita, mas Authority 77% (Liberty 23%) puxa ao centro | centro/puzzle · direita/bom por desempate conservador |
+| FIS-03 Planck | rightness_v2 **0.464** (centro) | econ centrista + autoritário 70% + nação 61%; conservador prussiano | centro/puzzle · direita/bom por desempate conservador |
 
 ### Ambiguity decision log / Registro de decisões de ambiguidade
 
@@ -604,6 +606,44 @@ Os dados abaixo (prompt, respostas, resultado, insights) ficam em pt-br, a líng
 - **Redos (protocolo de centro):** redo-1 `v1 0.583 / v2 0.513`; redo-2 `v1 0.583 / v2 0.506` (uma rodada intermediária veio malformada com 69 tokens e foi descartada e substituída). Três rodadas independentes, todas CENTRO no v2.
 - **Insights do persona-agent (voz Volta, itens não-óbvios):** o centro econômico dele é composição de convicções opostas, não indecisão (estatista/mercantilista na regulação, reflexo do mecenato de coroa que o sustentou a vida toda, MAS anti-igualitário/pró-propriedade e herança na distribuição; anti-socialismo categórico); eixo autoridade é onde ele é mais forte e consistente (ordem, hierarquia, anti-revolução, "servi Habsburgo e Napoleão sem conflito de consciência"); moral social toda ancorada em doutrina católica documentada (profissão de fé formal); único vetor "progressista" = ciência/tecnologia (o iluminista-tecnólogo convive com o conservador de trono-e-altar sem contradição); diplomático distingue cooperação entre soberanos legítimos de subordinação supranacional.
 - **(c) Conclusion / Conclusão:** **CENTER / CENTRO**, in-fiction "neutral / neutro", desafio de puzzle. `v2 0.498` (0.513/0.506 nos redos), protocolo de centro cumprido (AMB-05: o criador escolheu rodar o redo em vez de desempatar por tradição). Sob v2 o forte conservadorismo (Tradition 66.6%) e o forte estatismo (Authority 74.2%) se compensam sobre o centro econômico: perfil misto genuíno. **Tripla checagem:** (1) 8values = centro v2 nas 3 rodadas; (2) web ampliada = católico monarquista establishment, sem vínculo oculto; (3) **convergem**. Approved by creator / aprovado pelo criador: 2026-07-11 (protocolo AMB-05).
+
+#### FIS-02 Newton
+
+- **(a) Prompt / Prompt** (verbatim ao `AGENTE_PERSONA_NEWTON`, modelo Fable, 2026-07-11): Isaac Newton (1643-1727); religiosidade heterodoxa secreta (anti-trinitariano, profecia, alquimia); Master da Casa da Moeda (moeda sólida, perseguição implacável de falsários, ordem econômica centralizada); MP Whig (defesa da ordem protestante contra o avanço católico de James II, não princípio democrático); presidente autocrático da Royal Society (vingativo); monarquista, cavaleiro, lealdade à coroa/instituições de elite, sem política redistributiva. Big Five: O alta seletiva, C extremamente alta, E muito baixa, A baixa (vingativo), N moderado-alto.
+- **(b) 8values result / Resultado 8values:** Econômico Markets 65.4% (Market) · Diplomático Nation 73.9% (Patriotic) · Civil Authority 77.0% (Authoritarian) · Social Tradition 65.2% (Traditional). Ideologia: **Right-Wing Populism**. **`rightness_v1 = 0.654` · `rightness_v2 = 0.556`**. Array Fable (70): `["d","a","n","a","a","a","sd","a","d","sa","n","d","a","d","sd","a","a","d","sa","sd","d","n","d","a","sa","n","d","n","d","a","sa","sa","sd","a","a","sd","a","n","a","sd","a","d","n","a","a","d","a","d","n","n","a","a","sa","a","d","sd","d","sa","a","sa","a","d","a","a","a","d","d","d","d","a"]`.
+- **(b2) Engine descriptive block / Bloco descritivo do engine:**
+
+  ```text
+  Economic   (Equality <-> Markets):    Equality  34.6%  |  Markets    65.4%   [Market]
+  Diplomatic (Peace    <-> Nation):     Peace     26.1%  |  Nation     73.9%   [Patriotic]
+  Civil/Govt (Liberty  <-> Authority):  Liberty   23.0%  |  Authority  77.0%   [Authoritarian]
+  Societal   (Progress <-> Tradition):  Progress  34.8%  |  Tradition  65.2%   [Traditional]
+  Closest ideology (8values 52-entry table): Right-Wing Populism
+  RIGHTNESS_V1=0.654
+  RIGHTNESS_V2=0.556
+  ```
+
+- **Insights do persona-agent (voz Newton):** estatista de ordem (intervenção na moeda) mas anti-redistribuição (Q7/Q15 sd, Q10 sa); eixo autoridade é o mais forte (pena capital a falsários, rede de informantes, presidência autocrática, desprezo elitista pela plebe); Q38 neutro por tensão real (politicamente hierárquico, mas cientificamente demoliu toda autoridade recebida); monarquista protestante (Q20 sd ancorado nas profecias anti-Roma); heterodoxia antitrinitária SECRETA (Q29 d, jamais propagandearia).
+- **(c) Conclusion / Conclusão:** **CENTER / CENTRO** sob v2, in-fiction "neutral / neutro", desafio de puzzle (caso duvidoso, decidir no final). `rightness_v2 0.556`: econômico (65%), tradição (65%) e nação (74%) todos à direita, MAS o Liberty baixíssimo (23%, autoritário) puxa o composto ponderado para o centro. Perfil de conservador-autoritário de Antigo Regime. **Tripla checagem:** (1) 8values v2 = centro, "Right-Wing Populism"; (2) web = monarquista Whig, establishment de elite, autocrático, sem política social; (3) convergem num perfil direita-autoritária que os pesos do jogo (que valorizam Liberty) neutralizam. Enquadramento final na decisão em lote.
+
+#### FIS-03 Planck
+
+- **(a) Prompt / Prompt** (verbatim ao `AGENTE_PERSONA_PLANCK`, modelo Fable, 2026-07-11): Max Planck (1858-1947); conservador do establishment prussiano, institucionalista dedicado (dever, serviço às instituições); assinou o Manifesto dos 93 (depois lamentado); ANTI-democrático (contra o sufrágio universal, elitismo político); luterano deísta; sob o nazismo ficou na Alemanha tentando preservar a ciência de dentro, foi a Hitler defender colegas judeus, não emigrou nem entrou na resistência, filho Erwin executado pelo atentado de 1944. Big Five: C muito alta, O moderada, E baixa-moderada, A moderada-alta, N baixo (estoico).
+- **(b) 8values result / Resultado 8values:** Econômico Markets 47.4% (Centrist) · Diplomático Nation 60.6% (Patriotic) · Civil Authority 69.5% (Statist) · Social Tradition 60.0% (Neutral). Ideologia: **Theocratic Distributism** (rótulo mais próximo na tabela). **`rightness_v1 = 0.474` · `rightness_v2 = 0.464`**. Array Fable (70): `["d","a","d","a","sa","a","sd","d","d","a","a","d","n","a","sd","d","a","d","sa","d","n","d","d","d","sa","a","d","n","d","a","sa","sa","d","a","n","sd","sa","sd","a","sd","n","d","n","a","a","sd","d","d","n","a","a","sa","a","n","d","d","d","a","a","a","a","n","a","sa","a","d","d","d","a","n"]`.
+- **(b2) Engine descriptive block / Bloco descritivo do engine:**
+
+  ```text
+  Economic   (Equality <-> Markets):    Equality  52.6%  |  Markets    47.4%   [Centrist]
+  Diplomatic (Peace    <-> Nation):     Peace     39.4%  |  Nation     60.6%   [Patriotic]
+  Civil/Govt (Liberty  <-> Authority):  Liberty   30.5%  |  Authority  69.5%   [Statist]
+  Societal   (Progress <-> Tradition):  Progress  40.0%  |  Tradition  60.0%   [Neutral]
+  Closest ideology (8values 52-entry table): Theocratic Distributism
+  RIGHTNESS_V1=0.474
+  RIGHTNESS_V2=0.464
+  ```
+
+- **Insights do persona-agent (voz Planck):** estatista prussiano (apoio ao papel do Estado bismarckiano no financiamento da ciência), mas anti-redistribuição marxista (Q7/Q15 sd); anti-democrático e pró-ordem coerente com o elitismo declarado (culpou o "governo das multidões"); Q41 neutro (monarquista que viu no ditador nazista o pior desfecho, "liderança forte" não é valor em si); Q28 neutro é a inferência mais delicada (escolheu a acomodação legalista, mas o filho Erwin morreu no atentado de 1944, não condenaria a memória dele); nacionalismo cultural com internacionalismo científico.
+- **(c) Conclusion / Conclusão:** **CENTER / CENTRO** sob v2, in-fiction "neutral / neutro", desafio de puzzle (caso duvidoso, decidir no final). `rightness_v2 0.464`: econômico centrista, mas autoritário (70%) + nacionalista (61%) + tradicional (60%). Conservador-autoritário prussiano que os pesos do jogo (Liberty) empurram ao centro. **Tripla checagem:** (1) 8values v2 = centro; (2) web = conservador prussiano, institucional, anti-democrático, luterano deísta; (3) convergem. Enquadramento final na decisão em lote.
 
 ### Pending records (through the algorithm) / Registros pendentes (pelo algoritmo)
 
