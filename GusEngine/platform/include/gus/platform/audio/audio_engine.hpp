@@ -133,6 +133,19 @@ public:
     // introduzir uma interface so pra permitir um spy/mock.
     [[nodiscard]] unsigned int sfx_play_count() const noexcept;
 
+    // HOOK DE TESTE (item 1, retoque ao vivo SAVE-LOAD-UI/MODOS-MORTE-FASE0
+    // 2026-07-10/11, "SFX bloqueado do card Hardcore"): o SoundId do ULTIMO
+    // play_sfx EFETIVAMENTE disparado (mesmo criterio de sfx_play_count() acima -
+    // id invalido/engine indisponivel NAO atualiza isto); kInvalidSound se nenhum
+    // play efetivo aconteceu ainda. sfx_play_count() sozinho so prova QUANTOS
+    // plays aconteceram, nao QUAL SoundId - insuficiente pra provar ROTEAMENTO
+    // (ex.: "hover no item bloqueado tocou o SFX bloqueado, NAO o hover normal").
+    // Como SoundId e 1-based na ordem de load_sfx (ver o .cpp), um
+    // consumidor de teste que sabe a ordem de load_sfx do caminho de producao
+    // (ex.: difficulty_menu_loop.cpp: hover, click, blocked) pode comparar
+    // last_sfx_id() contra o id esperado apos uma interacao real (SDL_PushEvent).
+    [[nodiscard]] SoundId last_sfx_id() const noexcept;
+
     // HOOK DE TESTE (M6 F4, ADR-011): quantos play_music EFETIVAMENTE tocaram (id
     // valido + engine available() - nao conta chamadas no-op) desde a construcao. Mesmo
     // espirito de sfx_play_count(), agora pro lado de musica - prova HEADLESS que
@@ -157,6 +170,7 @@ private:
     float sfx_volume_ = 1.0f;    // MENU-PAUSA-CONFIG-SOM: volume do grupo sfx_group
     unsigned int sfx_play_count_ = 0;    // hook de teste (M6 F3) - ver sfx_play_count()
     unsigned int music_play_count_ = 0;  // hook de teste (M6 F4) - ver music_play_count()
+    SoundId last_sfx_id_ = kInvalidSound;  // hook de teste (item 1, 2026-07-10/11) - ver last_sfx_id()
 };
 
 }  // namespace gus::platform::audio

@@ -197,6 +197,13 @@ inline constexpr std::string_view kHitSfxAltFile = "hit_digital_alt_provisorio.w
 // rapido); click = confirmacao 2-tons ascendente (mais presente que o hover).
 inline constexpr std::string_view kMenuHoverSfxFile = "menu_hover_provisorio.wav";
 inline constexpr std::string_view kMenuClickSfxFile = "menu_click_provisorio.wav";
+// SFX de card BLOQUEADO (Hardcore bloqueado na tela de dificuldade, MODOS-MORTE Fase 0,
+// polish do playtest ao vivo do lider 2026-07-10): grave/abafado, tocado no lugar do
+// hover/click normal quando a interacao (hover OU clique/Enter) mira um item NAO-
+// selecionavel (difficulty_item_selectable()==false). Gerado pelo audio-designer em
+// paralelo (mesma pasta/formato de kMenuHoverSfxFile/kMenuClickSfxFile). MESMA
+// degradacao segura de load_sfx (arquivo ausente -> SoundId invalido -> play() no-op).
+inline constexpr std::string_view kMenuBlockedSfxFile = "menu_blocked_provisorio.wav";
 
 // Pasta da musica (MP3, streaming - M6 F4, ADR-011). Raiz assets/music/ (irma de
 // assets/sfx/, mesmo padrao/resolvedor - ver comentario de kSfxDir acima).

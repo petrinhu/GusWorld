@@ -63,6 +63,12 @@ add_executable(gusengine_app_tests
     # (0 assercoes) se GL/display indisponivel. ui_box_assertions.hpp e so header
     # (helpers genericos), nao entra aqui.
     save_load_menu_interaction_test.cpp
+    # MODOS-MORTE-FASE0/SAVE-LOAD-UI (retoque ao vivo 2026-07-10/11, item 1 "SFX
+    # bloqueado do card Hardcore"): harness HEADLESS com GL real, MESMA receita de
+    # save_load_menu_interaction_test.cpp - prova por CONTAGEM/SoundId
+    # (AudioEngine::last_sfx_id(), hook aditivo desta onda) o roteamento
+    # hover/click bloqueado x normal.
+    difficulty_menu_loop_interaction_test.cpp
 )
 
 target_link_libraries(gusengine_app_tests
@@ -89,6 +95,15 @@ target_link_libraries(gusengine_app_tests PRIVATE glintfx::glintfx)
 # CMAKE_CURRENT_SOURCE_DIR - as fontes vivem em GusEngine/assets/fonts).
 target_compile_definitions(gusengine_app_tests
     PRIVATE GUSWORLD_FONTS_DIR="${CMAKE_SOURCE_DIR}/assets/fonts"
+)
+
+# stb_image_write (item 2, prova visual PNG do dialogo "Deseja salvar no Espaco
+# [N] (vazio)?", save_load_menu_interaction_test.cpp): so a DECLARACAO aqui - a
+# IMPLEMENTACAO ja vive UMA vez em battle_preview.cpp (gusengine_app), linkado
+# abaixo - MESMO padrao de nao redefinir STB_IMAGE_WRITE_IMPLEMENTATION 2x usado
+# em difficulty_menu_loop.cpp/save_load_menu_loop.cpp.
+target_include_directories(gusengine_app_tests
+    PRIVATE ${CMAKE_SOURCE_DIR}/third_party/stb
 )
 
 target_compile_features(gusengine_app_tests PRIVATE cxx_std_20)

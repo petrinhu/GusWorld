@@ -38,6 +38,9 @@ Translator make_translator() {
         "## SAVE_CONFIRM_OVERWRITE\nSobrescrever este slot?\n\n"
         "## SAVE_OVERWRITE_CONFIRM_YES\nSim, sobrescrever\n\n"
         "## SAVE_OVERWRITE_CONFIRM_NO\nCancelar\n\n"
+        "## SAVE_CONFIRM_EMPTY\nDeseja salvar no Espaco {0} (vazio)?\n\n"
+        "## SAVE_EMPTY_CONFIRM_YES\nSalvar\n\n"
+        "## SAVE_EMPTY_CONFIRM_NO\nCancelar\n\n"
         "## SAVE_CONFIRM_DELETE\nApagar este espaco?\n\n"
         "## SAVE_DELETE_CONFIRM_YES\nSim, apagar\n\n"
         "## SAVE_DELETE_CONFIRM_NO\nCancelar\n\n"
@@ -133,6 +136,34 @@ TEST_CASE("build_save_load_menu_rml: mini-dialogo de sobrescrita substitui a lis
     const auto pos_no = rml.find("id=\"slmenu-confirm-no\"");
     const auto div_start = rml.rfind("<div class=\"", pos_no);
     REQUIRE(rml.substr(div_start, pos_no - div_start).find("focused") != std::string::npos);
+}
+
+// AJUSTE polish playtest 2026-07-10 (decisao do lider): slot GENUINAMENTE vazio
+// agora tambem abre confirming_overwrite (item 2, retoque ao vivo 2026-07-10/11) -
+// mas com COPY PROPRIA (nao promete "sobrescrever" nada que nao existe).
+TEST_CASE("build_save_load_menu_rml: mini-dialogo de confirmacao num slot "
+          "GENUINAMENTE VAZIO usa a copy do VAZIO ('Deseja salvar...'), NAO a de "
+          "sobrescrita, e mesmo assim usa os MESMOS ids fixos slmenu-confirm-yes/no",
+          "[save_load_menu_rml]") {
+    SaveLoadMenuState state;
+    save_load_menu_open(state, SaveLoadMode::Save, make_slots_mock_like());
+    state.selected = 2;  // slot 2: GENUINAMENTE vazio em make_slots_mock_like()
+    (void)save_load_menu_key_down(state, SDLK_RETURN);
+    REQUIRE(state.confirming_overwrite);
+
+    const std::string rml = build_save_load_menu_rml(state, make_translator());
+    REQUIRE(rml.find("Deseja salvar no Espaco 2 (vazio)?") != std::string::npos);
+    // A copy de OVERWRITE NAO deve vazar pro caso vazio.
+    REQUIRE(rml.find("Sobrescrever este slot?") == std::string::npos);
+    REQUIRE(rml.find("Sim, sobrescrever") == std::string::npos);
+    // Botao "Sim" do vazio e "Salvar" (nao "Sim, sobrescrever") - MESMO id fixo
+    // slmenu-confirm-yes (save_load_menu_loop.cpp roteia por id, nao por copy).
+    REQUIRE(rml.find("id=\"slmenu-confirm-yes\"") != std::string::npos);
+    REQUIRE(rml.find("id=\"slmenu-confirm-no\"") != std::string::npos);
+    const auto pos_yes = rml.find("id=\"slmenu-confirm-yes\"");
+    const auto div_yes_start = rml.rfind("<div class=\"", pos_yes);
+    const std::string yes_pill = rml.substr(div_yes_start, pos_yes - div_yes_start + 60);
+    REQUIRE(yes_pill.find("Salvar") != std::string::npos);
 }
 
 TEST_CASE("build_save_load_menu_rml: pressed_index marca o slot certo com a classe "

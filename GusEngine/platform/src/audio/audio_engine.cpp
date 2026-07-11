@@ -206,6 +206,7 @@ void AudioEngine::play_sfx(SoundId id) {
     ma_sound_start(instance.get());
     impl_->sfx_instances.push_back(std::move(instance));
     ++sfx_play_count_;  // hook de teste (M6 F3) - so conta o caminho que TOCOU de fato
+    last_sfx_id_ = id;  // hook de teste (item 1, 2026-07-10/11) - ver last_sfx_id()
 }
 
 void AudioEngine::play_music(SoundId id, bool loop, float fade_in_seconds) {
@@ -290,6 +291,8 @@ void AudioEngine::set_sfx_volume(float volume) {
 float AudioEngine::sfx_volume() const noexcept { return sfx_volume_; }
 
 unsigned int AudioEngine::sfx_play_count() const noexcept { return sfx_play_count_; }
+
+SoundId AudioEngine::last_sfx_id() const noexcept { return last_sfx_id_; }
 
 unsigned int AudioEngine::music_play_count() const noexcept { return music_play_count_; }
 

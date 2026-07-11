@@ -248,15 +248,39 @@ std::string build_save_load_menu_rml(const SaveLoadMenuState& state,
 
     if (state.confirming_overwrite) {
         // Mini-dialogo Sim/Nao (MESMA mecanica de controls_confirming_restore em
-        // system_menu_rml.cpp) - substitui a lista enquanto aberto.
-        body << "<div class=\"confirm-title\">" << tr.tr("SAVE_CONFIRM_OVERWRITE")
-             << "</div>";
-        body << "<div class=\"confirm-pill" << (state.confirm_selected == 0 ? " focused" : "")
-             << "\" id=\"slmenu-confirm-yes\">" << tr.tr("SAVE_OVERWRITE_CONFIRM_YES")
-             << "</div>";
-        body << "<div class=\"confirm-pill" << (state.confirm_selected == 1 ? " focused" : "")
-             << "\" id=\"slmenu-confirm-no\">" << tr.tr("SAVE_OVERWRITE_CONFIRM_NO")
-             << "</div>";
+        // system_menu_rml.cpp) - substitui a lista enquanto aberto. AJUSTE polish
+        // playtest 2026-07-10 (decisao do lider): este mesmo dialogo (ids FIXOS
+        // "slmenu-confirm-yes/no", ver save_load_menu_loop.cpp) agora tambem abre
+        // pra um slot GENUINAMENTE vazio (save_load_menu.cpp::confirm_selected_slot
+        // ja roteia isso) - so a COPY do body/botao "Sim" difere conforme o slot
+        // ALVO (state.selected) seja occupied/present_unreadable (CRIT-1,
+        // "Sobrescrever este slot?") vs GENUINAMENTE vazio ("Deseja salvar no
+        // Espaco [N] (vazio)?" + botao "Salvar", que nao promete sobrescrever
+        // nada). "Nao"/"Cancelar" tambem tem chave PROPRIA por variante (mesmo
+        // texto renderizado - "Cancelar" - mas escopo de chave dedicado, MESMA
+        // convencao ja usada por SAVE_DELETE_CONFIRM_NO/SAVE_OVERWRITE_CONFIRM_NO).
+        const SaveSlotPreview& target = state.slots[static_cast<std::size_t>(state.selected)];
+        const bool overwrite_case = target.occupied || target.present_unreadable;
+        if (overwrite_case) {
+            body << "<div class=\"confirm-title\">" << tr.tr("SAVE_CONFIRM_OVERWRITE")
+                 << "</div>";
+            body << "<div class=\"confirm-pill" << (state.confirm_selected == 0 ? " focused" : "")
+                 << "\" id=\"slmenu-confirm-yes\">" << tr.tr("SAVE_OVERWRITE_CONFIRM_YES")
+                 << "</div>";
+            body << "<div class=\"confirm-pill" << (state.confirm_selected == 1 ? " focused" : "")
+                 << "\" id=\"slmenu-confirm-no\">" << tr.tr("SAVE_OVERWRITE_CONFIRM_NO")
+                 << "</div>";
+        } else {
+            body << "<div class=\"confirm-title\">"
+                 << interpolate(tr.tr("SAVE_CONFIRM_EMPTY"), std::to_string(state.selected))
+                 << "</div>";
+            body << "<div class=\"confirm-pill" << (state.confirm_selected == 0 ? " focused" : "")
+                 << "\" id=\"slmenu-confirm-yes\">" << tr.tr("SAVE_EMPTY_CONFIRM_YES")
+                 << "</div>";
+            body << "<div class=\"confirm-pill" << (state.confirm_selected == 1 ? " focused" : "")
+                 << "\" id=\"slmenu-confirm-no\">" << tr.tr("SAVE_EMPTY_CONFIRM_NO")
+                 << "</div>";
+        }
         body << "</div>";  // #slmenu-panel
         return wrap_document(body.str());
     }

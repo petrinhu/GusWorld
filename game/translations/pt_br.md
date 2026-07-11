@@ -180,6 +180,22 @@ Sim, sobrescrever
 ## SAVE_OVERWRITE_CONFIRM_NO
 Cancelar
 
+# SAVE_CONFIRM_EMPTY/SAVE_EMPTY_CONFIRM_*: AJUSTE polish playtest 2026-07-10
+# (decisao do lider) - o MESMO mini-dialogo Sim/Nao (ids slmenu-confirm-yes/no)
+# acima agora tambem gateia um slot GENUINAMENTE vazio (antes salvava DIRETO,
+# sem confirmar), so com COPY PROPRIA (body/botao "Sim" distintos do caso
+# occupied/present_unreadable, ver SAVE_CONFIRM_OVERWRITE acima) - o slot NAO
+# tem nada a "sobrescrever", entao o texto nao promete isso. Wording alinhado a
+# "Espaço {0}" ja em uso (SAVE_SLOT_LABEL/SAVE_SLOT_EMPTY acima).
+## SAVE_CONFIRM_EMPTY
+Deseja salvar no Espaço {0} (vazio)?
+
+## SAVE_EMPTY_CONFIRM_YES
+Salvar
+
+## SAVE_EMPTY_CONFIRM_NO
+Cancelar
+
 ## SAVE_SUCCESS
 Jogo salvo.
 

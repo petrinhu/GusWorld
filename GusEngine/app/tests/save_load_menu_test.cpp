@@ -313,16 +313,30 @@ TEST_CASE("save_load_menu_key_down: Baixo/Cima navegam so entre slots selecionav
     REQUIRE(state.selected == kSlotCount - 1);
 }
 
-TEST_CASE("save_load_menu_key_down: Enter num slot VAZIO em modo Save confirma DIRETO "
-          "(sem mini-dialogo)",
+// ATUALIZADO (item 2, AJUSTE polish playtest 2026-07-10/11 - decisao do lider):
+// slot VAZIO em modo Save agora TAMBEM abre o mini-dialogo de confirmacao (antes
+// confirmava DIRETO, SlotChosen sem dialogo - ver o header de save_load_menu.hpp
+// pro racional completo). A COPY do dialogo pra este caso e distinta ("Deseja
+// salvar no Espaco [N] (vazio)?" em vez de "Sobrescrever este slot?"), ver
+// save_load_menu_rml.cpp/save_load_menu_rml_test.cpp.
+TEST_CASE("save_load_menu_key_down: Enter num slot VAZIO em modo Save TAMBEM abre "
+          "o mini-dialogo de confirmacao (item 2, nao confirma mais DIRETO)",
           "[save_load_menu]") {
     SaveLoadMenuState state;
     std::array<SaveSlotPreview, kSlotCount> slots{};
     for (int i = 0; i < kSlotCount; ++i) slots[static_cast<std::size_t>(i)] = empty_slot_preview(i);
     save_load_menu_open(state, SaveLoadMode::Save, slots);
 
-    REQUIRE(save_load_menu_key_down(state, SDLK_RETURN) == SaveLoadMenuAction::SlotChosen);
-    REQUIRE_FALSE(state.confirming_overwrite);
+    REQUIRE(save_load_menu_key_down(state, SDLK_RETURN) == SaveLoadMenuAction::None);
+    REQUIRE(state.confirming_overwrite);
+    REQUIRE(state.confirm_selected == 1);  // default seguro = Nao/Cancelar
+
+    // Confirmando ("Sim"/"Salvar") devolve OverwriteConfirmed, MESMO contrato do
+    // caso occupied (o CHAMADOR grava de fato, ver do_save em
+    // save_load_menu_loop.cpp - nenhuma mudanca de I/O, so a UX de confirmar).
+    REQUIRE(save_load_menu_key_down(state, SDLK_LEFT) == SaveLoadMenuAction::None);
+    REQUIRE(state.confirm_selected == 0);
+    REQUIRE(save_load_menu_key_down(state, SDLK_RETURN) == SaveLoadMenuAction::OverwriteConfirmed);
 }
 
 TEST_CASE("save_load_menu_key_down: Enter num slot OCUPADO em modo Save abre o "
@@ -412,8 +426,11 @@ TEST_CASE("save_load_menu_key_down: Esc fora do mini-dialogo devolve Back",
 // Clique de mouse (fora de qualquer mini-dialogo): "focar + Enter" (MESMA
 // convencao de system_menu_click_option).
 
+// ATUALIZADO (item 2, AJUSTE polish playtest 2026-07-10/11): vazio em Save agora
+// TAMBEM abre o mini-dialogo (nao mais SlotChosen direto) - ver o teste analogo
+// de save_load_menu_key_down acima pro racional completo.
 TEST_CASE("save_load_menu_click_slot: clique num slot selecionavel foca e aplica a "
-          "mesma regra do Enter (vazio em Save = SlotChosen direto)",
+          "mesma regra do Enter (vazio em Save = abre o mini-dialogo, item 2)",
           "[save_load_menu]") {
     SaveLoadMenuState state;
     std::array<SaveSlotPreview, kSlotCount> slots{};
@@ -421,8 +438,10 @@ TEST_CASE("save_load_menu_click_slot: clique num slot selecionavel foca e aplica
     save_load_menu_open(state, SaveLoadMode::Save, slots);
     REQUIRE(state.selected == 1);
 
-    REQUIRE(save_load_menu_click_slot(state, 3) == SaveLoadMenuAction::SlotChosen);
+    REQUIRE(save_load_menu_click_slot(state, 3) == SaveLoadMenuAction::None);
     REQUIRE(state.selected == 3);  // o clique MOVEU o foco pro slot clicado
+    REQUIRE(state.confirming_overwrite);
+    REQUIRE(state.confirm_selected == 1);  // default seguro = Nao/Cancelar
 }
 
 TEST_CASE("save_load_menu_click_slot: clique num slot manual OCUPADO em modo Save "

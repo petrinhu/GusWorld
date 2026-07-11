@@ -224,17 +224,19 @@ namespace {
 SaveLoadMenuAction confirm_selected_slot(SaveLoadMenuState& state) noexcept {
     if (!slot_selectable(state, state.selected)) return SaveLoadMenuAction::None;
     const SaveSlotPreview& slot = state.slots[static_cast<std::size_t>(state.selected)];
-    // CRIT-1 (auditoria AUD-SAVE-LOAD-UI-2026-07-09): gateia a confirmacao de
-    // sobrescrita em `occupied || present_unreadable`, NAO so `occupied` - um slot
-    // presente-mas-ilegivel (arquivo primario existe, LoadResult != Ok) tambem PRECISA
-    // de confirmacao antes de gravar por cima (senao 1 clique/Enter regravava DIRETO,
-    // erodindo silenciosamente a cadeia de backup em direcao a perda definitiva de
-    // dado recuperavel - ver o comentario de present_unreadable em save_load_menu.hpp).
-    if (state.mode == SaveLoadMode::Save && (slot.occupied || slot.present_unreadable)) {
-        // Slot manual OCUPADO (ou presente-mas-ilegivel) em modo Save: pede
-        // confirmacao (decisao (e) do lider, extensao CRIT-1).
+    // AJUSTE polish playtest 2026-07-10 (decisao do lider): TODO save em modo Save
+    // agora pede confirmacao, INCLUSIVE slot VAZIO (antes so occupied/present_
+    // unreadable - CRIT-1, auditoria AUD-SAVE-LOAD-UI-2026-07-09 - abriam o
+    // mini-dialogo; um slot GENUINAMENTE vazio salvava DIRETO). O mini-dialogo e o
+    // MESMO (confirming_overwrite/confirm_selected, ids slmenu-confirm-yes/no) -
+    // so a COPY do body/botao "Sim" muda conforme occupied/present_unreadable
+    // ("Sobrescrever este slot?") vs GENUINAMENTE vazio ("Deseja salvar no slot
+    // [N] (vazio)?"), ver save_load_menu_rml.cpp. do_save (CHAMADOR,
+    // save_load_menu_loop.cpp) ja era generico sobre occupied/vazio - nenhuma
+    // mudanca de I/O aqui, so a UX de confirmar ANTES.
+    if (state.mode == SaveLoadMode::Save) {
         state.confirming_overwrite = true;
-        state.confirm_selected = 1;  // default seguro = Nao
+        state.confirm_selected = 1;  // default seguro = Nao/Cancelar
         return SaveLoadMenuAction::None;
     }
     // SAVE-LOAD-AVISOS (aviso #1): slot present_unreadable em modo Load abre o

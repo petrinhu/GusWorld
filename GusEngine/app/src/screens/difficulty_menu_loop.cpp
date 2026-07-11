@@ -27,7 +27,7 @@
 #include <glintfx/ui_layer.hpp>
 
 #include "gus/app/screens/difficulty_menu_rml.hpp"
-#include "gus/core/asset_paths.hpp"  // kMenuHoverSfxFile/kMenuClickSfxFile/kSfxDir
+#include "gus/core/asset_paths.hpp"  // kMenuHoverSfxFile/kMenuClickSfxFile/kMenuBlockedSfxFile/kSfxDir
 #include "gus/core/spatial/camera_clamp.hpp"  // gus::core::spatial::Rect
 #include "gus/platform/assets/asset_source.hpp"  // FilesystemAssetSource (resolve do SFX)
 #include "gus/platform/render2d/render2d_gl3.hpp"
@@ -122,6 +122,18 @@ bool is_navigable_hover_id(const DifficultyMenuState& state, const std::string& 
     return false;
 }
 
+// AJUSTE polish playtest 2026-07-10 ("card Hardcore bloqueado toca SFX grave/
+// abafado"): extrai o indice do item de LISTA (nao-splash) do id do elemento
+// hover-native, ou nullopt se `id` nao for um "difficulty-item-<i>" (splash, ou
+// id desconhecido). So faz sentido fora do splash (os 2 pills de confirmacao sao
+// SEMPRE selecionaveis - nunca tocam o SFX bloqueado).
+std::optional<int> parse_difficulty_list_item_index(const std::string& id) {
+    for (int i = 0; i < kDifficultyItemCount; ++i) {
+        if (id == "difficulty-item-" + std::to_string(i)) return i;
+    }
+    return std::nullopt;
+}
+
 }  // namespace
 
 DifficultyLoopExit run_difficulty_menu_loop_gl_current(
@@ -180,8 +192,30 @@ DifficultyLoopExit run_difficulty_menu_loop_gl_current(
         resolve_menu_sfx_path(gus::core::assets::kMenuHoverSfxFile);
     const std::string click_sfx_path =
         resolve_menu_sfx_path(gus::core::assets::kMenuClickSfxFile);
+    // AJUSTE polish playtest 2026-07-10: SFX proprio (grave/abafado) do card
+    // Hardcore BLOQUEADO - toca no lugar do hover/click normal quando a
+    // interacao mira um item NAO-selecionavel (ver blocked_sfx_or abaixo).
+    // Degradacao segura: se o asset ainda nao existir no disco, load_sfx
+    // devolve kInvalidSound e audio.play_sfx() vira no-op (nunca crasha).
+    const std::string blocked_sfx_path =
+        resolve_menu_sfx_path(gus::core::assets::kMenuBlockedSfxFile);
     const gus::platform::audio::SoundId hover_sfx_id = audio.load_sfx(hover_sfx_path.c_str());
     const gus::platform::audio::SoundId click_sfx_id = audio.load_sfx(click_sfx_path.c_str());
+    const gus::platform::audio::SoundId blocked_sfx_id =
+        audio.load_sfx(blocked_sfx_path.c_str());
+
+    // Roteia pro SFX certo dado o item de LISTA em `index` (ignorado/irrelevante
+    // dentro do splash, onde os 2 pills sao SEMPRE selecionaveis): bloqueado
+    // (Hardcore nesta Fase 0) -> blocked_sfx_id; senao -> `normal_id` (hover_sfx_id
+    // ou click_sfx_id, conforme o call-site).
+    auto sfx_for_item = [&](int index,
+                             gus::platform::audio::SoundId normal_id) {
+        if (!state.confirming && index >= 0 && index < kDifficultyItemCount &&
+            !difficulty_item_selectable(state, index)) {
+            return blocked_sfx_id;
+        }
+        return normal_id;
+    };
 
     auto reload = [&] {
         rml_path = write_difficulty_rml_file(state, translator);
@@ -215,7 +249,12 @@ DifficultyLoopExit run_difficulty_menu_loop_gl_current(
         }
         if (id == last_hover_sfx_id || !is_navigable_hover_id(state, id)) return;
         last_hover_sfx_id = id;
-        audio.play_sfx(hover_sfx_id);
+        // AJUSTE polish playtest 2026-07-10: hover no card Hardcore BLOQUEADO
+        // toca blocked_sfx_id em vez do hover normal (splash/pills SEMPRE
+        // selecionaveis - parse_difficulty_list_item_index devolve nullopt la,
+        // sfx_for_item cai no `normal_id`).
+        const std::optional<int> list_index = parse_difficulty_list_item_index(id);
+        audio.play_sfx(sfx_for_item(list_index.value_or(-1), hover_sfx_id));
     };
     ui.set_hover_callback(hover_cb);
 
@@ -299,7 +338,12 @@ DifficultyLoopExit run_difficulty_menu_loop_gl_current(
                                               ev.key.key == SDLK_KP_ENTER ||
                                               ev.key.key == SDLK_SPACE);
                 if (is_confirm_key) {
-                    audio.play_sfx(click_sfx_id);
+                    // AJUSTE polish playtest 2026-07-10: Enter/Espaco com o foco no
+                    // Hardcore BLOQUEADO (item de LISTA, ver sfx_for_item) toca
+                    // blocked_sfx_id em vez do click normal - a ACAO em si segue
+                    // no-op TOTAL (difficulty_menu_key_down, sem mudar estado).
+                    audio.play_sfx(
+                        sfx_for_item(difficulty_keyboard_focus_index(state), click_sfx_id));
                     const DifficultyMenuAction action =
                         difficulty_menu_key_down(state, ev.key.key);
                     if (const auto exit = route_action(action)) return *exit;
@@ -314,7 +358,10 @@ DifficultyLoopExit run_difficulty_menu_loop_gl_current(
                     if (state.confirming == confirming_before) {
                         const int kb_index_after = difficulty_keyboard_focus_index(state);
                         if (ui_hover_entered_new_item(kb_index_before, kb_index_after)) {
-                            audio.play_sfx(hover_sfx_id);
+                            // AJUSTE polish playtest 2026-07-10: navegar (setas/WASD)
+                            // ATE o Hardcore BLOQUEADO toca blocked_sfx_id (paridade
+                            // teclado x mouse com o hover_cb acima).
+                            audio.play_sfx(sfx_for_item(kb_index_after, hover_sfx_id));
                         }
                     }
                     if (const auto exit = route_action(action)) return *exit;
@@ -339,14 +386,13 @@ DifficultyLoopExit run_difficulty_menu_loop_gl_current(
                             ("difficulty-item-" + std::to_string(i)).c_str());
                         if (!hit_test(box, ev.button.x, ev.button.y)) continue;
                         handled = true;
-                        // Clicar no Hardcore BLOQUEADO e no-op TOTAL (ver
-                        // difficulty_menu_click_option) - sem som tambem, MESMA
-                        // semantica "nao reage a nada" de title_menu_loop.cpp
-                        // pra "Continuar" desabilitado (Facil/Medio/Dificil
-                        // sempre selecionaveis, som sempre toca).
-                        if (difficulty_item_selectable(state, i)) {
-                            audio.play_sfx(click_sfx_id);
-                        }
+                        // Clicar no Hardcore BLOQUEADO e no-op TOTAL DE ESTADO
+                        // (ver difficulty_menu_click_option), mas AJUSTE polish
+                        // playtest 2026-07-10: toca blocked_sfx_id (grave/abafado)
+                        // em vez de ficar mudo - da feedback sonoro de "bloqueado"
+                        // ao jogador. Facil/Medio/Dificil sempre selecionaveis,
+                        // click normal toca.
+                        audio.play_sfx(sfx_for_item(i, click_sfx_id));
                         const DifficultyMenuAction action =
                             difficulty_menu_click_option(state, i);
                         if (const auto exit = route_action(action)) return *exit;

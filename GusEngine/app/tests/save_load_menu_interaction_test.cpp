@@ -34,8 +34,10 @@
 #include <cstdint>
 #include <filesystem>
 #include <fstream>
+#include <iostream>
 #include <optional>
 #include <string>
+#include <vector>
 
 #include <SDL3/SDL.h>
 #include <glintfx/ui_layer.hpp>
@@ -49,6 +51,13 @@
 #include "gus/platform/fs/save_file_store.hpp"
 #include "gus/platform/rmlui/gl3_loader.hpp"
 #include "ui_box_assertions.hpp"
+
+// stb_image_write: item 2 (retoque ao vivo 2026-07-10/11), prova visual PNG do
+// dialogo "Deseja salvar no Espaco [N] (vazio)?" - SO a DECLARACAO aqui (a
+// IMPLEMENTACAO ja vive UMA vez em battle_preview.cpp/gusengine_app, linkado por
+// este alvo de teste - nao redefinir STB_IMAGE_WRITE_IMPLEMENTATION 2x, MESMO
+// padrao de difficulty_menu_loop.cpp/save_load_menu_loop.cpp).
+#include "stb_image_write.h"
 
 using namespace gus::app::screens;
 using gus::app::testing::box_hittable;
@@ -192,6 +201,12 @@ gus::app::i18n::Translator make_translator() {
         "## SAVE_SLOT_READONLY_TAG\n(so-leitura)\n\n"
         "## SAVE_XP_LABEL\nXP {0}\n\n"
         "## SAVE_CHAPTER_LABEL\nCap. {0}\n\n"
+        "## SAVE_CONFIRM_OVERWRITE\nSobrescrever este slot?\n\n"
+        "## SAVE_OVERWRITE_CONFIRM_YES\nSim, sobrescrever\n\n"
+        "## SAVE_OVERWRITE_CONFIRM_NO\nCancelar\n\n"
+        "## SAVE_CONFIRM_EMPTY\nDeseja salvar no Espaco {0} (vazio)?\n\n"
+        "## SAVE_EMPTY_CONFIRM_YES\nSalvar\n\n"
+        "## SAVE_EMPTY_CONFIRM_NO\nCancelar\n\n"
         "## SAVE_DELETE_BUTTON_LABEL\nApagar\n\n"
         "## SAVE_LOAD_WARN_DAMAGED\nEste save esta danificado.\n\n"
         "## SAVE_LOAD_WARN_VERSION\nEste save e de uma versao mais nova.\n\n"
@@ -295,9 +310,25 @@ TEST_CASE("save_load_menu (harness headless): slots nao invadem a scrollbar da "
 
 // ---------------------------------------------------------------- (d) clique real dispara a acao
 
+// ATUALIZADO (item 2, retoque ao vivo 2026-07-10/11): desde o AJUSTE polish
+// playtest 2026-07-10, um clique num slot vazio NAO salva mais DIRETO - abre o
+// mini-dialogo de confirmacao (MESMO gate que ja existia pra slot ocupado, ver
+// o comentario extenso em save_load_menu.hpp). Este teste (regressao original
+// "bug 3/4 - clico e nada acontece") foi ATUALIZADO pra confirmar o dialogo
+// (clique em "Salvar") em vez de assumir save direto - a REGRESSAO ORIGINAL
+// (clique nao fazia NADA) continua coberta pelo mesmo REQUIRE(build_called)/
+// REQUIRE(has_save) no fim, so que agora passando pelo gate de confirmacao. O
+// caso "sem confirmar" (Esc fecha SO o dialogo, NAO salva) tem teste PROPRIO
+// dedicado, ver "(f) item 2" abaixo. ACHADO AO VIVO nesta atualizacao: a
+// versao ANTERIOR deste teste (so 1 Esc apos o clique) ficou HANG ate o
+// timeout do ctest (282s) apos o item 2 mudar o comportamento - o Esc unico
+// fechava so o dialogo (OverwriteCancelled, loop CONTINUA), nunca chegava a
+// SaveLoadLoopExit nenhum - REGISTRADO como o exemplo vivo de por que TODO
+// harness baseado em fila de eventos fixa precisa ser revisitado quando a
+// maquina de estado que ele exercita ganha um passo a mais.
 TEST_CASE("save_load_menu (harness headless): clique de mouse REAL (SDL_PushEvent) "
-          "no slot vazio dispara o save de fato em disco (bug 3/4 - 'clico e "
-          "nada acontece')",
+          "no slot vazio, confirmado no mini-dialogo, dispara o save de fato em "
+          "disco (bug 3/4 - 'clico e nada acontece')",
           "[save_load_menu_interaction][gl]") {
     GlTestEnv env = try_boot_gl();
     if (!env.ok) {
@@ -311,16 +342,17 @@ TEST_CASE("save_load_menu (harness headless): clique de mouse REAL (SDL_PushEven
         std::filesystem::temp_directory_path() / "gusworld_save_load_interaction_saves";
     std::filesystem::remove_all(saves_dir);  // hermetico (nunca o $HOME real do host)
 
+    std::array<SaveSlotPreview, kSlotCount> empty_slots{};
+    for (int i = 0; i < kSlotCount; ++i) {
+        empty_slots[static_cast<std::size_t>(i)] = empty_slot_preview(i);
+    }
+
     // Pre-mede a posicao REAL do slot 1 (vazio, selecionavel em modo Save) - o
     // MESMO documento/viewport/dp_ratio (960x540, dp_ratio=1.0 numa janela de
     // 960px) que run_save_load_menu_loop_gl_current monta INTERNAMENTE - layout
     // deterministico, a posicao medida aqui bate com a que o loop de producao
     // usa de fato.
     SaveLoadMenuState probe_state;
-    std::array<SaveSlotPreview, kSlotCount> empty_slots{};
-    for (int i = 0; i < kSlotCount; ++i) {
-        empty_slots[static_cast<std::size_t>(i)] = empty_slot_preview(i);
-    }
     save_load_menu_open(probe_state, SaveLoadMode::Save, empty_slots);
     float slot1_cx = 0.0f, slot1_cy = 0.0f;
     {
@@ -335,13 +367,32 @@ TEST_CASE("save_load_menu (harness headless): clique de mouse REAL (SDL_PushEven
         // documentado, ver o comentario extenso em system_menu_loop.cpp).
     }
 
+    // Pre-mede a posicao REAL da pill "Salvar" (slmenu-confirm-yes) no
+    // mini-dialogo JA ABERTO pra um slot vazio (item 2) - MESMA receita de
+    // 2-probes ja usada pelo teste (e)/SAVE-LOAD-AVISOS abaixo.
+    SaveLoadMenuState probe_confirm;
+    save_load_menu_open(probe_confirm, SaveLoadMode::Save, empty_slots);
+    (void)save_load_menu_click_slot(probe_confirm, 1);
+    REQUIRE(probe_confirm.confirming_overwrite);
+    float yes_cx = 0.0f, yes_cy = 0.0f;
+    {
+        auto probe_ui = load_ui(probe_confirm, translator);
+        REQUIRE(probe_ui.has_value());
+        const glintfx::ElementBox box = probe_ui->get_element_box("slmenu-confirm-yes");
+        REQUIRE(box_hittable(box, kWinW, kWinH));
+        yes_cx = box.x + box.w * 0.5f;
+        yes_cy = box.y + box.h * 0.5f;
+    }
+
     // Injeta os eventos NA FILA REAL do SDL (SDL_PushEvent) - a MESMA fila que
     // SDL_PollEvent dentro do loop de producao consome:
     //   1) MOUSE_MOTION ate o centro do slot 1 (assenta o hover nativo/RCSS);
-    //   2) MOUSE_BUTTON_DOWN no MESMO ponto - o clique que deveria salvar;
-    //   3) KEY_DOWN Escape - fecha a tela de volta (senao o while(true) do loop
+    //   2) MOUSE_BUTTON_DOWN no MESMO ponto - abre o mini-dialogo (item 2);
+    //   3-4) motion+click na pill "Salvar" - confirma, salva de fato;
+    //   5) KEY_DOWN Escape - fecha a tela de volta (senao o while(true) do loop
     //      ficaria esperando o PROXIMO evento pra sempre; o teste precisa que a
-    //      chamada RETORNE).
+    //      chamada RETORNE - OverwriteConfirmed faz do_save+reload SEM fechar a
+    //      tela, ver handle_action em save_load_menu_loop.cpp).
     SDL_Event motion_ev{};
     motion_ev.type = SDL_EVENT_MOUSE_MOTION;
     motion_ev.motion.x = slot1_cx;
@@ -354,6 +405,19 @@ TEST_CASE("save_load_menu (harness headless): clique de mouse REAL (SDL_PushEven
     click_ev.button.x = slot1_cx;
     click_ev.button.y = slot1_cy;
     REQUIRE(SDL_PushEvent(&click_ev));
+
+    SDL_Event motion2_ev{};
+    motion2_ev.type = SDL_EVENT_MOUSE_MOTION;
+    motion2_ev.motion.x = yes_cx;
+    motion2_ev.motion.y = yes_cy;
+    REQUIRE(SDL_PushEvent(&motion2_ev));
+
+    SDL_Event click2_ev{};
+    click2_ev.type = SDL_EVENT_MOUSE_BUTTON_DOWN;
+    click2_ev.button.button = SDL_BUTTON_LEFT;
+    click2_ev.button.x = yes_cx;
+    click2_ev.button.y = yes_cy;
+    REQUIRE(SDL_PushEvent(&click2_ev));
 
     SDL_Event esc_ev{};
     esc_ev.type = SDL_EVENT_KEY_DOWN;
@@ -604,4 +668,312 @@ TEST_CASE("save_load_menu (harness headless): clique de mouse REAL num slot "
     REQUIRE(applied->playtime_seconds == 1.0);
 
     std::filesystem::remove_all(saves_dir);
+}
+
+// ---------------------------------------------------------------- (f) item 2 (retoque
+// ao vivo 2026-07-10/11): slot GENUINAMENTE vazio agora EXIGE confirmacao antes de
+// gravar - clique real no slot vazio, sem confirmar, NAO grava; confirmando, grava.
+
+TEST_CASE("save_load_menu (harness headless): clique de mouse REAL num slot "
+          "GENUINAMENTE VAZIO abre o mini-dialogo de confirmacao (AJUSTE polish "
+          "playtest 2026-07-10) e NAO grava enquanto nao confirmado (Esc fecha o "
+          "dialogo sem I/O nenhum)",
+          "[save_load_menu_interaction][gl][item2-empty-confirm]") {
+    GlTestEnv env = try_boot_gl();
+    if (!env.ok) {
+        INFO("GL/display indisponivel - harness pulado (rode com Xvfb :99).");
+        return;
+    }
+
+    const gus::app::i18n::Translator translator = make_translator();
+
+    const std::filesystem::path saves_dir = std::filesystem::temp_directory_path() /
+                                             "gusworld_save_load_interaction_empty_confirm_saves";
+    std::filesystem::remove_all(saves_dir);  // hermetico
+
+    std::array<SaveSlotPreview, kSlotCount> empty_slots{};
+    for (int i = 0; i < kSlotCount; ++i) empty_slots[static_cast<std::size_t>(i)] = empty_slot_preview(i);
+
+    // Probe #1: posicao REAL do slot 1 (vazio, selecionavel em modo Save).
+    SaveLoadMenuState probe1;
+    save_load_menu_open(probe1, SaveLoadMode::Save, empty_slots);
+    float slot1_cx = 0.0f, slot1_cy = 0.0f;
+    {
+        auto probe_ui = load_ui(probe1, translator);
+        REQUIRE(probe_ui.has_value());
+        const glintfx::ElementBox box = probe_ui->get_element_box("slmenu-slot-1");
+        REQUIRE(box_hittable(box, kWinW, kWinH));
+        slot1_cx = box.x + box.w * 0.5f;
+        slot1_cy = box.y + box.h * 0.5f;
+        // FECHA a sondagem ANTES da proxima (RmlUi 1-instancia, ver o comentario
+        // extenso no teste (d) acima).
+    }
+
+    SDL_Event motion_ev{};
+    motion_ev.type = SDL_EVENT_MOUSE_MOTION;
+    motion_ev.motion.x = slot1_cx;
+    motion_ev.motion.y = slot1_cy;
+    REQUIRE(SDL_PushEvent(&motion_ev));
+
+    SDL_Event click_ev{};
+    click_ev.type = SDL_EVENT_MOUSE_BUTTON_DOWN;
+    click_ev.button.button = SDL_BUTTON_LEFT;
+    click_ev.button.x = slot1_cx;
+    click_ev.button.y = slot1_cy;
+    REQUIRE(SDL_PushEvent(&click_ev));
+
+    // 2 Esc: o 1o fecha SO o mini-dialogo (OverwriteCancelled, MESMA seguranca de
+    // confirming_delete/controls_confirming_discard - ESC == "Nao"), o loop
+    // CONTINUA na lista (reload, nao retorna); o 2o sai de fato da tela
+    // (SaveLoadMenuAction::Back). ANTES desta onda (slot vazio salvava DIRETO no
+    // Enter/clique, sem abrir dialogo), o 1o Esc aqui ja teria fechado a tela
+    // inteira (o clique ja teria gravado) - o REQUIRE de has_save abaixo teria
+    // FALHADO (o save ja teria acontecido).
+    SDL_Event esc1_ev{};
+    esc1_ev.type = SDL_EVENT_KEY_DOWN;
+    esc1_ev.key.key = SDLK_ESCAPE;
+    esc1_ev.key.repeat = 0;
+    REQUIRE(SDL_PushEvent(&esc1_ev));
+
+    SDL_Event esc2_ev = esc1_ev;
+    REQUIRE(SDL_PushEvent(&esc2_ev));
+
+    bool build_called = false;
+    const std::function<gus::domain::save::SaveData()> build_data = [&]() {
+        build_called = true;
+        gus::domain::save::SaveData d;
+        d.current_scene_path = "city_intro";
+        d.party_roster = {"gus"};
+        d.party_active = {"gus"};
+        return d;
+    };
+
+    gus::platform::audio::AudioEngine audio(/*device_active=*/false);  // sem hardware no CI
+    const SaveLoadLoopExit exit = run_save_load_menu_loop_gl_current(
+        env.window, audio, translator, SaveLoadMode::Save, saves_dir.string(), build_data,
+        /*apply_loaded_save_data=*/{});
+
+    REQUIRE(exit == SaveLoadLoopExit::BackToPause);
+    // O GATE (item 2): clicar num slot vazio sem CONFIRMAR nao chama build_data
+    // nem grava nada em disco.
+    REQUIRE_FALSE(build_called);
+    REQUIRE_FALSE(gus::platform::fs::has_save(1, saves_dir.string()));
+
+    std::filesystem::remove_all(saves_dir);
+}
+
+TEST_CASE("save_load_menu (harness headless): confirmar ('Salvar') o mini-dialogo "
+          "de um slot GENUINAMENTE VAZIO grava de fato em disco (item 2, retoque "
+          "ao vivo 2026-07-10/11)",
+          "[save_load_menu_interaction][gl][item2-empty-confirm]") {
+    GlTestEnv env = try_boot_gl();
+    if (!env.ok) {
+        INFO("GL/display indisponivel - harness pulado (rode com Xvfb :99).");
+        return;
+    }
+
+    const gus::app::i18n::Translator translator = make_translator();
+
+    const std::filesystem::path saves_dir =
+        std::filesystem::temp_directory_path() /
+        "gusworld_save_load_interaction_empty_confirm_yes_saves";
+    std::filesystem::remove_all(saves_dir);  // hermetico
+
+    std::array<SaveSlotPreview, kSlotCount> empty_slots{};
+    for (int i = 0; i < kSlotCount; ++i) empty_slots[static_cast<std::size_t>(i)] = empty_slot_preview(i);
+
+    // Probe #1: posicao REAL do slot 1 (vazio).
+    SaveLoadMenuState probe1;
+    save_load_menu_open(probe1, SaveLoadMode::Save, empty_slots);
+    float slot1_cx = 0.0f, slot1_cy = 0.0f;
+    {
+        auto probe_ui = load_ui(probe1, translator);
+        REQUIRE(probe_ui.has_value());
+        const glintfx::ElementBox box = probe_ui->get_element_box("slmenu-slot-1");
+        REQUIRE(box_hittable(box, kWinW, kWinH));
+        slot1_cx = box.x + box.w * 0.5f;
+        slot1_cy = box.y + box.h * 0.5f;
+    }
+
+    // Probe #2: posicao REAL da pill "Salvar" (slmenu-confirm-yes) no mini-dialogo
+    // JA ABERTO pra um slot vazio (MESMO estado que o clique real no slot 1
+    // produz - confirmado via save_load_menu_click_slot, a logica PURA ja
+    // provada em save_load_menu_test.cpp/save_load_menu_rml_test.cpp).
+    SaveLoadMenuState probe2;
+    save_load_menu_open(probe2, SaveLoadMode::Save, empty_slots);
+    (void)save_load_menu_click_slot(probe2, 1);
+    REQUIRE(probe2.confirming_overwrite);
+    float yes_cx = 0.0f, yes_cy = 0.0f;
+    {
+        auto probe_ui = load_ui(probe2, translator);
+        REQUIRE(probe_ui.has_value());
+        const glintfx::ElementBox box = probe_ui->get_element_box("slmenu-confirm-yes");
+        REQUIRE(box_hittable(box, kWinW, kWinH));
+        yes_cx = box.x + box.w * 0.5f;
+        yes_cy = box.y + box.h * 0.5f;
+    }
+
+    SDL_Event motion1_ev{};
+    motion1_ev.type = SDL_EVENT_MOUSE_MOTION;
+    motion1_ev.motion.x = slot1_cx;
+    motion1_ev.motion.y = slot1_cy;
+    REQUIRE(SDL_PushEvent(&motion1_ev));
+
+    SDL_Event click1_ev{};
+    click1_ev.type = SDL_EVENT_MOUSE_BUTTON_DOWN;
+    click1_ev.button.button = SDL_BUTTON_LEFT;
+    click1_ev.button.x = slot1_cx;
+    click1_ev.button.y = slot1_cy;
+    REQUIRE(SDL_PushEvent(&click1_ev));
+
+    SDL_Event motion2_ev{};
+    motion2_ev.type = SDL_EVENT_MOUSE_MOTION;
+    motion2_ev.motion.x = yes_cx;
+    motion2_ev.motion.y = yes_cy;
+    REQUIRE(SDL_PushEvent(&motion2_ev));
+
+    SDL_Event click2_ev{};
+    click2_ev.type = SDL_EVENT_MOUSE_BUTTON_DOWN;
+    click2_ev.button.button = SDL_BUTTON_LEFT;
+    click2_ev.button.x = yes_cx;
+    click2_ev.button.y = yes_cy;
+    REQUIRE(SDL_PushEvent(&click2_ev));
+
+    // OverwriteConfirmed grava e faz reload() SEM fechar a tela (do_save + reload,
+    // ver handle_action em save_load_menu_loop.cpp) - precisa de 1 Esc pra sair de
+    // fato (lista, ja sem o dialogo).
+    SDL_Event esc_ev{};
+    esc_ev.type = SDL_EVENT_KEY_DOWN;
+    esc_ev.key.key = SDLK_ESCAPE;
+    esc_ev.key.repeat = 0;
+    REQUIRE(SDL_PushEvent(&esc_ev));
+
+    bool build_called = false;
+    const std::function<gus::domain::save::SaveData()> build_data = [&]() {
+        build_called = true;
+        gus::domain::save::SaveData d;
+        d.current_scene_path = "city_intro";
+        d.party_roster = {"gus"};
+        d.party_active = {"gus"};
+        return d;
+    };
+
+    gus::platform::audio::AudioEngine audio(/*device_active=*/false);  // sem hardware no CI
+    const SaveLoadLoopExit exit = run_save_load_menu_loop_gl_current(
+        env.window, audio, translator, SaveLoadMode::Save, saves_dir.string(), build_data,
+        /*apply_loaded_save_data=*/{});
+
+    REQUIRE(exit == SaveLoadLoopExit::BackToPause);
+    REQUIRE(build_called);
+    REQUIRE(gus::platform::fs::has_save(1, saves_dir.string()));
+
+    std::filesystem::remove_all(saves_dir);
+}
+
+// ---------------------------------------------------------------- (g) item 2: PROVA
+// VISUAL headless (PNG) do dialogo "Deseja salvar no Espaco [N] (vazio)?" - prova que
+// a COPY renderizada e a do VAZIO (nao a de sobrescrita), nao so a logica de gate
+// acima. GUSWORLD_TMPDIR (opcional): onde salvar o PNG (default: temp_directory_path()).
+
+TEST_CASE("save_load_menu (harness headless): PROVA VISUAL - PNG do mini-dialogo "
+          "'Deseja salvar no Espaco [N] (vazio)?' aberto por um clique real num "
+          "slot vazio (item 2, retoque ao vivo 2026-07-10/11)",
+          "[save_load_menu_interaction][gl][item2-empty-confirm]") {
+    GlTestEnv env = try_boot_gl();
+    if (!env.ok) {
+        INFO("GL/display indisponivel - harness pulado (rode com Xvfb :99, "
+             "DISPLAY=:99 EXPLICITO - NUNCA :0, a tela real do lider).");
+        return;
+    }
+
+    const gus::app::i18n::Translator translator = make_translator();
+
+    std::array<SaveSlotPreview, kSlotCount> empty_slots{};
+    for (int i = 0; i < kSlotCount; ++i) empty_slots[static_cast<std::size_t>(i)] = empty_slot_preview(i);
+
+    // Estado JA no mini-dialogo de confirmacao pra um slot vazio (MESMO estado
+    // que save_load_menu_click_slot produz, PROVADO no teste (f) acima -
+    // aqui construimos direto, sem precisar de outro round de eventos SDL, so
+    // pra CAPTURAR o frame).
+    SaveLoadMenuState state;
+    save_load_menu_open(state, SaveLoadMode::Save, empty_slots);
+    (void)save_load_menu_click_slot(state, 1);
+    REQUIRE(state.confirming_overwrite);
+
+    glintfx::UiLayer ui(glintfx::UiLayer::Config{/*logical_width=*/kWinW,
+                                                  /*logical_height=*/kWinH,
+                                                  /*load_gl=*/true,
+                                                  /*dp_ratio=*/1.0f});
+    REQUIRE(ui.ok());
+
+    const std::filesystem::path stage =
+        std::filesystem::temp_directory_path() / "gusworld_save_load_empty_confirm_png";
+    std::error_code ec;
+    std::filesystem::create_directories(stage, ec);
+    std::string fonts_dir = GUSWORLD_FONTS_DIR;
+    if (const char* envf = std::getenv("GUSWORLD_FONTS")) {
+        if (envf[0] != '\0') fonts_dir = envf;
+    }
+    if (!fonts_dir.empty()) {
+        std::filesystem::copy_file(join_path(fonts_dir, "PixelOperatorMono.ttf"),
+                                    stage / "PixelOperatorMono.ttf",
+                                    std::filesystem::copy_options::overwrite_existing, ec);
+        std::filesystem::copy_file(join_path(fonts_dir, "PixelOperatorMono-Bold.ttf"),
+                                    stage / "PixelOperatorMono-Bold.ttf",
+                                    std::filesystem::copy_options::overwrite_existing, ec);
+    }
+
+    std::string rml = build_save_load_menu_rml(state, translator);
+    // Prova ESTRUTURAL (o mesmo REQUIRE de save_load_menu_rml_test.cpp, repetido
+    // aqui pra amarrar a prova visual ao texto REAL que vai pra tela - nao so
+    // "abriu algum dialogo", e "abriu O CERTO"): a copy do VAZIO, NAO a de
+    // sobrescrita.
+    REQUIRE(rml.find("Deseja salvar no Espaco 1 (vazio)?") != std::string::npos);
+    REQUIRE(rml.find("Sobrescrever este slot?") == std::string::npos);
+
+    const std::string needle = "<style>\n";
+    const std::size_t pos = rml.find(needle);
+    if (pos != std::string::npos) {
+        rml.insert(pos + needle.size(),
+                    "@font-face { font-family: \"Pixel Operator Mono\"; "
+                    "src: \"PixelOperatorMono.ttf\"; }\n"
+                    "@font-face { font-family: \"Pixel Operator Mono\"; "
+                    "font-weight: bold; src: \"PixelOperatorMono-Bold.ttf\"; }\n");
+    }
+    const std::filesystem::path rml_path = stage / "save_load_empty_confirm.rml";
+    {
+        std::ofstream f(rml_path);
+        f << rml;
+    }
+    ui.set_asset_base_url(stage.string().c_str());
+    ui.load(rml_path.string().c_str());
+    ui.set_viewport(kWinW, kWinH);
+    ui.set_dp_ratio(1.0f);
+
+    for (int i = 0; i < 6; ++i) {
+        ui.update();
+        ui.render();
+        SDL_GL_SwapWindow(env.window);
+    }
+
+    std::vector<unsigned char> buf(static_cast<std::size_t>(kWinW) *
+                                    static_cast<std::size_t>(kWinH) * 4);
+    REQUIRE(gus::platform::rmlui::gl3_read_backbuffer_rgba(kWinW, kWinH, buf.data()));
+
+    std::string out_dir = std::filesystem::temp_directory_path().string();
+    if (const char* envd = std::getenv("GUSWORLD_TMPDIR")) {
+        if (envd[0] != '\0') out_dir = envd;
+    }
+    std::error_code ec_dir;
+    std::filesystem::create_directories(out_dir, ec_dir);
+    const std::filesystem::path png_path =
+        std::filesystem::path(out_dir) / "save_load_empty_confirm.png";
+    const int written = stbi_write_png(png_path.string().c_str(), kWinW, kWinH, 4, buf.data(),
+                                        kWinW * 4);
+    REQUIRE(written != 0);
+    INFO("PNG salvo em: " << png_path.string());
+    std::cout << "save_load_menu_interaction_test: [PROVA VISUAL item 2] "
+              << png_path.string() << " (" << kWinW << "x" << kWinH << ")\n";
+    REQUIRE(std::filesystem::exists(png_path));
+    REQUIRE(std::filesystem::file_size(png_path) > 0);
 }

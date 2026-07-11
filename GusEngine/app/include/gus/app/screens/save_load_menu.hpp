@@ -45,13 +45,17 @@
 //     selecionavel"); o autosave, quando OCUPADO, e selecionavel (carregar do
 //     autosave e um uso legitimo, "Continuar" na tela de titulo se apoia nisso).
 //
-// CONFIRMACAO DE SOBRESCRITA (decisao (e) do lider, TODO.md): Enter num slot
-// MANUAL OCUPADO em modo Save abre um mini-dialogo Sim/Nao (MESMA mecanica
-// visual/de fluxo de controls_confirming_restore em system_menu.hpp) antes de
-// devolver Confirmed; slot VAZIO em modo Save confirma DIRETO (nada a
-// sobrescrever). Em modo Load, Enter sempre confirma DIRETO (o aviso de
-// versao/corrompido, se houver, e um fluxo SEPARADO pos-tentativa de load, fora
-// deste arquivo).
+// CONFIRMACAO DE SOBRESCRITA (decisao (e) do lider, TODO.md) + AJUSTE polish
+// playtest 2026-07-10 (decisao do lider): Enter num slot MANUAL SELECIONAVEL em
+// modo Save (ocupado, present_unreadable OU GENUINAMENTE vazio) abre um
+// mini-dialogo Sim/Nao (MESMA mecanica visual/de fluxo de
+// controls_confirming_restore em system_menu.hpp) antes de devolver Confirmed -
+// TODO save agora pede confirmacao, sem excecao (antes: slot VAZIO confirmava
+// DIRETO). A COPY do body/botao "Sim" muda conforme occupied/present_unreadable
+// ("Sobrescrever este slot?") vs GENUINAMENTE vazio ("Deseja salvar no slot [N]
+// (vazio)?" + botao "Salvar") - ver save_load_menu_rml.cpp. Em modo Load, Enter
+// sempre confirma DIRETO (o aviso de versao/corrompido, se houver, e um fluxo
+// SEPARADO pos-tentativa de load, fora deste arquivo).
 //
 // Cross-ref: gus/app/screens/system_menu.hpp (mesmo espirito POCO + mini-dialogo
 //            Sim/Nao); gus/domain/save/save_slots.hpp (kSlotCount/kAutosaveSlot,
