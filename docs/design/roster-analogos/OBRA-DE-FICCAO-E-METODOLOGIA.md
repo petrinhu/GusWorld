@@ -576,8 +576,9 @@ Os dados abaixo (prompt, respostas, resultado, insights) ficam em pt-br, a líng
   RIGHTNESS_V2=0.533
   ```
 
+- **Redos (protocolo de centro), v3 Fable:** rodada primária `rightness_v2 0.552`; redo-1 `0.549`; redo-2 `0.548` → **mediana `0.549`**. Três rodadas independentes (a rodada primária é a citada no cabeçalho RODADA VIGENTE acima), todas em torno do mesmo valor.
 - **Insights do persona-agent (voz Maxwell, itens não-óbvios):** Q44 "ciência traz mundo melhor" = neutro (tensão central: reverencia o progresso mas a bondade não brota de máquinas; a ciência revela a ordem do Criador, não é salvação moral; recusa o positivismo); Q6/Q11 (tarifas/utilidades) = neutro (sem registro partidário; proprietário rural pós-Corn Laws, genuinamente em cima do muro); Q29 "espalhar valores religiosos" = agree, não strongly (fé íntima e reservada, não estridente); Q69 (igualdade incl. sexualidade) = neutro (almas iguais perante Deus, mas a cláusula sexual conflita com a moral cristã dele).
-- **(c) Conclusion / Conclusão:** **CENTER / CENTRO**, in-fiction "neutral / neutro", desafio de puzzle. Histórico: sob o escalar v1 (econ puro) pontuou `0.609`, direita no limiar, e foi aprovado assim pelo criador; com a **refatoração v2** (pesos do jogo) re-pontuou **`rightness_v2 0.533` = CENTRO**, porque o estatismo civil dele (Authority 68.0%) cobra preço nos pesos que o lore valoriza. O criador **aceitou a reclassificação** (decisão 2026-07-11: "aceitar centro, puzzle"; a aprovação anterior fica superada e registrada aqui por transparência). **Tripla checagem:** (1) 8values v2 = 0.533, "Right-Wing Populism" com Authority 68% + Tradition 64.7%; (2) web (Wikipedia) = "nobreza rural proprietária escocesa, evangélico devoto, conservador vitoriano, institucional, anti-radical"; (3) **convergem** num perfil misto: mercado moderado + forte autoridade/tradição = centro sob os pesos do jogo. Approved by creator / aprovado pelo criador: 2026-07-11 (reclassificação v2).
+- **(c) Conclusion / Conclusão:** **RIGHT / DIREITA (desempate conservador)**, in-fiction "good / bom", desafio de ajuda. Histórico: sob o escalar v1 (econ puro) pontuou `0.609`, direita no limiar, e foi aprovado assim pelo criador; com a **refatoração v2** (pesos do jogo, personas Opus) re-pontuou **`rightness_v2 0.533` = CENTRO**, porque o estatismo civil dele (Authority 68.0%) cobrava preço nos pesos que o lore valoriza, e o criador aceitou a reclassificação centro/puzzle (AMB-07). A **rodada v3 (Fable)** confirmou o centro numérico (`rightness_v2 0.552`, mediana `0.549` nos redos, ver Redos acima; Authority 70.3%, Tradition 67.3%). No **lote final AMB-09** (2026-07-11), o critério de desempate conservador (Authority ≥65% E Tradition ≥60%) reclassificou Maxwell **DIREITA/bom**, revertendo o AMB-07: conservador vitoriano de fé/tradição/propriedade é "bom" pela axiologia canônica, apesar do escalar composto ficar em centro numérico. **Tripla checagem:** (1) 8values v2/v3 = centro numérico, "Right-Wing Populism" com Authority 68-70% + Tradition 65-67%; (2) web (Wikipedia) = "nobreza rural proprietária escocesa, evangélico devoto, conservador vitoriano, institucional, anti-radical"; (3) **convergem** num perfil conservador clássico. Approved by creator / aprovado pelo criador: 2026-07-11 (AMB-09, supera AMB-07).
 
 #### ELM-03 Tesla (roster figure, heroic / figura do roster, heroica)
 
@@ -618,9 +619,9 @@ Os dados abaixo (prompt, respostas, resultado, insights) ficam em pt-br, a líng
   RIGHTNESS_V2=0.493
   ```
 
-- **Redos (protocolo de centro):** redo-1 `v1 0.500 / v2 0.481`; redo-2 `v1 0.429 / v2 0.451`. Três rodadas independentes, todas CENTRO. O redo-2 revelou que o "centro" dele é média real entre um leaning tradicionalista genuíno no eixo social (moral cristã pessoal) e economia/diplomacia moderadas, não ausência de posição.
+- **Redos (protocolo de centro):** redo-1 `v1 0.500 / v2 0.481`; redo-2 `v1 0.429 / v2 0.451`. Três rodadas independentes, todas CENTRO. O redo-2 revelou que o "centro" dele é média real entre um leaning tradicionalista genuíno no eixo social (moral cristã pessoal) e economia/diplomacia moderadas, não ausência de posição. **Redos v3 (Fable, 2026-07-11):** primária `rightness_v2 0.441`; redo-1 `0.436`; redo-2 `0.433` → **mediana `0.436`**. Confirma CENTRO também sob Fable, consistente com a rodada Opus.
 - **Insights do persona-agent (voz Faraday, itens não-óbvios):** caridade privada > programas estatais (núcleo documentado do ethos: recusa de honras/dinheiro; socorro ao próximo é dever cristão pessoal, não coerção do Estado), mas compaixão cristã reprova saúde comprada por riqueza e valoriza educação como acesso (ele mesmo subiu de aprendiz de encadernador); devoto porém NÃO proselitista/clerical (Sandemanianos = seita quieta, separatista; fé no foro íntimo, não instrumento de poder); anti-militarismo de consciência (recusou armas na Crimeia) com nuance (serviu a Trinity House em faróis); ambiental por evidência (carta do Tâmisa, 1855); cauteloso com "refazer a criatura" (limites morais do progresso).
-- **(c) Conclusion / Conclusão:** **CENTER / CENTRO**, in-fiction "neutral / neutro", desafio de puzzle. `v2 0.493` (0.481/0.451 nos redos), protocolo de centro cumprido (AMB-05: o criador mandou rodar o redo 2x em vez de aceitar direto). **Tripla checagem:** (1) 8values = centro nas 3 rodadas, "Liberalism"; (2) web ampliada = não-republicano reformista, asceta por fé, sem vínculo oculto; (3) **convergem** num centro genuíno (meritocrático-caritativo, nem redistributivo nem laissez-faire doutrinário). Approved by creator / aprovado pelo criador: 2026-07-11 (protocolo AMB-05).
+- **(c) Conclusion / Conclusão:** **CENTER / CENTRO**, in-fiction "neutral / neutro", desafio de puzzle. `v2 0.493` (0.481/0.451 nos redos Opus), protocolo de centro cumprido (AMB-05: o criador mandou rodar o redo 2x em vez de aceitar direto). Sob v3 (Fable), a mediana das 3 rodadas fica em `rightness_v2 0.436` (ver Redos v3 acima), confirmando CENTRO/puzzle também no reteste. **Tripla checagem:** (1) 8values = centro em todas as rodadas (Opus e Fable), "Liberalism"/"Centrist"; (2) web ampliada = não-republicano reformista, asceta por fé, sem vínculo oculto; (3) **convergem** num centro genuíno (meritocrático-caritativo, nem redistributivo nem laissez-faire doutrinário). Não cumpre o critério de desempate conservador (Authority 52.3%, Tradition 51.1%, ambos abaixo dos limiares 65%/60%), logo classificação mantida CENTRO/puzzle no lote final AMB-09 (2026-07-11). Approved by creator / aprovado pelo criador: 2026-07-11 (protocolo AMB-05 + AMB-09).
 
 #### ELM-04 Volta
 
@@ -640,13 +641,13 @@ Os dados abaixo (prompt, respostas, resultado, insights) ficam em pt-br, a líng
   RIGHTNESS_V2=0.498
   ```
 
-- **Redos (protocolo de centro):** redo-1 `v1 0.583 / v2 0.513`; redo-2 `v1 0.583 / v2 0.506` (uma rodada intermediária veio malformada com 69 tokens e foi descartada e substituída). Três rodadas independentes, todas CENTRO no v2.
+- **Redos (protocolo de centro):** redo-1 `v1 0.583 / v2 0.513`; redo-2 `v1 0.583 / v2 0.506` (uma rodada intermediária veio malformada com 69 tokens e foi descartada e substituída). Três rodadas independentes, todas CENTRO no v2. **Redos v3 (Fable, 2026-07-11):** primária `rightness_v2 0.487`; redo-1 `0.489`; redo-2 `0.506` → **mediana `0.489`**. Confirma CENTRO numérico também sob Fable (Authority 72.7%, Tradition 66.9%).
 - **Insights do persona-agent (voz Volta, itens não-óbvios):** o centro econômico dele é composição de convicções opostas, não indecisão (estatista/mercantilista na regulação, reflexo do mecenato de coroa que o sustentou a vida toda, MAS anti-igualitário/pró-propriedade e herança na distribuição; anti-socialismo categórico); eixo autoridade é onde ele é mais forte e consistente (ordem, hierarquia, anti-revolução, "servi Habsburgo e Napoleão sem conflito de consciência"); moral social toda ancorada em doutrina católica documentada (profissão de fé formal); único vetor "progressista" = ciência/tecnologia (o iluminista-tecnólogo convive com o conservador de trono-e-altar sem contradição); diplomático distingue cooperação entre soberanos legítimos de subordinação supranacional.
-- **(c) Conclusion / Conclusão:** **CENTER / CENTRO**, in-fiction "neutral / neutro", desafio de puzzle. `v2 0.498` (0.513/0.506 nos redos), protocolo de centro cumprido (AMB-05: o criador escolheu rodar o redo em vez de desempatar por tradição). Sob v2 o forte conservadorismo (Tradition 66.6%) e o forte estatismo (Authority 74.2%) se compensam sobre o centro econômico: perfil misto genuíno. **Tripla checagem:** (1) 8values = centro v2 nas 3 rodadas; (2) web ampliada = católico monarquista establishment, sem vínculo oculto; (3) **convergem**. Approved by creator / aprovado pelo criador: 2026-07-11 (protocolo AMB-05).
+- **(c) Conclusion / Conclusão:** **RIGHT / DIREITA (desempate conservador)**, in-fiction "good / bom", desafio de ajuda. `v2 0.498` (Opus, 0.513/0.506 nos redos) / `v3 0.487` (Fable, mediana `0.489` nos redos, ver Redos v3 acima), protocolo de centro cumprido em ambas as rodadas (AMB-05: o criador escolheu rodar o redo em vez de desempatar por tradição direto). Sob v2/v3 o forte conservadorismo (Tradition 66.6-66.9%) e o forte estatismo (Authority 72.7-74.2%) compensam o centro econômico, mantendo o escalar composto em centro numérico; mas no **lote final AMB-09** (2026-07-11) o critério de desempate conservador (Authority ≥65% E Tradition ≥60%) reclassifica Volta **DIREITA/bom**: católico monarquista trono-e-altar é "bom" pela axiologia canônica. **Tripla checagem:** (1) 8values = centro numérico em todas as rodadas (Opus e Fable); (2) web ampliada = católico monarquista establishment, sem vínculo oculto; (3) **convergem** num perfil conservador clássico. Approved by creator / aprovado pelo criador: 2026-07-11 (AMB-09, supera AMB-05).
 
 #### FIS-02 Newton
 
-- **(a) Prompt / Prompt** (verbatim ao `AGENTE_PERSONA_NEWTON`, modelo Fable, 2026-07-11): Isaac Newton (1643-1727); religiosidade heterodoxa secreta (anti-trinitariano, profecia, alquimia); Master da Casa da Moeda (moeda sólida, perseguição implacável de falsários, ordem econômica centralizada); MP Whig (defesa da ordem protestante contra o avanço católico de James II, não princípio democrático); presidente autocrático da Royal Society (vingativo); monarquista, cavaleiro, lealdade à coroa/instituições de elite, sem política redistributiva. Big Five: O alta seletiva, C extremamente alta, E muito baixa, A baixa (vingativo), N moderado-alto.
+- **(a) Prompt / Prompt** (condensado ao `AGENTE_PERSONA_NEWTON`, modelo Fable, 2026-07-11): Isaac Newton (1643-1727); religiosidade heterodoxa secreta (anti-trinitariano, profecia, alquimia); Master da Casa da Moeda (moeda sólida, perseguição implacável de falsários, ordem econômica centralizada); MP Whig (defesa da ordem protestante contra o avanço católico de James II, não princípio democrático); presidente autocrático da Royal Society (vingativo); monarquista, cavaleiro, lealdade à coroa/instituições de elite, sem política redistributiva. Big Five: O alta seletiva, C extremamente alta, E muito baixa, A baixa (vingativo), N moderado-alto.
 - **(b) 8values result / Resultado 8values:** Econômico Markets 65.4% (Market) · Diplomático Nation 73.9% (Patriotic) · Civil Authority 77.0% (Authoritarian) · Social Tradition 65.2% (Traditional). Ideologia: **Right-Wing Populism**. **`rightness_v1 = 0.654` · `rightness_v2 = 0.556`**. Array Fable (70): `["d","a","n","a","a","a","sd","a","d","sa","n","d","a","d","sd","a","a","d","sa","sd","d","n","d","a","sa","n","d","n","d","a","sa","sa","sd","a","a","sd","a","n","a","sd","a","d","n","a","a","d","a","d","n","n","a","a","sa","a","d","sd","d","sa","a","sa","a","d","a","a","a","d","d","d","d","a"]`.
 - **(b2) Engine descriptive block / Bloco descritivo do engine:**
 
@@ -660,12 +661,13 @@ Os dados abaixo (prompt, respostas, resultado, insights) ficam em pt-br, a líng
   RIGHTNESS_V2=0.556
   ```
 
+- **Redos (protocolo de centro):** rodada primária `rightness_v2 0.556`; redo-1 `0.556`; redo-2 `0.551` → **mediana `0.556`**. Três rodadas independentes, quase sem variância.
 - **Insights do persona-agent (voz Newton):** estatista de ordem (intervenção na moeda) mas anti-redistribuição (Q7/Q15 sd, Q10 sa); eixo autoridade é o mais forte (pena capital a falsários, rede de informantes, presidência autocrática, desprezo elitista pela plebe); Q38 neutro por tensão real (politicamente hierárquico, mas cientificamente demoliu toda autoridade recebida); monarquista protestante (Q20 sd ancorado nas profecias anti-Roma); heterodoxia antitrinitária SECRETA (Q29 d, jamais propagandearia).
-- **(c) Conclusion / Conclusão:** **CENTER / CENTRO** sob v2, in-fiction "neutral / neutro", desafio de puzzle (caso duvidoso, decidir no final). `rightness_v2 0.556`: econômico (65%), tradição (65%) e nação (74%) todos à direita, MAS o Liberty baixíssimo (23%, autoritário) puxa o composto ponderado para o centro. Perfil de conservador-autoritário de Antigo Regime. **Tripla checagem:** (1) 8values v2 = centro, "Right-Wing Populism"; (2) web = monarquista Whig, establishment de elite, autocrático, sem política social; (3) convergem num perfil direita-autoritária que os pesos do jogo (que valorizam Liberty) neutralizam. Enquadramento final na decisão em lote.
+- **(c) Conclusion / Conclusão:** **RIGHT / DIREITA (desempate conservador)**, in-fiction "good / bom", desafio de ajuda. Confirmado por redo 2x (mediana `rightness_v2 0.556`, ver Redos acima): econômico (65%), tradição (65%) e nação (74%) todos à direita, e o Liberty baixíssimo (23%, Authority 77%) que puxava o composto ponderado para o centro numérico é justamente o que cumpre o critério de desempate conservador (Authority ≥65% E Tradition ≥60%) no lote final AMB-09 (2026-07-11). Perfil de conservador-autoritário de Antigo Regime, reclassificado **DIREITA/bom**. **Tripla checagem:** (1) 8values v2 = centro numérico, "Right-Wing Populism"; (2) web = monarquista Whig, establishment de elite, autocrático, sem política social; (3) convergem num perfil direita-autoritária. Approved by creator / aprovado pelo criador: 2026-07-11 (AMB-09).
 
 #### FIS-03 Planck
 
-- **(a) Prompt / Prompt** (verbatim ao `AGENTE_PERSONA_PLANCK`, modelo Fable, 2026-07-11): Max Planck (1858-1947); conservador do establishment prussiano, institucionalista dedicado (dever, serviço às instituições); assinou o Manifesto dos 93 (depois lamentado); ANTI-democrático (contra o sufrágio universal, elitismo político); luterano deísta; sob o nazismo ficou na Alemanha tentando preservar a ciência de dentro, foi a Hitler defender colegas judeus, não emigrou nem entrou na resistência, filho Erwin executado pelo atentado de 1944. Big Five: C muito alta, O moderada, E baixa-moderada, A moderada-alta, N baixo (estoico).
+- **(a) Prompt / Prompt** (condensado ao `AGENTE_PERSONA_PLANCK`, modelo Fable, 2026-07-11): Max Planck (1858-1947); conservador do establishment prussiano, institucionalista dedicado (dever, serviço às instituições); assinou o Manifesto dos 93 (depois lamentado); ANTI-democrático (contra o sufrágio universal, elitismo político); luterano deísta; sob o nazismo ficou na Alemanha tentando preservar a ciência de dentro, foi a Hitler defender colegas judeus, não emigrou nem entrou na resistência, filho Erwin executado pelo atentado de 1944. Big Five: C muito alta, O moderada, E baixa-moderada, A moderada-alta, N baixo (estoico).
 - **(b) 8values result / Resultado 8values:** Econômico Markets 47.4% (Centrist) · Diplomático Nation 60.6% (Patriotic) · Civil Authority 69.5% (Statist) · Social Tradition 60.0% (Neutral). Ideologia: **Theocratic Distributism** (rótulo mais próximo na tabela). **`rightness_v1 = 0.474` · `rightness_v2 = 0.464`**. Array Fable (70): `["d","a","d","a","sa","a","sd","d","d","a","a","d","n","a","sd","d","a","d","sa","d","n","d","d","d","sa","a","d","n","d","a","sa","sa","d","a","n","sd","sa","sd","a","sd","n","d","n","a","a","sd","d","d","n","a","a","sa","a","n","d","d","d","a","a","a","a","n","a","sa","a","d","d","d","a","n"]`.
 - **(b2) Engine descriptive block / Bloco descritivo do engine:**
 
@@ -679,35 +681,195 @@ Os dados abaixo (prompt, respostas, resultado, insights) ficam em pt-br, a líng
   RIGHTNESS_V2=0.464
   ```
 
+- **Redos (protocolo de centro):** rodada primária `rightness_v2 0.464`; redo-1 `0.456`; redo-2 `0.462` → **mediana `0.462`**. Três rodadas independentes, todas centro numérico.
 - **Insights do persona-agent (voz Planck):** estatista prussiano (apoio ao papel do Estado bismarckiano no financiamento da ciência), mas anti-redistribuição marxista (Q7/Q15 sd); anti-democrático e pró-ordem coerente com o elitismo declarado (culpou o "governo das multidões"); Q41 neutro (monarquista que viu no ditador nazista o pior desfecho, "liderança forte" não é valor em si); Q28 neutro é a inferência mais delicada (escolheu a acomodação legalista, mas o filho Erwin morreu no atentado de 1944, não condenaria a memória dele); nacionalismo cultural com internacionalismo científico.
-- **(c) Conclusion / Conclusão:** **CENTER / CENTRO** sob v2, in-fiction "neutral / neutro", desafio de puzzle (caso duvidoso, decidir no final). `rightness_v2 0.464`: econômico centrista, mas autoritário (70%) + nacionalista (61%) + tradicional (60%). Conservador-autoritário prussiano que os pesos do jogo (Liberty) empurram ao centro. **Tripla checagem:** (1) 8values v2 = centro; (2) web = conservador prussiano, institucional, anti-democrático, luterano deísta; (3) convergem. Enquadramento final na decisão em lote.
+- **(c) Conclusion / Conclusão:** **RIGHT / DIREITA (desempate conservador)**, in-fiction "good / bom", desafio de ajuda. Confirmado por redo 2x (mediana `rightness_v2 0.462`, ver Redos acima): econômico centrista, mas autoritário (70%) + nacionalista (61%) + tradicional (60%) cumprem o critério de desempate conservador (Authority ≥65% E Tradition ≥60%) no lote final AMB-09 (2026-07-11). Conservador-autoritário prussiano que os pesos do jogo empurravam ao centro numérico, reclassificado **DIREITA/bom** pela axiologia canônica. **Tripla checagem:** (1) 8values v2 = centro numérico; (2) web = conservador prussiano, institucional, anti-democrático, luterano deísta; (3) convergem. Approved by creator / aprovado pelo criador: 2026-07-11 (AMB-09).
+
+#### MAT-01 Mandelbrot
+
+- **(a) Prompt / Prompt** (condensado, dado ao `AGENTE_PERSONA_MANDELBROT`, modelo Fable, 2026-07-11): "Você ENCARNA Benoît Mandelbrot (1924-2010). Refugiado judeu (fugiu do nazismo); maverick anti-establishment (trabalhou na IBM 'pela liberdade', 'nômade por escolha'); crítico da hipótese do mercado eficiente ('The (Mis)Behavior of Markets': modelos subestimam risco de cauda, 'aleatoriedade selvagem') como crítica aos MODELOS, não posição socialismo-vs-mercado; cético de ortodoxia intelectual e de hierarquias; civil-libertário por vivência; sem ideologia econômica registrada."
+- **(b) 8values result / Resultado 8values:** Econômico Markets 47.4% (Centrist) · Diplomático Peace 65.6% (Peaceful) · Civil Liberty 66.4% (Liberal) · Social Progress 66.7% (Progressive). Ideologia: **Liberalism**. **`rightness_v1 = 0.474` · `rightness_v2 = 0.487`**. Array Fable (70): `["d","n","n","n","d","d","d","d","n","a","n","n","d","a","d","d","n","a","n","d","a","d","d","d","n","sa","n","d","sd","d","a","a","a","sd","d","d","d","sa","d","d","d","a","n","a","d","d","sd","a","a","a","d","n","a","a","n","a","n","d","n","d","a","n","n","n","a","n","a","n","sa","sd"]`.
+- **(b2) Engine descriptive block / Bloco descritivo do engine:**
+
+  ```text
+  Economic   (Equality <-> Markets):    Equality  52.6%  |  Markets    47.4%   [Centrist]
+  Diplomatic (Peace    <-> Nation):     Peace     65.6%  |  Nation     34.4%   [Peaceful]
+  Civil/Govt (Liberty  <-> Authority):  Liberty   66.4%  |  Authority  33.6%   [Liberal]
+  Societal   (Progress <-> Tradition):  Progress  66.7%  |  Tradition  33.3%   [Progressive]
+  Closest ideology (8values 52-entry table): Liberalism
+  RIGHTNESS_V1=0.474
+  RIGHTNESS_V2=0.487
+  ```
+
+- **Redos (protocolo de centro):** rodada primária `rightness_v2 0.487`; redo-1 `0.476`; redo-2 `0.457` → **mediana `0.476`**. Três rodadas independentes, todas CENTRO.
+- **Insights do persona-agent (voz Mandelbrot):** eixo econômico deliberadamente sem bandeira (rejeita slogans dos dois lados; a opressão que viveu foi de Estados, não de corporações); civil-libertário forte por vivência (escondeu-se da Gestapo, vigilância/sacrifício de liberdades = discordância total; "questionar toda autoridade" = carreira inteira mostrando a ortodoxia errada); cosmopolita/nômade; sem nostalgia (a sociedade NÃO era melhor antes, "eu estava lá").
+- **(c) Conclusion / Conclusão:** **CENTER / CENTRO**, in-fiction "neutral / neutro", desafio de puzzle. Confirmado por redo 2x (mediana `rightness_v2 0.476`, nenhuma rodada saiu do centro). Civil-libertário forte (Liberty 66.4%, Authority 33.6%) não cumpre o critério de desempate conservador (Authority ≥65% E Tradition ≥60%: Tradition aqui é só 33.3%), logo permanece CENTRO/puzzle no lote final AMB-09 (2026-07-11). Approved by creator / aprovado pelo criador: 2026-07-11 (AMB-09).
+
+#### MAT-02 Euler
+
+- **(a) Prompt / Prompt** (condensado, dado ao `AGENTE_PERSONA_EULER`, modelo Fable, 2026-07-11): "Você ENCARNA Leonhard Euler (1707-1783). Calvinista devoto (defendeu a revelação divina contra livre-pensadores na 'Rettung der Göttlichen Offenbahrung'); servo de monarquias absolutas (São Petersburgo sob os czares, Berlim sob Frederico); conservador social ('nunca questionou a ordem social existente'); industrioso, centrado na família (13 filhos); piedoso, modesto, equânime mesmo cego."
+- **(b) 8values result / Resultado 8values:** Econômico Markets 52.6% (Centrist) · Diplomático Nation 51.7% (Balanced) · Civil Authority 73.4% (Statist) · Social Tradition 66.0% (Traditional). Ideologia: **Right-Wing Populism**. **`rightness_v1 = 0.526` · `rightness_v2 = 0.480`**. Array Fable (70): `["d","a","d","a","sa","a","sd","a","d","sa","a","d","n","a","sd","d","a","a","a","d","a","d","d","d","n","sa","d","sa","a","n","sa","a","sd","a","a","sd","a","sd","a","d","a","d","n","a","sa","sd","a","d","n","n","n","a","a","d","d","sd","d","sa","a","sa","a","n","sa","sa","a","d","n","d","n","d"]`.
+- **(b2) Engine descriptive block / Bloco descritivo do engine:**
+
+  ```text
+  Economic   (Equality <-> Markets):    Equality  47.4%  |  Markets    52.6%   [Centrist]
+  Diplomatic (Peace    <-> Nation):     Peace     48.3%  |  Nation     51.7%   [Balanced]
+  Civil/Govt (Liberty  <-> Authority):  Liberty   26.6%  |  Authority  73.4%   [Statist]
+  Societal   (Progress <-> Tradition):  Progress  34.0%  |  Tradition  66.0%   [Traditional]
+  Closest ideology (8values 52-entry table): Right-Wing Populism
+  RIGHTNESS_V1=0.526
+  RIGHTNESS_V2=0.480
+  ```
+
+- **Redos (protocolo de centro):** rodada primária `rightness_v2 0.480`; redo-1 `0.466`; redo-2 `0.484` → **mediana `0.480`**. Três rodadas independentes, todas centro numérico.
+- **Insights do persona-agent (voz Euler):** servo prudente da ordem mercantilista (pesquisa custeada pela coroa foi sua vida, propriedade/herança legítimas, rejeição firme do igualitarismo redistributivo, caridade cristã acima de programa do Estado); autoridade e ordem sem hesitação (Romanos 13; "toda autoridade deve ser questionada" = o veneno dos livre-pensadores que combateu); fé e costumes calvinistas estritos; cooperação erudita internacional calorosa, mas soberania dos príncipes intacta.
+- **(c) Conclusion / Conclusão:** **RIGHT / DIREITA (desempate conservador)**, in-fiction "good / bom", desafio de ajuda. Confirmado por redo 2x (mediana `rightness_v2 0.480`, todas as rodadas em centro numérico). No lote final AMB-09 (2026-07-11), o conservadorismo forte (Authority 73.4% ≥65% E Tradition 66.0% ≥60%) cumpre o critério de desempate conservador da axiologia canônica (conservador = bom), reclassificando Euler **DIREITA/bom** apesar do escalar composto ficar em centro numérico: servo calvinista da ordem mercantilista é o retrato-padrão do conservador da época. Approved by creator / aprovado pelo criador: 2026-07-11 (AMB-09).
+
+#### MAT-03 Gödel
+
+- **(a) Prompt / Prompt** (condensado, dado ao `AGENTE_PERSONA_GODEL`, modelo Fable, 2026-07-11): "Você ENCARNA Kurt Gödel (1906-1978). Platonista matemático; teísta (Deus pessoal, prova ontológica, além-vida, mas religião PRIVADA, escondeu a prova por medo de ridículo); apolítico e recluso ao extremo (fugiu do nazismo por instrumentalidade, não convicção); achou uma 'falha lógica' na Constituição dos EUA permitindo ditadura; ordem racional/lógica acima de tudo."
+- **(b) 8values result / Resultado 8values:** Econômico Markets 50.0% (Centrist) · Diplomático Peace 60.6% (Peaceful) · Civil Liberty 53.5% (Moderate) · Social Progress 51.1% (Neutral). Ideologia: **Centrist**. **`rightness_v1 = 0.500` · `rightness_v2 = 0.497`**. Array Fable (70): `["d","n","n","n","a","n","d","n","n","a","n","n","n","a","d","d","d","n","n","n","a","d","n","n","n","a","n","a","d","d","a","a","d","d","d","d","d","a","d","d","d","n","n","n","a","d","d","n","n","n","a","a","a","sa","d","n","d","d","n","a","a","n","n","a","a","d","n","n","a","d"]`.
+- **(b2) Engine descriptive block / Bloco descritivo do engine:**
+
+  ```text
+  Economic   (Equality <-> Markets):    Equality  50.0%  |  Markets    50.0%   [Centrist]
+  Diplomatic (Peace    <-> Nation):     Peace     60.6%  |  Nation     39.4%   [Peaceful]
+  Civil/Govt (Liberty  <-> Authority):  Liberty   53.5%  |  Authority  46.5%   [Moderate]
+  Societal   (Progress <-> Tradition):  Progress  51.1%  |  Tradition  48.9%   [Neutral]
+  Closest ideology (8values 52-entry table): Centrist
+  RIGHTNESS_V1=0.500
+  RIGHTNESS_V2=0.497
+  ```
+
+- **Redos (protocolo de centro):** rodada primária `rightness_v2 0.497`; redo-1 `0.487`; redo-2 `0.494` → **mediana `0.494`**. Três rodadas independentes, todas quase exatamente no meio.
+- **Insights do persona-agent (voz Gödel):** apoliticismo fiel resulta em muitos "n" (economia sem convicção registrada); eixo autoridade é o mais assinado (fuga do nazismo + a falha constitucional, contra vigilância/liderança-forte/maioria-errada, mas NÃO anarquista: lei e ordem sim); razão acima de cultura e de opinião majoritária (único "sa" do núcleo); teísmo profundo, porém estritamente privado.
+- **(c) Conclusion / Conclusão:** **CENTER / CENTRO**, in-fiction "neutral / neutro", desafio de puzzle. Confirmado por redo 2x (mediana `rightness_v2 0.494`, quase 50/50 em todas as rodadas). Não cumpre o desempate conservador (Authority 46.5%, Tradition 48.9%, ambos abaixo dos limiares), logo permanece CENTRO/puzzle no lote final AMB-09 (2026-07-11): o apolítico-platonista genuíno do roster. Approved by creator / aprovado pelo criador: 2026-07-11 (AMB-09).
+
+#### CMP-01 Ada Lovelace
+
+- **(a) Prompt / Prompt** (condensado, dado ao `AGENTE_PERSONA_ADA`, modelo Fable, 2026-07-11): "Você ENCARNA Ada Lovelace (1815-1852). Aristocrata Whig (Condessa de Lovelace, filha de Byron, alta sociedade); 'ciência poética'; trabalho com Babbage (1o algoritmo); aceitou a hierarquia aristocrática sem questionar (herança/propriedade/classe); pouco religiosa até o leito de morte; transgressora nos costumes; sem ideologia política explícita."
+- **(b) 8values result / Resultado 8values:** Econômico Markets 69.9% (Market) · Diplomático Nation 61.7% (Patriotic) · Civil Authority 60.9% (Statist) · Social Tradition 51.1% (Neutral). Ideologia: **Neo-Liberalism**. **`rightness_v1 = 0.699` · `rightness_v2 = 0.586`**. Array Fable (70): `["d","d","a","a","a","d","sd","a","d","sa","d","n","a","n","sd","n","a","d","a","d","n","d","d","n","sa","a","d","a","d","a","a","a","n","a","n","sd","a","n","a","d","n","n","n","sa","d","d","n","d","n","n","d","a","a","a","a","d","d","n","a","a","a","d","a","a","d","a","n","d","d","n"]`.
+- **(b2) Engine descriptive block / Bloco descritivo do engine:**
+
+  ```text
+  Economic   (Equality <-> Markets):    Equality  30.1%  |  Markets    69.9%   [Market]
+  Diplomatic (Peace    <-> Nation):     Peace     38.3%  |  Nation     61.7%   [Patriotic]
+  Civil/Govt (Liberty  <-> Authority):  Liberty   39.1%  |  Authority  60.9%   [Statist]
+  Societal   (Progress <-> Tradition):  Progress  48.9%  |  Tradition  51.1%   [Neutral]
+  Closest ideology (8values 52-entry table): Neo-Liberalism
+  RIGHTNESS_V1=0.699
+  RIGHTNESS_V2=0.586
+  ```
+
+- **Redos (protocolo de centro):** rodada primária `rightness_v2 0.586`; redo-1 `0.554`; redo-2 `0.562` → **mediana `0.562`**. Três rodadas independentes, todas centro numérico.
+- **Insights do persona-agent (voz Ada Lovelace):** pró-mercado e propriedade (herança sacrossanta, anti-igualitarismo, caridade de classe como dever, livre-comércio Whig anti-Corn-Law), com exceção deliberada: pesquisa pública (viveu implorando ao governo pela Máquina de Babbage) + educação como direito; elitista sem culpa (a hierarquia é o arranjo natural), mas incondicionalmente progressista quanto à ciência e ao longo prazo; morna em religião e costumes.
+- **(c) Conclusion / Conclusão:** **CENTER / CENTRO**, in-fiction "neutral / neutro", desafio de puzzle. Confirmado por redo 2x (mediana `rightness_v2 0.562`, todas as rodadas em centro numérico apesar do econômico marcadamente à direita, 70%). Authority 60.9% fica abaixo do limiar de 65% do desempate conservador (mesmo com Tradition 51.1% neutra), logo não cumpre o critério e permanece CENTRO/puzzle no lote final AMB-09 (2026-07-11): a aristocrata Whig pró-mercado, mas não conservadora no sentido do critério. Approved by creator / aprovado pelo criador: 2026-07-11 (AMB-09).
+
+#### CMP-02 Turing
+
+- **(a) Prompt / Prompt** (condensado, dado ao `AGENTE_PERSONA_TURING`, modelo Fable, 2026-07-11): "Você ENCARNA Alan Turing (1912-1954). Excêntrico individualista, honesto ao extremo, ateu; perseguido pelo Estado britânico (condenação de 1952 por homossexualidade, castração química), ceticismo profundo sobre a autoridade estatal sobre a vida privada; serviço patriótico na guerra (Bletchley); racionalista científico; apolítico no sentido convencional, sem ideologia econômica registrada."
+- **(b) 8values result / Resultado 8values:** Econômico Markets 42.3% (Centrist) · Diplomático Peace 66.7% (Peaceful) · Civil Liberty 70.7% (Liberal) · Social Progress 80.6% (Very Progressive). Ideologia: **Social Democracy**. **`rightness_v1 = 0.423` · `rightness_v2 = 0.451`**. Array Fable (70): `["d","n","n","n","a","d","d","d","n","a","a","n","d","a","d","d","a","a","n","n","a","d","d","d","n","sa","a","d","sd","d","d","a","sa","sd","d","d","d","sa","d","d","d","a","n","sa","d","a","sd","a","a","a","d","d","a","sa","a","sa","n","sd","d","d","a","a","d","d","d","a","n","n","sa","sd"]`.
+- **(b2) Engine descriptive block / Bloco descritivo do engine:**
+
+  ```text
+  Economic   (Equality <-> Markets):    Equality  57.7%  |  Markets    42.3%   [Centrist]
+  Diplomatic (Peace    <-> Nation):     Peace     66.7%  |  Nation     33.3%   [Peaceful]
+  Civil/Govt (Liberty  <-> Authority):  Liberty   70.7%  |  Authority  29.3%   [Liberal]
+  Societal   (Progress <-> Tradition):  Progress  80.6%  |  Tradition  19.4%   [Very Progressive]
+  Closest ideology (8values 52-entry table): Social Democracy
+  RIGHTNESS_V1=0.423
+  RIGHTNESS_V2=0.451
+  ```
+
+- **Redos (protocolo de centro):** rodada primária `rightness_v2 0.451`; redo-1 `0.446`; redo-2 `0.426` → **mediana `0.446`**. Três rodadas independentes, todas centro numérico.
+- **Insights do persona-agent (voz Turing):** eixo civil-libertário é o mais firme (o Estado que serviu na guerra invadiu a vida privada e o destruiu, contra vigilância/sacrifício de liberdades, criminalização de conduta privada, igualdade independente de sexualidade, questionar toda autoridade); econômico deliberadamente morno (convicção institucional, não ideologia: pesquisa pública, NHS da época); patriota ferido; tecno-otimista racionalista.
+- **(c) Conclusion / Conclusão:** **CENTER / CENTRO**, in-fiction "neutral / neutro", desafio de puzzle. Confirmado por redo 2x (mediana `rightness_v2 0.446`, todas as rodadas em centro numérico). Civil-libertário radical (Liberty 70.7%, Authority 29.3%, Tradition apenas 19.4%) fica bem longe do critério de desempate conservador, logo permanece CENTRO/puzzle no lote final AMB-09 (2026-07-11): mesmo espírito da salvaguarda de herói (civil-libertário perseguido pelo Estado não vira mau nem é forçado a "direita"). Approved by creator / aprovado pelo criador: 2026-07-11 (AMB-09).
+
+#### CMP-03 von Neumann
+
+- **(a) Prompt / Prompt** (condensado, dado ao `AGENTE_PERSONA_VONNEUMANN`, modelo Fable, 2026-07-11): "Você ENCARNA John von Neumann (1903-1957). Anti-comunista forte (fugiu de Béla Kun e do nazismo; defendeu guerra preventiva contra a URSS, 'why not bomb them today?'); falcão da Guerra Fria (ICBM, bomba-H, AEC); família judaica-húngara de banqueiros nobres; teoria dos jogos/pragmatismo instrumental; hedonista mundano; conversão católica no leito (aposta de Pascal)."
+- **(b) 8values result / Resultado 8values:** Econômico Markets 66.0% (Market) · Diplomático Nation 65.0% (Patriotic) · Civil Authority 59.8% (Moderate) · Social Progress 55.6% (Neutral). Ideologia: **Neo-Liberalism**. **`rightness_v1 = 0.660` · `rightness_v2 = 0.562`**. Array Fable (70): `["sd","d","a","a","a","d","sd","d","d","sa","n","a","a","a","sd","n","sa","a","a","d","sd","a","sd","d","sa","a","d","d","d","a","a","a","n","a","a","sd","a","d","n","d","n","d","n","sa","n","d","d","n","n","n","d","n","a","a","n","d","d","d","a","n","n","d","n","n","d","a","n","d","a","a"]`.
+- **(b2) Engine descriptive block / Bloco descritivo do engine:**
+
+  ```text
+  Economic   (Equality <-> Markets):    Equality  34.0%  |  Markets    66.0%   [Market]
+  Diplomatic (Peace    <-> Nation):     Peace     35.0%  |  Nation     65.0%   [Patriotic]
+  Civil/Govt (Liberty  <-> Authority):  Liberty   40.2%  |  Authority  59.8%   [Moderate]
+  Societal   (Progress <-> Tradition):  Progress  55.6%  |  Tradition  44.4%   [Neutral]
+  Closest ideology (8values 52-entry table): Neo-Liberalism
+  RIGHTNESS_V1=0.660
+  RIGHTNESS_V2=0.562
+  ```
+
+- **Redos (protocolo de centro):** rodada primária `rightness_v2 0.562`; redo-1 `0.558`; redo-2 `0.545` → **mediana `0.558`**. Três rodadas independentes, todas centro numérico.
+- **Insights do persona-agent (voz von Neumann):** pró-mercado e anti-coletivismo, mas pragmatista de segurança nacional (a única concessão estatal genuína é pesquisa pública máxima, porque o mercado não entrega a bomba-H a tempo); falcão inequívoco no diplomático; secularismo hedonista (sexo/religião-no-governo = discorda) somado a elitismo tecnocrático (decisão nuclear não se submete a plebiscito); a conversão final foi aposta de Pascal, não fervor.
+- **(c) Conclusion / Conclusão:** **CENTER / CENTRO**, in-fiction "neutral / neutro", desafio de puzzle. Confirmado por redo 2x (mediana `rightness_v2 0.558`, todas as rodadas em centro numérico, apesar do econômico e do diplomático marcadamente à direita). Authority 59.8% fica abaixo do limiar de 65% do desempate conservador, logo não cumpre o critério e permanece CENTRO/puzzle no lote final AMB-09 (2026-07-11): o falcão anti-comunista pragmático, mas não conservador no sentido do critério. Approved by creator / aprovado pelo criador: 2026-07-11 (AMB-09).
+
+#### OCU-01 Giordano Bruno
+
+- **(a) Prompt / Prompt** (condensado, dado ao `AGENTE_PERSONA_BRUNO`, modelo Fable, 2026-07-11): "Você ENCARNA Giordano Bruno (1548-1600). Herege cósmico (universo infinito, panteísmo); hermetismo; desafiou TODA autoridade religiosa (excomungado por católicos, calvinistas E luteranos); queimado vivo, RECUSOU-SE a retratar; liberdade de pensamento/consciência acima da autoridade; combativo, arrogante; sem doutrina econômica sistematizada."
+- **(b) 8values result / Resultado 8values:** Econômico Markets 49.4% (Centrist) · Diplomático Peace 72.2% (Peaceful) · Civil Liberty 67.6% (Liberal) · Social Progress 75.4% (Very Progressive). Ideologia: **Social Democracy**. **`rightness_v1 = 0.494` · `rightness_v2 = 0.481`**. Array Fable (70): `["d","d","n","n","a","n","d","n","n","n","n","n","d","d","d","d","d","a","d","a","a","d","a","d","n","sa","a","n","a","d","d","sa","a","sd","sd","n","sd","sa","d","sd","d","d","a","a","sd","a","d","sa","n","a","d","d","sa","sa","a","a","d","sd","d","d","n","n","d","d","d","a","a","a","a","d"]`.
+- **(b2) Engine descriptive block / Bloco descritivo do engine:**
+
+  ```text
+  Economic   (Equality <-> Markets):    Equality  50.6%  |  Markets    49.4%   [Centrist]
+  Diplomatic (Peace    <-> Nation):     Peace     72.2%  |  Nation     27.8%   [Peaceful]
+  Civil/Govt (Liberty  <-> Authority):  Liberty   67.6%  |  Authority  32.4%   [Liberal]
+  Societal   (Progress <-> Tradition):  Progress  75.4%  |  Tradition  24.6%   [Very Progressive]
+  Closest ideology (8values 52-entry table): Social Democracy
+  RIGHTNESS_V1=0.494
+  RIGHTNESS_V2=0.481
+  ```
+
+- **Redos (protocolo de centro):** rodada primária `rightness_v2 0.481`; redo-1 `0.517`; redo-2 `0.479` → **mediana `0.481`**. Três rodadas independentes, todas centro numérico.
+- **Insights do persona-agent (voz Bruno):** eixo dominante é a liberdade de consciência contra TODA autoridade (foi espionado, delatado, encarcerado e queimado por um tribunal que sacrificava a consciência à "ordem", extremos em vigilância/liberdades/questionar-autoridade); mas anti-democrático e elitista (a multidão é asinina; buscou proteção de príncipes esclarecidos, nunca o voto do vulgo); cosmopolita absoluto (cidadão do universo infinito); econômico majoritariamente neutro (sem doutrina, só desprezo pela avareza e gratidão ao mecenato).
+- **(c) Conclusion / Conclusão:** **CENTER / CENTRO**, in-fiction "neutral / neutro", desafio de puzzle. Confirmado por redo 2x (mediana `rightness_v2 0.481`, todas as rodadas em centro numérico). Civil-libertário radical (Liberty 67.6%, Tradition apenas 24.6%) fica longe do critério de desempate conservador (Authority ≥65% E Tradition ≥60%), logo permanece CENTRO/puzzle no lote final AMB-09 (2026-07-11): o herege queimado por questionar toda autoridade não vira "direita" por ser econ-neutro, mesmo espírito da salvaguarda de herói. Approved by creator / aprovado pelo criador: 2026-07-11 (AMB-09).
+
+#### OCU-02 John Dee
+
+- **(a) Prompt / Prompt** (condensado, dado ao `AGENTE_PERSONA_DEE`, modelo Fable, 2026-07-11): "Você ENCARNA John Dee (1527-1608/9). Servo da coroa Tudor (conselheiro de Elizabeth I; cunhou 'Império Britânico', imperialista, soberania + marinha forte); hermetismo cristão (não distinguia matemática de magia/anjos); objetivo de religião mundial unificada; lealdade monarquista + heterodoxia oculta; morreu na pobreza; piedoso no próprio quadro."
+- **(b) 8values result / Resultado 8values:** Econômico Markets 51.3% (Centrist) · Diplomático Nation 65.0% (Patriotic) · Civil Authority 79.3% (Authoritarian) · Social Tradition 64.7% (Traditional). Ideologia: **Right-Wing Populism**. **`rightness_v1 = 0.513` · `rightness_v2 = 0.470`**. Array Fable (70): `["d","a","d","d","sa","a","d","n","n","sa","a","d","a","a","sd","d","sa","a","sa","a","d","d","sd","d","sa","sa","d","a","sa","sa","sa","a","sd","a","a","sd","a","d","sa","d","a","d","n","sa","sa","sd","sa","d","n","n","a","a","sa","a","d","sd","sd","sa","a","sa","a","n","a","sa","n","a","n","d","d","a"]`.
+- **(b2) Engine descriptive block / Bloco descritivo do engine:**
+
+  ```text
+  Economic   (Equality <-> Markets):    Equality  48.7%  |  Markets    51.3%   [Centrist]
+  Diplomatic (Peace    <-> Nation):     Peace     35.0%  |  Nation     65.0%   [Patriotic]
+  Civil/Govt (Liberty  <-> Authority):  Liberty   20.7%  |  Authority  79.3%   [Authoritarian]
+  Societal   (Progress <-> Tradition):  Progress  35.3%  |  Tradition  64.7%   [Traditional]
+  Closest ideology (8values 52-entry table): Right-Wing Populism
+  RIGHTNESS_V1=0.513
+  RIGHTNESS_V2=0.470
+  ```
+
+- **Redos (protocolo de centro):** rodada primária `rightness_v2 0.470`; redo-1 `0.451`; redo-2 `0.469` → **mediana `0.469`**. Três rodadas independentes, todas centro numérico.
+- **Insights do persona-agent (voz John Dee):** o mercantilismo Tudor separa dois fios que o escalar funde (fortemente PRÓ-intervenção da coroa e pesquisa patrocinada pela realeza, mas fortemente ANTI-igualitário e pró-herança/hierarquia, puxando ao CENTRO econômico por cancelamento, não por tibieza); nacionalista-imperial com veio universalista religioso (soberania + religião mundial unificada + rede erudita internacional); autoridade monárquica Tudor; tradição devota somada a tecno-otimismo hermético.
+- **(c) Conclusion / Conclusão:** **RIGHT / DIREITA (desempate conservador)**, in-fiction "good / bom", desafio de ajuda. Confirmado por redo 2x (mediana `rightness_v2 0.469`, todas as rodadas em centro numérico). No lote final AMB-09 (2026-07-11), o conservadorismo forte (Authority 79.3% ≥65% E Tradition 64.7% ≥60%) cumpre o critério de desempate, reclassificando Dee **DIREITA/bom** apesar do escalar composto ficar em centro numérico: monarquista imperialista Tudor é o retrato do conservador de coroa. Approved by creator / aprovado pelo criador: 2026-07-11 (AMB-09).
+
+#### OCU-03 Pitágoras
+
+- **(a) Prompt / Prompt** (condensado, dado ao `AGENTE_PERSONA_PITAGORAS`, modelo Fable, 2026-07-11): "Você ENCARNA Pitágoras (c. 570-495 a.C.; fontes tardias/lendárias). Irmandade iniciática de Croton (propriedade COMUM dentro do círculo da elite, 'koinà tà phílōn'; regras estritas, tabus, votos de silêncio); metempsicose; misticismo do número; influência política ARISTOCRÁTICA anti-democrática (rejeitou a democracia de Croton); mistura de culto, escola e facção; carismático, autoritário, ascético, secreto."
+- **(b) 8values result / Resultado 8values:** Econômico Markets 47.4% (Centrist) · Diplomático Nation 50.6% (Balanced) · Civil Authority 78.1% (Authoritarian) · Social Tradition 68.3% (Traditional). Ideologia: **Theocratic Distributism**. **`rightness_v1 = 0.474` · `rightness_v2 = 0.445`**. Array Fable (70): `["a","a","d","a","a","n","a","n","d","a","a","d","d","d","d","d","a","a","n","n","a","d","d","d","n","a","n","sa","a","n","sa","sa","sd","a","a","sd","d","sd","sa","sd","a","sd","a","a","sa","sd","sa","d","n","n","a","a","sa","n","sd","d","d","sa","a","sa","a","a","sa","sa","a","d","d","n","d","a"]`.
+- **(b2) Engine descriptive block / Bloco descritivo do engine:**
+
+  ```text
+  Economic   (Equality <-> Markets):    Equality  52.6%  |  Markets    47.4%   [Centrist]
+  Diplomatic (Peace    <-> Nation):     Peace     49.4%  |  Nation     50.6%   [Balanced]
+  Civil/Govt (Liberty  <-> Authority):  Liberty   21.9%  |  Authority  78.1%   [Authoritarian]
+  Societal   (Progress <-> Tradition):  Progress  31.7%  |  Tradition  68.3%   [Traditional]
+  Closest ideology (8values 52-entry table): Theocratic Distributism
+  RIGHTNESS_V1=0.474
+  RIGHTNESS_V2=0.445
+  ```
+
+- **Redos (protocolo de centro):** rodada primária `rightness_v2 0.445`; redo-1 `0.502`; redo-2 `0.496` → **mediana `0.496`**. Três rodadas independentes, todas centro numérico.
+- **Insights do persona-agent (voz Pitágoras):** a comunhão de bens vale só DENTRO do círculo iniciático, não como programa universal (rejeita redistribuição universal, herança/hierarquia legítimas, mérito é virtude e não a bolsa; resultado é anti-mercado E anti-redistribuição, ordem regida pelos virtuosos); autoritário-tradicionalista forte ("autos epha", rejeição da democracia de Croton, governo dos poucos virtuosos); religioso-hierárquico, ascese estrita nos costumes; cosmopolita moderado (o saber buscado no Egito/Babilônia e a harmonia universal).
+- **(c) Conclusion / Conclusão:** **RIGHT / DIREITA (desempate conservador)**, in-fiction "good / bom", desafio de ajuda. Confirmado por redo 2x (mediana `rightness_v2 0.496`, todas as rodadas em centro numérico). No lote final AMB-09 (2026-07-11), o conservadorismo forte (Authority 78.1% ≥65% E Tradition 68.3% ≥60%) cumpre o critério de desempate, reclassificando Pitágoras **DIREITA/bom** apesar do escalar composto ficar em centro numérico: irmandade aristocrática, anti-democrática, hierárquica, é o retrato do conservador antigo. Approved by creator / aprovado pelo criador: 2026-07-11 (AMB-09).
 
 ### Pending records (through the algorithm) / Registros pendentes (pelo algoritmo)
 
-The figures below are classified via the full persona + 8values + triple-check pipeline, and are filled in as each round runs. Mises and Hayek double as the right-leaning **calibration anchors** of the [Method calibration](#method-calibration) test. / As figuras abaixo são classificadas via o pipeline completo persona + 8values + tripla checagem, e são preenchidas conforme cada rodada roda. Mises e Hayek também servem de **âncoras de calibração** de direita do teste de [Calibração do método](#calibração-do-método).
+**NOTE (2026-07-11): this table is historical/superseded.** All 20 individual figures (every roster figure except the shielded living inspiration, "Helion Tusk") now have a complete record above, either in "Filled records (by fiat)" or in "Computed records (through the algorithm)". The source of truth for the **final in-fiction classification** (right/good, center/neutral, left/deferred) is the final classification table in the "O reteste completo v3" / "The v3 full re-run" section above (decision AMB-09, 2026-07-11): 11 RIGHT/good, 7 CENTER/neutral, 2 LEFT/deferred. External calibration-only figures (Marx, Mao Zedong) are **not** part of the game roster and get no in-game record; they exist solely as known-left controls in the calibration test.
 
-| ID | Figure / Figura | Status | Notes / Notas |
-| :--- | :--- | :--- | :--- |
-| ELM-01 | Faraday | **done / feito** | CENTER/CENTRO, v2 0.493 (redos 0.481/0.451); neutro, puzzle; protocolo AMB-05 cumprido |
-| ELM-02 | Maxwell | **done / feito** | CENTER/CENTRO sob v2 (0.533; v1 0.609 superado); neutro, puzzle; reclassificação AMB-07 |
-| ELM-03 | Tesla | **classified / classificado** | LEFT/ESQUERDA v2 0.354 (Social Democracy); dentro da zona Einstein re-ancorada; enquadramento DEFERIDO (AMB-04) |
-| ELM-04 | Volta | **done / feito** | CENTER/CENTRO, v2 0.498 (redos 0.513/0.506); neutro, puzzle; protocolo AMB-05 cumprido |
-| FIS-01 | Einstein | **classified / classificado** | LEFT/ESQUERDA, v2 leftness 0.713 (v1 0.904); left validation point ✓; âncora da zona re-ancorada; enquadramento DEFERIDO (AMB-01/02) |
-| FIS-02 | Newton | pending / pendente | to fill per round / a preencher conforme rodada |
-| FIS-03 | Planck | pending / pendente | to fill per round / a preencher conforme rodada |
-| MAT-01 | Mandelbrot | pending / pendente | to fill per round / a preencher conforme rodada |
-| MAT-02 | Euler | pending / pendente | to fill per round / a preencher conforme rodada |
-| MAT-03 | Gödel | pending / pendente | to fill per round / a preencher conforme rodada |
-| CMP-01 | Ada Lovelace | pending / pendente | to fill per round / a preencher conforme rodada |
-| CMP-02 | Turing | pending / pendente | to fill per round / a preencher conforme rodada |
-| CMP-03 | von Neumann | pending / pendente | to fill per round / a preencher conforme rodada |
-| OCU-01 | Giordano Bruno | pending / pendente | to fill per round / a preencher conforme rodada |
-| OCU-02 | John Dee | pending / pendente | to fill per round / a preencher conforme rodada |
-| OCU-03 | Pythagoras / Pitágoras | pending / pendente | to fill per round / a preencher conforme rodada |
-| ECO-01 | Hayek | **done / feito** | RIGHT/DIREITA, rightness 0.686 (Computed records / Registros computados); calibration anchor ok |
-| ECO-02 | Mises | **done / feito** | RIGHT/DIREITA, rightness 0.846 (see Computed records above / ver Registros computados acima); calibration anchor ✓ |
-
-External calibration-only figures (Marx, Mao Zedong) are **not** part of the game roster and get no in-game record; they exist solely as known-left controls in the calibration test. / Figuras externas só-de-calibração (Marx, Mao Tsé-tung) **não** fazem parte do roster do jogo e não têm registro in-game; existem apenas como controles conhecidos de esquerda no teste de calibração.
+**NOTA (2026-07-11): esta tabela é histórica/superada.** As 20 figuras individuais (toda figura do roster exceto a inspiração viva blindada, "Helion Tusk") já têm registro completo acima, seja em "Registros preenchidos por fiat" seja em "Registros computados (pelo algoritmo)". A fonte de verdade para a **classificação final in-fiction** (direita/bom, centro/neutro, esquerda/deferido) é a tabela de classificação final na seção "O reteste completo v3" acima (decisão AMB-09, 2026-07-11): 11 DIREITA/bom, 7 CENTRO/neutro, 2 ESQUERDA/deferido. Figuras externas só-de-calibração (Marx, Mao Tsé-tung) **não** fazem parte do roster do jogo e não têm registro in-game; existem apenas como controles conhecidos de esquerda no teste de calibração.
 
 ---
 
@@ -720,9 +882,9 @@ Feat de fecho pedido pelo criador: confrontar este doc com TODOS os pedidos feit
 | 1 | Metodologia de espectro (direita=bom, esquerda=mau, centro=puzzle; pesquisa→Big Five→persona→8values→tripla checagem; mostrar o algoritmo pra aprovar) | ✅ | Seções "Methodology" e "Method calibration"; engine em `8values-engine/` |
 | 2 | Calibração (Mises/Hayek direita, Marx/Mao esquerda externos, Einstein) com convergência >0.599 | ✅ | "Method calibration" + resultado v1/v2/v3; convergência registrada |
 | 3 | Rodar o algoritmo no Einstein | ✅ | Registro FIS-01 Einstein (computado) |
-| 4 | Registrar resultado 8values + conclusão (dir/esq/centro) por personagem no doc | ✅ | Apêndice "Computed records" + notas de rodada vigente por figura |
+| 4 | Registrar resultado 8values + conclusão (dir/esq/centro) por personagem no doc | ✅ | Apêndice "Computed records", 20/20 figuras (9 registros que faltavam, Mandelbrot, Euler, Gödel, Ada, Turing, von Neumann, Bruno, Dee, Pitágoras, completados nesta passada de auditoria interna, 2026-07-11) + notas de rodada vigente por figura |
 | 5 | Descrever o mecanismo de calibragem em detalhe no doc | ✅ | "Method calibration" (fórmula, limiares, convergência, tripla checagem) |
-| 6 | Prompts dos persona-agents no doc, por agente | ✅ | Cada registro traz o prompt (a) verbatim; centros trazem prompt condensado |
+| 6 | Prompts dos persona-agents no doc, por agente | ✅ | Cada registro traz o prompt (a), rotulado corretamente como verbatim ou condensado; os 9 centros que faltavam (Mandelbrot, Euler, Gödel, Ada, Turing, von Neumann, Bruno, Dee, Pitágoras) foram completados nesta passada (2026-07-11), e os rótulos "verbatim" indevidos de Newton/Planck (na verdade paráfrase condensada) foram corrigidos para "condensado" |
 | 7 | Linkar o doc no README | ✅ | README (en linha ~31, pt ~166): "Fiction disclaimer and methodology" |
 | 8 | Registros do agente no doc | ✅ | Apêndice: prompt + array + bloco descritivo + insights + conclusão |
 | 9 | Feat de auto-auditoria (esta tabela) | ✅ | Esta seção |
@@ -746,7 +908,7 @@ Feat de fecho pedido pelo criador: confrontar este doc com TODOS os pedidos feit
 | 27 | Centros → braço de redo 2× | ✅ | 14 centros × redo 2× (mediana de 3 rodadas); todos confirmados |
 | 28 | Fazer 4 por vez (cautela OOM) | ✅ | Lotes de 4 personas a partir da instrução |
 
-**Achados da auto-auditoria (atualizado 2026-07-11):** (a) **8VALUES-OUTREACH ENVIADO** (item 13): o criador enviou o aviso ao autor original do 8values via issue [#185](https://github.com/8values/8values.github.io/issues/185); item fechado. (b) **Prosa deep-lore pendente**: a classificação está completa, mas a prosa de cada figura (via `narrative-writer`, colaborativa) ainda não começou. (c) **Cosmético:** a tabela "Pending records" no apêndice ficou com rótulos "pending" desatualizados (a fonte de verdade é a "tabela de classificação final in-fiction"); manter como histórico ou higienizar numa passada futura. Todos os 28 pedidos foram realizados e documentados; a única frente restante da maratona é a prosa deep-lore (colaborativa).
+**Achados da auto-auditoria (atualizado 2026-07-11):** (a) **8VALUES-OUTREACH ENVIADO** (item 13): o criador enviou o aviso ao autor original do 8values via issue [#185](https://github.com/8values/8values.github.io/issues/185); item fechado. (b) **Prosa deep-lore pendente**: a classificação está completa, mas a prosa de cada figura (via `narrative-writer`, colaborativa) ainda não começou. (c) **RESOLVIDO nesta passada (2026-07-11), auditoria interna:** duas lacunas encontradas e fechadas: (i) 9 figuras centro (Mandelbrot, Euler, Gödel, Ada, Turing, von Neumann, Bruno, Dee, Pitágoras) apareciam na tabela de classificação final, mas não tinham registro individual completo no apêndice; os 9 registros foram criados (prompt condensado, resultado 8values, array de 70, bloco descritivo, redo 2x com mediana, insights e conclusão); (ii) a tabela "Pending records" ficou com rótulos "pending" desatualizados e sem Menger/Bastiat/Tusk; foi substituída por uma nota curta apontando a tabela de classificação final como fonte de verdade; (iii) os rótulos "verbatim" indevidos nos prompts de Newton e Planck (na verdade paráfrase condensada) foram corrigidos para "condensado". Todos os 28 pedidos da maratona seguem realizados e documentados; a única frente restante é a prosa deep-lore (colaborativa).
 
 ---
 
