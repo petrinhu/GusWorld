@@ -460,6 +460,19 @@ Corpo em pt-br (língua de trabalho); cada entrada = caso ambíguo levado ao cri
 - Opção 3, mau trágico/equivocado: o socialismo econômico é o "erro"; confronto compassivo, nobre-equivocado; aplica esquerda=mau com nuance.
 - **Decisão do criador: opção 3 (MAU trágico).** Einstein = ESQUERDA / mau-trágico, confronto de tom compassivo (o socialismo econômico como a falha do sábio humanista), não vilão puro.
 
+**AMB-12 (2026-07-11, loop de prosa deep-lore): ponte Era 1 arcano ↔ Era 2 técnico na §6 do Newton vs. o fio secreto do Estilhaçamento.** O legado do Newton (design doc `06-newton.md`) é a suspeita secreta e nunca declarada de que a "magia" da Era 1 e a física da Era 2 seguem o mesmo conjunto de regras, o que É o Pillar 1 público (magia = sistema formal computável). O `revisor-textual` apontou que duas imagens da prosa ("mesma gramática vestida em duas roupas", "costura entre as duas") + a glosa do header ("ecos convergentes, referido só em sussurro") ecoavam o léxico do doc SECRETO `cosmologia-origem-deep.md`.
+- Opção A: manter a ponte (Pillar 1), de-conflitar o vocabulário, remover a glosa do header.
+- Opção B: enfraquecer a suspeita (só o caderno enterrado, sem formular a hipótese).
+- Opção C: deixar como está (risco de o leitor ligar os pontos cedo demais).
+- **Decisão AUTÔNOMA (opção A), sob autorização "decida o que puder sem mim"; confirmar retroativamente com o líder.** Racional: A é o caminho que NÃO toca o Estilhaçamento (mantém tudo no Pillar 1 público); a origem multiversal segue exclusiva do doc secreto. Newton suspeita e cala; quem resolve é o Einstein.
+
+**AMB-13 (2026-07-11, loop de prosa deep-lore): inventário CHARS.md dos 21 mestres do Codex.** Os mestres escritos (Faraday, Maxwell, Volta, Newton) não constam no `CHARS.md`; os 4 docs são status PROPOSTA (a regra manda inventariar personagem novo em doc CANÔNICO, e PROPOSTA ainda não é canon).
+- Opção A: registrar só na canonização formal pelo criador; a entrada no CHARS.md vira passo obrigatório do DoD de cada mestre (a seção "Mestres do Codex" nasce na 1ª aprovação formal).
+- Opção B: criar a seção agora com os 4 marcados PROPOSTA + os 17 nomes reservados (visibilidade anti-colisão, mas mistura proposta e canon no inventário).
+- **Decisão AUTÔNOMA (opção A), sob a mesma autorização; confirmar retroativamente.** Consistente com os 3 pilotos (também fora do CHARS.md enquanto PROPOSTA).
+
+**Convenções do loop de prosa (registradas p/ não reincidir):** (1) **métrica de banda de palavras = SÓ o corpo** (§1 ao fim da §6, excluindo blockquote de status e rodapé de grounding); pilotos 1162-1344, teto de série ~1580 de corpo. (2) **Citação de pares:** nomes SIM, ordem temporal NÃO (permitido "na mesma rede que também abrigou Faraday, Maxwell e Volta"; proibido "antes/depois/uma geração/viria a" e linhagem mestre-a-mestre). (3) Remediação de prosa SEMPRE volta ao `narrative-writer` (nunca inline); cap de 3 rodadas por figura, senão escala ao CPO.
+
 ### Per-character records (sorted by domain/ID) / Registros por personagem (ordenados por domínio/ID)
 
 Os dados abaixo (prompt, respostas, resultado, insights) ficam em pt-br, a língua de trabalho do design; os rótulos seguem o template bilíngue. / The data below is kept in pt-br, the design working language; labels follow the bilingual template.
