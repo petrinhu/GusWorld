@@ -81,8 +81,8 @@ Ver `characters/party.md` para spec completa. Resumo:
 
 | Ato | Duração alvo | Função |
 |---|---|---|
-| **Ato 1 (Diagnóstico)** | 0-20% (~45min-1h30) | Setup. Cidade. Gus solo. Recrutamento dos primeiros companions. Catalyst. |
-| **Ato 2 (Compilação)** | 20-75% (~2h30-5h) | Seis arcos companion. Sterling presente em todos. Knowledge cresce. Foreshadow Dante dispara em 50%. |
+| **Ato 1 (Diagnóstico)** | 0-20% (~45min-1h30) | Setup. Cidade. Sumiço do Brunus (catalyst). Missão solo de abertura recruta o Companion #1 (Cauã). |
+| **Ato 2 (Compilação)** | 20-75% (~2h30-5h) | Cinco arcos companion novos (Iara, Bento, Linda, Dante, Jaci) + retorno de aprofundamento do Cauã. Sterling presente em todos. Knowledge cresce. Foreshadow Dante dispara após 3 slots de Ato 2 completos. |
 | **Ato 3 (Decodificação)** | 75-100% (~1h-1h30) | Catedrais de Silício corrompidas → Cúpula Sterling. Dante reveal e mini-boss. Boss final 2 fases. Triple hook pós-créditos. |
 
 ---
@@ -93,18 +93,18 @@ Estrutura geral: setup + 6 arcos companion (1 beat principal cada) + clímax. Ca
 
 | # | Beat | Função | Ato |
 |---|---|---|---|
-| 1 | **Setup** | Gus solo no Núcleo Metropolitano. Catalyst. Recrutamento Companion #1. | 1 |
-| 2 | **Arco Companion #2** | Primeiro arco em ordem livre. | 2 |
-| 3 | **Arco Companion #3** | Segundo arco. | 2 |
-| 4 | **Arco Companion #4** | Terceiro arco. **Foreshadow Dante dispara aqui (50%)** se ainda não recrutado. | 2 |
-| 5 | **Arco Companion #5** | Quarto arco. | 2 |
-| 6 | **Arco Companion #6** | Quinto arco. | 2 |
-| 7 | **Arco Companion #7** | Sexto e último arco companion. Convergência iminente. | 2/3 |
+| 1 | **Setup** | Núcleo Metropolitano. Sumiço do Brunus (catalyst). Missão solo de abertura recruta o Companion #1 (Cauã). | 1 |
+| 2 | **Slot de Ato 2 (1º)** | Primeiro slot em ordem livre. | 2 |
+| 3 | **Slot de Ato 2 (2º)** | Segundo slot. | 2 |
+| 4 | **Slot de Ato 2 (3º)** | Terceiro slot. **Foreshadow Dante dispara aqui (após 3 slots completos)** se Dante ainda não recrutado. | 2 |
+| 5 | **Slot de Ato 2 (4º)** | Quarto slot. | 2 |
+| 6 | **Slot de Ato 2 (5º)** | Quinto slot. | 2 |
+| 7 | **Slot de Ato 2 (6º)** | Sexto e último slot. Convergência iminente. | 2/3 |
 | 8 | **Climax (Decodificação Final)** | Dante reveal, mini-boss Dante, boss Sterling 2 fases, ending. | 3 |
 
-Ordem dos arcos companion (#2 a #7) é **livre** (B.6). Cada um funciona standalone. Foreshadow Dante não depende de ordem específica.
+Os **6 slots de Ato 2** são: **5 arcos de recrutamento** novos (Iara, Bento, Linda, Dante, Jaci) + **1 retorno de aprofundamento do Cauã** (que já entrou na party na abertura). A ordem dos 6 é **livre** (B.6). Cada um funciona standalone. Foreshadow Dante não depende de ordem específica.
 
-Total de sub-beats internos: 6 arcos × 4 (Kishōtenketsu) = **24 sub-beats** + setup + clímax = **~26 sub-beats jogáveis**.
+Total de sub-beats internos: 6 slots × 4 (Kishōtenketsu) = **24 sub-beats** + setup + clímax = **~26 sub-beats jogáveis**.
 
 ---
 
@@ -118,22 +118,22 @@ GusWorld City funciona aparentemente. Janelarum trava periodicamente, mas as pes
 
 | Sub-beat | Conteúdo |
 |---|---|
-| **Opening Image** | Núcleo Metropolitano, noite. Gus na bancada, soldando upgrade na Matriz Ortodôntica. Câmera 3/4 puxa lentamente. Janela: holograma Sterling distante pulsa. Mãe entra com chá. Sem palavras. Estabelece: lar, lógica, ritmo silencioso. |
-| **Tutorial diegético** | Gus testa o upgrade saindo pra praça. Combate-tutorial contra drone Sterling Corp "comportamento emergente inesperado". Player aprende stack de 3 tokens, Vetor do Gambito, óculos táticos. Drone se dissolve em compilação erro (estilizado, sem gore; P4). |
-| **Catalyst** | Anomalia massiva detectada via Matriz Ortodôntica. Sinal partindo da Orla Recursiva. Padrão fractal da Selve apresentando ruído **incoerente** (Patch-Zero pré-anuncia, sem nome ainda). Gus decide investigar. |
-| **Mãe** | Mãe pede pra Gus não ir. Não é briga; é cuidado contido. Beat curto. Gus vai mesmo assim. |
-| **Recrutamento Companion #1** | Encontro com **um companion à escolha do jogador** dependendo de onde Gus vai primeiro (Setor Mirage = Iara primeiro; Periferia Industrial = Dante primeiro; Dutos = Cauã primeiro; Zona do Silêncio = Linda primeiro; Catedrais Neo-Sylvania = Bento primeiro; fronteira-Selve = Jaci primeiro). |
-| **Foreshadow Sterling** | Holograma Sterling no Setor Mirage faz pronunciamento ao vivo enquanto Gus passa. Tom monolítico, frio. Gus não sabe ainda quem é mas reconhece a frieza. |
-| **Foreshadow Dante** | Independente de ordem, cena 4 de `comic-reliefs.md` ("Force Push") **não dispara ainda**. Dispara em ato 2 após 3 arcos completos. |
-| **Break into Two** | Gus + Companion #1 cruzam o limiar narrativo (entram em outro setting). Câmera muda de paleta. Trilha sonora muda de chave. Ato 2 começa. |
+| **Opening Image** | Apartamento Vance, Núcleo Metropolitano. Gus na própria bancada, refinando o **software** do Tavus-Drive (não solda de hardware). Gameplay mínimo desde o primeiro segundo. Cenário conta o personagem sem monólogo: peças de reposição, jogo de xadrez do tio Yakov, retrato da família (separada mas afetuosa, sem clima de ruptura), um objeto antigo do Brunus plantado como Chekhov barato. Câmera 3/4. Estabelece: lar, lógica, ofício. Ver `docs/design/gus-abertura.md` §2. |
+| **Tutorial diegético** | Doméstico, **sem combate**. Gus ensina o jogador os verbos scan (§6.1 gdd) e compilação (§6.2 gdd) mexendo nos próprios objetos do quarto (peças, deck de cartas, foto da família) e testando uma carta-token no ar, sem alvo. Controles de movimento/câmera aprendidos andando pelo apartamento. O primeiro combate do jogo NÃO acontece aqui: é cooperativo, na saída da missão de abertura (ver Recrutamento Companion #1). Ver `gus-abertura.md` §2. |
+| **Catalyst** | **Sumiço do mentor Brunus Vetorial** (boticário itinerante, cf. `characters/brunus-vetorial.md`). Gus vai à botica-laboratório do Brunus e a encontra vazia, com sinais de partida apressada, não de violência. Investiga por lógica (reusa o scan), acha um **recado pessoal endereçado a ele**. O recado planta, velado, a "força antiga" que persegue quem sabe demais (segredo de origem, nunca nomeado). Beats detalhados em `gus-abertura.md` §3-§6. |
+| **Mãe** | Gargi pode pedir pra Gus não ir, recontextualizado em torno da preocupação com o **Brunus** (não com uma anomalia). Não é briga; é cuidado contido. Beat curto e opcional (cf. `gus-abertura.md` §6, §9). A família Vance permanece base segura; ninguém dela é ferido ou ameaçado. |
+| **Recrutamento Companion #1** | **Fixo: Cauã "Volt"**, recrutado ainda na abertura via a missão solo "O Mistério dos Aparatos" (Distritos Inferiores → Dutos Infernais). Investigação solo (aparatos possuídos → scan + triangulação → fragmento antigo espalhado pela catadora Doralice → descida aos Dutos → aparato da Era 1 ainda ligado → puzzle cooperativo de roteamento de energia). Cauã aparece hostil, rivais viram aliados resolvendo o aparato juntos. Ver `gus-abertura.md` §13. Não há mais escolha de qual companion vem primeiro (ver Branching foldback #1). |
+| **Foreshadow Sterling** | **Não dispara no Ato 1.** Adiado para o Ato 2, na primeira visita ao Setor Mirage (Arco Iara), preservando a associação Sterling↔Setor Mirage. O trajeto fixo da abertura não passa por lá. |
+| **Foreshadow Dante** | Independente de ordem, cena 4 de `comic-reliefs.md` ("Force Push") **não dispara ainda**. Dispara em ato 2 após **3 slots de Ato 2 completos** (a base de 6 slots se mantém: 5 recrutamentos + o retorno de aprofundamento do Cauã contam igualmente; ver "Foreshadow Dante: timing detalhado"). |
+| **Break into Two** | O cruzamento de limiar acontece dentro da própria missão de abertura (Distritos Inferiores → descida aos Dutos Infernais). O Ato 1 fecha quando Cauã se junta à party ao fim da missão. Câmera muda de paleta, trilha muda de chave. Ato 2 começa. |
 
 ---
 
-## Ato 2: Compilação (seis arcos companion)
+## Ato 2: Compilação (seis slots companion)
 
-### Estrutura de cada arco companion (Kishōtenketsu interno)
+### Estrutura de cada slot companion (Kishōtenketsu interno)
 
-Cada arco companion ocupa aproximadamente **30-50 minutos** de gameplay e segue:
+Os 6 slots são **5 arcos de recrutamento** (Iara, Bento, Linda, Dante, Jaci) + **1 retorno de aprofundamento do Cauã** (já recrutado na abertura). Cada slot ocupa aproximadamente **30-50 minutos** de gameplay e segue:
 
 | Sub-beat | Função | Conteúdo padrão |
 |---|---|---|
@@ -142,14 +142,16 @@ Cada arco companion ocupa aproximadamente **30-50 minutos** de gameplay e segue:
 | **Ten (転), Twist** | Reviravolta que muda o entendimento | Reveal: Sterling Corp está por trás de um aspecto inesperado da crise. Patch-Zero aparece em manifestação local (canal 4 mínimo; canal 3 em arcos centrais). |
 | **Ketsu (結), Resolução** | Fechar o arco e amarrar de volta na trama central | Combate culminante. Companion oficialmente entra na party. Pista sobre Sterling/GRE/Patch-Zero registrada no Diário. Conjuro/token novo destravado. |
 
-### Os seis arcos companion (em ordem nominal; jogador escolhe ordem real)
+### Os seis slots companion (em ordem nominal; jogador escolhe ordem real)
 
-#### Arco Cauã (Dutos Infernais)
+#### Retorno de aprofundamento do Cauã (Dutos Infernais)
 
-- **Ki:** Cauã lidera grupo de runners adolescentes nos Dutos. Sterling Corp tentou comprar acesso vertical via FIR. Runners resistem; FIR ameaça inundar túneis com efluente industrial.
-- **Sho:** Gus + Cauã navegam os Dutos. Combate vertical (pulsos EMP do Cauã interagem com pistões hidráulicos do setting). Plantam call-back de `comic-reliefs.md` cena 3 ("Funciona no meu Drive"). Conjuro novo: **Pulso EM Concêntrico**.
-- **Ten:** Descobrem laboratório FIR escondido nos Dutos: estudam frequências da Matriz Ortodôntica do Gus (sem saber que é dele). **Sterling Corp pediu pra FIR replicar a tecnologia**. Cena Sterling: holograma elogiando "iniciativa da Federação" enquanto Cauã ouve, congelado.
-- **Ketsu:** Combate. Destruição do laboratório FIR. Cauã se junta à party. Cena cômica `comic-reliefs.md` 10 ("Não é magia, é cache") pode disparar aqui.
+**Nota estrutural:** o Cauã já entrou na party na abertura (missão solo "O Mistério dos Aparatos", `gus-abertura.md` §13). Este slot de Ato 2 **não é recrutamento**; é o retorno aos Dutos que aprofunda o companion já conhecido e paga o gancho velado da Subestação 7 plantado na abertura (`gus-abertura.md` §13.6). Segue o mesmo esqueleto Kishōtenketsu dos arcos de recrutamento.
+
+- **Ki:** Disputa interna dos runners juvenis dos Dutos: a facção paciente do Cauã (defesa) contra a facção radical (ataque aberto à FIR). A FIR ameaça inundar os túneis com efluente industrial. O Cauã, agora com o Gus ao lado, volta para conter os dois fogos.
+- **Sho:** Gus + Cauã navegam os Dutos mais fundo. Combate vertical (os pulsos EMP do Cauã interagem com os pistões hidráulicos do setting). Plantam call-back de `comic-reliefs.md` cena 3 ("Funciona no meu Drive"). Conjuro novo destravado aqui: **Pulso EM Concêntrico**.
+- **Ten:** Descobrem laboratório FIR escondido nos Dutos, estudando frequências da Matriz Ortodôntica do Gus (sem saber que é dele). **Sterling Corp pediu à FIR que replicasse a tecnologia.** Aqui paga o payoff da **Subestação 7**: passando pelos destroços, o Cauã enfim conta o que o lugar significa (o irmão, Davi Berenger), fechando a semente plantada em silêncio na abertura. Cena Sterling: holograma elogiando "iniciativa da Federação" enquanto o Cauã ouve, congelado.
+- **Ketsu:** Combate. Destruição do laboratório FIR. O Cauã **não se junta aqui** (já é da party desde a abertura); o que fecha é a disputa dos runners resolvida e o luto pelo irmão amadurecido. Cena cômica `comic-reliefs.md` 10 ("Não é magia, é cache") pode disparar aqui.
 
 #### Arco Iara (Setor Mirage)
 
@@ -194,13 +196,13 @@ Estrutura **foldback + knowledge-gated**. Branches curtos divergem temporariamen
 
 | # | Localização | Tipo | Reconvergência |
 |---|---|---|---|
-| 1 | **Ato 1, recrutamento Companion #1** | Decisão de destino (qual setting Gus visita primeiro). 6 opções. | Sem reconvergência forçada: todos os arcos virão, ordem solta. |
+| 1 | **Ato 2, ordem dos slots companion** | Escolha de ordem dos 6 slots de Ato 2 (5 recrutamentos + retorno do Cauã). O Companion #1 (Cauã) é fixo, recrutado na abertura; **não há mais escolha de qual companion vem primeiro**. | Sem reconvergência forçada: todos os slots virão, ordem solta. |
 | 2 | **Ato 2, Arco Iara, Ten** | Decisão: confrontar Sterling holograma direto (mais agressivo) OU sair em silêncio (preserva opção de retorno). Afeta 1-2 falas no próximo arco e flag no Diário. | Reconverge no Ketsu do próprio arco. |
 | 3 | **Ato 2, Arco Bento, Sho** | Decisão: aceitar Asmódico como linguagem secundária do Gus (3 tokens novos) OU rejeitar (mantém pureza C-Arcane, ganha bônus mestria). | Reconverge imediatamente; diferença mecânica permanente. |
 | 4 | **Ato 2, Arco Linda, Ten** | Decisão: alertar Cidades-Gêmeas imediatamente (corre risco de comprometer Underground local) OU manter sigilo (Underground sobrevive, Cidades-Gêmeas demoram a reagir). | Reconverge; afeta uma das variações de ending (Ouro requer alertar). |
 | 5 | **Ato 3, Dante reveal** | Decisão final: **executar** Dante (rápido, melancólico) / **capturar** (mais difícil mecanicamente, abre cena pós-combate) / **oferecer redenção forçada** (Dante sabotado por Sterling em tempo real; arriscado, alta chance de falha, abre única possibilidade de ending Ouro). | Reconverge no boss final Sterling. |
 
-Três dos seis arcos (Iara, Bento, Linda) têm branching curto interno. Três (Cauã, Dante, Jaci) são lineares (curados para tom + escopo).
+Três dos seis slots (Iara, Bento, Linda) têm branching curto interno. Três (retorno do Cauã, Dante, Jaci) são lineares (curados para tom + escopo).
 
 ---
 
@@ -208,15 +210,17 @@ Três dos seis arcos (Iara, Bento, Linda) têm branching curto interno. Três (C
 
 Dante é traidor canônico desde o ato 1. **Antes do jogo começar**, Sterling já o aliciou.
 
+**Base de contagem (pós-reconciliação da abertura):** o "50%" do Ato 2 mede-se sobre os **6 slots** dele (5 recrutamentos + o retorno de aprofundamento do Cauã, que conta igual). Logo, "50% = 3 slots completos". O Cauã já vem recrutado da abertura, então ele não está no pool de recrutamentos de Ato 2, mas o slot de retorno dele entra na contagem de progresso.
+
 ### Mecânica de foreshadow
 
 | Tipo | Implementação | Quando |
 |---|---|---|
 | **Narrativo (dialogue)** | Falas de Dante com micro-distância emocional. Despreza histórico/tradição em momentos chave. | Toda a campanha |
 | **Narrativo (comportamento)** | Expressão facial progressivamente mais fria. Manchas de graxa migram para mãos limpas (recebe upgrade Sterling). | Spec visual Dante |
-| **Narrativo (ambient)** | Pontos discretos: Dante "atrasa" durante manutenções, espelha terminal por 2 segundos antes de fechar. | Após 50% (3 arcos completos) |
+| **Narrativo (ambient)** | Pontos discretos: Dante "atrasa" durante manutenções, espelha terminal por 2 segundos antes de fechar. | Após 50% (3 slots de Ato 2 completos) |
 | **Mecânico (degradação stats Gus)** | Após 50%, stats do Gus passam a ter **flutuação anormal**: -2% precisão, -1% mestria de carta. Telemetria comprometida. Visível no Diário do Gus subseção "Diagnóstico de Hardware". | Capítulos finais ato 2 e ato 3 |
-| **Narrativo (cena planted)** | `comic-reliefs.md` cena 4 ("Force Push") dispara **automaticamente** após 50% (3 arcos completos). Foreshadow forte. | Auto-trigger 50% |
+| **Narrativo (cena planted)** | `comic-reliefs.md` cena 4 ("Force Push") dispara **automaticamente** após 50% (3 slots de Ato 2 completos). Foreshadow forte. | Auto-trigger 50% |
 | **Narrativo (Diário entry Patch-Zero)** | Patch-Zero comenta enigmaticamente em entry late ato 2: "alguém perto de você não compila. interpretam por você." | Após 75% |
 
 Reveal contextualiza retroativamente tudo. Player que prestou atenção: "ah." Player que não prestou: jogo permite re-leitura via Diário do Gus (Knowledge Progression destrava re-leitura cronológica do arco Dante).
@@ -366,12 +370,12 @@ Toda decisão narrativa deve ter expressão mecânica.
 
 | # | Setup | Payoff | Tipo | Quando setup | Quando payoff |
 |---|---|---|---|---|---|
-| 1 | Holograma Sterling em todo poste Setor Mirage | Sterling antagonista revelado em arco Iara | Visual | Ato 1 | Ato 2 (Arco Iara) |
+| 1 | Holograma Sterling em todo poste Setor Mirage | Sterling antagonista revelado em arco Iara | Visual | Ato 2 (1ª visita ao Setor Mirage; adiado do Ato 1) | Ato 2 (Arco Iara) |
 | 2 | Janelarum trava (`comic-reliefs.md` 11) | Apex-Data Systems caiu de modo similar; reveal Sterling backstory | Diálogo | Ato 1 | Ato 2 (qualquer arco) |
 | 3 | Dante manutenção gratuita | Rootkit Sterling instalado | Mecânico + diálogo | Ato 2 (Arco Dante) | Ato 3 (reveal) |
 | 4 | Stats Gus degradam após 50% | Comprovação rootkit ativo | Mecânico (UI Diário) | Ato 2 mid | Ato 3 (reveal) |
 | 5 | `comic-reliefs.md` cena 4 "Force Push" | Dante despreza histórico = traidor | Diálogo cômico | Auto-trigger 50% | Ato 3 (reveal) |
-| 6 | Patch-Zero canal 1 entries no Diário | Patch-Zero consciência alien | Texto | Ato 1 | Ato 2 + 3 |
+| 6 | Ruído/padrão sutil e **não-nomeado** no aparato da Era 1 (missão solo de abertura, `gus-abertura.md` §13.3 passo 6). Distinto do gancho velado da "força antiga" (Patch-Zero ≠ segredo de origem) | Patch-Zero consciência alien | Texto/log | Ato 1 (missão de abertura) | Ato 2 + 3 |
 | 7 | Áudio sussurrante em Polis-Vermelha (Linda rádio) | Patch-Zero global, infecção transcontinental | Áudio | Ato 2 (Arco Linda) | Ato 3 |
 | 8 | Cripto-glifos Neo-Sylvania | Lore profunda; Gus ativa partes desconhecidas | Visual | Ato 2 (Arco Bento) | Ato 3 / pós-jogo |
 | 9 | Sterling diz "iniciativa da Federação" (Arco Cauã) | FIR vassala Sterling, não rival | Diálogo | Ato 2 (Arco Cauã) | Ato 3 |
@@ -381,13 +385,13 @@ Toda decisão narrativa deve ter expressão mecânica.
 
 ## Beats: resumo executável (8 macro + sub-beats jogáveis)
 
-1. **Setup**: Núcleo Metropolitano, opening, catalyst, recrutamento companion #1.
-2. **Arco Companion #2**: Kishōtenketsu interno.
-3. **Arco Companion #3**: Kishōtenketsu interno.
-4. **Arco Companion #4**: Kishōtenketsu + foreshadow Dante auto-trigger.
-5. **Arco Companion #5**: Kishōtenketsu + Patch-Zero canal 3.
-6. **Arco Companion #6**: Kishōtenketsu + ambiente cresce (cidade fria, drones aumentam).
-7. **Arco Companion #7**: Kishōtenketsu + dialogue retroativo (Patch-Zero comenta Dante).
+1. **Setup**: Núcleo Metropolitano, opening (Gus refina software em casa), catalyst (sumiço do Brunus), missão solo de abertura recruta o Companion #1 (Cauã).
+2. **Slot de Ato 2 (1º)**: Kishōtenketsu interno.
+3. **Slot de Ato 2 (2º)**: Kishōtenketsu interno.
+4. **Slot de Ato 2 (3º)**: Kishōtenketsu + foreshadow Dante auto-trigger (após 3 slots).
+5. **Slot de Ato 2 (4º)**: Kishōtenketsu + Patch-Zero canal 3.
+6. **Slot de Ato 2 (5º)**: Kishōtenketsu + ambiente cresce (cidade fria, drones aumentam).
+7. **Slot de Ato 2 (6º)**: Kishōtenketsu + dialogue retroativo (Patch-Zero comenta Dante).
 8. **Climax**: Catedrais corrompidas → Cúpula. Dante reveal → mini-boss. Sterling fase 1 (Rede) → fase 2 (Locke Core). Patch-Zero selado. Triple hook.
 
 ---

@@ -33,23 +33,36 @@
 
 ---
 
-## Hero's Journey mini
+## Recrutamento (na abertura) e retorno de aprofundamento (Ato 2)
+
+**Nota de continuidade (reconciliação da abertura, 2026-07-12):** o Cauã é o **Companion #1**, recrutado ainda na abertura, pela missão solo "O Mistério dos Aparatos" (`docs/design/gus-abertura.md` §13; `docs/narrative/arco-principal.md` §Ato 1 Setup). O conteúdo antigo dos Dutos (disputa de facção dos runners, laboratório FIR, conjuro **Pulso EM Concêntrico**, payoff da **Subestação 7**) migrou para um **retorno de aprofundamento no Ato 2**, quando o Cauã já é da party. As duas fases abaixo substituem a antiga tabela de recrutamento única.
+
+### Fase 1: recrutamento na abertura (Distritos Inferiores → Dutos Infernais)
 
 | Sub-beat | Conteúdo |
 |---|---|
-| **Chamado** | Patrulha FIR ameaça inundar túneis com efluente industrial. Cauã sabe que precisa ajuda externa. |
-| **Recusa** | Recusa [[gus]] inicialmente, "ninguém de fora compreende os Dutos". Atrito visível. |
-| **Mentor** | Gus prova competência via puzzle vertical (uso de Vetor do Gambito). Cauã aceita parceria de igual pra igual. |
-| **Prova** | Combate contra unidade FIR no laboratório oculto. Cauã quase morre por impulsividade (puxa cabo errado); Gus salva via cálculo. Lição: "rápido só vence se for **certo** rápido". |
-| **Retorno** | Cauã se junta. Conjuro novo destravado: **Pulso EM Concêntrico**. Setting Dutos vira hub seguro alternativo no ato 2. |
+| **Chamado** | Os aparatos pessoais dos vizinhos dos Distritos Inferiores começam a se comportar "possuídos". A fonte transmite de baixo, dos Dutos. Gus segue o rastro sozinho (scan + triangulação; fragmento antigo espalhado pela catadora Doralice). |
+| **Encontro hostil** | Nos Dutos, junto ao Pilar Era 1, o Cauã confronta o Gus: forasteiro dos setores de cima mexendo no lar dele (território Pythia); presume que o Gus **causou** o defeito. Atrito. Sem resgate: o Cauã não é passivo. |
+| **Prova (cooperação)** | O aparato da Era 1 só desliga com os dois juntos. Gus **lê** (scan) a topologia corrompida do circuito e dita a sequência; o Cauã **é a corrente** e redireciona a energia. Puzzle cooperativo em cadeia de 3 sub-circuitos (`gus-abertura.md` §13.5). |
+| **1º combate cooperativo** | Na saída, um autômato corrompido pelo mesmo sinal do aparato bloqueia um corredor estreito. Gus + Cauã enfrentam **juntos**: primeiro combate do jogo, cooperativo, não solo (`gus-abertura.md` §13.3 passo 8). |
+| **Retorno** | Rivais viram aliados por terem resolvido o aparato juntos. O Cauã entra na party como Companion #1. Os Dutos viram hub seguro alternativo. Semente velada da Subestação 7 plantada só no ambiente (o Cauã reage mal ao lugar; nada é explicado ainda). |
+
+### Fase 2: retorno de aprofundamento (slot de Ato 2)
+
+| Sub-beat | Conteúdo |
+|---|---|
+| **Chamado** | Patrulha FIR ameaça inundar os túneis com efluente industrial. Disputa interna dos runners racha a comunidade. O Cauã, agora com o Gus, volta para conter. |
+| **Prova** | Combate vertical no laboratório FIR oculto. O Cauã quase se fere por impulsividade (puxa o cabo errado); o Gus resolve via cálculo. Lição: "rápido só vence se for **certo** rápido". |
+| **Payoff Subestação 7** | Passando pelos destroços, o Cauã enfim conta o que o lugar significa (o irmão, Davi Berenger), fechando a semente plantada em silêncio na abertura. |
+| **Retorno** | Conjuro novo destravado aqui: **Pulso EM Concêntrico**. A disputa dos runners se resolve; o luto amadurece. |
 
 ---
 
-## Mini-quest pré-recrutamento (disputa de facção home)
+## Mini-quest do retorno de aprofundamento (disputa de facção home)
 
-Disputa interna dos runners juvenis dos Dutos: facção do Cauã (defesa) vs facção radical (ataque ofensivo direto à FIR). Cauã quer estratégia paciente; facção radical quer guerra aberta. Sterling Corp infiltrou agitador na facção radical para forçar resposta militarizada.
+Disputa interna dos runners juvenis dos Dutos: facção do Cauã (defesa) vs facção radical (ataque ofensivo direto à FIR). Cauã quer estratégia paciente; facção radical quer guerra aberta. Sterling Corp infiltrou agitador na facção radical para forçar resposta militarizada. **Esta disputa é o miolo do retorno de aprofundamento (Ato 2), não do recrutamento (que acontece na abertura).**
 
-## Mini-quest pós-recrutamento (crise + reflexão)
+## Mini-quest posterior (crise + reflexão)
 
 **Crise:** facção radical, sem Cauã liderando dia-a-dia, fez ataque suicida a base FIR e foi destruída. Sobreviventes pedem socorro. Cauã volta sozinho (ou com Gus + party); precisa reconstruir comunidade desmoralizada.
 
