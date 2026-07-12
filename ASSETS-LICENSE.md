@@ -42,6 +42,8 @@ Texto e termos oficiais: <https://creativecommons.org/licenses/by-sa/4.0/>
 
 Em resumo (não substitui o texto oficial): pode usar, copiar, modificar e redistribuir, **desde que** atribua o crédito (petrinhu, 2026) e **mantenha a mesma licença** (CC-BY-SA 4.0) na obra derivada.
 
+Parte destes assets nasce de ferramentas de IA generativa de terceiro (PixelLab, Tripo3D, Suno, Gemini/Grok); nesses casos, o CC-BY-SA só se aplica na medida em que os Termos de Serviço daquela ferramenta cedem a titularidade do conteúdo gerado ao criador. Rastreabilidade por asset/lote em [`docs/tech/ai-assets-provenance.md`](docs/tech/ai-assets-provenance.md).
+
 ---
 
 ## Exceção: livros-companheiros = direitos reservados
