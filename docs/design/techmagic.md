@@ -1,6 +1,8 @@
 # techMagic — conceito (record de brainstorm, v1)
 
 > **Status:** REGISTRO de brainstorm colaborativo (líder + orquestrador, 2026-07-10). **NÃO é canon final** — é o registro das decisões do criador nesta sessão. A canonização polida (reescrever Pillar/terminologia/lore-bible, gerar o nome in-world, desenhar mecânica) e o código são **feats pendentes** (ver `TODO.md`: `TECHMAGIC-CANON`, `TECHMAGIC-EXECUTOR`), a serem executados por agentes especialistas com aprovação do líder. Nada aqui foi escrito no canon nem no código ainda.
+>
+> **CORREÇÃO DE TERMO (criador, 2026-07-12):** o termo canônico do meta-conceito é **"TechnoMagik"** (não "techMagic"), e o adjetivo/relativo de tudo que se liga a ele é **"technologiko"**. Este doc ainda usa "techMagic" no corpo (grafia antiga); a reconciliação completa da grafia (corpo do doc + a seção Tavus-Eco abaixo + eventual nome de símbolo de código) fica no item `TECHMAGIC-CANON`. Daqui pra frente, em prosa/lore, usar **TechnoMagik**.
 
 ## O que é
 

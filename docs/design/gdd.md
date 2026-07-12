@@ -112,6 +112,15 @@ Sinergia com 6.1 e 6.2: scan dá input, gambito dá output, deck é a ferramenta
 
 Sem level numérico estilo "Gus Lv 47". Progressão por **módulos de hardware** + **cartas desbloqueadas** + **fragmentos de lore decifrados**. Curva de poder: sigmoid (lenta-rápida-platô) para evitar power-creep no late.
 
+### 7.1 Topologia de acesso ao mundo (princípio canônico, criador 2026-07-12)
+
+**O mundo não tem barreiras artificiais hard.** Nada de parede de pedra sem explicação, hitbox invisível, ou mensagem quebra-4ª-parede tipo "área liberada no nível X": os personagens nunca sabem que estão num jogo. Gating é sempre por dois mecanismos, nunca por trava dura:
+
+- **Gating por DIFICULDADE:** áreas mais distantes da origem são mais perigosas (ecossistema + inimigos mais duros), não trancadas. O jogador pode tentar chegar a qualquer área desde o início; o risco escala com a distância, não uma porta fechada.
+- **Gating por ÁREA ESPECIAL CONTORNÁVEL:** algumas passagens só se abrem com algo diferenciado (item/carta/habilidade). Uma vez destravadas, essas passagens viram **atalhos** entre dois pontos: elas NUNCA são o único caminho pra alcançar o resto do mundo, só encurtam ou facilitam uma rota que já era alcançável de outro jeito.
+
+Cross-ref: seed `MUNDO-TOPOLOGIA-AREAS` #7 (`docs/design/brainstorm-backlog.md`, "Topologia de acesso: tudo acessível desde o começo, dificuldade por distância"). Aplica a toda área principal do jogo (cf. §7 acima); exemplo em uso: a dungeon da Zona do Silêncio no arco Helion Tusk (`docs/design/roster-analogos/21-helion-tusk.md`) soft-gateia por dificuldade, e o lockdown estilo Faraday dentro dela é contornável por item, não trava dura de progresso.
+
 ---
 
 ## 8. Métrica de sucesso

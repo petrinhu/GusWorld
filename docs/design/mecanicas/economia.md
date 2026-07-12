@@ -20,6 +20,23 @@
 | Baú / terminal hackeado | **13–34 cr** (fixo por achado) | curatorado, não farmável |
 | Marco narrativo (beat de capítulo) | **55 / 89 / 144 cr** | sequência recorrente; determinístico; não repetível |
 
+### §2.1 Recompensa de missão-capstone (Helion Tusk)
+
+**Status:** aprovado pelo criador (2026-07-12). Cross-ref: [`21-helion-tusk.md`](../roster-analogos/21-helion-tusk.md) §"Rewards".
+
+A missão-capstone do Helion Tusk (a carta 21, "A Carta Perdida de Tusk") paga um crédito de conclusão que ESCALA por dificuldade, em escada φ/Fibonacci, mantendo o MESMO peso relativo entre modos:
+
+| Dificuldade | Crédito |
+|---|---|
+| Fácil | **610 cr** |
+| Médio | **377 cr** |
+| Difícil | **233 cr** |
+| Hardcore | **144 cr** |
+
+- **Razão ~62% entre vizinhos** (sequência Fibonacci/φ): a economia geral é mais magra no Difícil/Hardcore, então um número absoluto menor pesa igual à economia mais farta do Fácil — peso relativo idêntico em todo modo.
+- **Hardcore RESETA** (save isolado, canon `project_morte_dificuldade_canon` / `reference_save_crypto_v2`): os 144 cr não são rede de segurança, são troféu de uma corrida que pode terminar em permadeath.
+- **Precedente restrito:** é o 1º valor de crédito do jogo que varia por MODO de dificuldade em vez de por zona (a tabela acima varia por `mult(zona)`). Escopo travado à recompensa desta missão-capstone — NÃO gera ripple pra outros faucets (encontro, baú, marco narrativo continuam variando por zona, não por modo).
+
 ---
 
 ## §3. Sinks: Hospital
@@ -285,6 +302,20 @@ Curva **sigmoid** (GDD §5.4): efeito ×1.6 por salto, platô em T3 — sem powe
 
 Anti-grind: ingredientes raros/épicos vêm de Knowledge-gated drops (inimigos-mestre/boss únicos, poucas aparições). Herda o anti-grind do XP differential automaticamente — não dá pra farmar trash mob pra conseguir componente-boss.
 
+### §7.9 Pedágio de bancada de terceiro e rede grátis do Tusk
+
+**Status:** aprovado pelo criador (2026-07-12). Cross-ref: [`21-helion-tusk.md`](../roster-analogos/21-helion-tusk.md) §"Rewards".
+
+**Regra geral:** craft numa bancada que NÃO é uma das 3 estações da party (§7.1: Bancada de Compilação/Jaci, Forja de Firmware/Gus, Patch/Recompilação/Gus) cobra um **pedágio de acesso de 13 cr fixo por uso** (Fibonacci), em cima do custo normal do craft (§7.7). As 3 estações da party seguem 100% grátis — sem mudança.
+
+**Reward do Tusk:** ao concluir a missão-capstone (§2.1), a party ganha acesso grátis pra sempre à **rede de 5 bancadas do Tusk** (1 na Montadora Confluência + 4 nas frentes do consórcio dele, ver `21-helion-tusk.md` §"Fluxo da missão"): o pedágio de 13 cr zera nessas 5 estações especificamente, pelo resto do jogo. Economia poupada estimada em **~130-195 cr** no pós-jogo (10-15 usos × 13 cr).
+
+- **Hardcore reseta a rede grátis também** — consistente com o save isolado (§2.1): a concessão está ligada ao save daquela corrida, não é permanente cross-save.
+- **Plantio narrativo (2 menções cedo, antes da capstone):**
+  1. **Ato 1:** um NPC artesão avisa a party que "bancada não é de graça, treze créditos" — primeira fricção com o pedágio, tom informativo, sem drama.
+  2. **Meio de jogo:** numa das empresas do consórcio do Tusk (cadeia "Em Busca do Mega-Empresário", `21-helion-tusk.md`), a party PAGA o mesmo pedágio de 13 cr antes da capstone — pro "grátis pra sempre" do fim virar concessão GANHA (payoff), não um freebie que cai do nada.
+- **Balanceamento:** é fricção de conveniência, NÃO sink essencial — Hospital (§3), ingrediente e melhoria de tier (§7.6) seguem cheios e obrigatórios. É reward de pós-endgame; não relaxa a escassez de crédito já estabelecida em §2/§3.
+
 ---
 
 ## §8. Estimativa de implementação (F3-Alpha)
@@ -304,4 +335,4 @@ Anti-grind: ingredientes raros/épicos vêm de Knowledge-gated drops (inimigos-m
 
 ---
 
-**Última revisão:** 2026-07-06 (canonização `ECONOMIA-HOSPITAL-DOC`: cross-refs explícitos §3.3 + §3.5 vitória, sem números novos). Economia mínima = canon VS. Craft = spec F3-Alpha.
+**Última revisão:** 2026-07-12 (adição §2.1 recompensa de missão-capstone Helion Tusk escalada por dificuldade + §7.9 pedágio de bancada de terceiro/rede grátis do Tusk; specs aprovadas pelo criador, cross-ref `21-helion-tusk.md` §"Rewards"). Revisão anterior: 2026-07-06 (canonização `ECONOMIA-HOSPITAL-DOC`: cross-refs explícitos §3.3 + §3.5 vitória, sem números novos). Economia mínima = canon VS. Craft = spec F3-Alpha.

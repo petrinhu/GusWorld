@@ -45,7 +45,7 @@
 
 | Nome | Tipo | Era | Localização canon | Status | Cross-ref |
 |---|---|---|---|---|---|
-| **Polis-Vermelha** | Cidade | 3 | Distante, residual | 🟡 lendário (sussurros via rádio, foreshadow Patch-Zero plural F104) | `factions.md` + `in-world-docs.md` doc 11 |
+| **Polis-Vermelha** | Cidade | 3 | Distante, residual | 🟡 lendário (sussurros via rádio, foreshadow Patch-Zero plural F104; origem canônica de duas figuras do arco Helion Tusk: o próprio Tusk, imigrante que foi embora e construiu, e Vitório Cardoso, ramo coletivista Cardoso, ficou e virou demagogo; espelho invertido) | `factions.md` + `in-world-docs.md` doc 11 |
 | **Cidades-Gêmeas** | Cidade | 3 | Distante | 🟡 lendário (rádio Zona do Silêncio mid-ato 2) | `environments/07-zona-do-silencio.md` + `foreshadowing.md` F130 |
 | **Heliópolis-Nova** | Cidade | 3 | Distante, eufemismo Sterling | 🟡 lendário (referenciada como destino "transferido" pelo Manual Octantes Reabsorção) | `in-world-docs.md` DD-021 |
 
@@ -116,6 +116,7 @@ Canon F5-BK.AUDIT T2-C3 resolução "modelo dois-anéis": 10 vilarejos pós-Êxo
 | **Trilha das Sementes** | Sub-local (Selve Profunda) | 1-2-3 | Principal entre 13 caminhos entrada Pelicano Branco → Núcleo Mandelbrot | ✅ canônico (117 placas latão Era 2, 23 desaparecidas, canon F5-BK.AUDIT T2-M10 resolução) | `deep/settings/08-selve-profunda.md:21` |
 | **Distrito V (Distrito 5)** | Sub-local (Periferia) | 3 | Bunker FIR canon, pavimento tesselado profanado | ✅ canônico (sede FIR operacional, canon F5-BK.AUDIT T2-L3 resolução) | `dante-grid.md:165` + `factions.md:301` + `foreshadowing.md` F005 + `diary/entries-fichas-bestiary.md:228-229` |
 | **Universidade Pública** | Sub-local (Núcleo) | 2 + 3 | Lado leste do Núcleo Metropolitano. Placa cerimonial dos 4 engenheiros (Lin Tórun, Rosaria Galp, Henrique Pira, Marcela Sívo) no átrio; ala de estudos Asmódico ativa (Ordem Recursiva); fachada com inscrição parcial da 47ª proposição, hoje coberta por holografia Sterling | ✅ canônico | `environments/01-cidade-cyber-gotica.md` + `deep/settings/01-cidade.md` + `tradicoes-cultura.md` + `environments/07-zona-do-silencio.md` + `environments/08-selve-profunda.md` |
+| **Montadora Confluência** | Sub-local (Selve Profunda, borda) | 3 | Borda da Selve Profunda. Montadora de carros elétricos mágicos flutuantes do consórcio industrial do Helion Tusk; usa sucata da FIR/Ferrovelhos como matéria-prima; ligação com o passado do Dante (garoto da Periferia que corria sucata pra lá); foreshadow discreto da Forja do Vértice (lore pura, não visitável em G1) | ✅ canônico | `docs/design/roster-analogos/21-helion-tusk.md` |
 
 ## 5a. Sub-locais Era 1 (canon §6 deep-lore, Ordem Recursiva)
 

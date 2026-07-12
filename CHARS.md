@@ -38,6 +38,7 @@
 |---|---|---|---|---|
 | Sterling Locke | — | Adulto corporativo, acadêmico dissidente → predador (Apex-Data, Nexus-Cloud, Core-Synth Bio-Tech via Chapter 11), criador do paradigma DRE, objetivo GRE (envelopar Selve em VM interpretada), geometria angular monolítica | `docs/narrative/characters/sterling-locke.md` + `prelore_vilao.md` | 🔴 antagonista principal |
 | Patch-Zero | — | Antagonista-sistema não-humano, anti-padrão + consciência alien, origem multi-causal (bug primordial + emergência Selve + captura Sterling + Polis-Vermelha residual), manifestação multi-canal (texto glitchado, sussurro áudio, persona dialogável, bug Perlin), **contível, não destrutível** | `docs/narrative/characters/patch-zero.md` | 🔴 antagonista-sistema |
+| Vitório Cardoso | — | Orador populista carismático da Praça da Compilação, membro novo da família **Cardoso** (ramo coletivista canônico das Famílias-Pilastra de Polis-Vermelha, má-evolução; cf. §8b Olímpia Cardoso), culpa os inovadores pela ruína de Polis-Vermelha, inveja o sucesso do Helion Tusk e engana a party a "capturar" o Tusk, espelho invertido do Tusk (mesma cidade, reação oposta), ecoa a propaganda paternalista de Sterling sem ser aliado dele | `docs/design/roster-analogos/21-helion-tusk.md` + (quando existir) `docs/narrative/deep/characters/mestre-cap-21-helion-tusk.md` | 🔴 antagonista (antagonista lateral, missão Helion Tusk) |
 
 ## 4. Família do Gus (NPCs adultos canônicos)
 
@@ -267,6 +268,14 @@ Os 20 análogos históricos cujas descobertas viraram as cartas do Codex (deep-l
 | Giordano Bruno | — | Oculto — carta "Cantar pra Outra Pedra" (OCU-01-R_v1.0); Cantor-Lector que cantou a heresia das rodas, julgado e queimado pelas fontes rachadas | `deep/characters/mestre-ocu-01-giordano-bruno.md` | 💀 histórico Era 1 |
 | John Dee | — | Oculto — carta "Espelho Negro" (OCU-02-R_v1.0); peregrino dos destroços que decifrou a gramática dos glifos no espelho da Selve, ouviu vozes | `deep/characters/mestre-ocu-02-john-dee.md` | 💀 histórico Era 1 |
 | Pythagoras | — | Oculto — carta "Harmonia das Esferas" (OCU-03-R_v1.0); esticou a corda e fundou a irmandade da harmonia das esferas, que terminou em levante e fim | `deep/characters/mestre-ocu-03-pythagoras.md` | 💀 histórico Era 1 |
+
+## 8e. Figura lendária viva (capstone)
+
+A única figura VIVA do conjunto dos análogos (distinta dos 20 "históricos" §8d e da party/antagonistas §2-3): não é encontrada como Tavus-Eco nem morreu na própria era, é rastreada contemporaneamente na Era 3. Carta capstone CAP-21, fora do cluster dos 20.
+
+| Nome | Apelido / codinome | Características | 1ª aparição | Status |
+|---|---|---|---|---|
+| Helion Tusk | — | Near-name (arquétipo empreendedor-engenheiro real, nunca citado pelo nome verdadeiro in-game), **boa-evolução** canônica (inovação, risco assumido, livre troca; espelho estrutural invertido de Vitório Cardoso), imigrante de Polis-Vermelha que reconstruiu do zero um consórcio industrial próprio (energia, veículos autônomos, autômatos "Mãos", computação avançada), sem patrocínio de Família-Pilastra nem vínculo com Sterling Corp. Achado dormindo na Montadora Confluência; NÃO entrega a carta (empresta a bancada, e a party FORJA a carta "A Carta Perdida de Tusk", CAP-21, efeito "Consórcio", unindo as 20 cartas coletadas) | `docs/design/roster-analogos/21-helion-tusk.md` + (quando existir) `docs/narrative/deep/characters/mestre-cap-21-helion-tusk.md` | ✅ canônico (vivo, Era 3) |
 
 ## 9. Stub: personagens a auditar/adicionar
 
