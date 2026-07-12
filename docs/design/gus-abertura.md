@@ -293,8 +293,9 @@ Encaixa **imediatamente após o Beat 5** (§6): o Gus sai da botica/apartamento 
 | 3 | Gus faz **scan + triangulação** com os óculos táticos: cada aparato lido dá um dado (hora, direção do "sinal", tipo de corrupção); ele cruza pra deduzir o foco | Pillar 3 (hardware do Gus) + Pillar 4 (lógica); reusa o verbo scan do Beat 1 | **BARATO**: interação com objeto + caderno de pistas no HUD + 1 dedução (escolher a resposta) |
 | 4 | A trilha leva a um **fragmento antigo** que um **catador dos Ferrovelhos** desenterrou e espalhou pelo bairro (vendendo sucata) | Raiz do mistério; teia com Ferrovelhos/FIR canon | BARATO (ver §13.4) |
 | 5 | Conter o caco **não para** o defeito — a **fonte ainda transmite de baixo**. Escala a aposta e amarra no gancho da força antiga (algo grande sob o mundo) | Foreshadow velado (§5); motiva a descida | BARATO (é lore + reação) |
-| 6 | Gus **desce aos Dutos** e acha a fonte: um **aparato da Era 1 ainda ligado** no Pilar Era 1 | Conecta à tecnologia perdida da Era 1 (mundo dos mestres do Codex), velando o segredo grande | BARATO-MÉDIO: 1 objeto-cenário destacado |
+| 6 | Gus **desce aos Dutos** e acha a fonte: um **aparato da Era 1 ainda ligado** no Pilar Era 1. Dentro dele, um **ruído/padrão sutil e não-nomeado** (foreshadow velado do Patch-Zero — ver §13.9) | Conecta à tecnologia perdida da Era 1 (mundo dos mestres do Codex), velando o segredo grande; planta o Patch-Zero sem nomear | BARATO-MÉDIO: 1 objeto-cenário destacado + 1 linha de Diário/log |
 | 7 | **Cauã "Volt"** aparece **hostil** (forasteiro mexendo no lar dele → acha que o Gus causou o defeito) → atrito → resolvem o aparato **juntos** → primeiro companion | Introdução do companion #1 (rivais→amigos); complementaridade lógica+energia | BARATO (diálogo) + o puzzle de §13.5 |
+| 8 | **Na saída, juntos:** um **autômato corrompido** (drône de manutenção "possuído" pelo mesmo sinal) bloqueia um **corredor estreito** — o **primeiro combate do jogo, COOPERATIVO** (Gus + Cauã), não solo | Ensina combate no primeiro momento em que ele é narrativamente necessário, já com a party; amarra o combate ao mistério (não à Sterling) | BARATO-MÉDIO: 1 encontro de combate reusando o inimigo-autômato |
 
 ### 13.4. A catadora: **Doralice** (NPC novo, trágico-simpático)
 
@@ -335,11 +336,24 @@ Encaixa **imediatamente após o Beat 5** (§6): o Gus sai da botica/apartamento 
 
 ### 13.7. Fios abertos desta seção (consolidado)
 
-Resolvidos em 2026-07-12: catadora = **Doralice** (§13.4, cadastrada em `CHARS.md`); puzzle = **cadeia de 3 sub-circuitos** (§13.5); fragmento/aparato = **pedra com veios tecno** (§13.5b); Subestação 7 = **velada, só no ambiente** (§13.6).
+Resolvidos em 2026-07-12: catadora = **Doralice** (§13.4, cadastrada em `CHARS.md`); puzzle = **cadeia de 3 sub-circuitos** (§13.5); fragmento/aparato = **pedra com veios tecno** (§13.5b); Subestação 7 = **velada, só no ambiente** (§13.6); 1º combate = **autômato corrompido cooperativo na saída** (passo 8); reconciliação com `arco-principal.md` = **decidida** (§13.9).
 
 Restam:
 
 1. Layout exato de cada um dos 3 sub-circuitos e nº de nós por tela (§13.5).
 2. Falas (redação final via `narrative-writer` em handoff; aqui só estrutura).
-3. **Reconciliação com `arco-principal.md` §Ato 1 "Recrutamento Companion #1"** (o rascunho antigo recruta em local/lógica diferentes — ver §10; agora o companion #1 é o Cauã, nos Dutos, via esta missão). — _próxima frente (via `narrative-designer`)._
-4. Sincronizar com o item `MUNDO-TOPOLOGIA-AREAS` (esta missão é a primeira "aresta" concreta das 13 áreas).
+3. Sincronizar com o item `MUNDO-TOPOLOGIA-AREAS` (esta missão é a primeira "aresta" concreta das 13 áreas).
+
+### 13.9. Reconciliação com `arco-principal.md` §Ato 1 — decisões do criador (2026-07-12)
+
+Após a proposta do `narrative-designer`, o criador decidiu os pontos de reconciliação. A APLICAÇÃO no `arco-principal.md` + `characters/caua-volt.md` é handoff de execução ao `narrative-designer` (não altera o que está fixado abaixo):
+
+| Ponto | Decisão | Efeito |
+|---|---|---|
+| **Recrutamento do Cauã** (colidia com o "Arco Cauã" do Ato 2) | O Cauã é recrutado na abertura (esta missão). O antigo "Arco Cauã" do Ato 2 vira **quest de aprofundamento** (retorno aos Dutos: disputa de facção dos runners + laboratório FIR + **payoff da Subestação 7**). O conjuro **Pulso EM Concêntrico** fica como reward desse retorno | Aproveita o conteúdo já escrito; dá lar ao payoff velado da Subestação 7 (§13.6); Ato 2 mantém 6 slots (5 recrutamentos + 1 aprofundamento) |
+| **Foreshadow do Patch-Zero** (era o Catalyst antigo) | Vai **pra dentro desta missão**: um ruído/padrão sutil e **não-nomeado** no aparato Era 1 (passo 6). **Distinto** do gancho da "força antiga" (Patch-Zero ≠ segredo de origem — não fundir) | Preserva o "double hook" sem embaralhar canon; custo baixo (1 linha de Diário/log) |
+| **Combate-tutorial do drone Sterling** | Reflavorado: **não é Sterling**, é um **autômato corrompido pelo aparato**, e aparece **na saída, como 1º combate COOPERATIVO** Gus+Cauã (passo 8) | Resolve "sem combate solo na abertura"; amarra o combate ao mistério; não reintroduz a Sterling cedo |
+| **Foreshadow Sterling** | **Adiado pro Ato 2** (primeira visita ao Setor Mirage, Arco Iara) | Preserva a associação Sterling↔Setor Mirage; Ato 1 abre mão do antagonista-onipresente-desde-cedo |
+| **Escolha do companion #1** (branching foldback #1) | **Removida** (Cauã é fixo como #1) — consequência aceita da decisão da abertura | Rejogabilidade de ordem passa a valer só pros 5 companions restantes (#2-6); a tabela de branching foldback do `arco-principal.md` perde/reescreve o ponto #1 |
+
+**Handoff de execução ao `narrative-designer`** (aplicar, não redecidir): editar `arco-principal.md` §Ato 1 Setup (Opening Image → software; Tutorial → doméstico sem combate; Catalyst → sumiço do Brunus; Recrutamento #1 → Cauã via esta missão; mover foreshadow Sterling pro Ato 2; reescrever o "Arco Cauã" do Ato 2 como aprofundamento; recalcular o "50%" do foreshadow Dante sobre a nova base; reancorar o conjuro Pulso EM e a cena "Não é magia, é cache" no retorno) e `characters/caua-volt.md` (reescrever a tabela Story Circle pro novo recrutamento na abertura + retorno de aprofundamento). ZERO em-dash, segredo de origem velado, sem push.
