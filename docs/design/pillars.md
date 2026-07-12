@@ -30,7 +30,7 @@ Toda feature do jogo responde: "qual pillar serve?". Não serve = corta.
 
 ### Boundaries comerciais/técnicas
 
-- Não é IAP / microtransação. Single-player paid game, zero monetização in-game.
+- Não é IAP / microtransação. Single-player gratuito e de código aberto (FOSS), zero monetização in-game.
 - Não é always-online. Sem requisito de conexão; save local.
 
 ---
