@@ -39,6 +39,26 @@ Total de raizes: **13**. Cada raiz gera familias de palavras por sufixo.
 - **Tavus-Drive** = *tavus* + *Drive* (emprestimo Era 3) = hibrido tecnologico moderno sobre raiz antiga.
 - **Aguas-de-Espelho** = traducao de um composto com *nenh-* + *cale-* (agua + luz/reflexo).
 
+## Derivadas: efeitos das cartas do Codex (`cardExec-`, canon 2026-07-12)
+
+Vocabulario Sylvarin dos efeitos das cartas comuns (cartas = conjuros; a comum se nomeia `cardExec-[palavra abaixo]`; a especial se nomeia `cardExec-[figura]`). Cada palavra deriva por raiz + sufixo das regras acima:
+
+| Efeito / familia | Palavra | Derivacao | Sentido |
+| :--- | :--- | :--- | :--- |
+| Eletrico (descarga) | **Tavusa** | *tavus-* + `-a` | o pulso / a descarga (amarra no Tavus-Drive) |
+| Fogo / Sobrecarga termica | **Vyrin** | *vyr-* + `-in` (adj) | igneo / incandescente |
+| Frio / Resfriamento (overclock) | **Morenh** | *mor-* (sombra/frio) + *nenh-* (agua), composto | frio-sombrio, resfriar o sistema |
+| Bioquimico (veneno) | **Erynin** | *eryn-* + `-in` (adj) | putrido / toxico (lado decomposicao) |
+| Sonico (ruido/silencio) | **Lhinin** | *lhin-* + `-in` (adj) | sonoro / ressonante |
+| Cinetico (impacto) | **Ondha** | *ondh-* + `-a` | a pedra / o impacto (massa, gravidade) |
+| Criptografico (decifrar) | **Rimin** | *rime-* + `-in` (adj) | cifrado / numerico |
+| Luz / Scan | **Cala** | *cale-* + `-a` (lenicao cale->cala) | a varredura / a luz (modo scan) |
+| Tempo (Haste/Slow) | **Anhin** | *anh-* + `-in` (adj) | temporal / ciclico |
+| Escudo / defesa | **Ondhesse** | *ondh-* + `-esse` (abstrato) | a Muralha / o Alicerce (distinto de Ondha impacto pelo sufixo) |
+| Cura / Regen | **Sylvesse** | *sylva-* + `-esse` (abstrato) | a Vida da Selve |
+
+Nota: a raiz *eryn-* cobre os dois lados da vida vegetal, *Erynin* (decomposicao/veneno) vs *erynesse* (crescimento, ver secao de regras); a cura das cartas usa *Sylvesse* (vida da Selve), nao *erynesse*, pra separar veneno de cura.
+
 ## Notas de design
 - O cruzamento elfico->canon nao e acidente: a lore ja usava raizes pseudo-elficas (Vyr, Selve), o Sylvarin so as TORNA SISTEMATICAS (Pillar 2). Onde um nome canon ja existe, a raiz se ajusta a ele, nunca o contrario.
 - Emprestimos modernos (Neo, Drive) marcam a camada Era 3 (a lingua viva absorveu termos tecnicos), exatamente como o portugues real absorve o ingles.
