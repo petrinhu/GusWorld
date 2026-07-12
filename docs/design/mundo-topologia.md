@@ -25,6 +25,8 @@ Mundo **aberto por design**: todas as áreas principais são alcançáveis desde
 | 5 — clímax | **Selve Profunda** |
 | especial | **Área "faraday" secreta** (contornável, vira atalho; ela mesma é dungeon-segredo) |
 
+> **Nota de canon (Periferia × Ferrovelhos, reconciliado 2026-07-12):** os dois são **duas zonas jogáveis do MESMO setting canônico "Periferia"** — **Periferia** (residencial oeste; Praça do Compilador, refugiados Tesla/Einstein) + **Ferrovelhos = "Periferia Industrial", distrito 2** (lore-bible §5.1: ferro-velho, oficinas, **lar do Dante**, atuação da FIR, economistas austríacos). Contíguos no mundo, divididos em dois mapas por gameplay.
+
 ## 3. Densidade (5 cheias + 8 enxutas = 13, Fibonacci)
 
 Eixo de **população/quests** (independente da contagem de dungeons do §4):
@@ -44,8 +46,8 @@ Nota: os **Dutos** são "enxuta" de população mas já **densos de enredo** (mi
 | Núcleo Metropolitano | 0 | hub cívico: lojas, quests, gente |
 | Dutos Infernais | 2 | aparato (abertura) + laboratório FIR (Ato 2) |
 | Setor Mirage | 1 | o Festival / Cult |
-| Periferia | 1 | reduto do Dante |
-| Ferrovelhos | 1 | ferro-velho labiríntico |
+| Periferia (residencial) | 1 | vielas apertadas da Praça do Compilador |
+| Ferrovelhos (Periferia Industrial) | 1 | reduto do Dante / ferro-velho |
 | Zona do Silêncio | 2 | zona morta, cheia de ruína |
 | Orla Recursiva | 1 | anomalia de fronteira |
 | Selve Sombria | 1 | entrada da floresta |
@@ -64,8 +66,8 @@ Dungeons chamam-se "**faraday**" no idioma do local (motivo Gaiola de Faraday; v
 | Dutos — aparato (abertura) | tutorial (+ puzzle leve) |
 | Dutos — laboratório FIR | só batalhas |
 | Setor Mirage — Festival | puzzle puro (ilusão/decifrar) |
-| Periferia — reduto Dante | só batalhas |
-| Ferrovelhos | labirinto |
+| Periferia (residencial) — vielas | labirinto |
+| Ferrovelhos — reduto do Dante | só batalhas |
 | Zona do Silêncio #1 | puzzle puro (acústica/silêncio) |
 | Zona do Silêncio #2 | mista |
 | Orla Recursiva | labirinto (fractal recursivo) |
@@ -80,8 +82,8 @@ Dungeons chamam-se "**faraday**" no idioma do local (motivo Gaiola de Faraday; v
 1. **Dutos — aparato (abertura):** linear-curta; gimmick = roteamento de energia cooperativo (Gus lê o circuito, Cauã é a corrente), cadeia de 3 sub-circuitos; ensina o loop e apresenta a party. O 1º grande momento de gameplay.
 2. **Dutos — laboratório FIR (Ato 2):** hub com celas; gimmick = ondas de guardas FIR + terminais que o Gus hackeia (desliga câmeras/torres) pra abrir caminho; clímax = payoff da Subestação 7.
 3. **Setor Mirage — Festival:** labirinto-de-ilusões curto; gimmick = o scan distingue real × holográfico (parede/inimigo falso vs real); decifrar o padrão do Festival pra desligar a extração sensorial. Arco Iara.
-4. **Periferia — reduto Dante:** arena em camadas; gimmick = combate em sucata improvisada (cobertura/armadilha) + ondas até o núcleo. Território do futuro traidor (tensão velada).
-5. **Ferrovelhos — labirinto:** labirinto vertical de sucata; gimmick = ímãs/guindastes que reconfiguram o caminho (mover pilhas); o mercado espontâneo dos economistas nos cantos.
+4. **Periferia (residencial) — labirinto de vielas:** o bairro apertado da Praça do Compilador; gimmick = becos/portões/escadas que reconfiguram a rota; refugiados Tesla/Einstein nos cantos.
+5. **Ferrovelhos (Periferia Industrial) — reduto do Dante (só batalhas):** arena em camadas de sucata (cobertura/armadilha), ondas até o núcleo; lar do Dante (tensão velada), FIR presente, e o mercado espontâneo dos economistas nos cantos.
 6. **Zona do Silêncio #1 — puzzle acústico:** câmaras ressonantes; gimmick = som não se propaga (silêncio mecânico); o Gus usa vibração/UHF (Matriz Ortodôntica) pra "ver" o que não ouve; puzzle de ressonância. Lar da Linda.
 7. **Zona do Silêncio #2 — mista:** linear com bolsões; gimmick = combate abafado (inimigos que só reagem a vibração) + pequenos puzzles acústicos. Respiro de variedade após a #1.
 8. **Orla Recursiva — labirinto fractal:** forma auto-similar (salas que se repetem em escala); gimmick = ler a regra recursiva (a "semente" do padrão) pra não se perder; a flora fractal invade o concreto. A dobradiça cidade↔Selve.
@@ -168,21 +170,20 @@ Lares canônicos, mapeados nos tiers de dificuldade:
 |---|---|---|
 | Cauã "Volt" | Dutos Infernais | T2 — **#1 (recrutado na abertura)** |
 | Iara "Lumen" | Setor Mirage | T2 |
-| Dante "Grid" (**traidor**) | Periferia | T2 |
+| Dante "Grid" (**traidor**) | Ferrovelhos (Periferia Industrial) | T2 |
 | Linda "Siren" | Zona do Silêncio | T3 |
 | Bento "Requiem" | Catedrais Neo-Sylvania | T4 |
 | Jaci "Proxy" | Selve Sombria | T4 |
 
 - **Ordem ABERTA, só sugerida por dificuldade** (gdd §7.1): sem ordem forçada; a distância-dificuldade nudga naturalmente Iara/Dante (T2) → Linda (T3) → Bento/Jaci (T4). Cada arco tem de funcionar em qualquer ordem (já é o design canon do Ato 2, "ordem livre").
-- **Dante recrutável CEDO (simmer longo):** a Periferia é T2/perto da origem, então o Dante naturalmente entra entre os primeiros — quanto mais tempo na party antes da revelação, mais dolorosa a traição. Nudge por proximidade, **sem gate duro**; um jogador que o deixe pra depois aceita um simmer mais curto (edge case do mundo aberto). Casa com o foreshadow que dispara "após 3 slots de Ato 2".
+- **Dante recrutável CEDO (simmer longo):** o Ferrovelhos (Periferia Industrial, lar dele) é T2/perto da origem, então o Dante naturalmente entra entre os primeiros — quanto mais tempo na party antes da revelação, mais dolorosa a traição. Nudge por proximidade, **sem gate duro**; um jogador que o deixe pra depois aceita um simmer mais curto (edge case do mundo aberto). Casa com o foreshadow que dispara "após 3 slots de Ato 2".
 
 ## 9. Fios abertos (continuar brainstorm)
 
-Resolvidos em 2026-07-12: mapeamento dos 20 interiores (§6, temático por campo); distribuição dos lugares secretos (§5, total 21); conceitos das 13 dungeons (§4, "só conceito").
+Resolvidos em 2026-07-12: mapeamento dos 20 interiores (§6, temático por campo); distribuição dos lugares secretos (§5, total 21); conceitos das 13 dungeons (§4, "só conceito"); **reconciliação Periferia × Ferrovelhos** (§2 nota: duas zonas jogáveis do mesmo setting Periferia; Ferrovelhos = Periferia Industrial = lar do Dante).
 
 Restam:
 
 1. **Layout FINO de cada dungeon** (level design sala-a-sala) — fase de PRODUÇÃO, com o `level-designer` + a engine de mapa. NÃO fazer antes da engine (retrabalho).
 2. **`ENGINE-MAPA-ONDA`** — onda de implementação do loader/compilador `.gmap` ([[reference_formato_mapa_gmap]]), pré-req de tudo isto virar jogável.
-3. Reconciliação canon leve: "Periferia Industrial" (roster) = "Ferrovelhos" (glossário) — decidir se é sub-distrito da Periferia ou área própria (afeta onde moram Menger/economistas).
-4. Detalhe: qual carta/item-chave cada lugar secreto e a área faraday guardam (liga a `cartas-technomagik.md` + FARADAY-DUNGEON-ITENS).
+3. Detalhe: qual carta/item-chave cada lugar secreto e a área faraday guardam (liga a `cartas-technomagik.md` + FARADAY-DUNGEON-ITENS).
