@@ -82,7 +82,7 @@ Ver `characters/party.md` para spec completa. Resumo:
 | Ato | Duração alvo | Função |
 |---|---|---|
 | **Ato 1 (Diagnóstico)** | 0-20% (~45min-1h30) | Setup. Cidade. Sumiço do Brunus (catalyst). Missão solo de abertura recruta o Companion #1 (Cauã). |
-| **Ato 2 (Compilação)** | 20-75% (~2h30-5h) | Cinco arcos companion novos (Iara, Bento, Linda, Dante, Jaci) + retorno de aprofundamento do Cauã. Sterling presente em todos. Knowledge cresce. Foreshadow Dante dispara após 3 slots de Ato 2 completos. |
+| **Ato 2 (Compilação)** | 20-75% (~2h30-5h) | Cinco arcos companion novos (Iara, Bento, Linda, Dante, Jaci) + retorno de aprofundamento do Cauã. Sterling presente em todos. Knowledge cresce. Foreshadow Dante dispara após 3 recrutamentos completos (~60%). |
 | **Ato 3 (Decodificação)** | 75-100% (~1h-1h30) | Catedrais de Silício corrompidas → Cúpula Sterling. Dante reveal e mini-boss. Boss final 2 fases. Triple hook pós-créditos. |
 
 ---
@@ -96,7 +96,7 @@ Estrutura geral: setup + 6 arcos companion (1 beat principal cada) + clímax. Ca
 | 1 | **Setup** | Núcleo Metropolitano. Sumiço do Brunus (catalyst). Missão solo de abertura recruta o Companion #1 (Cauã). | 1 |
 | 2 | **Slot de Ato 2 (1º)** | Primeiro slot em ordem livre. | 2 |
 | 3 | **Slot de Ato 2 (2º)** | Segundo slot. | 2 |
-| 4 | **Slot de Ato 2 (3º)** | Terceiro slot. **Foreshadow Dante dispara aqui (após 3 slots completos)** se Dante ainda não recrutado. | 2 |
+| 4 | **Slot de Ato 2 (3º)** | Terceiro slot. **Foreshadow Dante dispara após 3 RECRUTAMENTOS completos** (conta só recrutamentos, não o retorno do Cauã), se Dante ainda não recrutado. | 2 |
 | 5 | **Slot de Ato 2 (4º)** | Quarto slot. | 2 |
 | 6 | **Slot de Ato 2 (5º)** | Quinto slot. | 2 |
 | 7 | **Slot de Ato 2 (6º)** | Sexto e último slot. Convergência iminente. | 2/3 |
@@ -124,7 +124,7 @@ GusWorld City funciona aparentemente. Janelarum trava periodicamente, mas as pes
 | **Mãe** | Gargi pode pedir pra Gus não ir, recontextualizado em torno da preocupação com o **Brunus** (não com uma anomalia). Não é briga; é cuidado contido. Beat curto e opcional (cf. `gus-abertura.md` §6, §9). A família Vance permanece base segura; ninguém dela é ferido ou ameaçado. |
 | **Recrutamento Companion #1** | **Fixo: Cauã "Volt"**, recrutado ainda na abertura via a missão solo "O Mistério dos Aparatos" (Distritos Inferiores → Dutos Infernais). Investigação solo (aparatos possuídos → scan + triangulação → fragmento antigo espalhado pela catadora Doralice → descida aos Dutos → aparato da Era 1 ainda ligado → puzzle cooperativo de roteamento de energia). Cauã aparece hostil, rivais viram aliados resolvendo o aparato juntos. Ver `gus-abertura.md` §13. Não há mais escolha de qual companion vem primeiro (ver Branching foldback #1). |
 | **Foreshadow Sterling** | **Não dispara no Ato 1.** Adiado para o Ato 2, na primeira visita ao Setor Mirage (Arco Iara), preservando a associação Sterling↔Setor Mirage. O trajeto fixo da abertura não passa por lá. |
-| **Foreshadow Dante** | Independente de ordem, cena 4 de `comic-reliefs.md` ("Force Push") **não dispara ainda**. Dispara em ato 2 após **3 slots de Ato 2 completos** (a base de 6 slots se mantém: 5 recrutamentos + o retorno de aprofundamento do Cauã contam igualmente; ver "Foreshadow Dante: timing detalhado"). |
+| **Foreshadow Dante** | Independente de ordem, cena 4 de `comic-reliefs.md` ("Force Push") **não dispara ainda**. Dispara em ato 2 após **3 RECRUTAMENTOS completos** (~60%); conta só os 5 recrutamentos, o retorno de aprofundamento do Cauã NÃO conta pro gatilho (ver "Foreshadow Dante: timing detalhado"). |
 | **Break into Two** | O cruzamento de limiar acontece dentro da própria missão de abertura (Distritos Inferiores → descida aos Dutos Infernais). O Ato 1 fecha quando Cauã se junta à party ao fim da missão. Câmera muda de paleta, trilha muda de chave. Ato 2 começa. |
 
 ---
@@ -210,7 +210,7 @@ Três dos seis slots (Iara, Bento, Linda) têm branching curto interno. Três (r
 
 Dante é traidor canônico desde o ato 1. **Antes do jogo começar**, Sterling já o aliciou.
 
-**Base de contagem (pós-reconciliação da abertura):** o "50%" do Ato 2 mede-se sobre os **6 slots** dele (5 recrutamentos + o retorno de aprofundamento do Cauã, que conta igual). Logo, "50% = 3 slots completos". O Cauã já vem recrutado da abertura, então ele não está no pool de recrutamentos de Ato 2, mas o slot de retorno dele entra na contagem de progresso.
+**Base de contagem (pós-reconciliação da abertura + calibragem do criador 2026-07-12):** o gatilho do foreshadow Dante mede-se **só sobre os 5 recrutamentos** do Ato 2 (Iara, Bento, Linda, Dante, Jaci). O **retorno de aprofundamento do Cauã NÃO conta** pro gatilho (é quest de retorno, não recrutamento). Dispara **após 3 recrutamentos completos (~60% do Ato 2)**, se o Dante ainda não foi recrutado. Racional: a suspeita gatilha pelo quanto a party cresceu, e nesse ponto o Dante provavelmente já está junto (recrutável cedo).
 
 ### Mecânica de foreshadow
 
@@ -218,9 +218,9 @@ Dante é traidor canônico desde o ato 1. **Antes do jogo começar**, Sterling j
 |---|---|---|
 | **Narrativo (dialogue)** | Falas de Dante com micro-distância emocional. Despreza histórico/tradição em momentos chave. | Toda a campanha |
 | **Narrativo (comportamento)** | Expressão facial progressivamente mais fria. Manchas de graxa migram para mãos limpas (recebe upgrade Sterling). | Spec visual Dante |
-| **Narrativo (ambient)** | Pontos discretos: Dante "atrasa" durante manutenções, espelha terminal por 2 segundos antes de fechar. | Após 50% (3 slots de Ato 2 completos) |
-| **Mecânico (degradação stats Gus)** | Após 50%, stats do Gus passam a ter **flutuação anormal**: -2% precisão, -1% mestria de carta. Telemetria comprometida. Visível no Diário do Gus subseção "Diagnóstico de Hardware". | Capítulos finais ato 2 e ato 3 |
-| **Narrativo (cena planted)** | `comic-reliefs.md` cena 4 ("Force Push") dispara **automaticamente** após 50% (3 slots de Ato 2 completos). Foreshadow forte. | Auto-trigger 50% |
+| **Narrativo (ambient)** | Pontos discretos: Dante "atrasa" durante manutenções, espelha terminal por 2 segundos antes de fechar. | Após 3 recrutamentos (~60%) |
+| **Mecânico (degradação stats Gus)** | Após o gatilho da traição (3 recrutamentos), stats do Gus passam a ter **flutuação anormal**: -2% precisão, -1% mestria de carta. Telemetria comprometida. Visível no Diário do Gus subseção "Diagnóstico de Hardware". | Capítulos finais ato 2 e ato 3 |
+| **Narrativo (cena planted)** | `comic-reliefs.md` cena 4 ("Force Push") dispara **automaticamente** após 3 recrutamentos (~60%). Foreshadow forte. | Auto-trigger (3 recrutamentos) |
 | **Narrativo (Diário entry Patch-Zero)** | Patch-Zero comenta enigmaticamente em entry late ato 2: "alguém perto de você não compila. interpretam por você." | Após 75% |
 
 Reveal contextualiza retroativamente tudo. Player que prestou atenção: "ah." Player que não prestou: jogo permite re-leitura via Diário do Gus (Knowledge Progression destrava re-leitura cronológica do arco Dante).
@@ -357,7 +357,7 @@ Toda decisão narrativa deve ter expressão mecânica.
 | Inteligência serve à vida | Knowledge Progression: jogar atento = stats melhores, RNG menor, ending Ouro |
 | Sterling é decodificável, não destrutível | Fase 2 = puzzle de decifragem, não DPS-check |
 | Patch-Zero é antagonista-sistema | Manifestação multi-canal afeta UI, Diário, áudio (não só combate) |
-| Dante traidor | Stats Gus degradam visivelmente após 50%: sinal mecânico real |
+| Dante traidor | Stats Gus degradam visivelmente após o gatilho (3 recrutamentos): sinal mecânico real |
 | Companions imortais | HP=0 = incapacitado, vai pra hospital. Não há morte de companion na campanha. |
 | Foreshadow honesto | Cena 4 `comic-reliefs.md` planta sinal antes do reveal (Chekhov) |
 | Ending knowledge-gated | Sem moral-meter visível; jogador é recompensado por entender |
@@ -373,8 +373,8 @@ Toda decisão narrativa deve ter expressão mecânica.
 | 1 | Holograma Sterling em todo poste Setor Mirage | Sterling antagonista revelado em arco Iara | Visual | Ato 2 (1ª visita ao Setor Mirage; adiado do Ato 1) | Ato 2 (Arco Iara) |
 | 2 | Janelarum trava (`comic-reliefs.md` 11) | Apex-Data Systems caiu de modo similar; reveal Sterling backstory | Diálogo | Ato 1 | Ato 2 (qualquer arco) |
 | 3 | Dante manutenção gratuita | Rootkit Sterling instalado | Mecânico + diálogo | Ato 2 (Arco Dante) | Ato 3 (reveal) |
-| 4 | Stats Gus degradam após 50% | Comprovação rootkit ativo | Mecânico (UI Diário) | Ato 2 mid | Ato 3 (reveal) |
-| 5 | `comic-reliefs.md` cena 4 "Force Push" | Dante despreza histórico = traidor | Diálogo cômico | Auto-trigger 50% | Ato 3 (reveal) |
+| 4 | Stats Gus degradam após 3 recrutamentos | Comprovação rootkit ativo | Mecânico (UI Diário) | Ato 2 mid | Ato 3 (reveal) |
+| 5 | `comic-reliefs.md` cena 4 "Force Push" | Dante despreza histórico = traidor | Diálogo cômico | Auto-trigger (3 recrutamentos) | Ato 3 (reveal) |
 | 6 | Ruído/padrão sutil e **não-nomeado** no aparato da Era 1 (missão solo de abertura, `gus-abertura.md` §13.3 passo 6). Distinto do gancho velado da "força antiga" (Patch-Zero ≠ segredo de origem) | Patch-Zero consciência alien | Texto/log | Ato 1 (missão de abertura) | Ato 2 + 3 |
 | 7 | Áudio sussurrante em Polis-Vermelha (Linda rádio) | Patch-Zero global, infecção transcontinental | Áudio | Ato 2 (Arco Linda) | Ato 3 |
 | 8 | Cripto-glifos Neo-Sylvania | Lore profunda; Gus ativa partes desconhecidas | Visual | Ato 2 (Arco Bento) | Ato 3 / pós-jogo |
@@ -388,7 +388,7 @@ Toda decisão narrativa deve ter expressão mecânica.
 1. **Setup**: Núcleo Metropolitano, opening (Gus refina software em casa), catalyst (sumiço do Brunus), missão solo de abertura recruta o Companion #1 (Cauã).
 2. **Slot de Ato 2 (1º)**: Kishōtenketsu interno.
 3. **Slot de Ato 2 (2º)**: Kishōtenketsu interno.
-4. **Slot de Ato 2 (3º)**: Kishōtenketsu + foreshadow Dante auto-trigger (após 3 slots).
+4. **Slot de Ato 2 (3º)**: Kishōtenketsu + foreshadow Dante auto-trigger (após 3 recrutamentos).
 5. **Slot de Ato 2 (4º)**: Kishōtenketsu + Patch-Zero canal 3.
 6. **Slot de Ato 2 (5º)**: Kishōtenketsu + ambiente cresce (cidade fria, drones aumentam).
 7. **Slot de Ato 2 (6º)**: Kishōtenketsu + dialogue retroativo (Patch-Zero comenta Dante).

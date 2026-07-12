@@ -199,7 +199,7 @@ GUS
 
 ## Cena 4: "Force Push" (foreshadow Dante traidor)
 
-**Contexto:** Periferia Industrial. Dante faz manutenção no aparelho ortodôntico do Gus. **Plantar suspeita**; dispara só após 3 arcos completos (D.1).
+**Contexto:** Periferia Industrial (Ferrovelhos). Dante faz manutenção no aparelho ortodôntico do Gus. **Plantar suspeita**; dispara só após 3 recrutamentos de Ato 2 completos (~60%; conta só recrutamentos, não o retorno do Cauã) (D.1).
 
 ```
 [OFICINA DE DANTE, bancada coberta de sucata. Gus deitado, boca
@@ -560,7 +560,7 @@ Off-by-one.
 |---|---|
 | Ato 1 (introdução cidade) | 1 (sexta-feira), 6 (Sterling propaganda) |
 | Ato 2 (incursões companions, distribuídas conforme recrutamento) | 2 (tabs vs espaços, após recrutar Bento), 3 (funciona no meu, Cauã), 5 (regex, Iara), 7 (Pilha Sobrecarregada), 9 (off-by-one, Jaci), 10 (cache, Cauã) |
-| Ato 2 (≥50% completo) | 4 (force push, foreshadow Dante) |
+| Ato 2 (após 3 recrutamentos, ~60%) | 4 (force push, foreshadow Dante) |
 | Ato 2/3 transição | 8 (comentários latim, Bento) |
 
 Adicionar conforme o arco progride. Limite: máximo 1 cena cômica por capítulo (não saturar).
