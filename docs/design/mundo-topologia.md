@@ -57,6 +57,24 @@ Nota: os **Dutos** são "enxuta" de população mas já **densos de enredo** (mi
 
 Dungeons chamam-se "**faraday**" no idioma do local (motivo Gaiola de Faraday; ver seed #2 `FARADAY-DUNGEON-ITENS` + `project_save_dungeon_pem_faraday`): algumas revestidas por gaiola que contém o PEM só dentro delas.
 
+**Tipos de dungeon (seed #6; variedade, peso em puzzle pela Pillar 4):** cada uma das 13 tem um tipo, distribuído pra nenhuma vizinha repetir. Contagem: tutorial 1 · puzzle puro 4 · só batalhas 3 · labirinto 2 · mista 3.
+
+| Dungeon | Tipo |
+|---|---|
+| Dutos — aparato (abertura) | tutorial (+ puzzle leve) |
+| Dutos — laboratório FIR | só batalhas |
+| Setor Mirage — Festival | puzzle puro (ilusão/decifrar) |
+| Periferia — reduto Dante | só batalhas |
+| Ferrovelhos | labirinto |
+| Zona do Silêncio #1 | puzzle puro (acústica/silêncio) |
+| Zona do Silêncio #2 | mista |
+| Orla Recursiva | labirinto (fractal recursivo) |
+| Selve Sombria | mista |
+| Catedrais #1 | puzzle puro (engrenagem litúrgica) |
+| Catedrais #2 | só batalhas |
+| Selve Profunda (final) | mista (clímax) |
+| Área faraday | puzzle puro (EM/Faraday) |
+
 ## 5. Lugares secretos — gradiente Fibonacci por distância (barato)
 
 Camada por cima das dungeons: **lugares secretos pequenos** (1-2 salas, 1 puzzle/recompensa, tiles reusados, **opcionais**), mais numerosos quanto **mais longe da origem** (gradiente velado 0→1→2→3→5). São o BARATO que enche os ermos de recompensa de exploração sem custar como dungeon. Distribuição também **irregular** por área (não um número limpo por tier — o Fibonacci fica no agregado, não exposto).
@@ -69,11 +87,49 @@ Camada por cima das dungeons: **lugares secretos pequenos** (1-2 salas, 1 puzzle
 - **Distribuição:** espalhados pelas 13 áreas conforme a **era/lugar canônico de cada mestre** (já definido nos `docs/design/roster-analogos/*.md`); uma área cheia pode hospedar vários interiores de mestre. Mapeamento exato = detalhe posterior (segue o roster).
 - **Custo:** MÉDIO no agregado (20 interiores), mas cada um é barato (interior + 1 puzzle + diálogo do Tavus-Eco); reusa moldura de puzzle e o mecanismo Tavus-Eco. Escala com o roster já desenhado.
 
-## 7. Fios abertos (continuar brainstorm)
+## 7. Ecossistemas por área + contraste Pillar 5 (criador, 2026-07-12)
 
-1. **Ecossistemas finos** por área (o "look"/bioma de cada uma, contraste Pillar 5) — seed #5.
-2. **Tipos de dungeon** por área (tutorial / puzzle puro / só batalhas / labirinto / mista) — seed #6.
-3. **Ordem/lares dos companions** restantes (#2-6: Iara, Bento, Linda, Dante, Jaci) nas áreas.
-4. Mapeamento exato dos 20 interiores de mestre → áreas (segue o roster).
-5. Distribuição fina (quais áreas ganham quais lugares secretos).
-6. Onda de implementação da engine de mapa (`ENGINE-MAPA-ONDA`, pré-req de tudo isto virar jogável).
+Cada área tem **UMA paleta clara** (barato: uma paleta por área, sem híbridos espalhados). O eixo Pillar 5 (megacidade ciber-gótica × Selve) usa **contraste DURO**: a mistura de paletas é reservada como recompensa.
+
+| Área | Ecossistema (look) |
+|---|---|
+| Distritos Inferiores | ciber-gótico baixo/sujo, neon frio, concreto |
+| Núcleo Metropolitano | megacidade ciber-gótica, vertical, corporativa |
+| Dutos Infernais | subterrâneo industrial-arcano: canos, calor, brilho |
+| Setor Mirage | ilusão holográfica, neon-glitch, ofuscamento |
+| Periferia | favela-improviso, sucata habitada, quente |
+| Ferrovelhos | ferro-velho: montanhas de sucata, ferrugem, óxido |
+| Zona do Silêncio | distrito morto acusticamente, abafado, decaído |
+| Orla Recursiva | **a dobradiça:** onde o concreto encontra a flora fractal — vegetação recursiva invadindo a cidade, glitch (única zona de mistura fora do clímax) |
+| Selve Sombria | floresta-fronteira, bioluminescência, flora matemática |
+| Catedrais Neo-Sylvania | catedrais góticas na mata, pedra + vitral-tech |
+| Montadora Confluência | fábrica: carros elétricos flutuantes, linha alimentada por sucata |
+| Selve Profunda | núcleo denso da Selve, fractal — **fusão PLENA de paletas (recompensa do ato 3)** |
+| Área faraday | malha metálica, sinal morto, "cego" ao scan (blindagem EM) |
+
+**Regra de contraste (Pillar 5 canon):** cidade = frio/neon/gótico; Selve = orgânico/biolum/quente. **Única transição = Orla Recursiva**; fusão plena só na **Selve Profunda** (ato 3). Custo BARATO (uma paleta por área).
+
+**Detalhe de UX/UI (decisão do criador):** os **menus/HUD mudam de cor conforme a paleta da área atual** — imersão diegética. Custo BARATO na stack: é trocar as variáveis de cor do **RCSS** por área (UI servida pelo RmlUi via glintfx; cross-ref `project_rmlui_ui_stack` + `reference_glintfx_api`). Um tema RCSS por paleta de área, aplicado ao entrar na área.
+
+## 8. Companions: lares e ordem de recrutamento (criador, 2026-07-12)
+
+Lares canônicos, mapeados nos tiers de dificuldade:
+
+| Companion | Lar (canon) | Tier |
+|---|---|---|
+| Cauã "Volt" | Dutos Infernais | T2 — **#1 (recrutado na abertura)** |
+| Iara "Lumen" | Setor Mirage | T2 |
+| Dante "Grid" (**traidor**) | Periferia | T2 |
+| Linda "Siren" | Zona do Silêncio | T3 |
+| Bento "Requiem" | Catedrais Neo-Sylvania | T4 |
+| Jaci "Proxy" | Selve Sombria | T4 |
+
+- **Ordem ABERTA, só sugerida por dificuldade** (gdd §7.1): sem ordem forçada; a distância-dificuldade nudga naturalmente Iara/Dante (T2) → Linda (T3) → Bento/Jaci (T4). Cada arco tem de funcionar em qualquer ordem (já é o design canon do Ato 2, "ordem livre").
+- **Dante recrutável CEDO (simmer longo):** a Periferia é T2/perto da origem, então o Dante naturalmente entra entre os primeiros — quanto mais tempo na party antes da revelação, mais dolorosa a traição. Nudge por proximidade, **sem gate duro**; um jogador que o deixe pra depois aceita um simmer mais curto (edge case do mundo aberto). Casa com o foreshadow que dispara "após 3 slots de Ato 2".
+
+## 9. Fios abertos (continuar brainstorm)
+
+1. Mapeamento exato dos 20 interiores de mestre → áreas (segue o roster).
+2. Distribuição fina (quais áreas ganham quais lugares secretos).
+3. Layout concreto de cada dungeon (level design) — fase de produção, pós ENGINE-MAPA.
+4. Onda de implementação da engine de mapa (`ENGINE-MAPA-ONDA`, pré-req de tudo isto virar jogável).
