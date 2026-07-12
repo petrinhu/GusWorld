@@ -296,35 +296,50 @@ Encaixa **imediatamente após o Beat 5** (§6): o Gus sai da botica/apartamento 
 | 6 | Gus **desce aos Dutos** e acha a fonte: um **aparato da Era 1 ainda ligado** no Pilar Era 1 | Conecta à tecnologia perdida da Era 1 (mundo dos mestres do Codex), velando o segredo grande | BARATO-MÉDIO: 1 objeto-cenário destacado |
 | 7 | **Cauã "Volt"** aparece **hostil** (forasteiro mexendo no lar dele → acha que o Gus causou o defeito) → atrito → resolvem o aparato **juntos** → primeiro companion | Introdução do companion #1 (rivais→amigos); complementaridade lógica+energia | BARATO (diálogo) + o puzzle de §13.5 |
 
-### 13.4. O catador (NPC novo, trágico-simpático)
+### 13.4. A catadora: **Doralice** (NPC novo, trágico-simpático)
 
-- **Perfil:** catador pobre dos Ferrovelhos que vende sucata pra sobreviver; **não sabia** o que era o caco e sente **culpa** ao entender que adoeceu os próprios vizinhos.
-- **Função:** humaniza o custo do mistério (não é vilão — é gente comum ganhando a vida, coerente com a axiologia canônica); é o espelho que revela a **empatia** do Gus (11 anos, analítico mas gentil — não humilha o coitado, resolve o problema).
+- **Nome:** **Doralice** (sobrenome opcional, não fixado — NPC humilde, single-name como o Bertoldo; nomear depois se necessário).
+- **Perfil:** uma **avó catadora** dos Ferrovelhos que cata sucata pra **sustentar os netos**; **não sabia** o que era o caco e sente **culpa** ao entender que adoeceu a própria vizinhança (a dela).
+- **Função:** humaniza o custo do mistério (não é vilã — é gente comum ganhando a vida, coerente com a axiologia canônica) e eleva o peso (uma família depende dela); é o espelho que revela a **empatia** do Gus (11 anos, analítico mas gentil — não humilha a coitada, resolve o problema). Subverte a expectativa de "catador = homem velho".
 - **Custo:** BARATO — 1 NPC + diálogo. Sem arco de vilão, sem sistema de confronto.
-- **[A BRAINSTORMAR]:** nome do catador; se aparece uma vez ou reaparece; registrar em `CHARS.md` quando nomeado.
+- **Registro:** cadastrada em `CHARS.md` (NPCs).
+- **[A BRAINSTORMAR]:** se aparece uma vez ou reaparece mais tarde; sobrenome (se algum dia precisar).
 
 ### 13.5. O puzzle-clímax: roteamento de energia (Gus + Cauã)
 
 - **Premissa diegética:** o aparato da Era 1 transmite porque a energia flui por um **caminho corrompido** dentro dele.
 - **Loop cooperativo:** o **Gus LÊ** (scan) a topologia do circuito e **deduz a sequência de nós** correta; o **Cauã é a corrente** — redireciona a energia pelos nós na ordem que o Gus dita. Complementaridade literal: um pensa, o outro executa a descarga.
+- **Formato: cadeia de 3 sub-circuitos (escalada tutorial).** Três mini-circuitos em sequência, cada um introduzindo UMA regra nova:
+  1. **Ordem** — ligar os nós na sequência correta que o scan revela.
+  2. **Evitar o nó corrompido** — o scan marca um nó "doente"; a solução tem que contorná-lo.
+  3. **Redirecionar** — reencaminhar a corrente por um caminho alternativo pra fechar o circuito são.
+  A escalada ensina por fazer e culmina no desligamento do aparato.
 - **Encaixe de pilares:** puro Pillar 1/2 (magia = circuito/script compilado); ensina, na prática, a fantasia de party (lógica + força/energia) no primeiro grande momento de gameplay cooperativo.
-- **Custo:** **BARATO** — grid de nós/switches com estados on/off + som; o "raio" do Cauã pode ser um **highlight/linha simples**, sem partícula nem shader. Sem combate.
+- **Custo:** **BARATO-MÉDIO** — 3 telas pequenas de nós/switches com estados on/off + som; o "raio" do Cauã pode ser um **highlight/linha simples**, sem partícula nem shader. Sem combate.
 - **Gancho de easter egg (opcional, barato):** a sequência correta de nós pode ser um número de Fibonacci (densidade canônica, nunca narrada) — `project_fibonacci_easter_egg`.
-- **[A BRAINSTORMAR]:** layout exato do grid, número de nós, quantos passos de dedução, se há 1 ou mais "salas" de circuito.
+- **[A BRAINSTORMAR]:** layout exato de cada sub-circuito, número de nós por tela.
+
+### 13.5b. Aparência do fragmento e do aparato (spec de arte barata)
+
+- **Estética: "pedra com veios tecno" (híbrido).** Um **ashlar** de pedra lavrada **atravessado por veios metálicos/cristal** que acendem — a Era 1 onde a **cantaria e o circuito eram a mesma coisa** (pedra sagrada = máquina). Sintetiza os dois pilares (magia + tecnologia) num objeto só.
+- **Fragmento:** um caco pequeno dessa pedra-veio, com cripto-glifos gravados; vela o easter egg maçônico (ashlar/cripto-glifo, `project_eastereggs_maconaria_canonica`).
+- **Aparato da Era 1:** o **Pilar Era 1 (canal esculpido)** já canônico nos Dutos — o mesmo material em escala de console/pilar, com os veios formando o "circuito" que o puzzle percorre.
+- **Custo:** BARATO-MÉDIO — sprite um pouco mais detalhado (pedra + veios) + 1 pulse de brilho de 2 frames. Zero partícula/shader.
 
 ### 13.6. Introdução do Cauã (rivais → amigos)
 
 - **Primeiro contato hostil:** o Cauã vê um forasteiro dos setores de cima mexendo no território/lar dele (os Dutos são da Pythia) e presume que o Gus **causou** o defeito. Começam em atrito.
 - **Virada:** o respeito nasce de **resolverem o aparato juntos** (o puzzle de §13.5). Nenhum resgate — o Cauã não é passivo; ele é metade da solução.
 - **Contra-argumento considerado e descartado:** "Gus resgata o Cauã" foi rejeitado por pôr um Striker durão em posição passiva logo na entrada, contradizendo o caráter dele.
-- **[A BRAINSTORMAR]:** se o peso da Subestação 7 (tragédia do Cauã) é tocado já aqui (de leve, velado) ou reservado pra depois.
+- **Subestação 7 (tragédia do Cauã): velada, só no ambiente.** O jogador **passa pelos destroços** da Subestação 7 nos Dutos (environmental storytelling) e o Cauã **reage mal ao lugar** — mas **nada é explicado** no 1º encontro. Planta a semente do backstory sem gastar o payoff cedo e respeita o pacing rivais→amigos (não é hora de intimidade). Custo BARATO: cenário (destroços já são canon, `PLACES.md` L86) + 1 reação de diálogo. Foreshadow que paga depois, quando a relação com o Cauã amadurecer.
 
 ### 13.7. Fios abertos desta seção (consolidado)
 
-1. Nome e cadastro do catador em `CHARS.md`.
-2. Layout/parâmetros finos do puzzle de roteamento (§13.5).
-3. "Cara" visual do fragmento antigo e do aparato da Era 1 (spec de arte barata).
-4. Se/como a tragédia da Subestação 7 entra no primeiro encontro com o Cauã.
-5. Falas (redação final via `narrative-writer` em handoff; aqui só estrutura).
-6. Reconciliação com `arco-principal.md` §Ato 1 "Recrutamento Companion #1" (o rascunho antigo recruta em local/lógica diferentes — ver §10; agora o companion #1 é o Cauã, nos Dutos, via esta missão).
-7. Sincronizar com o item `MUNDO-TOPOLOGIA-AREAS` (esta missão é a primeira "aresta" concreta das 13 áreas).
+Resolvidos em 2026-07-12: catadora = **Doralice** (§13.4, cadastrada em `CHARS.md`); puzzle = **cadeia de 3 sub-circuitos** (§13.5); fragmento/aparato = **pedra com veios tecno** (§13.5b); Subestação 7 = **velada, só no ambiente** (§13.6).
+
+Restam:
+
+1. Layout exato de cada um dos 3 sub-circuitos e nº de nós por tela (§13.5).
+2. Falas (redação final via `narrative-writer` em handoff; aqui só estrutura).
+3. **Reconciliação com `arco-principal.md` §Ato 1 "Recrutamento Companion #1"** (o rascunho antigo recruta em local/lógica diferentes — ver §10; agora o companion #1 é o Cauã, nos Dutos, via esta missão). — _próxima frente (via `narrative-designer`)._
+4. Sincronizar com o item `MUNDO-TOPOLOGIA-AREAS` (esta missão é a primeira "aresta" concreta das 13 áreas).
