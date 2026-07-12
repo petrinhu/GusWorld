@@ -1,8 +1,8 @@
 # GUS-ABERTURA: Esqueleto da Abertura de GusWorld
 
-> **Status:** PROPOSTA (decisões do criador 2026-07-12, esqueleto; detalhes finos a brainstormar).
+> **Status:** PROPOSTA (decisões do criador 2026-07-12, esqueleto; detalhes finos a brainstormar). **Atualizado 2026-07-12:** adicionada a §13 (Missão solo de abertura "O Mistério dos Aparatos" → 1º companion Cauã), decidida em brainstorm interativo.
 >
-> **Tipo de documento:** blueprint estrutural (beat sheet + ludonarrative analysis + foreshadowing tracker). NÃO contém redação final de diálogo, cutscene ou texto do recado. Redação final é responsabilidade do `narrative-writer`, em handoff futuro, após aprovação deste esqueleto e resolução dos pontos marcados "a brainstormar depois".
+> **Tipo de documento:** blueprint estrutural (beat sheet + ludonarrative analysis + foreshadowing tracker + missão solo de abertura §13). NÃO contém redação final de diálogo, cutscene ou texto do recado. Redação final é responsabilidade do `narrative-writer`, em handoff futuro, após aprovação deste esqueleto e resolução dos pontos marcados "a brainstormar depois".
 >
 > **Item TODO.md:** `GUS-ABERTURA` (linha 434). Depende de `LORE-ORIGEM-MULTIVERSO` (parcialmente canonizada, seed #1 do brainstorm-backlog).
 >
@@ -260,3 +260,71 @@ O documento `arco-principal.md` (canônico, Revisão 1) já contém um rascunho 
 ## 12. Próximo passo sugerido
 
 Após aprovação deste esqueleto pelo criador (incluindo resolução dos pontos do §11 que forem necessários antes de redigir), o pacote de handoff ao `narrative-writer` deve incluir: os cinco beats fixados, o tom (sombrio contido, sem gore, Pillar 4 intacto), a voz do Brunus já estabelecida em `brunus-vetorial.md`, a disciplina de velado do §5, e a nota de continuidade familiar do §9. Este documento não inclui os parâmetros AEN de handoff porque a redação final ainda depende de decisões pendentes (§11); preencher o pacote de handoff é passo seguinte, não deste documento.
+
+---
+
+## 13. Missão solo de abertura — "O Mistério dos Aparatos" (Distritos Inferiores → Dutos Infernais)
+
+> **Status:** PROPOSTA (decisões do criador 2026-07-12, brainstorm interativo). Esqueleto estrutural; conteúdo fino (falas, layout do puzzle, nome do catador) a brainstormar/redigir depois.
+>
+> **O que esta seção resolve:** o §6 (Beat 5) e o §0 diziam que "o primeiro companion e a primeira área" ficavam adiados pro item `MUNDO-TOPOLOGIA`. Esta seção **decide** esses dois pontos PARA A ABERTURA: a primeira missão jogável após cruzar o limiar é uma **investigação solo** nos Distritos Inferiores que termina no primeiro companion (**Cauã "Volt"**) nos Dutos Infernais. `MUNDO-TOPOLOGIA` segue dono da topologia macro das 13 áreas; esta seção é só o primeiro fio.
+>
+> **Filtro de produção (regra dura do criador, `feedback_solo_baixa_infra_escopo`):** dev solo, recursos poucos. Toda peça abaixo foi escolhida por ser **BARATA** de implementar na stack C++20+SDL3/2D — resolvida com **estado de sprite + SFX + diálogo + lógica**, sem animação quadro-a-quadro, partículas, shader custom ou física complexa. Onde uma opção mais cara for escolhida no futuro, ela vira **pedido pra glintfx** na TODO.md (não implementação inline).
+
+### 13.1. Onde entra no fluxo
+
+Encaixa **imediatamente após o Beat 5** (§6): o Gus sai da botica/apartamento pra rua, no **mesmo distrito** onde mora. Não há salto de cena nem gating hard — o mundo abre e a primeira coisa "errada" que o Gus encontra é o mistério dos aparatos dos vizinhos.
+
+### 13.2. Âncora de cenário (canon)
+
+| Elemento | Local canônico | Fonte | Reaproveitamento |
+|---|---|---|---|
+| Casa do Gus + bairro do mistério | **Distritos Inferiores** (área-âncora do Vertical Slice; engloba a Praça da Compilação e a descida sul) | `PLACES.md` L79; `blockout-distritos-inferiores.md`; `environments/01-cidade-cyber-gotica.md` | 100% dos assets já em produção |
+| A descida | Descida sul dos Distritos Inferiores → **Dutos Infernais** (subterrâneo industrial-arcano) | `PLACES.md` L26; `environments/04-dutos-infernais.md` | topologia cidade-em-cima → subterrâneo já canônica |
+| A fonte (aparato Era 1) | Sub-local **"Pilar Era 1 (canal esculpido)"** nos Dutos (vestígio Era 1 já canônico) | `PLACES.md` L96 | cenário-vestígio já previsto |
+| Peso temático do Cauã | **Subestação 7** (destruída pelo Sterling, morte de Davi Berenger, Cauã tinha 8) fica nos Dutos | `PLACES.md` L86; `characters/caua-volt.md` | encontrar o Cauã no lar-ferido dele carrega sentido de graça |
+
+### 13.3. Espinha da missão (7 passos)
+
+| # | Passo | Pillar / função | Custo de produção |
+|---|---|---|---|
+| 1 | Gus sai de casa pra rua dos Distritos Inferiores (sozinho, pós-sumiço do Brunus) | Cruza o limiar; continuidade com Beat 5 | BARATO (reuso) |
+| 2 | Os **aparatos pessoais dos vizinhos** começam a se comportar "possuídos" (ferramenta que liga sozinha, implante que fala); os adultos acham defeito solto | Pillar 2 (anomalia = bug/vírus); Pillar 4 (o Gus vê o padrão que os adultos não veem) | **BARATO**: cada "possessão" = troca de estado de sprite + SFX + linha de diálogo. Zero VFX |
+| 3 | Gus faz **scan + triangulação** com os óculos táticos: cada aparato lido dá um dado (hora, direção do "sinal", tipo de corrupção); ele cruza pra deduzir o foco | Pillar 3 (hardware do Gus) + Pillar 4 (lógica); reusa o verbo scan do Beat 1 | **BARATO**: interação com objeto + caderno de pistas no HUD + 1 dedução (escolher a resposta) |
+| 4 | A trilha leva a um **fragmento antigo** que um **catador dos Ferrovelhos** desenterrou e espalhou pelo bairro (vendendo sucata) | Raiz do mistério; teia com Ferrovelhos/FIR canon | BARATO (ver §13.4) |
+| 5 | Conter o caco **não para** o defeito — a **fonte ainda transmite de baixo**. Escala a aposta e amarra no gancho da força antiga (algo grande sob o mundo) | Foreshadow velado (§5); motiva a descida | BARATO (é lore + reação) |
+| 6 | Gus **desce aos Dutos** e acha a fonte: um **aparato da Era 1 ainda ligado** no Pilar Era 1 | Conecta à tecnologia perdida da Era 1 (mundo dos mestres do Codex), velando o segredo grande | BARATO-MÉDIO: 1 objeto-cenário destacado |
+| 7 | **Cauã "Volt"** aparece **hostil** (forasteiro mexendo no lar dele → acha que o Gus causou o defeito) → atrito → resolvem o aparato **juntos** → primeiro companion | Introdução do companion #1 (rivais→amigos); complementaridade lógica+energia | BARATO (diálogo) + o puzzle de §13.5 |
+
+### 13.4. O catador (NPC novo, trágico-simpático)
+
+- **Perfil:** catador pobre dos Ferrovelhos que vende sucata pra sobreviver; **não sabia** o que era o caco e sente **culpa** ao entender que adoeceu os próprios vizinhos.
+- **Função:** humaniza o custo do mistério (não é vilão — é gente comum ganhando a vida, coerente com a axiologia canônica); é o espelho que revela a **empatia** do Gus (11 anos, analítico mas gentil — não humilha o coitado, resolve o problema).
+- **Custo:** BARATO — 1 NPC + diálogo. Sem arco de vilão, sem sistema de confronto.
+- **[A BRAINSTORMAR]:** nome do catador; se aparece uma vez ou reaparece; registrar em `CHARS.md` quando nomeado.
+
+### 13.5. O puzzle-clímax: roteamento de energia (Gus + Cauã)
+
+- **Premissa diegética:** o aparato da Era 1 transmite porque a energia flui por um **caminho corrompido** dentro dele.
+- **Loop cooperativo:** o **Gus LÊ** (scan) a topologia do circuito e **deduz a sequência de nós** correta; o **Cauã é a corrente** — redireciona a energia pelos nós na ordem que o Gus dita. Complementaridade literal: um pensa, o outro executa a descarga.
+- **Encaixe de pilares:** puro Pillar 1/2 (magia = circuito/script compilado); ensina, na prática, a fantasia de party (lógica + força/energia) no primeiro grande momento de gameplay cooperativo.
+- **Custo:** **BARATO** — grid de nós/switches com estados on/off + som; o "raio" do Cauã pode ser um **highlight/linha simples**, sem partícula nem shader. Sem combate.
+- **Gancho de easter egg (opcional, barato):** a sequência correta de nós pode ser um número de Fibonacci (densidade canônica, nunca narrada) — `project_fibonacci_easter_egg`.
+- **[A BRAINSTORMAR]:** layout exato do grid, número de nós, quantos passos de dedução, se há 1 ou mais "salas" de circuito.
+
+### 13.6. Introdução do Cauã (rivais → amigos)
+
+- **Primeiro contato hostil:** o Cauã vê um forasteiro dos setores de cima mexendo no território/lar dele (os Dutos são da Pythia) e presume que o Gus **causou** o defeito. Começam em atrito.
+- **Virada:** o respeito nasce de **resolverem o aparato juntos** (o puzzle de §13.5). Nenhum resgate — o Cauã não é passivo; ele é metade da solução.
+- **Contra-argumento considerado e descartado:** "Gus resgata o Cauã" foi rejeitado por pôr um Striker durão em posição passiva logo na entrada, contradizendo o caráter dele.
+- **[A BRAINSTORMAR]:** se o peso da Subestação 7 (tragédia do Cauã) é tocado já aqui (de leve, velado) ou reservado pra depois.
+
+### 13.7. Fios abertos desta seção (consolidado)
+
+1. Nome e cadastro do catador em `CHARS.md`.
+2. Layout/parâmetros finos do puzzle de roteamento (§13.5).
+3. "Cara" visual do fragmento antigo e do aparato da Era 1 (spec de arte barata).
+4. Se/como a tragédia da Subestação 7 entra no primeiro encontro com o Cauã.
+5. Falas (redação final via `narrative-writer` em handoff; aqui só estrutura).
+6. Reconciliação com `arco-principal.md` §Ato 1 "Recrutamento Companion #1" (o rascunho antigo recruta em local/lógica diferentes — ver §10; agora o companion #1 é o Cauã, nos Dutos, via esta missão).
+7. Sincronizar com o item `MUNDO-TOPOLOGIA-AREAS` (esta missão é a primeira "aresta" concreta das 13 áreas).
