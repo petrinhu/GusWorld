@@ -124,7 +124,7 @@ Dado o volume (o problema é systemic, não pontual), **não** listo aqui as ~80
 | proximo / proximas | próximo / próximas |
 | ceu / arvore / so | céu / árvore / só |
 
-**Matriz de raízes (13 canônicas, conferido total = 13, OK):** sylva-, vyr-, tavus-, nenh-, ondh-, cale-, mor-, rime-, glyfa-, elen-, gala-, lhin-, anh- — todas cross-referenciadas a termos canônicos existentes (Sylvarin/Neo-Sylvania/Selve, Vyrdragon/Vyrcátrix/Helíaco Vyr, Tavus-Drive, Ordem Recursiva, C-Arcane/cripto-glifo). Nenhuma raiz órfã ou duplicada.
+**Matriz de raízes (13 canônicas, conferido total = 13, OK):** sylva-, vyr-, tavus-, nenh-, ondh-, cale-, mor-, rime-, glyfa-, elen-, eryn-, lhin-, anh- — todas cross-referenciadas a termos canônicos existentes (Sylvarin/Neo-Sylvania/Selve, Vyrdragon/Vyrcátrix/Helíaco Vyr, Tavus-Drive, Ordem Recursiva, C-Arcane/cripto-glifo). Nenhuma raiz órfã ou duplicada. **Correção 2026-07-12:** a raiz 11 (listada como *gala-* na data desta auditoria) foi trocada por *eryn-* (sindarin bosque/mata) por conflito com palavrão pt-br, flag do criador; a colisão de lenição cale-> (raiz 11) discutida no achado MÉDIO acima ficou resolvida por *eryn-* ser vogal-inicial.
 
 **Matriz numérica (Fibonacci-alvo declarado vs. real):**
 

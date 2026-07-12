@@ -18,7 +18,7 @@ Total de raizes: **13**. Cada raiz gera familias de palavras por sufixo.
 | 8 | **rime-** | numero, ordem, computo | Ordem Recursiva; natureza = matematica; sequencias numericas |
 | 9 | **glyfa-** | glifo, palavra-codigo | C-Arcane, cripto-glifo Era 1, "Glyph" canon |
 | 10 | **elen-** | estrela, ceu | datacao por ciclo (calendario Era 1) |
-| 11 | **gala-** | vida, crescimento, arvore | fractais/recursao da flora da Selve (Pillar 2) |
+| 11 | **eryn-** | mata, bosque, vida vegetal, crescimento | fractais/recursao da flora da Selve (Pillar 2) |
 | 12 | **lhin-** | canto, fala, som | a propria lingua; tradicao oral |
 | 13 | **anh-** | tempo, ciclo lunar | medida de tempo Era 1 (ciclo lunar, in-world-docs) |
 
@@ -27,7 +27,7 @@ Total de raizes: **13**. Cada raiz gera familias de palavras por sufixo.
 - **-an** agente/habitante: *sylvan* (morador da Selve), *calan* (portador de luz).
 - **-in / -en** adjetivo: *vyrin* (igneo, draconico), *nenhin* (aquatico), *morin* (sombrio).
 - **-e** verbo (infinitivo): *tave* (executar/disparar um cartao), *lhine* (cantar/falar), *glyfe* (escrever/compilar), *cale* (iluminar).
-- **-esse** abstrato/coletivo: *rimesse* (a Ordem, o Computo), *galesse* (a Vida).
+- **-esse** abstrato/coletivo: *rimesse* (a Ordem, o Computo), *erynesse* (a Mata, o Crescimento).
 - **plural**: mutacao da 1a consoante + **-i**, ou coletivo **-rim** (ex.: *sylvarim* = todas as matas, o conjunto da Selve).
 
 ## Palavras compostas que EXPLICAM o canon (a lingua "justifica" a lore)

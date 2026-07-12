@@ -34,14 +34,14 @@ Gatilhos: depois do artigo definido, adjetivo posposto, objeto direto, 2o elemen
 
 ## 3. Caso e posse
 Ordem-base **SVO** (sujeito-verbo-objeto, como o portugues falado).
-- **Genitivo (posse)**: possuido + particula **en** + possuidor; o possuido sofre lenicao. Ex.: *cala en elen* = "a luz da estrela" (*cale* -> *cala*, lenicao c->g daria *gala*... ver nota). 
+- **Genitivo (posse)**: possuido + particula **en** + possuidor; o possuido sofre lenicao. Ex.: *cala en elen* = "a luz da estrela" (*cale* -> *cala* por lenicao).
 - **Locativo** ("em"): sufixo **-sse** (emprestado do Quenya, regular). Ex.: *sylvasse* = na floresta.
 - **Alativo** ("para, em direcao a"): sufixo **-nna**. Ex.: *sylvanna* = para a floresta.
 
 ### Reversibilidade (resolve colisoes) - FECHADO 2026-06-23
 Tres garantias tornam a lenicao SEMPRE reversivel, e por isso decifravel (Pillar 2; o C-Arcane le a lingua revertendo a mutacao):
-1. A lenicao muda APENAS a consoante inicial, nunca as vogais. As vogais sao contrastivas: *gale* (luz lenizada, de *cale*) e *gala* (vida) seguem distintas pela vogal final (e vs a).
-2. **g leniza para gh** (fricativa), nunca para zero. Assim nenhuma raiz "desaparece" virando vogal-inicial: *gala* (vida) -> *ghala*, distinto de qualquer palavra de vogal inicial.
+1. A lenicao muda APENAS a consoante inicial, nunca as vogais. As vogais sao contrastivas: formas com a mesma raiz mas sufixos diferentes seguem distintas pela vogal final (ex.: *cale* verbo vs *cala* substantivo, e vs a).
+2. **g leniza para gh** (fricativa), nunca para zero. Assim nenhuma raiz "desaparece" virando vogal-inicial: *glyfa* (glifo) -> *ghlyfa*, distinto de qualquer palavra de vogal inicial.
 3. Os gatilhos de lenicao sao um conjunto FIXO e enumerado (artigo, adjetivo posposto, objeto direto, 2o elemento de composto). A sintaxe sempre sinaliza que houve mutacao, entao a forma-base e recuperavel por regra. Homofonia residual se resolve pelo contexto sintatico, como em qualquer lingua natural.
 
 ## 4. Verbo (tempos)
@@ -79,7 +79,7 @@ Posposto ao nome (como em portugues e Sindarin) e sofre lenicao. Ex.: *dragna vy
 Para possuidor explicito, usa-se o genitivo com *en*: *sylva en Gus* (a floresta do Gus).
 
 ## Itens abertos (proxima etapa)
-- Colisao de lenicao (cale->gala vs raiz gala): fechar regra de desambiguacao.
+- ~~Colisao de lenicao (cale->gala vs raiz gala): fechar regra de desambiguacao.~~ RESOLVIDA 2026-07-12: a raiz 11 foi trocada de *gala-* para *eryn-* (vogal-inicial, correcao canonica por conflito com palavrao pt-br); como raizes vogal-iniciais nao sofrem lenicao de consoante inicial, a colisao cale->gala vs raiz gala deixou de existir.
 - Tabelas completas das mutacoes nasal e mista.
 - Pronomes pessoais e possessivos.
 - Deriva historica Era 1 -> Era 3 (como o Sylvarin puro virou substrato no portugues do jogo).
