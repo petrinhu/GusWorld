@@ -2,6 +2,8 @@
 
 **Status:** PROPOSTA (decisões do criador 2026-07-12, aguarda revisão). Consolida decisões fechadas do criador supremo sobre a taxonomia de cartas, poções e itens do sistema TechnoMagik. Documento de design, não de implementação: specs de engine (records, services) ficam para os agentes de implementação depois da revisão.
 
+**Atualização 2026-07-12 (rodada 2):** fecha os 5 gadgets, a contagem de slots (deck/Codex, implantes do triângulo, companions, gadget, injetor, especial, ampolas em combate) e a dupla Força/peso (atributo de logística + tabela de pesos por item). Os números finos de preço em crédito e as magnitudes exatas dos 2 status novos seguem diferidos, agora apontados explicitamente para as ondas que os fecham (ver §9).
+
 **Cross-ref (leia antes, este doc não duplica):**
 
 - [`combat.md`](combat.md) §6 (5 famílias e roda de fraqueza), §7-8 (modelo de carta e modificadores), §9 (status framework), §10 (pipeline de 3 slots e combos), §11 (fórmula de dano). Este doc referencia esses números, não os redefine.
@@ -120,6 +122,36 @@ Isso cria uma decisão tática dupla e não-redundante: **espaço** (quanto cabe
 
 Regra dura já canônica em `economia.md` §7.5 e reafirmada aqui: **equipamento é permanente, sem desgaste**. As Ampolas (§3.3) são o único tipo de consumível do sistema inteiro que efetivamente se gasta com o uso. Nenhum item de hardware (Injetor incluso) tem barra de durabilidade, taxa de manutenção por uso normal, ou degradação passiva. Consertos existem só como consequência narrativa pontual e scriptada (economia.md §7.5), nunca como sistema de desgaste.
 
+### 4.2 Força e pesos (fechado, decisão do criador 2026-07-12)
+
+**Força é atributo de logística, não stat de combate.** Não entra na fórmula de dano (combat.md §11), não escala Atk/Def/SPD: governa só quanto a party consegue carregar. Cada personagem tem um valor fixo de Força:
+
+| Personagem | Força |
+|---|---|
+| Gus | 13 |
+| Companion comum (Cauã, Iara, Linda, Dante, Jaci) | 21 |
+| Bento "Requiem" | 34 |
+
+A **capacidade de carga da party** é a soma da Força dos 3 personagens ativos em campo (§2.1 combat.md: party = Gus + 2 companions). Exemplos:
+
+- Gus + 2 companions comuns: 13 + 21 + 21 = **55**.
+- Gus + Bento + 1 companion comum: 13 + 34 + 21 = **68**.
+- Levar o Bento na party ativa aumenta diretamente o quanto a party consegue saquear: trade-off tático real (Pillar 1), não conveniência de menu.
+
+**Peso por item** (o que conta contra a capacidade de carga, §4 acima já isola loot/consumível como o único tipo que pesa):
+
+| Item | Peso |
+|---|---|
+| Carta | 0 |
+| Equipamento equipado | 0 |
+| Ampola (qualquer das 4, §3.3) | 1 |
+| Ingrediente comum | 1 |
+| Ingrediente raro | 2 |
+| Componente-boss / épico | 3 |
+| Injetor de reserva (não equipado) | 5 |
+
+**Estouro de peso = hard-stop.** Ao atingir a capacidade de carga, a party simplesmente não pega mais loot até soltar, usar ou vender algo. Sem penalty de stat, sem degradação: é um limite de logística, não uma punição de combate (consistente com a regra dura de zero durability, §4.1, e com "sem hardware inútil" dos anti-pillars).
+
 ---
 
 ## 5. Status framework: 2 novos status (camada 1, anti-body-horror)
@@ -176,7 +208,36 @@ Item é hardware, mapeado no triângulo do Pillar 3 (Óculos Táticos / Matriz O
 | Upgrade de triângulo | módulos que plugam em Óculos, Matriz ou Tavus-Drive | um dos 3 vértices canônicos (Pillar 3) |
 | Gadget acessório | drones, torres, escudos | NÃO é vértice novo (Pillar 3 é fechado em 3); gadget é ferramenta de campo separada, equipável em slot próprio |
 
-A lista fina de gadgets concretos, contagem de slots e preços/pesos do Injetor + Ampolas **não está fechada**: ver §9 PENDENTE.
+Preços e pesos do Injetor + Ampolas seguem em aberto: ver §9 PENDENTE. Gadgets concretos e a contagem de slots (deste §7 e do resto do inventário) fecham abaixo (§7.1, §7.2).
+
+### 7.1 Gadgets (5 fechados, decisão do criador 2026-07-12)
+
+Todos os gadgets custam **1 AP**, são **1x por batalha** (mesmo flag mecânico da Análise Preditiva e das cartas ESPECIAL, combat.md §2.1: "não se acumula, não recarrega durante a batalha") e **reusam mecanismos já canônicos de combat.md**, sem inventar sistema novo:
+
+| Gadget | AP | Uso | Efeito | Mecanismo reusado |
+|---|---|---|---|---|
+| **Drone-Vigia** | 1 | 1x/batalha | orbita por 3 turnos, revelando a intenção do inimigo a cada turno | `IntentPreview` (combat.md §12/§13) + modificador Object (combat.md §7-8) |
+| **Torre-Autômata** | 1 | 1x/batalha | planta uma torre que ataca sozinha 1x/turno, por 3 turnos | modificador Object (combat.md §7-8) |
+| **Escudo de Emergência** | 1 | 1x/batalha | aplica Shield instantâneo em si ou num aliado ao lado | status Shield (combat.md §9) |
+| **Baliza de Redirecionamento** | 1 | 1x/batalha | joga 1 inimigo pra trás na fila de iniciativa, sem gastar o Gambito | `ReorderActor` (combat.md §4/§12), sem consumir a ação de Gambito-Reordenar |
+| **Kit-Morenh** | 1 | 1x/batalha | aplica Resfriamento (§5.2 deste doc) num aliado | status novo Resfriamento (§5.2); nome herda a palavra Sylvarin `Morenh` já cunhada em §8.2 |
+
+Gadgets são **universais**: qualquer um dos 5 pode ser equipado por qualquer personagem. Não há gadget exclusivo de companion.
+
+### 7.2 Slots (fechado, decisão do criador 2026-07-12)
+
+Mapa completo de slots do jogador, consolidando cartas + implantes + gadgets + consumíveis num único lugar:
+
+| Categoria | Regra de slot |
+|---|---|
+| Deck / Codex | 40-60 Tokens no deck total, **15 em campo** (canon já existente, gdd.md §6.2 / §2.2 deste doc) |
+| Implantes do triângulo (Gus) | **1 por vértice, 3 total.** Gus escolhe 1 candidato de 3-4 por vértice (Óculos / Matriz / Tavus-Drive, Pillar 3) |
+| Companions | **1 slot de hardware-análogo cada.** Peça própria, distinta do triângulo do Gus: assimetria proposital, o triângulo (Pillar 3) é regra exclusiva do Gus, companions não herdam os 3 vértices |
+| Gadget | **1 por personagem ativo em campo** = 3 gadgets equipados simultaneamente na party (§7.1) |
+| Injetor | **1** (equipado ou não; ver §3.2) |
+| Carta ESPECIAL | ocupa 1 dos 15 slots em campo do Codex (já fechado em §2.3, reforçado aqui) |
+| Carta SUPER | **slot dedicado, FORA dos 15** (já fechado em §2.4, reforçado aqui) |
+| Ampolas em combate | **sem slot separado**: qualquer Ampola carregada na Mochila (§4) é usável em combate; o limite real é o peso da Mochila, não um slot de "quickbar" à parte |
 
 ---
 
@@ -216,22 +277,19 @@ O léxico Sylvarin completo (regras de derivação, tabela de mutação consonan
 
 ---
 
-## 9. PENDENTE (brainstorm futuro)
+## 9. PENDENTE (diferido para ondas de balanceamento)
 
-Itens explicitamente deixados em aberto pelo criador, para sessão de brainstorm futura:
+**Fechado na rodada 2026-07-12 (rodada 2), não é mais brainstorm aberto:** gadgets concretos (§7.1, os 5 estão nomeados e especificados), contagem de slots (§7.2, mapa completo), Força e peso por item (§4.2, tabela fechada). O que resta abaixo não é esquecido nem em aberto sem dono: é **diferido de propósito** para as ondas dedicadas de números finos, listadas explicitamente por item.
 
-- **Gadgets acessórios concretos:** lista fina de drones/torres/escudos (nomes, efeitos, quantos existem no jogo).
-- **Contagem de slots** de gadget/equipamento (quantos gadgets a party pode ter equipados simultaneamente; se é slot por personagem ou slot compartilhado da party).
-- **Preços e pesos:**
+- **Preços em crédito (diferido para a onda de ECONOMIA, `economia.md`):**
   - Preço do Injetor (achado vs comprado: os dois caminhos existem, valor de compra não definido).
   - Preços das 4 Ampolas (Religação / Recarga / Antídoto / Overclock): hoje só a Bio-Ampola e a Life Ampola têm número em `economia.md` §4-5; Recarga e Overclock ainda não têm valor.
-  - Peso das Ampolas na Mochila (se pesam algo, ou se são leves o bastante para não contar de forma relevante).
-- **Custo de Mana premium exato das cartas ESPECIAIS** (§2.3): "premium" está qualificado, não quantificado. Fica para `CARTAS-BALANCEAMENTO`.
-- **Magnitude/duração numérica** da Sobrecarga térmica e do Resfriamento (§5): a forma (DoT front-loaded + throttle; +SPD + desconto de mana) está fechada, os números não.
+- **Custo de Mana premium exato das cartas ESPECIAIS** (§2.3): "premium" está qualificado, não quantificado. Diferido para `CARTAS-BALANCEAMENTO` / playtest.
+- **Magnitude/duração numérica** da Sobrecarga térmica e do Resfriamento (§5): a forma (DoT front-loaded + throttle; +SPD + desconto de mana) está fechada, os números não. Diferido para `CARTAS-BALANCEAMENTO` / playtest.
 - **Sincronização do marcador de raridade visual do frame** (comum/rara/lendária) com os 3 tiers desta taxonomia (§2.5): depende de `CARTAS-BALANCEAMENTO`.
 - **Reconciliação da grafia "techMagic" → "TechnoMagik"** dentro de `techmagic.md` (já sinalizada naquele doc, item `TECHMAGIC-CANON`).
 - **Reconciliação da raiz Sylvarin de "Morenh"** (§8.2, nota) com o léxico-semente formal.
 
 ---
 
-**Última revisão:** 2026-07-12 (criação, decisões do criador consolidadas, aguarda revisão).
+**Última revisão:** 2026-07-12, rodada 2 (gadgets, slots, Força/peso fechados; preços e magnitudes diferidos para ECONOMIA e CARTAS-BALANCEAMENTO/playtest; aguarda revisão).
