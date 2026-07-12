@@ -39,6 +39,17 @@ Alerta anti-over-engineering registrado no brainstorm: o `techMagic` executor po
 
 Decisão de `software-architect` + `gameplay_engineer` **na hora de implementar** (feat `TECHMAGIC-EXECUTOR`), não no brainstorm.
 
+## Tavus-Eco (canon aprovado 2026-07-12)
+
+Aplicação mais literal de "magia = software". O **Tavus-Eco** é um self compilado: diante da morte, o mestre executa sobre si mesmo o mesmo gesto que qualquer conjuro exige, compila um snapshot finito da própria voz, do próprio método e da lição que escolheu preservar, e o sela no artefato que carrega a carta do Codex. O eco dorme, inerte, indistinguível de registro morto, até que alguém resolva a prova que o mestre deixou como condição de execução (o puzzle da missão). Resolvida a prova, o Tavus-Eco roda: o mestre aparece, projeção compilada, entrega a carta pela própria mão e conversa, presença limitada ao que foi compilado, não fantasma nem sobrevivente. O mestre continua morto na sua era; o que a party encontra na Era 3 é o que ele executou de si mesmo antes do fim. É a razão canônica pela qual a party ENCONTRA cada mestre pra receber a carta, sem que nenhum deles esteja vivo.
+
+- **Etimologia:** raiz Sylvarin `tavus-` ("o pulso que executa"), híbrido moderno no padrão de Tavus-Drive. Nome in-world puro em Sylvarin fica pendente (candidato com `lhin-`, canto/fala), junto do batismo do techMagic.
+- **Criação (Era 2, 17 mestres):** o mestre compila-se diante da morte, cada um à sua cara (Faraday trança o eco na malha, von Neumann aplica a si o teorema da auto-cópia, etc.). **Variante Era 1 (arcano-cerimonial, os 3 mestres OCU):** não "compila"; grava o próprio eco em canto, na pedra, na roda de memória, no instrumento ritual, do jeito que a era sabia guardar o que não podia perder. Mesma lógica formal (Pillar 1 é universal), só o substrato muda; a taxonomia da Era 3 classifica os dois sob o mesmo nome, porque a raiz `tavus-` é anterior a todos eles.
+- **Ativação:** a prova/puzzle da missão é a condição de execução. Resolveu, roda.
+- **Comportamento:** entrega a carta e conversa, limitado ao snapshot compilado (a descoberta, a voz, a lição). Não aprende, não é onisciente.
+- **Limite duro (guarda do segredo):** o Tavus-Eco é **camada 1** (techMagic comum, computável). A **camada 3** (origem, Estilhaçamento, convergência) é incompilável por definição, logo o eco estruturalmente NÃO pode conter nem revelar cosmologia de origem. O momento "O eco" (§5 de cada doc mestre, o déjà-vu, a cicatriz do Einstein) é justamente a parte da vida que a compilação não captura; o eco pode, no máximo, hesitar onde o original hesitou, sem saber por quê. O Tavus-Eco e o "eco" do §5 são fenômenos DISTINTOS e nunca são ligados em texto.
+- **Fios abertos (feat da cena de encontro):** o eco persiste após o encontro ou dissipa (one-shot vs re-visitável); o diálogo por mestre. Casa com a feat das cartas. Decisões de lead-game-designer/narrative-designer com o criador. Ver `docs/design/roster-analogos/OBRA-DE-FICCAO-E-METODOLOGIA.md` AMB-24.
+
 ## Fios ainda abertos (viram sub-decisões das feats pendentes)
 
 - **Nome in-world em Sylvarin** (candidatos via `narrative-designer` → líder escolhe).
