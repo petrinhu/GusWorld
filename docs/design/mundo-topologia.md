@@ -75,17 +75,66 @@ Dungeons chamam-se "**faraday**" no idioma do local (motivo Gaiola de Faraday; v
 | Selve Profunda (final) | mista (clímax) |
 | Área faraday | puzzle puro (EM/Faraday) |
 
+**Conceitos de dungeon (só conceito — tema + gimmick + forma; level design fino fica pra produção com a engine + `level-designer`; criador aprovou "só conceito" 2026-07-12):**
+
+1. **Dutos — aparato (abertura):** linear-curta; gimmick = roteamento de energia cooperativo (Gus lê o circuito, Cauã é a corrente), cadeia de 3 sub-circuitos; ensina o loop e apresenta a party. O 1º grande momento de gameplay.
+2. **Dutos — laboratório FIR (Ato 2):** hub com celas; gimmick = ondas de guardas FIR + terminais que o Gus hackeia (desliga câmeras/torres) pra abrir caminho; clímax = payoff da Subestação 7.
+3. **Setor Mirage — Festival:** labirinto-de-ilusões curto; gimmick = o scan distingue real × holográfico (parede/inimigo falso vs real); decifrar o padrão do Festival pra desligar a extração sensorial. Arco Iara.
+4. **Periferia — reduto Dante:** arena em camadas; gimmick = combate em sucata improvisada (cobertura/armadilha) + ondas até o núcleo. Território do futuro traidor (tensão velada).
+5. **Ferrovelhos — labirinto:** labirinto vertical de sucata; gimmick = ímãs/guindastes que reconfiguram o caminho (mover pilhas); o mercado espontâneo dos economistas nos cantos.
+6. **Zona do Silêncio #1 — puzzle acústico:** câmaras ressonantes; gimmick = som não se propaga (silêncio mecânico); o Gus usa vibração/UHF (Matriz Ortodôntica) pra "ver" o que não ouve; puzzle de ressonância. Lar da Linda.
+7. **Zona do Silêncio #2 — mista:** linear com bolsões; gimmick = combate abafado (inimigos que só reagem a vibração) + pequenos puzzles acústicos. Respiro de variedade após a #1.
+8. **Orla Recursiva — labirinto fractal:** forma auto-similar (salas que se repetem em escala); gimmick = ler a regra recursiva (a "semente" do padrão) pra não se perder; a flora fractal invade o concreto. A dobradiça cidade↔Selve.
+9. **Selve Sombria — mista:** trilha orgânica ramificada; gimmick = flora matemática (plantas em sequência — abrir caminho lendo o padrão de crescimento) + fauna-bug. Entrada da Selve, lar da Jaci.
+10. **Catedrais #1 — puzzle litúrgico:** vertical (nave + campanário); gimmick = engrenagens/carrilhões que o Gus sincroniza (a liturgia é um programa mecânico); a sequência abre a cripta. Lar do Bento, Ordem Recursiva.
+11. **Catedrais #2 — só batalhas:** claustro-arena; gimmick = guardiões-autômatos da catedral; o pavimento tesselado dá buffs posicionais; onda até o altar.
+12. **Selve Profunda (final) — mista (clímax):** culminante longa; gimmick = tudo junto (puzzle + labirinto + batalha), paletas fundidas (recompensa ato 3), rumo ao confronto final. O ápice.
+13. **Área faraday — puzzle EM (contornável/atalho):** câmara blindada; gimmick = dentro da gaiola o scan/HUD "cega" (sinal morto) — o Gus resolve às escuras, por dedução pura; guarda carta/item-chave.
+
 ## 5. Lugares secretos — gradiente Fibonacci por distância (barato)
 
 Camada por cima das dungeons: **lugares secretos pequenos** (1-2 salas, 1 puzzle/recompensa, tiles reusados, **opcionais**), mais numerosos quanto **mais longe da origem** (gradiente velado 0→1→2→3→5). São o BARATO que enche os ermos de recompensa de exploração sem custar como dungeon. Distribuição também **irregular** por área (não um número limpo por tier — o Fibonacci fica no agregado, não exposto).
+
+**Distribuição concreta (criador, 2026-07-12; total 21 = Fibonacci velado):**
+
+| Área | Lugares secretos |
+|---|---|
+| Distritos Inferiores | 0 |
+| Núcleo Metropolitano | 1 |
+| Dutos Infernais | 1 |
+| Setor Mirage | 1 |
+| Periferia | 1 |
+| Ferrovelhos | 2 |
+| Zona do Silêncio | 3 |
+| Orla Recursiva | 2 |
+| Selve Sombria | 1 |
+| Catedrais Neo-Sylvania | 1 |
+| Montadora Confluência | 2 |
+| Selve Profunda | 5 |
+| Área faraday | 1 |
+| **Total** | **21** |
+
+Hubs populados (cheias) têm poucos/zero; os ermos concentram (Zona do Silêncio 3, Selve Profunda 5). Números irregulares de propósito (Fibonacci só no agregado). São opcionais e baratos; alguns podem ser procedurais/reusados.
 
 ## 6. Interiores dos 20 mestres do Codex (superfície, não-bloqueantes)
 
 **Decisão do criador (2026-07-12):** cada um dos **20 mestres do Codex** (as 20 figuras históricas; Tusk é o capstone à parte) tem sua **área especial própria** — mas na **SUPERFÍCIE**, como **interior de casa / prédio / construção**, **NÃO bloqueante de passagem** (coerente com gdd §7.1). O jogador entra, resolve a missão/puzzle do mestre, encontra o **Tavus-Eco** (o self compilado do mestre) e **ganha a carta** dele (cross-ref `techmagic.md` Tavus-Eco + AMB-24 + `MESTRES-TAVUS-ECO-ENCONTRO` + cartas especiais `cartas-technomagik.md`).
 
 - Camada **distinta** das 13 dungeons e dos lugares secretos: são espaços-interiores de missão, não dungeons de exploração.
-- **Distribuição:** espalhados pelas 13 áreas conforme a **era/lugar canônico de cada mestre** (já definido nos `docs/design/roster-analogos/*.md`); uma área cheia pode hospedar vários interiores de mestre. Mapeamento exato = detalhe posterior (segue o roster).
 - **Custo:** MÉDIO no agregado (20 interiores), mas cada um é barato (interior + 1 puzzle + diálogo do Tavus-Eco); reusa moldura de puzzle e o mecanismo Tavus-Eco. Escala com o roster já desenhado.
+
+**Mapeamento TEMÁTICO POR CAMPO (criador, 2026-07-12):** cada área vira um "campus" de um campo — coerente, memorável e diegeticamente didático (o jogador aprende o campo pelo lugar). Os 10 mestres com lugar canônico seguem o canon; os 10 sem-lugar foram agrupados por campo. (Fonte da pesquisa de lugar: leitura do roster, 2026-07-12.)
+
+| Área (campus) | Mestres | Âncora |
+|---|---|---|
+| **Dutos Infernais** — eletromagnetismo & energia | Faraday · Maxwell · Volta · Euler | Euler = dutos técnicos (canon); resto por campo |
+| **Núcleo Metropolitano** — computação & matemática | von Neumann · Turing · Gödel · Ada Lovelace · Planck | von Neumann = Universidade Pública (canon) |
+| **Ferrovelhos** — economia austríaca | Menger · Hayek · Mises · Bastiat | Menger = Mercado da Sucata Honesta (canon); ordem espontânea emerge do mercado de sucata |
+| **Periferia** — cientistas-refugiados cooperativos | Tesla · Einstein | ambos canon (Praça do Compilador, F067/F068); expulsos por mecenas coletivistas (axiologia) |
+| **Catedrais Neo-Sylvania** — ciência sagrada da Era 1 | Giordano Bruno · John Dee · Pythagoras · Newton | Bruno/Dee canon Era 1; Pythagoras Era 1; Newton = eco Catedral Atelaiá |
+| **Orla Recursiva** — geometria fractal | Mandelbrot | canon (borda da Orla, Rio Verdor; eco Núcleo Mandelbrot na Selve Profunda) |
+
+Notas: (a) 6 das 13 áreas hospedam os interiores (as demais não têm mestre — concentração temática, ok); (b) **flag de canon a resolver:** o roster trata "Periferia Industrial" = "Ferrovelhos" (glossário lore-bible), mas o mapa atual os separa — decidir depois se Ferrovelhos é sub-distrito da Periferia ou área própria; (c) o Núcleo (5) e as Catedrais/Dutos/Ferrovelhos (4) são densos de interiores, coerente com serem campi.
 
 ## 7. Ecossistemas por área + contraste Pillar 5 (criador, 2026-07-12)
 
@@ -129,7 +178,11 @@ Lares canônicos, mapeados nos tiers de dificuldade:
 
 ## 9. Fios abertos (continuar brainstorm)
 
-1. Mapeamento exato dos 20 interiores de mestre → áreas (segue o roster).
-2. Distribuição fina (quais áreas ganham quais lugares secretos).
-3. Layout concreto de cada dungeon (level design) — fase de produção, pós ENGINE-MAPA.
-4. Onda de implementação da engine de mapa (`ENGINE-MAPA-ONDA`, pré-req de tudo isto virar jogável).
+Resolvidos em 2026-07-12: mapeamento dos 20 interiores (§6, temático por campo); distribuição dos lugares secretos (§5, total 21); conceitos das 13 dungeons (§4, "só conceito").
+
+Restam:
+
+1. **Layout FINO de cada dungeon** (level design sala-a-sala) — fase de PRODUÇÃO, com o `level-designer` + a engine de mapa. NÃO fazer antes da engine (retrabalho).
+2. **`ENGINE-MAPA-ONDA`** — onda de implementação do loader/compilador `.gmap` ([[reference_formato_mapa_gmap]]), pré-req de tudo isto virar jogável.
+3. Reconciliação canon leve: "Periferia Industrial" (roster) = "Ferrovelhos" (glossário) — decidir se é sub-distrito da Periferia ou área própria (afeta onde moram Menger/economistas).
+4. Detalhe: qual carta/item-chave cada lugar secreto e a área faraday guardam (liga a `cartas-technomagik.md` + FARADAY-DUNGEON-ITENS).
