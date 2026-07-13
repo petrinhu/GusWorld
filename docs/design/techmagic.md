@@ -50,7 +50,21 @@ Aplicação mais literal de "magia = software". O **Tavus-Eco** é um self compi
 - **Ativação:** a prova/puzzle da missão é a condição de execução. Resolveu, roda.
 - **Comportamento:** entrega a carta e conversa, limitado ao snapshot compilado (a descoberta, a voz, a lição). Não aprende, não é onisciente.
 - **Limite duro (guarda do segredo):** o Tavus-Eco é **camada 1** (techMagic comum, computável). A **camada 3** (origem, Estilhaçamento, convergência) é incompilável por definição, logo o eco estruturalmente NÃO pode conter nem revelar cosmologia de origem. O momento "O eco" (§5 de cada doc mestre, o déjà-vu, a cicatriz do Einstein) é justamente a parte da vida que a compilação não captura; o eco pode, no máximo, hesitar onde o original hesitou, sem saber por quê. O Tavus-Eco e o "eco" do §5 são fenômenos DISTINTOS e nunca são ligados em texto.
-- **Fios abertos (feat da cena de encontro):** o eco persiste após o encontro ou dissipa (one-shot vs re-visitável); o diálogo por mestre. Casa com a feat das cartas. Decisões de lead-game-designer/narrative-designer com o criador. Ver `docs/design/roster-analogos/OBRA-DE-FICCAO-E-METODOLOGIA.md` AMB-24.
+- **Nome Sylvarin puro (criador, 2026-07-12): `Morlhin`** ("voz-sombra"), de *mor-* (sombra) + *lhin-* (voz/canto). Registrado no léxico (`docs/narrative/lingua/02-lexico-semente.md`). Convivência de termos: **Tavus-Eco** = o nome híbrido moderno da Era 3 (padrão de Tavus-Drive); **Morlhin** = o nome puro/antigo em Sylvarin. Mesmo fenômeno, dois registros.
+
+### Cena de encontro (Morlhin / Tavus-Eco) — design canon (criador, 2026-07-12)
+
+**Formato: TEMPLATE UNIFORME de 5 beats + sabor por mestre** (barato: mesma estrutura, só variam diálogo e a cor do glow; dev solo). A "projeção" é retrato/sprite do mestre + glow simples, nunca 3D/animação pesada.
+
+1. **Ativação:** o puzzle da missão é resolvido; o artefato/console (Era 2) ou o instrumento ritual (Era 1, os 3 OCU) "roda" e acende, com o glow do campo do mestre (a cor do campus dele, ver `mundo-topologia.md` §6).
+2. **Aparição:** o Morlhin se ergue, projeção compilada. Não é fantasma nem sobrevivente: é o que o mestre executou de si antes do fim.
+3. **A lição:** fala curta na voz do mestre, quem foi + a descoberta + a lição que escolheu preservar (o momento didático diegético). Limitada ao snapshot: não aprende, não é onisciente; pode hesitar onde o original hesitou, sem saber por quê (guarda do §5, camada 3 incompilável).
+4. **A entrega:** entrega a carta do Codex pela própria mão (UI da carta).
+5. **Dissipa:** o Morlhin se apaga (one-shot, momento único e melancólico com um morto); o artefato volta inerte. **A lição fica arquivada no Diário/Codex** para reler (preserva o objetivo de ENSINO sem quebrar o "snapshot finito").
+
+- **Sabor por mestre:** diálogo (voz + descoberta + lição) + cor do glow (por campo) + substrato (Era 2 = console compilado; Era 1 OCU = canto/pedra/roda-de-memória/instrumento ritual, cf. canon acima).
+- **Custo:** BARATO por encontro (retrato + glow + diálogo + UI de carta + 1 entrada de Diário). Escala com o roster já desenhado.
+- **Handoff pendente:** a REDAÇÃO do diálogo de cada um dos 20 mestres (voz + lição) é feat do `narrative-writer` (colaborativo, aprovação do criador); aqui está só o template estrutural. Ver `docs/design/roster-analogos/OBRA-DE-FICCAO-E-METODOLOGIA.md` AMB-24.
 
 ## Fios ainda abertos (viram sub-decisões das feats pendentes)
 

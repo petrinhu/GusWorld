@@ -38,6 +38,7 @@ Total de raizes: **13**. Cada raiz gera familias de palavras por sufixo.
 - **Heliaco Vyr** = *heliaco* (relativo ao sol nascente) + *vyr* = titulo lendario da Era 1.
 - **Tavus-Drive** = *tavus* + *Drive* (emprestimo Era 3) = hibrido tecnologico moderno sobre raiz antiga.
 - **Aguas-de-Espelho** = traducao de um composto com *nenh-* + *cale-* (agua + luz/reflexo).
+- **Morlhin** = *mor-* (sombra) + *lhin-* (voz/canto) = "voz-sombra": o nome Sylvarin puro do fenomeno que a Era 3 chama de Tavus-Eco (o self compilado de um mestre morto, que roda e aparece ao resolver a prova, entrega a carta e dissipa). Registro antigo vs hibrido moderno (Tavus-Eco). Ver `docs/design/techmagic.md`.
 
 ## Derivadas: efeitos das cartas do Codex (`cardExec-`, canon 2026-07-12)
 
