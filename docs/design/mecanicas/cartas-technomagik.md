@@ -54,7 +54,7 @@ Três tiers de carta, com identidade mecânica e narrativa distinta. Nenhum tier
 - **O que é:** o conjuro-assinatura de cada um dos 20 mestres do roster de análogos (Faraday, Tesla, Euler, Gödel, Einstein, Turing, von Neumann, Mises etc., ver `_IDS-CARTAS.md`). Cada uma é **lendária e única**: existe exatamente 1 cópia no jogo inteiro.
 - **Pré-compilada, travada:** ao contrário da COMUM, a ESPECIAL **não recebe modificador**. Ela já vem pronta, sem Object/Stream/Null anexável. Isso a diferencia mecanicamente da COMUM além da raridade narrativa: é uma peça fixa, não um sistema aberto a runtime.
 - **Ocupa slot em campo:** consome 1 dos 15 slots do deck em campo (gdd.md §6.2: "deck de 40-60 cartas-token totais, 15 em campo"). Não é bônus fora do deck; o jogador escolhe se vale o slot.
-- **Custo de Mana premium:** custa mais mana que uma COMUM equivalente (valor exato fica para balanceamento, ver §9 PENDENTE).
+- **Custo de Mana premium (arcabouço fechado pelo criador 2026-07-12, via economy-designer):** **`ManaCost` fixo ≈ 6** (faixa aceitável 5-7; número exato dentro da faixa fica pra playtest). Racional: `manaMax = 2 + turnoIndex` (cap 8), então 6 destrava por volta da **rodada 4**, gastando quase todo o pool no turno (tensão real: jogar a especial = não sobra mana), alcançável em elite/mini-boss/boss onde ela deve brilhar, sem virar troféu que nunca dispara (o risco do custo-cap 8). Anti-abuso já coberto por 3 travas independentes: 1×/batalha + sem modificador + mana sem carry-over (impossível bankar pra abrir com ela no turno 1). Trunfos-fora-da-roda (Gödel etc.) NÃO recebem taxa de mana extra por padrão; só reavaliar (+1) se o playtest mostrar que a versão fora-da-roda supera sistematicamente a de-dentro contra Fraco.
 - **Uso limitado por batalha:** 1× por batalha. Reusa o mesmo flag mecânico da Análise Preditiva (combat.md §2.1: "não se acumula, não recarrega durante a batalha").
 - **Relação com a roda de fraqueza (combat.md §6):**
   - **Regra geral:** a base da carta ESPECIAL fica DENTRO da roda de fraqueza (tem família, tem contra). O jogador ainda pode explorar fraqueza/resistência normalmente contra ela e com ela.
@@ -161,15 +161,28 @@ O set canônico de `combat.md` §9 (Stun / Poison / Corrode / Disrupt / Silence 
 ### 5.1 Sobrecarga térmica ("fogo")
 
 - **Família origem:** Elétrico. É o **2º status do Elétrico** (o 1º continua sendo Stun, combat.md §6/§9).
-- **Efeito:** DoT front-loaded (dano concentrado nos primeiros ticks, decaindo) **mais** throttle leve enquanto o alvo está superaquecido: redução pequena de SPD e/ou Power durante a duração do status.
-- **Diegese:** o sistema do alvo está rodando quente demais; ele perde desempenho (throttle) enquanto dissipa o calor, igual um processador real sob carga.
-- **Forma de resolução (segue o padrão do combat.md §9):** magnitude e duração vêm sempre da carta/combo que aplica, nunca hardcoded. DoT front-loaded = magnitude maior nos primeiros ticks, decrescendo (forma exata fica para balanceamento, §9 PENDENTE).
+- **Efeito:** DoT front-loaded (dano concentrado nos primeiros ticks, decaindo) **mais** throttle leve de **SPD apenas** (Slow) enquanto o alvo está superaquecido.
+- **Diegese:** o sistema do alvo está rodando quente demais; ele fica mais LENTO (throttle) enquanto dissipa o calor, igual um processador real sob carga.
+- **Arcabouço fechado (criador 2026-07-12, via economy-designer):**
+  - **Throttle = SÓ SPD** (reusa 1:1 o mecanismo Slow: `SPD ±= Magnitude`, aditivo, clamp 0, recomputa fila). **NÃO mexe em Power** — reduzir Power já é o papel canônico do Disrupt (Sônico); dar isso ao Elétrico furaria a regra "sem sobreposição de papéis" (combat.md §6). Slow sugerido -1 SPD.
+  - **Forma do DoT = 3 turnos, front-load 50/30/20** (do total da magnitude: metade no 1º tick, depois decai). Dá ritmo de leitura (o Scan mostra quanto falta) e fica distinto do Poison (achatado/sustentado), reforçando o burst do Elétrico.
+  - **StackRule = Refresh** (reaplicar renova a Duration e a curva, NÃO empilha magnitude nem soma um 2º DoT concorrente — trava anti-degeneração, combat.md §15).
+  - **Magnitude absoluta do tick 1 = playtest** (depende do `Power`/custo das cartas COMUNS, ainda sem número canônico; ordem de grandeza provisória: DoT total ~27-33% do HP de um Trash de referência de 55 HP, algo como 8/5/3, a CALIBRAR).
 
 ### 5.2 Resfriamento ("gelo/frio")
 
 - **Categoria:** BUFF utilitário (não é debuff, distinto do padrão "status ruim" que domina a lista de combat.md §9).
 - **Efeito:** `+SPD` **mais** a 1ª carta jogada no turno custa menos mana (efetivamente um overclock defensivo: "computador funciona melhor no frio").
 - **Diegese:** reduzir a temperatura do sistema aumenta a margem de operação seguro, permitindo rodar acima do normal por um turno: o inverso lógico da Sobrecarga térmica (§5.1), lá o sistema sofre por rodar quente, aqui o sistema ganha por rodar frio.
+- **Arcabouço fechado (criador 2026-07-12, via economy-designer):**
+  - **`+1 SPD`** (reusa o mecanismo aditivo de Haste; +1 é a granularidade que o jogo já usa pra SPD em ambiente, combat.md §18 T8).
+  - **Desconto de mana: -1 na 1ª carta do turno**, com **clamp de custo mínimo 1** (uma carta nunca fica a 0 mana).
+  - **Duration = 3 turnos** (mesma janela dos gadgets Drone-Vigia/Torre-Autômata, §7.1).
+  - **StackRule = Refresh** (recastar renova Duration, não empilha SPD nem desconto).
+  - **Trava anti-loop (framework, combat.md §15):** `ManaCost(carta de Resfriamento) ≥ desconto × Duration`, ou seja, o card custa no mínimo o que economiza ao longo da própria vida (senão recastar em loop viraria lucro líquido de mana). Com -1 × 3 = 3, o card custa ≥ 3-4. Mana sem carry-over já impede bankar.
+  - **Nota de consistência (não bloqueia):** o terreno Gelo (combat.md §18) hoje PENALIZA +1 mana na 1ª carta; o status Resfriamento PREMIA -1. Polaridades opostas do mesmo elemento, defensável (ambiente frio hostil emperra vs resfriamento ATIVO do próprio sistema turbina). Registrado, não é conflito.
+  - **Kit-Morenh** (gadget, §7.1) aplica Resfriamento de graça 1×/batalha: aceitável, já gated pelo próprio limite do gadget.
+  - **Ajuste fino (playtest):** se +1 SPD / -1 mana é sentido como impactante o bastante, e o `ManaCost` exato do card (3 vs 4).
 
 ### 5.3 Mapa família → status (atualizado)
 
@@ -284,8 +297,8 @@ O léxico Sylvarin completo (regras de derivação, tabela de mutação consonan
 - **Preços em crédito (diferido para a onda de ECONOMIA, `economia.md`):**
   - Preço do Injetor (achado vs comprado: os dois caminhos existem, valor de compra não definido).
   - Preços das 4 Ampolas (Religação / Recarga / Antídoto / Overclock): hoje só a Bio-Ampola e a Life Ampola têm número em `economia.md` §4-5; Recarga e Overclock ainda não têm valor.
-- **Custo de Mana premium exato das cartas ESPECIAIS** (§2.3): "premium" está qualificado, não quantificado. Diferido para `CARTAS-BALANCEAMENTO` / playtest.
-- **Magnitude/duração numérica** da Sobrecarga térmica e do Resfriamento (§5): a forma (DoT front-loaded + throttle; +SPD + desconto de mana) está fechada, os números não. Diferido para `CARTAS-BALANCEAMENTO` / playtest.
+- **Custo de Mana premium das cartas ESPECIAIS** (§2.3): **ARCABOUÇO FECHADO 2026-07-12** (via economy-designer) = `ManaCost` fixo ≈ 6 (faixa 5-7, destrava rodada 4). Só o número exato dentro da faixa + a taxa dos trunfos-fora-da-roda ficam pra playtest.
+- **Magnitude/duração da Sobrecarga térmica e do Resfriamento** (§5): **ARCABOUÇO FECHADO 2026-07-12** (§5.1: throttle SÓ SPD, DoT 3 turnos 50/30/20, StackRule Refresh; §5.2: +1 SPD, -1 mana 1ª carta clamp min 1, Duration 3, Refresh, trava anti-loop). Só as magnitudes absolutas (dano do tick 1, custo exato do card Resfriamento) ficam pra playtest (dependem do `Power`/custo das COMUNS, ainda sem número canônico).
 - **Sincronização do marcador de raridade visual do frame** (comum/rara/lendária) com os 3 tiers desta taxonomia (§2.5): depende de `CARTAS-BALANCEAMENTO`.
 - **Reconciliação da grafia "techMagic" → "TechnoMagik"** dentro de `techmagic.md` (já sinalizada naquele doc, item `TECHMAGIC-CANON`).
 - **Reconciliação da raiz Sylvarin de "Morenh"** (§8.2, nota) com o léxico-semente formal.
