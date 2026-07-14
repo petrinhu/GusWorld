@@ -481,6 +481,11 @@ TEST_CASE("techmagic roundend: bonus que mata o alvo nao gera crash; check_end "
     CombatActor h1 = make_actor("h1", true, 100, 3, 0, 30);  // dono, dmg 3.
     CombatActor h2 = make_actor("h2", true, 100, 2, 0, 25);  // dmg 2.
     CombatActor e = make_actor("e", false, 6, 0, 0, 10);     // 6 hp: 3+2=5 sobra 1; bonus mata.
+    // DUPLA FUNCAO deste caso (pergunta do lider sobre floats/arredondamento): dmg 3 e 2 dao
+    // sum_of_squares = 9+4 = 13; sqrt(13) = 3.6055... Como a fracao e > 0.5, lround = 4 mas
+    // static_cast<int> (truncar) daria 3. Logo este teste TAMBEM e o regression de arredondamento:
+    // uma mutacao lround->truncar no handler quebra aqui (bonus 4 -> 3). Empate exato em x.5 e
+    // impossivel (sum_of_squares e sempre inteiro), entao fracao >0.5 vs <0.5 e a unica distincao.
     h1.set_equipped_special_ids({"hypo"});
     auto reg = registry({hypotenuse_card("hypo")});
 
