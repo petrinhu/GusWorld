@@ -667,6 +667,32 @@ Varredura Básica
 ## CARD_RAIZ_CURA_NAME
 Raiz Curativa
 
+### Cartas especiais dos mestres (executor techMagic, ADR-016; alcunha do efeito, valor provisorio)
+
+## CARD_EXEC_VOLTA_NAME
+Volt-Leech
+
+## CARD_EXEC_NEWTON_NAME
+Force-Law
+
+## CARD_EXEC_PYTHAGORAS_NAME
+Hypotenuse
+
+## CARD_EXEC_GODEL_NAME
+Null-Proof
+
+## CARD_EXEC_FARADAY_NAME
+EM-Shield
+
+## CARD_EXEC_EULER_NAME
+Bridge-Walk
+
+## CARD_EXEC_TURING_NAME
+Decrypt-All
+
+## CARD_EXEC_MENGER_NAME
+Barter
+
 ---
 
 ## §9. Menu de sistema (pausa + config de som, MENU-PAUSA-CONFIG-SOM)

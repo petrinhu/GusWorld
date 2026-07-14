@@ -475,6 +475,32 @@ Cancel
 
 ## CARD_RAIZ_CURA_NAME
 
+### Master special cards (techMagic executor, ADR-016; effect nickname, provisional)
+
+## CARD_EXEC_VOLTA_NAME
+Volt-Leech
+
+## CARD_EXEC_NEWTON_NAME
+Force-Law
+
+## CARD_EXEC_PYTHAGORAS_NAME
+Hypotenuse
+
+## CARD_EXEC_GODEL_NAME
+Null-Proof
+
+## CARD_EXEC_FARADAY_NAME
+EM-Shield
+
+## CARD_EXEC_EULER_NAME
+Bridge-Walk
+
+## CARD_EXEC_TURING_NAME
+Decrypt-All
+
+## CARD_EXEC_MENGER_NAME
+Barter
+
 ### Controls screen (keyboard remap, M2)
 
 ## CONTROLS_HINT

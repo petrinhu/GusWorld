@@ -95,10 +95,19 @@ add_executable(gusengine_domain_tests
     # Executor techMagic (ADR-016, MVP step 3): ledger cross-ator + hook OnRoundEnd +
     # handler HypotenuseCombo (Pythagoras, decisoes Q1-Q4 do lider).
     techmagic_roundend_test.cpp
+    # Executor techMagic (ADR-016, MVP step 4, TECHMAGIC-EXECUTOR): catalogo das 8 cartas
+    # especiais dos mestres (campos + execucao sem logic_error + paridade i18n).
+    master_cards_test.cpp
 )
 
 # Os testes do combate incluem helpers de teste headers-only (fixed_random.hpp).
 target_include_directories(gusengine_domain_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+
+# master_cards_test.cpp le os .md de traducao pra checar as chaves CARD_EXEC_<FIGURA>_NAME
+# nos 2 locales. Caminho ABSOLUTO injetado aqui (CMAKE_SOURCE_DIR = GusEngine; o repo e o
+# pai), robusto ao CWD do ctest (catch_discover_tests roda o binario do build dir).
+target_compile_definitions(gusengine_domain_tests PRIVATE
+    GUSWORLD_TRANSLATIONS_DIR="${CMAKE_SOURCE_DIR}/../game/translations")
 
 target_link_libraries(gusengine_domain_tests
     PRIVATE

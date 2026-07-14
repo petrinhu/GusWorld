@@ -45,6 +45,10 @@ add_library(gusengine_domain STATIC
     # Executor techMagic (ADR-016, MVP step 2): dispatcher OnCast/OnDamageDealt/
     # OnDamageReceived/Always sobre EffectSpec de Card (ApplyStatus/Leech/Reflect).
     src/combat/techmagic.cpp
+    # Executor techMagic (ADR-016, MVP step 4, TECHMAGIC-EXECUTOR): catalogo data-driven
+    # das 8 cartas especiais dos mestres suportadas pelos EffectKind atuais (POCO, sem
+    # logica de gameplay nova).
+    src/combat/master_cards.cpp
     src/input/action_registry.cpp
     src/input/controls_name.cpp
     src/input/controls_json.cpp
