@@ -20,6 +20,16 @@
 - **Ludonarrative:** a virada casa com o loop, ele resolve o combate por leitura e comando (Pillar 4), não por bravata vazia. A confiança em batalha é o inverso exato da cautela social.
 - **Na fala:** fora de combate = curto e cauteloso; em combate = firme, direto, encorajador com a party (voz de comandante-criança, nunca power-fantasy adulta, Pillar 4).
 
+### Arco de falibilidade do Gus (beats definidos pelo criador 2026-07-14; brainstorm de detalhe DEPOIS)
+Um arco de crescimento que mostra que **até heróis têm fragilidades e pontos fracos**. Beats fixados:
+1. **A falha:** ao longo da crônica, Gus comete uma falha SEM QUERER, por uma **escolha errada** que **prejudica a campanha**.
+2. **O perfeccionismo esconde:** o perfeccionismo dele (traço de gifted kid) faz Gus **esconder o erro da party**, e depois **mentir** sobre isso.
+3. **A descoberta:** em certo momento, **antes da missão de reverter o erro**, a party **descobre** a falha (e a mentira).
+4. **A conversa (cena de PURO DIÁLOGO, sem escolhas in-game):** a party conversa com Gus sobre como **todo mundo comete erros, até os mais inteligentes**, e o **perdoa**. É cutscene dialogal, não gameplay.
+5. **A reversão:** desfazer o efeito do erro é uma **missão extra OBRIGATÓRIA**, estimulada pela party, mas **sob comando do amigo TANKER (Bento "Requiem")**. Lição embutida: **não se pode ser perfeito em tudo**; a **necessidade de pedir ajuda quando preciso** evita erros desnecessários e previsíveis. O prodígio segue a liderança do tanque justo onde falhou sozinho.
+
+Casa com o perfeccionismo canônico do Gus (base gifted-kid), com a party como círculo de confiança, e com a dualidade tímido-fora / destemido-dentro (aqui a armadura da confiança em batalha racha na vida real). **A DEFINIR em brainstorm:** qual é a falha concreta + a escolha errada, quando na cronologia, como se descobre, o conteúdo do diálogo (redação = `narrative-writer`), e onde a missão-reversão entra no arco (`arco-principal.md`).
+
 ### Como isso vira FALA (fora de combate)
 - Com estranhos: **curto, cauteloso, econômico**; observa antes de se abrir.
 - Com o círculo de confiança: **caloroso, tagarela, brincalhão**; solta metáforas de programação sem filtro.
