@@ -20,7 +20,11 @@
 - **Lotação nos repositórios existentes (decisão do criador 2026-07-14):** as 3 são a recompensa especial de 3 das 13 dungeons/repositórios (reuso, barato):
   - **M1 (implante) → Ferrovelhos** (T2): ferro-velho onde se cata hardware usado; um implante de visão salvado.
   - **M2 (código dos marcadores) → Zona do Silêncio** (T3): zona morta/abandonada = repositório de código perdido, silencioso e corrompido.
-  - **M3 (VRAM) → Montadora Confluência** (T4): a fábrica de tech avançada do Tusk guarda o chip exótico de VRAM. **NOTA:** isso promove a Montadora de "lore/quest, não-dungeon" (`mundo-topologia.md` §4) a **repositório visitável** (atualizar a topologia: Montadora ganha 1 dungeon/repositório).
+  - **M3 (VRAM) → Montadora Confluência** (T4): a fábrica de tech avançada do Tusk guarda o chip exótico de VRAM.
+- **Reconciliação 13-vs-14 dungeons — RESOLVIDA (decisão do criador 2026-07-14, achados PS-R4+PS-R5):** as 3 missões do mini-mapa são **repositórios LEVES** (tier "lugar secreto": 1-2 salas + 1 puzzle), **NÃO dungeons principais**. Consequências:
+  - As **13 dungeons de `mundo-topologia.md` §4 permanecem 13** (o Fibonacci-13 velado fica intacto).
+  - A **Zona do Silêncio mantém suas 2 dungeons** (#1 puzzle acústico / #2 mista); o **M2** é um **repositório leve** ao lado delas, não um 3º slot de dungeon.
+  - A **Montadora Confluência** continua "lore/quest, não-dungeon" no cômputo das 13, mas ganha **1 repositório leve visitável** (o M3), sem virar 14ª dungeon.
 - **O implante e o Gus (Pillar 3):** os membros da party usam o implante real; o **Gus faz reverse-engineering (RE) no hardware dos implantes da party e cria um app que EMULA a função do implante nos óculos dele.** (O Gus não põe implante; ele hackeia/emula, coerente com os óculos táticos + o triângulo de hardware.)
 
 ### 0.1. "Não existem tesouros; existem REPOSITÓRIOS PERDIDOS" (insight canônico, expandido 2026-07-14)
@@ -28,7 +32,11 @@
 Baús/tesouros clássicos não existem. Detalhamento canônico ([[project_repositorios_perdidos_canon]]):
 - **TODAS as dungeons SÃO repositórios perdidos / corrompidos** (as 13 de `mundo-topologia.md`).
 - **O loot nunca é dinheiro/joia.** É **peça de hardware**, **código compilável** (mais barato) ou **algoritmo** (mais caro), **gravado no SSD da party** até ser **vendido** (vira Crédito) ou **usado**.
-- **Quase tudo é pra vender.** Os **ÚNICOS itens usáveis pela party** são os **3 componentes do mini-mapa: o implante, a VRAM e a skill de marcadores**. Todo o resto (demais hardware/código/algoritmo) é ativo só-pra-vender.
+- **Dois pools distintos de drop (decisão do criador 2026-07-14, achado PS-R3):** não confundir os dois sistemas canônicos:
+  - **Pool A — loot de repositório/dungeon:** hardware/código/algoritmo grande, **só-pra-vender** (Pillar "faz-se dinheiro com trabalho"), exceto os 3 do mini-mapa. É o que este doc descreve.
+  - **Pool B — insumos de craft:** os **18 ingredientes** dropáveis de `economia.md` (§ craft F3-Alpha) que **entram em receita** e são **usáveis via compilação**. Não são "loot de repositório vendável"; são matéria-prima de craft.
+  - Regra prática: se um drop **entra numa receita**, é Pool B (craft); senão, é Pool A (vender). Os 3 do mini-mapa são a exceção nomeada do Pool A (usáveis, não vendáveis por padrão).
+- **Quase tudo do Pool A é pra vender.** Os **ÚNICOS itens do Pool A usáveis pela party** são os **3 componentes do mini-mapa: o implante, a VRAM e a skill de marcadores**. Todo o resto do Pool A (demais hardware/código/algoritmo) é ativo só-pra-vender.
 - **Vender/recomprar vale pra implantes E skills.**
 - **Axiologia econômica canon:** *"não se acha dinheiro, se faz dinheiro com esforço e trabalho duro"* — o jogador acha ATIVOS e os converte em Crédito por trabalho (explorar/decifrar/vender). Reforça [[project_axiologia_canonica]].
 
@@ -102,7 +110,7 @@ O **efeito PEM das dungeons** (que já bloqueia save, [[project_save_dungeon_pem
 
 Fios VISUAIS resolvidos 2026-07-14: mapa-TAB dois níveis (§1); mini-mapa de canto norte-fixo (§1); transição do glitch = de-glitch "compilar" ~0.5s (§3); ícones = glífos tech minimalistas (§4); persistência no save (§7.5).
 
-Fios das 3 MISSÕES resolvidos 2026-07-14: lotação (M1 Ferrovelhos / M2 Zona do Silêncio / M3 Montadora, §0) + coração de cada (§0.2). Resta: puzzle fino de cada, NPCs envolvidos, blocking; e a **reconciliação 13-vs-14 dungeons** (a Montadora virou repositório visitável, então o total de "dungeons" passa de 13; decidir se aceita 14 ou trata os repositórios de mini-mapa como categoria leve fora das 13 "principais" — o Fibonacci-13 era velado, nunca exposto ao jogador).
+Fios das 3 MISSÕES resolvidos 2026-07-14: lotação (M1 Ferrovelhos / M2 Zona do Silêncio / M3 Montadora, §0) + coração de cada (§0.2) + **reconciliação 13-vs-14 dungeons** (RESOLVIDA — missões do mini-mapa = repositórios leves fora das 13 principais, ver §0). Resta: puzzle fino de cada, NPCs envolvidos, blocking.
 
 Restam:
 - O **repositório perdido** + **loot** como mecânica geral (o que é, como se compila; tipos+valores de hardware; inventário de códigos/algoritmos: quantos, quais, nomes, efeitos).

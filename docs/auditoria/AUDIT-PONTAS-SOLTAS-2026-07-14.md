@@ -18,7 +18,13 @@
 
 **14 achados mecânicos RESOLVIDOS** (doc-fix puro, sem decisão): PS-R6, PS-R2, PS-Y3, PS-Y4, PS-Y5, PS-Y6, PS-Y7 (virou item `MINIMAPA-SAVE-SCHEMA`), PS-Y8, PS-Y12, PS-G1, PS-G3, PS-G4, PS-G5, PS-G7.
 
-**RESTAM (precisam de DECISÃO do criador):** 🔴 PS-R1, PS-R3, PS-R4, PS-R5, PS-R7, PS-R8 · 🟡 PS-Y1, PS-Y2, PS-Y9, PS-Y10, PS-Y11, PS-Y13 · 🟢 PS-G2 (commitar app/tools?), PS-G6 (Brunus botica, junto da canonização da abertura). Levados ao criador via AskUserQuestion.
+**RESTAM (precisam de DECISÃO do criador):** 🔴 PS-R8 · 🟡 PS-Y1, PS-Y2, PS-Y9, PS-Y10, PS-Y11, PS-Y13 · 🟢 PS-G2 (commitar app/tools?), PS-G6 (Brunus botica, junto da canonização da abertura). Levados ao criador via AskUserQuestion.
+
+**DECIDIDOS pelo criador (AskUserQuestion, 2026-07-14) e APLICADOS:**
+- **PS-R1 → família `Universal`.** Valor novo no enum `CardFamily` (combat.md §17): fora da roda de fraqueza, multFraqueza=1.0, pras ~13 não-elementais. Aplicado em `combat.md` §17 + `cartas-technomagik.md` §2.3.
+- **PS-R3 → dois pools distintos.** Pool A (loot de repositório, sell-only, exceto os 3 do mini-mapa) vs Pool B (18 insumos de craft de `economia.md`, usáveis em receita). Aplicado em `mini-mapa.md` §0.1.
+- **PS-R4 + PS-R5 → missões do mini-mapa = repositórios LEVES.** Tier "lugar secreto", fora do cômputo das 13; Zona do Silêncio mantém 2 dungeons; Montadora ganha 1 repositório leve sem virar 14ª. As 13 dungeons ficam intactas. Aplicado em `mini-mapa.md` §0 + `mundo-topologia.md` §4.
+- **PS-R7 → beat da reversão condicionado ao Bento recrutado.** Dispara na 1ª oportunidade após o Bento juntar (não em % fixo); preserva ordem livre + a lição do tanker. Aplicado em `vozes-party.md` (arco de falibilidade, beat 5).
 
 ---
 

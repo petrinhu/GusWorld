@@ -52,7 +52,7 @@ Nota: os **Dutos** são "enxuta" de população mas já **densos de enredo** (mi
 | Orla Recursiva | 1 | anomalia de fronteira |
 | Selve Sombria | 1 | entrada da floresta |
 | Catedrais Neo-Sylvania | 2 | várias catedrais |
-| Montadora Confluência | 0 | lugar de lore/quest, não-dungeon |
+| Montadora Confluência | 0 | lugar de lore/quest, não-dungeon (+1 **repositório leve** do mini-mapa M3, fora do cômputo das 13 — ver `mini-mapa.md` §0) |
 | Selve Profunda | 1 | a dungeon final |
 | Área faraday especial | 1 | ela mesma é a dungeon-segredo |
 | **Total** | **13** | Fibonacci velado no agregado |

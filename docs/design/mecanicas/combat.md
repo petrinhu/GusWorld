@@ -730,7 +730,11 @@ Subconjunto mínimo implementável via TDD. Tudo abaixo é entregável no slice;
 ```csharp
 // Imutáveis. Tipos ilustrativos; nomes finais conforme convenção do projeto.
 
-public enum CardFamily { Eletrico, Bioquimico, Sonico, Cinetico, Criptografico }
+public enum CardFamily { Eletrico, Bioquimico, Sonico, Cinetico, Criptografico, Universal }
+// Universal (decisão do criador 2026-07-14, achado PS-R1): família das cartas que NÃO
+// competem na roda de fraqueza (multFraqueza SEMPRE 1.0). Cobre as ~13 cartas ESPECIAIS
+// não-elementais dos mestres (matemáticos/computação/economistas/ocultistas) + o
+// "utilitário" já usado em §9 (Shield/Regen/Haste/Slow). NÃO tem Fraco/Resistente/Imune.
 public enum CardBaseType { Pulso, Raiz, Eco, Fenda, Glifo }
 public enum TargetShape { Self, Single, Linha, Area3x3, Grupo }
 public enum CardModifier { Object, Stream, Null }
