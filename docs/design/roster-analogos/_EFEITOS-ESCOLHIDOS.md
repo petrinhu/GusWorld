@@ -80,26 +80,26 @@ Estilo: curto, techno-científico, evoca o feito real (modelo do criador: Einste
 
 **20/20 NOMES ESCOLHIDOS.** (Nome completo da carta = `cardExec-[figura]`; o nome do efeito/poder é a alcunha acima, ex.: `cardExec-Einstein` = "Time-Dilate".)
 
-## Frases pedagógicas (CARTAS-FRASES-PEDAGOGICAS) — RASCUNHO 2026-07-13
+## Frases pedagógicas (CARTAS-FRASES-PEDAGOGICAS) — 20/20 REVISADAS pelo criador 2026-07-13
 
-A linha didática que cada carta mostra ao ser usada (desperta curiosidade sobre a figura/lei + ajuda a entender o nome do efeito). Rascunho do orquestrador; polimento final = `narrative-writer`. Zero em-dash (texto user-facing).
+A linha didática que cada carta mostra ao ser usada (desperta curiosidade sobre a figura/lei + ajuda a entender o nome do efeito). Tom aprovado pelo criador (revisão frase-a-frase); **polimento final de prosa = `narrative-writer`** no handoff dos diálogos de encontro. Zero em-dash (texto user-facing).
 
 | Efeito | Frase |
 |---|---|
-| **EM-Shield** (Faraday) | "Uma gaiola de metal bloqueia o pulso: dentro dela, nenhum sinal entra nem sai. Faraday provou isso em 1836." |
+| **EM-Shield** (Faraday) | "Dentro de uma gaiola de metal, nenhum pulso entra nem sai. Faraday provou em 1836: você está blindado." |
 | **Spectra-Wave** (Maxwell) | "Maxwell mostrou que luz, eletricidade e magnetismo são a MESMA onda. Por isso a luz também ataca." |
-| **Coil-Arc** (Tesla) | "A corrente de Tesla salta pelo ar e perde força a cada salto, como um eco que vai sumindo." |
+| **Coil-Arc** (Tesla) | "O arco de Tesla salta de inimigo em inimigo, mais fraco a cada salto. Ele sonhava em enviar energia sem fios." |
 | **Volt-Leech** (Volta) | "Você drenou energia, mas só parte virou mana e HP. O resto escapou como calor: nenhuma pilha é perfeita (2ª lei da termodinâmica)." |
-| **Time-Dilate** (Einstein) | "Para Einstein, o tempo não corre igual pra todos. Do seu ponto de vista, o relógio do inimigo ficou mais lento." |
+| **Time-Dilate** (Einstein) | "Einstein descobriu que o tempo é relativo. Do seu referencial, o inimigo passou a se mover em câmera lenta." |
 | **Force-Law** (Newton) | "Toda ação tem uma reação igual e oposta (Newton). O golpe que acerta você também volta pra quem o deu." |
 | **Quantum-Lock** (Planck) | "A energia não vem em qualquer quantidade, só em pacotes fixos. Planck descobriu isso, e por isso seu dano agora cai em degraus certos." |
 | **Fractal-Echo** (Mandelbrot) | "Um fractal repete a mesma forma cada vez menor, sem fim. Sua ação ecoou pela metade." |
-| **Bridge-Walk** (Euler) | "Euler perguntou se dava pra cruzar 7 pontes sem repetir nenhuma. Nasceu a teoria dos grafos, e o mapa que você acabou de ver." |
-| **Null-Proof** (Gödel) | "Gödel provou que todo sistema tem verdades que ele não consegue provar. Sua jogada é uma delas: a defesa inimiga não a enxerga." |
+| **Bridge-Walk** (Euler) | "As 7 pontes de Königsberg: dava pra cruzar todas sem repetir? Euler resolveu e criou a teoria dos grafos. Eis o seu mapa." |
+| **Null-Proof** (Gödel) | "Gödel mostrou que toda lógica tem verdades que ela mesma não alcança. A defesa do inimigo é uma lógica, e sua jogada está fora dela." |
 | **Re-Run** (Ada) | "Ada Lovelace escreveu o primeiro programa da história: uma sequência que se repete sozinha. Sua ação rodou de novo." |
 | **Decrypt-All** (Turing) | "A máquina de Turing resolve QUALQUER problema com o método certo. Nenhuma cifra resiste." |
 | **Fork** (von Neumann) | "von Neumann imaginou uma máquina que se copia sozinha. Sua jogada virou dado, e pôde ser lida outra vez." |
-| **Echo-Self** (Bruno) | "Bruno foi queimado por dizer que existem infinitos mundos. Em um deles vive outro você, e ele veio lutar ao seu lado." |
+| **Echo-Self** (Bruno) | "Giordano Bruno foi queimado por dizer que existem infinitos mundos. Em um deles vive outro você, e ele veio lutar ao seu lado." |
 | **Black-Mirror** (John Dee) | "John Dee consultava um espelho negro para ver o que ainda não tinha acontecido. Agora você vê o próximo golpe do inimigo." |
 | **Hypotenuse** (Pythagoras) | "a² + b² = c². Dois golpes viraram um só, maior: a hipotenusa do triângulo que eles formaram." |
 | **Free-Order** (Hayek) | "Hayek mostrou que a melhor ordem nasce sozinha, sem um chefe mandando. Sua party rendeu mais porque cada um fez algo diferente." |
