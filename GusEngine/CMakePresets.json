@@ -11,7 +11,8 @@
       "deps": "SDL3 + RmlUi + Catch2 entram via FetchContent (pin de tag no CMakeLists.txt); NAO ha mais Qt/aqtinstall. Cacheados em build/<preset>/_deps.",
       "sdlBuildDeps": "Compilar SDL3 do fonte exige libs -dev de X11/Wayland/GL (ver .forgejo/workflows/ci.yml). Local: dnf/apt instala libXcursor-devel/libXi-devel/libXtst-devel/etc.",
       "generator": "Gerador padrao: Ninja. Quem nao tem Ninja usa o preset linux-release-make (fallback Makefiles).",
-      "gitignore": "binaryDir fica em GusEngine/build/<preset> (inclui _deps); ja no .gitignore."
+      "gitignore": "binaryDir fica em GusEngine/build/<preset> (inclui _deps); ja no .gitignore.",
+      "windowsMingw": "WIN-CROSS-VALIDATE (2026-07-14): preset windows-mingw cross-compila Linux->Windows x86_64 via cmake/toolchains/mingw-w64.cmake. Requer pacotes g++-mingw-w64-x86-64-posix (Ubuntu) + FreeType cross-compilado from-source (Ubuntu NAO empacota freetype-mingw; RmlUi usa find_package(Freetype), nao FetchContent) instalado num prefixo apontado por WINDEPS_PREFIX ANTES do configure. Uso de HOJE = validacao pontual via GusEngine/tools/winbuild_container.sh, com -B explicito em /tmp do container (efemero); o binaryDir padrao deste preset (build/windows-mingw) e para uso FUTURO da CI (job windows-cross, rascunho comentado em .forgejo/workflows/ci.yml). Sem testPreset: o .exe cross-compilado nao roda no host Linux sem Wine (fora de escopo desta onda)."
     }
   },
   "configurePresets": [
@@ -89,6 +90,22 @@
         "lhs": "${hostSystemName}",
         "rhs": "Windows"
       }
+    },
+    {
+      "name": "windows-mingw",
+      "displayName": "Windows x86_64 (MinGW-w64 cross, Ninja)",
+      "description": "Cross-compile Linux -> Windows x86_64 via MinGW-w64 (WIN-CROSS-VALIDATE). Roda EM cima de um host Linux (condition hostSystemName=Linux, nao Windows - e a maquina que INVOCA o cross-compiler, nao o alvo). Exige toolchain mingw-w64-x86-64-posix + FreeType cross from-source (WINDEPS_PREFIX). Ver GusEngine/tools/winbuild_container.sh para o ambiente reprodutivel (container efemero, nada instalado no host).",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build/${presetName}",
+      "toolchainFile": "${sourceDir}/cmake/toolchains/mingw-w64.cmake",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release"
+      },
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Linux"
+      }
     }
   ],
   "buildPresets": [
@@ -106,6 +123,11 @@
       "name": "linux-release-make",
       "configurePreset": "linux-release-make",
       "displayName": "Build Linux Release (Makefiles)"
+    },
+    {
+      "name": "windows-mingw",
+      "configurePreset": "windows-mingw",
+      "displayName": "Build Windows x86_64 (MinGW-w64 cross)"
     }
   ],
   "testPresets": [

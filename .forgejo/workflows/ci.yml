@@ -227,3 +227,50 @@ jobs:
 #          cmake --build --preset windows-release
 #          ctest --preset windows-release
 # ---------------------------------------------------------------------------
+
+# ---------------------------------------------------------------------------
+# ESBOCO ADIADO (NAO HABILITAR): job windows-cross (MinGW-w64, cross-compile).
+# WIN-CROSS-VALIDATE (2026-07-14) provou MANUALMENTE (via
+# tools/winbuild_container.sh, rodado uma vez fora da CI) que o GusEngine
+# cross-compila Linux->Windows x86_64 com o par g++-mingw-w64-x86-64-posix +
+# FreeType cross-compilado from-source (Ubuntu NAO empacota freetype-mingw).
+# Este job replicaria essa mesma prova a cada push, SEM sujar runner (o build
+# inteiro roda dentro do container, self-hosted, efemero por natureza do CI).
+#
+# Diferenca do job "windows" (MSVC) acima: aquele exige um runner Windows de
+# verdade; este cross-compila de dentro de um runner LINUX (self-hosted local,
+# "claudio" - CI-POLICY-LOCAL-FIRST), sem precisar de maquina Windows nenhuma.
+# Produz um .exe que ainda NAO roda nesta CI (sem Wine/runner Windows pra
+# executar ctest --preset windows-mingw) - so PROVA que compila. Rodar o .exe
+# de verdade (Windows real ou Wine) fica pra uma onda futura (ver TODO.md).
+#
+# DECISAO ABERTA PRO LIDER (wire desta CI, nao decidida nesta onda):
+#   (a) imagem definitiva do job: ghcr.io/catthehacker/ubuntu:act-latest (a
+#       mesma usada na prova manual E no job "linux" acima - consistencia,
+#       mas builda FreeType from-source TODA vez, ~alguns minutos a mais por
+#       run) x fedora:42 (CI-POLICY-LOCAL-FIRST; Fedora empacota
+#       mingw64-freetype pronto via dnf, dispensaria o bloco
+#       git-clone+cmake+build do FreeType - mais rapido, mas diverge da imagem
+#       do resto do CI e exigiria ajustar o toolchain file pros nomes de
+#       pacote/paths do Fedora, ex. /usr/x86_64-w64-mingw32/sys-root/mingw em
+#       vez de /usr/x86_64-w64-mingw32).
+#   (b) gatilho: todo push (paridade com o job "linux") x so em PR pra
+#       main/release (CI-POLICY-LOCAL-FIRST: "CI pesado so em PR->main/release")
+#       x manual (workflow_dispatch, mais barato, roda so quando alguem pedir).
+#
+#  windows-cross:
+#    name: Windows x86_64 (MinGW-w64 cross-compile, sem execucao)
+#    runs-on: docker              # runner self-hosted local "claudio"
+#    container:
+#      image: ghcr.io/catthehacker/ubuntu:act-latest   # ou fedora:42, ver decisao acima
+#    timeout-minutes: 40
+#    steps:
+#      - uses: actions/checkout@v4
+#      - name: Cross-build Windows (MinGW-w64) via script reprodutivel
+#        run: bash tools/winbuild_container.sh
+#        # NOTA: o script acima abre o SEU PROPRIO `docker run --rm` (pensado
+#        # pra rodar fora da CI, num host qualquer). Dentro de um job que JA
+#        # esta rodando no container act-latest, o passo equivalente seria
+#        # inlinar o corpo do script diretamente (sem docker-in-docker) -
+#        # ajustar quando este job for habilitado de verdade.
+# ---------------------------------------------------------------------------
