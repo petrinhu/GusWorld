@@ -284,6 +284,19 @@ Prefixo **`cardExec-`** (camelCase, `card` + `exec`, reforça a metáfora "conju
 | ESPECIAL | `cardExec-[figura]`, nome real do mestre, NÃO traduzido | `cardExec-Tesla`, `cardExec-Einstein`, `cardExec-Gödel` |
 | SUPER | herda o nome in-world já canônico, sem prefixo `cardExec-` | "A Carta Perdida de Tusk" |
 
+#### 8.1.1 Três camadas de nome por carta — regra de convivência (decisão do criador 2026-07-14, achado PS-Y13)
+
+Cada carta ESPECIAL tem 3 nomes; a regra de qual serve pra quê:
+
+| Camada | Papel | i18n? | Exemplo |
+|---|---|---|---|
+| **Título** | Nome descritivo que o jogador lê na prosa dos mestres e na UI | **SIM — chave `tr()` desde o começo** (PT agora, traduzido pós-1.0, coerente com o i18n canônico) | "Dilatação Temporal" |
+| **Alcunha EN** | Codinome techno curto, mostrado como flavor de combate | **NÃO se traduz** — fica fixa em inglês em todo locale (tech é inglês universalmente; trata-se como nome próprio de produto/tech) | "Time-Dilate" |
+| **ID de código** | Identificador interno | **irrelevante à língua** (é só código) | `cardExec-einstein` |
+
+- O **título** é a única camada traduzível; a **alcunha EN** é constante entre idiomas (não vira chave de tradução); o **ID** nunca aparece ao jogador.
+- Consequência pros 20 diálogos de encontro (Tavus-Eco/Morlhin): o mestre nomeia o **título** (traduzível) e pode cravar a **alcunha EN** como o "nome de guerra" da carta; o `narrative-writer` segue esse molde pra as 20 cenas não divergirem.
+
 ### 8.2 Léxico Sylvarin dos efeitos comuns
 
 Cada efeito de carta COMUM (as 5 famílias + os conceitos utilitários relevantes) recebe uma palavra Sylvarin (raiz + sufixo, conforme `docs/narrative/lingua/02-lexico-semente.md`), usada no `Id` interno (`cardExec-[palavra]`):
@@ -322,6 +335,10 @@ O léxico Sylvarin completo (regras de derivação, tabela de mutação consonan
   - **Volta (regra de recurso) — RESOLVIDO** (efeito escolhido em `_EFEITOS-ESCOLHIDOS.md`, 2026-07-14 achado PS-Y4): o Volta virou **leech termodinâmico** (dreno que absorve energia do ALVO e devolve à party como mana+HP, só x% do absoluto drenado, o resto "perdido como calor", 2ª lei). NÃO fura o "sem carry-over" (é dreno do inimigo, não retenção de mana própria). O exemplo antigo "mana não-gasta vira Shield" está DESCARTADO. Falta só o x% (brainstorm VOLTA-LEECH-%).
   - **Gap Bioquímico:** nenhuma das 20 cai na família da Jaci (os mestres skewam pra info/lógica); aceito como honesto (a Jaci é servida pelo kit próprio + comuns DoT). Reavaliar só se o playtest pedir.
 - **Dados faltantes (bloqueiam número fino, não a forma):** Atk/SPD do Elite (Daemon-Guard) e demais inimigos (TBD combat.md §17); tag de inimigo "comando central" (efeito do Mises, trabalho de `gameplay_engineer`); como a "quantização" do Planck pluga na variância `v` de §11 (decisão de engenharia).
+- **Primitivas de engine que os efeitos escolhidos EXIGEM (achado PS-Y2, decisões do criador 2026-07-14):** os efeitos de `_EFEITOS-ESCOLHIDOS.md` pedem 3 primitivas ainda ausentes do motor; entram no backlog de `gameplay_engineer`:
+  - **Status `Reflect` (Newton):** devolver parte do dano recebido ao atacante. NÃO existe em `combat.md` §9. Adicionar como status novo (magnitude = % refletido, Duration curta).
+  - **Combo CROSS-ATOR (Pythagoras):** `√(a²+b²)` quando **2 aliados** batem no mesmo alvo no mesmo round. O pipeline de combos de `combat.md` §10 hoje só resolve combo de **1 ator**. Precisa de um combo que agregue os hits de atores diferentes no mesmo alvo/round.
+  - **Clone (von Neumann / Bruno) = entidade-Objeto, COM representação visual (decisão do criador 2026-07-14):** o clone **NÃO entra na fila de turnos** como 4º ator (o Party=3 fixo, §2, fica intacto); é uma **entidade-Objeto** que reusa o sistema de modificadores/invocação (dá hit extra, absorve golpe, etc.), mais barato pra dev solo. **PORÉM precisa aparecer visualmente** (ex.: um sprite-eco/fantasma translúcido num slot de batalha) pra o jogador PERCEBER que a mecânica está funcionando, mesmo sem turno próprio. O visual é obrigatório; a fila de turnos não muda.
 - **Sincronização do marcador de raridade visual do frame** (comum/rara/lendária) com os 3 tiers desta taxonomia (§2.5): depende de `CARTAS-BALANCEAMENTO`.
 - **Reconciliação da grafia "techMagic" → "TechnoMagik"** dentro de `techmagic.md` (já sinalizada naquele doc, item `TECHMAGIC-CANON`).
 - **Reconciliação da raiz Sylvarin de "Morenh"** (§8.2, nota) com o léxico-semente formal.

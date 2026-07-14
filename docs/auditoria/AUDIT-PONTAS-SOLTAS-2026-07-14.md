@@ -18,7 +18,7 @@
 
 **14 achados mecânicos RESOLVIDOS** (doc-fix puro, sem decisão): PS-R6, PS-R2, PS-Y3, PS-Y4, PS-Y5, PS-Y6, PS-Y7 (virou item `MINIMAPA-SAVE-SCHEMA`), PS-Y8, PS-Y12, PS-G1, PS-G3, PS-G4, PS-G5, PS-G7.
 
-**RESTAM (precisam de DECISÃO do criador):** 🟡 PS-Y2, PS-Y13 · 🟢 PS-G2 (commitar app/tools?), PS-G6 (Brunus botica, junto da canonização da abertura). Levados ao criador via AskUserQuestion.
+**RESTAM:** nenhum achado precisa mais de decisão. 🟢 PS-G6 (botica do Brunus no PLACES) fica DIFERIDO por natureza (entra quando a abertura for canonizada, já auto-flagged em `gus-abertura.md` §11). Todo o resto DECIDIDO+APLICADO (28/28 achados encaminhados).
 
 **DECIDIDOS pelo criador (AskUserQuestion, 2026-07-14) e APLICADOS:**
 - **PS-R1 → família `Universal`.** Valor novo no enum `CardFamily` (combat.md §17): fora da roda de fraqueza, multFraqueza=1.0, pras ~13 não-elementais. Aplicado em `combat.md` §17 + `cartas-technomagik.md` §2.3.
@@ -30,6 +30,10 @@
 - **PS-Y9 → VRAM na FILIAL da Montadora (distância média) + gate.** Adianta o conserto do fog (Médio+ não fica cego o jogo todo); fog segue binário. Para montar o chip: pagar CARO OU mini-missão de sucata, gate dado pelo gerente da filial. Aplicado em `mini-mapa.md` §0 + `mundo-topologia.md` §4. **Gera entidades novas (filial + gerente + mini-missão + custo) → INBOX.**
 - **PS-Y10 → M1 = lugar secreto do Ferrovelhos** (não a dungeon de batalha "reduto do Dante"). Decorre da decisão de repositórios leves. Aplicado em `mini-mapa.md` §0.
 - **PS-Y11 → mapa-TAB da área atual por dificuldade.** Fácil: liberado desde o início (tilemap cru). Médio+: zero mapa até M1. Aplicado em `mini-mapa.md` §0.
+- **PS-Y2 → clone = entidade-Objeto COM visual + 2 primitivas novas.** Clone (von Neumann/Bruno) não fura o Party=3 (é Objeto que reusa modificador), mas TEM representação visual obrigatória (sprite-eco) pro jogador ver funcionando. Reflect (Newton) e combo cross-ator (Pythagoras) viram backlog de `gameplay_engineer`. Aplicado em `cartas-technomagik.md` §9.
+- **PS-Y13 → 3 camadas de nome.** Título = chave `tr()` traduzível (PT agora); alcunha EN = fixa em inglês em todo locale (nome próprio techno, não traduz); ID = só código. Aplicado em `cartas-technomagik.md` §8.1.1.
+- **PS-Y10 → M1 = lugar secreto do Ferrovelhos.** (já listado acima.)
+- **PS-G2 → `GusEngine/app/tools/` commitado** como dev-tooling (entrou no commit 45f26d5). As probes citadas como prova agora existem no repo.
 
 ---
 
