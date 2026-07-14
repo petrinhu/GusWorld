@@ -139,13 +139,30 @@ std::string resolve_saves_dir() {
             return join(join(env, ".gusworld"), "saves");
         }
     }
+#ifdef _WIN32
+    // Windows: sem convencao de dotfile (%APPDATA% ja fica fora da vista do
+    // Explorer por padrao) - layout %APPDATA%\gusworld\saves. USERPROFILE e
+    // fallback quando APPDATA nao esta setado (raro, mas documentado pela MS).
+    if (const char* appdata = std::getenv("APPDATA")) {
+        if (appdata[0] != '\0') {
+            return join(join(appdata, "gusworld"), "saves");
+        }
+    }
+    if (const char* userprofile = std::getenv("USERPROFILE")) {
+        if (userprofile[0] != '\0') {
+            return join(join(userprofile, "gusworld"), "saves");
+        }
+    }
+#else
     if (const char* home = std::getenv("HOME")) {
         if (home[0] != '\0') {
             return join(join(home, ".gusworld"), "saves");
         }
     }
-    // Fallback defensivo (HOME ausente - ambiente atipico): diretorio relativo ao
-    // CWD. Nunca deveria acontecer num host real, mas nao lanca.
+#endif
+    // Fallback defensivo (HOME/APPDATA/USERPROFILE ausentes - ambiente atipico):
+    // diretorio relativo ao CWD. Nunca deveria acontecer num host real, mas nao
+    // lanca.
     return join(".gusworld", "saves");
 }
 
