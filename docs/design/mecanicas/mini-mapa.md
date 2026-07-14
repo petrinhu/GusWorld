@@ -14,17 +14,23 @@
 |---|---|---|---|---|
 | **1** | **O implante** (implante removível de visão) | o **mini-mapa em si** aparece | menor | menor |
 | **2** | Um **repositório perdido** (ver §0.1) com código compilável | a **skill de marcar pontos** no mapa (os marcadores/POIs) | média | média |
-| **3** | **VRAM extra** (chip minúsculo) | acaba o **OOM** da GPU que renderiza o mapa → **desliga o glitch/fog** de área distante | maior | maior |
+| **3** | **VRAM extra** (chip minúsculo, montado a partir do repositório) | acaba o **OOM** da GPU que renderiza o mapa → **desliga o glitch/fog** de área distante | **média** (filial da Montadora) | maior |
 
 - **Todas já destravadas (mundo aberto, gdd §7.1):** a ordem 1→2→3 tem distância+dificuldade crescentes, mas NÃO é obrigatório seguir a ordem.
-- **Lotação nos repositórios existentes (decisão do criador 2026-07-14):** as 3 são a recompensa especial de 3 das 13 dungeons/repositórios (reuso, barato):
-  - **M1 (implante) → Ferrovelhos** (T2): ferro-velho onde se cata hardware usado; um implante de visão salvado.
+- **Lotação nos repositórios existentes (decisão do criador 2026-07-14):** as 3 são a recompensa especial de 3 pontos do mapa (reuso, barato):
+  - **M1 (implante) → Ferrovelhos** (T2): ferro-velho onde se cata hardware usado; um implante de visão salvado. **É um LUGAR SECRETO do Ferrovelhos (puzzle de reparo + diálogo), NÃO a dungeon de batalha "reduto do Dante" (achado PS-Y10):** a dungeon principal do Ferrovelhos é só-batalhas; o M1 fica à parte, coerente com "repositório leve = lugar secreto".
   - **M2 (código dos marcadores) → Zona do Silêncio** (T3): zona morta/abandonada = repositório de código perdido, silencioso e corrompido.
-  - **M3 (VRAM) → Montadora Confluência** (T4): a fábrica de tech avançada do Tusk guarda o chip exótico de VRAM.
+  - **M3 (VRAM) → FILIAL da Montadora (decisão do criador 2026-07-14, achado PS-Y9):** NÃO na Montadora principal (Tier 4, quase-fim), mas numa **filial de distância MÉDIA** cuja função é **fabricar chips para a fábrica principal**. Assim o conserto do fog chega mais cedo (o Médio+ não navega o jogo todo com névoa). Para **montar o chip de VRAM**, a party precisa de UMA de duas vias (gate dado pelo **gerente da filial**):
+    - **(a) Pagar** pela fabricação: **CARO** para o momento do jogo (valor exato = economy-designer; ver `LOOT-REPOSITORIOS` / TODO), OU
+    - **(b) Mini-missão de sucata:** buscar **materiais de sucata com sobra** que justifiquem o gasto da empresa (a filial fabrica de graça se a party traz o insumo excedente). Casa com o Pillar econômico ("faz-se dinheiro/valor com trabalho").
 - **Reconciliação 13-vs-14 dungeons — RESOLVIDA (decisão do criador 2026-07-14, achados PS-R4+PS-R5):** as 3 missões do mini-mapa são **repositórios LEVES** (tier "lugar secreto": 1-2 salas + 1 puzzle), **NÃO dungeons principais**. Consequências:
   - As **13 dungeons de `mundo-topologia.md` §4 permanecem 13** (o Fibonacci-13 velado fica intacto).
   - A **Zona do Silêncio mantém suas 2 dungeons** (#1 puzzle acústico / #2 mista); o **M2** é um **repositório leve** ao lado delas, não um 3º slot de dungeon.
-  - A **Montadora Confluência** continua "lore/quest, não-dungeon" no cômputo das 13, mas ganha **1 repositório leve visitável** (o M3), sem virar 14ª dungeon.
+  - A **filial da Montadora** ganha **1 repositório leve visitável** (o M3), sem virar 14ª dungeon; a **Montadora principal** segue "lore/quest, não-dungeon" (encontro do Tusk, endgame).
+- **Fog por marco NÃO — a VRAM segue sendo o conserto de vez (PS-Y9):** o criador escolheu ADIANTAR a VRAM (filial média) em vez de fatiar o raio da névoa por marco. O fog continua binário (liga/desliga), só que a chave chega mais cedo.
+- **Mapa-TAB da ÁREA ATUAL por dificuldade (decisão do criador 2026-07-14, achado PS-Y11):**
+  - **Fácil:** o mapa-TAB da área ONDE o jogador está fica **liberado desde o início** (só o tilemap cru, sem marcadores, sem mundo-múndi). Resolve a janela inicial sem navegação.
+  - **Médio+ (Médio/Difícil/Hardcore):** **zero mapa até achar o implante (M1)** — a conquista diegética vale integral. Consistente com o resto da escala de dificuldade (ex.: névoa só no Médio+).
 - **O implante e o Gus (Pillar 3):** os membros da party usam o implante real; o **Gus faz reverse-engineering (RE) no hardware dos implantes da party e cria um app que EMULA a função do implante nos óculos dele.** (O Gus não põe implante; ele hackeia/emula, coerente com os óculos táticos + o triângulo de hardware.)
 
 ### 0.1. "Não existem tesouros; existem REPOSITÓRIOS PERDIDOS" (insight canônico, expandido 2026-07-14)
