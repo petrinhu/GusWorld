@@ -24,7 +24,7 @@
 Baús/tesouros clássicos não existem. Detalhamento canônico ([[project_repositorios_perdidos_canon]]):
 - **TODAS as dungeons SÃO repositórios perdidos / corrompidos** (as 13 de `mundo-topologia.md`).
 - **O loot nunca é dinheiro/joia.** É **peça de hardware**, **código compilável** (mais barato) ou **algoritmo** (mais caro), **gravado no SSD da party** até ser **vendido** (vira Crédito) ou **usado**.
-- **Quase tudo é pra vender**; o **único realmente usável pela party** (até agora) é o **código da skill de marcadores** (missão 2). Os demais = ativos vendáveis, não skills.
+- **Quase tudo é pra vender.** Os **ÚNICOS itens usáveis pela party** são os **3 componentes do mini-mapa: o implante, a VRAM e a skill de marcadores**. Todo o resto (demais hardware/código/algoritmo) é ativo só-pra-vender.
 - **Vender/recomprar vale pra implantes E skills.**
 - **Axiologia econômica canon:** *"não se acha dinheiro, se faz dinheiro com esforço e trabalho duro"* — o jogador acha ATIVOS e os converte em Crédito por trabalho (explorar/decifrar/vender). Reforça [[project_axiologia_canonica]].
 
