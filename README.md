@@ -124,6 +124,16 @@ Or scan the QR code with your phone's camera:
 
 ## Credits and acknowledgments
 
+This game exists because of many people. First, **the people**:
+
+- **Gus Dragon (my son):** inspiration for the protagonist, in looks and tastes. My partner in game decisions and my lead tester.
+- **El Iagows (my brother):** inspiration for Yakov. A computer engineer who gave me plenty of architecture and stack advice and guided me on using SDL and spritesheets for movement. Author of one of the best dice-rolling libraries (800+ downloads): [@iagows/3d-dice-ts on npm](https://www.npmjs.com/package/@iagows/3d-dice-ts) ([code on GitLab](https://gitlab.com/iagows/3d-dice-ts)).
+- **Od Fuinha Minduim, Thiago MadDog and Thiago Arcanjo:** first-class IT professionals who gave countless tips on testing, architecture, QA, security, CI and RAG, and got me studying.
+- **The #metaleiros-PE crew** (now on WhatsApp, a friendship going back to mIRC since ~1997): for the lasting camaraderie.
+- **Bruno Vettore:** suggested creating a language for the game, in a conversation about Tolkien and nosy, inconvenient reporters, after seeing my prototypes. Sylvarin was born from that. He also inspired the character **Brunus "Vetorial" Solveckt**, the itinerant apothecary-physician who mentors Gus.
+
+And the **technical credits and tools**:
+
 - **Creative direction, code, art and writing:** petrinhu (2026).
 - **Engine foundation:** SDL3 (zlib) + glintfx (MPL-2.0, UI/HUD engine wrapping RmlUi 6.3 MIT + GL3 backend) + miniaudio (Public Domain / MIT-0) at the platform layer.
 - **Vendored C++ libraries:** header-only libraries under permissive licenses, listed with full attribution in [THIRD-PARTY-LICENSES.md](THIRD-PARTY-LICENSES.md).
@@ -260,6 +270,16 @@ Ou aponte a câmera do celular no QR Code:
 **Lore e arte (assets):** [CC-BY-SA-4.0](ASSETS-LICENSE.md), exceto os livros Vol. 1 / Vol. 2 (direitos reservados, obra à parte). Atribuições completas de terceiros em [THIRD-PARTY-LICENSES.md](THIRD-PARTY-LICENSES.md).
 
 ### Créditos e agradecimentos
+
+Este jogo existe por causa de muita gente. Primeiro, **as pessoas**:
+
+- **Gus Dragon (meu filho):** inspiração do protagonista, na aparência e nos gostos. Parceiro nas decisões sobre o jogo e meu tester principal.
+- **El Iagows (meu irmão):** inspiração do Yakov. Engenheiro de computação que me deu várias dicas de arquitetura e stack, e me orientou no uso de SDL e de spritesheets para o movimento. Criador de uma das melhores libs de rolagem de dados (800+ downloads): [@iagows/3d-dice-ts no npm](https://www.npmjs.com/package/@iagows/3d-dice-ts) ([código no GitLab](https://gitlab.com/iagows/3d-dice-ts)).
+- **Od Fuinha Minduim, Thiago MadDog e Thiago Arcanjo:** profissionais de primeira classe em TI, que deram inúmeras dicas de testes, arquitetura, QA, segurança, CI e RAG, e me puseram para estudar.
+- **A galera do grupo #metaleiros-PE** (hoje no WhatsApp, uma amizade que vem do mIRC desde ~1997): pela parceria de sempre.
+- **Bruno Vettore:** deu a sugestão de criar uma língua para o jogo, numa conversa sobre Tolkien e repórteres intrometidos e inconvenientes, ao ver meus protótipos. O Sylvarin nasceu daí. Também inspirou o personagem **Brunus "Vetorial" Solveckt**, o boticário-médico itinerante mentor do Gus.
+
+E os **créditos técnicos e ferramentas**:
 
 - **Direção criativa, código, arte e roteiro:** petrinhu (2026).
 - **Base da engine:** SDL3 (zlib) + glintfx (MPL-2.0, motor de UI/HUD que embrulha RmlUi 6.3 MIT + backend GL3) + miniaudio (Domínio Público / MIT-0) na camada de plataforma.
