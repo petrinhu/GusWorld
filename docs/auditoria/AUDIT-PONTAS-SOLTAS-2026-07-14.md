@@ -12,7 +12,7 @@
 | 🔴 Vermelho | 8 | Contradições ativas entre docs canônicos + dependências que travam gameplay/implementação |
 | 🟡 Amarelo | 13 | Docs desatualizados pós-decisão, primitivas de engine não rastreadas, atrito de UX/timing |
 | 🟢 Verde | 7 | Cosmético / doc incompleto sem risco de propagação |
-| (anteriores) | 6 | Resíduos de auditorias passadas ainda abertos (já rastreados no board) |
+| (anteriores) | 6 | Resíduos de auditorias passadas — 4 abertos + 2 resolvidos e reverificados adversarialmente em 2026-07-14 (já rastreados no board) |
 
 ## Passada de sync (2026-07-14, commit `1d0acb4`)
 
@@ -101,8 +101,8 @@
 
 ## Resíduos de AUDITORIAS ANTERIORES ainda abertos (já rastreados no board)
 
-- **AUD-MINIAUDIO-ALSA-LEAK** (PI10) — leak pré-existente em `ma_context_open_pcm__alsa`; bloqueia AC-E2 (incluir `platform/` no job ASan). Aberto, precisa item próprio.
-- **AUD-MINIAUDIO-UAF** — patch entregue (`317a2e9`), 🔍 aguarda verificação final.
+- **AUD-MINIAUDIO-ALSA-LEAK** (PI10, item no board em `TODO.md`:422) — ✅ RESOLVIDO. Suppression `tools/lsan.supp` (commit `fd37b14`) fecha o leak pré-existente em `ma_context_open_pcm__alsa`; AC-E2 (incluir `platform/` no job ASan) fechado em `e53a35a` (job `asan` verde ponta-a-ponta core+domain+platform+app). **Reverificado adversarialmente em 2026-07-14** (qa-engineer, reviewer≠implementer, mutation testing re-executado — não releitura de diff): PASS nas 4 pernas — eficácia (suíte exit 0 com suppression ativa, 36 allocs/34718 bytes suprimidos), necessidade (suppression removida → exit 1, leak de 34718 bytes/36 allocs em `ma_context_open_pcm__alsa`, batendo com o achado original), estreiteza (leak real injetado de 400 bytes AINDA acusado pelo LSan com a suppression ativa — prova que ela não mascara leak nosso), wiring (`.forgejo/workflows/ci.yml` job `asan` referencia `tools/lsan.supp`, que contém só a linha estreita `leak:ma_context_open_pcm__alsa`, sem wildcard). Entrada anterior deste dossiê ("aberto, precisa item próprio") estava desatualizada — o item já existia no board e já tinha sido corrigido antes desta passada de sync.
+- **AUD-MINIAUDIO-UAF** (fix `317a2e9`) — ✅ verificado. **Reverificado adversarialmente em 2026-07-14** (qa-engineer, reviewer≠implementer, mutation testing re-executado): baseline da suíte `platform` exit 0 (510 assertions/159 casos); reverse-apply do fix (`git apply -R` em `miniaudio.h`) faz o ASan abortar com `heap-use-after-free` em `miniaudio.h:70926` (freed em `:70918`), trilha via `AudioEngine::load_sfx("nao/existe.wav")`; fix restaurado → exit 0 idêntico ao baseline, working tree limpo ao fim. Entrada anterior ("🔍 aguarda verificação final") superada por este resultado.
 - **Build Windows nunca validado** — gate antes do M8 (dívida crescente; CUT.11 = Linux-only no ship v1).
 - **F5-BK.AUDIT** — verificação textual profunda do canon (pré-tradução), pendente e grande (~88 sessões; "fadiga era-2", tique degradado 156×).
 - **TODO-PARSER-BUG** — infra do harness (`~/.claude/githooks/`), fora do produto.
