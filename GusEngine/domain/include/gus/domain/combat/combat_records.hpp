@@ -44,6 +44,20 @@ struct StatusEffect {
     [[nodiscard]] bool operator==(const StatusEffect&) const = default;
 };
 
+// Instrucao declarativa do executor techMagic (ADR-016): a carta e um programa (lista
+// ordenada de EffectSpec) que o Tavus-Drive executa. Params tunaveis; significado por-kind.
+struct EffectSpec {
+    TriggerHook trigger = TriggerHook::OnCast;
+    EffectKind kind = EffectKind::ApplyStatus;
+    int magnitude = 0;
+    int percent = 0;
+    int duration = 0;
+    StatusId status = StatusId::Stun;
+    StackRule stack_rule = StackRule::Replace;
+
+    [[nodiscard]] bool operator==(const EffectSpec&) const = default;
+};
+
 // Carta-base imutavel (modelo B). Modificadores anexados em runtime via modifiers. secao 7.
 struct Card {
     std::string id;
@@ -61,6 +75,15 @@ struct Card {
     int mastery = 0;  // cresce por uso (Pillar 1)
     // 0..100, porcentagem de crit; 0 = sem crit (secao 7/11). Default 0.
     int crit_chance = 0;
+
+    // ---- Executor techMagic (ADR-016, MVP step 1): record-only, sem mudanca de
+    // comportamento no resolvedor neste step. Defaults preservam as 5 comuns intocadas
+    // (tier Comum, effects vazio).
+    CardTier tier = CardTier::Comum;
+    CardCategory category = CardCategory::Ativa;  // semantica so p/ tier != Comum
+    std::vector<EffectSpec> effects;               // vazio nas COMUNS (intocadas)
+    bool ignores_weakness_wheel = false;  // trunfo fora-da-roda (Godel); resolvedor liga depois
+    bool is_universal_compiler = false;   // flag de trunfo ADR-016; record-only neste step
 
     [[nodiscard]] bool operator==(const Card&) const = default;
 };

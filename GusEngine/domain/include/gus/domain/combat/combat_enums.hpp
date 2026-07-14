@@ -88,6 +88,8 @@ enum class StackRule : std::uint32_t {
 };
 
 // Identidade de status aplicavel a qualquer ator. secao 9.
+// APPEND-ONLY a partir daqui: 13+ sao do executor techMagic (ADR-016); NAO reordenar
+// 0..12 (contrato binario do serializer futuro).
 enum class StatusId : std::uint32_t {
     Stun = 0,
     Poison = 1,
@@ -102,6 +104,12 @@ enum class StatusId : std::uint32_t {
     Regen = 10,
     Haste = 11,
     Slow = 12,
+    SobrecargaTermica = 13,  // cartas-technomagik.md secao 5.1: DoT 3t 8/5/2 + Slow -1
+                             // SPD; Refresh; familia Eletrico.
+    Resfriamento = 14,       // secao 5.2: +1 SPD + (-1 mana na 1a carta, clamp custo min
+                             // 1); Dur 3; Refresh; buff.
+    Reflect = 15,            // marcador de reflexao (Newton); comportamento = executor
+                             // techMagic (step 2+).
 };
 
 // Tier de fraqueza da roda deterministica. secao 6.
@@ -159,6 +167,48 @@ enum class StatusChangeKind : std::uint32_t {
     Applied = 0,
     Expired = 1,
     Absorbed = 2,
+};
+
+// ---- Executor techMagic (ADR-016, MVP step 1) -------------------------------------
+// Enums novos do motor techMagic: a carta especial/super e um programa (lista ordenada
+// de EffectSpec, ver combat_records.hpp) que o Tavus-Drive executa. Record-only neste
+// step (nenhuma logica de resolucao ainda). APPEND-ONLY dali em diante (contrato
+// binario do serializer futuro).
+
+// Raridade/trilha de producao da carta. secao 6/7. Comum = as 5 do placeholder_cards
+// (intocadas); Especial/Super = trilha do executor techMagic.
+enum class CardTier : std::uint32_t {
+    Comum = 0,
+    Especial = 1,
+    Super = 2,
+};
+
+// Categoria de uso da carta; semantica so aplica quando tier != Comum.
+enum class CardCategory : std::uint32_t {
+    Ativa = 0,
+    Passiva = 1,
+    ForaDeCombate = 2,
+    Hibrida = 3,
+};
+
+// Gatilho de execucao de um EffectSpec dentro do programa da carta.
+enum class TriggerHook : std::uint32_t {
+    OnCast = 0,
+    OnDamageDealt = 1,
+    OnDamageReceived = 2,
+    OnAllyTurnEnd = 3,
+    OnRoundEnd = 4,
+    Always = 5,
+};
+
+// Tipo de efeito executavel por um EffectSpec. Conjunto inicial do MVP; cresce por
+// demanda (ate ~20-25) conforme as 20 especiais forem definidas. APPEND-ONLY.
+enum class EffectKind : std::uint32_t {
+    ApplyStatus = 0,
+    Leech = 1,
+    Reflect = 2,
+    HypotenuseCombo = 3,
+    CloneAlly = 4,
 };
 
 }  // namespace gus::domain::combat

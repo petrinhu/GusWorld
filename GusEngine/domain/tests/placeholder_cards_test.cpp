@@ -94,3 +94,16 @@ TEST_CASE("placeholder_cards: mesma instancia imutavel em toda chamada",
           "[domain][combat][cards]") {
     REQUIRE(&PlaceholderCards::all() == &PlaceholderCards::all());
 }
+
+// ---- Executor techMagic (ADR-016, MVP step 1): as 5 comuns ficam intocadas --------
+// placeholder_cards.cpp NAO foi editado; os campos novos do Card (tier/effects) vem so
+// do default member initializer do struct. Guarda de nao-regressao.
+
+TEST_CASE("placeholder_cards: as 5 comuns tem tier Comum e effects vazio (intocadas)",
+          "[domain][combat][cards][techmagic]") {
+    for (const auto& [id, card] : PlaceholderCards::all()) {
+        INFO("carta: " << id);
+        REQUIRE(card.tier == CardTier::Comum);
+        REQUIRE(card.effects.empty());
+    }
+}

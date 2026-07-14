@@ -180,3 +180,59 @@ TEST_CASE("combat_enums: StatusChangeKind ordinais", "[domain][combat][enums]") 
     REQUIRE(ord(StatusChangeKind::Expired) == 1u);
     REQUIRE(ord(StatusChangeKind::Absorbed) == 2u);
 }
+
+// ---- Executor techMagic (ADR-016, MVP step 1) -------------------------------------
+
+TEST_CASE("combat_enums: StatusId 0..12 intocados (guarda anti-reordenacao)",
+          "[domain][combat][enums][techmagic]") {
+    REQUIRE(ord(StatusId::Stun) == 0u);
+    REQUIRE(ord(StatusId::Poison) == 1u);
+    REQUIRE(ord(StatusId::Corrode) == 2u);
+    REQUIRE(ord(StatusId::Disrupt) == 3u);
+    REQUIRE(ord(StatusId::Silence) == 4u);
+    REQUIRE(ord(StatusId::Knockback) == 5u);
+    REQUIRE(ord(StatusId::Break) == 6u);
+    REQUIRE(ord(StatusId::Expose) == 7u);
+    REQUIRE(ord(StatusId::Decrypt) == 8u);
+    REQUIRE(ord(StatusId::Shield) == 9u);
+    REQUIRE(ord(StatusId::Regen) == 10u);
+    REQUIRE(ord(StatusId::Haste) == 11u);
+    REQUIRE(ord(StatusId::Slow) == 12u);
+}
+
+TEST_CASE("combat_enums: StatusId novos do executor techMagic (append-only 13..15)",
+          "[domain][combat][enums][techmagic]") {
+    REQUIRE(ord(StatusId::SobrecargaTermica) == 13u);
+    REQUIRE(ord(StatusId::Resfriamento) == 14u);
+    REQUIRE(ord(StatusId::Reflect) == 15u);
+}
+
+TEST_CASE("combat_enums: CardTier ordinais", "[domain][combat][enums][techmagic]") {
+    REQUIRE(ord(CardTier::Comum) == 0u);
+    REQUIRE(ord(CardTier::Especial) == 1u);
+    REQUIRE(ord(CardTier::Super) == 2u);
+}
+
+TEST_CASE("combat_enums: CardCategory ordinais", "[domain][combat][enums][techmagic]") {
+    REQUIRE(ord(CardCategory::Ativa) == 0u);
+    REQUIRE(ord(CardCategory::Passiva) == 1u);
+    REQUIRE(ord(CardCategory::ForaDeCombate) == 2u);
+    REQUIRE(ord(CardCategory::Hibrida) == 3u);
+}
+
+TEST_CASE("combat_enums: TriggerHook ordinais", "[domain][combat][enums][techmagic]") {
+    REQUIRE(ord(TriggerHook::OnCast) == 0u);
+    REQUIRE(ord(TriggerHook::OnDamageDealt) == 1u);
+    REQUIRE(ord(TriggerHook::OnDamageReceived) == 2u);
+    REQUIRE(ord(TriggerHook::OnAllyTurnEnd) == 3u);
+    REQUIRE(ord(TriggerHook::OnRoundEnd) == 4u);
+    REQUIRE(ord(TriggerHook::Always) == 5u);
+}
+
+TEST_CASE("combat_enums: EffectKind ordinais", "[domain][combat][enums][techmagic]") {
+    REQUIRE(ord(EffectKind::ApplyStatus) == 0u);
+    REQUIRE(ord(EffectKind::Leech) == 1u);
+    REQUIRE(ord(EffectKind::Reflect) == 2u);
+    REQUIRE(ord(EffectKind::HypotenuseCombo) == 3u);
+    REQUIRE(ord(EffectKind::CloneAlly) == 4u);
+}

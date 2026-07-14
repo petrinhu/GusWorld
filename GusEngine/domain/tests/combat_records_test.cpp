@@ -237,3 +237,61 @@ TEST_CASE("combat_records: CombatResult default e Ongoing, log vazio, 0 rounds",
     REQUIRE(r.log.empty());
     REQUIRE(r.rounds_elapsed == 0);
 }
+
+// ---- Executor techMagic (ADR-016, MVP step 1): defaults do Card + EffectSpec ------
+
+TEST_CASE("combat_records: Card default tier/category/effects/flags do executor techMagic",
+          "[domain][combat][records][techmagic]") {
+    const Card c{};
+    REQUIRE(c.tier == CardTier::Comum);
+    REQUIRE(c.category == CardCategory::Ativa);
+    REQUIRE(c.effects.empty());
+    REQUIRE(c.ignores_weakness_wheel == false);
+    REQUIRE(c.is_universal_compiler == false);
+}
+
+TEST_CASE("combat_records: EffectSpec e value record (igualdade por valor)",
+          "[domain][combat][records][techmagic]") {
+    const EffectSpec e1{
+        /*trigger=*/TriggerHook::OnDamageDealt,
+        /*kind=*/EffectKind::Leech,
+        /*magnitude=*/5,
+        /*percent=*/30,
+        /*duration=*/3,
+        /*status=*/StatusId::Poison,
+        /*stack_rule=*/StackRule::StackMagnitude};
+
+    EffectSpec e2 = e1;
+    REQUIRE(e1 == e2);
+
+    EffectSpec e3 = e1;
+    e3.magnitude = 6;  // 1 campo difere
+    REQUIRE(e1 != e3);
+}
+
+TEST_CASE("combat_records: EffectSpec default e OnCast/ApplyStatus com params zerados",
+          "[domain][combat][records][techmagic]") {
+    const EffectSpec e{};
+    REQUIRE(e.trigger == TriggerHook::OnCast);
+    REQUIRE(e.kind == EffectKind::ApplyStatus);
+    REQUIRE(e.magnitude == 0);
+    REQUIRE(e.percent == 0);
+    REQUIRE(e.duration == 0);
+    REQUIRE(e.status == StatusId::Stun);
+    REQUIRE(e.stack_rule == StackRule::Replace);
+}
+
+TEST_CASE("combat_records: StatusEffect aceita os 3 StatusId novos do techMagic",
+          "[domain][combat][records][techmagic]") {
+    const StatusEffect s1{StatusId::SobrecargaTermica, 8, 3, StackRule::Refresh,
+                           CardFamily::Eletrico};
+    REQUIRE(s1.id == StatusId::SobrecargaTermica);
+
+    const StatusEffect s2{StatusId::Resfriamento, 1, 3, StackRule::Refresh,
+                           CardFamily::Universal};
+    REQUIRE(s2.id == StatusId::Resfriamento);
+
+    const StatusEffect s3{StatusId::Reflect, 0, 0, StackRule::Replace,
+                           CardFamily::Criptografico};
+    REQUIRE(s3.id == StatusId::Reflect);
+}
