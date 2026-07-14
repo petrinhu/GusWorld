@@ -48,6 +48,18 @@ Três tiers de carta, com identidade mecânica e narrativa distinta. Nenhum tier
 - **"Compilar" = anexar o modificador no cast.** A compilação acontece em runtime, no momento de jogar a carta (combat.md §7: "modificadores são anexados em runtime, não pré-bakeados na carta"). Não existe uma segunda etapa de craft fora disso: **a compilação-no-cast É o único "craft" que existe no jogo.** Isso é consistente com o anti-pillar do gdd.md ("crafting de cartas: cartas são obtidas, não craftadas"): o jogador nunca monta uma carta nova numa bancada; ele obtém a carta pronta e, ao jogá-la em combate, o Tavus-Drive resolve a compilação do modificador.
 - **Obtenção:** exclusivamente por progresso narrativo (missão, beat de capítulo, recompensa de arco de companion). Nunca craftada, nunca comprada em loja. Reforça Pillar 2 (o deck é curado, não gerado) e o teto de 40-60 cartas totais do jogo (pillars.md, anti-pillar "não é Magic: The Gathering completo").
 - **Naming:** `cardExec-[efeito em Sylvarin]` (ver §8).
+- **Baseline numérica (framework fechado pelo criador 2026-07-12, via economy-designer; ancorada em Trash 55 HP / Def 8, Atk médio de companion ~10, fórmula combat.md §11, TTK-alvo trash 3-5 turnos):**
+
+  | Arquétipo | ManaCost | Power / Magnitude | Nota |
+  |---|---|---|---|
+  | Dano single-target barato | 1 | Power **3** | ~5 hits neutros pra matar Trash (teto do range) |
+  | Dano single-target médio | 2 | Power **5** | ~4 hits neutros |
+  | Dano single-target forte | 3 | Power **8** | 4 neutros / **3 explorando fraqueza** (chão do range) |
+  | DoT (Bioquímico, achatado) | 2 | Magnitude **5**/tick × 3 = 15 total | comparável ao médio, pago em paciência |
+  | Control (Stun/Disrupt/Break/Knockback) | 2-3 | Stun=pula turno; Disrupt=-30/50% Power; Break/Corrode=-3 Def | 0 dano direto, trade tático |
+  | Buff/Utilitário (Shield/Regen/Haste) | 1-2 | Shield=Def do lançador; Regen=**3**/turno; Haste=+1 SPD | reusa mecanismo existente |
+
+  O range TTK 3-5 emerge sozinho variando tier × fraqueza (nada forçado). Os Powers 3/5/8 caem na sequência de Fibonacci (mesmo easter egg velado do HP 34/55/89/144). Modificadores continuam somando por cima (Object +1 / Stream +2 / Null +1, combat.md §8). **FRAMEWORK:** as 3 faixas de ManaCost + a derivação de Power a partir do HP-Trash. **AJUSTE FINO (playtest N=3):** os valores 3/5/8 podem mexer ±1-2; a proporção entre tiers é o que se mantém.
 
 ### 2.3 ESPECIAL (as 20 cartas dos mestres)
 
@@ -55,7 +67,11 @@ Três tiers de carta, com identidade mecânica e narrativa distinta. Nenhum tier
 - **Pré-compilada, travada:** ao contrário da COMUM, a ESPECIAL **não recebe modificador**. Ela já vem pronta, sem Object/Stream/Null anexável. Isso a diferencia mecanicamente da COMUM além da raridade narrativa: é uma peça fixa, não um sistema aberto a runtime.
 - **Ocupa slot em campo:** consome 1 dos 15 slots do deck em campo (gdd.md §6.2: "deck de 40-60 cartas-token totais, 15 em campo"). Não é bônus fora do deck; o jogador escolhe se vale o slot.
 - **Custo de Mana premium (arcabouço fechado pelo criador 2026-07-12, via economy-designer):** **`ManaCost` fixo ≈ 6** (faixa aceitável 5-7; número exato dentro da faixa fica pra playtest). Racional: `manaMax = 2 + turnoIndex` (cap 8), então 6 destrava por volta da **rodada 4**, gastando quase todo o pool no turno (tensão real: jogar a especial = não sobra mana), alcançável em elite/mini-boss/boss onde ela deve brilhar, sem virar troféu que nunca dispara (o risco do custo-cap 8). Anti-abuso já coberto por 3 travas independentes: 1×/batalha + sem modificador + mana sem carry-over (impossível bankar pra abrir com ela no turno 1). Trunfos-fora-da-roda (Gödel etc.) NÃO recebem taxa de mana extra por padrão; só reavaliar (+1) se o playtest mostrar que a versão fora-da-roda supera sistematicamente a de-dentro contra Fraco.
-- **Uso limitado por batalha:** 1× por batalha. Reusa o mesmo flag mecânico da Análise Preditiva (combat.md §2.1: "não se acumula, não recarrega durante a batalha").
+- **Três sub-categorias (economy-designer + criador 2026-07-12):** ao statear as 20, elas se dividem em três, e o custo depende disso:
+  - **ATIVA (paga o mana premium ~6, 1×/batalha):** as que o jogador JOGA num turno (burst, invocação, control forte). Ocupam 1 dos 15 slots do deck de combate.
+  - **PASSIVA (ManaCost 0, equip-only):** sempre ligadas enquanto ocupam 1 slot do Codex; o "custo" delas é o SLOT ocupado, não mana. NÃO competem com o "1×/batalha". Fiel ao fenômeno real (a Gaiola de Faraday é proteção estrutural, não uma ação disparada). Ex.: Gödel, Ada, Pythagoras, Hayek, Mises, Bastiat.
+  - **FORA-DE-COMBATE (utilitário de exploração/economia, NÃO ocupam slot de deck de combate):** guardadas à parte, agem no overworld/dungeon. **Faraday** (anula o PEM das dungeons = habilita save onde há PEM, cross-ref `project_save_dungeon_pem_faraday` + FARADAY-DUNGEON-ITENS), **Euler** (revela o grafo/mapa da sala), **Menger** (revela valor real de loot + converte item em Crédito, 1×/encontro). Uma 3ª categoria leve, sem penalizar o deck de batalha.
+- **Uso limitado por batalha:** 1× por batalha (vale pras ATIVAS). Reusa o mesmo flag mecânico da Análise Preditiva (combat.md §2.1: "não se acumula, não recarrega durante a batalha").
 - **Relação com a roda de fraqueza (combat.md §6):**
   - **Regra geral:** a base da carta ESPECIAL fica DENTRO da roda de fraqueza (tem família, tem contra). O jogador ainda pode explorar fraqueza/resistência normalmente contra ela e com ela.
   - **Exceção (trunfo fora da roda):** cartas cuja assinatura NARRATIVA já quebra a regra do sistema (ex.: Gödel, cuja "Sentença Indecidível" ignora imunidade por design temático, um teorema de incompletude não se deixa resolver por classificação de família) ficam marcadas como **trunfo fora da roda**: não seguem `multFraqueza`, resolvem por regra própria. Esse comportamento vive como uma **flag no Card record** (ex.: `IgnoresWeaknessWheel: bool`), não como exceção hardcoded no resolvedor da roda.
@@ -167,7 +183,7 @@ O set canônico de `combat.md` §9 (Stun / Poison / Corrode / Disrupt / Silence 
   - **Throttle = SÓ SPD** (reusa 1:1 o mecanismo Slow: `SPD ±= Magnitude`, aditivo, clamp 0, recomputa fila). **NÃO mexe em Power** — reduzir Power já é o papel canônico do Disrupt (Sônico); dar isso ao Elétrico furaria a regra "sem sobreposição de papéis" (combat.md §6). Slow sugerido -1 SPD.
   - **Forma do DoT = 3 turnos, front-load 50/30/20** (do total da magnitude: metade no 1º tick, depois decai). Dá ritmo de leitura (o Scan mostra quanto falta) e fica distinto do Poison (achatado/sustentado), reforçando o burst do Elétrico.
   - **StackRule = Refresh** (reaplicar renova a Duration e a curva, NÃO empilha magnitude nem soma um 2º DoT concorrente — trava anti-degeneração, combat.md §15).
-  - **Magnitude absoluta do tick 1 = playtest** (depende do `Power`/custo das cartas COMUNS, ainda sem número canônico; ordem de grandeza provisória: DoT total ~27-33% do HP de um Trash de referência de 55 HP, algo como 8/5/3, a CALIBRAR).
+  - **Magnitude (ancorada na baseline COMUM, §2.2, Power-médio 5):** DoT total **~15** (equivale a uma carta média espalhada em 3 turnos), front-load 50/30/20 = **8 / 5 / 2**. FRAMEWORK; o valor exato segue AJUSTE FINO no playtest (pode mexer ±1-2 junto com a baseline).
 
 ### 5.2 Resfriamento ("gelo/frio")
 
@@ -179,7 +195,7 @@ O set canônico de `combat.md` §9 (Stun / Poison / Corrode / Disrupt / Silence 
   - **Desconto de mana: -1 na 1ª carta do turno**, com **clamp de custo mínimo 1** (uma carta nunca fica a 0 mana).
   - **Duration = 3 turnos** (mesma janela dos gadgets Drone-Vigia/Torre-Autômata, §7.1).
   - **StackRule = Refresh** (recastar renova Duration, não empilha SPD nem desconto).
-  - **Trava anti-loop (framework, combat.md §15):** `ManaCost(carta de Resfriamento) ≥ desconto × Duration`, ou seja, o card custa no mínimo o que economiza ao longo da própria vida (senão recastar em loop viraria lucro líquido de mana). Com -1 × 3 = 3, o card custa ≥ 3-4. Mana sem carry-over já impede bankar.
+  - **Trava anti-loop (framework, combat.md §15):** `ManaCost(carta de Resfriamento) ≥ desconto × Duration`, ou seja, o card custa no mínimo o que economiza ao longo da própria vida (senão recastar em loop viraria lucro líquido de mana). Com -1 × 3 = 3, **o card custa 4** (não o breakeven exato 3: +1 garante que reforjar em loop nunca é neutro nem lucro). Mana sem carry-over já impede bankar.
   - **Nota de consistência (não bloqueia):** o terreno Gelo (combat.md §18) hoje PENALIZA +1 mana na 1ª carta; o status Resfriamento PREMIA -1. Polaridades opostas do mesmo elemento, defensável (ambiente frio hostil emperra vs resfriamento ATIVO do próprio sistema turbina). Registrado, não é conflito.
   - **Kit-Morenh** (gadget, §7.1) aplica Resfriamento de graça 1×/batalha: aceitável, já gated pelo próprio limite do gadget.
   - **Ajuste fino (playtest):** se +1 SPD / -1 mana é sentido como impactante o bastante, e o `ManaCost` exato do card (3 vs 4).
@@ -298,11 +314,16 @@ O léxico Sylvarin completo (regras de derivação, tabela de mutação consonan
   - Preço do Injetor (achado vs comprado: os dois caminhos existem, valor de compra não definido).
   - Preços das 4 Ampolas (Religação / Recarga / Antídoto / Overclock): hoje só a Bio-Ampola e a Life Ampola têm número em `economia.md` §4-5; Recarga e Overclock ainda não têm valor.
 - **Custo de Mana premium das cartas ESPECIAIS** (§2.3): **ARCABOUÇO FECHADO 2026-07-12** (via economy-designer) = `ManaCost` fixo ≈ 6 (faixa 5-7, destrava rodada 4). Só o número exato dentro da faixa + a taxa dos trunfos-fora-da-roda ficam pra playtest.
-- **Magnitude/duração da Sobrecarga térmica e do Resfriamento** (§5): **ARCABOUÇO FECHADO 2026-07-12** (§5.1: throttle SÓ SPD, DoT 3 turnos 50/30/20, StackRule Refresh; §5.2: +1 SPD, -1 mana 1ª carta clamp min 1, Duration 3, Refresh, trava anti-loop). Só as magnitudes absolutas (dano do tick 1, custo exato do card Resfriamento) ficam pra playtest (dependem do `Power`/custo das COMUNS, ainda sem número canônico).
+- **Magnitude/duração da Sobrecarga térmica e do Resfriamento** (§5): **FECHADO 2026-07-12** (§5.1: throttle SÓ SPD, DoT 3 turnos 50/30/20 = **8/5/2** total ~15; §5.2: +1 SPD, -1 mana 1ª carta clamp min 1, Duration 3, **card custa 4**, trava anti-loop). Números destravados pela baseline COMUM (§2.2); AJUSTE FINO ±1-2 no playtest.
+- **Baseline numérica das cartas COMUNS** (§2.2): **FECHADA 2026-07-12** (via economy-designer) = ManaCost 1/2/3 → Power 3/5/8 + arquétipos DoT/control/buff, ancorada em Trash 55 HP. É a régua que destrava tudo. AJUSTE FINO no playtest.
+- **Statlines das 20 cartas ESPECIAIS:** o ARCABOUÇO está fechado (§2.3: 3 sub-categorias — ativa mana~6 / passiva mana-0 equip-only / fora-de-combate Faraday+Euler+Menger). Mas o **statline final por-carta DEPENDE de escolher o efeito A/B/C de cada mestre** (hoje os docs `roster-analogos/01..20` só RECOMENDAM uma opção; não é decisão do criador ainda). Logo o statline por-carta é **DIFERIDO até a feat de escolher os 20 efeitos** (feat do roster + criador). Existe uma tabela-rascunho provisória do economy-designer (2026-07-12, assumindo as opções recomendadas) como ponto de partida, NÃO canônica.
+  - **Volta (regra de recurso):** o efeito recomendado furava o "sem carry-over de mana"; decisão do criador = **reescrever o efeito do Volta** pra não tocar essa regra (ex.: mana não-gasta vira Shield/carga no fim do turno). Aplicar na feat de efeitos.
+  - **Gap Bioquímico:** nenhuma das 20 cai na família da Jaci (os mestres skewam pra info/lógica); aceito como honesto (a Jaci é servida pelo kit próprio + comuns DoT). Reavaliar só se o playtest pedir.
+- **Dados faltantes (bloqueiam número fino, não a forma):** Atk/SPD do Elite (Daemon-Guard) e demais inimigos (TBD combat.md §17); tag de inimigo "comando central" (efeito do Mises, trabalho de `gameplay_engineer`); como a "quantização" do Planck pluga na variância `v` de §11 (decisão de engenharia).
 - **Sincronização do marcador de raridade visual do frame** (comum/rara/lendária) com os 3 tiers desta taxonomia (§2.5): depende de `CARTAS-BALANCEAMENTO`.
 - **Reconciliação da grafia "techMagic" → "TechnoMagik"** dentro de `techmagic.md` (já sinalizada naquele doc, item `TECHMAGIC-CANON`).
 - **Reconciliação da raiz Sylvarin de "Morenh"** (§8.2, nota) com o léxico-semente formal.
 
 ---
 
-**Última revisão:** 2026-07-12, rodada 2 (gadgets, slots, Força/peso fechados; preços e magnitudes diferidos para ECONOMIA e CARTAS-BALANCEAMENTO/playtest; aguarda revisão).
+**Última revisão:** 2026-07-12, rodada 3 (via economy-designer + criador): baseline COMUM fechada (§2.2, ManaCost 1/2/3 → Power 3/5/8); 3 sub-categorias das ESPECIAIS (§2.3, ativa/passiva/fora-de-combate); números dos 2 status destravados (§5, Sobrecarga 8/5/2, Resfriamento card 4). Statlines por-carta das 20 = rascunho provisório (`cartas-statlines-rascunho.md`), DIFERIDO até a escolha dos efeitos A/B/C do roster.
