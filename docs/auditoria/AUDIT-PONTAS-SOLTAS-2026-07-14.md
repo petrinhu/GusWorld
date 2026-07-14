@@ -14,6 +14,12 @@
 | 🟢 Verde | 7 | Cosmético / doc incompleto sem risco de propagação |
 | (anteriores) | 6 | Resíduos de auditorias passadas ainda abertos (já rastreados no board) |
 
+## Passada de sync (2026-07-14, commit `1d0acb4`)
+
+**14 achados mecânicos RESOLVIDOS** (doc-fix puro, sem decisão): PS-R6, PS-R2, PS-Y3, PS-Y4, PS-Y5, PS-Y6, PS-Y7 (virou item `MINIMAPA-SAVE-SCHEMA`), PS-Y8, PS-Y12, PS-G1, PS-G3, PS-G4, PS-G5, PS-G7.
+
+**RESTAM (precisam de DECISÃO do criador):** 🔴 PS-R1, PS-R3, PS-R4, PS-R5, PS-R7, PS-R8 · 🟡 PS-Y1, PS-Y2, PS-Y9, PS-Y10, PS-Y11, PS-Y13 · 🟢 PS-G2 (commitar app/tools?), PS-G6 (Brunus botica, junto da canonização da abertura). Levados ao criador via AskUserQuestion.
+
 ---
 
 ## 🔴 ONDA 1 — VERMELHO (resolver já)
