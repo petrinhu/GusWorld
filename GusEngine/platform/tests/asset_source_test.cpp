@@ -60,6 +60,24 @@ std::string join(const std::string& a, const std::string& b) {
     return a + "/" + b;
 }
 
+// setenv/unsetenv sao POSIX; MSVC nao tem (usa _putenv_s, e string vazia REMOVE a var).
+// Helper portavel minimo pra manter a semantica identica nos dois lados.
+void portable_setenv(const char* name, const char* value) {
+#ifdef _WIN32
+    _putenv_s(name, value);
+#else
+    setenv(name, value, /*overwrite=*/1);
+#endif
+}
+
+void portable_unsetenv(const char* name) {
+#ifdef _WIN32
+    _putenv_s(name, "");
+#else
+    unsetenv(name);
+#endif
+}
+
 // RAII: seta uma env var e restaura o valor anterior (ou remove) no fim do escopo -
 // isola os testes uns dos outros mesmo que o binario Catch2 rode varios TEST_CASE no
 // mesmo processo.
@@ -71,13 +89,13 @@ public:
             had_prev_ = true;
             prev_ = prev;
         }
-        setenv(name, value.c_str(), /*overwrite=*/1);
+        portable_setenv(name, value.c_str());
     }
     ~ScopedEnv() {
         if (had_prev_) {
-            setenv(name_.c_str(), prev_.c_str(), 1);
+            portable_setenv(name_.c_str(), prev_.c_str());
         } else {
-            unsetenv(name_.c_str());
+            portable_unsetenv(name_.c_str());
         }
     }
     ScopedEnv(const ScopedEnv&) = delete;
@@ -98,11 +116,11 @@ public:
             had_prev_ = true;
             prev_ = prev;
         }
-        unsetenv(name);
+        portable_unsetenv(name);
     }
     ~ScopedUnsetEnv() {
         if (had_prev_) {
-            setenv(name_.c_str(), prev_.c_str(), 1);
+            portable_setenv(name_.c_str(), prev_.c_str());
         }
     }
     ScopedUnsetEnv(const ScopedUnsetEnv&) = delete;
