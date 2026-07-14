@@ -1,0 +1,48 @@
+# ADR-016: Motor de efeitos das cartas especiais = executor DATA-DRIVEN `techMagic` (nao VM)
+
+Status: Accepted (decisao do lider supremo via AskUserQuestion 2026-07-14; recomendacao do Caetano/CTO)
+Data: 2026-07-14
+Decisores: lider supremo (petrus), Caetano/CTO (analise + recomendacao), software-architect e backend-engineer/gameplay_engineer (execucao)
+
+Cross-ref: `docs/design/mecanicas/cartas-technomagik.md` (taxonomia: COMUM/ESPECIAL/SUPER, 4 sub-categorias §2.3, status novos §5), `docs/design/roster-analogos/_EFEITOS-ESCOLHIDOS.md` (os 20 efeitos escolhidos), `docs/design/techmagic.md` (conceito techMagic, item TECHMAGIC-EXECUTOR que este ADR resolve), `GusEngine/domain/include/gus/domain/combat/combat_records.hpp` (struct `Card` atual), `GusEngine/domain/src/combat/combat_state_machine.cpp` (`resolve_use_card`), `GusEngine/domain/src/templates/canonical_templates.cpp` (padrao de catalogo data-driven), memorias `project_sistema_cartas_technomagik`, `project_techmagic_canon`, `feedback_glintfx_nao_mexer_so_pedir`, `project_rmlui_ui_stack`.
+
+## Contexto
+
+O `Card` atual so modela carta COMUM (family/base_type/mana/ap/power/target_shape + 1 status opcional + modifiers Object/Stream/Null). Falta a camada ESPECIAL (20 cartas dos mestres) e o motor de efeitos que ela exige: 4 sub-categorias (ATIVA 1x/batalha, PASSIVA equip-only sempre-ligada, FORA-DE-COMBATE overworld, HIBRIDA), efeitos diversos (leech %, reflect, combo cross-ator, clone-entidade-com-visual, revelar area, trunfo-ignora-roda), 2 status novos (Sobrecarga termica, Resfriamento) e flags de trunfo (`IgnoresWeaknessWheel`, `IsUniversalCompiler`). Os statlines finais das 20 estao DIFERIDOS pra playtest (os efeitos foram escolhidos, os numeros nao) - logo o motor precisa ser data-first.
+
+O item TECHMAGIC-EXECUTOR (`techmagic.md`) nomeou um fork: (a) resolvedor data-driven vs (b) interpretador/VM de conjuro (bytecode). O contexto de valor e o easter-egg canonico "magia = software" (o executor techMagic ↔ Tavus-Drive do Gus).
+
+## Decisao
+
+**Motor de efeitos = executor DATA-DRIVEN chamado `techMagic`.** Cada carta carrega uma lista ordenada de instrucoes declarativas `EffectSpec = { gatilho (TriggerHook: OnCast/OnDamageDealt/OnDamageReceived/OnAllyTurnEnd/OnRoundEnd/Always), tipo (EffectKind: enum fechado ~20-25), parametros numericos tunaveis }`, resolvidas por um dispatcher `techMagic::execute(card, contexto)` na cadeia de `resolve_use_card`.
+
+**A VM (opcao b) foi RECUSADA** (analise do Caetano, anti-OE pra G1): o vocabulario de efeitos e FECHADO e conhecido (20 cartas curadas, sem craft/modding/UGC em G1), entao nao existe o caso de uso que justifica interpretador ("conteudo novo sem recompilar"). E a VM NAO elimina nenhum trabalho: a dificuldade real esta nas PRIMITIVAS de engine (hook de dano, agregacao cross-ator, entidade-clone, queries de overworld), que sao C++ de qualquer jeito; a VM so adiciona indirecao (bytecode + compilador + debug de 2 camadas + serializacao/versionamento), custo estimado 3-5x antes da 1a carta, risco ALTO pra dev solo, zero ganho jogavel.
+
+**O easter-egg fica LITERAL no codigo hoje, risco zero:** o executor chama-se `techMagic`, a carta E um programa declarativo (lista ordenada de instrucoes que o Tavus-Drive "executa"). **Porta aberta pra VM futura sem reescrita:** a lista `EffectSpec` e exatamente a IR que um compilador de conjuros emitiria; se v2 tiver consumidor real (editor de conjuros, modding), a VM nasce POR CIMA, sem tocar as cartas nem o resolvedor.
+
+**Insight estrutural:** efeitos nao sao "coisas no cast", sao REACOES A EVENTOS (recebi dano -> reflete; 2 aliados batem no mesmo alvo -> hipotenusa) - por isso o modelo e (gatilho, tipo, params). As FORA-DE-COMBATE (Faraday/Euler/Menger) nao sao "efeito executavel": sao uma QUERY de posse ("a party tem cardExec-faraday?") que os sistemas de overworld consultam.
+
+**Regra de VFX (ordem do lider 2026-07-14):** todo efeito VISUAL que o glintfx possa servir (screen-wave do Einstein, glow de carta, sprite-eco do clone) vai como PROMPT pro dev do glintfx, NUNCA hardcoded no nosso GL/render (`feedback_glintfx_nao_mexer_so_pedir`, `project_rmlui_ui_stack`). O dominio/gameplay dispara o efeito; a apresentacao e da lib.
+
+## MVP (ordem minima pra destravar PS-Y1 hibrida + PS-Y2 primitivas)
+
+1. **Records/enums** (backend-engineer): `CardTier` (Comum/Especial/Super) + sub-categoria; flags `ignores_weakness_wheel`/`is_universal_compiler`; `std::vector<EffectSpec>` no `Card` (comuns = vetor vazio, intocadas); `StatusId::{SobrecargaTermica, Resfriamento, Reflect}` (numeros de §5 ja fechados). `CardFamily::Universal` ja entregue (ADR/PS-R1, commit e594d07).
+2. **Executor `techMagic` + 3 hooks** (gameplay_engineer): OnCast, OnDamageDealt (leech Volta), OnDamageReceived (reflect Newton) na cadeia de `resolve_use_card`; regra 1x/batalha reusando o flag da Analise Preditiva. -> uma ATIVA, uma PASSIVA e uma HIBRIDA de ponta a ponta = **PS-Y1 fecha**.
+3. **Ledger cross-ator + hook OnRoundEnd** (Pythagoras): hits por alvo/round no estado de combate. -> **PS-Y2 fecha**.
+4. **Catalogo das especiais** no padrao `canonical_templates` (dados tunaveis num arquivo so; playtest N=3 mexe num lugar).
+5. **Por demanda do slice:** clone entidade-Objeto (slot visual = camada app + prompt glintfx), hooks de turno (Ada/Hayek/Mises), query de posse pras fora-de-combate (nao bloqueia o combate).
+
+## Decisoes de design ainda pendentes do lider (nao bloqueiam o MVP)
+
+1. Grafia canonica do simbolo: `techMagic` vs `TechnoMagik` (item TECHMAGIC-CANON) - o batismo do easter-egg e do lider.
+2. VOLTA-LEECH-% (fracao de conversao) - bloqueia o statline do Volta, nao o motor.
+3. Sequenciamento overworld: Faraday/Euler/Menger/Maxwell agem em sistemas ainda nao codados (mini-mapa/iluminacao/valuation) - recomendacao: stub por query agora, efeito real quando o sistema chegar.
+4. Clone-visual (sprite-eco): qual visual + slot na battle-screen (prompt glintfx).
+5. VFX Einstein (screen-wave): prompt pro glintfx antes, ou fallback barato.
+6. Tag "comando central" (Mises) na taxonomia de `EnemyTemplate`: agora ou quando o bestiario fechar.
+
+## Consequencias
+
+- **Positivas:** custo BAIXO-MEDIO, risco BAIXO; numeros 100% tunaveis pra playtest; testavel por unit test por EffectKind; easter-egg entregue hoje; nao fecha porta pra VM. Cada carta = 5-15 linhas de dado.
+- **Negativas/custo irredutivel:** cada efeito exotico exige um EffectKind + handler C++ novo (mas esse custo existe em QUALQUER opcao - e das primitivas, nao do envelope). O enum EffectKind cresce a ~20-25 valores.
+- **Impacto:** desbloqueia PS-Y1 (HIBRIDA) e PS-Y2 (Reflect/cross-ator/clone). Supersede a ambiguidade do fork em TECHMAGIC-EXECUTOR.

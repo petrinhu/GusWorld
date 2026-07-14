@@ -111,6 +111,7 @@ As viradas de stack e os contratos irreversíveis estão registrados em [`docs/t
 | [ADR-013](docs/tech/adr/ADR-013-asset-source-vfs-fase1.md) | Asset source VFS fase 1 (porteiro de assets) |
 | [ADR-014](docs/tech/adr/ADR-014-dialogue-runtime-poco.md) | Runtime de diálogo POCO C++20 (supersede ADR-003) |
 | [ADR-015](docs/tech/adr/ADR-015-save-security-v2-offline.md) | **Save security v2 offline (AEAD/Monocypher/machine-bind/anti-rollback)** — o mais recente e sensível |
+| [ADR-016](docs/tech/adr/ADR-016-techmagic-effect-engine-data-driven.md) | **Motor de efeitos das cartas = executor data-driven `techMagic` (não VM)** — desbloqueia as cartas especiais (2026-07-14) |
 
 
 ---

@@ -33,7 +33,7 @@ Alongside the AI tools, several people shaped this project directly. Full detail
 - **El Iagows (my brother):** a computer engineer and a personal inspiration to me in IT, whose training shaped how I think about tech; he gave me plenty of architecture and stack advice, and guided me on using SDL and spritesheets for movement.
 - **Od Fuinha Minduim, Thiago MadDog and Thiago Arcanjo:** IT professionals who gave countless tips on testing, architecture, QA, security, CI and RAG.
 - **The #metaleiros-PE crew:** a longstanding friendship and a source of ongoing feedback and camaraderie.
-- **Bruno Vettore:** suggested creating a language for the game (Sylvarin was born from that conversation), and inspired the character Brunus "Vetorial" Solveckt.
+- **Bruno Vettore:** suggested creating a language for the game (Sylvarin was born from that conversation), inspired the character Brunus "Vetorial" Solveckt, and contributed the idea for the Black Mirror card.
 
 ### Method: who decides, what the AI does
 
@@ -92,7 +92,7 @@ Além das ferramentas de IA, várias pessoas moldaram este projeto diretamente. 
 - **El Iagows (meu irmão):** engenheiro de computação e uma inspiração pessoal minha em TI, cuja formação moldou meu jeito de pensar tecnologia; me deu várias dicas de arquitetura e stack, e me orientou no uso de SDL e de spritesheets para o movimento.
 - **Od Fuinha Minduim, Thiago MadDog e Thiago Arcanjo:** profissionais de TI que deram inúmeras dicas de testes, arquitetura, QA, segurança, CI e RAG.
 - **A galera do #metaleiros-PE:** uma amizade antiga e uma fonte constante de feedback e parceria.
-- **Bruno Vettore:** deu a sugestão de criar uma língua para o jogo (o Sylvarin nasceu dessa conversa), e inspirou o personagem Brunus "Vetorial" Solveckt.
+- **Bruno Vettore:** deu a sugestão de criar uma língua para o jogo (o Sylvarin nasceu dessa conversa), inspirou o personagem Brunus "Vetorial" Solveckt, e contribuiu com a ideia da carta do Espelho Negro.
 
 ### Método: quem decide, o que a IA faz
 
