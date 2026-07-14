@@ -51,6 +51,35 @@
 
 > **20/20 EFEITOS ESCOLHIDOS.** Próximos passos: (a) statline numérico por-carta (com a baseline de `cartas-technomagik.md` §2.2, agora destravável); (b) os sub-brainstorms abaixo; (c) redação dos diálogos de encontro (`narrative-writer`, molde de 2 movimentos + frase pedagógica).
 
+## Nomes dos efeitos (CARTAS-NOMES-EFEITOS) — em andamento
+
+Estilo: curto, techno-científico, evoca o feito real (modelo do criador: Einstein = "Grav-Wave"). **Princípio do criador:** a explicação/frase da carta deve levar o jogador a ENTENDER o nome do efeito (nome ↔ frase pedagógica amarrados).
+
+| # | Mestre | Nome do efeito |
+|---|---|---|
+| 1 | Faraday | **EM-Shield** |
+| 2 | Maxwell | **Spectra-Wave** |
+| 3 | Tesla | **Coil-Arc** |
+| 4 | Volta | **Volt-Leech** |
+| 5 | Einstein | **Time-Dilate** |
+| 6 | Newton | **Force-Law** |
+| 7 | Planck | **Quantum-Lock** |
+| 8 | Mandelbrot | **Fractal-Echo** |
+| 9 | Euler | **Bridge-Walk** |
+| 10 | Gödel | **Null-Proof** |
+| 11 | Ada Lovelace | **Re-Run** |
+| 12 | Turing | **Decrypt-All** |
+| 13 | von Neumann | **Fork** |
+| 14 | Giordano Bruno | **Echo-Self** |
+| 15 | John Dee | **Black-Mirror** |
+| 16 | Pythagoras | **Hypotenuse** |
+| 17 | Hayek | **Free-Order** |
+| 18 | Mises | **Calc-Edge** |
+| 19 | Menger | **Barter** |
+| 20 | Bastiat | **Hidden-Cost** |
+
+**20/20 NOMES ESCOLHIDOS.** (Nome completo da carta = `cardExec-[figura]`; o nome do efeito/poder é a alcunha acima, ex.: `cardExec-Einstein` = "Time-Dilate".)
+
 ## Sub-brainstorms / feats que emergiram (a fazer depois)
 - **MAXWELL-AREAS-ESCURAS:** áreas escuras percorríveis só com a carta Maxwell (a "luz" dele); definir o que são, quantas, gate contornável (gdd §7.1).
 - **VOLTA-LEECH-%:** a fração de conversão do leech do Volta (calor perdido, 2ª lei) + absorve % ou absoluto, com argumentos de termodinâmica.
