@@ -58,7 +58,7 @@ Aplicação mais literal de "magia = software". O **Tavus-Eco** é um self compi
 
 1. **Ativação:** o puzzle da missão é resolvido; o artefato/console (Era 2) ou o instrumento ritual (Era 1, os 3 OCU) "roda" e acende, com o glow do campo do mestre (a cor do campus dele, ver `mundo-topologia.md` §6).
 2. **Aparição:** o Morlhin se ergue, projeção compilada. Não é fantasma nem sobrevivente: é o que o mestre executou de si antes do fim.
-3. **A lição:** fala curta na voz do mestre, quem foi + a descoberta + a lição que escolheu preservar (o momento didático diegético). Limitada ao snapshot: não aprende, não é onisciente; pode hesitar onde o original hesitou, sem saber por quê (guarda do §5, camada 3 incompilável).
+3. **A lição (estrutura fixa, insight do criador 2026-07-12):** a fala do mestre segue **dois movimentos**: (a) ele conta os **feitos reais dele para a humanidade em linguagem ACESSÍVEL a leigo** (sem jargão, o jogador aprende de verdade o que a figura fez); (b) então **deriva a carta disso**: "portanto, o efeito desta carta é [resumo do efeito em linguagem simples]". Assim o efeito nunca parece arbitrário, sai do feito real da figura. É o coração do ensino diegético. Limitada ao snapshot: não aprende, não é onisciente; pode hesitar onde o original hesitou, sem saber por quê (guarda do §5, camada 3 incompilável). Handoff de redação = `narrative-writer`, com este molde de 2 movimentos + o efeito escolhido da carta (ROSTER-EFEITOS-CARTAS).
 4. **A entrega:** entrega a carta do Codex pela própria mão (UI da carta).
 5. **Dissipa:** o Morlhin se apaga (one-shot, momento único e melancólico com um morto); o artefato volta inerte. **A lição fica arquivada no Diário/Codex** para reler (preserva o objetivo de ENSINO sem quebrar o "snapshot finito").
 
