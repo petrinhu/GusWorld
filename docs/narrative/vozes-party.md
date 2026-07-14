@@ -49,6 +49,7 @@ Casa com o perfeccionismo canônico do Gus (base gifted-kid), com a party como c
 8. "Isso não é bug do meu código. É feature do universo me odiando por eu comprar de segunda mão."
 9. "Reiniciar não conserta hardware, mãe. Isso é privilégio de quem trabalha com software."
 10. "Um dia eu emulo tudo isso e jogo esse ferro-velho pela janela. Um dia."
+11. (ao se queimar de leve na solda, missão da VRAM, perde 1 HP) "Ai! Viu? É por isso que eu CODO. Software não queima o dedo de ninguém."
 
 > Nota de consistência: casa com o loop de hardware (Pillar 3, óculos/matriz/Tavus-Drive) e com o RE que o Gus faz (ele emula em software o que não confia no hardware, ex.: o app de mini-mapa nos óculos). O rage é afetuoso, nunca amargo; é a voz de um menino brilhante brigando com sucata.
 

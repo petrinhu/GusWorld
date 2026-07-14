@@ -17,6 +17,10 @@
 | **3** | **VRAM extra** (chip minúsculo) | acaba o **OOM** da GPU que renderiza o mapa → **desliga o glitch/fog** de área distante | maior | maior |
 
 - **Todas já destravadas (mundo aberto, gdd §7.1):** a ordem 1→2→3 tem distância+dificuldade crescentes, mas NÃO é obrigatório seguir a ordem.
+- **Lotação nos repositórios existentes (decisão do criador 2026-07-14):** as 3 são a recompensa especial de 3 das 13 dungeons/repositórios (reuso, barato):
+  - **M1 (implante) → Ferrovelhos** (T2): ferro-velho onde se cata hardware usado; um implante de visão salvado.
+  - **M2 (código dos marcadores) → Zona do Silêncio** (T3): zona morta/abandonada = repositório de código perdido, silencioso e corrompido.
+  - **M3 (VRAM) → Montadora Confluência** (T4): a fábrica de tech avançada do Tusk guarda o chip exótico de VRAM. **NOTA:** isso promove a Montadora de "lore/quest, não-dungeon" (`mundo-topologia.md` §4) a **repositório visitável** (atualizar a topologia: Montadora ganha 1 dungeon/repositório).
 - **O implante e o Gus (Pillar 3):** os membros da party usam o implante real; o **Gus faz reverse-engineering (RE) no hardware dos implantes da party e cria um app que EMULA a função do implante nos óculos dele.** (O Gus não põe implante; ele hackeia/emula, coerente com os óculos táticos + o triângulo de hardware.)
 
 ### 0.1. "Não existem tesouros; existem REPOSITÓRIOS PERDIDOS" (insight canônico, expandido 2026-07-14)
@@ -29,6 +33,14 @@ Baús/tesouros clássicos não existem. Detalhamento canônico ([[project_reposi
 - **Axiologia econômica canon:** *"não se acha dinheiro, se faz dinheiro com esforço e trabalho duro"* — o jogador acha ATIVOS e os converte em Crédito por trabalho (explorar/decifrar/vender). Reforça [[project_axiologia_canonica]].
 
 Casa com Pillar 2 (magia = software) e a compilação-no-cast das cartas.
+
+### 0.2. Conteúdo das 3 missões (coração de cada, decidido 2026-07-14; detalhe fino depois)
+
+- **M1 (implante, Ferrovelhos): reparar / RE um implante quebrado.** A party acha um implante de visão DANIFICADO no ferro-velho; o Gus faz o **reverse-engineering** dele (mini-puzzle de reparo/decifração) e então **emula a função nos óculos** (Pillar 3, RE, software>hardware, a cara do Gus). Barato: 1 puzzle + diálogo.
+- **M2 (código dos marcadores, Zona do Silêncio): missão em 3 camadas.** (1) **atravessar** as ruínas da zona morta (labirinto, mecânica de silêncio/som-não-propaga) até o servidor; (2) **religar o sinal** (a zona é sinal-morto); (3) **decifrar e compilar** o repositório corrompido → a skill de marcadores. Casa com "repositório = código a compilar" + as cartas-lente (Turing).
+- **M3 (VRAM, Montadora Confluência): FORJAR o chip.** A VRAM não é achada pronta: a party opera a forja/linha do Tusk pra **fabricar** o chip, com **sucata + materiais de ponta cedidos pelo Tusk + equipamento emprestado**. Amarra na axiologia "não se acha, se FAZ com trabalho" + conecta Ferrovelhos→Montadora.
+  - **Clarificação canônica (criador):** as fábricas do Tusk usam sucata pra **baratear a produção E ser eco-friendly**, MAS **não usam só sucata** (são indústrias de tecnologia de PONTA; combinam sucata reciclada + materiais de ponta).
+  - **Beat cômico (criador):** em algum ponto aqui, o **Gus se queima de leve na solda elétrica** (perde só **1 HP**, diebegético/humor) e solta uma **rage-line** de hardware (ex.: *"Ai! Viu? É por isso que eu CODO. Software não queima o dedo de ninguém."*; cross-ref o banco de rage em `vozes-party.md`).
 
 ## 1. Forma + comportamento visual (decidido 2026-07-14)
 
@@ -90,8 +102,9 @@ O **efeito PEM das dungeons** (que já bloqueia save, [[project_save_dungeon_pem
 
 Fios VISUAIS resolvidos 2026-07-14: mapa-TAB dois níveis (§1); mini-mapa de canto norte-fixo (§1); transição do glitch = de-glitch "compilar" ~0.5s (§3); ícones = glífos tech minimalistas (§4); persistência no save (§7.5).
 
+Fios das 3 MISSÕES resolvidos 2026-07-14: lotação (M1 Ferrovelhos / M2 Zona do Silêncio / M3 Montadora, §0) + coração de cada (§0.2). Resta: puzzle fino de cada, NPCs envolvidos, blocking; e a **reconciliação 13-vs-14 dungeons** (a Montadora virou repositório visitável, então o total de "dungeons" passa de 13; decidir se aceita 14 ou trata os repositórios de mini-mapa como categoria leve fora das 13 "principais" — o Fibonacci-13 era velado, nunca exposto ao jogador).
+
 Restam:
-- Conteúdo de cada uma das **3 missões paralelas** (o mistério/puzzle de cada, onde ficam nas 13 áreas, quais NPCs).
 - O **repositório perdido** + **loot** como mecânica geral (o que é, como se compila; tipos+valores de hardware; inventário de códigos/algoritmos: quantos, quais, nomes, efeitos).
 - Números (economy-designer): preço de recompra do implante/skills + custo da assinatura Hard + preços de venda do loot.
 - Arte concreta: os glífos de cada marcador + o slot de VRAM (trilhas de cobre); paleta acessível (daltonismo).
