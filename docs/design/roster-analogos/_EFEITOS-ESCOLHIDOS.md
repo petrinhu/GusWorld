@@ -80,6 +80,33 @@ Estilo: curto, techno-científico, evoca o feito real (modelo do criador: Einste
 
 **20/20 NOMES ESCOLHIDOS.** (Nome completo da carta = `cardExec-[figura]`; o nome do efeito/poder é a alcunha acima, ex.: `cardExec-Einstein` = "Time-Dilate".)
 
+## Frases pedagógicas (CARTAS-FRASES-PEDAGOGICAS) — RASCUNHO 2026-07-13
+
+A linha didática que cada carta mostra ao ser usada (desperta curiosidade sobre a figura/lei + ajuda a entender o nome do efeito). Rascunho do orquestrador; polimento final = `narrative-writer`. Zero em-dash (texto user-facing).
+
+| Efeito | Frase |
+|---|---|
+| **EM-Shield** (Faraday) | "Uma gaiola de metal bloqueia o pulso: dentro dela, nenhum sinal entra nem sai. Faraday provou isso em 1836." |
+| **Spectra-Wave** (Maxwell) | "Maxwell mostrou que luz, eletricidade e magnetismo são a MESMA onda. Por isso a luz também ataca." |
+| **Coil-Arc** (Tesla) | "A corrente de Tesla salta pelo ar e perde força a cada salto, como um eco que vai sumindo." |
+| **Volt-Leech** (Volta) | "Você drenou energia, mas só parte virou mana e HP. O resto escapou como calor: nenhuma pilha é perfeita (2ª lei da termodinâmica)." |
+| **Time-Dilate** (Einstein) | "Para Einstein, o tempo não corre igual pra todos. Do seu ponto de vista, o relógio do inimigo ficou mais lento." |
+| **Force-Law** (Newton) | "Toda ação tem uma reação igual e oposta (Newton). O golpe que acerta você também volta pra quem o deu." |
+| **Quantum-Lock** (Planck) | "A energia não vem em qualquer quantidade, só em pacotes fixos. Planck descobriu isso, e por isso seu dano agora cai em degraus certos." |
+| **Fractal-Echo** (Mandelbrot) | "Um fractal repete a mesma forma cada vez menor, sem fim. Sua ação ecoou pela metade." |
+| **Bridge-Walk** (Euler) | "Euler perguntou se dava pra cruzar 7 pontes sem repetir nenhuma. Nasceu a teoria dos grafos, e o mapa que você acabou de ver." |
+| **Null-Proof** (Gödel) | "Gödel provou que todo sistema tem verdades que ele não consegue provar. Sua jogada é uma delas: a defesa inimiga não a enxerga." |
+| **Re-Run** (Ada) | "Ada Lovelace escreveu o primeiro programa da história: uma sequência que se repete sozinha. Sua ação rodou de novo." |
+| **Decrypt-All** (Turing) | "A máquina de Turing resolve QUALQUER problema com o método certo. Nenhuma cifra resiste." |
+| **Fork** (von Neumann) | "von Neumann imaginou uma máquina que se copia sozinha. Sua jogada virou dado, e pôde ser lida outra vez." |
+| **Echo-Self** (Bruno) | "Bruno foi queimado por dizer que existem infinitos mundos. Em um deles vive outro você, e ele veio lutar ao seu lado." |
+| **Black-Mirror** (John Dee) | "John Dee consultava um espelho negro para ver o que ainda não tinha acontecido. Agora você vê o próximo golpe do inimigo." |
+| **Hypotenuse** (Pythagoras) | "a² + b² = c². Dois golpes viraram um só, maior: a hipotenusa do triângulo que eles formaram." |
+| **Free-Order** (Hayek) | "Hayek mostrou que a melhor ordem nasce sozinha, sem um chefe mandando. Sua party rendeu mais porque cada um fez algo diferente." |
+| **Calc-Edge** (Mises) | "Sem preço real, ninguém calcula o que vale a pena (Mises). Quem obedece um comando central erra a conta. Você, não." |
+| **Barter** (Menger) | "Menger explicou como o dinheiro nasceu da troca direta. Você trocou o que sobrava por Crédito na hora, sem loja." |
+| **Hidden-Cost** (Bastiat) | "Bastiat ensinou a ver o que NÃO se vê: todo efeito tem uma consequência escondida. Agora você a enxerga antes que ela te pegue." |
+
 ## Sub-brainstorms / feats que emergiram (a fazer depois)
 - **MAXWELL-AREAS-ESCURAS:** áreas escuras percorríveis só com a carta Maxwell (a "luz" dele); definir o que são, quantas, gate contornável (gdd §7.1).
 - **VOLTA-LEECH-%:** a fração de conversão do leech do Volta (calor perdido, 2ª lei) + absorve % ou absoluto, com argumentos de termodinâmica.
