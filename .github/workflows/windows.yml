@@ -7,17 +7,15 @@ name: windows
 # SÓ no espelho GitHub (petrinhu/GusWorld), porque Codeberg não oferece runner
 # Windows global. NÃO duplicar/promover esta exceção sem nova autorização.
 #
-# MATRIZ HONESTA (não finge verde):
-#   REQUERIDOS core/domain/platform: já provados cross-compiláveis sob MinGW-w64
+# MATRIZ HONESTA (todos REQUERIDOS desde glintfx v0.9.2, 2026-07-14):
+#   core/domain/platform: provados cross-compiláveis sob MinGW-w64
 #   (WIN-CROSS-VALIDATE, TODO.md); esta CI valida a MESMA prova sob MSVC real.
-#   app/: BLOQUEADOR CONHECIDO — glintfx/src/gl_loader.c (gerado por
-#   tools/gen_glloader.py) inclui <dlfcn.h> incondicional, sem branch Windows
-#   (wglGetProcAddress/LoadLibraryA inexistentes). Mesmo gap no MinGW e no MSVC.
-#   O step de app/ RODA e É ESPERADO FALHAR (continue-on-error: true, sem mascarar
-#   o exit code) até o glintfx ganhar um GL loader Windows. NÃO patchar glintfx
-#   neste repo — é lib do líder, consumida via FetchContent
-#   (ver [[feedback_glintfx_nao_mexer_so_pedir]]); o achado é repassado como
-#   prompt para o dev da lib, não corrigido aqui.
+#   app/: destravado pelo glintfx v0.9.2 — o gl_loader.c gerado ganhou o branch
+#   Windows (wglGetProcAddress + fallback GetProcAddress(opengl32.dll)), então
+#   o app/ (que linka glintfx + RmlUi + GL) compila e linka no Windows real.
+#   O antigo continue-on-error do app/ foi REMOVIDO: falha aqui bloqueia o job.
+#   glintfx segue consumido via FetchContent, nunca patchado neste repo
+#   (ver [[feedback_glintfx_nao_mexer_so_pedir]]).
 
 on:
   push:
@@ -125,16 +123,14 @@ jobs:
           .\build\windows-release\platform\tests\gusengine_platform_tests.exe
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
-      # --- BLOQUEADOR CONHECIDO: app/ (glintfx gl_loader.c sem branch Windows) ---
-      # Este step RODA de proposito e e ESPERADO FALHAR. continue-on-error deixa o
-      # job seguir (nao bloqueia o mirror/CI), mas o exit code do cmake --build e
-      # propagado (se($LASTEXITCODE -ne 0){exit $LASTEXITCODE}) para o step aparecer
-      # VERMELHO/com aviso nos logs - sem mascarar, sem "fingir verde".
-      - name: Build app/ (KNOWN BLOCKER — glintfx gl_loader.c sem branch Windows, allow-fail)
+      # --- app/ (o jogo, linka glintfx + RmlUi + GL) ---
+      # REQUIRED desde glintfx v0.9.2 (2026-07-14): o gl_loader.c ganhou o branch
+      # Windows (wglGetProcAddress + fallback GetProcAddress(opengl32.dll)), entao o
+      # app/ compila e linka no Windows real. O antigo continue-on-error (bloqueador
+      # do gl_loader POSIX) foi REMOVIDO - agora falha aqui bloqueia o job, como deve.
+      - name: Build app/ (compila+linka no Windows, glintfx v0.9.2)
         shell: pwsh
         working-directory: GusEngine
-        continue-on-error: true
         run: |
-          Write-Host "::warning::KNOWN BLOCKER: glintfx/src/gl_loader.c inclui <dlfcn.h> incondicional (POSIX), sem branch Windows (wglGetProcAddress/LoadLibraryA). Mesmo gap ja confirmado no MinGW cross-build (WIN-CROSS-VALIDATE, ver TODO.md). app/ (que linka glintfx) e ESPERADO falhar aqui ate o glintfx ganhar um GL loader Windows nativo. NAO patchar glintfx neste repo - e lib do lider, consumida via FetchContent; o achado e repassado como prompt para o dev da lib."
           cmake --build --preset windows-release --target gusworld_app
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
