@@ -96,13 +96,22 @@ TEST_CASE("save_controls: cria o diretorio com permissao 0700 e o arquivo com "
 
     using std::filesystem::perms;
     REQUIRE((dir_perms & perms::owner_all) == perms::owner_all);
+#ifndef _WIN32
+    // std::filesystem::permissions no Windows NAO mapeia bits POSIX de
+    // grupo/outros (o backend _wstat64 espelha os bits de owner em todos os 9
+    // bits, exceto write quando o arquivo e read-only) - a privacidade real no
+    // Windows vem das ACLs per-user de %APPDATA%, nao de bits 0700 POSIX.
     REQUIRE((dir_perms & perms::group_all) == perms::none);
     REQUIRE((dir_perms & perms::others_all) == perms::none);
+#endif
 
     REQUIRE((file_perms & perms::owner_read) == perms::owner_read);
     REQUIRE((file_perms & perms::owner_write) == perms::owner_write);
+#ifndef _WIN32
+    // Mesmo motivo do bloco acima (grupo/outros POSIX nao existem no Windows).
     REQUIRE((file_perms & perms::group_all) == perms::none);
     REQUIRE((file_perms & perms::others_all) == perms::none);
+#endif
 
     std::filesystem::remove_all(dir);
 }

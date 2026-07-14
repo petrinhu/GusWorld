@@ -79,14 +79,23 @@ TEST_CASE("save_system_settings: cria o diretorio com permissao 0700 e o "
     using std::filesystem::perms;
     // 0700 = rwx pro dono, NADA pro grupo/outros.
     REQUIRE((dir_perms & perms::owner_all) == perms::owner_all);
+#ifndef _WIN32
+    // std::filesystem::permissions no Windows NAO mapeia bits POSIX de
+    // grupo/outros (o backend _wstat64 espelha os bits de owner em todos os 9
+    // bits, exceto write quando o arquivo e read-only) - a privacidade real no
+    // Windows vem das ACLs per-user de %APPDATA%, nao de bits 0700 POSIX.
     REQUIRE((dir_perms & perms::group_all) == perms::none);
     REQUIRE((dir_perms & perms::others_all) == perms::none);
+#endif
 
     // 0600 = rw pro dono (sem exec), NADA pro grupo/outros.
     REQUIRE((file_perms & perms::owner_read) == perms::owner_read);
     REQUIRE((file_perms & perms::owner_write) == perms::owner_write);
+#ifndef _WIN32
+    // Mesmo motivo do bloco acima (grupo/outros POSIX nao existem no Windows).
     REQUIRE((file_perms & perms::group_all) == perms::none);
     REQUIRE((file_perms & perms::others_all) == perms::none);
+#endif
 
     std::filesystem::remove_all(dir);
 }
@@ -139,7 +148,14 @@ TEST_CASE("resolve_settings_dir: sem override de env, resolve para $HOME/.guswor
           "[settings_file_store]") {
     const std::string dir = gus::platform::fs::resolve_settings_dir();
     // Nao assume qual e o $HOME do host que roda o teste - so que o sufixo
-    // canonico ".gusworld" esta presente (contrato da resolucao).
+    // canonico esta presente (contrato da resolucao).
     REQUIRE(dir.size() >= std::string(".gusworld").size());
+#ifdef _WIN32
+    // Layout de producao do Windows: "%APPDATA%\gusworld" SEM ponto (decisao do
+    // port, ver settings_file_store.cpp resolve_settings_dir). "gusworld" tambem
+    // casa com ".gusworld" se o override GUSWORLD_HOME estiver setado no CI.
+    REQUIRE(dir.find("gusworld") != std::string::npos);
+#else
     REQUIRE(dir.find(".gusworld") != std::string::npos);
+#endif
 }

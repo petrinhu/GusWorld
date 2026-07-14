@@ -163,18 +163,26 @@ TEST_CASE("AudioEngine load_sfx com WAV sintetico valido: id valido + play repet
 
 TEST_CASE("AudioEngine load_music com WAV sintetico valido: play/loop/stop com fade",
           "[audio_engine]") {
-    AudioEngine engine(/*device_active=*/false);
     const auto tmp =
         std::filesystem::temp_directory_path() / "gusworld_test_music_tone.wav";
     write_test_tone_wav(tmp, /*sample_rate=*/22050, /*duration_s=*/0.2f, /*freq_hz=*/220.0f);
 
-    const SoundId id = engine.load_music(tmp.string().c_str());
-    REQUIRE(id != kInvalidSound);
+    {
+        // Escopo proprio: o AudioEngine precisa ser DESTRUIDO (fechando o stream
+        // MA_SOUND_FLAG_STREAM aberto sobre `tmp`) antes do remove() abaixo. No
+        // Linux um arquivo aberto pode ser removido (unlink so desliga a entrada
+        // de diretorio); no Windows o handle aberto BLOQUEIA a remocao
+        // (sharing violation) - sem este escopo, remove(tmp) lancaria
+        // std::filesystem::filesystem_error so no Windows.
+        AudioEngine engine(/*device_active=*/false);
+        const SoundId id = engine.load_music(tmp.string().c_str());
+        REQUIRE(id != kInvalidSound);
 
-    engine.play_music(id, /*loop=*/true);
-    // Troca de faixa (mesma id de novo): deve substituir sem crashar.
-    engine.play_music(id, /*loop=*/false);
-    engine.stop_music(0.2f);  // fade nativo do miniaudio
+        engine.play_music(id, /*loop=*/true);
+        // Troca de faixa (mesma id de novo): deve substituir sem crashar.
+        engine.play_music(id, /*loop=*/false);
+        engine.stop_music(0.2f);  // fade nativo do miniaudio
+    }
 
     std::filesystem::remove(tmp);
     SUCCEED("load + play/loop/stop de musica real (sintetica) nao crashou");
@@ -192,19 +200,24 @@ TEST_CASE("AudioEngine: SFX e musica sao pools independentes (mesmo id, engines 
 TEST_CASE("AudioEngine play_music sem fade_in_seconds preserva o comportamento antigo "
           "(default 0.0f = volume cheio imediato, chamada de 2 args ainda compila)",
           "[audio_engine][m6_f4]") {
-    AudioEngine engine(/*device_active=*/false);
     const auto tmp =
         std::filesystem::temp_directory_path() / "gusworld_test_music_default.wav";
     write_test_tone_wav(tmp, /*sample_rate=*/22050, /*duration_s=*/0.2f, /*freq_hz=*/220.0f);
 
-    const SoundId id = engine.load_music(tmp.string().c_str());
-    REQUIRE(id != kInvalidSound);
+    {
+        // Escopo proprio: destroi o AudioEngine (fecha o stream aberto sobre
+        // `tmp`) antes do remove() - ver comentario identico no teste anterior
+        // (Windows bloqueia remocao de arquivo com handle aberto, Linux nao).
+        AudioEngine engine(/*device_active=*/false);
+        const SoundId id = engine.load_music(tmp.string().c_str());
+        REQUIRE(id != kInvalidSound);
 
-    // Chamada de 2 argumentos (assinatura antiga, F1/F3) continua valida - a extensao e
-    // ADITIVA (fade_in_seconds tem default 0.0f).
-    engine.play_music(id, /*loop=*/true);
-    REQUIRE(engine.music_is_playing());
-    REQUIRE(engine.music_play_count() == 1);
+        // Chamada de 2 argumentos (assinatura antiga, F1/F3) continua valida - a extensao e
+        // ADITIVA (fade_in_seconds tem default 0.0f).
+        engine.play_music(id, /*loop=*/true);
+        REQUIRE(engine.music_is_playing());
+        REQUIRE(engine.music_play_count() == 1);
+    }
 
     std::filesystem::remove(tmp);
 }
@@ -212,18 +225,23 @@ TEST_CASE("AudioEngine play_music sem fade_in_seconds preserva o comportamento a
 TEST_CASE("AudioEngine play_music com fade_in_seconds toca em loop e conta 1x "
           "(M6 F4, ADR-011)",
           "[audio_engine][m6_f4]") {
-    AudioEngine engine(/*device_active=*/false);
     const auto tmp =
         std::filesystem::temp_directory_path() / "gusworld_test_music_fadein.wav";
     write_test_tone_wav(tmp, /*sample_rate=*/22050, /*duration_s=*/0.2f, /*freq_hz=*/220.0f);
 
-    const SoundId id = engine.load_music(tmp.string().c_str());
-    REQUIRE(id != kInvalidSound);
-    REQUIRE_FALSE(engine.music_is_playing());  // nada tocando antes do play_music
+    {
+        // Escopo proprio: destroi o AudioEngine (fecha o stream aberto sobre
+        // `tmp`) antes do remove() - ver comentario identico nos testes acima
+        // (Windows bloqueia remocao de arquivo com handle aberto, Linux nao).
+        AudioEngine engine(/*device_active=*/false);
+        const SoundId id = engine.load_music(tmp.string().c_str());
+        REQUIRE(id != kInvalidSound);
+        REQUIRE_FALSE(engine.music_is_playing());  // nada tocando antes do play_music
 
-    engine.play_music(id, /*loop=*/true, /*fade_in_seconds=*/2.0f);
-    REQUIRE(engine.music_is_playing());
-    REQUIRE(engine.music_play_count() == 1);
+        engine.play_music(id, /*loop=*/true, /*fade_in_seconds=*/2.0f);
+        REQUIRE(engine.music_is_playing());
+        REQUIRE(engine.music_play_count() == 1);
+    }
 
     std::filesystem::remove(tmp);
 }
@@ -243,23 +261,31 @@ TEST_CASE("AudioEngine music_play_count: kInvalidSound/id fora de alcance NAO in
 TEST_CASE("AudioEngine stop_music com fade para o node de musica (music_is_playing "
           "reflete o estado apos o fade programado terminar de ser AGENDADO)",
           "[audio_engine][m6_f4]") {
-    AudioEngine engine(/*device_active=*/false);
     const auto tmp =
         std::filesystem::temp_directory_path() / "gusworld_test_music_stopfade.wav";
     write_test_tone_wav(tmp, /*sample_rate=*/22050, /*duration_s=*/0.2f, /*freq_hz=*/220.0f);
 
-    const SoundId id = engine.load_music(tmp.string().c_str());
-    REQUIRE(id != kInvalidSound);
+    {
+        // Escopo proprio: destroi o AudioEngine (fecha o stream aberto sobre
+        // `tmp`) antes do remove() - stop_music so AGENDA o fade-out, o sound
+        // (e o handle do arquivo) continua vivo ate o destrutor do engine
+        // limpar (ver stop_music() no .cpp). Sem este escopo, remove(tmp)
+        // lancaria std::filesystem::filesystem_error so no Windows (o handle
+        // ainda aberto bloqueia a remocao; Linux permite unlink de arquivo aberto).
+        AudioEngine engine(/*device_active=*/false);
+        const SoundId id = engine.load_music(tmp.string().c_str());
+        REQUIRE(id != kInvalidSound);
 
-    engine.play_music(id, /*loop=*/true, /*fade_in_seconds=*/0.5f);
-    REQUIRE(engine.music_is_playing());
+        engine.play_music(id, /*loop=*/true, /*fade_in_seconds=*/0.5f);
+        REQUIRE(engine.music_is_playing());
 
-    // stop_music agenda um fade-out (nao para instantaneamente) - o node continua
-    // "playing" (node_state_started, com fade programado) ate o tempo do fade decorrer;
-    // aqui so provamos que a chamada e segura e nao derruba o estado imediatamente
-    // (mesmo espirito do teste original "play/loop/stop com fade" da F1).
-    engine.stop_music(0.3f);
-    SUCCEED("stop_music com fade nao crashou e nao exige polling nesta API minima");
+        // stop_music agenda um fade-out (nao para instantaneamente) - o node continua
+        // "playing" (node_state_started, com fade programado) ate o tempo do fade decorrer;
+        // aqui so provamos que a chamada e segura e nao derruba o estado imediatamente
+        // (mesmo espirito do teste original "play/loop/stop com fade" da F1).
+        engine.stop_music(0.3f);
+        SUCCEED("stop_music com fade nao crashou e nao exige polling nesta API minima");
+    }
 
     std::filesystem::remove(tmp);
 }
@@ -267,8 +293,6 @@ TEST_CASE("AudioEngine stop_music com fade para o node de musica (music_is_playi
 TEST_CASE("AudioEngine: SFX e musica coexistem - tocar o hit NAO para a musica "
           "(grupos music/sfx independentes, M6 F4)",
           "[audio_engine][m6_f4]") {
-    AudioEngine engine(/*device_active=*/false);
-
     const auto music_tmp =
         std::filesystem::temp_directory_path() / "gusworld_test_coexist_music.wav";
     write_test_tone_wav(music_tmp, /*sample_rate=*/22050, /*duration_s=*/0.2f,
@@ -278,20 +302,30 @@ TEST_CASE("AudioEngine: SFX e musica coexistem - tocar o hit NAO para a musica "
     write_test_tone_wav(sfx_tmp, /*sample_rate=*/22050, /*duration_s=*/0.1f,
                          /*freq_hz=*/880.0f);
 
-    const SoundId music_id = engine.load_music(music_tmp.string().c_str());
-    const SoundId sfx_id = engine.load_sfx(sfx_tmp.string().c_str());
-    REQUIRE(music_id != kInvalidSound);
-    REQUIRE(sfx_id != kInvalidSound);
+    {
+        // Escopo proprio: destroi o AudioEngine (fecha o stream MA_SOUND_FLAG_
+        // STREAM aberto sobre `music_tmp`, nunca parado por stop_music neste
+        // teste) antes do remove() abaixo. sfx_tmp NAO precisa do escopo - o SFX
+        // usa MA_SOUND_FLAG_DECODE (decodifica tudo pra memoria no load, fecha o
+        // handle do arquivo antes de load_sfx retornar), so o handle de STREAM
+        // da musica fica aberto ate o engine morrer (Windows bloqueia remocao de
+        // arquivo com handle aberto; Linux permite).
+        AudioEngine engine(/*device_active=*/false);
+        const SoundId music_id = engine.load_music(music_tmp.string().c_str());
+        const SoundId sfx_id = engine.load_sfx(sfx_tmp.string().c_str());
+        REQUIRE(music_id != kInvalidSound);
+        REQUIRE(sfx_id != kInvalidSound);
 
-    engine.play_music(music_id, /*loop=*/true, /*fade_in_seconds=*/1.0f);
-    REQUIRE(engine.music_is_playing());
+        engine.play_music(music_id, /*loop=*/true, /*fade_in_seconds=*/1.0f);
+        REQUIRE(engine.music_is_playing());
 
-    // Dispara o SFX varias vezes (simula golpes repetidos) - a musica segue tocando.
-    engine.play_sfx(sfx_id);
-    engine.play_sfx(sfx_id);
-    REQUIRE(engine.music_is_playing());
-    REQUIRE(engine.sfx_play_count() == 2);
-    REQUIRE(engine.music_play_count() == 1);
+        // Dispara o SFX varias vezes (simula golpes repetidos) - a musica segue tocando.
+        engine.play_sfx(sfx_id);
+        engine.play_sfx(sfx_id);
+        REQUIRE(engine.music_is_playing());
+        REQUIRE(engine.sfx_play_count() == 2);
+        REQUIRE(engine.music_play_count() == 1);
+    }
 
     std::filesystem::remove(music_tmp);
     std::filesystem::remove(sfx_tmp);

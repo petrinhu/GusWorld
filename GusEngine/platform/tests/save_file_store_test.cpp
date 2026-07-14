@@ -59,7 +59,14 @@ SaveData make_valid_save(int slot) {
 TEST_CASE("resolve_saves_dir: contem o sufixo canonico .gusworld/saves",
           "[platform][fs][save]") {
     const std::string dir = gus::platform::fs::resolve_saves_dir();
+#ifdef _WIN32
+    // Layout de producao do Windows: "%APPDATA%\gusworld\saves" SEM ponto
+    // (decisao do port, ver save_file_store.cpp resolve_saves_dir). "gusworld"
+    // tambem casa com ".gusworld" se o override GUSWORLD_HOME estiver setado.
+    REQUIRE(dir.find("gusworld") != std::string::npos);
+#else
     REQUIRE(dir.find(".gusworld") != std::string::npos);
+#endif
     REQUIRE(dir.find("saves") != std::string::npos);
 }
 
@@ -128,13 +135,22 @@ TEST_CASE("save_game: cria o diretorio com permissao 0700 e o arquivo com "
 
     using std::filesystem::perms;
     REQUIRE((dir_perms & perms::owner_all) == perms::owner_all);
+#ifndef _WIN32
+    // std::filesystem::permissions no Windows NAO mapeia bits POSIX de
+    // grupo/outros (o backend _wstat64 espelha os bits de owner em todos os 9
+    // bits, exceto write quando o arquivo e read-only) - a privacidade real no
+    // Windows vem das ACLs per-user de %APPDATA%, nao de bits 0700 POSIX.
     REQUIRE((dir_perms & perms::group_all) == perms::none);
     REQUIRE((dir_perms & perms::others_all) == perms::none);
+#endif
 
     REQUIRE((file_perms & perms::owner_read) == perms::owner_read);
     REQUIRE((file_perms & perms::owner_write) == perms::owner_write);
+#ifndef _WIN32
+    // Mesmo motivo do bloco acima (grupo/outros POSIX nao existem no Windows).
     REQUIRE((file_perms & perms::group_all) == perms::none);
     REQUIRE((file_perms & perms::others_all) == perms::none);
+#endif
 
     std::filesystem::remove_all(dir);
 }
