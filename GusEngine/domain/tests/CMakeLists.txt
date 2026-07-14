@@ -92,6 +92,9 @@ add_executable(gusengine_domain_tests
     # Executor techMagic (ADR-016, MVP step 2): dispatcher OnCast/OnDamageDealt/
     # OnDamageReceived/Always (ApplyStatus/Leech/Reflect) via a CombatStateMachine.
     techmagic_executor_test.cpp
+    # Executor techMagic (ADR-016, MVP step 3): ledger cross-ator + hook OnRoundEnd +
+    # handler HypotenuseCombo (Pythagoras, decisoes Q1-Q4 do lider).
+    techmagic_roundend_test.cpp
 )
 
 # Os testes do combate incluem helpers de teste headers-only (fixed_random.hpp).

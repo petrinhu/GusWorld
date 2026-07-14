@@ -455,14 +455,37 @@ void CombatStateMachine::advance_to_next_actor() {
         queue_.advance();
 
     if (queue_.round_index() > round_before) {
-        // Fronteira da rodada (o wrap acabou de dar a volta na fila): reagrupa por lado a nova
-        // rodada (§4.1) e avanca o relogio de periodo (§18.3). O regroup so acontece AQUI, na
+        // Fronteira da rodada (o wrap acabou de dar a volta na fila): despacha OnRoundEnd
+        // (ADR-016 secao 20 item 4, HypotenuseCombo) sobre o ledger da rodada que ACABOU de
+        // fechar, ANTES do regroup - a iteracao usa queue_.order() na ordem que fechou a
+        // rodada (o regroup so reordena a PROXIMA). Depois reagrupa por lado a nova rodada
+        // (§4.1) e avanca o relogio de periodo (§18.3). O regroup so acontece AQUI, na
         // fronteira (nunca no meio da rodada): a esta altura prune_dead ja rodou e o cursor
         // esta em 0, entao ele so pode reordenar atores pendentes desta nova rodada. Reagrupar
         // AQUI (e nao a cada advance) preserva o comando livre da Fase 1 dentro da rodada.
+        process_round_end_hooks();
         regroup_round_by_side();
         advance_period_clock();
     }
+}
+
+void CombatStateMachine::process_round_end_hooks() {
+    // Dedup 1x/alvo/rodada (ADR-016 secao 20 item 4): compartilhado entre TODOS os atores
+    // iterados nesta chamada (= 1 rodada), entao >1 dono da passiva Hipotenusa fechando
+    // combo no MESMO alvo nao dobra o bonus.
+    std::unordered_set<CombatActor*> bonused_targets;
+
+    for (CombatActor* actor : queue_.order()) {
+        if (!actor->is_alive()) continue;  // cadaver: sem passiva pra rodar.
+        techMagic::TechMagicContext ctx{
+            /*caster=*/actor,       /*counterpart=*/nullptr, /*damage=*/0,
+            /*log=*/&log_,          /*round_hits=*/&round_hits_,
+            /*bonused_targets=*/&bonused_targets};
+        techMagic::execute_equipped(TriggerHook::OnRoundEnd, *actor, card_registry_, ctx);
+    }
+
+    // Hits nao atravessam fronteira de rodada (limpa SEMPRE, mesmo sem nenhuma especial).
+    round_hits_.clear();
 }
 
 CombatResult CombatStateMachine::run_until_end() {
@@ -664,6 +687,13 @@ void CombatStateMachine::apply_damage_with_hooks(CombatActor& attacker, CombatAc
                                                   int damage, const Card* source_card) {
     target.take_damage(damage);
     if (damage <= 0) return;  // canal FALHA/imunidade: hooks nao disparam (secao 20 item 2/3)
+
+    // Ledger cross-ator (ADR-016 secao 20 item 4, HypotenuseCombo/OnRoundEnd): registra o
+    // hit DEPOIS do guard acima (canal FALHA/imunidade nunca entra). Ticks de DoT (Poison/
+    // Corrode, apply_status_tick) chamam CombatActor::take_damage direto - FORA deste
+    // helper - entao ficam de fora do ledger por construcao (coerente com o escopo: o
+    // combo e sobre GOLPES, nao sobre veneno tiquetaqueando).
+    round_hits_.push_back(techMagic::RoundHitEntry{&attacker, &target, damage});
 
     // OnDamageDealt (Leech): fontes = a carta JOGADA (se houver, ataque basico nao tem) +
     // as especiais EQUIPADAS do atacante.

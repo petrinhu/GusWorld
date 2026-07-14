@@ -56,6 +56,7 @@
 #include "gus/domain/combat/environment_modifier.hpp"
 #include "gus/domain/combat/initiative_queue.hpp"
 #include "gus/domain/combat/random_source.hpp"
+#include "gus/domain/combat/techmagic.hpp"
 
 namespace gus::domain::combat {
 
@@ -133,6 +134,16 @@ public:
     // Mudancas de status acumuladas (Applied/Expired/Absorbed), secao 16.
     [[nodiscard]] const std::vector<StatusEffectChange>& status_changes() const noexcept {
         return status_changes_;
+    }
+
+    // Ledger de hits DA RODADA CORRENTE (ADR-016 secao 20 item 4, ledger cross-ator):
+    // observabilidade de teste do HypotenuseCombo/OnRoundEnd. Populado em
+    // apply_damage_with_hooks (cada hit com damage > 0), limpo no fim de
+    // process_round_end_hooks (fronteira de rodada, ver advance_to_next_actor). Vazio fora
+    // do meio de uma rodada em curso ja processada (a limpeza acontece logo apos o
+    // despacho do hook, entao o ledger nunca "vaza" pra rodada seguinte).
+    [[nodiscard]] const std::vector<techMagic::RoundHitEntry>& round_hits() const noexcept {
+        return round_hits_;
     }
 
     // Ultimo IntentPreview lido por Gambito-Prever (secao 12). nullopt antes do 1o uso.
@@ -284,6 +295,16 @@ private:
     void apply_damage_with_hooks(CombatActor& attacker, CombatActor& target, int damage,
                                  const Card* source_card);
 
+    // Despacha OnRoundEnd (ADR-016 secao 20 item 4, HypotenuseCombo) nas especiais
+    // EQUIPADAS de cada ator VIVO da fila, com ctx.round_hits apontando pro ledger da
+    // rodada que acabou de fechar (round_hits_) e um set de dedup (bonused_targets)
+    // compartilhado por TODA a chamada (1x/alvo/rodada mesmo com >1 dono da passiva).
+    // Chamado SO na fronteira da rodada (wrap de advance_to_next_actor), ANTES de
+    // regroup_round_by_side - a ordem de iteracao e queue_.order() (a ordem QUE FECHOU a
+    // rodada, antes do regroup da PROXIMA). Limpa round_hits_ ao final SEMPRE (hits nao
+    // atravessam fronteira de rodada, mesmo se nenhuma especial disparar).
+    void process_round_end_hooks();
+
     [[nodiscard]] CombatActor* resolve_primary_target(CombatActor& actor,
                                                       const CombatAction& action,
                                                       const Card& card);
@@ -335,6 +356,11 @@ private:
     // e o mesmo flag (a Analise Preditiva ainda nao tem campo no dado da carta). Comuns e
     // Passiva/ForaDeCombate NUNCA entram aqui (isentas, ver resolve_use_card).
     std::unordered_set<std::string> specials_cast_;
+
+    // Ledger de hits DA RODADA CORRENTE (ADR-016 secao 20 item 4, ledger cross-ator):
+    // acumulado em apply_damage_with_hooks (DEPOIS do guard damage<=0), consultado e
+    // limpo em process_round_end_hooks na fronteira da rodada. Ver round_hits() acima.
+    std::vector<techMagic::RoundHitEntry> round_hits_;
 
     std::vector<CombatLogEntry> log_;
     std::vector<StatusEffectChange> status_changes_;

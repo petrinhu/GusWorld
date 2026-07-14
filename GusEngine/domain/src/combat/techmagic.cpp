@@ -1,19 +1,22 @@
 // gus/domain/combat/techmagic.cpp
 //
-// Implementacao do executor techMagic (ADR-016, MVP step 2). Handlers deste step:
-// ApplyStatus, Leech, Reflect. EffectKind sem handler (HypotenuseCombo/CloneAlly) lanca
-// std::logic_error - fail-fast, nunca no-op silencioso (ver techmagic.hpp).
+// Implementacao do executor techMagic (ADR-016, MVP steps 2-3). Handlers: ApplyStatus,
+// Leech, Reflect (step 2) + HypotenuseCombo (step 3, ledger cross-ator/OnRoundEnd).
+// EffectKind sem handler (CloneAlly) lanca std::logic_error - fail-fast, nunca no-op
+// silencioso (ver techmagic.hpp).
 //
 // Cross-ref: gus/domain/combat/techmagic.hpp; combat_state_machine.cpp (pontos de hook);
 //            docs/design/mecanicas/cartas-technomagik.md; ADR-016.
 
 #include "gus/domain/combat/techmagic.hpp"
 
+#include <algorithm>
 #include <cmath>
 #include <optional>
 #include <stdexcept>
 #include <string>
 #include <utility>
+#include <vector>
 
 namespace gus::domain::combat::techMagic {
 
@@ -97,6 +100,82 @@ void handle_reflect(const EffectSpec& spec, const Card& card, TechMagicContext& 
                  ctx.counterpart->id() + " via " + card.id + " (Reflect).");
 }
 
+// HypotenuseCombo (OnRoundEnd, ADR-016 secao 20 item 4 / decisoes Q1-Q4 do lider,
+// 2026-07-14): quando >=2 ALIADOS DISTINTOS do dono bateram no MESMO alvo nesta rodada, E
+// o proprio dono esta entre eles (Q4), aplica um GOLPE-BONUS ADICIONAL de
+// round(sqrt(soma dos quadrados dos danos POR ATACANTE DISTINTO)) por cima dos hits normais
+// (Q1: soma, nao substitui). Mesmo aliado que bateu 2x conta como UM componente = soma dos
+// danos dele (Q3). Formula estende a N atacantes (Q2). Dedup 1x/alvo/rodada via
+// ctx.bonused_targets (>1 dono da passiva no mesmo alvo nao dobra o bonus).
+void handle_hypotenuse_combo(const Card& card, TechMagicContext& ctx) {
+    if (ctx.caster == nullptr)
+        throw std::logic_error("techMagic::HypotenuseCombo: ctx.caster nao pode ser nulo.");
+    if (ctx.round_hits == nullptr)
+        throw std::logic_error(
+            "techMagic::HypotenuseCombo: ctx.round_hits nao pode ser nulo (OnRoundEnd sem "
+            "ledger injetado no contexto - bug de call site, nao efeito vazio).");
+
+    // Agrega os hits do ledger por ALVO e, dentro de cada alvo, por ATACANTE DISTINTO do
+    // MESMO lado do caster (combo e so entre aliados; hit do lado oposto no mesmo alvo nao
+    // combina). Vetores em vez de mapas indexados por ponteiro: a ordem de agregacao segue
+    // a ordem de insercao no ledger (deterministica, ver combat_state_machine.cpp) em vez de
+    // depender de hash de endereco - mesmo racional de determinismo do RNG injetado
+    // (secao 11).
+    struct TargetAgg {
+        CombatActor* target = nullptr;
+        std::vector<std::pair<CombatActor*, int>> by_attacker;
+    };
+    std::vector<TargetAgg> targets;
+
+    for (const RoundHitEntry& hit : *ctx.round_hits) {
+        if (hit.attacker == nullptr || hit.target == nullptr) continue;
+        if (hit.attacker->is_player_side() != ctx.caster->is_player_side())
+            continue;  // so combina hits do MESMO lado do dono da passiva.
+
+        auto target_it = std::find_if(targets.begin(), targets.end(),
+                                      [&](const TargetAgg& t) { return t.target == hit.target; });
+        if (target_it == targets.end()) {
+            targets.push_back(TargetAgg{hit.target, {}});
+            target_it = targets.end() - 1;
+        }
+
+        auto attacker_it =
+            std::find_if(target_it->by_attacker.begin(), target_it->by_attacker.end(),
+                        [&](const auto& p) { return p.first == hit.attacker; });
+        if (attacker_it == target_it->by_attacker.end())
+            target_it->by_attacker.emplace_back(hit.attacker, hit.damage);
+        else
+            attacker_it->second += hit.damage;  // Q3: mesmo atacante 2x = soma, 1 componente.
+    }
+
+    for (const TargetAgg& agg : targets) {
+        if (!agg.target->is_alive()) continue;    // cadaver antes do fecho: sem bonus postumo.
+        if (agg.by_attacker.size() < 2) continue;  // Q1/Q2: precisa de >=2 atacantes distintos.
+
+        const bool caster_in_combo =
+            std::any_of(agg.by_attacker.begin(), agg.by_attacker.end(),
+                       [&](const auto& p) { return p.first == ctx.caster; });
+        if (!caster_in_combo) continue;  // Q4: o DONO precisa estar entre os atacantes.
+
+        if (ctx.bonused_targets != nullptr &&
+            !ctx.bonused_targets->insert(agg.target).second)
+            continue;  // dedup 1x/alvo/rodada (>1 dono da passiva no mesmo alvo).
+
+        double sum_of_squares = 0.0;
+        for (const auto& [attacker, dmg] : agg.by_attacker)
+            sum_of_squares += static_cast<double>(dmg) * static_cast<double>(dmg);
+        const int bonus = static_cast<int>(std::lround(std::sqrt(sum_of_squares)));
+        if (bonus <= 0) continue;
+
+        agg.target->take_damage(bonus);  // PURO - anti-recursao (nao redispara hooks de dano).
+
+        log_entry(ctx, agg.target, bonus,
+                 ctx.caster->id() + " fecha Hipotenuse combo em " + agg.target->id() +
+                     " via " + card.id + ": +" + std::to_string(bonus) + " (combo de " +
+                     std::to_string(agg.by_attacker.size()) + " atacantes).");
+    }
+}
+
 }  // namespace
 
 void execute(TriggerHook hook, const Card& card, TechMagicContext& ctx) {
@@ -114,12 +193,14 @@ void execute(TriggerHook hook, const Card& card, TechMagicContext& ctx) {
                 handle_reflect(spec, card, ctx);
                 break;
             case EffectKind::HypotenuseCombo:
+                handle_hypotenuse_combo(card, ctx);
+                break;
             case EffectKind::CloneAlly:
             default:
                 throw std::logic_error(
                     "techMagic: EffectKind sem handler implementado na carta '" + card.id +
-                    "' (step 2 cobre so ApplyStatus/Leech/Reflect; HypotenuseCombo/CloneAlly "
-                    "sao step 3+, ADR-016).");
+                    "' (steps 2-3 cobrem ApplyStatus/Leech/Reflect/HypotenuseCombo; CloneAlly "
+                    "e step 4+, ADR-016).");
         }
     }
 }
