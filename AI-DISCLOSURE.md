@@ -30,7 +30,7 @@ All prompts used for image and sprite generation were derived from the game's lo
 Alongside the AI tools, several people shaped this project directly. Full detail lives in the README's Credits and acknowledgments section and in [ACKNOWLEDGMENTS.md](ACKNOWLEDGMENTS.md); in summary:
 
 - **Gus Dragon (my son):** inspiration for the protagonist's look and tastes, my partner in game decisions, and lead tester.
-- **El Iagows (my brother):** a computer engineer who gave me plenty of architecture and stack advice, and guided me on using SDL and spritesheets for movement.
+- **El Iagows (my brother):** a computer engineer and a personal inspiration to me in IT, whose training shaped how I think about tech; he gave me plenty of architecture and stack advice, and guided me on using SDL and spritesheets for movement.
 - **Od Fuinha Minduim, Thiago MadDog and Thiago Arcanjo:** IT professionals who gave countless tips on testing, architecture, QA, security, CI and RAG.
 - **The #metaleiros-PE crew:** a longstanding friendship and a source of ongoing feedback and camaraderie.
 - **Bruno Vettore:** suggested creating a language for the game (Sylvarin was born from that conversation), and inspired the character Brunus "Vetorial" Solveckt.
@@ -89,7 +89,7 @@ Todos os prompts usados na geração de imagem e sprite foram derivados da lore 
 Além das ferramentas de IA, várias pessoas moldaram este projeto diretamente. O detalhe completo vive na seção de Créditos e agradecimentos do README e em [ACKNOWLEDGMENTS.md](ACKNOWLEDGMENTS.md); em resumo:
 
 - **Gus Dragon (meu filho):** inspiração da aparência e dos gostos do protagonista, parceiro nas decisões sobre o jogo, e meu tester principal.
-- **El Iagows (meu irmão):** engenheiro de computação que me deu várias dicas de arquitetura e stack, e me orientou no uso de SDL e de spritesheets para o movimento.
+- **El Iagows (meu irmão):** engenheiro de computação e uma inspiração pessoal minha em TI, cuja formação moldou meu jeito de pensar tecnologia; me deu várias dicas de arquitetura e stack, e me orientou no uso de SDL e de spritesheets para o movimento.
 - **Od Fuinha Minduim, Thiago MadDog e Thiago Arcanjo:** profissionais de TI que deram inúmeras dicas de testes, arquitetura, QA, segurança, CI e RAG.
 - **A galera do #metaleiros-PE:** uma amizade antiga e uma fonte constante de feedback e parceria.
 - **Bruno Vettore:** deu a sugestão de criar uma língua para o jogo (o Sylvarin nasceu dessa conversa), e inspirou o personagem Brunus "Vetorial" Solveckt.

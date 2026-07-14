@@ -127,7 +127,7 @@ Or scan the QR code with your phone's camera:
 This game exists because of many people. First, **the people**:
 
 - **Gus Dragon (my son):** inspiration for the protagonist, in looks and tastes. My partner in game decisions and my lead tester.
-- **El Iagows (my brother):** inspiration for Yakov. A computer engineer who gave me plenty of architecture and stack advice and guided me on using SDL and spritesheets for movement. Author of one of the best dice-rolling libraries (800+ downloads): [@iagows/3d-dice-ts on npm](https://www.npmjs.com/package/@iagows/3d-dice-ts) ([code on GitLab](https://gitlab.com/iagows/3d-dice-ts)).
+- **El Iagows (my brother):** inspiration for Yakov, and a personal inspiration to me in IT: a computer engineer whose training shaped how I think about tech, and who gave me plenty of architecture and stack advice and guided me on using SDL and spritesheets for movement. Author of one of the best dice-rolling libraries (800+ downloads): [@iagows/3d-dice-ts on npm](https://www.npmjs.com/package/@iagows/3d-dice-ts) ([code on GitLab](https://gitlab.com/iagows/3d-dice-ts)).
 - **Od Fuinha Minduim, Thiago MadDog and Thiago Arcanjo:** first-class IT professionals who gave countless tips on testing, architecture, QA, security, CI and RAG, and got me studying.
 - **The #metaleiros-PE crew** (now on WhatsApp, a friendship going back to mIRC since ~1997): for the lasting camaraderie.
 - **Bruno Vettore:** suggested creating a language for the game, in a conversation about Tolkien and nosy, inconvenient reporters, after seeing my prototypes. Sylvarin was born from that. He also inspired the character **Brunus "Vetorial" Solveckt**, the itinerant apothecary-physician who mentors Gus.
@@ -276,7 +276,7 @@ Ou aponte a câmera do celular no QR Code:
 Este jogo existe por causa de muita gente. Primeiro, **as pessoas**:
 
 - **Gus Dragon (meu filho):** inspiração do protagonista, na aparência e nos gostos. Parceiro nas decisões sobre o jogo e meu tester principal.
-- **El Iagows (meu irmão):** inspiração do Yakov. Engenheiro de computação que me deu várias dicas de arquitetura e stack, e me orientou no uso de SDL e de spritesheets para o movimento. Criador de uma das melhores libs de rolagem de dados (800+ downloads): [@iagows/3d-dice-ts no npm](https://www.npmjs.com/package/@iagows/3d-dice-ts) ([código no GitLab](https://gitlab.com/iagows/3d-dice-ts)).
+- **El Iagows (meu irmão):** inspiração do Yakov, e uma inspiração pessoal minha em TI: engenheiro de computação cuja formação moldou meu jeito de pensar tecnologia, que me deu várias dicas de arquitetura e stack, e me orientou no uso de SDL e de spritesheets para o movimento. Criador de uma das melhores libs de rolagem de dados (800+ downloads): [@iagows/3d-dice-ts no npm](https://www.npmjs.com/package/@iagows/3d-dice-ts) ([código no GitLab](https://gitlab.com/iagows/3d-dice-ts)).
 - **Od Fuinha Minduim, Thiago MadDog e Thiago Arcanjo:** profissionais de primeira classe em TI, que deram inúmeras dicas de testes, arquitetura, QA, segurança, CI e RAG, e me puseram para estudar.
 - **A galera do grupo #metaleiros-PE** (hoje no WhatsApp, uma amizade que vem do mIRC desde ~1997): pela parceria de sempre.
 - **Bruno Vettore:** deu a sugestão de criar uma língua para o jogo, numa conversa sobre Tolkien e repórteres intrometidos e inconvenientes, ao ver meus protótipos. O Sylvarin nasceu daí. Também inspirou o personagem **Brunus "Vetorial" Solveckt**, o boticário-médico itinerante mentor do Gus.
