@@ -290,4 +290,10 @@ std::vector<StatusEffectChange> CombatActor::drain_status_changes() {
     return snapshot;
 }
 
+void CombatActor::restore_mana(int amount) {
+    if (amount < 0)
+        throw std::out_of_range("Restauracao de mana deve ser >= 0.");
+    mana_ = std::min(max_mana_, mana_ + amount);
+}
+
 }  // namespace gus::domain::combat

@@ -46,6 +46,7 @@
 #include <optional>
 #include <string>
 #include <unordered_map>
+#include <unordered_set>
 #include <vector>
 
 #include "gus/domain/combat/combat_enums.hpp"
@@ -272,6 +273,17 @@ private:
                           const CombatState& state);
     void resolve_flee(CombatActor& actor);
 
+    // Aplica `damage` em `target` (take_damage) e despacha os hooks OnDamageDealt/
+    // OnDamageReceived do executor techMagic (ADR-016 secao 20 item 3): fontes de
+    // OnDamageDealt = `source_card` (se houver, a carta jogada por `attacker`) + as
+    // especiais EQUIPADAS de `attacker`; fontes de OnDamageReceived = as especiais
+    // EQUIPADAS de `target`. HELPER COMPARTILHADO entre resolve_use_card e
+    // resolve_basic_attack (anti-gemeo obrigatorio: os DOIS sitios de dano fiam aqui, NAO
+    // ha copy-paste da logica de hook). No-op de hooks se damage <= 0 (canal FALHA/
+    // imunidade nao dispara). source_card == nullptr no ataque basico (nao ha carta).
+    void apply_damage_with_hooks(CombatActor& attacker, CombatActor& target, int damage,
+                                 const Card* source_card);
+
     [[nodiscard]] CombatActor* resolve_primary_target(CombatActor& actor,
                                                       const CombatAction& action,
                                                       const Card& card);
@@ -316,6 +328,13 @@ private:
     // begin_turn (comando livre). nullptr = sem escolha => default (queue_.current()).
     // One-shot: begin_turn consome e zera. Ponteiro NAO-DONO (ator vive no escopo do dono).
     CombatActor* selected_next_party_ = nullptr;
+
+    // Regra 1x/batalha das especiais ATIVA/HIBRIDA (executor techMagic, ADR-016 secao
+    // 20): Card.Id ja jogados nesta batalha (escopo = vida desta CombatStateMachine).
+    // Reusa a SEMANTICA "nao recarrega na batalha" da Analise Preditiva (secao 2.1) - NAO
+    // e o mesmo flag (a Analise Preditiva ainda nao tem campo no dado da carta). Comuns e
+    // Passiva/ForaDeCombate NUNCA entram aqui (isentas, ver resolve_use_card).
+    std::unordered_set<std::string> specials_cast_;
 
     std::vector<CombatLogEntry> log_;
     std::vector<StatusEffectChange> status_changes_;

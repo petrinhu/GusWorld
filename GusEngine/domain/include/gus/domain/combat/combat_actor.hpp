@@ -168,6 +168,22 @@ public:
     // Drena (le e limpa) o buffer de mudancas de status (secao 16). Consumo unico.
     [[nodiscard]] std::vector<StatusEffectChange> drain_status_changes();
 
+    // Restaura mana (clamp em max_mana). Ex.: Leech do executor techMagic (ADR-016).
+    // Negativo e erro de chamador (out_of_range), mesmo padrao de heal/take_damage.
+    void restore_mana(int amount);
+
+    // ---- Especiais equipadas (executor techMagic, ADR-016) ----
+
+    // Ids de Card (Passiva/Hibrida) equipadas por este ator. Vazio = comportamento atual
+    // (nenhuma passiva ativa). Resolvidas contra o card_registry ja existente na FSM - o
+    // CombatActor NAO guarda os dados da carta, so a referencia por id.
+    [[nodiscard]] const std::vector<std::string>& equipped_special_ids() const noexcept {
+        return equipped_special_ids_;
+    }
+    void set_equipped_special_ids(std::vector<std::string> ids) {
+        equipped_special_ids_ = std::move(ids);
+    }
+
 private:
     // Drena o pool de Shield contra amount e devolve o dano remanescente pro HP.
     int absorb_with_shield(int amount);
@@ -201,6 +217,9 @@ private:
     std::vector<std::pair<StatusId, int>> applied_stat_deltas_;
     // Buffer de mudancas de status (secao 16), drenado pos-turno pela FSM.
     std::vector<StatusEffectChange> status_changes_;
+    // Especiais equipadas (executor techMagic, ADR-016). Vazio por padrao (nenhuma
+    // passiva); ver equipped_special_ids()/set_equipped_special_ids() acima.
+    std::vector<std::string> equipped_special_ids_;
 };
 
 }  // namespace gus::domain::combat

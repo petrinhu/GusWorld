@@ -28,6 +28,7 @@
 #include "gus/domain/combat/combo_table.hpp"
 #include "gus/domain/combat/enemy_brain.hpp"
 #include "gus/domain/combat/environment_catalog.hpp"
+#include "gus/domain/combat/techmagic.hpp"
 #include "gus/domain/combat/weakness_wheel.hpp"
 
 namespace gus::domain::combat {
@@ -340,6 +341,17 @@ bool CombatStateMachine::begin_turn() {
     actor.refresh_resources_for_turn(queue_.round_index());
 
     const bool stunned = apply_status_tick(actor);
+
+    // Always (executor techMagic, ADR-016 secao 20 item 4/MVP): reforca (Refresh) o
+    // ApplyStatus das especiais EQUIPADAS (Passiva/Hibrida) no dono, todo TurnStart,
+    // enquanto a carta seguir equipada. So ApplyStatus neste step; OnAllyTurnEnd/
+    // OnRoundEnd ficam DECLARADOS sem ponto de disparo (step 3+). No-op se `actor` nao
+    // tiver especiais equipadas.
+    {
+        techMagic::TechMagicContext always_ctx{&actor, nullptr, /*damage=*/0, &log_};
+        techMagic::execute_equipped(TriggerHook::Always, actor, card_registry_, always_ctx);
+    }
+
     drain_status_changes();
 
     phase_ = CombatPhase::ActionSelect;
@@ -638,11 +650,34 @@ void CombatStateMachine::resolve_basic_attack(CombatActor& attacker,
         throw std::logic_error("Alvo '" + *action.target_id + "' nao esta em combate.");
 
     const int damage = std::max(combat_constants::kMinDamage, attacker.atk() - target->def());
-    target->take_damage(damage);
+    // Ataque basico nao tem carta (source_card = nullptr); ainda assim dispara
+    // OnDamageDealt das equipadas do atacante e OnDamageReceived das equipadas do alvo
+    // (Reflect, secao 20 item 3 - mesmo helper compartilhado de resolve_use_card).
+    apply_damage_with_hooks(attacker, *target, damage, /*source_card=*/nullptr);
 
     log_.push_back(CombatLogEntry{
         attacker.id(), CombatActionType::Attack, target->id(), damage,
         attacker.id() + " ataca " + target->id() + " por " + std::to_string(damage) + "."});
+}
+
+void CombatStateMachine::apply_damage_with_hooks(CombatActor& attacker, CombatActor& target,
+                                                  int damage, const Card* source_card) {
+    target.take_damage(damage);
+    if (damage <= 0) return;  // canal FALHA/imunidade: hooks nao disparam (secao 20 item 2/3)
+
+    // OnDamageDealt (Leech): fontes = a carta JOGADA (se houver, ataque basico nao tem) +
+    // as especiais EQUIPADAS do atacante.
+    techMagic::TechMagicContext dealt_ctx{&attacker, &target, damage, &log_};
+    if (source_card != nullptr)
+        techMagic::execute(TriggerHook::OnDamageDealt, *source_card, dealt_ctx);
+    techMagic::execute_equipped(TriggerHook::OnDamageDealt, attacker, card_registry_, dealt_ctx);
+
+    // OnDamageReceived (Reflect): fontes = as especiais EQUIPADAS do ALVO. O dano
+    // refletido aplica via CombatActor::take_damage PURO dentro do handler (techmagic.cpp)
+    // - nao reentra aqui, entao nunca redispara estes hooks (guarda anti-recursao).
+    techMagic::TechMagicContext received_ctx{&target, &attacker, damage, &log_};
+    techMagic::execute_equipped(TriggerHook::OnDamageReceived, target, card_registry_,
+                                received_ctx);
 }
 
 void CombatStateMachine::resolve_defend(CombatActor& actor) {
@@ -765,6 +800,21 @@ void CombatStateMachine::resolve_use_card(CombatActor& actor, const CombatAction
         throw std::out_of_range("Carta '" + *action.card_id + "' nao esta no registry de combate.");
     const Card& card = card_it->second;
 
+    // Regra 1x/batalha das especiais ATIVA/HIBRIDA (executor techMagic, ADR-016 secao 20):
+    // reusa a SEMANTICA "nao recarrega na batalha" da Analise Preditiva (secao 2.1) - NAO e
+    // o mesmo flag (a Analise Preditiva ainda nao tem campo no dado da carta). Passiva/
+    // ForaDeCombate e TODAS as Comuns sao isentas. Estetica de erro de compilacao, mesmo
+    // padrao do bloqueio de Silence acima.
+    if (card.tier != CardTier::Comum &&
+        (card.category == CardCategory::Ativa || card.category == CardCategory::Hibrida)) {
+        if (specials_cast_.count(card.id) > 0)
+            throw std::logic_error(
+                "ERRO DE COMPILACAO: '" + card.id +
+                "' ja foi compilada nesta batalha (especiais Ativa/Hibrida sao 1x/batalha, "
+                "secao 2.1).");
+        specials_cast_.insert(card.id);
+    }
+
     const std::optional<CardModifier>& modifier = action.modifier;
 
     // Pre-condicao Null (secao 8): exige Scan previo no alvo.
@@ -848,7 +898,7 @@ void CombatStateMachine::resolve_use_card(CombatActor& actor, const CombatAction
         // 2. Curto-circuito de imunidade (secao 11): multFraqueza == 0 => dano 0 ANTES de
         //    qualquer sorteio. NAO consome RNG (determinismo: imune = 0 consumos).
         if (mult_fraqueza == 0.0f) {
-            target->take_damage(0);
+            apply_damage_with_hooks(actor, *target, 0, &card);
             if (card.status_applied.has_value())
                 target->add_status(*card.status_applied);
             if (combo.has_value() && combo->result_status.has_value())
@@ -897,7 +947,7 @@ void CombatStateMachine::resolve_use_card(CombatActor& actor, const CombatAction
             damage = static_cast<int>(std::lround(rolled));
         }
 
-        target->take_damage(damage);
+        apply_damage_with_hooks(actor, *target, damage, &card);
 
         if (card.status_applied.has_value())
             target->add_status(*card.status_applied);
@@ -909,6 +959,17 @@ void CombatStateMachine::resolve_use_card(CombatActor& actor, const CombatAction
             actor.id(), CombatActionType::UseCard, target->id(), damage,
             actor.id() + " compila " + card.id + " em " + target->id() + " por " +
                 std::to_string(damage) + "." + channel_suffix});
+    }
+
+    // OnCast (executor techMagic, ADR-016 secao 20 item 1): SO a carta JOGADA (nunca as
+    // equipadas), aplicado POR CIMA da base, APOS o loop de dano/status por alvo acima, nos
+    // MESMOS targets - inclusive alvos imunes (o curto-circuito de fraqueza so zera dano,
+    // nao os efeitos declarativos da carta).
+    if (!card.effects.empty()) {
+        for (CombatActor* target : targets) {
+            techMagic::TechMagicContext cast_ctx{&actor, target, /*damage=*/0, &log_};
+            techMagic::execute(TriggerHook::OnCast, card, cast_ctx);
+        }
     }
 }
 

@@ -42,6 +42,9 @@ add_library(gusengine_domain STATIC
     src/combat/scripted_brain.cpp
     src/combat/placeholder_cards.cpp
     src/combat/combat_state_machine.cpp
+    # Executor techMagic (ADR-016, MVP step 2): dispatcher OnCast/OnDamageDealt/
+    # OnDamageReceived/Always sobre EffectSpec de Card (ApplyStatus/Leech/Reflect).
+    src/combat/techmagic.cpp
     src/input/action_registry.cpp
     src/input/controls_name.cpp
     src/input/controls_json.cpp

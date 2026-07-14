@@ -89,6 +89,9 @@ add_executable(gusengine_domain_tests
     # via o motor ja existente + ScriptedBrain; agregacao win-rate/duracao/dominancia).
     # balance_harness.hpp e header-only (ver target_include_directories abaixo).
     balance_harness_test.cpp
+    # Executor techMagic (ADR-016, MVP step 2): dispatcher OnCast/OnDamageDealt/
+    # OnDamageReceived/Always (ApplyStatus/Leech/Reflect) via a CombatStateMachine.
+    techmagic_executor_test.cpp
 )
 
 # Os testes do combate incluem helpers de teste headers-only (fixed_random.hpp).
