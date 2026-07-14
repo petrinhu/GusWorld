@@ -1,0 +1,140 @@
+name: windows
+
+# CI Windows REAL do GusEngine (WIN-CROSS-VALIDATE, exceção pontual autorizada pelo
+# líder 2026-07-14): roda em windows-latest (MSVC nativo, Nível 3 de validação),
+# completando a prova de MinGW cross-compile já feita em .forgejo/workflows/ci.yml
+# (tools/winbuild_container.sh). Repo local é Codeberg-first; este workflow existe
+# SÓ no espelho GitHub (petrinhu/GusWorld), porque Codeberg não oferece runner
+# Windows global. NÃO duplicar/promover esta exceção sem nova autorização.
+#
+# MATRIZ HONESTA (não finge verde):
+#   REQUERIDOS core/domain/platform: já provados cross-compiláveis sob MinGW-w64
+#   (WIN-CROSS-VALIDATE, TODO.md); esta CI valida a MESMA prova sob MSVC real.
+#   app/: BLOQUEADOR CONHECIDO — glintfx/src/gl_loader.c (gerado por
+#   tools/gen_glloader.py) inclui <dlfcn.h> incondicional, sem branch Windows
+#   (wglGetProcAddress/LoadLibraryA inexistentes). Mesmo gap no MinGW e no MSVC.
+#   O step de app/ RODA e É ESPERADO FALHAR (continue-on-error: true, sem mascarar
+#   o exit code) até o glintfx ganhar um GL loader Windows. NÃO patchar glintfx
+#   neste repo — é lib do líder, consumida via FetchContent
+#   (ver [[feedback_glintfx_nao_mexer_so_pedir]]); o achado é repassado como
+#   prompt para o dev da lib, não corrigido aqui.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'GusEngine/**'
+      - '.github/workflows/windows.yml'
+  pull_request:
+    paths:
+      - 'GusEngine/**'
+      - '.github/workflows/windows.yml'
+  workflow_dispatch: {}
+
+concurrency:
+  group: windows-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  windows:
+    name: Windows (MSVC, Release)
+    runs-on: windows-latest
+    timeout-minutes: 60
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup MSVC dev environment (cl.exe no PATH)
+        uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: x64
+
+      - name: Ensure Ninja
+        shell: pwsh
+        run: |
+          if (-not (Get-Command ninja -ErrorAction SilentlyContinue)) {
+            choco install ninja -y
+            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          }
+          ninja --version
+
+      # windows-latest traz vcpkg pre-instalado em C:\vcpkg (VCPKG_INSTALLATION_ROOT).
+      # FreeType via vcpkg (nao FetchContent): RmlUi usa find_package(Freetype), e o
+      # RmlUi_Include_GL3.h (loader glad de platform/) so PRECISA de RmlUi::RmlUi (que
+      # arrasta Freetype) porque RMLUI_FONT_ENGINE=freetype (ver GusEngine/CMakeLists.txt).
+      - name: Cache vcpkg packages
+        uses: actions/cache@v4
+        with:
+          path: C:\vcpkg\installed
+          key: vcpkg-freetype-x64-windows-${{ runner.os }}-v1
+
+      - name: Install FreeType via vcpkg
+        shell: pwsh
+        run: |
+          & "$env:VCPKG_INSTALLATION_ROOT\vcpkg.exe" install freetype:x64-windows
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      # Cache dos fontes de FetchContent (_deps: SDL3, RmlUi, Catch2, glintfx). Evita
+      # re-clonar a cada run. Chave amarrada ao CMakeLists (onde os pins vivem), mesmo
+      # padrao do job "linux" em .forgejo/workflows/ci.yml.
+      - name: Cache FetchContent deps
+        uses: actions/cache@v4
+        with:
+          path: GusEngine\build\windows-release\_deps
+          key: deps-windows-${{ hashFiles('GusEngine/CMakeLists.txt') }}
+
+      - name: Configure (CMake preset windows-release, MSVC + vcpkg FreeType)
+        shell: pwsh
+        working-directory: GusEngine
+        run: |
+          cmake --preset windows-release `
+            "-DCMAKE_TOOLCHAIN_FILE=$env:VCPKG_INSTALLATION_ROOT\scripts\buildsystems\vcpkg.cmake" `
+            "-DVCPKG_TARGET_TRIPLET=x64-windows"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      # --- REQUERIDOS: core/domain/platform (build por --target evita tocar app/ e,
+      #     com isso, evita compilar glintfx nesta fase) ---
+
+      - name: Build + test core/
+        shell: pwsh
+        working-directory: GusEngine
+        run: |
+          cmake --build --preset windows-release --target gusengine_core_tests
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          .\build\windows-release\tests\gusengine_core_tests.exe
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      - name: Build + test domain/
+        shell: pwsh
+        working-directory: GusEngine
+        run: |
+          cmake --build --preset windows-release --target gusengine_domain_tests
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          .\build\windows-release\domain\tests\gusengine_domain_tests.exe
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      - name: Build + test platform/
+        shell: pwsh
+        working-directory: GusEngine
+        run: |
+          cmake --build --preset windows-release --target gusengine_platform_tests
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          .\build\windows-release\platform\tests\gusengine_platform_tests.exe
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      # --- BLOQUEADOR CONHECIDO: app/ (glintfx gl_loader.c sem branch Windows) ---
+      # Este step RODA de proposito e e ESPERADO FALHAR. continue-on-error deixa o
+      # job seguir (nao bloqueia o mirror/CI), mas o exit code do cmake --build e
+      # propagado (se($LASTEXITCODE -ne 0){exit $LASTEXITCODE}) para o step aparecer
+      # VERMELHO/com aviso nos logs - sem mascarar, sem "fingir verde".
+      - name: Build app/ (KNOWN BLOCKER — glintfx gl_loader.c sem branch Windows, allow-fail)
+        shell: pwsh
+        working-directory: GusEngine
+        continue-on-error: true
+        run: |
+          Write-Host "::warning::KNOWN BLOCKER: glintfx/src/gl_loader.c inclui <dlfcn.h> incondicional (POSIX), sem branch Windows (wglGetProcAddress/LoadLibraryA). Mesmo gap ja confirmado no MinGW cross-build (WIN-CROSS-VALIDATE, ver TODO.md). app/ (que linka glintfx) e ESPERADO falhar aqui ate o glintfx ganhar um GL loader Windows nativo. NAO patchar glintfx neste repo - e lib do lider, consumida via FetchContent; o achado e repassado como prompt para o dev da lib."
+          cmake --build --preset windows-release --target gusworld_app
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }

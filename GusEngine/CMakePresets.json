@@ -75,9 +75,8 @@
     },
     {
       "name": "windows-release",
-      "hidden": true,
-      "displayName": "Windows Release (MSVC) - ADIADO",
-      "description": "ESBOCO, ADIADO ate haver runner Windows. Com SDL3 via FetchContent o setup e simples (toolchain MSVC + cmake; sem aqtinstall). Marcado hidden ate validacao no Windows.",
+      "displayName": "Windows Release (MSVC)",
+      "description": "WIN-CROSS-VALIDATE (2026-07-14): habilitado para runner Windows real (GitHub Actions windows-latest, .github/workflows/windows.yml). Requer ilammy/msvc-dev-cmd (cl.exe no PATH) + Ninja (ja vem no runner). FreeType (find_package, RmlUi) resolvido via toolchain vcpkg passado por -DCMAKE_TOOLCHAIN_FILE na invocacao do CI (nao hardcoded aqui). REQUERIDOS core/domain/platform; app/ (glintfx gl_loader.c sem branch Windows) e bloqueador conhecido, allow-fail no CI.",
       "generator": "Ninja",
       "binaryDir": "${sourceDir}/build/${presetName}",
       "cacheVariables": {
@@ -128,6 +127,11 @@
       "name": "windows-mingw",
       "configurePreset": "windows-mingw",
       "displayName": "Build Windows x86_64 (MinGW-w64 cross)"
+    },
+    {
+      "name": "windows-release",
+      "configurePreset": "windows-release",
+      "displayName": "Build Windows Release (MSVC)"
     }
   ],
   "testPresets": [
