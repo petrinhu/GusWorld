@@ -152,7 +152,7 @@ set(GLINTFX_BACKEND_GLFW OFF CACHE BOOL "" FORCE)  # embed-only (sem GLFW)
 FetchContent_Declare(
     glintfx
     GIT_REPOSITORY https://codeberg.org/petrinhu/glintfx
-    GIT_TAG        v0.9.1
+    GIT_TAG        v0.9.2
     SOURCE_SUBDIR  glintfx
 )
 FetchContent_MakeAvailable(glintfx)
