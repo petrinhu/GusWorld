@@ -55,6 +55,10 @@ NeutralRandom& neutral_random() {
 
 // Nome de uma CardFamily para o log (espelha CardFamily.ToString() do C#: o log do Scan
 // checa "familia {target.Family}", testes afere substring "Sonico" etc). So log/UI.
+// CARD-FAMILY-UNIVERSAL: "Universal" e so o nome literal do ordinal 5 (mesmo padrao das
+// outras 5 entradas, NAO e string de apresentacao nova/traduzida); nenhum ator de
+// combate (personagem/inimigo) tem essa family hoje (so-cartas, PS-R1), entao este
+// ramo fica de prontidao pro dia em que Scan citar uma carta Universal no log.
 [[nodiscard]] const char* family_name(CardFamily f) {
     switch (f) {
         case CardFamily::Eletrico: return "Eletrico";
@@ -62,6 +66,7 @@ NeutralRandom& neutral_random() {
         case CardFamily::Sonico: return "Sonico";
         case CardFamily::Cinetico: return "Cinetico";
         case CardFamily::Criptografico: return "Criptografico";
+        case CardFamily::Universal: return "Universal";
     }
     return "Desconhecido";
 }

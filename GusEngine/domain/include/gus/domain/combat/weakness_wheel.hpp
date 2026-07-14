@@ -40,11 +40,17 @@ namespace detail {
             return CardFamily::Bioquimico;
         case CardFamily::Bioquimico:
             return CardFamily::Eletrico;
+        case CardFamily::Universal:
+            // Universal (PS-R1) esta FORA da roda de 5: tier_for() curto-circuita antes
+            // de chegar aqui (Universal nunca e passado como attacker/target pra esta
+            // funcao). Case explicito so pra manter o switch exaustivo (-Wswitch);
+            // retornamos a propria familia (== o idioma do fallback abaixo).
+            return attacker;
     }
     // Familia desconhecida: o C# lanca ArgumentOutOfRangeException. No dominio POCO
     // C++ mantemos puro (sem excecao de runtime fora do contrato): retornamos a
     // propria familia, que classifica como Neutro (degrade seguro). Inalcancavel
-    // para os 5 valores canonicos do enum.
+    // para os 6 valores canonicos do enum.
     return attacker;
 }
 
@@ -52,7 +58,13 @@ namespace detail {
 
 // Tier de relacao entre atacante e alvo. secao 6.
 // Imune (0.0) NAO faz parte da roda base; e flag de inimigo/lore (incremento futuro).
+//
+// Universal (PS-R1, decisao do criador 2026-07-14): curto-circuito ANTES de consultar
+// o ciclo. Universal NAO compete na roda — se atacante OU alvo for Universal, o tier e
+// SEMPRE Neutro (1.0), em qualquer combinacao (inclusive Universal x Universal).
 [[nodiscard]] constexpr WeaknessTier tier_for(CardFamily attacker, CardFamily target) {
+    if (attacker == CardFamily::Universal || target == CardFamily::Universal)
+        return WeaknessTier::Neutro;
     if (detail::strong_against(attacker) == target)
         return WeaknessTier::Fraco;  // atacante forte contra alvo => alvo e fraco
     if (detail::strong_against(target) == attacker)

@@ -42,6 +42,15 @@ TEST_CASE("combat_enums: CardFamily ordinais espelham CombatEnums.cs",
     REQUIRE(ord(CardFamily::Criptografico) == 4u);
 }
 
+// PS-R1 (decisao do criador 2026-07-14, docs/design/mecanicas/combat.md secao 20):
+// Universal e append-only (ordinal 5, apos os 5 da roda). NAO reordena {0..4}: contrato
+// binario do serializer .gdt intocado. So-cartas: templates (personagem/inimigo)
+// continuam rejeitando este ordinal (ver character_template_test.cpp / kWheelFamilyCount).
+TEST_CASE("combat_enums: CardFamily::Universal e ordinal 5 (append-only, PS-R1)",
+          "[domain][combat][enums][card_family]") {
+    REQUIRE(ord(CardFamily::Universal) == 5u);
+}
+
 TEST_CASE("combat_enums: CardFamily canonico bate 1:1 com templates::CardFamily",
           "[domain][combat][enums][card_family]") {
     // Contrato de religacao (A1, chunk 4): mesma ordem, mesmos ordinais. Se este

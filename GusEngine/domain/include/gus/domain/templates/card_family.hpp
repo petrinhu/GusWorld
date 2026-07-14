@@ -31,9 +31,21 @@ namespace gus::domain::templates {
 // enum): o contrato binario do .gdt e inalterado. Religacao do A1.
 using CardFamily = gus::domain::combat::CardFamily;
 
-// Numero de valores canonicos da roda (0..kCardFamilyCount-1). Usado pela validacao de
-// ordinal (A1): rejeita family fora do dominio no validate() dos templates.
-inline constexpr std::uint32_t kCardFamilyCount = 5;
+// CARD-FAMILY-UNIVERSAL (decisao do criador 2026-07-14, PS-R1): CardFamily ganhou um 6o
+// valor (Universal = 5, append-only), mas Universal vale SO PARA CARTAS. Templates de
+// personagem/inimigo continuam restritos a roda de 5 — por isso dois contadores:
+//
+//   kWheelFamilyCount = 5  -> dominio da RODA (0..4). Usado pela validacao de ordinal
+//                             (A1) em CharacterTemplate::validate()/EnemyTemplate::validate():
+//                             rejeita family fora de {0..4}, INCLUSIVE Universal (5).
+//                             Comportamento INALTERADO em relacao ao A1 (so o nome/motivo
+//                             mudou: antes "todo o dominio canonico", agora "a roda").
+//   kCardFamilyCount  = 6  -> dominio TOTAL do enum (0..5, roda + Universal). Existe pra
+//                             consumidores futuros que precisem enumerar TODAS as
+//                             familias de CARTA (ex.: catalogo/UI de cartas). NAO usado
+//                             na validacao de template (essa usa kWheelFamilyCount).
+inline constexpr std::uint32_t kWheelFamilyCount = 5;
+inline constexpr std::uint32_t kCardFamilyCount = 6;
 
 }  // namespace gus::domain::templates
 

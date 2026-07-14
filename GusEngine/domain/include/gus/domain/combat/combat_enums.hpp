@@ -27,15 +27,27 @@
 
 namespace gus::domain::combat {
 
-// As 5 familias de carta (identidade mecanica nao-sobreposta). secao 6.
+// As 5 familias de carta da roda de fraqueza (identidade mecanica nao-sobreposta),
+// MAIS Universal (append-only, ordinal 5). secao 6.
 // Gus = todas as familias (compilador universal); companions = especialistas.
 // FONTE CANONICA. Ordem/ordinais espelham CombatEnums.cs e templates/card_family.hpp.
+//
+// Universal (decisao do criador 2026-07-14, achado PS-R1; docs/design/mecanicas/combat.md
+// secao 20): familia das CARTAS que NAO competem na roda de fraqueza — multFraqueza
+// SEMPRE 1.0, SEM Fraco/Resistente/Imune (ver weakness_wheel.hpp). Cobre as ~13 cartas
+// especiais nao-elementais dos mestres + o "utilitario" ja usado em secao 9
+// (Shield/Regen/Haste/Slow). SO-CARTAS: por decisao do criador, personagem/inimigo
+// (character_template.hpp / enemy_template.hpp) continuam restritos a roda de 5
+// (templates::kWheelFamilyCount); Universal NAO e um valor valido pra family de
+// template hoje. Ordinal 5 e ADITIVO: NAO reordena os 0..4 (contrato binario do
+// serializer .gdt).
 enum class CardFamily : std::uint32_t {
     Eletrico = 0,
     Bioquimico = 1,
     Sonico = 2,
     Cinetico = 3,
     Criptografico = 4,
+    Universal = 5,
 };
 
 // Tipo-base diegetico da carta (gramatica "tipo.familia"). secao 7.

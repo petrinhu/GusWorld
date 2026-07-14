@@ -45,8 +45,12 @@ void CharacterTemplate::validate() const {
     // Validate() NAO cobria isto; e hardening alem da paridade (um .gdt selado mas
     // schema-divergente, family=9999, deixa de ser aceito silenciosamente). Como
     // templates::CardFamily agora e a fonte canonica do combate (religacao A1), o range
-    // valido e [0, kCardFamilyCount).
-    if (static_cast<std::uint32_t>(family) >= kCardFamilyCount) {
+    // valido e [0, kWheelFamilyCount).
+    // CARD-FAMILY-UNIVERSAL (2026-07-14, PS-R1): Universal (ordinal 5) e SO-CARTAS —
+    // personagem/inimigo continuam restritos a roda de 5, por isso kWheelFamilyCount
+    // (5) e nao kCardFamilyCount (6, que inclui Universal). Family = Universal e
+    // rejeitado igual a qualquer outro ordinal fora do dominio.
+    if (static_cast<std::uint32_t>(family) >= kWheelFamilyCount) {
         throw std::invalid_argument("CharacterTemplate.family fora do dominio (ordinal invalido).");
     }
     for (const auto& card_id : base_deck) {

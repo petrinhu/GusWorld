@@ -198,6 +198,15 @@ TEST_CASE("card_family: ordinais espelham CombatEnums.cs",
     REQUIRE(static_cast<std::uint32_t>(CardFamily::Criptografico) == 4u);
 }
 
+// CARD-FAMILY-UNIVERSAL (2026-07-14, PS-R1): dois contadores desde a introducao de
+// Universal — kWheelFamilyCount (roda, 0..4, usado na validacao de template) e
+// kCardFamilyCount (dominio TOTAL do enum, 0..5, inclui Universal). NAO confundir.
+TEST_CASE("card_family: kWheelFamilyCount (5) e kCardFamilyCount (6) refletem so-cartas",
+          "[domain][templates][card_family][card_family_universal]") {
+    REQUIRE(gus::domain::templates::kWheelFamilyCount == 5u);
+    REQUIRE(gus::domain::templates::kCardFamilyCount == 6u);
+}
+
 TEST_CASE("brain_kind: ordinais espelham EnemyTemplate.cs",
           "[domain][templates][enemy]") {
     REQUIRE(static_cast<std::uint32_t>(BrainKind::Scripted) == 0u);
@@ -229,6 +238,27 @@ TEST_CASE("enemy_template: family com ordinal fora do dominio lanca",
           "[domain][templates][a1]") {
     auto e = sentinela_fixture();
     e.family = static_cast<CardFamily>(7u);  // fora de {0..4}
+    REQUIRE_THROWS_AS(e.validate(), std::invalid_argument);
+}
+
+// ---- CARD-FAMILY-UNIVERSAL: Universal (ordinal 5) e SO-CARTAS ------------------------
+//
+// Decisao do criador 2026-07-14 (PS-R1): Universal vale SO PARA CARTAS. Templates de
+// personagem/inimigo continuam na roda de 5 (kWheelFamilyCount); ordinal 5
+// (CardFamily::Universal) e rejeitado tal qual qualquer outro ordinal fora do dominio.
+// Comportamento INALTERADO em relacao ao A1: so muda o "porque" o 5 e invalido aqui.
+
+TEST_CASE("character_template: family = Universal (ordinal 5) e rejeitado (so-cartas)",
+          "[domain][templates][a1][card_family_universal]") {
+    auto c = gus_fixture();
+    c.family = CardFamily::Universal;  // ordinal 5, fora da roda de personagem/inimigo
+    REQUIRE_THROWS_AS(c.validate(), std::invalid_argument);
+}
+
+TEST_CASE("enemy_template: family = Universal (ordinal 5) e rejeitado (so-cartas)",
+          "[domain][templates][a1][card_family_universal]") {
+    auto e = sentinela_fixture();
+    e.family = CardFamily::Universal;  // ordinal 5, fora da roda de personagem/inimigo
     REQUIRE_THROWS_AS(e.validate(), std::invalid_argument);
 }
 

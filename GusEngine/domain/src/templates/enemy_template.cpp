@@ -45,8 +45,11 @@ void EnemyTemplate::validate() const {
     // A1 (auditoria M3): rejeita ordinal de family/brain fora do dominio canonico. Hardening
     // alem da paridade (o C# Validate() nao cobria isto): um .gdt selado mas schema-
     // divergente deixa de ser aceito silenciosamente. family religada a fonte canonica do
-    // combate (range [0, kCardFamilyCount)); brain permanece template-only ([0, kBrainKindCount)).
-    if (static_cast<std::uint32_t>(family) >= kCardFamilyCount) {
+    // combate (range [0, kWheelFamilyCount)); brain permanece template-only ([0, kBrainKindCount)).
+    // CARD-FAMILY-UNIVERSAL (2026-07-14, PS-R1): Universal (ordinal 5) e SO-CARTAS —
+    // inimigo/personagem continuam restritos a roda de 5 (kWheelFamilyCount, nao
+    // kCardFamilyCount que agora inclui Universal).
+    if (static_cast<std::uint32_t>(family) >= kWheelFamilyCount) {
         throw std::invalid_argument("EnemyTemplate.family fora do dominio (ordinal invalido).");
     }
     if (static_cast<std::uint32_t>(brain) >= kBrainKindCount) {

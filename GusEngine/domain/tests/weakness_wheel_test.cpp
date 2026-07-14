@@ -65,3 +65,43 @@ TEST_CASE("weakness_wheel: classifica tier corretamente",
     REQUIRE(WeaknessWheel::tier_for(CardFamily::Cinetico, CardFamily::Eletrico) == WeaknessTier::Resistente);
     REQUIRE(WeaknessWheel::tier_for(CardFamily::Eletrico, CardFamily::Eletrico) == WeaknessTier::Neutro);
 }
+
+// ---- Universal (PS-R1): fora da roda, curto-circuito Neutro/1.0 nos dois sentidos ----
+//
+// Decisao do criador 2026-07-14 (docs/design/mecanicas/combat.md secao 20): Universal
+// e a familia das cartas que NAO competem na roda de fraqueza. multFraqueza SEMPRE 1.0,
+// SEM Fraco/Resistente/Imune, em qualquer combinacao com qualquer uma das 5 familias
+// (e consigo mesma). So-cartas: templates de personagem/inimigo continuam na roda de 5
+// (character_template_test.cpp / enemy_template_test rejeitam ordinal 5).
+
+TEST_CASE("weakness_wheel: Universal como atacante e sempre Neutro/1.0",
+          "[domain][combat][weakness][universal]") {
+    REQUIRE(WeaknessWheel::tier_for(CardFamily::Universal, CardFamily::Eletrico) == WeaknessTier::Neutro);
+    REQUIRE(WeaknessWheel::tier_for(CardFamily::Universal, CardFamily::Bioquimico) == WeaknessTier::Neutro);
+    REQUIRE(WeaknessWheel::tier_for(CardFamily::Universal, CardFamily::Sonico) == WeaknessTier::Neutro);
+    REQUIRE(WeaknessWheel::tier_for(CardFamily::Universal, CardFamily::Cinetico) == WeaknessTier::Neutro);
+    REQUIRE(WeaknessWheel::tier_for(CardFamily::Universal, CardFamily::Criptografico) == WeaknessTier::Neutro);
+    REQUIRE(WeaknessWheel::tier_for(CardFamily::Universal, CardFamily::Universal) == WeaknessTier::Neutro);
+
+    REQUIRE(WeaknessWheel::multiplier(CardFamily::Universal, CardFamily::Eletrico) == 1.0f);
+    REQUIRE(WeaknessWheel::multiplier(CardFamily::Universal, CardFamily::Bioquimico) == 1.0f);
+    REQUIRE(WeaknessWheel::multiplier(CardFamily::Universal, CardFamily::Sonico) == 1.0f);
+    REQUIRE(WeaknessWheel::multiplier(CardFamily::Universal, CardFamily::Cinetico) == 1.0f);
+    REQUIRE(WeaknessWheel::multiplier(CardFamily::Universal, CardFamily::Criptografico) == 1.0f);
+    REQUIRE(WeaknessWheel::multiplier(CardFamily::Universal, CardFamily::Universal) == 1.0f);
+}
+
+TEST_CASE("weakness_wheel: Universal como alvo e sempre Neutro/1.0",
+          "[domain][combat][weakness][universal]") {
+    REQUIRE(WeaknessWheel::tier_for(CardFamily::Eletrico, CardFamily::Universal) == WeaknessTier::Neutro);
+    REQUIRE(WeaknessWheel::tier_for(CardFamily::Bioquimico, CardFamily::Universal) == WeaknessTier::Neutro);
+    REQUIRE(WeaknessWheel::tier_for(CardFamily::Sonico, CardFamily::Universal) == WeaknessTier::Neutro);
+    REQUIRE(WeaknessWheel::tier_for(CardFamily::Cinetico, CardFamily::Universal) == WeaknessTier::Neutro);
+    REQUIRE(WeaknessWheel::tier_for(CardFamily::Criptografico, CardFamily::Universal) == WeaknessTier::Neutro);
+
+    REQUIRE(WeaknessWheel::multiplier(CardFamily::Eletrico, CardFamily::Universal) == 1.0f);
+    REQUIRE(WeaknessWheel::multiplier(CardFamily::Bioquimico, CardFamily::Universal) == 1.0f);
+    REQUIRE(WeaknessWheel::multiplier(CardFamily::Sonico, CardFamily::Universal) == 1.0f);
+    REQUIRE(WeaknessWheel::multiplier(CardFamily::Cinetico, CardFamily::Universal) == 1.0f);
+    REQUIRE(WeaknessWheel::multiplier(CardFamily::Criptografico, CardFamily::Universal) == 1.0f);
+}
