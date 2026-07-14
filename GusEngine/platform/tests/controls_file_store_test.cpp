@@ -138,8 +138,15 @@ TEST_CASE("save_controls: arquivo escrito e PRETTY/legivel (contem quebras de "
     const auto dir = make_temp_dir("pretty");
     REQUIRE(save_controls(default_controls(), dir.string(), "default"));
 
-    std::ifstream in(controls_file_path(dir.string(), "default"));
-    std::string content((std::istreambuf_iterator<char>(in)), std::istreambuf_iterator<char>());
+    std::string content;
+    {
+        // Escopo proprio: fecha o ifstream (destrutor) ANTES do remove_all
+        // abaixo - no Windows, remove_all com handle ainda aberto lanca
+        // "process cannot access the file" (Linux permite unlink de arquivo
+        // aberto, Windows nao).
+        std::ifstream in(controls_file_path(dir.string(), "default"));
+        content.assign(std::istreambuf_iterator<char>(in), std::istreambuf_iterator<char>());
+    }
     REQUIRE(content.find('\n') != std::string::npos);
 
     std::filesystem::remove_all(dir);

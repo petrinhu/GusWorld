@@ -221,9 +221,15 @@ TEST_CASE("save_game: gravacoes sucessivas no mesmo slot rotacionam backup1 em "
 
     // backup1 em disco e a geracao ANTERIOR (primeira gravacao), lida via
     // deserialize_save direto (uso interno de teste - a app usa load_save).
-    std::ifstream in(dir / "save_1.backup1.sav", std::ios::binary);
-    const std::vector<std::uint8_t> bytes((std::istreambuf_iterator<char>(in)),
-                                           std::istreambuf_iterator<char>());
+    std::vector<std::uint8_t> bytes;
+    {
+        // Escopo proprio: fecha o ifstream (destrutor) ANTES do remove_all
+        // abaixo - no Windows, remove_all com handle ainda aberto lanca
+        // "process cannot access the file" (Linux permite unlink de arquivo
+        // aberto, Windows nao).
+        std::ifstream in(dir / "save_1.backup1.sav", std::ios::binary);
+        bytes.assign(std::istreambuf_iterator<char>(in), std::istreambuf_iterator<char>());
+    }
     const SaveData backup_data = gus::domain::save::deserialize_save(bytes);
     REQUIRE(backup_data.playtime_seconds == 1.0);
 

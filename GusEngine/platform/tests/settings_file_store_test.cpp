@@ -141,7 +141,11 @@ TEST_CASE("settings_file_path: nome do arquivo e settings.json dentro do dir dad
           "[settings_file_store]") {
     const auto dir = make_temp_dir("path");
     const std::string path = settings_file_path(dir.string());
-    REQUIRE(path == (dir / "settings.json").string());
+    // Comparacao path-EQUIVALENTE (nao string-crua): a producao junta com "/"
+    // literal, mas fs::path normaliza o separador nativo (\ no Windows) na
+    // igualdade - so a REPRESENTACAO em string difere entre plataformas, o
+    // path continua semanticamente igual (Windows aceita "/" tambem).
+    REQUIRE(std::filesystem::path(path) == dir / "settings.json");
 }
 
 TEST_CASE("resolve_settings_dir: sem override de env, resolve para $HOME/.gusworld",
