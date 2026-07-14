@@ -125,10 +125,15 @@ CTEST_LOG="$ENGINE/build/$PRESET/last_ctest.log"
 SUITE=0
 if [ "$BUILD" = "0" ]; then
     set +e
-    # outputOnFailure ja vem do testPreset; aqui so capturamos o resumo.
-    ( cd "$ENGINE" && ctest --preset "$PRESET" 2>&1 ) | tee "$CTEST_LOG" \
-        | grep -E "tests passed|tests failed|Total Test" || true
+    # FIX (2026-07-14): capturar o exit do ctest LOGO APOS o pipe ctest|tee, antes de
+    # qualquer grep/`|| true`. O padrao antigo (`ctest|tee|grep ... || true` seguido de
+    # SUITE=${PIPESTATUS[0]}) mascarava falha de teste: com `pipefail`, o pipeline
+    # inteiro saia != 0 quando o ctest falhava, o `|| true` disparava, e rodar `true`
+    # RESETAVA PIPESTATUS pra (0) -> SUITE=0 (verde cego). Agora o grep de exibicao e
+    # um comando isolado DEPOIS da captura, entao seu exit nao afeta SUITE.
+    ( cd "$ENGINE" && ctest --preset "$PRESET" 2>&1 ) | tee "$CTEST_LOG" >/dev/null
     SUITE=${PIPESTATUS[0]}
+    grep -E "tests passed|tests failed|Total Test" "$CTEST_LOG" || true
     set -e
 fi
 echo "SUITE=$SUITE"
