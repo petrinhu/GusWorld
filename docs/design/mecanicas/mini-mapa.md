@@ -1,42 +1,77 @@
 # Sistema de mapa / mini-mapa (GusWorld)
 
-> **Status:** PROPOSTA (brainstorm interativo do criador, 2026-07-13/14). Design; implementação é feat seguinte (consome o `.gmap`/tile_map já existente em `GusEngine/domain/map/`).
+> **Status:** PROPOSTA (brainstorm interativo do criador, 2026-07-13/14). Design; implementação é feat seguinte (consome o `.gmap`/tile_map já existente em `GusEngine/domain/map/`). **O criador pediu VÁRIOS brainstorms de detalhe** para os pontos abaixo; este doc CAPTURA as decisões e marca o que falta.
 >
 > **Filtro de produção (dev solo, [[feedback_solo_baixa_infra_escopo]]):** faseável se o escopo apertar.
 >
-> **Âncora canônica:** o mapa real é o `.gmap` selado (`reference_formato_mapa_gmap`); o mini-mapa é uma REPRODUÇÃO em escala menor do mesmo tilemap. Cross-ref topologia (`mundo-topologia.md`), gdd §7.1 (sem gate-hard), sistema de dificuldade ([[project_morte_dificuldade_canon]]), Pillar 2 (magia = software, anomalia = bug).
+> **Âncora canônica:** o mapa real é o `.gmap` selado (`reference_formato_mapa_gmap`); o mini-mapa é uma REPRODUÇÃO em escala menor do mesmo tilemap. Cross-ref topologia (`mundo-topologia.md`), gdd §7.1 (sem gate-hard), sistema de dificuldade ([[project_morte_dificuldade_canon]]), Pillar 2 (magia = software, anomalia = bug), Pillar 3 (loop de hardware: óculos/matriz/Tavus-Drive), save por PEM/Faraday ([[project_save_dungeon_pem_faraday]]).
 
-## 1. Forma (decisão do criador)
+## 0. Princípio central: o mini-mapa é DIEGÉTICO e CONQUISTADO (decisão do criador 2026-07-14)
 
-**Ambos**, com config no menu:
-- **Mapa cheio no TAB:** TAB abre o mapa grande da área (o tilemap real em escala menor) por cima da tela.
-- **Mini-mapa de canto:** um mini-mapa pequeno num canto, **ligável/desligável nas opções**.
-- **Faseável:** se o escopo apertar, entregar o mapa-TAB primeiro e o mini-mapa de canto depois.
+**O mini-mapa NÃO existe no início do jogo — mesmo com a config LIGADA.** Ele é montado peça por peça via hardware/software que a party encontra, cada camada com uma causa diegética real (Pillar 3 levado ao extremo). São **3 missões paralelas**, e cada uma destrava uma camada:
 
-## 2. Revelação + névoa (decisão do criador)
+| Missão | O que encontra | O que destrava | Distância da origem | Dificuldade |
+|---|---|---|---|---|
+| **1** | **O implante** (implante removível de visão) | o **mini-mapa em si** aparece | menor | menor |
+| **2** | Um **repositório perdido** (ver §0.1) com código compilável | a **skill de marcar pontos** no mapa (os marcadores/POIs) | média | média |
+| **3** | **VRAM extra** (chip minúsculo) | acaba o **OOM** da GPU que renderiza o mapa → **desliga o glitch/fog** de área distante | maior | maior |
+
+- **Todas já destravadas (mundo aberto, gdd §7.1):** a ordem 1→2→3 tem distância+dificuldade crescentes, mas NÃO é obrigatório seguir a ordem.
+- **O implante e o Gus (Pillar 3):** os membros da party usam o implante real; o **Gus faz reverse-engineering (RE) no hardware dos implantes da party e cria um app que EMULA a função do implante nos óculos dele.** (O Gus não põe implante; ele hackeia/emula, coerente com os óculos táticos + o triângulo de hardware.)
+
+### 0.1. "Não existem tesouros em GusWorld, existem REPOSITÓRIOS PERDIDOS" (insight canônico do criador)
+
+Baús/tesouros clássicos não existem no mundo. No lugar, **repositórios perdidos**: acervos de **código** que a party acha e **compila** para ativar skills/features (ex.: a missão 2 acha o repositório com o código compilável da skill de marcadores). Cross-ref [[project_repositorios_perdidos_canon]]. Casa com Pillar 2 (magia = software) e a mecânica de compilação-no-cast das cartas.
+
+## 1. Forma
+
+**Ambos**, com config no menu (mas ver §0: nada aparece antes da missão 1):
+- **Mapa cheio no TAB:** TAB abre o mapa grande da área (o tilemap real em escala menor).
+- **Mini-mapa de canto:** ligável/desligável nas opções.
+- **Faseável:** se o escopo apertar, mapa-TAB primeiro, mini-mapa de canto depois.
+
+## 2. Revelação + fog (com causa diegética)
 
 - **Fog of war (revela ao andar):** área não-visitada = escondida; revela conforme a party caminha.
-- **Névoa de dificuldade:** áreas **distantes já descobertas** voltam a ficar sob névoa no mini-mapa. **Gated por modo de dificuldade:** no **Fácil, SEM névoa** (descoberto = sempre claro); do **Médio pra cima**, a névoa cobre as áreas distantes descobertas. (Casa com dificuldade-por-distância + gdd §7.1: aviso diegético de "longe/perigoso", nunca "nível X".)
+- **Fog/névoa de área distante = OOM de VRAM:** a GPU dos implantes/óculos tem **pouca VRAM** e sofre **OOM** ao renderizar o mapa longe → o distante aparece **corrompido** (ver §3). **A missão 3 (VRAM extra) resolve o OOM e desliga esse fog distante.**
+- **Gate por dificuldade:** no **Fácil**, a **VRAM extra vem JUNTO com o implante na missão 1** (sem animação extra — é só citado em diálogo, algo como *"Veja, tem uns chips de vram aqui, podemos usar nos nossos implantes e você no seu óculos, Gus."*). Logo, no Fácil não há glitch/fog distante desde cedo. Do **Médio pra cima**, a VRAM é a missão 3 separada, então o fog distante persiste até achá-la. (A MESMA fala de diálogo aparece nos outros níveis quando a party enfim encontra a VRAM extra.)
 
-## 3. Estética da névoa/fog: DADO CORROMPIDO (não nuvem) — decisão do criador
+## 3. Estética do fog: DADO CORROMPIDO por OOM (não nuvem) — decisão do criador
 
-O fog e a névoa **não são nuvem**: são **ruído de imagem corrompida** — pixels mal-posicionados/mal-gerados, como um **bitmap/arquivo corrompido** (glitch art / datamoshing / pixel-sorting). Tematiza Pillar 2 (magia = software; o não-computado/não-descoberto aparece como **dado corrompido**, anomalia = bug). Ao descobrir, o glitch "resolve" e a imagem real aparece.
-- **Custo:** BARATO-MÉDIO — um shader de corrupção ou overlay de pixels embaralhados sobre os tiles velados (o glintfx pode ajudar no efeito de tela). Sem partícula/animação pesada.
+O fog distante **não é nuvem**: é **ruído de imagem corrompida** — pixels mal-posicionados/mal-gerados, como um **bitmap/arquivo corrompido** (glitch art / datamoshing / pixel-sorting), **porque é literalmente um OOM de VRAM** na GPU do implante. Tematiza Pillar 2 (magia = software; anomalia = bug) com causa mecânica real. Ao achar a VRAM (missão 3), o glitch "resolve" e a imagem real aparece.
+- **Custo:** BARATO-MÉDIO — shader de corrupção ou overlay de pixels embaralhados sobre os tiles distantes (glintfx pode ajudar no efeito de tela). Sem partícula/animação pesada.
 
-## 4. Marcadores (decisão do criador)
+## 4. Marcadores (skill destravada pela missão 2)
 
-Aparecem no mapa:
-- **Sempre:** party; entradas/saídas entre áreas; objetivo atual; **save points / zonas PEM-Faraday** (onde dá ou não pra salvar).
-- **Pontos de interesse JÁ descobertos:** dungeons, os 20 interiores de mestre, atalhos (ex.: pontes do Euler).
-- **Segredos "?" — EARNED, não automáticos:** um "?" só aparece num local específico quando **uma carta/poder/NPC avisa** que há algo ali (ex.: cartas-lente Turing/Dee/Bastiat, ou dica de NPC). **NÃO** existe "?" de todos os segredos por padrão. Quando a party descobre o que havia ali, **o "?" some**. Sinergia: achar segredo é papel das cartas-lente, não do mapa entregar tudo.
-- **Missões (principal/paralela):** um **glow neon** envolve a **área próxima** do objetivo, **sem revelar o local exato** (orienta a região, não o ponto).
+Depois de compilar o repositório (missão 2), aparecem no mapa:
+- **Sempre:** party; entradas/saídas entre áreas; objetivo atual; **save points / zonas PEM-Faraday**.
+- **Pontos de interesse JÁ descobertos:** dungeons, os 20 interiores de mestre, atalhos (pontes do Euler).
+- **Segredos "?" — EARNED:** um "?" só aparece num local quando **uma carta/poder/NPC avisa** que há algo ali (ex.: cartas-lente Turing/Dee/Bastiat). NÃO há "?" de todos os segredos por padrão. Ao descobrir, o "?" some. Sinergia com as cartas-lente.
+- **Missões (principal/paralela):** **glow neon** ao redor da **área próxima** do objetivo, **sem** o local exato.
+- **Config:** o jogador escolhe o que aparece no mini-mapa, mas **NUNCA** há opção de ligar TODOS os segredos (sem cheat "revelar tudo").
+- **Hard — assinatura:** no Difícil/Hardcore, a skill de marcar pontos funciona por **assinatura**: se ficar **ligada o tempo todo, gasta Créditos do personagem mais rápido** (incentiva ligar/desligar).
 
-**Config:** o jogador escolhe nas opções o que aparece no mini-mapa, MAS **nunca** há opção de ligar TODOS os segredos no mini-mapa (sem cheat de "revelar tudo").
+## 5. VRAM: item, slot e peso (decisão do criador)
 
-## 5. Fios abertos (continuar brainstorm)
-- Níveis de zoom do mapa-TAB (a área toda? dá pra afastar e ver as 13 áreas / o mundo?).
-- O mini-mapa de canto: raio/escala, rotaciona com a party ou norte-fixo.
-- Como o glitch "resolve" visualmente ao descobrir (transição barata).
-- Ícones concretos de cada marcador (arte barata).
-- Interação com os 20 interiores de mestre (aparecem como ? até avisados, ou como ícone ao descobrir?).
-- Legenda / acessibilidade (daltonismo nas cores dos marcadores).
+- **Slot específico no inventário pra a VRAM**, com **arte de trilhas de cobre se interligando** no slot (estética PCB).
+- **Peso da VRAM extra = 0** (chip minúsculo, tecnologia avançadíssima).
+
+## 6. PEM / Faraday (decisão do criador)
+
+O **efeito PEM das dungeons** (que já bloqueia save, [[project_save_dungeon_pem_faraday]]) **TAMBÉM desativa o mini-mapa / VRAM / skill de marcadores** (a GPU do implante apanha do pulso). A **carta Faraday (EM-Shield)** evita esse efeito ruim — reforça o valor da carta (não protege só o save, protege o mini-mapa também). Cross-ref `_EFEITOS-ESCOLHIDOS.md` (Faraday).
+
+## 7. Economia (handoff economy-designer)
+
+- **Vender os implantes:** a party PODE vender os implantes, com **trade-off de perder a feature do mini-mapa**.
+- **Recompra:** depois dá pra comprar de volta no **comércio de um bairro específico**, por **preço alto o bastante pra ser impossível comprar no início do jogo**. **Handoff `economy-designer`** pra achar esse preço (ancorado na curva de Crédito).
+- **Assinatura Hard** (§4): custo por tempo-ligado da skill de marcadores — também calibrar com o economy-designer.
+
+## 8. Fios abertos — VÁRIOS brainstorms pedidos pelo criador
+- Conteúdo de cada uma das **3 missões paralelas** (o mistério/puzzle de cada, onde ficam nas 13 áreas, quais NPCs).
+- O **repositório perdido** como mecânica geral (o que é, como se compila, quantos há no jogo, o que mais destravam além dos marcadores).
+- Números: preço de recompra do implante + custo da assinatura Hard (economy-designer).
+- Zoom do mapa-TAB (ver o mundo todo / as 13 áreas?); mini-mapa de canto (raio/rotação/norte-fixo).
+- Transição visual do glitch "resolvendo" ao achar a VRAM (barata).
+- Ícones concretos dos marcadores + arte do slot de VRAM (trilhas de cobre) + acessibilidade (daltonismo).
+- Diálogo canônico da fala da VRAM ("uns chips de vram aqui…") — redação final via `narrative-writer`.
+- Interação com a venda: se vender o implante, o que acontece com a VRAM/skill já compiladas (perde tudo? só o mapa?).
