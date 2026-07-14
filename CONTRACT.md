@@ -254,7 +254,7 @@ Os seguintes gates **MUST** estar funcionais em ship de v1.0.0. Cortes em VS sã
 
 ## §7. Save format compat (forward-only)
 
-Save format canon: **binário próprio versionado `save_version: N` (schema v4 atual, ADR-006/ADR-007) com criptografia própria (HMAC-SHA256) e migrators forward-only puros desde D1**.
+Save format canon: **binário próprio versionado `save_version: N` (schema `v5` atual, `kSaveSchemaVersion=5`) com envelope AEAD `GDS3` (XChaCha20-Poly1305 + Argon2id via Monocypher, ADR-015) e migrators forward-only puros desde D1**. _(Atualizado 2026-07-14, achado PS-R6: o schema subiu pra v5 e a cripto passou de HMAC-SHA256/GDS2 para AEAD/GDS3 na ADR-015; o texto antigo "v4/HMAC/ADR-006-007" estava defasado. HMAC-SHA256 segue vivo em OUTROS consumidores: `controls_hash128` (ADR-007) e o selo de conteúdo, mas NÃO é mais o esquema do save.)_
 
 ### Princípios
 

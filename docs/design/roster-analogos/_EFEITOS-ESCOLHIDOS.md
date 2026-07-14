@@ -53,7 +53,7 @@
 
 ## Nomes dos efeitos (CARTAS-NOMES-EFEITOS) — em andamento
 
-Estilo: curto, techno-científico, evoca o feito real (modelo do criador: Einstein = "Grav-Wave"). **Princípio do criador:** a explicação/frase da carta deve levar o jogador a ENTENDER o nome do efeito (nome ↔ frase pedagógica amarrados).
+Estilo: curto, techno-científico, evoca o feito real (o criador deu "Grav-Wave" como MODELO DE ESTILO; note que o nome escolhido do Einstein acabou sendo **"Time-Dilate"**, ver tabela abaixo — "Grav-Wave" ficou só como exemplo de tom, não é o nome final de ninguém). **Princípio do criador:** a explicação/frase da carta deve levar o jogador a ENTENDER o nome do efeito (nome ↔ frase pedagógica amarrados).
 
 | # | Mestre | Nome do efeito |
 |---|---|---|

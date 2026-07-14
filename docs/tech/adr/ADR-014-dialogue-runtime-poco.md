@@ -1,6 +1,7 @@
 # ADR-014: Runtime de diálogo POCO C++20 (formato de autoria, registro, escopo, persistência)
 
 **Status:** Accepted (4 decisões fechadas pelo criador supremo em 2026-07-06, todas na opção recomendada pelo `software-architect`)
+**Supersedes:** [ADR-003](ADR-003-dialogue-library.md) (o plugin DialogueManager/Godot que este runtime substituiu no pivot; marcador de reciprocidade adicionado 2026-07-14, achado PS-Y5)
 **Data:** 2026-07-06
 **Decisores:** criador supremo (petrus) + `software-architect` (modo colaborativo, regra canônica do projeto: nenhum agente decide arquitetura sozinho).
 **Cross-ref:** [ADR-012](ADR-012-m7-paridade-jogavel-plano.md) (plano do M7; este ADR **refina** a decisão 6 daquele — ver §"Reconciliação com ADR-012"), [ADR-006](ADR-006-crypto-hmac-formato-domain.md) (crypto própria SHA-256/HMAC, zero-dep; usada pelo pipeline de conteúdo cifrado), [ADR-007](ADR-007-controls-json-hash128-save-v4.md) (save V4 atual + parser JSON próprio dep-free), `docs/design/narrativa/dialogue-tree-npc-intro.md` (blueprint canônico do Bertoldo, `F2-N.1 ✅` — a referência de conteúdo/estrutura que este runtime precisa conseguir renderizar), `docs/design/mecanicas/combat-flavor.md` §5 (par terminal × caixa-quente + prompts por personagem — o item vizinho `DIALOGO-TERMINAL`), memória `project_i18n_canonico` (i18n-ready desde o dia 1), memória `reference_formato_mapa_gmap` (padrão fonte→compilador→artefato selado).

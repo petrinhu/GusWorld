@@ -98,13 +98,19 @@ As viradas de stack e os contratos irreversíveis estão registrados em [`docs/t
 |---|---|
 | [ADR-001](docs/tech/adr/ADR-001-pivot-lore-to-engine.md) | Pivot Fase 1 (lore) para Fase 2 (engine) |
 | [ADR-002](docs/tech/adr/ADR-002-csharp-aot-over-gdscript.md) | GDScript para C# .NET 8 AOT (depois superado) |
-| [ADR-003](docs/tech/adr/ADR-003-dialogue-library.md) | Biblioteca de diálogo (contexto Godot, sob revisão pós-pivot) |
+| [ADR-003](docs/tech/adr/ADR-003-dialogue-library.md) | Biblioteca de diálogo (Godot) — **SUPERADO pela ADR-014** |
 | [ADR-004](docs/tech/adr/ADR-004-environment-modifier-contract.md) | Contrato do `EnvironmentModifier` (§18 combate) |
 | [ADR-005](docs/tech/adr/ADR-005-license-gpl3-assets-ccbysa.md) | GPLv3 (código) + CC-BY-SA 4.0 (assets) |
 | [ADR-006](docs/tech/adr/ADR-006-crypto-hmac-formato-domain.md) | Cripto HMAC-SHA256 + formato de serialização do domain |
 | [ADR-007](docs/tech/adr/ADR-007-controls-json-hash128-save-v4.md) | Persistência de controles + save V4 anti-tamper |
 | [ADR-008](docs/tech/adr/ADR-008-repivot-qt-to-sdl3.md) | Re-pivot Qt6 para SDL3 + RmlUi + miniaudio |
+| [ADR-009](docs/tech/adr/ADR-009-rmlui.md) | Adoção do RmlUi (UI HTML/CSS-like) |
 | [ADR-010](docs/tech/adr/ADR-010-adopt-glintfx-embed-mode.md) | Adotar glintfx (embed mode) como motor de UI/HUD; aposentar o backend RmlUi vendorizado |
+| [ADR-011](docs/tech/adr/ADR-011-m6-audio-onda1-plano.md) | Plano da onda 1 de áudio (miniaudio) do M6 |
+| [ADR-012](docs/tech/adr/ADR-012-m7-paridade-jogavel-plano.md) | Plano de paridade jogável do M7 |
+| [ADR-013](docs/tech/adr/ADR-013-asset-source-vfs-fase1.md) | Asset source VFS fase 1 (porteiro de assets) |
+| [ADR-014](docs/tech/adr/ADR-014-dialogue-runtime-poco.md) | Runtime de diálogo POCO C++20 (supersede ADR-003) |
+| [ADR-015](docs/tech/adr/ADR-015-save-security-v2-offline.md) | **Save security v2 offline (AEAD/Monocypher/machine-bind/anti-rollback)** — o mais recente e sensível |
 
 
 ---

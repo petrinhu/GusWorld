@@ -1,5 +1,7 @@
 # Design da Engine — Pivot C++/Qt6 (GusWorld)
 
+> ⚠️ **AVISO DE LEITURA (reforçado 2026-07-14, achado PS-Y8):** este doc foi escrito na era **Qt6** e a maior parte do conteúdo TÉCNICO CONCRETO de render/UI/build/licença descreve **Qt RHI, Qt Quick/QML, Qt Test e static-link do Qt, que NÃO são mais a stack.** A stack real há semanas é **SDL3 + glintfx/RmlUi + miniaudio** (ADR-008, ADR-009, ADR-010). Só continuam VÁLIDOS: as **4 camadas** (core/domain POCO puro / platform / app), o **plano de migração M0-M9**, e o reaproveitamento de lógica C#→C++. Tudo que fala de Qt (§§ de render/UI/toolchain/licença) está **SUPERADO** — ao consultar este doc como "autoridade técnica" (CONTRACT §8), trate as partes Qt como histórico, não como verdade atual. Fonte viva do stack: ADR-008/009/010 + README.
+>
 > **NOTA 2026-06-23:** a camada de PLATAFORMA (Qt RHI + Qt Quick/QML + Qt Multimedia) foi SUPERADA por SDL3 + RmlUi + miniaudio. Ver [`docs/tech/adr/ADR-008-repivot-qt-to-sdl3.md`](../adr/ADR-008-repivot-qt-to-sdl3.md). O restante do design (4 camadas, POCO core/domain, save, i18n, board M0-M9) segue válido.
 
 **Status:** decisões macro **ratificadas pelo líder supremo** no brainstorm de 2026-06-21. O design da **engine** está fechado; os demais eixos do pivot (combate Pokémon, câmera, arte, áudio, porte, licença) ficam para brainstorms separados.

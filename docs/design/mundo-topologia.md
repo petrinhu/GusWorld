@@ -131,7 +131,7 @@ Hubs populados (cheias) têm poucos/zero; os ermos concentram (Zona do Silêncio
 |---|---|---|
 | **Dutos Infernais** — eletromagnetismo & energia | Faraday · Maxwell · Volta · Euler | Euler = dutos técnicos (canon); resto por campo |
 | **Núcleo Metropolitano** — computação & matemática | von Neumann · Turing · Gödel · Ada Lovelace · Planck | von Neumann = Universidade Pública (canon) |
-| **Ferrovelhos** — economia austríaca | Menger · Hayek · Mises · Bastiat | Menger = Mercado da Sucata Honesta (canon); ordem espontânea emerge do mercado de sucata |
+| **Ferrovelhos** — economia austríaca | Menger · Hayek · Mises · Bastiat | Menger = Mercado da Sucata Honesta (canon; nota PS-G5 2026-07-14: o Mercado é geograficamente a charneira Núcleo↔Periferia, `PLACES.md`, mas é tratado como parte do "campus Ferrovelhos" por tema; o ícone do interior do Menger fica na borda Ferrovelhos↔charneira); ordem espontânea emerge do mercado de sucata |
 | **Periferia** — cientistas-refugiados cooperativos | Tesla · Einstein | ambos canon (Praça do Compilador, F067/F068); expulsos por mecenas coletivistas (axiologia) |
 | **Catedrais Neo-Sylvania** — ciência sagrada da Era 1 | Giordano Bruno · John Dee · Pythagoras · Newton | Bruno/Dee canon Era 1; Pythagoras Era 1; Newton = eco Catedral Atelaiá |
 | **Orla Recursiva** — geometria fractal | Mandelbrot | canon (borda da Orla, Rio Verdor; eco Núcleo Mandelbrot na Selve Profunda) |

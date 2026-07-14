@@ -2,7 +2,7 @@
 
 > **Status:** Canônico. Revisão 2 (2026-05-15). **Refatorado pra ÍNDICE.** Conteúdo individual movido pra arquivos próprios. Este doc agora é **roteador, resumo executivo e matrizes de relacionamento**.
 >
-> **Escopo:** Gus + 6 companions canônicos. Roles complementares. Recrutamento em ordem livre (B.6). Cada companion segue Hero's Journey individual mini dentro do macro-arco do Gus.
+> **Escopo:** Gus + 6 companions canônicos. Roles complementares. **Recrutamento: o Cauã "Volt" é FIXO como Companion #1, recrutado na missão solo de abertura (`gus-abertura.md` §13); os outros 5 (Iara, Bento, Linda, Dante, Jaci) ficam em ordem livre (B.6).** (Correção 2026-07-14, achado PS-Y12: alinhado à reconciliação da abertura, `arco-principal.md` + `caua-volt.md`.) Cada companion segue Hero's Journey individual mini dentro do macro-arco do Gus.
 >
 > **Cross-ref:** specs visuais em `Resources/gusworld/character-spec-*.md`, `arco-principal.md`, `factions.md`, `lore-bible.md`, `comic-reliefs.md`, `pillars.md`.
 

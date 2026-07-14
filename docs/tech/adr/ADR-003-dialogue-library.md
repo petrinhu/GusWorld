@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| **Status** | Accepted (decisão criador supremo 2026-05-30, TODO F2-E.6-DECISION; ratificada como DA-2 do blueprint do NPC introdutório 2026-06-03) |
+| **Status** | **Superseded by [ADR-014](ADR-014-dialogue-runtime-poco.md)** (2026-07-06, no pivot Godot→SDL3/ADR-008; o plugin DialogueManager morreu com o Godot, o runtime foi re-derivado em POCO C++20). Marcador adicionado 2026-07-14 (achado PS-Y5). _Histórico:_ Accepted 2026-05-30 (criador supremo, TODO F2-E.6-DECISION; ratificada DA-2 do blueprint do NPC introdutório 2026-06-03) |
 | **Date** | 2026-05-30 |
 | **Decisor** | petrinhu (criador supremo) |
 | **Reversibilidade** | Two-way door barata AGORA (zero diálogo escrito) / one-way cara DEPOIS (cada fala migrada custa). Janela ótima: nada de prose final ainda existe, só blueprint de stubs. |
