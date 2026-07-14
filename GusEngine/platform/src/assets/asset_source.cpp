@@ -297,8 +297,12 @@ std::optional<AssetInfo> FilesystemAssetSource::stat(std::string_view id) const 
     std::int64_t mtime_epoch = 0;
     if (!ec) {
         // file_time_type -> system_clock -> epoch em SEGUNDOS (unidade cravada no
-        // header). file_clock::to_sys e a conversao padrao (C++20).
-        const auto sys_time = std::chrono::file_clock::to_sys(ftime);
+        // header). Conversao via offset entre relogios (idioma portavel):
+        // MSVC/std:c++20 nao expoe file_clock::to_sys para o clock interno de
+        // std::filesystem::file_time_type, mas este idioma compila igual em
+        // GCC/Clang/MSVC e produz o mesmo instante.
+        const auto sys_time = std::chrono::system_clock::now()
+                             + (ftime - fs::file_time_type::clock::now());
         mtime_epoch = std::chrono::duration_cast<std::chrono::seconds>(
                           sys_time.time_since_epoch())
                           .count();
