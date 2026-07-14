@@ -19,9 +19,16 @@
 - **Todas já destravadas (mundo aberto, gdd §7.1):** a ordem 1→2→3 tem distância+dificuldade crescentes, mas NÃO é obrigatório seguir a ordem.
 - **O implante e o Gus (Pillar 3):** os membros da party usam o implante real; o **Gus faz reverse-engineering (RE) no hardware dos implantes da party e cria um app que EMULA a função do implante nos óculos dele.** (O Gus não põe implante; ele hackeia/emula, coerente com os óculos táticos + o triângulo de hardware.)
 
-### 0.1. "Não existem tesouros em GusWorld, existem REPOSITÓRIOS PERDIDOS" (insight canônico do criador)
+### 0.1. "Não existem tesouros; existem REPOSITÓRIOS PERDIDOS" (insight canônico, expandido 2026-07-14)
 
-Baús/tesouros clássicos não existem no mundo. No lugar, **repositórios perdidos**: acervos de **código** que a party acha e **compila** para ativar skills/features (ex.: a missão 2 acha o repositório com o código compilável da skill de marcadores). Cross-ref [[project_repositorios_perdidos_canon]]. Casa com Pillar 2 (magia = software) e a mecânica de compilação-no-cast das cartas.
+Baús/tesouros clássicos não existem. Detalhamento canônico ([[project_repositorios_perdidos_canon]]):
+- **TODAS as dungeons SÃO repositórios perdidos / corrompidos** (as 13 de `mundo-topologia.md`).
+- **O loot nunca é dinheiro/joia.** É **peça de hardware**, **código compilável** (mais barato) ou **algoritmo** (mais caro), **gravado no SSD da party** até ser **vendido** (vira Crédito) ou **usado**.
+- **Quase tudo é pra vender**; o **único realmente usável pela party** (até agora) é o **código da skill de marcadores** (missão 2). Os demais = ativos vendáveis, não skills.
+- **Vender/recomprar vale pra implantes E skills.**
+- **Axiologia econômica canon:** *"não se acha dinheiro, se faz dinheiro com esforço e trabalho duro"* — o jogador acha ATIVOS e os converte em Crédito por trabalho (explorar/decifrar/vender). Reforça [[project_axiologia_canonica]].
+
+Casa com Pillar 2 (magia = software) e a compilação-no-cast das cartas.
 
 ## 1. Forma
 
