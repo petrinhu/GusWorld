@@ -145,6 +145,8 @@ And the **technical credits and tools**:
 
 The full acknowledgments (including a proper thank-you to the RmlUi and glintfx projects that make the game's UI possible) live in [`ACKNOWLEDGMENTS.md`](ACKNOWLEDGMENTS.md).
 
+**AI disclosure:** GusWorld is directed, decided and reviewed by a human; the AI tools listed above are execution tools used under my direction, carrying the heaviest load in code and, to a lesser extent, assisting in drafting deep-lore prose, always under my review. Full breakdown, by role, in [AI-DISCLOSURE.md](AI-DISCLOSURE.md).
+
 ---
 
 ## 🇧🇷 Português
@@ -292,6 +294,8 @@ E os **créditos técnicos e ferramentas**:
 
 Os agradecimentos completos (incluindo um agradecimento como manda o figurino aos projetos RmlUi e glintfx que tornam a UI do jogo possível) vivem em [`ACKNOWLEDGMENTS.md`](ACKNOWLEDGMENTS.md).
 
+**Divulgação de uso de IA:** o GusWorld é dirigido, decidido e revisado por um humano; as ferramentas de IA listadas acima são ferramentas de execução usadas sob minha direção, com o peso maior no código e, em menor grau, assistindo no rascunho de prosa de deep-lore, sempre sob minha revisão. Detalhamento completo, por papel, em [AI-DISCLOSURE.md](AI-DISCLOSURE.md).
+
 ---
 
-*Last updated / última atualização: 2026-07-10.*
+*Last updated / última atualização: 2026-07-14.*
