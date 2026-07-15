@@ -85,6 +85,12 @@ std::vector<std::string> order_ids(const CombatStateMachine& sm) {
     return ids;
 }
 
+bool log_has(const CombatStateMachine& sm, CombatActionType action, const std::string& needle) {
+    for (const auto& e : sm.log())
+        if (e.action == action && e.message.find(needle) != std::string::npos) return true;
+    return false;
+}
+
 }  // namespace
 
 // ===== SILENCE =====
@@ -307,9 +313,17 @@ TEST_CASE("status: haste restaura spd ao expirar", "[domain][combat][status]") {
     REQUIRE(find_status(h, StatusId::Haste) == nullptr);
 }
 
-// ===== KNOCKBACK =====
+// ===== KNOCKBACK (K-B: "adia o turno", decisao do lider 2026-07-15, =====
+// =====            COMBATE-FILA-CURSOR-FIX/A2) =====
 
-TEST_CASE("status: knockback empurra alvo uma posicao na fila",
+// Semantica revisada (substitui o comportamento antigo, que so deslocava o ator na fila
+// SEM adiar o turno - bug QA: o vizinho pendente era empurrado pra TRAS do cursor e pulava
+// a rodada inteira). Agora Knockback ADIA o turno do alvo: o vizinho que jogaria em seguida
+// age PRIMEIRO, e o ator com Knockback (one-shot, consumido no disparo) age logo depois.
+// Todos agem EXATAMENTE 1x na rodada.
+
+TEST_CASE("status: knockback (K-B) adia o turno - o vizinho pendente joga primeiro, o "
+          "empurrado joga em seguida (one-shot, consumido)",
           "[domain][combat][status]") {
     CombatActor a = hero("a", 100, /*spd=*/30);
     CombatActor b = foe("b", 500, /*spd=*/20);
@@ -319,12 +333,21 @@ TEST_CASE("status: knockback empurra alvo uma posicao na fila",
     CombatStateMachine sm({&a, &b, &c}, [](CombatActor&, const CombatState&) { return CombatAction::pass(); },
                           nullptr, nullptr, &rng);
     REQUIRE(order_ids(sm) == std::vector<std::string>{"a", "b", "c"});
-    sm.begin_turn(); sm.run_active_turn_to_end(); sm.advance_to_next_actor();  // a
-    sm.begin_turn();  // b tick empurra +1
+
+    sm.begin_turn(); sm.run_active_turn_to_end(); sm.advance_to_next_actor();  // a age.
+
+    sm.begin_turn();  // slot do cursor era b (Knockback) -> dispara ANTES do current() fixar.
+    REQUIRE(sm.active_actor()->id() == "c");  // c (vizinho pendente) joga primeiro.
     REQUIRE(order_ids(sm) == std::vector<std::string>{"a", "c", "b"});
+    REQUIRE(find_status(b, StatusId::Knockback) == nullptr);  // consumido no disparo.
+    REQUIRE(log_has(sm, CombatActionType::StatusTick, "empurrado (Knockback)"));
+
+    sm.run_active_turn_to_end(); sm.advance_to_next_actor();  // c age.
+    REQUIRE(sm.active_actor()->id() == "b");  // b (empurrado) fecha a rodada, joga em seguida.
 }
 
-TEST_CASE("status: knockback no proprio tick nao faz o ator perder o turno",
+TEST_CASE("status: knockback (K-B) - cada ator age exatamente 1x na rodada (sem "
+          "turno-duplo nem turno-pulado)",
           "[domain][combat][status]") {
     CombatActor a = hero("a", 100, /*spd=*/30, /*atk=*/0);
     CombatActor b = foe("b", 500, /*spd=*/20, /*atk=*/10);
@@ -336,13 +359,143 @@ TEST_CASE("status: knockback no proprio tick nao faz o ator perder o turno",
         if (act.id() == "b" && !*b_acted) { *b_acted = true; return CombatAction::attack("c"); }
         return CombatAction::pass();
     }, nullptr, nullptr, &rng);
-    sm.begin_turn(); sm.run_active_turn_to_end(); sm.advance_to_next_actor();  // a passa
-    sm.begin_turn();  // b tick empurra -> [a, c, b]; cursor segue b
-    REQUIRE(sm.active_actor()->id() == "b");
-    sm.run_active_turn_to_end();  // b ataca c
+
+    std::vector<std::string> act_order;
+    for (int i = 0; i < 3; ++i) {
+        sm.begin_turn();
+        act_order.push_back(sm.active_actor()->id());
+        sm.run_active_turn_to_end();
+        sm.advance_to_next_actor();
+    }
+
+    // a age normal (1o); b tem Knockback -> adia, c (vizinho) joga em 2o; b fecha em 3o e
+    // ainda ataca c (a acao NAO se perde, so adia). Cada id aparece EXATAMENTE 1x.
+    REQUIRE(act_order == std::vector<std::string>{"a", "c", "b"});
     REQUIRE(order_ids(sm) == std::vector<std::string>{"a", "c", "b"});
     REQUIRE(*b_acted);
     REQUIRE(c.max_hp() - c.hp() == 10);
+}
+
+// ===== QA-2: repro do bug Knockback-pula-vizinho (achado QA 2026-07-15, ============
+// =====        COMBATE-FILA-CURSOR-FIX/A2) - reorder_actor(+1) cru empurrava o alvo =====
+// =====        pra TRAS do cursor, fazendo o vizinho pendente perder a rodada inteira.
+
+TEST_CASE("status QA-2: [a, b(Knockback), c, d] - c (vizinho) age na rodada 0, todos "
+          "os 4 agem exatamente 1x",
+          "[domain][combat][status][qa]") {
+    CombatActor a = hero("a", 100, /*spd=*/40);
+    CombatActor b = foe("b", 500, /*spd=*/30);
+    CombatActor c = foe("c", 500, /*spd=*/20);
+    CombatActor d = foe("d", 500, /*spd=*/10);
+    b.add_status(effect(StatusId::Knockback, 0, 1, CardFamily::Cinetico));
+    FixedRandom rng;
+    CombatStateMachine sm({&a, &b, &c, &d},
+                          [](CombatActor&, const CombatState&) { return CombatAction::pass(); },
+                          nullptr, nullptr, &rng);
+    REQUIRE(order_ids(sm) == std::vector<std::string>{"a", "b", "c", "d"});
+
+    std::vector<std::string> act_order;
+    for (int i = 0; i < 4; ++i) {
+        sm.begin_turn();
+        act_order.push_back(sm.active_actor()->id());
+        sm.run_active_turn_to_end();
+        sm.advance_to_next_actor();
+    }
+
+    // a normal (1o); b(Knockback) adia -> c (vizinho) joga em 2o SEM perder a rodada (o bug
+    // antigo pulava c inteiro); b fecha em 3o; d normal em 4o. Cada id EXATAMENTE 1x.
+    REQUIRE(act_order == std::vector<std::string>{"a", "c", "b", "d"});
+    REQUIRE(order_ids(sm) == std::vector<std::string>{"a", "c", "b", "d"});
+}
+
+TEST_CASE("status QA-2: Knockback encadeado (2 vizinhos adjacentes, ambos com o status) - "
+          "o loop bounded resolve os 2 links no mesmo begin_turn, sem crash nem perda de "
+          "turno",
+          "[domain][combat][status][qa]") {
+    CombatActor a = hero("a", 100, /*spd=*/40);
+    CombatActor b = foe("b", 500, /*spd=*/30);
+    CombatActor c = foe("c", 500, /*spd=*/20);
+    CombatActor d = foe("d", 500, /*spd=*/10);
+    b.add_status(effect(StatusId::Knockback, 0, 1, CardFamily::Cinetico));
+    c.add_status(effect(StatusId::Knockback, 0, 1, CardFamily::Cinetico));
+    FixedRandom rng;
+    CombatStateMachine sm({&a, &b, &c, &d},
+                          [](CombatActor&, const CombatState&) { return CombatAction::pass(); },
+                          nullptr, nullptr, &rng);
+
+    std::vector<std::string> act_order;
+    for (int i = 0; i < 4; ++i) {
+        sm.begin_turn();
+        act_order.push_back(sm.active_actor()->id());
+        sm.run_active_turn_to_end();
+        sm.advance_to_next_actor();
+    }
+
+    // b e c sao vizinhos adjacentes com Knockback: b adia atras de c, e c (agora no cursor)
+    // TAMBEM tem Knockback, entao adia de volta atras de b - o par "cancela" a reordenacao
+    // liquida (2 links resolvidos no MESMO begin_turn), mas cada um consome o proprio status
+    // e todos os 4 agem EXATAMENTE 1x (sem crash, sem loop infinito - guard bounded).
+    REQUIRE(act_order == std::vector<std::string>{"a", "b", "c", "d"});
+    REQUIRE(find_status(b, StatusId::Knockback) == nullptr);
+    REQUIRE(find_status(c, StatusId::Knockback) == nullptr);
+    int tick_logs = 0;
+    for (const auto& e : sm.log())
+        if (e.action == CombatActionType::StatusTick) ++tick_logs;
+    REQUIRE(tick_logs == 2);  // 1 log por link da cadeia.
+}
+
+TEST_CASE("status QA-2: Knockback (begin_turn) e DelayAction/Einstein (reorder_pending "
+          "via UseCard) convivem na mesma rodada sem pular nem duplicar nenhum ator",
+          "[domain][combat][status][qa]") {
+    CombatActor h = hero("h", 100, /*spd=*/50, /*atk=*/0);
+    CombatActor e0 = foe("e0", 300, /*spd=*/40);
+    e0.add_status(effect(StatusId::Knockback, 0, 1, CardFamily::Cinetico));
+    CombatActor e1 = foe("e1", 300, /*spd=*/30);
+    CombatActor e2 = foe("e2", 300, /*spd=*/20);
+
+    Card einstein;
+    einstein.id = "qa_einstein";
+    einstein.display_name = "qa_einstein";
+    einstein.family = CardFamily::Cinetico;
+    einstein.base_type = CardBaseType::Glifo;
+    einstein.mana_cost = 0;
+    einstein.ap_cost = 1;
+    einstein.power = 0;
+    einstein.target_shape = TargetShape::Single;
+    einstein.tier = CardTier::Especial;
+    einstein.category = CardCategory::Ativa;
+    einstein.effects = {EffectSpec{
+        .trigger = TriggerHook::OnCast, .kind = EffectKind::DelayAction, .magnitude = 0}};
+    auto reg = registry(einstein);
+
+    auto h_acted = std::make_shared<bool>(false);
+    CombatStateMachine sm(
+        {&h, &e0, &e1, &e2},
+        [h_acted](CombatActor& act, const CombatState&) -> CombatAction {
+            if (act.id() == "h" && !*h_acted) {
+                *h_acted = true;
+                return CombatAction::use_card("qa_einstein", "e1");
+            }
+            return CombatAction::pass();
+        },
+        &reg);
+
+    std::vector<std::string> act_order;
+    for (int i = 0; i < 4; ++i) {
+        sm.begin_turn();
+        act_order.push_back(sm.active_actor()->id());
+        sm.run_active_turn_to_end();
+        sm.advance_to_next_actor();
+    }
+
+    // h abre e conjura Einstein em e1 (empurra e1 pro fim da fila via reorder_pending); e0
+    // tem Knockback e adia o proprio turno em begin_turn (via delay_current) - os 2
+    // mecanismos de reordenacao intra-rodada convivem no MESMO round. NENHUM ator falta,
+    // NENHUM repete.
+    std::vector<std::string> sorted_order = act_order;
+    std::sort(sorted_order.begin(), sorted_order.end());
+    REQUIRE(sorted_order == std::vector<std::string>{"e0", "e1", "e2", "h"});
+    REQUIRE(*h_acted);
 }
 
 TEST_CASE("status: haste no proprio tick nao faz o ator perder o turno",

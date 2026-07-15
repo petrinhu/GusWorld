@@ -334,8 +334,9 @@ void handle_chain_damage(const EffectSpec& spec, const Card& card, TechMagicCont
 // assimetrico", decisao do lider 2026-07-15): quando o alvo (ctx.counterpart) e do lado
 // OPOSTO ao caster (inimigo), empurra a acao dele pro FIM da fila da rodada corrente
 // (spec.magnitude == 0) ou N posicoes fixas atrasando (spec.magnitude > 0), via
-// InitiativeQueue::reorder_actor (mesma primitiva do Gambito-Reordenar - o clamp nos
-// limites da fila e dela, secao 4/12 combat.md). Quando o alvo e do MESMO lado do caster
+// InitiativeQueue::reorder_pending (mesma primitiva do Gambito-Reordenar, migrada de
+// reorder_actor em COMBATE-FILA-CURSOR-FIX 2026-07-15 - clamp em [cursor()+1, count()-1]
+// pela PROPRIA primitiva, nunca cruza o cursor). Quando o alvo e do MESMO lado do caster
 // (aliado), o efeito e o ESPELHO BENEFICO: o aliado avanca pra agir MAIS CEDO, indo pro
 // PRIMEIRO SLOT AINDA-NAO-AGIDO logo apos o ator atual (spec.magnitude == 0, "ao extremo")
 // ou N posicoes fixas adiantando (spec.magnitude > 0) - "dilata o tempo A FAVOR do
@@ -355,9 +356,12 @@ void handle_chain_damage(const EffectSpec& spec, const Card& card, TechMagicCont
 // problema PARECIDO mas com semantica diferente - la o alvo VIRA current(), aqui o alvo so
 // pode ir pro PROXIMO slot, current() precisa continuar apontando pro caster em resolucao).
 // Como o alvo aliado ja passou pelo guard "indice < cursor" acima, ele sempre comeca em
-// indice >= cursor()+1; o clamp abaixo so impede overshoot de N-posicoes grande demais
-// (magnitude > 0) pra ALEM do primeiro slot livre (cursor()+1) - reorder_actor por si so
-// so clampa nos limites [0, count-1] da fila inteira, nao no cursor.
+// indice >= cursor()+1; DESDE COMBATE-FILA-CURSOR-FIX (2026-07-15) o clamp inferior
+// cursor()+1 e IMPOSTO PELA PROPRIA reorder_pending (nunca cruza o cursor), entao o calculo
+// de `delta` aqui embaixo nao precisa mais de um max() manual pra proteger o overshoot -
+// so calcula o delta PEDIDO; a primitiva absorve o resto. O VALOR logado continua sendo o
+// pedido (nao o efetivamente aplicado), paridade byte-a-byte com o comportamento anterior
+// (techmagic_delay_test.cpp e o oraculo).
 void handle_delay_action(const EffectSpec& spec, const Card& card, TechMagicContext& ctx) {
     if (ctx.caster == nullptr)
         throw std::logic_error("techMagic::DelayAction: ctx.caster nao pode ser nulo.");
@@ -413,12 +417,11 @@ void handle_delay_action(const EffectSpec& spec, const Card& card, TechMagicCont
     if (ally) {
         // Espelho beneficio (decisao do lider 2026-07-15): o aliado AVANCA. magnitude==0
         // ("ao extremo") vai pro primeiro slot ainda-nao-agido apos o cursor (age a
-        // seguir); magnitude>0 adianta N posicoes fixas. Clamp defensivo: nunca ultrapassa
-        // pra ALEM do slot cursor()+1 (invariante anti turno-duplo, ver comentario da
-        // funcao acima).
+        // seguir); magnitude>0 adianta N posicoes fixas. O overshoot pra ALEM do slot
+        // cursor()+1 (invariante anti turno-duplo, ver comentario da funcao acima) e
+        // absorvido pelo clamp da PROPRIA reorder_pending - nao precisa de max() manual aqui.
         const int min_index = cursor + 1;
-        const int raw_delta = spec.magnitude == 0 ? min_index - index : -spec.magnitude;
-        delta = std::max(raw_delta, min_index - index);
+        delta = spec.magnitude == 0 ? min_index - index : -spec.magnitude;
         message = ctx.caster->id() + " tavus-executa " + card.id + ": dilata o tempo A "
                  "FAVOR de " + target->id() + ", adiantado pra agir a seguir.";
     } else {
@@ -427,7 +430,10 @@ void handle_delay_action(const EffectSpec& spec, const Card& card, TechMagicCont
                  target->id() + ", empurrado pro fim da fila.";
     }
 
-    ctx.queue->reorder_actor(target, delta);  // clamp nos limites da fila e dela.
+    // Descarta o valor efetivamente aplicado de proposito: o log usa `delta` (o valor
+    // PEDIDO), paridade byte-a-byte com o comportamento anterior (techmagic_delay_test.cpp
+    // caso 14 crava esse contrato pro ramo inimigo).
+    [[maybe_unused]] const int applied = ctx.queue->reorder_pending(target, delta);
 
     log_entry(ctx, target, delta, std::move(message));
 }

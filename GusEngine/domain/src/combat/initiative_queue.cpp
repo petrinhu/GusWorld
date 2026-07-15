@@ -57,6 +57,41 @@ void InitiativeQueue::reorder_actor(CombatActor* actor, int delta_pos) {
     cursor_ = clamp_int(cursor_, 0, static_cast<int>(order_.size()) - 1);
 }
 
+int InitiativeQueue::reorder_pending(CombatActor* actor, int delta_pos) {
+    const int from = index_of(actor);
+    if (from < 0)
+        throw std::invalid_argument("Ator '" + (actor ? actor->id() : std::string{}) +
+                                    "' nao esta na fila.");
+
+    // Alvo e o current() (from == cursor_) ou ja agiu nesta rodada (from < cursor_): nao ha
+    // "acao futura" pra reordenar. No-op, retorna 0 (dissipacao - o caller loga/decide).
+    if (from <= cursor_) return 0;
+
+    const int to =
+        clamp_int(from + delta_pos, cursor_ + 1, static_cast<int>(order_.size()) - 1);
+    if (to == from) return 0;
+
+    order_.erase(order_.begin() + from);
+    order_.insert(order_.begin() + to, actor);
+    // cursor_ intocado por construcao: from > cursor_ e to >= cursor_+1, entao a regiao
+    // [0, cursor_] NUNCA e reescrita. current() e todo ator ja-agido preservam identidade -
+    // a fila jamais cruza o cursor (raiz do bug GambitReorder-duplo, achado QA 2026-07-15).
+    return to - from;
+}
+
+bool InitiativeQueue::delay_current(int n) {
+    const int to = clamp_int(cursor_ + n, cursor_, static_cast<int>(order_.size()) - 1);
+    if (to == cursor_) return false;  // ja no ultimo slot: nada a adiar.
+
+    CombatActor* delayed = order_[static_cast<std::size_t>(cursor_)];
+    order_.erase(order_.begin() + cursor_);
+    order_.insert(order_.begin() + to, delayed);
+    // cursor_ intocado: order_[cursor_] agora e quem estava logo apos `delayed`, que vira o
+    // novo current(). round_index_ nao muda (nao e uma volta de fila, so um adiamento
+    // intra-rodada - decisao do lider 2026-07-15, A2).
+    return true;
+}
+
 void InitiativeQueue::recompute_by_speed() {
     CombatActor* current_actor = current();
     std::stable_sort(order_.begin(), order_.end(),

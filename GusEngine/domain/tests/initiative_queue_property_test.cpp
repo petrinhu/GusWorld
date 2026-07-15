@@ -14,6 +14,11 @@
 //   INV-9d advance() em volta completa incrementa round_index exatamente uma vez por wrap.
 //   INV-9e remove de ator ausente / sync de ator ausente sao no-op (cursor intacto).
 //   INV-9f reorder_actor preserva o conjunto (mesma multiplicidade de atores) e o current().
+//   INV-9g (COMBATE-FILA-CURSOR-FIX, decisao do lider 2026-07-15) reorder_pending NUNCA
+//          cruza o cursor: current() e todo ator com indice <= cursor(), POR IDENTIDADE,
+//          permanecem intactos apos qualquer reorder_pending, para qualquer alvo/delta
+//          pendente numa sequencia arbitraria - mata a RAIZ do bug (reorder_actor cru
+//          podia reescrever essa regiao e desincronizar quem esta em acao/ja agiu).
 //
 // property-based "a mao" (property_gen.hpp): LCG semeado por indice de caso. NAO altera
 // codigo de producao. Um caso que viole um invariante e BUG -> reportar ao lider com a seed.
@@ -211,5 +216,61 @@ TEST_CASE("property: remove/sync de ator ausente sao no-op; reorder ausente lanc
 
         REQUIRE_FALSE(q.contains(&outsider));
         REQUIRE_THROWS_AS(q.reorder_actor(&outsider, 1), std::invalid_argument);
+    }
+}
+
+// ===== INV-9g: reorder_pending NUNCA cruza o cursor - identidade de current()/ja-agidos =====
+// =====         preservada sob sequencia aleatoria de advance()/reorder_pending() ============
+// =====         (COMBATE-FILA-CURSOR-FIX, decisao do lider 2026-07-15) =======================
+
+TEST_CASE("property: reorder_pending preserva por identidade current() e todo ator "
+          "ja-agido, sob qualquer sequencia de advance/reorder_pending",
+          "[domain][combat][property][queue][pending]") {
+    for (int c = 0; c < kCasesPerProperty; ++c) {
+        Lcg g(0x93000000u + static_cast<unsigned>(c));
+
+        const int n = g.in_range(2, 6);  // precisa de >=2 pra ter regiao "ja-agida" + pendente
+        auto pool = make_pool(g, n);
+        std::vector<CombatActor*> ptrs;
+        for (auto& up : pool) ptrs.push_back(up.get());
+
+        InitiativeQueue q(ptrs);
+        check_integrity(q);
+
+        for (int step = 0; step < kStepsPerCase; ++step) {
+            const int op = g.in_range(0, 2);
+
+            if (op == 0) {
+                // advance: nunca invalida a regiao [0, cursor], so a estende.
+                q.advance();
+            } else {
+                // Snapshot da regiao "current() + ja-agidos" (indices [0, cursor()]) ANTES.
+                const int cursor_before = q.cursor();
+                std::vector<CombatActor*> region_before(
+                    q.order().begin(), q.order().begin() + cursor_before + 1);
+
+                CombatActor* who = q.order()[static_cast<std::size_t>(
+                    g.in_range(0, q.count() - 1))];
+                const int delta = g.in_range(-99, 99);
+
+                if (op == 1) {
+                    (void)q.reorder_pending(who, delta);  // [[nodiscard]]: so o efeito importa.
+                } else {
+                    // Metade das iteracoes tambem exercita alvo == current() (guard direto,
+                    // sem depender do sorteio bater exatamente no indice do cursor).
+                    (void)q.reorder_pending(q.current(), delta);
+                }
+
+                // INV-9g: cursor()/round_index intocados e a regiao [0, cursor()] e
+                // IDENTICA (mesmos ponteiros, mesma ordem) - reorder_pending nunca escreve
+                // ali, para NENHUM alvo/delta.
+                REQUIRE(q.cursor() == cursor_before);
+                std::vector<CombatActor*> region_after(
+                    q.order().begin(), q.order().begin() + cursor_before + 1);
+                REQUIRE(region_after == region_before);
+            }
+
+            check_integrity(q);
+        }
     }
 }

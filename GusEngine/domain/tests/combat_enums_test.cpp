@@ -145,6 +145,13 @@ TEST_CASE("combat_enums: CombatActionType ordinais", "[domain][combat][enums]") 
     REQUIRE(ord(CombatActionType::Pass) == 8u);
 }
 
+// COMBATE-FILA-CURSOR-FIX (decisao do lider 2026-07-15): StatusTick e append-only (ordinal
+// 9, apos Pass). NAO reordena {0..8}: contrato binario do serializer futuro intocado.
+TEST_CASE("combat_enums: CombatActionType::StatusTick e ordinal 9 (append-only)",
+          "[domain][combat][enums]") {
+    REQUIRE(ord(CombatActionType::StatusTick) == 9u);
+}
+
 // ---- CombatPhase (secao 3) --------------------------------------------------------
 
 TEST_CASE("combat_enums: CombatPhase ordinais", "[domain][combat][enums]") {

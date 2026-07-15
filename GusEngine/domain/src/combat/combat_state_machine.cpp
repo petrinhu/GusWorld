@@ -336,6 +336,38 @@ bool CombatStateMachine::begin_turn() {
             queue_.bring_to_current(chosen);
     }
 
+    // Knockback (K-B, decisao do lider 2026-07-15, A2/COMBATE-FILA-CURSOR-FIX): ANTES de
+    // fixar `actor` = current(), resolve toda a cadeia de adiamentos pendentes no proprio
+    // slot do cursor. Empurra o TURNO (nao um salto cru na fila): o vizinho que estava logo
+    // apos passa a agir primeiro, e o ator com Knockback age em seguida - todos agem
+    // EXATAMENTE 1x na rodada (substitui o bug antigo de reorder_actor(+1), que pulava o
+    // vizinho ao cruzar o cursor, achado QA). One-shot: o status e CONSUMIDO (remove_status)
+    // no instante em que dispara, sem depender do decremento de Duration de
+    // apply_status_tick. Loop bounded por count() (defensivo; delay_current ja tem teto
+    // proprio no fim da fila, nunca deveria estourar).
+    {
+        int guard = 0;
+        while (queue_.current()->index_of_status(StatusId::Knockback) >= 0) {
+            if (++guard > queue_.count())
+                break;
+            CombatActor* pushed = queue_.current();
+            pushed->remove_status(StatusId::Knockback);
+            if (queue_.delay_current(1)) {
+                log_.push_back(CombatLogEntry{
+                    pushed->id(), CombatActionType::StatusTick, queue_.current()->id(), 0,
+                    pushed->id() + " e empurrado (Knockback): recua na fila, " +
+                        queue_.current()->id() + " age primeiro."});
+            } else {
+                // Ultimo slot da fila: nao ha vizinho pra adiantar. Consome o status e age
+                // agora mesmo (mesma regra de "sem acao futura" do Gambito/Einstein).
+                log_.push_back(CombatLogEntry{
+                    pushed->id(), CombatActionType::StatusTick, std::nullopt, 0,
+                    pushed->id() + " e empurrado (Knockback), mas ja esta no ultimo slot da "
+                                  "fila: age agora mesmo."});
+            }
+        }
+    }
+
     CombatActor& actor = *queue_.current();
 
     actor.refresh_resources_for_turn(queue_.round_index());
@@ -890,13 +922,27 @@ void CombatStateMachine::resolve_gambit_reorder(CombatActor& actor,
     if (target == nullptr)
         throw std::logic_error("Alvo '" + *action.target_id + "' nao esta em combate.");
 
-    queue_.reorder_actor(target, action.reorder_delta);
+    // Guard de cursor (decisao do lider 2026-07-15, A1/COMBATE-FILA-CURSOR-FIX): o alvo so
+    // tem uma "acao futura" pra reordenar se AINDA nao agiu nesta rodada. O current() esta
+    // EM RESOLUCAO agora (reordena-lo seria indefinido) e quem ja agiu (indice < cursor) nao
+    // volta a jogar nesta rodada. Nos dois casos a carta DISSIPA: o AP ja foi debitado pelo
+    // caller (janela de acao normal), so o efeito de reordenar que nao se aplica - estado
+    // NORMAL, nao erro (mesma regra do handle_delay_action/Einstein).
+    if (target == queue_.current() || queue_.index_of(target) < queue_.cursor()) {
+        log_.push_back(CombatLogEntry{
+            actor.id(), CombatActionType::GambitReorder, target->id(), 0,
+            actor.id() + " usa Gambito Reordenar em " + target->id() +
+                ": dissipa (alvo em acao agora ou ja agiu neste ciclo)."});
+        return;
+    }
 
-    const std::string suffix = action.reorder_delta == 0 ? " (no-op: delta 0)" : "";
+    const int applied = queue_.reorder_pending(target, action.reorder_delta);
+
+    const std::string suffix = applied == 0 ? " (no-op)" : "";
     log_.push_back(CombatLogEntry{
-        actor.id(), CombatActionType::GambitReorder, target->id(), action.reorder_delta,
+        actor.id(), CombatActionType::GambitReorder, target->id(), applied,
         actor.id() + " usa Gambito Reordenar: empurra " + target->id() + " " +
-            std::to_string(action.reorder_delta) + " posicoes na fila." + suffix});
+            std::to_string(applied) + " posicoes na fila." + suffix});
 }
 
 void CombatStateMachine::resolve_use_card(CombatActor& actor, const CombatAction& action,
@@ -1306,12 +1352,6 @@ bool CombatStateMachine::apply_status_tick(CombatActor& actor) {
             case StatusId::Stun:
                 stunned = true;
                 break;
-            case StatusId::Knockback:
-                // secao 9 L253 / secao 8 L105: empurra o ator afetado +1 na fila. One-shot:
-                // consome a Duration toda neste tick. O ator NAO perde o turno corrente.
-                queue_.reorder_actor(&actor, +1);
-                queue_.sync_cursor_to(&actor);
-                break;
             case StatusId::Break:
                 actor.apply_stat_delta(StatusId::Break, /*def_delta=*/-status.magnitude,
                                        /*spd_delta=*/0);
@@ -1330,7 +1370,10 @@ bool CombatStateMachine::apply_status_tick(CombatActor& actor) {
                     spd_changed = true;
                 break;
             default:
-                // Disrupt/Silence/Expose/Shield: sem tick de stat aqui.
+                // Disrupt/Silence/Expose/Shield: sem tick de stat aqui. Knockback: resolvido
+                // (e CONSUMIDO via remove_status) inteiramente em begin_turn, ANTES deste
+                // metodo rodar (K-B, decisao do lider 2026-07-15, A2) - nunca aparece neste
+                // snapshot pro current().
                 break;
         }
 
@@ -1338,11 +1381,8 @@ bool CombatStateMachine::apply_status_tick(CombatActor& actor) {
         // proprio status sumiu, pula.
         const int idx = actor.index_of_status(status.id);
         if (idx >= 0) {
-            // Knockback one-shot: zera a Duration. Demais decrementam normalmente.
-            const int new_duration =
-                status.id == StatusId::Knockback ? 0 : status.duration - 1;
             StatusEffect updated = status;
-            updated.duration = new_duration;
+            updated.duration = status.duration - 1;
             actor.replace_status_at(idx, updated);
         }
     }

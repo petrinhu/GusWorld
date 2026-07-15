@@ -104,9 +104,14 @@ A ordem de turnos é uma **fila ordenada por SPD, sempre visível** ao jogador (
 Move um ator `deltaPosicao` casas na fila (negativo = adiantar, positivo = atrasar). É a primitiva que cartas Cinético/Sônico e o Gambito "reordenar/redirecionar vetor" usam para empurrar um inimigo para trás na ordem (ou puxar um aliado para frente, quando aplicável).
 
 - Clamp nos limites da fila (não sai do range válido).
-- Knockback (status, ver §9) tipicamente chama `ReorderActor(alvo, +1)`.
 - Gambito-reordenar (2 AP) chama `ReorderActor(alvo, +deltaUpgradavel)`.
 - A fila é recomputada por SPD apenas na entrada de novos atores ou em mudança de SPD (Haste/Slow); reordenações manuais persistem até a próxima recomputação natural.
+
+> **Correção de implementação (COMBATE-FILA-CURSOR-FIX, decisão do líder 2026-07-15).**
+> `ReorderActor` cru clampa nos limites da fila inteira `[0, count-1]`, **sem olhar o cursor** — pode cruzar `current()` e reescrever a região de quem já agiu nesta rodada, dessincronizando identidade (achado QA: o Gambito-reordenar fazia o ator repetir o turno e um vizinho ser pulado). A implementação real (`InitiativeQueue`) usa duas primitivas SEGURAS pra qualquer reordenação intra-rodada:
+> - **`ReorderPending(alvo, delta)`**: como o `ReorderActor`, mas o clamp é `[cursor()+1, count()-1]` — NUNCA cruza o cursor. Alvo que é o `current()` ou que já agiu (índice ≤ cursor) é no-op (a carta **dissipa**: o AP já foi gasto, só o efeito não se aplica). É o que o Gambito-reordenar chama de fato.
+> - **`DelayCurrent(n)`**: adia o turno do PRÓPRIO ator no slot do cursor — o vizinho que jogaria em seguida vira `current()`, sem mexer no índice do cursor nem no `round_index`. É o que o Knockback chama (ver §9).
+> `ReorderActor` cru continua existindo só como primitiva de FRONTEIRA (`RegroupStable`/`RecomputeBySpeed`, que operam sobre a fila inteira fora de um turno em andamento) — nunca em reordenação intra-rodada.
 
 ---
 
@@ -328,7 +333,7 @@ Status é record uniforme aplicado a qualquer ator. Tick processado no `TurnStar
 | **Poison / Corrode** | Bioquímico | dano por tick no TurnStart (Corrode reduz Def além do dano) |
 | **Disrupt** | Sônico | reduz eficácia da próxima ação (penalidade de Power) |
 | **Silence** | Sônico | bloqueia jogar cartas (só ataque básico/defender/flee) |
-| **Knockback** | Cinético | empurra o alvo na fila: `ReorderActor(alvo, +1)` |
+| **Knockback** | Cinético | adia o turno do alvo na fila (one-shot): `DelayCurrent(1)` |
 | **Break** | Cinético | reduz Def do alvo por Duration turnos |
 | **Expose** | Criptográfico | aumenta dano de carta recebido pelo alvo (ver detalhe abaixo) |
 | **Decrypt** | Criptográfico | anula/remove TODOS os buffs do alvo (qualquer status benéfico); NÃO bloqueia reaplicação (reset, não lockout; alvo pode re-buffar via item/poção/carta). Canon revisado 2026-06-03 (F2-E.5b) |
@@ -341,7 +346,7 @@ Status é record uniforme aplicado a qualquer ator. Tick processado no `TurnStar
 > - **Break:** redução de Def aplicada de uma vez, mantida e restaurada ao expirar. Distinta de Corrode (que reduz Def por tick, acumulativo).
 > - **Haste / Slow:** **aditivo** `SPD ±= Magnitude` (clamp 0), recomputa a fila na aplicação e no expire; restaura ao expirar. (NÃO multiplicativo: previsibilidade tática + equilibra o lento + casa com a notação "+1/-1/magnitude N" dos efeitos de ambiente §18.)
 > - **Decrypt:** dispela qualquer buff benéfico; SEM lockout (ver linha acima).
-> - **Knockback:** `ReorderActor(alvo, +1)`; NÃO custa o turno corrente do alvo (mantém-se distinto de Stun, que é quem tira o turno).
+> - **Knockback (K-B, revisado COMBATE-FILA-CURSOR-FIX 2026-07-15):** `DelayCurrent(1)` no PRÓPRIO slot do cursor — ADIA o turno do alvo em vez de saltá-lo na fila crua: o vizinho que jogaria em seguida vira `current()` e age primeiro; o alvo (status consumido one-shot, `RemoveStatus`) age logo depois. Cada ator age EXATAMENTE 1x na rodada (comportamento antigo, `ReorderActor(alvo, +1)`, tinha um bug latente: empurrava o alvo pra TRÁS do cursor e o vizinho pendente perdia a rodada inteira — corrigido). Encadeia (2 vizinhos adjacentes com Knockback resolvem os 2 links no mesmo `TurnStart`, loop bounded por `count()`). Continua distinto de Stun (que é quem de fato tira o turno do ator, não apenas adia).
 > - **Silence:** gate em `ResolveUseCard` com mensagem ERRO DE COMPILAÇÃO (§10); ataque básico / defender / flee passam.
 
 ### Shield (pool de absorção), canonizado 2026-05-26

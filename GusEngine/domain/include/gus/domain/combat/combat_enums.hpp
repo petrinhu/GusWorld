@@ -142,6 +142,12 @@ enum class CombatActionType : std::uint32_t {
     GambitPredict = 6,
     GambitReorder = 7,
     Pass = 8,
+    // Efeito de SISTEMA disparado num tick de status no TurnStart (ex.: Knockback adiando o
+    // turno do current(), secao 9), NAO amarrado a uma CombatAction de jogador. Append-only
+    // (decisao do lider 2026-07-15, COMBATE-FILA-CURSOR-FIX): a regra canonica "todo efeito
+    // loga uma mensagem diegetica" exige um CombatLogEntry mesmo quando nao ha acao de
+    // jogador correspondente - reusar Attack/UseCard/etc classificaria errado no log/UI.
+    StatusTick = 9,
 };
 
 // Fases da FSM de combate. secao 3.
@@ -233,7 +239,8 @@ enum class EffectKind : std::uint32_t {
     ChainDamage = 6,
     // Dilatacao temporal (Einstein/Time-Dilate): empurra a acao de 1 inimigo pro FIM da
     // fila da rodada corrente (age por ultimo; toda a party restante age antes). Primitiva
-    // = InitiativeQueue::reorder_actor (mesma da Gambito-Reordenar). EffectSpec.magnitude
+    // = InitiativeQueue::reorder_pending (mesma da Gambito-Reordenar, migrada de
+    // reorder_actor em COMBATE-FILA-CURSOR-FIX pra nunca cruzar o cursor). EffectSpec.magnitude
     // == 0 = empurra pro fim da fila (Einstein); >0 = N posicoes fixas. Alvo que JA agiu
     // nesta rodada (indice < cursor da fila) e um no-op + log de dissipacao, NAO reaplica
     // na proxima rodada. 0 consumo de RNG. Ver techmagic.cpp::handle_delay_action.

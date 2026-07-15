@@ -251,9 +251,10 @@ std::unordered_map<std::string, Card> assemble() {
 
         // --- Einstein (Time-Dilate): Ativa, Cinetico. OnCast -> DelayAction: empurra a
         // acao do alvo pro FIM da fila da rodada corrente (magnitude 0), via
-        // InitiativeQueue::reorder_actor (mesma primitiva do Gambito-Reordenar). Um alvo
-        // que ja agiu nesta rodada dissipa a carta (no-op + log), nao banca pra proxima
-        // rodada. Sem dano. ---
+        // InitiativeQueue::reorder_pending (mesma primitiva do Gambito-Reordenar; migrada
+        // de reorder_actor em COMBATE-FILA-CURSOR-FIX 2026-07-15). Um alvo que ja agiu
+        // nesta rodada dissipa a carta (no-op + log), nao banca pra proxima rodada. Sem
+        // dano. ---
         make_special(
             "einstein", "CARD_EXEC_EINSTEIN_NAME", CardFamily::Cinetico, CardCategory::Ativa,
             kActiveManaCost,

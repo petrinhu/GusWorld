@@ -77,6 +77,16 @@ TEST_CASE("log: Defender classifica como Status (Shield)", "[battle_log]") {
     REQUIRE(classify(def).kind == LogLineKind::Status);
 }
 
+TEST_CASE("log: StatusTick (Knockback adiando o turno, COMBATE-FILA-CURSOR-FIX) sempre "
+          "ecoa e classifica como Status",
+          "[battle_log]") {
+    CombatLogEntry tick;
+    tick.action = CombatActionType::StatusTick;
+    tick.message = "b e empurrado (Knockback): recua na fila, c age primeiro.";
+    REQUIRE(is_notable(tick));
+    REQUIRE(classify(tick).kind == LogLineKind::Status);
+}
+
 TEST_CASE("log: StatusEffectChange Applied classifica como Status", "[battle_log]") {
     StatusEffectChange c;
     c.actor_id = "alvo";
@@ -130,6 +140,26 @@ TEST_CASE("status_name_key mapeia StatusId pra a chave i18n STATUS_<id>_NAME",
     REQUIRE(status_name_key(StatusId::Stun) == std::string_view("STATUS_STUN_NAME"));
     REQUIRE(status_name_key(StatusId::Poison) == std::string_view("STATUS_POISON_NAME"));
     REQUIRE(status_name_key(StatusId::Shield) == std::string_view("STATUS_SHIELD_NAME"));
+}
+
+// ADR-016 Balde B (decisao do lider 2026-07-15): os 5 StatusId mais recentes
+// (SobrecargaTermica/Resfriamento/Reflect/BlindagemEM/NullProof) tinham CASE FALTANDO no
+// switch de status_name_key (-Wswitch, higiene do COMBATE-FILA-CURSOR-FIX: "todo efeito
+// loga uma mensagem diegetica" tambem cobre o NOME do status no consequence_suffix, senao
+// cai no guard STATUS_STUN_NAME e o player le "Atordoamento" pro status errado). Mata
+// mutante "case removido volta a cair no default/guard".
+TEST_CASE("status_name_key cobre os 5 StatusId novos (ADR-016 Balde B) sem cair no guard",
+          "[battle_log]") {
+    using gus::app::screens::status_name_key;
+    REQUIRE(status_name_key(StatusId::SobrecargaTermica) ==
+            std::string_view("STATUS_SOBRECARGATERMICA_NAME"));
+    REQUIRE(status_name_key(StatusId::Resfriamento) ==
+            std::string_view("STATUS_RESFRIAMENTO_NAME"));
+    REQUIRE(status_name_key(StatusId::Reflect) == std::string_view("STATUS_REFLECT_NAME"));
+    REQUIRE(status_name_key(StatusId::BlindagemEM) ==
+            std::string_view("STATUS_BLINDAGEMEM_NAME"));
+    REQUIRE(status_name_key(StatusId::NullProof) ==
+            std::string_view("STATUS_NULLPROOF_NAME"));
 }
 
 TEST_CASE("consequence_suffix monta '; <alvo> ficou com <status>' so quando ha status",

@@ -261,3 +261,67 @@ TEST_CASE("inc3: ator com ap 2 usa reorder e encerra turno sem segundo reorder",
         if (e.action == CombatActionType::GambitReorder) ++reorder_logs;
     REQUIRE(reorder_logs == 1);
 }
+
+// ===== QA-1: repro do bug GambitReorder-duplo (achado QA 2026-07-15, ==============
+// =====        COMBATE-FILA-CURSOR-FIX/A1) - reorder_actor cru cruzava o cursor, =====
+// =====        fazendo o CASTER agir 2x e um vizinho ser pulado inteiro. ============
+
+TEST_CASE("inc3 QA-1: gambit reorder adianta um alvo bem atras sem cruzar o cursor - "
+          "cada ator age exatamente 1x na rodada, o caster NAO repete",
+          "[domain][combat][inc3][qa]") {
+    CombatActor h = hero("h", 50, 40);
+    CombatActor a = foe("a", 50, 30);
+    CombatActor b = foe("b", 50, 20);
+    CombatActor c = foe("c", 50, 10);
+    CombatStateMachine sm({&h, &a, &b, &c}, play_once(CombatAction::gambit_reorder("c", -3)));
+    REQUIRE(order_ids(sm) == std::vector<std::string>{"h", "a", "b", "c"});
+
+    std::vector<std::string> act_order;
+    for (int i = 0; i < 4; ++i) {
+        act_order.push_back(sm.queue().current()->id());
+        sm.begin_turn();
+        sm.run_active_turn_to_end();
+        sm.advance_to_next_actor();
+    }
+
+    // c pede adiantar 3 (indice 3 -> 0), clampado em cursor()+1=1: [h, c, a, b]. Cada id
+    // aparece EXATAMENTE 1x - h NAO repete e nenhum vizinho e pulado (o bug antigo cruzava
+    // o cursor com reorder_actor cru e produzia exatamente esses 2 sintomas).
+    REQUIRE(act_order == std::vector<std::string>{"h", "c", "a", "b"});
+    REQUIRE(order_ids(sm) == std::vector<std::string>{"h", "c", "a", "b"});
+}
+
+TEST_CASE("inc3 QA-1: gambit reorder no alvo == current() (em acao agora) dissipa - AP "
+          "gasto, log de dissipacao, ordem intacta",
+          "[domain][combat][inc3][qa]") {
+    CombatActor h = hero("h", 50, 30);
+    CombatActor a = foe("a", 50, 20);
+    CombatStateMachine sm({&h, &a}, play_once(CombatAction::gambit_reorder("h", 1)));  // auto-alvo.
+    sm.begin_turn();
+    const std::vector<std::string> before = order_ids(sm);
+    sm.run_active_turn_to_end();
+    REQUIRE(h.ap() == 1);  // AP gasto mesmo dissipando (janela de acao normal).
+    REQUIRE(order_ids(sm) == before);
+    REQUIRE(log_has(sm, CombatActionType::GambitReorder, "dissipa"));
+}
+
+TEST_CASE("inc3 QA-1: gambit reorder num alvo que ja agiu nesta rodada (indice < cursor) "
+          "dissipa - AP gasto, log de dissipacao, ordem intacta",
+          "[domain][combat][inc3][qa]") {
+    CombatActor a = foe("a", 50, 30);   // abre a rodada (SPD maior).
+    CombatActor h = hero("h", 50, 20);  // age depois de a.
+    CombatStateMachine sm({&a, &h}, [](CombatActor& act, const CombatState&) -> CombatAction {
+        if (act.id() == "h") return CombatAction::gambit_reorder("a", 1);
+        return CombatAction::pass();
+    });
+    sm.begin_turn(); sm.run_active_turn_to_end(); sm.advance_to_next_actor();  // a age (pass).
+    REQUIRE(sm.active_actor()->id() == "h");
+    const std::vector<std::string> before = order_ids(sm);
+
+    sm.begin_turn();
+    sm.run_active_turn_to_end();  // h mira a, que ja agiu -> dissipa.
+
+    REQUIRE(h.ap() == 1);
+    REQUIRE(order_ids(sm) == before);
+    REQUIRE(log_has(sm, CombatActionType::GambitReorder, "dissipa"));
+}

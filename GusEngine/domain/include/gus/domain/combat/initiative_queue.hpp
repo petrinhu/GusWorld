@@ -59,9 +59,33 @@ public:
     [[nodiscard]] int round_index() const noexcept { return round_index_; }
 
     // Move um ator delta_pos casas (negativo = adiantar, positivo = atrasar). Clamp nos
-    // limites da fila. Primitiva de knockback (+1) e Gambito-reordenar. secao 4. Lanca
-    // std::invalid_argument se o ator nao esta na fila.
+    // limites da fila [0, count-1] SEM olhar o cursor: pode cruzar current() e reescrever
+    // a regiao [0, cursor_], desincronizando current()/identidade de quem ja agiu (raiz do
+    // bug GambitReorder-duplo/Knockback-pula-vizinho, achado QA 2026-07-15). NAO USAR EM
+    // MEIO DE RODADA: primitiva CRUA de fronteira/porte (regroup_stable/recompute_by_speed
+    // chamam sobre a fila inteira, fora de um turno em andamento). Prefira
+    // reorder_pending/delay_current pra qualquer reordenacao intra-rodada (Gambito/
+    // Knockback/Einstein). Lanca std::invalid_argument se o ator nao esta na fila.
     void reorder_actor(CombatActor* actor, int delta_pos);
+
+    // Reordena um ator PENDENTE (ainda nao agiu nesta rodada) delta_pos casas, SEM jamais
+    // cruzar o cursor: clamp em [cursor()+1, count()-1]. Primitiva SEGURA de Gambito-
+    // Reordenar/Knockback-em-outro-ator/Einstein (decisao do lider 2026-07-15, A1/A3) - ao
+    // contrario de reorder_actor, a regiao [0, cursor()] NUNCA e tocada, entao current() e
+    // todo ator com indice <= cursor() preservam identidade por construcao. Alvo ausente:
+    // lanca std::invalid_argument. Alvo e o current() OU ja agiu (indice <= cursor()):
+    // no-op, retorna 0 (dissipacao - a carta ja gastou o custo, so o efeito nao se aplica;
+    // o CALLER decide o log). Retorna o delta REALMENTE aplicado (0 = no-op/dissipado; pode
+    // divergir de delta_pos se o clamp absorveu parte do pedido).
+    [[nodiscard]] int reorder_pending(CombatActor* actor, int delta_pos);
+
+    // Adia o turno do ator CORRENTE em ate n slots (clamp no fim da fila), SEM mexer no
+    // indice do cursor: o vizinho que estava logo apos passa a ser current(), e o ator
+    // adiado age em seguida (decisao do lider 2026-07-15, A2 - Knockback "adia o turno" em
+    // vez de saltar o vizinho). round_index_ NAO muda. Retorna false (no-op) se o corrente
+    // ja esta no ultimo slot da fila (nada a adiar - o caller consome o status e o ator age
+    // agora mesmo).
+    bool delay_current(int n);
 
     // Recomputa a ordem por SPD (entrada de novos atores ou mudanca de SPD via
     // Haste/Slow). secao 4. Mantem o cursor apontando pro ator que estava em turno.
@@ -105,9 +129,12 @@ public:
     // true se o ator esta na fila.
     [[nodiscard]] bool contains(CombatActor* actor) const;
 
-private:
+    // Indice de `actor` na ordem corrente, ou -1 se ausente. Leitura pura (read-only):
+    // publico pro CALLER decidir guards de cursor (ex.: "alvo ja agiu" em
+    // resolve_gambit_reorder/handle_delay_action) sem duplicar a busca linear.
     [[nodiscard]] int index_of(CombatActor* actor) const;
 
+private:
     std::vector<CombatActor*> order_;
     int cursor_ = 0;
     int round_index_ = 0;

@@ -54,6 +54,12 @@ bool is_notable(const CombatLogEntry& e) noexcept {
             return true;  // acoes de sistema/informacao sempre ecoam (D7)
         case CombatActionType::Defend:
             return true;  // ganhar Shield e notavel (muda a leitura do proximo hit)
+        case CombatActionType::StatusTick:
+            // Efeito de sistema fora de uma CombatAction de jogador (ex.: Knockback adiando
+            // o turno, secao 9): regra canonica do lider (COMBATE-FILA-CURSOR-FIX,
+            // 2026-07-15) - "todo efeito loga uma mensagem diegetica pro player entender o
+            // que aconteceu". Sempre ecoa, mesmo racional do Scan/Gambito/Flee.
+            return true;
         case CombatActionType::Pass:
             // Pass so e notavel se carrega message de sistema (ex.: ANALISE PREDITIVA).
             return !e.message.empty() && is_system_message(e.message);
@@ -80,6 +86,9 @@ LogLine classify(const CombatLogEntry& e) {
         case CombatActionType::Flee:
         case CombatActionType::Pass:
             kind = LogLineKind::System;
+            break;
+        case CombatActionType::StatusTick:
+            kind = LogLineKind::Status;  // efeito de status (Knockback adiando o turno).
             break;
     }
     return LogLine{kind, e.message};
@@ -144,6 +153,11 @@ std::string_view status_name_key(gus::domain::combat::StatusId id) noexcept {
         case StatusId::Regen:     return "STATUS_REGEN_NAME";
         case StatusId::Haste:     return "STATUS_HASTE_NAME";
         case StatusId::Slow:      return "STATUS_SLOW_NAME";
+        case StatusId::SobrecargaTermica: return "STATUS_SOBRECARGATERMICA_NAME";
+        case StatusId::Resfriamento:      return "STATUS_RESFRIAMENTO_NAME";
+        case StatusId::Reflect:           return "STATUS_REFLECT_NAME";
+        case StatusId::BlindagemEM:       return "STATUS_BLINDAGEMEM_NAME";
+        case StatusId::NullProof:         return "STATUS_NULLPROOF_NAME";
     }
     return "STATUS_STUN_NAME";  // guarda (enum coberto)
 }

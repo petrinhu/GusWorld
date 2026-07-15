@@ -34,6 +34,10 @@ add_executable(gusengine_domain_tests
     weakness_wheel_test.cpp
     combat_actor_test.cpp
     initiative_queue_test.cpp
+    # COMBATE-FILA-CURSOR-FIX (decisao do lider 2026-07-15, A1/A2/A3): primitivas SEGURAS
+    # de reordenacao intra-rodada (reorder_pending/delay_current) que NUNCA cruzam o
+    # cursor - fecham a raiz dos bugs GambitReorder-duplo e Knockback-pula-vizinho.
+    initiative_queue_pending_test.cpp
     combat_state_test.cpp
     environment_modifier_test.cpp
     environment_catalog_test.cpp

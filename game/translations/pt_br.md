@@ -628,6 +628,21 @@ Aceleração
 ## STATUS_SLOW_NAME
 Lentidão
 
+## STATUS_SOBRECARGATERMICA_NAME
+Sobrecarga Térmica
+
+## STATUS_RESFRIAMENTO_NAME
+Resfriamento
+
+## STATUS_REFLECT_NAME
+Reflexo
+
+## STATUS_BLINDAGEMEM_NAME
+Blindagem EM
+
+## STATUS_NULLPROOF_NAME
+Prova Irrefutável
+
 ### Combos curados (combat.md §10, COMBO_<comboId>_NAME)
 
 ## COMBO_PULSO_STREAM_NAME
