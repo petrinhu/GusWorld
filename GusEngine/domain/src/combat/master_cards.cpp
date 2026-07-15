@@ -1,17 +1,18 @@
 // gus/domain/src/combat/master_cards.cpp
 //
-// Implementacao do catalogo das 8 cartas ESPECIAIS suportadas pelo executor techMagic
-// (ADR-016, MVP step 4). Ver header para o contrato. Mesmo padrao de
+// Implementacao do catalogo das 10 cartas ESPECIAIS suportadas pelo executor techMagic
+// (ADR-016, MVP steps 4-5). Ver header para o contrato. Mesmo padrao de
 // placeholder_cards.cpp: cartas construidas uma vez, emplace fail-fast em id duplicado.
 // POCO puro, ZERO Qt.
 //
 // Regra de familia (cartas-technomagik.md secao 2.3): dominio eletromagnetico -> Eletrico;
 // resto -> Universal. Volta/Faraday/Euler = Eletrico; Newton/Pythagoras/Godel/Turing/
-// Menger = Universal.
+// Menger/Mandelbrot/Ada = Universal.
 //
 // NUMEROS PROVISORIOS (//PLAYTEST): mana das ativas/hibridas = 6; percent do Leech (Volta)
-// = 50; percent do Reflect (Newton) = 30. Balanceamento real (VOLTA-LEECH-%, statline por
-// carta) e trabalho futuro.
+// = 50; percent do Reflect (Newton) = 30; percent do eco Fractal-Echo (Mandelbrot) = 50;
+// percent do eco Re-Run (Ada) = 100/magnitude(chance) = 34. Balanceamento real
+// (VOLTA-LEECH-%, statline por carta) e trabalho futuro.
 //
 // base_type: as ativas/hibridas usam Glifo (carta-programa nao-elemental; //PLAYTEST, nao
 // ha convencao fechada pra especiais). As posse-only/passivas idem Glifo por coerencia (o
@@ -37,6 +38,10 @@ namespace {
 constexpr int kActiveManaCost = 6;    //PLAYTEST mana das ativas/hibridas (Volta, Newton).
 constexpr int kVoltaLeechPercent = 50;  //PLAYTEST VOLTA-LEECH-% (fracao do Leech do Volta).
 constexpr int kNewtonReflectPercent = 30;  //PLAYTEST fracao do Reflect (Newton "acao e reacao").
+// RepeatLastAction (ADR-016 secao 20 item 5, decisoes Q1-Q4 do lider 2026-07-14).
+constexpr int kMandelbrotEchoPercent = 50;  //PLAYTEST escala do eco Fractal-Echo (Mandelbrot).
+constexpr int kAdaEchoPercent = 100;  // Q3: Ada ecoa a 100% - o freio dela e a CHANCE, nao a escala.
+constexpr int kAdaEchoChance = 34;    //PLAYTEST chance% do Re-Run (Ada); easter-egg velado.
 
 // Monta uma carta ESPECIAL base. base_type = Glifo (carta-programa nao-elemental,
 // //PLAYTEST). ap_cost default 1 (herda o mesmo default do placeholder). Sem
@@ -97,6 +102,28 @@ std::unordered_map<std::string, Card> assemble() {
             {EffectSpec{.trigger = TriggerHook::OnRoundEnd,
                        .kind = EffectKind::HypotenuseCombo}}),
 
+        // --- Mandelbrot (Fractal-Echo): Ativa, Universal. OnCast -> RepeatLastAction
+        // (magnitude 0 = sempre dispara, 0 consumo de RNG): eco de 50% do dano da ULTIMA
+        // acao de dano de um aliado nesta rodada (Q1-Q4, ADR-016 secao 20 item 5). ---
+        make_special(
+            "mandelbrot", "CARD_EXEC_MANDELBROT_NAME", CardFamily::Universal,
+            CardCategory::Ativa, kActiveManaCost,
+            {EffectSpec{.trigger = TriggerHook::OnCast,
+                       .kind = EffectKind::RepeatLastAction,
+                       .magnitude = 0,  // sempre dispara (nenhuma chance, Mandelbrot).
+                       .percent = kMandelbrotEchoPercent}}),
+
+        // --- Ada Lovelace (Re-Run): Passiva, Universal, mana 0. OnAllyTurnEnd ->
+        // RepeatLastAction (percent 100, magnitude = chance% do Re-Run): no fim do turno
+        // de OUTRO aliado, chance de ecoar a ultima acao de dano dele por completo
+        // (Q1-Q4, ADR-016 secao 20 item 5). ---
+        make_special(
+            "ada", "CARD_EXEC_ADA_NAME", CardFamily::Universal, CardCategory::Passiva, 0,
+            {EffectSpec{.trigger = TriggerHook::OnAllyTurnEnd,
+                       .kind = EffectKind::RepeatLastAction,
+                       .magnitude = kAdaEchoChance,  // chance% (0..99 roll < magnitude).
+                       .percent = kAdaEchoPercent}}),
+
         // --- Godel (Null-Proof): Passiva, Universal, mana 0. Sem programa: o trunfo E a
         // flag ignores_weakness_wheel; wiring no resolvedor e step futuro. ---
         make_special(
@@ -125,7 +152,7 @@ std::unordered_map<std::string, Card> assemble() {
     };
 
     std::unordered_map<std::string, Card> registry;
-    registry.reserve(8);
+    registry.reserve(10);
     for (const auto& card : cards) {
         // emplace (nao indexer) falha-cedo se algum id duplicar (mesmo padrao do placeholder).
         const auto [it, inserted] = registry.emplace(card.id, card);

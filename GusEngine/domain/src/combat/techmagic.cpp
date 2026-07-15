@@ -1,9 +1,10 @@
 // gus/domain/combat/techmagic.cpp
 //
-// Implementacao do executor techMagic (ADR-016, MVP steps 2-3). Handlers: ApplyStatus,
-// Leech, Reflect (step 2) + HypotenuseCombo (step 3, ledger cross-ator/OnRoundEnd).
-// EffectKind sem handler (CloneAlly) lanca std::logic_error - fail-fast, nunca no-op
-// silencioso (ver techmagic.hpp).
+// Implementacao do executor techMagic (ADR-016, MVP steps 2-5). Handlers: ApplyStatus,
+// Leech, Reflect (step 2) + HypotenuseCombo (step 3, ledger cross-ator/OnRoundEnd) +
+// RepeatLastAction (step 5, Mandelbrot/Fractal-Echo + Ada/Re-Run, decisoes Q1-Q4 do
+// lider 2026-07-14). EffectKind sem handler (CloneAlly) lanca std::logic_error -
+// fail-fast, nunca no-op silencioso (ver techmagic.hpp).
 //
 // Cross-ref: gus/domain/combat/techmagic.hpp; combat_state_machine.cpp (pontos de hook);
 //            docs/design/mecanicas/cartas-technomagik.md; ADR-016.
@@ -176,6 +177,67 @@ void handle_hypotenuse_combo(const Card& card, TechMagicContext& ctx) {
     }
 }
 
+// RepeatLastAction (step 5, Mandelbrot/Fractal-Echo + Ada/Re-Run; decisoes Q1-Q4 do
+// lider, 2026-07-14): reaplica o dano>0 de CADA ALVO da ULTIMA ACAO de dano de um ALIADO
+// do ctx.caster NESTA RODADA (ctx.last_action), escalado por spec.percent (Q1: eco do
+// RESULTADO, sem novo sorteio/critico/mana/status; Q3: Ada usa percent=100 - o freio dela
+// e a CHANCE, nao a escala). spec.magnitude e a chance% de disparar o Re-Run: 0 = sempre
+// dispara SEM tocar ctx.rng (Mandelbrot, sempre-repete, 0 consumo de RNG por construcao);
+// >0 consome ctx.rng->next(100) EXATAMENTE 1 vez (Ada 34%), mas SO quando ha uma acao
+// echoable (determinismo "1 consumo por dono so se ha acao repetivel" - sem acao pra
+// ecoar, ZERO RNG tambem).
+void handle_repeat_last_action(const EffectSpec& spec, const Card& card,
+                               TechMagicContext& ctx) {
+    if (ctx.caster == nullptr)
+        throw std::logic_error("techMagic::RepeatLastAction: ctx.caster nao pode ser nulo.");
+    if (ctx.last_action == nullptr)
+        throw std::logic_error(
+            "techMagic::RepeatLastAction: ctx.last_action nao pode ser nulo (bug de call "
+            "site - a FSM sempre injeta &last_action_, nao efeito vazio).");
+
+    const LastActionRecord& last = *ctx.last_action;
+    // Q4: so ecoa acao de um ALIADO (mesmo lado do dono); registro vazio (nada aconteceu
+    // ainda nesta rodada) ou de lado oposto => nada a ecoar. Estado NORMAL, nao erro.
+    const bool echoable = last.actor != nullptr && !last.hits.empty() &&
+                          last.actor->is_player_side() == ctx.caster->is_player_side();
+    if (!echoable) {
+        log_entry(ctx, nullptr, 0,
+                 ctx.caster->id() + " tavus-executa " + card.id +
+                     ": nada a ecoar nesta rodada.");
+        return;
+    }
+
+    if (spec.magnitude > 0) {
+        if (ctx.rng == nullptr)
+            throw std::logic_error(
+                "techMagic::RepeatLastAction: ctx.rng nao pode ser nulo com chance "
+                "(magnitude > 0) declarada na carta '" +
+                card.id + "'.");
+        const int roll = ctx.rng->next(100);
+        if (roll >= spec.magnitude) {
+            log_entry(ctx, nullptr, 0,
+                     ctx.caster->id() + " tavus-executa " + card.id +
+                         ": chance do Re-Run falhou (" + std::to_string(roll) + " >= " +
+                         std::to_string(spec.magnitude) + ").");
+            return;
+        }
+    }
+
+    for (const auto& [target, dmg] : last.hits) {
+        if (target == nullptr || !target->is_alive()) continue;
+        const int echo = static_cast<int>(
+            std::lround(static_cast<double>(dmg) * static_cast<double>(spec.percent) / 100.0));
+        if (echo <= 0) continue;
+
+        target->take_damage(echo);  // PURO - anti-recursao (nao redispara hooks/ledger).
+
+        log_entry(ctx, target, echo,
+                 ctx.caster->id() + " tavus-executa " + card.id + ": a acao de " +
+                     last.actor->id() + " ecoou (" + std::to_string(spec.percent) +
+                     "%) em " + target->id() + " por " + std::to_string(echo) + ".");
+    }
+}
+
 }  // namespace
 
 void execute(TriggerHook hook, const Card& card, TechMagicContext& ctx) {
@@ -195,12 +257,15 @@ void execute(TriggerHook hook, const Card& card, TechMagicContext& ctx) {
             case EffectKind::HypotenuseCombo:
                 handle_hypotenuse_combo(card, ctx);
                 break;
+            case EffectKind::RepeatLastAction:
+                handle_repeat_last_action(spec, card, ctx);
+                break;
             case EffectKind::CloneAlly:
             default:
                 throw std::logic_error(
                     "techMagic: EffectKind sem handler implementado na carta '" + card.id +
-                    "' (steps 2-3 cobrem ApplyStatus/Leech/Reflect/HypotenuseCombo; CloneAlly "
-                    "e step 4+, ADR-016).");
+                    "' (steps 2-3-5 cobrem ApplyStatus/Leech/Reflect/HypotenuseCombo/"
+                    "RepeatLastAction; CloneAlly e step 6+, ADR-016).");
         }
     }
 }

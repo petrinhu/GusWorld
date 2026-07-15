@@ -236,3 +236,11 @@ TEST_CASE("combat_enums: EffectKind ordinais", "[domain][combat][enums][techmagi
     REQUIRE(ord(EffectKind::HypotenuseCombo) == 3u);
     REQUIRE(ord(EffectKind::CloneAlly) == 4u);
 }
+
+// PS-Y-EXECUTOR-5 (decisao do lider 2026-07-14, ADR-016 secao 20 item 5): RepeatLastAction
+// e append-only (ordinal 5, apos CloneAlly). NAO reordena {0..4}: contrato binario do
+// serializer futuro intocado.
+TEST_CASE("combat_enums: EffectKind::RepeatLastAction e ordinal 5 (append-only)",
+          "[domain][combat][enums][techmagic]") {
+    REQUIRE(ord(EffectKind::RepeatLastAction) == 5u);
+}

@@ -24,9 +24,15 @@
 // apontando pro ledger da rodada, e limpa o ledger em seguida (hits nao atravessam
 // fronteira de rodada).
 //
-// ESCOPO deste step (NAO implementar aqui): CloneAlly, OnAllyTurnEnd (so DECLARADO no
-// hook, sem ponto de disparo), tick da Sobrecarga Termica, desconto do Resfriamento,
-// query fora-de-combate. Step 4+.
+// STEP 5 (RepeatLastAction, Mandelbrot+Ada, ADR-016; decisoes Q1-Q4 do lider,
+// 2026-07-14): OnAllyTurnEnd agora tem ponto de disparo real (CombatStateMachine::
+// process_ally_turn_end_hooks, chamado nos dois caminhos de fim-de-turno). O handler
+// reaplica o dano>0 da ULTIMA ACAO de dano de QUALQUER aliado NESTA RODADA
+// (LastActionRecord, abaixo), escalado por EffectSpec.percent, via CombatActor::
+// take_damage PURO (mesma anti-recursao de Reflect/HypotenuseCombo).
+//
+// ESCOPO ainda FORA deste step: CloneAlly, tick da Sobrecarga Termica, desconto do
+// Resfriamento, query fora-de-combate. Step 6+.
 //
 // Cross-ref: gus/domain/combat/combat_records.hpp (EffectSpec/Card); combat_enums.hpp
 //            (TriggerHook/EffectKind/CardTier/CardCategory); combat_state_machine.cpp
@@ -39,11 +45,13 @@
 #include <string>
 #include <unordered_map>
 #include <unordered_set>
+#include <utility>
 #include <vector>
 
 #include "gus/domain/combat/combat_actor.hpp"
 #include "gus/domain/combat/combat_enums.hpp"
 #include "gus/domain/combat/combat_records.hpp"
+#include "gus/domain/combat/random_source.hpp"
 
 namespace gus::domain::combat::techMagic {
 
@@ -55,6 +63,25 @@ struct RoundHitEntry {
     CombatActor* attacker = nullptr;
     CombatActor* target = nullptr;
     int damage = 0;
+};
+
+// Registro da ULTIMA ACAO DE DANO de QUALQUER aliado NESTA RODADA (step 5,
+// RepeatLastAction/Mandelbrot+Ada; decisoes Q1-Q4 do lider, 2026-07-14). Ponteiros
+// NAO-DONOS (mesmo padrao de RoundHitEntry). `actor` = quem executou a acao (Attack ou
+// UseCard); `card_id` vazio para ataque basico (Attack nao tem carta). `hits` agrega o
+// dano>0 causado a CADA ALVO DISTINTO por essa acao (Q2: so ataque basico ou carta
+// ofensiva que causou dano>0 grava aqui - Scan/Defend/status puro/canal FALHA/imunidade
+// NUNCA gravam). A FSM (last_action_) so ATUALIZA este registro ao FIM de
+// resolve_basic_attack/resolve_use_card, e so quando ha pelo menos 1 hit>0 (uma acao sem
+// dano preserva o registro anterior, ainda valido na rodada). Zerado (actor=nullptr,
+// hits vazio) na fronteira de rodada, junto do round_hits_ (Q4 - a janela nao atravessa
+// rodada). `actor == nullptr` (ou hits vazio) e ESTADO NORMAL (nada a ecoar ainda nesta
+// rodada), nao bug.
+struct LastActionRecord {
+    CombatActor* actor = nullptr;
+    CombatActionType type = CombatActionType::Attack;
+    std::string card_id;
+    std::vector<std::pair<CombatActor*, int>> hits;
 };
 
 // Contexto de execucao de um EffectSpec. `caster` e o DONO do programa em execucao (quem
@@ -82,6 +109,19 @@ struct RoundHitEntry {
 // alvo). Vive no escopo do CALLER (CombatStateMachine::process_round_end_hooks) - um set
 // por chamada de OnRoundEnd (= por rodada), reaproveitado entre os atores iterados nessa
 // chamada. nullptr desativa o dedup (ex. teste unitario isolado que so quer o valor bruto).
+// `last_action` (step 5, RepeatLastAction/Mandelbrot+Ada): ponteiro pro LastActionRecord
+// da FSM (last_action_), so usado por handle_repeat_last_action. Campo ADITIVO (default
+// nullptr preserva os call sites/testes dos steps 1-4 intactos); handle_repeat_last_action
+// lanca std::logic_error se rodar com last_action == nullptr (bug de call site - a FSM
+// SEMPRE injeta &last_action_ nos hooks OnCast/OnAllyTurnEnd, mesmo padrao de round_hits
+// acima). Um LastActionRecord com actor == nullptr (ou hits vazio, ou acao de lado OPOSTO
+// ao ctx.caster) e ESTADO NORMAL (nada a ecoar ainda nesta rodada) - NAO lanca, so
+// no-op+log.
+// `rng` (step 5): porta de RNG injetada, so consumida por handle_repeat_last_action quando
+// a carta declara EffectSpec.magnitude > 0 (chance do Re-Run, ex. Ada 34%). nullptr e bug
+// de call site SE a carta em execucao tiver magnitude>0 (a FSM sempre injeta rng_); cartas
+// com magnitude==0 (Mandelbrot, sempre-repete) NUNCA tocam este ponteiro - 0 consumo de
+// RNG por construcao (determinismo, secao 11/ADR-006).
 struct TechMagicContext {
     CombatActor* caster = nullptr;
     CombatActor* counterpart = nullptr;
@@ -89,6 +129,8 @@ struct TechMagicContext {
     std::vector<CombatLogEntry>* log = nullptr;
     const std::vector<RoundHitEntry>* round_hits = nullptr;
     std::unordered_set<CombatActor*>* bonused_targets = nullptr;
+    const LastActionRecord* last_action = nullptr;
+    IRandomSource* rng = nullptr;
 };
 
 // Executa, NA ORDEM declarada, os EffectSpec de `card` cujo `trigger == hook`. `ctx.caster`

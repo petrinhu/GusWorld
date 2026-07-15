@@ -209,6 +209,13 @@ enum class EffectKind : std::uint32_t {
     Reflect = 2,
     HypotenuseCombo = 3,
     CloneAlly = 4,
+    // Re-Run/Fractal-Echo (MVP step 5, Mandelbrot+Ada; decisoes Q1-Q4 do lider,
+    // 2026-07-14): reaplica o DANO>0 da ULTIMA ACAO de dano de QUALQUER aliado NESTA
+    // RODADA (LastActionRecord), escalado por EffectSpec.percent, direto via
+    // CombatActor::take_damage PURO (eco do resultado, sem novo sorteio/status/mana).
+    // EffectSpec.magnitude = chance% do Re-Run (0 = sempre, Mandelbrot; >0 consome 1
+    // rng->next(100), Ada). Ver techmagic.cpp::handle_repeat_last_action.
+    RepeatLastAction = 5,
 };
 
 }  // namespace gus::domain::combat

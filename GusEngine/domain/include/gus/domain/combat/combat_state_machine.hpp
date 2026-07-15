@@ -146,6 +146,15 @@ public:
         return round_hits_;
     }
 
+    // Registro da ULTIMA ACAO DE DANO de QUALQUER aliado NESTA RODADA (ADR-016 secao 20
+    // item 5, RepeatLastAction/Mandelbrot+Ada): observabilidade de teste. Populado ao FIM
+    // de resolve_basic_attack/resolve_use_card quando ha pelo menos 1 hit>0, limpo em
+    // process_round_end_hooks junto do round_hits_ (Q4 - a janela nao atravessa rodada).
+    // actor == nullptr antes do 1o hit de dano da batalha/rodada.
+    [[nodiscard]] const techMagic::LastActionRecord& last_action() const noexcept {
+        return last_action_;
+    }
+
     // Ultimo IntentPreview lido por Gambito-Prever (secao 12). nullopt antes do 1o uso.
     [[nodiscard]] const std::optional<IntentPreview>& last_prediction() const noexcept {
         return last_prediction_;
@@ -305,6 +314,15 @@ private:
     // atravessam fronteira de rodada, mesmo se nenhuma especial disparar).
     void process_round_end_hooks();
 
+    // Despacha OnAllyTurnEnd (ADR-016 secao 20 item 5, RepeatLastAction/Ada) nas
+    // especiais EQUIPADAS dos aliados VIVOS do MESMO lado de `ended`, EXCLUINDO o proprio
+    // `ended` (a passiva reage a um ALIADO fechando o turno, nunca ao proprio turno de
+    // quem a possui - decisao do lider 2026-07-14). Gemeo de process_round_end_hooks, mas
+    // por-TURNO (nao por-rodada) e sem ledger/dedup (RepeatLastAction nao usa round_hits
+    // nem bonused_targets). Chamado nos DOIS caminhos de fim-de-turno
+    // (run_active_turn_to_end e expire_on_stunned_turn_end).
+    void process_ally_turn_end_hooks(CombatActor& ended);
+
     [[nodiscard]] CombatActor* resolve_primary_target(CombatActor& actor,
                                                       const CombatAction& action,
                                                       const Card& card);
@@ -361,6 +379,12 @@ private:
     // acumulado em apply_damage_with_hooks (DEPOIS do guard damage<=0), consultado e
     // limpo em process_round_end_hooks na fronteira da rodada. Ver round_hits() acima.
     std::vector<techMagic::RoundHitEntry> round_hits_;
+
+    // Registro da ULTIMA ACAO DE DANO de QUALQUER aliado NESTA RODADA (ADR-016 secao 20
+    // item 5, RepeatLastAction/Mandelbrot+Ada): atualizado ao FIM de resolve_basic_attack/
+    // resolve_use_card (so quando ha hit>0, ver last_action() acima), limpo em
+    // process_round_end_hooks junto do round_hits_.
+    techMagic::LastActionRecord last_action_;
 
     std::vector<CombatLogEntry> log_;
     std::vector<StatusEffectChange> status_changes_;

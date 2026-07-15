@@ -41,6 +41,29 @@ O item TECHMAGIC-EXECUTOR (`techmagic.md`) nomeou um fork: (a) resolvedor data-d
 5. VFX Einstein (screen-wave): prompt pro glintfx antes, ou fallback barato.
 6. Tag "comando central" (Mises) na taxonomia de `EnemyTemplate`: agora ou quando o bestiario fechar.
 
+## Addendum (MVP step 5, 2026-07-14): RepeatLastAction (Mandelbrot/Fractal-Echo + Ada/Re-Run)
+
+Sexto `EffectKind` entregue (append-only, ordinal 5): `RepeatLastAction`, o eco Mandelbrot
+(OnCast, sempre dispara, 0 consumo de RNG) + Ada (OnAllyTurnEnd, chance 34%, percent 100%).
+Decisoes do lider (Q1-Q4): eco do RESULTADO (reaplica o dano ja causado, na % da carta,
+via `take_damage` puro, sem novo sorteio/critico/mana/status); so acao que causou dano>0
+grava o registro (`LastActionRecord`); Ada ecoa a 100% (o freio dela e a chance); a janela
+= ultima acao de dano de QUALQUER aliado NESTA RODADA, zerada na fronteira de rodada
+junto do ledger `round_hits_` do HypotenuseCombo.
+
+Isso exigiu ligar `OnAllyTurnEnd` a um ponto de disparo real (estava so DECLARADO desde o
+step 2): `CombatStateMachine::process_ally_turn_end_hooks`, chamado nos dois caminhos de
+fim-de-turno (`run_active_turn_to_end` e `expire_on_stunned_turn_end`), despachando pros
+aliados VIVOS do mesmo lado, excluindo quem fechou o turno. `TechMagicContext` ganhou 2
+campos aditivos (`last_action`, `rng`) com default `nullptr`, preservando os call sites
+dos steps 1-4. Catalogo `MasterCards::build_registry()` passa de 8 para 10 cartas.
+
+Cross-ref: `GusEngine/domain/include/gus/domain/combat/techmagic.hpp` (LastActionRecord);
+`GusEngine/domain/src/combat/combat_state_machine.cpp` (gravacao + despacho);
+`GusEngine/domain/src/combat/master_cards.cpp` (mandelbrot/ada);
+`docs/design/mecanicas/cartas-technomagik.md` §9; `docs/design/roster-analogos/
+_EFEITOS-ESCOLHIDOS.md` (AMB-01, "neste turno" -> "nesta rodada").
+
 ## Consequencias
 
 - **Positivas:** custo BAIXO-MEDIO, risco BAIXO; numeros 100% tunaveis pra playtest; testavel por unit test por EffectKind; easter-egg entregue hoje; nao fecha porta pra VM. Cada carta = 5-15 linhas de dado.

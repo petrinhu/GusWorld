@@ -20,7 +20,7 @@
 | 5 | **Einstein** | **A: "Dilatação Temporal"** — desacelera 1 inimigo (empurra a próxima ação dele pra depois do próximo turno da party) | ativa mana~6, Cinético | VFX desejado: "imagem ondulada varrendo a tela" (ver pergunta glintfx) |
 | 6 | **Newton** | **B: "Poço Gravitacional" + "Ação e Reação"** — ativa puxa/imobiliza todos 1 turno + passiva reflete fração do dano físico | ativa mana~6 + passiva, Cinético | as DUAS leis reais do Newton |
 | 7 | **Planck** | **A: "Quantização do Dano"** (passiva) — o dano do Gus cai sempre em degraus fixos/discretos com chance conhecida, elimina quase-acertos | passiva mana-0 | plug técnico na variância `v` (§11) = decisão de engenharia |
-| 8 | **Mandelbrot** | **A: "Eco Fractal"** (ativa) — repete a última ação da party neste turno a 50% | ativa mana~6 | confirmado |
+| 8 | **Mandelbrot** | **A: "Eco Fractal"** (ativa) — repete a última ação da party nesta rodada a 50% | ativa mana~6 | confirmado (redação ajustada "neste turno" → "nesta rodada", ver AMB-01) |
 
 ## Lote 3 (mestres 9-12) — decidido 2026-07-12
 
@@ -106,6 +106,16 @@ A linha didática que cada carta mostra ao ser usada (desperta curiosidade sobre
 | **Calc-Edge** (Mises) | "Sem preço real, ninguém calcula o que vale a pena (Mises). Quem obedece um comando central erra a conta. Você, não." |
 | **Barter** (Menger) | "Menger explicou como o dinheiro nasceu da troca direta. Você trocou o que sobrava por Crédito na hora, sem loja." |
 | **Hidden-Cost** (Bastiat) | "Bastiat ensinou a ver o que NÃO se vê: todo efeito tem uma consequência escondida. Agora você a enxerga antes que ela te pegue." |
+
+## Log de ambiguidades
+
+**AMB-01 (2026-07-14, implementação TECHMAGIC-EXECUTOR/RepeatLastAction — Mandelbrot+Ada): a janela de memória do eco é "neste turno" ou "nesta rodada"?**
+
+A redação original da linha do Mandelbrot (Lote 2) dizia "repete a última ação da party **neste turno**". Isso é ambíguo em combate por-turno-de-ator (cada ator tem seu próprio turno dentro de uma rodada): "neste turno" poderia significar (a) só a ação do turno IMEDIATAMENTE anterior ao Mandelbrot ser conjurado (janela estreitíssima, quase sempre vazia se o Mandelbrot for o 1º a agir), ou (b) qualquer ação de dano de QUALQUER aliado desde que a rodada corrente começou (janela larga, do tamanho de uma rodada inteira).
+
+**Decisão do criador:** opção (b) — **"nesta rodada"**. Motivo: (1) casa com o precedente já implementado do Hipotenuse/Pythagoras (`round_hits_`, ledger que também vive por-rodada, zerado na mesma fronteira); (2) uma janela do tamanho de "1 turno de 1 ator" tornaria o Mandelbrot quase sempre um no-op (given que ele mesmo precisa gastar seu próprio turno pra conjurar, "o turno anterior" seria o de outro ator, não necessariamente o dele); (3) "rodada" é a unidade de memória mecânica que o motor já usa consistentemente pro sistema de combo cross-ator. A carta do Mandelbrot foi reescrita (linha do Lote 2) de "neste turno" para "nesta rodada"; nenhuma outra redação do roster foi afetada (Ada já dizia "no fim do turno de um aliado", que descreve o GATILHO dela — quando ela dispara — não a largura da memória que ela lê, que é a MESMA janela de rodada do Mandelbrot).
+
+Implementação: `LastActionRecord` (memória de 1 slot, a ÚLTIMA ação de dano de QUALQUER aliado) é zerada em `CombatStateMachine::process_round_end_hooks`, na mesma fronteira de rodada que já zera o `round_hits_` do Hipotenuse. Ver `docs/tech/adr/ADR-016-techmagic-effect-engine-data-driven.md` (addendum MVP step 5).
 
 ## Sub-brainstorms / feats que emergiram (a fazer depois)
 - **MAXWELL-AREAS-ESCURAS:** áreas escuras percorríveis só com a carta Maxwell (a "luz" dele); definir o que são, quantas, gate contornável (gdd §7.1).

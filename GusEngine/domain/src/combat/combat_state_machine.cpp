@@ -397,6 +397,11 @@ void CombatStateMachine::run_active_turn_to_end() {
     if (actor.expire_elapsed_statuses())
         queue_.recompute_by_speed();
     drain_status_changes();
+
+    // OnAllyTurnEnd (ADR-016 secao 20 item 5, Ada/Re-Run): despacha nos OUTROS aliados
+    // vivos do mesmo lado de `actor`, ao fechar este turno (2o dos 2 caminhos de
+    // fim-de-turno; ver expire_on_stunned_turn_end abaixo).
+    process_ally_turn_end_hooks(actor);
 }
 
 bool CombatStateMachine::check_end() {
@@ -486,6 +491,24 @@ void CombatStateMachine::process_round_end_hooks() {
 
     // Hits nao atravessam fronteira de rodada (limpa SEMPRE, mesmo sem nenhuma especial).
     round_hits_.clear();
+
+    // RepeatLastAction (ADR-016 secao 20 item 5, Q4): a janela "ultima acao de dano de
+    // QUALQUER aliado" tambem nao atravessa fronteira de rodada - zera junto do ledger.
+    last_action_ = techMagic::LastActionRecord{};
+}
+
+void CombatStateMachine::process_ally_turn_end_hooks(CombatActor& ended) {
+    for (CombatActor* ally : queue_.order()) {
+        if (ally == &ended) continue;         // a passiva reage a OUTRO aliado, nunca a si.
+        if (!ally->is_alive()) continue;      // cadaver: sem passiva pra rodar.
+        if (ally->is_player_side() != ended.is_player_side()) continue;  // so o MESMO lado.
+
+        techMagic::TechMagicContext ctx{
+            /*caster=*/ally,   /*counterpart=*/nullptr, /*damage=*/0,
+            /*log=*/&log_,     /*round_hits=*/nullptr,  /*bonused_targets=*/nullptr,
+            /*last_action=*/&last_action_, /*rng=*/rng_};
+        techMagic::execute_equipped(TriggerHook::OnAllyTurnEnd, *ally, card_registry_, ctx);
+    }
 }
 
 CombatResult CombatStateMachine::run_until_end() {
@@ -529,6 +552,11 @@ void CombatStateMachine::expire_on_stunned_turn_end(CombatActor& actor) {
     if (actor.expire_elapsed_statuses())
         queue_.recompute_by_speed();
     drain_status_changes();
+
+    // OnAllyTurnEnd (ADR-016 secao 20 item 5, Ada/Re-Run): gemeo do ramo ativo acima -
+    // um turno perdido por Stun/morte-no-tick TAMBEM fecha o turno de `actor` (1o dos 2
+    // caminhos de fim-de-turno; ver run_active_turn_to_end).
+    process_ally_turn_end_hooks(actor);
 }
 
 // ---------------------------------------------------------------------------
@@ -681,6 +709,12 @@ void CombatStateMachine::resolve_basic_attack(CombatActor& attacker,
     log_.push_back(CombatLogEntry{
         attacker.id(), CombatActionType::Attack, target->id(), damage,
         attacker.id() + " ataca " + target->id() + " por " + std::to_string(damage) + "."});
+
+    // RepeatLastAction (ADR-016 secao 20 item 5): grava ao FIM, so quando o hit causou
+    // dano>0 (Q2). Uma acao sem dano preserva o registro anterior (ainda valido na rodada).
+    if (damage > 0)
+        last_action_ = techMagic::LastActionRecord{
+            &attacker, CombatActionType::Attack, /*card_id=*/std::string{}, {{target, damage}}};
 }
 
 void CombatStateMachine::apply_damage_with_hooks(CombatActor& attacker, CombatActor& target,
@@ -898,6 +932,10 @@ void CombatStateMachine::resolve_use_card(CombatActor& actor, const CombatAction
 
     const std::vector<CombatActor*> targets = resolve_targets(actor, action, card);
 
+    // RepeatLastAction (ADR-016 secao 20 item 5): agrega o dano>0 causado a CADA ALVO
+    // desta carta (Q2), gravado ao FIM da funcao (depois do OnCast, ver abaixo).
+    std::vector<std::pair<CombatActor*, int>> hits;
+
     for (CombatActor* target : targets) {
         // Defesa neutra do compilador universal (secao 6.1): alvo universal => mult 1.0.
         const float mult_fraqueza =
@@ -989,6 +1027,10 @@ void CombatStateMachine::resolve_use_card(CombatActor& actor, const CombatAction
             actor.id(), CombatActionType::UseCard, target->id(), damage,
             actor.id() + " compila " + card.id + " em " + target->id() + " por " +
                 std::to_string(damage) + "." + channel_suffix});
+
+        // RepeatLastAction (ADR-016 secao 20 item 5, Q2): so agrega hits com dano>0
+        // (FALHA/imune ja usaram `continue`/ficam em 0, nao chegam aqui com damage>0).
+        if (damage > 0) hits.emplace_back(target, damage);
     }
 
     // OnCast (executor techMagic, ADR-016 secao 20 item 1): SO a carta JOGADA (nunca as
@@ -998,9 +1040,22 @@ void CombatStateMachine::resolve_use_card(CombatActor& actor, const CombatAction
     if (!card.effects.empty()) {
         for (CombatActor* target : targets) {
             techMagic::TechMagicContext cast_ctx{&actor, target, /*damage=*/0, &log_};
+            // RepeatLastAction (Mandelbrot/OnCast, ADR-016 secao 20 item 5): ctx.last_action
+            // reflete o registro ANTES desta carta atualiza-lo (ver gravacao abaixo) - um
+            // Mandelbrot ecoa a ULTIMA acao de dano de um aliado ja fechada nesta rodada,
+            // nunca o proprio dano que ele acabou de causar no loop acima.
+            cast_ctx.last_action = &last_action_;
+            cast_ctx.rng = rng_;
             techMagic::execute(TriggerHook::OnCast, card, cast_ctx);
         }
     }
+
+    // RepeatLastAction (ADR-016 secao 20 item 5, Q2): grava ao FIM da funcao (DEPOIS do
+    // OnCast acima), so quando ao menos 1 alvo sofreu dano>0. Uma carta sem dano (status
+    // puro, imune em todos os alvos) preserva o registro anterior (ainda valido na rodada).
+    if (!hits.empty())
+        last_action_ = techMagic::LastActionRecord{&actor, CombatActionType::UseCard, card.id,
+                                                    std::move(hits)};
 }
 
 CombatActor* CombatStateMachine::resolve_primary_target(CombatActor& actor,

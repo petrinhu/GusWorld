@@ -95,9 +95,13 @@ add_executable(gusengine_domain_tests
     # Executor techMagic (ADR-016, MVP step 3): ledger cross-ator + hook OnRoundEnd +
     # handler HypotenuseCombo (Pythagoras, decisoes Q1-Q4 do lider).
     techmagic_roundend_test.cpp
-    # Executor techMagic (ADR-016, MVP step 4, TECHMAGIC-EXECUTOR): catalogo das 8 cartas
+    # Executor techMagic (ADR-016, MVP step 4, TECHMAGIC-EXECUTOR): catalogo das 10 cartas
     # especiais dos mestres (campos + execucao sem logic_error + paridade i18n).
     master_cards_test.cpp
+    # Executor techMagic (ADR-016, MVP step 5, TECHMAGIC-EXECUTOR): EffectKind::
+    # RepeatLastAction (Mandelbrot/Fractal-Echo OnCast + Ada/Re-Run OnAllyTurnEnd,
+    # decisoes Q1-Q4 do lider 2026-07-14).
+    techmagic_repeat_test.cpp
 )
 
 # Os testes do combate incluem helpers de teste headers-only (fixed_random.hpp).

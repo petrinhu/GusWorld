@@ -678,6 +678,12 @@ Force-Law
 ## CARD_EXEC_PYTHAGORAS_NAME
 Hypotenuse
 
+## CARD_EXEC_MANDELBROT_NAME
+Fractal-Echo
+
+## CARD_EXEC_ADA_NAME
+Re-Run
+
 ## CARD_EXEC_GODEL_NAME
 Null-Proof
 
