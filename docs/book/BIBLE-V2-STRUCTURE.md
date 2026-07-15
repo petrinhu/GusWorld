@@ -6,7 +6,7 @@
 >
 > **Audiência-alvo:** leitor do Volume 1 Bíblia que terminou e quer ouvir os personagens em primeira pessoa; comprador do jogo (post-release) que quer encarnar a party antes de jogar; pesquisador de polifonia narrativa.
 >
-> **Volume 1 (separado):** Bíblia Worldbuilding em 9 partes + Apêndices A-G, ~677k pal / ~2.255 pp em dois tomos físicos. Ver `BIBLE-V1-STRUCTURE.md`.
+> **Volume 1 (separado):** Bíblia Worldbuilding em 9 partes + Apêndices A-G, ~462k pal / ~1.541 pp (número canônico reconciliado em 2026-07-15, `F5-BK.1.FIX-METRICA`; recontagem real pós-`F5-BK.AUDIT.C-EX`). Ver `BIBLE-V1-STRUCTURE.md`.
 >
 > **Convenção de medida:** ~300 palavras por página A4 corpo 11/12 com margens normais. Estimativas declaradas em palavras (fonte canônica) + páginas derivadas.
 

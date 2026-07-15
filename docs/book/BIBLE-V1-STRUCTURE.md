@@ -19,14 +19,16 @@
 | Partes | 9 + Apêndices |
 | Capítulos | 18 |
 | Sub-capítulos | ~72 |
-| Palavras totais estimadas (corpo) | ~480k |
-| Palavras totais estimadas (apêndices) | ~85k |
-| **Palavras totais Vol 1** | **~565k** |
-| **Páginas totais Vol 1** | **~1.880 pp** (corpo ~1.600 + apêndices ~280) |
+| Palavras totais estimadas (corpo, tabelas por sub-capítulo, pré-reconciliação) | ~480k |
+| Palavras totais estimadas (apêndices, tabelas por sub-capítulo, pré-reconciliação) | ~85k |
+| **Palavras totais Vol 1 (RECONTAGEM REAL 2026-07-15)** | **~462k** |
+| **Páginas totais Vol 1 (RECONTAGEM REAL 2026-07-15)** | **~1.541 pp** |
 | Apêndices | 7 (A-G) |
-| Fontes consolidadas | 78 arquivos `.md` canon |
+| Fontes consolidadas | 75 arquivos `.md` canon |
 
-> **Nota sobre tamanho:** o volume cresceu além de estimativa original (~133k pal) porque Era 1 sozinha foi expandida pra ~218k pal (REFAC-2). Sugestão editorial: considerar **divisão em dois tomos físicos** (Tomo I = Partes I-IV, ~620 pp; Tomo II = Partes V-IX + Apêndices, ~1.260 pp), ou impressão em formato grande com papel fino tipo bíblia.
+> **Nota de reconciliação (2026-07-15, `F5-BK.1.FIX-METRICA`):** número canônico único fixado em **~462k pal / ~1.541 pp**, via recontagem real (`wc -w`) dos 75 arquivos-fonte listados em "Cross-refs canon" abaixo, no estado atual pós-`F5-BK.AUDIT.C-EX` (o refator que reduziu Era 1: `era-1-pre-codigo.md` caiu de ~218k pal estimados pra **157.293 pal reais**). As tabelas por sub-capítulo/parte acima e abaixo preservam os valores estimados de 2026-05-21 (pré-C-EX, pré-reconciliação) como referência editorial de planejamento; não foram reescritas linha a linha. O número que vale como canon de tamanho do volume é o desta nota e da linha "TOTAL VOLUME 1" nas Estatísticas finais. Reconciliado também em `BIBLE-V2-STRUCTURE.md` (única referência cruzada externa ao Vol 1 encontrada).
+>
+> **Nota sobre tamanho (histórico, 2026-05-21):** o volume cresceu além de estimativa original (~133k pal) porque Era 1 sozinha foi expandida pra ~218k pal (REFAC-2, estimativa pré-C-EX). Sugestão editorial: considerar **divisão em dois tomos físicos** (Tomo I = Partes I-IV; Tomo II = Partes V-IX + Apêndices), ou impressão em formato grande com papel fino tipo bíblia. Ver recontagem real acima para o corte de páginas atualizado.
 
 ---
 
@@ -496,11 +498,14 @@ VOLUME 1: BÍBLIA WORLDBUILDING
 | Parte VIII (Leitmotivs e Estética) | ~14k | ~46 | 2.5% |
 | Parte IX (Stinger e Legado) | ~9k | ~29 | 1.6% |
 | Apêndices A-G | ~85k | ~286 | (referência) |
-| **TOTAL VOLUME 1** | **~677k pal** | **~2.255 pp** | 100% |
+| **TOTAL VOLUME 1 (tabelas por sub-capítulo, estimativa 2026-05-21, pré-C-EX)** | **~677k pal** | **~2.255 pp** | 100% |
+| **TOTAL VOLUME 1 (RECONTAGEM REAL 2026-07-15, canônica)** | **~462k pal** | **~1.541 pp** | (n/a) |
 
-> **Observação calibração:** estimativa subiu de ~565k (sumário inicial) pra ~677k após detalhamento sub-capítulo. Diferença é margem de consolidação editorial (frase-de-ligação, prefácios curtos por parte/capítulo, transições). Reservar 10-15% de buffer editorial é prática padrão.
+> **Observação calibração (histórico):** estimativa subiu de ~565k (sumário inicial) pra ~677k após detalhamento sub-capítulo, em 2026-05-21. Essa cifra nunca foi remedida contra os arquivos-fonte reais e ficou defasada pelo refator `F5-BK.AUDIT.C-EX` (2026-05-30), que reduziu a Era 1 de ~218k pal estimados pra 157.293 pal reais.
 >
-> **Recomendação editorial reforçada:** dois tomos físicos ou formato bíblia (papel fino 65g/m², ~1.500-1.700 pp em 1 volume com tipografia condensada). Em formato A4 corpo 11/12 padrão, dois tomos é o caminho cômodo.
+> **Reconciliação canônica (`F5-BK.1.FIX-METRICA`, 2026-07-15):** o número que vale para planejamento editorial (divisão em tomos, formato, papel) é **~462k pal / ~1.541 pp**, medido via `wc -w` nos 75 arquivos-fonte reais listados em "Cross-refs canon" no estado atual do canon. As linhas de tabela acima (por Parte/Capítulo) permanecem como estimativas históricas de blueprint (2026-05-21, pré-C-EX) até uma nova passada de detalhamento sub-capítulo remedir cada bloco individualmente; não são a fonte do total canônico.
+>
+> **Recomendação editorial reforçada:** com ~462k pal / ~1.541 pp, um volume único em formato A4 corpo 11/12 já é viável sem necessidade de dois tomos físicos; a divisão em dois tomos (Tomo I = Partes I-IV; Tomo II = Partes V-IX + Apêndices) permanece como alternativa válida caso o detalhamento sub-capítulo futuro (Fase D) aproxime o volume real da estimativa de blueprint (~677k). Reavaliar formato físico após a consolidação editorial real (Fase D, pós-release).
 
 ---
 
@@ -525,7 +530,7 @@ Itens que **não existem ainda** e precisam ser produzidos antes do livro fechar
 
 ---
 
-# Cross-refs canon (78 arquivos fonte consolidados)
+# Cross-refs canon (78 arquivos fonte consolidados, estimativa original 2026-05-21; recontagem 2026-07-15 enumerou 75 arquivos efetivamente usados, excluindo `arco-principal.md` + `foreshadowing.md` marcados "não usado direto" abaixo, e excluindo os 14 contos de `deep/antologia/` que são Volume 2)
 
 ```
 docs/narrative/ (canon Bloco F/G/H/I)
@@ -587,3 +592,5 @@ raiz/
 ---
 
 **Última revisão:** 2026-05-21. Estrutura proposta pelo `narrative-designer` em modo colaborativo (Auto Mode ativo). Aguarda aprovação do criador supremo para canonização como blueprint editorial.
+
+**Reconciliação de métrica:** 2026-07-15 (`F5-BK.1.FIX-METRICA`). Contagem canônica de palavras/páginas do Vol 1 fixada em ~462k pal / ~1.541 pp via recontagem real pós-`F5-BK.AUDIT.C-EX`; ver nota no Sumário executivo e nas Estatísticas finais. Blueprint estrutural (partes, capítulos, ordem) não foi alterado.
