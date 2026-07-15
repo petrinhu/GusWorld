@@ -1,10 +1,11 @@
 // gus/domain/combat/techmagic.cpp
 //
-// Implementacao do executor techMagic (ADR-016, MVP steps 2-5). Handlers: ApplyStatus,
+// Implementacao do executor techMagic (ADR-016, MVP steps 2-7). Handlers: ApplyStatus,
 // Leech, Reflect (step 2) + HypotenuseCombo (step 3, ledger cross-ator/OnRoundEnd) +
 // RepeatLastAction (step 5, Mandelbrot/Fractal-Echo + Ada/Re-Run, decisoes Q1-Q4 do
-// lider 2026-07-14). EffectKind sem handler (CloneAlly) lanca std::logic_error -
-// fail-fast, nunca no-op silencioso (ver techmagic.hpp).
+// lider 2026-07-14) + ChainDamage (step 6, Tesla) + DelayAction (step 7, Einstein/
+// Time-Dilate, decisao do lider 2026-07-15). EffectKind sem handler (CloneAlly) lanca
+// std::logic_error - fail-fast, nunca no-op silencioso (ver techmagic.hpp).
 //
 // Cross-ref: gus/domain/combat/techmagic.hpp; combat_state_machine.cpp (pontos de hook);
 //            docs/design/mecanicas/cartas-technomagik.md; ADR-016.
@@ -19,6 +20,8 @@
 #include <string>
 #include <utility>
 #include <vector>
+
+#include "gus/domain/combat/initiative_queue.hpp"
 
 namespace gus::domain::combat::techMagic {
 
@@ -298,6 +301,70 @@ void handle_chain_damage(const EffectSpec& spec, const Card& card, TechMagicCont
     }
 }
 
+// DelayAction (OnCast, Einstein/Time-Dilate; ADR-016 step 7): empurra a acao do alvo
+// (ctx.counterpart) pro FIM da fila da rodada corrente (spec.magnitude == 0) ou N posicoes
+// fixas (spec.magnitude > 0), via InitiativeQueue::reorder_actor (mesma primitiva do
+// Gambito-Reordenar - o clamp nos limites da fila e dela, secao 4/12 combat.md). Estados
+// NORMAIS que dissipam a carta em no-op + log (NAO lancam): alvo morto ou fora da fila;
+// alvo e o current() (em acao agora, nao ha "acao futura" a empurrar); indice do alvo em
+// ctx.queue->order() < ctx.queue->cursor() (ja agiu nesta rodada - a dilatacao NAO banca
+// pra proxima rodada). Dano zero, ZERO consumo de RNG, NAO toca take_damage/round_hits/
+// last_action (sem eco em RepeatLastAction). O empurrao e uma reordenacao PERSISTENTE ate
+// a proxima recomputacao natural por SPD (InitiativeQueue::recompute_by_speed) - a mesma
+// regra do Gambito.
+void handle_delay_action(const EffectSpec& spec, const Card& card, TechMagicContext& ctx) {
+    if (ctx.caster == nullptr)
+        throw std::logic_error("techMagic::DelayAction: ctx.caster nao pode ser nulo.");
+    if (ctx.queue == nullptr)
+        throw std::logic_error(
+            "techMagic::DelayAction: ctx.queue nao pode ser nulo (OnCast sem fila injetada "
+            "no contexto - bug de call site, nao efeito vazio).");
+    if (ctx.counterpart == nullptr)
+        throw std::logic_error(
+            "techMagic::DelayAction: ctx.counterpart (alvo) nao pode ser nulo (OnCast "
+            "sempre tem alvo).");
+
+    CombatActor* target = ctx.counterpart;
+
+    // Alvo morto ou fora da fila: nada a atrasar. Estado NORMAL, nao erro.
+    if (!target->is_alive() || !ctx.queue->contains(target)) {
+        log_entry(ctx, target, 0,
+                 ctx.caster->id() + " tavus-executa " + card.id +
+                     ": alvo indisponivel, a dilatacao nao se aplica.");
+        return;
+    }
+
+    // O alvo esta EM ACAO agora (current()): nao ha turno futuro dele nesta rodada pra
+    // adiar - reordena-lo seria indefinido (ele ja esta sendo resolvido).
+    if (target == ctx.queue->current()) {
+        log_entry(ctx, target, 0,
+                 ctx.caster->id() + " tavus-executa " + card.id +
+                     ": o alvo ja esta em acao neste instante, a dilatacao nao se aplica.");
+        return;
+    }
+
+    const std::vector<CombatActor*>& order = ctx.queue->order();
+    const auto it = std::find(order.begin(), order.end(), target);
+    const int index = static_cast<int>(std::distance(order.begin(), it));
+
+    // Ja agiu nesta rodada (slot < cursor): a dilatacao se dissipa, nao banca pra proxima
+    // rodada (decisao do criador 2026-07-15, AMB registrada em _EFEITOS-ESCOLHIDOS.md).
+    if (index < ctx.queue->cursor()) {
+        log_entry(ctx, target, 0,
+                 ctx.caster->id() + " tavus-executa " + card.id +
+                     ": a dilatacao se dissipa, o inimigo ja agiu neste ciclo.");
+        return;
+    }
+
+    const int count = static_cast<int>(order.size());
+    const int delta = spec.magnitude == 0 ? (count - 1) - index : spec.magnitude;
+    ctx.queue->reorder_actor(target, delta);  // clamp nos limites da fila e dela.
+
+    log_entry(ctx, target, delta,
+             ctx.caster->id() + " tavus-executa " + card.id + ": dilata o tempo de " +
+                 target->id() + ", empurrado pro fim da fila.");
+}
+
 }  // namespace
 
 void execute(TriggerHook hook, const Card& card, TechMagicContext& ctx) {
@@ -323,12 +390,16 @@ void execute(TriggerHook hook, const Card& card, TechMagicContext& ctx) {
             case EffectKind::ChainDamage:
                 handle_chain_damage(spec, card, ctx);
                 break;
+            case EffectKind::DelayAction:
+                handle_delay_action(spec, card, ctx);
+                break;
             case EffectKind::CloneAlly:
             default:
                 throw std::logic_error(
                     "techMagic: EffectKind sem handler implementado na carta '" + card.id +
-                    "' (steps 2-3-5-6 cobrem ApplyStatus/Leech/Reflect/HypotenuseCombo/"
-                    "RepeatLastAction/ChainDamage; CloneAlly e step futuro, ADR-016).");
+                    "' (steps 2-3-5-6-7 cobrem ApplyStatus/Leech/Reflect/HypotenuseCombo/"
+                    "RepeatLastAction/ChainDamage/DelayAction; CloneAlly e step futuro, "
+                    "ADR-016).");
         }
     }
 }

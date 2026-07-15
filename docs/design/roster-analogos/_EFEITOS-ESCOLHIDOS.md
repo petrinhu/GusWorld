@@ -117,6 +117,16 @@ A redação original da linha do Mandelbrot (Lote 2) dizia "repete a última aç
 
 Implementação: `LastActionRecord` (memória de 1 slot, a ÚLTIMA ação de dano de QUALQUER aliado) é zerada em `CombatStateMachine::process_round_end_hooks`, na mesma fronteira de rodada que já zera o `round_hits_` do Hipotenuse. Ver `docs/tech/adr/ADR-016-techmagic-effect-engine-data-driven.md` (addendum MVP step 5).
 
+**AMB-02 (2026-07-15, implementação TECHMAGIC-EXECUTOR/DelayAction — Einstein/Time-Dilate): "empurra a próxima ação dele pra depois do próximo turno da party" traduzido como "fim da fila da rodada"?**
+
+A redação original da linha do Einstein (Lote 2) dizia: desacelera 1 inimigo (empurra a próxima ação dele **pra depois do próximo turno da party**). No motor de combate por-turno-de-ator (fila de iniciativa única, sem "turno da party" como bloco separado do turno de cada inimigo — ver `combat.md` §4/§4.1), essa frase é ambígua entre pelo menos duas traduções mecânicas: (a) empurrar o alvo pro **FIM da fila da rodada corrente** (ele age depois de todos os outros, inclusive os outros inimigos), ou (b) empurrar exatamente **N posições fixas** (um valor arbitrário, desacoplado do tamanho real da fila).
+
+**Decisão do criador (2026-07-15):** opção (a) — **"fim da fila da rodada"**. Motivo: (1) é a leitura mais fiel à intenção narrativa ("a party toda age antes dele" = ele é o último a agir); (2) não depende de um número mágico de posições que precisaria escalar com o tamanho da fila (3 vs 5 combatentes); (3) reusa a primitiva já existente `InitiativeQueue::reorder_actor` sem precisar de uma segunda primitiva "mover pro fim". Decisão complementar: um alvo que **JÁ AGIU nesta rodada** quando a carta é conjurada faz a carta **dissipar** (no-op, não fica "guardada" pra empurrar o alvo na rodada seguinte) — evita um efeito-fantasma que sobrevive além da janela natural da rodada (mesmo racional de "a memória não atravessa fronteira de rodada" já usado em `RepeatLastAction`/AMB-01 e no ledger do Hipotenuse).
+
+O `EffectSpec.magnitude` do motor permanece genérico (`0` = fim da fila; `>0` = N posições fixas, pra uso futuro de outra carta que precise do modo N-posições), mas a Einstein hoje usa exclusivamente `magnitude = 0`.
+
+Implementação: `handle_delay_action` (novo `EffectKind::DelayAction`, ordinal 7) via `InitiativeQueue::reorder_actor` (mesma primitiva do Gambito-Reordenar). Ver `docs/tech/adr/ADR-016-techmagic-effect-engine-data-driven.md` (addendum MVP step 7).
+
 ## Sub-brainstorms / feats que emergiram (a fazer depois)
 - **MAXWELL-AREAS-ESCURAS:** áreas escuras percorríveis só com a carta Maxwell (a "luz" dele); definir o que são, quantas, gate contornável (gdd §7.1).
 - **VOLTA-LEECH-%:** a fração de conversão do leech do Volta (calor perdido, 2ª lei) + absorve % ou absoluto, com argumentos de termodinâmica.

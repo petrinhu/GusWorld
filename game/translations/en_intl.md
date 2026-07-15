@@ -510,6 +510,9 @@ Barter
 ## CARD_EXEC_TESLA_NAME
 Tesla
 
+## CARD_EXEC_EINSTEIN_NAME
+Einstein
+
 ### Controls screen (keyboard remap, M2)
 
 ## CONTROLS_HINT

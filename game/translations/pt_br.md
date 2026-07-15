@@ -702,6 +702,9 @@ Barter
 ## CARD_EXEC_TESLA_NAME
 Tesla
 
+## CARD_EXEC_EINSTEIN_NAME
+Einstein
+
 ---
 
 ## §9. Menu de sistema (pausa + config de som, MENU-PAUSA-CONFIG-SOM)

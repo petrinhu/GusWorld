@@ -1054,6 +1054,10 @@ void CombatStateMachine::resolve_use_card(CombatActor& actor, const CombatAction
             // alvo. Nao afeta os outros handlers OnCast (ApplyStatus/Newton ignoram
             // ctx.damage/ctx.combatants).
             cast_ctx.combatants = &queue_.order();
+            // DelayAction (Einstein/OnCast, ADR-016 step 7): a fila REAL (nao so o
+            // snapshot ordenado de combatants) - handle_delay_action reordena via
+            // InitiativeQueue::reorder_actor (mesma primitiva do Gambito).
+            cast_ctx.queue = &queue_;
             int dealt = 0;
             for (const auto& [t, d] : hits)
                 if (t == target) {

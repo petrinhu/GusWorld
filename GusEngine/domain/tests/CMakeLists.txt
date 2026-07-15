@@ -105,6 +105,10 @@ add_executable(gusengine_domain_tests
     # Executor techMagic (ADR-016, MVP step 6, TECHMAGIC-EXECUTOR): EffectKind::ChainDamage
     # (Tesla) - cadeia de dano decrescente que salta pros proximos inimigos vivos.
     techmagic_chain_test.cpp
+    # Executor techMagic (ADR-016, MVP step 7, TECHMAGIC-EXECUTOR): EffectKind::DelayAction
+    # (Einstein/Time-Dilate) - empurra a acao do alvo pro fim da fila da rodada (ou N
+    # posicoes), via InitiativeQueue::reorder_actor (mesma primitiva do Gambito).
+    techmagic_delay_test.cpp
 )
 
 # Os testes do combate incluem helpers de teste headers-only (fixed_random.hpp).

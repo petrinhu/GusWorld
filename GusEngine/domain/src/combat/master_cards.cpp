@@ -1,18 +1,21 @@
 // gus/domain/src/combat/master_cards.cpp
 //
-// Implementacao do catalogo das 11 cartas ESPECIAIS suportadas pelo executor techMagic
-// (ADR-016, MVP steps 4-6). Ver header para o contrato. Mesmo padrao de
+// Implementacao do catalogo das 12 cartas ESPECIAIS suportadas pelo executor techMagic
+// (ADR-016, MVP steps 4-7). Ver header para o contrato. Mesmo padrao de
 // placeholder_cards.cpp: cartas construidas uma vez, emplace fail-fast em id duplicado.
 // POCO puro, ZERO Qt.
 //
 // Regra de familia (cartas-technomagik.md secao 2.3): dominio eletromagnetico -> Eletrico;
 // resto -> Universal. Volta/Faraday/Euler/Tesla = Eletrico; Newton/Pythagoras/Godel/Turing/
-// Menger/Mandelbrot/Ada = Universal.
+// Menger/Mandelbrot/Ada = Universal. Einstein = Cinetico (decisao do criador, brief
+// TIME-DILATE 2026-07-15 - a dilatacao temporal empurra a fila, mesma familia das cartas
+// COMUNS de reordenar/knockback).
 //
 // NUMEROS PROVISORIOS (//PLAYTEST): mana das ativas/hibridas = 6; percent do Leech (Volta)
 // = 50; percent do Reflect (Newton) = 30; percent do eco Fractal-Echo (Mandelbrot) = 50;
-// percent do eco Re-Run (Ada) = 100/magnitude(chance) = 34. Balanceamento real
-// (VOLTA-LEECH-%, statline por carta) e trabalho futuro.
+// percent do eco Re-Run (Ada) = 100/magnitude(chance) = 34; magnitude do DelayAction
+// (Einstein) = 0 (fim da fila). Balanceamento real (VOLTA-LEECH-%, statline por carta) e
+// trabalho futuro.
 //
 // base_type: as ativas/hibridas usam Glifo (carta-programa nao-elemental; //PLAYTEST, nao
 // ha convencao fechada pra especiais). As posse-only/passivas idem Glifo por coerencia (o
@@ -46,6 +49,9 @@ constexpr int kAdaEchoChance = 34;    //PLAYTEST chance% do Re-Run (Ada); easter
 // inimigos vivos.
 constexpr int kTeslaChainRetentionPercent = 62;  //PLAYTEST retencao por salto da cadeia.
 constexpr int kTeslaPower = 8;  //PLAYTEST dano-base do primario (Tesla e excecao: cadeia escala dele).
+// DelayAction (Einstein/Time-Dilate, ADR-016 step 7): empurra a acao do alvo pro fim da
+// fila da rodada (magnitude 0). //PLAYTEST reversivel se o playtest pedir N-posicoes fixas.
+constexpr int kEinsteinDelayMagnitude = 0;  // 0 = fim da fila (decisao do criador 2026-07-15).
 
 // Monta uma carta ESPECIAL base. base_type = Glifo (carta-programa nao-elemental,
 // //PLAYTEST). ap_cost default 1 (herda o mesmo default do placeholder). Sem
@@ -171,10 +177,22 @@ std::unordered_map<std::string, Card> assemble() {
                        .magnitude = 2,  //PLAYTEST 2 saltos = 3 alvos.
                        .percent = kTeslaChainRetentionPercent}},
             /*ignores_weakness_wheel=*/false, /*power=*/kTeslaPower),
+
+        // --- Einstein (Time-Dilate): Ativa, Cinetico. OnCast -> DelayAction: empurra a
+        // acao do alvo pro FIM da fila da rodada corrente (magnitude 0), via
+        // InitiativeQueue::reorder_actor (mesma primitiva do Gambito-Reordenar). Um alvo
+        // que ja agiu nesta rodada dissipa a carta (no-op + log), nao banca pra proxima
+        // rodada. Sem dano. ---
+        make_special(
+            "einstein", "CARD_EXEC_EINSTEIN_NAME", CardFamily::Cinetico, CardCategory::Ativa,
+            kActiveManaCost,
+            {EffectSpec{.trigger = TriggerHook::OnCast,
+                       .kind = EffectKind::DelayAction,
+                       .magnitude = kEinsteinDelayMagnitude}}),
     };
 
     std::unordered_map<std::string, Card> registry;
-    registry.reserve(11);
+    registry.reserve(12);
     for (const auto& card : cards) {
         // emplace (nao indexer) falha-cedo se algum id duplicar (mesmo padrao do placeholder).
         const auto [it, inserted] = registry.emplace(card.id, card);

@@ -221,6 +221,13 @@ enum class EffectKind : std::uint32_t {
     // saltos), retendo EffectSpec.percent% do dano a cada salto (decaimento multiplicativo).
     // Dano PURO (take_damage), 0 consumo de RNG. Ver techmagic.cpp::handle_chain_damage.
     ChainDamage = 6,
+    // Dilatacao temporal (Einstein/Time-Dilate): empurra a acao de 1 inimigo pro FIM da
+    // fila da rodada corrente (age por ultimo; toda a party restante age antes). Primitiva
+    // = InitiativeQueue::reorder_actor (mesma da Gambito-Reordenar). EffectSpec.magnitude
+    // == 0 = empurra pro fim da fila (Einstein); >0 = N posicoes fixas. Alvo que JA agiu
+    // nesta rodada (indice < cursor da fila) e um no-op + log de dissipacao, NAO reaplica
+    // na proxima rodada. 0 consumo de RNG. Ver techmagic.cpp::handle_delay_action.
+    DelayAction = 7,
 };
 
 }  // namespace gus::domain::combat

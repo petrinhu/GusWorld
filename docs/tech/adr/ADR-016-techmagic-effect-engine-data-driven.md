@@ -95,6 +95,44 @@ Cross-ref: `GusEngine/domain/include/gus/domain/combat/techmagic.hpp`
 `GusEngine/domain/src/combat/master_cards.cpp` (tesla); `docs/design/mecanicas/
 cartas-technomagik.md`.
 
+## Addendum (MVP step 7): DelayAction (Einstein/Time-Dilate)
+
+Oitavo `EffectKind` entregue (append-only, ordinal 7): `DelayAction`, a dilatacao temporal
+da Einstein. `OnCast`: empurra a acao do alvo (`ctx.counterpart`) pro FIM da fila da rodada
+corrente (`EffectSpec.magnitude == 0`, o caso da Einstein) ou N posicoes fixas
+(`magnitude > 0`, generico), via a MESMA primitiva do Gambito-Reordenar
+(`InitiativeQueue::reorder_actor`; o clamp nos limites da fila e dela). Sem dano - o
+handler nunca toca `take_damage`/`round_hits`/`last_action`, 0 consumo de RNG.
+
+**Regra de dissipacao (decisao do lider 2026-07-15, ver AMB-02 em
+`_EFEITOS-ESCOLHIDOS.md`):** um alvo que JA AGIU nesta rodada (indice dele em
+`queue->order()` menor que `queue->cursor()`) faz a carta DISSIPAR - no-op + log, NAO
+banca pra proxima rodada. Outros estados NORMAIS que tambem viram no-op + log (nao lancam):
+alvo morto, alvo fora da fila, ou alvo sendo o `current()` (em acao agora, sem turno futuro
+nesta rodada pra adiar).
+
+**Persistencia da reordenacao (contrato D3):** o empurrao e uma PERMUTACAO na fila, nao um
+estado separado - fica valido ate a proxima `InitiativeQueue::recompute_by_speed()` (a
+mesma primitiva que ja desfaz reordenacoes do Gambito quando um status muda SPD, ex.
+Haste/Slow expira). Isso significa que o empurrao do Einstein pode "sumir" se algo
+recomputar a fila por SPD antes do alvo chegar no fim - comportamento intencional, mesma
+regra do Gambito, nao um bug.
+
+Wiring no `OnCast` de `resolve_use_card`: `TechMagicContext` ganhou 1 campo aditivo
+(`queue`, ponteiro `InitiativeQueue*`, default `nullptr`), injetado como `&queue_` (a fila
+REAL da FSM, nao so o snapshot `combatants` de `ChainDamage`) - `handle_delay_action` lanca
+`std::logic_error` se rodar com `queue`/`counterpart`/`caster` nulos (fail-fast, bug de call
+site). Catalogo `MasterCards::build_registry()` passa de 11 para 12 cartas (a Einstein entra
+na familia Cinetico, nao Universal - decisao do criador: a dilatacao temporal e a mesma
+familia mecanica das cartas COMUNS de reordenar/knockback).
+
+Cross-ref: `GusEngine/domain/include/gus/domain/combat/techmagic.hpp`
+(TechMagicContext.queue); `GusEngine/domain/include/gus/domain/combat/initiative_queue.hpp`
+(reorder_actor/cursor/current/recompute_by_speed); `GusEngine/domain/src/combat/techmagic.cpp`
+(handle_delay_action); `GusEngine/domain/src/combat/combat_state_machine.cpp` (wiring OnCast);
+`GusEngine/domain/src/combat/master_cards.cpp` (einstein); `docs/design/mecanicas/
+cartas-technomagik.md`; `docs/design/roster-analogos/_EFEITOS-ESCOLHIDOS.md` (AMB-02).
+
 ## Consequencias
 
 - **Positivas:** custo BAIXO-MEDIO, risco BAIXO; numeros 100% tunaveis pra playtest; testavel por unit test por EffectKind; easter-egg entregue hoje; nao fecha porta pra VM. Cada carta = 5-15 linhas de dado.

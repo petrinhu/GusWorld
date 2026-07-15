@@ -53,6 +53,10 @@
 #include "gus/domain/combat/combat_records.hpp"
 #include "gus/domain/combat/random_source.hpp"
 
+namespace gus::domain::combat {
+class InitiativeQueue;
+}  // namespace gus::domain::combat
+
 namespace gus::domain::combat::techMagic {
 
 // Um hit de dano DESTA rodada (ledger cross-ator, ADR-016 secao 20 item 4). `attacker` e
@@ -129,6 +133,15 @@ struct LastActionRecord {
 // std::logic_error se rodar com combatants == nullptr (bug de call site - a FSM SEMPRE injeta
 // &queue_.order() no OnCast, mesmo padrao de round_hits/last_action acima). Ponteiro
 // NAO-DONO (mesmo padrao de CombatActor* na FSM/InitiativeQueue).
+// `queue` (step 7, DelayAction/Einstein): ponteiro pra InitiativeQueue da FSM (fila de
+// iniciativa real, nao so o snapshot de `combatants`), so consumido por
+// handle_delay_action pra reordenar o alvo via InitiativeQueue::reorder_actor (mesma
+// primitiva do Gambito-Reordenar). Campo ADITIVO (default nullptr preserva os call sites/
+// testes dos steps 1-6 intactos); handle_delay_action lanca std::logic_error se rodar com
+// queue == nullptr (bug de call site - a FSM SEMPRE injeta &queue_ no OnCast de uma carta
+// com DelayAction). Ponteiro NAO-DONO. So forward-declarado aqui (nao inclui
+// initiative_queue.hpp) pra nao empurrar essa dependencia pros consumidores do header que
+// nao precisam dela.
 struct TechMagicContext {
     CombatActor* caster = nullptr;
     CombatActor* counterpart = nullptr;
@@ -139,6 +152,7 @@ struct TechMagicContext {
     const LastActionRecord* last_action = nullptr;
     IRandomSource* rng = nullptr;
     const std::vector<CombatActor*>* combatants = nullptr;
+    InitiativeQueue* queue = nullptr;
 };
 
 // Executa, NA ORDEM declarada, os EffectSpec de `card` cujo `trigger == hook`. `ctx.caster`
