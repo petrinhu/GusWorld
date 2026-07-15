@@ -28,7 +28,10 @@ namespace {
 // explicitamente os NAO-BUFFS (debuffs + neutros + o proprio Decrypt) e tudo o que
 // sobra e tratado como buff. Assim, um buff novo cai automaticamente em is_buff sem
 // editar esta lista; so debuffs novos precisam entrar aqui.
-// Debuffs: Stun, Poison, Corrode, Disrupt, Silence, Knockback, Break, Expose, Slow.
+// Debuffs: Stun, Poison, Corrode, Disrupt, Silence, Knockback, Break, Expose, Slow,
+// SobrecargaTermica (DoT+Slow eletrico, cartas-technomagik.md secao 5.1 - achado ADR-016
+// Balde B/Faraday 2026-07-15: faltava aqui, o que classificaria SobrecargaTermica como
+// BUFF por exclusao e furaria o portao de imunidade EM-Shield/F-1, que so trava debuff).
 // Neutro/auto: Decrypt (nao dispela a si mesmo).
 [[nodiscard]] bool is_non_buff(StatusId id) {
     switch (id) {
@@ -42,6 +45,7 @@ namespace {
         case StatusId::Expose:
         case StatusId::Slow:
         case StatusId::Decrypt:
+        case StatusId::SobrecargaTermica:
             return true;
         default:
             return false;
@@ -205,7 +209,33 @@ void CombatActor::spend_mana(int cost) {
     mana_ -= cost;
 }
 
-void CombatActor::add_status(const StatusEffect& status) {
+void CombatActor::add_status(const StatusEffect& status) { try_add_status(status); }
+
+bool CombatActor::blocked_by_em_shield(const StatusEffect& status) const {
+    if (is_buff(status.id) || status.family_origin != CardFamily::Eletrico)
+        return false;  // portao so trava DEBUFF de familia Eletrico (F-1).
+    return std::any_of(status_effects_.begin(), status_effects_.end(),
+                       [](const StatusEffect& s) { return s.id == StatusId::BlindagemEM; });
+}
+
+StatusApplyResult CombatActor::try_add_status(const StatusEffect& status) {
+    // Portao de imunidade EM-Shield (Faraday, ADR-016 Balde B): bloqueia ANTES de
+    // inserir/registrar Applied - o bloqueio nao pode deixar rastro de "aplicado" no
+    // buffer de mudancas (secao 16), senao o log/UI mentiria.
+    if (blocked_by_em_shield(status))
+        return StatusApplyResult::BlockedByImmunity;
+
+    insert_or_stack_status(status);
+
+    // F-2 "previne + limpa": o proprio BlindagemEM entrando limpa os debuffs eletricos
+    // JA presentes no alvo (nao so previne os futuros).
+    if (status.id == StatusId::BlindagemEM)
+        clear_electric_debuffs();
+
+    return StatusApplyResult::Applied;
+}
+
+void CombatActor::insert_or_stack_status(const StatusEffect& status) {
     const auto it = std::find_if(status_effects_.begin(), status_effects_.end(),
                                  [&](const StatusEffect& s) { return s.id == status.id; });
     if (it == status_effects_.end()) {
@@ -238,6 +268,18 @@ void CombatActor::add_status(const StatusEffect& status) {
     // Stack/Replace/Refresh: a UI ainda quer refletir o estado resultante. Registra
     // Applied com os valores efetivos pos-stack (secao 16).
     record_applied(*it);
+}
+
+void CombatActor::clear_electric_debuffs() {
+    std::vector<StatusId> to_remove;
+    for (const StatusEffect& s : status_effects_) {
+        if (s.id != StatusId::BlindagemEM && !is_buff(s.id) && s.family_origin == CardFamily::Eletrico)
+            to_remove.push_back(s.id);
+    }
+    // Coleta os ids ANTES de remover (remove_status muta status_effects_ - iterar e mutar
+    // o mesmo vetor ao mesmo tempo invalidaria o iterador do for-range acima).
+    for (StatusId id : to_remove)
+        remove_status(id);
 }
 
 void CombatActor::record_applied(const StatusEffect& status) {

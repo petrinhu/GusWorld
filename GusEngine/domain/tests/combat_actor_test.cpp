@@ -311,6 +311,15 @@ TEST_CASE("combat_actor: is_buff classifica por exclusao dos nao-buffs",
     REQUIRE_FALSE(CombatActor::is_buff(StatusId::Stun));
     REQUIRE_FALSE(CombatActor::is_buff(StatusId::Slow));
     REQUIRE_FALSE(CombatActor::is_buff(StatusId::Decrypt));
+    // SobrecargaTermica: debuff eletrico (DoT+Slow, cartas-technomagik.md secao 5.1).
+    // Regressao (achado ADR-016 Balde B/Faraday 2026-07-15): faltava na lista de
+    // nao-buffs, o que classificava como BUFF por exclusao e furava o portao de
+    // imunidade EM-Shield/F-1 (que so trava DEBUFF de familia Eletrico).
+    REQUIRE_FALSE(CombatActor::is_buff(StatusId::SobrecargaTermica));
+    // Resfriamento e BlindagemEM SAO buffs (utilitario/imunidade, secao 5.2 + ADR-016
+    // Balde B) - continuam corretos por exclusao, sem entrar na lista de nao-buffs.
+    REQUIRE(CombatActor::is_buff(StatusId::Resfriamento));
+    REQUIRE(CombatActor::is_buff(StatusId::BlindagemEM));
 }
 
 // ---- ApplyStatDelta / RevertStatDelta (Break/Haste/Slow, secao 9) ------------------

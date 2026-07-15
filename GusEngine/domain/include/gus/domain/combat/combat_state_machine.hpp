@@ -293,6 +293,17 @@ private:
                           const CombatState& state);
     void resolve_flee(CombatActor& actor);
 
+    // Aplica um status OFENSIVO (card.status_applied OU combo->result_status) via
+    // CombatActor::try_add_status e loga o resultado REAL (ADR-016 Balde B, Faraday/
+    // EM-Shield): choke point unico dos 4 sitios de status ofensivo de resolve_use_card
+    // (curto-circuito de imunidade + resolucao normal, x status_applied + result_status) -
+    // sem isso, o portao de imunidade bloquearia so a carta especial (Faraday/handle_
+    // apply_status), mas um Stun de carta COMUM eletrica ou um combo passaria batido
+    // direto por CombatActor::add_status. NAO usado pelos sitios de BUFF/defesa (Shield do
+    // Defend etc - esses continuam com add_status legado, nunca sao bloqueados).
+    void apply_offensive_status(CombatActor& actor, CombatActor& target,
+                                const StatusEffect& status);
+
     // Aplica `damage` em `target` (take_damage) e despacha os hooks OnDamageDealt/
     // OnDamageReceived do executor techMagic (ADR-016 secao 20 item 3): fontes de
     // OnDamageDealt = `source_card` (se houver, a carta jogada por `attacker`) + as

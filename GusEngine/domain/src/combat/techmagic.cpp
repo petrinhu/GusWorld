@@ -43,6 +43,15 @@ void log_entry(TechMagicContext& ctx, CombatActor* target, int value, std::strin
 // caster - mesmo racional de card.status_applied no resolvedor base, secao 9) e aplica.
 // Destinatario depende do hook: OnCast -> ctx.counterpart (alvo da carta); Always ->
 // ctx.caster (o proprio dono, reforco no TurnStart enquanto a especial estiver equipada).
+//
+// side_filter (ADR-016 Balde B, Faraday/EM-Shield): quando o EffectSpec declara
+// EnemyOnly/AllyOnly e o `recipient` resolvido esta do lado que o filtro EXCLUI, a carta
+// DISSIPA - no-op + log, NAO lanca (estado NORMAL, mesmo racional de handle_delay_action).
+// Any (default) nunca dissipa aqui.
+//
+// Portao de imunidade (try_add_status, CombatActor): o resultado real (Applied vs
+// BlockedByImmunity) decide a MENSAGEM do log - nunca afirma "aplicado" quando o alvo
+// bloqueou via BlindagemEM.
 void handle_apply_status(const EffectSpec& spec, const Card& card, TriggerHook hook,
                          TechMagicContext& ctx) {
     if (ctx.caster == nullptr)
@@ -53,15 +62,33 @@ void handle_apply_status(const EffectSpec& spec, const Card& card, TriggerHook h
         throw std::logic_error(
             "techMagic::ApplyStatus: alvo ausente pro hook (ctx.counterpart nulo).");
 
+    if (spec.side_filter != SideFilter::Any) {
+        const bool ally = recipient->is_player_side() == ctx.caster->is_player_side();
+        const bool dissipates = (spec.side_filter == SideFilter::AllyOnly && !ally) ||
+                                (spec.side_filter == SideFilter::EnemyOnly && ally);
+        if (dissipates) {
+            log_entry(ctx, recipient, 0,
+                     ctx.caster->id() + " tavus-executa " + card.id + " em " +
+                         recipient->id() + ": nao adere a " + (ally ? "aliados" : "hostis") +
+                         ", a carta se dissipa.");
+            return;
+        }
+    }
+
     const StatusEffect status{spec.status, spec.magnitude, spec.duration, spec.stack_rule,
                               card.family};
-    recipient->add_status(status);
+    const StatusApplyResult result = recipient->try_add_status(status);
 
-    log_entry(ctx, recipient, spec.magnitude,
-             (ctx.caster != nullptr ? ctx.caster->id() : std::string{}) + " tavus-executa " +
-                 card.id + " em " + recipient->id() + ": status aplicado (mag " +
-                 std::to_string(spec.magnitude) + ", dur " + std::to_string(spec.duration) +
-                 ").");
+    if (result == StatusApplyResult::Applied) {
+        log_entry(ctx, recipient, spec.magnitude,
+                 ctx.caster->id() + " tavus-executa " + card.id + " em " + recipient->id() +
+                     ": status aplicado (mag " + std::to_string(spec.magnitude) + ", dur " +
+                     std::to_string(spec.duration) + ").");
+    } else {
+        log_entry(ctx, recipient, 0,
+                 ctx.caster->id() + " tavus-executa " + card.id + " em " + recipient->id() +
+                     ": bloqueado pela blindagem EM.");
+    }
 }
 
 // Leech (OnDamageDealt): caster recupera lround(ctx.damage * percent/100) em HP E mana

@@ -207,6 +207,19 @@ TEST_CASE("combat_enums: StatusId novos do executor techMagic (append-only 13..1
     REQUIRE(ord(StatusId::Reflect) == 15u);
 }
 
+// ADR-016 Balde B (Faraday/EM-Shield, decisao do lider 2026-07-15): BlindagemEM e
+// append-only (ordinal 16, apos Reflect). NAO reordena {0..15}.
+TEST_CASE("combat_enums: StatusId::BlindagemEM e ordinal 16 (append-only)",
+          "[domain][combat][enums][techmagic]") {
+    REQUIRE(ord(StatusId::BlindagemEM) == 16u);
+}
+
+TEST_CASE("combat_enums: SideFilter ordinais", "[domain][combat][enums][techmagic]") {
+    REQUIRE(ord(SideFilter::Any) == 0u);
+    REQUIRE(ord(SideFilter::EnemyOnly) == 1u);
+    REQUIRE(ord(SideFilter::AllyOnly) == 2u);
+}
+
 TEST_CASE("combat_enums: CardTier ordinais", "[domain][combat][enums][techmagic]") {
     REQUIRE(ord(CardTier::Comum) == 0u);
     REQUIRE(ord(CardTier::Especial) == 1u);

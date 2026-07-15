@@ -110,6 +110,9 @@ enum class StatusId : std::uint32_t {
                              // 1); Dur 3; Refresh; buff.
     Reflect = 15,            // marcador de reflexao (Newton); comportamento = executor
                              // techMagic (step 2+).
+    BlindagemEM = 16,        // EM-Shield (Faraday, ADR-016 Balde B): imunidade a debuff
+                             // eletrico (bloqueia + limpa Sobrecarga Termica/Stun/etc de
+                             // familia Eletrico no alvo). Ver CombatActor::try_add_status.
 };
 
 // Tier de fraqueza da roda deterministica. secao 6.
@@ -228,6 +231,17 @@ enum class EffectKind : std::uint32_t {
     // nesta rodada (indice < cursor da fila) e um no-op + log de dissipacao, NAO reaplica
     // na proxima rodada. 0 consumo de RNG. Ver techmagic.cpp::handle_delay_action.
     DelayAction = 7,
+};
+
+// Filtro de lado do alvo de um EffectSpec (ADR-016 Balde B, Faraday/EM-Shield). Data-driven:
+// codifica a filosofia "efeito-de-inimigo no aliado = beneficio" sem precisar de um
+// EffectKind novo por carta. Any (default) preserva o comportamento de TODAS as cartas/
+// EffectSpec ja existentes (nenhum filtro). EnemyOnly/AllyOnly dissipam (no-op + log) quando
+// o alvo resolvido esta do lado errado - ver techmagic.cpp::handle_apply_status. APPEND-ONLY.
+enum class SideFilter : std::uint32_t {
+    Any = 0,
+    EnemyOnly = 1,
+    AllyOnly = 2,
 };
 
 }  // namespace gus::domain::combat

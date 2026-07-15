@@ -44,6 +44,15 @@
 
 namespace gus::domain::combat {
 
+// Resultado de try_add_status (ADR-016 Balde B, Faraday/EM-Shield portao de imunidade).
+// BlockedByImmunity: NAO inseriu o status (o alvo tem BlindagemEM ativa e o status entrante
+// e um debuff de familia Eletrico) - o caller NUNCA deve logar "aplicado" nesse caso (ver
+// techmagic.cpp::handle_apply_status e combat_state_machine.cpp).
+enum class StatusApplyResult {
+    Applied,
+    BlockedByImmunity,
+};
+
 // Combatente (party ou inimigo). Identidade + estado mutavel de combate.
 class CombatActor {
 public:
@@ -146,8 +155,22 @@ public:
 
     // Aplica um status respeitando a StackRule contra um existente de mesmo Id
     // (Replace/Refresh/StackMagnitude/StackDuration). Sem existente, apenas adiciona.
-    // secao 9. Registra Applied (secao 16).
+    // secao 9. Registra Applied (secao 16). WRAPPER de try_add_status (abaixo) que ignora
+    // o retorno - preserva os call sites de BUFF/defesa (resolve_defend/Shield etc) que
+    // nunca precisam checar bloqueio.
     void add_status(const StatusEffect& status);
+
+    // Portao de imunidade EM-Shield (Faraday, ADR-016 Balde B): se este ator tem
+    // BlindagemEM ativa E `status` e um debuff (!is_buff) de familia Eletrico, o status NAO
+    // e inserido e o metodo retorna BlockedByImmunity (SEM registrar Applied - secao 16).
+    // Caso contrario, aplica normalmente (mesma logica de StackRule de add_status) e retorna
+    // Applied. Efeito colateral extra quando o status inserido E o proprio BlindagemEM:
+    // limpa (remove_status) todos os debuffs de familia Eletrico JA presentes no alvo -
+    // "previne + limpa" (decisao do criador, EM-Shield). Choke point unico: TODO sitio de
+    // status OFENSIVO do motor (techmagic.cpp::handle_apply_status, combat_state_machine.cpp
+    // status_applied/result_status) deve chamar ISTO, nao add_status, pra respeitar o
+    // portao (ver PR2/Newton, que reusa a mesma primitiva).
+    StatusApplyResult try_add_status(const StatusEffect& status);
 
     // Remove status por id (dispel via carta utilitaria, Null hostil ou Decrypt).
     // Reverte primeiro qualquer delta de stat aplicado. Retorna true se removeu >= 1.
@@ -188,6 +211,17 @@ private:
     // Drena o pool de Shield contra amount e devolve o dano remanescente pro HP.
     int absorb_with_shield(int amount);
     void record_applied(const StatusEffect& status);
+    // Corpo de insercao/stacking de add_status/try_add_status (StackRule contra um
+    // existente de mesmo Id). Extraido pra try_add_status poder rodar o portao de
+    // imunidade ANTES e o cleanse de BlindagemEM (F-2) DEPOIS, sem duplicar a logica de
+    // StackRule.
+    void insert_or_stack_status(const StatusEffect& status);
+    // true se este ator tem BlindagemEM ativa E `status` e um debuff de familia Eletrico
+    // (portao de imunidade EM-Shield, ADR-016 Balde B).
+    [[nodiscard]] bool blocked_by_em_shield(const StatusEffect& status) const;
+    // Remove todos os debuffs de familia Eletrico ja presentes (exceto o proprio
+    // BlindagemEM), chamado apos inserir BlindagemEM (F-2, "previne + limpa").
+    void clear_electric_debuffs();
 
     // Identidade + stats fixos.
     std::string id_;

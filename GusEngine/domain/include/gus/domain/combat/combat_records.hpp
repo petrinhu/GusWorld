@@ -54,6 +54,10 @@ struct EffectSpec {
     int duration = 0;
     StatusId status = StatusId::Stun;
     StackRule stack_rule = StackRule::Replace;
+    // Filtro de lado do alvo (ADR-016 Balde B, Faraday/EM-Shield). Campo ADITIVO ao fim do
+    // struct: default Any preserva TODAS as cartas/EffectSpec/testes existentes intactos
+    // (nenhum filtro). Ver combat_enums.hpp::SideFilter + techmagic.cpp::handle_apply_status.
+    SideFilter side_filter = SideFilter::Any;
 
     [[nodiscard]] bool operator==(const EffectSpec&) const = default;
 };

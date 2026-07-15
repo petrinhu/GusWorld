@@ -744,6 +744,23 @@ void CombatStateMachine::apply_damage_with_hooks(CombatActor& attacker, CombatAc
                                 received_ctx);
 }
 
+void CombatStateMachine::apply_offensive_status(CombatActor& actor, CombatActor& target,
+                                                 const StatusEffect& status) {
+    const StatusApplyResult result = target.try_add_status(status);
+    if (result == StatusApplyResult::Applied) {
+        log_.push_back(CombatLogEntry{
+            actor.id(), CombatActionType::UseCard, target.id(), status.magnitude,
+            actor.id() + " aplica status em " + target.id() + " (mag " +
+                std::to_string(status.magnitude) + ", dur " + std::to_string(status.duration) +
+                ")."});
+    } else {
+        log_.push_back(CombatLogEntry{
+            actor.id(), CombatActionType::UseCard, target.id(), 0,
+            actor.id() + " tenta aplicar status em " + target.id() +
+                ": bloqueado pela blindagem EM."});
+    }
+}
+
 void CombatStateMachine::resolve_defend(CombatActor& actor) {
     actor.add_status(StatusEffect{StatusId::Shield, /*magnitude=*/actor.def(),
                                   /*duration=*/1, StackRule::Replace, CardFamily::Eletrico});
@@ -968,9 +985,9 @@ void CombatStateMachine::resolve_use_card(CombatActor& actor, const CombatAction
         if (mult_fraqueza == 0.0f) {
             apply_damage_with_hooks(actor, *target, 0, &card);
             if (card.status_applied.has_value())
-                target->add_status(*card.status_applied);
+                apply_offensive_status(actor, *target, *card.status_applied);
             if (combo.has_value() && combo->result_status.has_value())
-                target->add_status(*combo->result_status);
+                apply_offensive_status(actor, *target, *combo->result_status);
             log_.push_back(CombatLogEntry{
                 actor.id(), CombatActionType::UseCard, target->id(), 0,
                 actor.id() + " compila " + card.id + " em " + target->id() + " por 0."});
@@ -1018,10 +1035,10 @@ void CombatStateMachine::resolve_use_card(CombatActor& actor, const CombatAction
         apply_damage_with_hooks(actor, *target, damage, &card);
 
         if (card.status_applied.has_value())
-            target->add_status(*card.status_applied);
+            apply_offensive_status(actor, *target, *card.status_applied);
 
         if (combo.has_value() && combo->result_status.has_value())
-            target->add_status(*combo->result_status);
+            apply_offensive_status(actor, *target, *combo->result_status);
 
         log_.push_back(CombatLogEntry{
             actor.id(), CombatActionType::UseCard, target->id(), damage,

@@ -163,6 +163,73 @@ Cross-ref: `GusEngine/domain/include/gus/domain/combat/techmagic.hpp`
 `docs/design/mecanicas/cartas-technomagik.md`;
 `docs/design/roster-analogos/_EFEITOS-ESCOLHIDOS.md` (AMB-02).
 
+## Addendum (Balde B, PR1, decisoes do lider 2026-07-15): Faraday/EM-Shield
+
+Primeiro PR do "Balde B" (efeitos de imunidade/reflexo cross-status, distinto do Balde A de
+dano/status ofensivo direto dos steps 5-7 acima). Entrega `StatusId::BlindagemEM` (ordinal
+16, append-only apos Reflect) + DUAS primitivas COMPARTILHADAS reusadas pelo PR2 (Newton):
+
+- **`SideFilter` (`combat_enums.hpp`):** `Any` / `EnemyOnly` / `AllyOnly`, campo novo
+  `EffectSpec.side_filter` (ADITIVO ao fim do struct, default `Any` preserva toda carta
+  existente). Filtro de lado DATA-DRIVEN checado em `handle_apply_status`
+  (`techmagic.cpp`): quando o `recipient` resolvido esta do lado que o filtro EXCLUI, a
+  carta DISSIPA (no-op + log, nao lanca - mesmo racional de `handle_delay_action`).
+- **`CombatActor::try_add_status` (portao de imunidade, choke point unico):** substitui
+  `add_status` como o caminho CANONICO de aplicar status OFENSIVO. Retorna
+  `StatusApplyResult{Applied, BlockedByImmunity}`. Regras (decisoes do lider, F-1..F-4):
+  - **F-1:** bloqueia SO quando o ator tem `BlindagemEM` ativa E o status entrante e um
+    **debuff** (`!CombatActor::is_buff(id)`) de `family_origin == CardFamily::Eletrico`.
+    Buffs eletricos e debuffs de outras familias passam direto - `try_add_status` cai no
+    caminho normal de `insert_or_stack_status` (mesma logica de StackRule de `add_status`).
+  - **Bloqueio nao registra `Applied`:** o guard roda ANTES de inserir/registrar no buffer
+    de mudancas de status (secao 16) - um bloqueio NUNCA aparece como "status aplicado" no
+    log/UI/replay.
+  - **F-2 "previne + limpa":** quando o status INSERIDO E o proprio `BlindagemEM`, apos
+    inserir, `try_add_status` chama `clear_electric_debuffs()` - remove (via
+    `remove_status`, que ja reverte deltas de stat) TODOS os debuffs de `family_origin ==
+    Eletrico` JA presentes no alvo (exceto a propria `BlindagemEM`). Nao so previne os
+    futuros, tambem limpa o que ja estava ativo.
+  - `add_status` (legado) vira WRAPPER de `try_add_status` que ignora o retorno -
+    preserva os call sites de BUFF/defesa (`resolve_defend`/Shield etc) sem qualquer
+    mudanca de comportamento.
+- **"O dominó":** o portao SO protege quem passa por `try_add_status`. Os OUTROS 4 sitios
+  de status OFENSIVO do motor - `handle_apply_status` (executor techMagic) + os 4 sitios
+  de `card.status_applied`/`combo->result_status` em
+  `combat_state_machine.cpp::resolve_use_card` (curto-circuito de imunidade E resolucao
+  normal, x2 campos) - precisaram trocar `add_status` -> `try_add_status` explicitamente.
+  Sem isso, o Faraday bloquearia so a carta ESPECIAL mas um Stun de carta COMUM eletrica
+  ou um combo passaria batido. Os 4 sitios de `resolve_use_card` foram unificados num
+  helper privado `CombatStateMachine::apply_offensive_status` (choke point + log honesto:
+  `Applied` -> "status aplicado"; `BlockedByImmunity` -> "bloqueado pela blindagem EM" -
+  nunca a mensagem generica de sucesso). Sitios de BUFF/defesa (Shield do Defend, Always
+  das passivas equipadas) **NAO** foram tocados - continuam com `add_status` legado.
+- **F-3, Faraday vira Hibrida:** `master_cards.cpp` - `category: ForaDeCombate ->
+  Hibrida`, `mana_cost: 0 -> kActiveManaCost`, `effects = [{OnCast, ApplyStatus,
+  duration=3, status=BlindagemEM, stack_rule=Refresh, side_filter=AllyOnly}]`. Sujeita ao
+  MESMO gate 1x/batalha das outras Ativa/Hibrida (`specials_cast_`). A face
+  fora-de-combate (anti-PEM, posse-only, `project_save_dungeon_pem_faraday`) **NAO** foi
+  tocada - continua sem programa, feat futura.
+- **F-4:** cast em alvo INIMIGO dissipa via `side_filter == AllyOnly` (o guard generico
+  acima), nunca lanca.
+- **Achado colateral (fix necessario, nao scope creep):** `StatusId::SobrecargaTermica`
+  faltava na enumeracao `is_non_buff()` (`combat_actor.cpp`) - por exclusao, isso a
+  classificava como BUFF, o que furaria F-1/F-2 (o proprio teste do lider, "Aplicar
+  BlindagemEM em alvo COM SobrecargaTermica ativa -> limpa", so passa com o fix). Corrigido
+  junto (`is_non_buff` ganhou o case `SobrecargaTermica`); `Resfriamento`/`BlindagemEM`
+  continuam corretamente classificados como buff (nao entram na lista).
+
+Cross-ref: `GusEngine/domain/include/gus/domain/combat/combat_enums.hpp` (SideFilter,
+StatusId::BlindagemEM); `GusEngine/domain/include/gus/domain/combat/combat_records.hpp`
+(EffectSpec.side_filter); `GusEngine/domain/include/gus/domain/combat/combat_actor.hpp`
+(StatusApplyResult/try_add_status); `GusEngine/domain/src/combat/combat_actor.cpp`
+(try_add_status/blocked_by_em_shield/clear_electric_debuffs/is_non_buff);
+`GusEngine/domain/src/combat/techmagic.cpp` (handle_apply_status);
+`GusEngine/domain/src/combat/combat_state_machine.cpp` (apply_offensive_status + os 4
+sitios do dominó); `GusEngine/domain/src/combat/master_cards.cpp` (faraday);
+`GusEngine/domain/tests/techmagic_faraday_test.cpp`;
+`docs/design/mecanicas/cartas-technomagik.md` secao 5;
+`docs/design/roster-analogos/_EFEITOS-ESCOLHIDOS.md` (AMB-03).
+
 ## Consequencias
 
 - **Positivas:** custo BAIXO-MEDIO, risco BAIXO; numeros 100% tunaveis pra playtest; testavel por unit test por EffectKind; easter-egg entregue hoje; nao fecha porta pra VM. Cada carta = 5-15 linhas de dado.

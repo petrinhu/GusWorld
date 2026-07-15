@@ -109,6 +109,11 @@ add_executable(gusengine_domain_tests
     # (Einstein/Time-Dilate) - empurra a acao do alvo pro fim da fila da rodada (ou N
     # posicoes), via InitiativeQueue::reorder_actor (mesma primitiva do Gambito).
     techmagic_delay_test.cpp
+    # Executor techMagic (ADR-016 Balde B, PR1, decisoes do lider 2026-07-15, F-1..F-4):
+    # Faraday/EM-Shield - StatusId::BlindagemEM, SideFilter (side_filter em EffectSpec) e o
+    # portao de imunidade CombatActor::try_add_status (choke point compartilhado com o
+    # PR2/Newton).
+    techmagic_faraday_test.cpp
 )
 
 # Os testes do combate incluem helpers de teste headers-only (fixed_random.hpp).

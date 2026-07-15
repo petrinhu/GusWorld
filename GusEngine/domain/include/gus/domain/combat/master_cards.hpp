@@ -12,10 +12,12 @@
 // EffectKind::CloneAlly (sem handler - lancaria std::logic_error): os DOIS FICAM DE FORA
 // desta leva de proposito; entram quando o executor ganhar o handler correspondente.
 //
-// Mana das ativas/hibridas (Volta, Newton, Mandelbrot) e PROVISORIA (6, marcada
-// //PLAYTEST no .cpp) - balanceamento real e trabalho futuro. As 4 fora-de-combate
-// (Faraday/Euler/Turing/Menger) e as passivas Godel/Ada tem mana 0 (nunca jogadas via
-// UseCard: possessao ou equipadas/sempre-ativas).
+// Mana das ativas/hibridas (Volta, Newton, Mandelbrot, Faraday) e PROVISORIA (6, marcada
+// //PLAYTEST no .cpp) - balanceamento real e trabalho futuro. As 3 fora-de-combate
+// (Euler/Turing/Menger) e as passivas Godel/Ada tem mana 0 (nunca jogadas via UseCard:
+// possessao ou equipadas/sempre-ativas). Faraday (ADR-016 Balde B) e Hibrida: ganhou uma
+// face de combate castavel (mana kActiveManaCost) alem da face fora-de-combate
+// (anti-PEM, posse-only, ainda feat futura).
 //
 // ZERO logica de gameplay NOVA aqui: so dados (Card + EffectSpec), mesmo padrao de
 // gus/domain/combat/placeholder_cards.hpp. NAO mexe no resolvedor (resolve_use_card),

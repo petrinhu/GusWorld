@@ -11,6 +11,12 @@
 // TIME-DILATE 2026-07-15 - a dilatacao temporal empurra a fila, mesma familia das cartas
 // COMUNS de reordenar/knockback).
 //
+// Faraday (EM-Shield, ADR-016 Balde B, decisao do lider 2026-07-15): passa de ForaDeCombate
+// (posse-only) pra Hibrida - ganha uma face de combate castavel (OnCast -> ApplyStatus
+// BlindagemEM) alem da face fora-de-combate (anti-PEM, posse-only, ainda FEAT FUTURA, sem
+// programa). Mana kActiveManaCost (nao mais 0) e sujeita ao gate 1x/batalha das
+// Ativa/Hibrida (resolve_use_card).
+//
 // NUMEROS PROVISORIOS (//PLAYTEST): mana das ativas/hibridas = 6; percent do Leech (Volta)
 // = 50; percent do Reflect (Newton) = 30; percent do eco Fractal-Echo (Mandelbrot) = 50;
 // percent do eco Re-Run (Ada) = 100/magnitude(chance) = 34; magnitude do DelayAction
@@ -52,6 +58,9 @@ constexpr int kTeslaPower = 8;  //PLAYTEST dano-base do primario (Tesla e exceca
 // DelayAction (Einstein/Time-Dilate, ADR-016 step 7): empurra a acao do alvo pro fim da
 // fila da rodada (magnitude 0). //PLAYTEST reversivel se o playtest pedir N-posicoes fixas.
 constexpr int kEinsteinDelayMagnitude = 0;  // 0 = fim da fila (decisao do criador 2026-07-15).
+// BlindagemEM (Faraday/EM-Shield, ADR-016 Balde B, decisao do lider 2026-07-15): duracao
+// da imunidade a debuff eletrico.
+constexpr int kFaradayShieldDuration = 3;  //PLAYTEST duracao da BlindagemEM (3 turnos).
 
 // Monta uma carta ESPECIAL base. base_type = Glifo (carta-programa nao-elemental,
 // //PLAYTEST). ap_cost default 1 (herda o mesmo default do placeholder). Sem
@@ -143,10 +152,21 @@ std::unordered_map<std::string, Card> assemble() {
             "godel", "CARD_EXEC_GODEL_NAME", CardFamily::Universal, CardCategory::Passiva, 0,
             /*effects=*/{}, /*ignores_weakness_wheel=*/true),
 
-        // --- Faraday (EM-Shield): ForaDeCombate, Eletrico, mana 0. Posse-only (anti-PEM
-        // + imunidade a debuff eletrico); query por id = feat futura, sem programa hoje. ---
-        make_special("faraday", "CARD_EXEC_FARADAY_NAME", CardFamily::Eletrico,
-                     CardCategory::ForaDeCombate, 0, /*effects=*/{}),
+        // --- Faraday (EM-Shield): Hibrida, Eletrico (ADR-016 Balde B, decisao do lider
+        // 2026-07-15). OnCast -> ApplyStatus BlindagemEM (dur 3, Refresh, side_filter
+        // AllyOnly incluindo self): previne + limpa debuffs eletricos no alvo (F-1/F-2,
+        // portao em CombatActor::try_add_status). Cast em INIMIGO dissipa (side_filter,
+        // F-4). A face fora-de-combate (anti-PEM, posse-only) fica FEAT FUTURA - nao
+        // implementada aqui (so a face de combate castavel). ---
+        make_special(
+            "faraday", "CARD_EXEC_FARADAY_NAME", CardFamily::Eletrico, CardCategory::Hibrida,
+            kActiveManaCost,
+            {EffectSpec{.trigger = TriggerHook::OnCast,
+                       .kind = EffectKind::ApplyStatus,
+                       .duration = kFaradayShieldDuration,
+                       .status = StatusId::BlindagemEM,
+                       .stack_rule = StackRule::Refresh,
+                       .side_filter = SideFilter::AllyOnly}}),
 
         // --- Euler (Bridge-Walk): ForaDeCombate, Eletrico, mana 0. Posse-only (atalho +
         // revelar grafo da dungeon); sem programa de combate. ---

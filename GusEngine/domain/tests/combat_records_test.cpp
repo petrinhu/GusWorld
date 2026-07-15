@@ -279,6 +279,20 @@ TEST_CASE("combat_records: EffectSpec default e OnCast/ApplyStatus com params ze
     REQUIRE(e.duration == 0);
     REQUIRE(e.status == StatusId::Stun);
     REQUIRE(e.stack_rule == StackRule::Replace);
+    // ADR-016 Balde B (Faraday/EM-Shield): campo ADITIVO ao fim do struct - default Any
+    // preserva TODAS as cartas/EffectSpec existentes (nenhum filtro de lado).
+    REQUIRE(e.side_filter == SideFilter::Any);
+}
+
+TEST_CASE("combat_records: EffectSpec.side_filter participa da igualdade por valor "
+         "(ADR-016 Balde B)",
+         "[domain][combat][records][techmagic]") {
+    EffectSpec e1{};
+    EffectSpec e2 = e1;
+    REQUIRE(e1 == e2);
+
+    e2.side_filter = SideFilter::AllyOnly;
+    REQUIRE(e1 != e2);  // 1 campo difere: side_filter agora entra no operator== default.
 }
 
 TEST_CASE("combat_records: StatusEffect aceita os 3 StatusId novos do techMagic",

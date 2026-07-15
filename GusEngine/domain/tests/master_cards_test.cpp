@@ -7,10 +7,17 @@
 //
 // Cobre: (1) as 12 cartas existem, ids unicos, nenhuma usa EffectKind::CloneAlly (guarda
 // que von Neumann/Bruno NAO entraram nesta leva); (2) campos canonicos por-carta (tier/
-// category/mana/power/ignores_weakness_wheel); (3) as 7 executaveis (volta/newton/pythagoras/
-// mandelbrot/ada/tesla/einstein) resolvem via techMagic::execute SEM logic_error num
-// contexto minimo; (4) as 4 fora-de-combate + godel tem effects vazio (exceto godel, cujo
-// trunfo e so a flag); (5) paridade i18n das 12 chaves CARD_EXEC_<FIGURA>_NAME (2 locales).
+// category/mana/power/ignores_weakness_wheel); (3) as 8 executaveis (volta/newton/pythagoras/
+// mandelbrot/ada/tesla/einstein/faraday) resolvem via techMagic::execute SEM logic_error num
+// contexto minimo; (4) as 3 fora-de-combate (euler/turing/menger) + godel tem effects vazio
+// (exceto godel, cujo trunfo e so a flag); (5) paridade i18n das 12 chaves
+// CARD_EXEC_<FIGURA>_NAME (2 locales).
+//
+// Faraday (EM-Shield, ADR-016 Balde B, decisao do lider 2026-07-15): passou de
+// ForaDeCombate (posse-only) pra Hibrida (ganhou face de combate castavel). Os testes
+// EXAUSTIVOS do portao de imunidade (BlockedByImmunity, F-1/F-2/F-4, side_filter, dominó
+// dos sitios de status ofensivo) vivem em techmagic_faraday_test.cpp - este arquivo so
+// cobre o CATALOGO (campos + smoke test de execucao), mesmo padrao das outras 11 cartas.
 //
 // Cross-ref: gus/domain/combat/master_cards.hpp; techmagic.hpp; placeholder_cards_test.cpp
 //            (mesmo padrao de spec de registry); docs/design/roster-analogos/
@@ -170,18 +177,11 @@ TEST_CASE("master_cards: godel = Passiva/Universal/mana 0/effects vazio, trunfo 
     REQUIRE(c.ignores_weakness_wheel == true);
 }
 
-TEST_CASE("master_cards: as 4 fora-de-combate (faraday/euler/turing/menger) sao "
+TEST_CASE("master_cards: as 3 fora-de-combate (euler/turing/menger) sao "
          "ForaDeCombate/mana 0/effects vazio; SOMENTE godel tem "
          "ignores_weakness_wheel=true",
          "[domain][combat][cards][techmagic][mastercards]") {
     const auto reg = MasterCards::build_registry();
-
-    const Card& faraday = reg.at("faraday");
-    REQUIRE(faraday.category == CardCategory::ForaDeCombate);
-    REQUIRE(faraday.family == CardFamily::Eletrico);
-    REQUIRE(faraday.mana_cost == 0);
-    REQUIRE(faraday.effects.empty());
-    REQUIRE(faraday.ignores_weakness_wheel == false);
 
     const Card& euler = reg.at("euler");
     REQUIRE(euler.category == CardCategory::ForaDeCombate);
@@ -433,6 +433,46 @@ TEST_CASE("master_cards: einstein (DelayAction em OnCast) executa via techMagic:
     REQUIRE_NOTHROW(techMagic::execute(TriggerHook::OnCast, c, ctx));
     REQUIRE(queue.order().back() == &target);  // fim da fila.
     REQUIRE(target.hp() == 300);               // sem dano.
+}
+
+TEST_CASE("master_cards: faraday = Hibrida/Eletrico/mana kActiveManaCost, effects [OnCast "
+         "ApplyStatus BlindagemEM duration 3 Refresh AllyOnly]",
+         "[domain][combat][cards][techmagic][mastercards]") {
+    const auto reg = MasterCards::build_registry();
+    const Card& c = reg.at("faraday");
+    REQUIRE(c.category == CardCategory::Hibrida);
+    REQUIRE(c.family == CardFamily::Eletrico);
+    REQUIRE(c.mana_cost == 6);  // kActiveManaCost, mesmo //PLAYTEST de volta/newton/mandelbrot.
+    REQUIRE(c.ignores_weakness_wheel == false);
+    REQUIRE(c.effects.size() == 1);
+
+    const auto& shield = c.effects[0];
+    REQUIRE(shield.trigger == TriggerHook::OnCast);
+    REQUIRE(shield.kind == EffectKind::ApplyStatus);
+    REQUIRE(shield.status == StatusId::BlindagemEM);
+    REQUIRE(shield.duration == 3);
+    REQUIRE(shield.stack_rule == StackRule::Refresh);
+    REQUIRE(shield.side_filter == SideFilter::AllyOnly);
+}
+
+TEST_CASE("master_cards: faraday (ApplyStatus BlindagemEM em OnCast) executa via "
+         "techMagic::execute sem lancar, alvo ALIADO recebe a blindagem",
+         "[domain][combat][cards][techmagic][mastercards]") {
+    const auto reg = MasterCards::build_registry();
+    const Card& c = reg.at("faraday");
+
+    CombatActor caster = make_actor("h", /*player_side=*/true);
+    CombatActor ally = make_actor("h2", /*player_side=*/true);
+
+    techMagic::TechMagicContext ctx;
+    ctx.caster = &caster;
+    ctx.counterpart = &ally;  // side_filter AllyOnly: alvo do mesmo lado, nao dissipa.
+
+    REQUIRE_NOTHROW(techMagic::execute(TriggerHook::OnCast, c, ctx));
+    bool shielded = false;
+    for (const auto& s : ally.status_effects())
+        if (s.id == StatusId::BlindagemEM) shielded = true;
+    REQUIRE(shielded);
 }
 
 // ===== 4. Paridade i18n das 11 chaves (2 locales) =====
