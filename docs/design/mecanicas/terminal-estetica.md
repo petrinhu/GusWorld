@@ -34,7 +34,14 @@ Criador aprovou o mock e quer **TODOS os 100 glifos no pool**: os **60 da Fase 1
 ### Fonte dos glifos (decisão do criador: Latin-1 agora + pedir os especiais ao glintfx)
 
 - **Fase 1 (agora, nosso lado, robusto):** pool só com símbolos que a `PixelOperatorMono` JÁ tem (Latin-1): `¶ § ° ± µ ¤ ¦ ¬ » ¿ × ÷ · ª º ¹ ½ ¼`. Renderizam como glifos reais esquisitos (mojibake), à prova do flip de fonte, zero dependência do glintfx.
-- **Fase 2 (enriquecer, pós-relay ao glintfx):** os glifos que o criador citou por nome e que provavelmente estão FORA da fonte: **tofu** (caixinha □ de glifo faltante), **return** (⏎ U+23CE), **control pictures** de binário (␀ ␁ ␂ U+2400+). Precisa o dev do glintfx (a) garantir que glifo-faltante = caixinha visível ESTÁVEL nos dois motores de fonte (FreeType + motor próprio v0.10.0), e/ou (b) cobrir um punhado desses glifos-glitch de propósito.
+- **Fase 2 (enriquecer):** os ~67 glifos que a fonte NÃO tem (control-pictures `␀`, box-drawing `─│┌┼`, blocos `░▒▓█`, geométricos `□■◆`, setas+return `←⏎`, replacement `�`).
+
+**RESOLUÇÃO (dev do glintfx, 2026-07-15) — NÃO é feat do glintfx, é NOSSA:**
+- **`fallback_face` é ruim pro nosso caso:** o glifo viria com o desenho de OUTRA fonte; pra box-drawing/blocos isso quebra (junções `─│┌┼` não casam com a grade pixel da PixelOperatorMono). Fallback serve pra texto linguístico (CJK/emoji), não pra arte-de-célula.
+- **CAMINHO ESCOLHIDO = estender nossa própria fonte** (item `FONT-EXTEND-GLITCH`): forkar a PixelOperatorMono (é **CC0**, manter atribuição) e desenhar os ~67 glifos na MESMA grade/em-square (1600) via FontForge/fontTools → pixel-perfeito, junções conectam, zero fallback, controle total. Trabalho one-time nosso; referência = o mock `11-terminal-glitch-glyphs.html` (os 100).
+- **Tofu de propósito = caractere REAL, não glifo-faltante:** o dev confirmou que glifo ausente hoje renderiza NADA (branco) nos dois motores (não caixinha) — a premissa antiga estava errada. Pra a caixinha-tofu, usar `□` (U+25A1) ou `█/▓` explícito e estilizar por RCSS. NÃO contar com o `.notdef`.
+- **Evitar o atalho do U+FFFD na fonte:** faria o FreeType auto-usar no faltante mas o motor próprio não → divergência entre motores. Caminho limpo e igual nos dois = caractere explícito.
+- **Sem pressa:** a Fase 1 (60 Latin-1) roda igual hoje nos dois motores; a fonte estendida é upgrade posterior (destrava a arte de célula real do dungeon-corrompido).
 
 ## 4. Hazard de dungeon: corrupção do terminal (feature nova)
 

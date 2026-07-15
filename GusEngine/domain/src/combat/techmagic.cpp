@@ -4,7 +4,9 @@
 // Leech, Reflect (step 2) + HypotenuseCombo (step 3, ledger cross-ator/OnRoundEnd) +
 // RepeatLastAction (step 5, Mandelbrot/Fractal-Echo + Ada/Re-Run, decisoes Q1-Q4 do
 // lider 2026-07-14) + ChainDamage (step 6, Tesla) + DelayAction (step 7, Einstein/
-// Time-Dilate, decisao do lider 2026-07-15). EffectKind sem handler (CloneAlly) lanca
+// Time-Dilate, decisao do lider 2026-07-15 + addendum "modo-aliado assimetrico"
+// 2026-07-15: alvo inimigo atrasa pro fim da fila, alvo aliado ADIANTA pro slot logo apos
+// o ator atual - espelho beneficio). EffectKind sem handler (CloneAlly) lanca
 // std::logic_error - fail-fast, nunca no-op silencioso (ver techmagic.hpp).
 //
 // Cross-ref: gus/domain/combat/techmagic.hpp; combat_state_machine.cpp (pontos de hook);
@@ -301,17 +303,34 @@ void handle_chain_damage(const EffectSpec& spec, const Card& card, TechMagicCont
     }
 }
 
-// DelayAction (OnCast, Einstein/Time-Dilate; ADR-016 step 7): empurra a acao do alvo
-// (ctx.counterpart) pro FIM da fila da rodada corrente (spec.magnitude == 0) ou N posicoes
-// fixas (spec.magnitude > 0), via InitiativeQueue::reorder_actor (mesma primitiva do
-// Gambito-Reordenar - o clamp nos limites da fila e dela, secao 4/12 combat.md). Estados
-// NORMAIS que dissipam a carta em no-op + log (NAO lancam): alvo morto ou fora da fila;
-// alvo e o current() (em acao agora, nao ha "acao futura" a empurrar); indice do alvo em
-// ctx.queue->order() < ctx.queue->cursor() (ja agiu nesta rodada - a dilatacao NAO banca
-// pra proxima rodada). Dano zero, ZERO consumo de RNG, NAO toca take_damage/round_hits/
-// last_action (sem eco em RepeatLastAction). O empurrao e uma reordenacao PERSISTENTE ate
-// a proxima recomputacao natural por SPD (InitiativeQueue::recompute_by_speed) - a mesma
-// regra do Gambito.
+// DelayAction (OnCast, Einstein/Time-Dilate; ADR-016 step 7 + addendum "modo-aliado
+// assimetrico", decisao do lider 2026-07-15): quando o alvo (ctx.counterpart) e do lado
+// OPOSTO ao caster (inimigo), empurra a acao dele pro FIM da fila da rodada corrente
+// (spec.magnitude == 0) ou N posicoes fixas atrasando (spec.magnitude > 0), via
+// InitiativeQueue::reorder_actor (mesma primitiva do Gambito-Reordenar - o clamp nos
+// limites da fila e dela, secao 4/12 combat.md). Quando o alvo e do MESMO lado do caster
+// (aliado), o efeito e o ESPELHO BENEFICO: o aliado avanca pra agir MAIS CEDO, indo pro
+// PRIMEIRO SLOT AINDA-NAO-AGIDO logo apos o ator atual (spec.magnitude == 0, "ao extremo")
+// ou N posicoes fixas adiantando (spec.magnitude > 0) - "dilata o tempo A FAVOR do
+// aliado". Estados NORMAIS que dissipam a carta em no-op + log (NAO lancam), IDENTICOS nos
+// dois lados: alvo morto ou fora da fila; alvo e o current() (em acao agora, nao ha "acao
+// futura" a reordenar); indice do alvo em ctx.queue->order() < ctx.queue->cursor() (ja
+// agiu nesta rodada - a dilatacao NAO banca pra proxima rodada, nem atrasando nem
+// adiantando). Dano zero, ZERO consumo de RNG, NAO toca take_damage/round_hits/
+// last_action (sem eco em RepeatLastAction). O empurrao/avanco e uma reordenacao
+// PERSISTENTE ate a proxima recomputacao natural por SPD
+// (InitiativeQueue::recompute_by_speed) - a mesma regra do Gambito.
+//
+// INVARIANTE ANTI TURNO-DUPLO no lado aliado: o alvo NUNCA pode ser reordenado pra um
+// indice <= cursor() - isso desincronizaria current() do ator cuja resolucao esta
+// realmente em andamento (mesma classe de bug do guard "alvo e o current()" acima; ver
+// techmagic_delay_test.cpp caso 11 e InitiativeQueue::bring_to_current, que resolve um
+// problema PARECIDO mas com semantica diferente - la o alvo VIRA current(), aqui o alvo so
+// pode ir pro PROXIMO slot, current() precisa continuar apontando pro caster em resolucao).
+// Como o alvo aliado ja passou pelo guard "indice < cursor" acima, ele sempre comeca em
+// indice >= cursor()+1; o clamp abaixo so impede overshoot de N-posicoes grande demais
+// (magnitude > 0) pra ALEM do primeiro slot livre (cursor()+1) - reorder_actor por si so
+// so clampa nos limites [0, count-1] da fila inteira, nao no cursor.
 void handle_delay_action(const EffectSpec& spec, const Card& card, TechMagicContext& ctx) {
     if (ctx.caster == nullptr)
         throw std::logic_error("techMagic::DelayAction: ctx.caster nao pode ser nulo.");
@@ -326,7 +345,7 @@ void handle_delay_action(const EffectSpec& spec, const Card& card, TechMagicCont
 
     CombatActor* target = ctx.counterpart;
 
-    // Alvo morto ou fora da fila: nada a atrasar. Estado NORMAL, nao erro.
+    // Alvo morto ou fora da fila: nada a reordenar. Estado NORMAL, nao erro.
     if (!target->is_alive() || !ctx.queue->contains(target)) {
         log_entry(ctx, target, 0,
                  ctx.caster->id() + " tavus-executa " + card.id +
@@ -335,7 +354,7 @@ void handle_delay_action(const EffectSpec& spec, const Card& card, TechMagicCont
     }
 
     // O alvo esta EM ACAO agora (current()): nao ha turno futuro dele nesta rodada pra
-    // adiar - reordena-lo seria indefinido (ele ja esta sendo resolvido).
+    // reordenar - reordena-lo seria indefinido (ele ja esta sendo resolvido).
     if (target == ctx.queue->current()) {
         log_entry(ctx, target, 0,
                  ctx.caster->id() + " tavus-executa " + card.id +
@@ -346,23 +365,44 @@ void handle_delay_action(const EffectSpec& spec, const Card& card, TechMagicCont
     const std::vector<CombatActor*>& order = ctx.queue->order();
     const auto it = std::find(order.begin(), order.end(), target);
     const int index = static_cast<int>(std::distance(order.begin(), it));
+    const int cursor = ctx.queue->cursor();
 
     // Ja agiu nesta rodada (slot < cursor): a dilatacao se dissipa, nao banca pra proxima
     // rodada (decisao do criador 2026-07-15, AMB registrada em _EFEITOS-ESCOLHIDOS.md).
-    if (index < ctx.queue->cursor()) {
+    // Vale nos dois sentidos - atrasar um inimigo que ja agiu ou adiantar um aliado que ja
+    // agiu sao igualmente sem efeito: nao ha "acao futura" pra reordenar.
+    if (index < cursor) {
         log_entry(ctx, target, 0,
                  ctx.caster->id() + " tavus-executa " + card.id +
-                     ": a dilatacao se dissipa, o inimigo ja agiu neste ciclo.");
+                     ": a dilatacao se dissipa, o alvo ja agiu neste ciclo.");
         return;
     }
 
     const int count = static_cast<int>(order.size());
-    const int delta = spec.magnitude == 0 ? (count - 1) - index : spec.magnitude;
+    const bool ally = target->is_player_side() == ctx.caster->is_player_side();
+
+    int delta;
+    std::string message;
+    if (ally) {
+        // Espelho beneficio (decisao do lider 2026-07-15): o aliado AVANCA. magnitude==0
+        // ("ao extremo") vai pro primeiro slot ainda-nao-agido apos o cursor (age a
+        // seguir); magnitude>0 adianta N posicoes fixas. Clamp defensivo: nunca ultrapassa
+        // pra ALEM do slot cursor()+1 (invariante anti turno-duplo, ver comentario da
+        // funcao acima).
+        const int min_index = cursor + 1;
+        const int raw_delta = spec.magnitude == 0 ? min_index - index : -spec.magnitude;
+        delta = std::max(raw_delta, min_index - index);
+        message = ctx.caster->id() + " tavus-executa " + card.id + ": dilata o tempo A "
+                 "FAVOR de " + target->id() + ", adiantado pra agir a seguir.";
+    } else {
+        delta = spec.magnitude == 0 ? (count - 1) - index : spec.magnitude;
+        message = ctx.caster->id() + " tavus-executa " + card.id + ": dilata o tempo de " +
+                 target->id() + ", empurrado pro fim da fila.";
+    }
+
     ctx.queue->reorder_actor(target, delta);  // clamp nos limites da fila e dela.
 
-    log_entry(ctx, target, delta,
-             ctx.caster->id() + " tavus-executa " + card.id + ": dilata o tempo de " +
-                 target->id() + ", empurrado pro fim da fila.");
+    log_entry(ctx, target, delta, std::move(message));
 }
 
 }  // namespace

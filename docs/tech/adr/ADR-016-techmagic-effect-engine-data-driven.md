@@ -126,12 +126,42 @@ site). Catalogo `MasterCards::build_registry()` passa de 11 para 12 cartas (a Ei
 na familia Cinetico, nao Universal - decisao do criador: a dilatacao temporal e a mesma
 familia mecanica das cartas COMUNS de reordenar/knockback).
 
+### Addendum ao addendum (modo-aliado assimetrico, decisao do lider 2026-07-15)
+
+`handle_delay_action` ramifica por LADO do alvo (`ctx.counterpart->is_player_side() ==
+ctx.caster->is_player_side()`), decisao do lider 2026-07-15: o comportamento pro alvo
+INIMIGO (empurra pro fim da fila) fica INALTERADO; alvo ALIADO ganha o espelho beneficio -
+avanca pra agir MAIS CEDO, indo pro PRIMEIRO SLOT AINDA-NAO-AGIDO logo apos o ator atual
+(`cursor()+1`), em vez do fim da fila. `EffectSpec.magnitude` mantem a mesma semantica
+generica dos dois lados (0 = "ao extremo" - fim da fila pro inimigo, `cursor()+1` pro
+aliado; >0 = N posicoes fixas, atrasando pro inimigo / adiantando pro aliado). A carta
+`einstein` (catalogo, `master_cards.cpp`) NAO muda - continua com `magnitude=0`; a
+ramificacao por lado vive so no HANDLER.
+
+**Invariante anti turno-duplo no ramo aliado:** o alvo NUNCA pode ser reordenado pra um
+indice <= `cursor()` - isso desincronizaria `current()` do ator cuja resolucao esta
+realmente em andamento (mesma classe de bug do guard preexistente "alvo e o current()").
+Como o alvo aliado so chega no ramo de reordenacao apos passar pelo guard "indice <
+cursor()" (ja agiu -> dissipa), ele sempre comeca em indice >= `cursor()+1`; o handler
+clampa qualquer overshoot de N-posicoes (magnitude > 0 grande) pra nao ultrapassar
+`cursor()+1` pra tras - `InitiativeQueue::reorder_actor` por si so so clampa nos limites
+`[0, count-1]` da fila inteira, nao no cursor, entao esse clamp adicional e necessario pro
+ramo aliado (o ramo inimigo nao precisa dele: empurrar pro fim so pode ir alem, nunca
+aquem, do cursor).
+
+Regras de dissipacao (alvo morto/fora da fila, alvo e o `current()`, alvo ja agiu nesta
+rodada) sao IDENTICAS nos dois lados - o guard compartilhado roda ANTES da ramificacao por
+lado. Sem dano, 0% de RNG nos dois ramos, `take_damage`/`round_hits`/`last_action`
+intocados.
+
 Cross-ref: `GusEngine/domain/include/gus/domain/combat/techmagic.hpp`
 (TechMagicContext.queue); `GusEngine/domain/include/gus/domain/combat/initiative_queue.hpp`
 (reorder_actor/cursor/current/recompute_by_speed); `GusEngine/domain/src/combat/techmagic.cpp`
 (handle_delay_action); `GusEngine/domain/src/combat/combat_state_machine.cpp` (wiring OnCast);
-`GusEngine/domain/src/combat/master_cards.cpp` (einstein); `docs/design/mecanicas/
-cartas-technomagik.md`; `docs/design/roster-analogos/_EFEITOS-ESCOLHIDOS.md` (AMB-02).
+`GusEngine/domain/src/combat/master_cards.cpp` (einstein);
+`GusEngine/domain/tests/techmagic_delay_test.cpp` (casos 15-22, ramo aliado);
+`docs/design/mecanicas/cartas-technomagik.md`;
+`docs/design/roster-analogos/_EFEITOS-ESCOLHIDOS.md` (AMB-02).
 
 ## Consequencias
 

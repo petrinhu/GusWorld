@@ -1,18 +1,23 @@
 // techmagic_delay_test.cpp
 //
-// Spec executavel (Catch2 v3) do executor techMagic (ADR-016, MVP step 7):
-// EffectKind::DelayAction (Einstein/Time-Dilate). Regras (decisao do lider 2026-07-15,
-// brief TIME-DILATE):
-//   - Empurra a acao do alvo pro FIM da fila da rodada corrente (spec.magnitude == 0) ou
-//     N posicoes fixas (spec.magnitude > 0), via InitiativeQueue::reorder_actor (MESMA
-//     primitiva do Gambito-Reordenar).
+// Spec executavel (Catch2 v3) do executor techMagic (ADR-016, MVP step 7 + addendum
+// "modo-aliado assimetrico"): EffectKind::DelayAction (Einstein/Time-Dilate). Regras
+// (decisao do lider 2026-07-15, brief TIME-DILATE + addendum ALIADO 2026-07-15):
+//   - Alvo INIMIGO (lado oposto ao caster): empurra a acao pro FIM da fila da rodada
+//     corrente (spec.magnitude == 0) ou N posicoes fixas atrasando (spec.magnitude > 0),
+//     via InitiativeQueue::reorder_actor (MESMA primitiva do Gambito-Reordenar).
+//   - Alvo ALIADO (mesmo lado do caster): ESPELHO BENEFICO - a acao ADIANTA pro primeiro
+//     slot ainda-nao-agido logo apos o ator atual (spec.magnitude == 0, "ao extremo") ou N
+//     posicoes fixas adiantando (spec.magnitude > 0), clampado pra nunca ultrapassar
+//     cursor()+1 (invariante anti turno-duplo: o alvo NUNCA pode ir pra indice <= cursor(),
+//     o que desincronizaria current() do ator realmente em resolucao).
 //   - Alvo que JA AGIU nesta rodada (indice em order() < cursor()) dissipa a carta: no-op
-//     + log, NAO banca pra proxima rodada.
+//     + log, NAO banca pra proxima rodada - vale nos dois lados (atrasar ou adiantar).
 //   - Alvo que E o current() (em acao agora), morto, ou fora da fila: tambem no-op + log
-//     (estados NORMAIS, nao erro).
-//   - 0 consumo de RNG (DelayAction nunca sorteia).
+//     (estados NORMAIS, nao erro) - guard compartilhado, independente de lado.
+//   - 0 consumo de RNG (DelayAction nunca sorteia), nos dois lados.
 //   - Sem dano: NAO toca take_damage/round_hits/last_action.
-//   - O empurrao e uma reordenacao PERSISTENTE ate a proxima recomputacao natural por SPD
+//   - A reordenacao e PERSISTENTE ate a proxima recomputacao natural por SPD
 //     (InitiativeQueue::recompute_by_speed desfaz, mesma regra do Gambito - contrato D3).
 //
 // Cartas de teste montadas localmente (id "techmagic.delay.*"), NUNCA do registry de
@@ -529,26 +534,221 @@ TEST_CASE("techmagic delay: fim da fila (magnitude 0) - o delta logado e exatame
     REQUIRE(log.back().value == 2);
 }
 
-// ===== 15. Alvo do MESMO lado do caster (aliado): o handler NAO filtra por lado - reordena =
-// =====     igual, sem efeito colateral estranho. PIN de comportamento ATUAL, NAO endosso ===
-// =====     de design: a flavor-text canonica ("desacelera 1 INIMIGO", AMB-02) sugere alvo ==
-// =====     inimigo-only, mas nem o handler nem resolve_targets(Single) da FSM restringem ===
-// =====     lado pra cartas single-target - decisao de design pendente do lider (reportado) =
+// ===== 15. Alvo do MESMO lado do caster (aliado, magnitude 0): ESPELHO BENEFICO - avanca ===
+// =====     pro primeiro slot ainda-nao-agido logo apos o ator atual (decisao do lider ======
+// =====     2026-07-15, addendum modo-aliado assimetrico). Ninguem que ja agiu se mexe e ====
+// =====     current()/cursor ficam inalterados (o caster continua "em resolucao"). ==========
 
-TEST_CASE("techmagic delay: alvo do MESMO lado do caster (aliado) - reordena igual, sem "
-         "filtro de lado no handler (pin de comportamento, decisao de design pendente)",
+TEST_CASE("techmagic delay: alvo ALIADO (magnitude 0) avanca pro primeiro slot "
+         "ainda-nao-agido apos o ator atual - current()/cursor inalterados",
          "[domain][combat][techmagic][delay]") {
-    CombatActor caster = make_actor("h", true, 100, /*atk=*/0, /*def=*/0, /*spd=*/50);
-    CombatActor ally = make_actor("h2", true, 100, /*atk=*/0, /*def=*/0, /*spd=*/40);
-    CombatActor e0 = make_actor("e0", false, 300, /*atk=*/0, /*def=*/0, /*spd=*/30);
-    InitiativeQueue queue({&caster, &ally, &e0});
+    CombatActor caster = make_actor("p1", true, 100, /*atk=*/0, /*def=*/0, /*spd=*/50);
+    CombatActor p2 = make_actor("p2", true, 100, /*atk=*/0, /*def=*/0, /*spd=*/40);
+    CombatActor p3 = make_actor("p3", true, 100, /*atk=*/0, /*def=*/0, /*spd=*/30);
+    CombatActor e1 = make_actor("e1", false, 300, /*atk=*/0, /*def=*/0, /*spd=*/20);
+    InitiativeQueue queue({&caster, &p2, &p3, &e1});  // ordem por SPD: p1, p2, p3, e1.
 
-    Card einstein = delay_card("techmagic.delay.ally_target", /*magnitude=*/0);
+    Card einstein = delay_card("techmagic.delay.ally_advance", /*magnitude=*/0);
     techMagic::TechMagicContext ctx;
     ctx.caster = &caster;
-    ctx.counterpart = &ally;  // aliado do MESMO lado do caster.
+    ctx.counterpart = &p3;  // aliado mais atras na fila.
+    ctx.queue = &queue;
+
+    techMagic::execute(TriggerHook::OnCast, einstein, ctx);
+
+    // p3 sai do indice 2 e vai pro indice 1 (cursor()+1 = 0+1): [p1, p3, p2, e1]. p2 (que
+    // nao se mexeu de proposito) desliza uma casa, mas ninguem "ja agiu" foi tocado.
+    REQUIRE(queue.order() == std::vector<CombatActor*>{&caster, &p3, &p2, &e1});
+    REQUIRE(queue.current() == &caster);  // cursor nao mexeu.
+    REQUIRE(queue.cursor() == 0);
+}
+
+// ===== 16. Aliado JA E o proximo (indice == cursor()+1): no-op, delta 0, sem crash =====
+
+TEST_CASE("techmagic delay: alvo ALIADO ja e o primeiro slot ainda-nao-agido - no-op, "
+         "ordem inalterada",
+         "[domain][combat][techmagic][delay]") {
+    CombatActor caster = make_actor("p1", true, 100, /*atk=*/0, /*def=*/0, /*spd=*/50);
+    CombatActor p2 = make_actor("p2", true, 100, /*atk=*/0, /*def=*/0, /*spd=*/40);
+    CombatActor p3 = make_actor("p3", true, 100, /*atk=*/0, /*def=*/0, /*spd=*/30);
+    InitiativeQueue queue({&caster, &p2, &p3});
+    const std::vector<CombatActor*> before = queue.order();
+
+    Card einstein = delay_card("techmagic.delay.ally_already_next", /*magnitude=*/0);
+    techMagic::TechMagicContext ctx;
+    ctx.caster = &caster;
+    ctx.counterpart = &p2;  // ja no indice cursor()+1 = 1.
     ctx.queue = &queue;
 
     REQUIRE_NOTHROW(techMagic::execute(TriggerHook::OnCast, einstein, ctx));
-    REQUIRE(queue.order() == std::vector<CombatActor*>{&caster, &e0, &ally});
+    REQUIRE(queue.order() == before);
+}
+
+// ===== 17. Aliado que JA AGIU nesta rodada (indice < cursor): dissipa igual ao lado ========
+// =====     inimigo - ordem byte-identica + log de dissipacao ================================
+
+TEST_CASE("techmagic delay: alvo ALIADO que ja agiu nesta rodada dissipa a carta (ordem "
+         "byte-identica + log de dissipacao)",
+         "[domain][combat][techmagic][delay]") {
+    CombatActor p2 = make_actor("p2", true, 100, /*atk=*/0, /*def=*/0, /*spd=*/50);
+    CombatActor caster = make_actor("p1", true, 100, /*atk=*/0, /*def=*/0, /*spd=*/40);
+    CombatActor e1 = make_actor("e1", false, 300, /*atk=*/0, /*def=*/0, /*spd=*/30);
+    InitiativeQueue queue({&p2, &caster, &e1});  // ordem: p2, p1(caster), e1.
+    queue.advance();                             // cursor 0 -> 1 (p2 "ja agiu").
+    REQUIRE(queue.current() == &caster);
+    const std::vector<CombatActor*> before = queue.order();
+
+    Card einstein = delay_card("techmagic.delay.ally_already_acted", /*magnitude=*/0);
+    std::vector<CombatLogEntry> log;
+    techMagic::TechMagicContext ctx;
+    ctx.caster = &caster;
+    ctx.counterpart = &p2;  // p2 esta no indice 0, cursor e 1 -> ja agiu.
+    ctx.queue = &queue;
+    ctx.log = &log;
+
+    techMagic::execute(TriggerHook::OnCast, einstein, ctx);
+
+    REQUIRE(queue.order() == before);
+    REQUIRE(log.size() == 1);
+    REQUIRE(log.back().message.find("dissipa") != std::string::npos);
+}
+
+// ===== 18. Aliado que E o current() dissipa - guard compartilhado com o lado inimigo, =====
+// =====     independente de lado (o alvo esta em resolucao agora, nao ha "acao futura") =====
+
+TEST_CASE("techmagic delay: alvo ALIADO que e o current() dissipa a carta (guard "
+         "compartilhado, nao especifico de lado)",
+         "[domain][combat][techmagic][delay]") {
+    CombatActor caster = make_actor("p1", true, 100, /*atk=*/0, /*def=*/0, /*spd=*/30);
+    CombatActor p2 = make_actor("p2", true, 100, /*atk=*/0, /*def=*/0, /*spd=*/50);  // current().
+    CombatActor e1 = make_actor("e1", false, 300, /*atk=*/0, /*def=*/0, /*spd=*/40);
+    InitiativeQueue queue({&p2, &caster, &e1});  // ordem por SPD desc: p2, e1, p1(caster).
+    REQUIRE(queue.current() == &p2);
+    const std::vector<CombatActor*> before = queue.order();
+
+    Card einstein = delay_card("techmagic.delay.ally_current", /*magnitude=*/0);
+    std::vector<CombatLogEntry> log;
+    techMagic::TechMagicContext ctx;
+    ctx.caster = &caster;  // caster nao e quem esta em resolucao neste ctx sintetico.
+    ctx.counterpart = &p2;  // aliado (mesmo lado) E o current().
+    ctx.queue = &queue;
+    ctx.log = &log;
+
+    techMagic::execute(TriggerHook::OnCast, einstein, ctx);
+
+    REQUIRE(queue.order() == before);
+    REQUIRE(queue.current() == &p2);
+    REQUIRE(log.size() == 1);
+    REQUIRE(log.back().message.find("dilatacao nao se aplica") != std::string::npos);
+}
+
+// ===== 19. Aliado com magnitude > 0: adianta exatamente N posicoes fixas =====
+
+TEST_CASE("techmagic delay: alvo ALIADO com magnitude > 0 adianta exatamente N posicoes",
+         "[domain][combat][techmagic][delay]") {
+    CombatActor caster = make_actor("p1", true, 100, /*atk=*/0, /*def=*/0, /*spd=*/50);
+    CombatActor p2 = make_actor("p2", true, 100, /*atk=*/0, /*def=*/0, /*spd=*/45);
+    CombatActor p3 = make_actor("p3", true, 100, /*atk=*/0, /*def=*/0, /*spd=*/40);
+    CombatActor p4 = make_actor("p4", true, 100, /*atk=*/0, /*def=*/0, /*spd=*/35);
+    CombatActor e1 = make_actor("e1", false, 300, /*atk=*/0, /*def=*/0, /*spd=*/30);
+    InitiativeQueue queue({&caster, &p2, &p3, &p4, &e1});  // p4 no indice 3.
+
+    Card einstein = delay_card("techmagic.delay.ally_fixed", /*magnitude=*/1);
+    techMagic::TechMagicContext ctx;
+    ctx.caster = &caster;
+    ctx.counterpart = &p4;
+    ctx.queue = &queue;
+
+    techMagic::execute(TriggerHook::OnCast, einstein, ctx);
+
+    // p4 sai do indice 3 e vai pro indice 2 (3-1): [p1, p2, p4, p3, e1].
+    REQUIRE(queue.order() == std::vector<CombatActor*>{&caster, &p2, &p4, &p3, &e1});
+}
+
+// ===== 20. Aliado com magnitude > 0 muito maior que a fila: clampa em cursor()+1, sem =====
+// =====     ultrapassar pro slot do ator em resolucao (invariante anti turno-duplo) =========
+
+TEST_CASE("techmagic delay: alvo ALIADO com magnitude > 0 muito maior que a fila clampa "
+         "em cursor()+1, sem ultrapassar o ator em resolucao",
+         "[domain][combat][techmagic][delay]") {
+    CombatActor caster = make_actor("p1", true, 100, /*atk=*/0, /*def=*/0, /*spd=*/50);
+    CombatActor p2 = make_actor("p2", true, 100, /*atk=*/0, /*def=*/0, /*spd=*/45);
+    CombatActor p3 = make_actor("p3", true, 100, /*atk=*/0, /*def=*/0, /*spd=*/40);
+    CombatActor p4 = make_actor("p4", true, 100, /*atk=*/0, /*def=*/0, /*spd=*/35);
+    InitiativeQueue queue({&caster, &p2, &p3, &p4});  // p4 no indice 3.
+
+    Card einstein = delay_card("techmagic.delay.ally_overflow", /*magnitude=*/99);
+    techMagic::TechMagicContext ctx;
+    ctx.caster = &caster;
+    ctx.counterpart = &p4;
+    ctx.queue = &queue;
+
+    REQUIRE_NOTHROW(techMagic::execute(TriggerHook::OnCast, einstein, ctx));
+
+    // magnitude=99 pediria indice 3-99 (negativo); clampado em cursor()+1 = 1, NUNCA em 0
+    // (indice 0 e o caster em resolucao - ultrapassar corromperia current()).
+    REQUIRE(queue.order() == std::vector<CombatActor*>{&caster, &p4, &p2, &p3});
+    REQUIRE(queue.current() == &caster);
+    REQUIRE(queue.cursor() == 0);
+}
+
+// ===== 21. ZERO consumo de RNG no ramo ALIADO (mesma garantia do ramo inimigo, mas o =====
+// =====     ramo aliado e codigo NOVO - cobre mutante que injeta sorteio acidental) =========
+
+TEST_CASE("techmagic delay: ZERO consumo de RNG no ramo ALIADO (codigo novo do "
+         "modo-aliado assimetrico)",
+         "[domain][combat][techmagic][delay]") {
+    CombatActor caster = make_actor("p1", true, 100, /*atk=*/0, /*def=*/0, /*spd=*/50);
+    CombatActor p2 = make_actor("p2", true, 100, /*atk=*/0, /*def=*/0, /*spd=*/40);
+    CombatActor p3 = make_actor("p3", true, 100, /*atk=*/0, /*def=*/0, /*spd=*/30);
+    InitiativeQueue queue({&caster, &p2, &p3});
+
+    Card einstein = delay_card("techmagic.delay.ally_rng", /*magnitude=*/0);
+    CountingRandom counting;
+    techMagic::TechMagicContext ctx;
+    ctx.caster = &caster;
+    ctx.counterpart = &p3;
+    ctx.queue = &queue;
+    ctx.rng = &counting;  // presente, mas DelayAction nunca deve toca-lo.
+
+    techMagic::execute(TriggerHook::OnCast, einstein, ctx);
+
+    // A dilatacao rodou de fato (prova que 0-consumo nao e no-op mascarado)...
+    REQUIRE(queue.order()[1] == &p3);
+    // ...e mesmo assim nao houve sorteio.
+    REQUIRE(counting.next_calls == 0);
+    REQUIRE(counting.next_double_calls == 0);
+}
+
+// ===== 22. E2E FSM (anti turno-duplo, ramo ALIADO): castear Einstein num aliado atras na =====
+// =====     fila - cada ator age EXATAMENTE 1x na rodada, e o aliado avancado age MAIS =======
+// =====     CEDO do que agiria sem o Einstein (nunca 2x, nunca pulado) =======================
+
+TEST_CASE("techmagic delay (via FSM): rodada completa com Einstein em ALIADO - cada ator "
+         "age exatamente uma vez e o aliado avancado age mais cedo",
+         "[domain][combat][techmagic][delay]") {
+    // Ordem natural por SPD (sem Einstein): h(50), e0(40), p2(30) - h primeiro, e0 segundo,
+    // p2 terceiro. h conjura Einstein em p2 (aliado) no seu proprio turno: p2 deve pular
+    // pra agir logo em seguida (2o), empurrando e0 pro 3o.
+    CombatActor caster = make_actor("h", true, 100, /*atk=*/0, /*def=*/0, /*spd=*/50);
+    CombatActor e0 = make_actor("e0", false, 300, /*atk=*/0, /*def=*/0, /*spd=*/40);
+    CombatActor p2 = make_actor("p2", true, 100, /*atk=*/0, /*def=*/0, /*spd=*/30);
+
+    auto reg = registry({delay_card("einstein_test", /*magnitude=*/0)});
+    auto provider = provider_for(
+        {{"h", {{0, {CombatAction::use_card("einstein_test", p2.id())}}}}});
+    FixedRandom rng(/*next_double=*/0.5, /*next_int=*/99);
+    CombatStateMachine sm({&caster, &e0, &p2}, provider, &reg, nullptr, &rng);
+
+    std::vector<std::string> act_order;
+    for (int i = 0; i < 3; ++i) {
+        act_order.push_back(sm.queue().current()->id());
+        sm.begin_turn();
+        sm.run_active_turn_to_end();
+        sm.advance_to_next_actor();
+    }
+
+    // h age primeiro (adianta p2); p2 (aliado avancado) age em 2o - mais cedo do que o 3o
+    // lugar que teria por SPD natural; e0 fecha a rodada. Cada id aparece exatamente 1x.
+    REQUIRE(act_order == std::vector<std::string>{"h", "p2", "e0"});
 }

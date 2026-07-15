@@ -127,6 +127,8 @@ O `EffectSpec.magnitude` do motor permanece genérico (`0` = fim da fila; `>0` =
 
 Implementação: `handle_delay_action` (novo `EffectKind::DelayAction`, ordinal 7) via `InitiativeQueue::reorder_actor` (mesma primitiva do Gambito-Reordenar). Ver `docs/tech/adr/ADR-016-techmagic-effect-engine-data-driven.md` (addendum MVP step 7).
 
+**Addendum AMB-02 (2026-07-15, modo-aliado assimétrico):** decisão complementar do criador — a redação canônica ("desacelera 1 inimigo") descreve o alvo INIMIGO, mas o motor não impedia mirar um aliado (ver PIN de comportamento que existia em `techmagic_delay_test.cpp`, caso 15, antes desta decisão). O criador decidiu que mirar um ALIADO vira o **espelho benéfico**: em vez de atrasar, o aliado **avança** — age no primeiro slot ainda-não-agido logo após o ator atual ("dilata o tempo A FAVOR dele"). Mesmos guards de dissipação dos dois lados (já agiu / é o `current()` / morto / fora da fila). Implementação: `handle_delay_action` ramifica por `is_player_side()` (ver ADR-016, "Addendum ao addendum"). **Pendente (conteúdo, não código):** a frase pedagógica canônica do Time-Dilate ("Einstein descobriu que o tempo é relativo...") narra o caso INIMIGO; falta uma variante pedagógica pro caso ALIADO — handoff futuro pro `narrative-writer` (mesmo racional de CARTAS-FRASES-PEDAGOGICAS abaixo), não escrita aqui.
+
 ## Sub-brainstorms / feats que emergiram (a fazer depois)
 - **MAXWELL-AREAS-ESCURAS:** áreas escuras percorríveis só com a carta Maxwell (a "luz" dele); definir o que são, quantas, gate contornável (gdd §7.1).
 - **VOLTA-LEECH-%:** a fração de conversão do leech do Volta (calor perdido, 2ª lei) + absorve % ou absoluto, com argumentos de termodinâmica.
