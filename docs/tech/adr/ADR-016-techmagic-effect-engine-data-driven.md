@@ -288,6 +288,64 @@ loop de `resolve_use_card`; `resolve_targets` Grupo; Reflect-por-status em
 tag `[friendlyfire]`); `docs/design/mecanicas/cartas-technomagik.md` secao 9;
 `docs/design/roster-analogos/_EFEITOS-ESCOLHIDOS.md` (AMB-04).
 
+## Addendum (Balde B, PR3, decisoes do lider 2026-07-15): Godel/Null-Proof
+
+Terceiro e ULTIMO PR do "Balde B". Diferente de PR1/PR2 (que so ADICIONAM primitivas
+compartilhadas), este PR3 muta o coracao do resolvedor de dano (`resolve_use_card`) - PR
+separado por decisao do criador, capricho de paridade com o preview.
+
+- **G-1, Godel vira castavel mana-0:** `master_cards.cpp::godel` passa de `Passiva`/
+  `effects` vazio (so o trunfo `ignores_weakness_wheel=true`) pra `Ativa`, mana 0, com
+  `effects = [OnCast -> ApplyStatus NullProof, side_filter AllyOnly]` - concede o status ao
+  PORTADOR (proprio Godel ou um aliado, `AllyOnly` inclui self). 1x/batalha via
+  `specials_cast_` (mesmo gate de Volta/Newton/Faraday, secao 2.1). `StatusId::NullProof`
+  (ordinal 17, append-only apos `BlindagemEM`).
+- **`StatusId::NullProof` = buff-trunfo GUARDADO**, nao um debuff-timer: duracao-sentinela
+  ALTA (`dur=99`, `//PLAYTEST` - nao expira por turno na pratica do slice). A saida real e
+  por CONSUMO (`remove_status` no hit que fura), nao por tick de duracao - sem isso o
+  "guardado ate o proximo hit relevante" ficaria refem do relogio de turnos.
+- **G-2/G-3, wiring do pierce em `resolve_use_card`:** no loop `for (CombatActor* target :
+  targets)`, LOGO APOS calcular `mult_fraqueza` (defesa neutra do compilador universal) e
+  ANTES do curto-circuito de imunidade (`if (mult_fraqueza == 0.0f) continue`), DUAS vias
+  INDEPENDENTES furam a roda:
+  1. **item 11 GENERICO** (o trunfo ORIGINAL de Godel, agora com wiring real): `if
+     (card.ignores_weakness_wheel) mult_fraqueza = 1.0f;` - qualquer carta com a flag
+     SEMPRE resolve mult 1.0, independente de NullProof de quem quer que seja.
+  2. **G-2/G-3** (o trunfo NOVO): senao, `if (mult_fraqueza < 1.0f && actor tem
+     StatusId::NullProof) { mult_fraqueza = 1.0f; actor.remove_status(NullProof); }` - o
+     ATACANTE porta o status; furou (Resistente 0.66 OU Imune 0.0 - `< 1.0f` NAO distingue o
+     tier, cobre os DOIS por construcao, G-3) e o status e CONSUMIDO. Contra Neutro/Fraco
+     (`mult_fraqueza >= 1.0f`) o status fica INTACTO - so consome quando ha algo a furar
+     (G-2), nao e um consume-sempre.
+  ORDEM CRITICA: o pierce roda ANTES do `continue` do imune (senao o `continue` agiria antes
+  dele) e ANTES do sorteio de canal - ele proprio NAO toca `rng_`, entao NAO muda a ordem de
+  consumo de RNG dos casos SEM pierce (secao 11, a ordem e SAGRADA). O guard de fogo amigo
+  (PR2) roda ANTES deste bloco inteiro (`continue` no INICIO do loop pra alvo aliado) - o
+  pierce so se aplica a alvo INIMIGO, correto por construcao.
+- **`estimate_card_damage` (preview PURO), o GEMEO obrigatorio:** MESMA logica, MESMA ordem,
+  colada ANTES do curto-circuito de imunidade do preview. Diferenca deliberada: o preview
+  NUNCA chama `remove_status` (contrato PURO do metodo) - sem isso a UI mostraria "IMUNE"
+  enquanto o hit real fura, dessincronizando preview vs resultado (a classe de bug que a
+  auditoria-dominó caca).
+- **LIMITE DE COBERTURA HONESTO (achado durante o TDD, nao uma regressao):** o tier
+  `WeaknessTier::Imune` (mult 0.0) NAO E ALCANCAVEL hoje via nenhuma combinacao real de
+  `CardFamily` - `WeaknessWheel::tier_for` so devolve Fraco/Resistente/Neutro pros 5 pares
+  nao-Universal (confirmado por inspecao de `weakness_wheel.hpp` e pela nota ja existente em
+  `combat_formula_test.cpp`: "o tier Imune NAO e exposto pela API publica hoje... e flag de
+  inimigo/lore, incremento futuro"). Os testes de `techmagic_godel_test.cpp` cobrem "vs
+  RESISTENTE" (a UNICA combinacao real com `mult < 1.0` hoje) - o codigo do pierce
+  (`mult_fraqueza < 1.0f`, sem distinguir o tier) trata os dois IDENTICAMENTE, entao a
+  cobertura via Resistente exercita a MESMA branch que cobriria Imune no dia em que a flag
+  de imunidade for plugada. Nao ha logica dedicada a 0.0 que fique sem teste.
+
+Cross-ref: `GusEngine/domain/include/gus/domain/combat/combat_enums.hpp`
+(`StatusId::NullProof`); `GusEngine/domain/src/combat/combat_state_machine.cpp`
+(`resolve_use_card` - wiring do pierce; `estimate_card_damage` - gemeo PURO);
+`GusEngine/domain/src/combat/master_cards.cpp` (godel); `GusEngine/domain/tests/
+techmagic_godel_test.cpp`; `GusEngine/domain/tests/master_cards_test.cpp`;
+`docs/design/mecanicas/cartas-technomagik.md` secao 6/9; `docs/design/roster-analogos/
+_EFEITOS-ESCOLHIDOS.md` (AMB-05).
+
 ## Consequencias
 
 - **Positivas:** custo BAIXO-MEDIO, risco BAIXO; numeros 100% tunaveis pra playtest; testavel por unit test por EffectKind; easter-egg entregue hoje; nao fecha porta pra VM. Cada carta = 5-15 linhas de dado.

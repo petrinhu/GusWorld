@@ -65,6 +65,10 @@ constexpr int kEinsteinDelayMagnitude = 0;  // 0 = fim da fila (decisao do criad
 // BlindagemEM (Faraday/EM-Shield, ADR-016 Balde B, decisao do lider 2026-07-15): duracao
 // da imunidade a debuff eletrico.
 constexpr int kFaradayShieldDuration = 3;  //PLAYTEST duracao da BlindagemEM (3 turnos).
+// NullProof (Godel/Null-Proof, ADR-016 Balde B PR3, decisao do lider 2026-07-15): duracao-
+// sentinela ALTA (nao expira por turno na pratica do slice) - o status e removido por
+// CONSUMO (resolve_use_card, no hit que fura), nao por tick de duracao. //PLAYTEST.
+constexpr int kNullProofDuration = 99;  //PLAYTEST sentinela (consumido, nao tickado).
 
 // Monta uma carta ESPECIAL base. base_type = Glifo (carta-programa nao-elemental,
 // //PLAYTEST). ap_cost default 1 (herda o mesmo default do placeholder). Sem
@@ -175,11 +179,29 @@ std::unordered_map<std::string, Card> assemble() {
                        .magnitude = kAdaEchoChance,  // chance% (0..99 roll < magnitude).
                        .percent = kAdaEchoPercent}}),
 
-        // --- Godel (Null-Proof): Passiva, Universal, mana 0. Sem programa: o trunfo E a
-        // flag ignores_weakness_wheel; wiring no resolvedor e step futuro. ---
+        // --- Godel (Null-Proof): Ativa, Universal, mana 0 (ADR-016 Balde B PR3, decisao do
+        // lider 2026-07-15, G-1). Duas vias fura-defesa INDEPENDENTES, wired no resolvedor
+        // (item 11 GENERICO + G-2/G-3, ver combat_state_machine.cpp::resolve_use_card):
+        //   (a) ignores_weakness_wheel=true: o TRUNFO original de Godel - qualquer carta com
+        //       esta flag SEMPRE resolve mult 1.0 contra a roda de fraqueza, sem tocar em
+        //       status de ninguem (generico, vale pra qualquer carta futura que a declare).
+        //   (b) OnCast -> ApplyStatus NullProof, side_filter AllyOnly (inclui self): concede
+        //       o status ao PORTADOR (proprio Godel ou um aliado). No proximo ataque do
+        //       portador contra alvo Resistente/Imune (mult < 1.0), o resolvedor forca mult
+        //       1.0 e CONSOME o status (G-2); contra Neutro/Fraco fica intacto (G-3: fura os
+        //       DOIS tiers, Imune 0.0 e Resistente 0.66). Duracao-sentinela alta (99,
+        //       kNullProofDuration) porque a saida real e por consumo, nao por tick.
+        // 1x/batalha via specials_cast_ (Ativa/Hibrida, secao 2.1) - mesmo gate de Volta/
+        // Newton/Faraday. ---
         make_special(
-            "godel", "CARD_EXEC_GODEL_NAME", CardFamily::Universal, CardCategory::Passiva, 0,
-            /*effects=*/{}, /*ignores_weakness_wheel=*/true),
+            "godel", "CARD_EXEC_GODEL_NAME", CardFamily::Universal, CardCategory::Ativa, 0,
+            {EffectSpec{.trigger = TriggerHook::OnCast,
+                       .kind = EffectKind::ApplyStatus,
+                       .duration = kNullProofDuration,
+                       .status = StatusId::NullProof,
+                       .stack_rule = StackRule::Refresh,
+                       .side_filter = SideFilter::AllyOnly}},
+            /*ignores_weakness_wheel=*/true),
 
         // --- Faraday (EM-Shield): Hibrida, Eletrico (ADR-016 Balde B, decisao do lider
         // 2026-07-15). OnCast -> ApplyStatus BlindagemEM (dur 3, Refresh, side_filter

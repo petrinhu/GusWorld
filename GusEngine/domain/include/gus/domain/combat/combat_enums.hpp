@@ -113,6 +113,13 @@ enum class StatusId : std::uint32_t {
     BlindagemEM = 16,        // EM-Shield (Faraday, ADR-016 Balde B): imunidade a debuff
                              // eletrico (bloqueia + limpa Sobrecarga Termica/Stun/etc de
                              // familia Eletrico no alvo). Ver CombatActor::try_add_status.
+    NullProof = 17,          // Null-Proof (Godel, ADR-016 Balde B PR3): trunfo fura-imunidade
+                             // guardado no PORTADOR (buff, self ou aliado via side_filter
+                             // AllyOnly). No proximo hit do portador contra um alvo Resistente
+                             // OU Imune (mult_fraqueza < 1.0), o resolvedor forca mult 1.0 e
+                             // CONSOME (remove) o status; contra Neutro/Fraco fica intacto,
+                             // guardado. Ver combat_state_machine.cpp::resolve_use_card/
+                             // estimate_card_damage.
 };
 
 // Tier de fraqueza da roda deterministica. secao 6.

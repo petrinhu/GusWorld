@@ -120,6 +120,12 @@ add_executable(gusengine_domain_tests
     # N-4). Cobre tambem o achado-dominó de resolve_targets(Grupo) (lado hardcoded) e a
     # regra geral "fogo amigo desligado" (Parte A) via regressao em combat_state_machine_test.cpp.
     techmagic_newton_test.cpp
+    # Executor techMagic (ADR-016 Balde B, PR3, decisoes do lider 2026-07-15, G-1..G-3):
+    # Godel/Null-Proof - StatusId::NullProof (buff-trunfo), item 11 GENERICO
+    # (ignores_weakness_wheel wiring real) + o pierce no ATACANTE (fura Resistente/Imune,
+    # so consome quando ha algo a furar), paridade preview (estimate_card_damage) e o
+    # domino com ChainDamage/Tesla (dano pierced alimenta a cadeia).
+    techmagic_godel_test.cpp
 )
 
 # Os testes do combate incluem helpers de teste headers-only (fixed_random.hpp).

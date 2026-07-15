@@ -625,6 +625,21 @@ CardDamageEstimate CombatStateMachine::estimate_card_damage(
                              ? 1.0f
                              : WeaknessWheel::multiplier(card.family, target.family());
 
+    // Fura-defesa (Godel/Null-Proof, ADR-016 Balde B PR3): mantido em sincronia com
+    // resolve_use_card, MESMA ordem e MESMAS duas vias. Diferenca deliberada: este metodo e
+    // PURO (contrato do preview) - le o NullProof do atacante mas NUNCA chama remove_status
+    // (sem isso a UI mostraria "IMUNE" enquanto o hit real fura, dessincronizando preview vs
+    // resultado - achado de auditoria-dominó).
+    if (card.ignores_weakness_wheel) {
+        est.mult_fraqueza = 1.0f;
+    } else if (est.mult_fraqueza < 1.0f) {
+        const auto& attacker_effects = attacker.status_effects();
+        const bool has_null_proof = std::any_of(
+            attacker_effects.begin(), attacker_effects.end(),
+            [](const StatusEffect& s) { return s.id == StatusId::NullProof; });
+        if (has_null_proof) est.mult_fraqueza = 1.0f;
+    }
+
     // Curto-circuito de imunidade (secao 11): dano 0 em tudo, ANTES de qualquer canal. O
     // motor tambem nao sorteia roll aqui (early-return em resolve_use_card) - o preview
     // reflete a MESMA regra sem nunca ter consumido RNG pra chegar ate este ponto.
@@ -1000,10 +1015,40 @@ void CombatStateMachine::resolve_use_card(CombatActor& actor, const CombatAction
         }
 
         // Defesa neutra do compilador universal (secao 6.1): alvo universal => mult 1.0.
-        const float mult_fraqueza =
+        float mult_fraqueza =
             target->is_universal_compiler()
                 ? 1.0f
                 : WeaknessWheel::multiplier(card.family, target->family());
+
+        // Fura-defesa (Godel/Null-Proof, ADR-016 Balde B PR3, decisao do lider 2026-07-15):
+        // DUAS vias independentes furam a roda de fraqueza. ORDEM CRITICA: isto roda ANTES
+        // do curto-circuito de imunidade abaixo (senao o `continue` do imune agiria antes do
+        // pierce) e antes do sorteio de canal (nem toca RNG, entao nao muda a ordem de
+        // consumo dos casos SEM pierce, secao 11). Mantido em sincronia com
+        // estimate_card_damage (preview PURO, mesma ordem, SEM consumir).
+        //   (a) item 11 GENERICO: qualquer carta com ignores_weakness_wheel=true (Godel em
+        //       si) sempre resolve mult 1.0 - independe do NullProof de quem quer que seja.
+        //   (b) G-2/G-3: senao, se o ATACANTE porta NullProof E o mult calculado e < 1.0
+        //       (Resistente 0.66 OU Imune 0.0 - fura OS DOIS), o trunfo fura (mult -> 1.0) e
+        //       e CONSUMIDO. Contra Neutro/Fraco (mult >= 1.0) fica intacto - so consome
+        //       quando ha algo a furar (G-2), nao e um consume-sempre.
+        if (card.ignores_weakness_wheel) {
+            mult_fraqueza = 1.0f;
+        } else if (mult_fraqueza < 1.0f) {
+            const auto& attacker_effects = actor.status_effects();
+            const bool has_null_proof = std::any_of(
+                attacker_effects.begin(), attacker_effects.end(),
+                [](const StatusEffect& s) { return s.id == StatusId::NullProof; });
+            if (has_null_proof) {
+                mult_fraqueza = 1.0f;
+                actor.remove_status(StatusId::NullProof);
+                log_.push_back(CombatLogEntry{
+                    actor.id(), CombatActionType::UseCard, target->id(), 0,
+                    actor.id() + " fura a defesa de " + target->id() +
+                        " com Null-Proof (sentenca indecidivel)."});
+            }
+        }
+
         constexpr float mult_mod = 1.0f;  // Stream distribui no jogo posterior; slice = 1.0
 
         // Expose (BUG-4, secao 11): alvo com Expose recebe dano * (1 + Mag/100). So UseCard.

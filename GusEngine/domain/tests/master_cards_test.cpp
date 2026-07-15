@@ -7,17 +7,22 @@
 //
 // Cobre: (1) as 12 cartas existem, ids unicos, nenhuma usa EffectKind::CloneAlly (guarda
 // que von Neumann/Bruno NAO entraram nesta leva); (2) campos canonicos por-carta (tier/
-// category/mana/power/ignores_weakness_wheel); (3) as 8 executaveis (volta/newton/pythagoras/
-// mandelbrot/ada/tesla/einstein/faraday) resolvem via techMagic::execute SEM logic_error num
-// contexto minimo; (4) as 3 fora-de-combate (euler/turing/menger) + godel tem effects vazio
-// (exceto godel, cujo trunfo e so a flag); (5) paridade i18n das 12 chaves
-// CARD_EXEC_<FIGURA>_NAME (2 locales).
+// category/mana/power/ignores_weakness_wheel); (3) as 9 executaveis (volta/newton/pythagoras/
+// mandelbrot/ada/tesla/einstein/faraday/godel) resolvem via techMagic::execute SEM logic_error
+// num contexto minimo; (4) as 3 fora-de-combate (euler/turing/menger) tem effects vazio; (5)
+// paridade i18n das 12 chaves CARD_EXEC_<FIGURA>_NAME (2 locales).
 //
 // Faraday (EM-Shield, ADR-016 Balde B, decisao do lider 2026-07-15): passou de
 // ForaDeCombate (posse-only) pra Hibrida (ganhou face de combate castavel). Os testes
 // EXAUSTIVOS do portao de imunidade (BlockedByImmunity, F-1/F-2/F-4, side_filter, dominó
 // dos sitios de status ofensivo) vivem em techmagic_faraday_test.cpp - este arquivo so
 // cobre o CATALOGO (campos + smoke test de execucao), mesmo padrao das outras 11 cartas.
+//
+// Godel (Null-Proof, ADR-016 Balde B PR3, decisao do lider 2026-07-15): passou de Passiva
+// (so a flag ignores_weakness_wheel) pra Ativa castavel (OnCast -> ApplyStatus NullProof,
+// AllyOnly), mantendo a flag original. Os testes EXAUSTIVOS do wiring do pierce (G-2/G-3:
+// consome so quando ha algo a furar, fura Imune E Resistente, paridade preview, determinismo
+// de RNG, dominó Tesla) vivem em techmagic_godel_test.cpp - este arquivo so cobre o CATALOGO.
 //
 // Cross-ref: gus/domain/combat/master_cards.hpp; techmagic.hpp; placeholder_cards_test.cpp
 //            (mesmo padrao de spec de registry); docs/design/roster-analogos/
@@ -176,16 +181,44 @@ TEST_CASE("master_cards: ada = Passiva/Universal/mana 0, effects [OnAllyTurnEnd 
     REQUIRE(c.effects[0].percent == 100);   // Q3: ecoa a 100%, o freio e a chance.
 }
 
-TEST_CASE("master_cards: godel = Passiva/Universal/mana 0/effects vazio, trunfo "
-         "ignores_weakness_wheel=true",
+TEST_CASE("master_cards: godel = Ativa/Universal/mana 0, effects [OnCast ApplyStatus "
+         "NullProof AllyOnly], trunfo ignores_weakness_wheel=true",
          "[domain][combat][cards][techmagic][mastercards]") {
     const auto reg = MasterCards::build_registry();
     const Card& c = reg.at("godel");
-    REQUIRE(c.category == CardCategory::Passiva);
+    REQUIRE(c.category == CardCategory::Ativa);
     REQUIRE(c.family == CardFamily::Universal);
     REQUIRE(c.mana_cost == 0);
-    REQUIRE(c.effects.empty());
     REQUIRE(c.ignores_weakness_wheel == true);
+    REQUIRE(c.effects.size() == 1);
+
+    const auto& null_proof = c.effects[0];
+    REQUIRE(null_proof.trigger == TriggerHook::OnCast);
+    REQUIRE(null_proof.kind == EffectKind::ApplyStatus);
+    REQUIRE(null_proof.status == StatusId::NullProof);
+    REQUIRE(null_proof.duration == 99);  // sentinela: sai por consumo, nao por tick.
+    REQUIRE(null_proof.stack_rule == StackRule::Refresh);
+    REQUIRE(null_proof.side_filter == SideFilter::AllyOnly);
+}
+
+TEST_CASE("master_cards: godel (ApplyStatus NullProof em OnCast) executa via "
+         "techMagic::execute sem lancar, alvo ALIADO recebe o status",
+         "[domain][combat][cards][techmagic][mastercards]") {
+    const auto reg = MasterCards::build_registry();
+    const Card& c = reg.at("godel");
+
+    CombatActor caster = make_actor("h", /*player_side=*/true);
+    CombatActor ally = make_actor("h2", /*player_side=*/true);
+
+    techMagic::TechMagicContext ctx;
+    ctx.caster = &caster;
+    ctx.counterpart = &ally;  // side_filter AllyOnly: alvo do mesmo lado, nao dissipa.
+
+    REQUIRE_NOTHROW(techMagic::execute(TriggerHook::OnCast, c, ctx));
+    bool has_null_proof = false;
+    for (const auto& s : ally.status_effects())
+        if (s.id == StatusId::NullProof) has_null_proof = true;
+    REQUIRE(has_null_proof);
 }
 
 TEST_CASE("master_cards: as 3 fora-de-combate (euler/turing/menger) sao "
