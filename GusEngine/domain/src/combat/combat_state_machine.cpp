@@ -1046,6 +1046,21 @@ void CombatStateMachine::resolve_use_card(CombatActor& actor, const CombatAction
             // nunca o proprio dano que ele acabou de causar no loop acima.
             cast_ctx.last_action = &last_action_;
             cast_ctx.rng = rng_;
+            // ChainDamage (Tesla/OnCast, ADR-016 step 6): a cadeia salta pros proximos
+            // inimigos vivos da fila -> injeta o roster completo (ctx.combatants) e o dano
+            // REALMENTE causado a ESTE target no loop base (ctx.damage). `hits` ainda esta
+            // intacto aqui (so e movido pro last_action_ DEPOIS deste loop); um alvo imune
+            // (FALHA/fraqueza) nao tem entrada em `hits` -> dealt=0 -> cadeia no-op nesse
+            // alvo. Nao afeta os outros handlers OnCast (ApplyStatus/Newton ignoram
+            // ctx.damage/ctx.combatants).
+            cast_ctx.combatants = &queue_.order();
+            int dealt = 0;
+            for (const auto& [t, d] : hits)
+                if (t == target) {
+                    dealt = d;
+                    break;
+                }
+            cast_ctx.damage = dealt;
             techMagic::execute(TriggerHook::OnCast, card, cast_ctx);
         }
     }

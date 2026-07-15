@@ -1,12 +1,12 @@
 // gus/domain/src/combat/master_cards.cpp
 //
-// Implementacao do catalogo das 10 cartas ESPECIAIS suportadas pelo executor techMagic
-// (ADR-016, MVP steps 4-5). Ver header para o contrato. Mesmo padrao de
+// Implementacao do catalogo das 11 cartas ESPECIAIS suportadas pelo executor techMagic
+// (ADR-016, MVP steps 4-6). Ver header para o contrato. Mesmo padrao de
 // placeholder_cards.cpp: cartas construidas uma vez, emplace fail-fast em id duplicado.
 // POCO puro, ZERO Qt.
 //
 // Regra de familia (cartas-technomagik.md secao 2.3): dominio eletromagnetico -> Eletrico;
-// resto -> Universal. Volta/Faraday/Euler = Eletrico; Newton/Pythagoras/Godel/Turing/
+// resto -> Universal. Volta/Faraday/Euler/Tesla = Eletrico; Newton/Pythagoras/Godel/Turing/
 // Menger/Mandelbrot/Ada = Universal.
 //
 // NUMEROS PROVISORIOS (//PLAYTEST): mana das ativas/hibridas = 6; percent do Leech (Volta)
@@ -42,6 +42,10 @@ constexpr int kNewtonReflectPercent = 30;  //PLAYTEST fracao do Reflect (Newton 
 constexpr int kMandelbrotEchoPercent = 50;  //PLAYTEST escala do eco Fractal-Echo (Mandelbrot).
 constexpr int kAdaEchoPercent = 100;  // Q3: Ada ecoa a 100% - o freio dela e a CHANCE, nao a escala.
 constexpr int kAdaEchoChance = 34;    //PLAYTEST chance% do Re-Run (Ada); easter-egg velado.
+// ChainDamage (Tesla, ADR-016 step 6): cadeia de dano decrescente que salta pros proximos
+// inimigos vivos.
+constexpr int kTeslaChainRetentionPercent = 62;  //PLAYTEST retencao por salto da cadeia.
+constexpr int kTeslaPower = 8;  //PLAYTEST dano-base do primario (Tesla e excecao: cadeia escala dele).
 
 // Monta uma carta ESPECIAL base. base_type = Glifo (carta-programa nao-elemental,
 // //PLAYTEST). ap_cost default 1 (herda o mesmo default do placeholder). Sem
@@ -52,7 +56,8 @@ Card make_special(std::string id,
                   CardCategory category,
                   int mana_cost,
                   std::vector<EffectSpec> effects,
-                  bool ignores_weakness_wheel = false) {
+                  bool ignores_weakness_wheel = false,
+                  int power = 0) {
     Card c;
     c.id = std::move(id);
     c.display_name = std::move(display_name);
@@ -60,7 +65,9 @@ Card make_special(std::string id,
     c.base_type = CardBaseType::Glifo;  //PLAYTEST (sem convencao fechada pra especiais).
     c.mana_cost = mana_cost;
     c.ap_cost = 1;
-    c.power = 0;  // o dano/efeito vem do programa (EffectSpec), nao de power base.
+    // Default 0: o dano/efeito das outras especiais vem do programa (EffectSpec), nao de
+    // power base. Excecao = Tesla (ChainDamage escala do dano-base do primario) -> power > 0.
+    c.power = power;
     c.target_shape = TargetShape::Single;
     c.tier = CardTier::Especial;
     c.category = category;
@@ -149,10 +156,25 @@ std::unordered_map<std::string, Card> assemble() {
         // marginal + escambo loot->Credito); economia, sem programa de combate. ---
         make_special("menger", "CARD_EXEC_MENGER_NAME", CardFamily::Universal,
                      CardCategory::ForaDeCombate, 0, /*effects=*/{}),
+
+        // --- Tesla (Chain-Arc): Ativa, Eletrico. OnCast -> ChainDamage: o dano-base
+        // (power) atinge o alvo primario e a descarga SALTA em 2 (magnitude) inimigos vivos
+        // seguintes, retendo 62% (percent) a cada salto (decaimento multiplicativo) = 3
+        // alvos no total. EXCECAO das especiais: precisa de power > 0 (a cadeia escala do
+        // dano-base do primario, nao de um EffectSpec). O dano-base e turbinavel por item
+        // futuro (capacitor serie/paralelo), feat separada. ---
+        make_special(
+            "tesla", "CARD_EXEC_TESLA_NAME", CardFamily::Eletrico, CardCategory::Ativa,
+            kActiveManaCost,
+            {EffectSpec{.trigger = TriggerHook::OnCast,
+                       .kind = EffectKind::ChainDamage,
+                       .magnitude = 2,  //PLAYTEST 2 saltos = 3 alvos.
+                       .percent = kTeslaChainRetentionPercent}},
+            /*ignores_weakness_wheel=*/false, /*power=*/kTeslaPower),
     };
 
     std::unordered_map<std::string, Card> registry;
-    registry.reserve(10);
+    registry.reserve(11);
     for (const auto& card : cards) {
         // emplace (nao indexer) falha-cedo se algum id duplicar (mesmo padrao do placeholder).
         const auto [it, inserted] = registry.emplace(card.id, card);

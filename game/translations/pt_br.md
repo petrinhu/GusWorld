@@ -699,6 +699,9 @@ Decrypt-All
 ## CARD_EXEC_MENGER_NAME
 Barter
 
+## CARD_EXEC_TESLA_NAME
+Tesla
+
 ---
 
 ## §9. Menu de sistema (pausa + config de som, MENU-PAUSA-CONFIG-SOM)

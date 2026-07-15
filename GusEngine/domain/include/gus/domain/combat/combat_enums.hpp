@@ -216,6 +216,11 @@ enum class EffectKind : std::uint32_t {
     // EffectSpec.magnitude = chance% do Re-Run (0 = sempre, Mandelbrot; >0 consome 1
     // rng->next(100), Ada). Ver techmagic.cpp::handle_repeat_last_action.
     RepeatLastAction = 5,
+    // Cadeia de dano decrescente (Tesla): apos o dano-base atingir o alvo primario, a
+    // descarga SALTA pros proximos inimigos VIVOS na ordem da fila (ate EffectSpec.magnitude
+    // saltos), retendo EffectSpec.percent% do dano a cada salto (decaimento multiplicativo).
+    // Dano PURO (take_damage), 0 consumo de RNG. Ver techmagic.cpp::handle_chain_damage.
+    ChainDamage = 6,
 };
 
 }  // namespace gus::domain::combat

@@ -102,6 +102,9 @@ add_executable(gusengine_domain_tests
     # RepeatLastAction (Mandelbrot/Fractal-Echo OnCast + Ada/Re-Run OnAllyTurnEnd,
     # decisoes Q1-Q4 do lider 2026-07-14).
     techmagic_repeat_test.cpp
+    # Executor techMagic (ADR-016, MVP step 6, TECHMAGIC-EXECUTOR): EffectKind::ChainDamage
+    # (Tesla) - cadeia de dano decrescente que salta pros proximos inimigos vivos.
+    techmagic_chain_test.cpp
 )
 
 # Os testes do combate incluem helpers de teste headers-only (fixed_random.hpp).

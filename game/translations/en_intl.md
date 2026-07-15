@@ -507,6 +507,9 @@ Decrypt-All
 ## CARD_EXEC_MENGER_NAME
 Barter
 
+## CARD_EXEC_TESLA_NAME
+Tesla
+
 ### Controls screen (keyboard remap, M2)
 
 ## CONTROLS_HINT

@@ -122,6 +122,13 @@ struct LastActionRecord {
 // de call site SE a carta em execucao tiver magnitude>0 (a FSM sempre injeta rng_); cartas
 // com magnitude==0 (Mandelbrot, sempre-repete) NUNCA tocam este ponteiro - 0 consumo de
 // RNG por construcao (determinismo, secao 11/ADR-006).
+// `combatants` (step 6, ChainDamage/Tesla): roster COMPLETO do combate (ordem da fila),
+// so consumido por handle_chain_damage pra achar os alvos SECUNDARIOS dos saltos (proximos
+// inimigos vivos do lado oposto, excluindo o alvo primario). Campo ADITIVO (default nullptr
+// preserva os call sites/testes dos steps 1-5 intactos); handle_chain_damage lanca
+// std::logic_error se rodar com combatants == nullptr (bug de call site - a FSM SEMPRE injeta
+// &queue_.order() no OnCast, mesmo padrao de round_hits/last_action acima). Ponteiro
+// NAO-DONO (mesmo padrao de CombatActor* na FSM/InitiativeQueue).
 struct TechMagicContext {
     CombatActor* caster = nullptr;
     CombatActor* counterpart = nullptr;
@@ -131,6 +138,7 @@ struct TechMagicContext {
     std::unordered_set<CombatActor*>* bonused_targets = nullptr;
     const LastActionRecord* last_action = nullptr;
     IRandomSource* rng = nullptr;
+    const std::vector<CombatActor*>* combatants = nullptr;
 };
 
 // Executa, NA ORDEM declarada, os EffectSpec de `card` cujo `trigger == hook`. `ctx.caster`

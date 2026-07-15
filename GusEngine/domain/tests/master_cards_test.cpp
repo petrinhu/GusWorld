@@ -1,16 +1,16 @@
 // master_cards_test.cpp
 //
 // Spec executavel (Catch2 v3) do catalogo data-driven das cartas ESPECIAIS dos mestres
-// suportadas pelo executor techMagic (ADR-016, item TECHMAGIC-EXECUTOR / MVP steps 4-5):
-// volta, newton, pythagoras, mandelbrot, ada, godel, faraday, euler, turing, menger.
+// suportadas pelo executor techMagic (ADR-016, item TECHMAGIC-EXECUTOR / MVP steps 4-6):
+// volta, newton, pythagoras, mandelbrot, ada, godel, faraday, euler, turing, menger, tesla.
 // POCO puro, ZERO Qt.
 //
-// Cobre: (1) as 10 cartas existem, ids unicos, nenhuma usa EffectKind::CloneAlly (guarda
+// Cobre: (1) as 11 cartas existem, ids unicos, nenhuma usa EffectKind::CloneAlly (guarda
 // que von Neumann/Bruno NAO entraram nesta leva); (2) campos canonicos por-carta (tier/
-// category/mana/ignores_weakness_wheel); (3) as 5 executaveis (volta/newton/pythagoras/
-// mandelbrot/ada) resolvem via techMagic::execute SEM logic_error num contexto minimo;
+// category/mana/power/ignores_weakness_wheel); (3) as 6 executaveis (volta/newton/pythagoras/
+// mandelbrot/ada/tesla) resolvem via techMagic::execute SEM logic_error num contexto minimo;
 // (4) as 4 fora-de-combate + godel tem effects vazio (exceto godel, cujo trunfo e so a
-// flag); (5) paridade i18n das 10 chaves CARD_EXEC_<FIGURA>_NAME (2 locales).
+// flag); (5) paridade i18n das 11 chaves CARD_EXEC_<FIGURA>_NAME (2 locales).
 //
 // Cross-ref: gus/domain/combat/master_cards.hpp; techmagic.hpp; placeholder_cards_test.cpp
 //            (mesmo padrao de spec de registry); docs/design/roster-analogos/
@@ -44,12 +44,12 @@ CombatActor make_actor(const std::string& id, bool player_side, int hp = 100, in
 
 // ===== 1. As 8 cartas existem, ids unicos, guarda anti-CloneAlly =====
 
-TEST_CASE("master_cards: build_registry tem exatamente as 10 cartas suportadas",
+TEST_CASE("master_cards: build_registry tem exatamente as 11 cartas suportadas",
           "[domain][combat][cards][techmagic][mastercards]") {
     const auto reg = MasterCards::build_registry();
-    REQUIRE(reg.size() == 10);
+    REQUIRE(reg.size() == 11);
     for (const char* id : {"volta", "newton", "pythagoras", "mandelbrot", "ada", "godel",
-                           "faraday", "euler", "turing", "menger"})
+                           "faraday", "euler", "turing", "menger", "tesla"})
         REQUIRE(reg.count(id) == 1);
 }
 
@@ -352,7 +352,50 @@ TEST_CASE("master_cards: ada (RepeatLastAction em OnAllyTurnEnd, magnitude 34) e
     }
 }
 
-// ===== 4. Paridade i18n das 10 chaves (2 locales) =====
+TEST_CASE("master_cards: tesla = Ativa/Eletrico/mana 6/power 8, effects [OnCast "
+         "ChainDamage magnitude 2 percent 62]",
+         "[domain][combat][cards][techmagic][mastercards]") {
+    const auto reg = MasterCards::build_registry();
+    const Card& c = reg.at("tesla");
+    REQUIRE(c.category == CardCategory::Ativa);
+    REQUIRE(c.family == CardFamily::Eletrico);
+    REQUIRE(c.mana_cost == 6);
+    REQUIRE(c.power == 8);  // EXCECAO: a cadeia escala do dano-base do primario.
+    REQUIRE(c.ignores_weakness_wheel == false);
+    REQUIRE(c.effects.size() == 1);
+    REQUIRE(c.effects[0].trigger == TriggerHook::OnCast);
+    REQUIRE(c.effects[0].kind == EffectKind::ChainDamage);
+    REQUIRE(c.effects[0].magnitude == 2);  // 2 saltos = 3 alvos.
+    REQUIRE(c.effects[0].percent == 62);   // retencao por salto.
+}
+
+TEST_CASE("master_cards: tesla (ChainDamage em OnCast) executa via techMagic::execute sem "
+         "lancar e a cadeia salta nos 2 inimigos seguintes (62%/salto)",
+         "[domain][combat][cards][techmagic][mastercards]") {
+    const auto reg = MasterCards::build_registry();
+    const Card& c = reg.at("tesla");
+
+    CombatActor caster = make_actor("h", /*player_side=*/true);
+    CombatActor primary = make_actor("e0", /*player_side=*/false, /*hp=*/300);
+    CombatActor e1 = make_actor("e1", /*player_side=*/false, /*hp=*/300);
+    CombatActor e2 = make_actor("e2", /*player_side=*/false, /*hp=*/300);
+    const std::vector<CombatActor*> roster = {&caster, &primary, &e1, &e2};
+
+    techMagic::TechMagicContext ctx;
+    ctx.caster = &caster;
+    ctx.counterpart = &primary;   // ja levou o dano-base fora do handler.
+    ctx.combatants = &roster;
+    ctx.damage = 10;              // dano-base efetivo no primario (D).
+
+    REQUIRE_NOTHROW(techMagic::execute(TriggerHook::OnCast, c, ctx));
+    // Salto 1: lround(10 * 0.62^1) = lround(6.2) = 6. Salto 2: lround(10 * 0.62^2) =
+    // lround(3.844) = 4. O primario nao recebe salto extra (so o dano-base, fora daqui).
+    REQUIRE(e1.hp() == 300 - 6);
+    REQUIRE(e2.hp() == 300 - 4);
+    REQUIRE(primary.hp() == 300);  // sem salto no primario.
+}
+
+// ===== 4. Paridade i18n das 11 chaves (2 locales) =====
 
 namespace {
 
@@ -384,7 +427,7 @@ bool has_key(const std::vector<std::string>& keys, const std::string& key) {
 #define GUSWORLD_TRANSLATIONS_DIR "../../../../game/translations"
 #endif
 
-TEST_CASE("master_cards: as 10 chaves CARD_EXEC_<FIGURA>_NAME existem em pt_br.md e "
+TEST_CASE("master_cards: as 11 chaves CARD_EXEC_<FIGURA>_NAME existem em pt_br.md e "
          "en_intl.md",
          "[domain][combat][cards][techmagic][mastercards][i18n]") {
     const std::vector<std::string> pt =
@@ -395,7 +438,7 @@ TEST_CASE("master_cards: as 10 chaves CARD_EXEC_<FIGURA>_NAME existem em pt_br.m
     REQUIRE_FALSE(en.empty());
 
     for (const char* figura : {"VOLTA", "NEWTON", "PYTHAGORAS", "MANDELBROT", "ADA",
-                               "GODEL", "FARADAY", "EULER", "TURING", "MENGER"}) {
+                               "GODEL", "FARADAY", "EULER", "TURING", "MENGER", "TESLA"}) {
         const std::string key = std::string("CARD_EXEC_") + figura + "_NAME";
         INFO("chave: " << key);
         REQUIRE(has_key(pt, key));

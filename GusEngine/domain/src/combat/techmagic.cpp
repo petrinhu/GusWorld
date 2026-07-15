@@ -13,6 +13,7 @@
 
 #include <algorithm>
 #include <cmath>
+#include <cstddef>
 #include <optional>
 #include <stdexcept>
 #include <string>
@@ -238,6 +239,65 @@ void handle_repeat_last_action(const EffectSpec& spec, const Card& card,
     }
 }
 
+// ChainDamage (OnCast, Tesla; ADR-016 step 6): apos o dano-base atingir o alvo primario
+// (ctx.counterpart, ja resolvido no loop base), a descarga SALTA pros proximos inimigos VIVOS
+// na ordem da fila (ctx.combatants), do lado OPOSTO ao caster, EXCLUINDO o primario. Coleta
+// ate spec.magnitude alvos-salto; para quando faltam alvos. Cada salto retem spec.percent% do
+// dano-base de forma MULTIPLICATIVA: salto k (1-indexado) = lround(ctx.damage * (percent/100)^k).
+// Para tambem quando o salto arredonda pra <=0 (os proximos so seriam menores). ctx.damage e o
+// dano REALMENTE causado ao primario (pos-fraqueza/crit/variancia); primario imune (0) => no-op.
+// take_damage PURO - anti-recursao (nao redispara OnDamageDealt/OnDamageReceived, nao entra no
+// ledger). 0 consumo de RNG (determinismo): nao toca ctx.rng.
+void handle_chain_damage(const EffectSpec& spec, const Card& card, TechMagicContext& ctx) {
+    if (ctx.caster == nullptr)
+        throw std::logic_error("techMagic::ChainDamage: ctx.caster nao pode ser nulo.");
+    if (ctx.combatants == nullptr)
+        throw std::logic_error(
+            "techMagic::ChainDamage: ctx.combatants nao pode ser nulo (OnCast sem roster "
+            "injetado no contexto - bug de call site, nao efeito vazio).");
+    if (ctx.counterpart == nullptr)
+        throw std::logic_error(
+            "techMagic::ChainDamage: ctx.counterpart (alvo primario) nao pode ser nulo "
+            "(OnCast sempre tem alvo).");
+
+    // Primario imune / dano-base 0: a cadeia nao tem de onde escalar. No-op + log.
+    if (ctx.damage <= 0) {
+        log_entry(ctx, ctx.counterpart, 0,
+                 ctx.caster->id() + " tavus-executa " + card.id +
+                     ": alvo primario imune, cadeia nao propaga.");
+        return;
+    }
+
+    const double factor = static_cast<double>(spec.percent) / 100.0;
+    const std::size_t max_jumps = static_cast<std::size_t>(std::max(0, spec.magnitude));
+
+    // Alvos-salto: proximos inimigos VIVOS do lado oposto, na ORDEM da fila, excluindo o
+    // primario (que ja levou o dano-base). Ate max_jumps; se houver menos, salta em menos.
+    std::vector<CombatActor*> jump_targets;
+    for (CombatActor* a : *ctx.combatants) {
+        if (jump_targets.size() >= max_jumps) break;
+        if (a == nullptr || !a->is_alive()) continue;
+        if (a->is_player_side() == ctx.caster->is_player_side()) continue;
+        if (a == ctx.counterpart) continue;
+        jump_targets.push_back(a);
+    }
+
+    int k = 1;
+    for (CombatActor* target : jump_targets) {
+        const int jump = static_cast<int>(
+            std::lround(static_cast<double>(ctx.damage) * std::pow(factor, k)));
+        if (jump <= 0) break;  // arredondou pra 0: os saltos seguintes so seriam menores.
+
+        target->take_damage(jump);  // PURO - anti-recursao (nao redispara hooks/ledger).
+
+        log_entry(ctx, target, jump,
+                 ctx.caster->id() + " tavus-executa " + card.id + ": cadeia salta em " +
+                     target->id() + " por " + std::to_string(jump) + " (salto " +
+                     std::to_string(k) + ").");
+        ++k;
+    }
+}
+
 }  // namespace
 
 void execute(TriggerHook hook, const Card& card, TechMagicContext& ctx) {
@@ -260,12 +320,15 @@ void execute(TriggerHook hook, const Card& card, TechMagicContext& ctx) {
             case EffectKind::RepeatLastAction:
                 handle_repeat_last_action(spec, card, ctx);
                 break;
+            case EffectKind::ChainDamage:
+                handle_chain_damage(spec, card, ctx);
+                break;
             case EffectKind::CloneAlly:
             default:
                 throw std::logic_error(
                     "techMagic: EffectKind sem handler implementado na carta '" + card.id +
-                    "' (steps 2-3-5 cobrem ApplyStatus/Leech/Reflect/HypotenuseCombo/"
-                    "RepeatLastAction; CloneAlly e step 6+, ADR-016).");
+                    "' (steps 2-3-5-6 cobrem ApplyStatus/Leech/Reflect/HypotenuseCombo/"
+                    "RepeatLastAction/ChainDamage; CloneAlly e step futuro, ADR-016).");
         }
     }
 }

@@ -64,6 +64,37 @@ Cross-ref: `GusEngine/domain/include/gus/domain/combat/techmagic.hpp` (LastActio
 `docs/design/mecanicas/cartas-technomagik.md` §9; `docs/design/roster-analogos/
 _EFEITOS-ESCOLHIDOS.md` (AMB-01, "neste turno" -> "nesta rodada").
 
+## Addendum (MVP step 6): ChainDamage (Tesla)
+
+Setimo `EffectKind` entregue (append-only, ordinal 6): `ChainDamage`, a descarga em cadeia
+da Tesla. `OnCast`: depois que o dano-base da carta atinge o alvo primario (no loop base do
+`resolve_use_card`), a descarga SALTA pros proximos inimigos VIVOS na ordem da fila, do lado
+OPOSTO ao caster, EXCLUINDO o primario. `EffectSpec.magnitude` = numero de saltos (Tesla = 2
+-> 3 alvos no total); `EffectSpec.percent` = retencao por salto (62%). Decaimento
+MULTIPLICATIVO: salto k (1-indexado) = `lround(danoPrimario * (percent/100)^k)`; para quando
+faltam alvos vivos OU quando o salto arredonda pra `<=0`. O `danoPrimario` e o dano
+REALMENTE causado ao primario (pos-fraqueza/crit/variancia); primario imune (dano 0) =>
+no-op. Dano dos saltos vai por `CombatActor::take_damage` PURO (igual a Reflect/Leech/
+RepeatLastAction): nao redispara `OnDamageDealt/OnDamageReceived`, nao entra no ledger
+`round_hits_`. 0 consumo de RNG (a cadeia nao sorteia nada).
+
+Wiring no `OnCast` de `resolve_use_card`: alem de `last_action`/`rng` (step 5), o contexto
+agora injeta `combatants = &queue_.order()` (roster pra achar os alvos-salto) e `damage` = o
+dano causado a ESTE `target` no loop base (varredura do vetor `hits` local, ainda intacto
+antes de ser movido pro `last_action_`). `TechMagicContext` ganhou 1 campo aditivo
+(`combatants`, default `nullptr`): `handle_chain_damage` lanca `std::logic_error` se rodar
+com `combatants`/`counterpart`/`caster` nulos (fail-fast, bug de call site). EXCECAO de
+catalogo: a Tesla e a unica especial que precisa de `power > 0` (a cadeia escala do dano-base
+do primario, nao de um `EffectSpec`); `make_special` ganhou um parametro `power` opcional
+(default 0 preserva as 10 anteriores). Catalogo passa de 10 para 11 cartas (familia Eletrico
+ganha a Tesla).
+
+Cross-ref: `GusEngine/domain/include/gus/domain/combat/techmagic.hpp`
+(TechMagicContext.combatants); `GusEngine/domain/src/combat/techmagic.cpp`
+(handle_chain_damage); `GusEngine/domain/src/combat/combat_state_machine.cpp` (wiring OnCast);
+`GusEngine/domain/src/combat/master_cards.cpp` (tesla); `docs/design/mecanicas/
+cartas-technomagik.md`.
+
 ## Consequencias
 
 - **Positivas:** custo BAIXO-MEDIO, risco BAIXO; numeros 100% tunaveis pra playtest; testavel por unit test por EffectKind; easter-egg entregue hoje; nao fecha porta pra VM. Cada carta = 5-15 linhas de dado.
