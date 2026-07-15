@@ -360,6 +360,113 @@ TEST_CASE("techmagic repeat: last_action grava apos dano>0, preserva o registro 
     REQUIRE(sm2.round_hits().empty());
 }
 
+// ===== 6. Ada: NAO ecoa quando quem FECHA o turno e INIMIGO, mesmo com last_action_ =====
+// =====    ainda do lado do JOGADOR (filtro de LADO no despacho de
+// =====    process_ally_turn_end_hooks, combat_state_machine.cpp:504 - guard DISTINTO do
+// =====    check "echoable" interno de handle_repeat_last_action, que so compara o lado
+// =====    de last_action_.actor contra ctx.caster, NAO quem fechou o turno) =============
+
+TEST_CASE("techmagic repeat: ada nao ecoa quando quem fecha o turno e INIMIGO, mesmo com "
+         "last_action_ ainda do lado do jogador (filtro de lado no DESPACHO, nao no "
+         "echoable interno do handler)",
+         "[domain][combat][techmagic][repeat]") {
+    CombatActor h1 = make_actor("h1", true, 100, 6, 0, 50);  // ataca e; grava last_action_.
+    CombatActor h2 = make_actor("h2", true, 100, 0, 0, 45);  // dono do Ada; so passa.
+    CombatActor e = make_actor("e", false, 100, 0, 0, 10);   // NUNCA ataca; so defende.
+    h2.set_equipped_special_ids({"ada_test"});
+    auto reg = registry({ada_card("ada_test", /*chance=*/34)});
+
+    auto provider = provider_for({{"h1", {{0, {CombatAction::attack(e.id())}}}},
+                                  {"e", {{0, {CombatAction::defend()}}}}});
+    FixedRandom rng(/*next_double=*/0.5, /*next_int=*/0);  // Ada sempre dispara quando roda.
+    CombatStateMachine sm({&h1, &h2, &e}, provider, &reg, nullptr, &rng);
+
+    act(sm);  // h1 ataca e (6): last_action_={h1,{e:6}}. Turno de h1 fecha (caminho NORMAL,
+              // MESMO lado do dono do Ada) -> Ada (h2) ecoa 100% de 6 -> e leva mais 6.
+    REQUIRE(e.hp() == 100 - 6 - 6);
+
+    act(sm);  // h2 passa (0 dano; last_action_ intacto). Turno de h2 fecha -> despacha pros
+              // OUTROS aliados do MESMO lado (so h1, sem Ada equipada) -> no-op.
+    REQUIRE(e.hp() == 100 - 6 - 6);
+
+    act(sm);  // e DEFENDE (0 dano; last_action_ CONTINUA {h1,{e:6}}, tecnicamente
+              // "echoable" pelo check interno do Ada - mesmo lado de h1). Turno de 'e'
+              // fecha -> process_ally_turn_end_hooks(e) filtra por LADO: so considera
+              // OUTROS aliados do MESMO lado de 'e' (inimigo) - h2 (jogador) e EXCLUIDO no
+              // DESPACHO, mesmo que o echoable interno do Ada aprovasse se rodasse.
+    REQUIRE(e.hp() == 100 - 6 - 6);  // SEM 3o eco: a Ada de h2 nao rodou nesta chamada.
+}
+
+// ===== 7. Mandelbrot (magnitude==0): ZERO consumo de RNG por construcao, mesmo com uma =====
+// =====    acao echoable ja gravada (chamada isolada do executor, tecmagic.cpp:210 - o
+// =====    branch `if (spec.magnitude > 0)` nunca roda pra 0) ===========================
+
+TEST_CASE("techmagic repeat: mandelbrot (magnitude==0) nunca consome RNG, mesmo com uma "
+         "acao echoable ja gravada",
+         "[domain][combat][techmagic][repeat]") {
+    CombatActor h1 = make_actor("h1", true, 100, 6, 0, 40);  // "autor" da acao echoable.
+    CombatActor h2 = make_actor("h2", true, 100, 0, 0, 35);  // conjura o Mandelbrot.
+    CombatActor e = make_actor("e", false, 300, 0, 0, 10);   // alvo do eco.
+
+    const techMagic::LastActionRecord recorded{&h1, CombatActionType::Attack,
+                                                /*card_id=*/std::string{}, {{&e, 6}}};
+
+    Card mandelbrot = mandelbrot_card("mandelbrot_zero_rng_test", /*percent=*/50);
+
+    CountingRandom counting;
+    techMagic::TechMagicContext ctx;
+    ctx.caster = &h2;
+    ctx.last_action = &recorded;
+    ctx.rng = &counting;
+
+    techMagic::execute(TriggerHook::OnCast, mandelbrot, ctx);
+
+    // O eco de fato rodou (prova que o 0-consumo NAO e um no-op mascarado):
+    // lround(6*50/100) = 3.
+    REQUIRE(e.hp() == 300 - 3);
+    REQUIRE(counting.next_calls == 0);
+    REQUIRE(counting.next_double_calls == 0);
+}
+
+// ===== 8. Ada: TAMBEM ecoa quando quem fecha o turno e um aliado STUNNED (2o caminho =====
+// =====    de fim-de-turno, combat_state_machine.cpp:559 expire_on_stunned_turn_end - =====
+// =====    gemeo de run_active_turn_to_end, so acessivel via run_until_end() porque =====
+// =====    expire_on_stunned_turn_end e privado) ==========================================
+
+TEST_CASE("techmagic repeat: ada tambem ecoa quando quem fecha o turno e um aliado "
+         "STUNNED (expire_on_stunned_turn_end, o 2o caminho de fim-de-turno)",
+         "[domain][combat][techmagic][repeat]") {
+    CombatActor h1 = make_actor("h1", true, 100, 6, 0, 50);        // ataca e; spd mais alta.
+    CombatActor h_stun = make_actor("h_stun", true, 100, 0, 0, 45); // perde o turno (Stun).
+    CombatActor h_ada = make_actor("h_ada", true, 100, 0, 0, 40);   // dono do Ada.
+    CombatActor e = make_actor("e", false, 18, 0, 0, 10);  // 18 = 6 base + 2 ecos de 6.
+    h_ada.set_equipped_special_ids({"ada_test"});
+    h_stun.add_status(StatusEffect{.id = StatusId::Stun, .duration = 1});
+
+    auto reg = registry({ada_card("ada_test", /*chance=*/34)});
+
+    // h1 ataca e na rodada 0 E na rodada 1 (rede de seguranca: se o caminho stunned NAO
+    // disparasse o hook, o combate so fecharia na rodada 1, nao na 0 - ver comentario da
+    // asercao de rounds_elapsed abaixo).
+    auto provider = provider_for(
+        {{"h1", {{0, {CombatAction::attack(e.id())}}, {1, {CombatAction::attack(e.id())}}}}});
+    FixedRandom rng(/*next_double=*/0.5, /*next_int=*/0);  // Ada sempre dispara (roll 0 < 34).
+    CombatStateMachine sm({&h1, &h_stun, &h_ada, &e}, provider, &reg, nullptr, &rng);
+
+    const CombatResult result = sm.run_until_end();
+
+    REQUIRE(result.outcome == CombatOutcome::Victory);
+    // e: 18 - 6 (h1 ataca) - 6 (Ada eco #1, turno de h1 fechando - caminho NORMAL, ja
+    // coberto noutro teste) - 6 (Ada eco #2, turno STUNNED de h_stun fechando - o caminho
+    // NOVO sob teste aqui, via expire_on_stunned_turn_end) = 0, tudo ainda na rodada 0.
+    REQUIRE(e.hp() == 0);
+    REQUIRE_FALSE(e.is_alive());
+    // Se expire_on_stunned_turn_end NAO disparasse process_ally_turn_end_hooks (o guard sob
+    // teste), o 2o eco nao aconteceria: e sobreviveria a rodada 0 com hp=6, e o combate so
+    // fecharia na RODADA 1 (quando h1 ataca de novo) - rounds_elapsed seria 1, nao 0.
+    REQUIRE(result.rounds_elapsed == 0);
+}
+
 // ===== 5. Fail-fast intacto: CloneAlly continua sem handler (RepeatLastAction nao =====
 // =====    "engoliu" o default do switch) ============================================
 
