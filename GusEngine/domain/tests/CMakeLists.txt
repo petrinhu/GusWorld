@@ -114,6 +114,12 @@ add_executable(gusengine_domain_tests
     # portao de imunidade CombatActor::try_add_status (choke point compartilhado com o
     # PR2/Newton).
     techmagic_faraday_test.cpp
+    # Executor techMagic (ADR-016 Balde B, PR2, decisoes do lider 2026-07-15, N-1..N-4):
+    # Newton/Poco Gravitacional - Stun AoE EnemyOnly + Reflect-status AllyOnly (modo-aliado)
+    # + Reflect-por-status honrado em apply_damage_with_hooks (soma com a passiva equipada,
+    # N-4). Cobre tambem o achado-dominó de resolve_targets(Grupo) (lado hardcoded) e a
+    # regra geral "fogo amigo desligado" (Parte A) via regressao em combat_state_machine_test.cpp.
+    techmagic_newton_test.cpp
 )
 
 # Os testes do combate incluem helpers de teste headers-only (fixed_random.hpp).

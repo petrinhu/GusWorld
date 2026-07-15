@@ -26,7 +26,6 @@
 #include <catch2/catch_test_macros.hpp>
 
 #include <fstream>
-#include <sstream>
 #include <string>
 #include <vector>
 
@@ -96,27 +95,39 @@ TEST_CASE("master_cards: volta = Ativa/Eletrico/mana 6, effects [OnDamageDealt L
     REQUIRE(c.effects[0].percent == 50);
 }
 
-TEST_CASE("master_cards: newton = Hibrida/Universal/mana 6, effects [OnCast ApplyStatus "
-         "Stun] + [OnDamageReceived Reflect]",
+TEST_CASE("master_cards: newton = Hibrida/Universal/mana 6/Grupo, effects [OnCast "
+         "ApplyStatus Stun EnemyOnly] + [OnCast ApplyStatus Reflect AllyOnly] + "
+         "[OnDamageReceived Reflect]",
          "[domain][combat][cards][techmagic][mastercards]") {
     const auto reg = MasterCards::build_registry();
     const Card& c = reg.at("newton");
     REQUIRE(c.category == CardCategory::Hibrida);
     REQUIRE(c.family == CardFamily::Universal);
     REQUIRE(c.mana_cost == 6);
+    REQUIRE(c.target_shape == TargetShape::Grupo);  // N-1: Poco Gravitacional e AoE.
     REQUIRE(c.ignores_weakness_wheel == false);
-    REQUIRE(c.effects.size() == 2);
+    REQUIRE(c.effects.size() == 3);
 
     const auto& stun = c.effects[0];
     REQUIRE(stun.trigger == TriggerHook::OnCast);
     REQUIRE(stun.kind == EffectKind::ApplyStatus);
     REQUIRE(stun.status == StatusId::Stun);
     REQUIRE(stun.duration == 1);
+    REQUIRE(stun.side_filter == SideFilter::EnemyOnly);
 
-    const auto& reflect = c.effects[1];
-    REQUIRE(reflect.trigger == TriggerHook::OnDamageReceived);
-    REQUIRE(reflect.kind == EffectKind::Reflect);
-    REQUIRE(reflect.percent == 30);
+    const auto& reflect_status = c.effects[1];
+    REQUIRE(reflect_status.trigger == TriggerHook::OnCast);
+    REQUIRE(reflect_status.kind == EffectKind::ApplyStatus);
+    REQUIRE(reflect_status.status == StatusId::Reflect);
+    REQUIRE(reflect_status.magnitude == 30);
+    REQUIRE(reflect_status.duration == 3);
+    REQUIRE(reflect_status.stack_rule == StackRule::Refresh);
+    REQUIRE(reflect_status.side_filter == SideFilter::AllyOnly);
+
+    const auto& reflect_passive = c.effects[2];
+    REQUIRE(reflect_passive.trigger == TriggerHook::OnDamageReceived);
+    REQUIRE(reflect_passive.kind == EffectKind::Reflect);
+    REQUIRE(reflect_passive.percent == 30);
 }
 
 TEST_CASE("master_cards: pythagoras = Passiva/Universal/mana 0, effects [OnRoundEnd "

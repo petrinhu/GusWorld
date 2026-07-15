@@ -47,6 +47,10 @@ namespace {
 constexpr int kActiveManaCost = 6;    //PLAYTEST mana das ativas/hibridas (Volta, Newton).
 constexpr int kVoltaLeechPercent = 50;  //PLAYTEST VOLTA-LEECH-% (fracao do Leech do Volta).
 constexpr int kNewtonReflectPercent = 30;  //PLAYTEST fracao do Reflect (Newton "acao e reacao").
+// Reflect-por-STATUS concedido no modo-aliado (N-3, ADR-016 Balde B PR2, decisao do lider
+// 2026-07-15): mesma fracao da passiva-propria (N-4: as duas fontes somam, ver
+// apply_damage_with_hooks). Duracao independente da do Poco Gravitacional (Stun 1t).
+constexpr int kNewtonReflectDuration = 3;  //PLAYTEST duracao do Reflect-status (3 turnos).
 // RepeatLastAction (ADR-016 secao 20 item 5, decisoes Q1-Q4 do lider 2026-07-14).
 constexpr int kMandelbrotEchoPercent = 50;  //PLAYTEST escala do eco Fractal-Echo (Mandelbrot).
 constexpr int kAdaEchoPercent = 100;  // Q3: Ada ecoa a 100% - o freio dela e a CHANCE, nao a escala.
@@ -72,7 +76,8 @@ Card make_special(std::string id,
                   int mana_cost,
                   std::vector<EffectSpec> effects,
                   bool ignores_weakness_wheel = false,
-                  int power = 0) {
+                  int power = 0,
+                  TargetShape target_shape = TargetShape::Single) {
     Card c;
     c.id = std::move(id);
     c.display_name = std::move(display_name);
@@ -83,7 +88,9 @@ Card make_special(std::string id,
     // Default 0: o dano/efeito das outras especiais vem do programa (EffectSpec), nao de
     // power base. Excecao = Tesla (ChainDamage escala do dano-base do primario) -> power > 0.
     c.power = power;
-    c.target_shape = TargetShape::Single;
+    // Default Single; Newton override pra Grupo (Poco Gravitacional, N-1: AoE nos inimigos
+    // ou, no ramo assimetrico do modo-aliado, single no aliado alvo - ver resolve_targets).
+    c.target_shape = target_shape;
     c.tier = CardTier::Especial;
     c.category = category;
     c.effects = std::move(effects);
@@ -102,8 +109,21 @@ std::unordered_map<std::string, Card> assemble() {
                        .kind = EffectKind::Leech,
                        .percent = kVoltaLeechPercent}}),
 
-        // --- Newton (Force-Law): Hibrida, Universal. OnCast -> Stun 1t no alvo (Poco
-        // Gravitacional, imobiliza) + OnDamageReceived -> Reflect 30% (Acao e Reacao). ---
+        // --- Newton (Force-Law): Hibrida, Universal, Grupo (N-1, ADR-016 Balde B PR2,
+        // decisao do lider 2026-07-15). Duas faces, roteadas por side_filter (ambas
+        // dissipam-no-lado-errado, no-op+log, nunca lancam):
+        //   OnCast -> ApplyStatus Stun 1t, side_filter EnemyOnly (Poco Gravitacional):
+        //     imobiliza TODOS os inimigos vivos do grupo; o dano-de-ATK que sai da formula
+        //     base ja acerta o mesmo grupo (power segue 0, so o ATK do conjurador conta).
+        //     Em aliado, dissipa (a face ofensiva nao recai no proprio time).
+        //   OnCast -> ApplyStatus Reflect (status, magnitude=percent), side_filter AllyOnly
+        //     (N-3, modo-aliado): concede Reflect 30%/3t ao ALIADO alvo (ramo assimetrico
+        //     de resolve_targets - Grupo mirando um aliado vira single nesse 1 aliado). Em
+        //     inimigo, dissipa.
+        // OnDamageReceived -> Reflect (passiva-propria do dono, INTOCADA): se o proprio
+        // dono TAMBEM tiver o Reflect-status (ex. auto-cast), as duas fontes SOMAM (N-4,
+        // apply_damage_with_hooks honra as duas separadamente - de graca, sem wiring
+        // extra aqui). ---
         make_special(
             "newton", "CARD_EXEC_NEWTON_NAME", CardFamily::Universal, CardCategory::Hibrida,
             kActiveManaCost,
@@ -111,10 +131,19 @@ std::unordered_map<std::string, Card> assemble() {
                        .kind = EffectKind::ApplyStatus,
                        .duration = 1,  //PLAYTEST duracao do Stun (1 turno).
                        .status = StatusId::Stun,
-                       .stack_rule = StackRule::Replace},
+                       .stack_rule = StackRule::Replace,
+                       .side_filter = SideFilter::EnemyOnly},
+             EffectSpec{.trigger = TriggerHook::OnCast,
+                       .kind = EffectKind::ApplyStatus,
+                       .magnitude = kNewtonReflectPercent,  // status.magnitude = fracao %.
+                       .duration = kNewtonReflectDuration,  //PLAYTEST 3 turnos.
+                       .status = StatusId::Reflect,
+                       .stack_rule = StackRule::Refresh,
+                       .side_filter = SideFilter::AllyOnly},
              EffectSpec{.trigger = TriggerHook::OnDamageReceived,
                        .kind = EffectKind::Reflect,
-                       .percent = kNewtonReflectPercent}}),
+                       .percent = kNewtonReflectPercent}},
+            /*ignores_weakness_wheel=*/false, /*power=*/0, /*target_shape=*/TargetShape::Grupo),
 
         // --- Pythagoras (Hypotenuse): Passiva, Universal, mana 0. OnRoundEnd ->
         // HypotenuseCombo (golpe-bonus quando >=2 aliados batem no mesmo alvo). ---

@@ -230,6 +230,64 @@ sitios do dominó); `GusEngine/domain/src/combat/master_cards.cpp` (faraday);
 `docs/design/mecanicas/cartas-technomagik.md` secao 5;
 `docs/design/roster-analogos/_EFEITOS-ESCOLHIDOS.md` (AMB-03).
 
+## Addendum (Balde B, PR2, decisoes do lider 2026-07-15): regra geral "fogo amigo desligado" + Newton/Force-Law
+
+Segundo PR do "Balde B", reusa as DUAS primitivas do PR1 (SideFilter/try_add_status) sem
+EffectKind nem StatusId novos.
+
+- **Regra geral, fogo amigo DESLIGADO (achado da auditoria, corrigido como regra do motor,
+  nao so do Newton):** `resolve_use_card` somava `actor.atk()` no dano-base MESMO quando o
+  `target` era do PROPRIO time do `actor` (a formula `(card.power + actor.atk()) * fatores`
+  nao checava lado) - isso ja quebrava silenciosamente os modos-aliado PRE-EXISTENTES
+  (Einstein/Faraday, PR1 e step 7), que sao pensados como BENEFICIO. Fix: no INICIO do loop
+  `for (CombatActor* target : targets)`, um guard `friendly = target->is_player_side() ==
+  actor.is_player_side()` zera o dano-base (`apply_damage_with_hooks(actor, *target, 0,
+  &card)`, MESMO padrao do ramo imune existente), SEM sortear canal/variancia (0 consumo de
+  RNG nesse alvo) e SEM aplicar status OFENSIVO (`card.status_applied`/`combo->
+  result_status` sao debuffs de INIMIGO). O loop `continue` pro proximo alvo; os
+  `EffectSpec` `OnCast` da carta (que rodam DEPOIS deste loop, sobre os MESMOS `targets`)
+  ficam intactos - o modo-aliado dos EffectSpec (Reflect-status `AllyOnly` do Newton, etc.)
+  continua funcionando normalmente, so o dano-de-ATK bruto e que nao vaza mais pro aliado.
+- **N-1, Poco Gravitacional vira AoE:** `master_cards.cpp::newton` ganha `target_shape =
+  Grupo` (era `Single`). `OnCast -> ApplyStatus Stun` ganha `side_filter = EnemyOnly` -
+  imobiliza (dur 1) TODOS os inimigos vivos do grupo; o dano-de-ATK acompanha o mesmo grupo
+  (o `power` da carta segue 0, so o ATK do conjurador conta na formula-base).
+- **`resolve_targets(TargetShape::Grupo)` consertado (dominó independente, achado durante o
+  PR2):** a versao anterior hardcodava `!is_player_side()` (SEMPRE os atores nao-player,
+  isto e, sempre "os inimigos da party") - se um INIMIGO castasse uma carta Grupo, o alvo
+  virava o PROPRIO time dele (o mesmo bug de lado que `handle_chain_damage`/Tesla ja evitava
+  corretamente com `a->is_player_side() == ctx.caster->is_player_side()`, mas que faltava
+  aqui). Fix: alvos = todos os vivos do lado OPOSTO ao `actor` que joga a carta (nao mais
+  hardcoded pro lado do jogador).
+- **N-3, modo-aliado assimetrico (mesmo padrao ja usado em Einstein/AMB-02 e Faraday/
+  AMB-03):** dentro de `resolve_targets(Grupo)`, se o alvo DECLARADO (`action.target_id`)
+  resolve pra um ator do MESMO lado do `actor`, o retorno vira single (so ESSE 1 aliado),
+  nao o grupo inteiro - a carta virou um cast MIRADO num beneficiario, nao um AoE. Newton
+  ganha um segundo `EffectSpec` `OnCast -> ApplyStatus`, `status = StatusId::Reflect`
+  (ordinal 15, ja existente - reusado como STATUS aplicavel, nao so como
+  `EffectKind::Reflect`), `magnitude = 30` (percent), `duration = 3`, `stack_rule =
+  Refresh`, `side_filter = AllyOnly`: concede Reflect 30%/3 turnos ao aliado alvo. Em
+  inimigo, dissipa (`side_filter` cuida disso, mesmo racional de F-4).
+- **N-4, Reflect-por-STATUS honrado em `apply_damage_with_hooks`:** alem da passiva-propria
+  EQUIPADA (`OnDamageReceived -> Reflect`, ja existente, INTOCADA), `apply_damage_with_hooks`
+  ganhou uma checagem SEPARADA, DEPOIS do guard `damage <= 0` e DEPOIS do despacho
+  `OnDamageReceived`: se `target.status_effects()` tem `StatusId::Reflect`, o `attacker`
+  sofre `lround(damage * status.magnitude / 100.0)` via `CombatActor::take_damage` PURO
+  (MESMA anti-recursao do Reflect equipado - nunca reentra no helper, nunca redispara
+  `OnDamageDealt`/`OnDamageReceived`). Como as duas fontes disparam em PONTOS DIFERENTES do
+  metodo (sem dedup), se o mesmo ator tiver AMBAS (passiva equipada + Reflect-status), elas
+  SOMAM de graca (30%+30% = 60% no caso de referencia) - decisao do criador, nao um efeito
+  colateral acidental. Nenhuma das duas fontes entra em `round_hits_`/`last_action_` (eco de
+  dano, nao um "hit" novo pro combo/RepeatLastAction - mesmo racional do Reflect equipado).
+
+Cross-ref: `GusEngine/domain/src/combat/combat_state_machine.cpp` (guard de fogo amigo no
+loop de `resolve_use_card`; `resolve_targets` Grupo; Reflect-por-status em
+`apply_damage_with_hooks`); `GusEngine/domain/src/combat/master_cards.cpp` (newton, 3
+`EffectSpec` + `target_shape = Grupo`); `GusEngine/domain/tests/techmagic_newton_test.cpp`;
+`GusEngine/domain/tests/combat_state_machine_test.cpp` (regressao Einstein/Faraday-em-aliado,
+tag `[friendlyfire]`); `docs/design/mecanicas/cartas-technomagik.md` secao 9;
+`docs/design/roster-analogos/_EFEITOS-ESCOLHIDOS.md` (AMB-04).
+
 ## Consequencias
 
 - **Positivas:** custo BAIXO-MEDIO, risco BAIXO; numeros 100% tunaveis pra playtest; testavel por unit test por EffectKind; easter-egg entregue hoje; nao fecha porta pra VM. Cada carta = 5-15 linhas de dado.

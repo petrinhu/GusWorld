@@ -1024,3 +1024,155 @@ TEST_CASE("1B-regroup: (d) cursor=0 e round_index correto em cada fronteira; ord
         REQUIRE(sm.active_actor()->id() == "e_fast");
     }
 }
+
+// ----- Fogo amigo DESLIGADO (ADR-016 Balde B PR2, decisao do lider 2026-07-15) -----
+//
+// resolve_use_card::(loop de targets) somava atk do conjurador no dano-base MESMO com
+// alvo do PROPRIO time (a formula (card.power + actor.atk()) * fatores nao checava lado) -
+// quebrava os modos-aliado (Einstein/Faraday/Newton, que sao BENEFICIO). Regra: carta NAO
+// causa dano-base em alvo do proprio time; so o efeito (status/OnCast) roda.
+
+namespace {
+
+// RNG que CONTA consumos (duplo local, mesmo padrao de CountingRandomSm acima - mantido
+// self-contido neste bloco pra nao alterar a visibilidade dos helpers ja existentes).
+class CountingRandomFriendlyFire final : public IRandomSource {
+public:
+    double next_double() override { ++double_calls; return 0.5; }
+    int next(int max_value) override {
+        ++int_calls;
+        return max_value <= 0 ? 0 : std::min(99, max_value - 1);
+    }
+    int int_calls = 0;
+    int double_calls = 0;
+};
+
+}  // namespace
+
+TEST_CASE("fogo amigo desligado: conjurador atk>0 joga carta de dano num ALIADO -> HP "
+         "inalterado, ZERO consumo de RNG nesse alvo",
+         "[domain][combat][fsm][friendlyfire]") {
+    CombatActor h = hero("gus", 30, 20, /*atk=*/10, /*def=*/2);
+    CombatActor buddy = hero("buddy", 30, 5, /*atk=*/0, /*def=*/0);
+
+    const Card card = make_estimate_card(CardFamily::Eletrico, /*power=*/0);
+    auto reg = single_card_registry(card);
+    CountingRandomFriendlyFire rng;
+    CombatStateMachine sm({&h, &buddy}, play_card_once(card.id, buddy.id()), &reg, nullptr,
+                          &rng);
+
+    sm.begin_turn();
+    sm.run_active_turn_to_end();
+
+    REQUIRE(buddy.hp() == buddy.max_hp());  // atk>0 do conjurador NAO vazou pro aliado.
+    REQUIRE(rng.int_calls == 0);            // nenhum sorteio de canal neste alvo.
+    REQUIRE(rng.double_calls == 0);         // nenhuma variancia sorteada neste alvo.
+    REQUIRE(log_has(sm, CombatActionType::UseCard, "fogo amigo desligado"));
+}
+
+TEST_CASE("fogo amigo desligado: carta em INIMIGO com atk>0 -> dano normal (caminho "
+         "ofensivo intacto)",
+         "[domain][combat][fsm][friendlyfire]") {
+    CombatActor h = hero("gus", 30, 20, /*atk=*/10, /*def=*/2);
+    CombatActor e = foe("enemy", 30, 10, /*atk=*/6, /*def=*/0);
+
+    const Card card = make_estimate_card(CardFamily::Eletrico, /*power=*/0);
+    auto reg = single_card_registry(card);
+    CountingRandomFriendlyFire rng;
+    CombatStateMachine sm({&h, &e}, play_card_once(card.id, e.id()), &reg, nullptr, &rng);
+
+    sm.begin_turn();
+    sm.run_active_turn_to_end();
+
+    REQUIRE(e.hp() < e.max_hp());  // dano REAL aplicado no inimigo.
+    REQUIRE(rng.int_calls == 1);   // 1 sorteio de canal, caminho ofensivo normal.
+}
+
+namespace {
+
+// Duplos LOCAIS de Einstein/Faraday (mesmo SHAPE de MasterCards, mana_cost=0 pra focar no
+// fix da Parte A, nao no ramp de mana da FSM - mesma convencao "cartas de teste nunca do
+// registry de producao" ja usada em techmagic_delay_test.cpp/techmagic_faraday_test.cpp).
+Card einstein_test_card(const std::string& id) {
+    Card c;
+    c.id = id;
+    c.display_name = id;
+    c.family = CardFamily::Cinetico;
+    c.base_type = CardBaseType::Glifo;
+    c.mana_cost = 0;
+    c.ap_cost = 1;
+    c.power = 0;
+    c.target_shape = TargetShape::Single;
+    c.tier = CardTier::Especial;
+    c.category = CardCategory::Ativa;
+    c.effects = {EffectSpec{.trigger = TriggerHook::OnCast,
+                            .kind = EffectKind::DelayAction,
+                            .magnitude = 0}};  // 0 = "ao extremo" (fim/adianta ao maximo).
+    return c;
+}
+
+Card faraday_test_card(const std::string& id) {
+    Card c;
+    c.id = id;
+    c.display_name = id;
+    c.family = CardFamily::Eletrico;
+    c.base_type = CardBaseType::Glifo;
+    c.mana_cost = 0;
+    c.ap_cost = 1;
+    c.power = 0;
+    c.target_shape = TargetShape::Single;
+    c.tier = CardTier::Especial;
+    c.category = CardCategory::Hibrida;
+    c.effects = {EffectSpec{.trigger = TriggerHook::OnCast,
+                            .kind = EffectKind::ApplyStatus,
+                            .duration = 3,
+                            .status = StatusId::BlindagemEM,
+                            .stack_rule = StackRule::Refresh,
+                            .side_filter = SideFilter::AllyOnly}};
+    return c;
+}
+
+}  // namespace
+
+TEST_CASE("fogo amigo desligado (regressao Einstein-em-aliado): conjurador atk>0, Einstein "
+         "num aliado -> aliado avanca na fila E NAO toma dano (o fix conserta "
+         "retroativamente o que ja foi pushado pro DelayAction)",
+         "[domain][combat][fsm][friendlyfire]") {
+    CombatActor h = hero("gus", 999, /*spd=*/50, /*atk=*/10, /*def=*/2);
+    CombatActor decoy = hero("decoy", 999, /*spd=*/8, /*atk=*/0, /*def=*/0);
+    CombatActor buddy = hero("buddy", 30, /*spd=*/3, /*atk=*/0, /*def=*/0);
+    CombatActor e = foe("enemy", 999, /*spd=*/1);
+
+    const Card einstein = einstein_test_card("techmagic.friendlyfire.einstein");
+    auto reg = single_card_registry(einstein);
+    CombatStateMachine sm({&h, &decoy, &buddy, &e},
+                          play_card_once(einstein.id, buddy.id()), &reg);
+
+    REQUIRE(order_ids(sm) == std::vector<std::string>{"gus", "decoy", "buddy", "enemy"});
+
+    sm.begin_turn();  // cursor=0, current=gus.
+    sm.run_active_turn_to_end();
+
+    // Espelho beneficio (Einstein/DelayAction, ally-favor): buddy avancou pro slot logo
+    // apos o cursor (index 1, trocou de lugar com decoy).
+    REQUIRE(order_ids(sm) == std::vector<std::string>{"gus", "buddy", "decoy", "enemy"});
+    REQUIRE(buddy.hp() == buddy.max_hp());  // fix Parte A: sem dano-de-atk no aliado.
+}
+
+TEST_CASE("fogo amigo desligado (regressao Faraday-em-aliado): conjurador atk>0, Faraday "
+         "num aliado -> aliado ganha BlindagemEM e NAO toma dano",
+         "[domain][combat][fsm][friendlyfire]") {
+    CombatActor h = hero("gus", 30, 20, /*atk=*/10, /*def=*/2);
+    CombatActor buddy = hero("buddy", 30, 5, /*atk=*/0, /*def=*/0);
+    CombatActor e = foe("enemy", 30, 1);
+
+    const Card faraday = faraday_test_card("techmagic.friendlyfire.faraday");
+    auto reg = single_card_registry(faraday);
+    CombatStateMachine sm({&h, &buddy, &e}, play_card_once(faraday.id, buddy.id()), &reg);
+
+    sm.begin_turn();
+    sm.run_active_turn_to_end();
+
+    REQUIRE(buddy.index_of_status(StatusId::BlindagemEM) >= 0);
+    REQUIRE(buddy.hp() == buddy.max_hp());  // fix Parte A: sem dano-de-atk no aliado.
+}

@@ -742,6 +742,29 @@ void CombatStateMachine::apply_damage_with_hooks(CombatActor& attacker, CombatAc
     techMagic::TechMagicContext received_ctx{&target, &attacker, damage, &log_};
     techMagic::execute_equipped(TriggerHook::OnDamageReceived, target, card_registry_,
                                 received_ctx);
+
+    // Reflect-por-STATUS (Newton N-3/N-4, ADR-016 Balde B PR2): alem da passiva EQUIPADA
+    // (handler acima, disparado via OnDamageReceived), um StatusId::Reflect NO ALVO
+    // (concedido por Newton em modo-aliado, ver master_cards.cpp) TAMBEM reflete -
+    // checagem SEPARADA, DEPOIS do guard damage<=0 acima (imune/FALHA nunca reflete).
+    // take_damage PURO (anti-recursao, mesmo padrao do handler de Reflect equipado): NUNCA
+    // reentra neste helper, entao nunca redispara OnDamageDealt/OnDamageReceived. N-4 (as
+    // duas fontes somam) sai DE GRACA: a passiva equipada e o status disparam em pontos
+    // DIFERENTES deste metodo, sem logica extra de soma. NAO entra em round_hits_/
+    // last_action_ (mesmo racional do Reflect equipado - eco de dano, nao um "hit" novo
+    // pro combo/RepeatLastAction).
+    for (const StatusEffect& s : target.status_effects()) {
+        if (s.id != StatusId::Reflect) continue;
+        const int reflected = static_cast<int>(
+            std::lround(static_cast<double>(damage) * static_cast<double>(s.magnitude) / 100.0));
+        if (reflected <= 0) break;
+        attacker.take_damage(reflected);
+        log_.push_back(CombatLogEntry{
+            target.id(), CombatActionType::UseCard, attacker.id(), reflected,
+            target.id() + " reflete " + std::to_string(reflected) + " de volta em " +
+                attacker.id() + " (status Reflect)."});
+        break;  // 1 entrada por StatusId (insert_or_stack_status nao duplica).
+    }
 }
 
 void CombatStateMachine::apply_offensive_status(CombatActor& actor, CombatActor& target,
@@ -954,6 +977,28 @@ void CombatStateMachine::resolve_use_card(CombatActor& actor, const CombatAction
     std::vector<std::pair<CombatActor*, int>> hits;
 
     for (CombatActor* target : targets) {
+        // Fogo amigo DESLIGADO (regra geral, decisao do lider 2026-07-15, Balde B PR2):
+        // carta NAO causa dano-base em alvo do PROPRIO time - so o efeito roda. Sem isso,
+        // o dano-base = (card.power + actor.atk()) * fatores somava o ATK do conjurador
+        // mesmo com power==0, machucando o proprio aliado nos modos-aliado (Einstein/
+        // Faraday/Newton, que sao BENEFICIO). Dano 0 via o MESMO helper do ramo imune
+        // abaixo (apply_damage_with_hooks com damage=0 - o guard damage<=0 la dentro ja
+        // suprime os hooks OnDamageDealt/OnDamageReceived, mesmo padrao), SEM sortear
+        // canal/variancia (0 consumo de RNG neste alvo) e SEM aplicar status OFENSIVO
+        // (card.status_applied/combo->result_status sao debuffs de INIMIGO - pular pra
+        // aliado). O loop CONTINUA pro proximo alvo; os EffectSpec OnCast da carta (ex.
+        // Reflect-status AllyOnly do Newton) rodam DEPOIS deste loop, com seu proprio
+        // side_filter, fora deste guard.
+        const bool friendly = target->is_player_side() == actor.is_player_side();
+        if (friendly) {
+            apply_damage_with_hooks(actor, *target, 0, &card);
+            log_.push_back(CombatLogEntry{
+                actor.id(), CombatActionType::UseCard, target->id(), 0,
+                actor.id() + " compila " + card.id + " em " + target->id() +
+                    " (aliado, fogo amigo desligado): dano 0."});
+            continue;
+        }
+
         // Defesa neutra do compilador universal (secao 6.1): alvo universal => mult 1.0.
         const float mult_fraqueza =
             target->is_universal_compiler()
@@ -1113,10 +1158,26 @@ std::vector<CombatActor*> CombatStateMachine::resolve_targets(CombatActor& actor
         case TargetShape::Grupo:
         case TargetShape::Area3x3:
         case TargetShape::Linha: {
-            // Simplificacao do slice: aplica a todos os inimigos vivos.
+            // DOMINO consertado (Balde B PR2, achado de auditoria): a versao anterior
+            // hardcodava "!is_player_side()" (sempre os inimigos) - se um INIMIGO castasse
+            // uma carta Grupo, o alvo virava o proprio time dele. O lado-alvo correto e
+            // sempre o OPOSTO ao `actor` que joga a carta (mesmo guard do ChainDamage,
+            // handle_chain_damage, que ja acertava isto).
+            //
+            // Ramo assimetrico (Newton modo-aliado, N-3): se o alvo DECLARADO
+            // (action.target_id) resolve pra um ator do MESMO lado de `actor`, o cast e um
+            // BENEFICIO mirado - devolve so ESSE aliado (single), nao o grupo inteiro.
+            // Ausente/nao encontrado/do lado oposto (o caso comum, ofensivo) => devolve
+            // TODOS os vivos do lado OPOSTO ao actor.
+            CombatActor* declared = action.target_id.has_value()
+                                        ? find_in_order(queue_, *action.target_id)
+                                        : nullptr;
+            if (declared != nullptr && declared->is_player_side() == actor.is_player_side())
+                return {declared};
+
             std::vector<CombatActor*> out;
             for (CombatActor* a : queue_.order())
-                if (!a->is_player_side() && a->is_alive())
+                if (a->is_player_side() != actor.is_player_side() && a->is_alive())
                     out.push_back(a);
             return out;
         }
