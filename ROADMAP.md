@@ -38,17 +38,21 @@ A migração é faseada anti big-bang: cada marco fecha pelo seu critério de sa
 | Marco | Status | O que é |
 |---|---|---|
 | M0 Andaime | 🔍 | Repo C++ + CMake + presets + framework de teste. Build Linux verde + `ctest` passando |
-| M1 Janela + loop + sprite | 🔍 | Janela + loop de tempo fixo + render2d + input. Boneco anda no mapa, câmera presa ao mapa. Fronteira já reescrita em SDL3 (ver re-pivot abaixo) |
-| M2 Input | 🔍 | Eventos para ações lógicas + input_remap + persistência de controles + save V4 ([ADR-007](docs/tech/adr/ADR-007-controls-json-hash128-save-v4.md)). Falta backend de evento + I/O em disco |
+| M1 Janela + loop + sprite | ✅ | Janela + loop de tempo fixo + render2d + input. Boneco anda no mapa, câmera presa ao mapa. Validado no display do líder (2026-06-23). Fronteira reescrita em SDL3 (ver re-pivot abaixo) |
+| M2 Input | ✅ | Eventos para ações lógicas + input_remap + persistência de controles + save V4 ([ADR-007](docs/tech/adr/ADR-007-controls-json-hash128-save-v4.md)). Validado ao vivo pelo líder de ponta a ponta (2026-07-07) |
 | M3 Lógica pura portada | ✅ | Save + i18n + progression + templates em POCO C++ puro. 174 testes verdes, cripto bate vetores FIPS/RFC ([ADR-006](docs/tech/adr/ADR-006-crypto-hmac-formato-domain.md)), auditado |
-| M4 Cena top-down | 🔍 | Tilemap + colisão de grade + clamp de câmera (lógica pura feita). Falta a metade visual (tilemap render na plataforma) |
-| M5 Combate + tela de batalha | 🔄 | Motor `turn_combat` portado e endurecido (fórmula de dano §11 evoluída e auditada, ver M5-DMG). BattleScreen cockpit "Tático" entregue via glintfx (paridade visual + dados vivos + rodada de polish visual aprovada, [ADR-010](docs/tech/adr/ADR-010-adopt-glintfx-embed-mode.md)) |
-| M6 Áudio | ⏳ | Camada de áudio (miniaudio) + música + SFX + fade entre telas |
-| M7 Paridade jogável | ⏳ | Loop completo (andar, NPC, combate, save, carregar) 100% na engine nova, sem Godot |
-| M8 Decommission | ⏳ | Apagar Godot + C# + addons. Repo compila e roda sem nenhum bit do stack antigo |
+| M4 Cena top-down | ✅ | Loop jogável fechado e validado ao vivo pelo líder (2026-06-23): tilemap + colisão de grade + clamp de câmera + render na plataforma |
+| M5 Combate + tela de batalha | ✅ | Motor `turn_combat` portado inteiro (~200 testes de combate) + BattleScreen cockpit "Tático" entregue via glintfx (paridade visual + dados vivos + rodada de polish, [ADR-010](docs/tech/adr/ADR-010-adopt-glintfx-embed-mode.md)). Saída "overworld → batalha → resultado → volta" validada ao vivo pelo líder (fechado 2026-07-07) |
+| M6 Áudio | ✅ | Camada de áudio (miniaudio) + música + SFX + fade entre telas. Crossfade cidade↔arena validado ao vivo pelo líder (concluído 2026-07-03) |
+| M7 Paridade jogável | ⏳ | Loop completo (andar, NPC, combate, save, carregar) 100% na engine nova, sem Godot. Todos os pré-requisitos técnicos entregues (M2/M5/M6/M7-DIALOGO/SAVE-LOAD-UI ✅); falta só o playthrough de ~5min ao vivo do líder para fechar o marco |
+| M8 Decommission | ⏳ | Apagar Godot + C# + addons. Repo compila e roda sem nenhum bit do stack antigo. Gate de build Windows já PRÉ-CUMPRIDO (CI Windows real MSVC verde desde 2026-07-14) |
 | M9 Higienização | ⏳ | Limpar a árvore pós-porte, remover resíduo do stack antigo, normalizar `GusEngine/` |
 
-Ordem real de execução: M0, depois M1 e M3 em paralelo, depois M2, M4, M5, M6, M7, M8, M9.
+Ordem real de execução: M0, depois M1 e M3 em paralelo, depois M2, M4, M5, M6, M7, M8, M9. M0-M6 e M7-DIALOGO estão entregues; M7 (milestone de paridade) é o único item bloqueando M8/M9, e depende só de uma validação ao vivo do líder, não de código pendente.
+
+### Onda paralela: motor de cartas techMagic (não bloqueia o M7)
+
+Onda `CARDS`, paralela ao board M0-M9 (não faz parte da fila de marcos, roda em paralelo desde 2026-07-14). Executor de conjuros `techMagic` data-driven ([ADR-016](docs/tech/adr/ADR-016-techmagic-effect-engine-data-driven.md)): MVP dos 5 steps entregue (records/enums, dispatcher de hooks, ledger cross-ator, catálogo de 8 cartas, RepeatLastAction) + EffectKinds adicionais entregues desde então (ChainDamage/Tesla, DelayAction/Einstein, o "Balde B" Faraday/Newton/Gödel). Cada EffectKind novo é verificado adversarialmente (mutation testing por `qa-engineer`, revisor distinto do implementador) antes de fechar. Próximo da fila: DamageQuantize/Planck. Detalhe completo em [ADR-016](docs/tech/adr/ADR-016-techmagic-effect-engine-data-driven.md), [`docs/design/mecanicas/cartas-technomagik.md`](docs/design/mecanicas/cartas-technomagik.md) e [TODO.md](TODO.md) (linha `CARD-ENGINE-MANIFESTO`). Paralelo a essa onda: a estética visual de "terminal" para logs de combate e telas de sistema (design fechado, implementação em curso).
 
 ### Re-pivot da plataforma: Qt6 para SDL3 (3 fases)
 
@@ -57,8 +61,8 @@ A camada de plataforma deixou de ser Qt6 e passou a ser SDL3 + RmlUi + miniaudio
 | Fase do re-pivot | Status | Escopo | Marco do board |
 |---|---|---|---|
 | Fase 1 (fronteira M1) | ✅ | platform/window + render2d (`SDL_Renderer`) + input com gamepad; sprite do Cauã reintegrado; smoke headless `SDL_VIDEODRIVER=dummy`; backend Qt aposentado | M1 |
-| Fase 2 (metades visuais) | 🔄 | A metade visual de M2 (input/IO) e M4 (tilemap render) nasce em SDL | M2, M4 |
-| Fase 3 (UI do jogador) | 🔄 | Menus, batalha estilo Pokémon, diálogo, inventário via glintfx (embed mode, [ADR-010](docs/tech/adr/ADR-010-adopt-glintfx-embed-mode.md)); cockpit "Tático" da batalha entregue | M5+ |
+| Fase 2 (metades visuais) | ✅ | A metade visual de M2 (input/IO) e M4 (tilemap render) nasceu em SDL | M2, M4 |
+| Fase 3 (UI do jogador) | 🔄 | Menus, batalha estilo Pokémon, diálogo, inventário via glintfx (embed mode, [ADR-010](docs/tech/adr/ADR-010-adopt-glintfx-embed-mode.md)). Entregues: cockpit "Tático" da batalha, menu de pausa + config (áudio/controles), tela de save/load com avisos, diálogo (caixa quente + tela-terminal), tela de dificuldade. Em curso: estética "terminal" para logs de combate, targeting de aliado nas cartas do Balde B | M5+ |
 
 ---
 
@@ -86,7 +90,7 @@ Depois que o slice provar o jogo e a engine atingir paridade jogável (M7) e dec
 - **Produção (`v0.5.x`-`v0.9.x`):** conteúdo completo, balanceamento, gates de a11y para v1.0.0.
 - **Beta (`v0.9.x`):** beta fechada, bug bash, localização en-intl (dev em pt-br; tradução pós-1.0).
 - **Release (`v1.0.0`):** Linux + Windows. Vol 1 (livro lore-bible) + Vol 2 (antologia narrativa).
-- **Wiki + doc para iniciante:** após a tag de versão, Wiki nativa do repo + documentação `.md` didática para iniciante em computação (derivada de `docs/`, não duplica).
+- **Wiki + doc para iniciante:** uma wiki inicial ("starter") já foi publicada em 2026-07-14 nos dois remotos (Codeberg, bilíngue EN/PT, foco técnico/contribuidor; GitHub, PT-br, foco leigo/iniciante). A versão completa e ainda mais didática, cobrindo tudo em detalhe (derivada de `docs/`, não duplica), fica para depois da tag de versão.
 
 ---
 
@@ -133,11 +137,11 @@ As viradas de stack e os contratos irreversíveis estão registrados em [`docs/t
 
 ## Roadmap VS — Now / Next / Later
 
-**Atualizado 2026-06-23 (pos-pivot SDL3, board M0-M9; game-producer).** O LOOP JOGAVEL (M4) fechou e foi validado no display; o proximo pilar e o COMBATE (M5 BattleScreen). WIP=2 frentes de codigo (conlang fora do WIP; sprites bloqueados nao contam).
+**Atualizado 2026-07-15 (pós-M6, mirror+Wiki publicados, onda `CARDS` em curso; sincronizado com [TODO.md](TODO.md)).** M0-M6 e M7-DIALOGO estão entregues; o M7 (paridade jogável, fecha o board da migração) só espera o playthrough ao vivo do líder. Em paralelo ao board, a onda `CARDS` (motor de cartas techMagic) avança um `EffectKind` por vez.
 
-| Now (CONCLUIDO) | Next (proxima onda) | Later |
+| Now (CONCLUÍDO) | Next (próxima onda) | Later |
 |---|---|---|
-| **M0-M5 motor portado** C++/SDL (save/i18n/progression/templates/combat/crypto); M3 e M5-DMG auditados | **M5 BattleScreen** (motor turn_combat ja portado/auditado; falta a apresentacao): comecar pelo BRAINSTORM da tela (layout, posicoes, UI de cartas, transicao overworld->batalha->volta, feel Pokemon) | **Tiled** + pipeline de mapas (brainstorm lore -> blockout level-designer -> .tmj -> compilador -> .gmap) |
-| **M1 visual** (janela+loop+sprite SDL) validado | Trilha de ARTE em paralelo (a 2a vaga do WIP): re-arte do walk com pe-plantado (zera foot-slide) + **ARTE-RESP-4DIR** (respiracao nas 4 direcoes) | **M6 audio** (miniaudio), M7 paridade jogavel, M8 decommission Godot/C#, M9 higiene |
-| **M4 loop jogavel** (cidade do .gmap selado HMAC+UUID + camera/zoom + walk polido + anti-deslize) | (Sprites: **76 secundarios** bloqueados pela API PixelLab/500; re-rodar em lote quando estabilizar) | **Conlang Sylvarin** (paralelo organico): mutacoes, deriva historica, escrita cifrada |
-| Mecanica **Carga do Aparato** canonizada (numeros) | **COMBATE-AUTOKILL** (INBOX, parametros fechados): canonizar no combat.md DENTRO do M5 | **ARTE-DIAGONAL-8DIR** (decisao 4-dir vs 8-dir) |
+| **M0-M6 motor+plataforma portados** (save/i18n/progression/templates/combat/crypto/áudio) em C++20+SDL3; M3, M5-DMG e M6 auditados/validados ao vivo | **M7 (fechar o milestone):** falta só o playthrough de ~5min ao vivo do líder (todo o resto — M2/M5/M6/M7-DIALOGO/SAVE-LOAD-UI — já está ✅) | **M8 Decommission** (apagar Godot/C#/addons; gate de build Windows já pré-cumprido) + **M9 Higienização** |
+| **M7-DIALOGO** (runtime de diálogo POCO, [ADR-014](docs/tech/adr/ADR-014-dialogue-runtime-poco.md)) + **DIALOGO-TERMINAL** (tela-terminal/caixa-quente) entregues e testados ao vivo | **Onda `CARDS`** (motor de cartas techMagic, [ADR-016](docs/tech/adr/ADR-016-techmagic-effect-engine-data-driven.md)): próximo EffectKind = DamageQuantize/Planck; resíduos de UI (targeting de aliado do Balde B) | **ARTE-DIAGONAL-8DIR** (decisão 4-dir vs 8-dir pendente) |
+| **Mirror GitHub + Wiki (GitHub e Codeberg) + AI-DISCLOSURE.md** publicados (2026-07-14); CI Windows real (MSVC) verde | **Estética "terminal"** para logs de combate e telas de sistema (design fechado, implementação em curso) | Sistema de deck/mão (brainstorm inicial, ainda sem decisão fechada) |
+| **CARD-ENGINE-MANIFESTO em curso:** ChainDamage/Tesla, DelayAction/Einstein e o "Balde B" (Faraday/Newton/Gödel) entregues e verificados adversarialmente | **CARTAS-BALANCEAMENTO:** statlines finais das 20 cartas dos mestres + playtest N=3 dos valores exatos | **Conlang Sylvarin** (paralelo orgânico): mutações, deriva histórica, escrita cifrada |

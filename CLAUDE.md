@@ -2,17 +2,24 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-## Estado atual
+## Estado atual (vigente — atualizado 2026-07-15)
+
+**Stack vigente: C++20 + SDL3 + glintfx/RmlUi.** Solo indie, Linux (v1.0.0) + Windows (pós-v1, CI real MSVC já validado), single-player puro. Gênero: RPG + Puzzle + Aventura + combate turn-based, **visual 2D estilizado** (sprites/pixel art, não 3D). Ver "Decisões fechadas" abaixo para a stack completa e os ADRs.
+
+**Board M0-M9 (migração da engine, ver ROADMAP.md/TODO.md para o board vivo):** M0-M6 entregues e M7-DIALOGO entregue; só falta o playthrough ao vivo do líder para fechar o M7 (paridade jogável). M8 (decommission Godot/C#) e M9 (higienização) vêm depois. Em paralelo ao board, a onda `CARDS` desenvolve o motor de cartas techMagic ([ADR-016](docs/tech/adr/ADR-016-techmagic-effect-engine-data-driven.md)).
+
+**Mirror + Wiki publicados (2026-07-14):** repo espelhado em `petrinhu/GusWorld` no GitHub (push dual-remote) além do Codeberg canônico; Wiki inicial publicada nos dois remotos (Codeberg bilíngue EN/PT para contribuidor técnico; GitHub PT-br para leigo/iniciante); `AI-DISCLOSURE.md` adicionado.
+
+**Deep-lore canon entregue (~365k pal):** Era 1 §§1-10 (~318k), R2 Facções (22k, 7 docs), R3 Settings (25k, 8 docs). Deep-lore restante segue PARALELO ORGÂNICO (não bloqueia código), entrando entre steps técnicos.
+
+<details>
+<summary>Histórico — Fase 1 → Fase 2 e a era Godot (superado, mantido por registro; ver "Decisões fechadas" para o vigente)</summary>
 
 **Início do projeto: 2026-05-15** (primeiro commit `97ed2fe`, Fase 1 concepção + deep-lore).
 
-**PIVOT Fase 1 → Fase 2 (ADR-001, 2026-05-19).** Solo indie G1, Godot 4.6.stable.mono instalado (`~/.local/bin/godot`), PC Linux+Windows, single-player puro. Gênero: RPG + Puzzle + Aventura + combate turn-based. Câmera 3/4 rotacional + zoom orbital (Chrono Trigger reference, mas 3D real).
+**PIVOT Fase 1 → Fase 2 (ADR-001, 2026-05-19).** Na época: Godot 4.6.stable.mono instalado (`~/.local/bin/godot`), C# .NET 8 AOT (ADR-002), câmera 3/4 rotacional + zoom orbital (Chrono Trigger reference, mas 3D real). Essa decisão de engine/câmera/visual foi **SUPERADA por dois pivôs de stack em sequência**: (1) Godot+C# → C++ com Qt6 (decisão RF-1/RF-7, brainstorm bigtech 2026-06-21); (2) Qt6 → C++20+SDL3 ([ADR-008](docs/tech/adr/ADR-008-repivot-qt-to-sdl3.md), 2026-06-22) — a tentativa Qt6 nunca chegou a ter jogo jogável antes do segundo pivô. O jogo nunca chegou a ser 3D em produção. O "porquê" de cada pivô está documentado nos ADRs (`docs/tech/adr/`), matéria do "cemitério de ideias mortas" do projeto.
 
-**Deep-lore canon entregue (~365k pal):** Era 1 §§1-10 (~318k), R2 Facções (22k, 7 docs), R3 Settings (25k, 8 docs).
-
-**Deep-lore restante PARALELO ORGÂNICO** (não bloqueia código): F1-DL.4-9 + F1-DL.REFAC (~111k pal restantes) entram entre steps técnicos conforme necessidade ou descanso criativo. Ver `docs/tech/adr/ADR-001-pivot-lore-to-engine.md`.
-
-**Fase 2 ativa:** vertical slice (4-6 meses meta) — engine modular reutilizável + 1 área cidade + 1 encontro turn-based + 1 puzzle Vetor Gambito.
+</details>
 
 ### Modo de trabalho com agentes (CRÍTICO — REGRA CANÔNICA INQUEBRÁVEL)
 
@@ -33,16 +40,18 @@ Bloco "Modo de operação" inserido em cada agent em `~/.claude/agents/`.
 
 **Dever de contra-argumentar (canonizado 2026-05-30):** Agentes NÃO devem aceitar decisões cegamente. Se uma decisão do criador for destrutiva, violar pillar, quebrar dependência de ondas, ou inviabilizar milestone — o agente DEVE contra-argumentar antes de executar. Tom: direto, sem rodeios. Formato: (1) nomeie a decisão, (2) explique o risco específico, (3) proponha alternativa, (4) deixe a decisão final com o criador via AskUserQuestion. O criador tem autoridade final — o agente executa após a resposta — mas o silêncio passivo NÃO é aceitável.
 
-### Decisões fechadas
+### Decisões fechadas (vigentes)
 
-- **Engine:** Godot 4 + **C# .NET 8 AOT** (revisão ADR-002 2026-05-19). Decisão anterior GDScript canonizada em ADR-001 superada por critério "máxima performance em máquinas fracas". GDScript MAY pra tooling editor-only. C++ GDExtension sob pressão de perf medida. Ver `docs/tech/adr/ADR-002-csharp-aot-over-gdscript.md`.
-- **Visual:** 3D estilizado low-poly (Sea of Stars / Sable / Death's Door refs). Sem PBR. Gradient atlas + vertex color. ~5 shaders custom.
-- **Arquitetura:** engine modular reutilizável (`/engine/`) separada do game-specific (`/game/`). Engine vira repo próprio + Godot addons.
-- **Save format:** JSON versionado `save_version: 1` com migrators desde D1.
-- **Localização:** Godot `tr()` + CSV. ICU recusado pra G1.
-- **CI:** Forgejo Actions (esqueleto em `docs/tech/build.md`).
-- **Plataformas:** Linux (AppImage/.tar.gz) + Windows (sem signing em G1).
-- **UI/HUD (pós-pivot C++/SDL3):** servida pelo **glintfx** via embed mode (`glintfx::UiLayer`), que embrulha RmlUi 6.3 + backend GL3 e compõe sobre o contexto GL da casca SDL; o backend RmlUi vendorizado à mão foi aposentado. Consumido via FetchContent (pin atual em `GusEngine/CMakeLists.txt`, `GLINTFX_BACKEND_GLFW=OFF`). Ver `docs/tech/adr/ADR-010-adopt-glintfx-embed-mode.md`. _(Os bullets de engine/visual/arquitetura acima são da era Godot/C# e ficaram defasados pelo pivot para C++20 + SDL3; ver README.md, ROADMAP.md e ADR-008/ADR-010 para o estado atual.)_
+- **Engine/linguagem:** **C++20 + SDL3**, engine própria escrita do zero, single repo (não `/engine/` + `/game/` separados; ver "Estrutura de repositório" abaixo). Substitui Godot/C# (ADR-001/ADR-002) e a tentativa intermediária com Qt6 (RF-1/RF-7). Ver `docs/tech/adr/ADR-008-repivot-qt-to-sdl3.md` e `docs/tech/pivot/engine-design.md`.
+- **Visual:** **2D estilizado** (sprites/pixel art via PixelLab, não 3D). Cockpit de batalha "Tático" com retratos, moldura de carta e HUD com barras de HP/AP/Mana. Referências de sensação: Chrono Trigger / Sea of Stars / Stardew Valley na exploração; Pokémon na apresentação de batalha.
+- **Arquitetura:** 4 camadas dentro de `GusEngine/` — `core/` (POCO genérico: tempo, RNG, ECS leve, recursos, eventos) → `domain/` (POCO das regras do jogo: save, i18n, progressão, templates, combate, diálogo) → `platform/` (única fronteira que toca bibliotecas externas: SDL3/GL/RmlUi/miniaudio — janela, render2d, input, áudio, arquivos) → `app/` (telas do jogo, gameplay, ferramentas internas). Regra: cada camada só depende das de baixo, nunca o contrário; gate de CI proíbe violação (inclusive `<glintfx` vazando pra `core`/`domain`).
+- **UI/HUD:** servida pelo **glintfx** via embed mode (`glintfx::UiLayer`), que embrulha RmlUi 6.3 + backend GL3 e compõe sobre o contexto GL da casca SDL; o backend RmlUi vendorizado à mão foi aposentado. Consumido via FetchContent (pin atual em `GusEngine/CMakeLists.txt`, `GLINTFX_BACKEND_GLFW=OFF`). Ver `docs/tech/adr/ADR-010-adopt-glintfx-embed-mode.md`.
+- **Motor de cartas (magia = software, na prática):** executor de conjuros `techMagic`, data-driven (não VM), com `EffectKind` por carta especial (ChainDamage/Tesla, DelayAction/Einstein, EM-Shield/Faraday, AoE-Stun/Newton, Null-Proof/Gödel, etc.), um handler por vez, cada um coberto por TDD + mutation testing adversarial. Ver `docs/tech/adr/ADR-016-techmagic-effect-engine-data-driven.md` (NÃO editar esse ADR nem `docs/design/mecanicas/combat.md`/`cartas-technomagik.md` a partir desta sessão — em edição ativa por outro agente).
+- **Save format:** JSON versionado com **AEAD (XChaCha20/Monocypher) + HMAC-SHA256** cifrando e autenticando o save inteiro (ADR-006, ADR-007 save V4, ADR-015 save security v2), migrators desde D1. Anti-tamper e anti-rollback são mais fortes no modo Hardcore (machine-bind, âncora selada).
+- **Localização (i18n):** dev em pt-br; chaves i18n custom (`pt_br.md`/`en_intl.md`) consumidas por um translator C++ próprio (não Godot `tr()`, não ICU). Tradução en-intl planejada pós-v1.0.0.
+- **CI:** Forgejo Actions (canônico, política local-first: jobs pesados só em PR/release) + espelho no GitHub Actions com CI Windows real (MSVC), validado verde desde 2026-07-14.
+- **Plataformas:** Linux é a plataforma alvo da v1.0.0 (CMakePresets `linux-release`); Windows (`windows-release`) planejado para pós-v1.0.0, já com CI real validado.
+- **Repositório:** Codeberg (`petrinhu/gusworld`) é o remoto canônico; espelho público em GitHub (`petrinhu/GusWorld`, push dual-remote). Wiki inicial publicada nos dois (2026-07-14).
 
 ### Documentos canônicos (Fase 1)
 
@@ -155,28 +164,36 @@ Dois sistemas de easter eggs sutis aplicam a TODOS docs deep-lore + assets do jo
 - **Fibonacci #1** (memória `project_fibonacci_easter_egg`): visual/arquitetural/textual/mecânico/sonoro/narrativo. Números 1,1,2,3,5,8,13,21,34,55,89,144 em datações/contagens/HP/dano/loot/proporções/compassos
 - **Maçonaria canon** (memória `project_eastereggs_maconaria_canonica`): vetor central Pigpen cipher ↔ cripto-glifo Era 1 (grade 3×3 + X + pontos). Símbolos visuais (pavimento tesselado, ashlar bruto/polido, esquadro+compasso, Colunas Boróstoma+Janor, acaceiro-tronco-vermelho, avental couro). Numéricos (3-5-7 degraus, 47ª proposição, cordão 89 nós). Lendário (Helíaco Vyr = Hiram Abiff echo)
 
-## Comandos (preliminares — Godot ainda não instalado)
+## Comandos (vigentes — CMake + Ninja, ver README.md para a versão completa)
 
-Build/test/run **ainda não existem**. Pipeline definido em `docs/tech/build.md`:
+Pré-requisitos: compilador C++20 (GCC/Clang/MSVC-MinGW), CMake, Ninja, Git. SDL3, RmlUi, glintfx e Catch2 são baixados e fixados automaticamente via `FetchContent` (sem instalação manual).
 
 ```bash
-# Quando Godot 4 estiver instalado e /game/ tiver project.godot:
-godot --headless --import                          # primeira vez
-godot --path ./game                                # editor
-godot --headless --path ./game --export-release "Linux/X11" ./build/linux/gusworld.x86_64
-godot --headless --path ./game --export-release "Windows Desktop" ./build/windows/gusworld.exe
+cd GusEngine
+
+# Configurar (primeira vez; gera build/linux-release/)
+cmake --preset linux-release
+
+# Compilar
+cmake --build --preset linux-release
+
+# Rodar o jogo
+./build/linux-release/app/gusworld_app
+
+# Rodar a suíte de testes (Catch2)
+ctest --preset linux-release
 ```
 
-Nada de inventar comandos antes de existirem. Atualizar esta seção quando primeiro protótipo rodar.
+Linux é a plataforma alvo do lançamento v1.0.0; existe preset Windows (`windows-release`), com CI real (MSVC) validado, planejado pra pós-v1.0.0. `game/` (Godot) e `engine/` (C# legado) são código morto — não usar como referência nem como alvo de build.
 
 ## Skills de projeto
 
 Projeto de **jogo** — usar `proj_jogo` (não `proj_software`). Agentes relevantes:
 
 - **Fase 1 (concluída):** `lead-game-designer`, `narrative-designer`, `art-director`, `software-architect`
-- **Fase 2 (próxima):** `gameplay_engineer` (mecânicas de gameplay puro: combate, exploração, progressão, inventário, IA, loot, status — consome POCO do `backend-engineer`, NÃO cria domínio/persistência), `backend-engineer` (POCO de domínio, persistência, serialização, repositórios, serviços centrais), `engine-graphics-programmer` (orbital camera, shaders), `level-designer` (blockout), `game-animator` (locomotion + combat anims), `3d-artist-rigger` (chars + props low-poly), `audio-designer-composer` (música adaptive + SFX)
-- **Fase 4 (QA/compliance):** `qa-engineer` (playtest plan), `compliance-legal` (age rating IARC/ESRB/PEGI), `accessibility-specialist` (controles remappáveis, color)
-- **Fase 5 (release):** `devops-sre` (Forgejo Actions build), `i18n-l10n-specialist` (se localizar v1.x)
+- **Fase 2 (ativa — vertical slice em C++20+SDL3):** `gameplay_engineer` (mecânicas de gameplay puro: combate, exploração, progressão, inventário, IA, loot, status — consome POCO do `backend-engineer`, NÃO cria domínio/persistência), `backend-engineer` (POCO de domínio, persistência, serialização, save/crypto, motor de cartas techMagic), `engine-graphics-programmer` (render2d SDL3, tilemap, câmera top-down 2D, shaders), `level-designer` (blockout), `game-animator` (locomotion + combat anims 2D), `security-engineer` (save crypto v2, AEAD), `audio-designer-composer` (música adaptive + SFX via miniaudio)
+- **Fase 4 (QA/compliance):** `qa-engineer` (playtest plan; verificação adversarial/mutation testing de cada EffectKind novo do motor de cartas), `compliance-legal` (age rating IARC/ESRB/PEGI), `accessibility-specialist` (controles remappáveis, color)
+- **Fase 5 (release):** `devops-sre` (Forgejo Actions + GitHub Actions Windows CI), `i18n-l10n-specialist` (se localizar v1.x), `technical-writer` (docs, wiki, ROADMAP/CHANGELOG)
 
 Skills auxiliares: `tab_pendencias` (TODO.md), `memo_persistente` (checkpoint), `forgejo` (CI), `caveman` (compressão de comm).
 
@@ -188,19 +205,18 @@ Diretório vive dentro de `~/IDrive/Documentos/projetos_claudebrain/Projects/gus
 - Não modificar arquivos canônicos externos a partir daqui.
 - Notas de design soltas podem usar estilo livre; entregáveis estruturados (GDD, lore bible, style guide) já existem em `docs/`.
 
-## Próximos passos (Fase 2)
+## Próximos passos (estado 2026-07-15, ver ROADMAP.md/TODO.md para o board vivo)
 
-1. **Instalar Godot 4** + criar `/game/project.godot` inicial.
-2. **Criar repo Forgejo** `gusworld` (privado inicial) + `gusworld-engine` (separado, candidato a public).
-3. **Primeiro protótipo:** módulo `orbital_camera` em `/engine/` — câmera 3/4 com rotação + zoom + collision-aware.
-4. **Vertical slice scope:** 1 área pequena cidade + 1 encontro turn-based + 1 puzzle Vetor do Gambito. Meta: 4-6 meses.
+1. **Fechar M7 (paridade jogável):** todos os pré-requisitos técnicos já entregues; falta só um playthrough de ~5min ao vivo do líder.
+2. **M8 (decommission):** apagar Godot/C#/addons legados assim que M7 fechar — gate de build Windows já pré-cumprido.
+3. **M9 (higienização):** limpar a árvore pós-porte.
+4. **Onda `CARDS` (paralela, não bloqueia M7/M8/M9):** próximo `EffectKind` do motor de cartas techMagic = DamageQuantize/Planck; estética visual "terminal" para logs de combate em implementação.
 5. Manter `TODO.md` atualizado via `/tab_pendencias`.
 
 ## Quando o projeto evoluir
 
 Atualizar este CLAUDE.md adicionando:
 
-- Comandos reais de build/run/test assim que primeiro protótipo existir.
-- Estrutura de pasta `/engine/` e `/game/` quando popular.
-- Decisões one-way door novas em ADRs leves (em `docs/tech/adr/` se necessário).
-- Sair de "Fase 1 concluída" pra "Vertical slice em produção" quando bater milestone.
+- Decisões one-way door novas em ADRs leves (em `docs/tech/adr/` se necessário) e refletir aqui em "Decisões fechadas".
+- Sair de "vertical slice em andamento" pra "vertical slice fechado" quando M7-M9 completarem.
+- Se o repo `GusEngine/` mudar de estrutura de camadas, atualizar a árvore em "Estrutura de repositório".
