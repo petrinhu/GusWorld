@@ -17,8 +17,8 @@ Notas do dev do glintfx (revisão dos 6 componentes contra RmlUi 6.3, 2026-07-16
 5. **`text-shadow` (glow do brand) -> `filter: drop-shadow(...)`.** Text-shadow puro não existe; drop-shadow dá o mesmo halo.
 6. **`border-radius:50%` (círculo de mana) -> px** (ex.: `10px` num elemento 20x20). O parser de radius é length, não %.
 
-## Fonte (conecta com FONT-EXTEND-GLITCH)
-As setas `▲▼` (U+25B2/25BC) e chips geométricos **NÃO estão no PixelOperatorMono** -> caem na fonte estendida (item [[reference_terminal_glitch_fonte]] / FONT-EXTEND-GLITCH). Sem ela, viram tofu no jogo (nos mockmups em browser aparecem porque o browser tem a fonte). Ao portar: ou estender a fonte com esses glifos, ou usar um sprite/ícone pra seta.
+## Fonte / glifos geométricos (NÃO inflar o FONT-EXTEND-GLITCH)
+Os glifos geométricos usados nos mockups (setas `▲▼` U+25B2/25BC; retrato-placeholder do NPC `◉` U+25C9; chips) **NÃO estão no PixelOperatorMono** e no browser só aparecem porque o browser tem outra fonte. **Resolução em produção: eles NÃO viram glifo de fonte** — o retrato do NPC vira **sprite/imagem** (elemento `<img>` RML) e a seta de scroll vira **ícone/sprite**. Ou seja, **não dependem do FONT-EXTEND-GLITCH** ([[reference_terminal_glitch_fonte]]); são placeholders de mockup. O FONT-EXTEND-GLITCH cobre só glifos que PRECISAM ser texto na fonte (ex.: `²` de expoente, acentos), não decoração que naturalmente é sprite.
 
 ## Padrão de porte
 O grosso do trabalho = `grid->flex` + `::before->elemento`; o resto é troca de sintaxe. A estética "Tático" (mono/cyan/cor-por-família) é 100% expressável. **O dev do glintfx ofereceu revisar o RCSS real de um componente-PILOTO (ex.: o card) pra fechar o padrão** antes de portar o resto. Recomendação: começar o porte pelo `10-card` como piloto, validar o RCSS com o dev, e replicar o padrão pros demais.
