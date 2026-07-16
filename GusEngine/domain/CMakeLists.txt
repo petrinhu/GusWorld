@@ -49,6 +49,10 @@ add_library(gusengine_domain STATIC
     # das 8 cartas especiais dos mestres suportadas pelos EffectKind atuais (POCO, sem
     # logica de gameplay nova).
     src/combat/master_cards.cpp
+    # ADR-017 (pedido do Gus + velocidade-por-carta): ActionClock ISOLADO, prova de
+    # conceito do escalonador por ticks estilo Pokemon Legends: Arceus. NAO ligado a
+    # CombatStateMachine/InitiativeQueue de producao (cutover e onda pos-M7).
+    src/combat/action_clock.cpp
     src/input/action_registry.cpp
     src/input/controls_name.cpp
     src/input/controls_json.cpp

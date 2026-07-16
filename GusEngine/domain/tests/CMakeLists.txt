@@ -181,6 +181,12 @@ add_executable(gusengine_domain_tests
     # mesmo ator/rodada nao recursa nem dobra indevidamente (os dois usam take_damage puro,
     # nenhum toca last_action_/round_hits_).
     techmagic_clone_test.cpp
+    # ADR-017 (pedido do Gus + velocidade-por-carta): ActionClock ISOLADO. Prova a
+    # formula de reset (BASE_CLOCK/SPD x cardSpeedMult x styleMult), os 3 estilos +
+    # decaimento do Agil consecutivo, o desempate D3, o starvation-guard (D1 hibrido) e
+    # a PendingResolution contra os 6 casos de exemplo do pedido do Gus. NAO liga a
+    # CombatStateMachine/InitiativeQueue de producao (cutover e onda pos-M7).
+    action_clock_test.cpp
 )
 
 # Os testes do combate incluem helpers de teste headers-only (fixed_random.hpp).
