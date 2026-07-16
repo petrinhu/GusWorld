@@ -643,6 +643,9 @@ Blindagem EM
 ## STATUS_NULLPROOF_NAME
 Prova Irrefutável
 
+## STATUS_SCRYING_NAME
+Espelho Negro
+
 ### Combos curados (combat.md §10, COMBO_<comboId>_NAME)
 
 ## COMBO_PULSO_STREAM_NAME
@@ -722,6 +725,9 @@ Einstein
 
 ## CARD_EXEC_PLANCK_NAME
 Quantum-Lock
+
+## CARD_EXEC_DEE_NAME
+Black-Mirror
 
 ---
 

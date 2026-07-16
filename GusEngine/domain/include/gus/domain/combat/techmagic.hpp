@@ -34,6 +34,19 @@
 // ESCOPO ainda FORA deste step: CloneAlly, tick da Sobrecarga Termica, desconto do
 // Resfriamento, query fora-de-combate. Step 6+.
 //
+// STEP 8 (RevealIntent, John Dee/Black-Mirror, manifesto item 6; decisoes D1-D4 do lider,
+// 2026-07-15): status-based (StatusId::Scrying), NAO carta-equipada - `execute_equipped`
+// NUNCA despacha isto (execute_equipped so roda hooks de cartas Passiva/Hibrida
+// EQUIPADAS). O dump/re-dump vive em 2 funcoes PUBLICAS novas (abaixo, expostas fora do
+// dispatcher `execute`): `log_intent_for` (1 alvo) e `dump_reveal_intent` (todos os
+// inimigos vivos do lado oposto ao caster). handle_reveal_intent (OnCast, a carta jogada)
+// chama dump_reveal_intent DEPOIS de aplicar o buff Scrying; CombatStateMachine::
+// process_scrying_hooks chama dump_reveal_intent de novo na FRONTEIRA DE RODADA, 1x por
+// aliado vivo que ainda porta Scrying; CombatStateMachine::resolve_scan chama
+// log_intent_for (1 alvo) quando o scanner porta a carta (Scan aprimorado, D1-ii). FAIL-
+// SOFT no brain ausente nos 3 sitios (assimetria deliberada vs o Gambito manual, que
+// lanca) - ver doc-comment de log_intent_for.
+//
 // Cross-ref: gus/domain/combat/combat_records.hpp (EffectSpec/Card); combat_enums.hpp
 //            (TriggerHook/EffectKind/CardTier/CardCategory); combat_state_machine.cpp
 //            (pontos de hook OnCast/OnDamageDealt/OnDamageReceived/Always/OnRoundEnd);
@@ -55,6 +68,7 @@
 
 namespace gus::domain::combat {
 class InitiativeQueue;
+class IEnemyBrain;
 }  // namespace gus::domain::combat
 
 namespace gus::domain::combat::techMagic {
@@ -142,6 +156,15 @@ struct LastActionRecord {
 // com DelayAction). Ponteiro NAO-DONO. So forward-declarado aqui (nao inclui
 // initiative_queue.hpp) pra nao empurrar essa dependencia pros consumidores do header que
 // nao precisam dela.
+// `brain_registry` (step 8, RevealIntent/John Dee-Black-Mirror): mesmo registry id->
+// IEnemyBrain* ja injetado na CombatStateMachine (brain_registry_), so consumido por
+// dump_reveal_intent/log_intent_for pra achar o IEnemyBrain de cada inimigo (mesmo lookup
+// de resolve_gambit_predict). Campo ADITIVO (default nullptr preserva os call sites/testes
+// dos steps 1-7 intactos). Ausencia de brain (registry nullptr OU id nao encontrado) e
+// FAIL-SOFT aqui (loga "sem sinal" e segue) - ao contrario do Gambito manual
+// (resolve_gambit_predict), que lanca std::out_of_range: o dump roda AUTOMATICO num hook de
+// rodada/scan, nao pode derrubar o combate por 1 inimigo sem brain registrado. So
+// forward-declarado (IEnemyBrain), nao inclui enemy_brain.hpp aqui.
 struct TechMagicContext {
     CombatActor* caster = nullptr;
     CombatActor* counterpart = nullptr;
@@ -153,6 +176,7 @@ struct TechMagicContext {
     IRandomSource* rng = nullptr;
     const std::vector<CombatActor*>* combatants = nullptr;
     InitiativeQueue* queue = nullptr;
+    const std::unordered_map<std::string, IEnemyBrain*>* brain_registry = nullptr;
 };
 
 // Executa, NA ORDEM declarada, os EffectSpec de `card` cujo `trigger == hook`. `ctx.caster`
@@ -170,6 +194,34 @@ void execute(TriggerHook hook, const Card& card, TechMagicContext& ctx);
 void execute_equipped(TriggerHook hook, CombatActor& owner,
                       const std::unordered_map<std::string, Card>* registry,
                       TechMagicContext& ctx);
+
+// Scrying/Black-Mirror (John Dee, step 8, EffectKind::RevealIntent): loga 1 linha de
+// IntentPreview de `target`, do ponto de vista de `ctx.caster` (o "vidente"). FAIL-SOFT no
+// brain ausente (ctx.brain_registry nulo OU id nao encontrado): loga "sem sinal" e retorna,
+// NUNCA lanca - assimetria DELIBERADA vs o Gambito manual (resolve_gambit_predict, que
+// lanca std::out_of_range): este helper roda em contextos AUTOMATICOS (dump em massa,
+// re-dump de rodada) ou como bonus OPCIONAL de outra acao (Scan aprimorado), nenhum dos
+// dois pode derrubar o combate por causa de 1 inimigo sem brain registrado. Intent CAOTICO
+// (D2, decisao do lider - Patch-Zero): loga ruido, nunca revela os campos previstos -
+// preserva a one-way door do boss. Read-only: NAO muta nada (monta um CombatState local via
+// ctx.queue quando ha brain a consultar, mesmo padrao de DelayAction), NAO consome RNG
+// (preview_intent nao sorteia, contrato de IEnemyBrain). Lanca std::logic_error se
+// ctx.caster for nulo (guard mais externo, sempre). ctx.queue so e EXIGIDO (lanca se nulo)
+// quando um brain de fato foi ENCONTRADO pra `target` - sem brain (fail-soft acima), nao
+// ha CombatState pra montar, entao queue ausente NAO e bug nesse ramo. Usado por
+// dump_reveal_intent (abaixo) E por CombatStateMachine::resolve_scan (Scan aprimorado, 1
+// alvo, quando o scanner porta a carta - ver combat_state_machine.cpp).
+void log_intent_for(CombatActor& target, TechMagicContext& ctx);
+
+// Scrying/Black-Mirror (John Dee, step 8): dump em massa - roda log_intent_for pra CADA
+// inimigo VIVO do lado OPOSTO a ctx.caster, na ordem de ctx.combatants (mesmo guard de lado
+// do ChainDamage/handle_chain_damage). Zero inimigos vivos: no-op logado (dissipacao), NAO
+// silencioso (regra todo-efeito-loga). Lanca std::logic_error se ctx.caster ou
+// ctx.combatants forem nulos (bug de call site). Chamado por handle_reveal_intent (OnCast,
+// a carta jogada) E por CombatStateMachine::process_scrying_hooks (re-dump automatico na
+// FRONTEIRA DE RODADA, 1x por aliado vivo que porta StatusId::Scrying - NAO via
+// execute_equipped, Scrying e status, nao carta equipada).
+void dump_reveal_intent(TechMagicContext& ctx);
 
 }  // namespace gus::domain::combat::techMagic
 

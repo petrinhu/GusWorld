@@ -1,7 +1,7 @@
 // gus/domain/src/combat/master_cards.cpp
 //
-// Implementacao do catalogo das 13 cartas ESPECIAIS suportadas pelo executor techMagic
-// (ADR-016, MVP steps 4-7 + manifesto item 5). Ver header para o contrato. Mesmo padrao de
+// Implementacao do catalogo das 14 cartas ESPECIAIS suportadas pelo executor techMagic
+// (ADR-016, MVP steps 4-8 + manifesto itens 5-6). Ver header para o contrato. Mesmo padrao de
 // placeholder_cards.cpp: cartas construidas uma vez, emplace fail-fast em id duplicado.
 // POCO puro, ZERO Qt.
 //
@@ -75,6 +75,10 @@ constexpr int kNullProofDuration = 99;  //PLAYTEST sentinela (consumido, nao tic
 // 100% (25+50+25). Numeros fechados pelo lider (nao //PLAYTEST-livre como os outros).
 constexpr int kPlanckStepCenterPercent = 50;
 constexpr int kPlanckStepExtremePercent = 25;
+// Scrying (John Dee/Black-Mirror, manifesto item 6, decisao D3 do lider 2026-07-15):
+// duracao do buff Scrying (numero FECHADO pelo lider, nao //PLAYTEST-livre como a maioria
+// dos outros - mesma categoria de kPlanckStepCenterPercent/kPlanckStepExtremePercent acima).
+constexpr int kDeeScryingDuration = 3;
 
 // Monta uma carta ESPECIAL base. base_type = Glifo (carta-programa nao-elemental,
 // //PLAYTEST). ap_cost default 1 (herda o mesmo default do placeholder). Sem
@@ -286,10 +290,45 @@ std::unordered_map<std::string, Card> assemble() {
                        .kind = EffectKind::DamageQuantize,
                        .magnitude = kPlanckStepCenterPercent,  // chance% do degrau CENTRAL.
                        .percent = kPlanckStepExtremePercent}}),  // chance% de CADA extremo.
+
+        // --- John Dee (Black-Mirror/Scrying): Hibrida, Universal, TargetShape::Self
+        // (manifesto item 6, decisoes D1-D4 do lider 2026-07-15, AMB-07). Duas faces:
+        //   OnCast -> RevealIntent (ATIVA/"Scrying"): aplica o buff Scrying (dur
+        //     kDeeScryingDuration, Refresh) no PROPRIO caster + dump read-only do
+        //     IntentPreview de cada inimigo vivo. Enquanto QUALQUER aliado vivo portar
+        //     Scrying, a FSM RE-DUMPA na fronteira de rodada
+        //     (CombatStateMachine::process_scrying_hooks) - NAO via este EffectSpec de
+        //     novo (Scrying e status, nao carta equipada). D2: intent CAOTICO
+        //     (Patch-Zero) retorna ruido, preserva a one-way door do boss.
+        //   Scan aprimorado ("Black-Mirror"/PASSIVA, D1-ii): quando esta carta esta
+        //     EQUIPADA (has_reveal_intent_equipped, combat_state_machine.cpp), a acao
+        //     Scan passa a revelar TAMBEM status ativos + posicao na fila + intent
+        //     previsto do alvo escaneado. So dados que JA existem no modelo (nenhum
+        //     atributo oculto novo). Wiring FORA do dispatcher techMagic::execute (mesmo
+        //     padrao de Planck/DamageQuantize) - resolve_scan chama techMagic::
+        //     log_intent_for direto.
+        //   MUNDO (D1-i, "Espelho Negro" original do roster - baus/passagens ocultas na
+        //     exploracao): NAO existe sistema de ocultos no overworld ainda -> STUB
+        //     posse-only (mesmo padrao de Euler/Turing/Menger acima), ZERO codigo de
+        //     combate aqui. Ponto de extensao: quando o sistema de ocultos existir, a
+        //     query e "a party tem 'dee' em equipped_special_ids()?" (mesmo mecanismo
+        //     ja usado por has_reveal_intent_equipped) - NENHUM campo/EffectKind novo
+        //     necessario.
+        // 1x/batalha via specials_cast_ (Ativa/Hibrida, secao 2.1) - mesmo gate das
+        // outras Ativa/Hibrida. ---
+        make_special(
+            "dee", "CARD_EXEC_DEE_NAME", CardFamily::Universal, CardCategory::Hibrida,
+            kActiveManaCost,
+            {EffectSpec{.trigger = TriggerHook::OnCast,
+                       .kind = EffectKind::RevealIntent,
+                       .duration = kDeeScryingDuration,
+                       .status = StatusId::Scrying,
+                       .stack_rule = StackRule::Refresh}},
+            /*ignores_weakness_wheel=*/false, /*power=*/0, /*target_shape=*/TargetShape::Self),
     };
 
     std::unordered_map<std::string, Card> registry;
-    registry.reserve(13);
+    registry.reserve(14);
     for (const auto& card : cards) {
         // emplace (nao indexer) falha-cedo se algum id duplicar (mesmo padrao do placeholder).
         const auto [it, inserted] = registry.emplace(card.id, card);

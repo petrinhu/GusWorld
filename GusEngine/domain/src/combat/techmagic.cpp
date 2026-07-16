@@ -1,13 +1,17 @@
 // gus/domain/combat/techmagic.cpp
 //
-// Implementacao do executor techMagic (ADR-016, MVP steps 2-7). Handlers: ApplyStatus,
+// Implementacao do executor techMagic (ADR-016, MVP steps 2-8). Handlers: ApplyStatus,
 // Leech, Reflect (step 2) + HypotenuseCombo (step 3, ledger cross-ator/OnRoundEnd) +
 // RepeatLastAction (step 5, Mandelbrot/Fractal-Echo + Ada/Re-Run, decisoes Q1-Q4 do
 // lider 2026-07-14) + ChainDamage (step 6, Tesla) + DelayAction (step 7, Einstein/
 // Time-Dilate, decisao do lider 2026-07-15 + addendum "modo-aliado assimetrico"
 // 2026-07-15: alvo inimigo atrasa pro fim da fila, alvo aliado ADIANTA pro slot logo apos
-// o ator atual - espelho beneficio). EffectKind sem handler (CloneAlly) lanca
-// std::logic_error - fail-fast, nunca no-op silencioso (ver techmagic.hpp).
+// o ator atual - espelho beneficio) + RevealIntent (step 8, John Dee/Black-Mirror,
+// manifesto item 6, decisoes D1-D4 do lider 2026-07-15: buff Scrying + dump read-only de
+// IntentPreview via log_intent_for/dump_reveal_intent, funcoes PUBLICAS reusadas pelo
+// re-dump de rodada e pelo Scan aprimorado - ver combat_state_machine.cpp). EffectKind sem
+// handler (CloneAlly) lanca std::logic_error - fail-fast, nunca no-op silencioso (ver
+// techmagic.hpp).
 //
 // Cross-ref: gus/domain/combat/techmagic.hpp; combat_state_machine.cpp (pontos de hook);
 //            docs/design/mecanicas/cartas-technomagik.md; ADR-016.
@@ -23,6 +27,8 @@
 #include <utility>
 #include <vector>
 
+#include "gus/domain/combat/combat_state.hpp"
+#include "gus/domain/combat/enemy_brain.hpp"
 #include "gus/domain/combat/initiative_queue.hpp"
 
 namespace gus::domain::combat::techMagic {
@@ -453,7 +459,110 @@ void handle_damage_quantize(const EffectSpec&, const Card&, TechMagicContext&) {
     // No-op deliberado: ver comentario acima.
 }
 
+// RevealIntent (OnCast, John Dee/Black-Mirror; ADR-016 step 8, manifesto item 6; decisoes
+// D1-D4 do lider 2026-07-15): aplica o buff Scrying no PROPRIO caster via add_status
+// LEGADO (NAO try_add_status - e um buff auto-aplicado, nao um debuff ofensivo em outro
+// ator; mesmo padrao do Shield de resolve_defend, ver combat_state_machine.cpp), lendo
+// spec.status/spec.duration/spec.stack_rule (data-driven, mesma construcao de
+// handle_apply_status) com familia FIXA Universal (o buff nao pertence a familia da
+// carta - e informacao, nao dano elemental). Depois dumpa os intents via
+// dump_reveal_intent (funcao PUBLICA compartilhada com o re-dump de rodada da FSM, ver
+// techmagic.hpp).
+void handle_reveal_intent(const EffectSpec& spec, const Card& card, TechMagicContext& ctx) {
+    if (ctx.caster == nullptr)
+        throw std::logic_error("techMagic::RevealIntent: ctx.caster nao pode ser nulo.");
+
+    ctx.caster->add_status(
+        StatusEffect{spec.status, spec.magnitude, spec.duration, spec.stack_rule,
+                    CardFamily::Universal});
+    log_entry(ctx, ctx.caster, 0,
+             ctx.caster->id() + " tavus-executa " + card.id + ": Scrying ativo (dur " +
+                 std::to_string(spec.duration) + ") - varredura de intents inimigos.");
+
+    dump_reveal_intent(ctx);
+}
+
 }  // namespace
+
+// log_intent_for/dump_reveal_intent (step 8, John Dee/Black-Mirror): ver doc-comment em
+// techmagic.hpp. Definidas FORA do namespace anonimo (linkage externa - a assinatura
+// publica ja esta declarada no header) mas chamadas de DENTRO dele (handle_reveal_intent
+// acima) - mesmo padrao de execute/execute_equipped chamando os handleXXX privados, so
+// invertido (aqui um privado chama um publico, la o publico chama os privados). log_entry
+// (helper do namespace anonimo, definido no topo deste arquivo) continua visivel aqui: e
+// membro do MESMO namespace envolvente (techMagic), so com linkage interna.
+void log_intent_for(CombatActor& target, TechMagicContext& ctx) {
+    if (ctx.caster == nullptr)
+        throw std::logic_error("techMagic::RevealIntent: ctx.caster nao pode ser nulo.");
+
+    IEnemyBrain* brain = nullptr;
+    if (ctx.brain_registry != nullptr) {
+        const auto it = ctx.brain_registry->find(target.id());
+        if (it != ctx.brain_registry->end()) brain = it->second;
+    }
+
+    // FAIL-SOFT (assimetria deliberada vs o Gambito manual, que lanca std::out_of_range):
+    // este helper roda em contextos automaticos/bonus-opcional (dump em massa, re-dump de
+    // rodada, Scan aprimorado) - 1 inimigo sem brain registrado NAO pode derrubar o
+    // combate inteiro. NOTA: o guard de ctx.queue fica ABAIXO (so exigido quando ha
+    // brain de fato pra consultar - sem brain, nao precisamos montar CombatState nenhum).
+    if (brain == nullptr) {
+        log_entry(ctx, &target, 0,
+                 ctx.caster->id() + " executa RevealIntent em " + target.id() +
+                     ": sem sinal (brain nao registrado).");
+        return;
+    }
+
+    if (ctx.queue == nullptr)
+        throw std::logic_error(
+            "techMagic::RevealIntent: ctx.queue nao pode ser nulo (precisa montar um "
+            "CombatState pro brain, mesmo padrao de DelayAction - bug de call site, nao "
+            "efeito vazio).");
+
+    const CombatState state(*ctx.queue, ctx.caster, ctx.queue->round_index());
+    const IntentPreview intent = brain->preview_intent(state, target);
+
+    if (intent.is_chaotic) {
+        // D2 (decisao do lider): NAO fura o caos do Patch-Zero - intent CAOTICO retorna
+        // RUIDO, nunca os campos previstos (preserva a one-way door do boss).
+        log_entry(ctx, &target, 0,
+                 ctx.caster->id() + " executa RevealIntent em " + target.id() +
+                     ": sinal embaralhado / nao-deterministico. [CAOTICO - ruido]");
+        return;
+    }
+
+    log_entry(ctx, &target, intent.predicted_damage,
+             ctx.caster->id() + " executa RevealIntent em " + target.id() + ": preve " +
+                 intent.predicted_action_id + " -> " + intent.predicted_target_id +
+                 " (dano " + std::to_string(intent.predicted_damage) + "). [LEGIVEL]");
+}
+
+void dump_reveal_intent(TechMagicContext& ctx) {
+    if (ctx.caster == nullptr)
+        throw std::logic_error("techMagic::RevealIntent: ctx.caster nao pode ser nulo.");
+    if (ctx.combatants == nullptr)
+        throw std::logic_error(
+            "techMagic::RevealIntent: ctx.combatants nao pode ser nulo (dump sem roster "
+            "injetado no contexto - bug de call site, nao efeito vazio).");
+
+    // Inimigos VIVOS do lado OPOSTO ao caster, na ORDEM da fila (mesmo guard de lado do
+    // ChainDamage/handle_chain_damage).
+    std::vector<CombatActor*> enemies;
+    for (CombatActor* a : *ctx.combatants) {
+        if (a == nullptr || !a->is_alive()) continue;
+        if (a->is_player_side() == ctx.caster->is_player_side()) continue;
+        enemies.push_back(a);
+    }
+
+    if (enemies.empty()) {
+        log_entry(ctx, nullptr, 0,
+                 ctx.caster->id() +
+                     " executa RevealIntent: nenhum sinal a captar, o campo esta vazio.");
+        return;
+    }
+
+    for (CombatActor* enemy : enemies) log_intent_for(*enemy, ctx);
+}
 
 void execute(TriggerHook hook, const Card& card, TechMagicContext& ctx) {
     for (const EffectSpec& spec : card.effects) {
@@ -484,13 +593,16 @@ void execute(TriggerHook hook, const Card& card, TechMagicContext& ctx) {
             case EffectKind::DamageQuantize:
                 handle_damage_quantize(spec, card, ctx);
                 break;
+            case EffectKind::RevealIntent:
+                handle_reveal_intent(spec, card, ctx);
+                break;
             case EffectKind::CloneAlly:
             default:
                 throw std::logic_error(
                     "techMagic: EffectKind sem handler implementado na carta '" + card.id +
-                    "' (steps 2-3-5-6-7 + manifesto5 cobrem ApplyStatus/Leech/Reflect/"
+                    "' (steps 2-3-5-6-7-8 + manifesto5 cobrem ApplyStatus/Leech/Reflect/"
                     "HypotenuseCombo/RepeatLastAction/ChainDamage/DelayAction/"
-                    "DamageQuantize; CloneAlly e step futuro, ADR-016).");
+                    "DamageQuantize/RevealIntent; CloneAlly e step futuro, ADR-016).");
         }
     }
 }

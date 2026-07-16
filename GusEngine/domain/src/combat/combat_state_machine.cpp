@@ -119,6 +119,34 @@ NeutralRandom& neutral_random() {
     return "Desconhecido";
 }
 
+// Nome de um StatusId para o log (mesmo racional de family_name/modifier_name acima - so
+// log/UI). Usado pelo Scan aprimorado (ADR-016 step 8, John Dee/Black-Mirror): lista os
+// status ativos do alvo escaneado por nome, quando o scanner porta RevealIntent.
+[[nodiscard]] const char* status_name(StatusId id) {
+    switch (id) {
+        case StatusId::Stun: return "Stun";
+        case StatusId::Poison: return "Poison";
+        case StatusId::Corrode: return "Corrode";
+        case StatusId::Disrupt: return "Disrupt";
+        case StatusId::Silence: return "Silence";
+        case StatusId::Knockback: return "Knockback";
+        case StatusId::Break: return "Break";
+        case StatusId::Expose: return "Expose";
+        case StatusId::Decrypt: return "Decrypt";
+        case StatusId::Shield: return "Shield";
+        case StatusId::Regen: return "Regen";
+        case StatusId::Haste: return "Haste";
+        case StatusId::Slow: return "Slow";
+        case StatusId::SobrecargaTermica: return "SobrecargaTermica";
+        case StatusId::Resfriamento: return "Resfriamento";
+        case StatusId::Reflect: return "Reflect";
+        case StatusId::BlindagemEM: return "BlindagemEM";
+        case StatusId::NullProof: return "NullProof";
+        case StatusId::Scrying: return "Scrying";
+    }
+    return "Desconhecido";
+}
+
 // Localiza um ator na ordem da fila por id (nullptr se ausente). Espelha
 // Queue.Order.FirstOrDefault(a => a.Id == id) do C#.
 [[nodiscard]] CombatActor* find_in_order(const InitiativeQueue& queue,
@@ -197,6 +225,23 @@ NeutralRandom& neutral_random() {
     if (r == 1.0)
         return " [Quantum-Lock: degrau alto, " + std::to_string(spec.percent) + "%]";
     return " [Quantum-Lock: degrau medio, " + std::to_string(spec.magnitude) + "%]";
+}
+
+// Scan aprimorado (ADR-016 step 8, John Dee/Black-Mirror, decisao do lider D1-ii):
+// detecta a carta RevealIntent EQUIPADA em `actor`, mesmo padrao de scan de
+// quantize_spec_of acima (varre equipped_special_ids() contra `registry` procurando o
+// EffectKind, NAO hardcoda id/nome de carta). Fail-SOFT (false): registry nullptr ou id
+// nao encontrado so significa "Scan comum, sem bonus" - nunca bloqueia o Scan base.
+[[nodiscard]] bool has_reveal_intent_equipped(
+    const CombatActor& actor, const std::unordered_map<std::string, Card>* registry) {
+    if (registry == nullptr) return false;
+    for (const std::string& id : actor.equipped_special_ids()) {
+        const auto it = registry->find(id);
+        if (it == registry->end()) continue;
+        for (const EffectSpec& spec : it->second.effects)
+            if (spec.kind == EffectKind::RevealIntent) return true;
+    }
+    return false;
 }
 
 }  // namespace
@@ -541,6 +586,7 @@ void CombatStateMachine::advance_to_next_actor() {
         // AQUI (e nao a cada advance) preserva o comando livre da Fase 1 dentro da rodada.
         process_round_end_hooks();
         regroup_round_by_side();
+        process_scrying_hooks();
         advance_period_clock();
     }
 }
@@ -579,6 +625,20 @@ void CombatStateMachine::process_ally_turn_end_hooks(CombatActor& ended) {
             /*log=*/&log_,     /*round_hits=*/nullptr,  /*bonused_targets=*/nullptr,
             /*last_action=*/&last_action_, /*rng=*/rng_};
         techMagic::execute_equipped(TriggerHook::OnAllyTurnEnd, *ally, card_registry_, ctx);
+    }
+}
+
+void CombatStateMachine::process_scrying_hooks() {
+    for (CombatActor* actor : queue_.order()) {
+        if (!actor->is_alive()) continue;             // cadaver: sem re-dump.
+        if (actor->index_of_status(StatusId::Scrying) < 0) continue;  // nao porta o buff.
+
+        techMagic::TechMagicContext ctx{
+            /*caster=*/actor, /*counterpart=*/nullptr, /*damage=*/0, /*log=*/&log_};
+        ctx.combatants = &queue_.order();
+        ctx.queue = &queue_;
+        ctx.brain_registry = brain_registry_;
+        techMagic::dump_reveal_intent(ctx);
     }
 }
 
@@ -909,6 +969,34 @@ void CombatStateMachine::resolve_scan(CombatActor& actor, const CombatAction& ac
         actor.id(), CombatActionType::Scan, target->id(), target->hp(),
         actor.id() + " scaneia " + target->id() + ": HP " + std::to_string(target->hp()) +
             ", familia " + family_name(target->family()) + "."});
+
+    // Scan aprimorado (ADR-016 step 8, John Dee/Black-Mirror, decisao do lider D1-ii): so
+    // quando o SCANNER porta a carta RevealIntent equipada. Usa APENAS dados que ja existem
+    // no modelo (status list, InitiativeQueue::index_of, IntentPreview) - nenhum atributo
+    // oculto novo. 3 linhas extra, cada uma logada (regra todo-efeito-loga).
+    if (has_reveal_intent_equipped(actor, card_registry_)) {
+        std::string statuses;
+        for (const StatusEffect& s : target->status_effects()) {
+            if (!statuses.empty()) statuses += ", ";
+            statuses += status_name(s.id);
+        }
+        if (statuses.empty()) statuses = "nenhum";
+        log_.push_back(CombatLogEntry{
+            actor.id(), CombatActionType::Scan, target->id(), 0,
+            actor.id() + " (Black-Mirror) amplia o scan de " + target->id() +
+                ": status ativos [" + statuses + "]."});
+
+        const int index = queue_.index_of(target);
+        log_.push_back(CombatLogEntry{
+            actor.id(), CombatActionType::Scan, target->id(), index,
+            actor.id() + " (Black-Mirror) amplia o scan de " + target->id() +
+                ": posicao " + std::to_string(index) + " na fila de iniciativa."});
+
+        techMagic::TechMagicContext ctx{&actor, nullptr, /*damage=*/0, &log_};
+        ctx.queue = &queue_;
+        ctx.brain_registry = brain_registry_;
+        techMagic::log_intent_for(*target, ctx);
+    }
 }
 
 void CombatStateMachine::resolve_scan_environment(CombatActor& actor) {
@@ -1278,6 +1366,9 @@ void CombatStateMachine::resolve_use_card(CombatActor& actor, const CombatAction
             // snapshot ordenado de combatants) - handle_delay_action reordena via
             // InitiativeQueue::reorder_actor (mesma primitiva do Gambito).
             cast_ctx.queue = &queue_;
+            // RevealIntent (John Dee/Black-Mirror, ADR-016 step 8): mesmo registry id->
+            // IEnemyBrain* ja injetado na FSM, pro dump ler o intent de cada inimigo.
+            cast_ctx.brain_registry = brain_registry_;
             int dealt = 0;
             for (const auto& [t, d] : hits)
                 if (t == target) {

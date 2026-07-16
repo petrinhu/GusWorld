@@ -1,16 +1,22 @@
 // master_cards_test.cpp
 //
 // Spec executavel (Catch2 v3) do catalogo data-driven das cartas ESPECIAIS dos mestres
-// suportadas pelo executor techMagic (ADR-016, item TECHMAGIC-EXECUTOR / MVP steps 4-7 +
-// manifesto item 5): volta, newton, pythagoras, mandelbrot, ada, godel, faraday, euler,
-// turing, menger, tesla, einstein, planck. POCO puro, ZERO Qt.
+// suportadas pelo executor techMagic (ADR-016, item TECHMAGIC-EXECUTOR / MVP steps 4-8 +
+// manifesto itens 5-6): volta, newton, pythagoras, mandelbrot, ada, godel, faraday, euler,
+// turing, menger, tesla, einstein, planck, dee. POCO puro, ZERO Qt.
 //
-// Cobre: (1) as 13 cartas existem, ids unicos, nenhuma usa EffectKind::CloneAlly (guarda
+// Cobre: (1) as 14 cartas existem, ids unicos, nenhuma usa EffectKind::CloneAlly (guarda
 // que von Neumann/Bruno NAO entraram nesta leva); (2) campos canonicos por-carta (tier/
-// category/mana/power/ignores_weakness_wheel); (3) as 9 executaveis (volta/newton/pythagoras/
-// mandelbrot/ada/tesla/einstein/faraday/godel) resolvem via techMagic::execute SEM logic_error
-// num contexto minimo; (4) as 3 fora-de-combate (euler/turing/menger) tem effects vazio; (5)
-// paridade i18n das 13 chaves CARD_EXEC_<FIGURA>_NAME (2 locales).
+// category/mana/power/ignores_weakness_wheel); (3) as 10 executaveis (volta/newton/
+// pythagoras/mandelbrot/ada/tesla/einstein/faraday/godel/dee) resolvem via techMagic::execute
+// SEM logic_error num contexto minimo; (4) as 3 fora-de-combate (euler/turing/menger) tem
+// effects vazio; (5) paridade i18n das 14 chaves CARD_EXEC_<FIGURA>_NAME (2 locales).
+//
+// John Dee (Black-Mirror/Scrying, ADR-016 step 8, manifesto item 6, decisoes D1-D4 do lider
+// 2026-07-15, AMB-07): Hibrida/Universal/TargetShape::Self, OnCast -> RevealIntent. Os
+// testes EXAUSTIVOS (buff Scrying, dump/re-dump, D2 caotico->ruido, brain ausente
+// fail-soft, no-op 0-inimigos, Scan aprimorado, stub posse-only, TESTE-REI de
+// determinismo) vivem em techmagic_reveal_test.cpp - este arquivo so cobre o CATALOGO.
 //
 // Faraday (EM-Shield, ADR-016 Balde B, decisao do lider 2026-07-15): passou de
 // ForaDeCombate (posse-only) pra Hibrida (ganhou face de combate castavel). Os testes
@@ -63,13 +69,13 @@ CombatActor make_actor(const std::string& id, bool player_side, int hp = 100, in
 
 // ===== 1. As 8 cartas existem, ids unicos, guarda anti-CloneAlly =====
 
-TEST_CASE("master_cards: build_registry tem exatamente as 13 cartas suportadas",
+TEST_CASE("master_cards: build_registry tem exatamente as 14 cartas suportadas",
           "[domain][combat][cards][techmagic][mastercards]") {
     const auto reg = MasterCards::build_registry();
-    REQUIRE(reg.size() == 13);
+    REQUIRE(reg.size() == 14);
     for (const char* id : {"volta", "newton", "pythagoras", "mandelbrot", "ada", "godel",
                            "faraday", "euler", "turing", "menger", "tesla", "einstein",
-                           "planck"})
+                           "planck", "dee"})
         REQUIRE(reg.count(id) == 1);
 }
 
@@ -559,7 +565,50 @@ TEST_CASE("master_cards: faraday (ApplyStatus BlindagemEM em OnCast) executa via
     REQUIRE(shielded);
 }
 
-// ===== 4. Paridade i18n das 13 chaves (2 locales) =====
+TEST_CASE("master_cards: dee = Hibrida/Universal/mana kActiveManaCost/Self, effects [OnCast "
+         "RevealIntent duration 3 status Scrying Refresh]",
+         "[domain][combat][cards][techmagic][mastercards]") {
+    const auto reg = MasterCards::build_registry();
+    const Card& c = reg.at("dee");
+    REQUIRE(c.category == CardCategory::Hibrida);
+    REQUIRE(c.family == CardFamily::Universal);
+    REQUIRE(c.mana_cost == 6);  // kActiveManaCost, mesmo //PLAYTEST de volta/newton/faraday.
+    REQUIRE(c.target_shape == TargetShape::Self);
+    REQUIRE(c.ignores_weakness_wheel == false);
+    REQUIRE(c.effects.size() == 1);
+
+    const auto& reveal = c.effects[0];
+    REQUIRE(reveal.trigger == TriggerHook::OnCast);
+    REQUIRE(reveal.kind == EffectKind::RevealIntent);
+    REQUIRE(reveal.duration == 3);
+    REQUIRE(reveal.status == StatusId::Scrying);
+    REQUIRE(reveal.stack_rule == StackRule::Refresh);
+}
+
+TEST_CASE("master_cards: dee (RevealIntent em OnCast) executa via techMagic::execute sem "
+         "lancar, caster ganha Scrying",
+         "[domain][combat][cards][techmagic][mastercards]") {
+    const auto reg = MasterCards::build_registry();
+    const Card& c = reg.at("dee");
+
+    CombatActor caster = make_actor("h", /*player_side=*/true);
+    const InitiativeQueue queue({&caster});
+    const std::vector<CombatActor*> combatants = {&caster};
+
+    techMagic::TechMagicContext ctx;
+    ctx.caster = &caster;
+    ctx.counterpart = &caster;  // TargetShape::Self.
+    ctx.combatants = &combatants;
+    ctx.queue = const_cast<InitiativeQueue*>(&queue);
+
+    REQUIRE_NOTHROW(techMagic::execute(TriggerHook::OnCast, c, ctx));
+    bool scrying = false;
+    for (const auto& s : caster.status_effects())
+        if (s.id == StatusId::Scrying) scrying = true;
+    REQUIRE(scrying);
+}
+
+// ===== 4. Paridade i18n das 14 chaves (2 locales) =====
 
 namespace {
 
@@ -591,7 +640,7 @@ bool has_key(const std::vector<std::string>& keys, const std::string& key) {
 #define GUSWORLD_TRANSLATIONS_DIR "../../../../game/translations"
 #endif
 
-TEST_CASE("master_cards: as 13 chaves CARD_EXEC_<FIGURA>_NAME existem em pt_br.md e "
+TEST_CASE("master_cards: as 14 chaves CARD_EXEC_<FIGURA>_NAME existem em pt_br.md e "
          "en_intl.md",
          "[domain][combat][cards][techmagic][mastercards][i18n]") {
     const std::vector<std::string> pt =
@@ -603,7 +652,7 @@ TEST_CASE("master_cards: as 13 chaves CARD_EXEC_<FIGURA>_NAME existem em pt_br.m
 
     for (const char* figura : {"VOLTA", "NEWTON", "PYTHAGORAS", "MANDELBROT", "ADA",
                                "GODEL", "FARADAY", "EULER", "TURING", "MENGER", "TESLA",
-                               "EINSTEIN", "PLANCK"}) {
+                               "EINSTEIN", "PLANCK", "DEE"}) {
         const std::string key = std::string("CARD_EXEC_") + figura + "_NAME";
         INFO("chave: " << key);
         REQUIRE(has_key(pt, key));

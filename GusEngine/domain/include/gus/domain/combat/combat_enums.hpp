@@ -120,6 +120,14 @@ enum class StatusId : std::uint32_t {
                              // CONSOME (remove) o status; contra Neutro/Fraco fica intacto,
                              // guardado. Ver combat_state_machine.cpp::resolve_use_card/
                              // estimate_card_damage.
+    Scrying = 18,            // Scrying (John Dee/Black-Mirror, ADR-016 step 8,
+                             // EffectKind::RevealIntent): buff auto-aplicado no CASTER (dur 3,
+                             // StackRule::Refresh, familia Universal) via add_status LEGADO -
+                             // NAO passa pelo portao de imunidade (e um buff, nao um debuff
+                             // ofensivo em outro ator). Enquanto ativo, a FSM re-dumpa os
+                             // intents inimigos na fronteira de rodada (ver CombatStateMachine::
+                             // process_scrying_hooks). Classificado BUFF por exclusao (nao
+                             // listado em is_non_buff, combat_actor.cpp).
 };
 
 // Tier de fraqueza da roda deterministica. secao 6.
@@ -260,6 +268,18 @@ enum class EffectKind : std::uint32_t {
     // EffectSpec.magnitude = chance% do centro. Critico/falha INTACTOS (a quantizacao so
     // age no canal COMUM).
     DamageQuantize = 8,
+    // Scrying/Black-Mirror (John Dee, manifesto item 6, decisoes do lider 2026-07-15,
+    // D1-D4): buff auto-aplicado no CASTER (StatusId::Scrying, add_status LEGADO - fora do
+    // portao de imunidade) + DUMP read-only do IntentPreview de cada inimigo VIVO do lado
+    // oposto (1 linha de log por inimigo). Enquanto QUALQUER aliado vivo portar Scrying, a
+    // FSM RE-DUMPA na fronteira de rodada (CombatStateMachine::process_scrying_hooks) -
+    // FORA do dispatcher techMagic::execute nesse caso (Scrying e status, nao carta
+    // equipada; execute_equipped nunca despacha isto). D2: intent CAOTICO (Patch-Zero)
+    // retorna RUIDO, nunca revela os campos previstos - preserva a one-way door do boss.
+    // Read-only sobre o combate: 0 dano, 0 consumo de RNG, nao muta a fila (TESTE-REI de
+    // determinismo, ver techmagic_reveal_test.cpp). Ver techmagic.cpp::handle_reveal_intent/
+    // dump_reveal_intent/log_intent_for.
+    RevealIntent = 9,
 };
 
 // Filtro de lado do alvo de um EffectSpec (ADR-016 Balde B, Faraday/EM-Shield). Data-driven:

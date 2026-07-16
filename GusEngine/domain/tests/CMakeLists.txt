@@ -136,6 +136,14 @@ add_executable(gusengine_domain_tests
     # sorteio de degrau, determinismo/contagem de RNG (substitui next_double por next(100),
     # mesma contagem), escopo por-ator, critico/falha intactos, colapso graceful.
     techmagic_quantize_test.cpp
+    # Executor techMagic (ADR-016 step 8, manifesto item 6, decisoes D1-D4 do lider
+    # 2026-07-15): John Dee/Black-Mirror - EffectKind::RevealIntent (buff StatusId::Scrying
+    # + dump read-only de IntentPreview via log_intent_for/dump_reveal_intent), re-dump na
+    # fronteira de rodada (CombatStateMachine::process_scrying_hooks), D2 (intent CAOTICO
+    # do Patch-Zero retorna ruido, nunca revela), fail-soft no brain ausente (assimetria vs
+    # Gambito manual), Scan aprimorado (status/fila/intent, D1-ii), stub posse-only (D1-i) e
+    # o TESTE-REI de determinismo (HP/dano/ordem/RNG byte-identicos com e sem Scrying).
+    techmagic_reveal_test.cpp
 )
 
 # Os testes do combate incluem helpers de teste headers-only (fixed_random.hpp).

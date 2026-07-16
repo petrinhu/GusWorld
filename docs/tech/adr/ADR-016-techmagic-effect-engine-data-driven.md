@@ -409,6 +409,89 @@ combat/combat_state_machine.cpp` (`quantize_spec_of`/`quantize_step_r`/
 `GusEngine/domain/src/combat/master_cards.cpp` (planck); `docs/design/mecanicas/combat.md`
 secao 11 (Quantum-Lock); `docs/design/roster-analogos/_EFEITOS-ESCOLHIDOS.md` (AMB-06).
 
+## Addendum (MVP step 8, manifesto item 6, decisoes do lider 2026-07-15, D1-D4): John Dee/Black-Mirror (RevealIntent/Scrying)
+
+Diferente de HypotenuseCombo/RepeatLastAction (hooks despachados via `execute_equipped`
+sobre cartas EQUIPADAS), o RevealIntent e **status-based**: a ativa aplica um BUFF
+(`StatusId::Scrying`, ordinal 18) no proprio caster, e o re-dump de rodada e disparado
+pela FSM checando o STATUS do ator (`index_of_status`), nao pelo mecanismo de cartas
+equipadas. `execute_equipped` NUNCA despacha isto.
+
+- **`EffectKind::RevealIntent` (ordinal 9, append-only)**: carta `dee` em
+  `master_cards.cpp` - `Hibrida`/`Universal`/`TargetShape::Self`/mana `kActiveManaCost`
+  (D4), `effects = [OnCast -> RevealIntent, duration=3, status=Scrying,
+  stack_rule=Refresh]` (D3).
+- **`StatusId::Scrying` (ordinal 18, append-only)**: buff auto-aplicado no CASTER via
+  `add_status` LEGADO (NAO `try_add_status` - nao passa pelo portao de imunidade
+  EM-Shield, e um buff auto-aplicado, nao um debuff ofensivo em outro ator). Classificado
+  BUFF por exclusao (`is_non_buff` em `combat_actor.cpp` nao o lista).
+- **`handle_reveal_intent`** (`techmagic.cpp`, dispatcher `OnCast`): aplica o buff
+  Scrying, loga a ativacao, e chama `dump_reveal_intent` (funcao PUBLICA nova, ver
+  abaixo) pra dumpar os intents dos inimigos vivos no MOMENTO do cast.
+- **`log_intent_for(target, ctx)` e `dump_reveal_intent(ctx)`** (funcoes PUBLICAS novas,
+  expostas em `techmagic.hpp` FORA do dispatcher `execute` - unica fonte de verdade
+  reusada por 3 sitios: o dump inicial do cast, o re-dump de rodada, e o Scan
+  aprimorado):
+  - `log_intent_for`: loga 1 linha do `IntentPreview` de UM alvo, do ponto de vista do
+    caster. Busca o `IEnemyBrain` em `ctx.brain_registry` (campo ADITIVO novo em
+    `TechMagicContext`, mesmo registry id->`IEnemyBrain*` ja injetado na FSM).
+    **FAIL-SOFT no brain ausente** (loga "sem sinal" e retorna, NUNCA lanca) -
+    assimetria DELIBERADA vs. o Gambito-Prever manual (`resolve_gambit_predict`, que
+    lanca `std::out_of_range`): a Scrying roda em contextos AUTOMATICOS (dump em
+    massa/re-dump de rodada) ou como bonus OPCIONAL do Scan, nenhum dos dois pode
+    derrubar o combate por 1 inimigo sem brain registrado; o Gambito e uma acao
+    DELIBERADA do jogador sobre 1 alvo especifico, onde falhar alto e o certo. **D2
+    (intent CAOTICO, Patch-Zero):** se `intent.is_chaotic == true`, loga RUIDO -
+    NUNCA revela `predicted_action_id`/`predicted_target_id`/`predicted_damage` -
+    preserva a one-way door do boss.
+  - `dump_reveal_intent`: itera `ctx.combatants` (mesmo guard de lado do ChainDamage -
+    inimigos VIVOS do lado OPOSTO ao caster), chamando `log_intent_for` pra cada um.
+    Zero inimigos vivos: no-op logado (dissipacao), NAO silencioso.
+  - Read-only sobre o combate: monta um `CombatState` LOCAL (via `ctx.queue`, so
+    quando ha brain de fato pra consultar) pra alimentar `brain->preview_intent`, mas
+    NAO muta NADA (0 dano, 0 status novo em terceiros, 0 RNG, fila intocada).
+- **`CombatStateMachine::process_scrying_hooks`** (D3, re-dump de rodada): gemeo de
+  `process_round_end_hooks`/`process_ally_turn_end_hooks`, mas orientado a STATUS -
+  itera `queue_.order()`, e pra cada ator VIVO que porta `StatusId::Scrying`
+  (`index_of_status >= 0`), chama `dump_reveal_intent` de novo. Chamado na FRONTEIRA
+  DE RODADA (`advance_to_next_actor`, junto de `process_round_end_hooks`/
+  `regroup_round_by_side`). Duracao tickada pelo motor de status DE SEMPRE
+  (`apply_status_tick`, no `TurnStart` do proprio caster) - nenhum codigo dedicado de
+  expiracao; quando `Scrying` some do ator, o proximo `process_scrying_hooks` so pula
+  ele (`continue`).
+- **Scan aprimorado (D1-ii):** `resolve_scan` ganha um bloco condicional -
+  `has_reveal_intent_equipped(actor, registry)` (helper novo, anonimo em
+  `combat_state_machine.cpp`, MESMO padrao de scan-por-EffectKind de
+  `quantize_spec_of` - varre `equipped_special_ids()` procurando `EffectKind::
+  RevealIntent`, Fail-SOFT `false` se ausente). Quando true, o Scan loga 3 linhas
+  extra: status ativos do alvo (`status_name`, helper novo), posicao na fila
+  (`InitiativeQueue::index_of`), e o intent previsto (`log_intent_for` direto). SO
+  dados que JA EXISTEM no modelo - nenhum atributo oculto novo.
+- **Stub posse-only de mundo (D1-i):** a face "revela baus/passagens ocultas na
+  exploracao" do design original NAO tem sistema de ocultos no overworld ainda -
+  ZERO codigo de combate aqui, so um comentario/ponto de extensao em
+  `master_cards.cpp::dee`. Quando o sistema de ocultos existir, a query reusa o MESMO
+  mecanismo do Scan aprimorado (`equipped_special_ids()` contem uma carta com
+  `EffectKind::RevealIntent`?) - nenhum campo/EffectKind novo necessario. Mesmo padrao
+  do stub anti-PEM do Faraday/Euler/Menger.
+- **TESTE-REI (determinismo, mutation-alvo):** dois combates com a MESMA seed - um com
+  Scrying ativo no caster, outro sem - produzem HP/dano/ordem-de-fila/contagem-de-RNG
+  BYTE-IDENTICOS ao longo de N rodadas; so o log difere. Prova 0 consumo de RNG e que
+  chamar `preview_intent` N vezes extras nao muta nenhum brain (telegraph honesto).
+- Testes: `GusEngine/domain/tests/techmagic_reveal_test.cpp` (11 casos: dump inicial,
+  no-op 0-inimigos, brain ausente fail-soft x2, D2 caotico->ruido sem vazamento, guards
+  fail-fast, D3 re-dump de rodada + expiracao, Scan aprimorado, stub posse-only
+  negativo, TESTE-REI) + `master_cards_test.cpp` (catalogo + i18n `CARD_EXEC_DEE_NAME`).
+
+Cross-ref: `GusEngine/domain/include/gus/domain/combat/combat_enums.hpp`
+(`EffectKind::RevealIntent`, `StatusId::Scrying`); `GusEngine/domain/include/gus/domain/
+combat/techmagic.hpp` (`TechMagicContext.brain_registry`, `log_intent_for`,
+`dump_reveal_intent`); `GusEngine/domain/src/combat/techmagic.cpp`
+(`handle_reveal_intent`); `GusEngine/domain/src/combat/combat_state_machine.cpp`
+(`process_scrying_hooks`, `resolve_scan`, `has_reveal_intent_equipped`, `status_name`);
+`GusEngine/domain/src/combat/master_cards.cpp` (dee); `docs/design/mecanicas/
+cartas-technomagik.md`; `docs/design/roster-analogos/_EFEITOS-ESCOLHIDOS.md` (AMB-07).
+
 ## Consequencias
 
 - **Positivas:** custo BAIXO-MEDIO, risco BAIXO; numeros 100% tunaveis pra playtest; testavel por unit test por EffectKind; easter-egg entregue hoje; nao fecha porta pra VM. Cada carta = 5-15 linhas de dado.

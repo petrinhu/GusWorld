@@ -158,6 +158,7 @@ std::string_view status_name_key(gus::domain::combat::StatusId id) noexcept {
         case StatusId::Reflect:           return "STATUS_REFLECT_NAME";
         case StatusId::BlindagemEM:       return "STATUS_BLINDAGEMEM_NAME";
         case StatusId::NullProof:         return "STATUS_NULLPROOF_NAME";
+        case StatusId::Scrying:           return "STATUS_SCRYING_NAME";
     }
     return "STATUS_STUN_NAME";  // guarda (enum coberto)
 }

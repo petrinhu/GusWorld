@@ -349,6 +349,16 @@ private:
     // (run_active_turn_to_end e expire_on_stunned_turn_end).
     void process_ally_turn_end_hooks(CombatActor& ended);
 
+    // Re-dump dos intents inimigos (ADR-016 step 8, John Dee/Black-Mirror, RevealIntent):
+    // roda techMagic::dump_reveal_intent 1x por ator VIVO da fila que porta StatusId::
+    // Scrying (qualquer lado - a query e generica, so a party equipa a carta hoje mas o
+    // motor nao hardcoda isso). Gemeo de process_round_end_hooks/process_ally_turn_end_hooks,
+    // mas orientado a STATUS (nao a especial EQUIPADA) - Scrying e um buff auto-aplicado no
+    // caster, nao uma passiva Passiva/Hibrida rodada via execute_equipped. Chamado SO na
+    // fronteira de rodada (wrap de advance_to_next_actor), ANTES de regroup_round_by_side -
+    // mesma ordem/racional de process_round_end_hooks (ordem que FECHOU a rodada).
+    void process_scrying_hooks();
+
     [[nodiscard]] CombatActor* resolve_primary_target(CombatActor& actor,
                                                       const CombatAction& action,
                                                       const Card& card);

@@ -443,6 +443,8 @@ Cancel
 
 ## STATUS_NULLPROOF_NAME
 
+## STATUS_SCRYING_NAME
+
 ### Curated combos (COMBO_<comboId>_NAME)
 
 ## COMBO_PULSO_STREAM_NAME
@@ -525,6 +527,9 @@ Einstein
 
 ## CARD_EXEC_PLANCK_NAME
 Quantum-Lock
+
+## CARD_EXEC_DEE_NAME
+Black-Mirror
 
 ### Controls screen (keyboard remap, M2)
 
