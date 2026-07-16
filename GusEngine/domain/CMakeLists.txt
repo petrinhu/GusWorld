@@ -69,6 +69,10 @@ add_library(gusengine_domain STATIC
     src/dialogue/dialogue_graph.cpp
     src/dialogue/dialogue_text.cpp
     src/dialogue/dialogue_runtime.cpp
+    # DECK-1: fundacao do sistema de deck/mao (deck-mao-sistema.md). CardCollection e o
+    # agregado que garante os invariantes anti-exploit (XOR de container, deck morto
+    # inerte, one-way por ausencia de API, guard de tier pra classe protegida).
+    src/deck/card_collection.cpp
 )
 
 target_include_directories(gusengine_domain

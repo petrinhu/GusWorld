@@ -187,6 +187,10 @@ add_executable(gusengine_domain_tests
     # a PendingResolution contra os 6 casos de exemplo do pedido do Gus. NAO liga a
     # CombatStateMachine/InitiativeQueue de producao (cutover e onda pos-M7).
     action_clock_test.cpp
+    # DECK-1 (fundacao do sistema de deck/mao, deck-mao-sistema.md secao 7/8c):
+    # CardCollection - XOR de container, deck morto inerte, one-way por ausencia de
+    # API, guard de tier pra classe protegida (Especial/Super), capacidade 34/55/89.
+    card_collection_test.cpp
 )
 
 # Os testes do combate incluem helpers de teste headers-only (fixed_random.hpp).
