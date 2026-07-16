@@ -73,6 +73,11 @@ add_library(gusengine_domain STATIC
     # agregado que garante os invariantes anti-exploit (XOR de container, deck morto
     # inerte, one-way por ausencia de API, guard de tier pra classe protegida).
     src/deck/card_collection.cpp
+    # DECK-2: a MAO (loadout) como SELECAO sobre o deck ativo (secao 4/7 inv.2 - a mao
+    # nao e container, so guarda instance_id; validada contra CardCollection::active()).
+    # hand_capacity() (secao 8c, teto anti-snowball) + slot especial dedicado do Gus
+    # (kGusSpecialHandSlots, flag is_universal_compiler) + revalidacao de IDs orfaos.
+    src/deck/hand_loadout.cpp
 )
 
 target_include_directories(gusengine_domain

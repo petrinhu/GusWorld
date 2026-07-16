@@ -191,6 +191,11 @@ add_executable(gusengine_domain_tests
     # CardCollection - XOR de container, deck morto inerte, one-way por ausencia de
     # API, guard de tier pra classe protegida (Especial/Super), capacidade 34/55/89.
     card_collection_test.cpp
+    # DECK-2 (mao/loadout como selecao, deck-mao-sistema.md secao 3/4/7/8c): HandLoadout
+    # - anti-dup (so guarda instance_id), so-deck-ativo, teto de comuns, slot especial
+    # dedicado do Gus (kGusSpecialHandSlots), hand_capacity() (teto/delta Bento),
+    # atomicidade de set_selection/swap_card, revalidacao de IDs orfaos.
+    hand_loadout_test.cpp
 )
 
 # Os testes do combate incluem helpers de teste headers-only (fixed_random.hpp).
