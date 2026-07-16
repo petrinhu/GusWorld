@@ -473,6 +473,24 @@ void handle_diversity_bonus(const EffectSpec&, const Card&, TechMagicContext&) {
     // No-op deliberado: ver comentario acima.
 }
 
+// ApEfficiency (Mises/Calc-Edge, CARD-ENGINE-MANIFESTO item 9): MARCADOR no-op deliberado,
+// MESMO padrao de handle_damage_quantize/handle_diversity_bonus acima. As DUAS faces da
+// passiva NAO passam por este dispatcher:
+//   Face 1 (+1 AP no turno do dono): CombatStateMachine::begin_turn le o EffectSpec DIRETO
+//     via combat_state_machine.cpp::apefficiency_spec_of, DEPOIS de
+//     refresh_resources_for_turn, e chama CombatActor::grant_bonus_ap.
+//   Face 2 (atraso + erro de mira nos taggeados "comando central"): CombatStateMachine::
+//     regroup_round_by_side (atraso, via InitiativeQueue::regroup_stable) e o resolvedor/
+//     preview (erro de mira, via combat_state_machine.cpp::mises_aim_error_spec_for -
+//     ULTIMO fator da cadeia divisiva/raw) leem o MESMO EffectSpec DIRETO.
+// A carta e Passiva (nunca jogada via UseCard) - execute_equipped NUNCA despacha OnCast pra
+// ela (so Always/OnDamageDealt/OnDamageReceived/OnRoundEnd/OnAllyTurnEnd); na pratica este
+// handler nunca roda, existe so pra satisfazer o invariante fail-fast "EffectKind sem
+// handler = bug" (techmagic.hpp) sem lancar.
+void handle_ap_efficiency(const EffectSpec&, const Card&, TechMagicContext&) {
+    // No-op deliberado: ver comentario acima.
+}
+
 // RevealIntent (OnCast, John Dee/Black-Mirror; ADR-016 step 8, manifesto item 6; decisoes
 // D1-D4 do lider 2026-07-15): aplica o buff Scrying no PROPRIO caster via add_status
 // LEGADO (NAO try_add_status - e um buff auto-aplicado, nao um debuff ofensivo em outro
@@ -613,14 +631,17 @@ void execute(TriggerHook hook, const Card& card, TechMagicContext& ctx) {
             case EffectKind::DiversityBonus:
                 handle_diversity_bonus(spec, card, ctx);
                 break;
+            case EffectKind::ApEfficiency:
+                handle_ap_efficiency(spec, card, ctx);
+                break;
             case EffectKind::CloneAlly:
             default:
                 throw std::logic_error(
                     "techMagic: EffectKind sem handler implementado na carta '" + card.id +
-                    "' (steps 2-3-5-6-7-8 + manifesto5-6 + CARD-ENGINE-MANIFESTO item 7 cobrem "
+                    "' (steps 2-3-5-6-7-8 + manifesto5-6 + CARD-ENGINE-MANIFESTO item 7-9 cobrem "
                     "ApplyStatus/Leech/Reflect/HypotenuseCombo/RepeatLastAction/ChainDamage/"
-                    "DelayAction/DamageQuantize/RevealIntent/DiversityBonus; CloneAlly e step "
-                    "futuro, ADR-016).");
+                    "DelayAction/DamageQuantize/RevealIntent/DiversityBonus/ApEfficiency; "
+                    "CloneAlly e step futuro, ADR-016).");
         }
     }
 }

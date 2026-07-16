@@ -161,6 +161,15 @@ add_executable(gusengine_domain_tests
     # basico); determinismo de RNG identico com/sem Hayek (CountingRandom); piso de
     # falha 0.
     techmagic_hayek_test.cpp
+    # Executor techMagic (CARD-ENGINE-MANIFESTO item 9, decisao do lider 2026-07-16):
+    # Mises/Calc-Edge - EffectKind::ApEfficiency (marker fora do dispatcher, mesmo padrao
+    # de DamageQuantize/DiversityBonus). Face 1 (+1 AP no turno do dono equipado, nao
+    # persiste); Face 2 ("comando central": atores CombatActor::central_command() do lado
+    # oposto ao dono da Mises sofrem atraso de fila via regroup_round_by_side + desconto
+    # -13% de dano, carta E ataque basico, gemeo preview<->real); tag sem Mises ativa e
+    # Mises sem tag = no-op (com log); determinismo de RNG (CountingRandom); handler
+    # no-op no dispatcher.
+    techmagic_mises_test.cpp
 )
 
 # Os testes do combate incluem helpers de teste headers-only (fixed_random.hpp).

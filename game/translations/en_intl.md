@@ -537,6 +537,9 @@ Spectra-Wave
 ## CARD_EXEC_HAYEK_NAME
 Free-Order
 
+## CARD_EXEC_MISES_NAME
+Calc-Edge
+
 ### Controls screen (keyboard remap, M2)
 
 ## CONTROLS_HINT

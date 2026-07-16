@@ -207,6 +207,22 @@ public:
         equipped_special_ids_ = std::move(ids);
     }
 
+    // ---- Tag "comando central" (Mises/Calc-Edge, CARD-ENGINE-MANIFESTO item 9) ----
+
+    // true = este ator esta marcado "comando central" (EffectKind::ApEfficiency face 2):
+    // sofre atraso de fila + erro de mira quando algum VIVO do lado OPOSTO porta a carta
+    // Mises equipada. Espelha EnemyTemplate::central_command (templates/enemy_template.hpp).
+    // Default false preserva TODO ator/teste existente. Setter dedicado (MESMO padrao de
+    // equipped_special_ids acima) - nenhum call site do construtor quebra.
+    [[nodiscard]] bool central_command() const noexcept { return central_command_; }
+    void set_central_command(bool value) noexcept { central_command_ = value; }
+
+    // Concede AP bonus TEMPORARIO neste turno (Mises/Calc-Edge, CARD-ENGINE-MANIFESTO item
+    // 9, EffectKind::ApEfficiency face 1). NAO muta max_ap_: o bonus NAO persiste, o
+    // PROXIMO refresh_resources_for_turn reseta ap_ = max_ap_ de novo (secao 5). amount
+    // negativo e erro de chamador (out_of_range), mesmo padrao de heal/restore_mana.
+    void grant_bonus_ap(int amount);
+
 private:
     // Drena o pool de Shield contra amount e devolve o dano remanescente pro HP.
     int absorb_with_shield(int amount);
@@ -254,6 +270,9 @@ private:
     // Especiais equipadas (executor techMagic, ADR-016). Vazio por padrao (nenhuma
     // passiva); ver equipped_special_ids()/set_equipped_special_ids() acima.
     std::vector<std::string> equipped_special_ids_;
+    // Tag "comando central" (Mises/Calc-Edge, CARD-ENGINE-MANIFESTO item 9). Default false;
+    // ver central_command()/set_central_command() acima.
+    bool central_command_ = false;
 };
 
 }  // namespace gus::domain::combat

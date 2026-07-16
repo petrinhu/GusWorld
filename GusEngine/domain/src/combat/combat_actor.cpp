@@ -338,4 +338,10 @@ void CombatActor::restore_mana(int amount) {
     mana_ = std::min(max_mana_, mana_ + amount);
 }
 
+void CombatActor::grant_bonus_ap(int amount) {
+    if (amount < 0)
+        throw std::out_of_range("Bonus de AP deve ser >= 0.");
+    ap_ += amount;
+}
+
 }  // namespace gus::domain::combat

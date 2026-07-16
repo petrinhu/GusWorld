@@ -272,6 +272,15 @@ std::vector<std::uint8_t> serialize_enemy(const EnemyTemplate& tpl) {
     // na struct - nao ha .gdt em disco hoje pra quebrar, mas ficar no fim mantem o
     // formato extensivel do mesmo jeito).
     put_u32(payload, static_cast<std::uint32_t>(tpl.kind));
+    // Mises/Calc-Edge (CARD-ENGINE-MANIFESTO item 9): campo NOVO no FINAL do payload,
+    // MESMO padrao (append-only) de `kind` logo acima - NAO ha versionamento neste
+    // formato (sem campo de schema-version no envelope GDT1, ver header). Nenhum .gdt
+    // existe em disco/repo hoje pra este payload (grep confirmado - so testes exercitam
+    // serialize_enemy/deserialize_enemy), entao esta adicao NAO quebra nenhum arquivo
+    // persistido HOJE; fica registrado aqui, do mesmo jeito que no comentario do `kind`,
+    // que o formato SEGUE sem discriminador de versao - gap sistemico pre-existente,
+    // sinalizado ao lider no relatorio desta leva (nao inventado por esta mudanca).
+    payload.push_back(tpl.central_command ? 1u : 0u);
 
     return pack(payload);
 }
@@ -291,6 +300,7 @@ EnemyTemplate deserialize_enemy(const std::vector<std::uint8_t>& data) {
     tpl.is_boss = (r.read_u8() != 0);
     tpl.base_deck = r.read_deck();
     tpl.kind = static_cast<EnemyKind>(r.read_u32());
+    tpl.central_command = (r.read_u8() != 0);
     r.expect_end();
 
     tpl.validate();

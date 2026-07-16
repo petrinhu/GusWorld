@@ -1,9 +1,9 @@
 // gus/domain/src/combat/master_cards.cpp
 //
-// Implementacao do catalogo das 15 cartas ESPECIAIS suportadas pelo executor techMagic
-// (ADR-016, MVP steps 4-8 + manifesto itens 5-6, 12). Ver header para o contrato. Mesmo padrao de
-// placeholder_cards.cpp: cartas construidas uma vez, emplace fail-fast em id duplicado.
-// POCO puro, ZERO Qt.
+// Implementacao do catalogo das 17 cartas ESPECIAIS suportadas pelo executor techMagic
+// (ADR-016, MVP steps 4-8 + manifesto itens 5-6, 12 + CARD-ENGINE-MANIFESTO itens 7, 9).
+// Ver header para o contrato. Mesmo padrao de placeholder_cards.cpp: cartas construidas uma
+// vez, emplace fail-fast em id duplicado. POCO puro, ZERO Qt.
 //
 // Regra de familia (cartas-technomagik.md secao 2.3): dominio eletromagnetico -> Eletrico;
 // resto -> Universal. Volta/Faraday/Euler/Tesla = Eletrico; Newton/Pythagoras/Godel/Turing/
@@ -115,6 +115,13 @@ constexpr int kHayekTier3FumblePp = 2;
 constexpr int kHayekTier4Distinct = 4;
 constexpr int kHayekTier4DamagePct = 13;
 constexpr int kHayekTier4FumblePp = 3;
+// Calc-Edge (Mises, CARD-ENGINE-MANIFESTO item 9, decisoes do lider 2026-07-16): passiva
+// DUPLA mana-0. magnitude = +AP concedido ao DONO neste turno (face 1, "party aloca
+// melhor"); percent = desconto% de dano dos taggeados "comando central" quando esta carta
+// esta ativa do lado oposto (face 2). //PLAYTEST (tunavel; NAO rotular como easter-egg em
+// codigo/commit apesar da forma - mesma ressalva do Hayek acima).
+constexpr int kMisesBonusAp = 1;
+constexpr int kMisesAimErrorPercent = 13;  //PLAYTEST kMisesAimError.
 
 // Monta uma carta ESPECIAL base. base_type = Glifo (carta-programa nao-elemental,
 // //PLAYTEST). ap_cost default 1 (herda o mesmo default do placeholder). Sem
@@ -408,10 +415,32 @@ std::unordered_map<std::string, Card> assemble() {
                        .duration = kHayekTier4FumblePp}},
             /*ignores_weakness_wheel=*/false, /*power=*/0,
             /*target_shape=*/TargetShape::Self),
+
+        // --- Mises (Calc-Edge): Passiva, Universal, mana 0 (CARD-ENGINE-MANIFESTO item 9,
+        // decisoes do lider 2026-07-16). Equip-only, NUNCA jogada via UseCard. NAO executa
+        // via techMagic::execute (marcador no-op, ver techmagic.cpp::
+        // handle_ap_efficiency) - as DUAS faces plugam DIRETO no motor:
+        //   Face 1 ("party aloca melhor"): +1 AP (magnitude) NESTE turno pro DONO,
+        //     CombatStateMachine::begin_turn via apefficiency_spec_of.
+        //   Face 2 ("comando central"): atores CombatActor::central_command()==true do
+        //     lado OPOSTO sofrem atraso de fila (CombatStateMachine::regroup_round_by_side)
+        //     + desconto percent% no dano ofensivo (resolvedor/preview, ULTIMO fator da
+        //     cadeia divisiva/raw), SO enquanto esta carta estiver equipada por algum VIVO
+        //     do lado oposto ao taggeado (combat_state_machine.cpp::
+        //     mises_aim_error_spec_for). power 0 (passiva, sem dano proprio),
+        //     TargetShape::Self (equip-only, nunca mira nada). ---
+        make_special(
+            "mises", "CARD_EXEC_MISES_NAME", CardFamily::Universal, CardCategory::Passiva, 0,
+            {EffectSpec{.trigger = TriggerHook::OnCast,
+                       .kind = EffectKind::ApEfficiency,
+                       .magnitude = kMisesBonusAp,          // +AP da face 1.
+                       .percent = kMisesAimErrorPercent}},  // desconto% da face 2.
+            /*ignores_weakness_wheel=*/false, /*power=*/0,
+            /*target_shape=*/TargetShape::Self),
     };
 
     std::unordered_map<std::string, Card> registry;
-    registry.reserve(16);
+    registry.reserve(17);
     for (const auto& card : cards) {
         // emplace (nao indexer) falha-cedo se algum id duplicar (mesmo padrao do placeholder).
         const auto [it, inserted] = registry.emplace(card.id, card);

@@ -735,6 +735,9 @@ Spectra-Wave
 ## CARD_EXEC_HAYEK_NAME
 Free-Order
 
+## CARD_EXEC_MISES_NAME
+Calc-Edge
+
 ---
 
 ## §9. Menu de sistema (pausa + config de som, MENU-PAUSA-CONFIG-SOM)

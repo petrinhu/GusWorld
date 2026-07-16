@@ -300,6 +300,23 @@ enum class EffectKind : std::uint32_t {
     // CombatActor::take_damage direto sem passar por resolve_action) ficam FORA por
     // construcao. Ver techmagic.cpp::handle_diversity_bonus (no-op) + techmagic_hayek_test.cpp.
     DiversityBonus = 10,
+    // Calc-Edge (Mises, CARD-ENGINE-MANIFESTO item 9): passiva DUPLA mana-0, Universal.
+    // MARCADOR fora do dispatcher, MESMO padrao de DamageQuantize/DiversityBonus (o handler
+    // em techmagic.cpp e no-op deliberado - nunca roda de fato, a carta e Passiva/equip-only,
+    // execute_equipped nunca despacha OnCast pra ela). Face 1 ("party aloca melhor"): +1 AP
+    // NESTE turno pro DONO da passiva equipada (NAO party-wide, NAO muta max_ap_ - o bonus
+    // NAO persiste, reseta no PROXIMO refresh_resources_for_turn), plugado DIRETO em
+    // CombatStateMachine::begin_turn via apefficiency_spec_of. Face 2 ("comando central"):
+    // atores com CombatActor::central_command()==true DO LADO OPOSTO a quem porta a Mises
+    // (SE algum VIVO desse lado a tem equipada) sao (a) empurrados pro FIM do bloco do
+    // lado deles na fronteira de rodada (CombatStateMachine::regroup_round_by_side, 2a
+    // stable_partition, reusa InitiativeQueue::regroup_stable) e (b) sofrem desconto FIXO
+    // percent% no dano ofensivo que causam (carta E ataque basico - ULTIMO fator da cadeia
+    // divisiva/raw, gemeo preview<->real), plugado via
+    // combat_state_machine.cpp::mises_aim_error_spec_for. `magnitude` = +AP da face 1;
+    // `percent` = desconto% da face 2. Determinístico (0 RNG). Ver techmagic.cpp::
+    // handle_ap_efficiency (marcador no-op) e combat_state_machine.cpp (wiring real).
+    ApEfficiency = 11,
 };
 
 // Filtro de lado do alvo de um EffectSpec (ADR-016 Balde B, Faraday/EM-Shield). Data-driven:

@@ -21,9 +21,13 @@
 //   EnemyTemplate:
 //     u32 id_len | id[id_len] | i32 max_hp | i32 atk | i32 def | i32 spd |
 //     u32 family | u32 brain | u8 is_boss | u32 deck_count |
-//       (u32 card_len | card[card_len])*deck_count | u32 kind
+//       (u32 card_len | card[card_len])*deck_count | u32 kind | u8 central_command
 //     (kind = MODOS-MORTE Fase 0, EnemyKind: Creature/Human - campo aditivo no
-//     FINAL do payload, ver enemy_template.hpp)
+//     FINAL do payload, ver enemy_template.hpp; central_command = CARD-ENGINE-MANIFESTO
+//     item 9, Mises/Calc-Edge - campo aditivo SEGUINTE, MESMO padrao append-only. NOTA:
+//     este formato NAO tem discriminador de versao (nenhum campo de schema-version no
+//     envelope) - cada campo novo append-only e seguro SOMENTE enquanto nao houver .gdt
+//     persistido com o schema anterior; nao ha nenhum .gdt em disco/repo hoje.)
 //
 // O int32 e gravado como 4 bytes LE do bit-pattern (stats sao >= 0 por invariante,
 // mas o codec e fiel ao tipo). Chave de integridade FIXA embutida (integridade

@@ -2,15 +2,17 @@
 //
 // Spec executavel (Catch2 v3) do catalogo data-driven das cartas ESPECIAIS dos mestres
 // suportadas pelo executor techMagic (ADR-016, item TECHMAGIC-EXECUTOR / MVP steps 4-8 +
-// manifesto itens 5-6, 12): volta, newton, pythagoras, mandelbrot, ada, godel, faraday,
-// euler, turing, menger, tesla, einstein, planck, dee, maxwell. POCO puro, ZERO Qt.
+// manifesto itens 5-6, 12 + CARD-ENGINE-MANIFESTO itens 7, 9): volta, newton, pythagoras,
+// mandelbrot, ada, godel, faraday, euler, turing, menger, tesla, einstein, planck, dee,
+// maxwell, hayek, mises. POCO puro, ZERO Qt.
 //
-// Cobre: (1) as 15 cartas existem, ids unicos, nenhuma usa EffectKind::CloneAlly (guarda
+// Cobre: (1) as 17 cartas existem, ids unicos, nenhuma usa EffectKind::CloneAlly (guarda
 // que von Neumann/Bruno NAO entraram nesta leva); (2) campos canonicos por-carta (tier/
-// category/mana/power/ignores_weakness_wheel); (3) as 10 executaveis (volta/newton/
-// pythagoras/mandelbrot/ada/tesla/einstein/faraday/godel/dee) resolvem via techMagic::execute
-// SEM logic_error num contexto minimo; (4) as 3 fora-de-combate (euler/turing/menger) tem
-// effects vazio; (5) paridade i18n das 15 chaves CARD_EXEC_<FIGURA>_NAME (2 locales).
+// category/mana/power/ignores_weakness_wheel); (3) as 12 executaveis (volta/newton/
+// pythagoras/mandelbrot/ada/tesla/einstein/faraday/godel/dee/hayek/mises) resolvem via
+// techMagic::execute SEM logic_error num contexto minimo; (4) as 3 fora-de-combate
+// (euler/turing/menger) tem effects vazio; (5) paridade i18n das 17 chaves
+// CARD_EXEC_<FIGURA>_NAME (2 locales).
 //
 // Maxwell (Spectra-Wave, manifesto item 12, decisao do lider 2026-07-16, AMB-08): Hibrida/
 // Eletrico/Grupo, effects VAZIO (dano-base puro, reusa o caminho Grupo/AoE do Newton, zero
@@ -75,13 +77,13 @@ CombatActor make_actor(const std::string& id, bool player_side, int hp = 100, in
 
 // ===== 1. As 8 cartas existem, ids unicos, guarda anti-CloneAlly =====
 
-TEST_CASE("master_cards: build_registry tem exatamente as 16 cartas suportadas",
+TEST_CASE("master_cards: build_registry tem exatamente as 17 cartas suportadas",
           "[domain][combat][cards][techmagic][mastercards]") {
     const auto reg = MasterCards::build_registry();
-    REQUIRE(reg.size() == 16);
+    REQUIRE(reg.size() == 17);
     for (const char* id : {"volta", "newton", "pythagoras", "mandelbrot", "ada", "godel",
                            "faraday", "euler", "turing", "menger", "tesla", "einstein",
-                           "planck", "dee", "maxwell", "hayek"})
+                           "planck", "dee", "maxwell", "hayek", "mises"})
         REQUIRE(reg.count(id) == 1);
 }
 
@@ -673,7 +675,41 @@ TEST_CASE("master_cards: hayek (DiversityBonus em OnCast) executa via techMagic:
     REQUIRE_NOTHROW(techMagic::execute(TriggerHook::OnCast, c, ctx));
 }
 
-// ===== 4. Paridade i18n das 16 chaves (2 locales) =====
+TEST_CASE("master_cards: mises = Passiva/Universal/mana 0, effects [OnCast ApEfficiency "
+         "magnitude=+1AP percent=13]",
+         "[domain][combat][cards][techmagic][mastercards]") {
+    const auto reg = MasterCards::build_registry();
+    const Card& c = reg.at("mises");
+    REQUIRE(c.category == CardCategory::Passiva);
+    REQUIRE(c.family == CardFamily::Universal);
+    REQUIRE(c.mana_cost == 0);
+    REQUIRE(c.power == 0);  // passiva equip-only: sem dano proprio.
+    REQUIRE(c.target_shape == TargetShape::Self);  // equip-only, nunca mira nada.
+    REQUIRE(c.ignores_weakness_wheel == false);
+    REQUIRE(c.effects.size() == 1);
+
+    const EffectSpec& spec = c.effects[0];
+    REQUIRE(spec.trigger == TriggerHook::OnCast);
+    REQUIRE(spec.kind == EffectKind::ApEfficiency);
+    REQUIRE(spec.magnitude == 1);   // face 1: +1 AP no turno do dono.
+    REQUIRE(spec.percent == 13);    // face 2: -13% de dano nos taggeados "comando central".
+}
+
+TEST_CASE("master_cards: mises (ApEfficiency em OnCast) executa via techMagic::execute "
+         "sem lancar - handler no-op deliberado (as 2 faces vivem fora do dispatcher)",
+         "[domain][combat][cards][techmagic][mastercards]") {
+    const auto reg = MasterCards::build_registry();
+    const Card& c = reg.at("mises");
+
+    CombatActor caster = make_actor("m", /*player_side=*/true);
+
+    techMagic::TechMagicContext ctx;
+    ctx.caster = &caster;
+
+    REQUIRE_NOTHROW(techMagic::execute(TriggerHook::OnCast, c, ctx));
+}
+
+// ===== 4. Paridade i18n das 17 chaves (2 locales) =====
 
 namespace {
 
@@ -705,7 +741,7 @@ bool has_key(const std::vector<std::string>& keys, const std::string& key) {
 #define GUSWORLD_TRANSLATIONS_DIR "../../../../game/translations"
 #endif
 
-TEST_CASE("master_cards: as 16 chaves CARD_EXEC_<FIGURA>_NAME existem em pt_br.md e "
+TEST_CASE("master_cards: as 17 chaves CARD_EXEC_<FIGURA>_NAME existem em pt_br.md e "
          "en_intl.md",
          "[domain][combat][cards][techmagic][mastercards][i18n]") {
     const std::vector<std::string> pt =
@@ -717,7 +753,7 @@ TEST_CASE("master_cards: as 16 chaves CARD_EXEC_<FIGURA>_NAME existem em pt_br.m
 
     for (const char* figura : {"VOLTA", "NEWTON", "PYTHAGORAS", "MANDELBROT", "ADA",
                                "GODEL", "FARADAY", "EULER", "TURING", "MENGER", "TESLA",
-                               "EINSTEIN", "PLANCK", "DEE", "MAXWELL", "HAYEK"}) {
+                               "EINSTEIN", "PLANCK", "DEE", "MAXWELL", "HAYEK", "MISES"}) {
         const std::string key = std::string("CARD_EXEC_") + figura + "_NAME";
         INFO("chave: " << key);
         REQUIRE(has_key(pt, key));

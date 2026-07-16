@@ -377,6 +377,70 @@ struct HayekBonus {
     return " [Free-Order: sem diversidade ainda]";
 }
 
+// ---- Calc-Edge (Mises, CARD-ENGINE-MANIFESTO item 9, EffectKind::ApEfficiency) --------
+//
+// Mesmo padrao "marker fora do dispatcher" de quantize_spec_of/diversity_spec_of acima: a
+// carta e um MARCADOR (techmagic.cpp::handle_ap_efficiency e no-op) e as DUAS faces plugam
+// DIRETO no motor via os helpers abaixo. `magnitude` = +AP da face 1 (alocacao eficiente);
+// `percent` = desconto% de dano da face 2 (erro de mira do "comando central").
+
+// Face 1/gating de face 2: o EffectSpec ApEfficiency equipado por `actor`, ou nullptr. Mesmo
+// padrao de quantize_spec_of (scan de equipped_special_ids() contra `registry`, fail-soft).
+[[nodiscard]] const EffectSpec* apefficiency_spec_of(
+    const CombatActor& actor, const std::unordered_map<std::string, Card>* registry) {
+    if (registry == nullptr) return nullptr;
+    for (const std::string& id : actor.equipped_special_ids())
+        if (const auto it = registry->find(id); it != registry->end())
+            for (const EffectSpec& spec : it->second.effects)
+                if (spec.kind == EffectKind::ApEfficiency) return &spec;
+    return nullptr;
+}
+
+// O EffectSpec ApEfficiency equipado por QUALQUER VIVO do lado `player_side`, ou nullptr.
+// Mesmo padrao de diversity_spec_of (o beneficio/gating e do LADO INTEIRO, nao so de 1
+// ator). Usado tanto pra gating da face 2 (delay em regroup_round_by_side) quanto pro
+// desconto% que ela aplica (mises_aim_error_spec_for abaixo).
+[[nodiscard]] const EffectSpec* apefficiency_spec_on_side(
+    bool player_side, const std::vector<CombatActor*>& roster,
+    const std::unordered_map<std::string, Card>* registry) {
+    if (registry == nullptr) return nullptr;
+    for (const CombatActor* a : roster) {
+        if (a == nullptr || !a->is_alive() || a->is_player_side() != player_side) continue;
+        if (const EffectSpec* spec = apefficiency_spec_of(*a, registry)) return spec;
+    }
+    return nullptr;
+}
+
+// Face 2 (erro de mira): o EffectSpec ApEfficiency ATIVO contra `actor`, ou nullptr se nao
+// aplica. So aplica a atores com CombatActor::central_command()==true, E so quando algum
+// VIVO do lado OPOSTO a `actor` porta a Mises equipada (fail-soft, mesmo padrao acima) - a
+// tag sozinha, sem a carta ativa do lado oposto, nao produz desconto (ver
+// mises_aim_log_suffix, que ainda assim LOGA o estado "sem Mises ativo").
+[[nodiscard]] const EffectSpec* mises_aim_error_spec_for(
+    const CombatActor& actor, const std::vector<CombatActor*>& roster,
+    const std::unordered_map<std::string, Card>* registry) {
+    if (!actor.central_command()) return nullptr;
+    return apefficiency_spec_on_side(!actor.is_player_side(), roster, registry);
+}
+
+// Multiplicador de dano da face 2: 1.0 sem desconto (spec nulo); (1 - percent/100) com a
+// Mises ativa contra o taggeado. Piso 0 (nunca negativo) por simetria com os outros
+// multiplicadores desta cadeia (mult_disrupt etc.).
+[[nodiscard]] float mises_aim_error_mult(const EffectSpec* spec) {
+    return spec == nullptr
+               ? 1.0f
+               : std::max(0.0f, 1.0f - static_cast<float>(spec->percent) / 100.0f);
+}
+
+// Sufixo de log da face 2 (regra do lider: todo efeito loga - hit descontado E no-op),
+// mesmo padrao de quantize_log_suffix/hayek_log_suffix. "" quando `actor` nem porta a tag
+// (nada a logar); com a tag, loga SEMPRE (desconto ativo OU "sem Mises ativo").
+[[nodiscard]] std::string mises_aim_log_suffix(bool tagged, const EffectSpec* spec) {
+    if (!tagged) return "";
+    if (spec == nullptr) return " [comando central: sem Mises ativo, mira intacta]";
+    return " [comando central: erro de calculo, -" + std::to_string(spec->percent) + "%]";
+}
+
 }  // namespace
 
 CombatStateMachine::CombatStateMachine(
@@ -527,6 +591,43 @@ void CombatStateMachine::regroup_round_by_side() {
     // "lado": passamos um predicado que marca o lado que abre. party_opens verdadeiro => os
     // atores player-side vao pra frente; falso => os enemy-side vao pra frente.
     const bool party_opens = round_opening_side() == CombatSide::Party;
+
+    // Calc-Edge (Mises, CARD-ENGINE-MANIFESTO item 9, EffectKind::ApEfficiency face 2,
+    // "comando central"): atores TAGGEADOS (CombatActor::central_command()) sao empurrados
+    // pro FIM do bloco do PROPRIO lado, SE algum VIVO do lado OPOSTO porta a Mises equipada
+    // (deteccao fail-soft, mesmo padrao de quantize_spec_of/diversity_equipped_on_side - sem
+    // carta/registry/tag, `delayed` e sempre false e o passo abaixo vira no-op). 0 RNG.
+    const auto delayed = [this](const CombatActor* a) {
+        if (!a->central_command()) return false;
+        return apefficiency_spec_on_side(!a->is_player_side(), queue_.order(), card_registry_) !=
+               nullptr;
+    };
+
+    const int tagged_count = static_cast<int>(
+        std::count_if(queue_.order().begin(), queue_.order().end(),
+                      [](const CombatActor* a) { return a->central_command(); }));
+    if (tagged_count > 0) {
+        const bool active = std::any_of(queue_.order().begin(), queue_.order().end(), delayed);
+        log_.push_back(CombatLogEntry{
+            std::string{}, CombatActionType::StatusTick, std::nullopt, 0,
+            active
+                ? "comando central: " + std::to_string(tagged_count) +
+                      " ator(es) marcado(s) empurrado(s) pro fim do bloco (Mises ativo)."
+                : "comando central: " + std::to_string(tagged_count) +
+                      " ator(es) marcado(s), mas sem Mises ativo do lado oposto (sem "
+                      "atraso)."});
+    }
+
+    // 1a stable_partition: separa os taggeados-atrasados (grupo FINAL, sempre pro fim da
+    // fila INTEIRA) - no-op se `delayed` e sempre false (sem tag ou sem Mises ativo). A 2a
+    // stable_partition (side-split, logo abaixo, INALTERADA) preserva esta ordem relativa
+    // ao extrair o lado que abre pra frente: como os taggeados ja estao no ULTIMO
+    // sub-bloco apos este passo, eles permanecem no FIM do bloco do PROPRIO lado depois do
+    // side-split, nos dois sentidos (party abre ou inimigo abre) - reusa o mesmo primitivo
+    // regroup_stable de sempre, sem reordenar Gambito/Knockback (opera na FRONTEIRA de
+    // rodada, mesma garantia do side-split).
+    queue_.regroup_stable([&delayed](const CombatActor* a) { return !delayed(a); });
+
     queue_.regroup_stable([party_opens](const CombatActor* a) {
         return a->is_player_side() == party_opens;
     });
@@ -588,6 +689,19 @@ bool CombatStateMachine::begin_turn() {
     CombatActor& actor = *queue_.current();
 
     actor.refresh_resources_for_turn(queue_.round_index());
+
+    // Calc-Edge (Mises, CARD-ENGINE-MANIFESTO item 9, EffectKind::ApEfficiency face 1,
+    // "party aloca melhor"): +1 AP (magnitude) NESTE turno pro DONO da passiva equipada,
+    // DEPOIS de refresh_resources_for_turn acima (nao muta max_ap_ - reseta no PROXIMO
+    // begin_turn de novo). Determinístico (0 RNG); todo-efeito-loga.
+    if (const EffectSpec* mises = apefficiency_spec_of(actor, card_registry_);
+        mises != nullptr) {
+        actor.grant_bonus_ap(mises->magnitude);
+        log_.push_back(CombatLogEntry{
+            actor.id(), CombatActionType::StatusTick, std::nullopt, mises->magnitude,
+            actor.id() + " aloca recursos com eficiencia (Calc-Edge): +" +
+                std::to_string(mises->magnitude) + " AP neste turno."});
+    }
 
     const bool stunned = apply_status_tick(actor);
 
@@ -899,8 +1013,12 @@ int CombatStateMachine::preview_basic_attack_damage(
     // le o ledger CORRENTE (round_actions_), sem mutar nada (contrato PURO deste metodo).
     const HayekBonus hayek =
         hayek_bonus_for(attacker.is_player_side(), queue_.order(), card_registry_, round_actions_);
-    const int boosted =
-        static_cast<int>(std::lround(static_cast<float>(raw) * hayek.mult_damage()));
+    // Calc-Edge (Mises, item 9, face 2): MESMO gemeo preview<->real - le o desconto de
+    // "erro de mira" do taggeado, sem mutar nada (contrato PURO deste metodo).
+    const float mult_mises = mises_aim_error_mult(
+        mises_aim_error_spec_for(attacker, queue_.order(), card_registry_));
+    const int boosted = static_cast<int>(
+        std::lround(static_cast<float>(raw) * mult_mises * hayek.mult_damage()));
     // Absorcao de Shield espelhada de CombatActor::absorb_with_shield, SEM mutar (helper
     // compartilhado com estimate_card_damage, ver namespace anonimo acima).
     return shield_absorbed_loss(boosted, target);
@@ -969,12 +1087,19 @@ CardDamageEstimate CombatStateMachine::estimate_card_damage(
     const HayekBonus hayek =
         hayek_bonus_for(attacker.is_player_side(), queue_.order(), card_registry_, round_actions_);
 
+    // Calc-Edge (Mises, item 9, face 2): MESMO gemeo preview<->real que o Free-Order/
+    // Quantum-Lock - le o desconto de "erro de mira" do ATACANTE taggeado, sem mutar nada.
+    const float mult_mises = mises_aim_error_mult(
+        mises_aim_error_spec_for(attacker, queue_.order(), card_registry_));
+
     // 1. Cadeia divisiva IDENTICA a resolve_use_card (secao 11). mult_hayek e o ULTIMO fator
-    //    (Free-Order, item 7) - substitui mult_ambiente como ultimo da cadeia.
+    //    "sempre presente" (Free-Order, item 7); mult_mises (Calc-Edge, item 9) entra por
+    //    cima, so != 1.0 quando o atacante e taggeado E a Mises esta ativa do lado oposto.
     const float base_damage =
         static_cast<float>(card.power + attacker.atk()) *
         (100.0f / (100.0f + static_cast<float>(target.def()))) * est.mult_fraqueza *
-        mult_mod * mult_combo * mult_expose * mult_disrupt * mult_ambiente * hayek.mult_damage();
+        mult_mod * mult_combo * mult_expose * mult_disrupt * mult_ambiente *
+        hayek.mult_damage() * mult_mises;
 
     // 2. Variancia Knowledge (secao 11), IDENTICA: v = max(0.05, 0.30*exp(-kills*0.10)).
     const int kills = target.knowledge_kills();
@@ -1039,7 +1164,12 @@ void CombatStateMachine::resolve_basic_attack(CombatActor& attacker,
     // resolve_action - anti auto-inflacao). Ataque basico: lround(raw * mult_hayek).
     const HayekBonus hayek = hayek_bonus_for(attacker.is_player_side(), queue_.order(),
                                              card_registry_, round_actions_);
-    const int damage = static_cast<int>(std::lround(static_cast<float>(raw) * hayek.mult_damage()));
+    // Calc-Edge (Mises, item 9, face 2): "escala o raw" - desconto de erro de mira do
+    // ATACANTE taggeado, ANTES do lround final (ordem comuta com o mult_hayek).
+    const EffectSpec* mises = mises_aim_error_spec_for(attacker, queue_.order(), card_registry_);
+    const float mult_mises = mises_aim_error_mult(mises);
+    const int damage = static_cast<int>(
+        std::lround(static_cast<float>(raw) * mult_mises * hayek.mult_damage()));
 
     // Ataque basico nao tem carta (source_card = nullptr); ainda assim dispara
     // OnDamageDealt das equipadas do atacante e OnDamageReceived das equipadas do alvo
@@ -1049,7 +1179,7 @@ void CombatStateMachine::resolve_basic_attack(CombatActor& attacker,
     log_.push_back(CombatLogEntry{
         attacker.id(), CombatActionType::Attack, target->id(), damage,
         attacker.id() + " ataca " + target->id() + " por " + std::to_string(damage) + "." +
-            hayek_log_suffix(hayek)});
+            hayek_log_suffix(hayek) + mises_aim_log_suffix(attacker.central_command(), mises)});
 
     // RepeatLastAction (ADR-016 secao 20 item 5): grava ao FIM, so quando o hit causou
     // dano>0 (Q2). Uma acao sem dano preserva o registro anterior (ainda valido na rodada).
@@ -1360,6 +1490,11 @@ void CombatStateMachine::resolve_use_card(CombatActor& actor, const CombatAction
     const HayekBonus hayek = hayek_bonus_for(actor.is_player_side(), queue_.order(),
                                              card_registry_, round_actions_);
 
+    // Calc-Edge (Mises, item 9, face 2): calculado 1x pra acao inteira (nao por-alvo,
+    // mesmo racional do Hayek acima - o lado/tag do atacante nao muda entre alvos de AoE).
+    const EffectSpec* mises = mises_aim_error_spec_for(actor, queue_.order(), card_registry_);
+    const float mult_mises = mises_aim_error_mult(mises);
+
     const std::vector<CombatActor*> targets = resolve_targets(actor, action, card);
 
     // RepeatLastAction (ADR-016 secao 20 item 5): agrega o dano>0 causado a CADA ALVO
@@ -1440,11 +1575,14 @@ void CombatStateMachine::resolve_use_card(CombatActor& actor, const CombatAction
         const float mult_ambiente = mult_ambiente_for(card.family);
 
         // 1. Cadeia divisiva (secao 11). danoBase = "range da arma" base, ANTES da variancia.
-        //    mult_hayek (Free-Order, item 7) e o ULTIMO fator da cadeia.
+        //    mult_hayek (Free-Order, item 7) e mult_mises (Calc-Edge, item 9) sao os
+        //    ULTIMOS fatores da cadeia (mult_mises so != 1.0 se `actor` e taggeado E a
+        //    Mises esta ativa do lado oposto).
         const float base_damage =
             static_cast<float>(card.power + actor.atk()) *
             (100.0f / (100.0f + static_cast<float>(target->def()))) * mult_fraqueza * mult_mod *
-            mult_combo * mult_expose * mult_disrupt * mult_ambiente * hayek.mult_damage();
+            mult_combo * mult_expose * mult_disrupt * mult_ambiente * hayek.mult_damage() *
+            mult_mises;
 
         // 2. Curto-circuito de imunidade (secao 11): multFraqueza == 0 => dano 0 ANTES de
         //    qualquer sorteio. NAO consome RNG (determinismo: imune = 0 consumos).
@@ -1525,7 +1663,8 @@ void CombatStateMachine::resolve_use_card(CombatActor& actor, const CombatAction
         log_.push_back(CombatLogEntry{
             actor.id(), CombatActionType::UseCard, target->id(), damage,
             actor.id() + " compila " + card.id + " em " + target->id() + " por " +
-                std::to_string(damage) + "." + channel_suffix + hayek_log_suffix(hayek)});
+                std::to_string(damage) + "." + channel_suffix + hayek_log_suffix(hayek) +
+                mises_aim_log_suffix(actor.central_command(), mises)});
 
         // RepeatLastAction (ADR-016 secao 20 item 5, Q2): so agrega hits com dano>0
         // (FALHA/imune ja usaram `continue`/ficam em 0, nao chegam aqui com damage>0).

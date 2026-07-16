@@ -120,6 +120,31 @@ TEST_CASE("serializer: EnemyTemplate.kind com ordinal fora do dominio rejeitado"
     REQUIRE_THROWS_AS(tpl.validate(), std::invalid_argument);
 }
 
+// ---- CARD-ENGINE-MANIFESTO item 9 (Mises/Calc-Edge): EnemyTemplate.central_command ----
+
+TEST_CASE("serializer: EnemyTemplate.central_command roundtrippa (campo aditivo no FINAL "
+         "do payload, default false)",
+         "[domain][templates][serializer][techmagic]") {
+    // (a) default false roundtrippa (fixture nao seta o campo novo - guarda de regressao
+    // pra QUALQUER .gdt/fixture anterior a esta leva).
+    {
+        const auto original = daemon_fixture();
+        REQUIRE(original.central_command == false);
+        const auto restored = deserialize_enemy(serialize_enemy(original));
+        REQUIRE(restored.central_command == false);
+        REQUIRE(restored == original);
+    }
+    // (b) true roundtrippa (o teste de TESTE que o motor tageia - ver combat_actor_test.cpp
+    // pro espelho em CombatActor, e techmagic_mises_test.cpp pro efeito de combate).
+    {
+        auto original = sentinela_fixture();
+        original.central_command = true;
+        const auto restored = deserialize_enemy(serialize_enemy(original));
+        REQUIRE(restored.central_command == true);
+        REQUIRE(restored == original);
+    }
+}
+
 // ---- header binario valido ------------------------------------------------
 
 TEST_CASE("serializer: layout magic || length || payload || hmac",

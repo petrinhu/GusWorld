@@ -88,6 +88,19 @@ struct EnemyTemplate {
     // explicitos continuam validos, este 10o usa o default).
     EnemyKind kind = EnemyKind::Creature;
 
+    // Tag "comando central" (Mises/Calc-Edge, CARD-ENGINE-MANIFESTO item 9,
+    // EffectKind::ApEfficiency face 2, combat_enums.hpp): inimigos marcados sofrem atraso
+    // de fila + erro de mira quando a party porta a passiva Mises equipada. Espelhado em
+    // CombatActor::central_command() (combat_actor.hpp) - o wiring template->actor fica
+    // pro sitio que constroi o CombatActor a partir deste template (nao existe ainda em
+    // producao; ver AMB-10, _EFEITOS-ESCOLHIDOS.md). Campo NOVO no FINAL da struct (mesmo
+    // padrao de `kind` acima) - preserva os aggregate-inits posicionais existentes
+    // (canonical_templates.cpp/testes com 10 campos explicitos continuam validos, este 11o
+    // usa o default false). Curadoria de QUAIS inimigos canônicos levam a tag e decisao de
+    // design/lore do criador, FORA de escopo desta implementacao - o bestiario canonico
+    // fica intocado; so templates de TESTE ganham a tag.
+    bool central_command = false;
+
     // Igualdade por valor (semantica de record do C#).
     [[nodiscard]] bool operator==(const EnemyTemplate&) const = default;
 

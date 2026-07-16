@@ -619,6 +619,91 @@ Cross-ref: `GusEngine/domain/include/gus/domain/combat/combat_enums.hpp`
 `diversity_spec_of`/`hayek_bonus_for`/`hayek_log_suffix`); `docs/design/mecanicas/
 cartas-technomagik.md`; `docs/design/roster-analogos/_EFEITOS-ESCOLHIDOS.md` (AMB-09).
 
+## Addendum (CARD-ENGINE-MANIFESTO item 9, decisoes do lider 2026-07-16, AMB-10): Mises/Calc-Edge (ApEfficiency)
+
+Decimo segundo `EffectKind` entregue (append-only, ordinal 11): `ApEfficiency`, a passiva DUPLA
+"Calc-Edge" de Mises. Passiva mana-0, equip-only, Universal. Duas faces num UNICO `EffectKind`
+(a face 2 e comportamento detectado por PRESENCA - carta equipada x tag no ator - nao um 2o
+kind). A carta e a PRIMEIRA a tocar o SERIALIZER binario `.gdt` (campo novo no `EnemyTemplate`).
+
+- **`EffectKind::ApEfficiency` (ordinal 11, append-only apos `DiversityBonus`)**: MARCADOR no-op
+  deliberado, MESMO padrao de `DamageQuantize`/Planck e `DiversityBonus`/Hayek - 
+  `techmagic.cpp::handle_ap_efficiency` e um no-op; nenhuma das duas faces passa pelo
+  dispatcher `techMagic::execute` (a carta e Passiva, `execute_equipped` nunca despacha `OnCast`
+  pra ela). Um UNICO `EffectSpec` carrega os dois parametros: `magnitude` = +AP da face 1;
+  `percent` = desconto% de dano da face 2 (`kMisesAimError` = 13, `//PLAYTEST`).
+- **Face 1 ("party aloca melhor") = +1 AP so pro DONO, NAO party-wide** (decisao do lider - AP
+  party-wide seria forte demais). Concedido em `CombatStateMachine::begin_turn`, DEPOIS de
+  `refresh_resources_for_turn`, via `apefficiency_spec_of` + `CombatActor::grant_bonus_ap`. NAO
+  muta `max_ap_` - o bonus NAO persiste, o PROXIMO `begin_turn` reseta `ap_ = max_ap_` de novo
+  (mesma disciplina de recurso da secao 5). Zero RNG. Log diegetico (regra "todo efeito loga").
+- **Tag "comando central" = campo booleano no ATOR, nao um `EffectKind`/status** (mesmo padrao
+  de `is_boss`/`is_universal_compiler`: e uma PROPRIEDADE do ator). `CombatActor::
+  central_command()`/`set_central_command()` (setter dedicado, mesmo padrao de
+  `equipped_special_ids`) espelha `EnemyTemplate::central_command` (campo aditivo no FINAL da
+  struct - preserva os aggregate-inits posicionais existentes). A CURADORIA de quais inimigos
+  canonicos levam a tag e decisao de design/lore do lider (bate na axiologia canonica: "comando
+  central" = lado ruim), FORA de escopo do motor - o bestiario fica intocado, so 1 template/
+  ator de TESTE ganha a tag.
+- **Face 2, atraso = reordenacao de fila (nao perda de acao)**: em
+  `CombatStateMachine::regroup_round_by_side`, uma 2a `stable_partition` (via a MESMA primitiva
+  `InitiativeQueue::regroup_stable` do regroup-por-lado da secao 4.1) empurra os atores
+  taggeados pro FIM do array ANTES da partition por lado ja existente - a composicao das duas
+  partitions deixa cada taggeado no FIM do bloco do PROPRIO lado, nos dois sentidos (party abre
+  ou inimigo abre). SO dispara quando algum VIVO do lado OPOSTO ao taggeado porta a Mises
+  equipada (deteccao fail-soft `apefficiency_spec_on_side`, mesmo padrao de
+  `diversity_equipped_on_side`); sem Mises ativa, o `delayed` e sempre false e o passo vira
+  no-op. Opera na FRONTEIRA de rodada (mesma garantia do regroup-por-lado) - nao briga com
+  Gambito/Einstein/Knockback. Zero RNG.
+- **Face 2, erro de mira = desconto FIXO determinístico, NAO "chance de errar"** (decisao do
+  lider): usar uma chance% consumiria RNG e quebraria a contagem/paridade determinística do
+  canal COMUM (secao 11). `mult_mises` = `max(0, 1 - percent/100)` entra como o ULTIMO fator da
+  cadeia divisiva em `resolve_use_card`/`estimate_card_damage` (por cima de `mult_hayek`) e
+  escala o `raw` no ataque basico (`resolve_basic_attack`/`preview_basic_attack_damage`) -
+  gemeo preview<->real nos DOIS. SO != 1.0 quando o ATACANTE e taggeado E a Mises esta ativa do
+  lado oposto (`mises_aim_error_spec_for`). Zero RNG (provado por `CountingRandom` com/sem
+  Mises produzindo contagens IDENTICAS).
+- **Serializer `.gdt` - NOTA DE RISCO (achado, nao decisao nova)**: `EnemyTemplate::
+  central_command` e o primeiro campo aditivo do manifesto a tocar o formato binario
+  (`template_serializer.cpp`, `u8` append-only no FINAL do payload, MESMO padrao do
+  `EnemyKind::kind` de MODOS-MORTE Fase 0). O formato NAO tem discriminador de versao no
+  envelope (`MAGIC || LENGTH || PAYLOAD || HMAC`, sem campo schema-version) - gap SISTEMICO
+  pre-existente, nao introduzido por esta leva. Seguro HOJE porque NAO existe nenhum `.gdt`
+  persistido em disco/repo (`serialize_enemy`/`deserialize_enemy` so tem consumidores em teste +
+  `template_source.cpp`; nenhum asset `.gdt` real ainda). SINALIZADO ao lider: quando o jogo
+  passar a persistir `.gdt` de verdade (assets moddaveis via `user://`), este formato vai
+  precisar de um campo de versao + migrator ANTES do proximo campo aditivo virar risco real de
+  quebra retroativa. Round-trip do campo coberto por `template_serializer_test.cpp`.
+- **Log**: sufixo `mises_aim_log_suffix` anexado a CADA hit de um ator taggeado (regra "todo
+  efeito loga") - desconto ativo mostra `" [comando central: erro de calculo, -P%]"`; taggeado
+  mas sem Mises ativa do lado oposto mostra `" [comando central: sem Mises ativo, mira
+  intacta]"`; ator nao-taggeado = "" (sem ruido). O atraso tambem loga 1x/regroup (ativo vs
+  "sem Mises ativo do lado oposto").
+- Testes: `GusEngine/domain/tests/techmagic_mises_test.cpp` (+1 AP so pro dono/nao-persiste,
+  atraso via partition nos DOIS sentidos de abertura de rodada - com o taggeado de SPD MAIOR pra
+  o atraso INVERTER a ordem natural de SPD, distinguindo mecanismo-ativo de ausente; tag-sem-
+  Mises e Mises-sem-tag = no-op logado; desconto -13% carta E ataque basico com paridade
+  preview<->real; determinismo de RNG identico com/sem Mises via `CountingRandom`; handler no-op
+  no dispatcher) + `combat_actor_test.cpp` (`central_command`/`grant_bonus_ap`) +
+  `template_serializer_test.cpp` (round-trip do campo) + `combat_enums_test.cpp` (ordinal 11
+  append-only).
+
+Diferente das cartas do manifesto anteriores, esta leva JA CATALOGOU a carta em producao (nao
+so o motor): `master_cards.cpp::mises` (Passiva/Universal/mana 0, `OnCast -> ApEfficiency
+magnitude=1 percent=13`), registry 16->17, `master_cards_test.cpp` (campos + smoke), i18n
+`CARD_EXEC_MISES_NAME` = "Calc-Edge" (pt_br/en_intl) - "nao deixar a carta fora do jogo"
+(licao do Hayek, cuja catalogacao ficou pendente).
+
+Cross-ref: `GusEngine/domain/include/gus/domain/combat/combat_enums.hpp`
+(`EffectKind::ApEfficiency`); `GusEngine/domain/include/gus/domain/combat/combat_actor.hpp`
+(`central_command`/`grant_bonus_ap`); `GusEngine/domain/include/gus/domain/templates/
+enemy_template.hpp` (`central_command`); `GusEngine/domain/src/templates/template_serializer.cpp`
+(campo serializado); `GusEngine/domain/src/combat/combat_state_machine.cpp`
+(`apefficiency_spec_of`/`apefficiency_spec_on_side`/`mises_aim_error_spec_for`/
+`mises_aim_error_mult`/`mises_aim_log_suffix`/`regroup_round_by_side`/`begin_turn`);
+`docs/design/mecanicas/cartas-technomagik.md`; `docs/design/roster-analogos/
+_EFEITOS-ESCOLHIDOS.md` (AMB-10).
+
 ## Consequencias
 
 - **Positivas:** custo BAIXO-MEDIO, risco BAIXO; numeros 100% tunaveis pra playtest; testavel por unit test por EffectKind; easter-egg entregue hoje; nao fecha porta pra VM. Cada carta = 5-15 linhas de dado.

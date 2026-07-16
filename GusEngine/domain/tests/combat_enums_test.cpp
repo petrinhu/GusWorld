@@ -264,3 +264,11 @@ TEST_CASE("combat_enums: EffectKind::RepeatLastAction e ordinal 5 (append-only)"
           "[domain][combat][enums][techmagic]") {
     REQUIRE(ord(EffectKind::RepeatLastAction) == 5u);
 }
+
+// CARD-ENGINE-MANIFESTO item 9 (Mises/Calc-Edge, decisao do lider 2026-07-16):
+// ApEfficiency e append-only (ordinal 11, apos DiversityBonus). NAO reordena {0..10}:
+// contrato binario do serializer futuro intocado.
+TEST_CASE("combat_enums: EffectKind::ApEfficiency e ordinal 11 (append-only)",
+          "[domain][combat][enums][techmagic]") {
+    REQUIRE(ord(EffectKind::ApEfficiency) == 11u);
+}

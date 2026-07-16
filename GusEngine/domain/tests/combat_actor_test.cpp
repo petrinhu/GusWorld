@@ -150,6 +150,44 @@ TEST_CASE("combat_actor: defaults canonicos (max_ap, flags, knowledge)",
     REQUIRE_FALSE(a.is_universal_compiler());
     REQUIRE(a.knowledge_kills() == 0);
     REQUIRE(a.status_effects().empty());
+    REQUIRE_FALSE(a.central_command());  // Mises/Calc-Edge, CARD-ENGINE-MANIFESTO item 9.
+}
+
+// ---- Tag "comando central" (Mises/Calc-Edge, CARD-ENGINE-MANIFESTO item 9) --------
+
+TEST_CASE("combat_actor: set_central_command marca/desmarca a tag (default false)",
+          "[domain][combat][actor][techmagic]") {
+    auto a = make_actor();
+    REQUIRE_FALSE(a.central_command());
+    a.set_central_command(true);
+    REQUIRE(a.central_command());
+    a.set_central_command(false);
+    REQUIRE_FALSE(a.central_command());
+}
+
+// ---- grant_bonus_ap (Mises/Calc-Edge face 1, CARD-ENGINE-MANIFESTO item 9) --------
+
+TEST_CASE("combat_actor: grant_bonus_ap soma AP mas NAO muta max_ap (nao persiste no "
+         "proximo refresh)",
+         "[domain][combat][actor][techmagic]") {
+    auto a = make_actor();
+    a.refresh_resources_for_turn(0);
+    REQUIRE(a.ap() == combat_constants::kBaseApPerTurn);  // 3
+
+    a.grant_bonus_ap(1);
+    REQUIRE(a.ap() == combat_constants::kBaseApPerTurn + 1);  // 4, bonus TEMPORARIO
+    REQUIRE(a.max_ap() == combat_constants::kBaseApPerTurn);  // max_ap_ intocado
+
+    // O bonus NAO persiste: o PROXIMO refresh_resources_for_turn reseta ap_ = max_ap_.
+    a.refresh_resources_for_turn(1);
+    REQUIRE(a.ap() == combat_constants::kBaseApPerTurn);
+}
+
+TEST_CASE("combat_actor: grant_bonus_ap negativo e rejeitado",
+          "[domain][combat][actor][techmagic]") {
+    auto a = make_actor();
+    a.refresh_resources_for_turn(0);
+    REQUIRE_THROWS_AS(a.grant_bonus_ap(-1), std::out_of_range);
 }
 
 // ---- RefreshResourcesForTurn (ramp de mana, secao 5) ------------------------------
@@ -355,7 +393,7 @@ TEST_CASE("combat_actor: expire_elapsed_statuses remove duration <= 0",
     auto a = make_actor();
     a.add_status(StatusEffect{StatusId::Poison, 3, /*duration=*/0, StackRule::Replace});
     a.add_status(StatusEffect{StatusId::Regen, 2, /*duration=*/2, StackRule::Replace});
-    a.drain_status_changes();  // limpa Applied
+    (void)a.drain_status_changes();  // limpa Applied
     const bool spd_changed = a.expire_elapsed_statuses();
     REQUIRE_FALSE(spd_changed);  // nenhum status de SPD expirou
     REQUIRE(a.status_effects().size() == 1);
