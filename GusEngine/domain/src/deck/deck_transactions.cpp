@@ -1,0 +1,125 @@
+// gus/domain/deck/deck_transactions.cpp
+//
+// Implementacao das transacoes atomicas do sistema de deck/mao (DECK-3). Ver
+// deck_transactions.hpp pra garantia forte + idempotencia + fail-fast reservado a
+// invariante de programacao.
+
+#include "gus/domain/deck/deck_transactions.hpp"
+
+#include <algorithm>
+#include <stdexcept>
+#include <utility>
+
+namespace gus::domain::deck {
+
+using gus::domain::combat::CardTier;
+
+namespace {
+
+// Acha a instancia no ativo por leitura publica (CardCollection::active()) - usado
+// pra classificar a falha (InstanceNotInActive vs ProtectedTier) SEM depender de
+// capturar excecao de CardCollection::remove_for_sale() como controle de fluxo.
+const CardInstance* find_in_active(const CardCollection& collection, std::uint64_t instance_id) {
+    const auto& active = collection.active();
+    auto it = std::find_if(active.begin(), active.end(),
+                            [instance_id](const CardInstance& c) { return c.instance_id == instance_id; });
+    return it == active.end() ? nullptr : &*it;
+}
+
+// Nucleo comum de sell()/upload(): valida presenca+tier ANTES de mutar (garantia
+// forte), so entao remove do ativo e credita. Devolve {error, instance, credited}
+// generico - sell()/upload() so envolvem no Result tipado proprio.
+struct RemovalOutcome {
+    TransactionError error;
+    CardInstance instance;
+    int credited;
+};
+
+RemovalOutcome remove_and_credit(CardCollection& collection, std::int64_t& credits,
+                                  std::uint64_t instance_id, int price,
+                                  const CardCollection::TierLookup& tier_of,
+                                  const char* caller_name) {
+    if (price < 0) {
+        throw std::invalid_argument(std::string("deck_transactions::") + caller_name +
+                                     ": price/upload_price nao pode ser negativo (invariante de "
+                                     "programacao - o caller escolhe o preco de deck_constants.hpp)");
+    }
+
+    const CardInstance* found = find_in_active(collection, instance_id);
+    if (found == nullptr) {
+        // Idempotencia (inv.5): instancia ja fora do ativo (vendida/uploadada/descartada
+        // antes, ou nunca existiu) - rejeita, NAO credita.
+        return RemovalOutcome{TransactionError::InstanceNotInActive, CardInstance{}, 0};
+    }
+
+    if (const CardTier tier = tier_of(found->card_id);
+        tier == CardTier::Especial || tier == CardTier::Super) {
+        // Classe PROTEGIDA (inv.9) - nenhuma via de saida do ativo. Nada mutou ainda.
+        return RemovalOutcome{TransactionError::ProtectedTier, CardInstance{}, 0};
+    }
+
+    // Tudo validado - agora muta. remove_for_sale() reaplica o mesmo guard
+    // internamente (defesa redundante; nunca deveria disparar aqui, ja que acabamos
+    // de checar as duas condicoes por leitura publica).
+    CardInstance removed = collection.remove_for_sale(instance_id, tier_of);
+    credits += price;
+    return RemovalOutcome{TransactionError::Ok, removed, price};
+}
+
+}  // namespace
+
+SellResult sell(CardCollection& collection, std::int64_t& credits, std::uint64_t instance_id,
+                 int price, const CardCollection::TierLookup& tier_of) {
+    const RemovalOutcome outcome = remove_and_credit(collection, credits, instance_id, price,
+                                                      tier_of, "sell");
+    return SellResult{outcome.error, outcome.instance, outcome.credited};
+}
+
+UploadResult upload(CardCollection& collection, std::int64_t& credits, std::uint64_t instance_id,
+                     int upload_price, const CardCollection::TierLookup& tier_of) {
+    const RemovalOutcome outcome = remove_and_credit(collection, credits, instance_id, upload_price,
+                                                      tier_of, "upload");
+    return UploadResult{outcome.error, outcome.instance, outcome.credited};
+}
+
+AcquireResult acquire(CardCollection& collection, std::int64_t& credits, std::string card_id,
+                      int price) {
+    if (price < 0) {
+        throw std::invalid_argument(
+            "deck_transactions::acquire: price nao pode ser negativo (invariante de "
+            "programacao - 0 e o valor valido pra loot garantido/achado, nao negativo)");
+    }
+
+    if (credits < price) {
+        return AcquireResult{TransactionError::InsufficientCredits, CardInstance{}, 0};
+    }
+    if (collection.active_is_full()) {
+        return AcquireResult{TransactionError::ActiveCapacityFull, CardInstance{}, 0};
+    }
+
+    // Tudo validado - muta o container PRIMEIRO (unica mutacao que pode, em teoria,
+    // lancar via o guard interno de capacidade de add_to_active); so credita/debita
+    // depois que ela teve sucesso, pra nao deixar a wallet debitada sem a carta
+    // correspondente em nenhum cenario defensivo.
+    CardInstance instance = collection.add_to_active(std::move(card_id));
+    credits -= price;
+    return AcquireResult{TransactionError::Ok, instance, price};
+}
+
+CraftResult craft(CardCollection& collection, std::string result_card_id,
+                   const MaterialConsumer& consumer) {
+    // Capacidade checada ANTES de invocar o consumer (garantia forte): se nao cabe,
+    // NUNCA tenta consumir material a toa.
+    if (collection.active_is_full()) {
+        return CraftResult{TransactionError::ActiveCapacityFull, CardInstance{}};
+    }
+
+    if (!consumer()) {
+        return CraftResult{TransactionError::MaterialsUnavailable, CardInstance{}};
+    }
+
+    CardInstance instance = collection.add_to_active(std::move(result_card_id));
+    return CraftResult{TransactionError::Ok, instance};
+}
+
+}  // namespace gus::domain::deck

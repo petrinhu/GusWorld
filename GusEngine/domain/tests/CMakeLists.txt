@@ -196,6 +196,12 @@ add_executable(gusengine_domain_tests
     # dedicado do Gus (kGusSpecialHandSlots), hand_capacity() (teto/delta Bento),
     # atomicidade de set_selection/swap_card, revalidacao de IDs orfaos.
     hand_loadout_test.cpp
+    # DECK-3 (transacoes atomicas, deck-mao-sistema.md secao 6.1/6.2/7/8c):
+    # sell/upload/acquire/craft - garantia forte (valida tudo, so entao muta container+
+    # wallet), idempotencia (double-sell/double-upload nao credita 2x), guard de tier
+    # herdado (Especial/Super nunca saem do ativo), craft desacoplado de materiais via
+    # MaterialConsumer (capacidade checada ANTES de consumir).
+    deck_transactions_test.cpp
 )
 
 # Os testes do combate incluem helpers de teste headers-only (fixed_random.hpp).

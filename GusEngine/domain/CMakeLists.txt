@@ -78,6 +78,12 @@ add_library(gusengine_domain STATIC
     # hand_capacity() (secao 8c, teto anti-snowball) + slot especial dedicado do Gus
     # (kGusSpecialHandSlots, flag is_universal_compiler) + revalidacao de IDs orfaos.
     src/deck/hand_loadout.cpp
+    # DECK-3: transacoes atomicas sell/upload/acquire/craft (secao 6.1/6.2/7/8c) -
+    # garantia forte (valida tudo, so entao muta container+wallet), idempotencia
+    # (double-sell/double-upload nao credita 2x via TransactionError::InstanceNotInActive),
+    # guard de tier herdado de CardCollection::remove_for_sale (Especial/Super nunca
+    # saem do ativo), craft desacoplado do inventario de materiais via MaterialConsumer.
+    src/deck/deck_transactions.cpp
 )
 
 target_include_directories(gusengine_domain
