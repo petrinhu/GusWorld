@@ -89,6 +89,32 @@ O **capacitor** (`capacitor-item.md`) e outros itens de bolsa **NÃO competem** 
 
 ---
 
+## 8b. Catálogo das cartas comuns — ESTRUTURA (fechada 2026-07-16)
+
+Ancorado no canon (`combat.md §6`): as 5 famílias = especialidades dos companions; Gus = universal. Ataque básico é **ação inata (não-carta)** → as comuns são TODAS coloridas por família.
+
+| Família | Companion | Identidade | Status |
+|---|---|---|---|
+| Elétrico | Cauã Volt | burst single-target | Stun |
+| Bioquímico | Jaci Proxy | DoT/degradação | Poison/Corrode |
+| Sônico | Linda Siren | área-CC/interrupção | Disrupt/Silence |
+| Cinético | Bento Requiem | impacto/deslocamento | Knockback/Break |
+| Criptográfico | Iara Lumen | utilidade/anti-buff | Expose/Decrypt |
+
+- **Template de arquétipos por família** (decisão do líder): desenha o molde 1×, instancia nas 5 (anti-OE). **~6-7 arquétipos:**
+  1. **Jab** (mana 1, dano baixo, sem status) — o spam controlado.
+  2. **Golpe+status** (mana 2, dano médio + o status da família).
+  3. **Assinatura** (mana 3, a mecânica-cara: Elétrico=burst, Bio=DoT forte, Sônico=área, Cinético=deslocamento, Cripto=expose/anti-buff).
+  4. **Status-puro** (mana 1-2, controle, pouco/zero dano — aplica o status forte).
+  5. **Utilidade de classe** (o não-dano da cor: Bio=cura leve/regen, Cripto=scan+, Sônico=silence, Cinético=escudo/reposição, Elétrico=recarga/overclock).
+  6. **Finalizador-sinérgico** (mana 3, bônus se o alvo JÁ tem o status da família — sinergia intra-família).
+  7. (opcional por família.) Total ≈ 5×7 = **~35 comuns**.
+- **Gus (universal):** a coleção dele pode cruzar famílias (companions ficam travados na sua), adquirida como todos (compra/loot/acha, compete por crédito); a MÃO é do mesmo tamanho (5 comuns + 1-2 especiais) → **vantagem = versatilidade de coleção, não mais slots**. Flag `IsUniversalCompiler` (canon F2-E.10, `combat.md §6`).
+
+RESTA: **números `//PLAYTEST`** (em parecer com o `economy-designer`, 2026-07-16) + o **conteúdo real** de cada arquétipo × família (statlines) + playtest N=3.
+
+---
+
 ## 9. Faseamento + frentes abertas (execução)
 
 **Contra-argumento anti-OE (dev solo):** o loadout funciona SEM o mercado de NPC. Fasear:
