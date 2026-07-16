@@ -13,10 +13,16 @@ namespace gus::domain {
 // +EnemyKnowledge; V4 +input_remap_backup +controls_hash128 +slot_id (ADR-007:
 // persistencia de controles + deteccao de adulteracao + slot-id selado); V5
 // +difficulty +difficult_recovery_stage (MODOS-MORTE Fase 0: dificuldade FIXA do
-// save, escolhida na criacao - docs/design/mecanicas/modos-morte.md §3.2). Ancora
-// forward-only e FONTE UNICA da versao (o comentario "V2/V3/V4" em outros arquivos
-// NAO e autoridade; esta constante e).
-inline constexpr int kSaveSchemaVersion = 5;
+// save, escolhida na criacao - docs/design/mecanicas/modos-morte.md §3.2); V6
+// +CardCollectionState (deck ativo/morto com instance_id) +hand_selection por
+// personagem, em SUBSTITUICAO ao campo legado CharacterSaveState::deck (DECK-4,
+// docs/design/mecanicas/deck-mao-sistema.md) - migrator V5->V6 converte o deck
+// legado (vector<string> de card_id) nas instancias novas do deck ativo; +credits
+// (int64_t) UMA VEZ no nivel do SaveData (carteira UNICA da party, docs/design/
+// mecanicas/economia.md - economia single-currency, NAO per-character).
+// Ancora forward-only e FONTE UNICA da versao (o comentario "V2/V3/V4/V5" em
+// outros arquivos NAO e autoridade; esta constante e).
+inline constexpr int kSaveSchemaVersion = 6;
 
 // Rotulo da camada de dominio, util para diagnostico/log na fase de andaime.
 std::string_view domain_label() noexcept;

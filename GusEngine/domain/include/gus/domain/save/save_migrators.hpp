@@ -4,7 +4,7 @@
 // arvore JSON (como era o C#). Cada bump de schema (VN -> VN+1) e um passo da chain;
 // CurrentVersion = maior versao alcancavel = gus::domain::kSaveSchemaVersion.
 //
-// Schema atual = V5 (fonte unica: gus::domain::kSaveSchemaVersion). NAO confiar
+// Schema atual = V6 (fonte unica: gus::domain::kSaveSchemaVersion). NAO confiar
 // neste comentario como autoridade da versao; a ancora kSaveSchemaVersion e que manda.
 //   V1 = inicial, SEM character_states (per-character).
 //   V2 = + character_states. MigrateV1ToV2 popula character_states VAZIO (semantica
@@ -18,6 +18,19 @@
 //        (default canonico §2.1: saves pre-dificuldade sobem no "meio-termo", nao
 //        havia escolha explicita antes) e difficult_recovery_stage = 0 (sem
 //        penalidade ativa).
+//   V6 = + CardCollectionState (deck ativo/morto) + hand_selection por
+//        personagem, EM SUBSTITUICAO ao campo legado CharacterSaveState::deck
+//        (DECK-4, docs/design/mecanicas/deck-mao-sistema.md); + credits (i64) UMA
+//        VEZ no nivel do SaveData (carteira UNICA da party, docs/design/mecanicas/
+//        economia.md - economia single-currency, NAO per-character). MigrateV5ToV6
+//        converte o deck legado (vector<string> de card_id) de cada personagem em
+//        instancias sequenciais no deck ATIVO novo (instance_id 1..N, deterministico,
+//        LOCAL a cada personagem - CardCollection nao compartilha espaco de IDs
+//        entre companions), deck morto vazio, hand_selection vazia (mao nao
+//        persistia antes; bancada comeca vazia); credits=0 no SaveData (nao havia
+//        carteira antes desta onda). O campo deck legado e ESVAZIADO apos a
+//        conversao (fonte de
+//        verdade migrou pra card_collection.active).
 //
 // A chain e extensivel: somar o passo VN->VN+1 + bumpar a ancora quando o marco
 // chegar (test-guarda current_schema_version()==kSaveSchemaVersion trava o esquecimento).
@@ -76,6 +89,15 @@ namespace gus::domain::save {
 // "geracao V4" do jogo (ADR-007, pre-MODOS-MORTE), para a fixture de migracao
 // V4->V5. NAO valida invariantes de V5.
 [[nodiscard]] std::vector<std::uint8_t> serialize_save_v4(const SaveData& data);
+
+// Serializa um SaveData no layout do payload V5 (comuns + character_states COM O
+// DECK LEGADO (list<str>, sem card_collection/credits/hand_selection) +
+// enemy_knowledge + input_remap_backup + controls_hash128 + slot_id + difficulty +
+// difficult_recovery_stage) dentro do envelope selado. Representa a "geracao V5"
+// do jogo (MODOS-MORTE Fase 0, pre-DECK-4), para a fixture de migracao V5->V6. NAO
+// valida invariantes de V6 (CharacterSaveState::deck e o campo lido pelo migrator;
+// card_collection/credits/hand_selection nao existem neste layout).
+[[nodiscard]] std::vector<std::uint8_t> serialize_save_v5(const SaveData& data);
 
 // Forja um envelope selado (HMAC valido) cujo payload declara schema_version =
 // version, com o restante dos campos minimos (layout V1). Usado para testar a

@@ -79,6 +79,9 @@ add_executable(gusengine_domain_tests
     # Tela Controles (remap, M2): swap-on-conflict PURO ("avisa e troca").
     controls_remap_apply_test.cpp
     save_v4_test.cpp
+    # DECK-4: persistencia do sistema de deck/mao no save (V5->V6, CardCollectionState
+    # + credits + hand_selection por personagem, EM SUBSTITUICAO ao `deck` legado).
+    save_v6_test.cpp
     # SAVE-LOAD-UI etapa 5 (AUTOSAVE): predicado puro de politica por local
     # (cidade sempre ON; dungeon so ON com PEM descoberto OU carta Faraday).
     save_policy_test.cpp

@@ -47,18 +47,28 @@
 //   list<str> party_roster | list<str> party_active |
 //   map<str,u8> flags | map<str,i32> inventory | map<str,i32> quest_progress |
 //   map<str,i32> relations |
-//   map<str, CharacterSaveState{ i32 current_hp | i32 xp | list<str> deck }> |
+//   map<str, CharacterSaveState{ i32 current_hp | i32 xp |
+//     list<CardInstance{u64 instance_id | str card_id}> card_collection.active |
+//     list<CardInstance> card_collection.dead | u64 next_instance_id |
+//     list<u64> hand_selection }> (V6, DECK-4 - SUBSTITUI o `deck` legado
+//     list<str> dos layouts V2..V5, ver serialize_save_v5) |
 //   map<str,i32> enemy_knowledge (V3) |
 //   input_remap_backup (V4: u32 config_version | u32 actions_count | repeat:
 //     str action_name | f32 deadzone |
 //     u32 keys_count{ i64 keycode | u8 ctrl | u8 shift | u8 alt } |
 //     u32 gamepad_buttons_count{ i32 } | u32 mouse_buttons_count{ i32 } |
 //     u32 gamepad_axes_count{ i32 axis | f32 axis_value }) |
-//   controls_hash128 (V4: 16 bytes crus) | i32 slot_id (V4)
+//   controls_hash128 (V4: 16 bytes crus) | i32 slot_id (V4) |
+//   u32 difficulty | i32 difficult_recovery_stage (V5) |
+//   i64 credits (V6, DECK-4 - carteira UNICA da party, gravada 1x aqui no FIM do
+//   payload; docs/design/mecanicas/economia.md, economia single-currency, NAO
+//   per-character)
 // (mapas gravados em ordem de chave; actions do backup na ordem do vetor que o caller
 // monta na ordem do ActionRegistry: std::map/ordem = serializacao deterministica).
 // Os layouts antigos (V1 sem character_states; V2 sem enemy_knowledge; V3 sem campos
-// V4) sao produzidos por serialize_save_v1/v2/v3, para as fixtures de migracao.
+// V4; V4 sem difficulty/difficult_recovery_stage; V5 com o `deck` legado no lugar de
+// card_collection/hand_selection e SEM credits) sao produzidos por
+// serialize_save_v1/v2/v3/v4/v5, para as fixtures de migracao.
 //
 // ORDEM DO LOAD (deserialize_save, forward-only, CONTRACT §7):
 //   1. valida a tag AEAD do envelope (integridade+confidencialidade ANTES de
@@ -128,7 +138,7 @@ class SaveVersionTooNewError : public std::runtime_error {
 
 // ---- serialize / deserialize ----------------------------------------------
 
-// Serializa SaveData no formato atual (V5), envelope GDS3. Valida invariantes
+// Serializa SaveData no formato atual (V6), envelope GDS3. Valida invariantes
 // antes (fail-fast: lanca std::invalid_argument se invalido). Carimbo
 // timestamp_ms ja deve estar preenchido pelo chamador (injetado, ADR-006 item 4).
 // O slot_id do envelope (AAD) vem de data.slot_id; rollback_ctr = 0 (saves

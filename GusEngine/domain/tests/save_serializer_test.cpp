@@ -59,7 +59,7 @@ namespace {
 // preenchidos, timestamp_ms fixo (1718900000123 = determinismo, sem relogio).
 SaveData rich_fixture() {
     SaveData s;
-    s.schema_version = gus::domain::kSaveSchemaVersion;  // V2
+    s.schema_version = gus::domain::kSaveSchemaVersion;
     s.timestamp_ms = 1718900000123LL;
     s.playtime_seconds = 3661.5;
     s.current_scene_path = "res://world/gusworld_city.tscn";
@@ -71,10 +71,25 @@ SaveData rich_fixture() {
     s.inventory = {{"bio_ampola", 3}, {"credito", 144}};
     s.quest_progress = {{"q_gambito", 2}, {"q_main", 1}};
     s.relations = {{"caua", 5}, {"iara", 8}};
-    s.character_states = {
-        {"gus", CharacterSaveState{34, 120, {"pulso_eletrico", "scan_basico"}}},
-        {"caua", CharacterSaveState{40, 89, {"stream_raio"}}},
-    };
+    // V6 (DECK-4): card_collection/hand_selection SUBSTITUEM o `deck` legado
+    // (list<str>) - o oraculo de roundtrip exercita os campos VIGENTES.
+    CharacterSaveState gus_state;
+    gus_state.current_hp = 34;
+    gus_state.xp = 120;
+    gus_state.card_collection.active = {{1, "pulso_eletrico"}, {2, "scan_basico"}};
+    gus_state.card_collection.dead = {{3, "glifo_obsoleto"}};
+    gus_state.card_collection.next_instance_id = 4;
+    gus_state.hand_selection = {1, 2};
+
+    CharacterSaveState caua_state;
+    caua_state.current_hp = 40;
+    caua_state.xp = 89;
+    caua_state.card_collection.active = {{1, "stream_raio"}};
+    caua_state.card_collection.next_instance_id = 2;
+
+    s.character_states = {{"gus", gus_state}, {"caua", caua_state}};
+    // credits: carteira UNICA da party, no nivel do SaveData (nao per-character).
+    s.credits = 29;
     // V3: conhecimento de bestiario por TIPO (enemy_type_id -> kills). std::map =
     // serializacao deterministica (selo estavel).
     s.enemy_knowledge = {{"sentinela_bit", 8}, {"daemon_fork", 13}};

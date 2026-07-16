@@ -70,13 +70,47 @@ SaveData migrate_v4_to_v5(SaveData data) {
     return data;
 }
 
+// Passo V5 -> V6 (DECK-4, docs/design/mecanicas/deck-mao-sistema.md): converte o
+// deck legado (vector<string> de card_id) de CADA personagem no deck ATIVO novo
+// (CardCollectionState). instance_id e sequencial deterministico comecando em 1,
+// LOCAL a cada personagem (mesma semantica de CardCollection::add_to_active - sem
+// RNG, sem timestamp; cada CardCollection e um espaco de IDs proprio, companions
+// nao compartilham contador). Semantica honesta de um save V5: "as cartas do deck
+// legado sao a UNICA fonte de verdade que existia" - viram instancias novas no
+// ativo, deck morto vazio (V5 nao tinha o conceito), e hand_selection vazia (mao
+// nao persistia; a bancada comeca vazia, o jogador remonta). O campo deck legado
+// e ESVAZIADO apos a conversao - documento COM o resto do bump: manter os dois
+// populados seria estado duplicado incoerente (fonte de verdade migrou pra
+// card_collection.active). credits nasce em 0 UMA VEZ no nivel do SaveData
+// (carteira UNICA da party, docs/design/mecanicas/economia.md - nao havia
+// carteira registrada antes desta onda; NAO e per-character). Funcao pura.
+SaveData migrate_v5_to_v6(SaveData data) {
+    for (auto& [character_id, state] : data.character_states) {
+        CardCollectionState collection;
+        std::uint64_t next_id = 1;
+        for (const auto& card_id : state.deck) {
+            collection.active.push_back(
+                gus::domain::deck::CardInstance{next_id, card_id});
+            ++next_id;
+        }
+        collection.next_instance_id = next_id;
+        state.card_collection = std::move(collection);
+        state.deck.clear();
+        state.hand_selection.clear();
+    }
+    data.credits = 0;
+    data.schema_version = 6;
+    return data;
+}
+
 }  // namespace
 
 int current_schema_version() noexcept {
-    // Fonte unica: o ancora do dominio. A chain abaixo (passos 1->2->3) DEVE alcancar
-    // exatamente esta versao; o test-guarda current_schema_version()==kSaveSchemaVersion
-    // trava qualquer divergencia (ex.: somar passo sem bumpar o ancora).
-    return gus::domain::kSaveSchemaVersion;  // 4
+    // Fonte unica: o ancora do dominio. A chain abaixo (passos 1->2->3->4->5) DEVE
+    // alcancar exatamente esta versao; o test-guarda
+    // current_schema_version()==kSaveSchemaVersion trava qualquer divergencia (ex.:
+    // somar passo sem bumpar o ancora).
+    return gus::domain::kSaveSchemaVersion;  // 6
 }
 
 SaveData migrate_to_current(SaveData data, int from_version) {
@@ -105,6 +139,10 @@ SaveData migrate_to_current(SaveData data, int from_version) {
             case 4:
                 data = migrate_v4_to_v5(std::move(data));
                 version = 5;
+                break;
+            case 5:
+                data = migrate_v5_to_v6(std::move(data));
+                version = 6;
                 break;
             default:
                 // GAP na chain: versao sem migrator registrado. Bug de schema.

@@ -42,5 +42,5 @@ TEST_CASE("domain expoe identidade e schema de save", "[domain]") {
     // Schema forward-only: V5 (MODOS-MORTE Fase 0: +difficulty
     // +difficult_recovery_stage, por cima do V4 do ADR-007: +input_remap_backup
     // +controls_hash128 +slot_id).
-    REQUIRE(gus::domain::kSaveSchemaVersion == 5);
+    REQUIRE(gus::domain::kSaveSchemaVersion == 6);
 }

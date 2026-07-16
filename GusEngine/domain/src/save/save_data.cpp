@@ -5,10 +5,44 @@
 
 #include "gus/domain/save/save_data.hpp"
 
+#include <cstdint>
 #include <stdexcept>
 #include <string>
+#include <unordered_set>
 
 namespace gus::domain::save {
+
+void CardCollectionState::validate() const {
+    std::unordered_set<std::uint64_t> seen_ids;
+    std::uint64_t max_id = 0;
+    bool any_id = false;
+    for (const std::vector<gus::domain::deck::CardInstance>* container :
+         {&active, &dead}) {
+        for (const auto& inst : *container) {
+            if (inst.instance_id == 0)
+                throw std::invalid_argument(
+                    "CardCollectionState: instance_id deve ser >= 1 (0 e "
+                    "reservado/nao-instanciado).");
+            if (inst.card_id.empty())
+                throw std::invalid_argument(
+                    "CardCollectionState: card_id nao pode ser vazio.");
+            if (!seen_ids.insert(inst.instance_id).second)
+                throw std::invalid_argument(
+                    "CardCollectionState: instance_id duplicado entre ativo e "
+                    "morto (uma instancia deve viver em EXATAMENTE um "
+                    "container).");
+            any_id = true;
+            if (inst.instance_id > max_id) max_id = inst.instance_id;
+        }
+    }
+    if (next_instance_id == 0)
+        throw std::invalid_argument(
+            "CardCollectionState: next_instance_id deve ser >= 1.");
+    if (any_id && next_instance_id <= max_id)
+        throw std::invalid_argument(
+            "CardCollectionState: next_instance_id deve ser MAIOR que qualquer "
+            "instance_id existente (o contador nunca reusa um id emitido).");
+}
 
 void CharacterSaveState::validate() const {
     if (current_hp < 0)
@@ -19,6 +53,27 @@ void CharacterSaveState::validate() const {
         if (card.empty())
             throw std::invalid_argument(
                 "CharacterSaveState: deck nao pode conter Card.Id vazio.");
+    }
+    // V6 (DECK-4): CardCollectionState (deck ativo/morto). credits NAO e checado
+    // aqui - mora em SaveData::credits (carteira UNICA da party), ver
+    // SaveData::validate() abaixo.
+    card_collection.validate();
+    // V6 (DECK-4): a mao so pode referenciar instancias PRESENTES no deck ativo
+    // (inv.6 de deck-mao-sistema.md secao 7 - "mao so puxa do ativo"), sem
+    // duplicata (cada instancia ocupa no maximo 1 slot da mao).
+    std::unordered_set<std::uint64_t> active_ids;
+    active_ids.reserve(card_collection.active.size());
+    for (const auto& inst : card_collection.active) active_ids.insert(inst.instance_id);
+    std::unordered_set<std::uint64_t> hand_seen;
+    for (const auto id : hand_selection) {
+        if (!active_ids.count(id))
+            throw std::invalid_argument(
+                "CharacterSaveState: hand_selection referencia instance_id fora "
+                "do deck ativo.");
+        if (!hand_seen.insert(id).second)
+            throw std::invalid_argument(
+                "CharacterSaveState: hand_selection contem instance_id "
+                "duplicado.");
     }
 }
 
@@ -51,6 +106,10 @@ void SaveData::validate() const {
     if (difficult_recovery_stage < 0 || difficult_recovery_stage > 4)
         throw std::invalid_argument(
             "SaveData: difficult_recovery_stage deve estar em [0, 4].");
+    // V6 (DECK-4): carteira UNICA da party (docs/design/mecanicas/economia.md -
+    // single-currency, nao per-character). Sem credito negativo.
+    if (credits < 0)
+        throw std::invalid_argument("SaveData: credits deve ser >= 0.");
 }
 
 }  // namespace gus::domain::save

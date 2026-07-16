@@ -298,6 +298,82 @@ TEST_CASE("save/fuzz: payload AEAD-valido truncado apos version rejeita",
     REQUIRE_THROWS_AS(deserialize_save(packed), SaveCorruptError);
 }
 
+// ---- DECK-4 (V6): count gigante nas listas NOVAS de card_collection --------
+//
+// Mesmo padrao IMP-01 acima, agora exercitando o layout V6 CORRENTE
+// (write_character_states_v6/read_character_states_v6, save_serializer.cpp):
+// card_collection.active e um list<CardInstance{u64 instance_id, str card_id}>
+// cujo COUNT (u32) e atacante-controlado (o payload esta DENTRO de um envelope
+// selado com tag AEAD valida - bytes forjados, chave nao vazou aqui, mas o
+// decoder nao pode assumir boa-fe do conteudo). Cada elemento custa no minimo 12
+// bytes (8 do instance_id + 4 do length da string) - bounded_count deve rejeitar
+// ANTES do reserve(count), mesmo com o payload por si so bem pequeno.
+
+TEST_CASE("save/v6/fuzz: card_collection.active com count gigante rejeita "
+          "SaveCorruptError antes de alocar",
+          "[domain][save][fuzz][v6][imp01]") {
+    std::vector<std::uint8_t> payload;
+    put_u32_le(payload, 6u);                  // schema_version = 6 (layout corrente)
+    payload.insert(payload.end(), 8, 0x00u);  // timestamp_ms (i64)
+    payload.insert(payload.end(), 8, 0x00u);  // playtime_seconds (f64)
+    put_u32_le(payload, 0u);                  // current_scene_path len = 0
+    payload.insert(payload.end(), 48, 0x00u); // player_position + player_rotation
+    put_u32_le(payload, 0u);                  // party_roster count = 0
+    put_u32_le(payload, 0u);                  // party_active count = 0
+    put_u32_le(payload, 0u);                  // flags count = 0
+    put_u32_le(payload, 0u);                  // inventory count = 0
+    put_u32_le(payload, 0u);                  // quest_progress count = 0
+    put_u32_le(payload, 0u);                  // relations count = 0
+    // character_states_v6: 1 entrada ("gus"), depois o count de active MENTE.
+    put_u32_le(payload, 1u);                  // character_states count = 1
+    put_u32_le(payload, 3u);                  // "gus" (string key, len=3)
+    payload.push_back('g');
+    payload.push_back('u');
+    payload.push_back('s');
+    payload.insert(payload.end(), 4, 0x00u);  // current_hp (i32) = 0
+    payload.insert(payload.end(), 4, 0x00u);  // xp (i32) = 0
+    put_u32_le(payload, 0xFFFFFFFFu);         // card_collection.active count GIGANTE
+    // (sem os bytes das instancias: bounded_count deve barrar ANTES do reserve)
+
+    const auto packed = pack_save(payload);   // tag AEAD valida sobre o payload mentiroso
+    REQUIRE_THROWS_AS(deserialize_save(packed), SaveCorruptError);
+}
+
+TEST_CASE("save/v6/fuzz: hand_selection com count gigante rejeita SaveCorruptError "
+          "antes de alocar",
+          "[domain][save][fuzz][v6][imp01]") {
+    std::vector<std::uint8_t> payload;
+    put_u32_le(payload, 6u);
+    payload.insert(payload.end(), 8, 0x00u);
+    payload.insert(payload.end(), 8, 0x00u);
+    put_u32_le(payload, 0u);
+    payload.insert(payload.end(), 48, 0x00u);
+    put_u32_le(payload, 0u);
+    put_u32_le(payload, 0u);
+    put_u32_le(payload, 0u);
+    put_u32_le(payload, 0u);
+    put_u32_le(payload, 0u);
+    put_u32_le(payload, 0u);
+    put_u32_le(payload, 1u);  // character_states count = 1
+    put_u32_le(payload, 3u);
+    payload.push_back('g');
+    payload.push_back('u');
+    payload.push_back('s');
+    payload.insert(payload.end(), 4, 0x00u);  // current_hp
+    payload.insert(payload.end(), 4, 0x00u);  // xp
+    put_u32_le(payload, 0u);                  // card_collection.active count = 0
+    put_u32_le(payload, 0u);                  // card_collection.dead count = 0
+    payload.insert(payload.end(), 8, 0x00u);  // next_instance_id (u64) = 0
+    // credits NAO mora aqui (V6 pos-correcao do lider: carteira UNICA da party,
+    // gravada 1x no FIM do payload em SaveData - ver write_credits_wallet). Logo
+    // apos next_instance_id vem DIRETO o count de hand_selection.
+    put_u32_le(payload, 0xFFFFFFFFu);         // hand_selection count GIGANTE
+    // (sem os u64 da selecao: bounded_count deve barrar ANTES do reserve)
+
+    const auto packed = pack_save(payload);
+    REQUIRE_THROWS_AS(deserialize_save(packed), SaveCorruptError);
+}
+
 // ---- bytes 100% aleatorios deterministicos (seed FIXA) ---------------------
 
 TEST_CASE("save/fuzz: 2000 buffers aleatorios (seed fixa) nunca crasham",

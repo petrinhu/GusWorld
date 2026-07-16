@@ -23,6 +23,7 @@
 
 #include "gus/core/crypto/aead_xchacha20poly1305.hpp"
 #include "gus/core/crypto/argon2id.hpp"
+#include "gus/domain/deck/deck_records.hpp"  // CardInstance (V6 card_collection)
 #include "gus/domain/save/save_migrators.hpp"
 
 namespace gus::domain::save {
@@ -294,6 +295,10 @@ void read_common_payload(Reader& r, SaveData& s) {
     read_int_map(s.relations);
 }
 
+// Layout LEGADO (V2..V5): current_hp | xp | list<str> deck. Usado SO pelos
+// payloads antigos (build_payload_v2..v5, fixtures de migracao) - o layout
+// CORRENTE (V6+) usa write_character_states_v6/read_character_states_v6 abaixo
+// (DECK-4: card_collection substitui deck).
 void write_character_states(std::vector<std::uint8_t>& payload, const SaveData& s) {
     put_map(payload, s.character_states,
             [](std::vector<std::uint8_t>& o, const CharacterSaveState& st) {
@@ -314,6 +319,81 @@ void read_character_states(Reader& r, SaveData& s) {
         s.character_states.emplace(id, std::move(st));
     }
 }
+
+// Escreve uma lista de CardInstance (instance_id u64 | card_id str) - shape
+// compartilhado entre card_collection.active e .dead (V6).
+void put_card_instance_list(
+    std::vector<std::uint8_t>& out,
+    const std::vector<gus::domain::deck::CardInstance>& list) {
+    put_u32(out, static_cast<std::uint32_t>(list.size()));
+    for (const auto& inst : list) {
+        put_u64(out, inst.instance_id);
+        put_string(out, inst.card_id);
+    }
+}
+
+// Le uma lista de CardInstance. IMP-01 (CWE-789): cada instancia custa no minimo
+// 12 bytes (u64 instance_id + u32 do length da string) - bounded_count barra um
+// count implausivel ANTES do reserve, mesmo padrao de read_string_list.
+std::vector<gus::domain::deck::CardInstance> read_card_instance_list(Reader& r,
+                                                                      const char* what) {
+    const std::uint32_t n = r.bounded_count(r.read_u32(), 12, what);
+    std::vector<gus::domain::deck::CardInstance> list;
+    list.reserve(n);
+    for (std::uint32_t i = 0; i < n; ++i) {
+        gus::domain::deck::CardInstance inst;
+        inst.instance_id = r.read_u64();
+        inst.card_id = r.read_string();
+        list.push_back(std::move(inst));
+    }
+    return list;
+}
+
+// Layout CORRENTE (V6+, DECK-4): current_hp | xp | card_collection{ list<CardInstance>
+// active | list<CardInstance> dead | u64 next_instance_id } | list<u64>
+// hand_selection. SUBSTITUI o `deck` legado (write_character_states acima,
+// congelado nos payloads V2..V5). credits NAO mora aqui - e a carteira UNICA da
+// party, gravada 1x no nivel do SaveData (write_credits_wallet abaixo), nao
+// per-character.
+void write_character_states_v6(std::vector<std::uint8_t>& payload, const SaveData& s) {
+    put_map(payload, s.character_states,
+            [](std::vector<std::uint8_t>& o, const CharacterSaveState& st) {
+                put_i32(o, st.current_hp);
+                put_i32(o, st.xp);
+                put_card_instance_list(o, st.card_collection.active);
+                put_card_instance_list(o, st.card_collection.dead);
+                put_u64(o, st.card_collection.next_instance_id);
+                put_u32(o, static_cast<std::uint32_t>(st.hand_selection.size()));
+                for (const auto instance_id : st.hand_selection) put_u64(o, instance_id);
+            });
+}
+
+void read_character_states_v6(Reader& r, SaveData& s) {
+    const std::uint32_t n = r.read_u32();
+    for (std::uint32_t i = 0; i < n; ++i) {
+        const std::string id = r.read_string();
+        CharacterSaveState st;
+        st.current_hp = r.read_i32();
+        st.xp = r.read_i32();
+        st.card_collection.active = read_card_instance_list(r, "v6-card-active");
+        st.card_collection.dead = read_card_instance_list(r, "v6-card-dead");
+        st.card_collection.next_instance_id = r.read_u64();
+        // hand_selection: cada id custa >= 8 bytes (u64).
+        const std::uint32_t hand_n = r.bounded_count(r.read_u32(), 8, "v6-hand");
+        st.hand_selection.reserve(hand_n);
+        for (std::uint32_t j = 0; j < hand_n; ++j)
+            st.hand_selection.push_back(r.read_u64());
+        s.character_states.emplace(id, std::move(st));
+    }
+}
+
+// V6 (DECK-4): carteira UNICA da party (i64 credits), gravada 1x - NAO
+// per-character (docs/design/mecanicas/economia.md, single-currency).
+void write_credits_wallet(std::vector<std::uint8_t>& payload, const SaveData& s) {
+    put_i64(payload, s.credits);
+}
+
+void read_credits_wallet(Reader& r, SaveData& s) { s.credits = r.read_i64(); }
 
 // V3: enemy_knowledge = map<enemy_type_id, kills>. Mesmo codec dos demais int-maps;
 // std::map garante ordem de chave (selo deterministico).
@@ -431,14 +511,22 @@ void read_difficulty_fields(Reader& r, SaveData& s) {
     s.difficult_recovery_stage = r.read_i32();
 }
 
-// Monta o payload no layout corrente (V5): u32 schema_version || comuns ||
-// character_states || enemy_knowledge || input_remap_backup || controls_hash128 ||
-// i32 slot_id || u32 difficulty || i32 difficult_recovery_stage.
+// Monta o payload no layout corrente (V6, DECK-4): u32 schema_version || comuns ||
+// character_states_v6 (card_collection + hand_selection, SEM o deck legado) ||
+// enemy_knowledge || input_remap_backup || controls_hash128 || i32 slot_id ||
+// u32 difficulty || i32 difficult_recovery_stage || i64 credits (carteira UNICA
+// da party, gravada 1x no FIM do payload - nao per-character).
 std::vector<std::uint8_t> build_payload_current(const SaveData& data) {
     std::vector<std::uint8_t> payload;
     put_u32(payload, static_cast<std::uint32_t>(current_schema_version()));
-    write_v4_tail(payload, data);
+    write_common_payload(payload, data);
+    write_character_states_v6(payload, data);
+    write_enemy_knowledge(payload, data);
+    write_input_remap_backup(payload, data);
+    write_controls_hash(payload, data);
+    put_i32(payload, data.slot_id);
     write_difficulty_fields(payload, data);
+    write_credits_wallet(payload, data);
     return payload;
 }
 
@@ -449,6 +537,20 @@ std::vector<std::uint8_t> build_payload_v4(const SaveData& data) {
     std::vector<std::uint8_t> payload;
     put_u32(payload, 4u);
     write_v4_tail(payload, data);
+    return payload;
+}
+
+// Monta o payload no layout V5 (comuns || character_states COM O DECK LEGADO (list
+// <str>, write_character_states acima) || enemy_knowledge || input_remap_backup ||
+// controls_hash128 || slot_id || difficulty || difficult_recovery_stage, SEM os
+// campos V6: card_collection/credits/hand_selection), para a fixture de migracao
+// V5->V6 (DECK-4). E o que build_payload_current fazia ANTES deste bump (MODOS-
+// MORTE Fase 0 congelado como "geracao V5").
+std::vector<std::uint8_t> build_payload_v5(const SaveData& data) {
+    std::vector<std::uint8_t> payload;
+    put_u32(payload, 5u);
+    write_v4_tail(payload, data);
+    write_difficulty_fields(payload, data);
     return payload;
 }
 
@@ -606,7 +708,11 @@ SaveData deserialize_save(const std::vector<std::uint8_t>& data) {
     SaveData decoded;
     decoded.schema_version = version;
     read_common_payload(r, decoded);
-    if (version >= 2) read_character_states(r, decoded);
+    // V2..V5: layout LEGADO (character_states com o `deck` de string). V6+: layout
+    // corrente (card_collection/credits/hand_selection, DECK-4) - mutuamente
+    // exclusivos, a versao lida decide qual formato esta nos bytes.
+    if (version >= 2 && version <= 5) read_character_states(r, decoded);
+    if (version >= 6) read_character_states_v6(r, decoded);
     if (version >= 3) read_enemy_knowledge(r, decoded);
     if (version >= 4) {
         read_input_remap_backup(r, decoded);
@@ -614,6 +720,8 @@ SaveData deserialize_save(const std::vector<std::uint8_t>& data) {
         decoded.slot_id = r.read_i32();
     }
     if (version >= 5) read_difficulty_fields(r, decoded);
+    // V6 (DECK-4): carteira UNICA da party, gravada 1x no FIM do payload.
+    if (version >= 6) read_credits_wallet(r, decoded);
     r.expect_end();
 
     // 5. Sobe pela chain ate a versao atual (no-op se ja == atual).
@@ -644,6 +752,10 @@ std::vector<std::uint8_t> serialize_save_v3(const SaveData& data) {
 
 std::vector<std::uint8_t> serialize_save_v4(const SaveData& data) {
     return pack_save(build_payload_v4(data), data.slot_id);
+}
+
+std::vector<std::uint8_t> serialize_save_v5(const SaveData& data) {
+    return pack_save(build_payload_v5(data), data.slot_id);
 }
 
 std::vector<std::uint8_t> make_v1_payload(int version) {
