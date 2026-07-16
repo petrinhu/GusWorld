@@ -73,6 +73,22 @@ _(Cripto usa o `multExpose` global que já existe — não precisa do SynergySta
 
 ---
 
+## NOMES + frases pedagógicas (aprovado pelo líder 2026-07-16 — SUPERA os provisórios das tabelas acima)
+
+Cada carta = **sintaxe real da linguagem-âncora do dono** + uma frase que ensina um conceito de programação de leve (público 11+). Voz consistente por família. (`narrative-writer`; sem latim bíblico no Bento — compliance religião real.)
+
+**⚡ Elétrico / Cauã (Pythia):** `zap()` · `except Choque:` · `import fulgor` · `sleep(1)` · `yield mais()` · `finally: fulmina()`
+**🧪 Bioquímico / Jaci (Pythia):** `self.picar()` · `for tick in praga:` · `class Epidemia:` · `self.def -= 4` · `self.hp += cura` · `if infectado: dano *= 1.4`
+**🔊 Sônico / Linda (Óxido):** `&eco` · `&mut ruido` · `panic!("eco")` · `borrow_conflitante()` · `mutex.lock()` · `unwrap()`
+**🔐 Criptográfico / Iara (Óxido):** `Some(golpe)` · `dbg!(alvo)` · `#[derive(Debug)]` · `pub alvo` · `drop(alvo)` · `Ok(dano)`
+**💥 Cinético / Bento (Asmódico):** `MOV.golpe` · `PUSH.impacto` · `PUSH.multiplex` · `SUB.custodia` · `CALL.tutela` · `HLT.ultima`
+
+(Frases pedagógicas completas no relatório do `narrative-writer` — a canonizar 1:1 quando produzir o doc de conteúdo final.) Flags: 3 nomes longos (`#[derive(Debug)]`, `borrow_conflitante()`, `mutex.lock()`) podem pedir fonte menor/2 linhas na moldura (art-director); nome exibido vs slug interno = decisão de impl.
+
+## VELOCIDADE (compilada/rápida × interpretada/lenta) — decisão do líder 2026-07-16
+
+Amarração FECHADA (ver `combat-flavor.md §2`): **velocidade = propriedade da CARTA, com AFINIDADE (não trava) à linguagem do dono.** Interpretada (Pythia) = lenta (resolve casas à frente na fila CTB, mais potente, vulnerável a interrupção → `RUNTIME ERROR`); compilada (C-Arcane/Óxido/Asmódico) = rápida (resolve no turno, efeito fechado → `ERRO DE COMPILAÇÃO`). Afinidade: Cauã/Jaci tendem lento (Pythia), Iara/Linda/Bento tendem rápido; MAS por role/balance uma carta pode fugir (ex.: a assinatura-burst do Cauã pode ser rápida, aí ganha voz compilada). **PENDENTE:** atribuir rápida/lenta por-carta às 30 (respeitando afinidade + balance) + reconciliar o naming da exceção com a velocidade (item CARTAS-CAST-TIME). + **frase cômica do Gus** ocasional no cast (defende C-Arcane, comic-reliefs C.4; densidade baixa; narrative-writer).
+
 ## Riscos a vigiar no N=3 (do parecer do lead-game-designer)
 1. **"Golpe+status" (mana2/power5+status) pode dominar** sobre "dano puro" e "status-puro" no mesmo custo — a defesa é a economia de AP (1 carta=1 AP vs 2 cartas=2 AP de um pool de 3). Medir taxa de escolha; se dominar, baixar o Power do combo (5→3).
 2. **Bioquímico pode parecer fraco em combate curto** (DoT só entrega em 3 turnos). Comparar DPS-efetivo vs as 4.
