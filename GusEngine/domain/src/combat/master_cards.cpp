@@ -1,7 +1,7 @@
 // gus/domain/src/combat/master_cards.cpp
 //
-// Implementacao do catalogo das 14 cartas ESPECIAIS suportadas pelo executor techMagic
-// (ADR-016, MVP steps 4-8 + manifesto itens 5-6). Ver header para o contrato. Mesmo padrao de
+// Implementacao do catalogo das 15 cartas ESPECIAIS suportadas pelo executor techMagic
+// (ADR-016, MVP steps 4-8 + manifesto itens 5-6, 12). Ver header para o contrato. Mesmo padrao de
 // placeholder_cards.cpp: cartas construidas uma vez, emplace fail-fast em id duplicado.
 // POCO puro, ZERO Qt.
 //
@@ -17,11 +17,22 @@
 // programa). Mana kActiveManaCost (nao mais 0) e sujeita ao gate 1x/batalha das
 // Ativa/Hibrida (resolve_use_card).
 //
+// Maxwell (Spectra-Wave, manifesto item 12, decisao do lider 2026-07-16, AMB-08): Hibrida,
+// Eletrico, TargetShape::Grupo. NENHUM EffectSpec (effects vazio) - "Onda Unificada" reusa
+// PURO o caminho Grupo/AoE ja pronto do Newton (resolve_targets/resolve_use_card): dano em
+// TODOS os inimigos vivos do lado oposto, via a cadeia divisiva de sempre (power + ATK do
+// conjurador), zero EffectKind novo. Modo-aliado dissipa de graca (a regra geral "fogo
+// amigo desligado" ja zera o dano nesse ramo; sem EffectSpec, nao ha nada pra rodar ali -
+// no-op puro). Hibrida pela FACE irma fora-de-combate ("iluminar areas escuras" na
+// exploracao) - STUB posse-only, ZERO codigo aqui (feat futura separada,
+// MAXWELL-AREAS-ESCURAS, e decisao de design do criador, nao deste executor). Gate
+// 1x/batalha via specials_cast_ (mesmo mecanismo generico das outras Ativa/Hibrida).
+//
 // NUMEROS PROVISORIOS (//PLAYTEST): mana das ativas/hibridas = 6; percent do Leech (Volta)
 // = 50; percent do Reflect (Newton) = 30; percent do eco Fractal-Echo (Mandelbrot) = 50;
 // percent do eco Re-Run (Ada) = 100/magnitude(chance) = 34; magnitude do DelayAction
-// (Einstein) = 0 (fim da fila). Balanceamento real (VOLTA-LEECH-%, statline por carta) e
-// trabalho futuro.
+// (Einstein) = 0 (fim da fila); power do Spectra-Wave (Maxwell) = 5. Balanceamento real
+// (VOLTA-LEECH-%, statline por carta) e trabalho futuro.
 //
 // base_type: as ativas/hibridas usam Glifo (carta-programa nao-elemental; //PLAYTEST, nao
 // ha convencao fechada pra especiais). As posse-only/passivas idem Glifo por coerencia (o
@@ -79,6 +90,15 @@ constexpr int kPlanckStepExtremePercent = 25;
 // duracao do buff Scrying (numero FECHADO pelo lider, nao //PLAYTEST-livre como a maioria
 // dos outros - mesma categoria de kPlanckStepCenterPercent/kPlanckStepExtremePercent acima).
 constexpr int kDeeScryingDuration = 3;
+// Onda Unificada (Maxwell/Spectra-Wave, manifesto item 12, decisao AUTONOMA do
+// orquestrador 2026-07-16, AMB-08): dano-base do AoE puro (SEM EffectSpec, reusa a cadeia
+// divisiva de sempre via card.power). AoE cheio a 8 (mesmo power-base do primario da
+// Coil-Arc/Tesla) eclipsaria o nicho dela; 5 preserva a diferenca (Tesla = burst
+// concentrado decaindo por salto; Maxwell = dano uniforme mais fraco espalhado em TODOS os
+// inimigos). //PLAYTEST - decisao a confirmar no playtest real, mesma categoria das outras
+// constantes acima (NAO e um numero fechado pelo lider, ao contrario de
+// kPlanckStepCenterPercent/kDeeScryingDuration).
+constexpr int kMaxwellPower = 5;  //PLAYTEST
 
 // Monta uma carta ESPECIAL base. base_type = Glifo (carta-programa nao-elemental,
 // //PLAYTEST). ap_cost default 1 (herda o mesmo default do placeholder). Sem
@@ -325,10 +345,25 @@ std::unordered_map<std::string, Card> assemble() {
                        .status = StatusId::Scrying,
                        .stack_rule = StackRule::Refresh}},
             /*ignores_weakness_wheel=*/false, /*power=*/0, /*target_shape=*/TargetShape::Self),
+
+        // --- Maxwell (Spectra-Wave): Hibrida, Eletrico, Grupo (manifesto item 12, decisao
+        // do lider 2026-07-16, AMB-08). NENHUM EffectSpec: "Onda Unificada" e dano-base PURO
+        // (power=kMaxwellPower + ATK do conjurador, cadeia divisiva de sempre) em TODOS os
+        // inimigos vivos do lado oposto, via o MESMO caminho Grupo/AoE do Newton
+        // (resolve_targets/resolve_use_card) - zero EffectKind novo, zero wiring novo no
+        // resolvedor. Modo-aliado (mirar um aliado) dissipa: a regra geral "fogo amigo
+        // desligado" ja zera o dano nesse ramo e, sem EffectSpec, nao ha OnCast pra rodar -
+        // no-op puro (dano 0 + log de dissipacao, nada mais). Hibrida pela FACE irma
+        // fora-de-combate "iluminar areas escuras" (exploracao) - STUB posse-only, FEAT
+        // FUTURA separada (MAXWELL-AREAS-ESCURAS), ZERO codigo aqui. ---
+        make_special(
+            "maxwell", "CARD_EXEC_MAXWELL_NAME", CardFamily::Eletrico, CardCategory::Hibrida,
+            kActiveManaCost, /*effects=*/{}, /*ignores_weakness_wheel=*/false,
+            /*power=*/kMaxwellPower, /*target_shape=*/TargetShape::Grupo),
     };
 
     std::unordered_map<std::string, Card> registry;
-    registry.reserve(14);
+    registry.reserve(15);
     for (const auto& card : cards) {
         // emplace (nao indexer) falha-cedo se algum id duplicar (mesmo padrao do placeholder).
         const auto [it, inserted] = registry.emplace(card.id, card);

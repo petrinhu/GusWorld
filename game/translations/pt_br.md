@@ -729,6 +729,9 @@ Quantum-Lock
 ## CARD_EXEC_DEE_NAME
 Black-Mirror
 
+## CARD_EXEC_MAXWELL_NAME
+Spectra-Wave
+
 ---
 
 ## §9. Menu de sistema (pausa + config de som, MENU-PAUSA-CONFIG-SOM)

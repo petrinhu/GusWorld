@@ -531,6 +531,9 @@ Quantum-Lock
 ## CARD_EXEC_DEE_NAME
 Black-Mirror
 
+## CARD_EXEC_MAXWELL_NAME
+Spectra-Wave
+
 ### Controls screen (keyboard remap, M2)
 
 ## CONTROLS_HINT

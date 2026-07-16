@@ -28,7 +28,6 @@
 
 #include <catch2/catch_test_macros.hpp>
 
-#include <algorithm>
 #include <map>
 #include <memory>
 #include <string>
@@ -36,16 +35,17 @@
 #include <utility>
 #include <vector>
 
+#include "counting_random.hpp"
 #include "fixed_random.hpp"
 #include "gus/domain/combat/combat_actor.hpp"
 #include "gus/domain/combat/combat_enums.hpp"
 #include "gus/domain/combat/combat_records.hpp"
 #include "gus/domain/combat/combat_state.hpp"
 #include "gus/domain/combat/combat_state_machine.hpp"
-#include "gus/domain/combat/random_source.hpp"
 #include "gus/domain/combat/techmagic.hpp"
 
 using namespace gus::domain::combat;
+using gus::domain::tests::CountingRandom;
 using gus::domain::tests::FixedRandom;
 
 namespace {
@@ -164,17 +164,9 @@ CombatActionProvider provider_for(ActionPlan plan) {
     };
 }
 
-// RNG que CONTA consumos (mesmo padrao de CountingRandom* dos outros arquivos deste dir).
-class CountingRandom final : public IRandomSource {
-public:
-    double next_double() override { ++next_double_calls; return 0.5; }
-    int next(int max_value) override {
-        ++next_calls;
-        return max_value <= 0 ? 0 : std::min(99, max_value - 1);
-    }
-    int next_calls = 0;
-    int next_double_calls = 0;
-};
+// RNG que CONTA consumos (canal + variancia): CountingRandom, extraido para o header
+// compartilhado counting_random.hpp (reusado por Newton/Maxwell/Hayek/Mises - todos
+// exercitam o mesmo caminho Grupo/AoE).
 
 }  // namespace
 

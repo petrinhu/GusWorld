@@ -492,6 +492,48 @@ combat/techmagic.hpp` (`TechMagicContext.brain_registry`, `log_intent_for`,
 `GusEngine/domain/src/combat/master_cards.cpp` (dee); `docs/design/mecanicas/
 cartas-technomagik.md`; `docs/design/roster-analogos/_EFEITOS-ESCOLHIDOS.md` (AMB-07).
 
+## Addendum (manifesto item 12, decisao do lider 2026-07-16, AMB-08): Maxwell/Spectra-Wave ("Onda Unificada")
+
+A carta MAIS SIMPLES do catalogo ate hoje: Maxwell **NAO precisa de `EffectKind` novo**.
+"Onda Unificada" e dano eletrico/luminoso em AREA (todos os inimigos vivos) - o caminho
+`TargetShape::Grupo` ja existente (`resolve_targets`/`resolve_use_card`, entregue pelo
+Newton no addendum "Balde B, PR2" acima) ja cobre exatamente isso: qualquer carta `Grupo`
+atinge todos os inimigos vivos do lado OPOSTO ao conjurador, com o dano-base saindo da MESMA
+cadeia divisiva de sempre (`card.power + actor.atk()`, secao 11) - sem tocar em
+`resolve_use_card`, `resolve_targets` nem `estimate_card_damage`.
+
+- **`master_cards.cpp::maxwell`**: `Hibrida`/`Eletrico`/`TargetShape::Grupo`, mana
+  `kActiveManaCost`, `power = kMaxwellPower` (5, `//PLAYTEST` - decisao AUTONOMA do
+  orquestrador: um `power` igual ao do primario da Tesla/Coil-Arc, 8, eclipsaria o nicho
+  dela; 5 preserva a diferenca de design entre "burst concentrado decaindo por salto"
+  (Tesla) e "dano uniforme mais fraco espalhado em todos os inimigos" (Maxwell)),
+  **`effects` VAZIO** - nenhum `EffectSpec`, o dano-base sozinho JA E o efeito inteiro da
+  carta.
+- **Modo-aliado (mirar um aliado) e no-op PURO**: o ramo assimetrico de `resolve_targets`
+  (N-3 do Newton) devolve o aliado declarado como alvo unico; a regra geral "fogo amigo
+  desligado" (Parte A do addendum Newton) ja zera o dano nesse alvo E loga a dissipacao. Sem
+  `EffectSpec`, o bloco `if (!card.effects.empty())` de `resolve_use_card` (que despacharia
+  `OnCast`) nunca roda pra esta carta - ao contrario do Newton (que ainda concede
+  Reflect-status no modo-aliado), Maxwell mirada num aliado literalmente NAO FAZ NADA alem
+  do log do guard de fogo amigo. Zero wiring novo: o comportamento sai de graca da
+  combinacao `Grupo` + `effects` vazio.
+- **Face irma fora-de-combate ("iluminar areas escuras", `_EFEITOS-ESCOLHIDOS.md` linha 12,
+  feat MAXWELL-AREAS-ESCURAS)**: STUB posse-only, ZERO codigo de combate/exploracao aqui -
+  mesmo padrao do anti-PEM do Faraday/Euler/Menger/Turing/Dee (i). Quando o sistema de areas
+  escuras existir, a query reusa o MESMO mecanismo (`equipped_special_ids()` contem
+  `"maxwell"`?) - nenhum campo/`EffectKind` novo necessario. `CardCategory::Hibrida` aqui
+  sinaliza a MESMA dualidade de faces (combate castavel + face fora-de-combate irma) ja
+  documentada pro Faraday (`cartas-technomagik.md` §2.3), nao um efeito duplo EM combate.
+- Testes: `master_cards_test.cpp` (catalogo: campos + i18n `CARD_EXEC_MAXWELL_NAME`) +
+  `GusEngine/domain/tests/techmagic_maxwell_test.cpp` (AoE em todos os inimigos vivos,
+  inimigo ja morto fica de fora, paridade preview<->real nas fronteiras do canal COMUM via
+  `estimate_card_damage`, modo-aliado no-op puro).
+
+Cross-ref: `GusEngine/domain/src/combat/master_cards.cpp` (maxwell);
+`GusEngine/domain/src/combat/combat_state_machine.cpp` (`resolve_targets`/`resolve_use_card`
+Grupo, addendum "Balde B, PR2" acima - reusado sem alteracao); `docs/design/mecanicas/
+cartas-technomagik.md`; `docs/design/roster-analogos/_EFEITOS-ESCOLHIDOS.md` (AMB-08).
+
 ## Consequencias
 
 - **Positivas:** custo BAIXO-MEDIO, risco BAIXO; numeros 100% tunaveis pra playtest; testavel por unit test por EffectKind; easter-egg entregue hoje; nao fecha porta pra VM. Cada carta = 5-15 linhas de dado.

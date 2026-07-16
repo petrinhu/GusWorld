@@ -144,6 +144,13 @@ add_executable(gusengine_domain_tests
     # Gambito manual), Scan aprimorado (status/fila/intent, D1-ii), stub posse-only (D1-i) e
     # o TESTE-REI de determinismo (HP/dano/ordem/RNG byte-identicos com e sem Scrying).
     techmagic_reveal_test.cpp
+    # Executor techMagic (ADR-016 manifesto item 12, decisao do lider 2026-07-16, AMB-08):
+    # Maxwell/Spectra-Wave ("Onda Unificada") - dano-base PURO (effects vazio, ZERO
+    # EffectKind novo) via o MESMO caminho Grupo/AoE do Newton. AoE em todos os inimigos
+    # vivos, paridade preview<->real (estimate_card_damage) nas fronteiras do canal COMUM, e
+    # o modo-aliado como no-op puro (dissipa via a regra geral "fogo amigo desligado", sem
+    # EffectSpec pra rodar).
+    techmagic_maxwell_test.cpp
 )
 
 # Os testes do combate incluem helpers de teste headers-only (fixed_random.hpp).

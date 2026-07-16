@@ -40,9 +40,9 @@
 
 namespace gus::domain::combat::MasterCards {
 
-// Monta e devolve o registry id->Card das 13 cartas ESPECIAIS suportadas (volta, newton,
+// Monta e devolve o registry id->Card das cartas ESPECIAIS suportadas (volta, newton,
 // pythagoras, mandelbrot, ada, godel, faraday, euler, turing, menger, tesla, einstein,
-// planck). Por VALOR (nao cacheado num static const&, ao contrario de PlaceholderCards::
+// planck, dee, maxwell). Por VALOR (nao cacheado num static const&, ao contrario de PlaceholderCards::
 // all()) - o chamador decide se funde este
 // registry com PlaceholderCards::all() num unico card_registry da CombatStateMachine.
 // Fail-fast (std::logic_error) se algum id duplicar internamente (mesmo padrao emplace do

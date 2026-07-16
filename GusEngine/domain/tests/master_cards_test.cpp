@@ -2,15 +2,21 @@
 //
 // Spec executavel (Catch2 v3) do catalogo data-driven das cartas ESPECIAIS dos mestres
 // suportadas pelo executor techMagic (ADR-016, item TECHMAGIC-EXECUTOR / MVP steps 4-8 +
-// manifesto itens 5-6): volta, newton, pythagoras, mandelbrot, ada, godel, faraday, euler,
-// turing, menger, tesla, einstein, planck, dee. POCO puro, ZERO Qt.
+// manifesto itens 5-6, 12): volta, newton, pythagoras, mandelbrot, ada, godel, faraday,
+// euler, turing, menger, tesla, einstein, planck, dee, maxwell. POCO puro, ZERO Qt.
 //
-// Cobre: (1) as 14 cartas existem, ids unicos, nenhuma usa EffectKind::CloneAlly (guarda
+// Cobre: (1) as 15 cartas existem, ids unicos, nenhuma usa EffectKind::CloneAlly (guarda
 // que von Neumann/Bruno NAO entraram nesta leva); (2) campos canonicos por-carta (tier/
 // category/mana/power/ignores_weakness_wheel); (3) as 10 executaveis (volta/newton/
 // pythagoras/mandelbrot/ada/tesla/einstein/faraday/godel/dee) resolvem via techMagic::execute
 // SEM logic_error num contexto minimo; (4) as 3 fora-de-combate (euler/turing/menger) tem
-// effects vazio; (5) paridade i18n das 14 chaves CARD_EXEC_<FIGURA>_NAME (2 locales).
+// effects vazio; (5) paridade i18n das 15 chaves CARD_EXEC_<FIGURA>_NAME (2 locales).
+//
+// Maxwell (Spectra-Wave, manifesto item 12, decisao do lider 2026-07-16, AMB-08): Hibrida/
+// Eletrico/Grupo, effects VAZIO (dano-base puro, reusa o caminho Grupo/AoE do Newton, zero
+// EffectKind novo). Este arquivo so cobre o CATALOGO (campos, mesmo padrao das outras); os
+// testes EXAUSTIVOS de resolucao (AoE em todos os inimigos, paridade preview, modo-aliado
+// no-op) vivem em techmagic_maxwell_test.cpp.
 //
 // John Dee (Black-Mirror/Scrying, ADR-016 step 8, manifesto item 6, decisoes D1-D4 do lider
 // 2026-07-15, AMB-07): Hibrida/Universal/TargetShape::Self, OnCast -> RevealIntent. Os
@@ -69,13 +75,13 @@ CombatActor make_actor(const std::string& id, bool player_side, int hp = 100, in
 
 // ===== 1. As 8 cartas existem, ids unicos, guarda anti-CloneAlly =====
 
-TEST_CASE("master_cards: build_registry tem exatamente as 14 cartas suportadas",
+TEST_CASE("master_cards: build_registry tem exatamente as 15 cartas suportadas",
           "[domain][combat][cards][techmagic][mastercards]") {
     const auto reg = MasterCards::build_registry();
-    REQUIRE(reg.size() == 14);
+    REQUIRE(reg.size() == 15);
     for (const char* id : {"volta", "newton", "pythagoras", "mandelbrot", "ada", "godel",
                            "faraday", "euler", "turing", "menger", "tesla", "einstein",
-                           "planck", "dee"})
+                           "planck", "dee", "maxwell"})
         REQUIRE(reg.count(id) == 1);
 }
 
@@ -608,7 +614,21 @@ TEST_CASE("master_cards: dee (RevealIntent em OnCast) executa via techMagic::exe
     REQUIRE(scrying);
 }
 
-// ===== 4. Paridade i18n das 14 chaves (2 locales) =====
+TEST_CASE("master_cards: maxwell = Hibrida/Eletrico/mana kActiveManaCost/power 5/Grupo, "
+         "effects VAZIO (dano-base puro, reusa o caminho Grupo do Newton)",
+         "[domain][combat][cards][techmagic][mastercards]") {
+    const auto reg = MasterCards::build_registry();
+    const Card& c = reg.at("maxwell");
+    REQUIRE(c.category == CardCategory::Hibrida);
+    REQUIRE(c.family == CardFamily::Eletrico);
+    REQUIRE(c.mana_cost == 6);  // kActiveManaCost, mesmo //PLAYTEST de volta/newton/faraday/dee.
+    REQUIRE(c.power == 5);      // kMaxwellPower, //PLAYTEST.
+    REQUIRE(c.target_shape == TargetShape::Grupo);
+    REQUIRE(c.ignores_weakness_wheel == false);
+    REQUIRE(c.effects.empty());  // dano-base puro: NENHUM EffectSpec, zero EffectKind novo.
+}
+
+// ===== 4. Paridade i18n das 15 chaves (2 locales) =====
 
 namespace {
 
@@ -640,7 +660,7 @@ bool has_key(const std::vector<std::string>& keys, const std::string& key) {
 #define GUSWORLD_TRANSLATIONS_DIR "../../../../game/translations"
 #endif
 
-TEST_CASE("master_cards: as 14 chaves CARD_EXEC_<FIGURA>_NAME existem em pt_br.md e "
+TEST_CASE("master_cards: as 15 chaves CARD_EXEC_<FIGURA>_NAME existem em pt_br.md e "
          "en_intl.md",
          "[domain][combat][cards][techmagic][mastercards][i18n]") {
     const std::vector<std::string> pt =
@@ -652,7 +672,7 @@ TEST_CASE("master_cards: as 14 chaves CARD_EXEC_<FIGURA>_NAME existem em pt_br.m
 
     for (const char* figura : {"VOLTA", "NEWTON", "PYTHAGORAS", "MANDELBROT", "ADA",
                                "GODEL", "FARADAY", "EULER", "TURING", "MENGER", "TESLA",
-                               "EINSTEIN", "PLANCK", "DEE"}) {
+                               "EINSTEIN", "PLANCK", "DEE", "MAXWELL"}) {
         const std::string key = std::string("CARD_EXEC_") + figura + "_NAME";
         INFO("chave: " << key);
         REQUIRE(has_key(pt, key));
