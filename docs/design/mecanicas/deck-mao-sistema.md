@@ -36,7 +36,7 @@ Limite de mão = **base por personagem** (identidade; ex.: Gus prodígio segura 
 - **DECK/BOLSA = a coleção do personagem** (tudo que ele possui), num **slot de inventário**, com **capacidade upgradável** (cresce com upgrade de bolsa/hardware).
 - **MÃO = uma SELEÇÃO (loadout) do deck ativo** para a batalha. **A mão NÃO é um container — é uma lista de IDs que aponta pro deck ativo** (invariante anti-dup, §7).
 - Sem nível intermediário de "deck curado": a única escolha significativa é a MÃO.
-- **Gus:** mão comum normal (como todos) **+ 1-2 slots DEDICADOS só pra especiais** (garante a identidade de compilador sem competir com comuns nem torná-lo estritamente dominante). Número exato `//PLAYTEST`.
+- **Gus:** mão comum normal (como todos) **+ 1 slot DEDICADO só pra especial** (decisão do líder 2026-07-16; garante a identidade de compilador sem competir com comuns nem torná-lo dominante). `//PLAYTEST`.
 
 ---
 
@@ -113,6 +113,30 @@ Ancorado no canon (`combat.md §6`): as 5 famílias = especialidades dos compani
 - **Gus (universal):** a coleção dele pode cruzar famílias (companions ficam travados na sua), adquirida como todos (compra/loot/acha, compete por crédito); a MÃO é do mesmo tamanho (5 comuns + 1-2 especiais) → **vantagem = versatilidade de coleção, não mais slots**. Flag `IsUniversalCompiler` (canon F2-E.10, `combat.md §6`).
 
 RESTA: **números `//PLAYTEST`** (em parecer com o `economy-designer`, 2026-07-16) + o **conteúdo real** de cada arquétipo × família (statlines) + playtest N=3.
+
+---
+
+## 8c. Números baseline (`//PLAYTEST` — parecer do `economy-designer` + decisão do líder 2026-07-16)
+
+Todos afináveis no playtest N=3. O parecer completo (faucets×sinks, riscos-mestres) está no relatório do agente.
+
+| Número | Valor | Nota |
+|---|---|---|
+| Curva mana→power | 1→3, 2→5, 3→8 | canon §2.2 (combat.md), mantido |
+| Mão comum (base) | **5** | 71% do toolkit ~7 = escolha real de loadout |
+| Delta Bento (tanque) | **−1 (mão 4)** | trava de identidade; compensar em Def/HP (medir TTK com/sem Bento no N=3) |
+| Stat mental | +1 por patamar de foco/INT, **COM TETO** (mão máx ≤ toolkit−1, ~**6**) | sem cap a mão iguala o toolkit e mata a escolha no late-game (anti-snowball) |
+| Slots especiais do Gus | **1** dedicado | decisão do líder (conservador; não competir com comuns, não abrir com 2 especiais fortes) |
+| Deck/bolsa (capacidade) | **34 → 55 → 89** (progressão explícita, upgradável) | comporta 20 especiais + comuns no late-game |
+| Deck morto (limite) | **8** + **auto-upload FIFO** ao encher | one-way; ESPECIAL/SUPER nunca entram (§7 inv. 9) |
+| Upload ao commons (base) | **2-3 cr/carta** | a 1cr virava "carta = lixo"; 2-3 preserva hierarquia |
+| Compra de comum na loja | **12-18 cr** | ratio compra:venda ~3-4:1 (padrão do gênero) |
+| Venda de comum | NPC **3-5** / loja **4-6 cr** | |
+| Achado na grama (pity) | teto **13** encontros + **taxa-base ~10-15%/encontro** | pity = rede de segurança, não relógio |
+
+**Supersessão:** o canon antigo "deck de **15 em campo**" (`cartas-technomagik` §2.1, modelo de camada única) fica SUPERADO pela estrutura bolsa→mão (§4): a **mão-loadout (~5)** é o que fica "em campo" por batalha; o "15" não é mais um número do sistema.
+
+**Riscos-mestres a vigiar no N=3 (do parecer):** (1) perda permanente de especial por bolsa cheia — RESOLVIDO por §7 inv.9; (2) reconciliação comum/especial — RESOLVIDA pela evolução de pillar 2026-07-16; (3) mão que cresce sem teto — RESOLVIDA pelo cap do stat mental acima.
 
 ---
 
