@@ -16,7 +16,7 @@ Toda feature do jogo responde: "qual pillar serve?". Não serve = corta.
 - Não é multiplayer. Single-player puro, sem cooperativo ou competitivo.
 - Não é dark gratuito. **Toda escuridão serve a propósito narrativo claro** — sem edgy pra ser edgy, sem grimdark sem esperança, sem body horror, sem exploração de trauma infantil pra impacto barato.
 - Não é grind-fest com level cap 99. **Knowledge Progression** (ver §Sistemas-âncora) substitui grind — repetir inimigo reduz XP e aumenta conhecimento.
-- Não é "Magic: The Gathering completo". TCG é mecânica, não produto: **40-60 cartas totais no jogo** (todas descobríveis), deck de **15 em campo**, **mestria por uso** (carta cresce com repetição).
+- Não é "Magic: The Gathering completo" — colecionável **ENXUTO**, não TCG expansível infinito. **Modelo de DUAS CAMADAS (evolução consciente de pillar, líder 2026-07-16 — a distinção comum×especial virou o eixo de design):** as **ESPECIAIS** (20 dos mestres + a SUPER de Tusk) são **únicas, curadas, adquiridas SÓ in-game por progresso narrativo** (Tavus-Eco / forja; nunca compra/craft/drop) e formam uma **classe PROTEGIDA** (não podem ir pro deck morto). As **COMUNS** são um **pool FINITO e curado** (template de arquétipos × 5 famílias) que o jogador **MONTA e ADQUIRE** via loja (compra/venda), craft, loot de missão/luta (garantido E aleatório) e achados na exploração. Deck em campo + mão como loadout, mestria por uso. Ver `docs/design/mecanicas/deck-mao-sistema.md`.
 
 ### Boundaries de gênero/forma
 
@@ -43,7 +43,7 @@ Toda feature do jogo responde: "qual pillar serve?". Não serve = corta.
 
 - **Active turn-based** sem timer no turno do jogador; **timed inputs opcionais** dão bônus (skipável sem punição).
 - **Wait-mode toggle** (acessibilidade): user pode ligar/desligar pressão temporal.
-- **Compilação do Codex** com 40-60 cartas curadas, deck 15 em campo, mestria por uso.
+- **Compilação do Codex** em duas camadas (evolução de pillar 2026-07-16): especiais únicas curadas (só narrativa, protegidas) + comuns num pool bounded que o jogador monta/adquire; deck em campo + mão-loadout, mestria por uso.
 - **Telegrafia condicional**: 1º encontro com inimigo = surpresa. 2º+ = óculos táticos revelam próximo ataque **consumindo recurso** (energia/AP/turno parcial). Vetor do Gambito complementa.
 - **RNG calibrado**: hit/dodge/crit com % visível; Gambito permite forçar re-roll ou cancelar; RNG **decai com knowledge** (Knowledge Progression).
 - **Puzzles ambientais** que ensinam o sistema.

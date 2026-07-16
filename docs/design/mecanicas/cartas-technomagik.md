@@ -38,7 +38,7 @@ Três tiers de carta, com identidade mecânica e narrativa distinta. Nenhum tier
 
 | Tier | O que é | Como se obtém | Onde vive |
 |---|---|---|---|
-| **COMUM** | conjuro compilado de 3 Tokens (5 famílias + roda de fraqueza, combat.md §6; modelo carta-base + modificador, combat.md §7) | progresso narrativo (nunca craft, nunca compra; gdd.md linha 145 preservado) | os 15 slots em campo, junto com ESPECIAL |
+| **COMUM** | conjuro compilado de 3 Tokens (5 famílias + roda de fraqueza, combat.md §6; modelo carta-base + modificador, combat.md §7) | **loja/craft/loot(garantido+aleatório)/achado** (evolução de pillar 2026-07-16, §2.2; a curadoria narrativa migrou pras ESPECIAIS) | deck em campo + mão-loadout, junto com ESPECIAL |
 | **ESPECIAL** | conjuro-assinatura lendário dos 20 mestres, pré-compilado e único (1 cópia no jogo inteiro) | entregue pelo Tavus-Eco do mestre, ao fim da missão dele | 1 dos 15 slots em campo |
 | **SUPER** | "A Carta Perdida de Tusk", efeito Consórcio (passiva que potencia as 20 ESPECIAIS + ativa suprema) | forjada com as 20 ESPECIAIS na bancada do Tusk (missão-capstone) | slot dedicado, FORA dos 15 |
 
@@ -46,7 +46,7 @@ Três tiers de carta, com identidade mecânica e narrativa distinta. Nenhum tier
 
 - **Composição:** 3 Tokens compilados. Cada Token é uma das 5 famílias elementais (Elétrico / Bioquímico / Sônico / Cinético / Criptográfico, combat.md §6) combinada com o modelo carta-base + modificador (combat.md §7-8: Object / Stream / Null).
 - **"Compilar" = anexar o modificador no cast.** A compilação acontece em runtime, no momento de jogar a carta (combat.md §7: "modificadores são anexados em runtime, não pré-bakeados na carta"). Não existe uma segunda etapa de craft fora disso: **a compilação-no-cast É o único "craft" que existe no jogo.** Isso é consistente com o anti-pillar do gdd.md ("crafting de cartas: cartas são obtidas, não craftadas"): o jogador nunca monta uma carta nova numa bancada; ele obtém a carta pronta e, ao jogá-la em combate, o Tavus-Drive resolve a compilação do modificador.
-- **Obtenção:** exclusivamente por progresso narrativo (missão, beat de capítulo, recompensa de arco de companion). Nunca craftada, nunca comprada em loja. Reforça Pillar 2 (o deck é curado, não gerado) e o teto de 40-60 cartas totais do jogo (pillars.md, anti-pillar "não é Magic: The Gathering completo").
+- **Obtenção (EVOLUÍDA — decisão de pillar do líder 2026-07-16; ver pillars.md + `deck-mao-sistema.md`):** as COMUNS agora são um **pool bounded que o jogador MONTA e ADQUIRE** por múltiplos canais: **loja** (compra/venda), **craft** (compilar via F3-Alpha), **loot de missão/luta** (garantido E aleatório) e **achados na exploração** (visível + grama-surpresa com pity). A regra antiga "nunca craftada, nunca comprada" **valia pras comuns e foi conscientemente revista** (a distinção comum×especial virou o eixo: a curadoria narrativa migrou pras ESPECIAIS, §2.3). O teto rígido "40-60 cartas totais" vira "colecionável ENXUTO bounded" (não TCG infinito). _(As ESPECIAIS/SUPER mantêm o canon original: únicas, só progresso narrativo, nunca comércio/craft/drop — ver §2.3/§2.4.)_
 - **Naming:** `cardExec-[efeito em Sylvarin]` (ver §8).
 - **Baseline numérica (framework fechado pelo criador 2026-07-12, via economy-designer; ancorada em Trash 55 HP / Def 8, Atk médio de companion ~10, fórmula combat.md §11, TTK-alvo trash 3-5 turnos):**
 

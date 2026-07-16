@@ -142,7 +142,7 @@ Secundárias (não bloqueantes): "would play again" ≥70%, taxa de conclusão d
 - Dynamic difficulty adjustment (oferecer 2 modos fixos: Padrão + Analítico-hard).
 - Sistema de companions com afinidade / dating-sim mechanics.
 - Mais de 2 macro-biomas.
-- Crafting de cartas (cartas são obtidas, não craftadas).
+- ~~Crafting de cartas (cartas são obtidas, não craftadas).~~ **REVISTO 2026-07-16 (evolução de pillar do líder):** as COMUNS podem ser craftadas/compradas/lootadas (economia de coleção bounded); as ESPECIAIS/SUPER seguem "obtidas, não craftadas" (só progresso narrativo). Ver pillars.md + cartas-technomagik §2.2 + deck-mao-sistema.md.
 - DLC / season pass / live-service.
 - Console port no MVP (Linux v1; Windows export template preparado mas ship pós-v1).
 - Tradução além de pt-br em v1 (en-intl pós-release v1.0.0; estrutura i18n-ready desde F2-S.11).

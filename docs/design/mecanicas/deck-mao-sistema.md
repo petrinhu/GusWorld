@@ -50,10 +50,10 @@ Limite de mão = **base por personagem** (identidade; ex.: Gus prodígio segura 
 ## 6. Aquisição e descarte
 
 ### 6.1 Adquirir (decisão: multi-canal determinístico + achados híbridos)
-- **Especiais (Gus):** vêm da **NARRATIVA** (encontra/aprende com cada mestre → compila a carta). Nunca caem de loot.
+- **Especiais (Gus):** vêm **SÓ in-game, por progresso NARRATIVO** (encontra/aprende com cada mestre → compila a carta; Tavus-Eco / forja). **Nunca** compradas/craftadas/dropadas, e **classe PROTEGIDA** (não vão pro deck morto — ver §7). Confirmado pelo líder 2026-07-16.
 - **Comuns — espinha determinística (você sempre consegue o que precisa, sem grind):**
   - **Loja "app store" (crédito):** compra o que quer. Casa com "faz-se dinheiro com trabalho" + a metáfora de app. **Lojas compram E vendem** cartas.
-  - **Loot GARANTIDO de repositórios** (não aleatório).
+  - **Loot de repositórios/missão/luta:** GARANTIDO (recompensa fixa de arco/beat) **E ALEATÓRIO** (drop de missão/combate — variância de COLEÇÃO, não de combate; ok com o pillar anti-sorte porque não decide batalha, só engorda a coleção). Decisão do líder 2026-07-16.
   - **Craft (compilar)** via F3-Alpha (material/código → carta).
 - **Achados na exploração — camada BÔNUS (nunca gate de progressão):** modelo **híbrido**:
   - **Maioria VISÍVEL/colocada** (brilho no chão, baú, drop) — determinístico, você vê e pega, zero grind.
@@ -80,6 +80,7 @@ Fecham as duas fraudes que o criador antecipou (duplicar carta; usar deck morto 
 6. **Mão só puxa do deck ATIVO.**
 7. Base de confiança: o save é **AEAD/HMAC assinado** (ADR-015) — adulterar o arquivo quebra a assinatura. Os invariantes acima protegem contra bug de LÓGICA (o vetor real dentro do jogo).
 8. O **deck morto persistente** é mais superfície → o `qa-engineer` DEVE ter testes dedicados de dup/slot-extra/one-way/atomicidade/round-trip no save.
+9. **CLASSE PROTEGIDA — ESPECIAL/SUPER nunca vão pro deck morto** (Finding B do parecer de economia, 2026-07-16). São únicas (1 de 20 + a Super), só-narrativa, sem craft/drop/2ª chance: mandá-las pro morto (one-way) = **perda permanente de conteúdo único**. A lógica/UI do descarte **RECUSA** carta ESPECIAL/SUPER (guard por tier no service de descarte; custo ~1 `if`, risco altíssimo se faltar). Elas ocupam slot de deck normalmente, mas o único "descarte" possível delas é não-existente (ficam sempre). Teste dedicado do `qa-engineer`: tentar mandar especial pro morto → rejeitado.
 
 ---
 
