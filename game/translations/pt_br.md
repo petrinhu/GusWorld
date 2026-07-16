@@ -646,6 +646,9 @@ Prova Irrefutável
 ## STATUS_SCRYING_NAME
 Espelho Negro
 
+## STATUS_ECO_NAME
+Molde
+
 ### Combos curados (combat.md §10, COMBO_<comboId>_NAME)
 
 ## COMBO_PULSO_STREAM_NAME
@@ -737,6 +740,12 @@ Free-Order
 
 ## CARD_EXEC_MISES_NAME
 Calc-Edge
+
+## CARD_EXEC_VONNEUMANN_NAME
+Fork
+
+## CARD_EXEC_BRUNO_NAME
+Echo-Self
 
 ---
 

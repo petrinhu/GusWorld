@@ -445,6 +445,9 @@ Cancel
 
 ## STATUS_SCRYING_NAME
 
+## STATUS_ECO_NAME
+Mold
+
 ### Curated combos (COMBO_<comboId>_NAME)
 
 ## COMBO_PULSO_STREAM_NAME
@@ -539,6 +542,12 @@ Free-Order
 
 ## CARD_EXEC_MISES_NAME
 Calc-Edge
+
+## CARD_EXEC_VONNEUMANN_NAME
+Fork
+
+## CARD_EXEC_BRUNO_NAME
+Echo-Self
 
 ### Controls screen (keyboard remap, M2)
 

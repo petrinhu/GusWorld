@@ -2,17 +2,21 @@
 //
 // Spec executavel (Catch2 v3) do catalogo data-driven das cartas ESPECIAIS dos mestres
 // suportadas pelo executor techMagic (ADR-016, item TECHMAGIC-EXECUTOR / MVP steps 4-8 +
-// manifesto itens 5-6, 12 + CARD-ENGINE-MANIFESTO itens 7, 9): volta, newton, pythagoras,
+// manifesto itens 5-6, 12 + CARD-ENGINE-MANIFESTO itens 7-9 e 8): volta, newton, pythagoras,
 // mandelbrot, ada, godel, faraday, euler, turing, menger, tesla, einstein, planck, dee,
-// maxwell, hayek, mises. POCO puro, ZERO Qt.
+// maxwell, hayek, mises, vonneumann, bruno. POCO puro, ZERO Qt.
 //
-// Cobre: (1) as 17 cartas existem, ids unicos, nenhuma usa EffectKind::CloneAlly (guarda
-// que von Neumann/Bruno NAO entraram nesta leva); (2) campos canonicos por-carta (tier/
-// category/mana/power/ignores_weakness_wheel); (3) as 12 executaveis (volta/newton/
-// pythagoras/mandelbrot/ada/tesla/einstein/faraday/godel/dee/hayek/mises) resolvem via
-// techMagic::execute SEM logic_error num contexto minimo; (4) as 3 fora-de-combate
-// (euler/turing/menger) tem effects vazio; (5) paridade i18n das 17 chaves
+// Cobre: (1) as 19 cartas existem, ids unicos; (2) campos canonicos por-carta (tier/
+// category/mana/power/ignores_weakness_wheel); (3) as 14 executaveis (volta/newton/
+// pythagoras/mandelbrot/ada/tesla/einstein/faraday/godel/dee/hayek/mises/vonneumann/bruno)
+// resolvem via techMagic::execute SEM logic_error num contexto minimo; (4) as 3
+// fora-de-combate (euler/turing/menger) tem effects vazio; (5) paridade i18n das 19 chaves
 // CARD_EXEC_<FIGURA>_NAME (2 locales).
+//
+// von Neumann (Fork) e Giordano Bruno (Echo-Self, CARD-ENGINE-MANIFESTO item 8, ultimo
+// step do manifesto, AMB-11): os testes EXAUSTIVOS do Eco (replicate_eco, composicao
+// Ada+Eco anti-recursao/anti-dobra, TokenRefund) vivem em techmagic_clone_test.cpp - este
+// arquivo so cobre o CATALOGO (campos + smoke test de execucao), mesmo padrao das outras.
 //
 // Maxwell (Spectra-Wave, manifesto item 12, decisao do lider 2026-07-16, AMB-08): Hibrida/
 // Eletrico/Grupo, effects VAZIO (dano-base puro, reusa o caminho Grupo/AoE do Newton, zero
@@ -75,26 +79,32 @@ CombatActor make_actor(const std::string& id, bool player_side, int hp = 100, in
 
 }  // namespace
 
-// ===== 1. As 8 cartas existem, ids unicos, guarda anti-CloneAlly =====
+// ===== 1. As 19 cartas existem, ids unicos =====
 
-TEST_CASE("master_cards: build_registry tem exatamente as 17 cartas suportadas",
+TEST_CASE("master_cards: build_registry tem exatamente as 19 cartas suportadas",
           "[domain][combat][cards][techmagic][mastercards]") {
     const auto reg = MasterCards::build_registry();
-    REQUIRE(reg.size() == 17);
+    REQUIRE(reg.size() == 19);
     for (const char* id : {"volta", "newton", "pythagoras", "mandelbrot", "ada", "godel",
                            "faraday", "euler", "turing", "menger", "tesla", "einstein",
-                           "planck", "dee", "maxwell", "hayek", "mises"})
+                           "planck", "dee", "maxwell", "hayek", "mises", "vonneumann",
+                           "bruno"})
         REQUIRE(reg.count(id) == 1);
 }
 
-TEST_CASE("master_cards: nenhuma carta usa EffectKind::CloneAlly (von Neumann/Bruno "
-         "ficam de fora desta leva)",
+TEST_CASE("master_cards: SO vonneumann e bruno usam EffectKind::CloneAlly (as demais 17 "
+         "nao)",
          "[domain][combat][cards][techmagic][mastercards]") {
     const auto reg = MasterCards::build_registry();
     for (const auto& [id, card] : reg) {
         INFO("carta: " << id);
-        for (const EffectSpec& spec : card.effects)
-            REQUIRE(spec.kind != EffectKind::CloneAlly);
+        const bool has_clone_ally =
+            std::any_of(card.effects.begin(), card.effects.end(),
+                       [](const EffectSpec& s) { return s.kind == EffectKind::CloneAlly; });
+        if (id == "vonneumann" || id == "bruno")
+            REQUIRE(has_clone_ally);
+        else
+            REQUIRE_FALSE(has_clone_ally);
     }
 }
 
@@ -709,7 +719,94 @@ TEST_CASE("master_cards: mises (ApEfficiency em OnCast) executa via techMagic::e
     REQUIRE_NOTHROW(techMagic::execute(TriggerHook::OnCast, c, ctx));
 }
 
-// ===== 4. Paridade i18n das 17 chaves (2 locales) =====
+TEST_CASE("master_cards: vonneumann = Hibrida/Universal/mana 6/Single, effects [OnCast "
+         "CloneAlly Eco 50% dur 3 AllyOnly] + [OnCast TokenRefund]",
+         "[domain][combat][cards][techmagic][mastercards]") {
+    const auto reg = MasterCards::build_registry();
+    const Card& c = reg.at("vonneumann");
+    REQUIRE(c.category == CardCategory::Hibrida);
+    REQUIRE(c.family == CardFamily::Universal);
+    REQUIRE(c.mana_cost == 6);
+    REQUIRE(c.target_shape == TargetShape::Single);
+    REQUIRE(c.ignores_weakness_wheel == false);
+    REQUIRE(c.effects.size() == 2);
+
+    const auto& clone = c.effects[0];
+    REQUIRE(clone.trigger == TriggerHook::OnCast);
+    REQUIRE(clone.kind == EffectKind::CloneAlly);
+    REQUIRE(clone.status == StatusId::Eco);
+    REQUIRE(clone.magnitude == 50);
+    REQUIRE(clone.duration == 3);
+    REQUIRE(clone.stack_rule == StackRule::Refresh);
+    REQUIRE(clone.side_filter == SideFilter::AllyOnly);
+
+    const auto& refund = c.effects[1];
+    REQUIRE(refund.trigger == TriggerHook::OnCast);
+    REQUIRE(refund.kind == EffectKind::TokenRefund);
+}
+
+TEST_CASE("master_cards: vonneumann (CloneAlly em OnCast) executa via techMagic::execute "
+         "sem lancar, aliado alvo recebe StatusId::Eco",
+         "[domain][combat][cards][techmagic][mastercards]") {
+    const auto reg = MasterCards::build_registry();
+    const Card& c = reg.at("vonneumann");
+
+    CombatActor caster = make_actor("h", /*player_side=*/true);
+    CombatActor ally = make_actor("h2", /*player_side=*/true);
+
+    techMagic::TechMagicContext ctx;
+    ctx.caster = &caster;
+    ctx.counterpart = &ally;  // side_filter AllyOnly: alvo do mesmo lado, nao dissipa.
+
+    REQUIRE_NOTHROW(techMagic::execute(TriggerHook::OnCast, c, ctx));
+    bool has_eco = false;
+    for (const auto& s : ally.status_effects())
+        if (s.id == StatusId::Eco) has_eco = true;
+    REQUIRE(has_eco);
+}
+
+TEST_CASE("master_cards: bruno = Ativa/Universal/mana 6/Self, effects [OnCast CloneAlly "
+         "Eco 62% dur 2 AllyOnly]",
+         "[domain][combat][cards][techmagic][mastercards]") {
+    const auto reg = MasterCards::build_registry();
+    const Card& c = reg.at("bruno");
+    REQUIRE(c.category == CardCategory::Ativa);
+    REQUIRE(c.family == CardFamily::Universal);
+    REQUIRE(c.mana_cost == 6);
+    REQUIRE(c.target_shape == TargetShape::Self);
+    REQUIRE(c.ignores_weakness_wheel == false);
+    REQUIRE(c.effects.size() == 1);
+
+    const auto& clone = c.effects[0];
+    REQUIRE(clone.trigger == TriggerHook::OnCast);
+    REQUIRE(clone.kind == EffectKind::CloneAlly);
+    REQUIRE(clone.status == StatusId::Eco);
+    REQUIRE(clone.magnitude == 62);
+    REQUIRE(clone.duration == 2);
+    REQUIRE(clone.stack_rule == StackRule::Refresh);
+    REQUIRE(clone.side_filter == SideFilter::AllyOnly);
+}
+
+TEST_CASE("master_cards: bruno (CloneAlly em OnCast) executa via techMagic::execute sem "
+         "lancar, o proprio conjurador recebe StatusId::Eco",
+         "[domain][combat][cards][techmagic][mastercards]") {
+    const auto reg = MasterCards::build_registry();
+    const Card& c = reg.at("bruno");
+
+    CombatActor caster = make_actor("h", /*player_side=*/true);
+
+    techMagic::TechMagicContext ctx;
+    ctx.caster = &caster;
+    ctx.counterpart = &caster;  // TargetShape::Self.
+
+    REQUIRE_NOTHROW(techMagic::execute(TriggerHook::OnCast, c, ctx));
+    bool has_eco = false;
+    for (const auto& s : caster.status_effects())
+        if (s.id == StatusId::Eco) has_eco = true;
+    REQUIRE(has_eco);
+}
+
+// ===== 4. Paridade i18n das 19 chaves (2 locales) =====
 
 namespace {
 
@@ -741,7 +838,7 @@ bool has_key(const std::vector<std::string>& keys, const std::string& key) {
 #define GUSWORLD_TRANSLATIONS_DIR "../../../../game/translations"
 #endif
 
-TEST_CASE("master_cards: as 17 chaves CARD_EXEC_<FIGURA>_NAME existem em pt_br.md e "
+TEST_CASE("master_cards: as 19 chaves CARD_EXEC_<FIGURA>_NAME existem em pt_br.md e "
          "en_intl.md",
          "[domain][combat][cards][techmagic][mastercards][i18n]") {
     const std::vector<std::string> pt =
@@ -753,7 +850,8 @@ TEST_CASE("master_cards: as 17 chaves CARD_EXEC_<FIGURA>_NAME existem em pt_br.m
 
     for (const char* figura : {"VOLTA", "NEWTON", "PYTHAGORAS", "MANDELBROT", "ADA",
                                "GODEL", "FARADAY", "EULER", "TURING", "MENGER", "TESLA",
-                               "EINSTEIN", "PLANCK", "DEE", "MAXWELL", "HAYEK", "MISES"}) {
+                               "EINSTEIN", "PLANCK", "DEE", "MAXWELL", "HAYEK", "MISES",
+                               "VONNEUMANN", "BRUNO"}) {
         const std::string key = std::string("CARD_EXEC_") + figura + "_NAME";
         INFO("chave: " << key);
         REQUIRE(has_key(pt, key));

@@ -122,6 +122,14 @@ constexpr int kHayekTier4FumblePp = 3;
 // codigo/commit apesar da forma - mesma ressalva do Hayek acima).
 constexpr int kMisesBonusAp = 1;
 constexpr int kMisesAimErrorPercent = 13;  //PLAYTEST kMisesAimError.
+// Eco/Molde-Fiel (CloneAlly, CARD-ENGINE-MANIFESTO item 8, ultimo step): von Neumann
+// (qualquer aliado, Hibrida) e Giordano Bruno (self-only, Ativa) portam a MESMA mecanica
+// com numeros distintos (//PLAYTEST, decisao do lider 2026-07-16 no brief). magnitude% =
+// fracao do eco; duration = N turnos PROPRIOS do portador.
+constexpr int kVonNeumannEcoPercent = 50;
+constexpr int kVonNeumannEcoDuration = 3;
+constexpr int kBrunoEcoPercent = 62;
+constexpr int kBrunoEcoDuration = 2;
 
 // Monta uma carta ESPECIAL base. base_type = Glifo (carta-programa nao-elemental,
 // //PLAYTEST). ap_cost default 1 (herda o mesmo default do placeholder). Sem
@@ -437,10 +445,53 @@ std::unordered_map<std::string, Card> assemble() {
                        .percent = kMisesAimErrorPercent}},  // desconto% da face 2.
             /*ignores_weakness_wheel=*/false, /*power=*/0,
             /*target_shape=*/TargetShape::Self),
+
+        // --- von Neumann (Fork): Hibrida, Universal, mana 6, Single (CARD-ENGINE-MANIFESTO
+        // item 8, ultimo step, decisoes do lider no brief 2026-07-16, AMB-11). Duas faces:
+        //   OnCast -> CloneAlly ("Molde Fiel"): aplica StatusId::Eco (magnitude 50%,
+        //     duration 3 turnos PROPRIOS do portador, Refresh) no ALVO da carta -
+        //     side_filter AllyOnly (qualquer aliado, self incluso; inimigo dissipa). Ao fim
+        //     de CADA turno proprio do portador, o Eco reaplica a ultima acao de dano dele
+        //     mesmo a 50% (techMagic::replicate_eco, ver CombatStateMachine::
+        //     process_eco_turn_end_hook - NAO um trigger deste dispatcher).
+        //   OnCast -> TokenRefund ("Construtor Universal", marcador no-op no dispatcher):
+        //     enquanto equipada, a 1a especial Ativa/Hibrida jogada na batalha (inclusive
+        //     esta PROPRIA carta) "se reconstroi" - nao entra em specials_cast_ - via
+        //     combat_state_machine.cpp::token_refund_equipped_on_side. 1x/batalha (o refund
+        //     em si, nao a carta). ---
+        make_special(
+            "vonneumann", "CARD_EXEC_VONNEUMANN_NAME", CardFamily::Universal,
+            CardCategory::Hibrida, kActiveManaCost,
+            {EffectSpec{.trigger = TriggerHook::OnCast,
+                       .kind = EffectKind::CloneAlly,
+                       .magnitude = kVonNeumannEcoPercent,  // % de replicacao do Eco.
+                       .duration = kVonNeumannEcoDuration,  //PLAYTEST 3 turnos proprios.
+                       .status = StatusId::Eco,
+                       .stack_rule = StackRule::Refresh,
+                       .side_filter = SideFilter::AllyOnly},
+             EffectSpec{.trigger = TriggerHook::OnCast, .kind = EffectKind::TokenRefund}}),
+
+        // --- Giordano Bruno (Echo-Self): Ativa, Universal, mana 6, Self (CARD-ENGINE-
+        // MANIFESTO item 8, ultimo step, AMB-11). OnCast -> CloneAlly: MESMA mecanica do
+        // von Neumann acima (StatusId::Eco), mas SELF-ONLY (TargetShape::Self - o alvo e
+        // SEMPRE o proprio conjurador, "um eco do proprio Gus") e numeros distintos (62%,
+        // 2 turnos proprios, //PLAYTEST) - a imagem de "dois Gus", sem colidir com o clone
+        // de qualquer-aliado do von Neumann. ---
+        make_special(
+            "bruno", "CARD_EXEC_BRUNO_NAME", CardFamily::Universal, CardCategory::Ativa,
+            kActiveManaCost,
+            {EffectSpec{.trigger = TriggerHook::OnCast,
+                       .kind = EffectKind::CloneAlly,
+                       .magnitude = kBrunoEcoPercent,  // % de replicacao do Eco.
+                       .duration = kBrunoEcoDuration,  //PLAYTEST 2 turnos proprios.
+                       .status = StatusId::Eco,
+                       .stack_rule = StackRule::Refresh,
+                       .side_filter = SideFilter::AllyOnly}},
+            /*ignores_weakness_wheel=*/false, /*power=*/0, /*target_shape=*/TargetShape::Self),
     };
 
     std::unordered_map<std::string, Card> registry;
-    registry.reserve(17);
+    registry.reserve(19);
     for (const auto& card : cards) {
         // emplace (nao indexer) falha-cedo se algum id duplicar (mesmo padrao do placeholder).
         const auto [it, inserted] = registry.emplace(card.id, card);

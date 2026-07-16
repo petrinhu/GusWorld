@@ -510,10 +510,15 @@ TEST_CASE("techmagic roundend: bonus que mata o alvo nao gera crash; check_end "
     REQUIRE(sm.outcome() == CombatOutcome::Victory);
 }
 
-// ===== 13. Fail-fast: OnRoundEnd sem ledger; CloneAlly segue sem handler =====
+// ===== 13. Fail-fast: OnRoundEnd sem ledger lanca; CloneAlly (que GANHOU handler no =====
+// =====     CARD-ENGINE-MANIFESTO item 8) tambem lanca aqui, mas pela validacao de =====
+// =====     ARGUMENTO do PROPRIO handle_clone_ally (ctx.counterpart nulo), NAO mais pelo =====
+// =====     default fail-fast do switch de execute() (mesma correcao ja feita no arquivo =====
+// =====     irmao techmagic_repeat_test.cpp) ===============================================
 
 TEST_CASE("techmagic roundend: execute(OnRoundEnd, HypotenuseCombo) sem ctx.round_hits "
-         "lanca logic_error; CloneAlly continua sem handler (lanca tambem)",
+         "lanca logic_error; CloneAlly TEM handler mas tambem lanca aqui (ctx.counterpart "
+         "nulo, validacao interna do handle_clone_ally - nao mais o default do switch)",
          "[domain][combat][techmagic][roundend]") {
     CombatActor h = make_actor("h", true, 100, 8, 0, 20);
 
@@ -524,11 +529,16 @@ TEST_CASE("techmagic roundend: execute(OnRoundEnd, HypotenuseCombo) sem ctx.roun
     clone.effects = {
         EffectSpec{.trigger = TriggerHook::OnRoundEnd, .kind = EffectKind::CloneAlly}};
 
-    techMagic::TechMagicContext ctx;  // round_hits == nullptr (default).
+    techMagic::TechMagicContext ctx;  // round_hits == nullptr, counterpart == nullptr (default).
     ctx.caster = &h;
 
     REQUIRE_THROWS_AS(techMagic::execute(TriggerHook::OnRoundEnd, hypo, ctx),
                       std::logic_error);
+    // CloneAlly ganhou handler (handle_clone_ally) no manifesto item 8 - o switch de
+    // execute() NAO cai mais no default fail-fast pra ele. O logic_error aqui vem da
+    // validacao de argumento DENTRO do handler (OnCast/OnRoundEnd sempre precisa de alvo,
+    // ctx.counterpart nulo). Prova que o dispatch acha o case certo E que o handler mantem
+    // fail-fast em argumento invalido.
     REQUIRE_THROWS_AS(techMagic::execute(TriggerHook::OnRoundEnd, clone, ctx),
                       std::logic_error);
 }

@@ -128,6 +128,28 @@ enum class StatusId : std::uint32_t {
                              // intents inimigos na fronteira de rodada (ver CombatStateMachine::
                              // process_scrying_hooks). Classificado BUFF por exclusao (nao
                              // listado em is_non_buff, combat_actor.cpp).
+    Eco = 19,                // Eco/Molde-Fiel (CloneAlly, von Neumann/Fork + Giordano Bruno/
+                             // Echo-Self; CARD-ENGINE-MANIFESTO item 8, ultimo step do
+                             // manifesto). Buff auto-aplicado no ALIADO clonado (self incluso,
+                             // Bruno e self-only por TargetShape) via add_status LEGADO - fora
+                             // do portao de imunidade EM-Shield (e um buff, nunca um debuff
+                             // ofensivo em outro ator). `magnitude` = % de replicacao (von
+                             // Neumann 50, Bruno 62, //PLAYTEST); `duration` = N turnos
+                             // PROPRIOS do portador (tick generico de qualquer StatusEffect,
+                             // ver CombatStateMachine::apply_status_tick default case). Ao
+                             // FIM de CADA turno proprio do portador (os DOIS sitios de
+                             // fim-de-turno, mesmo par de RepeatLastAction/OnAllyTurnEnd), se
+                             // a ULTIMA ACAO DE DANO desta rodada foi do PROPRIO portador
+                             // (last_action_.actor == portador), o eco reaplica os hits dele a
+                             // `magnitude`% via CombatActor::take_damage PURO (anti-recursao,
+                             // NAO toca last_action_/round_hits_ - mesma disciplina de
+                             // RepeatLastAction/HypotenuseCombo/Reflect). Classificado BUFF por
+                             // exclusao (nao listado em is_non_buff, combat_actor.cpp). Ver
+                             // techMagic::replicate_eco (techmagic.hpp) +
+                             // CombatStateMachine::process_eco_turn_end_hook
+                             // (combat_state_machine.cpp). Visual (sprite-eco translucido) e
+                             // responsabilidade da camada de apresentacao (glintfx), lendo este
+                             // StatusId - NAO implementado no domain/.
 };
 
 // Tier de fraqueza da roda deterministica. secao 6.
@@ -317,6 +339,21 @@ enum class EffectKind : std::uint32_t {
     // `percent` = desconto% da face 2. Determinístico (0 RNG). Ver techmagic.cpp::
     // handle_ap_efficiency (marcador no-op) e combat_state_machine.cpp (wiring real).
     ApEfficiency = 11,
+    // Construtor Universal (von Neumann/Fork, CARD-ENGINE-MANIFESTO item 8, passiva PR-B):
+    // MARCADOR fora do dispatcher, MESMO padrao de DamageQuantize/DiversityBonus/
+    // ApEfficiency acima (o handler em techmagic.cpp e no-op deliberado). Refund
+    // automatico e DETERMINISTICO (0 RNG) da PRIMEIRA especial Ativa/Hibrida jogada nesta
+    // batalha (inclusive a PROPRIA carta que porta esta passiva): SE algum VIVO do lado do
+    // conjurador porta TokenRefund equipado E o refund desta batalha AINDA nao foi gasto,
+    // a carta jogada NAO entra no gate 1x/batalha (specials_cast_) - "se reconstroi no
+    // Codex" - e o refund se consome (1x/batalha, nao 1x/carta). Wiring DIRETO no gate de
+    // resolve_use_card (combat_state_machine.cpp::token_refund_equipped_on_side +
+    // CombatStateMachine::token_refund_used_), nao no dispatcher techMagic::execute
+    // (embora, ao contrario de DamageQuantize/DiversityBonus/ApEfficiency - que sao
+    // Passiva/equip-only e por isso NUNCA veem OnCast disparado -, a carta portadora de
+    // TokenRefund pode ser Hibrida/castavel: o marcador no-op ainda roda inofensivo se
+    // dispachado via OnCast, mesmo padrao fail-fast "sem handler = bug").
+    TokenRefund = 12,
 };
 
 // Filtro de lado do alvo de um EffectSpec (ADR-016 Balde B, Faraday/EM-Shield). Data-driven:

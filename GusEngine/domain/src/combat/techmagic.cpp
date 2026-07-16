@@ -9,9 +9,14 @@
 // o ator atual - espelho beneficio) + RevealIntent (step 8, John Dee/Black-Mirror,
 // manifesto item 6, decisoes D1-D4 do lider 2026-07-15: buff Scrying + dump read-only de
 // IntentPreview via log_intent_for/dump_reveal_intent, funcoes PUBLICAS reusadas pelo
-// re-dump de rodada e pelo Scan aprimorado - ver combat_state_machine.cpp). EffectKind sem
-// handler (CloneAlly) lanca std::logic_error - fail-fast, nunca no-op silencioso (ver
-// techmagic.hpp).
+// re-dump de rodada e pelo Scan aprimorado - ver combat_state_machine.cpp) + CloneAlly
+// (CARD-ENGINE-MANIFESTO item 8, ultimo step: von Neumann/Fork + Giordano Bruno/Echo-Self,
+// status-based StatusId::Eco - handle_clone_ally aplica o status via OnCast,
+// techMagic::replicate_eco reaplica os hits do PROPRIO portador no fim de cada turno dele,
+// chamada FORA do dispatcher por CombatStateMachine::process_eco_turn_end_hook - + o
+// marcador TokenRefund/Construtor Universal, refund 1x/batalha fora do dispatcher). Um
+// EffectKind append-only NOVO sem case no switch de execute() lanca std::logic_error -
+// fail-fast, nunca no-op silencioso (ver techmagic.hpp).
 //
 // Cross-ref: gus/domain/combat/techmagic.hpp; combat_state_machine.cpp (pontos de hook);
 //            docs/design/mecanicas/cartas-technomagik.md; ADR-016.
@@ -500,6 +505,76 @@ void handle_ap_efficiency(const EffectSpec&, const Card&, TechMagicContext&) {
 // carta - e informacao, nao dano elemental). Depois dumpa os intents via
 // dump_reveal_intent (funcao PUBLICA compartilhada com o re-dump de rodada da FSM, ver
 // techmagic.hpp).
+// CloneAlly (OnCast, von Neumann/Fork + Giordano Bruno/Echo-Self; CARD-ENGINE-MANIFESTO
+// item 8, ultimo step do manifesto): aplica o StatusId::Eco (spec.status, data-driven -
+// mesma convencao de handle_apply_status: spec.magnitude/duration/stack_rule alimentam o
+// StatusEffect) no ALVO da carta (ctx.counterpart) - um "molde" que, ao FIM de CADA turno
+// PROPRIO do portador nesta rodada, reaplica os hits da ULTIMA ACAO DE DANO dele mesmo a
+// spec.magnitude% (ver techMagic::replicate_eco + CombatStateMachine::
+// process_eco_turn_end_hook - NAO um trigger deste dispatcher, o Eco e status, nao carta
+// equipada, mesmo padrao de Scrying/John Dee). side_filter (Balde B): von Neumann =
+// AllyOnly (qualquer aliado, inclusive o proprio dono - self-target resolve pra Single com
+// target==caster); Bruno = TargetShape::Self na carta (o alvo e SEMPRE o proprio
+// conjurador), mas o handler roda o MESMO side_filter AllyOnly por simetria/defesa (nunca
+// clona um inimigo por engano de wiring futuro). Alvo inimigo DISSIPA (F-4, mesmo padrao
+// de handle_apply_status), NAO lanca. add_status LEGADO (nao try_add_status): o Eco e um
+// BUFF auto-aplicado num ALIADO (nunca um debuff ofensivo em outro ator), fora do portao
+// de imunidade EM-Shield (o Balde B so trava DEBUFF) - mesmo racional do Shield do Defend/
+// Scrying do John Dee (ver handle_reveal_intent abaixo). Familia de origem do status e
+// SEMPRE Universal (card.family, mesma convencao de handle_apply_status - o Eco nao
+// compete na roda de fraqueza, nao e um debuff elemental de forma alguma). Visual do
+// sprite-eco (fantasma translucido no slot) e responsabilidade da camada de apresentacao
+// (glintfx), lendo o mesmo StatusId::Eco (mesmo mecanismo dos icones de status do HUD) -
+// NAO implementado aqui (domain/ so entrega o status + o log, ver ADR-016).
+void handle_clone_ally(const EffectSpec& spec, const Card& card, TechMagicContext& ctx) {
+    if (ctx.caster == nullptr)
+        throw std::logic_error("techMagic::CloneAlly: ctx.caster nao pode ser nulo.");
+    if (ctx.counterpart == nullptr)
+        throw std::logic_error(
+            "techMagic::CloneAlly: ctx.counterpart (alvo) nao pode ser nulo (OnCast sempre "
+            "tem alvo).");
+
+    CombatActor* target = ctx.counterpart;
+
+    if (spec.side_filter != SideFilter::Any) {
+        const bool ally = target->is_player_side() == ctx.caster->is_player_side();
+        const bool dissipates = (spec.side_filter == SideFilter::AllyOnly && !ally) ||
+                                (spec.side_filter == SideFilter::EnemyOnly && ally);
+        if (dissipates) {
+            log_entry(ctx, target, 0,
+                     ctx.caster->id() + " tavus-executa " + card.id + " em " + target->id() +
+                         ": nao adere a " + (ally ? "aliados" : "hostis") +
+                         ", a carta se dissipa.");
+            return;
+        }
+    }
+
+    target->add_status(
+        StatusEffect{spec.status, spec.magnitude, spec.duration, spec.stack_rule,
+                    CardFamily::Universal});
+
+    log_entry(ctx, target, spec.magnitude,
+             ctx.caster->id() + " tavus-executa " + card.id + " em " + target->id() +
+                 ": molde de eco ativo (" + std::to_string(spec.magnitude) + "%, dur " +
+                 std::to_string(spec.duration) + " turnos) - o proximo golpe de " +
+                 target->id() + " vai ecoar.");
+}
+
+// TokenRefund (Construtor Universal, von Neumann/Fork; CARD-ENGINE-MANIFESTO item 8
+// PR-B): MARCADOR no-op deliberado, MESMO padrao de handle_damage_quantize/
+// handle_diversity_bonus/handle_ap_efficiency acima. O refund 1x/batalha NAO passa por
+// este dispatcher - pluga DIRETO no gate specials_cast_ do resolvedor
+// (combat_state_machine.cpp::resolve_use_card), via
+// combat_state_machine.cpp::token_refund_equipped_on_side + CombatStateMachine::
+// token_refund_used_. Existe so pra satisfazer o invariante fail-fast "EffectKind sem
+// handler = bug" (techmagic.hpp) - ao contrario de DamageQuantize/DiversityBonus/
+// ApEfficiency (Passiva/equip-only, OnCast NUNCA disparado na pratica), a carta portadora
+// de TokenRefund pode ser Hibrida/castavel (von Neumann): este no-op AINDA pode rodar de
+// fato quando a carta e jogada, mas e inofensivo por construcao (nao muta nada).
+void handle_token_refund(const EffectSpec&, const Card&, TechMagicContext&) {
+    // No-op deliberado: ver comentario acima.
+}
+
 void handle_reveal_intent(const EffectSpec& spec, const Card& card, TechMagicContext& ctx) {
     if (ctx.caster == nullptr)
         throw std::logic_error("techMagic::RevealIntent: ctx.caster nao pode ser nulo.");
@@ -596,6 +671,49 @@ void dump_reveal_intent(TechMagicContext& ctx) {
     for (CombatActor* enemy : enemies) log_intent_for(*enemy, ctx);
 }
 
+// Eco/Molde-Fiel (CloneAlly, von Neumann/Fork + Giordano Bruno/Echo-Self, CARD-ENGINE-
+// MANIFESTO item 8): ver doc-comment em techmagic.hpp. `ctx.caster` e o PORTADOR do status
+// Eco (quem fecha o proprio turno); `percent` e o StatusEffect.magnitude ja extraido pelo
+// CALLER (CombatStateMachine::process_eco_turn_end_hook). Reaplica os hits>0 da ULTIMA
+// ACAO DE DANO do PROPRIO portador NESTA RODADA (ctx.last_action), escalado por `percent`%,
+// via CombatActor::take_damage PURO - MESMA anti-recursao/anti-inflacao de
+// handle_repeat_last_action (nao toca ctx.last_action/round_hits_, entao nao pode compor
+// com Ada/HypotenuseCombo pra dobrar dano). Diferente de RepeatLastAction (que ecoa a acao
+// de QUALQUER aliado): exige last_action->actor == ctx.caster EXATAMENTE. Sem acao-de-dano
+// propria nesta rodada = eco ocioso (log, nao erro). Zero consumo de RNG.
+void replicate_eco(int percent, TechMagicContext& ctx) {
+    if (ctx.caster == nullptr)
+        throw std::logic_error("techMagic::CloneAlly: ctx.caster nao pode ser nulo.");
+    if (ctx.last_action == nullptr)
+        throw std::logic_error(
+            "techMagic::CloneAlly: ctx.last_action nao pode ser nulo (bug de call site - "
+            "CombatStateMachine::process_eco_turn_end_hook sempre injeta &last_action_ "
+            "quando o portador tem Eco).");
+
+    const LastActionRecord& last = *ctx.last_action;
+    const bool echoable = last.actor == ctx.caster && !last.hits.empty();
+    if (!echoable) {
+        log_entry(ctx, nullptr, 0,
+                 ctx.caster->id() +
+                     ": o molde aguarda, nada a replicar neste turno (eco ocioso).");
+        return;
+    }
+
+    for (const auto& [target, dmg] : last.hits) {
+        if (target == nullptr || !target->is_alive()) continue;
+        const int echo = static_cast<int>(
+            std::lround(static_cast<double>(dmg) * static_cast<double>(percent) / 100.0));
+        if (echo <= 0) continue;
+
+        target->take_damage(echo);  // PURO - anti-recursao (nao redispara hooks/ledger).
+
+        log_entry(ctx, target, echo,
+                 ctx.caster->id() + ": o eco de " + ctx.caster->id() + " replica (" +
+                     std::to_string(percent) + "%) em " + target->id() + " por " +
+                     std::to_string(echo) + ".");
+    }
+}
+
 void execute(TriggerHook hook, const Card& card, TechMagicContext& ctx) {
     for (const EffectSpec& spec : card.effects) {
         if (spec.trigger != hook) continue;
@@ -635,13 +753,19 @@ void execute(TriggerHook hook, const Card& card, TechMagicContext& ctx) {
                 handle_ap_efficiency(spec, card, ctx);
                 break;
             case EffectKind::CloneAlly:
+                handle_clone_ally(spec, card, ctx);
+                break;
+            case EffectKind::TokenRefund:
+                handle_token_refund(spec, card, ctx);
+                break;
             default:
                 throw std::logic_error(
                     "techMagic: EffectKind sem handler implementado na carta '" + card.id +
-                    "' (steps 2-3-5-6-7-8 + manifesto5-6 + CARD-ENGINE-MANIFESTO item 7-9 cobrem "
-                    "ApplyStatus/Leech/Reflect/HypotenuseCombo/RepeatLastAction/ChainDamage/"
-                    "DelayAction/DamageQuantize/RevealIntent/DiversityBonus/ApEfficiency; "
-                    "CloneAlly e step futuro, ADR-016).");
+                    "' (steps 2-3-5-6-7-8 + manifesto5-6 + CARD-ENGINE-MANIFESTO item 7-9 e "
+                    "8 cobrem ApplyStatus/Leech/Reflect/HypotenuseCombo/CloneAlly/"
+                    "RepeatLastAction/ChainDamage/DelayAction/DamageQuantize/RevealIntent/"
+                    "DiversityBonus/ApEfficiency/TokenRefund; um EffectKind novo append-only "
+                    "sem case aqui e bug de implementacao, ADR-016).");
         }
     }
 }

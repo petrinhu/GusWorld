@@ -221,6 +221,16 @@ TEST_CASE("combat_enums: StatusId::BlindagemEM e ordinal 16 (append-only)",
     REQUIRE(ord(StatusId::BlindagemEM) == 16u);
 }
 
+// CARD-ENGINE-MANIFESTO item 8 (CloneAlly, von Neumann/Fork + Giordano Bruno/Echo-Self,
+// ultimo step do manifesto): Eco e append-only (ordinal 19, apos Scrying=18). NAO reordena
+// {0..18}: contrato binario do serializer futuro intocado.
+TEST_CASE("combat_enums: StatusId::Eco e ordinal 19 (append-only)",
+          "[domain][combat][enums][techmagic]") {
+    REQUIRE(ord(StatusId::NullProof) == 17u);
+    REQUIRE(ord(StatusId::Scrying) == 18u);
+    REQUIRE(ord(StatusId::Eco) == 19u);
+}
+
 TEST_CASE("combat_enums: SideFilter ordinais", "[domain][combat][enums][techmagic]") {
     REQUIRE(ord(SideFilter::Any) == 0u);
     REQUIRE(ord(SideFilter::EnemyOnly) == 1u);
@@ -271,4 +281,12 @@ TEST_CASE("combat_enums: EffectKind::RepeatLastAction e ordinal 5 (append-only)"
 TEST_CASE("combat_enums: EffectKind::ApEfficiency e ordinal 11 (append-only)",
           "[domain][combat][enums][techmagic]") {
     REQUIRE(ord(EffectKind::ApEfficiency) == 11u);
+}
+
+// CARD-ENGINE-MANIFESTO item 8 (von Neumann/Fork, passiva "Construtor Universal", ultimo
+// step do manifesto): TokenRefund e append-only (ordinal 12, apos ApEfficiency). NAO
+// reordena {0..11}: contrato binario do serializer futuro intocado.
+TEST_CASE("combat_enums: EffectKind::TokenRefund e ordinal 12 (append-only)",
+          "[domain][combat][enums][techmagic]") {
+    REQUIRE(ord(EffectKind::TokenRefund) == 12u);
 }

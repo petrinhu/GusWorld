@@ -170,6 +170,17 @@ add_executable(gusengine_domain_tests
     # Mises sem tag = no-op (com log); determinismo de RNG (CountingRandom); handler
     # no-op no dispatcher.
     techmagic_mises_test.cpp
+    # Executor techMagic (CARD-ENGINE-MANIFESTO item 8, ultimo step do manifesto, AMB-11):
+    # von Neumann/Fork + Giordano Bruno/Echo-Self - EffectKind::CloneAlly (status-based,
+    # StatusId::Eco) + EffectKind::TokenRefund (marker fora do dispatcher). handle_clone_ally
+    # (OnCast, side_filter AllyOnly dissipa em inimigo) + techMagic::replicate_eco (fim de
+    # CADA turno PROPRIO do portador, last_action_.actor == portador, take_damage PURO) +
+    # CombatStateMachine::process_eco_turn_end_hook (os 2 sitios de fim-de-turno, ANTES de
+    # expire_elapsed_statuses) + token_refund_equipped_on_side (gate specials_cast_ de
+    # resolve_use_card). TESTE-REI: composicao Ada (RepeatLastAction/OnAllyTurnEnd) + Eco no
+    # mesmo ator/rodada nao recursa nem dobra indevidamente (os dois usam take_damage puro,
+    # nenhum toca last_action_/round_hits_).
+    techmagic_clone_test.cpp
 )
 
 # Os testes do combate incluem helpers de teste headers-only (fixed_random.hpp).

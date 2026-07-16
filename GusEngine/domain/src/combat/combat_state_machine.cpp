@@ -143,6 +143,7 @@ NeutralRandom& neutral_random() {
         case StatusId::BlindagemEM: return "BlindagemEM";
         case StatusId::NullProof: return "NullProof";
         case StatusId::Scrying: return "Scrying";
+        case StatusId::Eco: return "Eco";
     }
     return "Desconhecido";
 }
@@ -435,6 +436,33 @@ struct HayekBonus {
 // Sufixo de log da face 2 (regra do lider: todo efeito loga - hit descontado E no-op),
 // mesmo padrao de quantize_log_suffix/hayek_log_suffix. "" quando `actor` nem porta a tag
 // (nada a logar); com a tag, loga SEMPRE (desconto ativo OU "sem Mises ativo").
+// ---- Construtor Universal (von Neumann/Fork, CARD-ENGINE-MANIFESTO item 8 PR-B,
+// EffectKind::TokenRefund) --------------------------------------------------------------
+//
+// Mesmo padrao "marker fora do dispatcher" de quantize_spec_of/apefficiency_spec_of acima:
+// a carta NAO tem handler de verdade em techmagic.cpp (handle_token_refund e no-op) e o
+// refund pluga DIRETO no gate 1x/batalha do resolvedor (resolve_use_card), via o helper
+// abaixo.
+
+// true se QUALQUER VIVO do lado `player_side` porta a passiva TokenRefund equipada. Fail-
+// soft (registry nulo ou id nao encontrado => false), mesmo padrao de
+// diversity_equipped_on_side/apefficiency_spec_on_side.
+[[nodiscard]] bool token_refund_equipped_on_side(
+    bool player_side, const std::vector<CombatActor*>& roster,
+    const std::unordered_map<std::string, Card>* registry) {
+    if (registry == nullptr) return false;
+    for (const CombatActor* a : roster) {
+        if (a == nullptr || !a->is_alive() || a->is_player_side() != player_side) continue;
+        for (const std::string& id : a->equipped_special_ids()) {
+            const auto it = registry->find(id);
+            if (it == registry->end()) continue;
+            for (const EffectSpec& spec : it->second.effects)
+                if (spec.kind == EffectKind::TokenRefund) return true;
+        }
+    }
+    return false;
+}
+
 [[nodiscard]] std::string mises_aim_log_suffix(bool tagged, const EffectSpec* spec) {
     if (!tagged) return "";
     if (spec == nullptr) return " [comando central: sem Mises ativo, mira intacta]";
@@ -757,6 +785,12 @@ void CombatStateMachine::run_active_turn_to_end() {
     }
 
     phase_ = CombatPhase::TurnEnd;
+
+    // Eco/Molde-Fiel (CARD-ENGINE-MANIFESTO item 8): ANTES de expire_elapsed_statuses de
+    // proposito - cobre tambem o ULTIMO turno ativo do Eco (a duracao pode ja ter tickado
+    // pra 0 neste TurnStart sem ainda ter sido removida). Ver doc-comment do metodo.
+    process_eco_turn_end_hook(actor);
+
     if (actor.expire_elapsed_statuses())
         queue_.recompute_by_speed();
     drain_status_changes();
@@ -880,6 +914,20 @@ void CombatStateMachine::process_ally_turn_end_hooks(CombatActor& ended) {
     }
 }
 
+void CombatStateMachine::process_eco_turn_end_hook(CombatActor& ended) {
+    if (!ended.is_alive()) return;  // cadaver: sem eco a rodar.
+
+    const auto& effects = ended.status_effects();
+    const auto it = std::find_if(effects.begin(), effects.end(),
+                                 [](const StatusEffect& s) { return s.id == StatusId::Eco; });
+    if (it == effects.end()) return;  // nao porta o Eco: nada a logar (mesmo padrao de Scrying).
+
+    techMagic::TechMagicContext ctx{
+        /*caster=*/&ended, /*counterpart=*/nullptr, /*damage=*/0, /*log=*/&log_};
+    ctx.last_action = &last_action_;
+    techMagic::replicate_eco(it->magnitude, ctx);
+}
+
 void CombatStateMachine::process_scrying_hooks() {
     for (CombatActor* actor : queue_.order()) {
         if (!actor->is_alive()) continue;             // cadaver: sem re-dump.
@@ -932,6 +980,14 @@ CombatResult CombatStateMachine::run_until_end() {
 
 void CombatStateMachine::expire_on_stunned_turn_end(CombatActor& actor) {
     phase_ = CombatPhase::TurnEnd;
+
+    // Eco/Molde-Fiel (CARD-ENGINE-MANIFESTO item 8): mesmo racional/posicionamento (ANTES
+    // de expire_elapsed_statuses) de run_active_turn_to_end acima. Um turno perdido por
+    // Stun/morte-no-tick tipicamente NAO teve acao de dano PROPRIA nesta rodada (a menos
+    // que uma acao anterior do MESMO ator, na mesma rodada, ja tenha gravado last_action_)
+    // - replicate_eco resolve isso sozinho via o guard last_action_.actor == portador.
+    process_eco_turn_end_hook(actor);
+
     if (actor.expire_elapsed_statuses())
         queue_.recompute_by_speed();
     drain_status_changes();
@@ -1429,7 +1485,26 @@ void CombatStateMachine::resolve_use_card(CombatActor& actor, const CombatAction
                 "ERRO DE COMPILACAO: '" + card.id +
                 "' ja foi compilada nesta batalha (especiais Ativa/Hibrida sao 1x/batalha, "
                 "secao 2.1).");
-        specials_cast_.insert(card.id);
+
+        // TokenRefund (Construtor Universal / von Neumann-Fork, CARD-ENGINE-MANIFESTO item
+        // 8 PR-B): se algum VIVO do lado do conjurador porta a passiva TokenRefund
+        // equipada E o refund desta batalha AINDA nao foi gasto, a 1a especial Ativa/
+        // Hibrida jogada na batalha (inclusive a PROPRIA von Neumann) "se reconstroi": NAO
+        // entra no gate specials_cast_ (pode ser jogada de novo depois, mana permitindo) -
+        // e o refund se consome (1x/batalha). Marker fora do dispatcher techMagic (mesmo
+        // padrao Planck/Hayek/Mises) - le o EffectSpec DIRETO via
+        // token_refund_equipped_on_side (nao passa por execute/execute_equipped).
+        // Deterministico, 0 RNG.
+        if (!token_refund_used_ &&
+            token_refund_equipped_on_side(actor.is_player_side(), queue_.order(), card_registry_)) {
+            token_refund_used_ = true;
+            log_.push_back(CombatLogEntry{
+                actor.id(), CombatActionType::UseCard, std::nullopt, 0,
+                actor.id() + " tavus-executa " + card.id +
+                    ": Construtor Universal - a carta se reconstroi no Codex (refund)."});
+        } else {
+            specials_cast_.insert(card.id);
+        }
     }
 
     const std::optional<CardModifier>& modifier = action.modifier;

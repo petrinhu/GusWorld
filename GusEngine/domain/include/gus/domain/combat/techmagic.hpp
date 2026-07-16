@@ -34,6 +34,20 @@
 // ESCOPO ainda FORA deste step: CloneAlly, tick da Sobrecarga Termica, desconto do
 // Resfriamento, query fora-de-combate. Step 6+.
 //
+// MANIFESTO item 8 (CloneAlly, von Neumann/Fork + Giordano Bruno/Echo-Self, ultimo step do
+// CARD-ENGINE-MANIFESTO): status-based (StatusId::Eco, ordinal 19), NAO entidade nova na
+// fila (decisao do lider 2026-07-14 superada pela decisao 2026-07-16 - Party=3 fixo
+// intacto; ver AMB-11 em docs/design/roster-analogos/_EFEITOS-ESCOLHIDOS.md). OnCast ->
+// CloneAlly (handle_clone_ally) aplica o Eco (buff, add_status LEGADO) no ALIADO alvo
+// (self incluso). Ao FIM de CADA turno PROPRIO do portador (2 sitios de fim-de-turno,
+// mesmo par de RepeatLastAction/OnAllyTurnEnd - ver CombatStateMachine::
+// process_eco_turn_end_hook), `replicate_eco` (funcao PUBLICA nova, abaixo, MESMO padrao
+// de dump_reveal_intent) reaplica os hits>0 da ULTIMA ACAO DE DANO do PROPRIO portador
+// nesta rodada (last_action_.actor == portador), escalado por StatusId::Eco.magnitude, via
+// take_damage PURO. TokenRefund (ordinal 12, passiva "Construtor Universal" do von
+// Neumann) e MARCADOR fora do dispatcher (handle_token_refund no-op) - o refund 1x/batalha
+// pluga DIRETO no gate specials_cast_ de resolve_use_card.
+//
 // STEP 8 (RevealIntent, John Dee/Black-Mirror, manifesto item 6; decisoes D1-D4 do lider,
 // 2026-07-15): status-based (StatusId::Scrying), NAO carta-equipada - `execute_equipped`
 // NUNCA despacha isto (execute_equipped so roda hooks de cartas Passiva/Hibrida
@@ -245,6 +259,25 @@ void log_intent_for(CombatActor& target, TechMagicContext& ctx);
 // FRONTEIRA DE RODADA, 1x por aliado vivo que porta StatusId::Scrying - NAO via
 // execute_equipped, Scrying e status, nao carta equipada).
 void dump_reveal_intent(TechMagicContext& ctx);
+
+// Eco/Molde-Fiel (CloneAlly, von Neumann/Fork + Giordano Bruno/Echo-Self; CARD-ENGINE-
+// MANIFESTO item 8): reaplica os hits>0 da ULTIMA ACAO DE DANO do PROPRIO `ctx.caster`
+// (o portador do status Eco) NESTA RODADA (ctx.last_action), escalado por `percent`% (o
+// StatusEffect.magnitude do Eco, lido pelo CALLER - esta funcao NAO consulta
+// status_effects() sozinha, mesma separacao de responsabilidade de replicate_eco vs.
+// CombatStateMachine::process_eco_turn_end_hook, que localiza o status e extrai a
+// magnitude ANTES de chamar), via CombatActor::take_damage PURO - MESMA anti-recursao/
+// anti-inflacao de handle_repeat_last_action (NAO toca ctx.last_action/round_hits_, entao
+// nao pode compor com Ada/HypotenuseCombo/RepeatLastAction pra dobrar dano; o TESTE-REI de
+// composicao Ada+Eco fica em techmagic_clone_test.cpp). DIFERENTE de RepeatLastAction (que
+// ecoa a ultima acao de QUALQUER aliado): exige `last_action->actor == ctx.caster`
+// EXATAMENTE - durante o turno PROPRIO do portador ninguem mais age, entao o registro de 1
+// slot ja identifica a acao DELE mesmo, sem estrutura nova. Sem acao-de-dano propria nesta
+// rodada = "eco ocioso" (log, ESTADO NORMAL, nao erro). Zero consumo de RNG
+// (determinismo). Lanca std::logic_error se ctx.caster ou ctx.last_action forem nulos (bug
+// de call site - CombatStateMachine::process_eco_turn_end_hook SEMPRE injeta os dois antes
+// de chamar, so quando `ended` de fato porta StatusId::Eco).
+void replicate_eco(int percent, TechMagicContext& ctx);
 
 }  // namespace gus::domain::combat::techMagic
 

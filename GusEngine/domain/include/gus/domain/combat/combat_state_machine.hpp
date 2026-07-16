@@ -358,6 +358,24 @@ private:
     // (run_active_turn_to_end e expire_on_stunned_turn_end).
     void process_ally_turn_end_hooks(CombatActor& ended);
 
+    // Eco/Molde-Fiel (CloneAlly, von Neumann/Fork + Giordano Bruno/Echo-Self; CARD-ENGINE-
+    // MANIFESTO item 8, ultimo step): reaplica os hits>0 da ULTIMA ACAO DE DANO do PROPRIO
+    // `ended` NESTA RODADA (last_action_.actor == &ended), escalado por StatusId::
+    // Eco.magnitude, via techMagic::replicate_eco - MESMA anti-recursao/anti-inflacao de
+    // RepeatLastAction (nunca toca last_action_/round_hits_). DIFERENTE de
+    // process_ally_turn_end_hooks acima (que reage a OUTRO aliado fechando turno): aqui o
+    // gatilho e o PROPRIO fim-de-turno do portador do status - status-based, NAO carta
+    // equipada (mesmo racional orientado-a-STATUS de process_scrying_hooks abaixo). No-op
+    // SILENCIOSO se `ended` nao esta viva ou nao porta Eco (mesmo padrao de
+    // process_scrying_hooks pulando quem nao porta Scrying - nao ha o que logar pra quem
+    // nao tem a mecanica); com o status presente, replicate_eco SEMPRE loga (replicado OU
+    // "eco ocioso", regra todo-efeito-loga). Chamado ANTES de expire_elapsed_statuses nos
+    // DOIS caminhos de fim-de-turno (run_active_turn_to_end e expire_on_stunned_turn_end,
+    // mesmo par de sitios de process_ally_turn_end_hooks) - cobre tambem o ULTIMO turno
+    // ativo do Eco (a duracao pode ja ter tickado pra 0 neste TurnStart sem ainda ter sido
+    // removida pelo expire; checar DEPOIS perderia o beneficio do turno final).
+    void process_eco_turn_end_hook(CombatActor& ended);
+
     // Re-dump dos intents inimigos (ADR-016 step 8, John Dee/Black-Mirror, RevealIntent):
     // roda techMagic::dump_reveal_intent 1x por ator VIVO da fila que porta StatusId::
     // Scrying (qualquer lado - a query e generica, so a party equipa a carta hoje mas o
@@ -419,6 +437,18 @@ private:
     // e o mesmo flag (a Analise Preditiva ainda nao tem campo no dado da carta). Comuns e
     // Passiva/ForaDeCombate NUNCA entram aqui (isentas, ver resolve_use_card).
     std::unordered_set<std::string> specials_cast_;
+
+    // Construtor Universal (von Neumann/Fork, CARD-ENGINE-MANIFESTO item 8 PR-B,
+    // EffectKind::TokenRefund): true apos o refund 1x/batalha ja ter sido gasto. Enquanto
+    // false, a PRIMEIRA especial Ativa/Hibrida jogada nesta batalha (inclusive a PROPRIA
+    // "Molde Fiel" do von Neumann) "se reconstroi no Codex" - nao entra em specials_cast_ -
+    // SE algum VIVO do lado do conjurador porta TokenRefund equipado nesse instante
+    // (deteccao fail-soft, mesmo padrao de token_refund_equipped_on_side em
+    // combat_state_machine.cpp). Marker fora do dispatcher techMagic (mesmo padrao de
+    // DamageQuantize/DiversityBonus/ApEfficiency); wiring real no gate specials_cast_ de
+    // resolve_use_card. Escopo = vida desta CombatStateMachine (mesmo escopo de
+    // specials_cast_ acima).
+    bool token_refund_used_ = false;
 
     // Ledger de hits DA RODADA CORRENTE (ADR-016 secao 20 item 4, ledger cross-ator):
     // acumulado em apply_damage_with_hooks (DEPOIS do guard damage<=0), consultado e

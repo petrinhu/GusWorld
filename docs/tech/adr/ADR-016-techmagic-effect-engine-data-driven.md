@@ -704,6 +704,107 @@ enemy_template.hpp` (`central_command`); `GusEngine/domain/src/templates/templat
 `docs/design/mecanicas/cartas-technomagik.md`; `docs/design/roster-analogos/
 _EFEITOS-ESCOLHIDOS.md` (AMB-10).
 
+## Addendum (CARD-ENGINE-MANIFESTO item 8, ultimo item do manifesto, AMB-11): von Neumann/Fork + Giordano Bruno/Echo-Self (CloneAlly) + TokenRefund
+
+Decimo terceiro e decimo quarto `EffectKind` entregues (append-only, ordinais 4 - CloneAlly ja
+existia DECLARADO desde o step 1 sem handler - e 12): `CloneAlly` ganha handler de verdade
+(`handle_clone_ally`) e `TokenRefund` (marcador) entra novo. Fecha o ULTIMO item do
+CARD-ENGINE-MANIFESTO. Novo `StatusId::Eco` (ordinal 19, append-only apos `Scrying`).
+
+- **Clone = STATUS-DRIVEN, NAO entidade-Objeto (mudanca de rumo vs. a secao "MVP" deste ADR e
+  vs. `cartas-technomagik.md` §9, decisao do criador 2026-07-14 original):** o design original
+  (linha 33 acima, "clone entidade-Objeto") previa um 4o ator/objeto na fila de iniciativa. O
+  brief de implementacao 2026-07-16 (CARD-ENGINE-MANIFESTO item 8) MUDOU a abordagem pra
+  **status-driven** - `StatusId::Eco` aplicado no ALVO clonado, sem nenhum ator novo na fila
+  (Party=3 fixo intacto, respeita o canon do lider 2026-07-14 sobre a fila de turnos). Isso e
+  uma **decisao AUTONOMA a confirmar retroativamente** (AMB-11 em `_EFEITOS-ESCOLHIDOS.md`): se
+  o lider entender "entidade-Objeto" como um alvo-atacavel LITERAL (nao so uma metafora de
+  "invocacao"), a implementacao vigente precisaria de revisao. O VISUAL obrigatorio (sprite-eco
+  translucido, decisao original) continua de pe - so muda ONDE o motor guarda o estado (status
+  no ator, nao um ator novo).
+- **`EffectKind::CloneAlly` (ordinal 4, ja existia declarado - ganhou handler `handle_clone_ally`
+  no lugar do fail-fast `default:` do dispatcher)**: `OnCast`, aplica `StatusId::Eco` no ALVO da
+  carta (`ctx.counterpart`) via `add_status` LEGADO - BUFF auto-aplicado num aliado, fora do
+  portao de imunidade EM-Shield (mesmo racional do Shield/Scrying: nunca e um debuff ofensivo em
+  OUTRO ator). `side_filter AllyOnly` (Balde B) - alvo inimigo DISSIPA (F-4), nao lanca.
+  `spec.magnitude` = % de replicacao do eco; `spec.duration` = N turnos PROPRIOS do portador
+  (tick GENERICO de qualquer `StatusEffect`, `CombatStateMachine::apply_status_tick` default
+  case - zero codigo dedicado de tick). Familia de origem do status = SEMPRE `Universal`
+  (mesma convencao de `handle_apply_status`).
+- **`techMagic::replicate_eco` (funcao PUBLICA nova, MESMO padrao arquitetural de
+  `dump_reveal_intent`/John Dee - exposta FORA do dispatcher `execute`)**: reaplica os hits>0
+  da ULTIMA ACAO DE DANO do PROPRIO portador NESTA RODADA (`last_action_.actor == portador`
+  EXATAMENTE - diferente de `RepeatLastAction`, que aceita a acao de QUALQUER aliado), escalado
+  por `percent`% (o `magnitude` do `StatusEffect::Eco`, extraido pelo CALLER), via
+  `CombatActor::take_damage` PURO - MESMA anti-recursao/anti-inflacao de `RepeatLastAction`/
+  `HypotenuseCombo`/`Reflect` (nao toca `last_action_`/`round_hits_`). Sem acao-de-dano propria
+  nesta rodada = "eco ocioso" (log, ESTADO NORMAL). Zero consumo de RNG.
+- **`CombatStateMachine::process_eco_turn_end_hook` (gemeo NOVO de `process_ally_turn_end_hooks`,
+  mas orientado a SELF-turno, nao a OUTRO aliado)**: chamado nos DOIS caminhos de fim-de-turno
+  (`run_active_turn_to_end`/`expire_on_stunned_turn_end`), ANTES de `expire_elapsed_statuses` de
+  proposito - cobre tambem o ULTIMO turno ativo do Eco (a duracao pode ja ter tickado pra 0 no
+  TurnStart deste MESMO turno sem ainda ter sido removida pelo `expire`; checar DEPOIS perderia
+  o beneficio do turno final - provado por `techmagic_clone_test.cpp`, duration=3 cobre
+  EXATAMENTE 3 turnos proprios do portador, nem 2 nem 4). No-op SILENCIOSO se `ended` nao esta
+  viva ou nao porta Eco (mesmo padrao fail-soft de `process_scrying_hooks` pulando quem nao
+  porta Scrying) - com o status presente, `replicate_eco` SEMPRE loga (regra todo-efeito-loga).
+- **`EffectKind::TokenRefund` (ordinal 12, append-only apos `ApEfficiency`)**: passiva
+  "Construtor Universal" do von Neumann. MARCADOR fora do dispatcher (mesmo padrao
+  `DamageQuantize`/`DiversityBonus`/`ApEfficiency` - `handle_token_refund` e no-op), mas
+  DIFERENTE dos markers anteriores (Passiva/equip-only, `OnCast` nunca despachado na pratica):
+  a carta portadora (von Neumann) e Hibrida/castavel, entao o marcador PODE rodar de fato via
+  `execute()` quando a carta e jogada - inofensivo por construcao (nao muta nada). O refund real
+  pluga DIRETO no gate `specials_cast_` de `resolve_use_card`, via
+  `token_refund_equipped_on_side` (mesmo padrao fail-soft de deteccao-por-presenca de
+  `apefficiency_spec_on_side`/`diversity_equipped_on_side`) + `CombatStateMachine::
+  token_refund_used_` (novo, bool, escopo = vida da FSM, mesmo escopo de `specials_cast_`).
+  Enquanto `!token_refund_used_`, a 1a especial Ativa/Hibrida jogada na batalha (**inclusive a
+  PROPRIA carta que porta a passiva**, se ela mesma estiver equipada nela propria) "se
+  reconstroi no Codex" - NAO entra em `specials_cast_` (pode ser jogada de novo depois, mana
+  permitindo) - e o refund se consome (1x/batalha, nao 1x/carta: a 2a especial jogada DEPOIS do
+  refund ja gasto entra no gate normal).
+- **Numeros (`//PLAYTEST`, decisoes do lider no brief 2026-07-16)**: von Neumann (Fork) - eco
+  50%, duracao 3 turnos, alvo qualquer aliado (`TargetShape::Single`); Giordano Bruno
+  (Echo-Self) - eco 62%, duracao 2 turnos, SELF-ONLY (`TargetShape::Self`, "um eco do proprio
+  Gus" - a imagem de "dois Gus", sem colidir com o clone-de-qualquer-aliado do von Neumann).
+- **TESTE-REI (composicao Ada + Eco, anti-recursao/anti-dobra)**: quando o MESMO ator A porta
+  Eco (de ter sido clonado) E outro ator B do mesmo lado porta a passiva `RepeatLastAction`/
+  `OnAllyTurnEnd` (Ada), A causa dano -> `last_action_={A,{alvo:D}}` -> turno de A fecha ->
+  (1) `process_eco_turn_end_hook(A)` ecoa `D * eco%` via `take_damage` PURO, SEM tocar
+  `last_action_`/`round_hits_` -> (2) `process_ally_turn_end_hooks(A)` despacha Ada em B, que le
+  `last_action_` (AINDA `{A,{alvo:D}}`, INTACTO) e ecoa `D * ada%` do valor ORIGINAL, nunca do
+  ja-ecoado pelo Eco. Dano total = `D + D*eco% + D*ada%` (soma linear dos DOIS ecos do MESMO
+  dado original), nunca uma cadeia composta/exponencial. Provado por
+  `techmagic_clone_test.cpp` (secao 6).
+- **Catalogacao JA FEITA** (mesma disciplina do Mises - "nao deixar a carta fora do jogo"):
+  `master_cards.cpp::vonneumann` (Hibrida/Universal/mana 6/Single, `OnCast -> CloneAlly` +
+  `OnCast -> TokenRefund`) e `master_cards.cpp::bruno` (Ativa/Universal/mana 6/Self, `OnCast ->
+  CloneAlly`), registry 17->19, `master_cards_test.cpp` (campos + smoke), i18n
+  `CARD_EXEC_VONNEUMANN_NAME` = "Fork" / `CARD_EXEC_BRUNO_NAME` = "Echo-Self" (pt_br/en_intl).
+- **Visual FORA de escopo (regra de VFX deste ADR, secao "Contexto"/"Decisao" acima)**: o
+  sprite-eco (fantasma translucido no slot de batalha, atrelado a presenca de `StatusId::Eco`
+  no ator) e responsabilidade da camada de apresentacao (glintfx) - o dominio so entrega o
+  status + o log diegetico. Vira PROMPT pro dev do glintfx (nao implementado aqui,
+  `feedback_glintfx_nao_mexer_so_pedir`). O icone de status do Eco no HUD cai no bug conhecido
+  **HUD-STATUS-ICONS-STALE** (INBOX) - NAO corrigido nesta leva, so registrado.
+- Testes: `GusEngine/domain/tests/techmagic_clone_test.cpp` (handle_clone_ally aplica/dissipa/
+  self/guardas de argumento; replicate_eco echoable/ocioso/multi-alvo/alvo-morto/
+  arredondamento-a-0/guardas; integracao FSM ponta-a-ponta von Neumann em aliado + Bruno em
+  self + dissipacao em inimigo real + turno-sem-dano + morte-mid-Eco; duracao N-turnos-EXATA
+  inclusive o ultimo turno tickando pra 0; TESTE-REI de composicao Ada+Eco; TokenRefund sem-
+  passiva/com-passiva/refund-cobre-a-propria-carta/1x-batalha-nao-1x-carta) +
+  `master_cards_test.cpp` (catalogo vonneumann/bruno) + `combat_enums_test.cpp` (StatusId::Eco
+  ordinal 19, EffectKind::TokenRefund ordinal 12, append-only).
+
+Cross-ref: `GusEngine/domain/include/gus/domain/combat/combat_enums.hpp`
+(`StatusId::Eco`/`EffectKind::CloneAlly`/`EffectKind::TokenRefund`);
+`GusEngine/domain/include/gus/domain/combat/techmagic.hpp` (`techMagic::replicate_eco`);
+`GusEngine/domain/src/combat/techmagic.cpp` (`handle_clone_ally`/`handle_token_refund`);
+`GusEngine/domain/src/combat/combat_state_machine.cpp`
+(`process_eco_turn_end_hook`/`token_refund_equipped_on_side`/`token_refund_used_`/
+`resolve_use_card`); `master_cards.cpp` (vonneumann/bruno); `docs/design/mecanicas/
+cartas-technomagik.md` §9; `docs/design/roster-analogos/_EFEITOS-ESCOLHIDOS.md` (AMB-11).
+
 ## Consequencias
 
 - **Positivas:** custo BAIXO-MEDIO, risco BAIXO; numeros 100% tunaveis pra playtest; testavel por unit test por EffectKind; easter-egg entregue hoje; nao fecha porta pra VM. Cada carta = 5-15 linhas de dado.

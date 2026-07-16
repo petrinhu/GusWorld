@@ -467,11 +467,14 @@ TEST_CASE("techmagic repeat: ada tambem ecoa quando quem fecha o turno e um alia
     REQUIRE(result.rounds_elapsed == 0);
 }
 
-// ===== 5. Fail-fast intacto: CloneAlly continua sem handler (RepeatLastAction nao =====
-// =====    "engoliu" o default do switch) ============================================
+// ===== 5. Guarda de dominó (achado, CARD-ENGINE-MANIFESTO item 8): CloneAlly GANHOU =====
+// =====    handler (deixou de ser o "sem handler" desta suite) - o switch de execute() =====
+// =====    despacha pra handle_clone_ally, NAO mais pro default fail-fast. O guard de =====
+// =====    validacao de argumentos migrou pro PROPRIO handler (ctx.counterpart nulo). =====
+// =====    Testes EXAUSTIVOS de CloneAlly/Eco vivem em techmagic_clone_test.cpp. ===========
 
-TEST_CASE("techmagic repeat: RepeatLastAction ganhou handler, mas CloneAlly continua "
-         "sem handler (lanca logic_error - fail-fast intacto)",
+TEST_CASE("techmagic repeat: RepeatLastAction e CloneAlly TEM handler ambos - nenhum "
+         "cai no default fail-fast do switch (mas CloneAlly ainda valida ctx.counterpart)",
          "[domain][combat][techmagic][repeat]") {
     CombatActor h = make_actor("h", true, 100, 8, 0, 20);
 
@@ -484,14 +487,19 @@ TEST_CASE("techmagic repeat: RepeatLastAction ganhou handler, mas CloneAlly cont
     clone_card.effects = {
         EffectSpec{.trigger = TriggerHook::OnCast, .kind = EffectKind::CloneAlly}};
 
+    // CloneAlly TEM handler hoje (handle_clone_ally) - o logic_error aqui NAO vem mais do
+    // default "sem handler" do switch, e sim da validacao de argumento do PROPRIO handler
+    // (ctx.counterpart nulo - OnCast sempre precisa de alvo). Prova que RepeatLastAction
+    // ganhar handler nao "engoliu" o caso de CloneAlly no switch (cada EffectKind cai no
+    // seu PROPRIO case).
     techMagic::TechMagicContext ctx;
     ctx.caster = &h;
 
     REQUIRE_THROWS_AS(techMagic::execute(TriggerHook::OnCast, clone_card, ctx),
                       std::logic_error);
 
-    // RepeatLastAction, em contraste, roda ate o fim sem lancar (mesmo sem last_action
-    // echoable - vira no-op+log, nao excecao).
+    // RepeatLastAction roda ate o fim sem lancar (mesmo sem last_action echoable - vira
+    // no-op+log, nao excecao).
     Card repeat_card = mandelbrot_card("techmagic.repeat.clone.failfast.mandelbrot",
                                        /*percent=*/50);
     techMagic::TechMagicContext repeat_ctx;
