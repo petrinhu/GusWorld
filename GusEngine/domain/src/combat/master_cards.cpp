@@ -1,7 +1,7 @@
 // gus/domain/src/combat/master_cards.cpp
 //
-// Implementacao do catalogo das 12 cartas ESPECIAIS suportadas pelo executor techMagic
-// (ADR-016, MVP steps 4-7). Ver header para o contrato. Mesmo padrao de
+// Implementacao do catalogo das 13 cartas ESPECIAIS suportadas pelo executor techMagic
+// (ADR-016, MVP steps 4-7 + manifesto item 5). Ver header para o contrato. Mesmo padrao de
 // placeholder_cards.cpp: cartas construidas uma vez, emplace fail-fast em id duplicado.
 // POCO puro, ZERO Qt.
 //
@@ -69,6 +69,12 @@ constexpr int kFaradayShieldDuration = 3;  //PLAYTEST duracao da BlindagemEM (3 
 // sentinela ALTA (nao expira por turno na pratica do slice) - o status e removido por
 // CONSUMO (resolve_use_card, no hit que fura), nao por tick de duracao. //PLAYTEST.
 constexpr int kNullProofDuration = 99;  //PLAYTEST sentinela (consumido, nao tickado).
+// Quantum-Lock (Planck, manifesto item 5, decisoes do lider 2026-07-15): chances FIXAS dos
+// 3 degraus do canal COMUM. kPlanckStepCenterPercent = chance% do degrau CENTRAL;
+// kPlanckStepExtremePercent = chance% de CADA extremo (piso E teto, simetrico). Soma =
+// 100% (25+50+25). Numeros fechados pelo lider (nao //PLAYTEST-livre como os outros).
+constexpr int kPlanckStepCenterPercent = 50;
+constexpr int kPlanckStepExtremePercent = 25;
 
 // Monta uma carta ESPECIAL base. base_type = Glifo (carta-programa nao-elemental,
 // //PLAYTEST). ap_cost default 1 (herda o mesmo default do placeholder). Sem
@@ -261,10 +267,29 @@ std::unordered_map<std::string, Card> assemble() {
             {EffectSpec{.trigger = TriggerHook::OnCast,
                        .kind = EffectKind::DelayAction,
                        .magnitude = kEinsteinDelayMagnitude}}),
+
+        // --- Planck (Quantum-Lock): Passiva, Universal, mana 0 (manifesto item 5, decisoes
+        // do lider 2026-07-15). NAO executa via techMagic::execute (marcador no-op, ver
+        // techmagic.cpp::handle_damage_quantize) - a quantizacao pluga DIRETO no canal
+        // COMUM do resolvedor/preview (combat_state_machine.cpp::quantize_spec_of): 3
+        // degraus fixos da propria faixa da variancia Knowledge (piso/centro/teto = r
+        // 0.0/0.5/1.0 em comum_channel_damage), chances FIXAS 25%/50%/25%
+        // (kPlanckStepExtremePercent/kPlanckStepCenterPercent). Media = danoBase (zero
+        // mudanca de balance); Knowledge continua mandando na LARGURA dos degraus, as
+        // chances NAO evoluem com kills. Carta HISTORICA (so o Gus equipa, decisao
+        // narrativa fora do motor - o motor e agnostico por-ator, mesmo padrao do
+        // Reflect/Newton: nenhum hardcode de id/nome de personagem aqui). ---
+        make_special(
+            "planck", "CARD_EXEC_PLANCK_NAME", CardFamily::Universal, CardCategory::Passiva,
+            0,
+            {EffectSpec{.trigger = TriggerHook::OnCast,
+                       .kind = EffectKind::DamageQuantize,
+                       .magnitude = kPlanckStepCenterPercent,  // chance% do degrau CENTRAL.
+                       .percent = kPlanckStepExtremePercent}}),  // chance% de CADA extremo.
     };
 
     std::unordered_map<std::string, Card> registry;
-    registry.reserve(12);
+    registry.reserve(13);
     for (const auto& card : cards) {
         // emplace (nao indexer) falha-cedo se algum id duplicar (mesmo padrao do placeholder).
         const auto [it, inserted] = registry.emplace(card.id, card);

@@ -502,6 +502,31 @@ A falha chega a **0% a partir de 5 kills** do mesmo tipo de inimigo.
 - **Ordem**: cadeia divisiva completa (incl. `multExpose` e `multAmbiente`) → curto-circuito de imunidade → sorteio de canal → resolução por canal → um único `round` no final.
 - **RNG injetável e seedável** (porta `IRandomSource`, ADR-006): o domínio é PURO; a semente real (data+hora+ms) é injetada na fronteira `app/`, nunca dentro do domínio. O canal (falha/crit/comum) é decidido por UM sorteio do RNG injetado; o 2º roll (variância) só ocorre no canal COMUM. Pillar 1/2: a incerteza é transparente (chances visíveis na UI), não opaca.
 
+#### Quantum-Lock (Planck) — quantização do canal COMUM (ADR-016 manifesto item 5, canonizado 2026-07-15)
+
+Passiva mana-0 (carta HISTÓRICA — só o Gus equipa; o **motor é agnóstico por-ator**, zero hardcode de personagem no domínio, mesmo padrão do Reflect/Newton). Quando o **atacante** porta a passiva equipada, o canal COMUM deixa de sortear um `r` contínuo e passa a sortear um **degrau discreto** dentro da MESMA faixa da variância Knowledge — elimina os "quase-acertos", sem mexer na largura do range nem na média.
+
+```
+// SEM Quantum-Lock (de sempre):
+COMUM:  r = rng.NextDouble()                                    // [0, 1) continuo
+        danoFinal = round(danoBase × (1 + (v × 2 × r − v)))
+
+// COM Quantum-Lock (atacante porta a passiva equipada):
+COMUM:  roll2 = rng.Next(0..99)                                  // SUBSTITUI o NextDouble
+        se roll2 < percent               → r = 0.0   // degrau PISO   = danoBase × (1 − v)
+        senão se roll2 < percent + magnitude → r = 0.5   // degrau CENTRO = danoBase
+        senão                             → r = 1.0   // degrau TETO   = danoBase × (1 + v)
+        danoFinal = round(danoBase × (1 + (v × 2 × r − v)))       // MESMA fórmula, r discreto
+```
+
+- **3 degraus, chances FIXAS 25% / 50% / 25%** (`percent` = chance de CADA extremo, `magnitude` = chance do centro no `EffectSpec` da carta — `//PLAYTEST`, número fechado pelo criador). Média ponderada = `danoBase` (**zero mudança de balance** vs. o canal COMUM de sempre).
+- **Knowledge continua mandando na LARGURA**: `v` (variância) segue a mesma curva de decaimento por `kills` (§11 acima) — os degraus encolhem conforme o jogador farma o inimigo, exatamente como o range contínuo encolhia. Só as CHANCES (25/50/25) não evoluem com Knowledge.
+- **Crítico e FALHA intactos** (regra A6): a quantização só troca o sorteio DENTRO do canal COMUM. O 1º sorteio (canal FALHA/CRIT/COMUM) é idêntico com ou sem a passiva.
+- **Consumo de RNG**: o canal COMUM com Quantum-Lock consome `rng.Next(100)` **duas vezes** (canal + degrau) e `rng.NextDouble()` **zero** vezes — MESMA contagem total de consumos do canal COMUM de sempre (1 canal + 1 variância = 2), só muda o TIPO do 2º consumo. Sem a passiva equipada, o caminho fica **byte-idêntico** ao de hoje (0 mudança).
+- **Preview (perfect information, regra A2):** a UI mostra os **3 valores** (piso/centro/teto) **+ as 3 chances**, calculados PUROS (sem sortear) pelo mesmo helper do canal COMUM — bit-idênticos ao que o motor produziria em cada degrau forçado (gêmeo preview↔real obrigatório).
+- **Colapso gracioso**: quando `danoBase` é pequeno e `v` está no piso (~0.05, inimigo muito farmado), os 3 degraus podem arredondar pro MESMO inteiro — comportamento esperado, não um bug (o preview mostra os 3 iguais).
+- **Escopo por-ator**: a detecção varre as especiais EQUIPADAS do próprio ATACANTE da ação corrente — outro membro da party sem a passiva segue com a variância contínua normal; um inimigo nunca porta a carta na prática (não é bloqueio estrutural do motor, é o fato de a carta ser exclusiva do Gus na progressão).
+
 **Stacking das 3 camadas ambientais** (terreno + clima + período, canonizado 2026-05-26): os multiplicadores das camadas ativas que afetam a mesma família **se multiplicam** entre si, com **cap final `multAmbiente ∈ [0.44, 2.25]`** (mesmo teto que o sistema já permite via 1.5 × 1.5 = 2.25 e piso via 0.66 × 0.66 ≈ 0.44). A curadoria de transições (§18.6) impede por design que 2 fontes ×1.5 da MESMA família coexistam (nunca atingir 2.25 organicamente fora de janela curta); o cap é a trava de segurança numérica.
 
 | Fator | Origem | Valores |

@@ -130,6 +130,12 @@ add_executable(gusengine_domain_tests
     # so consome quando ha algo a furar), paridade preview (estimate_card_damage) e o
     # domino com ChainDamage/Tesla (dano pierced alimenta a cadeia).
     techmagic_godel_test.cpp
+    # Executor techMagic (ADR-016 manifesto item 5, decisoes do lider 2026-07-15): Planck/
+    # Quantum-Lock - EffectKind::DamageQuantize quantiza o canal COMUM em 3 degraus fixos
+    # (piso/centro/teto, chances 25%/50%/25%), paridade preview<->real, fronteiras do
+    # sorteio de degrau, determinismo/contagem de RNG (substitui next_double por next(100),
+    # mesma contagem), escopo por-ator, critico/falha intactos, colapso graceful.
+    techmagic_quantize_test.cpp
 )
 
 # Os testes do combate incluem helpers de teste headers-only (fixed_random.hpp).

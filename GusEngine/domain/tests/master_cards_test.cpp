@@ -1,16 +1,16 @@
 // master_cards_test.cpp
 //
 // Spec executavel (Catch2 v3) do catalogo data-driven das cartas ESPECIAIS dos mestres
-// suportadas pelo executor techMagic (ADR-016, item TECHMAGIC-EXECUTOR / MVP steps 4-7):
-// volta, newton, pythagoras, mandelbrot, ada, godel, faraday, euler, turing, menger, tesla,
-// einstein. POCO puro, ZERO Qt.
+// suportadas pelo executor techMagic (ADR-016, item TECHMAGIC-EXECUTOR / MVP steps 4-7 +
+// manifesto item 5): volta, newton, pythagoras, mandelbrot, ada, godel, faraday, euler,
+// turing, menger, tesla, einstein, planck. POCO puro, ZERO Qt.
 //
-// Cobre: (1) as 12 cartas existem, ids unicos, nenhuma usa EffectKind::CloneAlly (guarda
+// Cobre: (1) as 13 cartas existem, ids unicos, nenhuma usa EffectKind::CloneAlly (guarda
 // que von Neumann/Bruno NAO entraram nesta leva); (2) campos canonicos por-carta (tier/
 // category/mana/power/ignores_weakness_wheel); (3) as 9 executaveis (volta/newton/pythagoras/
 // mandelbrot/ada/tesla/einstein/faraday/godel) resolvem via techMagic::execute SEM logic_error
 // num contexto minimo; (4) as 3 fora-de-combate (euler/turing/menger) tem effects vazio; (5)
-// paridade i18n das 12 chaves CARD_EXEC_<FIGURA>_NAME (2 locales).
+// paridade i18n das 13 chaves CARD_EXEC_<FIGURA>_NAME (2 locales).
 //
 // Faraday (EM-Shield, ADR-016 Balde B, decisao do lider 2026-07-15): passou de
 // ForaDeCombate (posse-only) pra Hibrida (ganhou face de combate castavel). Os testes
@@ -23,6 +23,13 @@
 // AllyOnly), mantendo a flag original. Os testes EXAUSTIVOS do wiring do pierce (G-2/G-3:
 // consome so quando ha algo a furar, fura Imune E Resistente, paridade preview, determinismo
 // de RNG, dominó Tesla) vivem em techmagic_godel_test.cpp - este arquivo so cobre o CATALOGO.
+//
+// Planck (Quantum-Lock, manifesto item 5, decisoes do lider 2026-07-15): Passiva/Universal/
+// mana 0, NAO executa via techMagic::execute (handler no-op deliberado, ver
+// techmagic.cpp::handle_damage_quantize) - a quantizacao pluga direto no resolvedor/preview.
+// Os testes EXAUSTIVOS (degraus corretos, paridade preview<->real, fronteiras do sorteio,
+// determinismo de RNG, escopo por-ator, dominó crit/fumble) vivem em
+// techmagic_quantize_test.cpp - este arquivo so cobre o CATALOGO.
 //
 // Cross-ref: gus/domain/combat/master_cards.hpp; techmagic.hpp; placeholder_cards_test.cpp
 //            (mesmo padrao de spec de registry); docs/design/roster-analogos/
@@ -56,12 +63,13 @@ CombatActor make_actor(const std::string& id, bool player_side, int hp = 100, in
 
 // ===== 1. As 8 cartas existem, ids unicos, guarda anti-CloneAlly =====
 
-TEST_CASE("master_cards: build_registry tem exatamente as 12 cartas suportadas",
+TEST_CASE("master_cards: build_registry tem exatamente as 13 cartas suportadas",
           "[domain][combat][cards][techmagic][mastercards]") {
     const auto reg = MasterCards::build_registry();
-    REQUIRE(reg.size() == 12);
+    REQUIRE(reg.size() == 13);
     for (const char* id : {"volta", "newton", "pythagoras", "mandelbrot", "ada", "godel",
-                           "faraday", "euler", "turing", "menger", "tesla", "einstein"})
+                           "faraday", "euler", "turing", "menger", "tesla", "einstein",
+                           "planck"})
         REQUIRE(reg.count(id) == 1);
 }
 
@@ -479,6 +487,38 @@ TEST_CASE("master_cards: einstein (DelayAction em OnCast) executa via techMagic:
     REQUIRE(target.hp() == 300);               // sem dano.
 }
 
+TEST_CASE("master_cards: planck = Passiva/Universal/mana 0, effects [OnCast DamageQuantize "
+         "magnitude 50 percent 25]",
+         "[domain][combat][cards][techmagic][mastercards]") {
+    const auto reg = MasterCards::build_registry();
+    const Card& c = reg.at("planck");
+    REQUIRE(c.category == CardCategory::Passiva);
+    REQUIRE(c.family == CardFamily::Universal);
+    REQUIRE(c.mana_cost == 0);
+    REQUIRE(c.ignores_weakness_wheel == false);
+    REQUIRE(c.effects.size() == 1);
+
+    const auto& quantize = c.effects[0];
+    REQUIRE(quantize.trigger == TriggerHook::OnCast);
+    REQUIRE(quantize.kind == EffectKind::DamageQuantize);
+    REQUIRE(quantize.magnitude == 50);  // chance% do degrau CENTRAL.
+    REQUIRE(quantize.percent == 25);    // chance% de CADA extremo (piso E teto).
+}
+
+TEST_CASE("master_cards: planck (DamageQuantize em OnCast) executa via techMagic::execute "
+         "sem lancar - handler no-op deliberado (a quantizacao vive fora do dispatcher)",
+         "[domain][combat][cards][techmagic][mastercards]") {
+    const auto reg = MasterCards::build_registry();
+    const Card& c = reg.at("planck");
+
+    CombatActor caster = make_actor("h", /*player_side=*/true);
+
+    techMagic::TechMagicContext ctx;
+    ctx.caster = &caster;
+
+    REQUIRE_NOTHROW(techMagic::execute(TriggerHook::OnCast, c, ctx));
+}
+
 TEST_CASE("master_cards: faraday = Hibrida/Eletrico/mana kActiveManaCost, effects [OnCast "
          "ApplyStatus BlindagemEM duration 3 Refresh AllyOnly]",
          "[domain][combat][cards][techmagic][mastercards]") {
@@ -519,7 +559,7 @@ TEST_CASE("master_cards: faraday (ApplyStatus BlindagemEM em OnCast) executa via
     REQUIRE(shielded);
 }
 
-// ===== 4. Paridade i18n das 11 chaves (2 locales) =====
+// ===== 4. Paridade i18n das 13 chaves (2 locales) =====
 
 namespace {
 
@@ -551,7 +591,7 @@ bool has_key(const std::vector<std::string>& keys, const std::string& key) {
 #define GUSWORLD_TRANSLATIONS_DIR "../../../../game/translations"
 #endif
 
-TEST_CASE("master_cards: as 12 chaves CARD_EXEC_<FIGURA>_NAME existem em pt_br.md e "
+TEST_CASE("master_cards: as 13 chaves CARD_EXEC_<FIGURA>_NAME existem em pt_br.md e "
          "en_intl.md",
          "[domain][combat][cards][techmagic][mastercards][i18n]") {
     const std::vector<std::string> pt =
@@ -563,7 +603,7 @@ TEST_CASE("master_cards: as 12 chaves CARD_EXEC_<FIGURA>_NAME existem em pt_br.m
 
     for (const char* figura : {"VOLTA", "NEWTON", "PYTHAGORAS", "MANDELBROT", "ADA",
                                "GODEL", "FARADAY", "EULER", "TURING", "MENGER", "TESLA",
-                               "EINSTEIN"}) {
+                               "EINSTEIN", "PLANCK"}) {
         const std::string key = std::string("CARD_EXEC_") + figura + "_NAME";
         INFO("chave: " << key);
         REQUIRE(has_key(pt, key));

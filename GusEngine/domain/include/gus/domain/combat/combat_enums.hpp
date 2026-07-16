@@ -245,6 +245,21 @@ enum class EffectKind : std::uint32_t {
     // nesta rodada (indice < cursor da fila) e um no-op + log de dissipacao, NAO reaplica
     // na proxima rodada. 0 consumo de RNG. Ver techmagic.cpp::handle_delay_action.
     DelayAction = 7,
+    // Quantum-Lock (Planck, manifesto item 5, decisoes do lider 2026-07-15): passiva mana-0
+    // que QUANTIZA o dano de carta do PORTADOR em 3 degraus fixos da propria faixa da
+    // variancia Knowledge (secao 11): piso `base*(1-v)`, centro `base`, teto `base*(1+v)`,
+    // chances FIXAS 25%/50%/25% (nao evoluem com Knowledge - so a LARGURA dos degraus
+    // encolhe com kills, via `v`). Media = base (zero mudanca de balance). NAO passa pelo
+    // dispatcher techMagic::execute (ver techmagic.cpp::handle_damage_quantize, marcador
+    // no-op) - pluga DIRETO no sorteio de canal COMUM do resolvedor
+    // (combat_state_machine.cpp::resolve_use_card) e no preview PURO
+    // (estimate_card_damage), via combat_state_machine.cpp::quantize_spec_of. Consumo de
+    // RNG: SUBSTITUI o 2o consumo (next_double, variancia continua) por um sorteio de
+    // degrau (next(100)) - MESMA contagem do canal COMUM de sempre (2 consumos), so muda o
+    // TIPO do 2o. EffectSpec.percent = chance% de CADA extremo (piso E teto, simetrico);
+    // EffectSpec.magnitude = chance% do centro. Critico/falha INTACTOS (a quantizacao so
+    // age no canal COMUM).
+    DamageQuantize = 8,
 };
 
 // Filtro de lado do alvo de um EffectSpec (ADR-016 Balde B, Faraday/EM-Shield). Data-driven:

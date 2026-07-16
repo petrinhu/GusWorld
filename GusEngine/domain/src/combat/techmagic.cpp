@@ -438,6 +438,21 @@ void handle_delay_action(const EffectSpec& spec, const Card& card, TechMagicCont
     log_entry(ctx, target, delta, std::move(message));
 }
 
+// DamageQuantize (Planck/Quantum-Lock, manifesto item 5): MARCADOR no-op deliberado. A
+// quantizacao NAO passa por este dispatcher - o resolvedor (combat_state_machine.cpp::
+// resolve_use_card) e o preview PURO (estimate_card_damage) leem o EffectSpec DIRETO via
+// combat_state_machine.cpp::quantize_spec_of, plugando no sorteio de degrau do canal COMUM
+// da secao 11. Nao ha "alvo"/"dano de evento" no sentido dos outros EffectKind (Leech/
+// Reflect/etc.) - nada pra este handler fazer. Existe so pra satisfazer o invariante
+// fail-fast "EffectKind sem handler = bug" (techmagic.hpp) sem lancar. Trigger da carta e
+// OnCast, que execute_equipped NUNCA despacha (Planck e Passiva, nunca jogada; equipadas so
+// recebem Always/OnDamageDealt/OnDamageReceived/OnRoundEnd/OnAllyTurnEnd) - na pratica este
+// handler nunca roda; documentado do mesmo jeito que o wiring fora-do-dispatcher do trunfo
+// ignores_weakness_wheel de Godel.
+void handle_damage_quantize(const EffectSpec&, const Card&, TechMagicContext&) {
+    // No-op deliberado: ver comentario acima.
+}
+
 }  // namespace
 
 void execute(TriggerHook hook, const Card& card, TechMagicContext& ctx) {
@@ -466,13 +481,16 @@ void execute(TriggerHook hook, const Card& card, TechMagicContext& ctx) {
             case EffectKind::DelayAction:
                 handle_delay_action(spec, card, ctx);
                 break;
+            case EffectKind::DamageQuantize:
+                handle_damage_quantize(spec, card, ctx);
+                break;
             case EffectKind::CloneAlly:
             default:
                 throw std::logic_error(
                     "techMagic: EffectKind sem handler implementado na carta '" + card.id +
-                    "' (steps 2-3-5-6-7 cobrem ApplyStatus/Leech/Reflect/HypotenuseCombo/"
-                    "RepeatLastAction/ChainDamage/DelayAction; CloneAlly e step futuro, "
-                    "ADR-016).");
+                    "' (steps 2-3-5-6-7 + manifesto5 cobrem ApplyStatus/Leech/Reflect/"
+                    "HypotenuseCombo/RepeatLastAction/ChainDamage/DelayAction/"
+                    "DamageQuantize; CloneAlly e step futuro, ADR-016).");
         }
     }
 }

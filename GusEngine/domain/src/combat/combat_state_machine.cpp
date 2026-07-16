@@ -160,6 +160,45 @@ NeutralRandom& neutral_random() {
     return absorbed <= 0 ? raw_damage : raw_damage - absorbed;
 }
 
+// Quantum-Lock (Planck, ADR-016 manifesto item 5): detecta a passiva DamageQuantize
+// equipada em `actor`, varrendo equipped_special_ids() contra `registry` (mesmo padrao de
+// deteccao de passiva ja usado pelo Reflect/Newton, mas SEM passar pelo dispatcher
+// techMagic::execute - a quantizacao pluga DIRETO no canal COMUM do resolvedor/preview, ver
+// doc-comment de EffectKind::DamageQuantize). Fail-SOFT (nullptr), ao contrario do
+// fail-fast de execute_equipped: registry nullptr ou id nao encontrado so significa "sem
+// quantizacao", nunca bloqueia as OUTRAS passivas equipadas do ator.
+[[nodiscard]] const EffectSpec* quantize_spec_of(
+    const CombatActor& actor, const std::unordered_map<std::string, Card>* registry) {
+    if (registry == nullptr) return nullptr;
+    for (const std::string& id : actor.equipped_special_ids()) {
+        const auto it = registry->find(id);
+        if (it == registry->end()) continue;
+        for (const EffectSpec& spec : it->second.effects)
+            if (spec.kind == EffectKind::DamageQuantize) return &spec;
+    }
+    return nullptr;
+}
+
+// Quantum-Lock: escolhe o degrau (r do comum_channel_damage) a partir de um roll 0..99.
+// spec.percent = chance% de CADA extremo (piso E teto, simetrico); spec.magnitude =
+// chance% do degrau central. So usado por resolve_use_card (roll REAL); o preview
+// (estimate_card_damage) NAO sorteia - mostra os 3 degraus fixos direto.
+[[nodiscard]] double quantize_step_r(const EffectSpec& spec, int roll) {
+    if (roll < spec.percent) return 0.0;
+    if (roll < spec.percent + spec.magnitude) return 0.5;
+    return 1.0;
+}
+
+// Quantum-Lock: sufixo de log do hit quantizado (regra do lider: todo efeito loga), mesmo
+// padrao dos sufixos existentes (" [CRITICO]", " FALHA DE COMPILACAO").
+[[nodiscard]] std::string quantize_log_suffix(double r, const EffectSpec& spec) {
+    if (r == 0.0)
+        return " [Quantum-Lock: degrau baixo, " + std::to_string(spec.percent) + "%]";
+    if (r == 1.0)
+        return " [Quantum-Lock: degrau alto, " + std::to_string(spec.percent) + "%]";
+    return " [Quantum-Lock: degrau medio, " + std::to_string(spec.magnitude) + "%]";
+}
+
 }  // namespace
 
 CombatStateMachine::CombatStateMachine(
@@ -735,6 +774,22 @@ CardDamageEstimate CombatStateMachine::estimate_card_damage(
     est.min_damage = shield_absorbed_loss(comum_floor, target);
     est.max_damage = shield_absorbed_loss(comum_ceil, target);
     est.crit_damage = shield_absorbed_loss(crit_raw, target);
+
+    // 6. Quantum-Lock (Planck, ADR-016 manifesto item 5, A2: perfect information). SO
+    //    quando o ATACANTE porta a passiva equipada. NAO sorteia (r fixo 0.0/0.5/1.0,
+    //    MESMO helper comum_channel_damage do piso/teto acima) - bit-identico ao que
+    //    resolve_use_card produziria em cada degrau forcado (gemeo preview<->real).
+    if (const EffectSpec* quantize = quantize_spec_of(attacker, card_registry_);
+        quantize != nullptr) {
+        est.quantized = true;
+        const int comum_mid =
+            static_cast<int>(std::lround(comum_channel_damage(base_damage, v, 0.5)));
+        est.mid_damage = shield_absorbed_loss(comum_mid, target);
+        est.step_low_pct = quantize->percent;
+        est.step_mid_pct = quantize->magnitude;
+        est.step_high_pct = quantize->percent;
+    }
+
     return est;
 }
 
@@ -1161,9 +1216,21 @@ void CombatStateMachine::resolve_use_card(CombatActor& actor, const CombatAction
             damage = static_cast<int>(std::lround(crit_damage));
             channel_suffix = " [CRITICO]";
         } else {
-            // COMUM: 2o consumo de RNG (next_double); aplica a variancia normal. Helper
-            // compartilhado com estimate_card_damage (preview PURO) - mesma formula.
-            const double r = rng_->next_double();
+            // COMUM: 2o consumo de RNG. SEM Quantum-Lock: variancia continua de sempre
+            // (next_double). COM Quantum-Lock (Planck, ADR-016 manifesto item 5, A5): o 2o
+            // consumo vira um sorteio de DEGRAU (next(100) em vez de next_double) - MESMA
+            // contagem (1 consumo aqui de qualquer forma), so o TIPO muda. Helper
+            // comum_channel_damage compartilhado com estimate_card_damage (preview PURO)
+            // nos dois casos - so o `r` muda de continuo pra {0.0, 0.5, 1.0}.
+            const EffectSpec* quantize = quantize_spec_of(actor, card_registry_);
+            double r;
+            if (quantize != nullptr) {
+                const int roll2 = rng_->next(100);
+                r = quantize_step_r(*quantize, roll2);
+                channel_suffix = quantize_log_suffix(r, *quantize);
+            } else {
+                r = rng_->next_double();
+            }
             const float rolled = comum_channel_damage(base_damage, v, r);
             damage = static_cast<int>(std::lround(rolled));
         }

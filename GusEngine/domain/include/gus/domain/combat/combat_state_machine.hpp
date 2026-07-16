@@ -93,6 +93,21 @@ struct CardDamageEstimate {
     // caso, ver resolve_use_card).
     bool immune = false;
 
+    // ---- Quantum-Lock (Planck, ADR-016 manifesto item 5, A2: perfect information) ----
+    // Campos ADITIVOS: default (false/0) preserva TODOS os call sites/testes anteriores
+    // intactos. quantized=true SO quando o ATACANTE porta a passiva Planck equipada (mesma
+    // regra de resolve_use_card, ver combat_state_machine.cpp::quantize_spec_of) E o alvo
+    // nao e imune (o curto-circuito de imunidade acima retorna ANTES destes campos serem
+    // tocados). min_damage/max_damage ACIMA continuam sendo piso/teto do canal COMUM de
+    // SEMPRE (NAO mudam de semantica - com Planck eles viram tambem os degraus baixo/alto,
+    // ja que os 3 degraus SAO a faixa completa da variancia). mid_damage = degrau CENTRAL
+    // (r=0.5), pos-Shield, MESMO helper comum_channel_damage dos outros dois.
+    bool quantized = false;
+    int mid_damage = 0;    // degrau central (r=0.5), perda de HP pos-Shield.
+    int step_low_pct = 0;  // chance% do degrau piso (= EffectSpec.percent do Planck).
+    int step_mid_pct = 0;  // chance% do degrau centro (= EffectSpec.magnitude do Planck).
+    int step_high_pct = 0; // chance% do degrau teto (= EffectSpec.percent, simetrico).
+
     [[nodiscard]] bool operator==(const CardDamageEstimate&) const = default;
 };
 

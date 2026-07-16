@@ -346,6 +346,69 @@ techmagic_godel_test.cpp`; `GusEngine/domain/tests/master_cards_test.cpp`;
 `docs/design/mecanicas/cartas-technomagik.md` secao 6/9; `docs/design/roster-analogos/
 _EFEITOS-ESCOLHIDOS.md` (AMB-05).
 
+## Addendum (manifesto item 5, decisoes do lider 2026-07-15): Planck/Quantum-Lock
+
+Diferente de todos os EffectKind anteriores (que resolvem POR DENTRO do dispatcher
+`techMagic::execute`, contra `ctx.caster`/`ctx.counterpart`), o Quantum-Lock **pluga direto
+no coracao da secao 11** (o resolvedor de dano `resolve_use_card` e o gemeo PURO
+`estimate_card_damage`), nao no dispatcher de efeitos. PR PROPRIO, disjunto de qualquer
+trabalho de fila (mexe na formula de dano, nao em ordenacao de turno).
+
+- **`EffectKind::DamageQuantize` (ordinal 8, append-only)**: carta `planck` em
+  `master_cards.cpp` - `Passiva`/`Universal`/mana 0, `effects = [OnCast ->
+  DamageQuantize, magnitude=50 (chance% do centro), percent=25 (chance% de CADA
+  extremo)]`. Carta HISTORICA (so o Gus equipa na progressao) - o MOTOR e agnostico
+  por-ator, ZERO hardcode de id/nome de personagem no dominio (mesmo padrao do
+  Reflect/Newton).
+- **Handler no-op deliberado** (`techmagic.cpp::handle_damage_quantize`): satisfaz o
+  invariante fail-fast "EffectKind sem handler = bug" sem lancar, mas nao faz nada - o
+  trigger da carta e `OnCast`, que `execute_equipped` NUNCA despacha (Planck e Passiva,
+  nunca jogada; equipadas so recebem `Always`/`OnDamageDealt`/`OnDamageReceived`/
+  `OnRoundEnd`/`OnAllyTurnEnd`). Na pratica este handler nunca roda - documentado do mesmo
+  jeito que o wiring fora-do-dispatcher do trunfo `ignores_weakness_wheel` de Godel.
+- **`quantize_spec_of(actor, registry)`** (helper novo, anonimo em
+  `combat_state_machine.cpp`): varre `actor.equipped_special_ids()` contra o
+  `card_registry_` procurando um `EffectSpec.kind == DamageQuantize`. Fail-SOFT (nullptr),
+  ao contrario do fail-fast de `execute_equipped` - registry nulo ou id ausente so
+  significa "sem quantizacao", nunca bloqueia OUTRAS passivas equipadas do ator.
+- **Wiring real, os DOIS gemeos:**
+  - `resolve_use_card`, ramo COMUM: se `quantize_spec_of(actor, ...)` != nullptr, o 2o
+    consumo de RNG (que seria `rng_->next_double()`, a variancia continua) vira
+    `rng_->next(100)` (sorteio de degrau via `quantize_step_r`) - `roll2 < percent` = piso
+    (`r=0.0`), `roll2 < percent+magnitude` = centro (`r=0.5`), senao teto (`r=1.0`). O `r`
+    resultante alimenta o MESMO `comum_channel_damage(base_damage, v, r)` de sempre - zero
+    formula paralela. Log ganha sufixo via `quantize_log_suffix` (degrau + chance%, regra
+    do lider "todo efeito loga").
+  - `estimate_card_damage` (preview PURO): campos ADITIVOS em `CardDamageEstimate`
+    (`quantized`, `mid_damage`, `step_low_pct`/`step_mid_pct`/`step_high_pct`) calculados
+    SEM sortear (`comum_channel_damage(base_damage, v, 0.5)` pro centro; piso/teto ja
+    existiam via `r=0.0`/`r=1.0`) - bit-identicos ao que `resolve_use_card` produziria em
+    cada degrau forcado (gemeo obrigatorio, auditoria-dominó).
+- **Consumo de RNG (A5): MESMA contagem.** Canal COMUM com Planck = 2 consumos de
+  `next(100)` (canal + degrau), 0 de `next_double`. Canal COMUM sem Planck = 1 de
+  `next(100)` + 1 de `next_double` (caminho INTOCADO, byte-identico ao de sempre). Total =
+  2 nos dois casos - so o TIPO do 2o consumo muda.
+- **A6, critico/falha intactos:** a quantizacao so troca o `else` do canal COMUM; os ramos
+  FALHA e CRIT (e o curto-circuito de imunidade, ANTES do sorteio) ficam byte-identicos com
+  ou sem a passiva.
+- **Colapso gracioso**: kills altos (`v` no piso ~0.05) + dano-base pequeno podem fazer os
+  3 degraus arredondarem (`lround`) pro MESMO inteiro - comportamento esperado (o preview
+  mostra os 3 iguais), coberto por teste dedicado.
+- Testes: `GusEngine/domain/tests/techmagic_quantize_test.cpp` (10 casos: degraus corretos
+  vs formula hand-calculada, paridade preview<->real com Shield, fronteiras do sorteio,
+  determinismo/contagem de RNG com e sem a passiva, escopo por-ator, critico/falha
+  intactos, ataque basico inalterado, colapso gracioso, log, fogo-amigo/imune 0 consumo
+  extra) + `master_cards_test.cpp` (catalogo + i18n `CARD_EXEC_PLANCK_NAME`).
+
+Cross-ref: `GusEngine/domain/include/gus/domain/combat/combat_enums.hpp`
+(`EffectKind::DamageQuantize`); `GusEngine/domain/include/gus/domain/combat/
+combat_state_machine.hpp` (`CardDamageEstimate` campos aditivos); `GusEngine/domain/src/
+combat/combat_state_machine.cpp` (`quantize_spec_of`/`quantize_step_r`/
+`quantize_log_suffix`, wiring em `resolve_use_card`/`estimate_card_damage`);
+`GusEngine/domain/src/combat/techmagic.cpp` (`handle_damage_quantize`, marcador no-op);
+`GusEngine/domain/src/combat/master_cards.cpp` (planck); `docs/design/mecanicas/combat.md`
+secao 11 (Quantum-Lock); `docs/design/roster-analogos/_EFEITOS-ESCOLHIDOS.md` (AMB-06).
+
 ## Consequencias
 
 - **Positivas:** custo BAIXO-MEDIO, risco BAIXO; numeros 100% tunaveis pra playtest; testavel por unit test por EffectKind; easter-egg entregue hoje; nao fecha porta pra VM. Cada carta = 5-15 linhas de dado.

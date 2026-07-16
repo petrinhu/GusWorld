@@ -523,6 +523,9 @@ Tesla
 ## CARD_EXEC_EINSTEIN_NAME
 Einstein
 
+## CARD_EXEC_PLANCK_NAME
+Quantum-Lock
+
 ### Controls screen (keyboard remap, M2)
 
 ## CONTROLS_HINT

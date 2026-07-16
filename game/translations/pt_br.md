@@ -720,6 +720,9 @@ Tesla
 ## CARD_EXEC_EINSTEIN_NAME
 Einstein
 
+## CARD_EXEC_PLANCK_NAME
+Quantum-Lock
+
 ---
 
 ## §9. Menu de sistema (pausa + config de som, MENU-PAUSA-CONFIG-SOM)
