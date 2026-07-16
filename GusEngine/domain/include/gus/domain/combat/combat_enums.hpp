@@ -280,6 +280,26 @@ enum class EffectKind : std::uint32_t {
     // determinismo, ver techmagic_reveal_test.cpp). Ver techmagic.cpp::handle_reveal_intent/
     // dump_reveal_intent/log_intent_for.
     RevealIntent = 9,
+    // Free-Order (Hayek, CARD-ENGINE-MANIFESTO item 7, AMB-09): passiva de "ordem espontanea"
+    // - quando os membros do lado do PORTADOR agem de forma DIFERENTE (assinaturas de
+    // CombatActionType distintas, com UseCard refinado pela CardFamily da carta jogada, M2)
+    // na MESMA rodada, o lado inteiro ganha um bonus ESCALONADO de dano (mult >= 1.0) e um
+    // desconto no LIMIAR de falha (fumble_chance, piso 0) - NUNCA pune, so premia. MARCADOR
+    // no-op deliberado (mesmo padrao de DamageQuantize/Planck): NAO passa pelo dispatcher
+    // techMagic::execute - o resolvedor (combat_state_machine.cpp::resolve_use_card/
+    // resolve_basic_attack) e o preview PURO (estimate_card_damage/
+    // preview_basic_attack_damage) leem os EffectSpec DIRETO via
+    // combat_state_machine.cpp::diversity_spec_of, plugando na cadeia divisiva da secao 11 e
+    // no limiar do canal FALHA. Cada EffectSpec da carta e um DEGRAU: `magnitude` = limiar de
+    // assinaturas distintas pra este degrau valer, `percent` = bonus% de dano, `duration` =
+    // reducao em pontos-percentuais (pp) do limiar de falha (reuse deliberado do campo,
+    // mesmo padrao data-driven de outros EffectKind reinterpretando magnitude/percent/
+    // duration por-kind). Ledger novo `CombatStateMachine::round_actions_`
+    // (techMagic::RoundActionEntry, granularidade de ACAO via resolve_action - NAO de hit,
+    // ver RoundHitEntry): ecos de dano PURO (Mandelbrot/Ada/HypotenuseCombo, que usam
+    // CombatActor::take_damage direto sem passar por resolve_action) ficam FORA por
+    // construcao. Ver techmagic.cpp::handle_diversity_bonus (no-op) + techmagic_hayek_test.cpp.
+    DiversityBonus = 10,
 };
 
 // Filtro de lado do alvo de um EffectSpec (ADR-016 Balde B, Faraday/EM-Shield). Data-driven:

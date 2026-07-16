@@ -534,6 +534,9 @@ Black-Mirror
 ## CARD_EXEC_MAXWELL_NAME
 Spectra-Wave
 
+## CARD_EXEC_HAYEK_NAME
+Free-Order
+
 ### Controls screen (keyboard remap, M2)
 
 ## CONTROLS_HINT

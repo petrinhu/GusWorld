@@ -534,6 +534,91 @@ Cross-ref: `GusEngine/domain/src/combat/master_cards.cpp` (maxwell);
 Grupo, addendum "Balde B, PR2" acima - reusado sem alteracao); `docs/design/mecanicas/
 cartas-technomagik.md`; `docs/design/roster-analogos/_EFEITOS-ESCOLHIDOS.md` (AMB-08).
 
+## Addendum (CARD-ENGINE-MANIFESTO item 7, decisoes do lider 2026-07-16, AMB-09): Hayek/Free-Order (DiversityBonus)
+
+Decimo primeiro `EffectKind` entregue (append-only, ordinal 10): `DiversityBonus`, a passiva
+"ordem espontanea" de Hayek. Passiva mana-0, equip-only, Universal. Quando os membros do LADO
+do portador agem de forma DIFERENTE na mesma rodada, o lado inteiro ganha um bonus
+ESCALONADO de dano/precisao - NUNCA pune, so premia (mult de dano sempre >= 1.0; limiar de
+falha so diminui, piso 0).
+
+- **`EffectKind::DiversityBonus` (ordinal 10, append-only apos `RevealIntent`)**: MARCADOR
+  no-op deliberado, MESMO padrao de `DamageQuantize`/Planck (addendum "manifesto item 5"
+  acima) - `techmagic.cpp::handle_diversity_bonus` e um no-op; o bonus NAO passa pelo
+  dispatcher `techMagic::execute`. O resolvedor (`combat_state_machine.cpp::
+  resolve_use_card`/`resolve_basic_attack`) e o preview PURO (`estimate_card_damage`/
+  `preview_basic_attack_damage`) leem os `EffectSpec` DIRETO via
+  `combat_state_machine.cpp::diversity_spec_of`.
+- **Ledger novo `CombatStateMachine::round_actions_` (`techMagic::RoundActionEntry`,
+  declarado em `techmagic.hpp` junto de `RoundHitEntry`)**: granularidade de ACAO (populado
+  em `resolve_action`, APOS o dispatch pro `resolve_XXX` correspondente - nao de golpe
+  individual como `round_hits_`). 1 entrada por chamada de `resolve_action`, independente de
+  quantos alvos/hits a acao produza (AoE conta 1x). Campos: `{actor*, CombatActionType,
+  CardFamily}` - `family` so e significativo quando `type == UseCard`. Zerado na MESMA
+  fronteira de rodada que `round_hits_`/`last_action_` (`process_round_end_hooks`). Ecos de
+  dano PURO (Mandelbrot/Ada/`RepeatLastAction`, `HypotenuseCombo`/`OnRoundEnd`) usam
+  `CombatActor::take_damage` DIRETO sem passar por `resolve_action` - ficam FORA do ledger
+  por construcao.
+- **M2 (metrica de "acao diferente", decisao do lider, AMB-09)**: a assinatura de uma acao e
+  o `CombatActionType`, mas `UseCard` e REFINADO pela `CardFamily` da carta jogada (2 cartas
+  da MESMA familia = 1 assinatura; familias diferentes = 2 assinaturas distintas). Helper
+  `same_action_signature` (namespace anonimo de `combat_state_machine.cpp`).
+- **Forward-only / anti auto-inflacao**: `distinct_action_count` conta as assinaturas
+  DISTINTAS ja registradas no ledger pelo lado do atacante ANTES da acao corrente
+  (`hayek_bonus_for`, chamado em `resolve_basic_attack`/`resolve_use_card`/
+  `estimate_card_damage`/`preview_basic_attack_damage` - o gemeo obrigatorio le o MESMO
+  ledger). A acao corrente so ENTRA no ledger (`round_actions_.push_back(...)`) no FIM de
+  `resolve_action`, DEPOIS do bonus dela ja ter sido lido pelo `resolve_XXX` - sem esse
+  ordenamento a acao se auto-inflacionaria (contaria a si propria como uma das distintas que
+  ELA MESMA precisa pra escalar). Consequencia mecanica: a 1a acao de uma rodada NUNCA se
+  autobeneficia (distinct_count=0 antes dela); o bonus so aparece a partir da 3a acao em
+  diante do lado (quando ja ha >=2 assinaturas distintas registradas por acoes ANTERIORES).
+- **Degraus (`//PLAYTEST`, decisao do lider): 2 distintas = +5% dano / -1pp falha; 3 = +8% /
+  -2pp; 4+ = +13% / -3pp** (cap automatico - nenhum `EffectSpec` declara `magnitude` > 4). A
+  carta e 3 `EffectSpec` (um por degrau), cada um reusando os campos genericos do struct pra
+  carregar o degrau inteiro: `magnitude` = limiar de assinaturas distintas pra este degrau
+  valer, `percent` = bonus% de dano, `duration` = reducao em pontos-percentuais (pp) do
+  limiar de falha (reuse deliberado do campo `duration`, mesmo padrao data-driven de outros
+  `EffectKind` reinterpretando `magnitude`/`percent`/`duration` por-kind, ex.:
+  `ChainDamage` usa `magnitude`=saltos/`percent`=retencao). `diversity_spec_of` acha o
+  `EffectSpec` de MAIOR limiar que `distinct_count` ainda alcanca, entre TODAS as
+  `DiversityBonus` equipadas por QUALQUER VIVO do lado (nao so o dono) - o cap "4+" e
+  automatico dessa escolha (nenhum limiar > 4 existe, entao 4/5/6... sempre casam com o
+  mesmo degrau mais alto).
+- **Beneficia o LADO INTEIRO** (decisao do lider) enquanto o dono estiver VIVO e com a carta
+  EQUIPADA - nao so o dono. `diversity_equipped_on_side`/`diversity_spec_of` varrem TODOS os
+  vivos do lado, nao so o atacante da acao corrente.
+- **Wiring na cadeia divisiva (secao 11)**: `mult_hayek` (via `HayekBonus::mult_damage()`)
+  entra como o ULTIMO fator multiplicativo da cadeia divisiva em `resolve_use_card`/
+  `estimate_card_damage` (substitui `mult_ambiente` como ultimo fator). Ataque basico:
+  `lround(raw * mult_hayek)`. Limiar de falha (`fumble_chance`): desconta
+  `hayek.fumble_reduction_pp` do valor calculado normalmente, com piso 0
+  (`std::max(0, fumble - reducao)`) - mexe SO no LIMIAR de comparacao (`roll < fumble_chance`),
+  NAO na contagem de RNG (continua exatamente 1 sorteio de canal `rng_->next(100)`,
+  determinismo intacto - provado por `CountingRandom` com/sem Hayek equipado produzindo
+  contagens IDENTICAS).
+- **Log**: sufixo `hayek_log_suffix` anexado a CADA hit (regra "todo efeito loga") - bonus
+  ativo mostra `" [Free-Order: N abordagens, +P%]"`; equipada mas sem diversidade ainda
+  mostra `" [Free-Order: sem diversidade ainda]"`; ninguem do lado porta a passiva = "" (sem
+  ruido de log).
+- Testes: `GusEngine/domain/tests/techmagic_hayek_test.cpp` (degraus 2/3/4+ com cap
+  automatico, M2, anti auto-inflacao/1a acao da rodada, eco de Mandelbrot fora do ledger,
+  fronteira de rodada zera o ledger, paridade preview<->real carta E ataque basico,
+  determinismo de RNG identico com/sem Hayek via `CountingRandom`, beneficia o lado inteiro
+  + dono morto derruba o bonus, piso de falha 0, handler no-op no dispatcher).
+
+**Catalogacao pendente:** esta leva cobriu SO o motor/`EffectKind` (mesmo isolamento das
+outras cartas do manifesto antes de entrarem no catalogo de producao) - `master_cards.cpp`,
+`master_cards_test.cpp` e as chaves i18n `CARD_EXEC_HAYEK_NAME` (pt_br/en_intl) ficam pra uma
+leva futura, quando a carta entrar no catalogo `MasterCards::build_registry()`.
+
+Cross-ref: `GusEngine/domain/include/gus/domain/combat/combat_enums.hpp`
+(`EffectKind::DiversityBonus`); `GusEngine/domain/include/gus/domain/combat/techmagic.hpp`
+(`techMagic::RoundActionEntry`); `GusEngine/domain/src/combat/combat_state_machine.cpp`
+(`same_action_signature`/`distinct_action_count`/`diversity_equipped_on_side`/
+`diversity_spec_of`/`hayek_bonus_for`/`hayek_log_suffix`); `docs/design/mecanicas/
+cartas-technomagik.md`; `docs/design/roster-analogos/_EFEITOS-ESCOLHIDOS.md` (AMB-09).
+
 ## Consequencias
 
 - **Positivas:** custo BAIXO-MEDIO, risco BAIXO; numeros 100% tunaveis pra playtest; testavel por unit test por EffectKind; easter-egg entregue hoje; nao fecha porta pra VM. Cada carta = 5-15 linhas de dado.

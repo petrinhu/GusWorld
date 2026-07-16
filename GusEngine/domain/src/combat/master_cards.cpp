@@ -99,6 +99,22 @@ constexpr int kDeeScryingDuration = 3;
 // constantes acima (NAO e um numero fechado pelo lider, ao contrario de
 // kPlanckStepCenterPercent/kDeeScryingDuration).
 constexpr int kMaxwellPower = 5;  //PLAYTEST
+// Free-Order (Hayek, CARD-ENGINE-MANIFESTO item 7, decisoes do lider 2026-07-16, AMB-09):
+// os 3 degraus da diversidade (um EffectSpec/degrau). Para cada degrau: magnitude = limiar
+// de assinaturas de acao DISTINTAS ja registradas pelo lado ANTES da acao corrente;
+// percent = bonus% de dano; duration = reducao em pontos-percentuais (pp) do limiar de
+// falha (reuse deliberado do campo, mesmo padrao data-driven de outros EffectKind). O
+// degrau "4+" e o teto (cap automatico: diversity_spec_of nunca acha limiar > 4). Numeros
+// //PLAYTEST (tunaveis; NAO rotular como easter-egg em codigo/comentario - repo publico).
+constexpr int kHayekTier2Distinct = 2;
+constexpr int kHayekTier2DamagePct = 5;
+constexpr int kHayekTier2FumblePp = 1;
+constexpr int kHayekTier3Distinct = 3;
+constexpr int kHayekTier3DamagePct = 8;
+constexpr int kHayekTier3FumblePp = 2;
+constexpr int kHayekTier4Distinct = 4;
+constexpr int kHayekTier4DamagePct = 13;
+constexpr int kHayekTier4FumblePp = 3;
 
 // Monta uma carta ESPECIAL base. base_type = Glifo (carta-programa nao-elemental,
 // //PLAYTEST). ap_cost default 1 (herda o mesmo default do placeholder). Sem
@@ -360,10 +376,42 @@ std::unordered_map<std::string, Card> assemble() {
             "maxwell", "CARD_EXEC_MAXWELL_NAME", CardFamily::Eletrico, CardCategory::Hibrida,
             kActiveManaCost, /*effects=*/{}, /*ignores_weakness_wheel=*/false,
             /*power=*/kMaxwellPower, /*target_shape=*/TargetShape::Grupo),
+
+        // --- Hayek (Free-Order): Passiva, Universal, mana 0 (CARD-ENGINE-MANIFESTO item 7,
+        // decisoes do lider 2026-07-16, AMB-09). Equip-only, NUNCA jogada via UseCard. NAO
+        // executa via techMagic::execute (marcador no-op, ver techmagic.cpp::
+        // handle_diversity_bonus) - o bonus de "ordem espontanea" pluga DIRETO na cadeia
+        // divisiva (secao 11) e no limiar do canal FALHA do resolvedor/preview, via
+        // combat_state_machine.cpp::diversity_spec_of (mesmo padrao fora-do-dispatcher de
+        // Planck/DamageQuantize). NUNCA pune, so premia (mult de dano >= 1.0; falha so
+        // diminui, piso 0). 3 EffectSpec, um por DEGRAU: magnitude = limiar de assinaturas
+        // de acao DISTINTAS do lado nesta rodada (2/3/4+), percent = bonus% de dano,
+        // duration = reducao pp do limiar de falha. Beneficia o LADO INTEIRO enquanto o dono
+        // estiver vivo/equipado (nao so o dono). power 0 (passiva, sem dano proprio),
+        // TargetShape::Self (equip-only, nunca mira nada). ---
+        make_special(
+            "hayek", "CARD_EXEC_HAYEK_NAME", CardFamily::Universal, CardCategory::Passiva, 0,
+            {EffectSpec{.trigger = TriggerHook::OnCast,
+                       .kind = EffectKind::DiversityBonus,
+                       .magnitude = kHayekTier2Distinct,   // limiar de distintas do degrau.
+                       .percent = kHayekTier2DamagePct,    // bonus% de dano.
+                       .duration = kHayekTier2FumblePp},   // reducao pp do limiar de falha.
+             EffectSpec{.trigger = TriggerHook::OnCast,
+                       .kind = EffectKind::DiversityBonus,
+                       .magnitude = kHayekTier3Distinct,
+                       .percent = kHayekTier3DamagePct,
+                       .duration = kHayekTier3FumblePp},
+             EffectSpec{.trigger = TriggerHook::OnCast,
+                       .kind = EffectKind::DiversityBonus,
+                       .magnitude = kHayekTier4Distinct,  // teto: diversity_spec_of nao acha >4.
+                       .percent = kHayekTier4DamagePct,
+                       .duration = kHayekTier4FumblePp}},
+            /*ignores_weakness_wheel=*/false, /*power=*/0,
+            /*target_shape=*/TargetShape::Self),
     };
 
     std::unordered_map<std::string, Card> registry;
-    registry.reserve(15);
+    registry.reserve(16);
     for (const auto& card : cards) {
         // emplace (nao indexer) falha-cedo se algum id duplicar (mesmo padrao do placeholder).
         const auto [it, inserted] = registry.emplace(card.id, card);

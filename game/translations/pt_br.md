@@ -732,6 +732,9 @@ Black-Mirror
 ## CARD_EXEC_MAXWELL_NAME
 Spectra-Wave
 
+## CARD_EXEC_HAYEK_NAME
+Free-Order
+
 ---
 
 ## §9. Menu de sistema (pausa + config de som, MENU-PAUSA-CONFIG-SOM)

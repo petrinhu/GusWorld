@@ -75,13 +75,13 @@ CombatActor make_actor(const std::string& id, bool player_side, int hp = 100, in
 
 // ===== 1. As 8 cartas existem, ids unicos, guarda anti-CloneAlly =====
 
-TEST_CASE("master_cards: build_registry tem exatamente as 15 cartas suportadas",
+TEST_CASE("master_cards: build_registry tem exatamente as 16 cartas suportadas",
           "[domain][combat][cards][techmagic][mastercards]") {
     const auto reg = MasterCards::build_registry();
-    REQUIRE(reg.size() == 15);
+    REQUIRE(reg.size() == 16);
     for (const char* id : {"volta", "newton", "pythagoras", "mandelbrot", "ada", "godel",
                            "faraday", "euler", "turing", "menger", "tesla", "einstein",
-                           "planck", "dee", "maxwell"})
+                           "planck", "dee", "maxwell", "hayek"})
         REQUIRE(reg.count(id) == 1);
 }
 
@@ -628,7 +628,52 @@ TEST_CASE("master_cards: maxwell = Hibrida/Eletrico/mana kActiveManaCost/power 5
     REQUIRE(c.effects.empty());  // dano-base puro: NENHUM EffectSpec, zero EffectKind novo.
 }
 
-// ===== 4. Paridade i18n das 15 chaves (2 locales) =====
+TEST_CASE("master_cards: hayek = Passiva/Universal/mana 0, effects [3x OnCast DiversityBonus] "
+         "(degraus 2/3/4+ distintas)",
+         "[domain][combat][cards][techmagic][mastercards]") {
+    const auto reg = MasterCards::build_registry();
+    const Card& c = reg.at("hayek");
+    REQUIRE(c.category == CardCategory::Passiva);
+    REQUIRE(c.family == CardFamily::Universal);
+    REQUIRE(c.mana_cost == 0);
+    REQUIRE(c.power == 0);  // passiva equip-only: sem dano proprio.
+    REQUIRE(c.target_shape == TargetShape::Self);  // equip-only, nunca mira nada.
+    REQUIRE(c.ignores_weakness_wheel == false);
+    REQUIRE(c.effects.size() == 3);  // um EffectSpec por DEGRAU.
+
+    for (const auto& spec : c.effects) {
+        REQUIRE(spec.trigger == TriggerHook::OnCast);
+        REQUIRE(spec.kind == EffectKind::DiversityBonus);
+    }
+    // Degrau 2: 2 distintas -> +5% dano / -1pp falha.
+    REQUIRE(c.effects[0].magnitude == 2);
+    REQUIRE(c.effects[0].percent == 5);
+    REQUIRE(c.effects[0].duration == 1);
+    // Degrau 3: 3 distintas -> +8% / -2pp.
+    REQUIRE(c.effects[1].magnitude == 3);
+    REQUIRE(c.effects[1].percent == 8);
+    REQUIRE(c.effects[1].duration == 2);
+    // Degrau 4+: teto (cap automatico) -> +13% / -3pp.
+    REQUIRE(c.effects[2].magnitude == 4);
+    REQUIRE(c.effects[2].percent == 13);
+    REQUIRE(c.effects[2].duration == 3);
+}
+
+TEST_CASE("master_cards: hayek (DiversityBonus em OnCast) executa via techMagic::execute "
+         "sem lancar - handler no-op deliberado (o bonus vive fora do dispatcher)",
+         "[domain][combat][cards][techmagic][mastercards]") {
+    const auto reg = MasterCards::build_registry();
+    const Card& c = reg.at("hayek");
+
+    CombatActor caster = make_actor("h", /*player_side=*/true);
+
+    techMagic::TechMagicContext ctx;
+    ctx.caster = &caster;
+
+    REQUIRE_NOTHROW(techMagic::execute(TriggerHook::OnCast, c, ctx));
+}
+
+// ===== 4. Paridade i18n das 16 chaves (2 locales) =====
 
 namespace {
 
@@ -660,7 +705,7 @@ bool has_key(const std::vector<std::string>& keys, const std::string& key) {
 #define GUSWORLD_TRANSLATIONS_DIR "../../../../game/translations"
 #endif
 
-TEST_CASE("master_cards: as 15 chaves CARD_EXEC_<FIGURA>_NAME existem em pt_br.md e "
+TEST_CASE("master_cards: as 16 chaves CARD_EXEC_<FIGURA>_NAME existem em pt_br.md e "
          "en_intl.md",
          "[domain][combat][cards][techmagic][mastercards][i18n]") {
     const std::vector<std::string> pt =
@@ -672,7 +717,7 @@ TEST_CASE("master_cards: as 15 chaves CARD_EXEC_<FIGURA>_NAME existem em pt_br.m
 
     for (const char* figura : {"VOLTA", "NEWTON", "PYTHAGORAS", "MANDELBROT", "ADA",
                                "GODEL", "FARADAY", "EULER", "TURING", "MENGER", "TESLA",
-                               "EINSTEIN", "PLANCK", "DEE", "MAXWELL"}) {
+                               "EINSTEIN", "PLANCK", "DEE", "MAXWELL", "HAYEK"}) {
         const std::string key = std::string("CARD_EXEC_") + figura + "_NAME";
         INFO("chave: " << key);
         REQUIRE(has_key(pt, key));

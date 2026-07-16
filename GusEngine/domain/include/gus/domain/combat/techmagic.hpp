@@ -83,6 +83,29 @@ struct RoundHitEntry {
     int damage = 0;
 };
 
+// Um registro de ACAO (nao de HIT) desta rodada (CARD-ENGINE-MANIFESTO item 7, Hayek/
+// Free-Order, EffectKind::DiversityBonus; AMB-09). Granularidade de ACAO
+// (CombatStateMachine::resolve_action), NAO de golpe individual: diferente de
+// RoundHitEntry (que nasce em apply_damage_with_hooks, 1 entrada por HIT>0 contra um alvo),
+// este ledger ganha EXATAMENTE 1 entrada por ACAO despachada por resolve_action -
+// independente de quantos alvos/hits ela produza (AoE conta 1x, nao N vezes) e mesmo pra
+// acoes SEM dano (Defend/Scan/GambitPredict/etc. tambem contam como "assinaturas" pra fins
+// de diversidade). Ecos de dano PURO que usam CombatActor::take_damage DIRETO (Mandelbrot/
+// Ada/RepeatLastAction, HypotenuseCombo/OnRoundEnd) NUNCA passam por resolve_action -
+// ficam FORA deste ledger por construcao (nao sao "acoes" no sentido de ActionSelect).
+// `family` so e significativo quando `type == CombatActionType::UseCard` (M2, AMB-09): a
+// assinatura de UseCard e REFINADA pela familia da CARTA jogada (2 cartas da MESMA familia
+// = mesma assinatura; familias diferentes = assinaturas distintas); nos demais tipos de
+// acao fica no default (Eletrico) e NAO participa da comparacao de assinatura (so o `type`
+// importa - ver combat_state_machine.cpp namespace anonimo, helper de igualdade de
+// assinatura). Ponteiro NAO-DONO (mesmo padrao de RoundHitEntry). Zerado na MESMA fronteira
+// de rodada que round_hits_/last_action_ (CombatStateMachine::process_round_end_hooks).
+struct RoundActionEntry {
+    CombatActor* actor = nullptr;
+    CombatActionType type = CombatActionType::Pass;
+    CardFamily family = CardFamily::Eletrico;
+};
+
 // Registro da ULTIMA ACAO DE DANO de QUALQUER aliado NESTA RODADA (step 5,
 // RepeatLastAction/Mandelbrot+Ada; decisoes Q1-Q4 do lider, 2026-07-14). Ponteiros
 // NAO-DONOS (mesmo padrao de RoundHitEntry). `actor` = quem executou a acao (Attack ou

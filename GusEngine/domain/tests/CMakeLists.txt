@@ -151,6 +151,16 @@ add_executable(gusengine_domain_tests
     # o modo-aliado como no-op puro (dissipa via a regra geral "fogo amigo desligado", sem
     # EffectSpec pra rodar).
     techmagic_maxwell_test.cpp
+    # Executor techMagic (CARD-ENGINE-MANIFESTO item 7, AMB-09, decisao do lider
+    # 2026-07-16): Hayek/Free-Order - EffectKind::DiversityBonus (marker fora do
+    # dispatcher, mesmo padrao de DamageQuantize/Planck). Ledger novo round_actions_
+    # (granularidade de ACAO via resolve_action, primo do round_hits_ do Pythagoras); M2
+    # (UseCard refinado por CardFamily); forward-only anti auto-inflacao; degraus
+    # 2/3/4+ distintas = +5%/-1pp, +8%/-2pp, +13%/-3pp; beneficia o LADO INTEIRO
+    # enquanto o dono estiver vivo/equipado; paridade preview<->real (carta E ataque
+    # basico); determinismo de RNG identico com/sem Hayek (CountingRandom); piso de
+    # falha 0.
+    techmagic_hayek_test.cpp
 )
 
 # Os testes do combate incluem helpers de teste headers-only (fixed_random.hpp).

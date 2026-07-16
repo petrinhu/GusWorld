@@ -244,6 +244,139 @@ NeutralRandom& neutral_random() {
     return false;
 }
 
+// ---- Free-Order (Hayek, CARD-ENGINE-MANIFESTO item 7, AMB-09, EffectKind::
+// DiversityBonus) ----------------------------------------------------------------------
+//
+// Mesmo padrao "marker fora do dispatcher" de quantize_spec_of/quantize_step_r acima: a
+// carta e um MARCADOR (techmagic.cpp::handle_diversity_bonus e no-op) e o bonus pluga
+// DIRETO na cadeia divisiva/limiar de falha do resolvedor + preview, via os helpers abaixo.
+
+// M2 (AMB-09): duas entradas do ledger tem a MESMA assinatura de acao quando o `type` bate
+// E, se `type == UseCard`, a `family` da carta jogada tambem bate (2 cartas da MESMA
+// familia = 1 assinatura; familias diferentes = assinaturas distintas). Nos demais tipos
+// (Attack/Defend/Scan/etc.) so o `type` importa.
+[[nodiscard]] bool same_action_signature(const techMagic::RoundActionEntry& a,
+                                         const techMagic::RoundActionEntry& b) {
+    if (a.type != b.type) return false;
+    if (a.type == CombatActionType::UseCard) return a.family == b.family;
+    return true;
+}
+
+// Conta as assinaturas de acao DISTINTAS ja registradas no ledger `actions` pelo lado
+// `player_side` (todo o vetor recebido - o CALLER decide o corte "antes da acao corrente",
+// ver CombatStateMachine::resolve_action: a acao corrente so entra no ledger DEPOIS do
+// bonus dela ja ter sido lido, entao esta contagem NUNCA inclui a propria acao em
+// resolucao - anti auto-inflacao). O(n^2) deliberado: n = acoes/rodada de 1 lado, tipicamente
+// <= 8 (party 1-4 + eventuais AoE nao mudam n, 1 entrada/acao).
+[[nodiscard]] int distinct_action_count(const std::vector<techMagic::RoundActionEntry>& actions,
+                                        bool player_side) {
+    std::vector<techMagic::RoundActionEntry> seen;
+    for (const techMagic::RoundActionEntry& e : actions) {
+        if (e.actor == nullptr || e.actor->is_player_side() != player_side) continue;
+        const bool dup = std::any_of(seen.begin(), seen.end(), [&](const auto& s) {
+            return same_action_signature(e, s);
+        });
+        if (!dup) seen.push_back(e);
+    }
+    return static_cast<int>(seen.size());
+}
+
+// true se QUALQUER VIVO do lado `player_side` porta a passiva DiversityBonus equipada
+// (independente do limiar de distintas ter sido alcancado) - usado so pra decidir SE loga a
+// linha (bonus OU no-op "sem diversidade ainda"; regra todo-efeito-loga). Fail-soft
+// (registry nulo ou id nao encontrado => false), mesmo padrao de quantize_spec_of/
+// has_reveal_intent_equipped.
+[[nodiscard]] bool diversity_equipped_on_side(
+    bool player_side, const std::vector<CombatActor*>& roster,
+    const std::unordered_map<std::string, Card>* registry) {
+    if (registry == nullptr) return false;
+    for (const CombatActor* a : roster) {
+        if (a == nullptr || !a->is_alive() || a->is_player_side() != player_side) continue;
+        for (const std::string& id : a->equipped_special_ids()) {
+            const auto it = registry->find(id);
+            if (it == registry->end()) continue;
+            for (const EffectSpec& spec : it->second.effects)
+                if (spec.kind == EffectKind::DiversityBonus) return true;
+        }
+    }
+    return false;
+}
+
+// Acha o EffectSpec de MAIOR limiar (spec.magnitude) que `distinct_count` ainda alcanca,
+// entre TODAS as especiais DiversityBonus equipadas por QUALQUER VIVO do lado
+// `player_side` (o beneficio e do LADO INTEIRO enquanto o dono estiver vivo/equipado, nao
+// so do dono - decisao do lider). Cada EffectSpec da carta hayek e um DEGRAU: `magnitude` =
+// limiar de assinaturas distintas pra este degrau valer, `percent` = bonus% de dano,
+// `duration` = reducao em pontos-percentuais (pp) do limiar de falha (reuse deliberado do
+// campo - mesmo padrao data-driven de outros EffectKind reinterpretando magnitude/percent/
+// duration por-kind, ex. ChainDamage usa magnitude=saltos/percent=retencao). "4+" (o degrau
+// mais alto) e automatico: nenhum spec tem magnitude > 4, entao distinct_count 4, 5, 6...
+// sempre casam com o MESMO degrau mais alto (cap). Fail-soft (registry nulo ou nenhuma
+// equipada/limiar nao alcancado => nullptr), mesmo padrao de quantize_spec_of.
+[[nodiscard]] const EffectSpec* diversity_spec_of(
+    bool player_side, const std::vector<CombatActor*>& roster,
+    const std::unordered_map<std::string, Card>* registry, int distinct_count) {
+    if (registry == nullptr) return nullptr;
+    const EffectSpec* best = nullptr;
+    for (const CombatActor* a : roster) {
+        if (a == nullptr || !a->is_alive() || a->is_player_side() != player_side) continue;
+        for (const std::string& id : a->equipped_special_ids()) {
+            const auto it = registry->find(id);
+            if (it == registry->end()) continue;
+            for (const EffectSpec& spec : it->second.effects) {
+                if (spec.kind != EffectKind::DiversityBonus) continue;
+                if (spec.magnitude > distinct_count) continue;  // limiar nao alcancado.
+                if (best == nullptr || spec.magnitude > best->magnitude) best = &spec;
+            }
+        }
+    }
+    return best;
+}
+
+// Resultado agregado do Free-Order pra UMA acao (calculado ANTES dela entrar no ledger -
+// anti auto-inflacao). `equipped` decide SE loga algo (bonus ou no-op); `active` decide SE
+// o bonus realmente aplica (equipada mas distinct_count<2 => equipped=true, active=false).
+struct HayekBonus {
+    bool equipped = false;
+    bool active = false;
+    int distinct_count = 0;
+    int damage_percent = 0;       // spec->percent quando active (bonus% de dano).
+    int fumble_reduction_pp = 0;  // spec->duration quando active (desconto pp no limiar).
+
+    [[nodiscard]] float mult_damage() const noexcept {
+        return active ? 1.0f + static_cast<float>(damage_percent) / 100.0f : 1.0f;
+    }
+};
+
+// Monta o HayekBonus pro lado `player_side`, lendo `round_actions` (o ledger da rodada,
+// ANTES da acao corrente - contrato do CALLER) + `roster`/`registry` (deteccao fail-soft).
+[[nodiscard]] HayekBonus hayek_bonus_for(
+    bool player_side, const std::vector<CombatActor*>& roster,
+    const std::unordered_map<std::string, Card>* registry,
+    const std::vector<techMagic::RoundActionEntry>& round_actions) {
+    HayekBonus out;
+    out.equipped = diversity_equipped_on_side(player_side, roster, registry);
+    if (!out.equipped) return out;
+    out.distinct_count = distinct_action_count(round_actions, player_side);
+    const EffectSpec* spec = diversity_spec_of(player_side, roster, registry, out.distinct_count);
+    if (spec == nullptr) return out;  // equipada, mas ainda sem diversidade suficiente.
+    out.active = true;
+    out.damage_percent = spec->percent;
+    out.fumble_reduction_pp = spec->duration;
+    return out;
+}
+
+// Sufixo de log do Free-Order (regra do lider: todo efeito loga - hit beneficiado E no-op),
+// mesmo padrao dos sufixos existentes (quantize_log_suffix etc.). "" quando ninguem do lado
+// porta a passiva (nada a logar).
+[[nodiscard]] std::string hayek_log_suffix(const HayekBonus& hayek) {
+    if (!hayek.equipped) return "";
+    if (hayek.active)
+        return " [Free-Order: " + std::to_string(hayek.distinct_count) + " abordagens, +" +
+               std::to_string(hayek.damage_percent) + "%]";
+    return " [Free-Order: sem diversidade ainda]";
+}
+
 }  // namespace
 
 CombatStateMachine::CombatStateMachine(
@@ -612,6 +745,11 @@ void CombatStateMachine::process_round_end_hooks() {
     // RepeatLastAction (ADR-016 secao 20 item 5, Q4): a janela "ultima acao de dano de
     // QUALQUER aliado" tambem nao atravessa fronteira de rodada - zera junto do ledger.
     last_action_ = techMagic::LastActionRecord{};
+
+    // Free-Order (Hayek, CARD-ENGINE-MANIFESTO item 7, AMB-09): o ledger de ACOES da
+    // rodada tambem nao atravessa fronteira de rodada - zera na MESMA fronteira que
+    // round_hits_/last_action_ acima.
+    round_actions_.clear();
 }
 
 void CombatStateMachine::process_ally_turn_end_hooks(CombatActor& ended) {
@@ -734,15 +872,38 @@ void CombatStateMachine::resolve_action(CombatActor& actor, const CombatAction& 
         default:
             throw std::out_of_range("Tipo de acao de combate desconhecido.");
     }
+
+    // Free-Order (Hayek, CARD-ENGINE-MANIFESTO item 7, AMB-09): registra a assinatura da
+    // acao corrente no ledger da rodada (round_actions_) DEPOIS de resolve_basic_attack/
+    // resolve_use_card acima ja terem rodado e lido o ledger no estado PRE-acao (via
+    // hayek_bonus_for) - sem este ordenamento a acao se auto-inflacionaria (contaria a si
+    // propria como uma das distintas que ELA MESMA precisa pra escalar). Granularidade de
+    // ACAO (nao de hit): 1 entrada por chamada de resolve_action, independente de quantos
+    // alvos/hits a acao produza. `family` so e resolvido quando UseCard (M2) - a carta ja
+    // foi validada por resolve_use_card acima (ou a excecao ja propagou e este ponto nunca
+    // e alcancado), entao o find aqui e so releitura, nunca falha em caminho feliz.
+    CardFamily action_family = CardFamily::Eletrico;
+    if (action.type == CombatActionType::UseCard && action.card_id.has_value()) {
+        const auto& registry = state.card_registry();
+        const auto it = registry.find(*action.card_id);
+        if (it != registry.end()) action_family = it->second.family;
+    }
+    round_actions_.push_back(techMagic::RoundActionEntry{&actor, action.type, action_family});
 }
 
 int CombatStateMachine::preview_basic_attack_damage(
     const CombatActor& attacker, const CombatActor& target) const noexcept {
     // Dano bruto IDENTICO a resolve_basic_attack (logo abaixo). Mantido em sincronia.
     const int raw = std::max(combat_constants::kMinDamage, attacker.atk() - target.def());
+    // Free-Order (Hayek, item 7): MESMO gemeo preview<->real que o Quantum-Lock/Planck -
+    // le o ledger CORRENTE (round_actions_), sem mutar nada (contrato PURO deste metodo).
+    const HayekBonus hayek =
+        hayek_bonus_for(attacker.is_player_side(), queue_.order(), card_registry_, round_actions_);
+    const int boosted =
+        static_cast<int>(std::lround(static_cast<float>(raw) * hayek.mult_damage()));
     // Absorcao de Shield espelhada de CombatActor::absorb_with_shield, SEM mutar (helper
     // compartilhado com estimate_card_damage, ver namespace anonimo acima).
-    return shield_absorbed_loss(raw, target);
+    return shield_absorbed_loss(boosted, target);
 }
 
 CardDamageEstimate CombatStateMachine::estimate_card_damage(
@@ -803,20 +964,29 @@ CardDamageEstimate CombatStateMachine::estimate_card_damage(
 
     const float mult_ambiente = mult_ambiente_for(card.family);
 
-    // 1. Cadeia divisiva IDENTICA a resolve_use_card (secao 11).
+    // Free-Order (Hayek, item 7): MESMO gemeo preview<->real que o Quantum-Lock/Planck - le
+    // o ledger CORRENTE (round_actions_) do lado do ATACANTE, sem mutar nada.
+    const HayekBonus hayek =
+        hayek_bonus_for(attacker.is_player_side(), queue_.order(), card_registry_, round_actions_);
+
+    // 1. Cadeia divisiva IDENTICA a resolve_use_card (secao 11). mult_hayek e o ULTIMO fator
+    //    (Free-Order, item 7) - substitui mult_ambiente como ultimo da cadeia.
     const float base_damage =
         static_cast<float>(card.power + attacker.atk()) *
         (100.0f / (100.0f + static_cast<float>(target.def()))) * est.mult_fraqueza *
-        mult_mod * mult_combo * mult_expose * mult_disrupt * mult_ambiente;
+        mult_mod * mult_combo * mult_expose * mult_disrupt * mult_ambiente * hayek.mult_damage();
 
     // 2. Variancia Knowledge (secao 11), IDENTICA: v = max(0.05, 0.30*exp(-kills*0.10)).
     const int kills = target.knowledge_kills();
     const float v = std::max(0.05f, 0.30f * std::exp(-static_cast<float>(kills) * 0.10f));
 
     // 3. Chances dos canais (secao 11): formulas deterministicas sobre kills/CritChance -
-    //    ZERO consumo de RNG (o sorteio de canal so acontece em resolve_use_card).
-    est.fumble_chance_pct =
-        static_cast<int>(std::lround(5.0 * std::exp(-static_cast<double>(kills) * 0.50)));
+    //    ZERO consumo de RNG (o sorteio de canal so acontece em resolve_use_card). Free-
+    //    Order (item 7): desconta hayek.fumble_reduction_pp do LIMIAR (piso 0) - nao mexe
+    //    na contagem de RNG (o motor continua sorteando 1 unico canal, so o limiar muda).
+    est.fumble_chance_pct = std::max(
+        0, static_cast<int>(std::lround(5.0 * std::exp(-static_cast<double>(kills) * 0.50))) -
+               hayek.fumble_reduction_pp);
     est.crit_chance_pct = std::max(5, card.crit_chance);
 
     // 4. Faixa do canal COMUM: r=0 (piso) e r=1 (teto), MESMO helper comum_channel_damage de
@@ -862,7 +1032,15 @@ void CombatStateMachine::resolve_basic_attack(CombatActor& attacker,
     if (target == nullptr)
         throw std::logic_error("Alvo '" + *action.target_id + "' nao esta em combate.");
 
-    const int damage = std::max(combat_constants::kMinDamage, attacker.atk() - target->def());
+    const int raw = std::max(combat_constants::kMinDamage, attacker.atk() - target->def());
+
+    // Free-Order (Hayek, CARD-ENGINE-MANIFESTO item 7, AMB-09): le o ledger da rodada NO
+    // ESTADO PRE-acao (round_actions_ so ganha a entrada desta acao DEPOIS, em
+    // resolve_action - anti auto-inflacao). Ataque basico: lround(raw * mult_hayek).
+    const HayekBonus hayek = hayek_bonus_for(attacker.is_player_side(), queue_.order(),
+                                             card_registry_, round_actions_);
+    const int damage = static_cast<int>(std::lround(static_cast<float>(raw) * hayek.mult_damage()));
+
     // Ataque basico nao tem carta (source_card = nullptr); ainda assim dispara
     // OnDamageDealt das equipadas do atacante e OnDamageReceived das equipadas do alvo
     // (Reflect, secao 20 item 3 - mesmo helper compartilhado de resolve_use_card).
@@ -870,7 +1048,8 @@ void CombatStateMachine::resolve_basic_attack(CombatActor& attacker,
 
     log_.push_back(CombatLogEntry{
         attacker.id(), CombatActionType::Attack, target->id(), damage,
-        attacker.id() + " ataca " + target->id() + " por " + std::to_string(damage) + "."});
+        attacker.id() + " ataca " + target->id() + " por " + std::to_string(damage) + "." +
+            hayek_log_suffix(hayek)});
 
     // RepeatLastAction (ADR-016 secao 20 item 5): grava ao FIM, so quando o hit causou
     // dano>0 (Q2). Uma acao sem dano preserva o registro anterior (ainda valido na rodada).
@@ -1174,6 +1353,13 @@ void CombatStateMachine::resolve_use_card(CombatActor& actor, const CombatAction
         }
     }
 
+    // Free-Order (Hayek, CARD-ENGINE-MANIFESTO item 7, AMB-09): le o ledger da rodada NO
+    // ESTADO PRE-acao (round_actions_ so ganha a entrada desta acao DEPOIS, em
+    // resolve_action - anti auto-inflacao). Calculado 1x pra acao inteira (nao por-alvo): o
+    // lado do atacante nao muda entre alvos de um AoE.
+    const HayekBonus hayek = hayek_bonus_for(actor.is_player_side(), queue_.order(),
+                                             card_registry_, round_actions_);
+
     const std::vector<CombatActor*> targets = resolve_targets(actor, action, card);
 
     // RepeatLastAction (ADR-016 secao 20 item 5): agrega o dano>0 causado a CADA ALVO
@@ -1250,14 +1436,15 @@ void CombatStateMachine::resolve_use_card(CombatActor& actor, const CombatAction
                 mult_expose = 1.0f + static_cast<float>(it->magnitude) / 100.0f;
         }
 
-        // mult_ambiente (secao 18, 11): ULTIMO fator da cadeia divisiva.
+        // mult_ambiente (secao 18, 11): penultimo fator da cadeia divisiva.
         const float mult_ambiente = mult_ambiente_for(card.family);
 
         // 1. Cadeia divisiva (secao 11). danoBase = "range da arma" base, ANTES da variancia.
+        //    mult_hayek (Free-Order, item 7) e o ULTIMO fator da cadeia.
         const float base_damage =
             static_cast<float>(card.power + actor.atk()) *
             (100.0f / (100.0f + static_cast<float>(target->def()))) * mult_fraqueza * mult_mod *
-            mult_combo * mult_expose * mult_disrupt * mult_ambiente;
+            mult_combo * mult_expose * mult_disrupt * mult_ambiente * hayek.mult_damage();
 
         // 2. Curto-circuito de imunidade (secao 11): multFraqueza == 0 => dano 0 ANTES de
         //    qualquer sorteio. NAO consome RNG (determinismo: imune = 0 consumos).
@@ -1281,8 +1468,12 @@ void CombatStateMachine::resolve_use_card(CombatActor& actor, const CombatAction
         // 4. Chances dos canais (secao 11).
         //    fumbleChance = round(5 * exp(-kills * 0.50)); 0 kills = 5%, 5+ kills = 0%.
         //    critChance   = max(5, card.CritChance); piso global de 5%, carta eleva.
-        const int fumble_chance = static_cast<int>(
-            std::lround(5.0 * std::exp(-static_cast<double>(kills) * 0.50)));
+        //    Free-Order (item 7): desconta hayek.fumble_reduction_pp do LIMIAR (piso 0) -
+        //    NAO mexe na contagem de RNG (continua 1 UNICO sorteio de canal, so o limiar).
+        const int fumble_chance = std::max(
+            0, static_cast<int>(
+                   std::lround(5.0 * std::exp(-static_cast<double>(kills) * 0.50))) -
+                   hayek.fumble_reduction_pp);
         const int crit_chance = std::max(5, card.crit_chance);
 
         // 5. UM sorteio de canal (secao 11): consome rng.next(100) UMA vez.
@@ -1334,7 +1525,7 @@ void CombatStateMachine::resolve_use_card(CombatActor& actor, const CombatAction
         log_.push_back(CombatLogEntry{
             actor.id(), CombatActionType::UseCard, target->id(), damage,
             actor.id() + " compila " + card.id + " em " + target->id() + " por " +
-                std::to_string(damage) + "." + channel_suffix});
+                std::to_string(damage) + "." + channel_suffix + hayek_log_suffix(hayek)});
 
         // RepeatLastAction (ADR-016 secao 20 item 5, Q2): so agrega hits com dano>0
         // (FALHA/imune ja usaram `continue`/ficam em 0, nao chegam aqui com damage>0).

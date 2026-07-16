@@ -459,6 +459,20 @@ void handle_damage_quantize(const EffectSpec&, const Card&, TechMagicContext&) {
     // No-op deliberado: ver comentario acima.
 }
 
+// DiversityBonus (Hayek/Free-Order, CARD-ENGINE-MANIFESTO item 7, AMB-09): MARCADOR no-op
+// deliberado, MESMO padrao de handle_damage_quantize acima. O bonus de ordem espontanea NAO
+// passa por este dispatcher - o resolvedor (combat_state_machine.cpp::resolve_use_card/
+// resolve_basic_attack) e o preview PURO (estimate_card_damage/preview_basic_attack_damage)
+// leem os EffectSpec (um por DEGRAU de assinaturas distintas) DIRETO via
+// combat_state_machine.cpp::diversity_spec_of, plugando na cadeia divisiva (secao 11) e no
+// limiar do canal FALHA. A carta e Passiva (nunca jogada via UseCard) - execute_equipped
+// NUNCA despacha OnCast pra ela (so Always/OnDamageDealt/OnDamageReceived/OnRoundEnd/
+// OnAllyTurnEnd); na pratica este handler nunca roda, existe so pra satisfazer o invariante
+// fail-fast "EffectKind sem handler = bug" (techmagic.hpp) sem lancar.
+void handle_diversity_bonus(const EffectSpec&, const Card&, TechMagicContext&) {
+    // No-op deliberado: ver comentario acima.
+}
+
 // RevealIntent (OnCast, John Dee/Black-Mirror; ADR-016 step 8, manifesto item 6; decisoes
 // D1-D4 do lider 2026-07-15): aplica o buff Scrying no PROPRIO caster via add_status
 // LEGADO (NAO try_add_status - e um buff auto-aplicado, nao um debuff ofensivo em outro
@@ -596,13 +610,17 @@ void execute(TriggerHook hook, const Card& card, TechMagicContext& ctx) {
             case EffectKind::RevealIntent:
                 handle_reveal_intent(spec, card, ctx);
                 break;
+            case EffectKind::DiversityBonus:
+                handle_diversity_bonus(spec, card, ctx);
+                break;
             case EffectKind::CloneAlly:
             default:
                 throw std::logic_error(
                     "techMagic: EffectKind sem handler implementado na carta '" + card.id +
-                    "' (steps 2-3-5-6-7-8 + manifesto5 cobrem ApplyStatus/Leech/Reflect/"
-                    "HypotenuseCombo/RepeatLastAction/ChainDamage/DelayAction/"
-                    "DamageQuantize/RevealIntent; CloneAlly e step futuro, ADR-016).");
+                    "' (steps 2-3-5-6-7-8 + manifesto5-6 + CARD-ENGINE-MANIFESTO item 7 cobrem "
+                    "ApplyStatus/Leech/Reflect/HypotenuseCombo/RepeatLastAction/ChainDamage/"
+                    "DelayAction/DamageQuantize/RevealIntent/DiversityBonus; CloneAlly e step "
+                    "futuro, ADR-016).");
         }
     }
 }

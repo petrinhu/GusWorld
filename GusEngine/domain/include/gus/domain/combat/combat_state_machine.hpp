@@ -170,6 +170,15 @@ public:
         return last_action_;
     }
 
+    // Ledger de ACOES da RODADA CORRENTE (CARD-ENGINE-MANIFESTO item 7, Hayek/Free-Order,
+    // EffectKind::DiversityBonus; AMB-09): observabilidade de teste. Granularidade de ACAO
+    // (populado em resolve_action, 1 entrada por acao despachada - NAO por hit), primo do
+    // round_hits() acima. Limpo na MESMA fronteira que round_hits_/last_action_
+    // (process_round_end_hooks). Ver techMagic::RoundActionEntry.
+    [[nodiscard]] const std::vector<techMagic::RoundActionEntry>& round_actions() const noexcept {
+        return round_actions_;
+    }
+
     // Ultimo IntentPreview lido por Gambito-Prever (secao 12). nullopt antes do 1o uso.
     [[nodiscard]] const std::optional<IntentPreview>& last_prediction() const noexcept {
         return last_prediction_;
@@ -421,6 +430,12 @@ private:
     // resolve_use_card (so quando ha hit>0, ver last_action() acima), limpo em
     // process_round_end_hooks junto do round_hits_.
     techMagic::LastActionRecord last_action_;
+
+    // Ledger de ACOES DA RODADA CORRENTE (CARD-ENGINE-MANIFESTO item 7, Hayek/Free-Order):
+    // acumulado em resolve_action, DEPOIS do bonus da acao corrente ja ter sido calculado
+    // (anti auto-inflacao - ver combat_state_machine.cpp namespace anonimo), limpo em
+    // process_round_end_hooks junto do round_hits_/last_action_. Ver round_actions() acima.
+    std::vector<techMagic::RoundActionEntry> round_actions_;
 
     std::vector<CombatLogEntry> log_;
     std::vector<StatusEffectChange> status_changes_;
