@@ -16,6 +16,15 @@ Cada ator compete no relógio individualmente (intercalação real entre os dois
 - Redes de segurança já-existentes que continuam valendo: Análise Preditiva 1×/batalha (absorve golpe fatal, qualquer estilo), Gambito-Reordenar 2 AP (já força mudança de alvo do inimigo, `combat.md §12`), escalonamento de letalidade por MODOS-MORTE.
 - _(Rejeitado: Arceus puro sem proteção — reabre o "preso sem jogar" + ameaça o Gus. Rejeitado: conservador puro — não entrega o dinamismo que o Gus pediu.)_
 
+### Comando da party (decisão do líder 2026-07-16): escolher entre os PRONTOS + segurar
+O relógio decide QUANDO cada membro fica pronto (não é mais o free-order do 1B). Quando 1+ membro da party está pronto, o jogador **escolhe qual joga** (ação + alvo) e **pode SEGURAR** um membro pronto pra sequenciar (esperar outro ficar pronto e decidir a ordem dos dois). O jogador **sempre escolhe o ALVO** da ação (single/AoE) — isso é ortogonal ao motor e nunca muda. O que se perde vs 1B: forçar um membro a agir ANTES do relógio dele deixar. _(Rejeitado: "banco" total de turnos = afrouxa a pressão do relógio; mínimo sem-segurar = menos controle de ordem.)_
+
+### Indicador de prontidão — barra de carga + LED sobre a cabeça (decisão do líder 2026-07-16, camada de UI/battle-screen)
+Cada personagem exibe, **sobre a cabeça**, uma **barra de carga** (fração = quanto falta pro `next_action_at`, lida direto do action-clock — dado nativo, sem sistema novo) com um **LED na ponta direita da barra**:
+- **PRONTO (pode ser escolhido):** LED **verde vivo**, aceso, leve glow.
+- **CARREGANDO:** LED **verde escuro** (apagado) + um **pontinho branco** de brilho especular (parece LED físico desligado pegando luz ambiente).
+Ancorado na posição do personagem (glintfx/RML ancorado OU host-drawn na cena). É a leitura "quem posso escolher AGORA" por-personagem; complementa a fila/clock visível (`battle-screen.md D4`). Entra no **cutover/battle-screen** (o build isolado do ActionClock é só lógica). Viável: confirmado.
+
 ## Arquitetura
 
 ```
