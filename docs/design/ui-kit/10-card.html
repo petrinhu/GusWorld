@@ -1,0 +1,41 @@
+<!-- @dsCard group="Components" -->
+<!doctype html>
+<html lang="pt-br"><head><meta charset="utf-8"><title>GusWorld UI :: Card</title>
+<style>
+  :root{--panel2:#111a26;--line:#1d2c3d;--cyan:#3ad0e0;--cyan-dim:#1c6b74;--ink:#c9d6e2;--ink-dim:#6d8299;--green:#5fe08a;--violet:#a06be0;
+    --fam-eletrico:#3ad0e0;--fam-termico:#e0703a;--fam-grupo:#e0c93a;--fam-bio:#5fe08a;--fam-anomalia:#a06be0}
+  body{margin:0;background:#080b11;color:var(--ink);font-family:"PixelOperatorMono","DejaVu Sans Mono",ui-monospace,monospace;padding:18px}
+  h2{color:var(--cyan);font-size:11px;letter-spacing:1.5px;text-transform:uppercase;margin:0 0 12px}
+  .grid{display:grid;grid-template-columns:repeat(3,220px);gap:10px}
+  .card{border:1px solid var(--line);background:linear-gradient(180deg,var(--panel2),#0a1017);border-radius:3px;padding:9px 10px;position:relative;overflow:hidden}
+  .card::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--fam,#555)}
+  .card.eletrico{--fam:var(--fam-eletrico)}.card.termico{--fam:var(--fam-termico)}.card.grupo{--fam:var(--fam-grupo)}.card.bio{--fam:var(--fam-bio)}.card.anom{--fam:var(--fam-anomalia)}
+  .card.special{--fam:var(--violet);border-color:#3a2550;background:linear-gradient(180deg,#160c22,#0a0713)}
+  .nm{display:flex;align-items:center;gap:6px;font-weight:bold}
+  .special .nm{color:#d9b8ff}
+  .mana{margin-left:auto;color:var(--cyan);border:1px solid var(--cyan-dim);border-radius:50%;width:21px;height:21px;display:grid;place-items:center;font-size:12px;background:#04141a}
+  .special .mana{color:#d9b8ff;border-color:#5a3a80;background:#160c22}
+  .fx{color:var(--ink-dim);font-size:11.5px;margin-top:4px;line-height:1.35}
+  .tag{position:absolute;right:7px;bottom:6px;font-size:9.5px;color:var(--ink-dim);letter-spacing:.5px}
+  .special .tag{color:#8a6bb0}
+  .card.inhand{opacity:.42}
+  .card.inhand .nm::after{content:" [na mao]";color:var(--green);font-weight:normal;font-size:10px}
+  .card.sel{box-shadow:0 0 0 1px var(--cyan),0 0 12px rgba(58,208,224,.3);border-color:var(--cyan)}
+  .note{color:var(--ink-dim);font-size:11px;margin:16px 0 6px}
+</style></head>
+<body>
+  <h2>Card :: comum</h2>
+  <div class="grid">
+    <div class="card eletrico"><div class="nm">Descarga.exe<span class="mana">1</span></div><div class="fx">dano eletrico simples</div><div class="tag">COMUM</div></div>
+    <div class="card grupo sel"><div class="nm">Broadcast.sh<span class="mana">3</span></div><div class="fx">dano em area, todos os alvos</div><div class="tag">COMUM · selecionada</div></div>
+    <div class="card bio inhand"><div class="nm">Patch-Vida<span class="mana">2</span></div><div class="fx">cura HP de 1 aliado</div><div class="tag">COMUM</div></div>
+  </div>
+  <div class="note">Estados: normal / selecionada (foco de teclado-gamepad) / [na mao] (esmaecida = ja no loadout; a mao e uma SELECAO, nao copia).</div>
+
+  <h2 style="margin-top:18px">Card :: especial (so Gus)</h2>
+  <div class="grid">
+    <div class="card special"><div class="nm">Tesla<span class="mana">8</span></div><div class="fx">cadeia eletrica que salta entre inimigos (1x/batalha)</div><div class="tag">ESPECIAL</div></div>
+    <div class="card special"><div class="nm">Einstein<span class="mana">6</span></div><div class="fx">dilata o tempo: empurra 1 inimigo na fila</div><div class="tag">ESPECIAL</div></div>
+    <div class="card special"><div class="nm">John Dee<span class="mana">6</span></div><div class="fx">preve o proximo golpe de todos os inimigos</div><div class="tag">ESPECIAL</div></div>
+  </div>
+</body></html>

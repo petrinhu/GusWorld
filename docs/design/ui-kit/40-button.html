@@ -1,0 +1,28 @@
+<!-- @dsCard group="Components" -->
+<!doctype html>
+<html lang="pt-br"><head><meta charset="utf-8"><title>GusWorld UI :: Botao</title>
+<style>
+  :root{--cyan:#3ad0e0;--cyan-dim:#1c6b74;--amber:#e0a53a;--ink-dim:#6d8299}
+  body{margin:0;background:#080b11;color:#c9d6e2;font-family:"PixelOperatorMono","DejaVu Sans Mono",ui-monospace,monospace;padding:18px}
+  h2{color:var(--cyan);font-size:11px;letter-spacing:1.5px;text-transform:uppercase;margin:0 0 12px}
+  .row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+  .btn{font-family:inherit;font-size:12px;padding:7px 14px;border:1px solid var(--cyan-dim);background:#08151a;color:var(--cyan);border-radius:2px}
+  .btn.focus{box-shadow:0 0 0 1px var(--cyan),0 0 12px rgba(58,208,224,.35);border-color:var(--cyan)}
+  .btn.warn{border-color:#5a3a1a;background:#160f05;color:var(--amber)}
+  .btn.ghost{border-color:#26384a;background:transparent;color:var(--ink-dim)}
+  .btn.disabled{opacity:.4}
+  .note{color:var(--ink-dim);font-size:11px}
+  .k{color:var(--cyan)}
+</style></head>
+<body>
+  <h2>Botao :: variantes</h2>
+  <div class="row">
+    <span class="btn">Confirmar mao</span>
+    <span class="btn focus">Confirmar mao (foco)</span>
+    <span class="btn warn">Upload ao commons: +3 creditos</span>
+    <span class="btn ghost">Comerciar</span>
+    <span class="btn disabled">Indisponivel</span>
+  </div>
+  <h2>Dica de tecla (rodape)</h2>
+  <div class="note"><span class="k">[A]</span> confirmar &nbsp; <span class="k">[X]</span> deck morto &nbsp; <span class="k">[U]</span> upload &nbsp; <span class="k">[B]</span> voltar</div>
+</body></html>
