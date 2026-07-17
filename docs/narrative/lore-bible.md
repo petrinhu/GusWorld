@@ -68,7 +68,7 @@ A reconstrução. Há cerca de 150 anos antes do jogo, a civilização atual eme
 - Outras linguagens surgiram em paralelo:
   - **Asmódico** (Bento): analógico, herdado das catedrais Neo-Sylvania, executado em relojoaria e ressonância acústica.
   - **Óxido** (Iara, Linda): linguagem de baixo nível voltada a segurança e precisão; quase ilegível para iniciantes mas indestrutível em runtime.
-  - **Pythia** (Cauã, Jaci): linguagem de scripting rápido, interpretada, ideal para protótipos e bio-hacking. Compila menos, escreve mais.
+  - **Pythia** (Cauã, Jaci): linguagem rápida de escrever, interpretada, ideal para protótipos e bio-hacking. Compila menos, escreve mais (escreve rápido, roda devagar: o trade honesto).
 - A **Federação Industrial de Reciclagem** (FIR) emergiu nesse período como esforço cooperativo de aproveitamento de hardware antigo. Vermelha de boa-fé no começo. Capturada por interesses corporativos depois.
 - Cidades cresceram em torno dos sítios Neo-Sylvania melhor preservados. **GusWorld City** é a maior dessas cidades; outras três grandes existem nesta região do mundo (ver §10).
 - Tom geral da Era 2: pragmatismo cooperativo, código aberto, conhecimento compartilhado. O **Tomo da Pilha Sobrecarregada** (referenciado em `comic-reliefs.md` cena 7) data dessa era: documentação coletiva de soluções, mantida por séculos.
@@ -280,7 +280,7 @@ Asmódico é **a linguagem analógica de Neo-Sylvania**. Roda em relojoaria de l
 - Não usa Tavus-Drive nem tokens digitais.
 - Tem **slots fixos**: 5-6 habilidades em rotação mecânica, ativadas por engrenagens do escudo-catedral.
 - Cada habilidade tem ciclo próprio (cronômetro físico no peitoral; ver spec Bento).
-- Não é flexível como C-Arcane. É **previsível, lento e firme**.
+- Não é flexível como C-Arcane. É **previsível, rígido e firme**.
 
 **Justificativa de pillar:** relógio mecânico é state machine, só substrato diferente. Asmódico segue Pillar 2 ("sistema formal computável"); apenas opera em latão e mola em vez de silício. Drama interno party: Asmódico é tese rival ao C-Arcane do Gus. Atrito narrativo (ver `comic-reliefs.md` cena 2, "Tabulações vs Espaços" e cena 8, "Comentários em Latim").
 

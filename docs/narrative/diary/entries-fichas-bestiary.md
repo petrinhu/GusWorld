@@ -77,7 +77,7 @@ Cada companion tem ficha com 3 estados de Knowledge canônicos:
 | Nome canônico | Cauã Berenger |
 | Apelido | "Volt" |
 | Idade | 13 |
-| Linguagem-âncora | **Pythia** (scripting rápido, interpretado) |
+| Linguagem-âncora | **Pythia** (rápida de escrever, interpretada) |
 | Facção home | Dutos Infernais (comunidade descentralizada juvenil) |
 | Setting home | [[04-dutos-infernais|Dutos Infernais]] (QG Runners, Pilar Era 1) |
 | Role mecânico | Striker (DPS elétrico) |

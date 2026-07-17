@@ -2,7 +2,7 @@
 
 > **Status:** Canônico. Revisão 1 (2026-05-15). Refatorado a partir de `party.md`.
 >
-> **Idade:** 13. **Role mecânico:** Striker (EMP cinético, acumula energia por movimento e descarrega pulso eletromagnético). **Linguagem-âncora:** **Pythia** (scripting rápido).
+> **Idade:** 13. **Role mecânico:** Striker (EMP cinético, acumula energia por movimento e descarrega pulso eletromagnético). **Linguagem-âncora:** **Pythia** (rápida de escrever).
 >
 > **Cross-ref:** spec mestre `Resources/gusworld/character-spec-caua-volt.md` · facção `factions.md` (Dutos Infernais, comunidade jovem) · setting `lore-bible.md` (Dutos Infernais).
 >

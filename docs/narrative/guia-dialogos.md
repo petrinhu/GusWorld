@@ -46,7 +46,7 @@ Elementos que constroem voz distinta:
 **Aplicação GusWorld: a "linguagem-âncora" já é a ferramenta de voz pronta.** Cada companion defende uma linguagem de programação in-world (C-Arcane/Asmódico/Óxido/Pythia, ver `docs/narrative/characters/party.md`) como parte da personalidade. Isso não é só lore de sistema de magia, é uma fonte primária de voz de diálogo:
 
   - **Bento (Asmódico, tradição/latim litúrgico):** fala mais formal, cadenciada, referências a "pureza" e "regra".
-  - **Cauã e Jaci (Pythia, "perdão de erros", scripting rápido):** fala mais solta, tolerante a gafe própria, calorosa.
+  - **Cauã e Jaci (Pythia, "perdão de erros", rápida de escrever):** fala mais solta, tolerante a gafe própria, calorosa.
   - **Iara e Linda (Óxido, elegância opaca, "três bits decidem"):** fala mais econômica, cortada, deliberadamente ambígua.
   - **Gus (C-Arcane, baixo-nível mas legível):** fala que busca clareza mesmo quando o assunto é complexo; ele traduz em vez de mistificar.
   - **Dante (Asmódico fake, C-Arcane tardio):** a fala dele deve soar como um Bento levemente errado (o "sotaque" está quase certo, mas não é autêntico), isso é uma pista de personagem plantada em superfície de voz, não só em plot.

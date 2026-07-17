@@ -81,7 +81,7 @@
 | **C-Arcane** | Gus (vence climax) | Baixo-nível MAS legível. Equilíbrio supremo. Honra substrato. |
 | **Asmódico** | Bento, Dante (aparente) | Pureza ancestral, tabulação obrigatória, latim litúrgico, venera histórico. |
 | **Óxido** | Iara, Linda | Segurança opaca, três bits decidem, elegância arquitetural. |
-| **Pythia** | Cauã, Jaci | Scripting rápido, perdão de erros, sintaxe limpa, "Pythia te abraça". |
+| **Pythia** | Cauã, Jaci | Rápida de escrever, perdão de erros, sintaxe limpa, "Pythia te abraça". |
 
 Cross-ref: `comic-reliefs.md` (cenas 2, 5, 7, 8, 9, 10).
 

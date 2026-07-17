@@ -215,7 +215,7 @@ VOLUME 1: BÍBLIA WORLDBUILDING
 | 8.5 | C-Arcane (Gus, baixo nível compilado) | `deep/magic/4-linguagens-deep.md` §C-Arcane | ~5k | ~17 | extrair |
 | 8.6 | Asmódico (Bento, analógico Neo-Sylvania) | `4-linguagens-deep.md` §Asmódico | ~5k | ~17 | extrair (cross-ref Era 1 §3) |
 | 8.7 | Óxido (Iara, Linda; alta segurança) | `4-linguagens-deep.md` §Óxido | ~5k | ~17 | extrair |
-| 8.8 | Pythia (Cauã, Jaci; scripting rápido bio-hacking) | `4-linguagens-deep.md` §Pythia | ~5k | ~17 | extrair |
+| 8.8 | Pythia (Cauã, Jaci; rápida de escrever, bio-hacking) | `4-linguagens-deep.md` §Pythia | ~5k | ~17 | extrair |
 | 8.9 | Comparativa cruzada das quatro linguagens (custo, escopo, runtime) | `4-linguagens-deep.md` §comparativa | ~4k | ~13 | extrair |
 
 **Subtotal Cap 8:** ~36k pal / ~121 pp
