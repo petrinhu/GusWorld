@@ -223,6 +223,16 @@ public:
     // negativo e erro de chamador (out_of_range), mesmo padrao de heal/restore_mana.
     void grant_bonus_ap(int amount);
 
+    // ---- Overclock (CARTAS-COMUNS-ENGINE, Eletrico-utilidade "Tavus-Overclock",
+    // 2026-07-16) ----
+
+    // true = este ator JA recarregou recurso (Card::restore_ap/restore_mana) NESTE turno.
+    // Trava 1x/turno (decisao do lider: sem ela vira loop infinito + farm de Mastery) - a
+    // FSM le/marca em resolve_use_card; resetada por refresh_resources_for_turn (mesmo
+    // lugar que zera AP/mana, secao 5).
+    [[nodiscard]] bool overclock_used() const noexcept { return overclock_used_; }
+    void set_overclock_used(bool value) noexcept { overclock_used_ = value; }
+
 private:
     // Drena o pool de Shield contra amount e devolve o dano remanescente pro HP.
     int absorb_with_shield(int amount);
@@ -273,6 +283,9 @@ private:
     // Tag "comando central" (Mises/Calc-Edge, CARD-ENGINE-MANIFESTO item 9). Default false;
     // ver central_command()/set_central_command() acima.
     bool central_command_ = false;
+    // Trava 1x/turno do Overclock (CARTAS-COMUNS-ENGINE). Default false; ver
+    // overclock_used()/set_overclock_used() acima.
+    bool overclock_used_ = false;
 };
 
 }  // namespace gus::domain::combat

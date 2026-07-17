@@ -191,6 +191,9 @@ void CombatActor::refresh_resources_for_turn(int round_index) {
     max_mana_ = std::min(combat_constants::kManaCap,
                          combat_constants::kBaseMana + std::max(0, round_index));
     mana_ = max_mana_;  // recarrega ao maximo, sem banking
+    // Overclock (CARTAS-COMUNS-ENGINE): trava 1x/turno reseta no MESMO TurnStart que zera
+    // AP/mana (secao 5) - o Tavus-Overclock volta a funcionar todo turno novo.
+    overclock_used_ = false;
 }
 
 void CombatActor::spend_ap(int cost) {

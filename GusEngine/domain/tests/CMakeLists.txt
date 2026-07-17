@@ -220,6 +220,14 @@ add_executable(gusengine_domain_tests
     # realoca o buffer ANTES de ler o card_id - crashavam pre-fix, passam pos-fix (copia
     # estavel do card_id + reancoragem do iterador antes do erase).
     deck_tier_callback_lifetime_test.cpp
+    # CARTAS-COMUNS-ENGINE (TODO.md, decisoes do lider 2026-07-16): 2 pecas de engine pras
+    # cartas COMUNS (record-base secao 7 + formula divisiva secao 11, ZERO EffectKind/
+    # StatusId novo - NAO toca o executor techMagic/ADR-016). PECA 1 SynergyStatus
+    # (Finalizador Opcao A, generaliza mult_expose pra qualquer StatusId, +40% fixo sem
+    # stack, gemeo preview<->real, paridade com Planck/Quantum-Lock). PECA 2 recarga de
+    # AP/mana (Eletrico-utilidade "Tavus-Overclock", trava 1x/turno resetada no refresh de
+    # TurnStart, custo sempre pago antes, Silence bloqueia).
+    cartas_comuns_engine_test.cpp
 )
 
 # Os testes do combate incluem helpers de teste headers-only (fixed_random.hpp).

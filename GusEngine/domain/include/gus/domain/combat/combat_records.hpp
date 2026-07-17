@@ -89,6 +89,31 @@ struct Card {
     bool ignores_weakness_wheel = false;  // trunfo fora-da-roda (Godel); resolvedor liga depois
     bool is_universal_compiler = false;   // flag de trunfo ADR-016; record-only neste step
 
+    // ---- CARTAS-COMUNS-ENGINE (TODO.md, decisoes do lider 2026-07-16): 2 pecas de engine
+    // pequenas pras COMUNS (NAO tocam o executor techMagic/EffectKind; ADR-016 continua so
+    // ESPECIAL/SUPER). Campos ADITIVOS ao fim do struct, default neutro preserva TODA carta/
+    // teste existente intacta.
+
+    // SynergyStatus (Finalizador Opcao A): generaliza o multExpose (secao 9/11, que so cobre
+    // Expose) pra QUALQUER StatusId. Vazio = sem sinergia (comportamento atual). Se >=1 dos
+    // status listados aqui esta presente no ALVO, aplica o fator FIXO synergy_percent - NAO
+    // stacka por-status-presente (2+ status da lista no alvo = MESMO fator, e binario
+    // presente/ausente). Ver combat_state_machine.cpp::resolve_use_card/estimate_card_damage
+    // (mult_synergy, mesmo padrao ordinal do mult_expose).
+    std::vector<StatusId> synergy_statuses;
+    // Percentual do bonus multiplicativo quando a sinergia dispara (40 = +40%, mesma forma
+    // de StatusEffect::magnitude do Expose). 0 = sem bonus (default neutro). Data-driven
+    // por-carta: a logica do resolvedor NUNCA hardcoda 40 (a carta e quem carrega o numero).
+    int synergy_percent = 0;
+
+    // Recarga de recurso (Eletrico-utilidade "Tavus-Overclock"): ao ser jogada, concede
+    // grant_bonus_ap(restore_ap) + restore_mana(restore_mana) ao PROPRIO conjurador, apos o
+    // custo de mana ja ter sido pago. Sujeito a trava 1x/turno (CombatActor::overclock_used_,
+    // resetada no refresh de TurnStart). 0/0 = sem recarga (default neutro, toda carta
+    // existente intocada). Ver resolve_use_card.
+    int restore_ap = 0;
+    int restore_mana = 0;
+
     [[nodiscard]] bool operator==(const Card&) const = default;
 };
 

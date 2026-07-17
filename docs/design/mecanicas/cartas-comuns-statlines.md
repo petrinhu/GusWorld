@@ -96,5 +96,11 @@ Amarração FECHADA (ver `combat-flavor.md §2`): **velocidade = propriedade da 
 
 ## Pendências
 - **Naming** das 30 (narrative-writer; voz do mundo; líder lê antes de aprovar) — cruza com a frente LINGUAGENS-COMICAS-DISPUTAS (Pythia/Óxido/Asmódico/C-Arcane).
-- **Engine:** CARTAS-COMUNS-ENGINE = SynergyStatus (Finalizador Opção A) + recarga-de-recurso (Elétrico-utilidade). Ambos pré-req da impl das comuns.
 - **Frases pedagógicas** por carta (didática) + VFX — dentro de CARTAS-PRODUCAO.
+
+## Engine (CARTAS-COMUNS-ENGINE — FEITO 2026-07-16, `backend-engineer`, TDD + gêmeo preview<->real)
+
+- **SynergyStatus (Finalizador Opção A):** `Card::synergy_statuses`/`synergy_percent` generaliza o `multExpose` (`combat.md` §9/§11) pra qualquer `StatusId`; +40% fixo (`//PLAYTEST`, data-driven, sem hardcode) quando ≥1 status da lista está presente no alvo, sem stack por-status. Wired em `resolve_use_card`/`estimate_card_damage` (`GusEngine/domain/src/combat/combat_state_machine.cpp`), campos em `Card` (`GusEngine/domain/include/gus/domain/combat/combat_records.hpp`). Log diegético `[SINERGIA: alvo vulnerável, dano +N%]`. Paridade verificada com Quantum-Lock/Planck (degraus sobre a base já amplificada).
+- **Recarga de AP/mana (Elétrico-utilidade "Tavus-Overclock"):** `Card::restore_ap`/`restore_mana`; trava 1×/turno (`CombatActor::overclock_used()`, resetada no refresh de `TurnStart`, `GusEngine/domain/src/combat/combat_actor.cpp`); custo sempre pago antes; Silence bloqueia; log de sucesso e de bloqueio.
+- Testes: `GusEngine/domain/tests/cartas_comuns_engine_test.cpp` (16 casos, 51 assertions) — sinergia (dispara/ausente/não-stack/gêmeo extremos/gêmeo crítico/contagem RNG/interação Planck/log), recarga (persistência do bônus de AP/clamp de mana/reset da trava/1ª e 2ª jogada/reset no turno seguinte/custo pago antes/Silence).
+- Status: 🔍 Pendente verificação (item CARTAS-COMUNS-ENGINE do TODO.md). Pré-requisito da impl das 30 comuns (CARTAS-PRODUCAO) cumprido.

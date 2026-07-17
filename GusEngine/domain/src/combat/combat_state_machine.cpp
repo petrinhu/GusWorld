@@ -1125,6 +1125,26 @@ CardDamageEstimate CombatStateMachine::estimate_card_damage(
         }
     }
 
+    // SynergyStatus (CARTAS-COMUNS-ENGINE, Finalizador Opcao A, 2026-07-16): generaliza o
+    // multExpose acima pra QUALQUER StatusId listado em card.synergy_statuses. LE o status
+    // do ALVO (mesmo padrao do mult_expose - nao muta, nao consome). Fator FIXO
+    // card.synergy_percent se >=1 status da lista esta presente; NAO stacka por-status
+    // (2+ presentes = mesmo fator). Vazio (comuns sem Finalizador) = 1.0, sem custo.
+    float mult_synergy = 1.0f;
+    if (!card.synergy_statuses.empty()) {
+        const auto& target_effects = target.status_effects();
+        const bool has_synergy = std::any_of(
+            card.synergy_statuses.begin(), card.synergy_statuses.end(),
+            [&target_effects](StatusId synergy_id) {
+                return std::any_of(target_effects.begin(), target_effects.end(),
+                                   [synergy_id](const StatusEffect& s) {
+                                       return s.id == synergy_id;
+                                   });
+            });
+        if (has_synergy)
+            mult_synergy = 1.0f + static_cast<float>(card.synergy_percent) / 100.0f;
+    }
+
     // Disrupt (secao 9/11): LE o status do ATACANTE. resolve_use_card so CONSOME (remove) o
     // Disrupt na resolucao real de fato jogada; o preview apenas LE o multiplicador vigente,
     // sem remove_status - nao muta nada (contrato PURO deste metodo).
@@ -1154,7 +1174,7 @@ CardDamageEstimate CombatStateMachine::estimate_card_damage(
     const float base_damage =
         static_cast<float>(card.power + attacker.atk()) *
         (100.0f / (100.0f + static_cast<float>(target.def()))) * est.mult_fraqueza *
-        mult_mod * mult_combo * mult_expose * mult_disrupt * mult_ambiente *
+        mult_mod * mult_combo * mult_expose * mult_synergy * mult_disrupt * mult_ambiente *
         hayek.mult_damage() * mult_mises;
 
     // 2. Variancia Knowledge (secao 11), IDENTICA: v = max(0.05, 0.30*exp(-kills*0.10)).
@@ -1526,6 +1546,30 @@ void CombatStateMachine::resolve_use_card(CombatActor& actor, const CombatAction
     }
     actor.spend_mana(card.mana_cost + mana_extra);
 
+    // Recarga de recurso (CARTAS-COMUNS-ENGINE, Eletrico-utilidade "Tavus-Overclock",
+    // 2026-07-16): DEPOIS do custo pago acima (anti-exploit de mana insuficiente - o custo
+    // sempre sai primeiro, a recarga nunca "paga a si mesma"). Trava 1x/turno
+    // (CombatActor::overclock_used_, decisao do lider: sem ela vira loop infinito + farm de
+    // Mastery); comuns sem restore_ap/restore_mana (0/0, default) nao entram aqui - custo
+    // zero pra toda carta existente. Todo efeito loga (regra do lider), inclusive o bloqueio.
+    if (card.restore_ap > 0 || card.restore_mana > 0) {
+        if (!actor.overclock_used()) {
+            actor.grant_bonus_ap(card.restore_ap);
+            actor.restore_mana(card.restore_mana);
+            actor.set_overclock_used(true);
+            log_.push_back(CombatLogEntry{
+                actor.id(), CombatActionType::UseCard, std::nullopt, 0,
+                actor.id() + " tavus-overclock " + card.id + ": +" +
+                    std::to_string(card.restore_ap) + " AP, +" +
+                    std::to_string(card.restore_mana) + " mana."});
+        } else {
+            log_.push_back(CombatLogEntry{
+                actor.id(), CombatActionType::UseCard, std::nullopt, 0,
+                actor.id() + " tavus-overclock " + card.id +
+                    ": ja recarregado nesta rodada (1x por turno) - recarga bloqueada."});
+        }
+    }
+
     // Pipeline de 1 slot (carta) + modificador -> casamento de combo (secao 10).
     std::vector<PipelineSlot> pipeline = {{PipelineSlotKind::Card, card.id}};
     if (modifier.has_value())
@@ -1646,6 +1690,35 @@ void CombatStateMachine::resolve_use_card(CombatActor& actor, const CombatAction
                 mult_expose = 1.0f + static_cast<float>(it->magnitude) / 100.0f;
         }
 
+        // SynergyStatus (CARTAS-COMUNS-ENGINE, Finalizador Opcao A, 2026-07-16): generaliza
+        // o mult_expose acima pra QUALQUER StatusId listado em card.synergy_statuses. Fator
+        // FIXO card.synergy_percent se >=1 status da lista esta presente no alvo; NAO
+        // stacka por-status (2+ presentes = mesmo fator). MESMA ordem/gemeo de
+        // estimate_card_damage (mult_synergy). Log diegetico so quando dispara (regra
+        // "todo efeito loga no terminal").
+        float mult_synergy = 1.0f;
+        bool synergy_triggered = false;
+        if (!card.synergy_statuses.empty()) {
+            const auto& target_effects = target->status_effects();
+            synergy_triggered = std::any_of(
+                card.synergy_statuses.begin(), card.synergy_statuses.end(),
+                [&target_effects](StatusId synergy_id) {
+                    return std::any_of(target_effects.begin(), target_effects.end(),
+                                       [synergy_id](const StatusEffect& s) {
+                                           return s.id == synergy_id;
+                                       });
+                });
+            if (synergy_triggered)
+                mult_synergy = 1.0f + static_cast<float>(card.synergy_percent) / 100.0f;
+        }
+        // Log diegetico da sinergia (regra "todo efeito loga no terminal"): so quando
+        // dispara (mesmo padrao "" default dos outros sufixos, ex. hayek_log_suffix acima).
+        const std::string synergy_suffix =
+            synergy_triggered
+                ? " [SINERGIA: alvo vulneravel, dano +" + std::to_string(card.synergy_percent) +
+                      "%]"
+                : "";
+
         // mult_ambiente (secao 18, 11): penultimo fator da cadeia divisiva.
         const float mult_ambiente = mult_ambiente_for(card.family);
 
@@ -1656,8 +1729,8 @@ void CombatStateMachine::resolve_use_card(CombatActor& actor, const CombatAction
         const float base_damage =
             static_cast<float>(card.power + actor.atk()) *
             (100.0f / (100.0f + static_cast<float>(target->def()))) * mult_fraqueza * mult_mod *
-            mult_combo * mult_expose * mult_disrupt * mult_ambiente * hayek.mult_damage() *
-            mult_mises;
+            mult_combo * mult_expose * mult_synergy * mult_disrupt * mult_ambiente *
+            hayek.mult_damage() * mult_mises;
 
         // 2. Curto-circuito de imunidade (secao 11): multFraqueza == 0 => dano 0 ANTES de
         //    qualquer sorteio. NAO consome RNG (determinismo: imune = 0 consumos).
@@ -1738,8 +1811,8 @@ void CombatStateMachine::resolve_use_card(CombatActor& actor, const CombatAction
         log_.push_back(CombatLogEntry{
             actor.id(), CombatActionType::UseCard, target->id(), damage,
             actor.id() + " compila " + card.id + " em " + target->id() + " por " +
-                std::to_string(damage) + "." + channel_suffix + hayek_log_suffix(hayek) +
-                mises_aim_log_suffix(actor.central_command(), mises)});
+                std::to_string(damage) + "." + channel_suffix + synergy_suffix +
+                hayek_log_suffix(hayek) + mises_aim_log_suffix(actor.central_command(), mises)});
 
         // RepeatLastAction (ADR-016 secao 20 item 5, Q2): so agrega hits com dano>0
         // (FALHA/imune ja usaram `continue`/ficam em 0, nao chegam aqui com damage>0).

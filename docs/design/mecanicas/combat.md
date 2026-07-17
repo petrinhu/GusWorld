@@ -224,6 +224,12 @@ Dois recursos, propósitos distintos. AP limita **quantas** ações; Mana limita
 
 Modificadores anexados a cartas somam mana (Object +1, Stream +2, Null +1; ver §8).
 
+### Recarga de recurso via carta comum (CARTAS-COMUNS-ENGINE, "Tavus-Overclock", canonizado 2026-07-16)
+
+Elétrico-utilidade (versão forte escolhida pelo líder, não o fallback Haste): carta comum que devolve AP e/ou mana ao próprio conjurador, campos `Card.RestoreAp`/`Card.RestoreMana` (record-base §7, `//PLAYTEST` a carta canônica usa +1 AP / +2 mana). Custo de mana da carta é **sempre pago primeiro** (`spend_mana`), a recarga entra depois — anti-exploit de "a carta paga a si mesma". `RestoreAp` usa a MESMA semântica temporária do bônus de Calc-Edge/Mises (§20 do executor techMagic): não muta `MaxAp`, some no próximo `TurnStart`. `RestoreMana` clampa em `manaMax` (sem overflow).
+
+**Trava 1×/TURNO (decisão do líder):** sem ela, a carta vira loop infinito de AP/mana dentro do mesmo turno + farm degenerado de Mastery (confirmado pelo economy-designer). Flag por-ator (`CombatActor.OverclockUsed`), **resetada no MESMO `TurnStart`** que zera AP/mana (não é 1×/batalha como a Análise Preditiva §2.1 nem as especiais Ativa/Hibrida — é 1× por turno, todo turno). 2ª tentativa no mesmo turno paga o custo normalmente mas NÃO recarrega; loga o bloqueio (regra "todo efeito loga", inclusive quando não faz nada). Silence bloqueia o cast inteiro (gate no topo de `ResolveUseCard`, mesmo padrão de qualquer carta).
+
 ---
 
 ## 6. Famílias de carta e roda de fraqueza
@@ -374,6 +380,20 @@ multExpose = alvoTemExpose ? (1 + Expose.Magnitude / 100) : 1.0
 - Aplica **somente em UseCard**, como último fator da cadeia divisiva (§11). O ataque básico subtrativo `clamp(Atk - Def, 1)` **não** é afetado.
 - Ex: `Expose.Magnitude = 30` → dano de carta ×1.3.
 
+### SynergyStatus (Finalizador-sinérgico, CARTAS-COMUNS-ENGINE, canonizado 2026-07-16)
+
+Generalização de `multExpose` (acima) pra **qualquer** `StatusId`, usada pelas cartas COMUNS finalizadoras (`combat.md` §7, record-base — **não** é `EffectKind` do executor techMagic, ADR-016 continua exclusivo de ESPECIAL/SUPER). Campo `Card.SynergyStatuses` (lista de `StatusId`) + `Card.SynergyPercent` (int, `//PLAYTEST`, a carta canônica usa 40):
+
+```
+multSynergy = (alvo tem >= 1 status de SynergyStatuses) ? (1 + SynergyPercent / 100) : 1.0
+```
+
+- **Fator FIXO, NÃO stacka por-status-presente**: 2 ou mais status da lista presentes no alvo continuam valendo o MESMO `multSynergy` (é binário presente/ausente, não soma por status).
+- Aplica **somente em UseCard**, na MESMA posição ordinal do `multExpose` na cadeia divisiva (§11) — antes do curto-circuito de imunidade e do sorteio de canal. `multFraqueza == 0.0` (imune) tem prioridade absoluta: zera o dano antes de qualquer sorteio, independente de `multSynergy`.
+- Sem RNG consumido pelo próprio fator (é determinístico, igual ao Expose).
+- Log diegético só quando dispara (regra "todo efeito loga"): sufixo `[SINERGIA: alvo vulnerável, dano +N%]`.
+- Exemplo canônico: Tavusa-Fulminante (Elétrico) tem `SynergyStatuses = [Stun]`, `SynergyPercent = 40` → dano ×1.4 contra alvo já Stunado ("execute em alvo travado", `cartas-comuns-statlines.md`).
+
 ---
 
 ## 10. Stack pipeline de 3 slots e combos
@@ -430,9 +450,11 @@ Duas fórmulas distintas: **UseCard é divisiva** (Def reduz por fração, escal
 A variância Knowledge atual É o "range da arma": preservada intacta. Sobre ela roda **um único sorteio de canal** que decide se o golpe é FALHA, CRIT ou COMUM (mutuamente exclusivos).
 
 ```
-// 1. Cadeia divisiva (INALTERADA — nenhum fator novo aqui)
+// 1. Cadeia divisiva (CARTAS-COMUNS-ENGINE 2026-07-16 acrescenta multSynergy, mesma posição
+//    ordinal do multExpose — nenhum OUTRO fator novo aqui)
 multExpose  = alvoTemExpose ? (1 + Expose.Magnitude / 100) : 1.0
-danoBase    = (Power + Atk) × (100 / (100 + Def)) × multFraqueza × multMod × multCombo × multExpose × multAmbiente
+multSynergy = (>=1 status de Card.SynergyStatuses presente no alvo) ? (1 + Card.SynergyPercent / 100) : 1.0
+danoBase    = (Power + Atk) × (100 / (100 + Def)) × multFraqueza × multMod × multCombo × multExpose × multSynergy × multAmbiente
 
 // 2. Curto-circuito de imunidade (ANTES de qualquer sorteio)
 se multFraqueza == 0.0  →  danoFinal = 0  (FIM; nenhum RNG consumido)
@@ -537,6 +559,7 @@ COMUM:  roll2 = rng.Next(0..99)                                  // SUBSTITUI o 
 | `multMod` | modificador aplicado | default 1.0; Stream pode distribuir; valores tabelados |
 | `multCombo` | receita de combo (§10) | default 1.0; >1.0 em combo casado |
 | `multExpose` | status Expose no alvo (§9) | default 1.0; `1 + Expose.Magnitude/100` se Expose presente; só UseCard |
+| `multSynergy` | `Card.SynergyStatuses`/`SynergyPercent` no alvo (§9, CARTAS-COMUNS-ENGINE) | default 1.0; `1 + SynergyPercent/100` se >=1 status da lista presente no alvo; NÃO stacka por-status; só UseCard; mesma posição ordinal do `multExpose` |
 | `multAmbiente` | camadas ambientais ativas (§18) | default 1.0; produto das camadas (terreno+clima+período) por família; só UseCard; nunca toca `multFraqueza`; cap [0.44, 2.25] (canonizado + implementado F2-E.11, ADR-004) |
 | `Def` | atributo do defensor | divisor `100/(100+Def)`; reduzido por Break/Corrode |
 | `kills` (`knowledgeKills`) | `CombatActor.KnowledgeKills` (SaveSystem) | kills do mesmo tipo de inimigo; alimenta o decaimento de variância E de falha |
