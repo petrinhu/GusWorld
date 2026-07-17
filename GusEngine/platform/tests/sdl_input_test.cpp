@@ -174,6 +174,51 @@ TEST_CASE("SdlInput clear solta tudo", "[sdl_input]") {
     REQUIRE(in.run() == false);
 }
 
+// RUN-CAPSLOCK: Caps Lock e ESTADO (nao evento) - set_caps_lock_active() e a porta
+// de injecao headless (o pump_events() real chama o mesmo setter com
+// SDL_GetModState() & SDL_KMOD_CAPS a cada frame, ver sdl_input.cpp). "Enquanto
+// ON, corre" = nao precisa de nenhum process_key.
+TEST_CASE("SdlInput Caps Lock ON ativa run (estado, sem tecla segurada)",
+          "[sdl_input][run-capslock]") {
+    SdlInput in;
+    REQUIRE(in.run() == false);
+    REQUIRE(in.should_run_caps_lock() == false);
+
+    in.set_caps_lock_active(true);
+    REQUIRE(in.run() == true);
+    REQUIRE(in.should_run_caps_lock() == true);
+
+    // Desligar o Caps Lock volta a andar - sem soltar nenhuma tecla.
+    in.set_caps_lock_active(false);
+    REQUIRE(in.run() == false);
+}
+
+// Aditivo: Caps Lock ON + Shift OFF ainda corre; Shift ON + Caps Lock OFF idem -
+// nenhuma fonte desliga a outra (OR puro), igual ao gamepad ja testado acima.
+TEST_CASE("SdlInput Caps Lock e Shift sao fontes independentes de run (OR)",
+          "[sdl_input][run-capslock]") {
+    SdlInput in;
+    in.set_caps_lock_active(true);
+    in.process_key(kSdlLShift, /*pressed=*/false);
+    REQUIRE(in.run() == true);  // so o Caps Lock ja basta
+
+    in.set_caps_lock_active(false);
+    in.process_key(kSdlLShift, /*pressed=*/true);
+    REQUIRE(in.run() == true);  // so o Shift ja basta
+}
+
+// clear() (perder foco) zera o Caps Lock injetado - o pump_events() REAL re-le o
+// estado do SO no proximo frame (nao fica "grudado" nem "vazio" por mais de 1
+// frame); aqui, sem novo pump, fica false ate o proximo set/pump.
+TEST_CASE("SdlInput clear() zera o Caps Lock injetado", "[sdl_input][run-capslock]") {
+    SdlInput in;
+    in.set_caps_lock_active(true);
+    REQUIRE(in.run() == true);
+    in.clear();
+    REQUIRE(in.run() == false);
+    REQUIRE(in.should_run_caps_lock() == false);
+}
+
 // MENU-PAUSA-CONFIG-SOM: consume_escape_pressed() e o gancho da CIDADE pro menu de
 // pausa (Esc == abrir, sem pilha de modais como a batalha). EDGE + consumo: 1
 // press = 1 true, e so 1 - a proxima chamada sem novo press devolve false.

@@ -632,6 +632,64 @@ TEST_CASE("overworld: run move mais que andar", "[overworld]") {
     REQUIRE(run.player().x > walk.player().x);
 }
 
+// RUN-CAPSLOCK (pedido do lider: Caps Lock ON mantem a corrida ativa) - a PARTE
+// PURA do multiplicador, sem SDL/teclado nenhum: step_fixed(run=true) desloca
+// EXATAMENTE tuning.run_multiplier vezes o deslocamento de step_fixed(run=false),
+// no MESMO dt/tick (campo livre, sem colisao). Baseline //PLAYTEST do lider:
+// run_multiplier = 1.6x a velocidade de andar (ele afina o numero depois vendo o
+// display - este teste trava a RELACAO exata pro valor de tuning vigente, nao um
+// numero magico duplicado aqui).
+TEST_CASE("overworld: run desloca EXATAMENTE run_multiplier x o walk no mesmo tick",
+          "[overworld][run-capslock]") {
+    TileGrid g = make_map();
+    OverworldTuning t;
+    t.walk_speed_tiles_per_sec = 4.0f;
+    REQUIRE(t.run_multiplier > 1.0f);  // trava a premissa: correr e SEMPRE mais rapido
+
+    OverworldSim walk(g, Aabb{16.0f, 16.0f, 8.0f, 8.0f}, t);
+    OverworldSim run(g, Aabb{16.0f, 16.0f, 8.0f, 8.0f}, t);
+    const float dt = 1.0f / 60.0f;
+    walk.step_fixed(/*dx=*/1, /*dy=*/0, /*run=*/false, dt);
+    run.step_fixed(/*dx=*/1, /*dy=*/0, /*run=*/true, dt);
+
+    const float walk_disp = walk.player().x - 16.0f;
+    const float run_disp = run.player().x - 16.0f;
+    REQUIRE(walk_disp > 0.0f);
+    REQUIRE_THAT(static_cast<double>(run_disp),
+                 WithinAbs(static_cast<double>(walk_disp * t.run_multiplier), kEps));
+}
+
+// RUN-CAPSLOCK: a colisao continua RESPEITADA correndo (Caps Lock ON) contra uma
+// parede, mesmo em MUITOS ticks seguidos (nao atravessa por "passo grande demais").
+// O FixedTimestep (SdlWindow) so avanca em incrementos de 1/60s cada; a esta
+// cadencia, mesmo na velocidade de CORRIDA, o passo por tick fica bem menor que 1
+// tile (ver rationale no relatorio do agente) - entao a colisao discreta por-eixo
+// de resolve_move_with_corner_assist (checa a AABB alvo, nao um raycast) ja e
+// suficiente, SEM subdividir o movimento. Este teste PROVA isso: correndo direto
+// contra a parede leste por 5s de ticks (300 a 60Hz) o jogador para ENCOSTADO nela
+// (x + w <= parede), nunca do OUTRO lado.
+TEST_CASE("overworld: correndo (Caps Lock) contra parede nao atravessa (colisao "
+          "segura em alta velocidade)",
+          "[overworld][run-capslock]") {
+    // Corredor horizontal de 5 tiles (tile 16): parede leste na coluna 4 (x=64..80).
+    TileGrid g = TileGrid::from_rows({"....#"}, 16.0f);
+    OverworldTuning t;
+    t.walk_speed_tiles_per_sec = 4.0f;   // 4 tiles/s andando
+    t.run_multiplier = 1.6f;             // //PLAYTEST: 6.4 tiles/s correndo
+    OverworldSim sim(g, Aabb{4.0f, 4.0f, 8.0f, 8.0f}, t);
+
+    const float dt = 1.0f / 60.0f;
+    for (int i = 0; i < 300; ++i) {
+        sim.step_fixed(/*dx=*/1, /*dy=*/0, /*run=*/true, dt);
+    }
+
+    // Parede comeca em x=64: o jogador (w=8) deve parar encostado (x+w <= 64),
+    // NUNCA ter atravessado pro outro lado (x >= 64, o que so aconteceria se a
+    // colisao tivesse "vazado" com o passo grande da corrida).
+    REQUIRE(sim.player().x + sim.player().w <= 64.0f + kEps);
+    REQUIRE(sim.player().x < 64.0f);
+}
+
 TEST_CASE("overworld: ctor com tuning define velocidade", "[overworld]") {
     TileGrid g = make_map();
     OverworldTuning t;

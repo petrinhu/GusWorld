@@ -74,6 +74,10 @@ void SdlInput::clear() noexcept {
     pad_ = GamepadState{};
     // Mantem connected: re-sondado no proximo pump. clear so solta o movimento.
     pad_.connected = (gamepad_ != nullptr);
+    // RUN-CAPSLOCK: zera aqui (nao "gruda" correndo ao perder foco); o pump_events
+    // real re-le o Caps Lock do SO logo no proximo frame (ver corpo de pump_events
+    // abaixo), entao o estado real volta a valer sem exigir soltar/apertar a tecla.
+    caps_lock_active_ = false;
 }
 
 void SdlInput::open_gamepads() {
@@ -129,6 +133,15 @@ bool SdlInput::pump_events() {
         }
     }
 
+    // RUN-CAPSLOCK: le o estado ATUAL do modificador Caps Lock do SO (nao um
+    // evento de tecla - SDL_GetModState() e uma leitura de ESTADO, chamada a CADA
+    // pump_events(), igual ao stick do gamepad logo abaixo). "Enquanto Caps Lock ON,
+    // corre" e literalmente isto: nenhum press/release a rastrear, so o bit do
+    // modificador a cada frame. Em headless/driver dummy (--smoke, SDL_VIDEODRIVER=
+    // dummy) SDL_GetModState() devolve SDL_KMOD_NONE (sem teclado fisico nenhum
+    // modificador fica "preso" ligado) - degrada seguro pra "nao corre".
+    caps_lock_active_ = (SDL_GetModState() & SDL_KMOD_CAPS) != 0;
+
     // Le o estado continuo do gamepad aberto (stick + d-pad + botao de run).
     if (gamepad_ != nullptr) {
         SDL_Gamepad* g = as_pad(gamepad_);
@@ -154,7 +167,10 @@ int SdlInput::dy() const noexcept {
 }
 
 bool SdlInput::run() const noexcept {
-    return mapper_.run_active() || pad_.run_button;
+    // RUN-CAPSLOCK: Caps Lock ON (should_run_caps_lock()) e mais uma fonte de
+    // "correr", aditiva as ja existentes (Shift segurado, botao do gamepad) -
+    // nenhuma substitui a outra.
+    return mapper_.run_active() || pad_.run_button || should_run_caps_lock();
 }
 
 }  // namespace gus::platform::input

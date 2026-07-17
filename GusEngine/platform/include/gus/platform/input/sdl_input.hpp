@@ -4,15 +4,23 @@
 // evento SDL e a intencao cardinal (dx,dy,run) que o overworld consome. Junta:
 //   - TECLADO: SDL_Keycode -> keycode Godot (key_translation) -> InputMapper (o
 //     mapa logico puro de domain/, que decide qual tecla e qual acao);
-//   - GAMEPAD: GamepadState (stick + d-pad + botao de run) -> gamepad_mapping.
-// As duas fontes sao FUNDIDAS e clampadas em {-1,0,1}: mesmo sentido nao vira 2,
-// opostos cancelam. run = Shift (teclado) OU botao de run (gamepad).
+//   - GAMEPAD: GamepadState (stick + d-pad + botao de run) -> gamepad_mapping;
+//   - CAPS LOCK (RUN-CAPSLOCK, pedido do lider): estado do modificador Caps Lock
+//     do SO, lido via SDL_GetModState() a CADA pump_events() - NAO e um evento de
+//     tecla (KEY_DOWN/UP), e um ESTADO PERSISTENTE: enquanto ON, corre; ao
+//     desligar, volta a andar, sem precisar segurar nada. Ver should_run_caps_
+//     lock()/set_caps_lock_active() abaixo.
+// As fontes sao FUNDIDAS e clampadas em {-1,0,1}: mesmo sentido nao vira 2,
+// opostos cancelam. run = Shift (teclado, segurar) OU botao de run (gamepad) OU
+// Caps Lock ON (teclado, toggle por estado) - qualquer uma basta.
 //
 // HEADER LIMPO (sem <SDL...>): inclui so InputMapper + gamepad_mapping (POCO). O
 // processamento de SDL_Event de hardware (pump_events, open/close de gamepad) vive
 // no .cpp - a unica parte que toca SDL. Isso mantem a FUSAO e a traducao de tecla
-// testaveis headless (sdl_input_test.cpp): process_key e mutable_gamepad sao a
-// porta de injecao do teste; pump_events e o caminho real (coberto pelo smoke).
+// testaveis headless (sdl_input_test.cpp): process_key, mutable_gamepad e
+// set_caps_lock_active sao a porta de injecao do teste; pump_events e o caminho
+// real (coberto pelo smoke; SDL_GetModState degrada pra KMOD_NONE sem teclado
+// fisico/driver dummy, ou seja Caps Lock OFF - seguro em headless).
 
 #ifndef GUS_PLATFORM_INPUT_SDL_INPUT_HPP
 #define GUS_PLATFORM_INPUT_SDL_INPUT_HPP
@@ -61,7 +69,15 @@ public:
     void process_key(int sdl_keycode, bool pressed);
     // Acesso ao estado do gamepad (o teste injeta; o pump_events preenche).
     [[nodiscard]] GamepadState& mutable_gamepad() noexcept { return pad_; }
-    // Solta tudo (teclado + gamepad), ex.: ao perder foco da janela.
+    // RUN-CAPSLOCK: injeta o estado do Caps Lock (o teste chama direto, sem SDL; o
+    // pump_events() real chama isto com SDL_GetModState() & SDL_KMOD_CAPS a cada
+    // frame - MESMO padrao de porta de injecao do mutable_gamepad() acima, so que
+    // ESTADO puro em vez de referencia mutavel, porque nao ha "botoes" pra o teste
+    // mexer individualmente, so um bool.
+    void set_caps_lock_active(bool active) noexcept { caps_lock_active_ = active; }
+    // Solta tudo (teclado + gamepad + caps lock), ex.: ao perder foco da janela. O
+    // Caps Lock volta a refletir o estado real do SO no PROXIMO pump_events() (nao
+    // fica "grudado" nem "vazio" por mais de um frame).
     void clear() noexcept;
 
     // MENU-PAUSA-CONFIG-SOM: EDGE (press unico, nao auto-repeat - pump_events ja
@@ -86,7 +102,18 @@ public:
     // --- intencao FUNDIDA (teclado + gamepad), clampada em {-1,0,1} ---------
     [[nodiscard]] int dx() const noexcept;
     [[nodiscard]] int dy() const noexcept;
+    // true se DEVE correr agora: Shift segurado (mapper_.run_active()) OU botao de
+    // run do gamepad (pad_.run_button) OU Caps Lock ligado (should_run_caps_lock()).
+    // Qualquer fonte basta (OR aditivo - nenhuma desliga a outra).
     [[nodiscard]] bool run() const noexcept;
+
+    // RUN-CAPSLOCK (GANCHO PRO GAMEPAD, TODO lider decide o binding depois): a
+    // UNICA funcao que decide "correr" por ESTADO PERSISTENTE (nao por segurar uma
+    // tecla) - hoje so olha o Caps Lock. Quando o gamepad ganhar um binding de
+    // "correr por toggle" (alem do run_button de segurar que ja existe), plugar
+    // AQUI (ex.: `caps_lock_active_ || pad_toggle_run_`), sem mexer em run() nem no
+    // resto do fluxo (run() so chama should_run_caps_lock(), nao conhece a fonte).
+    [[nodiscard]] bool should_run_caps_lock() const noexcept { return caps_lock_active_; }
 
 private:
     InputMapper mapper_;  // teclado -> acao (mapa logico puro)
@@ -95,6 +122,10 @@ private:
     // MENU-PAUSA-CONFIG-SOM: flag EDGE do Esc, setada em process_key (press) e
     // consumida (lida + zerada) por consume_escape_pressed().
     bool escape_pressed_ = false;
+    // RUN-CAPSLOCK: estado ATUAL (nao edge) do Caps Lock, refeito a cada
+    // pump_events() real (SDL_GetModState) ou injetado por set_caps_lock_active
+    // (teste). Default false = anda (headless/antes do 1o pump).
+    bool caps_lock_active_ = false;
 };
 
 }  // namespace gus::platform::input
