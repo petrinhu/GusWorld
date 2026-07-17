@@ -161,13 +161,13 @@ jobs:
       - name: Test core/ under ASan/UBSan
         run: |
           set -eux
-          ASAN_OPTIONS=detect_leaks=1 UBSAN_OPTIONS=print_stacktrace=1,halt_on_error=1 \
+          ASAN_OPTIONS=detect_leaks=1 UBSAN_OPTIONS=print_stacktrace=1:halt_on_error=1 \
             ./GusEngine/build/asan/tests/gusengine_core_tests
 
       - name: Test domain/ under ASan/UBSan
         run: |
           set -eux
-          ASAN_OPTIONS=detect_leaks=1 UBSAN_OPTIONS=print_stacktrace=1,halt_on_error=1 \
+          ASAN_OPTIONS=detect_leaks=1 UBSAN_OPTIONS=print_stacktrace=1:halt_on_error=1 \
             ./GusEngine/build/asan/domain/tests/gusengine_domain_tests
 
       # AUD-MINIAUDIO-UAF (fechado 2026-07-10, commit 317a2e9): patch cirurgico no
@@ -181,7 +181,7 @@ jobs:
       - name: Test platform/ under ASan/UBSan
         run: |
           set -eux
-          ASAN_OPTIONS=detect_leaks=1 UBSAN_OPTIONS=print_stacktrace=1,halt_on_error=1 \
+          ASAN_OPTIONS=detect_leaks=1 UBSAN_OPTIONS=print_stacktrace=1:halt_on_error=1 \
             LSAN_OPTIONS=suppressions=tools/lsan.supp \
             ./GusEngine/build/asan/platform/tests/gusengine_platform_tests
 
@@ -203,7 +203,7 @@ jobs:
       - name: Test app/ under ASan/UBSan
         run: |
           set -eux
-          ASAN_OPTIONS=detect_leaks=1 UBSAN_OPTIONS=print_stacktrace=1,halt_on_error=1 \
+          ASAN_OPTIONS=detect_leaks=1 UBSAN_OPTIONS=print_stacktrace=1:halt_on_error=1 \
             LSAN_OPTIONS=suppressions=tools/lsan.supp \
             ./GusEngine/build/asan/app/tests/gusengine_app_tests
 
