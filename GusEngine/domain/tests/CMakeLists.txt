@@ -205,6 +205,14 @@ add_executable(gusengine_domain_tests
     # herdado (Especial/Super nunca saem do ativo), craft desacoplado de materiais via
     # MaterialConsumer (capacidade checada ANTES de consumir).
     deck_transactions_test.cpp
+    # DECK-5 (revisao ADVERSARIAL INDEPENDENTE, qa-engineer): property-based testing
+    # "a mao" (property_gen.hpp) sobre os invariantes anti-exploit do deck/mao inteiro
+    # (secao 7: XOR de container, sem duplicata, mao so-do-ativo pos-revalidate,
+    # carteira nao-negativa/conservada, classe protegida fora do morto, roundtrip do
+    # save V6) sob sequencias aleatorias de sell/upload/acquire/craft/add/discard/
+    # hand-mutations. Mutation testing "com dente" (mutantes revertidos) documentado
+    # no relatorio da onda DECK-5, nao no codigo.
+    deck_invariants_property_test.cpp
 )
 
 # Os testes do combate incluem helpers de teste headers-only (fixed_random.hpp).
