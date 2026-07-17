@@ -87,7 +87,22 @@ Cada carta = **sintaxe real da linguagem-âncora do dono** + uma frase que ensin
 
 ## VELOCIDADE (compilada/rápida × interpretada/lenta) — decisão do líder 2026-07-16
 
-Amarração FECHADA (ver `combat-flavor.md §2`): **velocidade = propriedade da CARTA, com AFINIDADE (não trava) à linguagem do dono.** Interpretada (Pythia) = lenta (resolve casas à frente na fila CTB, mais potente, vulnerável a interrupção → `RUNTIME ERROR`); compilada (C-Arcane/Óxido/Asmódico) = rápida (resolve no turno, efeito fechado → `ERRO DE COMPILAÇÃO`). Afinidade: Cauã/Jaci tendem lento (Pythia), Iara/Linda/Bento tendem rápido; MAS por role/balance uma carta pode fugir (ex.: a assinatura-burst do Cauã pode ser rápida, aí ganha voz compilada). **PENDENTE:** atribuir rápida/lenta por-carta às 30 (respeitando afinidade + balance) + reconciliar o naming da exceção com a velocidade (item CARTAS-CAST-TIME). + **frase cômica do Gus** ocasional no cast (defende C-Arcane, comic-reliefs C.4; densidade baixa; narrative-writer).
+Amarração FECHADA (ver `combat-flavor.md §2`): **velocidade = propriedade da CARTA, com AFINIDADE (não trava) à linguagem do dono.** Interpretada (Pythia) = lenta (resolve casas à frente na fila CTB, mais potente, vulnerável a interrupção → `RUNTIME ERROR`); compilada (C-Arcane/Óxido/Asmódico) = rápida (resolve no turno, efeito fechado → `ERRO DE COMPILAÇÃO`). Afinidade: Cauã/Jaci tendem lento (Pythia), Iara/Linda/Bento tendem rápido; MAS por role/balance uma carta pode fugir (ex.: a assinatura-burst do Cauã pode ser rápida, aí ganha voz compilada). **ATRIBUÍDO** (parecer do lead-game-designer, **decisão autônoma 2026-07-17 — confirmar retroativamente**; tudo `//PLAYTEST`, o N=3 inverte qualquer linha sem custo = só o campo de velocidade no record, plugado no `cardSpeedMult` do ActionClock `ADR-017`).
+
+**Régua-mestre (acima da afinidade):** o efeito perde sentido se resolver DEPOIS da próxima ação do alvo/aliado? **SIM → RÁPIDA sempre** (CC/proteção/heal de emergência que chegam tarde = carta desperdiçada); **NÃO → segue a afinidade da família** e pode ir LENTA pra ganhar potência/tensão (DoT que "se espalha", trava temporizável, execute que aposta na sinergia seguir de pé).
+
+**Defaults por arquétipo:** Jab = RÁPIDA sempre (filler 1 mana, punir com interrupção é ruim p/ todas); Golpe+status = segue afinidade pura; Assinatura = tende RÁPIDA (confiabilidade do burst; exceção se for DoT); Status-puro = MISTO (família decide: Disrupt/Silence/Expose-setup = rápida por janela curta; Def/Break = lento por potência); Utilidade = tende RÁPIDA (landing garantido); Finalizador = LENTA sempre (o risk/reward É apostar que o SynergyStatus segue de pé).
+
+**As 30 (R=rápida/compilada · L=lenta/interpretada):**
+- **Elétrico/Cauã** (afim.Pythia-L): Pulso R*, Choque L, Arco R*, Trava L, Overclock L, Fulminante L → 4L/2R.
+- **Bioquímico/Jaci** (afim.Pythia-L): Espinho R*, Infecção L, Toxina L, Ferrugem L, Religação(cura) R*, Epidemia L → 4L/2R.
+- **Sônico/Linda** (afim.Óxido-R): Estalo R, Ruído R, Onda R, Estático R, Silêncio R, Ressonância L* → 5R/1L.
+- **Cinético/Bento** (afim.Asmódico-R): Impacto R, Empurrão R, Terremoto R, Fratura L*, Blindagem R, Colapso L* → 4R/2L.
+- **Criptográfico/Iara** (afim.Óxido-R): Sonda R, Brecha R, Backdoor R, Vulnerabilidade R, Decrypt R, Exploit L* → 5R/1L.
+
+**8 exceções (`*`, velocidade contraria a afinidade do dono → re-voz do narrative-writer, EM CURSO):** Pulso/Arco/Espinho/Religação (Pythia-lenta mas RÁPIDA → hook JIT real Numba/PyPy ou reflexo bio); Ressonância/Exploit (Óxido-rápida mas LENTA → Rust `async`/`.await` real); Fratura/Colapso (Asmódico-rápida mas LENTA → Assembly DMA/deferred interrupt). Os hooks são autênticos à linguagem-âncora (não trocam de linguagem, só de registro) — resolve "exceção quebra a voz da família". + **frase cômica do Gus** ocasional no cast (defende C-Arcane, comic-reliefs C.4; densidade baixa; narrative-writer).
+
+**Watchlist N=3:** (1) Golpe+status (5/5 afinidade pura, arquétipo com menos "tensão") pode acusar monotonia; (2) finalizadores de janela curta (Sônico 1-2t, Cripto 2-3t) podem "whiffar" se a sinergia expira antes do resolve — se punir demais, ampliar a duração do status-gatilho (não a velocidade).
 
 ## Riscos a vigiar no N=3 (do parecer do lead-game-designer)
 1. **"Golpe+status" (mana2/power5+status) pode dominar** sobre "dano puro" e "status-puro" no mesmo custo — a defesa é a economia de AP (1 carta=1 AP vs 2 cartas=2 AP de um pool de 3). Medir taxa de escolha; se dominar, baixar o Power do combo (5→3).
@@ -104,3 +119,69 @@ Amarração FECHADA (ver `combat-flavor.md §2`): **velocidade = propriedade da 
 - **Recarga de AP/mana (Elétrico-utilidade "Tavus-Overclock"):** `Card::restore_ap`/`restore_mana`; trava 1×/turno (`CombatActor::overclock_used()`, resetada no refresh de `TurnStart`, `GusEngine/domain/src/combat/combat_actor.cpp`); custo sempre pago antes; Silence bloqueia; log de sucesso e de bloqueio.
 - Testes: `GusEngine/domain/tests/cartas_comuns_engine_test.cpp` (16 casos, 51 assertions) — sinergia (dispara/ausente/não-stack/gêmeo extremos/gêmeo crítico/contagem RNG/interação Planck/log), recarga (persistência do bônus de AP/clamp de mana/reset da trava/1ª e 2ª jogada/reset no turno seguinte/custo pago antes/Silence).
 - Status: 🔍 Pendente verificação (item CARTAS-COMUNS-ENGINE do TODO.md). Pré-requisito da impl das 30 comuns (CARTAS-PRODUCAO) cumprido.
+
+---
+
+## Re-voz das 8 exceções de velocidade (PROPOSTA 2026-07-17, aguarda leitura do líder)
+
+**Status: PROPOSTA do `narrative-writer`, NÃO aprovada.** As tabelas principais acima (arquétipos por família e a seção "NOMES + frases pedagógicas") continuam valendo como estão até o líder ler e aprovar esta seção; nenhum nome foi trocado nas tabelas. Escopo: reconciliar a voz (nome + frase de cast) das 8 comuns cuja VELOCIDADE contraria a afinidade de linguagem do dono (`combat-flavor.md` §2, `VELOCIDADE` acima), usando só hooks técnicos autênticos da própria linguagem-âncora, sem trocar de linguagem em nenhum caso.
+
+Convenção: `frase de cast` é o texto técnico que aparece na tela de conjuração (registro dev completo, `combat-flavor.md` §1); o "hook" é o conceito real da linguagem que justifica a exceção. Nome mantido nas 8: em todos os casos a conotação do nome atual já sustenta a exceção sem precisar trocar (justificado carta a carta abaixo).
+
+### 1. Tavusa-Pulso (Cauã, Elétrico, Jab): nome mantido
+
+- Frase de cast: `>>> zap()` (prompt REPL, Enter, eco na hora; sem `def`, sem `import` por cima)
+- Hook: o REPL real do Python avalia uma linha solta assim que aperta Enter, sem montar um arquivo/script inteiro primeiro. Pulso é um "one-liner" digitado direto no prompt: nunca entra na fila de parse completo que o resto da família Pythia usa, então resolve no mesmo turno.
+- Por que o nome cabe: "Pulso" já sugere um tiro curto e seco, coerente com uma linha solta no REPL em vez de um script.
+
+### 2. Tavusa-Arco (Cauã, Elétrico, Assinatura): nome mantido
+
+- Frase de cast: `@jit` seguido de `def arco(): fulgor.disparar()` (decorador que troca bytecode por código de máquina depois de "aquecer")
+- Hook: JIT real (Numba/PyPy) recompila pra máquina uma função "quente", chamada muitas vezes. A assinatura de um personagem é, por definição, o golpe mais treinado dele: narrativamente é A função mais quente do repertório de Cauã, e por isso já roda compilada quando o jogador a usa.
+- Por que o nome cabe: "Arco" (de arco voltaico, carga que se acumula e descarrega) combina com a ideia de algo que esquentou até virar caminho direto.
+- Aparte cômico opcional (densidade baixa, comic-reliefs C.4): Gus resmunga "Cara, você precisa de JIT pra ficar rápido? Em C-Arcane eu já nasço compilado." (leve implicância carinhosa Gus x Cauã, tom de rivalidade fraterna, não debochado)
+
+### 3. Erynin-Espinho (Jaci, Bioquímico, Jab): nome mantido
+
+- Frase de cast: `self.picar()`, com nota visual de "builtin" (mono verde, ícone C) em vez de "def" (mono branco, ícone Pythia) na moldura
+- Hook: no CPython real, os builtins são implementados em C e rodam mais rápido que a função Python equivalente, porque pulam o laço de despacho do interpretador. A picada de Erynin é reflexo, não "pensamento" (ela nem processa o alvo, só reage); narrativamente é a única ação do kit da Jaci que roda "por baixo" do Pythia, direto no substrato C, coerente com reflexo bio-instintivo.
+- Por que o nome cabe: "Espinho" já é reflexo puro na natureza (planta que fere sem decidir); não precisa mudar.
+
+### 4. Sylvesse-Religação (Jaci, Bioquímico, Utilidade/CURA): nome mantido
+
+- Frase de cast: `@jit(nogil=True)` seguido de `def religacao(): self.hp += cura` (libera a trava do interpretador pra rodar sem fila)
+- Hook: `nogil` é opção real (Numba/Cython) pra liberar a trava global do interpretador numa chamada crítica, prioridade máxima. Religação é a ÚNICA cura do jogo: narrativamente é tratada como "código de emergência" pré-compilado, uma ligação que não pode esperar a fila normal de interpretação. Isso justifica ser a exceção rápida numa família lenta: emergência sempre fura fila.
+- Por que o nome cabe: "Religação" já é o ato de reconectar algo às pressas; a urgência está no próprio nome.
+- Aparte cômico opcional (densidade baixa, comic-reliefs C.4, Gus x Jaci = "aliança emocional mais profunda" em `party.md`): Gus, baixinho, enquanto ela cura alguém: "Ta, isso é rápido rápido. Quase C-Arcane." Jaci revira os olhos sem tirar a concentração da cura.
+
+### 5. Lhinin-Ressonância (Linda, Sônico, Finalizador): nome mantido
+
+- Frase de cast: `async fn ressonancia(eco: Onda) -> Dano { eco.amplificar().await }`
+- Hook: Rust real tem `async`/`.await` de verdade (não é gambiarra, não quebra a voz Óxido). Fisicamente, ressonância exige o som ir e voltar pra amplificar; o `.await` É o tempo de viagem do eco, não um truque narrativo. Coerente com ser a única carta lenta de uma família rápida: essa carta especificamente depende de um processo assíncrono real, as outras do Sônico não.
+- Por que o nome cabe: "Ressonância" já implica acúmulo/eco ao longo do tempo, não um golpe instantâneo.
+
+### 6. Rimin-Exploit (Iara, Criptográfico, Finalizador): nome mantido
+
+- Frase de cast: `let payload = exploit(alvo).await;`
+- Hook: mesmo recurso real do Óxido (`async`/`.await`). Narrativamente, Exploit aposta que a falha (o status Expose no alvo) continua aberta até o payload assíncrono terminar de rodar; se a janela fechar antes do `.await` resolver, o exploit falha (risk/reward de finalizador). Consistente com Exploit já ser "o único finalizador zero-engine" da tabela (depende do `multExpose` global, não do `SynergyStatus`): a espera assíncrona É a dependência de sinergia, só que expressa em tempo de fila em vez de campo de dados.
+- Por que o nome cabe: "Exploit" já é um termo real de segurança que descreve uma janela de oportunidade explorada, não um golpe seco.
+
+### 7. Ondha-Fratura (Bento, Cinético, Status-puro): nome mantido
+
+- Frase de cast: `DMA.custodia -> INT 0x1F` (a transferência começa agora, roda em segundo plano, o interrupt dispara quando termina de chegar)
+- Hook: DMA (Direct Memory Access) real transfere dados em paralelo ao processador principal e avisa por interrupção quando termina, exatamente o padrão "inicia agora, completa depois" que Assembly usa de verdade (não é invenção). A Fratura vaza aos poucos (Def cai por 4 turnos), coerente com uma transferência ainda em curso, não um golpe fechado.
+- Por que o nome cabe: "Fratura" já é dano que se espalha com o tempo (rachadura que cresce), não um impacto único.
+
+### 8. Ondha-Colapso (Bento, Cinético, Finalizador): nome mantido
+
+- Frase de cast: `CALL vetor_colapso -> IRET` (a chamada entra no vetor de interrupção, só retorna quando a fila chega nela)
+- Hook: vetor de interrupção real é uma tabela de endereços que o processador consulta quando um evento assíncrono acontece; `IRET` (interrupt return) só executa quando a interrupção é finalmente atendida. Colapso é o finalizador que aposta que o alvo continua desestabilizado (Knockback/Break) quando a "interrupção" finalmente retorna, coerente com risk/reward de um finalizador lento.
+- Por que o nome cabe: "Colapso" já é um evento que se prepara e desaba depois, não instantâneo.
+- Aparte cômico opcional (densidade baixa, comic-reliefs C.4, Gus x Bento = "Linguagem (C-Arcane vs Asmódico). Modernidade vs tradição." em `party.md`): Gus comenta, meio impressionado meio implicante: "Vetor de interrupção, hein? Isso é literalmente 'esperar o sistema acordar'. C-Arcane nem dorme." Bento só grunhe, sem se abalar (ele venera o ancestral, não precisa de aprovação).
+
+### Notas de escopo
+
+- Nenhuma das 8 muda de linguagem-âncora nem de família; todos os hooks (REPL one-liner, builtin em C, JIT/`nogil`, `async`/`.await`, DMA/vetor de interrupção) são conceitos técnicos reais das respectivas linguagens (Pythia = Python, Óxido = Rust, Asmódico = Assembly), coerente com Pillar 1 (magia = software, analogia real).
+- Os 2 apartes cômicos do Gus (Tavusa-Arco, Ondha-Colapso) respeitam a densidade baixa pedida ("nem todo cast") e a dualidade de voz do Gus (`project_gus_voz_personalidade`): fora de combate ele é mais cauteloso, mas o rage/implicância com hardware-e-linguagem é sempre afetuoso, nunca amargo. Ficam como OPCIONAIS, marcados pra decisão do líder incluir ou não.
+- Frases de cast completas (com todas as fases visuais de `combat-flavor.md` §1, ex. `> compilando... > linkando... -> EXEC` pras rápidas e `> parse: montando AST... > interpretando... -> EVAL` pras lentas) ficam pro doc de conteúdo final quando o naming das 30 for aprovado; aqui só o núcleo que resolve a reconciliação de voz x velocidade.
+- Pendência cruzada: esta proposta cobre só as 8 exceções; o naming das 22 comuns restantes (sem exceção de velocidade) segue a seção "NOMES + frases pedagógicas" já existente acima, sem mudança.
