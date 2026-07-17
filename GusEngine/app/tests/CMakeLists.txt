@@ -69,6 +69,11 @@ add_executable(gusengine_app_tests
     # (AudioEngine::last_sfx_id(), hook aditivo desta onda) o roteamento
     # hover/click bloqueado x normal.
     difficulty_menu_loop_interaction_test.cpp
+    # REGRESSAO do SIGSEGV real (playtest ao vivo 2026-07-17: pausa -> Save/Load ->
+    # LOAD -> deref de render2d_ nulo em SdlWindow::load_enemy_marker_texture). Prova
+    # HEADLESS (sem janela/GL): SdlWindow recem-construida ja tem render2d_ == nullptr,
+    # MESMO estado que release_renderer() cria no menu de pausa - antes do fix crashava.
+    sdl_window_marker_defer_test.cpp
 )
 
 target_link_libraries(gusengine_app_tests

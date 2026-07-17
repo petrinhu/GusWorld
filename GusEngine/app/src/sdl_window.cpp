@@ -132,6 +132,21 @@ void SdlWindow::load_enemy_marker_texture() {
     if (!enemy_marker_aabb_.has_value()) {
         return;  // nenhum marcador definido ainda (uso standalone/sem Maestro)
     }
+    // FIX CRASH (SIGSEGV real, playtest ao vivo 2026-07-17: pausa na cidade -> menu
+    // Save/Load -> LOAD -> deref de ponteiro nulo aqui). RAIZ: o menu de pausa roda
+    // NUM CONTEXTO GL PROPRIO e a Maestro (open_pause_from_city) chama
+    // release_renderer() ANTES de abrir o menu -> render2d_ == nullptr enquanto o
+    // menu esta vivo. A acao LOAD -> Maestro::apply_loaded_save_data ->
+    // city_->set_enemy_marker(...) cai aqui com render2d_ (e o SDL_Renderer) ja
+    // soltos. Separacao dado x GL: o enemy_marker_aabb_ (estado LOGICO) ja foi
+    // armazenado em set_enemy_marker ANTES desta chamada; a (re)carga da TEXTURA
+    // (estado GL) e ADIADA - reacquire_renderer() a refaz INCONDICIONALMENTE ao a
+    // cidade retomar (ver reacquire_renderer -> load_enemy_marker_texture), entao o
+    // marcador REAPARECE sozinho. sim_ nunca e nulo (criado no ctor), mas guardado
+    // por simetria/defesa. Degrada seguro, MESMO espirito do ramo headless abaixo.
+    if (render2d_ == nullptr || sim_ == nullptr) {
+        return;  // renderer solto (menu de pausa) - defer: reacquire_renderer recarrega
+    }
     // ASSETS-VFS-F1: monta o id RELATIVO completo (subdir + arquivo) e resolve UMA vez
     // (era resolver so o subdir e concatenar o arquivo depois - equivalente, mas agora o
     // porteiro resolve o caminho inteiro de uma vez, mesmo padrao dos demais consumidores).
@@ -165,6 +180,13 @@ void SdlWindow::clear_enemy_marker() {
 void SdlWindow::load_npc_bertoldo_marker_texture() {
     if (!npc_bertoldo_marker_aabb_.has_value()) {
         return;  // nenhum marcador definido ainda (uso standalone/sem Maestro)
+    }
+    // FIX CRASH (mesma raiz de load_enemy_marker_texture acima): render2d_/sim_ podem
+    // estar soltos (release_renderer feito pela Maestro enquanto o menu de pausa/GL
+    // roda). O npc_bertoldo_marker_aabb_ ja foi armazenado em set_npc_bertoldo_marker;
+    // a carga da textura e ADIADA e reacquire_renderer() a refaz ao a cidade retomar.
+    if (render2d_ == nullptr || sim_ == nullptr) {
+        return;  // renderer solto - defer: reacquire_renderer recarrega
     }
     const std::string id = std::string(gus::core::assets::kBertoldoSpritesDir) + "/" +
                             std::string(gus::core::assets::kBertoldoSpriteSouthFile);
