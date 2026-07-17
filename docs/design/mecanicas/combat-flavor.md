@@ -4,7 +4,9 @@
 
 **Convencao:** pt-br na prosa. As mensagens de erro ficam no ORIGINAL tecnico (ingles do terminal real): a autenticidade e a piada (Pillar 1/2, magia = software). Sem em-dash; usa hifen, virgula, parenteses, dois-pontos.
 
-**Cross-ref:** [`combat.md`](combat.md), [`battle-screen.md`](battle-screen.md), [`pillars.md`](../pillars.md), [`arco-principal.md`](../../narrative/arco-principal.md) (eixo Compilacao vs Interpretacao, Gus vs Sterling).
+**⚠ Atualizacao 2026-07-17 (lider):** o **§2 foi reescrito** e agora carrega a **regua-lei** de velocidade (**CANON PETREO**, acima dos pillars). A clausula "afinidade, nao trava" que vivia ali esta **removida**. Todo agente que for desenhar carta (inclusive **ESPECIAIS/SUPER**, que passam pelo executor techMagic, [ADR-016](../../tech/adr/ADR-016-techmagic-effect-engine-data-driven.md)) le o §2 **antes**.
+
+**Cross-ref:** [`combat.md`](combat.md), [`battle-screen.md`](battle-screen.md), [`pillars.md`](../pillars.md), [`arco-principal.md`](../../narrative/arco-principal.md) (eixo Compilacao vs Interpretacao, Gus vs Sterling), [`cartas-comuns-statlines.md`](cartas-comuns-statlines.md) (§VELOCIDADE: o doc de CONTEUDO que espelha a regua-lei do §2), [`gus-apartes-c-arcane.md`](../../narrative/gus-apartes-c-arcane.md) (regua fato x juizo).
 
 ---
 
@@ -44,17 +46,89 @@ Ao falhar, sorteia-se aleatoriamente uma frase do acervo (paragrafo 3), do canal
 
 ## 2. Linguagens runicas -> velocidade da carta
 
+> ## ⚠ CANON PETREO (nao e `//PLAYTEST`, nao e decisao de agente)
+>
+> **A regua-lei deste paragrafo foi aprovada pelo lider em 2026-07-17, carta a carta**, junto com a velocidade das 30 comuns (ver [`cartas-comuns-statlines.md`](cartas-comuns-statlines.md) §VELOCIDADE, o doc de CONTEUDO que espelha esta lei).
+>
+> **Motivo:** o eixo compilado x interpretado e **definicao pessoal do Gus original** e uma **promessa do lider ao menino**. Isso o coloca **acima dos pillars** na hierarquia de canon: um pillar pode ser revisado em brainstorm, este eixo nao.
+>
+> **Regra de alteracao:** qualquer mudanca exige **autorizacao explicita do lider**, naquele contexto. Aprovacao anterior nao vale pra frente. **Nenhum agente inverte uma velocidade "por balance".**
+>
+> **Se o playtest doer:** o remedio e **Power / mana / duracao de status / casas de espera na fila**. **Nunca a velocidade.** A velocidade e premissa; o balance trabalha em volta dela.
+>
+> **Historico:** a clausula "AFINIDADE, nao exclusividade" que ocupava este paragrafo (2026-07-16) foi **SUPERADA e removida** em 2026-07-17. Ela era a **causa-raiz** de uma atribuicao de velocidade que INVERTIA o eixo. Ver §2.4.
+
 As linguagens do canon parodiam linguagens reais; o nome (parecido com o original) TELEGRAFA o tipo da carta. Camada de legibilidade dupla: quem programa reconhece, o leigo aprende pela cor/icone. O eixo Compilacao (Gus, disciplina) vs Interpretacao (Sterling, controle) ja e canonico em [`arco-principal.md`](../../narrative/arco-principal.md).
 
-| Linguagem canon | Eco real | Tipo | Velocidade | Falha | Ancora de personagem |
-|---|---|---|---|---|---|
-| **C-Arcane** | C / C++ | compilada | rapida | ERRO DE COMPILACAO | Gus; Dante (late game) |
-| **Oxido** | Rust | compilada | rapida | ERRO DE COMPILACAO | Iara |
-| **Asmodico** | Assembly | montada (baixo nivel) | rapida (a mais) | ERRO DE COMPILACAO | Bento; Dante (origem) |
-| **Pythia** | Python | interpretada | lenta | RUNTIME ERROR | Caua, Jaci |
-| **DRE / GRE** | runtime/VM (JS/Go/Lua) | interpretada | lenta | RUNTIME ERROR | Sterling (vilao) |
+### 2.1 A regua-lei: conjurar = compilar + executar
 
-**Amarracao FECHADA (decisao do criador 2026-07-16):** a linguagem/velocidade e **propriedade da CARTA**, com **AFINIDADE (nao exclusividade)** a linguagem-ancora comica do personagem. As cartas de um personagem SOAM/tendem a linguagem dele (Caua/Jaci -> Pythia; Iara/Linda -> Oxido; Bento -> Asmodico), mas ele PODE ter cartas de outra velocidade quando o role/balance pede (ex.: a assinatura-burst do Caua/Striker pode ser compilada/rapida apesar da afinidade Pythia). O nome/voz da carta TELEGRAFA a velocidade (nome estilo Python = lenta/interpretada; estilo C/Rust/Assembly = rapida/compilada), entao a excecao de velocidade vem com voz da linguagem correspondente. Gus = compilador universal (poliglota, usa qualquer). Consequencia: cada carta COMUM ganha um atributo de velocidade (rapida/lenta); a atribuicao por-carta (respeitando afinidade + balance de role) + a reconciliacao do naming com a velocidade = pass de design (item CARTAS-CAST-TIME / statlines). **Frase comica do Gus:** o Gus solta uma fala engracada de vez em quando durante o cast / nas disputas de linguagem (defende C-Arcane; ver comic-reliefs C.4) -- conteudo do narrative-writer, densidade baixa (nem todo cast).
+O jogo **ja mostra isso na tela**. A fase de cast da carta rapida e, verbatim (§1 acima):
+
+```
+> compilando...   > linkando...   -> EXEC
+```
+
+A velocidade **nao e uma regra imposta por cima da lore**. Ela e a **consequencia aritmetica** do que o jogo ja afirma que acontece: se conjurar e compilar e executar, entao **quanto custa compilar e quanto demora conjurar**. A velocidade de cada carta CAI DELA SOZINHA, sem inventar nada e sem mentir em nenhum ponto.
+
+**A LINGUAGEM TRAVA.** Nao e afinidade, nao e tendencia, nao e sabor. E **lei**, e esta **acima de role, de balance e de arquetipo**.
+
+| Linguagem canon | Eco real | O que acontece DE VERDADE ao conjurar | Velocidade | Falha | Ancora de personagem |
+|---|---|---|---|---|---|
+| **Asmodico** | Assembly | **Nao compila. MONTA.** Ja e codigo de maquina, so traduz simbolo pra opcode | **rapida (A MAIS)** | ERRO DE COMPILACAO | Bento; Dante (origem) |
+| **C-Arcane** | **C** | **Compila rapido.** E a fama real do C, e e merecida | **rapida** (o ponto doce) | ERRO DE COMPILACAO | Gus; Dante (late game) |
+| **C-Arcane Major** | **C++** | Compila. Mesma familia, mesmo pacto firme | **rapida** | ERRO DE COMPILACAO | Gus (so na frase rara) |
+| **Oxido** | Rust | Compila **DEVAGAR**: borrow checker + monomorfizacao + LLVM. **`async` e o pior caso notorio** | **rapida** no simples, **LENTA** no `async` | ERRO DE COMPILACAO | Iara, Linda |
+| **Pythia** | Python | **Nao compila. INTERPRETA em runtime**, linha a linha, toda vez | **lenta** (excecao: §2.2) | RUNTIME ERROR | Caua, Jaci |
+| **HIBRIDO** | cast numa linguagem, **executor final em outra** | A velocidade e a do **elo mais lento**. Se o executor final e interpretado, a carta e lenta, **e a culpa e do executor** | **a do elo mais lento** | a do elo que quebrou | caso canon: `Ondha-Fratura` (cast Asmodico, executor Pythia) |
+| **DRE / GRE** | runtime/VM (JS/Go/Lua) | **Nao compila. Interpreta tudo em runtime**, por projeto (anti-compilacao e a tese do vilao) | **lenta** | RUNTIME ERROR | Sterling (vilao) |
+
+**Nota de canon (2026-07-17):** `C-Arcane` mapeia pra **C sozinho**. O C++ tem nome diegetico proprio, **C-Arcane Major**, criado pelo lider em 2026-07-17 (resolve AMB-01 de [`gus-apartes-c-arcane.md`](../../narrative/gus-apartes-c-arcane.md)). A linha antiga `C-Arcane | C / C++` tratava os dois como um so. **Nao muda velocidade nenhuma**: os dois compilam, os dois sao rapidos.
+
+**Achado a registrar (o eixo novo nao quebra a narrativa, ele a ENDIREITA):** a linha `DRE / GRE (Sterling) | interpretada | lenta` **ja estava correta e REFORCA a regua-lei**. O runtime do vilao ser lento casa exatamente com a oposicao **Compilacao (Gus) x Interpretacao (Sterling)** de [`arco-principal.md`](../../narrative/arco-principal.md). Idem `Asmodico | montada | rapida (a mais)`: **ja estava correto** e ja antecipava esta regua. O framework tinha a verdade; a clausula "afinidade" a atropelou.
+
+### 2.2 As duas excecoes honestas (que PROVAM a regra, nao furam)
+
+**1. Pythia rapida quando GENUINAMENTE COMPILA.** Nao e "a carta e especial". E que **naquele caso especifico o Python compila de verdade**:
+
+- **`@jit` (Numba/PyPy) compila mesmo.** Vira codigo de maquina. Nao e metafora, e o que a ferramenta faz.
+- **Builtin do CPython E escrito em C.** Roda rapido porque **nao e Python rodando**, e C compilado embaixo do capo (fato dos apartes A1/A2: *"tem um C-Arcane ali embaixo fazendo o trabalho pesado"*).
+
+Repare no que isso faz: a Pythia so fica rapida **quando para de ser interpretada**. Toda vez que a Pythia e rapida, e porque compilou. Isso **PROVA a tese do Gus** com mais forca do que uma excecao furada proveria.
+
+**2. Hibrido: a lerdeza vem da parte interpretada.** Se o cast e Asmodico mas o executor final e Pythia, a carta e **LENTA**, e **a culpa e do Python, nao do Assembly**. O Asmodico fez a parte dele em nanossegundos e ficou esperando o interpretador. **Assembly continua o mais rapido**, e a lerdeza tem um culpado nomeado.
+
+### 2.3 🚫 MENTIRA PROIBIDA (regra de redacao inegociavel)
+
+> **"Nao minta JAMAIS para uma crianca."**
+
+**NUNCA afirmar, em nome de carta nenhum, em frase de cast nenhuma, em aparte nenhum, em VFX nenhum:**
+
+- ❌ que **interpretado e rapido**
+- ❌ que **compilado e lento por ser compilado**
+
+Ambas sao falsas, e este paragrafo existe porque foram ditas uma vez. Um agente que precisar de uma carta lenta numa familia compilada **nao inventa um hook**: ele acha o **motivo real** (o `async` do Oxido e lento de verdade; o executor Pythia do hibrido e lento de verdade) ou **nao faz a carta lenta**.
+
+**Teste de deteccao (aplicar a todo hook novo):** nao pergunte *"esse recurso existe?"*. Pergunte: **"a frase que sobra afirma que interpretado e rapido, ou que compilado e lento?"** Se sim, o hook esta morto, **por mais real que o recurso seja**. Os 3 hooks ja mortos (REPL rapido, `async` como espera diegetica, vetor de interrupcao/`IRET`) eram todos tecnicamente verificaveis e **mesmo assim mentiam**, porque a **conclusao** que sustentavam era falsa. Registro completo em [`cartas-comuns-statlines.md`](cartas-comuns-statlines.md) §"Os 3 hooks DESCARTADOS".
+
+Isto e irmao da regua dos apartes ([`gus-apartes-c-arcane.md`](../../narrative/gus-apartes-c-arcane.md)): **fato e proibido de ser falso, juizo e livre.** O Gus pode achar o Oxido feio. Ele nao pode dizer que interpretado e rapido.
+
+### 2.4 O que esta clausula SUBSTITUI (pra ninguem ressuscitar)
+
+**A clausula "AFINIDADE, nao exclusividade" (2026-07-16) esta MORTA.** Ela dizia, verbatim, que a linguagem era so afinidade e que o personagem *"PODE ter cartas de outra velocidade **quando o role/balance pede**"*.
+
+**Por que produziu o erro:** a clausula rebaixava a linguagem a **tendencia estetica** e promovia **role/balance** a criterio que **vencia** a linguagem. Traduzindo o que ela autorizava: *"se o balance pedir, faca a carta interpretada ser rapida."* Foi obedecendo a isso que (1) o arquetipo virou lei ("Finalizador = LENTA sempre", "Jab = RAPIDA sempre") acima da linguagem; (2) quando arquetipo e linguagem colidiram, **a linguagem cedeu**; (3) pra vestir a colisao, inventaram-se hooks que **afirmavam fato falso**. O erro foi **sistematico, nao aleatorio**: seguiu a regra escrita, e a regra estava errada.
+
+**Regra derivada (vale para as ESPECIAIS/SUPER tambem):** **nenhum arquetipo dita velocidade. A LINGUAGEM dita.** O arquetipo dita **custo, Power e condicao**. Se um arquetipo futuro "precisar" ser lento numa familia compilada, **o arquetipo esta errado, nao a regua**.
+
+**A "regua-mestre" antiga tambem morreu:** *"CC/heal = rapida sempre, senao chega tarde e e carta desperdicada"*. Ela **colide com a lei** e perde. `Tavusa-Trava` (Stun, Pythia) e **LENTA**, e isso e **custo ACEITO e INTENCIONAL** pelo lider: um Stun que chega tarde e **exatamente a licao** de que interpretado te trai na hora H. Idem `Tavusa-Overclock` (recarga de recurso que chega tarde vale menos). **Watchlist do N=3, nao bug.** Remedio permitido: duracao do status ou casas de espera. Nunca a velocidade.
+
+**Gus = compilador universal** (poliglota, usa qualquer linguagem). **Frase comica do Gus:** o Gus solta uma fala engracada de vez em quando durante o cast / nas disputas de linguagem (defende C-Arcane; ver comic-reliefs C.4) e os apartes atrelados a cartas especificas ([`gus-apartes-c-arcane.md`](../../narrative/gus-apartes-c-arcane.md)); conteudo do narrative-writer, densidade baixa (nem todo cast).
+
+### 2.5 Ressalva: o `>>>` do prompt do Caua NAO e afirmacao de velocidade
+
+O prompt `caua@pythia:~$ >>>` (§5 abaixo) e **caracterizacao**: o Caua "vive no REPL". **Nao e**, e **nao pode virar**, justificativa de rapidez.
+
+O hook **"REPL one-liner e rapido" esta MORTO** e nao volta: o REPL do Python **continua interpretado**; digitar direto no prompt **nao compila nada**. O hook trocava "compilar" por "nao precisar salvar arquivo", que nao e a mesma coisa e nao afeta a velocidade de execucao. Era a mentira mais sutil das tres, e por isso a mais perigosa. Consequencia canon: a `Tavusa-Pulso` (o jab do Caua) e **LENTA**, e sem residuo visual de REPL na frase de cast dela. **Manter o `>>>` no prompt; nunca deriva-lo em rapidez.**
 
 ---
 
@@ -286,5 +360,6 @@ Decisao macro tomada. O design FINO dos dois registros (estilo do terminal cru v
 
 ## 6. Pendencias (a fechar no design do M5)
 
-- Canonizar a mecanica de cast-time (paragrafo 1) como extensao do combat.md, via lead-game-designer (ratificacao do criador). Parametros finos a definir: quantas posicoes a frente a lenta resolve (por carta?), o que a interrupcao faz (cancela e perde AP/mana? atrasa? reduz potencia proporcional ao dano?), o que "le o tabuleiro tarde" significa (re-mira? escala com estado?), e a amarracao linguagem<->carta<->personagem (paragrafo 2).
+- Canonizar a mecanica de cast-time (paragrafo 1) como extensao do combat.md, via lead-game-designer (ratificacao do criador). Parametros finos a definir (todos `//PLAYTEST`, afinaveis livremente): quantas posicoes a frente a lenta resolve (por carta?), o que a interrupcao faz (cancela e perde AP/mana? atrasa? reduz potencia proporcional ao dano?), o que "le o tabuleiro tarde" significa (re-mira? escala com estado?).
+- ~~A amarracao linguagem<->carta<->personagem~~ **RESOLVIDA (lider, 2026-07-17): a linguagem TRAVA a velocidade.** Ver §2 (regua-lei) e [`cartas-comuns-statlines.md`](cartas-comuns-statlines.md) §VELOCIDADE (as 30 comuns, aprovadas carta a carta). **Nao reabrir sem autorizacao explicita do lider.**
 - Estilo visual das fases (spinner/log) e da mensagem de falha na tela: ver [`battle-screen.md`](battle-screen.md).

@@ -278,7 +278,7 @@ O `Ondha-Colapso` rápido não é o Bento ficando forte demais: é o jogo **ensi
 - **Naming** das 30 (narrative-writer; voz do mundo; líder lê antes de aprovar), cruza com a frente LINGUAGENS-COMICAS-DISPUTAS (Pythia/Óxido/Asmódico/C-Arcane).
 - **Frases pedagógicas** por carta (didática) + VFX, dentro de CARTAS-PRODUCAO.
 - **`consume_status` pro Rimin-Exploit** (efeito novo do líder 2026-07-17): checar se o `resolve_use_card` já remove `StatusId` do alvo; se não, item pro `backend-engineer` (escopo pequeno, data-driven). Pré-req de CARTAS-PRODUCAO.
-- **Decisão do líder pendente:** corrigir `combat-flavor.md` §2 (framework, "afinidade não trava" = raiz do erro) e o mapeamento `C-Arcane = C` vs `C-Arcane Major = C++`. Ver §"Correção do framework".
+- ~~**Decisão do líder pendente:** corrigir `combat-flavor.md` §2~~ **FEITO 2026-07-17.** §2 reescrito com a régua-lei; `C-Arcane = C` e `C-Arcane Major = C++` separados na tabela dele. Ver §"Correção do framework". **Sobra 1 doc desalinhado:** a tabela de convenção diegética de `gus-apartes-c-arcane.md` ainda diz `C-Arcane | C / C++`. **Não corrigido de propósito:** aquele doc é canon aprovado frase a frase pelo líder e declara que qualquer mudança exige nova autorização explícita dele. **Pedir autorização** (edição de 1 célula, não afeta velocidade nem nenhum aparte: C e C++ compilam, ambos rápidos).
 
 ## Engine (CARTAS-COMUNS-ENGINE, FEITO 2026-07-16, `backend-engineer`, TDD + gêmeo preview<->real)
 
@@ -435,23 +435,21 @@ O erro foi **sistemático, não aleatório**: seguiu a regra escrita, e a regra 
 >
 > Balance NUNCA inverte velocidade. Balance ajusta **Power, mana, duração e casas de espera**. A velocidade é premissa; o balance trabalha **em volta** dela.
 
-### ❓ DECISÃO PENDENTE DO LÍDER: corrigir o `combat-flavor.md` também?
+### ✅ RESOLVIDO (líder autorizou; `combat-flavor.md` §2 REESCRITO em 2026-07-17)
 
-**Minha recomendação: SIM, e com prioridade.** Motivos:
+> **O §2 do `combat-flavor.md` foi corrigido.** A cláusula "afinidade, NÃO trava" foi **removida** (não apenas marcada superada) e substituída pela **régua-lei**. A contradição entre os dois canônicos **não existe mais**: o framework (`combat-flavor.md` §2) e o conteúdo (este doc, §VELOCIDADE) agora dizem a mesma coisa.
+>
+> O que entrou no §2: banner CANON PÉTREO · régua-lei (conjurar = compilar + executar; **a linguagem TRAVA**) · tabela corrigida (Óxido compila **devagar**, `async` = pior caso) · linha **HÍBRIDO** nova · `C-Arcane = C` separado de **`C-Arcane Major` = C++** · as 2 exceções honestas · **MENTIRA PROIBIDA** + teste de detecção · morte da régua-mestre antiga ("CC/heal = rápida sempre") · ressalva do `>>>` do Cauã (§2.5) · pendência §6 fechada.
+>
+> **Mantido intacto** o que já estava certo: `Asmódico | montada | rápida (a mais)` e `DRE/GRE | interpretada | lenta`. Este último **REFORÇA** o eixo (o runtime do vilão ser lento casa com a oposição Compilação/Gus × Interpretação/Sterling do `arco-principal.md`). **Achado: o eixo novo não quebra a narrativa, ele a endireita.**
+
+**Registro do motivo (por que era urgente):**
 
 1. **`combat-flavor.md` é o doc de FRAMEWORK; este aqui é de CONTEÚDO.** Anotar "superado" no doc de conteúdo conserta as 30 cartas de hoje, mas deixa a cláusula errada de pé **na fonte que os agentes vão ler amanhã**. O próximo agente que abrir o framework pra desenhar as **ESPECIAIS/SUPER** vai ler "afinidade, não trava" + "role/balance pode pedir" e **repetir o erro inteiro**, de boa-fé.
 2. **A superfície de risco é maior que as comuns.** As especiais/SUPER passam pelo executor techMagic (ADR-016) e são **narrativa protegida** (`reference_deck_mao_sistema`). Errar o eixo lá é mais caro que nas comuns.
 3. **Contradição ativa entre dois docs canônicos.** Hoje o §2 diz "não trava" e este diz "trava". Dois canônicos em oposição direta = o próximo leitor escolhe **o que der na telha**.
 
-**Escopo cirúrgico que eu proporia (nada além disto):**
-
-- Reescrever o parágrafo "Amarração FECHADA" do §2: "afinidade, não trava" → **régua-lei** (conjurar = compilar + executar; a linguagem trava; balance ajusta em volta).
-- **Corrigir a tabela do §2**, que tem uma imprecisão factual própria: `Óxido | Rust | compilada | rapida` está **incompleto**. Óxido compila **devagar**, e **`async` é o pior caso**. A linha precisa refletir isso, senão contradiz a `Lhinin-Ressonância`.
-- **Adicionar a linha do HÍBRIDO** na tabela (cast numa linguagem, executor em outra, e a lerdeza vem do executor interpretado). Hoje o caso da `Ondha-Fratura` **não existe** no framework.
-- **Gravar a MENTIRA PROIBIDA** no §2, como regra de redação, com o teste de detecção ("a frase que sobra afirma que interpretado é rápido ou que compilado é lento?").
-- **Manter** o §2 onde ele já acerta: `Asmodico | montada (baixo nivel) | rapida (a mais)` **já está correto** e já antecipava a régua nova. Bom sinal: o framework tinha a verdade e a cláusula "afinidade" a atropelou.
-
-**Aguardando ordem do líder.** Não toquei em `combat-flavor.md` nesta passada (fora do escopo autorizado).
+**Escopo executado (2026-07-17, autorizado pelo líder):** todos os 5 itens acima entraram no `combat-flavor.md` §2. Nada além disso foi tocado naquele doc.
 
 ---
 
@@ -461,9 +459,11 @@ O erro foi **sistemático, não aleatório**: seguiu a regra escrita, e a regra 
 |---|---|---|
 | **C-Arcane Major** | **C++** | Criado pelo líder em 2026-07-17 (resolve AMB-01 de `gus-apartes-c-arcane.md`). Mantém a convenção de nunca citar nome real de linguagem em diálogo. Estreia na **frase rara** (o "bilhete dourado", a única em que o Gus critica o C-Arcane): *"Dá pra fazer classe em C-Arcane puro, sabia? Não é BEM classe... é struct com ponteiro de função. O C-Arcane Major só deixou fácil pra quem tem preguiça."* |
 
-**⚠ Consequência a resolver (achado desta passada):** com `C-Arcane Major = C++` canonizado, **`C-Arcane` deveria mapear pra C sozinho**. Mas duas tabelas canônicas ainda dizem `C-Arcane | C / C++`:
+**⚠ Consequência (status 2026-07-17):** com `C-Arcane Major = C++` canonizado, **`C-Arcane` mapeia pra C sozinho**. Duas tabelas canônicas diziam `C-Arcane | C / C++`:
 
-- `combat-flavor.md` §2 (tabela de linguagens)
-- `gus-apartes-c-arcane.md` (tabela de convenção diegética)
+| Tabela | Status |
+|---|---|
+| `combat-flavor.md` §2 (linguagens) | ✅ **CORRIGIDA 2026-07-17.** `C-Arcane` = C, e linha nova `C-Arcane Major` = C++ |
+| `gus-apartes-c-arcane.md` (convenção diegética) | ⏳ **PENDENTE, aguarda autorização explícita do líder.** Doc de canon aprovado frase a frase; não se edita sem ordem dele |
 
-Não é urgente (não afeta velocidade: C e C++ compilam, ambos rápidos), mas é **inconsistência real** e vai confundir. **Sugestão:** `C-Arcane = C` e `C-Arcane Major = C++`, atualizando as duas tabelas. **Decisão do líder**, junto com a do `combat-flavor.md`.
+Não afeta velocidade (C e C++ compilam, ambos rápidos) nem invalida nenhum aparte, mas é **inconsistência real** entre canônicos e vai confundir o próximo leitor.
