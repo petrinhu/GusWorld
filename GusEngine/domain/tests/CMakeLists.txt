@@ -213,6 +213,13 @@ add_executable(gusengine_domain_tests
     # hand-mutations. Mutation testing "com dente" (mutantes revertidos) documentado
     # no relatorio da onda DECK-5, nao no codigo.
     deck_invariants_property_test.cpp
+    # REGRESSAO de lifetime (heap-use-after-free): tier_of (TierLookup) recebia uma
+    # REFERENCIA pro card_id dentro de active(); um tier_of que realoque active_ (add_to_
+    # active) fazia essa referencia pendurar (UAF deterministico sob ASan, crash
+    # intermitente ASLR-dependente no build normal). Casos com tier_of adversarial que
+    # realoca o buffer ANTES de ler o card_id - crashavam pre-fix, passam pos-fix (copia
+    # estavel do card_id + reancoragem do iterador antes do erase).
+    deck_tier_callback_lifetime_test.cpp
 )
 
 # Os testes do combate incluem helpers de teste headers-only (fixed_random.hpp).

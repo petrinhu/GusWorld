@@ -56,7 +56,15 @@ void HandLoadout::validate_candidate(const std::vector<std::uint64_t>& candidate
                 " nao esta no deck ATIVO (carta morta/vendida/inexistente - secao 7 inv.6)");
         }
 
-        const CardTier tier = tier_of(it->card_id);
+        // COPIA o card_id ANTES de invocar o callback opaco tier_of. `it->card_id` e
+        // uma referencia pro buffer de deck.active(); tier_of e fornecido pelo chamador
+        // e nao ha garantia estatica de que ele nao toque o CardCollection (ex.: um
+        // lookup que carregue/expanda o catalogo e, por efeito colateral, mute o deck).
+        // Se active_ realocar durante a chamada, `it->card_id` penduraria
+        // (heap-use-after-free - ASan confirma em hand_loadout.cpp:59). Passar uma copia
+        // estavel desacopla a corretude do lifetime do elemento do container.
+        const std::string card_id = it->card_id;
+        const CardTier tier = tier_of(card_id);
         if (tier == CardTier::Comum) {
             ++comum_count;
         } else {

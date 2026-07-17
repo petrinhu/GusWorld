@@ -83,10 +83,21 @@ void CardCollection::discard_to_dead(std::uint64_t instance_id, const TierLookup
         throw std::invalid_argument(
             "CardCollection::discard_to_dead: instance_id nao esta no deck ativo");
     }
-    // Guard de tier ANTES de mutar qualquer container (falha = zero efeito colateral).
-    guard_protected_tier(it->card_id, tier_of);
-
+    // COPIA a instancia ANTES do callback opaco tier_of (dentro de guard_protected_tier):
+    // `it` e it->card_id apontam pro buffer de active_; se tier_of tocar este agregado e
+    // realocar active_, tanto o iterador quanto a referencia da string penduram
+    // (heap-use-after-free). Guardamos sobre a COPIA (estavel) e reancoramos o iterador
+    // depois - fail-fast se a instancia sumiu no meio (tier_of nao pode mutar o agregado).
     CardInstance moved = *it;
+    guard_protected_tier(moved.card_id, tier_of);  // guard sobre a copia estavel
+    it = std::find_if(active_.begin(), active_.end(), [instance_id](const CardInstance& c) {
+        return c.instance_id == instance_id;
+    });
+    if (it == active_.end()) {
+        throw std::invalid_argument(
+            "CardCollection::discard_to_dead: instance_id sumiu do deck ativo durante o "
+            "lookup de tier (tier_of nao pode mutar o agregado)");
+    }
     active_.erase(it);
     dead_.push_back(std::move(moved));
 }
@@ -99,9 +110,19 @@ CardInstance CardCollection::remove_for_sale(std::uint64_t instance_id, const Ti
         throw std::invalid_argument(
             "CardCollection::remove_for_sale: instance_id nao esta no deck ativo");
     }
-    guard_protected_tier(it->card_id, tier_of);
-
+    // COPIA a instancia ANTES do callback opaco tier_of (mesma raiz de discard_to_dead):
+    // guard sobre a copia estavel, reancora o iterador depois - imune a uma realocacao
+    // de active_ provocada por tier_of.
     CardInstance removed = *it;
+    guard_protected_tier(removed.card_id, tier_of);
+    it = std::find_if(active_.begin(), active_.end(), [instance_id](const CardInstance& c) {
+        return c.instance_id == instance_id;
+    });
+    if (it == active_.end()) {
+        throw std::invalid_argument(
+            "CardCollection::remove_for_sale: instance_id sumiu do deck ativo durante o "
+            "lookup de tier (tier_of nao pode mutar o agregado)");
+    }
     active_.erase(it);
     return removed;
 }

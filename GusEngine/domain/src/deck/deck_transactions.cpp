@@ -52,7 +52,12 @@ RemovalOutcome remove_and_credit(CardCollection& collection, std::int64_t& credi
         return RemovalOutcome{TransactionError::InstanceNotInActive, CardInstance{}, 0};
     }
 
-    if (const CardTier tier = tier_of(found->card_id);
+    // COPIA o card_id antes do callback opaco tier_of (mesma raiz de
+    // HandLoadout::validate_candidate): `found` aponta pro buffer de
+    // collection.active(); se tier_of mutar o deck e realocar active_, `found->card_id`
+    // penduraria (heap-use-after-free). tier_of recebe uma copia estavel.
+    const std::string card_id = found->card_id;
+    if (const CardTier tier = tier_of(card_id);
         tier == CardTier::Especial || tier == CardTier::Super) {
         // Classe PROTEGIDA (inv.9) - nenhuma via de saida do ativo. Nada mutou ainda.
         return RemovalOutcome{TransactionError::ProtectedTier, CardInstance{}, 0};
