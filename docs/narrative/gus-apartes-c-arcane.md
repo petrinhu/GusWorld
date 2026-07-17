@@ -654,3 +654,28 @@ Uns oito passos de silêncio.
 | "O teu deixa você somar letra com número e não reclama" | Cauã, contra a A17 | Verdadeiro em parte (conversões implícitas), mas eu não achei fonte primária fetchada nesta sessão pra redigir sem imprecisão, e o assunto é escorregadio (o compilador avisa com flag). Fora até ter citação. |
 | Revide do Dante | Dante, em qualquer frase | **Cortado de propósito, decisão a reportar ao líder.** O Dante defende Asmódico "aparente" (`party.md`: "Asmódico autêntico vs Asmódico-fake") e migra pra C-Arcane no late game. Qualquer revide dele é ou pista de traição ou ruído. Se ele revida, isso é assunto de foreshadowing, não de piada. Precisa de decisão separada do líder. |
 
+---
+
+# A30 (diálogo: o gato e o peixe)
+
+> **APROVADO pelo líder 2026-07-17, CANON.**
+> Diferente de A1-A29 (fala solo do Gus, sem resposta obrigatória): este é um **aparte-DIÁLOGO**, uma troca de duas falas entre Linda e Gus. Conecta com o **A22** (o turbofish, "o peixe"): os dois operadores citados aqui têm apelido real de bicho, e o Gus fecha a piada com a lealdade tribal da família C (ver nota de canon abaixo).
+
+**Linda** (Óxido):
+
+> "Pode rir o quanto quiser do meu turbofish, Gus. É o operador mais elegante que existe. O peixe."
+
+**Gus:**
+
+> "Pois é... sabia que o irmão mais velho do meu C-Arcane acabou de ganhar um operador novo? Chamam de 'orelhas de gato'. O `^^`."
+>
+> (pausa)
+>
+> "Gato caça peixe, Linda."
+
+**Reação da Linda:** perde o CONTROLE da conversa, o mesmo padrão dela nos revides (ver tabela "Reação do Gus, por personagem" acima, AMB-06). Aqui é ela quem perde: muda de assunto rápido demais.
+
+**Fato (verdadeiro):** `^^` é o operador de reflexão votado pro **C++26** (proposta P2996, aprovada em junho/2025), sintaxe prefixa unária `^^T` que reflete um nome em `std::meta::info`. O apelido é real na comunidade C++, "cat-ear operator" (operador de orelhas de gato), porque `^^` lembra duas orelhas de gato. **Fonte:** isocpp.org, P2996R13; dev.classmethod.jp, "Cat-Ear Operator ^^". O turbofish (`::<>`, "o peixe") já é fato citado e fontado no A22 (The Rust Reference, "Paths").
+
+**Nota de canon (C-Arcane Major = C++):** o "irmão mais velho do meu C-Arcane" é o **C-Arcane Major**, nome diegético do C++ já canonizado na "frase RARA (o bilhete dourado)" (AMB-01). No bilhete dourado, o Gus critica o C-Arcane Major por facilitar demais ("só deixou fácil pra quem tem preguiça"); aqui, contra o Óxido (linguagem forasteira à família C), a família C fecha fileira, lealdade tribal, e o Gus torce pelo gato do C++ mesmo sem gostar dele por dentro. Os dois momentos não se contradizem: são registros diferentes (crítica interna vs. defesa externa), decisão já resolvida com o líder.
+
