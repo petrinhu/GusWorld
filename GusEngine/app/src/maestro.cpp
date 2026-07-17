@@ -528,6 +528,18 @@ bool Maestro::open_pause_from_city() {
             "- a cidade segue rodando SEM desenhar (degradacao segura, sem crash).");
     }
 
+    // MENU-PAUSA-FLASH-FIX (playtest ao vivo do lider - filho dele, 11 anos, notou
+    // um flash rapido ao FECHAR o menu de pausa/Salvar/Carregar - a tela de Save/
+    // Load roda ANINHADA neste MESMO contexto GL, ver system_menu_loop.hpp, entao
+    // este UNICO ponto ja cobre os dois): o SDL_Renderer que reacquire_renderer()
+    // acaba de criar pisca 1-2 frames antes da cidade ao vivo estabilizar
+    // (swapchain novo, conteudo indefinido na 1a apresentacao). "Esquenta" o
+    // renderer novo com a MESMA cena parada que o fundo congelado do menu ja
+    // mostrava (hold_frozen_frame, no-op seguro se reacquire_renderer falhou
+    // acima) ANTES de devolver o controle ao loop normal - mascara a costura sem
+    // cross-fade nem reestruturar release/reacquire.
+    city_->hold_frozen_frame();
+
     // M2 (GAP FINAL) -> M2 STAGED CHANGES: RELE o controls.json e realimenta o
     // SdlInput da cidade - aplica o remap SEM exigir restart. O jogador pode
     // ter passado por Controles, confirmado "Aplicar" (persist_controls, so

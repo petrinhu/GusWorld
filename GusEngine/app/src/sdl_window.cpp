@@ -409,6 +409,26 @@ void SdlWindow::render_dialogue_overlay_frame(const std::vector<std::string>& li
     render2d_->set_defer_present(false);  // restaura o default pro step() normal
 }
 
+void SdlWindow::hold_frozen_frame(int frames) {
+    if (render2d_ == nullptr || renderer_ == nullptr) {
+        return;  // renderer liberado (reacquire_renderer falhou) - nada a segurar
+    }
+    int pw = kWindowW, ph = kWindowH;
+    SDL_GetCurrentRenderOutputSize(renderer_, &pw, &ph);
+    const float kLogicalViewportW = static_cast<float>(kWindowW);
+    const float kLogicalViewportH = static_cast<float>(kWindowH);
+    for (int i = 0; i < frames; ++i) {
+        // alpha=1.0 sem interpolar: sim_ NAO avancou durante o menu (mesma cena
+        // parada que o fundo congelado ja mostrava) - so redesenha+apresenta (via
+        // OverworldSim::render -> IRenderer::end_frame, present AUTOMATICO com
+        // defer_present=false, o default de um Render2dSdl recem-criado) pra
+        // sobrescrever qualquer imagem indefinida/antiga do swapchain do
+        // SDL_Renderer novo com o conteudo CORRETO.
+        sim_->render(*render2d_, kLogicalViewportW, kLogicalViewportH, /*alpha=*/1.0f,
+                     static_cast<float>(pw), static_cast<float>(ph));
+    }
+}
+
 bool SdlWindow::capture_frame_to_png(const std::string& out_path) {
     if (render2d_ == nullptr || renderer_ == nullptr) {
         return false;  // renderer liberado - nada a capturar (degradacao segura)

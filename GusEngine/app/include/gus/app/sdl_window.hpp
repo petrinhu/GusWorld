@@ -186,6 +186,24 @@ public:
     // (degradacao segura - o chamador cai pro fundo abstrato de sempre).
     [[nodiscard]] bool capture_frame_to_png(const std::string& out_path);
 
+    // MENU-PAUSA-FLASH-FIX (achado de playtest ao vivo do lider - o filho dele, 11
+    // anos, notou um flash rapido ao FECHAR o menu de pausa): reacquire_renderer()
+    // cria um SDL_Renderer NOVO (SDL_CreateRenderer) - o swapchain double-buffered
+    // desse renderer comeca com conteudo indefinido/da tela anterior (o menu de
+    // pausa, contexto GL diferente), entao a 1a apresentacao real do jogo ao vivo
+    // (o proximo step() do loop normal) mostra 1-2 frames de pisca antes de
+    // estabilizar. Este metodo "esquenta" o renderer recem-criado: redesenha e
+    // APRESENTA a cena da cidade PARADA (sim_ NAO avanca - alpha=1.0 sem
+    // interpolar, MESMA tecnica de render_dialogue_overlay_frame/capture_frame_
+    // to_png) `frames` vezes seguidas, cobrindo TODAS as imagens do swapchain com
+    // o conteudo CORRETO (o ultimo frame vivo, o mesmo que o fundo congelado do
+    // menu ja mostrava) antes de devolver o controle ao loop normal - sem
+    // cross-fade, sem reestruturar release_renderer/reacquire_renderer. Chamar
+    // APOS reacquire_renderer() ter sucesso. No-op seguro se o renderer estiver
+    // liberado (mesmo guard de render_dialogue_overlay_frame) - cobre o caso
+    // reacquire_renderer() ter falhado.
+    void hold_frozen_frame(int frames = 2);
+
     // MENU-PAUSA-CONFIG-SOM: repassa o EDGE do Esc drenado pelo input_ (ver
     // SdlInput::consume_escape_pressed) - o gancho unico do MENU DE PAUSA na
     // CIDADE (que, ao contrario da batalha, nao tem pilha de modais pra Esc
