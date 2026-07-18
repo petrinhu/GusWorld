@@ -3,7 +3,7 @@
 // Implementacao da SdlWindow - casca SDL de janela + loop PROPRIO + input. Ver
 // header. Caminho irredutivel (janela/renderer/loop): coberto pelo smoke headless
 // do main (--smoke, SDL_VIDEODRIVER=dummy). A regra de jogo (OverworldSim) e o
-// renderer (Render2dSdl) sao testados a parte.
+// renderer (Render2dGl3, FLASH-CTX - era Render2dSdl) sao testados a parte.
 
 #include "gus/app/sdl_window.hpp"
 
@@ -15,6 +15,7 @@
 #include "gus/app/screens/player_sprites_loader.hpp"
 #include "gus/core/asset_paths.hpp"  // kRetratosDir/kRetratoInimigoFile (marcador do inimigo); kBertoldoSpritesDir/kBertoldoSpriteSouthFile (marcador do Bertoldo)
 #include "gus/platform/assets/asset_source.hpp"  // ASSETS-VFS-F1 (ADR-013): porteiro
+#include "gus/platform/rmlui/gl3_loader.hpp"  // FLASH-CTX: gl3_load_functions (init() standalone) + gl3_read_backbuffer_rgba (capture_frame_to_png)
 
 // stb_image_write: SO o header aqui (mesma receita de stb_image.h em render2d_gl3.cpp -
 // ver seu comentario de topo) - a IMPLEMENTACAO (STB_IMAGE_WRITE_IMPLEMENTATION) ja e
@@ -55,15 +56,23 @@ SdlWindow::SdlWindow() : clock_(1.0 / 60.0, 5) {
 }
 
 SdlWindow::~SdlWindow() {
+    // FLASH-CTX: destroi o Render2dGl3 (libera GL: texturas/programa/VAO/VBO) ENQUANTO o
+    // contexto ainda pode estar corrente - so entao (se dono) derruba o contexto e a
+    // janela, MESMA ordem de gus/app/screens/battle_preview.cpp (Render2dGl3 destruido
+    // antes do SDL_GL_DestroyContext). No modo ANEXADO (init_attached, a Maestro) nem o
+    // contexto nem a janela sao desta SdlWindow - so o Render2dGl3 e destruido aqui; a
+    // Maestro cuida do resto no PROPRIO dtor.
     render2d_.reset();
-    if (renderer_ != nullptr) {
-        SDL_DestroyRenderer(renderer_);
-    }
-    // M7-COSTURA: so destroi a janela se ESTA instancia a criou (init()). Em modo
-    // anexado (init_attached, usado pela Maestro) a janela e da Maestro - o dtor
-    // desta SdlWindow NUNCA a toca.
-    if (owns_window_ && window_ != nullptr) {
-        SDL_DestroyWindow(window_);
+    // M7-COSTURA / FLASH-CTX: so destroi contexto+janela se ESTA instancia os criou
+    // (init(), caminho STANDALONE). Em modo anexado (init_attached, usado pela Maestro) a
+    // janela E o contexto GL sao da Maestro - o dtor desta SdlWindow NUNCA os toca.
+    if (owns_window_) {
+        if (gl_context_ != nullptr) {
+            SDL_GL_DestroyContext(gl_context_);
+        }
+        if (window_ != nullptr) {
+            SDL_DestroyWindow(window_);
+        }
     }
 }
 
@@ -77,18 +86,39 @@ void SdlWindow::load_player_sprites() {
 }
 
 bool SdlWindow::init() {
-    // Cria janela + renderer num passo (SDL3 helper). vsync ligado por padrao
-    // (suave; o lider pode decidir desligar - ver relatorio).
-    if (!SDL_CreateWindowAndRenderer("GusWorld", kWindowW, kWindowH,
-                                     SDL_WINDOW_RESIZABLE, &window_, &renderer_)) {
-        SDL_Log("SDL_CreateWindowAndRenderer falhou: %s", SDL_GetError());
+    // FLASH-CTX (A1): caminho STANDALONE - cria a JANELA + o CONTEXTO GL PROPRIOS (3.3
+    // core/doublebuffer/stencil 8, MESMA receita de gus/app/maestro.cpp::init() - ver o
+    // comentario grande no header). SDL_WINDOW_OPENGL e obrigatorio aqui (o antigo
+    // SDL_CreateWindowAndRenderer criava um SDL_Renderer; agora e a janela CRUA + o
+    // contexto que criamos manualmente).
+    window_ = SDL_CreateWindow("GusWorld", kWindowW, kWindowH,
+                               SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
+    if (window_ == nullptr) {
+        SDL_Log("SDL_CreateWindow (standalone GL) falhou: %s", SDL_GetError());
         return false;
     }
     owns_window_ = true;
-    SDL_SetRenderVSync(renderer_, 1);  // 1 = sincroniza com o refresh
 
-    render2d_ =
-        std::make_unique<gus::platform::render2d::Render2dSdl>(renderer_);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
+    SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+    SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
+    gl_context_ = SDL_GL_CreateContext(window_);
+    if (gl_context_ == nullptr) {
+        SDL_Log("SDL_GL_CreateContext (standalone) falhou: %s", SDL_GetError());
+        return false;
+    }
+    SDL_GL_MakeCurrent(window_, gl_context_);
+    SDL_GL_SetSwapInterval(1);  // 1 = sincroniza com o refresh (era SDL_SetRenderVSync)
+    if (!gus::platform::rmlui::gl3_load_functions(
+            reinterpret_cast<void* (*)(const char*)>(SDL_GL_GetProcAddress))) {
+        SDL_Log("SdlWindow::init - gl3_load_functions (glad) falhou.");
+        return false;
+    }
+
+    render2d_ = std::make_unique<gus::platform::render2d::Render2dGl3>(
+        /*gl_active=*/true);
 
     // APP-ICON: esta SdlWindow e dona da janela (owns_window_) - aplica aqui pela
     // simetria "quem cria a janela decide o icone". NOTA: no modo normal (main.cpp),
@@ -96,6 +126,8 @@ bool SdlWindow::init() {
     // init_attached na janela ja existente e ja com icone - ver Maestro::init) -
     // este init() e o caminho STANDALONE (sem Maestro), usado por testes/uso
     // avulso da SdlWindow. Chamar aqui de novo nesse caminho e correto e barato.
+    // (NOTA FLASH-CTX: a chamada real fica FORA de escopo desta refatoracao - o
+    // comentario ja existia assim antes; init() e dead code sem chamador de producao.)
 
     // Abre gamepad ja conectado + arma hot-plug.
     input_.open_gamepads();
@@ -109,15 +141,14 @@ bool SdlWindow::init_attached(SDL_Window* window) {
     window_ = window;
     owns_window_ = false;  // a janela e da Maestro - o dtor NAO a destroi
 
-    renderer_ = SDL_CreateRenderer(window_, nullptr);
-    if (renderer_ == nullptr) {
-        SDL_Log("SDL_CreateRenderer (attached) falhou: %s", SDL_GetError());
-        return false;
-    }
-    SDL_SetRenderVSync(renderer_, 1);
-
-    render2d_ =
-        std::make_unique<gus::platform::render2d::Render2dSdl>(renderer_);
+    // FLASH-CTX (A1): NAO cria contexto nem faz make-current - o CHAMADOR (a Maestro,
+    // gus/app/maestro.cpp::init()) ja fez isso ANTES de chamar init_attached() (o
+    // contexto GL UNICO do processo, vivo do boot ao shutdown). Ver o comentario grande
+    // no header. gl_active=true assume que ha um contexto corrente valido; se
+    // Render2dGl3::init_gl() falhar (programa GL nao compila/linka), o proprio ctor
+    // degrada pra headless (gl_active_ vira false internamente) sem lancar.
+    render2d_ = std::make_unique<gus::platform::render2d::Render2dGl3>(
+        /*gl_active=*/true);
 
     // APP-ICON: a janela e da Maestro (dona real, ver init() acima) - ela ja aplica o
     // icone na criacao; nada a fazer aqui alem de nao duplicar.
@@ -133,19 +164,24 @@ void SdlWindow::load_enemy_marker_texture() {
         return;  // nenhum marcador definido ainda (uso standalone/sem Maestro)
     }
     // FIX CRASH (SIGSEGV real, playtest ao vivo 2026-07-17: pausa na cidade -> menu
-    // Save/Load -> LOAD -> deref de ponteiro nulo aqui). RAIZ: o menu de pausa roda
-    // NUM CONTEXTO GL PROPRIO e a Maestro (open_pause_from_city) chama
-    // release_renderer() ANTES de abrir o menu -> render2d_ == nullptr enquanto o
-    // menu esta vivo. A acao LOAD -> Maestro::apply_loaded_save_data ->
-    // city_->set_enemy_marker(...) cai aqui com render2d_ (e o SDL_Renderer) ja
-    // soltos. Separacao dado x GL: o enemy_marker_aabb_ (estado LOGICO) ja foi
-    // armazenado em set_enemy_marker ANTES desta chamada; a (re)carga da TEXTURA
-    // (estado GL) e ADIADA - reacquire_renderer() a refaz INCONDICIONALMENTE ao a
-    // cidade retomar (ver reacquire_renderer -> load_enemy_marker_texture), entao o
-    // marcador REAPARECE sozinho. sim_ nunca e nulo (criado no ctor), mas guardado
-    // por simetria/defesa. Degrada seguro, MESMO espirito do ramo headless abaixo.
-    if (render2d_ == nullptr || sim_ == nullptr) {
-        return;  // renderer solto (menu de pausa) - defer: reacquire_renderer recarrega
+    // Save/Load -> LOAD -> deref de ponteiro nulo aqui). RAIZ ORIGINAL (era SDL_Renderer):
+    // o menu de pausa rodava NUM CONTEXTO GL PROPRIO e a Maestro (open_pause_from_city)
+    // chamava release_renderer() ANTES de abrir o menu -> render2d_ == nullptr enquanto o
+    // menu estava vivo. FLASH-CTX (A1): o Render2dGl3 agora NUNCA e destruido (release_
+    // renderer so pausa - ver o header), entao o risco mudou de "ponteiro nulo" pra
+    // "contexto GL ERRADO corrente" - uma casca owning (menu/dialogo/titulo/batalha)
+    // AINDA cria o PROPRIO contexto GL por cima do da Maestro nesta etapa da ponte (ver
+    // o comentario grande em gus/app/maestro.cpp); tocar GL aqui enquanto pausado
+    // criaria a textura no contexto EFEMERO da casca owning (que morre com ela) em vez
+    // do contexto PERSISTENTE da Maestro. A acao LOAD -> Maestro::apply_loaded_save_data
+    // -> city_->set_enemy_marker(...) pode cair aqui com o renderer PAUSADO. Separacao
+    // dado x GL: o enemy_marker_aabb_ (estado LOGICO) ja foi armazenado em
+    // set_enemy_marker ANTES desta chamada; a (re)carga da TEXTURA (estado GL) e
+    // ADIADA - reacquire_renderer() a refaz INCONDICIONALMENTE ao a cidade retomar (ver
+    // reacquire_renderer -> load_enemy_marker_texture), entao o marcador REAPARECE
+    // sozinho. sim_ nunca e nulo (criado no ctor), mas guardado por simetria/defesa.
+    if (renderer_paused_ || render2d_ == nullptr || sim_ == nullptr) {
+        return;  // renderer pausado (menu de pausa) - defer: reacquire_renderer recarrega
     }
     // ASSETS-VFS-F1: monta o id RELATIVO completo (subdir + arquivo) e resolve UMA vez
     // (era resolver so o subdir e concatenar o arquivo depois - equivalente, mas agora o
@@ -181,12 +217,13 @@ void SdlWindow::load_npc_bertoldo_marker_texture() {
     if (!npc_bertoldo_marker_aabb_.has_value()) {
         return;  // nenhum marcador definido ainda (uso standalone/sem Maestro)
     }
-    // FIX CRASH (mesma raiz de load_enemy_marker_texture acima): render2d_/sim_ podem
-    // estar soltos (release_renderer feito pela Maestro enquanto o menu de pausa/GL
-    // roda). O npc_bertoldo_marker_aabb_ ja foi armazenado em set_npc_bertoldo_marker;
-    // a carga da textura e ADIADA e reacquire_renderer() a refaz ao a cidade retomar.
-    if (render2d_ == nullptr || sim_ == nullptr) {
-        return;  // renderer solto - defer: reacquire_renderer recarrega
+    // FIX CRASH (mesma raiz de load_enemy_marker_texture acima, FLASH-CTX): o renderer
+    // pode estar PAUSADO (release_renderer feito pela Maestro enquanto uma casca owning
+    // com o PROPRIO contexto GL roda). O npc_bertoldo_marker_aabb_ ja foi armazenado em
+    // set_npc_bertoldo_marker; a carga da textura e ADIADA e reacquire_renderer() a
+    // refaz ao a cidade retomar.
+    if (renderer_paused_ || render2d_ == nullptr || sim_ == nullptr) {
+        return;  // renderer pausado - defer: reacquire_renderer recarrega
     }
     const std::string id = std::string(gus::core::assets::kBertoldoSpritesDir) + "/" +
                             std::string(gus::core::assets::kBertoldoSpriteSouthFile);
@@ -212,32 +249,32 @@ void SdlWindow::clear_npc_bertoldo_marker() {
 }
 
 void SdlWindow::release_renderer() {
-    render2d_.reset();
-    if (renderer_ != nullptr) {
-        SDL_DestroyRenderer(renderer_);
-        renderer_ = nullptr;
-    }
+    // FLASH-CTX PONTE TEMPORARIA (A1): NAO destroi mais nada (o Render2dGl3/contexto GL
+    // e UNICO e vive do boot ao shutdown, dono e a Maestro) - so PAUSA (ver o guard em
+    // load_enemy_marker_texture/load_npc_bertoldo_marker_texture/step_with_fade/
+    // render_dialogue_overlay_frame/hold_frozen_frame/capture_frame_to_png, e o
+    // comentario grande no header). Poda definitiva (remocao da chamada + desta funcao)
+    // e o A3, passo 6 do plano.
+    renderer_paused_ = true;
 }
 
 bool SdlWindow::reacquire_renderer() {
-    renderer_ = SDL_CreateRenderer(window_, nullptr);
-    if (renderer_ == nullptr) {
-        SDL_Log("SDL_CreateRenderer (reacquire) falhou: %s", SDL_GetError());
-        return false;
-    }
-    SDL_SetRenderVSync(renderer_, 1);
-    render2d_ =
-        std::make_unique<gus::platform::render2d::Render2dSdl>(renderer_);
-    // Os TextureId anteriores nao sobrevivem ao SDL_Renderer destruido - recarrega.
+    // FLASH-CTX PONTE TEMPORARIA (A1): so DESPAUSA - nao ha mais SDL_Renderer/contexto
+    // pra recriar (nada foi destruido). IMPORTANTE: exige que o contexto GL da MAESTRO
+    // ja esteja CORRENTE quando chamado (a Maestro restaura via SDL_GL_MakeCurrent
+    // IMEDIATAMENTE apos a casca owning devolver o controle, ANTES de chamar isto - ver
+    // gus/app/maestro.cpp). As 4 cargas abaixo continuam INCONDICIONAIS (mesmo
+    // comportamento de sempre) mas agora sao BARATAS: Render2dGl3::load_texture cacheia
+    // por caminho (path->TextureId), entao um asset ja carregado volta na hora sem GL
+    // novo - o contexto nunca morreu, os handles de load_player_sprites/load_boot_pixel_
+    // frames continuam validos e essas 2 chamadas viram cache-hit puro. As dos
+    // marcadores (enemy/npc) SAO necessarias de fato quando set_enemy_marker/
+    // set_npc_bertoldo_marker foi chamado ENQUANTO pausado (a carga da textura ficou
+    // adiada pelo guard renderer_paused_ - ver o comentario dessas funcoes acima).
+    renderer_paused_ = false;
     load_player_sprites();
-    // Idem pro marcador de inimigo (M7-COSTURA Inc 2): so recarrega se ja havia um
-    // definido (no-op seguro se enemy_marker_aabb_ nunca foi setada).
     load_enemy_marker_texture();
-    // Idem pro marcador do Bertoldo (M7-DIALOGO, integracao do sprite): mesmo
-    // racional, no-op seguro se npc_bertoldo_marker_aabb_ nunca foi setada.
     load_npc_bertoldo_marker_texture();
-    // Idem pro boot pixelizado (M7-COSTURA Inc 2c): os 20 TextureId antigos tambem
-    // nao sobrevivem a troca de SDL_Renderer.
     load_boot_pixel_frames();
     return true;
 }
@@ -270,11 +307,14 @@ bool SdlWindow::step_with_fade(float overlay_alpha,
     }
 
     // 4) RENDER: 1 frame, interpolado pelo alpha residual. Viewport em PIXELS. So
-    // desenha se o renderer esta vivo (release_renderer o esvazia durante a batalha -
-    // a Maestro nao chama step() nesse intervalo, mas o guard e defensivo/barato).
-    if (render2d_ != nullptr && renderer_ != nullptr) {
+    // desenha se o renderer esta ATIVO/nao-pausado (release_renderer o pausa durante a
+    // batalha/menu/dialogo/titulo - a Maestro nao chama step() nesse intervalo, mas o
+    // guard e defensivo/barato, FLASH-CTX: era "renderer_ != nullptr").
+    if (!renderer_paused_ && render2d_ != nullptr) {
         int pw = kWindowW, ph = kWindowH;
-        SDL_GetCurrentRenderOutputSize(renderer_, &pw, &ph);
+        // FLASH-CTX: SDL_GetWindowSizeInPixels (era SDL_GetCurrentRenderOutputSize do
+        // SDL_Renderer) - equivalente em GL, MESMA chamada que battle_preview.cpp usa.
+        SDL_GetWindowSizeInPixels(window_, &pw, &ph);
         // DUNGEON-SCALING (fix do letterbox ao maximizar, achado do lider ao vivo
         // 2026-07-03): o ZOOM (quanto mundo a camera mostra) fica FIXO no viewport
         // LOGICO de referencia (kWindowW x kWindowH - a resolucao onde
@@ -325,9 +365,15 @@ bool SdlWindow::step_with_fade(float overlay_alpha,
                                   : gus::core::anim::BootPixelLeg::kFromBattleRevealing;
             const float t = going_to_battle ? clamped : (1.0f - clamped);
             boot_overlay_.draw(*render2d_, cam.rect, leg, t);
-            render2d_->present();
+            render2d_->present();  // FLASH-CTX: no-op no GL (mantido por simetria de API)
             render2d_->set_defer_present(false);  // restaura o default pro step() normal
         }
+        // FLASH-CTX (passo 3 do plano): o swap do frame da cidade agora e explicito -
+        // Render2dGl3::end_frame() NUNCA apresenta sozinho (diferente do Render2dSdl
+        // antigo, que auto-presentava quando defer_present_==false). Cobre os DOIS
+        // ramos acima (com/sem overlay): 1 swap por frame, no fim, MESMA disciplina
+        // "o dono do frame faz o swap" da batalha (ver battle_preview.cpp).
+        SDL_GL_SwapWindow(window_);
     }
     return true;
 }
@@ -365,11 +411,11 @@ void SdlWindow::set_controls(gus::domain::input::InputRemapConfig config) {
 }
 
 void SdlWindow::render_dialogue_overlay_frame(const std::vector<std::string>& lines) {
-    if (render2d_ == nullptr || renderer_ == nullptr) {
-        return;  // renderer liberado (uso incorreto/degradacao segura) - no-op
+    if (renderer_paused_ || render2d_ == nullptr) {
+        return;  // renderer pausado (uso incorreto/degradacao segura) - no-op
     }
     int pw = kWindowW, ph = kWindowH;
-    SDL_GetCurrentRenderOutputSize(renderer_, &pw, &ph);
+    SDL_GetWindowSizeInPixels(window_, &pw, &ph);  // FLASH-CTX: era SDL_GetCurrentRenderOutputSize
     const float kLogicalViewportW = static_cast<float>(kWindowW);
     const float kLogicalViewportH = static_cast<float>(kWindowH);
 
@@ -405,82 +451,87 @@ void SdlWindow::render_dialogue_overlay_frame(const std::vector<std::string>& li
         ty += px_size * 1.4f;
     }
 
-    render2d_->present();
+    render2d_->present();  // FLASH-CTX: no-op no GL (mantido por simetria de API)
     render2d_->set_defer_present(false);  // restaura o default pro step() normal
+    // FLASH-CTX: swap explicito (Render2dGl3::end_frame() nunca apresenta sozinho -
+    // era present AUTOMATICO do Render2dSdl com defer_present=false; ver step_with_fade).
+    SDL_GL_SwapWindow(window_);
 }
 
 void SdlWindow::hold_frozen_frame(int frames) {
-    if (render2d_ == nullptr || renderer_ == nullptr) {
-        return;  // renderer liberado (reacquire_renderer falhou) - nada a segurar
+    if (renderer_paused_ || render2d_ == nullptr) {
+        return;  // renderer pausado (reacquire_renderer falhou) - nada a segurar
     }
     int pw = kWindowW, ph = kWindowH;
-    SDL_GetCurrentRenderOutputSize(renderer_, &pw, &ph);
+    SDL_GetWindowSizeInPixels(window_, &pw, &ph);  // FLASH-CTX: era SDL_GetCurrentRenderOutputSize
     const float kLogicalViewportW = static_cast<float>(kWindowW);
     const float kLogicalViewportH = static_cast<float>(kWindowH);
     for (int i = 0; i < frames; ++i) {
         // alpha=1.0 sem interpolar: sim_ NAO avancou durante o menu (mesma cena
-        // parada que o fundo congelado ja mostrava) - so redesenha+apresenta (via
-        // OverworldSim::render -> IRenderer::end_frame, present AUTOMATICO com
-        // defer_present=false, o default de um Render2dSdl recem-criado) pra
-        // sobrescrever qualquer imagem indefinida/antiga do swapchain do
-        // SDL_Renderer novo com o conteudo CORRETO.
+        // parada que o fundo congelado ja mostrava) - so redesenha+apresenta pra
+        // sobrescrever qualquer imagem indefinida/antiga do swapchain com o conteudo
+        // CORRETO. FLASH-CTX: Render2dGl3::end_frame() NAO apresenta sozinho (ao
+        // contrario do Render2dSdl antigo, que auto-presentava com defer_present=
+        // false) - o SWAP EXPLICITO por iteracao (abaixo) e o que de fato cobre CADA
+        // imagem do swapchain, MESMO proposito de antes.
         sim_->render(*render2d_, kLogicalViewportW, kLogicalViewportH, /*alpha=*/1.0f,
                      static_cast<float>(pw), static_cast<float>(ph));
+        SDL_GL_SwapWindow(window_);
     }
 }
 
 bool SdlWindow::capture_frame_to_png(const std::string& out_path) {
-    if (render2d_ == nullptr || renderer_ == nullptr) {
-        return false;  // renderer liberado - nada a capturar (degradacao segura)
+    if (renderer_paused_ || render2d_ == nullptr) {
+        return false;  // renderer pausado - nada a capturar (degradacao segura)
     }
     int pw = kWindowW, ph = kWindowH;
-    SDL_GetCurrentRenderOutputSize(renderer_, &pw, &ph);
+    SDL_GetWindowSizeInPixels(window_, &pw, &ph);  // FLASH-CTX: era SDL_GetCurrentRenderOutputSize
     const float kLogicalViewportW = static_cast<float>(kWindowW);
     const float kLogicalViewportH = static_cast<float>(kWindowH);
 
-    // FUNDO REAL CONGELADO (M7-DIALOGO/MENU-PAUSA-CONFIG-SOM, decisao do lider): a
-    // caixa de dialogo do NPC e o menu de pausa passam a mostrar a CENA REAL da
-    // cidade (ultimo frame antes de abrir), nao mais a vinheta abstrata - mesmo
-    // padrao de Chrono Trigger/Zelda/Stardew Valley (o mundo "pausa" atras da UI).
+    // FUNDO REAL CONGELADO (M7-DIALOGO/MENU-PAUSA-CONFIG-SOM, decisao do lider). FLASH-CTX
+    // (A1, passo 4 - DEFAULT escolhido, ver o header): a caixa de dialogo do NPC e o menu
+    // de pausa passam a mostrar a CENA REAL da cidade (ultimo frame antes de abrir), nao
+    // mais a vinheta abstrata - mesmo padrao de Chrono Trigger/Zelda/Stardew Valley (o
+    // mundo "pausa" atras da UI).
     //
-    // TECNICA: redesenha o MESMO frame (sim_ NAO avanca - nenhum step_fixed aqui,
-    // alpha=1.0 sem interpolar, MESMA receita de render_dialogue_overlay_frame
-    // acima) com present ADIADO (ADR-009, set_defer_present) e le o backbuffer via
-    // SDL_RenderReadPixels ANTES de apresentar - a doc da SDL3 so garante o
-    // conteudo do frame ATUAL nessa janela (entre o desenho e o SDL_RenderPresent);
-    // ler DEPOIS do swap seria conteudo indefinido em backends com double-buffer
-    // real (opengl/vulkan/d3d, onde o backbuffer troca de lugar com o front no
-    // present). MESMA tecnica ja provada empiricamente sob Xvfb (ver
-    // app/tools/repro_bertoldo.cpp, que le OK sem nenhum present). Depois de ler,
-    // presenta o MESMO frame normalmente - byte-identico ao que o jogador ja
-    // estava vendo, so desenhado 1x a mais (custo desprezivel: 1 captura pontual
-    // por ABERTURA de tela, nao por frame).
+    // TECNICA (GL): redesenha o MESMO frame (sim_ NAO avanca - nenhum step_fixed aqui,
+    // alpha=1.0 sem interpolar, MESMA receita de render_dialogue_overlay_frame acima) e
+    // le o BACKBUFFER via gus::platform::rmlui::gl3_read_backbuffer_rgba (glReadPixels +
+    // flip vertical pra origem no topo, MESMA funcao que a batalha ja usa pro smoke
+    // visual - ver gus/platform/rmlui/gl3_loader.cpp) ANTES do swap - o conteudo do
+    // GL_BACK so e garantido ENTRE o desenho e o SDL_GL_SwapWindow (ler DEPOIS do swap
+    // seria o FRONT antigo/indefinido, double-buffer real). Depois de ler, apresenta o
+    // MESMO frame normalmente (SDL_GL_SwapWindow - o dono do frame faz o swap, mesma
+    // disciplina de step_with_fade acima) - byte-identico ao que o jogador ja estava
+    // vendo, so desenhado 1x a mais (custo desprezivel: 1 captura pontual por ABERTURA
+    // de tela, nao por frame). set_defer_present/present() SAO no-op no GL (mantidos por
+    // simetria de API com a era Render2dSdl - nao afetam o resultado).
     render2d_->set_defer_present(true);
     sim_->render(*render2d_, kLogicalViewportW, kLogicalViewportH, /*alpha=*/1.0f,
                  static_cast<float>(pw), static_cast<float>(ph));
 
-    SDL_Surface* surface = SDL_RenderReadPixels(renderer_, nullptr);
-    render2d_->present();
-    render2d_->set_defer_present(false);  // restaura o default pro step() normal
+    std::vector<unsigned char> pixels(static_cast<std::size_t>(pw) * ph * 4);
+    const bool read_ok =
+        gus::platform::rmlui::gl3_read_backbuffer_rgba(pw, ph, pixels.data());
 
-    if (surface == nullptr) {
-        SDL_Log("SdlWindow: capture_frame_to_png - SDL_RenderReadPixels falhou: %s",
-                SDL_GetError());
+    render2d_->present();  // no-op no GL, mantido por simetria
+    render2d_->set_defer_present(false);  // restaura o default pro step() normal
+    SDL_GL_SwapWindow(window_);  // apresenta o MESMO frame que acabou de ser lido
+
+    if (!read_ok) {
+        SDL_Log(
+            "SdlWindow: capture_frame_to_png - gl3_read_backbuffer_rgba falhou "
+            "(dimensoes invalidas ou glad nao carregado).");
         return false;
     }
-    // Converte pro formato RGBA32 tightly-defined (o formato NATIVO devolvido por
-    // SDL_RenderReadPixels varia por backend/driver - normalizar antes de escrever
-    // o PNG, mesma receita de repro_bertoldo.cpp).
-    SDL_Surface* converted = SDL_ConvertSurface(surface, SDL_PIXELFORMAT_RGBA32);
-    SDL_DestroySurface(surface);
-    if (converted == nullptr) {
-        SDL_Log("SdlWindow: capture_frame_to_png - SDL_ConvertSurface falhou: %s",
-                SDL_GetError());
-        return false;
-    }
-    const int ok = stbi_write_png(out_path.c_str(), converted->w, converted->h,
-                                  /*comp=*/4, converted->pixels, converted->pitch);
-    SDL_DestroySurface(converted);
+    // stb_image_write escreve RGBA32 tightly-packed (4 bytes/pixel, stride = w*4) -
+    // gl3_read_backbuffer_rgba ja devolve exatamente esse formato (glReadPixels com
+    // GL_RGBA/GL_UNSIGNED_BYTE + GL_PACK_ALIGNMENT=1), sem SDL_ConvertSurface
+    // intermediario (esse passo so existia pra normalizar o formato NATIVO/variavel do
+    // SDL_RenderReadPixels - nao existe mais no caminho GL).
+    const int ok = stbi_write_png(out_path.c_str(), pw, ph, /*comp=*/4, pixels.data(),
+                                  pw * 4);
     if (ok == 0) {
         SDL_Log("SdlWindow: capture_frame_to_png - stbi_write_png falhou (%s)",
                 out_path.c_str());

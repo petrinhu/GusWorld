@@ -85,8 +85,7 @@ int main() {
     constexpr int kW = 960;
     constexpr int kH = 540;
 
-    // JANELA UNICA com flag OPENGL desde o inicio - MESMA receita de Maestro::init()
-    // (SdlWindow::init_attached cria o SDL_Renderer NUMA janela ja OPENGL-flagged).
+    // JANELA UNICA com flag OPENGL desde o inicio - MESMA receita de Maestro::init().
     SDL_Window* window =
         SDL_CreateWindow("frozen_bg_probe", kW, kH, SDL_WINDOW_OPENGL);
     if (window == nullptr) {
@@ -94,32 +93,43 @@ int main() {
         return 1;
     }
 
-    // 1) CAPTURA REAL da cidade (MESMA tecnica de Maestro::to_npc_dialogue/
-    // open_pause_from_city -> SdlWindow::capture_frame_to_png) - ANTES de soltar o
-    // renderer.
-    gus::app::SdlWindow city;
-    if (!city.init_attached(window)) {
-        std::cerr << "city.init_attached falhou\n";
-        return 1;
-    }
-    // Alguns ticks de update (parado no spawn e suficiente pra provar a tecnica -
-    // nao precisa andar ate o Bertoldo/inimigo pra esta prova).
-    for (int i = 0; i < 5; ++i) {
-        city.step();
-    }
-    const std::string frozen_path =
-        (fs::temp_directory_path() / "gusworld_frozen_bg_probe_city.png").string();
-    const bool captured = city.capture_frame_to_png(frozen_path);
-    std::cout << "capture_frame_to_png(" << frozen_path << ") = " << captured << "\n";
-    if (!captured) {
-        return 1;
-    }
-    city.release_renderer();
-
-    // 2) CONTEXTO GL PROPRIO (MESMA janela - troca de backend, MESMA tecnica de
-    // run_npc_dialogue_loop_gl/run_system_menu_loop_owning_gl).
+    // FLASH-CTX (A1): CONTEXTO GL UNICO criado AQUI, ANTES de city.init_attached() -
+    // SdlWindow::init_attached() agora ASSUME um contexto ja corrente (MESMA receita
+    // de Maestro::init() - ver maestro.cpp). Reusa a MESMA janela/contexto pro resto
+    // do probe (dialogo + pausa), SEM criar um 2o contexto - a arena (city/backdrop)
+    // e o glintfx::UiLayer compoem no MESMO contexto, MESMA disciplina da producao.
     SDL_GLContext gl = nullptr;
     if (!make_gl_context(window, &gl)) {
+        return 1;
+    }
+
+    // 1) CAPTURA REAL da cidade (MESMA tecnica de Maestro::to_npc_dialogue/
+    // open_pause_from_city -> SdlWindow::capture_frame_to_png) - ANTES de pausar o
+    // renderer.
+    const std::string frozen_path =
+        (fs::temp_directory_path() / "gusworld_frozen_bg_probe_city.png").string();
+    bool captured = false;
+    {
+        // FLASH-CTX: escopo PROPRIO pra `city` - o dtor da SdlWindow agora destroi um
+        // Render2dGl3 que NUNCA foi destruido por release_renderer (so pausado, ver
+        // sdl_window.hpp), entao PRECISA rodar enquanto `gl` ainda esta vivo/corrente.
+        // Fecha ANTES do SDL_GL_DestroyContext/SDL_DestroyWindow/SDL_Quit no fim do
+        // main() (ordem importa: GL apos contexto destruido e UB).
+        gus::app::SdlWindow city;
+        if (!city.init_attached(window)) {
+            std::cerr << "city.init_attached falhou\n";
+            return 1;
+        }
+        // Alguns ticks de update (parado no spawn e suficiente pra provar a tecnica -
+        // nao precisa andar ate o Bertoldo/inimigo pra esta prova).
+        for (int i = 0; i < 5; ++i) {
+            city.step();
+        }
+        captured = city.capture_frame_to_png(frozen_path);
+        std::cout << "capture_frame_to_png(" << frozen_path << ") = " << captured << "\n";
+        city.release_renderer();  // FLASH-CTX: agora so PAUSA (nada e destruido)
+    }
+    if (!captured) {
         return 1;
     }
 
