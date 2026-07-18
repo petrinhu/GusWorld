@@ -70,7 +70,7 @@
 | **Bento × Dante** | Asmódico autêntico vs Asmódico-fake. | Intuição Bento; reveal climax. |
 | **Jaci × Dante** | Bio-leitura silenciosa. | Distância mútua; reveal climax. |
 
-**Sem triângulos românticos.** Vínculos = amizade, respeito, rivalidade fraterna (Pillar 4).
+**Sem triângulos românticos, namoro ou fan-service.** Vínculos = amizade, respeito, rivalidade fraterna (Pillar 4). **Exceção nuançada (decisão do líder 2026-07-18):** um afeto platônico infantil, velado e nunca revelado/correspondido em texto, típico da idade, é permitido com sutileza (canon: Jaci e Gus, ambos 11). Ver "Não fazer".
 
 ---
 
@@ -105,7 +105,7 @@ Cross-ref: `comic-reliefs.md` (cenas 2, 5, 7, 8, 9, 10).
 - **Sem mascote falante.** Clichê e custo de animação.
 - **Sem personagem que existe só para morrer.** Anti-fridging. Se companion morre, é arc completo (Dante traidor é o único, e ele é vilão por dentro).
 - **Sem voice intercambiável.** Se duas falas trocam de boca sem soar errado, refatorar.
-- **Sem romance.** Vínculos = amizade, respeito, rivalidade.
+- **Sem romance de verdade** (namoro, triângulo, declaração, fan-service): NÃO. Vínculos default = amizade, respeito, rivalidade. **Exceção nuançada (líder, 2026-07-18):** um afeto platônico infantil NÃO-REVELADO e nunca correspondido em texto, típico dos 11 anos, é permitido com MUITA sutileza (só Jaci e Gus). Regras da exceção: nunca é dito em voz alta por nenhum dos dois; aparece só em subtexto (gesto, um emoji de carinha da Jaci, uma hesitação); nunca vira triângulo nem "arco romântico"; se um leigo perceber, foi longe demais. É o "cuidar sem dizer" da Jaci ganhando uma camada, não um enredo.
 - **Sem grupo "Power Rangers" com líder + 5 secundários.** Gus é protagonista mas companions têm subjetividade plena.
 - **Sem morte de companion off-screen pra economizar cinemática.** Se algum cai, o jogo trata isso com peso.
 - **Sem "dark backstory" sem propósito.** Cada wound serve ao arc do personagem.
