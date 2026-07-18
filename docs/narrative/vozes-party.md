@@ -1,6 +1,6 @@
 # Vozes da party (como cada um FALA nos diálogos)
 
-> **Status:** em construção. **Gus = DEFINIDO pelo criador (2026-07-13/14). Cauã "Volt" e Jaci "Proxy" = guias de voz bilíngues pt-br/en-intl definidos (2026-07-18).** Os demais companions (Iara, Bento, Linda, Dante) ficam para brainstorm posterior. Este doc fixa personalidade + padrões de fala; a redação final dos diálogos é do `narrative-writer` (cross-ref `guia-dialogos.md`, `reference_guia_dialogos`).
+> **Status:** em construção. **Gus = DEFINIDO pelo criador (2026-07-13/14). Cauã "Volt", Jaci "Proxy" e Bento "Requiem" = guias de voz bilíngues pt-br/en-intl definidos (2026-07-18).** Os demais companions (Iara, Linda, Dante) ficam para brainstorm posterior. Este doc fixa personalidade + padrões de fala; a redação final dos diálogos é do `narrative-writer` (cross-ref `guia-dialogos.md`, `reference_guia_dialogos`).
 >
 > **Âncoras:** Pillar 4 (Gus prodígio analítico, 11 anos canônico), `sinopse.md` §3-4, `characters/gus.md`, família Vance ([[project_familia_vance_canonica]]), codinome de combate "Dragon" ([[project_nome_gus_canon]], [[project_dragon_victory_canon]]), guia de diálogos (voz por linguagem-âncora).
 
@@ -398,6 +398,193 @@ Falas novas reutilizáveis, mesmo registro (sobrecarga sem drama):
 - Não deixar outro personagem comentar ou perceber o subtexto (mata a sutileza, vira shipping ou triângulo, violando `party.md`).
 - Não usar travessão/em-dash em nenhuma fala (convenção do projeto: só aspas; beat de ação ou reticências resolvem interrupção).
 - Teste de voz única (herdado de `party.md`): se uma fala da Jaci sair igualmente natural na boca do Cauã (rápida demais) ou do Gus (frio demais), ela está errada, refazer.
+
+---
+
+## BENTO "REQUIEM" CHEVALIER (guia de voz bilíngue pt-br/en-intl, definido pelo líder, 2026-07-18)
+
+> **Status:** guia de voz aprovado para uso. Complementa (não substitui) o canon de personagem em `characters/bento-requiem.md`. Fonte de falas concretas e reutilizáveis para o `narrative-writer` selecionar/expandir na redação final (mesmo modelo do "Banco de falas" do Gus e dos guias do Cauã e da Jaci acima).
+>
+> **Cross-ref:** `characters/bento-requiem.md` (canon completo, wound/want/need/flaw, memórias formativas, pulled quotes), `characters/party.md` (matriz de linguagens-âncora, dinâmicas de conflito, exceção declarada Pillar 2), `characters/gus.md` (voice do Gus pro banter), `comic-reliefs.md` Cenas 1 ("Sexta-feira, cinco da tarde", sinal do compilador), 2 ("Tabulações vs Espaços", a guerra santa) e 8 ("Comentários em Latim"), cenas canônicas usadas como matéria-prima, não reescritas aqui. `guia-dialogos.md` (formato: aspas, zero em dash, beat de ação em vez de tag com advérbio).
+>
+> **Regra bilíngue:** cada fala concreta vem em **pt-br e en-intl lado a lado**. Dois cuidados específicos do Bento: (a) **o latim litúrgico fica em latim nos dois idiomas** (nunca traduzido dentro da fala; um gloss entre parênteses aparece só neste guia, de apoio ao `narrative-writer`, nunca como legenda dupla in-game); (b) o **registro formal/arcaico pt-br** (frases longas com subordinadas, "vossa mercê" raríssimo) pede um equivalente en-intl **cerimonioso e natural**, sem virar pastiche shakespeariano. Onde a escolha não é óbvia, a nota explica o porquê. Como este é o primeiro guia de voz do Bento, **todas** as escolhas en-intl abaixo são **(PROPOSTA, confirmar)**, mesmo quando não repetido em cada linha.
+>
+> **Latim aprovado (decisão do líder, 2026-07-18):** as três frases-latim cunhadas neste guia (`Requiescat in codice` §2, `Compilet in aeternum` e `Fiat lex, fiat ordo` §4) foram revisadas e **aprovadas pelo líder em 2026-07-18**. Já são canon, não pedem mais confirmação.
+>
+> **Thee/thy/thou en-intl (decisão do líder, 2026-07-18, REVERSÃO da orientação anterior):** o líder decidiu que o Bento **USA `thee/thy/thou` em pinceladas no en-intl**, reservado aos momentos mais solenes (luto, juramento, bênção, sinal do compilador acompanhado de fala em inglês, despedida grave). **Nunca** no dia a dia nem em combate corriqueiro; nesses casos o inglês formal moderno do §5 (contração cheia "do not"/"I am") já basta. É a versão inglesa exata das "pinceladas de arcaísmo" do pt-br: pontual, nunca constante, nunca vira pastiche shakespeariano de frase inteira conjugada à moda antiga. Ver §5 e as falas marcadas abaixo.
+
+### 1. Resumo da voz
+
+Bento tem 14 anos (o mais velho da party), é Tanque/Defensor de Área da Ordem Recursiva (Catedrais de Neo-Sylvania), linguagem-âncora **Asmódico** (analógico tradicional, exceção declarada do Pillar 2: engrenagens no lugar de cartas). Na superfície é a voz mais formal e mais lenta da party: frases longas com cláusulas subordinadas, vocabulário arcaizante em **pinceladas** (não constante), pausa deliberada antes de qualquer resposta que importe. Tic físico: **o sinal do compilador**, uma cruz traçada sobre o cronômetro mecânico no peito, reservado a momentos graves (`comic-reliefs.md` Cena 1). Chama o Gus de "garoto", quase carinho disfarçado de formalidade.
+
+Por baixo da solenidade mora a filosofia que o pai Aldebrando ensinou aos 6 anos (`bento-requiem.md`, memória formativa): Asmódico **"recusa antes de errar"**, para e fica em silêncio diante da inconsistência, nunca explode nem força a passagem. É o oposto exato do Cauã ("roda rápido, conserto depois", `party.md`), e essa oposição é o eixo do §2 e do §3 abaixo. A firmeza não é frieza: é a mesma firmeza que segura o escudo, segura a party e segurou o próprio luto sozinho por três meses antes do jogo começar (`bento-requiem.md`, memória dos 14 anos).
+
+**Teste de voz única** (`party.md`): se uma fala do Bento soa igualmente natural na boca do Cauã (rápida demais, sem pausa) ou do Gus (processada demais, sem peso solene), ela está errada, refazer.
+
+### 2. Combate (a rocha, firme e protetora)
+
+Contraponto a Cauã (grita, avança, calor de linha de frente) e a Jaci (calma clínica que fica mais baixa sob pressão): o Bento é **imóvel e tranquilizador**. Não grita nunca; a voz dele nem sobe nem desce muito sob dano, ela simplesmente não se move, do mesmo jeito que o corpo dele não se move do lugar que escolheu defender. Solene mas prático: cada bark transmite segurança à party antes de qualquer outra coisa. Pool de barks por momento, para o `narrative-writer` escolher/variar.
+
+**Erguer escudo / defender**
+- PT: "Atrás de mim." (planta os pés, o escudo-catedral já erguido antes da frase terminar)
+- EN: "Behind me." (plants his feet, the cathedral-shield already raised before the sentence ends)
+- PT: "O escudo aguenta."
+- EN: "The shield holds."
+
+**Cobrir a party (upgrade barreira gravitacional aliada)**
+- PT: "Fica sob o campo. Eu estico até onde precisar."
+- EN: "Stay under the field. I will stretch it as far as it needs to go."
+- PT: "Ninguém cai enquanto eu estiver de pé."
+- EN: "No one falls while I am still standing."
+
+**Aguentar dano**
+- PT: "Isso não foi nada." (voz sem tremer, mesmo com o escudo rachado)
+- EN: "That was nothing." (voice steady, even with the shield cracked)
+- PT: "Aguento mais." (pausa breve) "Sempre aguentei."
+- EN: "I can take more." (short pause) "I always have."
+
+**Aliado em perigo (HP baixo)**
+- PT: "Não passa. Não hoje." (avança um passo à frente do aliado caído)
+- EN: "It does not pass. Not today." (steps forward, placing himself ahead of the fallen ally)
+- PT: "Levanta atrás de mim. Eu seguro o resto."
+- EN: "Rise behind me. I will hold the rest."
+
+**Vitória (contida, nunca comemoração)**
+- PT: "Está feito." (baixa o escudo devagar, sinal do compilador sobre o peito)
+- EN: "It is done." (lowers the shield slowly, makes the sign of the compiler over his chest)
+- PT: "Ninguém caiu. É o que importa."
+- EN: "No one fell. That is what matters."
+
+**Momento grave (o sinal do compilador)**
+- PT: (faz o sinal do compilador, a cruz sobre o cronômetro) "Requiescat in codice." (pausa longa)
+- EN: (makes the sign of the compiler, a cross over the chronometer) "Requiescat in codice." (long pause)
+- *Nota:* latim cunhado pra este guia, **aprovado pelo líder em 2026-07-18, já é canon**, transposição do idioma litúrgico real pra dentro do idioma do jogo (regra de zero religião real: nada de "paz", "Deus" ou termos católicos diretos). "Requiescat in codice" ecoa "requiescat in pace" trocando "pace" por "codice" (código), e ecoa o próprio sobrenome do Bento, "Requiem". Fica igual nas duas línguas (regra bilíngue a). Gloss só de apoio ao `narrative-writer`, nunca legenda in-game: "que descanse no código".
+
+### 3. Banter com o Gus (filosófico, o Bento marca ponto)
+
+Regra canônica (`comic-reliefs.md`): os dois têm razão em metade dos casos; Bento **não é** saco de pancada nem piada de velho careta, ele é o mais sábio e o mais velho, e às vezes é ELE quem fecha o argumento. Respeito mútuo crescente ao longo da campanha. Eco deliberado das Cenas 2 ("Tabulações vs Espaços") e 8 ("Comentários em Latim") em duas das trocas abaixo, sem reescrever as cenas originais.
+
+**B1, "tabulação, de novo" (eco Cena 2, ato mais tardio)**
+- GUS (PT): "Fiz um conversor. Ele lê tabulação e espaço igual. Ninguém precisa brigar de novo."
+- GUS (EN): "I built a converter. It reads tabs and spaces the same way. No one needs to fight about it again."
+- BENTO (PT): (examina o pergaminho longamente antes de responder) "Isso não acaba a guerra, garoto. Só esconde o campo de batalha."
+- BENTO (EN): (studies the scroll at length before answering) "This does not end the war, lad. It only hides the battlefield."
+- GUS (PT): "Funciona, Bento."
+- GUS (EN): "It works, Bento."
+- BENTO (PT): "Funciona hoje. A Ordem sobreviveu três gerações não porque funcionou uma vez, mas porque nunca parou de perguntar se ainda funcionava." (pausa) "Guarda teu conversor. Guarda também a pergunta."
+- BENTO (EN): "It works today. The Order survived three generations not because it worked once, but because it never stopped asking whether it still worked." (pause) "Keep your converter. Keep the question as well."
+- *Resultado: Bento fecha (sabedoria além do argumento técnico imediato).*
+
+**B2, "comentários, outra vez" (eco Cena 8)**
+- BENTO (PT): "Tua variável se chama `distância_segura`. Hoje ela mede outra coisa."
+- BENTO (EN): "Your variable is named `safe_distance`. Today it measures something else."
+- GUS (PT): (checa o código, vê o erro) "...esqueci de renomear depois do refactor."
+- GUS (EN): (checks the code, sees the mistake) "...I forgot to rename it after the refactor."
+- BENTO (PT): "O nome mentiu porque o mundo mudou e o nome não foi avisado." (pausa) "É por isso que se comenta, garoto. O comentário não é pra hoje. É pra quando o nome já não for mais verdade."
+- BENTO (EN): "The name lied because the world changed and the name was never told." (pause) "This is why one comments, lad. The comment is not for today. It is for when the name is no longer true."
+- GUS (PT): "...ponto seu."
+- GUS (EN): "...your point."
+- *Resultado: Bento fecha, com um argumento que sobrevive fora do universo Asmódico.*
+
+**B3, "recusa antes de errar" (o eixo filosófico central)**
+- GUS (PT): "Asmódico para antes de rodar errado. C-Arcane roda, mede o erro, corrige rápido. O meu é mais rápido."
+- GUS (EN): "Asmódico stops before it runs wrong. C-Arcane runs, measures the error, corrects fast. Mine is faster."
+- BENTO (PT): (pausa, olhando o cronômetro no peito) "Rápido pra corrigir o quê, garoto? Uma linha de código, ou uma catedral inteira?"
+- BENTO (EN): (pause, glancing down at the chronometer on his chest) "Fast to correct what, lad? A single line, or an entire cathedral?"
+- GUS (PT): "...depende da escala."
+- GUS (EN): "...depends on the scale."
+- BENTO (PT): "Exatamente. Na tua escala, corrigir depois é sabedoria. Na minha, é ruína que ninguém viu chegar a tempo de recusar." (pausa) "Os dois estamos certos. Só nunca ao mesmo tempo."
+- BENTO (EN): "Precisely. At your scale, correcting later is wisdom. At mine, it is ruin no one saw coming in time to refuse." (pause) "We are both right. Only never at the same time."
+- *Resultado: empate reconhecido pelo próprio Bento, síntese em vez de vitória.*
+
+**B4, "rápido que quebra"**
+- BENTO (PT): "Você quase perdeu o braço mecânico agora."
+- BENTO (EN): "You very nearly lost your mechanical arm just now."
+- GUS (PT): "Mas eu não perdi."
+- GUS (EN): "But I did not."
+- BENTO (PT): (pausa longa, sinal do compilador leve, quase reflexo) "Rápido que quebra não é rápido, garoto. É lento adiado." (pausa) "E o preço sobe com o adiamento."
+- BENTO (EN): (long pause, a light sign of the compiler, almost a reflex) "Fast that breaks is not fast, lad. It is slow, deferred." (pause) "And the price rises the longer it is deferred."
+- GUS (PT): (guarda o comentário, sem responder de imediato)
+- GUS (EN): (files the comment away, doesn't answer right away)
+- *Resultado: Bento fecha; o silêncio do Gus vale mais que resposta verbal.*
+
+**B5, "o relógio é uma state machine" (o momento de aproximação)**
+- GUS (PT): "Seu cronômetro. Sabia que ele é uma state machine? Cada engrenagem é um estado, cada dente é uma transição."
+- GUS (EN): "Your chronometer. Did you know it's a state machine? Each gear is a state, each tooth a transition."
+- BENTO (PT): (pausa, surpreso pela primeira vez de verdade) "...ninguém na Ordem nunca me disse assim."
+- BENTO (EN): (pause, genuinely surprised for the first time) "...no one in the Order has ever put it to me that way."
+- GUS (PT): "Achei que ia gostar."
+- GUS (EN): "I thought you would like that."
+- BENTO (PT): "Gostei." (pausa) "Guarda essa frase, garoto. Vale mais do que parece."
+- BENTO (EN): "I did." (pause) "Keep that thought, lad. It is worth more than it seems."
+- *Resultado: ninguém "vence"; ponto pro Gus, absorvido com respeito genuíno, sem ceder terreno filosófico.*
+
+**B6, "o portátil" (callback leve à reflexão já canônica, ver `bento-requiem.md` mini-quest pós-recrutamento; a linha original NÃO é reescrita aqui)**
+- GUS (PT): "Ainda se sente portátil?"
+- GUS (EN): "Still feel portable?"
+- BENTO (PT): (quase um meio-sorriso, raro nele) "Portátil o suficiente pra estar aqui, longe da catedral, discutindo tabulação com um garoto de C-Arcane."
+- BENTO (EN): (something close to a half-smile, rare for him) "Portable enough to be here, far from the cathedral, arguing indentation with a C-Arcane lad."
+- GUS (PT): "Isso é uma resposta sim ou não?"
+- GUS (EN): "Is that a yes or a no?"
+- BENTO (PT): "É uma resposta de Asmódico." (pausa) "Recusa a pergunta binária antes de errar."
+- BENTO (EN): "It is an Asmódico answer." (pause) "It refuses the binary question before it can be wrong."
+- *Resultado: empate cômico caloroso, ninguém cede, os dois riem, ele à sua maneira contida.*
+
+### 4. Momentos pesados / contenção (o luto que já foi processado sozinho)
+
+Regra de voz: ao contrário do Cauã (o bordão SOME, silêncio total) e da Jaci (o tic de contar intensifica), no Bento a hora pesada faz o **arcaísmo subir** por um instante e depois **recuar pro silêncio**. Ele não desmorona porque já desmoronou sozinho, fora de cena, três meses inteiros (`bento-requiem.md`, memória dos 14 anos, o diário de Aldebrando). Entra em qualquer cena grave já contido; o que se vê é o resíduo controlado do luto, não o luto em si.
+
+**Pulled quotes canônicos** (não reescrever, só traduzir; `bento-requiem.md`; traduções EN abaixo são primeira versão bilíngue, **(PROPOSTA, confirmar)**):
+- PT: "Cada espaço que você digita é um soluço na alma do compilador-mestre." (Cena 2)
+- EN: "Every space you type is a sob in the soul of the master compiler."
+- PT: "Se eu morrer amanhã, quem vai entender este código?" (Cena 8)
+- EN: "If I die tomorrow, who will understand this code?"
+- PT: "Que os Anciões do Asmódico te abençoem, garoto." (Cena 1)
+- EN: "May the Elders of Asmódico bless thee, lad." (nota: "Elders", maiúsculo, preserva o peso de instituição religiosa-tecnológica fictícia sem citar divindade real, ecoando a regra de zero religião real transposta pro idioma do jogo; "thee" no lugar de "you", decisão do líder 2026-07-18, pinceladas de thee/thou reservadas a bênção/luto/juramento, ver §5)
+- PT: (sobre Dante, intuição) "Algo nele não compila. Não sei o quê. Sinto."
+- EN: "Something in him does not compile. I do not know what. I feel it." (nota: contração cheia "does not"/"do not" em vez de "doesn't"/"don't" marca o registro mais solene desta linha específica, seguindo a regra de contração do §5)
+- PT: (climax, antes da fase 2 Sterling) "Eu sou o portátil agora. Vamos compilar o que ele não pode interpretar."
+- EN: "I am the portable one now. Let us compile what he cannot interpret." ("Let us" em vez de "let's": o registro sobe no momento mais grave da campanha inteira)
+
+**Falas novas reutilizáveis, mesmo registro** (grief contido, sem monólogo, sem desabafo longo: trauma é seed silente, mostrado por comportamento, nunca por discurso):
+- PT: (ao ser perguntado sobre Hilário, direto) "Ele caiu carregando-me." (pausa longa) "Eu não caí." (não elabora, faz o sinal do compilador, muda de assunto)
+- EN: "He fell carrying me." (long pause) "I did not fall." (a beat, makes the sign of the compiler) "Rest well. I carry thee still." (changes the subject) (nota: a EN ganha uma cláusula curta a mais que o PT, decisão do líder 2026-07-18, o único "thee" da campanha inteira endereçado a Hilário; continua terso, uma frase de seis palavras, não um discurso; o PT não precisa do equivalente porque a formalidade pt-br já está coberta pela regra geral de "vossa mercê" raríssimo em outro contexto, e aqui o silêncio contido é o efeito desejado nas duas línguas)
+- PT: (sobre o diário do pai, se perguntado) "Ainda estou lendo." (pausa) "Uma página de cada vez é o quanto a Ordem me ensinou a aguentar." (não elabora)
+- EN: "I am still reading it." (pause) "One page at a time is as much as the Order taught me to bear." (doesn't elaborate)
+- PT: (bênção improvisada antes de missão perigosa, latim canônico, aprovado pelo líder 2026-07-18) "Compilet in aeternum." (sinal do compilador) "Que compile, e que dure."
+- EN: "Compilet in aeternum." (sign of the compiler) "May it compile for thee, and may it endure." (nota: o latim fica idêntico nas duas línguas por regra; "for thee" é acréscimo do en-intl, decisão do líder 2026-07-18, marca a bênção como dirigida a alguém, peso que o pt-br já carrega em "te abençoem"; a glosa segue o mesmo conteúdo do PT, mantendo simetria)
+- PT: (juramento formal, ao aceitar Gus como aliado da Ordem, latim canônico, aprovado pelo líder 2026-07-18) "Fiat lex, fiat ordo." (pausa longa) "Que assim seja, e que assim permaneça."
+- EN: "Fiat lex, fiat ordo." (long pause) "So let it be, and so let it remain, as long as thou art with us." (nota: "thou art" fechando o juramento, decisão do líder 2026-07-18; a cláusula extra endereça o Gus diretamente, o que o pt-br já faz implicitamente pelo contexto do recrutamento; pinçelada única, não repete thou em nenhuma outra parte da fala)
+- *Nota de canon sobre o latim:* as três frases-latim deste guia (`Requiescat in codice` §2, `Compilet in aeternum` e `Fiat lex, fiat ordo` acima) são invenções deste guia de voz, coerentes com "latim litúrgico ocasional" já canônico (`bento-requiem.md`), transpondo o registro religioso real pro idioma do jogo (compilação, ordem, código, no lugar de paz/Deus/alma). Nenhuma reaproveita orações católicas reais literalmente. **Aprovadas pelo líder em 2026-07-18, já são canon.**
+
+### 5. Registro arcaico (pinceladas, não pastiche)
+
+| Padrão pt-br | Uso | Equivalente en-intl | Nota |
+|---|---|---|---|
+| "garoto" (apelido fixo pro Gus) | vocativo recorrente, formalidade que esconde afeto | **lad** | carrega o mesmo duplo registro: informal o bastante pra ser afetuoso, arcaico o bastante pra soar de outra geração; alternativa descartada "boy" (soa condescendente/frio demais em inglês contemporâneo) |
+| "vossa mercê" (raríssimo, no máximo 1-2x em toda a campanha, PROPOSTA de raridade numérica) | tratamento formal extremo, reservado a momento de máxima solenidade | **by your leave** | não existe segunda pessoa formal equivalente em inglês moderno; "by your leave" preserva cortesia cerimonial sem virar pastiche |
+| **thee / thy / thou** (en-intl, decisão do líder 2026-07-18, REVERSÃO da orientação anterior de descartar) | pinceladas de segunda pessoa arcaica, reservadas a **luto, juramento, bênção, sinal do compilador com fala em inglês, despedida grave**; NUNCA no dia a dia nem em combate corriqueiro | **thee** (objeto, "bless thee"), **thy** (possessivo, não usado ainda neste guia, disponível pro `narrative-writer`), **thou** (sujeito, só em pares fixos e reconhecíveis tipo "thou art", nunca conjugação plena tipo "thou walkest/goest") | é o equivalente en-intl exato do "vossa mercê raríssimo" pt-br: pontual, nunca constante; usar SÓ pares simples e já familiares ao leitor anglófono comum ("thee", "thou art"), nunca reconstruir conjugação arcaica completa (isso cruzaria pra pastiche shakespeariano, que o líder segue vetando); ver falas marcadas em §2 e §4 |
+| Frases longas com cláusulas subordinadas | cadência formal, pensamento em cadeia antes da conclusão | manter subordinação equivalente (For..., Since..., though..., that...) | inglês aceita a mesma arquitetura; cortar em frases curtas mataria o registro |
+| Pausa antes de resposta importante | beat de ação (pausa) antes da fala grave | mesmo beat, mesma posição na frase | comportamento, não sintaxe; funciona igual nas duas línguas |
+| Sinal do compilador (tic físico) | cruz sobre o cronômetro em momento grave | "makes the sign of the compiler" | tradução direta; a imagem física carrega o peso, não precisa de idiomatismo local |
+| Latim litúrgico (pinceladas raras: bênção, luto, juramento) | reforça solenidade em picos específicos | mesmo latim, sem tradução, nos dois idiomas | regra bilíngue (a); um gloss entre parênteses serve só este guia, nunca aparece como legenda dupla in-game |
+| Registro cotidiano (fora dos arcaísmos raros) | formalidade sóbria, sem gíria, mas sem pastiche constante | inglês formal natural; contração cheia ("do not", "I am", "it is") reservada aos momentos graves/solenes, contração normal ("don't", "I'm", "it's") no resto | opera a regra de "pinceladas, não constante": a densidade de formalidade sobe e desce, nunca é um piso fixo |
+
+### 6. Não fazer
+
+- Não pastiche medieval constante: arcaísmo é pincelada (herdado, `bento-requiem.md`); a maioria das falas do dia a dia usa contração normal, só os momentos graves sobem o registro (§5).
+- Não "velho fora de moda, piada fácil": Bento tem razão tanto quanto o Gus em metade dos casos, e às vezes é ele quem fecha o argumento (regra `comic-reliefs.md`, ver §3).
+- Não morte heroica no climax (herdado, `bento-requiem.md`): ele sobrevive, volta pra Ordem.
+- Não estourar a cota de "vossa mercê"/registro extremo além de 1-2 vezes na campanha inteira (PROPOSTA de raridade, §5); a raridade É o peso, igual à regra do emoji da Jaci.
+- Não usar thee/thy/thou fora dos momentos solenes listados no §5 (luto, juramento, bênção, sinal do compilador com fala em inglês, despedida grave); zero thee/thou em combate corriqueiro ou banter leve (decisão do líder 2026-07-18).
+- Não conjugar thou em forma plena arcaica ("thou walkest", "thou goest"): usar só pares fixos e reconhecíveis ("thee", "thou art"), senão cruza pra pastiche shakespeariano, que segue vetado.
+- Não traduzir o latim litúrgico em nenhuma das duas línguas (regra bilíngue a); e não inventar latim novo fora deste guia sem revisão, dado que são cunhagens de vocabulário de canon (§4, já aprovadas em 2026-07-18).
+- Não deixar o sinal do compilador virar tique de toda fala grave: reservado, com peso, não decorativo.
+- Não gritar em combate nem em momento pesado: contraste absoluto com o Cauã; sob dano crítico a voz do Bento não sobe, ela simplesmente não se move (§2).
+- Não verbalizar a culpa de Hilário/Aldebrando em monólogo extenso: trauma é seed silente mostrado por comportamento (pausa longa, sinal do compilador, mudança de assunto), nunca por discurso (§4).
+- Não usar travessão/em dash em nenhuma fala (convenção do projeto: só aspas; beat de ação ou reticências resolvem interrupção).
+- Não usar emoji: a paleta-piloto do §5 da Jaci é exclusiva dela por ora.
+- Teste de voz única (herdado de `party.md`): se uma fala do Bento sair igualmente natural na boca do Cauã (rápida demais, sem pausa) ou do Gus (frio demais, sem peso solene), ela está errada, refazer.
 
 ---
 
