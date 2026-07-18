@@ -86,8 +86,8 @@ TEST_CASE("parent_screen_of: cada tela da arvore aponta pro pai correto",
 
 // ---------------------------------------------------------------- Pause
 
-TEST_CASE("Pause: UP/DOWN navega os 5 itens com WRAP (Continuar/Salvar/Carregar/"
-          "Configuracoes/Sair)",
+TEST_CASE("Pause: UP/DOWN navega os 6 itens com WRAP (Continuar/Salvar/Carregar/"
+          "Configuracoes/MenuInicial/Sair, MENU-INICIAL)",
           "[system_menu]") {
     SystemMenuState state;
     system_menu_open(state);
@@ -101,11 +101,13 @@ TEST_CASE("Pause: UP/DOWN navega os 5 itens com WRAP (Continuar/Salvar/Carregar/
     REQUIRE(state.pause_selected == 3);
     system_menu_key_down(state, SDLK_DOWN);
     REQUIRE(state.pause_selected == 4);
+    system_menu_key_down(state, SDLK_DOWN);
+    REQUIRE(state.pause_selected == 5);
     system_menu_key_down(state, SDLK_DOWN);  // wrap pro topo
     REQUIRE(state.pause_selected == 0);
 
     system_menu_key_down(state, SDLK_UP);  // wrap pro fim
-    REQUIRE(state.pause_selected == 4);
+    REQUIRE(state.pause_selected == 5);
 }
 
 TEST_CASE("Pause: ENTER em Continuar (item 0) devolve action Continue",
@@ -162,15 +164,68 @@ TEST_CASE("Pause: ENTER em Configuracoes (item 3) abre ConfigCategories, foco "
     REQUIRE(state.config_categories_selected == 0);  // foco inicial = Audio
 }
 
-TEST_CASE("Pause: ENTER em Sair (item 4) devolve action RequestQuit sem fechar "
-          "o menu sozinho (o chamador decide encerrar o programa)",
+TEST_CASE("Pause: ENTER em Menu Inicial (item 4, MENU-INICIAL) abre o "
+          "mini-dialogo de confirmacao SEM navegar/fechar nada ainda",
           "[system_menu]") {
     SystemMenuState state;
     system_menu_open(state);
     system_menu_key_down(state, SDLK_DOWN);
     system_menu_key_down(state, SDLK_DOWN);
     system_menu_key_down(state, SDLK_DOWN);
-    system_menu_key_down(state, SDLK_DOWN);  // item 4 = Sair
+    system_menu_key_down(state, SDLK_DOWN);  // item 4 = Menu Inicial
+    const SystemMenuAction action = system_menu_key_down(state, SDLK_RETURN);
+    REQUIRE(action == SystemMenuAction::None);
+    REQUIRE(state.screen == SystemMenuScreen::Pause);  // screen INTOCADO
+    REQUIRE(state.pause_confirming_to_title);
+    REQUIRE(state.pause_to_title_confirm_selected == 1);  // default seguro = Cancelar
+}
+
+TEST_CASE("Pause: mini-dialogo Menu Inicial - confirmar Sim devolve "
+          "RequestToTitle; Cancelar/Esc fecha o prompt sem navegar",
+          "[system_menu]") {
+    SystemMenuState confirm_yes;
+    system_menu_open(confirm_yes);
+    confirm_yes.pause_selected = static_cast<int>(PauseItem::ToTitle);
+    system_menu_key_down(confirm_yes, SDLK_RETURN);  // abre o prompt
+    REQUIRE(confirm_yes.pause_confirming_to_title);
+    system_menu_key_down(confirm_yes, SDLK_LEFT);  // alterna Cancelar(1) -> Sim(0)
+    REQUIRE(confirm_yes.pause_to_title_confirm_selected == 0);
+    const SystemMenuAction yes_action = system_menu_key_down(confirm_yes, SDLK_RETURN);
+    REQUIRE(yes_action == SystemMenuAction::RequestToTitle);
+    REQUIRE_FALSE(confirm_yes.pause_confirming_to_title);
+    REQUIRE(confirm_yes.screen == SystemMenuScreen::Pause);  // screen INTOCADO
+
+    SystemMenuState confirm_no;
+    system_menu_open(confirm_no);
+    confirm_no.pause_selected = static_cast<int>(PauseItem::ToTitle);
+    system_menu_key_down(confirm_no, SDLK_RETURN);  // abre o prompt
+    const SystemMenuAction no_action =
+        system_menu_key_down(confirm_no, SDLK_RETURN);  // default = Cancelar
+    REQUIRE(no_action == SystemMenuAction::None);
+    REQUIRE_FALSE(confirm_no.pause_confirming_to_title);
+    REQUIRE(confirm_no.screen == SystemMenuScreen::Pause);
+
+    SystemMenuState confirm_esc;
+    system_menu_open(confirm_esc);
+    confirm_esc.pause_selected = static_cast<int>(PauseItem::ToTitle);
+    system_menu_key_down(confirm_esc, SDLK_RETURN);  // abre o prompt
+    const SystemMenuAction esc_action = system_menu_key_down(confirm_esc, SDLK_ESCAPE);
+    REQUIRE(esc_action == SystemMenuAction::None);
+    REQUIRE_FALSE(confirm_esc.pause_confirming_to_title);
+    REQUIRE(confirm_esc.screen == SystemMenuScreen::Pause);
+}
+
+TEST_CASE("Pause: ENTER em Sair (item 5, MENU-INICIAL deslocou +1) devolve "
+          "action RequestQuit sem fechar o menu sozinho (o chamador decide "
+          "encerrar o programa)",
+          "[system_menu]") {
+    SystemMenuState state;
+    system_menu_open(state);
+    system_menu_key_down(state, SDLK_DOWN);
+    system_menu_key_down(state, SDLK_DOWN);
+    system_menu_key_down(state, SDLK_DOWN);
+    system_menu_key_down(state, SDLK_DOWN);
+    system_menu_key_down(state, SDLK_DOWN);  // item 5 = Sair
     const SystemMenuAction action = system_menu_key_down(state, SDLK_RETURN);
     REQUIRE(action == SystemMenuAction::RequestQuit);
 }
@@ -984,14 +1039,42 @@ TEST_CASE("system_menu_click_option (Pause): clicar numa pill seleciona E "
     REQUIRE(config.screen == SystemMenuScreen::ConfigCategories);
     REQUIRE(config.config_categories_selected == 0);  // foco inicial = Audio
 
+    SystemMenuState to_title = state;
+    const SystemMenuAction to_title_action = system_menu_click_option(to_title, 4);
+    REQUIRE(to_title_action == SystemMenuAction::None);  // abre o prompt, nao navega
+    REQUIRE(to_title.pause_confirming_to_title);
+    REQUIRE(to_title.screen == SystemMenuScreen::Pause);
+
     SystemMenuState sair = state;
-    REQUIRE(system_menu_click_option(sair, 4) == SystemMenuAction::RequestQuit);
+    REQUIRE(system_menu_click_option(sair, 5) == SystemMenuAction::RequestQuit);
 
     // indice invalido: no-op defensivo, nao muda pause_selected.
     SystemMenuState invalido = state;
     const int before = invalido.pause_selected;
     REQUIRE(system_menu_click_option(invalido, 99) == SystemMenuAction::None);
     REQUIRE(invalido.pause_selected == before);
+}
+
+TEST_CASE("system_menu_click_option (Pause): mini-dialogo Menu Inicial "
+          "reinterpreta o indice como 0=Sim/1=Cancelar (MESMA convencao dos "
+          "prompts de Controles)",
+          "[system_menu]") {
+    SystemMenuState confirm_yes;
+    system_menu_open(confirm_yes);
+    confirm_yes.pause_confirming_to_title = true;
+    confirm_yes.pause_to_title_confirm_selected = 1;
+    const SystemMenuAction yes_action = system_menu_click_option(confirm_yes, 0);
+    REQUIRE(yes_action == SystemMenuAction::RequestToTitle);
+    REQUIRE_FALSE(confirm_yes.pause_confirming_to_title);
+
+    SystemMenuState confirm_no;
+    system_menu_open(confirm_no);
+    confirm_no.pause_confirming_to_title = true;
+    confirm_no.pause_to_title_confirm_selected = 1;
+    const SystemMenuAction no_action = system_menu_click_option(confirm_no, 1);
+    REQUIRE(no_action == SystemMenuAction::None);
+    REQUIRE_FALSE(confirm_no.pause_confirming_to_title);
+    REQUIRE(confirm_no.screen == SystemMenuScreen::Pause);
 }
 
 TEST_CASE("system_menu_click_option (ConfigCategories): clicar em qualquer "
@@ -1116,6 +1199,23 @@ TEST_CASE("system_menu_hover_index: Pause (4 itens) acha o indice sob o mouse",
     REQUIRE(system_menu_hover_index(state, 50.0f, 350.0f, boxes) == 3);  // item 3
 }
 
+TEST_CASE("system_menu_hover_index: Pause com mini-dialogo Menu Inicial aberto "
+          "so hover-testa as 2 pills Sim/Cancelar (MENU-INICIAL, MESMA "
+          "convencao de Controls::controls_confirming_restore)",
+          "[system_menu][hover]") {
+    SystemMenuState state;
+    system_menu_open(state);
+    state.pause_confirming_to_title = true;
+    SystemMenuHoverBox boxes[kSystemMenuMaxHoverItems];
+    make_boxes_into(boxes);
+
+    REQUIRE(system_menu_hover_index(state, 50.0f, 50.0f, boxes) == 0);   // pill Sim
+    REQUIRE(system_menu_hover_index(state, 50.0f, 150.0f, boxes) == 1);  // pill Cancelar
+    // item 2 (fora das 2 pills do dialogo) NAO conta mais, mesmo com caixa
+    // valida na posicao - count=2 enquanto confirmando.
+    REQUIRE(system_menu_hover_index(state, 50.0f, 250.0f, boxes) == -1);
+}
+
 TEST_CASE("system_menu_hover_index: mouse fora de qualquer caixa devolve -1",
           "[system_menu][hover]") {
     SystemMenuState state;
@@ -1203,6 +1303,19 @@ TEST_CASE("system_menu_keyboard_focus_index: Pause devolve pause_selected",
     REQUIRE(system_menu_keyboard_focus_index(state) == 0);
     state.pause_selected = static_cast<int>(PauseItem::Quit);
     REQUIRE(system_menu_keyboard_focus_index(state) == static_cast<int>(PauseItem::Quit));
+}
+
+TEST_CASE("system_menu_keyboard_focus_index: Pause com mini-dialogo Menu "
+          "Inicial aberto devolve pause_to_title_confirm_selected "
+          "(MENU-INICIAL)",
+          "[system_menu][keyboard-hover]") {
+    SystemMenuState state;
+    system_menu_open(state);
+    state.pause_confirming_to_title = true;
+    state.pause_to_title_confirm_selected = 0;
+    REQUIRE(system_menu_keyboard_focus_index(state) == 0);
+    state.pause_to_title_confirm_selected = 1;
+    REQUIRE(system_menu_keyboard_focus_index(state) == 1);
 }
 
 TEST_CASE("system_menu_keyboard_focus_index: ConfigCategories devolve "

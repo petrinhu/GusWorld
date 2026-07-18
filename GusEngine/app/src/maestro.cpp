@@ -190,6 +190,14 @@ bool Maestro::init() {
         return false;
     }
 
+    // MENU-INICIAL (ACHADO 1): captura o SPAWN real do jogador AQUI - init_attached()
+    // ja carregou a cidade (o ctor de SdlWindow monta o sim_ via load_city_or_fallback,
+    // player_start = spawn_player_aabb(map)) mas nenhum step_fixed rodou ainda, entao
+    // city_->player_aabb() e EXATAMENTE a posicao de nascimento. reset_to_new_game()
+    // (chamado pelo gameplay_engineer quando "Novo Jogo" e escolhido FORA do boot, ver
+    // o contrato no header) teleporta o jogador de volta pra cá.
+    player_spawn_aabb_ = city_->player_aabb();
+
     // SAVE-LOAD-UI etapa 6: ancora do relogio de playtime (ver o comentario do
     // campo em maestro.hpp) - comeca no boot do processo, base 0 (nenhum save
     // carregado ainda).
@@ -416,6 +424,45 @@ void Maestro::apply_loaded_save_data(const gus::domain::save::SaveData& data) {
               << " playtime_seconds=" << playtime_base_seconds_ << "\n";
 }
 
+void Maestro::reset_to_new_game(gus::domain::save::DifficultyLevel difficulty) {
+    // MENU-INICIAL (ACHADO 1): mesma ESTRUTURA de apply_loaded_save_data() acima
+    // (posicao -> inimigo/marcador -> edge-triggers -> playtime), so que a FONTE
+    // do estado nao e um SaveData carregado do disco - e o SHAPE de um jogo NOVO
+    // (domain::save::fresh_new_game_save_data, POCO, ver gus/domain/save/
+    // new_game.hpp) + o spawn REAL capturado em init() (player_spawn_aabb_, ver o
+    // comentario do campo em maestro.hpp).
+    save_ = gus::domain::save::fresh_new_game_save_data(difficulty);
+
+    // Posicao do jogador: TELEPORTE pro spawn (mesmo set_player_position sem
+    // interpolacao fantasma que apply_loaded_save_data usa acima - nunca um
+    // "deslize" visual do ponto antigo pro novo).
+    city_->set_player_position(player_spawn_aabb_);
+
+    // Inimigo fixo: volta a existir - uma Victory da sessao ANTERIOR (que
+    // sobreviveria em memoria se so trocassemos de tela) nao deve persistir num
+    // jogo novo. MESMO par set_enemy_marker/enemy_defeated_ que init() usa no
+    // boot.
+    enemy_defeated_ = false;
+    city_->set_enemy_marker(enemy_aabb_);
+
+    // EDGE-TRIGGER (mesma cautela de apply_loaded_save_data acima): o jogador
+    // "acaba de nascer" no spawn - nunca deve contar como "ja estava sobre a
+    // hitbox" (evitaria false-negative se o spawn ficasse perto de um trigger).
+    was_overlapping_enemy_ = false;
+    was_overlapping_npc_bertoldo_ = false;
+
+    // Playtime: re-ancora do ZERO (um jogo novo comeca em playtime_seconds=0, ao
+    // contrario de apply_loaded_save_data - que herda o playtime do save
+    // carregado - a base aqui e sempre 0.0, nunca save_.playtime_seconds).
+    playtime_base_seconds_ = 0.0;
+    playtime_anchor_ns_ = SDL_GetTicksNS();
+
+    std::cout << "Maestro: [reset] Novo Jogo (fora do boot, MENU-INICIAL achado 1) "
+                 "aplicado - posicao=("
+              << player_spawn_aabb_.x << ", " << player_spawn_aabb_.y
+              << ") dificuldade=" << static_cast<unsigned>(difficulty) << ".\n";
+}
+
 void Maestro::maybe_autosave(const char* trigger_label) {
     // SAVE-LOAD-UI etapa 5 (AUTOSAVE): hook de politica por local (ver
     // gus/domain/save/save_policy.hpp, memoria project_save_dungeon_pem_faraday).
@@ -443,7 +490,32 @@ void Maestro::maybe_autosave(const char* trigger_label) {
               << saves_dir << ".\n";
 }
 
-bool Maestro::show_title_screen() {
+void Maestro::handle_new_game_selected(
+    bool reached_via_pause, gus::domain::save::DifficultyLevel difficulty) {
+    if (reached_via_pause) {
+        // MENU-INICIAL (wiring final): esta tela de titulo NAO foi alcancada pelo
+        // boot - havia uma partida rodando em memoria (Pause -> Menu Inicial ->
+        // Sim). reset_to_new_game() zera posicao/save/inimigo/playtime pro
+        // equivalente exato de um jogo novo do zero (ver o comentario do metodo no
+        // header) ANTES de devolver false (o que faz run() seguir rodando NA
+        // CIDADE, agora com estado fresco).
+        std::cout << "Maestro: [costura] Novo Jogo via Menu Inicial (pos-pausa) - "
+                     "chamando reset_to_new_game().\n";
+        reset_to_new_game(difficulty);
+        return;
+    }
+    std::cout << "Maestro: [costura] Novo Jogo - estado FRESCO ja pronto desde "
+                 "init() (sem retrabalho).\n";
+    // MODOS-MORTE Fase 0 (§3.2): grava a dificuldade ESCOLHIDA na tela de selecao
+    // (fixa por save, nunca reescrita depois - a UNICA escrita legitima e aqui,
+    // antes do 1o save_game deste save novo).
+    save_.difficulty = difficulty;
+    std::cout << "Maestro: [modos-morte] dificuldade escolhida = "
+              << static_cast<unsigned>(save_.difficulty)
+              << " (0=Facil 1=Medio 2=Dificil 3=Hardcore).\n";
+}
+
+bool Maestro::show_title_screen(bool reached_via_pause) {
     std::cout << "Maestro: [costura] boot -> TELA DE TITULO (SAVE-LOAD-UI etapa "
                  "4, boot MUDOU - nao entra mais direto na cidade).\n";
 
@@ -488,15 +560,7 @@ bool Maestro::show_title_screen() {
                          "fechada) - encerrando SEM jogar (nenhum autosave).\n";
             return true;
         case gus::app::screens::TitleLoopExit::NewGame:
-            std::cout << "Maestro: [costura] Novo Jogo - estado FRESCO ja pronto "
-                         "desde init() (sem retrabalho).\n";
-            // MODOS-MORTE Fase 0 (§3.2): grava a dificuldade ESCOLHIDA na tela de
-            // selecao (fixa por save, nunca reescrita depois - a UNICA escrita
-            // legitima e aqui, antes do 1o save_game deste save novo).
-            save_.difficulty = new_game_difficulty;
-            std::cout << "Maestro: [modos-morte] dificuldade escolhida = "
-                      << static_cast<unsigned>(save_.difficulty) << " (0=Facil "
-                         "1=Medio 2=Dificil 3=Hardcore).\n";
+            handle_new_game_selected(reached_via_pause, new_game_difficulty);
             return false;
         case gus::app::screens::TitleLoopExit::ContinueGame:
             std::cout << "Maestro: [costura] Continuar - aplicando o save mais "
@@ -570,6 +634,27 @@ bool Maestro::open_pause_from_city() {
     if (frozen_ok) {
         std::error_code remove_ec;
         std::filesystem::remove(frozen_bg_path, remove_ec);
+    }
+
+    if (outcome.to_title) {
+        // MENU-INICIAL: "Sim" confirmado no mini-dialogo "voltar ao menu
+        // inicial?" - volta pra TELA DE TITULO (Novo Jogo/Continuar/Sair, a
+        // MESMA tela do boot, ver show_title_screen()) SEM encerrar o processo -
+        // diferente de PauseItem::Quit acima (RequestQuit -> outcome.quit_app,
+        // fecha o jogo). show_title_screen() ja desenha DIRETO no MESMO contexto
+        // GL UNICO da Maestro (FLASH-CTX) - nenhuma criacao/destruicao de
+        // contexto acontece aqui, MESMA tecnica de qualquer outra transicao de
+        // cena da Maestro. Devolve o que show_title_screen() devolver: true SO
+        // se o jogador escolheu Sair OU fechou a janela DENTRO da tela de
+        // titulo (o chamador de run() encerra o programa, MESMO contrato de
+        // sempre); false (Novo Jogo/Continuar escolhidos) faz o loop de run()
+        // seguir rodando NA CIDADE ATUAL. `reached_via_pause=true` (MENU-INICIAL,
+        // wiring final): este caminho JA tinha uma partida rodando em memoria -
+        // "Novo Jogo" aqui chama reset_to_new_game() por dentro de
+        // show_title_screen() antes de devolver, pra nao herdar posicao/
+        // progresso/inimigo/playtime da sessao anterior (ver o comentario do
+        // parametro no header).
+        return show_title_screen(/*reached_via_pause=*/true);
     }
 
     return outcome.quit_app;
@@ -648,6 +733,154 @@ void Maestro::run() {
                      "save aplicado): player=("
                   << city_->player_aabb().x << ", " << city_->player_aabb().y
                   << ") esperado=(111, 222)\n";
+        return;
+    }
+
+    // DIAGNOSTICO/PROVA (MENU-INICIAL, ACHADO 1): GUSWORLD_NEWGAME_RESET_SELFTEST=1
+    // exercita reset_to_new_game() DIRETO (bypassa a tela de titulo/pausa e o loop de
+    // jogo por completo) - prova, via log + posicao/save/inimigo/playtime ANTES/
+    // DEPOIS, que o metodo devolve o estado de partida ao equivalente do BOOT MESMO
+    // depois de "sujar" o estado em memoria (posicao andada, dificuldade/credits/flag
+    // setados, inimigo derrotado, playtime acumulado, edge-triggers ligados) - o
+    // cenario EXATO do bug relatado (Pause -> Menu Inicial -> titulo -> Novo Jogo NAO
+    // resetava nada). Headless (so mexe em campos POCO/city_->set_player_position,
+    // MESMA tecnica dos 2 selftests acima). Rodar com GUSWORLD_HOME apontando pra um
+    // dir de SCRATCH.
+    if (const char* newgame_reset_selftest =
+            std::getenv("GUSWORLD_NEWGAME_RESET_SELFTEST");
+        newgame_reset_selftest != nullptr && newgame_reset_selftest[0] != '\0') {
+        // "Suja" o estado em memoria - simula uma sessao real jogada ANTES do reset.
+        gus::core::spatial::Aabb moved = city_->player_aabb();
+        moved.x = player_spawn_aabb_.x + 500.0f;
+        moved.y = player_spawn_aabb_.y + 500.0f;
+        city_->set_player_position(moved);
+        save_.difficulty = gus::domain::save::DifficultyLevel::Dificil;
+        save_.credits = 999;
+        save_.flags["chave_teste_sujando_estado"] = true;
+        enemy_defeated_ = true;
+        city_->clear_enemy_marker();
+        was_overlapping_enemy_ = true;
+        was_overlapping_npc_bertoldo_ = true;
+        playtime_base_seconds_ = 12345.0;
+        playtime_anchor_ns_ = SDL_GetTicksNS();
+
+        std::cout << "Maestro: [newgame-reset][selftest] ANTES (estado 'sujo', "
+                     "simulando sessao jogada): player=("
+                  << city_->player_aabb().x << ", " << city_->player_aabb().y
+                  << ") credits=" << save_.credits
+                  << " enemy_defeated=" << enemy_defeated_
+                  << " playtime_seconds=" << playtime_base_seconds_ << "\n";
+
+        reset_to_new_game(gus::domain::save::DifficultyLevel::Facil);
+
+        const bool position_ok = city_->player_aabb().x == player_spawn_aabb_.x &&
+                                  city_->player_aabb().y == player_spawn_aabb_.y;
+        const bool save_ok =
+            save_ == gus::domain::save::fresh_new_game_save_data(
+                         gus::domain::save::DifficultyLevel::Facil);
+        std::cout << "Maestro: [newgame-reset][selftest] DEPOIS (reset_to_new_game "
+                     "aplicado): player=("
+                  << city_->player_aabb().x << ", " << city_->player_aabb().y
+                  << ") esperado=(" << player_spawn_aabb_.x << ", "
+                  << player_spawn_aabb_.y << ") posicao_ok=" << position_ok
+                  << " save_ok=" << save_ok << " enemy_defeated=" << enemy_defeated_
+                  << " was_overlapping_enemy=" << was_overlapping_enemy_
+                  << " playtime_seconds=" << playtime_base_seconds_
+                  << " (esperado 0)\n";
+        return;
+    }
+
+    // DIAGNOSTICO/PROVA (MENU-INICIAL, wiring final): GUSWORLD_NEWGAME_VIA_TITLE_
+    // SELFTEST=1 exercita handle_new_game_selected() DIRETO (bypassa a tela de
+    // titulo/pausa e o loop de jogo por completo, MESMA tecnica do selftest acima -
+    // headless, so mexe em campos POCO/city_->set_player_position) - prova as DUAS
+    // metades do wiring que o selftest acima NAO cobre (aquele exercita
+    // reset_to_new_game() isolado; este exercita o METODO QUE show_title_screen()
+    // REALMENTE CHAMA no case NewGame, com os 2 valores de reached_via_pause):
+    //   1) reached_via_pause=false (BOOT) NAO reseta - so grava a dificuldade -
+    //      estado "sujo" simulado permanece sujo (posicao/credits/flag intactos);
+    //   2) reached_via_pause=true (POS-PAUSA, Menu Inicial) RESETA por completo -
+    //      equivalente ao GUSWORLD_NEWGAME_RESET_SELFTEST acima, so que passando
+    //      pelo mesmo metodo que o wiring real usa.
+    if (const char* newgame_via_title_selftest =
+            std::getenv("GUSWORLD_NEWGAME_VIA_TITLE_SELFTEST");
+        newgame_via_title_selftest != nullptr && newgame_via_title_selftest[0] != '\0') {
+        const auto dirty_state = [this] {
+            gus::core::spatial::Aabb moved = city_->player_aabb();
+            moved.x = player_spawn_aabb_.x + 500.0f;
+            moved.y = player_spawn_aabb_.y + 500.0f;
+            city_->set_player_position(moved);
+            save_.difficulty = gus::domain::save::DifficultyLevel::Dificil;
+            save_.credits = 999;
+            save_.flags["chave_teste_sujando_estado"] = true;
+            enemy_defeated_ = true;
+            city_->clear_enemy_marker();
+            was_overlapping_enemy_ = true;
+            was_overlapping_npc_bertoldo_ = true;
+            playtime_base_seconds_ = 12345.0;
+            playtime_anchor_ns_ = SDL_GetTicksNS();
+        };
+
+        // PROVA VISUAL (opcional, MESMA tecnica PASSIVA de captura de frame que
+        // frozen_city_snapshot_path/capture_frame_to_png ja usam em qualquer
+        // outro lugar da Maestro - glReadPixels sobre o framebuffer, ZERO
+        // automacao de foco/teclado/mouse de janela - ver a memoria global
+        // feedback_nao_automacao_gui_ambiente_medico: agentes SO headless/
+        // offscreen, nunca xdotool/wmctrl/ydotool). GUSWORLD_NEWGAME_VIA_TITLE_
+        // SCREENSHOT_DIR=<dir> (opcional) salva 1 PNG do estado "sujo" (posicao
+        // longe do spawn) e 1 do estado pos-reset (posicao NO spawn), pra
+        // conferencia visual sem depender de injecao de input real.
+        const char* screenshot_dir =
+            std::getenv("GUSWORLD_NEWGAME_VIA_TITLE_SCREENSHOT_DIR");
+        const bool want_screenshots = screenshot_dir != nullptr && screenshot_dir[0] != '\0';
+        const auto snapshot = [this, screenshot_dir](const char* suffix) {
+            const std::string path =
+                std::string(screenshot_dir) + "/newgame_via_title_" + suffix + ".png";
+            const bool ok = city_->capture_frame_to_png(path);
+            std::cout << "Maestro: [newgame-via-title][selftest][screenshot] " << path
+                      << " (" << (ok ? "OK" : "FALHOU") << ")\n";
+        };
+
+        // 1) reached_via_pause=false (BOOT) - "suja" o estado e chama o handler
+        // como show_title_screen(/*reached_via_pause=*/false) chamaria - o estado
+        // deve permanecer SUJO (so a dificuldade muda).
+        dirty_state();
+        if (want_screenshots) snapshot("1_boot_before_dirty");
+        handle_new_game_selected(/*reached_via_pause=*/false,
+                                  gus::domain::save::DifficultyLevel::Facil);
+        if (want_screenshots) snapshot("2_boot_after_no_reset_still_dirty");
+        const bool boot_position_untouched =
+            city_->player_aabb().x == player_spawn_aabb_.x + 500.0f &&
+            city_->player_aabb().y == player_spawn_aabb_.y + 500.0f;
+        const bool boot_credits_untouched = save_.credits == 999;
+        const bool boot_enemy_untouched = enemy_defeated_ == true;
+        std::cout << "Maestro: [newgame-via-title][selftest] (1) reached_via_pause="
+                     "false (BOOT): posicao_intacta=" << boot_position_untouched
+                  << " credits_intacto=" << boot_credits_untouched
+                  << " enemy_defeated_intacto=" << boot_enemy_untouched
+                  << " dificuldade_gravada=" << static_cast<unsigned>(save_.difficulty)
+                  << " (esperado TODOS true/0=Facil).\n";
+
+        // 2) reached_via_pause=true (POS-PAUSA, Menu Inicial) - "suja" de novo e
+        // chama o handler como show_title_screen(/*reached_via_pause=*/true)
+        // chamaria (via open_pause_from_city()) - o estado deve voltar ao
+        // equivalente de um jogo novo do zero.
+        dirty_state();
+        if (want_screenshots) snapshot("3_pause_before_dirty");
+        handle_new_game_selected(/*reached_via_pause=*/true,
+                                  gus::domain::save::DifficultyLevel::Facil);
+        if (want_screenshots) snapshot("4_pause_after_reset_at_spawn");
+        const bool pause_position_ok = city_->player_aabb().x == player_spawn_aabb_.x &&
+                                        city_->player_aabb().y == player_spawn_aabb_.y;
+        const bool pause_save_ok =
+            save_ == gus::domain::save::fresh_new_game_save_data(
+                         gus::domain::save::DifficultyLevel::Facil);
+        std::cout << "Maestro: [newgame-via-title][selftest] (2) reached_via_pause="
+                     "true (POS-PAUSA): posicao_ok=" << pause_position_ok
+                  << " save_ok=" << pause_save_ok
+                  << " enemy_defeated=" << enemy_defeated_
+                  << " playtime_seconds=" << playtime_base_seconds_
+                  << " (esperado TODOS true/false/0).\n";
         return;
     }
 

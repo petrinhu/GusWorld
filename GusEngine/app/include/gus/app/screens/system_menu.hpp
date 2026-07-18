@@ -83,7 +83,8 @@ enum class SystemMenuScreen {
 };
 
 // Numero de itens navegaveis de cada tela (fonte unica do wrap de navegacao).
-inline constexpr int kPauseItemCount = 5;  // Continuar/Salvar/Carregar/Configuracoes/Sair
+inline constexpr int kPauseItemCount = 6;  // Continuar/Salvar/Carregar/Configuracoes/
+                                            // MenuInicial (MENU-INICIAL)/Sair
 inline constexpr int kConfigCategoriesItemCount = 5;  // Audio/Video/Controles/Lingua/Voltar
 inline constexpr int kAudioItemCount = 3;             // Musica/SFX/Voltar
 inline constexpr int kPlaceholderItemCount = 1;       // so Voltar (Video/Language)
@@ -141,15 +142,20 @@ inline constexpr int kControlsItemCount = 33;            // 30 actions + Restaur
 // documentados junto dos demais campos de Controles em SystemMenuState, logo
 // abaixo.
 
-// Indices dos itens de Pause (ordem SAVE-LOAD-UI etapa 6: Continuar, Salvar,
-// Carregar, Configuracoes, Sair - "Carregar" inserido logo apos "Salvar",
-// deslocando Configuracoes/Sair +1 - ver kPauseItemCount=5).
+// Indices dos itens de Pause (ordem SAVE-LOAD-UI etapa 6 + MENU-INICIAL:
+// Continuar, Salvar, Carregar, Configuracoes, Menu Inicial, Sair -
+// "Carregar" inserido logo apos "Salvar" deslocando Configuracoes/Sair +1;
+// "Menu Inicial" inserido ENTRE Configuracoes e Sair deslocando so Sair +1 -
+// ver kPauseItemCount=6). ToTitle: volta pra tela de titulo SEM fechar o
+// jogo (diferente de Quit, que encerra o processo) - ver
+// SystemMenuAction::RequestToTitle e pause_confirming_to_title abaixo.
 enum class PauseItem : int {
     Continue = 0,
     Save = 1,
     Load = 2,
     Settings = 3,
-    Quit = 4,
+    ToTitle = 4,
+    Quit = 5,
 };
 
 // Indices dos itens de ConfigCategories (ordem da arvore aprovada: Audio,
@@ -252,6 +258,15 @@ struct SystemMenuState {
     float music_volume = 1.0f;
     float sfx_volume = 1.0f;
 
+    // ---- Menu Inicial (MENU-INICIAL) ----
+    // Confirmacao "Voltar ao menu inicial?" (PauseItem::ToTitle) - MESMA
+    // mecanica visual/de fluxo dos mini-dialogos de Controles acima
+    // (controls_confirming_restore/discard): confirmar ToTitle NAO navega
+    // direto, abre este prompt (substitui a lista de Pause por 2 pills
+    // Sim/Cancelar, ver build_pause_body em system_menu_rml.cpp).
+    bool pause_confirming_to_title = false;      // mostrando o prompt "voltar ao menu inicial?"
+    int pause_to_title_confirm_selected = 1;     // 0=Sim, 1=Cancelar (default seguro, MESMA convencao dos prompts de Controles)
+
     // ---- Controles (M2 -> M2 STAGED CHANGES) ----
     gus::domain::input::InputRemapConfig controls_config;  // COPIA DE TRABALHO (staged) - carregada do disco pelo chamador no boot da tela
     gus::domain::input::InputRemapConfig controls_applied_config;  // BASELINE (ultimo carregado/aplicado) - alvo do revert ao descartar
@@ -300,6 +315,13 @@ enum class SystemMenuAction {
                        // modo Save (gus/app/screens/save_load_menu_loop.hpp),
                        // ANINHADA no MESMO contexto GL.
     OpenSaveLoadLoad,  // "Carregar" confirmado no Pause - idem, modo Load.
+    RequestToTitle,    // "Sim" confirmado no mini-dialogo de Menu Inicial
+                       // (MENU-INICIAL) - o CHAMADOR (system_menu_loop.cpp/
+                       // Maestro) volta pra tela de TITULO (show_title_screen())
+                       // SEM encerrar o processo - diferente de RequestQuit
+                       // acima, que fecha o jogo. O menu de pausa nao se fecha
+                       // sozinho aqui (mesmo espirito de RequestQuit: quem
+                       // decide o efeito de mundo e o chamador).
 };
 
 // Abre o menu na tela PAUSA com foco inicial em Continuar (item 0, arvore). NAO

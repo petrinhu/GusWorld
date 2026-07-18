@@ -34,6 +34,10 @@ Translator make_translator() {
         "## SETTINGS_AUDIO\nAudio\n\n"
         "## SETTINGS_VIDEO\nVideo\n\n"
         "## SETTINGS_LANGUAGE\nIdioma\n\n"
+        "## MENU_TO_TITLE\nMenu Inicial\n\n"
+        "## MENU_TO_TITLE_CONFIRM_TITLE\nVoltar ao menu inicial?\n\n"
+        "## MENU_TO_TITLE_CONFIRM_YES\nSim\n\n"
+        "## MENU_TO_TITLE_CONFIRM_NO\nCancelar\n\n"
         "## MENU_SYSTEM_KICKER\nSistema\n\n"
         "## MENU_PAUSE_TITLE\nPausado\n\n"
         // Placeholders posicionais de proposito (espelha o catalogo real pt_br.md,
@@ -74,8 +78,9 @@ Translator make_translator() {
 
 // ---------------------------------------------------------------- Pause
 
-TEST_CASE("build_system_menu_rml: tela Pause contem os 5 verb-pills traduzidos "
-          "(Continuar/Salvar/Carregar/Configuracoes/Sair, SAVE-LOAD-UI etapa 6)",
+TEST_CASE("build_system_menu_rml: tela Pause contem os 6 verb-pills traduzidos "
+          "(Continuar/Salvar/Carregar/Configuracoes/MenuInicial/Sair, "
+          "SAVE-LOAD-UI etapa 6 + MENU-INICIAL)",
           "[system_menu_rml]") {
     SystemMenuState state;
     system_menu_open(state);
@@ -87,8 +92,50 @@ TEST_CASE("build_system_menu_rml: tela Pause contem os 5 verb-pills traduzidos "
     REQUIRE(rml.find("Carregar") != std::string::npos);
     REQUIRE(rml.find("id=\"pause-item-2\"") != std::string::npos);  // Carregar
     REQUIRE(rml.find("Configuracoes") != std::string::npos);
+    REQUIRE(rml.find("Menu Inicial") != std::string::npos);
+    REQUIRE(rml.find("id=\"pause-item-4\"") != std::string::npos);  // Menu Inicial (MENU-INICIAL)
     REQUIRE(rml.find("Sair") != std::string::npos);
+    REQUIRE(rml.find("id=\"pause-item-5\"") != std::string::npos);  // Sair (MENU-INICIAL: +1)
     REQUIRE(rml.find("Pausado") != std::string::npos);
+}
+
+TEST_CASE("build_system_menu_rml: Pause com mini-dialogo Menu Inicial aberto "
+          "mostra o prompt + 2 pills Sim/Cancelar, SEM a lista normal "
+          "(MENU-INICIAL)",
+          "[system_menu_rml]") {
+    SystemMenuState state;
+    system_menu_open(state);
+    state.pause_confirming_to_title = true;
+    state.pause_to_title_confirm_selected = 1;
+    const Translator tr = make_translator();
+
+    const std::string rml = build_system_menu_rml(state, tr);
+    REQUIRE(rml.find("Voltar ao menu inicial?") != std::string::npos);
+    REQUIRE(rml.find("id=\"pause-totitle-confirm-0\"") != std::string::npos);
+    REQUIRE(rml.find("id=\"pause-totitle-confirm-1\"") != std::string::npos);
+    // A lista normal de Pause NAO deve aparecer enquanto o prompt esta aberto.
+    REQUIRE(rml.find("id=\"pause-item-0\"") == std::string::npos);
+    REQUIRE(rml.find("id=\"pause-item-5\"") == std::string::npos);
+}
+
+TEST_CASE("build_system_menu_rml: Pause com mini-dialogo Menu Inicial - "
+          "pill selecionada ganha 'focused' (MENU-INICIAL)",
+          "[system_menu_rml]") {
+    SystemMenuState state;
+    system_menu_open(state);
+    state.pause_confirming_to_title = true;
+    state.pause_to_title_confirm_selected = 0;  // Sim focado
+    const Translator tr = make_translator();
+
+    const std::string rml = build_system_menu_rml(state, tr);
+    const auto yes_pos = rml.find("id=\"pause-totitle-confirm-0\"");
+    const auto no_pos = rml.find("id=\"pause-totitle-confirm-1\"");
+    REQUIRE(yes_pos != std::string::npos);
+    REQUIRE(no_pos != std::string::npos);
+    const std::string around_yes = rml.substr(yes_pos > 40 ? yes_pos - 40 : 0, 80);
+    const std::string around_no = rml.substr(no_pos > 40 ? no_pos - 40 : 0, 80);
+    REQUIRE(around_yes.find("focused") != std::string::npos);
+    REQUIRE(around_no.find("focused") == std::string::npos);
 }
 
 TEST_CASE("build_system_menu_rml: footer-hint de Pause interpola os placeholders "
@@ -114,7 +161,7 @@ TEST_CASE("build_system_menu_rml: item selecionado de Pause ganha a classe "
 
     const std::string rml = build_system_menu_rml(state, tr);
     const auto continue_pos = rml.find("id=\"pause-item-0\"");
-    const auto quit_pos = rml.find("id=\"pause-item-4\"");  // Sair (SAVE-LOAD-UI etapa 6: +1)
+    const auto quit_pos = rml.find("id=\"pause-item-5\"");  // Sair (MENU-INICIAL: +1)
     REQUIRE(continue_pos != std::string::npos);
     REQUIRE(quit_pos != std::string::npos);
     const std::string around_continue =

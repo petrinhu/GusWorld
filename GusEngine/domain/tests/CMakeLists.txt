@@ -23,6 +23,9 @@ add_executable(gusengine_domain_tests
     save_serializer_fuzz_test.cpp
     save_migrators_test.cpp
     save_backup_test.cpp
+    # MENU-INICIAL (ACHADO 1): fresh_new_game_save_data - "estado fresco" de save
+    # Novo Jogo, nomeado/testado (ate esta onda so implicito em Maestro::save_{}).
+    new_game_test.cpp
     tile_map_test.cpp
     map_serializer_test.cpp
     map_csv_test.cpp

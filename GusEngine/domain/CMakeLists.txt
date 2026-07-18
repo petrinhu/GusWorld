@@ -25,6 +25,9 @@ add_library(gusengine_domain STATIC
     src/save/save_serializer.cpp
     src/save/save_migrators.cpp
     src/save/save_backup.cpp
+    # MENU-INICIAL (ACHADO 1): "estado fresco" de um save Novo Jogo, nomeado/testado -
+    # ate esta onda so existia implicito em Maestro::save_{} (default-construction).
+    src/save/new_game.cpp
     src/map/tile_map.cpp
     src/map/map_serializer.cpp
     src/map/map_csv.cpp

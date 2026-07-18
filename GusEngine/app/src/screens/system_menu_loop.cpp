@@ -187,6 +187,12 @@ std::string track_id_for_item(int item) {
 std::string pause_item_id(int item) {
     return "pause-item-" + std::to_string(item);
 }
+// MENU-INICIAL: ids das pills Sim/Cancelar do mini-dialogo "voltar ao menu
+// inicial?" (system_menu_rml.cpp: build_pause_body, ramo pause_confirming_to_title)
+// - MESMA convencao de controls_confirm_id abaixo.
+std::string pause_totitle_confirm_id(int item) {
+    return "pause-totitle-confirm-" + std::to_string(item);
+}
 std::string category_item_id(int item) {
     return "category-item-" + std::to_string(item);
 }
@@ -274,6 +280,12 @@ std::string resolve_menu_sfx_path(std::string_view file) {
 bool is_navigable_hover_id(const SystemMenuState& state, const std::string& id) {
     switch (state.screen) {
         case SystemMenuScreen::Pause:
+            // MENU-INICIAL: enquanto o mini-dialogo esta aberto, so as 2 pills
+            // Sim/Cancelar sao navegaveis (MESMA convencao de Controls abaixo).
+            if (state.pause_confirming_to_title) {
+                return id == pause_totitle_confirm_id(0) ||
+                       id == pause_totitle_confirm_id(1);
+            }
             for (int i = 0; i < kPauseItemCount; ++i) {
                 if (id == pause_item_id(i)) return true;
             }
@@ -578,6 +590,14 @@ SystemMenuLoopOutcome run_system_menu_loop_gl_current(
             outcome.quit_app = true;
             return true;
         }
+        if (action == SystemMenuAction::RequestToTitle) {
+            // MENU-INICIAL: sinaliza pro CHAMADOR (Maestro) trocar pra tela de
+            // titulo - NAO seta quit_app (o jogo continua rodando, so a CENA
+            // muda). O menu de pausa fecha por conta desta chamada devolver
+            // outcome (mesmo mecanismo de RequestQuit acima).
+            outcome.to_title = true;
+            return true;
+        }
         if (action == SystemMenuAction::VolumeChanged) {
             apply_and_persist(state, audio, settings_dir);
         }
@@ -699,6 +719,7 @@ SystemMenuLoopOutcome run_system_menu_loop_gl_current(
     auto is_confirming = [](SystemMenuAction action) {
         return action == SystemMenuAction::Continue ||
                action == SystemMenuAction::RequestQuit ||
+               action == SystemMenuAction::RequestToTitle ||
                action == SystemMenuAction::Navigated ||
                action == SystemMenuAction::ControlsChanged ||
                action == SystemMenuAction::ControlsApplied;
@@ -1232,7 +1253,13 @@ SystemMenuLoopOutcome run_system_menu_loop_gl_current(
                     int item_index = -1;
                     switch (state.screen) {
                         case SystemMenuScreen::Pause:
-                            item_index = state.pause_selected;
+                            // MENU-INICIAL: enquanto o mini-dialogo esta aberto, o
+                            // item pressionado e a pill Sim/Cancelar (MESMA
+                            // convencao de Controls::controls_confirming_restore
+                            // abaixo).
+                            item_index = state.pause_confirming_to_title
+                                             ? state.pause_to_title_confirm_selected
+                                             : state.pause_selected;
                             break;
                         case SystemMenuScreen::ConfigCategories:
                             item_index = state.config_categories_selected;
@@ -1276,18 +1303,38 @@ SystemMenuLoopOutcome run_system_menu_loop_gl_current(
                        ev.button.button == SDL_BUTTON_LEFT) {
                 bool handled = false;
                 if (state.screen == SystemMenuScreen::Pause) {
-                    // Clicar numa pill (Continuar/Salvar/Configuracoes/Sair)
-                    // SELECIONA E ACIONA na hora - equivalente a focar + ENTER.
-                    for (int item = 0; item < kPauseItemCount && !handled; ++item) {
-                        const glintfx::ElementBox box =
-                            ui_opt->get_element_box(pause_item_id(item).c_str());
-                        if (!hit_test(box, ev.button.x, ev.button.y)) continue;
-                        handled = true;
-                        const SystemMenuState pre_action_state = state;
-                        const SystemMenuAction action =
-                            system_menu_click_option(state, item);
-                        if (is_confirming(action)) flash_pressed(pre_action_state, item);
-                        if (handle_action(action)) return outcome;
+                    if (state.pause_confirming_to_title) {
+                        // MENU-INICIAL: mini-dialogo "tem certeza?" - so as 2
+                        // pills Sim/Cancelar (MESMA mecanica de
+                        // controls_confirming_restore/discard mais abaixo,
+                        // system_menu_click_option reinterpreta o indice como
+                        // 0=Sim/1=Cancelar neste sub-modo).
+                        for (int item = 0; item < 2 && !handled; ++item) {
+                            const glintfx::ElementBox box = ui_opt->get_element_box(
+                                pause_totitle_confirm_id(item).c_str());
+                            if (!hit_test(box, ev.button.x, ev.button.y)) continue;
+                            handled = true;
+                            const SystemMenuState pre_action_state = state;
+                            const SystemMenuAction action =
+                                system_menu_click_option(state, item);
+                            if (is_confirming(action)) flash_pressed(pre_action_state, item);
+                            if (handle_action(action)) return outcome;
+                        }
+                    } else {
+                        // Clicar numa pill (Continuar/Salvar/Carregar/Configuracoes/
+                        // Menu Inicial/Sair) SELECIONA E ACIONA na hora -
+                        // equivalente a focar + ENTER.
+                        for (int item = 0; item < kPauseItemCount && !handled; ++item) {
+                            const glintfx::ElementBox box =
+                                ui_opt->get_element_box(pause_item_id(item).c_str());
+                            if (!hit_test(box, ev.button.x, ev.button.y)) continue;
+                            handled = true;
+                            const SystemMenuState pre_action_state = state;
+                            const SystemMenuAction action =
+                                system_menu_click_option(state, item);
+                            if (is_confirming(action)) flash_pressed(pre_action_state, item);
+                            if (handle_action(action)) return outcome;
+                        }
                     }
                 } else if (state.screen == SystemMenuScreen::ConfigCategories) {
                     // Categorias (Audio/Video/Lingua/Voltar) - botoes simples, SEM

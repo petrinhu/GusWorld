@@ -194,3 +194,64 @@ TEST_CASE("i18n::parse: ignora CR de finais de linha CRLF", "[domain][i18n][load
     REQUIRE(result.size() == 1);
     REQUIRE(result.at("KEY") == "valor");
 }
+
+TEST_CASE("i18n::parse: separador '---' isolado NAO e absorvido pelo valor",
+          "[domain][i18n][loader]") {
+    // PROVA do bug de producao (TITLE_NEW_GAME_CONFIRM_NO em pt_br.md:289): uma linha
+    // "---" (thematic break do Markdown, usada como separador de secao no catalogo real)
+    // NUNCA deve virar parte do VALOR da chave anterior. Reproduz o shape exato do
+    // catalogo: chave -> valor -> linha em branco -> "---" -> linha em branco -> header
+    // de secao (nao-chave) -> linha em branco -> proxima chave.
+    const auto result = parse(
+        "## TITLE_NEW_GAME_CONFIRM_NO\nCancelar\n\n---\n\n"
+        "## §4c. Tela de selecao\n\n## SAVE_DIFFICULTY_TITLE\nEscolha a dificuldade");
+
+    REQUIRE(result.size() == 2);
+    REQUIRE(result.at("TITLE_NEW_GAME_CONFIRM_NO") == "Cancelar");  // SEM "---" grudado
+    REQUIRE(result.at("SAVE_DIFFICULTY_TITLE") == "Escolha a dificuldade");
+}
+
+TEST_CASE("i18n::parse: '---' como ULTIMA linha do arquivo fecha a entry corrente",
+          "[domain][i18n][loader]") {
+    // Caso de borda: nao ha chave alguma depois do separador (fim do arquivo).
+    const auto result = parse("## LAST_KEY\nvalor final\n\n---\n");
+
+    REQUIRE(result.size() == 1);
+    REQUIRE(result.at("LAST_KEY") == "valor final");
+}
+
+TEST_CASE("i18n::parse: '---' com espacos em volta tambem e separador",
+          "[domain][i18n][loader]") {
+    // "linha so com hifens, possivelmente com espacos" (contrato do fix) - cobre o
+    // trim antes de checar que so sobram hifens.
+    const auto result = parse("## KEY\nvalor\n\n  ---  \n\n## NEXT\noutro valor");
+
+    REQUIRE(result.size() == 2);
+    REQUIRE(result.at("KEY") == "valor");
+    REQUIRE(result.at("NEXT") == "outro valor");
+}
+
+TEST_CASE("i18n::parse: '--' (2 hifens) NAO e separador - conteudo normal preservado",
+          "[domain][i18n][loader]") {
+    // Thematic break do Markdown exige >=3 hifens; "--" isolado e conteudo legitimo
+    // (ex.: um travessao duplo usado de proposito), NAO deve disparar o fechamento.
+    const auto result = parse("## KEY\nantes\n--\ndepois");
+
+    REQUIRE(result.at("KEY") == "antes\n--\ndepois");
+}
+
+TEST_CASE("i18n::parse: catalogo real das 10 chaves afetadas (pt_br.md) fica limpo",
+          "[domain][i18n][loader]") {
+    // Integra a PROVA com o shape real do arquivo (11 separadores "---" no pt_br.md,
+    // 10 chaves na ULTIMA posicao antes de um deles) - nenhuma sobrevive com "---"
+    // grudado no valor.
+    const auto result = parse(
+        "## MENU_QUIT_CONFIRM_NO\nCancelar\n\n---\n\n## PROXIMO_A\nx\n\n"
+        "## SETTINGS_RESET_DEFAULTS\nRestaurar padroes\n\n---\n\n## PROXIMO_B\nx");
+
+    REQUIRE(result.at("MENU_QUIT_CONFIRM_NO") == "Cancelar");
+    REQUIRE(result.at("SETTINGS_RESET_DEFAULTS") == "Restaurar padroes");
+    for (const auto& [k, v] : result) {
+        REQUIRE(v.find("---") == std::string::npos);
+    }
+}

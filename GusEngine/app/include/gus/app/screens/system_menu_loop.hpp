@@ -70,6 +70,13 @@ struct SystemMenuLoopOutcome {
     // false - o chamador so retoma a cena, sem encerrar nada). Mesmo espirito do
     // quit_requested de run_battle_preview_embedded.
     bool quit_app = false;
+
+    // MENU-INICIAL: true = o jogador confirmou "Sim" no mini-dialogo "voltar ao
+    // menu inicial?" (SystemMenuAction::RequestToTitle) - o CHAMADOR (Maestro::
+    // open_pause_from_city) deve chamar show_title_screen() em vez de encerrar
+    // o processo. Mutuamente exclusivo com quit_app (so 1 dos dois fica true por
+    // chamada - RequestToTitle e RequestQuit nunca coexistem no mesmo desfecho).
+    bool to_title = false;
 };
 
 // Variante que ASSUME um contexto GL corrente (ver header). Seed inicial do volume
