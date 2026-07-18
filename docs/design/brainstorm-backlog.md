@@ -51,10 +51,16 @@ GusWorld se passa no planeta **Terra**, mas uma Terra que é **um dos vários mu
 Chamar as **dungeons de "faraday"** (nome do local), já sugerindo o uso da carta **Gaiola de Faraday**. Refinamento da mecânica: a **própria dungeon é revestida por uma gaiola de Faraday**, que CONTÉM o PEM/EMP dentro dela (não propaga o pulso pro resto da localidade — só afeta quem está dentro).
 - Refina a memoria `project_save_dungeon_pem_faraday`.
 
+> **CANONIZADO 2026-07-18 (brainstorm líder):** a carta **Gaiola de Faraday** é obtida CEDO no interior-faraday do análogo Faraday — o HUD fica cego, o jogador resolve **às escuras**, e a carta (passiva anti-PEM) é o prêmio. Ver `project_save_dungeon_pem_faraday`.
+
 ## 3. Combate final: cartas de Gaiola de Faraday perdidas
 No **combate final**, os personagens estão SEM as cartas Gaiola de Faraday (perdidas — batalha? gastas? roubo? a definir) e precisam chegar ao chefe final atravessando **áreas sem save**, sob influência de **dispositivos de PEM escondidos** (quebráveis se encontrados) que desativam o save numa área qualquer.
 - **UX/dica canônica:** o jogador observa o MENU DE SAVE pra saber se está sob influência de PEM (save disponível ou não = sinal diegético).
 - Cross-ref: memoria `project_save_dungeon_pem_faraday`, `project_dragon_victory_canon` (clímax).
+
+> **CANONIZADO 2026-07-18:** a carta se perde no clímax porque **o Dante instala um VÍRUS nela durante a noite** (é UMA carta — especiais são únicas). Amarra o seed #3 + o arco do traidor Dante + o Dragon Victory (o Gus PERDOA o Dante; a redenção pode ser remover o vírus), e literaliza "magia = software". Esse vírus ESCALOU para o sistema inteiro de cartas modificadas/piratas/infectadas em `docs/design/mecanicas/cartas-hardware-pirataria-energia.md`.
+>
+> **Desambiguação (líder 2026-07-18):** cartas ESPECIAIS são IMUNES a vírus comum (ROM suprema, risco 0). O vírus do Dante não é infecção acidental — é uma **arma especial fabricada pelas indústrias Sterling sob medida** para neutralizar a Gaiola de Faraday especificamente; o Dante só a instala. Uma especial só cai por arma dedicada.
 
 ## 4. Origens do REINO na lore (brainstorm intenso)
 Brainstorm intenso sobre as **origens do reino** na lore, **incluindo a seed 1** (a origem multiversal / o acidente do mago-tech). Fundação de worldbuilding.
@@ -79,6 +85,8 @@ Todo insight/decisão de design DEVE sempre ser **confrontado com a lore existen
 ## 10. Carta Gaiola de Faraday = item-chave básico (brainstorm próprio) + outros itens do tipo
 A carta **Gaiola de Faraday** merece **brainstorm próprio**: como funciona (efeito passivo já canon), ONDE e COMO é obtida. Ela deve ser um **item-chave BÁSICO** (obtido relativamente cedo? a definir). Discutir também **outros itens do tipo** (itens-chave que destravam mecânicas/atalhos, cf. seed 7) num brainstorm de itens-chave.
 - Cross-ref: item `DUNGEON-PEM-ITEM-BRAINSTORM` (o item que acessa o PEM, distinto da carta Faraday), memoria `project_save_dungeon_pem_faraday`.
+
+> **CANONIZADO 2026-07-18 (`DUNGEON-PEM-ITEM-BRAINSTORM` resolvido):** a carta Faraday é obtida cedo, às escuras (seed #2). O **item que ACIONA o PEM = um EMISSOR de PEM** (item-chave/**hardware**, NÃO carta — cartas especiais são únicas). Emissor **tático**: desliga eletrônicos inimigos e resolve puzzles; trade-off = **custo alto de AP/cooldown**, "limpo" (sem cegueira própria); entregue pelo análogo **TESLA** (campus eletromagnetismo), como **progressão** (a missão dele é mais desafiadora). Ver `project_save_dungeon_pem_faraday`. Outros itens-chave/atalhos (seed #7) seguem em aberto.
 
 ---
 

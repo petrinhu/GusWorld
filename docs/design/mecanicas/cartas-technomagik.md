@@ -13,6 +13,7 @@
 - [`../narrative/lingua/02-lexico-semente.md`](../../narrative/lingua/02-lexico-semente.md): as 13 raízes Sylvarin usadas no naming (§8 abaixo).
 - [`../roster-analogos/_IDS-CARTAS.md`](../roster-analogos/_IDS-CARTAS.md): os 21 IDs de domínio (`DOM-NN-R_vM.m`) dos 20 mestres + Tusk, base do naming ESPECIAL/SUPER.
 - [`../gdd.md`](../gdd.md) linha 145 (anti-pillar preservado: "cartas são obtidas, não craftadas").
+- [`cartas-hardware-pirataria-energia.md`](cartas-hardware-pirataria-energia.md): a **camada física/hardware** da carta (ROM/EPROM, memória em **Runa** = r/R, conector **RSB**, bateria CR2032), o sistema de **pirataria / vírus / mercado negro / adware**, a **RunaDex** (índice estilo Pokédex) e o **arco econômico Bastiat** (brainstorm líder 2026-07-18). O anti-pillar acima é **preservado**: o homebrew COPIA um conjuro existente (pirataria = duplicação), nunca cria carta nova numa bancada.
 
 ---
 
