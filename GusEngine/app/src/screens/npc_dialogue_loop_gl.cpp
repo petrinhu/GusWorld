@@ -184,42 +184,19 @@ int npc_dialogue_digit_for_key(SDL_Keycode key) noexcept {
     }
 }
 
-bool run_npc_dialogue_loop_gl(SDL_Window* window, gus::app::SdlWindow& city,
-                               gus::domain::dialogue::DialogueRuntime& runtime,
-                               const gus::app::i18n::Translator& translator,
-                               gus::platform::audio::AudioEngine& audio,
-                               const std::string& frozen_background_png) {
-    // FIX BUG (ver header) - solta qualquer tecla de movimento segurada ANTES de
-    // entrar no modal (o jogador nao pode estar "tentando mover" olhando pra uma
-    // caixa de dialogo).
-    city.clear_input();
-
-    // MESMOS atributos GL de run_system_menu_loop_owning_gl/run_battle_preview_
-    // embedded (viabilidade ja provada empiricamente pela troca cidade<->batalha/
-    // cidade<->menu-de-pausa).
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
-    SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
-    SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
-
-    SDL_GLContext gl = SDL_GL_CreateContext(window);
-    if (gl == nullptr) {
-        SDL_Log("NpcDialogueLoopGl: SDL_GL_CreateContext falhou: %s", SDL_GetError());
-        city.clear_input();
-        return false;  // degradacao segura: a Maestro so retoma a cidade
-    }
-    SDL_GL_MakeCurrent(window, gl);
-    SDL_GL_SetSwapInterval(1);
-
-    if (!gus::platform::rmlui::gl3_load_functions(
-            reinterpret_cast<void* (*)(const char*)>(SDL_GL_GetProcAddress))) {
-        SDL_Log("NpcDialogueLoopGl: falha ao carregar funcoes OpenGL (glad)");
-        SDL_GL_DestroyContext(gl);
-        city.clear_input();
-        return false;
-    }
-
+// FLASH-CTX (A2, extracao behavior-preserving): NUCLEO que ASSUME um contexto
+// GL JA CORRENTE + glad JA CARREGADO - mesmo corpo que antes vivia direto em
+// run_npc_dialogue_loop_gl (ver o header pro contrato). NAO mexe em
+// SdlWindow::clear_input() (o `city` nem e parametro aqui - essa gestao de
+// input fica inteira no wrapper owning, ver run_npc_dialogue_loop_gl abaixo,
+// unico chamador de producao). Extraida verbatim (zero mudanca de logica) pra
+// permitir reuso futuro sem recriar o contexto (Opcao C do plano de contexto
+// GL unico).
+bool run_npc_dialogue_loop_gl_current(
+    SDL_Window* window, gus::domain::dialogue::DialogueRuntime& runtime,
+    const gus::app::i18n::Translator& translator,
+    gus::platform::audio::AudioEngine& audio,
+    const std::string& frozen_background_png) {
     bool window_closed = false;
     {
         int pw = 0, ph = 0;
@@ -827,6 +804,48 @@ bool run_npc_dialogue_loop_gl(SDL_Window* window, gus::app::SdlWindow& city,
         }
     }  // ui (glintfx::UiLayer) destruida aqui, ANTES do contexto GL - mesma ordem
        // de run_system_menu_loop_gl_current/owning_gl.
+
+    return window_closed;
+}
+
+bool run_npc_dialogue_loop_gl(SDL_Window* window, gus::app::SdlWindow& city,
+                               gus::domain::dialogue::DialogueRuntime& runtime,
+                               const gus::app::i18n::Translator& translator,
+                               gus::platform::audio::AudioEngine& audio,
+                               const std::string& frozen_background_png) {
+    // FIX BUG (ver header) - solta qualquer tecla de movimento segurada ANTES de
+    // entrar no modal (o jogador nao pode estar "tentando mover" olhando pra uma
+    // caixa de dialogo).
+    city.clear_input();
+
+    // MESMOS atributos GL de run_system_menu_loop_owning_gl/run_battle_preview_
+    // embedded (viabilidade ja provada empiricamente pela troca cidade<->batalha/
+    // cidade<->menu-de-pausa).
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
+    SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+    SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
+
+    SDL_GLContext gl = SDL_GL_CreateContext(window);
+    if (gl == nullptr) {
+        SDL_Log("NpcDialogueLoopGl: SDL_GL_CreateContext falhou: %s", SDL_GetError());
+        city.clear_input();
+        return false;  // degradacao segura: a Maestro so retoma a cidade
+    }
+    SDL_GL_MakeCurrent(window, gl);
+    SDL_GL_SetSwapInterval(1);
+
+    if (!gus::platform::rmlui::gl3_load_functions(
+            reinterpret_cast<void* (*)(const char*)>(SDL_GL_GetProcAddress))) {
+        SDL_Log("NpcDialogueLoopGl: falha ao carregar funcoes OpenGL (glad)");
+        SDL_GL_DestroyContext(gl);
+        city.clear_input();
+        return false;
+    }
+
+    const bool window_closed = run_npc_dialogue_loop_gl_current(
+        window, runtime, translator, audio, frozen_background_png);
 
     SDL_GL_DestroyContext(gl);
 

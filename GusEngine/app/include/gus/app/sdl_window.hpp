@@ -12,9 +12,31 @@
 // com SDL_GetTicksNS medindo o dt real. Isso casa exatamente com o modelo de loop
 // que o engine-design pediu.
 //
+// FLASH-CTX (A1, contexto GL UNICO - docs/tech/pivot/menu-flash-contexto-unico-plano.md):
+// a cidade desenhava com Render2dSdl (SDL_Renderer). Agora desenha com Render2dGl3, no
+// MESMO contexto GL que a Maestro cria UMA vez no boot (gus/app/maestro.cpp) e mantem vivo
+// ate o shutdown - ZERO SDL_CreateRenderer/SDL_DestroyRenderer na cidade. init_attached()
+// (o caminho de PRODUCAO, usado pela Maestro) ASSUME que o contexto GL ja esta CORRENTE
+// (SDL_GL_MakeCurrent) quando e chamado - nao cria nem faz make-current sozinho, MESMO
+// padrao "assume contexto corrente" de gus/app/screens/system_menu_loop.hpp::
+// run_system_menu_loop_gl_current. init() (caminho STANDALONE, sem Maestro - HOJE SEM
+// NENHUM CHAMADOR de producao/teste/tool, mantido por simetria de API) e dono do PROPRIO
+// contexto GL (cria/faz current/destroi, MESMA receita da Maestro).
+//
+// PODA (A3, passo 6 do plano): a PONTE TEMPORARIA do A1 (guard booleano renderer_paused_
+// + release_renderer()/reacquire_renderer()/hold_frozen_frame() pausando/mascarando a
+// troca de contexto das cascas "owning") foi REMOVIDA por completo - a Maestro (passo 5)
+// parou de chamar as cascas owning (menu/dialogo/titulo/batalha agora desenham DIRETO no
+// contexto GL UNICO via as variantes `_gl_current`), entao nunca mais existe um contexto
+// GL PROPRIO por cima do da Maestro pra pausar contra. Os 3 metodos abaixo continuam
+// existindo (marcados [[deprecated]], corpo virou no-op) so por compatibilidade de API
+// com os poucos call-sites remanescentes fora de app/src/ (ex.: app/tools/*_probe.cpp) -
+// remocao FISICA e decisao do M9 (com o lider).
+//
 // Inclui <SDL3/SDL.h> (camada app/, SDL permitido). O irredutivel (criar janela/
-// renderer, apresentar) e coberto pelo smoke headless do main (--smoke com
-// SDL_VIDEODRIVER=dummy).
+// contexto GL, apresentar) e coberto pelo smoke headless do main (--smoke com
+// SDL_VIDEODRIVER=dummy - Render2dGl3 em modo headless, gl_active=false, todo draw
+// vira no-op contabilizado, mesma degradacao que Render2dSdl(nullptr) ja tinha).
 
 #ifndef GUS_APP_SDL_WINDOW_HPP
 #define GUS_APP_SDL_WINDOW_HPP
@@ -30,7 +52,7 @@
 #include "gus/core/anim/fade_transition.hpp"  // FadeDirection (qual perna do boot pixelizado)
 #include "gus/core/time/fixed_timestep.hpp"
 #include "gus/platform/input/sdl_input.hpp"
-#include "gus/platform/render2d/render2d_sdl.hpp"
+#include "gus/platform/render2d/render2d_gl3.hpp"  // FLASH-CTX: GL3 (era render2d_sdl.hpp)
 
 namespace gus::app {
 
@@ -42,38 +64,57 @@ public:
     SdlWindow(const SdlWindow&) = delete;
     SdlWindow& operator=(const SdlWindow&) = delete;
 
-    // Cria janela + renderer SDL + carrega os sprites do Caua. Devolve false se o
-    // SDL/janela/renderer falharem (o main reporta e sai != 0). A SdlWindow POSSUI a
-    // janela criada aqui (o dtor a destroi).
+    // Cria janela + contexto GL PROPRIO (3.3 core/doublebuffer/stencil 8, MESMA receita
+    // de gus/app/maestro.cpp) + carrega os sprites do Gus. Devolve false se o SDL/
+    // janela/contexto falharem (o main reporta e sai != 0). A SdlWindow POSSUI a janela
+    // E o contexto GL criados aqui (o dtor destroi os dois, contexto primeiro). FLASH-CTX:
+    // caminho STANDALONE (sem Maestro) - SEM NENHUM CHAMADOR de producao/teste/tool hoje
+    // (a Maestro sempre usa init_attached() abaixo); mantido por simetria de API/futuro-
+    // proofing barato, nao dead-code-removido de proposito (decisao de remocao e do M9).
     [[nodiscard]] bool init();
 
-    // M7-COSTURA (ADR-012 Onda 1): cria SO o renderer (Render2dSdl) numa janela JA
-    // CRIADA por quem chama (a Maestro, dona da janela COMPARTILHADA entre cidade e
-    // batalha - "trocar escondido atras do preto"). A SdlWindow NAO possui a janela
-    // neste modo: o dtor NUNCA a destroi. Carrega a cidade + os sprites do Gus, como
-    // init() faz. Devolve false se a criacao do renderer falhar.
+    // FLASH-CTX (A1, era M7-COSTURA Onda 1): cria o Render2dGl3 (arena/cidade em GL, o
+    // MESMO backend que a batalha ja usa) numa janela JA CRIADA por quem chama, com um
+    // CONTEXTO GL JA CORRENTE (SDL_GL_MakeCurrent) - a Maestro cria/faz-current o contexto
+    // GL UNICO (vivo do boot ao shutdown) ANTES de chamar isto (ver gus/app/maestro.cpp::
+    // init()). Este metodo NAO cria contexto nem faz make-current (mesmo padrao "assume
+    // contexto corrente" de run_system_menu_loop_gl_current/run_battle_preview_embedded_
+    // gl_current) - so constroi o Render2dGl3(gl_active=true) no contexto que ja esta
+    // current. A SdlWindow NAO possui a janela neste modo: o dtor NUNCA a destroi (nem o
+    // contexto GL - que tambem NAO e desta SdlWindow, e da Maestro). Carrega a cidade + os
+    // sprites do Gus, como init() faz. Devolve false se a criacao do Render2dGl3 falhar
+    // (programa GL nao compilou/linkou - degrada pra headless, ver Render2dGl3::Render2dGl3).
     [[nodiscard]] bool init_attached(SDL_Window* window);
 
-    // M7-COSTURA: solta o SDL_Renderer/Render2dSdl (a janela NAO e tocada) - chamado ao
-    // ENTRAR na batalha, pra liberar a janela pro contexto GL da BattleScene (o design
-    // de troca-de-backend na MESMA janela). O OverworldSim (posicao/animacao do Gus)
-    // segue intacto - so os handles de textura (TextureId) que ele guarda ficam
-    // OBSOLETOS ate reacquire_renderer() recarrega-los.
+    // FLASH-CTX PODA (A3, passo 6 do plano): [[deprecated]] - a Maestro nao chama mais
+    // isto (passo 5: as cascas owning que exigiam pausar a cidade pra ceder a janela
+    // pra um contexto GL PROPRIO nao sao mais chamadas - menu/dialogo/titulo/batalha
+    // desenham DIRETO no contexto GL UNICO/persistente, via as variantes `_gl_current`).
+    // Corpo virou NO-OP de verdade (nem pausa mais nada - nao ha mais o guard
+    // renderer_paused_, ver o comentario no topo do header). Mantido so por
+    // compatibilidade de API com os poucos call-sites remanescentes fora de app/src/
+    // (ex.: app/tools/frozen_bg_probe.cpp) - chamar isto hoje e um no-op seguro
+    // (a cidade continua desenhando normalmente). Remocao FISICA e decisao do M9.
+    [[deprecated(
+        "FLASH-CTX: contexto GL unico - a cidade nunca mais pausa; a Maestro nao "
+        "chama mais isto (ver docs/tech/pivot/menu-flash-contexto-unico-plano.md)")]]
     void release_renderer();
 
-    // M7-COSTURA: reconstroi o SDL_Renderer/Render2dSdl na MESMA janela (apos
-    // release_renderer, ao VOLTAR da batalha) e RECARREGA os sprites do Gus - os
-    // TextureId antigos nao sobrevivem a destruicao do renderer anterior (handles de
-    // uma tabela de texturas que nao existe mais; custo aceito do design, documentado
-    // no relatorio da Onda 1). Devolve false se SDL_CreateRenderer falhar.
-    [[nodiscard]] bool reacquire_renderer();
+    // FLASH-CTX PODA (A3, passo 6 do plano): [[deprecated]], MESMO racional de
+    // release_renderer() acima - corpo virou NO-OP de verdade (`return true;`, nao
+    // recarrega mais nada: nunca houve pausa pra recarregar de volta). Mantido so por
+    // compatibilidade de API com os poucos call-sites remanescentes fora de app/src/.
+    [[nodiscard, deprecated(
+        "FLASH-CTX: contexto GL unico - a cidade nunca mais pausa; a Maestro nao "
+        "chama mais isto (ver docs/tech/pivot/menu-flash-contexto-unico-plano.md)")]]
+    bool reacquire_renderer();
 
     // Um FRAME do loop (poll -> N updates fixos -> 1 render), extraido de run() pra
     // permitir que a Maestro intercale a checagem de colisao/trigger de batalha entre
     // frames. Devolve false quando o usuario fechou a janela (pump_events devolveu
     // false) - o chamador encerra o app nesse caso. NAO renderiza (so faz poll+update)
-    // se o renderer foi liberado (release_renderer) - a Maestro so chama step() com o
-    // renderer da cidade ativo.
+    // se render2d_ for nulo (degradacao segura, headless/GL nao compilou - FLASH-CTX
+    // A1->A3: nao ha mais um estado "pausado" a checar).
     [[nodiscard]] bool step();
 
     // M7-COSTURA Inc 2 (ADR-012 decisao 5, "fade preto curto") / Inc 2c (sequencia de
@@ -170,38 +211,40 @@ public:
     // (o loop de dialogo, ver gus/app/screens/npc_dialogue_loop.hpp) faz o proprio
     // poll de tecla, MESMO padrao independente de SdlInput que system_menu_loop.cpp
     // ja usa pro menu de pausa (navegacao de UI != movimento do jogador). No-op de
-    // desenho (mas nao crasha) se o renderer estiver liberado (release_renderer).
+    // desenho (mas nao crasha) se render2d_ for nulo (degradacao segura).
     void render_dialogue_overlay_frame(const std::vector<std::string>& lines);
 
-    // FUNDO REAL CONGELADO (M7-DIALOGO/MENU-PAUSA-CONFIG-SOM, decisao do lider):
-    // captura o frame ATUAL da cidade (o que esta na tela agora, sim_ PARADO -
-    // nenhum step_fixed) em RGBA e escreve num PNG em `out_path` (SDL_
-    // RenderReadPixels no SDL_Renderer vivo + stbi_write_png, ver .cpp pra a
-    // tecnica completa). Chamar SEMPRE ANTES de release_renderer() (a captura
-    // exige o SDL_Renderer da cidade ainda vivo) - a Maestro usa isto em
-    // to_npc_dialogue()/open_pause_from_city() pra dar aos loops GL (dialogo/menu
-    // de pausa) a CENA REAL da cidade como fundo estatico, no lugar da vinheta
-    // abstrata (mesmo padrao de Chrono Trigger/Zelda/Stardew Valley). Devolve
-    // false se o renderer estiver liberado ou a captura/escrita falhar
-    // (degradacao segura - o chamador cai pro fundo abstrato de sempre).
+    // FUNDO REAL CONGELADO (M7-DIALOGO/MENU-PAUSA-CONFIG-SOM, decisao do lider). FLASH-CTX
+    // (A1, passo 4 do plano - DEFAULT escolhido: PNG congelado via glReadPixels, paridade
+    // visual estrita; a alternativa "redesenhar a cidade sob a UI a cada frame" fica
+    // registrada como decisao do LIDER pendente, nao tomada aqui): captura o frame ATUAL
+    // da cidade (o que esta no backbuffer agora, sim_ PARADO - nenhum step_fixed) em RGBA
+    // e escreve num PNG em `out_path` - desenha 1 frame (Render2dGl3, contexto GL
+    // corrente), le o BACKBUFFER via gus::platform::rmlui::gl3_read_backbuffer_rgba
+    // (glReadPixels + flip vertical, MESMA funcao que a batalha ja usa pro smoke visual)
+    // ANTES do swap, escreve o PNG (stb_image_write), e SO ENTAO apresenta esse MESMO
+    // frame (SDL_GL_SwapWindow - byte-identico ao que o jogador ja estava vendo, so
+    // desenhado 1x a mais, mesmo racional de antes com SDL_RenderReadPixels). FLASH-CTX
+    // (A3): a cidade nunca mais para de desenhar (nao ha mais "chamar ANTES de
+    // release_renderer()" - esse passo sumiu) - a Maestro usa isto em to_npc_dialogue()/
+    // open_pause_from_city()/show_title_screen() pra dar aos loops GL (dialogo/menu/
+    // titulo) a CENA REAL da cidade como fundo estatico, no lugar da vinheta abstrata
+    // (mesmo padrao de Chrono Trigger/Zelda/Stardew Valley). Devolve false se render2d_
+    // for nulo ou a captura/escrita falhar (degradacao segura - o chamador cai pro fundo
+    // abstrato de sempre).
     [[nodiscard]] bool capture_frame_to_png(const std::string& out_path);
 
-    // MENU-PAUSA-FLASH-FIX (achado de playtest ao vivo do lider - o filho dele, 11
-    // anos, notou um flash rapido ao FECHAR o menu de pausa): reacquire_renderer()
-    // cria um SDL_Renderer NOVO (SDL_CreateRenderer) - o swapchain double-buffered
-    // desse renderer comeca com conteudo indefinido/da tela anterior (o menu de
-    // pausa, contexto GL diferente), entao a 1a apresentacao real do jogo ao vivo
-    // (o proximo step() do loop normal) mostra 1-2 frames de pisca antes de
-    // estabilizar. Este metodo "esquenta" o renderer recem-criado: redesenha e
-    // APRESENTA a cena da cidade PARADA (sim_ NAO avanca - alpha=1.0 sem
-    // interpolar, MESMA tecnica de render_dialogue_overlay_frame/capture_frame_
-    // to_png) `frames` vezes seguidas, cobrindo TODAS as imagens do swapchain com
-    // o conteudo CORRETO (o ultimo frame vivo, o mesmo que o fundo congelado do
-    // menu ja mostrava) antes de devolver o controle ao loop normal - sem
-    // cross-fade, sem reestruturar release_renderer/reacquire_renderer. Chamar
-    // APOS reacquire_renderer() ter sucesso. No-op seguro se o renderer estiver
-    // liberado (mesmo guard de render_dialogue_overlay_frame) - cobre o caso
-    // reacquire_renderer() ter falhado.
+    // MENU-PAUSA-FLASH-FIX (achado de playtest ao vivo do lider - o filho dele, 11 anos,
+    // notou um flash rapido ao FECHAR o menu de pausa). FLASH-CTX PODA (A3, passo 6 do
+    // plano): este era o MASCARAMENTO do sintoma - a Opcao C atacou a RAIZ (zero troca
+    // de contexto na cidade, passo 5) e o sintoma que isto mascarava deixou de existir;
+    // [[deprecated]], a Maestro nao chama mais isto. Continua desenhando/apresentando
+    // `frames` vezes se chamado (nao virou no-op puro - a redundancia visual e
+    // inofensiva), so por compatibilidade de API com call-sites remanescentes fora de
+    // app/src/. Remocao FISICA e decisao do M9.
+    [[deprecated(
+        "FLASH-CTX: o sintoma que isto mascarava (flash ao fechar o menu) foi "
+        "corrigido na RAIZ - a Maestro nao chama mais isto")]]
     void hold_frozen_frame(int frames = 2);
 
     // MENU-PAUSA-CONFIG-SOM: repassa o EDGE do Esc drenado pelo input_ (ver
@@ -243,40 +286,43 @@ public:
     void set_controls(gus::domain::input::InputRemapConfig config);
 
 private:
-    // Carrega os sprites do Gus no renderer_ corrente e os entrega ao sim_. Extraido
-    // de init() pra ser reusado por init_attached() e reacquire_renderer() (mesma
-    // receita, 3 pontos de chamada).
+    // Carrega os sprites do Gus no render2d_ corrente e os entrega ao sim_. Extraido
+    // de init() pra ser reusado por init_attached() (mesma receita, 2 pontos de
+    // chamada - FLASH-CTX A3: reacquire_renderer() nao chama mais nada, virou no-op
+    // puro, ver a poda no passo 6 do plano). Render2dGl3::load_texture cacheia por
+    // caminho (path->TextureId) - carregar de novo o mesmo asset e barato (cache
+    // hit), nao GL novo.
     void load_player_sprites();
 
-    // (Re)carrega a textura do marcador de inimigo no renderer_ CORRENTE e a reaplica ao
+    // (Re)carrega a textura do marcador de inimigo no render2d_ CORRENTE e a reaplica ao
     // sim_ (ver set_enemy_marker no header publico). No-op se enemy_marker_aabb_ ainda
     // nao foi definida (uso standalone da cidade sem Maestro, ou antes do 1o
     // set_enemy_marker) - o mesmo motivo de load_player_sprites nao depender de posicao.
-    // Chamado por set_enemy_marker() e por reacquire_renderer() (os handles de textura
-    // NAO sobrevivem a troca de SDL_Renderer, mesmo racional do Gus).
+    // Chamado por set_enemy_marker() (unico chamador desde a poda A3, ver acima).
     void load_enemy_marker_texture();
 
-    // (Re)carrega a textura ESTATICA do marcador do Bertoldo (south.png) no renderer_
+    // (Re)carrega a textura ESTATICA do marcador do Bertoldo (south.png) no render2d_
     // CORRENTE e a reaplica ao sim_ (ver set_npc_bertoldo_marker no header publico).
     // No-op se npc_bertoldo_marker_aabb_ ainda nao foi definida. Chamado por
-    // set_npc_bertoldo_marker() e por reacquire_renderer() (mesmo racional de
-    // load_enemy_marker_texture acima - os TextureId nao sobrevivem a troca de
-    // SDL_Renderer).
+    // set_npc_bertoldo_marker() (mesma nota de load_enemy_marker_texture acima).
     void load_npc_bertoldo_marker_texture();
 
     // Carrega os 20 frames do boot pixelizado (BootPixelOverlay, M7-COSTURA Inc 2c) no
-    // renderer_ CORRENTE. Chamado por init()/init_attached() (1a carga) e por
-    // reacquire_renderer() (os TextureId antigos nao sobrevivem a troca de
-    // SDL_Renderer, mesmo motivo de load_player_sprites/load_enemy_marker_texture).
-    // Asset ausente/headless: BootPixelOverlay::load() devolve false e step_with_fade
+    // render2d_ CORRENTE. Chamado por init()/init_attached() (1a carga). Asset
+    // ausente/headless: BootPixelOverlay::load() devolve false e step_with_fade
     // degrada com seguranca pro retangulo solido (ver o header do overlay).
     void load_boot_pixel_frames();
 
-    SDL_Window* window_ = nullptr;      // dono SO se owns_window_ (ver init() vs init_attached())
-    SDL_Renderer* renderer_ = nullptr;  // sempre owner (destruido em release_renderer/dtor)
+    SDL_Window* window_ = nullptr;  // dono SO se owns_window_ (ver init() vs init_attached())
     bool owns_window_ = false;
 
-    std::unique_ptr<gus::platform::render2d::Render2dSdl> render2d_;
+    // FLASH-CTX (A1): contexto GL PROPRIO, so existe/e destruido no caminho STANDALONE
+    // (init(), owns_window_==true - HOJE sem chamador de producao, ver o comentario de
+    // init() no header publico). No caminho ANEXADO (init_attached(), a Maestro) o
+    // contexto e da MAESTRO - esta SdlWindow nunca cria nem destroi um contexto ali.
+    SDL_GLContext gl_context_ = nullptr;
+
+    std::unique_ptr<gus::platform::render2d::Render2dGl3> render2d_;
     std::unique_ptr<gus::app::screens::OverworldSim> sim_;
     gus::platform::input::SdlInput input_;
     gus::core::time::FixedTimestep clock_;
@@ -299,9 +345,9 @@ private:
         gus::platform::render2d::kInvalidTexture;
 
     // M7-COSTURA Inc 2c: sequencia de frames do boot pixelizado (substitui o glitch
-    // procedural vetado pelo lider). Carregada em init()/init_attached()/
-    // reacquire_renderer() (load_boot_pixel_frames) - handles locais ao renderer_
-    // vivo, mesmo racional do marcador de inimigo/sprites do Gus acima.
+    // procedural vetado pelo lider). Carregada em init()/init_attached()
+    // (load_boot_pixel_frames) - handles locais ao renderer_ vivo, mesmo racional do
+    // marcador de inimigo/sprites do Gus acima.
     gus::app::BootPixelOverlay boot_overlay_;
 };
 

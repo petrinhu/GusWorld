@@ -54,11 +54,27 @@ enum class TitleLoopExit {
                    // (nada foi jogado ainda - nenhum autosave faz sentido aqui).
 };
 
+// FLASH-CTX (extracao behavior-preserving, A2): NUCLEO que ASSUME um contexto
+// GL JA CORRENTE e com os ponteiros de funcao (glad) JA CARREGADOS - MESMO
+// espirito de run_system_menu_loop_gl_current (system_menu_loop.hpp, ver o
+// comentario la pro contrato completo das 2 formas de entrar). Devolve por
+// `*out_exit`/`*out_loaded_save`/`*out_new_game_difficulty`, MESMO contrato de
+// run_title_menu_loop_owning_gl abaixo (parametros identicos, so sem window
+// ownership). Hoje SO chamada internamente por run_title_menu_loop_owning_gl
+// (unico chamador de producao continua sendo a Maestro, via a variante
+// owning); exposta pra futura reutilizacao aninhada (Opcao C, contexto unico).
+void run_title_menu_loop_gl_current(
+    SDL_Window* window, gus::platform::audio::AudioEngine& audio,
+    const gus::app::i18n::Translator& translator, const std::string& saves_dir,
+    TitleLoopExit* out_exit, gus::domain::save::SaveData* out_loaded_save,
+    gus::domain::save::DifficultyLevel* out_new_game_difficulty = nullptr,
+    const std::string& frozen_background_png = std::string());
+
 // Roda a tela de titulo ATE o jogador escolher Continuar/Novo Jogo/Sair (ou
 // fechar a janela). CRIA seu PROPRIO contexto GL na janela dada (mesma
 // receita/atributos de run_system_menu_loop_owning_gl - profile core 3.3,
-// double-buffer, stencil 8), carrega o glad, roda o loop, e DESTROI o contexto
-// ao sair.
+// double-buffer, stencil 8), carrega o glad, chama run_title_menu_loop_gl_current
+// (o nucleo acima) e DESTROI o contexto ao sair.
 //
 // `audio`: AudioEngine da Maestro (nao-dono, MESMO padrao de injecao de
 //   run_system_menu_loop_owning_gl/BattleScene::set_audio) - COCKPIT-SFX-HOVER-

@@ -72,3 +72,105 @@ target_include_directories(msaa_glintfx_probe PRIVATE
 
 target_link_libraries(msaa_glintfx_probe PRIVATE SDL3::SDL3 glintfx::glintfx)
 target_compile_features(msaa_glintfx_probe PRIVATE cxx_std_20)
+
+# =============================================================================
+# poc_gl_single_context_probe (FLASH-CTX passo 1, GATE - ver docs/tech/pivot/
+# menu-flash-contexto-unico-plano.md secao 5 passo 1). Diferente do
+# msaa_glintfx_probe acima (que so precisa de SDL3+glintfx crus), este probe
+# chama gus::app::screens::OverworldSim/load_city_or_fallback/
+# run_system_menu_loop_gl_current de VERDADE - precisa das 4 camadas da engine
+# (gusengine_core/domain/platform/app). Em vez de RECOMPILAR tudo aqui (pesado,
+# duplicaria a arvore inteira), IMPORTA os .a JA COMPILADOS pelo preset
+# linux-release (mesma maquina/commit - ISOLADO: le artefatos, nao reconfigura
+# nem altera build/linux-release). Se o preset ainda nao foi buildado, este
+# target falha ao configurar com uma mensagem clara (pre-requisito documentado).
+#
+# Uso:
+#   cmake --preset linux-release && cmake --build --preset linux-release   # 1x
+#   cmake -S GusEngine/app/tools -B GusEngine/build/msaa_probe_scratch -G Ninja
+#   cmake --build GusEngine/build/msaa_probe_scratch --target poc_gl_single_context_probe
+#   DISPLAY=:99 GusEngine/build/msaa_probe_scratch/poc_gl_single_context_probe
+set(_GUSENGINE_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/../..")
+set(_GUSENGINE_RELEASE "${_GUSENGINE_ROOT}/build/linux-release")
+
+if(EXISTS "${_GUSENGINE_RELEASE}/app/libgusengine_app.a")
+    add_library(gusengine_app_imported STATIC IMPORTED)
+    set_target_properties(gusengine_app_imported PROPERTIES
+        IMPORTED_LOCATION "${_GUSENGINE_RELEASE}/app/libgusengine_app.a")
+    add_library(gusengine_platform_imported STATIC IMPORTED)
+    set_target_properties(gusengine_platform_imported PROPERTIES
+        IMPORTED_LOCATION "${_GUSENGINE_RELEASE}/platform/libgusengine_platform.a")
+    add_library(gusengine_domain_imported STATIC IMPORTED)
+    set_target_properties(gusengine_domain_imported PROPERTIES
+        IMPORTED_LOCATION "${_GUSENGINE_RELEASE}/domain/libgusengine_domain.a")
+    add_library(gusengine_core_imported STATIC IMPORTED)
+    set_target_properties(gusengine_core_imported PROPERTIES
+        IMPORTED_LOCATION "${_GUSENGINE_RELEASE}/core/libgusengine_core.a")
+    add_library(monocypher_imported STATIC IMPORTED)
+    set_target_properties(monocypher_imported PROPERTIES
+        IMPORTED_LOCATION "${_GUSENGINE_RELEASE}/third_party/monocypher/libmonocypher.a")
+    add_library(rmlui_imported STATIC IMPORTED)
+    set_target_properties(rmlui_imported PROPERTIES
+        IMPORTED_LOCATION "${_GUSENGINE_RELEASE}/librmlui.a")
+    add_library(rmlui_debugger_imported STATIC IMPORTED)
+    set_target_properties(rmlui_debugger_imported PROPERTIES
+        IMPORTED_LOCATION "${_GUSENGINE_RELEASE}/librmlui_debugger.a")
+    add_library(glintfx_imported STATIC IMPORTED)
+    set_target_properties(glintfx_imported PROPERTIES
+        IMPORTED_LOCATION "${_GUSENGINE_RELEASE}/_deps/glintfx-build/libglintfx.a")
+    add_library(sdl3_imported STATIC IMPORTED)
+    set_target_properties(sdl3_imported PROPERTIES
+        IMPORTED_LOCATION "${_GUSENGINE_RELEASE}/_deps/sdl3-build/libSDL3.a")
+
+    find_package(OpenGL REQUIRED)
+    find_package(Freetype REQUIRED)
+    find_package(Threads REQUIRED)
+
+    add_executable(poc_gl_single_context_probe poc_gl_single_context_probe.cpp)
+
+    target_include_directories(poc_gl_single_context_probe PRIVATE
+        "${_GUSENGINE_ROOT}/core/include"
+        "${_GUSENGINE_ROOT}/domain/include"
+        "${_GUSENGINE_ROOT}/platform/include"
+        "${_GUSENGINE_ROOT}/app/include"
+        "${_GUSENGINE_ROOT}/third_party/stb"
+        # RmlUi_Include_GL3.h (glad GL3.3 core vendorizado) - MESMA tecnica do
+        # msaa_glintfx_probe acima, pra ter glGetError/GL_NO_ERROR disponiveis.
+        "${_GUSENGINE_ROOT}/platform/rmlui"
+        "${_GUSENGINE_RELEASE}/_deps/sdl3-build/include-revision"
+        "${_GUSENGINE_RELEASE}/_deps/sdl3-src/include"
+    )
+
+    target_compile_features(poc_gl_single_context_probe PRIVATE cxx_std_20)
+
+    # Ordem do link REPLICA EXATAMENTE a linha (comprovadamente funcional) que o
+    # ninja do preset linux-release usa pra linkar gusworld_app (ver
+    # build/linux-release/build.ninja, alvo app/gusworld_app) - inclui as
+    # duplicatas de domain/core apos platform (resolve refs circulares no link
+    # estatico de arquivo unico, sem --start-group/--end-group).
+    target_link_libraries(poc_gl_single_context_probe PRIVATE
+        gusengine_app_imported
+        gusengine_core_imported
+        gusengine_domain_imported
+        gusengine_platform_imported
+        sdl3_imported
+        gusengine_domain_imported
+        gusengine_core_imported
+        monocypher_imported
+        rmlui_debugger_imported
+        glintfx_imported
+        rmlui_imported
+        OpenGL::GL
+        Freetype::Freetype
+        Threads::Threads
+        ${CMAKE_DL_LIBS}
+        m
+    )
+else()
+    message(STATUS
+        "poc_gl_single_context_probe: build/linux-release ainda nao foi "
+        "compilado (falta ${_GUSENGINE_RELEASE}/app/libgusengine_app.a) - "
+        "rode 'cmake --preset linux-release && cmake --build --preset "
+        "linux-release' na raiz do GusEngine primeiro. Alvo NAO adicionado "
+        "nesta configuracao.")
+endif()

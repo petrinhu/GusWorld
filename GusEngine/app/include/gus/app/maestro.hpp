@@ -6,10 +6,15 @@
 // battle_scene via run_battle_preview_embedded) por um contrato pequeno: "contra quem"
 // (to_battle) e "ganhou/perdeu" (on_battle_result).
 //
-// DONA de: a janela + o contexto de render corrente (troca por baixo entre SDL_Renderer
-// da cidade e contexto GL da batalha, NA MESMA SDL_Window - decisao do lider, "trocar
-// escondido atras do preto"; viabilidade validada empiricamente na Onda 1, ver relatorio
-// do incremento); a instancia VIVA de OverworldSim (dentro de SdlWindow, mantida viva e
+// DONA de: a janela + o CONTEXTO GL UNICO (FLASH-CTX, A1+A3 - docs/tech/pivot/
+// menu-flash-contexto-unico-plano.md: um SO contexto GL 3.3 core/stencil 8, criado UMA
+// vez em init() e vivo ate o dtor, servindo cidade (Render2dGl3) E menus/dialogo/batalha
+// (glintfx::UiLayer) DIRETO nele, via as variantes `_gl_current` - to_battle()/
+// open_pause_from_city()/show_title_screen()/to_npc_dialogue() nao criam/destroem
+// contexto GL algum, passo 5 do plano); SUPERA por completo a tecnica antiga "trocar por
+// baixo entre SDL_Renderer da cidade e contexto GL da batalha/menu, NA MESMA SDL_Window"
+// descrita no historico do M7-COSTURA Onda 1 - a troca de contexto era a CAUSA RAIZ do
+// flash ao fechar o menu de pausa, ver o plano; a instancia VIVA de OverworldSim (dentro de SdlWindow, mantida viva e
 // PAUSADA - sem step_fixed - durante a batalha, entao a posicao do Gus e de GRACA: nao
 // ha reposicionamento/serializacao, a cidade nunca foi destruida); e o estado em memoria
 // que sobrevive a troca (flags de encontro - o I/O real em disco e M2-SAVE-IO, Onda 2).
@@ -79,8 +84,12 @@ public:
     Maestro& operator=(const Maestro&) = delete;
 
     // SDL_Init (video+gamepad) + cria a JANELA UNICA (compartilhada entre cidade e
-    // batalha) + a cidade (SdlWindow anexado) + posiciona o inimigo fixo. Devolve false
-    // se qualquer passo falhar (o main reporta e sai != 0).
+    // batalha) + o CONTEXTO GL UNICO (FLASH-CTX, A1: SDL_GL_SetAttribute 3.3 core/
+    // doublebuffer/stencil 8 -> SDL_GL_CreateContext -> SDL_GL_MakeCurrent -> gl3_load_
+    // functions (glad) -> SDL_GL_SetSwapInterval(1), TUDO uma unica vez aqui - o
+    // contexto vive ate o dtor) + a cidade (SdlWindow::init_attached, que agora ASSUME
+    // este contexto ja corrente e desenha em Render2dGl3) + posiciona o inimigo fixo.
+    // Devolve false se qualquer passo falhar (o main reporta e sai != 0).
     [[nodiscard]] bool init();
 
     // Loop principal: roda a cidade ate o jogador fechar a janela OU esbarrar no
@@ -89,17 +98,18 @@ public:
     void run();
 
 private:
-    // Troca cidade->batalha: libera o SDL_Renderer da cidade (a janela fica livre pro
-    // contexto GL), roda o loop da BattleScene na MESMA janela ate o jogador
-    // resolver/fugir/fechar, le o outcome final e chama on_battle_result. Ao final,
-    // reconstroi o renderer da cidade (recarrega sprites - handles antigos nao
-    // sobrevivem, ver sdl_window.hpp/reacquire_renderer). FIX BUG-3 (playtest ao vivo do
-    // lider: fechar a janela DURANTE a batalha reabria a cidade em LOOP INFINITO):
-    // devolve true se o jogador pediu pra FECHAR A JANELA durante a batalha (sinal
-    // DISTINTO de qualquer CombatOutcome) - o chamador (run()) DEVE encerrar o programa
-    // na hora, sem voltar a renderizar a cidade (por isso on_battle_result/
-    // reacquire_renderer sao PULADOS nesse caso: a janela esta fechando de qualquer
-    // jeito). false = retorno normal pra cidade (Victory/Defeat/Fled/Ongoing).
+    // Troca cidade->batalha (FLASH-CTX, A3, passo 5 do plano - docs/tech/pivot/
+    // menu-flash-contexto-unico-plano.md): a cidade E a batalha compartilham o MESMO
+    // contexto GL UNICO/persistente da Maestro (gl_context_, nunca muda de dono) - a
+    // arena desenha DIRETO nele via run_battle_preview_embedded_gl_current, SEM
+    // criar/destruir contexto GL (a PONTE TEMPORARIA do A1 - release_renderer/
+    // reacquire_renderer/SDL_GL_MakeCurrent de restauracao - foi removida; ver o
+    // historico git pra era anterior). FIX BUG-3 (playtest ao vivo do lider: fechar a
+    // janela DURANTE a batalha reabria a cidade em LOOP INFINITO): devolve true se o
+    // jogador pediu pra FECHAR A JANELA durante a batalha (sinal DISTINTO de qualquer
+    // CombatOutcome) - o chamador (run()) DEVE encerrar o programa na hora, sem
+    // aplicar o outcome na cidade (a janela esta fechando de qualquer jeito). false =
+    // retorno normal pra cidade (Victory/Defeat/Fled/Ongoing).
     [[nodiscard]] bool to_battle(EncounterId id);
 
     // Roteamento outcome->acao (delega a logica pura pra maestro_logic.hpp): Victory
@@ -117,23 +127,24 @@ private:
     [[nodiscard]] bool run_city_fade(gus::core::anim::FadeDirection direction,
                                       float duration_seconds);
 
-    // MENU-PAUSA-CONFIG-SOM (M7-COSTURA, INTEGRACAO FINAL): Esc na CIDADE (fora de
-    // qualquer modal - a cidade nao tem pilha como a batalha, ver SdlWindow::
-    // consume_escape_pressed) abre o MENU DE PAUSA. A cidade roda 100% em
-    // Render2dSdl (SEM GL) - REUSA a MESMA tecnica de "trocar escondido atras do
-    // preto" ja provada empiricamente por to_battle(): solta o SDL_Renderer da
-    // cidade, cria um contexto GL PROPRIO so pro menu (gus/app/screens/
-    // system_menu_loop.hpp::run_system_menu_loop_owning_gl), destroi o contexto,
-    // reconstroi o SDL_Renderer. Devolve true se o jogador confirmou "Sair" no
-    // menu OU fechou a janela DURANTE ele - o chamador (run()) encerra o programa
-    // (mesmo contrato/nome de intencao de should_stop_running_after_battle).
+    // MENU-PAUSA-CONFIG-SOM (M7-COSTURA, INTEGRACAO FINAL). FLASH-CTX (A3, passo 5 do
+    // plano): Esc na CIDADE (fora de qualquer modal - a cidade nao tem pilha como a
+    // batalha, ver SdlWindow::consume_escape_pressed) abre o MENU DE PAUSA DIRETO no
+    // contexto GL UNICO/persistente da Maestro (run_system_menu_loop_gl_current) - SEM
+    // criar/destruir contexto GL, SEM pausar a cidade (a PONTE TEMPORARIA do A1 -
+    // release_renderer/reacquire_renderer/SDL_GL_MakeCurrent de restauracao - foi
+    // removida; ver o historico git pra era anterior). Devolve true se o jogador
+    // confirmou "Sair" no menu OU fechou a janela DURANTE ele - o chamador (run())
+    // encerra o programa (mesmo contrato/nome de intencao de
+    // should_stop_running_after_battle).
     [[nodiscard]] bool open_pause_from_city();
 
     // M7-DIALOGO (NPC-MVP): esbarrou no Bertoldo (rising edge, MESMA tecnica de
-    // to_battle() acima) -> abre o loop de dialogo (overlay funcional simples,
-    // SEM troca de contexto GL/glintfx - fica no SDL_Renderer da cidade, ver
-    // gus/app/screens/npc_dialogue_loop.hpp). Devolve true SO se o jogador fechou a
-    // JANELA durante a conversa (mesmo contrato de to_battle()/
+    // to_battle() acima) -> abre o loop de dialogo (DIALOGO-TERMINAL, glintfx::UiLayer -
+    // gus/app/screens/npc_dialogue_loop_gl.hpp). FLASH-CTX (A3): MESMO padrao de
+    // open_pause_from_city() acima - desenha DIRETO no contexto GL UNICO da Maestro
+    // (run_npc_dialogue_loop_gl_current), sem criar/destruir contexto. Devolve true SO
+    // se o jogador fechou a JANELA durante a conversa (mesmo contrato de to_battle()/
     // open_pause_from_city() - o chamador encerra o programa). Grafo AUSENTE/
     // invalido (degradacao segura, ver init()) -> no-op, devolve false (o
     // esbarrão e ignorado, a cidade continua rodando normalmente).
@@ -141,16 +152,15 @@ private:
 
     // SAVE-LOAD-UI etapa 4 (TELA DE TITULO): chamada UMA vez no INICIO de run(),
     // ANTES do loop cidade<->batalha (o boot MUDOU: nao entra mais direto na
-    // cidade). MESMA tecnica de "trocar escondido atras do preto" ja provada por
-    // open_pause_from_city()/to_battle() - captura o frame congelado, solta o
-    // SDL_Renderer da cidade, roda o loop DONO de contexto GL proprio
-    // (gus::app::screens::run_title_menu_loop_owning_gl), reconstroi o renderer.
-    // "Continuar" aplica o save mais recente via apply_loaded_save_data(); "Novo
-    // Jogo" e um no-op (o estado FRESCO que init() ja deixou pronto ja serve).
-    // Devolve true SO se o jogador escolheu "Sair" na tela de titulo OU fechou a
-    // JANELA durante ela - o chamador (run()) encerra o programa IMEDIATAMENTE,
-    // SEM entrar no loop de jogo (nada foi jogado ainda, nenhum autosave faz
-    // sentido nesse caso).
+    // cidade). FLASH-CTX (A3): MESMO padrao de open_pause_from_city() acima - captura
+    // o frame congelado (glReadPixels, ver sdl_window.hpp::capture_frame_to_png) e roda
+    // o loop DIRETO no contexto GL UNICO/persistente da Maestro
+    // (run_title_menu_loop_gl_current), sem criar/destruir contexto GL. "Continuar"
+    // aplica o save mais recente via apply_loaded_save_data(); "Novo Jogo" e um no-op
+    // (o estado FRESCO que init() ja deixou pronto ja serve). Devolve true SO se o
+    // jogador escolheu "Sair" na tela de titulo OU fechou a JANELA durante ela - o
+    // chamador (run()) encerra o programa IMEDIATAMENTE, SEM entrar no loop de jogo
+    // (nada foi jogado ainda, nenhum autosave faz sentido nesse caso).
     [[nodiscard]] bool show_title_screen();
 
     // Monta o SaveData VIVO da sessao ATUAL (flags acumuladas + posicao real do
@@ -192,6 +202,19 @@ private:
     void reload_most_recent_save_on_defeat();
 
     SDL_Window* window_ = nullptr;         // dono (a UNICA janela do app)
+
+    // FLASH-CTX (A1, contrato final consumado pelo A3 no passo 5 do plano): o
+    // CONTEXTO GL UNICO do processo - criado UMA vez em init(), corrente do boot ao
+    // shutdown (destruido no dtor), servindo cidade (Render2dGl3) E menus/dialogo/
+    // batalha (glintfx::UiLayer), todos DIRETO nele via as variantes `_gl_current`
+    // (to_battle()/open_pause_from_city()/show_title_screen()/to_npc_dialogue()) -
+    // NUNCA muda de dono, NUNCA e recriado. Zero SDL_GL_MakeCurrent fora de init()/
+    // dtor: a antiga PONTE TEMPORARIA (cascas owning criando/destruindo um contexto
+    // PROPRIO por cima deste + o MakeCurrent de restauracao) foi removida - era ela a
+    // causa raiz do flash ao fechar o menu (ver docs/tech/pivot/menu-flash-contexto-
+    // unico-plano.md).
+    SDL_GLContext gl_context_ = nullptr;
+
     std::unique_ptr<SdlWindow> city_;      // a cidade (OverworldSim vive aqui, sempre)
 
     // AUDIO (M7-COSTURA Inc 2): a Maestro e DONA - 1 instancia viva pro loop inteiro

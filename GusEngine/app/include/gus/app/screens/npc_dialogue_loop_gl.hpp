@@ -125,6 +125,23 @@ namespace gus::app::screens {
     gus::platform::audio::AudioEngine& audio,
     const std::string& frozen_background_png = std::string());
 
+// FLASH-CTX (extracao behavior-preserving, A2): NUCLEO que ASSUME um contexto
+// GL JA CORRENTE e com os ponteiros de funcao (glad) JA CARREGADOS - MESMO
+// espirito de run_system_menu_loop_gl_current (system_menu_loop.hpp). Roda
+// exatamente o mesmo corpo do dialogo (a caixa "quente" completa); NAO chama
+// SdlWindow::clear_input() (essa gestao de input fica no CHAMADOR que possui o
+// contexto GL, mesmo como run_npc_dialogue_loop_gl faz hoje ao redor da
+// criacao/destruicao do contexto - ver o .cpp). Devolve true SO se o jogador
+// fechou a JANELA durante a conversa (MESMO contrato de run_npc_dialogue_loop_gl
+// acima). Hoje SO chamada internamente por run_npc_dialogue_loop_gl (unico
+// chamador de producao continua sendo a Maestro, via a variante owning);
+// exposta pra futura reutilizacao aninhada (Opcao C, contexto GL unico).
+[[nodiscard]] bool run_npc_dialogue_loop_gl_current(
+    SDL_Window* window, gus::domain::dialogue::DialogueRuntime& runtime,
+    const gus::app::i18n::Translator& translator,
+    gus::platform::audio::AudioEngine& audio,
+    const std::string& frozen_background_png = std::string());
+
 }  // namespace gus::app::screens
 
 #endif  // GUS_APP_SCREENS_NPC_DIALOGUE_LOOP_GL_HPP

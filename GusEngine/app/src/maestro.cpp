@@ -28,6 +28,7 @@
 #include "gus/platform/fs/controls_file_store.hpp"  // load_controls (M2)
 #include "gus/platform/fs/save_file_store.hpp"  // SAVE-LOAD-UI etapa 6: resolve_saves_dir
 #include "gus/platform/fs/settings_file_store.hpp"
+#include "gus/platform/rmlui/gl3_loader.hpp"  // FLASH-CTX (A1): gl3_load_functions do contexto GL unico
 
 namespace gus::app {
 
@@ -120,7 +121,16 @@ std::string frozen_city_snapshot_path() {
 Maestro::Maestro() = default;
 
 Maestro::~Maestro() {
-    city_.reset();  // destroi o renderer da cidade (se vivo); a janela NAO (ver abaixo)
+    // FLASH-CTX (A1): city_.reset() destroi o Render2dGl3 (libera GL: texturas/
+    // programa/VAO/VBO) - precisa do contexto CORRENTE pra isso (glDelete* com
+    // nenhum contexto corrente e comportamento indefinido). O contexto da Maestro
+    // (gl_context_) so e destruido DEPOIS, na sequencia certa (mesma ordem de
+    // gus/app/screens/battle_preview.cpp: Render2dGl3 destruido antes do
+    // SDL_GL_DestroyContext). A janela e destruida por ultimo.
+    city_.reset();
+    if (gl_context_ != nullptr) {
+        SDL_GL_DestroyContext(gl_context_);
+    }
     if (window_ != nullptr) {
         SDL_DestroyWindow(window_);
     }
@@ -133,11 +143,8 @@ bool Maestro::init() {
         return false;
     }
 
-    // A JANELA UNICA do app: criada com SDL_WINDOW_OPENGL desde o inicio (necessario
-    // pra SDL_GL_CreateContext funcionar de forma portavel mais tarde, quando a batalha
-    // entra - validado que NAO precisa ter os atributos de versao/profile/stencil
-    // setados nesta hora, so o flag OPENGL; a batalha os seta a cada entrada, ver
-    // run_battle_preview_embedded). SDL_WINDOW_RESIZABLE preserva o feel de sempre.
+    // A JANELA UNICA do app: criada com SDL_WINDOW_OPENGL desde o inicio.
+    // SDL_WINDOW_RESIZABLE preserva o feel de sempre.
     window_ = SDL_CreateWindow("GusWorld", kWindowW, kWindowH,
                                 SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
     if (window_ == nullptr) {
@@ -150,6 +157,32 @@ bool Maestro::init() {
     // nao a SdlWindow standalone). Degradacao segura embutida na propria funcao (asset
     // ausente/decode falhou/SDL recusou -> loga e segue sem icone, nunca crasha).
     set_window_icon_if_available(window_);
+
+    // FLASH-CTX (A1, passo 2 do plano - docs/tech/pivot/menu-flash-contexto-unico-plano.md):
+    // O CONTEXTO GL UNICO do processo - criado UMA vez aqui, corrente do boot ao
+    // shutdown (destruido so no dtor). Atributos 3.3 core/doublebuffer/stencil 8 (MESMA
+    // receita que run_system_menu_loop_owning_gl/run_battle_preview_embedded ja usavam
+    // POR ENTRADA - agora e so uma vez, no processo inteiro). SDL_GL_SetSwapInterval(1)
+    // substitui o SDL_SetRenderVSync(renderer, 1) que a cidade usava em SDL_Renderer -
+    // com contexto unico o vsync e uma propriedade do CONTEXTO, setada uma vez so.
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
+    SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+    SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);  // o GL3 do RmlUi usa stencil (clip mask)
+    gl_context_ = SDL_GL_CreateContext(window_);
+    if (gl_context_ == nullptr) {
+        SDL_Log("Maestro: SDL_GL_CreateContext (contexto unico) falhou: %s",
+                SDL_GetError());
+        return false;
+    }
+    SDL_GL_MakeCurrent(window_, gl_context_);
+    SDL_GL_SetSwapInterval(1);  // 1 = sincroniza com o refresh (era SDL_SetRenderVSync)
+    if (!gus::platform::rmlui::gl3_load_functions(
+            reinterpret_cast<void* (*)(const char*)>(SDL_GL_GetProcAddress))) {
+        SDL_Log("Maestro: falha ao carregar funcoes OpenGL (glad) pro contexto unico.");
+        return false;
+    }
 
     city_ = std::make_unique<SdlWindow>();
     if (!city_->init_attached(window_)) {
@@ -417,10 +450,10 @@ bool Maestro::show_title_screen() {
     // MESMA tecnica de open_pause_from_city/to_battle: captura o frame ATUAL da
     // cidade (o boot ja deixou sim_ pronto em init(), mesmo sem nenhum step()
     // ainda - capture_frame_to_png redesenha o estado CORRENTE, nao exige um
-    // frame anterior) ANTES de soltar o renderer.
+    // frame anterior) - fundo congelado real (paridade visual estrita, decisao
+    // do A1 no passo 4 do plano, INTOCADA aqui).
     const std::string frozen_bg_path = frozen_city_snapshot_path();
     const bool frozen_ok = city_->capture_frame_to_png(frozen_bg_path);
-    city_->release_renderer();
 
     gus::app::screens::TitleLoopExit exit = gus::app::screens::TitleLoopExit::QuitApp;
     gus::domain::save::SaveData loaded{};
@@ -429,26 +462,24 @@ bool Maestro::show_title_screen() {
     // ver title_menu_loop.cpp).
     gus::domain::save::DifficultyLevel new_game_difficulty =
         gus::domain::save::DifficultyLevel::Medio;
-    const bool ok = gus::app::screens::run_title_menu_loop_owning_gl(
+    // FLASH-CTX (A3, passo 5 do plano): o contexto GL UNICO da Maestro (gl_context_)
+    // JA E o corrente do boot ao shutdown - a tela de titulo desenha DIRETO nele
+    // (run_title_menu_loop_gl_current, o nucleo que o A2 extraiu), sem criar/destruir
+    // contexto GL algum. Substitui run_title_menu_loop_owning_gl + city_->
+    // release_renderer()/reacquire_renderer() + o SDL_GL_MakeCurrent de restauracao
+    // (a PONTE TEMPORARIA do A1 nao existe mais - nao ha mais NENHUMA troca de
+    // contexto pra mascarar: a cidade segue desenhada por baixo o tempo todo). Sem
+    // retorno bool: a criacao do contexto ja foi resolvida em init() (se tivesse
+    // falhado, o app nunca teria chegado aqui) - o unico modo de degradacao que resta
+    // e interno ao proprio loop (glintfx::UiLayer::ok()==false), ja tratado dentro
+    // dele (out_exit cai pra NewGame, mesmo padrao de sempre).
+    gus::app::screens::run_title_menu_loop_gl_current(
         window_, audio_, translator_, gus::platform::fs::resolve_saves_dir(), &exit,
         &loaded, &new_game_difficulty, frozen_ok ? frozen_bg_path : std::string());
 
-    if (!city_->reacquire_renderer()) {
-        SDL_Log(
-            "Maestro: falha ao reconstruir o renderer da cidade apos a tela de "
-            "titulo - a cidade segue rodando SEM desenhar (degradacao segura, sem "
-            "crash).");
-    }
     if (frozen_ok) {
         std::error_code remove_ec;
         std::filesystem::remove(frozen_bg_path, remove_ec);
-    }
-
-    if (!ok) {
-        SDL_Log(
-            "Maestro: falha ao abrir a tela de titulo (contexto GL/glad) - "
-            "comecando NOVO JOGO direto (degradacao segura, nao fecha o app).");
-        return false;
     }
 
     switch (exit) {
@@ -490,10 +521,6 @@ bool Maestro::open_pause_from_city() {
     const std::string frozen_bg_path = frozen_city_snapshot_path();
     const bool frozen_ok = city_->capture_frame_to_png(frozen_bg_path);
 
-    // MESMA tecnica de to_battle() (comprovada empiricamente): solta o SDL_Renderer
-    // da cidade pra deixar a janela livre pro contexto GL do menu.
-    city_->release_renderer();
-
     const std::string settings_dir = gus::platform::fs::resolve_settings_dir();
 
     // SAVE-LOAD-UI etapa 6 (wiring REAL): os 2 callbacks que dao a tela de save/
@@ -508,44 +535,27 @@ bool Maestro::open_pause_from_city() {
         this->apply_loaded_save_data(data);
     };
 
-    gus::app::screens::SystemMenuLoopOutcome outcome{};
-    const bool ok = gus::app::screens::run_system_menu_loop_owning_gl(
-        window_, audio_, translator_, settings_dir,
-        gus::platform::fs::resolve_saves_dir(), &outcome, build_current_save_data,
-        apply_loaded_save_data, frozen_ok ? frozen_bg_path : std::string());
-    if (!ok) {
-        SDL_Log(
-            "Maestro: falha ao abrir o menu de pausa (contexto GL/glad) - voltando "
-            "pra cidade sem mostrar o menu (degradacao segura).");
-    }
-
-    // Reconstroi o SDL_Renderer da cidade INCONDICIONALMENTE (mesmo se ok==false) -
-    // senao a cidade fica sem desenhar pro resto da sessao. Mesmo padrao de
-    // to_battle()/reacquire_renderer.
-    if (!city_->reacquire_renderer()) {
-        SDL_Log(
-            "Maestro: falha ao reconstruir o renderer da cidade apos o menu de pausa "
-            "- a cidade segue rodando SEM desenhar (degradacao segura, sem crash).");
-    }
-
-    // MENU-PAUSA-FLASH-FIX (playtest ao vivo do lider - filho dele, 11 anos, notou
-    // um flash rapido ao FECHAR o menu de pausa/Salvar/Carregar - a tela de Save/
-    // Load roda ANINHADA neste MESMO contexto GL, ver system_menu_loop.hpp, entao
-    // este UNICO ponto ja cobre os dois): o SDL_Renderer que reacquire_renderer()
-    // acaba de criar pisca 1-2 frames antes da cidade ao vivo estabilizar
-    // (swapchain novo, conteudo indefinido na 1a apresentacao). "Esquenta" o
-    // renderer novo com a MESMA cena parada que o fundo congelado do menu ja
-    // mostrava (hold_frozen_frame, no-op seguro se reacquire_renderer falhou
-    // acima) ANTES de devolver o controle ao loop normal - mascara a costura sem
-    // cross-fade nem reestruturar release/reacquire.
-    city_->hold_frozen_frame();
+    // FLASH-CTX (A3, passo 5 do plano): contexto GL UNICO ja corrente - o menu (e a
+    // tela de Save/Load ANINHADA dentro dele, mesmo contexto) desenha DIRETO nele
+    // (run_system_menu_loop_gl_current), sem criar/destruir contexto GL. Substitui
+    // run_system_menu_loop_owning_gl + o SDL_GL_MakeCurrent de restauracao (a PONTE
+    // TEMPORARIA do A1 nao existe mais). O MENU-PAUSA-FLASH-FIX (hold_frozen_frame)
+    // tambem sai: aquele metodo MASCARAVA o pisca do SDL_Renderer recriado por
+    // reacquire_renderer() - sem essa recriacao (a cidade nunca para de desenhar no
+    // MESMO contexto), nao ha mais nada pra mascarar. O flash morreu na RAIZ (Opcao
+    // C do plano), nao no sintoma.
+    const gus::app::screens::SystemMenuLoopOutcome outcome =
+        gus::app::screens::run_system_menu_loop_gl_current(
+            window_, audio_, translator_, settings_dir,
+            gus::platform::fs::resolve_saves_dir(), build_current_save_data,
+            apply_loaded_save_data, frozen_ok ? frozen_bg_path : std::string());
 
     // M2 (GAP FINAL) -> M2 STAGED CHANGES: RELE o controls.json e realimenta o
     // SdlInput da cidade - aplica o remap SEM exigir restart. O jogador pode
     // ter passado por Controles, confirmado "Aplicar" (persist_controls, so
     // ESSE botao escreve em controls.json agora - ver system_menu_loop.cpp) e
-    // voltado direto pra Continuar; INCONDICIONAL (mesmo se ok==false / nada
-    // mudou/nada aplicado) porque load_controls e barato e sempre degrada com
+    // voltado direto pra Continuar; INCONDICIONAL (mesmo se nada mudou/nada
+    // foi aplicado) porque load_controls e barato e sempre degrada com
     // seguranca (arquivo ausente/corrompido -> default_controls(), nunca
     // lanca) - reler de mais nunca corrompe nada, so confirma o estado do
     // disco (que so mudou se o jogador de fato aplicou).
@@ -562,10 +572,7 @@ bool Maestro::open_pause_from_city() {
         std::filesystem::remove(frozen_bg_path, remove_ec);
     }
 
-    // outcome so e valido quando ok==true (run_system_menu_loop_owning_gl deixa
-    // *out_outcome no default quit_app=false se a criacao do contexto GL falhar) -
-    // o "&&" ja cobre isso sem precisar de um guard extra.
-    return ok && outcome.quit_app;
+    return outcome.quit_app;
 }
 
 void Maestro::run() {
@@ -817,33 +824,32 @@ bool Maestro::to_battle(EncounterId id) {
     crossfade_music(&audio_, battle_crossfade_target(battle_music_id_, city_music_id_),
                      /*loop=*/true, kAudioCrossfadeSeconds);
 
-    // TROCA ESCONDIDA ATRAS DO PRETO: libera o SDL_Renderer da cidade pra deixar a
-    // janela livre pro contexto GL da batalha (a MESMA SDL_Window - decisao do lider,
-    // viabilidade validada empiricamente na Onda 1). A tela ja esta 100% preta aqui.
-    city_->release_renderer();
-
+    // TROCA ESCONDIDA ATRAS DO PRETO (FLASH-CTX, A3, passo 5 do plano): a cidade E a
+    // batalha compartilham o MESMO contexto GL UNICO/persistente da Maestro (nunca
+    // muda de dono - substitui "PAUSA a cidade pra deixar a janela livre pro contexto
+    // GL PROPRIO da batalha" da era da PONTE TEMPORARIA, ver historico git). A arena
+    // desenha DIRETO nesse contexto via run_battle_preview_embedded_gl_current (o
+    // nucleo que o A2 extraiu), sem criar/destruir contexto GL algum. A tela ja esta
+    // 100% preta aqui (fade acima), entao a troca de TELA (cidade->arena) segue
+    // invisivel, so que agora sem NENHUMA troca de CONTEXTO por baixo.
     gus::domain::combat::CombatOutcome outcome =
         gus::domain::combat::CombatOutcome::Ongoing;
     bool quit_requested = false;
     // M7-COSTURA Inc 2: passa o AudioEngine DELA (ponteiro nao-dono - a battle_preview
     // so usa pro SFX do hit + o fade visual PROPRIO da tela de batalha, nunca musica) +
-    // os DOIS fades visuais da batalha (entrada clareando, saida escurecendo).
-    const int rc = gus::app::screens::run_battle_preview_embedded(
+    // os DOIS fades visuais da batalha (entrada clareando, saida escurecendo). Sem
+    // retorno de erro: a criacao do contexto ja foi resolvida em init() (ver o
+    // comentario de show_title_screen() acima pro mesmo racional).
+    gus::app::screens::run_battle_preview_embedded_gl_current(
         window_, &outcome, &quit_requested, &audio_, kTransitionFadeSeconds,
         kTransitionFadeSeconds);
-    if (rc != 0) {
-        SDL_Log(
-            "Maestro: run_battle_preview_embedded devolveu %d (contexto GL/glad "
-            "falhou) - outcome fica Ongoing, o inimigo NAO e marcado derrotado.",
-            rc);
-    }
 
     if (quit_requested) {
         // FIX BUG-3: o jogador fechou a janela DENTRO da batalha. NAO volta pra cidade
-        // (on_battle_result/reacquire_renderer sao PULADOS de proposito - a janela vai
-        // ser destruida pelo dtor da Maestro de qualquer jeito, reconstruir o renderer
-        // da cidade agora so pra descarta-lo em seguida seria trabalho inutil). O
-        // outcome fica descartado (nao importa mais: o programa esta encerrando).
+        // (on_battle_result e PULADO de proposito - a janela vai ser destruida pelo
+        // dtor da Maestro de qualquer jeito, aplicar o outcome na cidade agora so pra
+        // descarta-la em seguida seria trabalho inutil). O outcome fica descartado
+        // (nao importa mais: o programa esta encerrando).
         std::cout << "Maestro: [costura] janela fechada DURANTE a batalha -> "
                      "encerrando o programa (sem voltar pra cidade).\n";
         return true;
@@ -864,18 +870,14 @@ bool Maestro::to_battle(EncounterId id) {
         maybe_autosave("retornando_da_batalha_vitoria");
     }
 
-    if (!city_->reacquire_renderer()) {
-        SDL_Log(
-            "Maestro: falha ao reconstruir o renderer da cidade apos a batalha - a "
-            "cidade segue rodando SEM desenhar (degradacao segura, sem crash).");
-    }
-
     // CROSSFADE DE VOLTA + FADE-IN sobre a CIDADE (Inc 2): mesma receita, sentido
     // inverso - a batalha ja fez o SEU fade-out (kOut, dentro de
-    // run_battle_preview_embedded, tela preta ao voltar aqui); o crossfade dispara
-    // agora (ainda preto, cidade acabou de reconstruir o renderer) e a cidade clareia.
-    // Inc 3: sempre mira city_music_id_ (o tema da cidade, existe desde sempre) -
-    // mesma degradacao segura de antes se estiver invalido (no-op silencioso).
+    // run_battle_preview_embedded_gl_current, tela preta ao voltar aqui); o crossfade
+    // dispara agora (ainda preto - FLASH-CTX: a cidade nunca parou de desenhar no
+    // MESMO contexto, entao nao ha mais "reconstruir o renderer" antes disto) e a
+    // cidade clareia. Inc 3: sempre mira city_music_id_ (o tema da cidade, existe
+    // desde sempre) - mesma degradacao segura de antes se estiver invalido (no-op
+    // silencioso).
     crossfade_music(&audio_, city_music_id_, /*loop=*/true, kAudioCrossfadeSeconds);
     if (!run_city_fade(gus::core::anim::FadeDirection::kIn, kTransitionFadeSeconds)) {
         return true;  // fechou a janela durante o fade de volta - mesmo contrato
@@ -907,27 +909,26 @@ bool Maestro::to_npc_dialogue() {
     runtime.enter();
 
     // FUNDO REAL CONGELADO (decisao do lider): MESMA tecnica de open_pause_from_
-    // city - captura o frame ATUAL da cidade ANTES de soltar o renderer; a caixa
-    // de dialogo desenha essa cena REAL como fundo estatico, no lugar da vinheta
-    // abstrata (mesmo padrao de Chrono Trigger/Zelda/Stardew Valley). frozen_ok==
-    // false degrada pra vinheta de sempre (ver run_npc_dialogue_loop_gl).
+    // city - captura o frame ATUAL da cidade; a caixa de dialogo desenha essa cena
+    // REAL como fundo estatico, no lugar da vinheta abstrata (mesmo padrao de
+    // Chrono Trigger/Zelda/Stardew Valley). frozen_ok==false degrada pra vinheta de
+    // sempre (ver run_npc_dialogue_loop_gl_current).
     const std::string frozen_bg_path = frozen_city_snapshot_path();
     const bool frozen_ok = city_->capture_frame_to_png(frozen_bg_path);
 
-    // DIALOGO-TERMINAL: MESMA tecnica de open_pause_from_city (contexto GL PROPRIO,
-    // criado so aqui/destruido ao sair) - solta o SDL_Renderer da cidade ANTES (a
-    // janela precisa ficar livre pro contexto GL) e reconstroi DEPOIS,
-    // INCONDICIONALMENTE (mesmo se o contexto GL falhar - degradacao segura, a
-    // cidade nunca fica sem desenhar pro resto da sessao).
-    city_->release_renderer();
-    const bool quit_requested = gus::app::screens::run_npc_dialogue_loop_gl(
-        window_, *city_, runtime, translator_, audio_,
+    // DIALOGO-TERMINAL (FLASH-CTX, A3, passo 5 do plano): contexto GL UNICO ja
+    // corrente - o dialogo desenha DIRETO nele (run_npc_dialogue_loop_gl_current, o
+    // nucleo que o A2 extraiu), sem criar/destruir contexto GL. Substitui
+    // run_npc_dialogue_loop_gl (a casca owning) + o SDL_GL_MakeCurrent de
+    // restauracao (a PONTE TEMPORARIA do A1 nao existe mais). O nucleo _gl_current
+    // NAO chama SdlWindow::clear_input() sozinho (fica no CHAMADOR que possui o
+    // contexto, ver o header) - clear_input() ao ENTRAR e ao SAIR continua aqui,
+    // MESMO fix de sempre (BUG "Gus anda sozinho apos fechar o dialogo").
+    city_->clear_input();
+    const bool quit_requested = gus::app::screens::run_npc_dialogue_loop_gl_current(
+        window_, runtime, translator_, audio_,
         frozen_ok ? frozen_bg_path : std::string());
-    if (!city_->reacquire_renderer()) {
-        SDL_Log(
-            "Maestro: falha ao reconstruir o renderer da cidade apos o dialogo - a "
-            "cidade segue rodando SEM desenhar (degradacao segura, sem crash).");
-    }
+    city_->clear_input();
 
     // Higiene (AC-E3): mesma limpeza pos-uso do menu de pausa (ver open_pause_from_
     // city) - o snapshot congelado nao precisa sobreviver alem do dialogo que o leu.

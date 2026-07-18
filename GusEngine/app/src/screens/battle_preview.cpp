@@ -1208,55 +1208,24 @@ void battle_key_down(BattleScene& scene, SDL_Keycode key, bool& running,
     }
 }
 
-// M7-COSTURA (ADR-012 Onda 1): "trocar escondido atras do preto" - viabilidade validada
-// EMPIRICAMENTE (probes standalone fora da arvore, nao commitados) num build SDL3 real
-// (X11/Mesa, GL 4.6 core): destruir o SDL_Renderer da cidade, criar um contexto GL na
-// MESMA janela (mesmo sem SDL_WINDOW_OPENGL setado na criacao original), rodar a
-// batalha, destruir o contexto, recriar o SDL_Renderer - tudo na MESMA SDL_Window, em
-// ciclo repetido (cidade->batalha->cidade->batalha), sem crash/hang. Os atributos GL
-// (profile/versao/stencil) sao setados de novo a CADA entrada na batalha (nao precisam
-// ter sido setados na criacao da janela) - por isso run_battle_preview_embedded() os
-// seta aqui, e nao so no wrapper standalone. Custo real aceito (nao e "pesadelo
-// tecnico", e um tradeoff conhecido): TextureId da SDL_Renderer antiga NAO sobrevivem a
-// destruicao do renderer - a Maestro RECARREGA os sprites da cidade ao reconstruir o
-// SDL_Renderer no retorno (ver Maestro::reacquire_city_renderer em maestro.cpp).
-int run_battle_preview_embedded(SDL_Window* window,
-                                 gus::domain::combat::CombatOutcome* out_outcome,
-                                 bool* out_quit_requested,
-                                 gus::platform::audio::AudioEngine* external_audio,
-                                 float fade_in_seconds, float fade_out_seconds) {
+// FLASH-CTX (A2, extracao behavior-preserving): NUCLEO que ASSUME um contexto
+// GL JA CORRENTE + glad JA CARREGADO - mesmo corpo que antes vivia direto em
+// run_battle_preview_embedded (ver o header pro contrato, e o comentario
+// M7-COSTURA acima da casca owning mais abaixo pra tecnica de "trocar
+// escondido atras do preto"). `quit_requested` e `fxtest` passam a ser locais
+// deste nucleo (antes viviam no escopo da funcao dona do contexto, mas so
+// eram usados dentro deste corpo - mudanca de escopo pura, zero mudanca de
+// valor/logica). Extraida verbatim pra permitir reuso futuro sem recriar o
+// contexto (Opcao C do plano de contexto GL unico).
+void run_battle_preview_embedded_gl_current(
+    SDL_Window* window, gus::domain::combat::CombatOutcome* out_outcome,
+    bool* out_quit_requested, gus::platform::audio::AudioEngine* external_audio,
+    float fade_in_seconds, float fade_out_seconds) {
     // FIX BUG-3 (playtest ao vivo do lider: fechar a janela durante a batalha reabria a
     // cidade em LOOP INFINITO): comeca false; so vira true no MESMO handler de
     // SDL_EVENT_QUIT que ja existia (ver o `while (running)` abaixo) - um sinal DISTINTO
     // de qualquer CombatOutcome, gravado no choke-point de saida junto do outcome.
     bool quit_requested = false;
-    // ADR-009 adendo GL3: a janela usa contexto OpenGL 3.3 core (nao SDL_Renderer), pois o
-    // HUD RmlUi-GL3 precisa de shaders (gradiente/box-shadow/blur). A arena (Render2dGl3) e
-    // o HUD compartilham o MESMO contexto GL; swap unico (SDL_GL_SwapWindow).
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
-    SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
-    SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);  // o GL3 do RmlUi usa stencil (clip mask)
-
-    SDL_GLContext gl = SDL_GL_CreateContext(window);
-    if (gl == nullptr) {
-        std::cerr << "BattlePreview: SDL_GL_CreateContext falhou: " << SDL_GetError()
-                  << "\n";
-        return 1;
-    }
-    SDL_GL_MakeCurrent(window, gl);
-    SDL_GL_SetSwapInterval(1);  // VSync
-
-    // Carrega os ponteiros de funcao GL (glad, via o backend GL3 do RmlUi). PRECISA vir
-    // depois do contexto corrente e ANTES de qualquer chamada GL (Render2dGl3/RmlUiHud).
-    // Chamado a CADA entrada na batalha (o contexto e recriado toda vez - ver nota acima).
-    if (!gus::platform::rmlui::gl3_load_functions(
-            reinterpret_cast<void* (*)(const char*)>(SDL_GL_GetProcAddress))) {
-        std::cerr << "BattlePreview: falha ao carregar funcoes OpenGL (glad)\n";
-        SDL_GL_DestroyContext(gl);
-        return 1;
-    }
 
     // DIAGNOSTICO DE EFEITOS (ADR-009 #1): GUSWORLD_RMLUI_FXTEST=1 carrega um doc com
     // efeitos MAXIMAMENTE OBVIOS (gradiente vermelho->azul, box-shadow magenta forte) e
@@ -2875,6 +2844,60 @@ int run_battle_preview_embedded(SDL_Window* window,
         std::cout << "BattlePreview: [audio] play_sfx(hit) disparou "
                   << audio_ptr->sfx_play_count() << "x nesta sessao.\n";
     }  // Render2dGl3 destruido (libera recursos GL) antes de destruir o contexto
+}
+
+// M7-COSTURA (ADR-012 Onda 1): "trocar escondido atras do preto" - viabilidade validada
+// EMPIRICAMENTE (probes standalone fora da arvore, nao commitados) num build SDL3 real
+// (X11/Mesa, GL 4.6 core): destruir o SDL_Renderer da cidade, criar um contexto GL na
+// MESMA janela (mesmo sem SDL_WINDOW_OPENGL setado na criacao original), rodar a
+// batalha, destruir o contexto, recriar o SDL_Renderer - tudo na MESMA SDL_Window, em
+// ciclo repetido (cidade->batalha->cidade->batalha), sem crash/hang. Os atributos GL
+// (profile/versao/stencil) sao setados de novo a CADA entrada na batalha (nao precisam
+// ter sido setados na criacao da janela) - por isso run_battle_preview_embedded() os
+// seta aqui, e nao so no wrapper standalone. Custo real aceito (nao e "pesadelo
+// tecnico", e um tradeoff conhecido): TextureId da SDL_Renderer antiga NAO sobrevivem a
+// destruicao do renderer - a Maestro RECARREGA os sprites da cidade ao reconstruir o
+// SDL_Renderer no retorno (ver Maestro::reacquire_city_renderer em maestro.cpp).
+//
+// FLASH-CTX (A2): casca fina que cria/destroi o contexto GL e delega o corpo pra
+// run_battle_preview_embedded_gl_current (o nucleo acima) - MESMO padrao de
+// run_system_menu_loop_owning_gl/run_system_menu_loop_gl_current.
+int run_battle_preview_embedded(SDL_Window* window,
+                                 gus::domain::combat::CombatOutcome* out_outcome,
+                                 bool* out_quit_requested,
+                                 gus::platform::audio::AudioEngine* external_audio,
+                                 float fade_in_seconds, float fade_out_seconds) {
+    // ADR-009 adendo GL3: a janela usa contexto OpenGL 3.3 core (nao SDL_Renderer), pois o
+    // HUD RmlUi-GL3 precisa de shaders (gradiente/box-shadow/blur). A arena (Render2dGl3) e
+    // o HUD compartilham o MESMO contexto GL; swap unico (SDL_GL_SwapWindow).
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
+    SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+    SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);  // o GL3 do RmlUi usa stencil (clip mask)
+
+    SDL_GLContext gl = SDL_GL_CreateContext(window);
+    if (gl == nullptr) {
+        std::cerr << "BattlePreview: SDL_GL_CreateContext falhou: " << SDL_GetError()
+                  << "\n";
+        return 1;
+    }
+    SDL_GL_MakeCurrent(window, gl);
+    SDL_GL_SetSwapInterval(1);  // VSync
+
+    // Carrega os ponteiros de funcao GL (glad, via o backend GL3 do RmlUi). PRECISA vir
+    // depois do contexto corrente e ANTES de qualquer chamada GL (Render2dGl3/RmlUiHud).
+    // Chamado a CADA entrada na batalha (o contexto e recriado toda vez - ver nota acima).
+    if (!gus::platform::rmlui::gl3_load_functions(
+            reinterpret_cast<void* (*)(const char*)>(SDL_GL_GetProcAddress))) {
+        std::cerr << "BattlePreview: falha ao carregar funcoes OpenGL (glad)\n";
+        SDL_GL_DestroyContext(gl);
+        return 1;
+    }
+
+    run_battle_preview_embedded_gl_current(window, out_outcome, out_quit_requested,
+                                            external_audio, fade_in_seconds,
+                                            fade_out_seconds);
 
     // M7-COSTURA: SO o contexto GL e desta funcao (criado no topo). A janela e o SDL_Init/
     // Quit pertencem a quem chamou (a Maestro, dona da janela compartilhada; ou o wrapper
