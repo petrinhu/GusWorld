@@ -1,6 +1,6 @@
 # Vozes da party (como cada um FALA nos diálogos)
 
-> **Status:** em construção. **Gus = DEFINIDO pelo criador (2026-07-13/14). Cauã "Volt", Jaci "Proxy" e Bento "Requiem" = guias de voz bilíngues pt-br/en-intl definidos (2026-07-18).** Os demais companions (Iara, Linda, Dante) ficam para brainstorm posterior. Este doc fixa personalidade + padrões de fala; a redação final dos diálogos é do `narrative-writer` (cross-ref `guia-dialogos.md`, `reference_guia_dialogos`).
+> **Status:** COMPLETO. **Gus = DEFINIDO pelo criador (2026-07-13/14). Cauã "Volt", Jaci "Proxy", Bento "Requiem", Iara "Lumen", Linda "Siren" e Dante "Grid" = guias de voz bilíngues pt-br/en-intl definidos (2026-07-18).** As 6 vozes dos companions + a voz do Gus estão todas fixadas. Este doc fixa personalidade + padrões de fala; a redação final dos diálogos é do `narrative-writer` (cross-ref `guia-dialogos.md`, `reference_guia_dialogos`).
 >
 > **Âncoras:** Pillar 4 (Gus prodígio analítico, 11 anos canônico), `sinopse.md` §3-4, `characters/gus.md`, família Vance ([[project_familia_vance_canonica]]), codinome de combate "Dragon" ([[project_nome_gus_canon]], [[project_dragon_victory_canon]]), guia de diálogos (voz por linguagem-âncora).
 
@@ -585,6 +585,624 @@ Regra de voz: ao contrário do Cauã (o bordão SOME, silêncio total) e da Jaci
 - Não usar travessão/em dash em nenhuma fala (convenção do projeto: só aspas; beat de ação ou reticências resolvem interrupção).
 - Não usar emoji: a paleta-piloto do §5 da Jaci é exclusiva dela por ora.
 - Teste de voz única (herdado de `party.md`): se uma fala do Bento sair igualmente natural na boca do Cauã (rápida demais, sem pausa) ou do Gus (frio demais, sem peso solene), ela está errada, refazer.
+
+---
+
+## IARA "LUMEN" KOSLOV (guia de voz bilíngue pt-br/en-intl, definido pelo líder, 2026-07-18)
+
+> **Status:** guia de voz aprovado para uso. Complementa (não substitui) o canon de personagem em `characters/iara-lumen.md`. Fonte de falas concretas e reutilizáveis para o `narrative-writer` selecionar/expandir na redação final (mesmo modelo do "Banco de falas" do Gus e dos guias do Cauã, Jaci e Bento acima).
+>
+> **Cross-ref:** `characters/iara-lumen.md` (canon completo, wound/want/need/flaw, memórias formativas, pulled quotes), `characters/party.md` (matriz de linguagens-âncora, dinâmicas de conflito, conflito Iara x Linda), `characters/gus.md` (voice do Gus pro contraponto), `characters/linda-siren.md` (a outra Óxido; ainda sem guia de voz próprio, ver nota de blindagem §5), `comic-reliefs.md` Cena 5 (a troca canônica "Quatro caracteres... / Pra você, é múmia falando..."), `guia-dialogos.md` (formato: aspas, zero em-dash, beat de ação em vez de tag com advérbio).
+>
+> **Regra bilíngue:** cada fala concreta vem em **pt-br e en-intl lado a lado**. Como este é o primeiro guia de voz da Iara, **todas** as escolhas en-intl abaixo são **(PROPOSTA, confirmar)**, mesmo quando não repetido em cada linha. Cuidado específico: o latim da Iara é **estético/irônico** (cita pra velar ou impressionar), nunca devocional como o do Bento; nenhuma frase-latim nova é cunhada neste guia, e qualquer uma que surgir na redação final fica marcada **PENDENTE aprovação do líder** (regra distinta do Bento, cujas três frases-latim já foram aprovadas em 2026-07-18).
+
+### 1. Resumo da voz
+
+Iara tem 12 anos, é Infiltradora desertora do Cult Mirage, linguagem-âncora **Óxido** ("segurança opaca / elegância opaca"). Na superfície é a voz mais estetizada da party: frases longas e elegantes, com pausas calculadas, quase poesia; vocabulário emprestado de filmagem e holografia (quadro, corte, take, ângulo, roteiro, exposição, foco) e latim ocasional usado como ornamento, nunca como devoção. Tic: **termina frases sussurrando levemente**, como se estivesse sempre um pouco escondida, mesmo quando ninguém a persegue.
+
+Diferenciação obrigatória do Bento (decisão do líder, ponto 3): os dois cultivam frase longa e cadência formal, mas a temperatura é oposta. Bento é solene, litúrgico, caloroso por baixo da formalidade; o latim dele é reza. Iara é **lâmina de veludo**: elegância gélida e cortante; o latim dela é didascália, citado pra impressionar ou pra velar, nunca pra confortar. Onde o Bento pausa porque a fala pesa, a Iara pausa porque calculou o efeito da pausa. Regra pro `narrative-writer`: se uma fala da Iara soar aconchegante, ela está errada, refazer.
+
+Por baixo da encenação fria mora o **belief** dela: "tudo é encenação; quem não percebe, é encenado." A flaw (opacidade defensiva, esconde sentimento por reflexo) e a strength (decifra manipulação social em segundos, lê micro-expressão como criptografia inversa) são as duas faces da mesma moeda: cinco anos sendo treinada por Adila Murmúrio pra "mentir bonito" viraram, depois da deserção aos 11, um radar que ela vira contra o próprio mundo. O único ponto cego desse radar é o Gus (ver §3).
+
+**Teste de voz única** (`party.md`): se uma fala da Iara soa igualmente natural na boca do Gus, do Cauã ou da Jaci, ela está errada, refazer. Cuidado extra (a Linda ainda não tem guia próprio, mas o eixo já está fixado): Iara é estetização/ilusão, Linda é silêncio/anti-estética; nenhuma fala da Iara pode soar econômica ou seca demais, ou ela colide com o campo que será da Linda.
+
+### 2. Combate (encenação fria sob controle)
+
+Contraponto ao Cauã (calor gritado) e à Jaci (calma clínica): a Iara trata combate como **direção de cena**. Fala pouco, e o pouco que fala soa ensaiado, nunca improvisado, mesmo debaixo de fogo. O clone holográfico e a ofuscação de sensores são, na cabeça dela, montagem: ela edita o que o inimigo vê antes de o inimigo perceber que foi editado. Pool de barks por momento, para o `narrative-writer` escolher/variar.
+
+**Projetar clone (Decoy Lumen)**
+- PT: "Assista." (ergue a mão; um clone dela se levanta do nada, a luz curva ao redor do inimigo) "A plateia nunca sabe qual quadro é real." (a voz cai a um sussurro na última palavra)
+- EN: "Watch." (raises her hand; a clone of her rises out of nothing, light bending around the enemy) "The audience never knows which frame is real." (her voice drops to a whisper on the last word)
+- PT: "Segundo take." (o clone pisca em existência a um passo do original, indistinguível por um instante)
+- EN: "Take two." (the clone flickers into existence a step from the original, indistinguishable for an instant)
+
+**Ofuscar sensores inimigos**
+- PT: "Eu edito o que ele vê." (traça um gesto no ar; o sensor do inimigo pisca, confuso) "Um corte limpo. Ele nunca sente a tesoura."
+- EN: "I edit what it sees." (traces a gesture in the air; the enemy's sensor flickers, confused) "A clean cut. It never feels the scissors."
+
+**Avançar / reposicionar (a sombra)**
+- PT: "Câmera dois." (desliza pra sombra, quase some antes de terminar a frase)
+- EN: "Camera two." (slides into the shadow, almost gone before she finishes the sentence)
+
+**Proteger um aliado (redirecionar o golpe pro clone)**
+- PT: "Segura o quadro. Eu troco o ângulo." (o clone se reposiciona entre o aliado e o golpe, mais rápido do que deveria ser possível)
+- EN: "Hold the frame. I'll change the angle." (the clone repositions between the ally and the blow, faster than it should be possible)
+
+**Aliado em perigo (HP baixo)**
+- PT: "Não corta ainda." (a voz perde o sussurro por um instante, mais direta do que o normal) "Eu não deixo cortar ainda."
+- EN: "Don't cut yet." (her voice loses the whisper for a moment, more direct than usual) "I won't let it cut yet."
+
+**Vitória**
+- PT: "Corta." (baixa a mão devagar; o clone se desfaz em partículas de luz) "Foi um bom take."
+- EN: "Cut." (lowers her hand slowly; the clone dissolves into particles of light) "That was a good take."
+
+**Tomar dano**
+- PT: "Isso não estava no roteiro." (sorriso fino, sem humor de verdade)
+- EN: "That wasn't in the script." (a thin smile, no real humor in it)
+
+**Recompor a capa / retomar fôlego**
+- PT: "Corta a cena. Regravamos de outro ângulo." (recua um passo; a capa de refração já dobra a luz ao redor dela)
+- EN: "Cut the scene. We reshoot from another angle." (steps back; the refraction cape already bending the light around her)
+
+### 3. Interação com o Gus (o código que ela não decifra) + conflito com a Linda
+
+#### 3.1 O código que ela não decifra (decisão do líder, ponto 1)
+
+Não é rivalidade fraterna tipo Cauã, com ponto marcado de cada lado; é um **jogo intelectual de leitura**. Iara decifra qualquer pessoa em segundos (strength canônica), menos o Gus. A honestidade total dele é, pra ela, um dado que não fecha, e isso a incomoda e intriga ao mesmo tempo: ela o provoca tentando achar a máscara que ele "deveria" ter, e cada tentativa fracassa porque não existe máscara pra encontrar. O arco evolui pra respeito relutante, o Gus como o "código aberto" que ela aprende, aos poucos, a confiar.
+
+**Eco do canon** (`comic-reliefs.md` Cena 5, não reescrever, só ancorar aqui):
+- IARA (PT): "Quatro caracteres. Oitenta linhas. Você escolhe."
+- IARA (EN): "Four characters. Eighty lines. You choose."
+- GUS (PT): "Legibilidade não é fraqueza."
+- GUS (EN): "Legibility isn't a weakness."
+- IARA (PT): "Pra você, é múmia falando. Pra mim, é poesia."
+- IARA (EN): "To you, it's a mummy talking. To me, it's poetry."
+
+**Exemplo A, primeira leitura (ela tenta e falha)**
+- IARA (PT): "Você segura a respiração quando mente. A maioria segura." (pausa, estudando-o) "Você não segurou." (mais sussurrado) "Isso é... raro."
+- IARA (EN): "You hold your breath when you lie. Most people do." (pause, studying him) "You didn't." (more of a whisper) "That's... rare."
+- GUS (PT): "Eu não menti."
+- GUS (EN): "I wasn't lying."
+- IARA (PT): "Eu sei." (pausa mais longa que o normal) "É isso que eu não sei processar."
+- IARA (EN): "I know." (a longer pause than usual) "That's the part I can't process."
+
+**Exemplo B, a provocação (ela procura a máscara)**
+- IARA (PT): "Todo mundo tem um corte que não mostra. Qual é o seu?"
+- IARA (EN): "Everyone has a cut they don't show. What's yours?"
+- GUS (PT): "Eu não tenho corte. Eu só... digo a coisa."
+- GUS (EN): "I don't have a cut. I just... say the thing."
+- IARA (PT): (silêncio mais longo que o dela de costume, sem sussurrar dessa vez) "Você não esconde nada." (pausa) "É quase ofensivo." (pulled quote canônico)
+- IARA (EN): "You don't hide anything." (pause) "It's almost offensive."
+
+**Exemplo C, o respeito relutante (mais tarde na campanha)**
+- IARA (PT): "Eu decifro todo mundo em segundos, Gus. Você eu decifrei em semanas, e ainda errei metade." (pausa, sussurro só no fim) "Isso devia me incomodar mais do que incomoda."
+- IARA (EN): "I decode everyone in seconds, Gus. You took me weeks, and I still got half of it wrong." (pause, whisper only at the very end) "That should bother me more than it does."
+- GUS (PT): "Talvez eu não seja pra decifrar. Talvez eu seja só... pra ler."
+- GUS (EN): "Maybe I'm not meant to be decoded. Maybe I'm just... meant to be read."
+- IARA (PT): (pausa) "Código aberto." (quase um meio-sorriso genuíno, raríssimo nela) "Eu não confio em código aberto." (pausa) "Ainda."
+- IARA (EN): "Open source." (something close to a genuine half-smile, very rare on her) "I don't trust open source." (pause) "Yet."
+- *Resultado: ninguém "vence"; é jogo de leitura, não banter de rivalidade. A Iara termina desconcertada e mais próxima, nunca derrotada, nunca vitoriosa.*
+
+#### 3.2 Conflito com a Linda (canônico, aliança operacional)
+
+Canon (`party.md` §Dinâmicas, `iara-lumen.md` §Conflito): o Underground do Silêncio despreza a estetização do Cult Mirage; a Linda vê a Iara como "ex-conversa que ainda fala bonito demais pra ser confiável". A Iara responde com elegância gélida, nunca se rebaixa ao registro seco da Linda. A aproximação acontece durante o arco da Linda (a Iara sabota a holografia da Sterling Corp por dentro); a aliança é operacional, não pessoal.
+
+**Nota de blindagem (atualizada 2026-07-18, guia da Linda publicado):** a Linda agora tem guia de voz próprio (ver seção `LINDA "SIREN" NEUMANN` abaixo, eixo cadência rítmica/vigilância sonora, auditivo em vez do visual/cinema da Iara). As falas dela nesta subseção foram conferidas contra o guia oficial e continuam consistentes (registro seco, direto, sem ornamentação); deixam de ser **provisórias** e passam a ser oficiais deste lado do conflito também (ver §3.3 do guia da Linda pra harmonização completa, com uma fala de fechamento nova do lado dela).
+
+- LINDA (PT): "Fala bonito de novo. Deve ser hábito."
+- LINDA (EN): "Talking pretty again. Must be a habit."
+- IARA (PT): "Falar feio não te faz mais honesta." (sussurra a última palavra) "Só mais alta."
+- IARA (EN): "Talking ugly doesn't make you more honest." (whispers the last word) "Just louder."
+- LINDA (PT): "Alta o bastante pra não precisar de holograma pra ser ouvida."
+- LINDA (EN): "Loud enough that I don't need a hologram to be heard."
+- IARA (PT): "Justo." (pausa) "Trabalhamos juntas mesmo assim."
+- IARA (EN): "Fair." (pause) "We work together anyway."
+- *Resultado: aliança operacional, não pessoal (canon `party.md`); nenhuma cede terreno estético, mas a missão vence a implicância.*
+
+### 4. Momentos pesados / o sussurro que some
+
+Regra de voz (decisão do líder, ponto 2): ao contrário do Cauã (o bordão SOME), da Jaci (o tic de contar INTENSIFICA) e do Bento (o arcaísmo SOBE), na Iara é o **sussurro que SOME**. No normal, ela sussurra o fim de cada frase, sempre um pouco escondida. Quando algo é real, quando dói de verdade, a voz fica **clara e direta pela primeira vez**: ela para de se esconder. É o inverso exato do tic dos outros companions, que GANHAM um tique sob pressão (Jaci conta mais, Bento reza mais); a Iara PERDE o dela.
+
+**Pulled quotes canônicos** (não reescrever, só traduzir; `iara-lumen.md`; traduções EN abaixo, **(PROPOSTA, confirmar)**):
+- PT: "Adila me ensinou a mentir bem. Agora eu minto contra ela. Justiça poética."
+- EN: "Adila taught me to lie well. Now I lie against her. Poetic justice."
+- *Nota de entrega:* dita em voz limpa, sem o sussurro de costume no fim da frase, o primeiro sinal cedo na campanha de que a dor por trás é real.
+- PT: (climax, antes do confronto final com Sterling) "Eu sou a única aqui que sabe o preço de servir Sterling. Acredite em mim."
+- EN: "I'm the only one here who knows the price of serving Sterling. Believe me."
+- *Nota de entrega:* a fala mais grave da campanha inteira pra ela; zero sussurro do início ao fim, olhando direto pra quem ouve, sem desviar.
+
+**Diálogo canônico da reflexão filosófica** (`iara-lumen.md`, mini-quest pós-recrutamento; substância não reescrita, só formatada bilíngue com nota de entrega):
+- IARA (PT): "Ela me ensinou tudo. Eu sou a aluna que ataca o mestre." (pausa) "E se eu virar igual a ela, por matar ela?"
+- IARA (EN): "She taught me everything. I'm the student attacking the master." (pause) "What if I become just like her, by killing her?"
+- *Nota de entrega:* voz limpa, sem sussurro, a primeira vez que verbaliza dúvida em voz alta pra alguém.
+- GUS (PT): "Você não está matando. Está fechando o programa que ela escreveu em você." (pausa) "Compilando seu próprio binário."
+- GUS (EN): "You're not killing her. You're closing the program she wrote into you." (pause) "Compiling your own binary."
+
+Falas novas reutilizáveis, mesmo registro (voz limpa, sem sussurro, sem monólogo, sem discurso):
+- PT: "Eu sei mentir tão bem que às vezes esqueço qual parte de mim ainda é original."
+- EN: "I know how to lie so well that sometimes I forget which part of me is still original."
+- PT: "Não sussurro porque tenho medo." (pausa) "Sussurro porque aprendi que gritar custa mais caro." (pausa mais longa) "Isso, eu não aprendi sussurrando."
+- EN: "I don't whisper because I'm afraid." (pause) "I whisper because I learned that shouting costs more." (longer pause) "That part, I didn't learn in a whisper."
+- PT: (sobre Adila, se perguntada direto, sem retórica) "Ela não mentiu pra mim uma vez." (pausa) "Ela mentiu pra mim durante cinco anos, todos os dias, devagar o bastante pra eu chamar de carinho."
+- EN: "She didn't lie to me once." (pause) "She lied to me for five years, every day, slowly enough that I called it affection."
+
+### 5. Registro e gíria (bilíngue)
+
+Iara tem pouca gíria de rua (não é registro de comunidade como o Cauã); a "gíria" dela é estética, feita de vocabulário técnico de imagem e de citação latina pontual. O risco de tradução é diferente do Cauã: aqui o cuidado é manter a frieza elegante e a cadência de pausas soando igualmente naturais nas duas línguas, sem esfriar demais (viraria robótico) nem aquecer demais (colidiria com o Bento).
+
+| Padrão pt-br | Uso | Equivalente en-intl | Nota |
+|---|---|---|---|
+| Vocabulário de filmagem/holografia (quadro, corte, take, ângulo, roteiro, exposição, foco) | metáfora recorrente pra descrever ação/verdade/mentira | **frame, cut, take, angle, script, exposure, focus** | jargão de cinema é quase 1:1 entre os dois idiomas; poucas perdas de sentido |
+| Latim ocasional, estético/irônico | cita latim pra impressionar ou velar, nunca pra rezar (contraste do Bento) | manter o latim idêntico nos dois idiomas; gloss só de apoio neste guia | regra distinta do Bento: NENHUMA frase-latim nova cunhada aqui; se a redação final precisar de uma, marcar **PENDENTE aprovação do líder** antes de usar |
+| Tic: sussurro no fim da frase | insegurança velada por elegância, sempre um pouco escondida | beat de ação "(a voz cai a um sussurro)" ou trecho final em itálico | regra do §4: o sussurro SOME em momento pesado real; fora disso, é constante e não se anuncia toda vez, só o suficiente pra lembrar o leitor |
+| "múmia" (Cena 5, `comic-reliefs.md`) | desprezo elegante pela verbosidade do C-Arcane | **mummy** | tradução literal preserva a imagem grotesca-cômica; alternativa descartada "corpse" (perde o humor seco, fica só macabro) |
+| Frases longas com pausas calculadas | cadência de encenação fria, "quase poesia" | manter subordinação equivalente; pausas marcadas por reticências ou beat de ação | inglês aceita a mesma arquitetura de frase longa; cortar em frases curtas mataria o registro |
+| Registro geral (fora dos momentos pesados) | gélido, nunca caloroso, nunca aconchegante | inglês literário moderno e afiado; contração normal do dia a dia, sem soar robótica | contraste deliberado com o Bento: **zero thee/thy/thou** (exclusivo dele, ver §5 do guia do Bento acima); a formalidade da Iara é estética, não arcaica |
+
+**Nota de blindagem vs Linda (a outra Óxido):** quando a Linda ganhar guia próprio, ela ocupa o eixo silêncio/anti-estética; a Iara fica travada no eixo estetização/ilusão/lâmina de veludo. Nenhuma fala da Iara deve soar seca, econômica ou monossilábica demais (isso é território da Linda); nenhuma fala futura da Linda deve soar "quase poesia" (isso é território da Iara).
+
+**Nota:** sem emoji. A paleta-piloto de emoji (§5 do guia da Jaci acima) é exclusiva dela por ora.
+
+### 6. Não fazer
+
+- Não eroticizar. Tem 12 anos. Beleza referida = elegância, postura, voz, nunca corporal (herdado, `iara-lumen.md`).
+- Não fan-service "femme fatale juvenil": Iara é grave, não sedutora (herdado, `iara-lumen.md`).
+- Não redemption arc pra Adila: ela cai e fica caída (herdado, `iara-lumen.md`).
+- Não deixar o latim virar devocional/litúrgico tipo Bento: o latim da Iara é ornamento irônico, nunca reza (decisão do líder, ponto 3).
+- Não cunhar frase-latim nova sem marcar **PENDENTE aprovação do líder**: regra distinta da já-aprovada do Bento (bloco de topo deste guia).
+- Não usar thee/thy/thou: registro arcaico-litúrgico é exclusivo do Bento.
+- Não usar emoji: a paleta-piloto é exclusiva da Jaci por ora.
+- Não deixar o sussurro sumir fora de um momento pesado real: a raridade é o peso, mesma lógica das outras regras de raridade da party (emoji da Jaci, "vossa mercê" do Bento).
+- Não fazer banter de rivalidade fraterna tipo Cauã com o Gus: é jogo de leitura, ninguém marca ponto, ninguém vence.
+- Não deixar outro personagem comentar ou perceber quando o sussurro da Iara some: mataria a sutileza, mesma regra do subtexto Jaci x Gus.
+- Não deixar a voz da Iara soar seca, econômica ou monossilábica demais: colide com o eixo reservado pra Linda (nota de blindagem §5).
+- Não usar travessão/em-dash em nenhuma fala (convenção do projeto: só aspas; beat de ação ou reticências resolvem interrupção).
+- Teste de voz única (herdado de `party.md`): se uma fala da Iara sair igualmente natural na boca do Gus, do Cauã ou da Jaci, ela está errada, refazer.
+
+---
+
+## LINDA "SIREN" NEUMANN (guia de voz bilíngue pt-br/en-intl, definido pelo líder, 2026-07-18)
+
+> **Status:** guia de voz aprovado para uso. Complementa (não substitui) o canon de personagem em `characters/linda-siren.md`. Fonte de falas concretas e reutilizáveis para o `narrative-writer` selecionar/expandir na redação final (mesmo modelo dos guias do Gus, Cauã, Jaci, Bento e Iara acima).
+>
+> **Cross-ref:** `characters/linda-siren.md` (canon completo, wound/want/need/flaw, memórias formativas, pulled quotes), `characters/party.md` (matriz de linguagens-âncora, conflito Cauã×Linda declarado "conflito principal", conflito Iara×Linda), `characters/caua-volt.md` (o conflito-vira-parceria, âncora da §3 deste guia), `characters/iara-lumen.md` (a outra Óxido; §3.2 dela já tinha falas provisórias da Linda, harmonizadas e oficializadas neste guia, ver §3.3), `characters/gus.md` (voice do Gus pro contraponto filosófico), `comic-reliefs.md` Cena 6 "Bug declarado Feature" (pulled quotes canônicos, não reescritos) e Cena 14 "Comutador vs Tocador-Trono" (registro casual de descanso, referência de tom fora de combate), `guia-dialogos.md` (formato: aspas, zero em-dash, beat de ação em vez de tag com advérbio).
+>
+> **Regra bilíngue:** cada fala concreta vem em **pt-br e en-intl lado a lado**. Como este é o primeiro guia de voz da Linda, **todas** as escolhas en-intl abaixo são **(PROPOSTA, confirmar)**, mesmo quando não repetido em cada linha. O slang pós-punk NÃO se traduz literal: mesma disciplina do guia do Cauã, buscar o equivalente que soa natural na boca de uma garota pós-punk de 12 anos em inglês, sem trend datável (o registro precisa soar igualmente crível em qualquer década).
+>
+> **Nota de canon em aberto, NÃO resolvida aqui (flag pro líder):** `linda-siren.md` traz uma inconsistência de idade na batida Sterling Corp + FIR que originou o wound: a seção "Interno" diz "aos 8 anos", a seção "Memórias formativas" diz "aos 4 anos" (mesmo evento). Este guia **não escolhe** entre as duas: usa "criança pequena" / "quando era pequena" nas falas que tocam o wound (§4), e em um ponto específico transforma a própria imprecisão em traço de voz (a Linda genuinamente não tem certeza da própria idade na hora, plausível pra um trauma tão cedo), marcado como escolha do `narrative-writer`, não como resolução do canon. Decisão de qual idade é a oficial fica com o líder.
+
+### 1. Resumo da voz
+
+Linda tem 12 anos, é Crowd Control do Underground do Silêncio, linguagem-âncora **Óxido** ("precisão sônica"). Na superfície tem cadência rítmica, fala quase em compasso, e às vezes **cantarola** no meio de uma frase sem perceber que fez isso. Vocabulário técnico de áudio fundido a slang pós-punk: música é "matéria" (substância manipulável, não arte abstrata), "frequência" funciona como verbo ("eu frequenço melhor de noite"). Tics: ajusta os fones o tempo todo, olhar lateral sempre escaneando o ambiente sonoro, nunca totalmente relaxada (flaw canônica: hipervigilância crônica, ela não desliga).
+
+Diferenciação obrigatória da Iara, decisão do líder, ponto 3 (ambas Óxido, "segurança opaca / elegância opaca", mas com dois sabores opostos de precisão): Iara é **visual**, cinema e holografia, elegância fria e opaca, "quase poesia", sussurra o fim das frases pra parecer sempre um pouco escondida. Linda é **auditiva**, mixagem e compasso, precisão seca e vigilante, sem ornamento nenhum. Onde a Iara pausa porque calculou o efeito da pausa, a Linda mantém o ritmo porque é assim que ela processa o mundo, cadência funcional, não performance. Ela lê mentira **pelo tom de voz** (auditivo), nunca por micro-expressão (isso é radar da Iara). Regra pro `narrative-writer`: se uma fala da Linda soar como direção de cena, roteiro ou "quase poesia", ela está errada, refazer, isso é território da Iara.
+
+Por baixo da vigilância mora o belief dela: "quem ouve mais, sobrevive mais." A strength (ouvido absoluto, decodifica padrão sonoro, raramente erra ao detectar mentira pelo tom) e a flaw (nunca desliga, cansaço crônico) são a mesma engrenagem virada em duas direções. O need é o oposto do belief de superfície: **silêncio também é mensagem**, o Underground não é só anti-ruído, é cultivo de espaço pra escuta, e Linda confunde silêncio com vazio até aprender a diferença.
+
+*Nota de easter egg velado (não sublinhar em fala):* o sobrenome Neumann carrega, em surdina, o eco do análogo técnico von Neumann da linhagem Óxido; a Linda nunca comenta a própria etimologia, o peso fica só na autoria, nunca em diálogo.
+
+**Teste de voz única** (`party.md`): se uma fala da Linda soar igualmente natural na boca do Cauã (quente, impulsivo, exclamativo) ou da Iara (elegante, ornamentada, cinematográfica), ela está errada, refazer. Linda é grave, seca, rítmica, vigilante, e nada disso se confunde com as outras duas.
+
+### 2. Combate (mixagem sob pressão)
+
+Contraponto às outras quatro leituras de combate já fixadas: o Cauã grita e avança (calor de linha de frente), a Jaci fica mais baixa e mais lenta sob dano (calma clínica), o Bento não se move (rocha imóvel), a Iara trata a cena como direção de filme (encenação fria). A Linda trata o combate como **mixagem ao vivo**: ela ouve o campo de batalha como uma pista de áudio em camadas e comanda ajustando o "volume" de cada elemento, o que precisa emergir, o que precisa ser silenciado. Fala pouco, mas o pouco que fala é cadenciado, e ela conta o tempo em voz alta pra sincronizar os aliados. Pool de barks por momento, para o `narrative-writer` escolher/variar.
+
+**Escanear o campo (analisar padrão sonoro antes de agir)**
+- PT: "Silêncio." (ajeita o fone, cabeça inclinada) "Isso é passo de bota. Não é vento."
+- EN: "Quiet." (adjusts her headphones, head tilted) "That's a boot step. Not wind."
+- PT: "Três padrões. Um deles tá fingindo ser eco."
+- EN: "Three patterns. One of them is pretending to be an echo."
+
+**Descarregar Eco do Cânion (onda infra-sônica)**
+- PT: "Três, dois, um." (a onda infra-sônica sai em compasso perfeito, rachaduras se abrem na blindagem inimiga)
+- EN: "Three, two, one." (the infrasonic wave releases right on the beat, cracks spreading across the enemy's armor)
+- PT: "Escuta isso." (cantarola dois compassos, a onda sai seguindo o próprio ritmo dela)
+- EN: "Listen to this." (hums two bars, the wave follows her own rhythm)
+
+**Proteger / avisar aliado com leitura tática**
+- PT: "Não pisa aí. O eco voltou errado."
+- EN: "Don't step there. The echo came back wrong."
+- PT: "Fica no meu compasso." (ajusta o fone) "Eu marco o tempo, você segue."
+- EN: "Stay on my beat." (adjusts her headphones) "I keep the time, you follow."
+
+**Aliado em perigo (HP baixo)**
+- PT: "Sua respiração tá errada." (ajusta o fone rápido, olhar lateral direto nele agora) "Aguenta o compasso. Eu chego no três."
+- EN: "Your breathing's off." (quick adjustment to her headphones, sideways glance now locked on him) "Hold the beat. I'm there on three."
+
+**Vitória**
+- PT: (tira um fone, escuta o silêncio pós-luta) "Isso. Essa é a frequência certa."
+- EN: (takes off one headphone, listens to the post-fight quiet) "That's it. That's the right frequency."
+
+**Tomar dano**
+- PT: "Isso vazou no grave." (ajusta o fone, sem parar de andar) "Ainda tô no compasso."
+- EN: "That leaked into the low end." (adjusts her headphones, without breaking stride) "Still on beat."
+
+**Retomar fôlego**
+- PT: (ajusta os fones, olhar lateral escaneando) "Deixa eu recalibrar." (pausa) "Um segundo. Só isso."
+- EN: (adjusts her headphones, eyes scanning sideways) "Let me recalibrate." (pause) "One second. That's all."
+
+**Combo Pulso EM + Eco do Cânion (com o Cauã; arco completo em §3.1)**
+- PT: (ajeita o fone, cadência plena) "No SEU sinal. No MEU compasso." (pausa) "Três, dois..."
+- EN: (adjusts her headphones, rhythm in full swing) "On YOUR signal. On MY beat." (pause) "Three, two..."
+
+### 3. Interação (âncora Cauã, notas secundárias Gus e Iara)
+
+#### 3.1 O Cauã: ruído incidental x noise-canceling, fricção que vira parceria (âncora da seção, decisão do líder ponto 1)
+
+Não é banter de rivalidade fraterna tipo Cauã×Gus, com ponto marcado de cada lado; é a fricção canônica entre dois moleques de comunidade opostos no som (`party.md` §Dinâmicas, "conflito principal": ele = barulho e energia quente, ela = precisão e silêncio vigilante) que amadurece pra sincronia funcional. O arco tem três estágios: fricção genuína, respeito crescente, sincronia operacional (combo Pulso EM + Eco do Cânion, canon `linda-siren.md` §Mini-quest pós-recrutamento).
+
+**Estágio 1, fricção (recém-formada a party)**
+- CAUÃ (PT): (estala os dedos, pulso cyan crepita, animado) "Vambora!"
+- CAUÃ (EN): (snaps his fingers, cyan pulse crackling, hyped) "Let's go!"
+- LINDA (PT): (arranca um dos fones do ouvido, irritada) "Para com isso." (aponta pro dedo dele) "Isso é ruído incidental. Eu tô tentando ouvir o que importa."
+- LINDA (EN): (yanks one headphone off her ear, annoyed) "Cut that out." (points at his finger) "That's incidental noise. I'm trying to hear what matters."
+- CAUÃ (PT): "Ruído incidental é vida, Linda. Você vive numa zona de silêncio, óbvio que ficou tensa demais."
+- CAUÃ (EN): "Incidental noise is life, Linda. You live in a silence zone, no wonder you got this tense."
+- LINDA (PT): "Eu não fiquei tensa." (pausa) "Eu fiquei PRECISA. Tem diferença."
+- LINDA (EN): "I didn't get tense." (pause) "I got PRECISE. There's a difference."
+- *Resultado: nenhum cede; atrito genuíno, sem ranço pessoal.*
+
+**Estágio 2, respeito crescente (durante o arco da Linda, `linda-siren.md` §Mini-quest pós-recrutamento)**
+- CAUÃ (PT): (olha pro pingente dela, sério pela primeira vez) "Essa agulha. É do seu pai?"
+- CAUÃ (EN): (looks at her pendant, serious for the first time) "That needle. Is it your dad's?"
+- LINDA (PT): (para de ajustar o fone, olhar direto, sem cadência nenhuma na voz) "É."
+- LINDA (EN): (stops adjusting her headphones, direct look, no rhythm left in her voice) "It is."
+- CAUÃ (PT): "Eu não sabia que ruído também doía." (pausa) "Achei que só doía silêncio."
+- CAUÃ (EN): "I didn't know noise could hurt too." (pause) "I thought only silence hurt."
+- LINDA (PT): (volta a ajustar o fone, a cadência retornando devagar) "Os dois doem." (pausa) "Depende do que tá dentro."
+- LINDA (EN): (goes back to adjusting her headphones, rhythm slowly returning) "Both do." (pause) "Depends what's inside it."
+- *Resultado: aproximação sem grande discurso; o Cauã aprende a ouvir o peso do som, a Linda deixa aprender.*
+
+**Estágio 3, sincronia (combate, o combo, destrave canônico do arco da Linda)**
+- CAUÃ (PT): "No meu sinal?"
+- CAUÃ (EN): "On my signal?"
+- LINDA (PT): (ajeita o fone, cadência voltando cheia) "No SEU sinal. No MEU compasso." (pausa) "Três, dois..."
+- LINDA (EN): (adjusts her headphones, rhythm coming back full force) "On YOUR signal. On MY beat." (pause) "Three, two..."
+- CAUÃ (PT): "UM!" (descarrega o Pulso EM no instante exato em que a onda sônica da Linda expande; os dois efeitos se fundem numa única explosão cyan-fúcsia)
+- CAUÃ (EN): "ONE!" (discharges the EM Pulse at the exact instant Linda's sonic wave expands; the two effects merge into a single cyan-fuchsia blast)
+- LINDA (PT): (quase sorri) "Compilou."
+- LINDA (EN): (almost smiles) "Compiled."
+- CAUÃ (PT): (sorri largo) "Rodou."
+- CAUÃ (EN): (grins wide) "Ran."
+- *Resultado: parceria operacional plena; nenhum dos dois muda de linguagem-âncora nem de temperamento, mas os dois encontram um compasso comum.*
+
+#### 3.2 Nota secundária, o Gus (filosófico, Cena 6 `comic-reliefs.md`)
+
+Canon (`comic-reliefs.md` Cena 6 "Bug declarado Feature", pulled quotes, **não reescrever**, só ancorar aqui): Linda capta rápido como a Sterling Corp distorce realidade via linguagem (declarar bug como "comportamento emergente inesperado"); o Gus reconhece o valor da leitura dela.
+
+- LINDA (PT): (cantarolando, fones) "Bug é feature, débito é capital, Chapter 11 é renovação institucional..."
+- LINDA (EN): (humming, headphones on) "Bug is a feature, debt is capital, Chapter 11 is institutional renewal..."
+- GUS (PT): "Para. Você está pensando como Sterling."
+- GUS (EN): "Stop. You're thinking like Sterling."
+- LINDA (PT): (congela, assustada) "Que horror."
+- LINDA (EN): (freezes, startled) "How horrifying."
+
+Fala nova, ambientada mais tarde na campanha, reforça o mesmo insight sem reescrever a cena original:
+- GUS (PT): "Você percebeu rápido. Mais rápido que eu, da primeira vez."
+- GUS (EN): "You caught it fast. Faster than I did, the first time."
+- LINDA (PT): (ajusta o fone, olhar lateral) "Eu ouço padrão." (pausa) "Aquilo era só um padrão bonito escondendo um ruído feio."
+- LINDA (EN): "I hear patterns." (pause) "That was just a pretty pattern hiding an ugly noise."
+
+#### 3.3 Nota secundária, a Iara (harmonização com `vozes-party.md` §3.2 do guia dela, decisão do líder)
+
+Canon (`party.md` §Dinâmicas, `linda-siren.md` §Conflito): desprezo mútuo inicial (Underground x Cult Mirage); aliança operacional gradual durante o arco da Linda (a Iara sabota a holografia da Sterling Corp por dentro). As falas da Linda no §3.2 do guia da Iara (acima) foram conferidas contra este guia e ficam **oficiais** a partir de agora (edição de harmonização já aplicada lá):
+
+- LINDA (PT): "Fala bonito de novo. Deve ser hábito."
+- LINDA (EN): "Talking pretty again. Must be a habit."
+- IARA (PT): "Falar feio não te faz mais honesta." (sussurra a última palavra) "Só mais alta."
+- LINDA (PT): "Alta o bastante pra não precisar de holograma pra ser ouvida."
+- LINDA (EN): "Loud enough that I don't need a hologram to be heard."
+
+Fechamento do lado da Linda (fala nova, não presente no §3.2 da Iara, reutilizável pelo `narrative-writer`):
+- LINDA (PT): (ajusta o fone, sem se abalar com o tom da Iara) "Bonito não é mentira." (pausa) "Só é mais devagar de decifrar. Eu prefiro rápido."
+- LINDA (EN): (adjusts her headphones, unbothered by Iara's tone) "Pretty isn't a lie." (pause) "It's just slower to decode. I prefer fast."
+- LINDA (PT): "Trabalhamos juntas." (pausa) "Isso não muda o que eu acho da tua estética."
+- LINDA (EN): "We work together." (pause) "That doesn't change what I think of your aesthetic."
+- *Resultado: aliança operacional confirmada dos dois lados (canon `party.md`); zero calor pessoal, zero sabotagem também.*
+
+### 4. Momentos pesados / o ritmo que para
+
+Regra de voz (decisão do líder, ponto 2): ao contrário do Cauã (o bordão SOME), da Jaci (o tic de contar INTENSIFICA), do Bento (o arcaísmo SOBE) e da Iara (o sussurro SOME), na Linda é o **ritmo inteiro que para**. No normal ela tem cadência, cantarola, os fones nunca saem. Quando dói de verdade, ela **tira os fones** e a cadência desaparece por completo: frases retas, sem compasso, sem metáfora de música. O silêncio dela é o sinal, e casa direto com o need canônico ("silêncio também é mensagem"). É o inverso exato do tic dos outros companions, que GANHAM alguma coisa sob pressão (Jaci conta mais, Bento reza mais); a Linda PERDE o próprio instrumento.
+
+**Pulled quotes canônicos** (não reescrever, só traduzir; `linda-siren.md`; traduções EN abaixo, **(PROPOSTA, confirmar)**):
+- PT: "Eu frequenço melhor de noite. Frequência é matéria."
+- EN: "I tune better at night. Frequency is matter."
+- *Nota de entrega:* registro normal, cadenciado; usar como fala de dia a dia, não pertence ao momento pesado.
+- PT: "Cidades-Gêmeas respondem em meio-tom mais agudo. Crise. Crise organizada."
+- EN: "The Twin Cities are answering a half-tone sharper. Crisis. Organized crisis."
+- *Nota de entrega:* crise processada AINDA com cadência (ela está analisando, não sofrendo ainda); a voz só quebra na linha seguinte, no climax.
+- PT: (climax) "Eu ouvi Polis-Vermelha morrer. Não vamos ouvir mais cidades."
+- EN: "I heard Polis-Vermelha die. We're not losing another city."
+- *Nota de entrega:* fones já fora, voz reta, zero cadência, zero cantarolar, do início ao fim da linha.
+
+**Diálogo canônico da reflexão filosófica** (`linda-siren.md`, mini-quest pós-recrutamento; substância não reescrita, só formatada bilíngue com nota de entrega):
+- LINDA (PT): (fones no pescoço, não nos ouvidos) "Fui rápida demais." (pausa) "Expus a comunidade. Underground sobrevivia por estar escondido. Agora vamos ser caçados."
+- LINDA (EN): (headphones around her neck, not on her ears) "I was too fast." (pause) "I exposed the community. The Underground survived by staying hidden. Now we're going to be hunted."
+- GUS (PT): "Sobrevivência sem comunicação não é sobrevivência." (pausa) "É estoque." (pausa) "Você ativou o sinal. Cidades-irmãs respondem." (pausa mais longa) "Vocês existem agora."
+- GUS (EN): "Survival without communication isn't survival." (pause) "It's storage." (pause) "You activated the signal. Sister cities are answering." (longer pause) "You exist now."
+
+Falas novas reutilizáveis, mesmo registro (ritmo ausente, sem cantarolar, sem metáfora de música, frases retas):
+
+- PT: (tira os fones, devagar) "Escuta." (pausa longa) "Só escuta."
+- EN: (takes off her headphones, slowly) "Listen." (long pause) "Just listen."
+- PT: (toca a agulha no peito, sem cantarolar) "Meu pai desparafusou isso em trinta segundos." (pausa) "Trinta segundos pra salvar uma agulha. Zero segundos pra salvar o resto."
+- EN: (touches the needle at her chest, no hum in her voice) "My father unscrewed this in thirty seconds." (pause) "Thirty seconds to save a needle. Zero seconds to save the rest."
+- PT: (sobre a batida, se perguntada direto, voz reta) "Eu tinha o quê. Quatro anos. Talvez oito." (pausa) "Não lembro direito." (pausa) "Lembro da agulha."
+- EN: (about the raid, if asked directly, flat voice) "I was, what. Four. Maybe eight." (pause) "I don't remember right." (pause) "I remember the needle."
+- *Nota de uso:* fala deliberada pra abraçar a inconsistência de idade do canon sem resolvê-la (ver nota de topo desta seção); usar só se o líder confirmar que prefere esta solução diegética à correção editorial direta do documento-fonte.
+- PT: "Eu não vou cantarolar isso." (pausa) "Isso não é matéria pra canção."
+- EN: "I'm not humming this one." (pause) "This isn't material for a song."
+- PT: (fones pendurados no pescoço, não nos ouvidos) "Deixa eu não ouvir nada por um minuto." (pausa) "Só um minuto."
+- EN: (headphones hanging around her neck, not on her ears) "Let me not hear anything for a minute." (pause) "Just one minute."
+
+### 5. Registro e gíria
+
+Vocabulário técnico de áudio fundido a slang pós-punk atemporal (mesma disciplina do Cauã: nenhuma gíria pode ancorar a um ano específico). O risco de tradução aqui é distinto do da Iara: não é preservar "quase poesia", é preservar a **secura funcional**, ritmo que soa como comando de estúdio, nunca como fala ornamentada.
+
+| Padrão pt-br | Uso | Equivalente en-intl | Nota |
+|---|---|---|---|
+| "frequência" como verbo ("eu frequenço melhor de noite") | descreve sintonia/atenção auditiva como ação, não como substantivo | **"I tune better at night"** (uso corrido) / **"I frequency better at night"** (PROPOSTA, uso raro, efeito de estranhamento deliberado) | duas trilhas possíveis: "tune" é natural em inglês mas perde a estranheza do neologismo pt-br; transformar "frequency" em verbo é mais estranho em inglês do que em português (o idioma resiste mais a esse tipo de conversão), mas preserva a marca idiossincrática; recomendação deste guia: "tune" no dia a dia, "to frequency" reservado a um momento-chave que pede o estranhamento como efeito estilístico; **decisão final do líder** |
+| "matéria" (música/realidade como substância manipulável) | música não é arte abstrata pra Linda, é matéria física | **"matter"** | tradução quase 1:1; "matter" carrega o mesmo peso concreto que "matéria" em português |
+| Cantarolar em meio à fala (tic) | cadência vaza pro discurso cotidiano | mesmo beat de ação "(cantarola)" / "(hums)" | comportamento, não sintaxe, funciona igual nas duas línguas; **SOME por completo no §4** (regra de vulnerabilidade) |
+| Ajustar os fones (tic físico) | vigilância constante, nunca desliga | mesmo beat "(ajusta os fones)" / "(adjusts her headphones)" | comportamento puro |
+| Olhar lateral (tic físico) | hipervigilância visual que acompanha a auditiva, sempre escaneando | mesmo beat "(olhar lateral)" / "(a sideways glance)" | idem |
+| Contagem regressiva em voz alta como comando ("três, dois, um") | timing compartilhado, ela "rege" o compasso da party em combate | mesma contagem, cardinais em inglês | não é gíria, é comportamento musical (ver §2); funciona igual nas duas línguas |
+| Jargão de mixagem usado como metáfora cotidiana ("isso vazou no grave", "tá puro ruído") | usa vocabulário técnico de áudio pra descrever situações fora de contexto sonoro | **"that leaked into the low end"** / **"that's just noise"** | jargão de indústria musical é quase idêntico entre os dois idiomas; poucas perdas |
+| Slang pós-punk geral (registro, não léxico fixo) | frases curtas, cortadas, secas; contraste deliberado com pós-punk "de pose" | inglês pós-punk atemporal, sem trend datável; cru, monossilábico quando possível | mesma disciplina do guia do Cauã: teste mental "isso soaria estranho em 1979 e em 2050?"; se sim, ainda serve |
+
+**Nota de blindagem vs Iara (a outra Óxido):** Iara ocupa o eixo visual/cinema, "elegância opaca", quase poesia, sussurro; Linda ocupa o eixo auditivo/ritmo, "precisão sônica", secura vigilante, cadência. Nenhuma fala da Linda deve soar cinematográfica, ornamentada ou "quase poesia" (território da Iara); nenhuma fala da Iara deve soar seca, econômica ou monossilábica demais (território da Linda, regra já registrada no §5 do guia dela acima).
+
+**Nota:** sem emoji (paleta-piloto exclusiva da Jaci) e sem latim/thee-thy-thou (registro litúrgico exclusivo do Bento; a Linda não é litúrgica, é pós-punk).
+
+### 6. Não fazer
+
+- Não estética "punk barata" performática. Linda é grave, não pose. Postura pós-punk é atitude, não fan-service visual (herdado, `linda-siren.md`).
+- Não áudio gore (ouvido sangrando etc., Pillar 4).
+- Não roteiro de "menina rebelde sem causa": a causa é clara, Underground + memória dos pais (herdado, `linda-siren.md`).
+- Não deixar a cadência/cantarolar vazar pra dentro de um momento pesado real: regra oposta à dos outros companions, aqui o ritmo SOME por completo, não intensifica (§4).
+- Não cravar a idade exata da batida Sterling Corp + FIR (canon tem inconsistência 4 x 8 anos, não resolvida): usar "criança pequena"/"quando era pequena", ou a incerteza diegética da própria Linda (§4), nunca um número fixo, até o líder decidir.
+- Não deixar a voz soar "quase poesia" ou ornamentada: colide com o eixo reservado à Iara, mesma linguagem-âncora Óxido, sabor oposto (nota de blindagem §5).
+- Não usar emoji: a paleta-piloto do §5 do guia da Jaci é exclusiva dela por ora.
+- Não usar latim nem thee/thy/thou: registro litúrgico-arcaico exclusivo do Bento.
+- Não fazer banter de rivalidade fraterna tipo Cauã×Gus com o próprio Cauã: com ele é fricção genuína que amadurece pra sincronia funcional, não disputa de pontos marcados (§3.1).
+- Não deixar outro personagem comentar quando o ritmo da Linda para: mataria a sutileza, mesma regra do subtexto Jaci x Gus e do sussurro da Iara.
+- Não usar travessão/em-dash em nenhuma fala (convenção do projeto: só aspas; beat de ação ou reticências resolvem interrupção).
+- Teste de voz única (herdado de `party.md`): se uma fala da Linda soar igualmente natural na boca do Cauã (quente, impulsivo demais) ou da Iara (elegante, ornamentada demais), ela está errada, refazer.
+
+---
+
+## DANTE "GRID" ALENCAR (guia de voz bilíngue pt-br/en-intl, definido pelo líder, 2026-07-18)
+
+> **Status:** guia de voz aprovado para uso. Complementa (não substitui) o canon de personagem em `characters/dante-grid.md`. Fonte de falas concretas e reutilizáveis para o `narrative-writer` selecionar/expandir na redação final (mesmo modelo dos guias do Gus, Cauã, Jaci, Bento, Iara e Linda acima). **É o guia mais complexo da party**: Dante é o TRAIDOR canônico, e toda fala-chave dele existe em duas camadas simultâneas, a de superfície (o que o jogador ouve) e a oculta (o que só quem reler depois do reveal, ou quem tem Knowledge alta, capta).
+>
+> **Cross-ref:** `characters/dante-grid.md` (canon completo: esquema duplo camada aparente/camada real, Hero's Journey subvertida, foreshadow visual escalonado, rootkit progressivo, cena de reveal, 3 destinos, memórias formativas double-layer), `characters/bento-requiem.md` (o Asmódico verdadeiro, venera histórico, âncora de contraste desta seção inteira), `characters/party.md` (matriz de linguagens-âncora, "conflito principal" Bento×Dante, tabela de conflitos intra-party), `characters/gus.md` (voice do Gus pro subtexto da manutenção), `comic-reliefs.md` Cena 4 "Force Push" (pulled quotes canônicos, não reescritos), `arco-principal.md` Etapa 1 do climax (cena de reveal completa), `guia-dialogos.md` (formato: aspas, zero em-dash, beat de ação em vez de tag com advérbio).
+>
+> **Regra bilíngue:** cada fala concreta vem em **pt-br e en-intl lado a lado**. Como este é o primeiro guia de voz do Dante, **todas** as escolhas en-intl abaixo são **(PROPOSTA, confirmar)**, mesmo quando não repetido em cada linha. Dante tem pouca gíria (registro técnico-seco, quase sem ornamento), então a tradução tende a ser direta; o cuidado real está em preservar a AMBIGUIDADE (uma frase que soa inocente pra quem não presta atenção e sinistra pra quem relê) igualmente nas duas línguas.
+>
+> **Metodologia de camada dupla (decisão do líder, ponto 1):** toda fala-chave do Dante neste guia vem em três partes: (1) a fala de SUPERFÍCIE em pt-br/en-intl, exatamente como soa pra um jogador desatento na primeira leitura; (2) beat de ação, quando houver; (3) uma nota `*Camada oculta:*` que existe SÓ neste documento, nunca in-game, explicando o subtexto/foreshadow que um jogador atento (ou qualquer um relendo pós-reveal) capta. **Regra rígida:** a fala de superfície JAMAIS pode denunciar a traição sozinha. Se, ao reler só a parte de superfície e ignorar a nota, alguém já desconfiar da traição, a fala está errada e precisa ser reescrita mais neutra. A nota é ferramenta de produção pro `narrative-writer`, nunca conteúdo do jogo.
+
+### 1. Resumo da voz
+
+Dante tem 13 anos, é Suporte logístico/fortificação (torres modulares, manutenção de implantes, coberturas temporárias), operativo encoberto da Sterling Corp por baixo da fachada de mecânico independente da Periferia Industrial. Na superfície é a voz mais seca e mais curta de toda a party: frases operacionais, vocabulário técnico-prático ("pode mexer aí", "passa o estilete", "tá pronto"), sintaxe declarativa e contida, pouco lirismo. Raramente pergunta, e quando pergunta é tática, nunca curiosidade social. Tic físico fixo: **olha um segundo pro lado antes de afirmar algo importante** (canon: reflexo condicionado, conferindo se a operação ainda está alinhada; o jogador nunca vê o que ele confere, só o glance).
+
+Publicamente, a linguagem-âncora de Dante é **Asmódico**, a mesma do Bento, mas **esvaziada**. É o contraste que estrutura este guia inteiro: **Bento é Asmódico-pleno** (venera histórico, recita nomes em latim "pra lembrar que existiu gente antes da gente", pausa longa antes de falar porque a fala pesa, canon `bento-requiem.md`). **Dante é Asmódico-oco**: usa o mesmo vocabulário de engrenagem e mecanismo, mas despreza exatamente a parte que dá substância ao Asmódico real, a memória. "Histórico é peso morto" (Cena 4) é a frase que resume tudo: onde o Bento reza pelo compilador-mestre, Dante quer apagar o log. Um jogador que só ouviu o Bento pode achar, por um tempo, que os dois falam a mesma língua espiritual; não falam. Dante fala o sotaque sem a fé.
+
+**Nota de leitura pro `narrative-writer` (leitura do canon já existente, não é fato novo):** a própria frase-símbolo de Dante, "force push", é vocabulário de controle de versão digital, ou seja, pertence ao substrato C-Arcane, não ao analógico Asmódico (engrenagem não tem "push"; um relógio mecânico não sobrescreve o próprio passado, ele só continua girando sobre ele). Isso quer dizer que a contaminação de Dante por C-Arcane **não começa aos 75% do jogo**: ela já está semi-visível na primeira vez que ele usa a expressão, na Cena 4. O que muda aos ~75% não é a origem da fala, é a frequência e a intenção: cedo, "force push" é uma bravata isolada; tarde, vira reflexo que ele não percebe mais que tem. Ver §4.
+
+Por baixo da secura mora a competência genuína que o canon exige (`dante-grid.md` §Interno, Strength real): Dante ajuda de verdade, no curto prazo, e é isso que torna a traição cortante. Nenhuma fala de superfície deste guia deve soar falsa ou vazia sem a nota de camada oculta; a máscara só funciona porque é feita de material real.
+
+**Teste de voz única** (`party.md`): se uma fala do Dante soar igualmente natural na boca do Bento (solene, caloroso, cheio de reverência) ou de qualquer outro companion, ela está errada, refazer. Dante é técnico-seco-contido, com uma frieza que CRESCE ao longo do jogo (não é fixa desde o início, ver §4).
+
+### 2. Combate (suporte útil, cortante por ser genuíno)
+
+Contraponto a toda a party: Dante não lidera a linha de frente (Bento), não cura (Jaci), não controla multidão (Linda), não decide o quadro (Iara), não descarrega energia (Cauã); ele **sustenta**. Torre, cobertura, reparo. Cada bark soa como manutenção, nunca como bravura. Pool de barks por momento, pro `narrative-writer` escolher/variar. A maioria não carrega camada oculta (é trabalho puro); onde carrega, está marcado.
+
+**Erguer torre / fortificar posição**
+- PT: "Ponto fixo. Cobertura em três segundos." (planta a torre modular, engrenagens travam no lugar)
+- EN: "Fixed point. Cover in three seconds." (plants the modular tower, gears locking into place)
+- PT: "Segura essa linha. Eu monto atrás."
+- EN: "Hold this line. I'll build behind it."
+
+**Reparo de implante / manutenção em campo**
+- PT: "Fica parado." (ajusta o dedo modular no encaixe) "Não vai doer."
+- EN: "Hold still." (adjusts his modular finger into the socket) "It won't hurt."
+- *Camada oculta:* "não vai doer" tem duplo sentido físico e sistêmico; é literalmente a mesma frase de manutenção que ele usa no Gus fora de combate (§3.1). Repetição deliberada pro jogador atento cruzar depois.
+- PT: "Isso aí não é hardware, é sucata. Troco em dez segundos."
+- EN: "That's not hardware, that's scrap. I'll swap it in ten seconds."
+
+**Cobrir aliado (cobertura temporária)**
+- PT: "Passa por aqui. Eu seguro a abertura."
+- EN: "Get through here. I'll hold the opening."
+- PT: "Não olha pra trás. Eu tô de olho."
+- EN: "Don't look back. I've got eyes on it."
+- *Camada oculta:* "eu tô de olho" é literal (proteção genuína) e, na releitura, um eco irônico do papel real dele (vigiar o Gus).
+
+**Aliado em perigo (HP baixo)**
+- PT: "Aguenta. Torre reforça em dois." (ajusta um parâmetro, sem pressa aparente, mas rápido)
+- EN: "Hold on. Tower reinforces in two." (adjusts a parameter, no visible rush, but fast)
+
+**Vitória (contida, funcional)**
+- PT: "Tá de pé." (desmonta a torre em silêncio) "Função cumprida."
+- EN: "Still standing." (dismantles the tower in silence) "Function done."
+
+**Tomar dano**
+- PT: "Superficial." (olha o próprio braço um segundo, sem se abalar) "Continuo."
+- EN: "Surface damage." (glances at his own arm for a second, unfazed) "I keep going."
+
+**Retomar / recarregar ferramentas**
+- PT: (checa o kit, sem falar) "Um minuto." (pausa) "Só isso."
+- EN: (checks his kit, without a word) "One minute." (pause) "That's all."
+
+### 3. Interação (a manutenção que ele explora + quem desconfia + quem não desconfia)
+
+Regra geral desta seção: cada par abaixo tem UMA leitura de superfície (o que a cena entrega a um jogador comum) e, quando aplicável, uma `*Camada oculta:*` (o que fica pro replay). Não force a nota em todo par; alguns pares (Cauã) funcionam melhor SEM nenhuma, porque a ausência de suspeita também é informação de design (calibra a dosagem geral de foreshadow, ver §4).
+
+#### 3.1 O Gus: a "manutenção" e a confiança que ele explora (âncora da seção)
+
+Não é banter, não é rivalidade, não é aliança emocional como nos outros companions; é uma rotina disfarçada de cuidado técnico. Toda a proximidade Gus-Dante nasce da manutenção do aparelho ortodôntico, o ponto exato onde o rootkit progride (`dante-grid.md` §Função técnica como traidor).
+
+**Exemplo A, a primeira manutenção (pré-recrutamento, tom quase caloroso)**
+- DANTE (PT): "Senta. Abre a boca." (ajusta a ferramenta, tom rotineiro, sem urgência) "Não vai doer."
+- DANTE (EN): "Sit down. Open up." (adjusts the tool, routine tone, no urgency) "It won't hurt."
+- GUS (PT): "Confio em você com isso." (abre a boca, sem hesitar)
+- GUS (EN): "I trust you with this." (opens his mouth, without hesitating)
+- DANTE (PT): (olha pro lado, breve) "...eu sei." (pausa) "Fica quieto um segundo."
+- DANTE (EN): (glances aside, brief) "...I know." (pause) "Stay still a second."
+- *Camada oculta:* o "eu sei" carrega peso duplo: é resposta gentil normal E, na releitura, o reconhecimento seco de que ele SABE exatamente o que essa confiança vale pra operação. O glance dura o tempo canônico de 1 segundo, o tic no seu primeiro uso documentado.
+
+**Exemplo B, meio de jogo (rotina de manutenção grátis oferecida)**
+- DANTE (PT): "Trago meu kit na próxima vez. Não cobro essa."
+- DANTE (EN): "I'll bring my kit next time. This one's on the house."
+- GUS (PT): "Por quê?"
+- GUS (EN): "Why?"
+- DANTE (PT): (pausa, olha pro lado) "Porque funciona melhor quando eu cuido direto." (pausa) "Sem intermediário."
+- DANTE (EN): (pause, glances aside) "Because it works better when I handle it myself." (pause) "No middleman."
+- *Camada oculta:* "sem intermediário" é literalmente verdadeiro (é assim que ele tem acesso direto e regular ao hardware do Gus, o root físico do canon); soa como zelo profissional, é controle de canal.
+
+**Exemplo C, o reveal, referenciado aqui só como âncora (redação completa em §4)**
+- Linha canônica do Dante (não reescrever): "Eu não pedi pra você confiar."
+- Linha canônica do Gus (não reescrever): "Você também não pediu pra fazer manutenção. Mas se ofereceu."
+- *Nota:* este par fecha o arco que os Exemplos A e B abriram; a "manutenção" nunca foi pedida por ninguém, foi oferecida por Dante desde o início, exatamente como o Gus nomeia no climax.
+
+#### 3.2 O Bento: conflito principal, desconfiança por intuição
+
+Canon (`party.md`, `bento-requiem.md`): "conflito principal" da party inteira. Bento não articula por que desconfia até o late game; a fricção é Asmódico-pleno reconhecendo, sem saber nomear, o Asmódico-oco.
+
+- BENTO (PT): (observa Dante remontar uma torre, longamente, sem dizer nada) "Você nunca guarda a peça velha."
+- BENTO (EN): (watches Dante reassemble a tower, at length, without a word) "You never keep the old part."
+- DANTE (PT): "Peça velha quebrou. Pra que guardar."
+- DANTE (EN): "Old part broke. Why keep it."
+- BENTO (PT): (pausa mais longa que o de costume) "Porque a peça velha te ensina onde a nova vai quebrar de novo." (pausa) "Você não guarda porque não quer aprender. Ou porque já sabe, e prefere esquecer."
+- BENTO (EN): (a longer pause than usual) "Because the old part teaches you where the new one will break again." (pause) "You don't keep it because you don't want to learn. Or because you already know, and would rather forget."
+- DANTE (PT): (olha pro lado) "É só ferro-velho, Bento."
+- DANTE (EN): (glances aside) "It's just scrap metal, Bento."
+- *Camada oculta:* Bento está descrevendo o próprio Dante sem saber; a fala dele funciona como diagnóstico acidental. Dante desvia pro literal (ferro-velho) porque o figurado dói demais pra admitir, mesmo pra si.
+
+**Eco do pulled quote canônico** (não reescrever, só ancorar aqui; `bento-requiem.md`/`dante-grid.md`): "Algo nele não compila. Não sei o quê. Sinto." / EN (já fixado no guia do Bento acima): "Something in him does not compile. I do not know what. I feel it." Esta linha é a síntese de toda a seção 3.2: usar como beat isolado, nunca em resposta direta de Dante (ele nunca ouve isso dito na cara).
+
+#### 3.3 A Linda: pega o tom inconsistente
+
+Canon: Linda lê mentira pelo tom de voz (nunca por micro-expressão, isso é radar da Iara), e ela raramente erra (`linda-siren.md`, guia da Linda §1 acima). Dois ou três momentos-chave bastam; ela não articula publicamente.
+
+- LINDA (PT): (ajusta o fone, olhar lateral fixo em Dante) "Sua voz sobe meio-tom quando você fala em 'manutenção'." (pausa) "Só isso. Não é nada."
+- LINDA (EN): (adjusts her headphones, sideways glance locked on Dante) "Your voice goes up half a tone when you say 'maintenance'." (pause) "That's all. It's nothing."
+- DANTE (PT): (olha pro lado, mais tempo que o normal) "Deve ser o fone que tá com defeito."
+- DANTE (EN): (glances aside, longer than usual) "Must be your headphones acting up."
+- LINDA (PT): (não insiste, mas não desliga do assunto; ajusta o fone de novo, devagar)
+- LINDA (EN): (doesn't push it, but doesn't drop it either; adjusts her headphones again, slowly)
+- *Camada oculta:* Linda está certa (ela não erra); Dante desvia a culpa pro instrumento dela, a mesma racionalização (flaw canônica) que ele usa consigo mesmo. Ela guarda o dado, não confronta, condizente com "não articula publicamente" do canon.
+
+#### 3.4 A Iara: desconfia, mas o radar erra a causa
+
+Canon: Iara desconfia, atribui a princípio a "personalidade fechada", revisão tardia. Ela decifra qualquer pessoa em segundos (strength canônica), exceto o Gus, cuja honestidade total não fecha em código nenhum (guia da Iara §3.1 acima); Dante é o oposto exato, opacidade TREINADA, e por isso confunde o radar dela de um jeito diferente.
+
+- IARA (PT): (observa Dante por um instante, sussurro no fim) "Você é opaco. Mas do jeito errado." (pausa) "Não é elegância. É outra coisa."
+- IARA (EN): "You're opaque. But the wrong kind." (pause) "It's not elegance. It's something else." (whisper on the last word)
+- DANTE (PT): "Sou só fechado." (olha pro lado)
+- DANTE (EN): "I'm just closed off." (glances aside)
+- IARA (PT): (pausa mais longa que a dela de costume, sem sussurrar) "Talvez." (pausa) "Fechado eu decifro fácil. Você eu não decifro. Isso não é a mesma coisa."
+- IARA (EN): (a longer pause than her usual, no whisper) "Maybe." (pause) "Closed off, I can read easy. You, I can't read. That's not the same thing."
+- *Camada oculta:* ela chega perto da verdade e recua pra explicação mais simples ("personalidade fechada"); a revisão tardia (canon) acontece perto do reveal, quando ela finalmente nomeia a diferença entre opacidade natural e opacidade construída.
+
+#### 3.5 A Jaci: ele evita
+
+Canon: Jaci é bio-orgânica, honesta, o oposto funcional de Dante; ele a evita levemente, sem cena de conflito.
+
+- JACI (PT): (oferece uma ampola, gesto de cuidado padrão dela) "Toma."
+- JACI (EN): (offers an ampoule, her standard gesture of care) "Here."
+- DANTE (PT): (pega rápido, sem olhar pra ela) "Valeu." (já se afasta, de volta pra torre)
+- DANTE (EN): (takes it quickly, without looking at her) "Thanks." (already moving away, back to the tower)
+- *Camada oculta:* nenhuma fala reveladora aqui, deliberadamente; o desconforto é só o corpo dele saindo de cena rápido demais. Jaci nunca comenta (ela não tem por que suspeitar; a evitação lê, pra ela, como timidez comum).
+
+#### 3.6 O Cauã: parceria pragmática que não fareja nada
+
+Canon: parceria operacional sem tensão; Cauã não tem antena pra detectar duplicidade ainda. Este par existe pra CALIBRAR a dosagem geral de foreshadow: nem todo mundo desconfia, e essa ausência também ensina o jogador (por contraste com Bento/Linda/Iara) que a suspeita não é óbvia.
+
+- CAUÃ (PT): "Firmeza, mano! Essa torre salvou a gente."
+- CAUÃ (EN): "Solid, bro! That tower saved us."
+- DANTE (PT): "Função dela." (olha pro lado, rápido) "Continua vivo. É o que importa."
+- DANTE (EN): "That's its function." (quick glance aside) "Stay alive. That's what matters."
+- *Nota:* sem camada oculta aqui, de propósito. Cauã lê o glance como o jeito calado de Dante ser Dante, nada mais. Usar este par sempre que o `narrative-writer` precisar de uma cena Dante SEM peso adicional, pra não saturar o jogador de pistas.
+
+### 4. A máscara escorrega: três fases + o reveal
+
+Regra de voz (decisão do líder, ponto 2): a frieza de Dante não é um estado fixo, é uma curva. Ela esfria em **três fases**, casando com o rootkit progressivo do canon (`dante-grid.md` §Função técnica como traidor: ~5% pré-recrutamento, ~50% pós-recrutamento, ~80% Cena 4, 100% pós-arco-4). O tic (glance de 1s) e o vazamento de vocabulário C-Arcane são os dois indicadores que sobem juntos.
+
+**Fase (a), CEDO: útil, quase caloroso, Asmódico-forma plena**
+
+Nesta fase Dante soa quase como o Bento júnior, o vocabulário Asmódico ainda não denuncia vazio nenhum pra quem não sabe procurar.
+
+- DANTE (PT): "Chega mais. Deixa eu ver esse fio." (ajusta o estilete, sem pressa) "Não é nada. Eu resolvo rápido."
+- DANTE (EN): "Come here. Let me see that wire." (adjusts the tool, unhurried) "It's nothing. I'll fix it quick."
+- *Camada oculta:* calor genuíno na entrega (é a Strength real dele, ele ajuda de verdade); o glance de 1s já está ativo, mas curto e raro o bastante pra passar despercebido numa primeira leitura.
+
+**Fase (b), MEIO: frieza sutil crescente, o tic mais frequente**
+
+- DANTE (PT): (olha pro lado, breve) "Tá pronto." (pausa maior que o normal) "Não precisa agradecer."
+- DANTE (EN): (glances aside, brief) "It's ready." (a longer pause than usual) "You don't need to thank me."
+- *Camada oculta:* a recusa do agradecimento é NOVA (antes ele aceitava calor sem estranhar); ele está desconfortável com a proximidade que a própria cobertura exige dele. O glance dura mais que na Fase (a).
+
+**Fase (c), LATE (~75%): o C-Arcane vaza, a voz enrijece**
+
+- DANTE (PT): "Isso compila melhor assim." (pausa) "Quer dizer... funciona melhor assim." (olha pro lado, mais longo que o de costume)
+- DANTE (EN): "This compiles better this way." (pause) "I mean... it works better this way." (glances aside, longer than usual)
+- *Camada oculta:* "compila" é vocabulário C-Arcane, não Asmódico (Asmódico "recusa antes de errar", para e fica em silêncio diante da inconsistência, canon `bento-requiem.md`; nunca "compila" nada). A autocorreção tardia é o próprio Dante notando o próprio deslize meio segundo depois de já ter falado, sem entender totalmente por quê. É este o sinal que o Bento sente por intuição e não sabe nomear (§3.2), e que o player Knowledge alta cataloga.
+- DANTE (PT): (a Bento, defendendo C-Arcane sem perceber que está defendendo) "Rápido resolve. Recusar não resolve nada, só atrasa."
+- DANTE (EN): (to Bento, defending C-Arcane without realizing he's defending it) "Fast fixes it. Refusing fixes nothing, it just delays."
+- *Camada oculta:* é quase uma paráfrase do axioma C-Arcane do Gus ("otimiza antes de errar"), na boca de quem professa Asmódico. Bento reage só com um olhar mais longo (ver §3.2); ele não precisa dizer nada, o próprio Dante acabou de confirmar a intuição dele.
+
+### A cena de reveal (climax)
+
+Redação completa em `arco-principal.md` (Etapa 1 do climax); aqui só o guia de entrega, bilíngue, das linhas já canônicas (não reescrever o conteúdo, só formatar):
+
+- DANTE (PT): (mão modular opera em padrão Sterling reconhecível, meio-hack) [sem fala; o corpo já denunciou antes da boca]
+- DANTE (EN): (his modular hand operates in a recognizable Sterling pattern, mid-hack) [no line; the body has already given it away before the mouth does]
+- GUS (PT): (ergue o Tavus-Drive)
+- GUS (EN): (raises his Tavus-Drive)
+- DANTE (PT): (para. Vira-se. Sem culpa, sem raiva) "Eu não pedi pra você confiar."
+- DANTE (EN): (stops. Turns around. No guilt, no anger) "I never asked you to trust me."
+- GUS (PT): "Você também não pediu pra fazer manutenção. Mas se ofereceu."
+- GUS (EN): "You didn't ask to do the maintenance either. But you offered."
+- *Nota de entrega (regra do líder, ponto 3):* zero elevação de voz dos dois lados. Dante não se explica, não implora, não chora; a frieza que cresceu nas três fases chega aqui no pico e FICA lá, não quebra. O glance de 1s não aparece nesta cena, de propósito, ele não precisa mais checar nada, o jogo acabou pra ele nesse instante. O Need dele (reconhecer cumplicidade) não é alcançado nesta fala nem em nenhuma outra; ele sai de cena tão racionalizado quanto entrou.
+
+### Os três destinos (branching point #5)
+
+| Destino | Entrega de voz |
+|---|---|
+| **Executar** | Sem última fala grande. No máximo um som curto, sem palavra. Rápido, melancólico, sem heroísmo nem súplica (canon: "morre quieto"). |
+| **Capturar** | Incapacitado, sem fala de derrota dramática; se falar algo, é operacional ("...vocês erraram a peça que importava.") sem elaborar. Sabotagem Sterling à distância acontece depois, fora de cena. |
+| **Redenção forçada (mini-puzzle de hack)** | A redenção é 100% AÇÃO (o puzzle resolvido), nunca discurso. Se sucesso, a única fala é o pulled quote canônico: PT "Você não precisava me dar uma terceira chance. Mas vou usar essa." / EN "You didn't have to give me a third chance." (pause) "But I'm going to use this one." A entrega continua fria, sem lágrima, sem "desculpa" dito em voz alta; o verbo "vou usar" é funcional, não emocional. Se falha, morre quieto, mesma regra da coluna Executar. |
+
+*Nota:* em nenhum dos três destinos há catarse verbal Dante-Gus. Se o `narrative-writer` sentir que uma cena está "pedindo" um discurso de arrependimento, é sinal de que a cena está errada; cortar e devolver ao silêncio funcional.
+
+### 5. Registro e gíria
+
+| Padrão pt-br | Uso | Equivalente en-intl | Nota |
+|---|---|---|---|
+| Frases curtas operacionais ("pode mexer aí", "passa o estilete", "tá pronto") | vocabulário de oficina, sem ornamento | **"you can work on that"**, **"hand me the scalpel"**, **"it's ready"** | tradução direta; o registro é funcional nas duas línguas, sem gíria de comunidade (contraste com o Cauã) nem formalidade (contraste com o Bento) |
+| "Histórico é peso morto" (Cena 4, pulled quote canônico) | desprezo Asmódico-oco pela memória, o oposto exato da reverência do Bento | **"History's dead weight."** | tradução quase 1:1; "dead weight" preserva a imagem física de carga descartável |
+| "Force push" (Cena 4, pulled quote canônico) | termo real de controle de versão (loanword C-Arcane dentro de fala supostamente Asmódico) | **"force push"** (mantido idêntico, é jargão técnico real, não traduz) | ver §1, nota de leitura: é o primeiro vazamento de C-Arcane, já na Cena 4, não só aos 75% |
+| Glance lateral de 1 segundo (tic físico) | reflexo condicionado, checando alinhamento com a operação | mesmo beat "(olha pro lado)" / "(glances aside)" | comportamento, não sintaxe; **frequência sobe nas três fases do §4**, é o principal indicador visual de temperatura pro `narrative-writer` dosar |
+| Vocabulário C-Arcane vazando ("compila", "otimiza", "roda") dentro de fala Asmódico | sinal sutil de corrupção, ~75% em diante (canon) | manter os mesmos empréstimos técnicos ("compiles", "optimizes", "runs") | regra do §4(c): sempre seguido de autocorreção tardia ou de um silêncio incômodo, nunca fluente e confortável |
+| Endereçamento ao Gus | Dante nunca usa apelido afetuoso pro Gus (contraste deliberado com "mano" do Cauã e "garoto" do Bento); chama por "Gus", direto, seco | **"Gus"** | a ausência de apelido é ela mesma um dado de voz: mede distância funcional, nunca vínculo pessoal |
+| Pergunta tática (raríssima, nunca social) | quando pergunta, é sobre operação, nunca sobre sentimento | mesmo padrão direto, frase curta | Dante nunca pergunta "como você tá" ou equivalente; pergunta "onde", "quando", "quanto tempo" |
+| Registro geral (fora dos vazamentos do §4c) | seco, contido, sem metáfora, sem lirismo | inglês funcional e curto, contração normal ("I'm", "it's"), zero ornamento | contraste com todos os outros cinco companions: Dante é o único sem paleta de gíria própria, sem tic sonoro/visual decorativo, sem vocabulário-assinatura caloroso; a secura É a voz |
+
+### 6. Não fazer
+
+- Não dar a Dante backstory de "foi enganado/forçado": é escolha cínica adulta em criança de 13 anos, ele olhou nos olhos de quem destruiu a família dele e apostou nele mesmo assim (`dante-grid.md` §Memórias formativas). Tragédia, não vítima.
+- Não fazer cena de catarse/choro Dante-Gus, em nenhum dos três destinos: a frieza permanece (Pillar 4, canon `dante-grid.md`).
+- Não fazer morte heroica épica: se morre, morre quieto, sem discurso, sem música de clímax verbal.
+- Não fazer redenção verbal explícita: se redime, é por ação (o mini-puzzle), nunca por pedido de desculpa dito em voz alta.
+- Não revelar a traição cedo demais em nenhuma fala de superfície: toda `*Camada oculta:*` deste guia é invisível ao jogador desatento; se uma fala denuncia sozinha, reescrever.
+- Não deixar a fala de superfície soar vazia ou robótica demais: a competência e o calor cedo (§4a) precisam ser reais, senão a traição perde o corte.
+- Não confundir a frieza de Dante com a frieza do Gus fora de combate (tímido) nem com a solenidade do Bento (reverente): a frieza de Dante é FUNCIONAL, cresce ao longo do jogo, e nunca vem acompanhada de pausa contemplativa nem de vocabulário arcaico.
+- Não deixar o glance lateral virar tique cômico ou decorativo: é sinal de foreshadow dosado, sempre com peso, nunca repetido sem função na cena.
+- Não usar "compila"/"otimiza"/vocabulário C-Arcane antes de ~75% de jogo (fase c), exceto o "force push" já canônico da Cena 4, que é o vazamento fundador, não uma regra geral pra falas cedo.
+- Não dar apelido afetuoso ao Gus (nem a ninguém da party): a secura do endereçamento é dado de voz, não lacuna a preencher.
+- Não usar travessão/em-dash em nenhuma fala (convenção do projeto: só aspas; beat de ação ou reticências resolvem interrupção).
+- Não usar emoji (paleta-piloto exclusiva da Jaci) nem latim/thee-thy-thou (registro litúrgico exclusivo do Bento): Dante não tem paleta ornamental própria, de propósito.
+- Teste de voz única (herdado de `party.md`): se uma fala do Dante sair igualmente natural na boca do Bento (solene, reverente) ou de qualquer outro companion, ela está errada, refazer.
 
 ---
 
