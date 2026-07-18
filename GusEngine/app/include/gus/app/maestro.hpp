@@ -165,35 +165,45 @@ private:
     // o frame congelado (glReadPixels, ver sdl_window.hpp::capture_frame_to_png) e roda
     // o loop DIRETO no contexto GL UNICO/persistente da Maestro
     // (run_title_menu_loop_gl_current), sem criar/destruir contexto GL. "Continuar"
-    // aplica o save mais recente via apply_loaded_save_data(); "Novo Jogo" e um no-op
-    // (o estado FRESCO que init() ja deixou pronto ja serve). Devolve true SO se o
+    // aplica o save mais recente via apply_loaded_save_data(). Devolve true SO se o
     // jogador escolheu "Sair" na tela de titulo OU fechou a JANELA durante ela - o
     // chamador (run()) encerra o programa IMEDIATAMENTE, SEM entrar no loop de jogo
     // (nada foi jogado ainda, nenhum autosave faz sentido nesse caso).
-    [[nodiscard]] bool show_title_screen();
-
-    // MENU-INICIAL (ACHADO 1, backend_engineer): reseta o estado de PARTIDA em
-    // MEMORIA pro equivalente a um Novo Jogo do zero - fecha a lacuna documentada
-    // no comentario de open_pause_from_city() acima ("Novo Jogo alcancado por este
-    // caminho NAO reseta o estado da cidade em memoria - show_title_screen() foi
-    // escrito assumindo 1 unica chamada no BOOT"). Ate esta onda, o "estado
-    // fresco" so existia IMPLICITAMENTE no boot (init() nunca roda 2x no mesmo
-    // processo); este metodo e a versao EXPLICITA/reutilizavel do mesmo shape,
-    // chamavel a qualquer momento DEPOIS do boot.
     //
-    // CONTRATO PARA O CHAMADOR (gameplay_engineer, wiring do fluxo "Novo Jogo" no
-    // titulo pos-pausa - FORA do escopo desta entrega): chamar isto ANTES de voltar
-    // a rodar o loop da cidade (run()), assim que TitleLoopExit::NewGame for
-    // recebido de run_title_menu_loop_gl_current NUM CONTEXTO QUE NAO SEJA O BOOT
-    // (isto e, quando show_title_screen() foi alcancada via open_pause_from_city(),
-    // nao via a 1a chamada de run()). Passar a MESMA `new_game_difficulty` que a
-    // tela de selecao ja devolve (a variavel local que show_title_screen() hoje so
-    // atribui em save_.difficulty no caso NewGame, linha `save_.difficulty =
-    // new_game_difficulty;` - ver o comentario la, esta chamada deve ser
-    // SUBSTITUIDA por reset_to_new_game(new_game_difficulty) quando o caminho
-    // pos-boot for ligado). NAO chamar no caminho de boot normal (init() ja deixa
-    // tudo fresco; chamar de novo seria trabalho redundante, so nao INCORRETO -
-    // reset_to_new_game() e idempotente por construcao).
+    // MENU-INICIAL (wiring final, gameplay_engineer): `reached_via_pause` distingue
+    // os DOIS caminhos que alcancam esta tela (ver o comentario grande de
+    // reset_to_new_game() abaixo pro racional completo). false (default, PRESERVA o
+    // comportamento de sempre) = caminho de BOOT, 1a chamada de run() - "Novo Jogo" e
+    // um no-op (o estado FRESCO que init() ja deixou pronto ja serve), so grava a
+    // dificuldade escolhida. true = alcancada via open_pause_from_city() (jogador JA
+    // tinha uma partida rodando em memoria) - "Novo Jogo" chama reset_to_new_game()
+    // ANTES de devolver, pra nao herdar posicao/progresso/inimigo/playtime da sessao
+    // anterior.
+    [[nodiscard]] bool show_title_screen(bool reached_via_pause = false);
+
+    // MENU-INICIAL (wiring final, gameplay_engineer): corpo do case
+    // TitleLoopExit::NewGame de show_title_screen(), EXTRAIDO pra metodo proprio so
+    // pra ficar testavel sem depender do loop interativo real (SDL/GL, entrada de
+    // teclado) - GUSWORLD_NEWGAME_VIA_TITLE_SELFTEST em run() chama isto DIRETO com
+    // os 2 valores de `reached_via_pause`, exercitando o MESMO codigo que a tela de
+    // titulo real chamaria ao selecionar "Novo Jogo". reached_via_pause=false grava
+    // so a dificuldade escolhida (boot, estado ja fresco desde init());
+    // reached_via_pause=true chama reset_to_new_game(difficulty) (pos-pausa, ver o
+    // comentario do metodo abaixo).
+    void handle_new_game_selected(bool reached_via_pause,
+                                   gus::domain::save::DifficultyLevel difficulty);
+
+    // MENU-INICIAL (ACHADO 1, backend_engineer + wiring final, gameplay_engineer):
+    // reseta o estado de PARTIDA em MEMORIA pro equivalente a um Novo Jogo do zero.
+    // Chamada por show_title_screen() quando `reached_via_pause=true` E
+    // TitleLoopExit::NewGame foi escolhido (isto e, quando a tela de titulo foi
+    // alcancada via open_pause_from_city(), nao via a 1a chamada de run()) - fecha a
+    // lacuna que existia ate esta onda ("Novo Jogo" alcancado por aquele caminho NAO
+    // resetava o estado da cidade em memoria). NAO chamada no caminho de boot normal
+    // (init() ja deixa tudo fresco; chamar de novo seria trabalho redundante, so nao
+    // INCORRETO - reset_to_new_game() e idempotente por construcao). Pode ainda ser
+    // chamada diretamente por quem quiser o mesmo efeito fora desse fluxo (ex.: o
+    // self-test GUSWORLD_NEWGAME_RESET_SELFTEST em run()).
     //
     // O QUE RESETA (espelha byte-a-byte o que init() monta no boot):
     //   - save_ (domain::save::SaveData): via fresh_new_game_save_data(difficulty)
