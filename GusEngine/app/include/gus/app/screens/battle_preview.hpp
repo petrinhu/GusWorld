@@ -133,6 +133,20 @@ int run_battle_preview_embedded(
     gus::platform::audio::AudioEngine* external_audio = nullptr,
     float fade_in_seconds = 0.0f, float fade_out_seconds = 0.0f);
 
+// FLASH-CTX (extracao behavior-preserving, A2): NUCLEO que ASSUME um contexto
+// GL JA CORRENTE e com os ponteiros de funcao (glad) JA CARREGADOS - MESMO
+// espirito de run_system_menu_loop_gl_current (system_menu_loop.hpp). Mesmos
+// parametros/contrato de run_battle_preview_embedded (ver acima), so sem a
+// posse do contexto GL (nao cria nem destroi). Hoje SO chamada internamente
+// por run_battle_preview_embedded (unico chamador de producao continua sendo
+// a Maestro, via a variante que possui o contexto); exposta pra futura
+// reutilizacao aninhada (Opcao C, contexto GL unico).
+void run_battle_preview_embedded_gl_current(
+    SDL_Window* window, gus::domain::combat::CombatOutcome* out_outcome,
+    bool* out_quit_requested = nullptr,
+    gus::platform::audio::AudioEngine* external_audio = nullptr,
+    float fade_in_seconds = 0.0f, float fade_out_seconds = 0.0f);
+
 // Roda o viewer da BattleScene: SDL_Init proprio, janela PROPRIA, loop de render do
 // esqueleto (camera logica 960x540 escalada por inteiro x2 = 1080p), Esc/fechar encerra.
 // WRAPPER fino sobre run_battle_preview_embedded (outcome descartado). Devolve 0 ok.

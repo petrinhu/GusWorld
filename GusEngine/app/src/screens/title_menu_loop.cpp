@@ -177,43 +177,18 @@ TitleDiskScan scan_saves(const std::string& saves_dir) {
 
 }  // namespace
 
-bool run_title_menu_loop_owning_gl(
+// FLASH-CTX (A2, extracao behavior-preserving): NUCLEO que ASSUME um contexto
+// GL JA CORRENTE + glad JA CARREGADO - mesmo corpo que antes vivia numa lambda
+// `run_body` dentro de run_title_menu_loop_owning_gl (ver o header pro
+// contrato). Extraida verbatim (zero mudanca de logica) pra permitir reuso
+// futuro sem recriar o contexto (Opcao C do plano de contexto GL unico).
+void run_title_menu_loop_gl_current(
     SDL_Window* window, gus::platform::audio::AudioEngine& audio,
     const gus::app::i18n::Translator& translator, const std::string& saves_dir,
     TitleLoopExit* out_exit, gus::domain::save::SaveData* out_loaded_save,
     gus::domain::save::DifficultyLevel* out_new_game_difficulty,
     const std::string& frozen_background_png) {
-    if (out_exit != nullptr) *out_exit = TitleLoopExit::QuitApp;
-
-    // MESMA receita de run_system_menu_loop_owning_gl/run_battle_preview_embedded:
-    // os atributos GL sao setados a CADA entrada (viabilidade ja provada
-    // empiricamente pela troca cidade<->batalha/cidade<->menu).
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
-    SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
-    SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
-
-    SDL_GLContext gl = SDL_GL_CreateContext(window);
-    if (gl == nullptr) {
-        std::cerr << "TitleMenuLoop: SDL_GL_CreateContext falhou: " << SDL_GetError()
-                  << "\n";
-        return false;
-    }
-    SDL_GL_MakeCurrent(window, gl);
-    SDL_GL_SetSwapInterval(1);
-
-    if (!gus::platform::rmlui::gl3_load_functions(
-            reinterpret_cast<void* (*)(const char*)>(SDL_GL_GetProcAddress))) {
-        std::cerr << "TitleMenuLoop: falha ao carregar funcoes OpenGL (glad)\n";
-        SDL_GL_DestroyContext(gl);
-        return false;
-    }
-
-    // Corpo do loop numa lambda: garante que SDL_GL_DestroyContext roda em
-    // QUALQUER caminho de saida (return dentro da lambda so sai DELA, nao da
-    // funcao) - MESMA disciplina de limpeza incondicional das demais telas.
-    const auto run_body = [&] {
+    {
         // DIAGNOSTICO/PROVA (MODOS-MORTE Fase 0, prova visual headless Xvfb :99):
         // GUSWORLD_DIFFICULTY_SCREENSHOT_DIR=<dir> pula a tela de titulo por
         // completo e abre DIRETO a tela de selecao de dificuldade (ANINHADA no
@@ -571,9 +546,46 @@ bool run_title_menu_loop_owning_gl(
             }
             present_frame();
         }
-    };
+    }
+}
 
-    run_body();
+bool run_title_menu_loop_owning_gl(
+    SDL_Window* window, gus::platform::audio::AudioEngine& audio,
+    const gus::app::i18n::Translator& translator, const std::string& saves_dir,
+    TitleLoopExit* out_exit, gus::domain::save::SaveData* out_loaded_save,
+    gus::domain::save::DifficultyLevel* out_new_game_difficulty,
+    const std::string& frozen_background_png) {
+    if (out_exit != nullptr) *out_exit = TitleLoopExit::QuitApp;
+
+    // MESMA receita de run_system_menu_loop_owning_gl/run_battle_preview_embedded:
+    // os atributos GL sao setados a CADA entrada (viabilidade ja provada
+    // empiricamente pela troca cidade<->batalha/cidade<->menu).
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
+    SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+    SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
+
+    SDL_GLContext gl = SDL_GL_CreateContext(window);
+    if (gl == nullptr) {
+        std::cerr << "TitleMenuLoop: SDL_GL_CreateContext falhou: " << SDL_GetError()
+                  << "\n";
+        return false;
+    }
+    SDL_GL_MakeCurrent(window, gl);
+    SDL_GL_SetSwapInterval(1);
+
+    if (!gus::platform::rmlui::gl3_load_functions(
+            reinterpret_cast<void* (*)(const char*)>(SDL_GL_GetProcAddress))) {
+        std::cerr << "TitleMenuLoop: falha ao carregar funcoes OpenGL (glad)\n";
+        SDL_GL_DestroyContext(gl);
+        return false;
+    }
+
+    run_title_menu_loop_gl_current(window, audio, translator, saves_dir, out_exit,
+                                    out_loaded_save, out_new_game_difficulty,
+                                    frozen_background_png);
+
     SDL_GL_DestroyContext(gl);
     return true;
 }
