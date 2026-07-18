@@ -75,6 +75,8 @@ Quantidade de **dungeons por área** também na **sequência numérica recorrent
 As **áreas principais são TODAS acessíveis desde o começo** do jogo, PORÉM quanto **mais distantes da origem**, mais difíceis (ecossistema + inimigos mais duros). Há **áreas especiais contornáveis** só acessíveis com **algo diferenciado** (item/carta/habilidade), que **virarão atalhos** entre dois pontos no futuro; elas **NUNCA restringem alcançar outras áreas** (open desde o início), mas podem **dificultar bastante** o caminho.
 - Princípio: mundo aberto por design; gating por DIFICULDADE, não por barreira dura.
 
+> **CANONIZADO:** topologia de acesso em `docs/design/mundo-topologia.md` §1-2 (2026-07-12: 13 áreas, gradiente de dificuldade por tier, área faraday contornável). **Itens-chave e atalhos** em `mundo-topologia.md` §9 (2026-07-18): as chaves vêm de **3 fontes misturadas** (cartas do roster com efeito temático + upgrades de hardware do Gus + itens dedicados como o emissor de PEM); o **Euler revela o GRAFO de atalhos** (sistema central, mini-mapa dos atalhos); densidade/posicionamento ficam pra produção (level-designer + engine de mapa).
+
 ## 8. Como o Gus começa (sozinho, mas onde?)
 O Gus **começa sozinho**. ONDE/como é a abertura? Sementes a brainstormar (extenso): em casa? desmaiado com amnésia? preso? na escola? (outras hipóteses no brainstorm).
 - Cross-ref: `sinopse.md`, arco-principal, família Vance canônica.

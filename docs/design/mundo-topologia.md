@@ -178,7 +178,19 @@ Lares canônicos, mapeados nos tiers de dificuldade:
 - **Ordem ABERTA, só sugerida por dificuldade** (gdd §7.1): sem ordem forçada; a distância-dificuldade nudga naturalmente Iara/Dante (T2) → Linda (T3) → Bento/Jaci (T4). Cada arco tem de funcionar em qualquer ordem (já é o design canon do Ato 2, "ordem livre").
 - **Dante recrutável CEDO (simmer longo):** o Ferrovelhos (Periferia Industrial, lar dele) é T2/perto da origem, então o Dante naturalmente entra entre os primeiros — quanto mais tempo na party antes da revelação, mais dolorosa a traição. Nudge por proximidade, **sem gate duro**; um jogador que o deixe pra depois aceita um simmer mais curto (edge case do mundo aberto). Casa com o foreshadow que dispara "após 3 slots de Ato 2".
 
-## 9. Fios abertos (continuar brainstorm)
+## 9. Itens-chave e atalhos (seed #7, decisões do líder 2026-07-18)
+
+O gating é sempre por **dificuldade, nunca barreira dura** (§1). As **áreas especiais contornáveis** viram **atalhos** — encurtam entre dois pontos **já alcançáveis pelo caminho longo**, NUNCA são o único acesso. O que destrava um atalho vem de **três fontes misturadas**:
+
+1. **Cartas do roster** com efeito temático que serve de chave: **Euler** (atalho/grafo, ver abaixo), **Newton** (gravidade: puxar-se / atravessar um vão), **Tesla** (pulso EM: desligar uma barreira eletrônica), **Mandelbrot** (fractal: navegar o labirinto da Orla Recursiva), **Turing** (decifrar uma fechadura cifrada), **Faraday** (anti-PEM: a área faraday, §2/§4). As cartas já existem no Codex; alguns efeitos **duplicam como chave de mundo**.
+2. **Upgrades de hardware do Gus** (triângulo Pillar 3): óculos táticos (scan/revelar), Matriz Ortodôntica (UHF/vibração: "ver" ou ressoar o que não se ouve, ex.: Zona do Silêncio), exo-botas / mobilidade.
+3. **Itens dedicados:** o **emissor de PEM** (do Tesla, `project_save_dungeon_pem_faraday`) já é um; outros conforme a produção pedir.
+
+**Euler = o sistema de atalhos central:** descobrir o Euler entrega a carta que **revela o GRAFO de atalhos** do mundo — mostra no mini-mapa quais atalhos existem e o que cada um exige (o "mapa de metrô" dos atalhos). Os atalhos existem sem ele; o Euler os torna **legíveis e planejáveis** (casa com o Gus analítico, Pillar 4, e ensina teoria dos grafos de forma diegética). Cross-ref `mini-mapa.md`.
+
+**Densidade e posicionamento ficam pra PRODUÇÃO** (com o `level-designer` + a engine de mapa), como o layout fino das dungeons — evita retrabalho. Fixado agora: o **princípio** (atalho encurta, nunca bloqueia) e os **tipos de chave** (as 3 fontes acima). O número exato de atalhos e onde cada um fica são decididos quando a engine de mapa existir.
+
+## 10. Fios abertos (continuar brainstorm)
 
 Resolvidos em 2026-07-12: mapeamento dos 20 interiores (§6, temático por campo); distribuição dos lugares secretos (§5, total 21); conceitos das 13 dungeons (§4, "só conceito"); **reconciliação Periferia × Ferrovelhos** (§2 nota: duas zonas jogáveis do mesmo setting Periferia; Ferrovelhos = Periferia Industrial = lar do Dante).
 
@@ -186,4 +198,4 @@ Restam:
 
 1. **Layout FINO de cada dungeon** (level design sala-a-sala) — fase de PRODUÇÃO, com o `level-designer` + a engine de mapa. NÃO fazer antes da engine (retrabalho).
 2. **`ENGINE-MAPA-ONDA`** — onda de implementação do loader/compilador `.gmap` ([[reference_formato_mapa_gmap]]), pré-req de tudo isto virar jogável.
-3. Detalhe: qual carta/item-chave cada lugar secreto e a área faraday guardam (liga a `cartas-technomagik.md` + FARADAY-DUNGEON-ITENS).
+3. Detalhe: qual carta/item-chave cada lugar secreto e a área faraday guardam (liga a `cartas-technomagik.md` + FARADAY-DUNGEON-ITENS). **O princípio e os tipos de chave já estão fechados em §9 (seed #7); resta só o CONTEÚDO específico por lugar, fase de produção.**
