@@ -73,6 +73,11 @@
 #include "gus/domain/save/save_data.hpp"
 #include "gus/platform/audio/audio_engine.hpp"
 
+// MENU-INICIAL (ACHADO 1): fresh_new_game_save_data - a peca de DOMINIO/POCO que
+// reset_to_new_game() abaixo consome (ver gus/domain/save/new_game.hpp pro contrato
+// completo e o racional de existir).
+#include "gus/domain/save/new_game.hpp"
+
 namespace gus::app {
 
 class Maestro {
@@ -167,6 +172,54 @@ private:
     // (nada foi jogado ainda, nenhum autosave faz sentido nesse caso).
     [[nodiscard]] bool show_title_screen();
 
+    // MENU-INICIAL (ACHADO 1, backend_engineer): reseta o estado de PARTIDA em
+    // MEMORIA pro equivalente a um Novo Jogo do zero - fecha a lacuna documentada
+    // no comentario de open_pause_from_city() acima ("Novo Jogo alcancado por este
+    // caminho NAO reseta o estado da cidade em memoria - show_title_screen() foi
+    // escrito assumindo 1 unica chamada no BOOT"). Ate esta onda, o "estado
+    // fresco" so existia IMPLICITAMENTE no boot (init() nunca roda 2x no mesmo
+    // processo); este metodo e a versao EXPLICITA/reutilizavel do mesmo shape,
+    // chamavel a qualquer momento DEPOIS do boot.
+    //
+    // CONTRATO PARA O CHAMADOR (gameplay_engineer, wiring do fluxo "Novo Jogo" no
+    // titulo pos-pausa - FORA do escopo desta entrega): chamar isto ANTES de voltar
+    // a rodar o loop da cidade (run()), assim que TitleLoopExit::NewGame for
+    // recebido de run_title_menu_loop_gl_current NUM CONTEXTO QUE NAO SEJA O BOOT
+    // (isto e, quando show_title_screen() foi alcancada via open_pause_from_city(),
+    // nao via a 1a chamada de run()). Passar a MESMA `new_game_difficulty` que a
+    // tela de selecao ja devolve (a variavel local que show_title_screen() hoje so
+    // atribui em save_.difficulty no caso NewGame, linha `save_.difficulty =
+    // new_game_difficulty;` - ver o comentario la, esta chamada deve ser
+    // SUBSTITUIDA por reset_to_new_game(new_game_difficulty) quando o caminho
+    // pos-boot for ligado). NAO chamar no caminho de boot normal (init() ja deixa
+    // tudo fresco; chamar de novo seria trabalho redundante, so nao INCORRETO -
+    // reset_to_new_game() e idempotente por construcao).
+    //
+    // O QUE RESETA (espelha byte-a-byte o que init() monta no boot):
+    //   - save_ (domain::save::SaveData): via fresh_new_game_save_data(difficulty)
+    //     (POCO, gus/domain/save/new_game.hpp) - schema atual, playtime 0, flags/
+    //     inventory/quest_progress/relations/character_states/enemy_knowledge
+    //     vazios, credits 0, slot_id -1, a dificuldade ESCOLHIDA;
+    //   - posicao do jogador: volta pro spawn REAL do mapa (player_spawn_aabb_,
+    //     capturado em init() ANTES de qualquer step_fixed - a MESMA posicao que
+    //     o boot usaria);
+    //   - o inimigo fixo: volta a existir (enemy_defeated_=false + marcador
+    //     redesenhado) - uma Victory da sessao ANTERIOR nao deve sobreviver a um
+    //     jogo novo;
+    //   - edge-triggers (was_overlapping_enemy_/was_overlapping_npc_bertoldo_):
+    //     voltam a false (MESMO estado inicial do boot);
+    //   - playtime (playtime_base_seconds_/playtime_anchor_ns_): re-ancorado do
+    //     ZERO (um jogo novo comeca com playtime 0, nao herda o acumulado da
+    //     sessao anterior).
+    //
+    // O QUE NAO RESETA (fora do escopo desta entrega, ver o aviso no relatorio da
+    // onda): o grafo de dialogo do Bertoldo (npc_bertoldo_graph_) e os handles de
+    // audio (city_music_id_/battle_music_id_) - nenhum dos dois muda com uma
+    // partida nova (sao recursos ESTATICOS carregados do disco 1 vez, nao estado
+    // de PARTIDA). NAO grava nada em disco (isso e save_game(), responsabilidade
+    // do CHAMADOR se/quando quiser persistir o save novo).
+    void reset_to_new_game(gus::domain::save::DifficultyLevel difficulty);
+
     // Monta o SaveData VIVO da sessao ATUAL (flags acumuladas + posicao real do
     // jogador + timestamp/playtime frescos) - EXTRAIDO da lambda local que
     // open_pause_from_city() usava (SAVE-LOAD-UI etapa 6), agora reusado TAMBEM
@@ -220,6 +273,15 @@ private:
     SDL_GLContext gl_context_ = nullptr;
 
     std::unique_ptr<SdlWindow> city_;      // a cidade (OverworldSim vive aqui, sempre)
+
+    // MENU-INICIAL (ACHADO 1): a posicao de SPAWN real do jogador, capturada em
+    // init() logo apos city_->init_attached() (city_->player_aabb() ANTES de
+    // qualquer step_fixed - a mesma leitura que o calculo do inimigo fixo logo
+    // abaixo ja fazia). reset_to_new_game() teleporta o jogador de volta pra cá -
+    // e a fonte de verdade de "onde um jogo novo comeca", sem precisar expor o
+    // TileMap/spawn_player_aabb() pra fora de SdlWindow (a Maestro so precisa de 1
+    // leitura, feita 1 vez, e nunca mais toca no calculo de spawn de novo).
+    gus::core::spatial::Aabb player_spawn_aabb_{};
 
     // AUDIO (M7-COSTURA Inc 2): a Maestro e DONA - 1 instancia viva pro loop inteiro
     // (paga a divida do ADR-011 "AudioEngine e dono da battle_preview" - o device nao

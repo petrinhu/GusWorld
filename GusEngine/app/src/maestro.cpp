@@ -190,6 +190,14 @@ bool Maestro::init() {
         return false;
     }
 
+    // MENU-INICIAL (ACHADO 1): captura o SPAWN real do jogador AQUI - init_attached()
+    // ja carregou a cidade (o ctor de SdlWindow monta o sim_ via load_city_or_fallback,
+    // player_start = spawn_player_aabb(map)) mas nenhum step_fixed rodou ainda, entao
+    // city_->player_aabb() e EXATAMENTE a posicao de nascimento. reset_to_new_game()
+    // (chamado pelo gameplay_engineer quando "Novo Jogo" e escolhido FORA do boot, ver
+    // o contrato no header) teleporta o jogador de volta pra cá.
+    player_spawn_aabb_ = city_->player_aabb();
+
     // SAVE-LOAD-UI etapa 6: ancora do relogio de playtime (ver o comentario do
     // campo em maestro.hpp) - comeca no boot do processo, base 0 (nenhum save
     // carregado ainda).
@@ -414,6 +422,45 @@ void Maestro::apply_loaded_save_data(const gus::domain::save::SaveData& data) {
     std::cout << "Maestro: [save-load] Load aplicado - posicao=(" << pos.x << ", "
               << pos.y << ") enemy_defeated=" << enemy_defeated_
               << " playtime_seconds=" << playtime_base_seconds_ << "\n";
+}
+
+void Maestro::reset_to_new_game(gus::domain::save::DifficultyLevel difficulty) {
+    // MENU-INICIAL (ACHADO 1): mesma ESTRUTURA de apply_loaded_save_data() acima
+    // (posicao -> inimigo/marcador -> edge-triggers -> playtime), so que a FONTE
+    // do estado nao e um SaveData carregado do disco - e o SHAPE de um jogo NOVO
+    // (domain::save::fresh_new_game_save_data, POCO, ver gus/domain/save/
+    // new_game.hpp) + o spawn REAL capturado em init() (player_spawn_aabb_, ver o
+    // comentario do campo em maestro.hpp).
+    save_ = gus::domain::save::fresh_new_game_save_data(difficulty);
+
+    // Posicao do jogador: TELEPORTE pro spawn (mesmo set_player_position sem
+    // interpolacao fantasma que apply_loaded_save_data usa acima - nunca um
+    // "deslize" visual do ponto antigo pro novo).
+    city_->set_player_position(player_spawn_aabb_);
+
+    // Inimigo fixo: volta a existir - uma Victory da sessao ANTERIOR (que
+    // sobreviveria em memoria se so trocassemos de tela) nao deve persistir num
+    // jogo novo. MESMO par set_enemy_marker/enemy_defeated_ que init() usa no
+    // boot.
+    enemy_defeated_ = false;
+    city_->set_enemy_marker(enemy_aabb_);
+
+    // EDGE-TRIGGER (mesma cautela de apply_loaded_save_data acima): o jogador
+    // "acaba de nascer" no spawn - nunca deve contar como "ja estava sobre a
+    // hitbox" (evitaria false-negative se o spawn ficasse perto de um trigger).
+    was_overlapping_enemy_ = false;
+    was_overlapping_npc_bertoldo_ = false;
+
+    // Playtime: re-ancora do ZERO (um jogo novo comeca em playtime_seconds=0, ao
+    // contrario de apply_loaded_save_data - que herda o playtime do save
+    // carregado - a base aqui e sempre 0.0, nunca save_.playtime_seconds).
+    playtime_base_seconds_ = 0.0;
+    playtime_anchor_ns_ = SDL_GetTicksNS();
+
+    std::cout << "Maestro: [reset] Novo Jogo (fora do boot, MENU-INICIAL achado 1) "
+                 "aplicado - posicao=("
+              << player_spawn_aabb_.x << ", " << player_spawn_aabb_.y
+              << ") dificuldade=" << static_cast<unsigned>(difficulty) << ".\n";
 }
 
 void Maestro::maybe_autosave(const char* trigger_label) {
@@ -667,6 +714,60 @@ void Maestro::run() {
                      "save aplicado): player=("
                   << city_->player_aabb().x << ", " << city_->player_aabb().y
                   << ") esperado=(111, 222)\n";
+        return;
+    }
+
+    // DIAGNOSTICO/PROVA (MENU-INICIAL, ACHADO 1): GUSWORLD_NEWGAME_RESET_SELFTEST=1
+    // exercita reset_to_new_game() DIRETO (bypassa a tela de titulo/pausa e o loop de
+    // jogo por completo) - prova, via log + posicao/save/inimigo/playtime ANTES/
+    // DEPOIS, que o metodo devolve o estado de partida ao equivalente do BOOT MESMO
+    // depois de "sujar" o estado em memoria (posicao andada, dificuldade/credits/flag
+    // setados, inimigo derrotado, playtime acumulado, edge-triggers ligados) - o
+    // cenario EXATO do bug relatado (Pause -> Menu Inicial -> titulo -> Novo Jogo NAO
+    // resetava nada). Headless (so mexe em campos POCO/city_->set_player_position,
+    // MESMA tecnica dos 2 selftests acima). Rodar com GUSWORLD_HOME apontando pra um
+    // dir de SCRATCH.
+    if (const char* newgame_reset_selftest =
+            std::getenv("GUSWORLD_NEWGAME_RESET_SELFTEST");
+        newgame_reset_selftest != nullptr && newgame_reset_selftest[0] != '\0') {
+        // "Suja" o estado em memoria - simula uma sessao real jogada ANTES do reset.
+        gus::core::spatial::Aabb moved = city_->player_aabb();
+        moved.x = player_spawn_aabb_.x + 500.0f;
+        moved.y = player_spawn_aabb_.y + 500.0f;
+        city_->set_player_position(moved);
+        save_.difficulty = gus::domain::save::DifficultyLevel::Dificil;
+        save_.credits = 999;
+        save_.flags["chave_teste_sujando_estado"] = true;
+        enemy_defeated_ = true;
+        city_->clear_enemy_marker();
+        was_overlapping_enemy_ = true;
+        was_overlapping_npc_bertoldo_ = true;
+        playtime_base_seconds_ = 12345.0;
+        playtime_anchor_ns_ = SDL_GetTicksNS();
+
+        std::cout << "Maestro: [newgame-reset][selftest] ANTES (estado 'sujo', "
+                     "simulando sessao jogada): player=("
+                  << city_->player_aabb().x << ", " << city_->player_aabb().y
+                  << ") credits=" << save_.credits
+                  << " enemy_defeated=" << enemy_defeated_
+                  << " playtime_seconds=" << playtime_base_seconds_ << "\n";
+
+        reset_to_new_game(gus::domain::save::DifficultyLevel::Facil);
+
+        const bool position_ok = city_->player_aabb().x == player_spawn_aabb_.x &&
+                                  city_->player_aabb().y == player_spawn_aabb_.y;
+        const bool save_ok =
+            save_ == gus::domain::save::fresh_new_game_save_data(
+                         gus::domain::save::DifficultyLevel::Facil);
+        std::cout << "Maestro: [newgame-reset][selftest] DEPOIS (reset_to_new_game "
+                     "aplicado): player=("
+                  << city_->player_aabb().x << ", " << city_->player_aabb().y
+                  << ") esperado=(" << player_spawn_aabb_.x << ", "
+                  << player_spawn_aabb_.y << ") posicao_ok=" << position_ok
+                  << " save_ok=" << save_ok << " enemy_defeated=" << enemy_defeated_
+                  << " was_overlapping_enemy=" << was_overlapping_enemy_
+                  << " playtime_seconds=" << playtime_base_seconds_
+                  << " (esperado 0)\n";
         return;
     }
 
