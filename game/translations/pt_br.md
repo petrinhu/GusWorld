@@ -766,6 +766,9 @@ Volume da Música
 ## SETTINGS_SFX_VOLUME
 Volume dos Efeitos (SFX)
 
+## MENU_PLACEHOLDER_TEXT
+Em breve.
+
 ## MENU_TO_TITLE
 Menu Inicial
 
@@ -777,9 +780,6 @@ Sim
 
 ## MENU_TO_TITLE_CONFIRM_NO
 Cancelar
-
-## MENU_PLACEHOLDER_TEXT
-Em breve.
 
 ---
 

@@ -19,6 +19,14 @@
 //   - valor multi-linha juntado por '\n', com trim das pontas;
 //   - chave duplicada = last-wins;
 //   - chave sem corpo mapeia para string vazia (nao some do mapa).
+//
+// Regra ADICIONAL (fix ACHADO-2, bug de producao TITLE_NEW_GAME_CONFIRM_NO):
+//   - uma linha "---" isolada (so hifens, >=3, trim tolera espacos em volta -
+//     thematic break do Markdown) FECHA a entry corrente sem abrir uma nova; NAO
+//     e chave nem conteudo. Sem isto, a chave imediatamente ANTES de um "---" no
+//     catalogo absorvia o separador como parte do proprio valor (10 chaves reais
+//     afetadas em pt_br.md, ver o TEST_CASE de regressao em
+//     md_translation_loader_test.cpp).
 
 #ifndef GUS_DOMAIN_I18N_MD_TRANSLATION_LOADER_HPP
 #define GUS_DOMAIN_I18N_MD_TRANSLATION_LOADER_HPP

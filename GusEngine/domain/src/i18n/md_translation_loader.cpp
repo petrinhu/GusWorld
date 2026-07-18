@@ -43,6 +43,24 @@ std::string join_and_trim(const std::vector<std::string_view>& lines) {
     return trim(joined);
 }
 
+// Linha "---" (thematic break do Markdown): usada no catalogo real como separador de
+// SECAO (ver o header do arquivo/pt_br.md, en_intl.md). So hifens (>=3, o minimo do
+// Markdown) apos trim - "possivelmente com espacos em volta" (contrato do bug F2-S.11c/
+// ACHADO-2). "--" (2 hifens) NAO conta: e conteudo legitimo (ex.: travessao duplo), nao
+// dispara o fechamento.
+bool is_section_separator(std::string_view line) {
+    const std::string t = trim(line);
+    if (t.size() < 3) {
+        return false;
+    }
+    for (const char c : t) {
+        if (c != '-') {
+            return false;
+        }
+    }
+    return true;
+}
+
 }  // namespace
 
 bool is_translation_key(std::string_view s) noexcept {
@@ -96,6 +114,19 @@ TranslationCatalog parse(std::string_view content) {
             current_key = trim(line.substr(3));
             current_value_lines.clear();
             in_entry = true;
+        } else if (is_section_separator(line)) {
+            // Fecha a entry corrente (se houver) SEM abrir uma nova: "---" nao e
+            // chave nem conteudo, e fronteira de secao. Fecha ANTES de qualquer
+            // acumulo futuro - as linhas entre aqui e a proxima "## CHAVE" (headers
+            // de secao, linhas em branco) sao descartadas, nunca grudam no valor
+            // que acabou de fechar (era a causa raiz do bug: TITLE_NEW_GAME_CONFIRM_NO
+            // e outras 9 chaves absorviam o "---" por ficarem na ULTIMA posicao antes
+            // de um separador - ver pt_br.md:289 e o TEST_CASE de regressao).
+            if (in_entry) {
+                result[current_key] = join_and_trim(current_value_lines);
+            }
+            current_value_lines.clear();
+            in_entry = false;
         } else if (in_entry) {
             // Acumula linhas de valor. Filtra qualquer linha header MD ("# X",
             // "### X", e "## §N" que nao passou no teste de chave acima).
