@@ -167,21 +167,14 @@ void SdlWindow::load_enemy_marker_texture() {
     // Save/Load -> LOAD -> deref de ponteiro nulo aqui). RAIZ ORIGINAL (era SDL_Renderer):
     // o menu de pausa rodava NUM CONTEXTO GL PROPRIO e a Maestro (open_pause_from_city)
     // chamava release_renderer() ANTES de abrir o menu -> render2d_ == nullptr enquanto o
-    // menu estava vivo. FLASH-CTX (A1): o Render2dGl3 agora NUNCA e destruido (release_
-    // renderer so pausa - ver o header), entao o risco mudou de "ponteiro nulo" pra
-    // "contexto GL ERRADO corrente" - uma casca owning (menu/dialogo/titulo/batalha)
-    // AINDA cria o PROPRIO contexto GL por cima do da Maestro nesta etapa da ponte (ver
-    // o comentario grande em gus/app/maestro.cpp); tocar GL aqui enquanto pausado
-    // criaria a textura no contexto EFEMERO da casca owning (que morre com ela) em vez
-    // do contexto PERSISTENTE da Maestro. A acao LOAD -> Maestro::apply_loaded_save_data
-    // -> city_->set_enemy_marker(...) pode cair aqui com o renderer PAUSADO. Separacao
-    // dado x GL: o enemy_marker_aabb_ (estado LOGICO) ja foi armazenado em
-    // set_enemy_marker ANTES desta chamada; a (re)carga da TEXTURA (estado GL) e
-    // ADIADA - reacquire_renderer() a refaz INCONDICIONALMENTE ao a cidade retomar (ver
-    // reacquire_renderer -> load_enemy_marker_texture), entao o marcador REAPARECE
-    // sozinho. sim_ nunca e nulo (criado no ctor), mas guardado por simetria/defesa.
-    if (renderer_paused_ || render2d_ == nullptr || sim_ == nullptr) {
-        return;  // renderer pausado (menu de pausa) - defer: reacquire_renderer recarrega
+    // menu estava vivo. FLASH-CTX (A1->A3): o Render2dGl3 e o contexto GL sao UNICOS e
+    // vivem do boot ao shutdown (nunca ha mais um contexto GL PROPRIO por cima do da
+    // Maestro, desde que o A3 removeu a ultima casca owning do call-graph de producao,
+    // passo 5 do plano) - render2d_ nunca mais e nulo nem "pausado" depois de
+    // init()/init_attached(). sim_ nunca e nulo (criado no ctor), mas guardado por
+    // simetria/defesa.
+    if (render2d_ == nullptr || sim_ == nullptr) {
+        return;
     }
     // ASSETS-VFS-F1: monta o id RELATIVO completo (subdir + arquivo) e resolve UMA vez
     // (era resolver so o subdir e concatenar o arquivo depois - equivalente, mas agora o
@@ -217,13 +210,11 @@ void SdlWindow::load_npc_bertoldo_marker_texture() {
     if (!npc_bertoldo_marker_aabb_.has_value()) {
         return;  // nenhum marcador definido ainda (uso standalone/sem Maestro)
     }
-    // FIX CRASH (mesma raiz de load_enemy_marker_texture acima, FLASH-CTX): o renderer
-    // pode estar PAUSADO (release_renderer feito pela Maestro enquanto uma casca owning
-    // com o PROPRIO contexto GL roda). O npc_bertoldo_marker_aabb_ ja foi armazenado em
-    // set_npc_bertoldo_marker; a carga da textura e ADIADA e reacquire_renderer() a
-    // refaz ao a cidade retomar.
-    if (renderer_paused_ || render2d_ == nullptr || sim_ == nullptr) {
-        return;  // renderer pausado - defer: reacquire_renderer recarrega
+    // FIX CRASH (mesma raiz de load_enemy_marker_texture acima, FLASH-CTX A1->A3): o
+    // guard hoje so cobre defesa contra ponteiro nulo - o contexto GL nunca mais e
+    // "pausado" (ver a nota grande em load_enemy_marker_texture acima).
+    if (render2d_ == nullptr || sim_ == nullptr) {
+        return;
     }
     const std::string id = std::string(gus::core::assets::kBertoldoSpritesDir) + "/" +
                             std::string(gus::core::assets::kBertoldoSpriteSouthFile);
@@ -249,33 +240,17 @@ void SdlWindow::clear_npc_bertoldo_marker() {
 }
 
 void SdlWindow::release_renderer() {
-    // FLASH-CTX PONTE TEMPORARIA (A1): NAO destroi mais nada (o Render2dGl3/contexto GL
-    // e UNICO e vive do boot ao shutdown, dono e a Maestro) - so PAUSA (ver o guard em
-    // load_enemy_marker_texture/load_npc_bertoldo_marker_texture/step_with_fade/
-    // render_dialogue_overlay_frame/hold_frozen_frame/capture_frame_to_png, e o
-    // comentario grande no header). Poda definitiva (remocao da chamada + desta funcao)
-    // e o A3, passo 6 do plano.
-    renderer_paused_ = true;
+    // FLASH-CTX PODA (A3, passo 6 do plano): NO-OP de verdade - nao ha mais guard
+    // renderer_paused_ pra setar (removido; ver o comentario grande no header). A
+    // Maestro nao chama mais isto (passo 5); mantido so por compatibilidade de API
+    // com call-sites remanescentes fora de app/src/ (deprecated, ver o header).
 }
 
 bool SdlWindow::reacquire_renderer() {
-    // FLASH-CTX PONTE TEMPORARIA (A1): so DESPAUSA - nao ha mais SDL_Renderer/contexto
-    // pra recriar (nada foi destruido). IMPORTANTE: exige que o contexto GL da MAESTRO
-    // ja esteja CORRENTE quando chamado (a Maestro restaura via SDL_GL_MakeCurrent
-    // IMEDIATAMENTE apos a casca owning devolver o controle, ANTES de chamar isto - ver
-    // gus/app/maestro.cpp). As 4 cargas abaixo continuam INCONDICIONAIS (mesmo
-    // comportamento de sempre) mas agora sao BARATAS: Render2dGl3::load_texture cacheia
-    // por caminho (path->TextureId), entao um asset ja carregado volta na hora sem GL
-    // novo - o contexto nunca morreu, os handles de load_player_sprites/load_boot_pixel_
-    // frames continuam validos e essas 2 chamadas viram cache-hit puro. As dos
-    // marcadores (enemy/npc) SAO necessarias de fato quando set_enemy_marker/
-    // set_npc_bertoldo_marker foi chamado ENQUANTO pausado (a carga da textura ficou
-    // adiada pelo guard renderer_paused_ - ver o comentario dessas funcoes acima).
-    renderer_paused_ = false;
-    load_player_sprites();
-    load_enemy_marker_texture();
-    load_npc_bertoldo_marker_texture();
-    load_boot_pixel_frames();
+    // FLASH-CTX PODA (A3, passo 6 do plano): NO-OP de verdade - nao ha mais nada pra
+    // despausar/recarregar (release_renderer() acima tambem virou no-op; a cidade
+    // nunca para de desenhar). Devolve true por compatibilidade de API (deprecated,
+    // ver o header) - a Maestro nao chama mais isto.
     return true;
 }
 
@@ -307,10 +282,11 @@ bool SdlWindow::step_with_fade(float overlay_alpha,
     }
 
     // 4) RENDER: 1 frame, interpolado pelo alpha residual. Viewport em PIXELS. So
-    // desenha se o renderer esta ATIVO/nao-pausado (release_renderer o pausa durante a
-    // batalha/menu/dialogo/titulo - a Maestro nao chama step() nesse intervalo, mas o
-    // guard e defensivo/barato, FLASH-CTX: era "renderer_ != nullptr").
-    if (!renderer_paused_ && render2d_ != nullptr) {
+    // desenha se render2d_ existe (defensivo/barato - FLASH-CTX A1->A3: nao ha mais
+    // um estado "pausado" pra checar - a cidade desenha SEMPRE que step()/step_with_
+    // fade() e chamado, batalha/menu/dialogo/titulo agora desenham no MESMO contexto
+    // por cima, ver Maestro::run()/to_battle()/open_pause_from_city()).
+    if (render2d_ != nullptr) {
         int pw = kWindowW, ph = kWindowH;
         // FLASH-CTX: SDL_GetWindowSizeInPixels (era SDL_GetCurrentRenderOutputSize do
         // SDL_Renderer) - equivalente em GL, MESMA chamada que battle_preview.cpp usa.
@@ -411,8 +387,8 @@ void SdlWindow::set_controls(gus::domain::input::InputRemapConfig config) {
 }
 
 void SdlWindow::render_dialogue_overlay_frame(const std::vector<std::string>& lines) {
-    if (renderer_paused_ || render2d_ == nullptr) {
-        return;  // renderer pausado (uso incorreto/degradacao segura) - no-op
+    if (render2d_ == nullptr) {
+        return;  // degradacao segura (headless/GL nao compilou) - no-op
     }
     int pw = kWindowW, ph = kWindowH;
     SDL_GetWindowSizeInPixels(window_, &pw, &ph);  // FLASH-CTX: era SDL_GetCurrentRenderOutputSize
@@ -459,8 +435,8 @@ void SdlWindow::render_dialogue_overlay_frame(const std::vector<std::string>& li
 }
 
 void SdlWindow::hold_frozen_frame(int frames) {
-    if (renderer_paused_ || render2d_ == nullptr) {
-        return;  // renderer pausado (reacquire_renderer falhou) - nada a segurar
+    if (render2d_ == nullptr) {
+        return;  // degradacao segura (headless/GL nao compilou) - nada a segurar
     }
     int pw = kWindowW, ph = kWindowH;
     SDL_GetWindowSizeInPixels(window_, &pw, &ph);  // FLASH-CTX: era SDL_GetCurrentRenderOutputSize
@@ -481,8 +457,8 @@ void SdlWindow::hold_frozen_frame(int frames) {
 }
 
 bool SdlWindow::capture_frame_to_png(const std::string& out_path) {
-    if (renderer_paused_ || render2d_ == nullptr) {
-        return false;  // renderer pausado - nada a capturar (degradacao segura)
+    if (render2d_ == nullptr) {
+        return false;  // degradacao segura (headless/GL nao compilou) - nada a capturar
     }
     int pw = kWindowW, ph = kWindowH;
     SDL_GetWindowSizeInPixels(window_, &pw, &ph);  // FLASH-CTX: era SDL_GetCurrentRenderOutputSize
