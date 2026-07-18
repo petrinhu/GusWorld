@@ -136,7 +136,11 @@ private:
     // removida; ver o historico git pra era anterior). Devolve true se o jogador
     // confirmou "Sair" no menu OU fechou a janela DURANTE ele - o chamador (run())
     // encerra o programa (mesmo contrato/nome de intencao de
-    // should_stop_running_after_battle).
+    // should_stop_running_after_battle). MENU-INICIAL: "Menu Inicial" confirmado
+    // (com "Sim" no mini-dialogo "voltar ao menu inicial?") chama
+    // show_title_screen() e devolve O QUE ELA devolver - true SO se o jogador
+    // escolher Sair/fechar a janela DENTRO da tela de titulo (o jogo NAO fecha
+    // so por ter voltado ao titulo, diferente de "Sair" no menu de pausa).
     [[nodiscard]] bool open_pause_from_city();
 
     // M7-DIALOGO (NPC-MVP): esbarrou no Bertoldo (rising edge, MESMA tecnica de

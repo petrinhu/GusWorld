@@ -123,6 +123,40 @@ void system_menu_close(SystemMenuState& state) noexcept {
 namespace {
 
 SystemMenuAction handle_pause_key(SystemMenuState& state, SDL_Keycode key) noexcept {
+    // MENU-INICIAL: mini-dialogo "voltar ao menu inicial?" (MESMA mecanica de
+    // controls_confirming_restore/discard - ver handle_controls_key abaixo)
+    // intercepta ANTES da navegacao normal da lista de Pause.
+    if (state.pause_confirming_to_title) {
+        switch (key) {
+            case SDLK_UP:
+            case SDLK_DOWN:
+            case SDLK_LEFT:
+            case SDLK_RIGHT:
+            case SDLK_W:
+            case SDLK_S:
+            case SDLK_A:
+            case SDLK_D:
+                // 2 escolhas (Sim/Cancelar): qualquer eixo alterna entre elas
+                // (MESMA convencao dos prompts de Controles).
+                state.pause_to_title_confirm_selected =
+                    1 - state.pause_to_title_confirm_selected;
+                return SystemMenuAction::None;
+            case SDLK_ESCAPE:
+                state.pause_confirming_to_title = false;  // cancela, fica em Pause
+                return SystemMenuAction::None;
+            case SDLK_RETURN:
+            case SDLK_KP_ENTER:
+            case SDLK_SPACE:
+                state.pause_confirming_to_title = false;
+                if (state.pause_to_title_confirm_selected == 0) {  // Sim
+                    return SystemMenuAction::RequestToTitle;
+                }
+                return SystemMenuAction::None;  // Cancelar: fica em Pause
+            default:
+                return SystemMenuAction::None;
+        }
+    }
+
     switch (key) {
         case SDLK_UP:
         case SDLK_W:
@@ -156,6 +190,13 @@ SystemMenuAction handle_pause_key(SystemMenuState& state, SDL_Keycode key) noexc
                     state.config_categories_selected =
                         static_cast<int>(ConfigCategoryItem::Audio);
                     return SystemMenuAction::Navigated;
+                case PauseItem::ToTitle:
+                    // MENU-INICIAL: abre o prompt "tem certeza?" - a navegacao de
+                    // fato (RequestToTitle) so acontece se o jogador confirmar
+                    // "Sim" dentro do dialogo (branch acima).
+                    state.pause_confirming_to_title = true;
+                    state.pause_to_title_confirm_selected = 1;  // default seguro = Cancelar
+                    return SystemMenuAction::None;
                 case PauseItem::Quit:
                     return SystemMenuAction::RequestQuit;
             }
@@ -516,6 +557,19 @@ void system_menu_set_slider_ratio(SystemMenuState& state, int item,
 namespace {
 
 SystemMenuAction click_pause_option(SystemMenuState& state, int index) noexcept {
+    // MENU-INICIAL: enquanto o mini-dialogo esta aberto, `index` e reinterpretado
+    // como a escolha do prompt (0=Sim, 1=Cancelar - MESMA convencao de
+    // click_controls_option pros prompts de Controles).
+    if (state.pause_confirming_to_title) {
+        if (index != 0 && index != 1) return SystemMenuAction::None;
+        state.pause_to_title_confirm_selected = index;
+        state.pause_confirming_to_title = false;
+        if (index == 0) {  // Sim
+            return SystemMenuAction::RequestToTitle;
+        }
+        return SystemMenuAction::None;  // Cancelar: fica em Pause
+    }
+
     if (index < 0 || index >= kPauseItemCount) return SystemMenuAction::None;
     state.pause_selected = index;
     // MESMA logica de handle_pause_key/SDLK_RETURN acima - clicar numa pill do
@@ -533,6 +587,12 @@ SystemMenuAction click_pause_option(SystemMenuState& state, int index) noexcept 
             state.screen = SystemMenuScreen::ConfigCategories;
             state.config_categories_selected = static_cast<int>(ConfigCategoryItem::Audio);
             return SystemMenuAction::Navigated;
+        case PauseItem::ToTitle:
+            // MENU-INICIAL: MESMA logica de handle_pause_key/ToTitle acima - abre
+            // o prompt, nao navega ainda.
+            state.pause_confirming_to_title = true;
+            state.pause_to_title_confirm_selected = 1;  // default seguro = Cancelar
+            return SystemMenuAction::None;
         case PauseItem::Quit:
             return SystemMenuAction::RequestQuit;
     }
@@ -715,7 +775,10 @@ int system_menu_hover_index(const SystemMenuState& state, float mouse_x, float m
     int count = 0;
     switch (state.screen) {
         case SystemMenuScreen::Pause:
-            count = kPauseItemCount;
+            // MENU-INICIAL: enquanto o mini-dialogo "voltar ao menu inicial?"
+            // esta aberto, so as 2 pills Sim/Cancelar sao hover-testaveis (MESMA
+            // convencao de Controls/controls_confirming_restore abaixo).
+            count = state.pause_confirming_to_title ? 2 : kPauseItemCount;
             break;
         case SystemMenuScreen::ConfigCategories:
             count = kConfigCategoriesItemCount;
@@ -764,6 +827,9 @@ bool system_menu_hover_entered_new_item(int previous_index, int current_index) n
 int system_menu_keyboard_focus_index(const SystemMenuState& state) noexcept {
     switch (state.screen) {
         case SystemMenuScreen::Pause:
+            // MENU-INICIAL: MESMA convencao dos prompts de Controles abaixo -
+            // enquanto o mini-dialogo esta aberto, o foco e a pill Sim/Cancelar.
+            if (state.pause_confirming_to_title) return state.pause_to_title_confirm_selected;
             return state.pause_selected;
         case SystemMenuScreen::ConfigCategories:
             return state.config_categories_selected;

@@ -488,6 +488,14 @@ Mold
 
 ## MENU_PLACEHOLDER_TEXT
 
+## MENU_TO_TITLE
+
+## MENU_TO_TITLE_CONFIRM_TITLE
+
+## MENU_TO_TITLE_CONFIRM_YES
+
+## MENU_TO_TITLE_CONFIRM_NO
+
 ## CARD_RAIZ_CURA_NAME
 
 ### Master special cards (techMagic executor, ADR-016; effect nickname, provisional)

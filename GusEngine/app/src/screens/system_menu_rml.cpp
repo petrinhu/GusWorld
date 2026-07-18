@@ -655,20 +655,43 @@ std::string build_pause_body(const SystemMenuState& state,
     std::ostringstream body;
     append_panel_open(body, tr, "MENU_PAUSE_TITLE");
 
+    // MENU-INICIAL: mini-dialogo "voltar ao menu inicial?" SUBSTITUI a lista
+    // inteira (MESMA linguagem visual dos prompts de Controles - reusa
+    // .ctrl-confirm-title/.verb-pill/.btn-back, ja definidos em kSharedStyle,
+    // sem CSS novo).
+    if (state.pause_confirming_to_title) {
+        body << "<div class=\"ctrl-confirm-title\">"
+             << tr.tr("MENU_TO_TITLE_CONFIRM_TITLE") << "</div>";
+        const bool yes_focused = (state.pause_to_title_confirm_selected == 0);
+        const bool no_focused = (state.pause_to_title_confirm_selected == 1);
+        body << "<div class=\"verb-pill" << (yes_focused ? " focused" : "")
+             << pressed_class(0, pressed_index) << "\" id=\"pause-totitle-confirm-0\">"
+             << tr.tr("MENU_TO_TITLE_CONFIRM_YES") << "</div>";
+        body << "<div class=\"btn-back" << (no_focused ? " focused" : "")
+             << pressed_class(1, pressed_index) << "\" id=\"pause-totitle-confirm-1\">"
+             << tr.tr("MENU_TO_TITLE_CONFIRM_NO") << "</div>";
+        body << "</div>";  // #sysmenu-panel
+        return body.str();
+    }
+
     struct Item {
         int index;
         const char* key;
         const char* extra_class;
     };
-    // Ordem SAVE-LOAD-UI etapa 6: Continuar / Salvar / Carregar / Configuracoes /
-    // Sair (MENU_LOAD_GAME ja existia no catalogo, ate agora so consumida pela
-    // tela de titulo legada - reusada aqui sem duplicar chave).
+    // Ordem SAVE-LOAD-UI etapa 6 + MENU-INICIAL: Continuar / Salvar / Carregar /
+    // Configuracoes / Menu Inicial / Sair (MENU_LOAD_GAME ja existia no
+    // catalogo, ate agora so consumida pela tela de titulo legada - reusada
+    // aqui sem duplicar chave). "Menu Inicial" fica ENTRE Configuracoes e Sair
+    // (spec do lider) - NAO e "danger" (nao encerra o processo, so navega, e
+    // ainda pede confirmacao antes; "danger" fica reservado pra Sair).
     const Item items[kPauseItemCount] = {
         {0, "MENU_CONTINUE", ""},
         {1, "MENU_SAVE_GAME", ""},
         {2, "MENU_LOAD_GAME", ""},
         {3, "SETTINGS_TITLE", ""},
-        {4, "MENU_QUIT", " danger"},
+        {4, "MENU_TO_TITLE", ""},
+        {5, "MENU_QUIT", " danger"},
     };
     for (const Item& item : items) {
         const bool focused = (state.pause_selected == item.index);

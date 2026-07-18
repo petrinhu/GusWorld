@@ -766,6 +766,18 @@ Volume da Música
 ## SETTINGS_SFX_VOLUME
 Volume dos Efeitos (SFX)
 
+## MENU_TO_TITLE
+Menu Inicial
+
+## MENU_TO_TITLE_CONFIRM_TITLE
+Voltar ao menu inicial? Progresso não salvo pode se perder.
+
+## MENU_TO_TITLE_CONFIRM_YES
+Sim
+
+## MENU_TO_TITLE_CONFIRM_NO
+Cancelar
+
 ## MENU_PLACEHOLDER_TEXT
 Em breve.
 

@@ -572,6 +572,25 @@ bool Maestro::open_pause_from_city() {
         std::filesystem::remove(frozen_bg_path, remove_ec);
     }
 
+    if (outcome.to_title) {
+        // MENU-INICIAL: "Sim" confirmado no mini-dialogo "voltar ao menu
+        // inicial?" - volta pra TELA DE TITULO (Novo Jogo/Continuar/Sair, a
+        // MESMA tela do boot, ver show_title_screen()) SEM encerrar o processo -
+        // diferente de PauseItem::Quit acima (RequestQuit -> outcome.quit_app,
+        // fecha o jogo). show_title_screen() ja desenha DIRETO no MESMO contexto
+        // GL UNICO da Maestro (FLASH-CTX) - nenhuma criacao/destruicao de
+        // contexto acontece aqui, MESMA tecnica de qualquer outra transicao de
+        // cena da Maestro. Devolve o que show_title_screen() devolver: true SO
+        // se o jogador escolheu Sair OU fechou a janela DENTRO da tela de
+        // titulo (o chamador de run() encerra o programa, MESMO contrato de
+        // sempre); false (Novo Jogo/Continuar escolhidos) faz o loop de run()
+        // seguir rodando NA CIDADE ATUAL (ver o aviso de escopo no relatorio
+        // desta onda: "Novo Jogo" alcancado por este caminho NAO reseta o
+        // estado da cidade em memoria - show_title_screen() foi escrito
+        // assumindo 1 unica chamada no BOOT, ANTES de qualquer gameplay).
+        return show_title_screen();
+    }
+
     return outcome.quit_app;
 }
 

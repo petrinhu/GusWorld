@@ -166,11 +166,60 @@ if(EXISTS "${_GUSENGINE_RELEASE}/app/libgusengine_app.a")
         ${CMAKE_DL_LIBS}
         m
     )
+    # =========================================================================
+    # sysmenu_pause_screenshot_probe (MENU-INICIAL, spot-check visual Xvfb :99):
+    # MESMA receita/libs importadas de poc_gl_single_context_probe acima (reusa
+    # os .a JA compilados pelo preset linux-release) - so chama
+    # build_system_menu_rml (POCO+RML pura, gus/app/screens/system_menu_rml.hpp)
+    # com state.screen=Pause, renderiza 1 frame via glintfx::UiLayer e grava PNG
+    # (stb_image_write). GUSWORLD_PROBE_CONFIRM=1 renderiza o mini-dialogo "voltar
+    # ao menu inicial?" em vez da lista normal - ver o comentario no topo do
+    # arquivo .cpp.
+    add_executable(sysmenu_pause_screenshot_probe sysmenu_pause_screenshot_probe.cpp)
+
+    target_include_directories(sysmenu_pause_screenshot_probe PRIVATE
+        "${_GUSENGINE_ROOT}/core/include"
+        "${_GUSENGINE_ROOT}/domain/include"
+        "${_GUSENGINE_ROOT}/platform/include"
+        "${_GUSENGINE_ROOT}/app/include"
+        "${_GUSENGINE_ROOT}/third_party/stb"
+        "${_GUSENGINE_ROOT}/platform/rmlui"
+        "${_GUSENGINE_RELEASE}/_deps/sdl3-build/include-revision"
+        "${_GUSENGINE_RELEASE}/_deps/sdl3-src/include"
+        # glintfx::ui_layer.hpp (chamado DIRETO neste probe, MESMA receita de
+        # sysmenu_controls_screenshot_probe.cpp) - o alvo importado
+        # glintfx_imported abaixo nao carrega INTERFACE_INCLUDE_DIRECTORIES
+        # (e um STATIC IMPORTED puro), entao o caminho precisa ser explicito.
+        "${_GUSENGINE_RELEASE}/_deps/glintfx-src/glintfx/include"
+    )
+
+    target_compile_features(sysmenu_pause_screenshot_probe PRIVATE cxx_std_20)
+
+    # MESMA ordem de link (comprovadamente funcional) de poc_gl_single_context_probe
+    # acima.
+    target_link_libraries(sysmenu_pause_screenshot_probe PRIVATE
+        gusengine_app_imported
+        gusengine_core_imported
+        gusengine_domain_imported
+        gusengine_platform_imported
+        sdl3_imported
+        gusengine_domain_imported
+        gusengine_core_imported
+        monocypher_imported
+        rmlui_debugger_imported
+        glintfx_imported
+        rmlui_imported
+        OpenGL::GL
+        Freetype::Freetype
+        Threads::Threads
+        ${CMAKE_DL_LIBS}
+        m
+    )
 else()
     message(STATUS
-        "poc_gl_single_context_probe: build/linux-release ainda nao foi "
-        "compilado (falta ${_GUSENGINE_RELEASE}/app/libgusengine_app.a) - "
-        "rode 'cmake --preset linux-release && cmake --build --preset "
-        "linux-release' na raiz do GusEngine primeiro. Alvo NAO adicionado "
-        "nesta configuracao.")
+        "poc_gl_single_context_probe/sysmenu_pause_screenshot_probe: "
+        "build/linux-release ainda nao foi compilado (falta "
+        "${_GUSENGINE_RELEASE}/app/libgusengine_app.a) - rode 'cmake --preset "
+        "linux-release && cmake --build --preset linux-release' na raiz do "
+        "GusEngine primeiro. Alvos NAO adicionados nesta configuracao.")
 endif()
