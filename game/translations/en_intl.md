@@ -557,6 +557,9 @@ Fork
 ## CARD_EXEC_BRUNO_NAME
 Echo-Self
 
+## CARD_EXEC_URANDOM_NAME
+urandom
+
 ### Controls screen (keyboard remap, M2)
 
 ## CONTROLS_HINT

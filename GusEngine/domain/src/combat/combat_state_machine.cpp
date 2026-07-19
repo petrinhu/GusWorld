@@ -519,12 +519,14 @@ CombatStateMachine::CombatStateMachine(
     const std::unordered_map<std::string, Card>* card_registry,
     const std::unordered_map<std::string, IEnemyBrain*>* brain_registry,
     IRandomSource* rng,
-    const std::vector<CardIntegrityRef>* integrity_ledger)
+    const std::vector<CardIntegrityRef>* integrity_ledger,
+    const std::vector<CardCollectionEntry>* collection_snapshot)
     : action_provider_(std::move(action_provider)),
       card_registry_(card_registry),
       brain_registry_(brain_registry),
       rng_(rng != nullptr ? rng : &neutral_random()),
       integrity_ledger_(integrity_ledger),
+      collection_snapshot_(collection_snapshot),
       // A fila valida vazio com std::invalid_argument (espelha o ArgumentException do C#
       // "Combate precisa de ao menos 1 ator."). Construida ja ordenada por SPD.
       queue_(std::move(actors)) {
@@ -1610,6 +1612,19 @@ void CombatStateMachine::resolve_use_card(CombatActor& actor, const CombatAction
     if (dispatch_virus_payload_pre_cast(actor, card, action.card_instance_id))
         return;  // efeito nominal INTEIRO substituido pelo backfire; nada mais roda.
 
+    // urandom (CARDS-HW-2 fatia B; docs/design/mecanicas/cartas-spec-logica.md secao 7):
+    // branch dedicado, FORA do dispatcher techMagic (trigger reportado ao lider - ver
+    // urandom_algorithm.hpp). Substitui a "RESOLUCAO NORMAL DO EFEITO" inteira: sorteia e
+    // redireciona pra uma carta JA EXISTENTE (record-base OU techMagic::execute conforme o
+    // tier sorteado), sem re-cobrar mana/AP/gates (ja pagos acima). Virus post-cast da
+    // PROPRIA urandom ainda roda (a instancia pode estar infectada, agnostico do que ela
+    // resolveu) - mesmo pipeline de qualquer outra carta (secao 1 do doc-fonte).
+    if (card.id == kUrandomCardId) {
+        resolve_urandom(actor, action, card);
+        dispatch_virus_payload_post_cast(actor, card, action.card_instance_id);
+        return;
+    }
+
     // Recarga de recurso (CARTAS-COMUNS-ENGINE, Eletrico-utilidade "Tavus-Overclock",
     // 2026-07-16): DEPOIS do custo pago acima (anti-exploit de mana insuficiente - o custo
     // sempre sai primeiro, a recarga nunca "paga a si mesma"). Trava 1x/turno
@@ -2133,6 +2148,244 @@ void CombatStateMachine::dispatch_virus_payload_post_cast(
             // LogicBomb ja foi tratado PRE-cast (dispatch_virus_payload_pre_cast); os demais
             // sao fatia futura.
             break;
+    }
+}
+
+// ---------------------------------------------------------------------------
+// urandom (CARDS-HW-2 fatia B; docs/design/mecanicas/cartas-spec-logica.md secao 7;
+// docs/design/mecanicas/cartas-numeros-proposta.md secao 4)
+// ---------------------------------------------------------------------------
+
+const CardCollectionEntry* CombatStateMachine::find_collection_entry(
+    std::uint64_t instance_id) const {
+    if (collection_snapshot_ == nullptr) return nullptr;
+    for (const CardCollectionEntry& entry : *collection_snapshot_)
+        if (entry.instance_id == instance_id) return &entry;
+    return nullptr;
+}
+
+void CombatStateMachine::resolve_urandom(CombatActor& caster, const CombatAction& action,
+                                         const Card& card) {
+    if (!action.card_instance_id.has_value()) {
+        log_.push_back(CombatLogEntry{
+            caster.id(), CombatActionType::UseCard, std::nullopt, 0,
+            caster.id() + " compila " + card.id +
+                ": sem instancia rastreada - sorteio dissipa (fail-safe)."});
+        return;
+    }
+    const CardCollectionEntry* self_entry = find_collection_entry(*action.card_instance_id);
+    if (self_entry == nullptr) {
+        log_.push_back(CombatLogEntry{
+            caster.id(), CombatActionType::UseCard, std::nullopt, 0,
+            caster.id() + " compila " + card.id +
+                ": instancia ausente do snapshot da coleçao - sorteio dissipa (fail-safe)."});
+        return;
+    }
+
+    const bool is_pirata = self_entry->origin == hardware::CardOrigin::PirateClone;
+    const UrandomWeightEntry* weights = is_pirata ? kUrandomPirataWeights : kUrandomOriginalWeights;
+    const std::size_t weights_count =
+        is_pirata ? kUrandomPirataWeightsCount : kUrandomOriginalWeightsCount;
+
+    const UrandomFaixa faixa = weighted_pick_urandom_faixa(weights, weights_count, *rng_);
+
+    if (faixa == UrandomFaixa::Backfire) {
+        const int idx = rng_->next(static_cast<int>(kUrandomBackfirePoolCount));
+        const StatusId bad = kUrandomBackfirePool[idx];
+        StatusEffect bad_status{bad, /*magnitude=*/0, /*duration=*/kUrandomBackfireStunDuration,
+                                StackRule::Replace, CardFamily::Universal};
+        if (bad == StatusId::Poison) {
+            bad_status.magnitude = kUrandomBackfirePoisonMagnitude;
+            bad_status.duration = kUrandomBackfirePoisonDuration;
+        }
+        apply_offensive_status(caster, caster, bad_status);
+        log_.push_back(CombatLogEntry{
+            caster.id(), CombatActionType::UseCard, caster.id(), 0,
+            "> urandom: PIRATA FALHA - o efeito se volta contra " + caster.id() + "!"});
+        return;
+    }
+
+    if (card_registry_ == nullptr) {
+        log_.push_back(CombatLogEntry{
+            caster.id(), CombatActionType::UseCard, std::nullopt, 0,
+            caster.id() + " compila " + card.id +
+                ": sem registry de combate - sorteio dissipa (fail-safe)."});
+        return;
+    }
+
+    std::vector<const CardCollectionEntry*> pool;
+    for (const CardCollectionEntry& entry : *collection_snapshot_) {
+        if (entry.owner_actor_id != self_entry->owner_actor_id) continue;
+        if (entry.card_id == kUrandomCardId) continue;  // anti-recursao.
+        const auto it = card_registry_->find(entry.card_id);
+        if (it == card_registry_->end()) continue;
+        if (classify_urandom_faixa(it->second) == faixa) pool.push_back(&entry);
+    }
+
+    if (pool.empty()) {
+        log_.push_back(CombatLogEntry{
+            caster.id(), CombatActionType::UseCard, std::nullopt, 0,
+            "> urandom: nenhum efeito compativel na coleçao - sorteio dissipa."});
+        return;
+    }
+
+    const std::size_t idx =
+        static_cast<std::size_t>(rng_->next(static_cast<int>(pool.size())));
+    const Card& chosen_card = card_registry_->at(pool[idx]->card_id);
+
+    // Lado do alvo, 50/50 INDEPENDENTE do efeito escolhido (AMB-10, caotico - decisao do
+    // lider 2026-07-18). 0 = self, 1 = inimigo.
+    const bool target_enemy = rng_->next(2) == 1;
+    CombatActor* target = nullptr;
+    std::string side_tag;
+    if (target_enemy) {
+        for (CombatActor* a : queue_.order()) {
+            if (a->is_player_side() != caster.is_player_side() && a->is_alive()) {
+                target = a;
+                break;
+            }
+        }
+        side_tag = "o inimigo " + (target != nullptr ? target->id() : std::string("?"));
+    } else {
+        target = &caster;
+        side_tag = "o proprio caster";
+    }
+
+    if (target == nullptr) {
+        log_.push_back(CombatLogEntry{
+            caster.id(), CombatActionType::UseCard, std::nullopt, 0,
+            "> urandom: sorteou " + chosen_card.id +
+                ", mas o lado inimigo nao tem alvo vivo - sorteio dissipa."});
+        return;
+    }
+
+    log_.push_back(CombatLogEntry{
+        caster.id(), CombatActionType::UseCard, target->id(), 0,
+        "> urandom: sorteou " + chosen_card.id + " -> aplicado em " + side_tag + "."});
+
+    resolve_redirected_card_effect(caster, *target, chosen_card);
+}
+
+void CombatStateMachine::resolve_redirected_card_effect(CombatActor& caster,
+                                                         CombatActor& target,
+                                                         const Card& card) {
+    const bool friendly = (&target == &caster) || (target.is_player_side() == caster.is_player_side());
+    int dealt = 0;
+
+    if (friendly) {
+        // Fogo amigo desligado (MESMA regra geral de resolve_use_card): dano 0, sem status
+        // ofensivo - so os EffectSpec OnCast (side_filter AllyOnly) rodam, abaixo.
+        apply_damage_with_hooks(caster, target, 0, &card);
+        log_.push_back(CombatLogEntry{
+            caster.id(), CombatActionType::UseCard, target.id(), 0,
+            caster.id() + " redireciona " + card.id + " (urandom) em " + target.id() +
+                " (aliado, fogo amigo desligado): dano 0."});
+    } else {
+        float mult_fraqueza = target.is_universal_compiler()
+                                  ? 1.0f
+                                  : WeaknessWheel::multiplier(card.family, target.family());
+        if (card.ignores_weakness_wheel) mult_fraqueza = 1.0f;
+
+        float mult_expose = 1.0f;
+        {
+            const auto& effects = target.status_effects();
+            const auto it = std::find_if(effects.begin(), effects.end(), [](const StatusEffect& s) {
+                return s.id == StatusId::Expose;
+            });
+            if (it != effects.end())
+                mult_expose = 1.0f + static_cast<float>(it->magnitude) / 100.0f;
+        }
+
+        float mult_synergy = 1.0f;
+        if (!card.synergy_statuses.empty()) {
+            const auto& target_effects = target.status_effects();
+            const bool synergy_triggered = std::any_of(
+                card.synergy_statuses.begin(), card.synergy_statuses.end(),
+                [&target_effects](StatusId synergy_id) {
+                    return std::any_of(target_effects.begin(), target_effects.end(),
+                                       [synergy_id](const StatusEffect& s) {
+                                           return s.id == synergy_id;
+                                       });
+                });
+            if (synergy_triggered)
+                mult_synergy = 1.0f + static_cast<float>(card.synergy_percent) / 100.0f;
+        }
+
+        // Disrupt do caster (secao 9 L251): MESMO consumo de resolve_use_card - a proxima
+        // acao ofensiva do caster, que aqui e o redirecionamento em si.
+        float mult_disrupt = 1.0f;
+        {
+            const auto& effects = caster.status_effects();
+            const auto it = std::find_if(effects.begin(), effects.end(), [](const StatusEffect& s) {
+                return s.id == StatusId::Disrupt;
+            });
+            if (it != effects.end()) {
+                mult_disrupt = std::max(0.0f, 1.0f - static_cast<float>(it->magnitude) / 100.0f);
+                caster.remove_status(StatusId::Disrupt);
+            }
+        }
+
+        const float mult_ambiente = mult_ambiente_for(card.family);
+
+        const float base_damage =
+            static_cast<float>(card.power + caster.atk()) *
+            (100.0f / (100.0f + static_cast<float>(target.def()))) * mult_fraqueza *
+            mult_expose * mult_synergy * mult_disrupt * mult_ambiente;
+
+        if (mult_fraqueza == 0.0f) {
+            apply_damage_with_hooks(caster, target, 0, &card);
+            if (card.status_applied.has_value())
+                apply_offensive_status(caster, target, *card.status_applied);
+            log_.push_back(CombatLogEntry{
+                caster.id(), CombatActionType::UseCard, target.id(), 0,
+                caster.id() + " redireciona " + card.id + " (urandom) em " + target.id() +
+                    " por 0."});
+        } else {
+            const int kills = target.knowledge_kills();
+            const float v = std::max(0.05f, 0.30f * std::exp(-static_cast<float>(kills) * 0.10f));
+            const int fumble_chance = std::max(
+                0, static_cast<int>(
+                       std::lround(5.0 * std::exp(-static_cast<double>(kills) * 0.50))));
+            const int crit_chance = std::max(5, card.crit_chance);
+
+            const int roll = rng_->next(100);
+            int damage = 0;
+            std::string channel_suffix;
+            if (roll < fumble_chance) {
+                damage = 0;
+                channel_suffix = " FALHA DE COMPILACAO";
+            } else if (roll < fumble_chance + crit_chance) {
+                damage = static_cast<int>(std::lround(crit_channel_damage(base_damage, v)));
+                channel_suffix = " [CRITICO]";
+            } else {
+                const double r = rng_->next_double();
+                damage = static_cast<int>(std::lround(comum_channel_damage(base_damage, v, r)));
+            }
+
+            apply_damage_with_hooks(caster, target, damage, &card);
+            dealt = damage;
+
+            if (card.status_applied.has_value())
+                apply_offensive_status(caster, target, *card.status_applied);
+
+            log_.push_back(CombatLogEntry{
+                caster.id(), CombatActionType::UseCard, target.id(), damage,
+                caster.id() + " redireciona " + card.id + " (urandom) em " + target.id() +
+                    " por " + std::to_string(damage) + "." + channel_suffix});
+        }
+    }
+
+    // techMagic OnCast (jackpot, ESPECIAL/SUPER sorteada): MESMO dispatcher de resolve_
+    // use_card, single-target (a carta redirecionada nunca forma Grupo/Area no redirect,
+    // ver doc-comment do header).
+    if (!card.effects.empty()) {
+        techMagic::TechMagicContext ctx{&caster, &target, dealt, &log_};
+        ctx.last_action = &last_action_;
+        ctx.rng = rng_;
+        ctx.combatants = &queue_.order();
+        ctx.queue = &queue_;
+        ctx.brain_registry = brain_registry_;
+        techMagic::execute(TriggerHook::OnCast, card, ctx);
     }
 }
 

@@ -259,6 +259,11 @@ add_executable(gusengine_domain_tests
     # nao-diagnosticado, AMB-T1 RESOLVIDA - queima = SUCATA) + mapeamento puro
     # outcome->chave i18n. docs/design/mecanicas/cartas-spec-logica.md secao 6.
     turing_service_test.cpp
+    # CARDS-HW-2 fatia B (CARDS-HW-2B, TODO.md): carta `urandom` (carta-caos do Gus) -
+    # redireciona pra um efeito JA EXISTENTE no catalogo (record-base OU techMagic::execute
+    # conforme o tier da carta sorteada), sorteado por peso (original x pirata, backfire
+    # 1/3 exato na pirata). docs/design/mecanicas/cartas-spec-logica.md secao 7.
+    urandom_test.cpp
 )
 
 # Os testes do combate incluem helpers de teste headers-only (fixed_random.hpp).

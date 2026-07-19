@@ -82,14 +82,14 @@ CombatActor make_actor(const std::string& id, bool player_side, int hp = 100, in
 
 // ===== 1. As 19 cartas existem, ids unicos =====
 
-TEST_CASE("master_cards: build_registry tem exatamente as 19 cartas suportadas",
+TEST_CASE("master_cards: build_registry tem exatamente as 20 cartas suportadas",
           "[domain][combat][cards][techmagic][mastercards]") {
     const auto reg = MasterCards::build_registry();
-    REQUIRE(reg.size() == 19);
+    REQUIRE(reg.size() == 20);
     for (const char* id : {"volta", "newton", "pythagoras", "mandelbrot", "ada", "godel",
                            "faraday", "euler", "turing", "menger", "tesla", "einstein",
                            "planck", "dee", "maxwell", "hayek", "mises", "vonneumann",
-                           "bruno"})
+                           "bruno", "urandom"})
         REQUIRE(reg.count(id) == 1);
 }
 
@@ -807,7 +807,22 @@ TEST_CASE("master_cards: bruno (CloneAlly em OnCast) executa via techMagic::exec
     REQUIRE(has_eco);
 }
 
-// ===== 4. Paridade i18n das 19 chaves (2 locales) =====
+// ===== urandom (CARDS-HW-2B): a carta-caos do Gus =====
+
+TEST_CASE("master_cards: urandom = Ativa/Universal/mana 0/Self, effects VAZIO (o efeito "
+         "inteiro roda fora do dispatcher techMagic, branch dedicado de resolve_use_card)",
+         "[domain][combat][cards][techmagic][mastercards][urandom]") {
+    const auto reg = MasterCards::build_registry();
+    const Card& c = reg.at("urandom");
+    REQUIRE(c.category == CardCategory::Ativa);
+    REQUIRE(c.family == CardFamily::Universal);
+    REQUIRE(c.tier == CardTier::Especial);
+    REQUIRE(c.target_shape == TargetShape::Self);
+    REQUIRE(c.ignores_weakness_wheel == false);
+    REQUIRE(c.effects.empty());
+}
+
+// ===== 4. Paridade i18n das 20 chaves (2 locales) =====
 
 namespace {
 
@@ -839,7 +854,7 @@ bool has_key(const std::vector<std::string>& keys, const std::string& key) {
 #define GUSWORLD_TRANSLATIONS_DIR "../../../../game/translations"
 #endif
 
-TEST_CASE("master_cards: as 19 chaves CARD_EXEC_<FIGURA>_NAME existem em pt_br.md e "
+TEST_CASE("master_cards: as 20 chaves CARD_EXEC_<FIGURA>_NAME existem em pt_br.md e "
          "en_intl.md",
          "[domain][combat][cards][techmagic][mastercards][i18n]") {
     const std::vector<std::string> pt =
@@ -852,7 +867,7 @@ TEST_CASE("master_cards: as 19 chaves CARD_EXEC_<FIGURA>_NAME existem em pt_br.m
     for (const char* figura : {"VOLTA", "NEWTON", "PYTHAGORAS", "MANDELBROT", "ADA",
                                "GODEL", "FARADAY", "EULER", "TURING", "MENGER", "TESLA",
                                "EINSTEIN", "PLANCK", "DEE", "MAXWELL", "HAYEK", "MISES",
-                               "VONNEUMANN", "BRUNO"}) {
+                               "VONNEUMANN", "BRUNO", "URANDOM"}) {
         const std::string key = std::string("CARD_EXEC_") + figura + "_NAME";
         INFO("chave: " << key);
         REQUIRE(has_key(pt, key));

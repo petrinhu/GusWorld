@@ -490,10 +490,30 @@ std::unordered_map<std::string, Card> assemble() {
                        .stack_rule = StackRule::Refresh,
                        .side_filter = SideFilter::AllyOnly}},
             /*ignores_weakness_wheel=*/false, /*power=*/0, /*target_shape=*/TargetShape::Self),
+
+        // --- urandom (a carta-caos do Gus): Ativa, Universal, mana 0, TargetShape::Self
+        // (CARDS-HW-2B, ideia + numero do backfire 1/3 exato do Gus Dragon, playtester).
+        // effects VAZIO: o efeito inteiro (sorteio de faixa por peso + redirecionamento pra
+        // uma carta JA EXISTENTE, record-base OU techMagic::execute conforme o tier
+        // sorteado) roda FORA do dispatcher techMagic - branch dedicado de resolve_use_card
+        // (CombatStateMachine::resolve_urandom, combat_state_machine.cpp), mesmo racional
+        // "marcador fora do dispatcher" de Planck/Hayek/Mises acima, mas aqui NEM UM
+        // EffectSpec e necessario (o "programa" da carta e so as duas tabelas de peso, dados
+        // globais em gus/domain/combat/urandom_algorithm.hpp, nao parametros por-carta).
+        // TargetShape::Self porque o alvo REAL (self ou inimigo, 50/50 caotico) e sorteado
+        // dentro de resolve_urandom, nao pelo pipeline normal de UseCard. Duas versoes por
+        // CardOrigin da INSTANCIA jogada (pirata x original, cartas-numeros-proposta.md
+        // secao 4) - mesmo Card de catalogo pras duas, a tabela de peso e escolhida em
+        // runtime pelo collection_snapshot (nao ha 2 entradas de catalogo). Mana 0
+        // (aquisicao/preco = fatia futura, fora do escopo desta fatia). ---
+        make_special("urandom", "CARD_EXEC_URANDOM_NAME", CardFamily::Universal,
+                     CardCategory::Ativa, /*mana_cost=*/0, /*effects=*/{},
+                     /*ignores_weakness_wheel=*/false, /*power=*/0,
+                     /*target_shape=*/TargetShape::Self),
     };
 
     std::unordered_map<std::string, Card> registry;
-    registry.reserve(19);
+    registry.reserve(20);
     for (const auto& card : cards) {
         // emplace (nao indexer) falha-cedo se algum id duplicar (mesmo padrao do placeholder).
         const auto [it, inserted] = registry.emplace(card.id, card);

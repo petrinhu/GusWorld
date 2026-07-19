@@ -47,6 +47,11 @@ add_library(gusengine_domain STATIC
     # Executor techMagic (ADR-016, MVP step 2): dispatcher OnCast/OnDamageDealt/
     # OnDamageReceived/Always sobre EffectSpec de Card (ApplyStatus/Leech/Reflect).
     src/combat/techmagic.cpp
+    # CARDS-HW-2 fatia B (CARDS-HW-2B, TODO.md): motor PURO da carta `urandom` (a carta-
+    # caos do Gus) - sorteio de faixa por peso (original x pirata) + classificacao da
+    # coleçao do caster. Fora do dispatcher techMagic (trigger = branch por card_id em
+    # resolve_use_card, ver combat_state_machine.cpp).
+    src/combat/urandom_algorithm.cpp
     # ADR-017 (pedido do Gus + velocidade-por-carta): ActionClock ISOLADO, prova de
     # conceito do escalonador por ticks estilo Pokemon Legends: Arceus. NAO ligado a
     # CombatStateMachine/InitiativeQueue de producao (cutover e onda pos-M7).

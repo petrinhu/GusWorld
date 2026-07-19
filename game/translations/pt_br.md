@@ -747,6 +747,9 @@ Fork
 ## CARD_EXEC_BRUNO_NAME
 Echo-Self
 
+## CARD_EXEC_URANDOM_NAME
+urandom
+
 ---
 
 ## §9. Menu de sistema (pausa + config de som, MENU-PAUSA-CONFIG-SOM)

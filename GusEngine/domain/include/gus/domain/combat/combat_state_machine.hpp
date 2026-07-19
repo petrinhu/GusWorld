@@ -49,6 +49,7 @@
 #include <unordered_set>
 #include <vector>
 
+#include "gus/domain/combat/card_collection_snapshot.hpp"
 #include "gus/domain/combat/card_integrity_ledger.hpp"
 #include "gus/domain/combat/combat_enums.hpp"
 #include "gus/domain/combat/combat_records.hpp"
@@ -58,6 +59,7 @@
 #include "gus/domain/combat/initiative_queue.hpp"
 #include "gus/domain/combat/random_source.hpp"
 #include "gus/domain/combat/techmagic.hpp"
+#include "gus/domain/combat/urandom_algorithm.hpp"
 #include "gus/domain/infection/integrity_state.hpp"
 
 namespace gus::domain::combat {
@@ -148,13 +150,20 @@ public:
     //                     card_instance_id preenchido) - preserva TODO call site/teste
     //                     pre-existente intacto (mesmo padrao aditivo de card_registry/
     //                     brain_registry/rng acima).
+    //   collection_snapshot: snapshot READ-ONLY da coleçao de CADA participante (CARDS-HW-2
+    //                     fatia B, carta `urandom`, card_collection_snapshot.hpp). nullptr =>
+    //                     urandom dissipa sempre (fail-safe logado, sem lookup) - mesmo
+    //                     padrao aditivo de integrity_ledger acima. So consultado pelo branch
+    //                     dedicado de resolve_use_card (resolve_urandom); NENHUM outro
+    //                     caminho do motor toca este ponteiro.
     CombatStateMachine(
         std::vector<CombatActor*> actors,
         CombatActionProvider action_provider,
         const std::unordered_map<std::string, Card>* card_registry = nullptr,
         const std::unordered_map<std::string, IEnemyBrain*>* brain_registry = nullptr,
         IRandomSource* rng = nullptr,
-        const std::vector<CardIntegrityRef>* integrity_ledger = nullptr);
+        const std::vector<CardIntegrityRef>* integrity_ledger = nullptr,
+        const std::vector<CardCollectionEntry>* collection_snapshot = nullptr);
 
     // ---- Estado observavel ----
 
@@ -422,6 +431,45 @@ private:
     void dispatch_virus_payload_post_cast(CombatActor& actor, const Card& card,
                                           const std::optional<std::uint64_t>& instance_id);
 
+    // ---- urandom (CARDS-HW-2 fatia B; docs/design/mecanicas/cartas-spec-logica.md secao
+    // 7, cartas-numeros-proposta.md secao 4) ----
+
+    // Lookup no collection_snapshot_ por instance_id. nullptr se o snapshot e nulo OU a
+    // instancia nao tem entrada (mesmo fail-safe do integrity ledger).
+    [[nodiscard]] const CardCollectionEntry* find_collection_entry(
+        std::uint64_t instance_id) const;
+
+    // Sorteia e REDIRECIONA pra um efeito de carta JA EXISTENTE (secao 7.1). Chamado pelo
+    // branch dedicado de resolve_use_card quando `card.id == kUrandomCardId` - substitui
+    // inteiramente a "RESOLUCAO NORMAL DO EFEITO" pra esta carta (NAO re-cobra mana/AP/
+    // gates, ja pagos por resolve_use_card antes do branch). Fail-safe (dissipa, log, 1
+    // draw) se collection_snapshot_ e nulo, `action.card_instance_id` ausente, ou a
+    // instancia nao esta no snapshot. Backfire (SO pirata, 2 draws): status ruim leve
+    // sorteado do pool, SEMPRE no proprio `caster`. Pool vazio (AMB-09): dissipa (1 draw,
+    // nada acontece, recursos gastos ficam gastos). Redirecionamento (3 draws): sorteia
+    // 1 carta possuida da faixa (excluindo a propria urandom, anti-recursao) + 1 lado
+    // (self/inimigo, 50/50 INDEPENDENTE do efeito, AMB-10 caotico) e chama
+    // resolve_redirected_card_effect.
+    void resolve_urandom(CombatActor& caster, const CombatAction& action, const Card& card);
+
+    // Reexecuta o resolvedor de UMA carta (`card`) contra UM alvo (`target`), FORA do
+    // pipeline normal de UseCard (sem gates/custo/combo - ja pagos pela urandom que
+    // redirecionou pra ca). TWIN do corpo por-alvo de resolve_use_card (mesmo padrao dos
+    // pares preview<->real ja existentes no motor, ex. preview_basic_attack_damage/
+    // estimate_card_damage): fogo amigo desligado, roda de fraqueza, Expose/SynergyStatus,
+    // Disrupt do caster, mult_ambiente, os 3 canais (FALHA/CRIT/COMUM via os MESMOS helpers
+    // comum_channel_damage/crit_channel_damage), status_applied, e techMagic::execute(
+    // OnCast) se `card.effects` nao for vazio (ESPECIAL/SUPER sorteada). Simplificacoes
+    // DELIBERADAS desta fatia (redirect e single-target, sempre): NAO consulta hayek/mises
+    // (bonus de lado/tag - neutros em qualquer cenario sem essas passivas ativas), NAO
+    // forma combo (mult_combo=1.0, redirect nao passa pelo pipeline de slots), NAO respeita
+    // TargetShape do `card` sorteado (Grupo/Area/Linha viram single no alvo ja escolhido
+    // por resolve_urandom), NAO atualiza last_action_/round_actions_ (RepeatLastAction/
+    // Hayek nao ecoam o redirecionamento). apply_damage_with_hooks/apply_offensive_status
+    // SAO reusados (Leech/Reflect/round_hits_ disparam normalmente).
+    void resolve_redirected_card_effect(CombatActor& caster, CombatActor& target,
+                                        const Card& card);
+
     // Aplica um status OFENSIVO (card.status_applied OU combo->result_status) via
     // CombatActor::try_add_status e loga o resultado REAL (ADR-016 Balde B, Faraday/
     // EM-Shield): choke point unico dos 4 sitios de status ofensivo de resolve_use_card
@@ -520,6 +568,10 @@ private:
     // Ponte instancia->combate (CARDS-HW-2 fatia 1, VIRUS EM COMBATE). nullptr = motor sem
     // vírus (comportamento identico ao pre-existente). Ponteiro NAO-DONO.
     const std::vector<CardIntegrityRef>* integrity_ledger_;
+
+    // Snapshot da coleçao de CADA participante (CARDS-HW-2 fatia B, carta `urandom`).
+    // nullptr = urandom sempre dissipa (fail-safe). Ponteiro NAO-DONO.
+    const std::vector<CardCollectionEntry>* collection_snapshot_;
 
     InitiativeQueue queue_;
     CombatPhase phase_ = CombatPhase::SetupPhase;
