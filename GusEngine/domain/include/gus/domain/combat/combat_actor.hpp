@@ -233,6 +233,18 @@ public:
     [[nodiscard]] bool overclock_used() const noexcept { return overclock_used_; }
     void set_overclock_used(bool value) noexcept { overclock_used_ = value; }
 
+    // ---- MemoryJammed (CARDS-HW-2 fatia 1, VIRUS EM COMBATE, payload ZipBomb pos-cast;
+    // docs/design/mecanicas/cartas-spec-logica.md secao 4.1.3) ----
+
+    // true = este ator esta com a memoria sobrecarregada (zip-bomb disparou): bloqueia jogar
+    // QUALQUER outra carta pelo RESTO DO TURNO (nao bloqueia ataque basico/defender/fugir -
+    // mais amplo que Silence, que so bloqueia carta-com-efeito). A FSM le/marca em
+    // resolve_use_card; resetada por refresh_resources_for_turn (MESMO padrao de trava
+    // 1x/turno de overclock_used_ acima - "resto do turno" = ate o proximo TurnStart proprio
+    // deste ator, ja que ele nao age de novo antes disso).
+    [[nodiscard]] bool memory_jammed() const noexcept { return memory_jammed_; }
+    void set_memory_jammed(bool value) noexcept { memory_jammed_ = value; }
+
 private:
     // Drena o pool de Shield contra amount e devolve o dano remanescente pro HP.
     int absorb_with_shield(int amount);
@@ -286,6 +298,9 @@ private:
     // Trava 1x/turno do Overclock (CARTAS-COMUNS-ENGINE). Default false; ver
     // overclock_used()/set_overclock_used() acima.
     bool overclock_used_ = false;
+    // MemoryJammed (CARDS-HW-2 fatia 1, virus ZipBomb). Default false; ver
+    // memory_jammed()/set_memory_jammed() acima.
+    bool memory_jammed_ = false;
 };
 
 }  // namespace gus::domain::combat

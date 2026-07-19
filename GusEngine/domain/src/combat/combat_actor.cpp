@@ -194,6 +194,9 @@ void CombatActor::refresh_resources_for_turn(int round_index) {
     // Overclock (CARTAS-COMUNS-ENGINE): trava 1x/turno reseta no MESMO TurnStart que zera
     // AP/mana (secao 5) - o Tavus-Overclock volta a funcionar todo turno novo.
     overclock_used_ = false;
+    // MemoryJammed (CARDS-HW-2 fatia 1, virus ZipBomb): "resto do turno" = ate o proximo
+    // TurnStart PROPRIO deste ator, MESMO racional/sitio do overclock_used_ acima.
+    memory_jammed_ = false;
 }
 
 void CombatActor::spend_ap(int cost) {

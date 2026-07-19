@@ -38,6 +38,7 @@
 #ifndef GUS_DOMAIN_COMBAT_COMBAT_RECORDS_HPP
 #define GUS_DOMAIN_COMBAT_COMBAT_RECORDS_HPP
 
+#include <cstdint>
 #include <optional>
 #include <string>
 #include <vector>
@@ -95,6 +96,16 @@ struct CombatAction {
     std::optional<std::string> card_id;
     std::optional<CardModifier> modifier;
     int reorder_delta = 0;
+
+    // Ponte instancia->combate (CARDS-HW-2 fatia 1, VIRUS EM COMBATE; docs/design/mecanicas/
+    // cartas-spec-logica.md secao 1/4): qual CardInstance (deck-mao-sistema.md secao 7) foi
+    // jogada, pro motor de combate consultar o integrity_ledger (card_integrity_ledger.hpp) e
+    // decidir se a carta esta infectada. Campo ADITIVO ao fim do struct: default nullopt
+    // preserva TODO call site/teste existente intacto (mesmo padrao de EffectSpec::
+    // side_filter). O preview/estimate (estimate_card_damage) NUNCA le isto (nao sorteia, nao
+    // infecta - preserva o gemeo preview<->real). nullopt = comportamento IDENTICO ao motor
+    // sem vírus (nenhum lookup no ledger acontece, ver CombatStateMachine::resolve_use_card).
+    std::optional<std::uint64_t> card_instance_id;
 
     [[nodiscard]] bool operator==(const CombatAction&) const = default;
 

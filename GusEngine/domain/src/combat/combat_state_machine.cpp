@@ -158,6 +158,48 @@ NeutralRandom& neutral_random() {
     return nullptr;
 }
 
+// ---------------------------------------------------------------------------
+// Virus em combate (CARDS-HW-2 fatia 1; docs/design/mecanicas/cartas-spec-logica.md
+// secao 1/4/5.2)
+// ---------------------------------------------------------------------------
+
+// LogicBomb - pool de condicoes deterministico (secao 4.1.1; decisao do lider: SEM campo
+// novo/save, a condicao E DERIVADA de instance_id % 3, reavaliada a CADA cast da carta
+// infectada - nunca "sorteada e fixada" na aquisicao, que e responsabilidade de um servico
+// que ainda nao existe).
+[[nodiscard]] bool logic_bomb_hp_below_30pct(const CombatActor& caster) {
+    return caster.hp() * 100 < caster.max_hp() * 30;
+}
+
+[[nodiscard]] bool logic_bomb_boss_or_miniboss_encounter(const InitiativeQueue& queue) {
+    for (const CombatActor* a : queue.order())
+        if (a->is_boss()) return true;
+    return false;
+}
+
+[[nodiscard]] bool logic_bomb_round_index_at_least_5(const InitiativeQueue& queue) {
+    return queue.round_index() >= 5;
+}
+
+[[nodiscard]] bool logic_bomb_condition_satisfied(std::uint64_t instance_id,
+                                                  const CombatActor& caster,
+                                                  const InitiativeQueue& queue) {
+    switch (instance_id % 3) {
+        case 0: return logic_bomb_hp_below_30pct(caster);
+        case 1: return logic_bomb_boss_or_miniboss_encounter(queue);
+        default: return logic_bomb_round_index_at_least_5(queue);
+    }
+}
+
+// Worm - Slow "resto do combate" (secao 4.1, PERMANENT_WHILE_INFECTED no doc-fonte): sem
+// campo de "duracao infinita" no motor de status (duration decrementa 1/tick, secao 9);
+// 999 e sentinela grande o bastante pra nunca expirar num combate real (nenhum encontro
+// chega perto de 999 rodadas) - StackRule::Refresh (idempotente) reseta pra 999 de novo a
+// cada cast, entao mesmo a longuissimo prazo o status nunca teria chance de tiquetaquear
+// ate 0 enquanto a carta continuar infectada e sendo jogada.
+constexpr int kWormSlowMagnitude = 2;                // //PLAYTEST (cartas-numeros SLOW_WORM, nao fechado)
+constexpr int kWormSlowDurationRestOfCombat = 999;   // sentinela "permanente enquanto infectada"
+
 // Dano do canal COMUM (secao 11): rolled = base * (1 + (v*2*r - v)), r em [0,1). Extraido
 // pra ser COMPARTILHADO entre resolve_use_card (r = rng_->next_double() real) e
 // estimate_card_damage (r = 0.0/1.0, faixa PURA sem RNG algum) - garante que o preview seja
@@ -476,11 +518,13 @@ CombatStateMachine::CombatStateMachine(
     CombatActionProvider action_provider,
     const std::unordered_map<std::string, Card>* card_registry,
     const std::unordered_map<std::string, IEnemyBrain*>* brain_registry,
-    IRandomSource* rng)
+    IRandomSource* rng,
+    const std::vector<CardIntegrityRef>* integrity_ledger)
     : action_provider_(std::move(action_provider)),
       card_registry_(card_registry),
       brain_registry_(brain_registry),
       rng_(rng != nullptr ? rng : &neutral_random()),
+      integrity_ledger_(integrity_ledger),
       // A fila valida vazio com std::invalid_argument (espelha o ArgumentException do C#
       // "Combate precisa de ao menos 1 ator."). Construida ja ordenada por SPD.
       queue_(std::move(actors)) {
@@ -1487,6 +1531,16 @@ void CombatStateMachine::resolve_use_card(CombatActor& actor, const CombatAction
                 "' esta silenciado (so ataque basico/defender/flee).");
     }
 
+    // MemoryJammed (CARDS-HW-2 fatia 1, virus ZipBomb pos-cast, secao 4.1.3): bloqueia
+    // QUALQUER OUTRA carta pelo resto do turno (mais amplo que Silence). Mesmo padrao de
+    // exception-sem-log-extra do gate de Silence acima (o log do TRIGGER ja aconteceu em
+    // trigger_zip_bomb_payload, quando o flag foi setado).
+    if (actor.memory_jammed())
+        throw std::logic_error(
+            "ERRO DE COMPILACAO: '" + actor.id() +
+            "' esta com a memoria sobrecarregada (zip-bomb) - nenhuma carta ate o fim do "
+            "turno.");
+
     const auto& registry = state.card_registry();
     const auto card_it = registry.find(*action.card_id);
     if (card_it == registry.end())
@@ -1545,6 +1599,16 @@ void CombatStateMachine::resolve_use_card(CombatActor& actor, const CombatAction
         }
     }
     actor.spend_mana(card.mana_cost + mana_extra);
+
+    // Virus em combate, payload PRE-CAST (CARDS-HW-2 fatia 1; docs/design/mecanicas/cartas-
+    // spec-logica.md secao 1/4): roda logo APOS o debito de recursos (AP em resolve_action +
+    // mana acima) - a carta "cobra" normalmente antes de eventualmente explodir na mao. So
+    // LogicBomb intercepta aqui; Worm/ZipBomb sao pos-cast (fim desta funcao). Ledger nulo OU
+    // card_instance_id ausente OU instancia sem entrada/limpa no ledger => comportamento
+    // IDENTICO ao motor sem vírus (nenhuma mudanca de pipeline, ver dispatch_virus_payload_
+    // pre_cast).
+    if (dispatch_virus_payload_pre_cast(actor, card, action.card_instance_id))
+        return;  // efeito nominal INTEIRO substituido pelo backfire; nada mais roda.
 
     // Recarga de recurso (CARTAS-COMUNS-ENGINE, Eletrico-utilidade "Tavus-Overclock",
     // 2026-07-16): DEPOIS do custo pago acima (anti-exploit de mana insuficiente - o custo
@@ -1864,6 +1928,212 @@ void CombatStateMachine::resolve_use_card(CombatActor& actor, const CombatAction
     if (!hits.empty())
         last_action_ = techMagic::LastActionRecord{&actor, CombatActionType::UseCard, card.id,
                                                     std::move(hits)};
+
+    // Virus em combate, payloads POS-CAST (CARDS-HW-2 fatia 1): Worm/ZipBomb agem DEPOIS da
+    // resolucao normal do efeito (secao 1 do doc-fonte, fluxo "RESOLUCAO NORMAL DO EFEITO" ->
+    // "VIRUS POST-CAST"). MESMO guard de ausencia do dispatcher pre-cast acima (ledger nulo/
+    // instance_id ausente/instancia limpa = no-op, ver dispatch_virus_payload_post_cast).
+    dispatch_virus_payload_post_cast(actor, card, action.card_instance_id);
+}
+
+// ---------------------------------------------------------------------------
+// Virus em combate (CARDS-HW-2 fatia 1; docs/design/mecanicas/cartas-spec-logica.md
+// secao 1/4/5.2)
+// ---------------------------------------------------------------------------
+
+const CardIntegrityRef* CombatStateMachine::find_ledger_entry(std::uint64_t instance_id) const {
+    if (integrity_ledger_ == nullptr) return nullptr;
+    for (const CardIntegrityRef& ref : *integrity_ledger_)
+        if (ref.instance_id == instance_id) return &ref;
+    return nullptr;
+}
+
+const CardIntegrityRef* CombatStateMachine::find_worm_propagation_candidate(
+    std::uint64_t source_instance_id, int source_owner_actor_id, bool same_owner) const {
+    if (integrity_ledger_ == nullptr) return nullptr;
+    for (const CardIntegrityRef& ref : *integrity_ledger_) {
+        if (ref.instance_id == source_instance_id) continue;  // nunca a propria fonte.
+        const bool is_same_owner = ref.owner_actor_id == source_owner_actor_id;
+        if (is_same_owner == same_owner) return &ref;
+    }
+    return nullptr;
+}
+
+bool CombatStateMachine::try_trigger_logic_bomb(CombatActor& caster, const Card& card,
+                                                std::uint64_t instance_id) {
+    if (!logic_bomb_condition_satisfied(instance_id, caster, queue_))
+        return false;
+
+    // Inversao (secao 4.1.1 AMB-04, decisao do lider): o efeito NOMINAL da carta vira contra
+    // o proprio caster, reusando o MESMO canal de dano/status de qualquer outra carta
+    // (apply_damage_with_hooks/apply_offensive_status) - nao ha formula paralela.
+    const int backfire_damage = std::max(0, card.power);
+    apply_damage_with_hooks(caster, caster, backfire_damage, &card);
+    if (card.status_applied.has_value())
+        apply_offensive_status(caster, caster, *card.status_applied);
+
+    log_.push_back(CombatLogEntry{
+        caster.id(), CombatActionType::UseCard, caster.id(), backfire_damage,
+        "ALERTA: " + caster.id() + " compila " + card.id +
+            " - payload logic-bomb disparado, efeito revertido contra o proprio "
+            "compilador por " + std::to_string(backfire_damage) + "."});
+    return true;
+}
+
+bool CombatStateMachine::dispatch_virus_payload_pre_cast(
+    CombatActor& actor, const Card& card, const std::optional<std::uint64_t>& instance_id) {
+    if (!instance_id.has_value()) return false;
+    const CardIntegrityRef* ref = find_ledger_entry(*instance_id);
+    if (ref == nullptr || ref->state == nullptr || !ref->state->is_infected) return false;
+
+    switch (ref->state->virus_kind) {
+        case infection::VirusKind::LogicBomb:
+            return try_trigger_logic_bomb(actor, card, *instance_id);
+        case infection::VirusKind::None:
+        case infection::VirusKind::Backdoor:
+        case infection::VirusKind::Worm:
+        case infection::VirusKind::FalseBenign:
+        case infection::VirusKind::AdwareSterling:
+        case infection::VirusKind::ZipBomb:
+        case infection::VirusKind::IndustrialWeapon:
+            // Worm/ZipBomb sao POS-cast (dispatch_virus_payload_post_cast, abaixo); os
+            // demais sao fatia futura (Backdoor/Adware/FalseBenign bloqueados por design ou
+            // adiados, IndustrialWeapon e o gatilho narrativo scriptado do Dante/Sterling).
+            return false;
+    }
+    return false;  // unreachable (switch exaustivo acima); satisfaz -Wreturn-type sem 'default'.
+}
+
+void CombatStateMachine::infect_with_worm(CombatActor& source_owner,
+                                          const CardIntegrityRef& target,
+                                          const std::string& success_flavor) {
+    if (card_registry_ == nullptr) {
+        log_.push_back(CombatLogEntry{
+            source_owner.id(), CombatActionType::UseCard, std::nullopt, 0,
+            source_owner.id() + ": worm tenta infectar '" + target.card_id +
+                "', mas o registry de combate esta ausente - infeccao recusada "
+                "(fail-safe)."});
+        return;
+    }
+    const auto it = card_registry_->find(target.card_id);
+    if (it == card_registry_->end()) {
+        log_.push_back(CombatLogEntry{
+            source_owner.id(), CombatActionType::UseCard, std::nullopt, 0,
+            source_owner.id() + ": worm tenta infectar '" + target.card_id +
+                "', mas ela nao esta no registry do encontro - infeccao recusada "
+                "(fail-safe)."});
+        return;
+    }
+    if (it->second.tier != CardTier::Comum) {
+        log_.push_back(CombatLogEntry{
+            source_owner.id(), CombatActionType::UseCard, std::nullopt, 0,
+            source_owner.id() + ": worm tenta infectar '" + target.card_id +
+                "', mas e ESPECIAL/SUPER - protegida contra infeccao (guard de classe "
+                "protegida, secao 5.2)."});
+        return;
+    }
+    if (target.state == nullptr) {
+        log_.push_back(CombatLogEntry{
+            source_owner.id(), CombatActionType::UseCard, std::nullopt, 0,
+            source_owner.id() + ": worm tenta infectar '" + target.card_id +
+                "', mas a instancia nao tem estado de integridade - infeccao recusada "
+                "(fail-safe)."});
+        return;
+    }
+
+    target.state->is_infected = true;
+    target.state->virus_kind = infection::VirusKind::Worm;
+    log_.push_back(CombatLogEntry{source_owner.id(), CombatActionType::UseCard, std::nullopt, 0,
+                                  source_owner.id() + ": " + success_flavor});
+}
+
+void CombatStateMachine::trigger_worm_payload(CombatActor& owner,
+                                              std::uint64_t source_instance_id) {
+    // (a) SEMPRE aplica Slow no dono, idempotente (secao 4.1: "mesmo se ROM/original"),
+    // reusando o choke point de status ofensivo.
+    apply_offensive_status(
+        owner, owner,
+        StatusEffect{StatusId::Slow, kWormSlowMagnitude, kWormSlowDurationRestOfCombat,
+                    StackRule::Refresh, CardFamily::Universal});
+    log_.push_back(CombatLogEntry{
+        owner.id(), CombatActionType::UseCard, owner.id(), 0,
+        owner.id() + ": arrasta a execucao - desempenho degradado (worm ativo)."});
+
+    // (b) rola 13% de propagacao (secao 5.2).
+    const int chance_roll = rng_->next(100);
+    if (chance_roll >= static_cast<int>(infection::kWormPropagationChancePercent)) return;
+
+    const CardIntegrityRef* source = find_ledger_entry(source_instance_id);
+    const int source_owner = source != nullptr ? source->owner_actor_id : 0;
+
+    const int direction_roll = rng_->next(3);  // 0=EnemyDeck, 1=OwnDeck, 2=WorldEcosystem.
+    if (direction_roll == 0) {
+        const CardIntegrityRef* target =
+            find_worm_propagation_candidate(source_instance_id, source_owner,
+                                            /*same_owner=*/false);
+        if (target != nullptr) {
+            infect_with_worm(owner, *target, "o virus salta pro sistema inimigo!");
+        } else {
+            log_.push_back(CombatLogEntry{
+                owner.id(), CombatActionType::UseCard, std::nullopt, 0,
+                owner.id() +
+                    ": worm tenta saltar pro sistema inimigo, mas nao ha alvo elegivel "
+                    "no ledger (fail-safe)."});
+        }
+    } else if (direction_roll == 1) {
+        const CardIntegrityRef* target =
+            find_worm_propagation_candidate(source_instance_id, source_owner,
+                                            /*same_owner=*/true);
+        if (target != nullptr) {
+            infect_with_worm(owner, *target, "o virus se espalha por outra carta do proprio deck.");
+        } else {
+            log_.push_back(CombatLogEntry{
+                owner.id(), CombatActionType::UseCard, std::nullopt, 0,
+                owner.id() +
+                    ": worm tenta se espalhar no proprio deck, mas nao ha outra carta "
+                    "elegivel no ledger (fail-safe)."});
+        }
+    } else {
+        world_events_.push_back(
+            WorldEventEntry{WorldEventKind::WormEcosystemLeak, source_instance_id});
+        log_.push_back(CombatLogEntry{
+            owner.id(), CombatActionType::UseCard, std::nullopt, 0,
+            owner.id() +
+                ": o virus escapa pra rede - em algum lugar, um vendedor nao vai notar."});
+    }
+}
+
+void CombatStateMachine::trigger_zip_bomb_payload(CombatActor& actor, const Card& card) {
+    actor.set_memory_jammed(true);
+    log_.push_back(CombatLogEntry{
+        actor.id(), CombatActionType::UseCard, actor.id(), 0,
+        actor.id() + " tavus-executa " + card.id +
+            ": zip-bomb - memoria sobrecarregada (nenhuma carta ate o fim do turno)."});
+}
+
+void CombatStateMachine::dispatch_virus_payload_post_cast(
+    CombatActor& actor, const Card& card, const std::optional<std::uint64_t>& instance_id) {
+    if (!instance_id.has_value()) return;
+    const CardIntegrityRef* ref = find_ledger_entry(*instance_id);
+    if (ref == nullptr || ref->state == nullptr || !ref->state->is_infected) return;
+
+    switch (ref->state->virus_kind) {
+        case infection::VirusKind::Worm:
+            trigger_worm_payload(actor, *instance_id);
+            break;
+        case infection::VirusKind::ZipBomb:
+            trigger_zip_bomb_payload(actor, card);
+            break;
+        case infection::VirusKind::None:
+        case infection::VirusKind::LogicBomb:
+        case infection::VirusKind::Backdoor:
+        case infection::VirusKind::FalseBenign:
+        case infection::VirusKind::AdwareSterling:
+        case infection::VirusKind::IndustrialWeapon:
+            // LogicBomb ja foi tratado PRE-cast (dispatch_virus_payload_pre_cast); os demais
+            // sao fatia futura.
+            break;
+    }
 }
 
 CombatActor* CombatStateMachine::resolve_primary_target(CombatActor& actor,

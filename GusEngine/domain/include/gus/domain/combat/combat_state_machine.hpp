@@ -49,6 +49,7 @@
 #include <unordered_set>
 #include <vector>
 
+#include "gus/domain/combat/card_integrity_ledger.hpp"
 #include "gus/domain/combat/combat_enums.hpp"
 #include "gus/domain/combat/combat_records.hpp"
 #include "gus/domain/combat/environment_clock.hpp"
@@ -57,6 +58,7 @@
 #include "gus/domain/combat/initiative_queue.hpp"
 #include "gus/domain/combat/random_source.hpp"
 #include "gus/domain/combat/techmagic.hpp"
+#include "gus/domain/infection/integrity_state.hpp"
 
 namespace gus::domain::combat {
 
@@ -75,6 +77,25 @@ using CombatActionProvider =
 enum class CombatSide : std::uint32_t {
     Party = 0,
     Enemy = 1,
+};
+
+// Evento emitido pra FORA do escopo de combate (CARDS-HW-2 fatia 1, Worm/WorldEcosystem;
+// docs/design/mecanicas/cartas-spec-logica.md secao 5.2): a 3a direcao de propagacao do
+// worm ("o virus escapa pra rede") nao tem alvo resolvivel DENTRO do combate (mercado
+// negro/reputacao de vendedor - sistema de mundo, fora desta arvore) - so o GATILHO e
+// definido aqui, como outbox observavel. Nao serializado (nao entra em combat_enums.hpp,
+// contrato de save) - so-query de UI/host + observabilidade de teste, MESMO padrao nao-
+// serializado de CombatSide acima. `kind` fechado a 1 valor hoje; APPEND-ONLY se um 2o
+// gatilho de outbox aparecer numa fatia futura.
+enum class WorldEventKind : std::uint32_t {
+    WormEcosystemLeak = 0,
+};
+
+struct WorldEventEntry {
+    WorldEventKind kind = WorldEventKind::WormEcosystemLeak;
+    std::uint64_t source_instance_id = 0;
+
+    [[nodiscard]] bool operator==(const WorldEventEntry&) const = default;
 };
 
 // Estimativa PURA de UseCard (COMBATE-TEORIA-JOGOS item [2]; secao 11), devolvida por
@@ -121,12 +142,19 @@ public:
     //   brain_registry  : AI inimiga por id (id->IEnemyBrain*). nullptr => vazio.
     //   rng             : porta de aleatoriedade (secao 11). nullptr => default neutro
     //                     deterministico (variancia zero, sem crit).
+    //   integrity_ledger: PONTE instancia->combate (CARDS-HW-2 fatia 1, VIRUS EM COMBATE,
+    //                     card_integrity_ledger.hpp). nullptr => comportamento IDENTICO ao
+    //                     motor sem vírus (nenhum lookup acontece, mesmo com CombatAction::
+    //                     card_instance_id preenchido) - preserva TODO call site/teste
+    //                     pre-existente intacto (mesmo padrao aditivo de card_registry/
+    //                     brain_registry/rng acima).
     CombatStateMachine(
         std::vector<CombatActor*> actors,
         CombatActionProvider action_provider,
         const std::unordered_map<std::string, Card>* card_registry = nullptr,
         const std::unordered_map<std::string, IEnemyBrain*>* brain_registry = nullptr,
-        IRandomSource* rng = nullptr);
+        IRandomSource* rng = nullptr,
+        const std::vector<CardIntegrityRef>* integrity_ledger = nullptr);
 
     // ---- Estado observavel ----
 
@@ -182,6 +210,14 @@ public:
     // Ultimo IntentPreview lido por Gambito-Prever (secao 12). nullopt antes do 1o uso.
     [[nodiscard]] const std::optional<IntentPreview>& last_prediction() const noexcept {
         return last_prediction_;
+    }
+
+    // Outbox de eventos pro sistema de MUNDO (CARDS-HW-2 fatia 1, Worm/WorldEcosystem): so
+    // registra + fica disponivel pro host drenar (nenhum consumidor implementado nesta
+    // fatia, ver WorldEventEntry acima). Nunca limpo automaticamente pela FSM (mesmo
+    // racional append-only de log() - o host decide quando consumir).
+    [[nodiscard]] const std::vector<WorldEventEntry>& world_events() const noexcept {
+        return world_events_;
     }
 
     // ---- Janela de Comando da Party (comando livre sobre o CTB, modelo 1B, §4.1) ----
@@ -317,6 +353,75 @@ private:
                           const CombatState& state);
     void resolve_flee(CombatActor& actor);
 
+    // ---- Virus em combate (CARDS-HW-2 fatia 1, VIRUS EM COMBATE; docs/design/mecanicas/
+    // cartas-spec-logica.md secao 1/4/5.2) ----
+
+    // Lookup no integrity_ledger_ por instance_id. nullptr se o ledger e nulo OU a instancia
+    // nao tem entrada (mesmo fail-safe: motor se comporta como sem vírus).
+    [[nodiscard]] const CardIntegrityRef* find_ledger_entry(std::uint64_t instance_id) const;
+
+    // 1o candidato do integrity_ledger_ elegivel pra propagacao do Worm (secao 5.2): NUNCA a
+    // propria `source_instance_id`; `same_owner`==true filtra owner_actor_id IGUAL ao de
+    // `source_owner_actor_id` (OwnDeck), false filtra DIFERENTE (EnemyDeck). Determinístico
+    // (1o match em ordem do vetor, NAO um sorteio novo - o sorteio ja aconteceu na escolha da
+    // DIRECAO em trigger_worm_payload). nullptr se nenhum candidato casa (fail-safe).
+    [[nodiscard]] const CardIntegrityRef* find_worm_propagation_candidate(
+        std::uint64_t source_instance_id, int source_owner_actor_id, bool same_owner) const;
+
+    // LogicBomb (pre-cast, DEPOIS dos recursos ja debitados - chamado logo apos actor.spend_
+    // mana em resolve_use_card): pool[instance_id % 3] determinístico ({HpBelow30pct(caster),
+    // IsBossOrMiniBossEncounter, RoundIndexAtLeast(5)} - secao 4.1.1). Condicao satisfeita
+    // AGORA intercepta o efeito NOMINAL inteiro e vira contra o proprio `caster`, reusando o
+    // MESMO canal de dano/status de qualquer outra carta (apply_damage_with_hooks/
+    // apply_offensive_status) - nao ha formula paralela. ZERO consumo de RNG (funcao pura).
+    // Retorna true se interceptou (o caller de resolve_use_card deve abortar a resolucao
+    // normal, `return` imediato).
+    [[nodiscard]] bool try_trigger_logic_bomb(CombatActor& caster, const Card& card,
+                                              std::uint64_t instance_id);
+
+    // Dispatcher PRE-cast, exaustivo sobre VirusKind (switch SEM default - -Werror=switch
+    // pega payload futuro esquecido, mesmo racional do gate de camadas). SO LogicBomb age
+    // aqui; Worm/ZipBomb sao POS-cast (dispatch_virus_payload_post_cast); os demais
+    // (Backdoor/FalseBenign/AdwareSterling/IndustrialWeapon/None) sao fatia futura, no-op
+    // explicito. `instance_id` ausente OU sem entrada no ledger OU instancia limpa (!is_
+    // infected) => false (comportamento identico ao motor sem vírus).
+    [[nodiscard]] bool dispatch_virus_payload_pre_cast(
+        CombatActor& actor, const Card& card,
+        const std::optional<std::uint64_t>& instance_id);
+
+    // Worm (pos-cast, docs/design/mecanicas/cartas-spec-logica.md secao 4.1/5.2): SEMPRE
+    // aplica Slow idempotente (StackRule::Refresh, sem stack de magnitude) no ATOR DONO da
+    // carta jogada, reusando o choke point de status ofensivo (apply_offensive_status) - dur
+    // = "resto do combate" (sentinela kWormSlowDurationRestOfCombat, ver .cpp). Depois rola
+    // kWormPropagationChancePercent (13%) via rng_ injetado; se disparar, sorteia 1 de 3
+    // direcoes (rng_->next(3): 0=EnemyDeck, 1=OwnDeck, 2=WorldEcosystem) e tenta propagar pro
+    // 1o candidato elegivel do integrity_ledger_ (owner_actor_id diferente/igual ao da fonte,
+    // respectivamente) via infect_with_worm; WorldEcosystem so registra world_events_ (fora
+    // do escopo de combate). Sem candidato na direcao sorteada => log fail-safe, no-op.
+    void trigger_worm_payload(CombatActor& owner, std::uint64_t source_instance_id);
+
+    // Tenta infectar `target` com Worm (guard de classe protegida, secao 5.2): recusa quando
+    // `target.card_id` nao esta no card_registry_ do encontro (fail-safe) OU quando a carta
+    // resolvida e ESPECIAL/SUPER (tier != CardTier::Comum) OU quando `target.state` e nulo -
+    // cada recusa loga o motivo (regra "todo efeito loga"), NUNCA lanca. `source_owner` so
+    // pro actor_id do log (quem disparou a propagacao). `success_flavor` = texto diegetico
+    // do log de sucesso (varia por direcao, ver trigger_worm_payload).
+    void infect_with_worm(CombatActor& source_owner, const CardIntegrityRef& target,
+                          const std::string& success_flavor);
+
+    // ZipBomb (pos-cast, secao 4.1.3, AMB-05 resolvido pelo lider: "entope a memoria"):
+    // marca CombatActor::set_memory_jammed(true) + loga. O bloqueio em si (qualquer OUTRA
+    // UseCard pelo resto do turno) e um gate no TOPO de resolve_use_card (mesmo padrao do
+    // gate de Silence), NAO aqui.
+    void trigger_zip_bomb_payload(CombatActor& actor, const Card& card);
+
+    // Dispatcher POS-cast, exaustivo sobre VirusKind (mesmo racional -Werror=switch do
+    // dispatcher pre-cast acima). SO Worm/ZipBomb agem aqui; LogicBomb ja foi tratado PRE-
+    // cast (se disparou, resolve_use_card ja retornou antes de chegar aqui); os demais sao
+    // fatia futura, no-op explicito.
+    void dispatch_virus_payload_post_cast(CombatActor& actor, const Card& card,
+                                          const std::optional<std::uint64_t>& instance_id);
+
     // Aplica um status OFENSIVO (card.status_applied OU combo->result_status) via
     // CombatActor::try_add_status e loga o resultado REAL (ADR-016 Balde B, Faraday/
     // EM-Shield): choke point unico dos 4 sitios de status ofensivo de resolve_use_card
@@ -412,6 +517,9 @@ private:
     const std::unordered_map<std::string, Card>* card_registry_;
     const std::unordered_map<std::string, IEnemyBrain*>* brain_registry_;
     IRandomSource* rng_;
+    // Ponte instancia->combate (CARDS-HW-2 fatia 1, VIRUS EM COMBATE). nullptr = motor sem
+    // vírus (comportamento identico ao pre-existente). Ponteiro NAO-DONO.
+    const std::vector<CardIntegrityRef>* integrity_ledger_;
 
     InitiativeQueue queue_;
     CombatPhase phase_ = CombatPhase::SetupPhase;
@@ -470,6 +578,10 @@ private:
     std::vector<CombatLogEntry> log_;
     std::vector<StatusEffectChange> status_changes_;
     std::optional<IntentPreview> last_prediction_;
+
+    // Outbox de eventos pro sistema de MUNDO (CARDS-HW-2 fatia 1, Worm/WorldEcosystem). Ver
+    // world_events() acima. Append-only, nunca limpo pela FSM.
+    std::vector<WorldEventEntry> world_events_;
 
     std::vector<EnvironmentModifier> active_environments_;
     std::optional<EnvironmentClock> period_clock_;

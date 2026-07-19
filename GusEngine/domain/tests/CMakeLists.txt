@@ -249,6 +249,11 @@ add_executable(gusengine_domain_tests
     battery_state_test.cpp
     integrity_state_test.cpp
     hardware_class_test.cpp
+    # CARDS-HW-2 fatia 1 (VIRUS EM COMBATE, TODO.md): ponte instancia->combate
+    # (CardIntegrityRef/integrity_ledger, CombatAction::card_instance_id) + os 3
+    # payloads desta fatia (LogicBomb pre-cast/Worm+ZipBomb pos-cast) no
+    # resolve_use_card. docs/design/mecanicas/cartas-spec-logica.md secao 1/4/5.2.
+    card_virus_combat_test.cpp
 )
 
 # Os testes do combate incluem helpers de teste headers-only (fixed_random.hpp).
