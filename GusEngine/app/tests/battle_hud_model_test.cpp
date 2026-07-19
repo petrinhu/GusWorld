@@ -1,9 +1,11 @@
 // GusEngine/app/tests/battle_hud_model_test.cpp
 //
-// Catch2 (headless) do MODELO PURO do HUD da BattleScreen (M5, incremento 2). Prova,
-// SEM janela nem SDL:
-//   - status_icon_file/index cobre TODO StatusId do enum (Stun..Slow) com arquivo
-//     existente em resources/sprites/icons-m5/status/;
+// Catch2 (headless) do MODELO PURO do HUD da BattleScreen (M5, incremento 2; expandido
+// na onda HUD-STATUS-ICONS-STALE pros 7 StatusId novos do executor techMagic, ADR-016).
+// Prova, SEM janela nem SDL:
+//   - status_icon_file/index cobre TODO StatusId do enum (Stun..Eco, 20 no total) com
+//     arquivo existente em resources/sprites/icons-m5/status/;
+//   - cada StatusId tem um filename PROPRIO e nao-vazio (D1a: sem colisao de arquivo);
 //   - bar_fill clampa 0..1 (HP); bar_fill_rect cresce da esquerda;
 //   - resource_pips: total/lit/saturacao no max (AP=3, Mana cap 8);
 //   - arena_hp_bar_frame: mini-barra centrada sob o slot.
@@ -12,6 +14,7 @@
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/matchers/catch_matchers_floating_point.hpp>
 
+#include <set>
 #include <string_view>
 
 #include "gus/app/screens/battle_hud_model.hpp"
@@ -35,12 +38,16 @@ using gus::domain::combat::StatusId;
 
 namespace {
 
-// Todos os StatusId do enum (Stun=0 .. Slow=12), na ordem do valor.
+// Todos os StatusId do enum (Stun=0 .. Eco=19), na ordem do valor. Expandido na onda
+// HUD-STATUS-ICONS-STALE pros 7 StatusId do executor techMagic (ADR-016) que caiam no
+// fallback antes deste fix (13..19).
 constexpr StatusId kAllStatus[] = {
-    StatusId::Stun,    StatusId::Poison,    StatusId::Corrode, StatusId::Disrupt,
-    StatusId::Silence, StatusId::Knockback, StatusId::Break,   StatusId::Expose,
-    StatusId::Decrypt, StatusId::Shield,    StatusId::Regen,   StatusId::Haste,
-    StatusId::Slow,
+    StatusId::Stun,      StatusId::Poison,     StatusId::Corrode,  StatusId::Disrupt,
+    StatusId::Silence,   StatusId::Knockback,  StatusId::Break,    StatusId::Expose,
+    StatusId::Decrypt,   StatusId::Shield,     StatusId::Regen,    StatusId::Haste,
+    StatusId::Slow,      StatusId::SobrecargaTermica, StatusId::Resfriamento,
+    StatusId::Reflect,   StatusId::BlindagemEM, StatusId::NullProof,
+    StatusId::Scrying,   StatusId::Eco,
 };
 
 }  // namespace
@@ -60,11 +67,23 @@ TEST_CASE("status_icon_file mapeia TODO StatusId pra um arquivo nao-vazio",
     REQUIRE(status_icon_file(StatusId::Poison) == std::string_view("status_poison.png"));
     REQUIRE(status_icon_file(StatusId::Shield) == std::string_view("status_shield.png"));
     REQUIRE(status_icon_file(StatusId::Slow) == std::string_view("status_slow.png"));
+    REQUIRE(status_icon_file(StatusId::Eco) == std::string_view("status_eco.png"));
 }
 
-TEST_CASE("status_icon_index = valor do enum (estavel 0..12)", "[battle_hud]") {
+TEST_CASE("status_icon_file: cada StatusId tem filename PROPRIO (D1a, sem colisao)",
+          "[battle_hud]") {
+    std::set<std::string_view> seen;
+    for (StatusId id : kAllStatus) {
+        const std::string_view f = status_icon_file(id);
+        const bool inserted = seen.insert(f).second;
+        REQUIRE(inserted);  // colisao = dois StatusId compartilhando arquivo (fallback stale)
+    }
+    REQUIRE(seen.size() == static_cast<std::size_t>(kStatusIdCount));
+}
+
+TEST_CASE("status_icon_index = valor do enum (estavel 0..19)", "[battle_hud]") {
     REQUIRE(status_icon_index(StatusId::Stun) == 0);
-    REQUIRE(status_icon_index(StatusId::Slow) == kStatusIdCount - 1);
+    REQUIRE(status_icon_index(StatusId::Eco) == kStatusIdCount - 1);
     // Indice distinto por status.
     for (int i = 0; i < kStatusIdCount; ++i) {
         REQUIRE(status_icon_index(kAllStatus[i]) == i);

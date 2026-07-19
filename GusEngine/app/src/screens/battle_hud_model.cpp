@@ -25,8 +25,19 @@ std::string_view status_icon_file(StatusId id) noexcept {
         case StatusId::Regen:     return "status_regen.png";
         case StatusId::Haste:     return "status_haste.png";
         case StatusId::Slow:      return "status_slow.png";
+        case StatusId::SobrecargaTermica: return "status_sobrecarga.png";
+        case StatusId::Resfriamento:      return "status_resfriamento.png";
+        case StatusId::Reflect:           return "status_reflect.png";
+        case StatusId::BlindagemEM:       return "status_blindagem_em.png";
+        case StatusId::NullProof:         return "status_nullproof.png";
+        case StatusId::Scrying:           return "status_scrying.png";
+        case StatusId::Eco:               return "status_eco.png";
+        // SEM default: switch EXAUSTIVO de proposito (gus_warnings/-Wswitch, Fase A da
+        // onda HUD-STATUS-ICONS-STALE) pega qualquer StatusId futuro nao mapeado aqui,
+        // em tempo de compilacao, antes de virar fallback silencioso na UI.
     }
-    // Inalcancavel (enum coberto); guarda de seguranca pra StatusId futuro nao mapeado.
+    // Inalcancavel (enum coberto); guarda de seguranca pra StatusId futuro nao mapeado
+    // (so dispara se alguem contornar o switch, ex.: static_cast de valor invalido).
     return "status_stun.png";
 }
 

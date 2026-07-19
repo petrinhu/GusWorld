@@ -112,6 +112,7 @@ namespace detail {
         case CombatActionType::GambitPredict: return side + "gambit_predict";
         case CombatActionType::GambitReorder: return side + "gambit_reorder";
         case CombatActionType::Pass: return side + "pass";
+        case CombatActionType::StatusTick: return side + "statustick";
     }
     return side + "unknown";
 }

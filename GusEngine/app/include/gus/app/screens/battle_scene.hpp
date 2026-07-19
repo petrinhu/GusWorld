@@ -40,6 +40,7 @@
 #include "gus/app/i18n/translator.hpp"            // Translator (tr() de UI)
 #include "gus/app/screens/battle_anim.hpp"        // BattleAnimDirector (W2, battle-anim.md)
 #include "gus/app/screens/battle_floaters.hpp"    // Floater (numeros flutuantes)
+#include "gus/app/screens/battle_hud_model.hpp"   // kStatusIdCount (HUD-STATUS-ICONS-STALE)
 #include "gus/app/screens/battle_log_model.hpp"   // LogLine
 #include "gus/app/screens/battle_menu.hpp"        // BattleMenu / BattleVerb
 #include "gus/app/screens/battle_pacing.hpp"      // PacingDirector (ritmo, D8)
@@ -75,13 +76,26 @@ struct BattlePortraitSet {
 // qual mostrar pelos status_effects() do ator. kInvalidTexture em qualquer slot =>
 // aquele status cai num quadradinho placeholder (headless / "sem arte").
 struct BattleStatusIconSet {
-    // [status_icon_index(id)] = handle. Vazio/ausente => placeholder.
-    std::array<gus::platform::render2d::TextureId, /*kStatusIdCount=*/13> by_index{};
+    // [status_icon_index(id)] = handle. Vazio/ausente => placeholder. Tamanho AMARRADO
+    // a kStatusIdCount (battle_hud_model.hpp), NAO mais um numero magico: HUD-STATUS-
+    // ICONS-STALE (auditoria-domino) achou a causa-raiz de os 7 StatusId novos do
+    // executor techMagic (SobrecargaTermica..Eco) nunca carregarem icone - o array
+    // ficava hardcoded em 13 mesmo com status_icon_file ja cobrindo os 20. Se o enum
+    // StatusId crescer de novo, este array cresce junto (static_assert de
+    // battle_hud_model.hpp + -Werror=switch de status_icon_file seguram a sincronia).
+    std::array<gus::platform::render2d::TextureId, kStatusIdCount> by_index{};
 
     // Handle do icone de um StatusId. kInvalidTexture se nao carregado.
     [[nodiscard]] gus::platform::render2d::TextureId find(
         gus::domain::combat::StatusId id) const noexcept;
 };
+
+// Trava a sincronia array<->enum em tempo de compilacao (mesmo raciocinio do
+// static_assert de kStatusIdCount em battle_hud_model.hpp; previne a regressao do
+// numero magico que causou este bug-raiz).
+static_assert(std::tuple_size_v<decltype(BattleStatusIconSet::by_index)> ==
+                  static_cast<std::size_t>(kStatusIdCount),
+              "BattleStatusIconSet::by_index deve ter kStatusIdCount entradas");
 
 // Icones de INTENT (telegraph, incremento 5) ja resolvidos para TextureId. O ScriptedBrain
 // expoe IntentPreview (o que o inimigo vai fazer); a cena mostra o icone sobre o inimigo.

@@ -32,9 +32,13 @@ namespace gus::app::screens {
 using gus::core::spatial::Rect;
 using gus::domain::combat::StatusId;
 
-// Numero de StatusId distintos (Stun..Slow). Mantido em sincronia com o enum: se um
+// Numero de StatusId distintos (Stun..Eco). Mantido em sincronia com o enum: se um
 // StatusId novo entrar, atualize aqui E o catalogo de arquivos (status_icon_file).
-inline constexpr int kStatusIdCount = 13;
+// D3a (onda HUD-STATUS-ICONS-STALE): amarrado ao enum via static_assert abaixo (sem
+// tocar combat_enums.hpp, que e do domain/).
+inline constexpr int kStatusIdCount = 20;
+static_assert(static_cast<int>(StatusId::Eco) + 1 == kStatusIdCount,
+              "kStatusIdCount deve acompanhar o ultimo StatusId do enum (Eco)");
 
 // ----------------------------------------------------------------------------
 // Constantes de layout do HUD (px logico). Ponto unico; ux-ui-designer ajusta aqui.
