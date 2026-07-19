@@ -34,6 +34,9 @@ add_library(gusengine_app STATIC
     # AC-E11 A5 (TU-split, ADR-019): modo-mira/target selection (§3.5, D3) extraido
     # de battle_scene.cpp - ver gus/app/screens/battle_scene.hpp.
     src/screens/battle_scene_aim.cpp
+    # AC-E11 A5 (TU-split, ADR-019): escolha de ator / Janela de Comando da Party
+    # (§4.1) extraido de battle_scene.cpp - ver gus/app/screens/battle_scene.hpp.
+    src/screens/battle_scene_picker.cpp
     # AC-E11 A1 (ADR-019): roteamento de input (teclado/mouse/SDL->glintfx) extraido de
     # battle_preview.cpp - ver gus/app/screens/battle_input.hpp.
     src/screens/battle_input.cpp
