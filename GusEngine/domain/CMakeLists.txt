@@ -101,7 +101,10 @@ add_library(gusengine_domain STATIC
     src/infection/integrity_state.cpp
     # CARDS-HW-2 fatia A (CARDS-HW-2A, TODO.md): servico de diagnostico/cura do
     # Turing (diagnose()/attempt_cure()) - AMB-T1 RESOLVIDA (queima = SUCATA).
-    src/infection/turing_service.cpp
+    # Mora em deck/ (nao infection/) desde o refactor mecanico de eliminacao de
+    # ciclo infection<->deck (CARDS-HW-2A, 2026-07-19) - reusa arestas ja
+    # existentes de deck/ para combat/ e para a peca infection/.
+    src/deck/turing_service.cpp
 )
 
 target_include_directories(gusengine_domain

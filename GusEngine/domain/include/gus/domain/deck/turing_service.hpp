@@ -1,4 +1,4 @@
-// gus/domain/infection/turing_service.hpp
+// gus/domain/deck/turing_service.hpp
 //
 // Servico de diagnostico/cura do Turing (CARDS-HW-2 fatia A, "servico de cura/
 // diagnostico do Turing", CARDS-HW-2A, TODO.md; docs/design/mecanicas/
@@ -9,20 +9,19 @@
 // combate, reaproveitada aqui pelo MESMO motivo: determinismo testavel sem RNG
 // global no dominio (secao 11).
 //
-// FUNCOES LIVRES sem estado (mesmo estilo das demais funcoes puras de infection/
-// - NAO e um struct com instancia; e um SERVICO stateless sobre estado alheio).
+// FUNCOES LIVRES sem estado (mesmo estilo das demais funcoes puras de deck/ - NAO
+// e um struct com instancia; e um SERVICO stateless sobre estado alheio).
 //
-// GATE DE CAMADAS (excecao documentada, mesmo padrao de card_hardware_constants.hpp
-// cruzando hardware/save): integrity_state.hpp (MESMA pasta) declara que infection/
-// NAO inclui combat/ nem deck/. Esta excecao e SO deste arquivo:
-//   - a QUEIMA (AttemptCure, ramo de falha) escreve is_burned_out, campo que mora
-//     no AGREGADO CardPhysicalState (deck/card_hardware.hpp), NAO na peca
-//     IntegrityState isolada - sem deck/ o servico nao teria onde persistir a sucata;
-//   - o sorteio (1 draw, 62/38%) usa IRandomSource (combat/random_source.hpp), a
-//     porta canonica de aleatoriedade determinista do dominio - sem ela o servico
-//     teria que inventar uma segunda fonte de RNG so pra si, duplicando a porta.
-// cards::CardTier (guard de classe protegida) e permitido sem excecao (regra ja
-// documentada em card_enums.hpp/card_integrity_ledger.hpp).
+// MODULO: deck/, NAO infection/ (CARDS-HW-2A refactor mecanico de eliminacao de
+// ciclo). Este servico opera sobre o AGREGADO deck::CardPhysicalState (escreve
+// is_burned_out, campo que so existe no agregado, nao na peca IntegrityState
+// isolada) e sobre combat::IRandomSource (a porta canonica de RNG do dominio) - as
+// DUAS ja sao dependencias normais de deck/ (card_hardware.hpp herda de
+// infection::IntegrityState; card_collection.hpp inclui combat/combat_enums.hpp),
+// entao morar aqui reusa arestas EXISTENTES em vez de abrir uma excecao pontual em
+// infection/ (que volta a ser folha pura - gate de camadas sem excecao, ver
+// integrity_state.hpp). cards::CardTier (guard de classe protegida) e permitido
+// sem excecao (regra ja documentada em card_enums.hpp/card_integrity_ledger.hpp).
 //
 // Cross-ref: docs/design/mecanicas/cartas-spec-logica.md secao 6 (state machine +
 //            AttemptCure; AMB-T1 RESOLVIDA - queima = SUCATA, NAO destruicao);
@@ -38,8 +37,8 @@
 //            trata da CURA fora do combate, guards e escopos SEPARADOS, zero
 //            superposicao); TODO.md CARDS-HW-2A.
 
-#ifndef GUS_DOMAIN_INFECTION_TURING_SERVICE_HPP
-#define GUS_DOMAIN_INFECTION_TURING_SERVICE_HPP
+#ifndef GUS_DOMAIN_DECK_TURING_SERVICE_HPP
+#define GUS_DOMAIN_DECK_TURING_SERVICE_HPP
 
 #include <string_view>
 
@@ -48,7 +47,7 @@
 #include "gus/domain/deck/card_hardware.hpp"
 #include "gus/domain/infection/integrity_state.hpp"
 
-namespace gus::domain::infection {
+namespace gus::domain::deck {
 
 // Resultado de diagnose(). Diagnosticar exige infeccao previa - nao existe
 // "diagnostico" de carta limpa (guard simetrico ao inv.1 de
@@ -63,7 +62,7 @@ enum class DiagnoseOutcome {
 // state.is_infected==false, e no-op (RejectedNotInfected) - nunca viola o inv.1.
 // Se ja estava diagnosticada, idempotente (Diagnosed de novo, sem duplo efeito
 // observavel). Mutacao direta do parametro, zero I/O, zero RNG.
-[[nodiscard]] DiagnoseOutcome diagnose(IntegrityState& state) noexcept;
+[[nodiscard]] DiagnoseOutcome diagnose(infection::IntegrityState& state) noexcept;
 
 // Resultado de attempt_cure() - secao 6 do doc-fonte, state machine
 // InfectedDiagnosed -> {Cured, ChipsetBurned} via roll(0.62).
@@ -94,7 +93,7 @@ enum class CureOutcome {
 //                                             roda mais - gate de gameplay futuro).
 // Pos-estado SEMPRE passa physical.validate() nos 4 desfechos (inclusive os 2 guards
 // que nao mutam nada - o estado de entrada ja era valido por construcao).
-[[nodiscard]] CureOutcome attempt_cure(deck::CardPhysicalState& physical,
+[[nodiscard]] CureOutcome attempt_cure(CardPhysicalState& physical,
                                         cards::CardTier tier,
                                         combat::IRandomSource& rng);
 
@@ -107,6 +106,6 @@ enum class CureOutcome {
 [[nodiscard]] std::string_view translation_key_for(DiagnoseOutcome outcome);
 [[nodiscard]] std::string_view translation_key_for(CureOutcome outcome);
 
-}  // namespace gus::domain::infection
+}  // namespace gus::domain::deck
 
-#endif  // GUS_DOMAIN_INFECTION_TURING_SERVICE_HPP
+#endif  // GUS_DOMAIN_DECK_TURING_SERVICE_HPP

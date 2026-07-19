@@ -1,23 +1,23 @@
-// gus/domain/src/infection/turing_service.cpp
+// gus/domain/src/deck/turing_service.cpp
 //
 // Implementacao do servico de diagnostico/cura do Turing. Ver o header para o
 // contrato completo (guards, ordem, split 62/38%, AMB-T1). CARDS-HW-2A.
 
-#include "gus/domain/infection/turing_service.hpp"
+#include "gus/domain/deck/turing_service.hpp"
 
 #include <stdexcept>
 
 #include "gus/domain/deck/card_hardware_constants.hpp"
 
-namespace gus::domain::infection {
+namespace gus::domain::deck {
 
-DiagnoseOutcome diagnose(IntegrityState& state) noexcept {
+DiagnoseOutcome diagnose(infection::IntegrityState& state) noexcept {
     if (!state.is_infected) return DiagnoseOutcome::RejectedNotInfected;
     state.is_diagnosed = true;
     return DiagnoseOutcome::Diagnosed;
 }
 
-CureOutcome attempt_cure(deck::CardPhysicalState& physical, cards::CardTier tier,
+CureOutcome attempt_cure(CardPhysicalState& physical, cards::CardTier tier,
                           combat::IRandomSource& rng) {
     // Guard 1 (defensivo): classe protegida nunca deveria chegar aqui infectada
     // (secao 5.1, 0% de risco geral) - checado ANTES do guard de diagnostico
@@ -30,7 +30,7 @@ CureOutcome attempt_cure(deck::CardPhysicalState& physical, cards::CardTier tier
 
     // 1 draw de RNG, canonico (secao 11) - roll em [0,100), sucesso se < 62%.
     const int roll = rng.next(100);
-    if (roll < static_cast<int>(deck::kTuringCureSuccessPercent)) {
+    if (roll < static_cast<int>(kTuringCureSuccessPercent)) {
         physical.is_infected = false;
         physical.virus_kind = VirusKind::None;
         physical.is_diagnosed = false;
@@ -72,4 +72,4 @@ std::string_view translation_key_for(CureOutcome outcome) {
         "valor novo append-only sem case aqui e bug de implementacao.");
 }
 
-}  // namespace gus::domain::infection
+}  // namespace gus::domain::deck

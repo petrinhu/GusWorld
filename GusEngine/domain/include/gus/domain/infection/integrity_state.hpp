@@ -7,11 +7,12 @@
 // de domain/, engine-design.md secao 2).
 //
 // infection/ NAO inclui combat/ nem deck/ (gate de camadas; so cards/ e permitido -
-// este header nao precisa nem disso). EXCECAO DOCUMENTADA (CARDS-HW-2A): turing_service.hpp
-// (mesma pasta) cruza as duas de proposito - ver o cabecalho daquele arquivo pro
-// racional completo (precisa de deck::CardPhysicalState pra escrever is_burned_out
-// e de combat::IRandomSource pro roll 62/38%). NENHUM outro arquivo desta pasta tem
-// essa licenca.
+// este header nao precisa nem disso). SEM EXCECAO (CARDS-HW-2A refactor mecanico,
+// 2026-07-19): o servico de diagnostico/cura do Turing morava aqui e cruzava
+// deck/+combat/ de proposito; foi MOVIDO para gus/domain/deck/turing_service.hpp,
+// onde as duas arestas ja existiam naturalmente (card_hardware.hpp herda desta
+// peca; card_collection.hpp ja inclui combat/combat_enums.hpp) - infection/ volta a
+// ser FOLHA pura, sem excecao de layering.
 //
 // NOTA: is_burned_out (chip permanentemente destruido) NAO mora nesta peca - fica
 // direto no agregado CardPhysicalState (gus/domain/deck/card_hardware.hpp). E

@@ -1,7 +1,7 @@
 // turing_service_test.cpp
 //
 // Spec executavel (Catch2 v3) do servico de diagnostico/cura do Turing (CARDS-HW-2
-// fatia A, CARDS-HW-2A, TODO.md; gus/domain/infection/turing_service.hpp;
+// fatia A, CARDS-HW-2A, TODO.md; gus/domain/deck/turing_service.hpp;
 // docs/design/mecanicas/cartas-spec-logica.md secao 6, AttemptCure).
 //
 // Cobre: diagnose() (guard is_infected, idempotencia); attempt_cure() nas bordas
@@ -12,7 +12,7 @@
 // physical.validate() nos 4 desfechos; determinismo de draws (exatamente 1 draw de
 // rng por attempt_cure(), via CountingRandom); retry apos cura/queima.
 //
-// Cross-ref: gus/domain/infection/turing_service.hpp; gus/domain/infection/
+// Cross-ref: gus/domain/deck/turing_service.hpp; gus/domain/infection/
 //            integrity_state.hpp; gus/domain/deck/card_hardware.hpp;
 //            gus/domain/deck/card_hardware_constants.hpp (kTuringCureSuccessPercent/
 //            kTuringCureBurnoutPercent); fixed_random.hpp; counting_random.hpp.
@@ -26,20 +26,20 @@
 #include "gus/domain/cards/card_enums.hpp"
 #include "gus/domain/deck/card_hardware.hpp"
 #include "gus/domain/deck/card_hardware_constants.hpp"
+#include "gus/domain/deck/turing_service.hpp"
 #include "gus/domain/infection/integrity_state.hpp"
-#include "gus/domain/infection/turing_service.hpp"
 
 using gus::domain::cards::CardTier;
+using gus::domain::deck::attempt_cure;
 using gus::domain::deck::CardPhysicalState;
+using gus::domain::deck::CureOutcome;
+using gus::domain::deck::diagnose;
+using gus::domain::deck::DiagnoseOutcome;
 using gus::domain::deck::kTuringCureBurnoutPercent;
 using gus::domain::deck::kTuringCureSuccessPercent;
+using gus::domain::deck::translation_key_for;
 using gus::domain::deck::VirusKind;
-using gus::domain::infection::attempt_cure;
-using gus::domain::infection::CureOutcome;
-using gus::domain::infection::diagnose;
-using gus::domain::infection::DiagnoseOutcome;
 using gus::domain::infection::IntegrityState;
-using gus::domain::infection::translation_key_for;
 using gus::domain::tests::CountingRandom;
 using gus::domain::tests::FixedRandom;
 
