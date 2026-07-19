@@ -29,39 +29,27 @@
 
 #include <SDL3/SDL.h>  // SDL_Window (dono da janela do host, ver run_battle_preview_embedded)
 
+#include "gus/app/screens/battle_assets.hpp"  // AC-E11 A3: resolve_retratos_dir/
+                                               // resolve_music_path/etc moraram pra ca
+                                               // (ADR-019); incluido aqui pra call-sites
+                                               // existentes (ex. maestro.cpp) continuarem
+                                               // intactos.
 #include "gus/app/screens/battle_input.hpp"  // AC-E11 A1: battle_key_down/BattleEscEffect/
                                               // battle_digit_for_key moraram pra ca (ADR-019);
                                               // incluido aqui pra call-site existentes que so
                                               // incluem battle_preview.hpp continuarem intactos.
 #include "gus/app/screens/battle_scene.hpp"
-#include "gus/core/asset_paths.hpp"             // kCityThemeFile (default de resolve_music_path)
 #include "gus/domain/combat/combat_enums.hpp"  // CombatOutcome (out-param do embedded)
 #include "gus/platform/audio/audio_engine.hpp"  // AudioEngine externo (M7-COSTURA Inc 2)
 
 namespace gus::app::screens {
 
-// Resolve a pasta dos retratos 48px (resources/sprites/icons-m5/retratos), na MESMA
-// ordem do resolver de sprites do Gus: env GUSWORLD_ASSETS > macro embutido > relativo
-// ao CWD. So monta a STRING (nao abre arquivo).
-[[nodiscard]] std::string resolve_retratos_dir();
-
-// Resolve a pasta dos icones de status (resources/sprites/icons-m5/status), na mesma
-// ordem do resolver de retratos. So monta a STRING (nao abre arquivo).
-[[nodiscard]] std::string resolve_status_icons_dir();
-
-// M7-COSTURA Inc 2/3: resolve o caminho de uma faixa de MUSICA, mesma receita/ordem de
-// resolve_retratos_dir (env GUSWORLD_MUSIC > macro embutida GUSWORLD_MUSIC_DIR >
-// relativo ao CWD) + o NOME do arquivo dado em `file` (default kCityThemeFile, o
-// comportamento de sempre - todo call-site existente sem argumento continua
-// identico). Inc 3: a Maestro chama com `file=kBattleThemeFile` pra resolver a faixa
-// da ARENA tambem (mesma pasta kMusicDir, so o nome do arquivo muda) - generalizacao
-// MINIMA (so o parametro, zero env nova) em vez de duplicar a funcao inteira.
-[[nodiscard]] std::string resolve_music_path(
-    std::string_view file = gus::core::assets::kCityThemeFile);
-
-// AC-E11 A1 (ADR-019): battle_digit_for_key/BattleEscEffect/battle_key_down MORARAM pra
-// gus/app/screens/battle_input.hpp (incluido no topo deste arquivo) - ficam acessiveis via
-// gus::app::screens::* pra quem so inclui battle_preview.hpp, ZERO mudanca de call-site.
+// AC-E11 A1/A3 (ADR-019): resolve_retratos_dir/resolve_status_icons_dir/
+// resolve_music_path/resolve_intent_icons_dir MORARAM pra gus/app/screens/
+// battle_assets.hpp; battle_digit_for_key/BattleEscEffect/battle_key_down MORARAM pra
+// gus/app/screens/battle_input.hpp (ambos incluidos no topo deste arquivo) - ficam
+// acessiveis via gus::app::screens::* pra quem so inclui battle_preview.hpp, ZERO
+// mudanca de call-site.
 
 // M7-COSTURA: roda o loop de batalha (mesma BattleScene/mesmo esqueleto) numa janela JA
 // CRIADA por quem chama (a Maestro). NAO chama SDL_Init/SDL_Quit nem cria/destroi a
