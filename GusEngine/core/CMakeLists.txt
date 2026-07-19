@@ -49,4 +49,8 @@ target_compile_features(gusengine_core PUBLIC cxx_std_20)
 # PRIVATE: consumidores de gusengine_core nao herdam o include path do Monocypher.
 target_link_libraries(gusengine_core PRIVATE monocypher)
 
+# gus_warnings (HUD-STATUS-ICONS-STALE Fase A): -Wswitch/w14062 warning-only,
+# so nos alvos do projeto (raiz do CMakeLists.txt principal define o target).
+target_link_libraries(gusengine_core PRIVATE gus_warnings)
+
 # Sem target_link_libraries(... Qt6::*/SDL3::*) por design. Camada pura.

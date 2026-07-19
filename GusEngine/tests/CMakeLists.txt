@@ -36,6 +36,7 @@ target_link_libraries(gusengine_core_tests
         gusengine_core
         gusengine_domain
         Catch2::Catch2WithMain
+        gus_warnings
 )
 
 target_compile_features(gusengine_core_tests PRIVATE cxx_std_20)

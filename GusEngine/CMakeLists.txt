@@ -176,6 +176,26 @@ include(Catch)
 #     header-only como o resto de third_party/; precisa de um alvo compilado). ---
 add_subdirectory(third_party/monocypher)
 
+# --- gus_warnings (onda HUD-STATUS-ICONS-STALE, Fase A) ---------------------
+# INTERFACE target so com flags de warning, SEM fontes proprias. Linkado PRIVATE
+# nos alvos do PROJETO (core/domain/platform/app + seus executaveis de teste),
+# NUNCA em third_party/ nem nos alvos vindos de FetchContent (SDL3/RmlUi/glintfx/
+# Catch2/monocypher) - o box2d vendorizado (third_party/box2d/), por exemplo, tem
+# switch sem `default:` que dispararia o warning e nao e nosso codigo pra corrigir.
+#
+# Fase A (HUD-STATUS-ICONS-STALE) foi so a REDE: warning-only, pra inventariar os
+# switches nao-exaustivos do projeto (enumeration value ... not handled in
+# switch). Fase B (SA-1/gameplay_engineer) consertou os casos encontrados
+# (battle_hud_model.cpp: 20 StatusId; balance_harness.hpp: case StatusTick).
+# Fase D (promocao, esta mudanca): com o projeto ja limpo, -Wswitch vira ERRO
+# (Werror=switch/we4062) - switch nao-exaustivo novo QUEBRA o build a partir daqui,
+# em vez de so avisar.
+add_library(gus_warnings INTERFACE)
+target_compile_options(gus_warnings INTERFACE
+    $<$<CXX_COMPILER_ID:GNU,Clang>:-Werror=switch>
+    $<$<CXX_COMPILER_ID:MSVC>:/we4062>
+)
+
 # --- Camadas ---
 # Ordem importa: core e base de domain; platform usa core; app usa todos.
 add_subdirectory(core)

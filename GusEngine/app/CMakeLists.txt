@@ -142,6 +142,10 @@ target_compile_features(gusengine_app PUBLIC cxx_std_20)
 # vendorizado foi aposentado (two-way door via historico git).
 target_link_libraries(gusengine_app PRIVATE glintfx::glintfx)
 
+# gus_warnings (HUD-STATUS-ICONS-STALE Fase A): -Wswitch/w14062 warning-only,
+# so nos alvos do projeto (raiz do CMakeLists.txt principal define o target).
+target_link_libraries(gusengine_app PRIVATE gus_warnings)
+
 # --- executavel ---
 add_executable(gusworld_app
     main.cpp
@@ -154,6 +158,7 @@ target_link_libraries(gusworld_app
         gusengine_domain
         gusengine_platform
         SDL3::SDL3
+        gus_warnings
 )
 
 target_compile_features(gusworld_app PRIVATE cxx_std_20)

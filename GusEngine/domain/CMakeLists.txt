@@ -97,6 +97,10 @@ target_link_libraries(gusengine_domain
     PUBLIC gusengine_core
 )
 
+# gus_warnings (HUD-STATUS-ICONS-STALE Fase A): -Wswitch/w14062 warning-only,
+# so nos alvos do projeto (raiz do CMakeLists.txt principal define o target).
+target_link_libraries(gusengine_domain PRIVATE gus_warnings)
+
 target_compile_features(gusengine_domain PUBLIC cxx_std_20)
 
 # Sem target_link_libraries(... Qt6::*/SDL3::*) por design. Camada pura portada.

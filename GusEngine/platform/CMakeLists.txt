@@ -133,6 +133,10 @@ target_link_libraries(gusengine_platform
 # diretamente (o resto de gusengine_platform/app nao inclui miniaudio.h).
 target_link_libraries(gusengine_platform PRIVATE Threads::Threads ${CMAKE_DL_LIBS})
 
+# gus_warnings (HUD-STATUS-ICONS-STALE Fase A): -Wswitch/w14062 warning-only,
+# so nos alvos do projeto (raiz do CMakeLists.txt principal define o target).
+target_link_libraries(gusengine_platform PRIVATE gus_warnings)
+
 target_compile_features(gusengine_platform PUBLIC cxx_std_20)
 
 # Testes (Catch2, headless) da camada platform/.

@@ -83,6 +83,7 @@ target_link_libraries(gusengine_app_tests
         gusengine_domain
         gusengine_platform
         Catch2::Catch2WithMain
+        gus_warnings
 )
 
 # save_load_menu_interaction_test.cpp inclui <glintfx/ui_layer.hpp> direto (harness
