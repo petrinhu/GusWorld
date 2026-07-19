@@ -59,6 +59,14 @@ void put_u32_le(std::vector<std::uint8_t>& out, std::uint32_t v) {
     out.push_back(static_cast<std::uint8_t>((v >> 24) & 0xFFu));
 }
 
+// Helper: escreve um u64 LE no fim de um buffer (instance_id/next_instance_id
+// dos payloads V7 forjados a mao abaixo - o codec de producao usa put_u64
+// interno, nao exportado no header publico; este e so o espelho local do teste).
+void put_u64_le(std::vector<std::uint8_t>& out, std::uint64_t v) {
+    for (int i = 0; i < 8; ++i)
+        out.push_back(static_cast<std::uint8_t>((v >> (8 * i)) & 0xFFu));
+}
+
 // "QUALQUER excecao std::, mas NUNCA crash/UB". O contrato IDEAL e erro tipado do
 // dominio; aceitamos tambem std:: (length_error/bad_alloc/invalid_argument) como
 // "rejeitou sem crashar". O importante deste predicado: a funcao SEMPRE termina
@@ -369,6 +377,154 @@ TEST_CASE("save/v6/fuzz: hand_selection com count gigante rejeita SaveCorruptErr
     // apos next_instance_id vem DIRETO o count de hand_selection.
     put_u32_le(payload, 0xFFFFFFFFu);         // hand_selection count GIGANTE
     // (sem os u64 da selecao: bounded_count deve barrar ANTES do reserve)
+
+    const auto packed = pack_save(payload);
+    REQUIRE_THROWS_AS(deserialize_save(packed), SaveCorruptError);
+}
+
+// ---- V7 (CARDS-HW-1): count gigante nas listas NOVAS de card_collection ----
+//
+// GAP encontrado na revisao adversarial (qa-engineer, verificacao independente do
+// incremento CARDS-HW-1, a09ebd6): os 2 casos IMP-01 acima cobrem SO o layout V6
+// (read_card_instance_list, min 12 bytes/elemento). O layout CORRENTE V7+
+// (read_card_instance_list_v7, min 12+17=29 bytes/elemento - CADA CardInstance
+// ganhou CardPhysicalState) NAO tinha nenhum caso hostil aqui; os testes aleatorios
+// (2000 iteracoes abaixo) tambem nunca exercitam o payload V7 de proposito (a
+// chance de um schema_version==7 sair de bytes aleatorios e ~1/2^32). Os 4 casos
+// abaixo fecham esse buraco, espelhando o padrao IMP-01 ja usado para V6.
+
+TEST_CASE("save/v7/fuzz: card_collection.active com count gigante rejeita "
+          "SaveCorruptError antes de alocar (bound V7 = 29 bytes/elemento, nao "
+          "12 do V6)",
+          "[domain][save][fuzz][v7][imp01]") {
+    std::vector<std::uint8_t> payload;
+    put_u32_le(payload, 7u);                  // schema_version = 7 (layout corrente)
+    payload.insert(payload.end(), 8, 0x00u);  // timestamp_ms (i64)
+    payload.insert(payload.end(), 8, 0x00u);  // playtime_seconds (f64)
+    put_u32_le(payload, 0u);                  // current_scene_path len = 0
+    payload.insert(payload.end(), 48, 0x00u); // player_position + player_rotation
+    put_u32_le(payload, 0u);                  // party_roster count = 0
+    put_u32_le(payload, 0u);                  // party_active count = 0
+    put_u32_le(payload, 0u);                  // flags count = 0
+    put_u32_le(payload, 0u);                  // inventory count = 0
+    put_u32_le(payload, 0u);                  // quest_progress count = 0
+    put_u32_le(payload, 0u);                  // relations count = 0
+    // character_states_v7: 1 entrada ("gus"), depois o count de active MENTE.
+    put_u32_le(payload, 1u);                  // character_states count = 1
+    put_u32_le(payload, 3u);                  // "gus" (string key, len=3)
+    payload.push_back('g');
+    payload.push_back('u');
+    payload.push_back('s');
+    payload.insert(payload.end(), 4, 0x00u);  // current_hp (i32) = 0
+    payload.insert(payload.end(), 4, 0x00u);  // xp (i32) = 0
+    put_u32_le(payload, 0xFFFFFFFFu);         // card_collection.active count GIGANTE
+    // (sem os bytes das instancias V7: bounded_count deve barrar ANTES do reserve)
+
+    const auto packed = pack_save(payload);   // tag AEAD valida sobre o payload mentiroso
+    REQUIRE_THROWS_AS(deserialize_save(packed), SaveCorruptError);
+}
+
+TEST_CASE("save/v7/fuzz: card_collection.dead com count gigante rejeita "
+          "SaveCorruptError antes de alocar",
+          "[domain][save][fuzz][v7][imp01]") {
+    std::vector<std::uint8_t> payload;
+    put_u32_le(payload, 7u);
+    payload.insert(payload.end(), 8, 0x00u);
+    payload.insert(payload.end(), 8, 0x00u);
+    put_u32_le(payload, 0u);
+    payload.insert(payload.end(), 48, 0x00u);
+    put_u32_le(payload, 0u);
+    put_u32_le(payload, 0u);
+    put_u32_le(payload, 0u);
+    put_u32_le(payload, 0u);
+    put_u32_le(payload, 0u);
+    put_u32_le(payload, 0u);
+    put_u32_le(payload, 1u);  // character_states count = 1
+    put_u32_le(payload, 3u);
+    payload.push_back('g');
+    payload.push_back('u');
+    payload.push_back('s');
+    payload.insert(payload.end(), 4, 0x00u);  // current_hp
+    payload.insert(payload.end(), 4, 0x00u);  // xp
+    put_u32_le(payload, 0u);                  // card_collection.active count = 0
+    put_u32_le(payload, 0xFFFFFFFFu);         // card_collection.dead count GIGANTE
+    // (sem as instancias V7: bounded_count deve barrar ANTES do reserve)
+
+    const auto packed = pack_save(payload);
+    REQUIRE_THROWS_AS(deserialize_save(packed), SaveCorruptError);
+}
+
+TEST_CASE("save/v7/fuzz: hand_selection do layout V7 (apos card_collection COM "
+          "physical) com count gigante rejeita SaveCorruptError antes de alocar",
+          "[domain][save][fuzz][v7][imp01]") {
+    std::vector<std::uint8_t> payload;
+    put_u32_le(payload, 7u);
+    payload.insert(payload.end(), 8, 0x00u);
+    payload.insert(payload.end(), 8, 0x00u);
+    put_u32_le(payload, 0u);
+    payload.insert(payload.end(), 48, 0x00u);
+    put_u32_le(payload, 0u);
+    put_u32_le(payload, 0u);
+    put_u32_le(payload, 0u);
+    put_u32_le(payload, 0u);
+    put_u32_le(payload, 0u);
+    put_u32_le(payload, 0u);
+    put_u32_le(payload, 1u);  // character_states count = 1
+    put_u32_le(payload, 3u);
+    payload.push_back('g');
+    payload.push_back('u');
+    payload.push_back('s');
+    payload.insert(payload.end(), 4, 0x00u);  // current_hp
+    payload.insert(payload.end(), 4, 0x00u);  // xp
+    put_u32_le(payload, 0u);                  // card_collection.active count = 0
+    put_u32_le(payload, 0u);                  // card_collection.dead count = 0
+    payload.insert(payload.end(), 8, 0x00u);  // next_instance_id (u64) = 0
+    put_u32_le(payload, 0xFFFFFFFFu);         // hand_selection count GIGANTE
+    // (sem os u64 da selecao: bounded_count deve barrar ANTES do reserve)
+
+    const auto packed = pack_save(payload);
+    REQUIRE_THROWS_AS(deserialize_save(packed), SaveCorruptError);
+}
+
+TEST_CASE("save/v7/fuzz: CardInstance V7 truncado NO MEIO do bloco novo de "
+          "CardPhysicalState (apos origin+cycles, faltam deficit/flags/virus/"
+          "burned_out) rejeita, nunca le lixo/UB",
+          "[domain][save][fuzz][v7][imp01]") {
+    // count=1 (plausivel), instance_id+card_id validos, so o bloco physical vem
+    // cortado bem no meio (4 bytes de origin + 2 de cycles = 6 dos 17 esperados) -
+    // ataca especificamente o offset novo que o incremento CARDS-HW-1 introduziu
+    // (read_card_physical_state), nao coberto pelos truncamentos genericos de
+    // "truncar em cada offset" (que usam um save V7 JA valido/completo, nunca um
+    // payload V7 forjado a mao como este).
+    std::vector<std::uint8_t> payload;
+    put_u32_le(payload, 7u);
+    payload.insert(payload.end(), 8, 0x00u);
+    payload.insert(payload.end(), 8, 0x00u);
+    put_u32_le(payload, 0u);
+    payload.insert(payload.end(), 48, 0x00u);
+    put_u32_le(payload, 0u);
+    put_u32_le(payload, 0u);
+    put_u32_le(payload, 0u);
+    put_u32_le(payload, 0u);
+    put_u32_le(payload, 0u);
+    put_u32_le(payload, 0u);
+    put_u32_le(payload, 1u);  // character_states count = 1
+    put_u32_le(payload, 3u);
+    payload.push_back('g');
+    payload.push_back('u');
+    payload.push_back('s');
+    payload.insert(payload.end(), 4, 0x00u);  // current_hp
+    payload.insert(payload.end(), 4, 0x00u);  // xp
+    put_u32_le(payload, 1u);                  // card_collection.active count = 1 (plausivel)
+    put_u64_le(payload, 1u);                  // instance_id
+    put_u32_le(payload, 4u);                  // card_id len=4
+    payload.push_back('t');
+    payload.push_back('e');
+    payload.push_back('s');
+    payload.push_back('t');
+    put_u32_le(payload, 0u);                  // physical.origin = OriginalRom (4 bytes)
+    payload.push_back(0x00u);                 // battery_recharge_cycles LO (so 2 dos 17
+    payload.push_back(0x00u);                 // esperados - corta aqui de proposito)
 
     const auto packed = pack_save(payload);
     REQUIRE_THROWS_AS(deserialize_save(packed), SaveCorruptError);
