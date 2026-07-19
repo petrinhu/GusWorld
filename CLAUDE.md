@@ -207,12 +207,12 @@ Diretório vive dentro de `~/IDrive/Documentos/projetos_claudebrain/Projects/gus
 - Não modificar arquivos canônicos externos a partir daqui.
 - Notas de design soltas podem usar estilo livre; entregáveis estruturados (GDD, lore bible, style guide) já existem em `docs/`.
 
-## Próximos passos (estado 2026-07-15, ver ROADMAP.md/TODO.md para o board vivo)
+## Próximos passos (estado 2026-07-18, ver ROADMAP.md/TODO.md para o board vivo)
 
 1. **Fechar M7 (paridade jogável):** todos os pré-requisitos técnicos já entregues; falta só um playthrough de ~5min ao vivo do líder.
 2. **M8 (decommission):** apagar Godot/C#/addons legados assim que M7 fechar — gate de build Windows já pré-cumprido.
 3. **M9 (higienização):** limpar a árvore pós-porte.
-4. **Onda `CARDS` (paralela, não bloqueia M7/M8/M9):** próximo `EffectKind` do motor de cartas techMagic = DamageQuantize/Planck; estética visual "terminal" para logs de combate em implementação.
+4. **Onda `CARDS` (paralela, não bloqueia M7/M8/M9):** o motor de cartas techMagic (ADR-016) tem **11/12 EffectKinds implementados** (fechado 2026-07-16; só falta o Bastiat/RevealHiddenCost, bloqueado pela feat `EFEITOS-ADIADOS-OCULTOS`, adiada pelo líder em 2026-07-18). O **sistema de cartas hardware/energia/pirataria** (baterias CR2032, memória Runa, conector RSB, vírus, mercado negro, carta urandom, RunaDex) tem **design + números + spec técnica prontos** (2026-07-18, docs em `docs/design/mecanicas/cartas-*.md`); implementação = onda futura `CARDS-HARDWARE-ENGINE`. Ver memórias `reference_techmagic_engine_impl` + `reference_sistema_cartas_hardware_energia`.
 5. Manter `TODO.md` atualizado via `/tab_pendencias`.
 
 ## Quando o projeto evoluir
