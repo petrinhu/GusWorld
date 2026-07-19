@@ -703,6 +703,18 @@ Cada item abaixo é uma trava de design contra estratégia dominante ou jogo "re
 | **Clamp dano mínimo 1** | impede build de Def infinita que zera dano (exceto imunidade telegrafa) |
 | **AP escasso (3)** | toda ação compete por AP; Scan/Gambito custam o turno de ataque (trade-off real) |
 
+### 15.1 Duração-alvo por tier de encontro (decisão líder + Gus, 2026-07-19)
+
+Alvo de sensação por tier (rodadas; conversão informal ~25-30s/rodada no modelo 1B, cai com a maestria). O harness de balanceamento (`balance_harness.hpp`, cross-ref §15) valida média+mediana dentro da janela.
+
+| Tier | Rodadas-alvo | ~Minutos | Perfil |
+|---|---|---|---|
+| **Inimigo normal (trash/elite)** | **3-5** | ~1,5-2,5 min | **Ágil clássico** (Pokémon/SNES): trash rápido, não cansa o público 11+ |
+| **Boss** | **12-18** | ~6-9 min | **Tático/pesado** — respira. **Bosses são estilo Zelda** (mecânica/puzzle, não esponja de HP): aguardam BRAINSTORM DEDICADO (ver INBOX `BOSSES-ZELDA-BRAINSTORM`); os números aqui são o envelope de duração, o DESIGN da luta vem depois |
+| **Boss final (Sterling, 2 fases / Dragon Victory)** | **~30** (somando fases) | ~15-18 min | **Tático/pesado — TAMBÉM estilo Zelda** (mecânica/puzzle no clímax, não só troca de dano): entra no mesmo `BOSSES-ZELDA-BRAINSTORM`. Evento clímax |
+
+Nota de harness: a janela histórica do normal era 4-8 rodadas; a decisão aperta o trash pra **3-5** (ágil). Retune do alvo do harness = item de balanceamento futuro (não bloqueia; 4-5 já é interseção). One-way-door de sensação: fica registrado, revisável só via nova decisão do líder.
+
 ---
 
 ## 16. Integração com event bus
