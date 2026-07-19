@@ -77,12 +77,12 @@ SaveData rich_v4() {
 
 }  // namespace
 
-// ---- ancora: kSaveSchemaVersion (V4 nasceu aqui; hoje aponta pro topo V6,
-//      DECK-4 - o teste segue a ancora, nao um numero fixo) --------
+// ---- ancora: kSaveSchemaVersion (V4 nasceu aqui; hoje aponta pro topo V7,
+//      CARDS-HW-1 - o teste segue a ancora, nao um numero fixo) --------
 
 TEST_CASE("save_v4: kSaveSchemaVersion aponta pro topo da chain (ancora)",
           "[domain][save][v4]") {
-    REQUIRE(gus::domain::kSaveSchemaVersion == 6);
+    REQUIRE(gus::domain::kSaveSchemaVersion == 7);
     REQUIRE(gus::domain::save::current_schema_version() ==
             gus::domain::kSaveSchemaVersion);
 }

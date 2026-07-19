@@ -4,7 +4,7 @@
 // arvore JSON (como era o C#). Cada bump de schema (VN -> VN+1) e um passo da chain;
 // CurrentVersion = maior versao alcancavel = gus::domain::kSaveSchemaVersion.
 //
-// Schema atual = V6 (fonte unica: gus::domain::kSaveSchemaVersion). NAO confiar
+// Schema atual = V7 (fonte unica: gus::domain::kSaveSchemaVersion). NAO confiar
 // neste comentario como autoridade da versao; a ancora kSaveSchemaVersion e que manda.
 //   V1 = inicial, SEM character_states (per-character).
 //   V2 = + character_states. MigrateV1ToV2 popula character_states VAZIO (semantica
@@ -31,6 +31,15 @@
 //        carteira antes desta onda). O campo deck legado e ESVAZIADO apos a
 //        conversao (fonte de
 //        verdade migrou pra card_collection.active).
+//   V7 = + CardPhysicalState (gus/domain/deck/card_hardware.hpp) dentro de CADA
+//        CardInstance (ativo E morto) de CardCollectionState (CARDS-HARDWARE-
+//        ENGINE incremento 1, CARDS-HW-1, docs/design/mecanicas/
+//        cartas-spec-dados.md secao 10). MigrateV6ToV7 popula physical =
+//        CardPhysicalState{} (ROM original, bateria cheia, sem infeccao - o
+//        estado mais SEGURO/generoso, "zero e seguro") em TODA instancia ja
+//        existente - semantica honesta de um save V6: "toda carta pre-existente e
+//        legitima", sem tentar adivinhar contaminacao retroativa (funcao PURA,
+//        sem RNG/relogio, CONTRACT.md secao 7).
 //
 // A chain e extensivel: somar o passo VN->VN+1 + bumpar a ancora quando o marco
 // chegar (test-guarda current_schema_version()==kSaveSchemaVersion trava o esquecimento).
@@ -98,6 +107,16 @@ namespace gus::domain::save {
 // valida invariantes de V6 (CharacterSaveState::deck e o campo lido pelo migrator;
 // card_collection/credits/hand_selection nao existem neste layout).
 [[nodiscard]] std::vector<std::uint8_t> serialize_save_v5(const SaveData& data);
+
+// Serializa um SaveData no layout do payload V6 (comuns + character_states_v6 COM
+// card_collection/hand_selection MAS SEM CardInstance::physical + enemy_knowledge +
+// input_remap_backup + controls_hash128 + slot_id + difficulty +
+// difficult_recovery_stage + credits) dentro do envelope selado. Representa a
+// "geracao V6" do jogo (DECK-4, pre-CARDS-HW-1), para a fixture de migracao
+// V6->V7 (CARDS-HARDWARE-ENGINE incremento 1). NAO valida invariantes de V7
+// (CardInstance::physical nao existe neste layout - o decoder de V6 ja deixa
+// physical no default ao materializar, e o migrator so confirma/documenta isso).
+[[nodiscard]] std::vector<std::uint8_t> serialize_save_v6(const SaveData& data);
 
 // Forja um envelope selado (HMAC valido) cujo payload declara schema_version =
 // version, com o restante dos campos minimos (layout V1). Usado para testar a

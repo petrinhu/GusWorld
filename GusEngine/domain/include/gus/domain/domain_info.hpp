@@ -19,10 +19,16 @@ namespace gus::domain {
 // docs/design/mecanicas/deck-mao-sistema.md) - migrator V5->V6 converte o deck
 // legado (vector<string> de card_id) nas instancias novas do deck ativo; +credits
 // (int64_t) UMA VEZ no nivel do SaveData (carteira UNICA da party, docs/design/
-// mecanicas/economia.md - economia single-currency, NAO per-character).
-// Ancora forward-only e FONTE UNICA da versao (o comentario "V2/V3/V4/V5" em
+// mecanicas/economia.md - economia single-currency, NAO per-character); V7
+// +CardPhysicalState (gus/domain/deck/card_hardware.hpp) dentro de CADA
+// CardInstance (ativo e morto) de CardCollectionState - CARDS-HARDWARE-ENGINE
+// incremento 1 (CARDS-HW-1, TODO.md), a camada FISICA de carta possuida
+// (origem ROM/EPROM/pirata, bateria CR2032, integridade/virus oculto) -
+// migrator V6->V7 popula physical = CardPhysicalState{} (default seguro) em toda
+// instancia ja existente.
+// Ancora forward-only e FONTE UNICA da versao (o comentario "V2/V3/V4/V5/V6" em
 // outros arquivos NAO e autoridade; esta constante e).
-inline constexpr int kSaveSchemaVersion = 6;
+inline constexpr int kSaveSchemaVersion = 7;
 
 // Rotulo da camada de dominio, util para diagnostico/log na fase de andaime.
 std::string_view domain_label() noexcept;

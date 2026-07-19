@@ -103,14 +103,39 @@ SaveData migrate_v5_to_v6(SaveData data) {
     return data;
 }
 
+// Passo V6 -> V7 (CARDS-HARDWARE-ENGINE incremento 1, CARDS-HW-1, docs/design/
+// mecanicas/cartas-spec-dados.md secao 10): adiciona CardPhysicalState
+// (CardInstance::physical) a CADA CardInstance de card_collection.active E .dead,
+// de CADA personagem. Semantica honesta de um save V6: "toda carta pre-existente e
+// legitima" - nenhuma tentativa de "adivinhar" retroativamente se uma carta ja
+// salva seria pirata/infectada. physical = CardPhysicalState{} (ROM original,
+// bateria cheia, sem infeccao - secao 5.2 "zero e seguro", o estado mais
+// SEGURO/generoso). Nenhum outro campo de SaveData/CharacterSaveState muda neste
+// bump (so o SHAPE de CardInstance ganhou physical). Funcao pura (sem RNG/
+// relogio, CONTRACT.md secao 7) - o decoder do layout V6 (read_character_states_v6,
+// save_serializer.cpp) ja materializa CardInstance com physical no default (o
+// campo nao existe nos bytes V6); este passo so CONFIRMA/documenta esse estado
+// honesto, mesmo padrao dos passos anteriores (ex.: migrate_v1_to_v2 confirmando
+// character_states vazio).
+SaveData migrate_v6_to_v7(SaveData data) {
+    for (auto& [character_id, state] : data.character_states) {
+        for (auto& inst : state.card_collection.active)
+            inst.physical = gus::domain::deck::CardPhysicalState{};
+        for (auto& inst : state.card_collection.dead)
+            inst.physical = gus::domain::deck::CardPhysicalState{};
+    }
+    data.schema_version = 7;
+    return data;
+}
+
 }  // namespace
 
 int current_schema_version() noexcept {
-    // Fonte unica: o ancora do dominio. A chain abaixo (passos 1->2->3->4->5) DEVE
-    // alcancar exatamente esta versao; o test-guarda
+    // Fonte unica: o ancora do dominio. A chain abaixo (passos 1->2->3->4->5->6)
+    // DEVE alcancar exatamente esta versao; o test-guarda
     // current_schema_version()==kSaveSchemaVersion trava qualquer divergencia (ex.:
     // somar passo sem bumpar o ancora).
-    return gus::domain::kSaveSchemaVersion;  // 6
+    return gus::domain::kSaveSchemaVersion;  // 7
 }
 
 SaveData migrate_to_current(SaveData data, int from_version) {
@@ -143,6 +168,10 @@ SaveData migrate_to_current(SaveData data, int from_version) {
             case 5:
                 data = migrate_v5_to_v6(std::move(data));
                 version = 6;
+                break;
+            case 6:
+                data = migrate_v6_to_v7(std::move(data));
+                version = 7;
                 break;
             default:
                 // GAP na chain: versao sem migrator registrado. Bug de schema.

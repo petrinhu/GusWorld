@@ -48,10 +48,14 @@
 //   map<str,u8> flags | map<str,i32> inventory | map<str,i32> quest_progress |
 //   map<str,i32> relations |
 //   map<str, CharacterSaveState{ i32 current_hp | i32 xp |
-//     list<CardInstance{u64 instance_id | str card_id}> card_collection.active |
-//     list<CardInstance> card_collection.dead | u64 next_instance_id |
-//     list<u64> hand_selection }> (V6, DECK-4 - SUBSTITUI o `deck` legado
-//     list<str> dos layouts V2..V5, ver serialize_save_v5) |
+//     list<CardInstance{u64 instance_id | str card_id | CardPhysicalState physical{
+//       u32 origin | u16 battery_recharge_cycles | u32 battery_charge_deficit |
+//       u8 is_infected | u8 is_diagnosed | u32 virus_kind | u8 is_burned_out }}>
+//     card_collection.active | list<CardInstance> card_collection.dead |
+//     u64 next_instance_id | list<u64> hand_selection }> (V7, CARDS-HW-1 - CADA
+//     CardInstance ganhou physical; V6, DECK-4, tinha o MESMO shape SEM physical -
+//     SUBSTITUI o `deck` legado list<str> dos layouts V2..V5, ver
+//     serialize_save_v5/v6) |
 //   map<str,i32> enemy_knowledge (V3) |
 //   input_remap_backup (V4: u32 config_version | u32 actions_count | repeat:
 //     str action_name | f32 deadzone |
@@ -138,7 +142,7 @@ class SaveVersionTooNewError : public std::runtime_error {
 
 // ---- serialize / deserialize ----------------------------------------------
 
-// Serializa SaveData no formato atual (V6), envelope GDS3. Valida invariantes
+// Serializa SaveData no formato atual (V7), envelope GDS3. Valida invariantes
 // antes (fail-fast: lanca std::invalid_argument se invalido). Carimbo
 // timestamp_ms ja deve estar preenchido pelo chamador (injetado, ADR-006 item 4).
 // O slot_id do envelope (AAD) vem de data.slot_id; rollback_ctr = 0 (saves

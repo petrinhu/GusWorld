@@ -20,15 +20,26 @@
 #include <cstdint>
 #include <string>
 
+#include "gus/domain/deck/card_hardware.hpp"  // CardPhysicalState (CARDS-HW-1)
+
 namespace gus::domain::deck {
 
 // Instancia unica de uma carta possuida por um personagem. instance_id e o identificador
 // deterministico do CONTAINER (deck ativo/morto); card_id e a chave pro catalogo (
-// gus::domain::combat::Card::id). Sem mastery/skin/durabilidade aqui - sem consumidor
-// ainda (fica pra quando existir progressao de instancia, fora do MVP).
+// gus::domain::combat::Card::id). Sem mastery/skin aqui - sem consumidor ainda (fica
+// pra quando existir progressao de instancia, fora do MVP).
 struct CardInstance {
     std::uint64_t instance_id = 0;
     std::string card_id;
+
+    // NOVO (CARDS-HW-1, cartas-spec-dados.md secao 4). Estado fisico MUTAVEL desta
+    // copia especifica (bateria/degradacao/integridade sao por-EXEMPLAR, nao
+    // por-catalogo: duas copias da MESMA carta podem ter cargas de bateria e
+    // status de infeccao diferentes). Default = CardPhysicalState{} = "ROM
+    // original legitima, bateria cheia, sem infeccao" - o estado mais SEGURO,
+    // preservando TODO CardInstance{id, card_id} existente intacto (campo
+    // ADITIVO ao fim do struct, mesmo padrao de EffectSpec::side_filter).
+    CardPhysicalState physical;
 
     [[nodiscard]] bool operator==(const CardInstance&) const = default;
 };

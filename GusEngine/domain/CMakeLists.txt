@@ -87,6 +87,12 @@ add_library(gusengine_domain STATIC
     # guard de tier herdado de CardCollection::remove_for_sale (Especial/Super nunca
     # saem do ativo), craft desacoplado do inventario de materiais via MaterialConsumer.
     src/deck/deck_transactions.cpp
+    # CARDS-HARDWARE-ENGINE incremento 1 (CARDS-HW-1, TODO.md): camada FISICA de
+    # carta possuida (CardPhysicalState + enums CardOrigin/VirusKind/RsbConnector/
+    # HardwareClass) - CardPhysicalState::validate() + funcoes puras derivadas
+    # (SoH, conector, classe-de-hardware). card_hardware_constants.hpp e
+    # header-only (sem .cpp proprio).
+    src/deck/card_hardware.cpp
 )
 
 target_include_directories(gusengine_domain

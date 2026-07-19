@@ -231,6 +231,17 @@ add_executable(gusengine_domain_tests
     # AP/mana (Eletrico-utilidade "Tavus-Overclock", trava 1x/turno resetada no refresh de
     # TurnStart, custo sempre pago antes, Silence bloqueia).
     cartas_comuns_engine_test.cpp
+    # CARDS-HARDWARE-ENGINE incremento 1 (CARDS-HW-1, TODO.md): camada FISICA de
+    # carta possuida (origem ROM/EPROM/pirata, bateria CR2032, integridade/virus
+    # oculto, conector RSB) - CardPhysicalState::validate() + funcoes puras
+    # derivadas (SoH, conector, classe-de-hardware) + tabela de constantes
+    # (bateria por dificuldade, contaminacao por classe).
+    card_hardware_test.cpp
+    # CARDS-HW-1: persistencia do save V6->V7 (CardInstance::physical em cada
+    # CardInstance ativo/morto) - migrator puro, fixture serialize_save_v6
+    # congelando o layout antigo, roundtrip, defesa em profundidade (ordinal fora
+    # de faixa em payload forjado).
+    save_v7_test.cpp
 )
 
 # Os testes do combate incluem helpers de teste headers-only (fixed_random.hpp).

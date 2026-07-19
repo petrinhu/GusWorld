@@ -77,21 +77,21 @@ SaveData v1_state_fixture() {
 TEST_CASE("migrators: CurrentVersion da chain == kSaveSchemaVersion (guarda)",
           "[domain][save][migrators]") {
     REQUIRE(current_schema_version() == gus::domain::kSaveSchemaVersion);
-    REQUIRE(current_schema_version() == 6);
+    REQUIRE(current_schema_version() == 7);
 }
 
-// ---- migracao V1 -> V6: load de save antigo sobe todos os saltos da chain ---
+// ---- migracao V1 -> V7: load de save antigo sobe todos os saltos da chain ---
 
-TEST_CASE("migrators: save V1 carregado sobe ate V6 (campos novos vazios/default)",
+TEST_CASE("migrators: save V1 carregado sobe ate V7 (campos novos vazios/default)",
           "[domain][save][migrators]") {
     const auto v1 = v1_state_fixture();
     const auto bytes_v1 = serialize_save_v1(v1);  // envelope com payload V1
 
-    // O load version-aware roda a chain inteira (V1->V2->V3->V4->V5->V6) ANTES de
-    // materializar.
+    // O load version-aware roda a chain inteira (V1->V2->V3->V4->V5->V6->V7) ANTES
+    // de materializar.
     const auto loaded = deserialize_save(bytes_v1);
 
-    REQUIRE(loaded.schema_version == 6);                // bumpado ate o topo
+    REQUIRE(loaded.schema_version == 7);                // bumpado ate o topo
     REQUIRE(loaded.character_states.empty());           // campo V2, vazio
     REQUIRE(loaded.enemy_knowledge.empty());            // campo V3, vazio
     // V5 (MODOS-MORTE Fase 0): saves pre-dificuldade sobem como Medio.
@@ -105,9 +105,9 @@ TEST_CASE("migrators: save V1 carregado sobe ate V6 (campos novos vazios/default
     REQUIRE(loaded.timestamp_ms == 1000LL);
 }
 
-// ---- migracao V2 -> V6: save com character_states sobe os saltos restantes --
+// ---- migracao V2 -> V7: save com character_states sobe os saltos restantes --
 
-TEST_CASE("migrators: save V2 carregado sobe para V6 (deck legado vira card_collection)",
+TEST_CASE("migrators: save V2 carregado sobe para V7 (deck legado vira card_collection)",
           "[domain][save][migrators]") {
     // Forja um envelope V2 (layout antigo, SEM enemy_knowledge) via helper de teste.
     SaveData v2;
@@ -120,7 +120,7 @@ TEST_CASE("migrators: save V2 carregado sobe para V6 (deck legado vira card_coll
 
     const auto loaded = deserialize_save(bytes_v2);
 
-    REQUIRE(loaded.schema_version == 6);                // bumpado V2->V3->V4->V5->V6
+    REQUIRE(loaded.schema_version == 7);           // bumpado V2->V3->V4->V5->V6->V7
     REQUIRE(loaded.enemy_knowledge.empty());            // campo V3, vazio (honesto)
     REQUIRE(loaded.difficulty == gus::domain::save::DifficultyLevel::Medio);
     // Campos que ja existiam em V2 preservados:
@@ -138,11 +138,15 @@ TEST_CASE("migrators: save V2 carregado sobe para V6 (deck legado vira card_coll
     REQUIRE(gus_state.hand_selection.empty());
     // credits: carteira UNICA da party, no nivel do SaveData (nao per-character).
     REQUIRE(loaded.credits == 0);
+    // CARDS-HW-1: physical default (ROM original, bateria cheia, sem infeccao) em
+    // TODA instancia que atravessou a chain inteira (aqui via V2->...->V7).
+    REQUIRE(gus_state.card_collection.active[0].physical ==
+            gus::domain::deck::CardPhysicalState{});
 }
 
-// ---- migracao V4 -> V6: save do ADR-007 sobe os 2 ultimos saltos -----------
+// ---- migracao V4 -> V7: save do ADR-007 sobe os saltos restantes -----------
 
-TEST_CASE("migrators: save V4 carregado sobe para V6 (difficulty vira Medio + "
+TEST_CASE("migrators: save V4 carregado sobe para V7 (difficulty vira Medio + "
           "deck legado vira card_collection)",
           "[domain][save][migrators]") {
     SaveData v4;
@@ -156,14 +160,14 @@ TEST_CASE("migrators: save V4 carregado sobe para V6 (difficulty vira Medio + "
 
     const auto loaded = deserialize_save(bytes_v4);
 
-    REQUIRE(loaded.schema_version == 6);
+    REQUIRE(loaded.schema_version == 7);
     REQUIRE(loaded.difficulty == gus::domain::save::DifficultyLevel::Medio);
     REQUIRE(loaded.difficult_recovery_stage == 0);
     // Campos que ja existiam em V4 preservados:
     const auto& gus_state = loaded.character_states.at("gus");
     REQUIRE(gus_state.xp == 55);
     REQUIRE(loaded.slot_id == 2);
-    // DECK-4: mesma conversao do teste V2->V6 acima.
+    // DECK-4: mesma conversao do teste V2->V7 acima.
     REQUIRE(gus_state.deck.empty());
     REQUIRE(gus_state.card_collection.active.size() == 1);
     REQUIRE(gus_state.card_collection.active[0].card_id == "glifo_root");
@@ -171,9 +175,9 @@ TEST_CASE("migrators: save V4 carregado sobe para V6 (difficulty vira Medio + "
     REQUIRE(loaded.credits == 0);
 }
 
-// ---- migracao V5 -> V6: DECK-4, deck legado com VARIAS cartas + varios personagens
+// ---- migracao V5 -> V7: DECK-4, deck legado com VARIAS cartas + varios personagens
 
-TEST_CASE("migrators: save V5 carregado sobe para V6 (DECK-4: deck legado "
+TEST_CASE("migrators: save V5 carregado sobe para V7 (DECK-4: deck legado "
           "POPULADO vira card_collection, instance_id sequencial por personagem)",
           "[domain][save][migrators]") {
     SaveData v5;
@@ -190,7 +194,7 @@ TEST_CASE("migrators: save V5 carregado sobe para V6 (DECK-4: deck legado "
 
     const auto loaded = deserialize_save(bytes_v5);
 
-    REQUIRE(loaded.schema_version == 6);
+    REQUIRE(loaded.schema_version == 7);
     // difficulty/difficult_recovery_stage ja existiam em V5, preservados intactos.
     REQUIRE(loaded.difficulty == gus::domain::save::DifficultyLevel::Dificil);
     REQUIRE(loaded.difficult_recovery_stage == 1);
@@ -208,6 +212,9 @@ TEST_CASE("migrators: save V5 carregado sobe para V6 (DECK-4: deck legado "
     REQUIRE(gus_state.card_collection.next_instance_id == 4);
     REQUIRE(gus_state.hand_selection.empty());
     REQUIRE(loaded.credits == 0);
+    // CARDS-HW-1: physical default em toda instancia (V5->V6->V7).
+    for (const auto& inst : gus_state.card_collection.active)
+        REQUIRE(inst.physical == gus::domain::deck::CardPhysicalState{});
 
     // caua: instance_id reinicia em 1 (LOCAL ao personagem, nao compartilha
     // contador entre companions).
@@ -218,7 +225,7 @@ TEST_CASE("migrators: save V5 carregado sobe para V6 (DECK-4: deck legado "
     REQUIRE(caua_state.card_collection.next_instance_id == 2);
 }
 
-TEST_CASE("migrators: save V5 com deck legado VAZIO sobe para V6 sem instancias",
+TEST_CASE("migrators: save V5 com deck legado VAZIO sobe para V7 sem instancias",
           "[domain][save][migrators]") {
     SaveData v5;
     v5.schema_version = 5;
@@ -229,7 +236,7 @@ TEST_CASE("migrators: save V5 com deck legado VAZIO sobe para V6 sem instancias"
 
     const auto loaded = deserialize_save(bytes_v5);
 
-    REQUIRE(loaded.schema_version == 6);
+    REQUIRE(loaded.schema_version == 7);
     const auto& gus_state = loaded.character_states.at("gus");
     REQUIRE(gus_state.card_collection.active.empty());
     REQUIRE(gus_state.card_collection.dead.empty());
@@ -240,14 +247,21 @@ TEST_CASE("migrators: save V5 com deck legado VAZIO sobe para V6 sem instancias"
     REQUIRE(loaded.credits == 0);
 }
 
-// ---- save V6 carrega direto, sem migracao (chain no-op) --------------------
+// ---- save V7 carrega direto, sem migracao (chain no-op) --------------------
+//
+// NOTA (bump V6->V7, CARDS-HW-1): este caso testava "save V6 carrega direto"
+// enquanto V6 era o topo da chain; hoje o topo e V7 - serialize_save SEMPRE
+// escreve no layout CORRENTE (current_schema_version()), entao um SaveData cujo
+// campo schema_version nao bate com a versao atual falharia so por causa do
+// proprio campo (nao por perda real de dado). Ver save_v7_test.cpp para a
+// cobertura dedicada do bump (physical infectado/queimado/roundtrip).
 
-TEST_CASE("migrators: save V6 carrega direto (chain no-op)",
+TEST_CASE("migrators: save V7 carrega direto (chain no-op)",
           "[domain][save][migrators]") {
-    SaveData v6;
-    v6.schema_version = 6;
-    v6.timestamp_ms = 5LL;
-    v6.current_scene_path = "res://now.tscn";
+    SaveData v7;
+    v7.schema_version = 7;
+    v7.timestamp_ms = 5LL;
+    v7.current_scene_path = "res://now.tscn";
 
     CharacterSaveState gus_state;
     gus_state.current_hp = 34;
@@ -256,16 +270,16 @@ TEST_CASE("migrators: save V6 carrega direto (chain no-op)",
     gus_state.card_collection.dead = {{3, "glifo_obsoleto"}};
     gus_state.card_collection.next_instance_id = 4;
     gus_state.hand_selection = {1, 2};
-    v6.character_states = {{"gus", gus_state}};
-    v6.credits = 21;  // carteira UNICA da party, nivel do SaveData
+    v7.character_states = {{"gus", gus_state}};
+    v7.credits = 21;  // carteira UNICA da party, nivel do SaveData
 
-    v6.enemy_knowledge = {{"sentinela_bit", 8}, {"daemon_fork", 13}};
-    v6.difficulty = gus::domain::save::DifficultyLevel::Dificil;
-    v6.difficult_recovery_stage = 2;
+    v7.enemy_knowledge = {{"sentinela_bit", 8}, {"daemon_fork", 13}};
+    v7.difficulty = gus::domain::save::DifficultyLevel::Dificil;
+    v7.difficult_recovery_stage = 2;
 
     const auto loaded =
-        deserialize_save(gus::domain::save::serialize_save(v6));
-    REQUIRE(loaded == v6);
+        deserialize_save(gus::domain::save::serialize_save(v7));
+    REQUIRE(loaded == v7);
 }
 
 // ---- forward-only: rejeita versao FUTURA -----------------------------------

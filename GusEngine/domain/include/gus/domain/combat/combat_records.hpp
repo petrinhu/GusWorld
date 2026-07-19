@@ -114,6 +114,17 @@ struct Card {
     int restore_ap = 0;
     int restore_mana = 0;
 
+    // ---- CARDS-HARDWARE-ENGINE incremento 1 (CARDS-HW-1, cartas-spec-dados.md
+    // secao 3): clone-falso de especial (cartas-hardware-pirataria-energia.md
+    // secao 2, "Clone-falso de especial"). Quando preenchido, esta entrada de
+    // CATALOGO e uma imitacao pirata que IMPERSONA a carta especial cujo Card::id
+    // esta aqui. A imitacao e sua PROPRIA entrada de catalogo (tier =
+    // CardTier::Comum, id PROPRIO, ex. "cardExec-faraday-fake"), NUNCA o mesmo id
+    // da especial real - preserva a unicidade (deck-mao-sistema.md secao 7 inv.9)
+    // sem exigir NENHUM caso especial em CardCollection. std::nullopt = carta
+    // normal (imensa maioria; default preserva todo catalogo existente intacto).
+    std::optional<std::string> mimics_special_id;
+
     [[nodiscard]] bool operator==(const Card&) const = default;
 };
 

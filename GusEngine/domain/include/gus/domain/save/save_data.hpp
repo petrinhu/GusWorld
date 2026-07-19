@@ -148,11 +148,11 @@ struct CharacterSaveState {
     void validate() const;
 };
 
-// Save data versionado (schema atual V6). Imutavel por convencao (struct de valor).
+// Save data versionado (schema atual V7). Imutavel por convencao (struct de valor).
 struct SaveData {
     // Versao do schema deste save. Save novo nasce na versao atual
     // (kSaveSchemaVersion); saves antigos sobem pela chain antes de materializar.
-    int schema_version = 6;
+    int schema_version = 7;
 
     // CARIMBO injetado (epoch ms). Metadado de listagem/ordenacao (ADR-006 item 4).
     std::int64_t timestamp_ms = 0;

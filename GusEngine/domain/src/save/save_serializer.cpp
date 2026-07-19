@@ -147,6 +147,14 @@ class Reader {
         return buf_[pos_++];
     }
 
+    std::uint16_t read_u16() {
+        require(2, "u16");
+        const std::uint16_t v = static_cast<std::uint16_t>(buf_[pos_]) |
+                                (static_cast<std::uint16_t>(buf_[pos_ + 1]) << 8);
+        pos_ += 2;
+        return v;
+    }
+
     std::uint32_t read_u32() {
         require(4, "u32");
         const std::uint32_t v = static_cast<std::uint32_t>(buf_[pos_]) |
@@ -349,12 +357,13 @@ std::vector<gus::domain::deck::CardInstance> read_card_instance_list(Reader& r,
     return list;
 }
 
-// Layout CORRENTE (V6+, DECK-4): current_hp | xp | card_collection{ list<CardInstance>
-// active | list<CardInstance> dead | u64 next_instance_id } | list<u64>
-// hand_selection. SUBSTITUI o `deck` legado (write_character_states acima,
-// congelado nos payloads V2..V5). credits NAO mora aqui - e a carteira UNICA da
-// party, gravada 1x no nivel do SaveData (write_credits_wallet abaixo), nao
-// per-character.
+// Layout FIXTURE V6 (DECK-4, congelado em CARDS-HW-1): current_hp | xp |
+// card_collection{ list<CardInstance{u64 instance_id, str card_id}> active |
+// list<CardInstance> dead | u64 next_instance_id } | list<u64> hand_selection.
+// SEM CardPhysicalState (layout ANTERIOR ao bump V7) - usado SO por
+// serialize_save_v6 (fixture de migracao) e pelo read path de version==6. O
+// layout CORRENTE (V7+) e write_character_states_v7/read_character_states_v7
+// abaixo (CADA CardInstance ganhou physical).
 void write_character_states_v6(std::vector<std::uint8_t>& payload, const SaveData& s) {
     put_map(payload, s.character_states,
             [](std::vector<std::uint8_t>& o, const CharacterSaveState& st) {
@@ -380,6 +389,110 @@ void read_character_states_v6(Reader& r, SaveData& s) {
         st.card_collection.next_instance_id = r.read_u64();
         // hand_selection: cada id custa >= 8 bytes (u64).
         const std::uint32_t hand_n = r.bounded_count(r.read_u32(), 8, "v6-hand");
+        st.hand_selection.reserve(hand_n);
+        for (std::uint32_t j = 0; j < hand_n; ++j)
+            st.hand_selection.push_back(r.read_u64());
+        s.character_states.emplace(id, std::move(st));
+    }
+}
+
+// ---- CardPhysicalState (V7, CARDS-HW-1) -------------------------------------
+//
+// u32 origin | u16 battery_recharge_cycles | u32 battery_charge_deficit |
+// u8 is_infected | u8 is_diagnosed | u32 virus_kind | u8 is_burned_out.
+// Enums gravados como u32 cru (mesmo padrao de difficulty/CardTier neste codec);
+// o hardening de ordinal fora do dominio fica em CardPhysicalState::validate()
+// (chamado por CardCollectionState::validate(), defesa em profundidade no fim de
+// deserialize_save - mesmo padrao ja usado por DifficultyLevel).
+void put_card_physical_state(std::vector<std::uint8_t>& out,
+                             const gus::domain::deck::CardPhysicalState& p) {
+    put_u32(out, static_cast<std::uint32_t>(p.origin));
+    put_u16(out, p.battery_recharge_cycles);
+    put_u32(out, p.battery_charge_deficit);
+    out.push_back(p.is_infected ? 1u : 0u);
+    out.push_back(p.is_diagnosed ? 1u : 0u);
+    put_u32(out, static_cast<std::uint32_t>(p.virus_kind));
+    out.push_back(p.is_burned_out ? 1u : 0u);
+}
+
+gus::domain::deck::CardPhysicalState read_card_physical_state(Reader& r) {
+    gus::domain::deck::CardPhysicalState p;
+    p.origin = static_cast<gus::domain::deck::CardOrigin>(r.read_u32());
+    p.battery_recharge_cycles = r.read_u16();
+    p.battery_charge_deficit = r.read_u32();
+    p.is_infected = (r.read_u8() != 0);
+    p.is_diagnosed = (r.read_u8() != 0);
+    p.virus_kind = static_cast<gus::domain::deck::VirusKind>(r.read_u32());
+    p.is_burned_out = (r.read_u8() != 0);
+    return p;
+}
+
+// Escreve uma lista de CardInstance NO LAYOUT V7 (instance_id u64 | card_id str |
+// CardPhysicalState physical) - shape compartilhado entre card_collection.active
+// e .dead (V7, CARDS-HW-1).
+void put_card_instance_list_v7(
+    std::vector<std::uint8_t>& out,
+    const std::vector<gus::domain::deck::CardInstance>& list) {
+    put_u32(out, static_cast<std::uint32_t>(list.size()));
+    for (const auto& inst : list) {
+        put_u64(out, inst.instance_id);
+        put_string(out, inst.card_id);
+        put_card_physical_state(out, inst.physical);
+    }
+}
+
+// Le uma lista de CardInstance no layout V7. IMP-01 (CWE-789): cada instancia
+// custa no minimo 29 bytes - 12 do shape V6 (8 do instance_id u64 + 4 do length
+// da string card_id) + 17 de CardPhysicalState (origin u32=4, cycles u16=2,
+// deficit u32=4, is_infected u8=1, is_diagnosed u8=1, virus_kind u32=4,
+// is_burned_out u8=1) - bounded_count barra um count implausivel ANTES do
+// reserve, mesmo padrao de read_card_instance_list (V6).
+std::vector<gus::domain::deck::CardInstance> read_card_instance_list_v7(Reader& r,
+                                                                         const char* what) {
+    const std::uint32_t n = r.bounded_count(r.read_u32(), 12 + 17, what);
+    std::vector<gus::domain::deck::CardInstance> list;
+    list.reserve(n);
+    for (std::uint32_t i = 0; i < n; ++i) {
+        gus::domain::deck::CardInstance inst;
+        inst.instance_id = r.read_u64();
+        inst.card_id = r.read_string();
+        inst.physical = read_card_physical_state(r);
+        list.push_back(std::move(inst));
+    }
+    return list;
+}
+
+// Layout CORRENTE (V7+, CARDS-HW-1): current_hp | xp | card_collection{
+// list<CardInstance{u64 instance_id, str card_id, CardPhysicalState physical}>
+// active | list<CardInstance> dead | u64 next_instance_id } | list<u64>
+// hand_selection. SUBSTITUI o layout V6 (write_character_states_v6 acima, agora
+// congelado como fixture de migracao) - CADA CardInstance ganhou physical.
+// credits NAO mora aqui - carteira UNICA da party (write_credits_wallet abaixo).
+void write_character_states_v7(std::vector<std::uint8_t>& payload, const SaveData& s) {
+    put_map(payload, s.character_states,
+            [](std::vector<std::uint8_t>& o, const CharacterSaveState& st) {
+                put_i32(o, st.current_hp);
+                put_i32(o, st.xp);
+                put_card_instance_list_v7(o, st.card_collection.active);
+                put_card_instance_list_v7(o, st.card_collection.dead);
+                put_u64(o, st.card_collection.next_instance_id);
+                put_u32(o, static_cast<std::uint32_t>(st.hand_selection.size()));
+                for (const auto instance_id : st.hand_selection) put_u64(o, instance_id);
+            });
+}
+
+void read_character_states_v7(Reader& r, SaveData& s) {
+    const std::uint32_t n = r.read_u32();
+    for (std::uint32_t i = 0; i < n; ++i) {
+        const std::string id = r.read_string();
+        CharacterSaveState st;
+        st.current_hp = r.read_i32();
+        st.xp = r.read_i32();
+        st.card_collection.active = read_card_instance_list_v7(r, "v7-card-active");
+        st.card_collection.dead = read_card_instance_list_v7(r, "v7-card-dead");
+        st.card_collection.next_instance_id = r.read_u64();
+        // hand_selection: cada id custa >= 8 bytes (u64).
+        const std::uint32_t hand_n = r.bounded_count(r.read_u32(), 8, "v7-hand");
         st.hand_selection.reserve(hand_n);
         for (std::uint32_t j = 0; j < hand_n; ++j)
             st.hand_selection.push_back(r.read_u64());
@@ -511,14 +624,35 @@ void read_difficulty_fields(Reader& r, SaveData& s) {
     s.difficult_recovery_stage = r.read_i32();
 }
 
-// Monta o payload no layout corrente (V6, DECK-4): u32 schema_version || comuns ||
-// character_states_v6 (card_collection + hand_selection, SEM o deck legado) ||
-// enemy_knowledge || input_remap_backup || controls_hash128 || i32 slot_id ||
-// u32 difficulty || i32 difficult_recovery_stage || i64 credits (carteira UNICA
-// da party, gravada 1x no FIM do payload - nao per-character).
+// Monta o payload no layout corrente (V7, CARDS-HW-1): u32 schema_version ||
+// comuns || character_states_v7 (card_collection COM CardInstance::physical +
+// hand_selection, SEM o deck legado) || enemy_knowledge || input_remap_backup ||
+// controls_hash128 || i32 slot_id || u32 difficulty || i32
+// difficult_recovery_stage || i64 credits (carteira UNICA da party, gravada 1x no
+// FIM do payload - nao per-character).
 std::vector<std::uint8_t> build_payload_current(const SaveData& data) {
     std::vector<std::uint8_t> payload;
     put_u32(payload, static_cast<std::uint32_t>(current_schema_version()));
+    write_common_payload(payload, data);
+    write_character_states_v7(payload, data);
+    write_enemy_knowledge(payload, data);
+    write_input_remap_backup(payload, data);
+    write_controls_hash(payload, data);
+    put_i32(payload, data.slot_id);
+    write_difficulty_fields(payload, data);
+    write_credits_wallet(payload, data);
+    return payload;
+}
+
+// Monta o payload no layout V6 (comuns || character_states_v6 COM
+// card_collection/hand_selection MAS SEM CardInstance::physical || enemy_knowledge
+// || input_remap_backup || controls_hash128 || slot_id || difficulty ||
+// difficult_recovery_stage || credits, SEM o campo V7: physical dentro de cada
+// CardInstance), para a fixture de migracao V6->V7 (CARDS-HW-1). E o que
+// build_payload_current fazia ANTES deste bump (DECK-4 congelado como "geracao V6").
+std::vector<std::uint8_t> build_payload_v6(const SaveData& data) {
+    std::vector<std::uint8_t> payload;
+    put_u32(payload, 6u);
     write_common_payload(payload, data);
     write_character_states_v6(payload, data);
     write_enemy_knowledge(payload, data);
@@ -708,11 +842,13 @@ SaveData deserialize_save(const std::vector<std::uint8_t>& data) {
     SaveData decoded;
     decoded.schema_version = version;
     read_common_payload(r, decoded);
-    // V2..V5: layout LEGADO (character_states com o `deck` de string). V6+: layout
-    // corrente (card_collection/credits/hand_selection, DECK-4) - mutuamente
-    // exclusivos, a versao lida decide qual formato esta nos bytes.
+    // V2..V5: layout LEGADO (character_states com o `deck` de string). V6: layout
+    // card_collection/hand_selection SEM CardInstance::physical (DECK-4). V7+:
+    // MESMO layout, CADA CardInstance ganhou physical (CARDS-HW-1). Os 3 grupos
+    // sao mutuamente exclusivos - a versao lida decide qual formato esta nos bytes.
     if (version >= 2 && version <= 5) read_character_states(r, decoded);
-    if (version >= 6) read_character_states_v6(r, decoded);
+    if (version == 6) read_character_states_v6(r, decoded);
+    if (version >= 7) read_character_states_v7(r, decoded);
     if (version >= 3) read_enemy_knowledge(r, decoded);
     if (version >= 4) {
         read_input_remap_backup(r, decoded);
@@ -756,6 +892,10 @@ std::vector<std::uint8_t> serialize_save_v4(const SaveData& data) {
 
 std::vector<std::uint8_t> serialize_save_v5(const SaveData& data) {
     return pack_save(build_payload_v5(data), data.slot_id);
+}
+
+std::vector<std::uint8_t> serialize_save_v6(const SaveData& data) {
+    return pack_save(build_payload_v6(data), data.slot_id);
 }
 
 std::vector<std::uint8_t> make_v1_payload(int version) {

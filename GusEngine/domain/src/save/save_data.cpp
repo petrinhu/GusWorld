@@ -26,6 +26,11 @@ void CardCollectionState::validate() const {
             if (inst.card_id.empty())
                 throw std::invalid_argument(
                     "CardCollectionState: card_id nao pode ser vazio.");
+            // V7 (CARDS-HW-1): propaga o invariante de forma da camada FISICA
+            // (virus_kind != None => is_infected; is_diagnosed => is_infected;
+            // ordinais de origin/virus_kind - cartas-spec-dados.md secao 6 inv.1).
+            // Fail-fast na fronteira do save, mesmo espirito do resto do arquivo.
+            inst.physical.validate();
             if (!seen_ids.insert(inst.instance_id).second)
                 throw std::invalid_argument(
                     "CardCollectionState: instance_id duplicado entre ativo e "

@@ -90,11 +90,12 @@ SaveData rich_v6() {
 
 }  // namespace
 
-// ---- ancora: kSaveSchemaVersion aponta pro topo V6 (DECK-4) ----------------
+// ---- ancora: kSaveSchemaVersion (V6 nasceu aqui; hoje aponta pro topo V7,
+//      CARDS-HW-1 - o teste segue a ancora, nao um numero fixo) --------------
 
 TEST_CASE("save_v6: kSaveSchemaVersion aponta pro topo da chain (ancora)",
           "[domain][save][v6]") {
-    REQUIRE(gus::domain::kSaveSchemaVersion == 6);
+    REQUIRE(gus::domain::kSaveSchemaVersion == 7);
     REQUIRE(gus::domain::save::current_schema_version() ==
             gus::domain::kSaveSchemaVersion);
 }
@@ -193,7 +194,8 @@ TEST_CASE("save_v6: load_save de um save V5 com deck legado sobe para V6 (Ok)",
 
     const auto outcome = load_save(bytes_v5, /*expected_slot=*/1);
     REQUIRE(outcome.result == LoadResult::Ok);
-    REQUIRE(outcome.data.schema_version == 6);
+    // A chain sobe ATE o topo atual (hoje V7, CARDS-HW-1) - nao para em V6.
+    REQUIRE(outcome.data.schema_version == 7);
     const auto& gus_state = outcome.data.character_states.at("gus");
     REQUIRE(gus_state.deck.empty());
     REQUIRE(gus_state.card_collection.active.size() == 2);
@@ -316,11 +318,15 @@ TEST_CASE("save_v6: load rejeita hand_selection orfa forjada (defesa em profundi
     REQUIRE_THROWS_AS(deserialize_save(bytes), std::invalid_argument);
 }
 
-// ---- forward-only: rejeita versao FUTURA (V7, alem do topo atual V6) ------
+// ---- forward-only: rejeita versao FUTURA (V8, alem do topo atual V7) ------
+//
+// V7 (CARDS-HW-1) deixou de ser "futuro" ao virar o topo atual da chain - o
+// numero usado aqui SEMPRE precisa ficar 1 acima de kSaveSchemaVersion; ver
+// save_v7_test.cpp para o teste irmao com o numero certo do bump atual.
 
-TEST_CASE("save_v6: save de versao FUTURA (V7) rejeitado (forward-only)",
+TEST_CASE("save_v6: save de versao FUTURA (V8) rejeitado (forward-only)",
           "[domain][save][v6]") {
-    const auto bytes_future = gus::domain::save::make_v1_payload(7);
+    const auto bytes_future = gus::domain::save::make_v1_payload(8);
     const auto outcome = load_save(bytes_future, /*expected_slot=*/0);
     REQUIRE(outcome.result == LoadResult::VersionTooNew);
     REQUIRE_THROWS_AS(deserialize_save(bytes_future),

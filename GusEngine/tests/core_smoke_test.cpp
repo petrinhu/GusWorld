@@ -39,8 +39,7 @@ TEST_CASE("core::engine_version expoe a versao semver", "[core][version]") {
 
 TEST_CASE("domain expoe identidade e schema de save", "[domain]") {
     REQUIRE(gus::domain::domain_label() == "gusengine-domain");
-    // Schema forward-only: V5 (MODOS-MORTE Fase 0: +difficulty
-    // +difficult_recovery_stage, por cima do V4 do ADR-007: +input_remap_backup
-    // +controls_hash128 +slot_id).
-    REQUIRE(gus::domain::kSaveSchemaVersion == 6);
+    // Schema forward-only: V7 (CARDS-HW-1: +CardPhysicalState por CardInstance,
+    // por cima do V6/DECK-4: +CardCollectionState +credits +hand_selection).
+    REQUIRE(gus::domain::kSaveSchemaVersion == 7);
 }
