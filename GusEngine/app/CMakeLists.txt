@@ -31,6 +31,9 @@ add_library(gusengine_app STATIC
     # extraidos de battle_scene.cpp - ver gus/app/screens/battle_scene.hpp (header
     # intocado, mesma classe BattleScene).
     src/screens/battle_scene_render.cpp
+    # AC-E11 A5 (TU-split, ADR-019): modo-mira/target selection (§3.5, D3) extraido
+    # de battle_scene.cpp - ver gus/app/screens/battle_scene.hpp.
+    src/screens/battle_scene_aim.cpp
     # AC-E11 A1 (ADR-019): roteamento de input (teclado/mouse/SDL->glintfx) extraido de
     # battle_preview.cpp - ver gus/app/screens/battle_input.hpp.
     src/screens/battle_input.cpp
