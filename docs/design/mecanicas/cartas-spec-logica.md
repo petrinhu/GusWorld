@@ -220,6 +220,7 @@ on_logic_bomb_precast(card_instance, ctx):
 ### 4.1.2 Falso-benigno — bloqueado (não especificado aqui)
 
 Já sinalizado em `reference_techmagic_engine_impl`: **"Bastiat/RevealHiddenCost — BLOQUEADO por design: precisa da feat EFEITOS-ADIADOS-OCULTOS (scheduler de efeitos futuros + gramática da pegadinha vs telegraph-honesto §13 — decisão do líder, não autônoma)."** Este payload por definição cobra um custo **retardado** (não no momento do cast) — exige um scheduler genérico de "efeito que dispara N turnos/eventos depois", que hoje não existe no motor. Não proponho pseudocódigo aqui: seria inventar a primitiva sem decisão do líder. **Fica como item de handoff, não de spec.**
+> **DECISÃO DO LÍDER (2026-07-18): ADIAR.** O falso-benigno fica **PLANEJADO (não cortado)**, dependente da feat `EFEITOS-ADIADOS-OCULTOS` numa onda de motor futura. Por ora o sistema segue com os outros **5 payloads** ativos; a rolagem de contaminação (AMB-07) usa os **4 tipos disparáveis hoje** (LogicBomb / Backdoor / Worm / ZipBomb — Adware é opt-in, fora da rolagem) até a feat existir. **Não priorizar a feat agora.**
 
 ### 4.1.3 Zip-bomb — efeito exato (AMB-05)
 
@@ -418,6 +419,7 @@ on_urandom_cast(card_instance, caster, ctx):
 - **AMB-08 (pool de "efeito ruim" do backfire):** o que exatamente é aplicado no caster quando dá backfire? Um status negativo genérico (Poison/Stun aleatório de baixa magnitude)? Perda de mana/AP? O doc-fonte não especifica o CONTEÚDO do backfire, só a probabilidade (1/3). Proponho: reusar um pool pequeno de status negativos leves já existentes (Stun 1 turno, ou Poison magnitude baixa) — sorteado uniformemente — em vez de inventar um efeito novo. Confirmar com líder.
 - **AMB-09 (pool vazio):** se o jogador não possui nenhuma carta na faixa sorteada (ex.: sorteou "jackpot" mas não tem nenhuma especial ainda), o que acontece? Proponho: dissipa (log + nada acontece, recursos já gastos ficam gastos) em vez de "cair pra faixa de baixo", pra não inflar silenciosamente a chance efetiva das faixas baixas. Mas é decisão de sensação de jogo.
 - **AMB-10 (lado do alvo):** "podendo ser bom ou ruim, no caster ou no inimigo — totalmente imprevisível" (doc-fonte) não deixa claro se o lado é sorteado INDEPENDENTE do efeito escolhido (ex.: pode sortear uma cura e aplicá-la no inimigo, ou um dano e aplicá-lo no caster) ou se segue o alvo natural da carta sorteada (cura sempre em aliado, dano sempre em inimigo — só o EFEITO é aleatório, não o alvo). A primeira leitura é mais caótica/fiel ao "totalmente imprevisível"; a segunda é mais segura/legível. **One-way door de sensação — líder decide.**
+> **RESOLVIDO (líder, 2026-07-18): INDEPENDENTE do efeito (caótico).** O lado (self/inimigo) é sorteado junto, separado do efeito — pode cair uma cura no inimigo ou um dano no próprio caster. Fiel ao "totalmente imprevisível" e ao espírito caótico da carta do Gus (+ a pirata azarada com backfire 1/3).
 
 ---
 

@@ -130,6 +130,8 @@ Ordem de vulnerabilidade: **especial (0) < comum < pirata especial < pirata comu
 
 **Apelo dramático (líder, 2026-07-18):** a Gaiola de Faraday é provavelmente a **primeira carta especial** do jogador (obtida cedo, no interior-faraday) e o acompanha o **jogo inteiro** — a especial em que ele mais confia e a que mais se apega. É exatamente ELA que o vírus-arma da Sterling mata no clímax. A carta-companheira "morre" na hora mais crítica: a traição do Dante dói mais porque tira do jogador o que ele tinha de mais familiar. Reforça a decisão de obtê-la cedo (§ guarda-chuva Faraday).
 
+**Destino da carta no clímax (líder, 2026-07-18 — resolve AMB-DADOS-02):** a arma da Sterling **QUEIMA** a Faraday (ela "morre" de verdade — `is_burned_out`, não uma infecção curável comum). O **único** jeito de recuperá-la é o branch de **redenção do Dante** (ele, por ação, remove o vírus que plantou e restaura a carta). Dá peso enorme à escolha de redimir: salva a carta-companheira E o traidor de uma vez. Reconcilia com o "a redenção = remover o vírus" do guarda-chuva Faraday.
+
 ## 10. Cartas grátis (bônus de compra) e adware
 
 - **Cartas grátis de bônus de compra** vêm **SEMPRE com adware** (§8), **avisado** ao personagem — ele concorda ou não (opt-in consciente).
