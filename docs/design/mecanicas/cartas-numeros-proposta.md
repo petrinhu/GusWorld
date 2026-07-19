@@ -12,7 +12,7 @@
 
 | # | Número | Valor proposto | Deriva de |
 |---|---|---|---|
-| 1a | **Capacidade de bateria — FECHADO PELO LÍDER: escala por dificuldade** (ver §1a e §8.1) | Fácil 16/42/110/288 · Médio 8/21/55/144 · Difícil 4/10/27/72 · Hardcore 4/10/27/72 (Homebrew/Pirata comum/Comum original/Especial) | escada Fibonacci (Médio = original recomendado; Fácil = ×2; Difícil/Hardcore = ÷2) |
+| 1a | **Capacidade de bateria — FECHADO PELO LÍDER: escala por dificuldade** (ver §1a e §8.1). **5ª classe `PirataEspecialFalso` fechada pelo `economy-designer` em 2026-07-19 (AMB-DADOS-01).** | Fácil 16/42/68/110/288 · Médio 8/21/34/55/144 · Difícil 4/10/17/27/72 · Hardcore 4/10/17/27/72 (Homebrew/Pirata comum/**Pirata especial falso**/Comum original/Especial) | escada Fibonacci (Médio = original recomendado; Fácil = ×2; Difícil/Hardcore = ÷2). PirataEspecialFalso = 34 no Médio, o degrau Fibonacci que já faltava entre 21 e 55 |
 | 1a | Drain por uso ("recurso Y") | **= ManaCost da carta** (1/2/3/6), não escala por dificuldade | ManaCost canônico (cartas-technomagik §2.2-2.3) |
 | 1b | Degradação por ciclo de recarga | **−13 p.p. de SoH por recarga** | escada Fibonacci |
 | 1b | Piso de descarte (SoH mínimo) | **21% SoH** | escada Fibonacci |
@@ -51,12 +51,14 @@
 
 **Decisão do líder (§8.1): a bateria NÃO é um valor único — escala por dificuldade**, usando as 3 réguas já mapeadas nas opções A/B/C originais (§8.1):
 
-| Dificuldade | Perfil | Homebrew | Pirata comum | Comum original | Especial (selada) |
-|---|---|---|---|---|---|
-| **Fácil** | RELAXADA (opção B, ×2) | 16 | 42 | 110 | 288 |
-| **Médio** | TENSA (opção A, baseline) | 8 | 21 | 55 | 144 |
-| **Difícil** | APERTADA (opção C, ÷2) | 4 | 10 | 27 | 72 |
-| **Hardcore** | APERTADA (igual ao Difícil) | 4 | 10 | 27 | 72 |
+| Dificuldade | Perfil | Homebrew | Pirata comum | **Pirata especial (clone-falso)** | Comum original | Especial (selada) |
+|---|---|---|---|---|---|---|
+| **Fácil** | RELAXADA (opção B, ×2) | 16 | 42 | **68** | 110 | 288 |
+| **Médio** | TENSA (opção A, baseline) | 8 | 21 | **34** | 55 | 144 |
+| **Difícil** | APERTADA (opção C, ÷2) | 4 | 10 | **17** | 27 | 72 |
+| **Hardcore** | APERTADA (igual ao Difícil) | 4 | 10 | **17** | 27 | 72 |
+
+**Racional específico do `PirataEspecialFalso` (AMB-DADOS-01, fechado pelo `economy-designer` em 2026-07-19):** a hipótese de partida da spec era "mesma capacidade do Pirata comum" (só o disfarge muda, o hardware por baixo é igual). Contra-argumento aceito: a própria tabela de contaminação (§3, já fechada) já trata o clone-falso como hardware de **qualidade intermediária**, não igual ao pirata genérico — 8% de risco, entre o Comum original (1%) e o Pirata comum (21%), porque o vendedor que fabrica um clone convincente o bastante pra enganar o display/scanner do jogador precisa de componentes/blindagem melhores que o pirata de fundo de quintal. Aplicando a MESMA lógica à bateria: o clone-falso fica um degrau ACIMA do Pirata comum, não igual a ele. Isso cai de graça na escada Fibonacci já em uso — o Médio das outras 4 classes é 8/21/55/144, saltando o **34** que fica exatamente entre 21 e 55; nenhum número novo foi inventado, só o degrau que já estava faltando na sequência 8,13,21,**34**,55,89,144. Fácil/Difícil/Hardcore seguem a mesma regra ×2/÷2 (floor) das outras 4 linhas — 34 é par, então Difícil/Hardcore fecha exato em 17, sem arredondamento. Ordem monotônica preservada em toda dificuldade: Homebrew < Pirata comum < Pirata especial falso < Comum original < Especial.
 
 **Racional:** a mesma escada Fibonacci (8/21/55/144) vira o eixo **Médio**; Fácil dobra (relaxa o gerenciamento pro público casual/kids), Difícil corta pela metade (aperta pro público que já busca desafio). **Hardcore usa o mesmo valor do Difícil** (não aperta ainda mais) — o Hardcore já pune por outros vetores (permadeath, save isolado, machine-bind); duplicar o aperto de bateria em cima disso seria punição composta desnecessária.
 
