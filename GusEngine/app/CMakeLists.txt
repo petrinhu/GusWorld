@@ -27,6 +27,9 @@ add_library(gusengine_app STATIC
     src/screens/battle_sprite_anim.cpp
     src/screens/battle_pacing.cpp
     src/screens/battle_scene.cpp
+    # AC-E11 A1 (ADR-019): roteamento de input (teclado/mouse/SDL->glintfx) extraido de
+    # battle_preview.cpp - ver gus/app/screens/battle_input.hpp.
+    src/screens/battle_input.cpp
     src/screens/battle_preview.cpp
     # MENU-PAUSA-CONFIG-SOM (M7-COSTURA): logica pura do menu de pausa + config de som.
     src/screens/system_menu.cpp
