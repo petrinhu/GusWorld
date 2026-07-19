@@ -184,6 +184,41 @@ TEST_CASE("virus logic-bomb: condicao NAO satisfeita -> passthrough, efeito nomi
     REQUIRE_FALSE(log_has(sm, "logic-bomb"));
 }
 
+TEST_CASE("virus logic-bomb: recursos (mana) sao debitados ANTES da interceptacao - a carta "
+         "'cobra' normalmente mesmo quando o efeito nominal e substituido pelo backfire "
+         "(secao 1 da spec: ordem pre-cast e SEMPRE debito->intercepcao, nunca o inverso)",
+         "[domain][combat][virus][logicbomb][regression]") {
+    CombatActor caster = make_actor("h", true, /*hp=*/100, /*atk=*/0, /*def=*/0, /*spd=*/50);
+    CombatActor target = make_actor("e", false, /*hp=*/300, /*atk=*/0, /*def=*/0, /*spd=*/10);
+    caster.take_damage(75);  // hp 25/100 = 25% < 30% -> pool[0]=HpBelow30pct satisfeita.
+    caster.refresh_resources_for_turn(/*round_index=*/0);  // mana_max=2, mana=2 (kBaseMana).
+    REQUIRE(caster.mana() == 2);
+
+    Card bomb = damage_card("virus.logicbomb.manadebit", /*power=*/10);
+    bomb.mana_cost = 2;  // == mana disponivel: se NAO debitar, sobra 2; se debitar, sobra 0.
+    auto reg = registry({bomb});
+
+    IntegrityState integrity;
+    integrity.is_infected = true;
+    integrity.virus_kind = VirusKind::LogicBomb;
+    std::vector<CardIntegrityRef> ledger = {
+        CardIntegrityRef{/*instance_id=*/0, bomb.id, /*owner_actor_id=*/1, &integrity}};
+
+    CombatAction cast = CombatAction::use_card(bomb.id, target.id());
+    cast.card_instance_id = 0;  // 0 % 3 == 0 -> HpBelow30pct (ja satisfeita acima).
+
+    CountingRandom rng;
+    auto provider = play_sequence({cast});
+    CombatStateMachine sm({&caster, &target}, provider, &reg, nullptr, &rng, &ledger);
+
+    sm.begin_turn();
+    sm.run_active_turn_to_end();
+
+    REQUIRE(target.hp() == target.max_hp());  // backfire desviou o efeito nominal, como sempre.
+    REQUIRE(caster.mana() == 0);              // mana FOI debitada apesar do backfire.
+    REQUIRE(log_has(sm, "logic-bomb"));
+}
+
 // ===== Worm: sempre-Slow idempotente ==================================================
 
 TEST_CASE("virus worm: SEMPRE aplica Slow idempotente no dono a cada cast (sem stack), "
@@ -240,7 +275,14 @@ TEST_CASE("virus worm: SEMPRE aplica Slow idempotente no dono a cada cast (sem s
     REQUIRE(slow_count == 1);
     (void)duration_1;
 
-    REQUIRE(log_has(sm, "worm"));
+    // ACHADO QA (mutation testing, CARDS-HW-2 fatia 1 review): log_has(sm, "worm") SOZINHO
+    // e um assert FRACO aqui - o card.id de teste ("virus.worm.slow") contem a substring
+    // "worm", e o log GENERICO incondicional "<ator> compila <card.id> em <alvo> por 0."
+    // (resolve_use_card, canal de dano comum) TAMBEM bate nesse grep mesmo se a mensagem
+    // ESPECIFICA do Slow ("arrasta a execucao - desempenho degradado (worm ativo)") for
+    // removida - mutante sobreviveu com a mensagem especifica deletada. Assert PRECISO na
+    // frase que so essa mensagem contem, fechando o furo de cobertura de log.
+    REQUIRE(log_has(sm, "desempenho degradado"));
     REQUIRE_NOTHROW(integrity.validate());
 }
 
