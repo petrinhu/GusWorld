@@ -1,11 +1,23 @@
 // gus/domain/deck/card_hardware_constants.hpp
 //
-// TODAS as constantes numericas da camada FISICA de carta (CARDS-HARDWARE-ENGINE
-// incremento 1, CARDS-HW-1), num header so, cada uma marcada //PLAYTEST (mesmo
-// padrao de deck_constants.hpp). Afinaveis no playtest N=3; nenhum consumidor deve
-// hardcodar estes valores soltos no proprio codigo - sempre importar daqui (fonte
-// unica). Header-only (sem .cpp): tabelas constexpr + funcoes de lookup inline,
-// mesmo padrao de gus/domain/input/action_registry.hpp::all_action_categories().
+// UMBRELLA das constantes numericas da camada FISICA de carta que CRUZAM pecas/
+// dominios (CARDS-HARDWARE-ENGINE incremento 1, CARDS-HW-1), cada uma marcada
+// //PLAYTEST (mesmo padrao de deck_constants.hpp). Afinaveis no playtest N=3;
+// nenhum consumidor deve hardcodar estes valores soltos no proprio codigo - sempre
+// importar daqui (fonte unica). Header-only (sem .cpp): tabelas constexpr + funcoes
+// de lookup inline, mesmo padrao de gus/domain/input/action_registry.hpp::
+// all_action_categories().
+//
+// ATOM-1 (decomposicao atomica): as constantes que pertencem a UMA SO peca
+// migraram pro modulo da propria peca (kBatteryDegradationPerRechargeCyclePp/
+// kBatteryDeadSohFloorPercent -> hardware/battery_state.hpp;
+// kWormPropagationChancePercent -> infection/integrity_state.hpp;
+// kContaminationPercentTable/contamination_percent_for -> hardware/hardware_class.hpp,
+// indexada SO por HardwareClass). Este umbrella guarda o que sobra: numeros que
+// CRUZAM HardwareClass com save::DifficultyLevel (battery_capacity_for - hardware/
+// nao pode incluir save/) e numeros de config sem peca dona obvia (EPROM/Turing).
+// Todos continuam acessiveis em gus::domain::deck:: (re-exportados via
+// card_hardware.hpp, incluido abaixo).
 //
 // POCO puro, ZERO SDL/glintfx.
 //
@@ -49,39 +61,6 @@ inline constexpr std::array<std::array<std::uint32_t, 4>, 5> kBatteryCapacityTab
     return kBatteryCapacityTable[static_cast<std::size_t>(hardware_class)]
                                 [static_cast<std::size_t>(difficulty)];
 }
-
-// Degradacao por ciclo de recarga em-lugar (pontos percentuais de SoH). NAO escala
-// por dificuldade (decisao do lider - so a CAPACIDADE escala, cartas-numeros-
-// proposta.md secao 1b). //PLAYTEST
-inline constexpr std::uint16_t kBatteryDegradationPerRechargeCyclePp = 13;
-
-// Piso de SoH considerado bateria morta (nao serve mais pra recarregar em-lugar).
-// //PLAYTEST
-inline constexpr std::uint8_t kBatteryDeadSohFloorPercent = 21;
-
-// ---- Contaminacao por virus (%) - cartas-numeros-proposta.md secao 3 -------------
-//
-// FECHADO PELO LIDER 2026-07-18: fixo em TODO modo de dificuldade (nao escala,
-// ao contrario da bateria). Ordem ordinal de HardwareClass. //PLAYTEST
-inline constexpr std::array<std::uint8_t, 5> kContaminationPercentTable = {
-    1,   // ComumOriginal
-    55,  // HomebrewEprom
-    21,  // PirataComum
-    8,   // PirataEspecialFalso
-    0,   // EspecialSelada (canon fixo - so gatilho narrativo, nunca RNG)
-};
-
-// % de risco de contaminacao na aquisicao (loot/compra/upload homebrew), por
-// HardwareClass. Table lookup puro - mesma nota de battery_capacity_for sobre
-// dominio ja-validado do chamador.
-[[nodiscard]] inline std::uint8_t contamination_percent_for(
-    HardwareClass hardware_class) noexcept {
-    return kContaminationPercentTable[static_cast<std::size_t>(hardware_class)];
-}
-
-// Propagacao secundaria (carta JA infectada, ao ser conjurada) - "worm de deck".
-// //PLAYTEST
-inline constexpr std::uint8_t kWormPropagationChancePercent = 13;
 
 // ---- Memoria / EPROM (cartas-numeros-proposta.md secao 2) -------------------------
 

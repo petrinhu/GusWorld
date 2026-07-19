@@ -89,11 +89,16 @@ add_library(gusengine_domain STATIC
     # saem do ativo), craft desacoplado do inventario de materiais via MaterialConsumer.
     src/deck/deck_transactions.cpp
     # CARDS-HARDWARE-ENGINE incremento 1 (CARDS-HW-1, TODO.md): camada FISICA de
-    # carta possuida (CardPhysicalState + enums CardOrigin/VirusKind/RsbConnector/
-    # HardwareClass) - CardPhysicalState::validate() + funcoes puras derivadas
-    # (SoH, conector, classe-de-hardware). card_hardware_constants.hpp e
+    # carta possuida (CardPhysicalState, AGREGADO das 3 pecas abaixo desde ATOM-1) -
+    # CardPhysicalState::validate() delega as pecas. card_hardware_constants.hpp e
     # header-only (sem .cpp proprio).
     src/deck/card_hardware.cpp
+    # ATOM-1 (decomposicao atomica ao nivel de modulo, generaliza ADR-019):
+    # CardPhysicalState quebrado em 3 pecas componiveis em modulos estreitos.
+    src/hardware/card_provenance.cpp
+    src/hardware/battery_state.cpp
+    src/hardware/hardware_class.cpp
+    src/infection/integrity_state.cpp
 )
 
 target_include_directories(gusengine_domain

@@ -242,6 +242,13 @@ add_executable(gusengine_domain_tests
     # congelando o layout antigo, roundtrip, defesa em profundidade (ordinal fora
     # de faixa em payload forjado).
     save_v7_test.cpp
+    # ATOM-1 (decomposicao atomica ao nivel de modulo, generaliza ADR-019):
+    # cobertura FOCADA de cada peca componivel de CardPhysicalState, isolada do
+    # agregado (que continua coberto, zero diff, por card_hardware_test.cpp).
+    card_provenance_test.cpp
+    battery_state_test.cpp
+    integrity_state_test.cpp
+    hardware_class_test.cpp
 )
 
 # Os testes do combate incluem helpers de teste headers-only (fixed_random.hpp).
