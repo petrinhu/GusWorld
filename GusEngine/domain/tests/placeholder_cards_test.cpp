@@ -8,15 +8,19 @@
 // campos canonicos (familia, base type, power, mana, status aplicado), pra a FSM e a
 // cena de combate consumirem com paridade.
 //
+// ATOM-2: PlaceholderCards movido de gus::domain::combat pra gus::domain::cards
+// (gus/domain/cards/placeholder_cards.hpp, LAR do catalogo de cartas).
+//
 // Cross-ref: engine/foundation/turn_combat/PlaceholderCards.cs; docs/design/mecanicas/combat.md secao 9/10.
 
 #include <catch2/catch_test_macros.hpp>
 
+#include "gus/domain/cards/placeholder_cards.hpp"
 #include "gus/domain/combat/combat_enums.hpp"
 #include "gus/domain/combat/combat_records.hpp"
-#include "gus/domain/combat/placeholder_cards.hpp"
 
 using namespace gus::domain::combat;
+using namespace gus::domain::cards;
 
 TEST_CASE("placeholder_cards: 5 cartas, uma por familia", "[domain][combat][cards]") {
     const auto& cards = PlaceholderCards::all();

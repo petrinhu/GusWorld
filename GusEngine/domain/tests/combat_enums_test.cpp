@@ -10,7 +10,14 @@
 // si e o item A1, chunk 4). Travar os ordinais agora torna a religacao futura trivial
 // e detecta drift cedo.
 //
-// Cross-ref: engine/foundation/turn_combat/CombatEnums.cs;
+// ATOM-2 (decomposicao atomica ao nivel de modulo, generalizando ADR-019): o
+// vocabulario de carta (CardFamily/CardBaseType/TargetShape/CardModifier/StackRule/
+// StatusId/CardTier/CardCategory/TriggerHook/EffectKind/SideFilter) foi EXTRAIDO
+// para gus/domain/cards/card_enums.hpp (LAR CANONICO). combat_enums.hpp virou
+// FACHADA (include + using-declaration, MESMA identidade de tipo) - os testes
+// abaixo continuam validando os ordinais canonicos, agora reexportados.
+//
+// Cross-ref: gus/domain/cards/card_enums.hpp; engine/foundation/turn_combat/CombatEnums.cs;
 //            docs/design/mecanicas/combat.md secao 3/6/7/8/9; ADR-006.
 
 #include <catch2/catch_test_macros.hpp>

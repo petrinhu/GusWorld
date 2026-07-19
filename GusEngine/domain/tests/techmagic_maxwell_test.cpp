@@ -29,7 +29,7 @@
 // vive em master_cards_test.cpp. Mesma convencao de techmagic_newton_test.cpp/
 // techmagic_faraday_test.cpp/techmagic_chain_test.cpp.
 //
-// Cross-ref: gus/domain/combat/master_cards.hpp (maxwell); combat_state_machine.cpp
+// Cross-ref: gus/domain/cards/master_cards.hpp (maxwell, ATOM-2); combat_state_machine.cpp
 //            (resolve_targets Grupo, regra geral "fogo amigo desligado", estimate_card_damage);
 //            docs/design/mecanicas/cartas-technomagik.md; docs/design/roster-analogos/
 //            _EFEITOS-ESCOLHIDOS.md (AMB-08); ADR-016.

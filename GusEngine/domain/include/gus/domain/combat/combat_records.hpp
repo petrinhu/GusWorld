@@ -4,6 +4,18 @@
 // engine/foundation/turn_combat/CombatRecords.cs. POCO puro, ZERO Qt (invariante de
 // domain/, engine-design.md secao 2). Header-only: sao dados puros + factories triviais.
 //
+// ATOM-2 (decomposicao atomica ao nivel de modulo, generalizando ADR-019): os
+// records de VOCABULARIO DE CARTA (StatusEffect, EffectSpec, Card - migram JUNTOS)
+// foram EXTRAIDOS para gus/domain/cards/card_records.hpp (LAR CANONICO). Este header
+// virou FACHADA para esse pedaco: inclui card_records.hpp e RE-EXPORTA os nomes em
+// gus::domain::combat via using-declaration (MESMA identidade de tipo) - os ~90
+// consumidores existentes continuam enxergando `gus::domain::combat::Card` etc.
+// intocados. Os records de combate PROPRIAMENTE DITO (PipelineSlot, ComboRecipe,
+// IntentPreview, CombatAction, CombatLogEntry, StatusEffectChange, CombatResult)
+// continuam aqui - dependem de StatusEffect/CardModifier/TargetShape (agora vindos
+// da fachada de card_enums.hpp via combat_enums.hpp) mas nao sao vocabulario de
+// carta em si.
+//
 // readonly record struct (C#) -> struct C++ de campos publicos com igualdade por valor
 // (operator== = default), mesmo padrao de CharacterTemplate/EnemyTemplate no M3.
 //
@@ -19,8 +31,9 @@
 // read-only sobre InitiativeQueue) NAO entram aqui. Sao os chunks 2-4. Este arquivo
 // cobre so os records de DADOS imutaveis (secao 7/9/10/16/17).
 //
-// Cross-ref: engine/foundation/turn_combat/CombatRecords.cs;
-//            docs/design/mecanicas/combat.md secao 3/5/7/8/9/10/16/17; ADR-006.
+// Cross-ref: gus/domain/cards/card_records.hpp (LAR de StatusEffect/EffectSpec/Card);
+//            engine/foundation/turn_combat/CombatRecords.cs;
+//            docs/design/mecanicas/combat.md secao 3/5/7/8/9/10/16/17; ADR-006; ADR-019.
 
 #ifndef GUS_DOMAIN_COMBAT_COMBAT_RECORDS_HPP
 #define GUS_DOMAIN_COMBAT_COMBAT_RECORDS_HPP
@@ -29,104 +42,16 @@
 #include <string>
 #include <vector>
 
+#include "gus/domain/cards/card_records.hpp"
 #include "gus/domain/combat/combat_enums.hpp"
 
 namespace gus::domain::combat {
 
-// Status uniforme aplicado a qualquer ator. Tick processado no TurnStart. secao 9.
-struct StatusEffect {
-    StatusId id = StatusId::Stun;
-    int magnitude = 0;
-    int duration = 0;
-    StackRule stack_rule = StackRule::Replace;
-    CardFamily family_origin = CardFamily::Eletrico;
-
-    [[nodiscard]] bool operator==(const StatusEffect&) const = default;
-};
-
-// Instrucao declarativa do executor techMagic (ADR-016): a carta e um programa (lista
-// ordenada de EffectSpec) que o Tavus-Drive executa. Params tunaveis; significado por-kind.
-struct EffectSpec {
-    TriggerHook trigger = TriggerHook::OnCast;
-    EffectKind kind = EffectKind::ApplyStatus;
-    int magnitude = 0;
-    int percent = 0;
-    int duration = 0;
-    StatusId status = StatusId::Stun;
-    StackRule stack_rule = StackRule::Replace;
-    // Filtro de lado do alvo (ADR-016 Balde B, Faraday/EM-Shield). Campo ADITIVO ao fim do
-    // struct: default Any preserva TODAS as cartas/EffectSpec/testes existentes intactos
-    // (nenhum filtro). Ver combat_enums.hpp::SideFilter + techmagic.cpp::handle_apply_status.
-    SideFilter side_filter = SideFilter::Any;
-
-    [[nodiscard]] bool operator==(const EffectSpec&) const = default;
-};
-
-// Carta-base imutavel (modelo B). Modificadores anexados em runtime via modifiers. secao 7.
-struct Card {
-    std::string id;
-    // KEY de traducao (ex: CARD_PULSO_ELETRICO_NAME); resolvida via tr() no DISPLAY/UI,
-    // nunca no runtime de combate.
-    std::string display_name;
-    CardFamily family = CardFamily::Eletrico;
-    CardBaseType base_type = CardBaseType::Pulso;
-    int mana_cost = 0;
-    int ap_cost = 1;  // default 1 (espelha ApCost do C#)
-    int power = 0;
-    TargetShape target_shape = TargetShape::Single;
-    std::optional<StatusEffect> status_applied;
-    std::vector<CardModifier> modifiers;
-    int mastery = 0;  // cresce por uso (Pillar 1)
-    // 0..100, porcentagem de crit; 0 = sem crit (secao 7/11). Default 0.
-    int crit_chance = 0;
-
-    // ---- Executor techMagic (ADR-016, MVP step 1): record-only, sem mudanca de
-    // comportamento no resolvedor neste step. Defaults preservam as 5 comuns intocadas
-    // (tier Comum, effects vazio).
-    CardTier tier = CardTier::Comum;
-    CardCategory category = CardCategory::Ativa;  // semantica so p/ tier != Comum
-    std::vector<EffectSpec> effects;               // vazio nas COMUNS (intocadas)
-    bool ignores_weakness_wheel = false;  // trunfo fora-da-roda (Godel); resolvedor liga depois
-    bool is_universal_compiler = false;   // flag de trunfo ADR-016; record-only neste step
-
-    // ---- CARTAS-COMUNS-ENGINE (TODO.md, decisoes do lider 2026-07-16): 2 pecas de engine
-    // pequenas pras COMUNS (NAO tocam o executor techMagic/EffectKind; ADR-016 continua so
-    // ESPECIAL/SUPER). Campos ADITIVOS ao fim do struct, default neutro preserva TODA carta/
-    // teste existente intacta.
-
-    // SynergyStatus (Finalizador Opcao A): generaliza o multExpose (secao 9/11, que so cobre
-    // Expose) pra QUALQUER StatusId. Vazio = sem sinergia (comportamento atual). Se >=1 dos
-    // status listados aqui esta presente no ALVO, aplica o fator FIXO synergy_percent - NAO
-    // stacka por-status-presente (2+ status da lista no alvo = MESMO fator, e binario
-    // presente/ausente). Ver combat_state_machine.cpp::resolve_use_card/estimate_card_damage
-    // (mult_synergy, mesmo padrao ordinal do mult_expose).
-    std::vector<StatusId> synergy_statuses;
-    // Percentual do bonus multiplicativo quando a sinergia dispara (40 = +40%, mesma forma
-    // de StatusEffect::magnitude do Expose). 0 = sem bonus (default neutro). Data-driven
-    // por-carta: a logica do resolvedor NUNCA hardcoda 40 (a carta e quem carrega o numero).
-    int synergy_percent = 0;
-
-    // Recarga de recurso (Eletrico-utilidade "Tavus-Overclock"): ao ser jogada, concede
-    // grant_bonus_ap(restore_ap) + restore_mana(restore_mana) ao PROPRIO conjurador, apos o
-    // custo de mana ja ter sido pago. Sujeito a trava 1x/turno (CombatActor::overclock_used_,
-    // resetada no refresh de TurnStart). 0/0 = sem recarga (default neutro, toda carta
-    // existente intocada). Ver resolve_use_card.
-    int restore_ap = 0;
-    int restore_mana = 0;
-
-    // ---- CARDS-HARDWARE-ENGINE incremento 1 (CARDS-HW-1, cartas-spec-dados.md
-    // secao 3): clone-falso de especial (cartas-hardware-pirataria-energia.md
-    // secao 2, "Clone-falso de especial"). Quando preenchido, esta entrada de
-    // CATALOGO e uma imitacao pirata que IMPERSONA a carta especial cujo Card::id
-    // esta aqui. A imitacao e sua PROPRIA entrada de catalogo (tier =
-    // CardTier::Comum, id PROPRIO, ex. "cardExec-faraday-fake"), NUNCA o mesmo id
-    // da especial real - preserva a unicidade (deck-mao-sistema.md secao 7 inv.9)
-    // sem exigir NENHUM caso especial em CardCollection. std::nullopt = carta
-    // normal (imensa maioria; default preserva todo catalogo existente intacto).
-    std::optional<std::string> mimics_special_id;
-
-    [[nodiscard]] bool operator==(const Card&) const = default;
-};
+// ---- Re-exporta o vocabulario de carta (LAR CANONICO: gus/domain/cards/card_records.hpp,
+// ATOM-2). Using-declaration preserva a IDENTIDADE de tipo.
+using cards::Card;
+using cards::EffectSpec;
+using cards::StatusEffect;
 
 // Slot da pipeline de compilacao (Tavus-Drive). secao 10.
 struct PipelineSlot {

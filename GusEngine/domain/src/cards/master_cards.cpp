@@ -1,4 +1,6 @@
-// gus/domain/src/combat/master_cards.cpp
+// gus/domain/src/cards/master_cards.cpp
+//
+// ATOM-2: movido de gus/domain/src/combat/master_cards.cpp.
 //
 // Implementacao do catalogo das 17 cartas ESPECIAIS suportadas pelo executor techMagic
 // (ADR-016, MVP steps 4-8 + manifesto itens 5-6, 12 + CARD-ENGINE-MANIFESTO itens 7, 9).
@@ -38,19 +40,19 @@
 // ha convencao fechada pra especiais). As posse-only/passivas idem Glifo por coerencia (o
 // base_type diegetico nao afeta o executor).
 //
-// Cross-ref: gus/domain/combat/master_cards.hpp; docs/design/roster-analogos/
+// Cross-ref: gus/domain/cards/master_cards.hpp; docs/design/roster-analogos/
 //            _EFEITOS-ESCOLHIDOS.md; docs/design/mecanicas/cartas-technomagik.md; ADR-016.
 
-#include "gus/domain/combat/master_cards.hpp"
+#include "gus/domain/cards/master_cards.hpp"
 
 #include <stdexcept>
 #include <string>
 #include <utility>
 #include <vector>
 
-#include "gus/domain/combat/combat_enums.hpp"
+#include "gus/domain/cards/card_enums.hpp"
 
-namespace gus::domain::combat::MasterCards {
+namespace gus::domain::cards::MasterCards {
 
 namespace {
 
@@ -506,4 +508,4 @@ std::unordered_map<std::string, Card> assemble() {
 
 std::unordered_map<std::string, Card> build_registry() { return assemble(); }
 
-}  // namespace gus::domain::combat::MasterCards
+}  // namespace gus::domain::cards::MasterCards

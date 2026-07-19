@@ -49,7 +49,7 @@
 // determinismo de RNG, escopo por-ator, dominó crit/fumble) vivem em
 // techmagic_quantize_test.cpp - este arquivo so cobre o CATALOGO.
 //
-// Cross-ref: gus/domain/combat/master_cards.hpp; techmagic.hpp; placeholder_cards_test.cpp
+// Cross-ref: gus/domain/cards/master_cards.hpp (ATOM-2); techmagic.hpp; placeholder_cards_test.cpp
 //            (mesmo padrao de spec de registry); docs/design/roster-analogos/
 //            _EFEITOS-ESCOLHIDOS.md; ADR-016.
 
@@ -60,14 +60,15 @@
 #include <vector>
 
 #include "fixed_random.hpp"
+#include "gus/domain/cards/master_cards.hpp"
 #include "gus/domain/combat/combat_actor.hpp"
 #include "gus/domain/combat/combat_enums.hpp"
 #include "gus/domain/combat/combat_records.hpp"
 #include "gus/domain/combat/initiative_queue.hpp"
-#include "gus/domain/combat/master_cards.hpp"
 #include "gus/domain/combat/techmagic.hpp"
 
 using namespace gus::domain::combat;
+using namespace gus::domain::cards;
 using gus::domain::tests::FixedRandom;
 
 namespace {

@@ -43,19 +43,20 @@ add_library(gusengine_domain STATIC
     src/combat/environment_clock.cpp
     src/combat/combo_table.cpp
     src/combat/scripted_brain.cpp
-    src/combat/placeholder_cards.cpp
     src/combat/combat_state_machine.cpp
     # Executor techMagic (ADR-016, MVP step 2): dispatcher OnCast/OnDamageDealt/
     # OnDamageReceived/Always sobre EffectSpec de Card (ApplyStatus/Leech/Reflect).
     src/combat/techmagic.cpp
-    # Executor techMagic (ADR-016, MVP step 4, TECHMAGIC-EXECUTOR): catalogo data-driven
-    # das 8 cartas especiais dos mestres suportadas pelos EffectKind atuais (POCO, sem
-    # logica de gameplay nova).
-    src/combat/master_cards.cpp
     # ADR-017 (pedido do Gus + velocidade-por-carta): ActionClock ISOLADO, prova de
     # conceito do escalonador por ticks estilo Pokemon Legends: Arceus. NAO ligado a
     # CombatStateMachine/InitiativeQueue de producao (cutover e onda pos-M7).
     src/combat/action_clock.cpp
+    # ATOM-2 (decomposicao atomica ao nivel de modulo, generalizando ADR-019): catalogo
+    # de cartas (comuns + especiais dos mestres) movido de src/combat/ pra src/cards/
+    # (LAR proprio, cards/ NAO inclui combat/ - gate de camadas). Sem mudanca de
+    # comportamento; so o path/namespace.
+    src/cards/placeholder_cards.cpp
+    src/cards/master_cards.cpp
     src/input/action_registry.cpp
     src/input/controls_name.cpp
     src/input/controls_json.cpp

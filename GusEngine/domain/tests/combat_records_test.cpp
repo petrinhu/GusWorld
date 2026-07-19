@@ -17,7 +17,14 @@
 // igualdade por valor (operator== = default), mesmo padrao ja usado em
 // CharacterTemplate/EnemyTemplate no M3.
 //
-// Cross-ref: engine/foundation/turn_combat/CombatRecords.cs;
+// ATOM-2 (decomposicao atomica ao nivel de modulo, generalizando ADR-019): os
+// records de VOCABULARIO DE CARTA (StatusEffect/EffectSpec/Card) foram EXTRAIDOS
+// para gus/domain/cards/card_records.hpp (LAR CANONICO). combat_records.hpp virou
+// FACHADA (include + using-declaration, MESMA identidade de tipo) - os records de
+// combate PROPRIAMENTE DITO (PipelineSlot/ComboRecipe/IntentPreview/CombatAction/
+// CombatLogEntry/StatusEffectChange/CombatResult) continuam aqui.
+//
+// Cross-ref: gus/domain/cards/card_records.hpp; engine/foundation/turn_combat/CombatRecords.cs;
 //            engine/tests/turn_combat/CombatDataRecordsTests.cs;
 //            docs/design/mecanicas/combat.md secao 3/5/7/8/9/10/16/17; ADR-006.
 

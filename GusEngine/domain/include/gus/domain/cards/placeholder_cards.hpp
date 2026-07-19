@@ -1,4 +1,4 @@
-// gus/domain/combat/placeholder_cards.hpp
+// gus/domain/cards/placeholder_cards.hpp
 //
 // Registry in-memory de cartas placeholder do vertical slice (1 por familia), portado de
 // engine/foundation/turn_combat/PlaceholderCards.cs. POCO puro, ZERO Qt. Serve so para
@@ -11,21 +11,26 @@
 // const std::unordered_map<string,Card>& (mesma instancia imutavel toda chamada),
 // pronto para passar como card_registry da CombatStateMachine.
 //
+// ATOM-2 (decomposicao atomica ao nivel de modulo): movido de
+// gus/domain/combat/placeholder_cards.hpp pra gus/domain/cards/ (LAR do catalogo de
+// cartas). Namespace gus::domain::cards::PlaceholderCards (era gus::domain::combat::
+// PlaceholderCards). Sem mudanca de comportamento.
+//
 // Cross-ref: engine/foundation/turn_combat/PlaceholderCards.cs; docs/design/mecanicas/combat.md secao 9/10.
 
-#ifndef GUS_DOMAIN_COMBAT_PLACEHOLDER_CARDS_HPP
-#define GUS_DOMAIN_COMBAT_PLACEHOLDER_CARDS_HPP
+#ifndef GUS_DOMAIN_CARDS_PLACEHOLDER_CARDS_HPP
+#define GUS_DOMAIN_CARDS_PLACEHOLDER_CARDS_HPP
 
 #include <string>
 #include <unordered_map>
 
-#include "gus/domain/combat/combat_records.hpp"
+#include "gus/domain/cards/card_records.hpp"
 
-namespace gus::domain::combat::PlaceholderCards {
+namespace gus::domain::cards::PlaceholderCards {
 
 // Dicionario id->Card com as 5 cartas do slice. Imutavel; mesma instancia toda chamada.
 [[nodiscard]] const std::unordered_map<std::string, Card>& all();
 
-}  // namespace gus::domain::combat::PlaceholderCards
+}  // namespace gus::domain::cards::PlaceholderCards
 
-#endif  // GUS_DOMAIN_COMBAT_PLACEHOLDER_CARDS_HPP
+#endif  // GUS_DOMAIN_CARDS_PLACEHOLDER_CARDS_HPP

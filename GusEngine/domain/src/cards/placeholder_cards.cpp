@@ -1,16 +1,18 @@
-// gus/domain/src/combat/placeholder_cards.cpp
+// gus/domain/src/cards/placeholder_cards.cpp
 //
 // Implementacao do registry de cartas placeholder (secao 9/10). Ver header para o
 // contrato. Espelha PlaceholderCards.cs 1:1: 5 cartas, uma por familia, construidas uma
 // vez e congeladas. POCO puro, ZERO Qt.
+//
+// ATOM-2: movido de gus/domain/src/combat/placeholder_cards.cpp.
 
-#include "gus/domain/combat/placeholder_cards.hpp"
+#include "gus/domain/cards/placeholder_cards.hpp"
 
 #include <stdexcept>
 
-#include "gus/domain/combat/combat_enums.hpp"
+#include "gus/domain/cards/card_enums.hpp"
 
-namespace gus::domain::combat::PlaceholderCards {
+namespace gus::domain::cards::PlaceholderCards {
 
 namespace {
 
@@ -83,4 +85,4 @@ const std::unordered_map<std::string, Card>& all() {
     return kCards;
 }
 
-}  // namespace gus::domain::combat::PlaceholderCards
+}  // namespace gus::domain::cards::PlaceholderCards

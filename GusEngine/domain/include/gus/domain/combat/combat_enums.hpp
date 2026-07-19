@@ -1,13 +1,27 @@
 // gus/domain/combat/combat_enums.hpp
 //
-// Enums POCO do sistema de combate turn-based. FONTE CANONICA dos enums do motor de
-// combate (portado de engine/foundation/turn_combat/CombatEnums.cs). POCO puro, ZERO
-// Qt (invariante de domain/, engine-design.md secao 2). Header-only.
+// Enums POCO do sistema de combate turn-based. FONTE CANONICA dos enums de RUNTIME
+// de combate (portado de engine/foundation/turn_combat/CombatEnums.cs). POCO puro,
+// ZERO Qt (invariante de domain/, engine-design.md secao 2). Header-only.
 //
-// Sobre CardFamily: este header e a FONTE CANONICA do enum (espelha CombatEnums.cs
-// 1:1, ordinais 0..4). Existe hoje uma copia local em
+// ATOM-2 (decomposicao atomica ao nivel de modulo, generalizando ADR-019): o
+// VOCABULARIO DE CARTA (CardFamily, CardBaseType, TargetShape, CardModifier,
+// StackRule, StatusId, CardTier, CardCategory, TriggerHook, EffectKind, SideFilter)
+// foi EXTRAIDO para gus/domain/cards/card_enums.hpp (LAR CANONICO daqueles enums).
+// Este header virou FACHADA para esse pedaco: inclui card_enums.hpp e RE-EXPORTA
+// os nomes em gus::domain::combat via using-declaration (MESMA identidade de tipo,
+// nao um typedef/copia) - os ~90 consumidores existentes de combat_enums.hpp
+// continuam compilando e enxergando `gus::domain::combat::CardFamily` etc.
+// intocados. cards/ NAO inclui combat/ (inversao de dependencia; gate de camadas).
+//
+// Os enums de RUNTIME de combate PROPRIAMENTE DITO (WeaknessTier, CombatActionType,
+// CombatPhase, CombatOutcome, PipelineSlotKind, StatusChangeKind) continuam aqui -
+// nao sao vocabulario de carta, sao estado da FSM/resolucao.
+//
+// Sobre CardFamily: gus/domain/cards/card_enums.hpp e a FONTE CANONICA do enum
+// (espelha CombatEnums.cs 1:1, ordinais 0..4). Existe hoje uma copia local em
 // gus/domain/templates/card_family.hpp (portada no M3 antes do motor de combate
-// existir). A RELIGACAO de templates/ para esta fonte (e a remocao da copia) e o
+// existir). A RELIGACAO de templates/ para essa fonte (e a remocao da copia) e o
 // item A1, fechado no chunk 4 - NAO neste sub-porte. Aqui apenas garantimos que os
 // ordinais BATEM (validado por combat_enums_test.cpp) para a religacao futura ser
 // trivial.
@@ -17,140 +31,34 @@
 // quebra saves; os valores explicitos travam isso. No C# os ordinais sao implicitos
 // (0..N na ordem de declaracao); aqui os tornamos explicitos sem mudar a ordem.
 //
-// Cross-ref: engine/foundation/turn_combat/CombatEnums.cs;
-//            docs/design/mecanicas/combat.md secao 3/6/7/8/9/16; ADR-006.
+// Cross-ref: gus/domain/cards/card_enums.hpp (LAR do vocabulario de carta);
+//            engine/foundation/turn_combat/CombatEnums.cs;
+//            docs/design/mecanicas/combat.md secao 3/6/7/8/9/16; ADR-006; ADR-019.
 
 #ifndef GUS_DOMAIN_COMBAT_COMBAT_ENUMS_HPP
 #define GUS_DOMAIN_COMBAT_COMBAT_ENUMS_HPP
 
 #include <cstdint>
 
+#include "gus/domain/cards/card_enums.hpp"
+
 namespace gus::domain::combat {
 
-// As 5 familias de carta da roda de fraqueza (identidade mecanica nao-sobreposta),
-// MAIS Universal (append-only, ordinal 5). secao 6.
-// Gus = todas as familias (compilador universal); companions = especialistas.
-// FONTE CANONICA. Ordem/ordinais espelham CombatEnums.cs e templates/card_family.hpp.
-//
-// Universal (decisao do criador 2026-07-14, achado PS-R1; docs/design/mecanicas/combat.md
-// secao 20): familia das CARTAS que NAO competem na roda de fraqueza — multFraqueza
-// SEMPRE 1.0, SEM Fraco/Resistente/Imune (ver weakness_wheel.hpp). Cobre as ~13 cartas
-// especiais nao-elementais dos mestres + o "utilitario" ja usado em secao 9
-// (Shield/Regen/Haste/Slow). SO-CARTAS: por decisao do criador, personagem/inimigo
-// (character_template.hpp / enemy_template.hpp) continuam restritos a roda de 5
-// (templates::kWheelFamilyCount); Universal NAO e um valor valido pra family de
-// template hoje. Ordinal 5 e ADITIVO: NAO reordena os 0..4 (contrato binario do
-// serializer .gdt).
-enum class CardFamily : std::uint32_t {
-    Eletrico = 0,
-    Bioquimico = 1,
-    Sonico = 2,
-    Cinetico = 3,
-    Criptografico = 4,
-    Universal = 5,
-};
-
-// Tipo-base diegetico da carta (gramatica "tipo.familia"). secao 7.
-enum class CardBaseType : std::uint32_t {
-    Pulso = 0,
-    Raiz = 1,
-    Eco = 2,
-    Fenda = 3,
-    Glifo = 4,
-};
-
-// Forma de alvo da acao/carta. secao 7. (Single = nome diegetico canonico, secao 7.)
-enum class TargetShape : std::uint32_t {
-    Self = 0,
-    Single = 1,
-    Linha = 2,
-    Area3x3 = 3,
-    Grupo = 4,
-};
-
-// Modificadores anexaveis em runtime (modelo B). secao 8. Cada um soma mana.
-// (Object/Null/Stream = nomes diegeticos canonicos da spec secao 8.)
-enum class CardModifier : std::uint32_t {
-    // Cria entidade persistente no campo (+1 mana).
-    Object = 0,
-    // Converte single em area OU multi-hit (+2 mana).
-    Stream = 1,
-    // Inverte/cancela efeito (+1 mana). Requer Scan previo no alvo.
-    Null = 2,
-};
-
-// Regra de empilhamento de status. secao 9.
-enum class StackRule : std::uint32_t {
-    Replace = 0,
-    Refresh = 1,
-    StackMagnitude = 2,
-    StackDuration = 3,
-};
-
-// Identidade de status aplicavel a qualquer ator. secao 9.
-// APPEND-ONLY a partir daqui: 13+ sao do executor techMagic (ADR-016); NAO reordenar
-// 0..12 (contrato binario do serializer futuro).
-enum class StatusId : std::uint32_t {
-    Stun = 0,
-    Poison = 1,
-    Corrode = 2,
-    Disrupt = 3,
-    Silence = 4,
-    Knockback = 5,
-    Break = 6,
-    Expose = 7,
-    Decrypt = 8,
-    Shield = 9,
-    Regen = 10,
-    Haste = 11,
-    Slow = 12,
-    SobrecargaTermica = 13,  // cartas-technomagik.md secao 5.1: DoT 3t 8/5/2 + Slow -1
-                             // SPD; Refresh; familia Eletrico.
-    Resfriamento = 14,       // secao 5.2: +1 SPD + (-1 mana na 1a carta, clamp custo min
-                             // 1); Dur 3; Refresh; buff.
-    Reflect = 15,            // marcador de reflexao (Newton); comportamento = executor
-                             // techMagic (step 2+).
-    BlindagemEM = 16,        // EM-Shield (Faraday, ADR-016 Balde B): imunidade a debuff
-                             // eletrico (bloqueia + limpa Sobrecarga Termica/Stun/etc de
-                             // familia Eletrico no alvo). Ver CombatActor::try_add_status.
-    NullProof = 17,          // Null-Proof (Godel, ADR-016 Balde B PR3): trunfo fura-imunidade
-                             // guardado no PORTADOR (buff, self ou aliado via side_filter
-                             // AllyOnly). No proximo hit do portador contra um alvo Resistente
-                             // OU Imune (mult_fraqueza < 1.0), o resolvedor forca mult 1.0 e
-                             // CONSOME (remove) o status; contra Neutro/Fraco fica intacto,
-                             // guardado. Ver combat_state_machine.cpp::resolve_use_card/
-                             // estimate_card_damage.
-    Scrying = 18,            // Scrying (John Dee/Black-Mirror, ADR-016 step 8,
-                             // EffectKind::RevealIntent): buff auto-aplicado no CASTER (dur 3,
-                             // StackRule::Refresh, familia Universal) via add_status LEGADO -
-                             // NAO passa pelo portao de imunidade (e um buff, nao um debuff
-                             // ofensivo em outro ator). Enquanto ativo, a FSM re-dumpa os
-                             // intents inimigos na fronteira de rodada (ver CombatStateMachine::
-                             // process_scrying_hooks). Classificado BUFF por exclusao (nao
-                             // listado em is_non_buff, combat_actor.cpp).
-    Eco = 19,                // Eco/Molde-Fiel (CloneAlly, von Neumann/Fork + Giordano Bruno/
-                             // Echo-Self; CARD-ENGINE-MANIFESTO item 8, ultimo step do
-                             // manifesto). Buff auto-aplicado no ALIADO clonado (self incluso,
-                             // Bruno e self-only por TargetShape) via add_status LEGADO - fora
-                             // do portao de imunidade EM-Shield (e um buff, nunca um debuff
-                             // ofensivo em outro ator). `magnitude` = % de replicacao (von
-                             // Neumann 50, Bruno 62, //PLAYTEST); `duration` = N turnos
-                             // PROPRIOS do portador (tick generico de qualquer StatusEffect,
-                             // ver CombatStateMachine::apply_status_tick default case). Ao
-                             // FIM de CADA turno proprio do portador (os DOIS sitios de
-                             // fim-de-turno, mesmo par de RepeatLastAction/OnAllyTurnEnd), se
-                             // a ULTIMA ACAO DE DANO desta rodada foi do PROPRIO portador
-                             // (last_action_.actor == portador), o eco reaplica os hits dele a
-                             // `magnitude`% via CombatActor::take_damage PURO (anti-recursao,
-                             // NAO toca last_action_/round_hits_ - mesma disciplina de
-                             // RepeatLastAction/HypotenuseCombo/Reflect). Classificado BUFF por
-                             // exclusao (nao listado em is_non_buff, combat_actor.cpp). Ver
-                             // techMagic::replicate_eco (techmagic.hpp) +
-                             // CombatStateMachine::process_eco_turn_end_hook
-                             // (combat_state_machine.cpp). Visual (sprite-eco translucido) e
-                             // responsabilidade da camada de apresentacao (glintfx), lendo este
-                             // StatusId - NAO implementado no domain/.
-};
+// ---- Re-exporta o vocabulario de carta (LAR CANONICO: gus/domain/cards/card_enums.hpp,
+// ATOM-2). Using-declaration preserva a IDENTIDADE de tipo (gus::domain::combat::CardFamily
+// e gus::domain::cards::CardFamily sao o MESMO tipo, so acessivel por dois nomes
+// qualificados) - nenhum consumidor existente precisa mudar.
+using cards::CardBaseType;
+using cards::CardCategory;
+using cards::CardFamily;
+using cards::CardModifier;
+using cards::CardTier;
+using cards::EffectKind;
+using cards::SideFilter;
+using cards::StackRule;
+using cards::StatusId;
+using cards::TargetShape;
+using cards::TriggerHook;
 
 // Tier de fraqueza da roda deterministica. secao 6.
 // Fraco = 1.5, Neutro = 1.0, Resistente = 0.66, Imune = 0.0.
@@ -213,158 +121,6 @@ enum class StatusChangeKind : std::uint32_t {
     Applied = 0,
     Expired = 1,
     Absorbed = 2,
-};
-
-// ---- Executor techMagic (ADR-016, MVP step 1) -------------------------------------
-// Enums novos do motor techMagic: a carta especial/super e um programa (lista ordenada
-// de EffectSpec, ver combat_records.hpp) que o Tavus-Drive executa. Record-only neste
-// step (nenhuma logica de resolucao ainda). APPEND-ONLY dali em diante (contrato
-// binario do serializer futuro).
-
-// Raridade/trilha de producao da carta. secao 6/7. Comum = as 5 do placeholder_cards
-// (intocadas); Especial/Super = trilha do executor techMagic.
-enum class CardTier : std::uint32_t {
-    Comum = 0,
-    Especial = 1,
-    Super = 2,
-};
-
-// Categoria de uso da carta; semantica so aplica quando tier != Comum.
-enum class CardCategory : std::uint32_t {
-    Ativa = 0,
-    Passiva = 1,
-    ForaDeCombate = 2,
-    Hibrida = 3,
-};
-
-// Gatilho de execucao de um EffectSpec dentro do programa da carta.
-enum class TriggerHook : std::uint32_t {
-    OnCast = 0,
-    OnDamageDealt = 1,
-    OnDamageReceived = 2,
-    OnAllyTurnEnd = 3,
-    OnRoundEnd = 4,
-    Always = 5,
-};
-
-// Tipo de efeito executavel por um EffectSpec. Conjunto inicial do MVP; cresce por
-// demanda (ate ~20-25) conforme as 20 especiais forem definidas. APPEND-ONLY.
-enum class EffectKind : std::uint32_t {
-    ApplyStatus = 0,
-    Leech = 1,
-    Reflect = 2,
-    HypotenuseCombo = 3,
-    CloneAlly = 4,
-    // Re-Run/Fractal-Echo (MVP step 5, Mandelbrot+Ada; decisoes Q1-Q4 do lider,
-    // 2026-07-14): reaplica o DANO>0 da ULTIMA ACAO de dano de QUALQUER aliado NESTA
-    // RODADA (LastActionRecord), escalado por EffectSpec.percent, direto via
-    // CombatActor::take_damage PURO (eco do resultado, sem novo sorteio/status/mana).
-    // EffectSpec.magnitude = chance% do Re-Run (0 = sempre, Mandelbrot; >0 consome 1
-    // rng->next(100), Ada). Ver techmagic.cpp::handle_repeat_last_action.
-    RepeatLastAction = 5,
-    // Cadeia de dano decrescente (Tesla): apos o dano-base atingir o alvo primario, a
-    // descarga SALTA pros proximos inimigos VIVOS na ordem da fila (ate EffectSpec.magnitude
-    // saltos), retendo EffectSpec.percent% do dano a cada salto (decaimento multiplicativo).
-    // Dano PURO (take_damage), 0 consumo de RNG. Ver techmagic.cpp::handle_chain_damage.
-    ChainDamage = 6,
-    // Dilatacao temporal (Einstein/Time-Dilate): empurra a acao de 1 inimigo pro FIM da
-    // fila da rodada corrente (age por ultimo; toda a party restante age antes). Primitiva
-    // = InitiativeQueue::reorder_pending (mesma da Gambito-Reordenar, migrada de
-    // reorder_actor em COMBATE-FILA-CURSOR-FIX pra nunca cruzar o cursor). EffectSpec.magnitude
-    // == 0 = empurra pro fim da fila (Einstein); >0 = N posicoes fixas. Alvo que JA agiu
-    // nesta rodada (indice < cursor da fila) e um no-op + log de dissipacao, NAO reaplica
-    // na proxima rodada. 0 consumo de RNG. Ver techmagic.cpp::handle_delay_action.
-    DelayAction = 7,
-    // Quantum-Lock (Planck, manifesto item 5, decisoes do lider 2026-07-15): passiva mana-0
-    // que QUANTIZA o dano de carta do PORTADOR em 3 degraus fixos da propria faixa da
-    // variancia Knowledge (secao 11): piso `base*(1-v)`, centro `base`, teto `base*(1+v)`,
-    // chances FIXAS 25%/50%/25% (nao evoluem com Knowledge - so a LARGURA dos degraus
-    // encolhe com kills, via `v`). Media = base (zero mudanca de balance). NAO passa pelo
-    // dispatcher techMagic::execute (ver techmagic.cpp::handle_damage_quantize, marcador
-    // no-op) - pluga DIRETO no sorteio de canal COMUM do resolvedor
-    // (combat_state_machine.cpp::resolve_use_card) e no preview PURO
-    // (estimate_card_damage), via combat_state_machine.cpp::quantize_spec_of. Consumo de
-    // RNG: SUBSTITUI o 2o consumo (next_double, variancia continua) por um sorteio de
-    // degrau (next(100)) - MESMA contagem do canal COMUM de sempre (2 consumos), so muda o
-    // TIPO do 2o. EffectSpec.percent = chance% de CADA extremo (piso E teto, simetrico);
-    // EffectSpec.magnitude = chance% do centro. Critico/falha INTACTOS (a quantizacao so
-    // age no canal COMUM).
-    DamageQuantize = 8,
-    // Scrying/Black-Mirror (John Dee, manifesto item 6, decisoes do lider 2026-07-15,
-    // D1-D4): buff auto-aplicado no CASTER (StatusId::Scrying, add_status LEGADO - fora do
-    // portao de imunidade) + DUMP read-only do IntentPreview de cada inimigo VIVO do lado
-    // oposto (1 linha de log por inimigo). Enquanto QUALQUER aliado vivo portar Scrying, a
-    // FSM RE-DUMPA na fronteira de rodada (CombatStateMachine::process_scrying_hooks) -
-    // FORA do dispatcher techMagic::execute nesse caso (Scrying e status, nao carta
-    // equipada; execute_equipped nunca despacha isto). D2: intent CAOTICO (Patch-Zero)
-    // retorna RUIDO, nunca revela os campos previstos - preserva a one-way door do boss.
-    // Read-only sobre o combate: 0 dano, 0 consumo de RNG, nao muta a fila (TESTE-REI de
-    // determinismo, ver techmagic_reveal_test.cpp). Ver techmagic.cpp::handle_reveal_intent/
-    // dump_reveal_intent/log_intent_for.
-    RevealIntent = 9,
-    // Free-Order (Hayek, CARD-ENGINE-MANIFESTO item 7, AMB-09): passiva de "ordem espontanea"
-    // - quando os membros do lado do PORTADOR agem de forma DIFERENTE (assinaturas de
-    // CombatActionType distintas, com UseCard refinado pela CardFamily da carta jogada, M2)
-    // na MESMA rodada, o lado inteiro ganha um bonus ESCALONADO de dano (mult >= 1.0) e um
-    // desconto no LIMIAR de falha (fumble_chance, piso 0) - NUNCA pune, so premia. MARCADOR
-    // no-op deliberado (mesmo padrao de DamageQuantize/Planck): NAO passa pelo dispatcher
-    // techMagic::execute - o resolvedor (combat_state_machine.cpp::resolve_use_card/
-    // resolve_basic_attack) e o preview PURO (estimate_card_damage/
-    // preview_basic_attack_damage) leem os EffectSpec DIRETO via
-    // combat_state_machine.cpp::diversity_spec_of, plugando na cadeia divisiva da secao 11 e
-    // no limiar do canal FALHA. Cada EffectSpec da carta e um DEGRAU: `magnitude` = limiar de
-    // assinaturas distintas pra este degrau valer, `percent` = bonus% de dano, `duration` =
-    // reducao em pontos-percentuais (pp) do limiar de falha (reuse deliberado do campo,
-    // mesmo padrao data-driven de outros EffectKind reinterpretando magnitude/percent/
-    // duration por-kind). Ledger novo `CombatStateMachine::round_actions_`
-    // (techMagic::RoundActionEntry, granularidade de ACAO via resolve_action - NAO de hit,
-    // ver RoundHitEntry): ecos de dano PURO (Mandelbrot/Ada/HypotenuseCombo, que usam
-    // CombatActor::take_damage direto sem passar por resolve_action) ficam FORA por
-    // construcao. Ver techmagic.cpp::handle_diversity_bonus (no-op) + techmagic_hayek_test.cpp.
-    DiversityBonus = 10,
-    // Calc-Edge (Mises, CARD-ENGINE-MANIFESTO item 9): passiva DUPLA mana-0, Universal.
-    // MARCADOR fora do dispatcher, MESMO padrao de DamageQuantize/DiversityBonus (o handler
-    // em techmagic.cpp e no-op deliberado - nunca roda de fato, a carta e Passiva/equip-only,
-    // execute_equipped nunca despacha OnCast pra ela). Face 1 ("party aloca melhor"): +1 AP
-    // NESTE turno pro DONO da passiva equipada (NAO party-wide, NAO muta max_ap_ - o bonus
-    // NAO persiste, reseta no PROXIMO refresh_resources_for_turn), plugado DIRETO em
-    // CombatStateMachine::begin_turn via apefficiency_spec_of. Face 2 ("comando central"):
-    // atores com CombatActor::central_command()==true DO LADO OPOSTO a quem porta a Mises
-    // (SE algum VIVO desse lado a tem equipada) sao (a) empurrados pro FIM do bloco do
-    // lado deles na fronteira de rodada (CombatStateMachine::regroup_round_by_side, 2a
-    // stable_partition, reusa InitiativeQueue::regroup_stable) e (b) sofrem desconto FIXO
-    // percent% no dano ofensivo que causam (carta E ataque basico - ULTIMO fator da cadeia
-    // divisiva/raw, gemeo preview<->real), plugado via
-    // combat_state_machine.cpp::mises_aim_error_spec_for. `magnitude` = +AP da face 1;
-    // `percent` = desconto% da face 2. Determinístico (0 RNG). Ver techmagic.cpp::
-    // handle_ap_efficiency (marcador no-op) e combat_state_machine.cpp (wiring real).
-    ApEfficiency = 11,
-    // Construtor Universal (von Neumann/Fork, CARD-ENGINE-MANIFESTO item 8, passiva PR-B):
-    // MARCADOR fora do dispatcher, MESMO padrao de DamageQuantize/DiversityBonus/
-    // ApEfficiency acima (o handler em techmagic.cpp e no-op deliberado). Refund
-    // automatico e DETERMINISTICO (0 RNG) da PRIMEIRA especial Ativa/Hibrida jogada nesta
-    // batalha (inclusive a PROPRIA carta que porta esta passiva): SE algum VIVO do lado do
-    // conjurador porta TokenRefund equipado E o refund desta batalha AINDA nao foi gasto,
-    // a carta jogada NAO entra no gate 1x/batalha (specials_cast_) - "se reconstroi no
-    // Codex" - e o refund se consome (1x/batalha, nao 1x/carta). Wiring DIRETO no gate de
-    // resolve_use_card (combat_state_machine.cpp::token_refund_equipped_on_side +
-    // CombatStateMachine::token_refund_used_), nao no dispatcher techMagic::execute
-    // (embora, ao contrario de DamageQuantize/DiversityBonus/ApEfficiency - que sao
-    // Passiva/equip-only e por isso NUNCA veem OnCast disparado -, a carta portadora de
-    // TokenRefund pode ser Hibrida/castavel: o marcador no-op ainda roda inofensivo se
-    // dispachado via OnCast, mesmo padrao fail-fast "sem handler = bug").
-    TokenRefund = 12,
-};
-
-// Filtro de lado do alvo de um EffectSpec (ADR-016 Balde B, Faraday/EM-Shield). Data-driven:
-// codifica a filosofia "efeito-de-inimigo no aliado = beneficio" sem precisar de um
-// EffectKind novo por carta. Any (default) preserva o comportamento de TODAS as cartas/
-// EffectSpec ja existentes (nenhum filtro). EnemyOnly/AllyOnly dissipam (no-op + log) quando
-// o alvo resolvido esta do lado errado - ver techmagic.cpp::handle_apply_status. APPEND-ONLY.
-enum class SideFilter : std::uint32_t {
-    Any = 0,
-    EnemyOnly = 1,
-    AllyOnly = 2,
 };
 
 }  // namespace gus::domain::combat

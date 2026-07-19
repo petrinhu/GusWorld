@@ -22,8 +22,9 @@
 // de-fato (DECK-3), nem o FIFO do deck morto (onda 2, kDeadDeckLimit e so declarada).
 //
 // Cross-ref: docs/design/mecanicas/deck-mao-sistema.md secao 4/6.2/7/9;
-//            gus/domain/combat/combat_enums.hpp (CardTier);
-//            gus/domain/combat/placeholder_cards.hpp / master_cards.hpp (catalogo -
+//            gus/domain/combat/combat_enums.hpp (CardTier, fachada -> gus/domain/
+//            cards/card_enums.hpp, ATOM-2);
+//            gus/domain/cards/placeholder_cards.hpp / master_cards.hpp (catalogo -
 //            fonte do TierLookup passado pelo chamador; este agregado NAO conhece o
 //            registry, so recebe o resultado via callback).
 
