@@ -33,6 +33,9 @@ add_library(gusengine_app STATIC
     # AC-E11 A3 (ADR-019): resolucao de paths/loaders de asset extraida de
     # battle_preview.cpp - ver gus/app/screens/battle_assets.hpp.
     src/screens/battle_assets.cpp
+    # AC-E11 A2 (ADR-019): montagem do RML/RCSS do cockpit extraida de
+    # battle_preview.cpp - ver gus/app/screens/battle_cockpit_rml.hpp.
+    src/screens/battle_cockpit_rml.cpp
     src/screens/battle_preview.cpp
     # MENU-PAUSA-CONFIG-SOM (M7-COSTURA): logica pura do menu de pausa + config de som.
     src/screens/system_menu.cpp

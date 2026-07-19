@@ -31,6 +31,9 @@ add_executable(gusengine_app_tests
     battle_pacing_test.cpp
     battle_scene_test.cpp
     battle_key_routing_test.cpp
+    # AC-E11 A2 (ADR-019): caracterizacao da montagem RML/RCSS do cockpit, extraida de
+    # battle_preview.cpp - ver gus/app/screens/battle_cockpit_rml.hpp.
+    battle_cockpit_rml_test.cpp
     translator_test.cpp
     maestro_logic_test.cpp
     boot_pixel_overlay_test.cpp
