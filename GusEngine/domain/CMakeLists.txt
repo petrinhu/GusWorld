@@ -99,6 +99,9 @@ add_library(gusengine_domain STATIC
     src/hardware/battery_state.cpp
     src/hardware/hardware_class.cpp
     src/infection/integrity_state.cpp
+    # CARDS-HW-2 fatia A (CARDS-HW-2A, TODO.md): servico de diagnostico/cura do
+    # Turing (diagnose()/attempt_cure()) - AMB-T1 RESOLVIDA (queima = SUCATA).
+    src/infection/turing_service.cpp
 )
 
 target_include_directories(gusengine_domain

@@ -365,11 +365,21 @@ action AttemptCure(card_instance):
         log("> Turing: remoção bem-sucedida. <carta> limpa.")
         return CURED
     else:
-        destroy_card_instance(card_instance)   # perda permanente — fora do deck
-                                                 # ativo E do deck morto (não é
-                                                 # "descarte", é destruição real)
-        log("> Turing: a tentativa falhou — o chipset queimou. <carta> perdida.")
+        card_instance.physical.is_burned_out = true   # SUCATA (AMB-T1 resolvida):
+                                                        # a carta FICA na coleção,
+                                                        # inutilizável (cicatriz), NÃO
+                                                        # é destruída/removida. Vende no
+                                                        # ferro-velho. is_infected/virus
+                                                        # ficam (a carta não roda mais).
+        log("> Turing: a tentativa falhou — o chipset queimou. <carta> virou sucata.")
         return BURNED
+
+# **AMB-T1 RESOLVIDA (líder, 2026-07-19):** conflito entre este §6 (dizia
+# `destroy_card_instance` = destruição real) e o POCO já entregue
+# (`card_hardware.hpp`, `is_burned_out` = sucata persistente). Decisão: **SUCATA**
+# (`is_burned_out=true`, carta permanece). Bate com o código, é reversível-por-design,
+# alimenta a economia do ferro-velho, e não mexe no save. Implementado em
+# `infection/turing_service.hpp` (onda CARDS-HW-2A).
 ```
 
 `AttemptCure` é ação **fora de combate** (bancada/oficina do Turing) — listada aqui só para fechar a state machine da carta; não é uma ação da FSM de combate (`combat.md` §3).

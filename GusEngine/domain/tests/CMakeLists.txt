@@ -254,6 +254,11 @@ add_executable(gusengine_domain_tests
     # payloads desta fatia (LogicBomb pre-cast/Worm+ZipBomb pos-cast) no
     # resolve_use_card. docs/design/mecanicas/cartas-spec-logica.md secao 1/4/5.2.
     card_virus_combat_test.cpp
+    # CARDS-HW-2 fatia A (CARDS-HW-2A, TODO.md): servico de diagnostico/cura do
+    # Turing (diagnose()/attempt_cure(), roll 62/38%, guard tier protegido + guard
+    # nao-diagnosticado, AMB-T1 RESOLVIDA - queima = SUCATA) + mapeamento puro
+    # outcome->chave i18n. docs/design/mecanicas/cartas-spec-logica.md secao 6.
+    turing_service_test.cpp
 )
 
 # Os testes do combate incluem helpers de teste headers-only (fixed_random.hpp).
