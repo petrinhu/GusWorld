@@ -27,6 +27,10 @@ add_library(gusengine_app STATIC
     src/screens/battle_sprite_anim.cpp
     src/screens/battle_pacing.cpp
     src/screens/battle_scene.cpp
+    # AC-E11 A4 (TU-split, ADR-019): render() + draw_bar/draw_pips + paleta/flavor
+    # extraidos de battle_scene.cpp - ver gus/app/screens/battle_scene.hpp (header
+    # intocado, mesma classe BattleScene).
+    src/screens/battle_scene_render.cpp
     # AC-E11 A1 (ADR-019): roteamento de input (teclado/mouse/SDL->glintfx) extraido de
     # battle_preview.cpp - ver gus/app/screens/battle_input.hpp.
     src/screens/battle_input.cpp
