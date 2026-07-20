@@ -89,6 +89,17 @@ CombatActionProvider capture_and_pass(std::vector<int>* out_leaked, bool* out_ca
     };
 }
 
+// Toca as acoes de `actions`, em ordem, so quando e a vez do lado da party; dali em diante
+// passa (0 AP). Mesmo padrao de card_virus_combat_test.cpp::play_sequence.
+CombatActionProvider play_sequence(std::vector<CombatAction> actions) {
+    auto acts = std::make_shared<std::vector<CombatAction>>(std::move(actions));
+    auto idx = std::make_shared<std::size_t>(0);
+    return [acts, idx](CombatActor& a, const CombatState&) -> CombatAction {
+        if (a.is_player_side() && *idx < acts->size()) return (*acts)[(*idx)++];
+        return CombatAction::pass();
+    };
+}
+
 }  // namespace
 
 // ===== leaked_intel: populacao basica ==================================================
@@ -201,6 +212,73 @@ TEST_CASE("backdoor signal: carta infectada com OUTRO virus (Worm) NAO entra no 
 
     REQUIRE(captured);
     REQUIRE(leaked.empty());
+}
+
+TEST_CASE("backdoor signal: DEDUP - mesmo owner com 2 cartas Backdoor-infectadas -> "
+         "leaked_intel tem 1 UNICO id (regressao QA CARDS-HW-2C, mutation testing pegou "
+         "gap: nenhum teste anterior exercitava owner_actor_id duplicado)",
+         "[domain][combat][virus][backdoor][signal][regression]") {
+    CombatActor caster = make_actor("h", true, /*hp=*/100, /*atk=*/0, /*def=*/0, /*spd=*/50);
+    CombatActor filler = make_actor("e", false, /*hp=*/100, /*atk=*/0, /*def=*/0, /*spd=*/10);
+
+    Card card_a = damage_card("backdoor.card.dedup.a");
+    Card card_b = damage_card("backdoor.card.dedup.b");
+    auto reg = registry({card_a, card_b});
+
+    IntegrityState spy_a;
+    spy_a.is_infected = true;
+    spy_a.virus_kind = VirusKind::Backdoor;
+    IntegrityState spy_b;
+    spy_b.is_infected = true;
+    spy_b.virus_kind = VirusKind::Backdoor;
+    // MESMO owner_actor_id (7) nas duas entradas - 2 cartas Backdoor do MESMO aliado.
+    std::vector<CardIntegrityRef> ledger = {
+        CardIntegrityRef{/*instance_id=*/1, card_a.id, /*owner_actor_id=*/7, &spy_a},
+        CardIntegrityRef{/*instance_id=*/2, card_b.id, /*owner_actor_id=*/7, &spy_b}};
+
+    std::vector<int> leaked;
+    bool captured = false;
+    CombatStateMachine sm({&caster, &filler}, capture_and_pass(&leaked, &captured), &reg,
+                          nullptr, nullptr, &ledger);
+
+    sm.begin_turn();
+    sm.run_active_turn_to_end();
+
+    REQUIRE(captured);
+    REQUIRE(leaked.size() == 1);
+    REQUIRE(leaked == std::vector<int>{7});
+}
+
+// ===== case Backdoor no dispatcher pre-cast: passivo, nao engole o efeito nominal ======
+
+TEST_CASE("backdoor signal: cast de carta Backdoor-infectada aplica o efeito nominal "
+         "NORMALMENTE - o case Backdoor no dispatcher pre-cast e passivo (no-op), NUNCA "
+         "intercepta/substitui o dano (regressao QA CARDS-HW-2C, mutation testing pegou "
+         "gap: nenhum teste anterior de fato CONJURAVA uma carta Backdoor-infectada)",
+         "[domain][combat][virus][backdoor][signal][regression]") {
+    CombatActor caster = make_actor("h", true, /*hp=*/100, /*atk=*/0, /*def=*/0, /*spd=*/50);
+    CombatActor target = make_actor("e", false, /*hp=*/300, /*atk=*/0, /*def=*/0, /*spd=*/10);
+
+    Card bomb = damage_card("backdoor.card.cast.nominal", /*power=*/20);
+    auto reg = registry({bomb});
+
+    IntegrityState spy;
+    spy.is_infected = true;
+    spy.virus_kind = VirusKind::Backdoor;
+    std::vector<CardIntegrityRef> ledger = {
+        CardIntegrityRef{/*instance_id=*/0, bomb.id, /*owner_actor_id=*/1, &spy}};
+
+    CombatAction cast = CombatAction::use_card(bomb.id, target.id());
+    cast.card_instance_id = 0;
+
+    auto provider = play_sequence({cast});
+    CombatStateMachine sm({&caster, &target}, provider, &reg, nullptr, nullptr, &ledger);
+
+    sm.begin_turn();
+    sm.run_active_turn_to_end();
+
+    REQUIRE(target.hp() < target.max_hp());   // efeito nominal aplicou - Backdoor NAO desviou.
+    REQUIRE(caster.hp() == caster.max_hp());  // sem backfire (Backdoor nao e LogicBomb).
 }
 
 // ===== ledger nulo: fail-safe ===========================================================
