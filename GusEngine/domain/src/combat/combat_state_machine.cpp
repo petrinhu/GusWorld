@@ -817,7 +817,8 @@ void CombatStateMachine::run_active_turn_to_end() {
                 "' (provider nao passou nem gastou AP).");
 
         phase_ = CombatPhase::ActionSelect;
-        const CombatState state(queue_, &actor, queue_.round_index(), card_registry_);
+        const CombatState state(queue_, &actor, queue_.round_index(), card_registry_,
+                                collect_leaked_intel());
         const CombatAction action = action_provider_(actor, state);
 
         if (action.type == CombatActionType::Pass)
@@ -1475,7 +1476,8 @@ void CombatStateMachine::resolve_gambit_predict(CombatActor& actor,
             "Alvo '" + target->id() +
             "' nao tem IEnemyBrain no brain_registry; Gambito Prever exige brain registrado.");
 
-    const CombatState state(queue_, &actor, queue_.round_index(), card_registry_);
+    const CombatState state(queue_, &actor, queue_.round_index(), card_registry_,
+                            collect_leaked_intel());
     const IntentPreview intent = brain->preview_intent(state, *target);
     last_prediction_ = intent;
 
@@ -1963,6 +1965,20 @@ const CardIntegrityRef* CombatStateMachine::find_ledger_entry(std::uint64_t inst
     return nullptr;
 }
 
+std::vector<int> CombatStateMachine::collect_leaked_intel() const {
+    std::vector<int> leaked;
+    if (integrity_ledger_ == nullptr) return leaked;
+    for (const CardIntegrityRef& ref : *integrity_ledger_) {
+        if (ref.state == nullptr) continue;
+        if (!ref.state->is_infected) continue;
+        if (ref.state->virus_kind != infection::VirusKind::Backdoor) continue;
+        const bool already_leaked =
+            std::find(leaked.begin(), leaked.end(), ref.owner_actor_id) != leaked.end();
+        if (!already_leaked) leaked.push_back(ref.owner_actor_id);
+    }
+    return leaked;
+}
+
 const CardIntegrityRef* CombatStateMachine::find_worm_propagation_candidate(
     std::uint64_t source_instance_id, int source_owner_actor_id, bool same_owner) const {
     if (integrity_ledger_ == nullptr) return nullptr;
@@ -2004,15 +2020,18 @@ bool CombatStateMachine::dispatch_virus_payload_pre_cast(
     switch (ref->state->virus_kind) {
         case infection::VirusKind::LogicBomb:
             return try_trigger_logic_bomb(actor, card, *instance_id);
-        case infection::VirusKind::None:
         case infection::VirusKind::Backdoor:
+            // passivo por design, sinal continuo via leaked_intel, ver secao 4.2
+            // (CARDS-HW-2C) - nunca dispara aqui, nao ha "momento" de cast pro Backdoor.
+            return false;
+        case infection::VirusKind::None:
         case infection::VirusKind::Worm:
         case infection::VirusKind::FalseBenign:
         case infection::VirusKind::AdwareSterling:
         case infection::VirusKind::ZipBomb:
         case infection::VirusKind::IndustrialWeapon:
             // Worm/ZipBomb sao POS-cast (dispatch_virus_payload_post_cast, abaixo); os
-            // demais sao fatia futura (Backdoor/Adware/FalseBenign bloqueados por design ou
+            // demais sao fatia futura (Adware/FalseBenign bloqueados por design ou
             // adiados, IndustrialWeapon e o gatilho narrativo scriptado do Dante/Sterling).
             return false;
     }

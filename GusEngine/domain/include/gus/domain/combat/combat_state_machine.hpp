@@ -369,6 +369,15 @@ private:
     // nao tem entrada (mesmo fail-safe: motor se comporta como sem vírus).
     [[nodiscard]] const CardIntegrityRef* find_ledger_entry(std::uint64_t instance_id) const;
 
+    // Backdoor SIGNAL-ONLY (CARDS-HW-2C; docs/design/mecanicas/cartas-spec-logica.md secao
+    // 4.2): varre integrity_ledger_ inteiro e devolve os owner_actor_id (deduplicados, ordem
+    // de varredura) de toda entrada com state->is_infected && virus_kind==Backdoor. Chamado
+    // a CADA construcao de CombatState (mesmo padrao de card_registry_ acima) - populado, NAO
+    // consumido por nenhum brain nesta fatia (o UtilityBrain que ponderaria isto e onda
+    // futura). ledger nulo OU sem candidato => vazio (fail-safe). NAO loga (Backdoor e
+    // EXCECAO a regra "todo efeito loga" - spyware silencioso ate diagnostico, secao 4.1).
+    [[nodiscard]] std::vector<int> collect_leaked_intel() const;
+
     // 1o candidato do integrity_ledger_ elegivel pra propagacao do Worm (secao 5.2): NUNCA a
     // propria `source_instance_id`; `same_owner`==true filtra owner_actor_id IGUAL ao de
     // `source_owner_actor_id` (OwnDeck), false filtra DIFERENTE (EnemyDeck). Determinístico

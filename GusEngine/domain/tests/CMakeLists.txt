@@ -264,6 +264,12 @@ add_executable(gusengine_domain_tests
     # conforme o tier da carta sorteada), sorteado por peso (original x pirata, backfire
     # 1/3 exato na pirata). docs/design/mecanicas/cartas-spec-logica.md secao 7.
     urandom_test.cpp
+    # CARDS-HW-2C (Backdoor SIGNAL-ONLY, TODO.md): CombatState::leaked_intel(), populado
+    # pela CombatStateMachine a partir do integrity_ledger (owner_actor_id de carta
+    # Backdoor-infectada). SO o sinal - nenhum brain pondera ainda (UtilityBrain e onda
+    # futura); ScriptedBrain permanece byte-identico com/sem o sinal.
+    # docs/design/mecanicas/cartas-spec-logica.md secao 4.2.
+    backdoor_signal_test.cpp
 )
 
 # Os testes do combate incluem helpers de teste headers-only (fixed_random.hpp).

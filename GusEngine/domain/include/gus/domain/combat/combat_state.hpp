@@ -17,8 +17,19 @@
 // materializamos em std::vector<CombatActor*> (a fila e pequena: <= kMaxPartySize +
 // inimigos do encontro). FindById retorna nullable -> CombatActor* (nullptr se ausente).
 //
+// LEAKED_INTEL (CARDS-HW-2C, Backdoor SIGNAL-ONLY; docs/design/mecanicas/
+// cartas-spec-logica.md secao 4.2): sinal continuo, populado pela CombatStateMachine a
+// cada construcao de CombatState a partir do integrity_ledger (owner_actor_id de toda
+// carta infectada com VirusKind::Backdoor na mao/equipada de um aliado). Campo ADITIVO
+// (default vazio, todo call site pre-existente preservado). Esta fatia SO expoe o sinal -
+// NENHUM brain pondera isto ainda (o UtilityBrain que consumiria o vies, cartas-spec-
+// logica.md secao 4.2, e jogo posterior; o ScriptedBrain de hoje e determinístico e
+// ignora o campo por completo). owner_actor_id e a chave OPACA do ledger
+// (card_integrity_ledger.hpp) - NAO precisa casar com CombatActor::id() nesta fatia.
+//
 // Cross-ref: engine/foundation/turn_combat/CombatState.cs;
-//            docs/design/mecanicas/combat.md secao 3/13; ADR-006.
+//            docs/design/mecanicas/combat.md secao 3/13; ADR-006;
+//            docs/design/mecanicas/cartas-spec-logica.md secao 4.2.
 
 #ifndef GUS_DOMAIN_COMBAT_COMBAT_STATE_HPP
 #define GUS_DOMAIN_COMBAT_COMBAT_STATE_HPP
@@ -39,11 +50,13 @@ public:
     CombatState(const InitiativeQueue& queue,
                 CombatActor* active_actor,
                 int round_index,
-                const std::unordered_map<std::string, Card>* card_registry = nullptr)
+                const std::unordered_map<std::string, Card>* card_registry = nullptr,
+                std::vector<int> leaked_intel = {})
         : queue_(&queue),
           active_actor_(active_actor),
           round_index_(round_index),
-          card_registry_(card_registry) {}
+          card_registry_(card_registry),
+          leaked_intel_(std::move(leaked_intel)) {}
 
     // Ator cujo turno esta em andamento.
     [[nodiscard]] CombatActor* active_actor() const noexcept { return active_actor_; }
@@ -86,6 +99,11 @@ public:
         return nullptr;
     }
 
+    // Sinal continuo de vazamento do Backdoor (CARDS-HW-2C, secao 4.2 acima). Vazio quando
+    // nao ha carta Backdoor-infectada no ledger (ou o ledger e nulo). Ninguem consome isto
+    // ainda - so-query, ver comentario da classe.
+    [[nodiscard]] const std::vector<int>& leaked_intel() const noexcept { return leaked_intel_; }
+
 private:
     // Registry vazio compartilhado (equivalente ao EmptyRegistry static do C#).
     [[nodiscard]] static const std::unordered_map<std::string, Card>& empty_registry() {
@@ -97,6 +115,7 @@ private:
     CombatActor* active_actor_;
     int round_index_;
     const std::unordered_map<std::string, Card>* card_registry_;
+    std::vector<int> leaked_intel_;
 };
 
 }  // namespace gus::domain::combat
