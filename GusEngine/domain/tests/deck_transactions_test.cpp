@@ -27,6 +27,7 @@
 #include <stdexcept>
 #include <string>
 
+#include "counting_random.hpp"
 #include "fixed_random.hpp"
 #include "gus/domain/combat/combat_enums.hpp"
 #include "gus/domain/deck/card_collection.hpp"
@@ -36,6 +37,7 @@
 
 using namespace gus::domain::deck;
 using gus::domain::combat::CardTier;
+using gus::domain::tests::CountingRandom;
 using gus::domain::tests::FixedRandom;
 
 namespace {
@@ -447,6 +449,26 @@ TEST_CASE("deck_transactions: acquire() com RNG que forca infeccao seta "
     // Persistiu no container, nao so na copia devolvida.
     REQUIRE(deck.active().front().physical.is_infected);
     REQUIRE_NOTHROW(deck.active().front().physical.validate());
+    // Regressao 007b2bb (achado de auditoria adversarial CARDS-HW-3B): o Result
+    // PRECISA propagar o outcome real pro chamador poder emitir o log diegetico
+    // ambiguo - antes deste teste, a suite inteira passava mesmo com o campo
+    // sempre no default Clean (bug reintroduzido e mutation-testado).
+    REQUIRE(result.contamination == ContaminationRollOutcome::Infected);
+}
+
+TEST_CASE("deck_transactions: acquire() com RNG que NUNCA infecta devolve "
+          "result.contamination == Clean",
+          "[domain][deck][deck_transactions][cards_hw_3b]") {
+    CardCollection deck(kDeckCapacityTier1);
+    std::int64_t credits = kShopBuyPriceMax;
+    FixedRandom rng = never_infects_rng();
+
+    const AcquireResult result =
+        acquire(deck, credits, "pulso_novo", kShopBuyPriceMax, fake_tier_of, rng);
+
+    REQUIRE(result.ok());
+    REQUIRE_FALSE(result.instance.physical.is_infected);
+    REQUIRE(result.contamination == ContaminationRollOutcome::Clean);
 }
 
 TEST_CASE("deck_transactions: craft() com RNG que forca infeccao seta "
@@ -463,6 +485,22 @@ TEST_CASE("deck_transactions: craft() com RNG que forca infeccao seta "
     REQUIRE(result.instance.physical.virus_kind != VirusKind::None);
     REQUIRE(deck.active().front().physical.is_infected);
     REQUIRE_NOTHROW(deck.active().front().physical.validate());
+    // Mesma regressao 007b2bb do teste analogo de acquire() acima.
+    REQUIRE(result.contamination == ContaminationRollOutcome::Infected);
+}
+
+TEST_CASE("deck_transactions: craft() com RNG que NUNCA infecta devolve "
+          "result.contamination == Clean",
+          "[domain][deck][deck_transactions][cards_hw_3b]") {
+    CardCollection deck(kDeckCapacityTier1);
+    auto consumer = []() { return true; };
+    FixedRandom rng = never_infects_rng();
+
+    const CraftResult result = craft(deck, "carta_craftada", consumer, fake_tier_of, rng);
+
+    REQUIRE(result.ok());
+    REQUIRE_FALSE(result.instance.physical.is_infected);
+    REQUIRE(result.contamination == ContaminationRollOutcome::Clean);
 }
 
 TEST_CASE("deck_transactions: acquire() com carta CardTier Especial NUNCA infecta "
@@ -478,6 +516,7 @@ TEST_CASE("deck_transactions: acquire() com carta CardTier Especial NUNCA infect
     REQUIRE(result.ok());
     REQUIRE_FALSE(result.instance.physical.is_infected);
     REQUIRE(result.instance.physical.virus_kind == VirusKind::None);
+    REQUIRE(result.contamination == ContaminationRollOutcome::SkippedProtectedTier);
 }
 
 TEST_CASE("deck_transactions: acquire() rejeitado (saldo insuficiente) NAO consome "
@@ -488,8 +527,15 @@ TEST_CASE("deck_transactions: acquire() rejeitado (saldo insuficiente) NAO conso
     // FixedRandom nao conta draws - usamos o proprio resultado como oraculo: se um
     // draw fosse consumido indevidamente, nao haveria efeito observavel aqui (guard
     // de saldo insuficiente e o PRIMEIRO checado, antes de qualquer rng.next()) -
-    // regressao coberta com precisao em deck_invariants/contamination_service via
-    // CountingRandom; aqui so garantimos que a rejeicao continua sem mutar nada.
+    // aqui so garantimos que a rejeicao continua sem mutar nada. O consumo de RNG
+    // EXATO (zero draws) e verificado com precisao pelos 4 testes CountingRandom
+    // logo abaixo (acquire/craft x InsufficientCredits/ActiveCapacityFull/
+    // MaterialsUnavailable) - achado de auditoria adversarial CARDS-HW-3B: a
+    // afirmacao antiga deste comentario ("coberta com precisao em deck_invariants/
+    // contamination_service via CountingRandom") era FALSA - nenhum dos dois
+    // arquivos tinha esse teste no nivel de deck_transactions (so no nivel unitario
+    // de roll_contamination_on_acquisition, que nunca ve os guards de saldo/
+    // capacidade/material que vivem em deck_transactions.cpp).
     FixedRandom rng(0.5, 0);
 
     const AcquireResult result = acquire(deck, credits, "carta", 999999, fake_tier_of, rng);
@@ -497,4 +543,86 @@ TEST_CASE("deck_transactions: acquire() rejeitado (saldo insuficiente) NAO conso
     REQUIRE_FALSE(result.ok());
     REQUIRE(result.error == TransactionError::InsufficientCredits);
     REQUIRE(deck.active_count() == 0);
+}
+
+// ---- CARDS-HW-3B: transacao REJEITADA consome ZERO draws de RNG (determinismo,
+// secao 11) - regressao de achado adversarial: o comentario acima deste bloco
+// afirmava cobertura que nao existia; os 4 testes abaixo fecham o gap com
+// CountingRandom REAL no nivel de deck_transactions (nao so no nivel unitario de
+// contamination_service, que nunca passa pelos guards de saldo/capacidade/material
+// que ficam ANTES da chamada a roll_contamination_on_acquisition() em
+// deck_transactions.cpp). ------------------------------------------------------
+
+TEST_CASE("deck_transactions: acquire() rejeitado (InsufficientCredits) consome "
+          "EXATAMENTE 0 draws de RNG",
+          "[domain][deck][deck_transactions][cards_hw_3b][determinism]") {
+    CardCollection deck(kDeckCapacityTier1);
+    std::int64_t credits = 0;
+    CountingRandom rng;
+
+    const AcquireResult result = acquire(deck, credits, "carta", 999999, fake_tier_of, rng);
+
+    REQUIRE_FALSE(result.ok());
+    REQUIRE(result.error == TransactionError::InsufficientCredits);
+    REQUIRE(rng.next_calls == 0);
+    REQUIRE(rng.next_double_calls == 0);
+    // Contrato documentado (AcquireResult::contamination, deck_transactions.hpp):
+    // default Clean nos ramos rejeitados - nenhuma rolagem aconteceu.
+    REQUIRE(result.contamination == ContaminationRollOutcome::Clean);
+}
+
+TEST_CASE("deck_transactions: acquire() rejeitado (ActiveCapacityFull) consome "
+          "EXATAMENTE 0 draws de RNG",
+          "[domain][deck][deck_transactions][cards_hw_3b][determinism]") {
+    CardCollection deck(/*active_capacity=*/1);
+    std::int64_t credits = 1000;
+    deck.add_to_active("ja_ocupa_o_unico_slot");
+    CountingRandom rng;
+
+    const AcquireResult result =
+        acquire(deck, credits, "carta_nova", kShopBuyPriceMin, fake_tier_of, rng);
+
+    REQUIRE_FALSE(result.ok());
+    REQUIRE(result.error == TransactionError::ActiveCapacityFull);
+    REQUIRE(result.contamination == ContaminationRollOutcome::Clean);
+    REQUIRE(rng.next_calls == 0);
+    REQUIRE(rng.next_double_calls == 0);
+}
+
+TEST_CASE("deck_transactions: craft() rejeitado (MaterialsUnavailable) consome "
+          "EXATAMENTE 0 draws de RNG",
+          "[domain][deck][deck_transactions][cards_hw_3b][determinism]") {
+    CardCollection deck(kDeckCapacityTier1);
+    auto consumer = []() { return false; };
+    CountingRandom rng;
+
+    const CraftResult result = craft(deck, "carta_craftada", consumer, fake_tier_of, rng);
+
+    REQUIRE_FALSE(result.ok());
+    REQUIRE(result.error == TransactionError::MaterialsUnavailable);
+    REQUIRE(result.contamination == ContaminationRollOutcome::Clean);
+    REQUIRE(rng.next_calls == 0);
+    REQUIRE(rng.next_double_calls == 0);
+}
+
+TEST_CASE("deck_transactions: craft() rejeitado (ActiveCapacityFull) consome "
+          "EXATAMENTE 0 draws de RNG (consumer nem e chamado)",
+          "[domain][deck][deck_transactions][cards_hw_3b][determinism]") {
+    CardCollection deck(/*active_capacity=*/1);
+    deck.add_to_active("ja_ocupa_o_unico_slot");
+    bool consumer_called = false;
+    auto consumer = [&consumer_called]() {
+        consumer_called = true;
+        return true;
+    };
+    CountingRandom rng;
+
+    const CraftResult result = craft(deck, "carta_craftada", consumer, fake_tier_of, rng);
+
+    REQUIRE_FALSE(result.ok());
+    REQUIRE(result.error == TransactionError::ActiveCapacityFull);
+    REQUIRE_FALSE(consumer_called);
+    REQUIRE(result.contamination == ContaminationRollOutcome::Clean);
+    REQUIRE(rng.next_calls == 0);
+    REQUIRE(rng.next_double_calls == 0);
 }
