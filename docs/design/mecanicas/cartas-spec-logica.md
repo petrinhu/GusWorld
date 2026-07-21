@@ -395,6 +395,33 @@ action AttemptCure(card_instance):
 
 ---
 
+## 6.5 Upload gate: o servidor Sterling rejeita carta doente (decisão do líder, 2026-07-21)
+
+**Lore.** O repositório-commons (o "commons" do `deck-mao-sistema.md` §6.2, para onde o `upload` manda a carta em troca de crédito) é **hospedado pela Sterling**. Publicamente ela "garante a segurança dos dados"; na prática o servidor dela **rouba o código** de quem sobe, sem o dev saber (reviravolta de vilão — cross-ref `characters/sterling-locke.md`).
+
+**Regra (o pedágio).** Servidores de grandes empresas rodam **server-side hooks** (pré-receive): antes de aceitar o push, varrem binários suspeitos (`.exe`/`.dll`/`.bat`) e padrões de código malicioso injetado. Uma **carta infectada** (`is_infected==true`, diagnosticada ou não) dispara o hook e o **push é rejeitado na hora**; a carta **volta pro jogador após ~30s** (o "pedágio" tem latência diegética).
+
+- Regra POCO (onda futura, ver Handoff): `upload()` passa a checar `is_infected` **antes** de creditar/remover. Se infectada → `UploadOutcome::RejectedInfectedByServer`: **não credita, não remove da coleção**, e a instância ganha o estado **"quarentena Sterling"** (marca de doente).
+- **Carta doente = peso morto**: ocupa espaço no inventário e não sobe. Para se livrar dela, o jogador vai **presencialmente a uma filial Sterling** entregar a carta marcada (evento de mundo — gameplay/UI, onda futura). É o único escoadouro do peso morto além do Turing.
+- **Folclore do mundo comum:** "ninguém consegue desmarcar uma carta doente; mesmo que desmarcasse, ela sobe e é remarcada". Verdadeiro para o público geral — que **não tem Turing**.
+
+**Reconciliação com o Turing (AMB-UPLOAD-STERLING, resolvida pelo líder 2026-07-21): Gus é a exceção.** O Turing do Gus (§6) **cura de verdade**: `AttemptCure → CURED` zera `is_infected`/`virus`/`diagnosed`, então a carta **deixa de ser doente** e **sobe normal** pelo commons. O "ninguém desmarca" é folclore que o **prodígio quebra** — coerente com o pillar "Gus resolve por lógica + hardware único". (A cura antes de subir é o caminho legítimo; a filial Sterling é o escoadouro de quem não curou / não pôde curar, ex.: carta que virou sucata `is_burned_out` no roll 38%.)
+
+**Mensagem do hook (`error: hook declined`) — AGUARDA APROVAÇÃO/AJUSTE DO LÍDER.** Proposta (estilo git real + Sterling corporativa hipócrita):
+
+```
+remote: [STERLING SECURE COMMONS(tm)] varredura de integridade concluida.
+remote: error: hook declined to update refs/heads/commons
+remote:   > artefato marcado como PATOGENICO (assinatura viral detectada no payload).
+remote:   > Sua seguranca e a nossa prioridade. Por isso o seu lixo fica fora.
+remote:   > Devolvendo o pacote ao remetente. Tenha um dia produtivo.
+ ! [remote rejected] commons -> commons (pre-receive hook: quarentena Sterling)
+```
+
+Cross-ref achados de QA: `CARDS-HW-QA1-A1` (falta o accessor mutável `find_mutable_active`/`apply_to_physical` para a cura fiar numa carta viva — **pré-requisito** deste gate) e `CARDS-HW-QA1-A2` (este gate; o teste `cards_hw_lifecycle_integration_test.cpp` cadeia 3 hoje PINA o comportamento antigo "upload permitido" — atualizar quando o gate entrar).
+
+---
+
 ## 7. `urandom` (pirata × original)
 
 ### 7.1 Algoritmo de sorteio
