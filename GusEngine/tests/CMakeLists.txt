@@ -21,6 +21,7 @@ add_executable(gusengine_core_tests
     obstacle_collision_test.cpp
     corner_assist_test.cpp
     collision_sweep_invariants_test.cpp
+    corner_assist_sweep_test.cpp
     depth_sort_test.cpp
     camera_clamp_test.cpp
     fixed_timestep_test.cpp
