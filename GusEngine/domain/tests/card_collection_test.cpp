@@ -86,6 +86,52 @@ TEST_CASE("card_collection: add_to_active com instance_id explicito ja presente 
     REQUIRE(deck.active_count() == 1);
 }
 
+// ---- add_to_active: initial_physical (CARDS-HW-3A, origem fisica na aquisicao) -----
+
+TEST_CASE("card_collection: add_to_active sem initial_physical nasce com o default "
+          "seguro (ROM original)",
+          "[domain][deck][card_collection][cards_hw_3a]") {
+    CardCollection deck(kDeckCapacityTier1);
+
+    const CardInstance a = deck.add_to_active("pulso_eletrico");
+
+    REQUIRE(a.physical == CardPhysicalState{});
+    REQUIRE(a.physical.origin == CardOrigin::OriginalRom);
+    // O que esta REALMENTE guardado no container bate com o que a chamada devolveu -
+    // nao so a copia local (regressao: mutar so a variavel local sem persistir no
+    // active_ interno passaria este teste por acidente se checassemos so `a`).
+    REQUIRE(deck.active().front().physical.origin == CardOrigin::OriginalRom);
+}
+
+TEST_CASE("card_collection: add_to_active com initial_physical explicito persiste NO "
+          "CONTAINER, nao so na copia devolvida",
+          "[domain][deck][card_collection][cards_hw_3a]") {
+    CardCollection deck(kDeckCapacityTier1);
+    CardPhysicalState homebrew;
+    homebrew.origin = CardOrigin::HomebrewEprom;
+
+    const CardInstance a = deck.add_to_active("pulso_bio", std::nullopt, homebrew);
+
+    REQUIRE(a.physical.origin == CardOrigin::HomebrewEprom);
+    // Fonte de verdade e o vetor ativo_ interno, nao a variavel local `a` - active()
+    // precisa refletir a mesma origem (regressao contra "seta so na copia local").
+    REQUIRE(deck.active().front().physical.origin == CardOrigin::HomebrewEprom);
+}
+
+TEST_CASE("card_collection: add_to_active com initial_physical + instance_id_override "
+          "juntos (uso futuro: restaurar save)",
+          "[domain][deck][card_collection][cards_hw_3a]") {
+    CardCollection deck(kDeckCapacityTier1);
+    CardPhysicalState pirate;
+    pirate.origin = CardOrigin::PirateClone;
+
+    const CardInstance a =
+        deck.add_to_active("pulso_pirata", /*instance_id_override=*/std::uint64_t{99}, pirate);
+
+    REQUIRE(a.instance_id == 99);
+    REQUIRE(a.physical.origin == CardOrigin::PirateClone);
+}
+
 // ---- XOR de container: instancia nunca em ativo E morto ao mesmo tempo ------------
 
 TEST_CASE("card_collection: instancia esta SEMPRE em EXATAMENTE um container (XOR)",

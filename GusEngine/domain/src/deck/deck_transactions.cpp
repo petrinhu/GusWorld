@@ -123,7 +123,16 @@ CraftResult craft(CardCollection& collection, std::string result_card_id,
         return CraftResult{TransactionError::MaterialsUnavailable, CardInstance{}};
     }
 
-    CardInstance instance = collection.add_to_active(std::move(result_card_id));
+    // Origem fisica (CARDS-HW-3A, cartas-hardware-pirataria-energia.md secao 2/3):
+    // toda carta craftada via F3-Alpha e GRAVADA numa EPROM de bancada (o "terminal
+    // de bancada" do doc-fonte) - nunca sai como ROM de fabrica. HomebrewEprom aqui
+    // NAO rola contaminacao (fatia futura, deck_transactions.hpp acquire-com-origem
+    // do doc); so fixa a origem correta pra hardware_class_of()/contaminacao futura
+    // classificarem certo.
+    CardPhysicalState physical;
+    physical.origin = CardOrigin::HomebrewEprom;
+    CardInstance instance =
+        collection.add_to_active(std::move(result_card_id), std::nullopt, physical);
     return CraftResult{TransactionError::Ok, instance};
 }
 

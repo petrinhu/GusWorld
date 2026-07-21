@@ -45,7 +45,8 @@ void CardCollection::guard_protected_tier(const std::string& card_id,
 }
 
 CardInstance CardCollection::add_to_active(std::string card_id,
-                                            std::optional<std::uint64_t> instance_id_override) {
+                                            std::optional<std::uint64_t> instance_id_override,
+                                            CardPhysicalState initial_physical) {
     std::uint64_t id;
     if (instance_id_override.has_value()) {
         id = *instance_id_override;
@@ -70,7 +71,7 @@ CardInstance CardCollection::add_to_active(std::string card_id,
             "ou venda uma carta antes de adicionar (deck-mao-sistema.md secao 8c)");
     }
 
-    CardInstance instance{id, std::move(card_id)};
+    CardInstance instance{id, std::move(card_id), std::move(initial_physical)};
     active_.push_back(instance);
     return instance;
 }

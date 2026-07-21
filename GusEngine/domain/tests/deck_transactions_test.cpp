@@ -29,6 +29,7 @@
 
 #include "gus/domain/combat/combat_enums.hpp"
 #include "gus/domain/deck/card_collection.hpp"
+#include "gus/domain/deck/card_hardware.hpp"
 #include "gus/domain/deck/deck_constants.hpp"
 #include "gus/domain/deck/deck_transactions.hpp"
 
@@ -245,6 +246,33 @@ TEST_CASE("deck_transactions: acquire com preco negativo e fail-fast (invariante
     REQUIRE_THROWS_AS(acquire(deck, credits, "carta", -1), std::invalid_argument);
 }
 
+// ---- acquire(): origem fisica (CARDS-HW-3A) - canal LEGITIMO sempre OriginalRom ----
+
+TEST_CASE("deck_transactions: acquire (compra de loja) nasce com origem OriginalRom",
+          "[domain][deck][deck_transactions][cards_hw_3a]") {
+    CardCollection deck(kDeckCapacityTier1);
+    std::int64_t credits = kShopBuyPriceMax;
+
+    const AcquireResult result = acquire(deck, credits, "pulso_novo", kShopBuyPriceMax);
+
+    REQUIRE(result.ok());
+    REQUIRE(result.instance.physical.origin == CardOrigin::OriginalRom);
+    // Persistiu no container, nao so na copia devolvida.
+    REQUIRE(deck.active().front().physical.origin == CardOrigin::OriginalRom);
+}
+
+TEST_CASE("deck_transactions: acquire com preco 0 (loot garantido/achado) tambem "
+          "nasce OriginalRom",
+          "[domain][deck][deck_transactions][cards_hw_3a]") {
+    CardCollection deck(kDeckCapacityTier1);
+    std::int64_t credits = 42;
+
+    const AcquireResult result = acquire(deck, credits, "loot_garantido", 0);
+
+    REQUIRE(result.ok());
+    REQUIRE(result.instance.physical.origin == CardOrigin::OriginalRom);
+}
+
 // ---- craft(): materiais desacoplados via MaterialConsumer ---------------------------
 
 TEST_CASE("deck_transactions: craft de sucesso consome material e adiciona a carta",
@@ -292,4 +320,79 @@ TEST_CASE("deck_transactions: craft que nao cabe no ativo NUNCA invoca o consume
     REQUIRE(result.error == TransactionError::ActiveCapacityFull);
     REQUIRE_FALSE(consumer_called);
     REQUIRE(deck.active_count() == 1);
+}
+
+// ---- craft(): origem fisica (CARDS-HW-3A) - canal BANCADA sempre HomebrewEprom -----
+
+TEST_CASE("deck_transactions: craft (compilar via F3-Alpha) nasce com origem "
+          "HomebrewEprom, nunca OriginalRom",
+          "[domain][deck][deck_transactions][cards_hw_3a]") {
+    CardCollection deck(kDeckCapacityTier1);
+    auto consumer = []() { return true; };
+
+    const CraftResult result = craft(deck, "carta_craftada", consumer);
+
+    REQUIRE(result.ok());
+    REQUIRE(result.instance.physical.origin == CardOrigin::HomebrewEprom);
+    // Persistiu no container, nao so na copia devolvida (mesma regressao coberta em
+    // card_collection_test.cpp, checada de novo aqui pela via publica de craft()).
+    REQUIRE(deck.active().front().physical.origin == CardOrigin::HomebrewEprom);
+}
+
+TEST_CASE("deck_transactions: craft sem sucesso (material insuficiente) nao deixa "
+          "instancia orfa com origem nenhuma",
+          "[domain][deck][deck_transactions][cards_hw_3a][invariant]") {
+    CardCollection deck(kDeckCapacityTier1);
+    auto consumer = []() { return false; };
+
+    const CraftResult result = craft(deck, "carta_craftada", consumer);
+
+    REQUIRE_FALSE(result.ok());
+    // Nada foi adicionado - CraftResult::instance e o default (CardInstance{}), o
+    // campo physical dele nem importa (nao valida quando error != Ok, contrato do
+    // header), mas o container continua vazio.
+    REQUIRE(deck.active_count() == 0);
+}
+
+TEST_CASE("deck_transactions: craft e determinístico na origem em multiplas chamadas "
+          "(sem RNG na atribuicao de origin)",
+          "[domain][deck][deck_transactions][cards_hw_3a]") {
+    CardCollection deck(kDeckCapacityTier1);
+    auto consumer = []() { return true; };
+
+    const CraftResult first = craft(deck, "carta_a", consumer);
+    const CraftResult second = craft(deck, "carta_b", consumer);
+
+    REQUIRE(first.instance.physical.origin == CardOrigin::HomebrewEprom);
+    REQUIRE(second.instance.physical.origin == CardOrigin::HomebrewEprom);
+}
+
+// ---- integracao acquire()/craft() -> hardware_class_of() (CARDS-HW-3A) -------------
+//
+// A HardwareClass e SEMPRE derivada (hardware_class.hpp, nunca armazenada) - estes
+// testes fecham o elo ponta-a-ponta: origem setada pela transacao -> classe correta
+// pro lookup de config (contaminacao/bateria, onda futura).
+
+TEST_CASE("deck_transactions: origem de acquire() resolve em HardwareClass::ComumOriginal",
+          "[domain][deck][deck_transactions][cards_hw_3a]") {
+    CardCollection deck(kDeckCapacityTier1);
+    std::int64_t credits = 0;
+
+    const AcquireResult result = acquire(deck, credits, "pulso_novo", 0);
+
+    const HardwareClass cls = hardware_class_of(CardTier::Comum, result.instance.physical.origin,
+                                                 /*mimics_special=*/false);
+    REQUIRE(cls == HardwareClass::ComumOriginal);
+}
+
+TEST_CASE("deck_transactions: origem de craft() resolve em HardwareClass::HomebrewEprom",
+          "[domain][deck][deck_transactions][cards_hw_3a]") {
+    CardCollection deck(kDeckCapacityTier1);
+    auto consumer = []() { return true; };
+
+    const CraftResult result = craft(deck, "carta_craftada", consumer);
+
+    const HardwareClass cls = hardware_class_of(CardTier::Comum, result.instance.physical.origin,
+                                                 /*mimics_special=*/false);
+    REQUIRE(cls == HardwareClass::HomebrewEprom);
 }

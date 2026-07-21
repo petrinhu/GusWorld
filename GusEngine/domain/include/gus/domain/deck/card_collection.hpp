@@ -68,9 +68,18 @@ public:
     // instance_id JA esta presente no ativo OU no morto - nunca duplica, nunca cria em
     // 2 containers. O contador interno avanca pra nao colidir com o id restaurado.
     //
+    // initial_physical (CARDS-HW-3A, extensao sugerida em cartas-spec-dados.md secao
+    // 11): estado fisico DA INSTANCIA NOVA - origem/bateria/integridade ja resolvidos
+    // pelo CHAMADOR (deck_transactions.hpp) ANTES desta chamada. Default `{}` =
+    // CardPhysicalState{} = "ROM original legitima" - preserva TODO call-site
+    // existente (aquisicao legitima via loja/loot/achado) sem mudanca de
+    // comportamento. Este agregado NAO conhece origem/contaminacao - so guarda o que
+    // recebe (mesma separacao de responsabilidade do TierLookup ja existente).
+    //
     // Fail-fast (std::logic_error) se o deck ativo ja esta na capacidade maxima.
     CardInstance add_to_active(std::string card_id,
-                                std::optional<std::uint64_t> instance_id_override = std::nullopt);
+                                std::optional<std::uint64_t> instance_id_override = std::nullopt,
+                                CardPhysicalState initial_physical = {});
 
     // Move a instancia do deck ATIVO pro deck MORTO (unica saida "descarte" - inv.4:
     // NAO existe o caminho inverso). Guard de tier (inv.9): RECUSA

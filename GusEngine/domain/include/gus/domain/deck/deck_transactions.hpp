@@ -151,6 +151,15 @@ struct CraftResult {
 // valida saldo (credits >= price) E capacidade do ativo (nao estourar) ANTES de mutar
 // qualquer um dos dois; se qualquer checagem falhar, nada muda.
 //
+// Origem fisica (CARDS-HW-3A, cartas-hardware-pirataria-energia.md secao 2/3): todo
+// canal desta funcao (loja legitima/loot de repositorio limpo/achado/entrega
+// narrativa) e aquisicao LEGITIMA - a instancia nasce com CardPhysicalState{} default
+// (CardOrigin::OriginalRom), sem passar initial_physical algum. Ainda NAO existe aqui
+// um canal de mercado negro/pirata (CardOrigin::PirateClone) - onda futura
+// (mercado-negro/loja, fora do escopo desta fatia) precisara de uma
+// transacao-primitiva propria ou de um parametro de origem, a decidir quando aquele
+// canal for desenhado (nao inventado aqui).
+//
 // Fail-fast (std::invalid_argument) se price < 0.
 [[nodiscard]] AcquireResult acquire(CardCollection& collection, std::int64_t& credits,
                                      std::string card_id, int price);
@@ -166,6 +175,12 @@ using MaterialConsumer = std::function<bool()>;
 // ativo ja esta cheio, `consumer` NUNCA e chamado (nao "gasta" material pra descobrir
 // depois que a carta nao cabe). Se `consumer()` devolver false (material insuficiente),
 // nada e adicionado ao ativo.
+//
+// Origem fisica (CARDS-HW-3A, cartas-hardware-pirataria-energia.md secao 2/3): craft
+// via F3-Alpha grava a carta numa EPROM de bancada - a instancia resultante SEMPRE
+// nasce com CardOrigin::HomebrewEprom (nunca OriginalRom). NAO rola contaminacao
+// aqui (fatia futura, "acquire-com-origem" do doc-fonte secao 11) - so fixa a origem
+// pra hardware_class_of()/contaminacao futura classificarem certo.
 [[nodiscard]] CraftResult craft(CardCollection& collection, std::string result_card_id,
                                  const MaterialConsumer& consumer);
 
