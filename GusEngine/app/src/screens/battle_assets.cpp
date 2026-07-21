@@ -8,6 +8,7 @@
 
 #include <cstdlib>  // std::getenv
 #include <filesystem>
+#include <iostream>
 
 #include "gus/platform/assets/asset_source.hpp"  // ASSETS-VFS-F1 (ADR-013): porteiro
 
@@ -94,6 +95,9 @@ std::optional<ActorSpriteSet> load_gus_sprite_set(
             const gus::platform::render2d::TextureId tex =
                 renderer.load_texture(path.c_str());
             if (tex == gus::platform::render2d::kInvalidTexture) {
+                std::cerr << "battle_assets: [sprites] frame " << path
+                          << " sem textura (backend Null/headless) - clip degrada para os "
+                             "frames ja carregados.\n";
                 break;  // backend sem textura (Null/headless): degrada
             }
             clip.frames.push_back(tex);

@@ -187,6 +187,9 @@ void SdlWindow::load_enemy_marker_texture() {
         sim_->set_enemy_marker(*enemy_marker_aabb_, enemy_marker_tex_);
     } else {
         // Asset ausente/headless: degrada sem deixar um TextureId obsoleto no sim_.
+        SDL_Log("SdlWindow: retrato do inimigo ausente/ilegivel (%s) - marcador "
+                "limpo, cidade segue sem marker.",
+                path.c_str());
         sim_->clear_enemy_marker();
     }
 }
@@ -225,6 +228,9 @@ void SdlWindow::load_npc_bertoldo_marker_texture() {
                                       npc_bertoldo_marker_tex_);
     } else {
         // Asset ausente/headless: degrada sem deixar um TextureId obsoleto no sim_.
+        SDL_Log("SdlWindow: sprite do Bertoldo ausente/ilegivel (%s) - marcador "
+                "limpo, cidade segue sem marker.",
+                path.c_str());
         sim_->clear_npc_bertoldo_marker();
     }
 }

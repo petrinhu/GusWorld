@@ -7,6 +7,7 @@
 #include "gus/app/screens/player_sprites_loader.hpp"
 
 #include <array>
+#include <iostream>
 
 #include "gus/app/screens/sprite_anchor.hpp"  // bottom_margin_fraction
 #include "gus/core/asset_paths.hpp"           // caminhos de asset centralizados
@@ -81,7 +82,12 @@ PlayerSpriteSet load_player_sprites(gus::platform::render2d::IRenderer& renderer
             const std::string p =
                 join(join(base_dir, layout.idle_dir),
                      std::string(layout.idle_prefix) + std::to_string(f) + ".png");
-            shared_idle[static_cast<std::size_t>(f)] = renderer.load_texture(p.c_str());
+            const auto tex = renderer.load_texture(p.c_str());
+            if (tex == gus::platform::render2d::kInvalidTexture) {
+                std::cerr << "player_sprites: sprite ausente/ilegivel: " << p
+                          << " (render segue com textura invalida)\n";
+            }
+            shared_idle[static_cast<std::size_t>(f)] = tex;
         }
     }
 
@@ -97,7 +103,12 @@ PlayerSpriteSet load_player_sprites(gus::platform::render2d::IRenderer& renderer
                 join(join(join(base_dir, "walk"),
                           layout.walk_dir_names[static_cast<std::size_t>(d)]),
                      std::string(layout.walk_prefix) + std::to_string(f) + ".png");
-            set.walk[d][f] = renderer.load_texture(walk_path.c_str());
+            const auto tex = renderer.load_texture(walk_path.c_str());
+            if (tex == gus::platform::render2d::kInvalidTexture) {
+                std::cerr << "player_sprites: sprite ausente/ilegivel: " << walk_path
+                          << " (render segue com textura invalida)\n";
+            }
+            set.walk[d][f] = tex;
         }
 
         // --- IDLE (breathing animado OU congelado direcional) ---
@@ -126,6 +137,10 @@ PlayerSpriteSet load_player_sprites(gus::platform::render2d::IRenderer& renderer
             const std::string idle_path = join(base_dir, kIdleFilesCaua[d]);
             const gus::platform::render2d::TextureId t =
                 renderer.load_texture(idle_path.c_str());
+            if (t == gus::platform::render2d::kInvalidTexture) {
+                std::cerr << "player_sprites: sprite ausente/ilegivel: " << idle_path
+                          << " (render segue com textura invalida)\n";
+            }
             set.idle[d] = t;
             set.idle_frames[d][0] = t;  // 1 quadro = congelado
             set.idle_count[d] = 1;

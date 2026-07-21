@@ -248,8 +248,8 @@ void BattleScene::render(IRenderer& renderer, float viewport_px_w,
     // O FUNDO da arena agora vem da VINHETA/glow radial do renderer (Render2dGl3 desenha
     // um quad full-window LOGO APOS o clear, dando profundidade: bordas escuras + leve
     // lift no centro). NAO repintamos um fill chapado #0c0f1a aqui senao ele cobriria a
-    // vinheta. (kBgColor mantido como referencia da cor-base canonica.)
-    (void)kBgColor;
+    // vinheta. A cor-base canonica segue viva em kBgColor, hoje usada pelo cursor
+    // do badge da CTB (ver draw_text mais abaixo, ~linha 716).
 
     // ====================================================================
     // VARIANTE C "Tatico Cockpit": cockpit lateral esq + arena a direita +

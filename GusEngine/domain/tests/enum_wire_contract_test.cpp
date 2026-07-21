@@ -16,30 +16,37 @@
 // trocar dois ordinais (ex.: o mutante classico "inverte 2 linhas do enum") quebra
 // o BUILD na hora, em vez de silenciosamente corromper saves em producao.
 //
-// Inventario (grep em domain/src/save/save_serializer.cpp por static_cast<...>
+// Inventario GDS3 (grep em domain/src/save/save_serializer.cpp por static_cast<...>
 // (r.read_u32())/put_u32(out, static_cast<uint32_t>(...)) - 2026-07-20):
 //   - CardOrigin      (card_provenance.hpp)  - CardPhysicalState::origin
 //   - VirusKind       (integrity_state.hpp)  - CardPhysicalState::virus_kind
 //   - DifficultyLevel (save_data.hpp)        - SaveData::difficulty
 //
-// FORA de escopo (contrato binario IRMAO, mas DISTINTO - envelope GDS2/HMAC de
-// templates, explicitamente "fora de escopo" do save por comentario em
-// save_serializer.cpp topo do arquivo: "templates continuam GDS2/HMAC, fora de
-// escopo"): CardFamily/BrainKind em domain/src/templates/template_serializer.cpp.
-// Mesma classe de risco, mas e outro arquivo/formato (GDT1, nao GDS3) - achado
-// reportado a parte, nao congelado aqui.
+// Inventario GDT1 (contrato binario IRMAO, mas DISTINTO - envelope GDS2/HMAC de
+// templates, o comentario "templates continuam GDS2/HMAC, fora de escopo" no topo
+// de save_serializer.cpp refere-se ao ENVELOPE, nao aos enums de payload; os enums
+// abaixo SAO cobertos aqui desde 2026-07-21, grep em
+// domain/src/templates/template_serializer.cpp):
+//   - CardFamily (card_family.hpp, alias de gus::domain::combat::CardFamily, que por
+//     sua vez reexporta gus::domain::cards::CardFamily) - CharacterTemplate::family
+//     (serialize_character ~230) e EnemyTemplate::family (serialize_enemy ~267)
+//   - BrainKind  (enemy_template.hpp) - EnemyTemplate::brain (serialize_enemy ~268)
+//   - EnemyKind  (enemy_template.hpp) - EnemyTemplate::kind (serialize_enemy ~274)
 //
-// Se este arquivo PARAR de compilar depois de voce mexer num destes 3 enums: NAO
+// Se este arquivo PARAR de compilar depois de voce mexer num destes enums: NAO
 // mude os numeros aqui pra "consertar o erro" - isso e EXATAMENTE o alarme
 // disparando. Adicionar um membro NOVO no FIM (nunca no meio) e seguro; só então
 // atualize o assert do count (kCardOriginCount/kVirusKindCount/
-// kDifficultyLevelCount) e adicione o static_assert do membro novo aqui.
+// kDifficultyLevelCount/kCardFamilyCount/kBrainKindCount/kEnemyKindCount) e
+// adicione o static_assert do membro novo aqui.
 
 #include <cstdint>
 
 #include "gus/domain/hardware/card_provenance.hpp"
 #include "gus/domain/infection/integrity_state.hpp"
 #include "gus/domain/save/save_data.hpp"
+#include "gus/domain/templates/card_family.hpp"
+#include "gus/domain/templates/enemy_template.hpp"
 
 namespace {
 
@@ -49,6 +56,12 @@ using gus::domain::infection::VirusKind;
 using gus::domain::infection::kVirusKindCount;
 using gus::domain::save::DifficultyLevel;
 using gus::domain::save::kDifficultyLevelCount;
+using gus::domain::templates::BrainKind;
+using gus::domain::templates::CardFamily;
+using gus::domain::templates::EnemyKind;
+using gus::domain::templates::kBrainKindCount;
+using gus::domain::templates::kCardFamilyCount;
+using gus::domain::templates::kEnemyKindCount;
 
 // ---- CardOrigin (card_provenance.hpp) - CardPhysicalState::origin, u32 no wire --
 static_assert(static_cast<std::uint32_t>(CardOrigin::OriginalRom) == 0);
@@ -74,6 +87,26 @@ static_assert(static_cast<std::uint32_t>(DifficultyLevel::Dificil) == 2);
 static_assert(static_cast<std::uint32_t>(DifficultyLevel::Hardcore) == 3);
 static_assert(kDifficultyLevelCount == 4,
               "kDifficultyLevelCount desalinhado do enum acima");
+
+// ---- CardFamily (card_family.hpp) - CharacterTemplate::family (serialize_character)
+// e EnemyTemplate::family (serialize_enemy), u32 no wire (GDT1) --------------------
+static_assert(static_cast<std::uint32_t>(CardFamily::Eletrico) == 0);
+static_assert(static_cast<std::uint32_t>(CardFamily::Bioquimico) == 1);
+static_assert(static_cast<std::uint32_t>(CardFamily::Sonico) == 2);
+static_assert(static_cast<std::uint32_t>(CardFamily::Cinetico) == 3);
+static_assert(static_cast<std::uint32_t>(CardFamily::Criptografico) == 4);
+static_assert(static_cast<std::uint32_t>(CardFamily::Universal) == 5);
+static_assert(kCardFamilyCount == 6, "CONTRATO BINARIO GDT1 - NAO REORDENAR");
+
+// ---- BrainKind (enemy_template.hpp) - EnemyTemplate::brain, u32 no wire (GDT1) ----
+static_assert(static_cast<std::uint32_t>(BrainKind::Scripted) == 0);
+static_assert(static_cast<std::uint32_t>(BrainKind::Utility) == 1);
+static_assert(kBrainKindCount == 2, "CONTRATO BINARIO GDT1 - NAO REORDENAR");
+
+// ---- EnemyKind (enemy_template.hpp) - EnemyTemplate::kind, u32 no wire (GDT1) -----
+static_assert(static_cast<std::uint32_t>(EnemyKind::Creature) == 0);
+static_assert(static_cast<std::uint32_t>(EnemyKind::Human) == 1);
+static_assert(kEnemyKindCount == 2, "CONTRATO BINARIO GDT1 - NAO REORDENAR");
 
 }  // namespace
 

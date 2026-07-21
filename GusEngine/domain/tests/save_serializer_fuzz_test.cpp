@@ -167,6 +167,13 @@ TEST_CASE("save/fuzz: ciphertext_len declarado gigante (0xFFFFFFFF) rejeita sem 
     REQUIRE_THROWS_AS(deserialize_save(buf), SaveCorruptError);
 }
 
+// GCC 16.1 (Fedora 44) emite -Wstringop-overflow FALSO-POSITIVO neste TEST_CASE
+// (resize+insert em vector<uint8_t> sob Catch2, ref FEDORA-GCC16). Supressao
+// targeted, so aqui, so no GCC (Clang/MSVC nao emitem o FP).
+#if defined(__GNUC__) && !defined(__clang__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wstringop-overflow"
+#endif
 TEST_CASE("save/fuzz: ciphertext_len declarado zero num buffer maior rejeita",
           "[domain][save][fuzz]") {
     std::vector<std::uint8_t> buf = {'G', 'D', 'S', '3'};
@@ -177,6 +184,9 @@ TEST_CASE("save/fuzz: ciphertext_len declarado zero num buffer maior rejeita",
     buf.insert(buf.end(), kTagLenFuzz, 0x00u); // tag placeholder
     REQUIRE_THROWS_AS(deserialize_save(buf), SaveCorruptError);
 }
+#if defined(__GNUC__) && !defined(__clang__)
+#pragma GCC diagnostic pop
+#endif
 
 TEST_CASE("save/fuzz: ciphertext_len off-by-one (real-1 e real+1) rejeita",
           "[domain][save][fuzz]") {

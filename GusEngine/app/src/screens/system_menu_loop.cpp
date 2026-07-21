@@ -1198,7 +1198,11 @@ SystemMenuLoopOutcome run_system_menu_loop_gl_current(
             // jogador aciona) - o modo Load abaixo mostra esse slot OCUPADO.
             gus::domain::save::SaveData seed = build_current_save_data();
             seed.slot_id = 1;
-            (void)gus::platform::fs::save_game(seed, 1, saves_dir);
+            const bool seed_ok = gus::platform::fs::save_game(seed, 1, saves_dir);
+            if (!seed_ok) {
+                std::cerr << "[system_menu] selftest: seed do slot 1 FALHOU (save_game=false) "
+                             "- resultado do modo Load abaixo nao e representativo.\n";
+            }
         }
         (void)run_save_load_menu_loop_gl_current(window, audio, translator, SaveLoadMode::Load,
                                                   saves_dir, build_current_save_data,

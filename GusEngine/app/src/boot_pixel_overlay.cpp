@@ -5,6 +5,7 @@
 
 #include "gus/app/boot_pixel_overlay.hpp"
 
+#include <iostream>
 #include <string>
 
 #include "gus/core/anim/boot_pixel_sequence.hpp"
@@ -61,7 +62,12 @@ bool BootPixelOverlay::load(gus::platform::render2d::IRenderer& renderer,
         frames_.push_back(tex);
         if (tex == kInvalidTexture) {
             all_ok = false;
+            std::cerr << "boot_pixel: frame ausente/ilegivel (" << path << ")\n";
         }
+    }
+    if (!all_ok) {
+        std::cerr << "boot_pixel: overlay indisponivel (frame(s) ausente(s)) - "
+                     "boot segue sem animacao de pixel.\n";
     }
     ready_ = all_ok;
     return ready_;
