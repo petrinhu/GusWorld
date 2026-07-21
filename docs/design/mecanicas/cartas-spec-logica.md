@@ -270,13 +270,22 @@ on_card_acquired(card_instance):   # chamado pelo serviço de aquisição, NÃO 
     risk = contamination_table[card_instance.origin_kind]   # cartas-numeros §3
     if roll(risk):
         card_instance.is_infected = true
-        card_instance.virus_payload_kind = pick_random_payload()   # AMB-07: distribuição entre os 6 tipos
+        card_instance.virus_payload_kind = pick_weighted_payload(card_instance.origin_kind)   # AMB-07 RESOLVIDA: ponderado por classe, cartas-numeros §3a
         if card_instance.virus_payload_kind == LogicBomb:
             card_instance.trigger_condition = pick_random(condition_pool)   # §4.1.1
     # card_instance.is_infected fica OCULTO na UI até diagnóstico (§6)
 ```
 
-**AMB-07:** qual a distribuição de probabilidade ENTRE os 6 tipos de payload dado que a carta infectou? (uniforme? Zip-bomb mais rara por ser mais destrutiva? Adware não deveria nem entrar aqui pois é opt-in — ver nota abaixo). Não especificado em nenhum doc-fonte; proponho excluir Adware desta rolagem (adware não é "infecção", é feature opt-in de cartas-bônus, §9) e distribuir os 5 restantes (LogicBomb/Backdoor/Worm/FalsoBenigno-bloqueado/ZipBomb) — mas como Falso-benigno está bloqueado por design (§4.1.2), a distribuição efetiva hoje seria só 4 tipos até a feat de efeitos adiados existir. Confirmar com líder.
+**AMB-07 RESOLVIDA (líder, 2026-07-20): ponderado por classe de origem, pesos fechados pelo `economy-designer` — "pirata puxa payload pior".** Não é uniforme: os **4 tipos disparáveis hoje** (LogicBomb / Backdoor / Worm / ZipBomb — Adware fora por ser opt-in §9, Falso-benigno bloqueado §4.1.2, arma-scriptada da Sterling fora por ser evento narrativo pontual) são sorteados com peso diferente por `origin_kind`, na MESMA ordem de "sujeira" já fechada em §3 (Comum ≪ Pirata especial falso < Pirata comum ≪ Homebrew). Tabela completa + racional por classe em `cartas-numeros-proposta.md` §3a. Resumo (`//PLAYTEST`, grade Fibonacci 1/3/5/8/13):
+
+| Classe | Backdoor | Worm | LogicBomb | ZipBomb |
+|---|---|---|---|---|
+| Comum (original) | 52,0% | 32,0% | 12,0% | 4,0% |
+| Pirata especial (clone-falso) | 33,3% | 33,3% | 20,8% | 12,5% |
+| Pirata comum | 12,5% | 20,8% | 33,3% | 33,3% |
+| Homebrew (EPROM) | 4,0% | 12,0% | 32,0% | 52,0% |
+
+Ranking de severidade usado como eixo (mais brando → mais destrutivo): Backdoor (passivo, sem dano funcional) < Worm (Slow + espalha) < LogicBomb (condicional, mas inverte no pior turno) < ZipBomb (dispara sempre, sem gate — "entope memória"). Comum e Homebrew são pesos espelhados; Pirata especial e Pirata comum idem.
 
 ### 5.2 Propagação secundária (worm, dentro do combate)
 
@@ -523,7 +532,7 @@ on_cast_precondition_passed(card_instance, ctx):
 | AMB-04 | Logic Bomb: inverte o efeito (dano no caster) ou anula (carta falha)? | §4.1.1 |
 | AMB-05 | Zip-bomb: qual dos 3 desfechos do doc-fonte é o real (memória/deck/bateria)? Proposta = memória (Silence-like) | §4.1.3 |
 | AMB-06 | Magnitude do viés de targeting do Backdoor na IA; se também vaza o Gambito-Prever do jogador pro inimigo | §4.2 |
-| AMB-07 | Distribuição de probabilidade ENTRE os tipos de payload dado que infectou (uniforme? Adware fica de fora da rolagem?) | §5.1 |
+| AMB-07 | ~~Distribuição de probabilidade ENTRE os tipos de payload dado que infectou~~ **RESOLVIDA 2026-07-20: ponderado por classe, `economy-designer`, ver §5.1 / `cartas-numeros` §3a** | §5.1 |
 | AMB-08 | Conteúdo exato do "efeito ruim" do backfire do urandom pirata | §7.2 |
 | AMB-09 | Pool vazio no urandom (sorteou faixa sem carta correspondente na coleção): dissipa ou cai pra faixa vizinha? | §7.2 |
 | AMB-10 | urandom: o lado do alvo (self/inimigo) é sorteado independente do efeito, ou segue o alvo natural da carta sorteada? **One-way door de sensação.** | §7.2 |

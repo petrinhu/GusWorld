@@ -126,6 +126,37 @@ Tabela respeitando a ordem canônica **especial(0) < comum < pirata especial < p
 
 **Propagação secundária (carta JÁ infectada, ao ser conjurada — doc-fonte §9, vetor "worm de deck"):** proponho **13%** de chance de contágio por cast de uma carta já sabidamente infectada, nas 3 direções descritas no doc-fonte (deck inimigo / ecossistema / próprio deck). Número secundário, menos crítico que a tabela principal — ajustável livremente no playtest sem afetar a ordem estrutural acima.
 
+### 3a. Qual payload, dado que infectou — AMB-07 FECHADA PELO LÍDER (2026-07-20): ponderado por classe //PLAYTEST
+
+**Decisão do líder (AMB-07, `cartas-spec-logica.md` §5.1):** quando a rolagem de §3 acima marca a carta como infectada, o TIPO de payload (dos **4 disparáveis hoje**: `Worm`, `LogicBomb`, `Backdoor`, `ZipBomb` — Falso-benigno bloqueado, Adware fora da rolagem por ser opt-in, arma-scriptada da Sterling fora) **não é uniforme**: é ponderado pela classe de origem da carta, seguindo o princípio "pirata puxa payload pior" — quanto mais suja a proveniência (mesma ordem já fechada em §3: Comum ≪ Pirata especial falso < Pirata comum ≪ Homebrew), mais o payload sorteado tende pro lado destrutivo.
+
+**Ranking de severidade dos 4 payloads** (mais brando → mais destrutivo, base pra ponderar):
+
+| Payload | Por quê nessa posição |
+|---|---|
+| **Backdoor** (mais brando) | passivo, sem dano funcional na carta — só vazamento de informação contínuo pra IA inimiga (§4.2). Incômodo, não destrutivo. |
+| **Worm** | aplica Slow permanente na própria carta + 13% de chance de espalhar (§3, propagação secundária) — pior que Backdoor porque também contamina outras cartas, mas o dano imediato é só um debuff de status. |
+| **LogicBomb** | condicional (só dispara em turno crítico/boss/HP baixo — §4.1.1), mas quando dispara inverte o efeito nominal contra o próprio caster no pior momento possível. Mais grave que Worm por causa do timing adversarial. |
+| **ZipBomb** (mais destrutivo) | dispara sempre, todo cast, sem condição — "entope memória" (efeito exato em §4.1.3). O único dos 4 sem nenhum gate de disparo, por isso o mais temido. |
+
+**Tabela de pesos por classe** (pesos relativos da escada Fibonacci — 1/3/5/8/13 — convertidos em % dividindo pelo total da linha; cada classe é um sorteio independente, só roda depois que §3 já confirmou infecção):
+
+| Classe | Backdoor | Worm | LogicBomb | ZipBomb | Total |
+|---|---|---|---|---|---|
+| Comum (original) — 1% risco | **13 (52,0%)** | 8 (32,0%) | 3 (12,0%) | 1 (4,0%) | 25 |
+| Pirata especial (clone-falso) — 8% risco | 8 (33,3%) | 8 (33,3%) | 5 (20,8%) | 3 (12,5%) | 24 |
+| Pirata comum — 21% risco | 3 (12,5%) | 5 (20,8%) | 8 (33,3%) | 8 (33,3%) | 24 |
+| **Homebrew (EPROM)** — 55% risco | 1 (4,0%) | 3 (12,0%) | 8 (32,0%) | **13 (52,0%)** | 25 |
+
+**Racional por classe:**
+
+- **Comum (original):** quase-legítima (só 1% infecta pra começo de conversa). O pouco que vaza costuma ser resíduo de fábrica leve — sensor de telemetria mal removido (Backdoor domina, 52%) ou otimização preguiçosa (Worm) — quase nunca algo desenhado pra destruir (ZipBomb, 4%, é o piso da tabela inteira).
+- **Pirata especial (clone-falso):** hardware de segunda mão bom o bastante pra enganar o scanner (mesmo racional de §1a/AMB-DADOS-01), mas já sem a blindagem da fábrica. Distribuição quase equilibrada (Backdoor/Worm ainda levemente à frente) — é o primeiro degrau puxando pro lado ruim, sem dominância ainda.
+- **Pirata comum:** fundo de quintal, zero controle de qualidade. **Espelho exato** do clone-falso (mesmos 4 pesos, ordem invertida) — LogicBomb/ZipBomb já dominam 2/3 da rolagem.
+- **Homebrew (EPROM):** ROM caseira magra, sem NENHUMA camada de proteção (mesmo racional de §7 do doc-fonte: "só o payload funcional puro"). **Espelho exato** da linha Comum — o vírus mais provável já nasce destrutivo: ZipBomb sozinho é 52% (o mesmo peso que Backdoor tem lá em cima), LogicBomb+ZipBomb somam 84%.
+
+A simetria (Comum ↔ Homebrew espelhados; Pirata especial ↔ Pirata comum espelhados) não é coincidência de planilha — é a MESMA escada de "quanto mais suja a proveniência, pior o payload" de §3, agora aplicada a um segundo eixo. Nenhum peso novo fora da grade Fibonacci (1, 3, 5, 8, 13) foi inventado.
+
 ---
 
 ## 4. Carta `urandom` (pirata × original) — backfire da PIRATA FECHADO PELO LÍDER (2026-07-18): 1/3 EXATO
