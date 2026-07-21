@@ -27,6 +27,7 @@
 #include <stdexcept>
 #include <string>
 
+#include "fixed_random.hpp"
 #include "gus/domain/combat/combat_enums.hpp"
 #include "gus/domain/deck/card_collection.hpp"
 #include "gus/domain/deck/card_hardware.hpp"
@@ -35,6 +36,7 @@
 
 using namespace gus::domain::deck;
 using gus::domain::combat::CardTier;
+using gus::domain::tests::FixedRandom;
 
 namespace {
 
@@ -46,6 +48,12 @@ CardTier fake_tier_of(const std::string& card_id) {
     if (card_id.find("_super") != std::string::npos) return CardTier::Super;
     return CardTier::Comum;
 }
+
+// RNG "nunca infecta" (CARDS-HW-3B): FixedRandom default (draw=99) e sempre >= o
+// maior risco da tabela (55%, HomebrewEprom) - usado nos testes de acquire()/craft()
+// que NAO sao sobre contaminacao, pra manter o comportamento pre-3B (origin setado,
+// is_infected sempre false) sem acoplar cada teste a um RNG proprio.
+FixedRandom never_infects_rng() { return FixedRandom(0.5, 99); }
 
 }  // namespace
 
@@ -186,8 +194,10 @@ TEST_CASE("deck_transactions: acquire debita o preco e adiciona ao ativo",
           "[domain][deck][deck_transactions]") {
     CardCollection deck(kDeckCapacityTier1);
     std::int64_t credits = kShopBuyPriceMax;
+    FixedRandom rng = never_infects_rng();
 
-    const AcquireResult result = acquire(deck, credits, "pulso_novo", kShopBuyPriceMax);
+    const AcquireResult result =
+        acquire(deck, credits, "pulso_novo", kShopBuyPriceMax, fake_tier_of, rng);
 
     REQUIRE(result.ok());
     REQUIRE(result.instance.card_id == "pulso_novo");
@@ -200,8 +210,10 @@ TEST_CASE("deck_transactions: acquire com saldo insuficiente nao muta nada",
           "[domain][deck][deck_transactions][invariant]") {
     CardCollection deck(kDeckCapacityTier1);
     std::int64_t credits = 5;  // menor que o preco de loja (12-18)
+    FixedRandom rng = never_infects_rng();
 
-    const AcquireResult result = acquire(deck, credits, "pulso_novo", kShopBuyPriceMin);
+    const AcquireResult result =
+        acquire(deck, credits, "pulso_novo", kShopBuyPriceMin, fake_tier_of, rng);
 
     REQUIRE_FALSE(result.ok());
     REQUIRE(result.error == TransactionError::InsufficientCredits);
@@ -214,8 +226,10 @@ TEST_CASE("deck_transactions: acquire que estouraria a capacidade do ativo nao m
     CardCollection deck(/*active_capacity=*/1);
     std::int64_t credits = 1000;
     deck.add_to_active("ja_ocupa_o_unico_slot");
+    FixedRandom rng = never_infects_rng();
 
-    const AcquireResult result = acquire(deck, credits, "carta_nova", kShopBuyPriceMin);
+    const AcquireResult result =
+        acquire(deck, credits, "carta_nova", kShopBuyPriceMin, fake_tier_of, rng);
 
     REQUIRE_FALSE(result.ok());
     REQUIRE(result.error == TransactionError::ActiveCapacityFull);
@@ -229,8 +243,9 @@ TEST_CASE("deck_transactions: acquire com preco 0 (loot garantido/achado) nao de
           "[domain][deck][deck_transactions]") {
     CardCollection deck(kDeckCapacityTier1);
     std::int64_t credits = 42;
+    FixedRandom rng = never_infects_rng();
 
-    const AcquireResult result = acquire(deck, credits, "loot_garantido", 0);
+    const AcquireResult result = acquire(deck, credits, "loot_garantido", 0, fake_tier_of, rng);
 
     REQUIRE(result.ok());
     REQUIRE(result.debited == 0);
@@ -242,8 +257,10 @@ TEST_CASE("deck_transactions: acquire com preco negativo e fail-fast (invariante
           "[domain][deck][deck_transactions]") {
     CardCollection deck(kDeckCapacityTier1);
     std::int64_t credits = 0;
+    FixedRandom rng = never_infects_rng();
 
-    REQUIRE_THROWS_AS(acquire(deck, credits, "carta", -1), std::invalid_argument);
+    REQUIRE_THROWS_AS(acquire(deck, credits, "carta", -1, fake_tier_of, rng),
+                       std::invalid_argument);
 }
 
 // ---- acquire(): origem fisica (CARDS-HW-3A) - canal LEGITIMO sempre OriginalRom ----
@@ -252,8 +269,10 @@ TEST_CASE("deck_transactions: acquire (compra de loja) nasce com origem Original
           "[domain][deck][deck_transactions][cards_hw_3a]") {
     CardCollection deck(kDeckCapacityTier1);
     std::int64_t credits = kShopBuyPriceMax;
+    FixedRandom rng = never_infects_rng();
 
-    const AcquireResult result = acquire(deck, credits, "pulso_novo", kShopBuyPriceMax);
+    const AcquireResult result =
+        acquire(deck, credits, "pulso_novo", kShopBuyPriceMax, fake_tier_of, rng);
 
     REQUIRE(result.ok());
     REQUIRE(result.instance.physical.origin == CardOrigin::OriginalRom);
@@ -266,8 +285,9 @@ TEST_CASE("deck_transactions: acquire com preco 0 (loot garantido/achado) tambem
           "[domain][deck][deck_transactions][cards_hw_3a]") {
     CardCollection deck(kDeckCapacityTier1);
     std::int64_t credits = 42;
+    FixedRandom rng = never_infects_rng();
 
-    const AcquireResult result = acquire(deck, credits, "loot_garantido", 0);
+    const AcquireResult result = acquire(deck, credits, "loot_garantido", 0, fake_tier_of, rng);
 
     REQUIRE(result.ok());
     REQUIRE(result.instance.physical.origin == CardOrigin::OriginalRom);
@@ -283,8 +303,9 @@ TEST_CASE("deck_transactions: craft de sucesso consome material e adiciona a car
         consumed = true;
         return true;
     };
+    FixedRandom rng = never_infects_rng();
 
-    const CraftResult result = craft(deck, "carta_craftada", consumer);
+    const CraftResult result = craft(deck, "carta_craftada", consumer, fake_tier_of, rng);
 
     REQUIRE(result.ok());
     REQUIRE(consumed);
@@ -296,8 +317,9 @@ TEST_CASE("deck_transactions: craft sem material (consumer devolve false) nao ad
           "[domain][deck][deck_transactions][invariant]") {
     CardCollection deck(kDeckCapacityTier1);
     auto consumer = []() { return false; };
+    FixedRandom rng = never_infects_rng();
 
-    const CraftResult result = craft(deck, "carta_craftada", consumer);
+    const CraftResult result = craft(deck, "carta_craftada", consumer, fake_tier_of, rng);
 
     REQUIRE_FALSE(result.ok());
     REQUIRE(result.error == TransactionError::MaterialsUnavailable);
@@ -313,8 +335,9 @@ TEST_CASE("deck_transactions: craft que nao cabe no ativo NUNCA invoca o consume
         consumer_called = true;
         return true;
     };
+    FixedRandom rng = never_infects_rng();
 
-    const CraftResult result = craft(deck, "carta_craftada", consumer);
+    const CraftResult result = craft(deck, "carta_craftada", consumer, fake_tier_of, rng);
 
     REQUIRE_FALSE(result.ok());
     REQUIRE(result.error == TransactionError::ActiveCapacityFull);
@@ -329,8 +352,9 @@ TEST_CASE("deck_transactions: craft (compilar via F3-Alpha) nasce com origem "
           "[domain][deck][deck_transactions][cards_hw_3a]") {
     CardCollection deck(kDeckCapacityTier1);
     auto consumer = []() { return true; };
+    FixedRandom rng = never_infects_rng();
 
-    const CraftResult result = craft(deck, "carta_craftada", consumer);
+    const CraftResult result = craft(deck, "carta_craftada", consumer, fake_tier_of, rng);
 
     REQUIRE(result.ok());
     REQUIRE(result.instance.physical.origin == CardOrigin::HomebrewEprom);
@@ -344,8 +368,9 @@ TEST_CASE("deck_transactions: craft sem sucesso (material insuficiente) nao deix
           "[domain][deck][deck_transactions][cards_hw_3a][invariant]") {
     CardCollection deck(kDeckCapacityTier1);
     auto consumer = []() { return false; };
+    FixedRandom rng = never_infects_rng();
 
-    const CraftResult result = craft(deck, "carta_craftada", consumer);
+    const CraftResult result = craft(deck, "carta_craftada", consumer, fake_tier_of, rng);
 
     REQUIRE_FALSE(result.ok());
     // Nada foi adicionado - CraftResult::instance e o default (CardInstance{}), o
@@ -359,9 +384,10 @@ TEST_CASE("deck_transactions: craft e determinístico na origem em multiplas cha
           "[domain][deck][deck_transactions][cards_hw_3a]") {
     CardCollection deck(kDeckCapacityTier1);
     auto consumer = []() { return true; };
+    FixedRandom rng = never_infects_rng();
 
-    const CraftResult first = craft(deck, "carta_a", consumer);
-    const CraftResult second = craft(deck, "carta_b", consumer);
+    const CraftResult first = craft(deck, "carta_a", consumer, fake_tier_of, rng);
+    const CraftResult second = craft(deck, "carta_b", consumer, fake_tier_of, rng);
 
     REQUIRE(first.instance.physical.origin == CardOrigin::HomebrewEprom);
     REQUIRE(second.instance.physical.origin == CardOrigin::HomebrewEprom);
@@ -377,8 +403,9 @@ TEST_CASE("deck_transactions: origem de acquire() resolve em HardwareClass::Comu
           "[domain][deck][deck_transactions][cards_hw_3a]") {
     CardCollection deck(kDeckCapacityTier1);
     std::int64_t credits = 0;
+    FixedRandom rng = never_infects_rng();
 
-    const AcquireResult result = acquire(deck, credits, "pulso_novo", 0);
+    const AcquireResult result = acquire(deck, credits, "pulso_novo", 0, fake_tier_of, rng);
 
     const HardwareClass cls = hardware_class_of(CardTier::Comum, result.instance.physical.origin,
                                                  /*mimics_special=*/false);
@@ -389,10 +416,85 @@ TEST_CASE("deck_transactions: origem de craft() resolve em HardwareClass::Homebr
           "[domain][deck][deck_transactions][cards_hw_3a]") {
     CardCollection deck(kDeckCapacityTier1);
     auto consumer = []() { return true; };
+    FixedRandom rng = never_infects_rng();
 
-    const CraftResult result = craft(deck, "carta_craftada", consumer);
+    const CraftResult result = craft(deck, "carta_craftada", consumer, fake_tier_of, rng);
 
     const HardwareClass cls = hardware_class_of(CardTier::Comum, result.instance.physical.origin,
                                                  /*mimics_special=*/false);
     REQUIRE(cls == HardwareClass::HomebrewEprom);
+}
+
+// ---- CARDS-HW-3B: rolagem de contaminacao integrada em acquire()/craft() ----------
+//
+// A logica FINA (fronteiras exatas, distribuicao de payload, guards) e coberta em
+// contamination_service_test.cpp - estes testes so fecham o elo ponta-a-ponta: a
+// transacao realmente CHAMA roll_contamination_on_acquisition() no ponto certo.
+
+TEST_CASE("deck_transactions: acquire() com RNG que forca infeccao seta "
+          "is_infected/virus_kind na instancia adicionada",
+          "[domain][deck][deck_transactions][cards_hw_3b]") {
+    CardCollection deck(kDeckCapacityTier1);
+    std::int64_t credits = kShopBuyPriceMax;
+    FixedRandom rng(0.5, 0);  // draw=0 - infecta ComumOriginal (risco 1%)
+
+    const AcquireResult result =
+        acquire(deck, credits, "pulso_novo", kShopBuyPriceMax, fake_tier_of, rng);
+
+    REQUIRE(result.ok());
+    REQUIRE(result.instance.physical.is_infected);
+    REQUIRE(result.instance.physical.virus_kind != VirusKind::None);
+    // Persistiu no container, nao so na copia devolvida.
+    REQUIRE(deck.active().front().physical.is_infected);
+    REQUIRE_NOTHROW(deck.active().front().physical.validate());
+}
+
+TEST_CASE("deck_transactions: craft() com RNG que forca infeccao seta "
+          "is_infected/virus_kind na instancia adicionada",
+          "[domain][deck][deck_transactions][cards_hw_3b]") {
+    CardCollection deck(kDeckCapacityTier1);
+    auto consumer = []() { return true; };
+    FixedRandom rng(0.5, 0);  // draw=0 - infecta HomebrewEprom (risco 55%)
+
+    const CraftResult result = craft(deck, "carta_craftada", consumer, fake_tier_of, rng);
+
+    REQUIRE(result.ok());
+    REQUIRE(result.instance.physical.is_infected);
+    REQUIRE(result.instance.physical.virus_kind != VirusKind::None);
+    REQUIRE(deck.active().front().physical.is_infected);
+    REQUIRE_NOTHROW(deck.active().front().physical.validate());
+}
+
+TEST_CASE("deck_transactions: acquire() com carta CardTier Especial NUNCA infecta "
+          "mesmo com RNG que sempre infectaria (guard defensivo integrado)",
+          "[domain][deck][deck_transactions][cards_hw_3b][guard]") {
+    CardCollection deck(kDeckCapacityTier1);
+    std::int64_t credits = 1000;
+    FixedRandom rng(0.5, 0);  // infectaria qualquer classe nao-protegida
+
+    const AcquireResult result =
+        acquire(deck, credits, "mestre_hipotenusa_especial", 0, fake_tier_of, rng);
+
+    REQUIRE(result.ok());
+    REQUIRE_FALSE(result.instance.physical.is_infected);
+    REQUIRE(result.instance.physical.virus_kind == VirusKind::None);
+}
+
+TEST_CASE("deck_transactions: acquire() rejeitado (saldo insuficiente) NAO consome "
+          "draw de RNG (determinismo preservado)",
+          "[domain][deck][deck_transactions][cards_hw_3b][determinism]") {
+    CardCollection deck(kDeckCapacityTier1);
+    std::int64_t credits = 0;
+    // FixedRandom nao conta draws - usamos o proprio resultado como oraculo: se um
+    // draw fosse consumido indevidamente, nao haveria efeito observavel aqui (guard
+    // de saldo insuficiente e o PRIMEIRO checado, antes de qualquer rng.next()) -
+    // regressao coberta com precisao em deck_invariants/contamination_service via
+    // CountingRandom; aqui so garantimos que a rejeicao continua sem mutar nada.
+    FixedRandom rng(0.5, 0);
+
+    const AcquireResult result = acquire(deck, credits, "carta", 999999, fake_tier_of, rng);
+
+    REQUIRE_FALSE(result.ok());
+    REQUIRE(result.error == TransactionError::InsufficientCredits);
+    REQUIRE(deck.active_count() == 0);
 }

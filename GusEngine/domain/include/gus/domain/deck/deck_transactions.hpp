@@ -30,13 +30,24 @@
 // hand_loadout.hpp) - o CHAMADOR (gameplay_engineer) e quem decide quando revalidar a
 // mao apos uma transacao, este dominio so garante o container+wallet.
 //
+// CONTAMINACAO NA AQUISICAO (CARDS-HW-3B, TODO.md): acquire()/craft() agora exigem
+// TierLookup (mesmo callback ja usado por sell()/upload()) + combat::IRandomSource -
+// NO MESMO PONTO onde a origem fisica ja e resolvida (CARDS-HW-3A), rolam 1x
+// contaminacao via gus::domain::deck::roll_contamination_on_acquisition()
+// (contamination_service.hpp). Guard de RNG: os draws SO acontecem DEPOIS de todos os
+// guards de negocio passarem (saldo/capacidade/material) - uma transacao REJEITADA
+// nunca consome draw de RNG (determinismo preservado pros callers que contam draws).
+// mimics_special e SEMPRE false nos dois canais reais desta fatia (o canal
+// pirata/clone-falso ainda nao existe - onda futura de mercado negro).
+//
 // Cross-ref: docs/design/mecanicas/deck-mao-sistema.md secao 6.1 (aquisicao
 // garantida)/6.2 (upload ao commons)/7 (atomicidade+idempotencia)/8c (precos
 // //PLAYTEST); gus/domain/deck/card_collection.hpp (remove_for_sale/add_to_active -
 // este arquivo NAO reimplementa essas mecanicas, so orquestra); gus/domain/deck/
 // deck_constants.hpp (kUploadCreditMin/Max, kShopBuyPriceMin/Max, kNpcSellPriceMin/Max,
 // kShopSellPriceMin/Max - o CALLER escolhe o preco dentro da faixa e passa aqui; este
-// arquivo nao sorteia/decide preco).
+// arquivo nao sorteia/decide preco); gus/domain/deck/contamination_service.hpp
+// (roll_contamination_on_acquisition() - CARDS-HW-3B).
 
 #ifndef GUS_DOMAIN_DECK_DECK_TRANSACTIONS_HPP
 #define GUS_DOMAIN_DECK_DECK_TRANSACTIONS_HPP
@@ -45,6 +56,7 @@
 #include <functional>
 #include <string>
 
+#include "gus/domain/combat/random_source.hpp"
 #include "gus/domain/deck/card_collection.hpp"
 #include "gus/domain/deck/deck_records.hpp"
 
@@ -149,20 +161,29 @@ struct CraftResult {
 // estoque de loja/loot table/economia inteira (decisao "e" do spec), so a
 // transacao-primitiva de "debita saldo (se houver) + adiciona ao ativo". Atomico:
 // valida saldo (credits >= price) E capacidade do ativo (nao estourar) ANTES de mutar
-// qualquer um dos dois; se qualquer checagem falhar, nada muda.
+// qualquer um dos dois OU de rolar RNG; se qualquer checagem falhar, nada muda e
+// NENHUM draw de RNG e consumido.
 //
 // Origem fisica (CARDS-HW-3A, cartas-hardware-pirataria-energia.md secao 2/3): todo
 // canal desta funcao (loja legitima/loot de repositorio limpo/achado/entrega
-// narrativa) e aquisicao LEGITIMA - a instancia nasce com CardPhysicalState{} default
-// (CardOrigin::OriginalRom), sem passar initial_physical algum. Ainda NAO existe aqui
-// um canal de mercado negro/pirata (CardOrigin::PirateClone) - onda futura
-// (mercado-negro/loja, fora do escopo desta fatia) precisara de uma
-// transacao-primitiva propria ou de um parametro de origem, a decidir quando aquele
-// canal for desenhado (nao inventado aqui).
+// narrativa) e aquisicao LEGITIMA - a instancia nasce com origin=CardOrigin::
+// OriginalRom. Ainda NAO existe aqui um canal de mercado negro/pirata
+// (CardOrigin::PirateClone) - onda futura (mercado-negro/loja, fora do escopo desta
+// fatia) precisara de uma transacao-primitiva propria ou de um parametro de origem, a
+// decidir quando aquele canal for desenhado (nao inventado aqui).
+//
+// Contaminacao na aquisicao (CARDS-HW-3B, cartas-spec-logica.md secao 5.1): DEPOIS de
+// validar saldo/capacidade e ANTES de adicionar ao ativo, resolve `tier_of(card_id)`
+// e rola 1x roll_contamination_on_acquisition() (contamination_service.hpp) -
+// mimics_special SEMPRE false (canal clone-falso ainda nao existe). A instancia ja
+// nasce com is_infected/virus_kind corretos (nunca um estado transitorio "limpo"
+// seguido de uma 2a mutacao).
 //
 // Fail-fast (std::invalid_argument) se price < 0.
 [[nodiscard]] AcquireResult acquire(CardCollection& collection, std::int64_t& credits,
-                                     std::string card_id, int price);
+                                     std::string card_id, int price,
+                                     const CardCollection::TierLookup& tier_of,
+                                     combat::IRandomSource& rng);
 
 // Callback do chamador que tenta consumir os materiais de craft (F3-Alpha) e devolve
 // se conseguiu. O inventario de materiais e do GAMEPLAY, nao do domain de deck - este
@@ -173,16 +194,24 @@ using MaterialConsumer = std::function<bool()>;
 // Compila (craft) uma carta nova SE os materiais foram consumidos. Atomico com
 // garantia forte: a capacidade do ativo e checada ANTES de invocar `consumer` - se o
 // ativo ja esta cheio, `consumer` NUNCA e chamado (nao "gasta" material pra descobrir
-// depois que a carta nao cabe). Se `consumer()` devolver false (material insuficiente),
-// nada e adicionado ao ativo.
+// depois que a carta nao cabe), NEM RNG e consumido. Se `consumer()` devolver false
+// (material insuficiente), nada e adicionado ao ativo e RNG tambem NAO e consumido.
 //
 // Origem fisica (CARDS-HW-3A, cartas-hardware-pirataria-energia.md secao 2/3): craft
 // via F3-Alpha grava a carta numa EPROM de bancada - a instancia resultante SEMPRE
-// nasce com CardOrigin::HomebrewEprom (nunca OriginalRom). NAO rola contaminacao
-// aqui (fatia futura, "acquire-com-origem" do doc-fonte secao 11) - so fixa a origem
-// pra hardware_class_of()/contaminacao futura classificarem certo.
+// nasce com CardOrigin::HomebrewEprom (nunca OriginalRom).
+//
+// Contaminacao na aquisicao (CARDS-HW-3B, cartas-spec-logica.md secao 5.1): DEPOIS de
+// checar capacidade + consumir material com sucesso, e ANTES de adicionar ao ativo,
+// resolve `tier_of(result_card_id)` e rola 1x roll_contamination_on_acquisition()
+// (contamination_service.hpp; risco 55% pra HomebrewEprom - a classe mais suja da
+// tabela) - mimics_special SEMPRE false. F3-Alpha nunca crafta CardTier::Especial/
+// Super por design (secao 9/inv.9 - unicas, sem craft), mas o guard defensivo da
+// classe protegida se aplica igual, defesa em profundidade.
 [[nodiscard]] CraftResult craft(CardCollection& collection, std::string result_card_id,
-                                 const MaterialConsumer& consumer);
+                                 const MaterialConsumer& consumer,
+                                 const CardCollection::TierLookup& tier_of,
+                                 combat::IRandomSource& rng);
 
 }  // namespace gus::domain::deck
 

@@ -270,6 +270,12 @@ add_executable(gusengine_domain_tests
     # futura); ScriptedBrain permanece byte-identico com/sem o sinal.
     # docs/design/mecanicas/cartas-spec-logica.md secao 4.2.
     backdoor_signal_test.cpp
+    # CARDS-HW-3B (TODO.md): rolagem de contaminacao NA AQUISICAO - a fatia que ACENDE
+    # o sistema de virus (roll_contamination_on_acquisition() + pick_weighted_payload(),
+    # gus/domain/deck/contamination_service.hpp). docs/design/mecanicas/
+    # cartas-spec-logica.md secao 5.1 (AMB-07 RESOLVIDA); cartas-numeros-proposta.md
+    # secao 3/3a.
+    contamination_service_test.cpp
 )
 
 # Os testes do combate incluem helpers de teste headers-only (fixed_random.hpp).

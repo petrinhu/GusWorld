@@ -10,6 +10,8 @@
 #include <stdexcept>
 #include <utility>
 
+#include "gus/domain/deck/contamination_service.hpp"
+
 namespace gus::domain::deck {
 
 using gus::domain::combat::CardTier;
@@ -88,7 +90,8 @@ UploadResult upload(CardCollection& collection, std::int64_t& credits, std::uint
 }
 
 AcquireResult acquire(CardCollection& collection, std::int64_t& credits, std::string card_id,
-                      int price) {
+                      int price, const CardCollection::TierLookup& tier_of,
+                      combat::IRandomSource& rng) {
     if (price < 0) {
         throw std::invalid_argument(
             "deck_transactions::acquire: price nao pode ser negativo (invariante de "
@@ -102,19 +105,32 @@ AcquireResult acquire(CardCollection& collection, std::int64_t& credits, std::st
         return AcquireResult{TransactionError::ActiveCapacityFull, CardInstance{}, 0};
     }
 
-    // Tudo validado - muta o container PRIMEIRO (unica mutacao que pode, em teoria,
-    // lancar via o guard interno de capacidade de add_to_active); so credita/debita
-    // depois que ela teve sucesso, pra nao deixar a wallet debitada sem a carta
-    // correspondente em nenhum cenario defensivo.
-    CardInstance instance = collection.add_to_active(std::move(card_id));
+    // Origem fisica (CARDS-HW-3A): todo canal desta funcao e aquisicao LEGITIMA -
+    // origin default (CardOrigin::OriginalRom).
+    CardPhysicalState physical;
+
+    // Contaminacao na aquisicao (CARDS-HW-3B, cartas-spec-logica.md secao 5.1): SO
+    // DEPOIS dos guards de saldo/capacidade acima (nenhum draw de RNG numa transacao
+    // que ja seria rejeitada) - card_id ainda intocado (nao movido ainda) pro
+    // tier_of() ler. mimics_special SEMPRE false (canal clone-falso ainda nao existe).
+    const cards::CardTier catalog_tier = tier_of(card_id);
+    roll_contamination_on_acquisition(physical, catalog_tier, /*mimics_special=*/false, rng);
+
+    // Tudo validado + a instancia ja nasce com o estado fisico final - muta o
+    // container PRIMEIRO (unica mutacao que pode, em teoria, lancar via o guard
+    // interno de capacidade de add_to_active); so credita/debita depois que ela teve
+    // sucesso, pra nao deixar a wallet debitada sem a carta correspondente em nenhum
+    // cenario defensivo.
+    CardInstance instance = collection.add_to_active(std::move(card_id), std::nullopt, physical);
     credits -= price;
     return AcquireResult{TransactionError::Ok, instance, price};
 }
 
 CraftResult craft(CardCollection& collection, std::string result_card_id,
-                   const MaterialConsumer& consumer) {
+                   const MaterialConsumer& consumer, const CardCollection::TierLookup& tier_of,
+                   combat::IRandomSource& rng) {
     // Capacidade checada ANTES de invocar o consumer (garantia forte): se nao cabe,
-    // NUNCA tenta consumir material a toa.
+    // NUNCA tenta consumir material a toa, nem rola RNG.
     if (collection.active_is_full()) {
         return CraftResult{TransactionError::ActiveCapacityFull, CardInstance{}};
     }
@@ -125,12 +141,17 @@ CraftResult craft(CardCollection& collection, std::string result_card_id,
 
     // Origem fisica (CARDS-HW-3A, cartas-hardware-pirataria-energia.md secao 2/3):
     // toda carta craftada via F3-Alpha e GRAVADA numa EPROM de bancada (o "terminal
-    // de bancada" do doc-fonte) - nunca sai como ROM de fabrica. HomebrewEprom aqui
-    // NAO rola contaminacao (fatia futura, deck_transactions.hpp acquire-com-origem
-    // do doc); so fixa a origem correta pra hardware_class_of()/contaminacao futura
-    // classificarem certo.
+    // de bancada" do doc-fonte) - nunca sai como ROM de fabrica.
     CardPhysicalState physical;
     physical.origin = CardOrigin::HomebrewEprom;
+
+    // Contaminacao na aquisicao (CARDS-HW-3B, secao 5.1): SO depois do material
+    // confirmado consumido - result_card_id ainda intocado (nao movido ainda) pro
+    // tier_of() ler. mimics_special SEMPRE false. F3-Alpha nunca crafta Especial/
+    // Super por design (inv.9), mas o guard defensivo se aplica igual.
+    const cards::CardTier catalog_tier = tier_of(result_card_id);
+    roll_contamination_on_acquisition(physical, catalog_tier, /*mimics_special=*/false, rng);
+
     CardInstance instance =
         collection.add_to_active(std::move(result_card_id), std::nullopt, physical);
     return CraftResult{TransactionError::Ok, instance};

@@ -110,6 +110,13 @@ add_library(gusengine_domain STATIC
     # ciclo infection<->deck (CARDS-HW-2A, 2026-07-19) - reusa arestas ja
     # existentes de deck/ para combat/ e para a peca infection/.
     src/deck/turing_service.cpp
+    # CARDS-HW-3B (TODO.md): rolagem de contaminacao NA AQUISICAO - a fatia que ACENDE
+    # o sistema de virus (roll_contamination_on_acquisition()/pick_weighted_payload()).
+    # Mora em deck/ pelo MESMO racional de turing_service.hpp (precisa de
+    # combat::IRandomSource, aresta que hardware/ e infection/ nao tem por gate de
+    # camadas). Chamada por acquire()/craft() em deck_transactions.cpp, no MESMO ponto
+    # onde a origem fisica ja foi resolvida (CARDS-HW-3A).
+    src/deck/contamination_service.cpp
 )
 
 target_include_directories(gusengine_domain

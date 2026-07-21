@@ -59,7 +59,9 @@
 
 using namespace gus::domain::deck;
 using gus::domain::combat::CardTier;
+using gus::domain::combat::IRandomSource;
 using gus::domain::tests::Lcg;
+using gus::domain::tests::PropertyRandom;
 
 namespace {
 
@@ -166,7 +168,8 @@ void check_hand_only_active(const HandLoadout& hand, const CardCollection& deck)
 // fica intocada). Chamar check_hand_only_active() fora dessas garantias e FALSO
 // POSITIVO (acusaria uma orfandade transitoria LEGITIMA, nao um bug).
 bool apply_random_step(Lcg& g, int op, CardCollection& collection, HandLoadout& hand,
-                        std::int64_t& credits, std::int64_t& expected_credits) {
+                        std::int64_t& credits, std::int64_t& expected_credits,
+                        IRandomSource& rng) {
     switch (op) {
         case 0: {  // add_to_active direto (sem passar pela transacao acquire)
             try {
@@ -206,17 +209,24 @@ bool apply_random_step(Lcg& g, int op, CardCollection& collection, HandLoadout& 
             if (res.ok()) expected_credits += price;
             return false;
         }
-        case 4: {  // acquire (DECK-3) - preco pode exceder saldo (InsufficientCredits) de proposito
+        case 4: {  // acquire (DECK-3) - preco pode exceder saldo (InsufficientCredits) de
+                   // proposito; CARDS-HW-3B: rng real (PropertyRandom) exercita a rolagem
+                   // de contaminacao tambem sob a sequencia arbitraria (o resultado nao e
+                   // checado aqui - so precisa NUNCA corromper os invariantes estruturais/
+                   // de carteira, ja checados pelo chamador apos cada passo).
             const std::string card_id = random_card_id(g);
             const int price = g.in_range(0, 25);
-            const AcquireResult res = acquire(collection, credits, card_id, price);
+            const AcquireResult res = acquire(collection, credits, card_id, price, tier_of_pool, rng);
             if (res.ok()) expected_credits -= price;
             return false;
         }
-        case 5: {  // craft (DECK-3) - NUNCA mexe em credits, so container
+        case 5: {  // craft (DECK-3) - NUNCA mexe em credits, so container; mesmo rng real
+                   // pra contaminacao (CARDS-HW-3B)
             const std::string card_id = random_card_id(g);
             const bool has_material = g.coin();
-            const CraftResult res = craft(collection, card_id, [has_material] { return has_material; });
+            const CraftResult res =
+                craft(collection, card_id, [has_material] { return has_material; }, tier_of_pool,
+                      rng);
             (void)res;  // conservacao (f): expected_credits intocado de proposito.
             return false;
         }
@@ -287,6 +297,11 @@ TEST_CASE("property: deck/mao mantem XOR de container + sem duplicata + carteira
           "[domain][deck][property]") {
     for (int c = 0; c < kCasesPerProperty; ++c) {
         Lcg g(0xDEC00000u + static_cast<unsigned>(c));
+        PropertyRandom rng(0xDEC00000u + static_cast<unsigned>(c));  // CARDS-HW-3B: RNG real
+                                                                       // pra contaminacao,
+                                                                       // seed IRMA da do Lcg
+                                                                       // (mesmo caso, mesma
+                                                                       // reproducao).
 
         const int capacity = g.in_range(2, 6);  // pequeno: forca full/edge com frequencia
         CardCollection collection(capacity);
@@ -302,7 +317,7 @@ TEST_CASE("property: deck/mao mantem XOR de container + sem duplicata + carteira
         for (int step = 0; step < kStepsPerCase; ++step) {
             const int op = g.in_range(0, 10);
             const bool hand_fully_revalidated =
-                apply_random_step(g, op, collection, hand, credits, expected_credits);
+                apply_random_step(g, op, collection, hand, credits, expected_credits, rng);
 
             check_container_invariants(collection, tier_of_pool);
             check_wallet_invariant(credits, expected_credits);
@@ -328,6 +343,7 @@ TEST_CASE("property: roundtrip do save (V6) preserva card_collection + hand_sele
           "[domain][deck][property][save]") {
     for (int c = 0; c < kRoundtripCases; ++c) {
         Lcg g(0xDEC10000u + static_cast<unsigned>(c));
+        PropertyRandom rng(0xDEC10000u + static_cast<unsigned>(c));  // CARDS-HW-3B
 
         const int capacity = g.in_range(2, 6);
         CardCollection collection(capacity);
@@ -339,7 +355,7 @@ TEST_CASE("property: roundtrip do save (V6) preserva card_collection + hand_sele
 
         for (int step = 0; step < kRoundtripSteps; ++step) {
             const int op = g.in_range(0, 10);
-            apply_random_step(g, op, collection, hand, credits, expected_credits);
+            apply_random_step(g, op, collection, hand, credits, expected_credits, rng);
         }
 
         // Espelha o fluxo real (gameplay chama revalidate() antes de salvar): so ai o
@@ -387,6 +403,7 @@ TEST_CASE("property: save rejeita QUALQUER adulteracao em memoria (dup instance_
           "[domain][deck][property][save][adversarial]") {
     for (int c = 0; c < kRoundtripCases; ++c) {
         Lcg g(0xDEC20000u + static_cast<unsigned>(c));
+        PropertyRandom rng(0xDEC20000u + static_cast<unsigned>(c));  // CARDS-HW-3B
 
         const int capacity = g.in_range(2, 6);
         CardCollection collection(capacity);
@@ -398,7 +415,7 @@ TEST_CASE("property: save rejeita QUALQUER adulteracao em memoria (dup instance_
 
         for (int step = 0; step < kRoundtripSteps; ++step) {
             const int op = g.in_range(0, 10);
-            apply_random_step(g, op, collection, hand, credits, expected_credits);
+            apply_random_step(g, op, collection, hand, credits, expected_credits, rng);
         }
         hand.revalidate(collection);
 
