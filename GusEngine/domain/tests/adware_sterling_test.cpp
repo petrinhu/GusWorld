@@ -315,6 +315,32 @@ TEST_CASE("adware integracao: exposicoes 2 e 3 (rodadas seguintes) tambem sempre
     REQUIRE(count_log(sm, "propaganda Sterling dispensada") == 3);
 }
 
+TEST_CASE("adware integracao: gate roda ANTES do debito de mana - o log do anuncio ja existe "
+          "mesmo quando o debito subsequente falha por mana insuficiente (prova de ordem, "
+          "vetor QA de mutacao)",
+          "[domain][combat][adware][integration]") {
+    CombatActor h = hero();  // mana inicial = kBaseMana (begin_turn abaixo confirma).
+    CombatActor e = foe();
+    Card card = adware_card("exec_sterling_mana_insuf", /*has_adware=*/true,
+                            /*mana_cost=*/combat_constants::kBaseMana + 100);
+    auto reg = registry({card});
+    FixedRandom rng;
+    CombatStateMachine sm({&h, &e}, play_once(CombatAction::use_card(card.id, e.id())), &reg,
+                          nullptr, &rng);
+
+    sm.begin_turn();
+    REQUIRE(h.mana() == combat_constants::kBaseMana);
+
+    // spend_mana lanca (mana insuficiente) - so alcancavel SE o gate ja rodou antes (secao 1:
+    // "gate ANTES do debito"). Se a ordem fosse invertida (debito primeiro), a excecao
+    // interromperia o resolve ANTES do tracker/log do adware serem tocados - este teste
+    // pegaria a inversao (mutation vetor 2).
+    REQUIRE_THROWS_AS(sm.run_active_turn_to_end(), std::logic_error);
+
+    REQUIRE(sm.adware_exposure_count() == 1);
+    REQUIRE(log_has(sm, "propaganda Sterling dispensada"));
+}
+
 TEST_CASE("adware integracao: 4a exposicao com RNG forcando SKIP - loga texto proprio (nao "
           "'dispensada'), e o cast AINDA PROSSEGUE (sem espera)",
           "[domain][combat][adware][integration]") {
