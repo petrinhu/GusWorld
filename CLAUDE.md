@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 **Stack vigente: C++20 + SDL3 + glintfx/RmlUi.** Solo indie, Linux (v1.0.0) + Windows (pós-v1, CI real MSVC já validado), single-player puro. Gênero: RPG + Puzzle + Aventura + combate turn-based, **visual 2D estilizado** (sprites/pixel art, não 3D). Ver "Decisões fechadas" abaixo para a stack completa e os ADRs.
 
-**Board M0-M9 (migração da engine, ver ROADMAP.md/TODO.md para o board vivo):** M0-M6 entregues e M7-DIALOGO entregue; só falta o playthrough ao vivo do líder para fechar o M7 (paridade jogável). M8 (decommission Godot/C#) e M9 (higienização) vêm depois. Em paralelo ao board, a onda `CARDS` desenvolve o motor de cartas techMagic ([ADR-016](docs/tech/adr/ADR-016-techmagic-effect-engine-data-driven.md)).
+**Board M0-M9 (migração da engine, ver ROADMAP.md/TODO.md para o board vivo):** M0-M7 entregues — **M7 (paridade jogável) FECHADO 2026-07-21** pelo playthrough ao vivo (Gus): loop completo (andar/NPC/combate→Victory/save/load) rodou 100% na engine C++/SDL3+glintfx sem Godot, zero erro. M8 (decommission Godot/C#) e M9 (higienização) vêm depois; 3 feedbacks de polish do playtest na INBOX (M7-FB1/2/3). Em paralelo ao board, a onda `CARDS` desenvolve o motor de cartas techMagic ([ADR-016](docs/tech/adr/ADR-016-techmagic-effect-engine-data-driven.md)).
 
 **Mirror + Wiki publicados (2026-07-14):** repo espelhado em `petrinhu/GusWorld` no GitHub (push dual-remote) além do Codeberg canônico; Wiki inicial publicada nos dois remotos (Codeberg bilíngue EN/PT para contribuidor técnico; GitHub PT-br para leigo/iniciante); `AI-DISCLOSURE.md` adicionado.
 
