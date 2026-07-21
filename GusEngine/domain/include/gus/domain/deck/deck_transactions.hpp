@@ -58,6 +58,7 @@
 
 #include "gus/domain/combat/random_source.hpp"
 #include "gus/domain/deck/card_collection.hpp"
+#include "gus/domain/deck/contamination_service.hpp"
 #include "gus/domain/deck/deck_records.hpp"
 
 namespace gus::domain::deck {
@@ -116,6 +117,12 @@ struct AcquireResult {
     // Valida SO quando error == Ok: quanto foi debitado (== price passado; 0 pra
     // loot garantido/achado visivel).
     int debited = 0;
+    // Valida SO quando error == Ok (CARDS-HW-3B): desfecho da rolagem de contaminacao
+    // feita no MESMO ponto em que `instance` nasceu - a carta ja saiu com o estado
+    // fisico final refletido nela, este campo so devolve o desfecho pro CHAMADOR poder
+    // emitir o log diegetico AMBIGUO (contamination_service::translation_key_for);
+    // default Clean nos ramos rejeitados (nenhuma rolagem aconteceu).
+    ContaminationRollOutcome contamination = ContaminationRollOutcome::Clean;
 
     [[nodiscard]] bool ok() const noexcept { return error == TransactionError::Ok; }
 };
@@ -125,6 +132,10 @@ struct CraftResult {
     TransactionError error = TransactionError::Ok;
     // Valida SO quando error == Ok: a instancia da carta resultante.
     CardInstance instance;
+    // Valida SO quando error == Ok (CARDS-HW-3B): mesmo desfecho de
+    // AcquireResult::contamination, ver comentario la - default Clean nos ramos
+    // rejeitados (nenhuma rolagem aconteceu).
+    ContaminationRollOutcome contamination = ContaminationRollOutcome::Clean;
 
     [[nodiscard]] bool ok() const noexcept { return error == TransactionError::Ok; }
 };

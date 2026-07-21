@@ -114,7 +114,8 @@ AcquireResult acquire(CardCollection& collection, std::int64_t& credits, std::st
     // que ja seria rejeitada) - card_id ainda intocado (nao movido ainda) pro
     // tier_of() ler. mimics_special SEMPRE false (canal clone-falso ainda nao existe).
     const cards::CardTier catalog_tier = tier_of(card_id);
-    roll_contamination_on_acquisition(physical, catalog_tier, /*mimics_special=*/false, rng);
+    const ContaminationRollOutcome contamination =
+        roll_contamination_on_acquisition(physical, catalog_tier, /*mimics_special=*/false, rng);
 
     // Tudo validado + a instancia ja nasce com o estado fisico final - muta o
     // container PRIMEIRO (unica mutacao que pode, em teoria, lancar via o guard
@@ -123,7 +124,7 @@ AcquireResult acquire(CardCollection& collection, std::int64_t& credits, std::st
     // cenario defensivo.
     CardInstance instance = collection.add_to_active(std::move(card_id), std::nullopt, physical);
     credits -= price;
-    return AcquireResult{TransactionError::Ok, instance, price};
+    return AcquireResult{TransactionError::Ok, instance, price, contamination};
 }
 
 CraftResult craft(CardCollection& collection, std::string result_card_id,
@@ -150,11 +151,12 @@ CraftResult craft(CardCollection& collection, std::string result_card_id,
     // tier_of() ler. mimics_special SEMPRE false. F3-Alpha nunca crafta Especial/
     // Super por design (inv.9), mas o guard defensivo se aplica igual.
     const cards::CardTier catalog_tier = tier_of(result_card_id);
-    roll_contamination_on_acquisition(physical, catalog_tier, /*mimics_special=*/false, rng);
+    const ContaminationRollOutcome contamination =
+        roll_contamination_on_acquisition(physical, catalog_tier, /*mimics_special=*/false, rng);
 
     CardInstance instance =
         collection.add_to_active(std::move(result_card_id), std::nullopt, physical);
-    return CraftResult{TransactionError::Ok, instance};
+    return CraftResult{TransactionError::Ok, instance, contamination};
 }
 
 }  // namespace gus::domain::deck
