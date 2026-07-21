@@ -1602,6 +1602,11 @@ void CombatStateMachine::resolve_use_card(CombatActor& actor, const CombatAction
             case CardModifier::Null: mana_extra = 1; break;
         }
     }
+    // Adware Sterling (CARDS-HW-3C; docs/design/mecanicas/cartas-spec-logica.md secao 1):
+    // roda ANTES do debito de recurso (mana logo abaixo) - no-op total se a carta nao tem
+    // adware (ver dispatch_adware_gate).
+    dispatch_adware_gate(actor, card);
+
     actor.spend_mana(card.mana_cost + mana_extra);
 
     // Virus em combate, payload PRE-CAST (CARDS-HW-2 fatia 1; docs/design/mecanicas/cartas-
@@ -2009,6 +2014,30 @@ bool CombatStateMachine::try_trigger_logic_bomb(CombatActor& caster, const Card&
             " - payload logic-bomb disparado, efeito revertido contra o proprio "
             "compilador por " + std::to_string(backfire_damage) + "."});
     return true;
+}
+
+void CombatStateMachine::dispatch_adware_gate(CombatActor& actor, const Card& card) {
+    // Carta comum (imensa maioria do catalogo): no-op TOTAL - ZERO log, ZERO consumo de
+    // adware_tracker_/rng_. Pipeline IDENTICO ao motor sem adware (regressao coberta em
+    // adware_sterling_test.cpp).
+    if (!card.has_adware) return;
+
+    const AdwareGateResult result = adware_tracker_.roll_exposure(*rng_);
+
+    // O cast SEMPRE PROSSEGUE apos a decisao acima (ver NOTA/FLAG AMB-12 no header) - o
+    // caller (resolve_use_card) continua pro debito de mana/AP + efeito nominal logo em
+    // seguida, sem interrupcao real (a espera de kAdwareMinWatchSeconds e o botao-X sao
+    // 100% responsabilidade da UI futura; este motor e sincrono/turn-based).
+    if (result.outcome == AdwareOutcome::ShowFull) {
+        log_.push_back(CombatLogEntry{
+            actor.id(), CombatActionType::UseCard, std::nullopt, 0,
+            "> propaganda Sterling dispensada. Prosseguindo com a compilação."});
+    } else {
+        log_.push_back(CombatLogEntry{
+            actor.id(), CombatActionType::UseCard, std::nullopt, 0,
+            "> propaganda Sterling pulada (" + std::to_string(result.exposure_index) +
+                "a exposicao, sorteio favoravel). Prosseguindo direto."});
+    }
 }
 
 bool CombatStateMachine::dispatch_virus_payload_pre_cast(

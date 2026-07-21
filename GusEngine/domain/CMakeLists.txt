@@ -56,6 +56,10 @@ add_library(gusengine_domain STATIC
     # conceito do escalonador por ticks estilo Pokemon Legends: Arceus. NAO ligado a
     # CombatStateMachine/InitiativeQueue de producao (cutover e onda pos-M7).
     src/combat/action_clock.cpp
+    # CARDS-HW-3C (TODO.md): logica de dominio do Adware Sterling - AdwareExposureTracker
+    # (decisao PURA ShowFull/Skip, AMB-11 resolvida pelo lider), consumida pelo gate
+    # pre-cast de resolve_use_card. docs/design/mecanicas/cartas-spec-logica.md secao 9.
+    src/combat/adware_sterling.cpp
     # ATOM-2 (decomposicao atomica ao nivel de modulo, generalizando ADR-019): catalogo
     # de cartas (comuns + especiais dos mestres) movido de src/combat/ pra src/cards/
     # (LAR proprio, cards/ NAO inclui combat/ - gate de camadas). Sem mudanca de

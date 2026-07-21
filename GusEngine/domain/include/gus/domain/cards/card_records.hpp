@@ -122,6 +122,17 @@ struct Card {
     // normal (imensa maioria; default preserva todo catalogo existente intacto).
     std::optional<std::string> mimics_special_id;
 
+    // ---- CARDS-HW-3C (TODO.md, docs/design/mecanicas/cartas-spec-logica.md secao 4.1/9):
+    // flag de CATALOGO da carta Adware Sterling - opt-in CONSCIENTE do jogador (aceitou a
+    // carta gratis sabendo do anuncio, cartas-hardware-pirataria-energia.md secao 10). NAO
+    // e infeccao hostil (isso e gus::domain::infection::VirusKind::AdwareSterling, fora da
+    // rolagem de contaminacao - ver contamination_service.hpp). Quando true, resolve_
+    // use_card intercepta ANTES do debito de recurso via CombatStateMachine::
+    // dispatch_adware_gate (gus/domain/combat/adware_sterling.hpp). false = imensa maioria
+    // do catalogo, pipeline IDENTICO ao motor sem adware (default preserva toda carta/teste
+    // existente intacta).
+    bool has_adware = false;
+
     [[nodiscard]] bool operator==(const Card&) const = default;
 };
 

@@ -49,6 +49,7 @@
 #include <unordered_set>
 #include <vector>
 
+#include "gus/domain/combat/adware_sterling.hpp"
 #include "gus/domain/combat/card_collection_snapshot.hpp"
 #include "gus/domain/combat/card_integrity_ledger.hpp"
 #include "gus/domain/combat/combat_enums.hpp"
@@ -219,6 +220,16 @@ public:
     // Ultimo IntentPreview lido por Gambito-Prever (secao 12). nullopt antes do 1o uso.
     [[nodiscard]] const std::optional<IntentPreview>& last_prediction() const noexcept {
         return last_prediction_;
+    }
+
+    // Contador de exposicoes ao anuncio Adware Sterling NESTA instancia de combate (CARDS-
+    // HW-3C; docs/design/mecanicas/cartas-spec-logica.md secao 9, AMB-11 resolvida pelo
+    // lider). Estado de RUNTIME, NUNCA persistido (nao faz parte de CombatResult/save) -
+    // reseta a cada CombatStateMachine nova (por-combate; ver adware_sterling.hpp pro
+    // racional de escopo/wiring futuro cross-combate). So observabilidade de teste/log -
+    // a UI futura tem seu proprio jeito de saber quantas vezes ja mostrou o anuncio.
+    [[nodiscard]] int adware_exposure_count() const noexcept {
+        return adware_tracker_.exposure_count();
     }
 
     // Outbox de eventos pro sistema de MUNDO (CARDS-HW-2 fatia 1, Worm/WorldEcosystem): so
@@ -440,6 +451,22 @@ private:
     void dispatch_virus_payload_post_cast(CombatActor& actor, const Card& card,
                                           const std::optional<std::uint64_t>& instance_id);
 
+    // ---- Adware Sterling (CARDS-HW-3C; docs/design/mecanicas/cartas-spec-logica.md secao
+    // 1/9) ----
+
+    // Gate PRE-cast, chamado em resolve_use_card ANTES do debito de mana (secao 1: "Se
+    // card.HasAdware -> intercepta ANTES do debito de recurso"). card.has_adware==false =>
+    // no-op TOTAL (ZERO log, ZERO consumo de adware_tracker_/rng_ - pipeline IDENTICO ao
+    // motor sem adware, regressao coberta em adware_sterling_test.cpp). Com adware: rola
+    // adware_tracker_.roll_exposure(*rng_) e loga o desfecho (regra "todo efeito loga").
+    //
+    // NOTA/FLAG pra confirmacao do lider (AMB-12, secao 9): esta fatia assume que o botao-X
+    // so DISPENSA o anuncio - o cast SEMPRE PROSSEGUE logo apos (debito + efeito nominal
+    // seguem normalmente em resolve_use_card), nunca cancela/estorna. Se a intencao real
+    // for "X CANCELA a carta" (desistir sem custo), e um branch DIFERENTE (return antes do
+    // debito, como o backfire de LogicBomb faz) - deliberadamente NAO implementado aqui.
+    void dispatch_adware_gate(CombatActor& actor, const Card& card);
+
     // ---- urandom (CARDS-HW-2 fatia B; docs/design/mecanicas/cartas-spec-logica.md secao
     // 7, cartas-numeros-proposta.md secao 4) ----
 
@@ -618,6 +645,11 @@ private:
     // resolve_use_card. Escopo = vida desta CombatStateMachine (mesmo escopo de
     // specials_cast_ acima).
     bool token_refund_used_ = false;
+
+    // Adware Sterling (CARDS-HW-3C, secao 9, AMB-11): contador de exposicoes + decisor
+    // ShowFull/Skip. Escopo = vida desta CombatStateMachine (mesmo racional de
+    // specials_cast_/token_refund_used_ acima). Ver adware_sterling.hpp.
+    AdwareExposureTracker adware_tracker_;
 
     // Ledger de hits DA RODADA CORRENTE (ADR-016 secao 20 item 4, ledger cross-ator):
     // acumulado em apply_damage_with_hooks (DEPOIS do guard damage<=0), consultado e

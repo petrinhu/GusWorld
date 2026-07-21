@@ -276,6 +276,13 @@ add_executable(gusengine_domain_tests
     # cartas-spec-logica.md secao 5.1 (AMB-07 RESOLVIDA); cartas-numeros-proposta.md
     # secao 3/3a.
     contamination_service_test.cpp
+    # CARDS-HW-3C (TODO.md): logica de dominio do Adware Sterling - flag de catalogo
+    # (Card::has_adware, opt-in) + AdwareExposureTracker (gus/domain/combat/
+    # adware_sterling.hpp, AMB-11 resolvida pelo lider) + gate pre-cast em
+    # resolve_use_card (ANTES do debito de recurso, secao 1). docs/design/mecanicas/
+    # cartas-spec-logica.md secao 1/4.1/9. A tela glintfx (overlay 5s + X) e fatia
+    # futura de UI, FORA deste teste.
+    adware_sterling_test.cpp
 )
 
 # Os testes do combate incluem helpers de teste headers-only (fixed_random.hpp).
