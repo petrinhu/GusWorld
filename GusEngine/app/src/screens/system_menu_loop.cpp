@@ -915,12 +915,14 @@ SystemMenuLoopOutcome run_system_menu_loop_gl_current(
     const char* controls_selftest = std::getenv("GUSWORLD_SYSMENU_CONTROLS_SELFTEST");
     if (controls_selftest != nullptr && controls_selftest[0] != '\0') {
         // Pause -> ConfigCategories -> Controls (navegacao REAL via system_menu_key_down).
-        system_menu_key_down(state, SDLK_DOWN);    // Continue->Save
-        system_menu_key_down(state, SDLK_DOWN);    // Save->Settings
-        system_menu_key_down(state, SDLK_RETURN);  // entra ConfigCategories
-        system_menu_key_down(state, SDLK_DOWN);    // Audio->Video
-        system_menu_key_down(state, SDLK_DOWN);    // Video->Controls
-        system_menu_key_down(state, SDLK_RETURN);  // entra Controls
+        // (void): self-test so quer a MUTACAO de state (navegacao), a SystemMenuAction
+        // devolvida nao e consumida aqui (FEDORA-GCC16-NODISCARD).
+        (void)system_menu_key_down(state, SDLK_DOWN);    // Continue->Save
+        (void)system_menu_key_down(state, SDLK_DOWN);    // Save->Settings
+        (void)system_menu_key_down(state, SDLK_RETURN);  // entra ConfigCategories
+        (void)system_menu_key_down(state, SDLK_DOWN);    // Audio->Video
+        (void)system_menu_key_down(state, SDLK_DOWN);    // Video->Controls
+        (void)system_menu_key_down(state, SDLK_RETURN);  // entra Controls
         reload();
         present_frame();
         present_frame();  // 2o update() por seguranca (layout assentado)
@@ -965,7 +967,7 @@ SystemMenuLoopOutcome run_system_menu_loop_gl_current(
         // testado a parte em system_menu_test.cpp - aqui so prova o caminho REAL
         // do loop, com reload() reconstruindo o RML a cada passo).
         for (int i = 0; i < 3; ++i) {
-            system_menu_key_down(state, SDLK_DOWN);
+            (void)system_menu_key_down(state, SDLK_DOWN);  // so a mutacao importa
         }
         reload();
         present_frame();
@@ -991,8 +993,8 @@ SystemMenuLoopOutcome run_system_menu_loop_gl_current(
         // BUG-A (Voltar morto pro mouse, achado NOVO nesta investigacao - ver o
         // comentario extenso de controls_row_visible_in_list em
         // system_menu.hpp): cancela a captura aberta pelo teste BUG-3 acima (Esc,
-        // nao muda config) antes de prosseguir.
-        system_menu_controls_capture_key(state, /*is_escape=*/true, 0);
+        // nao muda config) antes de prosseguir. (void): so a mutacao importa.
+        (void)system_menu_controls_capture_key(state, /*is_escape=*/true, 0);
         {
             const glintfx::ElementBox list_box = ui_opt->get_element_box(kControlsListId);
             const glintfx::ElementBox raw_row6 =
@@ -1055,8 +1057,9 @@ SystemMenuLoopOutcome run_system_menu_loop_gl_current(
         // Re-entra em Controles (config_categories_selected ainda aponta pra ela -
         // ver o comentario de heranca de selecao no topo do arquivo/header, so 1
         // RETURN, sem repetir os DOWN/DOWN - Voltar em leave_controls_screen_or_
-        // confirm_discard nunca mexe em config_categories_selected).
-        system_menu_key_down(state, SDLK_RETURN);
+        // confirm_discard nunca mexe em config_categories_selected). (void): so a
+        // mutacao importa.
+        (void)system_menu_key_down(state, SDLK_RETURN);
         reload();
         present_frame();
         present_frame();
@@ -1105,7 +1108,7 @@ SystemMenuLoopOutcome run_system_menu_loop_gl_current(
         // DOWN (nao 1 so no fim) - MESMO caminho incremental que o loop de
         // producao roda a cada tecla real.
         for (int i = 0; i < 25; ++i) {
-            system_menu_key_down(state, SDLK_DOWN);
+            (void)system_menu_key_down(state, SDLK_DOWN);  // so a mutacao importa
             reload();
         }
         present_frame();
@@ -1163,7 +1166,7 @@ SystemMenuLoopOutcome run_system_menu_loop_gl_current(
                               : "FALHOU")
                       << "\n";
             (void)click_action25;
-            system_menu_controls_capture_key(state, /*is_escape=*/true, 0);  // cancela
+            (void)system_menu_controls_capture_key(state, /*is_escape=*/true, 0);  // cancela
         }
 
         return outcome;

@@ -234,9 +234,16 @@ bool Maestro::init() {
 
     // Traducao (i18n) do MENU DE PAUSA/CONFIG - carregada 1 vez aqui, reusada em toda
     // abertura do menu pela CIDADE (open_pause_from_city). Ausencia => fallback (o
-    // Translator devolve a propria chave), mesma degradacao do resto do app/.
+    // Translator devolve a propria chave), mesma degradacao do resto do app/. FIX
+    // (FEDORA-GCC16-NODISCARD): o retorno era descartado silenciosamente - a
+    // degradacao (catalogo ausente/ilegivel -> UI mostra as CHAVES cruas) nao tinha
+    // NENHUM log, quebrando a regra do projeto "todo efeito loga" e o padrao dos 2
+    // loads vizinhos (settings/controls, ambos logam load ok/fallback acima).
     const std::string tr_path = gus::app::i18n::resolve_translations_path();
-    translator_.load_from_file(tr_path);
+    const bool tr_loaded = translator_.load_from_file(tr_path);
+    std::cout << "Maestro: [i18n] catalogo de " << tr_path << " - "
+              << (tr_loaded ? "carregado" : "AUSENTE/ILEGIVEL (fallback: UI mostra as chaves)")
+              << ".\n";
 
     // AUDIO (M7-COSTURA Inc 2, ADR-012 decisao 5 + paga a divida do ADR-011 "AudioEngine
     // e dono da battle_preview"): a Maestro carrega o tema da cidade UMA vez aqui (audio_

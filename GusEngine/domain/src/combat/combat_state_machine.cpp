@@ -2320,6 +2320,17 @@ void CombatStateMachine::resolve_redirected_card_effect(CombatActor& caster,
     const bool friendly = (&target == &caster) || (target.is_player_side() == caster.is_player_side());
     int dealt = 0;
 
+    // URANDOM-AOE-REDIRECT-LOG (TODO.md): o redirect e SEMPRE single-target (ver o
+    // doc-comment do header - "NAO respeita TargetShape do card sorteado"), mesmo
+    // quando a carta sorteada e Grupo/Area3x3/Linha (efeito de area na resolucao
+    // normal). //PLAYTEST: simplificacao ja aceita pelo lider - este log so avisa o
+    // jogador do downgrade, NAO muda o comportamento (segue single-target).
+    const bool area_reduced_to_single = card.target_shape == TargetShape::Linha ||
+                                         card.target_shape == TargetShape::Area3x3 ||
+                                         card.target_shape == TargetShape::Grupo;
+    const std::string area_downgrade_suffix =
+        area_reduced_to_single ? " (efeito de area reduzido a alvo unico)" : "";
+
     if (friendly) {
         // Fogo amigo desligado (MESMA regra geral de resolve_use_card): dano 0, sem status
         // ofensivo - so os EffectSpec OnCast (side_filter AllyOnly) rodam, abaixo.
@@ -2327,7 +2338,7 @@ void CombatStateMachine::resolve_redirected_card_effect(CombatActor& caster,
         log_.push_back(CombatLogEntry{
             caster.id(), CombatActionType::UseCard, target.id(), 0,
             caster.id() + " redireciona " + card.id + " (urandom) em " + target.id() +
-                " (aliado, fogo amigo desligado): dano 0."});
+                " (aliado, fogo amigo desligado): dano 0." + area_downgrade_suffix});
     } else {
         float mult_fraqueza = target.is_universal_compiler()
                                   ? 1.0f
@@ -2387,7 +2398,7 @@ void CombatStateMachine::resolve_redirected_card_effect(CombatActor& caster,
             log_.push_back(CombatLogEntry{
                 caster.id(), CombatActionType::UseCard, target.id(), 0,
                 caster.id() + " redireciona " + card.id + " (urandom) em " + target.id() +
-                    " por 0."});
+                    " por 0." + area_downgrade_suffix});
         } else {
             const int kills = target.knowledge_kills();
             const float v = std::max(0.05f, 0.30f * std::exp(-static_cast<float>(kills) * 0.10f));
@@ -2419,7 +2430,8 @@ void CombatStateMachine::resolve_redirected_card_effect(CombatActor& caster,
             log_.push_back(CombatLogEntry{
                 caster.id(), CombatActionType::UseCard, target.id(), damage,
                 caster.id() + " redireciona " + card.id + " (urandom) em " + target.id() +
-                    " por " + std::to_string(damage) + "." + channel_suffix});
+                    " por " + std::to_string(damage) + "." + channel_suffix +
+                    area_downgrade_suffix});
         }
     }
 

@@ -612,6 +612,69 @@ TEST_CASE("urandom FSM: redirecionamento pra uma COMUM produz o MESMO dano + sta
     REQUIRE(redirect_target_hp == direct_target_hp);
 }
 
+// ----- URANDOM-AOE-REDIRECT-LOG (TODO.md): aviso diegetico do downgrade area->single ---
+
+TEST_CASE("urandom FSM: carta sorteada com TargetShape de area (Grupo/Area3x3/Linha) loga "
+         "o sufixo de downgrade (redirect e SEMPRE single-target, comportamento intacto)",
+         "[domain][combat][urandom][fsm][log]") {
+    // "blast": mesma receita de comum_card, so com TargetShape::Grupo no lugar de Single -
+    // na resolucao NORMAL seria um efeito de area; via urandom vira single no alvo ja
+    // sorteado (ver doc-comment de resolve_redirected_card_effect no header).
+    Card blast = comum_card("blast", /*mana=*/1, /*power=*/4);
+    blast.target_shape = TargetShape::Grupo;
+
+    CombatActor caster = make_actor("h", true, /*hp=*/100, /*atk=*/10, /*def=*/0);
+    CombatActor target = make_actor("e", false, /*hp=*/300, /*atk=*/0, /*def=*/0);
+    Card urandom = urandom_card();
+    auto reg = registry({urandom, blast});
+    std::vector<CardCollectionEntry> snapshot = {
+        CardCollectionEntry{0, urandom.id, 1, CardOrigin::OriginalRom},
+        CardCollectionEntry{1, blast.id, 1, CardOrigin::OriginalRom}};
+    CombatAction cast = CombatAction::use_card(urandom.id, caster.id());
+    cast.card_instance_id = 0;
+    // draw1=0 (Fraco), draw2=0 (unico candidato, "blast"), draw3=1 (lado=inimigo), depois
+    // downstream: draw4=99 (canal COMUM), next_double=0.5.
+    SequenceRandom rng({0, 0, 1, 99}, /*next_double_value=*/0.5);
+    auto provider = play_sequence({cast});
+    CombatStateMachine sm({&caster, &target}, provider, &reg, nullptr, &rng, nullptr,
+                          &snapshot);
+
+    sm.begin_turn();
+    sm.run_active_turn_to_end();
+
+    REQUIRE(log_has(sm, "sorteou blast"));
+    REQUIRE(log_has(sm, "(efeito de area reduzido a alvo unico)"));
+    // Comportamento intacto: continua single-target (so o "e" leva o dano, nao ha
+    // segundo alvo no combate pra checar - a ausencia de crash/segundo hit ja prova).
+    REQUIRE(target.hp() < 300);
+}
+
+TEST_CASE("urandom FSM: carta sorteada com TargetShape::Single NAO loga o sufixo de "
+         "downgrade (nao houve reducao nenhuma pra avisar)",
+         "[domain][combat][urandom][fsm][log]") {
+    Card sting = comum_card("sting", /*mana=*/1, /*power=*/4);  // TargetShape::Single (default)
+
+    CombatActor caster = make_actor("h", true, /*hp=*/100, /*atk=*/10, /*def=*/0);
+    CombatActor target = make_actor("e", false, /*hp=*/300, /*atk=*/0, /*def=*/0);
+    Card urandom = urandom_card();
+    auto reg = registry({urandom, sting});
+    std::vector<CardCollectionEntry> snapshot = {
+        CardCollectionEntry{0, urandom.id, 1, CardOrigin::OriginalRom},
+        CardCollectionEntry{1, sting.id, 1, CardOrigin::OriginalRom}};
+    CombatAction cast = CombatAction::use_card(urandom.id, caster.id());
+    cast.card_instance_id = 0;
+    SequenceRandom rng({0, 0, 1, 99}, /*next_double_value=*/0.5);
+    auto provider = play_sequence({cast});
+    CombatStateMachine sm({&caster, &target}, provider, &reg, nullptr, &rng, nullptr,
+                          &snapshot);
+
+    sm.begin_turn();
+    sm.run_active_turn_to_end();
+
+    REQUIRE(log_has(sm, "sorteou sting"));
+    REQUIRE_FALSE(log_has(sm, "(efeito de area reduzido a alvo unico)"));
+}
+
 TEST_CASE("urandom FSM: redirecionamento pra uma ESPECIAL (jackpot) executa via "
          "techMagic::execute e produz o MESMO status que o cast direto",
          "[domain][combat][urandom][fsm][parity][jackpot]") {

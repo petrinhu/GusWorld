@@ -178,7 +178,9 @@ bool has_save(int slot, const std::string& dir) {
 bool save_game(const gus::domain::save::SaveData& data, int slot, const std::string& dir) {
     // Fail-fast (nao e I/O): slot invalido / SaveData invariante-violada propagam
     // (std::out_of_range / std::invalid_argument via serialize_save -> validate()).
-    gus::domain::save::primary_logical_name(slot);
+    // (void): so o efeito de VALIDAR o slot importa aqui, o nome logico devolvido
+    // nao e usado (FEDORA-GCC16-NODISCARD).
+    (void)gus::domain::save::primary_logical_name(slot);
     const std::vector<std::uint8_t> bytes = gus::domain::save::serialize_save(data);
 
     try {

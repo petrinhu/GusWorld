@@ -283,6 +283,12 @@ add_executable(gusengine_domain_tests
     # cartas-spec-logica.md secao 1/4.1/9. A tela glintfx (overlay 5s + X) e fatia
     # futura de UI, FORA deste teste.
     adware_sterling_test.cpp
+    # CARDS-HW-ENUMFREEZE (TODO.md): trava o contrato binario do save (GDS3) -
+    # static_assert do ordinal EXATO de CardOrigin/VirusKind/DifficultyLevel, os 3
+    # enums que save_serializer.cpp grava como u32 cru. Reorder/insert-no-meio
+    # quebra o BUILD aqui em vez de corromper saves silenciosamente em producao
+    # (a classe de bug achada pelo qa-engineer na onda ATOM).
+    enum_wire_contract_test.cpp
 )
 
 # Os testes do combate incluem helpers de teste headers-only (fixed_random.hpp).
