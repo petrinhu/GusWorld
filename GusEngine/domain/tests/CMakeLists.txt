@@ -289,6 +289,15 @@ add_executable(gusengine_domain_tests
     # quebra o BUILD aqui em vez de corromper saves silenciosamente em producao
     # (a classe de bug achada pelo qa-engineer na onda ATOM).
     enum_wire_contract_test.cpp
+    # CARDS-HW-QA1 (TODO.md): leva de verificacao decision-free da onda cartas-hardware
+    # (os unitarios ja sao densos; o gap real e cruzado). A=ciclo de vida entre servicos
+    # (acquire->save V7 no meio->diagnose->cure/queima->sell->revalidate); B=property
+    # stateful de sequencias aleatorias de ops com modelo-sombra; D=unicidade global das
+    # chaves i18n da onda + bordas do ledger; C=mutation killers das fatias mais novas.
+    cards_hw_lifecycle_integration_test.cpp
+    cards_hw_ops_property_test.cpp
+    cards_hw_i18n_registry_test.cpp
+    cards_hw_mutation_killers_test.cpp
 )
 
 # Os testes do combate incluem helpers de teste headers-only (fixed_random.hpp).
