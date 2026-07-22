@@ -1,6 +1,0 @@
-[gd_scene format=3 uid="uid://test_scene_b_smgr"]
-
-[node name="TestSceneB" type="Node3D"]
-
-[node name="LabelMarker" type="Node" parent="."]
-metadata/scene_id = "B"
