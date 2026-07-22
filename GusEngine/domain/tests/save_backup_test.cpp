@@ -15,6 +15,8 @@
 //
 // Cross-ref: game/scripts/foundation/save_system/SaveManager.cs (RotateBackups,
 //            referencia), ADR-006 (backup chain).
+// (o C# original nao existe mais: repo do submodulo engine/ apagado no M8;
+//  referencia historica, tambem vale pra mencao na linha 8)
 
 #include <catch2/catch_test_macros.hpp>
 

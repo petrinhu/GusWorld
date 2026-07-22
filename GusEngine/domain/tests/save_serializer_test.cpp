@@ -30,6 +30,8 @@
 // Cross-ref: engine/foundation/save_system/SaveSerializer.cs (ref semantica),
 //            docs/tech/adr/ADR-006-crypto-hmac-formato-domain.md,
 //            docs/tech/adr/ADR-015-save-security-v2-offline.md.
+// (o C# original nao existe mais: repo do submodulo engine/ apagado no M8;
+//  referencia historica, tambem vale pra mencao na linha 6)
 
 #include <catch2/catch_test_macros.hpp>
 

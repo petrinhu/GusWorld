@@ -107,7 +107,7 @@ Três viradas de base técnica até hoje. Cada uma reescreveu fundação; a últ
   - **Correção** (`c81b5d0`): limpeza física de `game/` (30M), `.mcp.json` e `.git/modules/engine`, que ainda sobravam no disco fora do índice.
   - Tag `pre-m8-godot-legacy` preserva o legado por registro (recuperação: `git checkout pre-m8-godot-legacy -- game/`).
   - Gate de build Windows do M8 já estava PRÉ-CUMPRIDO desde 2026-07-14 (WIN-CROSS-VALIDATE); ficou verde de novo na F1.
-  - Decisão do líder pendente FORA deste repo: arquivar read-only o `petrinhu/gus_dragon-engine` no Codeberg.
+  - **Desfecho do repo `petrinhu/gus_dragon-engine` (fora deste repo):** em vez de arquivado read-only como planejado, o repositório foi **apagado** do Codeberg. A tag `pre-m8-godot-legacy` preserva só o *ponteiro* do submódulo (`160000 commit f10faff7...`), não os arquivos: o objeto não existe em nenhum pack local, não há cópia em lixeira nem em disco. **Consequência:** o código C# original não é mais acessível por ninguém; os comentários `Cross-ref`/`Portado de` no C++ atual que apontam pra ele (`engine/foundation/save_system/*.cs`, `game/scripts/foundation/save_system/SaveManager.cs`) viraram referência histórica, marcada como tal no código. **Sem perda funcional:** a porta pro C++ já estava completa e testada desde o M3 e o M5.
 
 ### Bibliotecas e dependências
 

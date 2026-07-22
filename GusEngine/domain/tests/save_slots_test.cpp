@@ -15,6 +15,8 @@
 //
 // Cross-ref: game/scripts/foundation/save_system/SaveManager.cs (referencia,
 //            adaptada de 1+4 para 1+6), ADR-006.
+// (o C# original nao existe mais: repo do submodulo engine/ apagado no M8;
+//  referencia historica, tambem vale pra mencao na linha 9)
 
 #include <catch2/catch_test_macros.hpp>
 

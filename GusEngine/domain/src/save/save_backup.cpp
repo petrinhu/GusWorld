@@ -2,6 +2,8 @@
 //
 // Politica de backup chain (pura) sobre o port SaveStore. Portada de
 // SaveManager.cs::RotateBackups (C#). POCO puro, ZERO Qt, ZERO disco. Ver header.
+// (o C# original nao existe mais: repo do submodulo engine/ apagado no M8;
+//  referencia historica, tambem vale pro comentario de RotateBackups mais abaixo)
 
 #include "gus/domain/save/save_backup.hpp"
 

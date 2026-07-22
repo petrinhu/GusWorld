@@ -11,6 +11,8 @@
 //
 // Cross-ref: game/scripts/foundation/save_system/SaveManager.cs (FileAccess era o
 //            "store" concreto no C#), ADR-006.
+// (o C# original nao existe mais: repo do submodulo engine/ apagado no M8;
+//  referencia historica)
 
 #ifndef GUS_DOMAIN_SAVE_SAVE_STORE_HPP
 #define GUS_DOMAIN_SAVE_SAVE_STORE_HPP

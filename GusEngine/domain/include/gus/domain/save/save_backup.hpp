@@ -16,6 +16,8 @@
 //
 // Cross-ref: game/scripts/foundation/save_system/SaveManager.cs (RotateBackups,
 //            ref), gus/domain/save/save_store.hpp, save_slots.hpp, ADR-006.
+// (o C# original nao existe mais: repo do submodulo engine/ apagado no M8;
+//  referencia historica, mantida so pela genealogia do codigo)
 
 #ifndef GUS_DOMAIN_SAVE_SAVE_BACKUP_HPP
 #define GUS_DOMAIN_SAVE_SAVE_BACKUP_HPP

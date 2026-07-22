@@ -23,6 +23,8 @@
 //
 // Cross-ref: game/scripts/foundation/save_system/SaveManager.cs (ref, adaptada),
 //            ADR-006.
+// (o C# original nao existe mais: repo do submodulo engine/ apagado no M8;
+//  referencia historica, ambas as mencoes acima)
 
 #ifndef GUS_DOMAIN_SAVE_SAVE_SLOTS_HPP
 #define GUS_DOMAIN_SAVE_SAVE_SLOTS_HPP

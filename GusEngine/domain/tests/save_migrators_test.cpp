@@ -30,6 +30,8 @@
 // Cross-ref: engine/foundation/save_system/Migrators/MigrateV1ToV2.cs +
 //            SaveMigratorChain.cs + SaveMigrators.cs (ref semantica), CONTRACT §7,
 //            ADR-006, docs/design/mecanicas/deck-mao-sistema.md (DECK-4).
+// (o C# original nao existe mais: repo do submodulo engine/ apagado no M8;
+//  referencia historica, tambem vale pra mencao na linha 4)
 
 #include <catch2/catch_test_macros.hpp>
 

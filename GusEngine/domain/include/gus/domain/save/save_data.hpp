@@ -30,6 +30,8 @@
 //
 // Cross-ref: engine/foundation/save_system/SaveDataV1.cs + CharacterSaveState.cs,
 //            CONTRACT.md §7, ADR-006.
+// (o C# original nao existe mais: repo do submodulo engine/ apagado no M8;
+//  referencia historica, ambas as mencoes acima)
 
 #ifndef GUS_DOMAIN_SAVE_SAVE_DATA_HPP
 #define GUS_DOMAIN_SAVE_SAVE_DATA_HPP

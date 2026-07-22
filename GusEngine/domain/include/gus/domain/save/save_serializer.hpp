@@ -87,6 +87,8 @@
 //            HMAC - o save divergiu pro GDS3/AEAD no ADR-015; templates ficaram
 //            de fora do escopo),
 //            gus/domain/save/save_migrators.hpp, ADR-006, ADR-015.
+// (o C# original (engine/foundation/save_system/SaveSerializer.cs) nao existe
+//  mais: repo do submodulo engine/ apagado no M8; referencia historica)
 
 #ifndef GUS_DOMAIN_SAVE_SAVE_SERIALIZER_HPP
 #define GUS_DOMAIN_SAVE_SAVE_SERIALIZER_HPP

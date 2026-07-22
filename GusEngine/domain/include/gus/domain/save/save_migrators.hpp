@@ -51,6 +51,8 @@
 //
 // Cross-ref: engine/foundation/save_system/Migrators/* (ref semantica), CONTRACT §7,
 //            gus/domain/save/save_serializer.hpp, ADR-006.
+// (o C# original nao existe mais: repo do submodulo engine/ apagado no M8;
+//  referencia historica)
 
 #ifndef GUS_DOMAIN_SAVE_SAVE_MIGRATORS_HPP
 #define GUS_DOMAIN_SAVE_SAVE_MIGRATORS_HPP
