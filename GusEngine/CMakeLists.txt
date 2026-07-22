@@ -141,10 +141,15 @@ set(GLINTFX_BACKEND_GLFW OFF CACHE BOOL "" FORCE)  # embed-only (sem GLFW)
 #     saem do binario e o RCSS correspondente vira no-op silencioso (fail-high documentado
 #     do lado deles, mas silencioso pra nos = regressao visual). Ja e o default ON; fixado
 #     aqui por clareza/estabilidade contra bump futuro que troque o default.
-#   - GLINTFX_MODULE_AUDIO/GAMEPAD/I18N OFF: nao usamos ainda (audio = miniaudio vendorizado
-#     nosso, TODO GLINTFX-INTEGRACAO F2 separado; i18n = translator C++ proprio no domain;
-#     gamepad = fora de escopo). Real ON/OFF (nao reservada) - default de fabrica e ON pros
-#     3; desligar aqui evita linkar codigo/dep que nao usamos (ex.: nao expor evdev).
+#   - GLINTFX_MODULE_AUDIO ON (GLINTFX-INTEGRACAO F2, 2026-07-22): a partir desta onda o
+#     audio do jogo vem do modulo glintfx::Audio (glintfx_audio, OBJECT library dobrada no
+#     alvo glintfx STATIC - ver comentario do bump abaixo) em vez do miniaudio vendorizado
+#     nosso (third_party/miniaudio, aposentado deste bloco em diante - continua no disco ate
+#     a limpeza fisica do M9). platform/src/audio/audio_engine.cpp (fachada AudioEngine,
+#     header intocado) consome glintfx::Audio por baixo do PImpl.
+#   - GLINTFX_MODULE_GAMEPAD/I18N OFF: nao usamos ainda (i18n = translator C++ proprio no
+#     domain; gamepad = fora de escopo). Real ON/OFF (nao reservada) - default de fabrica e
+#     ON pros 2; desligar aqui evita linkar codigo/dep que nao usamos (ex.: nao expor evdev).
 #   - GLINTFX_MODULE_WINDOW OFF: alias de GLINTFX_BACKEND_GLFW (ja fixado OFF acima desde
 #     o embed-only original); o glintfx v0.16 espelha o valor de BACKEND_GLFW dentro de
 #     MODULE_WINDOW automaticamente (ver comentario "alias target" no CMakeLists deles) -
@@ -171,7 +176,7 @@ set(GLINTFX_BACKEND_GLFW OFF CACHE BOOL "" FORCE)  # embed-only (sem GLFW)
 # nao e regressao, e o preco de "fail-safe por padrao" ate la.
 set(GLINTFX_MODULE_TEXT      ON  CACHE BOOL "" FORCE)
 set(GLINTFX_MODULE_FX        ON  CACHE BOOL "" FORCE)
-set(GLINTFX_MODULE_AUDIO     OFF CACHE BOOL "" FORCE)
+set(GLINTFX_MODULE_AUDIO     ON  CACHE BOOL "" FORCE)
 set(GLINTFX_MODULE_GAMEPAD   OFF CACHE BOOL "" FORCE)
 set(GLINTFX_MODULE_I18N      OFF CACHE BOOL "" FORCE)
 set(GLINTFX_OWN_FONT_ENGINE  OFF CACHE BOOL "" FORCE)
@@ -231,6 +236,17 @@ set(GLINTFX_OWN_FONT_ENGINE  OFF CACHE BOOL "" FORCE)
 # teardown-UB segue aplicavel). AUDIO continua OFF nesta fase (troca de audio e a F2,
 # pacote separado). Build local + suite completa (2394 testes) verdes no pin novo antes
 # deste commit.
+#
+# GLINTFX-INTEGRACAO F2 (2026-07-22, mesmo pin v0.18.0 - so a flag muda): liga
+# GLINTFX_MODULE_AUDIO=ON (ver o comentario da propria flag, acima, pro raciocinio
+# completo). A v0.18.0 trouxe as 4 features de audio pedidas (loop/fade nativos,
+# play_oneshot polifonico com cap+voice-stealing, is_playing) que faltavam quando o
+# GLINTFX-INTEGRACAO-F1 ainda deixava o modulo OFF. Consumo real:
+# platform/src/audio/audio_engine.cpp reescrito para falar com glintfx::Audio (ver o
+# cabecalho daquele arquivo); platform/CMakeLists.txt agora linka glintfx::glintfx e
+# nao inclui mais third_party/miniaudio (aposentado deste bloco em diante, so a
+# remocao FISICA do vendored fica pro M9). Suite completa (2394 testes, incluindo os
+# 21 de platform/tests/audio_engine_test.cpp intactos) verde antes deste commit.
 FetchContent_Declare(
     glintfx
     GIT_REPOSITORY https://codeberg.org/petrinhu/glintfx
