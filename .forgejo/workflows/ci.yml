@@ -1,10 +1,10 @@
 name: ci
 
 # CI do GusEngine (pos repivot C++/SDL3, ADR-008).
-# Escopo: build + testes da engine nova em GusEngine/. NAO toca game/ nem engine/
-# (base Godot/C#, legado dormente ate M8 apagar - M8 ja moveu os dados VIVOS que
-# consumiam dali, translations/dialogues, pra resources/; o que sobra em game/ e
-# so o projeto Godot morto). Sem deploy.
+# Escopo: build + testes da engine nova em GusEngine/. O legado Godot/C# (game/,
+# engine/) foi decommissionado no M8 (2026-07-22): nao existe mais no repo. Os
+# dados vivos que consumiam dali (translations/dialogues) ja vivem em resources/.
+# Tag pre-m8-godot-legacy preserva o legado por registro. Sem deploy.
 #
 # Runner: codeberg-medium (global, estavel). NAO usar runs-on: docker (runner
 # individual claudio fica offline por dias). codeberg-small (4 GB / 5 min) e

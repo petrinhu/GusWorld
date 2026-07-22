@@ -45,10 +45,10 @@ A migração é faseada anti big-bang: cada marco fecha pelo seu critério de sa
 | M5 Combate + tela de batalha | ✅ | Motor `turn_combat` portado inteiro (~200 testes de combate) + BattleScreen cockpit "Tático" entregue via glintfx (paridade visual + dados vivos + rodada de polish, [ADR-010](docs/tech/adr/ADR-010-adopt-glintfx-embed-mode.md)). Saída "overworld → batalha → resultado → volta" validada ao vivo pelo líder (fechado 2026-07-07) |
 | M6 Áudio | ✅ | Camada de áudio (miniaudio) + música + SFX + fade entre telas. Crossfade cidade↔arena validado ao vivo pelo líder (concluído 2026-07-03) |
 | M7 Paridade jogável | ✅ | **FECHADO 2026-07-21 (playthrough ao vivo, Gus).** Loop completo (andar, NPC/Bertoldo, combate→Victory, autosave, load) rodou 100% na engine C++/SDL3+glintfx, sem Godot, zero erro (exit 0). 3 feedbacks de polish do playtest viraram follow-up na INBOX (M7-FB1 corner-exploit test, M7-FB2 maximize/taskbar→glintfx, M7-FB3 menu inicial com fundo próprio) — não são paridade, não bloqueiam. Destrava M8/M9 + integração glintfx |
-| M8 Decommission | ⏳ | Apagar Godot + C# + addons. Repo compila e roda sem nenhum bit do stack antigo. Gate de build Windows já PRÉ-CUMPRIDO (CI Windows real MSVC verde desde 2026-07-14) |
+| M8 Decommission | ✅ | **FECHADO 2026-07-22.** Godot + C# + addons apagados; repo compila e roda sem nenhum bit do stack antigo. Faseado em 3 fases + 1 correção: F1 moveu dados VIVOS de `game/` pra `resources/` (`resources/translations/`, `resources/dialogues/`); F2 removeu o submódulo `engine/` (C# legado, repo próprio) + `.gitmodules` + `global.json`; F3 apagou `game/` morto (172 arquivos, 20816 linhas); correção fez a limpeza física (lixeira, 30M). Tag `pre-m8-godot-legacy` preserva o legado pra recuperação. Gate de build Windows já PRÉ-CUMPRIDO (CI Windows real MSVC verde desde 2026-07-14, e verde de novo na F1 do M8). Decisão do líder pendente FORA deste repo: arquivar read-only `petrinhu/gus_dragon-engine` no Codeberg |
 | M9 Higienização | ⏳ | Limpar a árvore pós-porte, remover resíduo do stack antigo, normalizar `GusEngine/` |
 
-Ordem real de execução: M0, depois M1 e M3 em paralelo, depois M2, M4, M5, M6, M7, M8, M9. **M0-M7 entregues — M7 (paridade) FECHADO 2026-07-21 pelo playthrough ao vivo (Gus); M8/M9 destravados.**
+Ordem real de execução: M0, depois M1 e M3 em paralelo, depois M2, M4, M5, M6, M7, M8, M9. **M0-M8 entregues — M7 (paridade) FECHADO 2026-07-21 pelo playthrough ao vivo (Gus); M8 (decommission) FECHADO 2026-07-22; só falta o M9.**
 
 ### Onda paralela: motor de cartas techMagic (não bloqueia o M7)
 
@@ -84,7 +84,7 @@ Produção de assets assistida por IA, do lore ao sprite (pipeline detalhado no 
 
 ## Pós-vertical slice
 
-Depois que o slice provar o jogo e a engine atingir paridade jogável (M7) e decommission (M8/M9), o foco vira conteúdo e release. Mapeamento de marco para versão em [CHANGELOG.md](CHANGELOG.md) (seção "Marcos planejados").
+Depois que o slice provar o jogo, a engine atingir paridade jogável (M7, fechado) e o decommission (M8, fechado) completar com a higienização (M9, pendente), o foco vira conteúdo e release. Mapeamento de marco para versão em [CHANGELOG.md](CHANGELOG.md) (seção "Marcos planejados").
 
 - **Mecânicas pós-VS:** scan ambiental consumindo Carga, Celula de Pulso, foreshadow da sabotagem do Dante, escopo completo de combate. Ver [`docs/design/mecanicas/stamina.md`](docs/design/mecanicas/stamina.md).
 - **Produção (`v0.5.x`-`v0.9.x`):** conteúdo completo, balanceamento, gates de a11y para v1.0.0.
@@ -137,11 +137,11 @@ As viradas de stack e os contratos irreversíveis estão registrados em [`docs/t
 
 ## Roadmap VS — Now / Next / Later
 
-**Atualizado 2026-07-21 (M7 FECHADO pelo playthrough ao vivo; mirror+Wiki publicados; ondas `CARDS`/`CARDS-HW` em curso; sincronizado com [TODO.md](TODO.md)).** M0-M7 entregues — o M7 (paridade jogável, fecha o board da migração) foi validado ao vivo (loop completo sem Godot, zero erro). Em paralelo ao board, a onda `CARDS` (motor de cartas techMagic) avança um `EffectKind` por vez.
+**Atualizado 2026-07-22 (M8 FECHADO — decommission Godot/C# concluído; M7 fechado 2026-07-21 pelo playthrough ao vivo; mirror+Wiki publicados; ondas `CARDS`/`CARDS-HW` em curso; sincronizado com [TODO.md](TODO.md)).** M0-M8 entregues — só falta o M9 (higienização) pra fechar o board inteiro da migração. Em paralelo ao board, a onda `CARDS` (motor de cartas techMagic) avança um `EffectKind` por vez.
 
 | Now (CONCLUÍDO) | Next (próxima onda) | Later |
 |---|---|---|
-| **M0-M7 motor+plataforma portados** (save/i18n/progression/templates/combat/crypto/áudio) em C++20+SDL3; M3, M5-DMG, M6 e **M7 (paridade jogável)** validados ao vivo | **M7 FECHADO 2026-07-21** (playthrough ao vivo; loop completo sem Godot, zero erro); 3 feedbacks de polish na INBOX (M7-FB1/2/3) | **M8 Decommission** (apagar Godot/C#/addons; gate de build Windows já pré-cumprido) + **M9 Higienização** — DESTRAVADOS |
+| **M0-M8 motor+plataforma portados** (save/i18n/progression/templates/combat/crypto/áudio) em C++20+SDL3; M3, M5-DMG, M6, **M7 (paridade jogável)** validados ao vivo e **M8 (decommission)** fechado | **M8 FECHADO 2026-07-22** (Godot/C#/addons apagados, repo sem nenhum bit do stack antigo, tag `pre-m8-godot-legacy` preserva o legado); 3 feedbacks de polish na INBOX (M7-FB1/2/3) | **M9 Higienização** — DESTRAVADO, único item que falta no board M0-M9 |
 | **M7-DIALOGO** (runtime de diálogo POCO, [ADR-014](docs/tech/adr/ADR-014-dialogue-runtime-poco.md)) + **DIALOGO-TERMINAL** (tela-terminal/caixa-quente) entregues e testados ao vivo | **Onda `CARDS`** (motor de cartas techMagic, [ADR-016](docs/tech/adr/ADR-016-techmagic-effect-engine-data-driven.md)): próximo EffectKind = DamageQuantize/Planck; resíduos de UI (targeting de aliado do Balde B) | **ARTE-DIAGONAL-8DIR** (decisão 4-dir vs 8-dir pendente) |
 | **Mirror GitHub + Wiki (GitHub e Codeberg) + AI-DISCLOSURE.md** publicados (2026-07-14); CI Windows real (MSVC) verde | **Estética "terminal"** para logs de combate e telas de sistema (design fechado, implementação em curso) | Sistema de deck/mão (brainstorm inicial, ainda sem decisão fechada) |
 | **CARD-ENGINE-MANIFESTO em curso:** ChainDamage/Tesla, DelayAction/Einstein e o "Balde B" (Faraday/Newton/Gödel) entregues e verificados adversarialmente | **CARTAS-BALANCEAMENTO:** statlines finais das 20 cartas dos mestres + playtest N=3 dos valores exatos | **Conlang Sylvarin** (paralelo orgânico): mutações, deriva histórica, escrita cifrada |

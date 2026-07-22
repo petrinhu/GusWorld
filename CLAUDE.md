@@ -2,11 +2,11 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-## Estado atual (vigente — atualizado 2026-07-15)
+## Estado atual (vigente — atualizado 2026-07-22)
 
 **Stack vigente: C++20 + SDL3 + glintfx/RmlUi.** Solo indie, Linux (v1.0.0) + Windows (pós-v1, CI real MSVC já validado), single-player puro. Gênero: RPG + Puzzle + Aventura + combate turn-based, **visual 2D estilizado** (sprites/pixel art, não 3D). Ver "Decisões fechadas" abaixo para a stack completa e os ADRs.
 
-**Board M0-M9 (migração da engine, ver ROADMAP.md/TODO.md para o board vivo):** M0-M7 entregues — **M7 (paridade jogável) FECHADO 2026-07-21** pelo playthrough ao vivo (Gus): loop completo (andar/NPC/combate→Victory/save/load) rodou 100% na engine C++/SDL3+glintfx sem Godot, zero erro. M8 (decommission Godot/C#) e M9 (higienização) vêm depois; 3 feedbacks de polish do playtest na INBOX (M7-FB1/2/3). Em paralelo ao board, a onda `CARDS` desenvolve o motor de cartas techMagic ([ADR-016](docs/tech/adr/ADR-016-techmagic-effect-engine-data-driven.md)).
+**Board M0-M9 (migração da engine, ver ROADMAP.md/TODO.md para o board vivo):** M0-M8 entregues — **M7 (paridade jogável) FECHADO 2026-07-21** pelo playthrough ao vivo (Gus): loop completo (andar/NPC/combate→Victory/save/load) rodou 100% na engine C++/SDL3+glintfx sem Godot, zero erro. **M8 (decommission Godot/C#) FECHADO 2026-07-22:** dados vivos migrados pra `resources/` (F1), submódulo `engine/` removido (F2), `game/` apagado — 172 arquivos, 20816 linhas (F3) — e a lixeira física limpa (30M); repo compila e roda sem nenhum bit do stack antigo, CI Windows verde na F1. Tag `pre-m8-godot-legacy` preserva o legado por registro. Só falta o **M9 (higienização)**; 3 feedbacks de polish do playtest na INBOX (M7-FB1/2/3). Em paralelo ao board, a onda `CARDS` desenvolve o motor de cartas techMagic ([ADR-016](docs/tech/adr/ADR-016-techmagic-effect-engine-data-driven.md)).
 
 **Mirror + Wiki publicados (2026-07-14):** repo espelhado em `petrinhu/GusWorld` no GitHub (push dual-remote) além do Codeberg canônico; Wiki inicial publicada nos dois remotos (Codeberg bilíngue EN/PT para contribuidor técnico; GitHub PT-br para leigo/iniciante); `AI-DISCLOSURE.md` adicionado.
 
@@ -116,7 +116,7 @@ Base canônica imutável: `sinopse.md` (worldbuilding + protagonista) + `Resourc
 
 ### Estrutura de repositório
 
-Stack vigente: **C++20 + SDL3** (pivot ADR-008, 2026-06-22). `engine/` e `game/` (Godot/C#) são **legado dormente até M8**; não usar como referência de código atual.
+Stack vigente: **C++20 + SDL3** (pivot ADR-008, 2026-06-22). `engine/` e `game/` (Godot/C#) foram **decommissionados no M8 (2026-07-22)**: não existem mais no repo (nem no índice, nem no disco); a tag `pre-m8-godot-legacy` preserva o legado para recuperação, se um dia for preciso ler referência histórica.
 
 ```
 gusworld/
@@ -143,11 +143,11 @@ gusworld/
 │   ├── livros/           # corpus RAG (bibliografia)
 │   ├── prompts_images/   # prompts de geração de imagem (nano banana / PixelLab)
 │   ├── maps/             # mapas .gmap
+│   ├── translations/     # fonte VIVA do i18n (pt_br.md/en_intl.md) + gate de paridade do CI
+│   ├── dialogues/        # diálogos VIVOS (.dlg.txt), consumidos pelo runtime de diálogo POCO
 │   ├── pers_3d/          # arte conceitual 3D (glb) para os livros futuros
 │   ├── glb/, images/, vfx/
-├── engine/              # LEGADO Godot C# (dormente até M8; não editar como se fosse vigente)
-├── game/                # LEGADO projeto Godot (dormente até M8)
-├── assets/              # sources arte/som legados (Blender, Krita, Aseprite, audio raw)
+├── assets/              # áudio VIVO do jogo (música + SFX, carregado via GUSWORLD_SFX_DIR/GUSWORLD_MUSIC_DIR)
 └── build/               # outputs export legados
 ```
 
@@ -188,7 +188,7 @@ cmake --build --preset linux-release
 ctest --preset linux-release
 ```
 
-Linux é a plataforma alvo do lançamento v1.0.0; existe preset Windows (`windows-release`), com CI real (MSVC) validado, planejado pra pós-v1.0.0. `game/` (Godot) e `engine/` (C# legado) são código morto — não usar como referência nem como alvo de build.
+Linux é a plataforma alvo do lançamento v1.0.0; existe preset Windows (`windows-release`), com CI real (MSVC) validado, planejado pra pós-v1.0.0. `game/` (Godot) e `engine/` (C# legado) foram decommissionados no M8 (2026-07-22) — não existem mais no repo; a tag `pre-m8-godot-legacy` preserva o histórico.
 
 ## Skills de projeto
 
@@ -209,18 +209,16 @@ Diretório vive dentro de `~/IDrive/Documentos/projetos_claudebrain/Projects/gus
 - Não modificar arquivos canônicos externos a partir daqui.
 - Notas de design soltas podem usar estilo livre; entregáveis estruturados (GDD, lore bible, style guide) já existem em `docs/`.
 
-## Próximos passos (estado 2026-07-18, ver ROADMAP.md/TODO.md para o board vivo)
+## Próximos passos (estado 2026-07-22, ver ROADMAP.md/TODO.md para o board vivo)
 
-1. **Fechar M7 (paridade jogável):** todos os pré-requisitos técnicos já entregues; falta só um playthrough de ~5min ao vivo do líder.
-2. **M8 (decommission):** apagar Godot/C#/addons legados assim que M7 fechar — gate de build Windows já pré-cumprido.
-3. **M9 (higienização):** limpar a árvore pós-porte.
-4. **Onda `CARDS` (paralela, não bloqueia M7/M8/M9):** o motor de cartas techMagic (ADR-016) tem **11/12 EffectKinds implementados** (fechado 2026-07-16; só falta o Bastiat/RevealHiddenCost, bloqueado pela feat `EFEITOS-ADIADOS-OCULTOS`, adiada pelo líder em 2026-07-18). O **sistema de cartas hardware/energia/pirataria** (baterias CR2032, memória Runa, conector RSB, vírus, mercado negro, carta urandom, RunaDex) tem **design + números + spec técnica prontos** (2026-07-18, docs em `docs/design/mecanicas/cartas-*.md`); implementação = onda futura `CARDS-HARDWARE-ENGINE`. Ver memórias `reference_techmagic_engine_impl` + `reference_sistema_cartas_hardware_energia`.
-5. Manter `TODO.md` atualizado via `/tab_pendencias`.
+1. **M9 (higienização, único item que falta no board M0-M9):** limpar a árvore pós-porte agora que M8 fechou (2026-07-22) — remover resíduo do stack antigo, normalizar `GusEngine/`.
+2. **Onda `CARDS` (paralela, não bloqueia M9):** o motor de cartas techMagic (ADR-016) tem **11/12 EffectKinds implementados** (fechado 2026-07-16; só falta o Bastiat/RevealHiddenCost, bloqueado pela feat `EFEITOS-ADIADOS-OCULTOS`, adiada pelo líder em 2026-07-18). O **sistema de cartas hardware/energia/pirataria** (baterias CR2032, memória Runa, conector RSB, vírus, mercado negro, carta urandom, RunaDex) tem **design + números + spec técnica prontos** (2026-07-18, docs em `docs/design/mecanicas/cartas-*.md`); implementação = onda futura `CARDS-HARDWARE-ENGINE`. Ver memórias `reference_techmagic_engine_impl` + `reference_sistema_cartas_hardware_energia`.
+3. Manter `TODO.md` atualizado via `/tab_pendencias`.
 
 ## Quando o projeto evoluir
 
 Atualizar este CLAUDE.md adicionando:
 
 - Decisões one-way door novas em ADRs leves (em `docs/tech/adr/` se necessário) e refletir aqui em "Decisões fechadas".
-- Sair de "vertical slice em andamento" pra "vertical slice fechado" quando M7-M9 completarem.
+- Sair de "vertical slice em andamento" pra "vertical slice fechado" quando M9 completar (M0-M8 já entregues).
 - Se o repo `GusEngine/` mudar de estrutura de camadas, atualizar a árvore em "Estrutura de repositório".

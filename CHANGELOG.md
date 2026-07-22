@@ -80,6 +80,17 @@ Três viradas de base técnica até hoje. Cada uma reescreveu fundação; a últ
 - Preservado: SDL3 dono de janela/loop/input/gamepad/contexto GL; a arena (`Render2dGl3`) intocada; a ordem de composição arena → UI → swap; `core/`+`domain/` POCO (~1013 testes) intactos.
 - **Rodada de polish do cockpit (2026-07-01, aprovada ao vivo pelo criador):** o brasão da abertura passou a usar o glyph Vetor-Dragão (`resources/images/vance_dragon_glyph.png`, agora versionado por whitelist no `.gitignore`) recortado em medalhão circular via par máscara/filho (o RmlUi não tem `border-radius:50%` nem recorta o próprio decorator do elemento), no lugar do antigo monograma "V"; os anéis do brasão foram para aço/gunmetal neutro (`#8a94a8`/`#6f7c96`/`#5d6a86`) no lugar de latão/cyan, para harmonizar com o glyph vermelho e o fundo azul. Fixes de layout no mesmo passe: nome/role do ator centrados sob a moldura do retrato, log de combate enxuto em estilo terminal (`atacante -> alvo -dano`) no lugar da narração verbosa, barra de HP com largura contida, fila CTB sem a caixa de fundo (compõe direto sobre a vinheta da arena) e topo do gradiente do painel escurecido para não formar barra clara na borda.
 
+### M8: decommission Godot/C#, 2026-07-22
+
+- **Godot/C# apagados do repo: repo compila e roda sem nenhum bit do stack antigo.** Faseado anti big-bang em 3 fases + 1 correção, todas validadas por build+`ctest` verdes:
+  - **F1** (`912f9c3`): dados VIVOS movidos de `game/` para `resources/` via `git mv` (preserva histórico), `resources/translations/` (fonte do i18n e do gate de paridade do CI) e `resources/dialogues/npc_intro_bertoldo.dlg.txt`.
+  - **F2** (`4760659`): submódulo `engine/` (foundation C# legada, repo próprio `petrinhu/gus_dragon-engine`) removido, junto com `.gitmodules` e `global.json` (o pin do .NET SDK 8 que só existia por causa dele).
+  - **F3** (`c59fa0c`): `game/` morto apagado, 172 arquivos, 20816 linhas (addon dialogue_manager, 30 scripts C# incluindo o `SaveManager.cs` legado, tools, tests, `CombatScene.tscn`, `project.godot`, `Game.csproj`, `GusWorld.sln`). Prova: build a partir de diretório zerado, 1044/1044 alvos.
+  - **Correção** (`c81b5d0`): limpeza física de `game/` (30M), `.mcp.json` e `.git/modules/engine`, que ainda sobravam no disco fora do índice.
+  - Tag `pre-m8-godot-legacy` preserva o legado por registro (recuperação: `git checkout pre-m8-godot-legacy -- game/`).
+  - Gate de build Windows do M8 já estava PRÉ-CUMPRIDO desde 2026-07-14 (WIN-CROSS-VALIDATE); ficou verde de novo na F1.
+  - Decisão do líder pendente FORA deste repo: arquivar read-only o `petrinhu/gus_dragon-engine` no Codeberg.
+
 ### Bibliotecas e dependências
 
 - **32 bibliotecas C++ vendorizadas** em `GusEngine/third_party/` (filosofia zero-dep): header-only de licenças permissivas (MIT/Boost/zlib/Apache/PD), incluindo miniaudio, PCG, stb, fmt, glm, EnTT, Box2D.
