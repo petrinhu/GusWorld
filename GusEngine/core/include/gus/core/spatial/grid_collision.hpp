@@ -17,6 +17,20 @@
 //     parede). A caixa de entrada NAO e modificada.
 //   - Pre-condicao: assume-se que a posicao de entrada nao esta DENTRO de uma
 //     parede (estado valido). Borda do mapa e parede (TileGrid::is_blocked).
+//
+// TETO ANTI-TUNNELING (TUNNELING-CLAMP-GUARD, ver gus/core/spatial/step_clamp.
+// hpp): dx e dy sao clampados por eixo em +-(0.95 * tile_size) ANTES de
+// qualquer resolucao, em resolve_move E em resolve_move_with_corner_assist -
+// fronteira UNICA, aplicada a TODO chamador (nenhum precisa clampar por conta
+// propria). O algoritmo continua TARGET-ONLY (resolve so a posicao alvo, sem
+// swept/CCD): sem este teto, um delta grande o bastante (walk/run com tuning
+// absurdo, lag spike, corrupcao de estado) podia fazer a caixa pular POR CIMA
+// de uma parede fina de 1 tile sem nunca sobrepo-la (tunneling) - a limitacao
+// target-only agora fica CERCADA por este teto, nao removida. MoveResult::
+// step_clamped sinaliza (observabilidade, sem I/O) quando o clamp alterou dx
+// OU dy nesta chamada. Deltas dentro do teto (|delta| <= 0.95*tile) saem
+// byte-identicos ao comportamento legado. Teleporte LEGITIMO (save/load, troca
+// de mapa) usa OverworldSim::set_player_position, que NUNCA passa por aqui.
 
 #ifndef GUS_CORE_SPATIAL_GRID_COLLISION_HPP
 #define GUS_CORE_SPATIAL_GRID_COLLISION_HPP
@@ -36,6 +50,11 @@ struct MoveResult {
     Aabb box;            // posicao final (w/h preservados)
     bool hit_x = false;  // movimento em X foi limitado por parede
     bool hit_y = false;  // movimento em Y foi limitado por parede
+    // TUNNELING-CLAMP-GUARD (ver step_clamp.hpp e o CONTRATO acima): true se o
+    // teto anti-tunneling alterou dx OU dy nesta chamada (o delta CRU pedido
+    // excedia +-0.95*tile_size num eixo). Aditivo: default false nao quebra
+    // nenhum chamador/agregado existente (inicializacao por membro).
+    bool step_clamped = false;
 };
 
 // ---------------------------------------------------------------------------

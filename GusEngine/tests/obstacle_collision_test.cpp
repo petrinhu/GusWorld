@@ -87,6 +87,11 @@ TEST_CASE("resolve_move: obstaculo NAO bloqueia tiles adjacentes/vizinhos (conto
     // MESMO obstaculo do teste acima, mas o jogador tenta ir por CIMA dele (Y
     // negativo, contornando) - o obstaculo ocupa so a faixa Y=[16,28); uma caixa
     // que passa acima (ex.: terminando em y<=16) NAO deve ser afetada.
+    //
+    // TUNNELING-CLAMP-GUARD (step_clamp.hpp): dx=15.0 (nao mais 20.0) - fica
+    // ABAIXO do teto (<=0.95*tile=15.2 pro tile=16), avanca numa unica chamada
+    // sem ser clampado, e ainda atravessa a faixa X do obstaculo (30..42) o
+    // bastante pra provar a MESMA coisa (Y disjunto = nunca colide).
     TileGrid g(10, 10, 16.0f);
     Aabb box{20.0f, 0.0f, 8.0f, 8.0f};  // faixa Y=[0,8), bem acima do obstaculo
 
@@ -94,8 +99,8 @@ TEST_CASE("resolve_move: obstaculo NAO bloqueia tiles adjacentes/vizinhos (conto
     ObstacleSpan obstacles{&npc, 1};
 
     // Anda para a direita passando "por cima" do obstaculo (nao ha overlap em Y).
-    MoveResult r = resolve_move(g, box, 20.0f, 0.0f, obstacles);
-    REQUIRE_THAT(r.box.x, WithinAbs(40.0f, kEps));  // moveu LIVRE, sem tocar o obstaculo
+    MoveResult r = resolve_move(g, box, 15.0f, 0.0f, obstacles);
+    REQUIRE_THAT(r.box.x, WithinAbs(35.0f, kEps));  // moveu LIVRE, sem tocar o obstaculo
     REQUIRE_FALSE(r.hit_x);
 }
 
@@ -104,25 +109,38 @@ TEST_CASE("resolve_move: obstaculo pontual nao bloqueia o corredor inteiro (cont
     // Corredor largo (nenhuma parede da grade). O obstaculo fica no meio do
     // caminho reto, mas o jogador consegue desviar por BAIXO dele livremente (o
     // obstaculo e PONTUAL, nao uma parede que cobre a largura toda do corredor).
+    //
+    // TUNNELING-CLAMP-GUARD (step_clamp.hpp): o deslocamento total (40) excede o
+    // teto de UMA chamada (0.95*tile=15.2 pro tile=16) - caminha em VARIOS passos
+    // pequenos (exatamente como o jogo real faz por tick), acumulando o mesmo
+    // deslocamento total. Nunca deveria colidir em NENHUM passo, pois as faixas Y
+    // sao disjuntas o tempo todo.
     TileGrid g(10, 10, 16.0f);
     Aabb npc{48.0f, 48.0f, 16.0f, 16.0f};  // obstaculo no centro do corredor
     ObstacleSpan obstacles{&npc, 1};
 
-    // Caixa comeca abaixo do obstaculo (faixa Y sem overlap) e anda so em X: nunca
-    // deveria colidir, pois as faixas Y sao disjuntas.
     Aabb box{20.0f, 80.0f, 8.0f, 8.0f};
-    MoveResult r = resolve_move(g, box, 40.0f, 0.0f, obstacles);
-    REQUIRE_THAT(r.box.x, WithinAbs(60.0f, kEps));
-    REQUIRE_FALSE(r.hit_x);
+    for (int i = 0; i < 3; ++i) {
+        MoveResult r = resolve_move(g, box, 15.0f, 0.0f, obstacles);
+        REQUIRE_FALSE(r.hit_x);
+        box = r.box;
+    }
+    REQUIRE_THAT(box.x, WithinAbs(65.0f, kEps));  // 20 + 3*15 = 65, bem alem do obstaculo
 }
 
 TEST_CASE("resolve_move: parede da grade E obstaculo concorrem - o mais restritivo vence",
           "[core][spatial][collision][obstacle]") {
-    // Parede da grade em x=2 (face esquerda em 32): o alvo cru (dx=30 a partir de
-    // x=4 -> target=34, borda direita 42) cai na celula bloqueada 2 -> candidato da
-    // parede = 2*16 - 8 = 24. Obstaculo MAIS PERTO (faixa [28,36)) sobrepoe o alvo
-    // CRU (target=34 esta dentro de [28,36)) e restringe MAIS: candidato = 28 - 8 =
-    // 20 (< 24 da parede) - o obstaculo deve vencer (trava antes da parede).
+    // Parede da grade em x=2 (face esquerda em 32) e obstaculo (faixa [28,36)) MAIS
+    // PERTO: o obstaculo deve vencer (trava antes da parede) - candidato do
+    // obstaculo = 28 - 8 = 20 (< 24 da parede).
+    //
+    // TUNNELING-CLAMP-GUARD (step_clamp.hpp): o deslocamento total (30) excede o
+    // teto de UMA chamada (0.95*tile=15.2 pro tile=16) - caminha em 2 passos de 15
+    // (soma 30, identica ao delta original). O 1o passo (x=4->19) nao alcanca nem
+    // o obstaculo nem a parede (fica livre); o 2o passo (x=19, alvo cru 34, mesmo
+    // alvo final do delta original de 30 a partir de x=4) e onde os dois
+    // bloqueadores concorrem de fato - reproduz EXATAMENTE o mesmo alvo cru do
+    // teste original, so que em 2 chamadas.
     TileGrid g = TileGrid::from_rows({
         "..#.",
         "..#.",
@@ -132,9 +150,11 @@ TEST_CASE("resolve_move: parede da grade E obstaculo concorrem - o mais restriti
     Aabb npc{28.0f, 0.0f, 8.0f, 16.0f};
     ObstacleSpan obstacles{&npc, 1};
 
-    MoveResult r = resolve_move(g, box, 30.0f, 0.0f, obstacles);
-    REQUIRE_THAT(r.box.x, WithinAbs(20.0f, kEps));
-    REQUIRE(r.hit_x);
+    MoveResult r1 = resolve_move(g, box, 15.0f, 0.0f, obstacles);
+    REQUIRE_FALSE(r1.hit_x);
+    MoveResult r2 = resolve_move(g, r1.box, 15.0f, 0.0f, obstacles);
+    REQUIRE_THAT(r2.box.x, WithinAbs(20.0f, kEps));
+    REQUIRE(r2.hit_x);
 }
 
 TEST_CASE("resolve_move_with_corner_assist: nao empurra o jogador pra dentro do obstaculo",

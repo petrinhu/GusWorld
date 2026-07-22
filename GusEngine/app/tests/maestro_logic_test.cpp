@@ -31,6 +31,7 @@ using gus::app::should_stop_running_after_battle;
 using gus::app::should_trigger_battle;
 using gus::app::should_trigger_battle_on_edge;
 using gus::core::spatial::Aabb;
+using gus::core::spatial::MoveResult;
 using gus::core::spatial::ObstacleSpan;
 using gus::core::spatial::resolve_move;
 using gus::core::spatial::TileGrid;
@@ -1004,6 +1005,42 @@ TEST_CASE("enemy_sprite_footprint_aabb: footprint VISUAL (o quad desenhado) NAO 
           Catch::Approx(anchor.x + anchor.w * 0.5f));
 }
 
+namespace {
+
+// TUNNELING-CLAMP-GUARD (ver core/spatial/step_clamp.hpp): resolve_move agora
+// clampa CADA delta em +-0.95*tile_size POR CHAMADA - um "teleporte" de tiro
+// unico (o truque original destes testes: um dx/dy cru enorme, de proposito
+// mirado no CENTRO do obstaculo pra "pousar" ali numa unica chamada, driblando
+// o limite conhecido de tunneling do resolve_move de passo unico) nao alcanca
+// mais um alvo distante numa unica chamada. Este helper caminha em VARIOS
+// passos pequenos (exatamente como o jogo real faz por tick, ver
+// overworld_sim.cpp::step_fixed) ate o eixo bater (hit) ou o alvo ser
+// alcancado. O resultado de REPOUSO final (encostado no obstaculo) e o MESMO
+// de antes: a resolucao por eixo so depende do alvo CRU de CADA chamada
+// individual, nunca do caminho percorrido ate ali.
+MoveResult walk_axis_until_hit(const TileGrid& grid, const Aabb& start, bool horizontal,
+                               float target, ObstacleSpan obstacles) {
+    MoveResult r{};
+    r.box = start;
+    for (int i = 0; i < 200; ++i) {
+        const float cur = horizontal ? r.box.x : r.box.y;
+        const float remaining = target - cur;
+        if (remaining == 0.0f) {
+            break;
+        }
+        const float dx = horizontal ? remaining : 0.0f;
+        const float dy = horizontal ? 0.0f : remaining;
+        r = resolve_move(grid, r.box, dx, dy, obstacles);
+        const bool hit = horizontal ? r.hit_x : r.hit_y;
+        if (hit) {
+            break;
+        }
+    }
+    return r;
+}
+
+}  // namespace
+
 // ============================================================================
 // REGRESSAO BUG-8 (playtest ao vivo do lider, MESMO DIA em que a colisao SOLIDA de
 // BUG-8 entrou: "esbarrar no androide NAO aciona mais a batalha, encostar no
@@ -1016,7 +1053,9 @@ TEST_CASE("enemy_sprite_footprint_aabb: footprint VISUAL (o quad desenhado) NAO 
 // nunca mais alcancava overlap real, nas 4 direcoes cardeais.
 //
 // Estes testes provam, com resolve_move REAL (a MESMA funcao que overworld_sim.cpp::
-// step_fixed usa em producao, contra um ObstacleSpan) e os NUMEROS REAIS do jogo
+// step_fixed usa em producao, contra um ObstacleSpan, caminhada em VARIOS passos
+// pequenos via walk_axis_until_hit - ver TUNNELING-CLAMP-GUARD acima) e os NUMEROS
+// REAIS do jogo
 // (tile_size=2.0 do .gmap, solid_box_tiles=1.0 = OverworldTuning::npc_solid_box_tiles,
 // player_side=0.6 tile = kPlayerHitboxTileFraction): (a) o NOVO feet_trigger_aabb
 // dispara nas 4 direcoes exatamente na posicao onde o jogador e PARADO pela colisao
@@ -1056,12 +1095,9 @@ TEST_CASE("BUG-8 revisitado: jogador PARADO pela colisao SOLIDA (resolve_move re
 
     const float solid_cx = solid.x + solid.w * 0.5f;
     const float solid_cy = solid.y + solid.h * 0.5f;
-    // Pouso-alvo CENTRADO dentro do solido (garante overlap do "target" cru com o
-    // obstaculo, qualquer que seja a origem - resolve_move so detecta colisao se o
-    // deslocamento CRU pedido sobrepoe o obstaculo; um delta grande demais que
-    // ATRAVESSASSE o obstaculo inteiro sem nunca sobrepo-lo faria "tunneling" e
-    // hit_x/hit_y ficaria false, limite conhecido do resolve_move de passo unico -
-    // ver overworld_sim_test.cpp). Pousar bem no centro elimina esse risco.
+    // Pouso-alvo CENTRADO dentro do solido (garante overlap do alvo com o
+    // obstaculo assim que a caminhada de passos pequenos chegar perto o
+    // bastante - ver walk_axis_until_hit/TUNNELING-CLAMP-GUARD acima).
     const float target_x_centered = solid_cx - player_side * 0.5f;
     const float target_y_centered = solid_cy - player_side * 0.5f;
 
@@ -1069,7 +1105,7 @@ TEST_CASE("BUG-8 revisitado: jogador PARADO pela colisao SOLIDA (resolve_move re
     {
         const Aabb start{10.0f, target_y_centered, player_side, player_side};
         const auto result =
-            resolve_move(g, start, /*dx=*/target_x_centered - start.x, /*dy=*/0.0f, obstacles);
+            walk_axis_until_hit(g, start, /*horizontal=*/true, target_x_centered, obstacles);
         REQUIRE(result.hit_x);
         CHECK_FALSE(aabb_overlaps(result.box, solid));  // colisao solida intacta (nao regrediu)
         CHECK(aabb_overlaps(result.box, trigger));      // FIX: agora dispara
@@ -1080,7 +1116,7 @@ TEST_CASE("BUG-8 revisitado: jogador PARADO pela colisao SOLIDA (resolve_move re
     {
         const Aabb start{90.0f, target_y_centered, player_side, player_side};
         const auto result =
-            resolve_move(g, start, /*dx=*/target_x_centered - start.x, /*dy=*/0.0f, obstacles);
+            walk_axis_until_hit(g, start, /*horizontal=*/true, target_x_centered, obstacles);
         REQUIRE(result.hit_x);
         CHECK_FALSE(aabb_overlaps(result.box, solid));
         CHECK(aabb_overlaps(result.box, trigger));
@@ -1091,7 +1127,7 @@ TEST_CASE("BUG-8 revisitado: jogador PARADO pela colisao SOLIDA (resolve_move re
     {
         const Aabb start{target_x_centered, 10.0f, player_side, player_side};
         const auto result =
-            resolve_move(g, start, /*dx=*/0.0f, /*dy=*/target_y_centered - start.y, obstacles);
+            walk_axis_until_hit(g, start, /*horizontal=*/false, target_y_centered, obstacles);
         REQUIRE(result.hit_y);
         CHECK_FALSE(aabb_overlaps(result.box, solid));
         CHECK(aabb_overlaps(result.box, trigger));
@@ -1106,7 +1142,7 @@ TEST_CASE("BUG-8 revisitado: jogador PARADO pela colisao SOLIDA (resolve_move re
     {
         const Aabb start{target_x_centered, 90.0f, player_side, player_side};
         const auto result =
-            resolve_move(g, start, /*dx=*/0.0f, /*dy=*/target_y_centered - start.y, obstacles);
+            walk_axis_until_hit(g, start, /*horizontal=*/false, target_y_centered, obstacles);
         REQUIRE(result.hit_y);
         CHECK_FALSE(aabb_overlaps(result.box, solid));
         CHECK(aabb_overlaps(result.box, trigger));
@@ -1145,33 +1181,34 @@ TEST_CASE("BUG-8 revisitado: com o trigger ANTIGO (0.8x0.4 tile, contido dentro 
     const TileGrid g(50, 50, tile_size);
     const float solid_cx = solid.x + solid.w * 0.5f;
     const float solid_cy = solid.y + solid.h * 0.5f;
-    // MESMO pouso-alvo centrado do teste irmao acima (evita tunneling do resolve_move
-    // de passo unico - garante que o jogador REALMENTE bateu no solido, hit_x/hit_y
-    // checado abaixo, antes de provar que o trigger antigo NAO disparava ali).
+    // MESMO pouso-alvo centrado do teste irmao acima - garante que o jogador
+    // REALMENTE bateu no solido (hit_x/hit_y checado abaixo, via caminhada de
+    // passos pequenos - ver walk_axis_until_hit/TUNNELING-CLAMP-GUARD acima)
+    // antes de provar que o trigger antigo NAO disparava ali.
     const float target_x_centered = solid_cx - player_side * 0.5f;
     const float target_y_centered = solid_cy - player_side * 0.5f;
 
     const Aabb west_start{10.0f, target_y_centered, player_side, player_side};
-    const auto west_result = resolve_move(g, west_start, target_x_centered - west_start.x,
-                                           0.0f, obstacles);
+    const auto west_result =
+        walk_axis_until_hit(g, west_start, /*horizontal=*/true, target_x_centered, obstacles);
     REQUIRE(west_result.hit_x);
     CHECK_FALSE(aabb_overlaps(west_result.box, old_trigger));
 
     const Aabb east_start{90.0f, target_y_centered, player_side, player_side};
-    const auto east_result = resolve_move(g, east_start, target_x_centered - east_start.x,
-                                           0.0f, obstacles);
+    const auto east_result =
+        walk_axis_until_hit(g, east_start, /*horizontal=*/true, target_x_centered, obstacles);
     REQUIRE(east_result.hit_x);
     CHECK_FALSE(aabb_overlaps(east_result.box, old_trigger));
 
     const Aabb north_start{target_x_centered, 10.0f, player_side, player_side};
-    const auto north_result = resolve_move(g, north_start, 0.0f,
-                                            target_y_centered - north_start.y, obstacles);
+    const auto north_result =
+        walk_axis_until_hit(g, north_start, /*horizontal=*/false, target_y_centered, obstacles);
     REQUIRE(north_result.hit_y);
     CHECK_FALSE(aabb_overlaps(north_result.box, old_trigger));
 
     const Aabb south_start{target_x_centered, 90.0f, player_side, player_side};
-    const auto south_result = resolve_move(g, south_start, 0.0f,
-                                            target_y_centered - south_start.y, obstacles);
+    const auto south_result =
+        walk_axis_until_hit(g, south_start, /*horizontal=*/false, target_y_centered, obstacles);
     REQUIRE(south_result.hit_y);
     CHECK_FALSE(aabb_overlaps(south_result.box, old_trigger));
 }

@@ -6,6 +6,7 @@
 
 #include <cmath>
 
+#include "gus/core/spatial/step_clamp.hpp"
 #include "gus/core/spatial/tile_grid.hpp"
 
 namespace gus::core::spatial {
@@ -220,16 +221,27 @@ float find_corner_push(const TileGrid& grid, const Aabb& box, bool horizontal,
 
 MoveResult resolve_move(const TileGrid& grid, const Aabb& box, float dx, float dy,
                         ObstacleSpan obstacles) noexcept {
+    // TUNNELING-CLAMP-GUARD (ver step_clamp.hpp e o CONTRATO no header): clampa
+    // CADA EIXO ANTES de qualquer resolucao - fronteira UNICA (grid.tile_size()
+    // ja disponivel aqui), sem exigir que cada chamador (OverworldSim, testes,
+    // etc.) clampe por conta propria. Deltas legitimos (|delta| <= 0.95*tile)
+    // saem byte-identicos ao comportamento legado.
+    const float tile = grid.tile_size();
+    const float clamped_dx = clamp_step_axis(dx, tile);
+    const float clamped_dy = clamp_step_axis(dy, tile);
+
     // Eixo X primeiro, a partir da posicao corrente.
-    const AxisOutcome rx = resolve_x(grid, box.x, box.y, box.w, box.h, dx, obstacles);
+    const AxisOutcome rx =
+        resolve_x(grid, box.x, box.y, box.w, box.h, clamped_dx, obstacles);
     // Eixo Y depois, com o X ja resolvido (slide).
     const AxisOutcome ry =
-        resolve_y(grid, rx.coord, box.y, box.w, box.h, dy, obstacles);
+        resolve_y(grid, rx.coord, box.y, box.w, box.h, clamped_dy, obstacles);
 
     MoveResult result;
     result.box = Aabb{rx.coord, ry.coord, box.w, box.h};
     result.hit_x = rx.hit;
     result.hit_y = ry.hit;
+    result.step_clamped = (clamped_dx != dx) || (clamped_dy != dy);
     return result;
 }
 
@@ -237,10 +249,28 @@ MoveResult resolve_move_with_corner_assist(const TileGrid& grid, const Aabb& box
                                            float dx, float dy,
                                            const CornerAssistOptions& opts,
                                            ObstacleSpan obstacles) noexcept {
-    // Resolve normal primeiro: e a base e tambem o fallback se nada destravar.
-    const MoveResult base = resolve_move(grid, box, dx, dy, obstacles);
+    // TUNNELING-CLAMP-GUARD (ver step_clamp.hpp): clampa ANTES de qualquer
+    // resolucao. O resolve_move chamado logo abaixo clampa de novo internamente
+    // (idempotente - clamped_dx/clamped_dy ja estao dentro do teto, entao o
+    // clamp interno dele e um no-op) - mas o main_delta usado no empurrao do
+    // corner-assist (mais abaixo) PRECISA do valor JA clampado, senao um delta
+    // absurdo vazaria pro passo do eixo principal depois do empurrao
+    // perpendicular. outer_clamped guarda se ESTE clamp (o unico que de fato
+    // altera algo aqui) mexeu em dx/dy, pra reportar em MoveResult::step_clamped
+    // em TODOS os caminhos de retorno abaixo (base.step_clamped sempre sai
+    // false, ja que o resolve_move interno recebe valores ja clampados).
+    const float tile = grid.tile_size();
+    const float clamped_dx = clamp_step_axis(dx, tile);
+    const float clamped_dy = clamp_step_axis(dy, tile);
+    const bool outer_clamped = (clamped_dx != dx) || (clamped_dy != dy);
+
+    // Resolve normal primeiro (com dx/dy ja clampados): e a base e tambem o
+    // fallback se nada destravar.
+    const MoveResult base = resolve_move(grid, box, clamped_dx, clamped_dy, obstacles);
     if (!opts.enabled || opts.max_assist_fraction <= 0.0f) {
-        return base;
+        MoveResult result = base;
+        result.step_clamped = outer_clamped;
+        return result;
     }
 
     const float max_assist = opts.max_assist_fraction * grid.tile_size();
@@ -248,17 +278,21 @@ MoveResult resolve_move_with_corner_assist(const TileGrid& grid, const Aabb& box
     // Corner-assist so atua em movimento CARDINAL (um eixo) que bateu. Em
     // diagonal a resolucao por eixo do resolve_move ja contorna quinas isoladas
     // (mantemos o comportamento da base; ver nota no header). Detecta o eixo:
-    const bool horizontal = (dx != 0.0f && dy == 0.0f && base.hit_x);
-    const bool vertical = (dy != 0.0f && dx == 0.0f && base.hit_y);
+    const bool horizontal = (clamped_dx != 0.0f && clamped_dy == 0.0f && base.hit_x);
+    const bool vertical = (clamped_dy != 0.0f && clamped_dx == 0.0f && base.hit_y);
     if (!horizontal && !vertical) {
-        return base;
+        MoveResult result = base;
+        result.step_clamped = outer_clamped;
+        return result;
     }
 
-    const float main_delta = horizontal ? dx : dy;
+    const float main_delta = horizontal ? clamped_dx : clamped_dy;
     const float push =
         find_corner_push(grid, box, horizontal, main_delta, max_assist, obstacles);
     if (push == 0.0f) {
-        return base;  // nenhuma abertura dentro do limite: trava como hoje
+        MoveResult result = base;
+        result.step_clamped = outer_clamped;
+        return result;  // nenhuma abertura dentro do limite: trava como hoje
     }
 
     // Aplica o empurrao perpendicular e resolve o movimento a partir dali. O
@@ -276,6 +310,7 @@ MoveResult resolve_move_with_corner_assist(const TileGrid& grid, const Aabb& box
         result.box = Aabb{rx.coord, ry.coord, box.w, box.h};
         result.hit_x = rx.hit;
         result.hit_y = false;  // o empurrao perpendicular nao e "bater"
+        result.step_clamped = outer_clamped;
         return result;
     }
     // vertical: empurra em X, depois move em Y.
@@ -287,6 +322,7 @@ MoveResult resolve_move_with_corner_assist(const TileGrid& grid, const Aabb& box
     result.box = Aabb{rx.coord, ry.coord, box.w, box.h};
     result.hit_x = false;
     result.hit_y = ry.hit;
+    result.step_clamped = outer_clamped;
     return result;
 }
 

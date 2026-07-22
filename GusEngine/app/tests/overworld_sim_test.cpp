@@ -15,13 +15,16 @@
 #include <cmath>
 #include <vector>
 
+#include "gus/app/screens/city_scene.hpp"  // kPlayerHitboxTileFraction (teste-trava)
 #include "gus/app/screens/overworld_sim.hpp"
 #include "gus/app/screens/overworld_tuning.hpp"
+#include "gus/core/spatial/step_clamp.hpp"  // TUNNELING-CLAMP-GUARD
 #include "gus/core/spatial/tile_grid.hpp"
 #include "gus/platform/render2d/i_renderer.hpp"
 
 using Catch::Matchers::WithinAbs;
 using gus::app::screens::Direction;
+using gus::app::screens::kPlayerHitboxTileFraction;
 using gus::app::screens::kWalkFrameCount;
 using gus::app::screens::OverworldSim;
 using gus::app::screens::OverworldTuning;
@@ -1435,4 +1438,93 @@ TEST_CASE("feel: respiracao calma so BOB (escala zerada, sem esticar/achatar, li
     REQUIRE(t.idle_calm_scale_amplitude == 0.0f);        // escala DESLIGADA (sem squash/stretch)
     REQUIRE(t.idle_calm_bob_tiles > 0.0f);               // ainda respira, so pelo bob
     REQUIRE(t.idle_calm_bob_tiles <= 0.06f);             // deslize vertical contido (sutil)
+}
+
+// ============================================================================
+// TUNNELING-CLAMP-GUARD (TUNNELING-CLAMP-GUARD, ver core/spatial/step_clamp.hpp)
+// - SIM-LEVEL: prova em cima do OverworldSim REAL (a mesma step_fixed que a casca
+// SDL chama por tick) que um tuning ABSURDO (velocidade/corrida muito acima de
+// qualquer numero canonico do jogo) + um fixed_dt gigante (muito acima do que o
+// FixedTimestep de producao jamais entregaria - o clamp de lag ja existe e e
+// SEPARADO, ver core/time/fixed_timestep.hpp) NUNCA atravessa uma parede de 1
+// tile, em NENHUM sentido de eixo (reforco do lider via Gus: "e se o personagem
+// andar de costas, velocidade negativa?" - o teto e SIMETRICO por construcao, ver
+// step_clamp.hpp; aqui a suite prova isso tambem no nivel da SIMULACAO, nao so na
+// colisao pura).
+// ============================================================================
+
+TEST_CASE("overworld: teto anti-tunneling - tuning absurdo (1000 tiles/s, corrida "
+          "100x, dt=10s) jamais atravessa parede a LESTE (dx positivo)",
+          "[overworld][step_clamp]") {
+    TileGrid g(30, 30, 16.0f);
+    for (int cy = 0; cy < 30; ++cy) {
+        g.set_blocked(10, cy, true);  // coluna 10 INTEIRA bloqueada -> mundo x=[160,176)
+    }
+
+    OverworldTuning t;
+    t.walk_speed_tiles_per_sec = 1000.0f;  // ABSURDO (canone real ~4.5)
+    t.run_multiplier = 100.0f;             // ABSURDO (canone real ~1.6)
+    t.corner.enabled = false;              // isola o clamp (sem interferencia do corner-assist)
+
+    constexpr float kWallFace = 10.0f * 16.0f;  // 160 (face esquerda da parede)
+    // Spawn 2 tiles de folga a OESTE da parede (borda direita da caixa a 2 tiles).
+    OverworldSim sim(g, Aabb{120.0f, 100.0f, 8.0f, 8.0f}, t);
+
+    const float cap = gus::core::spatial::kMaxStepPerAxisTileFraction * 16.0f;
+    for (int i = 0; i < 20; ++i) {
+        const float before = sim.player().x;
+        sim.step_fixed(/*dx=*/1, /*dy=*/0, /*run=*/true, /*fixed_dt=*/10.0f);
+        const float after = sim.player().x;
+        CAPTURE(i, before, after);
+        REQUIRE(std::fabs(after - before) <= static_cast<double>(cap) + kEps);
+        REQUIRE(sim.player().x + sim.player().w <= kWallFace + kEps);  // nunca cruza
+    }
+}
+
+TEST_CASE("overworld: teto anti-tunneling - tuning absurdo, ANDANDO DE COSTAS (dx "
+          "negativo) jamais atravessa parede a OESTE",
+          "[overworld][step_clamp]") {
+    // Reforco (input do lider via Gus): "e se o personagem andar de costas,
+    // velocidade negativa como -1.6, o teto basta?" - espelho EXATO do teste
+    // acima, so que a parede fica ATRAS do spawn (a -2 tiles) e o input pede
+    // dx=-1 (velocidade negativa/andar de costas).
+    TileGrid g(30, 30, 16.0f);
+    for (int cy = 0; cy < 30; ++cy) {
+        g.set_blocked(3, cy, true);  // coluna 3 INTEIRA bloqueada -> mundo x=[48,64)
+    }
+
+    OverworldTuning t;
+    t.walk_speed_tiles_per_sec = 1000.0f;
+    t.run_multiplier = 100.0f;
+    t.corner.enabled = false;
+
+    constexpr float kWallFaceRight = 4.0f * 16.0f;  // 64 (borda direita da parede)
+    // Spawn 2 tiles de folga a LESTE da parede (borda esquerda da caixa a 2 tiles).
+    OverworldSim sim(g, Aabb{96.0f, 100.0f, 8.0f, 8.0f}, t);
+
+    const float cap = gus::core::spatial::kMaxStepPerAxisTileFraction * 16.0f;
+    for (int i = 0; i < 20; ++i) {
+        const float before = sim.player().x;
+        sim.step_fixed(/*dx=*/-1, /*dy=*/0, /*run=*/true, /*fixed_dt=*/10.0f);
+        const float after = sim.player().x;
+        CAPTURE(i, before, after);
+        REQUIRE(std::fabs(after - before) <= static_cast<double>(cap) + kEps);
+        REQUIRE(sim.player().x >= kWallFaceRight - kEps);  // nunca cruza
+    }
+}
+
+TEST_CASE("step_clamp: teste-trava - obstaculo pontual + hitbox do jogador excedem "
+          "o teto do clamp (nenhum vira 'buraco de agulha')",
+          "[overworld][step_clamp]") {
+    // Premissa vigente da qual o TUNNELING-CLAMP-GUARD depende (invariante de
+    // TUNING, nao garantida pelo compilador): um obstaculo pontual de ~1 tile
+    // (OverworldTuning::npc_solid_box_tiles) somado a largura da propria hitbox do
+    // jogador (kPlayerHitboxTileFraction) fica ACIMA do teto do clamp
+    // (kMaxStepPerAxisTileFraction=0.95) - garante que nenhum obstaculo pontual
+    // vira um "buraco de agulha" que um unico passo (ja clampado) atravesse sem
+    // nunca sobrepor. Se algum dia os numeros forem reduzidos abaixo desta soma,
+    // este teste FALHA de proposito - reavaliar o teto do clamp E os numeros de
+    // tuning JUNTOS (nao um sem o outro).
+    REQUIRE(OverworldTuning{}.npc_solid_box_tiles + kPlayerHitboxTileFraction >
+            gus::core::spatial::kMaxStepPerAxisTileFraction);
 }
