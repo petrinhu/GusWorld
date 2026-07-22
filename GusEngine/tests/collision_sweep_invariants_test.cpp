@@ -741,13 +741,21 @@ TEST_CASE("collision_sweep: amostragem PRNG deterministica de 20000 casos "
 TEST_CASE("collision_sweep: tunneling atraves de parede fina de 1 tile - "
           "caracterizacao (tier adversarial)",
           "[core][spatial][collision][sweep][!mayfail]") {
-    // O resolve_move atual resolve SO a posicao alvo (sem swept/CCD): quando
-    // o deslocamento por passo e grande o bastante para o rodape da caixa
-    // pular INTEIRO por cima de uma parede fina, a colisao nunca e detectada
-    // (hit_x fica false) e a caixa "teleporta" pro outro lado. Isto documenta
-    // a fronteira exata (a partir de qual magnitude de delta o bug aparece)
-    // e produz o contraexemplo minimo via CAPTURE - NAO tenta consertar o
-    // .cpp de producao (fora de escopo desta fatia, M7-FB1 fatia 1).
+    // ATUALIZADO (TUNNELING-CLAMP-GUARD, ver core/spatial/step_clamp.hpp): o
+    // resolve_move continua resolvendo SO a posicao alvo (sem swept/CCD) - o
+    // algoritmo em si nao mudou. O que mudou e a FRONTEIRA: resolve_move agora
+    // clampa CADA delta em +-0.95*tile_size ANTES de chamar a resolucao (ver
+    // grid_collision.cpp). Como este teste usa magnitudes de 1.0 a 3.0*tile
+    // POR CHAMADA UNICA, todo delta cru chega clampado a 0.95*tile - abaixo do
+    // limiar teorico de tunneling (tile+box_size = 1.6*tile) - entao o CHECK_
+    // FALSE(tunneled) abaixo passa DETERMINISTICAMENTE agora: este bloco deixou
+    // de ser um "achado esperado" (documentacao de bug conhecido) e passou a
+    // ser uma CONFIRMACAO do cerco (o guarda impede o tiro-unico de tunelar).
+    // Mantido como tag [!mayfail] por seguranca de regressao: se um refactor
+    // futuro remover ou enfraquecer o clamp, este teste volta a falhar aqui
+    // (voz de alarme) sem quebrar o CI (tier adversarial, nao bloqueante) -
+    // mas o objetivo original de "caracterizar o limite conhecido" nao se
+    // aplica mais como estava escrito.
     for (const float tile : kTileSizes) {
         // Parede de 1 tile de espessura na coluna cx=5, campo aberto ao redor.
         TileGrid g = TileGrid::from_rows(
@@ -775,12 +783,13 @@ TEST_CASE("collision_sweep: tunneling atraves de parede fina de 1 tile - "
             const bool tunneled = horizontal_tunnel_detected(g, start, r, dx);
 
             CAPTURE(tile, mf, dx, start.x, start.y, r.box.x, r.hit_x);
-            // ACHADO PRIORITARIO ESPERADO: para mf grande o bastante (o
-            // rodape da caixa passa inteiro por cima da parede - limiar
-            // teorico = tile+box_size = 1.6*tile), tunneled vira true e este
-            // CHECK_FALSE fura de proposito (tier adversarial). Usa
-            // CHECK (nao REQUIRE) pra nao abortar o loop e caracterizar TODAS
-            // as magnitudes/tile_sizes num unico relatorio.
+            // CERCADO PELO CLAMP (TUNNELING-CLAMP-GUARD): dx aqui e ate 3.0*tile,
+            // mas resolve_move clampa o delta cru pra +-0.95*tile ANTES de
+            // resolver - sempre abaixo do limiar teorico de tunneling
+            // (tile+box_size = 1.6*tile). tunneled fica false pra TODA
+            // magnitude testada, pra TODO tile_size. Usa CHECK (nao REQUIRE)
+            // pra nao abortar o loop e reportar TODAS as magnitudes/tile_sizes
+            // num unico relatorio, do mesmo jeito que caracterizava o bug antes.
             CHECK_FALSE(tunneled);
         }
     }
