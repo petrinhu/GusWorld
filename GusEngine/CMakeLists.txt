@@ -247,6 +247,28 @@ set(GLINTFX_OWN_FONT_ENGINE  OFF CACHE BOOL "" FORCE)
 # nao inclui mais third_party/miniaudio (aposentado deste bloco em diante, so a
 # remocao FISICA do vendored fica pro M9). Suite completa (2394 testes, incluindo os
 # 21 de platform/tests/audio_engine_test.cpp intactos) verde antes deste commit.
+# SHIM TEMPORARIO DE PORTABILIDADE (GLINTFX-INTEGRACAO-F2, 2026-07-22) - libm no MSVC.
+# O glintfx v0.18.0 linka a libm do Unix no modulo de audio SEM guard de plataforma:
+#   glintfx/CMakeLists.txt:1151
+#   target_link_libraries(glintfx_audio PRIVATE Threads::Threads ${CMAKE_DL_LIBS} m)
+# (curiosidade: a linha 1152, logo abaixo, JA tem o guard por compilador que pedimos no
+# report anterior - o "m" e que passou batido). No MSVC nao existe "m.lib" (a math vive
+# na CRT), e como glintfx_audio e STATIC e dobrado no alvo glintfx, a dependencia
+# propaga pro link FINAL do consumidor: quem quebra somos nos, com
+#   LINK : fatal error LNK1181: cannot open input file 'm.lib'
+# O CI Windows do MSVC deles nao pega isso porque COMPILA os alvos mas nao LINKA um
+# consumidor com o modulo de audio ligado (sugestao ja enviada a eles pelo bus).
+#
+# O shim: um alvo INTERFACE vazio chamado "m" so no Windows. O CMake resolve o NOME "m"
+# para este alvo em vez de procurar m.lib no disco; no Unix o alvo nem e criado e o -lm
+# de verdade continua valendo. Precisa vir ANTES do MakeAvailable (e quando o
+# target_link_libraries deles e avaliado).
+# REMOVER quando o glintfx taggear o guard de plataforma (dor reportada pelo bus em
+# 2026-07-22); a remocao sai no mesmo commit do bump que trouxer o fix.
+if(WIN32 AND NOT TARGET m)
+    add_library(m INTERFACE)
+endif()
+
 FetchContent_Declare(
     glintfx
     GIT_REPOSITORY https://codeberg.org/petrinhu/glintfx
