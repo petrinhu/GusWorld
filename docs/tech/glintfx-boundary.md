@@ -23,6 +23,8 @@
 | Carregamento de asset, fs, math 2D, colisão/spatial genérica | Save-crypto (AEAD do save do jogo), motor de cartas, progressão, economia |
 | i18n loader (parser/fallback) genérico | Chaves i18n e conteúdo das traduções |
 
+> **Exceção ratificada (líder 2026-07-21): o i18n NÃO migra pro glintfx.** O translator do GusWorld vive em `domain/` (POCO puro, com os tiers de censura = regra de jogo), e o gate de CI proíbe `<glintfx` em `core/`/`domain/`. Migrar furaria a arquitetura de 4 camadas. Coexistência permanente: o módulo i18n do glintfx fica desligado; o translator próprio (pt_br/en_intl) permanece a fonte.
+
 ## O gate — quando dispara
 
 Não é marco de calendário: é **checkpoint por onda**, no **planejamento (Caetano/CTO)**, disparado pela **fronteira `platform/`**. Roda **ANTES** de qualquer uma destas três ações:

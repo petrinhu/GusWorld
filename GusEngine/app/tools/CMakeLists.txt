@@ -215,6 +215,61 @@ if(EXISTS "${_GUSENGINE_RELEASE}/app/libgusengine_app.a")
         ${CMAKE_DL_LIBS}
         m
     )
+    # =========================================================================
+    # GLINTFX-INTEGRACAO-F1 (validacao visual do bump v0.9.2 -> v0.16.0): mais 4
+    # probes de screenshot JA EXISTENTES no disco (fontes prontos, so faltava o
+    # add_executable - este diretorio e scratch/untracked, cada sessao adiciona o
+    # que precisa) - MESMA receita/libs importadas acima, reusadas via foreach pra
+    # nao repetir os 2 blocos de include/link 4x. Cobrem texto+decorators RCSS em
+    # mais telas (dialogo NPC, Controles com scroll, Save/Load, fundo congelado).
+    foreach(_probe IN ITEMS
+        npcdlg_screenshot_probe
+        sysmenu_controls_screenshot_probe
+        save_load_screenshot_probe
+        frozen_bg_probe)
+        add_executable(${_probe} ${_probe}.cpp)
+
+        target_include_directories(${_probe} PRIVATE
+            "${_GUSENGINE_ROOT}/core/include"
+            "${_GUSENGINE_ROOT}/domain/include"
+            "${_GUSENGINE_ROOT}/platform/include"
+            "${_GUSENGINE_ROOT}/app/include"
+            "${_GUSENGINE_ROOT}/third_party/stb"
+            "${_GUSENGINE_ROOT}/platform/rmlui"
+            "${_GUSENGINE_RELEASE}/_deps/sdl3-build/include-revision"
+            "${_GUSENGINE_RELEASE}/_deps/sdl3-src/include"
+            "${_GUSENGINE_RELEASE}/_deps/glintfx-src/glintfx/include"
+        )
+
+        target_compile_features(${_probe} PRIVATE cxx_std_20)
+
+        # MESMAS macros de app/CMakeLists.txt (gusengine_app) - estes probes usam
+        # GUSWORLD_FONTS_DIR/GUSWORLD_ASSETS_DIR como fallback quando as env vars
+        # GUSWORLD_FONTS/GUSWORLD_ASSETS nao estao setadas. _GUSENGINE_ROOT = GusEngine/.
+        target_compile_definitions(${_probe} PRIVATE
+            GUSWORLD_ASSETS_DIR="${_GUSENGINE_ROOT}/../resources"
+            GUSWORLD_FONTS_DIR="${_GUSENGINE_ROOT}/assets/fonts"
+        )
+
+        target_link_libraries(${_probe} PRIVATE
+            gusengine_app_imported
+            gusengine_core_imported
+            gusengine_domain_imported
+            gusengine_platform_imported
+            sdl3_imported
+            gusengine_domain_imported
+            gusengine_core_imported
+            monocypher_imported
+            rmlui_debugger_imported
+            glintfx_imported
+            rmlui_imported
+            OpenGL::GL
+            Freetype::Freetype
+            Threads::Threads
+            ${CMAKE_DL_LIBS}
+            m
+        )
+    endforeach()
 else()
     message(STATUS
         "poc_gl_single_context_probe/sysmenu_pause_screenshot_probe: "
