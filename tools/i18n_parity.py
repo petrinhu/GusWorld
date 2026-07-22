@@ -47,7 +47,7 @@ USO
 ---
     python3 tools/i18n_parity.py
     python3 tools/i18n_parity.py --min 95      # tambem exige %>=95 no alvo
-    python3 tools/i18n_parity.py --dir game/translations --source pt_br
+    python3 tools/i18n_parity.py --dir resources/translations --source pt_br
 """
 from __future__ import annotations
 
@@ -127,7 +127,7 @@ def main() -> int:
     parser = argparse.ArgumentParser(
         description="Tabela de paridade i18n do GusWorld (gate estrutural)."
     )
-    parser.add_argument("--dir", default="game/translations",
+    parser.add_argument("--dir", default="resources/translations",
                         help="Diretorio dos catalogos .md.")
     parser.add_argument("--source", default=SOURCE_PADRAO,
                         help="Locale source (lingua-fonte). Padrao pt_br.")

@@ -1,7 +1,8 @@
 // gus/app/i18n/translator.hpp
 //
 // Translator de UI (M5, incremento 3.5): o tr() runtime da camada app/. Carrega o
-// catalogo de traducao ativo (game/translations/<locale>.md) e resolve KEY -> string.
+// catalogo de traducao ativo (resources/translations/<locale>.md, M8 decommission
+// moveu de game/translations/ via git mv) e resolve KEY -> string.
 // O PARSER e o POCO do dominio (gus::domain::i18n::parse); o I/O de arquivo (ler o .md)
 // vive AQUI na fronteira app/ (como o city_loader le o .gmap), respeitando a invariante
 // 4 camadas (domain/ nao faz I/O). Fallback: chave ausente devolve a propria chave
@@ -13,7 +14,7 @@
 // e NAO passam por aqui.
 //
 // Cross-ref: gus/domain/i18n/md_translation_loader.hpp (parser POCO);
-//            game/translations/pt_br.md (catalogo dev primario);
+//            resources/translations/pt_br.md (catalogo dev primario);
 //            gus/app/screens/battle_menu.hpp (verbos -> chaves via verb_label_key).
 
 #ifndef GUS_APP_I18N_TRANSLATOR_HPP

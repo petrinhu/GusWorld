@@ -19,7 +19,8 @@
 // (strings); este header e o COMO abrir.
 //
 // CONVENCAO DO id: a MESMA string relativa ja centralizada em core/asset_paths.hpp (ex.:
-// "assets/fonts/PixelOperatorMono.ttf", "game/translations/pt_br.md",
+// "assets/fonts/PixelOperatorMono.ttf", "resources/translations/pt_br.md" (M8
+// decommission moveu de game/translations/ via git mv),
 // "sprites/caua_volt/walk/south/0.png"). Zero tabela de remapeamento nova - o
 // asset_paths.hpp ja E a camada logica de nomes.
 //
@@ -72,10 +73,12 @@ public:
 //   - fontes    (prefixo "assets/fonts/"):      GUSWORLD_ASSETS+"/fonts" (com checagem
 //                de exists, pra nao "sequestrar" a fonte) > macro GUSWORLD_FONTS_DIR >
 //                relativo ao CWD (id como esta).
-//   - traducoes (prefixo "game/translations/"): GUSWORLD_TRANSLATIONS = override
+//   - traducoes (prefixo "resources/translations/", M8 decommission moveu de
+//                game/translations/ via git mv): GUSWORLD_TRANSLATIONS = override
 //                LITERAL completo (ignora o id, mesmo comportamento de hoje) > macro
 //                GUSWORLD_TRANSLATIONS_DIR+nome-do-arquivo > CWD (id).
-//   - dialogos  (prefixo "game/dialogues/"):    GUSWORLD_DIALOGUES = override LITERAL
+//   - dialogos  (prefixo "resources/dialogues/", M8 decommission moveu de
+//                game/dialogues/ via git mv): GUSWORLD_DIALOGUES = override LITERAL
 //                completo (mesmo padrao da familia TRADUCOES - so existe 1 grafo hoje,
 //                ADR-013/ASSETS-VFS-F1b, M7-DIALOGO) > macro GUSWORLD_DIALOGUES_DIR+
 //                nome-do-arquivo > CWD (id).

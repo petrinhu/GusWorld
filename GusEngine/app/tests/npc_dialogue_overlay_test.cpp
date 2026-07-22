@@ -28,7 +28,7 @@ namespace {
 
 // Mesmo grafo do Bertoldo (5 nos + reconvergencia) exercitado pelos testes de
 // dialogue_text_test.cpp/dialogue_runtime_test.cpp, aqui com as chaves reais do
-// npc_intro_bertoldo.dlg.txt (game/dialogues/) - prova a MESMA forma sem depender
+// npc_intro_bertoldo.dlg.txt (resources/dialogues/) - prova a MESMA forma sem depender
 // de I/O de disco (POCO puro, ver npc_dialogue_catalog_test.cpp pro parse do
 // arquivo real).
 const std::string kSrc =

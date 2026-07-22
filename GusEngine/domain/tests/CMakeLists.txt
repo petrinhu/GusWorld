@@ -306,8 +306,9 @@ target_include_directories(gusengine_domain_tests PRIVATE ${CMAKE_CURRENT_SOURCE
 # master_cards_test.cpp le os .md de traducao pra checar as chaves CARD_EXEC_<FIGURA>_NAME
 # nos 2 locales. Caminho ABSOLUTO injetado aqui (CMAKE_SOURCE_DIR = GusEngine; o repo e o
 # pai), robusto ao CWD do ctest (catch_discover_tests roda o binario do build dir).
+# M8 decommission: moveu de game/translations/ para resources/translations/ via git mv.
 target_compile_definitions(gusengine_domain_tests PRIVATE
-    GUSWORLD_TRANSLATIONS_DIR="${CMAKE_SOURCE_DIR}/../game/translations")
+    GUSWORLD_TRANSLATIONS_DIR="${CMAKE_SOURCE_DIR}/../resources/translations")
 
 target_link_libraries(gusengine_domain_tests
     PRIVATE

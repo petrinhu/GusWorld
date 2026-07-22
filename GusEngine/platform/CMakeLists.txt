@@ -100,11 +100,12 @@ target_compile_definitions(gusengine_platform
     PRIVATE GUSWORLD_SFX_DIR="${CMAKE_SOURCE_DIR}/../assets/sfx"
     # Musica CC0, irma de assets/sfx/ (M6 ADR-011).
     PRIVATE GUSWORLD_MUSIC_DIR="${CMAKE_SOURCE_DIR}/../assets/music"
-    # Catalogos de traducao (game/translations/), raiz = pai de GusEngine/.
-    PRIVATE GUSWORLD_TRANSLATIONS_DIR="${CMAKE_SOURCE_DIR}/../game/translations"
-    # Grafos de dialogo (game/dialogues/), raiz-irma de GUSWORLD_TRANSLATIONS_DIR acima
-    # (M7-DIALOGO, ASSETS-VFS-F1b).
-    PRIVATE GUSWORLD_DIALOGUES_DIR="${CMAKE_SOURCE_DIR}/../game/dialogues"
+    # Catalogos de traducao (resources/translations/), raiz = pai de GusEngine/
+    # (M8 decommission: moveu de game/translations/ via git mv).
+    PRIVATE GUSWORLD_TRANSLATIONS_DIR="${CMAKE_SOURCE_DIR}/../resources/translations"
+    # Grafos de dialogo (resources/dialogues/), raiz-irma de GUSWORLD_TRANSLATIONS_DIR acima
+    # (M7-DIALOGO, ASSETS-VFS-F1b; M8 decommission moveu de game/dialogues/ via git mv).
+    PRIVATE GUSWORLD_DIALOGUES_DIR="${CMAKE_SOURCE_DIR}/../resources/dialogues"
     # Mapas .gmap compilados, DENTRO de GusEngine/ (versionados com a engine, ASSETS-VFS-F1c).
     PRIVATE GUSWORLD_MAPS_DIR="${CMAKE_SOURCE_DIR}/assets/maps/compiled"
 )

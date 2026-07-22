@@ -85,8 +85,10 @@ std::string strip_prefix(std::string_view id, std::string_view prefix) {
 }
 
 constexpr std::string_view kFontsPrefix = "assets/fonts/";
-constexpr std::string_view kTranslationsPrefix = "game/translations/";
-constexpr std::string_view kDialoguesPrefix = "game/dialogues/";
+// M8 decommission: prefixos migraram de game/translations/ e game/dialogues/ pra
+// resources/translations/ e resources/dialogues/ (git mv preservando historico).
+constexpr std::string_view kTranslationsPrefix = "resources/translations/";
+constexpr std::string_view kDialoguesPrefix = "resources/dialogues/";
 constexpr std::string_view kSfxPrefix = "assets/sfx/";
 constexpr std::string_view kMusicPrefix = "assets/music/";
 constexpr std::string_view kMapsPrefix = "assets/maps/compiled/";

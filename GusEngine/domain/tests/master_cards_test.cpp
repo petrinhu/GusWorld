@@ -848,10 +848,11 @@ bool has_key(const std::vector<std::string>& keys, const std::string& key) {
 }  // namespace
 
 // GUSWORLD_TRANSLATIONS_DIR e injetado por tests/CMakeLists.txt
-// (${CMAKE_SOURCE_DIR}/../game/translations) - caminho ABSOLUTO, robusto ao CWD do
+// (${CMAKE_SOURCE_DIR}/../resources/translations, M8 decommission moveu de
+// game/translations/ via git mv) - caminho ABSOLUTO, robusto ao CWD do
 // ctest (catch_discover_tests roda o binario a partir do build dir).
 #ifndef GUSWORLD_TRANSLATIONS_DIR
-#define GUSWORLD_TRANSLATIONS_DIR "../../../../game/translations"
+#define GUSWORLD_TRANSLATIONS_DIR "../../../../resources/translations"
 #endif
 
 TEST_CASE("master_cards: as 20 chaves CARD_EXEC_<FIGURA>_NAME existem em pt_br.md e "

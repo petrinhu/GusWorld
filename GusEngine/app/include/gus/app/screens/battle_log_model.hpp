@@ -70,7 +70,7 @@ struct LogLine {
 
 // ---- D12: log narra a CONSEQUENCIA (incremento 6) ----
 //
-// Chave i18n do NOME de um StatusId (STATUS_<id>_NAME, ver game/translations). A UI
+// Chave i18n do NOME de um StatusId (STATUS_<id>_NAME, ver resources/translations). A UI
 // resolve via tr(); o POCO so devolve a chave (deterministico, testavel). Todo StatusId
 // do enum mapeia (sem chave vazia).
 [[nodiscard]] std::string_view status_name_key(

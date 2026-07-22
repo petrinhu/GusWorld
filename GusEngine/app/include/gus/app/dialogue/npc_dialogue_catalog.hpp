@@ -6,7 +6,8 @@
 // parser POCO de dominio (gus::domain::dialogue::parse_text_to_dialogue_graph).
 //
 // Cross-ref: gus/domain/dialogue/dialogue_text.hpp (parser, formato .dlg.txt),
-//            game/dialogues/npc_intro_bertoldo.dlg.txt (fonte editavel),
+//            resources/dialogues/npc_intro_bertoldo.dlg.txt (fonte editavel, M8
+//            decommission moveu de game/dialogues/ via git mv),
 //            gus/app/i18n/translator.hpp (MESMA receita de resolucao de path).
 
 #ifndef GUS_APP_DIALOGUE_NPC_DIALOGUE_CATALOG_HPP
@@ -22,7 +23,7 @@ namespace gus::app::dialogue {
 // Resolve o caminho do .dlg.txt do Bertoldo: env GUSWORLD_DIALOGUES (caminho
 // COMPLETO do arquivo, o lider aponta direto - mesmo contrato de GUSWORLD_
 // TRANSLATIONS) > macro embutida em compilacao (GUSWORLD_DIALOGUES_DIR) > relativo
-// ao CWD (game/dialogues/npc_intro_bertoldo.dlg.txt). So MONTA a string; nao le
+// ao CWD (resources/dialogues/npc_intro_bertoldo.dlg.txt). So MONTA a string; nao le
 // nada do disco.
 [[nodiscard]] std::string resolve_npc_intro_bertoldo_dialogue_path();
 

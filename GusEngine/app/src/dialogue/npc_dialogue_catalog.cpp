@@ -26,7 +26,8 @@ std::string resolve_npc_intro_bertoldo_dialogue_path() {
     // ASSETS-VFS-F1b (ADR-013): a cadeia `env GUSWORLD_DIALOGUES = override LITERAL >
     // macro GUSWORLD_DIALOGUES_DIR > CWD (kDialoguesDir)` foi CONSOLIDADA em
     // FilesystemAssetSource::resolve_path (familia DIALOGUES, dispatch pelo prefixo
-    // "game/dialogues/" do id, mesmo padrao da familia I18N). Assinatura/contrato
+    // "resources/dialogues/" do id, M8 decommission moveu de "game/dialogues/" via
+    // git mv; mesmo padrao da familia I18N). Assinatura/contrato
     // INTOCADOS - paridade provada em platform/tests/asset_source_test.cpp e reforcada
     // pelos testes de integracao ja existentes deste arquivo (carregam o grafo real
     // via o path resolvido).

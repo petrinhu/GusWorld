@@ -4,7 +4,8 @@
 // hermetico de platform/tests/save_file_store_test.cpp) do CRITERIO DE SAIDA do
 // M7-DIALOGO/NPC-MVP: "falar com 1 NPC, escolha muda flag, flag sobrevive a save/
 // load round-trip". Junta as 3 pontas:
-//   1) o ARQUIVO REAL do Bertoldo (game/dialogues/npc_intro_bertoldo.dlg.txt),
+//   1) o ARQUIVO REAL do Bertoldo (resources/dialogues/npc_intro_bertoldo.dlg.txt,
+//      M8 decommission moveu de game/dialogues/ via git mv),
 //      carregado via gus::app::dialogue::load_dialogue_graph_from_file;
 //   2) o runtime POCO (gus::domain::dialogue::DialogueRuntime) escrevendo em
 //      SaveData::flags por referencia (ADR-014: domain/dialogue NAO depende de

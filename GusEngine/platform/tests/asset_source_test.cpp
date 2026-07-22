@@ -271,8 +271,8 @@ TEST_CASE(
     FilesystemAssetSource src;
     // Mesmo pedindo um id de OUTRO arquivo, o override literal manda (paridade com
     // resolve_translations_path: devolve o env AS-IS, sem juntar com o id).
-    REQUIRE(src.resolve_path("game/translations/pt_br.md") == literal.string());
-    const auto bytes = src.read("game/translations/pt_br.md");
+    REQUIRE(src.resolve_path("resources/translations/pt_br.md") == literal.string());
+    const auto bytes = src.read("resources/translations/pt_br.md");
     REQUIRE(bytes.has_value());
 }
 
@@ -281,7 +281,7 @@ TEST_CASE(
     "[asset_source]") {
     ScopedUnsetEnv no_env("GUSWORLD_TRANSLATIONS");
     FilesystemAssetSource src;
-    const std::string id = "game/translations/pt_br.md";
+    const std::string id = "resources/translations/pt_br.md";
     const std::string compiled = GUSWORLD_TRANSLATIONS_DIR;
     const std::string expected = !compiled.empty() ? join(compiled, "pt_br.md") : id;
     REQUIRE(src.resolve_path(id) == expected);
@@ -300,9 +300,9 @@ TEST_CASE(
     // Mesmo pedindo um id de OUTRO arquivo, o override literal manda (paridade com
     // resolve_npc_intro_bertoldo_dialogue_path: devolve o env AS-IS, sem juntar com o
     // id).
-    REQUIRE(src.resolve_path("game/dialogues/npc_intro_bertoldo.dlg.txt") ==
+    REQUIRE(src.resolve_path("resources/dialogues/npc_intro_bertoldo.dlg.txt") ==
             literal.string());
-    const auto bytes = src.read("game/dialogues/npc_intro_bertoldo.dlg.txt");
+    const auto bytes = src.read("resources/dialogues/npc_intro_bertoldo.dlg.txt");
     REQUIRE(bytes.has_value());
 }
 
@@ -312,7 +312,7 @@ TEST_CASE(
     "[asset_source]") {
     ScopedUnsetEnv no_env("GUSWORLD_DIALOGUES");
     FilesystemAssetSource src;
-    const std::string id = "game/dialogues/npc_intro_bertoldo.dlg.txt";
+    const std::string id = "resources/dialogues/npc_intro_bertoldo.dlg.txt";
     const std::string compiled = GUSWORLD_DIALOGUES_DIR;
     const std::string expected =
         !compiled.empty() ? join(compiled, "npc_intro_bertoldo.dlg.txt") : id;
@@ -433,12 +433,12 @@ private:
 TEST_CASE("FakeAssetSource: read/stat servem do mapa in-memory, sem tocar disco",
           "[asset_source]") {
     FakeAssetSource fake;
-    fake.put("game/translations/pt_br.md", "## X\nvalor\n");
-    const auto bytes = fake.read("game/translations/pt_br.md");
+    fake.put("resources/translations/pt_br.md", "## X\nvalor\n");
+    const auto bytes = fake.read("resources/translations/pt_br.md");
     REQUIRE(bytes.has_value());
     REQUIRE(bytes->size() == std::string("## X\nvalor\n").size());
     REQUIRE_FALSE(fake.read("ausente").has_value());
-    const auto info = fake.stat("game/translations/pt_br.md");
+    const auto info = fake.stat("resources/translations/pt_br.md");
     REQUIRE(info.has_value());
     REQUIRE(info->size == std::string("## X\nvalor\n").size());
 }

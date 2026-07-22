@@ -3,8 +3,9 @@
 // Catch2 (headless) do I/O do grafo de dialogo do Bertoldo (M7-DIALOGO, NPC-MVP):
 // resolve_npc_intro_bertoldo_dialogue_path (resolucao de caminho) +
 // load_dialogue_graph_from_file (le + delega ao parser POCO de dominio). Prova,
-// entre outras coisas, que o ARQUIVO REAL SHIPADO (game/dialogues/
-// npc_intro_bertoldo.dlg.txt) parseia sem erro fim-a-fim (nao so um fixture inline).
+// entre outras coisas, que o ARQUIVO REAL SHIPADO (resources/dialogues/
+// npc_intro_bertoldo.dlg.txt, M8 decommission moveu de game/dialogues/ via git mv)
+// parseia sem erro fim-a-fim (nao so um fixture inline).
 
 #include <catch2/catch_test_macros.hpp>
 
@@ -64,7 +65,7 @@ TEST_CASE("load_dialogue_graph_from_file: conteudo malformado PROPAGA "
 }
 
 TEST_CASE("load_dialogue_graph_from_file: o ARQUIVO REAL shipado "
-          "(game/dialogues/npc_intro_bertoldo.dlg.txt) parseia OK fim-a-fim",
+          "(resources/dialogues/npc_intro_bertoldo.dlg.txt) parseia OK fim-a-fim",
           "[npc_dialogue][catalog][integracao]") {
     const std::string path = resolve_npc_intro_bertoldo_dialogue_path();
     const auto graph = load_dialogue_graph_from_file(path);

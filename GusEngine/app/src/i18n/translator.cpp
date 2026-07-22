@@ -56,7 +56,8 @@ std::string resolve_translations_path() {
     // ASSETS-VFS-F1 (ADR-013): a cadeia `env GUSWORLD_TRANSLATIONS = override LITERAL >
     // macro GUSWORLD_TRANSLATIONS_DIR > CWD (kTranslationsDir)` foi CONSOLIDADA em
     // FilesystemAssetSource::resolve_path (familia I18N, dispatch pelo prefixo
-    // "game/translations/" do id). Assinatura/contrato INTOCADOS - paridade provada em
+    // "resources/translations/" do id, M8 decommission moveu de "game/translations/"
+    // via git mv). Assinatura/contrato INTOCADOS - paridade provada em
     // platform/tests/asset_source_test.cpp.
     const std::string id =
         join(std::string(gus::core::assets::kTranslationsDir),

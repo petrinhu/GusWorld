@@ -92,7 +92,7 @@ int main() {
         return 1;
     }
 
-    // Traducao REAL (game/translations/pt_br.md) - prova o texto de PRODUCAO, nao
+    // Traducao REAL (resources/translations/pt_br.md) - prova o texto de PRODUCAO, nao
     // um valor sintetico digitado no probe.
     gus::app::i18n::Translator translator;
     const std::string tr_path = gus::app::i18n::resolve_translations_path();

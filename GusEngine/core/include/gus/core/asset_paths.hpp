@@ -154,22 +154,24 @@ inline constexpr std::string_view kDistritosInferioresGmapFile =
     "distritos_inferiores.gmap";
 
 // ============================================================================
-// TRADUCOES (catalogos i18n, sob game/translations/).
+// TRADUCOES (catalogos i18n, sob resources/translations/ - M8 decommission
+// Godot moveu de game/translations/ preservando historico via git mv).
 // ============================================================================
 
 // Pasta dos catalogos de traducao.
-inline constexpr std::string_view kTranslationsDir = "game/translations";
+inline constexpr std::string_view kTranslationsDir = "resources/translations";
 // Catalogo do locale dev primario (pt-br).
 inline constexpr std::string_view kTranslationPtBrFile = "pt_br.md";
 
 // ============================================================================
-// DIALOGO (grafos .dlg.txt do formato-texto proprio, ADR-014, sob game/dialogues/
-// - mesma raiz irma de kTranslationsDir, conteudo de JOGO editavel pelo narrative-
-// designer/narrative-writer).
+// DIALOGO (grafos .dlg.txt do formato-texto proprio, ADR-014, sob
+// resources/dialogues/ - mesma raiz irma de kTranslationsDir, conteudo de JOGO
+// editavel pelo narrative-designer/narrative-writer; M8 moveu de
+// game/dialogues/ preservando historico via git mv).
 // ============================================================================
 
 // Pasta dos grafos de dialogo (.dlg.txt).
-inline constexpr std::string_view kDialoguesDir = "game/dialogues";
+inline constexpr std::string_view kDialoguesDir = "resources/dialogues";
 // Grafo do NPC introdutorio do VS (M7-DIALOGO/NPC-MVP, Seu Bertoldo Caim, F2-N.1).
 inline constexpr std::string_view kNpcIntroBertoldoDlgFile =
     "npc_intro_bertoldo.dlg.txt";

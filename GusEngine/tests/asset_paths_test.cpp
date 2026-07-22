@@ -58,7 +58,7 @@ TEST_CASE("asset_paths: fonte/mapa/traducao centralizados", "[core][assets]") {
     REQUIRE(ap::kMapsCompiledDir == std::string_view("assets/maps/compiled"));
     REQUIRE(ap::kDistritosInferioresGmapFile ==
             std::string_view("distritos_inferiores.gmap"));
-    REQUIRE(ap::kTranslationsDir == std::string_view("game/translations"));
+    REQUIRE(ap::kTranslationsDir == std::string_view("resources/translations"));
     REQUIRE(ap::kTranslationPtBrFile == std::string_view("pt_br.md"));
 }
 
