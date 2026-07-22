@@ -130,52 +130,6 @@ set(GLINTFX_BACKEND_GLFW OFF CACHE BOOL "" FORCE)  # embed-only (sem GLFW)
 # NAO tem CMakeLists.txt); e o que o consumer-example oficial do glintfx aponta. Sem isto,
 # MakeAvailable popula mas NAO adiciona o subdir => alvo glintfx::glintfx nao existe.
 #
-# GLINTFX-INTEGRACAO F1 (2026-07-21): a partir da v0.12.0 o glintfx atomizou em modulos
-# opt-in GLINTFX_MODULE_* (framework 2D, ADR-0015 do lado deles). Fixando EXPLICITAMENTE
-# os 3 que usamos e desligando o resto, em vez de depender do default de cada flag:
-#   - GLINTFX_MODULE_TEXT ON: reservada mas FORCADA ON nesta versao (FATAL_ERROR se OFF -
-#     ainda nao ha caminho OFF real, ver comentario da propria option() no CMakeLists do
-#     glintfx). Setar ON aqui e so documentar a dependencia, nao muda nada.
-#   - GLINTFX_MODULE_FX ON: usamos polygon()/image-tint() como decorator RCSS (recolor de
-#     carta) - sem este modulo os 3 TUs de decorator (decorator_polygon/image_tint/ripple)
-#     saem do binario e o RCSS correspondente vira no-op silencioso (fail-high documentado
-#     do lado deles, mas silencioso pra nos = regressao visual). Ja e o default ON; fixado
-#     aqui por clareza/estabilidade contra bump futuro que troque o default.
-#   - GLINTFX_MODULE_AUDIO/GAMEPAD/I18N OFF: nao usamos ainda (audio = miniaudio vendorizado
-#     nosso, TODO GLINTFX-INTEGRACAO F2 separado; i18n = translator C++ proprio no domain;
-#     gamepad = fora de escopo). Real ON/OFF (nao reservada) - default de fabrica e ON pros
-#     3; desligar aqui evita linkar codigo/dep que nao usamos (ex.: nao expor evdev).
-#   - GLINTFX_MODULE_WINDOW OFF: alias de GLINTFX_BACKEND_GLFW (ja fixado OFF acima desde
-#     o embed-only original); o glintfx v0.16 espelha o valor de BACKEND_GLFW dentro de
-#     MODULE_WINDOW automaticamente (ver comentario "alias target" no CMakeLists deles) -
-#     nao precisa ser setado 2x, so registrado aqui pra quem procurar a flag pelo nome novo.
-#   - "UI" e "INPUT" NAO SAO flags reais nesta versao (nomes RESERVADOS pela ADR-0015 (b/c)
-#     do lado deles, ainda nao introduzidos - "UI" e o produto inteiro de hoje sem gate,
-#     "INPUT" foi decidido D1 a nunca existir como nome guarda-chuva, gamepad ganhou atomo
-#     proprio GLINTFX_MODULE_GAMEPAD em vez de cair dentro de MODULE_INPUT). Nada a setar.
-#
-# GLINTFX_OWN_FONT_ENGINE OFF (opt-out do font-flip, ADR-009): desde a v0.10 o default de
-# RUNTIME do UiLayer/App virou FontEngine::Own (motor de fonte proprio clean-room do
-# glintfx, nao FreeType) - ver UiLayerConfig::font_engine em glintfx/include/glintfx/
-# ui_layer.hpp. Nos usamos FreeType (PixelOperatorMono, goldens calibrados por DPI); o
-# opt-out documentado do lado deles e de UMA linha em UiLayerConfig::font_engine, mas isso
-# tocaria nosso codigo de consumo (fora do escopo desta bump, "consumo intocado"). Em vez
-# disso, desligamos o motor proprio em TEMPO DE BUILD: com GLINTFX_OWN_FONT_ENGINE=OFF o
-# modulo nem entra no binario, e o proprio Bootstrap::init() deles cai no fallback pra
-# FreeType SEMPRE que alguem (nos, ou codigo futuro que nunca sete font_engine) pedir
-# FontEngine::Own - fail-safe, nao fail-silent (loga 1 warning por init(), documentado no
-# doc-comment de FontEngine). Resultado: rasterizacao byte-identica sem tocar 1 linha de
-# app/, mais forte que so setar o campo runtime (cobre qualquer call site futuro tambem).
-# Trade-off registrado: pos-M8, o item GLINTFX-FONTFLIP-VALIDATE (A/B dos 2 motores) vai
-# precisar religar esta flag ON + reconfigure pra experimentar o motor proprio de novo -
-# nao e regressao, e o preco de "fail-safe por padrao" ate la.
-set(GLINTFX_MODULE_TEXT      ON  CACHE BOOL "" FORCE)
-set(GLINTFX_MODULE_FX        ON  CACHE BOOL "" FORCE)
-set(GLINTFX_MODULE_AUDIO     OFF CACHE BOOL "" FORCE)
-set(GLINTFX_MODULE_GAMEPAD   OFF CACHE BOOL "" FORCE)
-set(GLINTFX_MODULE_I18N      OFF CACHE BOOL "" FORCE)
-set(GLINTFX_OWN_FONT_ENGINE  OFF CACHE BOOL "" FORCE)
-#
 # BUMP v0.2.4 -> v0.2.5 (decisao Caetano/CTO 2026-07-02, higiene pre-M7): a v0.2.5 entrega
 # UiLayer::set_click_callback (hit-test de elemento NATIVO do glintfx, reportando o id do
 # elemento clicado) - mata a divida do hit-test manual dos 6 pills de verbo do cockpit
@@ -195,27 +149,10 @@ set(GLINTFX_OWN_FONT_ENGINE  OFF CACHE BOOL "" FORCE)
 # handle_mouse_motion/navegacao) - controls_row_visible_in_list (BUG-A, filtro de
 # hit-test por recorte visivel) RECONCILIADO com a geometria JA ROLADA que
 # get_element_box passa a devolver.
-#
-# BUMP v0.9.2 -> v0.16.0 (GLINTFX-INTEGRACAO F1, decisao do lider 2026-07-21, saida do
-# freeze framework-2D): gap de 6 minors (v0.10-v0.16), aditivo - CHANGELOG do glintfx nao
-# remove API existente ate aqui. Verificado antes do bump (leitura do CMakeLists deles
-# apos fetch): pin do RmlUi continua no MESMO SHA 2cd28864 (nosso patch teardown-UB segue
-# aplicavel, reverificado - diff byte-a-byte contra patches/rmlui-2cd28864-teardown-ub.patch
-# deles = identico); alvo glintfx::glintfx (ALIAS) continua existindo (consumo em
-# app/CMakeLists.txt intocado). Consumo real: ZERO ajuste de codigo em app/ - so este
-# bloco de CMake (GIT_TAG + os GLINTFX_MODULE_*/GLINTFX_OWN_FONT_ENGINE explicitos acima,
-# ver os comentarios deles pro raciocinio completo por flag: TEXT/FX ON, AUDIO/GAMEPAD/
-# I18N/WINDOW OFF, motor de fonte proprio OFF pra manter FreeType byte-identico). Ganhos
-# que vieram de graca com o bump (nao pedidos, so herdados): GLSYM-COLLISION resolvido
-# desde a v0.11.2 (globais do loader prefixados glx_, ver memoria reference_glintfx_api.md
-# secao GLSYM-COLLISION - preocupacao de link-order que tinhamos documentada como risco
-# latente agora fechada, sem nada a fazer do nosso lado) + hardening geral das versoes
-# intermediarias. Build local + suite completa (2394 testes) verdes no pin novo antes
-# deste commit (ver relatorio da onda GLINTFX-INTEGRACAO-F1).
 FetchContent_Declare(
     glintfx
     GIT_REPOSITORY https://codeberg.org/petrinhu/glintfx
-    GIT_TAG        v0.16.0
+    GIT_TAG        v0.9.2
     SOURCE_SUBDIR  glintfx
 )
 FetchContent_MakeAvailable(glintfx)
