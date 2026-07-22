@@ -256,11 +256,24 @@ set(GLINTFX_OWN_FONT_ENGINE  OFF CACHE BOOL "" FORCE)
 # Com o guard a montante, o shim temporario de portabilidade (alvo INTERFACE "m" vazio
 # so no Windows) que tinhamos aqui deixou de ser necessario e foi removido neste mesmo
 # commit, como planejado no proprio comentario do shim.
+#
+# BUMP v0.18.1 -> v0.19.0 (GLINTFX-INTEGRACAO, 2026-07-22): aditiva, CI deles 9/9 verde
+# (inclui MSVC). Traz canal de input fisico no App (is_key_down/is_mouse_button_down/
+# get_cursor_pos), set_key_callback de borda, ciclo de vida de janela (set_close_
+# request_callback com veto, request_close, foco/minimizacao) e throttle do flood de log
+# do RmlUi ("No font face defined"). Nada disso e consumido aqui - o input/lifecycle e
+# pre-requisito da F4 (migracao da casca SDL pro App mode), decisao separada; so o
+# throttle de log tem efeito passivo (nosso embed passa pelo mesmo caminho de log).
+# Revalidado apos fetch: flags GLINTFX_MODULE_TEXT/_FX/_AUDIO/_GAMEPAD/_I18N/_WINDOW e
+# GLINTFX_BACKEND_GLFW/GLINTFX_OWN_FONT_ENGINE continuam com os mesmos nomes; guard de
+# plataforma do libm (GLINTFX-LIBM-SHIM) continua em glintfx_audio; pin do RmlUi continua
+# no MESMO SHA 2cd28864 (patch teardown-UB segue aplicavel). Suite completa verde no pin
+# novo antes deste commit.
 
 FetchContent_Declare(
     glintfx
     GIT_REPOSITORY https://codeberg.org/petrinhu/glintfx
-    GIT_TAG        v0.18.1
+    GIT_TAG        v0.19.0
     SOURCE_SUBDIR  glintfx
 )
 FetchContent_MakeAvailable(glintfx)
