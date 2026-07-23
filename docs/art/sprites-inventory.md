@@ -122,3 +122,28 @@ Detalhe da ferramenta em `reference_pixellab_mcp` (memória). Resumo:
 
 Saldo/limites: Tier 1, 2000 gerações/ciclo, máx 8 jobs concorrentes; `get_balance`
 e `list_*` não gastam.
+
+## Balde `resources/images/` (props de lore + conceitos de personagem)
+
+Distinto de `sprites/` (sprites de jogo direcionais). Aqui vivem props/lore e
+arte-conceito. **Organizado 2026-07-23 em subpastas** espelhando a taxonomia de
+`resources/prompts_images/` (era um dump plano; reorganizado):
+
+- `flora/` (6), `fauna/` (6) — criaturas/plantas fractais (easter-egg Fibonacci)
+- `architecture/` (9) — colunas Boróstoma/Janor, ashlar, pavimento tesselado (maçônico)
+- `consumables/` (7) — bolo de bit, café de neurônio, poções
+- `runic_cards/` (5) — as 5 cartas-família (electric/sonic/biochemical/cryptographic/kinetic)
+- `logos_glyphs/` (8), `traditions/` (3), `vehicles/` (5), `props/` (10), `ui_frames/` (2)
+- `card-frame-tests/` — mockups de moldura de carta (alguns tracked)
+
+**NA RAIZ (não mover):** `vance_dragon_glyph.png` — o jogo carrega daqui
+(`asset_paths.hpp` kVanceDragonGlyphFile); é o único game-loaded, e é tracked.
+
+### Conceitos de personagem (HD chibi front, fundo branco) = REFERÊNCIA de geração
+Ilustrações HD (2048px) de personagens que **NÃO têm pasta de sprite ainda** — são
+a semente pra gerar os sprites de jogo (via a pipeline de referência). Na raiz de
+`images/` aguardando geração: **Anaximandro Vyrcátrix, Anhuera Vanderbist, Cassiano
+Vorto, Yara Ducourt, Anslemo Boroshova, Mariana Vanderbist**. Fluxo: concept →
+gerar 4 direções (no_background) → `sprites/<slug>/`. `aleatorio.png` = órfão
+(rosto de mercenário cyber-tático que NÃO bate com o Sterling corporativo; aguarda
+atribuição de canon antes de virar personagem).
