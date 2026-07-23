@@ -1,8 +1,8 @@
 # Testes headless (Catch2 v3) de core/ + domain/.
 #
-# Estes testes NAO linkam Qt: exercitam apenas as camadas puras, do mesmo jeito
-# que a logica do jogo roda hoje sem abrir o Godot. Qt Test (camada platform/)
-# entra em M1+, quando houver janela/input/audio para testar.
+# Estes testes NAO linkam SDL3/OpenGL/glintfx: exercitam apenas as camadas
+# puras (core/ + domain/), headless. platform/ e app/ tambem sao cobertos por
+# Catch2 (sem framework de teste separado por camada), em suites proprias.
 #
 # Integra ao ctest via catch_discover_tests (cada TEST_CASE vira um teste).
 

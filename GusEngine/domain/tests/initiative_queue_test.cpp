@@ -23,8 +23,10 @@
 #include "gus/domain/combat/combat_actor.hpp"
 #include "gus/domain/combat/combat_enums.hpp"
 #include "gus/domain/combat/initiative_queue.hpp"
+#include "initiative_queue_test_access.hpp"
 
 using namespace gus::domain::combat;
+using gus::domain::tests::InitiativeQueueRawReorderTestAccess;
 
 namespace {
 
@@ -88,7 +90,7 @@ TEST_CASE("initiative_queue: reorder_actor adianta com delta negativo",
     CombatActor a = actor("a", 30), b = actor("b", 20), c = actor("c", 10);
     InitiativeQueue q({&a, &b, &c});
     // ordem inicial: a, b, c. Adianta c em 2 (-2) -> c, a, b
-    q.reorder_actor(q.order()[2], -2);
+    InitiativeQueueRawReorderTestAccess::reorder_actor(q, q.order()[2], -2);
     REQUIRE(order_ids(q) == std::vector<std::string>{"c", "a", "b"});
 }
 
@@ -97,7 +99,7 @@ TEST_CASE("initiative_queue: reorder_actor atrasa com delta positivo",
     CombatActor a = actor("a", 30), b = actor("b", 20), c = actor("c", 10);
     InitiativeQueue q({&a, &b, &c});
     // atrasa a em 1 (+1) -> b, a, c (knockback tipico)
-    q.reorder_actor(q.order()[0], +1);
+    InitiativeQueueRawReorderTestAccess::reorder_actor(q, q.order()[0], +1);
     REQUIRE(order_ids(q) == std::vector<std::string>{"b", "a", "c"});
 }
 
@@ -106,7 +108,7 @@ TEST_CASE("initiative_queue: reorder_actor clamp no inicio",
     CombatActor a = actor("a", 30), b = actor("b", 20), c = actor("c", 10);
     InitiativeQueue q({&a, &b, &c});
     // tenta adiantar b em -5 (alem do indice 0) -> clamp pro topo: b, a, c
-    q.reorder_actor(q.order()[1], -5);
+    InitiativeQueueRawReorderTestAccess::reorder_actor(q, q.order()[1], -5);
     REQUIRE(order_ids(q) == std::vector<std::string>{"b", "a", "c"});
 }
 
@@ -115,7 +117,7 @@ TEST_CASE("initiative_queue: reorder_actor clamp no fim",
     CombatActor a = actor("a", 30), b = actor("b", 20), c = actor("c", 10);
     InitiativeQueue q({&a, &b, &c});
     // tenta atrasar a em +99 (alem do ultimo) -> clamp pro fim: b, c, a
-    q.reorder_actor(q.order()[0], +99);
+    InitiativeQueueRawReorderTestAccess::reorder_actor(q, q.order()[0], +99);
     REQUIRE(order_ids(q) == std::vector<std::string>{"b", "c", "a"});
 }
 
@@ -123,7 +125,7 @@ TEST_CASE("initiative_queue: reorder_actor delta zero e noop",
           "[domain][combat][queue]") {
     CombatActor a = actor("a", 30), b = actor("b", 20);
     InitiativeQueue q({&a, &b});
-    q.reorder_actor(q.order()[0], 0);
+    InitiativeQueueRawReorderTestAccess::reorder_actor(q, q.order()[0], 0);
     REQUIRE(order_ids(q) == std::vector<std::string>{"a", "b"});
 }
 
@@ -132,7 +134,8 @@ TEST_CASE("initiative_queue: reorder_actor ator inexistente lanca",
     CombatActor a = actor("a", 30);
     InitiativeQueue q({&a});
     CombatActor estranho = actor("z", 99);
-    REQUIRE_THROWS_AS(q.reorder_actor(&estranho, +1), std::invalid_argument);
+    REQUIRE_THROWS_AS(InitiativeQueueRawReorderTestAccess::reorder_actor(q, &estranho, +1),
+                     std::invalid_argument);
 }
 
 // ---- Current / Advance (ciclico + RoundIndex) -------------------------------------
@@ -206,7 +209,7 @@ TEST_CASE("initiative_queue: sync_cursor_to reaponta pro ator dado",
     CombatActor a = actor("a", 30), b = actor("b", 20), c = actor("c", 10);
     InitiativeQueue q({&a, &b, &c});  // current = a
     // a leva knockback (+1) no proprio turno -> ordem b, a, c, mas a NAO perde o turno.
-    q.reorder_actor(&a, +1);
+    InitiativeQueueRawReorderTestAccess::reorder_actor(q, &a, +1);
     q.sync_cursor_to(&a);
     REQUIRE(q.current()->id() == "a");
 }
@@ -292,7 +295,8 @@ TEST_CASE("initiative_queue: regroup_stable agrupa por predicado preservando ord
     InitiativeQueue q({&pA1, &pA2, &eB1, &eB2});  // sort SPD: [pA1, eB1, pA2, eB2]
     REQUIRE(order_ids(q) == std::vector<std::string>{"pA1", "eB1", "pA2", "eB2"});
 
-    q.reorder_actor(&pA1, +2);  // empurra pA1 pra tras -> [eB1, pA2, pA1, eB2]
+    // empurra pA1 pra tras -> [eB1, pA2, pA1, eB2]
+    InitiativeQueueRawReorderTestAccess::reorder_actor(q, &pA1, +2);
     REQUIRE(order_ids(q) == std::vector<std::string>{"eB1", "pA2", "pA1", "eB2"});
 
     q.regroup_stable([](const CombatActor* a) { return a->is_player_side(); });

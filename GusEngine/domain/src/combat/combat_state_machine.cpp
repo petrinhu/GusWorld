@@ -1928,7 +1928,8 @@ void CombatStateMachine::resolve_use_card(CombatActor& actor, const CombatAction
             cast_ctx.combatants = &queue_.order();
             // DelayAction (Einstein/OnCast, ADR-016 step 7): a fila REAL (nao so o
             // snapshot ordenado de combatants) - handle_delay_action reordena via
-            // InitiativeQueue::reorder_actor (mesma primitiva do Gambito).
+            // InitiativeQueue::reorder_pending (mesma primitiva do Gambito; reorder_actor foi
+            // privatizada no M9, 2026-07-22).
             cast_ctx.queue = &queue_;
             // RevealIntent (John Dee/Black-Mirror, ADR-016 step 8): mesmo registry id->
             // IEnemyBrain* ja injetado na FSM, pro dump ler o intent de cada inimigo.

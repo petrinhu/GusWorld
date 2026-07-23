@@ -2,8 +2,8 @@
 //
 // Fila de iniciativa por-ator (CTB-style), SEMPRE VISIVEL ao jogador (secao 4). E
 // mecanica central: o Gambito opera sobre esta fila. Ordenada por SPD desc na
-// construcao; reordenacoes manuais (reorder_actor / knockback / Gambito) persistem ate
-// a proxima recomputacao natural por SPD. Portado de
+// construcao; reordenacoes manuais (reorder_pending / delay_current / Gambito / Knockback)
+// persistem ate a proxima recomputacao natural por SPD. Portado de
 // engine/foundation/turn_combat/InitiativeQueue.cs. POCO puro, ZERO Qt (invariante de
 // domain/, engine-design.md secao 2).
 //
@@ -30,6 +30,10 @@
 #include <vector>
 
 #include "gus/domain/combat/combat_actor.hpp"
+
+namespace gus::domain::tests {
+struct InitiativeQueueRawReorderTestAccess;
+}  // namespace gus::domain::tests
 
 namespace gus::domain::combat {
 
@@ -58,20 +62,11 @@ public:
     // Indice da rodada completa de fila (0-based). Governa o ramp de mana (secao 3/5).
     [[nodiscard]] int round_index() const noexcept { return round_index_; }
 
-    // Move um ator delta_pos casas (negativo = adiantar, positivo = atrasar). Clamp nos
-    // limites da fila [0, count-1] SEM olhar o cursor: pode cruzar current() e reescrever
-    // a regiao [0, cursor_], desincronizando current()/identidade de quem ja agiu (raiz do
-    // bug GambitReorder-duplo/Knockback-pula-vizinho, achado QA 2026-07-15). NAO USAR EM
-    // MEIO DE RODADA: primitiva CRUA de fronteira/porte (regroup_stable/recompute_by_speed
-    // chamam sobre a fila inteira, fora de um turno em andamento). Prefira
-    // reorder_pending/delay_current pra qualquer reordenacao intra-rodada (Gambito/
-    // Knockback/Einstein). Lanca std::invalid_argument se o ator nao esta na fila.
-    void reorder_actor(CombatActor* actor, int delta_pos);
-
     // Reordena um ator PENDENTE (ainda nao agiu nesta rodada) delta_pos casas, SEM jamais
     // cruzar o cursor: clamp em [cursor()+1, count()-1]. Primitiva SEGURA de Gambito-
     // Reordenar/Knockback-em-outro-ator/Einstein (decisao do lider 2026-07-15, A1/A3) - ao
-    // contrario de reorder_actor, a regiao [0, cursor()] NUNCA e tocada, entao current() e
+    // contrario da antiga reorder_actor (privatizada no M9, 2026-07-22 - ver secao private
+    // abaixo), a regiao [0, cursor()] NUNCA e tocada, entao current() e
     // todo ator com indice <= cursor() preservam identidade por construcao. Alvo ausente:
     // lanca std::invalid_argument. Alvo e o current() OU ja agiu (indice <= cursor()):
     // no-op, retorna 0 (dissipacao - a carta ja gastou o custo, so o efeito nao se aplica;
@@ -91,8 +86,8 @@ public:
     // Haste/Slow). secao 4. Mantem o cursor apontando pro ator que estava em turno.
     void recompute_by_speed();
 
-    // Re-sincroniza o cursor pra continuar apontando para actor (FSM quando um
-    // reorder_actor no proprio tick muda a ordem mas o ator NAO perde o turno). secao 4.
+    // Re-sincroniza o cursor pra continuar apontando para actor (FSM quando uma
+    // reordenacao no proprio tick muda a ordem mas o ator NAO perde o turno). secao 4.
     // No-op se o ator nao esta na fila.
     void sync_cursor_to(CombatActor* actor);
 
@@ -135,6 +130,26 @@ public:
     [[nodiscard]] int index_of(CombatActor* actor) const;
 
 private:
+    // Acesso de teste-only pro reorder_actor privado logo abaixo (privatizacao M9,
+    // COMBATE-FILA-CURSOR-FIX, decisao do lider 2026-07-15/fechamento 2026-07-22): os testes
+    // que exercitam o clamp CRU [0, count()-1] ignorando o cursor (a prova do proprio
+    // invariante que motivou privatizar a funcao) nao tem equivalente publico - nenhuma
+    // primitiva publica cruza o cursor por design. Friend de TESTE, nunca de producao; ver
+    // domain/tests/initiative_queue_test_access.hpp.
+    friend struct gus::domain::tests::InitiativeQueueRawReorderTestAccess;
+
+    // Move um ator delta_pos casas (negativo = adiantar, positivo = atrasar). Clamp nos
+    // limites da fila [0, count-1] SEM olhar o cursor: pode cruzar current() e reescrever
+    // a regiao [0, cursor_], desincronizando current()/identidade de quem ja agiu (raiz do
+    // bug GambitReorder-duplo/Knockback-pula-vizinho, achado QA 2026-07-15). PRIVATIZADA no
+    // M9 (2026-07-22): os 3 callers de producao (Gambito/Knockback/Einstein) ja tinham
+    // migrado pra reorder_pending/delay_current desde 2026-07-15 (decisao do lider, A1/A3);
+    // mante-la publica so deixava a porta aberta pra codigo novo reintroduzir a mesma classe
+    // de bug sem perceber. Nao chamada por nenhum outro metodo desta classe hoje - sobrevive
+    // como primitiva crua documentada, acessivel so a friend de teste (ver acima). Lanca
+    // std::invalid_argument se o ator nao esta na fila.
+    void reorder_actor(CombatActor* actor, int delta_pos);
+
     std::vector<CombatActor*> order_;
     int cursor_ = 0;
     int round_index_ = 0;

@@ -144,8 +144,9 @@ set(GLINTFX_BACKEND_GLFW OFF CACHE BOOL "" FORCE)  # embed-only (sem GLFW)
 #   - GLINTFX_MODULE_AUDIO ON (GLINTFX-INTEGRACAO F2, 2026-07-22): a partir desta onda o
 #     audio do jogo vem do modulo glintfx::Audio (glintfx_audio, OBJECT library dobrada no
 #     alvo glintfx STATIC - ver comentario do bump abaixo) em vez do miniaudio vendorizado
-#     nosso (third_party/miniaudio, aposentado deste bloco em diante - continua no disco ate
-#     a limpeza fisica do M9). platform/src/audio/audio_engine.cpp (fachada AudioEngine,
+#     nosso (era third_party/miniaudio; removido do disco na higiene do M9 - o miniaudio
+#     que sobra vem vendorizado pelo glintfx em _deps/glintfx-src/glintfx/third_party/
+#     miniaudio/). platform/src/audio/audio_engine.cpp (fachada AudioEngine,
 #     header intocado) consome glintfx::Audio por baixo do PImpl.
 #   - GLINTFX_MODULE_GAMEPAD/I18N OFF: nao usamos ainda (i18n = translator C++ proprio no
 #     domain; gamepad = fora de escopo). Real ON/OFF (nao reservada) - default de fabrica e
@@ -244,8 +245,9 @@ set(GLINTFX_OWN_FONT_ENGINE  OFF CACHE BOOL "" FORCE)
 # GLINTFX-INTEGRACAO-F1 ainda deixava o modulo OFF. Consumo real:
 # platform/src/audio/audio_engine.cpp reescrito para falar com glintfx::Audio (ver o
 # cabecalho daquele arquivo); platform/CMakeLists.txt agora linka glintfx::glintfx e
-# nao inclui mais third_party/miniaudio (aposentado deste bloco em diante, so a
-# remocao FISICA do vendored fica pro M9). Suite completa (2394 testes, incluindo os
+# nao inclui mais third_party/miniaudio (removido do disco na higiene do M9; o
+# miniaudio que sobra vem vendorizado pelo glintfx em _deps/glintfx-src/glintfx/
+# third_party/miniaudio/). Suite completa (2394 testes, incluindo os
 # 21 de platform/tests/audio_engine_test.cpp intactos) verde antes deste commit.
 #
 # BUMP v0.18.0 -> v0.18.1 (GLINTFX-LIBM-SHIM, 2026-07-22): o glintfx taggeou o guard de

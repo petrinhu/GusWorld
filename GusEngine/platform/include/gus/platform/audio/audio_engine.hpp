@@ -1,7 +1,9 @@
 // gus/platform/audio/audio_engine.hpp
 //
 // AudioEngine: alicerce tecnico da camada de audio (M6 F1, ADR-011). Inicializa e
-// finaliza o device de audio via miniaudio (third_party/miniaudio, vendorizado) com
+// finaliza o device de audio via glintfx::Audio (GLINTFX-INTEGRACAO F2, 2026-07-22 -
+// miniaudio deixou de ser vendorizado direto neste repo; o glintfx compila e expoe o
+// device por baixo, ver nota completa no .cpp) com
 // RAII + degradacao graciosa: falha de init NUNCA crasha o jogo - vira "sem audio" com
 // log, e toda a API depois vira no-op (mesmo padrao de Render2dGl3(gl_active=false) e
 // Render2dSdl(nullptr) em platform/render2d - o jogo nunca depende de audio pra rodar).
@@ -16,22 +18,26 @@
 //   set_master_volume(v)
 //
 // MIXER MINIMO (ADR-011 item 3, "estrutura minima... volume master + separacao
-// musica/SFX"): 2 ma_sound_group internos (music/sfx), o suficiente pra separar o fade
-// de musica dos SFX fire-and-forget e preparar o terreno (aditivo, nao reescrita - ver
-// Reversibilidade do ADR) pro sistema de 5 buses de uma onda futura. NAO e esse sistema
-// completo.
+// musica/SFX"): 2 grupos logicos internos (music/sfx) - desde a GLINTFX-INTEGRACAO F2
+// emulados por-SoundId sobre glintfx::Audio (nao ha ma_sound_group real, ver
+// set_music_volume/set_sfx_volume abaixo e a nota no .cpp), mas o efeito observavel
+// (fade de musica separado dos SFX fire-and-forget) e o mesmo. Prepara o terreno
+// (aditivo, nao reescrita - ver Reversibilidade do ADR) pro sistema de 5 buses de uma
+// onda futura. NAO e esse sistema completo.
 //
 // NULL-DEVICE (device_active bool no construtor): mesmo padrao do Render2dGl3
 // (gl_active). true = tenta abrir o device real do SO (uso normal do jogo). false =
-// forca o modo noDevice do miniaudio (usado em testes/CI/smoke SEM hardware de audio
-// garantido) - o ma_engine continua funcional (carrega/gerencia sons de verdade), so
-// nao toca hardware. Em AMBOS os casos, se ma_engine_init falhar de verdade (nem o
-// device real nem o modo null sobem), available() fica false e a API inteira vira
-// no-op seguro (com log de aviso na construcao).
+// forca o modo noDevice do glintfx::Audio (miniaudio por baixo, usado em testes/CI/
+// smoke SEM hardware de audio garantido) - o engine continua funcional (carrega/
+// gerencia sons de verdade), so nao toca hardware. Em AMBOS os casos, se o init falhar
+// de verdade (nem o device real nem o modo null sobem), available() fica false e a API
+// inteira vira no-op seguro (com log de aviso na construcao).
 //
-// HEADER LIMPO (sem <miniaudio.h>): PImpl (mesmo padrao de Render2dGl3::Impl) - o .cpp
-// e a UNICA TU desta classe que inclui miniaudio.h; MINIAUDIO_IMPLEMENTATION e definido
-// so ali (third_party/miniaudio/miniaudio.h e single-header).
+// HEADER LIMPO (sem <glintfx/audio.hpp>): PImpl (mesmo padrao de Render2dGl3::Impl) -
+// o .cpp e a UNICA TU desta classe que inclui glintfx/audio.hpp e fala com o tipo
+// glintfx::Audio; nenhum tipo ma_* aparece nesta fachada (o glintfx compila o proprio
+// src/miniaudio_impl.c dele, confinado dentro da lib - ver nota GLINTFX-INTEGRACAO F2
+// no .cpp).
 //
 // Cross-ref: docs/tech/adr/ADR-011-m6-audio-onda1-plano.md (spec aprovada desta onda);
 //            platform/include/gus/platform/render2d/render2d_gl3.hpp (mesmo padrao de
@@ -55,8 +61,9 @@ inline constexpr SoundId kInvalidSound = 0;
 class AudioEngine {
 public:
     // device_active: true = tenta abrir o device de audio real do SO (uso normal do
-    // jogo, app/). false = forca o modo null-device do miniaudio (sem hardware -
-    // testes/CI/smoke sem garantia de placa de som). Falha de init do device REAL
+    // jogo, app/). false = forca o modo null-device (miniaudio por baixo do
+    // glintfx::Audio, sem hardware - testes/CI/smoke sem garantia de placa de som).
+    // Falha de init do device REAL
     // (sem soundcard/driver) tambem degrada com seguranca: available()==false, log de
     // aviso, e a API inteira vira no-op - o jogo nunca depende de audio pra rodar.
     explicit AudioEngine(bool device_active) noexcept;
@@ -65,7 +72,8 @@ public:
     AudioEngine(const AudioEngine&) = delete;
     AudioEngine& operator=(const AudioEngine&) = delete;
 
-    // true = o engine miniaudio subiu (device real OU null-device) e aceita chamadas.
+    // true = o engine de audio (glintfx::Audio, miniaudio por baixo) subiu (device
+    // real OU null-device) e aceita chamadas.
     // false = falha de init total - toda a API abaixo vira no-op seguro.
     [[nodiscard]] bool available() const noexcept;
 
@@ -115,10 +123,13 @@ public:
     [[nodiscard]] float master_volume() const noexcept;
 
     // Volume POR GRUPO (MENU-PAUSA-CONFIG-SOM, M7-COSTURA): musica e SFX
-    // independentes, em [0,1] (clampado), via ma_sound_group_set_volume nos 2
-    // ma_sound_group ja existentes (music_group/sfx_group, ADR-011 item 3). ADITIVO -
-    // NAO substitui set_master_volume (os dois multiplicam na cadeia do miniaudio:
-    // volume_efetivo = master * grupo). Guardado mesmo se available()==false (o
+    // independentes, em [0,1] (clampado). O glintfx::Audio nao tem ma_sound_group (nem
+    // nocao de bus): os 2 grupos (music_group/sfx_group, ADR-011 item 3) sao EMULADOS
+    // nesta fachada reaplicando set_volume() por-SoundId em todos os sons daquele tipo
+    // (ver nota GLINTFX-INTEGRACAO F2 no .cpp) - nao ha 1 multiplicador intermediario
+    // real na cadeia do miniaudio, mas o efeito observavel bate. ADITIVO - NAO substitui
+    // set_master_volume (os dois multiplicam o volume efetivo: volume_efetivo = master *
+    // grupo). Guardado mesmo se available()==false (o
     // slider de config funciona sem hardware, mesmo padrao de master_volume acima).
     void set_music_volume(float volume);
     [[nodiscard]] float music_volume() const noexcept;
@@ -162,8 +173,9 @@ public:
 private:
     void reap_finished_sfx_instances() noexcept;
 
-    struct Impl;                  // ma_engine + ma_sound_group + sons (PImpl - miniaudio
-                                   // fica confinado ao .cpp)
+    struct Impl;                  // glintfx::Audio + vetores de traducao de SoundId
+                                   // sfx/music (PImpl - miniaudio fica confinado dentro
+                                   // do glintfx, nunca toca esta TU nem o .cpp)
     std::unique_ptr<Impl> impl_;  // sempre nao-nulo (mesmo em modo indisponivel)
     float master_volume_ = 1.0f;
     float music_volume_ = 1.0f;  // MENU-PAUSA-CONFIG-SOM: volume do grupo music_group

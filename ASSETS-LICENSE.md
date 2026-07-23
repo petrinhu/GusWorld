@@ -18,11 +18,16 @@ GusWorld é **freeware** (grátis, pra sempre). Tem partes sob licenças diferen
 
 ## Código = GPLv3
 
-Cobre todo o código-fonte e os scripts de build:
+Cobre todo o código-fonte vigente e os scripts de build:
 
-- Fontes C# (`.cs`), C++ (`.cpp`, `.h`, `.hpp`)
-- Scripts GDScript (`.gd`) e scripts de tooling/editor
+- Fontes C++ (`.cpp`, `.h`, `.hpp`)
+- Scripts de tooling/editor
 - Scripts de build (CI, shell, empacotamento)
+
+**Histórico (2026-07-22):** fontes C# (`.cs`) e scripts GDScript (`.gd`) da era Godot
+não existem mais no repositório atual (decommission no marco M8; preservados na tag
+`pre-m8-godot-legacy`), mas **continuavam cobertos pela GPLv3 enquanto existiram**;
+esta seção não remove nem enfraquece aquela cobertura retroativa.
 
 A licença completa está em [LICENSE](LICENSE) (texto GPLv3 verbatim, imutável). Titular: petrinhu, 2026.
 
@@ -57,7 +62,13 @@ Ficam (no todo ou em parte) em `docs/book/`. Reprodução, distribuição ou obr
 
 ---
 
-## Regra de fronteira: arquivos de cena Godot (.tscn / .tres)
+## Regra de fronteira (histórica): arquivos de cena Godot (.tscn / .tres)
+
+> **Nota (2026-07-22):** o stack Godot/C# foi decommissionado no marco M8; arquivos
+> `.tscn` e `.tres` não existem mais no repositório (histórico preservado na tag
+> `pre-m8-godot-legacy`). A regra abaixo fica como registro de como a fronteira
+> código/asset foi resolvida naquela era; não se aplica a nenhum arquivo do
+> repositório atual.
 
 Arquivos `.tscn` e `.tres` podem ser **código** ou **asset** conforme o conteúdo:
 

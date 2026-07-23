@@ -1,15 +1,18 @@
 #!/usr/bin/env python3
 """PostToolUse hook: roda tools/check.sh (build + smoke + gate + suite) apos
 edicoes que tocam codigo/i18n da engine. Espelha o automatismo do
-PokemonTCGViewer, adaptado a stack C++/CMake/Catch2/Qt6 do GusWorld.
+PokemonTCGViewer, adaptado a stack C++20/SDL3/glintfx/CMake/Catch2 do
+GusWorld (engine unica em GusEngine/; o legado Godot/C# foi decommissionado
+no M8, 2026-07-22).
 
 COMPLEMENTAR ao tdd_guard_cpp.py (PreToolUse): o guard cobra teste-primeiro
 ANTES da escrita; este roda a suite DEPOIS. Os dois convivem no settings.json.
 
 CUIDADO DE PERFORMANCE / RUIDO (por que nao incomoda):
   1. FILTRO DE PATH: so dispara se o arquivo editado casa GATILHO (codigo da
-     engine, catalogos i18n, ou os proprios scripts de teste). Editar lore,
-     docs, game/ (C# Godot congelado) ou engine/ (submodulo) NAO dispara.
+     engine em GusEngine/, catalogos i18n em resources/translations/, ou os
+     proprios scripts de teste/check). Editar lore, docs ou resources/ fora
+     de translations/ NAO dispara.
   2. DEBOUNCE: numa rajada de N edits seguidos, roda no maximo 1x a cada
      DEBOUNCE_S segundos (marcador de tempo em build/.last_check). O ultimo
      edit da rajada sempre reflete o estado final (proxima chamada re-roda).
@@ -48,7 +51,7 @@ GATILHO_PREFIXOS = (
     "GusEngine/tests/",
     "GusEngine/CMakeLists.txt",
     "GusEngine/CMakePresets.json",
-    "game/translations/",   # catalogos i18n (gate de paridade)
+    "resources/translations/",  # catalogos i18n (gate de paridade)
     "tools/check.sh",
     "tools/i18n_parity.py",
 )

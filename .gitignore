@@ -1,14 +1,8 @@
-# Godot 4
-.godot/
-.import/
-export.cfg
-export_presets.cfg
-export_presets.cfg.user
-*.translation
-user://
-
 # Build outputs
 /build/
+
+# Symlink local pro clangd (gerado pelo CMake, nao versionavel)
+GusEngine/compile_commands.json
 
 # OS lixo
 .DS_Store
@@ -35,9 +29,6 @@ __pycache__/
 *.blend1
 *.blend2
 
-# Krita backup
-*~
-
 # Sessão Claude local (não versionar)
 .claude/local/
 
@@ -46,7 +37,6 @@ __pycache__/
 .TEXTREVIEW.md.kate-swp
 
 # Concept art / refs e PDFs soltos (locais, fora do repo) — F2-S.OPS.2
-resources/images/
 resumo.pdf
 
 # Ferramenta de dev Funplay MCP (addon SÓ-editor, de terceiro, auditado e
@@ -55,7 +45,6 @@ resumo.pdf
 .mcp.json
 
 # Assets de imagem/sprite (binarios grandes; uncommitted, controle do user)
-resources/images/
 resources/sprites/*
 # EXCECAO: icones/retratos do M5 (pixel-art pequenos) versionados pra backup. Politica: pixel-art pequeno = git normal; asset grande = LFS
 !resources/sprites/icons-m5/

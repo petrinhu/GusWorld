@@ -35,9 +35,11 @@
 #include "gus/domain/combat/combat_actor.hpp"
 #include "gus/domain/combat/combat_enums.hpp"
 #include "gus/domain/combat/initiative_queue.hpp"
+#include "initiative_queue_test_access.hpp"
 #include "property_gen.hpp"
 
 using namespace gus::domain::combat;
+using gus::domain::tests::InitiativeQueueRawReorderTestAccess;
 using gus::domain::tests::Lcg;
 
 namespace {
@@ -115,7 +117,7 @@ TEST_CASE("property: a fila mantem integridade sob qualquer sequencia de operaco
                     CombatActor* who = q.order()[static_cast<std::size_t>(
                         g.in_range(0, q.count() - 1))];
                     const int before_count = q.count();
-                    q.reorder_actor(who, g.in_range(-5, 5));
+                    InitiativeQueueRawReorderTestAccess::reorder_actor(q, who, g.in_range(-5, 5));
                     // INV-9f: reorder preserva o CONJUNTO (mesma cardinalidade, ator ainda
                     // presente) e mantem o cursor num indice VALIDO. NOTA: reorder NAO
                     // re-aponta current() por identidade de ator - ele preserva o INDICE do
@@ -215,7 +217,8 @@ TEST_CASE("property: remove/sync de ator ausente sao no-op; reorder ausente lanc
         REQUIRE(q.current() == cur_before);
 
         REQUIRE_FALSE(q.contains(&outsider));
-        REQUIRE_THROWS_AS(q.reorder_actor(&outsider, 1), std::invalid_argument);
+        REQUIRE_THROWS_AS(InitiativeQueueRawReorderTestAccess::reorder_actor(q, &outsider, 1),
+                         std::invalid_argument);
     }
 }
 

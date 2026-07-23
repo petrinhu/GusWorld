@@ -4,10 +4,11 @@
 // Formato-texto proprio (ADR-014, gus/domain/dialogue/dialogue_text.hpp) - o
 // SUCESSOR consumido pelo runtime C++ (DialogueRuntime/parse_text_to_dialogue_graph).
 //
-// O irmao "npc_intro_bertoldo.dialogue" (sintaxe DialogueManager, Godot) que vive
-// nesta MESMA pasta e um ARTEFATO HISTORICO do stub F2-E.6/ADR-003 - obsoleto pos-
-// ADR-008 (DA-2 do blueprint abaixo), preservado como historico, NAO consumido pelo
-// engine C++ atual. Este arquivo (.dlg.txt) e a fonte editavel de verdade.
+// Existiu um irmao "npc_intro_bertoldo.dialogue" (sintaxe DialogueManager, Godot),
+// artefato do stub F2-E.6/ADR-003, obsoleto pos-ADR-008 (DA-2 do blueprint abaixo) e
+// NAO consumido pelo engine C++ atual. Removido do disco no decommission do M8
+// (2026-07-22); o historico sobrevive na tag `pre-m8-godot-legacy`. Este arquivo
+// (.dlg.txt) e a fonte editavel de verdade.
 //
 // Blueprint canonico (roteiro/flags/reconvergencia): docs/design/narrativa/
 // dialogue-tree-npc-intro.md (F2-N.1, ratificado 2026-06-03).

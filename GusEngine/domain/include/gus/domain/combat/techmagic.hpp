@@ -186,8 +186,9 @@ struct LastActionRecord {
 // NAO-DONO (mesmo padrao de CombatActor* na FSM/InitiativeQueue).
 // `queue` (step 7, DelayAction/Einstein): ponteiro pra InitiativeQueue da FSM (fila de
 // iniciativa real, nao so o snapshot de `combatants`), so consumido por
-// handle_delay_action pra reordenar o alvo via InitiativeQueue::reorder_actor (mesma
-// primitiva do Gambito-Reordenar). Campo ADITIVO (default nullptr preserva os call sites/
+// handle_delay_action pra reordenar o alvo via InitiativeQueue::reorder_pending (mesma
+// primitiva do Gambito-Reordenar; reorder_actor foi privatizada no M9, 2026-07-22). Campo
+// ADITIVO (default nullptr preserva os call sites/
 // testes dos steps 1-6 intactos); handle_delay_action lanca std::logic_error se rodar com
 // queue == nullptr (bug de call site - a FSM SEMPRE injeta &queue_ no OnCast de uma carta
 // com DelayAction). Ponteiro NAO-DONO. So forward-declarado aqui (nao inclui

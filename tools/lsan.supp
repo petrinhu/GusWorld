@@ -13,7 +13,10 @@
 # (`AudioEngine::AudioEngine(true)`, platform/src/audio/audio_engine.cpp:81, via
 # `ma_engine_init` -> `ma_device_init_ex` -> `ma_device_init` ->
 # `ma_device_init_by_type__alsa` -> `ma_context_open_pcm__alsa`,
-# GusEngine/third_party/miniaudio/miniaudio.h:28740/29250). ~17KB/18 allocs (17359
+# _deps/glintfx-src/glintfx/third_party/miniaudio/miniaudio.h, vendorizado pelo glintfx
+# desde a GLINTFX-INTEGRACAO F2 - numero de linha omitido de proposito: e dependencia de
+# terceiro que bumpamos com frequencia, entao o numero apodrece a cada pin novo).
+# ~17KB/18 allocs (17359
 # bytes / 18 allocations, reproduzido byte-a-byte) alocados via strdup/calloc durante
 # o parsing de `snd_config` e a resolucao do device "default" (dlopen de plugins ALSA
 # como pcm_pipewire neste host) dentro de `snd_pcm_open` -> `snd_pcm_open_noupdate` ->

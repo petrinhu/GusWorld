@@ -32,60 +32,31 @@ Este arquivo cumpre essa obrigação para o GusWorld. O texto acima também deve
 
 ## Legado dormente (não linkado no binário C++/SDL3 atual)
 
-> Componentes da era Godot/C# (`engine/`/`game/`) e da fase intermediária Qt do pivot. Mantidos só como histórico/arqueologia, **dormentes até M8** (ver CLAUDE.md); NÃO entram no binário `gusengine_app` produzido hoje. Reativar exigiria decisão explícita de reverter o pivot C++20+SDL3 (ADR-008).
+> Componentes da era Godot/C# (`engine/`/`game/`) e da fase intermediária Qt do pivot. **Removidos do disco no M8 (decommission, 2026-07-22)** — não existem mais em `main`; sobrevivem só na tag `pre-m8-godot-legacy` (histórico/arqueologia, recuperável se um dia for preciso). NÃO entram no binário `gusengine_app` produzido hoje. Reativar exigiria decisão explícita de reverter o pivot C++20+SDL3 (ADR-008) e resgatar o código da tag.
 
 | Componente | Licença | Titular / fonte | Nota |
 |---|---|---|---|
 | Qt 6 | LGPLv3 (núcleo) + GPLv3 (alguns módulos) | The Qt Company / Qt Project | Camada de plataforma da Fase 1 do pivot original; SUBSTITUÍDA por SDL3 no re-pivot (ADR-008). Não empacotada em nenhum release atual. |
-| Godot Engine | MIT | Juan Linietsky, Ariel Manzur e contribuidores | Engine da fase de transição pré-pivot (`engine/`/`game/`), dormente. |
-| DialogueManager (addon) | MIT | Copyright (c) 2022-present Nathan Hoad | Addon Godot de diálogo, dormente junto do Godot legado. |
+| Godot Engine | MIT | Juan Linietsky, Ariel Manzur e contribuidores | Engine da fase de transição pré-pivot (`engine/`/`game/`); removida do disco no M8, preservada na tag `pre-m8-godot-legacy`. |
+| DialogueManager (addon) | MIT | Copyright (c) 2022-present Nathan Hoad | Addon Godot de diálogo; removido do disco no M8 junto do Godot legado, preservado na tag `pre-m8-godot-legacy`. |
 | Dear ImGui | MIT | Omar Cornut (ocornut) e contribuidores | UI de debug/dev cogitada na fase Qt; não linkada no binário C++/SDL3 atual. |
 
 *Nota (achado COS-2): a linha antiga de OpenSSL ("Apache-2.0, apenas se empacotado via Qt") foi removida. Qt é legado dormente e o binário SDL3 atual não empacota OpenSSL. Se uma dependência empacotar OpenSSL no futuro, reintroduzir a linha na tabela de dependências ATIVAS.*
 
 ---
 
-## Bibliotecas C++ vendorizadas em `GusEngine/third_party/` (2026-06-22)
+## Bibliotecas C++ vendorizadas em `GusEngine/third_party/` (atualizado no M9, 2026-07-22)
 
-Codigo-fonte incorporado no repo (filosofia zero-dep), cada lib com seu arquivo `LICENSE` preservado na pasta. Catalogo: [`docs/tech/libs-vendoring-candidatas.md`](docs/tech/libs-vendoring-candidatas.md). As libs nao usadas no codigo serao removidas na higiene do M9.
+Codigo-fonte incorporado no repo (filosofia zero-dep), cada lib com seu arquivo `LICENSE` preservado na pasta. Catalogo historico das 33 candidatas avaliadas: [`docs/tech/libs-vendoring-candidatas.md`](docs/tech/libs-vendoring-candidatas.md).
+
+**Higiene do M9 (2026-07-22):** das 33 libs vendorizadas em 2026-06-22, 31 nunca tiveram `#include` real fora de `third_party/` nem `add_subdirectory`/FetchContent no CMake do projeto (miniaudio foi a ultima a cair: desde o commit `d79d880`/F2 do GLINTFX-INTEGRACAO o audio passou a usar `glintfx::Audio`, restando so comentario). As 31 foram removidas do disco (`git rm`); so as 2 efetivamente linkadas ficam:
 
 | lib | licenca | fonte |
 |---|---|---|
-| miniaudio | Public Domain (Unlicense) ou MIT-0 | github.com/mackron/miniaudio |
-| dr_libs | Public Domain (Unlicense) ou MIT-0 | github.com/mackron/dr_libs |
-| AudioFile | MIT | github.com/adamstark/AudioFile |
-| pcg-cpp | MIT ou Apache-2.0 | github.com/imneme/pcg-cpp |
-| fpm | MIT | github.com/MikeLankamp/fpm |
-| glm | MIT (ou Happy Bunny) | github.com/g-truc/glm |
-| hlslpp | MIT | github.com/redorav/hlslpp |
-| exprtk | MIT | github.com/ArashPartow/exprtk |
 | stb | MIT ou Public Domain | github.com/nothings/stb |
-| wykobi | MIT | github.com/ArashPartow/wykobi |
-| plf_colony | zlib | github.com/mattreecebentley/plf_colony |
-| plf_queue | zlib | github.com/mattreecebentley/plf_queue |
-| plf_stack | zlib | github.com/mattreecebentley/plf_stack |
-| plf_list | zlib | github.com/mattreecebentley/plf_list |
-| frozen | Apache-2.0 | github.com/serge-sans-paille/frozen |
-| expected-lite | BSL-1.0 (Boost) | github.com/martinmoene/expected-lite |
-| gsl-lite | MIT ou BSL-1.0 | github.com/martinmoene/gsl-lite |
-| scope-lite | BSL-1.0 (Boost) | github.com/martinmoene/scope-lite |
-| ring-span-lite | BSL-1.0 (Boost) | github.com/martinmoene/ring-span-lite |
-| matchit | Apache-2.0 | github.com/BowenFu/matchit.cpp |
-| better-enums | BSD-2-Clause | github.com/aantron/better-enums |
-| fmt | MIT | github.com/fmtlib/fmt |
-| ctre | Apache-2.0 | github.com/hanickadot/compile-time-regular-expressions |
-| lexy | BSL-1.0 (Boost) | github.com/foonathan/lexy |
-| pegtl | BSL-1.0 (Boost) | github.com/taocpp/PEGTL |
-| cppcodec | MIT | github.com/tplgy/cppcodec |
-| visit_struct | BSL-1.0 (Boost) | github.com/cbeck88/visit_struct |
-| entt | MIT | github.com/skypjack/entt |
-| anax | MIT | github.com/miguelishawt/anax |
-| entityplus | BSL-1.0 (Boost) | github.com/Yelnats321/EntityPlus |
-| entityx | MIT | github.com/alecthomas/entityx |
-| box2d | MIT | github.com/erincatto/box2d |
-| monocypher | CC0-1.0 ou BSD-2-Clause (dupla) | github.com/LoupVaillant/Monocypher | ADR-015 (SAVE-CRYPTO-V2). Tag 4.0.3, commit `ab2b16dd619ad5f6979a4fbe69cfa324a6fcc35f`. UNICO vendor com build proprio (2 arquivos C, compilado via `third_party/monocypher/CMakeLists.txt`); os demais desta tabela sao header-only. AEAD XChaCha20-Poly1305 + Argon2id do envelope de save v2. |
+| monocypher | CC0-1.0 ou BSD-2-Clause (dupla) | github.com/LoupVaillant/Monocypher | ADR-015 (SAVE-CRYPTO-V2). Tag 4.0.3, commit `ab2b16dd619ad5f6979a4fbe69cfa324a6fcc35f`. UNICO vendor com build proprio (2 arquivos C, compilado via `third_party/monocypher/CMakeLists.txt`); `stb` e header-only. AEAD XChaCha20-Poly1305 + Argon2id do envelope de save v2. |
 
-Nota de compatibilidade: todas permissivas e compativeis com o GPLv3 do jogo (Apache-2.0 e compativel com GPLv3, nao com GPLv2; public-domain usar o fallback explicito MIT/Unlicense).
+Nota de compatibilidade: ambas permissivas e compativeis com o GPLv3 do jogo.
 
 ---
 
