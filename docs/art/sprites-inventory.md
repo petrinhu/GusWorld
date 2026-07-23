@@ -38,8 +38,7 @@ O jogo é **4-direcional sem flip** por design (Pillar 3); ver a memória
 Pasta canônica dos personagens **inspirados em pessoas reais** (homenagens):
 - `gus` — o protagonista (o filho, "Gus Dragon")
 - `pyotor_vance` — o pai · `yakov` — o tio
-- `brunus_vetorial` — ← amigo real Bruno Vettore
-- `heliaco_vyr` — figura lendária Era-1, eco de Hiram Abiff
+- `brunus_vetorial` — ← amigo real Bruno Vettore (só estes 4 são pessoas reais)
 
 NÃO confundir com os NPCs comuns em `sprites/<slug>/`. A doc do tributo dos
 homenageados-mestres (Faraday, Turing, Gödel, von Neumann...) vive em
