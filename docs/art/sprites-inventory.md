@@ -130,13 +130,15 @@ próprio: [`props-inventory.md`](props-inventory.md). Aqui é só personagem-spr
 
 ## Conceitos de personagem aguardando geração (2026-07-23)
 
-6 personagens cujo ÚNICO asset hoje é a ilustração-conceito HD em `resources/images/`
-(chibi front, fundo branco), SEM pasta de sprite ainda. São a referência pra gerar
-os sprites de jogo (pipeline de referência, `no_background`, 4 direções → depois
-anims conforme o papel):
+6 personagens com **pasta criada 2026-07-23** e o conceito HD dentro como
+`sprites/<slug>/_concept_front.png` (a referência de geração). Falta GERAR os
+sprites de jogo a partir dele (`generate-8-rotations-v3` + `no_background` → 4
+direções; anims depois conforme o papel). Fila atrás da geração da party (limite de
+taxa):
 
 `anaximandro_vyrcatrix`, `anhuera_vanderbist`, `cassiano_vorto`, `yara_ducourt`,
-`anslemo_boroshova`, `mariana_vanderbist`.
+`anslemo_boroshova`, `mariana_vanderbist` — cada um com `_concept_front.png`, zero
+sprite ainda.
 
-Fluxo: concept (`images/<Nome>.png`) → gerar → `sprites/<slug>/`. Órfão sem canon:
-`aleatorio.png` (não é o Sterling; aguarda atribuição).
+Órfão sem canon: `aleatorio.png` (fica em `images/` raiz; não é o Sterling; aguarda
+atribuição antes de virar pasta).

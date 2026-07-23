@@ -42,12 +42,10 @@ conceito** — distinto dos sprites de jogo direcionais (esses estão em
 
 ## Conceitos de personagem (na raiz, NÃO são prop)
 
-Ilustrações HD chibi (2048px, fundo branco) de personagens **sem pasta de sprite
-ainda** — são a **referência de geração** dos sprites de jogo, não props. Vivem na
-raiz de `images/` até serem gerados: **Anaximandro Vyrcátrix, Anhuera Vanderbist,
-Cassiano Vorto, Yara Ducourt, Anslemo Boroshova, Mariana Vanderbist**. Fluxo em
-[`sprites-inventory.md`](sprites-inventory.md) (concept → 4 direções no_background →
-`sprites/<slug>/`). Órfão: `aleatorio.png` (mercenário cyber-tático que NÃO bate com
+**MOVIDOS 2026-07-23** pras pastas dos personagens (`sprites/<slug>/_concept_front.png`),
+saíram da raiz de `images/`. São a referência de geração — ver
+[`sprites-inventory.md`](sprites-inventory.md). Restou na raiz de `images/` só o
+`vance_dragon_glyph.png` (game-loaded) e o `aleatorio.png` (órfão). Órfão: `aleatorio.png` (mercenário cyber-tático que NÃO bate com
 o Sterling corporativo — aguarda atribuição de canon).
 
 ## Como eu deixei isso bagunçado (registro, pra não repetir)
