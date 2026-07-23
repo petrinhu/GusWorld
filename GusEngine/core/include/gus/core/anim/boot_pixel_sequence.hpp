@@ -40,6 +40,22 @@
 // QUEM CARREGA/DESENHA (draw_textured_rect por frame, sobre um retangulo solido de
 // seguranca por baixo) fica em app/ (gus/app/boot_pixel_overlay.hpp) - aqui e so a
 // matematica determinista.
+//
+// boot_pixel_idle_frame_index (M7-FB3, MENU-INICIAL-FUNDO): o MESMO asset de 20
+// frames GANHA um 2o uso, DESACOPLADO da transicao de 4 pernas acima - fundo VIVO da
+// TELA DE TITULO (gus/app/screens/title_menu_loop.cpp), que fica aberta por tempo
+// INDEFINIDO (nao um `t`=[0,1] de UMA transicao com duracao fixa). Playtest do Gus
+// Dragon: "menu inicial de jogo tem arte/animacao PROPRIA por tras, nao a tela de onde
+// o jogador estava" - decisao do lider: o fundo do menu inicial passa a ser o MESMO
+// monitor CRT do boot, so que agora precisa ficar "vivo" indefinidamente sem: (a)
+// congelar no ultimo frame (leria como travado) nem (b) repetir os 20 frames inteiros
+// em loop (pareceria o boot REINICIANDO - o MESMO "pareceu bug" que o glitch procedural
+// original levou o veto). A solucao mais barata que ainda le como "vivo": cicla PRA
+// FRENTE, devagar, so pelos ULTIMOS kBootPixelIdleWindowFrames indices (17,18,19 de 20)
+// - exatamente o dump hexadecimal + "SYSTEM READY." + cursor do frame final (ver
+// contact_sheet.png) - o CONTEUDO desses 3 frames ja e ruido/telemetria mudando
+// (valores de registrador, nao linhas de log sendo apagadas), entao o ciclo NUNCA
+// parece "voltar atras" ou "perder conteudo" - so parece o terminal seguindo vivo.
 
 #ifndef GUS_CORE_ANIM_BOOT_PIXEL_SEQUENCE_HPP
 #define GUS_CORE_ANIM_BOOT_PIXEL_SEQUENCE_HPP
@@ -79,6 +95,27 @@ enum class BootPixelLeg {
 // crescem 0->1 com t (a tela fica cada vez mais coberta); pernas "Revealing" decrescem
 // 1->0 com t (a tela vai revelando). Clampa t em [0,1] antes de calcular.
 [[nodiscard]] float boot_pixel_safety_alpha(BootPixelLeg leg, float t) noexcept;
+
+// Quantos dos ULTIMOS frames do asset formam a "janela de repouso" (ver o comentario
+// grande acima) - com kBootPixelFrameCount=20, a janela e [17,18,19]. Clampada por
+// boot_pixel_idle_frame_index quando frame_count < este valor (asset hipotetico menor).
+inline constexpr int kBootPixelIdleWindowFrames = 3;
+
+// Segundos que CADA frame da janela de repouso fica visivel antes de avancar pro
+// proximo - devagar o bastante pra nao virar slideshow ilegivel, rapido o bastante pra
+// o olho perceber que mudou (mesmo espirito "log de terminal rolando devagar").
+inline constexpr float kBootPixelIdleFrameSeconds = 0.6f;
+
+// Indice [0, frame_count-1] do frame a mostrar no fundo VIVO da tela de titulo, dado
+// `elapsed_seconds` (tempo corrido DESDE que a tela abriu - SEMPRE crescente, sem
+// duracao fixa, ao contrario do `t`=[0,1] de boot_pixel_frame_index) e `frame_count`
+// (normalmente kBootPixelFrameCount, parametrizado pra testabilidade). Cicla PRA
+// FRENTE (round-robin, nunca recua) so pelos ULTIMOS min(kBootPixelIdleWindowFrames,
+// frame_count) indices - NUNCA volta ao frame_00 (isso pareceria o boot reiniciando).
+// elapsed_seconds negativo e tratado como 0 (defensivo). frame_count<=0 devolve 0 (sem
+// UB nem divisao por zero - mesma garantia de boot_pixel_frame_index).
+[[nodiscard]] int boot_pixel_idle_frame_index(float elapsed_seconds,
+                                               int frame_count) noexcept;
 
 }  // namespace gus::core::anim
 

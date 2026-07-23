@@ -97,9 +97,17 @@ void run_title_menu_loop_gl_current(
 //   devolver NewGame; a dificuldade ESCOLHIDA sai aqui. Ignorado/intocado nos
 //   demais casos. Pode ser nullptr (degrada: o CHAMADOR usa o default Medio do
 //   proprio SaveData).
-// `frozen_background_png` (default vazio): MESMA tecnica de fundo real congelado
-//   das demais telas (PNG de 1 frame capturado pelo chamador ANTES de abrir) -
-//   vazio degrada pro fundo abstrato (a vinheta/scrim do proprio painel).
+// `frozen_background_png` (default vazio, M7-FB3 MUDOU O USO): a LISTA da tela de
+//   titulo (Continuar/Novo Jogo/Sair) NAO desenha mais este PNG - playtest do Gus
+//   Dragon ("menu inicial de jogo tem arte/animacao PROPRIA por tras, nao a tela de
+//   onde o jogador estava") + decisao do lider: o fundo da LISTA agora e SEMPRE o
+//   boot pixelizado VIVO (gus::app::BootPixelOverlay::draw_idle + gus::core::anim::
+//   boot_pixel_idle_frame_index, resolvido via gus::core::assets::kVfxBootPixelDir -
+//   ZERO dependencia deste parametro). `frozen_background_png` CONTINUA existindo e
+//   sendo repassado, INTOCADO, pra tela de SELECAO DE DIFICULDADE aninhada (aberta
+//   ao confirmar "Novo Jogo", ver start_new_game_via_difficulty_menu no .cpp) - essa
+//   tela fora do escopo deste feedback, segue mostrando a cidade congelada (vazio
+//   degrada pro fundo abstrato, MESMO contrato de antes).
 //
 // Devolve false se a criacao do contexto GL ou o load do glad falhar (a janela
 // segue viva; `*out_exit` fica no default QuitApp definido pela IMPLEMENTACAO -

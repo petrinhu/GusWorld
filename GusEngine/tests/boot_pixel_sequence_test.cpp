@@ -13,13 +13,17 @@
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/matchers/catch_matchers_floating_point.hpp>
 
+#include <limits>
+
 #include "gus/core/anim/boot_pixel_sequence.hpp"
 
 using Catch::Matchers::WithinAbs;
 using gus::core::anim::boot_pixel_frame_index;
+using gus::core::anim::boot_pixel_idle_frame_index;
 using gus::core::anim::boot_pixel_safety_alpha;
 using gus::core::anim::BootPixelLeg;
 using gus::core::anim::kBootPixelFrameCount;
+using gus::core::anim::kBootPixelIdleWindowFrames;
 
 // --- boot_pixel_frame_index: extremos de cada perna ---
 
@@ -173,4 +177,107 @@ TEST_CASE("boot_pixel_safety_alpha: clampa t fora de [0,1]", "[boot_pixel_sequen
                  WithinAbs(1.0f, 1e-5f));
     REQUIRE_THAT(boot_pixel_safety_alpha(BootPixelLeg::kToBattleRevealing, 2.0f),
                  WithinAbs(0.0f, 1e-5f));
+}
+
+// --- boot_pixel_idle_frame_index (M7-FB3, fundo VIVO da tela de titulo) ---
+
+TEST_CASE("boot_pixel_idle_frame_index: comeca no PRIMEIRO indice da janela de "
+          "repouso (elapsed=0)",
+          "[boot_pixel_sequence]") {
+    REQUIRE(boot_pixel_idle_frame_index(0.0f, kBootPixelFrameCount) ==
+            kBootPixelFrameCount - kBootPixelIdleWindowFrames);
+}
+
+TEST_CASE("boot_pixel_idle_frame_index: NUNCA sai da janela dos ULTIMOS "
+          "kBootPixelIdleWindowFrames indices (nunca volta pro frame_00)",
+          "[boot_pixel_sequence]") {
+    for (float elapsed = 0.0f; elapsed <= 12.0f; elapsed += 0.05f) {
+        const int idx = boot_pixel_idle_frame_index(elapsed, kBootPixelFrameCount);
+        REQUIRE(idx >= kBootPixelFrameCount - kBootPixelIdleWindowFrames);
+        REQUIRE(idx <= kBootPixelFrameCount - 1);
+    }
+}
+
+TEST_CASE("boot_pixel_idle_frame_index: avanca PRA FRENTE (round-robin) a cada "
+          "kBootPixelIdleFrameSeconds",
+          "[boot_pixel_sequence]") {
+    const int first = boot_pixel_idle_frame_index(0.0f, kBootPixelFrameCount);
+    const int second = boot_pixel_idle_frame_index(
+        gus::core::anim::kBootPixelIdleFrameSeconds + 0.01f, kBootPixelFrameCount);
+    const int third = boot_pixel_idle_frame_index(
+        2.0f * gus::core::anim::kBootPixelIdleFrameSeconds + 0.01f, kBootPixelFrameCount);
+    const int wrap = boot_pixel_idle_frame_index(
+        3.0f * gus::core::anim::kBootPixelIdleFrameSeconds + 0.01f, kBootPixelFrameCount);
+    REQUIRE(second == first + 1);
+    REQUIRE(third == first + 2);
+    REQUIRE(wrap == first);  // deu a volta na janela (round-robin), nao saiu dela.
+}
+
+TEST_CASE("boot_pixel_idle_frame_index: elapsed_seconds negativo trata como 0",
+          "[boot_pixel_sequence]") {
+    REQUIRE(boot_pixel_idle_frame_index(-5.0f, kBootPixelFrameCount) ==
+            boot_pixel_idle_frame_index(0.0f, kBootPixelFrameCount));
+}
+
+TEST_CASE("boot_pixel_idle_frame_index: frame_count<=0 devolve 0 (sem UB/divisao "
+          "por zero)",
+          "[boot_pixel_sequence]") {
+    REQUIRE(boot_pixel_idle_frame_index(1.5f, 0) == 0);
+    REQUIRE(boot_pixel_idle_frame_index(1.5f, -3) == 0);
+}
+
+TEST_CASE("boot_pixel_idle_frame_index: frame_count menor que a janela usa o asset "
+          "INTEIRO como janela (sem indice negativo)",
+          "[boot_pixel_sequence]") {
+    for (float elapsed = 0.0f; elapsed <= 3.0f; elapsed += 0.1f) {
+        const int idx = boot_pixel_idle_frame_index(elapsed, /*frame_count=*/2);
+        REQUIRE(idx >= 0);
+        REQUIRE(idx <= 1);
+    }
+}
+
+// --- QA pos-implementacao (float-cast-overflow, -fsanitize=float-cast-overflow):
+// elapsed_seconds astronomico/nao-finito NUNCA pode chegar num static_cast<int> fora
+// de [0, frame_count-1] OU nao-finito - "validar float antes de cast" e licao
+// canonica do projeto (auditoria anterior onde exatamente essa classe passou batido).
+// NaN JA degradava pra 0 antes deste fix (a comparacao `> 0.0f` e sempre false com
+// NaN, IEEE 754) - os 2 casos que faltavam sao +Infinity e um finito astronomico. ---
+
+TEST_CASE("boot_pixel_idle_frame_index: elapsed_seconds = +Infinity NAO e UB (fica "
+          "dentro da janela, degrada pro PRIMEIRO indice - MESMO 'elapsed<=0' vira 0)",
+          "[boot_pixel_sequence]") {
+    const int idx = boot_pixel_idle_frame_index(
+        std::numeric_limits<float>::infinity(), kBootPixelFrameCount);
+    REQUIRE(idx >= kBootPixelFrameCount - kBootPixelIdleWindowFrames);
+    REQUIRE(idx <= kBootPixelFrameCount - 1);
+    REQUIRE(idx == boot_pixel_idle_frame_index(0.0f, kBootPixelFrameCount));
+}
+
+TEST_CASE("boot_pixel_idle_frame_index: elapsed_seconds = -Infinity NAO e UB (fica "
+          "dentro da janela - o mesmo guard cobre os 2 sinais)",
+          "[boot_pixel_sequence]") {
+    const int idx = boot_pixel_idle_frame_index(
+        -std::numeric_limits<float>::infinity(), kBootPixelFrameCount);
+    REQUIRE(idx >= kBootPixelFrameCount - kBootPixelIdleWindowFrames);
+    REQUIRE(idx <= kBootPixelFrameCount - 1);
+}
+
+TEST_CASE("boot_pixel_idle_frame_index: elapsed_seconds = FLT_MAX (finito mas "
+          "astronomico - a tela de titulo aberta por 'decadas') NAO e UB, o "
+          "indice fica dentro da janela por CONSTRUCAO (reducao por fmod ANTES "
+          "do cast, nao so no caso 'plausivel')",
+          "[boot_pixel_sequence]") {
+    const int idx = boot_pixel_idle_frame_index(std::numeric_limits<float>::max(),
+                                                  kBootPixelFrameCount);
+    REQUIRE(idx >= kBootPixelFrameCount - kBootPixelIdleWindowFrames);
+    REQUIRE(idx <= kBootPixelFrameCount - 1);
+}
+
+TEST_CASE("boot_pixel_idle_frame_index: elapsed_seconds = NaN continua degradando "
+          "pro PRIMEIRO indice (regressao - NaN ja era coberto antes deste fix, "
+          "o guard novo (isfinite) nao pode quebrar isto)",
+          "[boot_pixel_sequence]") {
+    const int idx = boot_pixel_idle_frame_index(
+        std::numeric_limits<float>::quiet_NaN(), kBootPixelFrameCount);
+    REQUIRE(idx == boot_pixel_idle_frame_index(0.0f, kBootPixelFrameCount));
 }

@@ -21,11 +21,13 @@
 #include <glintfx/element_box.hpp>
 #include <glintfx/ui_layer.hpp>
 
+#include "gus/app/boot_pixel_overlay.hpp"  // M7-FB3: fundo VIVO da tela de titulo
 #include "gus/app/screens/difficulty_menu_loop.hpp"  // MODOS-MORTE Fase 0: aninhada no mesmo GL
 #include "gus/app/screens/save_load_menu.hpp"  // SaveSlotPreview/most_recent_occupied_slot
 #include "gus/app/screens/title_menu_rml.hpp"
 #include "gus/app/screens/ui_hover.hpp"  // COCKPIT-SFX-HOVER-CLIQUE: edge-detect generico
-#include "gus/core/asset_paths.hpp"  // kMenuHoverSfxFile/kMenuClickSfxFile/kSfxDir
+#include "gus/core/anim/boot_pixel_sequence.hpp"  // M7-FB3: boot_pixel_idle_frame_index
+#include "gus/core/asset_paths.hpp"  // kMenuHoverSfxFile/kMenuClickSfxFile/kSfxDir/kVfxBootPixelDir
 #include "gus/core/spatial/camera_clamp.hpp"  // gus::core::spatial::Rect
 #include "gus/domain/save/save_serializer.hpp"  // LoadResult
 #include "gus/platform/assets/asset_source.hpp"  // FilesystemAssetSource (resolve do SFX)
@@ -257,10 +259,24 @@ void run_title_menu_loop_gl_current(
         ui_opt->update();
 
         gus::platform::render2d::Render2dGl3 backdrop(/*gl_active=*/true);
-        const gus::platform::render2d::TextureId frozen_bg_tex =
-            frozen_background_png.empty()
-                ? gus::platform::render2d::kInvalidTexture
-                : backdrop.load_texture(frozen_background_png.c_str());
+
+        // M7-FB3 (MENU-INICIAL-FUNDO): fundo VIVO da LISTA (Continuar/Novo Jogo/
+        // Sair) - playtest do Gus Dragon ("menu inicial tem arte/animacao PROPRIA
+        // por tras, nao a tela de onde o jogador estava") + decisao do lider: o
+        // MESMO monitor CRT do boot pixelizado (ja aprovado pela transicao cidade<-
+        // >batalha, M7-COSTURA Inc 2c), agora "assentado" (nao uma transicao com
+        // duracao fixa - ver gus/core/anim/boot_pixel_sequence.hpp::
+        // boot_pixel_idle_frame_index). `frozen_background_png` (cidade congelada)
+        // NAO e mais usado AQUI - segue existindo so pra tela de dificuldade
+        // aninhada (start_new_game_via_difficulty_menu abaixo, fora do escopo deste
+        // feedback). load() JA loga no stderr se algum frame faltar (asset ausente/
+        // headless) - draw_idle() degrada sozinho pro solido gunmetal nesse caso
+        // (regra do projeto: todo efeito, bom ou ruim, loga - a falha e logada UMA
+        // vez aqui, nao a cada frame desenhado).
+        gus::app::BootPixelOverlay boot_bg;
+        boot_bg.load(backdrop, gus::platform::assets::FilesystemAssetSource().resolve_path(
+                                    gus::core::assets::kVfxBootPixelDir));
+        const unsigned long long boot_bg_start_ns = SDL_GetTicksNS();
 
         // COCKPIT-SFX-HOVER-CLIQUE: SFX de hover/clique - load_sfx UMA VEZ por
         // sessao desta tela (MESMA cautela de "load_sfx NUNCA no frame" ja
@@ -293,12 +309,15 @@ void run_title_menu_loop_gl_current(
             const gus::core::spatial::Rect cam{0.0f, 0.0f, static_cast<float>(pw),
                                                 static_cast<float>(ph)};
             backdrop.begin_frame(cam, pw, ph);
-            if (frozen_bg_tex != gus::platform::render2d::kInvalidTexture) {
-                backdrop.draw_textured_rect(
-                    cam, frozen_bg_tex,
-                    gus::platform::render2d::UvRect{0.0f, 0.0f, 1.0f, 1.0f},
-                    gus::platform::render2d::DrawColor{1.0f, 1.0f, 1.0f, 1.0f});
-            }
+            // M7-FB3: fundo VIVO - indice calculado do tempo REAL corrido desde que
+            // a tela abriu (SDL_GetTicksNS, MESMO padrao de elapsed de
+            // battle_preview.cpp/sdl_window.cpp), ciclando devagar pelos ULTIMOS 3
+            // frames do boot (ver o comentario de boot_pixel_idle_frame_index).
+            const float boot_bg_elapsed_s =
+                static_cast<float>(SDL_GetTicksNS() - boot_bg_start_ns) / 1.0e9f;
+            const int boot_bg_frame = gus::core::anim::boot_pixel_idle_frame_index(
+                boot_bg_elapsed_s, gus::core::anim::kBootPixelFrameCount);
+            boot_bg.draw_idle(backdrop, cam, boot_bg_frame);
             backdrop.end_frame();
             ui_opt->update();
             ui_opt->render();

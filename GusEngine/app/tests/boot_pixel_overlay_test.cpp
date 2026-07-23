@@ -203,3 +203,57 @@ TEST_CASE("BootPixelOverlay::draw: kFromBattleRevealing quase no fim (t=0.99, "
     overlay.draw(r, kScreen, BootPixelLeg::kFromBattleRevealing, 0.99f);
     REQUIRE(r.textured[0].tex == static_cast<TextureId>(1));
 }
+
+// --- draw_idle (M7-FB3, fundo VIVO da tela de titulo) ---
+
+TEST_CASE("BootPixelOverlay::draw_idle: frames OK desenha o SOLIDO de seguranca + "
+          "o frame pedido (nesta ordem, 1 de cada), SEMPRE (nao depende de "
+          "alpha/leg/t como draw())",
+          "[boot_pixel_overlay]") {
+    FakeRenderer r;
+    gus::app::BootPixelOverlay overlay;
+    overlay.load(r, "resources/vfx/boot_pixel");
+    overlay.draw_idle(r, kScreen, /*frame_index=*/17);
+    REQUIRE(r.filled.size() == 1);
+    REQUIRE(r.textured.size() == 1);
+    REQUIRE(r.textured[0].tex == static_cast<TextureId>(18));  // indice 17 = 18o load
+}
+
+TEST_CASE("BootPixelOverlay::draw_idle: o solido cobre a tela INTEIRA, opaco "
+          "(alpha=1, fundo persistente, nao um fade)",
+          "[boot_pixel_overlay]") {
+    FakeRenderer r;
+    gus::app::BootPixelOverlay overlay;
+    overlay.load(r, "resources/vfx/boot_pixel");
+    overlay.draw_idle(r, kScreen, /*frame_index=*/19);
+    REQUIRE(r.filled[0].rect.x == kScreen.x);
+    REQUIRE(r.filled[0].rect.y == kScreen.y);
+    REQUIRE(r.filled[0].rect.w == kScreen.w);
+    REQUIRE(r.filled[0].rect.h == kScreen.h);
+    REQUIRE(r.filled[0].color.a == 1.0f);
+}
+
+TEST_CASE("BootPixelOverlay::draw_idle: sem frames (load falhou/nunca chamado) "
+          "SO o solido de seguranca desenha (mesma degradacao segura de draw())",
+          "[boot_pixel_overlay]") {
+    FakeRenderer r;
+    gus::app::BootPixelOverlay overlay;  // load() NUNCA chamado
+    overlay.draw_idle(r, kScreen, /*frame_index=*/17);
+    REQUIRE(r.filled.size() == 1);
+    REQUIRE(r.textured.empty());
+}
+
+TEST_CASE("BootPixelOverlay::draw_idle: frame_index fora de [0, frame_count-1] e "
+          "clampado (defensivo, nunca acessa fora do vector)",
+          "[boot_pixel_overlay]") {
+    FakeRenderer r;
+    gus::app::BootPixelOverlay overlay;
+    overlay.load(r, "resources/vfx/boot_pixel");
+
+    overlay.draw_idle(r, kScreen, /*frame_index=*/-5);
+    REQUIRE(r.textured.back().tex == static_cast<TextureId>(1));  // clampado pro 1o
+
+    overlay.draw_idle(r, kScreen, /*frame_index=*/999);
+    REQUIRE(r.textured.back().tex ==
+            static_cast<TextureId>(gus::core::anim::kBootPixelFrameCount));  // ultimo
+}

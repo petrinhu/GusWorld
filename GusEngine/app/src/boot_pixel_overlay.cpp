@@ -106,4 +106,31 @@ void BootPixelOverlay::draw(gus::platform::render2d::IRenderer& renderer,
                                 DrawColor{1.0f, 1.0f, 1.0f, 1.0f});
 }
 
+void BootPixelOverlay::draw_idle(gus::platform::render2d::IRenderer& renderer,
+                                  const Rect& screen_rect, int frame_index) const {
+    // CAMADA DE SEGURANCA: SEMPRE opaca (alpha 1) - fundo PERSISTENTE da tela de
+    // titulo, nao uma transicao com progresso (draw() varia alpha com o `t` de UMA
+    // metade fisica; aqui nao ha metade fisica nenhuma, a tela fica aberta por tempo
+    // indefinido). Protege a mesma borda/aliasing E cobre a tela se os frames nao
+    // carregaram (ready_==false) - a falha JA foi logada em load(), aqui so degrada
+    // visualmente (regra do projeto: todo efeito, bom ou ruim, loga - o log ja
+    // aconteceu no load(), nao precisa repetir a cada frame desenhado).
+    renderer.draw_filled_rect(screen_rect,
+                              DrawColor{kGunmetalR, kGunmetalG, kGunmetalB, 1.0f});
+
+    if (!ready_ || frames_.empty()) {
+        return;  // frames indisponiveis - so o solido acima (MESMO invariante de draw()).
+    }
+
+    int idx = frame_index;
+    if (idx < 0) {
+        idx = 0;
+    } else if (idx > static_cast<int>(frames_.size()) - 1) {
+        idx = static_cast<int>(frames_.size()) - 1;
+    }
+    renderer.draw_textured_rect(screen_rect, frames_[static_cast<std::size_t>(idx)],
+                                UvRect{0.0f, 0.0f, 1.0f, 1.0f},
+                                DrawColor{1.0f, 1.0f, 1.0f, 1.0f});
+}
+
 }  // namespace gus::app

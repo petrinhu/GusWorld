@@ -9,15 +9,20 @@
 // frame) mora em gus/core/anim/boot_pixel_sequence.hpp; aqui e so o carregamento +
 // o laco de desenho.
 //
-// PONTOS UNICOS de chamada (os MESMOS 3 lugares do glitch_dissolve/glitch_overlay
-// aposentados por este modulo): gus/app/sdl_window.cpp::step_with_fade (lado CIDADE,
-// backend Render2dSdl) e gus/app/screens/battle_preview.cpp (os 2 loops de fade,
-// entrada e saida, lado BATALHA, backend Render2dGl3). CADA lado precisa da SUA
-// PROPRIA instancia + load() (TextureId sao locais ao renderer VIVO - mesmo racional
-// de enemy_marker_tex_/load_player_sprites em sdl_window.cpp: handles de uma tabela
-// de texturas que NAO sobrevive a troca/destruicao do renderer). Recarregar em
-// reacquire_renderer() (apos release_renderer) segue o MESMO padrao ja usado pros
-// sprites do Gus.
+// PONTOS UNICOS de chamada da TRANSICAO (draw(), os MESMOS 3 lugares do
+// glitch_dissolve/glitch_overlay aposentados por este modulo): gus/app/sdl_window.cpp::
+// step_with_fade (lado CIDADE, backend Render2dSdl) e gus/app/screens/
+// battle_preview.cpp (os 2 loops de fade, entrada e saida, lado BATALHA, backend
+// Render2dGl3). CADA lado precisa da SUA PROPRIA instancia + load() (TextureId sao
+// locais ao renderer VIVO - mesmo racional de enemy_marker_tex_/load_player_sprites em
+// sdl_window.cpp: handles de uma tabela de texturas que NAO sobrevive a troca/
+// destruicao do renderer). Recarregar em reacquire_renderer() (apos release_renderer)
+// segue o MESMO padrao ja usado pros sprites do Gus.
+//
+// + 1 PONTO do fundo VIVO/idle (draw_idle(), M7-FB3): gus/app/screens/
+// title_menu_loop.cpp (tela de titulo, backend Render2dGl3, PROPRIA instancia -
+// mesmo racional acima). Ver o comentario de draw_idle() e o header do POCO
+// (gus/core/anim/boot_pixel_sequence.hpp) pro racional completo.
 //
 // FACTIBILIDADE NOS 2 BACKENDS: usa SOMENTE IRenderer::load_texture +
 // draw_textured_rect + draw_filled_rect (a MESMA interface que o resto do app ja usa
@@ -84,6 +89,19 @@ public:
     void draw(gus::platform::render2d::IRenderer& renderer,
               const gus::core::spatial::Rect& screen_rect,
               gus::core::anim::BootPixelLeg leg, float t) const;
+
+    // M7-FB3 (MENU-INICIAL-FUNDO): desenha o fundo VIVO da tela de titulo (BOOT ja
+    // "assentado" - nao uma transicao). Ao contrario de draw() (leg/t de UMA
+    // transicao com duracao fixa, alpha variavel pra cross-fade), aqui a camada de
+    // seguranca e SEMPRE opaca (alpha 1 - fundo PERSISTENTE, nao um fade) e o frame
+    // mostrado e `frame_index` (o CHAMADOR decide QUAL via gus::core::anim::
+    // boot_pixel_idle_frame_index, tipicamente os ULTIMOS 3 indices em round-robin
+    // lento - ver o header do POCO). `frame_index` fora de [0, frame_count-1] e
+    // clampado (defensivo). ready()==false (frames ausentes/headless) degrada pro
+    // MESMO retangulo solido gunmetal de draw() - a falha JA foi logada em load().
+    void draw_idle(gus::platform::render2d::IRenderer& renderer,
+                    const gus::core::spatial::Rect& screen_rect,
+                    int frame_index) const;
 
 private:
     std::vector<gus::platform::render2d::TextureId> frames_;
