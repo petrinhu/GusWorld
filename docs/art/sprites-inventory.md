@@ -33,6 +33,37 @@ O jogo é **4-direcional sem flip** por design (Pillar 3); ver a memória
 
 ## Estado atual (81 pastas de personagem)
 
+### Gus PROTAGONISTA — `resources/sprites/personagens_inspirados/gus/` ⭐
+
+**ATENÇÃO: o Gus NÃO fica em `sprites/gus/`.** A pasta canônica é
+`sprites/personagens_inspirados/gus/`, apontada pelo header
+`GusEngine/core/include/gus/core/asset_paths.hpp` → `kGusSpritesDir =
+"sprites/personagens_inspirados/gus"`. (O `gustaf_i_tavus_vance/` é o **ancestral
+Gustaf I**, não o protagonista — não confundir.) Tudo 256×256.
+
+```
+personagens_inspirados/gus/
+├── rotations/            # 8 direções estáticas: 0_south 1_south-west 2_west
+│                         #   3_north-west 4_north 5_north-east 6_east 7_south-east
+├── walk/{south,north,east,west}/   # 7 frames cada (locomoção 4-dir)
+├── anims/                # estados de combate + idle (frames por estado):
+│   ├── breathing_idle/ (5)   ← a "RESPIRAÇÃO"; hoje SÓ existe virada pro efeito Sul.
+│   │                            O idle OFEGANTE/CANSADO reusa estes frames com clock
+│   │                            mais rápido (idle_tired). N/E/O ainda usam walk-f0
+│   │                            congelado = o buraco do item ARTE-RESP-4DIR.
+│   ├── battle_idle/ (7)  cast/ (7)  attack_melee/ (7)  attack_melee_east/ (9)
+│   ├── defend/ (5)  hurt_magic/ (5)  hurt_physical/ (5)  ko/ (7)  revive/ (7)
+│   ├── run/ (7)  run_east/ (9)  run_west/ (9)  victory/ (7)  dragon_victory/ (9)
+│   └── attack_melee_east_OLD_leftfacing/ (9)  ← LEGADO, não usar
+└── (raiz) gus_conceito.png (HD 1844×2304, NÃO-sprite) · gus_front_pixel.png ·
+          gus_front_pixel_quant.png · retrato_gus_3q.png
+```
+
+**ANTENA DE UM LADO SÓ = ZERO FLIP (Pillar 3).** O aparato do Gus é assimétrico
+(antena de um lado). NUNCA espelhar east↔west nem derivar uma direção por flip —
+cada direção tem arte própria com a antena no lado certo. Vale pra todo o elenco,
+mas é crítico no Gus.
+
 ### Party jogável — locomoção COMPLETA (4 dir + walk)
 
 Estes 7 têm ciclo de caminhada pronto (o alvo de completude):
@@ -47,10 +78,10 @@ Estes 7 têm ciclo de caminhada pronto (o alvo de completude):
 | `dante_grid` | 180×180 | 24 | TRAIDOR |
 | `jaci_proxy` | 180×180 | 24 | Healer |
 
-Falta o **Gus protagonista** com walk: hoje só existe `gustaf_i_tavus_vance/`
-(4 dir estáticas, sem walk) — mas esse é o **ancestral Gustaf I**, não o
-protagonista (ver `project_nome_gus_canon`). O sprite de locomoção do
-protagonista Gus ainda não está nesta árvore como pasta própria.
+O **Gus protagonista** tem a árvore mais completa de todas (ver bloco ⭐ acima:
+8 rotações + walk 4-dir + 16 estados de anim). O que FALTA nele é pontual: a
+**respiração/cansado (`breathing_idle`) para Norte, Leste e Oeste** — hoje só o
+Sul tem, e os outros lados caem no walk-f0 congelado (item `ARTE-RESP-4DIR`).
 
 ### Personagens com 4 direções estáticas, SEM walk (70)
 
