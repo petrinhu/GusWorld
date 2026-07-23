@@ -47,10 +47,13 @@ personagens_inspirados/gus/
 │                         #   3_north-west 4_north 5_north-east 6_east 7_south-east
 ├── walk/{south,north,east,west}/   # 7 frames cada (locomoção 4-dir)
 ├── anims/                # estados de combate + idle (frames por estado):
-│   ├── breathing_idle/ (5)   ← a "RESPIRAÇÃO"; hoje SÓ existe virada pro efeito Sul.
-│   │                            O idle OFEGANTE/CANSADO reusa estes frames com clock
-│   │                            mais rápido (idle_tired). N/E/O ainda usam walk-f0
-│   │                            congelado = o buraco do item ARTE-RESP-4DIR.
+│   ├── breathing_idle/ (5)   ← a "RESPIRAÇÃO"/cansado, virada pro Sul.
+│   ├── _breathing_idle_dirs_STAGING_2026-07-23/{north,east,west}/ (5 cada)
+│   │        ← GERADO 2026-07-23 via API HTTP direta (/animate-with-text-v3, first_frame
+│   │          = a rotação real de cada dir, animação "winded/ofegante", antena preservada
+│   │          por construção). STAGING: aguarda aval do líder + wiring do loader
+│   │          (ARTE-RESP-4DIR: montar breathing direcional + desligar
+│   │          idle_animated_only_one_facing). NÃO sobrescreveu o Sul nem o código.
 │   ├── battle_idle/ (7)  cast/ (7)  attack_melee/ (7)  attack_melee_east/ (9)
 │   ├── defend/ (5)  hurt_magic/ (5)  hurt_physical/ (5)  ko/ (7)  revive/ (7)
 │   ├── run/ (7)  run_east/ (9)  run_west/ (9)  victory/ (7)  dragon_victory/ (9)
