@@ -25,11 +25,12 @@ conceito** — distinto dos sprites de jogo direcionais (esses estão em
 | `architecture/` | 9 | colunas Boróstoma/Janor/quebrada, ashlar stones, pavimento tesselado, mármore São Vargas, catedral mãe, boca da funda (+detail) |
 | `consumables/` | 7 | comida/poção: bolo de bit, café de neurônio, feijão computacional, pão de engrenagem, sopa 7 raízes, semente relíquia, ampola |
 | `runic_cards/` | 5 | as 5 cartas-família: electric, sonic, biochemical, cryptographic, kinetic |
-| `logos_glyphs/` | 8 | cripto-glifo Pigpen, Pigpen grid, Helíaco Vyr, selo glyph Vyr, Sterling sigma logo, partitura última frequência, selo pergunta, QRCode |
+| `logos_glyphs/` | 7 | cripto-glifo Pigpen, Pigpen grid, selo glyph Vyr, Sterling sigma logo, partitura última frequência, selo pergunta, QRCode |
 | `traditions/` | 3 | avental de aprendiz, cordão 89 nós, esquadro+compasso do Joaquim |
 | `vehicles/` | 5 | FIR truck, runner bike, Sterling van, toca-discos da Linda, underground wave |
 | `props/` | 10 | agulha da Linda, medalha do Vorto, caderno do Salviano, Tavus-Drive, óculos táticos, matriz ortodôntica, tomo pilha, scanner do Yakov, drone do Sterling, recursive order gear |
 | `ui_frames/` | 2 | runic UI frame, buymecoffe |
+| `homenageados/` | 1 | RETRATOS de figuras homenageadas/lendárias (não são glifo nem prop). Hoje: `heliaco_vyr` (figura lendária Era-1, eco de Hiram Abiff). Os homenageados REAIS (Faraday, Turing, Gödel, von Neumann...) têm a doc do tributo em `docs/design/roster-analogos/` (21 figuras); a arte deles, quando houver, vem pra cá. |
 | `card-frame-tests/` | vários | mockups de moldura de carta (alguns TRACKED no git) |
 
 ## Easter eggs embutidos (não rotular em doc público — velado)
