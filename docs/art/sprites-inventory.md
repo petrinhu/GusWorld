@@ -33,6 +33,18 @@ O jogo é **4-direcional sem flip** por design (Pillar 3); ver a memória
 
 ## Estado atual (81 pastas de personagem)
 
+### `personagens_inspirados/` = os HOMENAGEADOS (inspirados em pessoas reais)
+
+Pasta canônica dos personagens **inspirados em pessoas reais** (homenagens):
+- `gus` — o protagonista (o filho, "Gus Dragon")
+- `pyotor_vance` — o pai · `yakov` — o tio
+- `brunus_vetorial` — ← amigo real Bruno Vettore
+- `heliaco_vyr` — figura lendária Era-1, eco de Hiram Abiff
+
+NÃO confundir com os NPCs comuns em `sprites/<slug>/`. A doc do tributo dos
+homenageados-mestres (Faraday, Turing, Gödel, von Neumann...) vive em
+`docs/design/roster-analogos/` (21 figuras).
+
 ### Gus PROTAGONISTA — `resources/sprites/personagens_inspirados/gus/` ⭐
 
 **ATENÇÃO: o Gus NÃO fica em `sprites/gus/`.** A pasta canônica é
