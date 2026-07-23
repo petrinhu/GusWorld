@@ -271,11 +271,48 @@ set(GLINTFX_OWN_FONT_ENGINE  OFF CACHE BOOL "" FORCE)
 # plataforma do libm (GLINTFX-LIBM-SHIM) continua em glintfx_audio; pin do RmlUi continua
 # no MESMO SHA 2cd28864 (patch teardown-UB segue aplicavel). Suite completa verde no pin
 # novo antes deste commit.
+#
+# BUMP v0.19.0 -> v0.20.0 (GLINTFX-INTEGRACAO, 2026-07-23): aditiva, CHANGELOG deles nao
+# remove API existente. Traz GLINTFX_MODULE_DRAW2D (sprites + batching por-textura sobre
+# pipeline GL 3.3 proprio, ADR-0017 do lado deles, ligado por padrao ON) + o carve interno
+# de image-decode que o sustenta (D2D-1A, GLINTFX_MODULE_IMAGE segue reservada/forcada ON,
+# inalterada) + um fix de isolamento Xvfb/CI (XDG_RUNTIME_DIR por processo de teste - nao
+# nos afeta, nosso CI usa xvfb-run com o proprio wrapper deles). NAO adotamos o Draw2D
+# agora (decisao do lider): ele desenha em coordenada de TELA mas o jogo inteiro desenha em
+# coordenada de MUNDO com camera (platform/render2d/ tem 6 primitivas proprias; Draw2D
+# cobre 1 delas). Este bump e consumo intocado - ZERO ajuste em app/.
+#
+# GLINTFX_MODULE_DRAW2D=OFF (setado abaixo, mesma disciplina de GAMEPAD/I18N: codigo que
+# nao consumimos nao deveria entrar no binario) - VERIFICADO NO BINARIO REAL, nao só na
+# .a intermediaria (hipotese inicial de "linker de archive ja exclui sozinho" testada e
+# REFUTADA por nm): com ON (default), `nm -C gusworld_app` mostra 25 simbolos
+# glintfx::Draw2d::*/draw2d_detail::SpriteBatch::* REALMENTE PRESENTES no executavel final
+# (nao só na .a), ~40KB a mais (11622032 vs 11582872 bytes) - MESMO SEM NADA em app/
+# referenciar Draw2d (confirmado por nm --undefined-only em TODOS os outros .a/.o do link:
+# zero referencia a qualquer simbolo Draw2d). Causa raiz isolada com `ld -y` +
+# intersecao de simbolos definidos-vs-indefinidos: draw2d.cpp.o e puxado pro link inteiro
+# nao por Draw2d em si, mas por UM simbolo COMDAT generico que ele tambem define -
+# `std::string::append(const char*)` (instanciacao de template usada em Impl::log_warn) -
+# que colide com o mesmo simbolo fraco pedido por outro .o em qualquer lugar do programa;
+# ld resolve o primeiro membro de arquivo que define o simbolo pedido e leva o .o inteiro
+# junto (arquivo estatico so seleciona por-.o, nao por-simbolo) - o codigo Draw2d que
+# sobra e morto/inalcancavel (nada chama draw_sprite/load_texture/etc), mas ocupa espaco
+# porque o projeto nao compila com -ffunction-sections/-fdata-sections nem linka com
+# --gc-sections (mudanca maior, fora de escopo deste bump). OFF corta a raiz (o .o nem
+# entra no build), entao e a unica forma de garantir zero-custo hoje - nao e so
+# "disciplina de arvore de build", e reducao REAL, confirmada, do binario que entregamos.
+#
+# Revalidado apos fetch: flags GLINTFX_MODULE_TEXT/_FX/_AUDIO/_GAMEPAD/_I18N/_WINDOW e
+# GLINTFX_BACKEND_GLFW/GLINTFX_OWN_FONT_ENGINE continuam com os mesmos nomes; guard de
+# plataforma do libm (GLINTFX-LIBM-SHIM) continua em glintfx_audio; pin do RmlUi continua
+# no MESMO SHA 2cd28864 (patch teardown-UB segue aplicavel). Suite completa verde no pin
+# novo antes deste commit.
+set(GLINTFX_MODULE_DRAW2D    OFF CACHE BOOL "" FORCE)
 
 FetchContent_Declare(
     glintfx
     GIT_REPOSITORY https://codeberg.org/petrinhu/glintfx
-    GIT_TAG        v0.19.0
+    GIT_TAG        v0.20.0
     SOURCE_SUBDIR  glintfx
 )
 FetchContent_MakeAvailable(glintfx)
