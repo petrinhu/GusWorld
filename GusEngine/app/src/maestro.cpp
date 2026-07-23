@@ -1167,13 +1167,26 @@ bool Maestro::to_npc_dialogue() {
     // run_npc_dialogue_loop_gl (a casca owning) + o SDL_GL_MakeCurrent de
     // restauracao (a PONTE TEMPORARIA do A1 nao existe mais). O nucleo _gl_current
     // NAO chama SdlWindow::clear_input() sozinho (fica no CHAMADOR que possui o
-    // contexto, ver o header) - clear_input() ao ENTRAR e ao SAIR continua aqui,
-    // MESMO fix de sempre (BUG "Gus anda sozinho apos fechar o dialogo").
+    // contexto, ver o header).
+    //
+    // F4-1a (onda F4, fatia 1 - loops modais -> maquina de estados com 1 unico
+    // pump de eventos, ver gus/app/screen_state.hpp): o dialogo agora roda por
+    // gus::app::run_screen_state (dentro de run_npc_dialogue_loop_gl_current),
+    // que entrega CADA SDL_Event pumpado tanto pra tela QUANTO, por este
+    // sync_hook, pro SdlInput persistente da cidade (city_->sync_input_event) -
+    // ai esta o motivo do clear_input() de SAIDA ter SUMIDO logo abaixo (ainda
+    // existia ate esta fatia): a solta de uma tecla de movimento durante a
+    // conversa agora e vista AO VIVO (no MESMO frame em que acontece), nao
+    // precisa mais de um flush retroativo ao fechar o dialogo. O clear_input()
+    // de ENTRADA continua (decisao de PRODUTO, nao bug - "nao faz sentido o Gus
+    // tentar mover" com a caixa de dialogo aberta; ver o comentario de
+    // sync_input_event em sdl_window.hpp pro racional completo, inclusive por
+    // que sync_input_event so repassa SOLTA/perda-de-foco, nunca aperto).
+    // PROVA: platform/tests/sdl_input_test.cpp, casos "[f4-1a]".
     city_->clear_input();
     const bool quit_requested = gus::app::screens::run_npc_dialogue_loop_gl_current(
-        window_, runtime, translator_, audio_,
-        frozen_ok ? frozen_bg_path : std::string());
-    city_->clear_input();
+        window_, runtime, translator_, audio_, frozen_ok ? frozen_bg_path : std::string(),
+        [this](const SDL_Event& ev) { city_->sync_input_event(ev); });
 
     // Higiene (AC-E3): mesma limpeza pos-uso do menu de pausa (ver open_pause_from_
     // city) - o snapshot congelado nao precisa sobreviver alem do dialogo que o leu.

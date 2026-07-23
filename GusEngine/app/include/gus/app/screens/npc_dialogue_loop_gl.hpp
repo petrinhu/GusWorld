@@ -89,6 +89,7 @@
 #include <SDL3/SDL.h>
 
 #include "gus/app/i18n/translator.hpp"
+#include "gus/app/screen_state.hpp"  // F4-1a: gus::app::EventSyncHook
 #include "gus/app/sdl_window.hpp"
 #include "gus/domain/dialogue/dialogue_runtime.hpp"
 #include "gus/platform/audio/audio_engine.hpp"
@@ -124,6 +125,12 @@ namespace gus::app::screens {
     const gus::app::i18n::Translator& translator,
     gus::platform::audio::AudioEngine& audio,
     const std::string& frozen_background_png = std::string());
+// F4-1a: nota de nao-mudanca - este wrapper OWNING continua chamando
+// SdlWindow::clear_input() na ENTRADA e na SAIDA (ver o .cpp), MESMO
+// comportamento de sempre. So o caminho de PRODUCAO (run_npc_dialogue_loop_gl_
+// current, via Maestro::to_npc_dialogue) foi convertido pro pump unico +
+// EventSyncHook (abaixo) - este wrapper e usado hoje so por probes/tools
+// standalone (nao-tracked), fora do escopo desta fatia.
 
 // FLASH-CTX (extracao behavior-preserving, A2): NUCLEO que ASSUME um contexto
 // GL JA CORRENTE e com os ponteiros de funcao (glad) JA CARREGADOS - MESMO
@@ -136,11 +143,21 @@ namespace gus::app::screens {
 // acima). Hoje SO chamada internamente por run_npc_dialogue_loop_gl (unico
 // chamador de producao continua sendo a Maestro, via a variante owning);
 // exposta pra futura reutilizacao aninhada (Opcao C, contexto GL unico).
+// F4-1a: `sync_hook` (opcional - nullptr = nao sincroniza nada, MESMO
+// comportamento de antes desta fatia) e entregue a gus::app::run_screen_state()
+// por dentro - recebe TODO SDL_Event pumpado pelo loop UNICO desta tela, no
+// MESMO frame em que a propria tela o processa. Maestro::to_npc_dialogue()
+// passa `[this](const SDL_Event& ev) { city_->sync_input_event(ev); }` - ver o
+// comentario de gus::app::SdlWindow::sync_input_event (sdl_window.hpp) pro
+// filtro exato (so KEY_UP/FOCUS_LOST) e o racional de o clear_input() de SAIDA
+// ter sido removido do chamador (nao mais necessario - o estado ja e visto ao
+// vivo).
 [[nodiscard]] bool run_npc_dialogue_loop_gl_current(
     SDL_Window* window, gus::domain::dialogue::DialogueRuntime& runtime,
     const gus::app::i18n::Translator& translator,
     gus::platform::audio::AudioEngine& audio,
-    const std::string& frozen_background_png = std::string());
+    const std::string& frozen_background_png = std::string(),
+    const gus::app::EventSyncHook& sync_hook = nullptr);
 
 }  // namespace gus::app::screens
 

@@ -268,3 +268,84 @@ TEST_CASE("SdlInput: KEY_DOWN sem KEY_UP correspondente (tecla 'presa' durante u
     in.clear();  // o que SdlWindow::clear_input() faz ao ENTRAR/SAIR do modal
     REQUIRE(in.dx() == 0);  // D nao fica "presa": o Gus nao anda sozinho ao retomar
 }
+
+// F4-1a (onda F4, fatia 1 - loops modais -> maquina de estados com 1 unico pump de
+// eventos): handle_event() e a peca NOVA que gus::app::SdlWindow::sync_input_event
+// repassa pro SdlInput da cidade quando um evento e pumpado por um CHAMADOR
+// EXTERNO (ex.: NpcDialogueScreen, dentro do modal) - MESMO switch que
+// pump_events() ja fazia por dentro do proprio poll, so exposto pra ser chamado
+// por fora. Prova de EQUIVALENCIA: alimentar handle_event() com os MESMOS 2
+// eventos (KEY_DOWN d, KEY_UP d) que um SDL_PollEvent real geraria produz o MESMO
+// resultado que process_key() direto (o caminho ja coberto acima) - a extracao de
+// pump_events() NAO mudou comportamento nenhum.
+TEST_CASE("SdlInput::handle_event reproduz process_key para KEY_DOWN/KEY_UP",
+          "[sdl_input][f4-1a]") {
+    SdlInput in;
+
+    SDL_Event down{};
+    down.type = SDL_EVENT_KEY_DOWN;
+    down.key.key = static_cast<SDL_Keycode>(kKeyD);
+    down.key.repeat = false;
+    REQUIRE(in.handle_event(down) == true);  // true = "segue rodando" (nao e QUIT)
+    REQUIRE(in.dx() == 1);
+
+    SDL_Event up{};
+    up.type = SDL_EVENT_KEY_UP;
+    up.key.key = static_cast<SDL_Keycode>(kKeyD);
+    REQUIRE(in.handle_event(up) == true);
+    REQUIRE(in.dx() == 0);
+}
+
+// Auto-repeat (e.key.repeat=true) e ignorado por handle_event() EXATAMENTE como
+// ja era por pump_events() (idempotente) - nao-regressao da extracao.
+TEST_CASE("SdlInput::handle_event ignora KEY_DOWN com repeat=true (auto-repeat)",
+          "[sdl_input][f4-1a]") {
+    SdlInput in;
+    SDL_Event down{};
+    down.type = SDL_EVENT_KEY_DOWN;
+    down.key.key = static_cast<SDL_Keycode>(kKeyD);
+    down.key.repeat = true;
+    REQUIRE(in.handle_event(down) == true);
+    REQUIRE(in.dx() == 0);  // repeat nunca chega em process_key
+}
+
+// SDL_EVENT_QUIT devolve false (MESMO contrato de pump_events() no QUIT).
+TEST_CASE("SdlInput::handle_event devolve false em SDL_EVENT_QUIT",
+          "[sdl_input][f4-1a]") {
+    SdlInput in;
+    SDL_Event quit{};
+    quit.type = SDL_EVENT_QUIT;
+    REQUIRE(in.handle_event(quit) == false);
+}
+
+// PROVA CENTRAL da F4-1a: o mecanismo NOVO (pump unico - handle_event chamado por
+// um CHAMADOR EXTERNO enquanto um modal "tem o foco", ver gus/app/sdl_window.hpp::
+// sync_input_event) fecha o MESMO bug do teste "regressao-dialogo" acima SEM
+// depender de um clear() defensivo na SAIDA do modal: a tecla segurada ANTES do
+// modal e solta DURANTE o modal (o handle_event acontece ao vivo, no MESMO
+// instante da solta - nao um flush retroativo ao sair).
+TEST_CASE("SdlInput::handle_event ao vivo DURANTE o modal solta a tecla sem "
+          "precisar de clear() na saida (F4-1a, prova da onda dos loops modais)",
+          "[sdl_input][f4-1a][regressao-dialogo]") {
+    SdlInput in;
+    in.process_key(kKeyD, /*pressed=*/true);  // segura D antes de entrar no modal
+    REQUIRE(in.dx() == 1);
+
+    // ... o modal abre aqui (ScreenState::enter()) - SEM clear_input() de entrada
+    // nesta prova (isolando o efeito SO do sync ao vivo, nao do freeze de
+    // entrada que Maestro::to_npc_dialogue() ainda aplica por decisao de
+    // produto separada - ver o comentario de sync_input_event) ...
+
+    // o KEY_UP de D acontece DURANTE o modal - o pump UNICO da F4-1a entrega
+    // este MESMO evento tanto pro ScreenState (via handle_event da tela) quanto,
+    // por este EventSyncHook, pro handle_event do SdlInput da cidade - no MESMO
+    // frame em que acontece.
+    SDL_Event up{};
+    up.type = SDL_EVENT_KEY_UP;
+    up.key.key = static_cast<SDL_Keycode>(kKeyD);
+    REQUIRE(in.handle_event(up) == true);
+
+    // SEM clear() nenhum aqui (nem de entrada nem de saida) - o estado JA esta
+    // correto porque o evento foi visto ao vivo, nao porque foi varrido depois.
+    REQUIRE(in.dx() == 0);
+}

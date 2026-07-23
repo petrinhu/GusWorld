@@ -95,41 +95,50 @@ void SdlInput::open_gamepads() {
     }
 }
 
+bool SdlInput::handle_event(const SDL_Event& e) {
+    switch (e.type) {
+        case SDL_EVENT_QUIT:
+            return false;  // fechar janela / Ctrl-C: encerra o loop
+
+        case SDL_EVENT_KEY_DOWN:
+            if (!e.key.repeat) {  // auto-repeat e idempotente; ignora
+                process_key(static_cast<int>(e.key.key), /*pressed=*/true);
+            }
+            break;
+        case SDL_EVENT_KEY_UP:
+            process_key(static_cast<int>(e.key.key), /*pressed=*/false);
+            break;
+
+        // Perder foco: solta tudo pra nao "grudar" movimento.
+        case SDL_EVENT_WINDOW_FOCUS_LOST:
+            clear();
+            break;
+
+        // Hot-plug: abre o gamepad recem-conectado; fecha o removido.
+        case SDL_EVENT_GAMEPAD_ADDED:
+            open_gamepads();
+            break;
+        case SDL_EVENT_GAMEPAD_REMOVED:
+            if (gamepad_ != nullptr) {
+                SDL_CloseGamepad(as_pad(gamepad_));
+                gamepad_ = nullptr;
+            }
+            pad_ = GamepadState{};
+            break;
+
+        default:
+            break;
+    }
+    return true;
+}
+
 bool SdlInput::pump_events() {
     SDL_Event e;
     while (SDL_PollEvent(&e)) {
-        switch (e.type) {
-            case SDL_EVENT_QUIT:
-                return false;  // fechar janela / Ctrl-C: encerra o loop
-
-            case SDL_EVENT_KEY_DOWN:
-                if (!e.key.repeat) {  // auto-repeat e idempotente; ignora
-                    process_key(static_cast<int>(e.key.key), /*pressed=*/true);
-                }
-                break;
-            case SDL_EVENT_KEY_UP:
-                process_key(static_cast<int>(e.key.key), /*pressed=*/false);
-                break;
-
-            // Perder foco: solta tudo pra nao "grudar" movimento.
-            case SDL_EVENT_WINDOW_FOCUS_LOST:
-                clear();
-                break;
-
-            // Hot-plug: abre o gamepad recem-conectado; fecha o removido.
-            case SDL_EVENT_GAMEPAD_ADDED:
-                open_gamepads();
-                break;
-            case SDL_EVENT_GAMEPAD_REMOVED:
-                if (gamepad_ != nullptr) {
-                    SDL_CloseGamepad(as_pad(gamepad_));
-                    gamepad_ = nullptr;
-                }
-                pad_ = GamepadState{};
-                break;
-
-            default:
-                break;
+        if (!handle_event(e)) {
+            return false;  // MESMO comportamento de sempre: retorna NA HORA no
+                            // QUIT, sem ler Caps Lock/gamepad deste frame (os
+                            // eventos restantes da fila ficam pro proximo pump).
         }
     }
 

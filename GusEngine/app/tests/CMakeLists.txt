@@ -37,6 +37,17 @@ add_executable(gusengine_app_tests
     translator_test.cpp
     maestro_logic_test.cpp
     boot_pixel_overlay_test.cpp
+    # F4-1a (onda F4, fatia 1 - loops modais bloqueantes -> maquina de estados
+    # com 1 unico pump de eventos): run_screen_state() com ScreenState/poll_fn/
+    # now_fn FALSOS, headless - ver gus/app/screen_state.hpp.
+    screen_state_test.cpp
+    # F4-1a QA-FOLLOWUP (achado 1 da auditoria adversarial - mutantes
+    # sobreviventes de SdlWindow::sync_input_event): chama sync_input_event()
+    # DE VERDADE, observa via input_dx()/input_dy().
+    sdl_window_sync_input_event_test.cpp
+    # F4-1a QA-FOLLOWUP: integracao real run_screen_state + sync_input_event +
+    # SdlInput, reproduzindo o bug ponta-a-ponta (COM e SEM o sync_hook).
+    screen_state_sync_input_integration_test.cpp
     # M7-DIALOGO (NPC-MVP): overlay funcional simples + I/O do grafo do Bertoldo.
     npc_dialogue_overlay_test.cpp
     npc_dialogue_catalog_test.cpp

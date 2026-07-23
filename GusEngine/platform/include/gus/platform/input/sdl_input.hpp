@@ -14,16 +14,25 @@
 // opostos cancelam. run = Shift (teclado, segurar) OU botao de run (gamepad) OU
 // Caps Lock ON (teclado, toggle por estado) - qualquer uma basta.
 //
-// HEADER LIMPO (sem <SDL...>): inclui so InputMapper + gamepad_mapping (POCO). O
-// processamento de SDL_Event de hardware (pump_events, open/close de gamepad) vive
-// no .cpp - a unica parte que toca SDL. Isso mantem a FUSAO e a traducao de tecla
-// testaveis headless (sdl_input_test.cpp): process_key, mutable_gamepad e
-// set_caps_lock_active sao a porta de injecao do teste; pump_events e o caminho
-// real (coberto pelo smoke; SDL_GetModState degrada pra KMOD_NONE sem teclado
-// fisico/driver dummy, ou seja Caps Lock OFF - seguro em headless).
+// F4-1a (onda F4, fatia 1 - loops modais -> maquina de estados com 1 unico pump de
+// eventos): o header GANHOU <SDL3/SDL.h> (deixou de ser "sem <SDL...>") para expor
+// handle_event(const SDL_Event&) - a MESMA logica que pump_events() ja fazia por
+// dentro do proprio poll, agora tambem chamavel por um CHAMADOR EXTERNO que fez o
+// PROPRIO SDL_PollEvent (ex.: gus::app::run_screen_state(), via
+// gus::app::SdlWindow::sync_input_event) - a peca que fecha "SdlWindow::
+// clear_input() na SAIDA de um modal" pela raiz (ver o comentario de
+// clear_input() em gus/app/sdl_window.hpp e o consumidor real em
+// gus/app/src/screens/npc_dialogue_loop_gl.cpp/gus/app/maestro.cpp). platform/ e a
+// fronteira que TOCA SDL/GL (ao contrario de core/domain/) - incluir SDL3 aqui nao
+// viola o GATE de 4 camadas (ver tools/check.sh). process_key/mutable_gamepad/
+// set_caps_lock_active continuam a porta de injecao SEM SDL_Event pros testes que
+// nao precisam simular o evento cru; handle_event() e a porta pra quem PRECISA
+// (ex.: sdl_input_test.cpp, prova de equivalencia com pump_events()).
 
 #ifndef GUS_PLATFORM_INPUT_SDL_INPUT_HPP
 #define GUS_PLATFORM_INPUT_SDL_INPUT_HPP
+
+#include <SDL3/SDL.h>
 
 #include "gus/platform/input/gamepad_mapping.hpp"
 #include "gus/platform/input/input_mapper.hpp"
@@ -52,10 +61,26 @@ public:
     SdlInput& operator=(const SdlInput&) = delete;
 
     // --- caminho REAL (toca SDL; coberto pelo smoke) -----------------------
-    // Drena a fila de eventos do SDL: teclado -> process_key, gamepad
-    // (conexao/desconexao/botoes) -> GamepadState. Devolve false se o SDL pediu
-    // para sair (janela fechada / SDL_EVENT_QUIT) - o loop encerra. true continua.
+    // Drena a fila de eventos do SDL (via handle_event(), abaixo, por evento):
+    // teclado -> process_key, gamepad (conexao/desconexao/botoes) -> GamepadState.
+    // Devolve false se o SDL pediu para sair (janela fechada / SDL_EVENT_QUIT) - o
+    // loop encerra. true continua.
     [[nodiscard]] bool pump_events();
+
+    // F4-1a: processa UM SDL_Event JA obtido - por este objeto via pump_events()
+    // (caminho de sempre) OU por um CHAMADOR EXTERNO que fez o PROPRIO
+    // SDL_PollEvent (ex.: gus::app::run_screen_state() dentro de um modal, via
+    // gus::app::SdlWindow::sync_input_event - ver o header do .hpp). Cobre
+    // EXATAMENTE os mesmos casos que pump_events() ja tratava por dentro do
+    // proprio poll (KEY_DOWN/UP -> process_key, foco perdido -> clear(), hot-plug
+    // de gamepad); NAO le Caps Lock nem eixo/botao continuo do gamepad (isso
+    // continua so em pump_events(), 1x por CHAMADA - MESMO comportamento de
+    // sempre, um CHAMADOR externo evento-a-evento nao tem "1x por frame" bem
+    // definido do jeito que pump_events() tem). Devolve false SO para
+    // SDL_EVENT_QUIT (MESMO contrato de retorno que pump_events() ja tinha pro
+    // caso QUIT); true caso contrario (inclusive eventos ignorados/default).
+    [[nodiscard]] bool handle_event(const SDL_Event& e);
+
     // Abre os gamepads ja conectados e arma o hot-plug (chamar apos SDL_Init).
     void open_gamepads();
 

@@ -388,6 +388,22 @@ bool SdlWindow::consume_escape_pressed() noexcept {
 
 void SdlWindow::clear_input() noexcept { input_.clear(); }
 
+void SdlWindow::sync_input_event(const SDL_Event& ev) noexcept {
+    // F4-1a: ver o comentario grande no .hpp pro racional completo do filtro
+    // (so KEY_UP/FOCUS_LOST atravessam, nunca KEY_DOWN).
+    if (ev.type == SDL_EVENT_KEY_UP || ev.type == SDL_EVENT_WINDOW_FOCUS_LOST) {
+        (void)input_.handle_event(ev);
+    }
+}
+
+void SdlWindow::process_key_for_test(int sdl_keycode, bool pressed) noexcept {
+    input_.process_key(sdl_keycode, pressed);
+}
+
+int SdlWindow::input_dx() const noexcept { return input_.dx(); }
+
+int SdlWindow::input_dy() const noexcept { return input_.dy(); }
+
 void SdlWindow::set_controls(gus::domain::input::InputRemapConfig config) {
     input_.set_controls(std::move(config));
 }

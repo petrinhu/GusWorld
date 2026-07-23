@@ -95,6 +95,9 @@ add_library(gusengine_app STATIC
     # M7-COSTURA (ADR-012 Onda 1): maestro leve cidade<->batalha (ver maestro.hpp).
     src/maestro_logic.cpp
     src/maestro.cpp
+    # F4-1a (onda F4, fatia 1): contrato de ScreenState + o loop UNICO com 1
+    # pump de eventos por frame - ver gus/app/screen_state.hpp.
+    src/screen_state.cpp
     # M7-COSTURA Inc 2c: sequencia de frames pre-renderizada (boot pixelizado) no
     # lugar do glitch procedural (aposentado - o lider VETOU o visual ao vivo,
     # "pareceu bug"; ver gus/app/boot_pixel_overlay.hpp).

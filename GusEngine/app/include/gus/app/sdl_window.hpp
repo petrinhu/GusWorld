@@ -258,22 +258,100 @@ public:
     // FIX BUG (playtest ao vivo do lider, M7-DIALOGO NPC-MVP: "Gus anda sozinho
     // apos fechar o dialogo com o Bertoldo"): solta TODA tecla de movimento
     // segurada no estado de input da cidade (mesmo efeito de SDL_EVENT_WINDOW_
-    // FOCUS_LOST -> SdlInput::clear(), ver sdl_input.hpp). CAUSA RAIZ: qualquer
-    // loop MODAL que faz o proprio SDL_PollEvent independente (dialogo, menu de
-    // pausa - ver npc_dialogue_loop.cpp/npc_dialogue_loop_gl.cpp/system_menu_loop.cpp)
-    // NUNCA repassa os eventos pro input_ desta SdlWindow (input_.pump_events() so
-    // roda dentro de step()/step_with_fade(), que a Maestro NAO chama enquanto o
-    // modal esta aberto). Se o jogador estava segurando uma tecla de movimento ao
-    // entrar no modal e a SOLTA durante a conversa, o SDL_EVENT_KEY_UP correspondente
-    // e descartado pelo loop modal (nunca chega em input_) - o estado interno
-    // continua "pressionada" para sempre, e o Gus retoma andando na cidade ate
-    // esbarrar em algo. Chamar isto ao ENTRAR (congela o movimento em "nada
-    // pressionado", coerente com o jogador olhando pra uma caixa de dialogo/menu -
-    // nao faz sentido ele estar "tentando mover" nesse momento) E ao SAIR (garante
-    // que o estado comeca limpo ao retomar a cidade, mesmo se algo mudasse
-    // input_ no meio do caminho) fecha o bug pela raiz, sem exigir que cada loop
-    // modal reimplemente o roteamento de KEY_UP.
+    // FOCUS_LOST -> SdlInput::clear(), ver sdl_input.hpp). CAUSA RAIZ (HISTORICA -
+    // ver a nota F4-1a abaixo pro estado ATUAL): qualquer loop MODAL que faz o
+    // proprio SDL_PollEvent independente (system_menu_loop.cpp e as demais telas
+    // ainda nao convertidas, ver TODO.md F4-1b em diante) NUNCA repassa os eventos
+    // pro input_ desta SdlWindow (input_.pump_events() so roda dentro de step()/
+    // step_with_fade(), que a Maestro NAO chama enquanto o modal esta aberto). Se
+    // o jogador estava segurando uma tecla de movimento ao entrar no modal e a
+    // SOLTA durante a conversa, o SDL_EVENT_KEY_UP correspondente e descartado
+    // pelo loop modal (nunca chega em input_) - o estado interno continua
+    // "pressionada" para sempre, e o Gus retoma andando na cidade ate esbarrar em
+    // algo. Chamar isto ao ENTRAR (congela o movimento em "nada pressionado",
+    // coerente com o jogador olhando pra uma caixa de dialogo/menu - nao faz
+    // sentido ele estar "tentando mover" nesse momento) E ao SAIR (garante que o
+    // estado comeca limpo ao retomar a cidade, mesmo se algo mudasse input_ no
+    // meio do caminho) fecha o bug pela raiz, sem exigir que cada loop modal
+    // reimplemente o roteamento de KEY_UP.
+    //
+    // F4-1a (onda F4, fatia 1 - npc_dialogue_loop_gl.cpp convertido pro pump
+    // unico, ver gus/app/screen_state.hpp): Maestro::to_npc_dialogue() REMOVEU a
+    // chamada de SAIDA (a de ENTRADA continua - decisao de PRODUTO, nao bug, ver
+    // sync_input_event abaixo) - o dialogo agora entrega cada SDL_EVENT_KEY_UP a
+    // esta SdlWindow AO VIVO via sync_input_event() (nao mais so no flush de
+    // saida), entao o clear() de saida provou-se redundante PRA ESTA TRANSICAO
+    // especifica (nada mais fica pendente pra "limpar" quando o dialogo fecha).
+    // As telas AINDA nao convertidas (system_menu_loop.cpp e as demais) nao usam
+    // clear_input() nenhum hoje - continuam fora deste mecanismo ate suas
+    // proprias fatias de conversao.
     void clear_input() noexcept;
+
+    // F4-1a (onda F4, fatia 1 - loops modais bloqueantes -> maquina de estados
+    // tickada por 1 loop UNICO com 1 UNICO pump de eventos, ver gus/app/
+    // screen_state.hpp): entrega ao input_ desta cidade um SDL_Event que um
+    // CHAMADOR EXTERNO ja pumpou (ex.: gus::app::run_screen_state(), rodando o
+    // ScreenState do dialogo do NPC) - o mesmo objetivo de clear_input() acima
+    // (nunca perder um SDL_EVENT_KEY_UP so porque um modal tinha o foco), so
+    // que pela RAIZ: o estado ve o evento no INSTANTE em que ele acontece
+    // (enquanto o modal ainda esta aberto), nao so num flush grosseiro no
+    // enter()/exit() do modal.
+    //
+    // FILTRO DELIBERADO (isto NAO repassa tudo): so SDL_EVENT_KEY_UP e
+    // SDL_EVENT_WINDOW_FOCUS_LOST atravessam - NUNCA SDL_EVENT_KEY_DOWN.
+    // Motivo: o CHAMADOR (Maestro::to_npc_dialogue) ainda congela o movimento
+    // pra "nada pressionado" ao ENTRAR no modal (clear_input(), preservado -
+    // decisao de PRODUTO do lider, nao um bug: "nao faz sentido [o Gus] estar
+    // tentando mover" enquanto uma caixa de dialogo/menu tem o foco). Se
+    // eventos de PRESS tambem atravessassem, uma tecla de NAVEGACAO do proprio
+    // modal (ex.: seta-cima pra mover a selecao de uma opcao) que o jogador
+    // AINDA estivesse segurando no instante exato em que o modal fecha faria
+    // o Gus comecar a andar IMEDIATAMENTE ao voltar pra cidade - uma mudanca
+    // de COMPORTAMENTO que ninguem pediu nesta fatia (fica registrada como
+    // refinamento possivel de fatia futura, nao decidida aqui). So repassar
+    // SOLTA (e perda de foco, que so pode zerar) preserva 100% o
+    // comportamento de sempre - a cidade so pode ir de "pressionada" pra
+    // "solta" durante o modal, nunca o contrario - enquanto fecha o bug pela
+    // raiz: nenhuma SOLTA se perde mais (antes dependia do modal nunca ser
+    // interrompido entre o clear_input() de ENTRADA e o de SAIDA; agora e
+    // vista ao vivo, evento a evento).
+    //
+    // PROVA (QA-FOLLOWUP - a auditoria adversarial mutou este metodo de 3
+    // jeitos - no-op, repassa tudo incluindo KEY_DOWN, so FOCUS_LOST - e os 3
+    // mutantes SOBREVIVERAM porque nenhum teste chamava sync_input_event()
+    // diretamente; o teste "[f4-1a][regressao-dialogo]" de sdl_input_test.cpp
+    // chamava SdlInput::handle_event() direto, pulando esta funcao): ver
+    // app/tests/sdl_window_sync_input_event_test.cpp (chama sync_input_event()
+    // de verdade, observa via input_dx()/input_dy() abaixo - mata os 3
+    // mutantes) e app/tests/screen_state_sync_input_integration_test.cpp
+    // (amarra a corrente real: gus::app::run_screen_state + sync_input_event +
+    // SdlInput, reproduzindo tecla pressionada ANTES do modal / solta DURANTE
+    // / cidade correta DEPOIS - COM e SEM o sync_hook, pra provar que o
+    // mecanismo, nao coincidencia, e quem fecha o bug).
+    void sync_input_event(const SDL_Event& ev) noexcept;
+
+    // --- caminho TESTAVEL (sem SDL/SDL_Init - MESMO padrao de SdlInput::
+    // process_key/mutable_gamepad, ver sdl_input.hpp) ---------------------
+    // F4-1a QA-FOLLOWUP: injeta uma transicao de tecla de MOVIMENTO direto no
+    // input_ desta cidade, sem depender de SDL_PushEvent (que FALHA sem
+    // SDL_Init - confirmado empiricamente antes de escrever este metodo,
+    // SDL_PushEvent devolve false e o evento nunca entra na fila) nem expor o
+    // SdlInput inteiro pra fora de SdlWindow. Producao real NUNCA chama isto
+    // (o caminho real e input_.pump_events(), dentro de step()/
+    // step_with_fade()) - existe SO pra testes headless armarem "tecla ja
+    // pressionada ANTES do modal" (o precondicao que os testes de
+    // sync_input_event precisam, ja que sync_input_event() so repassa
+    // SOLTA/foco-perdido, nunca PRESSIONA - ver o comentario acima).
+    void process_key_for_test(int sdl_keycode, bool pressed) noexcept;
+
+    // Intencao de movimento FUNDIDA atual (teclado+gamepad) desta cidade,
+    // MESMO contrato de SdlInput::dx()/dy() - exposta pra testes observarem o
+    // efeito de sync_input_event()/clear_input()/process_key_for_test() sem
+    // precisar rodar step() (que exigiria clock_/SDL_GetTicksNS reais, alem
+    // de nao ser necessario pra estas provas - so o ESTADO de input importa
+    // aqui, nao o movimento simulado).
+    [[nodiscard]] int input_dx() const noexcept;
+    [[nodiscard]] int input_dy() const noexcept;
 
     // M2 (ligando a tela Controles ao input REAL): repassa `config` pro
     // SdlInput::set_controls interno - a Maestro chama isto (1) no BOOT, com o
