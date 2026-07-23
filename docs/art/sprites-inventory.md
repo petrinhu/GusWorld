@@ -100,7 +100,10 @@ walk. São NPCs que hoje não andam (parados no mundo). Ex.: `seu_bertoldo_caim`
 
 ## Como gerar o que falta (PixelLab, pipeline canônica)
 
-Detalhe completo em `reference_pixellab_mcp` (memória). Resumo:
+**RITUAL OBRIGATÓRIO de 5 passos (líder 2026-07-23, memória `feedback_ritual_geracao_sprite`):**
+1. **Buscar NESTE mapa** (nunca sair procurando no disco). 2. **Buscar referência** aprovada do personagem (é o insumo; trava identidade+antena, ZERO flip). 3. **Gerar** via PixelLab, pasta nova para variante/regen. 4. **Baixar** os PNGs pra `resources/sprites/<slug>/` (sem isso ficam invisíveis pro jogo). 5. **Atualizar ESTE mapa** com o que foi gerado. O mapa alimenta a geração (passo 1) e a geração alimenta o mapa (passo 5) — nunca envelhece.
+
+Detalhe da ferramenta em `reference_pixellab_mcp` (memória). Resumo:
 
 1. **Referência → 8 direções:** `create_character` **mode="v3"** +
    `reference_image_base64` = o `south.png` aprovado (≤256px, ~6KB de base64, cabe
