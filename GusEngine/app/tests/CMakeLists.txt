@@ -134,6 +134,11 @@ add_executable(gusengine_app_tests
     # difficulty_menu_loop_interaction_test.cpp - prova o FIO INTEIRO ate
     # run_battle_preview_embedded_gl_current (SDL_EVENT_QUIT real fecha a janela).
     battle_preview_interaction_test.cpp
+    # F4-1b.6 (onda F4, fatia 1b.6 - ferramenta INTERNA de dev --anim-preview,
+    # a MAIS SIMPLES da onda): anim_preview_step, a funcao PURA de roteamento
+    # de evento extraida do while(true) antigo - headless, SEM SDL_Init/
+    # janela/IRenderer/AnimClock real (ver o topo do arquivo).
+    anim_preview_step_test.cpp
 )
 
 target_link_libraries(gusengine_app_tests
