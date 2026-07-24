@@ -92,6 +92,15 @@ Estes 7 têm ciclo de caminhada pronto (o alvo de completude):
 | `dante_grid` | 180×180 | 24 | TRAIDOR |
 | `jaci_proxy` | 180×180 | 24 | Healer |
 
+**GERAÇÃO 2026-07-23 (party completa + Gus breathing):** os 6 companions ganharam o
+conjunto de anims do Gus via API HTTP direta (`animate-with-text-v3`, `no_background`,
+referência = o sprite direcional real de cada um). **14 tipos de anim × 6, 1086 frames,
+0 opaco** (conferido). Em STAGING (`anims/_<anim>_STAGING_2026-07-23/`), aguardando
+wiring do loader: breathing_idle/walk/run/caindo/caido_desacordado (direcionais 4-dir) +
+battle_idle/cast/attack_melee/defend/hurt_magic/hurt_physical/ko/revive/victory
+(front). `dragon_victory` NÃO (lore só do Gus). Gus breathing_idle N/L/O regenerado
+transparente (o 1º lote saiu opaco, bug de `no_background` esquecido).
+
 O **Gus protagonista** tem a árvore mais completa de todas (ver bloco ⭐ acima:
 8 rotações + walk 4-dir + 16 estados de anim). O que FALTA nele é pontual: a
 **respiração/cansado (`breathing_idle`) para Norte, Leste e Oeste** — hoje só o
