@@ -93,6 +93,15 @@ add_executable(gusengine_app_tests
     # HEADLESS (sem janela/GL): SdlWindow recem-construida ja tem render2d_ == nullptr,
     # MESMO estado que release_renderer() cria no menu de pausa - antes do fix crashava.
     sdl_window_marker_defer_test.cpp
+    # F4-1b.2 (onda F4, fatia 1b.2 - SEGUNDA tela convertida ao contrato
+    # ScreenState apos F4-1b.1/difficulty_menu_loop.cpp): save_load_screen_step, a
+    # funcao PURA de roteamento de evento extraida do while(true) antigo -
+    # headless, SEM SDL_Init/janela/glintfx::UiLayer real (ver o topo do arquivo).
+    save_load_screen_step_test.cpp
+    # F4-1b.2: harness HEADLESS com GL real (Xvfb :99), MESMA receita de
+    # difficulty_menu_loop_interaction_test.cpp - prova o FIO INTEIRO ate
+    # run_save_load_menu_loop_gl_current (SDL_EVENT_QUIT real fecha a janela).
+    save_load_menu_loop_interaction_test.cpp
 )
 
 target_link_libraries(gusengine_app_tests
