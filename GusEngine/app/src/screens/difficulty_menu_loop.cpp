@@ -1,11 +1,23 @@
 // gus/app/src/screens/difficulty_menu_loop.cpp
 //
 // Implementacao do loop interativo da tela de selecao de dificuldade. Ver header
-// para o contrato completo. GL/glintfx-heavy (mesma familia de
-// title_menu_loop.cpp/save_load_menu_loop.cpp) - sem unidade de teste direta (a
-// logica PURA testavel ja fica em difficulty_menu.hpp/difficulty_menu_test.cpp e
-// difficulty_menu_rml.hpp/difficulty_menu_rml_test.cpp; este .cpp so orquestra
-// SDL/GL em torno delas).
+// para o contrato completo.
+//
+// F4-1b (onda F4 "casca SDL -> App mode do glintfx", fatia 1b - PRIMEIRA tela
+// convertida ao contrato ScreenState apos F4-1a/npc_dialogue_loop_gl.cpp - esta
+// conversao ESTABELECE o template pras telas seguintes da fatia): o caminho de
+// PRODUCAO (run_difficulty_menu_loop_gl_current, unico chamador de producao e
+// title_menu_loop.cpp) foi convertido de um while(true){SDL_PollEvent...} PROPRIO
+// pra classe DifficultyScreen (gus::app::ScreenState) + gus::app::run_screen_state
+// (gus/app/screen_state.hpp) - MESMA tecnica de NpcDialogueScreen (F4-1a). O
+// roteamento de evento (o "o que fazer" - navegar/confirmar/tocar SFX/reload/
+// sair) foi extraido pra uma FUNCAO LIVRE PURA nova, difficulty_screen_step
+// (declarada no .hpp, testada headless SEM SDL_Init/glintfx real em
+// difficulty_screen_step_test.cpp) - ela recebe as glintfx::ElementBox JA
+// RESOLVIDAS como parametro (`boxes`), nunca consulta a UiLayer diretamente;
+// DifficultyScreen::handle_event() e o UNICO chamador de producao dela (resolve
+// as boxes quando o evento precisa, delega a decisao, aplica os side effects
+// REAIS - SDL/GL/audio - que a funcao pura devolve pedidos).
 //
 // ANINHADO (NAO owning_gl): ao contrario de title_menu_loop.cpp, esta funcao NAO
 // cria/destroi o contexto GL - ela roda DENTRO do contexto que o CHAMADOR
@@ -15,6 +27,7 @@
 
 #include "gus/app/screens/difficulty_menu_loop.hpp"
 
+#include <array>
 #include <cstdlib>
 #include <filesystem>
 #include <fstream>
@@ -98,8 +111,10 @@ std::string write_difficulty_rml_file(const DifficultyMenuState& state,
 
 // Hit-test simples (MESMA receita de title_menu_loop.cpp/system_menu_loop.cpp):
 // cursor (espaco-janela) dentro da caixa border-box devolvida por
-// glintfx::UiLayer::get_element_box.
-bool hit_test(const glintfx::ElementBox& box, float x, float y) {
+// glintfx::UiLayer::get_element_box. PURA - usada tanto por difficulty_screen_step
+// (roteamento de clique) quanto (indiretamente, via boxes ja resolvidas) pelo
+// resto deste arquivo.
+bool hit_test(const glintfx::ElementBox& box, float x, float y) noexcept {
     if (!box.found) return false;
     return x >= box.x && x <= box.x + box.w && y >= box.y && y <= box.y + box.h;
 }
@@ -134,276 +149,479 @@ std::optional<int> parse_difficulty_list_item_index(const std::string& id) {
     return std::nullopt;
 }
 
+// F4-1b: roteia UM "kind normal" (Hover/Click) pro Blocked quando `index` e um
+// item de LISTA (nao-splash) NAO selecionavel (Hardcore nesta Fase 0) - MESMA
+// decisao que o antigo `sfx_for_item` lambda tomava, agora 100% PURA (so
+// `state` + `difficulty_item_selectable`, sem SoundId nenhum) e COMPARTILHADA
+// entre difficulty_screen_step (teclado/clique) e o callback nativo de hover
+// (mouse) abaixo - um UNICO lugar decide "isto e o card bloqueado?".
+DifficultySfxKind sfx_kind_for_item(const DifficultyMenuState& state, int index,
+                                    DifficultySfxKind normal_kind) noexcept {
+    if (!state.confirming && index >= 0 && index < kDifficultyItemCount &&
+        !difficulty_item_selectable(state, index)) {
+        return DifficultySfxKind::Blocked;
+    }
+    return normal_kind;
+}
+
+// F4-1b: aplica o DESFECHO de um DifficultyMenuAction (None/Chosen/Cancelled) no
+// DifficultyStepResult - MESMO dispatch do antigo `route_action` lambda, so que
+// gravando em campos da struct de retorno (reload/exit) em vez de chamar
+// reload()/retornar direto (esses side effects ficam com o CHAMADOR, ver
+// DifficultyScreen::handle_event).
+void apply_action_to_result(DifficultyStepResult& result, DifficultyMenuAction action) noexcept {
+    switch (action) {
+        case DifficultyMenuAction::None:
+            result.reload = true;
+            return;
+        case DifficultyMenuAction::Chosen:
+            result.exit = DifficultyLoopExit::Chosen;
+            return;
+        case DifficultyMenuAction::Cancelled:
+            result.exit = DifficultyLoopExit::Cancelled;
+            return;
+    }
+}
+
+}  // namespace
+
+// F4-1b: implementacao de difficulty_screen_step (declarada no .hpp) - ver o
+// comentario grande la pro contrato completo. Extracao BEHAVIOR-PRESERVING do
+// corpo do while(true) antigo (o mesmo racional/ordem de checagem de tipo de
+// evento, MESMAS chamadas a difficulty_menu_key_down/difficulty_menu_click_option,
+// MESMO uso de sfx_kind_for_item/ui_hover_entered_new_item) - so devolvendo a
+// DECISAO em vez de executar os side effects na hora.
+DifficultyStepResult difficulty_screen_step(
+    DifficultyMenuState& state, const SDL_Event& ev,
+    const glintfx::ElementBox boxes[kDifficultyItemCount]) noexcept {
+    DifficultyStepResult result;
+
+    if (ev.type == SDL_EVENT_QUIT) {
+        result.window_closed = true;
+        return result;
+    }
+
+    if (ev.type == SDL_EVENT_WINDOW_RESIZED ||
+        ev.type == SDL_EVENT_WINDOW_PIXEL_SIZE_CHANGED) {
+        result.resize = true;  // estado da tela intocado - o CHAMADOR reposiciona.
+        return result;
+    }
+
+    if (ev.type == SDL_EVENT_KEY_DOWN && !ev.key.repeat) {
+        const bool is_confirm_key = (ev.key.key == SDLK_RETURN ||
+                                      ev.key.key == SDLK_KP_ENTER ||
+                                      ev.key.key == SDLK_SPACE);
+        if (is_confirm_key) {
+            // AJUSTE polish playtest 2026-07-10: Enter/Espaco com o foco no
+            // Hardcore BLOQUEADO (item de LISTA) toca o SFX bloqueado em vez do
+            // click normal - a ACAO em si segue no-op TOTAL de estado
+            // (difficulty_menu_key_down, ver o header) - result.reload ainda vira
+            // true (MESMO comportamento antigo: route_action recarrega o RML
+            // mesmo quando o estado nao mudou de fato).
+            result.sfx = sfx_kind_for_item(state, difficulty_keyboard_focus_index(state),
+                                           DifficultySfxKind::Click);
+            const DifficultyMenuAction action = difficulty_menu_key_down(state, ev.key.key);
+            apply_action_to_result(result, action);
+        } else {
+            // Navegacao (setas/WASD/ESC) - SOM DE HOVER paridade teclado x mouse
+            // (MESMA tecnica de title_menu_loop.cpp): so toca se o MODO (lista vs
+            // splash) NAO mudou E moveu pra um item NOVO.
+            const bool confirming_before = state.confirming;
+            const int kb_index_before = difficulty_keyboard_focus_index(state);
+            const DifficultyMenuAction action = difficulty_menu_key_down(state, ev.key.key);
+            if (state.confirming == confirming_before) {
+                const int kb_index_after = difficulty_keyboard_focus_index(state);
+                if (ui_hover_entered_new_item(kb_index_before, kb_index_after)) {
+                    result.sfx =
+                        sfx_kind_for_item(state, kb_index_after, DifficultySfxKind::Hover);
+                }
+            }
+            apply_action_to_result(result, action);
+        }
+        return result;
+    }
+
+    if (ev.type == SDL_EVENT_MOUSE_BUTTON_DOWN && ev.button.button == SDL_BUTTON_LEFT) {
+        if (state.confirming) {
+            for (int i = 0; i < 2; ++i) {
+                if (!hit_test(boxes[i], ev.button.x, ev.button.y)) continue;
+                // Os 2 pills de confirmacao sao SEMPRE selecionaveis - nunca
+                // tocam o SFX bloqueado (MESMO comentario do lambda antigo).
+                result.sfx = DifficultySfxKind::Click;
+                const DifficultyMenuAction action = difficulty_menu_click_option(state, i);
+                apply_action_to_result(result, action);
+                return result;
+            }
+            return result;  // clique fora de qualquer pill - no-op TOTAL
+        }
+        for (int i = 0; i < kDifficultyItemCount; ++i) {
+            if (!hit_test(boxes[i], ev.button.x, ev.button.y)) continue;
+            // Clicar no Hardcore BLOQUEADO e no-op TOTAL DE ESTADO (ver
+            // difficulty_menu_click_option), mas AJUSTE polish playtest
+            // 2026-07-10: toca o SFX bloqueado (grave/abafado) em vez de ficar
+            // mudo - da feedback sonoro de "bloqueado" ao jogador. Facil/Medio/
+            // Dificil sempre selecionaveis, click normal toca.
+            result.sfx = sfx_kind_for_item(state, i, DifficultySfxKind::Click);
+            const DifficultyMenuAction action = difficulty_menu_click_option(state, i);
+            apply_action_to_result(result, action);
+            return result;
+        }
+        return result;  // clique fora de qualquer item - no-op TOTAL
+    }
+
+    if (ev.type == SDL_EVENT_MOUSE_MOTION) {
+        result.mouse_move = true;
+        result.mouse_x = ev.motion.x;
+        result.mouse_y = ev.motion.y;
+        return result;
+    }
+
+    return result;  // tipo de evento nao roteado por esta tela - no-op TOTAL
+}
+
+namespace {
+
+// F4-1b: o ScreenState de PRODUCAO da tela de dificuldade (unico chamador:
+// run_difficulty_menu_loop_gl_current, abaixo) - MESMO padrao de
+// NpcDialogueScreen (npc_dialogue_loop_gl.cpp, F4-1a). Todo o estado que antes
+// vivia em variaveis locais fechadas por lambdas (ui/backdrop/ids de SFX/
+// rml_path/etc) agora e MEMBRO; enter() cria (glintfx::UiLayer + Render2dGl3 +
+// ids de SFX), exit() libera (a EXCLUSIVIDADE do UiLayer descrita em
+// gus/app/screen_state.hpp: exit() e o UNICO lugar onde ui_/backdrop_ sao
+// destruidos, chamado pelo runner logo apos o ultimo tick()).
+class DifficultyScreen final : public gus::app::ScreenState {
+public:
+    DifficultyScreen(SDL_Window* window, gus::platform::audio::AudioEngine& audio,
+                      const gus::app::i18n::Translator& translator,
+                      gus::domain::save::DifficultyLevel* out_difficulty,
+                      std::string frozen_background_png)
+        : window_(window),
+          audio_(audio),
+          translator_(translator),
+          out_difficulty_(out_difficulty),
+          frozen_background_png_(std::move(frozen_background_png)) {}
+
+    void enter() override {
+        // TODO Fase 4 - ler da ANCORA selada (ADR-015 + modos-morte.md §2.3b: o
+        // unlock do Hardcore mora DENTRO da mesma ancora selada+machine-bound do
+        // save-crypto, setado na vitoria do Dificil - nao ha profile.json/flag
+        // soft, proposta rejeitada pelo lider). Nesta Fase 0 e o UNICO estado
+        // alcancavel: hardcoded false - Hardcore fica visivel mas SEMPRE
+        // bloqueado (scope-add REVISAO 2026-07-10, "cenoura" - ver o comentario
+        // grande em difficulty_menu.hpp).
+        constexpr bool kHardcoreUnlockedFase0 = false;
+        difficulty_menu_open(state_, kHardcoreUnlockedFase0);
+
+        SDL_GetWindowSizeInPixels(window_, &pw_, &ph_);
+        if (pw_ < 1) pw_ = 1;
+        if (ph_ < 1) ph_ = 1;
+        dp_ratio_ = static_cast<float>(pw_) / 960.0f;
+
+        ui_.emplace(glintfx::UiLayer::Config{/*logical_width=*/960,
+                                              /*logical_height=*/540,
+                                              /*load_gl=*/true,
+                                              /*dp_ratio=*/dp_ratio_});
+        if (!ui_->ok()) {
+            std::cerr << "DifficultyMenuLoop: glintfx::UiLayer::ok()=false (attach "
+                         "falhou) - abortando Novo Jogo, volta pra tela de titulo "
+                         "(degradacao segura).\n";
+            result_ = DifficultyLoopExit::Cancelled;
+            bailed_ = true;
+            return;
+        }
+
+        stage_ = difficulty_stage_dir();
+        ui_->set_asset_base_url(stage_.c_str());
+        rml_path_ = write_difficulty_rml_file(state_, translator_);
+        ui_->load(rml_path_.c_str());
+        ui_->set_viewport(pw_, ph_);
+        ui_->set_dp_ratio(dp_ratio_);
+        // SFX-MIGRATE-V0.9: 1 update() de "assentamento" (MESMO achado empirico de
+        // title_menu_loop.cpp/save_load_menu_loop.cpp - o hover NATIVO so resolve
+        // elemento sob o cursor apos pelo menos 1 Context::Update() do documento
+        // recem-carregado).
+        ui_->update();
+
+        backdrop_.emplace(/*gl_active=*/true);
+        frozen_bg_tex_ = frozen_background_png_.empty()
+                             ? gus::platform::render2d::kInvalidTexture
+                             : backdrop_->load_texture(frozen_background_png_.c_str());
+
+        // AJUSTE polish playtest 2026-07-10: SFX proprio (grave/abafado) do card
+        // Hardcore BLOQUEADO - toca no lugar do hover/click normal quando a
+        // interacao mira um item NAO-selecionavel (ver sfx_kind_for_item acima).
+        // Degradacao segura: se o asset ainda nao existir no disco, load_sfx
+        // devolve kInvalidSound e audio.play_sfx() vira no-op (nunca crasha).
+        const std::string hover_sfx_path =
+            resolve_menu_sfx_path(gus::core::assets::kMenuHoverSfxFile);
+        const std::string click_sfx_path =
+            resolve_menu_sfx_path(gus::core::assets::kMenuClickSfxFile);
+        const std::string blocked_sfx_path =
+            resolve_menu_sfx_path(gus::core::assets::kMenuBlockedSfxFile);
+        hover_sfx_id_ = audio_.load_sfx(hover_sfx_path.c_str());
+        click_sfx_id_ = audio_.load_sfx(click_sfx_path.c_str());
+        blocked_sfx_id_ = audio_.load_sfx(blocked_sfx_path.c_str());
+
+        ui_->set_hover_callback([this](const char* raw_id, bool entered) {
+            native_hover_callback_(raw_id, entered);
+        });
+
+        // DIAGNOSTICO/PROVA (prova visual headless Xvfb :99): GUSWORLD_DIFFICULTY_
+        // SCREENSHOT_DIR=<dir> assenta alguns frames e salva 1 PNG ANTES de entrar
+        // no loop interativo - bypassa por completo (MESMO espirito de
+        // GUSWORLD_TITLE_SCREENSHOT_DIR em title_menu_loop.cpp).
+        const char* screenshot_dir = std::getenv("GUSWORLD_DIFFICULTY_SCREENSHOT_DIR");
+        if (screenshot_dir != nullptr && screenshot_dir[0] != '\0') {
+            // GUSWORLD_DIFFICULTY_SCREENSHOT_CONFIRM=1 (opcional): captura o
+            // SPLASH de confirmacao (Aviso #2) em vez da lista - abre via a MESMA
+            // maquina de estado PURA (Enter na lista, mesma logica de um clique
+            // real) antes do reload() que gera o RML novo.
+            const char* confirm_flag = std::getenv("GUSWORLD_DIFFICULTY_SCREENSHOT_CONFIRM");
+            const bool want_confirm = confirm_flag != nullptr && confirm_flag[0] != '\0';
+            if (want_confirm) {
+                (void)difficulty_menu_key_down(state_, SDLK_RETURN);  // abre o splash
+                reload_();
+            }
+            for (int i = 0; i < 6; ++i) present_frame_();
+            std::vector<unsigned char> buf(static_cast<std::size_t>(pw_) *
+                                            static_cast<std::size_t>(ph_) * 4);
+            if (gus::platform::rmlui::gl3_read_backbuffer_rgba(pw_, ph_, buf.data())) {
+                const std::string filename =
+                    want_confirm ? "difficulty_menu_confirm.png" : "difficulty_menu.png";
+                const std::string out = join(std::string(screenshot_dir), filename);
+                stbi_write_png(out.c_str(), pw_, ph_, 4, buf.data(), pw_ * 4);
+                std::cout << "DifficultyMenuLoop: [screenshot] " << out << " (" << pw_ << "x"
+                          << ph_ << ")\n";
+            } else {
+                std::cerr << "DifficultyMenuLoop: [screenshot] gl3_read_backbuffer_rgba "
+                             "falhou\n";
+            }
+            result_ = DifficultyLoopExit::Cancelled;
+            bailed_ = true;
+            return;
+        }
+
+        // NAO ha present_frame_() explicito aqui (ao contrario de
+        // NpcDialogueScreen): o while(true) ORIGINAL desta tela so desenhava no
+        // FIM de cada iteracao, DEPOIS de drenar a rajada de eventos daquele
+        // frame - o 1o tick() do runner reproduz exatamente essa 1a iteracao
+        // (drena o que houver, desenha em seguida).
+    }
+
+    void handle_event(const SDL_Event& ev) override {
+        if (bailed_) {
+            return;  // defensivo: nao deveria ser chamado (finished()==true).
+        }
+
+        // Resolve as boxes SO quando o evento precisa (MESMO custo do while(true)
+        // antigo, que so chamava get_element_box dentro do ramo de clique) -
+        // demais eventos passam um array zerado (found=false), que
+        // difficulty_screen_step so consulta no ramo de MOUSE_BUTTON_DOWN.
+        std::array<glintfx::ElementBox, kDifficultyItemCount> boxes{};
+        if (ev.type == SDL_EVENT_MOUSE_BUTTON_DOWN && ev.button.button == SDL_BUTTON_LEFT) {
+            boxes = collect_click_boxes_();
+        }
+
+        const DifficultyStepResult step = difficulty_screen_step(state_, ev, boxes.data());
+
+        if (step.window_closed) {
+            window_closed_ = true;
+            return;
+        }
+        if (step.resize) {
+            SDL_GetWindowSizeInPixels(window_, &pw_, &ph_);
+            if (pw_ < 1) pw_ = 1;
+            if (ph_ < 1) ph_ = 1;
+            dp_ratio_ = static_cast<float>(pw_) / 960.0f;
+            ui_->set_viewport(pw_, ph_);
+            ui_->set_dp_ratio(dp_ratio_);
+            return;
+        }
+        if (step.mouse_move) {
+            handle_mouse_motion_(step.mouse_x, step.mouse_y);
+            return;
+        }
+        if (step.sfx != DifficultySfxKind::None) {
+            audio_.play_sfx(sound_id_for_(step.sfx));
+        }
+        if (step.exit.has_value()) {
+            if (*step.exit == DifficultyLoopExit::Chosen && out_difficulty_ != nullptr) {
+                *out_difficulty_ = difficulty_level_for_item(state_.selected);
+            }
+            result_ = *step.exit;
+            done_ = true;
+            return;
+        }
+        if (step.reload) {
+            reload_();
+        }
+    }
+
+    void tick(float /*dt*/) override {
+        if (bailed_ || done_ || window_closed_) {
+            return;  // defensivo: run_screen_state() nao chama tick() quando
+                      // finished()/window_closed() ja e true, mas guarda mesmo assim.
+        }
+        present_frame_();
+    }
+
+    [[nodiscard]] bool finished() const override { return bailed_ || done_; }
+
+    void exit() override {
+        // EXCLUSIVIDADE DO UILAYER (ver gus/app/screen_state.hpp): destroi ui_
+        // ANTES de backdrop_ (MESMA ordem de sempre) - depois de exit(), a
+        // PROXIMA tela pode chamar seu proprio enter() com seguranca.
+        ui_.reset();
+        backdrop_.reset();
+    }
+
+    [[nodiscard]] bool window_closed() const override { return window_closed_; }
+
+    // Exposto SO pro wrapper run_difficulty_menu_loop_gl_current (nao faz parte
+    // do contrato ScreenState) - o desfecho Chosen/Cancelled decidido pelo
+    // ultimo difficulty_screen_step com exit preenchido, OU o default Cancelled
+    // (ui_->ok()==false / screenshot mode / nunca terminou por acao real).
+    [[nodiscard]] DifficultyLoopExit result() const { return result_; }
+
+private:
+    void reload_() {
+        rml_path_ = write_difficulty_rml_file(state_, translator_);
+        ui_->load(rml_path_.c_str());
+        ui_->set_viewport(pw_, ph_);
+        ui_->set_dp_ratio(dp_ratio_);
+        ui_->update();  // MESMO assentamento a cada troca de documento
+    }
+
+    void present_frame_() {
+        const gus::core::spatial::Rect cam{0.0f, 0.0f, static_cast<float>(pw_),
+                                            static_cast<float>(ph_)};
+        backdrop_->begin_frame(cam, pw_, ph_);
+        if (frozen_bg_tex_ != gus::platform::render2d::kInvalidTexture) {
+            backdrop_->draw_textured_rect(
+                cam, frozen_bg_tex_, gus::platform::render2d::UvRect{0.0f, 0.0f, 1.0f, 1.0f},
+                gus::platform::render2d::DrawColor{1.0f, 1.0f, 1.0f, 1.0f});
+        }
+        backdrop_->end_frame();
+        ui_->update();
+        ui_->render();
+        SDL_GL_SwapWindow(window_);
+    }
+
+    void handle_mouse_motion_(float mx, float my) {
+        glintfx::UiEvent hover_ev{};
+        hover_ev.type = glintfx::UiEvent::Type::MouseMove;
+        hover_ev.x = mx;
+        hover_ev.y = my;
+        ui_->process_event(hover_ev);
+    }
+
+    // Callback NATIVO de hover do glintfx (id-based, RCSS :hover) - MESMA receita
+    // do hover_cb lambda antigo, agora metodo (captura `this` em vez de fechar
+    // sobre variaveis locais). Reusa sfx_kind_for_item (a MESMA decisao PURA que
+    // difficulty_screen_step usa pro teclado/clique) - garante paridade: hover de
+    // mouse no Hardcore bloqueado toca o MESMO SFX que navegar ate ele por
+    // teclado.
+    void native_hover_callback_(const char* raw_id, bool entered) {
+        const std::string id = raw_id != nullptr ? raw_id : "";
+        if (!entered) {
+            if (id == last_hover_sfx_id_) last_hover_sfx_id_.clear();
+            return;
+        }
+        if (id == last_hover_sfx_id_ || !is_navigable_hover_id(state_, id)) return;
+        last_hover_sfx_id_ = id;
+        const std::optional<int> list_index = parse_difficulty_list_item_index(id);
+        const DifficultySfxKind kind =
+            sfx_kind_for_item(state_, list_index.value_or(-1), DifficultySfxKind::Hover);
+        audio_.play_sfx(sound_id_for_(kind));
+    }
+
+    // Resolve as boxes de CLIQUE do frame ATUAL - "difficulty-confirm-<i>" (2
+    // posicoes, splash) OU "difficulty-item-<i>" (kDifficultyItemCount posicoes,
+    // lista), conforme state_.confirming - MESMA leitura que
+    // difficulty_screen_step faz internamente pra decidir a semantica de
+    // `boxes` (ver o comentario do .hpp). SO chamado do ramo MOUSE_BUTTON_DOWN de
+    // handle_event() (get_element_box e uma query da UiLayer - nao roda em todo
+    // evento, MESMO custo do while(true) antigo).
+    [[nodiscard]] std::array<glintfx::ElementBox, kDifficultyItemCount>
+    collect_click_boxes_() const {
+        std::array<glintfx::ElementBox, kDifficultyItemCount> boxes{};
+        if (state_.confirming) {
+            for (int i = 0; i < 2; ++i) {
+                boxes[static_cast<std::size_t>(i)] =
+                    ui_->get_element_box(("difficulty-confirm-" + std::to_string(i)).c_str());
+            }
+        } else {
+            for (int i = 0; i < kDifficultyItemCount; ++i) {
+                boxes[static_cast<std::size_t>(i)] =
+                    ui_->get_element_box(("difficulty-item-" + std::to_string(i)).c_str());
+            }
+        }
+        return boxes;
+    }
+
+    [[nodiscard]] gus::platform::audio::SoundId sound_id_for_(DifficultySfxKind kind) const {
+        switch (kind) {
+            case DifficultySfxKind::Hover:
+                return hover_sfx_id_;
+            case DifficultySfxKind::Click:
+                return click_sfx_id_;
+            case DifficultySfxKind::Blocked:
+                return blocked_sfx_id_;
+            case DifficultySfxKind::None:
+                return gus::platform::audio::kInvalidSound;
+        }
+        return gus::platform::audio::kInvalidSound;
+    }
+
+    SDL_Window* window_;
+    gus::platform::audio::AudioEngine& audio_;
+    const gus::app::i18n::Translator& translator_;
+    gus::domain::save::DifficultyLevel* out_difficulty_;
+    std::string frozen_background_png_;
+
+    DifficultyMenuState state_;
+
+    int pw_ = 0;
+    int ph_ = 0;
+    float dp_ratio_ = 1.0f;
+
+    bool window_closed_ = false;
+    bool bailed_ = false;  // ui_->ok()==false OU o modo screenshot rodou (ver enter())
+    bool done_ = false;    // Chosen/Cancelled decidido por um difficulty_screen_step
+
+    // std::optional (nao um objeto direto): enter()/exit() controlam o ciclo de
+    // vida (EXCLUSIVIDADE DO UILAYER, ver gus/app/screen_state.hpp).
+    std::optional<glintfx::UiLayer> ui_;
+    std::optional<gus::platform::render2d::Render2dGl3> backdrop_;
+
+    std::string stage_;
+    std::string rml_path_;
+    gus::platform::render2d::TextureId frozen_bg_tex_ =
+        gus::platform::render2d::kInvalidTexture;
+
+    gus::platform::audio::SoundId hover_sfx_id_ = gus::platform::audio::kInvalidSound;
+    gus::platform::audio::SoundId click_sfx_id_ = gus::platform::audio::kInvalidSound;
+    gus::platform::audio::SoundId blocked_sfx_id_ = gus::platform::audio::kInvalidSound;
+    std::string last_hover_sfx_id_;
+
+    // Default Cancelled (MESMO fallback do while(true) antigo: qualquer saida
+    // que nao seja um Chosen/Cancelled explicito por acao real degrada pra
+    // Cancelled - ui_->ok()==false e o modo screenshot tambem setam isto
+    // explicitamente em enter()).
+    DifficultyLoopExit result_ = DifficultyLoopExit::Cancelled;
+};
+
 }  // namespace
 
 DifficultyLoopExit run_difficulty_menu_loop_gl_current(
     SDL_Window* window, gus::platform::audio::AudioEngine& audio,
     const gus::app::i18n::Translator& translator,
     gus::domain::save::DifficultyLevel* out_difficulty,
-    const std::string& frozen_background_png) {
-    // TODO Fase 4 - ler da ANCORA selada (ADR-015 + modos-morte.md
-    // §2.3b: o unlock do Hardcore mora DENTRO da mesma ancora selada+
-    // machine-bound do save-crypto, setado na vitoria do Dificil - nao ha
-    // profile.json/flag soft, proposta rejeitada pelo lider). Nesta Fase 0 e o
-    // UNICO estado alcancavel: hardcoded false - Hardcore fica visivel mas
-    // SEMPRE bloqueado (scope-add REVISAO 2026-07-10, "cenoura" - ver o
-    // comentario grande em difficulty_menu.hpp).
-    constexpr bool kHardcoreUnlockedFase0 = false;
-
-    DifficultyMenuState state;
-    difficulty_menu_open(state, kHardcoreUnlockedFase0);
-
-    int pw = 0, ph = 0;
-    SDL_GetWindowSizeInPixels(window, &pw, &ph);
-    if (pw < 1) pw = 1;
-    if (ph < 1) ph = 1;
-    const float dp_ratio = static_cast<float>(pw) / 960.0f;
-
-    glintfx::UiLayer ui(glintfx::UiLayer::Config{/*logical_width=*/960,
-                                                  /*logical_height=*/540,
-                                                  /*load_gl=*/true,
-                                                  /*dp_ratio=*/dp_ratio});
-    if (!ui.ok()) {
-        std::cerr << "DifficultyMenuLoop: glintfx::UiLayer::ok()=false (attach "
-                     "falhou) - abortando Novo Jogo, volta pra tela de titulo "
-                     "(degradacao segura).\n";
-        return DifficultyLoopExit::Cancelled;
-    }
-
-    const std::string stage = difficulty_stage_dir();
-    ui.set_asset_base_url(stage.c_str());
-    std::string rml_path = write_difficulty_rml_file(state, translator);
-    ui.load(rml_path.c_str());
-    ui.set_viewport(pw, ph);
-    ui.set_dp_ratio(dp_ratio);
-    // SFX-MIGRATE-V0.9: 1 update() de "assentamento" (MESMO achado empirico de
-    // title_menu_loop.cpp/save_load_menu_loop.cpp - o hover NATIVO so resolve
-    // elemento sob o cursor apos pelo menos 1 Context::Update() do documento
-    // recem-carregado).
-    ui.update();
-
-    gus::platform::render2d::Render2dGl3 backdrop(/*gl_active=*/true);
-    const gus::platform::render2d::TextureId frozen_bg_tex =
-        frozen_background_png.empty()
-            ? gus::platform::render2d::kInvalidTexture
-            : backdrop.load_texture(frozen_background_png.c_str());
-
-    const std::string hover_sfx_path =
-        resolve_menu_sfx_path(gus::core::assets::kMenuHoverSfxFile);
-    const std::string click_sfx_path =
-        resolve_menu_sfx_path(gus::core::assets::kMenuClickSfxFile);
-    // AJUSTE polish playtest 2026-07-10: SFX proprio (grave/abafado) do card
-    // Hardcore BLOQUEADO - toca no lugar do hover/click normal quando a
-    // interacao mira um item NAO-selecionavel (ver blocked_sfx_or abaixo).
-    // Degradacao segura: se o asset ainda nao existir no disco, load_sfx
-    // devolve kInvalidSound e audio.play_sfx() vira no-op (nunca crasha).
-    const std::string blocked_sfx_path =
-        resolve_menu_sfx_path(gus::core::assets::kMenuBlockedSfxFile);
-    const gus::platform::audio::SoundId hover_sfx_id = audio.load_sfx(hover_sfx_path.c_str());
-    const gus::platform::audio::SoundId click_sfx_id = audio.load_sfx(click_sfx_path.c_str());
-    const gus::platform::audio::SoundId blocked_sfx_id =
-        audio.load_sfx(blocked_sfx_path.c_str());
-
-    // Roteia pro SFX certo dado o item de LISTA em `index` (ignorado/irrelevante
-    // dentro do splash, onde os 2 pills sao SEMPRE selecionaveis): bloqueado
-    // (Hardcore nesta Fase 0) -> blocked_sfx_id; senao -> `normal_id` (hover_sfx_id
-    // ou click_sfx_id, conforme o call-site).
-    auto sfx_for_item = [&](int index,
-                             gus::platform::audio::SoundId normal_id) {
-        if (!state.confirming && index >= 0 && index < kDifficultyItemCount &&
-            !difficulty_item_selectable(state, index)) {
-            return blocked_sfx_id;
-        }
-        return normal_id;
-    };
-
-    auto reload = [&] {
-        rml_path = write_difficulty_rml_file(state, translator);
-        ui.load(rml_path.c_str());
-        ui.set_viewport(pw, ph);
-        ui.set_dp_ratio(dp_ratio);
-        ui.update();  // MESMO assentamento a cada troca de documento
-    };
-
-    auto present_frame = [&] {
-        const gus::core::spatial::Rect cam{0.0f, 0.0f, static_cast<float>(pw),
-                                            static_cast<float>(ph)};
-        backdrop.begin_frame(cam, pw, ph);
-        if (frozen_bg_tex != gus::platform::render2d::kInvalidTexture) {
-            backdrop.draw_textured_rect(
-                cam, frozen_bg_tex, gus::platform::render2d::UvRect{0.0f, 0.0f, 1.0f, 1.0f},
-                gus::platform::render2d::DrawColor{1.0f, 1.0f, 1.0f, 1.0f});
-        }
-        backdrop.end_frame();
-        ui.update();
-        ui.render();
-        SDL_GL_SwapWindow(window);
-    };
-
-    std::string last_hover_sfx_id;
-    auto hover_cb = [&](const char* raw_id, bool entered) {
-        const std::string id = raw_id != nullptr ? raw_id : "";
-        if (!entered) {
-            if (id == last_hover_sfx_id) last_hover_sfx_id.clear();
-            return;
-        }
-        if (id == last_hover_sfx_id || !is_navigable_hover_id(state, id)) return;
-        last_hover_sfx_id = id;
-        // AJUSTE polish playtest 2026-07-10: hover no card Hardcore BLOQUEADO
-        // toca blocked_sfx_id em vez do hover normal (splash/pills SEMPRE
-        // selecionaveis - parse_difficulty_list_item_index devolve nullopt la,
-        // sfx_for_item cai no `normal_id`).
-        const std::optional<int> list_index = parse_difficulty_list_item_index(id);
-        audio.play_sfx(sfx_for_item(list_index.value_or(-1), hover_sfx_id));
-    };
-    ui.set_hover_callback(hover_cb);
-
-    auto handle_mouse_motion = [&](float mx, float my) {
-        glintfx::UiEvent hover_ev{};
-        hover_ev.type = glintfx::UiEvent::Type::MouseMove;
-        hover_ev.x = mx;
-        hover_ev.y = my;
-        ui.process_event(hover_ev);
-    };
-
-    // Roteia UMA DifficultyMenuAction pro efeito de mundo comum aos pontos de
-    // entrada (Enter, clique) - devolve o exit se o CHAMADOR deve retornar NA
-    // HORA (Chosen/Cancelled), senao reload() e continua no loop.
-    auto route_action = [&](DifficultyMenuAction action) -> std::optional<DifficultyLoopExit> {
-        switch (action) {
-            case DifficultyMenuAction::None:
-                reload();
-                return std::nullopt;
-            case DifficultyMenuAction::Chosen:
-                if (out_difficulty != nullptr) {
-                    *out_difficulty = difficulty_level_for_item(state.selected);
-                }
-                return DifficultyLoopExit::Chosen;
-            case DifficultyMenuAction::Cancelled:
-                return DifficultyLoopExit::Cancelled;
-        }
-        return std::nullopt;
-    };
-
-    // DIAGNOSTICO/PROVA (prova visual headless Xvfb :99): GUSWORLD_DIFFICULTY_
-    // SCREENSHOT_DIR=<dir> assenta alguns frames e salva 1 PNG ANTES de entrar no
-    // loop interativo - bypassa por completo (MESMO espirito de
-    // GUSWORLD_TITLE_SCREENSHOT_DIR em title_menu_loop.cpp).
-    const char* screenshot_dir = std::getenv("GUSWORLD_DIFFICULTY_SCREENSHOT_DIR");
-    if (screenshot_dir != nullptr && screenshot_dir[0] != '\0') {
-        // GUSWORLD_DIFFICULTY_SCREENSHOT_CONFIRM=1 (opcional): captura o SPLASH
-        // de confirmacao (Aviso #2) em vez da lista - abre via a MESMA
-        // maquina de estado PURA (Enter na lista, mesma logica de um clique
-        // real) antes do reload() que gera o RML novo.
-        const char* confirm_flag = std::getenv("GUSWORLD_DIFFICULTY_SCREENSHOT_CONFIRM");
-        const bool want_confirm = confirm_flag != nullptr && confirm_flag[0] != '\0';
-        if (want_confirm) {
-            (void)difficulty_menu_key_down(state, SDLK_RETURN);  // abre o splash
-            reload();
-        }
-        for (int i = 0; i < 6; ++i) present_frame();
-        std::vector<unsigned char> buf(static_cast<std::size_t>(pw) *
-                                        static_cast<std::size_t>(ph) * 4);
-        if (gus::platform::rmlui::gl3_read_backbuffer_rgba(pw, ph, buf.data())) {
-            const std::string filename =
-                want_confirm ? "difficulty_menu_confirm.png" : "difficulty_menu.png";
-            const std::string out = join(std::string(screenshot_dir), filename);
-            stbi_write_png(out.c_str(), pw, ph, 4, buf.data(), pw * 4);
-            std::cout << "DifficultyMenuLoop: [screenshot] " << out << " (" << pw << "x"
-                      << ph << ")\n";
-        } else {
-            std::cerr << "DifficultyMenuLoop: [screenshot] gl3_read_backbuffer_rgba "
-                         "falhou\n";
-        }
-        return DifficultyLoopExit::Cancelled;
-    }
-
-    while (true) {
-        SDL_Event ev;
-        while (SDL_PollEvent(&ev)) {
-            if (ev.type == SDL_EVENT_QUIT) {
-                return DifficultyLoopExit::QuitApp;
-            }
-            if (ev.type == SDL_EVENT_WINDOW_RESIZED ||
-                ev.type == SDL_EVENT_WINDOW_PIXEL_SIZE_CHANGED) {
-                SDL_GetWindowSizeInPixels(window, &pw, &ph);
-                if (pw < 1) pw = 1;
-                if (ph < 1) ph = 1;
-                ui.set_viewport(pw, ph);
-                ui.set_dp_ratio(static_cast<float>(pw) / 960.0f);
-                continue;
-            }
-            if (ev.type == SDL_EVENT_KEY_DOWN && !ev.key.repeat) {
-                const bool is_confirm_key = (ev.key.key == SDLK_RETURN ||
-                                              ev.key.key == SDLK_KP_ENTER ||
-                                              ev.key.key == SDLK_SPACE);
-                if (is_confirm_key) {
-                    // AJUSTE polish playtest 2026-07-10: Enter/Espaco com o foco no
-                    // Hardcore BLOQUEADO (item de LISTA, ver sfx_for_item) toca
-                    // blocked_sfx_id em vez do click normal - a ACAO em si segue
-                    // no-op TOTAL (difficulty_menu_key_down, sem mudar estado).
-                    audio.play_sfx(
-                        sfx_for_item(difficulty_keyboard_focus_index(state), click_sfx_id));
-                    const DifficultyMenuAction action =
-                        difficulty_menu_key_down(state, ev.key.key);
-                    if (const auto exit = route_action(action)) return *exit;
-                } else {
-                    // Navegacao (setas/WASD/ESC) - SOM DE HOVER paridade teclado x
-                    // mouse (MESMA tecnica de title_menu_loop.cpp): so toca se o
-                    // MODO (lista vs splash) NAO mudou E moveu pra um item NOVO.
-                    const bool confirming_before = state.confirming;
-                    const int kb_index_before = difficulty_keyboard_focus_index(state);
-                    const DifficultyMenuAction action =
-                        difficulty_menu_key_down(state, ev.key.key);
-                    if (state.confirming == confirming_before) {
-                        const int kb_index_after = difficulty_keyboard_focus_index(state);
-                        if (ui_hover_entered_new_item(kb_index_before, kb_index_after)) {
-                            // AJUSTE polish playtest 2026-07-10: navegar (setas/WASD)
-                            // ATE o Hardcore BLOQUEADO toca blocked_sfx_id (paridade
-                            // teclado x mouse com o hover_cb acima).
-                            audio.play_sfx(sfx_for_item(kb_index_after, hover_sfx_id));
-                        }
-                    }
-                    if (const auto exit = route_action(action)) return *exit;
-                }
-            } else if (ev.type == SDL_EVENT_MOUSE_BUTTON_DOWN &&
-                       ev.button.button == SDL_BUTTON_LEFT) {
-                bool handled = false;
-                if (state.confirming) {
-                    for (int i = 0; i < 2 && !handled; ++i) {
-                        const glintfx::ElementBox box = ui.get_element_box(
-                            ("difficulty-confirm-" + std::to_string(i)).c_str());
-                        if (!hit_test(box, ev.button.x, ev.button.y)) continue;
-                        handled = true;
-                        audio.play_sfx(click_sfx_id);
-                        const DifficultyMenuAction action =
-                            difficulty_menu_click_option(state, i);
-                        if (const auto exit = route_action(action)) return *exit;
-                    }
-                } else {
-                    for (int i = 0; i < kDifficultyItemCount && !handled; ++i) {
-                        const glintfx::ElementBox box = ui.get_element_box(
-                            ("difficulty-item-" + std::to_string(i)).c_str());
-                        if (!hit_test(box, ev.button.x, ev.button.y)) continue;
-                        handled = true;
-                        // Clicar no Hardcore BLOQUEADO e no-op TOTAL DE ESTADO
-                        // (ver difficulty_menu_click_option), mas AJUSTE polish
-                        // playtest 2026-07-10: toca blocked_sfx_id (grave/abafado)
-                        // em vez de ficar mudo - da feedback sonoro de "bloqueado"
-                        // ao jogador. Facil/Medio/Dificil sempre selecionaveis,
-                        // click normal toca.
-                        audio.play_sfx(sfx_for_item(i, click_sfx_id));
-                        const DifficultyMenuAction action =
-                            difficulty_menu_click_option(state, i);
-                        if (const auto exit = route_action(action)) return *exit;
-                    }
-                }
-            } else if (ev.type == SDL_EVENT_MOUSE_MOTION) {
-                handle_mouse_motion(ev.motion.x, ev.motion.y);
-            }
-        }
-        present_frame();
-    }
+    const std::string& frozen_background_png, const gus::app::EventSyncHook& sync_hook) {
+    DifficultyScreen screen(window, audio, translator, out_difficulty, frozen_background_png);
+    gus::app::run_screen_state(screen, sync_hook);
+    if (screen.window_closed()) return DifficultyLoopExit::QuitApp;
+    return screen.result();
 }
 
 }  // namespace gus::app::screens

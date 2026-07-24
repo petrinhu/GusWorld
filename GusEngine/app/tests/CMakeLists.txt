@@ -72,6 +72,11 @@ add_executable(gusengine_app_tests
     # dificuldade - logica pura de navegacao/confirmacao + gerador de RML.
     difficulty_menu_test.cpp
     difficulty_menu_rml_test.cpp
+    # F4-1b (onda F4, fatia 1b - PRIMEIRA tela convertida ao contrato
+    # ScreenState apos F4-1a/npc_dialogue_loop_gl.cpp): difficulty_screen_step,
+    # a funcao PURA de roteamento de evento extraida do while(true) antigo -
+    # headless, SEM SDL_Init/janela/glintfx::UiLayer real (ver o topo do arquivo).
+    difficulty_screen_step_test.cpp
     # SAVE-LOAD-UI (retoque ao vivo do lider, bugs 1-9 + feature "Apagar"): harness
     # HEADLESS com GL real (Xvfb :99) de POSICIONAMENTO/INTERACAO - degrada seguro
     # (0 assercoes) se GL/display indisponivel. ui_box_assertions.hpp e so header
@@ -128,4 +133,6 @@ target_include_directories(gusengine_app_tests
 
 target_compile_features(gusengine_app_tests PRIVATE cxx_std_20)
 
-catch_discover_tests(gusengine_app_tests)
+# TIMEOUT por teste (F4-CTEST-NO-TIMEOUT): um hang (ex.: loop de tela que nao
+# encerra por wiring quebrado) vira falha-rapida do ctest em vez de travar o CI.
+catch_discover_tests(gusengine_app_tests PROPERTIES TIMEOUT 60)

@@ -422,3 +422,49 @@ TEST_CASE("difficulty_menu_loop (harness headless): hover+clique REAL num item "
     REQUIRE(audio.last_sfx_id() == ids.click);
     REQUIRE(audio.last_sfx_id() != ids.blocked);
 }
+
+// ---------------------------------------------------------------- QUIT real (F4-1b QA-FOLLOWUP)
+
+// F4-1b QA-FOLLOWUP (auditoria adversarial, mutante 3 SOBREVIVENTE): a
+// propagacao SDL_EVENT_QUIT -> DifficultyScreen::window_closed_ (handle_event(),
+// difficulty_menu_loop.cpp) nao tinha NENHUM teste no NIVEL DA CLASSE - so ESC
+// (Cancelled) era exercitado pelos harnesses acima. difficulty_screen_step_test.cpp
+// prova a decisao PURA (SDL_EVENT_QUIT -> DifficultyStepResult::window_closed);
+// este teste prova o FIO INTEIRO ate o retorno REAL de
+// run_difficulty_menu_loop_gl_current - se alguem quebrar a propagacao
+// step.window_closed -> window_closed_ (ou o guard window_closed() no
+// wrapper), a janela nunca fecharia pelo X/Alt+F4 nesta tela e a suite passaria
+// verde sem isto.
+TEST_CASE("difficulty_menu_loop (harness headless): SDL_EVENT_QUIT real "
+          "(SDL_PushEvent) fecha a janela - run_difficulty_menu_loop_gl_current "
+          "devolve QuitApp (mutante 3 do QA adversarial F4-1b.1)",
+          "[difficulty_menu_loop_interaction][gl]") {
+    GlTestEnv env = try_boot_gl();
+    if (!env.ok) {
+        INFO("GL/display indisponivel neste ambiente (sem Xvfb) - harness pulado "
+             "(degradacao segura, 0 assercoes). Rode com Xvfb :99 (export "
+             "DISPLAY=:99) pra exercitar de fato.");
+        return;
+    }
+
+    const gus::app::i18n::Translator translator = make_translator();
+
+    SDL_Event quit_ev{};
+    quit_ev.type = SDL_EVENT_QUIT;
+    REQUIRE(SDL_PushEvent(&quit_ev));
+
+    AudioEngine audio(/*device_active=*/false);
+    gus::domain::save::DifficultyLevel out_difficulty{};
+    const DifficultyLoopExit exit =
+        run_difficulty_menu_loop_gl_current(env.window, audio, translator, &out_difficulty);
+
+    // ANTES do fix desta fatia (se o mutante tivesse sobrevivido de verdade):
+    // window_closed_ nunca viraria true, o loop ficaria esperando o PROXIMO
+    // evento pra sempre (fila vazia apos o QUIT) - o teste TRAVARIA em vez de
+    // falhar rapido (MESMO padrao de deteccao ja documentado nos testes de ESC
+    // acima).
+    REQUIRE(exit == DifficultyLoopExit::QuitApp);
+    // QUIT e verificado ANTES de qualquer hit-test/SFX (ver difficulty_screen_step)
+    // - nenhum som deveria ter tocado no caminho ate fechar a janela.
+    REQUIRE(audio.sfx_play_count() == 0);
+}
