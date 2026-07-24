@@ -125,14 +125,41 @@ CTEST_LOG="$ENGINE/build/$PRESET/last_ctest.log"
 SUITE=0
 if [ "$BUILD" = "0" ]; then
     set +e
-    # FIX (2026-07-14): capturar o exit do ctest LOGO APOS o pipe ctest|tee, antes de
-    # qualquer grep/`|| true`. O padrao antigo (`ctest|tee|grep ... || true` seguido de
-    # SUITE=${PIPESTATUS[0]}) mascarava falha de teste: com `pipefail`, o pipeline
-    # inteiro saia != 0 quando o ctest falhava, o `|| true` disparava, e rodar `true`
-    # RESETAVA PIPESTATUS pra (0) -> SUITE=0 (verde cego). Agora o grep de exibicao e
-    # um comando isolado DEPOIS da captura, entao seu exit nao afeta SUITE.
-    ( cd "$ENGINE" && ctest --preset "$PRESET" 2>&1 ) | tee "$CTEST_LOG" >/dev/null
+    # DISPLAY ISOLADO (2026-07-24, F4-GL-TESTS-SILENT-DEGRADE / achado do QA F4-1b.4):
+    # alguns testes de interacao (app/tests/*_interaction_test) abrem contexto GL REAL
+    # via glintfx::UiLayer. Sem isolar, o ctest herda o DISPLAY=:0 / WAYLAND_DISPLAY da
+    # sessao VIVA do usuario e os testes GL rodam NELA (janelas HIDDEN, mas mesma
+    # superficie que feedback_nunca_stress_janela_sessao_viva proibe em absoluto).
+    # Solucao: subir um Xvfb dedicado num display LIVRE e forcar o SDL a usar X11 nele
+    # (env -u WAYLAND_DISPLAY tira o wayland-0 do caminho; SDL_VIDEODRIVER=x11 impede
+    # o SDL de escolher wayland). Sem Xvfb no host -> SDL_VIDEODRIVER=offscreen (os
+    # testes GL degradam pra 0 assercoes, mas NAO tocam a sessao do usuario). SMOKE ja
+    # usa dummy; aqui o GL precisa rodar de verdade, por isso Xvfb (framebuffer real),
+    # nao dummy. GUSWORLD_SUITE_DISPLAY=:N sobrepoe (ex.: CI que ja tem Xvfb proprio).
+    _suite_xvfb_pid=""
+    _suite_disp="${GUSWORLD_SUITE_DISPLAY:-}"
+    if [ -z "$_suite_disp" ] && command -v Xvfb >/dev/null 2>&1; then
+        for _n in 99 100 101 102 103 104 105 106 107 108; do
+            [ -e "/tmp/.X11-unix/X$_n" ] || { _suite_disp=":$_n"; break; }
+        done
+        if [ -n "$_suite_disp" ]; then
+            Xvfb "$_suite_disp" -screen 0 1024x768x24 >/dev/null 2>&1 &
+            _suite_xvfb_pid=$!
+            sleep 1
+        fi
+    fi
+    # FIX (2026-07-14): capturar o exit do ctest LOGO APOS o pipe ctest|tee (o `|| true`
+    # de um grep depois resetava PIPESTATUS e mascarava falha -> verde cego).
+    if [ -n "$_suite_disp" ]; then
+        ( cd "$ENGINE" && env -u WAYLAND_DISPLAY DISPLAY="$_suite_disp" SDL_VIDEODRIVER=x11 \
+            ctest --preset "$PRESET" 2>&1 ) | tee "$CTEST_LOG" >/dev/null
+    else
+        # sem display isolado: NUNCA rodar GL no :0 vivo -> offscreen (GL degrada).
+        ( cd "$ENGINE" && env -u WAYLAND_DISPLAY DISPLAY= SDL_VIDEODRIVER=offscreen \
+            ctest --preset "$PRESET" 2>&1 ) | tee "$CTEST_LOG" >/dev/null
+    fi
     SUITE=${PIPESTATUS[0]}
+    [ -n "$_suite_xvfb_pid" ] && kill "$_suite_xvfb_pid" 2>/dev/null
     grep -E "tests passed|tests failed|Total Test" "$CTEST_LOG" || true
     set -e
 fi
