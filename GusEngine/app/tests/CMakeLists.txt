@@ -124,6 +124,16 @@ add_executable(gusengine_app_tests
     # fluxo pausa->save/load->BackToPause->volta preserva o estado do
     # SystemMenuLoopScreen reusado pelo mini-driver).
     system_menu_loop_interaction_test.cpp
+    # F4-1b.5 (onda F4, fatia 1b.5 - a conversao MAIS ARRISCADA da onda): a FSM DE FASE
+    # PURA do host da batalha (BattlePhase/battle_phase_initial/battle_phase_next/
+    # battle_screen_should_close_on_event) - headless, SEM SDL_Init/janela/BattleScene
+    # real (ver o topo do arquivo) - + a REUSA do roteamento de tecla ja provado em
+    # battle_key_routing_test.cpp (nao duplicado, so referenciado).
+    battle_screen_step_test.cpp
+    # F4-1b.5: harness HEADLESS com GL real (Xvfb :99), MESMA receita de
+    # difficulty_menu_loop_interaction_test.cpp - prova o FIO INTEIRO ate
+    # run_battle_preview_embedded_gl_current (SDL_EVENT_QUIT real fecha a janela).
+    battle_preview_interaction_test.cpp
 )
 
 target_link_libraries(gusengine_app_tests

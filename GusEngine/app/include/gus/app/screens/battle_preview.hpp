@@ -29,6 +29,7 @@
 
 #include <SDL3/SDL.h>  // SDL_Window (dono da janela do host, ver run_battle_preview_embedded)
 
+#include "gus/app/screen_state.hpp"  // F4-1b.5: gus::app::EventSyncHook (MESMO contrato da onda F4)
 #include "gus/app/screens/battle_assets.hpp"  // AC-E11 A3: resolve_retratos_dir/
                                                // resolve_music_path/etc moraram pra ca
                                                // (ADR-019); incluido aqui pra call-sites
@@ -90,11 +91,18 @@ namespace gus::app::screens {
 //     anterior). O fade de SAIDA e PULADO se o motivo foi o jogador fechar a janela
 //     (quit_requested) - fechar e imediato, sem segurar o jogador pra um fade que ele
 //     nao pediu.
+//
+// `sync_hook` (F4-1b.5, opcional - nullptr = nao sincroniza nada, MESMO comportamento
+// de sempre): repassado direto pro gus::app::run_screen_state() interno (ver o .cpp) -
+// MESMO papel/contrato de title_menu_loop.hpp/system_menu_loop.hpp. O UNICO chamador de
+// producao (Maestro::to_battle) NAO passa sync_hook ainda (MESMO estado de antes desta
+// fatia) - existe pra esta tela ja seguir o MESMO contrato do resto da onda F4.
 int run_battle_preview_embedded(
     SDL_Window* window, gus::domain::combat::CombatOutcome* out_outcome,
     bool* out_quit_requested = nullptr,
     gus::platform::audio::AudioEngine* external_audio = nullptr,
-    float fade_in_seconds = 0.0f, float fade_out_seconds = 0.0f);
+    float fade_in_seconds = 0.0f, float fade_out_seconds = 0.0f,
+    const gus::app::EventSyncHook& sync_hook = nullptr);
 
 // FLASH-CTX (extracao behavior-preserving, A2): NUCLEO que ASSUME um contexto
 // GL JA CORRENTE e com os ponteiros de funcao (glad) JA CARREGADOS - MESMO
@@ -104,16 +112,88 @@ int run_battle_preview_embedded(
 // por run_battle_preview_embedded (unico chamador de producao continua sendo
 // a Maestro, via a variante que possui o contexto); exposta pra futura
 // reutilizacao aninhada (Opcao C, contexto GL unico).
+//
+// F4-1b.5 (onda F4 "casca SDL -> App mode do glintfx", fatia 1b.5 - a conversao MAIS
+// ARRISCADA da onda): o HOST REAL da batalha (~1831 linhas, 3 SDL_PollEvent PROPRIOS -
+// fade-in/loop principal/fade-out) foi convertido pra uma classe BattleScreen
+// (gus::app::ScreenState) + gus::app::run_screen_state, MESMA tecnica das telas
+// anteriores (Difficulty/SaveLoad/Title/System) - so que os 3 PollEvent viram 3 FASES de
+// UMA UNICA tela (gus::app::screens::BattlePhase: FadeIn -> Main -> FadeOut), decididas
+// pela FSM PURA battle_phase_initial/battle_phase_next abaixo (testavel headless, SEM
+// SDL_Init/janela/BattleScene - ver battle_screen_step_test.cpp). Esta funcao (o NUCLEO)
+// e agora um WRAPPER FINO: constroi a BattleScreen, chama run_screen_state(), e SO
+// ENTAO escreve *out_outcome/*out_quit_requested (MESMO choke-point/ORDEM das linhas
+// ~1681-1689 do while(true) antigo - out_outcome PRIMEIRO, out_quit_requested DEPOIS;
+// intocavel, a Maestro distingue "abortou" de "derrota" por esses 2 out-params).
 void run_battle_preview_embedded_gl_current(
     SDL_Window* window, gus::domain::combat::CombatOutcome* out_outcome,
     bool* out_quit_requested = nullptr,
     gus::platform::audio::AudioEngine* external_audio = nullptr,
-    float fade_in_seconds = 0.0f, float fade_out_seconds = 0.0f);
+    float fade_in_seconds = 0.0f, float fade_out_seconds = 0.0f,
+    const gus::app::EventSyncHook& sync_hook = nullptr);
 
 // Roda o viewer da BattleScene: SDL_Init proprio, janela PROPRIA, loop de render do
 // esqueleto (camera logica 960x540 escalada por inteiro x2 = 1080p), Esc/fechar encerra.
 // WRAPPER fino sobre run_battle_preview_embedded (outcome descartado). Devolve 0 ok.
 int run_battle_preview();
+
+// ---------------------------------------------------------------------------------
+// F4-1b.5: FSM DE FASE PURA do host da batalha - decide FadeIn -> Main -> FadeOut ->
+// Done SEM tocar SDL/GL/BattleScene/audio nenhum (testavel headless, ZERO setup - ver
+// battle_screen_step_test.cpp). BattleScreen (privada no .cpp) e o UNICO consumidor de
+// producao; exposta aqui SO pra ser testavel (mesmo espirito de difficulty_screen_step/
+// title_screen_step, que vivem no header PUBLICO da tela pra o teste incluir).
+
+// As 3 fases + o estado terminal. Cada fase corresponde a UM dos 3 SDL_PollEvent
+// antigos: FadeIn/FadeOut = os 2 `while(fading)` (Pump LIMITADO a QUIT); Main = o
+// `while(running)` principal (roteamento completo). Done = a tela terminou (ScreenState::
+// finished()==true) - run_screen_state() para de chamar handle_event()/tick() e roda
+// exit() em seguida.
+enum class BattlePhase {
+    FadeIn,
+    Main,
+    FadeOut,
+    Done,
+};
+
+// Fase INICIAL de uma BattleScreen nova - `fade_in_enabled` e SEMPRE
+// `fade_in_seconds > 0.0f && running` (running so pode ja estar false aqui se um
+// self-test como GUSWORLD_BATTLE_MOUSE_SELFTEST/GUSWORLD_BATTLE_ACTOR_SELFTEST rodou
+// e terminou por completo DENTRO do proprio enter() - MESMO comportamento do
+// `if (fade_in_seconds > 0.0f && running)` antigo: guard falso pula o FadeIn
+// inteiro). fade_in_enabled==false comeca DIRETO em Main (o --battle standalone e
+// quase todo self-test/captura, que pedem fade_in_seconds<=0 - ver os defaults acima).
+[[nodiscard]] BattlePhase battle_phase_initial(bool fade_in_enabled) noexcept;
+
+// Decisao PURA de proxima fase, chamada UMA vez por tick() (ou uma vez extra em
+// enter(), pro caso Main-nasce-ja-terminado dos 2 self-tests acima) apos a fase
+// corrente terminar seu proprio trabalho:
+//   `quit`: SDL_EVENT_QUIT ja chegou (em QUALQUER fase, ver battle_screen_should_close_
+//     on_event abaixo) - forca Done na hora, de QUALQUER fase corrente (o "quit pula o
+//     resto" do FIX BUG-3: FadeIn->Done pula Main+FadeOut; Main->Done pula FadeOut;
+//     FadeOut->Done so encerra o proprio fade mais cedo). Na BattleScreen real isto e
+//     redundante com ScreenState::window_closed() (que ja para run_screen_state() de
+//     chamar tick() de novo, ver screen_state.hpp) - a FSM fica correta/testavel do
+//     mesmo jeito, sem depender dessa redundancia externa.
+//   `phase_done`: a fase CORRENTE terminou seu proprio criterio - FadeIn/FadeOut:
+//     elapsed>=duration (o tempo acumulado desta fase alcancou fade_in/out_seconds);
+//     Main: o `running` interno virou false (combate terminou/Esc na pilha vazia/
+//     algum self-test concluiu/max_frames/captura de 1 frame).
+//   `fade_out_enabled`: SEMPRE `fade_out_seconds > 0.0f` (avaliado 1 vez, MESMO papel
+//     de fade_in_enabled acima) - Main->Done direto se false (--battle standalone/
+//     selftests, que pedem fade_out_seconds<=0).
+// `current` inalterado se `phase_done==false` e `quit==false` (a fase segue rodando).
+[[nodiscard]] BattlePhase battle_phase_next(BattlePhase current, bool quit,
+                                            bool phase_done,
+                                            bool fade_out_enabled) noexcept;
+
+// Decisao PURA de fechamento de janela - MESMA condicao que os 3 handlers de evento
+// antigos checavam (`ev.type == SDL_EVENT_QUIT`), extraida em UMA funcao pra ser
+// testavel isoladamente e reusada tanto pelas fases de fade (que SO ouvem isto,
+// ignorando qualquer outro tipo de evento - "Pump de eventos LIMITADO a SDL_EVENT_QUIT"
+// dos 2 `while(fading)` antigos) quanto pela fase Main (que ouve tudo, mas trata QUIT
+// da MESMA forma - ver BattleScreen::handle_event_main_ no .cpp).
+[[nodiscard]] bool battle_screen_should_close_on_event(const SDL_Event& ev) noexcept;
 
 }  // namespace gus::app::screens
 
