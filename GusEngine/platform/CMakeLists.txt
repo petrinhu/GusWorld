@@ -16,6 +16,11 @@
 add_library(gusengine_platform STATIC
     src/platform_info.cpp
     src/input/key_translation.cpp
+    # F4-2.1 (Onda F4, costura de input): traducao BIDIRECIONAL glintfx::Key <->
+    # keycode Godot, irma do key_translation.cpp acima - segundo backend de evento
+    # (glintfx) preparando pro cutover F4-3. Inclui <glintfx/ui_event.hpp> (por isso o
+    # link glintfx::glintfx abaixo deixou de ser exclusivo de audio_engine.cpp).
+    src/input/key_translation_glintfx.cpp
     src/input/input_mapper.cpp
     src/input/gamepad_mapping.cpp
     src/input/sdl_input.cpp
@@ -125,13 +130,17 @@ target_link_libraries(gusengine_platform
         OpenGL::GL
 )
 
-# glintfx (GLINTFX-INTEGRACAO F2): audio_engine.cpp inclui <glintfx/audio.hpp> e chama
-# glintfx::Audio - PRIVATE porque so aquela TU toca o header do glintfx (nenhum outro
-# .cpp de gusengine_platform inclui glintfx/*). O modulo glintfx_audio (miniaudio_impl.c +
-# Threads::Threads/dl/m dele) ja vem dobrado dentro do alvo glintfx STATIC
-# (GLINTFX_MODULE_AUDIO=ON, ver raiz do CMakeLists.txt) - nao precisamos mais linkar
-# Threads/dl aqui de novo (dependencia PRIVATE de biblioteca STATIC propaga pro link
-# final automaticamente; so include dirs ficam privados).
+# glintfx (GLINTFX-INTEGRACAO F2; F4-2.1 ampliou pra uma 2a TU): audio_engine.cpp
+# inclui <glintfx/audio.hpp>/glintfx::Audio; key_translation_glintfx.cpp (F4-2.1) inclui
+# <glintfx/ui_event.hpp>/glintfx::Key. PRIVATE porque so essas 2 TUs de gusengine_platform
+# tocam glintfx/* (o header PUBLICO key_translation_glintfx.hpp que expoe glintfx::Key
+# pros CONSUMIDORES do alvo tambem inclui esse mesmo header - app/ ja linka
+# glintfx::glintfx PRIVATE por conta propria, ver app/CMakeLists.txt; gusengine_platform_
+# tests precisa do MESMO link, ver platform/tests/CMakeLists.txt). O modulo glintfx_audio
+# (miniaudio_impl.c + Threads::Threads/dl/m dele) ja vem dobrado dentro do alvo glintfx
+# STATIC (GLINTFX_MODULE_AUDIO=ON, ver raiz do CMakeLists.txt) - nao precisamos mais
+# linkar Threads/dl aqui de novo (dependencia PRIVATE de biblioteca STATIC propaga pro
+# link final automaticamente; so include dirs ficam privados).
 target_link_libraries(gusengine_platform PRIVATE glintfx::glintfx)
 
 # gus_warnings (HUD-STATUS-ICONS-STALE Fase A): -Wswitch/w14062 warning-only,

@@ -9,6 +9,9 @@
 
 add_executable(gusengine_platform_tests
     key_translation_test.cpp
+    # F4-2.1/F4-2.2 (Onda F4, costura de input): traducao bidirecional glintfx::Key <->
+    # keycode Godot + captura de remap do backend glintfx.
+    key_translation_glintfx_test.cpp
     input_mapper_test.cpp
     gamepad_mapping_test.cpp
     sdl_input_test.cpp
@@ -39,6 +42,14 @@ target_link_libraries(gusengine_platform_tests
         gusengine_domain
         Catch2::Catch2WithMain
         gus_warnings
+        # F4-2.1: key_translation_glintfx_test.cpp inclui key_translation_glintfx.hpp,
+        # que por sua vez inclui <glintfx/ui_event.hpp> (glintfx::Key e PUBLICO na
+        # assinatura das funcoes) - o link PRIVATE de glintfx::glintfx dentro de
+        # gusengine_platform (ver platform/CMakeLists.txt) NAO propaga include dirs pra
+        # este alvo (usage requirements PRIVATE nao atravessam consumidor), entao este
+        # TU precisa do proprio link. MESMO padrao que app/CMakeLists.txt ja usa pra
+        # gusengine_app (glintfx::glintfx PRIVATE, direto no alvo que inclui o header).
+        glintfx::glintfx
 )
 
 target_compile_features(gusengine_platform_tests PRIVATE cxx_std_20)
