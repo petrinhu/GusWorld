@@ -615,11 +615,17 @@ bool Maestro::open_pause_from_city() {
     // reacquire_renderer() - sem essa recriacao (a cidade nunca para de desenhar no
     // MESMO contexto), nao ha mais nada pra mascarar. O flash morreu na RAIZ (Opcao
     // C do plano), nao no sintoma.
+    // F4-1b.7: MESMO mecanismo do dialogo (ver run_npc_dialogue_loop_gl_current
+    // acima) - repassa CADA SDL_Event pumpado dentro do menu de pausa pro SdlInput
+    // persistente da cidade via sync_input_event, pra uma tecla de movimento
+    // solta/perdida DURANTE a pausa ser vista AO VIVO (mesmo fix do "Gus anda
+    // sozinho", agora tambem cobrindo a pausa).
     const gus::app::screens::SystemMenuLoopOutcome outcome =
         gus::app::screens::run_system_menu_loop_gl_current(
             window_, audio_, translator_, settings_dir,
             gus::platform::fs::resolve_saves_dir(), build_current_save_data,
-            apply_loaded_save_data, frozen_ok ? frozen_bg_path : std::string());
+            apply_loaded_save_data, frozen_ok ? frozen_bg_path : std::string(),
+            [this](const SDL_Event& ev) { city_->sync_input_event(ev); });
 
     // M2 (GAP FINAL) -> M2 STAGED CHANGES: RELE o controls.json e realimenta o
     // SdlInput da cidade - aplica o remap SEM exigir restart. O jogador pode
@@ -1085,9 +1091,15 @@ bool Maestro::to_battle(EncounterId id) {
     // os DOIS fades visuais da batalha (entrada clareando, saida escurecendo). Sem
     // retorno de erro: a criacao do contexto ja foi resolvida em init() (ver o
     // comentario de show_title_screen() acima pro mesmo racional).
+    // F4-1b.7: MESMO mecanismo do dialogo/pausa - repassa CADA SDL_Event pumpado
+    // dentro da batalha pro SdlInput persistente da cidade via sync_input_event,
+    // pra uma tecla de movimento solta/perdida DURANTE o combate ser vista AO
+    // VIVO ao retomar a cidade (mesmo fix do "Gus anda sozinho", agora tambem
+    // cobrindo a batalha).
     gus::app::screens::run_battle_preview_embedded_gl_current(
         window_, &outcome, &quit_requested, &audio_, kTransitionFadeSeconds,
-        kTransitionFadeSeconds);
+        kTransitionFadeSeconds,
+        [this](const SDL_Event& ev) { city_->sync_input_event(ev); });
 
     if (quit_requested) {
         // FIX BUG-3: o jogador fechou a janela DENTRO da batalha. NAO volta pra cidade

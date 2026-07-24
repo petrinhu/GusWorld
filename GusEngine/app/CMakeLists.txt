@@ -86,7 +86,6 @@ add_library(gusengine_app STATIC
     # system_menu_loop.cpp, ver npc_dialogue_loop_gl.hpp).
     src/screens/npc_dialogue_rml.cpp
     src/screens/npc_dialogue_loop_gl.cpp
-    src/screens/npc_dialogue_loop.cpp
     src/sdl_window.cpp
     # APP-ICON: aplica o icone do app (opcao C do mock, Gus combate + glow cyan) na
     # SDL_Window - chamado por SdlWindow::init() E por Maestro::init() (a dona da
