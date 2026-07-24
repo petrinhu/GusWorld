@@ -157,7 +157,7 @@ direções; anims depois conforme o papel). Fila atrás da geração da party (l
 taxa):
 
 `anaximandro_vyrcatrix`, `anhuera_vanderbist`, `cassiano_vorto`, `yara_ducourt`,
-`anslemo_boroshova`, `mariana_vanderbist` — cada um com `_concept_front.png`, zero
+`anselmo_boroshova_vance`, `mariana_vanderbist` — cada um com `_concept_front.png`, zero
 sprite ainda.
 
 Órfão sem canon: `aleatorio.png` (fica em `images/` raiz; não é o Sterling; aguarda
