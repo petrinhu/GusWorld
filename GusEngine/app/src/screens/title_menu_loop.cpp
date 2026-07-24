@@ -1,11 +1,55 @@
 // gus/app/src/screens/title_menu_loop.cpp
 //
 // Implementacao do loop interativo da TELA DE TITULO. Ver header para o
-// contrato completo. GL/glintfx-heavy (mesma familia de save_load_menu_loop.cpp/
-// system_menu_loop.cpp) - sem unidade de teste direta (a logica PURA testavel ja
-// fica em title_menu.hpp/title_menu_test.cpp e title_menu_rml.hpp/
-// title_menu_rml_test.cpp; este .cpp so orquestra SDL/GL + o I/O de disco em
-// torno delas).
+// contrato completo.
+//
+// F4-1b.3 (onda F4 "casca SDL -> App mode do glintfx", fatia 1b.3 - PRIMEIRA
+// tela PAI da onda apos F4-1b.1/difficulty_menu_loop.cpp e F4-1b.2/
+// save_load_menu_loop.cpp): o caminho de PRODUCAO (run_title_menu_loop_gl_
+// current, chamado DIRETO por Maestro::show_title_screen) foi convertido de um
+// while(true){SDL_PollEvent...} PROPRIO pra uma classe TitleScreen (gus::app::
+// ScreenState) + gus::app::run_screen_state - MESMA tecnica de
+// DifficultyScreen/SaveLoadScreen. O roteamento de evento (decisao PURA) foi
+// extraido pra title_screen_step (declarada no .hpp, testada headless em
+// title_screen_step_test.cpp) - MESMO racional de difficulty_screen_step.
+//
+// O PROBLEMA NOVO desta fatia (por isso e a PRIMEIRA tela PAI): o titulo
+// dispara a tela de SELECAO DE DIFICULDADE (difficulty_menu_loop.hpp) ANINHADA
+// quando o jogador confirma "Novo Jogo". ANTES desta fatia, isso acontecia de
+// DENTRO do handler da tela de titulo (o antigo start_new_game_via_difficulty_
+// menu, chamado de dentro de route_title_action) - o que agora VIOLARIA a
+// guarda de reentrada de gus::app::run_screen_state() (screen_state.hpp:29-39:
+// run_screen_state(pai) precisa RETORNAR - rodando pai.exit(), que libera a
+// UiLayer do pai - ANTES de qualquer codigo chamar run_screen_state(filha)).
+//
+// A SOLUCAO (canonizada pelo lider): MINI-DRIVER no WRAPPER (run_title_menu_
+// loop_gl_current), NAO dentro da tela. TitleScreen::handle_event() SO devolve
+// um TitleScreenExit (ver o .hpp) - nunca chama a tela de dificuldade. O
+// DRIVER, dentro do wrapper:
+//   1) chama gus::app::run_screen_state(title_screen) - ela SO retorna DEPOIS
+//      que title_screen.exit() ja rodou (garantia ESTRUTURAL do proprio
+//      run_screen_state, nao depende de ninguem "lembrar" de nada);
+//   2) SO ENTAO, se o desfecho foi NewGameRequested, chama
+//      run_difficulty_menu_loop_gl_current (a UiLayer do titulo ja foi
+//      destruida - seguro criar a 2a);
+//   3) decide o proximo passo via a funcao PURA title_flow_next() (testada
+//      headless em title_screen_step_test.cpp: as 3x3 combinacoes de
+//      TitleScreenExit x DifficultyLoopExit);
+//   4) se o jogador Cancelou na dificuldade, RE-USA o MESMO objeto
+//      TitleScreen, chamando run_screen_state(title_screen) de novo.
+//
+// TitleScreen PERSISTE entre iteracoes do driver (e um objeto local da PILHA
+// do wrapper, nao recriado a cada volta) - o ESTADO de negocio (TitleMenuState
+// state_, o TitleDiskScan scan_ dos saves) e inicializado no CONSTRUTOR, NAO
+// em enter(): so ASSIM "voltar da dificuldade cancelando" preserva o foco/
+// estado ATUAL (nao re-escaneia saves, nao perde o item selecionado) - MESMO
+// comportamento observavel do while(true) antigo (que so recriava a UiLayer,
+// nunca o TitleMenuState, ao cancelar). enter()/exit() SO cuidam de recursos
+// GL (glintfx::UiLayer, Render2dGl3, boot overlay, SFX ids) - a exclusividade
+// da UiLayer (gus/app/screen_state.hpp) vira consequencia ESTRUTURAL de
+// title_screen.exit() acontecer (dentro de run_screen_state) ANTES do driver
+// sequer cogitar abrir a tela de dificuldade, substituindo o antigo
+// ui_opt.reset()/emplace() manual cruzando a fronteira de telas.
 
 #include "gus/app/screens/title_menu_loop.hpp"
 
@@ -179,391 +223,590 @@ TitleDiskScan scan_saves(const std::string& saves_dir) {
 
 }  // namespace
 
-// FLASH-CTX (A2, extracao behavior-preserving): NUCLEO que ASSUME um contexto
-// GL JA CORRENTE + glad JA CARREGADO - mesmo corpo que antes vivia numa lambda
-// `run_body` dentro de run_title_menu_loop_owning_gl (ver o header pro
-// contrato). Extraida verbatim (zero mudanca de logica) pra permitir reuso
-// futuro sem recriar o contexto (Opcao C do plano de contexto GL unico).
+namespace {
+
+// F4-1b.3: aplica o DESFECHO de uma TitleMenuAction (None/ContinueGame/
+// StartNewGame/RequestQuit) no TitleStepResult - MESMO dispatch do antigo
+// `route_title_action` lambda, so que gravando em campos da struct de retorno
+// (reload/exit) em vez de chamar reload()/confirm_continue()/retornar direto
+// (esses side effects ficam com o CHAMADOR, ver TitleScreen::handle_event -
+// inclusive confirm_continue(), que precisa do cache scan_ que esta funcao
+// PURA nao tem).
+void apply_title_action_to_result(TitleStepResult& result, TitleMenuAction action) noexcept {
+    switch (action) {
+        case TitleMenuAction::None:
+            result.reload = true;
+            return;
+        case TitleMenuAction::ContinueGame:
+            result.exit = TitleScreenExit::ContinueGame;
+            return;
+        case TitleMenuAction::StartNewGame:
+            result.exit = TitleScreenExit::NewGameRequested;
+            return;
+        case TitleMenuAction::RequestQuit:
+            result.exit = TitleScreenExit::QuitApp;
+            return;
+    }
+}
+
+}  // namespace
+
+// F4-1b.3: implementacao de title_screen_step (declarada no .hpp) - ver o
+// comentario grande la pro contrato completo. Extracao BEHAVIOR-PRESERVING do
+// corpo do while(true) antigo (MESMO racional/ordem de checagem de tipo de
+// evento, MESMAS chamadas a title_menu_key_down/title_menu_click_option,
+// MESMO uso de title_item_selectable/ui_hover_entered_new_item) - so devolvendo
+// a DECISAO em vez de executar os side effects na hora.
+TitleStepResult title_screen_step(TitleMenuState& state, const SDL_Event& ev,
+                                   const glintfx::ElementBox boxes[kTitleItemCount]) noexcept {
+    TitleStepResult result;
+
+    if (ev.type == SDL_EVENT_QUIT) {
+        result.window_closed = true;
+        return result;
+    }
+
+    if (ev.type == SDL_EVENT_WINDOW_RESIZED ||
+        ev.type == SDL_EVENT_WINDOW_PIXEL_SIZE_CHANGED) {
+        result.resize = true;  // estado da tela intocado - o CHAMADOR reposiciona.
+        return result;
+    }
+
+    if (ev.type == SDL_EVENT_KEY_DOWN && !ev.key.repeat) {
+        const bool is_confirm_key = (ev.key.key == SDLK_RETURN ||
+                                      ev.key.key == SDLK_KP_ENTER ||
+                                      ev.key.key == SDLK_SPACE);
+        if (is_confirm_key) {
+            // SOM DE CLIQUE (COCKPIT-SFX-HOVER-CLIQUE): Enter/Espaco e sempre
+            // uma confirmacao intencional de item/pill - toca INCONDICIONAL
+            // (MESMO comportamento antigo: nao ha "item bloqueado" na tela de
+            // titulo, ao contrario da tela de dificuldade).
+            result.sfx = TitleSfxKind::Click;
+            const TitleMenuAction action = title_menu_key_down(state, ev.key.key);
+            apply_title_action_to_result(result, action);
+        } else {
+            // Navegacao (setas/WASD/ESC) - SOM DE HOVER PARIDADE TECLADO x
+            // MOUSE: move a selecao e, SO se o MODO (lista vs mini-dialogo)
+            // NAO mudou E moveu pra um item NOVO, toca hover_sfx.
+            const bool confirming_before = state.confirming_new_game;
+            const int kb_index_before = title_keyboard_focus_index(state);
+            const TitleMenuAction action = title_menu_key_down(state, ev.key.key);
+            if (state.confirming_new_game == confirming_before) {
+                const int kb_index_after = title_keyboard_focus_index(state);
+                if (ui_hover_entered_new_item(kb_index_before, kb_index_after)) {
+                    result.sfx = TitleSfxKind::Hover;
+                }
+            }
+            apply_title_action_to_result(result, action);
+        }
+        return result;
+    }
+
+    if (ev.type == SDL_EVENT_MOUSE_BUTTON_DOWN && ev.button.button == SDL_BUTTON_LEFT) {
+        if (state.confirming_new_game) {
+            for (int i = 0; i < 2; ++i) {
+                if (!hit_test(boxes[i], ev.button.x, ev.button.y)) continue;
+                // as 2 pills do mini-dialogo sao SEMPRE validas (sem conceito
+                // de "desabilitada" aqui) - som sempre toca.
+                result.sfx = TitleSfxKind::Click;
+                const TitleMenuAction action = title_menu_click_option(state, i);
+                apply_title_action_to_result(result, action);
+                return result;
+            }
+            return result;  // clique fora de qualquer pill - no-op TOTAL
+        }
+        for (int i = 0; i < kTitleItemCount; ++i) {
+            if (!hit_test(boxes[i], ev.button.x, ev.button.y)) continue;
+            // Clicar num item DESABILITADO (Continuar sem save) e no-op TOTAL
+            // (ver title_menu_click_option) - sem som tambem, MESMA semantica
+            // "nao reage a nada".
+            if (title_item_selectable(state, i)) {
+                result.sfx = TitleSfxKind::Click;
+            }
+            const TitleMenuAction action = title_menu_click_option(state, i);
+            apply_title_action_to_result(result, action);
+            return result;
+        }
+        return result;  // clique fora de qualquer item - no-op TOTAL
+    }
+
+    if (ev.type == SDL_EVENT_MOUSE_MOTION) {
+        result.mouse_move = true;
+        result.mouse_x = ev.motion.x;
+        result.mouse_y = ev.motion.y;
+        return result;
+    }
+
+    return result;  // tipo de evento nao roteado por esta tela - no-op TOTAL
+}
+
+// F4-1b.3: implementacao de title_flow_next (declarada no .hpp) - a MATRIZ DE
+// DECISAO do mini-driver, 100% testavel sem GL (title_screen_step_test.cpp
+// exercita as 3x3 combinacoes). `difficulty_exit` SO importa quando
+// `title_exit == NewGameRequested` (nos outros 2 casos o driver nem chega a
+// rodar a tela de dificuldade - ver run_title_menu_loop_gl_current abaixo).
+TitleFlowStep title_flow_next(TitleScreenExit title_exit,
+                               DifficultyLoopExit difficulty_exit) noexcept {
+    switch (title_exit) {
+        case TitleScreenExit::ContinueGame:
+            return TitleFlowStep::ContinueGame;
+        case TitleScreenExit::QuitApp:
+            return TitleFlowStep::QuitApp;
+        case TitleScreenExit::NewGameRequested:
+            switch (difficulty_exit) {
+                case DifficultyLoopExit::QuitApp:
+                    return TitleFlowStep::QuitApp;
+                case DifficultyLoopExit::Chosen:
+                    return TitleFlowStep::StartNewGame;
+                case DifficultyLoopExit::Cancelled:
+                    return TitleFlowStep::RetryTitle;
+            }
+            break;
+    }
+    return TitleFlowStep::QuitApp;  // inalcancavel (defensivo - todo
+                                     // TitleScreenExit/DifficultyLoopExit
+                                     // relevante ja foi coberto acima).
+}
+
+namespace {
+
+// F4-1b.3: o ScreenState de PRODUCAO da tela de titulo (unico chamador: o
+// MINI-DRIVER dentro de run_title_menu_loop_gl_current, abaixo) - MESMO padrao
+// de DifficultyScreen (difficulty_menu_loop.cpp, F4-1b.1). Todo o estado que
+// antes vivia em variaveis locais fechadas por lambdas (ui/backdrop/boot_bg/
+// ids de SFX/rml_path/etc) agora e MEMBRO; enter() cria os recursos GL
+// (glintfx::UiLayer + Render2dGl3 + BootPixelOverlay + ids de SFX), exit()
+// libera (a EXCLUSIVIDADE do UiLayer descrita em gus/app/screen_state.hpp).
+//
+// DIFERENCA-CHAVE em relacao a DifficultyScreen: o ESTADO DE NEGOCIO (state_/
+// scan_) NAO nasce em enter() - nasce no CONSTRUTOR, UMA UNICA VEZ. O
+// MINI-DRIVER reusa o MESMO objeto TitleScreen entre a lista e a volta da
+// tela de dificuldade (Cancelled) - se state_/scan_ fossem recriados em
+// enter(), o jogador perderia o foco/re-escanearia os saves a cada volta
+// (regressao do comportamento antigo, ver o comentario grande no topo deste
+// arquivo).
+class TitleScreen final : public gus::app::ScreenState {
+   public:
+    TitleScreen(SDL_Window* window, gus::platform::audio::AudioEngine& audio,
+                const gus::app::i18n::Translator& translator, std::string saves_dir,
+                gus::domain::save::SaveData* out_loaded_save)
+        : window_(window),
+          audio_(audio),
+          translator_(translator),
+          saves_dir_(std::move(saves_dir)),
+          out_loaded_save_(out_loaded_save) {
+        scan_ = scan_saves(saves_dir_);
+        title_menu_open(state_, scan_.any_save_exists);
+    }
+
+    void enter() override {
+        // Flags TRANSIENTES de UMA rodada - resetadas a CADA enter(),
+        // diferente de state_/scan_ (persistem entre rodadas, ver o
+        // comentario da classe/construtor acima).
+        bailed_ = false;
+        done_ = false;
+        window_closed_ = false;
+        ui_init_failed_ = false;
+        screenshot_only_ = false;
+
+        SDL_GetWindowSizeInPixels(window_, &pw_, &ph_);
+        if (pw_ < 1) pw_ = 1;
+        if (ph_ < 1) ph_ = 1;
+        dp_ratio_ = static_cast<float>(pw_) / 960.0f;
+
+        ui_.emplace(glintfx::UiLayer::Config{/*logical_width=*/960,
+                                              /*logical_height=*/540,
+                                              /*load_gl=*/true,
+                                              /*dp_ratio=*/dp_ratio_});
+        if (!ui_->ok()) {
+            std::cerr << "TitleMenuLoop: glintfx::UiLayer::ok()=false (attach "
+                         "falhou) - fechando sem desenhar (degradacao segura, "
+                         "comeca fresco).\n";
+            // MESMO degrade do while(true) antigo: NewGame direto (Medio
+            // default), SEM passar pela tela de dificuldade (abrir uma 2a
+            // UiLayer logo apos a 1a ter falhado provavelmente falharia de
+            // novo - nao ha ganho em tentar) - flag PROPRIA (nao
+            // TitleScreenExit::NewGameRequested), o driver nao deve abrir a
+            // dificuldade neste caso (ver ui_init_failed() abaixo).
+            ui_init_failed_ = true;
+            bailed_ = true;
+            return;
+        }
+
+        stage_ = title_stage_dir();
+        ui_->set_asset_base_url(stage_.c_str());
+        rml_path_ = write_title_rml_file(state_, translator_);
+        ui_->load(rml_path_.c_str());
+        ui_->set_viewport(pw_, ph_);
+        ui_->set_dp_ratio(dp_ratio_);
+        // SFX-MIGRATE-V0.9: 1 update() de "assentamento" (MESMO achado
+        // empirico de difficulty_menu_loop.cpp/save_load_menu_loop.cpp - o
+        // hover NATIVO so resolve elemento sob o cursor apos pelo menos 1
+        // Context::Update() do documento recem-carregado).
+        ui_->update();
+
+        backdrop_.emplace(/*gl_active=*/true);
+
+        // M7-FB3 (MENU-INICIAL-FUNDO): fundo VIVO da LISTA - MESMO monitor CRT
+        // do boot pixelizado, "assentado" (ver gus/core/anim/
+        // boot_pixel_sequence.hpp::boot_pixel_idle_frame_index). boot_bg_ e um
+        // MEMBRO reusado entre rodadas (nao um std::optional) mas load()
+        // PRECISA rodar de novo a CADA enter() - os TextureId antigos nao
+        // sobrevivem a destruicao do Render2dGl3 anterior (ver o comentario de
+        // BootPixelOverlay::load() no header - "chamar de novo apos
+        // reacquire_renderer()", MESMO racional aqui: backdrop_ e recriado a
+        // cada enter()).
+        boot_bg_.load(*backdrop_, gus::platform::assets::FilesystemAssetSource().resolve_path(
+                                       gus::core::assets::kVfxBootPixelDir));
+        boot_bg_start_ns_ = SDL_GetTicksNS();
+
+        // COCKPIT-SFX-HOVER-CLIQUE: SFX de hover/clique - load_sfx a CADA
+        // enter() (MESMA cautela de "load_sfx NUNCA no frame", os SoundId
+        // antigos tambem nao sobrevivem entre rodadas do AudioEngine se ele
+        // fosse recriado - aqui audio_ e injetada/nao-dona, sobrevive, mas
+        // recarregar o MESMO arquivo e barato e idempotente).
+        const std::string hover_sfx_path =
+            resolve_menu_sfx_path(gus::core::assets::kMenuHoverSfxFile);
+        const std::string click_sfx_path =
+            resolve_menu_sfx_path(gus::core::assets::kMenuClickSfxFile);
+        hover_sfx_id_ = audio_.load_sfx(hover_sfx_path.c_str());
+        click_sfx_id_ = audio_.load_sfx(click_sfx_path.c_str());
+
+        ui_->set_hover_callback([this](const char* raw_id, bool entered) {
+            native_hover_callback_(raw_id, entered);
+        });
+
+        // DIAGNOSTICO/PROVA (SAVE-LOAD-UI etapa 4, prova visual headless Xvfb
+        // :99): GUSWORLD_TITLE_SCREENSHOT_DIR=<dir> assenta alguns frames e
+        // salva 1 PNG ANTES de entrar no loop interativo - bypassa por
+        // completo, MESMO espirito de GUSWORLD_DIFFICULTY_SCREENSHOT_DIR em
+        // DifficultyScreen::enter().
+        const char* screenshot_dir = std::getenv("GUSWORLD_TITLE_SCREENSHOT_DIR");
+        if (screenshot_dir != nullptr && screenshot_dir[0] != '\0') {
+            for (int i = 0; i < 6; ++i) present_frame_();
+            std::vector<unsigned char> buf(static_cast<std::size_t>(pw_) *
+                                            static_cast<std::size_t>(ph_) * 4);
+            if (gus::platform::rmlui::gl3_read_backbuffer_rgba(pw_, ph_, buf.data())) {
+                const std::string suffix = scan_.any_save_exists
+                                                ? "title_continue_enabled"
+                                                : "title_continue_disabled";
+                const std::string out = join(std::string(screenshot_dir), suffix + ".png");
+                stbi_write_png(out.c_str(), pw_, ph_, 4, buf.data(), pw_ * 4);
+                std::cout << "TitleMenuLoop: [screenshot] " << out << " (" << pw_ << "x"
+                          << ph_ << ")\n";
+            } else {
+                std::cerr << "TitleMenuLoop: [screenshot] gl3_read_backbuffer_rgba "
+                             "falhou\n";
+            }
+            screenshot_only_ = true;
+            bailed_ = true;
+            return;
+        }
+
+        // NAO ha present_frame_() explicito aqui (ao contrario de
+        // NpcDialogueScreen): o while(true) ORIGINAL desta tela so desenhava
+        // no FIM de cada iteracao, DEPOIS de drenar a rajada de eventos
+        // daquele frame - o 1o tick() do runner reproduz exatamente essa 1a
+        // iteracao.
+    }
+
+    void handle_event(const SDL_Event& ev) override {
+        if (bailed_) {
+            return;  // defensivo: nao deveria ser chamado (finished()==true).
+        }
+
+        std::array<glintfx::ElementBox, kTitleItemCount> boxes{};
+        if (ev.type == SDL_EVENT_MOUSE_BUTTON_DOWN && ev.button.button == SDL_BUTTON_LEFT) {
+            boxes = collect_click_boxes_();
+        }
+
+        const TitleStepResult step = title_screen_step(state_, ev, boxes.data());
+
+        if (step.window_closed) {
+            window_closed_ = true;
+            return;
+        }
+        if (step.resize) {
+            SDL_GetWindowSizeInPixels(window_, &pw_, &ph_);
+            if (pw_ < 1) pw_ = 1;
+            if (ph_ < 1) ph_ = 1;
+            dp_ratio_ = static_cast<float>(pw_) / 960.0f;
+            ui_->set_viewport(pw_, ph_);
+            ui_->set_dp_ratio(dp_ratio_);
+            return;
+        }
+        if (step.mouse_move) {
+            handle_mouse_motion_(step.mouse_x, step.mouse_y);
+            return;
+        }
+        if (step.sfx != TitleSfxKind::None) {
+            audio_.play_sfx(step.sfx == TitleSfxKind::Hover ? hover_sfx_id_ : click_sfx_id_);
+        }
+        if (step.exit.has_value()) {
+            apply_exit_(*step.exit);
+            done_ = true;
+            return;
+        }
+        if (step.reload) {
+            reload_();
+        }
+    }
+
+    void tick(float /*dt*/) override {
+        if (bailed_ || done_ || window_closed_) {
+            return;  // defensivo: run_screen_state() nao chama tick() quando
+                      // finished()/window_closed() ja e true, mas guarda mesmo assim.
+        }
+        present_frame_();
+    }
+
+    [[nodiscard]] bool finished() const override { return bailed_ || done_; }
+
+    void exit() override {
+        // EXCLUSIVIDADE DO UILAYER (ver gus/app/screen_state.hpp): destroi
+        // ui_ ANTES de backdrop_ (MESMA ordem de sempre) - depois de exit(),
+        // o MINI-DRIVER pode abrir a tela de dificuldade (OU re-entrar este
+        // MESMO TitleScreen) com seguranca.
+        ui_.reset();
+        backdrop_.reset();
+    }
+
+    [[nodiscard]] bool window_closed() const override { return window_closed_; }
+
+    // Exposto SO pro DRIVER (run_title_menu_loop_gl_current, abaixo) - nao faz
+    // parte do contrato ScreenState. O desfecho ContinueGame/NewGameRequested/
+    // QuitApp decidido pelo ultimo title_screen_step com exit preenchido
+    // (ContinueGame ja passou por apply_exit_, que pode degradar pra
+    // NewGameRequested - ver o comentario la).
+    [[nodiscard]] TitleScreenExit result() const { return result_; }
+
+    // idem - 2 degradacoes que NAO abrem a tela de dificuldade (ui_->ok()==
+    // false / modo screenshot), MESMO contrato do while(true) antigo.
+    [[nodiscard]] bool ui_init_failed() const { return ui_init_failed_; }
+    [[nodiscard]] bool screenshot_only() const { return screenshot_only_; }
+
+   private:
+    // Aplica o desfecho de UM title_screen_step (ContinueGame/NewGameRequested/
+    // QuitApp) em result_ - ContinueGame precisa do cache scan_ (que a funcao
+    // PURA title_screen_step nao tem) pra de fato preencher *out_loaded_save_;
+    // se o cache estiver vazio (BUG defensivo, nunca deveria acontecer -
+    // Continuar so e selecionavel quando any_save_exists, que implica
+    // most_recent_slot >= 0), degrada pra NewGameRequested (MESMO racional do
+    // antigo confirm_continue lambda - nunca finge um load que nao aconteceu).
+    void apply_exit_(TitleScreenExit step_exit) {
+        if (step_exit != TitleScreenExit::ContinueGame) {
+            result_ = step_exit;
+            return;
+        }
+        if (scan_.most_recent_slot >= 0 &&
+            scan_.loaded[static_cast<std::size_t>(scan_.most_recent_slot)].has_value()) {
+            if (out_loaded_save_ != nullptr) {
+                *out_loaded_save_ =
+                    *scan_.loaded[static_cast<std::size_t>(scan_.most_recent_slot)];
+            }
+            result_ = TitleScreenExit::ContinueGame;
+        } else {
+            std::cerr << "[title_menu_loop] BUG defensivo: ContinueGame sem "
+                         "slot no cache - degradando pra Novo Jogo (nao finge "
+                         "um load que nao aconteceu).\n";
+            result_ = TitleScreenExit::NewGameRequested;
+        }
+    }
+
+    void reload_() {
+        rml_path_ = write_title_rml_file(state_, translator_);
+        ui_->load(rml_path_.c_str());
+        ui_->set_viewport(pw_, ph_);
+        ui_->set_dp_ratio(dp_ratio_);
+        ui_->update();  // MESMO assentamento a cada troca de documento
+    }
+
+    void present_frame_() {
+        const gus::core::spatial::Rect cam{0.0f, 0.0f, static_cast<float>(pw_),
+                                            static_cast<float>(ph_)};
+        backdrop_->begin_frame(cam, pw_, ph_);
+        const float boot_bg_elapsed_s =
+            static_cast<float>(SDL_GetTicksNS() - boot_bg_start_ns_) / 1.0e9f;
+        const int boot_bg_frame = gus::core::anim::boot_pixel_idle_frame_index(
+            boot_bg_elapsed_s, gus::core::anim::kBootPixelFrameCount);
+        boot_bg_.draw_idle(*backdrop_, cam, boot_bg_frame);
+        backdrop_->end_frame();
+        ui_->update();
+        ui_->render();
+        SDL_GL_SwapWindow(window_);
+    }
+
+    void handle_mouse_motion_(float mx, float my) {
+        glintfx::UiEvent hover_ev{};
+        hover_ev.type = glintfx::UiEvent::Type::MouseMove;
+        hover_ev.x = mx;
+        hover_ev.y = my;
+        ui_->process_event(hover_ev);
+    }
+
+    // Callback NATIVO de hover do glintfx (id-based, RCSS :hover) - MESMA
+    // receita do hover_cb lambda antigo, agora metodo (captura `this` em vez
+    // de fechar sobre variaveis locais).
+    void native_hover_callback_(const char* raw_id, bool entered) {
+        const std::string id = raw_id != nullptr ? raw_id : "";
+        if (!entered) {
+            if (id == last_hover_sfx_id_) last_hover_sfx_id_.clear();
+            return;
+        }
+        if (id == last_hover_sfx_id_ || !is_navigable_hover_id(state_, id)) return;
+        last_hover_sfx_id_ = id;
+        audio_.play_sfx(hover_sfx_id_);
+    }
+
+    // Resolve as boxes de CLIQUE do frame ATUAL - "title-confirm-<i>" (2
+    // posicoes, mini-dialogo) OU "title-item-<i>" (kTitleItemCount posicoes,
+    // lista), conforme state_.confirming_new_game - SO chamado do ramo
+    // MOUSE_BUTTON_DOWN de handle_event() (MESMO custo do while(true) antigo).
+    [[nodiscard]] std::array<glintfx::ElementBox, kTitleItemCount> collect_click_boxes_() const {
+        std::array<glintfx::ElementBox, kTitleItemCount> boxes{};
+        if (state_.confirming_new_game) {
+            for (int i = 0; i < 2; ++i) {
+                boxes[static_cast<std::size_t>(i)] =
+                    ui_->get_element_box(("title-confirm-" + std::to_string(i)).c_str());
+            }
+        } else {
+            for (int i = 0; i < kTitleItemCount; ++i) {
+                boxes[static_cast<std::size_t>(i)] =
+                    ui_->get_element_box(("title-item-" + std::to_string(i)).c_str());
+            }
+        }
+        return boxes;
+    }
+
+    SDL_Window* window_;
+    gus::platform::audio::AudioEngine& audio_;
+    const gus::app::i18n::Translator& translator_;
+    std::string saves_dir_;
+    gus::domain::save::SaveData* out_loaded_save_;
+
+    // ESTADO DE NEGOCIO - inicializado UMA VEZ no construtor, PERSISTE entre
+    // rodadas do driver (ver o comentario grande da classe acima).
+    TitleDiskScan scan_;
+    TitleMenuState state_;
+
+    int pw_ = 0;
+    int ph_ = 0;
+    float dp_ratio_ = 1.0f;
+
+    bool window_closed_ = false;
+    bool bailed_ = false;         // ui_init_failed_ OU screenshot_only_ (ver enter())
+    bool done_ = false;           // um TitleScreenExit foi decidido por um title_screen_step
+    bool ui_init_failed_ = false;
+    bool screenshot_only_ = false;
+
+    // std::optional (nao um objeto direto): enter()/exit() controlam o ciclo
+    // de vida (EXCLUSIVIDADE DO UILAYER, ver gus/app/screen_state.hpp).
+    std::optional<glintfx::UiLayer> ui_;
+    std::optional<gus::platform::render2d::Render2dGl3> backdrop_;
+    // MEMBRO direto (nao optional): so guarda TextureId (ints) - load() roda
+    // de novo a cada enter() (ver o comentario la), nao precisa de RAII de
+    // ciclo de vida proprio.
+    gus::app::BootPixelOverlay boot_bg_;
+    unsigned long long boot_bg_start_ns_ = 0;
+
+    std::string stage_;
+    std::string rml_path_;
+
+    gus::platform::audio::SoundId hover_sfx_id_ = gus::platform::audio::kInvalidSound;
+    gus::platform::audio::SoundId click_sfx_id_ = gus::platform::audio::kInvalidSound;
+    std::string last_hover_sfx_id_;
+
+    // Default QuitApp (MESMO fallback documentado no .hpp) - so lido pelo
+    // driver quando done_==true (nunca em bailed_==true, ver ui_init_failed()/
+    // screenshot_only() acima, que o driver checa ANTES de ler result()).
+    TitleScreenExit result_ = TitleScreenExit::QuitApp;
+};
+
+}  // namespace
+
+// F4-1b.3 MINI-DRIVER: o NUCLEO que ASSUME um contexto GL JA CORRENTE + glad
+// JA CARREGADO (FLASH-CTX, A2) - ver o comentario grande no topo deste arquivo
+// pro racional completo de POR QUE existe um driver aqui (a guarda de
+// reentrada de run_screen_state PROIBE abrir a tela de dificuldade de DENTRO
+// do handler da tela de titulo).
 void run_title_menu_loop_gl_current(
     SDL_Window* window, gus::platform::audio::AudioEngine& audio,
     const gus::app::i18n::Translator& translator, const std::string& saves_dir,
     TitleLoopExit* out_exit, gus::domain::save::SaveData* out_loaded_save,
     gus::domain::save::DifficultyLevel* out_new_game_difficulty,
-    const std::string& frozen_background_png) {
-    {
-        // DIAGNOSTICO/PROVA (MODOS-MORTE Fase 0, prova visual headless Xvfb :99):
-        // GUSWORLD_DIFFICULTY_SCREENSHOT_DIR=<dir> pula a tela de titulo por
-        // completo e abre DIRETO a tela de selecao de dificuldade (ANINHADA no
-        // MESMO contexto GL que este owning_gl acabou de criar) - MESMO espirito
-        // de GUSWORLD_TITLE_SCREENSHOT_DIR abaixo, so que mirando a tela seguinte
-        // do fluxo de Novo Jogo. O proprio run_difficulty_menu_loop_gl_current
-        // detecta a mesma variavel e salva o PNG (difficulty_menu.png) antes de
-        // entrar no loop interativo - aqui so evitamos montar a tela de titulo
-        // (que nao seria exercitada de qualquer forma).
-        if (const char* diff_screenshot_dir =
-                std::getenv("GUSWORLD_DIFFICULTY_SCREENSHOT_DIR");
-            diff_screenshot_dir != nullptr && diff_screenshot_dir[0] != '\0') {
-            gus::domain::save::DifficultyLevel dummy =
-                gus::domain::save::DifficultyLevel::Medio;
-            (void)run_difficulty_menu_loop_gl_current(window, audio, translator,
-                                                       &dummy, frozen_background_png);
+    const std::string& frozen_background_png, const gus::app::EventSyncHook& sync_hook) {
+    // DIAGNOSTICO/PROVA (MODOS-MORTE Fase 0, prova visual headless Xvfb :99):
+    // GUSWORLD_DIFFICULTY_SCREENSHOT_DIR=<dir> pula a tela de titulo por
+    // completo e abre DIRETO a tela de selecao de dificuldade (ANINHADA no
+    // MESMO contexto GL) - roda ANTES de sequer construir o TitleScreen (nunca
+    // entra no par enter()/exit() da tela de titulo). MESMO espirito de
+    // GUSWORLD_TITLE_SCREENSHOT_DIR (checado dentro de TitleScreen::enter()),
+    // so que mirando a tela seguinte do fluxo de Novo Jogo.
+    if (const char* diff_screenshot_dir = std::getenv("GUSWORLD_DIFFICULTY_SCREENSHOT_DIR");
+        diff_screenshot_dir != nullptr && diff_screenshot_dir[0] != '\0') {
+        gus::domain::save::DifficultyLevel dummy = gus::domain::save::DifficultyLevel::Medio;
+        (void)run_difficulty_menu_loop_gl_current(window, audio, translator, &dummy,
+                                                   frozen_background_png);
+        *out_exit = TitleLoopExit::NewGame;
+        return;
+    }
+
+    // TitleScreen PERSISTE entre iteracoes deste driver (objeto local da
+    // PILHA do wrapper, NAO recriado a cada volta) - scan_saves()/
+    // title_menu_open() rodaram UMA VEZ no construtor (ver a classe acima).
+    TitleScreen title_screen(window, audio, translator, saves_dir, out_loaded_save);
+
+    for (;;) {
+        // run_screen_state SO retorna DEPOIS que title_screen.exit() ja rodou
+        // (garantia ESTRUTURAL, ver gus/app/screen_state.hpp:29-39) - so
+        // ENTAO e seguro abrir a tela de dificuldade ANINHADA logo abaixo (2a
+        // UiLayer viva ao mesmo tempo e o crash real que essa exclusividade
+        // existe pra prevenir).
+        gus::app::run_screen_state(title_screen, sync_hook);
+
+        if (title_screen.window_closed()) {
+            *out_exit = TitleLoopExit::QuitApp;
+            return;
+        }
+        if (title_screen.ui_init_failed()) {
             *out_exit = TitleLoopExit::NewGame;
             return;
         }
-
-        const TitleDiskScan scan = scan_saves(saves_dir);
-
-        TitleMenuState state;
-        title_menu_open(state, scan.any_save_exists);
-
-        int pw = 0, ph = 0;
-        SDL_GetWindowSizeInPixels(window, &pw, &ph);
-        if (pw < 1) pw = 1;
-        if (ph < 1) ph = 1;
-        const float dp_ratio = static_cast<float>(pw) / 960.0f;
-
-        // std::optional (nao um objeto direto): MODOS-MORTE Fase 0 precisa
-        // DESTRUIR esta UiLayer ANTES de abrir a tela de dificuldade ANINHADA
-        // (RmlUi so aceita 1 instancia viva no processo, ver o comentario
-        // "FIX CRITICO" em system_menu_loop.cpp - MESMA causa raiz) e RECRIAR
-        // se o jogador Cancelar e voltar pra esta lista.
-        std::optional<glintfx::UiLayer> ui_opt;
-        ui_opt.emplace(glintfx::UiLayer::Config{/*logical_width=*/960,
-                                                 /*logical_height=*/540,
-                                                 /*load_gl=*/true,
-                                                 /*dp_ratio=*/dp_ratio});
-        if (!ui_opt->ok()) {
-            std::cerr << "TitleMenuLoop: glintfx::UiLayer::ok()=false (attach "
-                         "falhou) - fechando sem desenhar (degradacao segura, "
-                         "comeca fresco).\n";
-            *out_exit = TitleLoopExit::NewGame;
+        if (title_screen.screenshot_only()) {
+            *out_exit = TitleLoopExit::QuitApp;
             return;
         }
 
-        const std::string stage = title_stage_dir();
-        ui_opt->set_asset_base_url(stage.c_str());
-        std::string rml_path = write_title_rml_file(state, translator);
-        ui_opt->load(rml_path.c_str());
-        ui_opt->set_viewport(pw, ph);
-        ui_opt->set_dp_ratio(dp_ratio);
-        // SFX-MIGRATE-V0.9: 1 update() de "assentamento" AQUI, ANTES do
-        // while(true) - achado EMPIRICO (harness headless de
-        // save_load_menu_loop.cpp, MESMA receita replicada aqui): o hover
-        // NATIVO (Context::ProcessMouseMove -> UpdateHoverChain ->
-        // GetElementAtPoint, fonte pinada do RmlUi) so resolve elemento sob o
-        // cursor DEPOIS de pelo menos 1 Context::Update() ter rodado pro
-        // documento RECEM-carregado. Sem isto, um MouseMove que chegue ANTES
-        // do 1o present_frame() desta tela cairia num hover_cb mudo ate o
-        // PROXIMO MouseMove. Idempotente/barato (present_frame() ja chama
-        // ui.update() de novo a cada frame).
-        ui_opt->update();
+        const TitleScreenExit texit = title_screen.result();
+        gus::domain::save::DifficultyLevel chosen = gus::domain::save::DifficultyLevel::Medio;
+        // Irrelevante fora de NewGameRequested (title_flow_next ignora este
+        // valor nos outros 2 casos, ver os testes de title_flow_next) - valor
+        // qualquer (Cancelled) pra nao deixar a variavel indeterminada.
+        DifficultyLoopExit dexit = DifficultyLoopExit::Cancelled;
+        if (texit == TitleScreenExit::NewGameRequested) {
+            // ANINHADA (MESMA tecnica do antigo start_new_game_via_difficulty_
+            // menu): a UiLayer do titulo JA foi destruida (title_screen.exit()
+            // rodou dentro do run_screen_state acima) - seguro criar a da
+            // dificuldade agora.
+            dexit = run_difficulty_menu_loop_gl_current(window, audio, translator, &chosen,
+                                                         frozen_background_png);
+        }
 
-        gus::platform::render2d::Render2dGl3 backdrop(/*gl_active=*/true);
-
-        // M7-FB3 (MENU-INICIAL-FUNDO): fundo VIVO da LISTA (Continuar/Novo Jogo/
-        // Sair) - playtest do Gus Dragon ("menu inicial tem arte/animacao PROPRIA
-        // por tras, nao a tela de onde o jogador estava") + decisao do lider: o
-        // MESMO monitor CRT do boot pixelizado (ja aprovado pela transicao cidade<-
-        // >batalha, M7-COSTURA Inc 2c), agora "assentado" (nao uma transicao com
-        // duracao fixa - ver gus/core/anim/boot_pixel_sequence.hpp::
-        // boot_pixel_idle_frame_index). `frozen_background_png` (cidade congelada)
-        // NAO e mais usado AQUI - segue existindo so pra tela de dificuldade
-        // aninhada (start_new_game_via_difficulty_menu abaixo, fora do escopo deste
-        // feedback). load() JA loga no stderr se algum frame faltar (asset ausente/
-        // headless) - draw_idle() degrada sozinho pro solido gunmetal nesse caso
-        // (regra do projeto: todo efeito, bom ou ruim, loga - a falha e logada UMA
-        // vez aqui, nao a cada frame desenhado).
-        gus::app::BootPixelOverlay boot_bg;
-        boot_bg.load(backdrop, gus::platform::assets::FilesystemAssetSource().resolve_path(
-                                    gus::core::assets::kVfxBootPixelDir));
-        const unsigned long long boot_bg_start_ns = SDL_GetTicksNS();
-
-        // COCKPIT-SFX-HOVER-CLIQUE: SFX de hover/clique - load_sfx UMA VEZ por
-        // sessao desta tela (MESMA cautela de "load_sfx NUNCA no frame" ja
-        // documentada em system_menu_loop.cpp/battle_preview.cpp). MESMOS
-        // arquivos do menu de pausa (kMenuHoverSfxFile/kMenuClickSfxFile) -
-        // paridade sonora entre os menus de botoes. audio.available()==false
-        // (device indisponivel/CI) degrada com seguranca (play_sfx com id
-        // invalido ja e no-op, ver AudioEngine::play_sfx).
-        const std::string hover_sfx_path =
-            resolve_menu_sfx_path(gus::core::assets::kMenuHoverSfxFile);
-        const std::string click_sfx_path =
-            resolve_menu_sfx_path(gus::core::assets::kMenuClickSfxFile);
-        const gus::platform::audio::SoundId hover_sfx_id =
-            audio.load_sfx(hover_sfx_path.c_str());
-        const gus::platform::audio::SoundId click_sfx_id =
-            audio.load_sfx(click_sfx_path.c_str());
-        auto reload = [&] {
-            rml_path = write_title_rml_file(state, translator);
-            ui_opt->load(rml_path.c_str());
-            ui_opt->set_viewport(pw, ph);
-            ui_opt->set_dp_ratio(dp_ratio);
-            // SFX-MIGRATE-V0.9: MESMO update() de assentamento da construcao
-            // inicial acima (ver o comentario la) - QUALQUER reload() troca de
-            // DOCUMENTO, entao o hover NATIVO precisa do mesmo "layout
-            // assentado" de novo a cada troca, nao so na primeira.
-            ui_opt->update();
-        };
-
-        auto present_frame = [&] {
-            const gus::core::spatial::Rect cam{0.0f, 0.0f, static_cast<float>(pw),
-                                                static_cast<float>(ph)};
-            backdrop.begin_frame(cam, pw, ph);
-            // M7-FB3: fundo VIVO - indice calculado do tempo REAL corrido desde que
-            // a tela abriu (SDL_GetTicksNS, MESMO padrao de elapsed de
-            // battle_preview.cpp/sdl_window.cpp), ciclando devagar pelos ULTIMOS 3
-            // frames do boot (ver o comentario de boot_pixel_idle_frame_index).
-            const float boot_bg_elapsed_s =
-                static_cast<float>(SDL_GetTicksNS() - boot_bg_start_ns) / 1.0e9f;
-            const int boot_bg_frame = gus::core::anim::boot_pixel_idle_frame_index(
-                boot_bg_elapsed_s, gus::core::anim::kBootPixelFrameCount);
-            boot_bg.draw_idle(backdrop, cam, boot_bg_frame);
-            backdrop.end_frame();
-            ui_opt->update();
-            ui_opt->render();
-            SDL_GL_SwapWindow(window);
-        };
-
-        // SOM DE HOVER (mouse) - SFX-MIGRATE-V0.9: hover_cb e o callback NATIVO
-        // (glintfx::UiLayer::set_hover_callback, v0.9.0) - a glintfx despacha
-        // entered=true/false JA deduplicado por id (current_hover_id_ interno,
-        // ver o doc-comment vendorizado em ui_layer.hpp/bootstrap.hpp: so invoca
-        // o callback quando o id hovered de fato MUDA). `last_hover_sfx_id` e
-        // uma 2a camada de dedup NOSSA (defesa em profundidade, redundante mas
-        // barata com a da glintfx) - sincronizada nos DOIS sentidos
-        // (entered=false TAMBEM atualiza, senao sair-e-voltar pro MESMO item
-        // nunca redispararia). `id` (const char*) so e valido DURANTE esta
-        // chamada (contrato do glintfx) - convertido pra std::string ANTES de
-        // qualquer outra coisa. is_navigable_hover_id() filtra os ids que o
-        // hover nativo TAMBEM resolve mas nunca devem soar. Registrado UMA VEZ
-        // (`ui` aqui e uma UNICA glintfx::UiLayer pra vida inteira da tela).
-        std::string last_hover_sfx_id;
-        auto hover_cb = [&](const char* raw_id, bool entered) {
-            const std::string id = raw_id != nullptr ? raw_id : "";
-            if (!entered) {
-                if (id == last_hover_sfx_id) last_hover_sfx_id.clear();
-                return;
-            }
-            if (id == last_hover_sfx_id || !is_navigable_hover_id(state, id)) return;
-            last_hover_sfx_id = id;
-            audio.play_sfx(hover_sfx_id);
-        };
-        ui_opt->set_hover_callback(hover_cb);
-
-        // HOVER (mouse) - COCKPIT-SFX-HOVER-CLIQUE: injeta o MouseMove no glintfx
-        // (visual :hover NATIVO, ver title_menu_rml.cpp - e o QUE dispara
-        // hover_cb acima por baixo dos panos). O SOM de hover agora e 100%
-        // responsabilidade do callback nativo - esta lambda so injeta o evento.
-        // Fatorada em lambda pra ser o UNICO choke-point do SDL_EVENT_MOUSE_MOTION
-        // real.
-        auto handle_mouse_motion = [&](float mx, float my) {
-            glintfx::UiEvent hover_ev{};
-            hover_ev.type = glintfx::UiEvent::Type::MouseMove;
-            hover_ev.x = mx;
-            hover_ev.y = my;
-            ui_opt->process_event(hover_ev);
-        };
-
-        // Confirma "Continuar": o save mais recente JA esta no cache (scan_saves) -
-        // nao le o disco de novo. Defensivo (nunca deveria acontecer - Continuar
-        // so e selecionavel quando any_save_exists, que implica most_recent_slot
-        // >= 0): se por algum motivo o cache estiver vazio, degrada pra NewGame
-        // em vez de devolver um SaveData por default-construir (nunca finge um
-        // load que nao aconteceu).
-        auto confirm_continue = [&] {
-            if (scan.most_recent_slot >= 0 &&
-                scan.loaded[static_cast<std::size_t>(scan.most_recent_slot)]
-                    .has_value()) {
-                if (out_loaded_save != nullptr) {
-                    *out_loaded_save =
-                        *scan.loaded[static_cast<std::size_t>(scan.most_recent_slot)];
-                }
+        switch (title_flow_next(texit, dexit)) {
+            case TitleFlowStep::ContinueGame:
                 *out_exit = TitleLoopExit::ContinueGame;
-            } else {
-                std::cerr << "[title_menu_loop] BUG defensivo: ContinueGame sem "
-                             "slot no cache - degradando pra Novo Jogo (nao finge "
-                             "um load que nao aconteceu).\n";
+                return;
+            case TitleFlowStep::QuitApp:
+                *out_exit = TitleLoopExit::QuitApp;
+                return;
+            case TitleFlowStep::StartNewGame:
                 *out_exit = TitleLoopExit::NewGame;
-            }
-        };
-
-        // MODOS-MORTE Fase 0 (docs/design/mecanicas/modos-morte.md §3.2):
-        // "Novo Jogo" confirmado dispara a TELA DE SELECAO DE DIFICULDADE,
-        // ANINHADA no MESMO contexto GL (MESMA tecnica de
-        // run_save_load_menu_loop_gl_current - RmlUi so aceita 1 UiLayer viva por
-        // processo, entao a desta tela e DESTRUIDA antes e RECRIADA se o
-        // jogador Cancelar). Devolve true se o CHAMADOR (route_title_action) deve
-        // retornar de run_body NA HORA.
-        auto start_new_game_via_difficulty_menu = [&] {
-            ui_opt.reset();
-            gus::domain::save::DifficultyLevel chosen =
-                gus::domain::save::DifficultyLevel::Medio;
-            const DifficultyLoopExit dexit = run_difficulty_menu_loop_gl_current(
-                window, audio, translator, &chosen, frozen_background_png);
-            switch (dexit) {
-                case DifficultyLoopExit::QuitApp:
-                    *out_exit = TitleLoopExit::QuitApp;
-                    return true;
-                case DifficultyLoopExit::Chosen:
-                    *out_exit = TitleLoopExit::NewGame;
-                    if (out_new_game_difficulty != nullptr) {
-                        *out_new_game_difficulty = chosen;
-                    }
-                    return true;
-                case DifficultyLoopExit::Cancelled:
-                    // RECRIA a UiLayer do titulo (MESMO padrao de
-                    // system_menu_loop.cpp apos voltar de save/load, ver o "FIX
-                    // CRITICO" la) e segue mostrando a lista de novo.
-                    ui_opt.emplace(glintfx::UiLayer::Config{
-                        /*logical_width=*/960, /*logical_height=*/540,
-                        /*load_gl=*/true, /*dp_ratio=*/dp_ratio});
-                    ui_opt->set_asset_base_url(stage.c_str());
-                    ui_opt->set_hover_callback(hover_cb);
-                    reload();
-                    return false;
-            }
-            return false;
-        };
-
-        // Roteia UMA TitleMenuAction pro efeito de mundo comum aos pontos de
-        // entrada (Enter, clique em item) - devolve true se o CHAMADOR deve
-        // retornar de run_body NA HORA (ContinueGame/StartNewGame/RequestQuit ja
-        // setaram *out_exit ou chamaram confirm_continue()).
-        auto route_title_action = [&](TitleMenuAction action) -> bool {
-            switch (action) {
-                case TitleMenuAction::None:
-                    reload();
-                    return false;
-                case TitleMenuAction::ContinueGame:
-                    confirm_continue();
-                    return true;
-                case TitleMenuAction::StartNewGame:
-                    return start_new_game_via_difficulty_menu();
-                case TitleMenuAction::RequestQuit:
-                    *out_exit = TitleLoopExit::QuitApp;
-                    return true;
-            }
-            return false;
-        };
-
-        // DIAGNOSTICO/PROVA (SAVE-LOAD-UI etapa 4, prova visual headless Xvfb
-        // :99): GUSWORLD_TITLE_SCREENSHOT_DIR=<dir> assenta alguns frames (bake
-        // de fonte/layout, MESMA cautela dos demais self-tests) e salva 1 PNG
-        // ANTES de entrar no loop interativo - bypassa por completo (nunca abre
-        // pra input real), MESMO espirito de GUSWORLD_SAVELOAD_SCREENSHOT_DIR em
-        // save_load_menu_loop.cpp. Nome do arquivo reflete o ESTADO REAL varrido
-        // do disco (Continuar habilitado/desabilitado) - rodar o processo 2x com
-        // 2 GUSWORLD_HOME diferentes (1 com save, 1 vazio) produz os 2 PNGs
-        // pedidos sem precisar renomear nada por fora.
-        const char* screenshot_dir = std::getenv("GUSWORLD_TITLE_SCREENSHOT_DIR");
-        if (screenshot_dir != nullptr && screenshot_dir[0] != '\0') {
-            for (int i = 0; i < 6; ++i) present_frame();
-            std::vector<unsigned char> buf(static_cast<std::size_t>(pw) *
-                                            static_cast<std::size_t>(ph) * 4);
-            if (gus::platform::rmlui::gl3_read_backbuffer_rgba(pw, ph, buf.data())) {
-                const std::string suffix = scan.any_save_exists
-                                                ? "title_continue_enabled"
-                                                : "title_continue_disabled";
-                const std::string out =
-                    join(std::string(screenshot_dir), suffix + ".png");
-                stbi_write_png(out.c_str(), pw, ph, 4, buf.data(), pw * 4);
-                std::cout << "TitleMenuLoop: [screenshot] " << out << " (" << pw
-                          << "x" << ph << ")\n";
-            } else {
-                std::cerr << "TitleMenuLoop: [screenshot] gl3_read_backbuffer_rgba "
-                             "falhou\n";
-            }
-            return;
-        }
-
-        while (true) {
-            SDL_Event ev;
-            while (SDL_PollEvent(&ev)) {
-                if (ev.type == SDL_EVENT_QUIT) {
-                    *out_exit = TitleLoopExit::QuitApp;
-                    return;
+                if (out_new_game_difficulty != nullptr) {
+                    *out_new_game_difficulty = chosen;
                 }
-                if (ev.type == SDL_EVENT_WINDOW_RESIZED ||
-                    ev.type == SDL_EVENT_WINDOW_PIXEL_SIZE_CHANGED) {
-                    SDL_GetWindowSizeInPixels(window, &pw, &ph);
-                    if (pw < 1) pw = 1;
-                    if (ph < 1) ph = 1;
-                    ui_opt->set_viewport(pw, ph);
-                    ui_opt->set_dp_ratio(static_cast<float>(pw) / 960.0f);
-                    continue;
-                }
-                if (ev.type == SDL_EVENT_KEY_DOWN && !ev.key.repeat) {
-                    const bool is_confirm_key = (ev.key.key == SDLK_RETURN ||
-                                                  ev.key.key == SDLK_KP_ENTER ||
-                                                  ev.key.key == SDLK_SPACE);
-                    if (is_confirm_key) {
-                        // SOM DE CLIQUE (COCKPIT-SFX-HOVER-CLIQUE): Enter/Espaco e
-                        // sempre uma confirmacao intencional de item/pill - MESMO
-                        // choke-point de flash_pressed em system_menu_loop.cpp (a
-                        // tela de titulo nao tem flash visual, so o som).
-                        audio.play_sfx(click_sfx_id);
-                        const TitleMenuAction action =
-                            title_menu_key_down(state, ev.key.key);
-                        if (route_title_action(action)) return;
-                    } else {
-                        // Navegacao (setas/WASD/ESC) - SOM DE HOVER PARIDADE
-                        // TECLADO x MOUSE (MESMA tecnica de handle_navigation_key
-                        // em system_menu_loop.cpp): move a selecao e, SO se o
-                        // MODO (lista vs mini-dialogo) NAO mudou E moveu pra um
-                        // item NOVO, toca hover_sfx no MESMO choke-point do mouse.
-                        // Trocar de MODO (ex.: ESC fechando o mini-dialogo de Novo
-                        // Jogo) NAO conta como "hover num item novo" - MESMO guard
-                        // de `state.screen == screen_before` do menu de pausa.
-                        const bool confirming_before = state.confirming_new_game;
-                        const int kb_index_before = title_keyboard_focus_index(state);
-                        const TitleMenuAction action =
-                            title_menu_key_down(state, ev.key.key);
-                        if (state.confirming_new_game == confirming_before) {
-                            const int kb_index_after = title_keyboard_focus_index(state);
-                            if (ui_hover_entered_new_item(kb_index_before, kb_index_after)) {
-                                audio.play_sfx(hover_sfx_id);
-                            }
-                        }
-                        if (route_title_action(action)) return;
-                    }
-                } else if (ev.type == SDL_EVENT_MOUSE_BUTTON_DOWN &&
-                           ev.button.button == SDL_BUTTON_LEFT) {
-                    bool handled = false;
-                    if (state.confirming_new_game) {
-                        for (int i = 0; i < 2 && !handled; ++i) {
-                            const glintfx::ElementBox box = ui_opt->get_element_box(
-                                ("title-confirm-" + std::to_string(i)).c_str());
-                            if (!hit_test(box, ev.button.x, ev.button.y)) continue;
-                            handled = true;
-                            // as 2 pills do mini-dialogo sao SEMPRE validas (sem
-                            // conceito de "desabilitada" aqui) - som sempre toca.
-                            audio.play_sfx(click_sfx_id);
-                            const TitleMenuAction action =
-                                title_menu_click_option(state, i);
-                            if (route_title_action(action)) return;
-                        }
-                    } else {
-                        for (int i = 0; i < kTitleItemCount && !handled; ++i) {
-                            const glintfx::ElementBox box = ui_opt->get_element_box(
-                                ("title-item-" + std::to_string(i)).c_str());
-                            if (!hit_test(box, ev.button.x, ev.button.y)) continue;
-                            handled = true;
-                            // Clicar num item DESABILITADO (Continuar sem save) e
-                            // no-op TOTAL (ver title_menu_click_option) - sem som
-                            // tambem, MESMA semantica "nao reage a nada".
-                            if (title_item_selectable(state, i)) {
-                                audio.play_sfx(click_sfx_id);
-                            }
-                            const TitleMenuAction action =
-                                title_menu_click_option(state, i);
-                            if (route_title_action(action)) return;
-                        }
-                    }
-                } else if (ev.type == SDL_EVENT_MOUSE_MOTION) {
-                    handle_mouse_motion(ev.motion.x, ev.motion.y);
-                }
-            }
-            present_frame();
+                return;
+            case TitleFlowStep::RetryTitle:
+                break;  // RE-ENTRA no MESMO title_screen (topo do for(;;)).
         }
     }
 }
