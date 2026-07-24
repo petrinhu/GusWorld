@@ -1,11 +1,53 @@
 // gus/app/src/screens/system_menu_loop.cpp
 //
 // Implementacao do loop interativo do MENU DE SISTEMA. Ver header para o contrato
-// completo. GL/glintfx-heavy (mesma familia de battle_preview.cpp) - sem unidade
-// de teste direta (irredutivel, mesmo racional de run_battle_preview_embedded: a
-// logica PURA testavel ja fica em system_menu.hpp/system_menu_test.cpp e
-// system_menu_rml.hpp/system_menu_rml_test.cpp; este .cpp so orquestra SDL/GL em
-// torno dela).
+// completo.
+//
+// F4-1b.4 (onda F4 "casca SDL -> App mode do glintfx", fatia 1b.4 - SEGUNDA tela
+// PAI da onda, apos F4-1b.3/title_menu_loop.cpp): o caminho de PRODUCAO
+// (run_system_menu_loop_gl_current) foi convertido de um while(true){SDL_
+// PollEvent...} PROPRIO pra uma classe SystemMenuScreen (gus::app::ScreenState) +
+// gus::app::run_screen_state - MESMA tecnica de TitleScreen/DifficultyScreen/
+// SaveLoadScreen. O roteamento de evento (decisao PURA) foi extraido pra
+// system_screen_step (declarada no .hpp, testada headless em
+// system_screen_step_test.cpp) - MESMO racional de title_screen_step.
+//
+// O PROBLEMA NOVO desta fatia (MESMO racional de F4-1b.3): o Pause dispara a
+// tela de SALVAR/CARREGAR (save_load_menu_loop.hpp) ANINHADA quando o jogador
+// confirma "Salvar"/"Carregar" (SystemMenuAction::OpenSaveLoadSave/Load). ANTES
+// desta fatia, isso acontecia de DENTRO do handler do Pause (o antigo
+// handle_action lambda, chamando run_save_load_menu_loop_gl_current no MEIO do
+// proprio corpo, incluindo o velho par ui_opt.reset()/ui_opt.emplace() cruzando a
+// fronteira de telas) - o que agora VIOLARIA a guarda de reentrada de
+// gus::app::run_screen_state() (screen_state.hpp:29-39: run_screen_state(pai)
+// precisa RETORNAR - rodando pai.exit(), que libera a UiLayer do pai - ANTES de
+// qualquer codigo chamar run_screen_state(filha)).
+//
+// A SOLUCAO (MESMO MINI-DRIVER de title_menu_loop.cpp): SystemMenuScreen::
+// handle_event() SO devolve um SystemMenuScreenExit (ver o .hpp) - nunca chama a
+// tela de save/load. O DRIVER, dentro do wrapper (run_system_menu_loop_gl_current):
+//   1) chama gus::app::run_screen_state(system_screen) - ela SO retorna DEPOIS
+//      que system_screen.exit() ja rodou (garantia ESTRUTURAL);
+//   2) SO ENTAO, se o desfecho foi OpenSaveLoadSave/OpenSaveLoadLoad, chama
+//      run_save_load_menu_loop_gl_current (a UiLayer do Pause ja foi destruida -
+//      seguro criar a 2a);
+//   3) decide o proximo passo via a funcao PURA pause_flow_next() (testada
+//      headless em system_screen_step_test.cpp);
+//   4) se a tela de save/load devolveu BackToPause, RE-USA o MESMO objeto
+//      SystemMenuScreen, chamando run_screen_state(system_screen) de novo.
+//
+// SystemMenuScreen PERSISTE entre iteracoes do driver (objeto local da PILHA do
+// wrapper, NAO recriado a cada volta) - o ESTADO DE NEGOCIO (SystemMenuState
+// state_: tela atual/selecoes/volume/copia de trabalho de Controles) e
+// inicializado no CONSTRUTOR, NAO em enter() - so ASSIM "voltar do save/load"
+// preserva a tela/selecao/staged changes ATUAIS (nao reabre sempre em Pause com
+// foco em Continuar, nao perde um remap de tecla ainda nao aplicado) - MESMO
+// comportamento observavel do while(true) antigo. enter()/exit() SO cuidam de
+// recursos GL (glintfx::UiLayer, Render2dGl3, ids de SFX) - a exclusividade da
+// UiLayer (gus/app/screen_state.hpp) vira consequencia ESTRUTURAL de
+// system_screen.exit() acontecer (dentro de run_screen_state) ANTES do driver
+// sequer cogitar abrir a tela de save/load, substituindo o antigo
+// ui_opt.reset()/emplace() manual cruzando a fronteira de telas.
 //
 // EFEITO DE PRESS (MENU-PAUSA-CONFIG-SOM, onda arvore): quando o jogador aciona
 // uma pill/categoria/Voltar (Enter/Espaco no TECLADO ou clique de MOUSE), o loop
@@ -13,32 +55,21 @@
 // intenso, ver .verb-pill.pressed/.btn-back.pressed em system_menu_rml.cpp) ANTES
 // de aplicar a transicao de fato (trocar de tela/fechar o menu/pedir Sair). Isto e
 // deliberadamente um efeito NOSSO (nao do glintfx - a lib nao tem estado "active"
-// disparado por teclado, so :focus/:hover via classe) - flash_pressed() abaixo e o
-// UNICO lugar que gera esse frame extra.
+// disparado por teclado, so :focus/:hover via classe) - flash_pressed_() abaixo e
+// o UNICO lugar que gera esse frame extra. O SOM DE CLIQUE dispara DENTRO dele -
+// nao ha um SystemMenuSfxKind::Click separado (ver o .hpp).
 //
 // HOVER NATIVO + SOM DE HOVER/CLIQUE (retoque ao vivo do lider, pos-ONDA ARVORE;
 // SOM DE HOVER de MOUSE migrado pro callback NATIVO em SFX-MIGRATE-V0.9): o
 // VISUAL do hover e 100% :hover nativo do glintfx (RCSS em system_menu_rml.cpp) -
-// so precisamos injetar UiEvent::MouseMove em TODO SDL_EVENT_MOUSE_MOTION (nao so
-// durante o arrasto do slider, como antes), MESMO pipeline ja em producao no
-// cockpit da batalha (battle_preview.cpp: sdl_to_glintfx -> process_event ->
-// Context::ProcessMouseMove -> :hover). O SOM DE HOVER (mouse) agora usa
-// glintfx::UiLayer::set_hover_callback (v0.9.0, ver hover_cb mais abaixo) - a
-// glintfx JA deduplica o proprio fan-out de Mouseover internamente
-// (current_hover_id_, ver o doc-comment vendorizado em ui_layer.hpp/
-// bootstrap.hpp) e so invoca o callback na TRANSICAO real; is_navigable_hover_id
-// (POCO, abaixo) filtra pra so os ids de item NAVEGAVEL da tela ATUAL soarem (o
-// hover nativo tambem resolve containers como #sysmenu-panel/.ctrl-list/
-// slider-track-N, que NUNCA devem soar). O antigo hit-test manual
-// (current_hover_index, um get_element_box por item SO pra decidir o som) foi
-// REMOVIDO nesta migracao - o CLIQUE continua no MESMO get_element_box+hit_test
-// de sempre, intocado. O hover de TECLADO (sem mouse) continua na MESMA dupla
-// system_menu_hover_entered_new_item/system_menu_keyboard_focus_index de antes
-// (nao ha callback nativo pra foco de teclado dirigido por dado - ver
-// handle_navigation_key mais abaixo). O som de CLIQUE (click_sfx_id_) dispara
-// dentro de flash_pressed() - o MESMO choke-point que ja gera o flash visual
-// .pressed pra CONFIRMACAO de teclado OU mouse, garantindo 1 unico lugar pros
-// dois canais de entrada (sem duplicar a logica).
+// so precisamos injetar UiEvent::MouseMove em TODO SDL_EVENT_MOUSE_MOTION, MESMO
+// pipeline ja em producao no cockpit da batalha. O SOM DE HOVER (mouse) usa
+// glintfx::UiLayer::set_hover_callback - a glintfx JA deduplica o proprio fan-out
+// de Mouseover internamente e so invoca o callback na TRANSICAO real;
+// is_navigable_hover_id (POCO, abaixo) filtra pra so os ids de item NAVEGAVEL da
+// tela ATUAL soarem. O hover de TECLADO (sem mouse) continua na MESMA dupla
+// system_menu_hover_entered_new_item/system_menu_keyboard_focus_index de antes -
+// agora decidido DENTRO de system_screen_step (SystemMenuSfxKind::Hover).
 
 #include "gus/app/screens/system_menu_loop.hpp"
 
@@ -47,7 +78,9 @@
 #include <fstream>
 #include <iostream>
 #include <optional>
+#include <sstream>
 #include <string>
+#include <vector>
 
 #include <glintfx/element_box.hpp>
 #include <glintfx/ui_layer.hpp>
@@ -66,6 +99,11 @@
 #include "gus/platform/input/key_translation.hpp"  // sdl_key_to_godot_keycode (captura, M2)
 #include "gus/platform/render2d/render2d_gl3.hpp"
 #include "gus/platform/rmlui/gl3_loader.hpp"  // glad load (variante owning_gl)
+
+// stb_image_write: SO a declaracao aqui (a IMPLEMENTACAO ja vive UMA vez em
+// battle_preview.cpp, MESMA lib gusengine_app - nao redefinir
+// STB_IMAGE_WRITE_IMPLEMENTATION aqui, senao da symbol duplicado no link).
+#include "stb_image_write.h"
 
 // Pasta das fontes (.ttf), embutida pelo CMake (mesma macro que battle_preview.cpp
 // ja usa - PRIVATE no CMakeLists do target app, aplica a TODO .cpp do target). SO usada
@@ -159,7 +197,7 @@ void apply_and_persist(const SystemMenuState& state,
 // M2 STAGED CHANGES - MESMO padrao best-effort de apply_and_persist acima:
 // falha de I/O so loga, a copia de trabalho em MEMORIA continua valendo pro
 // resto da sessao). Chamada SO quando o CHAMADOR ve SystemMenuAction::
-// ControlsApplied ("Aplicar" confirmado, ver handle_action) - remap/
+// ControlsApplied ("Aplicar" confirmado, ver system_screen_step) - remap/
 // restaurar-padrao isolados (ControlsChanged) NAO chegam mais aqui (o modelo
 // antigo "aplica na hora" foi trocado por mudancas preparadas + Aplicar
 // explicito). Perfil UNICO "default" nesta onda (nao ha selecao de jogador na
@@ -246,8 +284,10 @@ glintfx::ElementBox filter_offscreen_controls_row(int index, glintfx::ElementBox
 // Hit-test simples: cursor (x,y, espaco-janela) dentro da caixa border-box
 // devolvida por glintfx::UiLayer::get_element_box (MESMO espaco de coordenadas
 // - ver docs/embed-integration.md secao 10, ja citado em outros comentarios
-// deste arquivo). box.found=false conta como "fora".
-bool hit_test(const glintfx::ElementBox& box, float x, float y) {
+// deste arquivo). box.found=false conta como "fora". PURA - usada tanto por
+// system_screen_step (roteamento de clique) quanto (indiretamente, via boxes ja
+// resolvidas) pelo resto deste arquivo.
+bool hit_test(const glintfx::ElementBox& box, float x, float y) noexcept {
     if (!box.found) return false;
     return x >= box.x && x <= box.x + box.w && y >= box.y && y <= box.y + box.h;
 }
@@ -268,15 +308,9 @@ std::string resolve_menu_sfx_path(std::string_view file) {
 // category_item_id/audio_item_id/kPlaceholderBackId/controls_item_id/
 // controls_confirm_id/controls_discard_confirm_id) - o hover nativo do RmlUi
 // tambem resolve ids de CONTAINER (#sysmenu-panel, .ctrl-list, slider-track-N,
-// ver system_menu_rml.cpp) que NUNCA devem tocar o SFX de hover. Diferente do
-// antigo current_hover_index (removido nesta migracao), NAO precisa filtrar
-// linhas roladas pra fora da vista (BUG-A): o hover NATIVO so resolve `id` pra
-// um elemento de fato PINTADO sob o cursor - uma linha clipada pelo
-// overflow:auto de `.ctrl-list` literalmente nao pode ser hovered de verdade
-// (ao contrario do get_element_box usado pelo hit-test de CLIQUE, que le
-// geometria de LAYOUT crua e por isso PRECISA do filtro, ver
-// filter_offscreen_controls_row logo abaixo - esse continua intocado). 100%
-// string/estado, sem GL.
+// ver system_menu_rml.cpp) que NUNCA devem tocar o SFX de hover. NAO precisa
+// filtrar linhas roladas pra fora da vista (BUG-A): o hover NATIVO so resolve
+// `id` pra um elemento de fato PINTADO sob o cursor.
 bool is_navigable_hover_id(const SystemMenuState& state, const std::string& id) {
     switch (state.screen) {
         case SystemMenuScreen::Pause:
@@ -303,8 +337,7 @@ bool is_navigable_hover_id(const SystemMenuState& state, const std::string& id) 
         case SystemMenuScreen::Controls:
             // Confirmando o restaurar-padrao OU o descarte (M2 STAGED CHANGES):
             // so as 2 pills do mini-dialogo correspondente. Capturando: nenhum
-            // item navegavel ("Pressione uma tecla..." - MESMO caso que
-            // current_hover_index tratava como count=0).
+            // item navegavel ("Pressione uma tecla...").
             if (state.controls_confirming_restore) {
                 return id == controls_confirm_id(0) || id == controls_confirm_id(1);
             }
@@ -326,634 +359,1030 @@ bool is_navigable_hover_id(const SystemMenuState& state, const std::string& id) 
     return false;
 }
 
+// F4-1b.4: indice do item que RECEBE o flash de PRESS quando um confirm-key
+// (Enter/Espaco) e apertado, ATUAL (ANTES da mutacao) - MESMO switch do antigo
+// bloco is_confirm_key do while(true), agora extraido pra funcao PURA usada por
+// system_screen_step.
+int confirm_item_index(const SystemMenuState& state) noexcept {
+    switch (state.screen) {
+        case SystemMenuScreen::Pause:
+            // MENU-INICIAL: enquanto o mini-dialogo esta aberto, o item
+            // pressionado e a pill Sim/Cancelar (MESMA convencao de
+            // Controls::controls_confirming_restore abaixo).
+            return state.pause_confirming_to_title ? state.pause_to_title_confirm_selected
+                                                    : state.pause_selected;
+        case SystemMenuScreen::ConfigCategories:
+            return state.config_categories_selected;
+        case SystemMenuScreen::Audio:
+            return state.audio_selected;
+        case SystemMenuScreen::Controls:
+            // Confirmando o restaurar-padrao OU o descarte (M2 STAGED CHANGES):
+            // o item pressionado e a pill Sim/Nao do mini-dialogo
+            // correspondente (0|1); caso contrario, a acao/rodape selecionado
+            // normalmente (inclui Aplicar, kControlsApplyIndex).
+            // controls_capturing nunca chega aqui (interceptado ANTES, ver
+            // system_screen_step).
+            if (state.controls_confirming_restore) return state.controls_restore_confirm_selected;
+            if (state.controls_confirming_discard) return state.controls_discard_confirm_selected;
+            return state.controls_selected;
+        case SystemMenuScreen::Video:
+        case SystemMenuScreen::Language:
+            return kPlaceholderBackIndex;
+        case SystemMenuScreen::Hidden:
+            return -1;
+    }
+    return -1;
+}
+
+// Confirma se `action` merece o flash de PRESS (ver topo do arquivo): SO as
+// acoes que de fato "acionam uma opcao" (pill/categoria/Voltar/Aplicar) -
+// nunca VolumeChanged (drag de slider nao pisca) nem None (nao aconteceu
+// nada). ControlsChanged (M2) SOMA aqui: confirmar "Sim" no restaurar-padrao e
+// uma acao destrutiva (reseta a copia de trabalho) - merece o mesmo flash de
+// confirmacao das demais. ControlsApplied (M2 STAGED CHANGES) SOMA aqui
+// tambem: "Aplicar" e a acao mais importante da tela - merece o mesmo flash.
+bool is_confirming(SystemMenuAction action) noexcept {
+    return action == SystemMenuAction::Continue ||
+           action == SystemMenuAction::RequestQuit ||
+           action == SystemMenuAction::RequestToTitle ||
+           action == SystemMenuAction::Navigated ||
+           action == SystemMenuAction::ControlsChanged ||
+           action == SystemMenuAction::ControlsApplied;
+}
+
+// F4-1b.4: aplica o DESFECHO de uma SystemMenuAction em SystemMenuStepResult -
+// MESMO dispatch do antigo `handle_action` lambda, so que gravando em campos da
+// struct de retorno (reload/volume_changed/controls_applied/exit) em vez de
+// executar os side effects na hora (esses ficam com o CHAMADOR, ver
+// SystemMenuScreen::handle_event). NUNCA mexe em `result.sfx`/`result.flash` -
+// quem decide isso e o CHAMADOR de system_screen_step (edge-detect de hover na
+// navegacao, is_confirming no confirm-key/clique).
+void apply_system_menu_action_to_result(SystemMenuStepResult& result,
+                                          SystemMenuAction action) noexcept {
+    switch (action) {
+        case SystemMenuAction::None:
+            result.reload = true;
+            return;
+        case SystemMenuAction::Continue:
+            result.exit = SystemMenuScreenExit::Continue;
+            return;
+        case SystemMenuAction::RequestQuit:
+            result.exit = SystemMenuScreenExit::RequestQuit;
+            return;
+        case SystemMenuAction::VolumeChanged:
+            result.volume_changed = true;
+            result.reload = true;
+            return;
+        case SystemMenuAction::Navigated:
+            result.reload = true;
+            return;
+        case SystemMenuAction::ControlsChanged:
+            result.reload = true;
+            return;
+        case SystemMenuAction::ControlsApplied:
+            result.controls_applied = true;
+            result.reload = true;
+            return;
+        case SystemMenuAction::OpenSaveLoadSave:
+            result.exit = SystemMenuScreenExit::OpenSaveLoadSave;
+            return;
+        case SystemMenuAction::OpenSaveLoadLoad:
+            result.exit = SystemMenuScreenExit::OpenSaveLoadLoad;
+            return;
+        case SystemMenuAction::RequestToTitle:
+            result.exit = SystemMenuScreenExit::RequestToTitle;
+            return;
+    }
+}
+
 }  // namespace
 
-SystemMenuLoopOutcome run_system_menu_loop_gl_current(
-    SDL_Window* window, gus::platform::audio::AudioEngine& audio,
-    const gus::app::i18n::Translator& translator, const std::string& settings_dir,
-    const std::string& saves_dir,
-    const std::function<gus::domain::save::SaveData()>& build_current_save_data,
-    const std::function<void(const gus::domain::save::SaveData&)>&
-        apply_loaded_save_data,
-    const std::string& frozen_background_png) {
-    SystemMenuLoopOutcome outcome;
+// F4-1b.4: implementacao de system_screen_step (declarada no .hpp) - ver o
+// comentario grande la pro contrato completo. Extracao BEHAVIOR-PRESERVING do
+// corpo do while(true) antigo (MESMA ordem de checagem de tipo de evento, MESMAS
+// chamadas a system_menu_key_down/system_menu_click_option/system_menu_
+// controls_capture_key/system_menu_set_slider_ratio) - so devolvendo a DECISAO
+// em vez de executar os side effects na hora.
+//
+// PONTO CRITICO #1 (preservado EXATAMENTE): a interceptacao de captura de tecla
+// da tela Controles (state.screen==Controls && state.controls_capturing) roda
+// ANTES de qualquer roteamento generico de KEY_DOWN - um mutante classico e
+// inverter essa ordem (ver system_screen_step_test.cpp, caso "ORDEM captura").
+SystemMenuStepResult system_screen_step(SystemMenuState& state, const SDL_Event& ev,
+                                          const SystemMenuStepBoxes& boxes) noexcept {
+    SystemMenuStepResult result;
 
-    SystemMenuState state;
-    state.music_volume = audio.music_volume();
-    state.sfx_volume = audio.sfx_volume();
-    // Tela Controles (M2 -> M2 STAGED CHANGES): carrega o remap persistido (ou
-    // default_controls() se ausente/corrompido, ver controls_file_store.hpp) -
-    // MESMO espirito de music_volume/sfx_volume acima (semeado do estado JA
-    // carregado no boot, nao resetado por system_menu_open). Perfil UNICO
-    // "default" nesta onda (ver persist_controls acima - nao ha selecao de
-    // jogador na UI ainda). controls_applied_config = a MESMA leitura -
-    // BASELINE (o que ja vale no jogo/disco agora, alvo do revert ao
-    // descartar, ver o comentario STAGED CHANGES em system_menu.hpp); as duas
-    // copias comecam IGUAIS, so controls_config (a copia de trabalho) muda com
-    // remap/restaurar ate o jogador confirmar "Aplicar".
-    state.controls_config = gus::platform::fs::load_controls(
-        settings_dir, std::string(gus::domain::input::kDefaultProfile));
-    state.controls_applied_config = state.controls_config;
-    system_menu_open(state);
-
-    int pw = 0, ph = 0;
-    SDL_GetWindowSizeInPixels(window, &pw, &ph);
-    if (pw < 1) pw = 1;
-    if (ph < 1) ph = 1;
-    float dp_ratio = static_cast<float>(pw) / 960.0f;
-
-    // SAVE-LOAD-UI etapa 6 (FIX critico, ver o comentario grande no ramo
-    // OpenSaveLoadSave/Load de handle_action mais abaixo): `ui` vive num
-    // std::optional (NAO um glintfx::UiLayer direto) porque a tela de save/load
-    // precisa abrir seu PROPRIO glintfx::UiLayer - e RmlUi NAO SUPORTA 2
-    // contextos/UiLayer simultaneos no MESMO processo (crash real ja documentado,
-    // ver o comentario historico em app/tests/battle_key_routing_test.cpp,
-    // "Element meta pool not empty on shutdown" - MESMO sintoma reproduzido ao
-    // vivo por este agente antes do fix). Por isso `ui` e DESTRUIDO (ui_opt.reset())
-    // ANTES de abrir a tela de save/load e RECRIADO (ui_opt.emplace(...) + reload())
-    // so DEPOIS dela fechar - nunca 2 instancias vivas ao mesmo tempo.
-    std::optional<glintfx::UiLayer> ui_opt(glintfx::UiLayer::Config{
-        /*logical_width=*/960, /*logical_height=*/540, /*load_gl=*/true,
-        /*dp_ratio=*/dp_ratio});
-    if (!ui_opt->ok()) {
-        std::cerr << "SystemMenuLoop: glintfx::UiLayer::ok()=false (attach falhou) - "
-                     "fechando o menu sem desenhar nada (degradacao segura).\n";
-        return outcome;  // quit_app=false: o chamador so retoma a cena
+    if (ev.type == SDL_EVENT_QUIT) {
+        result.window_closed = true;
+        return result;
     }
 
-    const std::string stage = menu_stage_dir();
-    ui_opt->set_asset_base_url(stage.c_str());
-    std::string rml_path = write_system_menu_rml_file(state, translator);
-    ui_opt->load(rml_path.c_str());
-    ui_opt->set_viewport(pw, ph);
-    ui_opt->set_dp_ratio(dp_ratio);
-    // SFX-MIGRATE-V0.9: 1 update() de "assentamento" AQUI, ANTES do while(true) -
-    // achado EMPIRICO (harness headless de save_load_menu_loop.cpp, MESMA
-    // receita replicada aqui por consistencia): o hover NATIVO (Context::
-    // ProcessMouseMove -> UpdateHoverChain -> GetElementAtPoint, fonte pinada do
-    // RmlUi) so resolve elemento sob o cursor DEPOIS de pelo menos 1 Context::
-    // Update() ter rodado pro documento RECEM-carregado (diferente de
-    // get_element_box, que ja funciona logo apos load()). Sem isto, um
-    // MouseMove que chegue ANTES do 1o present_frame() desta tela (raro mas
-    // real) cairia num hover_cb mudo ate o PROXIMO MouseMove. Idempotente/
-    // barato (present_frame() ja chama ui_opt->update() de novo a cada frame).
-    ui_opt->update();
+    if (ev.type == SDL_EVENT_WINDOW_RESIZED ||
+        ev.type == SDL_EVENT_WINDOW_PIXEL_SIZE_CHANGED) {
+        result.resize = true;  // estado da tela intocado - o CHAMADOR reposiciona.
+        return result;
+    }
 
-    gus::platform::render2d::Render2dGl3 backdrop(/*gl_active=*/true);
-
-    // FUNDO REAL CONGELADO (retoque do lider via AskUserQuestion, MENU-PAUSA-
-    // CONFIG-SOM): carrega a textura UMA VEZ (mesmo racional de "load_texture
-    // NUNCA no frame" ja documentado pros SFX abaixo) - kInvalidTexture (path
-    // vazio/asset ausente/backend headless) degrada com seguranca pra vinheta de
-    // sempre (ver present_frame). Independe do reload() de estado (a imagem NAO
-    // muda durante a sessao do menu).
-    const gus::platform::render2d::TextureId frozen_bg_tex =
-        frozen_background_png.empty()
-            ? gus::platform::render2d::kInvalidTexture
-            : backdrop.load_texture(frozen_background_png.c_str());
-
-    // SFX de hover/clique (retoque ao vivo do lider): load_sfx UMA VEZ por sessao de
-    // menu (a cada Esc que abre o menu de novo, ver o header - MESMO padrao de
-    // hit_sfx_id em battle_preview.cpp, "load_sfx NUNCA no frame"). audio.available()
-    // false (device indisponivel/CI) degrada com seguranca - play_sfx(id invalido)
-    // ja e no-op, ver AudioEngine::play_sfx.
-    const std::string hover_sfx_path =
-        resolve_menu_sfx_path(gus::core::assets::kMenuHoverSfxFile);
-    const std::string click_sfx_path =
-        resolve_menu_sfx_path(gus::core::assets::kMenuClickSfxFile);
-    const gus::platform::audio::SoundId hover_sfx_id = audio.load_sfx(hover_sfx_path.c_str());
-    const gus::platform::audio::SoundId click_sfx_id = audio.load_sfx(click_sfx_path.c_str());
-
-    // Reconstroi o RML/reflete no glintfx apos QUALQUER mutacao de estado (navegacao,
-    // troca de tela, volume) - ver o comentario de build_system_menu_rml/
-    // write_system_menu_rml_file: reload-on-change e simples e barato o bastante
-    // (o menu muda so em input do jogador, nao a cada frame).
-    //
-    // SCROLL SEGUE A SELECAO (M2/GLINTFX-SCROLL, glintfx v0.4.0): apos QUALQUER
-    // reload (navegacao por teclado UP/DOWN/W/S, entrar/sair de Controles,
-    // Restaurar padrao, etc - TODOS passam por aqui), garante que a linha
-    // state.controls_selected fique DENTRO do recorte visivel de `.ctrl-list`
-    // via UiLayer::scroll_element_into_view - controls_scroll_target_index
-    // (system_menu.hpp, POCO/testavel) decide SE deve rolar (so na tela
-    // Controles, fora dos mini-dialogos Restaurar/Descartar - ver seu
-    // comentario). scroll_element_into_view(id, align_with_top=true) e no-op
-    // seguro quando a linha ja esta visivel (RmlUi so escreve scrollTop quando
-    // precisa) - por isso um UNICO ponto de chamada cobre tanto "linha nova
-    // entrando na vista" (navegacao) quanto "linha que ja estava visivel" (sem
-    // custo extra perceptivel).
-    //
-    // ui_opt->update() logo apos load() (SFX-MIGRATE-V0.9, generalizado a
-    // TODO reload - antes so rodava condicional ao scroll de Controles): o
-    // load() troca de DOCUMENTO (novo Rml::ElementDocument) - a geometria
-    // precisa de 1 passo de layout assentado antes de QUALQUER consulta que
-    // dependa de Context::Update() ter rodado. Ja valia pra
-    // scroll_element_into_view (motivo original desta linha); SFX-MIGRATE-V0.9
-    // estendeu o mesmo racional pro hover NATIVO (Context::ProcessMouseMove ->
-    // UpdateHoverChain -> GetElementAtPoint, fonte pinada do RmlUi) - inclusive
-    // no UiLayer RECRIADO no retorno da tela de Salvar/Carregar (BackToPause,
-    // que so recria a instancia e cai NESTE reload() generico pra carregar o
-    // Pause de volta, sem load() proprio) - sem update() incondicional aqui, um
-    // MouseMove chegando logo apos qualquer reload/recriacao (raro mas real)
-    // cairia num hover_cb mudo ate o PROXIMO MouseMove. Idempotente/barato
-    // (present_frame() ja chama ui_opt->update() de novo a cada frame).
-    auto reload = [&] {
-        rml_path = write_system_menu_rml_file(state, translator);
-        ui_opt->load(rml_path.c_str());
-        ui_opt->set_viewport(pw, ph);
-        ui_opt->set_dp_ratio(dp_ratio);
-        ui_opt->update();
-
-        const int scroll_target = controls_scroll_target_index(state);
-        if (scroll_target >= 0) {
-            ui_opt->scroll_element_into_view(controls_item_id(scroll_target).c_str());
+    if (ev.type == SDL_EVENT_KEY_DOWN && !ev.key.repeat) {
+        // PONTO CRITICO #1: MODO DE CAPTURA (tela Controles, M2) intercepta
+        // ANTES do roteamento generico abaixo - toda tecla (nao so UP/DOWN/
+        // ENTER/ESC com o significado especial de navegacao) e candidata a
+        // virar o novo binding.
+        if (state.screen == SystemMenuScreen::Controls && state.controls_capturing) {
+            const bool is_escape = (ev.key.key == SDLK_ESCAPE);
+            const long long godot_keycode =
+                is_escape ? 0
+                          : gus::platform::input::sdl_key_to_godot_keycode(
+                                static_cast<int>(ev.key.key));
+            const SystemMenuAction action =
+                system_menu_controls_capture_key(state, is_escape, godot_keycode);
+            apply_system_menu_action_to_result(result, action);
+            return result;
         }
-    };
 
-    // Desenha um frame do backdrop+UI e apresenta (MESMA sequencia do corpo do
-    // loop principal abaixo) - fatorado pra ser reusado pelo flash de PRESS.
-    auto present_frame = [&] {
-        const gus::core::spatial::Rect cam{0.0f, 0.0f, static_cast<float>(pw),
-                                            static_cast<float>(ph)};
-        backdrop.begin_frame(cam, pw, ph);  // clear + vinheta radial (fallback abstrato)
-        if (frozen_bg_tex != gus::platform::render2d::kInvalidTexture) {
-            // FUNDO REAL CONGELADO (decisao do lider): cobre a vinheta com a CENA
-            // REAL da cidade (1 frame estatico, capturado pela Maestro ANTES de
-            // abrir - ver Maestro::open_pause_from_city/SdlWindow::capture_frame_
-            // to_png), full-screen e opaca - mesmo padrao de Chrono Trigger/Zelda/
-            // Stardew Valley (o mundo "pausa" atras da UI). O #sysmenu-scrim do
-            // RML (system_menu_rml.cpp, ~66% preto) segue desenhado por CIMA disto
-            // pelo glintfx (ui_opt->render() abaixo) - a legibilidade do painel nao muda.
-            backdrop.draw_textured_rect(
-                cam, frozen_bg_tex, gus::platform::render2d::UvRect{0.0f, 0.0f, 1.0f, 1.0f},
+        const bool is_confirm_key = (ev.key.key == SDLK_RETURN || ev.key.key == SDLK_KP_ENTER ||
+                                      ev.key.key == SDLK_SPACE);
+        if (is_confirm_key) {
+            // Enter/Espaco: captura a tela+item ATUAIS (antes da mutacao) pra
+            // poder desenhar o flash de PRESS na tela DE ORIGEM caso a action
+            // resultante confirme algo (ver is_confirming acima).
+            const SystemMenuState pre_action_state = state;
+            const int item_index = confirm_item_index(state);
+            const SystemMenuAction action = system_menu_key_down(state, ev.key.key);
+            if (is_confirming(action)) {
+                result.flash = SystemMenuFlashInfo{pre_action_state, item_index};
+            }
+            apply_system_menu_action_to_result(result, action);
+        } else {
+            // Navegacao (setas/WASD/LEFT/RIGHT/ESC) - SOM DE HOVER PARIDADE
+            // TECLADO x MOUSE: move a selecao e, SO se a TELA nao mudou E moveu
+            // pra um item NOVO, toca hover_sfx. Trocar de TELA (ex.: ESC subindo
+            // um nivel) NAO conta como "navegar pra um item novo" (comparar
+            // indices ENTRE telas diferentes nao faz sentido).
+            const SystemMenuScreen screen_before = state.screen;
+            const int kb_index_before = system_menu_keyboard_focus_index(state);
+            const SystemMenuAction action = system_menu_key_down(state, ev.key.key);
+            if (state.screen == screen_before) {
+                const int kb_index_after = system_menu_keyboard_focus_index(state);
+                if (system_menu_hover_entered_new_item(kb_index_before, kb_index_after)) {
+                    result.sfx = SystemMenuSfxKind::Hover;
+                }
+            }
+            apply_system_menu_action_to_result(result, action);
+        }
+        return result;
+    }
+
+    if (ev.type == SDL_EVENT_MOUSE_BUTTON_DOWN && ev.button.button == SDL_BUTTON_LEFT) {
+        switch (state.screen) {
+            case SystemMenuScreen::Pause: {
+                if (state.pause_confirming_to_title) {
+                    for (int item = 0; item < 2; ++item) {
+                        if (!hit_test(boxes.pause_totitle_confirm[static_cast<std::size_t>(item)],
+                                      ev.button.x, ev.button.y)) {
+                            continue;
+                        }
+                        const SystemMenuState pre_action_state = state;
+                        const SystemMenuAction action = system_menu_click_option(state, item);
+                        if (is_confirming(action)) {
+                            result.flash = SystemMenuFlashInfo{pre_action_state, item};
+                        }
+                        apply_system_menu_action_to_result(result, action);
+                        break;
+                    }
+                } else {
+                    for (int item = 0; item < kPauseItemCount; ++item) {
+                        if (!hit_test(boxes.pause_items[static_cast<std::size_t>(item)],
+                                      ev.button.x, ev.button.y)) {
+                            continue;
+                        }
+                        const SystemMenuState pre_action_state = state;
+                        const SystemMenuAction action = system_menu_click_option(state, item);
+                        if (is_confirming(action)) {
+                            result.flash = SystemMenuFlashInfo{pre_action_state, item};
+                        }
+                        apply_system_menu_action_to_result(result, action);
+                        break;
+                    }
+                }
+                break;
+            }
+            case SystemMenuScreen::ConfigCategories: {
+                for (int item = 0; item < kConfigCategoriesItemCount; ++item) {
+                    if (!hit_test(boxes.category_items[static_cast<std::size_t>(item)],
+                                  ev.button.x, ev.button.y)) {
+                        continue;
+                    }
+                    const SystemMenuState pre_action_state = state;
+                    const SystemMenuAction action = system_menu_click_option(state, item);
+                    if (is_confirming(action)) {
+                        result.flash = SystemMenuFlashInfo{pre_action_state, item};
+                    }
+                    apply_system_menu_action_to_result(result, action);
+                    break;
+                }
+                break;
+            }
+            case SystemMenuScreen::Audio: {
+                // (1) Tracks dos sliders (drag-start) - checado PRIMEIRO porque a
+                // caixa do track fica DENTRO da caixa do campo/rotulo (mais
+                // especifico vence quando o clique cai nos dois, PONTO CRITICO #2).
+                bool handled = false;
+                for (int item = 0; item < 2 && !handled; ++item) {
+                    const glintfx::ElementBox& box =
+                        boxes.audio_tracks[static_cast<std::size_t>(item)];
+                    if (!hit_test(box, ev.button.x, ev.button.y)) continue;
+                    handled = true;
+                    result.start_drag_item = item;
+                    state.audio_selected = item;
+                    if (box.w > 0.0f) {
+                        const float ratio = (ev.button.x - box.x) / box.w;
+                        system_menu_set_slider_ratio(state, item, ratio);
+                        result.volume_changed = true;
+                    }
+                    result.reload = true;
+                }
+                // (2) Botao Voltar - ACIONA na hora (equivalente a focar + ENTER).
+                if (!handled) {
+                    const int back_index = static_cast<int>(AudioItem::Back);
+                    if (hit_test(boxes.audio_items[static_cast<std::size_t>(back_index)],
+                                 ev.button.x, ev.button.y)) {
+                        handled = true;
+                        const SystemMenuState pre_action_state = state;
+                        const SystemMenuAction action = system_menu_click_option(state, back_index);
+                        if (is_confirming(action)) {
+                            result.flash = SystemMenuFlashInfo{pre_action_state, back_index};
+                        }
+                        apply_system_menu_action_to_result(result, action);
+                    }
+                }
+                // (3) Campo/rotulo do slider (fora do track) - SO FOCA.
+                for (int item = 0; item < 2 && !handled; ++item) {
+                    if (!hit_test(boxes.audio_items[static_cast<std::size_t>(item)], ev.button.x,
+                                  ev.button.y)) {
+                        continue;
+                    }
+                    handled = true;
+                    const SystemMenuAction action = system_menu_click_option(state, item);
+                    apply_system_menu_action_to_result(result, action);
+                }
+                break;
+            }
+            case SystemMenuScreen::Controls: {
+                if (state.controls_capturing) {
+                    // no-op: mouse nao participa neste modo (o jogador precisa
+                    // apertar uma tecla FISICA - interceptado no ramo KEY_DOWN).
+                } else if (state.controls_confirming_restore) {
+                    for (int item = 0; item < 2; ++item) {
+                        if (!hit_test(boxes.controls_confirm[static_cast<std::size_t>(item)],
+                                      ev.button.x, ev.button.y)) {
+                            continue;
+                        }
+                        const SystemMenuState pre_action_state = state;
+                        const SystemMenuAction action = system_menu_click_option(state, item);
+                        if (is_confirming(action)) {
+                            result.flash = SystemMenuFlashInfo{pre_action_state, item};
+                        }
+                        apply_system_menu_action_to_result(result, action);
+                        break;
+                    }
+                } else if (state.controls_confirming_discard) {
+                    for (int item = 0; item < 2; ++item) {
+                        if (!hit_test(boxes.controls_discard_confirm[static_cast<std::size_t>(item)],
+                                      ev.button.x, ev.button.y)) {
+                            continue;
+                        }
+                        const SystemMenuState pre_action_state = state;
+                        const SystemMenuAction action = system_menu_click_option(state, item);
+                        if (is_confirming(action)) {
+                            result.flash = SystemMenuFlashInfo{pre_action_state, item};
+                        }
+                        apply_system_menu_action_to_result(result, action);
+                        break;
+                    }
+                } else {
+                    // Navegacao normal - `boxes.controls_items` ja chega FILTRADO
+                    // (BUG-A) pelo CALLER (collect_click_boxes_).
+                    for (int item = 0; item < kControlsItemCount; ++item) {
+                        if (!hit_test(boxes.controls_items[static_cast<std::size_t>(item)],
+                                      ev.button.x, ev.button.y)) {
+                            continue;
+                        }
+                        const SystemMenuState pre_action_state = state;
+                        const SystemMenuAction action = system_menu_click_option(state, item);
+                        if (is_confirming(action)) {
+                            result.flash = SystemMenuFlashInfo{pre_action_state, item};
+                        }
+                        apply_system_menu_action_to_result(result, action);
+                        break;
+                    }
+                }
+                break;
+            }
+            case SystemMenuScreen::Video:
+            case SystemMenuScreen::Language: {
+                if (hit_test(boxes.placeholder_back, ev.button.x, ev.button.y)) {
+                    const SystemMenuState pre_action_state = state;
+                    const SystemMenuAction action =
+                        system_menu_click_option(state, kPlaceholderBackIndex);
+                    if (is_confirming(action)) {
+                        result.flash = SystemMenuFlashInfo{pre_action_state, kPlaceholderBackIndex};
+                    }
+                    apply_system_menu_action_to_result(result, action);
+                }
+                break;
+            }
+            case SystemMenuScreen::Hidden:
+                break;
+        }
+        return result;
+    }
+
+    if (ev.type == SDL_EVENT_MOUSE_MOTION) {
+        result.mouse_move = true;
+        result.mouse_x = ev.motion.x;
+        result.mouse_y = ev.motion.y;
+        return result;
+    }
+
+    if (ev.type == SDL_EVENT_MOUSE_BUTTON_UP && ev.button.button == SDL_BUTTON_LEFT) {
+        result.end_drag = true;
+        return result;
+    }
+
+    // SDL_EVENT_MOUSE_WHEEL (forwarding pra `.ctrl-list`) e qualquer outro tipo
+    // de evento NAO sao roteados aqui - MOUSE_WHEEL exige SDL_GetMouseState
+    // (consulta IMPURA de cursor real), tratado direto em
+    // SystemMenuScreen::handle_event (system_menu_loop.cpp) ANTES de chamar
+    // esta funcao.
+    return result;  // no-op TOTAL
+}
+
+// F4-1b.4: implementacao de pause_flow_next (declarada no .hpp) - a MATRIZ DE
+// DECISAO do mini-driver, 100% testavel sem GL (system_screen_step_test.cpp
+// exercita os casos relevantes). `saveload_exit` SO importa quando `exit` e
+// OpenSaveLoadSave/OpenSaveLoadLoad (nos demais casos o driver nem chega a
+// rodar a tela de save/load - ver run_system_menu_loop_gl_current abaixo).
+SystemMenuFlowStep pause_flow_next(SystemMenuScreenExit exit,
+                                     SaveLoadLoopExit saveload_exit) noexcept {
+    switch (exit) {
+        case SystemMenuScreenExit::Continue:
+            return SystemMenuFlowStep::Continue;
+        case SystemMenuScreenExit::RequestQuit:
+            return SystemMenuFlowStep::RequestQuit;
+        case SystemMenuScreenExit::RequestToTitle:
+            return SystemMenuFlowStep::RequestToTitle;
+        case SystemMenuScreenExit::OpenSaveLoadSave:
+        case SystemMenuScreenExit::OpenSaveLoadLoad:
+            switch (saveload_exit) {
+                case SaveLoadLoopExit::BackToPause:
+                    return SystemMenuFlowStep::RetryPause;
+                case SaveLoadLoopExit::ClosedAfterLoad:
+                    return SystemMenuFlowStep::Continue;  // MESMO efeito de Continuar
+                case SaveLoadLoopExit::QuitApp:
+                    return SystemMenuFlowStep::RequestQuit;  // propaga
+            }
+            break;
+    }
+    return SystemMenuFlowStep::RequestQuit;  // inalcancavel (defensivo - todo
+                                              // SystemMenuScreenExit/
+                                              // SaveLoadLoopExit relevante ja
+                                              // foi coberto acima).
+}
+
+namespace {
+
+// F4-1b.4: o ScreenState de PRODUCAO do menu de sistema (unico chamador: o
+// MINI-DRIVER dentro de run_system_menu_loop_gl_current, abaixo) - MESMO padrao
+// de TitleScreen (title_menu_loop.cpp, F4-1b.3). Todo o estado que antes vivia
+// em variaveis locais fechadas por lambdas (ui/backdrop/drag_item/ids de SFX/
+// rml_path/etc) agora e MEMBRO; enter() cria os recursos GL (glintfx::UiLayer +
+// Render2dGl3 + ids de SFX), exit() libera (a EXCLUSIVIDADE do UiLayer descrita
+// em gus/app/screen_state.hpp).
+//
+// DIFERENCA-CHAVE em relacao a recriar do zero: o ESTADO DE NEGOCIO (state_) NAO
+// nasce em enter() - nasce no CONSTRUTOR, UMA UNICA VEZ. O MINI-DRIVER reusa o
+// MESMO objeto SystemMenuScreen entre o Pause e a volta da tela de save/load
+// (BackToPause) - se state_ fosse recriado em enter(), o jogador perderia a
+// tela/selecao atual (ex.: uma copia de trabalho de Controles ainda nao
+// aplicada) toda vez que voltasse de Salvar/Carregar (regressao do
+// comportamento antigo, ver o comentario grande no topo deste arquivo).
+class SystemMenuLoopScreen final : public gus::app::ScreenState {
+   public:
+    SystemMenuLoopScreen(SDL_Window* window, gus::platform::audio::AudioEngine& audio,
+                      const gus::app::i18n::Translator& translator, std::string settings_dir,
+                      std::string saves_dir,
+                      std::function<gus::domain::save::SaveData()> build_current_save_data,
+                      std::function<void(const gus::domain::save::SaveData&)>
+                          apply_loaded_save_data,
+                      std::string frozen_background_png)
+        : window_(window),
+          audio_(audio),
+          translator_(translator),
+          settings_dir_(std::move(settings_dir)),
+          saves_dir_(std::move(saves_dir)),
+          build_current_save_data_(std::move(build_current_save_data)),
+          apply_loaded_save_data_(std::move(apply_loaded_save_data)),
+          frozen_background_png_(std::move(frozen_background_png)) {
+        state_.music_volume = audio_.music_volume();
+        state_.sfx_volume = audio_.sfx_volume();
+        // Tela Controles (M2 -> M2 STAGED CHANGES): carrega o remap persistido
+        // (ou default_controls() se ausente/corrompido) - controls_applied_
+        // config = a MESMA leitura (BASELINE, alvo do revert ao descartar); as
+        // duas copias comecam IGUAIS.
+        state_.controls_config = gus::platform::fs::load_controls(
+            settings_dir_, std::string(gus::domain::input::kDefaultProfile));
+        state_.controls_applied_config = state_.controls_config;
+        system_menu_open(state_);
+    }
+
+    void enter() override {
+        // Flags TRANSIENTES de UMA rodada do driver - resetadas a CADA enter(),
+        // diferente de state_ (persiste entre rodadas, ver o comentario da
+        // classe/construtor acima).
+        bailed_ = false;
+        done_ = false;
+        window_closed_ = false;
+        drag_item_ = -1;
+        last_hover_sfx_id_.clear();
+
+        SDL_GetWindowSizeInPixels(window_, &pw_, &ph_);
+        if (pw_ < 1) pw_ = 1;
+        if (ph_ < 1) ph_ = 1;
+        dp_ratio_ = static_cast<float>(pw_) / 960.0f;
+
+        ui_.emplace(glintfx::UiLayer::Config{/*logical_width=*/960,
+                                              /*logical_height=*/540,
+                                              /*load_gl=*/true,
+                                              /*dp_ratio=*/dp_ratio_});
+        if (!ui_->ok()) {
+            std::cerr << "SystemMenuLoop: glintfx::UiLayer::ok()=false (attach "
+                         "falhou) - fechando o menu sem desenhar nada (degradacao "
+                         "segura).\n";
+            result_ = SystemMenuScreenExit::Continue;  // quit_app=false: o
+                                                        // driver so retoma a cena
+            bailed_ = true;
+            return;
+        }
+
+        stage_ = menu_stage_dir();
+        ui_->set_asset_base_url(stage_.c_str());
+        rml_path_ = write_system_menu_rml_file(state_, translator_);
+        ui_->load(rml_path_.c_str());
+        ui_->set_viewport(pw_, ph_);
+        ui_->set_dp_ratio(dp_ratio_);
+        // SFX-MIGRATE-V0.9: 1 update() de "assentamento" (achado empirico: o
+        // hover NATIVO so resolve elemento sob o cursor apos pelo menos 1
+        // Context::Update() do documento recem-carregado).
+        ui_->update();
+
+        backdrop_.emplace(/*gl_active=*/true);
+
+        // FUNDO REAL CONGELADO (retoque do lider via AskUserQuestion, MENU-PAUSA-
+        // CONFIG-SOM): carrega a textura A CADA enter() (os TextureId antigos nao
+        // sobrevivem a destruicao do Render2dGl3 anterior) - kInvalidTexture
+        // (path vazio/asset ausente/backend headless) degrada com seguranca pra
+        // vinheta de sempre (ver present_frame_).
+        frozen_bg_tex_ = frozen_background_png_.empty()
+                             ? gus::platform::render2d::kInvalidTexture
+                             : backdrop_->load_texture(frozen_background_png_.c_str());
+
+        // SFX de hover/clique: load_sfx a CADA enter() (os SoundId antigos nao
+        // sobrevivem entre rodadas - recarregar o MESMO arquivo e barato e
+        // idempotente).
+        const std::string hover_sfx_path =
+            resolve_menu_sfx_path(gus::core::assets::kMenuHoverSfxFile);
+        const std::string click_sfx_path =
+            resolve_menu_sfx_path(gus::core::assets::kMenuClickSfxFile);
+        hover_sfx_id_ = audio_.load_sfx(hover_sfx_path.c_str());
+        click_sfx_id_ = audio_.load_sfx(click_sfx_path.c_str());
+
+        ui_->set_hover_callback([this](const char* raw_id, bool entered) {
+            native_hover_callback_(raw_id, entered);
+        });
+
+        // DIAGNOSTICO/PROVA (SOM DE HOVER/CLIQUE): GUSWORLD_SYSMENU_HOVER_
+        // SELFTEST=1 entra na tela Pause (ja aberta acima), MOVE o mouse
+        // SINTETICO sequencialmente pelos 4 pills e SIMULA 1 clique confirmando
+        // "Continuar" - tudo SEM SDL_PushEvent, SEM input real, SEM tocar
+        // hardware de audio. Bypassa por completo o loop interativo (MESMO
+        // espirito de GUSWORLD_TITLE_SCREENSHOT_DIR em title_menu_loop.cpp -
+        // bailed_=true, nunca entra no loop de tick()).
+        if (const char* sysmenu_selftest = std::getenv("GUSWORLD_SYSMENU_HOVER_SELFTEST");
+            sysmenu_selftest != nullptr && sysmenu_selftest[0] != '\0') {
+            run_hover_selftest_();
+            bailed_ = true;
+            return;
+        }
+
+        // DIAGNOSTICO/PROVA (PARIDADE SOM DE HOVER TECLADO x MOUSE):
+        // GUSWORLD_SYSMENU_KEYBOARD_HOVER_SELFTEST=1 prova que a navegacao por
+        // TECLADO (via handle_event(), o MESMO caminho de codigo do SDL_EVENT_
+        // KEY_DOWN real) toca hover_sfx exatamente quando move pra um item NOVO
+        // na MESMA tela.
+        if (const char* keyboard_hover_selftest =
+                std::getenv("GUSWORLD_SYSMENU_KEYBOARD_HOVER_SELFTEST");
+            keyboard_hover_selftest != nullptr && keyboard_hover_selftest[0] != '\0') {
+            run_keyboard_hover_selftest_();
+            bailed_ = true;
+            return;
+        }
+
+        // DIAGNOSTICO/PROVA (TELA CONTROLES, M2, 3 bugs ao vivo reportados pelo
+        // lider): GUSWORLD_SYSMENU_CONTROLS_SELFTEST=1 entra em Controles
+        // (navegacao REAL via system_menu_key_down) e MEDE/EXERCITA os pontos
+        // que quebraram (BUG-1/BUG-A/BUG-2/BUG-3/GLINTFX-SCROLL).
+        if (const char* controls_selftest = std::getenv("GUSWORLD_SYSMENU_CONTROLS_SELFTEST");
+            controls_selftest != nullptr && controls_selftest[0] != '\0') {
+            run_controls_selftest_();
+            bailed_ = true;
+            return;
+        }
+
+        // NAO ha present_frame_() explicito aqui (ao contrario de
+        // NpcDialogueScreen): o while(true) ORIGINAL desta tela so desenhava no
+        // FIM de cada iteracao, DEPOIS de drenar a rajada de eventos daquele
+        // frame - o 1o tick() do runner reproduz exatamente essa 1a iteracao.
+    }
+
+    void handle_event(const SDL_Event& ev) override {
+        if (bailed_) {
+            return;  // defensivo: nao deveria ser chamado (finished()==true).
+        }
+
+        // WHEEL FORWARDING (M2/GLINTFX-SCROLL): exige SDL_GetMouseState
+        // (consulta IMPURA de cursor real) - FORA do escopo de
+        // system_screen_step, tratado direto aqui (MESMO racional de
+        // SaveLoadScreen::handle_event).
+        if (ev.type == SDL_EVENT_MOUSE_WHEEL) {
+            float mouse_x = 0.0f, mouse_y = 0.0f;
+            SDL_GetMouseState(&mouse_x, &mouse_y);
+            handle_mouse_motion_(mouse_x, mouse_y);
+
+            const float wheel_dy = system_menu_wheel_delta_to_rmlui(
+                ev.wheel.y, ev.wheel.direction == SDL_MOUSEWHEEL_FLIPPED);
+            glintfx::UiEvent wheel_ev{};
+            wheel_ev.type = glintfx::UiEvent::Type::MouseWheel;
+            wheel_ev.x = 0.0f;
+            wheel_ev.y = wheel_dy;
+            ui_->process_event(wheel_ev);
+            return;
+        }
+
+        SystemMenuStepBoxes boxes;
+        if (ev.type == SDL_EVENT_MOUSE_BUTTON_DOWN && ev.button.button == SDL_BUTTON_LEFT) {
+            boxes = collect_click_boxes_();
+        }
+
+        const SystemMenuStepResult step = system_screen_step(state_, ev, boxes);
+
+        if (step.window_closed) {
+            window_closed_ = true;
+            return;
+        }
+        if (step.resize) {
+            SDL_GetWindowSizeInPixels(window_, &pw_, &ph_);
+            if (pw_ < 1) pw_ = 1;
+            if (ph_ < 1) ph_ = 1;
+            dp_ratio_ = static_cast<float>(pw_) / 960.0f;
+            ui_->set_viewport(pw_, ph_);
+            ui_->set_dp_ratio(dp_ratio_);
+            return;
+        }
+        if (step.mouse_move) {
+            handle_mouse_motion_(step.mouse_x, step.mouse_y);
+            return;
+        }
+        if (step.end_drag) {
+            drag_item_ = -1;
+            return;
+        }
+        if (step.start_drag_item.has_value()) {
+            drag_item_ = *step.start_drag_item;
+        }
+        if (step.sfx == SystemMenuSfxKind::Hover) {
+            audio_.play_sfx(hover_sfx_id_);
+        }
+        if (step.flash.has_value()) {
+            flash_pressed_(step.flash->pre_action_state, step.flash->item_index);
+        }
+        if (step.volume_changed) {
+            apply_and_persist_();
+        }
+        if (step.controls_applied) {
+            persist_controls_();
+        }
+        if (step.exit.has_value()) {
+            result_ = *step.exit;
+            done_ = true;
+            return;
+        }
+        if (step.reload) {
+            reload_();
+        }
+    }
+
+    void tick(float /*dt*/) override {
+        if (bailed_ || done_ || window_closed_) {
+            return;  // defensivo: run_screen_state() nao chama tick() quando
+                      // finished()/window_closed() ja e true, mas guarda mesmo assim.
+        }
+        present_frame_();
+    }
+
+    [[nodiscard]] bool finished() const override { return bailed_ || done_; }
+
+    void exit() override {
+        // EXCLUSIVIDADE DO UILAYER (ver gus/app/screen_state.hpp): destroi ui_
+        // ANTES de backdrop_ (MESMA ordem de sempre) - depois de exit(), o
+        // MINI-DRIVER pode abrir a tela de save/load (OU re-entrar este MESMO
+        // SystemMenuScreen) com seguranca.
+        ui_.reset();
+        backdrop_.reset();
+    }
+
+    [[nodiscard]] bool window_closed() const override { return window_closed_; }
+
+    // Exposto SO pro DRIVER (run_system_menu_loop_gl_current, abaixo) - nao faz
+    // parte do contrato ScreenState. O desfecho decidido pelo ultimo
+    // system_screen_step com exit preenchido, OU o default Continue setado em
+    // enter() (ui_->ok()==false).
+    [[nodiscard]] SystemMenuScreenExit result() const { return result_; }
+
+   private:
+    void reload_() {
+        rml_path_ = write_system_menu_rml_file(state_, translator_);
+        ui_->load(rml_path_.c_str());
+        ui_->set_viewport(pw_, ph_);
+        ui_->set_dp_ratio(dp_ratio_);
+        ui_->update();  // MESMO assentamento a cada troca de documento
+
+        // SCROLL SEGUE A SELECAO (M2/GLINTFX-SCROLL): garante que a linha
+        // state.controls_selected fique DENTRO do recorte visivel de
+        // `.ctrl-list` - no-op seguro quando a linha ja esta visivel.
+        const int scroll_target = controls_scroll_target_index(state_);
+        if (scroll_target >= 0) {
+            ui_->scroll_element_into_view(controls_item_id(scroll_target).c_str());
+        }
+    }
+
+    void present_frame_() {
+        const gus::core::spatial::Rect cam{0.0f, 0.0f, static_cast<float>(pw_),
+                                            static_cast<float>(ph_)};
+        backdrop_->begin_frame(cam, pw_, ph_);  // clear + vinheta radial (fallback abstrato)
+        if (frozen_bg_tex_ != gus::platform::render2d::kInvalidTexture) {
+            // FUNDO REAL CONGELADO: cobre a vinheta com a CENA REAL da cidade (1
+            // frame estatico), full-screen e opaca. O #sysmenu-scrim do RML
+            // segue desenhado por CIMA disto pelo glintfx.
+            backdrop_->draw_textured_rect(
+                cam, frozen_bg_tex_, gus::platform::render2d::UvRect{0.0f, 0.0f, 1.0f, 1.0f},
                 gus::platform::render2d::DrawColor{1.0f, 1.0f, 1.0f, 1.0f});
         }
-        backdrop.end_frame();
-        ui_opt->update();
-        ui_opt->render();
-        SDL_GL_SwapWindow(window);
-    };
+        backdrop_->end_frame();
+        ui_->update();
+        ui_->render();
+        SDL_GL_SwapWindow(window_);
+    }
 
     // EFEITO DE PRESS (ver comentario do topo do arquivo): renderiza a tela
     // `pre_action_state` (snapshot tirado ANTES da mutacao que ja aconteceu em
-    // `state`) com o item `item_index` marcado ".pressed", por ~100ms (4 frames
-    // de ~25ms - varios swaps garantem que o compositor/driver apresente pelo
-    // menos 1 frame do flash mesmo sob vsync), e SO DEPOIS devolve - o chamador
-    // segue com handle_action/reload usando o `state` JA MUTADO (a transicao
-    // real acontece normalmente no proximo reload/return). SOM DE CLIQUE (retoque
-    // ao vivo do lider): dispara AQUI, no MESMO choke-point do flash visual - e o
-    // UNICO lugar chamado tanto por confirmacao de TECLADO (Enter/Espaco) quanto
-    // por CLIQUE de mouse (ver is_confirming mais abaixo), entao 1 play_sfx cobre
-    // os dois canais sem duplicar logica.
-    auto flash_pressed = [&](const SystemMenuState& pre_action_state, int item_index) {
-        audio.play_sfx(click_sfx_id);
-        rml_path = write_system_menu_rml_file(pre_action_state, translator, item_index);
-        ui_opt->load(rml_path.c_str());
-        ui_opt->set_viewport(pw, ph);
-        ui_opt->set_dp_ratio(dp_ratio);
+    // state_) com o item `item_index` marcado ".pressed", por ~100ms (4 frames
+    // de ~25ms) - SO DEPOIS o CHAMADOR (handle_event) segue com o efeito de
+    // mundo (volume/controls_applied/exit ja decididos por system_screen_step,
+    // usando state_ JA MUTADO). SOM DE CLIQUE: dispara AQUI, no MESMO
+    // choke-point do flash visual - o UNICO lugar chamado tanto por
+    // confirmacao de TECLADO quanto por CLIQUE de mouse (ver
+    // system_screen_step), entao 1 play_sfx cobre os dois canais sem duplicar
+    // logica.
+    void flash_pressed_(const SystemMenuState& pre_action_state, int item_index) {
+        audio_.play_sfx(click_sfx_id_);
+        rml_path_ = write_system_menu_rml_file(pre_action_state, translator_, item_index);
+        ui_->load(rml_path_.c_str());
+        ui_->set_viewport(pw_, ph_);
+        ui_->set_dp_ratio(dp_ratio_);
         for (int frame = 0; frame < 4; ++frame) {
-            present_frame();
+            present_frame_();
             SDL_Delay(25);
         }
-    };
+    }
 
-    int drag_item = -1;  // -1 = nenhum arrasto em curso; 0=Music, 1=Sfx
-
-    // SOM DE HOVER (mouse) - SFX-MIGRATE-V0.9: hover_cb e o callback NATIVO
-    // (glintfx::UiLayer::set_hover_callback, v0.9.0) - a glintfx despacha
-    // entered=true/false JA deduplicado por id (current_hover_id_ interno, ver o
-    // doc-comment vendorizado em ui_layer.hpp/bootstrap.hpp: so invoca o
-    // callback quando o id hovered de fato MUDA). `last_hover_sfx_id` e uma 2a
-    // camada de dedup NOSSA (defesa em profundidade, redundante mas barata com
-    // a da glintfx) - sincronizada nos DOIS sentidos (entered=false TAMBEM
-    // atualiza, senao sair-e-voltar pro MESMO item nunca redispararia, ja que a
-    // glintfx nao invocaria o callback de novo pro id que ja era o "last"
-    // daqui). `id` (const char*) so e valido DURANTE esta chamada (contrato do
-    // glintfx) - convertido pra std::string ANTES de qualquer outra coisa.
-    // is_navigable_hover_id() filtra os containers (#sysmenu-panel, .ctrl-list,
-    // slider-track-N) que o hover nativo TAMBEM resolve mas nunca devem soar.
-    // REGISTRO: precisa ser re-chamado em CADA glintfx::UiLayer NOVA (o
-    // callback vive no Bootstrap::Impl da instancia, nao sobrevive a
-    // ui_opt.reset()+emplace() - ver o ramo BackToPause de handle_action
-    // abaixo, que reregistra apos recriar o UiLayer do Pause).
-    std::string last_hover_sfx_id;
-    auto hover_cb = [&](const char* raw_id, bool entered) {
-        const std::string id = raw_id != nullptr ? raw_id : "";
-        if (!entered) {
-            if (id == last_hover_sfx_id) last_hover_sfx_id.clear();
-            return;
-        }
-        if (id == last_hover_sfx_id || !is_navigable_hover_id(state, id)) return;
-        last_hover_sfx_id = id;
-        audio.play_sfx(hover_sfx_id);
-    };
-    ui_opt->set_hover_callback(hover_cb);
-
-    // HOVER (mouse) - PEDIDO 2a/2b: injeta o MouseMove no glintfx (visual :hover
-    // NATIVO, MESMO pipeline do cockpit da batalha, e o QUE dispara hover_cb
-    // acima por baixo dos panos, ver Context::ProcessMouseMove/UpdateHoverChain
-    // no source pinado do RmlUi). O SOM de hover agora e 100% responsabilidade
-    // do callback nativo (hover_cb) - esta lambda so injeta o evento + trata o
-    // arrasto de slider (drag_item), logica DIFERENTE (nada a ver com
-    // hover-SFX). Fatorada em lambda pra ser chamada tanto pelo
-    // SDL_EVENT_MOUSE_MOTION real (abaixo) quanto pelo self-test headless
-    // (GUSWORLD_SYSMENU_HOVER_SELFTEST, ver mais abaixo) - MESMO caminho de
-    // codigo prova o comportamento real, sem duplicar.
-    auto handle_mouse_motion = [&](float mx, float my) {
+    // HOVER (mouse): injeta o MouseMove no glintfx (visual :hover NATIVO, o QUE
+    // dispara native_hover_callback_ por baixo dos panos) + trata o arrasto de
+    // slider (drag_item_ - PONTO CRITICO #2, o estado de arrasto vive ENTRE
+    // MOUSE_MOTIONs, por isso e MEMBRO, nao variavel local). O SOM de hover e
+    // 100% responsabilidade do callback nativo.
+    void handle_mouse_motion_(float mx, float my) {
         glintfx::UiEvent hover_ev{};
         hover_ev.type = glintfx::UiEvent::Type::MouseMove;
         hover_ev.x = mx;
         hover_ev.y = my;
-        ui_opt->process_event(hover_ev);
+        ui_->process_event(hover_ev);
 
-        if (drag_item >= 0) {
-            const std::string id = track_id_for_item(drag_item);
-            const glintfx::ElementBox box = ui_opt->get_element_box(id.c_str());
+        if (drag_item_ >= 0) {
+            const std::string id = track_id_for_item(drag_item_);
+            const glintfx::ElementBox box = ui_->get_element_box(id.c_str());
             if (box.found && box.w > 0.0f) {
                 const float ratio = (mx - box.x) / box.w;
-                system_menu_set_slider_ratio(state, drag_item, ratio);
-                apply_and_persist(state, audio, settings_dir);
-                reload();
+                system_menu_set_slider_ratio(state_, drag_item_, ratio);
+                apply_and_persist_();
+                reload_();
             }
         }
-    };
+    }
 
-    // Roteia UMA action (vinda do teclado OU de um clique de mouse) pro mesmo
-    // efeito de mundo (persistir volume, recarregar o RML) - compartilhado
-    // pelos dois canais de entrada pra nao duplicar a logica de
-    // Continue/RequestQuit/VolumeChanged/Navigated. Devolve true se o CHAMADOR
-    // deve retornar `outcome` na hora (Continue/RequestQuit ja setaram outcome).
-    auto handle_action = [&](SystemMenuAction action) -> bool {
-        if (action == SystemMenuAction::Continue) {
-            return true;  // quit_app=false: retoma a cena
-        }
-        if (action == SystemMenuAction::RequestQuit) {
-            outcome.quit_app = true;
-            return true;
-        }
-        if (action == SystemMenuAction::RequestToTitle) {
-            // MENU-INICIAL: sinaliza pro CHAMADOR (Maestro) trocar pra tela de
-            // titulo - NAO seta quit_app (o jogo continua rodando, so a CENA
-            // muda). O menu de pausa fecha por conta desta chamada devolver
-            // outcome (mesmo mecanismo de RequestQuit acima).
-            outcome.to_title = true;
-            return true;
-        }
-        if (action == SystemMenuAction::VolumeChanged) {
-            apply_and_persist(state, audio, settings_dir);
-        }
-        // ControlsChanged (M2 STAGED CHANGES): remap/restaurar-padrao mutou SO
-        // a COPIA DE TRABALHO (controls_config) - controls_dirty ja ficou true
-        // do lado puro (system_menu.cpp). NAO persiste mais em disco aqui (era
-        // o modelo antigo "aplica na hora") - so ControlsApplied persiste,
-        // abaixo. O reload() generico no fim ja cobre a UI (botao Aplicar
-        // acende, linha mostra o novo binding).
-        if (action == SystemMenuAction::ControlsApplied) {
-            // UNICO ponto de escrita em disco da tela Controles agora: a copia
-            // de trabalho (ja promovida a baseline em controls_applied_config
-            // pelo lado puro) e o que persiste.
-            persist_controls(state, settings_dir);
-        }
-        // SAVE-LOAD-UI etapa 6: "Salvar"/"Carregar" confirmados no Pause abrem a
-        // tela REAL, ANINHADA no MESMO contexto GL (state.screen continua Pause -
-        // ver o comentario grande em system_menu.hpp). Ao voltar: BackToPause so
-        // recarrega o Pause (fica no while(true) deste loop); ClosedAfterLoad
-        // fecha o menu de pausa INTEIRO igual a Continuar (o Load ja aplicou no
-        // jogo vivo, via apply_loaded_save_data, ANTES de devolver); QuitApp
-        // propaga o fechamento da janela.
-        if (action == SystemMenuAction::OpenSaveLoadSave ||
-            action == SystemMenuAction::OpenSaveLoadLoad) {
-            const SaveLoadMode mode = (action == SystemMenuAction::OpenSaveLoadSave)
-                                           ? SaveLoadMode::Save
-                                           : SaveLoadMode::Load;
-            // FIX CRITICO (crash real reproduzido ao vivo por este agente, MESMO
-            // sintoma ja documentado em battle_key_routing_test.cpp - "Element
-            // meta pool not empty on shutdown"): RmlUi NAO SUPORTA 2 UiLayer
-            // simultaneos no processo. DESTROI o UiLayer do Pause ANTES de abrir
-            // o da tela de save/load (que cria o SEU PROPRIO) - nunca 2 vivos ao
-            // mesmo tempo.
-            ui_opt.reset();
-            const SaveLoadLoopExit exit = run_save_load_menu_loop_gl_current(
-                window, audio, translator, mode, saves_dir, build_current_save_data,
-                apply_loaded_save_data, frozen_background_png);
-            switch (exit) {
-                case SaveLoadLoopExit::QuitApp:
-                    outcome.quit_app = true;
-                    return true;
-                case SaveLoadLoopExit::ClosedAfterLoad:
-                    return true;  // quit_app=false: MESMO efeito de Continuar
-                case SaveLoadLoopExit::BackToPause:
-                    // RECRIA o UiLayer do Pause (a tela de save/load ja destruiu
-                    // o dela ao retornar) ANTES do reload() generico abaixo, que
-                    // dereferencia ui_opt.
-                    ui_opt.emplace(glintfx::UiLayer::Config{
-                        /*logical_width=*/960, /*logical_height=*/540,
-                        /*load_gl=*/true, /*dp_ratio=*/dp_ratio});
-                    ui_opt->set_asset_base_url(stage.c_str());
-                    // SFX-MIGRATE-V0.9: REREGISTRA hover_cb - o callback nativo
-                    // vive no Bootstrap::Impl da INSTANCIA de UiLayer (ver o
-                    // comentario de hover_cb acima), e esta e uma instancia NOVA
-                    // (a anterior morreu no ui_opt.reset() antes de abrir
-                    // save/load) - sem isto, o hover de mouse do Pause voltaria
-                    // mudo apos qualquer ida-e-volta pela tela de save/load.
-                    ui_opt->set_hover_callback(hover_cb);
-                    break;  // so recarrega o Pause abaixo, segue no while(true)
-            }
-        }
-        // None/Navigated: o ESTADO pode ter mudado mesmo assim (navegacao/foco
-        // move e devolve None, ou trocou de tela e devolve Navigated) - reload
-        // sempre.
-        reload();
-        return false;
-    };
+    void apply_and_persist_() { apply_and_persist(state_, audio_, settings_dir_); }
+    void persist_controls_() { persist_controls(state_, settings_dir_); }
 
-    // NAVEGACAO POR TECLADO (nao confirm-key: setas/WASD/LEFT/RIGHT/ESC) - SOM
-    // DE HOVER PARIDADE (retoque ao vivo do lider, pos-tela Controles
-    // aprovada): move a selecao (system_menu_key_down) e, SO quando a selecao
-    // mudou pra um item NOVO na MESMA tela (edge-detect via
-    // system_menu_keyboard_focus_index + system_menu_hover_entered_new_item -
-    // AS MESMAS 2 funcoes puras que handle_mouse_motion acima ja usa pro
-    // hover de MOUSE, NADA duplicado), toca hover_sfx no MESMO choke-point
-    // (audio.play_sfx(hover_sfx_id)) que o mouse ja usa. O guard `state.screen
-    // == screen_before` barra TROCA DE TELA (ex.: ESC subindo um nivel, ou
-    // ESC abrindo o mini-dialogo de descarte NAO muda de tela, entao esse
-    // caso especifico passa pelo guard normalmente): trocar de tela NAO e
-    // "navegar pra um item novo" (ela ja tem seu proprio feedback - o flash
-    // .pressed de Enter/click, quando aplicavel; ESC hoje nao tem flash, fora
-    // de escopo mudar aqui) e comparar indices ENTRE telas diferentes nao
-    // faz sentido (pause_selected=2 e "Configuracoes", config_categories_
-    // selected=2 e "Controles" - numeros iguais, significados diferentes).
-    // LEFT/RIGHT/A/D no slider da tela Audio (ajusta volume, NAO navega -
-    // audio_selected fica intocado) naturalmente NAO dispara (indice
-    // antes==depois, edge-detect nao acha "item novo"). Fatorada em lambda
-    // pra ser o UNICO choke-point tanto do SDL_EVENT_KEY_DOWN real (ramo
-    // nao-confirm mais abaixo) quanto do self-test headless
-    // (GUSWORLD_SYSMENU_KEYBOARD_HOVER_SELFTEST, ver mais abaixo) - MESMA
-    // receita de handle_mouse_motion/flash_pressed acima (1 unico lugar,
-    // reusado pelos dois canais/caminhos, sem duplicar logica de som).
-    // Devolve o mesmo bool de handle_action (true = o CHAMADOR deve retornar
-    // `outcome` na hora).
-    auto handle_navigation_key = [&](SDL_Keycode key) -> bool {
-        const SystemMenuScreen screen_before = state.screen;
-        const int kb_index_before = system_menu_keyboard_focus_index(state);
-        const SystemMenuAction action = system_menu_key_down(state, key);
-        if (state.screen == screen_before) {
-            const int kb_index_after = system_menu_keyboard_focus_index(state);
-            if (system_menu_hover_entered_new_item(kb_index_before, kb_index_after)) {
-                audio.play_sfx(hover_sfx_id);
-            }
+    // Callback NATIVO de hover do glintfx (id-based, RCSS :hover) - precisa ser
+    // re-registrado em CADA glintfx::UiLayer NOVA (o callback vive no
+    // Bootstrap::Impl da instancia, nao sobrevive a ui_.reset()+emplace() - ver
+    // enter() acima, que registra de novo a CADA rodada).
+    void native_hover_callback_(const char* raw_id, bool entered) {
+        const std::string id = raw_id != nullptr ? raw_id : "";
+        if (!entered) {
+            if (id == last_hover_sfx_id_) last_hover_sfx_id_.clear();
+            return;
         }
-        return handle_action(action);
-    };
+        if (id == last_hover_sfx_id_ || !is_navigable_hover_id(state_, id)) return;
+        last_hover_sfx_id_ = id;
+        audio_.play_sfx(hover_sfx_id_);
+    }
 
-    // Confirma se `action` merece o flash de PRESS (ver topo do arquivo): SO as
-    // acoes que de fato "acionam uma opcao" (pill/categoria/Voltar/Aplicar) -
-    // nunca VolumeChanged (drag de slider nao pisca) nem None (nao aconteceu
-    // nada). ControlsChanged (M2) SOMA aqui: confirmar "Sim" no
-    // restaurar-padrao e uma acao destrutiva (reseta a copia de trabalho) -
-    // merece o mesmo flash de confirmacao das demais (entrar em modo CAPTURA
-    // tambem devolve None, entao nao pisca - o feedback dela e a propria linha
-    // ciano "Pressione uma tecla...", ja imediato via reload()).
-    // ControlsApplied (M2 STAGED CHANGES) SOMA aqui tambem: clicar/confirmar
-    // "Aplicar" e a acao mais importante da tela (persiste de fato) - merece o
-    // mesmo flash.
-    auto is_confirming = [](SystemMenuAction action) {
-        return action == SystemMenuAction::Continue ||
-               action == SystemMenuAction::RequestQuit ||
-               action == SystemMenuAction::RequestToTitle ||
-               action == SystemMenuAction::Navigated ||
-               action == SystemMenuAction::ControlsChanged ||
-               action == SystemMenuAction::ControlsApplied;
-    };
+    // Resolve as boxes de CLIQUE do frame ATUAL - SO os sub-arrays do
+    // ramo/estado ATUAL de state_.screen sao preenchidos (found=true), MESMA
+    // convencao de DifficultyScreen::collect_click_boxes_. Controls: consulta
+    // `ctrl-list` UMA VEZ e filtra as 33 caixas (BUG-A) - as demais telas nao
+    // precisam de filtro.
+    [[nodiscard]] SystemMenuStepBoxes collect_click_boxes_() const {
+        SystemMenuStepBoxes boxes;
+        switch (state_.screen) {
+            case SystemMenuScreen::Pause:
+                if (state_.pause_confirming_to_title) {
+                    for (int i = 0; i < 2; ++i) {
+                        boxes.pause_totitle_confirm[static_cast<std::size_t>(i)] =
+                            ui_->get_element_box(pause_totitle_confirm_id(i).c_str());
+                    }
+                } else {
+                    for (int i = 0; i < kPauseItemCount; ++i) {
+                        boxes.pause_items[static_cast<std::size_t>(i)] =
+                            ui_->get_element_box(pause_item_id(i).c_str());
+                    }
+                }
+                break;
+            case SystemMenuScreen::ConfigCategories:
+                for (int i = 0; i < kConfigCategoriesItemCount; ++i) {
+                    boxes.category_items[static_cast<std::size_t>(i)] =
+                        ui_->get_element_box(category_item_id(i).c_str());
+                }
+                break;
+            case SystemMenuScreen::Audio:
+                for (int i = 0; i < 2; ++i) {
+                    boxes.audio_tracks[static_cast<std::size_t>(i)] =
+                        ui_->get_element_box(track_id_for_item(i).c_str());
+                }
+                for (int i = 0; i < kAudioItemCount; ++i) {
+                    boxes.audio_items[static_cast<std::size_t>(i)] =
+                        ui_->get_element_box(audio_item_id(i).c_str());
+                }
+                break;
+            case SystemMenuScreen::Controls:
+                if (state_.controls_capturing) {
+                    // no-op: boxes ficam found=false (mouse nao participa).
+                } else if (state_.controls_confirming_restore) {
+                    for (int i = 0; i < 2; ++i) {
+                        boxes.controls_confirm[static_cast<std::size_t>(i)] =
+                            ui_->get_element_box(controls_confirm_id(i).c_str());
+                    }
+                } else if (state_.controls_confirming_discard) {
+                    for (int i = 0; i < 2; ++i) {
+                        boxes.controls_discard_confirm[static_cast<std::size_t>(i)] =
+                            ui_->get_element_box(controls_discard_confirm_id(i).c_str());
+                    }
+                } else {
+                    const glintfx::ElementBox list_box = ui_->get_element_box(kControlsListId);
+                    for (int i = 0; i < kControlsItemCount; ++i) {
+                        const glintfx::ElementBox raw =
+                            ui_->get_element_box(controls_item_id(i).c_str());
+                        boxes.controls_items[static_cast<std::size_t>(i)] =
+                            filter_offscreen_controls_row(i, raw, list_box);
+                    }
+                }
+                break;
+            case SystemMenuScreen::Video:
+            case SystemMenuScreen::Language:
+                boxes.placeholder_back = ui_->get_element_box(kPlaceholderBackId);
+                break;
+            case SystemMenuScreen::Hidden:
+                break;
+        }
+        return boxes;
+    }
 
-    // DIAGNOSTICO/PROVA (SOM DE HOVER/CLIQUE): GUSWORLD_SYSMENU_HOVER_SELFTEST=1
-    // entra na tela Pause (ja aberta acima), MOVE o mouse SINTETICO sequencialmente
-    // pelos 4 pills (item0->1->2->3->0 de novo, provando que sair-e-voltar redispara
-    // o hover - SFX-MIGRATE-V0.9: agora e o proprio dedup nativo da glintfx
-    // (current_hover_id_, hover_cb acima) que garante isto) via
-    // handle_mouse_motion (o MESMO codigo do SDL_EVENT_MOUSE_MOTION real acima, sem
-    // duplicar), e SIMULA 1 clique confirmando "Continuar" (system_menu_click_option
-    // + flash_pressed, o MESMO caminho de um clique real) - tudo SEM SDL_PushEvent,
-    // SEM input real, SEM tocar hardware de audio (o CHAMADOR decide device_active
-    // do AudioEngine - este self-test so EXERCITA os call-sites; sfx_play_count() e
-    // o hook de prova, ver AudioEngine::sfx_play_count). Imprime a contagem
-    // observada e retorna ANTES do loop interativo (bypassa por completo - nunca
-    // abre pra input real). MESMO espirito de GUSWORLD_BATTLE_HOVER_SELFTEST em
-    // battle_preview.cpp (auto-contido, headless, Xvfb).
-    const char* sysmenu_selftest = std::getenv("GUSWORLD_SYSMENU_HOVER_SELFTEST");
-    if (sysmenu_selftest != nullptr && sysmenu_selftest[0] != '\0') {
-        present_frame();  // assenta o layout (get_element_box precisa de 1 update())
+    // ---------------------------------------------------------------- selftests
+    //
+    // Os 3 diagnosticos abaixo (SOM DE HOVER/CLIQUE do mouse; PARIDADE SOM DE
+    // HOVER TECLADO x MOUSE; TELA CONTROLES) migraram do antigo while(true)
+    // (que rodava ANTES do loop, usando as variaveis locais desta funcao) pra
+    // metodos desta classe (MESMO padrao de bailed_=true de TitleScreen/
+    // DifficultyScreen pro screenshot self-test) - chamados por enter() acima,
+    // rodam UMA VEZ e terminam a rodada (bailed_=true, nunca entram no loop
+    // interativo de tick()).
 
-        // Centro de cada pill (item0..3), na ORDEM 0,1,2,3,0 (o ultimo "0" de novo
-        // prova o re-trigger apos sair pro item 3).
+    void run_hover_selftest_() {
+        present_frame_();  // assenta o layout (get_element_box precisa de 1 update())
+
+        // Centro de cada pill (item0..3), na ORDEM 0,1,2,3,0 (o ultimo "0" de
+        // novo prova o re-trigger apos sair pro item 3).
         const int hover_sequence[] = {0, 1, 2, 3, 0};
         for (const int item : hover_sequence) {
-            const glintfx::ElementBox box = ui_opt->get_element_box(pause_item_id(item).c_str());
+            const glintfx::ElementBox box = ui_->get_element_box(pause_item_id(item).c_str());
             const float cx = box.found ? box.x + box.w * 0.5f : -1.0f;
             const float cy = box.found ? box.y + box.h * 0.5f : -1.0f;
-            handle_mouse_motion(cx, cy);
-            present_frame();
+            handle_mouse_motion_(cx, cy);
+            present_frame_();
         }
         std::cout << "SystemMenuLoop: [selftest] hover_sfx_play_count apos 5 "
                      "moves (0,1,2,3,0 - 5 entradas NOVAS esperadas) = "
-                  << audio.sfx_play_count() << "\n";
+                  << audio_.sfx_play_count() << "\n";
 
-        const int click_baseline = static_cast<int>(audio.sfx_play_count());
-        const SystemMenuState pre_click_state = state;
+        const int click_baseline = static_cast<int>(audio_.sfx_play_count());
+        const SystemMenuState pre_click_state = state_;
         const SystemMenuAction click_action =
-            system_menu_click_option(state, static_cast<int>(PauseItem::Continue));
+            system_menu_click_option(state_, static_cast<int>(PauseItem::Continue));
         if (is_confirming(click_action)) {
-            flash_pressed(pre_click_state, static_cast<int>(PauseItem::Continue));
+            flash_pressed_(pre_click_state, static_cast<int>(PauseItem::Continue));
         }
         std::cout << "SystemMenuLoop: [selftest] click_sfx disparou "
-                  << (static_cast<int>(audio.sfx_play_count()) - click_baseline)
-                  << "x (esperado 1) - total sfx_play_count()=" << audio.sfx_play_count()
+                  << (static_cast<int>(audio_.sfx_play_count()) - click_baseline)
+                  << "x (esperado 1) - total sfx_play_count()=" << audio_.sfx_play_count()
                   << "\n";
-        (void)handle_action(click_action);  // fecha o menu (Continuar) - outcome ja refletido
-        return outcome;
+
+        SystemMenuStepResult tmp;
+        apply_system_menu_action_to_result(tmp, click_action);  // fecha o menu (Continuar)
+        if (tmp.exit.has_value()) result_ = *tmp.exit;
     }
 
-    // DIAGNOSTICO/PROVA (PARIDADE SOM DE HOVER TECLADO x MOUSE, retoque ao vivo
-    // do lider pos-tela Controles aprovada):
-    // GUSWORLD_SYSMENU_KEYBOARD_HOVER_SELFTEST=1 prova que handle_navigation_key
-    // (MESMO caminho de codigo do SDL_EVENT_KEY_DOWN nao-confirm real acima) toca
-    // hover_sfx EXATAMENTE quando a navegacao por TECLADO move a selecao pra um
-    // item NOVO na MESMA tela (edge-detect), e NAO toca em (a) no-op de
-    // navegacao (tecla sem efeito na selecao, ex. LEFT em Pause), (b) ajuste de
-    // slider (LEFT/RIGHT no Audio muda volume, nao indice), nem (c) troca de
-    // TELA (ESC subindo de nivel) - tudo SEM SDL_PushEvent/input real, headless,
-    // SEM tocar hardware de audio, sfx_play_count() como hook de prova. MESMO
-    // espirito de GUSWORLD_SYSMENU_HOVER_SELFTEST acima (canal MOUSE) - aqui o
-    // canal e TECLADO.
-    const char* keyboard_hover_selftest =
-        std::getenv("GUSWORLD_SYSMENU_KEYBOARD_HOVER_SELFTEST");
-    if (keyboard_hover_selftest != nullptr && keyboard_hover_selftest[0] != '\0') {
-        present_frame();  // assenta o layout (mesma cautela dos demais self-tests)
+    void run_keyboard_hover_selftest_() {
+        present_frame_();  // assenta o layout (mesma cautela dos demais self-tests)
 
         // Pause (4 itens, item 0 "Continuar" selecionado por system_menu_open ja
-        // chamado acima): 3x DOWN move 0->1->2->3 - 3 itens NOVOS, 3 sons.
-        const unsigned int baseline_down3 = audio.sfx_play_count();
+        // chamado no construtor): 3x DOWN move 0->1->2->3 - 3 itens NOVOS, 3
+        // sons. handle_event(down_ev) e o MESMO caminho de codigo do SDL_EVENT_
+        // KEY_DOWN real (nao-confirm-key -> ramo de navegacao de
+        // system_screen_step).
+        const unsigned int baseline_down3 = audio_.sfx_play_count();
         for (int i = 0; i < 3; ++i) {
-            if (handle_navigation_key(SDLK_DOWN)) return outcome;
+            handle_event(key_down_event_(SDLK_DOWN));
+            if (done_ || window_closed_) return;
         }
-        const unsigned int after_down3 = audio.sfx_play_count() - baseline_down3;
+        const unsigned int after_down3 = audio_.sfx_play_count() - baseline_down3;
         std::cout << "SystemMenuLoop: [selftest][KEYBOARD-HOVER] Pause 3x DOWN: "
                      "pause_selected="
-                  << state.pause_selected << " (esperado 3); hover_sfx tocou "
+                  << state_.pause_selected << " (esperado 3); hover_sfx tocou "
                   << after_down3 << "x (esperado 3) - "
-                  << (state.pause_selected == 3 && after_down3 == 3 ? "OK" : "FALHOU")
+                  << (state_.pause_selected == 3 && after_down3 == 3 ? "OK" : "FALHOU")
                   << "\n";
 
-        // NO-OP: LEFT nao tem efeito de navegacao em Pause (handle_pause_key so
-        // trata UP/DOWN/ESC/RETURN/SPACE - default case, sem mudar
-        // pause_selected) - selecao intocada, hover_sfx NAO deve tocar.
-        const unsigned int baseline_left = audio.sfx_play_count();
-        if (handle_navigation_key(SDLK_LEFT)) return outcome;
-        const unsigned int after_left = audio.sfx_play_count() - baseline_left;
+        // NO-OP: LEFT nao tem efeito de navegacao em Pause - selecao intocada,
+        // hover_sfx NAO deve tocar.
+        const unsigned int baseline_left = audio_.sfx_play_count();
+        handle_event(key_down_event_(SDLK_LEFT));
+        if (done_ || window_closed_) return;
+        const unsigned int after_left = audio_.sfx_play_count() - baseline_left;
         std::cout << "SystemMenuLoop: [selftest][KEYBOARD-HOVER] Pause LEFT "
                      "(no-op, sem efeito de navegacao): pause_selected="
-                  << state.pause_selected << " (esperado 3, intocado); hover_sfx "
+                  << state_.pause_selected << " (esperado 3, intocado); hover_sfx "
                      "tocou "
                   << after_left << "x (esperado 0) - "
-                  << (state.pause_selected == 3 && after_left == 0 ? "OK" : "FALHOU")
+                  << (state_.pause_selected == 3 && after_left == 0 ? "OK" : "FALHOU")
                   << "\n";
 
-        // WRAP: mais 1 DOWN (3->0) - AINDA um item NOVO (diferente do anterior) -
-        // edge-detect continua disparando atraves do wrap-around (wrap_move nunca
-        // repete o indice anterior quando count>1).
-        const unsigned int baseline_wrap = audio.sfx_play_count();
-        if (handle_navigation_key(SDLK_DOWN)) return outcome;
-        const unsigned int after_wrap = audio.sfx_play_count() - baseline_wrap;
+        // WRAP: mais 1 DOWN (3->0) - AINDA um item NOVO - edge-detect continua
+        // disparando atraves do wrap-around.
+        const unsigned int baseline_wrap = audio_.sfx_play_count();
+        handle_event(key_down_event_(SDLK_DOWN));
+        if (done_ || window_closed_) return;
+        const unsigned int after_wrap = audio_.sfx_play_count() - baseline_wrap;
         std::cout << "SystemMenuLoop: [selftest][KEYBOARD-HOVER] Pause DOWN (wrap "
                      "3->0): pause_selected="
-                  << state.pause_selected << " (esperado 0); hover_sfx tocou "
+                  << state_.pause_selected << " (esperado 0); hover_sfx tocou "
                   << after_wrap << "x (esperado 1) - "
-                  << (state.pause_selected == 0 && after_wrap == 1 ? "OK" : "FALHOU")
+                  << (state_.pause_selected == 0 && after_wrap == 1 ? "OK" : "FALHOU")
                   << "\n";
 
         // TROCA DE TELA nao conta como navegacao: forca "Configuracoes"
-        // selecionado e ENTER (confirm-key, FORA de handle_navigation_key - MESMO
-        // roteamento do while(true) de producao, ver o ramo is_confirm_key acima)
-        // pra entrar em ConfigCategories.
-        state.pause_selected = static_cast<int>(PauseItem::Settings);
-        (void)handle_action(system_menu_key_down(state, SDLK_RETURN));
-        const bool entered_config = state.screen == SystemMenuScreen::ConfigCategories;
+        // selecionado e ENTER (confirm-key) pra entrar em ConfigCategories -
+        // via mutacao direta + selftest_route_only_ (MESMA receita do antigo
+        // `(void)handle_action(system_menu_key_down(...))`: so aplica volume/
+        // controls_applied/reload, sem flash - o selftest historico nunca
+        // exercitou o flash nestas transicoes de tela).
+        state_.pause_selected = static_cast<int>(PauseItem::Settings);
+        selftest_route_only_(system_menu_key_down(state_, SDLK_RETURN));
+        const bool entered_config = state_.screen == SystemMenuScreen::ConfigCategories;
 
-        // ESC (NAO e confirm-key - passa por handle_navigation_key igual a
+        // ESC (NAO e confirm-key - passa pelo ramo de navegacao igual a
         // qualquer seta) sobe de volta pra Pause: TROCA DE TELA - o guard
-        // `state.screen == screen_before` (dentro de handle_navigation_key) barra
-        // o hover_sfx mesmo que os indices numericos difiram entre as duas telas
-        // (comparar entre telas diferentes nao faz sentido, ver o comentario da
-        // lambda acima).
-        const unsigned int baseline_esc = audio.sfx_play_count();
-        if (handle_navigation_key(SDLK_ESCAPE)) return outcome;
-        const unsigned int after_esc = audio.sfx_play_count() - baseline_esc;
+        // `state.screen == screen_before` (dentro de system_screen_step) barra
+        // o hover_sfx mesmo que os indices numericos difiram entre as 2 telas.
+        const unsigned int baseline_esc = audio_.sfx_play_count();
+        handle_event(key_down_event_(SDLK_ESCAPE));
+        if (done_ || window_closed_) return;
+        const unsigned int after_esc = audio_.sfx_play_count() - baseline_esc;
         std::cout << "SystemMenuLoop: [selftest][KEYBOARD-HOVER] ESC troca de "
                      "tela (ConfigCategories->Pause, entrou_em_config="
                   << entered_config << "): screen_apos="
-                  << (state.screen == SystemMenuScreen::Pause ? "Pause" : "outro")
+                  << (state_.screen == SystemMenuScreen::Pause ? "Pause" : "outro")
                   << " hover_sfx tocou " << after_esc
                   << "x (esperado 0, guard de tela barra) - "
-                  << (entered_config && state.screen == SystemMenuScreen::Pause &&
+                  << (entered_config && state_.screen == SystemMenuScreen::Pause &&
                               after_esc == 0
                           ? "OK"
                           : "FALHOU")
                   << "\n";
 
         // SLIDER (Audio): LEFT/RIGHT ajustam volume (VolumeChanged), NAO navegam
-        // (audio_selected fica intocado) - hover_sfx NAO deve tocar. Entra em
-        // Configuracoes (Audio ja selecionado, indice 0 - reset por
-        // handle_pause_key/SDLK_RETURN acima) -> Audio (Musica, indice 0), ambos
-        // ENTER (confirm-key, fora de handle_navigation_key).
-        (void)handle_action(system_menu_key_down(state, SDLK_RETURN));  // -> ConfigCategories
-        (void)handle_action(system_menu_key_down(state, SDLK_RETURN));  // -> Audio
-        const bool entered_audio = state.screen == SystemMenuScreen::Audio;
-        const unsigned int baseline_slider = audio.sfx_play_count();
-        if (handle_navigation_key(SDLK_LEFT)) return outcome;
-        const unsigned int after_slider = audio.sfx_play_count() - baseline_slider;
+        // - hover_sfx NAO deve tocar. Entra em Configuracoes (Audio ja
+        // selecionado, indice 0) -> Audio (Musica, indice 0), ambos ENTER
+        // (confirm-key).
+        selftest_route_only_(system_menu_key_down(state_, SDLK_RETURN));  // -> ConfigCategories
+        selftest_route_only_(system_menu_key_down(state_, SDLK_RETURN));  // -> Audio
+        const bool entered_audio = state_.screen == SystemMenuScreen::Audio;
+        const unsigned int baseline_slider = audio_.sfx_play_count();
+        handle_event(key_down_event_(SDLK_LEFT));
+        if (done_ || window_closed_) return;
+        const unsigned int after_slider = audio_.sfx_play_count() - baseline_slider;
         std::cout << "SystemMenuLoop: [selftest][KEYBOARD-HOVER] Audio LEFT "
                      "(ajusta volume, nao navega, entrou_em_audio="
-                  << entered_audio << "): audio_selected=" << state.audio_selected
+                  << entered_audio << "): audio_selected=" << state_.audio_selected
                   << " (esperado 0, Musica); hover_sfx tocou " << after_slider
                   << "x (esperado 0, e slider, nao navegacao) - "
-                  << (entered_audio && state.audio_selected == 0 && after_slider == 0
+                  << (entered_audio && state_.audio_selected == 0 && after_slider == 0
                           ? "OK"
                           : "FALHOU")
                   << "\n";
-
-        return outcome;
     }
 
-    // DIAGNOSTICO/PROVA (TELA CONTROLES, M2, 3 bugs ao vivo reportados pelo lider):
-    // GUSWORLD_SYSMENU_CONTROLS_SELFTEST=1 entra em Controles (navegacao REAL via
-    // system_menu_key_down, MESMO caminho de codigo do teclado de producao - SEM
-    // SDL_PushEvent, MESMO espirito do GUSWORLD_SYSMENU_HOVER_SELFTEST acima) e
-    // MEDE/EXERCITA os 3 pontos que quebraram:
-    //   BUG-1 (painel estourava a viewport, rodape cortado): confere que o
-    //     bottom do #sysmenu-panel cabe dentro de `ph` (achado por probe Xvfb :99:
-    //     `top:90dp` herdado + `.ctrl-list{height:270dp}` somavam ~525dp de
-    //     conteudo, estourando o canvas de 540dp - FIX: `.wide{top:20dp}` +
-    //     `.ctrl-list{height:220dp}`, ver os comentarios no <style> acima).
-    //   BUG-A (achado NOVO nesta investigacao, causa raiz do "mouse nao
-    //     seleciona nada"): `.ctrl-row` (display:flex, filho de `.ctrl-list` que
-    //     tem `overflow-y:auto`) colapsava pra ~16px de largura (so o padding -
-    //     o conteudo flex ficava com largura 0) em vez de ~750px - a caixa de
-    //     hit-test (get_element_box, MESMA que o mouse do loop usa) ficava uma
-    //     fresta de 12dp perto da borda esquerda; qualquer clique no resto da
-    //     linha (onde o jogador VE o texto, que so visualmente transbordava a
-    //     caixa colapsada) errava o hit-test. FIX: `box-sizing:border-box;
-    //     width:558dp` explicito em .ctrl-row (sidesteps o bug de
-    //     overflow-auto+flex sem width explicita - width:100% tambem falhava,
-    //     so um comprimento ABSOLUTO fixou). Confere que a largura medida e
-    //     grande o bastante pro clique acertar a linha inteira.
-    //   BUG-2 (coluna Teclado mostrava "-" em vez de "W"): NAO reproduziu nem no
-    //     teste unitario (system_menu_rml_test.cpp) nem neste self-test ao vivo -
-    //     o keycap correto ("W") sempre apareceu no RML gerado com
-    //     default_controls(). Mantido aqui como guarda de regressao (BUG-A podia
-    //     ser a causa visual: com a linha colapsada a 16px, "W"/"-" ficavam
-    //     espremidos quase um em cima do outro perto da borda esquerda - com a
-    //     largura corrigida, as 3 colunas ficam nos offsets certos, sem overlap).
-    const char* controls_selftest = std::getenv("GUSWORLD_SYSMENU_CONTROLS_SELFTEST");
-    if (controls_selftest != nullptr && controls_selftest[0] != '\0') {
-        // Pause -> ConfigCategories -> Controls (navegacao REAL via system_menu_key_down).
-        // (void): self-test so quer a MUTACAO de state (navegacao), a SystemMenuAction
-        // devolvida nao e consumida aqui (FEDORA-GCC16-NODISCARD).
-        (void)system_menu_key_down(state, SDLK_DOWN);    // Continue->Save
-        (void)system_menu_key_down(state, SDLK_DOWN);    // Save->Settings
-        (void)system_menu_key_down(state, SDLK_RETURN);  // entra ConfigCategories
-        (void)system_menu_key_down(state, SDLK_DOWN);    // Audio->Video
-        (void)system_menu_key_down(state, SDLK_DOWN);    // Video->Controls
-        (void)system_menu_key_down(state, SDLK_RETURN);  // entra Controls
-        reload();
-        present_frame();
-        present_frame();  // 2o update() por seguranca (layout assentado)
+    // Constroi um SDL_Event KEY_DOWN sintetico (repeat=0) - usado SO pelos
+    // selftests acima, pra rotear pelo MESMO caminho de codigo de producao
+    // (handle_event) sem precisar de SDL_PushEvent/fila de eventos real.
+    static SDL_Event key_down_event_(SDL_Keycode key) {
+        SDL_Event ev{};
+        ev.type = SDL_EVENT_KEY_DOWN;
+        ev.key.key = key;
+        ev.key.repeat = 0;
+        return ev;
+    }
+
+    // MESMO racional do antigo `(void)handle_action(system_menu_key_down(...))`
+    // dos selftests: aplica volume_changed/controls_applied/reload, SEM flash -
+    // usado so pelas transicoes de tela que os selftests provocam de proposito
+    // (nunca pelo roteamento de producao, que sempre passa por
+    // system_screen_step via handle_event).
+    void selftest_route_only_(SystemMenuAction action) {
+        if (action == SystemMenuAction::VolumeChanged) apply_and_persist_();
+        if (action == SystemMenuAction::ControlsApplied) persist_controls_();
+        reload_();
+    }
+
+    void run_controls_selftest_() {
+        // Pause -> ConfigCategories -> Controls (navegacao REAL via
+        // system_menu_key_down). (void): so a mutacao de state_ importa aqui.
+        (void)system_menu_key_down(state_, SDLK_DOWN);    // Continue->Save
+        (void)system_menu_key_down(state_, SDLK_DOWN);    // Save->Settings
+        (void)system_menu_key_down(state_, SDLK_RETURN);  // entra ConfigCategories
+        (void)system_menu_key_down(state_, SDLK_DOWN);    // Audio->Video
+        (void)system_menu_key_down(state_, SDLK_DOWN);    // Video->Controls
+        (void)system_menu_key_down(state_, SDLK_RETURN);  // entra Controls
+        reload_();
+        present_frame_();
+        present_frame_();  // 2o update() por seguranca (layout assentado)
 
         // BUG-1: o painel (e o rodape Restaurar/Voltar) tem que caber na viewport.
-        const glintfx::ElementBox panel = ui_opt->get_element_box("sysmenu-panel");
+        const glintfx::ElementBox panel = ui_->get_element_box("sysmenu-panel");
         const glintfx::ElementBox back_btn =
-            ui_opt->get_element_box(controls_item_id(kControlsBackIndex).c_str());
-        std::cout << "SystemMenuLoop: [selftest][BUG-1] viewport ph=" << ph
+            ui_->get_element_box(controls_item_id(kControlsBackIndex).c_str());
+        std::cout << "SystemMenuLoop: [selftest][BUG-1] viewport ph=" << ph_
                   << " panel_bottom=" << (panel.y + panel.h)
-                  << " (esperado <= " << ph << ") - "
-                  << ((panel.y + panel.h) <= static_cast<float>(ph) ? "OK" : "FALHOU")
+                  << " (esperado <= " << ph_ << ") - "
+                  << ((panel.y + panel.h) <= static_cast<float>(ph_) ? "OK" : "FALHOU")
                   << "\n";
         std::cout << "SystemMenuLoop: [selftest][BUG-1] botao Voltar do rodape: found="
                   << back_btn.found << " bottom=" << (back_btn.y + back_btn.h)
-                  << " (esperado found=1 e <= " << ph << ") - "
-                  << (back_btn.found && (back_btn.y + back_btn.h) <= static_cast<float>(ph)
+                  << " (esperado found=1 e <= " << ph_ << ") - "
+                  << (back_btn.found && (back_btn.y + back_btn.h) <= static_cast<float>(ph_)
                           ? "OK"
                           : "FALHOU")
                   << "\n";
 
-        // BUG-A: a caixa de hit-test da linha 0 precisa cobrir a linha INTEIRA
-        // (nao so os ~16px de padding do bug original).
-        const glintfx::ElementBox row0 = ui_opt->get_element_box(controls_item_id(0).c_str());
+        // BUG-A: a caixa de hit-test da linha 0 precisa cobrir a linha INTEIRA.
+        const glintfx::ElementBox row0 = ui_->get_element_box(controls_item_id(0).c_str());
         std::cout << "SystemMenuLoop: [selftest][BUG-A] largura hit-test da linha 0: w="
                   << row0.w << " (esperado > 400px, era ~16px no bug) - "
                   << (row0.w > 400.0f ? "OK" : "FALHOU") << "\n";
 
-        // BUG-2: o keycap de move_forward (1a linha) tem que mostrar "W" (default_controls()).
+        // BUG-2: o keycap de move_forward (1a linha) tem que mostrar "W".
         {
-            std::ifstream rml_in(rml_path);
+            std::ifstream rml_in(rml_path_);
             std::ostringstream ss;
             ss << rml_in.rdbuf();
             const std::string txt = ss.str();
@@ -963,42 +1392,36 @@ SystemMenuLoopOutcome run_system_menu_loop_gl_current(
                       << (has_w_keycap ? "OK" : "FALHOU") << "\n";
         }
 
-        // BUG-3 (teclado): DOWN 3x tem que avancar controls_selected 0->3 (WRAP
-        // testado a parte em system_menu_test.cpp - aqui so prova o caminho REAL
-        // do loop, com reload() reconstruindo o RML a cada passo).
+        // BUG-3 (teclado): DOWN 3x tem que avancar controls_selected 0->3.
         for (int i = 0; i < 3; ++i) {
-            (void)system_menu_key_down(state, SDLK_DOWN);  // so a mutacao importa
+            (void)system_menu_key_down(state_, SDLK_DOWN);
         }
-        reload();
-        present_frame();
+        reload_();
+        present_frame_();
         std::cout << "SystemMenuLoop: [selftest][BUG-3 teclado] apos 3x DOWN: "
                      "controls_selected="
-                  << state.controls_selected << " (esperado 3) - "
-                  << (state.controls_selected == 3 ? "OK" : "FALHOU") << "\n";
+                  << state_.controls_selected << " (esperado 3) - "
+                  << (state_.controls_selected == 3 ? "OK" : "FALHOU") << "\n";
 
-        // BUG-3 (mouse): hit-test + clique na linha 5 (MESMO par get_element_box +
-        // system_menu_click_option que o handler de SDL_EVENT_MOUSE_BUTTON_DOWN
-        // do while(true) de producao usa - so sem passar pela fila de eventos).
-        const glintfx::ElementBox row5 = ui_opt->get_element_box(controls_item_id(5).c_str());
-        const SystemMenuAction click_action = system_menu_click_option(state, 5);
+        // BUG-3 (mouse): hit-test + clique na linha 5.
+        const glintfx::ElementBox row5 = ui_->get_element_box(controls_item_id(5).c_str());
+        const SystemMenuAction click_action = system_menu_click_option(state_, 5);
         std::cout << "SystemMenuLoop: [selftest][BUG-3 mouse] hit-test linha 5: found="
                   << row5.found << " w=" << row5.w << "; apos clique: controls_selected="
-                  << state.controls_selected << " controls_capturing="
-                  << state.controls_capturing << " (esperado selected=5, capturing=1) - "
-                  << (state.controls_selected == 5 && state.controls_capturing ? "OK"
-                                                                                : "FALHOU")
+                  << state_.controls_selected << " controls_capturing="
+                  << state_.controls_capturing << " (esperado selected=5, capturing=1) - "
+                  << (state_.controls_selected == 5 && state_.controls_capturing ? "OK"
+                                                                                  : "FALHOU")
                   << "\n";
         (void)click_action;
 
-        // BUG-A (Voltar morto pro mouse, achado NOVO nesta investigacao - ver o
-        // comentario extenso de controls_row_visible_in_list em
-        // system_menu.hpp): cancela a captura aberta pelo teste BUG-3 acima (Esc,
-        // nao muda config) antes de prosseguir. (void): so a mutacao importa.
-        (void)system_menu_controls_capture_key(state, /*is_escape=*/true, 0);
+        // BUG-A (Voltar morto pro mouse): cancela a captura aberta pelo teste
+        // BUG-3 acima (Esc, nao muda config) antes de prosseguir.
+        (void)system_menu_controls_capture_key(state_, /*is_escape=*/true, 0);
         {
-            const glintfx::ElementBox list_box = ui_opt->get_element_box(kControlsListId);
+            const glintfx::ElementBox list_box = ui_->get_element_box(kControlsListId);
             const glintfx::ElementBox raw_row6 =
-                ui_opt->get_element_box(controls_item_id(6).c_str());
+                ui_->get_element_box(controls_item_id(6).c_str());
             std::cout << "SystemMenuLoop: [selftest][BUG-A] linha 6 (rolada pra fora "
                          "da vista) - caixa REAL: y="
                       << raw_row6.y << " h=" << raw_row6.h << "; recorte visivel de "
@@ -1007,42 +1430,32 @@ SystemMenuLoopOutcome run_system_menu_loop_gl_current(
                          "recorte, MESMA geometria que roubava o clique do rodape "
                          "antes do fix)\n";
 
-            // Centro da caixa REAL de Voltar (kControlsBackIndex, rodape - sempre
-            // fora da lista rolavel) - a coordenada de clique que o jogador
-            // fisicamente usaria.
             const glintfx::ElementBox raw_back =
-                ui_opt->get_element_box(controls_item_id(kControlsBackIndex).c_str());
+                ui_->get_element_box(controls_item_id(kControlsBackIndex).c_str());
             const float cx = raw_back.found ? raw_back.x + raw_back.w * 0.5f : -1.0f;
             const float cy = raw_back.found ? raw_back.y + raw_back.h * 0.5f : -1.0f;
 
-            // REPLICA o loop de producao (SDL_EVENT_MOUSE_BUTTON_DOWN, ramo
-            // Controles/navegacao normal acima): itera 0..kControlsItemCount-1 EM
-            // ORDEM, filtra pelo recorte visivel (filter_offscreen_controls_row) e
-            // para no PRIMEIRO que bater - prova QUAL indice de fato vence o
-            // clique na posicao REAL de Voltar (antes do fix, era o indice 6, nao
-            // o 31 esperado - ver o comentario do header).
             int winner = -1;
             for (int item = 0; item < kControlsItemCount; ++item) {
                 const glintfx::ElementBox raw =
-                    ui_opt->get_element_box(controls_item_id(item).c_str());
-                const glintfx::ElementBox box =
-                    filter_offscreen_controls_row(item, raw, list_box);
+                    ui_->get_element_box(controls_item_id(item).c_str());
+                const glintfx::ElementBox box = filter_offscreen_controls_row(item, raw, list_box);
                 if (hit_test(box, cx, cy)) {
                     winner = item;
                     break;
                 }
             }
             const SystemMenuAction back_action =
-                (winner == kControlsBackIndex) ? system_menu_click_option(state, winner)
+                (winner == kControlsBackIndex) ? system_menu_click_option(state_, winner)
                                                 : SystemMenuAction::None;
             const bool ok = winner == kControlsBackIndex &&
-                             state.screen == SystemMenuScreen::ConfigCategories &&
+                             state_.screen == SystemMenuScreen::ConfigCategories &&
                              back_action == SystemMenuAction::Navigated;
             std::cout << "SystemMenuLoop: [selftest][BUG-A] clique na posicao REAL de "
                          "Voltar (loop de producao replicado 0.."
                       << (kControlsItemCount - 1) << "): indice vencedor=" << winner
                       << " (esperado " << kControlsBackIndex << ") screen_apos="
-                      << (state.screen == SystemMenuScreen::ConfigCategories
+                      << (state_.screen == SystemMenuScreen::ConfigCategories
                               ? "ConfigCategories"
                               : "outro")
                       << " action=" << static_cast<int>(back_action)
@@ -1050,37 +1463,22 @@ SystemMenuLoopOutcome run_system_menu_loop_gl_current(
                       << (ok ? "OK" : "FALHOU") << "\n";
         }
 
-        // GLINTFX-SCROLL (M2, bump v0.3.1 -> v0.4.0): a v0.4.0 entrega scroll DE
-        // VERDADE em embed mode - antes disso `.ctrl-list` nunca rolava (scrollTop
-        // sempre 0), so ~6 das 30 actions eram alcancaveis (ver BUG-A acima, que so
-        // filtrava o HIT-TEST das linhas invisiveis, sem trazer nenhuma pra vista).
-        // Re-entra em Controles (config_categories_selected ainda aponta pra ela -
-        // ver o comentario de heranca de selecao no topo do arquivo/header, so 1
-        // RETURN, sem repetir os DOWN/DOWN - Voltar em leave_controls_screen_or_
-        // confirm_discard nunca mexe em config_categories_selected). (void): so a
-        // mutacao importa.
-        (void)system_menu_key_down(state, SDLK_RETURN);
-        reload();
-        present_frame();
-        present_frame();
+        // GLINTFX-SCROLL (M2): re-entra em Controles (config_categories_selected
+        // ainda aponta pra ela). (void): so a mutacao importa.
+        (void)system_menu_key_down(state_, SDLK_RETURN);
+        reload_();
+        present_frame_();
+        present_frame_();
 
-        // (b) WHEEL: a roda rola o elemento em HOVER (nao o com foco - ver o
-        // comentario extenso de UiEvent::Type::MouseWheel no ui_event.hpp
-        // vendorizado) - posiciona o cursor sintetico sobre `.ctrl-list`
-        // (handle_mouse_motion, MESMO caminho do SDL_EVENT_MOUSE_MOTION real) e
-        // mede scroll_top ANTES/DEPOIS de um MouseWheel sintetico
-        // (system_menu_wheel_delta_to_rmlui, MESMA conversao do loop de producao).
-        // Roda ANTES da navegacao por teclado abaixo (lista ainda no topo,
-        // scrollTop=0 - controls_selected==0 acabou de reentrar - garante espaco
-        // pra rolar PRA BAIXO sem bater no limite do fim do conteudo).
+        // (b) WHEEL: a roda rola o elemento em HOVER.
         {
-            const glintfx::ElementBox list_box = ui_opt->get_element_box(kControlsListId);
+            const glintfx::ElementBox list_box = ui_->get_element_box(kControlsListId);
             const float hover_x = list_box.found ? list_box.x + list_box.w * 0.5f : -1.0f;
             const float hover_y = list_box.found ? list_box.y + list_box.h * 0.5f : -1.0f;
-            handle_mouse_motion(hover_x, hover_y);
+            handle_mouse_motion_(hover_x, hover_y);
 
             float scroll_before = -1.0f;
-            ui_opt->get_element_scroll_top(kControlsListId, scroll_before);
+            ui_->get_element_scroll_top(kControlsListId, scroll_before);
 
             const float wheel_dy =
                 system_menu_wheel_delta_to_rmlui(/*sdl_wheel_y=*/-3.0f, /*flipped=*/false);
@@ -1088,11 +1486,11 @@ SystemMenuLoopOutcome run_system_menu_loop_gl_current(
             wheel_ev.type = glintfx::UiEvent::Type::MouseWheel;
             wheel_ev.x = 0.0f;
             wheel_ev.y = wheel_dy;
-            ui_opt->process_event(wheel_ev);
-            present_frame();
+            ui_->process_event(wheel_ev);
+            present_frame_();
 
             float scroll_after = -1.0f;
-            ui_opt->get_element_scroll_top(kControlsListId, scroll_after);
+            ui_->get_element_scroll_top(kControlsListId, scroll_after);
             std::cout << "SystemMenuLoop: [selftest][GLINTFX-SCROLL][wheel] "
                          "scroll_top antes="
                       << scroll_before << " depois=" << scroll_after
@@ -1100,52 +1498,38 @@ SystemMenuLoopOutcome run_system_menu_loop_gl_current(
                       << (scroll_after > scroll_before ? "OK" : "FALHOU") << "\n";
         }
 
-        // (a) TECLADO: navega ATE uma action perto do FIM da lista (25a, dentro de
-        // kControlsActionCount=30) - PROVA que scroll_element_into_view (chamado
-        // DENTRO de reload(), ver seu comentario) traz a linha selecionada pra
-        // dentro do recorte visivel de `.ctrl-list`, mesmo ela comecando MUITO
-        // alem das ~6 linhas visiveis por vez (220dp de altura). reload() a CADA
-        // DOWN (nao 1 so no fim) - MESMO caminho incremental que o loop de
-        // producao roda a cada tecla real.
+        // (a) TECLADO: navega ate uma action perto do FIM da lista (25a).
         for (int i = 0; i < 25; ++i) {
-            (void)system_menu_key_down(state, SDLK_DOWN);  // so a mutacao importa
-            reload();
+            (void)system_menu_key_down(state_, SDLK_DOWN);
+            reload_();
         }
-        present_frame();
-        present_frame();
+        present_frame_();
+        present_frame_();
         {
-            const glintfx::ElementBox list_box = ui_opt->get_element_box(kControlsListId);
-            const glintfx::ElementBox row25 = ui_opt->get_element_box(controls_item_id(25).c_str());
+            const glintfx::ElementBox list_box = ui_->get_element_box(kControlsListId);
+            const glintfx::ElementBox row25 = ui_->get_element_box(controls_item_id(25).c_str());
             const bool visible = row25.found && list_box.found &&
                                   controls_row_visible_in_list(row25.y, row25.h,
                                                                 list_box.y, list_box.h);
             std::cout << "SystemMenuLoop: [selftest][GLINTFX-SCROLL][teclado] apos "
                          "DOWN x25: controls_selected="
-                      << state.controls_selected << " (esperado 25); linha 25 - y="
+                      << state_.controls_selected << " (esperado 25); linha 25 - y="
                       << row25.y << " h=" << row25.h << "; recorte de ctrl-list - y="
                       << list_box.y << " h=" << list_box.h << " - "
-                      << (state.controls_selected == 25 && visible ? "OK" : "FALHOU")
+                      << (state_.controls_selected == 25 && visible ? "OK" : "FALHOU")
                       << "\n";
         }
 
-        // (c) RECONCILIACAO com o hit-test de mouse: a linha 25, agora DENTRO do
-        // recorte visivel (scroll_element_into_view ja rolou pra ela), tem que
-        // continuar clicavel na sua posicao REAL (JA ROLADA) - get_element_box
-        // reflete a geometria POS-scroll (a mesma que filter_offscreen_controls_
-        // row/controls_row_visible_in_list consultam); nao mudou algoritmo, so a
-        // geometria que ele filtra passou a ser DINAMICA (antes do scroll de
-        // verdade, linhas fora da vista tinham uma posicao FIXA "de coluna longa"
-        // que podia coincidir com o rodape - ver BUG-A acima; agora refletem
-        // onde a linha REALMENTE esta, dentro ou fora do recorte).
+        // (c) RECONCILIACAO com o hit-test de mouse.
         {
-            const glintfx::ElementBox list_box = ui_opt->get_element_box(kControlsListId);
-            const glintfx::ElementBox row25 = ui_opt->get_element_box(controls_item_id(25).c_str());
+            const glintfx::ElementBox list_box = ui_->get_element_box(kControlsListId);
+            const glintfx::ElementBox row25 = ui_->get_element_box(controls_item_id(25).c_str());
             const float cx = row25.found ? row25.x + row25.w * 0.5f : -1.0f;
             const float cy = row25.found ? row25.y + row25.h * 0.5f : -1.0f;
 
             int winner = -1;
             for (int item = 0; item < kControlsItemCount; ++item) {
-                const glintfx::ElementBox raw = ui_opt->get_element_box(controls_item_id(item).c_str());
+                const glintfx::ElementBox raw = ui_->get_element_box(controls_item_id(item).c_str());
                 const glintfx::ElementBox box = filter_offscreen_controls_row(item, raw, list_box);
                 if (hit_test(box, cx, cy)) {
                     winner = item;
@@ -1153,46 +1537,96 @@ SystemMenuLoopOutcome run_system_menu_loop_gl_current(
                 }
             }
             const SystemMenuAction click_action25 =
-                (winner == 25) ? system_menu_click_option(state, winner) : SystemMenuAction::None;
+                (winner == 25) ? system_menu_click_option(state_, winner) : SystemMenuAction::None;
             std::cout << "SystemMenuLoop: [selftest][GLINTFX-SCROLL][clique "
                          "pos-scroll] indice vencedor="
                       << winner << " (esperado 25); apos clique: controls_selected="
-                      << state.controls_selected << " controls_capturing="
-                      << state.controls_capturing << " (esperado selected=25 "
+                      << state_.controls_selected << " controls_capturing="
+                      << state_.controls_capturing << " (esperado selected=25 "
                          "capturing=1) - "
-                      << (winner == 25 && state.controls_selected == 25 &&
-                                  state.controls_capturing
+                      << (winner == 25 && state_.controls_selected == 25 &&
+                                  state_.controls_capturing
                               ? "OK"
                               : "FALHOU")
                       << "\n";
             (void)click_action25;
-            (void)system_menu_controls_capture_key(state, /*is_escape=*/true, 0);  // cancela
+            (void)system_menu_controls_capture_key(state_, /*is_escape=*/true, 0);  // cancela
         }
-
-        return outcome;
     }
 
+    SDL_Window* window_;
+    gus::platform::audio::AudioEngine& audio_;
+    const gus::app::i18n::Translator& translator_;
+    std::string settings_dir_;
+    std::string saves_dir_;
+    std::function<gus::domain::save::SaveData()> build_current_save_data_;
+    std::function<void(const gus::domain::save::SaveData&)> apply_loaded_save_data_;
+    std::string frozen_background_png_;
+
+    // ESTADO DE NEGOCIO - inicializado UMA VEZ no construtor, PERSISTE entre
+    // rodadas do driver (ver o comentario grande da classe acima).
+    SystemMenuState state_;
+
+    int pw_ = 0;
+    int ph_ = 0;
+    float dp_ratio_ = 1.0f;
+
+    bool window_closed_ = false;
+    bool bailed_ = false;  // ui_->ok()==false OU um selftest rodou ate o fim
+    bool done_ = false;    // um SystemMenuScreenExit foi decidido por um system_screen_step
+
+    // PONTO CRITICO #2: estado de arrasto de slider - vive ENTRE MOUSE_MOTIONs
+    // (por isso e MEMBRO, resetado a CADA enter(), nao variavel local de
+    // iteracao). -1 = nenhum arrasto em curso; 0=Music, 1=Sfx.
+    int drag_item_ = -1;
+
+    // std::optional (nao um objeto direto): enter()/exit() controlam o ciclo de
+    // vida (EXCLUSIVIDADE DO UILAYER, ver gus/app/screen_state.hpp).
+    std::optional<glintfx::UiLayer> ui_;
+    std::optional<gus::platform::render2d::Render2dGl3> backdrop_;
+    gus::platform::render2d::TextureId frozen_bg_tex_ = gus::platform::render2d::kInvalidTexture;
+
+    std::string stage_;
+    std::string rml_path_;
+
+    gus::platform::audio::SoundId hover_sfx_id_ = gus::platform::audio::kInvalidSound;
+    gus::platform::audio::SoundId click_sfx_id_ = gus::platform::audio::kInvalidSound;
+    std::string last_hover_sfx_id_;
+
+    // Default Continue (MESMO fallback documentado no .hpp) - so lido pelo
+    // driver quando done_==true (ou bailed_==true por ui_->ok()==false /
+    // selftest, que tambem setam este campo explicitamente).
+    SystemMenuScreenExit result_ = SystemMenuScreenExit::Continue;
+};
+
+}  // namespace
+
+// F4-1b.4 MINI-DRIVER: o NUCLEO que ASSUME um contexto GL JA CORRENTE + glad JA
+// CARREGADO - ver o comentario grande no topo deste arquivo pro racional
+// completo de POR QUE existe um driver aqui (a guarda de reentrada de
+// run_screen_state PROIBE abrir a tela de save/load de DENTRO do handler do
+// Pause).
+SystemMenuLoopOutcome run_system_menu_loop_gl_current(
+    SDL_Window* window, gus::platform::audio::AudioEngine& audio,
+    const gus::app::i18n::Translator& translator, const std::string& settings_dir,
+    const std::string& saves_dir,
+    const std::function<gus::domain::save::SaveData()>& build_current_save_data,
+    const std::function<void(const gus::domain::save::SaveData&)>&
+        apply_loaded_save_data,
+    const std::string& frozen_background_png, const gus::app::EventSyncHook& sync_hook) {
+    SystemMenuLoopOutcome outcome;
+
     // DIAGNOSTICO/PROVA (SAVE-LOAD-UI etapa 6, prova visual headless Xvfb :99):
-    // GUSWORLD_SAVELOAD_SCREENSHOT_DIR=<dir> abre a tela REAL de save/load (a
-    // MESMA alcancada pelo jogador via Pause > Salvar/Carregar) em modo Save
-    // (semeando o slot 1 de verdade em disco, save_game() real - pra o modo Load
-    // seguinte mostrar um slot OCUPADO de verdade, nao um mock) e depois em modo
-    // Load, salvando 1 PNG de cada (save_load_save.png/save_load_load.png, ver
-    // save_load_menu_loop.cpp) - bypassa por completo o jogo real (nunca abre pra
-    // input real), MESMO espirito dos demais self-tests acima.
-    const char* saveload_screenshot_dir =
-        std::getenv("GUSWORLD_SAVELOAD_SCREENSHOT_DIR");
-    if (saveload_screenshot_dir != nullptr && saveload_screenshot_dir[0] != '\0') {
-        // MESMO fix critico do ramo OpenSaveLoadSave/Load de handle_action acima
-        // (RmlUi nao suporta 2 UiLayer simultaneos) - destroi o UiLayer do Pause
-        // (ainda vivo desde a construcao no topo desta funcao) ANTES de abrir a
-        // tela de save/load. Sem re-emplace depois: este ramo so retorna
-        // (nenhum reload()/present_frame() do Pause roda mais nesta chamada).
-        ui_opt.reset();
+    // GUSWORLD_SAVELOAD_SCREENSHOT_DIR=<dir> pula o Pause por COMPLETO - MESMO
+    // espirito de GUSWORLD_DIFFICULTY_SCREENSHOT_DIR em title_menu_loop.cpp
+    // (roda ANTES de sequer construir a SystemMenuScreen - este selftest nunca
+    // reusa a UiLayer/estado do Pause, so abre a tela REAL de save/load direto
+    // em modo Save e depois Load, salvando 1 PNG de cada).
+    if (const char* saveload_screenshot_dir = std::getenv("GUSWORLD_SAVELOAD_SCREENSHOT_DIR");
+        saveload_screenshot_dir != nullptr && saveload_screenshot_dir[0] != '\0') {
         (void)run_save_load_menu_loop_gl_current(window, audio, translator, SaveLoadMode::Save,
                                                   saves_dir, build_current_save_data,
-                                                  apply_loaded_save_data,
-                                                  frozen_background_png);
+                                                  apply_loaded_save_data, frozen_background_png);
         if (build_current_save_data) {
             // Semeia o slot 1 de verdade (I/O real, MESMO save_game que o
             // jogador aciona) - o modo Load abaixo mostra esse slot OCUPADO.
@@ -1206,324 +1640,62 @@ SystemMenuLoopOutcome run_system_menu_loop_gl_current(
         }
         (void)run_save_load_menu_loop_gl_current(window, audio, translator, SaveLoadMode::Load,
                                                   saves_dir, build_current_save_data,
-                                                  apply_loaded_save_data,
-                                                  frozen_background_png);
+                                                  apply_loaded_save_data, frozen_background_png);
         return outcome;
     }
 
-    while (true) {
-        SDL_Event ev;
-        while (SDL_PollEvent(&ev)) {
-            if (ev.type == SDL_EVENT_QUIT) {
-                outcome.quit_app = true;
-                return outcome;
-            }
-            if (ev.type == SDL_EVENT_WINDOW_RESIZED ||
-                ev.type == SDL_EVENT_WINDOW_PIXEL_SIZE_CHANGED) {
-                SDL_GetWindowSizeInPixels(window, &pw, &ph);
-                if (pw < 1) pw = 1;
-                if (ph < 1) ph = 1;
-                dp_ratio = static_cast<float>(pw) / 960.0f;
-                ui_opt->set_viewport(pw, ph);
-                ui_opt->set_dp_ratio(dp_ratio);
-                continue;
-            }
-            if (ev.type == SDL_EVENT_KEY_DOWN && !ev.key.repeat) {
-                // MODO DE CAPTURA (tela Controles, M2): intercepta ANTES do
-                // roteamento generico abaixo - toda tecla (nao so UP/DOWN/
-                // ENTER/ESC com o significado especial de navegacao) e
-                // candidata a virar o novo binding. Esc CANCELA (nao vira
-                // binding); qualquer outra tecla e traduzida pro esquema Godot
-                // (sdl_key_to_godot_keycode, MESMA tabela que o InputMapper de
-                // gameplay usa) e aplicada via system_menu_controls_capture_key
-                // (swap-on-conflict + persistencia se ControlsChanged).
-                if (state.screen == SystemMenuScreen::Controls && state.controls_capturing) {
-                    const bool is_escape = (ev.key.key == SDLK_ESCAPE);
-                    const long long godot_keycode =
-                        is_escape ? 0
-                                  : gus::platform::input::sdl_key_to_godot_keycode(
-                                        static_cast<int>(ev.key.key));
-                    const SystemMenuAction action =
-                        system_menu_controls_capture_key(state, is_escape, godot_keycode);
-                    if (handle_action(action)) return outcome;
-                    continue;
-                }
+    // SystemMenuScreen PERSISTE entre iteracoes deste driver (objeto local da
+    // PILHA do wrapper, NAO recriado a cada volta) - o estado de negocio
+    // (state_) roda UMA VEZ no construtor (ver a classe acima).
+    SystemMenuLoopScreen system_screen(window, audio, translator, settings_dir, saves_dir,
+                                    build_current_save_data, apply_loaded_save_data,
+                                    frozen_background_png);
 
-                const bool is_confirm_key = (ev.key.key == SDLK_RETURN ||
-                                              ev.key.key == SDLK_KP_ENTER ||
-                                              ev.key.key == SDLK_SPACE);
-                if (is_confirm_key) {
-                    // Enter/Espaco: captura a tela+item ATUAIS (antes da mutacao)
-                    // pra poder desenhar o flash de PRESS na tela DE ORIGEM caso a
-                    // action resultante confirme algo (ver is_confirming acima).
-                    const SystemMenuState pre_action_state = state;
-                    int item_index = -1;
-                    switch (state.screen) {
-                        case SystemMenuScreen::Pause:
-                            // MENU-INICIAL: enquanto o mini-dialogo esta aberto, o
-                            // item pressionado e a pill Sim/Cancelar (MESMA
-                            // convencao de Controls::controls_confirming_restore
-                            // abaixo).
-                            item_index = state.pause_confirming_to_title
-                                             ? state.pause_to_title_confirm_selected
-                                             : state.pause_selected;
-                            break;
-                        case SystemMenuScreen::ConfigCategories:
-                            item_index = state.config_categories_selected;
-                            break;
-                        case SystemMenuScreen::Audio:
-                            item_index = state.audio_selected;
-                            break;
-                        case SystemMenuScreen::Controls:
-                            // Confirmando o restaurar-padrao OU o descarte (M2 STAGED
-                            // CHANGES): o item pressionado e a pill Sim/Nao do
-                            // mini-dialogo correspondente (0|1); caso contrario, a
-                            // acao/rodape selecionado normalmente (inclui Aplicar,
-                            // kControlsApplyIndex). controls_capturing nunca chega
-                            // aqui (interceptado acima, ver o `continue`).
-                            if (state.controls_confirming_restore) {
-                                item_index = state.controls_restore_confirm_selected;
-                            } else if (state.controls_confirming_discard) {
-                                item_index = state.controls_discard_confirm_selected;
-                            } else {
-                                item_index = state.controls_selected;
-                            }
-                            break;
-                        case SystemMenuScreen::Video:
-                        case SystemMenuScreen::Language:
-                            item_index = kPlaceholderBackIndex;
-                            break;
-                        case SystemMenuScreen::Hidden:
-                            break;
-                    }
-                    const SystemMenuAction action =
-                        system_menu_key_down(state, ev.key.key);
-                    if (is_confirming(action)) flash_pressed(pre_action_state, item_index);
-                    if (handle_action(action)) return outcome;
-                } else {
-                    // Nao-confirm-key (setas/WASD/LEFT/RIGHT/ESC): handle_navigation_key
-                    // (ver seu comentario acima) ja cobre system_menu_key_down +
-                    // handle_action + o SOM DE HOVER PARIDADE na navegacao.
-                    if (handle_navigation_key(ev.key.key)) return outcome;
-                }
-            } else if (ev.type == SDL_EVENT_MOUSE_BUTTON_DOWN &&
-                       ev.button.button == SDL_BUTTON_LEFT) {
-                bool handled = false;
-                if (state.screen == SystemMenuScreen::Pause) {
-                    if (state.pause_confirming_to_title) {
-                        // MENU-INICIAL: mini-dialogo "tem certeza?" - so as 2
-                        // pills Sim/Cancelar (MESMA mecanica de
-                        // controls_confirming_restore/discard mais abaixo,
-                        // system_menu_click_option reinterpreta o indice como
-                        // 0=Sim/1=Cancelar neste sub-modo).
-                        for (int item = 0; item < 2 && !handled; ++item) {
-                            const glintfx::ElementBox box = ui_opt->get_element_box(
-                                pause_totitle_confirm_id(item).c_str());
-                            if (!hit_test(box, ev.button.x, ev.button.y)) continue;
-                            handled = true;
-                            const SystemMenuState pre_action_state = state;
-                            const SystemMenuAction action =
-                                system_menu_click_option(state, item);
-                            if (is_confirming(action)) flash_pressed(pre_action_state, item);
-                            if (handle_action(action)) return outcome;
-                        }
-                    } else {
-                        // Clicar numa pill (Continuar/Salvar/Carregar/Configuracoes/
-                        // Menu Inicial/Sair) SELECIONA E ACIONA na hora -
-                        // equivalente a focar + ENTER.
-                        for (int item = 0; item < kPauseItemCount && !handled; ++item) {
-                            const glintfx::ElementBox box =
-                                ui_opt->get_element_box(pause_item_id(item).c_str());
-                            if (!hit_test(box, ev.button.x, ev.button.y)) continue;
-                            handled = true;
-                            const SystemMenuState pre_action_state = state;
-                            const SystemMenuAction action =
-                                system_menu_click_option(state, item);
-                            if (is_confirming(action)) flash_pressed(pre_action_state, item);
-                            if (handle_action(action)) return outcome;
-                        }
-                    }
-                } else if (state.screen == SystemMenuScreen::ConfigCategories) {
-                    // Categorias (Audio/Video/Lingua/Voltar) - botoes simples, SEM
-                    // slider: clicar SEMPRE seleciona E aciona na hora.
-                    for (int item = 0; item < kConfigCategoriesItemCount && !handled;
-                         ++item) {
-                        const glintfx::ElementBox box =
-                            ui_opt->get_element_box(category_item_id(item).c_str());
-                        if (!hit_test(box, ev.button.x, ev.button.y)) continue;
-                        handled = true;
-                        const SystemMenuState pre_action_state = state;
-                        const SystemMenuAction action =
-                            system_menu_click_option(state, item);
-                        if (is_confirming(action)) flash_pressed(pre_action_state, item);
-                        if (handle_action(action)) return outcome;
-                    }
-                } else if (state.screen == SystemMenuScreen::Audio) {
-                    // (1) Tracks dos sliders (drag-start, receita PRE-EXISTENTE) -
-                    // checado PRIMEIRO porque a caixa do track fica DENTRO da
-                    // caixa do campo/rotulo (audio-item-<i>, ver (3) abaixo) - o
-                    // mais especifico tem que vencer quando o clique cai nos dois.
-                    for (int item = 0; item < 2 && !handled; ++item) {
-                        const glintfx::ElementBox box =
-                            ui_opt->get_element_box(track_id_for_item(item).c_str());
-                        if (!hit_test(box, ev.button.x, ev.button.y)) continue;
-                        handled = true;
-                        drag_item = item;
-                        state.audio_selected = item;
-                        if (box.w > 0.0f) {
-                            const float ratio = (ev.button.x - box.x) / box.w;
-                            system_menu_set_slider_ratio(state, item, ratio);
-                            apply_and_persist(state, audio, settings_dir);
-                        }
-                        reload();
-                    }
-                    // (2) Botao Voltar - ACIONA na hora (equivalente a focar + ENTER).
-                    if (!handled) {
-                        const int back_index = static_cast<int>(AudioItem::Back);
-                        const glintfx::ElementBox box =
-                            ui_opt->get_element_box(audio_item_id(back_index).c_str());
-                        if (hit_test(box, ev.button.x, ev.button.y)) {
-                            handled = true;
-                            const SystemMenuState pre_action_state = state;
-                            const SystemMenuAction action =
-                                system_menu_click_option(state, back_index);
-                            if (is_confirming(action)) {
-                                flash_pressed(pre_action_state, back_index);
-                            }
-                            if (handle_action(action)) return outcome;
-                        }
-                    }
-                    // (3) Campo/rotulo do slider (fora do track) - SO FOCA (nao
-                    // ajusta volume - isso e papel exclusivo do track, ver (1)).
-                    for (int item = 0; item < 2 && !handled; ++item) {
-                        const glintfx::ElementBox box =
-                            ui_opt->get_element_box(audio_item_id(item).c_str());
-                        if (!hit_test(box, ev.button.x, ev.button.y)) continue;
-                        handled = true;
-                        const SystemMenuAction action =
-                            system_menu_click_option(state, item);
-                        if (handle_action(action)) return outcome;
-                    }
-                } else if (state.screen == SystemMenuScreen::Controls) {
-                    // Capturando: mouse NAO participa (o jogador precisa apertar
-                    // uma tecla FISICA - ver a interceptacao no ramo KEY_DOWN
-                    // acima) - clique nao faz nada nesse modo.
-                    if (state.controls_capturing) {
-                        // no-op
-                    } else if (state.controls_confirming_restore) {
-                        // Mini-dialogo "tem certeza?": so as 2 pills Sim/Nao
-                        // (system_menu_click_option reinterpreta o indice como
-                        // 0=Sim/1=Nao neste sub-modo, ver system_menu.cpp).
-                        for (int item = 0; item < 2 && !handled; ++item) {
-                            const glintfx::ElementBox box =
-                                ui_opt->get_element_box(controls_confirm_id(item).c_str());
-                            if (!hit_test(box, ev.button.x, ev.button.y)) continue;
-                            handled = true;
-                            const SystemMenuState pre_action_state = state;
-                            const SystemMenuAction action = system_menu_click_option(state, item);
-                            if (is_confirming(action)) flash_pressed(pre_action_state, item);
-                            if (handle_action(action)) return outcome;
-                        }
-                    } else if (state.controls_confirming_discard) {
-                        // Mini-dialogo "descartar alteracoes?" (M2 STAGED
-                        // CHANGES) - MESMA mecanica do restaurar-padrao acima,
-                        // ids proprios (controls_discard_confirm_id).
-                        for (int item = 0; item < 2 && !handled; ++item) {
-                            const glintfx::ElementBox box =
-                                ui_opt->get_element_box(controls_discard_confirm_id(item).c_str());
-                            if (!hit_test(box, ev.button.x, ev.button.y)) continue;
-                            handled = true;
-                            const SystemMenuState pre_action_state = state;
-                            const SystemMenuAction action = system_menu_click_option(state, item);
-                            if (is_confirming(action)) flash_pressed(pre_action_state, item);
-                            if (handle_action(action)) return outcome;
-                        }
-                    } else {
-                        // Navegacao normal: clicar numa action FOCA+ENTRA em
-                        // captura (system_menu_click_option, MESMA convencao
-                        // "focar+ENTER" das outras telas); clicar em Restaurar
-                        // abre o mini-dialogo; clicar em Voltar confirma na hora.
-                        // BUG-A: filtra as 30 actions (nao o rodape) pelo
-                        // recorte visivel de `.ctrl-list` ANTES do hit-test -
-                        // sem isto, uma linha rolada pra fora da vista podia
-                        // roubar o clique de Restaurar/Voltar (ver
-                        // filter_offscreen_controls_row/controls_row_visible_in_list).
-                        const glintfx::ElementBox list_box = ui_opt->get_element_box(kControlsListId);
-                        for (int item = 0; item < kControlsItemCount && !handled; ++item) {
-                            const glintfx::ElementBox raw =
-                                ui_opt->get_element_box(controls_item_id(item).c_str());
-                            const glintfx::ElementBox box =
-                                filter_offscreen_controls_row(item, raw, list_box);
-                            if (!hit_test(box, ev.button.x, ev.button.y)) continue;
-                            handled = true;
-                            const SystemMenuState pre_action_state = state;
-                            const SystemMenuAction action = system_menu_click_option(state, item);
-                            if (is_confirming(action)) flash_pressed(pre_action_state, item);
-                            if (handle_action(action)) return outcome;
-                        }
-                    }
-                } else if (state.screen == SystemMenuScreen::Video ||
-                           state.screen == SystemMenuScreen::Language) {
-                    // Placeholder ("em breve"): so o Voltar e clicavel.
-                    const glintfx::ElementBox box = ui_opt->get_element_box(kPlaceholderBackId);
-                    if (hit_test(box, ev.button.x, ev.button.y)) {
-                        handled = true;
-                        const SystemMenuState pre_action_state = state;
-                        const SystemMenuAction action = system_menu_click_option(
-                            state, kPlaceholderBackIndex);
-                        if (is_confirming(action)) {
-                            flash_pressed(pre_action_state, kPlaceholderBackIndex);
-                        }
-                        if (handle_action(action)) return outcome;
-                    }
-                }
-            } else if (ev.type == SDL_EVENT_MOUSE_MOTION) {
-                // SEMPRE (nao so durante o arrasto, PEDIDO 2a): hover NATIVO (:hover
-                // RCSS) + edge-detect do SOM de hover; o arrasto de slider (se
-                // drag_item>=0) continua tratado DENTRO de handle_mouse_motion.
-                handle_mouse_motion(ev.motion.x, ev.motion.y);
-            } else if (ev.type == SDL_EVENT_MOUSE_BUTTON_UP &&
-                       ev.button.button == SDL_BUTTON_LEFT) {
-                drag_item = -1;
-            } else if (ev.type == SDL_EVENT_MOUSE_WHEEL) {
-                // WHEEL FORWARDING (M2/GLINTFX-SCROLL, glintfx v0.4.0): rola o
-                // elemento em HOVER (NAO o com foco - ver o comentario extenso de
-                // glintfx::UiEvent::Type::MouseWheel no vendored ui_event.hpp).
-                // GOTCHA CRITICO da release note: um MouseWheel sem MouseMove
-                // recente sobre o alvo e um no-op silencioso (hover fica o que o
-                // ULTIMO MouseMove deixou - possivelmente nenhum, ex. logo apos
-                // reload() trocar de DOCUMENTO, que reseta o hover interno do
-                // RmlUi, ou o cursor parado ha varios frames sem novo
-                // SDL_EVENT_MOUSE_MOTION). Nao contamos com "o loop ja manda
-                // MouseMove todo frame" pra garantir isso (so manda em
-                // SDL_EVENT_MOUSE_MOTION de verdade, nao a cada frame) - por
-                // isso, SEMPRE mandamos 1 MouseMove sintetico pra posicao ATUAL
-                // do cursor (SDL_GetMouseState, nao um cache proprio - pega o
-                // valor mais fresco possivel) IMEDIATAMENTE antes do
-                // MouseWheel, via handle_mouse_motion (o MESMO caminho de
-                // codigo do SDL_EVENT_MOUSE_MOTION real acima - reusa hover
-                // visual + som de hover + arrasto de slider, sem duplicar
-                // logica). Hover fora de container overflow:auto (ou hover
-                // nenhum) e um no-op seguro do lado do RmlUi (GetClosestScrollable
-                // Container devolve nullptr) - nao gated por tela de proposito
-                // (a tela Controles e a UNICA com lista rolavel hoje, mas
-                // encaminhar sempre, incondicional, cobre qualquer lista rolavel
-                // futura de graca).
-                float mouse_x = 0.0f, mouse_y = 0.0f;
-                SDL_GetMouseState(&mouse_x, &mouse_y);
-                handle_mouse_motion(mouse_x, mouse_y);
+    for (;;) {
+        // run_screen_state SO retorna DEPOIS que system_screen.exit() ja rodou
+        // (garantia ESTRUTURAL, ver gus/app/screen_state.hpp:29-39) - so ENTAO
+        // e seguro abrir a tela de save/load ANINHADA logo abaixo (2a UiLayer
+        // viva ao mesmo tempo e o crash real que essa exclusividade existe pra
+        // prevenir - "Element meta pool not empty on shutdown").
+        gus::app::run_screen_state(system_screen, sync_hook);
 
-                const float wheel_dy = system_menu_wheel_delta_to_rmlui(
-                    ev.wheel.y, ev.wheel.direction == SDL_MOUSEWHEEL_FLIPPED);
-                glintfx::UiEvent wheel_ev{};
-                wheel_ev.type = glintfx::UiEvent::Type::MouseWheel;
-                wheel_ev.x = 0.0f;
-                wheel_ev.y = wheel_dy;
-                ui_opt->process_event(wheel_ev);
-            }
+        if (system_screen.window_closed()) {
+            outcome.quit_app = true;
+            return outcome;
         }
 
-        present_frame();
+        const SystemMenuScreenExit sexit = system_screen.result();
+        // Irrelevante fora de OpenSaveLoadSave/OpenSaveLoadLoad (pause_flow_next
+        // ignora este valor nos outros 3 casos, ver os testes de
+        // pause_flow_next) - valor qualquer (BackToPause) pra nao deixar a
+        // variavel indeterminada.
+        SaveLoadLoopExit saveload_exit = SaveLoadLoopExit::BackToPause;
+        if (sexit == SystemMenuScreenExit::OpenSaveLoadSave ||
+            sexit == SystemMenuScreenExit::OpenSaveLoadLoad) {
+            const SaveLoadMode mode = (sexit == SystemMenuScreenExit::OpenSaveLoadSave)
+                                           ? SaveLoadMode::Save
+                                           : SaveLoadMode::Load;
+            // ANINHADA (MESMA tecnica do antigo handle_action lambda, agora sem
+            // o ui_opt.reset()/emplace() manual - a UiLayer do Pause JA foi
+            // destruida, system_screen.exit() rodou dentro do run_screen_state
+            // acima).
+            saveload_exit = run_save_load_menu_loop_gl_current(
+                window, audio, translator, mode, saves_dir, build_current_save_data,
+                apply_loaded_save_data, frozen_background_png);
+        }
+
+        switch (pause_flow_next(sexit, saveload_exit)) {
+            case SystemMenuFlowStep::Continue:
+                return outcome;  // quit_app=false/to_title=false (default)
+            case SystemMenuFlowStep::RequestQuit:
+                outcome.quit_app = true;
+                return outcome;
+            case SystemMenuFlowStep::RequestToTitle:
+                outcome.to_title = true;
+                return outcome;
+            case SystemMenuFlowStep::RetryPause:
+                break;  // RE-ENTRA no MESMO system_screen (topo do for(;;)).
+        }
     }
 }
 

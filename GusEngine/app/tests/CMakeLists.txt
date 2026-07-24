@@ -113,6 +113,17 @@ add_executable(gusengine_app_tests
     # fluxo titulo->dificuldade->cancela->volta preserva o estado do
     # TitleScreen reusado pelo mini-driver).
     title_menu_loop_interaction_test.cpp
+    # F4-1b.4 (onda F4, fatia 1b.4 - SEGUNDA tela PAI da onda, apos F4-1b.3/
+    # title_menu_loop.cpp): system_screen_step + pause_flow_next, as funcoes
+    # PURAS de roteamento de evento e de decisao do driver - headless, SEM
+    # SDL_Init/janela/glintfx::UiLayer real (ver o topo do arquivo).
+    system_screen_step_test.cpp
+    # F4-1b.4: harness HEADLESS com GL real (Xvfb :99), MESMA receita de
+    # title_menu_loop_interaction_test.cpp - prova o FIO INTEIRO ate
+    # run_system_menu_loop_gl_current (SDL_EVENT_QUIT real fecha a janela; o
+    # fluxo pausa->save/load->BackToPause->volta preserva o estado do
+    # SystemMenuLoopScreen reusado pelo mini-driver).
+    system_menu_loop_interaction_test.cpp
 )
 
 target_link_libraries(gusengine_app_tests
