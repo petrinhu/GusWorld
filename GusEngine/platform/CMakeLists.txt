@@ -24,6 +24,9 @@ add_library(gusengine_platform STATIC
     src/input/input_mapper.cpp
     src/input/gamepad_mapping.cpp
     src/input/sdl_input.cpp
+    # F4-2.3 (Onda F4, costura de input): adaptador de teclado do backend glintfx
+    # por POLLING DE NIVEL (decisao do lider), provider injetavel (sem App).
+    src/input/glintfx_input.cpp
     src/render2d/viewport_transform.cpp
     src/render2d/text_metrics.cpp
     src/render2d/font_atlas.cpp

@@ -15,6 +15,9 @@ add_executable(gusengine_platform_tests
     input_mapper_test.cpp
     gamepad_mapping_test.cpp
     sdl_input_test.cpp
+    # F4-2.3 (Onda F4, costura de input): adaptador de teclado do backend novo
+    # (glintfx) por polling de nivel, provider injetavel (headless).
+    glintfx_input_test.cpp
     viewport_transform_test.cpp
     render2d_sdl_test.cpp
     render2d_gl3_test.cpp
