@@ -35,6 +35,17 @@ add_executable(gusengine_platform_tests
     asset_source_test.cpp
 )
 
+# F4-2.4 (Onda F4, costura de input): adaptador de GAMEPAD do backend novo (glintfx, evdev
+# cru Linux) para o mesmo GamepadState - provider injetavel (headless) + teste "sem
+# dispositivo" com glintfx::Gamepads real (dev_dir vazio injetado). Registrado SO em Linux,
+# MESMO guard `if(UNIX AND NOT APPLE)` de GLINTFX_MODULE_GAMEPAD no CMakeLists raiz - o
+# header glintfx_gamepad_input.hpp inclui <glintfx/gamepad.hpp>, que tem #error fora de
+# Linux (glintfx::Gamepads requer GLINTFX_MODULE_GAMEPAD=ON). Ligar isto incondicionalmente
+# quebraria o build no CI Windows (MSVC).
+if(UNIX AND NOT APPLE)
+    target_sources(gusengine_platform_tests PRIVATE glintfx_gamepad_input_test.cpp)
+endif()
+
 # ADR-010 F3: os testes do HUD RmlUi VENDORIZADO (rmlui_hud_test.cpp, 4 TEST_CASE) foram
 # aposentados junto do backend vendorizado - o glintfx e o unico motor de UI/HUD agora.
 

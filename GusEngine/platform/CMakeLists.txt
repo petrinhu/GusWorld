@@ -57,6 +57,15 @@ add_library(gusengine_platform STATIC
     src/assets/asset_source.cpp
 )
 
+# F4-2.4 (Onda F4, costura de input): adaptador de GAMEPAD do backend glintfx (evdev cru,
+# Linux-only) pro MESMO GamepadState que o SdlInput ja preenche - o header inclui
+# <glintfx/gamepad.hpp>, que tem #error fora de GLINTFX_MODULE_GAMEPAD=ON (Linux, ver
+# CMakeLists raiz). Registrado SO em Linux, MESMO guard `if(UNIX AND NOT APPLE)` da flag do
+# modulo - ligar isto incondicionalmente quebraria o build no CI Windows (MSVC).
+if(UNIX AND NOT APPLE)
+    target_sources(gusengine_platform PRIVATE src/input/glintfx_gamepad_input.cpp)
+endif()
+
 # ADR-010 F3: o backend RmlUi vendorizado (RmlUi_Renderer_GL3.cpp / RmlUi_Platform_SDL.cpp /
 # rmlui_hud.cpp) foi APOSENTADO - o glintfx (linkado em app/) provê o RenderInterface_GL3. O
 # RmlUi_Renderer_GL3 vendorizado era o dono do GLAD_GL_IMPLEMENTATION; como ele saiu, o

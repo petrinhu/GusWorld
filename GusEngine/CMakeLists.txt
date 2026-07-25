@@ -148,9 +148,17 @@ set(GLINTFX_BACKEND_GLFW OFF CACHE BOOL "" FORCE)  # embed-only (sem GLFW)
 #     que sobra vem vendorizado pelo glintfx em _deps/glintfx-src/glintfx/third_party/
 #     miniaudio/). platform/src/audio/audio_engine.cpp (fachada AudioEngine,
 #     header intocado) consome glintfx::Audio por baixo do PImpl.
-#   - GLINTFX_MODULE_GAMEPAD/I18N OFF: nao usamos ainda (i18n = translator C++ proprio no
-#     domain; gamepad = fora de escopo). Real ON/OFF (nao reservada) - default de fabrica e
-#     ON pros 2; desligar aqui evita linkar codigo/dep que nao usamos (ex.: nao expor evdev).
+#   - GLINTFX_MODULE_GAMEPAD ON CONDICIONADO A LINUX (F4-2.4, 2026-07-24): o modulo e
+#     evdev CRU (`/dev/input/eventN`) - o proprio header publico dele
+#     (glintfx/include/glintfx/gamepad.hpp) tem um `#error` fora de
+#     GLINTFX_MODULE_GAMEPAD=ON ("Linux-only module... no portable substitute"), e o CMake
+#     deles ja auto-desliga a flag em qualquer CMAKE_SYSTEM_NAME != Linux. Ligar isto
+#     INCONDICIONALMENTE quebraria o CI Windows (MSVC) no #error - por isso o guard
+#     `if(UNIX AND NOT APPLE)` abaixo (nunca `WIN32`/`APPLE`; ver GlintfxGamepadInput,
+#     platform/include/gus/platform/input/glintfx_gamepad_input.hpp, o adaptador que
+#     consome isto). GLINTFX_MODULE_I18N OFF: nao usamos (i18n = translator C++ proprio
+#     no domain) - real ON/OFF (nao reservada), default de fabrica ON; desligar aqui evita
+#     linkar codigo/dep que nao usamos.
 #   - GLINTFX_MODULE_WINDOW OFF: alias de GLINTFX_BACKEND_GLFW (ja fixado OFF acima desde
 #     o embed-only original); o glintfx v0.16 espelha o valor de BACKEND_GLFW dentro de
 #     MODULE_WINDOW automaticamente (ver comentario "alias target" no CMakeLists deles) -
@@ -178,7 +186,16 @@ set(GLINTFX_BACKEND_GLFW OFF CACHE BOOL "" FORCE)  # embed-only (sem GLFW)
 set(GLINTFX_MODULE_TEXT      ON  CACHE BOOL "" FORCE)
 set(GLINTFX_MODULE_FX        ON  CACHE BOOL "" FORCE)
 set(GLINTFX_MODULE_AUDIO     ON  CACHE BOOL "" FORCE)
-set(GLINTFX_MODULE_GAMEPAD   OFF CACHE BOOL "" FORCE)
+# F4-2.4: ON so em Linux (UNIX AND NOT APPLE exclui macOS de propósito - o modulo e
+# evdev cru, especifico do kernel Linux; macOS e UNIX mas nao tem evdev). Em qualquer
+# outro CMAKE_SYSTEM_NAME (Windows, macOS) fica OFF - INEGOCIAVEL, ver o comentario
+# grande acima ("GLINTFX_MODULE_GAMEPAD ON CONDICIONADO A LINUX") para o raciocinio do
+# `#error` guard que isto evita estourar no CI Windows (MSVC).
+if(UNIX AND NOT APPLE)
+    set(GLINTFX_MODULE_GAMEPAD ON  CACHE BOOL "" FORCE)
+else()
+    set(GLINTFX_MODULE_GAMEPAD OFF CACHE BOOL "" FORCE)
+endif()
 set(GLINTFX_MODULE_I18N      OFF CACHE BOOL "" FORCE)
 set(GLINTFX_OWN_FONT_ENGINE  OFF CACHE BOOL "" FORCE)
 #
