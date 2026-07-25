@@ -55,7 +55,25 @@ resources/gus_baby/
 # repo e publico e git-normal guardaria no historico pra sempre). Decisao do
 # lider 2026-07-02. Se um dia reintroduzir 3D e quiser versionar: Git LFS +
 # workaround Codeberg (lfs.sshtransfer never). Cross-ref candidata tinygltf.
-resources/glb/
+#
+# EXCECAO (decisao do lider 2026-07-25): os 3 modelos que ANTES viviam em
+# resources/pers_3d/ (tracked via LFS desde a decisao AC-E7 de 2026-07-14, "arte
+# conceitual pros livros futuros") foram MOVIDOS pra ca pelo lider, e ele decidiu
+# mante-los VERSIONADOS no lugar novo. Continuam em Git LFS (regra `*.glb
+# filter=lfs` no .gitattributes) e o oid e o MESMO de antes, entao a movimentacao
+# NAO adiciona peso novo ao storage LFS - so troca o caminho.
+# Os demais .glb da pasta (gus.glb 58M, heliaco_vyr.glb 55M) seguem FORA do git
+# pela decisao original de 2026-07-02; versiona-los seria +113MB novos de LFS e e
+# decisao separada, nao tomada aqui.
+# Padrao da casa (mesmo usado no bloco de resources/images/ abaixo):
+# un-ignore o dir -> re-ignore o conteudo -> un-ignore os arquivos escolhidos.
+# (Necessario porque, se o DIRETORIO esta ignorado, o git nao desce nele e
+# excecao de arquivo la dentro nao funciona.)
+!resources/glb/
+resources/glb/*
+!resources/glb/Gus.glb
+!resources/glb/Gus_movimento.glb
+!resources/glb/Yakov.glb
 
 # Manual privado dos easter eggs (NUNCA publicar: mata o segredo)
 docs/_secret/

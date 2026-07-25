@@ -211,16 +211,20 @@ resources/
 ├── prompts_images/         # [tracked] prompts de geração de imagem (nano banana / PixelLab), prosa auto-contida
 │   ├── feitos/               # os 170 prompts já executados (curados)
 │   └── <categoria>/           # [PENDÊNCIA DE HIGIENE: várias vazias, estado "drenado pra feitos/", ver seção Órfãos]
-├── glb/                    # [gitignored inteiro] modelos 3D (~50-60MB cada), arte conceitual, fora de escopo 2D atual
-├── pers_3d/                 # [tracked] modelos 3D pequenos (Gus.glb, Gus_movimento.glb, Yakov.glb) para os livros futuros
+├── glb/                    # modelos 3D (~50-60MB cada), arte conceitual, fora de escopo 2D atual. Gitignored EXCETO 3 arquivos: Gus.glb, Gus_movimento.glb e Yakov.glb são TRACKED via LFS (vieram de pers_3d/ em 2026-07-25, decisão do líder)
 ├── vfx/                      # frames de VFX pré-renderizado; só boot_pixel/ é tracked (exceção do .gitignore), resto gitignored
 └── livros/                    # [gitignored inteiro, ~943MB] corpus RAG (bibliografia de referência), indexado via `rag`
 ```
 
-`glb/` vs `pers_3d/`: ambos guardam `.glb`, mas `glb/` é gitignored (peso alto,
-concept art solta) enquanto `pers_3d/` é tracked (peso baixo, arte conceitual
-3D destinada aos livros/book, ver `docs/book/`). Não confundir os dois ao
-procurar um modelo.
+**`pers_3d/` não existe mais (2026-07-25).** O líder juntou tudo em `glb/`, e os
+3 modelos que estavam versionados (`Gus.glb`, `Gus_movimento.glb`, `Yakov.glb`,
+arte conceitual destinada aos livros/book, ver `docs/book/`) continuam **tracked
+via Git LFS** no lugar novo, por exceção explícita no `.gitignore` (padrão da casa:
+un-ignore o dir → re-ignore o conteúdo → un-ignore os arquivos escolhidos). O git
+registrou a mudança como **rename puro** e o oid do LFS é o mesmo, então **nada de
+peso novo** entrou no storage. Os demais `.glb` da pasta (`gus.glb` 58MB,
+`heliaco_vyr.glb` 55MB) seguem **fora do git** pela decisão de 2026-07-02 (repo
+público; git guardaria no histórico pra sempre) — versioná-los é decisão separada.
 
 ## `assets/` (raiz, não confundir com `GusEngine/assets/`)
 
