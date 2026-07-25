@@ -14,7 +14,7 @@ If you maintain one of the projects below and you're reading this: thank you. Th
 
 ### glintfx
 
-[glintfx](https://codeberg.org/petrinhu/glintfx) (also on [GitHub](https://github.com/petrinhu/glintfx); MPL-2.0) is the UI/HUD engine GusWorld uses in embed mode, through `glintfx::UiLayer`. It wraps RmlUi 6.3 and an OpenGL GL3 backend behind a clean, compose-only facade: it never clears or swaps the framebuffer on its own, it composes the game's menus and HUD directly over the same GL context the world is rendered in, saving and restoring GL state around itself. That single design choice is what lets GusWorld have HTML/CSS-like UI (gradients, glow effects, data binding) without fighting a second rendering pipeline. Building glintfx is its own project, developed alongside GusWorld specifically to make this kind of UI possible for a small C++/SDL3 game. Full credit and thanks for that work.
+[glintfx](https://github.com/petrinhu/glintfx) (MPL-2.0) is the UI/HUD engine GusWorld uses in embed mode, through `glintfx::UiLayer`. It wraps RmlUi 6.3 and an OpenGL GL3 backend behind a clean, compose-only facade: it never clears or swaps the framebuffer on its own, it composes the game's menus and HUD directly over the same GL context the world is rendered in, saving and restoring GL state around itself. That single design choice is what lets GusWorld have HTML/CSS-like UI (gradients, glow effects, data binding) without fighting a second rendering pipeline. Building glintfx is its own project, developed alongside GusWorld specifically to make this kind of UI possible for a small C++/SDL3 game. Full credit and thanks for that work.
 
 ### RmlUi
 
@@ -88,7 +88,7 @@ Se você mantém um dos projetos abaixo e está lendo isto: obrigado. Este jogo 
 
 #### glintfx
 
-O [glintfx](https://codeberg.org/petrinhu/glintfx) (também no [GitHub](https://github.com/petrinhu/glintfx); MPL-2.0) é o motor de UI/HUD que o GusWorld usa em embed mode, via `glintfx::UiLayer`. Ele embrulha o RmlUi 6.3 e um backend OpenGL GL3 atrás de uma fachada limpa e compose-only: nunca limpa nem troca o framebuffer sozinho, compõe os menus e o HUD do jogo diretamente sobre o mesmo contexto GL em que o mundo é renderizado, salvando e restaurando o estado GL ao redor de si mesmo. Essa única decisão de design é o que permite ao GusWorld ter uma UI HTML/CSS-like (degradês, efeitos de glow, data binding) sem brigar com um segundo pipeline de renderização. Construir o glintfx é um projeto à parte, desenvolvido junto com o GusWorld especificamente para tornar esse tipo de UI possível num jogo pequeno em C++/SDL3. Crédito e agradecimento completos por esse trabalho.
+O [glintfx](https://github.com/petrinhu/glintfx) (MPL-2.0) é o motor de UI/HUD que o GusWorld usa em embed mode, via `glintfx::UiLayer`. Ele embrulha o RmlUi 6.3 e um backend OpenGL GL3 atrás de uma fachada limpa e compose-only: nunca limpa nem troca o framebuffer sozinho, compõe os menus e o HUD do jogo diretamente sobre o mesmo contexto GL em que o mundo é renderizado, salvando e restaurando o estado GL ao redor de si mesmo. Essa única decisão de design é o que permite ao GusWorld ter uma UI HTML/CSS-like (degradês, efeitos de glow, data binding) sem brigar com um segundo pipeline de renderização. Construir o glintfx é um projeto à parte, desenvolvido junto com o GusWorld especificamente para tornar esse tipo de UI possível num jogo pequeno em C++/SDL3. Crédito e agradecimento completos por esse trabalho.
 
 #### RmlUi
 

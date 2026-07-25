@@ -19,9 +19,12 @@
 # Escape (documentado, NAO magico): `git push --no-verify` pula TODOS os
 # hooks de pre-push, este incluso. Uso excepcional, nunca default.
 #
-# --- relacao com o job "asan" do CI (.forgejo/workflows/ci.yml) -----------
+# --- relacao com o job "asan" do CI (.github/workflows/ci.yml) ------------
+# (Ate 2026-07-25 o CI vivia em .forgejo/workflows/ci.yml, no Codeberg; o projeto
+#  migrou pro GitHub como host unico porque o Codeberg passou a nao aceitar codigo
+#  escrito com auxilio de IA. O desenho abaixo nao mudou, so o endereco.)
 # O CI ja tem um job "asan" completo (core+domain+platform+app, runner
-# codeberg-medium, ~30min timeout) que roda em PR/push pro remoto. ESTE
+# hospedado do GitHub) que roda em PR/push pro remoto. ESTE
 # script NAO substitui aquele - e um pre-flight LOCAL e mais estreito (so
 # domain/, so o subconjunto do -R) pra pegar o mesmo tipo de bug ANTES de
 # gastar minuto de CI/round-trip de PR. Os dois sao defense-in-depth entre

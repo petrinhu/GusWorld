@@ -30,13 +30,13 @@ Dossiê de orientações técnicas da AUDITORIA-COMPLETA-2026-07-06 (engenharia 
 
 ## AC-E2 — CI não roda SMOKE, GATE i18n nem sanitizers (drift entre check.sh e ci.yml)
 
-**Achado.** `tools/check.sh` roda 4 estágios (BUILD, SMOKE headless, GATE arch **+ GATE i18n**, SUITE). O CI (`.forgejo/workflows/ci.yml`) roda só: gate arch (sincronizado, ok) + Configure + Build + Test. Faltam no CI: (a) o smoke headless (`--smoke` com `SDL_VIDEODRIVER=dummy SDL_AUDIODRIVER=dummy`, que o container já suporta); (b) o gate de paridade i18n (`tools/i18n_parity.py`); (c) nenhum job ASan/UBSan em lugar nenhum do CI — recomendação explícita do dossiê AUDIT-M7-COSTURA §8 para o gate T4 de v1.0.0 (foi o ASan local que achou o `AUD-MINIAUDIO-UAF`).
+**Achado.** `tools/check.sh` roda 4 estágios (BUILD, SMOKE headless, GATE arch **+ GATE i18n**, SUITE). O CI (`.forgejo/workflows/ci.yml`) roda só: gate arch (sincronizado, ok) + Configure + Build + Test. Faltam no CI: (a) o smoke headless (`--smoke` com `SDL_VIDEODRIVER=dummy SDL_AUDIODRIVER=dummy`, que o container já suporta); (b) o gate de paridade i18n (`tools/i18n_parity.py`); (c) nenhum job ASan/UBSan em lugar nenhum do CI — recomendação explícita do dossiê AUDIT-M7-COSTURA §8 para o gate T4 de v1.0.0 (foi o ASan local que achou o `AUD-MINIAUDIO-UAF`). **[NOTA 2026-07-25: este achado foi RESOLVIDO pela migração pro GitHub. O CI vive agora em `.github/workflows/ci.yml` e cobre os três buracos apontados aqui: o job `linux` roda o smoke headless E o gate de paridade i18n, e existe um job `asan` dedicado (ASan/UBSan sobre core+domain+platform+app). O `.forgejo/workflows/ci.yml` citado acima não existe mais. Falta apenas a confirmação ao vivo: o CI novo ainda não rodou uma vez no GitHub.]**
 
 **Classificação: (A) FIX DIRETO.**
 1. Em `ci.yml`, após o step Build, adicionar step "Smoke" espelhando o check.sh: `SDL_VIDEODRIVER=dummy SDL_AUDIODRIVER=dummy timeout 60 GusEngine/build/linux-release/app/gusworld_app --smoke`.
 2. Adicionar step "i18n parity gate": `python3 tools/i18n_parity.py` (falha != 0 já reprova).
 3. Job ASan: pode ser um segundo job (ou step) que configura um build dir `build/asan` com `-DCMAKE_CXX_FLAGS="-fsanitize=address,undefined -fno-omit-frame-pointer -g"` (mesma parametrização que o dossiê M7 usou) e roda as suites core/domain/app. NOTA: a suite `platform` ABORTA sob ASan por causa do `AUD-MINIAUDIO-UAF` (lib vendorizada) — deixar `platform` FORA do job ASan até aquele item fechar, com comentário apontando o item.
-4. Lembrete de contexto: a confirmação de run verde no Codeberg foi ADIADA pelo líder (decisão 2026-06-21, runner oscilante); validar localmente via `forgejo-runner exec` como no M0.
+4. Lembrete de contexto: a confirmação de run verde no Codeberg foi ADIADA pelo líder (decisão 2026-06-21, runner oscilante); validar localmente via `forgejo-runner exec` como no M0. _(Nota 2026-07-25: registro histórico do momento da auditoria; o item AC-E2 já fechou ✅ em 2026-07-10 e o projeto saiu do Codeberg/Forgejo nesta data; `forgejo-runner` foi desinstalado da máquina e `.forgejo/` removido do repo. CI hoje é GitHub Actions.)_
 
 ---
 

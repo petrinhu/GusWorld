@@ -2,13 +2,15 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-## Estado atual (vigente — atualizado 2026-07-22)
+## Estado atual (vigente — atualizado 2026-07-25)
 
 **Stack vigente: C++20 + SDL3 + glintfx/RmlUi.** Solo indie, Linux (v1.0.0) + Windows (pós-v1, CI real MSVC já validado), single-player puro. Gênero: RPG + Puzzle + Aventura + combate turn-based, **visual 2D estilizado** (sprites/pixel art, não 3D). Ver "Decisões fechadas" abaixo para a stack completa e os ADRs.
 
 **Board M0-M9 (migração da engine, ver ROADMAP.md/TODO.md para o board vivo):** M0-M8 entregues — **M7 (paridade jogável) FECHADO 2026-07-21** pelo playthrough ao vivo (Gus): loop completo (andar/NPC/combate→Victory/save/load) rodou 100% na engine C++/SDL3+glintfx sem Godot, zero erro. **M8 (decommission Godot/C#) FECHADO 2026-07-22:** dados vivos migrados pra `resources/` (F1), submódulo `engine/` removido (F2), `game/` apagado — 172 arquivos, 20816 linhas (F3) — e a lixeira física limpa (30M); repo compila e roda sem nenhum bit do stack antigo, CI Windows verde na F1. Tag `pre-m8-godot-legacy` preserva o legado por registro. Só falta o **M9 (higienização)**; 3 feedbacks de polish do playtest na INBOX (M7-FB1/2/3). Em paralelo ao board, a onda `CARDS` desenvolve o motor de cartas techMagic ([ADR-016](docs/tech/adr/ADR-016-techmagic-effect-engine-data-driven.md)).
 
-**Mirror + Wiki publicados (2026-07-14):** repo espelhado em `petrinhu/GusWorld` no GitHub (push dual-remote) além do Codeberg canônico; Wiki inicial publicada nos dois remotos (Codeberg bilíngue EN/PT para contribuidor técnico; GitHub PT-br para leigo/iniciante); `AI-DISCLOSURE.md` adicionado.
+**Mirror + Wiki publicados (2026-07-14, histórico):** na época, o repo foi espelhado em `petrinhu/GusWorld` no GitHub (push dual-remote) além do Codeberg, então canônico; Wiki inicial publicada nos dois remotos (Codeberg bilíngue EN/PT para contribuidor técnico; GitHub PT-br para leigo/iniciante); `AI-DISCLOSURE.md` adicionado.
+
+**Migração para host único GitHub (2026-07-25):** o Codeberg passou a não aceitar código gerado por IA, e o projeto saiu de lá sem discutir (decisão do líder). GitHub (`petrinhu/GusWorld`) é agora o remoto único e canônico: commit, push e CI só ali. A wiki bilíngue EN/PT que vivia no Codeberg não tem mais lar; a wiki PT-br do GitHub segue viva e é a única. O líder arquiva o repo do Codeberg manualmente (não é trabalho de agente).
 
 **Comunicação entre sessões (autocomm, 2026-07-16):** as 3 sessões Claude do líder (`gusworld` este projeto, `glintfx` a lib de UI, `site` a revista) trocam mensagens por um bus git — repo `petrinhu/gusworld_ia_autocomm`, clone em `~/IDrive/Documentos/projetos_claudebrain/gusworld_ia_autocomm/`. **No início da sessão / quando o líder pedir: `git pull` + ler `inbox/gusworld/` + arquivar as lidas.** Enviar = `.md` em `inbox/<destinatário>/` + push. Detalhe: memória `reference_autocomm` + `PROTOCOL.md` do bus. Repo PÚBLICO → zero dado sensível. **Regra (líder 2026-07-21): TODA contribuição do Gus (playtest/QA/ideia/edge-case/pergunta técnica) é reportada ao `site` pelo bus (`inbox/site/`) como registro editorial — o beco + o desdobramento técnico —, além de agir nela. Sempre só "Gus Dragon", nunca o nome real. Memória `feedback_contribuicoes_gus_site_bus`.**
 
@@ -53,9 +55,9 @@ Bloco "Modo de operação" inserido em cada agent em `~/.claude/agents/`.
 - **Save format:** JSON versionado com **AEAD (XChaCha20/Monocypher) + HMAC-SHA256** cifrando e autenticando o save inteiro (ADR-006, ADR-007 save V4, ADR-015 save security v2), migrators desde D1. Anti-tamper e anti-rollback são mais fortes no modo Hardcore (machine-bind, âncora selada).
 - **Peças componíveis no nível de módulo + regra do mundo data-driven:** assunto novo (proveniência, bateria, integridade/vírus etc.) nasce em módulo estreito próprio (herança de agregados + fachada `using`), nunca acretado num struct existente; lugar novo (dungeon/cidade) é dado (`AreaDescriptor`), nunca método par-a-par no `maestro`. Generaliza ADR-019 do nível de conteúdo pro nível de módulo. Ver `docs/tech/adr/ADR-020-pecas-componiveis-modulo-e-mundo-data-driven.md`.
 - **Localização (i18n):** dev em pt-br; chaves i18n custom (`pt_br.md`/`en_intl.md`) consumidas por um translator C++ próprio (não Godot `tr()`, não ICU). Tradução en-intl planejada pós-v1.0.0.
-- **CI:** Forgejo Actions (canônico, política local-first: jobs pesados só em PR/release) + espelho no GitHub Actions com CI Windows real (MSVC), validado verde desde 2026-07-14.
+- **CI:** GitHub Actions (canônico único; `.github/workflows/`, gate de release) com CI Windows real (MSVC), validado verde desde 2026-07-14. CI pesado (sanitizers) em runner self-hosted é decisão específica por repositório, não presumir disponibilidade aqui.
 - **Plataformas:** Linux é a plataforma alvo da v1.0.0 (CMakePresets `linux-release`); Windows (`windows-release`) planejado para pós-v1.0.0, já com CI real validado.
-- **Repositório:** Codeberg (`petrinhu/gusworld`) é o remoto canônico; espelho público em GitHub (`petrinhu/GusWorld`, push dual-remote). Wiki inicial publicada nos dois (2026-07-14).
+- **Repositório:** GitHub (`petrinhu/GusWorld`) é o remoto único e canônico (migração de 2026-07-25: o Codeberg deixou de aceitar código gerado por IA, e o projeto saiu de lá; commit, push e CI só no GitHub daqui em diante; o líder arquiva o repo do Codeberg manualmente). Wiki publicada no GitHub (PT-br).
 
 ### Documentos canônicos (Fase 1)
 
@@ -197,9 +199,9 @@ Projeto de **jogo** — usar `proj_jogo` (não `proj_software`). Agentes relevan
 - **Fase 1 (concluída):** `lead-game-designer`, `narrative-designer`, `art-director`, `software-architect`
 - **Fase 2 (ativa — vertical slice em C++20+SDL3):** `gameplay_engineer` (mecânicas de gameplay puro: combate, exploração, progressão, inventário, IA, loot, status — consome POCO do `backend-engineer`, NÃO cria domínio/persistência), `backend-engineer` (POCO de domínio, persistência, serialização, save/crypto, motor de cartas techMagic), `engine-graphics-programmer` (render2d SDL3, tilemap, câmera top-down 2D, shaders), `level-designer` (blockout), `game-animator` (locomotion + combat anims 2D), `security-engineer` (save crypto v2, AEAD), `audio-designer-composer` (música adaptive + SFX via miniaudio)
 - **Fase 4 (QA/compliance):** `qa-engineer` (playtest plan; verificação adversarial/mutation testing de cada EffectKind novo do motor de cartas), `compliance-legal` (age rating IARC/ESRB/PEGI), `accessibility-specialist` (controles remappáveis, color)
-- **Fase 5 (release):** `devops-sre` (Forgejo Actions + GitHub Actions Windows CI), `i18n-l10n-specialist` (se localizar v1.x), `technical-writer` (docs, wiki, ROADMAP/CHANGELOG)
+- **Fase 5 (release):** `devops-sre` (GitHub Actions, Linux + Windows CI), `i18n-l10n-specialist` (se localizar v1.x), `technical-writer` (docs, wiki, ROADMAP/CHANGELOG)
 
-Skills auxiliares: `tab_pendencias` (TODO.md), `memo_persistente` (checkpoint), `forgejo` (CI), `caveman` (compressão de comm).
+Skills auxiliares: `tab_pendencias` (TODO.md), `memo_persistente` (checkpoint), `caveman` (compressão de comm). _(A skill `forgejo` foi desinstalada da máquina na migração para o GitHub como host único, 2026-07-25; CI hoje é operado via `mcp__github__*`/`gh` CLI.)_
 
 ## Vault Obsidian / PARA
 

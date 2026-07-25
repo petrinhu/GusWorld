@@ -53,8 +53,11 @@ resources/gus_baby/
 
 # Modelos 3D .glb (binarios pesados ~50-60MB cada; modelo IDrive, fora do git;
 # repo e publico e git-normal guardaria no historico pra sempre). Decisao do
-# lider 2026-07-02. Se um dia reintroduzir 3D e quiser versionar: Git LFS +
-# workaround Codeberg (lfs.sshtransfer never). Cross-ref candidata tinygltf.
+# lider 2026-07-02. Se um dia reintroduzir 3D e quiser versionar: Git LFS.
+# (O workaround `lfs.sshtransfer never`, que existia porque o LFS do Codeberg
+#  travava sobre SSH puro, deixou de ser necessario na migracao pro GitHub em
+#  2026-07-25 - a config local segue inofensiva, mas nao e mais requisito.)
+# Cross-ref candidata tinygltf.
 #
 # EXCECAO (decisao do lider 2026-07-25): os 3 modelos que ANTES viviam em
 # resources/pers_3d/ (tracked via LFS desde a decisao AC-E7 de 2026-07-14, "arte

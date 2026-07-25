@@ -328,7 +328,12 @@ set(GLINTFX_MODULE_DRAW2D    OFF CACHE BOOL "" FORCE)
 
 FetchContent_Declare(
     glintfx
-    GIT_REPOSITORY https://codeberg.org/petrinhu/glintfx
+    # MIGRADO DO CODEBERG PRO GITHUB em 2026-07-25 (o Codeberg passou a nao aceitar
+    # codigo escrito com auxilio de IA; o glintfx saiu de la e o repo antigo vira
+    # somente-leitura, o que quebraria este FetchContent). Troca conferida por
+    # evidencia, nao presumida: a tag v0.20.0 tem o MESMO sha nos dois hosts
+    # (9bfaabfa, apontando pro commit 0442dd15 que ja esta no nosso _deps).
+    GIT_REPOSITORY https://github.com/petrinhu/glintfx
     GIT_TAG        v0.20.0
     SOURCE_SUBDIR  glintfx
 )

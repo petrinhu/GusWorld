@@ -1,3 +1,4 @@
-# Codeberg / Forgejo funding metadata.
+# GitHub Sponsors / funding metadata (veio de .codeberg/FUNDING.yml na migracao
+# pro GitHub como host unico, 2026-07-25).
 # Doacao 100% opcional ("buy me a coffee and some AI tokens"). Decisao do lider 2026-06-21.
 custom: ["https://www.paypal.com/donate/?business=9XNZQ4RND67KL&no_recurring=0&currency_code=BRL"]

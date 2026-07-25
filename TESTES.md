@@ -125,7 +125,7 @@ cmake --build --preset linux-release   # presets ativam -Werror
 ### CI integration
 
 ```yaml
-# .forgejo/workflows/lint.yml (resumo, pós-ADR-008)
+# .github/workflows/lint.yml (resumo, pós-ADR-008; era .forgejo/ até a migração de 2026-07-25)
 - uses: actions/checkout@v4
   with:
     submodules: recursive

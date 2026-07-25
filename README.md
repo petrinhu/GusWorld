@@ -53,14 +53,14 @@ Full design detail lives in [`docs/design/pillars.md`](docs/design/pillars.md).
 GusWorld is built on a small, deliberately chosen set of open-source technologies:
 
 - **[SDL3](https://www.libsdl.org/)**: window, main loop, input, gamepad and audio device, at the single platform boundary of the engine.
-- **[glintfx](https://codeberg.org/petrinhu/glintfx)** ([GitHub](https://github.com/petrinhu/glintfx)): the UI/HUD engine, used in embed mode. It wraps [RmlUi](https://github.com/mikke89/RmlUi) 6.3 and a GL3 backend behind a clean, compose-only facade, so HTML/CSS-like menus and HUD (gradients, glow, data binding) render straight over the game's own OpenGL context.
+- **[glintfx](https://github.com/petrinhu/glintfx)**: the UI/HUD engine, used in embed mode. It wraps [RmlUi](https://github.com/mikke89/RmlUi) 6.3 and a GL3 backend behind a clean, compose-only facade, so HTML/CSS-like menus and HUD (gradients, glow, data binding) render straight over the game's own OpenGL context.
 - **[RmlUi](https://github.com/mikke89/RmlUi)**: the retained-mode UI library underneath glintfx, by [Michael R. P. Ragazzon (mikke89)](https://github.com/mikke89). See [Credits and acknowledgments](#credits-and-acknowledgments) for why we're so happy to be building on it.
 - **[miniaudio](https://miniaud.io/)**: single-header audio engine (music, SFX, fades), vendored in `GusEngine/third_party/`.
 - **[Monocypher](https://monocypher.org/)**: modern, auditable cryptography (AEAD) protecting save files.
 - **[Catch2](https://github.com/catchorg/Catch2)**: the test framework behind the engine's automated test suite.
 - A curated **toolkit of modern, header-only C++ libraries** ([glm](https://github.com/g-truc/glm), [EnTT](https://github.com/skypjack/entt), [Box2D](https://github.com/erincatto/box2d), [stb](https://github.com/nothings/stb), [fmt](https://github.com/fmtlib/fmt), and more) vendored in `GusEngine/third_party/`.
 
-The full story (what each dependency does, its license, and a proper thank-you) is in [`ACKNOWLEDGMENTS.md`](ACKNOWLEDGMENTS.md) and on the wiki's [Tech Stack & Credits](https://codeberg.org/petrinhu/gusworld/wiki/Tech-Stack-and-Credits) page.
+The full story (what each dependency does, its license, and a proper thank-you) is in [`ACKNOWLEDGMENTS.md`](ACKNOWLEDGMENTS.md) and on the wiki's [Créditos](https://github.com/petrinhu/GusWorld/wiki/Creditos) page (currently Portuguese-only).
 
 The engine (`GusEngine/`) is organized in four layers: `core/` and `domain/` are plain, framework-free C++ (POCO); `platform/` is the only layer that touches SDL3; `app/` is the GusWorld-specific game and screens layer.
 
@@ -84,7 +84,7 @@ cmake --build --preset linux-release
 ctest --preset linux-release
 ```
 
-Linux is the target platform for the v1.0.0 release; a Windows preset exists (`windows-release`) and is planned for a post-v1.0.0 release. Full details and troubleshooting on the wiki's [Building and Running](https://codeberg.org/petrinhu/gusworld/wiki/Building-and-Running) page.
+Linux is the target platform for the v1.0.0 release; a Windows preset exists (`windows-release`) and is planned for a post-v1.0.0 release. Full details and troubleshooting on the wiki's [Como Rodar e Compilar](https://github.com/petrinhu/GusWorld/wiki/Como-Rodar-e-Compilar) page (currently Portuguese-only).
 
 ## Roadmap
 
@@ -96,11 +96,11 @@ The project moves through a milestone board (M0 to M9) covering the engine port,
 - [CHANGELOG.md](CHANGELOG.md): release history (Keep a Changelog format).
 - [`docs/design/pillars.md`](docs/design/pillars.md): the five creative pillars.
 - [`docs/tech/adr/`](docs/tech/adr/): architecture decision records behind the engine's design choices.
-- Wiki: [Home](https://codeberg.org/petrinhu/gusworld/wiki/Home) · [Building and Running](https://codeberg.org/petrinhu/gusworld/wiki/Building-and-Running) · [Tech Stack & Credits](https://codeberg.org/petrinhu/gusworld/wiki/Tech-Stack-and-Credits) · [Contributing](https://codeberg.org/petrinhu/gusworld/wiki/Contributing).
+- Wiki: [Home](https://github.com/petrinhu/GusWorld/wiki) · [Como Rodar e Compilar](https://github.com/petrinhu/GusWorld/wiki/Como-Rodar-e-Compilar) · [Créditos](https://github.com/petrinhu/GusWorld/wiki/Creditos) (currently Portuguese-only; there is no dedicated Contributing page yet).
 
 ## Contributing
 
-GusWorld is a **solo project** and isn't accepting external pull requests during this development phase. Bug reports and feedback are always welcome via [Codeberg issues](https://codeberg.org/petrinhu/gusworld/issues). See the wiki's [Contributing](https://codeberg.org/petrinhu/gusworld/wiki/Contributing) page for details.
+GusWorld is a **solo project** and isn't accepting external pull requests during this development phase. Bug reports and feedback are always welcome via [GitHub issues](https://github.com/petrinhu/GusWorld/issues).
 
 **Issue policy:** only **technical** issues are accepted (bugs, build problems, crashes, documentation errors). Issues of a political, economic, philosophical, social or similar nature will be **closed or deleted without reply**. GusWorld is a work of fiction (see the [Fiction disclaimer](docs/design/roster-analogos/OBRA-DE-FICCAO-E-METODOLOGIA.md)); its design documents are not an invitation to real-world debate.
 
@@ -202,14 +202,14 @@ Detalhes completos de design em [`docs/design/pillars.md`](docs/design/pillars.m
 GusWorld é construído sobre um conjunto pequeno e deliberado de tecnologias open-source:
 
 - **[SDL3](https://www.libsdl.org/)**: janela, loop principal, input, gamepad e dispositivo de áudio, na única fronteira de plataforma da engine.
-- **[glintfx](https://codeberg.org/petrinhu/glintfx)** ([GitHub](https://github.com/petrinhu/glintfx)): o motor de UI/HUD, usado em embed mode. Ele embrulha o [RmlUi](https://github.com/mikke89/RmlUi) 6.3 e um backend GL3 atrás de uma fachada limpa e compose-only, permitindo que menus e HUD HTML/CSS-like (degradês, glow, data binding) renderizem direto sobre o mesmo contexto OpenGL do jogo.
+- **[glintfx](https://github.com/petrinhu/glintfx)**: o motor de UI/HUD, usado em embed mode. Ele embrulha o [RmlUi](https://github.com/mikke89/RmlUi) 6.3 e um backend GL3 atrás de uma fachada limpa e compose-only, permitindo que menus e HUD HTML/CSS-like (degradês, glow, data binding) renderizem direto sobre o mesmo contexto OpenGL do jogo.
 - **[RmlUi](https://github.com/mikke89/RmlUi)**: a biblioteca de UI retida por trás do glintfx, de [Michael R. P. Ragazzon (mikke89)](https://github.com/mikke89). Veja [Créditos e agradecimentos](#créditos-e-agradecimentos) pra entender por que estamos tão felizes de construir em cima dela.
 - **[miniaudio](https://miniaud.io/)**: motor de áudio single-header (música, SFX, fades), vendorizado em `GusEngine/third_party/`.
 - **[Monocypher](https://monocypher.org/)**: criptografia moderna e auditável (AEAD) protegendo os arquivos de save.
 - **[Catch2](https://github.com/catchorg/Catch2)**: o framework de testes por trás da suíte de testes automatizados da engine.
 - Um **kit selecionado de bibliotecas C++ modernas, header-only** ([glm](https://github.com/g-truc/glm), [EnTT](https://github.com/skypjack/entt), [Box2D](https://github.com/erincatto/box2d), [stb](https://github.com/nothings/stb), [fmt](https://github.com/fmtlib/fmt), entre outras) vendorizadas em `GusEngine/third_party/`.
 
-A história completa (o que cada dependência faz, sua licença, e um agradecimento como manda o figurino) está em [`ACKNOWLEDGMENTS.md`](ACKNOWLEDGMENTS.md) e na página [Tech Stack & Credits](https://codeberg.org/petrinhu/gusworld/wiki/Tech-Stack-and-Credits) da wiki.
+A história completa (o que cada dependência faz, sua licença, e um agradecimento como manda o figurino) está em [`ACKNOWLEDGMENTS.md`](ACKNOWLEDGMENTS.md) e na página [Créditos](https://github.com/petrinhu/GusWorld/wiki/Creditos) da wiki.
 
 A engine (`GusEngine/`) é organizada em quatro camadas: `core/` e `domain/` são C++ puro, sem framework (POCO); `platform/` é a única camada que toca SDL3; `app/` é a camada de jogo e telas específica do GusWorld.
 
@@ -233,7 +233,7 @@ cmake --build --preset linux-release
 ctest --preset linux-release
 ```
 
-Linux é a plataforma alvo do lançamento v1.0.0; existe um preset Windows (`windows-release`) planejado para um lançamento pós-v1.0.0. Detalhes completos e resolução de problemas na página [Building and Running](https://codeberg.org/petrinhu/gusworld/wiki/Building-and-Running) da wiki.
+Linux é a plataforma alvo do lançamento v1.0.0; existe um preset Windows (`windows-release`) planejado para um lançamento pós-v1.0.0. Detalhes completos e resolução de problemas na página [Como Rodar e Compilar](https://github.com/petrinhu/GusWorld/wiki/Como-Rodar-e-Compilar) da wiki.
 
 ### Roadmap
 
@@ -245,11 +245,11 @@ O projeto avança por um board de marcos (M0 a M9) cobrindo o porte da engine, o
 - [CHANGELOG.md](CHANGELOG.md): histórico de lançamentos (formato Keep a Changelog).
 - [`docs/design/pillars.md`](docs/design/pillars.md): os cinco pilares criativos.
 - [`docs/tech/adr/`](docs/tech/adr/): registros de decisão de arquitetura por trás das escolhas de design da engine.
-- Wiki: [Home](https://codeberg.org/petrinhu/gusworld/wiki/Home) · [Building and Running](https://codeberg.org/petrinhu/gusworld/wiki/Building-and-Running) · [Tech Stack & Credits](https://codeberg.org/petrinhu/gusworld/wiki/Tech-Stack-and-Credits) · [Contributing](https://codeberg.org/petrinhu/gusworld/wiki/Contributing).
+- Wiki: [Home](https://github.com/petrinhu/GusWorld/wiki) · [Como Rodar e Compilar](https://github.com/petrinhu/GusWorld/wiki/Como-Rodar-e-Compilar) · [Créditos](https://github.com/petrinhu/GusWorld/wiki/Creditos) (ainda não existe uma página dedicada de Contribuição).
 
 ### Contribuindo
 
-GusWorld é um **projeto solo** e não aceita pull requests externos nesta fase de desenvolvimento. Relatos de bug e feedback são sempre bem-vindos via [issues do Codeberg](https://codeberg.org/petrinhu/gusworld/issues). Veja a página [Contributing](https://codeberg.org/petrinhu/gusworld/wiki/Contributing) da wiki para detalhes.
+GusWorld é um **projeto solo** e não aceita pull requests externos nesta fase de desenvolvimento. Relatos de bug e feedback são sempre bem-vindos via [issues do GitHub](https://github.com/petrinhu/GusWorld/issues).
 
 **Política de issues:** somente issues **técnicos** são aceitos (bugs, problemas de build, crashes, erros de documentação). Issues de fundo político, econômico, filosófico, social ou de natureza similar serão **fechados ou excluídos sem resposta**. GusWorld é uma obra de ficção (veja o [Aviso de Ficção](docs/design/roster-analogos/OBRA-DE-FICCAO-E-METODOLOGIA.md)); seus documentos de design não são um convite a debate de mundo real.
 

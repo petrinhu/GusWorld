@@ -90,7 +90,7 @@ Depois que o slice provar o jogo, a engine atingir paridade jogável (M7, fechad
 - **Produção (`v0.5.x`-`v0.9.x`):** conteúdo completo, balanceamento, gates de a11y para v1.0.0.
 - **Beta (`v0.9.x`):** beta fechada, bug bash, localização en-intl (dev em pt-br; tradução pós-1.0).
 - **Release (`v1.0.0`):** Linux + Windows. Vol 1 (livro lore-bible) + Vol 2 (antologia narrativa).
-- **Wiki + doc para iniciante:** uma wiki inicial ("starter") já foi publicada em 2026-07-14 nos dois remotos (Codeberg, bilíngue EN/PT, foco técnico/contribuidor; GitHub, PT-br, foco leigo/iniciante). A versão completa e ainda mais didática, cobrindo tudo em detalhe (derivada de `docs/`, não duplica), fica para depois da tag de versão.
+- **Wiki + doc para iniciante:** uma wiki inicial ("starter") foi publicada em 2026-07-14; a edição técnica/bilíngue EN/PT viveu no Codeberg (hospedagem descontinuada nesta migração, 2026-07-25) e a edição PT-br focada em leigo/iniciante segue ativa no GitHub, que agora é o host único do projeto. A versão completa e ainda mais didática, cobrindo tudo em detalhe (derivada de `docs/`, não duplica), fica para depois da tag de versão.
 
 ---
 

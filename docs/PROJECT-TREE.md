@@ -76,9 +76,8 @@ gusworld/
 ├── resumo.pdf             # [gitignored] concept art/refs solto, local
 ├── .bigtech-porte         # [tracked] marcador de porte/ativação da constelação C-level (Cósimo)
 ├── .editorconfig          # [tracked] estilo de arquivo (indentação etc.)
-├── .codeberg/FUNDING.yml  # [tracked] config de funding do Codeberg
-├── .forgejo/workflows/ci.yml     # [tracked] CI canônico (Forgejo Actions, local-first)
-├── .github/workflows/windows.yml # [tracked] espelho CI GitHub Actions (Windows/MSVC real)
+├── .github/FUNDING.yml    # [tracked] config de funding (migrado de .codeberg/, 2026-07-25)
+├── .github/workflows/     # [tracked] CI canônico único desde 2026-07-25 (GitHub Actions; ci.yml + windows.yml/MSVC real)
 ├── .claude/               # [tracked, exceto .claude/local/] hooks (anti-em-dash, TDD guard), settings
 ├── docs/                  # ver seção "docs/" abaixo
 ├── GusEngine/              # ver seção "GusEngine/" abaixo, engine + jogo em C++20/SDL3
@@ -261,7 +260,7 @@ tools/
 ├── check.sh                  # gate local (build + smoke + arch-gate + i18n-parity + suite), o "CI da mesa"
 ├── asan_gate.sh                # gate de build com AddressSanitizer
 ├── crash_journal_check.sh       # checagem de journal de crash (systemd/coredump)
-├── linuxci_container.sh          # runner containerizado do CI Linux (Forgejo Actions local-first)
+├── linuxci_container.sh          # runner containerizado do CI Linux (política local-first; espelha .github/workflows/ci.yml)
 ├── winbuild_container.sh          # runner containerizado do CI Windows (cross MinGW ou validação)
 ├── i18n_parity.py                  # valida paridade de chaves entre pt_br.md e en_intl.md
 ├── gen_menu_ui_sfx.py               # síntese determinística (Pillow/wave, sem lib externa) dos blips de menu

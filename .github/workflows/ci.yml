@@ -1,44 +1,51 @@
 name: ci
 
-# CI do GusEngine (pos repivot C++/SDL3, ADR-008).
-# Escopo: build + testes da engine nova em GusEngine/. O legado Godot/C# (game/,
-# engine/) foi decommissionado no M8 (2026-07-22): nao existe mais no repo. Os
-# dados vivos que consumiam dali (translations/dialogues) ja vivem em resources/.
-# Tag pre-m8-godot-legacy preserva o legado por registro. Sem deploy.
+# CI do GusEngine (pos repivot C++/SDL3, ADR-008), portado do Forgejo/Codeberg
+# para o GitHub Actions (decisao do lider 2026-07-25: GitHub vira host unico,
+# Codeberg deixou de aceitar codigo gerado por IA). Escopo: build + testes da
+# engine em GusEngine/. O legado Godot/C# (game/, engine/) foi decommissionado
+# no M8 (2026-07-22): nao existe mais no repo. Sem deploy.
 #
-# Runner: codeberg-medium (global, estavel). NAO usar runs-on: docker (runner
-# individual claudio fica offline por dias). codeberg-small (4 GB / 5 min) e
-# insuficiente para compilar SDL3 do fonte + C++20 + Catch2.
-# Container: ghcr.io/catthehacker/ubuntu:act-latest (compat actions/setup-*).
+# Runner: ubuntu-latest (hospedado pelo GitHub, GRATUITO no plano publico).
+# NAO usar self-hosted: existe um runner self-hosted na maquina do lider, mas
+# ele e registrado no repositorio petrinhu/glintfx (label glintfx-heavy) e so
+# atende aquele repo - apontar pra ele aqui simplesmente nao funciona. Sem
+# container overlay (o ghcr.io/catthehacker/ubuntu:act-latest do Forgejo
+# existia pra imitar o ambiente do GitHub Actions dentro do runner do
+# Codeberg; no GitHub real o runner JA E esse ambiente, entao rodamos direto
+# em ubuntu-latest sem container).
 #
-# STACK (ADR-008): SDL3 + RmlUi + Catch2 entram via FetchContent (pin de tag,
-# compilados do fonte) - nao ha mais aqtinstall/Qt. As deps de BUILD do SDL (libs
-# de dev X11/Wayland/GL) sao instaladas por apt; o resto o FetchContent resolve.
+# STACK (ADR-008): SDL3 + RmlUi + Catch2 + glintfx entram via FetchContent
+# (pin de tag no CMakeLists.txt) - nao ha Qt/aqtinstall. As deps de BUILD do
+# SDL (libs de dev X11/Wayland/GL) sao instaladas por apt-get (com sudo: o
+# runner hospedado roda como usuario "runner", nao root); o resto o
+# FetchContent resolve.
 #
-# PRE-REQUISITO no Codeberg: habilitar a unidade "Actions" em
-# Settings > Repository do repo (nao vem ligada por default).
+# O job "windows" (MSVC real) fica em .github/workflows/windows.yml, mantido
+# a parte (nao mexer aqui).
 
 on:
   push:
     branches: [main]
     paths:
       - 'GusEngine/**'
-      - '.forgejo/workflows/ci.yml'
+      - '.github/workflows/ci.yml'
   pull_request:
     paths:
       - 'GusEngine/**'
-      - '.forgejo/workflows/ci.yml'
+      - '.github/workflows/ci.yml'
 
 concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: true
 
+permissions:
+  contents: read
+
 jobs:
   linux:
     name: Linux (gcc, Release)
-    runs-on: codeberg-medium
-    container:
-      image: ghcr.io/catthehacker/ubuntu:act-latest
+    runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
       - name: Checkout
@@ -47,12 +54,13 @@ jobs:
       # Toolchain de build + deps de DESENVOLVIMENTO do SDL3. O SDL3 e compilado do
       # fonte (FetchContent), entao precisa dos -dev de X11/Wayland/GL/xkb. Lista
       # derivada do README-linux do SDL3 (build dependencies). Sem isto, o configure
-      # do SDL quebra pedindo XCURSOR/XTEST/etc.
+      # do SDL quebra pedindo XCURSOR/XTEST/etc. sudo: o runner hospedado do GitHub
+      # roda os steps como usuario "runner" (nao root).
       - name: Install toolchain + SDL build deps
         run: |
           set -eux
-          apt-get update -qq
-          apt-get install -y --no-install-recommends \
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends \
             cmake ninja-build g++ build-essential git \
             python3 python3-pip python3-venv \
             libx11-dev libxext-dev libxrandr-dev libxcursor-dev libxi-dev \
@@ -80,8 +88,8 @@ jobs:
           fi
           echo "OK: nenhum include/namespace Qt/SDL/RmlUi/glintfx em core/ ou domain/."
 
-      # Cache dos fontes de FetchContent (_deps: SDL3, RmlUi, Catch2). Evita
-      # re-clonar a cada run. Chave amarrada ao CMakeLists (onde os pins vivem).
+      # Cache dos fontes de FetchContent (_deps: SDL3, RmlUi, glintfx, Catch2). Evita
+      # re-clonar/recompilar a cada run. Chave amarrada ao CMakeLists (onde os pins vivem).
       - name: Cache FetchContent deps
         uses: actions/cache@v4
         with:
@@ -120,9 +128,7 @@ jobs:
 
   asan:
     name: ASan/UBSan (core+domain+app)
-    runs-on: codeberg-medium
-    container:
-      image: ghcr.io/catthehacker/ubuntu:act-latest
+    runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
       - name: Checkout
@@ -131,8 +137,8 @@ jobs:
       - name: Install toolchain + SDL build deps
         run: |
           set -eux
-          apt-get update -qq
-          apt-get install -y --no-install-recommends \
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends \
             cmake ninja-build g++ build-essential git \
             python3 python3-pip python3-venv \
             libx11-dev libxext-dev libxrandr-dev libxcursor-dev libxi-dev \
@@ -190,89 +196,16 @@ jobs:
       # APP-ASAN-RMLUI-UBSAN (fechado 2026-07-10, commit ae10d61): patch vendorizado
       # (glintfx v0.9.1/rmlui-2cd28864-teardown-ub.patch) eliminou o UB de teardown do
       # RmlUi (vptr findings = 0). O leak residual (~6.5-6.8KB/153 allocs, one-time na
-      # criacao do 1o contexto GL, driver GLVND/EGL - libEGL_nvidia.so.LoadVendors
-      # neste host de dev) NAO se reproduz no CONTAINER real do CI: reproduzido
-      # byte-a-byte via `docker run ghcr.io/catthehacker/ubuntu:act-latest` (mesma
-      # imagem deste job) SEM Xvfb/DISPLAY/dev-dri (== ambiente real deste job) - o
-      # unico teste que abre GL real (save_load_menu_interaction_test.cpp) degrada
-      # GRACIOSAMENTE (SDL nao acha X11/Wayland/kmsdrm; "assertions: - none -" nos 4
-      # TEST_CASE do harness) e a suite fecha 0 leaks, exit 0 (4428 assertions/650
-      # test cases). LSAN_OPTIONS aqui e defensivo/consistente com o step platform/
-      # (mesmo arquivo de suppression, hoje so cobre AUD-MINIAUDIO-ALSA-LEAK) - NAO
-      # foi adicionada nenhuma linha nova a tools/lsan.supp pro leak GL/EGL porque ele
-      # nao ocorre nas condicoes reais deste job (nao ha frame real de CI pra provar
-      # um match estreito contra).
+      # criacao do 1o contexto GL, driver GLVND/EGL) NAO se reproduz no runner real
+      # sem X11/Wayland/dev-dri: o unico teste que abre GL real
+      # (save_load_menu_interaction_test.cpp) degrada GRACIOSAMENTE (SDL nao acha
+      # X11/Wayland/kmsdrm; "assertions: - none -" nos 4 TEST_CASE do harness) e a
+      # suite fecha 0 leaks, exit 0. LSAN_OPTIONS aqui e defensivo/consistente com o
+      # step platform/ (mesmo arquivo de suppression, hoje so cobre
+      # AUD-MINIAUDIO-ALSA-LEAK).
       - name: Test app/ under ASan/UBSan
         run: |
           set -eux
           ASAN_OPTIONS=detect_leaks=1 UBSAN_OPTIONS=print_stacktrace=1:halt_on_error=1 \
             LSAN_OPTIONS=suppressions=tools/lsan.supp \
             ./GusEngine/build/asan/app/tests/gusengine_app_tests
-
-# ---------------------------------------------------------------------------
-# ESBOCO ADIADO: job Windows (MSVC). Habilitar quando houver runner Windows
-# disponivel (Codeberg nao oferece runner Windows global; precisaria self-hosted
-# Windows ou GitHub Actions espelhado). Com SDL3 via FetchContent, o setup fica
-# MAIS simples que com Qt: nao ha aqtinstall; basta o toolchain MSVC + cmake.
-#
-#  windows:
-#    name: Windows (MSVC, Release)
-#    runs-on: windows            # TODO: runner Windows self-hosted
-#    timeout-minutes: 40
-#    steps:
-#      - uses: actions/checkout@v4
-#      - uses: ilammy/msvc-dev-cmd@v1
-#      - name: Configure / Build / Test
-#        working-directory: GusEngine
-#        run: |
-#          cmake --preset windows-release
-#          cmake --build --preset windows-release
-#          ctest --preset windows-release
-# ---------------------------------------------------------------------------
-
-# ---------------------------------------------------------------------------
-# ESBOCO ADIADO (NAO HABILITAR): job windows-cross (MinGW-w64, cross-compile).
-# WIN-CROSS-VALIDATE (2026-07-14) provou MANUALMENTE (via
-# tools/winbuild_container.sh, rodado uma vez fora da CI) que o GusEngine
-# cross-compila Linux->Windows x86_64 com o par g++-mingw-w64-x86-64-posix +
-# FreeType cross-compilado from-source (Ubuntu NAO empacota freetype-mingw).
-# Este job replicaria essa mesma prova a cada push, SEM sujar runner (o build
-# inteiro roda dentro do container, self-hosted, efemero por natureza do CI).
-#
-# Diferenca do job "windows" (MSVC) acima: aquele exige um runner Windows de
-# verdade; este cross-compila de dentro de um runner LINUX (self-hosted local,
-# "claudio" - CI-POLICY-LOCAL-FIRST), sem precisar de maquina Windows nenhuma.
-# Produz um .exe que ainda NAO roda nesta CI (sem Wine/runner Windows pra
-# executar ctest --preset windows-mingw) - so PROVA que compila. Rodar o .exe
-# de verdade (Windows real ou Wine) fica pra uma onda futura (ver TODO.md).
-#
-# DECISAO ABERTA PRO LIDER (wire desta CI, nao decidida nesta onda):
-#   (a) imagem definitiva do job: ghcr.io/catthehacker/ubuntu:act-latest (a
-#       mesma usada na prova manual E no job "linux" acima - consistencia,
-#       mas builda FreeType from-source TODA vez, ~alguns minutos a mais por
-#       run) x fedora:42 (CI-POLICY-LOCAL-FIRST; Fedora empacota
-#       mingw64-freetype pronto via dnf, dispensaria o bloco
-#       git-clone+cmake+build do FreeType - mais rapido, mas diverge da imagem
-#       do resto do CI e exigiria ajustar o toolchain file pros nomes de
-#       pacote/paths do Fedora, ex. /usr/x86_64-w64-mingw32/sys-root/mingw em
-#       vez de /usr/x86_64-w64-mingw32).
-#   (b) gatilho: todo push (paridade com o job "linux") x so em PR pra
-#       main/release (CI-POLICY-LOCAL-FIRST: "CI pesado so em PR->main/release")
-#       x manual (workflow_dispatch, mais barato, roda so quando alguem pedir).
-#
-#  windows-cross:
-#    name: Windows x86_64 (MinGW-w64 cross-compile, sem execucao)
-#    runs-on: docker              # runner self-hosted local "claudio"
-#    container:
-#      image: ghcr.io/catthehacker/ubuntu:act-latest   # ou fedora:42, ver decisao acima
-#    timeout-minutes: 40
-#    steps:
-#      - uses: actions/checkout@v4
-#      - name: Cross-build Windows (MinGW-w64) via script reprodutivel
-#        run: bash tools/winbuild_container.sh
-#        # NOTA: o script acima abre o SEU PROPRIO `docker run --rm` (pensado
-#        # pra rodar fora da CI, num host qualquer). Dentro de um job que JA
-#        # esta rodando no container act-latest, o passo equivalente seria
-#        # inlinar o corpo do script diretamente (sem docker-in-docker) -
-#        # ajustar quando este job for habilitado de verdade.
-# ---------------------------------------------------------------------------

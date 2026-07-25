@@ -54,7 +54,7 @@ Every character built from this roster is a **fictional construct**. Their perso
 
 All figures whose real names are used in this roster are **deceased**, and are used here as **inspiration and homage** to their real, documented, historical contributions (see [Sources and attribution](#sources-and-attribution) below). One additional figure in the roster, "Helion Tusk", is a wholly fictional character whose archetype draws inspiration from a **living** contemporary public figure; that figure's real name and likeness are **deliberately not used** in the game itself (see [A note on the one living inspiration](#a-note-on-the-one-living-inspiration) below).
 
-No defamation, disparagement or misrepresentation of any real person, living or deceased, is intended by this project. If you are, or represent, a person referenced in this roster (or their estate) and have a concern about how a specific character is portrayed, please open an issue on the project's [Codeberg tracker](https://codeberg.org/petrinhu/gusworld/issues), we take such concerns seriously and will review them promptly.
+No defamation, disparagement or misrepresentation of any real person, living or deceased, is intended by this project. If you are, or represent, a person referenced in this roster (or their estate) and have a concern about how a specific character is portrayed, please open an issue on the project's [GitHub tracker](https://github.com/petrinhu/GusWorld/issues), we take such concerns seriously and will review them promptly.
 
 This notice is a plain-language disclosure of intent and process. It is not, and should not be read as, formal legal advice for any specific jurisdiction.
 
@@ -176,7 +176,7 @@ Every figure in this roster is included because their real, documented work chan
 
 ## Questions or concerns
 
-This is a solo, freeware, non-commercial passion project (see the main [README](../../../README.md)). If you are a descendant, estate representative, or anyone with a good-faith concern about how a specific figure is portrayed in this roster, please open an issue on [Codeberg](https://codeberg.org/petrinhu/gusworld/issues); concerns will be reviewed and, where warranted, the portrayal will be adjusted or removed.
+This is a solo, freeware, non-commercial passion project (see the main [README](../../../README.md)). If you are a descendant, estate representative, or anyone with a good-faith concern about how a specific figure is portrayed in this roster, please open an issue on [GitHub](https://github.com/petrinhu/GusWorld/issues); concerns will be reviewed and, where warranted, the portrayal will be adjusted or removed.
 
 **Issue policy.** Only **technical** issues are accepted (bugs, build problems, crashes, documentation errors) plus the good-faith portrayal concerns described above. **Issues of a political, economic, philosophical, social or similar nature will be closed or deleted without reply.** This game is a work of fiction; its design documents are not an invitation to real-world debate, and the repository's issue tracker will not host one.
 
@@ -196,7 +196,7 @@ Todo personagem construído a partir deste roster é uma **construção ficciona
 
 Todas as figuras cujo nome real é usado neste roster estão **falecidas**, e são usadas aqui como **inspiração e homenagem** às suas contribuições reais, documentadas e históricas (veja [Fontes e atribuição](#fontes-e-atribuição) abaixo). Uma figura adicional do roster, "Helion Tusk", é um personagem inteiramente fictício cujo arquétipo se inspira numa figura pública contemporânea **viva**; o nome real e a imagem dessa pessoa **deliberadamente não são usados** no jogo em si (veja [Uma nota sobre a única inspiração viva](#uma-nota-sobre-a-única-inspiração-viva) abaixo).
 
-Nenhuma difamação, desmerecimento ou deturpação de qualquer pessoa real, viva ou falecida, é pretendida por este projeto. Se você é, ou representa, uma pessoa referenciada neste roster (ou seu espólio) e tem uma preocupação sobre como um personagem específico é retratado, por favor abra uma issue no [rastreador do Codeberg](https://codeberg.org/petrinhu/gusworld/issues) do projeto: levamos essas preocupações a sério e vamos revisá-las prontamente.
+Nenhuma difamação, desmerecimento ou deturpação de qualquer pessoa real, viva ou falecida, é pretendida por este projeto. Se você é, ou representa, uma pessoa referenciada neste roster (ou seu espólio) e tem uma preocupação sobre como um personagem específico é retratado, por favor abra uma issue no [rastreador do GitHub](https://github.com/petrinhu/GusWorld/issues) do projeto: levamos essas preocupações a sério e vamos revisá-las prontamente.
 
 Este aviso é uma divulgação em linguagem simples de intenção e processo. Não é, e não deve ser lido como, aconselhamento jurídico formal para nenhuma jurisdição específica.
 
@@ -338,7 +338,7 @@ Cada figura deste roster está incluída porque seu trabalho real e documentado 
 
 ## Dúvidas ou preocupações
 
-Este é um projeto solo, freeware, sem fins comerciais (veja o [README](../../../README.md) principal). Se você é descendente, representante de espólio, ou qualquer pessoa com uma preocupação de boa-fé sobre como uma figura específica é retratada neste roster, por favor abra uma issue no [Codeberg](https://codeberg.org/petrinhu/gusworld/issues); as preocupações serão revisadas e, quando justificado, o retrato será ajustado ou removido.
+Este é um projeto solo, freeware, sem fins comerciais (veja o [README](../../../README.md) principal). Se você é descendente, representante de espólio, ou qualquer pessoa com uma preocupação de boa-fé sobre como uma figura específica é retratada neste roster, por favor abra uma issue no [GitHub](https://github.com/petrinhu/GusWorld/issues); as preocupações serão revisadas e, quando justificado, o retrato será ajustado ou removido.
 
 **Política de issues.** Somente issues **técnicos** são aceitos (bugs, problemas de build, crashes, erros de documentação), além das preocupações de boa-fé sobre retrato descritas acima. **Issues de fundo político, econômico, filosófico, social ou de natureza similar serão fechados ou excluídos sem resposta.** Este jogo é uma obra de ficção; seus documentos de design não são um convite a debate de mundo real, e o rastreador de issues do repositório não vai hospedar um.
 

@@ -1,10 +1,16 @@
 #!/usr/bin/env bash
 # linuxci_container.sh - CI-POLICY-LOCAL-FIRST: gemeo Linux do winbuild_container.sh.
 #
-# Reproduz o job "Linux (gcc, Release)" do .forgejo/workflows/ci.yml DENTRO de um
-# container efemero fedora:44, para uso enquanto o Codeberg (e o CI Forgejo dele)
-# esta fora do ar. Mesma regra suprema do irmao Windows: host limpo, nada sai do
-# container.
+# Reproduz o job "Linux (gcc, Release)" do CI (.github/workflows/ci.yml) DENTRO de
+# um container efemero fedora:44, para rodar o gate COMPLETO na maquina sem gastar
+# minuto de CI nem round-trip de PR. Mesma regra suprema do irmao Windows: host
+# limpo, nada sai do container.
+#
+# (Ate 2026-07-25 este script existia "enquanto o Codeberg estivesse fora do ar" e
+#  espelhava .forgejo/workflows/ci.yml. O projeto migrou pro GitHub como host unico
+#  porque o Codeberg passou a nao aceitar codigo escrito com auxilio de IA, entao o
+#  motivo do script mudou: nao e mais contingencia de host instavel, e a politica
+#  CI-POLICY-LOCAL-FIRST - build pesado roda local, o CI remoto e o gate de PR.)
 #
 #   - UM UNICO `docker run --rm`: dnf, configure, build, ctest, gates - tudo
 #     acontece dentro do container, que morre ao sair (--rm).
@@ -16,7 +22,7 @@
 #   - TMPDIR do build tambem fica dentro do container (/build/tmp), nao usa o /tmp
 #     do host.
 #
-# Estagios (espelham .forgejo/workflows/ci.yml job "linux" + tools/check.sh):
+# Estagios (espelham o job "linux" do .github/workflows/ci.yml + tools/check.sh):
 #   1) DNF_DEPS        - toolchain + deps de build do SDL3/RmlUi/glintfx (GL/X11/etc)
 #   2) ARCH_GATE_PRE   - gate de arquitetura (roda cedo, antes de gastar build - mesma
 #                        ordem do ci.yml: falha rapido se Qt/SDL/RmlUi/glintfx vazou
