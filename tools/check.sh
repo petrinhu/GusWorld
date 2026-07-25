@@ -125,6 +125,21 @@ CTEST_LOG="$ENGINE/build/$PRESET/last_ctest.log"
 SUITE=0
 if [ "$BUILD" = "0" ]; then
     set +e
+    # XDG_RUNTIME_DIR ISOLADO (2026-07-24, achado do glintfx via bus - o furo que sobrou
+    # no 1o conserto): forcar SDL_VIDEODRIVER=x11 e unsetar WAYLAND_DISPLAY **NAO ISOLA**.
+    # `wl_display_connect(NULL)` - que QUALQUER dependencia do processo pode chamar, nao so
+    # o nosso codigo - cai no nome EMBUTIDO "wayland-0" e resolve dentro do
+    # $XDG_RUNTIME_DIR; unsetar a variavel de backend so tira o OVERRIDE, o fallback pelo
+    # nome fixo continua achando o socket da sessao VIVA do usuario (eles levaram a mordida:
+    # janela na sessao real por 2-3 min com o display aninhado ja provado). O conserto que
+    # fecha e apontar o XDG_RUNTIME_DIR pra um dir PROPRIO e VAZIO (sem socket wayland-0 pra
+    # o fallback encontrar), so no processo sob teste. Fica dentro do build dir (descartavel,
+    # nunca contem socket) em vez de mktemp, o que evita de quebra a armadilha de limpeza que
+    # eles relataram (trap ... RETURN nao dispara quando `set -e` aborta pela falha do
+    # proprio comando - justamente o caminho de teste FALHANDO).
+    _suite_xdg="$ENGINE/build/$PRESET/.suite_xdg_runtime"
+    mkdir -p "$_suite_xdg" && chmod 700 "$_suite_xdg"
+
     # DISPLAY ISOLADO (2026-07-24, F4-GL-TESTS-SILENT-DEGRADE / achado do QA F4-1b.4):
     # alguns testes de interacao (app/tests/*_interaction_test) abrem contexto GL REAL
     # via glintfx::UiLayer. Sem isolar, o ctest herda o DISPLAY=:0 / WAYLAND_DISPLAY da
@@ -152,10 +167,17 @@ if [ "$BUILD" = "0" ]; then
     # de um grep depois resetava PIPESTATUS e mascarava falha -> verde cego).
     if [ -n "$_suite_disp" ]; then
         ( cd "$ENGINE" && env -u WAYLAND_DISPLAY DISPLAY="$_suite_disp" SDL_VIDEODRIVER=x11 \
+            XDG_RUNTIME_DIR="$_suite_xdg" XDG_SESSION_TYPE=x11 \
+            DBUS_SESSION_BUS_ADDRESS="unix:path=$_suite_xdg/no-dbus" \
             ctest --preset "$PRESET" 2>&1 ) | tee "$CTEST_LOG" >/dev/null
     else
         # sem display isolado: NUNCA rodar GL no :0 vivo -> offscreen (GL degrada).
+        # O XDG_RUNTIME_DIR proprio vai TAMBEM aqui: sem ele, uma dependencia que chame
+        # wl_display_connect(NULL) ainda acharia o wayland-0 da sessao viva mesmo com o
+        # DISPLAY vazio (o fallback e por nome fixo dentro do runtime dir, nao por DISPLAY).
         ( cd "$ENGINE" && env -u WAYLAND_DISPLAY DISPLAY= SDL_VIDEODRIVER=offscreen \
+            XDG_RUNTIME_DIR="$_suite_xdg" XDG_SESSION_TYPE=x11 \
+            DBUS_SESSION_BUS_ADDRESS="unix:path=$_suite_xdg/no-dbus" \
             ctest --preset "$PRESET" 2>&1 ) | tee "$CTEST_LOG" >/dev/null
     fi
     SUITE=${PIPESTATUS[0]}

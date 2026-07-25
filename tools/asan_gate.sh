@@ -160,8 +160,24 @@ if [ ! -d "$TEST_DIR" ]; then
     exit 1
 fi
 
+# ISOLAMENTO DE DISPLAY (2026-07-24, achado do glintfx via bus + principio 2.4 deles: "o
+# isolamento pertence a quem EXECUTA, nao a quem chama"). Hoje o TEST_REGEX default
+# (deck|save|combat|invariants|lifetime) so casa teste POCO de dominio, que nao abre janela
+# - mas o regex e SOBREPONIVEL por GUSWORLD_ASAN_TEST_REGEX, e este gate roda a CADA PUSH.
+# Se um dia alguem apontar o regex pra um teste de interacao GL, ele abriria contexto
+# grafico na sessao VIVA do usuario (a classe de incidente que ja travou o touchpad dele).
+# Fechar aqui e barato e nao depende de ninguem lembrar. Mesmo racional do tools/check.sh:
+# XDG_RUNTIME_DIR proprio e VAZIO (senao wl_display_connect(NULL) acha o "wayland-0"
+# embutido dentro do runtime dir da sessao real, mesmo com WAYLAND_DISPLAY unsetado) +
+# SDL_VIDEODRIVER=offscreen (o gate nao precisa de GL de verdade, so de nao tocar o :0).
+_asan_xdg="$TEST_DIR/.asan_gate_xdg_runtime"
+mkdir -p "$_asan_xdg" && chmod 700 "$_asan_xdg"
+
 set +e
-CTEST_OUT="$(ctest --test-dir "$TEST_DIR" -R "$TEST_REGEX" --output-on-failure 2>&1)"
+CTEST_OUT="$(env -u WAYLAND_DISPLAY DISPLAY= SDL_VIDEODRIVER=offscreen \
+    XDG_RUNTIME_DIR="$_asan_xdg" XDG_SESSION_TYPE=x11 \
+    DBUS_SESSION_BUS_ADDRESS="unix:path=$_asan_xdg/no-dbus" \
+    ctest --test-dir "$TEST_DIR" -R "$TEST_REGEX" --output-on-failure 2>&1)"
 SUITE_RC=$?
 set -e
 echo "$CTEST_OUT"
