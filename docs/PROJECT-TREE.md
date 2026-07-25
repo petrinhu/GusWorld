@@ -211,20 +211,30 @@ resources/
 ├── prompts_images/         # [tracked] prompts de geração de imagem (nano banana / PixelLab), prosa auto-contida
 │   ├── feitos/               # os 170 prompts já executados (curados)
 │   └── <categoria>/           # [PENDÊNCIA DE HIGIENE: várias vazias, estado "drenado pra feitos/", ver seção Órfãos]
-├── glb/                    # modelos 3D (~50-60MB cada), arte conceitual, fora de escopo 2D atual. Gitignored EXCETO 3 arquivos: Gus.glb, Gus_movimento.glb e Yakov.glb são TRACKED via LFS (vieram de pers_3d/ em 2026-07-25, decisão do líder)
+├── glb/                    # modelos 3D (~50-60MB cada), arte conceitual, fora de escopo 2D atual. Gitignored EXCETO 2 arquivos: Gus.glb e Gus_movimento.glb são TRACKED via LFS (vieram de pers_3d/ em 2026-07-25, decisão do líder)
 ├── vfx/                      # frames de VFX pré-renderizado; só boot_pixel/ é tracked (exceção do .gitignore), resto gitignored
 └── livros/                    # [gitignored inteiro, ~943MB] corpus RAG (bibliografia de referência), indexado via `rag`
 ```
 
-**`pers_3d/` não existe mais (2026-07-25).** O líder juntou tudo em `glb/`, e os
-3 modelos que estavam versionados (`Gus.glb`, `Gus_movimento.glb`, `Yakov.glb`,
-arte conceitual destinada aos livros/book, ver `docs/book/`) continuam **tracked
-via Git LFS** no lugar novo, por exceção explícita no `.gitignore` (padrão da casa:
-un-ignore o dir → re-ignore o conteúdo → un-ignore os arquivos escolhidos). O git
-registrou a mudança como **rename puro** e o oid do LFS é o mesmo, então **nada de
-peso novo** entrou no storage. Os demais `.glb` da pasta (`gus.glb` 58MB,
-`heliaco_vyr.glb` 55MB) seguem **fora do git** pela decisão de 2026-07-02 (repo
-público; git guardaria no histórico pra sempre) — versioná-los é decisão separada.
+**`pers_3d/` não existe mais (2026-07-25).** O líder juntou tudo em `glb/`. Dos 3
+modelos que vinham versionados de lá, **2 continuam tracked via Git LFS**
+(`Gus.glb` e `Gus_movimento.glb`, arte conceitual destinada aos livros/book, ver
+`docs/book/`), por exceção explícita no `.gitignore` (padrão da casa: un-ignore o
+dir → re-ignore o conteúdo → un-ignore os arquivos escolhidos). O git registrou a
+mudança como **rename puro** e o oid do LFS é o mesmo, então **nada de peso novo**
+entrou no storage.
+
+⚠️ **Lição registrada no mesmo dia:** a exceção casa por **nome exato**, então
+renomear o arquivo a tira do versionamento **em silêncio**. Foi o que aconteceu com
+o `Yakov.glb`: renomeado para `yakov.glb` minúsculo horas depois, voltou a ser
+ignorado sem nenhum aviso, e o líder optou por deixá-lo fora do git de vez (o
+conteúdo antigo segue recuperável no histórico via LFS). Quem renomear um `.glb`
+versionado precisa atualizar a exceção junto, ou o arquivo some do git calado.
+
+Todos os demais `.glb` da pasta (`yakov.glb`, `gus.glb`, `brunus.glb`,
+`pyotor.glb`, `heliaco_vyr.glb`, `gus_com_antena_aparelho.glb`, somando ~350MB)
+estão **fora do git** pela decisão de 2026-07-02 (repo público; o git guardaria no
+histórico pra sempre). Versioná-los é decisão separada, não tomada.
 
 ## `assets/` (raiz, não confundir com `GusEngine/assets/`)
 

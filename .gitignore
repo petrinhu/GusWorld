@@ -73,7 +73,11 @@ resources/gus_baby/
 resources/glb/*
 !resources/glb/Gus.glb
 !resources/glb/Gus_movimento.glb
-!resources/glb/Yakov.glb
+# (o Yakov.glb tinha excecao aqui e foi REMOVIDA em 2026-07-25: o lider renomeou o
+#  arquivo pra `yakov.glb` MINUSCULO no mesmo dia, e a excecao por nome exato deixou
+#  de casar - o arquivo voltou a ser ignorado em silencio. Em vez de reescrever a
+#  excecao pro nome novo, o lider optou por deixa-lo fora do git, como os demais .glb
+#  da pasta. O conteudo antigo segue recuperavel no historico via LFS.)
 
 # Manual privado dos easter eggs (NUNCA publicar: mata o segredo)
 docs/_secret/

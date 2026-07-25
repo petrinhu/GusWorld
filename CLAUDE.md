@@ -145,7 +145,7 @@ gusworld/
 │   ├── maps/             # mapas .gmap
 │   ├── translations/     # fonte VIVA do i18n (pt_br.md/en_intl.md) + gate de paridade do CI
 │   ├── dialogues/        # diálogos VIVOS (.dlg.txt), consumidos pelo runtime de diálogo POCO
-│   ├── glb/              # arte conceitual 3D (.glb) para os livros futuros; gitignored EXCETO Gus/Gus_movimento/Yakov (tracked via LFS)
+│   ├── glb/              # arte conceitual 3D (.glb) para os livros futuros; gitignored EXCETO Gus.glb e Gus_movimento.glb (tracked via LFS; a exceção casa por NOME EXATO, renomear tira do git em silêncio)
 │   ├── images/, vfx/
 ├── assets/              # áudio VIVO do jogo (música + SFX, carregado via GUSWORLD_SFX_DIR/GUSWORLD_MUSIC_DIR)
 └── build/               # outputs export legados
