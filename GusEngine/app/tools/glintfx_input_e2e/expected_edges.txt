@@ -1,0 +1,17 @@
+# F4-2.5 - sequencia esperada de transicoes (dx dy run), UMA por linha, na ORDEM em
+# que o roteiro de run_e2e.sh injeta teclas (ver o array ROTEIRO la - 10 eventos
+# xdotool, 1:1 com as 10 linhas nao-comentario abaixo). Comparado byte-a-byte pelo
+# script contra as linhas "EDGE ... dx=X dy=Y run=Z" de probe.log (so os 3 campos).
+# Mapeamento de acao (fabrica, ver domain/src/input/controls_restore.cpp): W=move_forward
+# (dy-1), S=move_backward (dy+1), A=move_left (dx-1), D=move_right (dx+1),
+# Shift_L=move_run.
+0 -1 0
+1 -1 0
+1 0 0
+1 0 1
+0 0 1
+0 0 0
+0 1 0
+-1 1 0
+-1 0 0
+0 0 0

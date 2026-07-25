@@ -1,0 +1,6 @@
+/* main.rcss (F4-2.5, tracked). body preenche a janela; sem texto, sem fonte. */
+body {
+  width: 100%;
+  height: 100%;
+  background-color: #202020;
+}

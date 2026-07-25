@@ -1,0 +1,9 @@
+<!--
+main.rml (F4-2.5, tracked). Documento MINIMO carregado via glintfx::App::load() so
+para exercitar o load() dentro do fio real - SEM texto, SEM @font-face: esta fatia
+prova o INPUT, nao a UI/fonte (zero dependencia de assets/fontes).
+-->
+<rml>
+<head><link type="text/rcss" href="main.rcss"/></head>
+<body></body>
+</rml>
