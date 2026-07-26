@@ -2,6 +2,8 @@
 
 > **Status:** COMPLETO. **Gus = DEFINIDO pelo criador (2026-07-13/14). Cauã "Volt", Jaci "Proxy", Bento "Requiem", Iara "Lumen", Linda "Siren" e Dante "Grid" = guias de voz bilíngues pt-br/en-intl definidos (2026-07-18).** As 6 vozes dos companions + a voz do Gus estão todas fixadas. Este doc fixa personalidade + padrões de fala; a redação final dos diálogos é do `narrative-writer` (cross-ref `guia-dialogos.md`, `reference_guia_dialogos`).
 >
+> ⚠ **Este arquivo guarda BANTER de caminhada e descanso** (trocas de 4 a 8 falas, não disparadas por evento). As **farpas curtas de par, disparadas por evento de jogo** (cast lento, dano alto, loot, colisão de efeitos) vivem em [`farpas-linguagens.md`](farpas-linguagens.md), aprovadas uma a uma pelo criador em 2026-07-26. Antes de escrever fala nova, **cheque os dois** para não duplicar.
+>
 > **Âncoras:** Pillar 4 (Gus prodígio analítico, 11 anos canônico), `sinopse.md` §3-4, `characters/gus.md`, família Vance ([[project_familia_vance_canonica]]), codinome de combate "Dragon" ([[project_nome_gus_canon]], [[project_dragon_victory_canon]]), guia de diálogos (voz por linguagem-âncora).
 
 ## GUS (definido pelo criador)

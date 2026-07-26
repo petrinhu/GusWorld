@@ -67,6 +67,8 @@
 | **Cauã × Bento** | Velocidade vs cálculo. | Equipe sólida em combate (Bento bloqueia, Cauã contra). |
 | **Iara × Linda** | Estetização vs anti-estetização. | Aliança operacional, não pessoal. |
 | **Iara × Jaci** | Ilusão vs verdade orgânica. | Aliança fundada em ato (Iara salva Jaci). |
+| **Cauã × Iara** | Iteração barata e quente vs decisão cara e definitiva (Pythia vs Óxido, sem intermediário). | Sem vencedor fixo. Só existe com o Gus fora do grupo, e os dois chegam sozinhos a conclusões que favorecem o ausente. |
+| **Jaci × Linda** | As duas contam o tempo inteiro por motivos opostos: Linda pra frente para sincronizar, Jaci pra trás para conferir. Nenhuma percebeu que a outra também conta. | Desencontro, não briga. Trégua na vitória sem baixas. |
 | **Bento × Dante** | Asmódico autêntico vs Asmódico-fake. | Intuição Bento; reveal climax. |
 | **Jaci × Dante** | Bio-leitura silenciosa. | Distância mútua; reveal climax. |
 
