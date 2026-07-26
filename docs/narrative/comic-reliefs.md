@@ -143,7 +143,7 @@ GUS
 Mas o Pythia da Jaci aceita os do...
 
 BENTO
-PYTHIA NEM VIRA MÁQUINA. Pythia é POESIA, não engenharia.
+PYTHIA SEQUER COMPILA. Pythia é POESIA, não engenharia.
 
 [JACI passa por trás carregando ampolas. Pausa.]
 
@@ -158,7 +158,7 @@ Eu ouvi. Use o que você quiser. Pythia te entende.
 
 **Notas de leitura (decisões do criador, 2026-07-26):**
 
-- **A fala do Bento é "NEM VIRA MÁQUINA", não "sequer compila".** A redação anterior era falsa ao pé da letra (Pythia compila para bytecode) e verdadeira só no que importa. Como o público inclui criança aprendendo programação, e um personagem respeitado dizendo uma falsidade técnica é a classe de frase que gruda, a fala foi ajustada para ficar correta **sem perder o soco nem a substância**: na visão do Bento, Pythia não vira máquina. A [Cena 15](#cena-15-pergunta-amanhã-o-cauã-descobre) depende dessa substância, e não da redação exata.
+- **"PYTHIA SEQUER COMPILA" é ERRO DELIBERADO do Bento. NÃO CORRIGIR.** Ao pé da letra a frase é falsa (Pythia compila para bytecode). Ela fica **porque o Bento é um garoto de 14 anos em surto retórico, defendendo diante do grupo a linguagem que é a identidade dele**, e não um manual. A frase anterior dele ("cada espaço que você digita é um soluço na alma do compilador-mestre") já marca o registro: quem fala assim não faz ressalva técnica. **O certo é ensinado na própria cena, por contraponto:** a Jaci responde na hora ("use o que você quiser, Pythia te entende") e ele finge não ter ouvido. Uma versão tecnicamente correta desta fala seria uma frase que o Bento não diria. _(Registro honesto: em 2026-07-26 esta fala chegou a ser trocada por "PYTHIA NEM VIRA MÁQUINA" e o criador **reverteu no mesmo dia**, por este motivo. Se você acha que achou um bug aqui, leia a regra dos pesos 5 e 2 em "Regras de tom" antes de mexer.)_ A [Cena 15](#cena-15-pergunta-amanhã-o-cauã-descobre) depende da **substância** desta fala, não da redação, e sobreviveu ao ajuste e à reversão sem retrabalho.
 - **A tabulação do Asmódico é liberdade deste mundo, não erro.** Assembly real não é sensível a tabulação (isso é Python e Makefile), mas **Asmódico não é assembly**: é o análogo dele aqui, e tem regra própria. Registrado para ninguém "corrigir" esta cena no futuro achando que achou um bug.
 
 ---
@@ -580,6 +580,25 @@ Adicionar conforme o arco progride. Limite: máximo 1 cena cômica por capítulo
 - **Sterling NUNCA é cômico.** Mantém a frieza ameaçadora. Comédia em torno dele é sempre satirizando a propaganda dele.
 - **Patch-Zero NUNCA é cômico.** Terror puro.
 - **Linguagem profana zero** (Pillar 4.3). "Que horror" é o palavrão máximo.
+
+### Conceito correto x personagem defendendo o que pensa (regra dos pesos, criador 2026-07-26)
+
+**A regra é ensinar o certo.** Sempre que possível, e é o que o jogo entrega na maior parte das vezes.
+
+**A exceção:** quando aparecem **pontas soltas, falhas de sincronia ou de congruência** com conceitos sólidos, entra o argumento das **crianças disputando espaço**. Elas erram. São humanas, não são computadores, e criança tem mais margem para dissonância cognitiva: defende o que pensa mesmo quando no fundo sabe que está errada, porque precisa de engajamento social. Essa exceção **traz alma aos personagens** e costuma ser o que costura pontas soltas do canon.
+
+**Os pesos, para decidir no caso concreto:**
+
+| O que está em jogo | Peso |
+|---|---|
+| Conceito correto | **5** |
+| Tentativa social de manter o argumento (personagem defendendo o que pensa) | **2** |
+
+Ou seja: o certo ganha por mais de dois para um, e **não se escreve fala errada por preguiça ou por efeito fácil**. Mas quando o erro do personagem serve para dar alma, marcar quem ele é diante do grupo, ou costurar uma incongruência que já existia, ele **fica** e vira material.
+
+**Corolário prático, para quem for revisar canon:** achar um erro técnico na boca de um personagem **não é autorização para corrigi-lo**. Verifique primeiro se o certo é ensinado ali por contraponto (outro personagem responde, o resultado desmente, a cena seguinte mostra o custo). Se é, a fala fica. **Uma frase tecnicamente impecável na boca de um garoto de 14 anos em surto retórico é uma frase que ele não diria.** Este é o gate que faltou uma vez, em 2026-07-26, e que fez uma fala canônica ser "consertada" e revertida no mesmo dia.
+
+**A régua "fato: proibido mentir" continua exclusiva dos apartes do Gus** (`gus-apartes-c-arcane.md`), e é exclusiva de propósito: ali ele é o veículo didático, e o rigor é o ponto. Os outros personagens são humanos e erram.
 
 ---
 
