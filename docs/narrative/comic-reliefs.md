@@ -379,7 +379,7 @@ GUS
 Os Anciões evoluem.
 ```
 
-**Payoff:** Stack Overflow personificado. Cauã engatilha cada vez melhor que o anterior; payoff "Use Pythia" como vitória da Jaci na flame war.
+**Payoff:** Stack Overflow personificado. Cauã engatilha cada vez melhor que o anterior; payoff "Use Pythia" como vitória da Jaci na flame war. **Nota de leitura: a vitória é de ergonomia (é a resposta mais fácil de escrever e de ensinar), nunca de execução. O eixo compilado/interpretado não se move aqui.**
 
 ---
 

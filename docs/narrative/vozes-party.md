@@ -142,6 +142,8 @@ Contraponto ao Gus/"Dragon" (líder frio e calculista em batalha): o Cauã é o 
 - CAUÃ (EN): (shrugs) "Nothing that couldn't be patched."
 - *Resultado: Gus marca ponto (risco real), Cauã não admite.*
 
+> *Nota de leitura (eixo compilado/interpretado):* "Rodou RÁPIDO" aqui significa **ficou pronto rápido**, o relógio do programador, e nunca "executou rápido". O B6 abaixo confirma a leitura ("ia disparar antes SIM. Na semana que vem. Quando eu terminasse de escrever"). **Não converter esta fala em bark de combate:** fora do contexto do B2 ela inverte o eixo compilado/interpretado, que é definição do Gus original e não se move.
+
 **B3, "compila e roda" (a piada de sempre)**
 - CAUÃ (PT): "Compila e roda, Gus."
 - CAUÃ (EN): "Compile and run, Gus."
