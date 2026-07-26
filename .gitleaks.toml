@@ -1,0 +1,95 @@
+# .gitleaks.toml — configuração do secret-scan do GusWorld
+#
+# Origem: item TST-8 (TESTES.md §T8), auditoria de 2026-07-25.
+# Relatório com a verificação de cada entrada: docs/auditoria/TST-8-secret-scan-2026-07-25.md
+#
+# PRINCÍPIO DESTE ARQUIVO: o allowlist existe para que `gitleaks dir` saia 0 numa
+# árvore limpa — e só para isso. Um gate que acusa falso positivo toda vez é um
+# gate que as pessoas param de ler (alert fatigue), e aí o achado de verdade passa
+# no meio. Mas allowlist largo é pior que gate barulhento: cega o scanner em
+# silêncio. Por isso NENHUMA entrada abaixo isenta um caminho inteiro nem uma regra
+# inteira. Cada uma casa três coisas AO MESMO TEMPO (`condition = "AND"`):
+#   1. a regra específica que dispara (`targetRules`),
+#   2. o arquivo específico onde o falso positivo vive (`paths`),
+#   3. o texto específico que a regra confunde com segredo (`regexes`).
+# Consequência prática: nesses mesmos arquivos, um segredo DE VERDADE continua
+# sendo detectado — seja por outra regra (AWS, GitHub PAT, chave privada), seja
+# pela mesma `generic-api-key` com qualquer conteúdo diferente do listado.
+# Isso é verificado por prova adversarial; ver §4.1 do relatório do TST-8.
+#
+# AO ADICIONAR UMA ENTRADA NOVA: verifique a linha-fonte primeiro (`git show
+# <sha>:<arquivo>`), explique no comentário POR QUE é falso positivo, e mantenha
+# `condition = "AND"` com os três eixos. Nunca adicione `paths` sozinho.
+
+[extend]
+useDefault = true
+
+# ---------------------------------------------------------------------------
+# ESCOPO: árvore de trabalho, não histórico.
+#
+# Os 8 achados restantes do histórico (o enum `error_token_kind = UINT_LEAST16_MAX
+# - N` da lib `lexy`, vendorizada em 69c4f630 e PURGADA no M9) NÃO estão isentos
+# aqui, de propósito:
+#   - eles não afetam este gate: `GusEngine/third_party/lexy/` não existe mais na
+#     árvore (`git ls-files | grep -c lexy` = 0), logo `gitleaks dir` nunca os vê;
+#   - isentar o caminho abriria um ponto cego numa pasta de dependência
+#     vendorizada — exatamente o lugar onde um segredo de terceiro entraria sem
+#     ninguém reparar — em troca de silenciar uma varredura que não é gate de dia
+#     a dia, e sim auditoria deliberada, feita com um humano lendo a saída.
+#
+# Portanto: `gitleaks git --log-opts="--all"` DEVE continuar reportando 8 achados
+# conhecidos e sair 1. Isso é o esperado, não uma regressão. A lista verificada
+# um a um está no §4.2 do relatório do TST-8; confira contra ela antes de tratar
+# qualquer achado de histórico como novo.
+# ---------------------------------------------------------------------------
+
+# Artefatos de build locais: ~3,5 GB de objetos e dependências baixadas via
+# FetchContent (SDL3, RmlUi, glintfx, Catch2). Não são versionados e não são
+# publicáveis; varrê-los só queima tempo. Único allowlist de caminho puro do
+# arquivo, e ele cobre conteúdo que por definição não entra em commit.
+[[allowlists]]
+description = "artefatos de build locais (nao versionados)"
+paths = ['''(^|/)GusEngine/build/''']
+
+# FP 1 — ADR-017, lista de EffectKinds do motor techMagic (ADR-016).
+# A regra casa "TokenRefund, ApEfficiency-face1" porque vê a palavra "Token"
+# seguida de string longa. "Token" aqui é o recurso de combate consumido pelas
+# cartas, e "ApEfficiency-face1" é o nome de uma face de efeito — ambos
+# terminologia de design de jogo, não credencial.
+# O relatório da auditoria cita a linha verbatim, por isso os dois caminhos.
+[[allowlists]]
+description = "FP: EffectKinds do techMagic (TokenRefund / ApEfficiency) no ADR-017"
+targetRules = ["generic-api-key"]
+condition = "AND"
+paths = [
+  '''(^|/)docs/tech/adr/ADR-017-action-clock-combat-unificado\.md$''',
+  '''(^|/)docs/auditoria/TST-8-secret-scan-2026-07-25\.md$''',
+]
+regexes = ['''ApEfficiency-face1''']
+
+# FP 2 — system_menu.cpp, tela de remapeamento de controles.
+# A linha é `state.controls_last_swapped_with_label_key = result.swapped_with_label_i18n_key;`,
+# atribuição entre dois campos de struct. O "segredo" detectado é o próprio nome
+# do campo: uma CHAVE i18n (identificador de string traduzível), não uma API key.
+# A palavra "key" no identificador é o que dispara a heurística.
+[[allowlists]]
+description = "FP: chave i18n (swapped_with_label_i18n_key) na tela de controles"
+targetRules = ["generic-api-key"]
+condition = "AND"
+paths = [
+  '''(^|/)GusEngine/app/src/screens/system_menu\.cpp$''',
+  '''(^|/)docs/auditoria/TST-8-secret-scan-2026-07-25\.md$''',
+]
+regexes = ['''result\.swapped_with_label_i18n_key''']
+
+# FP 3 — o relatório do TST-8 cita, como evidência, o enum do parser `lexy`
+# (`error_token_kind = UINT_LEAST16_MAX - 1`). "token" ali é terminologia de
+# análise léxica. Isento SÓ no relatório: o caminho original da lib fica de fora
+# de propósito (ver o bloco ESCOPO acima), então isto não cria ponto cego em
+# `third_party/`.
+[[allowlists]]
+description = "FP: enum do parser lexy citado como evidencia no relatorio do TST-8"
+targetRules = ["generic-api-key"]
+condition = "AND"
+paths = ['''(^|/)docs/auditoria/TST-8-secret-scan-2026-07-25\.md$''']
+regexes = ['''UINT_LEAST16_MAX''']

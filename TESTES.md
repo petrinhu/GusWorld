@@ -185,10 +185,22 @@ ls GusEngine/third_party/
 
 ### Comando pre-commit
 
+Ferramenta: `gitleaks` (série 8.30). O config do repo (`.gitleaks.toml`, raiz) é lido
+automaticamente; não precisa passar `-c`.
+
 ```bash
-gitleaks detect --no-banner
-# OU
-git-secrets --scan
+# gate do dia a dia: varre a ÁRVORE de trabalho (deve sair 0)
+gitleaks dir --no-banner .
+```
+
+⚠️ O subcomando `gitleaks detect`, prescrito por versões antigas deste documento, foi
+**removido na série 8.30** — quem rodar aquele comando toma erro de subcomando inválido,
+não um gate verde. Hoje são dois subcomandos distintos: `gitleaks dir` (árvore) e
+`gitleaks git` (histórico).
+
+```bash
+# auditoria de histórico (todos os refs) — NÃO é gate de dia a dia
+gitleaks git --log-opts="--all" --no-banner .
 ```
 
 ### Hook canônico (já ativo no global)
@@ -197,8 +209,24 @@ git-secrets --scan
 
 ### Critério "done"
 
-- Scan de secrets retorna exit 0 antes de cada push.
-- CI roda secret scan job (futuro F2-CI.X).
+- `gitleaks dir --no-banner .` retorna **exit 0** antes de cada push.
+- CI roda secret scan job (futuro F2-CI.X) — **ainda pendente**; o líder decidiu em
+  2026-07-25 criar só o `.gitleaks.toml` por ora, sem o job.
+
+### Falsos positivos e o `.gitleaks.toml`
+
+O exit 0 acima só é alcançável porque o `.gitleaks.toml` isenta falsos positivos
+**verificados um a um** (identificadores contendo `token`/`key` que a heurística
+`generic-api-key` confunde com credencial). Cada isenção casa regra + arquivo + texto
+específicos ao mesmo tempo (`condition = "AND"`), nunca um caminho ou uma regra inteira,
+justamente para não cegar o scanner. Ao adicionar entrada nova, siga o cabeçalho do
+próprio `.gitleaks.toml` e registre o porquê.
+
+**O scan de histórico sai 1, e isso é esperado:** ele reporta 8 achados conhecidos (enum
+de um parser vendorizado, já purgado no M9) que de propósito NÃO foram isentos, para não
+abrir ponto cego em `third_party/`. Confira contra a lista verificada em
+`docs/auditoria/TST-8-secret-scan-2026-07-25.md` §4.2 antes de tratar qualquer achado de
+histórico como novo.
 
 ---
 
