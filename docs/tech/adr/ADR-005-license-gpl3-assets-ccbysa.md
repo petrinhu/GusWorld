@@ -112,10 +112,10 @@ Ações fora do escopo desta ADR (responsabilidade do líder, separadas):
 1. ✅ `LICENSE` trocado para GPLv3 (texto verbatim) e README raiz atualizado (feito antes desta ADR).
 2. ✅ Criar `ASSETS-LICENSE.md` (fronteira código/assets/livros).
 3. ✅ Criar `THIRD-PARTY-LICENSES.md` (atribuição Qt/Godot/addons/fontes/OpenSSL; incluir no release).
-4. ✅ Criar `.codeberg/FUNDING.yml` (`custom: paypal.me/petrinhu`).
+4. ✅ Criar `.codeberg/FUNDING.yml` (`custom: paypal.me/petrinhu`). _(Nota de superação, 2026-07-25: o projeto saiu do Codeberg e o GitHub virou host único; o arquivo vive hoje em `.github/FUNDING.yml`, com o mesmo conteúdo. A decisão desta ADR não muda: só o caminho do arquivo.)_
 5. ✅ Atualizar `docs/tech/pivot/engine-design.md` §7 (AGPL para GPLv3; assets CC-BY-SA; livros reservados; static-link Qt liberado).
 6. ⏳ SPDX `GPL-3.0-or-later` nos fontes C++ NOVOS do pivot, conforme forem criados (NÃO em massa nos `.cs`).
-7. ⏳ **Líder:** arquivar repo `gus_dragon-engine` no Codeberg (decommission, ação separada).
+7. ⏳ **Líder:** arquivar repo `gus_dragon-engine` no Codeberg (decommission, ação separada). _(Nota de superação, 2026-07-25: sem efeito. O repo foi **apagado** do Codeberg em vez de arquivado, no M8, e o projeto inteiro saiu do Codeberg nesta data; ver CHANGELOG do M8.)_
 
 ## Cross-refs
 

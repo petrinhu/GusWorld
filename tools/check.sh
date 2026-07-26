@@ -88,7 +88,7 @@ fi
 # (a) Arquitetura: core/ e domain/ sao POCO; nenhum #include <Q...>, <SDL...>, <RmlUi...>
 #     NEM <glintfx...> (ADR-008 + ADR-009 + ADR-010 F3: SDL/RmlUi/glintfx vivem SO em
 #     platform/ + app/). O match tambem pega os namespaces Rml:: e glintfx:: vazando pra
-#     core/domain. Mesma logica do .forgejo/workflows/ci.yml (sincronia de proposito).
+#     core/domain. Mesma logica do .github/workflows/ci.yml (sincronia de proposito).
 GATE_ARCH=0
 if grep -rnE '#[[:space:]]*include[[:space:]]*<(Q[A-Za-z]|SDL|RmlUi|glintfx)' \
         "$ENGINE/core" "$ENGINE/domain" 2>/dev/null; then

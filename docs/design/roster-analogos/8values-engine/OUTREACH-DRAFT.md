@@ -2,6 +2,12 @@
 
 **Status: SENT (2026-07-11).** The creator sent this outreach as an issue on the 8values repository: **https://github.com/8values/8values.github.io/issues/185**. The text below is the draft that was used (kept as record). External communication was sent by the creator, not by the agent.
 
+> **Note added on 2026-07-25 (repository migration).** The message below was written when Codeberg was the project's main host, and it says so. That is no longer true: GusWorld moved to GitHub as its **single canonical host**, and the Codeberg links in the body are **dead**. The current repository is **https://github.com/petrinhu/GusWorld**, and GitHub is now the reliable way to reach the project (issues included).
+>
+> The sent text is kept **verbatim on purpose**: it is the record of what was actually sent on 2026-07-11, not a template to reuse. Rewriting it would misrepresent that record. If this outreach is ever reused as a template, replace the "I use Codeberg / rarely check GitHub" paragraph and both repository links with the GitHub URL above.
+>
+> The copy published in issue #185 still carries the dead links. Editing it there is the creator's action, not an agent's.
+
 ---
 
 ## Suggested subject
@@ -23,6 +29,7 @@ A few things I want to be transparent about:
 - **It's a fiction project, not a political one.** Everything sits under a fiction disclaimer. To quote it directly: "GusWorld is a work of fiction. [...] None of it is, or is intended to be read as, a factual, biographical or historical claim about the real person: not about what they actually believed, how they actually behaved, what their actual character or morality was, or how a rigorous historian, biographer or psychologist would assess them."
 
 Repository (Codeberg): https://codeberg.org/petrinhu/gusworld
+<!-- DEAD LINK since 2026-07-25. Current repository: https://github.com/petrinhu/GusWorld -->
 The port and attribution: `docs/design/roster-analogos/8values-engine/`
 
 If anything about the attribution or the way I've described 8values isn't to your liking, please let me know and I'll adjust it right away. Mostly I just wanted to say thanks: the quiz was a great, well-designed foundation to build a game mechanic on.
@@ -41,6 +48,7 @@ Estou construindo um jogo indie single-player chamado **GusWorld** (é **freewar
 Pontos de transparência: é um fork/port fiel, creditado sob a licença MIT de vocês (perguntas e matemática originais intocadas, `LICENSE` verbatim, `ATTRIBUTION.md` creditando o 8values); a camada ponderada é exclusiva do jogo e não modifica o teste (script separado, sem alegação de melhoria nem sobre política do mundo real); e é um projeto de ficção, sob disclaimer, que cito diretamente: "GusWorld é uma obra de ficção. [...] Nada disso é, ou pretende ser lido como, uma afirmação factual, biográfica ou histórica sobre a pessoa real." Se algo na atribuição não agradar, ajusto na hora.
 
 Repositório: https://codeberg.org/petrinhu/gusworld
+<!-- LINK MORTO desde 2026-07-25. Repositório atual: https://github.com/petrinhu/GusWorld -->
 Port e atribuição: `docs/design/roster-analogos/8values-engine/`
 
 Abraço,

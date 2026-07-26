@@ -2,10 +2,14 @@ name: windows
 
 # CI Windows REAL do GusEngine (WIN-CROSS-VALIDATE, exceção pontual autorizada pelo
 # líder 2026-07-14): roda em windows-latest (MSVC nativo, Nível 3 de validação),
-# completando a prova de MinGW cross-compile já feita em .forgejo/workflows/ci.yml
-# (tools/winbuild_container.sh). Repo local é Codeberg-first; este workflow existe
-# SÓ no espelho GitHub (petrinhu/GusWorld), porque Codeberg não oferece runner
-# Windows global. NÃO duplicar/promover esta exceção sem nova autorização.
+# completando a prova de MinGW cross-compile feita via tools/winbuild_container.sh.
+# NÃO duplicar/promover esta exceção sem nova autorização.
+#
+# Nota histórica (2026-07-25): este workflow nasceu quando o repo era Codeberg-first
+# e o GitHub era só espelho, porque o Codeberg não oferecia runner Windows global.
+# O Codeberg passou a não aceitar código gerado por IA e o projeto saiu de lá: o
+# GitHub é hoje o host ÚNICO, e a CI Linux que ficava em .forgejo/workflows/ci.yml
+# vive agora em .github/workflows/ci.yml.
 #
 # MATRIZ HONESTA (todos REQUERIDOS desde glintfx v0.9.2, 2026-07-14):
 #   core/domain/platform: provados cross-compiláveis sob MinGW-w64
@@ -77,7 +81,7 @@ jobs:
 
       # Cache dos fontes de FetchContent (_deps: SDL3, RmlUi, Catch2, glintfx). Evita
       # re-clonar a cada run. Chave amarrada ao CMakeLists (onde os pins vivem), mesmo
-      # padrao do job "linux" em .forgejo/workflows/ci.yml.
+      # padrao do job "linux" em .github/workflows/ci.yml.
       - name: Cache FetchContent deps
         uses: actions/cache@v4
         with:

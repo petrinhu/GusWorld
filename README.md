@@ -64,7 +64,7 @@ GusWorld is built on a small, deliberately chosen set of open-source technologie
 - **[Catch2](https://github.com/catchorg/Catch2)**: the test framework behind the engine's automated test suite.
 - A curated **toolkit of modern, header-only C++ libraries** ([glm](https://github.com/g-truc/glm), [EnTT](https://github.com/skypjack/entt), [Box2D](https://github.com/erincatto/box2d), [stb](https://github.com/nothings/stb), [fmt](https://github.com/fmtlib/fmt), and more) vendored in `GusEngine/third_party/`.
 
-The full story (what each dependency does, its license, and a proper thank-you) is in [`ACKNOWLEDGMENTS.md`](ACKNOWLEDGMENTS.md) and on the wiki's [Créditos](https://github.com/petrinhu/GusWorld/wiki/Creditos) page (currently Portuguese-only).
+The full story (what each dependency does, its license, and a proper thank-you) is in [`ACKNOWLEDGMENTS.md`](ACKNOWLEDGMENTS.md) and on the wiki's [Tech Stack & Credits](https://github.com/petrinhu/GusWorld/wiki/Tech-Stack-and-Credits) page.
 
 The engine (`GusEngine/`) is organized in four layers: `core/` and `domain/` are plain, framework-free C++ (POCO); `platform/` is the only layer that touches SDL3; `app/` is the GusWorld-specific game and screens layer.
 
@@ -88,7 +88,7 @@ cmake --build --preset linux-release
 ctest --preset linux-release
 ```
 
-Linux is the target platform for the v1.0.0 release; a Windows preset exists (`windows-release`) and is planned for a post-v1.0.0 release. Full details and troubleshooting on the wiki's [Como Rodar e Compilar](https://github.com/petrinhu/GusWorld/wiki/Como-Rodar-e-Compilar) page (currently Portuguese-only).
+Linux is the target platform for the v1.0.0 release; a Windows preset exists (`windows-release`) and is planned for a post-v1.0.0 release. Full details and troubleshooting on the wiki's [Building and Running](https://github.com/petrinhu/GusWorld/wiki/Building-and-Running) page.
 
 ## Roadmap
 
@@ -100,7 +100,8 @@ The project moves through a milestone board (M0 to M9) covering the engine port,
 - [CHANGELOG.md](CHANGELOG.md): release history (Keep a Changelog format).
 - [`docs/design/pillars.md`](docs/design/pillars.md): the five creative pillars.
 - [`docs/tech/adr/`](docs/tech/adr/): architecture decision records behind the engine's design choices.
-- Wiki: [Home](https://github.com/petrinhu/GusWorld/wiki) · [Como Rodar e Compilar](https://github.com/petrinhu/GusWorld/wiki/Como-Rodar-e-Compilar) · [Créditos](https://github.com/petrinhu/GusWorld/wiki/Creditos) (currently Portuguese-only; there is no dedicated Contributing page yet).
+- Wiki (English): [Home](https://github.com/petrinhu/GusWorld/wiki/Home-English) · [Building and Running](https://github.com/petrinhu/GusWorld/wiki/Building-and-Running) · [Tech Stack & Credits](https://github.com/petrinhu/GusWorld/wiki/Tech-Stack-and-Credits) · [Contributing](https://github.com/petrinhu/GusWorld/wiki/Contributing).
+- Wiki (Portuguese, written for beginners): [Home](https://github.com/petrinhu/GusWorld/wiki) · [Sobre o Jogo](https://github.com/petrinhu/GusWorld/wiki/Sobre-o-Jogo) · [Como Rodar e Compilar](https://github.com/petrinhu/GusWorld/wiki/Como-Rodar-e-Compilar) · [Arquitetura em Visão Geral](https://github.com/petrinhu/GusWorld/wiki/Arquitetura-em-Visao-Geral) · [Roadmap](https://github.com/petrinhu/GusWorld/wiki/Roadmap) · [Créditos](https://github.com/petrinhu/GusWorld/wiki/Creditos).
 
 ## Contributing
 
@@ -253,7 +254,8 @@ O projeto avança por um board de marcos (M0 a M9) cobrindo o porte da engine, o
 - [CHANGELOG.md](CHANGELOG.md): histórico de lançamentos (formato Keep a Changelog).
 - [`docs/design/pillars.md`](docs/design/pillars.md): os cinco pilares criativos.
 - [`docs/tech/adr/`](docs/tech/adr/): registros de decisão de arquitetura por trás das escolhas de design da engine.
-- Wiki: [Home](https://github.com/petrinhu/GusWorld/wiki) · [Como Rodar e Compilar](https://github.com/petrinhu/GusWorld/wiki/Como-Rodar-e-Compilar) · [Créditos](https://github.com/petrinhu/GusWorld/wiki/Creditos) (ainda não existe uma página dedicada de Contribuição).
+- Wiki (pt-br, escrita para iniciante): [Home](https://github.com/petrinhu/GusWorld/wiki) · [Sobre o Jogo](https://github.com/petrinhu/GusWorld/wiki/Sobre-o-Jogo) · [Como Rodar e Compilar](https://github.com/petrinhu/GusWorld/wiki/Como-Rodar-e-Compilar) · [Arquitetura em Visão Geral](https://github.com/petrinhu/GusWorld/wiki/Arquitetura-em-Visao-Geral) · [Roadmap](https://github.com/petrinhu/GusWorld/wiki/Roadmap) · [Créditos](https://github.com/petrinhu/GusWorld/wiki/Creditos).
+- Wiki (inglês, para contribuidor técnico): [Home](https://github.com/petrinhu/GusWorld/wiki/Home-English) · [Building and Running](https://github.com/petrinhu/GusWorld/wiki/Building-and-Running) · [Tech Stack & Credits](https://github.com/petrinhu/GusWorld/wiki/Tech-Stack-and-Credits) · [Contributing](https://github.com/petrinhu/GusWorld/wiki/Contributing).
 
 ### Contribuindo
 

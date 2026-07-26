@@ -180,7 +180,7 @@ ls GusEngine/third_party/
 ### Disciplina
 
 - **Nenhum secret** deve estar versionado. GusWorld G1 single-player puro NÃO tem secrets de runtime, mas:
-  - Tokens de CI (Forgejo, signing futuro): variables Forgejo Actions, NUNCA repo.
+  - Tokens de CI (signing futuro): secrets e variables do repositório no GitHub Actions (`Settings > Secrets and variables > Actions`), NUNCA versionados.
   - Future analytics opt-in keys: env vars, NUNCA repo.
 
 ### Comando pre-commit

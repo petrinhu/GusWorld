@@ -56,7 +56,7 @@ Todo commit MUST seguir [Conventional Commits 1.0](https://www.conventionalcommi
 | `docs` | Documentação apenas | `docs(tech): atualiza engine-design.md §4.5` |
 | `chore` | Manutenção, build, deps | `chore(deps): pin SDL3 3.2.x no FetchContent` |
 | `build` | Sistema de build | `build(cmake): adiciona preset linux-release ao CMakePresets` |
-| `ci` | Pipeline CI | `ci(forgejo): cacheia build do SDL3 entre runs` |
+| `ci` | Pipeline CI | `ci(actions): cacheia build do SDL3 entre runs` |
 
 ### Scopes game-dev (MUST usar)
 
@@ -68,7 +68,7 @@ Todo commit MUST seguir [Conventional Commits 1.0](https://www.conventionalcommi
 | `art` | Arte 2D, sprites, atlas, shaders | `/assets/sprites/*`, `/assets/textures/*`, shaders |
 | `narrative` | Lore canon, deep-lore, dialogue, in-world docs | `/docs/narrative/*` |
 | `design` | GDD, pillars, balanceamento | `/docs/design/*` |
-| `tech` | Arquitetura, ADRs, build, infra | `/docs/tech/*`, `/.forgejo/*` |
+| `tech` | Arquitetura, ADRs, build, infra | `/docs/tech/*`, `/.github/workflows/*` |
 | `audio` | SFX, música, mix | `/assets/sfx/*`, `/assets/music/*` |
 | `i18n` | Localização, strings, fontes | loader `.md` próprio + CSV de strings |
 | `qa` | Testes, playtest plans, bugs | `GusEngine/tests/*`, `docs/qa/*` |

@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| **Status** | Accepted (aprovado granular em 8 batches AskUserQuestion 2026-05-19, 30 decisões canonizadas) |
+| **Status** | **SUPERADO** (marcador adicionado em 2026-07-25). Foi Accepted em 2026-05-19 (aprovado granular em 8 batches AskUserQuestion, 30 decisões canonizadas) e vigorou até o pivô de stack: Godot/C# saiu em favor de C++ com Qt6 (`docs/tech/pivot/engine-design.md`, 2026-06-21) e depois de C++20 + SDL3 ([ADR-008](ADR-008-repivot-qt-to-sdl3.md), 2026-06-22). O decommission do C#/Godot fechou no marco **M8 (2026-07-22)**. O texto abaixo fica como **registro histórico permanente** (parte do "cemitério de ideias mortas"): não editar como se fosse vigente. |
 | **Date** | 2026-05-19 |
 | **Decisor** | petrinhu (criador supremo) |
 | **Reversibilidade** | One-way door massivo. Reverter exige rewrite paralelo (~2-4 semanas). |

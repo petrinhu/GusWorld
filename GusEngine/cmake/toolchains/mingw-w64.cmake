@@ -1,8 +1,10 @@
 # mingw-w64.cmake - toolchain de cross-compile Linux -> Windows x86_64 (MinGW-w64).
 #
 # WIN-CROSS-VALIDATE (2026-07-14): usado para validar, DENTRO de um container
-# efemero (imagem ghcr.io/catthehacker/ubuntu:act-latest, a mesma da CI Forgejo
-# local "claudio"), que o GusEngine (C++20/SDL3) cross-compila pra Windows sem
+# efemero (imagem ghcr.io/catthehacker/ubuntu:act-latest, a mesma que a CI de
+# entao usava no runner local "claudio", no tempo do Codeberg/Forgejo - o projeto
+# migrou pro GitHub como host unico em 2026-07-25), que o GusEngine (C++20/SDL3)
+# cross-compila pra Windows sem
 # tocar o host. Ver GusEngine/tools/winbuild_container.sh (script reprodutivel
 # que consome este toolchain) e o preset "windows-mingw" em CMakePresets.json.
 #

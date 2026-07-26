@@ -10,7 +10,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 **Mirror + Wiki publicados (2026-07-14, histórico):** na época, o repo foi espelhado em `petrinhu/GusWorld` no GitHub (push dual-remote) além do Codeberg, então canônico; Wiki inicial publicada nos dois remotos (Codeberg bilíngue EN/PT para contribuidor técnico; GitHub PT-br para leigo/iniciante); `AI-DISCLOSURE.md` adicionado.
 
-**Migração para host único GitHub (2026-07-25):** o Codeberg passou a não aceitar código gerado por IA, e o projeto saiu de lá sem discutir (decisão do líder). GitHub (`petrinhu/GusWorld`) é agora o remoto único e canônico: commit, push e CI só ali. A wiki bilíngue EN/PT que vivia no Codeberg não tem mais lar; a wiki PT-br do GitHub segue viva e é a única. O líder arquiva o repo do Codeberg manualmente (não é trabalho de agente).
+**Migração para host único GitHub (2026-07-25):** o Codeberg passou a não aceitar código gerado por IA, e o projeto saiu de lá sem discutir (decisão do líder). GitHub (`petrinhu/GusWorld`) é agora o remoto único e canônico: commit, push e CI só ali. **A wiki do GitHub é a única, e é bilíngue:** as 4 páginas técnicas em inglês que viviam no Codeberg foram migradas pra lá no mesmo dia (item `MIGRACAO-WIKI-EN-CODEBERG`, commit `95cb3fd`), então a wiki tem hoje 6 páginas em pt-br para leigo/iniciante (`Home`, `Sobre-o-Jogo`, `Como-Rodar-e-Compilar`, `Arquitetura-em-Visao-Geral`, `Roadmap`, `Creditos`) e 4 em inglês para contribuidor técnico (`Home-English`, `Building-and-Running`, `Tech-Stack-and-Credits`, `Contributing`), separadas por seção no `_Sidebar`. O `Home` pt-br continua sendo a porta de entrada; o inglês entra por `Home-English` para não sobrescrever público diferente. O líder arquiva o repo do Codeberg manualmente (não é trabalho de agente).
 
 **Comunicação entre sessões (autocomm, 2026-07-16):** as 3 sessões Claude do líder (`gusworld` este projeto, `glintfx` a lib de UI, `site` a revista) trocam mensagens por um bus git — repo `petrinhu/gusworld_ia_autocomm`, clone em `~/IDrive/Documentos/projetos_claudebrain/gusworld_ia_autocomm/`. **No início da sessão / quando o líder pedir: `git pull` + ler `inbox/gusworld/` + arquivar as lidas.** Enviar = `.md` em `inbox/<destinatário>/` + push. Detalhe: memória `reference_autocomm` + `PROTOCOL.md` do bus. Repo PÚBLICO → zero dado sensível. **Regra (líder 2026-07-21): TODA contribuição do Gus (playtest/QA/ideia/edge-case/pergunta técnica) é reportada ao `site` pelo bus (`inbox/site/`) como registro editorial — o beco + o desdobramento técnico —, além de agir nela. Sempre só "Gus Dragon", nunca o nome real. Memória `feedback_contribuicoes_gus_site_bus`.**
 
@@ -57,7 +57,7 @@ Bloco "Modo de operação" inserido em cada agent em `~/.claude/agents/`.
 - **Localização (i18n):** dev em pt-br; chaves i18n custom (`pt_br.md`/`en_intl.md`) consumidas por um translator C++ próprio (não Godot `tr()`, não ICU). Tradução en-intl planejada pós-v1.0.0.
 - **CI:** GitHub Actions (canônico único; `.github/workflows/`, gate de release) com CI Windows real (MSVC), validado verde desde 2026-07-14. CI pesado (sanitizers) em runner self-hosted é decisão específica por repositório, não presumir disponibilidade aqui.
 - **Plataformas:** Linux é a plataforma alvo da v1.0.0 (CMakePresets `linux-release`); Windows (`windows-release`) planejado para pós-v1.0.0, já com CI real validado.
-- **Repositório:** GitHub (`petrinhu/GusWorld`) é o remoto único e canônico (migração de 2026-07-25: o Codeberg deixou de aceitar código gerado por IA, e o projeto saiu de lá; commit, push e CI só no GitHub daqui em diante; o líder arquiva o repo do Codeberg manualmente). Wiki publicada no GitHub (PT-br).
+- **Repositório:** GitHub (`petrinhu/GusWorld`) é o remoto único e canônico (migração de 2026-07-25: o Codeberg deixou de aceitar código gerado por IA, e o projeto saiu de lá; commit, push e CI só no GitHub daqui em diante; o líder arquiva o repo do Codeberg manualmente). Wiki publicada no GitHub, bilíngue (6 páginas pt-br para leigo/iniciante + 4 páginas técnicas em inglês migradas do Codeberg em 2026-07-25).
 
 ### Documentos canônicos (Fase 1)
 
@@ -99,7 +99,7 @@ docs/
 
 ### Specs canônicas externas (Resources do vault)
 
-**8 character specs canônicas em `Resources/gusworld/`** (índice: `Resources/gusworld/_INDEX.md`). Padrão unificado: cel-shaded 3D, proporção SD 1:1:1, fundo `#FFFFFF` unlit, prompt SD/MJ incluso.
+**8 character specs canônicas em `Resources/gusworld/`** (índice: `Resources/gusworld/_INDEX.md`). Padrão visual vigente: **2D pixel-art via pipeline PixelLab**. Cada spec preserva os traços de identidade canônicos (nome, idade, cor-marca, acessório-assinatura, silhueta, role), que são agnósticos de dimensão, e guarda a antiga spec 3D cel-shaded (proporção SD 1:1:1, fundo `#FFFFFF` unlit, prompt SD/MJ) num bloco `<details>` de histórico. A spec 2D detalhada (resolução de sprite, frames/direções, paleta indexada, prompt PixelLab por personagem) segue **pendente de decisão do criador supremo**.
 
 - `character-spec-gus.md` — Gus Vector Tavus Vance (protagonista, 11)
 - `character-spec-caua-volt.md` — Cauã Berenger (Striker, 13)
