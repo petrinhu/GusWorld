@@ -161,6 +161,27 @@ Passo a passo pra revisão retroativa (uso pelo `revisor-textual` ou `narrative-
 
 ---
 
+## 11. Trocadilho e jargão NÃO se traduzem: cada idioma ganha a própria versão (regra do criador, 2026-07-26)
+
+**A regra:** fala cuja graça depende de **trocadilho, jargão técnico ou par de termos** não tem tradução literal. Cada idioma recebe uma **versão própria**, que preserva o EFEITO (o que a fala faz na cena) e não as palavras.
+
+**Por que existe:** é o problema clássico do filme americano dublado, em que o trocadilho morre na passagem e sobra uma frase sem graça que ninguém entende. Aqui o risco é maior, porque a piada costuma carregar informação de personagem.
+
+**O caso que gerou a regra (farpa F09, deslize do Dante).** O deslize precisa que uma palavra da linguagem errada escape da boca dele e ele se corrija tarde demais.
+
+- **Em inglês funciona `compile` → `assemble`:** o par é imediato, porque *assembler* é o nome da ferramenta e o verbo existe no uso corrente.
+- **Em pt-br esse par MORRE.** Ninguém diz "montar" para assembly em português; usamos a palavra "assembly" e derivados como "assemblar". Traduzir "assemble" por "monta" produz uma frase que **nem quem entende de linguagens decifra** (foi exatamente o que aconteceu quando isto foi testado com o criador).
+- **A versão pt-br usa outro par:** `ponteiro` → `endereço`. Ponteiro é a marca do C-Arcane e já é canon; endereço é o que o Asmódico manipula e é palavra do dia a dia.
+
+**Como aplicar:**
+
+1. Ao escrever fala com trocadilho ou jargão, **marque-a como "versão por idioma"** no doc, e não como "traduzir depois".
+2. Escreva a versão pt-br **primeiro** (é a língua de desenvolvimento) e registre ao lado, quando já souber, o par que funciona em inglês. Não force o mesmo par nos dois.
+3. Critério de aceitação: **um falante nativo daquele idioma que entende do assunto tem que pegar a piada sem explicação.** Se precisa de nota de rodapé, a versão está errada.
+4. Vale para o `i18n-l10n-specialist` e para qualquer tradução futura: **não traduza estas falas, peça a versão**.
+
+---
+
 ## Fontes consultadas
 
 **As 7 fontes indicadas:**
