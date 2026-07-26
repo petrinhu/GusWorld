@@ -1,5 +1,9 @@
 # GusWorld
 
+[![CI](https://github.com/petrinhu/GusWorld/actions/workflows/ci.yml/badge.svg)](https://github.com/petrinhu/GusWorld/actions/workflows/ci.yml)
+[![Windows](https://github.com/petrinhu/GusWorld/actions/workflows/windows.yml/badge.svg)](https://github.com/petrinhu/GusWorld/actions/workflows/windows.yml)
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](LICENSE)
+
 > A stylized turn-based 2D RPG: an 11-year-old hacker prodigy against a cyber-gothic megacorporation.
 
 **Solo indie, freeware.** Built by petrinhu, started 2026-05-15. C++20 + SDL3, with a small engine written from scratch (`GusEngine/`). Currently a **vertical slice in active development**: see [Status](#status) below.
@@ -152,6 +156,10 @@ The full acknowledgments (including a proper thank-you to the RmlUi and glintfx 
 ## 🇧🇷 Português
 
 ### GusWorld
+
+[![CI](https://github.com/petrinhu/GusWorld/actions/workflows/ci.yml/badge.svg)](https://github.com/petrinhu/GusWorld/actions/workflows/ci.yml)
+[![Windows](https://github.com/petrinhu/GusWorld/actions/workflows/windows.yml/badge.svg)](https://github.com/petrinhu/GusWorld/actions/workflows/windows.yml)
+[![Licença: GPL v3](https://img.shields.io/badge/Licen%C3%A7a-GPLv3-blue.svg)](LICENSE)
 
 > Um RPG 2D estilizado com combate por turnos: um prodígio-hacker de 11 anos contra uma megacorporação ciber-gótica.
 
