@@ -143,7 +143,7 @@ GUS
 Mas o Pythia da Jaci aceita os do...
 
 BENTO
-PYTHIA SEQUER COMPILA. Pythia é POESIA, não engenharia.
+PYTHIA NEM VIRA MÁQUINA. Pythia é POESIA, não engenharia.
 
 [JACI passa por trás carregando ampolas. Pausa.]
 
@@ -155,6 +155,11 @@ Eu ouvi. Use o que você quiser. Pythia te entende.
 ```
 
 **Payoff:** estabelece linguagem-conflito como recorrente. Jaci aliada do Gus na flame war.
+
+**Notas de leitura (decisões do criador, 2026-07-26):**
+
+- **A fala do Bento é "NEM VIRA MÁQUINA", não "sequer compila".** A redação anterior era falsa ao pé da letra (Pythia compila para bytecode) e verdadeira só no que importa. Como o público inclui criança aprendendo programação, e um personagem respeitado dizendo uma falsidade técnica é a classe de frase que gruda, a fala foi ajustada para ficar correta **sem perder o soco nem a substância**: na visão do Bento, Pythia não vira máquina. A [Cena 15](#cena-15-pergunta-amanhã-o-cauã-descobre) depende dessa substância, e não da redação exata.
+- **A tabulação do Asmódico é liberdade deste mundo, não erro.** Assembly real não é sensível a tabulação (isso é Python e Makefile), mas **Asmódico não é assembly**: é o análogo dele aqui, e tem regra própria. Registrado para ninguém "corrigir" esta cena no futuro achando que achou um bug.
 
 ---
 
@@ -1054,7 +1059,7 @@ Mensagem opcional discreta no canto da tela durante carregamento:
 
 ## Cena 15: "Pergunta amanhã" (o Cauã descobre)
 
-**Origem:** decisão do criador em 2026-07-26. Nasce da tensão X-01 do inventário de disputas de linguagem: o bordão do Cauã é "compila e roda" (`vozes-party.md:145-152`) e o Bento diz na Cena 2 "PYTHIA SEQUER COMPILA". Duas peças canônicas que se chocam de frente, e o criador decidiu que o Cauã **descobre**.
+**Origem:** decisão do criador em 2026-07-26. Nasce da tensão X-01 do inventário de disputas de linguagem: o bordão do Cauã é "compila e roda" (`vozes-party.md:145-152`) e o Bento diz na Cena 2 que Pythia **nem vira máquina**. Duas peças canônicas que se chocam de frente, e o criador decidiu que o Cauã **descobre**. _(A fala do Bento foi ajustada em 2026-07-26, decisão X-06: era "PYTHIA SEQUER COMPILA". Esta cena depende da substância, não da redação, e por isso sobreviveu ao ajuste sem retrabalho.)_
 
 **Contexto:** Ato 2, dentro da mini-quest posterior do Cauã (`characters/caua-volt.md:65-67`), depois que a facção radical foi destruída e ele volta aos Dutos pra reconstruir a comunidade desmoralizada. É o momento em que ele volta a **ensinar**, e é por isso que a pergunta chega.
 
