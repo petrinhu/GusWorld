@@ -297,3 +297,82 @@ gitleaks dir --no-banner --redact=80 --report-format json \
 ## 9. Disciplina de execução
 
 Varredura **read-only** sobre o git: nenhum commit, push, `reset`, `checkout -f`, `clean`, `stash` ou `filter-repo` foi executado. A árvore tinha trabalho **não commitado** de outra frente (4 arquivos modificados + 2 untracked em `GusEngine/app/`) no início e no fim da varredura, intacto. Todo scratch em `/var/tmp/tst8-scan/` (o `/tmp` desta máquina é tmpfs/RAM). Nenhum pacote de sistema instalado. Nenhum segredo aparece em claro neste relatório.
+
+---
+
+## 10. Adendo de remediação — 2026-07-25
+
+> **Natureza deste adendo.** Os §§1–9 acima são registro **datado** do que a auditoria encontrou em 2026-07-25 e não foram editados: quem quiser saber o que o repositório era naquele momento lê o corpo, não isto. Esta seção registra o que foi **feito depois**, no mesmo dia (remediação executada entre 23:41 e 23:56 de 2026-07-25; adendo redigido às 00:0x de 2026-07-26, logo após).
+>
+> Decisão do líder em 2026-07-25: implementar **apenas** a recomendação nº 2 do §7. O job de secret-scan no CI (recomendação nº 1) ficou **adiado por decisão dele**, não por esquecimento.
+
+### 10.1 O que foi implementado
+
+**Recomendação nº 2 (§4.1 / §7) — `.gitleaks.toml` versionado: FEITA.**
+Commit **`8df65e6`** — *"chore(qa): .gitleaks.toml torna o gate do TST-8 acionavel"* (`.gitleaks.toml` 95 linhas, `TESTES.md` §T8, `TODO.md`).
+
+**Desenho do allowlist.** Nenhuma entrada isenta um caminho inteiro nem uma regra inteira. Cada uma casa **três eixos ao mesmo tempo** (`condition = "AND"`):
+
+| Eixo | Campo | Papel |
+|---|---|---|
+| Qual regra dispara | `targetRules` | só `generic-api-key`; as demais regras seguem ativas |
+| Onde o FP vive | `paths` | arquivo específico, nunca diretório |
+| Que texto confunde | `regexes` | o identificador exato, nunca curinga |
+
+São **3 entradas** (lista de EffectKinds do ADR-017; chave i18n do `system_menu.cpp`; enum do `lexy` citado como evidência **neste relatório**) mais **1** allowlist de caminho puro, `GusEngine/build/`, que cobre artefato local não versionado — o único caso em que caminho puro se justifica, porque por definição não entra em commit.
+
+Consequência verificada: nesses mesmos arquivos isentos, segredo de verdade **continua sendo detectado**, seja por outra regra, seja pela mesma `generic-api-key` com qualquer conteúdo diferente do listado (§10.3).
+
+### 10.2 Decisão de escopo: árvore, não histórico
+
+O allowlist mira **`gitleaks dir`** (o gate do dia a dia). Os **8 achados de histórico do `lexy`** (`GusEngine/third_party/lexy/include/lexy/grammar.hpp`) foram deixados **deliberadamente de fora**:
+
+- não afetam o gate — o caminho não existe mais na árvore (purgado no M9);
+- isentá-lo abriria **ponto cego numa pasta de dependência vendorizada**, que é justamente onde um segredo de terceiro entraria sem ninguém reparar;
+- em troca de silenciar uma varredura que **não é gate**, e sim auditoria deliberada, feita com um humano lendo a saída.
+
+**Portanto, por desenho: `gitleaks git --log-opts="--all"` continua saindo 1, com 8 achados conhecidos.** Isso é o esperado, não regressão. Confira contra o §4.2 antes de tratar qualquer achado de histórico como novo.
+
+⚠️ **Efeito colateral registrado por precisão:** o histórico caiu de **10 para 8** achados. As entradas do `ADR-017` e do `system_menu.cpp` são por caminho, e silenciam também as ocorrências históricas **desses dois arquivos**. Ou seja, não é "histórico intocado" — é "sobrou só o `lexy`". Verificado: os 8 restantes são todos do mesmo arquivo do `lexy`.
+
+### 10.3 Verificação
+
+**Gate (não quebrou):**
+
+```bash
+gitleaks dir --no-banner .    # config lido da raiz, sem -c
+# INF scanned ~1404357027 bytes (1.40 GB) in 46s
+# INF no leaks found
+# exit code: 0
+```
+
+**Prova adversarial (não cegou o scanner).** Credenciais falsas plantadas em arquivos **tracked e limpos** — e de propósito **dentro do caminho isento**, que é o teste mais duro:
+
+| Mutante | Onde | Resultado |
+|---|---|---|
+| Mesma regra `generic-api-key`, mesmo arquivo isento, conteúdo diferente (`api_key` de 32 chars) | `ADR-017` (**isento**) | **DETECTADO** |
+| `github-pat` (`ghp_…`) | `AUDITORIAS.md` (não isento) | **DETECTADO** |
+| `AKIAZZ7EXAMPLE9QTEST` | `ADR-017` (**isento**) | não detectado → **apurado**, ver abaixo |
+
+O terceiro mutante não disparar exigiu apuração em vez de suposição. Dois controles fecharam a causa: (a) a **mesma** string AKIA num arquivo **não isento** também **não** dispara; (b) um AKIA no alfabeto válido da regra (`AKIA` + `[A-Z2-7]{16}`), plantado **dentro do arquivo isento**, **dispara** (`aws-access-token`). Causa real: a string falsa continha um `9`, fora do alfabeto que a regra da AWS exige. **Não** era cegueira do allowlist.
+
+**Re-execução independente pelo orquestrador** (implementer ≠ verificador): mutante `api_key` de 32 caracteres plantado dentro do arquivo isento → **detectado, exit 1**; restauração conferida por **md5 byte-idêntico**. Resultado concordante com o desta seção, obtido por outro executor.
+
+**Restauração provada nos dois rounds:** `git checkout -- <arquivos>` seguido de `git status --porcelain` **vazio** e `md5sum -c` batendo com os hashes tirados **antes** do plantio. Os hashes foram gravados de antemão justamente para não depender de conferência visual, e nada foi plantado em arquivo untracked — ali o `git checkout` não restauraria e o `git diff` mentiria.
+
+### 10.4 Efeito de segunda ordem: este relatório criou 2 falsos positivos
+
+Contraintuitivo, e a próxima pessoa precisa saber antes de estranhar a contagem: **commitar este relatório aumentou o número de achados na árvore de 2 para 4.** O motivo é que o §4.2 cita as linhas dos falsos positivos **verbatim**, como evidência — então a mesma heurística que casou no código original casa de novo no documento que a analisa.
+
+Não é defeito do relatório (citar a linha-fonte é o que torna a classificação auditável), nem do scanner. É uma propriedade de qualquer documento de auditoria que transcreva o que encontrou, e por isso o `.gitleaks.toml` isenta explicitamente as ocorrências **neste arquivo**, com o mesmo rigor de três eixos. **Ao escrever auditoria futura que transcreva achado, conte com isso.**
+
+### 10.5 O que continua aberto
+
+| Item | Status |
+|---|---|
+| **Job de secret-scan no CI** (lacuna **F2-CI.X** do §T8; rec. nº 1) | **ADIADO por decisão do líder em 2026-07-25.** O `.github/workflows/` segue sem job de secret-scan; o gate existe, mas depende de alguém rodar. Pré-requisito técnico (o `.gitleaks.toml`) já está pronto, então a implementação é barata quando for retomada. |
+| **Scan de histórico saindo 1** com 8 achados conhecidos | **POR DESENHO**, ver §10.2. Não tratar como regressão. |
+| **Rec. nº 3 — hook `pre-commit` local** rodando `gitleaks dir` nos arquivos staged | **NÃO IMPLEMENTADA e não decidida pelo líder.** Verificado em 2026-07-25: `core.hooksPath` aponta para `~/.claude/githooks` e **nenhum** hook de lá menciona `gitleaks`. Segue como recomendação em aberto. |
+| **Rec. nº 4 — corrigir a sintaxe do §T8** | **FEITA**, no mesmo commit `8df65e6`. O `TESTES.md` §T8 agora prescreve `gitleaks dir` / `gitleaks git`, avisa que `gitleaks detect` foi removido na série 8.30, e aponta para o §4.2 deste relatório como lista de referência dos achados de histórico conhecidos. |
+
+**O veredito do §"Veredito" permanece PASSOU e não muda com este adendo** — a remediação tornou o gate *acionável*, não alterou nada sobre o que foi (ou não foi) encontrado em 2026-07-25.
