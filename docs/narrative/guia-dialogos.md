@@ -163,7 +163,14 @@ Passo a passo pra revisão retroativa (uso pelo `revisor-textual` ou `narrative-
 
 ## 11. Trocadilho e jargão NÃO se traduzem: cada idioma ganha a própria versão (regra do criador, 2026-07-26)
 
-**A regra:** fala cuja graça depende de **trocadilho, jargão técnico ou par de termos** não tem tradução literal. Cada idioma recebe uma **versão própria**, que preserva o EFEITO (o que a fala faz na cena) e não as palavras.
+**A regra, e ela é caso a caso (refinamento do criador, 2026-07-26): alguns trocadilhos SE traduzem, outros não. Resolve-se um a um, nunca por atacado.**
+
+Fala cuja graça depende de **trocadilho, jargão técnico ou par de termos** entra numa triagem antes de ir para tradução:
+
+1. **O par sobrevive nos dois idiomas?** Então **traduz normal**, e não se inventa versão nova (versão desnecessária é dívida de manutenção e risco de as duas línguas contarem coisas diferentes).
+2. **O par morre na passagem?** Então aquele idioma recebe **versão própria**, que preserva o EFEITO (o que a fala faz na cena) e não as palavras.
+
+Não presuma nenhum dos dois lados. **Testar o caso concreto** é o único método, e o teste é o critério de aceitação do item 3 abaixo.
 
 **Por que existe:** é o problema clássico do filme americano dublado, em que o trocadilho morre na passagem e sobra uma frase sem graça que ninguém entende. Aqui o risco é maior, porque a piada costuma carregar informação de personagem.
 
@@ -175,7 +182,7 @@ Passo a passo pra revisão retroativa (uso pelo `revisor-textual` ou `narrative-
 
 **Como aplicar:**
 
-1. Ao escrever fala com trocadilho ou jargão, **marque-a como "versão por idioma"** no doc, e não como "traduzir depois".
+1. Ao escrever fala com trocadilho ou jargão, **marque-a como "checar na passagem de idioma"**, e faça a triagem acima **uma a uma**. Marcar tudo como "versão por idioma" é tão errado quanto mandar tudo para tradução literal.
 2. Escreva a versão pt-br **primeiro** (é a língua de desenvolvimento) e registre ao lado, quando já souber, o par que funciona em inglês. Não force o mesmo par nos dois.
 3. Critério de aceitação: **um falante nativo daquele idioma que entende do assunto tem que pegar a piada sem explicação.** Se precisa de nota de rodapé, a versão está errada.
 4. Vale para o `i18n-l10n-specialist` e para qualquer tradução futura: **não traduza estas falas, peça a versão**.
