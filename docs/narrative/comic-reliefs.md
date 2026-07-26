@@ -596,6 +596,8 @@ Adicionar conforme o arco progride. Limite: máximo 1 cena cômica por capítulo
 
 Ou seja: o certo ganha por mais de dois para um, e **não se escreve fala errada por preguiça ou por efeito fácil**. Mas quando o erro do personagem serve para dar alma, marcar quem ele é diante do grupo, ou costurar uma incongruência que já existia, ele **fica** e vira material.
 
+**PROTOCOLO OBRIGATÓRIO (criador, 2026-07-26): erro técnico em fala de personagem NÃO se corrige e NÃO se decide sozinho. Leva-se ao criador, e a apresentação DEVE incluir a opção de justificativa social** (manter a fala porque o personagem está defendendo o que pensa diante do grupo), ao lado da opção de corrigir. Quem revisa **levanta** o achado; quem decide é o criador. Vale para qualquer agente e para o orquestrador.
+
 **Corolário prático, para quem for revisar canon:** achar um erro técnico na boca de um personagem **não é autorização para corrigi-lo**. Verifique primeiro se o certo é ensinado ali por contraponto (outro personagem responde, o resultado desmente, a cena seguinte mostra o custo). Se é, a fala fica. **Uma frase tecnicamente impecável na boca de um garoto de 14 anos em surto retórico é uma frase que ele não diria.** Este é o gate que faltou uma vez, em 2026-07-26, e que fez uma fala canônica ser "consertada" e revertida no mesmo dia.
 
 **A régua "fato: proibido mentir" continua exclusiva dos apartes do Gus** (`gus-apartes-c-arcane.md`), e é exclusiva de propósito: ali ele é o veículo didático, e o rigor é o ponto. Os outros personagens são humanos e erram.
