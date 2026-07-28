@@ -373,6 +373,208 @@ Cancel
 
 ---
 
+
+### Scene 15 (comic-reliefs), in-game form
+
+> Convertida da prosa de `docs/narrative/comic-reliefs.md` (Cena 15) em 2026-07-28.
+> Falas no registro `warm`; narração no registro `terminal`, speaker `terminal`.
+> Três arquivos em `resources/dialogues/`: `cena15_m1_pergunta`, `cena15_m2_intervalo`, `cena15_m3_coda`.
+
+## DIALOGUE_CENA15_M1_N01_ABERTURA
+The Infernal Ducts, in the block being rebuilt. Makeshift scaffolding, new cable run over the burnt one. Cauã is teaching five kids sitting on crates, and the smallest one won't leave his side.
+
+## DIALOGUE_CENA15_M1_N02_ESCREVE
+Write the step. Say what you want. She gets it.
+
+## DIALOGUE_CENA15_M1_N03_ERRADO
+And if I write it wrong?
+
+## DIALOGUE_CENA15_M1_N04_PERDOA
+She forgives. You fix it later.
+
+## DIALOGUE_CENA15_M1_N05_JAESCREVE
+The smallest one starts writing before Cauã finishes talking.
+
+## DIALOGUE_CENA15_M1_N06_PRONTO
+Done.
+
+## DIALOGUE_CENA15_M1_N07_LEITURA
+Cauã reads over his shoulder.
+
+## DIALOGUE_CENA15_M1_N08_LIGATUDO
+You wrote "turn everything on".
+
+## DIALOGUE_CENA15_M1_N09_EQUEEUQUERO
+That's what I want.
+
+## DIALOGUE_CENA15_M1_N10_TUDOOQUE
+Everything what?
+
+## DIALOGUE_CENA15_M1_N11_TUDO
+Everything.
+
+## DIALOGUE_CENA15_M1_N12_APAGA
+Delete the "everything".
+
+## DIALOGUE_CENA15_M1_N13_RIEM
+The other kids laugh. The smallest one doesn't find it funny at all, and erases it with great seriousness.
+
+## DIALOGUE_CENA15_M1_N14_CONSERTAR
+And if I don't know how to fix it?
+
+## DIALOGUE_CENA15_M1_N15_MECHAMA
+Then you call me.
+
+## DIALOGUE_CENA15_M1_N16_NAOESTIVER
+And if you're not there?
+
+## DIALOGUE_CENA15_M1_N17_OLHABLOCO
+Cauã stops. He looks at the kid. Then he looks at the block around them, which two weeks ago had more people sitting in it.
+
+## DIALOGUE_CENA15_M1_N18_OUTRO
+Then you call someone else. There's always someone else.
+
+## DIALOGUE_CENA15_M1_N19_ACEITA
+The kid accepts the answer right away, the way only an eight-year-old can. He goes back to writing. Cauã lets out his breath.
+
+## DIALOGUE_CENA15_M1_N20_CAUA
+Cauã.
+
+## DIALOGUE_CENA15_M1_N21_OI
+Yeah.
+
+## DIALOGUE_CENA15_M1_N22_COMPILAR
+What does compile mean?
+
+## DIALOGUE_CENA15_M1_N23_SILENCIO
+Silence. One of the older kids looks up, curious, because he never asked either.
+
+## DIALOGUE_CENA15_M1_N24_EQUANDO
+It's when...
+
+## DIALOGUE_CENA15_M1_N25_NAOCONTINUA
+The sentence doesn't continue.
+
+## DIALOGUE_CENA15_M1_N26_AMANHA
+Ask me tomorrow.
+
+## DIALOGUE_CENA15_M1_N27_SAIDA
+He puts the stylus away and leaves slowly. His hand stays still the whole way. None of the kids find that strange: Cauã always comes back.
+
+## DIALOGUE_CENA15_M2_N01_CATEDRAL
+The Cathedral of Neo-Sylvania, late afternoon. The echo gives every footstep back half a second later. Cauã walks in and hates the place immediately. Bento is sitting on a step, cleaning one of the shield's gears with a rag, and doesn't look up.
+
+## DIALOGUE_CENA15_M2_N02_MOSAICO
+You are standing on the mosaic.
+
+## DIALOGUE_CENA15_M2_N03_CHAOINTEIRO
+There's mosaic on the whole floor.
+
+## DIALOGUE_CENA15_M2_N04_TEM
+There is.
+
+## DIALOGUE_CENA15_M2_N05_EPISANDO
+And you are standing on it.
+
+## DIALOGUE_CENA15_M2_N06_PES
+Cauã looks down at his own feet. He takes a step to the side. It doesn't help. He gives up.
+
+## DIALOGUE_CENA15_M2_N07_PERGUNTAR
+I gotta ask you something.
+
+## DIALOGUE_CENA15_M2_N08_PERGUNTA
+Ask.
+
+## DIALOGUE_CENA15_M2_N09_NAOPERGUNTA
+Cauã doesn't ask. Bento keeps cleaning the gear and doesn't help. A good few seconds go by, and the echo gives nothing back, because nobody spoke.
+
+## DIALOGUE_CENA15_M2_N10_MOLEQUE
+A kid asked me something yesterday.
+
+## DIALOGUE_CENA15_M2_N11_E
+And?
+
+## DIALOGUE_CENA15_M2_N12_AMANHA
+And I told him to ask me tomorrow.
+
+## DIALOGUE_CENA15_M2_N13_AMANHAEHOJE
+Tomorrow is today.
+
+## DIALOGUE_CENA15_M2_N14_LIMPA
+Bento cleans the gear.
+
+## DIALOGUE_CENA15_M2_N15_NEMCOMPILA
+You said mine doesn't even compile.
+
+## DIALOGUE_CENA15_M2_N16_FALEI
+I did.
+
+## DIALOGUE_CENA15_M2_N17_ZOANDO
+Were you messing with me?
+
+## DIALOGUE_CENA15_M2_N18_PARA
+Bento stops cleaning. He sets the rag down in his lap.
+
+## DIALOGUE_CENA15_M2_N19_NAO
+No.
+
+## DIALOGUE_CENA15_M2_N20_ECO
+The echo gives the no back half a second later. Cauã hears it twice.
+
+## DIALOGUE_CENA15_M2_N21_SILENCIO
+Bento doesn't add anything, and the pause goes past the point where adding something would still be comfortable.
+
+## DIALOGUE_CENA15_M2_N22_PALAVRA
+But you say the word every day.
+
+## DIALOGUE_CENA15_M2_N23_PROMESSA
+That is not a lie, lad. It is a promise.
+
+## DIALOGUE_CENA15_M2_N24_SENTA
+Cauã sits on the step, two below him. He doesn't ask permission. Bento doesn't complain.
+
+## DIALOGUE_CENA15_M2_N25_PROMESSADEQUE
+A promise of what?
+
+## DIALOGUE_CENA15_M2_N26_VERDADE
+That one day the word will be true in your mouth.
+
+## DIALOGUE_CENA15_M2_N27_NAODECIDO
+That is not mine to decide.
+
+## DIALOGUE_CENA15_M2_N28_LEVANTA
+Cauã sits with that for a while. Then he gets up and leaves. Halfway down the nave, he stops.
+
+## DIALOGUE_CENA15_M2_N29_BENTO
+Bento.
+
+## DIALOGUE_CENA15_M2_N30_GAROTO
+Lad.
+
+## DIALOGUE_CENA15_M2_N31_OBRIGADO
+Thank you.
+
+## DIALOGUE_CENA15_M2_N32_FECHO
+Bento doesn't answer. He waits for the echo to give the word back, and only then goes back to cleaning the gear.
+
+## DIALOGUE_CENA15_M3_N01_CAIXOTE
+The Infernal Ducts, later. The kid is sitting on the same crate, with the same stylus.
+
+## DIALOGUE_CENA15_M3_N02_FALOU
+You told me to ask you tomorrow.
+
+## DIALOGUE_CENA15_M3_N03_FALEI
+I did.
+
+## DIALOGUE_CENA15_M3_N04_EAMANHA
+It's tomorrow.
+
+## DIALOGUE_CENA15_M3_N05_SENTA
+Cauã sits down next to him on the crate.
+
+## DIALOGUE_CENA15_M3_N06_ELONGO
+Then sit properly, because this takes a while.
+
 ## §7. Errors + system messages
 
 ## ERROR_GENERIC

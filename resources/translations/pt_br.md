@@ -542,6 +542,208 @@ Vai andando. Essa praça já viu gente demais sair, e não voltar do jeito que f
 
 ---
 
+
+### Cena 15 (comic-reliefs), forma-jogo
+
+> Convertida da prosa de `docs/narrative/comic-reliefs.md` (Cena 15) em 2026-07-28.
+> Falas no registro `warm`; narração no registro `terminal`, speaker `terminal`.
+> Três arquivos em `resources/dialogues/`: `cena15_m1_pergunta`, `cena15_m2_intervalo`, `cena15_m3_coda`.
+
+## DIALOGUE_CENA15_M1_N01_ABERTURA
+Os Dutos Infernais, no bloco em reconstrução. Andaime improvisado, cabo novo passado por cima do cabo queimado. Cauã ensina cinco moleques sentados em caixotes, e o menor deles não desgruda.
+
+## DIALOGUE_CENA15_M1_N02_ESCREVE
+Escreve o passo. Fala o que você quer. Ela entende.
+
+## DIALOGUE_CENA15_M1_N03_ERRADO
+E se eu escrever errado?
+
+## DIALOGUE_CENA15_M1_N04_PERDOA
+Ela perdoa. Você conserta depois.
+
+## DIALOGUE_CENA15_M1_N05_JAESCREVE
+O menor escreve antes de o Cauã terminar de falar.
+
+## DIALOGUE_CENA15_M1_N06_PRONTO
+Pronto.
+
+## DIALOGUE_CENA15_M1_N07_LEITURA
+Cauã lê por cima do ombro dele.
+
+## DIALOGUE_CENA15_M1_N08_LIGATUDO
+Você escreveu "liga tudo".
+
+## DIALOGUE_CENA15_M1_N09_EQUEEUQUERO
+É o que eu quero.
+
+## DIALOGUE_CENA15_M1_N10_TUDOOQUE
+Tudo o quê?
+
+## DIALOGUE_CENA15_M1_N11_TUDO
+Tudo.
+
+## DIALOGUE_CENA15_M1_N12_APAGA
+Apaga o "tudo".
+
+## DIALOGUE_CENA15_M1_N13_RIEM
+Os outros moleques riem. O menor não acha graça nenhuma, e apaga com muita seriedade.
+
+## DIALOGUE_CENA15_M1_N14_CONSERTAR
+E se eu não souber consertar?
+
+## DIALOGUE_CENA15_M1_N15_MECHAMA
+Aí você me chama.
+
+## DIALOGUE_CENA15_M1_N16_NAOESTIVER
+E se você não estiver?
+
+## DIALOGUE_CENA15_M1_N17_OLHABLOCO
+Cauã para. Olha pro moleque. Depois olha pro bloco em volta, que até duas semanas atrás tinha mais gente sentada nele.
+
+## DIALOGUE_CENA15_M1_N18_OUTRO
+Aí você chama outro. Sempre tem outro.
+
+## DIALOGUE_CENA15_M1_N19_ACEITA
+O moleque aceita a resposta na hora, do jeito que só quem tem oito anos aceita. Volta a escrever. Cauã solta o ar.
+
+## DIALOGUE_CENA15_M1_N20_CAUA
+Cauã.
+
+## DIALOGUE_CENA15_M1_N21_OI
+Oi.
+
+## DIALOGUE_CENA15_M1_N22_COMPILAR
+O que é compilar?
+
+## DIALOGUE_CENA15_M1_N23_SILENCIO
+Silêncio. Um dos moleques maiores levanta a cabeça, curioso, porque também nunca perguntou.
+
+## DIALOGUE_CENA15_M1_N24_EQUANDO
+É quando...
+
+## DIALOGUE_CENA15_M1_N25_NAOCONTINUA
+A frase não continua.
+
+## DIALOGUE_CENA15_M1_N26_AMANHA
+Pergunta amanhã.
+
+## DIALOGUE_CENA15_M1_N27_SAIDA
+Ele guarda o estilete e vai embora devagar. A mão dele fica parada o caminho inteiro. Nenhum dos moleques acha isso estranho: o Cauã sempre volta.
+
+## DIALOGUE_CENA15_M2_N01_CATEDRAL
+A Catedral de Neo-Sylvania, fim de tarde. O eco devolve cada passo com meio segundo de atraso. Cauã entra e odeia o lugar imediatamente. Bento está sentado num degrau, limpando uma engrenagem do escudo com um pano, e não levanta a cabeça.
+
+## DIALOGUE_CENA15_M2_N02_MOSAICO
+Você está pisando no mosaico.
+
+## DIALOGUE_CENA15_M2_N03_CHAOINTEIRO
+Tem mosaico no chão inteiro.
+
+## DIALOGUE_CENA15_M2_N04_TEM
+Tem.
+
+## DIALOGUE_CENA15_M2_N05_EPISANDO
+E você está pisando nele.
+
+## DIALOGUE_CENA15_M2_N06_PES
+Cauã olha pros próprios pés. Dá um passo pro lado. Não melhora nada. Desiste.
+
+## DIALOGUE_CENA15_M2_N07_PERGUNTAR
+Preciso perguntar uma parada.
+
+## DIALOGUE_CENA15_M2_N08_PERGUNTA
+Pergunta.
+
+## DIALOGUE_CENA15_M2_N09_NAOPERGUNTA
+Cauã não pergunta. Bento continua limpando a engrenagem e não ajuda. Passam uns bons segundos, e o eco não devolve nada, porque ninguém falou.
+
+## DIALOGUE_CENA15_M2_N10_MOLEQUE
+Um moleque me perguntou uma coisa ontem.
+
+## DIALOGUE_CENA15_M2_N11_E
+E?
+
+## DIALOGUE_CENA15_M2_N12_AMANHA
+E eu falei pra ele perguntar amanhã.
+
+## DIALOGUE_CENA15_M2_N13_AMANHAEHOJE
+Amanhã é hoje.
+
+## DIALOGUE_CENA15_M2_N14_LIMPA
+Bento limpa a engrenagem.
+
+## DIALOGUE_CENA15_M2_N15_NEMCOMPILA
+Você falou que a minha nem compila.
+
+## DIALOGUE_CENA15_M2_N16_FALEI
+Falei.
+
+## DIALOGUE_CENA15_M2_N17_ZOANDO
+Você tava zoando?
+
+## DIALOGUE_CENA15_M2_N18_PARA
+Bento para de limpar. Põe o pano no colo.
+
+## DIALOGUE_CENA15_M2_N19_NAO
+Não.
+
+## DIALOGUE_CENA15_M2_N20_ECO
+O eco devolve o não meio segundo depois. Cauã escuta duas vezes.
+
+## DIALOGUE_CENA15_M2_N21_SILENCIO
+Bento não acrescenta nada, e a pausa passa do ponto em que seria confortável acrescentar.
+
+## DIALOGUE_CENA15_M2_N22_PALAVRA
+Mas você diz a palavra todo dia.
+
+## DIALOGUE_CENA15_M2_N23_PROMESSA
+Isso não é mentira, garoto. É promessa.
+
+## DIALOGUE_CENA15_M2_N24_SENTA
+Cauã senta no degrau, dois abaixo dele. Não pede licença. Bento não reclama.
+
+## DIALOGUE_CENA15_M2_N25_PROMESSADEQUE
+Promessa de quê?
+
+## DIALOGUE_CENA15_M2_N26_VERDADE
+De que um dia a palavra vai ser verdade na tua boca.
+
+## DIALOGUE_CENA15_M2_N27_NAODECIDO
+Não sou eu que decido quando.
+
+## DIALOGUE_CENA15_M2_N28_LEVANTA
+Cauã fica com isso um tempo. Depois levanta e vai embora. No meio da nave, para.
+
+## DIALOGUE_CENA15_M2_N29_BENTO
+Bento.
+
+## DIALOGUE_CENA15_M2_N30_GAROTO
+Garoto.
+
+## DIALOGUE_CENA15_M2_N31_OBRIGADO
+Obrigado.
+
+## DIALOGUE_CENA15_M2_N32_FECHO
+Bento não responde. Espera o eco devolver a palavra e só então volta a limpar a engrenagem.
+
+## DIALOGUE_CENA15_M3_N01_CAIXOTE
+Os Dutos Infernais, depois. O moleque está sentado no mesmo caixote, com o mesmo estilete.
+
+## DIALOGUE_CENA15_M3_N02_FALOU
+Você falou pra eu perguntar amanhã.
+
+## DIALOGUE_CENA15_M3_N03_FALEI
+Falei.
+
+## DIALOGUE_CENA15_M3_N04_EAMANHA
+É amanhã.
+
+## DIALOGUE_CENA15_M3_N05_SENTA
+Cauã senta ao lado dele no caixote.
+
+## DIALOGUE_CENA15_M3_N06_ELONGO
+Então senta direito, que é longo.
+
 ## §7. Errors + mensagens sistema
 
 ## ERROR_GENERIC
