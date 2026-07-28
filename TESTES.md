@@ -193,10 +193,12 @@ automaticamente; não precisa passar `-c`.
 gitleaks dir --no-banner .
 ```
 
-⚠️ O subcomando `gitleaks detect`, prescrito por versões antigas deste documento, foi
-**removido na série 8.30** — quem rodar aquele comando toma erro de subcomando inválido,
-não um gate verde. Hoje são dois subcomandos distintos: `gitleaks dir` (árvore) e
-`gitleaks git` (histórico).
+⚠️ Não use `gitleaks detect`, prescrito por versões antigas deste documento. Na série 8.30
+ele está **oculto, não removido**: some da lista "Available Commands" do `--help`, mas ainda
+executa e sai 0 (verificado no binário 8.30.0 em 2026-07-28). É pior que um erro limpo, porque
+o comando obsoleto passa despercebido até morrer de vez no próximo major. Use os dois
+subcomandos publicados, que têm escopos distintos: `gitleaks dir` (árvore) e `gitleaks git`
+(histórico).
 
 ```bash
 # auditoria de histórico (todos os refs) — NÃO é gate de dia a dia

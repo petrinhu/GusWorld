@@ -30,7 +30,9 @@ GusWorld's entire player-facing UI (menus, the battle cockpit, dialogue, HUD) ex
 
 ### miniaudio
 
-[miniaudio](https://miniaud.io/) (`github.com/mackron/miniaudio`, public domain / MIT-0, by David Reid) is the audio engine behind GusWorld's music, SFX and cross-fades. It's vendored as a single header in `GusEngine/third_party/`, which is exactly the kind of dependency a small solo project loves: no build system to fight, no dynamic linking to configure, drop the header in and it works. Thank you, David Reid, for putting this level of audio engineering behind such a simple, generous license.
+[miniaudio](https://miniaud.io/) (`github.com/mackron/miniaudio`, public domain / MIT-0, by David Reid) is still the audio engine behind GusWorld's music, SFX and cross-fades, but it no longer enters the project directly. Since 2026-07-22 the game's audio goes through `glintfx::Audio`, and miniaudio comes in transitively as the implementation glintfx vendors and compiles on its own; GusWorld's `AudioEngine` facade sits on top of that and never touches a `ma_*` type. The credit stands either way, and so does the reason miniaudio won in the first place: a single-header audio engine with no build system to fight and no dynamic linking to configure is exactly the kind of dependency a small solo project loves. Thank you, David Reid, for putting this level of audio engineering behind such a simple, generous license.
+
+*Historical note: miniaudio used to be vendored directly in `GusEngine/third_party/miniaudio/`. That copy was removed in the M9 cleanup (2026-07-22), once `glintfx::Audio` had taken over the device.*
 
 ---
 
@@ -52,15 +54,12 @@ GusWorld's entire player-facing UI (menus, the battle cockpit, dialogue, HUD) ex
 
 ## C++ toolkit
 
-Beyond the platform-critical dependencies above, GusWorld vendors a curated set of modern, header-only C++ libraries under `GusEngine/third_party/`, each under its own permissive license (see [THIRD-PARTY-LICENSES.md](THIRD-PARTY-LICENSES.md) for the full list and exact licenses). A few worth calling out by name:
+Beyond the platform-critical dependencies above, GusWorld vendors C++ source under `GusEngine/third_party/`, each library under its own permissive license (see [THIRD-PARTY-LICENSES.md](THIRD-PARTY-LICENSES.md) for the exact licenses). The list is short on purpose, and today it has exactly two entries:
 
-- **[glm](https://github.com/g-truc/glm)** (MIT), GLSL-style math types, the kind of small utility that quietly saves hours across an entire codebase.
-- **[EnTT](https://github.com/skypjack/entt)** (MIT), a fast, modern entity-component-system library by Michele Caini (skypjack).
-- **[Box2D](https://github.com/erincatto/box2d)** (MIT), Erin Catto's battle-tested 2D physics engine, a foundational piece of open-source game tech used far beyond this one project.
-- **[stb](https://github.com/nothings/stb)** (MIT / public domain), Sean Barrett's single-header libraries; a huge part of the indie game dev world runs on stb in one way or another.
-- **[fmt](https://github.com/fmtlib/fmt)** (MIT), fast, safe, modern string formatting for C++.
+- **[stb](https://github.com/nothings/stb)** (MIT / public domain), Sean Barrett's single-header libraries: image loading, writing and resizing, rectangle packing, and TrueType rasterization, all used by the render2d and font-atlas layers. A huge part of the indie game dev world runs on stb in one way or another.
+- **[Monocypher](https://monocypher.org/)** (CC0 / BSD-2-Clause), thanked in full in the Cryptography section above, and the only vendored dependency with a build of its own.
 
-Thank you to every author and contributor in this toolkit. Header-only, permissively licensed C++ libraries are a gift to small teams, and GusWorld leans on many of them.
+*Historical note: an earlier round of vendoring (2026-06-22) pulled in a much larger "just in case" toolkit of header-only libraries, among them [glm](https://github.com/g-truc/glm) (MIT), [EnTT](https://github.com/skypjack/entt) (MIT), [Box2D](https://github.com/erincatto/box2d) (MIT) and [fmt](https://github.com/fmtlib/fmt) (MIT). Thirty-one of those libraries had no remaining `#include` outside `third_party/` by the time the M9 cleanup came around, and were removed from the repository on 2026-07-22. They are named here as history, not as current dependencies. The thanks to their authors stands anyway: being able to try a library, decide it is not needed, and drop it without friction is itself part of what permissive, header-only C++ gives a small team.*
 
 ---
 
@@ -102,7 +101,9 @@ Toda a UI voltada ao jogador do GusWorld (menus, o cockpit de batalha, diálogos
 
 #### miniaudio
 
-O [miniaudio](https://miniaud.io/) (`github.com/mackron/miniaudio`, domínio público / MIT-0, de David Reid) é o motor de áudio por trás da música, dos SFX e dos cross-fades do GusWorld. Está vendorizado como um único header em `GusEngine/third_party/`, exatamente o tipo de dependência que um pequeno projeto solo adora: nenhum sistema de build para brigar, nenhuma linkagem dinâmica para configurar, é só colocar o header e funciona. Obrigado, David Reid, por colocar esse nível de engenharia de áudio atrás de uma licença tão simples e generosa.
+O [miniaudio](https://miniaud.io/) (`github.com/mackron/miniaudio`, domínio público / MIT-0, de David Reid) continua sendo o motor de áudio por trás da música, dos SFX e dos cross-fades do GusWorld, mas não entra mais no projeto diretamente. Desde 2026-07-22 o áudio do jogo passa pelo `glintfx::Audio`, e o miniaudio chega de forma transitiva, como a implementação que o glintfx vendoriza e compila por conta própria; a fachada `AudioEngine` do GusWorld fica por cima disso e nunca toca num tipo `ma_*`. O crédito vale do mesmo jeito, e o motivo pelo qual o miniaudio ganhou continua valendo também: um motor de áudio em um header só, sem sistema de build para brigar e sem linkagem dinâmica para configurar, é exatamente o tipo de dependência que um pequeno projeto solo adora. Obrigado, David Reid, por colocar esse nível de engenharia de áudio atrás de uma licença tão simples e generosa.
+
+*Nota histórica: o miniaudio já foi vendorizado direto em `GusEngine/third_party/miniaudio/`. Essa cópia foi removida na higienização do M9 (2026-07-22), depois que o `glintfx::Audio` assumiu o device.*
 
 ### Criptografia
 
@@ -118,15 +119,12 @@ O [Catch2](https://github.com/catchorg/Catch2) é o framework de testes por trá
 
 ### Kit de bibliotecas C++
 
-Além das dependências críticas de plataforma citadas acima, o GusWorld vendoriza um conjunto selecionado de bibliotecas C++ modernas e header-only em `GusEngine/third_party/`, cada uma sob sua própria licença permissiva (veja [THIRD-PARTY-LICENSES.md](THIRD-PARTY-LICENSES.md) para a lista completa e licenças exatas). Algumas merecem menção nominal:
+Além das dependências críticas de plataforma citadas acima, o GusWorld vendoriza código C++ em `GusEngine/third_party/`, cada biblioteca sob sua própria licença permissiva (veja [THIRD-PARTY-LICENSES.md](THIRD-PARTY-LICENSES.md) para as licenças exatas). A lista é curta de propósito, e hoje tem exatamente duas entradas:
 
-- **[glm](https://github.com/g-truc/glm)** (MIT), tipos matemáticos estilo GLSL, o tipo de utilitário pequeno que silenciosamente economiza horas ao longo de todo um código-fonte.
-- **[EnTT](https://github.com/skypjack/entt)** (MIT), uma biblioteca rápida e moderna de entity-component-system, de Michele Caini (skypjack).
-- **[Box2D](https://github.com/erincatto/box2d)** (MIT), a engine de física 2D testada em batalha de Erin Catto, uma peça fundamental da tecnologia de jogos open-source usada muito além deste único projeto.
-- **[stb](https://github.com/nothings/stb)** (MIT / domínio público), as bibliotecas single-header de Sean Barrett; boa parte do mundo indie de desenvolvimento de jogos roda em cima do stb de alguma forma.
-- **[fmt](https://github.com/fmtlib/fmt)** (MIT), formatação de string rápida, segura e moderna para C++.
+- **[stb](https://github.com/nothings/stb)** (MIT / domínio público), as bibliotecas single-header de Sean Barrett: carregamento, escrita e redimensionamento de imagem, empacotamento de retângulos e rasterização TrueType, todas usadas pelas camadas de render2d e de atlas de fonte. Boa parte do mundo indie de desenvolvimento de jogos roda em cima do stb de alguma forma.
+- **[Monocypher](https://monocypher.org/)** (CC0 / BSD-2-Clause), agradecido por extenso na seção de Criptografia acima, e o único vendor com build próprio.
 
-Obrigado a cada autor e contribuidor deste kit. Bibliotecas C++ header-only sob licença permissiva são um presente para times pequenos, e o GusWorld se apoia em várias delas.
+*Nota histórica: uma rodada anterior de vendorização (2026-06-22) trouxe um kit bem maior de bibliotecas header-only "por via das dúvidas", entre elas [glm](https://github.com/g-truc/glm) (MIT), [EnTT](https://github.com/skypjack/entt) (MIT), [Box2D](https://github.com/erincatto/box2d) (MIT) e [fmt](https://github.com/fmtlib/fmt) (MIT). Trinta e uma dessas bibliotecas já não tinham nenhum `#include` fora de `third_party/` quando a higienização do M9 chegou, e foram removidas do repositório em 2026-07-22. Estão nomeadas aqui como registro histórico, não como dependência atual. O agradecimento aos autores vale de qualquer forma: poder experimentar uma biblioteca, concluir que ela não é necessária e removê-la sem atrito é parte do que o C++ header-only sob licença permissiva dá a um time pequeno.*
 
 ### Nota final
 
@@ -136,4 +134,4 @@ Se o GusWorld algum dia ajudar alguém a descobrir um desses projetos, essa já 
 
 ---
 
-*Last updated / última atualização: 2026-07-10.*
+*Last updated / última atualização: 2026-07-28 (dependency state re-checked against the tree after the M9 cleanup / estado das dependências reconferido contra a árvore depois da higienização do M9).*
