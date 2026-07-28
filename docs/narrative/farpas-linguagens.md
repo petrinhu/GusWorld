@@ -21,6 +21,7 @@ Consequência: **Pythia (Cauã e Jaci) perde no eixo da execução, sempre.** A 
 | **Elenco** | F11 a F22 (pares Cauã × Iara e Jaci × Linda) | Só disparam com o **Gus FORA do grupo ativo**. Sem o Gus na sala os dois chegam sozinhos a conclusões que favorecem o ausente, e é isso que faz o par existir em vez de virar plateia. |
 | **Estado do bordão** | F02, F13 | Ficam melhores **depois** do payoff da [Cena 15](comic-reliefs.md) (o bordão do Cauã tem três estados, ver `CAUA-BORDAO-3-ESTADOS` no `TODO.md`). |
 | **Eco pós-cena (trava dura)** | **F11, F12, F13** | Estas três **vivem dentro da [Cena 16](comic-reliefs.md) quase palavra por palavra**. Só podem disparar **DEPOIS de a cena ter acontecido**. Antes disso, o jogador ouviria a troca fora de contexto e a cena chegaria depois soando repetida. Decisão do criador, 2026-07-27. |
+| **Eco pós-cena (trava dura)** | **F17, F18, F19, F21** | Mesma situação com a [Cena 17](comic-reliefs.md), que contém **quatro das seis** farpas do par Jaci x Linda. Só disparam depois da cena. Livres desde o começo: apenas F20 e F22. |
 | **Versão por idioma** | F09 | A fala pt-br e a inglesa usam **pares de termos diferentes**, não tradução. Ver a nota na própria farpa e a seção 11 do [guia de diálogos](guia-dialogos.md). |
 
 ---
@@ -209,7 +210,7 @@ Mesma pergunta da F04, sem o Gus: com ele ela sussurrou uma preferência, com o 
 
 **Cuidados de voz herdados:** a Jaci nunca grita, a Linda nunca ornamenta, e **nenhuma farpa tira os fones dela** (o ritmo da Linda só para em dor real, e a F22 é a exceção que confirma). O tic de off-by-one da Jaci pode ser tocado de leve, **nunca como punchline**: a Cena 9 já gastou essa piada.
 
-### F17 · gatilho: início de combate, ou preparação de investida
+### F17 · gatilho: início de combate, ou preparação de investida · **ECO PÓS-CENA 17**
 
 > **LINDA:** "Três, dois, um."
 >
@@ -219,7 +220,7 @@ Mesma pergunta da F04, sem o Gus: com ele ela sussurrou uma preferência, com o 
 >
 > **JACI:** "Você contou pra frente." *(pausa)* "Eu conto pra trás."
 
-### F18 · gatilho: cura sob pressão, ou uso do último item
+### F18 · gatilho: cura sob pressão, ou uso do último item · **ECO PÓS-CENA 17**
 
 > **LINDA:** "O meu não monta com peça faltando. Ele para antes de mim."
 >
@@ -227,7 +228,7 @@ Mesma pergunta da F04, sem o Gus: com ele ela sussurrou uma preferência, com o 
 
 Única troca do arquivo em que **as duas estão certas e não há vencedor**: a recusa de compilar de um lado, o erro identificado com nome e número do outro (R-02, fontado). "Ele para antes de mim" é a fala de quem já se viu errando.
 
-### F19 · gatilho: a cura da Jaci resolve tarde
+### F19 · gatilho: a cura da Jaci resolve tarde · **ECO PÓS-CENA 17**
 
 > **LINDA:** "Sua cura demorou meio compasso."
 >
@@ -245,7 +246,7 @@ Mesma pergunta da F04, sem o Gus: com ele ela sussurrou uma preferência, com o 
 
 Quem enuncia a lei aqui é a própria Jaci, sobre a própria carta, **sem ressentimento**. Base factual: o núcleo numérico e os builtins do CPython são C pré-compilado (A2 e R-08, fontados).
 
-### F21 · gatilho: distribuição de itens antes de uma missão
+### F21 · gatilho: distribuição de itens antes de uma missão · **ECO PÓS-CENA 17**
 
 > **LINDA:** "Decide agora quem fica com a última."
 >
