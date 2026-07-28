@@ -15,6 +15,8 @@ O código próprio do GusWorld está sob GPLv3 (ver [LICENSE](LICENSE)); os asse
 | RmlUi | MIT | mikke89 e contribuidores | UI do jogador, **ATIVA** desde o M2 (glintfx embed mode, ADR-010); corrige nota anterior desatualizada ("ainda não usada"). Via FetchContent, pin fixado por SHA `2cd28864ae25ed345b70598751703a5433b12356`, correspondente à **v6.3** (alinhado ao pin que o glintfx exige). `RMLUI_FONT_ENGINE=freetype`. |
 | FreeType | FTL (FreeType License) | The FreeType Project | Dependência do RmlUi (`find_package(Freetype)`, biblioteca de sistema, Linux: `libfreetype-dev`, NÃO via FetchContent). Rasteriza a fonte do HUD (Pixel Operator Mono) e os font-effects (glow/outline). **A FTL exige aviso de atribuição na documentação de distribuição; texto obrigatório na seção dedicada abaixo.** |
 | miniaudio | Unlicense (domínio público) **ou** MIT-0, à escolha de quem usa (dupla, declarada no rodapé do próprio `miniaudio.h`) | David Reid / mackron (<https://github.com/mackron/miniaudio>) | **Dependência TRANSITIVA: não é vendorizada por nós, mas ESTÁ no binário distribuído.** Entra pelo glintfx, que vendoriza e compila o próprio `miniaudio.h` (`glintfx/third_party/miniaudio/`, pin `0.11.25`, commit `9634bedb5b5a2ca38c1ee7108a9358a4e233f14d`) quando `GLINTFX_MODULE_AUDIO=ON` (`GusEngine/CMakeLists.txt:188`). A fachada `AudioEngine` do GusWorld fala com `glintfx::Audio` e não inclui `miniaudio.h`; a cópia direta que existia em `GusEngine/third_party/miniaudio/` foi removida na higienização do M9 (2026-07-22), quando o áudio migrou para o módulo do glintfx. Nenhuma das duas licenças exige aviso de atribuição no binário, mas o componente é distribuído, então é listado aqui. |
+| SDL_GameControllerDB (subconjunto Linux) | zlib | Sam Lantinga e a comunidade do SDL; base mantida em <https://github.com/mdqinc/SDL_GameControllerDB> | **Dependência TRANSITIVA, específica de Linux, e ESTÁ no binário distribuído.** Entra pelo glintfx, que vendoriza um subconjunto filtrado do banco de mapeamentos **como DADO** (`glintfx/third_party/gamecontrollerdb/`) e o embute via `#include "gamecontrollerdb_linux.inc"` em `glintfx/src/gamepad.cpp:105`, consumido pelo parser clean-room do próprio glintfx (nenhum código do SDL é compilado ou linkado por essa via). Ativo sempre que `GLINTFX_MODULE_GAMEPAD=ON`, o que aqui vale para `UNIX AND NOT APPLE` (`GusEngine/CMakeLists.txt:194-198`); em Windows e macOS o módulo é OFF e o dado não entra. A zlib pede que o aviso não seja removido nem alterado de distribuição de código-fonte, e não impõe atribuição em distribuição binária; listado aqui porque é obra de terceiro com titular próprio embarcada no release Linux, que é a plataforma da v1.0.0. |
+| Headers do Khronos (OpenGL) | MIT (`GL/glcorearb.h`, `KHR/khrplatform.h`) e Apache-2.0 (`gl.xml`, o registry) | The Khronos Group Inc. | **Dependência TRANSITIVA de BUILD, não de distribuição.** O glintfx vendoriza os headers de declaração da API OpenGL (`glintfx/third_party/khronos/`) para gerar e compilar o próprio loader GL. São `typedef`, `#define` e protótipo: **nenhum código de terceiro do Khronos entra no binário** por essa via, ao contrário do miniaudio e do gamecontrollerdb, que entram. Listado pelo mesmo motivo do Catch2, porque esta tabela se pretende exaustiva. |
 | Catch2 | BSL-1.0 (Boost) | catchorg / Phil Nash, Martin Hořeňovský e contribuidores (<https://github.com/catchorg/Catch2>) | Framework da suíte de testes (`ctest` + Catch2 nas 4 camadas). Via FetchContent, pin `v3.7.1` em `GusEngine/CMakeLists.txt` (linha 349). **Não entra no binário distribuído** (linka só nos alvos de teste, que não são empacotados no release), então a obrigação de atribuição da BSL-1.0 não recai sobre o pacote do jogo; fica listado aqui porque esta tabela se pretende exaustiva e o Catch2 é dependência de build real. |
 | Fontes Noto | SIL OFL 1.1 | Google e contribuidores | <https://openfontlicense.org> |
 | Fonte Inter | SIL OFL 1.1 | The Inter Project Authors | <https://openfontlicense.org> |
@@ -60,6 +62,8 @@ Codigo-fonte incorporado no repo (filosofia zero-dep), cada lib com seu arquivo 
 
 Nota de compatibilidade: ambas permissivas e compativeis com o GPLv3 do jogo.
 
+**Precisão de inventário sobre o `stb` (2026-07-28): o binário carrega DUAS cópias dele.** A linha acima descreve a nossa, em `GusEngine/third_party/stb/`, usada pelas camadas de render2d e de atlas de fonte. O glintfx vendoriza a própria `stb_image.h` e compila a implementação dele em `stb_image_impl.cpp` (ver `glintfx/src/render_gl3.cpp:25-26`), então a segunda cópia chega junto do glintfx. Mesma biblioteca, mesmo autor e mesma licença, logo não há obrigação adicional; fica registrado para o inventário bater com o que o binário realmente contém.
+
 ---
 
 ## Links das licenças (texto oficial)
@@ -95,5 +99,15 @@ Fonte do Qt: <https://download.qt.io/official_releases/qt/>
 ## Manutenção
 
 Atualizar esta tabela sempre que adicionar, remover ou trocar a versão de qualquer dependência de terceiro (addon Godot, fonte, biblioteca C++/NuGet, lib do sistema empacotada). Auditoria de licença = item RF-9 do pivot.
+
+**Dependência transitiva conta, e o bump do glintfx é gatilho obrigatório (regra acrescentada em 2026-07-28).** A formulação anterior mandava atualizar quando "uma dependência de terceiro" mudasse, e foi exatamente por ela que um componente escapou: o glintfx é dependência nossa, mas os vendors DELE não são "nossos" na leitura literal, e a tabela só rastreava o dono antigo. Foi o que aconteceu com o miniaudio, que **não saiu do binário, mudou de dono** (deixou de ser vendorizado por nós e passou a chegar embutido no glintfx), e ficou fora deste documento por isso.
+
+Portanto: **sempre que o pin do glintfx mudar (`GIT_TAG` em `GusEngine/CMakeLists.txt`), reconferir os vendors dele contra esta tabela**, mesmo que nenhuma dependência nossa tenha mudado. O conjunto de vendors do glintfx não é estável entre releases. Conferência mecânica, depois de configurar o build:
+
+```bash
+ls GusEngine/build/linux-release/_deps/glintfx-src/glintfx/third_party/
+```
+
+No pin `v0.20.0` isso devolve `gamecontrollerdb`, `khronos`, `miniaudio` e `stb`, os quatro já cobertos acima. Entrada nova nessa listagem precisa de linha nova aqui, classificando **se entra no binário distribuído ou se é só build**, porque a obrigação de atribuição depende disso. Vale o mesmo raciocínio para qualquer outra dependência que vendorize código de terceiro (hoje, além do glintfx, o RmlUi é o caso a vigiar).
 
 *Recomendação técnica de atribuição; validação jurídica formal cabe ao titular.*
