@@ -69,6 +69,11 @@ add_executable(gusengine_domain_tests
     environment_cap_property_test.cpp
     combat_formula_property_test.cpp
     initiative_queue_property_test.cpp
+    # FALHA CONHECIDA marcada com Catch2 [!shouldfail] (verificacao independente 2026-07-28):
+    # recompute_by_speed reordena a regiao [0, cursor_] e quebra "cada ator age 1x por
+    # rodada". Documenta o bug e vira o criterio de aceite do conserto - ver o cabecalho do
+    # arquivo para a semantica decidida pelo lider (preservar a particao).
+    initiative_queue_recompute_round_invariant_test.cpp
     # Marco M2 (metade de logica pura): input_remap (ActionRegistry/InputBinding)
     # portado C#->C++ POCO. O backend de evento Qt (platform/input/) NAO entra aqui.
     input_remap_test.cpp
