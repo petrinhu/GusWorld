@@ -98,7 +98,9 @@ Fonte do Qt: <https://download.qt.io/official_releases/qt/>
 
 ## Manutenção
 
-Atualizar esta tabela sempre que adicionar, remover ou trocar a versão de qualquer dependência de terceiro (addon Godot, fonte, biblioteca C++/NuGet, lib do sistema empacotada). Auditoria de licença = item RF-9 do pivot.
+Atualizar esta tabela sempre que adicionar, remover ou trocar a versão de qualquer dependência de terceiro: **biblioteca C++ via FetchContent** (pin no `GusEngine/CMakeLists.txt`), **lib vendorizada** em `GusEngine/third_party/`, **fonte**, **lib do sistema empacotada** no release, ou **vendor transitivo** que entre junto de uma dependência nossa (ver a regra do bump do glintfx abaixo). Auditoria de licença = item RF-9 do pivot.
+
+_(Esta frase citava "addon Godot" e "biblioteca C++/NuGet" até 2026-07-28. Godot, C# e NuGet saíram do projeto no decommission do M8, em 2026-07-22: não há mais addon nem pacote NuGet a rastrear. O legado Godot continua coberto na seção de legado dormente acima, que é registro histórico e não instrução de manutenção.)_
 
 **Dependência transitiva conta, e o bump do glintfx é gatilho obrigatório (regra acrescentada em 2026-07-28).** A formulação anterior mandava atualizar quando "uma dependência de terceiro" mudasse, e foi exatamente por ela que um componente escapou: o glintfx é dependência nossa, mas os vendors DELE não são "nossos" na leitura literal, e a tabela só rastreava o dono antigo. Foi o que aconteceu com o miniaudio, que **não saiu do binário, mudou de dono** (deixou de ser vendorizado por nós e passou a chegar embutido no glintfx), e ficou fora deste documento por isso.
 
