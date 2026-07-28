@@ -20,6 +20,7 @@ Consequência: **Pythia (Cauã e Jaci) perde no eixo da execução, sempre.** A 
 |---|---|---|
 | **Elenco** | F11 a F22 (pares Cauã × Iara e Jaci × Linda) | Só disparam com o **Gus FORA do grupo ativo**. Sem o Gus na sala os dois chegam sozinhos a conclusões que favorecem o ausente, e é isso que faz o par existir em vez de virar plateia. |
 | **Estado do bordão** | F02, F13 | Ficam melhores **depois** do payoff da [Cena 15](comic-reliefs.md) (o bordão do Cauã tem três estados, ver `CAUA-BORDAO-3-ESTADOS` no `TODO.md`). |
+| **Eco pós-cena (trava dura)** | **F11, F12, F13** | Estas três **vivem dentro da [Cena 16](comic-reliefs.md) quase palavra por palavra**. Só podem disparar **DEPOIS de a cena ter acontecido**. Antes disso, o jogador ouviria a troca fora de contexto e a cena chegaria depois soando repetida. Decisão do criador, 2026-07-27. |
 | **Versão por idioma** | F09 | A fala pt-br e a inglesa usam **pares de termos diferentes**, não tradução. Ver a nota na própria farpa e a seção 11 do [guia de diálogos](guia-dialogos.md). |
 
 ---
@@ -140,7 +141,7 @@ Não há deslize de vocabulário: o que carrega é a **repetição**. "Não vai 
 
 **Eixo do par:** iteração quente e barata (Cauã) contra decisão cara e definitiva (Iara). É Pythia contra Óxido sem intermediário.
 
-### F11 · gatilho: a Iara demora a preparar uma carta
+### F11 · gatilho: a Iara demora a preparar uma carta · **ECO PÓS-CENA 16**
 
 > **CAUÃ:** "Eu já usei a minha três vezes no tempo que você levou até agora."
 >
@@ -148,7 +149,7 @@ Não há deslize de vocabulário: o que carrega é a **repetição**. "Não vai 
 
 Ela não nega a velocidade dele. Conta os erros.
 
-### F12 · gatilho: Cauã casta carta Pythia lenta
+### F12 · gatilho: Cauã casta carta Pythia lenta · **ECO PÓS-CENA 16**
 
 > **IARA:** "Ela está pensando."
 >
@@ -158,7 +159,7 @@ Ela não nega a velocidade dele. Conta os erros.
 
 Ela elogia com ironia, ele morde a isca e corrige em maiúscula, e ela fecha com o que importa em combate: **de fora, esperar é esperar**. Respeita a lei sem enunciá-la.
 
-### F13 · gatilho: Cauã casta carta Pythia com `@jit`
+### F13 · gatilho: Cauã casta carta Pythia com `@jit` · **ECO PÓS-CENA 16**
 
 > **CAUÃ:** "Essa aqui compila antes de rodar. De verdade." *(a carta dispara instantânea)*
 >
