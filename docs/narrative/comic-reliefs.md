@@ -2052,6 +2052,22 @@ Isso eu sei fazer.
 
 ---
 
+## Como estas cenas chegam ao jogador (decisão do criador, 2026-07-28)
+
+**As cenas têm DUAS formas, e as duas são canônicas.**
+
+**1. No jogo: diálogo linear com narração.** Cada cena vira um arquivo `.dlg.txt` consumido pelo runtime de diálogo (ADR-014), no mesmo formato do `npc_intro_bertoldo.dlg.txt`. As falas entram como estão. **As direções cênicas viram linhas de um speaker de narração**, no registro terminal já aprovado para logs e telas de sistema.
+
+Isto é o que o motor faz **hoje**, sem feature nova: o formato tem `speaker`, `text` (chave i18n), escolhas e flags. O que ele **não** tem é movimento de sprite scriptado, e por isso o gesto interrompido no meio, o dedo seguindo o cabo e o tronco estalando são **narrados**, não encenados. Cutscene com sprites móveis seria feature de engine e não está na fila.
+
+**Consequência prática para quem converter:** toda fala e toda linha de narração precisa de **chave i18n**, e a narração precisa ser escrita como texto que se sustenta lido, não como rubrica de roteiro. "[BENTO se agacha]" é rubrica; "Bento se agacha e segue o cabo com o dedo, sem encostar" é narração.
+
+**2. No livro: a prosa, com a direção cênica preservada.** As cenas foram escritas com direção cênica, e é em prosa que elas rendem inteiras. Elas entram nos volumes (F5-BK) na forma em que estão neste arquivo, que continua sendo a fonte.
+
+**As 22 farpas de [`farpas-linguagens.md`](farpas-linguagens.md) não têm esse problema:** são barks de duas a quatro linhas e cabem no sistema atual sem nenhuma adaptação.
+
+---
+
 ## Templates pra novas cenas
 
 Quem quiser adicionar (designer, narrative-designer, escrita expandida em produção):
