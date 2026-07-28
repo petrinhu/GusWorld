@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // GusEngine/platform/tests/input_mapper_test.cpp
 //
 // Catch2 do InputMapper (platform/input): estado de teclas pressionadas -> acoes

@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // gus/domain/hardware/card_provenance.hpp
 //
 // PECA de proveniencia fisica de uma carta possuida (ATOM-1, decomposicao atomica

@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // gus/app/src/screens/save_load_menu_loop.cpp
 //
 // Implementacao do loop interativo da tela de save/load. Ver header para o

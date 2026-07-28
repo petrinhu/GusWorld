@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // GusEngine/tests/obstacle_collision_test.cpp
 //
 // Spec executavel (Catch2 v3) dos OBSTACULOS PONTUAIS do resolve_move/resolve_move_

@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // gus/domain/save/save_data.hpp
 //
 // Estado de SAVE versionado (schema atual V6 = gus::domain::kSaveSchemaVersion).

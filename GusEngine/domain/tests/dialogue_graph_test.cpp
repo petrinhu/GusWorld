@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // dialogue_graph_test.cpp
 //
 // Spec executavel (Catch2 v3) do grafo de dialogo POCO (ADR-014): DialogueGraph,

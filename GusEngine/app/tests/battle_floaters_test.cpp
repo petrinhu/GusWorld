@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // GusEngine/app/tests/battle_floaters_test.cpp
 //
 // Catch2 (headless) do MODELO PURO dos numeros flutuantes de dano (M5, incremento 5).

@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // gus/domain/input/controls_diff.hpp
 //
 // Diff PURO entre dois InputRemapConfig (ADR-007 item 4). POCO puro, ZERO Qt, ZERO

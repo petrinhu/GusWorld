@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // GusEngine/app/tests/anim_preview_step_test.cpp
 //
 // Catch2 (headless, SEM SDL_Init/janela/IRenderer/AnimClock real) de

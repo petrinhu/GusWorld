@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // gus/domain/combat/techmagic.hpp
 //
 // Executor techMagic (ADR-016, MVP step 2-3): a carta especial/super e um PROGRAMA (lista

@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // input_remap_test.cpp
 //
 // Spec executavel do subsistema input_remap (marco M2, metade de logica pura).

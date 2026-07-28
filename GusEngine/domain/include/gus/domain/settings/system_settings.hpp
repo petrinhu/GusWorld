@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // gus/domain/settings/system_settings.hpp
 //
 // SystemSettings: schema MINIMO de preferencias de sistema persistidas em disco

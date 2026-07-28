@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // gus/domain/input/controls_json.hpp
 //
 // Serializer + parser JSON PROPRIO MINIMO do schema de controles (ADR-007 itens 1 e

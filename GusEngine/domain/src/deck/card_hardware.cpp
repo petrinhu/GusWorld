@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // gus/domain/src/deck/card_hardware.cpp
 //
 // Implementacao de CardPhysicalState::validate() - o AGREGADO. ATOM-1: as funcoes

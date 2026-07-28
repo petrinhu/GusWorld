@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // turing_service_test.cpp
 //
 // Spec executavel (Catch2 v3) do servico de diagnostico/cura do Turing (CARDS-HW-2

@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // PROBE EFEMERO (NAO COMMITADO - app/tools/ fica de fora do git, MESMO padrao de
 // npcdlg_screenshot_probe.cpp/repro_bertoldo.cpp neste mesmo diretorio) - prova
 // headless (Xvfb :99, NUNCA :0) do fundo real congelado (M7-DIALOGO/MENU-PAUSA-

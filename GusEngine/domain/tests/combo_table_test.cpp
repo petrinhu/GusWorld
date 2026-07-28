@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // combo_table_test.cpp
 //
 // Spec executavel (Catch2 v3) do ComboTable (resolvedor de pipeline de combo, secao 10),

@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // gus/domain/src/dialogue/dialogue_text.cpp
 //
 // Implementacao do parser POCO do formato-texto de dialogo. Ver dialogue_text.hpp

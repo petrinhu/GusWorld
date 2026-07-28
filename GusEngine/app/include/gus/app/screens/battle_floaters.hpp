@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // gus/app/screens/battle_floaters.hpp
 //
 // MODELO PURO dos NUMEROS FLUTUANTES de dano (M5, incremento 5): POCO 100% testavel SEM

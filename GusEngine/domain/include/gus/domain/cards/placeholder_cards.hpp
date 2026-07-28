@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // gus/domain/cards/placeholder_cards.hpp
 //
 // Registry in-memory de cartas placeholder do vertical slice (1 por familia), portado de

@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // gus/domain/src/templates/enemy_template.cpp
 //
 // Validacao fail-fast do EnemyTemplate. Ver header para o contrato. Espelha

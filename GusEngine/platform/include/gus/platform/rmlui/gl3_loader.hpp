@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // gus/platform/rmlui/gl3_loader.hpp
 //
 // gl3_load_functions: carrega os ponteiros de funcao OpenGL 3.3 (glad, embarcado no

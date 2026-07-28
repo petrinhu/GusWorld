@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // gus/domain/src/settings/system_settings_json.cpp
 //
 // Serializer + parser JSON proprio MINIMO do schema de SystemSettings

@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // gus/app/screens/battle_cockpit_rml.hpp
 //
 // AC-E11 A2 (ADR-019, decomposicao atomica de battle_preview.cpp): montagem do RML/RCSS

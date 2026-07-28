@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // gus/platform/src/fs/controls_file_store.cpp
 //
 // Implementacao do I/O real de controles (tela Controles, M2). Ver header.

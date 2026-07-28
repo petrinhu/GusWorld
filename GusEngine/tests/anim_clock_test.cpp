@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // GusEngine/tests/anim_clock_test.cpp
 //
 // Catch2 do AnimClock (core/anim), POCO puro sem SDL/IO/GPU. TEST-FIRST.

@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // gus/app/src/app_icon.cpp
 //
 // Implementacao de set_window_icon_if_available. Ver header.

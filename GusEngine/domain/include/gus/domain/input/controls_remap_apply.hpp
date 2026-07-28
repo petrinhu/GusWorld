@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // gus/domain/input/controls_remap_apply.hpp
 //
 // Aplica um novo KEYBOARD binding a uma action do InputRemapConfig, com

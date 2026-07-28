@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // gus/app/src/screens/difficulty_menu_loop.cpp
 //
 // Implementacao do loop interativo da tela de selecao de dificuldade. Ver header

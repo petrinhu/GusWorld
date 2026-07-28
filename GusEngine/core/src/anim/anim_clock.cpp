@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // gus/core/src/anim/anim_clock.cpp
 //
 // Ver header. Implementacao POCO do relogio de animacao por tempo.

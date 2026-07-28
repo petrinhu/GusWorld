@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // gus/domain/deck/contamination_service.hpp
 //
 // Rolagem de contaminacao por virus NA AQUISICAO de uma carta - a fatia que ACENDE o

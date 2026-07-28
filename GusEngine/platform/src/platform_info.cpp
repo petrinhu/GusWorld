@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // gus/platform/src/platform_info.cpp
 // Ver header. Reporta a versao do SDL em runtime (pos repivot ADR-008).
 

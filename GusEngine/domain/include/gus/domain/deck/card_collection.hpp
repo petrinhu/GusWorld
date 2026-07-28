@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // gus/domain/deck/card_collection.hpp
 //
 // CardCollection: agregado UNICO dono do deck ATIVO e do deck MORTO de um personagem

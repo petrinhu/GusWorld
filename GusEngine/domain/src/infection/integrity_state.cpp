@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // gus/domain/src/infection/integrity_state.cpp
 //
 // Implementacao de IntegrityState::validate(). Ver header para o contrato. ATOM-1:

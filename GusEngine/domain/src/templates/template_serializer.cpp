@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // gus/domain/src/templates/template_serializer.cpp
 //
 // Implementacao do serializer binario proprio + HMAC-SHA256 (core/). Ver header

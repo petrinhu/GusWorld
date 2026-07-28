@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // GusEngine/platform/tests/asset_source_test.cpp
 //
 // Catch2 (headless) do AssetSource/FilesystemAssetSource (ADR-013, ASSETS-VFS-F1).

@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // GusEngine/tests/winded_timer_test.cpp
 //
 // Catch2 do POCO core::player::WindedTimer: o TIMER DE FOLEGO (corpo) do Gus,

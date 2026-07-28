@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // gus/domain/combat/techmagic.cpp
 //
 // Implementacao do executor techMagic (ADR-016, MVP steps 2-8). Handlers: ApplyStatus,

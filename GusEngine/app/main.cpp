@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // GusEngine/app/main.cpp
 // Ponto de entrada do gusworld_app (overworld jogavel). Pos repivot ADR-008: a
 // casca de plataforma e SDL3 (nos possuimos o loop), nao mais Qt.

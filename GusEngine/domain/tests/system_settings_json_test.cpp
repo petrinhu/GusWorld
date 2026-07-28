@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // GusEngine/domain/tests/system_settings_json_test.cpp
 //
 // Catch2 (TEST-FIRST) do serializer/parser JSON proprio de SystemSettings

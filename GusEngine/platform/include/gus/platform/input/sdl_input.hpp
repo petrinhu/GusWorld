@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // gus/platform/input/sdl_input.hpp
 //
 // SdlInput (platform/input, pos repivot ADR-008): a ponte entre o backend de

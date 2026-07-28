@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // GusEngine/tests/core_smoke_test.cpp
 // Teste dummy do M0. Prova que o framework de teste (Catch2) compila, linka
 // contra as libs puras (core/ + domain/) e roda via ctest, headless (sem Qt).

@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // controls_diff_test.cpp
 //
 // Spec executavel (Catch2 v3) do diff de controles (ADR-007 item 4). POCO puro,

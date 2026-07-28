@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // combat_records_test.cpp
 //
 // Spec executavel (Catch2 v3) dos records imutaveis de dados do combate, portados de

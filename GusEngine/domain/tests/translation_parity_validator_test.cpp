@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // translation_parity_validator_test.cpp
 //
 // Spec executavel (Catch2 v3) do validador de paridade estrutural i18n, portada

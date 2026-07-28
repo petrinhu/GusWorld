@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // gus/domain/progression/enemy_knowledge_tracker.hpp
 //
 // Logica PURA de progressao de Knowledge por TIPO de inimigo (Eixo A, F2-E.9).

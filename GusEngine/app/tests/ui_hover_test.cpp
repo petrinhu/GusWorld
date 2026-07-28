@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // gus/app/tests/ui_hover_test.cpp
 //
 // COCKPIT-SFX-HOVER-CLIQUE: trava a fatia PURA/generica do "som de hover" de botoes

@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // gus/domain/map/map_serializer.hpp
 //
 // Formato binario proprio .gmap SELADO com HMAC-SHA256 (do core/) anti-tamper do

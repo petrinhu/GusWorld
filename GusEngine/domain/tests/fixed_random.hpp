@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // fixed_random.hpp (test helper)
 //
 // Duplo deterministico da porta IRandomSource (gus/domain/combat/random_source.hpp),

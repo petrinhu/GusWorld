@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // gus/app/src/screens/system_menu.cpp
 //
 // Implementacao da logica pura do menu de sistema (MENU-PAUSA-CONFIG-SOM,

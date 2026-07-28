@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // gus/domain/combat/combat_actor.hpp
 //
 // Combatente em campo. Estado MUTAVEL (HP/AP/Mana/status mudam a cada acao), modelado

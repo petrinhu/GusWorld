@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // gus/app/screens/overworld_sim.hpp
 //
 // OverworldSim: a regra de jogo do overworld do M1, POCO "fora da casca Qt"

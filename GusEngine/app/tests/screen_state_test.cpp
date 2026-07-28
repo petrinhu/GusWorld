@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // GusEngine/app/tests/screen_state_test.cpp
 //
 // Catch2 (headless, SEM SDL_Init/janela/GL) de gus::app::run_screen_state (F4-1a,

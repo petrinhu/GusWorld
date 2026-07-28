@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // gus/app/src/screens/battle_cockpit_verb_ids.cpp
 //
 // Implementacao do mapeamento id->indice de verbo (ver header). strcmp puro, sem

@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // gus/app/screens/npc_dialogue_rml.hpp
 //
 // RML/RCSS da caixa de dialogo "QUENTE" (M7-DIALOGO, DIALOGO-TERMINAL): moldura de

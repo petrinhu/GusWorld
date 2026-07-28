@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // gus/domain/combat/environment_enums.hpp
 //
 // Enums POCO do sistema de ambientes de combate (secao 18). Portado de

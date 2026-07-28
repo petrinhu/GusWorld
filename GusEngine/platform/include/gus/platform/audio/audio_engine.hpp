@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // gus/platform/audio/audio_engine.hpp
 //
 // AudioEngine: alicerce tecnico da camada de audio (M6 F1, ADR-011). Inicializa e

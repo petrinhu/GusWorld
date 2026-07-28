@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // gus/app/dialogue/npc_dialogue_catalog.hpp
 //
 // I/O REAL de arquivo do grafo de dialogo do Bertoldo (M7-DIALOGO, NPC-MVP): le o

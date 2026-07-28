@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // GusEngine/app/tests/overworld_sim_test.cpp
 //
 // Catch2 da simulacao do overworld (app/screens): junta input cardinal +

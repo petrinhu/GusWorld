@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // gus/platform/src/input/gamepad_mapping.cpp
 //
 // Implementacao do mapeamento gamepad -> cardinal. Ver header. Travado por

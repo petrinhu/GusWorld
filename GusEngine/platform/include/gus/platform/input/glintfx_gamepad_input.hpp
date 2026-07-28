@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // gus/platform/input/glintfx_gamepad_input.hpp
 //
 // GlintfxGamepadInput (platform/input, F4-2.4): adaptador de GAMEPAD do backend novo

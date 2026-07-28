@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // gus/app/screens/ui_hover.cpp
 //
 // Implementacao da fatia PURA do "som de hover" de botoes de UI (ver header).

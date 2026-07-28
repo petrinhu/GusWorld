@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // GusEngine/app/tests/sdl_window_sync_input_event_test.cpp
 //
 // F4-1a QA-FOLLOWUP (auditoria adversarial, achado 1): SdlWindow::sync_input_event

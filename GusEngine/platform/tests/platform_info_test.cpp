@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // GusEngine/platform/tests/platform_info_test.cpp
 //
 // Catch2 do platform_info: prova que a fronteira SDL linka e responde a versao de

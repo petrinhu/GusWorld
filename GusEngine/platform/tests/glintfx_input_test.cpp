@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // GusEngine/platform/tests/glintfx_input_test.cpp
 //
 // Catch2 do GlintfxInput (platform/input, F4-2.3): o adaptador de TECLADO do

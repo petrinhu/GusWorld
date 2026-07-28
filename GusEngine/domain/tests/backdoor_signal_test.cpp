@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // backdoor_signal_test.cpp
 //
 // Spec executavel (Catch2 v3) da fatia C da onda CARDS-HW-2 (CARDS-HW-2C, Backdoor

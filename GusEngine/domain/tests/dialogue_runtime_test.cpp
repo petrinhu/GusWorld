@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // dialogue_runtime_test.cpp
 //
 // Spec executavel (Catch2 v3) do DialogueRuntime POCO (ADR-014): motor que percorre

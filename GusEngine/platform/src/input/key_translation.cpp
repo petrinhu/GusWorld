@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // gus/platform/src/input/key_translation.cpp
 //
 // Tabela de traducao SDL_Keycode -> keycode Godot. Ver header. Travado por

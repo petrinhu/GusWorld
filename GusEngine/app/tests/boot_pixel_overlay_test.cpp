@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // GusEngine/app/tests/boot_pixel_overlay_test.cpp
 //
 // Catch2 do carregamento/desenho da SEQUENCIA DE FRAMES pre-renderizada (M7-COSTURA

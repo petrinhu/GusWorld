@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // urandom_test.cpp
 //
 // Spec executavel (Catch2 v3) da fatia B da onda CARDS-HW-2 (carta `urandom`, a carta-caos

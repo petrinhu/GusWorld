@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // hmac_sha256_test.cpp
 //
 // Spec executavel (Catch2 v3) do HMAC-SHA256 PROPRIO de core/ (ADR-006).

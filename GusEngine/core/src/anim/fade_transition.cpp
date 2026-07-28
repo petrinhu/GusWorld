@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // gus/core/src/anim/fade_transition.cpp
 //
 // Implementacao do POCO fade_overlay_alpha. Ver header. Travado por

@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // map_serializer_test.cpp
 //
 // Spec executavel (Catch2 v3) do formato binario proprio .gmap SELADO com

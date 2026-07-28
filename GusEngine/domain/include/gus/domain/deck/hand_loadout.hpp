@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // gus/domain/deck/hand_loadout.hpp
 //
 // HandLoadout: a MAO (loadout de combate) do sistema deck/mao (DECK-2). POCO puro,

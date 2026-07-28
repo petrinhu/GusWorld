@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // gus/domain/domain_info.hpp
 // Stub de identidade da camada de dominio (M0). Existe so para dar simbolo e
 // target ao build antes do porte real (save/i18n/progression/templates/combat

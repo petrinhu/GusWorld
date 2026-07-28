@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // gus/domain/combat/initiative_queue.hpp
 //
 // Fila de iniciativa por-ator (CTB-style), SEMPRE VISIVEL ao jogador (secao 4). E

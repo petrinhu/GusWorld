@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // PROBE EFEMERO (NAO COMMITADO - app/tools/ fica de fora do git, MESMO padrao de
 // frozen_bg_probe.cpp neste mesmo diretorio) - dispara run_system_menu_loop_gl_current
 // direto (sem Maestro/cidade) com GUSWORLD_SYSMENU_CONTROLS_DIAG=1 pra investigar os 3

@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // gus/app/src/screens/battle_assets.cpp
 //
 // Ver header. AC-E11 A3: implementacao dos resolvers/loaders de asset extraidos de

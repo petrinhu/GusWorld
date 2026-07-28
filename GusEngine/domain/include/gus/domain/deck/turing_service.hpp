@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // gus/domain/deck/turing_service.hpp
 //
 // Servico de diagnostico/cura do Turing (CARDS-HW-2 fatia A, "servico de cura/

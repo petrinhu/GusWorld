@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // techmagic_quantize_test.cpp
 //
 // Spec executavel (Catch2 v3) do Quantum-Lock (Planck), manifesto item 5 do executor

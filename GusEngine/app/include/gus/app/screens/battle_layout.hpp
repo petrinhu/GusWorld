@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // gus/app/screens/battle_layout.hpp
 //
 // LAYOUT PURO da BattleScreen (M5), POCO 100% testavel SEM SDL nem janela. Calcula

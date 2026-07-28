@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // gus/domain/src/save/save_serializer.cpp
 //
 // Serializer binario proprio + AEAD XChaCha20-Poly1305 (core/, sobre o Monocypher

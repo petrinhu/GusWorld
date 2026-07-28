@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // combat_inc3_test.cpp
 //
 // Spec executavel (Catch2 v3) do incremento 3 (secao 12): Gambito Prever (1 AP, le

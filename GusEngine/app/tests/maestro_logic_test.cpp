@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // GusEngine/app/tests/maestro_logic_test.cpp
 //
 // Catch2 (headless, SEM SDL_Init/janela) da logica PURA da Maestro (M7-COSTURA, ADR-012

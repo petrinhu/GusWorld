@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // gus/app/screens/difficulty_menu.hpp
 //
 // Logica PURA da TELA DE SELECAO DE DIFICULDADE (MODOS-MORTE Fase 0, decisao do

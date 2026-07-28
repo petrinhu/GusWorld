@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // GusEngine/app/tests/city_scene_test.cpp
 //
 // Catch2 (headless) da montagem da CENA DA CIDADE a partir de um TileMap (M4-visual).

@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // gus/domain/combat/combat_state_machine.hpp
 //
 // FSM por-ator do combate turn-based (secao 3). POCO 100% testavel sem runtime Godot.

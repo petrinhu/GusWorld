@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // gus/app/screens/system_menu.hpp
 //
 // Logica PURA do MENU DE SISTEMA (pausa + config de som/video/lingua/save),

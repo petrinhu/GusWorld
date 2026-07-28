@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // techmagic_maxwell_test.cpp
 //
 // Spec executavel (Catch2 v3) do Maxwell (Spectra-Wave/"Onda Unificada"), manifesto item 12

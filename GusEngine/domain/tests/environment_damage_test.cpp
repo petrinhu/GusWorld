@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // environment_damage_test.cpp
 //
 // Spec executavel (Catch2 v3) da integracao de mult_ambiente como ULTIMO fator da formula

@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // initiative_queue_recompute_round_invariant_test.cpp
 //
 // FALHA CONHECIDA, DOCUMENTADA DE PROPOSITO (Catch2 [!shouldfail]). Estes dois casos

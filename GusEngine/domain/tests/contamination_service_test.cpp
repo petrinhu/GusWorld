@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // contamination_service_test.cpp
 //
 // Spec executavel (Catch2 v3) da rolagem de contaminacao NA AQUISICAO (CARDS-HARDWARE-

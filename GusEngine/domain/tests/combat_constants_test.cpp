@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // combat_constants_test.cpp
 //
 // Spec executavel (Catch2 v3) das constantes canonicas do combate, portadas de

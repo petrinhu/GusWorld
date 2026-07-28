@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // gus/domain/combat/combat_actor.cpp
 //
 // Implementacao do CombatActor (combatente mutavel). Portado de

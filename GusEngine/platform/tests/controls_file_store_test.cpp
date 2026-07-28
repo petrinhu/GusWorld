@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // GusEngine/platform/tests/controls_file_store_test.cpp
 //
 // Catch2 (TEST-FIRST) do ControlsFileStore (tela Controles/M2): I/O REAL em

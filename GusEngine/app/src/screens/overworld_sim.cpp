@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // gus/app/src/screens/overworld_sim.cpp
 //
 // Implementacao do OverworldSim (M1). Ver header. Travado por

@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // GusEngine/platform/tests/key_translation_test.cpp
 //
 // Catch2 da traducao SDL_Keycode -> keycode Godot (platform/input). TEST-FIRST.

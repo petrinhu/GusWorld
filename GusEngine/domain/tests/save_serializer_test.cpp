@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // save_serializer_test.cpp
 //
 // Spec executavel (Catch2 v3) do SaveSerializer (envelope BINARIO PROPRIO + AEAD

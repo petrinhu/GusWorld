@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // GusEngine/tests/fixed_timestep_test.cpp
 //
 // Spec executavel (Catch2 v3) do loop de tempo fixo (M1). TEST-FIRST: estes

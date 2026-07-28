@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // GusEngine/platform/tests/sdl_input_test.cpp
 //
 // Catch2 do SdlInput (platform/input): a ponte que junta teclado (via InputMapper

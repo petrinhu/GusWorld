@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // GusEngine/tests/stamina_test.cpp
 //
 // Catch2 do POCO core::player::Stamina: a CARGA DO APARATO do jogador (drena

@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // gus/app/src/screens/battle_layout.cpp
 //
 // Implementacao do layout PURO da BattleScreen (variante C "Tatico Cockpit"). Aritmetica

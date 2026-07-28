@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // gus/app/screens/city_loader.hpp
 //
 // Fronteira app/: le o .gmap dos Distritos Inferiores DO DISCO (I/O de arquivo so

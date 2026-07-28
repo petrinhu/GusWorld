@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // gus/core/crypto/hmac_sha256.hpp
 //
 // HMAC-SHA256 PROPRIO (RFC 2104 / RFC 4231) sobre o SHA-256 de sha256.hpp.

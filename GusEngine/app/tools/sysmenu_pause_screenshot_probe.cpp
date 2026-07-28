@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // PROBE de spot-check (MENU-INICIAL) - captura headless (Xvfb :99, NUNCA :0) de 1
 // frame REAL da tela Pause (state.screen=Pause), com EXATAMENTE
 // gus::app::screens::SystemMenuState (a mesma logica pura ja coberta por

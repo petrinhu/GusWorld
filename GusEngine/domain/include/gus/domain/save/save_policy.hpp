@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // gus/domain/save/save_policy.hpp
 //
 // POLITICA DE AUTOSAVE POR LOCAL (SAVE-LOAD-UI etapa 5, decisao do lider). POCO puro

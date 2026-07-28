@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // gus/app/screens/title_menu_rml.hpp
 //
 // RML/RCSS da TELA DE TITULO (SAVE-LOAD-UI etapa 4), fiel ao mock APROVADO

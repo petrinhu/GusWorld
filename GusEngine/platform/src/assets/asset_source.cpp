@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // gus/platform/src/assets/asset_source.cpp
 //
 // Implementacao do porteiro de assets (ver header). FilesystemAssetSource consolida, POR

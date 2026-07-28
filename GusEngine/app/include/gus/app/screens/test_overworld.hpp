@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // gus/app/screens/test_overworld.hpp
 //
 // Cena de teste HARDCODED do overworld do M1 (header-only): o mapa, a posicao/

@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // gus/platform/render2d/alpha_bbox.hpp
 //
 // MEDICAO do bounding-box do CONTEUDO nao-transparente (alpha > limiar) de uma

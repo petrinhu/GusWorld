@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // gus/domain/src/deck/turing_service.cpp
 //
 // Implementacao do servico de diagnostico/cura do Turing. Ver o header para o

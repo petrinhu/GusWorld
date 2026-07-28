@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // gus/domain/src/save/save_migrators.cpp
 //
 // Chain forward-only de migracao sobre STRUCTS VERSIONADAS (ADR-006). POCO puro,

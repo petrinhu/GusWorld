@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // PROBE EFEMERO (NAO COMMITADO - app/tools/ fica de fora do git ate hoje, MESMO
 // padrao de npcdlg_hover_probe.cpp/repro_bertoldo.cpp neste mesmo diretorio) -
 // captura headless (Xvfb :99, NUNCA :0) de 1 frame da caixa quente do dialogo com

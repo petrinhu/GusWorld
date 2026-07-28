@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // controls_hash_test.cpp
 //
 // Spec executavel (Catch2 v3) do hash 128 de controles (ADR-007 item 2). POCO puro,

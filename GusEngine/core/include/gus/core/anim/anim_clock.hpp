@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // gus/core/anim/anim_clock.hpp
 //
 // AnimClock: relogio de animacao por TEMPO, POCO C++ puro (ZERO SDL, ZERO I/O,

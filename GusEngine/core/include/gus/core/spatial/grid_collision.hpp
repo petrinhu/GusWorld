@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // gus/core/spatial/grid_collision.hpp
 //
 // Colisao AABB-desliza-na-grade (M4) - POCO C++ puro, ZERO Qt, ZERO I/O.

@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // gus/domain/deck/card_collection.cpp
 //
 // Implementacao do agregado CardCollection (DECK-1). Ver card_collection.hpp pros

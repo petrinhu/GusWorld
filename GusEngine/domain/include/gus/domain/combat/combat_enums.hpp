@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // gus/domain/combat/combat_enums.hpp
 //
 // Enums POCO do sistema de combate turn-based. FONTE CANONICA dos enums de RUNTIME

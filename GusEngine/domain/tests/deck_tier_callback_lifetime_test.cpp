@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // deck_tier_callback_lifetime_test.cpp
 //
 // REGRESSAO (heap-use-after-free): o sistema de deck/mao passa uma REFERENCIA pra um

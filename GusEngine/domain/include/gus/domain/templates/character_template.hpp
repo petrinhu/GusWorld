@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // gus/domain/templates/character_template.hpp
 //
 // Template imutavel de personagem jogavel (party). Dado PURO. Portado de

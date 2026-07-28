@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // controls_restore_test.cpp
 //
 // Spec executavel (Catch2 v3) da restauracao de controles e da fabrica de defaults

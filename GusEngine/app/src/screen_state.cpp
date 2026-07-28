@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // gus/app/src/screen_state.cpp
 //
 // Implementacao de run_screen_state(). Ver o header para o contrato completo

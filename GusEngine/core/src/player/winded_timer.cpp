@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // gus/core/src/player/winded_timer.cpp
 //
 // Implementacao do POCO WindedTimer (folego do corpo). Ver header. Travado por

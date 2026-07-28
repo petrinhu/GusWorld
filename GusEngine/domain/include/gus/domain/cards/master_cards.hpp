@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // gus/domain/cards/master_cards.hpp
 //
 // Catalogo data-driven das cartas ESPECIAIS dos 20 mestres do Codex SUPORTADAS pelo

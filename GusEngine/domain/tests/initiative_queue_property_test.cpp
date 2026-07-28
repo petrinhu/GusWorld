@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // initiative_queue_property_test.cpp
 //
 // REFORCO DE QA (marco M5) da InitiativeQueue (secao 4) por PROPRIEDADE + FUZZ. A fila e a

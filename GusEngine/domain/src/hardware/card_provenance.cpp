@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // gus/domain/src/hardware/card_provenance.cpp
 //
 // Implementacao de CardProvenance::validate() + connector_of(). Ver header para o

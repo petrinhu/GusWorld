@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // gus/domain/combat/urandom_algorithm.hpp
 //
 // Motor PURO da carta `urandom` (a carta-caos do Gus; CARDS-HW-2 fatia B, ideia + numero do

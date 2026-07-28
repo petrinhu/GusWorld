@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // gus/app/screens/battle_cockpit_verb_ids.hpp
 //
 // GLINTFX-CLICK: mapeamento ESTAVEL entre o `id` RCSS de cada um dos 6 pills de verbo do

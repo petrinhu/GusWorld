@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // GusEngine/app/tests/title_menu_rml_test.cpp
 //
 // Catch2 (TEST-FIRST) de build_title_menu_rml (SAVE-LOAD-UI etapa 4). SO checagem

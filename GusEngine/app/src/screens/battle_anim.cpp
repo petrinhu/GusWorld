@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // gus/app/src/screens/battle_anim.cpp
 //
 // Implementacao do BattleAnimDirector (ver header). Curvas:

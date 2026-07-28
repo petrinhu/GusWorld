@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // gus/domain/progression/enemy_knowledge_tracker.cpp
 //
 // Implementacao da logica pura de Knowledge por tipo de inimigo. Ver header para

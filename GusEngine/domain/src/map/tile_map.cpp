@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // gus/domain/src/map/tile_map.cpp
 //
 // Implementacao do TileMap (POCO do mapa de tiles). Ver tile_map.hpp para o

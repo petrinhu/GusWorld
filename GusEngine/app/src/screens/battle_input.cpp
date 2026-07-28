@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // gus/app/src/screens/battle_input.cpp
 //
 // Ver header. AC-E11 A1: implementacao do roteamento de input extraido de

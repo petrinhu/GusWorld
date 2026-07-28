@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // gus/app/screens/sprite_anchor.hpp
 //
 // ANCORAGEM do sprite pelos PES REAIS (POCO puro, mesma disciplina do

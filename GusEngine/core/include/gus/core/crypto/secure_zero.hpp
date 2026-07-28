@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // gus/core/crypto/secure_zero.hpp
 //
 // Zeragem segura anti-otimizador (ADR-015 decisao 5, item 4 do wipe do Hardcore).

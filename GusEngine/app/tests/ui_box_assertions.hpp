@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // GusEngine/app/tests/ui_box_assertions.hpp
 //
 // Helpers PUROS (sem GL, sem depender de nenhum estado de tela especifico) pra

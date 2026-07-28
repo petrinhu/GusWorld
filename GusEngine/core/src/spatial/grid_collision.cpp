@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // gus/core/spatial/grid_collision.cpp
 // Colisao AABB-desliza-na-grade (M4). Ver grid_collision.hpp para o contrato e
 // o feel (deslizar, resolucao por eixo). Movimento cinematico puro.

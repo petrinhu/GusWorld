@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // gus/domain/combat/initiative_queue.cpp
 //
 // Implementacao da fila de iniciativa. Portado de

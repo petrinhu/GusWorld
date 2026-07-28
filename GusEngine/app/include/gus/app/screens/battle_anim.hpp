@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // gus/app/screens/battle_anim.hpp
 //
 // ANIMACAO DE COMBATE (M5, W2 base funcional): POCO 100% testavel SEM SDL. Estado de

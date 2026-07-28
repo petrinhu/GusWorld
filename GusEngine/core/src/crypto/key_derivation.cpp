@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // gus/core/src/crypto/key_derivation.cpp
 //
 // Implementacao do KDF simples (ADR-006 T2.2). Ver header para o contrato. Dominio

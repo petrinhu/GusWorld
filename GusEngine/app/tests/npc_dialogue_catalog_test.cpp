@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // GusEngine/app/tests/npc_dialogue_catalog_test.cpp
 //
 // Catch2 (headless) do I/O do grafo de dialogo do Bertoldo (M7-DIALOGO, NPC-MVP):

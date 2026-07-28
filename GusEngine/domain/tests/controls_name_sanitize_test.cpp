@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // controls_name_sanitize_test.cpp
 //
 // Spec executavel (Catch2 v3) do sanitize de nome de perfil de jogador (ADR-007,

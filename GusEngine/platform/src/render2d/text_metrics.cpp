@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // gus/platform/src/render2d/text_metrics.cpp
 //
 // Implementacao das metricas de texto puras (ver header). Aritmetica monospace, sem

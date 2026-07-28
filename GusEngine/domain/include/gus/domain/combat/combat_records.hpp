@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // gus/domain/combat/combat_records.hpp
 //
 // Records imutaveis de dados do combate, portados de

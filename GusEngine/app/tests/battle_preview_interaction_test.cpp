@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // GusEngine/app/tests/battle_preview_interaction_test.cpp
 //
 // Catch2 HEADLESS (GL REAL - Xvfb :99, MESMA receita de difficulty_menu_loop_

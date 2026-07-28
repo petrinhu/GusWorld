@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // gus/app/screens/battle_sprite_anim.hpp
 //
 // SPRITE ANIMADO NA ARENA (M5, W3): POCO 100% testavel SEM SDL/IO. E a troca

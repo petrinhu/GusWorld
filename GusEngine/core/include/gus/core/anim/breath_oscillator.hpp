@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // gus/core/anim/breath_oscillator.hpp
 //
 // BreathOscillator: respiracao CALMA procedural, POCO C++ puro (ZERO SDL, ZERO I/O,

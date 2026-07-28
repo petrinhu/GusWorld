@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // GusEngine/tests/tile_grid_test.cpp
 //
 // Spec executavel (Catch2 v3) do TileGrid: o modelo de mapa de grade do M4

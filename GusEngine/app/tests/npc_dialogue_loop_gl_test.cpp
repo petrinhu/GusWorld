@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // GusEngine/app/tests/npc_dialogue_loop_gl_test.cpp
 //
 // Catch2 (headless, SEM SDL_Init/janela/GL) de npc_dialogue_digit_for_key

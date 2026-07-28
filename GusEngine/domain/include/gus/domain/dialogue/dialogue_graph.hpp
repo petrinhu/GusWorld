@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // gus/domain/dialogue/dialogue_graph.hpp
 //
 // Grafo de dialogo POCO (ADR-014). Namespace gus::domain::dialogue. Camada domain/

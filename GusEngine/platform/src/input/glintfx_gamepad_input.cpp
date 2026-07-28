@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // gus/platform/src/input/glintfx_gamepad_input.cpp
 //
 // Implementacao do GlintfxGamepadInput. Ver header. Travado por

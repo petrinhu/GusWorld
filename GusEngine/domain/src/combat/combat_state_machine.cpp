@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // gus/domain/src/combat/combat_state_machine.cpp
 //
 // Implementacao da FSM de combate (secao 3). Ver header para o contrato e o mapeamento

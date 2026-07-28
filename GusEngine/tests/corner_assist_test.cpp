@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // GusEngine/tests/corner_assist_test.cpp
 //
 // Spec executavel (Catch2 v3) do corner-correction (corner-assist) sobre a colisao

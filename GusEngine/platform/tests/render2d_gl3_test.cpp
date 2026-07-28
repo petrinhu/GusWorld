@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // GusEngine/platform/tests/render2d_gl3_test.cpp
 //
 // Catch2 do Render2dGl3 (platform/render2d), o backend de IRenderer sobre OpenGL 3.3

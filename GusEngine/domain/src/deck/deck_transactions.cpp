@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // gus/domain/deck/deck_transactions.cpp
 //
 // Implementacao das transacoes atomicas do sistema de deck/mao (DECK-3). Ver

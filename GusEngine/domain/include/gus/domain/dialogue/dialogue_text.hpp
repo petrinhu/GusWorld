@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // gus/domain/dialogue/dialogue_text.hpp
 //
 // Parser POCO do FORMATO-TEXTO proprio de dialogo (ADR-014 decisao 1): string em

@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // gus/platform/input/glintfx_input.hpp
 //
 // GlintfxInput (platform/input, F4-2.3): adaptador de TECLADO do backend novo

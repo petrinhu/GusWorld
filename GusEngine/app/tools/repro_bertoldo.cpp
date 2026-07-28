@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // DIAGNOSTIC-ONLY (nao commitado): reproduz headless a MESMA sequencia do
 // Maestro::init() para a cidade + marcador do inimigo + marcador do Bertoldo,
 // com um SDL_Renderer REAL (driver "software", SDL_VIDEODRIVER=dummy - sem

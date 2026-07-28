@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // gus/app/src/screens/anim_catalog.cpp
 //
 // Ver header. Varredura da pasta de sprites do Gus (caminho do header central

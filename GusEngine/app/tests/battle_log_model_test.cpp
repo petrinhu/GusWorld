@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // GusEngine/app/tests/battle_log_model_test.cpp
 //
 // Catch2 (headless) do MODELO PURO do log (M5, incremento 3, D7). Prova, SEM SDL: a

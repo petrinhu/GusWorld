@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // gus/app/screens/difficulty_menu_rml.hpp
 //
 // RML/RCSS da TELA DE SELECAO DE DIFICULDADE (MODOS-MORTE Fase 0). MESMO estilo

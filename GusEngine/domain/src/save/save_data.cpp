@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // gus/domain/src/save/save_data.cpp
 //
 // Validacao de invariantes (fail-fast) do estado de save. POCO puro, ZERO Qt.

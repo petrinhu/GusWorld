@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // GusEngine/app/tests/battle_hud_model_test.cpp
 //
 // Catch2 (headless) do MODELO PURO do HUD da BattleScreen (M5, incremento 2; expandido

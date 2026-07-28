@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // save_backup_test.cpp
 //
 // Spec executavel (Catch2 v3) da POLITICA DE BACKUP CHAIN do save (domain/save).

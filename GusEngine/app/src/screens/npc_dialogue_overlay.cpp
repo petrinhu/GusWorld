@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // gus/app/src/screens/npc_dialogue_overlay.cpp
 //
 // Implementacao da logica de interacao do overlay de dialogo do NPC. Ver header.

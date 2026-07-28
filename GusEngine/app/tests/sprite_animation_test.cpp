@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // GusEngine/app/tests/sprite_animation_test.cpp
 //
 // Catch2 da LOGICA de animacao de locomocao (app/screens/sprite_animation), POCO

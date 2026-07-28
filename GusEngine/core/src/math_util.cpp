@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // gus/core/math_util.cpp
 #include "gus/core/math_util.hpp"
 

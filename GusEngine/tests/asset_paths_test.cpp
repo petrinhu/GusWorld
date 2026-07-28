@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // GusEngine/tests/asset_paths_test.cpp
 //
 // Catch2 (headless) do header CENTRAL de caminhos de asset (gus/core/asset_paths.hpp).

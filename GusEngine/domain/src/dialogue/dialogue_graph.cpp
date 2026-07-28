@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // gus/domain/src/dialogue/dialogue_graph.cpp
 //
 // Implementacao de DialogueGraph::validate(). Ver o header para o contrato de

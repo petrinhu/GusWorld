@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // techmagic_reveal_test.cpp
 //
 // Spec executavel (Catch2 v3) do executor techMagic (ADR-016 step 8, manifesto item 6):

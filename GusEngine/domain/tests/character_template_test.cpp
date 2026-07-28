@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // character_template_test.cpp
 //
 // Spec executavel (Catch2 v3) do CharacterTemplate + EnemyTemplate + CardFamily

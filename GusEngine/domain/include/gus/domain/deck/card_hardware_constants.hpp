@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // gus/domain/deck/card_hardware_constants.hpp
 //
 // UMBRELLA das constantes numericas da camada FISICA de carta que CRUZAM pecas/

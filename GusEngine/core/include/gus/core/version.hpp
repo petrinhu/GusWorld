@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // gus/core/version.hpp
 // Versao da engine, exposta como POCO puro (sem Qt). Usada como ponto de
 // ancoragem do teste dummy do M0 e como fonte unica da versao da engine.

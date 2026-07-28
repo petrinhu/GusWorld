@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // hand_loadout_test.cpp
 //
 // Spec executavel (Catch2 v3) do HandLoadout (DECK-2): a MAO (selecao/loadout) sobre o

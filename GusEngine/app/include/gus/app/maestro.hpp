@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // gus/app/maestro.hpp
 //
 // Maestro: orquestracao LEVE cidade<->batalha (M7-COSTURA, ADR-012 Onda 1). NAO e um

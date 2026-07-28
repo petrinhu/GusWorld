@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // PROBE EFEMERO (NAO COMMITADO - app/tools/ e UNTRACKED). Descartar apos a prova.
 //
 // PERGUNTA UNICA: se o jogo habilitar MSAA (SDL_GL_SetAttribute MULTISAMPLEBUFFERS=1 +

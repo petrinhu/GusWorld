@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // GusEngine/app/tests/battle_layout_test.cpp
 //
 // Catch2 (headless) do LAYOUT PURO da BattleScreen (variante C "Tatico Cockpit"). Prova,

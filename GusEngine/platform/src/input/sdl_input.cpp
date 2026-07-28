@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // gus/platform/src/input/sdl_input.cpp
 //
 // Implementacao do SdlInput. Ver header. A FUSAO teclado+gamepad e a traducao de

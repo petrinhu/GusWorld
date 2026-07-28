@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // gus/platform/fs/controls_file_store.hpp
 //
 // I/O REAL de controles (tela Controles, M2; ADR-007): "<perfil>_controls.json"

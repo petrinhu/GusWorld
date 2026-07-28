@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // gus/domain/save/new_game.cpp
 //
 // Implementacao. Ver o header para o contrato e o racional de existir.

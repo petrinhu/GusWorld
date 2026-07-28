@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // gus/app/screens/save_load_menu_loop.hpp
 //
 // LOOP INTERATIVO da tela de SALVAR/CARREGAR (SAVE-LOAD-UI etapa 6, wiring REAL

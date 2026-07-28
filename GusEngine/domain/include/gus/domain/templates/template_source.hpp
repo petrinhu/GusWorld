@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // gus/domain/templates/template_source.hpp
 //
 // Politica de selecao de fonte de template: res:// e AUTORITATIVO (PCK); user:// e

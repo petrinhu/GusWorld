@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // secure_zero_test.cpp
 //
 // Spec executavel (Catch2 v3) da zeragem segura anti-otimizador (ADR-015 secao 5,

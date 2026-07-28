@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // environment_clock_test.cpp
 //
 // Spec executavel (Catch2 v3) da roda temporal de periodo (secao 18.3):

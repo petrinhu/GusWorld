@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // tile_map_test.cpp
 //
 // Spec executavel (Catch2 v3) do TileMap (POCO do mapa de tiles do overworld) e da

@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // gus/app/boot_pixel_overlay.hpp
 //
 // BootPixelOverlay: carregamento + DESENHO da SEQUENCIA DE FRAMES pre-renderizada

@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // gus/domain/progression/xp_differential.cpp
 //
 // Implementacao da formula pura de XP differential por zona. Ver header para o

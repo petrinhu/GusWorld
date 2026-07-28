@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // PROBE EFEMERO (NAO COMMITADO - app/tools/ fica de fora do git, MESMO padrao de
 // npcdlg_screenshot_probe.cpp/frozen_bg_probe.cpp neste mesmo diretorio) - captura
 // headless (Xvfb :99, NUNCA :0) de 1 frame REAL da tela Controles (M2), com

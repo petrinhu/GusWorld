@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // gus/domain/combat/card_integrity_ledger.hpp
 //
 // PONTE instancia->combate (CARDS-HW-2 fatia 1, VIRUS EM COMBATE; docs/design/mecanicas/

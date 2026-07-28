@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // gus/domain/save/save_store.hpp
 //
 // PORT (interface injetavel) de armazenamento de saves, sobre NOMES LOGICOS de

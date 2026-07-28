@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // GusEngine/platform/tests/gamepad_mapping_test.cpp
 //
 // Catch2 da LOGICA pura de mapeamento de gamepad -> intencao cardinal (platform/

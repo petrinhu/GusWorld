@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // gus/app/screens/battle_pacing.hpp
 //
 // DIRETOR DE PACING da BattleScreen (M5, incremento 6, D8/D10): POCO 100% testavel SEM

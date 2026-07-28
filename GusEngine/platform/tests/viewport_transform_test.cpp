@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // GusEngine/platform/tests/viewport_transform_test.cpp
 //
 // Catch2 da matematica de projecao do render2d (POCO, sem GPU/SDL). TEST-FIRST.

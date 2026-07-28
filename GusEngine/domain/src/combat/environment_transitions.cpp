@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // gus/domain/combat/environment_transitions.cpp
 //
 // Implementacao da tabela fechada de mutabilidade de ambiente (secao 18.6), portada de

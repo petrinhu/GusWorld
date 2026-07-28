@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // gus/platform/src/render2d/font_atlas.cpp
 //
 // Implementacao do FONT ATLAS (ver header). Le o .ttf (I/O, fronteira platform/) e

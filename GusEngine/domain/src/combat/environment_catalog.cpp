@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // gus/domain/combat/environment_catalog.cpp
 //
 // Implementacao do catalogo data-driven de ambientes (secao 18), portado de

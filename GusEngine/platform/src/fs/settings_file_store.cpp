@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // gus/platform/src/fs/settings_file_store.cpp
 //
 // Implementacao do I/O real de settings.json (MENU-PAUSA-CONFIG-SOM). Ver header.

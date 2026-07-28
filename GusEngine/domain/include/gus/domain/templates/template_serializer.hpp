@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // gus/domain/templates/template_serializer.hpp
 //
 // Serializacao BINARIA PROPRIA + HMAC-SHA256 (do core/) anti-tamper para templates

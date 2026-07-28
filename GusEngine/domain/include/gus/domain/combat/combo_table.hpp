@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // gus/domain/combat/combo_table.hpp
 //
 // Tabela de receitas de combo (formato canonico secao 10). Resolvedor deterministico,

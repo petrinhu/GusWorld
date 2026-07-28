@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // gus/domain/combat/scripted_brain.hpp
 //
 // AI nivel Trash: deterministica, roteiro fixo. Intent 100% legivel (secao 13). Portado

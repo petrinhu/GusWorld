@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // balance_harness_test.cpp
 //
 // Spec do harness de balanceamento OFFLINE (COMBATE-TEORIA-JOGOS item [1]).

@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // gus/domain/combat/environment_clock.cpp
 //
 // Implementacao da roda temporal de periodo (secao 18.3), portada de

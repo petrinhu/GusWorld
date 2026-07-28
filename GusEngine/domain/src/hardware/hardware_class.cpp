@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // gus/domain/src/hardware/hardware_class.cpp
 //
 // Implementacao de hardware_class_of(). Ver header para o contrato. ATOM-1:

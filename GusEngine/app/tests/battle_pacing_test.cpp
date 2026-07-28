@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // GusEngine/app/tests/battle_pacing_test.cpp
 //
 // Catch2 (headless) do DIRETOR DE PACING (M5, incremento 6, D8/D10). Prova, SEM SDL: a

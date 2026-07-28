@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // gus/app/src/screens/anim_preview.cpp
 //
 // Ver header. Casca SDL do viewer de animacao. Reusa Render2dSdl (atras de

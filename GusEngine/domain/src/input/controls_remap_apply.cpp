@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // gus/domain/src/input/controls_remap_apply.cpp
 //
 // Implementacao do swap-on-conflict (tela Controles/M2). Ver header para o

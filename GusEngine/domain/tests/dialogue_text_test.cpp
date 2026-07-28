@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // dialogue_text_test.cpp
 //
 // Spec executavel (Catch2 v3) do parser POCO do FORMATO-TEXTO de dialogo (ADR-014):

@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // gus/domain/input/action_registry.hpp
 //
 // Registry canonico de actions GusWorld, portado de

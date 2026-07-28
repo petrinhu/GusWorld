@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // gus/app/screens/npc_dialogue_overlay.hpp
 //
 // Logica de INTERACAO do overlay funcional simples de dialogo do NPC (M7-DIALOGO,

@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // initiative_queue_test_access.hpp
 //
 // Friend de TESTE (nunca de producao) pro reorder_actor privatizado no M9 (fechamento da

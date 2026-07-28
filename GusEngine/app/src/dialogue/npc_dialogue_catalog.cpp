@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // gus/app/src/dialogue/npc_dialogue_catalog.cpp
 //
 // Implementacao do I/O do grafo de dialogo do Bertoldo. Ver header.

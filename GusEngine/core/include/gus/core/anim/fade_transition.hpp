@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // gus/core/anim/fade_transition.hpp
 //
 // FadeTransition: matematica PURA (POCO, ZERO SDL/GL/I-O) do overlay preto usado nas

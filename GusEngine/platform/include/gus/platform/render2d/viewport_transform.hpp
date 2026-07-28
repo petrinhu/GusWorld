@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // gus/platform/render2d/viewport_transform.hpp
 //
 // Projecao mundo -> tela para a camera ortografica fixa do render2d. Esta e a

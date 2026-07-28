@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // gus/domain/save/save_backup.hpp
 //
 // POLITICA DE BACKUP CHAIN do save (camada PURA, ZERO Qt, ZERO disco). Opera sobre

@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // gus/platform/src/audio/audio_engine.cpp
 //
 // Implementacao do AudioEngine (M6 F1, ADR-011). Ver header. Travado por

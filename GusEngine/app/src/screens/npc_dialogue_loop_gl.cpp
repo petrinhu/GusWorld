@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // gus/app/src/screens/npc_dialogue_loop_gl.cpp
 //
 // Implementacao do loop GL real do dialogo do NPC. Ver header para o contrato

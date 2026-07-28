@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // gus/domain/combat/enemy_brain.hpp
 //
 // Contrato de AI inimiga (IEnemyBrain), portado de

@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // GusEngine/app/tests/title_menu_test.cpp
 //
 // Catch2 (TEST-FIRST) de title_menu.hpp (SAVE-LOAD-UI etapa 4, TELA DE TITULO).

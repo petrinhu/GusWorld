@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // card_provenance_test.cpp
 //
 // Spec executavel (Catch2 v3) da PECA de proveniencia fisica de uma carta possuida

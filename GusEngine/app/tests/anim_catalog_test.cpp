@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // GusEngine/app/tests/anim_catalog_test.cpp
 //
 // Catch2 da varredura do AnimCatalog (app/screens/anim_catalog). Toca filesystem

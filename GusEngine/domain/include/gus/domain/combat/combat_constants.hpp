@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // gus/domain/combat/combat_constants.hpp
 //
 // Constantes canonicas do combate (secao 2/5/6/11/18). Centralizadas pra evitar

@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // cards_hw_lifecycle_integration_test.cpp
 //
 // Spec executavel de INTEGRACAO (Catch2 v3) da onda cartas-hardware (CARDS-HW-QA1,

@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // canonical_templates_test.cpp
 //
 // Spec executavel (Catch2 v3) dos templates CANONICOS do encontro de referencia do

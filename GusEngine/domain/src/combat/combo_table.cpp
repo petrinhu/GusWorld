@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // gus/domain/src/combat/combo_table.cpp
 //
 // Implementacao do resolvedor de combo (secao 10). Ver header para o contrato. Espelha

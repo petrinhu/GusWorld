@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // gus/app/src/screens/battle_preview.cpp
 //
 // Ver header. Casca SDL do viewer da BattleScene (esqueleto M5). Reusa Render2dSdl

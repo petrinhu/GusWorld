@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // gus/app/src/audio_smoke.cpp
 //
 // Ver header. Diagnostico opcional de device de audio REAL (M6 F1, ADR-011, item 5).

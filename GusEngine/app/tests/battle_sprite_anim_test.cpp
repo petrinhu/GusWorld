@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // GusEngine/app/tests/battle_sprite_anim_test.cpp
 //
 // Catch2 (headless) do POCO de SPRITE ANIMADO na arena (M5, W3 - a troca

@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // gus/domain/src/input/controls_restore.cpp
 //
 // Fabrica de controles default + restauracao a partir do backup do save (ADR-007

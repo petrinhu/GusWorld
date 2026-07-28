@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // gus/core/crypto/key_derivation.hpp
 //
 // KDF SIMPLES (derivacao de chave) sobre o SHA-256 proprio de sha256.hpp. Dominio

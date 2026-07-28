@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // gus/platform/render2d/render2d_sdl.hpp
 //
 // Render2dSdl: a implementacao concreta de IRenderer sobre SDL_Renderer (pos

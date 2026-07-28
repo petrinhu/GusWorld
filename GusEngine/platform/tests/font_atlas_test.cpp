@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // GusEngine/platform/tests/font_atlas_test.cpp
 //
 // Catch2 (headless) do FONT ATLAS (M5, incremento 3.5). O bake (stb_truetype -> bitmap

@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // gus/domain/combat/environment_modifier.hpp
 //
 // Record POCO de um ambiente de combate (secao 18.10), portado de

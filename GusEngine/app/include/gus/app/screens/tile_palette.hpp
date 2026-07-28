@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // gus/app/screens/tile_palette.hpp
 //
 // ===========================================================================

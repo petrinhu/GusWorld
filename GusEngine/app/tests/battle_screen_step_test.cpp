@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // GusEngine/app/tests/battle_screen_step_test.cpp
 //
 // Catch2 HEADLESS (SEM SDL_Init/janela/glintfx::UiLayer/BattleScene real) da FSM DE FASE

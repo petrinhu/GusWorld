@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // gus/domain/src/templates/template_source.cpp
 //
 // Implementacao da politica res:// > user://. Ver header. POCO puro, ZERO Qt.

@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // gus/core/spatial/step_clamp.hpp
 //
 // Teto anti-tunneling POR EIXO (TUNNELING-CLAMP-GUARD) - POCO C++ puro, header-

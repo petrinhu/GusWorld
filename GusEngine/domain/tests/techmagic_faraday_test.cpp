@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // techmagic_faraday_test.cpp
 //
 // Spec executavel (Catch2 v3) do EM-Shield (Faraday), PR1 do "Balde B" (ADR-016, decisoes

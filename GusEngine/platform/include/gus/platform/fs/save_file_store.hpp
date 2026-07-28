@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // gus/platform/fs/save_file_store.hpp
 //
 // I/O REAL em disco do SAVE do jogo (M2-SAVE-IO, ADR-012 Onda 2): ~/.gusworld/saves/,

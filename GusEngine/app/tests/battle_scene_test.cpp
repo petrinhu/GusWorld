@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // GusEngine/app/tests/battle_scene_test.cpp
 //
 // Catch2 (headless) da BattleScene (M5, incremento 1): prova que a cena LE o estado do

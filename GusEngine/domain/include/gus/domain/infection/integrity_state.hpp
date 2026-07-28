@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // gus/domain/infection/integrity_state.hpp
 //
 // PECA de integridade/virus de uma carta possuida (ATOM-1, decomposicao atomica de

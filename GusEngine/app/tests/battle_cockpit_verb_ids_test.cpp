@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // GusEngine/app/tests/battle_cockpit_verb_ids_test.cpp
 //
 // GLINTFX-CLICK: Catch2 (headless) do mapeamento id<->indice de verbo (ver header). POCO

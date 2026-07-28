@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // gus/core/crypto/aead_xchacha20poly1305.hpp
 //
 // AEAD XChaCha20-Poly1305 PROPRIO sobre o Monocypher vendorizado (ADR-015 decisao

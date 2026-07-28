@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // gus/app/src/screens/battle_scene.cpp
 //
 // Implementacao da BattleScene (ver header). INCREMENTO 1: esqueleto navegavel.

@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // GusEngine/platform/tests/text_metrics_test.cpp
 //
 // Catch2 (headless) das METRICAS DE TEXTO puras (M5, incremento 3.5). Prova, SEM SDL

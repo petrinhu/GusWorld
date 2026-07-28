@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // GusEngine/tests/boot_pixel_sequence_test.cpp
 //
 // Catch2 do POCO core::anim::boot_pixel_* (M7-COSTURA Inc 2c: sequencia de frames

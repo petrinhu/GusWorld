@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // GusEngine/platform/tests/settings_file_store_test.cpp
 //
 // Catch2 (TEST-FIRST) do SettingsFileStore (MENU-PAUSA-CONFIG-SOM, M7-COSTURA):

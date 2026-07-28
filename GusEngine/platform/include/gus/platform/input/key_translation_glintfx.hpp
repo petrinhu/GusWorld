@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // gus/platform/input/key_translation_glintfx.hpp
 //
 // Traducao BIDIRECIONAL glintfx::Key <-> keycode do vocabulario Godot Key persistido

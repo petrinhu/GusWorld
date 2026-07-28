@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // environment_stacking_test.cpp
 //
 // Spec executavel (Catch2 v3) do STACKING de 3 camadas e do CAP final de mult_ambiente

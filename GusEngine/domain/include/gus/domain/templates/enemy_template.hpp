@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // gus/domain/templates/enemy_template.hpp
 //
 // Template imutavel de inimigo. Dado PURO. Portado de

@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // GusEngine/app/tests/save_load_menu_interaction_test.cpp
 //
 // Catch2 HEADLESS (GL REAL - Xvfb :99, nao so a logica pura) da tela de Salvar/

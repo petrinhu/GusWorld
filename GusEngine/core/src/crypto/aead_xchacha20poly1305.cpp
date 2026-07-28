@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // gus/core/src/crypto/aead_xchacha20poly1305.cpp
 //
 // Implementacao do AEAD XChaCha20-Poly1305 proprio (ADR-015 decisao 1/2). Ver

@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // gus/domain/src/input/controls_hash.cpp
 //
 // Hash 128 dos controles (ADR-007 item 2). POCO puro, ZERO Qt. Trunca o SHA-256

@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // card_virus_combat_test.cpp
 //
 // Spec executavel (Catch2 v3) da fatia 1 da onda CARDS-HW-2 (VIRUS EM COMBATE):

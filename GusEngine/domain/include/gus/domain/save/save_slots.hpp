@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // gus/domain/save/save_slots.hpp
 //
 // POLITICA DE SLOTS do save (camada PURA, ZERO Qt, ZERO disco). Decisao do lider

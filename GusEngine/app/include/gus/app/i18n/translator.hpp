@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // gus/app/i18n/translator.hpp
 //
 // Translator de UI (M5, incremento 3.5): o tr() runtime da camada app/. Carrega o

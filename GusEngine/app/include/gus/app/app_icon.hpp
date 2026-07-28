@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // gus/app/app_icon.hpp
 //
 // APP-ICONE: aplica o icone do app (opcao C do mock docs/design/mockups/08-app-icon.html

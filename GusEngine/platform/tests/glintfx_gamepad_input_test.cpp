@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // GusEngine/platform/tests/glintfx_gamepad_input_test.cpp
 //
 // Catch2 do GlintfxGamepadInput (platform/input, F4-2.4): adaptador de GAMEPAD do backend

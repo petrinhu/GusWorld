@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // template_source_test.cpp
 //
 // Spec executavel (Catch2 v3) da politica res:// > user:// (F2-E.10-CONTRACT),

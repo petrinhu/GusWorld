@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // gus/app/src/boot_pixel_overlay.cpp
 //
 // Implementacao de BootPixelOverlay. Ver header. Travado por

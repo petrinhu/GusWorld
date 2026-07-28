@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // aead_xchacha20poly1305_test.cpp
 //
 // Spec executavel (Catch2 v3) do AEAD XChaCha20-Poly1305 PROPRIO sobre o

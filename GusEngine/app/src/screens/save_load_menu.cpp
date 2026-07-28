@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // gus/app/src/screens/save_load_menu.cpp
 //
 // Implementacao de save_load_menu.hpp. Ver header para o contrato completo.

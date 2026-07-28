@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // GusEngine/tests/breath_oscillator_test.cpp
 //
 // Catch2 do POCO core::anim::BreathOscillator: respiracao CALMA procedural - uma

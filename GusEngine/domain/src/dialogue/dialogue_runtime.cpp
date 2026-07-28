@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // gus/domain/src/dialogue/dialogue_runtime.cpp
 //
 // Implementacao do DialogueRuntime. Ver o header para o contrato. POCO puro,

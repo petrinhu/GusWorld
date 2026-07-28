@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // gus/platform/input/input_mapper.hpp
 //
 // InputMapper (M1, platform/input): mantem o conjunto de teclas pressionadas e

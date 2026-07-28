@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // save_v6_test.cpp
 //
 // Spec executavel (Catch2 v3) do SAVE V6 (DECK-4, docs/design/mecanicas/

@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // techmagic_mises_test.cpp
 //
 // Spec executavel (Catch2 v3) do Calc-Edge (Mises), CARD-ENGINE-MANIFESTO item 9 do

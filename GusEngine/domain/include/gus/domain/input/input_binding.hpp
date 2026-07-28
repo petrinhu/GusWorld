@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // gus/domain/input/input_binding.hpp
 //
 // POCO records de binding de InputAction, portados de

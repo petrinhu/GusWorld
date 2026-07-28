@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // combat_status_fixes_test.cpp
 //
 // Spec executavel (Catch2 v3) das 4 correcoes de combate (criador 2026-05-26):

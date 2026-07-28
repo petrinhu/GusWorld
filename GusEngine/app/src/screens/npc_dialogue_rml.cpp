@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // gus/app/src/screens/npc_dialogue_rml.cpp
 //
 // Implementacao de npc_dialogue_portrait_file/build_npc_dialogue_rml. Ver header.

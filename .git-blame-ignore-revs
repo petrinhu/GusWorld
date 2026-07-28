@@ -1,0 +1,31 @@
+# .git-blame-ignore-revs - commits que o `git blame` deve PULAR
+#
+# PARA QUE SERVE
+# Mudanca em massa puramente mecanica (aplicar cabecalho SPDX em centenas de
+# arquivos, reformatar com clang-format, trocar CRLF por LF) toca TODA linha de
+# um arquivo sem mudar uma virgula do que o codigo faz. Sem este arquivo, o
+# `git blame` passa a atribuir cada linha ao commit mecanico - e a pergunta que
+# importa ("quem escreveu esta logica, e por que?") fica sem resposta, enterrada
+# sob o commit que so mexeu em formatacao.
+#
+# Listando o SHA do commit mecanico aqui, o blame o IGNORA e continua mostrando
+# o autor real de cada linha.
+#
+# COMO USAR (uma vez por clone - o git NAO le este arquivo sozinho)
+#
+#     git config blame.ignoreRevsFile .git-blame-ignore-revs
+#
+# Depois disso, `git blame` e `git log -L` ja pulam os commits listados. Editor
+# e forge que respeitam a convencao (VS Code, GitHub) tambem passam a usar.
+# Para consultar sem configurar nada:
+#
+#     git blame --ignore-revs-file .git-blame-ignore-revs <arquivo>
+#
+# COMO ADICIONAR UM COMMIT
+# Um SHA COMPLETO (40 digitos) por linha - SHA abreviado o git rejeita. Comente
+# a linha de cima dizendo o que o commit fez, para o proximo leitor entender.
+#
+# ---------------------------------------------------------------------------
+
+# chore(licenca): cabecalho SPDX GPL-3.0-or-later em 524 fontes do GusEngine
+# (SHA a preencher depois que o commit existir)

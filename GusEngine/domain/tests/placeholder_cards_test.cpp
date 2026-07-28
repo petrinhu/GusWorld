@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // placeholder_cards_test.cpp
 //
 // Spec executavel (Catch2 v3) do registry in-memory de cartas placeholder do vertical

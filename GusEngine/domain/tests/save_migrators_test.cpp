@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // save_migrators_test.cpp
 //
 // Spec executavel (Catch2 v3) dos MIGRATORS forward-only do save (domain/save).

@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // adware_sterling.cpp
 //
 // Ver gus/domain/combat/adware_sterling.hpp pro contrato/racional completo.

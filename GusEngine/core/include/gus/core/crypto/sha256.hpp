@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // gus/core/crypto/sha256.hpp
 //
 // SHA-256 PROPRIO (FIPS 180-4), implementacao de dominio publico, deterministica,

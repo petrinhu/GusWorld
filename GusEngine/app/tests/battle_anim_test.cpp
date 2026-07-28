@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // GusEngine/app/tests/battle_anim_test.cpp
 //
 // Catch2 (headless) do BattleAnimDirector (M5, W2 base funcional): prova o POCO de

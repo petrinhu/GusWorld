@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // environment_transitions_test.cpp
 //
 // Spec executavel (Catch2 v3) da tabela FECHADA e DETERMINISTICA de mutabilidade de

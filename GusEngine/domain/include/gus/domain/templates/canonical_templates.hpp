@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // gus/domain/templates/canonical_templates.hpp
 //
 // Fonte-de-verdade EM CODIGO dos templates do encontro de referencia do vertical

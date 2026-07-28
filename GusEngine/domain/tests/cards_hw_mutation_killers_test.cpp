@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // cards_hw_mutation_killers_test.cpp
 //
 // CARDS-HW-QA1: mutation testing manual adversarial nas fatias mais novas do motor de

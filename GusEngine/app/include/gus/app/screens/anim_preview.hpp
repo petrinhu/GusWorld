@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // gus/app/screens/anim_preview.hpp
 //
 // AnimPreview: VIEWER de animacao do Gus, acionado por --anim-preview. Reusa a

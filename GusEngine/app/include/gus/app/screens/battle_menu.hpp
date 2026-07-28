@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // gus/app/screens/battle_menu.hpp
 //
 // MODELO PURO do menu de verbos comando-first da BattleScreen (M5, incremento 3): POCO

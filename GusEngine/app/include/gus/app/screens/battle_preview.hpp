@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // gus/app/screens/battle_preview.hpp
 //
 // VIEWER da BattleScreen (M5, incremento 1): abre uma janela SDL direto na BattleScene

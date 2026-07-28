@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // gus/core/anim/boot_pixel_sequence.hpp
 //
 // boot_pixel_frame_index / boot_pixel_safety_alpha: matematica PURA (POCO, ZERO SDL/
