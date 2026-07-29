@@ -152,6 +152,19 @@ public:
     // Render2dGlintfx SOBRESCREVE com Draw2d::measure_text() (motor de fonte proprio do
     // glintfx, proporcional + kerning quando a tabela existir - ver seu .cpp/.hpp).
     // text == nullptr ou px_size <= 0 => 0.0f (mesmo contrato fail-high do draw_text).
+    //
+    // ⚠️ CONTRATO PRA QUEM ESCREVE UM NOVO IRenderer: se o SEU draw_text() rasteriza com
+    // avanco PROPORCIONAL (nao monospace fixo), voce DEVE sobrescrever este metodo com o
+    // motor de medida REAL do seu rasterizador - herdar o default em silencio compila,
+    // passa em teste e roda; so desalinha centralizacao/alinhamento-a-direita NA TELA
+    // (o mesmo defeito de classe do bake fixo cell_px=16 que este backend teve ate
+    // 2026-07-29: valor plausivel herdado adiante sem revisao). NAO HA verificacao
+    // automatica disto (nem em compilacao nem no CI headless deste projeto - o
+    // irredutivel de GPU real fica pro smoke visual, ver render2d_glintfx_test.cpp) -
+    // pra provar que a sua sobrescrita bate com o que draw_text() de fato desenha,
+    // renderize uma string de teste, leia os pixels (glReadPixels) e compare a bbox
+    // horizontal do conteudo contra o valor devolvido aqui (a mesma tecnica do probe
+    // ad-hoc do commit que migrou Render2dGlintfx - fora da suite, no smoke/probe tier).
     [[nodiscard]] virtual float measure_text_width(const char* text, float px_size,
                                                     bool /*bold*/) {
         return text_width(text != nullptr ? std::string_view(text)
