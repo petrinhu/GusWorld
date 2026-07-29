@@ -61,6 +61,29 @@ Estes são contornos onde **o sinal sumiu e o custo ficou**. Três achados:
 
 **S1 — Ícone de janela (`app/src/app_icon.cpp`).** Hoje: `stbi_load` decodifica o PNG → `SDL_Surface` → `SDL_SetWindowIcon`. Verificado por grep no `app.hpp` da v0.24.0: **não existe `set_window_icon`** no App mode (só `set_window_iconify_callback`, que é outra coisa). Quando a casca migrar (F4-3), o jogo **perde o ícone** e não há API para pedir de volta. Nunca foi sinalizado. **Ação: pedido novo no bus** (contrato sugerido: `set_window_icon(pixels, w, h)` — casa com o `D2D-TEXPIXELS` na forma "pixels em memória").
 
+> ⚠️ **S2 RECLASSIFICADO EM 2026-07-29, DEPOIS DE PUBLICADO: NÃO é achado.**
+> A captura de quadro **não é ferramenta de QA dentro do produto**: é o mecanismo da feature
+> **fundo congelado**, decidida pelo líder na onda M7-DIALOGO. `capture_frame_to_png` é chamado
+> **incondicionalmente** (sem env var, sem gate) em 3 pontos do `maestro.cpp` (:536, :594, :1175),
+> e o PNG é lido de volta **como textura de fundo** do menu de pausa, do menu de dificuldade, do
+> save/load e do diálogo de NPC. Mover para `tools/` **quebraria a feature em produção**.
+> **Decisão do líder 2026-07-29: fica como está.** A D2 da seção 9 está respondida por aqui.
+>
+> **Por que a classificação errou, que é o que importa daqui pra frente:** ela veio de olhar ONDE
+> o código mora e O QUE ele usa (`glReadPixels` + escrita de PNG, técnica idêntica à das sondas de
+> verificação visual), e não **QUEM o chama**. São perguntas diferentes. **"Parece ferramenta" não
+> é "é ferramenta"**: o que decide é haver chamador de produção no caminho de execução do
+> jogador, e isso só aparece olhando PARA CIMA na cadeia de chamadas.
+>
+> O erro passou por **duas** auditorias (este plano e o `plano-camadas-sdl.md`). Quem pegou foi o
+> agente que ia EXECUTAR, lendo o código em vez do relatório sobre o código, e parou antes de
+> tocar em nada. Régua: **relatório de auditoria não substitui ler o alvo antes de mexer nele.**
+>
+> ⚠️ **Consequência para o S3 (logo abaixo):** ele dizia que o readback "morre por cascata quando
+> o S2 for resolvido". **Não morre** — o S2 não vai ser resolvido, porque não é problema. O
+> `gl3_read_backbuffer_rgba` continua tendo consumidor de produção enquanto o fundo congelado
+> existir no formato atual.
+
 **S2 — Captura de frame → PNG (`capture_frame_to_png`).** Produção real, em **5 telas + `sdl_window.cpp`** (`sdl_window.cpp:503-539`, `title_menu_loop.cpp:490-495`, e save_load/difficulty/battle_preview): `glReadPixels` via `gl3_read_backbuffer_rgba` (o wrapper do glad em `platform/rmlui/gl3_loader.cpp`) + `stbi_write_png`. Duas consequências:
 
 - **A mensagem de 14:20 ao glintfx contém um erro factual nosso**: dissemos que `stbi_write_png` era "só das nossas sondas de verificação visual, fora do binário do jogo". **Falso** — está em `app/src`, que compila em `gusworld_app`. Corrigir no bus (é a segunda retificação do dia; melhor nós que eles).
