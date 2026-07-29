@@ -38,6 +38,8 @@ ROOT = Path(__file__).resolve().parents[2]
 CHECK = ROOT / "tools" / "check.sh"
 STAMP = ROOT / "GusEngine" / "build" / ".last_check"
 LOCK = ROOT / "GusEngine" / "build" / ".check.lock"
+# Lock GLOBAL de build, compartilhado com os `flock` manuais dos agentes.
+BUILD_LOCK = "/var/tmp/gusworld-build.lock"
 
 # Janela de debounce: no maximo 1 check a cada N segundos numa rajada de edits.
 DEBOUNCE_S = 8
@@ -113,14 +115,41 @@ def main() -> int:
     except OSError:
         pass
 
-    # Lock nao-bloqueante: se outro check roda, sai quieto.
+    # DOIS locks, nao-bloqueantes, nesta ordem:
+    #
+    #   1. LOCK (GusEngine/build/.check.lock) - evita duas instancias DESTE hook.
+    #   2. BUILD_LOCK (/var/tmp/gusworld-build.lock) - evita que este hook compile
+    #      ao mesmo tempo que um `cmake --build`/`ctest` MANUAL de outro agente.
+    #
+    # Por que o 2o existe (achado de 2026-07-29): o lock do hook so protegia dele
+    # mesmo. Com varios agentes editando a mesma arvore, um Edit disparava
+    # check.sh (build + suite completos) enquanto outro agente compilava a mao, e
+    # dois builds C++ concorrentes nesta maquina (16 nucleos, ninja abrindo
+    # nproc+2 jobs cada) competem por varios GB. O lock global e o MESMO que os
+    # agentes usam via `flock /var/tmp/gusworld-build.lock cmake --build ...`.
+    #
+    # NAO-bloqueante de proposito: este hook roda em PostToolUse, entao esperar
+    # aqui congelaria a edicao do agente por minutos. Se o build global esta
+    # ocupado, o check sai quieto - e best-effort, o gate de verdade e o
+    # check.sh/CI rodado a mao no fim da fatia.
     STAMP.parent.mkdir(parents=True, exist_ok=True)
+    build_lock_fd = None
     try:
         import fcntl
         lock_fd = open(LOCK, "w")
         try:
             fcntl.flock(lock_fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
         except OSError:
+            lock_fd.close()
+            return 0
+        try:
+            build_lock_fd = open(BUILD_LOCK, "w")
+            fcntl.flock(build_lock_fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        except OSError:
+            # Outro agente esta compilando: nao concorre por RAM, sai quieto.
+            if build_lock_fd is not None:
+                build_lock_fd.close()
+            fcntl.flock(lock_fd, fcntl.LOCK_UN)
             lock_fd.close()
             return 0
     except ImportError:
@@ -150,6 +179,8 @@ def main() -> int:
     except Exception as e:
         emite(f"[check.sh apos editar `{rel}`] erro ao rodar: {e}")
     finally:
+        if build_lock_fd is not None:
+            build_lock_fd.close()
         if lock_fd is not None:
             lock_fd.close()
 
