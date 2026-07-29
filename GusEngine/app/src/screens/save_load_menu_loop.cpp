@@ -176,21 +176,43 @@ std::string write_save_load_rml_file(const SaveLoadMenuState& state,
                       fs::copy_options::overwrite_existing, ec);
     }
 
+    // FONT-EXTEND-GLITCH (2026-07-29): a fonte NAO e mais injetada aqui via @font-face
+    // de string - SaveLoadMenuLoopScreen::enter() registra a familia 1x via
+    // glintfx::UiLayer::load_font_face (API v0.24.0) logo apos set_asset_base_url (ver
+    // register_pixel_operator_mono_fonts abaixo). Os .ttf continuam copiados pro stage
+    // acima (load_font_face resolve o path pela MESMA BaseUrlFileInterface que a
+    // @font-face antiga usava).
     std::string rml = build_save_load_menu_rml(state, tr);
-    const std::string needle = "<style>\n";
-    const std::size_t pos = rml.find(needle);
-    if (pos != std::string::npos) {
-        rml.insert(pos + needle.size(),
-                    "@font-face { font-family: \"Pixel Operator Mono\"; "
-                    "src: \"PixelOperatorMono.ttf\"; }\n"
-                    "@font-face { font-family: \"Pixel Operator Mono\"; "
-                    "font-weight: bold; src: \"PixelOperatorMono-Bold.ttf\"; }\n");
-    }
 
     const fs::path out = stage / "save_load_menu.rml";
     std::ofstream f(out);
     f << rml;
     return out.string();
+}
+
+// FONT-EXTEND-GLITCH (2026-07-29): registra "Pixel Operator Mono" (regular+bold) via
+// glintfx::UiLayer::load_font_face (API v0.24.0) - mata o @font-face por string que
+// write_save_load_rml_file injetava antes. Chamado 1x em enter() (registro e
+// process-wide RmlUi state, ver ui_layer.hpp), DEPOIS do stage ja ter os .ttf (o
+// PRIMEIRO write_save_load_rml_file os copia) e ANTES de ui_->load(). `family` SEMPRE
+// explicito (armadilha de assimetria de motor Own-vs-FreeType documentada em
+// font_face.hpp - o mesmo literal que o RCSS ja referencia neutraliza os dois).
+void register_pixel_operator_mono_fonts(glintfx::UiLayer& ui) {
+    if (!ui.load_font_face(glintfx::FontFaceDesc{/*path=*/"PixelOperatorMono.ttf",
+                                                  /*family=*/"Pixel Operator Mono"})) {
+        std::cerr << "SaveLoadMenuLoop: load_font_face(PixelOperatorMono.ttf) falhou "
+                     "(arquivo ausente/invalido no stage) - cai no fallback de fonte do "
+                     "RmlUi.\n";
+    }
+    if (!ui.load_font_face(glintfx::FontFaceDesc{
+            /*path=*/"PixelOperatorMono-Bold.ttf",
+            /*family=*/"Pixel Operator Mono",
+            /*style=*/glintfx::FontStyle::Normal,
+            /*weight=*/glintfx::FontWeight::Bold})) {
+        std::cerr << "SaveLoadMenuLoop: load_font_face(PixelOperatorMono-Bold.ttf) "
+                     "falhou (arquivo ausente/invalido no stage) - cai no fallback de "
+                     "fonte do RmlUi.\n";
+    }
 }
 
 // Le TODOS os slots do disco e monta os previews + (modo Load) um cache do
@@ -474,6 +496,7 @@ public:
         stage_ = save_load_stage_dir();
         ui_->set_asset_base_url(stage_.c_str());
         rml_path_ = write_save_load_rml_file(state_, translator_);
+        register_pixel_operator_mono_fonts(*ui_);
         ui_->load(rml_path_.c_str());
         ui_->set_viewport(pw_, ph_);
         ui_->set_dp_ratio(dp_ratio_);
