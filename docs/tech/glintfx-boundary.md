@@ -40,3 +40,20 @@ Aplicar a régua no ponto. Se der "genérico" → **não internaliza**: manda o 
 - **Casca SDL própria (janela + loop)** → migrar pro **App mode do glintfx** (v0.12.0+, `set_frame_callback`). É a maior dependência direta de SDL ainda no GusWorld; alvo natural de uma onda "input/casca via glintfx" quando o roadmap chegar lá.
 
 (A auditoria completa das ~32 libs vendorizadas em `third_party/` — quais migram pro glintfx — foi deixada fora deste doc leve; roda sob demanda se o líder pedir.)
+
+## Lacunas do glintfx que estamos CONTORNANDO (regra do líder, 2026-07-29)
+
+**Ordem do líder, verbatim:** *"nao crie maneira de contornar deficiências no glintfx. Se encontrar alguma, pause, documente e encaminhe ao glintfx via bus"*.
+
+**Por quê:** um contorno local resolve o sintoma do nosso lado e **apaga o sinal** que faria a lacuna ser consertada na origem. Fica funcionando, ninguém revisita, e o custo reaparece inteiro no próximo consumidor. É o mesmo mecanismo do `cell_px=16` (ver `D2D-2-SENTINELA`): alguém resolveu localmente uma vez, funcionou, e ninguém voltou por meses.
+
+Esta seção é o registro vivo. Entrada nova aqui **exige** mensagem correspondente no bus — documentar sem encaminhar é meio caminho, e o meio caminho é o que cria passivo silencioso.
+
+| # | lacuna | o contorno que existe hoje | custo | encaminhado |
+|---|---|---|---|---|
+| L1 | **Não há `flush()` público no `Draw2d`.** A única forma de esvaziar o batcher é `end()`, que fecha o bracket inteiro. Medido: `flush` aparece 17× no `draw2d.hpp` da v0.23.0, **todas em comentário**; nenhuma declaração. | `render2d_glintfx.cpp:398`/`426` fecha o bracket antes de desenhar texto na nossa pipeline GL e reabre depois, para preservar a ordem de pintura (contrato do `IRenderer`) entre draws batchados e texto cru. | Perde-se o batching entre os sprites de antes e os de depois de cada texto. **Não medimos o efeito em tempo de quadro** — o pedido é sobre o mecanismo, não sobre uma regressão observada. | 2026-07-29 |
+| L2 | **O motor de fonte próprio colapsa os acentos pt-br em corpo miúdo (8px).** `ÁÉÍÓÚÇ` saem numa faixa ilegível. | Não usamos `Draw2d::draw_text`; mantivemos pipeline GL própria com stb_truetype (duplicando a receita do `Render2dGl3`). | Duplicação de pipeline de texto, e o Draw2D fica com uma primitiva pública inutilizada por nós. | 2026-07-29 |
+
+Prova visual de L2: `docs/tech/fontflip-visuals/triplet_1x_08_cockpitText_menor.png` (linha 1 = motor deles) e o dossiê `docs/tech/fontflip-draw2d-dossie.md`.
+
+⚠️ **O que NÃO é lacuna deles** e não entra aqui: defeito nosso que por acaso aparece na fronteira. O `cell_px=16` era nosso, o bake é nosso, o stb_truetype é nosso — consertamos em casa, sem pedir nada. A pergunta que separa os dois casos: **o código problemático é nosso, ou é a ausência de uma API deles?**
