@@ -21,6 +21,7 @@
 
 using gus::platform::render2d::bake_font_atlas;
 using gus::platform::render2d::FontAtlas;
+using gus::platform::render2d::quantize_cell_px;
 using gus::platform::render2d::resolve_font_path;
 
 TEST_CASE("resolve_font_path monta um caminho terminando no .ttf pedido",
@@ -90,6 +91,41 @@ TEST_CASE("glyph_uv devolve sub-regiao normalizada [0,1] do caractere",
     // Caractere fora do range printable cai num UV vazio (w==0) sem crash.
     const auto uv_bad = atlas.glyph_uv('\x01');
     REQUIRE(uv_bad.w == 0.0f);
+}
+
+TEST_CASE("quantize_cell_px arredonda o px_size fracionario pro inteiro mais proximo",
+          "[font_atlas]") {
+    // D2D-2-SENTINELA: o bake escolhe a RESOLUCAO pelo inteiro mais proximo do px_size
+    // logico (float) - so a resolucao do bake muda, o layout (text_metrics) continua float.
+    REQUIRE(quantize_cell_px(8.0f) == 8);
+    REQUIRE(quantize_cell_px(8.4f) == 8);   // arredonda pra baixo
+    REQUIRE(quantize_cell_px(8.6f) == 9);   // arredonda pra cima
+    REQUIRE(quantize_cell_px(20.16f) == 20);  // exemplo real: cam.rect.h*0.028f (~sdl_window)
+}
+
+TEST_CASE("quantize_cell_px degrada pro minimo (1) sem crash em entradas invalidas",
+          "[font_atlas]") {
+    REQUIRE(quantize_cell_px(0.0f) == 1);
+    REQUIRE(quantize_cell_px(-5.0f) == 1);
+    REQUIRE(quantize_cell_px(0.4f) == 1);  // arredondaria pra 0; clampado em 1
+    // NaN: comparacao "> 0.0f" com NaN e sempre false -> cai no ramo de invalido.
+    REQUIRE(quantize_cell_px(std::numeric_limits<float>::quiet_NaN()) == 1);
+}
+
+TEST_CASE("bake_font_atlas produz atlases distintos e coerentes em varios cell_px",
+          "[font_atlas]") {
+    // Prova a base do cache por (face, cell_px): tamanhos diferentes bakeiam atlases
+    // com dimensoes proporcionais (cols=rows=14 fixos - kFontGlyphCount=191), sem
+    // interferir uns nos outros (bake_font_atlas e uma funcao pura por chamada).
+    for (const int cell_px : {8, 9, 10, 11, 12, 13, 14, 15, 20, 24, 30}) {
+        const FontAtlas atlas =
+            bake_font_atlas(resolve_font_path("PixelOperatorMono.ttf"), cell_px);
+        REQUIRE(atlas.valid());
+        REQUIRE(atlas.cell_px == cell_px);
+        REQUIRE(atlas.atlas_w == atlas.cols * cell_px);
+        REQUIRE(atlas.atlas_h == atlas.rows * cell_px);
+        REQUIRE(atlas.glyph_has_ink('A'));
+    }
 }
 
 TEST_CASE("bake degrada sem crash quando o arquivo nao existe", "[font_atlas]") {

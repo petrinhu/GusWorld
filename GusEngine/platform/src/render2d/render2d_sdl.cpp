@@ -51,12 +51,19 @@ Render2dSdl::~Render2dSdl() {
             SDL_DestroyTexture(textures_[i]);
         }
     }
-    // Texturas do atlas de fonte (regular/bold).
-    if (font_regular_.texture != nullptr) {
-        SDL_DestroyTexture(font_regular_.texture);
+    // Texturas do atlas de fonte: agora um CACHE por (face, cell_px) - D2D-2-SENTINELA.
+    // Libera TODAS as entradas de todos os tamanhos bakeados, nas duas faces.
+    for (auto& [cell_px, baked] : font_regular_.by_cell_px) {
+        (void)cell_px;
+        if (baked.texture != nullptr) {
+            SDL_DestroyTexture(baked.texture);
+        }
     }
-    if (font_bold_.texture != nullptr) {
-        SDL_DestroyTexture(font_bold_.texture);
+    for (auto& [cell_px, baked] : font_bold_.by_cell_px) {
+        (void)cell_px;
+        if (baked.texture != nullptr) {
+            SDL_DestroyTexture(baked.texture);
+        }
     }
 }
 
@@ -210,34 +217,45 @@ void Render2dSdl::draw_textured_rect(const gus::core::spatial::Rect& world_rect,
     SDL_RenderTexture(renderer_, tex, &src, &dst);
 }
 
-Render2dSdl::FontFace* Render2dSdl::ensure_font(bool bold) {
+Render2dSdl::BakedFontSize* Render2dSdl::ensure_font(bool bold, int cell_px) {
     FontFace& face = bold ? font_bold_ : font_regular_;
-    if (face.tried) {
-        return face.atlas.valid() && face.texture != nullptr ? &face : nullptr;
+    ++face.tick;
+
+    if (face.unavailable) {
+        return nullptr;  // ja falhou uma vez (arquivo ausente/stb recusou): nunca retenta
     }
-    face.tried = true;
+
+    // Cache hit: bake deste tamanho ja existe. Atualiza o relogio LRU e devolve.
+    auto it = face.by_cell_px.find(cell_px);
+    if (it != face.by_cell_px.end()) {
+        it->second.last_used = face.tick;
+        return &it->second;
+    }
 
     // Headless (sem renderer): nao da pra criar textura. Fica indisponivel (no-op).
     if (renderer_ == nullptr) {
         return nullptr;
     }
 
-    // Bake na CPU (16px nativo = multiplo de 8 da Pixel Operator, crisp ao escalar).
-    // Nomes dos .ttf vem do header central de caminhos de asset.
+    // Bake SOB DEMANDA no tamanho pedido (D2D-2-SENTINELA - era 16px fixo com downscale
+    // na GPU). Nomes dos .ttf vem do header central de caminhos de asset.
     const std::string file(bold ? gus::core::assets::kFontMonoBoldFile
                                  : gus::core::assets::kFontMonoRegularFile);
-    face.atlas = bake_font_atlas(resolve_font_path(file), /*cell_px=*/16);
-    if (!face.atlas.valid()) {
-        return nullptr;  // fonte ausente: degrada (sem texto, so fallback do caller)
+    FontAtlas atlas = bake_font_atlas(resolve_font_path(file), cell_px);
+    if (!atlas.valid()) {
+        // Fonte ausente/stb recusou: TODO tamanho falharia igual (mesmo arquivo). Marca a
+        // FACE inteira indisponivel - evita re-ler o .ttf do disco a cada tamanho novo.
+        face.unavailable = true;
+        return nullptr;
     }
 
     // Converte o atlas grayscale (alpha) -> RGBA32 (branco + alpha do glifo). O
-    // color-mod no draw tinge depois. NEAREST = crisp ao escalar pro px_size logico.
-    const int w = face.atlas.atlas_w;
-    const int h = face.atlas.atlas_h;
+    // color-mod no draw tinge depois. NEAREST = crisp (o tamanho ja bate com o desenhado).
+    const int w = atlas.atlas_w;
+    const int h = atlas.atlas_h;
     std::vector<std::uint8_t> rgba(static_cast<std::size_t>(w) * h * 4);
     for (std::size_t i = 0; i < static_cast<std::size_t>(w) * h; ++i) {
-        const std::uint8_t a = face.atlas.pixels[i];
+        const std::uint8_t a = atlas.pixels[i];
         rgba[i * 4 + 0] = 255;  // R
         rgba[i * 4 + 1] = 255;  // G
         rgba[i * 4 + 2] = 255;  // B
@@ -246,14 +264,38 @@ Render2dSdl::FontFace* Render2dSdl::ensure_font(bool bold) {
     SDL_Texture* tex = SDL_CreateTexture(renderer_, SDL_PIXELFORMAT_RGBA32,
                                          SDL_TEXTUREACCESS_STATIC, w, h);
     if (tex == nullptr) {
-        face.atlas = FontAtlas{};  // invalida pra cair no no-op
+        // Falha pode ser transiente (GPU/memoria); NAO marca a face indisponivel - o
+        // proximo draw_text tenta de novo (o arquivo .ttf em si era valido).
         return nullptr;
     }
     SDL_UpdateTexture(tex, nullptr, rgba.data(), w * 4);
     SDL_SetTextureScaleMode(tex, SDL_SCALEMODE_NEAREST);
     SDL_SetTextureBlendMode(tex, SDL_BLENDMODE_BLEND);
-    face.texture = tex;
-    return &face;
+
+    // TETO (fail-high, nunca crash): estourou kMaxCachedFontSizesPerFace? Evicta a
+    // entrada MENOS RECENTEMENTE USADA (menor last_used) antes de inserir a nova. Nunca
+    // cresce sem limite; o unico custo e re-bake ocasional se o teto for violado de
+    // verdade (nao acontece hoje: uso medido = ~12 tamanhos/face, teto = 32).
+    if (face.by_cell_px.size() >= static_cast<std::size_t>(kMaxCachedFontSizesPerFace)) {
+        auto lru = face.by_cell_px.begin();
+        for (auto cur = face.by_cell_px.begin(); cur != face.by_cell_px.end(); ++cur) {
+            if (cur->second.last_used < lru->second.last_used) {
+                lru = cur;
+            }
+        }
+        if (lru->second.texture != nullptr) {
+            SDL_DestroyTexture(lru->second.texture);
+        }
+        face.by_cell_px.erase(lru);
+    }
+
+    BakedFontSize baked;
+    baked.atlas = std::move(atlas);
+    baked.texture = tex;
+    baked.last_used = face.tick;
+    auto [ins_it, inserted] = face.by_cell_px.emplace(cell_px, std::move(baked));
+    (void)inserted;
+    return &ins_it->second;
 }
 
 void Render2dSdl::draw_text(const char* text, float x, float y, float px_size,
@@ -261,7 +303,10 @@ void Render2dSdl::draw_text(const char* text, float x, float y, float px_size,
     if (text == nullptr || px_size <= 0.0f) {
         return;
     }
-    FontFace* face = ensure_font(bold);
+    // D2D-2-SENTINELA: bakeia no tamanho REALMENTE desenhado (arredondado pro inteiro
+    // mais proximo), nao mais 16px fixo com downscale na GPU.
+    const int cell_px = quantize_cell_px(px_size);
+    BakedFontSize* face = ensure_font(bold, cell_px);
     if (face == nullptr) {
         return;  // sem fonte (headless/ausente): no-op, o caller ja desenhou o fallback
     }

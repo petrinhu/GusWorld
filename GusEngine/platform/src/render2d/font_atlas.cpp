@@ -11,6 +11,7 @@
 
 #include "gus/platform/render2d/font_atlas.hpp"
 
+#include <cmath>       // std::lround
 #include <cstring>     // std::memset
 #include <vector>
 
@@ -53,6 +54,17 @@ std::vector<unsigned char> read_file(const std::string& path) {
 }
 
 }  // namespace
+
+int quantize_cell_px(float px_size) noexcept {
+    if (!(px_size > 0.0f)) {  // NaN-safe: comparacao com NaN e sempre false
+        return 1;
+    }
+    const long rounded = std::lround(px_size);
+    if (rounded < 1) {
+        return 1;
+    }
+    return static_cast<int>(rounded);
+}
 
 int glyph_slot(int codepoint) noexcept {
     // ASCII printable -> slots 0..94; Latin-1 (160..255) -> slots 95..190. Fora = -1.

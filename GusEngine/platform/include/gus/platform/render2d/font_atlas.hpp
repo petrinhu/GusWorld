@@ -50,6 +50,23 @@ inline constexpr int kFontGlyphCount = kFontAsciiCount + kFontLatin1Count;  // 1
 inline constexpr int kFontFirstChar = kFontAsciiFirst;
 inline constexpr int kFontLastChar = kFontAsciiLast;
 
+// D2D-2-SENTINELA: teto de tamanhos de atlas (cell_px) CACHEADOS por face (regular/bold).
+// O bake vira SOB DEMANDA no tamanho realmente desenhado (era 16px fixo com downscale na
+// GPU - o defeito original: HUD a 8px saia pontilhado). Cache indefinido dentro do teto;
+// se estourar, o caller evicta LRU (nunca cresce sem limite, nunca crasha - so re-bakeia
+// o tamanho menos usado recentemente). Uso real medido por varredura de todo call-site de
+// draw_text() no jogo (D2D-2-SENTINELA, 2026-07): 11 tamanhos inteiros distintos
+// (8,9,10,11,12,13,14,15,20,24,30) + 1 fracionario computado em runtime
+// (sdl_window.cpp:render_dialogue_overlay_frame) = ~12 tamanhos/face. 32 da ~2.6x de
+// folga sem custo de memoria relevante (o maior atlas, 30px, e ~172KB grayscale).
+inline constexpr int kMaxCachedFontSizesPerFace = 32;
+
+// Arredonda um px_size FRACIONARIO (o HUD usa float - text_metrics/kMonoAdvanceRatio
+// continuam so com float; isto e SO pra escolher a resolucao do BAKE) pro tamanho de
+// celula INTEIRO mais proximo. Clampa em >=1 (NaN/<=0 degrada pra 1, nunca 0/negativo -
+// bake_font_atlas ja rejeita cell_px<=0, mas o caller nao deveria nem tentar).
+[[nodiscard]] int quantize_cell_px(float px_size) noexcept;
+
 // Slot linear (0..kFontGlyphCount-1) de um CODEPOINT, ou -1 se fora das faixas baked.
 [[nodiscard]] int glyph_slot(int codepoint) noexcept;
 

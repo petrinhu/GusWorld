@@ -28,6 +28,7 @@
 #ifndef GUS_PLATFORM_RENDER2D_RENDER2D_SDL_HPP
 #define GUS_PLATFORM_RENDER2D_RENDER2D_SDL_HPP
 
+#include <cstdint>
 #include <string>
 #include <unordered_map>
 #include <vector>
@@ -96,16 +97,32 @@ private:
     // pra ancorar o sprite pelos PES (texture_content_bbox); ver alpha_bbox.hpp.
     std::vector<ContentBbox> bboxes_;
 
-    // FONTE (incremento 3.5): atlas bakeado (CPU) + SDL_Texture do atlas, por FACE
-    // (regular/bold). Carregado PREGUICOSAMENTE no 1o draw_text (so se houver renderer).
-    // Se a fonte faltar (headless/CI sem assets), atlas invalido e draw_text vira no-op.
-    struct FontFace {
-        FontAtlas atlas;              // bitmap + metricas (vazio = nao bakeado)
-        SDL_Texture* texture = nullptr;  // owned; nullptr ate subir o atlas
-        bool tried = false;           // ja tentou bakear (evita re-tentar a cada draw)
+    // FONTE (D2D-2-SENTINELA): atlas bakeado SOB DEMANDA no TAMANHO REALMENTE DESENHADO,
+    // nao mais um unico bake fixo de 16px com downscale na GPU (o defeito original: HUD a
+    // 8px saia pontilhado - ver docs/tech/fontflip-visuals/). Uma entrada BakedFontSize por
+    // (face, cell_px) INTEIRO (px_size fracionario e arredondado por quantize_cell_px -
+    // font_atlas.hpp - so pra escolher a RESOLUCAO do bake; o layout continua float).
+    //
+    // FontFace agrupa o cache POR TAMANHO de uma face (regular/bold): mapa cell_px ->
+    // BakedFontSize, um relogio logico (tick, incrementado a cada ensure_font) pra
+    // eviccao LRU quando o cache estoura kMaxCachedFontSizesPerFace, e uma flag
+    // "unavailable" (a fonte falhou uma vez - arquivo ausente/stb recusou - entao TODO
+    // tamanho falharia igual; evita re-ler o .ttf do disco a cada tamanho novo pedido).
+    struct BakedFontSize {
+        FontAtlas atlas;                 // bitmap + metricas bakeados NESTE cell_px
+        SDL_Texture* texture = nullptr;  // owned; textura RGBA do atlas deste tamanho
+        std::uint64_t last_used = 0;     // tick da FontFace no ultimo uso (LRU)
     };
-    // Garante o face carregado (bake + textura). Devolve nullptr se indisponivel.
-    FontFace* ensure_font(bool bold);
+    struct FontFace {
+        std::unordered_map<int, BakedFontSize> by_cell_px;  // cache por tamanho
+        bool unavailable = false;  // fonte ausente/invalida: nao retenta bake nenhum
+        std::uint64_t tick = 0;    // relogio logico (incrementa a cada ensure_font)
+    };
+    // Garante o bake do TAMANHO pedido (cell_px, ja arredondado por quantize_cell_px).
+    // Devolve nullptr se indisponivel (headless sem renderer / fonte ausente). Evicta a
+    // entrada LRU do cache antes de inserir se o teto (kMaxCachedFontSizesPerFace) for
+    // atingido - nunca cresce sem limite, nunca crasha (fail-high).
+    BakedFontSize* ensure_font(bool bold, int cell_px);
 
     FontFace font_regular_{};
     FontFace font_bold_{};

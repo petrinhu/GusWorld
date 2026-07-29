@@ -24,6 +24,7 @@
 #include <cstdint>
 #include <cstdlib>  // std::getenv
 #include <string>
+#include <unordered_map>
 #include <vector>
 
 #include "gus/core/asset_paths.hpp"               // nomes de arquivo de fonte
@@ -145,11 +146,20 @@ struct Render2dGl3::Impl {
     std::vector<ContentBbox> bboxes{ContentBbox{}};
     std::unordered_map<std::string, TextureId> by_path;
 
-    // Atlas de fonte por face (regular/bold): textura GL + atlas (metricas).
-    struct FontFace {
+    // Atlas de fonte por face (regular/bold): D2D-2-SENTINELA, cache SOB DEMANDA por
+    // (face, cell_px) inteiro - nao mais um unico bake fixo de 16px com downscale na GPU
+    // (o defeito original). Ver o mesmo desenho em Render2dSdl::BakedFontSize/FontFace
+    // (render2d_sdl.hpp) - duplicado aqui porque este backend nao expoe a struct no
+    // header (PImpl: Impl e privado inteiro no .cpp).
+    struct BakedFontSize {
         FontAtlas atlas;
         GLuint texture = 0;
-        bool tried = false;
+        std::uint64_t last_used = 0;  // tick da FontFace no ultimo uso (LRU)
+    };
+    struct FontFace {
+        std::unordered_map<int, BakedFontSize> by_cell_px;
+        bool unavailable = false;  // fonte ausente/invalida: nao retenta bake nenhum
+        std::uint64_t tick = 0;    // relogio logico (incrementa a cada ensure_font)
     };
     FontFace font_regular;
     FontFace font_bold;
@@ -320,39 +330,86 @@ struct Render2dGl3::Impl {
         return tex;
     }
 
-    FontFace* ensure_font(bool bold) {
+    BakedFontSize* ensure_font(bool bold, int cell_px) {
         FontFace& face = bold ? font_bold : font_regular;
-        if (face.tried) {
-            return face.atlas.valid() && face.texture != 0 ? &face : nullptr;
+        ++face.tick;
+
+        if (face.unavailable) {
+            return nullptr;  // ja falhou uma vez: nunca retenta (mesmo arquivo falharia)
         }
-        face.tried = true;
+
+        // Cache hit: bake deste tamanho ja existe. Atualiza o relogio LRU e devolve.
+        auto it = face.by_cell_px.find(cell_px);
+        if (it != face.by_cell_px.end()) {
+            it->second.last_used = face.tick;
+            return &it->second;
+        }
+
+        // Bake SOB DEMANDA no tamanho pedido (D2D-2-SENTINELA - era 16px fixo com
+        // downscale na GPU, o defeito original).
         const std::string file(bold ? gus::core::assets::kFontMonoBoldFile
                                     : gus::core::assets::kFontMonoRegularFile);
-        face.atlas = bake_font_atlas(resolve_font_path(file), /*cell_px=*/16);
-        if (!face.atlas.valid()) {
+        FontAtlas atlas = bake_font_atlas(resolve_font_path(file), cell_px);
+        if (!atlas.valid()) {
+            face.unavailable = true;  // fonte ausente/stb recusou: TODO tamanho falharia
             return nullptr;
         }
         // grayscale (alpha) -> RGBA premultiplied (branco * alpha; tint vem no draw).
-        const int w = face.atlas.atlas_w;
-        const int h = face.atlas.atlas_h;
+        const int w = atlas.atlas_w;
+        const int h = atlas.atlas_h;
         std::vector<std::uint8_t> rgba(static_cast<std::size_t>(w) * h * 4);
         for (std::size_t i = 0; i < static_cast<std::size_t>(w) * h; ++i) {
-            const std::uint8_t a = face.atlas.pixels[i];
+            const std::uint8_t a = atlas.pixels[i];
             rgba[i * 4 + 0] = a;  // premultiplied: branco*alpha = alpha
             rgba[i * 4 + 1] = a;
             rgba[i * 4 + 2] = a;
             rgba[i * 4 + 3] = a;
         }
-        face.texture = upload_rgba(rgba.data(), w, h, /*nearest=*/true);
-        return face.texture != 0 ? &face : nullptr;
+        const GLuint tex = upload_rgba(rgba.data(), w, h, /*nearest=*/true);
+        if (tex == 0) {
+            return nullptr;  // falha transiente (GPU): NAO marca a face indisponivel
+        }
+
+        // TETO (fail-high, nunca crash): evicta a entrada LRU antes de inserir se o
+        // cache ja estiver no limite (kMaxCachedFontSizesPerFace - ver font_atlas.hpp).
+        if (face.by_cell_px.size() >=
+            static_cast<std::size_t>(kMaxCachedFontSizesPerFace)) {
+            auto lru = face.by_cell_px.begin();
+            for (auto cur = face.by_cell_px.begin(); cur != face.by_cell_px.end();
+                 ++cur) {
+                if (cur->second.last_used < lru->second.last_used) {
+                    lru = cur;
+                }
+            }
+            if (lru->second.texture != 0) {
+                glDeleteTextures(1, &lru->second.texture);
+            }
+            face.by_cell_px.erase(lru);
+        }
+
+        BakedFontSize baked;
+        baked.atlas = std::move(atlas);
+        baked.texture = tex;
+        baked.last_used = face.tick;
+        auto [ins_it, inserted] = face.by_cell_px.emplace(cell_px, std::move(baked));
+        (void)inserted;
+        return &ins_it->second;
     }
 
     ~Impl() {
         for (std::size_t i = 1; i < textures.size(); ++i) {
             if (textures[i] != 0) glDeleteTextures(1, &textures[i]);
         }
-        if (font_regular.texture) glDeleteTextures(1, &font_regular.texture);
-        if (font_bold.texture) glDeleteTextures(1, &font_bold.texture);
+        // Texturas do atlas de fonte: cache por (face, cell_px) - libera TODAS as
+        // entradas de todos os tamanhos bakeados, nas duas faces.
+        for (auto& [cell_px, baked] : font_regular.by_cell_px) {
+            (void)cell_px;
+            if (baked.texture != 0) glDeleteTextures(1, &baked.texture);
+        }
+        for (auto& [cell_px, baked] : font_bold.by_cell_px) {
+            (void)cell_px;
+            if (baked.texture != 0) glDeleteTextures(1, &baked.texture);
+        }
         if (vbo) glDeleteBuffers(1, &vbo);
         if (ebo) glDeleteBuffers(1, &ebo);
         if (vao) glDeleteVertexArrays(1, &vao);
@@ -495,7 +552,10 @@ void Render2dGl3::draw_text(const char* text, float x, float y, float px_size,
         return;
     }
     if (!impl_) return;  // headless
-    Impl::FontFace* face = impl_->ensure_font(bold);
+    // D2D-2-SENTINELA: bakeia no tamanho REALMENTE desenhado (arredondado pro inteiro
+    // mais proximo), nao mais 16px fixo com downscale na GPU.
+    const int cell_px = quantize_cell_px(px_size);
+    Impl::BakedFontSize* face = impl_->ensure_font(bold, cell_px);
     if (face == nullptr) {
         return;  // sem fonte: no-op (caller ja tem fallback)
     }
