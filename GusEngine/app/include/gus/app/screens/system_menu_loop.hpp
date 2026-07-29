@@ -8,19 +8,18 @@
 // real e PERSISTE em settings.json a cada mudanca (fundacao ja pronta: gus/platform/
 // fs/settings_file_store.hpp).
 //
-// DUAS FORMAS DE ENTRAR (o contexto GL e MAIS CARO/dificil de possuir que de so
-// USAR - a maioria dos chamadores ja tem um contexto corrente):
+// UM UNICO JEITO DE ENTRAR (FLASH-CTX, contexto GL unico do boot ao shutdown):
 //   run_system_menu_loop_gl_current: ASSUME um contexto GL JA CORRENTE e com os
 //     ponteiros de funcao (glad) JA CARREGADOS (o chamador e dono - cria/destroi por
 //     fora). Uso: BATALHA (a battle_preview ja roda dentro do MESMO contexto GL -
-//     Esc na pilha vazia do combate abre este loop ANINHADO, sem sair do contexto).
-//   run_system_menu_loop_owning_gl: CRIA seu PROPRIO contexto GL na janela dada
-//     (mesma receita/atributos de run_battle_preview_embedded - profile core 3.3,
-//     double-buffer, stencil 8), carrega o glad, roda o loop, e DESTROI o contexto
-//     ao sair. Uso: CIDADE (Render2dSdl puro, SEM GL nenhum - o CHAMADOR, a Maestro,
-//     faz city_->release_renderer() ANTES e city_->reacquire_renderer() DEPOIS,
-//     REUSANDO a MESMA tecnica de "trocar escondido atras do preto" ja provada
-//     empiricamente pela troca cidade<->batalha, ver maestro.cpp::to_battle).
+//     Esc na pilha vazia do combate abre este loop ANINHADO, sem sair do contexto)
+//     e CIDADE (a Maestro tambem desenha DIRETO no contexto GL unico - ver o
+//     comentario FLASH-CTX em maestro.cpp). Existiu uma 2a forma
+//     (run_system_menu_loop_owning_gl, que criava/destruia um contexto GL PROPRIO
+//     pra CIDADE - Render2dSdl puro, exigindo city_->release_renderer()/
+//     reacquire_renderer() por fora) - DECOMMISSIONADA por ser codigo morto desde
+//     FLASH-CTX (M9-CAMADAS-SDL Fatia 0, zero call-site confirmado,
+//     docs/tech/plano-camadas-sdl.md).
 //
 // FUNDO (retoque do lider via AskUserQuestion, M7-DIALOGO/MENU-PAUSA-CONFIG-SOM):
 // quando o CHAMADOR fornece `frozen_background_png` (PNG de 1 frame, capturado por
@@ -42,8 +41,8 @@
 //
 // F4-1b.4 (onda F4 "casca SDL -> App mode do glintfx", fatia 1b.4 - SEGUNDA
 // tela PAI da onda, apos F4-1b.3/title_menu_loop.cpp): o caminho de PRODUCAO
-// (run_system_menu_loop_gl_current, chamado pela batalha - variante gl_current
-// - e pela Maestro via run_system_menu_loop_owning_gl) foi convertido de um
+// (run_system_menu_loop_gl_current, chamado pela batalha E pela Maestro - as
+// duas via a MESMA variante gl_current desde FLASH-CTX) foi convertido de um
 // while(true){SDL_PollEvent...} PROPRIO pra uma classe SystemMenuScreen (gus::
 // app::ScreenState) + gus::app::run_screen_state - MESMA tecnica de
 // TitleScreen/DifficultyScreen/SaveLoadScreen. O roteamento de evento (decisao
@@ -76,9 +75,10 @@
 //            gus/app/screens/title_menu_loop.hpp (o TEMPLATE do MINI-DRIVER,
 //            F4-1b.3); gus/app/screens/battle_preview.cpp
 //            (run_battle_preview_embedded, o chamador da variante gl_current -
-//            Esc na pilha vazia do combate); gus/app/maestro.cpp (o chamador da
-//            variante owning_gl - Esc na cidade); gus/platform/fs/
-//            settings_file_store.hpp (I/O real do settings.json).
+//            Esc na pilha vazia do combate); gus/app/maestro.cpp (tambem
+//            chamador da variante gl_current - Esc na cidade, FLASH-CTX);
+//            gus/platform/fs/settings_file_store.hpp (I/O real do
+//            settings.json).
 
 #ifndef GUS_APP_SCREENS_SYSTEM_MENU_LOOP_HPP
 #define GUS_APP_SCREENS_SYSTEM_MENU_LOOP_HPP
@@ -309,31 +309,6 @@ enum class SystemMenuFlowStep {
         apply_loaded_save_data = {},
     const std::string& frozen_background_png = std::string(),
     const gus::app::EventSyncHook& sync_hook = nullptr);
-
-// Variante DONA do contexto GL (ver header) - cria/destroi por conta propria. O
-// CHAMADOR (Maestro) e responsavel por release_renderer()/reacquire_renderer() do
-// SDL_Renderer da cidade POR FORA desta chamada (mesmo contrato de
-// run_battle_preview_embedded vs a Maestro). Devolve false se a criacao do
-// contexto GL ou o load do glad falhar (a janela segue viva; `*out_outcome` fica
-// no default quit_app=false - o chamador decide como degradar, mesmo contrato de
-// run_battle_preview_embedded). `out_outcome` pode ser nullptr se o chamador nao
-// precisar do desfecho (nao ha uso previsto, mas mantido por simetria).
-// `frozen_background_png` (ver o header, NOVO): repassado direto pra
-// run_system_menu_loop_gl_current (ver seu comentario) - a Maestro (unica chamadora
-// de producao desta variante) passa o PNG da cidade CONGELADA (Maestro::open_pause_
-// from_city); vazio (default) = fundo abstrato de sempre.
-// `saves_dir`/`build_current_save_data`/`apply_loaded_save_data` (SAVE-LOAD-UI
-// etapa 6): repassados direto pra run_system_menu_loop_gl_current (ver seu
-// comentario acima) - a Maestro (unica chamadora de producao) fornece os 3.
-[[nodiscard]] bool run_system_menu_loop_owning_gl(
-    SDL_Window* window, gus::platform::audio::AudioEngine& audio,
-    const gus::app::i18n::Translator& translator, const std::string& settings_dir,
-    const std::string& saves_dir, SystemMenuLoopOutcome* out_outcome,
-    const std::function<gus::domain::save::SaveData()>& build_current_save_data =
-        {},
-    const std::function<void(const gus::domain::save::SaveData&)>&
-        apply_loaded_save_data = {},
-    const std::string& frozen_background_png = std::string());
 
 }  // namespace gus::app::screens
 

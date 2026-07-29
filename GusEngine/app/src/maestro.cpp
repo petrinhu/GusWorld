@@ -905,7 +905,7 @@ void Maestro::run() {
 
     // DIAGNOSTICO/PROVA (SAVE-LOAD-UI etapa 4, prova visual headless Xvfb :99):
     // GUSWORLD_TITLE_SCREENSHOT_DIR=<dir> mostra a TELA DE TITULO diretamente no
-    // boot (o proprio show_title_screen()/run_title_menu_loop_owning_gl carrega o
+    // boot (o proprio show_title_screen()/run_title_menu_loop_gl_current carrega o
     // self-test de screenshot, ver title_menu_loop.cpp) e retorna - bypassa por
     // completo o loop de jogo. Rodar 2x com 2 GUSWORLD_HOME diferentes (1 com
     // save gravado, 1 vazio) produz os 2 PNGs pedidos (Continuar habilitado vs
@@ -918,11 +918,11 @@ void Maestro::run() {
 
     // DIAGNOSTICO/PROVA (MODOS-MORTE Fase 0, prova visual headless Xvfb :99):
     // GUSWORLD_DIFFICULTY_SCREENSHOT_DIR=<dir> mostra a TELA DE SELECAO DE
-    // DIFICULDADE diretamente no boot - show_title_screen() cria o contexto GL
-    // owning normal (run_title_menu_loop_owning_gl), que detecta a MESMA
-    // variavel e pula reto pra tela de dificuldade (ANINHADA, ver
-    // title_menu_loop.cpp) ANTES de sequer montar a tela de titulo - bypassa por
-    // completo o loop de jogo, MESMO espirito de GUSWORLD_TITLE_SCREENSHOT_DIR.
+    // DIFICULDADE diretamente no boot - show_title_screen() desenha DIRETO no
+    // contexto GL UNICO da Maestro (FLASH-CTX, run_title_menu_loop_gl_current),
+    // que detecta a MESMA variavel e pula reto pra tela de dificuldade (ANINHADA,
+    // ver title_menu_loop.cpp) ANTES de sequer montar a tela de titulo - bypassa
+    // por completo o loop de jogo, MESMO espirito de GUSWORLD_TITLE_SCREENSHOT_DIR.
     if (const char* difficulty_screenshot_dir =
             std::getenv("GUSWORLD_DIFFICULTY_SCREENSHOT_DIR");
         difficulty_screenshot_dir != nullptr && difficulty_screenshot_dir[0] != '\0') {

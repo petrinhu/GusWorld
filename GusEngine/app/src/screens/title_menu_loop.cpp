@@ -78,7 +78,9 @@
 #include "gus/platform/assets/asset_source.hpp"  // FilesystemAssetSource (resolve do SFX)
 #include "gus/platform/fs/save_file_store.hpp"  // has_save/load_game
 #include "gus/platform/render2d/render2d_gl3.hpp"
-#include "gus/platform/rmlui/gl3_loader.hpp"  // glad load + gl3_read_backbuffer_rgba
+#include "gus/platform/rmlui/gl3_loader.hpp"  // gl3_read_backbuffer_rgba (gl3_load_functions
+                                              // era usado so por run_title_menu_loop_owning_gl,
+                                              // decommissionada - M9-CAMADAS-SDL Fatia 0)
 
 // stb_image_write: SO a declaracao aqui (a IMPLEMENTACAO ja vive UMA vez em
 // battle_preview.cpp, MESMA lib gusengine_app - nao redefinir
@@ -832,47 +834,6 @@ void run_title_menu_loop_gl_current(
                 break;  // RE-ENTRA no MESMO title_screen (topo do for(;;)).
         }
     }
-}
-
-bool run_title_menu_loop_owning_gl(
-    SDL_Window* window, gus::platform::audio::AudioEngine& audio,
-    const gus::app::i18n::Translator& translator, const std::string& saves_dir,
-    TitleLoopExit* out_exit, gus::domain::save::SaveData* out_loaded_save,
-    gus::domain::save::DifficultyLevel* out_new_game_difficulty,
-    const std::string& frozen_background_png) {
-    if (out_exit != nullptr) *out_exit = TitleLoopExit::QuitApp;
-
-    // MESMA receita de run_system_menu_loop_owning_gl/run_battle_preview_embedded:
-    // os atributos GL sao setados a CADA entrada (viabilidade ja provada
-    // empiricamente pela troca cidade<->batalha/cidade<->menu).
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
-    SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
-    SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
-
-    SDL_GLContext gl = SDL_GL_CreateContext(window);
-    if (gl == nullptr) {
-        std::cerr << "TitleMenuLoop: SDL_GL_CreateContext falhou: " << SDL_GetError()
-                  << "\n";
-        return false;
-    }
-    SDL_GL_MakeCurrent(window, gl);
-    SDL_GL_SetSwapInterval(1);
-
-    if (!gus::platform::rmlui::gl3_load_functions(
-            reinterpret_cast<void* (*)(const char*)>(SDL_GL_GetProcAddress))) {
-        std::cerr << "TitleMenuLoop: falha ao carregar funcoes OpenGL (glad)\n";
-        SDL_GL_DestroyContext(gl);
-        return false;
-    }
-
-    run_title_menu_loop_gl_current(window, audio, translator, saves_dir, out_exit,
-                                    out_loaded_save, out_new_game_difficulty,
-                                    frozen_background_png);
-
-    SDL_GL_DestroyContext(gl);
-    return true;
 }
 
 }  // namespace gus::app::screens

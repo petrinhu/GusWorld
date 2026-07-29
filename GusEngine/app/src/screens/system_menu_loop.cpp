@@ -99,7 +99,6 @@
 #include "gus/platform/fs/settings_file_store.hpp"
 #include "gus/platform/input/key_translation.hpp"  // sdl_key_to_godot_keycode (captura, M2)
 #include "gus/platform/render2d/render2d_gl3.hpp"
-#include "gus/platform/rmlui/gl3_loader.hpp"  // glad load (variante owning_gl)
 
 // stb_image_write: SO a declaracao aqui (a IMPLEMENTACAO ja vive UMA vez em
 // battle_preview.cpp, MESMA lib gusengine_app - nao redefinir
@@ -1719,51 +1718,6 @@ SystemMenuLoopOutcome run_system_menu_loop_gl_current(
                 break;  // RE-ENTRA no MESMO system_screen (topo do for(;;)).
         }
     }
-}
-
-bool run_system_menu_loop_owning_gl(
-    SDL_Window* window, gus::platform::audio::AudioEngine& audio,
-    const gus::app::i18n::Translator& translator, const std::string& settings_dir,
-    const std::string& saves_dir, SystemMenuLoopOutcome* out_outcome,
-    const std::function<gus::domain::save::SaveData()>& build_current_save_data,
-    const std::function<void(const gus::domain::save::SaveData&)>&
-        apply_loaded_save_data,
-    const std::string& frozen_background_png) {
-    // MESMA receita de run_battle_preview_embedded (battle_preview.cpp): os
-    // atributos GL sao setados a CADA entrada (nao precisam ter sido setados na
-    // criacao da janela) - viabilidade ja provada empiricamente pela troca
-    // cidade<->batalha (ver maestro.cpp::to_battle).
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
-    SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
-    SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
-
-    SDL_GLContext gl = SDL_GL_CreateContext(window);
-    if (gl == nullptr) {
-        std::cerr << "SystemMenuLoop: SDL_GL_CreateContext falhou: " << SDL_GetError()
-                  << "\n";
-        return false;
-    }
-    SDL_GL_MakeCurrent(window, gl);
-    SDL_GL_SetSwapInterval(1);
-
-    if (!gus::platform::rmlui::gl3_load_functions(
-            reinterpret_cast<void* (*)(const char*)>(SDL_GL_GetProcAddress))) {
-        std::cerr << "SystemMenuLoop: falha ao carregar funcoes OpenGL (glad)\n";
-        SDL_GL_DestroyContext(gl);
-        return false;
-    }
-
-    const SystemMenuLoopOutcome outcome = run_system_menu_loop_gl_current(
-        window, audio, translator, settings_dir, saves_dir, build_current_save_data,
-        apply_loaded_save_data, frozen_background_png);
-    if (out_outcome != nullptr) {
-        *out_outcome = outcome;
-    }
-
-    SDL_GL_DestroyContext(gl);
-    return true;
 }
 
 }  // namespace gus::app::screens

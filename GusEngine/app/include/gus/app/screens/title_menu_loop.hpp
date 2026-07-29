@@ -3,12 +3,13 @@
 //
 // LOOP INTERATIVO da TELA DE TITULO (SAVE-LOAD-UI etapa 4, wiring REAL do boot).
 // Roda a maquina de estado pura de title_menu.hpp + o RML/RCSS de
-// title_menu_rml.hpp numa glintfx::UiLayer PROPRIA, num CONTEXTO GL DONO (owning -
-// MESMA receita de run_system_menu_loop_owning_gl/run_battle_preview_embedded): o
-// UNICO chamador de producao (Maestro::show_title_screen, chamado no INICIO do
-// boot, antes do loop cidade<->batalha) ja fez city_->release_renderer() ANTES e
-// faz city_->reacquire_renderer() DEPOIS - a janela fica livre pro contexto GL
-// enquanto esta tela roda.
+// title_menu_rml.hpp numa glintfx::UiLayer PROPRIA. O UNICO chamador de producao
+// (Maestro::show_title_screen, chamado no INICIO do boot, antes do loop
+// cidade<->batalha) desenha DIRETO no contexto GL UNICO da Maestro (FLASH-CTX,
+// ver run_title_menu_loop_gl_current abaixo) - nao ha criacao/destruicao de
+// contexto GL proprio nem troca de release_renderer()/reacquire_renderer() (essa
+// era a receita "owning" antiga, ja DECOMMISSIONADA por ser codigo morto desde
+// FLASH-CTX - M9-CAMADAS-SDL Fatia 0, docs/tech/plano-camadas-sdl.md).
 //
 // ESTE ARQUIVO E O UNICO PONTO QUE FAZ I/O REAL DE DISCO desta tela (gus::
 // platform::fs::has_save/load_game, JA EXISTENTES desde M2-SAVE-IO): varre TODOS
@@ -191,11 +192,12 @@ enum class TitleFlowStep {
 // GL JA CORRENTE e com os ponteiros de funcao (glad) JA CARREGADOS - MESMO
 // espirito de run_system_menu_loop_gl_current (system_menu_loop.hpp, ver o
 // comentario la pro contrato completo das 2 formas de entrar). Devolve por
-// `*out_exit`/`*out_loaded_save`/`*out_new_game_difficulty`, MESMO contrato de
-// run_title_menu_loop_owning_gl abaixo (parametros identicos, so sem window
-// ownership). Hoje SO chamada internamente por run_title_menu_loop_owning_gl E
-// diretamente pela Maestro (FLASH-CTX, contexto GL unico - ver
-// Maestro::show_title_screen).
+// `*out_exit`/`*out_loaded_save`/`*out_new_game_difficulty`. Chamada
+// DIRETAMENTE pela Maestro (FLASH-CTX, contexto GL unico - ver
+// Maestro::show_title_screen) - e o UNICO caminho de producao; a variante
+// "owning" (run_title_menu_loop_owning_gl, criava/destruia contexto GL
+// proprio) foi DECOMMISSIONADA por ser codigo morto (M9-CAMADAS-SDL Fatia 0,
+// zero call-site desde FLASH-CTX - docs/tech/plano-camadas-sdl.md).
 //
 // `sync_hook` (F4-1b.3, opcional - nullptr = nao sincroniza nada, MESMO
 // comportamento de antes desta fatia): repassado direto pro
@@ -213,57 +215,6 @@ void run_title_menu_loop_gl_current(
     gus::domain::save::DifficultyLevel* out_new_game_difficulty = nullptr,
     const std::string& frozen_background_png = std::string(),
     const gus::app::EventSyncHook& sync_hook = nullptr);
-
-// Roda a tela de titulo ATE o jogador escolher Continuar/Novo Jogo/Sair (ou
-// fechar a janela). CRIA seu PROPRIO contexto GL na janela dada (mesma
-// receita/atributos de run_system_menu_loop_owning_gl - profile core 3.3,
-// double-buffer, stencil 8), carrega o glad, chama run_title_menu_loop_gl_current
-// (o nucleo acima) e DESTROI o contexto ao sair.
-//
-// `audio`: AudioEngine da Maestro (nao-dono, MESMO padrao de injecao de
-//   run_system_menu_loop_owning_gl/BattleScene::set_audio) - COCKPIT-SFX-HOVER-
-//   CLIQUE: hover (edge-detect via gus/app/screens/ui_hover.hpp) e clique nos
-//   botoes/pills da tela, MESMOS sons do menu de pausa (kMenuHoverSfxFile/
-//   kMenuClickSfxFile) - paridade sonora entre TODOS os menus de botoes.
-// `saves_dir`: diretorio real dos saves (o CHAMADOR passa gus::platform::fs::
-//   resolve_saves_dir() - MESMA convencao de injecao de outros loops,
-//   testabilidade/override via GUSWORLD_HOME).
-// `out_exit`: preenchido com o desfecho (ver TitleLoopExit acima). Nao pode ser
-//   nullptr.
-// `out_loaded_save`: SO valido (preenchido) quando `*out_exit ==
-//   TitleLoopExit::ContinueGame`; ignorado/intocado nos demais casos. Pode ser
-//   nullptr SE o chamador so precisar saber QUE o jogador quer continuar (sem
-//   uso previsto - o unico chamador de producao sempre fornece).
-// `out_new_game_difficulty` (MODOS-MORTE Fase 0): SO valido (preenchido) quando
-//   `*out_exit == TitleLoopExit::NewGame` - "Novo Jogo" agora passa pela TELA DE
-//   SELECAO DE DIFICULDADE (gus/app/screens/difficulty_menu_loop.hpp, ANINHADA no
-//   MESMO contexto GL, disparada ao confirmar StartNewGame - ver o .cpp) ANTES de
-//   devolver NewGame; a dificuldade ESCOLHIDA sai aqui. Ignorado/intocado nos
-//   demais casos. Pode ser nullptr (degrada: o CHAMADOR usa o default Medio do
-//   proprio SaveData).
-// `frozen_background_png` (default vazio, M7-FB3 MUDOU O USO): a LISTA da tela de
-//   titulo (Continuar/Novo Jogo/Sair) NAO desenha mais este PNG - playtest do Gus
-//   Dragon ("menu inicial de jogo tem arte/animacao PROPRIA por tras, nao a tela de
-//   onde o jogador estava") + decisao do lider: o fundo da LISTA agora e SEMPRE o
-//   boot pixelizado VIVO (gus::app::BootPixelOverlay::draw_idle + gus::core::anim::
-//   boot_pixel_idle_frame_index, resolvido via gus::core::assets::kVfxBootPixelDir -
-//   ZERO dependencia deste parametro). `frozen_background_png` CONTINUA existindo e
-//   sendo repassado, INTOCADO, pra tela de SELECAO DE DIFICULDADE aninhada (aberta
-//   pelo MINI-DRIVER ao confirmar "Novo Jogo", ver run_title_menu_loop_gl_current
-//   no .cpp) - essa tela fora do escopo deste feedback, segue mostrando a cidade
-//   congelada (vazio degrada pro fundo abstrato, MESMO contrato de antes).
-//
-// Devolve false se a criacao do contexto GL ou o load do glad falhar (a janela
-// segue viva; `*out_exit` fica no default QuitApp definido pela IMPLEMENTACAO -
-// o CHAMADOR decide como degradar; o unico chamador de producao trata false como
-// "sem tela de titulo, comeca fresco" em vez de fechar o app, ver
-// Maestro::show_title_screen).
-[[nodiscard]] bool run_title_menu_loop_owning_gl(
-    SDL_Window* window, gus::platform::audio::AudioEngine& audio,
-    const gus::app::i18n::Translator& translator, const std::string& saves_dir,
-    TitleLoopExit* out_exit, gus::domain::save::SaveData* out_loaded_save,
-    gus::domain::save::DifficultyLevel* out_new_game_difficulty = nullptr,
-    const std::string& frozen_background_png = std::string());
 
 }  // namespace gus::app::screens
 
