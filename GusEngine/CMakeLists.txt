@@ -426,6 +426,33 @@ set(GLINTFX_MODULE_DRAW2D    ON  CACHE BOOL "" FORCE)
 #     igual ao que o RCSS ja referenciava), o que neutraliza a assimetria nos dois motores.
 # Build local + suite completa verdes no pin novo antes deste commit (contagem de testes no
 # relatorio da onda FONT-EXTEND-GLITCH).
+#
+# BUMP v0.24.0 -> v0.25.0 (STB-IMAGE-APP, 2026-07-29): traz IMG-DECODE
+# (glintfx::decode_image_file/decode_image_memory, glintfx/include/glintfx/image.hpp) - par de
+# free functions que decodifica PNG/JPG/TGA em pixels RGBA8 alpha STRAIGHT (nao-premultiplicado)
+# sem exigir contexto GL nenhum, complementando o `Draw2d::create_texture(pixels, w, h,
+# PixelFormat)` que ja existia (D2D-TEXPIXELS) e que so cobria a metade "pixels -> textura GPU"
+# do pipeline. Consumo real (mesma onda): app/src/app_icon.cpp trocou stbi_load() direto por
+# glintfx::decode_image_file() - unico uso GENUINO de decode de stb_image em app/ (os outros 8
+# arquivos que o grep inicial listou usam stb_image_write, que e ENCODE/escrita de PNG pra
+# screenshot, fora do escopo desta API e nao tocados). Drop-in a partir da v0.24.0 (nenhuma
+# assinatura existente mudou, so API nova aditiva) - ZERO ajuste neste bloco de CMake, so o
+# GIT_TAG. Ritual de bump revalidado por leitura direta do CMakeLists.txt deles na tag v0.25.0
+# (baixado via `gh api repos/petrinhu/glintfx/contents/glintfx/CMakeLists.txt?ref=v0.25.0`):
+#   - Flags GLINTFX_MODULE_TEXT/_FX/_AUDIO/_GAMEPAD/_I18N/_WINDOW/_DRAW2D/_APP/_IMAGE e
+#     GLINTFX_BACKEND_GLFW/GLINTFX_OWN_FONT_ENGINE continuam com os mesmos nomes e mesma
+#     semantica (inclusive os FATAL_ERROR de dependencia entre GLINTFX_MODULE_APP/_WINDOW e o
+#     de GLINTFX_MODULE_IMAGE/_TEXT=OFF, ainda reservadas/forcadas ON).
+#   - Guard de libm em glintfx_audio continua por COMPILADOR
+#     ($<$<NOT:$<CXX_COMPILER_ID:MSVC>>:m>), inalterado desde a v0.18.1.
+#   - Pin do RmlUi deles continua no MESMO SHA 2cd28864ae25ed345b70598751703a5433b12356 (o
+#     patch teardown-UB nosso segue aplicavel - o nosso Declare(RmlUi) vem primeiro e decide,
+#     ver comentario grande no bloco RmlUi acima).
+#   - Vendors deles (gamecontrollerdb/khronos/miniaudio/stb) conferidos via
+#     `gh api repos/petrinhu/glintfx/contents/glintfx/third_party?ref=v0.25.0` - MESMOS 4 do
+#     pin anterior, nenhum vendor novo. THIRD-PARTY-LICENSES.md atualizado so na data/pin.
+# Build local + suite completa verdes no pin novo antes deste commit (contagem de testes no
+# relatorio da onda STB-IMAGE-APP).
 
 FetchContent_Declare(
     glintfx
@@ -435,7 +462,7 @@ FetchContent_Declare(
     # evidencia, nao presumida: a tag v0.20.0 tem o MESMO sha nos dois hosts
     # (9bfaabfa, apontando pro commit 0442dd15 que ja esta no nosso _deps).
     GIT_REPOSITORY https://github.com/petrinhu/glintfx
-    GIT_TAG        v0.24.0
+    GIT_TAG        v0.25.0
     SOURCE_SUBDIR  glintfx
 )
 FetchContent_MakeAvailable(glintfx)
