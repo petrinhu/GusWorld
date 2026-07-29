@@ -58,7 +58,7 @@ constexpr float kLogTextPx = 11.0f;     // linha do log (terminal fino)
 constexpr float kPanelTextPx = 13.0f;   // numeros gerais
 // Texto do COCKPIT (variante C): nome do ator, numeros, rotulos.
 constexpr float kCockpitNamePx = 15.0f;   // nome grande do ator ativo
-constexpr float kCockpitTextPx = 8.0f;    // numero "hp/max" sobre a barra (compacto)
+constexpr float kCockpitTextPx = 9.0f;    // numero "hp/max" sobre a barra (compacto)
 constexpr float kCockpitLabelPx = 9.0f;   // rotulos "AP"/"MANA"/"ACAO"
 constexpr float kCockpitResLabelW = 34.0f;  // largura reservada pro rotulo antes dos pips
 
