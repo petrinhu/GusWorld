@@ -309,5 +309,5 @@ líder.
 
 ## 7. Commit
 
-SHA a preencher após o commit local deste arquivo (Conventional Commit citando
-`GLINTFX-FONTFLIP-VALIDATE`, sem push).
+`fc40916fe41a576fa7e09cce511da8238dcd7247` — commit local (sem push) que introduziu este
+dossiê + as imagens de `docs/tech/fontflip-visuals/`.
