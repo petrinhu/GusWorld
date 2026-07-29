@@ -270,6 +270,51 @@ if(EXISTS "${_GUSENGINE_RELEASE}/app/libgusengine_app.a")
             m
         )
     endforeach()
+
+    # =========================================================================
+    # ARTE-RESP-4DIR (2026-07-23): idle_facing_probe - valida visualmente o
+    # breathing DIRECIONAL do Gus (4 PNGs, 1 por direcao). NAO usa GL/RmlUi/glintfx
+    # (Render2dSdl puro, janela HIDDEN + renderer "software" - MESMA receita de
+    # repro_bertoldo.cpp), mas mantem o MESMO link estatico completo dos outros
+    # probes (comprovadamente funcional) por simplicidade - nao vale a pena um
+    # 3o conjunto de flags so pra tirar 4 libs nao usadas.
+    add_executable(idle_facing_probe idle_facing_probe.cpp)
+
+    target_include_directories(idle_facing_probe PRIVATE
+        "${_GUSENGINE_ROOT}/core/include"
+        "${_GUSENGINE_ROOT}/domain/include"
+        "${_GUSENGINE_ROOT}/platform/include"
+        "${_GUSENGINE_ROOT}/app/include"
+        "${_GUSENGINE_ROOT}/third_party/stb"
+        "${_GUSENGINE_RELEASE}/_deps/sdl3-build/include-revision"
+        "${_GUSENGINE_RELEASE}/_deps/sdl3-src/include"
+    )
+
+    target_compile_features(idle_facing_probe PRIVATE cxx_std_20)
+
+    target_compile_definitions(idle_facing_probe PRIVATE
+        GUSWORLD_ASSETS_DIR="${_GUSENGINE_ROOT}/../resources"
+        GUSWORLD_FONTS_DIR="${_GUSENGINE_ROOT}/assets/fonts"
+    )
+
+    target_link_libraries(idle_facing_probe PRIVATE
+        gusengine_app_imported
+        gusengine_core_imported
+        gusengine_domain_imported
+        gusengine_platform_imported
+        sdl3_imported
+        gusengine_domain_imported
+        gusengine_core_imported
+        monocypher_imported
+        rmlui_debugger_imported
+        glintfx_imported
+        rmlui_imported
+        OpenGL::GL
+        Freetype::Freetype
+        Threads::Threads
+        ${CMAKE_DL_LIBS}
+        m
+    )
 else()
     message(STATUS
         "poc_gl_single_context_probe/sysmenu_pause_screenshot_probe: "
