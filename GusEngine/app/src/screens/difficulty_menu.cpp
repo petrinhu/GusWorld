@@ -10,15 +10,27 @@ namespace gus::app::screens {
 
 namespace {
 
-bool is_confirm_key(SDL_Keycode key) noexcept {
-    return key == SDLK_RETURN || key == SDLK_KP_ENTER || key == SDLK_SPACE;
+// SDLK_RETURN e SDLK_KP_ENTER (numpad) colapsavam nesta MESMA condicao antes da
+// migracao pra glintfx::Key (M9-CAMADAS-SDL Fatia 2) - glintfx::Key nao tem um
+// KpEnter dedicado (lacuna ja reportada ao glintfx pelo bus), e a ponte SDL->
+// Godot->glintfx (platform/input/key_translation.hpp +
+// key_translation_glintfx.hpp) ja fundia as duas teclas no MESMO Key::Enter, MESMO
+// ANTES desta fatia - comportamento IDENTICO, nao regressao.
+bool is_confirm_key(glintfx::Key key) noexcept {
+    return key == glintfx::Key::Enter || key == glintfx::Key::Space;
 }
 
-bool is_up_key(SDL_Keycode key) noexcept { return key == SDLK_UP || key == SDLK_W; }
-bool is_down_key(SDL_Keycode key) noexcept { return key == SDLK_DOWN || key == SDLK_S; }
-bool is_axis_key(SDL_Keycode key) noexcept {
-    return key == SDLK_UP || key == SDLK_DOWN || key == SDLK_LEFT || key == SDLK_RIGHT ||
-           key == SDLK_W || key == SDLK_S || key == SDLK_A || key == SDLK_D;
+bool is_up_key(glintfx::Key key) noexcept {
+    return key == glintfx::Key::Up || key == glintfx::Key::W;
+}
+bool is_down_key(glintfx::Key key) noexcept {
+    return key == glintfx::Key::Down || key == glintfx::Key::S;
+}
+bool is_axis_key(glintfx::Key key) noexcept {
+    return key == glintfx::Key::Up || key == glintfx::Key::Down ||
+           key == glintfx::Key::Left || key == glintfx::Key::Right ||
+           key == glintfx::Key::W || key == glintfx::Key::S ||
+           key == glintfx::Key::A || key == glintfx::Key::D;
 }
 
 }  // namespace
@@ -39,9 +51,9 @@ void difficulty_menu_open(DifficultyMenuState& state, bool hardcore_unlocked) no
 }
 
 DifficultyMenuAction difficulty_menu_key_down(DifficultyMenuState& state,
-                                               SDL_Keycode key) noexcept {
+                                               glintfx::Key key) noexcept {
     if (state.confirming) {
-        if (key == SDLK_ESCAPE) {
+        if (key == glintfx::Key::Escape) {
             // Esc no splash = "Cancelar" (MESMA seguranca de confirming_new_game
             // em title_menu.hpp) - fecha o splash, volta pra lista.
             state.confirming = false;
@@ -85,7 +97,7 @@ DifficultyMenuAction difficulty_menu_key_down(DifficultyMenuState& state,
         state.confirm_selected = 1;  // default seguro
         return DifficultyMenuAction::None;
     }
-    if (key == SDLK_ESCAPE) {
+    if (key == glintfx::Key::Escape) {
         // GAP preenchido (ver o comentario grande no header): ESC na lista aborta
         // Novo Jogo, volta pra tela de titulo.
         return DifficultyMenuAction::Cancelled;

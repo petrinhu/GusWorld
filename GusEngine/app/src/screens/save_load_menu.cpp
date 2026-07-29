@@ -19,21 +19,34 @@ using gus::domain::save::kAutosaveSlot;
 using gus::domain::save::kSlotCount;
 
 // Enter (varias plataformas mandam RETURN ou KP_ENTER - mesma convencao de
-// system_menu.cpp).
-bool is_confirm_key(SDL_Keycode key) noexcept {
-    return key == SDLK_RETURN || key == SDLK_KP_ENTER || key == SDLK_SPACE;
+// system_menu.cpp). SDLK_RETURN e SDLK_KP_ENTER colapsavam nesta MESMA condicao
+// antes da migracao pra glintfx::Key (M9-CAMADAS-SDL Fatia 2) - glintfx::Key nao
+// tem um KpEnter dedicado (lacuna ja reportada ao glintfx pelo bus), e a ponte
+// SDL->Godot->glintfx (platform/input/key_translation.hpp +
+// key_translation_glintfx.hpp) ja fundia as duas teclas no MESMO Key::Enter,
+// MESMO ANTES desta fatia - comportamento IDENTICO, nao regressao.
+bool is_confirm_key(glintfx::Key key) noexcept {
+    return key == glintfx::Key::Enter || key == glintfx::Key::Space;
 }
 
-bool is_back_key(SDL_Keycode key) noexcept { return key == SDLK_ESCAPE; }
+bool is_back_key(glintfx::Key key) noexcept { return key == glintfx::Key::Escape; }
 
-bool is_up_key(SDL_Keycode key) noexcept { return key == SDLK_UP || key == SDLK_W; }
-bool is_down_key(SDL_Keycode key) noexcept { return key == SDLK_DOWN || key == SDLK_S; }
-bool is_left_key(SDL_Keycode key) noexcept { return key == SDLK_LEFT || key == SDLK_A; }
-bool is_right_key(SDL_Keycode key) noexcept { return key == SDLK_RIGHT || key == SDLK_D; }
+bool is_up_key(glintfx::Key key) noexcept {
+    return key == glintfx::Key::Up || key == glintfx::Key::W;
+}
+bool is_down_key(glintfx::Key key) noexcept {
+    return key == glintfx::Key::Down || key == glintfx::Key::S;
+}
+bool is_left_key(glintfx::Key key) noexcept {
+    return key == glintfx::Key::Left || key == glintfx::Key::A;
+}
+bool is_right_key(glintfx::Key key) noexcept {
+    return key == glintfx::Key::Right || key == glintfx::Key::D;
+}
 
 // Delete (tecla dedicada da feature "Apagar") - propositalmente SEPARADA de
 // is_back_key/is_confirm_key (nenhuma tecla de navegacao existente e reaproveitada).
-bool is_delete_key(SDL_Keycode key) noexcept { return key == SDLK_DELETE; }
+bool is_delete_key(glintfx::Key key) noexcept { return key == glintfx::Key::Delete; }
 
 }  // namespace
 
@@ -309,7 +322,7 @@ SaveLoadMenuAction save_load_menu_click_warning_cancel(SaveLoadMenuState& state)
 }
 
 SaveLoadMenuAction save_load_menu_key_down(SaveLoadMenuState& state,
-                                            SDL_Keycode key) noexcept {
+                                            glintfx::Key key) noexcept {
     if (state.warning_kind != SaveLoadMenuState::WarningKind::None) {
         // Damaged tem 2 botoes (0=Tentar recuperar, 1=Cancelar); Version/
         // RecoverFailed tem SO Cancelar (nao ha pill 0 pra alternar - ver a doc

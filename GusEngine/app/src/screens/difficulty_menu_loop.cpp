@@ -44,6 +44,8 @@
 #include "gus/core/asset_paths.hpp"  // kMenuHoverSfxFile/kMenuClickSfxFile/kMenuBlockedSfxFile/kSfxDir
 #include "gus/core/spatial/camera_clamp.hpp"  // gus::core::spatial::Rect
 #include "gus/platform/assets/asset_source.hpp"  // FilesystemAssetSource (resolve do SFX)
+#include "gus/platform/input/key_translation.hpp"  // sdl_key_to_godot_keycode (Fatia 2)
+#include "gus/platform/input/key_translation_glintfx.hpp"  // godot_keycode_to_glintfx_key
 #include "gus/platform/render2d/render2d_gl3.hpp"
 #include "gus/platform/rmlui/gl3_loader.hpp"  // gl3_read_backbuffer_rgba (prova visual)
 
@@ -205,6 +207,26 @@ void apply_action_to_result(DifficultyStepResult& result, DifficultyMenuAction a
     }
 }
 
+// Traduz SDL_Keycode -> glintfx::Key REUSANDO a ponte SDL->Godot->glintfx JA
+// EXISTENTE e testada adversarialmente (F4-2, 8/8 mutantes mortos):
+// platform/input/key_translation.hpp (SDL_Keycode -> keycode Godot) +
+// platform/input/key_translation_glintfx.hpp (keycode Godot -> glintfx::Key).
+// Evita duplicar uma 3a tabela SDLK_*->glintfx::Key so pra esta tela
+// (M9-CAMADAS-SDL Fatia 2, docs/tech/plano-camadas-sdl.md) - difficulty_menu.hpp
+// (a logica PURA) so conhece glintfx::Key, o SDL fica 100% aqui no loop.
+//
+// SDLK_RETURN e SDLK_KP_ENTER colapsam no MESMO Key::Enter pela ponte Godot
+// (key_translation.cpp ja fundia as duas no MESMO kGodotEnter, ANTES desta
+// fatia) - preserva EXATAMENTE o comportamento anterior (difficulty_menu.cpp ja
+// tratava as duas teclas como sinonimo em is_confirm_key), nao e regressao.
+// glintfx::Key nao tem KpEnter dedicado - lacuna ja reportada ao glintfx.
+glintfx::Key sdl_keycode_to_menu_key(SDL_Keycode sdl_key) noexcept {
+    const long long godot =
+        gus::platform::input::sdl_key_to_godot_keycode(static_cast<int>(sdl_key));
+    return gus::platform::input::godot_keycode_to_glintfx_key(godot)
+        .value_or(glintfx::Key::None);
+}
+
 }  // namespace
 
 // F4-1b: implementacao de difficulty_screen_step (declarada no .hpp) - ver o
@@ -242,7 +264,8 @@ DifficultyStepResult difficulty_screen_step(
             // mesmo quando o estado nao mudou de fato).
             result.sfx = sfx_kind_for_item(state, difficulty_keyboard_focus_index(state),
                                            DifficultySfxKind::Click);
-            const DifficultyMenuAction action = difficulty_menu_key_down(state, ev.key.key);
+            const DifficultyMenuAction action =
+                difficulty_menu_key_down(state, sdl_keycode_to_menu_key(ev.key.key));
             apply_action_to_result(result, action);
         } else {
             // Navegacao (setas/WASD/ESC) - SOM DE HOVER paridade teclado x mouse
@@ -250,7 +273,8 @@ DifficultyStepResult difficulty_screen_step(
             // splash) NAO mudou E moveu pra um item NOVO.
             const bool confirming_before = state.confirming;
             const int kb_index_before = difficulty_keyboard_focus_index(state);
-            const DifficultyMenuAction action = difficulty_menu_key_down(state, ev.key.key);
+            const DifficultyMenuAction action =
+                difficulty_menu_key_down(state, sdl_keycode_to_menu_key(ev.key.key));
             if (state.confirming == confirming_before) {
                 const int kb_index_after = difficulty_keyboard_focus_index(state);
                 if (ui_hover_entered_new_item(kb_index_before, kb_index_after)) {
@@ -402,7 +426,7 @@ public:
             const char* confirm_flag = std::getenv("GUSWORLD_DIFFICULTY_SCREENSHOT_CONFIRM");
             const bool want_confirm = confirm_flag != nullptr && confirm_flag[0] != '\0';
             if (want_confirm) {
-                (void)difficulty_menu_key_down(state_, SDLK_RETURN);  // abre o splash
+                (void)difficulty_menu_key_down(state_, glintfx::Key::Enter);  // abre o splash
                 reload_();
             }
             for (int i = 0; i < 6; ++i) present_frame_();

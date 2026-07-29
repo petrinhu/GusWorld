@@ -303,14 +303,14 @@ TEST_CASE("save_load_menu_key_down: Baixo/Cima navegam so entre slots selecionav
     save_load_menu_open(state, SaveLoadMode::Save, slots);
     REQUIRE(state.selected == 1);
 
-    REQUIRE(save_load_menu_key_down(state, SDLK_DOWN) == SaveLoadMenuAction::None);
+    REQUIRE(save_load_menu_key_down(state, glintfx::Key::Down) == SaveLoadMenuAction::None);
     REQUIRE(state.selected == 2);
 
-    REQUIRE(save_load_menu_key_down(state, SDLK_UP) == SaveLoadMenuAction::None);
+    REQUIRE(save_load_menu_key_down(state, glintfx::Key::Up) == SaveLoadMenuAction::None);
     REQUIRE(state.selected == 1);
 
     // Subir a partir do primeiro manual dá wrap pro ULTIMO manual (pula o autosave).
-    REQUIRE(save_load_menu_key_down(state, SDLK_UP) == SaveLoadMenuAction::None);
+    REQUIRE(save_load_menu_key_down(state, glintfx::Key::Up) == SaveLoadMenuAction::None);
     REQUIRE(state.selected == kSlotCount - 1);
 }
 
@@ -328,16 +328,16 @@ TEST_CASE("save_load_menu_key_down: Enter num slot VAZIO em modo Save TAMBEM abr
     for (int i = 0; i < kSlotCount; ++i) slots[static_cast<std::size_t>(i)] = empty_slot_preview(i);
     save_load_menu_open(state, SaveLoadMode::Save, slots);
 
-    REQUIRE(save_load_menu_key_down(state, SDLK_RETURN) == SaveLoadMenuAction::None);
+    REQUIRE(save_load_menu_key_down(state, glintfx::Key::Enter) == SaveLoadMenuAction::None);
     REQUIRE(state.confirming_overwrite);
     REQUIRE(state.confirm_selected == 1);  // default seguro = Nao/Cancelar
 
     // Confirmando ("Sim"/"Salvar") devolve OverwriteConfirmed, MESMO contrato do
     // caso occupied (o CHAMADOR grava de fato, ver do_save em
     // save_load_menu_loop.cpp - nenhuma mudanca de I/O, so a UX de confirmar).
-    REQUIRE(save_load_menu_key_down(state, SDLK_LEFT) == SaveLoadMenuAction::None);
+    REQUIRE(save_load_menu_key_down(state, glintfx::Key::Left) == SaveLoadMenuAction::None);
     REQUIRE(state.confirm_selected == 0);
-    REQUIRE(save_load_menu_key_down(state, SDLK_RETURN) == SaveLoadMenuAction::OverwriteConfirmed);
+    REQUIRE(save_load_menu_key_down(state, glintfx::Key::Enter) == SaveLoadMenuAction::OverwriteConfirmed);
 }
 
 TEST_CASE("save_load_menu_key_down: Enter num slot OCUPADO em modo Save abre o "
@@ -349,7 +349,7 @@ TEST_CASE("save_load_menu_key_down: Enter num slot OCUPADO em modo Save abre o "
     slots[1] = build_slot_preview(make_save_data(100), 1);
     save_load_menu_open(state, SaveLoadMode::Save, slots);
 
-    REQUIRE(save_load_menu_key_down(state, SDLK_RETURN) == SaveLoadMenuAction::None);
+    REQUIRE(save_load_menu_key_down(state, glintfx::Key::Enter) == SaveLoadMenuAction::None);
     REQUIRE(state.confirming_overwrite);
     REQUIRE(state.confirm_selected == 1);  // default seguro = Nao
 }
@@ -362,9 +362,9 @@ TEST_CASE("save_load_menu_key_down: mini-dialogo - Enter com Nao devolve "
     for (int i = 0; i < kSlotCount; ++i) slots[static_cast<std::size_t>(i)] = empty_slot_preview(i);
     slots[1] = build_slot_preview(make_save_data(100), 1);
     save_load_menu_open(state, SaveLoadMode::Save, slots);
-    (void)save_load_menu_key_down(state, SDLK_RETURN);  // abre o dialogo
+    (void)save_load_menu_key_down(state, glintfx::Key::Enter);  // abre o dialogo
 
-    REQUIRE(save_load_menu_key_down(state, SDLK_RETURN) ==
+    REQUIRE(save_load_menu_key_down(state, glintfx::Key::Enter) ==
             SaveLoadMenuAction::OverwriteCancelled);
     REQUIRE_FALSE(state.confirming_overwrite);
 }
@@ -377,11 +377,11 @@ TEST_CASE("save_load_menu_key_down: mini-dialogo - alternar pra Sim e confirmar 
     for (int i = 0; i < kSlotCount; ++i) slots[static_cast<std::size_t>(i)] = empty_slot_preview(i);
     slots[1] = build_slot_preview(make_save_data(100), 1);
     save_load_menu_open(state, SaveLoadMode::Save, slots);
-    (void)save_load_menu_key_down(state, SDLK_RETURN);  // abre o dialogo
+    (void)save_load_menu_key_down(state, glintfx::Key::Enter);  // abre o dialogo
 
-    REQUIRE(save_load_menu_key_down(state, SDLK_LEFT) == SaveLoadMenuAction::None);
+    REQUIRE(save_load_menu_key_down(state, glintfx::Key::Left) == SaveLoadMenuAction::None);
     REQUIRE(state.confirm_selected == 0);
-    REQUIRE(save_load_menu_key_down(state, SDLK_RETURN) ==
+    REQUIRE(save_load_menu_key_down(state, glintfx::Key::Enter) ==
             SaveLoadMenuAction::OverwriteConfirmed);
     REQUIRE_FALSE(state.confirming_overwrite);
 }
@@ -393,9 +393,9 @@ TEST_CASE("save_load_menu_key_down: mini-dialogo - Esc equivale a Nao (seguranca
     for (int i = 0; i < kSlotCount; ++i) slots[static_cast<std::size_t>(i)] = empty_slot_preview(i);
     slots[1] = build_slot_preview(make_save_data(100), 1);
     save_load_menu_open(state, SaveLoadMode::Save, slots);
-    (void)save_load_menu_key_down(state, SDLK_RETURN);  // abre o dialogo
+    (void)save_load_menu_key_down(state, glintfx::Key::Enter);  // abre o dialogo
 
-    REQUIRE(save_load_menu_key_down(state, SDLK_ESCAPE) ==
+    REQUIRE(save_load_menu_key_down(state, glintfx::Key::Escape) ==
             SaveLoadMenuAction::OverwriteCancelled);
     REQUIRE_FALSE(state.confirming_overwrite);
 }
@@ -408,7 +408,7 @@ TEST_CASE("save_load_menu_key_down: Enter num slot ocupado em modo Load confirma
     slots[1] = build_slot_preview(make_save_data(100), 1);
     save_load_menu_open(state, SaveLoadMode::Load, slots);
 
-    REQUIRE(save_load_menu_key_down(state, SDLK_RETURN) == SaveLoadMenuAction::SlotChosen);
+    REQUIRE(save_load_menu_key_down(state, glintfx::Key::Enter) == SaveLoadMenuAction::SlotChosen);
     REQUIRE_FALSE(state.confirming_overwrite);
 }
 
@@ -419,7 +419,7 @@ TEST_CASE("save_load_menu_key_down: Esc fora do mini-dialogo devolve Back",
     for (int i = 0; i < kSlotCount; ++i) slots[static_cast<std::size_t>(i)] = empty_slot_preview(i);
     save_load_menu_open(state, SaveLoadMode::Save, slots);
 
-    REQUIRE(save_load_menu_key_down(state, SDLK_ESCAPE) == SaveLoadMenuAction::Back);
+    REQUIRE(save_load_menu_key_down(state, glintfx::Key::Escape) == SaveLoadMenuAction::Back);
 }
 
 // ---------------------------------------------------------------- save_load_menu_click_slot
@@ -492,7 +492,7 @@ TEST_CASE("save_load_menu_click_slot: clique na lista e no-op enquanto um "
     slots[1] = build_slot_preview(make_save_data(100), 1);
     slots[2] = build_slot_preview(make_save_data(200), 2);
     save_load_menu_open(state, SaveLoadMode::Save, slots);
-    (void)save_load_menu_key_down(state, SDLK_RETURN);  // abre overwrite no slot 1
+    (void)save_load_menu_key_down(state, glintfx::Key::Enter);  // abre overwrite no slot 1
     REQUIRE(state.confirming_overwrite);
 
     REQUIRE(save_load_menu_click_slot(state, 2) == SaveLoadMenuAction::None);
@@ -563,7 +563,7 @@ TEST_CASE("save_load_menu_request_delete: no-op se o dialogo de sobrescrita ja "
     slots[1] = build_slot_preview(make_save_data(100), 1);
     slots[2] = build_slot_preview(make_save_data(200), 2);
     save_load_menu_open(state, SaveLoadMode::Save, slots);
-    (void)save_load_menu_key_down(state, SDLK_RETURN);  // abre overwrite no slot 1
+    (void)save_load_menu_key_down(state, glintfx::Key::Enter);  // abre overwrite no slot 1
     REQUIRE(state.confirming_overwrite);
 
     save_load_menu_request_delete(state, 2);
@@ -580,7 +580,7 @@ TEST_CASE("save_load_menu_key_down: Delete sobre o slot focado (ocupado) abre o 
     save_load_menu_open(state, SaveLoadMode::Save, slots);
     REQUIRE(state.selected == 1);
 
-    REQUIRE(save_load_menu_key_down(state, SDLK_DELETE) == SaveLoadMenuAction::None);
+    REQUIRE(save_load_menu_key_down(state, glintfx::Key::Delete) == SaveLoadMenuAction::None);
     REQUIRE(state.confirming_delete);
     REQUIRE(state.delete_target_slot == 1);
 }
@@ -593,9 +593,9 @@ TEST_CASE("save_load_menu_key_down: mini-dialogo de exclusao - Enter com Nao "
     for (int i = 0; i < kSlotCount; ++i) slots[static_cast<std::size_t>(i)] = empty_slot_preview(i);
     slots[1] = build_slot_preview(make_save_data(100), 1);
     save_load_menu_open(state, SaveLoadMode::Save, slots);
-    (void)save_load_menu_key_down(state, SDLK_DELETE);  // abre o dialogo
+    (void)save_load_menu_key_down(state, glintfx::Key::Delete);  // abre o dialogo
 
-    REQUIRE(save_load_menu_key_down(state, SDLK_RETURN) == SaveLoadMenuAction::DeleteCancelled);
+    REQUIRE(save_load_menu_key_down(state, glintfx::Key::Enter) == SaveLoadMenuAction::DeleteCancelled);
     REQUIRE_FALSE(state.confirming_delete);
 }
 
@@ -607,11 +607,11 @@ TEST_CASE("save_load_menu_key_down: mini-dialogo de exclusao - alternar pra Sim 
     for (int i = 0; i < kSlotCount; ++i) slots[static_cast<std::size_t>(i)] = empty_slot_preview(i);
     slots[1] = build_slot_preview(make_save_data(100), 1);
     save_load_menu_open(state, SaveLoadMode::Save, slots);
-    (void)save_load_menu_key_down(state, SDLK_DELETE);  // abre o dialogo
+    (void)save_load_menu_key_down(state, glintfx::Key::Delete);  // abre o dialogo
 
-    REQUIRE(save_load_menu_key_down(state, SDLK_LEFT) == SaveLoadMenuAction::None);
+    REQUIRE(save_load_menu_key_down(state, glintfx::Key::Left) == SaveLoadMenuAction::None);
     REQUIRE(state.delete_confirm_selected == 0);
-    REQUIRE(save_load_menu_key_down(state, SDLK_RETURN) == SaveLoadMenuAction::DeleteConfirmed);
+    REQUIRE(save_load_menu_key_down(state, glintfx::Key::Enter) == SaveLoadMenuAction::DeleteConfirmed);
     REQUIRE_FALSE(state.confirming_delete);
     REQUIRE(state.delete_target_slot == 1);  // o CHAMADOR ainda le o alvo apos confirmar
 }
@@ -624,9 +624,9 @@ TEST_CASE("save_load_menu_key_down: mini-dialogo de exclusao - Esc equivale a Na
     for (int i = 0; i < kSlotCount; ++i) slots[static_cast<std::size_t>(i)] = empty_slot_preview(i);
     slots[1] = build_slot_preview(make_save_data(100), 1);
     save_load_menu_open(state, SaveLoadMode::Save, slots);
-    (void)save_load_menu_key_down(state, SDLK_DELETE);  // abre o dialogo
+    (void)save_load_menu_key_down(state, glintfx::Key::Delete);  // abre o dialogo
 
-    REQUIRE(save_load_menu_key_down(state, SDLK_ESCAPE) == SaveLoadMenuAction::DeleteCancelled);
+    REQUIRE(save_load_menu_key_down(state, glintfx::Key::Escape) == SaveLoadMenuAction::DeleteCancelled);
     REQUIRE_FALSE(state.confirming_delete);
 }
 
@@ -638,7 +638,7 @@ TEST_CASE("save_load_menu_key_down: Delete sobre slot VAZIO/nao-selecionavel e "
     for (int i = 0; i < kSlotCount; ++i) slots[static_cast<std::size_t>(i)] = empty_slot_preview(i);
     save_load_menu_open(state, SaveLoadMode::Save, slots);
 
-    REQUIRE(save_load_menu_key_down(state, SDLK_DELETE) == SaveLoadMenuAction::None);
+    REQUIRE(save_load_menu_key_down(state, glintfx::Key::Delete) == SaveLoadMenuAction::None);
     REQUIRE_FALSE(state.confirming_delete);
 }
 
@@ -652,7 +652,7 @@ TEST_CASE("save_load_menu_click_overwrite_confirm: clique em 'Sim' (pill 0) "
     for (int i = 0; i < kSlotCount; ++i) slots[static_cast<std::size_t>(i)] = empty_slot_preview(i);
     slots[1] = build_slot_preview(make_save_data(100), 1);
     save_load_menu_open(state, SaveLoadMode::Save, slots);
-    (void)save_load_menu_key_down(state, SDLK_RETURN);  // abre o dialogo
+    (void)save_load_menu_key_down(state, glintfx::Key::Enter);  // abre o dialogo
     REQUIRE(state.confirming_overwrite);
 
     REQUIRE(save_load_menu_click_overwrite_confirm(state, 0) ==
@@ -668,7 +668,7 @@ TEST_CASE("save_load_menu_click_overwrite_confirm: clique em 'Nao' (pill 1) "
     for (int i = 0; i < kSlotCount; ++i) slots[static_cast<std::size_t>(i)] = empty_slot_preview(i);
     slots[1] = build_slot_preview(make_save_data(100), 1);
     save_load_menu_open(state, SaveLoadMode::Save, slots);
-    (void)save_load_menu_key_down(state, SDLK_RETURN);  // abre o dialogo
+    (void)save_load_menu_key_down(state, glintfx::Key::Enter);  // abre o dialogo
 
     REQUIRE(save_load_menu_click_overwrite_confirm(state, 1) ==
             SaveLoadMenuAction::OverwriteCancelled);
@@ -910,7 +910,7 @@ TEST_CASE("CRIT-1: MESMO cenario via teclado (Enter, nao so clique de mouse) "
     save_load_menu_open(state, SaveLoadMode::Save, slots);
     REQUIRE(state.selected == 1);  // 1o slot selecionavel apos o autosave
 
-    REQUIRE(save_load_menu_key_down(state, SDLK_RETURN) == SaveLoadMenuAction::None);
+    REQUIRE(save_load_menu_key_down(state, glintfx::Key::Enter) == SaveLoadMenuAction::None);
     REQUIRE(state.confirming_overwrite);
 
     std::filesystem::remove_all(dir);
@@ -941,7 +941,7 @@ TEST_CASE("save_load_menu_key_down: Enter num slot Danificado em modo Load abre 
                          slots_with_unreadable(1, gus::domain::save::LoadResult::HmacInvalid));
     REQUIRE(state.selected == 1);
 
-    REQUIRE(save_load_menu_key_down(state, SDLK_RETURN) == SaveLoadMenuAction::None);
+    REQUIRE(save_load_menu_key_down(state, glintfx::Key::Enter) == SaveLoadMenuAction::None);
     REQUIRE(state.warning_kind == SaveLoadMenuState::WarningKind::Damaged);
     REQUIRE(state.warning_selected == 1);  // default seguro = Cancelar
 }
@@ -954,7 +954,7 @@ TEST_CASE("save_load_menu_key_down: Enter num slot de Versao incompativel em "
         state, SaveLoadMode::Load,
         slots_with_unreadable(1, gus::domain::save::LoadResult::VersionTooNew));
 
-    REQUIRE(save_load_menu_key_down(state, SDLK_RETURN) == SaveLoadMenuAction::None);
+    REQUIRE(save_load_menu_key_down(state, glintfx::Key::Enter) == SaveLoadMenuAction::None);
     REQUIRE(state.warning_kind == SaveLoadMenuState::WarningKind::Version);
 }
 
@@ -976,9 +976,9 @@ TEST_CASE("save_load_menu_key_down: aviso Damaged - Esc equivale a Cancelar "
     SaveLoadMenuState state;
     save_load_menu_open(state, SaveLoadMode::Load,
                          slots_with_unreadable(1, gus::domain::save::LoadResult::HmacInvalid));
-    (void)save_load_menu_key_down(state, SDLK_RETURN);  // abre o aviso
+    (void)save_load_menu_key_down(state, glintfx::Key::Enter);  // abre o aviso
 
-    REQUIRE(save_load_menu_key_down(state, SDLK_ESCAPE) == SaveLoadMenuAction::WarningCancelled);
+    REQUIRE(save_load_menu_key_down(state, glintfx::Key::Escape) == SaveLoadMenuAction::WarningCancelled);
     REQUIRE(state.warning_kind == SaveLoadMenuState::WarningKind::None);
 }
 
@@ -988,9 +988,9 @@ TEST_CASE("save_load_menu_key_down: aviso Damaged - Enter com Cancelar focado "
     SaveLoadMenuState state;
     save_load_menu_open(state, SaveLoadMode::Load,
                          slots_with_unreadable(1, gus::domain::save::LoadResult::HmacInvalid));
-    (void)save_load_menu_key_down(state, SDLK_RETURN);  // abre o aviso
+    (void)save_load_menu_key_down(state, glintfx::Key::Enter);  // abre o aviso
 
-    REQUIRE(save_load_menu_key_down(state, SDLK_RETURN) == SaveLoadMenuAction::WarningCancelled);
+    REQUIRE(save_load_menu_key_down(state, glintfx::Key::Enter) == SaveLoadMenuAction::WarningCancelled);
     REQUIRE(state.warning_kind == SaveLoadMenuState::WarningKind::None);
 }
 
@@ -1003,9 +1003,9 @@ TEST_CASE("save_load_menu_key_down: aviso Damaged - alternar pra 'Tentar "
     (void)save_load_menu_click_slot(state, 2);  // foca e abre o aviso no slot 2
     REQUIRE(state.warning_kind == SaveLoadMenuState::WarningKind::Damaged);
 
-    REQUIRE(save_load_menu_key_down(state, SDLK_LEFT) == SaveLoadMenuAction::None);
+    REQUIRE(save_load_menu_key_down(state, glintfx::Key::Left) == SaveLoadMenuAction::None);
     REQUIRE(state.warning_selected == 0);
-    REQUIRE(save_load_menu_key_down(state, SDLK_RETURN) == SaveLoadMenuAction::RecoverRequested);
+    REQUIRE(save_load_menu_key_down(state, glintfx::Key::Enter) == SaveLoadMenuAction::RecoverRequested);
     REQUIRE(state.warning_kind == SaveLoadMenuState::WarningKind::None);
     REQUIRE(state.selected == 2);  // o CHAMADOR ainda le state.selected apos RecoverRequested
 }
@@ -1017,12 +1017,12 @@ TEST_CASE("save_load_menu_key_down: aviso Version - LEFT/RIGHT/UP/DOWN nao "
     save_load_menu_open(
         state, SaveLoadMode::Load,
         slots_with_unreadable(1, gus::domain::save::LoadResult::VersionTooNew));
-    (void)save_load_menu_key_down(state, SDLK_RETURN);  // abre o aviso Version
+    (void)save_load_menu_key_down(state, glintfx::Key::Enter);  // abre o aviso Version
 
-    REQUIRE(save_load_menu_key_down(state, SDLK_LEFT) == SaveLoadMenuAction::None);
+    REQUIRE(save_load_menu_key_down(state, glintfx::Key::Left) == SaveLoadMenuAction::None);
     REQUIRE(state.warning_kind == SaveLoadMenuState::WarningKind::Version);  // ainda aberto
 
-    REQUIRE(save_load_menu_key_down(state, SDLK_RETURN) == SaveLoadMenuAction::WarningCancelled);
+    REQUIRE(save_load_menu_key_down(state, glintfx::Key::Enter) == SaveLoadMenuAction::WarningCancelled);
     REQUIRE(state.warning_kind == SaveLoadMenuState::WarningKind::None);
 }
 
@@ -1035,7 +1035,7 @@ TEST_CASE("save_load_menu_click_warning_recover: no-op se o aviso nao for "
     save_load_menu_open(
         state, SaveLoadMode::Load,
         slots_with_unreadable(1, gus::domain::save::LoadResult::VersionTooNew));
-    (void)save_load_menu_key_down(state, SDLK_RETURN);  // abre Version
+    (void)save_load_menu_key_down(state, glintfx::Key::Enter);  // abre Version
     REQUIRE(save_load_menu_click_warning_recover(state) == SaveLoadMenuAction::None);
     REQUIRE(state.warning_kind == SaveLoadMenuState::WarningKind::Version);  // intocado
 }
@@ -1184,9 +1184,9 @@ TEST_CASE("SAVE-LOAD-AVISOS: RecoverRequested + load_game_from_backup real "
     REQUIRE(state.warning_kind == SaveLoadMenuState::WarningKind::RecoverFailed);
 
     // O aviso RecoverFailed tambem so tem Cancelar (mesmo contrato de Version).
-    REQUIRE(save_load_menu_key_down(state, SDLK_LEFT) == SaveLoadMenuAction::None);
+    REQUIRE(save_load_menu_key_down(state, glintfx::Key::Left) == SaveLoadMenuAction::None);
     REQUIRE(state.warning_kind == SaveLoadMenuState::WarningKind::RecoverFailed);  // intocado
-    REQUIRE(save_load_menu_key_down(state, SDLK_RETURN) == SaveLoadMenuAction::WarningCancelled);
+    REQUIRE(save_load_menu_key_down(state, glintfx::Key::Enter) == SaveLoadMenuAction::WarningCancelled);
     REQUIRE(state.warning_kind == SaveLoadMenuState::WarningKind::None);
 
     std::filesystem::remove_all(dir);

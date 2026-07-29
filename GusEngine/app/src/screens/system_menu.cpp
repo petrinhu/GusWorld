@@ -123,31 +123,30 @@ void system_menu_close(SystemMenuState& state) noexcept {
 
 namespace {
 
-SystemMenuAction handle_pause_key(SystemMenuState& state, SDL_Keycode key) noexcept {
+SystemMenuAction handle_pause_key(SystemMenuState& state, glintfx::Key key) noexcept {
     // MENU-INICIAL: mini-dialogo "voltar ao menu inicial?" (MESMA mecanica de
     // controls_confirming_restore/discard - ver handle_controls_key abaixo)
     // intercepta ANTES da navegacao normal da lista de Pause.
     if (state.pause_confirming_to_title) {
         switch (key) {
-            case SDLK_UP:
-            case SDLK_DOWN:
-            case SDLK_LEFT:
-            case SDLK_RIGHT:
-            case SDLK_W:
-            case SDLK_S:
-            case SDLK_A:
-            case SDLK_D:
+            case glintfx::Key::Up:
+            case glintfx::Key::Down:
+            case glintfx::Key::Left:
+            case glintfx::Key::Right:
+            case glintfx::Key::W:
+            case glintfx::Key::S:
+            case glintfx::Key::A:
+            case glintfx::Key::D:
                 // 2 escolhas (Sim/Cancelar): qualquer eixo alterna entre elas
                 // (MESMA convencao dos prompts de Controles).
                 state.pause_to_title_confirm_selected =
                     1 - state.pause_to_title_confirm_selected;
                 return SystemMenuAction::None;
-            case SDLK_ESCAPE:
+            case glintfx::Key::Escape:
                 state.pause_confirming_to_title = false;  // cancela, fica em Pause
                 return SystemMenuAction::None;
-            case SDLK_RETURN:
-            case SDLK_KP_ENTER:
-            case SDLK_SPACE:
+            case glintfx::Key::Enter:
+            case glintfx::Key::Space:
                 state.pause_confirming_to_title = false;
                 if (state.pause_to_title_confirm_selected == 0) {  // Sim
                     return SystemMenuAction::RequestToTitle;
@@ -159,24 +158,23 @@ SystemMenuAction handle_pause_key(SystemMenuState& state, SDL_Keycode key) noexc
     }
 
     switch (key) {
-        case SDLK_UP:
-        case SDLK_W:
+        case glintfx::Key::Up:
+        case glintfx::Key::W:
             state.pause_selected =
                 wrap_move(state.pause_selected, -1, kPauseItemCount);
             return SystemMenuAction::None;
-        case SDLK_DOWN:
-        case SDLK_S:
+        case glintfx::Key::Down:
+        case glintfx::Key::S:
             state.pause_selected =
                 wrap_move(state.pause_selected, +1, kPauseItemCount);
             return SystemMenuAction::None;
-        case SDLK_ESCAPE:
+        case glintfx::Key::Escape:
             // Pause e a RAIZ da arvore - ESC (footer: "ESC volta ao jogo") FECHA o
             // menu inteiro, mesmo efeito de confirmar Continuar, de qualquer item
             // selecionado. Diferente de qualquer outra tela (ESC la SOBE 1 nivel).
             return SystemMenuAction::Continue;
-        case SDLK_RETURN:
-        case SDLK_KP_ENTER:
-        case SDLK_SPACE: {
+        case glintfx::Key::Enter:
+        case glintfx::Key::Space: {
             switch (static_cast<PauseItem>(state.pause_selected)) {
                 case PauseItem::Continue:
                     return SystemMenuAction::Continue;
@@ -209,24 +207,23 @@ SystemMenuAction handle_pause_key(SystemMenuState& state, SDL_Keycode key) noexc
 }
 
 SystemMenuAction handle_config_categories_key(SystemMenuState& state,
-                                               SDL_Keycode key) noexcept {
+                                               glintfx::Key key) noexcept {
     switch (key) {
-        case SDLK_UP:
-        case SDLK_W:
+        case glintfx::Key::Up:
+        case glintfx::Key::W:
             state.config_categories_selected =
                 wrap_move(state.config_categories_selected, -1, kConfigCategoriesItemCount);
             return SystemMenuAction::None;
-        case SDLK_DOWN:
-        case SDLK_S:
+        case glintfx::Key::Down:
+        case glintfx::Key::S:
             state.config_categories_selected =
                 wrap_move(state.config_categories_selected, +1, kConfigCategoriesItemCount);
             return SystemMenuAction::None;
-        case SDLK_ESCAPE:
+        case glintfx::Key::Escape:
             state.screen = parent_screen_of(SystemMenuScreen::ConfigCategories);  // Pause
             return SystemMenuAction::Navigated;
-        case SDLK_RETURN:
-        case SDLK_KP_ENTER:
-        case SDLK_SPACE: {
+        case glintfx::Key::Enter:
+        case glintfx::Key::Space: {
             switch (static_cast<ConfigCategoryItem>(state.config_categories_selected)) {
                 case ConfigCategoryItem::Audio:
                     state.screen = SystemMenuScreen::Audio;
@@ -279,7 +276,7 @@ SystemMenuAction leave_controls_screen_or_confirm_discard(SystemMenuState& state
 // roteia pra system_menu_controls_capture_key nesse caso (ver o header, o
 // motivo de nao reusar este roteador generico: toda tecla vira candidata a
 // binding).
-SystemMenuAction handle_controls_key(SystemMenuState& state, SDL_Keycode key) noexcept {
+SystemMenuAction handle_controls_key(SystemMenuState& state, glintfx::Key key) noexcept {
     if (state.controls_capturing) {
         // Defensivo: o chamador nao deveria rotear aqui neste modo; no-op.
         return SystemMenuAction::None;
@@ -287,24 +284,23 @@ SystemMenuAction handle_controls_key(SystemMenuState& state, SDL_Keycode key) no
 
     if (state.controls_confirming_restore) {
         switch (key) {
-            case SDLK_UP:
-            case SDLK_DOWN:
-            case SDLK_LEFT:
-            case SDLK_RIGHT:
-            case SDLK_W:
-            case SDLK_S:
-            case SDLK_A:
-            case SDLK_D:
+            case glintfx::Key::Up:
+            case glintfx::Key::Down:
+            case glintfx::Key::Left:
+            case glintfx::Key::Right:
+            case glintfx::Key::W:
+            case glintfx::Key::S:
+            case glintfx::Key::A:
+            case glintfx::Key::D:
                 // 2 escolhas (Sim/Nao): qualquer eixo alterna entre elas.
                 state.controls_restore_confirm_selected =
                     1 - state.controls_restore_confirm_selected;
                 return SystemMenuAction::None;
-            case SDLK_ESCAPE:
+            case glintfx::Key::Escape:
                 state.controls_confirming_restore = false;  // cancela, sem mudar config
                 return SystemMenuAction::None;
-            case SDLK_RETURN:
-            case SDLK_KP_ENTER:
-            case SDLK_SPACE:
+            case glintfx::Key::Enter:
+            case glintfx::Key::Space:
                 state.controls_confirming_restore = false;
                 if (state.controls_restore_confirm_selected == 0) {  // Sim
                     // STAGED (M2): so muta a COPIA DE TRABALHO + marca dirty -
@@ -325,25 +321,24 @@ SystemMenuAction handle_controls_key(SystemMenuState& state, SDL_Keycode key) no
 
     if (state.controls_confirming_discard) {
         switch (key) {
-            case SDLK_UP:
-            case SDLK_DOWN:
-            case SDLK_LEFT:
-            case SDLK_RIGHT:
-            case SDLK_W:
-            case SDLK_S:
-            case SDLK_A:
-            case SDLK_D:
+            case glintfx::Key::Up:
+            case glintfx::Key::Down:
+            case glintfx::Key::Left:
+            case glintfx::Key::Right:
+            case glintfx::Key::W:
+            case glintfx::Key::S:
+            case glintfx::Key::A:
+            case glintfx::Key::D:
                 // 2 escolhas (Sim/Nao): qualquer eixo alterna entre elas (MESMA
                 // convencao do prompt de restaurar-padrao acima).
                 state.controls_discard_confirm_selected =
                     1 - state.controls_discard_confirm_selected;
                 return SystemMenuAction::None;
-            case SDLK_ESCAPE:
+            case glintfx::Key::Escape:
                 state.controls_confirming_discard = false;  // cancela, fica editando
                 return SystemMenuAction::None;
-            case SDLK_RETURN:
-            case SDLK_KP_ENTER:
-            case SDLK_SPACE:
+            case glintfx::Key::Enter:
+            case glintfx::Key::Space:
                 state.controls_confirming_discard = false;
                 if (state.controls_discard_confirm_selected == 0) {  // Sim, descartar
                     // Reverte a copia de trabalho pra ultima BASELINE (carregada
@@ -365,24 +360,23 @@ SystemMenuAction handle_controls_key(SystemMenuState& state, SDL_Keycode key) no
     }
 
     switch (key) {
-        case SDLK_UP:
-        case SDLK_W:
+        case glintfx::Key::Up:
+        case glintfx::Key::W:
             state.controls_selected = wrap_move(state.controls_selected, -1, kControlsItemCount);
             state.controls_last_action_swapped = false;  // navegar limpa o aviso de troca
             return SystemMenuAction::None;
-        case SDLK_DOWN:
-        case SDLK_S:
+        case glintfx::Key::Down:
+        case glintfx::Key::S:
             state.controls_selected = wrap_move(state.controls_selected, +1, kControlsItemCount);
             state.controls_last_action_swapped = false;
             return SystemMenuAction::None;
-        case SDLK_ESCAPE:
+        case glintfx::Key::Escape:
             // MESMO gate do Voltar (kControlsBackIndex, abaixo): Esc so sobe de
             // fato se nao houver mudanca staged pendente (M2 STAGED CHANGES) -
             // ver leave_controls_screen_or_confirm_discard acima.
             return leave_controls_screen_or_confirm_discard(state);
-        case SDLK_RETURN:
-        case SDLK_KP_ENTER:
-        case SDLK_SPACE:
+        case glintfx::Key::Enter:
+        case glintfx::Key::Space:
             if (state.controls_selected < kControlsActionCount) {
                 state.controls_capturing = true;
                 state.controls_last_action_swapped = false;
@@ -409,37 +403,36 @@ SystemMenuAction handle_controls_key(SystemMenuState& state, SDL_Keycode key) no
     }
 }
 
-SystemMenuAction handle_audio_key(SystemMenuState& state, SDL_Keycode key) noexcept {
+SystemMenuAction handle_audio_key(SystemMenuState& state, glintfx::Key key) noexcept {
     switch (key) {
-        case SDLK_UP:
-        case SDLK_W:
+        case glintfx::Key::Up:
+        case glintfx::Key::W:
             state.audio_selected = wrap_move(state.audio_selected, -1, kAudioItemCount);
             return SystemMenuAction::None;
-        case SDLK_DOWN:
-        case SDLK_S:
+        case glintfx::Key::Down:
+        case glintfx::Key::S:
             state.audio_selected = wrap_move(state.audio_selected, +1, kAudioItemCount);
             return SystemMenuAction::None;
-        case SDLK_ESCAPE:
+        case glintfx::Key::Escape:
             state.screen = parent_screen_of(SystemMenuScreen::Audio);  // ConfigCategories
             return SystemMenuAction::Navigated;
-        case SDLK_RETURN:
-        case SDLK_KP_ENTER:
-        case SDLK_SPACE:
+        case glintfx::Key::Enter:
+        case glintfx::Key::Space:
             if (static_cast<AudioItem>(state.audio_selected) == AudioItem::Back) {
                 state.screen = parent_screen_of(SystemMenuScreen::Audio);
                 return SystemMenuAction::Navigated;
             }
             return SystemMenuAction::None;  // ENTER num slider nao faz nada
-        case SDLK_LEFT:
-        case SDLK_A:
-        case SDLK_RIGHT:
-        case SDLK_D: {
+        case glintfx::Key::Left:
+        case glintfx::Key::A:
+        case glintfx::Key::Right:
+        case glintfx::Key::D: {
             // WASD completo (pedido do lider, MENU-PAUSA-CONFIG-SOM): A=D no
             // eixo horizontal do Audio espelha LEFT/RIGHT (A=esquerda/diminui,
             // D=direita/aumenta) - mesmo par que W/S ja espelha UP/DOWN acima.
             // Nas demais telas nao ha eixo horizontal - A/D cai no default=None.
             const float delta =
-                (key == SDLK_LEFT || key == SDLK_A) ? -kVolumeStep : kVolumeStep;
+                (key == glintfx::Key::Left || key == glintfx::Key::A) ? -kVolumeStep : kVolumeStep;
             switch (static_cast<AudioItem>(state.audio_selected)) {
                 case AudioItem::Music:
                     state.music_volume =
@@ -462,12 +455,11 @@ SystemMenuAction handle_audio_key(SystemMenuState& state, SDL_Keycode key) noexc
 // Telas placeholder (Save/Video/Language): 1 unico item (Voltar). Sem eixo de
 // navegacao (UP/DOWN/A/D no-op - nao ha entre-o-que escolher). ESC/ENTER/SPACE
 // sobem pro pai (parent_screen_of).
-SystemMenuAction handle_placeholder_key(SystemMenuState& state, SDL_Keycode key) noexcept {
+SystemMenuAction handle_placeholder_key(SystemMenuState& state, glintfx::Key key) noexcept {
     switch (key) {
-        case SDLK_ESCAPE:
-        case SDLK_RETURN:
-        case SDLK_KP_ENTER:
-        case SDLK_SPACE:
+        case glintfx::Key::Escape:
+        case glintfx::Key::Enter:
+        case glintfx::Key::Space:
             state.screen = parent_screen_of(state.screen);
             return SystemMenuAction::Navigated;
         default:
@@ -478,7 +470,7 @@ SystemMenuAction handle_placeholder_key(SystemMenuState& state, SDL_Keycode key)
 }  // namespace
 
 SystemMenuAction system_menu_key_down(SystemMenuState& state,
-                                       SDL_Keycode key) noexcept {
+                                       glintfx::Key key) noexcept {
     switch (state.screen) {
         case SystemMenuScreen::Hidden:
             return SystemMenuAction::None;  // menu fechado: no-op defensivo
@@ -573,7 +565,7 @@ SystemMenuAction click_pause_option(SystemMenuState& state, int index) noexcept 
 
     if (index < 0 || index >= kPauseItemCount) return SystemMenuAction::None;
     state.pause_selected = index;
-    // MESMA logica de handle_pause_key/SDLK_RETURN acima - clicar numa pill do
+    // MESMA logica de handle_pause_key/glintfx::Key::Enter acima - clicar numa pill do
     // Pause SEMPRE confirma na hora (nao ha estado "so foco, sem confirmar").
     switch (static_cast<PauseItem>(index)) {
         case PauseItem::Continue:
@@ -603,7 +595,7 @@ SystemMenuAction click_pause_option(SystemMenuState& state, int index) noexcept 
 SystemMenuAction click_config_categories_option(SystemMenuState& state, int index) noexcept {
     if (index < 0 || index >= kConfigCategoriesItemCount) return SystemMenuAction::None;
     state.config_categories_selected = index;
-    // MESMA logica de handle_config_categories_key/SDLK_RETURN - categorias sao
+    // MESMA logica de handle_config_categories_key/glintfx::Key::Enter - categorias sao
     // botoes simples (nao sliders), clicar SEMPRE confirma na hora.
     switch (static_cast<ConfigCategoryItem>(index)) {
         case ConfigCategoryItem::Audio:
@@ -633,7 +625,7 @@ SystemMenuAction click_audio_option(SystemMenuState& state, int index) noexcept 
     if (index < 0 || index >= kAudioItemCount) return SystemMenuAction::None;
     state.audio_selected = index;
     if (static_cast<AudioItem>(index) == AudioItem::Back) {
-        // MESMA logica de handle_audio_key/SDLK_RETURN em Voltar - confirma na
+        // MESMA logica de handle_audio_key/glintfx::Key::Enter em Voltar - confirma na
         // hora (Navigated pro pai).
         state.screen = parent_screen_of(SystemMenuScreen::Audio);
         return SystemMenuAction::Navigated;
@@ -711,7 +703,7 @@ SystemMenuAction click_controls_option(SystemMenuState& state, int index) noexce
     }
     if (index == kControlsApplyIndex) {
         // "Aplicar" (M2 STAGED CHANGES) - MESMO efeito de
-        // handle_controls_key/SDLK_RETURN acima: persistencia real fica com o
+        // handle_controls_key/glintfx::Key::Enter acima: persistencia real fica com o
         // CHAMADOR ao ver ControlsApplied.
         state.controls_applied_config = state.controls_config;
         state.controls_dirty = false;

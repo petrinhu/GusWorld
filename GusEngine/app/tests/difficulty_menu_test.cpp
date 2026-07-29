@@ -49,22 +49,22 @@ TEST_CASE("difficulty_menu_key_down: Baixo/Cima visitam os 4 itens com wrap "
     difficulty_menu_open(state);
     REQUIRE(state.selected == static_cast<int>(DifficultyMenuItem::Medio));
 
-    REQUIRE(difficulty_menu_key_down(state, SDLK_DOWN) == DifficultyMenuAction::None);
+    REQUIRE(difficulty_menu_key_down(state, glintfx::Key::Down) == DifficultyMenuAction::None);
     REQUIRE(state.selected == static_cast<int>(DifficultyMenuItem::Dificil));
-    REQUIRE(difficulty_menu_key_down(state, SDLK_DOWN) == DifficultyMenuAction::None);
+    REQUIRE(difficulty_menu_key_down(state, glintfx::Key::Down) == DifficultyMenuAction::None);
     REQUIRE(state.selected == static_cast<int>(DifficultyMenuItem::Hardcore));
-    REQUIRE(difficulty_menu_key_down(state, SDLK_DOWN) == DifficultyMenuAction::None);
+    REQUIRE(difficulty_menu_key_down(state, glintfx::Key::Down) == DifficultyMenuAction::None);
     REQUIRE(state.selected == static_cast<int>(DifficultyMenuItem::Facil));  // wrap
-    REQUIRE(difficulty_menu_key_down(state, SDLK_UP) == DifficultyMenuAction::None);
+    REQUIRE(difficulty_menu_key_down(state, glintfx::Key::Up) == DifficultyMenuAction::None);
     REQUIRE(state.selected == static_cast<int>(DifficultyMenuItem::Hardcore));
 }
 
 TEST_CASE("difficulty_menu_key_down: WASD espelha as setas", "[difficulty_menu]") {
     DifficultyMenuState state;
     difficulty_menu_open(state);
-    REQUIRE(difficulty_menu_key_down(state, SDLK_S) == DifficultyMenuAction::None);
+    REQUIRE(difficulty_menu_key_down(state, glintfx::Key::S) == DifficultyMenuAction::None);
     REQUIRE(state.selected == static_cast<int>(DifficultyMenuItem::Dificil));
-    REQUIRE(difficulty_menu_key_down(state, SDLK_W) == DifficultyMenuAction::None);
+    REQUIRE(difficulty_menu_key_down(state, glintfx::Key::W) == DifficultyMenuAction::None);
     REQUIRE(state.selected == static_cast<int>(DifficultyMenuItem::Medio));
 }
 
@@ -76,7 +76,7 @@ TEST_CASE("difficulty_menu_key_down: Enter na lista abre o splash (nao devolve "
     DifficultyMenuState state;
     difficulty_menu_open(state);
     state.selected = static_cast<int>(DifficultyMenuItem::Facil);
-    REQUIRE(difficulty_menu_key_down(state, SDLK_RETURN) == DifficultyMenuAction::None);
+    REQUIRE(difficulty_menu_key_down(state, glintfx::Key::Enter) == DifficultyMenuAction::None);
     REQUIRE(state.confirming);
     REQUIRE(state.confirm_selected == 1);  // default seguro = Cancelar
     REQUIRE(state.selected == static_cast<int>(DifficultyMenuItem::Facil));  // preservado
@@ -89,8 +89,8 @@ TEST_CASE("difficulty_menu_key_down: splash - Enter com Cancelar (default) fecha
           "[difficulty_menu]") {
     DifficultyMenuState state;
     difficulty_menu_open(state);
-    (void)difficulty_menu_key_down(state, SDLK_RETURN);  // abre o splash
-    REQUIRE(difficulty_menu_key_down(state, SDLK_RETURN) == DifficultyMenuAction::None);
+    (void)difficulty_menu_key_down(state, glintfx::Key::Enter);  // abre o splash
+    REQUIRE(difficulty_menu_key_down(state, glintfx::Key::Enter) == DifficultyMenuAction::None);
     REQUIRE_FALSE(state.confirming);
 }
 
@@ -99,11 +99,11 @@ TEST_CASE("difficulty_menu_key_down: splash - alternar pra Confirmar devolve Cho
     DifficultyMenuState state;
     difficulty_menu_open(state);
     state.selected = static_cast<int>(DifficultyMenuItem::Dificil);
-    (void)difficulty_menu_key_down(state, SDLK_RETURN);  // abre o splash
+    (void)difficulty_menu_key_down(state, glintfx::Key::Enter);  // abre o splash
 
-    REQUIRE(difficulty_menu_key_down(state, SDLK_LEFT) == DifficultyMenuAction::None);
+    REQUIRE(difficulty_menu_key_down(state, glintfx::Key::Left) == DifficultyMenuAction::None);
     REQUIRE(state.confirm_selected == 0);
-    REQUIRE(difficulty_menu_key_down(state, SDLK_RETURN) == DifficultyMenuAction::Chosen);
+    REQUIRE(difficulty_menu_key_down(state, glintfx::Key::Enter) == DifficultyMenuAction::Chosen);
     REQUIRE_FALSE(state.confirming);
     REQUIRE(difficulty_level_for_item(state.selected) == DifficultyLevel::Dificil);
 }
@@ -112,8 +112,8 @@ TEST_CASE("difficulty_menu_key_down: splash - Esc equivale a Cancelar (seguranca
           "[difficulty_menu]") {
     DifficultyMenuState state;
     difficulty_menu_open(state);
-    (void)difficulty_menu_key_down(state, SDLK_RETURN);  // abre o splash
-    REQUIRE(difficulty_menu_key_down(state, SDLK_ESCAPE) == DifficultyMenuAction::None);
+    (void)difficulty_menu_key_down(state, glintfx::Key::Enter);  // abre o splash
+    REQUIRE(difficulty_menu_key_down(state, glintfx::Key::Escape) == DifficultyMenuAction::None);
     REQUIRE_FALSE(state.confirming);
 }
 
@@ -124,7 +124,7 @@ TEST_CASE("difficulty_menu_key_down: ESC na LISTA (fora do splash) devolve "
           "[difficulty_menu]") {
     DifficultyMenuState state;
     difficulty_menu_open(state);
-    REQUIRE(difficulty_menu_key_down(state, SDLK_ESCAPE) == DifficultyMenuAction::Cancelled);
+    REQUIRE(difficulty_menu_key_down(state, glintfx::Key::Escape) == DifficultyMenuAction::Cancelled);
 }
 
 // ---------------------------------------------------------------- Hardcore BLOQUEADO (scope-add 2026-07-10)
@@ -153,7 +153,7 @@ TEST_CASE("difficulty_menu_key_down: Enter no Hardcore BLOQUEADO e no-op TOTAL "
     DifficultyMenuState state;
     difficulty_menu_open(state);  // hardcore_unlocked=false
     state.selected = static_cast<int>(DifficultyMenuItem::Hardcore);
-    REQUIRE(difficulty_menu_key_down(state, SDLK_RETURN) == DifficultyMenuAction::None);
+    REQUIRE(difficulty_menu_key_down(state, glintfx::Key::Enter) == DifficultyMenuAction::None);
     REQUIRE_FALSE(state.confirming);
     REQUIRE(state.selected == static_cast<int>(DifficultyMenuItem::Hardcore));  // foco preservado
 }
@@ -176,11 +176,11 @@ TEST_CASE("difficulty_menu_key_down: com hardcore_unlocked=true, Hardcore "
     DifficultyMenuState state;
     difficulty_menu_open(state, /*hardcore_unlocked=*/true);
     state.selected = static_cast<int>(DifficultyMenuItem::Hardcore);
-    REQUIRE(difficulty_menu_key_down(state, SDLK_RETURN) == DifficultyMenuAction::None);
+    REQUIRE(difficulty_menu_key_down(state, glintfx::Key::Enter) == DifficultyMenuAction::None);
     REQUIRE(state.confirming);
-    REQUIRE(difficulty_menu_key_down(state, SDLK_LEFT) == DifficultyMenuAction::None);
+    REQUIRE(difficulty_menu_key_down(state, glintfx::Key::Left) == DifficultyMenuAction::None);
     REQUIRE(state.confirm_selected == 0);
-    REQUIRE(difficulty_menu_key_down(state, SDLK_RETURN) == DifficultyMenuAction::Chosen);
+    REQUIRE(difficulty_menu_key_down(state, glintfx::Key::Enter) == DifficultyMenuAction::Chosen);
     REQUIRE(difficulty_level_for_item(state.selected) == DifficultyLevel::Hardcore);
 }
 
@@ -201,7 +201,7 @@ TEST_CASE("difficulty_menu_click_option: no splash, index reinterpreta como "
           "[difficulty_menu]") {
     DifficultyMenuState state;
     difficulty_menu_open(state);
-    (void)difficulty_menu_key_down(state, SDLK_RETURN);  // abre o splash
+    (void)difficulty_menu_key_down(state, glintfx::Key::Enter);  // abre o splash
 
     REQUIRE(difficulty_menu_click_option(state, 0) == DifficultyMenuAction::Chosen);
     REQUIRE_FALSE(state.confirming);
@@ -223,7 +223,7 @@ TEST_CASE("difficulty_keyboard_focus_index: fora do splash devolve state.selecte
     difficulty_menu_open(state);
     REQUIRE(difficulty_keyboard_focus_index(state) ==
             static_cast<int>(DifficultyMenuItem::Medio));
-    (void)difficulty_menu_key_down(state, SDLK_DOWN);
+    (void)difficulty_menu_key_down(state, glintfx::Key::Down);
     REQUIRE(difficulty_keyboard_focus_index(state) ==
             static_cast<int>(DifficultyMenuItem::Dificil));
 }
@@ -232,9 +232,9 @@ TEST_CASE("difficulty_keyboard_focus_index: no splash devolve confirm_selected",
           "[difficulty_menu]") {
     DifficultyMenuState state;
     difficulty_menu_open(state);
-    (void)difficulty_menu_key_down(state, SDLK_RETURN);  // abre o splash (confirm_selected=1)
+    (void)difficulty_menu_key_down(state, glintfx::Key::Enter);  // abre o splash (confirm_selected=1)
     REQUIRE(difficulty_keyboard_focus_index(state) == 1);
-    (void)difficulty_menu_key_down(state, SDLK_LEFT);  // alterna pra Confirmar (0)
+    (void)difficulty_menu_key_down(state, glintfx::Key::Left);  // alterna pra Confirmar (0)
     REQUIRE(difficulty_keyboard_focus_index(state) == 0);
 }
 
@@ -279,7 +279,7 @@ TEST_CASE("difficulty_hover_index: no splash, SO as 2 primeiras caixas contam",
           "[difficulty_menu][hover]") {
     DifficultyMenuState state;
     difficulty_menu_open(state);
-    (void)difficulty_menu_key_down(state, SDLK_RETURN);  // abre o splash
+    (void)difficulty_menu_key_down(state, glintfx::Key::Enter);  // abre o splash
 
     UiHoverBox boxes[kDifficultyItemCount];
     make_difficulty_boxes_into(boxes);  // boxes[2] tambem "found", mas fora do count=2

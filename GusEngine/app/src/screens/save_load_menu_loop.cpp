@@ -64,6 +64,8 @@
 #include "gus/domain/save/save_serializer.hpp"  // LoadResult
 #include "gus/platform/assets/asset_source.hpp"  // FilesystemAssetSource (resolve SFX)
 #include "gus/platform/fs/save_file_store.hpp"  // has_save/save_game/load_game/delete_save
+#include "gus/platform/input/key_translation.hpp"  // sdl_key_to_godot_keycode (Fatia 2)
+#include "gus/platform/input/key_translation_glintfx.hpp"  // godot_keycode_to_glintfx_key
 #include "gus/platform/render2d/render2d_gl3.hpp"
 #include "gus/platform/rmlui/gl3_loader.hpp"  // gl3_read_backbuffer_rgba (prova visual)
 
@@ -395,6 +397,35 @@ void route_mouse_click(SaveLoadMenuState& state, float x, float y,
     if (handled) result.sfx = SaveLoadSfxKind::Click;
 }
 
+// Traduz SDL_Keycode -> glintfx::Key REUSANDO a ponte SDL->Godot->glintfx JA
+// EXISTENTE e testada adversarialmente (F4-2, 8/8 mutantes mortos):
+// platform/input/key_translation.hpp (SDL_Keycode -> keycode Godot) +
+// platform/input/key_translation_glintfx.hpp (keycode Godot -> glintfx::Key).
+// Evita duplicar uma 3a tabela SDLK_*->glintfx::Key so pra esta tela
+// (M9-CAMADAS-SDL Fatia 2, docs/tech/plano-camadas-sdl.md) - save_load_menu.hpp
+// (a logica PURA) so conhece glintfx::Key, o SDL fica 100% aqui no loop.
+//
+// SDLK_RETURN e SDLK_KP_ENTER colapsam no MESMO Key::Enter pela ponte Godot
+// (key_translation.cpp ja fundia as duas no MESMO kGodotEnter, ANTES desta
+// fatia) - preserva EXATAMENTE o comportamento anterior (save_load_menu.cpp ja
+// tratava as duas teclas como sinonimo em is_confirm_key), nao e regressao.
+// glintfx::Key nao tem KpEnter dedicado - lacuna ja reportada ao glintfx.
+//
+// SDLK_DELETE fica FORA da ponte Godot (o esquema de fabrica de controles nao
+// tem KEY_DELETE ancorado - key_translation.cpp so cobre setas/shift/enter/
+// escape/tab/space + ASCII 0x20-0x7E, e 0x7F/DEL fica de fora por 1 posicao),
+// tratado a parte aqui - e a UNICA das 4 telas de menu puro que usa Delete
+// (is_delete_key, save_load_menu.cpp).
+glintfx::Key sdl_keycode_to_menu_key(SDL_Keycode sdl_key) noexcept {
+    if (sdl_key == SDLK_DELETE) {
+        return glintfx::Key::Delete;
+    }
+    const long long godot =
+        gus::platform::input::sdl_key_to_godot_keycode(static_cast<int>(sdl_key));
+    return gus::platform::input::godot_keycode_to_glintfx_key(godot)
+        .value_or(glintfx::Key::None);
+}
+
 }  // namespace
 
 // F4-1b.2: implementacao de save_load_screen_step (declarada no .hpp) - ver o
@@ -419,7 +450,8 @@ SaveLoadStepResult save_load_screen_step(SaveLoadMenuState& state, const SDL_Eve
     }
 
     if (ev.type == SDL_EVENT_KEY_DOWN && !ev.key.repeat) {
-        const SaveLoadMenuAction action = save_load_menu_key_down(state, ev.key.key);
+        const SaveLoadMenuAction action =
+                save_load_menu_key_down(state, sdl_keycode_to_menu_key(ev.key.key));
         apply_action_to_result(result, state, action);
         return result;
     }

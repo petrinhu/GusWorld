@@ -44,7 +44,8 @@
 #ifndef GUS_APP_SCREENS_TITLE_MENU_HPP
 #define GUS_APP_SCREENS_TITLE_MENU_HPP
 
-#include <SDL3/SDL.h>  // SDL_Keycode
+#include <glintfx/ui_event.hpp>  // glintfx::Key (M9-CAMADAS-SDL Fatia 2: tipo neutro,
+                                 // tela PURA nao precisa mais de SDL)
 
 #include "gus/app/screens/ui_hover.hpp"  // COCKPIT-SFX-HOVER-CLIQUE: UiHoverBox/ui_hover_index
 
@@ -114,7 +115,7 @@ enum class TitleMenuAction {
 // espirito de Pause em system_menu.hpp, so que sem "Continuar fecha o menu"
 // aqui: nao ha menu, e a tela de boot).
 [[nodiscard]] TitleMenuAction title_menu_key_down(TitleMenuState& state,
-                                                   SDL_Keycode key) noexcept;
+                                                   glintfx::Key key) noexcept;
 
 // MOUSE (clique numa opcao/pill, roteado pelo hit-test de geometria do host -
 // ver title_menu_loop.cpp): trata o clique em `index` como "focar + confirmar"

@@ -100,7 +100,7 @@ TEST_CASE("build_difficulty_menu_rml: splash de confirmacao substitui a lista, "
     DifficultyMenuState state;
     difficulty_menu_open(state);
     state.selected = static_cast<int>(DifficultyMenuItem::Dificil);
-    (void)difficulty_menu_key_down(state, SDLK_RETURN);  // abre o splash
+    (void)difficulty_menu_key_down(state, glintfx::Key::Enter);  // abre o splash
     REQUIRE(state.confirming);
 
     const std::string rml = build_difficulty_menu_rml(state, make_translator());
@@ -121,14 +121,14 @@ TEST_CASE("build_difficulty_menu_rml: splash troca de titulo/botao conforme a "
     DifficultyMenuState state_facil;
     difficulty_menu_open(state_facil);
     state_facil.selected = static_cast<int>(DifficultyMenuItem::Facil);
-    (void)difficulty_menu_key_down(state_facil, SDLK_RETURN);
+    (void)difficulty_menu_key_down(state_facil, glintfx::Key::Enter);
     const std::string rml_facil = build_difficulty_menu_rml(state_facil, make_translator());
     REQUIRE(rml_facil.find("Jogar no Facil?") != std::string::npos);
     REQUIRE(rml_facil.find("Jogar no Medio?") == std::string::npos);
 
     DifficultyMenuState state_medio;
     difficulty_menu_open(state_medio);  // foco inicial ja e Medio
-    (void)difficulty_menu_key_down(state_medio, SDLK_RETURN);
+    (void)difficulty_menu_key_down(state_medio, glintfx::Key::Enter);
     const std::string rml_medio = build_difficulty_menu_rml(state_medio, make_translator());
     REQUIRE(rml_medio.find("Jogar no Medio?") != std::string::npos);
     REQUIRE(rml_medio.find("Sim, jogar no Medio") != std::string::npos);

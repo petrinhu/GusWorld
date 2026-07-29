@@ -46,7 +46,14 @@ PRODUCTION_DIRS = [
 # secao 2): 32 arquivos de producao tocavam SDL3 fora de comentario. Cada
 # fatia que reduz esse numero de verdade ATUALIZA o valor abaixo no mesmo
 # commit - senao o gate para de proteger o terreno reconquistado.
-CEILING = 32
+#
+# 32 -> 24 (M9-CAMADAS-SDL Fatia 0 + Fatia 2, mesmo dia): Fatia 0 apagou
+# run_title/system_menu_loop_owning_gl (codigo morto, nao mudou a contagem de
+# ARQUIVO - os 2 arquivos ainda tocam SDL via gl_current). Fatia 2 tirou
+# SDL_Keycode do TIPO das 4 telas de menu puro (title/difficulty/system/
+# save_load_menu.hpp+.cpp, 8 arquivos) trocando por glintfx::Key - a traducao
+# ficou 100% nos 4 *_loop.cpp (que continuam contando, corretamente).
+CEILING = 24
 
 SDL_TOKEN_RE = re.compile(r"\bSDL_[A-Za-z0-9_]*\b")
 SDL_INCLUDE_RE = re.compile(r'#\s*include\s*[<"]SDL3?/')

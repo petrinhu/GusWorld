@@ -126,7 +126,7 @@ TEST_CASE("build_save_load_menu_rml: mini-dialogo de sobrescrita substitui a lis
           "[save_load_menu_rml]") {
     SaveLoadMenuState state;
     save_load_menu_open(state, SaveLoadMode::Save, make_slots_mock_like());
-    (void)save_load_menu_key_down(state, SDLK_RETURN);  // slot 1 ocupado -> abre o dialogo
+    (void)save_load_menu_key_down(state, glintfx::Key::Enter);  // slot 1 ocupado -> abre o dialogo
     REQUIRE(state.confirming_overwrite);
 
     const std::string rml = build_save_load_menu_rml(state, make_translator());
@@ -149,7 +149,7 @@ TEST_CASE("build_save_load_menu_rml: mini-dialogo de confirmacao num slot "
     SaveLoadMenuState state;
     save_load_menu_open(state, SaveLoadMode::Save, make_slots_mock_like());
     state.selected = 2;  // slot 2: GENUINAMENTE vazio em make_slots_mock_like()
-    (void)save_load_menu_key_down(state, SDLK_RETURN);
+    (void)save_load_menu_key_down(state, glintfx::Key::Enter);
     REQUIRE(state.confirming_overwrite);
 
     const std::string rml = build_save_load_menu_rml(state, make_translator());
@@ -267,7 +267,7 @@ TEST_CASE("build_save_load_menu_rml: aviso Damaged substitui a lista e mostra os
     SaveLoadMenuState state;
     save_load_menu_open(state, SaveLoadMode::Load,
                          make_slots_with_unreadable(1, gus::domain::save::LoadResult::Corrupt));
-    (void)save_load_menu_key_down(state, SDLK_RETURN);  // abre o aviso Damaged
+    (void)save_load_menu_key_down(state, glintfx::Key::Enter);  // abre o aviso Damaged
     REQUIRE(state.warning_kind == SaveLoadMenuState::WarningKind::Damaged);
 
     const std::string rml = build_save_load_menu_rml(state, make_translator());
@@ -287,8 +287,8 @@ TEST_CASE("build_save_load_menu_rml: aviso Damaged - alternar pra 'Tentar "
     SaveLoadMenuState state;
     save_load_menu_open(state, SaveLoadMode::Load,
                          make_slots_with_unreadable(1, gus::domain::save::LoadResult::Corrupt));
-    (void)save_load_menu_key_down(state, SDLK_RETURN);
-    (void)save_load_menu_key_down(state, SDLK_LEFT);  // alterna pra "Tentar recuperar"
+    (void)save_load_menu_key_down(state, glintfx::Key::Enter);
+    (void)save_load_menu_key_down(state, glintfx::Key::Left);  // alterna pra "Tentar recuperar"
     REQUIRE(state.warning_selected == 0);
 
     const std::string rml = build_save_load_menu_rml(state, make_translator());
@@ -309,7 +309,7 @@ TEST_CASE("build_save_load_menu_rml: aviso Version so mostra Cancelar (SEM "
     save_load_menu_open(
         state, SaveLoadMode::Load,
         make_slots_with_unreadable(1, gus::domain::save::LoadResult::VersionTooNew));
-    (void)save_load_menu_key_down(state, SDLK_RETURN);
+    (void)save_load_menu_key_down(state, glintfx::Key::Enter);
     REQUIRE(state.warning_kind == SaveLoadMenuState::WarningKind::Version);
 
     const std::string rml = build_save_load_menu_rml(state, make_translator());
@@ -324,7 +324,7 @@ TEST_CASE("build_save_load_menu_rml: aviso RecoverFailed mostra a mensagem de "
     SaveLoadMenuState state;
     save_load_menu_open(state, SaveLoadMode::Load,
                          make_slots_with_unreadable(1, gus::domain::save::LoadResult::Corrupt));
-    (void)save_load_menu_key_down(state, SDLK_RETURN);
+    (void)save_load_menu_key_down(state, glintfx::Key::Enter);
     // Simula o CHAMADOR transitando pra RecoverFailed apos load_game_from_backup
     // falhar (mesmo padrao ja usado por build_previews_and_cache/do_delete).
     state.warning_kind = SaveLoadMenuState::WarningKind::RecoverFailed;

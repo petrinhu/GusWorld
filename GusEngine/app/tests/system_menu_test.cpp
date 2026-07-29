@@ -36,24 +36,24 @@ namespace {
 // Helpers de navegacao (evitam repetir a sequencia de teclas em todo TEST_CASE).
 void goto_config_categories(SystemMenuState& state) {
     system_menu_open(state);
-    (void)system_menu_key_down(state, SDLK_DOWN);
-    (void)system_menu_key_down(state, SDLK_DOWN);
-    (void)system_menu_key_down(state, SDLK_DOWN);    // Pause: foco = Configuracoes (3,
+    (void)system_menu_key_down(state, glintfx::Key::Down);
+    (void)system_menu_key_down(state, glintfx::Key::Down);
+    (void)system_menu_key_down(state, glintfx::Key::Down);    // Pause: foco = Configuracoes (3,
                                                 // SAVE-LOAD-UI etapa 6 - Carregar
                                                 // inserido no meio deslocou +1)
-    (void)system_menu_key_down(state, SDLK_RETURN);  // entra em ConfigCategories
+    (void)system_menu_key_down(state, glintfx::Key::Enter);  // entra em ConfigCategories
 }
 
 void goto_audio(SystemMenuState& state) {
     goto_config_categories(state);
-    (void)system_menu_key_down(state, SDLK_RETURN);  // ConfigCategories: foco=Audio(0) -> entra
+    (void)system_menu_key_down(state, glintfx::Key::Enter);  // ConfigCategories: foco=Audio(0) -> entra
 }
 
 void goto_controls(SystemMenuState& state) {
     goto_config_categories(state);
-    (void)system_menu_key_down(state, SDLK_DOWN);
-    (void)system_menu_key_down(state, SDLK_DOWN);    // ConfigCategories: foco=Controles(2)
-    (void)system_menu_key_down(state, SDLK_RETURN);  // entra em Controls
+    (void)system_menu_key_down(state, glintfx::Key::Down);
+    (void)system_menu_key_down(state, glintfx::Key::Down);    // ConfigCategories: foco=Controles(2)
+    (void)system_menu_key_down(state, glintfx::Key::Enter);  // entra em Controls
 }
 
 }  // namespace
@@ -94,20 +94,20 @@ TEST_CASE("Pause: UP/DOWN navega os 6 itens com WRAP (Continuar/Salvar/Carregar/
     system_menu_open(state);
     REQUIRE(state.pause_selected == 0);
 
-    (void)system_menu_key_down(state, SDLK_DOWN);
+    (void)system_menu_key_down(state, glintfx::Key::Down);
     REQUIRE(state.pause_selected == 1);
-    (void)system_menu_key_down(state, SDLK_DOWN);
+    (void)system_menu_key_down(state, glintfx::Key::Down);
     REQUIRE(state.pause_selected == 2);
-    (void)system_menu_key_down(state, SDLK_DOWN);
+    (void)system_menu_key_down(state, glintfx::Key::Down);
     REQUIRE(state.pause_selected == 3);
-    (void)system_menu_key_down(state, SDLK_DOWN);
+    (void)system_menu_key_down(state, glintfx::Key::Down);
     REQUIRE(state.pause_selected == 4);
-    (void)system_menu_key_down(state, SDLK_DOWN);
+    (void)system_menu_key_down(state, glintfx::Key::Down);
     REQUIRE(state.pause_selected == 5);
-    (void)system_menu_key_down(state, SDLK_DOWN);  // wrap pro topo
+    (void)system_menu_key_down(state, glintfx::Key::Down);  // wrap pro topo
     REQUIRE(state.pause_selected == 0);
 
-    (void)system_menu_key_down(state, SDLK_UP);  // wrap pro fim
+    (void)system_menu_key_down(state, glintfx::Key::Up);  // wrap pro fim
     REQUIRE(state.pause_selected == 5);
 }
 
@@ -115,7 +115,7 @@ TEST_CASE("Pause: ENTER em Continuar (item 0) devolve action Continue",
           "[system_menu]") {
     SystemMenuState state;
     system_menu_open(state);
-    const SystemMenuAction action = system_menu_key_down(state, SDLK_RETURN);
+    const SystemMenuAction action = system_menu_key_down(state, glintfx::Key::Enter);
     REQUIRE(action == SystemMenuAction::Continue);
 }
 
@@ -124,8 +124,8 @@ TEST_CASE("Pause: ESC (volta ao jogo) devolve action Continue - RAIZ da arvore, 
           "[system_menu]") {
     SystemMenuState state;
     system_menu_open(state);
-    (void)system_menu_key_down(state, SDLK_DOWN);  // move pro item 1 (Salvar)
-    const SystemMenuAction action = system_menu_key_down(state, SDLK_ESCAPE);
+    (void)system_menu_key_down(state, glintfx::Key::Down);  // move pro item 1 (Salvar)
+    const SystemMenuAction action = system_menu_key_down(state, glintfx::Key::Escape);
     REQUIRE(action == SystemMenuAction::Continue);
 }
 
@@ -134,8 +134,8 @@ TEST_CASE("Pause: ENTER em Salvar (item 1) devolve OpenSaveLoadSave SEM navegar 
           "[system_menu]") {
     SystemMenuState state;
     system_menu_open(state);
-    (void)system_menu_key_down(state, SDLK_DOWN);  // item 1 = Salvar
-    const SystemMenuAction action = system_menu_key_down(state, SDLK_RETURN);
+    (void)system_menu_key_down(state, glintfx::Key::Down);  // item 1 = Salvar
+    const SystemMenuAction action = system_menu_key_down(state, glintfx::Key::Enter);
     REQUIRE(action == SystemMenuAction::OpenSaveLoadSave);
     REQUIRE(state.screen == SystemMenuScreen::Pause);  // screen INTOCADO
 }
@@ -144,9 +144,9 @@ TEST_CASE("Pause: ENTER em Carregar (item 2) devolve OpenSaveLoadLoad SEM navega
           "[system_menu]") {
     SystemMenuState state;
     system_menu_open(state);
-    (void)system_menu_key_down(state, SDLK_DOWN);
-    (void)system_menu_key_down(state, SDLK_DOWN);  // item 2 = Carregar
-    const SystemMenuAction action = system_menu_key_down(state, SDLK_RETURN);
+    (void)system_menu_key_down(state, glintfx::Key::Down);
+    (void)system_menu_key_down(state, glintfx::Key::Down);  // item 2 = Carregar
+    const SystemMenuAction action = system_menu_key_down(state, glintfx::Key::Enter);
     REQUIRE(action == SystemMenuAction::OpenSaveLoadLoad);
     REQUIRE(state.screen == SystemMenuScreen::Pause);
 }
@@ -156,10 +156,10 @@ TEST_CASE("Pause: ENTER em Configuracoes (item 3) abre ConfigCategories, foco "
           "[system_menu]") {
     SystemMenuState state;
     system_menu_open(state);
-    (void)system_menu_key_down(state, SDLK_DOWN);
-    (void)system_menu_key_down(state, SDLK_DOWN);
-    (void)system_menu_key_down(state, SDLK_DOWN);  // item 3 = Configuracoes
-    const SystemMenuAction action = system_menu_key_down(state, SDLK_RETURN);
+    (void)system_menu_key_down(state, glintfx::Key::Down);
+    (void)system_menu_key_down(state, glintfx::Key::Down);
+    (void)system_menu_key_down(state, glintfx::Key::Down);  // item 3 = Configuracoes
+    const SystemMenuAction action = system_menu_key_down(state, glintfx::Key::Enter);
     REQUIRE(action == SystemMenuAction::Navigated);
     REQUIRE(state.screen == SystemMenuScreen::ConfigCategories);
     REQUIRE(state.config_categories_selected == 0);  // foco inicial = Audio
@@ -170,11 +170,11 @@ TEST_CASE("Pause: ENTER em Menu Inicial (item 4, MENU-INICIAL) abre o "
           "[system_menu]") {
     SystemMenuState state;
     system_menu_open(state);
-    (void)system_menu_key_down(state, SDLK_DOWN);
-    (void)system_menu_key_down(state, SDLK_DOWN);
-    (void)system_menu_key_down(state, SDLK_DOWN);
-    (void)system_menu_key_down(state, SDLK_DOWN);  // item 4 = Menu Inicial
-    const SystemMenuAction action = system_menu_key_down(state, SDLK_RETURN);
+    (void)system_menu_key_down(state, glintfx::Key::Down);
+    (void)system_menu_key_down(state, glintfx::Key::Down);
+    (void)system_menu_key_down(state, glintfx::Key::Down);
+    (void)system_menu_key_down(state, glintfx::Key::Down);  // item 4 = Menu Inicial
+    const SystemMenuAction action = system_menu_key_down(state, glintfx::Key::Enter);
     REQUIRE(action == SystemMenuAction::None);
     REQUIRE(state.screen == SystemMenuScreen::Pause);  // screen INTOCADO
     REQUIRE(state.pause_confirming_to_title);
@@ -187,11 +187,11 @@ TEST_CASE("Pause: mini-dialogo Menu Inicial - confirmar Sim devolve "
     SystemMenuState confirm_yes;
     system_menu_open(confirm_yes);
     confirm_yes.pause_selected = static_cast<int>(PauseItem::ToTitle);
-    (void)system_menu_key_down(confirm_yes, SDLK_RETURN);  // abre o prompt
+    (void)system_menu_key_down(confirm_yes, glintfx::Key::Enter);  // abre o prompt
     REQUIRE(confirm_yes.pause_confirming_to_title);
-    (void)system_menu_key_down(confirm_yes, SDLK_LEFT);  // alterna Cancelar(1) -> Sim(0)
+    (void)system_menu_key_down(confirm_yes, glintfx::Key::Left);  // alterna Cancelar(1) -> Sim(0)
     REQUIRE(confirm_yes.pause_to_title_confirm_selected == 0);
-    const SystemMenuAction yes_action = system_menu_key_down(confirm_yes, SDLK_RETURN);
+    const SystemMenuAction yes_action = system_menu_key_down(confirm_yes, glintfx::Key::Enter);
     REQUIRE(yes_action == SystemMenuAction::RequestToTitle);
     REQUIRE_FALSE(confirm_yes.pause_confirming_to_title);
     REQUIRE(confirm_yes.screen == SystemMenuScreen::Pause);  // screen INTOCADO
@@ -199,9 +199,9 @@ TEST_CASE("Pause: mini-dialogo Menu Inicial - confirmar Sim devolve "
     SystemMenuState confirm_no;
     system_menu_open(confirm_no);
     confirm_no.pause_selected = static_cast<int>(PauseItem::ToTitle);
-    (void)system_menu_key_down(confirm_no, SDLK_RETURN);  // abre o prompt
+    (void)system_menu_key_down(confirm_no, glintfx::Key::Enter);  // abre o prompt
     const SystemMenuAction no_action =
-        system_menu_key_down(confirm_no, SDLK_RETURN);  // default = Cancelar
+        system_menu_key_down(confirm_no, glintfx::Key::Enter);  // default = Cancelar
     REQUIRE(no_action == SystemMenuAction::None);
     REQUIRE_FALSE(confirm_no.pause_confirming_to_title);
     REQUIRE(confirm_no.screen == SystemMenuScreen::Pause);
@@ -209,8 +209,8 @@ TEST_CASE("Pause: mini-dialogo Menu Inicial - confirmar Sim devolve "
     SystemMenuState confirm_esc;
     system_menu_open(confirm_esc);
     confirm_esc.pause_selected = static_cast<int>(PauseItem::ToTitle);
-    (void)system_menu_key_down(confirm_esc, SDLK_RETURN);  // abre o prompt
-    const SystemMenuAction esc_action = system_menu_key_down(confirm_esc, SDLK_ESCAPE);
+    (void)system_menu_key_down(confirm_esc, glintfx::Key::Enter);  // abre o prompt
+    const SystemMenuAction esc_action = system_menu_key_down(confirm_esc, glintfx::Key::Escape);
     REQUIRE(esc_action == SystemMenuAction::None);
     REQUIRE_FALSE(confirm_esc.pause_confirming_to_title);
     REQUIRE(confirm_esc.screen == SystemMenuScreen::Pause);
@@ -222,12 +222,12 @@ TEST_CASE("Pause: ENTER em Sair (item 5, MENU-INICIAL deslocou +1) devolve "
           "[system_menu]") {
     SystemMenuState state;
     system_menu_open(state);
-    (void)system_menu_key_down(state, SDLK_DOWN);
-    (void)system_menu_key_down(state, SDLK_DOWN);
-    (void)system_menu_key_down(state, SDLK_DOWN);
-    (void)system_menu_key_down(state, SDLK_DOWN);
-    (void)system_menu_key_down(state, SDLK_DOWN);  // item 5 = Sair
-    const SystemMenuAction action = system_menu_key_down(state, SDLK_RETURN);
+    (void)system_menu_key_down(state, glintfx::Key::Down);
+    (void)system_menu_key_down(state, glintfx::Key::Down);
+    (void)system_menu_key_down(state, glintfx::Key::Down);
+    (void)system_menu_key_down(state, glintfx::Key::Down);
+    (void)system_menu_key_down(state, glintfx::Key::Down);  // item 5 = Sair
+    const SystemMenuAction action = system_menu_key_down(state, glintfx::Key::Enter);
     REQUIRE(action == SystemMenuAction::RequestQuit);
 }
 
@@ -236,8 +236,8 @@ TEST_CASE("Pause: A/D nao fazem nada (sem eixo horizontal na tela Pause)",
     SystemMenuState state;
     system_menu_open(state);
     const int before = state.pause_selected;
-    REQUIRE(system_menu_key_down(state, SDLK_A) == SystemMenuAction::None);
-    REQUIRE(system_menu_key_down(state, SDLK_D) == SystemMenuAction::None);
+    REQUIRE(system_menu_key_down(state, glintfx::Key::A) == SystemMenuAction::None);
+    REQUIRE(system_menu_key_down(state, glintfx::Key::D) == SystemMenuAction::None);
     REQUIRE(state.pause_selected == before);
 }
 
@@ -254,15 +254,15 @@ TEST_CASE("ConfigCategories: UP/DOWN navega os 5 itens com WRAP (Audio/Video/"
     goto_config_categories(state);
     REQUIRE(state.config_categories_selected == 0);
 
-    (void)system_menu_key_down(state, SDLK_DOWN);
+    (void)system_menu_key_down(state, glintfx::Key::Down);
     REQUIRE(state.config_categories_selected == 1);
-    (void)system_menu_key_down(state, SDLK_DOWN);
+    (void)system_menu_key_down(state, glintfx::Key::Down);
     REQUIRE(state.config_categories_selected == 2);
-    (void)system_menu_key_down(state, SDLK_DOWN);
+    (void)system_menu_key_down(state, glintfx::Key::Down);
     REQUIRE(state.config_categories_selected == 3);
-    (void)system_menu_key_down(state, SDLK_DOWN);
+    (void)system_menu_key_down(state, glintfx::Key::Down);
     REQUIRE(state.config_categories_selected == 4);
-    (void)system_menu_key_down(state, SDLK_DOWN);  // wrap
+    (void)system_menu_key_down(state, glintfx::Key::Down);  // wrap
     REQUIRE(state.config_categories_selected == 0);
 }
 
@@ -271,9 +271,9 @@ TEST_CASE("ConfigCategories: ENTER em Controles (item 2, M2) abre a tela "
           "[system_menu]") {
     SystemMenuState state;
     goto_config_categories(state);
-    (void)system_menu_key_down(state, SDLK_DOWN);
-    (void)system_menu_key_down(state, SDLK_DOWN);  // item 2 = Controles
-    const SystemMenuAction action = system_menu_key_down(state, SDLK_RETURN);
+    (void)system_menu_key_down(state, glintfx::Key::Down);
+    (void)system_menu_key_down(state, glintfx::Key::Down);  // item 2 = Controles
+    const SystemMenuAction action = system_menu_key_down(state, glintfx::Key::Enter);
     REQUIRE(action == SystemMenuAction::Navigated);
     REQUIRE(state.screen == SystemMenuScreen::Controls);
     REQUIRE(state.controls_selected == 0);
@@ -286,7 +286,7 @@ TEST_CASE("ConfigCategories: ENTER em Audio (item 0) abre a tela Audio, foco "
           "[system_menu]") {
     SystemMenuState state;
     goto_config_categories(state);
-    const SystemMenuAction action = system_menu_key_down(state, SDLK_RETURN);
+    const SystemMenuAction action = system_menu_key_down(state, glintfx::Key::Enter);
     REQUIRE(action == SystemMenuAction::Navigated);
     REQUIRE(state.screen == SystemMenuScreen::Audio);
     REQUIRE(state.audio_selected == 0);
@@ -297,8 +297,8 @@ TEST_CASE("ConfigCategories: ENTER em Video (item 1) abre a tela Video "
           "[system_menu]") {
     SystemMenuState state;
     goto_config_categories(state);
-    (void)system_menu_key_down(state, SDLK_DOWN);  // item 1 = Video
-    const SystemMenuAction action = system_menu_key_down(state, SDLK_RETURN);
+    (void)system_menu_key_down(state, glintfx::Key::Down);  // item 1 = Video
+    const SystemMenuAction action = system_menu_key_down(state, glintfx::Key::Enter);
     REQUIRE(action == SystemMenuAction::Navigated);
     REQUIRE(state.screen == SystemMenuScreen::Video);
 }
@@ -308,10 +308,10 @@ TEST_CASE("ConfigCategories: ENTER em Lingua (item 3) abre a tela Language "
           "[system_menu]") {
     SystemMenuState state;
     goto_config_categories(state);
-    (void)system_menu_key_down(state, SDLK_DOWN);
-    (void)system_menu_key_down(state, SDLK_DOWN);
-    (void)system_menu_key_down(state, SDLK_DOWN);  // item 3 = Lingua
-    const SystemMenuAction action = system_menu_key_down(state, SDLK_RETURN);
+    (void)system_menu_key_down(state, glintfx::Key::Down);
+    (void)system_menu_key_down(state, glintfx::Key::Down);
+    (void)system_menu_key_down(state, glintfx::Key::Down);  // item 3 = Lingua
+    const SystemMenuAction action = system_menu_key_down(state, glintfx::Key::Enter);
     REQUIRE(action == SystemMenuAction::Navigated);
     REQUIRE(state.screen == SystemMenuScreen::Language);
 }
@@ -321,18 +321,18 @@ TEST_CASE("ConfigCategories: ESC ou ENTER em Voltar (item 4) voltam pro Pause "
           "[system_menu]") {
     SystemMenuState state;
     goto_config_categories(state);
-    const SystemMenuAction esc_action = system_menu_key_down(state, SDLK_ESCAPE);
+    const SystemMenuAction esc_action = system_menu_key_down(state, glintfx::Key::Escape);
     REQUIRE(esc_action == SystemMenuAction::Navigated);
     REQUIRE(state.screen == SystemMenuScreen::Pause);
     REQUIRE(state.pause_selected == 3);  // ainda em Configuracoes (SAVE-LOAD-UI etapa 6)
 
     // De novo, desta vez confirmando com ENTER no item Voltar.
     goto_config_categories(state);
-    (void)system_menu_key_down(state, SDLK_DOWN);
-    (void)system_menu_key_down(state, SDLK_DOWN);
-    (void)system_menu_key_down(state, SDLK_DOWN);
-    (void)system_menu_key_down(state, SDLK_DOWN);  // item 4 = Voltar
-    const SystemMenuAction back_action = system_menu_key_down(state, SDLK_RETURN);
+    (void)system_menu_key_down(state, glintfx::Key::Down);
+    (void)system_menu_key_down(state, glintfx::Key::Down);
+    (void)system_menu_key_down(state, glintfx::Key::Down);
+    (void)system_menu_key_down(state, glintfx::Key::Down);  // item 4 = Voltar
+    const SystemMenuAction back_action = system_menu_key_down(state, glintfx::Key::Enter);
     REQUIRE(back_action == SystemMenuAction::Navigated);
     REQUIRE(state.screen == SystemMenuScreen::Pause);
 }
@@ -344,11 +344,11 @@ TEST_CASE("Video (placeholder): ESC volta pra ConfigCategories preservando a "
           "[system_menu]") {
     SystemMenuState state;
     goto_config_categories(state);
-    (void)system_menu_key_down(state, SDLK_DOWN);    // foco = Video (1)
-    (void)system_menu_key_down(state, SDLK_RETURN);  // entra em Video
+    (void)system_menu_key_down(state, glintfx::Key::Down);    // foco = Video (1)
+    (void)system_menu_key_down(state, glintfx::Key::Enter);  // entra em Video
     REQUIRE(state.screen == SystemMenuScreen::Video);
 
-    const SystemMenuAction action = system_menu_key_down(state, SDLK_ESCAPE);
+    const SystemMenuAction action = system_menu_key_down(state, glintfx::Key::Escape);
     REQUIRE(action == SystemMenuAction::Navigated);
     REQUIRE(state.screen == SystemMenuScreen::ConfigCategories);
     REQUIRE(state.config_categories_selected == 1);  // ainda em Video
@@ -358,13 +358,13 @@ TEST_CASE("Language (placeholder): ENTER volta pra ConfigCategories",
           "[system_menu]") {
     SystemMenuState state;
     goto_config_categories(state);
-    (void)system_menu_key_down(state, SDLK_DOWN);
-    (void)system_menu_key_down(state, SDLK_DOWN);
-    (void)system_menu_key_down(state, SDLK_DOWN);    // foco = Lingua (3)
-    (void)system_menu_key_down(state, SDLK_RETURN);  // entra em Language
+    (void)system_menu_key_down(state, glintfx::Key::Down);
+    (void)system_menu_key_down(state, glintfx::Key::Down);
+    (void)system_menu_key_down(state, glintfx::Key::Down);    // foco = Lingua (3)
+    (void)system_menu_key_down(state, glintfx::Key::Enter);  // entra em Language
     REQUIRE(state.screen == SystemMenuScreen::Language);
 
-    const SystemMenuAction action = system_menu_key_down(state, SDLK_RETURN);
+    const SystemMenuAction action = system_menu_key_down(state, glintfx::Key::Enter);
     REQUIRE(action == SystemMenuAction::Navigated);
     REQUIRE(state.screen == SystemMenuScreen::ConfigCategories);
 }
@@ -377,11 +377,11 @@ TEST_CASE("Audio: UP/DOWN navega os 3 itens com WRAP (Musica/SFX/Voltar)",
     goto_audio(state);
     REQUIRE(state.audio_selected == 0);
 
-    (void)system_menu_key_down(state, SDLK_DOWN);
+    (void)system_menu_key_down(state, glintfx::Key::Down);
     REQUIRE(state.audio_selected == 1);
-    (void)system_menu_key_down(state, SDLK_DOWN);
+    (void)system_menu_key_down(state, glintfx::Key::Down);
     REQUIRE(state.audio_selected == 2);
-    (void)system_menu_key_down(state, SDLK_DOWN);  // wrap
+    (void)system_menu_key_down(state, glintfx::Key::Down);  // wrap
     REQUIRE(state.audio_selected == 0);
 }
 
@@ -391,14 +391,14 @@ TEST_CASE("Audio: LEFT/RIGHT no item Musica ajusta music_volume clampado [0,1]",
     goto_audio(state);
     REQUIRE(state.music_volume == Catch::Approx(1.0f));
 
-    const SystemMenuAction a1 = system_menu_key_down(state, SDLK_LEFT);
+    const SystemMenuAction a1 = system_menu_key_down(state, glintfx::Key::Left);
     REQUIRE(a1 == SystemMenuAction::VolumeChanged);
     REQUIRE(state.music_volume < 1.0f);
 
-    for (int i = 0; i < 30; ++i) (void)system_menu_key_down(state, SDLK_LEFT);
+    for (int i = 0; i < 30; ++i) (void)system_menu_key_down(state, glintfx::Key::Left);
     REQUIRE(state.music_volume == Catch::Approx(0.0f));
 
-    for (int i = 0; i < 30; ++i) (void)system_menu_key_down(state, SDLK_RIGHT);
+    for (int i = 0; i < 30; ++i) (void)system_menu_key_down(state, glintfx::Key::Right);
     REQUIRE(state.music_volume == Catch::Approx(1.0f));
 }
 
@@ -407,10 +407,10 @@ TEST_CASE("Audio: LEFT/RIGHT no item SFX (indice 1) ajusta sfx_volume, NAO "
           "[system_menu]") {
     SystemMenuState state;
     goto_audio(state);
-    (void)system_menu_key_down(state, SDLK_DOWN);  // foco = SFX (1)
+    (void)system_menu_key_down(state, glintfx::Key::Down);  // foco = SFX (1)
     REQUIRE(state.audio_selected == 1);
 
-    (void)system_menu_key_down(state, SDLK_LEFT);
+    (void)system_menu_key_down(state, glintfx::Key::Left);
     REQUIRE(state.sfx_volume < 1.0f);
     REQUIRE(state.music_volume == Catch::Approx(1.0f));  // intocado
 }
@@ -420,11 +420,11 @@ TEST_CASE("Audio: LEFT/RIGHT no item Voltar (indice 2) NAO produz VolumeChanged 
           "[system_menu]") {
     SystemMenuState state;
     goto_audio(state);
-    (void)system_menu_key_down(state, SDLK_DOWN);
-    (void)system_menu_key_down(state, SDLK_DOWN);  // foco = Voltar (2)
+    (void)system_menu_key_down(state, glintfx::Key::Down);
+    (void)system_menu_key_down(state, glintfx::Key::Down);  // foco = Voltar (2)
     REQUIRE(state.audio_selected == 2);
 
-    const SystemMenuAction action = system_menu_key_down(state, SDLK_LEFT);
+    const SystemMenuAction action = system_menu_key_down(state, glintfx::Key::Left);
     REQUIRE(action != SystemMenuAction::VolumeChanged);
     REQUIRE(state.music_volume == Catch::Approx(1.0f));
     REQUIRE(state.sfx_volume == Catch::Approx(1.0f));
@@ -436,12 +436,12 @@ TEST_CASE("Audio: A/D ajustam volume igual LEFT/RIGHT (WASD completo)",
     goto_audio(state);
     REQUIRE(state.music_volume == Catch::Approx(1.0f));
 
-    const SystemMenuAction a_action = system_menu_key_down(state, SDLK_A);
+    const SystemMenuAction a_action = system_menu_key_down(state, glintfx::Key::A);
     REQUIRE(a_action == SystemMenuAction::VolumeChanged);
     REQUIRE(state.music_volume < 1.0f);
     const float after_a = state.music_volume;
 
-    const SystemMenuAction d_action = system_menu_key_down(state, SDLK_D);
+    const SystemMenuAction d_action = system_menu_key_down(state, glintfx::Key::D);
     REQUIRE(d_action == SystemMenuAction::VolumeChanged);
     REQUIRE(state.music_volume > after_a);
     REQUIRE(state.music_volume == Catch::Approx(1.0f));
@@ -452,15 +452,15 @@ TEST_CASE("Audio: ESC ou ENTER em Voltar voltam pra ConfigCategories "
           "[system_menu]") {
     SystemMenuState state;
     goto_audio(state);
-    const SystemMenuAction action = system_menu_key_down(state, SDLK_ESCAPE);
+    const SystemMenuAction action = system_menu_key_down(state, glintfx::Key::Escape);
     REQUIRE(action == SystemMenuAction::Navigated);
     REQUIRE(state.screen == SystemMenuScreen::ConfigCategories);
     REQUIRE(state.config_categories_selected == 0);  // ainda em Audio
 
     goto_audio(state);
-    (void)system_menu_key_down(state, SDLK_DOWN);
-    (void)system_menu_key_down(state, SDLK_DOWN);  // foco = Voltar
-    const SystemMenuAction back_action = system_menu_key_down(state, SDLK_RETURN);
+    (void)system_menu_key_down(state, glintfx::Key::Down);
+    (void)system_menu_key_down(state, glintfx::Key::Down);  // foco = Voltar
+    const SystemMenuAction back_action = system_menu_key_down(state, glintfx::Key::Enter);
     REQUIRE(back_action == SystemMenuAction::Navigated);
     REQUIRE(state.screen == SystemMenuScreen::ConfigCategories);
 }
@@ -514,13 +514,13 @@ TEST_CASE("Controls: UP/DOWN navega os 33 itens com WRAP (30 actions + "
     REQUIRE(state.controls_selected == 0);
 
     for (int i = 1; i < kControlsItemCount; ++i) {
-        (void)system_menu_key_down(state, SDLK_DOWN);
+        (void)system_menu_key_down(state, glintfx::Key::Down);
         REQUIRE(state.controls_selected == i);
     }
-    (void)system_menu_key_down(state, SDLK_DOWN);  // wrap
+    (void)system_menu_key_down(state, glintfx::Key::Down);  // wrap
     REQUIRE(state.controls_selected == 0);
 
-    (void)system_menu_key_down(state, SDLK_UP);  // wrap pro fim
+    (void)system_menu_key_down(state, glintfx::Key::Up);  // wrap pro fim
     REQUIRE(state.controls_selected == kControlsBackIndex);
 }
 
@@ -529,7 +529,7 @@ TEST_CASE("Controls: ESC na navegacao normal volta pra ConfigCategories "
           "[system_menu][controls]") {
     SystemMenuState state;
     goto_controls(state);
-    const SystemMenuAction action = system_menu_key_down(state, SDLK_ESCAPE);
+    const SystemMenuAction action = system_menu_key_down(state, glintfx::Key::Escape);
     REQUIRE(action == SystemMenuAction::Navigated);
     REQUIRE(state.screen == SystemMenuScreen::ConfigCategories);
     REQUIRE(state.config_categories_selected == static_cast<int>(ConfigCategoryItem::Controls));
@@ -540,7 +540,7 @@ TEST_CASE("Controls: ENTER numa action entra em modo CAPTURA (nao muda de "
           "[system_menu][controls]") {
     SystemMenuState state;
     goto_controls(state);
-    const SystemMenuAction action = system_menu_key_down(state, SDLK_RETURN);
+    const SystemMenuAction action = system_menu_key_down(state, glintfx::Key::Enter);
     REQUIRE(action == SystemMenuAction::None);
     REQUIRE(state.controls_capturing);
     REQUIRE(state.screen == SystemMenuScreen::Controls);
@@ -552,10 +552,10 @@ TEST_CASE("Controls: ENQUANTO capturando, system_menu_key_down normal e "
           "[system_menu][controls]") {
     SystemMenuState state;
     goto_controls(state);
-    (void)system_menu_key_down(state, SDLK_RETURN);  // entra em captura
+    (void)system_menu_key_down(state, glintfx::Key::Enter);  // entra em captura
     REQUIRE(state.controls_capturing);
 
-    const SystemMenuAction action = system_menu_key_down(state, SDLK_DOWN);
+    const SystemMenuAction action = system_menu_key_down(state, glintfx::Key::Down);
     REQUIRE(action == SystemMenuAction::None);
     REQUIRE(state.controls_selected == 0);  // nao navegou
     REQUIRE(state.controls_capturing);      // continua capturando
@@ -568,7 +568,7 @@ TEST_CASE("system_menu_controls_capture_key: Esc CANCELA a captura sem mudar "
     goto_controls(state);
     state.controls_config = gus::domain::input::default_controls();
     const gus::domain::input::InputRemapConfig before = state.controls_config;
-    (void)system_menu_key_down(state, SDLK_RETURN);  // entra em captura (action 0 = move_forward)
+    (void)system_menu_key_down(state, glintfx::Key::Enter);  // entra em captura (action 0 = move_forward)
     REQUIRE(state.controls_capturing);
 
     const SystemMenuAction action =
@@ -584,7 +584,7 @@ TEST_CASE("system_menu_controls_capture_key: tecla LIVRE aplica o remap e "
     SystemMenuState state;
     goto_controls(state);
     state.controls_config = gus::domain::input::default_controls();
-    (void)system_menu_key_down(state, SDLK_RETURN);  // captura action 0 = move_forward (default 'W')
+    (void)system_menu_key_down(state, glintfx::Key::Enter);  // captura action 0 = move_forward (default 'W')
     REQUIRE(state.controls_capturing);
 
     const SystemMenuAction action =
@@ -610,7 +610,7 @@ TEST_CASE("system_menu_controls_capture_key: CONFLITO troca com a outra "
     SystemMenuState state;
     goto_controls(state);
     state.controls_config = gus::domain::input::default_controls();
-    (void)system_menu_key_down(state, SDLK_RETURN);  // captura action 0 = move_forward ('W')
+    (void)system_menu_key_down(state, glintfx::Key::Enter);  // captura action 0 = move_forward ('W')
 
     // move_backward e 'S' por default (action 1 da lista curada).
     const SystemMenuAction action =
@@ -636,7 +636,7 @@ TEST_CASE("system_menu_controls_capture_key: keycode SENTINELA (0, tecla sem "
     goto_controls(state);
     state.controls_config = gus::domain::input::default_controls();
     const gus::domain::input::InputRemapConfig before = state.controls_config;
-    (void)system_menu_key_down(state, SDLK_RETURN);
+    (void)system_menu_key_down(state, glintfx::Key::Enter);
 
     const SystemMenuAction action =
         system_menu_controls_capture_key(state, /*is_escape=*/false, /*godot_keycode=*/0);
@@ -667,11 +667,11 @@ TEST_CASE("Controls: ENTER em Restaurar padrao (kControlsRestoreIndex) abre o "
     goto_controls(state);
     state.controls_config = gus::domain::input::default_controls();
     // Rebind move_forward pra 'K' - deve SOBREVIVER ate a confirmacao de fato.
-    (void)system_menu_key_down(state, SDLK_RETURN);
+    (void)system_menu_key_down(state, glintfx::Key::Enter);
     (void)system_menu_controls_capture_key(state, false, 'K');
 
     state.controls_selected = kControlsRestoreIndex;
-    const SystemMenuAction action = system_menu_key_down(state, SDLK_RETURN);
+    const SystemMenuAction action = system_menu_key_down(state, glintfx::Key::Enter);
     REQUIRE(action == SystemMenuAction::None);
     REQUIRE(state.controls_confirming_restore);
     REQUIRE(state.controls_restore_confirm_selected == 1);  // default seguro = Nao
@@ -691,15 +691,15 @@ TEST_CASE("Controls: confirmar restaurar (Sim) aplica default_controls() e "
         SystemMenuState state;
         goto_controls(state);
         state.controls_config = gus::domain::input::default_controls();
-        (void)system_menu_key_down(state, SDLK_RETURN);
+        (void)system_menu_key_down(state, glintfx::Key::Enter);
         (void)system_menu_controls_capture_key(state, false, 'K');
         const gus::domain::input::InputRemapConfig customizado = state.controls_config;
 
         state.controls_selected = kControlsRestoreIndex;
-        (void)system_menu_key_down(state, SDLK_RETURN);  // abre o prompt
+        (void)system_menu_key_down(state, glintfx::Key::Enter);  // abre o prompt
         REQUIRE(state.controls_confirming_restore);
 
-        const SystemMenuAction esc_action = system_menu_key_down(state, SDLK_ESCAPE);
+        const SystemMenuAction esc_action = system_menu_key_down(state, glintfx::Key::Escape);
         REQUIRE(esc_action == SystemMenuAction::None);
         REQUIRE_FALSE(state.controls_confirming_restore);
         REQUIRE(state.controls_config == customizado);  // intacto
@@ -710,16 +710,16 @@ TEST_CASE("Controls: confirmar restaurar (Sim) aplica default_controls() e "
         SystemMenuState state;
         goto_controls(state);
         state.controls_config = gus::domain::input::default_controls();
-        (void)system_menu_key_down(state, SDLK_RETURN);
+        (void)system_menu_key_down(state, glintfx::Key::Enter);
         (void)system_menu_controls_capture_key(state, false, 'K');  // customiza
 
         state.controls_selected = kControlsRestoreIndex;
-        (void)system_menu_key_down(state, SDLK_RETURN);  // abre o prompt (default = Nao)
+        (void)system_menu_key_down(state, glintfx::Key::Enter);  // abre o prompt (default = Nao)
         REQUIRE(state.controls_restore_confirm_selected == 1);
-        (void)system_menu_key_down(state, SDLK_LEFT);  // alterna pra Sim (0)
+        (void)system_menu_key_down(state, glintfx::Key::Left);  // alterna pra Sim (0)
         REQUIRE(state.controls_restore_confirm_selected == 0);
 
-        const SystemMenuAction action = system_menu_key_down(state, SDLK_RETURN);
+        const SystemMenuAction action = system_menu_key_down(state, glintfx::Key::Enter);
         REQUIRE(action == SystemMenuAction::ControlsChanged);
         REQUIRE_FALSE(state.controls_confirming_restore);
         REQUIRE(state.controls_config == gus::domain::input::default_controls());
@@ -733,7 +733,7 @@ TEST_CASE("Controls: ENTER em Voltar (kControlsBackIndex) volta pra "
     goto_controls(state);
     REQUIRE_FALSE(state.controls_dirty);  // estado fresco, nada staged ainda
     state.controls_selected = kControlsBackIndex;
-    const SystemMenuAction action = system_menu_key_down(state, SDLK_RETURN);
+    const SystemMenuAction action = system_menu_key_down(state, glintfx::Key::Enter);
     REQUIRE(action == SystemMenuAction::Navigated);
     REQUIRE(state.screen == SystemMenuScreen::ConfigCategories);
     REQUIRE_FALSE(state.controls_confirming_discard);
@@ -761,14 +761,14 @@ TEST_CASE("Controls: kControlsApplyIndex + ENTER promove a copia de trabalho a "
     seed_controls_baseline(state);
 
     // Remapeia move_forward -> 'K' (staged, ainda nao aplicado).
-    (void)system_menu_key_down(state, SDLK_RETURN);
+    (void)system_menu_key_down(state, glintfx::Key::Enter);
     (void)system_menu_controls_capture_key(state, /*is_escape=*/false, /*godot_keycode=*/'K');
     REQUIRE(state.controls_dirty);
     const gus::domain::input::InputRemapConfig staged = state.controls_config;
     REQUIRE_FALSE(state.controls_applied_config == staged);  // baseline AINDA nao mudou
 
     state.controls_selected = kControlsApplyIndex;
-    const SystemMenuAction action = system_menu_key_down(state, SDLK_RETURN);
+    const SystemMenuAction action = system_menu_key_down(state, glintfx::Key::Enter);
     REQUIRE(action == SystemMenuAction::ControlsApplied);
     REQUIRE_FALSE(state.controls_dirty);                  // dirty limpo
     REQUIRE(state.controls_applied_config == staged);      // baseline PROMOVIDA
@@ -780,12 +780,12 @@ TEST_CASE("Controls: Voltar (kControlsBackIndex) COM dirty abre o dialogo de "
           "[system_menu][controls][staged]") {
     SystemMenuState state;
     seed_controls_baseline(state);
-    (void)system_menu_key_down(state, SDLK_RETURN);
+    (void)system_menu_key_down(state, glintfx::Key::Enter);
     (void)system_menu_controls_capture_key(state, false, 'K');  // remap staged, dirty=true
     REQUIRE(state.controls_dirty);
 
     state.controls_selected = kControlsBackIndex;
-    const SystemMenuAction action = system_menu_key_down(state, SDLK_RETURN);
+    const SystemMenuAction action = system_menu_key_down(state, glintfx::Key::Enter);
     REQUIRE(action == SystemMenuAction::None);              // ainda NAO navegou
     REQUIRE(state.controls_confirming_discard);
     REQUIRE(state.controls_discard_confirm_selected == 1);  // default seguro = Nao
@@ -798,11 +798,11 @@ TEST_CASE("Controls: Esc na navegacao normal COM dirty tem o MESMO gate de "
           "[system_menu][controls][staged]") {
     SystemMenuState state;
     seed_controls_baseline(state);
-    (void)system_menu_key_down(state, SDLK_RETURN);
+    (void)system_menu_key_down(state, glintfx::Key::Enter);
     (void)system_menu_controls_capture_key(state, false, 'K');
     REQUIRE(state.controls_dirty);
 
-    const SystemMenuAction action = system_menu_key_down(state, SDLK_ESCAPE);
+    const SystemMenuAction action = system_menu_key_down(state, glintfx::Key::Escape);
     REQUIRE(action == SystemMenuAction::None);
     REQUIRE(state.controls_confirming_discard);
     REQUIRE(state.screen == SystemMenuScreen::Controls);
@@ -814,17 +814,17 @@ TEST_CASE("Controls: confirmar descarte (Sim) reverte a copia de trabalho pra "
     SystemMenuState state;
     seed_controls_baseline(state);
     const gus::domain::input::InputRemapConfig baseline = state.controls_applied_config;
-    (void)system_menu_key_down(state, SDLK_RETURN);
+    (void)system_menu_key_down(state, glintfx::Key::Enter);
     (void)system_menu_controls_capture_key(state, false, 'K');  // customiza (staged)
     REQUIRE_FALSE(state.controls_config == baseline);
 
     state.controls_selected = kControlsBackIndex;
-    (void)system_menu_key_down(state, SDLK_RETURN);  // abre o dialogo de descarte
+    (void)system_menu_key_down(state, glintfx::Key::Enter);  // abre o dialogo de descarte
     REQUIRE(state.controls_confirming_discard);
-    (void)system_menu_key_down(state, SDLK_LEFT);    // alterna pra Sim (indice 0)
+    (void)system_menu_key_down(state, glintfx::Key::Left);    // alterna pra Sim (indice 0)
     REQUIRE(state.controls_discard_confirm_selected == 0);
 
-    const SystemMenuAction action = system_menu_key_down(state, SDLK_RETURN);
+    const SystemMenuAction action = system_menu_key_down(state, glintfx::Key::Enter);
     REQUIRE(action == SystemMenuAction::Navigated);
     REQUIRE(state.screen == SystemMenuScreen::ConfigCategories);
     REQUIRE_FALSE(state.controls_confirming_discard);
@@ -839,15 +839,15 @@ TEST_CASE("Controls: confirmar descarte (Nao/Esc) cancela o dialogo e "
     {
         SystemMenuState state;
         seed_controls_baseline(state);
-        (void)system_menu_key_down(state, SDLK_RETURN);
+        (void)system_menu_key_down(state, glintfx::Key::Enter);
         (void)system_menu_controls_capture_key(state, false, 'K');
         const gus::domain::input::InputRemapConfig customizado = state.controls_config;
 
         state.controls_selected = kControlsBackIndex;
-        (void)system_menu_key_down(state, SDLK_RETURN);  // abre o dialogo
+        (void)system_menu_key_down(state, glintfx::Key::Enter);  // abre o dialogo
         REQUIRE(state.controls_confirming_discard);
 
-        const SystemMenuAction esc_action = system_menu_key_down(state, SDLK_ESCAPE);
+        const SystemMenuAction esc_action = system_menu_key_down(state, glintfx::Key::Escape);
         REQUIRE(esc_action == SystemMenuAction::None);
         REQUIRE_FALSE(state.controls_confirming_discard);
         REQUIRE(state.screen == SystemMenuScreen::Controls);  // NAO navegou
@@ -859,14 +859,14 @@ TEST_CASE("Controls: confirmar descarte (Nao/Esc) cancela o dialogo e "
     {
         SystemMenuState state;
         seed_controls_baseline(state);
-        (void)system_menu_key_down(state, SDLK_RETURN);
+        (void)system_menu_key_down(state, glintfx::Key::Enter);
         (void)system_menu_controls_capture_key(state, false, 'K');
 
         state.controls_selected = kControlsBackIndex;
-        (void)system_menu_key_down(state, SDLK_RETURN);  // abre o dialogo (default = Nao)
+        (void)system_menu_key_down(state, glintfx::Key::Enter);  // abre o dialogo (default = Nao)
         REQUIRE(state.controls_discard_confirm_selected == 1);
 
-        const SystemMenuAction no_action = system_menu_key_down(state, SDLK_RETURN);
+        const SystemMenuAction no_action = system_menu_key_down(state, glintfx::Key::Enter);
         REQUIRE(no_action == SystemMenuAction::None);
         REQUIRE_FALSE(state.controls_confirming_discard);
         REQUIRE(state.screen == SystemMenuScreen::Controls);
@@ -880,7 +880,7 @@ TEST_CASE("system_menu_click_option (Controls): clicar em Aplicar promove a "
           "[system_menu][controls][staged]") {
     SystemMenuState state;
     seed_controls_baseline(state);
-    (void)system_menu_key_down(state, SDLK_RETURN);
+    (void)system_menu_key_down(state, glintfx::Key::Enter);
     (void)system_menu_controls_capture_key(state, false, 'K');
     REQUIRE(state.controls_dirty);
     const gus::domain::input::InputRemapConfig staged = state.controls_config;
@@ -905,10 +905,10 @@ TEST_CASE("system_menu_click_option (Controls): durante confirmar-descarte, "
     SystemMenuState state;
     seed_controls_baseline(state);
     const gus::domain::input::InputRemapConfig baseline = state.controls_applied_config;
-    (void)system_menu_key_down(state, SDLK_RETURN);
+    (void)system_menu_key_down(state, glintfx::Key::Enter);
     (void)system_menu_controls_capture_key(state, false, 'K');
     state.controls_selected = kControlsBackIndex;
-    (void)system_menu_key_down(state, SDLK_RETURN);  // abre o dialogo
+    (void)system_menu_key_down(state, glintfx::Key::Enter);  // abre o dialogo
     REQUIRE(state.controls_confirming_discard);
 
     SystemMenuState click_yes = state;
@@ -932,14 +932,14 @@ TEST_CASE("Controls: confirmar Restaurar padrao (Sim) marca dirty na copia de "
           "[system_menu][controls][staged]") {
     SystemMenuState state;
     seed_controls_baseline(state);
-    (void)system_menu_key_down(state, SDLK_RETURN);
+    (void)system_menu_key_down(state, glintfx::Key::Enter);
     (void)system_menu_controls_capture_key(state, false, 'K');  // customiza move_forward
     const gus::domain::input::InputRemapConfig baseline_antes = state.controls_applied_config;
 
     state.controls_selected = kControlsRestoreIndex;
-    (void)system_menu_key_down(state, SDLK_RETURN);  // abre o prompt (default = Nao)
-    (void)system_menu_key_down(state, SDLK_LEFT);    // alterna pra Sim (0)
-    const SystemMenuAction action = system_menu_key_down(state, SDLK_RETURN);
+    (void)system_menu_key_down(state, glintfx::Key::Enter);  // abre o prompt (default = Nao)
+    (void)system_menu_key_down(state, glintfx::Key::Left);    // alterna pra Sim (0)
+    const SystemMenuAction action = system_menu_key_down(state, glintfx::Key::Enter);
 
     REQUIRE(action == SystemMenuAction::ControlsChanged);
     REQUIRE(state.controls_dirty);  // restaurar tambem e staged - ainda precisa de Aplicar
@@ -977,7 +977,7 @@ TEST_CASE("system_menu_click_option (Controls): durante confirmar-restaurar, "
     goto_controls(state);
     state.controls_config = gus::domain::input::default_controls();
     state.controls_selected = kControlsRestoreIndex;
-    (void)system_menu_key_down(state, SDLK_RETURN);  // abre o prompt
+    (void)system_menu_key_down(state, glintfx::Key::Enter);  // abre o prompt
     REQUIRE(state.controls_confirming_restore);
 
     SystemMenuState click_yes = state;
@@ -1002,13 +1002,13 @@ TEST_CASE("system_menu_close: fecha de qualquer tela (mesmo funda na arvore) "
     REQUIRE(state.screen == SystemMenuScreen::Hidden);
 }
 
-TEST_CASE("Teclas fora do conjunto conhecido (ex.: SDLK_Q) nao mudam estado nem "
+TEST_CASE("Teclas fora do conjunto conhecido (ex.: glintfx::Key::Q) nao mudam estado nem "
           "produzem action",
           "[system_menu]") {
     SystemMenuState state;
     system_menu_open(state);
     const int before = state.pause_selected;
-    const SystemMenuAction action = system_menu_key_down(state, SDLK_Q);
+    const SystemMenuAction action = system_menu_key_down(state, glintfx::Key::Q);
     REQUIRE(action == SystemMenuAction::None);
     REQUIRE(state.pause_selected == before);
 }
@@ -1130,8 +1130,8 @@ TEST_CASE("system_menu_click_option (placeholder): so kPlaceholderBackIndex "
     // telas desta arvore, SAVE-LOAD-UI etapa 6, ver os testes OpenSaveLoad* acima).
     SystemMenuState state;
     goto_config_categories(state);
-    (void)system_menu_key_down(state, SDLK_DOWN);    // Audio -> Video
-    (void)system_menu_key_down(state, SDLK_RETURN);  // entra em Video
+    (void)system_menu_key_down(state, glintfx::Key::Down);    // Audio -> Video
+    (void)system_menu_key_down(state, glintfx::Key::Enter);  // entra em Video
     REQUIRE(state.screen == SystemMenuScreen::Video);
 
     SystemMenuState invalido = state;
@@ -1471,7 +1471,7 @@ TEST_CASE("controls_scroll_target_index: navegacao normal em Controles devolve "
     SystemMenuState state;
     goto_controls(state);
     for (int i = 0; i < 25; ++i) {
-        (void)system_menu_key_down(state, SDLK_DOWN);
+        (void)system_menu_key_down(state, glintfx::Key::Down);
     }
     REQUIRE(state.controls_selected == 25);
     REQUIRE(controls_scroll_target_index(state) == 25);
@@ -1483,8 +1483,8 @@ TEST_CASE("controls_scroll_target_index: capturando tecla (mesma linha de "
           "[system_menu][controls][scroll]") {
     SystemMenuState state;
     goto_controls(state);
-    (void)system_menu_key_down(state, SDLK_DOWN);  // controls_selected = 1
-    (void)system_menu_key_down(state, SDLK_RETURN);  // entra em captura
+    (void)system_menu_key_down(state, glintfx::Key::Down);  // controls_selected = 1
+    (void)system_menu_key_down(state, glintfx::Key::Enter);  // entra em captura
     REQUIRE(state.controls_capturing == true);
     REQUIRE(controls_scroll_target_index(state) == 1);
 }
@@ -1496,9 +1496,9 @@ TEST_CASE("controls_scroll_target_index: mini-dialogo Restaurar padrao aberto "
     SystemMenuState state;
     goto_controls(state);
     for (int i = 0; i < kControlsRestoreIndex; ++i) {
-        (void)system_menu_key_down(state, SDLK_DOWN);
+        (void)system_menu_key_down(state, glintfx::Key::Down);
     }
-    (void)system_menu_key_down(state, SDLK_RETURN);  // abre o prompt "tem certeza?"
+    (void)system_menu_key_down(state, glintfx::Key::Enter);  // abre o prompt "tem certeza?"
     REQUIRE(state.controls_confirming_restore == true);
     REQUIRE(controls_scroll_target_index(state) == -1);
 }

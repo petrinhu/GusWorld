@@ -54,7 +54,8 @@
 #ifndef GUS_APP_SCREENS_DIFFICULTY_MENU_HPP
 #define GUS_APP_SCREENS_DIFFICULTY_MENU_HPP
 
-#include <SDL3/SDL.h>  // SDL_Keycode
+#include <glintfx/ui_event.hpp>  // glintfx::Key (M9-CAMADAS-SDL Fatia 2: tipo neutro,
+                                 // tela PURA nao precisa mais de SDL)
 
 #include "gus/app/screens/ui_hover.hpp"  // COCKPIT-SFX-HOVER-CLIQUE: UiHoverBox/ui_hover_index
 #include "gus/domain/save/save_data.hpp"  // DifficultyLevel
@@ -162,7 +163,7 @@ enum class DifficultyMenuAction {
 // seguranca de confirming_new_game em title_menu.hpp); ESC fora do splash
 // devolve Cancelled (ver o comentario do GAP no header).
 [[nodiscard]] DifficultyMenuAction difficulty_menu_key_down(
-    DifficultyMenuState& state, SDL_Keycode key) noexcept;
+    DifficultyMenuState& state, glintfx::Key key) noexcept;
 
 // MOUSE (clique numa opcao/pill, roteado pelo hit-test de geometria do host - ver
 // difficulty_menu_loop.cpp): trata o clique em `index` como "focar + confirmar"

@@ -72,7 +72,8 @@
 #include <map>
 #include <string>
 
-#include <SDL3/SDL.h>  // SDL_Keycode
+#include <glintfx/ui_event.hpp>  // glintfx::Key (M9-CAMADAS-SDL Fatia 2: tipo neutro,
+                                 // tela PURA nao precisa mais de SDL)
 
 #include "gus/domain/save/save_data.hpp"
 #include "gus/domain/save/save_serializer.hpp"  // LoadResult (motivo do unreadable_slot_preview)
@@ -319,7 +320,7 @@ enum class SaveLoadMenuAction {
 // (slot vazio ou OCUPADO em modo Load = SlotChosen direto; slot manual ocupado
 // em modo Save = abre o mini-dialogo de sobrescrita; slot present_unreadable em
 // modo Load = abre o AVISO dedicado, SAVE-LOAD-AVISOS). Delete (tecla dedicada,
-// SDLK_DELETE) sobre um slot OCUPADO abre o mini-dialogo de EXCLUSAO (ver
+// glintfx::Key::Delete) sobre um slot OCUPADO abre o mini-dialogo de EXCLUSAO (ver
 // save_load_menu_request_delete) - alvo = state.selected (o clique do MOUSE no
 // icone por-linha usa save_load_menu_click_slot/save_load_menu_request_delete
 // direto, targeting a linha clicada). Dentro do mini-dialogo de sobrescrita/
@@ -331,7 +332,7 @@ enum class SaveLoadMenuAction {
 // qualquer outro caso devolve WarningCancelled); ESC sempre equivale a Cancelar
 // (WarningCancelled). ESC/Voltar fora de QUALQUER dialogo/aviso devolve Back.
 [[nodiscard]] SaveLoadMenuAction save_load_menu_key_down(SaveLoadMenuState& state,
-                                                          SDL_Keycode key) noexcept;
+                                                          glintfx::Key key) noexcept;
 
 // Clique de MOUSE num slot da lista (fora de qualquer mini-dialogo/aviso, ver
 // save_load_menu_loop.cpp): equivalente a "focar + Enter" (MESMA convencao de

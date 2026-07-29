@@ -78,7 +78,7 @@ TEST_CASE("build_title_menu_rml: mini-dialogo de Novo Jogo substitui a lista",
     TitleMenuState state;
     title_menu_open(state, /*any_save_exists=*/true);
     state.selected = static_cast<int>(TitleMenuItem::NewGame);
-    (void)title_menu_key_down(state, SDLK_RETURN);  // abre o dialogo (ha save)
+    (void)title_menu_key_down(state, glintfx::Key::Enter);  // abre o dialogo (ha save)
     REQUIRE(state.confirming_new_game);
 
     const std::string rml = build_title_menu_rml(state, make_translator());

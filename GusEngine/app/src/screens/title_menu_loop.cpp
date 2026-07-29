@@ -77,6 +77,8 @@
 #include "gus/domain/save/save_serializer.hpp"  // LoadResult
 #include "gus/platform/assets/asset_source.hpp"  // FilesystemAssetSource (resolve do SFX)
 #include "gus/platform/fs/save_file_store.hpp"  // has_save/load_game
+#include "gus/platform/input/key_translation.hpp"  // sdl_key_to_godot_keycode (Fatia 2)
+#include "gus/platform/input/key_translation_glintfx.hpp"  // godot_keycode_to_glintfx_key
 #include "gus/platform/render2d/render2d_gl3.hpp"
 #include "gus/platform/rmlui/gl3_loader.hpp"  // gl3_read_backbuffer_rgba (gl3_load_functions
                                               // era usado so por run_title_menu_loop_owning_gl,
@@ -273,6 +275,26 @@ void apply_title_action_to_result(TitleStepResult& result, TitleMenuAction actio
     }
 }
 
+// Traduz SDL_Keycode -> glintfx::Key REUSANDO a ponte SDL->Godot->glintfx JA
+// EXISTENTE e testada adversarialmente (F4-2, 8/8 mutantes mortos):
+// platform/input/key_translation.hpp (SDL_Keycode -> keycode Godot) +
+// platform/input/key_translation_glintfx.hpp (keycode Godot -> glintfx::Key).
+// Evita duplicar uma 3a tabela SDLK_*->glintfx::Key so pra esta tela
+// (M9-CAMADAS-SDL Fatia 2, docs/tech/plano-camadas-sdl.md) - title_menu.hpp
+// (a logica PURA) so conhece glintfx::Key, o SDL fica 100% aqui no loop.
+//
+// SDLK_RETURN e SDLK_KP_ENTER colapsam no MESMO Key::Enter pela ponte Godot
+// (key_translation.cpp ja fundia as duas no MESMO kGodotEnter, ANTES desta
+// fatia) - preserva EXATAMENTE o comportamento anterior (title_menu.cpp ja
+// tratava as duas teclas como sinonimo em is_confirm_key), nao e regressao.
+// glintfx::Key nao tem KpEnter dedicado - lacuna ja reportada ao glintfx.
+glintfx::Key sdl_keycode_to_menu_key(SDL_Keycode sdl_key) noexcept {
+    const long long godot =
+        gus::platform::input::sdl_key_to_godot_keycode(static_cast<int>(sdl_key));
+    return gus::platform::input::godot_keycode_to_glintfx_key(godot)
+        .value_or(glintfx::Key::None);
+}
+
 }  // namespace
 
 // F4-1b.3: implementacao de title_screen_step (declarada no .hpp) - ver o
@@ -306,7 +328,8 @@ TitleStepResult title_screen_step(TitleMenuState& state, const SDL_Event& ev,
             // (MESMO comportamento antigo: nao ha "item bloqueado" na tela de
             // titulo, ao contrario da tela de dificuldade).
             result.sfx = TitleSfxKind::Click;
-            const TitleMenuAction action = title_menu_key_down(state, ev.key.key);
+            const TitleMenuAction action =
+                title_menu_key_down(state, sdl_keycode_to_menu_key(ev.key.key));
             apply_title_action_to_result(result, action);
         } else {
             // Navegacao (setas/WASD/ESC) - SOM DE HOVER PARIDADE TECLADO x
@@ -314,7 +337,8 @@ TitleStepResult title_screen_step(TitleMenuState& state, const SDL_Event& ev,
             // NAO mudou E moveu pra um item NOVO, toca hover_sfx.
             const bool confirming_before = state.confirming_new_game;
             const int kb_index_before = title_keyboard_focus_index(state);
-            const TitleMenuAction action = title_menu_key_down(state, ev.key.key);
+            const TitleMenuAction action =
+                title_menu_key_down(state, sdl_keycode_to_menu_key(ev.key.key));
             if (state.confirming_new_game == confirming_before) {
                 const int kb_index_after = title_keyboard_focus_index(state);
                 if (ui_hover_entered_new_item(kb_index_before, kb_index_after)) {

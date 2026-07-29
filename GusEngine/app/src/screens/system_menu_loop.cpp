@@ -98,6 +98,7 @@
 #include "gus/platform/fs/save_file_store.hpp"  // SAVE-LOAD-UI etapa 6: save_game (selftest)
 #include "gus/platform/fs/settings_file_store.hpp"
 #include "gus/platform/input/key_translation.hpp"  // sdl_key_to_godot_keycode (captura, M2)
+#include "gus/platform/input/key_translation_glintfx.hpp"  // godot_keycode_to_glintfx_key (Fatia 2)
 #include "gus/platform/render2d/render2d_gl3.hpp"
 
 // stb_image_write: SO a declaracao aqui (a IMPLEMENTACAO ja vive UMA vez em
@@ -475,6 +476,26 @@ void apply_system_menu_action_to_result(SystemMenuStepResult& result,
     }
 }
 
+// Traduz SDL_Keycode -> glintfx::Key REUSANDO a ponte SDL->Godot->glintfx JA
+// EXISTENTE e testada adversarialmente (F4-2, 8/8 mutantes mortos):
+// platform/input/key_translation.hpp (SDL_Keycode -> keycode Godot) +
+// platform/input/key_translation_glintfx.hpp (keycode Godot -> glintfx::Key).
+// Evita duplicar uma 3a tabela SDLK_*->glintfx::Key so pra esta tela
+// (M9-CAMADAS-SDL Fatia 2, docs/tech/plano-camadas-sdl.md) - system_menu.hpp
+// (a logica PURA) so conhece glintfx::Key, o SDL fica 100% aqui no loop.
+//
+// SDLK_RETURN e SDLK_KP_ENTER colapsam no MESMO Key::Enter pela ponte Godot
+// (key_translation.cpp ja fundia as duas no MESMO kGodotEnter, ANTES desta
+// fatia) - preserva EXATAMENTE o comportamento anterior (system_menu.cpp ja
+// tratava as duas teclas como sinonimo, fallthrough de switch - 8 sites).
+// glintfx::Key nao tem KpEnter dedicado - lacuna ja reportada ao glintfx.
+glintfx::Key sdl_keycode_to_menu_key(SDL_Keycode sdl_key) noexcept {
+    const long long godot =
+        gus::platform::input::sdl_key_to_godot_keycode(static_cast<int>(sdl_key));
+    return gus::platform::input::godot_keycode_to_glintfx_key(godot)
+        .value_or(glintfx::Key::None);
+}
+
 }  // namespace
 
 // F4-1b.4: implementacao de system_screen_step (declarada no .hpp) - ver o
@@ -528,7 +549,8 @@ SystemMenuStepResult system_screen_step(SystemMenuState& state, const SDL_Event&
             // resultante confirme algo (ver is_confirming acima).
             const SystemMenuState pre_action_state = state;
             const int item_index = confirm_item_index(state);
-            const SystemMenuAction action = system_menu_key_down(state, ev.key.key);
+            const SystemMenuAction action =
+                system_menu_key_down(state, sdl_keycode_to_menu_key(ev.key.key));
             if (is_confirming(action)) {
                 result.flash = SystemMenuFlashInfo{pre_action_state, item_index};
             }
@@ -541,7 +563,8 @@ SystemMenuStepResult system_screen_step(SystemMenuState& state, const SDL_Event&
             // indices ENTRE telas diferentes nao faz sentido).
             const SystemMenuScreen screen_before = state.screen;
             const int kb_index_before = system_menu_keyboard_focus_index(state);
-            const SystemMenuAction action = system_menu_key_down(state, ev.key.key);
+            const SystemMenuAction action =
+                system_menu_key_down(state, sdl_keycode_to_menu_key(ev.key.key));
             if (state.screen == screen_before) {
                 const int kb_index_after = system_menu_keyboard_focus_index(state);
                 if (system_menu_hover_entered_new_item(kb_index_before, kb_index_after)) {
@@ -1298,7 +1321,7 @@ class SystemMenuLoopScreen final : public gus::app::ScreenState {
         // controls_applied/reload, sem flash - o selftest historico nunca
         // exercitou o flash nestas transicoes de tela).
         state_.pause_selected = static_cast<int>(PauseItem::Settings);
-        selftest_route_only_(system_menu_key_down(state_, SDLK_RETURN));
+        selftest_route_only_(system_menu_key_down(state_, glintfx::Key::Enter));
         const bool entered_config = state_.screen == SystemMenuScreen::ConfigCategories;
 
         // ESC (NAO e confirm-key - passa pelo ramo de navegacao igual a
@@ -1325,8 +1348,8 @@ class SystemMenuLoopScreen final : public gus::app::ScreenState {
         // - hover_sfx NAO deve tocar. Entra em Configuracoes (Audio ja
         // selecionado, indice 0) -> Audio (Musica, indice 0), ambos ENTER
         // (confirm-key).
-        selftest_route_only_(system_menu_key_down(state_, SDLK_RETURN));  // -> ConfigCategories
-        selftest_route_only_(system_menu_key_down(state_, SDLK_RETURN));  // -> Audio
+        selftest_route_only_(system_menu_key_down(state_, glintfx::Key::Enter));  // -> ConfigCategories
+        selftest_route_only_(system_menu_key_down(state_, glintfx::Key::Enter));  // -> Audio
         const bool entered_audio = state_.screen == SystemMenuScreen::Audio;
         const unsigned int baseline_slider = audio_.sfx_play_count();
         handle_event(key_down_event_(SDLK_LEFT));
@@ -1368,12 +1391,12 @@ class SystemMenuLoopScreen final : public gus::app::ScreenState {
     void run_controls_selftest_() {
         // Pause -> ConfigCategories -> Controls (navegacao REAL via
         // system_menu_key_down). (void): so a mutacao de state_ importa aqui.
-        (void)system_menu_key_down(state_, SDLK_DOWN);    // Continue->Save
-        (void)system_menu_key_down(state_, SDLK_DOWN);    // Save->Settings
-        (void)system_menu_key_down(state_, SDLK_RETURN);  // entra ConfigCategories
-        (void)system_menu_key_down(state_, SDLK_DOWN);    // Audio->Video
-        (void)system_menu_key_down(state_, SDLK_DOWN);    // Video->Controls
-        (void)system_menu_key_down(state_, SDLK_RETURN);  // entra Controls
+        (void)system_menu_key_down(state_, glintfx::Key::Down);    // Continue->Save
+        (void)system_menu_key_down(state_, glintfx::Key::Down);    // Save->Settings
+        (void)system_menu_key_down(state_, glintfx::Key::Enter);  // entra ConfigCategories
+        (void)system_menu_key_down(state_, glintfx::Key::Down);    // Audio->Video
+        (void)system_menu_key_down(state_, glintfx::Key::Down);    // Video->Controls
+        (void)system_menu_key_down(state_, glintfx::Key::Enter);  // entra Controls
         reload_();
         present_frame_();
         present_frame_();  // 2o update() por seguranca (layout assentado)
@@ -1415,7 +1438,7 @@ class SystemMenuLoopScreen final : public gus::app::ScreenState {
 
         // BUG-3 (teclado): DOWN 3x tem que avancar controls_selected 0->3.
         for (int i = 0; i < 3; ++i) {
-            (void)system_menu_key_down(state_, SDLK_DOWN);
+            (void)system_menu_key_down(state_, glintfx::Key::Down);
         }
         reload_();
         present_frame_();
@@ -1486,7 +1509,7 @@ class SystemMenuLoopScreen final : public gus::app::ScreenState {
 
         // GLINTFX-SCROLL (M2): re-entra em Controles (config_categories_selected
         // ainda aponta pra ela). (void): so a mutacao importa.
-        (void)system_menu_key_down(state_, SDLK_RETURN);
+        (void)system_menu_key_down(state_, glintfx::Key::Enter);
         reload_();
         present_frame_();
         present_frame_();
@@ -1521,7 +1544,7 @@ class SystemMenuLoopScreen final : public gus::app::ScreenState {
 
         // (a) TECLADO: navega ate uma action perto do FIM da lista (25a).
         for (int i = 0; i < 25; ++i) {
-            (void)system_menu_key_down(state_, SDLK_DOWN);
+            (void)system_menu_key_down(state_, glintfx::Key::Down);
             reload_();
         }
         present_frame_();

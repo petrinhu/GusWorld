@@ -63,15 +63,15 @@ TEST_CASE("title_menu_key_down: Baixo/Cima pulam Continuar quando desabilitado (
     title_menu_open(state, /*any_save_exists=*/false);
     REQUIRE(state.selected == static_cast<int>(TitleMenuItem::NewGame));
 
-    REQUIRE(title_menu_key_down(state, SDLK_DOWN) == TitleMenuAction::None);
+    REQUIRE(title_menu_key_down(state, glintfx::Key::Down) == TitleMenuAction::None);
     REQUIRE(state.selected == static_cast<int>(TitleMenuItem::Quit));
 
     // DOWN de novo: wrap ate NewGame de novo (pula Continue, indice 0, desabilitado).
-    REQUIRE(title_menu_key_down(state, SDLK_DOWN) == TitleMenuAction::None);
+    REQUIRE(title_menu_key_down(state, glintfx::Key::Down) == TitleMenuAction::None);
     REQUIRE(state.selected == static_cast<int>(TitleMenuItem::NewGame));
 
     // UP a partir de NewGame: wrap pro ULTIMO selecionavel (Quit, pula Continue).
-    REQUIRE(title_menu_key_down(state, SDLK_UP) == TitleMenuAction::None);
+    REQUIRE(title_menu_key_down(state, glintfx::Key::Up) == TitleMenuAction::None);
     REQUIRE(state.selected == static_cast<int>(TitleMenuItem::Quit));
 }
 
@@ -81,11 +81,11 @@ TEST_CASE("title_menu_key_down: com save existente, navegacao visita os 3 itens"
     title_menu_open(state, /*any_save_exists=*/true);
     REQUIRE(state.selected == static_cast<int>(TitleMenuItem::Continue));
 
-    REQUIRE(title_menu_key_down(state, SDLK_DOWN) == TitleMenuAction::None);
+    REQUIRE(title_menu_key_down(state, glintfx::Key::Down) == TitleMenuAction::None);
     REQUIRE(state.selected == static_cast<int>(TitleMenuItem::NewGame));
-    REQUIRE(title_menu_key_down(state, SDLK_DOWN) == TitleMenuAction::None);
+    REQUIRE(title_menu_key_down(state, glintfx::Key::Down) == TitleMenuAction::None);
     REQUIRE(state.selected == static_cast<int>(TitleMenuItem::Quit));
-    REQUIRE(title_menu_key_down(state, SDLK_DOWN) == TitleMenuAction::None);
+    REQUIRE(title_menu_key_down(state, glintfx::Key::Down) == TitleMenuAction::None);
     REQUIRE(state.selected == static_cast<int>(TitleMenuItem::Continue));
 }
 
@@ -93,9 +93,9 @@ TEST_CASE("title_menu_key_down: WASD espelha as setas (W=cima, S=baixo)",
           "[title_menu]") {
     TitleMenuState state;
     title_menu_open(state, /*any_save_exists=*/true);
-    REQUIRE(title_menu_key_down(state, SDLK_S) == TitleMenuAction::None);
+    REQUIRE(title_menu_key_down(state, glintfx::Key::S) == TitleMenuAction::None);
     REQUIRE(state.selected == static_cast<int>(TitleMenuItem::NewGame));
-    REQUIRE(title_menu_key_down(state, SDLK_W) == TitleMenuAction::None);
+    REQUIRE(title_menu_key_down(state, glintfx::Key::W) == TitleMenuAction::None);
     REQUIRE(state.selected == static_cast<int>(TitleMenuItem::Continue));
 }
 
@@ -105,14 +105,14 @@ TEST_CASE("title_menu_key_down: Enter em Continuar (habilitado) devolve Continue
           "[title_menu]") {
     TitleMenuState state;
     title_menu_open(state, /*any_save_exists=*/true);
-    REQUIRE(title_menu_key_down(state, SDLK_RETURN) == TitleMenuAction::ContinueGame);
+    REQUIRE(title_menu_key_down(state, glintfx::Key::Enter) == TitleMenuAction::ContinueGame);
 }
 
 TEST_CASE("title_menu_key_down: Enter em Sair devolve RequestQuit", "[title_menu]") {
     TitleMenuState state;
     title_menu_open(state, /*any_save_exists=*/true);
     state.selected = static_cast<int>(TitleMenuItem::Quit);
-    REQUIRE(title_menu_key_down(state, SDLK_RETURN) == TitleMenuAction::RequestQuit);
+    REQUIRE(title_menu_key_down(state, glintfx::Key::Enter) == TitleMenuAction::RequestQuit);
 }
 
 TEST_CASE("title_menu_key_down: Enter em Novo Jogo SEM save nenhum comeca DIRETO "
@@ -121,7 +121,7 @@ TEST_CASE("title_menu_key_down: Enter em Novo Jogo SEM save nenhum comeca DIRETO
     TitleMenuState state;
     title_menu_open(state, /*any_save_exists=*/false);
     REQUIRE(state.selected == static_cast<int>(TitleMenuItem::NewGame));
-    REQUIRE(title_menu_key_down(state, SDLK_RETURN) == TitleMenuAction::StartNewGame);
+    REQUIRE(title_menu_key_down(state, glintfx::Key::Enter) == TitleMenuAction::StartNewGame);
     REQUIRE_FALSE(state.confirming_new_game);
 }
 
@@ -131,7 +131,7 @@ TEST_CASE("title_menu_key_down: Enter em Novo Jogo COM save existente abre o "
     TitleMenuState state;
     title_menu_open(state, /*any_save_exists=*/true);
     state.selected = static_cast<int>(TitleMenuItem::NewGame);
-    REQUIRE(title_menu_key_down(state, SDLK_RETURN) == TitleMenuAction::None);
+    REQUIRE(title_menu_key_down(state, glintfx::Key::Enter) == TitleMenuAction::None);
     REQUIRE(state.confirming_new_game);
     REQUIRE(state.confirm_selected == 1);  // default seguro = Nao
 }
@@ -144,9 +144,9 @@ TEST_CASE("title_menu_key_down: mini-dialogo - Enter com Nao (default) cancela, 
     TitleMenuState state;
     title_menu_open(state, /*any_save_exists=*/true);
     state.selected = static_cast<int>(TitleMenuItem::NewGame);
-    (void)title_menu_key_down(state, SDLK_RETURN);  // abre o dialogo
+    (void)title_menu_key_down(state, glintfx::Key::Enter);  // abre o dialogo
 
-    REQUIRE(title_menu_key_down(state, SDLK_RETURN) == TitleMenuAction::None);
+    REQUIRE(title_menu_key_down(state, glintfx::Key::Enter) == TitleMenuAction::None);
     REQUIRE_FALSE(state.confirming_new_game);
 }
 
@@ -156,11 +156,11 @@ TEST_CASE("title_menu_key_down: mini-dialogo - alternar pra Sim e confirmar devo
     TitleMenuState state;
     title_menu_open(state, /*any_save_exists=*/true);
     state.selected = static_cast<int>(TitleMenuItem::NewGame);
-    (void)title_menu_key_down(state, SDLK_RETURN);  // abre o dialogo
+    (void)title_menu_key_down(state, glintfx::Key::Enter);  // abre o dialogo
 
-    REQUIRE(title_menu_key_down(state, SDLK_LEFT) == TitleMenuAction::None);
+    REQUIRE(title_menu_key_down(state, glintfx::Key::Left) == TitleMenuAction::None);
     REQUIRE(state.confirm_selected == 0);
-    REQUIRE(title_menu_key_down(state, SDLK_RETURN) == TitleMenuAction::StartNewGame);
+    REQUIRE(title_menu_key_down(state, glintfx::Key::Enter) == TitleMenuAction::StartNewGame);
     REQUIRE_FALSE(state.confirming_new_game);
 }
 
@@ -169,9 +169,9 @@ TEST_CASE("title_menu_key_down: mini-dialogo - Esc equivale a Nao (seguranca)",
     TitleMenuState state;
     title_menu_open(state, /*any_save_exists=*/true);
     state.selected = static_cast<int>(TitleMenuItem::NewGame);
-    (void)title_menu_key_down(state, SDLK_RETURN);  // abre o dialogo
+    (void)title_menu_key_down(state, glintfx::Key::Enter);  // abre o dialogo
 
-    REQUIRE(title_menu_key_down(state, SDLK_ESCAPE) == TitleMenuAction::None);
+    REQUIRE(title_menu_key_down(state, glintfx::Key::Escape) == TitleMenuAction::None);
     REQUIRE_FALSE(state.confirming_new_game);
 }
 
@@ -199,7 +199,7 @@ TEST_CASE("title_menu_click_option: no mini-dialogo, index reinterpreta como Sim
     TitleMenuState state;
     title_menu_open(state, /*any_save_exists=*/true);
     state.selected = static_cast<int>(TitleMenuItem::NewGame);
-    (void)title_menu_key_down(state, SDLK_RETURN);  // abre o dialogo
+    (void)title_menu_key_down(state, glintfx::Key::Enter);  // abre o dialogo
 
     REQUIRE(title_menu_click_option(state, 0) == TitleMenuAction::StartNewGame);
     REQUIRE_FALSE(state.confirming_new_game);
@@ -214,7 +214,7 @@ TEST_CASE("title_keyboard_focus_index: fora do mini-dialogo devolve state.select
     REQUIRE(title_keyboard_focus_index(state) ==
             static_cast<int>(TitleMenuItem::Continue));
 
-    (void)title_menu_key_down(state, SDLK_DOWN);
+    (void)title_menu_key_down(state, glintfx::Key::Down);
     REQUIRE(title_keyboard_focus_index(state) ==
             static_cast<int>(TitleMenuItem::NewGame));
 }
@@ -224,11 +224,11 @@ TEST_CASE("title_keyboard_focus_index: no mini-dialogo devolve confirm_selected"
     TitleMenuState state;
     title_menu_open(state, /*any_save_exists=*/true);
     state.selected = static_cast<int>(TitleMenuItem::NewGame);
-    (void)title_menu_key_down(state, SDLK_RETURN);  // abre o dialogo (confirm_selected=1)
+    (void)title_menu_key_down(state, glintfx::Key::Enter);  // abre o dialogo (confirm_selected=1)
     REQUIRE(state.confirming_new_game);
     REQUIRE(title_keyboard_focus_index(state) == 1);
 
-    (void)title_menu_key_down(state, SDLK_LEFT);  // alterna pra Sim (indice 0)
+    (void)title_menu_key_down(state, glintfx::Key::Left);  // alterna pra Sim (indice 0)
     REQUIRE(title_keyboard_focus_index(state) == 0);
 }
 
@@ -278,7 +278,7 @@ TEST_CASE("title_hover_index: no mini-dialogo, SO as 2 primeiras caixas contam "
     TitleMenuState state;
     title_menu_open(state, /*any_save_exists=*/true);
     state.selected = static_cast<int>(TitleMenuItem::NewGame);
-    (void)title_menu_key_down(state, SDLK_RETURN);  // abre o dialogo
+    (void)title_menu_key_down(state, glintfx::Key::Enter);  // abre o dialogo
     REQUIRE(state.confirming_new_game);
 
     UiHoverBox boxes[kTitleItemCount];

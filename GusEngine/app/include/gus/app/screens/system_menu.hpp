@@ -5,9 +5,10 @@
 // MENU-PAUSA-CONFIG-SOM (M7-COSTURA). POCO 100% testavel sem SDL_Init/janela/
 // glintfx - so o estado de navegacao/selecao/volume (mesmo espirito de
 // gus/app/maestro_logic.hpp e da funcao-livre battle_key_down em
-// battle_preview.hpp). Consome SDL_Keycode diretamente (app/ ja e camada
-// SDL-aware, mesmo padrao de battle_key_down) mas NAO abre janela nem chama
-// SDL_Init - so compara o valor do enum.
+// battle_preview.hpp). Consome glintfx::Key (tipo neutro, M9-CAMADAS-SDL Fatia 2 -
+// docs/tech/plano-camadas-sdl.md; ANTES desta fatia consumia SDL_Keycode direto)
+// - o CHAMADOR (system_menu_loop.cpp) e quem traduz SDL_Event->glintfx::Key, esta
+// tela nao abre janela nem toca SDL, so compara o valor do enum.
 //
 // ARVORE HIERARQUICA (revisao MENU-PAUSA-CONFIG-SOM "onda arvore", aprovada ao
 // vivo pelo lider - substitui as 2 telas planas originais Pause/Config por uma
@@ -60,7 +61,8 @@
 #include <string>
 #include <string_view>
 
-#include <SDL3/SDL.h>  // SDL_Keycode
+#include <glintfx/ui_event.hpp>  // glintfx::Key (M9-CAMADAS-SDL Fatia 2: tipo neutro,
+                                 // tela PURA nao precisa mais de SDL)
 
 #include "gus/domain/input/input_binding.hpp"  // InputRemapConfig/KeyBinding (tela Controles)
 
@@ -341,7 +343,7 @@ void system_menu_close(SystemMenuState& state) noexcept;
 // (o menu nao esta aberto - o chamador nao deveria chamar aqui, mas e
 // defensivo) ou se a tecla nao tem efeito no estado/tela atual.
 [[nodiscard]] SystemMenuAction system_menu_key_down(SystemMenuState& state,
-                                                     SDL_Keycode key) noexcept;
+                                                     glintfx::Key key) noexcept;
 
 // CAPTURA DE TECLA (tela Controles, M2): chamado pelo LOOP (nao por
 // system_menu_key_down) quando state.controls_capturing==true e uma tecla real
