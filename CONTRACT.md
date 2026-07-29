@@ -148,6 +148,7 @@ DoD MUST ser satisfeito antes de marcar task ✅ no TODO.md.
 - [ ] Invariante das 4 camadas: `core/`+`domain/` NÃO incluem `<SDL...>` nem qualquer header de plataforma (auditável por grep no CI).
 - [ ] Commit message segue §2.
 - [ ] Cooling-off respeitado se feature grande (§3).
+- [ ] Se a feature introduz um `IRenderer` novo cujo `draw_text` rasteriza com avanço PROPORCIONAL (não monospace fixo): `measure_text_width()` **MUST** ser cross-checado contra o `draw_text()` real (renderiza, lê os pixels de volta, compara a bbox de conteúdo com o valor medido) via probe descartável em `app/tools/` antes do merge, receita: `cockpit_hp_text_probe.cpp`. **Isto NÃO é automático em CI**: a convenção deste projeto mantém SDL/GL real fora do `ctest` (só em probes descartáveis rodados à mão, nenhum teste Catch2 do repo chama `SDL_Init` de verdade), e a alternativa que existiria (cross-check dentro do próprio `ctest`) cobriria só o `Render2dSdl`, o único legado que roda sob driver `dummy` sem GL real, que é justamente um dos renderers marcados pra morrer na F4-4 (decommission da casca SDL). Pagar quebra de convenção mais risco de portabilidade no CI Windows pra proteger o que já vai sumir inverte o custo/benefício. **Gatilho de revisão:** quando a F4-4 fechar e sobrar um `IRenderer` só, esta regra de processo manual **MUST** ser reavaliada pra enforcement automático (detalhe: `TODO.md` item `MEDIDA-TEXTO-ENFORCEMENT`).
 
 ### DoD: feat(art)
 
