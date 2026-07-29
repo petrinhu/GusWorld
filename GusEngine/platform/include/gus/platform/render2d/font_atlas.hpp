@@ -51,21 +51,41 @@ inline constexpr int kFontFirstChar = kFontAsciiFirst;
 inline constexpr int kFontLastChar = kFontAsciiLast;
 
 // D2D-2-SENTINELA: teto de tamanhos de atlas (cell_px) CACHEADOS por face (regular/bold).
-// O bake vira SOB DEMANDA no tamanho realmente desenhado (era 16px fixo com downscale na
-// GPU - o defeito original: HUD a 8px saia pontilhado). Cache indefinido dentro do teto;
-// se estourar, o caller evicta LRU (nunca cresce sem limite, nunca crasha - so re-bakeia
-// o tamanho menos usado recentemente). Uso real medido por varredura de todo call-site de
-// draw_text() no jogo (D2D-2-SENTINELA, 2026-07): 11 tamanhos inteiros distintos
-// (8,9,10,11,12,13,14,15,20,24,30) + 1 fracionario computado em runtime
-// (sdl_window.cpp:render_dialogue_overlay_frame) = ~12 tamanhos/face. 32 da ~2.6x de
-// folga sem custo de memoria relevante (o maior atlas, 30px, e ~172KB grayscale).
+// O bake vira SOB DEMANDA no tamanho realmente RENDERIZADO NA TELA (era 16px fixo com
+// downscale na GPU - o defeito original: HUD a 8px saia pontilhado). Cache indefinido
+// dentro do teto; se estourar, o caller evicta LRU (nunca cresce sem limite, nunca
+// crasha - so re-bakeia o tamanho menos usado recentemente).
+//
+// CORRECAO (mesmo dia, achado do team-lead + medicao propria): a chave do bake NAO pode
+// ser o px_size (mundo) cru - ver bake_cell_px_for_draw() abaixo. px_size so aproxima o
+// tamanho final em TELA quando a camera tem escala ~1:1 (ex.: o HUD do cockpit, camera
+// Rect{0,0,960,540} ~= viewport). Numa camera com ZOOM de verdade (overworld,
+// px_per_world_unit=21.5), um px_size de mundo de ~0.94 (dialogo, sdl_window.cpp) bakeado
+// cru daria cell_px=1 - atlas ilegivel - mesmo o glifo aparecendo com ~20px REAIS na
+// tela. Por isso o teto de 32/face cobre nao so os ~12 tamanhos-base do jogo, mas a
+// FAIXA de tamanhos FISICOS que o resize da janela produz pra cada um (ver o relatorio
+// D2D-2-SENTINELA, secao 8, pra a medicao completa de cardinalidade/custo).
 inline constexpr int kMaxCachedFontSizesPerFace = 32;
 
-// Arredonda um px_size FRACIONARIO (o HUD usa float - text_metrics/kMonoAdvanceRatio
-// continuam so com float; isto e SO pra escolher a resolucao do BAKE) pro tamanho de
-// celula INTEIRO mais proximo. Clampa em >=1 (NaN/<=0 degrada pra 1, nunca 0/negativo -
-// bake_font_atlas ja rejeita cell_px<=0, mas o caller nao deveria nem tentar).
+// Arredonda um valor FRACIONARIO (px_size OU px_size-ja-escalado-pra-tela - ver
+// bake_cell_px_for_draw) pro tamanho de celula INTEIRO mais proximo. Clampa em >=1
+// (NaN/<=0 degrada pra 1, nunca 0/negativo - bake_font_atlas ja rejeita cell_px<=0, mas
+// o caller nao deveria nem tentar).
 [[nodiscard]] int quantize_cell_px(float px_size) noexcept;
+
+// Resolve o cell_px de BAKE certo pro tamanho REALMENTE exibido na tela, dado px_size
+// (tamanho do glifo em unidades de MUNDO, o que o draw_text recebe) e o eixo VERTICAL da
+// camera ativa (cam_axis_world = altura do retangulo de mundo visivel;
+// viewport_axis_px = altura real da viewport em pixels - a MESMA dupla que
+// viewport_transform::world_to_screen usa pro eixo Y). Multiplica px_size pela razao
+// pixels-por-unidade-de-mundo (a MESMA conta que o build_quad_screen faz na hora de
+// desenhar), e SO DEPOIS arredonda - assim o bake acompanha o zoom de qualquer camera,
+// nao so a identidade (câmera com escala ~1:1, ex.: HUD do cockpit). Camera degenerada
+// (cam_axis_world<=0) ou viewport invalido (<=0) cai pra escala 1.0 (trata px_size como
+// se ja fosse tamanho de tela - a mesma suposicao "camera identidade" que o codigo
+// assumia informalmente antes deste fix), nunca divide por zero.
+[[nodiscard]] int bake_cell_px_for_draw(float px_size, float cam_axis_world,
+                                        int viewport_axis_px) noexcept;
 
 // Slot linear (0..kFontGlyphCount-1) de um CODEPOINT, ou -1 se fora das faixas baked.
 [[nodiscard]] int glyph_slot(int codepoint) noexcept;

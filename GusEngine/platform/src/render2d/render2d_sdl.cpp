@@ -303,9 +303,13 @@ void Render2dSdl::draw_text(const char* text, float x, float y, float px_size,
     if (text == nullptr || px_size <= 0.0f) {
         return;
     }
-    // D2D-2-SENTINELA: bakeia no tamanho REALMENTE desenhado (arredondado pro inteiro
-    // mais proximo), nao mais 16px fixo com downscale na GPU.
-    const int cell_px = quantize_cell_px(px_size);
+    // D2D-2-SENTINELA: bakeia no tamanho REALMENTE renderizado na TELA (px_size, em
+    // unidades de mundo, escalado pelo zoom da camera ativa no eixo Y - bake_cell_px_for_draw,
+    // font_atlas.hpp). Correcao pos-review: quantizar o px_size CRU quebrava o overlay de
+    // dialogo (camera com zoom real, ppu=21.5) - dava cell_px=1 (atlas ilegivel) mesmo o
+    // glifo aparecendo com ~20px reais na tela. Nao mais 16px fixo com downscale na GPU
+    // (o defeito original).
+    const int cell_px = bake_cell_px_for_draw(px_size, camera_.h, pixel_h_);
     BakedFontSize* face = ensure_font(bold, cell_px);
     if (face == nullptr) {
         return;  // sem fonte (headless/ausente): no-op, o caller ja desenhou o fallback

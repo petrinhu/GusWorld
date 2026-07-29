@@ -66,6 +66,17 @@ int quantize_cell_px(float px_size) noexcept {
     return static_cast<int>(rounded);
 }
 
+int bake_cell_px_for_draw(float px_size, float cam_axis_world,
+                          int viewport_axis_px) noexcept {
+    float scale = 1.0f;  // degenerado (camera/viewport invalidos): trata px_size como
+                         // se ja fosse tamanho de tela - MESMA suposicao "identidade"
+                         // que o codigo assumia informalmente antes deste fix.
+    if (cam_axis_world > 0.0f && viewport_axis_px > 0) {
+        scale = static_cast<float>(viewport_axis_px) / cam_axis_world;
+    }
+    return quantize_cell_px(px_size * scale);
+}
+
 int glyph_slot(int codepoint) noexcept {
     // ASCII printable -> slots 0..94; Latin-1 (160..255) -> slots 95..190. Fora = -1.
     if (codepoint >= kFontAsciiFirst && codepoint <= kFontAsciiLast) {

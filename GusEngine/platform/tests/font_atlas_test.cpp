@@ -19,6 +19,7 @@
 
 #include "gus/platform/render2d/font_atlas.hpp"
 
+using gus::platform::render2d::bake_cell_px_for_draw;
 using gus::platform::render2d::bake_font_atlas;
 using gus::platform::render2d::FontAtlas;
 using gus::platform::render2d::quantize_cell_px;
@@ -110,6 +111,36 @@ TEST_CASE("quantize_cell_px degrada pro minimo (1) sem crash em entradas invalid
     REQUIRE(quantize_cell_px(0.4f) == 1);  // arredondaria pra 0; clampado em 1
     // NaN: comparacao "> 0.0f" com NaN e sempre false -> cai no ramo de invalido.
     REQUIRE(quantize_cell_px(std::numeric_limits<float>::quiet_NaN()) == 1);
+}
+
+TEST_CASE("bake_cell_px_for_draw escala px_size pelo zoom da camera (nao usa px_size cru)",
+          "[font_atlas]") {
+    // REGRESSAO (achada em 2026-07, pos-review do team-lead): o HUD do cockpit desenha
+    // com camera ~identidade (Rect{0,0,960,540}, pixel_w/h tipicamente ~960x540) -
+    // px_size (mundo) ja aproxima o tamanho final em tela, entao a escala e ~1.0.
+    REQUIRE(bake_cell_px_for_draw(8.0f, /*cam_axis_world=*/540.0f,
+                                  /*viewport_axis_px=*/540) == 8);
+    REQUIRE(bake_cell_px_for_draw(8.0f, 540.0f, 1080) == 16);  // janela 2x: escala 2.0
+
+    // CASO REAL que expos o bug do design anterior (quantizar px_size CRU): o overlay de
+    // dialogo (sdl_window.cpp:render_dialogue_overlay_frame) usa a camera do OVERWORLD,
+    // que tem ZOOM de verdade (px_per_world_unit=21.5 medido via probe standalone contra
+    // a cidade real). px_size ali e ~0.9377 (unidades de MUNDO) - quantize_cell_px cru
+    // dava cell_px=1 (atlas ILEGIVEL), mesmo o glifo aparecendo com ~20px REAIS na tela.
+    // bake_cell_px_for_draw com o eixo da camera (cam.rect.h=33.4884, viewport_px_h=720)
+    // corrige pro tamanho fisico correto.
+    const float px_size_dialogo = 0.937674f;  // cam.rect.h(33.4884) * 0.028, medido
+    const float cam_h_overworld = 33.4884f;   // cam.rect.h medido (cidade real, probe)
+    const int cell_px = bake_cell_px_for_draw(px_size_dialogo, cam_h_overworld, 720);
+    REQUIRE(cell_px == 20);  // 0.9377 * (720/33.4884) = 0.9377*21.5 = 20.16 -> 20
+    REQUIRE(cell_px > 1);    // trava a regressao: NUNCA mais cai pro bake ilegivel de nda
+
+    // Camera/viewport degenerados: cai pra escala 1.0 (trata px_size cru como se ja
+    // fosse tela), nunca divide por zero, nunca crash.
+    REQUIRE(bake_cell_px_for_draw(8.0f, /*cam_axis_world=*/0.0f, 720) == 8);
+    REQUIRE(bake_cell_px_for_draw(8.0f, -5.0f, 720) == 8);
+    REQUIRE(bake_cell_px_for_draw(8.0f, 540.0f, /*viewport_axis_px=*/0) == 8);
+    REQUIRE(bake_cell_px_for_draw(8.0f, 540.0f, -100) == 8);
 }
 
 TEST_CASE("bake_font_atlas produz atlases distintos e coerentes em varios cell_px",

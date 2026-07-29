@@ -552,9 +552,12 @@ void Render2dGl3::draw_text(const char* text, float x, float y, float px_size,
         return;
     }
     if (!impl_) return;  // headless
-    // D2D-2-SENTINELA: bakeia no tamanho REALMENTE desenhado (arredondado pro inteiro
-    // mais proximo), nao mais 16px fixo com downscale na GPU.
-    const int cell_px = quantize_cell_px(px_size);
+    // D2D-2-SENTINELA: bakeia no tamanho REALMENTE renderizado na TELA (px_size, em
+    // unidades de mundo, escalado pelo zoom da camera ativa no eixo Y -
+    // bake_cell_px_for_draw, font_atlas.hpp). Correcao pos-review: quantizar o px_size
+    // CRU quebrava telas com camera de zoom real (ppu != 1) - ver o comentario espelho em
+    // Render2dSdl::draw_text.
+    const int cell_px = bake_cell_px_for_draw(px_size, impl_->camera.h, impl_->pixel_h);
     Impl::BakedFontSize* face = impl_->ensure_font(bold, cell_px);
     if (face == nullptr) {
         return;  // sem fonte: no-op (caller ja tem fallback)
