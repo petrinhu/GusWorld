@@ -293,7 +293,9 @@ O líder não escolheu A/B/C isolado — escolheu as 3 réguas como uma escada p
 ## Ambiguidades registradas
 
 - **AMB-01 (UX do upload homebrew):** proposto gate narrativo (1 beat, zero timer real) como default barato. Alternativa: barra de progresso em tempo real (~34 segundos, Fibonacci) na tela da bancada, mais "sentida" mas exige UI nova. Recomendo o gate narrativo; líder pode preferir o timer se quiser mais peso sensorial na cena de pirataria.
+  - **RESOLVIDO (líder, 2026-07-28): BARRA DE PROGRESSO REAL, ~34s na tela da bancada.** O líder escolheu **contra** a recomendação do `economy-designer`, e o motivo é o que a própria proposta antecipou: **peso sensorial na cena de pirataria**. Esperar de verdade é parte da experiência de subir código pirata; um beat narrativo entregaria a informação sem entregar a espera. ⚠ **CONSEQUÊNCIA REGISTRADA:** isto **exige UI nova** (a barra na tela da bancada), que o gate narrativo não exigiria. Vira requisito da onda que implementar a bancada, não item invisível. O valor 34s é Fibonacci, coerente com a escada já em uso no doc.
 - **AMB-02 (drain de "recurso Y"):** interpretei como = ManaCost da carta (reuso total do número já canônico). Alternativa não escolhida: um multiplicador extra fixo só pra cartas de Controle/DoT (achei redundante — o ManaCost já capta isso, ManaCost 2-3 já é o Control/DoT).
+  - **RESOLVIDO (líder, 2026-07-28): drain = ManaCost da carta.** Confirmada a leitura do `economy-designer`: reusa número que **já é canon**, sem introduzir parâmetro novo, e cartas de Controle/DoT já drenam mais porque já custam mais mana. Nenhum multiplicador extra entra no modelo.
 
 ---
 

@@ -1,6 +1,6 @@
 # Cartas: hardware, energia e pirataria
 
-> **Status:** BRAINSTORM EM ANDAMENTO (líder, 2026-07-18). Decisões fechadas via AskUserQuestion capturadas fielmente. Ainda ABERTO: efeitos exatos do vírus, o mercado negro (lugar/vendedor), números (delegar ao `economy-designer`), spec de implementação (delegar a `gameplay_engineer`/`backend-engineer`). NÃO é canon fechado até o líder revisar o doc consolidado.
+> **Status:** ✅ **CANON FECHADO (líder, 2026-07-28).** Os quatro pontos que este cabeçalho listava como abertos foram entregues: os **números** viraram `cartas-numeros-proposta.md` (com as últimas duas ambiguidades fechadas em 2026-07-28), a **spec de implementação** virou `cartas-spec-dados.md` (aprovada em 2026-07-28) e `cartas-spec-logica.md`, e os **efeitos do vírus** e o **mercado negro** estão fixados aqui e nos docs de números. Reflexo pendente em `cartas-technomagik.md` e na terminologia, que é passo de escrita, não decisão. _(Status original, por registro: BRAINSTORM EM ANDAMENTO, líder, 2026-07-18.)_ Decisões fechadas via AskUserQuestion capturadas fielmente. Ainda ABERTO: efeitos exatos do vírus, o mercado negro (lugar/vendedor), números (delegar ao `economy-designer`), spec de implementação (delegar a `gameplay_engineer`/`backend-engineer`). NÃO é canon fechado até o líder revisar o doc consolidado.
 >
 > **Origem:** derivou do "vírus do Dante" (guarda-chuva Faraday, ver `docs/design/mundo-topologia.md` / brainstorm-backlog). O líder escalou o evento pontual (Dante injeta vírus na carta Faraday à noite) para um SISTEMA geral de cartas modificadas / piratas / infectadas / com bateria.
 >
@@ -192,6 +192,6 @@ Duas camadas que se combinam:
 ---
 
 ## Pontos ABERTOS (retomar aqui)
-- [ ] **Números** → `economy-designer` (preço de recarga, AP da troca in-battle, drain rate, capacidade kR/MR, vida de ciclos, **X% e a tabela de risco de contaminação da §9**, preço pirata vs original ao longo do arco).
-- [ ] **Spec de implementação** → `gameplay_engineer` (usos/bateria, estados de carta, vírus/adware) + `backend-engineer` (modelo de dados: tipo, memória, bateria, integridade, flag de infecção).
-- [ ] Canonizar no doc de mecânicas + refletir em `cartas-technomagik.md` / terminologia quando o líder aprovar.
+- [x] ✅ **Números** (ENTREGUE: `cartas-numeros-proposta.md`) → `economy-designer` (preço de recarga, AP da troca in-battle, drain rate, capacidade kR/MR, vida de ciclos, **X% e a tabela de risco de contaminação da §9**, preço pirata vs original ao longo do arco).
+- [x] ✅ **Spec de implementação** (ENTREGUE e APROVADA 2026-07-28: `cartas-spec-dados.md` + `cartas-spec-logica.md`) → `gameplay_engineer` (usos/bateria, estados de carta, vírus/adware) + `backend-engineer` (modelo de dados: tipo, memória, bateria, integridade, flag de infecção).
+- [x] ✅ **Canonizado pelo líder em 2026-07-28.** Falta só refletir em `cartas-technomagik.md` e na terminologia (passo de escrita). Era: canonizar no doc de mecânicas + refletir em `cartas-technomagik.md` / terminologia quando o líder aprovar.
