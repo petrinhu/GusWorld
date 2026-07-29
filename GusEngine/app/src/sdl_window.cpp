@@ -118,8 +118,10 @@ bool SdlWindow::init() {
         return false;
     }
 
-    render2d_ = std::make_unique<gus::platform::render2d::Render2dGl3>(
-        /*gl_active=*/true);
+    // D2D-2-SENTINELA: ActiveRenderer2d = Render2dGl3 (default) ou Render2dGlintfx
+    // (GUSWORLD_RENDER2D_BACKEND=glintfx), resolvido em compilacao - ver o alias no
+    // header. Os dois tem o MESMO ctor(bool gl_active).
+    render2d_ = std::make_unique<ActiveRenderer2d>(/*gl_active=*/true);
 
     // APP-ICON: esta SdlWindow e dona da janela (owns_window_) - aplica aqui pela
     // simetria "quem cria a janela decide o icone". NOTA: no modo normal (main.cpp),
@@ -148,8 +150,10 @@ bool SdlWindow::init_attached(SDL_Window* window) {
     // no header. gl_active=true assume que ha um contexto corrente valido; se
     // Render2dGl3::init_gl() falhar (programa GL nao compila/linka), o proprio ctor
     // degrada pra headless (gl_active_ vira false internamente) sem lancar.
-    render2d_ = std::make_unique<gus::platform::render2d::Render2dGl3>(
-        /*gl_active=*/true);
+    // D2D-2-SENTINELA: ActiveRenderer2d = Render2dGl3 (default) ou Render2dGlintfx
+    // (GUSWORLD_RENDER2D_BACKEND=glintfx), resolvido em compilacao - ver o alias no
+    // header. Os dois tem o MESMO ctor(bool gl_active).
+    render2d_ = std::make_unique<ActiveRenderer2d>(/*gl_active=*/true);
 
     // APP-ICON: a janela e da Maestro (dona real, ver init() acima) - ela ja aplica o
     // icone na criacao; nada a fazer aqui alem de nao duplicar.

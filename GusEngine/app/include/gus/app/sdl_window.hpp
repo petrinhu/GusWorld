@@ -55,7 +55,26 @@
 #include "gus/platform/input/sdl_input.hpp"
 #include "gus/platform/render2d/render2d_gl3.hpp"  // FLASH-CTX: GL3 (era render2d_sdl.hpp)
 
+// D2D-2-SENTINELA: qual IMPLEMENTACAO CONCRETA de IRenderer esta SdlWindow instancia,
+// resolvido em TEMPO DE COMPILACAO por GUSWORLD_RENDER2D_BACKEND_GLINTFX (compile
+// definition PUBLIC de gusengine_platform, ver a option() GUSWORLD_RENDER2D_BACKEND em
+// platform/CMakeLists.txt - default "gl3", ZERO mudanca pra quem nao mexe na cache var).
+// Por que um alias de tipo (nao um switch em runtime/IRenderer*): render2d_ (campo
+// abaixo) chama metodos que NAO pertencem ao IRenderer (present()/set_defer_present()/
+// last_draw_count(), ver os call sites em sdl_window.cpp) - Render2dGlintfx espelha essa
+// MESMA superficie publica (render2d_glintfx.hpp), entao o alias troca o backend inteiro
+// com UMA linha de diff aqui, sem tocar nenhum call site.
+#if GUSWORLD_RENDER2D_BACKEND_GLINTFX
+#include "gus/platform/render2d/render2d_glintfx.hpp"
+#endif
+
 namespace gus::app {
+
+#if GUSWORLD_RENDER2D_BACKEND_GLINTFX
+using ActiveRenderer2d = gus::platform::render2d::Render2dGlintfx;
+#else
+using ActiveRenderer2d = gus::platform::render2d::Render2dGl3;
+#endif
 
 class SdlWindow {
 public:
@@ -401,7 +420,12 @@ private:
     // contexto e da MAESTRO - esta SdlWindow nunca cria nem destroi um contexto ali.
     SDL_GLContext gl_context_ = nullptr;
 
-    std::unique_ptr<gus::platform::render2d::Render2dGl3> render2d_;
+    // D2D-2-SENTINELA: ActiveRenderer2d resolve pra Render2dGl3 (default) ou
+    // Render2dGlintfx (GUSWORLD_RENDER2D_BACKEND=glintfx) - ver o alias no topo deste
+    // header. Os call sites de render2d_-> abaixo (sdl_window.cpp) NAO mudam: os dois
+    // backends expoem a MESMA superficie publica (IRenderer + present()/
+    // set_defer_present()/last_draw_count() de simetria).
+    std::unique_ptr<ActiveRenderer2d> render2d_;
     std::unique_ptr<gus::app::screens::OverworldSim> sim_;
     gus::platform::input::SdlInput input_;
     gus::core::time::FixedTimestep clock_;

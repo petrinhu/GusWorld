@@ -34,8 +34,16 @@ add_library(gusengine_platform STATIC
     # Backend OpenGL 3.3 da ARENA (ADR-009 adendo GL3): coexiste com o HUD RmlUi-GL3 no
     # mesmo contexto GL. Mesma API IRenderer do Render2dSdl (a arena/testes nao mudam).
     src/render2d/render2d_gl3.cpp
-    # Loader GL (glad) da ARENA (Render2dGl3): gl3_load_functions + gl3_read_backbuffer.
-    # NAO e backend de RmlUi; a arena precisa dele SEMPRE => fica.
+    # D2D-2-SENTINELA: 3a impl. de IRenderer, delega ao glintfx::Draw2d (v0.23.0,
+    # GLINTFX_MODULE_DRAW2D=ON, ver GusEngine/CMakeLists.txt) pras 5 primitivas de mundo;
+    # draw_text fica no caminho FreeType/FontAtlas atual (ordem do lider, pipeline GL
+    # propria mantida - ver o header pro contrato completo). NAO e o default (selecionada
+    # em tempo de compilacao por GUSWORLD_RENDER2D_BACKEND, ver a option() mais abaixo);
+    # sempre compilada (comparacao lado a lado + cobertura do gate MSVC/CI mesmo quando
+    # nao selecionada, mesma disciplina do proprio modulo Draw2D no CMakeLists do glintfx).
+    src/render2d/render2d_glintfx.cpp
+    # Loader GL (glad) da ARENA (Render2dGl3/Render2dGlintfx): gl3_load_functions +
+    # gl3_read_backbuffer. NAO e backend de RmlUi; a arena precisa dele SEMPRE => fica.
     rmlui/gl3_loader.cpp
     # AudioEngine (M6 F1, ADR-011; GLINTFX-INTEGRACAO F2): consome glintfx::Audio
     # (glintfx/audio.hpp) por baixo do PImpl - NAO inclui mais miniaudio.h (o
@@ -74,9 +82,29 @@ endif()
 # ponteiros PROPRIA), entao nao ha conflito de simbolos GL.
 target_compile_definitions(gusengine_platform PRIVATE GUSWORLD_OWN_GLAD_IMPL=1)
 
-# OpenGL do sistema (libGL): o Render2dGl3 (arena) linka GL. O glad (loader header-only) ja
-# vem com o RmlUi_Include_GL3.h; so o link de GL e necessario.
+# OpenGL do sistema (libGL): o Render2dGl3/Render2dGlintfx (arena) linkam GL. O glad
+# (loader header-only) ja vem com o RmlUi_Include_GL3.h; so o link de GL e necessario.
 find_package(OpenGL REQUIRED)
+
+# D2D-2-SENTINELA: qual IMPLEMENTACAO CONCRETA de IRenderer a arena (app/sdl_window.hpp)
+# instancia, resolvido em TEMPO DE COMPILACAO (nao runtime/env var - ver o comentario de
+# cabecalho de render2d_glintfx.hpp pro raciocinio: o campo render2d_ do SdlWindow e
+# tipado concreto, nao IRenderer*, e chama metodos fora do IRenderer). Default "gl3"
+# (INALTERADO - nada muda pra quem nao mexe nesta cache var); "glintfx" liga o backend
+# novo (delega ao glintfx::Draw2d, exceto draw_text) pra comparacao lado a lado. Os DOIS
+# backends sao SEMPRE compilados (a option() acima so seleciona qual e INSTANCIADO); a
+# troca e reversivel (flip da cache var + reconfigure + rebuild).
+set(GUSWORLD_RENDER2D_BACKEND "gl3" CACHE STRING
+    "Backend concreto de IRenderer instanciado por app/sdl_window.hpp: gl3 (default) ou glintfx (D2D-2-SENTINELA)")
+set_property(CACHE GUSWORLD_RENDER2D_BACKEND PROPERTY STRINGS "gl3" "glintfx")
+if(NOT GUSWORLD_RENDER2D_BACKEND STREQUAL "gl3" AND NOT GUSWORLD_RENDER2D_BACKEND STREQUAL "glintfx")
+    message(FATAL_ERROR "GUSWORLD_RENDER2D_BACKEND invalido: '${GUSWORLD_RENDER2D_BACKEND}' (esperado 'gl3' ou 'glintfx')")
+endif()
+# PUBLIC: precisa alcancar app/sdl_window.hpp (consumidor de gusengine_platform), que
+# resolve o alias de tipo `ActiveRenderer2d` a partir desta macro - ver o header dele.
+target_compile_definitions(gusengine_platform
+    PUBLIC GUSWORLD_RENDER2D_BACKEND_GLINTFX=$<STREQUAL:${GUSWORLD_RENDER2D_BACKEND},glintfx>
+)
 
 target_include_directories(gusengine_platform
     PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include
@@ -84,9 +112,11 @@ target_include_directories(gusengine_platform
     # fonte (font_atlas) no Render2dSdl; tambem o LoadTexture do backend RmlUi (PATCH
     # GUSWORLD usa stb_image em vez de SDL_image).
     PRIVATE ${CMAKE_SOURCE_DIR}/third_party/stb
-    # Header do loader glad (RmlUi_Include_GL3.h), incluido pelo gl3_loader.cpp e pelo
-    # Render2dGl3 (arena). ADR-010 F3: o unico consumidor deste dir e a ARENA (o backend
-    # RmlUi vendorizado, que tambem o usava, foi aposentado).
+    # Header do loader glad (RmlUi_Include_GL3.h), incluido pelo gl3_loader.cpp e pelos
+    # DOIS backends da ARENA (Render2dGl3 e, desde D2D-2-SENTINELA, Render2dGlintfx - a
+    # pipeline GL propria de texto dele tambem usa glad cru). ADR-010 F3: o unico
+    # CONSUMIDOR (a ARENA) e o mesmo de sempre; o backend RmlUi vendorizado, que tambem
+    # usava este dir, foi aposentado.
     PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/rmlui
 )
 

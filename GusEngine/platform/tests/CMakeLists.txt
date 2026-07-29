@@ -21,6 +21,9 @@ add_executable(gusengine_platform_tests
     viewport_transform_test.cpp
     render2d_sdl_test.cpp
     render2d_gl3_test.cpp
+    # D2D-2-SENTINELA: Render2dGlintfx (3a impl. de IRenderer, delega ao glintfx::Draw2d
+    # v0.23.0) - equivalencia de camera (Rect->Camera2d) + headless.
+    render2d_glintfx_test.cpp
     alpha_bbox_test.cpp
     text_metrics_test.cpp
     font_atlas_test.cpp

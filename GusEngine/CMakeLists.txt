@@ -369,7 +369,33 @@ set(GLINTFX_MODULE_APP       OFF CACHE BOOL "" FORCE)
 #     defensiva no escuro - GLINTFX-FONTFLIP-VALIDATE, a decisao de A/B testar o motor
 #     proprio de verdade, segue pendente e e do lider).
 # Build local + suite completa (2576 testes) verdes no pin novo antes deste commit.
-set(GLINTFX_MODULE_DRAW2D    OFF CACHE BOOL "" FORCE)
+#
+# GLINTFX_MODULE_DRAW2D: OFF -> ON (D2D-2-SENTINELA, 2026-07-29, autorizado pelo lider -
+# "o líder autorizou migrar o nosso platform/render2d pro Draw2D do glintfx"): esta fatia
+# ADOTA de verdade o Draw2D pela primeira vez, via a TERCEIRA implementacao de IRenderer
+# (Render2dGlintfx, platform/render2d/render2d_glintfx.*) que delega ao glintfx::Draw2d 5
+# das 6 primitivas (tudo MENOS draw_text - GLINTFX-FONTFLIP-VALIDATE, decisao do lider,
+# pendente). ON e INDISPENSAVEL pra este consumo compilar/linkar: o modulo
+# `glintfx_draw2d` (OBJECT lib, glintfx/CMakeLists.txt) SO existe com a flag ON - com OFF
+# nenhum simbolo glintfx::Draw2d::* e definido em lugar nenhum do binario glintfx, entao
+# QUALQUER TU que chame Draw2d::init/begin/draw_sprite/etc falha no LINK (nao no runtime),
+# independente de o backend novo ser INSTANCIADO ou nao em tempo de execucao - o custo de
+# ~40KB medido no bump anterior (comentario ON->OFF acima) e o preco de trazer o Draw2D
+# pro binario AGORA que ha um consumidor real dele (deixou de ser "codigo morto que nao
+# deveriamos carregar" pra ser "codigo vivo, so nao selecionado por default" - ver
+# GUSWORLD_RENDER2D_BACKEND em platform/CMakeLists.txt, default "gl3", troca reversivel
+# pra "glintfx"). O ganho de ~40KB nao muda: o binario cresce de qualquer forma quando
+# GLINTFX_MODULE_DRAW2D=ON, seja o backend novo selecionado ou nao (os DOIS backends sao
+# SEMPRE compilados, so a instanciacao e condicional) - aceito porque o consumo agora e
+# REAL, nao especulativo. NAO reabre a questao do font-engine: o gate widening
+# `GLINTFX_OWN_FONT_ENGINE OR GLINTFX_MODULE_DRAW2D` (glintfx/CMakeLists.txt, ADR-0018 (e))
+# so controla se os PATHS vendorizados do motor de fonte proprio sao compilados pro
+# Draw2D's OWN (nao usado por nos) draw_text/measure_text - o SELETOR runtime do lado ui
+# (UiLayerConfig::font_engine, Bootstrap::init()) continua INTOCADO e cai no fallback
+# fail-safe pra FreeType do jeito que ja caia (GLINTFX_OWN_FONT_ENGINE continua OFF, ZERO
+# mudanca de comportamento do HUD RmlUi). Build local + suite completa verdes com a flag
+# ON (`nm` re-confirmado: simbolos Draw2d::* agora presentes E referenciados de verdade).
+set(GLINTFX_MODULE_DRAW2D    ON  CACHE BOOL "" FORCE)
 
 FetchContent_Declare(
     glintfx

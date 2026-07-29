@@ -1,0 +1,127 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+// gus/platform/render2d/render2d_glintfx.hpp
+//
+// Render2dGlintfx: TERCEIRA implementacao de IRenderer (D2D-2-SENTINELA), delegando ao
+// glintfx::Draw2d (pin v0.23.0, GLINTFX_MODULE_DRAW2D=ON - ver GusEngine/CMakeLists.txt)
+// pras 5 primitivas de MUNDO (begin/end de frame, retangulo preenchido, contorno, sprite
+// texturizado, bbox de conteudo). SO o draw_text continua no caminho FreeType/FontAtlas
+// ATUAL (ordem do lider: trocar o rasterizador de texto do jogo inteiro e decisao dele,
+// pendente de validacao visual - GLINTFX-FONTFLIP-VALIDATE).
+//
+// NAO E O DEFAULT: selecionada em tempo de COMPILACAO pela opcao de CMake
+// GUSWORLD_RENDER2D_BACKEND (valores "gl3" [default] | "glintfx", ver
+// platform/CMakeLists.txt) - reversivel (flip da cache var + reconfigure + rebuild),
+// comparavel lado a lado com Render2dGl3. Os dois backends expoem a MESMA superficie
+// publica (ctor(bool gl_active) + IRenderer + present()/set_defer_present()/
+// defer_present()/last_draw_count() de simetria), entao app/sdl_window.hpp troca so o
+// tipo concreto por tras de um alias (`using ActiveRenderer2d = ...`), zero mudanca nos
+// call sites. Selecao em TEMPO DE COMPILACAO (nao runtime/env var) de proposito: o campo
+// render2d_ do SdlWindow e tipado concreto (nao IRenderer*) e chama metodos que NAO
+// pertencem ao IRenderer (present/set_defer_present/last_draw_count) - um switch runtime
+// exigiria ou alargar o contrato do IRenderer (bate em Render2dSdl tambem, fora do escopo
+// desta fatia) ou um wrapper/variant tocando todo call site (nao seria "mudanca minima").
+// Um alias de tipo resolvido em CMake mantem os dois backends 1:1 substituiveis com UMA
+// linha de diff no campo do SdlWindow.
+//
+// CAMERA (a parte delicada desta fatia): begin_frame recebe um RETANGULO de mundo
+// (contrato do IRenderer, canto+tamanho); o Draw2D usa Camera2d (ancora no CENTRO +
+// zoom UNIFORME, mesmo fator nos dois eixos). A conversao usa o proprio helper PURO do
+// glintfx, `camera_from_world_rect(world_rect, pixel_w, pixel_h)` (D17 do header deles:
+// zoom = pixel_w / world_rect.w, centro = centro do retangulo) - EQUIVALENTE ao nosso
+// world_to_screen (viewport_transform.hpp, usado pelo Render2dGl3) sempre que a camera
+// mantiver aspecto uniforme, ou seja `camera_world.w / pixel_w == camera_world.h /
+// pixel_h` - o invariante que clamp_camera()+world_span_from_pixels() (core/spatial/
+// camera_clamp.*) JA garantem em todo caminho de render deste jogo (os dois eixos usam o
+// MESMO ppu). Prova por igualdade ponto-a-ponto contra o world_to_screen real do glintfx
+// e contra o build_quad_screen do Render2dGl3: platform/tests/render2d_glintfx_test.cpp.
+// FORA desse invariante (camera com aspecto NAO-uniforme - nenhum caller atual do
+// IRenderer produz isso, mas o CONTRATO da interface nao proibe) o Draw2D diverge do
+// Render2dGl3: zoom uniforme (Camera2d) vs. escala independente por eixo
+// (world_to_screen do Gl3) - a projecao usada aqui escala por LARGURA (zoom = pixel_w /
+// camera_world.w), entao o eixo vertical estica/encolhe diferente do Gl3 quando o
+// aspecto diverge. Documentado, nao escondido; nao ha caller real hoje que exercite isso.
+//
+// TEXTO: draw_text() NAO chama Draw2d::draw_text (motor de fonte proprio dele, tensao
+// com FreeType/nosso FontAtlas - GLINTFX-FONTFLIP-VALIDATE, decisao pendente do lider).
+// Mantem uma pipeline GL PROPRIA e minima, so pra texto (shader/VAO proprios, reusando
+// os MESMOS POCO que o Render2dGl3 ja usa - FontAtlas/text_metrics/asset_paths),
+// coexistindo no MESMO contexto GL que o Draw2D (contrato D9 do glintfx: o Draw2D SETA
+// todo estado GL de que depende a cada flush interno e NAO assume nada deixado por um
+// renderer coabitante - o mesmo contrato que ja vale entre Render2dGl3 e o HUD RmlUi-GL3
+// hoje). Pra preservar a ORDEM DE DESENHO (painter's order, contrato do IRenderer, ver
+// i_renderer.hpp): draw_text() fecha o bracket do Draw2D (end()) ANTES de desenhar o
+// texto - isso forca o flush de qualquer sprite/retangulo ainda pendente no batcher -,
+// desenha o texto pela pipeline propria, e REABRE o bracket (begin()) depois, pros draws
+// seguintes do MESMO frame continuarem. A camera fica STICKY entre brackets (D13 do
+// glintfx), entao reabrir nao perde o set_camera() do begin_frame().
+//
+// HEADLESS (gl_active == false): espelha Render2dGl3(false) - nenhuma chamada GL nem
+// Draw2D, todo draw vira no-op contabilizado, load_texture devolve kInvalidTexture. Prova
+// que a cadeia monta e roda sem GPU (CI).
+
+#ifndef GUS_PLATFORM_RENDER2D_RENDER2D_GLINTFX_HPP
+#define GUS_PLATFORM_RENDER2D_RENDER2D_GLINTFX_HPP
+
+#include <memory>
+
+#include "gus/platform/render2d/i_renderer.hpp"
+
+namespace gus::platform::render2d {
+
+class Render2dGlintfx : public IRenderer {
+public:
+    // gl_active: true = ha um contexto GL corrente (a janela ja criou e fez make-current
+    // ANTES de construir o renderer); false = headless (CI/smoke sem GPU): tudo no-op.
+    // Mesma semantica/assinatura do Render2dGl3 (simetria de API, ver comentario acima).
+    explicit Render2dGlintfx(bool gl_active) noexcept;
+    ~Render2dGlintfx() override;
+
+    Render2dGlintfx(const Render2dGlintfx&) = delete;
+    Render2dGlintfx& operator=(const Render2dGlintfx&) = delete;
+
+    // IRenderer.
+    void begin_frame(const gus::core::spatial::Rect& camera_world, int pixel_w,
+                     int pixel_h) override;
+    void draw_filled_rect(const gus::core::spatial::Rect& world_rect,
+                          const DrawColor& color) override;
+    void draw_rect_outline(const gus::core::spatial::Rect& world_rect,
+                           const DrawColor& color, float thickness_world) override;
+    [[nodiscard]] TextureId load_texture(const char* path) override;
+    void draw_textured_rect(const gus::core::spatial::Rect& world_rect,
+                            TextureId texture, const UvRect& uv,
+                            const DrawColor& tint) override;
+    [[nodiscard]] ContentBbox texture_content_bbox(
+        TextureId texture) const override;
+    void draw_text(const char* text, float x, float y, float px_size,
+                   const DrawColor& color, bool bold) override;
+    void end_frame() override;
+
+    [[nodiscard]] int last_draw_count() const noexcept { return last_draw_count_; }
+
+    // Simetria de API com Render2dGl3 (ver comentario de cabecalho): permite que
+    // app/sdl_window.hpp troque o backend so via um alias de tipo, sem mudar nenhum call
+    // site. NO-OP aqui pela MESMA razao do Render2dGl3: o swap real e SDL_GL_SwapWindow,
+    // na casca app/ (nem o Draw2D nem este backend sao donos da janela/do swap).
+    void set_defer_present(bool defer) noexcept { defer_present_ = defer; }
+    [[nodiscard]] bool defer_present() const noexcept { return defer_present_; }
+    void present();
+
+private:
+    struct Impl;                  // Draw2d + pipeline GL propria de texto; PImpl
+    std::unique_ptr<Impl> impl_;  // nullptr em headless (gl_active == false)
+    bool gl_active_ = false;
+
+    // Guardados no begin_frame pro draw_text() projetar via viewport_transform (POCO),
+    // NAO via Draw2D - ver a secao TEXTO do comentario de cabeçalho deste arquivo.
+    gus::core::spatial::Rect camera_world_{};
+    int pixel_w_ = 0;
+    int pixel_h_ = 0;
+
+    int draw_count_ = 0;
+    int last_draw_count_ = 0;
+    bool defer_present_ = false;
+};
+
+}  // namespace gus::platform::render2d
+
+#endif  // GUS_PLATFORM_RENDER2D_RENDER2D_GLINTFX_HPP
