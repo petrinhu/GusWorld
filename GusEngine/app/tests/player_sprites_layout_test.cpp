@@ -1,13 +1,22 @@
 // GusEngine/app/tests/player_sprites_layout_test.cpp
 //
-// Catch2 do MAPEAMENTO DE DIRECAO -> subpasta de walk dos layouts de personagem
-// (app/screens/player_sprites_loader). Dados PUROS (SpriteLayout): NAO toca filesystem,
-// renderer nem SDL. Trava o bug-fix do lider (2026-06-23): a arte do Gus veio com
-// leste/oeste TROCADOS na fonte (generate-8-rotations); gus_layout() corrige trocando
-// SO esses dois slots, sem mexer no input/facing compartilhado nem no Caua.
+// Catch2 do MAPEAMENTO DE DIRECAO -> subpasta de walk/idle dos layouts de personagem
+// (app/screens/player_sprites_loader). As TEST_CASEs de mapeamento puro (SpriteLayout)
+// NAO tocam filesystem/renderer/SDL. Trava o bug-fix do lider (2026-06-23): a arte do
+// Gus veio com leste/oeste TROCADOS na fonte (generate-8-rotations); gus_layout()
+// corrige trocando SO esses dois slots, sem mexer no input/facing compartilhado nem no
+// Caua.
+//
+// ARTE-RESP-4DIR (2026-07-23): as TEST_CASEs do LOADER (que exercitam
+// load_player_sprites com breathing direcional) TOCAM uma arvore temporaria real em
+// disco - mesmo padrao de app/tests/anim_catalog_test.cpp (touch_png em
+// fs::temp_directory_path()) - porque o loader agora sonda std::filesystem::exists()
+// pra decidir, POR DIRECAO, se ha breathing proprio ou se degrada pro walk f0.
 
 #include <catch2/catch_test_macros.hpp>
 
+#include <filesystem>
+#include <fstream>
 #include <map>
 #include <string>
 
@@ -15,6 +24,8 @@
 #include "gus/app/screens/player_sprites_loader.hpp"
 #include "gus/app/screens/sprite_animation.hpp"
 #include "gus/platform/render2d/i_renderer.hpp"
+
+namespace fs = std::filesystem;
 
 using gus::app::screens::caua_layout;
 using gus::app::screens::Direction;
@@ -27,6 +38,24 @@ using gus::platform::render2d::TextureId;
 namespace {
 const char* walk_dir(const SpriteLayout& l, Direction d) {
     return l.walk_dir_names[static_cast<std::size_t>(d)];
+}
+
+// Cria um arquivo vazio (o loader so sonda existencia + delega o load ao renderer
+// fake; o conteudo do PNG nunca e decodificado neste teste).
+void touch_png(const fs::path& p) {
+    fs::create_directories(p.parent_path());
+    std::ofstream(p.string()).put('\0');
+}
+
+// Raiz temporaria unica por chamada (evita colisao entre TEST_CASEs).
+fs::path make_temp_root(const char* tag) {
+    static int counter = 0;
+    const fs::path root = fs::temp_directory_path() /
+                           ("gus_player_sprites_test_" + std::string(tag) + "_" +
+                            std::to_string(counter++));
+    fs::remove_all(root);
+    fs::create_directories(root);
+    return root;
 }
 
 // Renderer FALSO que mapeia CADA caminho de arquivo a um TextureId estavel: dois loads
@@ -91,35 +120,87 @@ TEST_CASE("layout default: mapeamento direto (Caua-like, sem surpresa)",
     CHECK(std::string(walk_dir(l, Direction::West)) == "west");
 }
 
-// --- BUG 1 (lider 2026-06-23): idle DIRECIONAL (nao "sempre Sul") ------------
+// --- ARTE-RESP-4DIR (2026-07-23): breathing DIRECIONAL completo + degradacao -------
 
 TEST_CASE(
-    "loader Gus: o IDLE de cada direcao usa arte DAQUELA direcao (nao a do Sul)",
+    "loader Gus: breathing DIRECIONAL completo quando as 4 pastas existem no disco",
     "[player_sprites][loader][facing]") {
-    // RAIZ VISUAL do bug do Gus virar pra Sul ao parar: a arte de respiracao
-    // (anims/breathing_idle) so existe de FRENTE (Sul). Antes o loader replicava esse
-    // mesmo loop nas 4 direcoes -> parado, o Gus sempre parecia olhar pra baixo. Fix:
-    // South mantem o breathing animado; Norte/Leste/Oeste usam o walk f0 DAQUELA direcao
-    // (arte que ja existe), preservando o facing visualmente sem arte nova.
+    // As 4 pastas fisicas de breathing existem (south/north/east/west - os MESMOS
+    // nomes fisicos que walk usa, so que gus_layout() PERMUTA qual enum-direcao le
+    // qual pasta). Cada direcao deve carregar o proprio loop de 5 quadros, e o slot
+    // Leste deve ler da pasta fisica "west" (mesma correcao de rotulo que o walk).
+    const fs::path root = make_temp_root("full4dir");
+    for (const char* dir_name : {"south", "north", "east", "west"}) {
+        for (int f = 0; f < 5; ++f) {
+            touch_png(root / "anims" / "breathing_idle" / dir_name /
+                      ("f" + std::to_string(f) + ".png"));
+        }
+    }
+
     PathRenderer r;
-    const PlayerSpriteSet s = load_player_sprites(r, "BASE", gus_layout());
+    const PlayerSpriteSet s = load_player_sprites(r, root.string(), gus_layout());
 
     const int south = static_cast<int>(Direction::South);
     const int north = static_cast<int>(Direction::North);
     const int east = static_cast<int>(Direction::East);
     const int west = static_cast<int>(Direction::West);
 
-    // Sul: mantem o breathing animado (5 quadros), todos != invalido.
-    REQUIRE(s.idle_count[south] >= 1);
-    // O quadro representativo de cada direcao tem que DIFERIR do Sul (idle direcional).
+    // Todas as 4 direcoes carregam o loop completo (5 quadros), nao o fallback de 1.
+    REQUIRE(s.idle_count[south] == 5);
+    REQUIRE(s.idle_count[north] == 5);
+    REQUIRE(s.idle_count[east] == 5);
+    REQUIRE(s.idle_count[west] == 5);
+
+    // Cada direcao usa arte PROPRIA (nao mais o walk f0 congelado de fallback).
+    REQUIRE(s.idle[south] != s.walk[south][0]);
+    REQUIRE(s.idle[north] != s.walk[north][0]);
+    REQUIRE(s.idle[east] != s.walk[east][0]);
+    REQUIRE(s.idle[west] != s.walk[west][0]);
+
+    // Direcoes distintas carregam quadros distintos (sem flip, Pillar 3).
     REQUIRE(s.idle[north] != s.idle[south]);
     REQUIRE(s.idle[east] != s.idle[south]);
     REQUIRE(s.idle[west] != s.idle[south]);
-    // E o idle de Norte/Leste/Oeste e o respectivo walk f0 daquela direcao (arte que
-    // existe), nao o breathing do Sul.
-    REQUIRE(s.idle[north] == s.walk[north][0]);
-    REQUIRE(s.idle[east] == s.walk[east][0]);
-    REQUIRE(s.idle[west] == s.walk[west][0]);
-    // Leste e Oeste continuam DISTINTOS entre si (perfis opostos).
     REQUIRE(s.idle[east] != s.idle[west]);
+
+    // Leste (enum) le da pasta FISICA "west" (mesmo swap do walk); Oeste le de "east".
+    const std::string east_f0 = (root / "anims" / "breathing_idle" / "west" / "f0.png").string();
+    const std::string west_f0 = (root / "anims" / "breathing_idle" / "east" / "f0.png").string();
+    REQUIRE(s.idle[east] == r.load_texture(east_f0.c_str()));
+    REQUIRE(s.idle[west] == r.load_texture(west_f0.c_str()));
+}
+
+TEST_CASE(
+    "loader Gus: direcao SEM pasta de breathing degrada pro walk f0 (graciosa)",
+    "[player_sprites][loader][facing][fallback]") {
+    // So o Sul tem breathing no disco (cenario real de um personagem que so ganhou a
+    // arte de UM lado por enquanto - ex.: os companions ate ganharem a arte deles).
+    // Norte, Leste e Oeste NAO tem a pasta - o loader tem que cair pro walk f0 de CADA
+    // uma dessas direcoes, sem crash e sem exigir tudo-ou-nada.
+    const fs::path root = make_temp_root("partial_south_only");
+    for (int f = 0; f < 5; ++f) {
+        touch_png(root / "anims" / "breathing_idle" / "south" /
+                  ("f" + std::to_string(f) + ".png"));
+    }
+
+    PathRenderer r;
+    const PlayerSpriteSet s = load_player_sprites(r, root.string(), gus_layout());
+
+    const int south = static_cast<int>(Direction::South);
+    const int north = static_cast<int>(Direction::North);
+    const int east = static_cast<int>(Direction::East);
+    const int west = static_cast<int>(Direction::West);
+
+    // Sul: breathing completo, arte propria (nao o walk f0).
+    REQUIRE(s.idle_count[south] == 5);
+    REQUIRE(s.idle[south] != s.walk[south][0]);
+
+    // As demais direcoes degradam pro walk f0 CONGELADO daquela direcao (comportamento
+    // legado preservado quando falta a arte).
+    REQUIRE(s.idle_count[north] == 1);
+    REQUIRE(s.idle[north] == s.walk[north][0]);
+    REQUIRE(s.idle_count[east] == 1);
+    REQUIRE(s.idle[east] == s.walk[east][0]);
+    REQUIRE(s.idle_count[west] == 1);
+    REQUIRE(s.idle[west] == s.walk[west][0]);
 }

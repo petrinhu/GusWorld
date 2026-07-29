@@ -7,6 +7,7 @@
 #include "gus/app/screens/player_sprites_loader.hpp"
 
 #include <array>
+#include <filesystem>
 #include <iostream>
 
 #include "gus/app/screens/sprite_anchor.hpp"  // bottom_margin_fraction
@@ -74,23 +75,6 @@ PlayerSpriteSet load_player_sprites(gus::platform::render2d::IRenderer& renderer
     const int walk_n = clamp_count(layout.walk_frames, kMaxWalkFrameCount);
     const int idle_n = clamp_count(layout.idle_frames, kMaxIdleFrameCount);
 
-    // IDLE ANIMADO NAO-DIRECIONAL (Gus): um unico loop em <base>/<idle_dir>/<pref>i.png,
-    // reusado nas 4 direcoes. Carrega uma vez e replica os handles por direcao.
-    std::array<gus::platform::render2d::TextureId, kMaxIdleFrameCount> shared_idle{};
-    if (layout.idle_animated) {
-        for (int f = 0; f < idle_n; ++f) {
-            const std::string p =
-                join(join(base_dir, layout.idle_dir),
-                     std::string(layout.idle_prefix) + std::to_string(f) + ".png");
-            const auto tex = renderer.load_texture(p.c_str());
-            if (tex == gus::platform::render2d::kInvalidTexture) {
-                std::cerr << "player_sprites: sprite ausente/ilegivel: " << p
-                          << " (render segue com textura invalida)\n";
-            }
-            shared_idle[static_cast<std::size_t>(f)] = tex;
-        }
-    }
-
     for (int d = 0; d < kDirectionCount; ++d) {
         // --- WALK: <base>/walk/<dir>/<pref>f.png  (f = 0..walk_n-1) ---
         // Carregado ANTES do idle: o fix do BUG 1 (idle direcional) usa o walk f0
@@ -111,27 +95,47 @@ PlayerSpriteSet load_player_sprites(gus::platform::render2d::IRenderer& renderer
             set.walk[d][f] = tex;
         }
 
-        // --- IDLE (breathing animado OU congelado direcional) ---
-        // BUG 1 (lider 2026-06-23): o breathing animado so existe de FRENTE. Quando
-        // idle_animated_only_one_facing, ele e usado SO na direcao idle_animated_facing
-        // (Sul); as OUTRAS direcoes recebem o walk f0 DAQUELA direcao como idle de 1
-        // quadro - assim parar olhando Norte/Leste/Oeste NAO mostra a pose de frente.
-        const bool use_breathing_here =
-            layout.idle_animated &&
-            (!layout.idle_animated_only_one_facing ||
-             d == static_cast<int>(layout.idle_animated_facing));
-        if (use_breathing_here) {
-            set.idle_count[d] = idle_n;
-            for (int f = 0; f < idle_n; ++f) {
-                set.idle_frames[d][f] = shared_idle[static_cast<std::size_t>(f)];
+        // --- IDLE (breathing animado POR DIRECAO, OU congelado direcional) ---
+        // ARTE-RESP-4DIR (2026-07-23): o breathing tem pasta POR DIRECAO em
+        // <base>/<idle_dir>/<dir>/<pref>f.png, reusando walk_dir_names[d] (MESMA
+        // correcao leste/oeste da fonte que o walk usa). GRACIOSO: primeiro sonda
+        // (std::filesystem::exists, sem tocar o renderer) se o quadro 0 daquela
+        // direcao existe no disco. Existindo, carrega os idle_n quadros normalmente.
+        // Faltando (personagem sem breathing pra este lado - todo NPC comum, e por
+        // ora os companions), NAO tenta carregar (nem loga erro: ausencia esperada,
+        // nao falha) e cai pro walk f0 congelado da mesma direcao (comportamento
+        // legado, preserva o facing parado sem arte nova).
+        if (layout.idle_animated) {
+            const std::string idle_dir_path =
+                join(join(base_dir, layout.idle_dir),
+                     layout.walk_dir_names[static_cast<std::size_t>(d)]);
+            const std::string idle_f0_path =
+                join(idle_dir_path, std::string(layout.idle_prefix) + "0.png");
+            std::error_code ec;
+            const bool has_directional_breathing =
+                std::filesystem::exists(idle_f0_path, ec) && !ec;
+
+            if (has_directional_breathing) {
+                set.idle_count[d] = idle_n;
+                for (int f = 0; f < idle_n; ++f) {
+                    const std::string p =
+                        join(idle_dir_path,
+                             std::string(layout.idle_prefix) + std::to_string(f) + ".png");
+                    const auto tex = renderer.load_texture(p.c_str());
+                    if (tex == gus::platform::render2d::kInvalidTexture) {
+                        std::cerr << "player_sprites: sprite ausente/ilegivel: " << p
+                                  << " (render segue com textura invalida)\n";
+                    }
+                    set.idle_frames[d][f] = tex;
+                }
+                set.idle[d] = set.idle_frames[d][0];  // representativo = quadro 0
+            } else {
+                // Direcao sem breathing proprio: idle de 1 quadro = walk f0 daquela
+                // direcao (arte direcional que ja existe), preservando o facing parado.
+                set.idle[d] = set.walk[d][0];
+                set.idle_frames[d][0] = set.walk[d][0];
+                set.idle_count[d] = 1;
             }
-            set.idle[d] = shared_idle[0];  // representativo = quadro 0 do breathing
-        } else if (layout.idle_animated) {
-            // Direcao sem breathing proprio: idle de 1 quadro = walk f0 daquela direcao
-            // (arte direcional que ja existe), preservando o facing parado.
-            set.idle[d] = set.walk[d][0];
-            set.idle_frames[d][0] = set.walk[d][0];
-            set.idle_count[d] = 1;
         } else {
             // Caua: idle congelado direcional, 1 quadro por direcao (<base>/<dir>.png).
             const std::string idle_path = join(base_dir, kIdleFilesCaua[d]);
