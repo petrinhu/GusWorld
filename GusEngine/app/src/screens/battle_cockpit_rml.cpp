@@ -16,7 +16,9 @@
 #include "gus/domain/combat/combat_actor.hpp"
 
 // Pasta das fontes (.ttf), embutida pelo CMake (ADR-010 F2a). So usada no caminho glintfx
-// (cockpit BAKED/LIVE): o @font-face do RCSS aponta pra ca. Fallback vazio se ausente.
+// (cockpit BAKED/LIVE): os .ttf sao copiados pro stage daqui, e e pra la que
+// glintfx::UiLayer::load_font_face aponta (FONT-EXTEND-GLITCH, 2026-07-29 - ver
+// battle_preview.cpp). Fallback vazio se ausente.
 #ifndef GUSWORLD_FONTS_DIR
 #define GUSWORLD_FONTS_DIR ""
 #endif

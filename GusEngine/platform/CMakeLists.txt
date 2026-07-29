@@ -123,8 +123,9 @@ target_include_directories(gusengine_platform
 # Pasta dos assets de fonte da engine (.ttf embarcados no repo, dentro de assets/fonts/).
 # Embutida em compilacao pra o resolver achar a fonte rodando do build dir; override em
 # runtime via env GUSWORLD_ASSETS (mesma logica do resolver de mapas/sprites).
-# GUSWORLD_FONTS_DIR e usado pelo font_atlas (Render2dSdl); o glintfx (app/) carrega a Pixel
-# Operator Mono via @font-face no RCSS a partir da mesma pasta.
+# GUSWORLD_FONTS_DIR e usado pelo font_atlas (Render2dSdl); o glintfx (app/) registra a
+# Pixel Operator Mono via glintfx::UiLayer::load_font_face (API v0.24.0,
+# FONT-EXTEND-GLITCH 2026-07-29) a partir da mesma pasta.
 #
 # ASSETS-VFS-F1 (ADR-013): as 4 macros abaixo (ASSETS/SFX/MUSIC/TRANSLATIONS_DIR) MIGRAM
 # pra ca (antes so em app/CMakeLists.txt) porque a cadeia de resolucao `env > macro > CWD`

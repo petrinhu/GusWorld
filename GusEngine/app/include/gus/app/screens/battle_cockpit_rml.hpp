@@ -70,23 +70,26 @@ inline constexpr std::array<std::string_view, 6> kVerbLabels = {
 
 // ADR-010 F2a: produz a variante BAKED (valores ESTATICOS) do cockpit REAL pelo
 // glintfx::UiLayer. REUSA o RML/RCSS autorado (gradientes/glow/molduras/keyframes
-// intactos) e so TRANSFORMA por string: (1) injeta @font-face (o UiLayer nao expoe
-// Rml::LoadFontFace - so o doc carrega fonte); (2) remove o data-model; (3) troca
-// {{bindings}} por literais de um encontro-exemplo (Gus 55/55, papel); (4) achata o
-// caminho do retrato; (5) escolhe o estado (combate por padrao, ou intro/brasao). Copia
-// os 4 assets (2 fontes + moldura + retrato) pro stage dir e escreve o .rml la. Devolve o
-// path do .rml.
+// intactos) e so TRANSFORMA por string: (1) remove o data-model; (2) troca {{bindings}}
+// por literais de um encontro-exemplo (Gus 55/55, papel); (3) achata o caminho do
+// retrato; (4) escolhe o estado (combate por padrao, ou intro/brasao). Copia os 4
+// assets (2 fontes + moldura + retrato) pro stage dir e escreve o .rml la. Devolve o
+// path do .rml. FONT-EXTEND-GLITCH (2026-07-29): a familia "Pixel Operator Mono" NAO e
+// mais injetada aqui via @font-face de string - o CHAMADOR (battle_preview.cpp)
+// registra via glintfx::UiLayer::load_font_face (API v0.24.0), 1x, apos
+// set_asset_base_url e antes de ui_->load().
 [[nodiscard]] std::string write_baked_cockpit_rml(bool intro);
 
 // ADR-010 F2b: variante LIVE (data-model) do cockpit REAL pelo glintfx::UiLayer. Diferente
 // do BAKED (F2a, valores literais): aqui o RML MANTEM o data-model="hud" + os {{bindings}}
 // + os data-if(intro/!intro), e a casca alimenta os valores VIVOS por frame (set_*). REUSA
 // o RML/RCSS autorado (gradientes/glow/moldura/keyframes intactos) e so TRANSFORMA por
-// string: (1) injeta @font-face; (2) achata o caminho do retrato; (3) acrescenta
-// tab-index/nav ao .verb (foco navegavel) + data-class-sel por verbo (a SELECAO do motor
-// vira a classe .sel, motor = fonte de verdade); (4) troca o log hardcoded por
-// data-for("line : log") + uma now-line com {{verb}}/{{alvo}} (verbo selecionado + alvo,
-// vivos). Copia os 4 assets (2 fontes + moldura + retrato) pro stage e escreve o .rml la.
+// string: (1) achata o caminho do retrato; (2) acrescenta tab-index/nav ao .verb (foco
+// navegavel) + data-class-sel por verbo (a SELECAO do motor vira a classe .sel, motor =
+// fonte de verdade); (3) troca o log hardcoded por data-for("line : log") + uma now-line
+// com {{verb}}/{{alvo}} (verbo selecionado + alvo, vivos). FONT-EXTEND-GLITCH: mesma
+// migracao do BAKED acima - a familia e registrada pelo CHAMADOR via load_font_face, nao
+// mais aqui. Copia os 4 assets (2 fontes + moldura + retrato) pro stage e escreve o .rml la.
 // Devolve o path.
 [[nodiscard]] std::string write_live_cockpit_rml();
 

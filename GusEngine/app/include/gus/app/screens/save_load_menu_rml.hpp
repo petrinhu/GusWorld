@@ -37,8 +37,10 @@ namespace gus::app::screens {
 // system_menu_rml.cpp, efeito NOSSO - o chamador renderiza alguns frames
 // pressionado ANTES de aplicar a transicao real).
 //
-// Nao inclui @font-face (o CHAMADOR injeta, mesma receita de
-// write_baked_cockpit_rml em battle_preview.cpp) nem resolve caminhos de asset.
+// Nao inclui @font-face nem registra fonte nenhuma (o CHAMADOR - enter() de
+// save_load_menu_loop.cpp - registra "Pixel Operator Mono" via
+// glintfx::UiLayer::load_font_face, API v0.24.0, FONT-EXTEND-GLITCH 2026-07-29) nem
+// resolve caminhos de asset.
 [[nodiscard]] std::string build_save_load_menu_rml(
     const SaveLoadMenuState& state, const gus::app::i18n::Translator& translator,
     int pressed_index = -1);

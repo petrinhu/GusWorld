@@ -134,9 +134,10 @@ target_compile_definitions(gusengine_app
     # Override em runtime via env GUSWORLD_DIALOGUES (caminho completo do .dlg.txt).
     PRIVATE GUSWORLD_DIALOGUES_DIR="${CMAKE_SOURCE_DIR}/../resources/dialogues"
     # Pasta das fontes (.ttf) DENTRO de GusEngine/ (mesma macro do platform/). ADR-010
-    # F2a: o cockpit BAKED do glintfx registra a "Pixel Operator Mono" via @font-face no
-    # RCSS (o glintfx::UiLayer NAO expoe Rml::LoadFontFace - so o doc carrega fonte). Sem
-    # esta macro o app/ nao saberia o caminho absoluto da fonte. Override: env GUSWORLD_FONTS.
+    # F2a: as telas de UI/HUD registram a "Pixel Operator Mono" via
+    # glintfx::UiLayer::load_font_face (API v0.24.0, FONT-EXTEND-GLITCH 2026-07-29 - antes
+    # era @font-face injetado no RCSS por string, ver historico git). Sem esta macro o
+    # app/ nao saberia o caminho absoluto da fonte. Override: env GUSWORLD_FONTS.
     PRIVATE GUSWORLD_FONTS_DIR="${CMAKE_SOURCE_DIR}/assets/fonts"
     # Pasta do kit CC0 de SFX (M6 F2/F3, ADR-011), na RAIZ do repo (irma de resources/ e
     # GusEngine/ - "assets/" de origem/source do JOGO, diferente de GusEngine/assets/ que
