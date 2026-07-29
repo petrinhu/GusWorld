@@ -516,13 +516,16 @@ std::string write_baked_cockpit_rml(bool intro) {
 // do BAKED (F2a, valores literais): aqui o RML MANTEM o data-model="hud" + os {{bindings}}
 // + os data-if(intro/!intro), e a casca alimenta os valores VIVOS por frame (set_*). REUSA
 // o RML/RCSS de load_cockpit_rml() (gradientes/glow/moldura/keyframes intactos) e so
-// TRANSFORMA por string: (1) injeta @font-face (o UiLayer nao expoe LoadFontFace); (2)
-// achata o caminho do retrato; (3) acrescenta tab-index/nav ao .verb (foco navegavel,
-// secao 5 da doc de embed) + data-class-sel por verbo (a SELECAO do motor vira a classe
-// .sel, motor = fonte de verdade); (4) troca o log hardcoded por data-for("line : log") +
-// uma now-line com {{verb}}/{{alvo}} (verbo selecionado + alvo, vivos). Copia os 4 assets
-// (2 fontes + moldura + retrato) pro stage e escreve o .rml la. Devolve o path. NAO toca
-// load_cockpit_rml (o caminho vendorizado fica intacto).
+// TRANSFORMA por string: (1) achata o caminho do retrato; (2) acrescenta tab-index/nav ao
+// .verb (foco navegavel, secao 5 da doc de embed) + data-class-sel por verbo (a SELECAO do
+// motor vira a classe .sel, motor = fonte de verdade); (3) troca o log hardcoded por
+// data-for("line : log") + uma now-line com {{verb}}/{{alvo}} (verbo selecionado + alvo,
+// vivos). Copia os 4 assets (2 fontes + moldura + retrato) pro stage e escreve o .rml la.
+// Devolve o path. NAO toca load_cockpit_rml (o caminho vendorizado fica intacto).
+//
+// FONT-EXTEND-GLITCH (2026-07-29): mesma migracao de write_baked_cockpit_rml (ver o
+// comentario grande la) - a fonte e registrada pelo chamador via
+// glintfx::UiLayer::load_font_face, nao mais por @font-face de string aqui.
 std::string write_live_cockpit_rml() {
     namespace fs = std::filesystem;
     const fs::path stage = glintfx_cockpit_stage_dir();
@@ -587,7 +590,7 @@ std::string write_live_cockpit_rml() {
         "<div id=\"pic\" data-style-decorator=\"'image( ' + retrato_src + ' cover )'\">"
         "</div>");
 
-    // (3a) foco navegavel: o .verb vira focavel (tab-index) + navegavel por setas (nav:auto,
+    // (2a) foco navegavel: o .verb vira focavel (tab-index) + navegavel por setas (nav:auto,
     // shorthand de nav-up/right/down/left). O glintfx ja roteia Key->foco; aqui o DOC declara
     // os elementos focaveis (secao 5 da doc de embed). SEM estilo :focus de proposito: a
     // selecao VISIVEL e a classe .sel dirigida pelo MOTOR (data-class-sel abaixo), pra NAO
@@ -595,7 +598,7 @@ std::string write_live_cockpit_rml() {
     replace_all("  color: #d6e6ef; font-size: 11dp;\n}",
                 "  color: #d6e6ef; font-size: 11dp;\n  tab-index: auto; nav: auto;\n}");
 
-    // (3b) menu de verbos data-driven: a classe .sel de cada verbo segue o indice SELECIONADO
+    // (2b) menu de verbos data-driven: a classe .sel de cada verbo segue o indice SELECIONADO
     // no motor (binding 'sel'), via data-class-sel="sel == N". O motor (scene.menu_) e a
     // fonte de verdade da selecao; aqui so REFLETIMOS. (ordem N = BattleVerb).
     // GLINTFX-CLICK: a string de origem casa a saida ATUAL de load_cockpit_rml() (que ja
@@ -631,7 +634,7 @@ std::string write_live_cockpit_rml() {
         "class=\"glyph\"></span><span class=\"lbl\">FUGIR</span></div>\n"
         "      </div>");
 
-    // (4) log VIVO: troca as 3 linhas hardcoded por um data-for sobre a lista 'log'
+    // (3) log VIVO: troca as 3 linhas hardcoded por um data-for sobre a lista 'log'
     // (scene.log_lines, ultimas N) + uma now-line com o verbo SELECIONADO e o ALVO.
     replace_all(
         "      <div id=\"log\">\n"
