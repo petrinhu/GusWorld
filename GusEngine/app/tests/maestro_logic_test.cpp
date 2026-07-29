@@ -817,6 +817,70 @@ TEST_CASE("battle_crossfade_target: kInvalidSound como battle_id cai de volta pr
     CHECK(battle_crossfade_target(kInvalidSound, kCityId) == kCityId);
 }
 
+// ============================================================================
+// FUNDO CONGELADO - FrozenBgRemoveGuard (2026-07-29, ordem do lider: "quero que
+// apague"/"nao que fique armazenado"): POCO puro (so std::filesystem::remove),
+// headless - prova a remocao pelo FIM DO ESCOPO que os 3 call-sites de maestro.cpp
+// (show_title_screen/open_pause_from_city/to_npc_dialogue) agora usam no lugar de
+// uma chamada solta de remove() no fim de cada funcao.
+// ============================================================================
+
+using gus::app::FrozenBgRemoveGuard;
+
+TEST_CASE("FrozenBgRemoveGuard: apaga o arquivo no FIM DO ESCOPO (dtor)",
+          "[maestro][logic][frozen_bg]") {
+    const auto tmp = std::filesystem::temp_directory_path() /
+                      "gusworld_test_frozen_bg_guard_scope_exit.png";
+    {
+        std::ofstream out(tmp, std::ios::binary | std::ios::trunc);
+        out << "conteudo fake de PNG - so o path importa pro guardia";
+    }
+    REQUIRE(std::filesystem::exists(tmp));
+
+    {
+        const FrozenBgRemoveGuard guard(tmp.string());
+        // AINDA dentro do escopo: o arquivo continua la (o menu/dialogo/titulo
+        // ainda esta lendo essa textura) - o guardia so apaga ao DESTRUIR.
+        CHECK(std::filesystem::exists(tmp));
+    }  // guard destroi aqui
+
+    CHECK_FALSE(std::filesystem::exists(tmp));
+}
+
+TEST_CASE("FrozenBgRemoveGuard: path VAZIO (frozen_ok==false) e no-op no dtor - "
+          "nao apaga um arquivo alheio",
+          "[maestro][logic][frozen_bg]") {
+    // Arquivo de controle que NAO tem nada a ver com o guardia (simula um arquivo
+    // preexistente qualquer no disco) - prova que o dtor com path_ vazio nao sai
+    // "limpando" nada por engano.
+    const auto sentinel = std::filesystem::temp_directory_path() /
+                           "gusworld_test_frozen_bg_guard_sentinel.png";
+    {
+        std::ofstream out(sentinel, std::ios::binary | std::ios::trunc);
+        out << "sentinela - nao deve ser tocado";
+    }
+    REQUIRE(std::filesystem::exists(sentinel));
+
+    { const FrozenBgRemoveGuard guard(std::string()); }  // path vazio: dtor no-op
+
+    CHECK(std::filesystem::exists(sentinel));  // intacto
+    std::filesystem::remove(sentinel);
+}
+
+TEST_CASE("FrozenBgRemoveGuard: arquivo INEXISTENTE (frozen_ok==true mas o "
+          "arquivo sumiu por outra via) nao crasha no dtor",
+          "[maestro][logic][frozen_bg]") {
+    const auto tmp = std::filesystem::temp_directory_path() /
+                      "gusworld_test_frozen_bg_guard_missing.png";
+    std::filesystem::remove(tmp);  // garante que NAO existe
+    REQUIRE_FALSE(std::filesystem::exists(tmp));
+
+    { const FrozenBgRemoveGuard guard(tmp.string()); }  // dtor: overload com
+                                                         // std::error_code, nunca lanca
+
+    SUCCEED("dtor com arquivo ja ausente nao lancou/crashou");
+}
+
 TEST_CASE("battle_crossfade_target: os dois ids invalidos devolve invalido "
           "(degradacao segura ate o fim da cadeia - crossfade_music/play_music ja "
           "no-opam com kInvalidSound, nunca crasha)",

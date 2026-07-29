@@ -20,6 +20,9 @@
 #ifndef GUS_APP_MAESTRO_LOGIC_HPP
 #define GUS_APP_MAESTRO_LOGIC_HPP
 
+#include <filesystem>  // FrozenBgRemoveGuard
+#include <string>      // FrozenBgRemoveGuard::path_
+
 #include "gus/core/spatial/grid_collision.hpp"  // Aabb
 #include "gus/core/spatial/tile_grid.hpp"       // TileGrid (posicionamento do inimigo)
 #include "gus/domain/combat/combat_enums.hpp"   // CombatOutcome
@@ -270,6 +273,53 @@ void crossfade_music(gus::platform::audio::AudioEngine* engine,
     gus::platform::audio::SoundId city_id) noexcept {
     return (battle_id != gus::platform::audio::kInvalidSound) ? battle_id : city_id;
 }
+
+// FUNDO CONGELADO - guardia RAII (2026-07-29, ordem do lider: "o png em disco e
+// apagado logo apos o uso?" -> "quero que apague" -> "nao que fique armazenado").
+// Ate esta guarda existir, a remocao do PNG (gus::app::frozen_city_snapshot_path,
+// maestro.cpp) era uma chamada SOLTA de std::filesystem::remove no FIM de cada
+// funcao que capturava o fundo (show_title_screen/open_pause_from_city/
+// to_npc_dialogue) - so alcancada pelo caminho de saida NORMAL daquela funcao. Uma
+// excecao levantada durante o uso (ou um return antecipado inserido ali dentro no
+// futuro) pularia a chamada, e o PNG sobreviveria em disco alem do necessario.
+//
+// Esta classe prende a remocao ao FIM DO ESCOPO (destrutor, disparado pelo
+// desenrolamento de pilha em QUALQUER saida do bloco, inclusive por excecao) - o
+// chamador constroi o guardia LOGO APOS capture_frame_to_png() ter sucesso, no
+// MESMO bloco em que o arquivo e consumido como textura, e nao precisa mais de
+// nenhuma chamada de remove solta depois.
+//
+// path vazio == "nada a apagar" (a captura falhou, frozen_ok==false) - o dtor vira
+// no-op, sem tentar remover um arquivo que nunca existiu.
+//
+// POCO puro: so std::filesystem::remove (overload com std::error_code, que NUNCA
+// lanca - contrato exigido de um destrutor) - ZERO SDL/GL, testavel headless (ver
+// maestro_logic_test.cpp, mesmo padrao de write_crossfade_test_tone_wav).
+// Nao-copiavel/nao-movivel de proposito: cada guardia e dono de NO MAXIMO 1
+// remocao, construido e destruido dentro do MESMO bloco - nao ha cenario legitimo
+// de copiar ou transferir essa posse nesta base de codigo.
+//
+// O QUE NAO COBRE (nomear o limite, nao vender garantia que nao existe): queda
+// DURA do processo (SIGKILL, corte de energia, falha de segmentacao sem
+// desenrolamento de pilha) pula o destrutor igual pulava a chamada solta - nesses
+// casos o arquivo sobrevive ate a proxima captura BEM-SUCEDIDA sobrescrever, ou ate
+// frozen_city_snapshot_path() remover, no MELHOR esforco, um residuo deixado por
+// uma sessao anterior (ver o comentario daquela funcao em maestro.cpp) - essa 2a
+// linha de defesa estreita a janela de exposicao a, no maximo, 1 sessao do jogo,
+// mas nao e uma garantia formal contra SIGKILL.
+class FrozenBgRemoveGuard {
+public:
+    explicit FrozenBgRemoveGuard(std::string path) : path_(std::move(path)) {}
+    ~FrozenBgRemoveGuard();
+
+    FrozenBgRemoveGuard(const FrozenBgRemoveGuard&) = delete;
+    FrozenBgRemoveGuard& operator=(const FrozenBgRemoveGuard&) = delete;
+    FrozenBgRemoveGuard(FrozenBgRemoveGuard&&) = delete;
+    FrozenBgRemoveGuard& operator=(FrozenBgRemoveGuard&&) = delete;
+
+private:
+    std::string path_;
+};
 
 }  // namespace gus::app
 

@@ -6,9 +6,11 @@
 
 #include "gus/app/maestro_logic.hpp"
 
-#include <cmath>   // std::abs
-#include <cstddef> // std::size_t
-#include <utility> // std::pair
+#include <cmath>        // std::abs
+#include <cstddef>      // std::size_t
+#include <filesystem>   // FrozenBgRemoveGuard::~FrozenBgRemoveGuard
+#include <system_error> // std::error_code (overload de std::filesystem::remove que nao lanca)
+#include <utility>      // std::pair
 #include <vector>
 
 #include "gus/app/screens/sprite_anchor.hpp"  // sprite_top_y - MESMA formula do desenho
@@ -217,6 +219,19 @@ void crossfade_music(gus::platform::audio::AudioEngine* engine,
     // pelo CHAMADOR pra coincidir com o overlay preto no pico da opacidade.
     engine->stop_music(fade_seconds);
     engine->play_music(next_id, loop, fade_seconds);
+}
+
+FrozenBgRemoveGuard::~FrozenBgRemoveGuard() {
+    if (path_.empty()) {
+        return;  // frozen_ok==false na captura - nao ha arquivo a apagar.
+    }
+    // Overload com std::error_code (NUNCA lanca - contrato exigido de um
+    // destrutor). Falha silenciosa aqui e o MESMO comportamento que a chamada
+    // solta ja tinha antes desta guarda existir (arquivo pode ja ter sido
+    // removido por outra rota, ou o disco pode ter falhado) - nunca propaga
+    // pro chamador.
+    std::error_code ec;
+    std::filesystem::remove(path_, ec);
 }
 
 }  // namespace gus::app

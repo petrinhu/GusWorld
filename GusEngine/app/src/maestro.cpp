@@ -115,7 +115,23 @@ std::string frozen_city_snapshot_path() {
     // Falha silenciosa aqui (ec ignorado de proposito): se o diretorio nao puder
     // ser criado/permissionado, a captura seguinte (capture_frame_to_png) falha
     // sozinha e degrada pra vinheta (frozen_ok==false) - mesmo contrato de sempre.
-    return (std::filesystem::path(dir) / "frozen_city.png").string();
+    const std::string path = (std::filesystem::path(dir) / "frozen_city.png").string();
+
+    // RAII-GUARD (2026-07-29, 2a linha de defesa - ver gus::app::FrozenBgRemoveGuard
+    // em maestro_logic.hpp pra 1a linha): o guardia cobre saida normal/excecao, mas
+    // NAO cobre queda DURA do processo (SIGKILL/corte de energia/segfault sem
+    // desenrolamento de pilha) com o menu/dialogo ainda aberto - nesse caso o dtor
+    // nunca roda e um residuo do frame CONGELADO daquela sessao fica em disco. Sem
+    // esta linha, o residuo so seria apagado quando a PROXIMA captura tivesse
+    // SUCESSO (sobrescrevendo o arquivo) - se ela FALHAR (frozen_ok==false), o
+    // residuo antigo ficaria parado indefinidamente, porque frozen_ok==false nao
+    // arma guardia nenhum. Remocao no MELHOR esforco, ANTES da nova captura: estreita
+    // a janela de exposicao a NO MAXIMO 1 sessao do jogo (do crash ate a proxima vez
+    // que este caminho de codigo rodar), nao e garantia formal contra SIGKILL.
+    std::error_code stale_ec;
+    std::filesystem::remove(path, stale_ec);
+
+    return path;
 }
 }  // namespace
 
@@ -532,9 +548,6 @@ bool Maestro::show_title_screen(bool reached_via_pause) {
     // ainda - capture_frame_to_png redesenha o estado CORRENTE, nao exige um
     // frame anterior) - fundo congelado real (paridade visual estrita, decisao
     // do A1 no passo 4 do plano, INTOCADA aqui).
-    const std::string frozen_bg_path = frozen_city_snapshot_path();
-    const bool frozen_ok = city_->capture_frame_to_png(frozen_bg_path);
-
     gus::app::screens::TitleLoopExit exit = gus::app::screens::TitleLoopExit::QuitApp;
     gus::domain::save::SaveData loaded{};
     // MODOS-MORTE Fase 0: default Medio (§2.1) - so e sobrescrito de fato quando
@@ -542,25 +555,33 @@ bool Maestro::show_title_screen(bool reached_via_pause) {
     // ver title_menu_loop.cpp).
     gus::domain::save::DifficultyLevel new_game_difficulty =
         gus::domain::save::DifficultyLevel::Medio;
-    // FLASH-CTX (A3, passo 5 do plano): o contexto GL UNICO da Maestro (gl_context_)
-    // JA E o corrente do boot ao shutdown - a tela de titulo desenha DIRETO nele
-    // (run_title_menu_loop_gl_current, o nucleo que o A2 extraiu), sem criar/destruir
-    // contexto GL algum. Substitui run_title_menu_loop_owning_gl + city_->
-    // release_renderer()/reacquire_renderer() + o SDL_GL_MakeCurrent de restauracao
-    // (a PONTE TEMPORARIA do A1 nao existe mais - nao ha mais NENHUMA troca de
-    // contexto pra mascarar: a cidade segue desenhada por baixo o tempo todo). Sem
-    // retorno bool: a criacao do contexto ja foi resolvida em init() (se tivesse
-    // falhado, o app nunca teria chegado aqui) - o unico modo de degradacao que resta
-    // e interno ao proprio loop (glintfx::UiLayer::ok()==false), ja tratado dentro
-    // dele (out_exit cai pra NewGame, mesmo padrao de sempre).
-    gus::app::screens::run_title_menu_loop_gl_current(
-        window_, audio_, translator_, gus::platform::fs::resolve_saves_dir(), &exit,
-        &loaded, &new_game_difficulty, frozen_ok ? frozen_bg_path : std::string());
+    {
+        const std::string frozen_bg_path = frozen_city_snapshot_path();
+        const bool frozen_ok = city_->capture_frame_to_png(frozen_bg_path);
+        // RAII (2026-07-29, ordem do lider "quero que apague"): guardia armado SO
+        // se a captura teve sucesso (path vazio == no-op no dtor). Bloco proprio
+        // (em vez do escopo inteiro da funcao) pra apagar o PNG no MESMO ponto de
+        // sempre - logo apos o loop devolver -, agora garantido pelo desenrolamento
+        // de pilha em vez de uma chamada solta (cobre excecao/return antecipado
+        // DENTRO deste bloco; ver gus::app::FrozenBgRemoveGuard pro que NAO cobre).
+        const FrozenBgRemoveGuard frozen_bg_guard(frozen_ok ? frozen_bg_path
+                                                             : std::string());
 
-    if (frozen_ok) {
-        std::error_code remove_ec;
-        std::filesystem::remove(frozen_bg_path, remove_ec);
-    }
+        // FLASH-CTX (A3, passo 5 do plano): o contexto GL UNICO da Maestro (gl_context_)
+        // JA E o corrente do boot ao shutdown - a tela de titulo desenha DIRETO nele
+        // (run_title_menu_loop_gl_current, o nucleo que o A2 extraiu), sem criar/destruir
+        // contexto GL algum. Substitui run_title_menu_loop_owning_gl + city_->
+        // release_renderer()/reacquire_renderer() + o SDL_GL_MakeCurrent de restauracao
+        // (a PONTE TEMPORARIA do A1 nao existe mais - nao ha mais NENHUMA troca de
+        // contexto pra mascarar: a cidade segue desenhada por baixo o tempo todo). Sem
+        // retorno bool: a criacao do contexto ja foi resolvida em init() (se tivesse
+        // falhado, o app nunca teria chegado aqui) - o unico modo de degradacao que resta
+        // e interno ao proprio loop (glintfx::UiLayer::ok()==false), ja tratado dentro
+        // dele (out_exit cai pra NewGame, mesmo padrao de sempre).
+        gus::app::screens::run_title_menu_loop_gl_current(
+            window_, audio_, translator_, gus::platform::fs::resolve_saves_dir(), &exit,
+            &loaded, &new_game_difficulty, frozen_ok ? frozen_bg_path : std::string());
+    }  // frozen_bg_guard destroi aqui -> PNG removido (mesmo timing de antes)
 
     switch (exit) {
         case gus::app::screens::TitleLoopExit::QuitApp:
@@ -590,9 +611,6 @@ bool Maestro::open_pause_from_city() {
     // Trigger/Zelda/Stardew Valley). frozen_ok==false (asset/GPU indisponivel) cai
     // de volta pra vinheta de sempre (degradacao segura, ver run_system_menu_loop_
     // owning_gl - string vazia == "sem fundo capturado").
-    const std::string frozen_bg_path = frozen_city_snapshot_path();
-    const bool frozen_ok = city_->capture_frame_to_png(frozen_bg_path);
-
     const std::string settings_dir = gus::platform::fs::resolve_settings_dir();
 
     // SAVE-LOAD-UI etapa 6 (wiring REAL): os 2 callbacks que dao a tela de save/
@@ -607,48 +625,55 @@ bool Maestro::open_pause_from_city() {
         this->apply_loaded_save_data(data);
     };
 
-    // FLASH-CTX (A3, passo 5 do plano): contexto GL UNICO ja corrente - o menu (e a
-    // tela de Save/Load ANINHADA dentro dele, mesmo contexto) desenha DIRETO nele
-    // (run_system_menu_loop_gl_current), sem criar/destruir contexto GL. Substitui
-    // run_system_menu_loop_owning_gl + o SDL_GL_MakeCurrent de restauracao (a PONTE
-    // TEMPORARIA do A1 nao existe mais). O MENU-PAUSA-FLASH-FIX (hold_frozen_frame)
-    // tambem sai: aquele metodo MASCARAVA o pisca do SDL_Renderer recriado por
-    // reacquire_renderer() - sem essa recriacao (a cidade nunca para de desenhar no
-    // MESMO contexto), nao ha mais nada pra mascarar. O flash morreu na RAIZ (Opcao
-    // C do plano), nao no sintoma.
-    // F4-1b.7: MESMO mecanismo do dialogo (ver run_npc_dialogue_loop_gl_current
-    // acima) - repassa CADA SDL_Event pumpado dentro do menu de pausa pro SdlInput
-    // persistente da cidade via sync_input_event, pra uma tecla de movimento
-    // solta/perdida DURANTE a pausa ser vista AO VIVO (mesmo fix do "Gus anda
-    // sozinho", agora tambem cobrindo a pausa).
-    const gus::app::screens::SystemMenuLoopOutcome outcome =
-        gus::app::screens::run_system_menu_loop_gl_current(
+    gus::app::screens::SystemMenuLoopOutcome outcome;
+    {
+        const std::string frozen_bg_path = frozen_city_snapshot_path();
+        const bool frozen_ok = city_->capture_frame_to_png(frozen_bg_path);
+        // RAII (2026-07-29, ordem do lider "quero que apague"): guardia armado SO
+        // se a captura teve sucesso (path vazio == no-op no dtor). Bloco proprio
+        // (em vez do escopo inteiro da funcao) pra apagar o PNG no MESMO ponto de
+        // sempre - logo apos set_controls() abaixo -, agora garantido pelo
+        // desenrolamento de pilha em vez de uma chamada solta (cobre tambem
+        // excecao/return antecipado DENTRO deste bloco - se o escopo fosse a
+        // funcao INTEIRA, o guardia so destruiria DEPOIS de um eventual
+        // show_title_screen() chamado abaixo, que faz sua PROPRIA captura no
+        // MESMO caminho - desnecessario e confuso mante-lo vivo ate la). Ver
+        // gus::app::FrozenBgRemoveGuard pro que NAO cobre.
+        const FrozenBgRemoveGuard frozen_bg_guard(frozen_ok ? frozen_bg_path
+                                                             : std::string());
+
+        // FLASH-CTX (A3, passo 5 do plano): contexto GL UNICO ja corrente - o menu (e a
+        // tela de Save/Load ANINHADA dentro dele, mesmo contexto) desenha DIRETO nele
+        // (run_system_menu_loop_gl_current), sem criar/destruir contexto GL. Substitui
+        // run_system_menu_loop_owning_gl + o SDL_GL_MakeCurrent de restauracao (a PONTE
+        // TEMPORARIA do A1 nao existe mais). O MENU-PAUSA-FLASH-FIX (hold_frozen_frame)
+        // tambem sai: aquele metodo MASCARAVA o pisca do SDL_Renderer recriado por
+        // reacquire_renderer() - sem essa recriacao (a cidade nunca para de desenhar no
+        // MESMO contexto), nao ha mais nada pra mascarar. O flash morreu na RAIZ (Opcao
+        // C do plano), nao no sintoma.
+        // F4-1b.7: MESMO mecanismo do dialogo (ver run_npc_dialogue_loop_gl_current
+        // acima) - repassa CADA SDL_Event pumpado dentro do menu de pausa pro SdlInput
+        // persistente da cidade via sync_input_event, pra uma tecla de movimento
+        // solta/perdida DURANTE a pausa ser vista AO VIVO (mesmo fix do "Gus anda
+        // sozinho", agora tambem cobrindo a pausa).
+        outcome = gus::app::screens::run_system_menu_loop_gl_current(
             window_, audio_, translator_, settings_dir,
             gus::platform::fs::resolve_saves_dir(), build_current_save_data,
             apply_loaded_save_data, frozen_ok ? frozen_bg_path : std::string(),
             [this](const SDL_Event& ev) { city_->sync_input_event(ev); });
 
-    // M2 (GAP FINAL) -> M2 STAGED CHANGES: RELE o controls.json e realimenta o
-    // SdlInput da cidade - aplica o remap SEM exigir restart. O jogador pode
-    // ter passado por Controles, confirmado "Aplicar" (persist_controls, so
-    // ESSE botao escreve em controls.json agora - ver system_menu_loop.cpp) e
-    // voltado direto pra Continuar; INCONDICIONAL (mesmo se nada mudou/nada
-    // foi aplicado) porque load_controls e barato e sempre degrada com
-    // seguranca (arquivo ausente/corrompido -> default_controls(), nunca
-    // lanca) - reler de mais nunca corrompe nada, so confirma o estado do
-    // disco (que so mudou se o jogador de fato aplicou).
-    city_->set_controls(gus::platform::fs::load_controls(
-        settings_dir, std::string(gus::domain::input::kDefaultProfile)));
-
-    // Higiene (AC-E3): apaga o snapshot congelado ao fechar o menu - a proxima
-    // abertura sobrescreve de qualquer forma (dentro do dir 0700 o risco de symlink
-    // ja nao existe), mas nao ha motivo pra deixar o PNG do ultimo frame parado em
-    // disco entre uma abertura e outra. Falha silenciosa (arquivo pode nao existir
-    // se frozen_ok==false).
-    if (frozen_ok) {
-        std::error_code remove_ec;
-        std::filesystem::remove(frozen_bg_path, remove_ec);
-    }
+        // M2 (GAP FINAL) -> M2 STAGED CHANGES: RELE o controls.json e realimenta o
+        // SdlInput da cidade - aplica o remap SEM exigir restart. O jogador pode
+        // ter passado por Controles, confirmado "Aplicar" (persist_controls, so
+        // ESSE botao escreve em controls.json agora - ver system_menu_loop.cpp) e
+        // voltado direto pra Continuar; INCONDICIONAL (mesmo se nada mudou/nada
+        // foi aplicado) porque load_controls e barato e sempre degrada com
+        // seguranca (arquivo ausente/corrompido -> default_controls(), nunca
+        // lanca) - reler de mais nunca corrompe nada, so confirma o estado do
+        // disco (que so mudou se o jogador de fato aplicou).
+        city_->set_controls(gus::platform::fs::load_controls(
+            settings_dir, std::string(gus::domain::input::kDefaultProfile)));
+    }  // frozen_bg_guard destroi aqui -> PNG removido (mesmo timing de antes)
 
     if (outcome.to_title) {
         // MENU-INICIAL: "Sim" confirmado no mini-dialogo "voltar ao menu
@@ -1171,42 +1196,45 @@ bool Maestro::to_npc_dialogue() {
     // REAL como fundo estatico, no lugar da vinheta abstrata (mesmo padrao de
     // Chrono Trigger/Zelda/Stardew Valley). frozen_ok==false degrada pra vinheta de
     // sempre (ver run_npc_dialogue_loop_gl_current).
-    const std::string frozen_bg_path = frozen_city_snapshot_path();
-    const bool frozen_ok = city_->capture_frame_to_png(frozen_bg_path);
+    bool quit_requested = false;
+    {
+        const std::string frozen_bg_path = frozen_city_snapshot_path();
+        const bool frozen_ok = city_->capture_frame_to_png(frozen_bg_path);
+        // RAII (2026-07-29, ordem do lider "quero que apague"): guardia armado SO
+        // se a captura teve sucesso (path vazio == no-op no dtor). Bloco proprio
+        // pra apagar o PNG no MESMO ponto de sempre - logo apos o loop devolver -,
+        // agora garantido pelo desenrolamento de pilha em vez de uma chamada solta;
+        // ver gus::app::FrozenBgRemoveGuard pro que NAO cobre.
+        const FrozenBgRemoveGuard frozen_bg_guard(frozen_ok ? frozen_bg_path
+                                                             : std::string());
 
-    // DIALOGO-TERMINAL (FLASH-CTX, A3, passo 5 do plano): contexto GL UNICO ja
-    // corrente - o dialogo desenha DIRETO nele (run_npc_dialogue_loop_gl_current, o
-    // nucleo que o A2 extraiu), sem criar/destruir contexto GL. Substitui
-    // run_npc_dialogue_loop_gl (a casca owning) + o SDL_GL_MakeCurrent de
-    // restauracao (a PONTE TEMPORARIA do A1 nao existe mais). O nucleo _gl_current
-    // NAO chama SdlWindow::clear_input() sozinho (fica no CHAMADOR que possui o
-    // contexto, ver o header).
-    //
-    // F4-1a (onda F4, fatia 1 - loops modais -> maquina de estados com 1 unico
-    // pump de eventos, ver gus/app/screen_state.hpp): o dialogo agora roda por
-    // gus::app::run_screen_state (dentro de run_npc_dialogue_loop_gl_current),
-    // que entrega CADA SDL_Event pumpado tanto pra tela QUANTO, por este
-    // sync_hook, pro SdlInput persistente da cidade (city_->sync_input_event) -
-    // ai esta o motivo do clear_input() de SAIDA ter SUMIDO logo abaixo (ainda
-    // existia ate esta fatia): a solta de uma tecla de movimento durante a
-    // conversa agora e vista AO VIVO (no MESMO frame em que acontece), nao
-    // precisa mais de um flush retroativo ao fechar o dialogo. O clear_input()
-    // de ENTRADA continua (decisao de PRODUTO, nao bug - "nao faz sentido o Gus
-    // tentar mover" com a caixa de dialogo aberta; ver o comentario de
-    // sync_input_event em sdl_window.hpp pro racional completo, inclusive por
-    // que sync_input_event so repassa SOLTA/perda-de-foco, nunca aperto).
-    // PROVA: platform/tests/sdl_input_test.cpp, casos "[f4-1a]".
-    city_->clear_input();
-    const bool quit_requested = gus::app::screens::run_npc_dialogue_loop_gl_current(
-        window_, runtime, translator_, audio_, frozen_ok ? frozen_bg_path : std::string(),
-        [this](const SDL_Event& ev) { city_->sync_input_event(ev); });
-
-    // Higiene (AC-E3): mesma limpeza pos-uso do menu de pausa (ver open_pause_from_
-    // city) - o snapshot congelado nao precisa sobreviver alem do dialogo que o leu.
-    if (frozen_ok) {
-        std::error_code remove_ec;
-        std::filesystem::remove(frozen_bg_path, remove_ec);
-    }
+        // DIALOGO-TERMINAL (FLASH-CTX, A3, passo 5 do plano): contexto GL UNICO ja
+        // corrente - o dialogo desenha DIRETO nele (run_npc_dialogue_loop_gl_current, o
+        // nucleo que o A2 extraiu), sem criar/destruir contexto GL. Substitui
+        // run_npc_dialogue_loop_gl (a casca owning) + o SDL_GL_MakeCurrent de
+        // restauracao (a PONTE TEMPORARIA do A1 nao existe mais). O nucleo _gl_current
+        // NAO chama SdlWindow::clear_input() sozinho (fica no CHAMADOR que possui o
+        // contexto, ver o header).
+        //
+        // F4-1a (onda F4, fatia 1 - loops modais -> maquina de estados com 1 unico
+        // pump de eventos, ver gus/app/screen_state.hpp): o dialogo agora roda por
+        // gus::app::run_screen_state (dentro de run_npc_dialogue_loop_gl_current),
+        // que entrega CADA SDL_Event pumpado tanto pra tela QUANTO, por este
+        // sync_hook, pro SdlInput persistente da cidade (city_->sync_input_event) -
+        // ai esta o motivo do clear_input() de SAIDA ter SUMIDO logo abaixo (ainda
+        // existia ate esta fatia): a solta de uma tecla de movimento durante a
+        // conversa agora e vista AO VIVO (no MESMO frame em que acontece), nao
+        // precisa mais de um flush retroativo ao fechar o dialogo. O clear_input()
+        // de ENTRADA continua (decisao de PRODUTO, nao bug - "nao faz sentido o Gus
+        // tentar mover" com a caixa de dialogo aberta; ver o comentario de
+        // sync_input_event em sdl_window.hpp pro racional completo, inclusive por
+        // que sync_input_event so repassa SOLTA/perda-de-foco, nunca aperto).
+        // PROVA: platform/tests/sdl_input_test.cpp, casos "[f4-1a]".
+        city_->clear_input();
+        quit_requested = gus::app::screens::run_npc_dialogue_loop_gl_current(
+            window_, runtime, translator_, audio_, frozen_ok ? frozen_bg_path : std::string(),
+            [this](const SDL_Event& ev) { city_->sync_input_event(ev); });
+    }  // frozen_bg_guard destroi aqui -> PNG removido (mesmo timing de antes)
 
     const auto it = save_.flags.find("npc_intro.met");
     std::cout << "Maestro: [dialogo] conversa encerrada (npc_intro.met="
