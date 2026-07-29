@@ -140,8 +140,22 @@ fi
 GATE_I18N=$?
 set -e
 
+# (c) Ratchet de nao-regressao SDL em app/ (docs/tech/plano-camadas-sdl.md):
+#     platform/ e a UNICA fronteira que deveria tocar SDL3 (CLAUDE.md), mas
+#     app/ ainda tem 32 arquivos de producao (src/+include/gus/app/, fora
+#     tests/tools/) que tocam SDL3 direto - migracao em andamento por fatias.
+#     O teto (script tools/sdl_layer_ratchet.py) so pode CAIR: falha se o
+#     numero de arquivos infratores SUBIR. bash+grep cru conta comentario
+#     como uso real (a mesma armadilha que deixou o GATE(arch) original sem
+#     cobrir app/ - ver plano, secao 1), por isso o parser e Python.
+set +e
+python3 "$ROOT/tools/sdl_layer_ratchet.py"
+GATE_SDL_RATCHET=$?
+set -e
+
 GATE=0
-[ "$GATE_ARCH" = "0" ] && [ "$GATE_EXCL" = "0" ] && [ "$GATE_I18N" = "0" ] || GATE=1
+[ "$GATE_ARCH" = "0" ] && [ "$GATE_EXCL" = "0" ] && [ "$GATE_I18N" = "0" ] \
+    && [ "$GATE_SDL_RATCHET" = "0" ] || GATE=1
 echo "GATE=$GATE"
 
 # ---------------------------------------------------------------- SUITE
