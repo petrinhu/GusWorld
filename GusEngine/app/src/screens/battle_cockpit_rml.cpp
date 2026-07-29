@@ -414,12 +414,19 @@ std::string glintfx_cockpit_stage_dir() {
 
 // ADR-010 F2a: produz a variante BAKED (valores ESTATICOS) do cockpit REAL pelo
 // glintfx::UiLayer. REUSA o RML/RCSS autorado de load_cockpit_rml() (gradientes/glow/
-// molduras/keyframes intactos) e so TRANSFORMA por string: (1) injeta @font-face (o
-// UiLayer nao expoe Rml::LoadFontFace - so o doc carrega fonte); (2) remove o data-model;
-// (3) troca {{bindings}} por literais de um encontro-exemplo (Gus 55/55, papel); (4) achata
-// o caminho do retrato; (5) escolhe o estado (combate por padrao, ou intro/brasao). Copia
-// os 4 assets (2 fontes + moldura + retrato) pro stage dir e escreve o .rml la. Devolve o
-// path do .rml. NAO toca o caminho vendorizado (load_cockpit_rml fica intacto).
+// molduras/keyframes intactos) e so TRANSFORMA por string: (1) remove o data-model; (2)
+// troca {{bindings}} por literais de um encontro-exemplo (Gus 55/55, papel); (3) achata o
+// caminho do retrato; (4) escolhe o estado (combate por padrao, ou intro/brasao). Copia os
+// 4 assets (2 fontes + moldura + retrato) pro stage dir e escreve o .rml la. Devolve o path
+// do .rml. NAO toca o caminho vendorizado (load_cockpit_rml fica intacto).
+//
+// FONT-EXTEND-GLITCH (2026-07-29): a fonte NAO e mais injetada aqui via @font-face de
+// string - o chamador (battle_preview.cpp) registra a familia UMA vez via
+// glintfx::UiLayer::load_font_face (API nova, v0.24.0) logo apos set_asset_base_url,
+// ANTES de ui_->load(rml_path). Este helper continua copiando os 2 .ttf pro stage
+// (load_font_face resolve o path pela MESMA BaseUrlFileInterface que a @font-face antiga
+// usava - o arquivo precisa estar la do mesmo jeito), so a INJECAO na string do doc que
+// sumiu.
 std::string write_baked_cockpit_rml(bool intro) {
     namespace fs = std::filesystem;
     const fs::path stage = glintfx_cockpit_stage_dir();
@@ -463,30 +470,19 @@ std::string write_baked_cockpit_rml(bool intro) {
         }
     };
 
-    // (1) @font-face logo apos <style> (o UiLayer nao expoe LoadFontFace; o doc registra a
-    // familia). Caminhos RELATIVOS achatados (os .ttf foram copiados pro stage). 'src' usa
-    // a sintaxe do RmlUi.
-    replace_all(
-        "<style>\n",
-        "<style>\n"
-        "@font-face { font-family: \"Pixel Operator Mono\"; "
-        "src: \"PixelOperatorMono.ttf\"; }\n"
-        "@font-face { font-family: \"Pixel Operator Mono\"; font-weight: bold; "
-        "src: \"PixelOperatorMono-Bold.ttf\"; }\n");
-
-    // (2) remove o data-model (nao ha binding no v0.2.2 - e por isso que bakamos).
+    // (1) remove o data-model (nao ha binding no v0.2.2 - e por isso que bakamos).
     replace_all(" data-model=\"hud\"", "");
 
-    // (3) {{bindings}} -> literais do encontro-exemplo (decisao do lider: Gus 55/55).
+    // (2) {{bindings}} -> literais do encontro-exemplo (decisao do lider: Gus 55/55).
     replace_all("{{nome}}", "Gus");
     replace_all("{{role}}", "VETOR DO GAMBITO");
     replace_all("{{hp}}", "55");
     replace_all("{{hp_max}}", "55");
 
-    // (4) achata o caminho do retrato (copiado flat pro stage).
+    // (3) achata o caminho do retrato (copiado flat pro stage).
     replace_all("retratos/retrato_gus_combate_nobg.png", "retrato_gus_combate_nobg.png");
 
-    // (5) estado: o doc tem DOIS blocos mutuamente exclusivos via data-if (opening/combat).
+    // (4) estado: o doc tem DOIS blocos mutuamente exclusivos via data-if (opening/combat).
     // Sem data-model nao ha data-if; entao REMOVEMOS o bloco do estado nao-desejado e
     // tiramos o atributo data-if do que fica (senao o RmlUi tenta resolver e some).
     const std::size_t open_a = rml.find("<div id=\"opening\"");
@@ -576,20 +572,10 @@ std::string write_live_cockpit_rml() {
         }
     };
 
-    // (1) @font-face logo apos <style> (o UiLayer nao expoe LoadFontFace; o doc registra a
-    // familia). Caminhos RELATIVOS achatados (os .ttf foram copiados pro stage).
-    replace_all(
-        "<style>\n",
-        "<style>\n"
-        "@font-face { font-family: \"Pixel Operator Mono\"; "
-        "src: \"PixelOperatorMono.ttf\"; }\n"
-        "@font-face { font-family: \"Pixel Operator Mono\"; font-weight: bold; "
-        "src: \"PixelOperatorMono-Bold.ttf\"; }\n");
-
-    // (2) achata o caminho do retrato (copiado flat pro stage).
+    // (1) achata o caminho do retrato (copiado flat pro stage).
     replace_all("retratos/retrato_gus_combate_nobg.png", "retrato_gus_combate_nobg.png");
 
-    // (2b) RETRATO-VIVO: o retrato da moldura (#pic) vira DATA-DRIVEN e segue o ator ATIVO.
+    // (1b) RETRATO-VIVO: o retrato da moldura (#pic) vira DATA-DRIVEN e segue o ator ATIVO.
     // data-style-decorator monta a property 'decorator' por frame a partir do binding
     // {{retrato_src}} (nome flat do retrato, alimentado por cockpit_retrato_flat_for). Mantem
     // o fit 'cover' (encaixa sem distorcer/cropa o que sobra). O decorator ESTATICO do RCSS

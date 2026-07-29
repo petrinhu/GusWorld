@@ -394,6 +394,35 @@ void BattleScreen::enter() {
             // relativos -> base_url/path; absolutos passam direto.
             if (!base_url.empty()) {
                 ui_->set_asset_base_url(base_url.c_str());
+                // FONT-EXTEND-GLITCH (2026-07-29): registra a familia "Pixel Operator
+                // Mono" (regular+bold) UMA vez via glintfx::UiLayer::load_font_face (API
+                // nova, v0.24.0) - mata o @font-face injetado por string que
+                // write_baked_cockpit_rml/write_live_cockpit_rml faziam antes (ver
+                // battle_cockpit_rml.cpp). Registro e process-wide RmlUi state (sem
+                // ordem vs. load() - ver ui_layer.hpp), mas chamamos ANTES pra manter a
+                // mesma ordem visual do @font-face-logo-apos-<style> antigo. `family`
+                // SEMPRE explicito (armadilha de assimetria de motor documentada em
+                // font_face.hpp: sem family, FontEngine::Own derivaria do stem do
+                // arquivo enquanto o FreeType que rodamos le a tabela 'name' do SFNT -
+                // passar o mesmo literal que o RCSS ja referencia neutraliza os dois).
+                // Os .ttf ja foram copiados pro stage por write_baked_cockpit_rml/
+                // write_live_cockpit_rml (SMOKE nao entra aqui - base_url vazio).
+                if (!ui_->load_font_face(glintfx::FontFaceDesc{
+                        /*path=*/"PixelOperatorMono.ttf",
+                        /*family=*/"Pixel Operator Mono"})) {
+                    std::cerr << "BattlePreview: [glintfx] load_font_face(PixelOperator"
+                                 "Mono.ttf) falhou (arquivo ausente/invalido no stage) - "
+                                 "cockpit cai no fallback de fonte do RmlUi.\n";
+                }
+                if (!ui_->load_font_face(glintfx::FontFaceDesc{
+                        /*path=*/"PixelOperatorMono-Bold.ttf",
+                        /*family=*/"Pixel Operator Mono",
+                        /*style=*/glintfx::FontStyle::Normal,
+                        /*weight=*/glintfx::FontWeight::Bold})) {
+                    std::cerr << "BattlePreview: [glintfx] load_font_face(PixelOperator"
+                                 "Mono-Bold.ttf) falhou (arquivo ausente/invalido no "
+                                 "stage) - cockpit cai no fallback de fonte do RmlUi.\n";
+                }
             }
             ui_->load(rml_path.c_str());
             ui_->set_viewport(pw0_, ph0_);    // pixels reais do backbuffer

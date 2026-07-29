@@ -110,12 +110,18 @@ TEST_CASE("write_smoke_glintfx_rml: DIV com gradiente/glow em px, sem @font-face
 }
 
 TEST_CASE("write_baked_cockpit_rml(intro=false): bindings viram literais (Gus 55/55), "
-          "data-model removido, bloco de ABERTURA ausente, bloco de COMBATE presente",
+          "data-model removido, bloco de ABERTURA ausente, bloco de COMBATE presente, "
+          "SEM @font-face injetado (FONT-EXTEND-GLITCH: fonte registrada via "
+          "load_font_face, nao mais por string)",
           "[battle_cockpit_rml]") {
     const std::string path = write_baked_cockpit_rml(/*intro=*/false);
     const std::string rml = slurp(path);
 
-    REQUIRE(rml.find("@font-face") != std::string::npos);
+    // FONT-EXTEND-GLITCH (2026-07-29): o @font-face por string foi MATADO - a familia
+    // agora e registrada 1x pelo chamador via glintfx::UiLayer::load_font_face (API
+    // v0.24.0), fora deste .rml. Trava o comportamento NOVO (mesmo espirito do teste:
+    // characterization, nao "ideal").
+    REQUIRE(rml.find("@font-face") == std::string::npos);
     REQUIRE(rml.find("data-model") == std::string::npos);
     REQUIRE(rml.find("{{nome}}") == std::string::npos);
     REQUIRE(rml.find(">Gus<") != std::string::npos);
@@ -150,12 +156,15 @@ TEST_CASE("write_baked_cockpit_rml(intro=true): bloco de ABERTURA presente, bloc
 }
 
 TEST_CASE("write_live_cockpit_rml: mantem data-model + bindings vivos, foco navegavel "
-          "por pill, data-class-sel por indice, log data-for",
+          "por pill, data-class-sel por indice, log data-for, SEM @font-face injetado "
+          "(FONT-EXTEND-GLITCH: fonte registrada via load_font_face, nao mais por string)",
           "[battle_cockpit_rml]") {
     const std::string path = write_live_cockpit_rml();
     const std::string rml = slurp(path);
 
-    REQUIRE(rml.find("@font-face") != std::string::npos);
+    // FONT-EXTEND-GLITCH (2026-07-29): ver o comentario equivalente no TEST_CASE do BAKED
+    // acima - mesma migracao, mesmo racional.
+    REQUIRE(rml.find("@font-face") == std::string::npos);
     REQUIRE(rml.find("data-model=\"hud\"") != std::string::npos);
     // Bindings PRESERVADOS (nao viram literal, diferente do BAKED).
     REQUIRE(rml.find("{{nome}}") != std::string::npos);
