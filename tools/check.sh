@@ -102,6 +102,34 @@ else
         echo "GATE(arch): OK (sem Qt, SDL, RmlUi nem glintfx em core/ ou domain/)."
 fi
 
+# (a2) EXCLUSIVIDADE DO GLINTFX (decisao do lider, 2026-07-29): o RmlUi e servido
+#      EXCLUSIVAMENTE pelo glintfx. Nenhuma camada nossa fala com a API do RmlUi
+#      direto - nem app/, nem platform/. Se falta alguma coisa, o caminho e PEDIR ao
+#      glintfx (regua de fronteira, docs/tech/glintfx-boundary.md), nao contornar por
+#      dentro. Medido em 2026-07-29: o codigo ja estava 100% em conformidade (zero uso
+#      de Rml:: fora de comentario, 36 arquivos consumindo glintfx), entao este gate
+#      CONGELA um estado que ja existia por disciplina, em vez de pedir migracao.
+#      ATENCAO ao falso positivo: RmlUi_Include_GL3.h e o header do GLAD (nome
+#      historico enganoso, ver THIRD-PARTY-LICENSES.md), NAO e API do RmlUi - por isso
+#      o padrao abaixo casa <RmlUi/...> e Rml::, e nao a string "RmlUi" solta.
+GATE_EXCL=0
+if grep -rnE '#[[:space:]]*include[[:space:]]*[<"]RmlUi/' \
+        "$ENGINE/platform" "$ENGINE/app" 2>/dev/null; then
+    echo "GATE(excl): include da API do RmlUi encontrado fora do glintfx."
+    echo "            O RmlUi e servido EXCLUSIVAMENTE pelo glintfx (decisao do lider 2026-07-29)."
+    echo "            Falta algo? PECA ao glintfx (docs/tech/glintfx-boundary.md), nao contorne."
+    GATE_EXCL=1
+elif grep -rnE --include='*.cpp' --include='*.hpp' --include='*.h' '\bRml::' \
+        "$ENGINE/platform" "$ENGINE/app" 2>/dev/null \
+        | grep -vE '^[^:]+:[0-9]+:[[:space:]]*(//|\*|/\*|#)' | grep -q .; then
+    echo "GATE(excl): uso do namespace Rml:: fora de comentario em platform/ ou app/."
+    echo "            O RmlUi e servido EXCLUSIVAMENTE pelo glintfx (decisao do lider 2026-07-29)."
+    GATE_EXCL=1
+else
+    [ "$QUIET" = "1" ] || \
+        echo "GATE(excl): OK (RmlUi so via glintfx; nenhuma camada fala com a API dele direto)."
+fi
+
 # (b) Paridade i18n: tabela por locale (faltando/extra/dup reprovam; % so exibe).
 set +e
 if [ -n "$MIN_I18N" ]; then
@@ -113,7 +141,7 @@ GATE_I18N=$?
 set -e
 
 GATE=0
-[ "$GATE_ARCH" = "0" ] && [ "$GATE_I18N" = "0" ] || GATE=1
+[ "$GATE_ARCH" = "0" ] && [ "$GATE_EXCL" = "0" ] && [ "$GATE_I18N" = "0" ] || GATE=1
 echo "GATE=$GATE"
 
 # ---------------------------------------------------------------- SUITE
