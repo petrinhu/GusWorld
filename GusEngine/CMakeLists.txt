@@ -199,6 +199,17 @@ endif()
 set(GLINTFX_MODULE_I18N      OFF CACHE BOOL "" FORCE)
 set(GLINTFX_OWN_FONT_ENGINE  OFF CACHE BOOL "" FORCE)
 #
+# GLINTFX_MODULE_APP OFF (BUMP v0.20.0 -> v0.23.0, flag nova nesta versao, ADR-0015 (b) do
+# lado deles): "app" e a fachada App standalone (janela+loop proprios GLFW), o oposto do
+# nosso modo (embed-only, casca SDL propria hospedando glintfx::UiLayer). A propria option()
+# deles ja default pro valor de GLINTFX_MODULE_WINDOW (que e alias de GLINTFX_BACKEND_GLFW,
+# ja FORCADO OFF acima) - ou seja, ja herdariamos OFF de graca por dependencia de DAG deles
+# (com FATAL_ERROR se alguem tentasse ligar APP com WINDOW OFF). Fixado aqui EXPLICITO por
+# clareza/estabilidade contra bump futuro (mesma disciplina de TEXT/FX/AUDIO/GAMEPAD/I18N
+# acima) e porque e o unico jeito de o gate ficar visivel pra quem le este arquivo sem
+# precisar saber da regra de default-por-dependencia do lado deles.
+set(GLINTFX_MODULE_APP       OFF CACHE BOOL "" FORCE)
+#
 # BUMP v0.2.4 -> v0.2.5 (decisao Caetano/CTO 2026-07-02, higiene pre-M7): a v0.2.5 entrega
 # UiLayer::set_click_callback (hit-test de elemento NATIVO do glintfx, reportando o id do
 # elemento clicado) - mata a divida do hit-test manual dos 6 pills de verbo do cockpit
@@ -324,6 +335,40 @@ set(GLINTFX_OWN_FONT_ENGINE  OFF CACHE BOOL "" FORCE)
 # plataforma do libm (GLINTFX-LIBM-SHIM) continua em glintfx_audio; pin do RmlUi continua
 # no MESMO SHA 2cd28864 (patch teardown-UB segue aplicavel). Suite completa verde no pin
 # novo antes deste commit.
+#
+# BUMP v0.20.0 -> v0.23.0 (D2D-2-SENTINELA, 2026-07-29): SO ALINHAMENTO DE PIN, sem adotar
+# nenhuma API nova (Draw2D camera/transforms/primitivas/scissor/texto sao decisao futura do
+# lider, item D2D-2-SENTINELA/GLINTFX-FONTFLIP-VALIDATE - NAO consumidas aqui). Ritual de
+# bump revalidado por leitura direta do CMakeLists.txt deles na tag v0.23.0 (baixado via
+# `gh api repos/petrinhu/glintfx/contents/glintfx/CMakeLists.txt?ref=v0.23.0`):
+#   - Flags GLINTFX_MODULE_TEXT/_FX/_AUDIO/_GAMEPAD/_I18N/_WINDOW e GLINTFX_BACKEND_GLFW/
+#     GLINTFX_OWN_FONT_ENGINE continuam com os mesmos nomes e mesma semantica.
+#   - Guard de libm em glintfx_audio continua por COMPILADOR
+#     ($<$<NOT:$<CXX_COMPILER_ID:MSVC>>:m>), inalterado desde a v0.18.1.
+#   - Pin do RmlUi deles continua no MESMO SHA 2cd28864ae25ed345b70598751703a5433b12356 (o
+#     patch teardown-UB nosso segue aplicavel - o nosso Declare(RmlUi) vem primeiro e decide,
+#     ver comentario grande no bloco RmlUi acima).
+#   - Vendors deles (gamecontrollerdb/khronos/miniaudio/stb) conferidos apos o configure
+#     novo contra THIRD-PARTY-LICENSES.md - ver o proprio doc pro resultado desta rodada.
+#   - GLINTFX_MODULE_APP (flag NOVA nesta faixa, ADR-0015 (b), o agregador a-la-carte da
+#     fachada App standalone): FORCADA OFF explicitamente logo abaixo do bloco de flags
+#     acima (nao aqui) - ver o comentario proprio dela pro raciocinio (ja herdariamos OFF de
+#     graca via GLINTFX_MODULE_WINDOW=OFF, mas fixar explicito documenta a escolha).
+#   - GOTCHA do motor de fonte (L1.20-FONTFLIP): `UiLayerConfig::font_engine` (glintfx/
+#     include/glintfx/ui_layer.hpp) tem default FontEngine::Own desde a v0.10 - nos NUNCA
+#     setamos esse campo em nenhum ponto de construcao de glintfx::UiLayer::Config no
+#     GusEngine (grep confirmado, zero ocorrencia). Verificado que Bootstrap::init()
+#     (glintfx/src/bootstrap.cpp) cai no fallback fail-safe pra FreeType quando o binario e
+#     compilado com GLINTFX_OWN_FONT_ENGINE=OFF (nosso caso, ja fixado acima) mesmo que o
+#     chamador peca Own - loga 1 warning por init(), nunca quebra. Mecanismo ja documentado
+#     no comentario da propria flag GLINTFX_OWN_FONT_ENGINE (acima, nesta secao) desde antes
+#     deste bump; a conferencia desta rodada foi RE-VERIFICAR que continua valendo
+#     caractere-a-caractere na v0.23.0 (bootstrap.cpp linhas ~994-1020) - RESULTADO: continua
+#     valendo, ZERO mudanca de comportamento, e por isso NENHUM call site de app/ precisou
+#     setar FontEngine::FreeType explicito (resultado negativo provado, nao mudanca
+#     defensiva no escuro - GLINTFX-FONTFLIP-VALIDATE, a decisao de A/B testar o motor
+#     proprio de verdade, segue pendente e e do lider).
+# Build local + suite completa (2576 testes) verdes no pin novo antes deste commit.
 set(GLINTFX_MODULE_DRAW2D    OFF CACHE BOOL "" FORCE)
 
 FetchContent_Declare(
@@ -334,7 +379,7 @@ FetchContent_Declare(
     # evidencia, nao presumida: a tag v0.20.0 tem o MESMO sha nos dois hosts
     # (9bfaabfa, apontando pro commit 0442dd15 que ja esta no nosso _deps).
     GIT_REPOSITORY https://github.com/petrinhu/glintfx
-    GIT_TAG        v0.20.0
+    GIT_TAG        v0.23.0
     SOURCE_SUBDIR  glintfx
 )
 FetchContent_MakeAvailable(glintfx)
