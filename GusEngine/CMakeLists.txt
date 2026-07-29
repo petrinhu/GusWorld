@@ -397,6 +397,36 @@ set(GLINTFX_MODULE_APP       OFF CACHE BOOL "" FORCE)
 # ON (`nm` re-confirmado: simbolos Draw2d::* agora presentes E referenciados de verdade).
 set(GLINTFX_MODULE_DRAW2D    ON  CACHE BOOL "" FORCE)
 
+# BUMP v0.23.0 -> v0.24.0 (FONT-EXTEND-GLITCH, 2026-07-29): traz UI-FONTFACE
+# (glintfx::UiLayer::load_font_face/glintfx::App::load_font_face, glintfx/include/glintfx/
+# font_face.hpp) - a API que expoe Rml::LoadFontFace programaticamente, matando o
+# contorno que este projeto tinha (injetar `@font-face` no RML por concatenacao de string
+# procurando a substring "<style>\n"; ver o commit desta mesma onda que consome a API em
+# app/src/screens/). Drop-in a partir da v0.23.0 (nenhuma assinatura existente mudou, so
+# API nova aditiva) - ZERO ajuste de codigo neste bloco de CMake, so o GIT_TAG. Ritual de
+# bump revalidado por leitura direta do CMakeLists.txt deles na tag v0.24.0 (baixado via
+# `gh api repos/petrinhu/glintfx/contents/glintfx/CMakeLists.txt?ref=v0.24.0`):
+#   - Flags GLINTFX_MODULE_TEXT/_FX/_AUDIO/_GAMEPAD/_I18N/_WINDOW/_DRAW2D/_APP e
+#     GLINTFX_BACKEND_GLFW/GLINTFX_OWN_FONT_ENGINE continuam com os mesmos nomes e mesma
+#     semantica (inclusive o FATAL_ERROR de GLINTFX_MODULE_APP sem GLINTFX_MODULE_WINDOW e
+#     o de GLINTFX_MODULE_IMAGE/_TEXT=OFF, ainda reservadas/forcadas ON).
+#   - Guard de libm em glintfx_audio continua por COMPILADOR
+#     ($<$<NOT:$<CXX_COMPILER_ID:MSVC>>:m>), inalterado desde a v0.18.1.
+#   - Pin do RmlUi deles continua no MESMO SHA 2cd28864ae25ed345b70598751703a5433b12356 (o
+#     patch teardown-UB nosso segue aplicavel - o nosso Declare(RmlUi) vem primeiro e decide,
+#     ver comentario grande no bloco RmlUi acima).
+#   - Vendors deles (gamecontrollerdb/khronos/miniaudio/stb) conferidos via
+#     `gh api repos/petrinhu/glintfx/contents/glintfx/third_party?ref=v0.24.0` - MESMOS 4 do
+#     pin anterior, nenhum vendor novo. THIRD-PARTY-LICENSES.md atualizado so na data/pin.
+#   - GOTCHA NOVO desta versao (ASSIMETRIA DE MOTOR, ver o proprio doc-comment de
+#     font_face.hpp): com `family = nullptr`, FontEngine::Own deriva a familia do STEM do
+#     arquivo (`opensans-regular`) enquanto FreeType (o motor que rodamos,
+#     GLINTFX_OWN_FONT_ENGINE=OFF) le a tabela 'name' do SFNT (`Open Sans`) - os call sites
+#     novos em app/src/screens/ SEMPRE passam `family` explicito ("Pixel Operator Mono",
+#     igual ao que o RCSS ja referenciava), o que neutraliza a assimetria nos dois motores.
+# Build local + suite completa verdes no pin novo antes deste commit (contagem de testes no
+# relatorio da onda FONT-EXTEND-GLITCH).
+
 FetchContent_Declare(
     glintfx
     # MIGRADO DO CODEBERG PRO GITHUB em 2026-07-25 (o Codeberg passou a nao aceitar
@@ -405,7 +435,7 @@ FetchContent_Declare(
     # evidencia, nao presumida: a tag v0.20.0 tem o MESMO sha nos dois hosts
     # (9bfaabfa, apontando pro commit 0442dd15 que ja esta no nosso _deps).
     GIT_REPOSITORY https://github.com/petrinhu/glintfx
-    GIT_TAG        v0.23.0
+    GIT_TAG        v0.24.0
     SOURCE_SUBDIR  glintfx
 )
 FetchContent_MakeAvailable(glintfx)
