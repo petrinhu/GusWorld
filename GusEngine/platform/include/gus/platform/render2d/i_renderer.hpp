@@ -19,7 +19,10 @@
 #ifndef GUS_PLATFORM_RENDER2D_I_RENDERER_HPP
 #define GUS_PLATFORM_RENDER2D_I_RENDERER_HPP
 
+#include <string_view>
+
 #include "gus/core/spatial/camera_clamp.hpp"  // gus::core::spatial::Rect
+#include "gus/platform/render2d/text_metrics.hpp"  // text_width (default monospace)
 
 namespace gus::platform::render2d {
 
@@ -134,6 +137,27 @@ public:
     // assets), e um NO-OP seguro (o chamador desenhou um fallback antes - barras/marcas).
     virtual void draw_text(const char* text, float x, float y, float px_size,
                            const DrawColor& color, bool bold) = 0;
+
+    // Largura (px logico) que draw_text(text, ..., px_size, ..., bold) OCUPARIA neste
+    // MESMO renderer, na MESMA face (regular/bold) - pra quem centraliza/alinha-a-direita
+    // (nome do ator, "hp/max", floater de dano, etc.) medir com o motor de verdade, nao
+    // uma aproximacao paralela. bold IMPORTA: sob layout proporcional (Render2dGlintfx,
+    // rota Draw2D) a face Bold pode ter avanco de glifo DIFERENTE da Regular - medir com
+    // a face errada desalinha a centralizacao (achado do dossie fontflip-draw2d).
+    //
+    // Default = monospace legado (kMonoAdvanceRatio, text_metrics.hpp) - o COMPORTAMENTO
+    // DE SEMPRE deste M5, preservado sem 1 linha de mudanca pra Render2dGl3/Render2dSdl e
+    // pra qualquer IRenderer de teste que nao sobrescreva (bold e ignorado aqui: os dois
+    // motores de rasterizacao legados usam a MESMA razao avanco/altura pras duas faces).
+    // Render2dGlintfx SOBRESCREVE com Draw2d::measure_text() (motor de fonte proprio do
+    // glintfx, proporcional + kerning quando a tabela existir - ver seu .cpp/.hpp).
+    // text == nullptr ou px_size <= 0 => 0.0f (mesmo contrato fail-high do draw_text).
+    [[nodiscard]] virtual float measure_text_width(const char* text, float px_size,
+                                                    bool /*bold*/) {
+        return text_width(text != nullptr ? std::string_view(text)
+                                          : std::string_view(),
+                          px_size);
+    }
 
     // Fecha o frame (submete ao backend / swap).
     virtual void end_frame() = 0;

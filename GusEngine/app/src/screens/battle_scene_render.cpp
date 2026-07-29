@@ -34,7 +34,6 @@
 #include "gus/domain/combat/combat_records.hpp"
 #include "gus/domain/combat/combat_state.hpp"  // CombatState (preview_intent)
 #include "gus/domain/combat/weakness_wheel.hpp"  // WeaknessWheel (pre-selecao D3 de mira)
-#include "gus/platform/render2d/text_metrics.hpp"  // text_width (centrar floater)
 
 namespace gus::app::screens {
 
@@ -288,7 +287,8 @@ void BattleScene::render(IRenderer& renderer, float viewport_px_w,
 
             // Nome do ator (cyan), centrado sob o retrato.
             const std::string who = a->display_name();
-            const float nw = gus::platform::render2d::text_width(who, kCockpitNamePx);
+            const float nw =
+                renderer.measure_text_width(who.c_str(), kCockpitNamePx, /*bold=*/true);
             renderer.draw_text(who.c_str(), pr.x + (pr.w - nw) * 0.5f,
                                pr.y + pr.h + 4.0f, kCockpitNamePx, kCyan, /*bold=*/true);
 
@@ -297,7 +297,8 @@ void BattleScene::render(IRenderer& renderer, float viewport_px_w,
             draw_bar(renderer, hp, bar_fill(a->hp(), a->max_hp()), kHpFillColor);
             char num[40];
             std::snprintf(num, sizeof(num), "%d/%d", a->hp(), a->max_hp());
-            const float hw = gus::platform::render2d::text_width(num, kCockpitTextPx);
+            const float hw =
+                renderer.measure_text_width(num, kCockpitTextPx, /*bold=*/false);
             renderer.draw_text(num, hp.x + (hp.w - hw) * 0.5f,
                                hp.y + (hp.h - kCockpitTextPx) * 0.5f, kCockpitTextPx,
                                kInk, /*bold=*/false);
@@ -435,7 +436,8 @@ void BattleScene::render(IRenderer& renderer, float viewport_px_w,
             const float by = is_intro() ? (static_cast<float>(kArenaTop) + 40.0f)
                                         : (bz.y + (bz.h - kBannerTextPx) * 0.5f);
             const float bigPx = is_intro() ? kBannerTextPx + 6.0f : kBannerTextPx;
-            const float tw = gus::platform::render2d::text_width(text, bigPx);
+            const float tw =
+                renderer.measure_text_width(text.c_str(), bigPx, /*bold=*/true);
             renderer.draw_text(text.c_str(), center_x - tw * 0.5f, by, bigPx, col,
                                /*bold=*/true);
 
@@ -447,7 +449,8 @@ void BattleScene::render(IRenderer& renderer, float viewport_px_w,
                 const auto draw_prompt = [&](const char* tr_key, DrawColor pc) {
                     const std::string t = translator_->tr(tr_key);
                     const float pw =
-                        gus::platform::render2d::text_width(t, kPanelTextPx);
+                        renderer.measure_text_width(t.c_str(), kPanelTextPx,
+                                                    /*bold=*/false);
                     renderer.draw_text(t.c_str(), center_x - pw * 0.5f, py,
                                        kPanelTextPx, pc, /*bold=*/false);
                     py += kPanelTextPx + 6.0f;
@@ -802,10 +805,13 @@ void BattleScene::render(IRenderer& renderer, float viewport_px_w,
         }
         DrawColor col = floater_color_for_channel(f.channel);
         col.a = floater_alpha(f.age);  // fade
-        const float w = gus::platform::render2d::text_width(f.text, kFloaterTextPx);
+        const bool bold = f.channel == HitChannel::Crit;
+        // bold ANTES do measure (D2D-TEXT): a face Bold pode ter avanco DIFERENTE da
+        // Regular sob layout proporcional - medir com a MESMA face que draw_text vai usar
+        // (ver measure_text_width em i_renderer.hpp).
+        const float w = renderer.measure_text_width(f.text.c_str(), kFloaterTextPx, bold);
         const float fx = f.origin_x - w * 0.5f;  // centra o texto sobre o alvo
         const float fy = f.origin_y + floater_offset_y(f.age);  // sobe
-        const bool bold = f.channel == HitChannel::Crit;
         renderer.draw_text(f.text.c_str(), fx, fy, kFloaterTextPx, col, bold);
     }
 
@@ -822,10 +828,11 @@ void BattleScene::render(IRenderer& renderer, float viewport_px_w,
         const float cx = full.x + full.w * 0.5f;
         float ty = full.y + full.h * 0.5f - 40.0f;
 
-        const std::string_view reboot =
-            pick_defeat_reboot_line(machine_->log().size());
-        const float rw = gus::platform::render2d::text_width(reboot, kDefeatRebootPx);
-        renderer.draw_text(std::string(reboot).c_str(), cx - rw * 0.5f, ty,
+        const std::string reboot =
+            std::string(pick_defeat_reboot_line(machine_->log().size()));
+        const float rw =
+            renderer.measure_text_width(reboot.c_str(), kDefeatRebootPx, /*bold=*/true);
+        renderer.draw_text(reboot.c_str(), cx - rw * 0.5f, ty,
                            kDefeatRebootPx, kErr, /*bold=*/true);
         ty += kDefeatRebootPx + 16.0f;
 
@@ -844,14 +851,16 @@ void BattleScene::render(IRenderer& renderer, float viewport_px_w,
             } else {
                 bark = translator_->tr("COMBAT_DEFEAT_BARK_GENERIC");
             }
-            const float bw = gus::platform::render2d::text_width(bark, kDefeatBarkPx);
+            const float bw =
+                renderer.measure_text_width(bark.c_str(), kDefeatBarkPx, /*bold=*/false);
             renderer.draw_text(bark.c_str(), cx - bw * 0.5f, ty, kDefeatBarkPx, kInk,
                                /*bold=*/false);
             ty += kDefeatBarkPx + 12.0f;
 
             // (3) nota-xadrez: "o Rei caiu, a partida acaba" - explica o Gus-centric.
             const std::string note = translator_->tr("COMBAT_DEFEAT_CHESS_NOTE");
-            const float nw = gus::platform::render2d::text_width(note, kDefeatNotePx);
+            const float nw =
+                renderer.measure_text_width(note.c_str(), kDefeatNotePx, /*bold=*/false);
             renderer.draw_text(note.c_str(), cx - nw * 0.5f, ty, kDefeatNotePx, kInkDim,
                                /*bold=*/false);
         }

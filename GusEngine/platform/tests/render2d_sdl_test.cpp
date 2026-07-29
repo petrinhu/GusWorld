@@ -15,12 +15,14 @@
 
 #include "gus/core/spatial/camera_clamp.hpp"
 #include "gus/platform/render2d/render2d_sdl.hpp"
+#include "gus/platform/render2d/text_metrics.hpp"
 
 using gus::core::spatial::Rect;
 using gus::platform::render2d::ContentBbox;
 using gus::platform::render2d::DrawColor;
 using gus::platform::render2d::kInvalidTexture;
 using gus::platform::render2d::Render2dSdl;
+using gus::platform::render2d::text_width;
 using gus::platform::render2d::UvRect;
 
 TEST_CASE("Render2dSdl headless (renderer nulo) nao crasha", "[render2d_sdl]") {
@@ -112,4 +114,18 @@ TEST_CASE("Render2dSdl headless: draw_text nao crasha e conta 1 por glifo desenh
     r.end_frame();
     // Headless: sem fonte/textura, nenhum glifo emitido (degrada). Nao crasha.
     REQUIRE(r.last_draw_count() == 0);
+}
+
+TEST_CASE("Render2dSdl herda o measure_text_width monospace default (i_renderer.hpp)",
+          "[render2d_sdl]") {
+    // Render2dSdl NAO sobrescreve measure_text_width: o default de IRenderer (monospace,
+    // kMonoAdvanceRatio) preserva o comportamento de sempre, bold ignorado (as duas faces
+    // legadas usam a MESMA razao avanco/altura) - ver i_renderer.hpp.
+    Render2dSdl r(nullptr);
+    REQUIRE(r.measure_text_width("Atacar", 8.0f, false) ==
+            text_width("Atacar", 8.0f));
+    REQUIRE(r.measure_text_width("Atacar", 8.0f, true) ==
+            text_width("Atacar", 8.0f));  // bold nao muda o monospace legado
+    REQUIRE(r.measure_text_width(nullptr, 8.0f, false) == 0.0f);
+    REQUIRE(r.measure_text_width("Atacar", 0.0f, false) == 0.0f);
 }

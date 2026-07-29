@@ -2,11 +2,11 @@
 // GusEngine/platform/tests/render2d_glintfx_test.cpp
 //
 // Catch2 do Render2dGlintfx (platform/render2d), a TERCEIRA implementacao de IRenderer
-// (D2D-2-SENTINELA), que delega ao glintfx::Draw2d (pin v0.23.0) pras 5 primitivas de
-// mundo (draw_text fica no caminho FreeType/FontAtlas atual - ver render2d_glintfx.hpp).
-// TEST-FIRST.
+// (D2D-2-SENTINELA), que delega ao glintfx::Draw2d (pin v0.24.0) pras 6 primitivas de
+// mundo, INCLUSIVE texto (D2D-TEXT, migrado de FreeType/FontAtlas em 2026-07-29 - ver
+// render2d_glintfx.hpp). TEST-FIRST.
 //
-// DOIS BLOCOS:
+// TRES BLOCOS:
 //   1. EQUIVALENCIA DE CAMERA (a parte delicada da fatia): prova, com matematica PURA
 //      (sem GPU/contexto), que a conversao Rect-de-mundo -> Camera2d do glintfx
 //      (camera_from_world_rect) projeta os MESMOS pixels que o world_to_screen do
@@ -16,9 +16,10 @@
 //      compila sem GLINTFX_MODULE_APP nem contexto GL) - nao reimplementa a formula.
 //   2. HEADLESS: mesmo contrato de seguranca do Render2dGl3 (gl_active=false -> nenhuma
 //      chamada GL/Draw2D, tudo no-op contabilizado), mesmo padrao de teste.
-//
-// O irredutivel de GPU real (Draw2d::init() com contexto, upload de textura, o quad de
-// texto na pipeline GL propria) fica pro smoke visual do app, igual ao Render2dGl3.
+//   3. measure_text_width headless: mesmo fail-high do draw_text (sem impl_/fonte,
+//      devolve 0.0f, nunca crasha) - o irredutivel de GPU real (Draw2d::init() com
+//      contexto, load_font/draw_text/measure_text de verdade) fica pro smoke visual do
+//      app, igual ao Render2dGl3.
 
 #include <catch2/catch_approx.hpp>
 #include <catch2/catch_test_macros.hpp>
@@ -143,6 +144,21 @@ TEST_CASE("Render2dGlintfx headless: draw_text nao crasha (sem fonte/contexto)",
                 DrawColor{1.0f, 1.0f, 1.0f, 1.0f}, /*bold=*/false);
     r.end_frame();
     REQUIRE(r.last_draw_count() == 0);  // headless: sem fonte, nada emitido
+}
+
+TEST_CASE("Render2dGlintfx headless: measure_text_width degrada para 0 (sem fonte/contexto)",
+          "[render2d_glintfx]") {
+    Render2dGlintfx r(/*gl_active=*/false);
+    REQUIRE(r.measure_text_width("Atacar", 8.0f, /*bold=*/false) == 0.0f);
+    REQUIRE(r.measure_text_width("Atacar", 8.0f, /*bold=*/true) == 0.0f);
+}
+
+TEST_CASE("Render2dGlintfx headless: measure_text_width(nullptr/px_size<=0) e 0",
+          "[render2d_glintfx]") {
+    Render2dGlintfx r(/*gl_active=*/false);
+    REQUIRE(r.measure_text_width(nullptr, 8.0f, false) == 0.0f);
+    REQUIRE(r.measure_text_width("Atacar", 0.0f, false) == 0.0f);
+    REQUIRE(r.measure_text_width("Atacar", -1.0f, false) == 0.0f);
 }
 
 TEST_CASE("Render2dGlintfx present diferido (simetria de API) headless e seguro",

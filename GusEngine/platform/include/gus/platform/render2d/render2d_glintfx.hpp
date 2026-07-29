@@ -2,11 +2,10 @@
 // gus/platform/render2d/render2d_glintfx.hpp
 //
 // Render2dGlintfx: TERCEIRA implementacao de IRenderer (D2D-2-SENTINELA), delegando ao
-// glintfx::Draw2d (pin v0.23.0, GLINTFX_MODULE_DRAW2D=ON - ver GusEngine/CMakeLists.txt)
-// pras 5 primitivas de MUNDO (begin/end de frame, retangulo preenchido, contorno, sprite
-// texturizado, bbox de conteudo). SO o draw_text continua no caminho FreeType/FontAtlas
-// ATUAL (ordem do lider: trocar o rasterizador de texto do jogo inteiro e decisao dele,
-// pendente de validacao visual - GLINTFX-FONTFLIP-VALIDATE).
+// glintfx::Draw2d (pin v0.24.0, GLINTFX_MODULE_DRAW2D=ON - ver GusEngine/CMakeLists.txt)
+// pras 6 primitivas de MUNDO (begin/end de frame, retangulo preenchido, contorno, sprite
+// texturizado, bbox de conteudo, E TEXTO - ver secao TEXTO abaixo, migracao 2026-07-29
+// autorizada pelo lider). Zero FreeType, zero stb_truetype neste backend.
 //
 // NAO E O DEFAULT: selecionada em tempo de COMPILACAO pela opcao de CMake
 // GUSWORLD_RENDER2D_BACKEND (valores "gl3" [default] | "glintfx", ver
@@ -41,19 +40,30 @@
 // camera_world.w), entao o eixo vertical estica/encolhe diferente do Gl3 quando o
 // aspecto diverge. Documentado, nao escondido; nao ha caller real hoje que exercite isso.
 //
-// TEXTO: draw_text() NAO chama Draw2d::draw_text (motor de fonte proprio dele, tensao
-// com FreeType/nosso FontAtlas - GLINTFX-FONTFLIP-VALIDATE, decisao pendente do lider).
-// Mantem uma pipeline GL PROPRIA e minima, so pra texto (shader/VAO proprios, reusando
-// os MESMOS POCO que o Render2dGl3 ja usa - FontAtlas/text_metrics/asset_paths),
-// coexistindo no MESMO contexto GL que o Draw2D (contrato D9 do glintfx: o Draw2D SETA
-// todo estado GL de que depende a cada flush interno e NAO assume nada deixado por um
-// renderer coabitante - o mesmo contrato que ja vale entre Render2dGl3 e o HUD RmlUi-GL3
-// hoje). Pra preservar a ORDEM DE DESENHO (painter's order, contrato do IRenderer, ver
-// i_renderer.hpp): draw_text() fecha o bracket do Draw2D (end()) ANTES de desenhar o
-// texto - isso forca o flush de qualquer sprite/retangulo ainda pendente no batcher -,
-// desenha o texto pela pipeline propria, e REABRE o bracket (begin()) depois, pros draws
-// seguintes do MESMO frame continuarem. A camera fica STICKY entre brackets (D13 do
-// glintfx), entao reabrir nao perde o set_camera() do begin_frame().
+// TEXTO (decisao do lider, 2026-07-29, one-way na pratica - docs/tech/
+// plano-fim-dos-workarounds.md secao 4/9-D1 + docs/tech/fontflip-draw2d-dossie.md):
+// draw_text() CHAMA Draw2d::draw_text/load_font (D2D-TEXT), o motor de fonte SOBERANO
+// proprio do glintfx (zero FreeType, zero stb_truetype neste caminho) - substitui a
+// pipeline GL propria + FontAtlas/stb_truetype que este arquivo usava ate v0.24.0 (ver
+// historico em font_atlas.cpp/render2d_gl3.cpp/render2d_sdl.cpp, que CONTINUAM na
+// pipeline antiga - nao sao backends desta fatia). O texto agora BATCHA junto dos
+// sprites/retangulos no MESMO Draw2d::draw2d (nao ha mais bracket end()/begin() ao
+// redor do texto: o Draw2D preserva o painter's order sozinho, o mesmo motivo que
+// eliminou W2/D2D-FLUSH do censo de workarounds).
+//
+// LAYOUT: monospace fixo (kMonoAdvanceRatio) -> PROPORCIONAL + kerning-se-a-fonte-tiver
+// (tabela `kern` classica; confirmado por leitura direta do SFNT que PixelOperatorMono*
+// NAO TEM `kern` - kern_px() sempre 0.f, contrato documentado do glintfx, nao um bug).
+// Por isso measure_text_width() (i_renderer.hpp) SOBRESCREVE o default monospace com
+// Draw2d::measure_text() - medir com a matematica errada desalinha centralizacao/
+// alinhamento-a-direita (achado do dossie fontflip-draw2d, secao 0.6).
+//
+// FONTE: Font2d e carregada UMA VEZ por face (regular/bold) via load_font() e cacheada
+// no Impl - o atlas de glifo POR-TAMANHO e criado preguicosamente PELO PROPRIO Draw2d no
+// 1o draw_text()/measure_text() daquele tamanho (nao mais um cache por-(face,cell_px)
+// mantido aqui, como fazia o D2D-2-SENTINELA original: essa responsabilidade migrou pro
+// glintfx). unavailable trava a falha (arquivo ausente/corrompido: nunca reoferece o
+// load, mesmo contrato fail-high do ensure_font antigo).
 //
 // HEADLESS (gl_active == false): espelha Render2dGl3(false) - nenhuma chamada GL nem
 // Draw2D, todo draw vira no-op contabilizado, load_texture devolve kInvalidTexture. Prova
@@ -94,6 +104,8 @@ public:
         TextureId texture) const override;
     void draw_text(const char* text, float x, float y, float px_size,
                    const DrawColor& color, bool bold) override;
+    [[nodiscard]] float measure_text_width(const char* text, float px_size,
+                                           bool bold) override;
     void end_frame() override;
 
     [[nodiscard]] int last_draw_count() const noexcept { return last_draw_count_; }
@@ -107,15 +119,9 @@ public:
     void present();
 
 private:
-    struct Impl;                  // Draw2d + pipeline GL propria de texto; PImpl
+    struct Impl;                  // Draw2d + Font2d regular/bold cacheadas; PImpl
     std::unique_ptr<Impl> impl_;  // nullptr em headless (gl_active == false)
     bool gl_active_ = false;
-
-    // Guardados no begin_frame pro draw_text() projetar via viewport_transform (POCO),
-    // NAO via Draw2D - ver a secao TEXTO do comentario de cabeçalho deste arquivo.
-    gus::core::spatial::Rect camera_world_{};
-    int pixel_w_ = 0;
-    int pixel_h_ = 0;
 
     int draw_count_ = 0;
     int last_draw_count_ = 0;

@@ -91,7 +91,8 @@ find_package(OpenGL REQUIRED)
 # cabecalho de render2d_glintfx.hpp pro raciocinio: o campo render2d_ do SdlWindow e
 # tipado concreto, nao IRenderer*, e chama metodos fora do IRenderer). Default "gl3"
 # (INALTERADO - nada muda pra quem nao mexe nesta cache var); "glintfx" liga o backend
-# novo (delega ao glintfx::Draw2d, exceto draw_text) pra comparacao lado a lado. Os DOIS
+# novo (delega ao glintfx::Draw2d, INCLUSIVE draw_text desde 2026-07-29 - D2D-TEXT) pra
+# comparacao lado a lado. Os DOIS
 # backends sao SEMPRE compilados (a option() acima so seleciona qual e INSTANCIADO); a
 # troca e reversivel (flip da cache var + reconfigure + rebuild).
 set(GUSWORLD_RENDER2D_BACKEND "gl3" CACHE STRING

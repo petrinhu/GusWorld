@@ -16,12 +16,14 @@
 
 #include "gus/core/spatial/camera_clamp.hpp"
 #include "gus/platform/render2d/render2d_gl3.hpp"
+#include "gus/platform/render2d/text_metrics.hpp"
 #include "gus/platform/rmlui/gl3_loader.hpp"
 
 using gus::core::spatial::Rect;
 using gus::platform::render2d::DrawColor;
 using gus::platform::render2d::kInvalidTexture;
 using gus::platform::render2d::Render2dGl3;
+using gus::platform::render2d::text_width;
 using gus::platform::render2d::UvRect;
 
 TEST_CASE("Render2dGl3 headless (sem contexto GL) nao crasha e conta draws",
@@ -77,6 +79,20 @@ TEST_CASE("Render2dGl3 headless: draw_text nao crasha (sem fonte/contexto)",
                 DrawColor{1.0f, 1.0f, 1.0f, 1.0f}, /*bold=*/false);
     r.end_frame();
     REQUIRE(r.last_draw_count() == 0);  // headless: sem fonte, nada emitido
+}
+
+TEST_CASE("Render2dGl3 herda o measure_text_width monospace default (i_renderer.hpp)",
+          "[render2d_gl3]") {
+    // Render2dGl3 NAO sobrescreve measure_text_width: o default de IRenderer (monospace,
+    // kMonoAdvanceRatio) preserva o comportamento de sempre, bold ignorado (as duas faces
+    // legadas usam a MESMA razao avanco/altura) - ver i_renderer.hpp.
+    Render2dGl3 r(/*gl_active=*/false);
+    REQUIRE(r.measure_text_width("Atacar", 8.0f, false) ==
+            text_width("Atacar", 8.0f));
+    REQUIRE(r.measure_text_width("Atacar", 8.0f, true) ==
+            text_width("Atacar", 8.0f));  // bold nao muda o monospace legado
+    REQUIRE(r.measure_text_width(nullptr, 8.0f, false) == 0.0f);
+    REQUIRE(r.measure_text_width("Atacar", 0.0f, false) == 0.0f);
 }
 
 TEST_CASE("gl3_load_functions(nullptr) degrada para false (sem loader)",
