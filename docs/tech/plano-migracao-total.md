@@ -2,7 +2,7 @@
 
 **Autor:** Caetano (CTO). **Status:** pesquisa + plano executável; nenhuma linha de código tocada para produzir este documento.
 **Medido em:** HEAD `a105e60` (2026-07-30 00:41, gate `log-clock-zero`). Working tree com edições de OUTROS agentes no momento da medição (`player_sprites_loader.*`, `app/tools/CMakeLists.txt`, `app/tools/appmode_spike/`, `app/tools/idle_facing_probe.cpp`) - nenhuma fatia deste plano toca esses arquivos.
-**Complementa:** `plano-camadas-sdl.md` (fatias SDL), `plano-fim-dos-workarounds.md` (cascatas C1-C5), `glintfx-boundary.md` (a régua). Este doc responde à ordem do líder de 2026-07-30: "inicie migração total de glad, miniaudio e todas as outras possíveis".
+**Complementa:** `plano-camadas-sdl.md` (fatias SDL), `plano-fim-dos-workarounds.md` (cascatas C1-C5), `glintfx-boundary.md` (a régua). Este doc responde à ordem do líder de 2026-07-30: "inicie migração total de glad, miniaudio e todas as outras possíveis" - **ampliada na mesma noite** com: *"pesquisar também workarounds para acabar com eles usando framework glintfx"* e *"mande todas as necessidades para glintfx, NUNCA resolva sozinho"*. O censo de workarounds está na **seção 12** (adendo), e TODO item deste plano carrega uma das três classes: **(a)** executável por nós agora (API deles existe, é só consumir); **(b)** necessidade a encaminhar pelo bus (o plano descreve o pedido, nunca a solução caseira); **(c)** fica conosco por natureza (regra do jogo ou std C++, com justificativa).
 
 ## 0. Resposta em uma linha (leia isto antes de lançar agente)
 
@@ -188,3 +188,47 @@ As fatias S1-S3 são todas two-way doors (revert limpo), de propósito.
 - HEAD da medição: `a105e60` (2026-07-30 00:41). Pin glintfx: v0.26.0 (`GusEngine/CMakeLists.txt:497`).
 - Verificações diretas citadas: `gl_proc.hpp:77-79` e doc integral da função (checkout canônico do glintfx, HEAD `d9ca024`); `CMakeLists.txt:128` (`BACKEND_GLFW OFF FORCE`); `image.hpp:184/199` (`decode_image_file/memory`); TODO do glintfx linhas 203-205 (GLLOADER-GENDRIFT, FRAMEGRAB-TEX, IMG-ENCODE); `d79d880` (miniaudio->glintfx, 2026-07-22); `8ad8ee0` (D2D-TEXT); `46a12e3` (app_icon decode); `render2d_glintfx.cpp:119-125` (7 GL cru); `ACKNOWLEDGMENTS.md:59/124`.
 - Scripts: `measure_deps.py` no scratchpad da sessão (candidato a versionar junto com os gates da S3, para a medição do gate ser a mesma do plano).
+
+## 12. Censo de workarounds v2 (adendo da mesma noite, por ordem do líder)
+
+Ponto de partida: o censo do `plano-fim-dos-workarounds.md` §3 e o `glintfx-boundary.md` §Lacunas - usados como insumo, **não como lista fechada**. Método da varredura nova: (1) grep de sinais explícitos com filtro manual de contexto - ⚠️ armadilha linguística medida: "contorno" em pt-br é quase sempre *outline* visual (24 arquivos casaram, ~4 eram contorno-de-verdade); (2) cruzamento do CHANGELOG glintfx v0.23-v0.26 (5 versões em 2 dias) contra o nosso código, atrás de contorno cuja API já chegou e ninguém voltou para remover; (3) leitura dos blocos de comentário-dossiê das telas RML.
+
+### 12.1 Mortos hoje, confirmados no código (nenhuma ação além de registro)
+
+| workaround | matou | prova |
+|---|---|---|
+| W1 injeção de `@font-face` por string | `load_font_face` (v0.24) | grep: só comentários históricos restam (`difficulty_menu_loop.cpp:98-112`) |
+| W2 bracket `end()`/`begin()` em volta do texto | `Draw2d::draw_text` (D2D-TEXT, `8ad8ee0`) | `render2d_glintfx.cpp:245`: "nao ha mais bracket" |
+| W3 pipeline GL de texto duplicada | idem | GL cru do arquivo: 65 -> 7 (medido) |
+
+### 12.2 Vivos COM pedido/entrega no bus (nada novo a encaminhar)
+
+`DOC-GLCOHAB` (o (b)-loader esvaziou com a C1; restam as seções de doc); ícone de janela (pedido S1-ícone enviado 2026-07-29); `FRAMEGRAB-TEX` e `IMG-ENCODE` (viraram itens W21 deles, o primeiro BLOQUEANTE); `SDL_Delay` 5 usos e a travessia de path de asset (encaminhados pelo orquestrador em 2026-07-30 - o `SDL_Delay` é o gabarito da régua: pede-se mesmo esperando "usem a std", porque a fronteira é declarada por ELES). Entregues e já consumidos: decode (v0.25 - resto vira Fatia S1), clock e log (v0.26, `FATIA1-LOG-CLOCK`).
+
+### 12.3 Achados NOVOS desta varredura - vivos e SEM pedido
+
+**A1 - Ciclo por disco do fundo congelado. Classe (a) no transporte, condicionada a UMA decisão do líder; (já-pedido) na captura.** O fluxo hoje: `glReadPixels` (readback nosso) -> `stbi_write_png` em DISCO -> `IRenderer::load_texture(path)` relê o arquivo -> RAII apaga o PNG (`6e29cca`). O disco é transporte puro - e o TODO do glintfx chama exatamente este ciclo de "que nunca precisou existir". Desde a v0.25 existem `decode_image_memory` + `create_texture(pixels)`; o lado nosso que falta é um método aditivo pixels->textura no NOSSO `IRenderer` (trivial nos 3 backends: glintfx `create_texture`, gl3 `glTexImage2D`, sdl `SDL_CreateTexture` - zero lib nova, zero wrapper de terceiros, só consumo). Isso mata os `stbi_write_png` do fundo congelado SEM esperar a `IMG-ENCODE`, e **é a ponta nossa da ponte que o `FRAMEGRAB-TEX` vai plugar depois do cutover** (eles entregarão pixels em memória; o método já estará lá) - trabalho que sobrevive à reforma, não que ela joga fora. **Por que não é fatia desta rodada:** muda o contrato `IRenderer` (aditivo, mas contrato entre camadas = decisão de arquitetura do líder) e a família é grande (`i_renderer.hpp` + 3 impls + mocks + 5-6 telas + `sdl_window`/`maestro`). Fica DESENHADA e PARADA: quando o líder acordar, um "sim" destrava uma fatia por família com ~15 arquivos. ⚠️ Se aprovada, conferir na hora quais dos 8 `stbi_write_png` são fundo congelado e quais são captura-para-humano (`--battle`) - as duas metades têm destinos diferentes (memória vs `IMG-ENCODE`).
+
+**A2 - Três contornos de BUG DE LAYOUT do RmlUi em `system_menu_rml.cpp`. Classe (b) - encaminhar.** A família que "ninguém chamou de contorno" porque parece CSS de design, e é compensação (o perfil exato do `cell_px=16`):
+  1. **BUG-A flex colapsado** (`:480-495`): filho `display:flex` com `width:auto`/`100%` dentro de `overflow-y:auto` colapsa para a largura do padding (12dp) e quebra o hit-test; só largura ABSOLUTA (558dp) contornou. O comentário-dossiê já aponta o código do vendor.
+  2. **Corredor da scrollbar** (`GLINTFX-SCROLL`, `:496-520`): a reserva de `GetScrollbarSize` do RmlUi (`LayoutDetails.cpp:178-188`) só vale para filhos com largura auto/percentual - que o BUG-A proíbe. Consequência: `width:546dp` mágico + `padding-right` compensatório no cabeçalho irmão. ⚠️ O comentário diz "bug reportado ao vivo pelo líder" - **conferir no bus se o report virou item deles**; se não virou, o sinal se perdeu e é exatamente o caso que a lei quer evitar.
+  3. **Anel inset M2** (`:527+`): `box-shadow` externo é cortado pelo clip de overflow (clip_area=Padding, zero folga em 3 lados); contornado trocando para anel `inset`.
+  - **O pedido (b), um só, em lote:** relatório de bug de layout ao glintfx (donos do RmlUi vendorizado + patches), com os três casos e os pointers de código que os dossiês já anotaram. **Custo do contorno atual, declarado:** duas larguras absolutas acopladas (546dp/558dp) que quebram em silêncio se o painel mudar de tamanho, e um cabeçalho que precisa imitar o corredor da lista para as colunas alinharem. Não propomos conserto nosso; a decisão patch-local vs upstream é deles.
+
+**A3 - Os 7 GL cru do begin-frame embed** (`render2d_glintfx.cpp:119-125`; era a seção 4.4). **Classe (b) formal:** pergunta de fronteira ao bus - o embed deve expor prepara-alvo/clear, ou o estado GL de entrada é contrato do host (a DOC-GLCOHAB deles já tangencia)? Sete linhas de custo, zero urgência, mas sem a pergunta o sinal morre.
+
+**A4 - Headers stb órfãos** (`stb_rect_pack.h`, `stb_image_resize2.h`): classe **(a)**, já é a Fatia S2.
+
+**Verificados e NÃO são contornos** (para ninguém "consertar"): o glow por `drop-shadow` (receita documentada do `docs/effects.md` deles); `measure_text_width` do `Render2dGlintfx` (sobrescreve corretamente com `Draw2d::measure_text`, `render2d_glintfx.cpp:254-263`); a lacuna de modifier no capture de tecla (`key_translation_glintfx.hpp:133-137` - lacuna NOSSA pré-existente no caminho SDL, já fechada no caminho glintfx que a F4-3 vai consumir); vsync manual `SDL_GL_SetSwapInterval` (peça da casca, morre na F4-3 - `WM-VSYNC` v0.24 já cobre o App mode); `text_metrics`/`font_atlas`/`stb_truetype` (metade legada condenada pela F4-4, não compensação); conversão float->Sint16 da deadzone de gamepad (tradução de fronteira legítima, testada).
+
+### 12.4 Classificação (a)/(b)/(c) consolidada do plano inteiro
+
+| classe | itens |
+|---|---|
+| **(a) executável agora** | S1 (decode nas pipelines legadas), S2 (órfãos stb), S3 (gates) |
+| **(a) desenhada, PARADA por decisão de contrato do líder** | A1 (pixels->textura no `IRenderer`, mata o disco do fundo congelado) |
+| **(b) encaminhar pelo bus** | A2 (3 bugs de layout RmlUi, em lote), A3 (begin-frame embed); conferir se o `GLINTFX-SCROLL` do líder virou item deles |
+| **(b) já encaminhados/na fila deles** | FRAMEGRAB-TEX (bloqueante), IMG-ENCODE, S1-ícone, SDL_Delay, travessia de path |
+| **(c) fica conosco** | monocypher (trava por path), translator i18n (ratificado), std C++ (arbitragem §8 do plano-fim), conteúdo/regra de jogo |
+
+Nota de fronteira para o líder (não é desta rodada, e não é workaround): `core/spatial`/`core/anim`/`core/math_util` são módulos genéricos que PRECEDEM o glintfx - pela diretriz "todo o genérico é deles", são candidatos de longo prazo a virar PROMPT em lote. É decisão de roadmap one-way (a F4 do freeze), não pedido desta noite; registro para o assunto não sumir.
