@@ -47,7 +47,12 @@
 #include "gus/platform/input/key_translation.hpp"  // sdl_key_to_godot_keycode (Fatia 2)
 #include "gus/platform/input/key_translation_glintfx.hpp"  // godot_keycode_to_glintfx_key
 #include "gus/platform/render2d/render2d_gl3.hpp"
-#include "gus/platform/rmlui/gl3_loader.hpp"  // gl3_read_backbuffer_rgba (prova visual)
+// FRAMEGRAB-7-SITIOS (2026-07-30): gl3_loader.hpp/gl3_read_backbuffer_rgba
+// (leitura crua de backbuffer via glad) saiu daqui - a unica captura deste
+// arquivo migrou pra glintfx::UiLayer::capture_frame() (ver render_frame_()/
+// enter()). Nao ha mais nenhuma outra necessidade de gl3_loader.hpp neste
+// arquivo (ao contrario de battle_preview.cpp, que ainda usa
+// gl3_load_functions pra outro fim, fora do escopo desta migracao).
 
 // stb_image_write: SO a declaracao aqui (a IMPLEMENTACAO ja vive UMA vez em
 // battle_preview.cpp, MESMA lib gusengine_app - nao redefinir
@@ -429,20 +434,33 @@ public:
                 (void)difficulty_menu_key_down(state_, glintfx::Key::Enter);  // abre o splash
                 reload_();
             }
-            for (int i = 0; i < 6; ++i) present_frame_();
-            std::vector<unsigned char> buf(static_cast<std::size_t>(pw_) *
-                                            static_cast<std::size_t>(ph_) * 4);
-            if (gus::platform::rmlui::gl3_read_backbuffer_rgba(pw_, ph_, buf.data())) {
+            // FRAMEGRAB-7-SITIOS: 5 frames de assentamento (COM swap, via
+            // present_frame_() de sempre) + o 6o frame renderizado SEM swap
+            // ainda (render_frame_()) - a captura via glintfx::UiLayer::
+            // capture_frame() PRECISA rodar DEPOIS do render() e ANTES do
+            // swap (contrato do pin, ui_layer.hpp) - ler o backbuffer DEPOIS
+            // do swap e UNDEFINED em muitas implementacoes GL. O
+            // gl3_read_backbuffer_rgba antigo lia DEPOIS do 6o swap e so
+            // "funcionava" por um comportamento especifico do Mesa/llvmpipe
+            // (swap se comporta como copia, retendo o quadro anterior no
+            // back buffer) - nao e um contrato garantido, so um acidente de
+            // driver. Mesma contagem de 6 swaps no total (5 aqui + 1 abaixo,
+            // apos a captura) - comportamento de apresentacao preservado.
+            for (int i = 0; i < 5; ++i) present_frame_();
+            render_frame_();
+            const glintfx::UiLayer::CapturedFrame captured = ui_->capture_frame();
+            if (captured.ok) {
                 const std::string filename =
                     want_confirm ? "difficulty_menu_confirm.png" : "difficulty_menu.png";
                 const std::string out = join(std::string(screenshot_dir), filename);
-                stbi_write_png(out.c_str(), pw_, ph_, 4, buf.data(), pw_ * 4);
-                std::cout << "DifficultyMenuLoop: [screenshot] " << out << " (" << pw_ << "x"
-                          << ph_ << ")\n";
+                stbi_write_png(out.c_str(), captured.width, captured.height, 4,
+                               captured.pixels.get(), captured.width * 4);
+                std::cout << "DifficultyMenuLoop: [screenshot] " << out << " (" << captured.width
+                          << "x" << captured.height << ")\n";
             } else {
-                std::cerr << "DifficultyMenuLoop: [screenshot] gl3_read_backbuffer_rgba "
-                             "falhou\n";
+                std::cerr << "DifficultyMenuLoop: [screenshot] capture_frame() falhou\n";
             }
+            SDL_GL_SwapWindow(window_);  // completa o 6o frame (capturado logo acima)
             result_ = DifficultyLoopExit::Cancelled;
             bailed_ = true;
             return;
@@ -539,7 +557,11 @@ private:
         ui_->update();  // MESMO assentamento a cada troca de documento
     }
 
-    void present_frame_() {
+    // FRAMEGRAB-7-SITIOS: extraido de present_frame_() (que so agrega o swap
+    // por cima) - o corpo isolado permite capturar via glintfx::UiLayer::
+    // capture_frame() DEPOIS do render() e ANTES do proprio swap (contrato
+    // do pin, ui_layer.hpp), sem duplicar arena+UI a mao no chamador.
+    void render_frame_() {
         const gus::core::spatial::Rect cam{0.0f, 0.0f, static_cast<float>(pw_),
                                             static_cast<float>(ph_)};
         backdrop_->begin_frame(cam, pw_, ph_);
@@ -551,6 +573,10 @@ private:
         backdrop_->end_frame();
         ui_->update();
         ui_->render();
+    }
+
+    void present_frame_() {
+        render_frame_();
         SDL_GL_SwapWindow(window_);
     }
 
