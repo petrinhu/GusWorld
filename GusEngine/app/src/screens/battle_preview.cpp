@@ -58,7 +58,16 @@
 #include "gus/platform/audio/audio_engine.hpp"     // AudioEngine (M6 F3, ADR-011)
 #include "gus/platform/fs/settings_file_store.hpp"  // MENU-PAUSA-CONFIG-SOM: resolve_settings_dir
 #include "gus/platform/render2d/render2d_gl3.hpp"  // ADR-009 GL3: backend OpenGL da arena
-#include "gus/platform/rmlui/gl3_loader.hpp"  // glad load + read_backbuffer (captura)
+// FRAMEGRAB-7-SITIOS (2026-07-30): so gl3_load_functions (glad, ~linha 1745)
+// ainda vem daqui - as 4 capturas de backbuffer deste arquivo (hover/anim/
+// sprite-selftest + SMOKE VISUAL) migraram pra glintfx::UiLayer::
+// capture_frame(), removendo gl3_read_backbuffer_rgba. gl3_loader.hpp
+// PERMANECE incluido (diferente de difficulty_menu_loop.cpp/title_menu_loop.cpp/
+// save_load_menu_loop.cpp, onde o include saiu por completo) porque
+// gl3_load_functions carrega os ponteiros GL (glad) que a arena (Render2dGl3)
+// precisa - preocupacao TOTALMENTE separada da leitura de backbuffer, fora do
+// escopo desta migracao.
+#include "gus/platform/rmlui/gl3_loader.hpp"
 
 // ADR-010 F3: glintfx::UiLayer (embed mode) e o UNICO motor de UI/HUD - o backend RmlUi
 // vendorizado (RmlUiHud) foi aposentado. Compilado e linkado SEMPRE (app/ linka
@@ -1384,14 +1393,24 @@ void BattleScreen::tick_main_(float dt) {
                                  : hover_phase_ == 2 ? "_c_hover_sel.png"
                                                      : "_d_none_again.png";
             const std::string out = std::string(hover_selftest_prefix_) + suffix;
-            std::vector<unsigned char> buf(static_cast<std::size_t>(pw) *
-                                            static_cast<std::size_t>(ph) * 4);
-            if (gus::platform::rmlui::gl3_read_backbuffer_rgba(pw, ph, buf.data())) {
-                stbi_write_png(out.c_str(), pw, ph, 4, buf.data(), pw * 4);
-                std::cout << "BattlePreview: [hover-selftest] fase " << hover_phase_ << " -> "
-                          << out << " (" << pw << "x" << ph << ")\n";
+            // FRAMEGRAB-7-SITIOS: guarda glintfx_on_ && ui_ (MESMO idioma de
+            // handle_cockpit_hover_ acima) - capture_frame() e metodo de
+            // UiLayer, nao chamavel se ui_ nunca foi criado (GUSWORLD_RMLUI_OFF=1)
+            // ou o attach falhou. gl3_read_backbuffer_rgba nao tinha essa
+            // exigencia (leitura crua de GL, indiferente a UiLayer).
+            if (glintfx_on_ && ui_) {
+                const glintfx::UiLayer::CapturedFrame captured = ui_->capture_frame();
+                if (captured.ok) {
+                    stbi_write_png(out.c_str(), captured.width, captured.height, 4,
+                                   captured.pixels.get(), captured.width * 4);
+                    std::cout << "BattlePreview: [hover-selftest] fase " << hover_phase_ << " -> "
+                              << out << " (" << captured.width << "x" << captured.height << ")\n";
+                } else {
+                    std::cerr << "BattlePreview: [hover-selftest] capture_frame() falhou\n";
+                }
             } else {
-                std::cerr << "BattlePreview: [hover-selftest] gl3_read_backbuffer falhou\n";
+                std::cerr << "BattlePreview: [hover-selftest] capture_frame() indisponivel "
+                             "(ui_ inativo - GUSWORLD_RMLUI_OFF/attach falhou)\n";
             }
             ++hover_phase_;
             hover_phase_frame_ = 0;
@@ -1474,23 +1493,30 @@ void BattleScreen::tick_main_(float dt) {
     if (anim_selftest_) {
         const auto capture = [&](const char* suffix) {
             const std::string out = std::string(anim_selftest_prefix_) + suffix;
-            std::vector<unsigned char> buf(static_cast<std::size_t>(pw) *
-                                            static_cast<std::size_t>(ph) * 4);
-            if (gus::platform::rmlui::gl3_read_backbuffer_rgba(pw, ph, buf.data())) {
-                stbi_write_png(out.c_str(), pw, ph, 4, buf.data(), pw * 4);
-                const auto aoff = anim_attacker_id_.empty()
-                                      ? gus::core::spatial::Vec2{}
-                                      : scene_->anim().offset_for(anim_attacker_id_);
-                const auto toff = anim_target_id_.empty()
-                                      ? gus::core::spatial::Vec2{}
-                                      : scene_->anim().offset_for(anim_target_id_);
-                std::cout << "BattlePreview: [anim-selftest] f" << frame_no_ << " -> " << out
-                          << " | atacante_off=(" << aoff.x << "," << aoff.y << ") alvo_off=("
-                          << toff.x << "," << toff.y
-                          << ") projeteis=" << scene_->anim().projectiles().size()
-                          << " floaters=" << scene_->floaters().size() << "\n";
+            // FRAMEGRAB-7-SITIOS: mesma guarda glintfx_on_ && ui_ do site de
+            // hover-selftest acima (capture_frame() e metodo de UiLayer).
+            if (glintfx_on_ && ui_) {
+                const glintfx::UiLayer::CapturedFrame captured = ui_->capture_frame();
+                if (captured.ok) {
+                    stbi_write_png(out.c_str(), captured.width, captured.height, 4,
+                                   captured.pixels.get(), captured.width * 4);
+                    const auto aoff = anim_attacker_id_.empty()
+                                          ? gus::core::spatial::Vec2{}
+                                          : scene_->anim().offset_for(anim_attacker_id_);
+                    const auto toff = anim_target_id_.empty()
+                                          ? gus::core::spatial::Vec2{}
+                                          : scene_->anim().offset_for(anim_target_id_);
+                    std::cout << "BattlePreview: [anim-selftest] f" << frame_no_ << " -> " << out
+                              << " | atacante_off=(" << aoff.x << "," << aoff.y << ") alvo_off=("
+                              << toff.x << "," << toff.y
+                              << ") projeteis=" << scene_->anim().projectiles().size()
+                              << " floaters=" << scene_->floaters().size() << "\n";
+                } else {
+                    std::cerr << "BattlePreview: [anim-selftest] capture_frame() falhou\n";
+                }
             } else {
-                std::cerr << "BattlePreview: [anim-selftest] gl3_read_backbuffer falhou\n";
+                std::cerr << "BattlePreview: [anim-selftest] capture_frame() indisponivel "
+                             "(ui_ inativo - GUSWORLD_RMLUI_OFF/attach falhou)\n";
             }
         };
         if (frame_no_ == 40) {
@@ -1516,12 +1542,18 @@ void BattleScreen::tick_main_(float dt) {
     if (sprite_selftest_) {
         const auto capture = [&](const char* suffix) {
             const std::string out = std::string(sprite_selftest_prefix_) + suffix;
-            std::vector<unsigned char> buf(static_cast<std::size_t>(pw) *
-                                            static_cast<std::size_t>(ph) * 4);
-            if (gus::platform::rmlui::gl3_read_backbuffer_rgba(pw, ph, buf.data())) {
-                stbi_write_png(out.c_str(), pw, ph, 4, buf.data(), pw * 4);
+            // FRAMEGRAB-7-SITIOS: mesma guarda glintfx_on_ && ui_ dos 2 sites acima.
+            if (glintfx_on_ && ui_) {
+                const glintfx::UiLayer::CapturedFrame captured = ui_->capture_frame();
+                if (captured.ok) {
+                    stbi_write_png(out.c_str(), captured.width, captured.height, 4,
+                                   captured.pixels.get(), captured.width * 4);
+                } else {
+                    std::cerr << "BattlePreview: [sprite-selftest] capture_frame() falhou\n";
+                }
             } else {
-                std::cerr << "BattlePreview: [sprite-selftest] gl3_read_backbuffer falhou\n";
+                std::cerr << "BattlePreview: [sprite-selftest] capture_frame() indisponivel "
+                             "(ui_ inativo - GUSWORLD_RMLUI_OFF/attach falhou)\n";
             }
             const auto off = scene_->anim().offset_for("gus");
             const auto sf = scene_->actor_sprite_frame("gus");
@@ -1566,14 +1598,20 @@ void BattleScreen::tick_main_(float dt) {
     // SMOKE VISUAL: captura 1 PNG no frame alvo (ANTES do swap, lendo o backbuffer) e
     // encerra. Em modo interativo, o swap apresenta na janela.
     if (capture_path_ != nullptr && frame_no_ + 1 >= capture_at_frame_) {
-        std::vector<unsigned char> buf(static_cast<std::size_t>(pw) *
-                                        static_cast<std::size_t>(ph) * 4);
-        if (gus::platform::rmlui::gl3_read_backbuffer_rgba(pw, ph, buf.data())) {
-            stbi_write_png(capture_path_, pw, ph, 4, buf.data(), pw * 4);
-            std::cout << "BattlePreview: [capture] PNG salvo em " << capture_path_ << " ("
-                      << pw << "x" << ph << ")\n";
+        // FRAMEGRAB-7-SITIOS: mesma guarda glintfx_on_ && ui_ dos 3 sites acima.
+        if (glintfx_on_ && ui_) {
+            const glintfx::UiLayer::CapturedFrame captured = ui_->capture_frame();
+            if (captured.ok) {
+                stbi_write_png(capture_path_, captured.width, captured.height, 4,
+                               captured.pixels.get(), captured.width * 4);
+                std::cout << "BattlePreview: [capture] PNG salvo em " << capture_path_ << " ("
+                          << captured.width << "x" << captured.height << ")\n";
+            } else {
+                std::cerr << "BattlePreview: [capture] capture_frame() falhou\n";
+            }
         } else {
-            std::cerr << "BattlePreview: [capture] gl3_read_backbuffer falhou\n";
+            std::cerr << "BattlePreview: [capture] capture_frame() indisponivel (ui_ inativo "
+                         "- GUSWORLD_RMLUI_OFF/attach falhou)\n";
         }
         running_ = false;
     }
