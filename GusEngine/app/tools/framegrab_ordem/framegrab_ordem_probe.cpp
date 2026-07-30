@@ -9,6 +9,26 @@
 // O QUE ESTE PROBE NAO E: nao altera nada de producao (SdlWindow::capture_frame_to_png
 // segue intocado); nao e um workaround de lacuna; nao decide a migracao. Ele so MEDE.
 //
+// FRONTEIRA DO QUE ELE PROVA (leia antes de citar este probe como evidencia): ele prova a
+// MECANICA do capture_frame() - que le o FBO 0 e que a ORDEM em relacao ao render() decide
+// se a UI entra. Ele NAO prova a integracao com o pipeline real do jogo: a "cena" aqui e
+// glClear de cor solida, sem Render2dGl3, sem OverworldSim::render, sem sprite/textura, sem
+// blend, sem camera, sem o begin_frame/end_frame da casa. "O capture_frame funciona" e "o
+// fundo congelado esta resolvido" sao afirmacoes DIFERENTES. O que a fatia seguinte precisa
+// medir (proposta): no frame REAL de producao, chamar ui.capture_frame() e o
+// gl3_read_backbuffer_rgba() que ja usamos lado a lado e exigir buffers BYTE-IDENTICOS - os
+// dois leem o mesmo GL_BACK no mesmo instante, entao o criterio nao depende de conhecer a
+// cor de nenhum sprite.
+//
+// POR QUE GL CRU EM VEZ DO NOSSO Draw2d/Render2dGl3: pintar com glClear e MAIS controlado
+// pra esta pergunta - o valor do pixel e escolhido e a comparacao fica sem ambiguidade de
+// blend/filtragem/premultiply, o que permite oraculo de contagem EXATA (sem tolerancia). O
+// preco e exatamente a fronteira do paragrafo acima. A lei do framework unico nao e
+// violada: ela vale pra PRODUCAO, e app/tools/ esta fora dela por construcao (e o que o
+// escopo do GATE(sdl-ratchet) reconhece ao excluir app/tools/). O RmlUi_Include_GL3.h abaixo
+// e NOSSO (GusEngine/platform/rmlui/), o mesmo glad que platform/rmlui/gl3_loader.cpp usa em
+// producao - nao e vendor do glintfx.
+//
 // DESENHO (a UI tem de ser visualmente inconfundivel, senao o teste nao distingue nada):
 //   - o "jogo" (nos) e pintado com GL cru: glClear + glScissor. So valores de canal 0.0 e
 //     1.0, para que a cor no framebuffer seja EXATA (nada de arredondamento de float, e
