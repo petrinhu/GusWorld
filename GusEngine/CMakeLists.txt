@@ -453,6 +453,38 @@ set(GLINTFX_MODULE_DRAW2D    ON  CACHE BOOL "" FORCE)
 #     pin anterior, nenhum vendor novo. THIRD-PARTY-LICENSES.md atualizado so na data/pin.
 # Build local + suite completa verdes no pin novo antes deste commit (contagem de testes no
 # relatorio da onda STB-IMAGE-APP).
+#
+# BUMP v0.25.0 -> v0.26.0 (fatia 1 de log-e-relogio, 2026-07-30): traz FW-LOG
+# (glintfx::set_log_sink/log/log_info/log_warn/log_error, glintfx/include/glintfx/log.hpp) e
+# FW-CLOCK (glintfx::monotonic_now_ns(), glintfx/include/glintfx/clock.hpp) - as duas pecas que
+# estavam bloqueando a Fatia 1 do docs/tech/plano-camadas-sdl.md (proibido reimplementar em casa
+# o que cabe no glintfx). Consumo real (mesma onda): ~30 SDL_Log() em app/ trocados por
+# glintfx::log()/log_info()/log_warn()/log_error() (via plana quando a mensagem embute texto
+# externo - caminho de arquivo, erro de terceiro; variadica so quando o formato e literal do
+# nosso codigo); ~17 SDL_GetTicksNS() trocados por glintfx::monotonic_now_ns() (assinatura
+# identica uint64_t(*)(), troca de 1 token em app/src/screen_state.cpp:69 e nos demais pontos).
+# Ambos os headers vivem em glintfx_core (OBJECT library SEMPRE-ON, junto de system_clock.cpp/
+# version.cpp - ver comentario deles no CMakeLists deles), sem flag GLINTFX_MODULE_* nova: ZERO
+# ajuste de flag neste bloco de CMake, so o GIT_TAG. FW-LOG hardeneado contra CWE-134 (escrita
+# arbitraria via `%n`/`%1$n`): `fmt` da API variadica e validado por ALLOWLIST de especificadores
+# de conversao (nao blocklist - o proprio glintfx documenta que uma blocklist anterior deles
+# deixou passar a forma posicional POSIX `%1$n`, ja corrigido antes desta tag). Ritual de bump
+# revalidado por leitura direta do CMakeLists.txt deles na tag v0.26.0 (baixado via
+# `gh api repos/petrinhu/glintfx/contents/glintfx/CMakeLists.txt?ref=v0.26.0`):
+#   - Flags GLINTFX_MODULE_TEXT/_FX/_AUDIO/_GAMEPAD/_I18N/_WINDOW/_DRAW2D/_APP/_IMAGE e
+#     GLINTFX_BACKEND_GLFW/GLINTFX_OWN_FONT_ENGINE continuam com os mesmos nomes e mesma
+#     semantica (inclusive os FATAL_ERROR de dependencia entre GLINTFX_MODULE_APP/_WINDOW e o
+#     de GLINTFX_MODULE_IMAGE/_TEXT=OFF, ainda reservadas/forcadas ON).
+#   - Guard de libm em glintfx_audio continua por COMPILADOR
+#     ($<$<NOT:$<CXX_COMPILER_ID:MSVC>>:m>), inalterado desde a v0.18.1.
+#   - Pin do RmlUi deles continua no MESMO SHA 2cd28864ae25ed345b70598751703a5433b12356 (o
+#     patch teardown-UB nosso segue aplicavel - o nosso Declare(RmlUi) vem primeiro e decide,
+#     ver comentario grande no bloco RmlUi acima).
+#   - Vendors deles (gamecontrollerdb/khronos/miniaudio/stb) conferidos via
+#     `gh api repos/petrinhu/glintfx/contents/glintfx/third_party?ref=v0.26.0` - MESMOS 4 do
+#     pin anterior, nenhum vendor novo. THIRD-PARTY-LICENSES.md atualizado so na data/pin.
+# Build local + suite completa verdes no pin novo antes deste commit (contagem de testes no
+# relatorio da fatia 1 de log-e-relogio).
 
 FetchContent_Declare(
     glintfx
@@ -462,7 +494,7 @@ FetchContent_Declare(
     # evidencia, nao presumida: a tag v0.20.0 tem o MESMO sha nos dois hosts
     # (9bfaabfa, apontando pro commit 0442dd15 que ja esta no nosso _deps).
     GIT_REPOSITORY https://github.com/petrinhu/glintfx
-    GIT_TAG        v0.25.0
+    GIT_TAG        v0.26.0
     SOURCE_SUBDIR  glintfx
 )
 FetchContent_MakeAvailable(glintfx)

@@ -58,11 +58,13 @@ constexpr int kSdlTab = 0x09;           // SDLK_TAB
 constexpr int kSdlSpace = 0x20;         // SDLK_SPACE
 constexpr int kSdlBackspace = 0x08;     // SDLK_BACKSPACE
 
-// 4 exclusoes DOCUMENTADAS (ver key_translation_glintfx.hpp): teclas nomeaveis do
-// glintfx sem correspondente seguro/existente no vocabulario Godot. Reusada pelos
-// testes de round-trip e de cobertura total.
+// 5 exclusoes DOCUMENTADAS (ver key_translation_glintfx.hpp): teclas nomeaveis do
+// glintfx sem correspondente seguro/existente no vocabulario Godot, ou (KpEnter,
+// BUMP v0.26.0) um token vocabulario-so que o proprio glintfx documenta nunca
+// emitir de verdade. Reusada pelos testes de round-trip e de cobertura total.
 const std::set<K>& excluded_keys() {
-    static const std::set<K> kExcluded = {K::Backspace, K::World1, K::World2, K::KpEqual};
+    static const std::set<K> kExcluded = {K::Backspace, K::World1, K::World2, K::KpEqual,
+                                           K::KpEnter};
     return kExcluded;
 }
 

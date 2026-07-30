@@ -25,7 +25,7 @@
 // Count (sentinela "um-passado-do-fim", NUNCA uma tecla real - doc-comment do proprio
 // glintfx) ficam DE FORA da tabela de proposito: nao sao teclas nomeaveis.
 //
-// 4 TECLAS FICAM DE FORA MESMO SENDO NOMEAVEIS (sentinela 0 nas duas direcoes) - NAO
+// 5 TECLAS FICAM DE FORA MESMO SENDO NOMEAVEIS (sentinela 0 nas duas direcoes) - NAO
 // SAO OMISSAO, SAO EXCLUSAO DOCUMENTADA (regra do lider: "nao invente valor, use a
 // sentinela e documente"):
 //   - Backspace: o keycode REAL do Godot 4 pra Backspace (SPECIAL|0x04 = 4194308) JA E
@@ -43,6 +43,18 @@
 //     ABNT2/europeus - ver ui_event.hpp). Sem nome no vocabulario Godot -> sentinela.
 //   - KpEqual: o Key enum do Godot 4 tambem NAO define KP_EQUAL (conferido: so
 //     KP_MULTIPLY/DIVIDE/SUBTRACT/PERIOD/ADD/0-9). Sem nome no vocabulario -> sentinela.
+//   - KpEnter (BUMP v0.26.0, fatia 1 log-e-relogio, 2026-07-30): token NOVO,
+//     vocabulario-so, do proprio glintfx (KEY-KPENTER, Onda W20) - o proprio
+//     doc-comment de Key em ui_event.hpp diz explicitamente que a tecla FISICA Enter
+//     do numpad NAO emite este valor hoje (glfw_translate_key continua dobrando ela em
+//     Key::Enter, exatamente como key_translation.cpp/SDLK_KP_ENTER ja faz pro nosso
+//     kGodotEnter - MESMA fusao fisica, so que do lado glintfx o token canonico
+//     continua sendo Key::Enter). Mapear KpEnter pro MESMO kGodotEnter quebraria o
+//     round-trip generico (dois glintfx::Key forward-mapeando pro mesmo godot exige
+//     entrar na lista de fusao L/R documentada acima, e KpEnter NAO e uma fusao L/R -
+//     e um token que a propria glintfx admite nunca ser emitido na pratica). Sentinela
+//     e a escolha honesta ate o dia (se algum) em que glintfx parar de dobrar KP_ENTER
+//     em Key::Enter e o jogo quiser remapear os dois separadamente.
 //
 // PARA OS DEMAIS NAO-ANCORADOS AINDA (F1-F12, Ctrl/Alt/Super, CapsLock/NumLock/
 // ScrollLock/PrintScreen/Pause/Menu, Insert/Delete/Home/End/PageUp/PageDown, numpad,

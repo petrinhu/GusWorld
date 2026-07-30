@@ -138,6 +138,9 @@ constexpr KeyGodotPair kPairs[] = {
     {glintfx::Key::KpSubtract, kSpecial | 0x83},
     {glintfx::Key::KpAdd, kSpecial | 0x85},
     // KpEqual: DE PROPOSITO FORA da tabela - ver o header (Godot 4 nao tem KP_EQUAL).
+    // KpEnter (BUMP v0.26.0): DE PROPOSITO FORA da tabela - ver o header (token
+    // vocabulario-so do proprio glintfx, nunca emitido de verdade - a tecla FISICA
+    // continua dobrando em Key::Enter, ja coberto pelo ANCHOR acima).
 };
 
 }  // namespace
