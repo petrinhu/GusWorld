@@ -81,9 +81,12 @@
 #include "gus/platform/input/key_translation.hpp"  // sdl_key_to_godot_keycode (Fatia 2)
 #include "gus/platform/input/key_translation_glintfx.hpp"  // godot_keycode_to_glintfx_key
 #include "gus/platform/render2d/render2d_gl3.hpp"
-#include "gus/platform/rmlui/gl3_loader.hpp"  // gl3_read_backbuffer_rgba (gl3_load_functions
-                                              // era usado so por run_title_menu_loop_owning_gl,
-                                              // decommissionada - M9-CAMADAS-SDL Fatia 0)
+// FRAMEGRAB-7-SITIOS (2026-07-30): gl3_loader.hpp/gl3_read_backbuffer_rgba
+// (leitura crua de backbuffer via glad) saiu daqui - a unica captura deste
+// arquivo migrou pra glintfx::UiLayer::capture_frame() (ver render_frame_()/
+// enter()). gl3_load_functions ja nao era usado aqui desde a decommissao de
+// run_title_menu_loop_owning_gl (M9-CAMADAS-SDL Fatia 0) - zero necessidade
+// remanescente de gl3_loader.hpp neste arquivo.
 
 // stb_image_write: SO a declaracao aqui (a IMPLEMENTACAO ja vive UMA vez em
 // battle_preview.cpp, MESMA lib gusengine_app - nao redefinir
@@ -533,21 +536,34 @@ class TitleScreen final : public gus::app::ScreenState {
         // DifficultyScreen::enter().
         const char* screenshot_dir = std::getenv("GUSWORLD_TITLE_SCREENSHOT_DIR");
         if (screenshot_dir != nullptr && screenshot_dir[0] != '\0') {
-            for (int i = 0; i < 6; ++i) present_frame_();
-            std::vector<unsigned char> buf(static_cast<std::size_t>(pw_) *
-                                            static_cast<std::size_t>(ph_) * 4);
-            if (gus::platform::rmlui::gl3_read_backbuffer_rgba(pw_, ph_, buf.data())) {
+            // FRAMEGRAB-7-SITIOS: 5 frames de assentamento (COM swap, via
+            // present_frame_() de sempre) + o 6o frame renderizado SEM swap
+            // ainda (render_frame_()) - a captura via glintfx::UiLayer::
+            // capture_frame() PRECISA rodar DEPOIS do render() e ANTES do
+            // swap (contrato do pin, ui_layer.hpp) - ler o backbuffer DEPOIS
+            // do swap e UNDEFINED em muitas implementacoes GL. O
+            // gl3_read_backbuffer_rgba antigo lia DEPOIS do 6o swap e so
+            // "funcionava" por um comportamento especifico do Mesa/llvmpipe
+            // (swap se comporta como copia, retendo o quadro anterior no
+            // back buffer) - nao e um contrato garantido, so um acidente de
+            // driver. Mesma contagem de 6 swaps no total (5 aqui + 1 abaixo,
+            // apos a captura) - comportamento de apresentacao preservado.
+            for (int i = 0; i < 5; ++i) present_frame_();
+            render_frame_();
+            const glintfx::UiLayer::CapturedFrame captured = ui_->capture_frame();
+            if (captured.ok) {
                 const std::string suffix = scan_.any_save_exists
                                                 ? "title_continue_enabled"
                                                 : "title_continue_disabled";
                 const std::string out = join(std::string(screenshot_dir), suffix + ".png");
-                stbi_write_png(out.c_str(), pw_, ph_, 4, buf.data(), pw_ * 4);
-                std::cout << "TitleMenuLoop: [screenshot] " << out << " (" << pw_ << "x"
-                          << ph_ << ")\n";
+                stbi_write_png(out.c_str(), captured.width, captured.height, 4,
+                               captured.pixels.get(), captured.width * 4);
+                std::cout << "TitleMenuLoop: [screenshot] " << out << " (" << captured.width
+                          << "x" << captured.height << ")\n";
             } else {
-                std::cerr << "TitleMenuLoop: [screenshot] gl3_read_backbuffer_rgba "
-                             "falhou\n";
+                std::cerr << "TitleMenuLoop: [screenshot] capture_frame() falhou\n";
             }
+            SDL_GL_SwapWindow(window_);  // completa o 6o frame (capturado logo acima)
             screenshot_only_ = true;
             bailed_ = true;
             return;
@@ -671,7 +687,11 @@ class TitleScreen final : public gus::app::ScreenState {
         ui_->update();  // MESMO assentamento a cada troca de documento
     }
 
-    void present_frame_() {
+    // FRAMEGRAB-7-SITIOS: extraido de present_frame_() (que so agrega o swap
+    // por cima) - o corpo isolado permite capturar via glintfx::UiLayer::
+    // capture_frame() DEPOIS do render() e ANTES do proprio swap (contrato
+    // do pin, ui_layer.hpp), sem duplicar arena+UI a mao no chamador.
+    void render_frame_() {
         const gus::core::spatial::Rect cam{0.0f, 0.0f, static_cast<float>(pw_),
                                             static_cast<float>(ph_)};
         backdrop_->begin_frame(cam, pw_, ph_);
@@ -683,6 +703,10 @@ class TitleScreen final : public gus::app::ScreenState {
         backdrop_->end_frame();
         ui_->update();
         ui_->render();
+    }
+
+    void present_frame_() {
+        render_frame_();
         SDL_GL_SwapWindow(window_);
     }
 
