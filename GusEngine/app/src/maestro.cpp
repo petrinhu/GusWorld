@@ -12,6 +12,9 @@
 #include <string>
 #include <system_error>
 
+#include <glintfx/clock.hpp>  // FW-CLOCK (bump v0.26.0): substitui SDL_GetTicksNS
+#include <glintfx/log.hpp>  // FW-LOG (bump v0.26.0): substitui SDL_Log
+
 #include "gus/app/app_icon.hpp"  // APP-ICON: set_window_icon_if_available
 #include "gus/app/dialogue/npc_dialogue_catalog.hpp"  // M7-DIALOGO: I/O do .dlg.txt
 #include "gus/app/screens/battle_preview.hpp"    // run_battle_preview_embedded
@@ -156,7 +159,9 @@ Maestro::~Maestro() {
 
 bool Maestro::init() {
     if (!SDL_Init(SDL_INIT_VIDEO | SDL_INIT_GAMEPAD)) {
-        SDL_Log("Maestro: SDL_Init falhou: %s", SDL_GetError());
+        // via PLANA: SDL_GetError() e mensagem de terceiro, texto EXTERNO.
+        glintfx::log(glintfx::LogLevel::Error,
+                     ("Maestro: SDL_Init falhou: " + std::string(SDL_GetError())).c_str());
         return false;
     }
 
@@ -165,7 +170,10 @@ bool Maestro::init() {
     window_ = SDL_CreateWindow("GusWorld", kWindowW, kWindowH,
                                 SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
     if (window_ == nullptr) {
-        SDL_Log("Maestro: SDL_CreateWindow falhou: %s", SDL_GetError());
+        // via PLANA: SDL_GetError() e mensagem de terceiro, texto EXTERNO.
+        glintfx::log(
+            glintfx::LogLevel::Error,
+            ("Maestro: SDL_CreateWindow falhou: " + std::string(SDL_GetError())).c_str());
         return false;
     }
 
@@ -189,21 +197,28 @@ bool Maestro::init() {
     SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);  // o GL3 do RmlUi usa stencil (clip mask)
     gl_context_ = SDL_GL_CreateContext(window_);
     if (gl_context_ == nullptr) {
-        SDL_Log("Maestro: SDL_GL_CreateContext (contexto unico) falhou: %s",
-                SDL_GetError());
+        // via PLANA: SDL_GetError() e mensagem de terceiro, texto EXTERNO.
+        glintfx::log(glintfx::LogLevel::Error,
+                     ("Maestro: SDL_GL_CreateContext (contexto unico) falhou: " +
+                      std::string(SDL_GetError()))
+                         .c_str());
         return false;
     }
     SDL_GL_MakeCurrent(window_, gl_context_);
     SDL_GL_SetSwapInterval(1);  // 1 = sincroniza com o refresh (era SDL_SetRenderVSync)
     if (!gus::platform::rmlui::gl3_load_functions(
             reinterpret_cast<void* (*)(const char*)>(SDL_GL_GetProcAddress))) {
-        SDL_Log("Maestro: falha ao carregar funcoes OpenGL (glad) pro contexto unico.");
+        // literal do nosso codigo, sem argumento nenhum - via plana por simplicidade.
+        glintfx::log(glintfx::LogLevel::Error,
+                     "Maestro: falha ao carregar funcoes OpenGL (glad) pro contexto unico.");
         return false;
     }
 
     city_ = std::make_unique<SdlWindow>();
     if (!city_->init_attached(window_)) {
-        SDL_Log("Maestro: falha ao inicializar o renderer/cidade.");
+        // literal do nosso codigo, sem argumento nenhum - via plana por simplicidade.
+        glintfx::log(glintfx::LogLevel::Error,
+                     "Maestro: falha ao inicializar o renderer/cidade.");
         return false;
     }
 
@@ -218,7 +233,7 @@ bool Maestro::init() {
     // SAVE-LOAD-UI etapa 6: ancora do relogio de playtime (ver o comentario do
     // campo em maestro.hpp) - comeca no boot do processo, base 0 (nenhum save
     // carregado ainda).
-    playtime_anchor_ns_ = SDL_GetTicksNS();
+    playtime_anchor_ns_ = glintfx::monotonic_now_ns();
 
     // MENU-PAUSA-CONFIG-SOM (INTEGRACAO FINAL): carrega settings.json (ou os DEFAULTS
     // se for a 1a execucao/arquivo ausente/corrompido - load_system_settings degrada
@@ -402,7 +417,7 @@ gus::domain::save::SaveData Maestro::build_current_save_data() const {
             std::chrono::system_clock::now().time_since_epoch())
             .count());
     data.playtime_seconds = playtime_base_seconds_ +
-                             static_cast<double>(SDL_GetTicksNS() - playtime_anchor_ns_) /
+                             static_cast<double>(glintfx::monotonic_now_ns() - playtime_anchor_ns_) /
                                  1.0e9;
     return data;
 }
@@ -441,7 +456,7 @@ void Maestro::apply_loaded_save_data(const gus::domain::save::SaveData& data) {
     // acumulo (build_current_save_data acima) soma o tempo REAL desta
     // sessao por cima do que o save trazia.
     playtime_base_seconds_ = data.playtime_seconds;
-    playtime_anchor_ns_ = SDL_GetTicksNS();
+    playtime_anchor_ns_ = glintfx::monotonic_now_ns();
 
     std::cout << "Maestro: [save-load] Load aplicado - posicao=(" << pos.x << ", "
               << pos.y << ") enemy_defeated=" << enemy_defeated_
@@ -479,7 +494,7 @@ void Maestro::reset_to_new_game(gus::domain::save::DifficultyLevel difficulty) {
     // contrario de apply_loaded_save_data - que herda o playtime do save
     // carregado - a base aqui e sempre 0.0, nunca save_.playtime_seconds).
     playtime_base_seconds_ = 0.0;
-    playtime_anchor_ns_ = SDL_GetTicksNS();
+    playtime_anchor_ns_ = glintfx::monotonic_now_ns();
 
     std::cout << "Maestro: [reset] Novo Jogo (fora do boot, MENU-INICIAL achado 1) "
                  "aplicado - posicao=("
@@ -806,7 +821,7 @@ void Maestro::run() {
         was_overlapping_enemy_ = true;
         was_overlapping_npc_bertoldo_ = true;
         playtime_base_seconds_ = 12345.0;
-        playtime_anchor_ns_ = SDL_GetTicksNS();
+        playtime_anchor_ns_ = glintfx::monotonic_now_ns();
 
         std::cout << "Maestro: [newgame-reset][selftest] ANTES (estado 'sujo', "
                      "simulando sessao jogada): player=("
@@ -862,7 +877,7 @@ void Maestro::run() {
             was_overlapping_enemy_ = true;
             was_overlapping_npc_bertoldo_ = true;
             playtime_base_seconds_ = 12345.0;
-            playtime_anchor_ns_ = SDL_GetTicksNS();
+            playtime_anchor_ns_ = glintfx::monotonic_now_ns();
         };
 
         // PROVA VISUAL (opcional, MESMA tecnica PASSIVA de captura de frame que
@@ -1051,10 +1066,10 @@ bool Maestro::run_city_fade(gus::core::anim::FadeDirection direction,
     if (duration_seconds <= 0.0f) {
         return true;  // no-op: nenhum frame extra (simetrico a fade_overlay_alpha)
     }
-    const unsigned long long start_ns = SDL_GetTicksNS();
+    const unsigned long long start_ns = glintfx::monotonic_now_ns();
     while (true) {
         const float elapsed =
-            static_cast<float>(SDL_GetTicksNS() - start_ns) / 1.0e9f;
+            static_cast<float>(glintfx::monotonic_now_ns() - start_ns) / 1.0e9f;
         const float alpha =
             gus::core::anim::fade_overlay_alpha(direction, elapsed, duration_seconds);
         // M7-COSTURA Inc 2c: `direction` tambem escolhe a PERNA do boot pixelizado

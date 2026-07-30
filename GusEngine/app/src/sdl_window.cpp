@@ -11,6 +11,9 @@
 #include <string>
 #include <utility>  // std::move (set_controls)
 
+#include <glintfx/clock.hpp>  // FW-CLOCK (bump v0.26.0): substitui SDL_GetTicksNS
+#include <glintfx/log.hpp>  // FW-LOG (bump v0.26.0): substitui SDL_Log
+
 #include "gus/app/screens/anim_catalog.hpp"  // resolve_gus_sprites_dir
 #include "gus/app/screens/city_loader.hpp"   // load_city_or_fallback
 #include "gus/app/screens/player_sprites_loader.hpp"
@@ -95,7 +98,11 @@ bool SdlWindow::init() {
     window_ = SDL_CreateWindow("GusWorld", kWindowW, kWindowH,
                                SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
     if (window_ == nullptr) {
-        SDL_Log("SDL_CreateWindow (standalone GL) falhou: %s", SDL_GetError());
+        // via PLANA: SDL_GetError() e mensagem de terceiro, texto EXTERNO.
+        glintfx::log(
+            glintfx::LogLevel::Error,
+            ("SDL_CreateWindow (standalone GL) falhou: " + std::string(SDL_GetError()))
+                .c_str());
         return false;
     }
     owns_window_ = true;
@@ -107,14 +114,20 @@ bool SdlWindow::init() {
     SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
     gl_context_ = SDL_GL_CreateContext(window_);
     if (gl_context_ == nullptr) {
-        SDL_Log("SDL_GL_CreateContext (standalone) falhou: %s", SDL_GetError());
+        // via PLANA: SDL_GetError() e mensagem de terceiro, texto EXTERNO.
+        glintfx::log(
+            glintfx::LogLevel::Error,
+            ("SDL_GL_CreateContext (standalone) falhou: " + std::string(SDL_GetError()))
+                .c_str());
         return false;
     }
     SDL_GL_MakeCurrent(window_, gl_context_);
     SDL_GL_SetSwapInterval(1);  // 1 = sincroniza com o refresh (era SDL_SetRenderVSync)
     if (!gus::platform::rmlui::gl3_load_functions(
             reinterpret_cast<void* (*)(const char*)>(SDL_GL_GetProcAddress))) {
-        SDL_Log("SdlWindow::init - gl3_load_functions (glad) falhou.");
+        // literal do nosso codigo, sem argumento nenhum - via plana por simplicidade.
+        glintfx::log(glintfx::LogLevel::Error,
+                     "SdlWindow::init - gl3_load_functions (glad) falhou.");
         return false;
     }
 
@@ -192,9 +205,11 @@ void SdlWindow::load_enemy_marker_texture() {
         sim_->set_enemy_marker(*enemy_marker_aabb_, enemy_marker_tex_);
     } else {
         // Asset ausente/headless: degrada sem deixar um TextureId obsoleto no sim_.
-        SDL_Log("SdlWindow: retrato do inimigo ausente/ilegivel (%s) - marcador "
-                "limpo, cidade segue sem marker.",
-                path.c_str());
+        // via PLANA: path e caminho de arquivo, texto EXTERNO.
+        glintfx::log(glintfx::LogLevel::Warn,
+                     ("SdlWindow: retrato do inimigo ausente/ilegivel (" + path +
+                      ") - marcador limpo, cidade segue sem marker.")
+                         .c_str());
         sim_->clear_enemy_marker();
     }
 }
@@ -233,9 +248,11 @@ void SdlWindow::load_npc_bertoldo_marker_texture() {
                                       npc_bertoldo_marker_tex_);
     } else {
         // Asset ausente/headless: degrada sem deixar um TextureId obsoleto no sim_.
-        SDL_Log("SdlWindow: sprite do Bertoldo ausente/ilegivel (%s) - marcador "
-                "limpo, cidade segue sem marker.",
-                path.c_str());
+        // via PLANA: path e caminho de arquivo, texto EXTERNO.
+        glintfx::log(glintfx::LogLevel::Warn,
+                     ("SdlWindow: sprite do Bertoldo ausente/ilegivel (" + path +
+                      ") - marcador limpo, cidade segue sem marker.")
+                         .c_str());
         sim_->clear_npc_bertoldo_marker();
     }
 }
@@ -274,8 +291,9 @@ bool SdlWindow::step_with_fade(float overlay_alpha,
         return false;
     }
 
-    // 2) dt real desde o ultimo frame (segundos), via relogio monotonico do SDL.
-    const unsigned long long now_ns = SDL_GetTicksNS();
+    // 2) dt real desde o ultimo frame (segundos), via relogio monotonico do
+    //    glintfx (FW-CLOCK, bump v0.26.0 - substitui SDL_GetTicksNS).
+    const unsigned long long now_ns = glintfx::monotonic_now_ns();
     double dt = 0.0;
     if (have_last_time_) {
         dt = static_cast<double>(now_ns - last_ns_) / 1.0e9;
@@ -523,9 +541,10 @@ bool SdlWindow::capture_frame_to_png(const std::string& out_path) {
     SDL_GL_SwapWindow(window_);  // apresenta o MESMO frame que acabou de ser lido
 
     if (!read_ok) {
-        SDL_Log(
-            "SdlWindow: capture_frame_to_png - gl3_read_backbuffer_rgba falhou "
-            "(dimensoes invalidas ou glad nao carregado).");
+        // literal do nosso codigo, sem argumento nenhum - via plana por simplicidade.
+        glintfx::log(glintfx::LogLevel::Error,
+                     "SdlWindow: capture_frame_to_png - gl3_read_backbuffer_rgba falhou "
+                     "(dimensoes invalidas ou glad nao carregado).");
         return false;
     }
     // stb_image_write escreve RGBA32 tightly-packed (4 bytes/pixel, stride = w*4) -
@@ -536,8 +555,11 @@ bool SdlWindow::capture_frame_to_png(const std::string& out_path) {
     const int ok = stbi_write_png(out_path.c_str(), pw, ph, /*comp=*/4, pixels.data(),
                                   pw * 4);
     if (ok == 0) {
-        SDL_Log("SdlWindow: capture_frame_to_png - stbi_write_png falhou (%s)",
-                out_path.c_str());
+        // via PLANA: out_path e caminho de arquivo, texto EXTERNO.
+        glintfx::log(glintfx::LogLevel::Error,
+                     ("SdlWindow: capture_frame_to_png - stbi_write_png falhou (" +
+                      out_path + ")")
+                         .c_str());
         return false;
     }
     return true;
