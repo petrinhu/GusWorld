@@ -153,9 +153,22 @@ python3 "$ROOT/tools/sdl_layer_ratchet.py"
 GATE_SDL_RATCHET=$?
 set -e
 
+# (d) Zero-tolerancia de categoria FECHADA (fatia 1 log-e-relogio, 2026-07-30,
+#     docs/tech/plano-camadas-sdl.md secao 8): diferente do ratchet acima (que
+#     ainda acomoda transicao categoria-a-categoria), SDL_Log e SDL_GetTicksNS
+#     ja saíram por completo de app/ de producao (glintfx::log*/FW-LOG e
+#     glintfx::monotonic_now_ns/FW-CLOCK) - qualquer reintroducao reprova na
+#     hora, sem teto numerico. SDL_Delay fica de FORA (ver
+#     tools/sdl_log_clock_zero.py): continua em uso real, categoria ainda nao
+#     migrada.
+set +e
+python3 "$ROOT/tools/sdl_log_clock_zero.py"
+GATE_LOG_CLOCK_ZERO=$?
+set -e
+
 GATE=0
 [ "$GATE_ARCH" = "0" ] && [ "$GATE_EXCL" = "0" ] && [ "$GATE_I18N" = "0" ] \
-    && [ "$GATE_SDL_RATCHET" = "0" ] || GATE=1
+    && [ "$GATE_SDL_RATCHET" = "0" ] && [ "$GATE_LOG_CLOCK_ZERO" = "0" ] || GATE=1
 echo "GATE=$GATE"
 
 # ---------------------------------------------------------------- SUITE

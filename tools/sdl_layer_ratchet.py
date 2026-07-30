@@ -53,6 +53,21 @@ PRODUCTION_DIRS = [
 # SDL_Keycode do TIPO das 4 telas de menu puro (title/difficulty/system/
 # save_load_menu.hpp+.cpp, 8 arquivos) trocando por glintfx::Key - a traducao
 # ficou 100% nos 4 *_loop.cpp (que continuam contando, corretamente).
+#
+# 24 -> 24, SEM MUDANCA (Fatia 1, log-e-relogio, 2026-07-30): SDL_Log
+# (~30 call sites) e SDL_GetTicksNS (~17 call sites) saíram por completo de
+# producao (glintfx::log*/FW-LOG, glintfx::monotonic_now_ns/FW-CLOCK) - medido
+# ANTES e DEPOIS desta fatia, os mesmos 24 arquivos continuam na lista porque
+# TODOS OS 24, sem excecao, ja tinham OUTRO uso real de SDL3 (SDL_Window*,
+# SDL_GLContext, SDL_Event, SDL_GL_*, etc.) alem de log/relogio - nenhum
+# arquivo tinha log/relogio como seu UNICO motivo de aparecer aqui. Este
+# ratchet e por-ARQUIVO (nao por-token), entao uma categoria inteira pode
+# fechar sem mover este numero - a prova real da fatia esta no
+# GATE(log-clock-zero) novo (tools/sdl_log_clock_zero.py), zero-tolerancia
+# fechada pras duas categorias, chamado por tools/check.sh logo apos este
+# gate. NAO baixar CEILING sem medir de novo - um teto abaixo de 24 aqui
+# reprovaria hoje por engano (os 24 arquivos continuam legitimamente na
+# lista).
 CEILING = 24
 
 SDL_TOKEN_RE = re.compile(r"\bSDL_[A-Za-z0-9_]*\b")
