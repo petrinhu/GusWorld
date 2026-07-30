@@ -199,11 +199,27 @@ python3 "$ROOT/tools/fetchcontent_manifest.py"
 GATE_FETCHCONTENT=$?
 set -e
 
+# (h) Zero-tolerancia PERMANENTE ao proprio buraco do timeout (GATES-S3,
+#     2026-07-30, pedido do orquestrador apos o hang de 8h54min): TODO teste
+#     registrado no ctest precisa ter a propriedade TIMEOUT, medido por
+#     INTROSPECAO REAL (`ctest --show-only=json-v1`), NUNCA por grep no
+#     CMakeLists.txt - um grep so prova que a SINTAXE existe em algum lugar,
+#     nao que aquele teste especifico recebeu a propriedade (foi exatamente
+#     essa lacuna que deixou 3 dos 4 alvos sem TIMEOUT por 6 dias sem
+#     ninguem perceber). Fecha o buraco pra SEMPRE: no dia em que nascer um
+#     5o alvo de teste sem TIMEOUT, reprova na hora. Ver
+#     tools/ctest_timeout_required.py (inclusive o requisito de NUNCA passar
+#     em silencio se a introspecao falhar por qualquer motivo).
+set +e
+python3 "$ROOT/tools/ctest_timeout_required.py"
+GATE_CTEST_TIMEOUT=$?
+set -e
+
 GATE=0
 [ "$GATE_ARCH" = "0" ] && [ "$GATE_EXCL" = "0" ] && [ "$GATE_I18N" = "0" ] \
     && [ "$GATE_SDL_RATCHET" = "0" ] && [ "$GATE_LOG_CLOCK_ZERO" = "0" ] \
     && [ "$GATE_STBI_ZERO" = "0" ] && [ "$GATE_AUDIO_ZERO" = "0" ] \
-    && [ "$GATE_FETCHCONTENT" = "0" ] || GATE=1
+    && [ "$GATE_FETCHCONTENT" = "0" ] && [ "$GATE_CTEST_TIMEOUT" = "0" ] || GATE=1
 echo "GATE=$GATE"
 
 # ---------------------------------------------------------------- SUITE
