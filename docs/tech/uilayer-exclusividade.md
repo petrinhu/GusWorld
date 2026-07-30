@@ -143,11 +143,36 @@ estrutural do driver?"*
 | Classe | Arquivo | `.emplace()` dentro de `enter()`? | `.reset()` dentro de `exit()`? | Todas instanciações via `run_screen_state()`? | Veredito |
 |---|---|---|---|---|---|
 | `DifficultyScreen` | `difficulty_menu_loop.cpp` | Sim (:366, `enter()` 350–517) | Sim (:521, `exit()` 517–…) | Único ctor em `:668`, seguido por `run_screen_state(screen, ...)` em `:669` | **HERDA** |
-| `BattleScreen` | `battle_preview.cpp` | Sim (:360, `enter()` 289–…) | Sim (:1647, `exit()` 1612–…; reset extra em :444 é dentro do próprio `enter()`, ramo de falha de attach — não é um segundo sítio) | Único ctor em `:1659`, seguido por `run_screen_state(screen, ...)` em `:1660` | **HERDA** |
+| `BattleScreen` | `battle_preview.cpp` | Sim (:360, `enter()` 289–…) | Sim (:1647, `exit()` 1612–…) | Único ctor em `:1659`, seguido por `run_screen_state(screen, ...)` em `:1660` | **HERDA** |
 | `TitleScreen` | `title_menu_loop.cpp` | Sim (:466, `enter()` 451–615) | Sim (:620, `exit()` 615–…) | Único ctor em `:807`, dentro de um `for(;;)` que chama `run_screen_state(title_screen, ...)` em `:815` a cada volta | **HERDA** |
 | `NpcDialogueScreen` | `npc_dialogue_loop_gl.cpp` | Sim (:240, `enter()` 234–397) | Sim (:404, `exit()` 397–…) | Único ctor em `:884`, seguido por `run_screen_state(screen, ...)` em `:885` | **HERDA** |
 | `SystemMenuLoopScreen` | `system_menu_loop.cpp` | Sim (:857, `enter()` 842–1039) | Sim (:1044, `exit()` 1039–…) | Único ctor em `:1694`, dentro de loop que chama `run_screen_state(system_screen, ...)` em `:1704` | **HERDA** |
 | `SaveLoadScreen` | `save_load_menu_loop.cpp` | Sim (:516, `enter()` 506–687) | Sim (:690, `exit()` 687–…) | Único ctor em `:960`, seguido por `run_screen_state(screen, sync_hook)` em `:962` | **HERDA** |
+
+**⚠️ CORREÇÃO (apontada pelo revisor após o commit inicial, verificada e
+aceita):** a coluna acima descreve o par emplace/reset canônico das 6
+classes, mas **`BattleScreen` tem um terceiro toque em `ui_`** que a tabela
+por si só não captura: `battle_preview.cpp:444`, um `ui_.reset()` **dentro do
+próprio `enter()`** (range 289–1612, o mesmo onde está o `.emplace()` de
+`:360`) — não em `exit()`. Contexto:
+
+```cpp
+} else {
+    std::cerr << "BattlePreview: [glintfx] UiLayer::ok()=false (attach falhou) "
+                 "- caindo SEM UI neste run\n";
+    ui_.reset();
+}
+```
+
+É o **ramo de falha do próprio `enter()`**: se o attach da `UiLayer` não deu
+certo (`ok()==false`), libera na hora e a tela segue sem UI — não é um sítio
+fora do contrato, é limpeza de falha, e reforça a garantia (um layer que
+falhou não fica pendurado até o `exit()`). Verifiquei as outras 5 classes
+(`grep -n "ui_\.emplace\|ui_\.reset"` em cada arquivo) e **nenhuma tem
+equivalente** — cada uma tem exatamente 1 `emplace()` + 1 `reset()`, só
+`BattleScreen` tem os 3 toques. A formulação anterior deste documento
+("`.reset()` só em `exit()`", sem essa ressalva) estava imprecisa; corrigida
+aqui e na seção 7.
 
 Prova de (ii) para cada classe: `grep -rn "\bNomeDaClasse\b"` no repo inteiro
 (fora do próprio arquivo de definição) não retorna **nenhum outro** ponto de
@@ -260,9 +285,12 @@ anterior **verificada e correta**.
 
 - **Nenhum sítio INSEGURO encontrado.** Todos os 6 sítios-dono (a+b) **HERDAM**
   a garantia estrutural de `run_screen_state()`/`ScreenState`: `.emplace()`
-  só em `enter()`, `.reset()` só em `exit()`, e cada classe tem exatamente um
-  ponto de instanciação no repositório inteiro, sempre seguido imediatamente
-  por `run_screen_state()`.
+  só em `enter()`; `.reset()` no `exit()` em todas as 6, **mais um `reset()`
+  de limpeza no ramo de falha do próprio `enter()` em `BattleScreen`
+  (`battle_preview.cpp:444`, quando `ui_->ok()==false` — libera na hora e
+  segue sem UI, não fica pendurado até o `exit()`; ver correção na seção 3)**;
+  e cada classe tem exatamente um ponto de instanciação no repositório
+  inteiro, sempre seguido imediatamente por `run_screen_state()`.
 - Os 11 sítios de construção fora das classes-dono são **PROCESS-SEPARADO**
   (9, ferramentas standalone) ou **MANUAL-SEGURO** (2, helpers de teste
   RAII-escopados, comprovados sem overlap).
