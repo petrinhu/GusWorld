@@ -166,9 +166,44 @@ python3 "$ROOT/tools/sdl_log_clock_zero.py"
 GATE_LOG_CLOCK_ZERO=$?
 set -e
 
+# (e) Zero-tolerancia CROSS-CAMADA (Fatia S3, docs/tech/plano-migracao-total.md
+#     secao 5): stbi_load/stbi_image_free (decode) saíram de vez da producao
+#     inteira (core+domain+platform+app) na Fatia S1 (commit 9387155); este
+#     gate CONGELA o estado. stbi_write fica de fora de proposito (bloqueado
+#     pela IMG-ENCODE do glintfx) - ver o docstring de
+#     tools/stb_image_zero.py pro motivo, mesmo raciocinio do SDL_Delay acima.
+set +e
+python3 "$ROOT/tools/stb_image_zero.py"
+GATE_STBI_ZERO=$?
+set -e
+
+# (f) Zero-tolerancia CROSS-CAMADA (Fatia S3): ma_* (miniaudio direto) e
+#     <miniaudio...> ja saíram da producao inteira desde 2026-07-22 (commit
+#     d79d880, audio_engine.cpp -> glintfx::Audio); este gate TRAVA a
+#     migracao (o miniaudio ja mudou de dono uma vez - saiu do nosso
+#     third_party/, voltou por dentro do glintfx - o gate garante que nao
+#     volta pelo outro lado). Ver tools/audio_ma_zero.py.
+set +e
+python3 "$ROOT/tools/audio_ma_zero.py"
+GATE_AUDIO_ZERO=$?
+set -e
+
+# (g) Lista fechada de FetchContent (Fatia S3): GusEngine/CMakeLists.txt
+#     declara EXATAMENTE {SDL3, RmlUi, glintfx, Catch2} - dependencia nova
+#     (transitiva ou direta) so entra por decisao EXPLICITA (o proprio
+#     miniaudio ja entrou "de gratis" por dentro do glintfx uma vez; este
+#     gate obriga a proxima a virar uma linha em ALLOWED, nao um acidente).
+#     Ver tools/fetchcontent_manifest.py.
+set +e
+python3 "$ROOT/tools/fetchcontent_manifest.py"
+GATE_FETCHCONTENT=$?
+set -e
+
 GATE=0
 [ "$GATE_ARCH" = "0" ] && [ "$GATE_EXCL" = "0" ] && [ "$GATE_I18N" = "0" ] \
-    && [ "$GATE_SDL_RATCHET" = "0" ] && [ "$GATE_LOG_CLOCK_ZERO" = "0" ] || GATE=1
+    && [ "$GATE_SDL_RATCHET" = "0" ] && [ "$GATE_LOG_CLOCK_ZERO" = "0" ] \
+    && [ "$GATE_STBI_ZERO" = "0" ] && [ "$GATE_AUDIO_ZERO" = "0" ] \
+    && [ "$GATE_FETCHCONTENT" = "0" ] || GATE=1
 echo "GATE=$GATE"
 
 # ---------------------------------------------------------------- SUITE
@@ -218,13 +253,36 @@ if [ "$BUILD" = "0" ]; then
             sleep 1
         fi
     fi
+    # TIMEOUT POR TESTE (2026-07-30, achado da noite de S3): SEM isto, um teste
+    # pendurado NUNCA falha - ele so PARA de responder, e o ctest espera pra
+    # sempre. Aconteceu de verdade: "AudioEngine set_music_volume/set_sfx_volume
+    # com device real" (GusEngine/platform/tests/, gusengine_platform_tests) -
+    # SEM TIMEOUT property (so gusengine_app_tests tem, via
+    # F4-CTEST-NO-TIMEOUT/GusEngine/app/tests/CMakeLists.txt:184; platform/tests
+    # e domain/tests NUNCA tiveram) - pendurou com a thread principal em
+    # `pthread_join`, esperando uma thread do PipeWire presa em `epoll_wait`.
+    # Custo medido: 8h54min de maquina perdidos, dois agentes bloqueados sem
+    # saber por que (sem erro, sem log, sem fim). Nao reproduzi depois -
+    # isolado passa em 0,11s, a suite inteira passa em ~22s: e intermitente
+    # (ja reportado ao glintfx pelo bus).
+    #
+    # --timeout 120: a suite completa roda em ~22s e o teste mais lento leva
+    # poucos segundos - 120s e generoso o bastante (~20-40x o pior caso normal,
+    # cobrindo contencao de CPU/disco sob carga) pra nunca reprovar teste
+    # legitimo, e teto o bastante pra transformar um hang de 9 HORAS em um
+    # hang de 2 MINUTOS. So vale como DEFAULT pra teste SEM TIMEOUT property
+    # propria (ctest nao sobrescreve o TIMEOUT=60 explicito de app/tests) -
+    # NAO conserta o deadlock em si (isso e bug do glintfx/PipeWire, ja
+    # reportado); e cinto de seguranca, nao conserto.
+    CTEST_TIMEOUT="${CHECK_CTEST_TIMEOUT:-120}"
+
     # FIX (2026-07-14): capturar o exit do ctest LOGO APOS o pipe ctest|tee (o `|| true`
     # de um grep depois resetava PIPESTATUS e mascarava falha -> verde cego).
     if [ -n "$_suite_disp" ]; then
         ( cd "$ENGINE" && env -u WAYLAND_DISPLAY DISPLAY="$_suite_disp" SDL_VIDEODRIVER=x11 \
             XDG_RUNTIME_DIR="$_suite_xdg" XDG_SESSION_TYPE=x11 \
             DBUS_SESSION_BUS_ADDRESS="unix:path=$_suite_xdg/no-dbus" \
-            ctest --preset "$PRESET" 2>&1 ) | tee "$CTEST_LOG" >/dev/null
+            ctest --preset "$PRESET" --timeout "$CTEST_TIMEOUT" 2>&1 ) | tee "$CTEST_LOG" >/dev/null
     else
         # sem display isolado: NUNCA rodar GL no :0 vivo -> offscreen (GL degrada).
         # O XDG_RUNTIME_DIR proprio vai TAMBEM aqui: sem ele, uma dependencia que chame
@@ -233,7 +291,7 @@ if [ "$BUILD" = "0" ]; then
         ( cd "$ENGINE" && env -u WAYLAND_DISPLAY DISPLAY= SDL_VIDEODRIVER=offscreen \
             XDG_RUNTIME_DIR="$_suite_xdg" XDG_SESSION_TYPE=x11 \
             DBUS_SESSION_BUS_ADDRESS="unix:path=$_suite_xdg/no-dbus" \
-            ctest --preset "$PRESET" 2>&1 ) | tee "$CTEST_LOG" >/dev/null
+            ctest --preset "$PRESET" --timeout "$CTEST_TIMEOUT" 2>&1 ) | tee "$CTEST_LOG" >/dev/null
     fi
     SUITE=${PIPESTATUS[0]}
     [ -n "$_suite_xvfb_pid" ] && kill "$_suite_xvfb_pid" 2>/dev/null
