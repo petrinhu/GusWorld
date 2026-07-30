@@ -5,24 +5,33 @@
 // header. Travado por platform/tests/render2d_sdl_test.cpp (TEST-FIRST, caminho
 // headless) + smoke do app (caminho com renderer real).
 //
-// PNG -> SDL_Texture via stb_image (vendorizado em third_party/stb). A definicao
-// da implementacao do stb fica AQUI (esta e a unica TU que a usa no render2d).
+// PNG -> SDL_Texture via glintfx::decode_image_file (STB-IMAGE-PLATFORM, 2026-07-30;
+// sucessora do STB-IMAGE-APP que tirou o stbi_load direto do app/, commit 46a12e3).
+// Antes esta TU incluia "stb_image.h" com STB_IMAGE_IMPLEMENTATION (unica TU do
+// render2d a definir os simbolos - render2d_gl3.cpp so incluia o header, reusando-os
+// no link) e chamava stbi_load()/stbi_image_free() direto - violacao do contrato de
+// camadas (stb_image e detalhe de decode, nao fronteira SDL/GL que platform/ tem
+// licenca de tocar). glintfx::decode_image_file substitui 1-pra-1, sem exigir
+// contexto GL e sem free manual (RAII em DecodedImagePixels::pixels).
+//
+// ALPHA: decode_image_file devolve alpha STRAIGHT (nao-premultiplicado), exatamente
+// o que stbi_load ja devolvia. SDL_BLENDMODE_BLEND (setado no load_texture abaixo)
+// espera justamente alpha straight (formula dst=src*srcA+dst*(1-srcA)) - este
+// arquivo nunca passa pelo Draw2d::create_texture do glintfx (que premultiplica
+// Rgba8 na ingestao pro proprio blend GL premultiplied); a assimetria de premultiply
+// entre as duas APIs do glintfx nao se aplica aqui.
 
 #include "gus/platform/render2d/render2d_sdl.hpp"
 
 #include <cstdint>
 #include <vector>
 
+#include <glintfx/image.hpp>
+
 #include "gus/core/asset_paths.hpp"  // nomes dos arquivos de fonte centralizados
 #include "gus/platform/render2d/alpha_bbox.hpp"  // scan_alpha_content_bbox (POCO)
 #include "gus/platform/render2d/text_metrics.hpp"  // glyph_advance (monospace)
 #include "gus/platform/render2d/viewport_transform.hpp"
-
-// stb_image: so esta TU define a implementacao (evita simbolos duplicados).
-// Usamos stbi_load(path,...) que abre o arquivo (precisa de stdio - default ON).
-#define STB_IMAGE_IMPLEMENTATION
-#define STBI_ONLY_PNG  // o pipeline de arte do GusWorld exporta PNG
-#include "stb_image.h"
 
 namespace gus::platform::render2d {
 
@@ -136,32 +145,31 @@ TextureId Render2dSdl::load_texture(const char* path) {
         return kInvalidTexture;
     }
 
-    // Carrega o PNG como RGBA8 (4 canais forcados) via stb_image.
-    int w = 0, h = 0, channels = 0;
-    stbi_uc* pixels = stbi_load(path, &w, &h, &channels, 4);
-    if (pixels == nullptr || w <= 0 || h <= 0) {
-        if (pixels != nullptr) {
-            stbi_image_free(pixels);
-        }
+    // Carrega o PNG como RGBA8 (4 canais forcados) straight-alpha via
+    // glintfx::decode_image_file (STB-IMAGE-PLATFORM). ok==false cobre path
+    // nulo/ilegivel/corrompido/acima do teto - mesma degradacao que
+    // pixels==nullptr do stbi_load cobria.
+    const glintfx::DecodedImagePixels decoded = glintfx::decode_image_file(path);
+    if (!decoded.ok || decoded.width <= 0 || decoded.height <= 0) {
         return kInvalidTexture;
     }
+    const int w = decoded.width;
+    const int h = decoded.height;
 
     // Cria a SDL_Texture estatica RGBA32 e sobe os pixels.
     SDL_Texture* tex = SDL_CreateTexture(renderer_, SDL_PIXELFORMAT_RGBA32,
                                          SDL_TEXTUREACCESS_STATIC, w, h);
     if (tex == nullptr) {
-        stbi_image_free(pixels);
         return kInvalidTexture;
     }
     // pitch = w * 4 bytes (RGBA8).
-    SDL_UpdateTexture(tex, nullptr, pixels, w * 4);
+    SDL_UpdateTexture(tex, nullptr, decoded.pixels.data(), w * 4);
 
     // ANCORAGEM (M1-BUG.SUL): mede o alpha-bbox do conteudo AGORA, com os pixels
-    // ainda em memoria (antes de liberar). E o que da pra COLAR o pe na base da
-    // AABB sem numero magico - cada sprite mede a propria margem inferior vazia.
-    const ContentBbox bbox =
-        scan_alpha_content_bbox(static_cast<const std::uint8_t*>(pixels), w, h);
-    stbi_image_free(pixels);
+    // ainda vivos no vetor RAII de decoded (sai de escopo ao fim da funcao, sem
+    // free manual). E o que da pra COLAR o pe na base da AABB sem numero magico -
+    // cada sprite mede a propria margem inferior vazia.
+    const ContentBbox bbox = scan_alpha_content_bbox(decoded.pixels.data(), w, h);
 
     // NEAREST (pixel-art crisp) + blend alpha (sprite com transparencia).
     SDL_SetTextureScaleMode(tex, SDL_SCALEMODE_NEAREST);

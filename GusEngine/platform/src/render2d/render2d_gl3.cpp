@@ -14,8 +14,16 @@
 //
 // O .cpp inclui o loader glad via RmlUi_Include_GL3.h (header-only). A IMPLEMENTACAO do
 // glad (GLAD_GL_IMPLEMENTATION) e definida pelo gl3_loader.cpp (ADR-010 F3) - aqui so o
-// header (declaracoes + ponteiros de funcao globais que aquele .cpp resolve). stb_image
-// idem: so o header (impl no render2d_sdl.cpp).
+// header (declaracoes + ponteiros de funcao globais que aquele .cpp resolve).
+//
+// PNG -> pixels via glintfx::decode_image_file (STB-IMAGE-PLATFORM, 2026-07-30;
+// sucessora do STB-IMAGE-APP, commit 46a12e3). Antes este .cpp so incluia
+// "stb_image.h" (impl compartilhada de render2d_sdl.cpp) e chamava stbi_load()
+// direto - mesma violacao de camada corrigida la. decode_image_file devolve alpha
+// STRAIGHT (identico ao stbi_load); este backend PREMULTIPLICA in-place logo apos
+// o decode (ver load_texture) porque o blend GL daqui e premultiplied
+// (GL_ONE, GL_ONE_MINUS_SRC_ALPHA, begin_frame) - o passo de premultiply e
+// preexistente e NAO mudou, so a fonte dos pixels mudou.
 
 #include "gus/platform/render2d/render2d_gl3.hpp"
 
@@ -35,8 +43,7 @@
 // glad (GL 3.3 core) - so o header; a impl vem do gl3_loader.cpp (mesma TU-set, ADR-010 F3).
 #include "RmlUi_Include_GL3.h"
 
-// stb_image - so o header (impl em render2d_sdl.cpp).
-#include "stb_image.h"
+#include <glintfx/image.hpp>
 
 namespace gus::platform::render2d {
 
@@ -493,25 +500,29 @@ TextureId Render2dGl3::load_texture(const char* path) {
     if (it != impl_->by_path.end()) {
         return it->second;
     }
-    int w = 0, h = 0, channels = 0;
-    stbi_uc* pixels = stbi_load(path, &w, &h, &channels, 4);
-    if (pixels == nullptr || w <= 0 || h <= 0) {
-        if (pixels != nullptr) stbi_image_free(pixels);
+    // decode_image_file devolve alpha STRAIGHT (identico ao stbi_load); ok==false
+    // cobre path nulo/ilegivel/corrompido/acima do teto - mesma degradacao que
+    // pixels==nullptr do stbi_load cobria. decoded e mutavel de proposito: o
+    // premultiply abaixo escreve IN-PLACE no proprio buffer RAII (sem free manual,
+    // sem alocacao extra - o mesmo padrao que o stbi_load mutando seu buffer tinha).
+    glintfx::DecodedImagePixels decoded = glintfx::decode_image_file(path);
+    if (!decoded.ok || decoded.width <= 0 || decoded.height <= 0) {
         return kInvalidTexture;
     }
+    const int w = decoded.width;
+    const int h = decoded.height;
+    std::uint8_t* pixels = decoded.pixels.data();
     // Alpha-bbox medido com os pixels NAO premultiplicados (alpha original).
-    const ContentBbox bbox =
-        scan_alpha_content_bbox(static_cast<const std::uint8_t*>(pixels), w, h);
+    const ContentBbox bbox = scan_alpha_content_bbox(pixels, w, h);
     // Premultiplica para o blend premultiplied alpha.
     const std::size_t n = static_cast<std::size_t>(w) * h * 4;
     for (std::size_t i = 0; i < n; i += 4) {
         const unsigned int a = pixels[i + 3];
-        pixels[i + 0] = static_cast<stbi_uc>(pixels[i + 0] * a / 255);
-        pixels[i + 1] = static_cast<stbi_uc>(pixels[i + 1] * a / 255);
-        pixels[i + 2] = static_cast<stbi_uc>(pixels[i + 2] * a / 255);
+        pixels[i + 0] = static_cast<std::uint8_t>(pixels[i + 0] * a / 255);
+        pixels[i + 1] = static_cast<std::uint8_t>(pixels[i + 1] * a / 255);
+        pixels[i + 2] = static_cast<std::uint8_t>(pixels[i + 2] * a / 255);
     }
     const GLuint tex = impl_->upload_rgba(pixels, w, h, /*nearest=*/true);
-    stbi_image_free(pixels);
     if (tex == 0) {
         return kInvalidTexture;
     }
