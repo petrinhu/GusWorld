@@ -19,9 +19,11 @@
 // EXCLUSIVIDADE DO UILAYER (requisito DURO, nao detalhe de implementacao):
 // abrir um 2o glintfx::UiLayer com o 1o AINDA vivo crashava DE VERDADE ao vivo
 // ("Element meta pool not empty on shutdown, 75 object(s) leaked" - ver
-// gus/app/src/screens/battle_preview.cpp:1043-1059, o historico do revert
-// BATTLE-ESC-PAUSE-ACTOR-LIST). run_screen_state() abaixo empurra essa
-// invariante pra FORA da disciplina de quem escreve a proxima tela:
+// commit 89fb380, ID BATTLE-ESC-PAUSE-ACTOR-LIST, 2026-07-05: revert do menu
+// de pausa na arena de batalha apos esse crash real ao vivo). SHA de commit
+// e usado aqui em vez de arquivo:linha porque arquivo:linha se move e o SHA
+// nao. run_screen_state() abaixo empurra essa invariante pra FORA da
+// disciplina de quem escreve a proxima tela:
 //   1) toma UMA UNICA ScreenState& (nunca um vector/pilha de ponteiros - nao
 //      ha COMO passar 2 "correntes" ao mesmo tempo, a API nao oferece isso);
 //   2) chama enter() (onde a tela cria seus recursos GL/UiLayer) SEMPRE antes
