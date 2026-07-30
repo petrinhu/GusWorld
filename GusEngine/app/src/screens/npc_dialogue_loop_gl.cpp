@@ -40,6 +40,7 @@
 #include <vector>
 
 #include <glintfx/element_box.hpp>
+#include <glintfx/log.hpp>  // FW-LOG (bump v0.26.0): substitui SDL_Log
 #include <glintfx/ui_layer.hpp>
 
 #include "gus/app/screens/npc_dialogue_overlay.hpp"
@@ -192,16 +193,19 @@ std::string write_npc_dialogue_rml_file(
 void register_pixel_operator_mono_fonts(glintfx::UiLayer& ui) {
     if (!ui.load_font_face(glintfx::FontFaceDesc{/*path=*/"PixelOperatorMono.ttf",
                                                   /*family=*/"Pixel Operator Mono"})) {
-        SDL_Log(
-            "NpcDialogueLoopGl: load_font_face(PixelOperatorMono.ttf) falhou (arquivo "
-            "ausente/invalido no stage) - cai no fallback de fonte do RmlUi.");
+        // literal do nosso codigo, sem argumento nenhum - via plana por simplicidade.
+        glintfx::log(glintfx::LogLevel::Warn,
+                     "NpcDialogueLoopGl: load_font_face(PixelOperatorMono.ttf) falhou "
+                     "(arquivo ausente/invalido no stage) - cai no fallback de fonte do "
+                     "RmlUi.");
     }
     if (!ui.load_font_face(glintfx::FontFaceDesc{
             /*path=*/"PixelOperatorMono-Bold.ttf",
             /*family=*/"Pixel Operator Mono",
             /*style=*/glintfx::FontStyle::Normal,
             /*weight=*/glintfx::FontWeight::Bold})) {
-        SDL_Log(
+        glintfx::log(
+            glintfx::LogLevel::Warn,
             "NpcDialogueLoopGl: load_font_face(PixelOperatorMono-Bold.ttf) falhou "
             "(arquivo ausente/invalido no stage) - cai no fallback de fonte do RmlUi.");
     }
@@ -238,9 +242,10 @@ public:
                                               /*load_gl=*/true,
                                               /*dp_ratio=*/dp_ratio_});
         if (!ui_->ok()) {
-            SDL_Log(
-                "NpcDialogueLoopGl: glintfx::UiLayer::ok()=false (attach falhou) - "
-                "encerrando o dialogo sem desenhar nada (degradacao segura).");
+            // literal do nosso codigo, sem argumento nenhum - via plana por simplicidade.
+            glintfx::log(glintfx::LogLevel::Error,
+                         "NpcDialogueLoopGl: glintfx::UiLayer::ok()=false (attach falhou) "
+                         "- encerrando o dialogo sem desenhar nada (degradacao segura).");
             bailed_ = true;
             return;
         }
@@ -560,7 +565,8 @@ private:
                     present_frame_();
                 }
             }
-            SDL_Log(
+            // fmt literal do nosso codigo, args 100% numericos - variadica segura.
+            glintfx::log_info(
                 "NpcDialogueLoopGl: [selftest] conversa inteira avancada ate "
                 "finished()=%d em %d nos visitados (guard=%d) - GL/glintfx/stage "
                 "dir OK, sem crash.",
@@ -595,7 +601,8 @@ private:
                 present_frame_();
                 handle_mouse_motion_(cx, cy);  // volta - 2a entrada NOVA
                 present_frame_();
-                SDL_Log(
+                // fmt literal do nosso codigo, arg 100% numerico - variadica segura.
+                glintfx::log_info(
                     "NpcDialogueLoopGl: [hover-selftest] hover_sfx_play_count apos "
                     "fora->dentro->dentro(repete)->fora->dentro (2 entradas NOVAS "
                     "esperadas) = %u",
@@ -606,16 +613,23 @@ private:
                 flash_pressed_();
                 selected_option_ = apply_npc_dialogue_input(
                     runtime_, NpcDialogueInputAction::Confirm, selected_option_);
-                SDL_Log(
-                    "NpcDialogueLoopGl: [hover-selftest] click_sfx disparou %u x "
-                    "(esperado 1) - total sfx_play_count()=%u; no avancou de '%s' "
-                    "para '%s' (finished()=%d)",
-                    audio_.sfx_play_count() - click_baseline, audio_.sfx_play_count(),
-                    node_before.c_str(),
-                    runtime_.finished() ? "(fim)" : runtime_.current().id.c_str(),
-                    runtime_.finished() ? 1 : 0);
+                // via PLANA: node_before/id do no atual sao dado do grafo de dialogo
+                // (.dlg.txt), texto EXTERNO - concatenados na mao em vez de %s.
+                glintfx::log(
+                    glintfx::LogLevel::Info,
+                    ("NpcDialogueLoopGl: [hover-selftest] click_sfx disparou " +
+                     std::to_string(audio_.sfx_play_count() - click_baseline) +
+                     " x (esperado 1) - total sfx_play_count()=" +
+                     std::to_string(audio_.sfx_play_count()) + "; no avancou de '" +
+                     node_before + "' para '" +
+                     (runtime_.finished() ? std::string("(fim)")
+                                           : runtime_.current().id) +
+                     "' (finished()=" + std::to_string(runtime_.finished() ? 1 : 0) + ")")
+                        .c_str());
             } else {
-                SDL_Log(
+                // literal do nosso codigo, sem argumento nenhum - via plana.
+                glintfx::log(
+                    glintfx::LogLevel::Info,
                     "NpcDialogueLoopGl: [hover-selftest] no ATUAL e de ESCOLHA (sem "
                     "botao 'Continuar') - nada a provar aqui, encerrando sem crash "
                     "(degradacao segura).");
@@ -635,7 +649,9 @@ private:
             present_frame_();  // assenta o layout inicial (n0_greet)
 
             if (!runtime_.current().options.empty()) {
-                SDL_Log(
+                // literal do nosso codigo, sem argumento nenhum - via plana.
+                glintfx::log(
+                    glintfx::LogLevel::Warn,
                     "NpcDialogueLoopGl: [options-selftest] entry node JA e de "
                     "ESCOLHA (esperava LINEAR n0_greet) - grafo mudou, abortando "
                     "self-test sem crash.");
@@ -652,7 +668,8 @@ private:
             const int option_count =
                 static_cast<int>(runtime_.current().options.size());
             if (option_count < 3) {
-                SDL_Log(
+                // fmt literal do nosso codigo, arg 100% numerico - variadica segura.
+                glintfx::log_info(
                     "NpcDialogueLoopGl: [options-selftest] n1_hook tem %d opcoes "
                     "(esperava 3) - grafo do Bertoldo mudou, self-test parcial.",
                     option_count);
@@ -677,7 +694,8 @@ private:
                 }
                 present_frame_();
             }
-            SDL_Log(
+            // fmt literal do nosso codigo, arg 100% numerico - variadica segura.
+            glintfx::log_info(
                 "NpcDialogueLoopGl: [options-selftest] hover_sfx_play_count apos "
                 "0->1->2->2(repete)->fora->0 (4 entradas NOVAS esperadas) = %u",
                 audio_.sfx_play_count());
@@ -688,12 +706,18 @@ private:
             const unsigned int miss_baseline = audio_.sfx_play_count();
             const std::string node_before_miss = runtime_.current().id;
             const bool consumed_miss = handle_choice_click_(1.0f, 1.0f);
-            SDL_Log(
-                "NpcDialogueLoopGl: [options-selftest] clique FORA de qualquer "
-                "opcao (canto 1,1) consumed=%d (esperado 0), no continua '%s' "
-                "(era '%s'), click_sfx tocou %u x (esperado 0)",
-                consumed_miss ? 1 : 0, runtime_.current().id.c_str(),
-                node_before_miss.c_str(), audio_.sfx_play_count() - miss_baseline);
+            // via PLANA: ids de no do dialogo sao dado (.dlg.txt), texto EXTERNO -
+            // concatenados na mao em vez de %s.
+            glintfx::log(
+                glintfx::LogLevel::Info,
+                ("NpcDialogueLoopGl: [options-selftest] clique FORA de qualquer opcao "
+                 "(canto 1,1) consumed=" +
+                 std::to_string(consumed_miss ? 1 : 0) + ", no continua '" +
+                 runtime_.current().id + "' (era '" + node_before_miss +
+                 "'), click_sfx tocou " +
+                 std::to_string(audio_.sfx_play_count() - miss_baseline) +
+                 " x (esperado 0)")
+                    .c_str());
 
             // (3) CLIQUE de mouse NA CAIXA da opcao de INDICE 1 (pragmatico, NAO a
             // 0) SELECIONA e CONFIRMA DIRETO.
@@ -702,14 +726,20 @@ private:
             const unsigned int click_baseline = audio_.sfx_play_count();
             const std::string node_before_confirm = runtime_.current().id;
             const bool consumed = handle_choice_click_(cx1, cy1);
-            SDL_Log(
-                "NpcDialogueLoopGl: [options-selftest] clique na opcao indice 1 "
-                "(pragmatico) consumed=%d (esperado 1), no avancou de '%s' para "
-                "'%s' (esperava 'n2b_pragmatico'), click_sfx tocou %u x (esperado "
-                "1), finished()=%d",
-                consumed ? 1 : 0, node_before_confirm.c_str(),
-                runtime_.finished() ? "(fim)" : runtime_.current().id.c_str(),
-                audio_.sfx_play_count() - click_baseline, runtime_.finished() ? 1 : 0);
+            // via PLANA: ids de no do dialogo sao dado (.dlg.txt), texto EXTERNO -
+            // concatenados na mao em vez de %s.
+            glintfx::log(
+                glintfx::LogLevel::Info,
+                ("NpcDialogueLoopGl: [options-selftest] clique na opcao indice 1 "
+                 "(pragmatico) consumed=" +
+                 std::to_string(consumed ? 1 : 0) + " (esperado 1), no avancou de '" +
+                 node_before_confirm + "' para '" +
+                 (runtime_.finished() ? std::string("(fim)") : runtime_.current().id) +
+                 "' (esperava 'n2b_pragmatico'), click_sfx tocou " +
+                 std::to_string(audio_.sfx_play_count() - click_baseline) +
+                 " x (esperado 1), finished()=" +
+                 std::to_string(runtime_.finished() ? 1 : 0))
+                    .c_str());
             return true;
         }
 
@@ -723,7 +753,9 @@ private:
             present_frame_();
 
             if (!runtime_.current().options.empty()) {
-                SDL_Log(
+                // literal do nosso codigo, sem argumento nenhum - via plana.
+                glintfx::log(
+                    glintfx::LogLevel::Warn,
                     "NpcDialogueLoopGl: [hotkey-selftest] entry node JA e de "
                     "ESCOLHA (esperava LINEAR n0_greet) - grafo mudou, abortando "
                     "self-test sem crash.");
@@ -743,27 +775,37 @@ private:
             const unsigned int guard_baseline = audio_.sfx_play_count();
             const std::string node_before_guard = runtime_.current().id;
             const bool consumed_out_of_range = handle_number_key_(SDLK_9);
-            SDL_Log(
-                "NpcDialogueLoopGl: [hotkey-selftest] tecla '9' (fora do range, "
-                "so ha %d opcoes) consumed=%d (esperado 0), no continua '%s' "
-                "(era '%s'), click_sfx tocou %u x (esperado 0)",
-                option_count, consumed_out_of_range ? 1 : 0,
-                runtime_.current().id.c_str(), node_before_guard.c_str(),
-                audio_.sfx_play_count() - guard_baseline);
+            // via PLANA: ids de no do dialogo sao dado (.dlg.txt), texto EXTERNO -
+            // concatenados na mao em vez de %s.
+            glintfx::log(
+                glintfx::LogLevel::Info,
+                ("NpcDialogueLoopGl: [hotkey-selftest] tecla '9' (fora do range, so ha " +
+                 std::to_string(option_count) + " opcoes) consumed=" +
+                 std::to_string(consumed_out_of_range ? 1 : 0) +
+                 " (esperado 0), no continua '" + runtime_.current().id + "' (era '" +
+                 node_before_guard + "'), click_sfx tocou " +
+                 std::to_string(audio_.sfx_play_count() - guard_baseline) +
+                 " x (esperado 0)")
+                    .c_str());
 
             // (2) TECLA "2" SELECIONA e CONFIRMA DIRETO a opcao de INDICE 1
             // (pragmatico, NAO a 0) sem navegar com Up/Down antes.
             const unsigned int click_baseline = audio_.sfx_play_count();
             const std::string node_before_confirm = runtime_.current().id;
             const bool consumed = handle_number_key_(SDLK_2);
-            SDL_Log(
-                "NpcDialogueLoopGl: [hotkey-selftest] tecla '2' consumed=%d "
-                "(esperado 1), no avancou de '%s' para '%s' (esperava "
-                "'n2b_pragmatico'), click_sfx tocou %u x (esperado 1), "
-                "finished()=%d",
-                consumed ? 1 : 0, node_before_confirm.c_str(),
-                runtime_.finished() ? "(fim)" : runtime_.current().id.c_str(),
-                audio_.sfx_play_count() - click_baseline, runtime_.finished() ? 1 : 0);
+            // via PLANA: ids de no do dialogo sao dado (.dlg.txt), texto EXTERNO -
+            // concatenados na mao em vez de %s.
+            glintfx::log(
+                glintfx::LogLevel::Info,
+                ("NpcDialogueLoopGl: [hotkey-selftest] tecla '2' consumed=" +
+                 std::to_string(consumed ? 1 : 0) + " (esperado 1), no avancou de '" +
+                 node_before_confirm + "' para '" +
+                 (runtime_.finished() ? std::string("(fim)") : runtime_.current().id) +
+                 "' (esperava 'n2b_pragmatico'), click_sfx tocou " +
+                 std::to_string(audio_.sfx_play_count() - click_baseline) +
+                 " x (esperado 1), finished()=" +
+                 std::to_string(runtime_.finished() ? 1 : 0))
+                    .c_str());
             return true;
         }
 
@@ -868,7 +910,11 @@ bool run_npc_dialogue_loop_gl(SDL_Window* window, gus::app::SdlWindow& city,
 
     SDL_GLContext gl = SDL_GL_CreateContext(window);
     if (gl == nullptr) {
-        SDL_Log("NpcDialogueLoopGl: SDL_GL_CreateContext falhou: %s", SDL_GetError());
+        // via PLANA: SDL_GetError() e mensagem de terceiro, texto EXTERNO.
+        glintfx::log(glintfx::LogLevel::Error,
+                     ("NpcDialogueLoopGl: SDL_GL_CreateContext falhou: " +
+                      std::string(SDL_GetError()))
+                         .c_str());
         city.clear_input();
         return false;  // degradacao segura: a Maestro so retoma a cidade
     }
@@ -877,7 +923,9 @@ bool run_npc_dialogue_loop_gl(SDL_Window* window, gus::app::SdlWindow& city,
 
     if (!gus::platform::rmlui::gl3_load_functions(
             reinterpret_cast<void* (*)(const char*)>(SDL_GL_GetProcAddress))) {
-        SDL_Log("NpcDialogueLoopGl: falha ao carregar funcoes OpenGL (glad)");
+        // literal do nosso codigo, sem argumento nenhum - via plana por simplicidade.
+        glintfx::log(glintfx::LogLevel::Error,
+                     "NpcDialogueLoopGl: falha ao carregar funcoes OpenGL (glad)");
         SDL_GL_DestroyContext(gl);
         city.clear_input();
         return false;

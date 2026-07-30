@@ -27,6 +27,7 @@
 #include <string>
 
 #include <glintfx/image.hpp>
+#include <glintfx/log.hpp>  // FW-LOG (bump v0.26.0): substitui SDL_Log
 
 #include "gus/core/asset_paths.hpp"
 #include "gus/platform/assets/asset_source.hpp"  // ASSETS-VFS-F1 (ADR-013): porteiro
@@ -41,8 +42,12 @@ void set_window_icon_if_available(SDL_Window* window) {
 
     const glintfx::DecodedImagePixels decoded = glintfx::decode_image_file(path.c_str());
     if (!decoded.ok) {
-        SDL_Log("gus::app: icone do app ausente/ilegivel (%s) - seguindo sem icone",
-                path.c_str());
+        // via PLANA (nao printf-style): path e caminho de arquivo, texto EXTERNO - um "%"
+        // literal nele nao pode virar especificador de formato (FW-LOG, bump v0.26.0).
+        glintfx::log(glintfx::LogLevel::Warn,
+                     ("gus::app: icone do app ausente/ilegivel (" + path +
+                      ") - seguindo sem icone")
+                         .c_str());
         return;  // degradacao segura: janela sem icone, nao crasha
     }
 
@@ -53,12 +58,19 @@ void set_window_icon_if_available(SDL_Window* window) {
         decoded.width, decoded.height, SDL_PIXELFORMAT_RGBA32,
         const_cast<unsigned char*>(decoded.pixels.data()), decoded.width * 4);
     if (surface == nullptr) {
-        SDL_Log("gus::app: SDL_CreateSurfaceFrom (icone) falhou: %s", SDL_GetError());
+        // via PLANA: SDL_GetError() e mensagem de terceiro (SDL), texto EXTERNO.
+        glintfx::log(glintfx::LogLevel::Warn,
+                     ("gus::app: SDL_CreateSurfaceFrom (icone) falhou: " +
+                      std::string(SDL_GetError()))
+                         .c_str());
         return;  // degradacao segura
     }
 
     if (!SDL_SetWindowIcon(window, surface)) {
-        SDL_Log("gus::app: SDL_SetWindowIcon falhou: %s", SDL_GetError());
+        // via PLANA: SDL_GetError() e mensagem de terceiro (SDL), texto EXTERNO.
+        glintfx::log(glintfx::LogLevel::Warn,
+                     ("gus::app: SDL_SetWindowIcon falhou: " + std::string(SDL_GetError()))
+                         .c_str());
         // segue sem icone - nao crasha
     }
 

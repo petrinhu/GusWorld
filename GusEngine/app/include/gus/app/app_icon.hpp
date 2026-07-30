@@ -17,7 +17,8 @@
 // decode+SDL_Surface+SDL_SetWindowIcon nos dois lugares.
 //
 // DEGRADACAO SEGURA: qualquer falha (asset ausente, decode invalido, SDL_SetWindowIcon
-// recusando) loga via SDL_Log e retorna sem tocar a janela - NUNCA crasha o boot. Isto
+// recusando) loga via glintfx::log (FW-LOG, bump v0.26.0 - substitui o antigo SDL_Log) e
+// retorna sem tocar a janela - NUNCA crasha o boot. Isto
 // cobre tambem o smoke headless (--smoke, SDL_VIDEODRIVER=dummy): o driver dummy nao tem
 // SDL_SetWindowIcon com efeito visual nenhum, mas a chamada em si e segura (mesma
 // degradacao se o asset nao existir no ambiente do smoke).
