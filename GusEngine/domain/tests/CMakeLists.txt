@@ -324,5 +324,12 @@ target_link_libraries(gusengine_domain_tests
 
 target_compile_features(gusengine_domain_tests PRIVATE cxx_std_20)
 
+# TIMEOUT por teste (GATES-S3, 2026-07-30): mesma logica de app/tests (F4-CTEST-NO-TIMEOUT,
+# GusEngine/app/tests/CMakeLists.txt:184) e de tests/ (core, GATES-S3) - sem isto, um hang em
+# domain/ nunca falha, so pendura pra sempre. Medido em 2026-07-30 (log real do ctest): o
+# teste mais lento aqui e da familia "save_v7" a 0,06s; 20s de teto e ~333x de folga sobre o
+# pior caso medido (domain/ e POCO puro + I/O de save em disco, sem thread nem hardware que
+# justifique folga maior).
+#
 # Registra os casos no ctest. Rodar com: ctest --output-on-failure
-catch_discover_tests(gusengine_domain_tests)
+catch_discover_tests(gusengine_domain_tests PROPERTIES TIMEOUT 20)

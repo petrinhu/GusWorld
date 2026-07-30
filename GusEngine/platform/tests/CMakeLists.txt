@@ -84,4 +84,12 @@ target_compile_definitions(gusengine_platform_tests
     PRIVATE GUSWORLD_MAPS_DIR="${CMAKE_SOURCE_DIR}/assets/maps/compiled"
 )
 
-catch_discover_tests(gusengine_platform_tests)
+# TIMEOUT por teste (GATES-S3, 2026-07-30): ESTE e o alvo onde o hang de 8h54min aconteceu de
+# verdade - "AudioEngine set_music_volume/set_sfx_volume com device real (indisponivel ou
+# nao)..." pendurou com a thread principal em pthread_join, esperando uma thread do PipeWire
+# presa em epoll_wait (achado do glintfx, ja reportado pelo bus; ver tools/check.sh e
+# docs/tech/plano-migracao-total.md). Medido em 2026-07-30 (log real do ctest, sob Xvfb/CI
+# SEM device de audio real): o mesmo teste roda em 0,03s (degradacao graciosa, sem hardware).
+# 20s de teto cobre folgadamente qualquer interacao REAL de device (abrir/fechar) sob
+# hardware de verdade, sem deixar uma recorrencia do hang custar mais que 20s.
+catch_discover_tests(gusengine_platform_tests PROPERTIES TIMEOUT 20)

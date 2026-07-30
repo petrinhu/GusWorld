@@ -44,5 +44,13 @@ target_link_libraries(gusengine_core_tests
 
 target_compile_features(gusengine_core_tests PRIVATE cxx_std_20)
 
+# TIMEOUT por teste (GATES-S3, 2026-07-30): sem isto, um hang em core/ (ex.: sweep PRNG que
+# trava por engano) NUNCA falha - so pendura pra sempre, o mesmo buraco que custou 8h54min
+# de maquina num teste de platform/ sem TIMEOUT nenhum (docs/tech/plano-migracao-total.md,
+# tools/check.sh). Medido em 2026-07-30 (log real do ctest): o teste mais lento aqui e
+# "collision_sweep: grade sem obstaculos - varredura exaustiva de fronteiras" a 0,63s; 30s
+# de teto e ~47x de folga sobre o pior caso medido - generoso o bastante pra nunca reprovar
+# teste legitimo sob contencao de CI, e teto o bastante pra nunca mais custar horas.
+#
 # Registra os casos no ctest. Rodar com: ctest --output-on-failure
-catch_discover_tests(gusengine_core_tests)
+catch_discover_tests(gusengine_core_tests PROPERTIES TIMEOUT 30)

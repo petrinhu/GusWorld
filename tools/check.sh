@@ -257,21 +257,27 @@ if [ "$BUILD" = "0" ]; then
     # pendurado NUNCA falha - ele so PARA de responder, e o ctest espera pra
     # sempre. Aconteceu de verdade: "AudioEngine set_music_volume/set_sfx_volume
     # com device real" (GusEngine/platform/tests/, gusengine_platform_tests) -
-    # SEM TIMEOUT property (so gusengine_app_tests tem, via
-    # F4-CTEST-NO-TIMEOUT/GusEngine/app/tests/CMakeLists.txt:184; platform/tests
-    # e domain/tests NUNCA tiveram) - pendurou com a thread principal em
-    # `pthread_join`, esperando uma thread do PipeWire presa em `epoll_wait`.
-    # Custo medido: 8h54min de maquina perdidos, dois agentes bloqueados sem
-    # saber por que (sem erro, sem log, sem fim). Nao reproduzi depois -
-    # isolado passa em 0,11s, a suite inteira passa em ~22s: e intermitente
-    # (ja reportado ao glintfx pelo bus).
+    # NA HORA do hang, so gusengine_app_tests tinha TIMEOUT property
+    # (F4-CTEST-NO-TIMEOUT/GusEngine/app/tests/CMakeLists.txt:184); platform/tests,
+    # domain/tests (GusEngine/domain/tests/CMakeLists.txt) e tests/ (core,
+    # GusEngine/tests/CMakeLists.txt) NAO TINHAM NENHUM, e foi corrigido no MESMO
+    # commit desta fatia (GATES-S3) - agora os 4 alvos tem PROPERTIES TIMEOUT
+    # proprio, medido por alvo (30/20/20/60, ver cada CMakeLists.txt). O processo
+    # pendurou com a thread principal em `pthread_join`, esperando uma thread do
+    # PipeWire presa em `epoll_wait`. Custo medido: 8h54min de maquina perdidos,
+    # dois agentes bloqueados sem saber por que (sem erro, sem log, sem fim). Nao
+    # reproduzi depois - isolado passa em 0,03s, a suite inteira passa em ~22s: e
+    # intermitente (ja reportado ao glintfx pelo bus).
     #
-    # --timeout 120: a suite completa roda em ~22s e o teste mais lento leva
-    # poucos segundos - 120s e generoso o bastante (~20-40x o pior caso normal,
-    # cobrindo contencao de CPU/disco sob carga) pra nunca reprovar teste
-    # legitimo, e teto o bastante pra transformar um hang de 9 HORAS em um
-    # hang de 2 MINUTOS. So vale como DEFAULT pra teste SEM TIMEOUT property
-    # propria (ctest nao sobrescreve o TIMEOUT=60 explicito de app/tests) -
+    # --timeout 120 AQUI e a SEGUNDA camada (defesa em profundidade), nao a
+    # unica: cobre quem invoca `ctest --preset` direto na linha de comando (README,
+    # outros agentes) SEM passar pelas PROPERTIES por-alvo acima - mas as
+    # PROPERTIES ja bastam pra qualquer invocacao de ctest (viajam COM o teste,
+    # gravadas no CTestTestfile.cmake). 120s e generoso o bastante (bem acima de
+    # qualquer um dos 4 tetos por-alvo, nunca dispara antes deles) pra nunca
+    # reprovar teste legitimo, e teto o bastante pra transformar um hang de 9
+    # HORAS em, no pior caso (teste sem PROPERTIES por algum motivo futuro), 2
+    # MINUTOS. NAO protege execucao DIRETA do binario de teste (fora do ctest) -
     # NAO conserta o deadlock em si (isso e bug do glintfx/PipeWire, ja
     # reportado); e cinto de seguranca, nao conserto.
     CTEST_TIMEOUT="${CHECK_CTEST_TIMEOUT:-120}"
