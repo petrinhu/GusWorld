@@ -507,8 +507,13 @@ set(GLINTFX_MODULE_DRAW2D    ON  CACHE BOOL "" FORCE)
 #     platform/src/render2d/render2d_glintfx.cpp:72 - PROIBIDO envolver em try/catch (a lei do
 #     projeto proibe contornar lacuna do glintfx); o pedido FONT-NOTHROW ja foi sinalizado pelo
 #     bus e a fatia espera o fix deles. (2) `UiLayer::capture_frame()`/`App::capture_frame()`
-#     (API nova nesta tag) NAO serve pro nosso fundo congelado - le a layer offscreen do RmlUi,
-#     nao o FBO 0 com o quadro de jogo composto. (3) O par IMG-ENCODE novo torna o nosso vendor
+#     (API nova nesta tag) NAO e adotada aqui, mas por ESCOPO, nao por inadequacao: e readback
+#     puro do FBO 0 na regiao do viewport, e SERVE pro nosso fundo congelado desde que chamada
+#     ANTES do `render()` da UI. (A primeira redacao deste comentario dizia que ela "le a layer
+#     offscreen do RmlUi, nao o FBO 0" - ERRADO, corrigido no commit seguinte: a premissa vinha
+#     de ler o "depois de render()" do doc deles como se a ordem fosse REQUISITO, quando era
+#     descricao de um caso de uso.) Migrar `capture_frame_to_png` pra ela e fatia propria.
+#     (3) O par IMG-ENCODE novo torna o nosso vendor
 #     `third_party/stb/stb_image_write.h` tecnicamente removivel (~20 arquivos de app/ o usam
 #     pra screenshot) - onda propria, nao esta.
 # Ritual de bump revalidado por leitura direta do CMakeLists.txt deles nas DUAS tags (baixados
