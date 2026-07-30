@@ -8,8 +8,11 @@
 // corrente - MESMO padrao de aninhamento de run_save_load_menu_loop_gl_current
 // (gus/app/screens/save_load_menu_loop.hpp): o CHAMADOR DESTROI o proprio
 // UiLayer ANTES de chamar esta funcao (RmlUi NAO suporta 2 UiLayer simultaneos
-// no processo) e recria o dele DEPOIS se precisar seguir mostrando algo (ver o
-// comentario "FIX CRITICO" em system_menu_loop.cpp pela causa raiz historica).
+// no processo) e recria o dele DEPOIS se precisar seguir mostrando algo (ver a
+// causa raiz historica no commit 89fb380 "BATTLE-ESC-PAUSE-ACTOR-LIST", 2026-07-05:
+// crash real ao vivo - "Element meta pool not empty on shutdown, 75 object(s)
+// leaked" - ao abrir um SEGUNDO UiLayer/contexto RmlUi enquanto o primeiro
+// ainda estava vivo).
 //
 // ESTE LOOP NAO FAZ I/O DE DISCO (ao contrario de title_menu_loop.cpp/
 // save_load_menu_loop.cpp) - a dificuldade escolhida so e GRAVADA no SaveData
