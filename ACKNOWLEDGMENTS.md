@@ -56,10 +56,12 @@ GusWorld's entire player-facing UI (menus, the battle cockpit, dialogue, HUD) ex
 
 Beyond the platform-critical dependencies above, GusWorld vendors C++ source under `GusEngine/third_party/`, each library under its own permissive license (see [THIRD-PARTY-LICENSES.md](THIRD-PARTY-LICENSES.md) for the exact licenses). The list is short on purpose, and today it has exactly two entries:
 
-- **[stb](https://github.com/nothings/stb)** (MIT / public domain), Sean Barrett's single-header libraries: image loading, writing and resizing, rectangle packing, and TrueType rasterization, all used by the render2d and font-atlas layers. A huge part of the indie game dev world runs on stb in one way or another.
+- **[stb](https://github.com/nothings/stb)** (MIT / public domain), Sean Barrett's single-header libraries: image loading, writing, and TrueType rasterization, used by the render2d and font-atlas layers. A huge part of the indie game dev world runs on stb in one way or another.
 - **[Monocypher](https://monocypher.org/)** (CC0 / BSD-2-Clause), thanked in full in the Cryptography section above, and the only vendored dependency with a build of its own.
 
 *Historical note: an earlier round of vendoring (2026-06-22) pulled in a much larger "just in case" toolkit of header-only libraries, among them [glm](https://github.com/g-truc/glm) (MIT), [EnTT](https://github.com/skypjack/entt) (MIT), [Box2D](https://github.com/erincatto/box2d) (MIT) and [fmt](https://github.com/fmtlib/fmt) (MIT). Thirty-one of those libraries had no remaining `#include` outside `third_party/` by the time the M9 cleanup came around, and were removed from the repository on 2026-07-22. They are named here as history, not as current dependencies. The thanks to their authors stands anyway: being able to try a library, decide it is not needed, and drop it without friction is itself part of what permissive, header-only C++ gives a small team.*
+
+*Historical note (2026-07-30): the stb vendor also carried `stb_rect_pack.h` (rectangle packing) and `stb_image_resize2.h` (image resizing), both single-header files from the same project. Neither ever had a consumer in the codebase, and both were removed as part of the migration-plan cleanup. The thanks to Sean Barrett for the whole stb collection stands regardless of which single-header files we happen to use.*
 
 ---
 
@@ -121,10 +123,12 @@ O [Catch2](https://github.com/catchorg/Catch2) é o framework de testes por trá
 
 Além das dependências críticas de plataforma citadas acima, o GusWorld vendoriza código C++ em `GusEngine/third_party/`, cada biblioteca sob sua própria licença permissiva (veja [THIRD-PARTY-LICENSES.md](THIRD-PARTY-LICENSES.md) para as licenças exatas). A lista é curta de propósito, e hoje tem exatamente duas entradas:
 
-- **[stb](https://github.com/nothings/stb)** (MIT / domínio público), as bibliotecas single-header de Sean Barrett: carregamento, escrita e redimensionamento de imagem, empacotamento de retângulos e rasterização TrueType, todas usadas pelas camadas de render2d e de atlas de fonte. Boa parte do mundo indie de desenvolvimento de jogos roda em cima do stb de alguma forma.
+- **[stb](https://github.com/nothings/stb)** (MIT / domínio público), as bibliotecas single-header de Sean Barrett: carregamento e escrita de imagem, e rasterização TrueType, usadas pelas camadas de render2d e de atlas de fonte. Boa parte do mundo indie de desenvolvimento de jogos roda em cima do stb de alguma forma.
 - **[Monocypher](https://monocypher.org/)** (CC0 / BSD-2-Clause), agradecido por extenso na seção de Criptografia acima, e o único vendor com build próprio.
 
 *Nota histórica: uma rodada anterior de vendorização (2026-06-22) trouxe um kit bem maior de bibliotecas header-only "por via das dúvidas", entre elas [glm](https://github.com/g-truc/glm) (MIT), [EnTT](https://github.com/skypjack/entt) (MIT), [Box2D](https://github.com/erincatto/box2d) (MIT) e [fmt](https://github.com/fmtlib/fmt) (MIT). Trinta e uma dessas bibliotecas já não tinham nenhum `#include` fora de `third_party/` quando a higienização do M9 chegou, e foram removidas do repositório em 2026-07-22. Estão nomeadas aqui como registro histórico, não como dependência atual. O agradecimento aos autores vale de qualquer forma: poder experimentar uma biblioteca, concluir que ela não é necessária e removê-la sem atrito é parte do que o C++ header-only sob licença permissiva dá a um time pequeno.*
+
+*Nota histórica (2026-07-30): o vendor do stb também trazia `stb_rect_pack.h` (empacotamento de retângulos) e `stb_image_resize2.h` (redimensionamento de imagem), dois arquivos single-header do mesmo projeto. Nenhum dos dois jamais teve consumidor no código, e ambos foram removidos como parte da limpeza do plano de migração. O agradecimento a Sean Barrett pela coleção inteira do stb vale de qualquer forma, independente de quais single-headers acabamos usando.*
 
 ### Nota final
 
@@ -134,4 +138,4 @@ Se o GusWorld algum dia ajudar alguém a descobrir um desses projetos, essa já 
 
 ---
 
-*Last updated / última atualização: 2026-07-28 (dependency state re-checked against the tree after the M9 cleanup / estado das dependências reconferido contra a árvore depois da higienização do M9).*
+*Last updated / última atualização: 2026-07-30 (two orphaned stb single-headers removed, `stb_rect_pack.h` and `stb_image_resize2.h`, zero consumers / dois single-headers órfãos do stb removidos, `stb_rect_pack.h` e `stb_image_resize2.h`, zero consumidores).*
