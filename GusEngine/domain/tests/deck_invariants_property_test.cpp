@@ -21,15 +21,23 @@
 //       card_collection + hand_selection + credits para qualquer estado alcancavel pela
 //       sequencia aleatoria (apos revalidate(), unico jeito de o estado satisfazer
 //       CharacterSaveState::validate() - "mao so referencia instance_id do ativo").
+//   (h) CARDS-HW-QA1-A1: toda instancia (ATIVO e MORTO) sempre satisfaz
+//       CardPhysicalState::validate(), mesmo sob sequencia arbitraria que inclui
+//       CardCollection::apply_to_physical/turing_service::diagnose_in_deck/
+//       attempt_cure_in_deck com mutadores INTENCIONALMENTE invalidos (ataca a
+//       garantia ALL-OR-NOTHING do emprestimo de escopo fechado - fn que deixa o
+//       estado fisico incoerente NUNCA deve chegar a ser commitado no container real).
 //
 // Sequencia aleatoria varre as 4 transacoes atomicas (deck_transactions.hpp:
 // sell/upload/acquire/craft) + as mutacoes diretas de CardCollection
-// (add_to_active/discard_to_dead) + as mutacoes de HandLoadout
-// (add_card/remove_card/swap_card/set_selection/revalidate) - exercitando os caminhos
-// de FALHA esperada (capacidade cheia, tier protegido, id ausente, saldo insuficiente,
-// duplicata) tanto quanto os de sucesso; excecoes de fluxo esperado (std::invalid_argument/
-// std::logic_error) sao capturadas e ignoradas - o teste verifica que o ESTADO
-// permanece coerente independente de qual ramo foi tomado.
+// (add_to_active/discard_to_dead/apply_to_physical) + a fiacao do Turing ao deck real
+// (turing_service.hpp: diagnose_in_deck/attempt_cure_in_deck, CARDS-HW-QA1-A1) + as
+// mutacoes de HandLoadout (add_card/remove_card/swap_card/set_selection/revalidate) -
+// exercitando os caminhos de FALHA esperada (capacidade cheia, tier protegido, id
+// ausente, saldo insuficiente, duplicata, estado fisico invalido) tanto quanto os de
+// sucesso; excecoes de fluxo esperado (std::invalid_argument/std::logic_error) sao
+// capturadas e ignoradas - o teste verifica que o ESTADO permanece coerente
+// independente de qual ramo foi tomado.
 //
 // Determinismo TOTAL (LCG semeado por indice de caso, property_gen.hpp): zero
 // Date/random real. Reproducao garantida com a mesma seed.
@@ -54,6 +62,7 @@
 #include "gus/domain/deck/deck_records.hpp"
 #include "gus/domain/deck/deck_transactions.hpp"
 #include "gus/domain/deck/hand_loadout.hpp"
+#include "gus/domain/deck/turing_service.hpp"
 #include "gus/domain/save/save_data.hpp"
 #include "gus/domain/save/save_serializer.hpp"
 #include "property_gen.hpp"
@@ -100,6 +109,11 @@ void check_container_invariants(const CardCollection& deck, const CardCollection
         // com o loop do morto - qualquer id repetido entre os dois containers falha
         // aqui (segundo insert() no MESMO set).
         REQUIRE(seen.insert(c.instance_id).second);
+        // (h) CARDS-HW-QA1-A1: apply_to_physical/diagnose_in_deck/attempt_cure_in_deck
+        // sao ALL-OR-NOTHING - nenhuma sequencia de chamadas (inclusive com mutadores
+        // intencionalmente invalidos) pode deixar uma instancia do ativo num estado
+        // fisico que reprove validate().
+        REQUIRE_NOTHROW(c.physical.validate());
     }
     for (const auto& c : deck.dead()) {
         REQUIRE(c.instance_id != 0);
@@ -110,6 +124,9 @@ void check_container_invariants(const CardCollection& deck, const CardCollection
         const CardTier tier = tier_of(c.card_id);
         REQUIRE(tier != CardTier::Especial);
         REQUIRE(tier != CardTier::Super);
+        // (h) mesma garantia acima, tambem valida pro deck morto (apply_to_physical so
+        // muta o ativo, mas uma instancia pode ir pro morto DEPOIS de mutada).
+        REQUIRE_NOTHROW(c.physical.validate());
     }
 }
 
@@ -281,9 +298,65 @@ bool apply_random_step(Lcg& g, int op, CardCollection& collection, HandLoadout& 
                 return false;
             }
         }
-        default: {  // 10: hand.revalidate - SEMPRE remove todo orfao, por definicao
+        case 10: {  // hand.revalidate - SEMPRE remove todo orfao, por definicao
             hand.revalidate(collection);
             return true;
+        }
+        case 11: {  // CardCollection::apply_to_physical (CARDS-HW-QA1-A1) - candidato
+                    // ativo/morto/bogus (mesma diversidade de random_candidate_id),
+                    // mutador ORA valido (avanca infeccao/diagnostico - ciclo de vida
+                    // legitimo) ORA INTENCIONALMENTE INVALIDO (ataca a garantia
+                    // ALL-OR-NOTHING: seta virus_kind sem is_infected, viola inv.1 de
+                    // IntegrityState). Id fora do ativo (morto/bogus) E estado invalido
+                    // sao ambos std::invalid_argument - capturados, o container real
+                    // fica intocado nos dois casos (checado por (h) apos o passo).
+            const std::uint64_t id = random_candidate_id(g, collection);
+            const bool make_invalid = g.coin();
+            try {
+                collection.apply_to_physical(
+                    id, [make_invalid](const std::string&, CardPhysicalState& p) {
+                        if (make_invalid) {
+                            // SEMPRE invalido, independente do estado de entrada (nao
+                            // depende de historico): forca is_infected=false com
+                            // virus_kind!=None - viola inv.1 na certa.
+                            p.is_infected = false;
+                            p.virus_kind = VirusKind::Worm;
+                        } else {
+                            p.is_infected = true;
+                            p.virus_kind = VirusKind::LogicBomb;
+                            p.is_diagnosed = false;
+                        }
+                    });
+            } catch (const std::invalid_argument&) {
+                // id fora do ativo OU mutador deixou o estado invalido - esperado.
+            }
+            return false;
+        }
+        case 12: {  // turing_service::diagnose_in_deck (CARDS-HW-QA1-A1) - candidato
+                    // ativo/morto/bogus; RejectedNotInfected (carta limpa) NAO e
+                    // excecao, so o guard std::invalid_argument (id fora do ativo) e
+                    // capturado.
+            const std::uint64_t id = random_candidate_id(g, collection);
+            try {
+                diagnose_in_deck(collection, id);
+            } catch (const std::invalid_argument&) {
+                // id fora do ativo - esperado.
+            }
+            return false;
+        }
+        default: {  // 13: turing_service::attempt_cure_in_deck (CARDS-HW-QA1-A1) -
+                    // candidato ativo/morto/bogus; os guards (RejectedNotDiagnosed/
+                    // RejectedProtectedTier) sao OUTCOME, nao excecao - so o
+                    // std::invalid_argument de id-fora-do-ativo e capturado. rng REAL
+                    // (PropertyRandom) exercita o roll 62/38 tambem sob a sequencia
+                    // arbitraria, sem cravar o resultado.
+            const std::uint64_t id = random_candidate_id(g, collection);
+            try {
+                attempt_cure_in_deck(collection, id, tier_of_pool, rng);
+            } catch (const std::invalid_argument&) {
+                // id fora do ativo - esperado.
+            }
+            return false;
         }
     }
 }
@@ -316,7 +389,7 @@ TEST_CASE("property: deck/mao mantem XOR de container + sem duplicata + carteira
         check_wallet_invariant(credits, expected_credits);
 
         for (int step = 0; step < kStepsPerCase; ++step) {
-            const int op = g.in_range(0, 10);
+            const int op = g.in_range(0, 13);
             const bool hand_fully_revalidated =
                 apply_random_step(g, op, collection, hand, credits, expected_credits, rng);
 
@@ -355,7 +428,7 @@ TEST_CASE("property: roundtrip do save (V6) preserva card_collection + hand_sele
         std::int64_t expected_credits = credits;
 
         for (int step = 0; step < kRoundtripSteps; ++step) {
-            const int op = g.in_range(0, 10);
+            const int op = g.in_range(0, 13);
             apply_random_step(g, op, collection, hand, credits, expected_credits, rng);
         }
 
@@ -415,7 +488,7 @@ TEST_CASE("property: save rejeita QUALQUER adulteracao em memoria (dup instance_
         std::int64_t expected_credits = credits;
 
         for (int step = 0; step < kRoundtripSteps; ++step) {
-            const int op = g.in_range(0, 10);
+            const int op = g.in_range(0, 13);
             apply_random_step(g, op, collection, hand, credits, expected_credits, rng);
         }
         hand.revalidate(collection);

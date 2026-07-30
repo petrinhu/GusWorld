@@ -129,6 +129,45 @@ CardInstance CardCollection::remove_for_sale(std::uint64_t instance_id, const Ti
     return removed;
 }
 
+void CardCollection::apply_to_physical(std::uint64_t instance_id, const PhysicalMutator& fn) {
+    auto it = std::find_if(active_.begin(), active_.end(), [instance_id](const CardInstance& c) {
+        return c.instance_id == instance_id;
+    });
+    if (it == active_.end()) {
+        throw std::invalid_argument(
+            "CardCollection::apply_to_physical: instance_id nao esta no deck ativo");
+    }
+
+    // Emprestimo fechado (propriedade 1): fn so enxerga COPIAS locais - card_id_copy e
+    // working nunca apontam pro buffer real de active_. Protege contra reentrancia (fn
+    // podendo capturar e mutar este MESMO agregado por fora) e contra realocacao do
+    // vetor active_ - mesma cautela ja aplicada ao TierLookup em discard_to_dead/
+    // remove_for_sale, aqui reforcada: nem card_id nem physical são referencias.
+    const std::string card_id_copy = it->card_id;
+    CardPhysicalState working = it->physical;
+
+    fn(card_id_copy, working);
+
+    // Propriedade 2 - revalida ANTES de commitar. Propriedade 3 - ALL-OR-NOTHING: se
+    // fn deixou o estado fisico invalido, validate() lanca AQUI e a copia local
+    // 'working' e destruida pelo stack unwind - active_ fica intocado byte a byte.
+    working.validate();
+
+    // Reancora o iterador: fn e opaco (std::function) - mesma defesa contra o
+    // agregado ter sido mutado por fora durante a chamada (mesmo que fn so tenha
+    // recebido a copia local, nada impede o chamador de capturar `this` e mexer no
+    // agregado real dentro de fn).
+    it = std::find_if(active_.begin(), active_.end(), [instance_id](const CardInstance& c) {
+        return c.instance_id == instance_id;
+    });
+    if (it == active_.end()) {
+        throw std::invalid_argument(
+            "CardCollection::apply_to_physical: instance_id sumiu do deck ativo durante "
+            "a mutacao (fn nao pode mutar o agregado por fora)");
+    }
+    it->physical = std::move(working);
+}
+
 const std::vector<CardInstance>& CardCollection::active() const noexcept { return active_; }
 
 const std::vector<CardInstance>& CardCollection::dead() const noexcept { return dead_; }

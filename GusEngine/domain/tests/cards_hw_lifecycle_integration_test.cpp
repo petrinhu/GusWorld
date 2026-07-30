@@ -24,17 +24,16 @@
 //   4. cura fora de combate reflete AO VIVO no card_integrity_ledger (leaked_intel
 //      recomputado por turno, nao um snapshot congelado).
 //
-// ACHADO QA (nao consertado aqui, so documentado): CardCollection::active()/dead() sao
-// views READ-ONLY (card_collection.hpp) - nao existe hoje um jeito de MUTAR o
-// CardPhysicalState de uma instancia JA presente no deck ativo (turing_service::
-// diagnose()/attempt_cure() operam sobre um CardPhysicalState& que o CHAMADOR precisa
-// manter por fora; add_to_active(..., initial_physical) so serve pra CRIAR uma
-// instancia NOVA, o guard XOR de instance_id recusa reusar o mesmo id pra "atualizar").
-// Os testes abaixo refletem esse gap explicitamente: a copia de CardInstance devolvida
-// pelas transacoes (`current`/`crafted`) e o "dono" do estado fisico ao longo da cadeia,
-// NAO o vetor interno de CardCollection (que fica esperado como referencia congelada no
-// momento da aquisicao). Onda futura (gameplay_engineer) precisa de uma API de
-// write-back antes de orquestrar cura de verdade dentro do agregado real.
+// ACHADO QA RESOLVIDO (CARDS-HW-QA1-A1, wire-up 2026-07-30): ate esta fatia,
+// CardCollection::active()/dead() eram views READ-ONLY - nao existia um jeito de
+// MUTAR o CardPhysicalState de uma instancia JA presente no deck ativo (turing_
+// service::diagnose()/attempt_cure() operavam sobre um CardPhysicalState& que o
+// CHAMADOR precisava manter por fora; a copia de CardInstance devolvida pelas
+// transacoes era o "dono" do estado fisico, NAO o vetor interno de CardCollection).
+// Fechado por CardCollection::apply_to_physical (emprestimo com escopo fechado,
+// decisao do lider) + os wrappers gus::domain::deck::diagnose_in_deck/
+// attempt_cure_in_deck (turing_service.hpp) - a Cadeia 1 abaixo opera DIRETO no
+// `deck` real do inicio ao fim (sem side-deck nem copia solta threadada a mao).
 //
 // Cross-ref: docs/design/mecanicas/cartas-spec-dados.md secao 5/6/7/10 (CardPhysicalState,
 //            invariantes, save V7); docs/design/mecanicas/cartas-spec-logica.md secao 5.1/6
@@ -80,6 +79,7 @@ using gus::domain::cards::CardTier;
 using gus::domain::deck::acquire;
 using gus::domain::deck::AcquireResult;
 using gus::domain::deck::attempt_cure;
+using gus::domain::deck::attempt_cure_in_deck;
 using gus::domain::deck::CardCollection;
 using gus::domain::deck::CardInstance;
 using gus::domain::deck::CardOrigin;
@@ -89,6 +89,7 @@ using gus::domain::deck::craft;
 using gus::domain::deck::CraftResult;
 using gus::domain::deck::CureOutcome;
 using gus::domain::deck::diagnose;
+using gus::domain::deck::diagnose_in_deck;
 using gus::domain::deck::DiagnoseOutcome;
 using gus::domain::deck::HandLoadout;
 using gus::domain::deck::kDeckCapacityTier1;
@@ -205,53 +206,57 @@ TEST_CASE("cards_hw_lifecycle: acquire() infectado oculto sobrevive a 2 roundtri
     REQUIRE_FALSE(special_acq.instance.physical.is_infected);
     REQUIRE(special_acq.contamination == ContaminationRollOutcome::SkippedProtectedTier);
 
-    // `current` e o "dono" do estado fisico threadado pela cadeia inteira (a copia
-    // devolvida por acquire() - ver ACHADO QA no topo do arquivo sobre a ausencia de
-    // write-back no CardCollection real).
-    CardInstance current = acq.instance;
+    const std::uint64_t id = acq.instance.instance_id;
 
     // ---- elo 2: roundtrip V7 NO MEIO da cadeia - infeccao oculta sobrevive byte a byte
-    const SaveData original = make_save_with_card(current, /*timestamp_ms=*/1721150000000LL);
+    // Le do DECK REAL (nao de uma copia local threadada a mao) - deck.active().front()
+    // e o mesmo objeto que os elos seguintes vao mutar via diagnose_in_deck/
+    // attempt_cure_in_deck.
+    const SaveData original = make_save_with_card(deck.active().front(), /*timestamp_ms=*/1721150000000LL);
     const SaveData restored = deserialize_save(serialize_save(original));
     const CardInstance& restored_hidden =
         restored.character_states.at("gus").card_collection.active.at(0);
 
-    REQUIRE(restored_hidden == current);
+    REQUIRE(restored_hidden == deck.active().front());
     REQUIRE(restored_hidden.physical.is_infected);
     REQUIRE_FALSE(restored_hidden.physical.is_diagnosed);
-    REQUIRE(restored_hidden.physical.virus_kind == current.physical.virus_kind);
     REQUIRE_NOTHROW(restored_hidden.physical.validate());
+    const VirusKind original_virus_kind = restored_hidden.physical.virus_kind;
 
-    // ---- elo 3: diagnose() confirma a infeccao (Turing revela o que estava oculto) ---
-    const DiagnoseOutcome diag_outcome = diagnose(current.physical);
+    // ---- elo 3: diagnose_in_deck() confirma a infeccao NO DECK REAL (CARDS-HW-QA1-A1 -
+    //      alcanca a carta VIVA via CardCollection::apply_to_physical, nao uma copia) ---
+    const DiagnoseOutcome diag_outcome = diagnose_in_deck(deck, id);
     REQUIRE(diag_outcome == DiagnoseOutcome::Diagnosed);
-    REQUIRE(current.physical.is_diagnosed);
-    REQUIRE_NOTHROW(current.physical.validate());
+    REQUIRE(deck.active().front().physical.is_diagnosed);
+    REQUIRE_NOTHROW(deck.active().front().physical.validate());
 
-    // ---- elo 4: attempt_cure() com roll de QUEIMA (borda exata, >=62 - AMB-T1) -------
+    // ---- elo 4: attempt_cure_in_deck() com roll de QUEIMA (borda exata, >=62 - AMB-T1),
+    //      mutando O MESMO container real (CARDS-HW-QA1-A1) -------------------------
     FixedRandom burn_rng(0.5, kTuringCureSuccessPercent);  // ==62, borda: queima
-    const CureOutcome cure_outcome = attempt_cure(current.physical, CardTier::Comum, burn_rng);
+    const CureOutcome cure_outcome = attempt_cure_in_deck(deck, id, fake_tier_of, burn_rng);
 
     REQUIRE(cure_outcome == CureOutcome::Burned);
-    REQUIRE(current.physical.is_burned_out);
+    REQUIRE(deck.active().front().physical.is_burned_out);
     // AMB-T1 RESOLVIDA: queima = sucata, NAO destruicao - is_infected/virus_kind ficam
-    // como estavam (nao e revertido pela queima).
-    REQUIRE(current.physical.is_infected);
-    REQUIRE(current.physical.virus_kind == restored_hidden.physical.virus_kind);
-    REQUIRE(current.physical.is_diagnosed);
-    REQUIRE_NOTHROW(current.physical.validate());
+    // como estavam (nao e revertido pela queima); a instancia CONTINUA no ativo.
+    REQUIRE(deck.active_count() == 1);
+    REQUIRE(deck.active().front().physical.is_infected);
+    REQUIRE(deck.active().front().physical.virus_kind == original_virus_kind);
+    REQUIRE(deck.active().front().physical.is_diagnosed);
+    REQUIRE_NOTHROW(deck.active().front().physical.validate());
 
     // ---- elo 5: roundtrip V7 DEPOIS da queima - is_burned_out + is_infected +
     //      virus_kind simultaneos sobrevivem juntos ---------------------------------
-    const SaveData original_burned = make_save_with_card(current, /*timestamp_ms=*/1721150100000LL);
+    const SaveData original_burned =
+        make_save_with_card(deck.active().front(), /*timestamp_ms=*/1721150100000LL);
     const SaveData restored_burned = deserialize_save(serialize_save(original_burned));
     const CardInstance& restored_sucata =
         restored_burned.character_states.at("gus").card_collection.active.at(0);
 
-    REQUIRE(restored_sucata == current);
+    REQUIRE(restored_sucata == deck.active().front());
     REQUIRE(restored_sucata.physical.is_burned_out);
     REQUIRE(restored_sucata.physical.is_infected);
-    REQUIRE(restored_sucata.physical.virus_kind == current.physical.virus_kind);
+    REQUIRE(restored_sucata.physical.virus_kind == original_virus_kind);
     REQUIRE(restored_sucata.physical.is_diagnosed);
     REQUIRE_NOTHROW(restored_sucata.physical.validate());
 
@@ -264,42 +269,37 @@ TEST_CASE("cards_hw_lifecycle: acquire() infectado oculto sobrevive a 2 roundtri
     // Super de CardCollection::remove_for_sale). //PLAYTEST: kNpcSellPriceMin aqui e o
     // MESMO preco de uma carta saudavel, sem penalidade/bonus por estado fisico.
     //
-    // ACHADO QA (ver topo do arquivo): `deck` (o CardCollection real) ainda guarda a
-    // copia ORIGINAL da instancia (infectada-oculta, pre-diagnose/pre-queima) - o
-    // dominio nao tem write-back. Pra vender a copia REALMENTE queimada (`current`),
-    // usamos um CardCollection dedicado onde injetamos o estado fisico final via
-    // add_to_active(..., instance_id_override, initial_physical) - a UNICA via hoje
-    // pra um CardCollection guardar um physical especifico, mesmo que so na CRIACAO.
-    CardCollection sell_deck(kDeckCapacityTier1);
-    sell_deck.add_to_active(current.card_id, current.instance_id, current.physical);
+    // `deck` e o MESMO CardCollection do inicio ao fim da cadeia (CARDS-HW-QA1-A1 -
+    // ja NAO precisa de um side-deck so pra injetar o estado fisico final via
+    // instance_id_override; a mutacao real chegou por diagnose_in_deck/
+    // attempt_cure_in_deck acima).
 
     // A instancia tambem estava na mao (bancada) antes da venda.
     HandLoadout hand(kHandSizeBase);
-    hand.add_card(current.instance_id, sell_deck, fake_tier_of);
+    hand.add_card(id, deck, fake_tier_of);
     REQUIRE(hand.size() == 1);
 
     std::int64_t sell_credits = 0;
-    const SellResult sell_result =
-        sell(sell_deck, sell_credits, current.instance_id, kNpcSellPriceMin, fake_tier_of);
+    const SellResult sell_result = sell(deck, sell_credits, id, kNpcSellPriceMin, fake_tier_of);
 
     REQUIRE(sell_result.ok());
-    REQUIRE(sell_result.instance.instance_id == current.instance_id);
+    REQUIRE(sell_result.instance.instance_id == id);
     // A sucata sai do ativo do jeito que estava - sell() nao apaga/reseta o estado
     // fisico da instancia devolvida, so remove do container.
     REQUIRE(sell_result.instance.physical.is_burned_out);
     REQUIRE(sell_result.instance.physical.is_infected);
     REQUIRE(sell_result.credited == kNpcSellPriceMin);
     REQUIRE(sell_credits == kNpcSellPriceMin);
-    REQUIRE(sell_deck.active_count() == 0);
+    REQUIRE(deck.active_count() == 0);
 
     // ---- elo 7: orfao na mao (find_orphan_instance_ids + revalidate a removem) ------
-    const auto orphans = hand.find_orphan_instance_ids(sell_deck);
+    const auto orphans = hand.find_orphan_instance_ids(deck);
     REQUIRE(orphans.size() == 1);
-    REQUIRE(orphans.front() == current.instance_id);
+    REQUIRE(orphans.front() == id);
 
-    const auto removed = hand.revalidate(sell_deck);
+    const auto removed = hand.revalidate(deck);
     REQUIRE(removed.size() == 1);
-    REQUIRE(removed.front() == current.instance_id);
+    REQUIRE(removed.front() == id);
     REQUIRE(hand.size() == 0);
 }
 

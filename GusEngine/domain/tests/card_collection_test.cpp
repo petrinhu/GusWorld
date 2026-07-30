@@ -319,6 +319,155 @@ TEST_CASE("card_collection: NAO existe API morto->ativo (one-way por ausencia, i
     SUCCEED("one-way garantido em compile-time: CardCollection nao expoe morto->ativo");
 }
 
+// ---- apply_to_physical: EMPRESTIMO com escopo fechado (CARDS-HW-QA1-A1) -----------
+// Fecha o gap achado pela auditoria: ate aqui nao havia caminho de PRODUCAO pra mutar
+// o CardPhysicalState de uma instancia JA VIVA no deck ativo - so a copia devolvida
+// pelas transacoes (que NAO reflete no container real).
+
+TEST_CASE("card_collection: apply_to_physical muta o estado fisico DA INSTANCIA REAL "
+          "no container, nao so de uma copia local",
+          "[domain][deck][card_collection][apply_to_physical]") {
+    CardCollection deck(kDeckCapacityTier1);
+    const CardInstance a = deck.add_to_active("pulso_eletrico");
+    REQUIRE_FALSE(deck.active().front().physical.is_infected);
+
+    deck.apply_to_physical(a.instance_id, [](const std::string&, CardPhysicalState& physical) {
+        physical.is_infected = true;
+        physical.virus_kind = VirusKind::Worm;
+    });
+
+    // A mutacao esta no CONTAINER, nao numa copia perdida - active() reflete.
+    REQUIRE(deck.active().front().physical.is_infected);
+    REQUIRE(deck.active().front().physical.virus_kind == VirusKind::Worm);
+}
+
+TEST_CASE("card_collection: apply_to_physical entrega o card_id CORRETO da instancia "
+          "ao callback (read-only, mesma neutralidade do TierLookup)",
+          "[domain][deck][card_collection][apply_to_physical]") {
+    CardCollection deck(kDeckCapacityTier1);
+    deck.add_to_active("pulso_bio");
+    const CardInstance target = deck.add_to_active("pulso_sonico");
+    deck.add_to_active("pulso_eletrico");
+
+    std::string seen_card_id;
+    deck.apply_to_physical(target.instance_id,
+                            [&seen_card_id](const std::string& card_id, CardPhysicalState&) {
+                                seen_card_id = card_id;
+                            });
+
+    REQUIRE(seen_card_id == "pulso_sonico");
+}
+
+TEST_CASE("card_collection: apply_to_physical de instance_id ausente do ativo falha "
+          "(fail-fast, nada muta)",
+          "[domain][deck][card_collection][apply_to_physical]") {
+    CardCollection deck(kDeckCapacityTier1);
+    deck.add_to_active("pulso_eletrico");
+    bool called = false;
+
+    REQUIRE_THROWS_AS(deck.apply_to_physical(999,
+                                              [&called](const std::string&, CardPhysicalState&) {
+                                                  called = true;
+                                              }),
+                       std::invalid_argument);
+    // O callback nunca roda pra um id inexistente - a busca falha ANTES de chamar fn.
+    REQUIRE_FALSE(called);
+}
+
+TEST_CASE("card_collection: apply_to_physical e ALL-OR-NOTHING - fn que deixa o "
+          "estado fisico INVALIDO nao corrompe o container real",
+          "[domain][deck][card_collection][apply_to_physical][invariant]") {
+    CardCollection deck(kDeckCapacityTier1);
+    const CardInstance a = deck.add_to_active("pulso_eletrico");
+    const CardPhysicalState before = deck.active().front().physical;
+
+    // fn viola inv.1 de CardPhysicalState/IntegrityState (secao 6): virus_kind !=
+    // None exige is_infected==true. is_infected fica false de proposito.
+    REQUIRE_THROWS_AS(
+        deck.apply_to_physical(a.instance_id,
+                                [](const std::string&, CardPhysicalState& physical) {
+                                    physical.virus_kind = VirusKind::Worm;
+                                    // is_infected NAO setado - estado incoerente.
+                                }),
+        std::invalid_argument);
+
+    // O container REAL fica EXATAMENTE como estava - a mutacao inteira foi
+    // descartada (a copia local nunca chegou a ser escrita de volta).
+    REQUIRE(deck.active().front().physical == before);
+    REQUIRE_FALSE(deck.active().front().physical.is_infected);
+    REQUIRE(deck.active().front().physical.virus_kind == VirusKind::None);
+}
+
+TEST_CASE("card_collection: apply_to_physical so afeta a INSTANCIA alvo - as demais "
+          "do ativo ficam intocadas",
+          "[domain][deck][card_collection][apply_to_physical]") {
+    CardCollection deck(kDeckCapacityTier1);
+    const CardInstance a = deck.add_to_active("pulso_bio");
+    const CardInstance b = deck.add_to_active("pulso_sonico");
+
+    deck.apply_to_physical(a.instance_id, [](const std::string&, CardPhysicalState& physical) {
+        physical.is_infected = true;
+        physical.virus_kind = VirusKind::LogicBomb;
+    });
+
+    for (const auto& c : deck.active()) {
+        if (c.instance_id == a.instance_id) {
+            REQUIRE(c.physical.is_infected);
+        } else {
+            REQUIRE(c.instance_id == b.instance_id);
+            REQUIRE_FALSE(c.physical.is_infected);
+        }
+    }
+}
+
+TEST_CASE("card_collection: apply_to_physical NAO vaza referencia pro buffer real - "
+          "fn que guarda o ponteiro do parametro so enxerga a copia LOCAL",
+          "[domain][deck][card_collection][apply_to_physical][invariant]") {
+    CardCollection deck(kDeckCapacityTier1);
+    const CardInstance a = deck.add_to_active("pulso_eletrico");
+
+    const CardPhysicalState* captured_ptr = nullptr;
+    deck.apply_to_physical(a.instance_id,
+                            [&captured_ptr](const std::string&, CardPhysicalState& physical) {
+                                captured_ptr = &physical;
+                                physical.is_infected = true;
+                                physical.virus_kind = VirusKind::Backdoor;
+                            });
+
+    // O ponteiro capturado NAO e o endereco do physical dentro de active() - era uma
+    // copia local que ja morreu no retorno de apply_to_physical (a comparacao de
+    // endereco em si e so uma checagem defensiva; o que garante o contrato e o
+    // container real ter sido escrito por VALOR, nao por referencia compartilhada).
+    REQUIRE(captured_ptr != &deck.active().front().physical);
+    // A mutacao AINDA chegou no container (via commit por valor apos validate()).
+    REQUIRE(deck.active().front().physical.is_infected);
+}
+
+TEST_CASE("card_collection: apply_to_physical falha (fail-fast) se fn, por fora, faz "
+          "a instancia sumir do ativo antes do commit (reancoragem do iterador)",
+          "[domain][deck][card_collection][apply_to_physical][lifetime]") {
+    CardCollection deck(kDeckCapacityTier1);
+    const CardInstance a = deck.add_to_active("pulso_eletrico");
+
+    // fn captura o PROPRIO agregado e descarta a instancia-alvo por fora - simula um
+    // chamador adversarial/errado que reentra no CardCollection dentro do
+    // emprestimo. O commit final (apos validate()) precisa reancorar e falhar, nao
+    // escrever num slot que nao existe mais / ressuscitar a instancia no morto.
+    REQUIRE_THROWS_AS(
+        deck.apply_to_physical(a.instance_id,
+                                [&deck, &a](const std::string&, CardPhysicalState& physical) {
+                                    physical.is_infected = true;
+                                    deck.discard_to_dead(a.instance_id, fake_tier_of);
+                                }),
+        std::invalid_argument);
+
+    // A instancia foi pro morto pela reentrancia (nao pelo apply_to_physical em si) -
+    // e continua la, sem duplicar nem voltar ao ativo.
+    REQUIRE(deck.active_count() == 0);
+    REQUIRE(deck.dead().size() == 1);
+    REQUIRE(deck.dead().front().instance_id == a.instance_id);
+}
+
 // ---- Constantes de deck_constants.hpp: presenca + valores //PLAYTEST (secao 8c) ---
 
 TEST_CASE("deck_constants: valores baseline //PLAYTEST da mao/deck (secao 8c)",

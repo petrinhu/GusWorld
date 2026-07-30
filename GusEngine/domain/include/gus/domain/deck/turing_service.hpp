@@ -41,10 +41,12 @@
 #ifndef GUS_DOMAIN_DECK_TURING_SERVICE_HPP
 #define GUS_DOMAIN_DECK_TURING_SERVICE_HPP
 
+#include <cstdint>
 #include <string_view>
 
 #include "gus/domain/cards/card_enums.hpp"
 #include "gus/domain/combat/random_source.hpp"
+#include "gus/domain/deck/card_collection.hpp"
 #include "gus/domain/deck/card_hardware.hpp"
 #include "gus/domain/infection/integrity_state.hpp"
 
@@ -97,6 +99,34 @@ enum class CureOutcome {
 [[nodiscard]] CureOutcome attempt_cure(CardPhysicalState& physical,
                                         cards::CardTier tier,
                                         combat::IRandomSource& rng);
+
+// ---- Fiacao ao deck REAL (CARDS-HW-QA1-A1) ----------------------------------------
+// diagnose()/attempt_cure() acima SAO a fonte de verdade da REGRA (guards, split
+// 62/38%, AMB-T1) - continuam existindo, testadas isoladamente. O gap que a auditoria
+// achou e que, ate CardCollection::apply_to_physical (card_collection.hpp), nao havia
+// caminho de PRODUCAO pra alcancar o CardPhysicalState REAL de uma instancia JA no
+// deck ativo de um personagem - so um CardPhysicalState& solto que o chamador mantinha
+// por fora (a copia devolvida por acquire()/craft(), nao o container). As duas
+// funcoes abaixo fecham essa costura: alcancam a carta VIVA via o emprestimo fechado
+// de apply_to_physical (nunca uma referencia escapando do agregado - decisao do
+// lider), sem duplicar NENHUMA regra - so encaminham pro servico puro acima.
+
+// Diagnostica a instancia `instance_id` DENTRO do deck ATIVO de `collection`. Mesmo
+// contrato de diagnose() (idempotente, no-op se a carta nao esta infectada). Fail-
+// fast (std::invalid_argument, propagado de apply_to_physical) se instance_id nao
+// esta no deck ativo.
+[[nodiscard]] DiagnoseOutcome diagnose_in_deck(CardCollection& collection,
+                                                std::uint64_t instance_id);
+
+// Tenta curar a instancia `instance_id` DENTRO do deck ATIVO de `collection` - MESMOS
+// guards/split/AMB-T1 de attempt_cure() (o tier e resolvido via tier_of(card_id),
+// mesma convencao de CardCollection::TierLookup ja usada por discard_to_dead/
+// remove_for_sale/sell/upload). Fail-fast (std::invalid_argument, propagado de
+// apply_to_physical) se instance_id nao esta no deck ativo.
+[[nodiscard]] CureOutcome attempt_cure_in_deck(CardCollection& collection,
+                                                std::uint64_t instance_id,
+                                                const CardCollection::TierLookup& tier_of,
+                                                combat::IRandomSource& rng);
 
 // ---- Log diegetico (regra "todo efeito loga", feedback_todo_efeito_loga_terminal)
 // Mapeamento PURO outcome -> chave i18n (UPPER_SNAKE_CASE, gus/domain/i18n/

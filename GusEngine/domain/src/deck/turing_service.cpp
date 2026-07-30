@@ -45,6 +45,37 @@ CureOutcome attempt_cure(CardPhysicalState& physical, cards::CardTier tier,
     return CureOutcome::Burned;
 }
 
+DiagnoseOutcome diagnose_in_deck(CardCollection& collection, std::uint64_t instance_id) {
+    // Valor de entrada nunca observado pelo chamador se apply_to_physical lancar
+    // (fail-fast propaga antes do return) - so existe pra dar um valor inicial
+    // ao outcome capturado por referencia dentro do emprestimo.
+    DiagnoseOutcome outcome = DiagnoseOutcome::RejectedNotInfected;
+    collection.apply_to_physical(
+        instance_id, [&outcome](const std::string&, CardPhysicalState& physical) {
+            // diagnose() e puro (opera sobre a PECA IntegrityState, base publica de
+            // CardPhysicalState) - o emprestimo garante que esta 'physical' e a
+            // copia local revalidada pelo agregado no commit, nao o container real.
+            outcome = diagnose(physical);
+        });
+    return outcome;
+}
+
+CureOutcome attempt_cure_in_deck(CardCollection& collection, std::uint64_t instance_id,
+                                  const CardCollection::TierLookup& tier_of,
+                                  combat::IRandomSource& rng) {
+    CureOutcome outcome = CureOutcome::RejectedNotDiagnosed;  // idem diagnose_in_deck
+    collection.apply_to_physical(
+        instance_id,
+        [&outcome, &tier_of, &rng](const std::string& card_id, CardPhysicalState& physical) {
+            // card_id vem do PROPRIO emprestimo (copia estavel, card_collection.hpp) -
+            // resolve o tier ANTES de chamar o servico puro, mesma convencao de
+            // guard_protected_tier/sell()/upload() (TierLookup por card_id).
+            const cards::CardTier tier = tier_of(card_id);
+            outcome = attempt_cure(physical, tier, rng);
+        });
+    return outcome;
+}
+
 std::string_view translation_key_for(DiagnoseOutcome outcome) {
     switch (outcome) {
         case DiagnoseOutcome::Diagnosed:

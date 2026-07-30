@@ -52,6 +52,14 @@ public:
     // conhece o registry - so consulta o guard de tier (inv.9) por cima deste lookup.
     using TierLookup = std::function<gus::domain::combat::CardTier(const std::string&)>;
 
+    // Callback de EMPRESTIMO (CARDS-HW-QA1-A1, apply_to_physical abaixo). Recebe
+    // card_id (READ-ONLY, mesma neutralidade do TierLookup - o agregado nao
+    // interpreta, so repassa) e a REFERENCIA MUTAVEL de uma COPIA LOCAL do estado
+    // fisico da instancia - nunca uma referencia pro buffer real de active_. fn NAO
+    // deve capturar nem `physical` nem `card_id` pra usar depois de retornar (o
+    // escopo do emprestimo fecha no fim da chamada a apply_to_physical).
+    using PhysicalMutator = std::function<void(const std::string& card_id, CardPhysicalState& physical)>;
+
     // active_capacity: capacidade do deck ATIVO no patamar atual (kDeckCapacityTier1/2/3,
     // deck_constants.hpp). next_instance_id: valor inicial do contador sequencial
     // (default 1, spec secao 7 inv.1); um valor > 1 permite retomar a sequencia apos
@@ -99,6 +107,33 @@ public:
     // Fail-fast (std::invalid_argument) se instance_id nao esta no deck ativo.
     [[nodiscard]] CardInstance remove_for_sale(std::uint64_t instance_id,
                                                const TierLookup& tier_of);
+
+    // EMPRESTIMO com escopo FECHADO (decisao do lider, CARDS-HW-QA1-A1) - a UNICA via
+    // MUTAVEL que este agregado expoe para o CardPhysicalState de uma instancia JA no
+    // deck ATIVO (nao existe para o deck morto - inerte, nunca precisa mutar, inv.3).
+    // Fecha o gap achado pela auditoria: turing_service::diagnose()/attempt_cure() ja
+    // existiam prontos, mas so operavam sobre um CardPhysicalState& solto que o
+    // CHAMADOR mantinha por fora - nao havia caminho de producao pra alcancar a copia
+    // REAL guardada no deck de um personagem.
+    //
+    // Contrato (as 3 propriedades exigidas, nenhuma delas negociavel):
+    //   1. fn roda sobre uma COPIA LOCAL (card_id + physical) - NUNCA uma referencia
+    //      pro buffer real de active_. O emprestimo comeca e termina DENTRO desta
+    //      chamada; ninguem guarda a referencia pra mexer depois (ela e destruida
+    //      no retorno, commitada ou nao).
+    //   2. Ao fn retornar, a copia mutada e REVALIDADA (CardPhysicalState::validate())
+    //      ANTES de qualquer escrita no container real.
+    //   3. SO se a validacao passar, a copia e escrita de volta na instancia real
+    //      (ALL-OR-NOTHING): fn que deixa o estado fisico invalido NAO corrompe o
+    //      agregado - validate() lanca, a copia local morre no stack unwind,
+    //      active_ fica intocado byte a byte, e a excecao propaga pro chamador.
+    //
+    // Fail-fast (std::invalid_argument) se instance_id nao esta no deck ativo. Mesma
+    // cautela de discard_to_dead/remove_for_sale contra o callback ser opaco: o
+    // iterador e REANCORADO apos fn rodar (fail-fast, std::invalid_argument, se a
+    // instancia sumiu do ativo durante a chamada - fn nao pode mutar o agregado por
+    // fora, mesmo que so enxergue a copia local).
+    void apply_to_physical(std::uint64_t instance_id, const PhysicalMutator& fn);
 
     // Views read-only (copia por referencia const; chamador nao muta por aqui).
     [[nodiscard]] const std::vector<CardInstance>& active() const noexcept;

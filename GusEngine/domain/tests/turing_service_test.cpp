@@ -22,20 +22,29 @@
 
 #include <stdexcept>
 
+#include <string>
+
 #include "counting_random.hpp"
 #include "fixed_random.hpp"
 #include "gus/domain/cards/card_enums.hpp"
+#include "gus/domain/combat/combat_enums.hpp"
+#include "gus/domain/deck/card_collection.hpp"
 #include "gus/domain/deck/card_hardware.hpp"
 #include "gus/domain/deck/card_hardware_constants.hpp"
+#include "gus/domain/deck/deck_constants.hpp"
 #include "gus/domain/deck/turing_service.hpp"
 #include "gus/domain/infection/integrity_state.hpp"
 
 using gus::domain::cards::CardTier;
 using gus::domain::deck::attempt_cure;
+using gus::domain::deck::attempt_cure_in_deck;
+using gus::domain::deck::CardCollection;
 using gus::domain::deck::CardPhysicalState;
 using gus::domain::deck::CureOutcome;
 using gus::domain::deck::diagnose;
+using gus::domain::deck::diagnose_in_deck;
 using gus::domain::deck::DiagnoseOutcome;
+using gus::domain::deck::kDeckCapacityTier1;
 using gus::domain::deck::kTuringCureBurnoutPercent;
 using gus::domain::deck::kTuringCureSuccessPercent;
 using gus::domain::deck::translation_key_for;
@@ -43,6 +52,19 @@ using gus::domain::deck::VirusKind;
 using gus::domain::infection::IntegrityState;
 using gus::domain::tests::CountingRandom;
 using gus::domain::tests::FixedRandom;
+
+namespace {
+
+// Mesma convencao de card_collection_test.cpp/deck_transactions_test.cpp: sufixo
+// "_especial"/"_super" marca a classe protegida (secao 7 inv.9), sem depender do
+// registry real de combate.
+CardTier fake_tier_of(const std::string& card_id) {
+    if (card_id.find("_especial") != std::string::npos) return CardTier::Especial;
+    if (card_id.find("_super") != std::string::npos) return CardTier::Super;
+    return CardTier::Comum;
+}
+
+}  // namespace
 
 namespace {
 
@@ -270,6 +292,143 @@ TEST_CASE("turing_service: attempt_cure() numa carta JA sucata ainda rola (nao h
     REQUIRE(p.is_burned_out);
     REQUIRE_FALSE(p.is_infected);
     REQUIRE_NOTHROW(p.validate());
+}
+
+// ---- Fiacao ao deck REAL (CARDS-HW-QA1-A1): diagnose_in_deck/attempt_cure_in_deck -
+// alcancam a instancia JA VIVA no deck ATIVO via CardCollection::apply_to_physical -
+// fecha o gap que a auditoria achou (diagnose()/attempt_cure() sozinhos so mexem num
+// CardPhysicalState solto que o chamador mantinha por fora).
+
+TEST_CASE("turing_service: diagnose_in_deck diagnostica a instancia REAL do deck "
+          "ativo (nao uma copia perdida)",
+          "[domain][infection][turing_service][in_deck]") {
+    CardCollection deck(kDeckCapacityTier1);
+    const auto inst = deck.add_to_active("pulso_infectado");
+    // Injeta infeccao oculta direto no container (a rolagem de contaminacao em si e
+    // de outro servico - aqui so precisamos de uma instancia infectada JA no deck).
+    deck.apply_to_physical(inst.instance_id, [](const std::string&, CardPhysicalState& p) {
+        p.is_infected = true;
+        p.virus_kind = VirusKind::LogicBomb;
+    });
+    REQUIRE_FALSE(deck.active().front().physical.is_diagnosed);
+
+    const DiagnoseOutcome outcome = diagnose_in_deck(deck, inst.instance_id);
+
+    REQUIRE(outcome == DiagnoseOutcome::Diagnosed);
+    // A mutacao esta no CONTAINER real, nao numa copia solta.
+    REQUIRE(deck.active().front().physical.is_diagnosed);
+}
+
+TEST_CASE("turing_service: diagnose_in_deck e no-op numa instancia limpa (nada muta "
+          "no deck real)",
+          "[domain][infection][turing_service][in_deck]") {
+    CardCollection deck(kDeckCapacityTier1);
+    const auto inst = deck.add_to_active("pulso_limpo");
+
+    const DiagnoseOutcome outcome = diagnose_in_deck(deck, inst.instance_id);
+
+    REQUIRE(outcome == DiagnoseOutcome::RejectedNotInfected);
+    REQUIRE_FALSE(deck.active().front().physical.is_diagnosed);
+}
+
+TEST_CASE("turing_service: diagnose_in_deck de instance_id ausente do ativo propaga "
+          "fail-fast (apply_to_physical)",
+          "[domain][infection][turing_service][in_deck]") {
+    CardCollection deck(kDeckCapacityTier1);
+    REQUIRE_THROWS_AS(diagnose_in_deck(deck, 999), std::invalid_argument);
+}
+
+TEST_CASE("turing_service: attempt_cure_in_deck cura (roll<62) a instancia REAL do "
+          "deck ativo",
+          "[domain][infection][turing_service][in_deck]") {
+    CardCollection deck(kDeckCapacityTier1);
+    const auto inst = deck.add_to_active("pulso_infectado");
+    deck.apply_to_physical(inst.instance_id, [](const std::string&, CardPhysicalState& p) {
+        p.is_infected = true;
+        p.virus_kind = VirusKind::Worm;
+        p.is_diagnosed = true;
+    });
+
+    FixedRandom cure_rng(0.5, 0);  // <62 => Cured
+    const CureOutcome outcome =
+        attempt_cure_in_deck(deck, inst.instance_id, fake_tier_of, cure_rng);
+
+    REQUIRE(outcome == CureOutcome::Cured);
+    const CardPhysicalState& real = deck.active().front().physical;
+    REQUIRE_FALSE(real.is_infected);
+    REQUIRE(real.virus_kind == VirusKind::None);
+    REQUIRE_FALSE(real.is_diagnosed);
+    REQUIRE_NOTHROW(real.validate());
+}
+
+TEST_CASE("turing_service: attempt_cure_in_deck queima (roll>=62) a instancia REAL "
+          "do deck ativo - sucata, permanece no ativo (AMB-T1)",
+          "[domain][infection][turing_service][in_deck]") {
+    CardCollection deck(kDeckCapacityTier1);
+    const auto inst = deck.add_to_active("pulso_infectado");
+    deck.apply_to_physical(inst.instance_id, [](const std::string&, CardPhysicalState& p) {
+        p.is_infected = true;
+        p.virus_kind = VirusKind::Worm;
+        p.is_diagnosed = true;
+    });
+
+    FixedRandom burn_rng(0.5, 99);  // >=62 => Burned
+    const CureOutcome outcome =
+        attempt_cure_in_deck(deck, inst.instance_id, fake_tier_of, burn_rng);
+
+    REQUIRE(outcome == CureOutcome::Burned);
+    REQUIRE(deck.active_count() == 1);  // sucata NAO sai do ativo (AMB-T1)
+    const CardPhysicalState& real = deck.active().front().physical;
+    REQUIRE(real.is_burned_out);
+    REQUIRE(real.is_infected);  // AMB-T1: queima nao reverte infeccao/virus_kind
+    REQUIRE_NOTHROW(real.validate());
+}
+
+TEST_CASE("turing_service: attempt_cure_in_deck rejeita instancia nao-diagnosticada "
+          "(guard) - nada muta no deck real",
+          "[domain][infection][turing_service][in_deck][guard]") {
+    CardCollection deck(kDeckCapacityTier1);
+    const auto inst = deck.add_to_active("pulso_infectado");
+    deck.apply_to_physical(inst.instance_id, [](const std::string&, CardPhysicalState& p) {
+        p.is_infected = true;
+        p.virus_kind = VirusKind::Worm;
+        // is_diagnosed continua false de proposito.
+    });
+    const CardPhysicalState before = deck.active().front().physical;
+
+    FixedRandom rng(0.5, 0);  // curaria se o guard nao barrasse
+    const CureOutcome outcome = attempt_cure_in_deck(deck, inst.instance_id, fake_tier_of, rng);
+
+    REQUIRE(outcome == CureOutcome::RejectedNotDiagnosed);
+    REQUIRE(deck.active().front().physical == before);
+}
+
+TEST_CASE("turing_service: attempt_cure_in_deck rejeita tier PROTEGIDO (Especial/"
+          "Super) resolvido via tier_of(card_id) - nada muta no deck real",
+          "[domain][infection][turing_service][in_deck][guard]") {
+    CardCollection deck(kDeckCapacityTier1);
+    const auto inst = deck.add_to_active("mestre_hipotenusa_especial");
+    deck.apply_to_physical(inst.instance_id, [](const std::string&, CardPhysicalState& p) {
+        p.is_infected = true;
+        p.virus_kind = VirusKind::Worm;
+        p.is_diagnosed = true;
+    });
+    const CardPhysicalState before = deck.active().front().physical;
+
+    FixedRandom rng(0.5, 0);
+    const CureOutcome outcome = attempt_cure_in_deck(deck, inst.instance_id, fake_tier_of, rng);
+
+    REQUIRE(outcome == CureOutcome::RejectedProtectedTier);
+    REQUIRE(deck.active().front().physical == before);
+}
+
+TEST_CASE("turing_service: attempt_cure_in_deck de instance_id ausente do ativo "
+          "propaga fail-fast (apply_to_physical)",
+          "[domain][infection][turing_service][in_deck]") {
+    CardCollection deck(kDeckCapacityTier1);
+    FixedRandom rng(0.5, 0);
+    REQUIRE_THROWS_AS(attempt_cure_in_deck(deck, 999, fake_tier_of, rng),
+                       std::invalid_argument);
 }
 
 // ---- Log diegetico: mapeamento PURO outcome -> chave i18n -------------------------
