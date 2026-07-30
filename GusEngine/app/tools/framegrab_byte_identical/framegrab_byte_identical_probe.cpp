@@ -139,6 +139,18 @@ bool dump(const std::string& dir, const std::string& stem, const unsigned char* 
     return ok != 0 && raw_ok;
 }
 
+// Orientacao: bloco amarelo assimetrico na vertical (y=[40,120), kH=540 -> espelhado
+// seria y=[420,500)). ANTIDOTO (achado do glintfx, retransmitido pelo lider apos este
+// probe ja estar escrito): um teste que so compara old==new pixel a pixel PASSA MESMO
+// SE OS DOIS LADOS ESTIVEREM IGUALMENTE INVERTIDOS - a comparacao relativa nao prova
+// orientacao ABSOLUTA. Por isso esta checagem e feita SEPARADAMENTE, na regiao FIXA
+// esperada (kYellow) e na regiao ESPELHADA (mirror_of(kYellow)), pra cada buffer
+// INDEPENDENTEMENTE - nao contra o outro buffer. Amostra de CENTRO/area uniforme nao
+// serviria (uma cena simetrica passa nos dois sentidos); a assimetria e o que importa.
+RectPx mirror_of(const RectPx& r) {
+    return RectPx{r.x, kH - (r.y + r.h), r.w, r.h};
+}
+
 void report(const char* tag, const unsigned char* px) {
     std::printf("[%s] magenta(imagem inteira)      = %zu\n", tag,
                 count_exact_full(px, kMagentaRgb));
@@ -148,6 +160,10 @@ void report(const char* tag, const unsigned char* px) {
                 count_exact(px, kGreen, kMagentaRgb), kGreen.w * kGreen.h);
     std::printf("[%s] amarelo(bloco amarelo)       = %zu de %d\n", tag,
                 count_exact(px, kYellow, kYellowRgb), kYellow.w * kYellow.h);
+    const RectPx mirrored = mirror_of(kYellow);
+    std::printf("[%s] amarelo(regiao ESPELHADA)    = %zu (precisa ser 0 - prova orientacao "
+                "ABSOLUTA, nao so relativa old-vs-new)\n",
+                tag, count_exact(px, mirrored, kYellowRgb));
 }
 
 }  // namespace
