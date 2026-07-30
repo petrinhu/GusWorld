@@ -485,6 +485,67 @@ set(GLINTFX_MODULE_DRAW2D    ON  CACHE BOOL "" FORCE)
 #     pin anterior, nenhum vendor novo. THIRD-PARTY-LICENSES.md atualizado so na data/pin.
 # Build local + suite completa verdes no pin novo antes deste commit (contagem de testes no
 # relatorio da fatia 1 de log-e-relogio).
+#
+# BUMP v0.26.0 -> v0.27.0 (BUMP-GLINTFX-V027, 2026-07-30): a v0.27.0 paga os 4 defeitos que o
+# NOSSO review adversarial da S1 provocou do lado deles - DEC-NOTHROW (decode_image_file/
+# decode_image_memory) e TEX-NOTHROW (Draw2d::load_texture/create_texture) agora sao `noexcept`
+# com try/catch no corpo, degradando bad_alloc pra retorno invalido (`ok() == false`) em vez de
+# lancar atraves da fronteira de API. Somam-se 2 funcoes NOVAS ja nascidas noexcept
+# (encode_image_memory/encode_image_file, IMG-ENCODE) = as 6 noexcept desta release.
+# Compatibilidade em nivel de FONTE verificada por ENUMERACAO, nao pela palavra deles: diff das
+# declaracoes (comentarios removidos) dos 19 headers publicos das duas tags mostra que
+# **NENHUMA** assinatura existente mudou alem dos 4 `noexcept` acima - zero remocao, zero troca
+# de tipo/parametro. Nosso consumo e imune por dois motivos medidos: (a) ZERO teste da suite
+# espera excecao vinda de funcao do glintfx (os 4 arquivos com glintfx E *_THROWS mencionam
+# glintfx so em COMENTARIO; o unico catch() perto de glintfx, maestro.cpp:394, envolve
+# load_dialogue_graph_from_file, funcao NOSSA de domain/); (b) ZERO lugar do codigo pega o
+# ENDERECO dessas funcoes (`&glintfx::decode_image_*`/`decltype`) - `noexcept` faz parte do TIPO
+# desde o C++17, entao ponteiro-de-funcao seria a unica forma de o acrescimo quebrar compilacao,
+# e nao existe nenhum. Consumo real: ZERO ajuste de codigo, so o GIT_TAG.
+#   - ⛔ NAO adotado nesta fatia (fora de escopo, decisao do lider): (1) `Draw2d::load_font`
+#     CONTINUA sem `noexcept` na v0.27.0 (draw2d.hpp:948, conferido na tag) e nos o chamamos em
+#     platform/src/render2d/render2d_glintfx.cpp:72 - PROIBIDO envolver em try/catch (a lei do
+#     projeto proibe contornar lacuna do glintfx); o pedido FONT-NOTHROW ja foi sinalizado pelo
+#     bus e a fatia espera o fix deles. (2) `UiLayer::capture_frame()`/`App::capture_frame()`
+#     (API nova nesta tag) NAO serve pro nosso fundo congelado - le a layer offscreen do RmlUi,
+#     nao o FBO 0 com o quadro de jogo composto. (3) O par IMG-ENCODE novo torna o nosso vendor
+#     `third_party/stb/stb_image_write.h` tecnicamente removivel (~20 arquivos de app/ o usam
+#     pra screenshot) - onda propria, nao esta.
+# Ritual de bump revalidado por leitura direta do CMakeLists.txt deles nas DUAS tags (baixados
+# via `gh api repos/petrinhu/glintfx/contents/glintfx/CMakeLists.txt?ref=v0.2{6,7}.0` e
+# diffados, em vez de conferidos de memoria):
+#   - Conjunto de NOMES de flag GLINTFX_* IDENTICO entre v0.26.0 e v0.27.0 (diff do conjunto
+#     ordenado de todos os tokens `GLINTFX_[A-Z0-9_]+` dos dois arquivos = vazio): nenhuma flag
+#     nova, renomeada ou removida. As 16 `option()`/`set()` deles foram ENUMERADAS (nao grepadas
+#     uma a uma): SANITIZE, COVERAGE, BACKEND_GLFW, OWN_FONT_ENGINE, MODULE_WINDOW, MODULE_APP,
+#     MODULE_IMAGE, MODULE_TEXT, MODULE_I18N, MODULE_AUDIO, MODULE_GAMEPAD, MODULE_DRAW2D,
+#     MODULE_FX, BUILD_LINK_SMOKE, BUILD_DEMOS, BUILD_TESTS - as 9 que setamos acima cobrem
+#     tudo que nos concerne (MODULE_IMAGE segue reservada/forcada ON do lado deles;
+#     BUILD_DEMOS/_TESTS defaultam pro `_glintfx_top`, FALSE quando consumidos por FetchContent).
+#   - Guard de libm em glintfx_audio continua por COMPILADOR
+#     ($<$<NOT:$<CXX_COMPILER_ID:MSVC>>:m>, CMakeLists deles linha 1364), inalterado desde a
+#     v0.18.1 - linkar `m` no MSVC quebraria o CI Windows.
+#   - Pin do RmlUi deles continua no MESMO SHA 2cd28864ae25ed345b70598751703a5433b12356 (linha
+#     752 deles) e o patch `patches/rmlui-2cd28864-teardown-ub.patch` da tag v0.27.0 e IDENTICO
+#     byte-a-byte ao nosso vendorizado em GusEngine/patches/. Aplicacao conferida na ARVORE
+#     BAIXADA, nao no CMake declarativo: `git -C build/linux-release/_deps/rmlui-src apply
+#     --reverse --check <patch>` passa (= ja aplicado) E o texto do hunk esta presente de fato
+#     em Source/Core/Element.cpp (DestroyAndDeallocate(meta) ANTES de children.clear()).
+#   - ⚠️ VENDOR NOVO A NIVEL DE ARQUIVO (o unico achado deste bump): os 4 DIRETORIOS de
+#     third_party/ deles continuam os mesmos (gamecontrollerdb/khronos/miniaudio/stb), mas
+#     `third_party/stb/` ganhou **stb_image_write.h** (71221 bytes) na v0.27.0, e ele e
+#     COMPILADO de verdade (src/stb_image_write_impl.cpp entrou na OBJECT library
+#     `glintfx_image`, que NAO tem gate desligavel) => esta no binario que distribuimos.
+#     Mesma lib/autor/licenca do stb_image.h ja creditado, logo ZERO obrigacao nova de
+#     atribuicao, mas o inventario precisava bater: THIRD-PARTY-LICENSES.md atualizado no mesmo
+#     commit. NOTA DE METODO: a receita mecanica que o proprio THIRD-PARTY-LICENSES.md prescrevia
+#     (`ls .../glintfx-src/glintfx/third_party/`) e um listing de DIRETORIO e por construcao NAO
+#     ENXERGA arquivo novo dentro de vendor que ja existia - responderia "os mesmos 4, nada novo"
+#     e passaria batido. A receita foi corrigida pra `find` recursivo naquele doc.
+#   - GLINTFX_VERSION conferido no config.hpp GERADO (build/linux-release/_deps/glintfx-build/
+#     include/glintfx/config.hpp), nao no CMakeLists declarativo: "0.27.0".
+# Build local + gate ASan + suite completa (2596 testes, MESMA contagem do pin anterior - o bump
+# nao soma nem remove teste nosso) verdes no pin novo antes deste commit.
 
 FetchContent_Declare(
     glintfx
@@ -494,7 +555,7 @@ FetchContent_Declare(
     # evidencia, nao presumida: a tag v0.20.0 tem o MESMO sha nos dois hosts
     # (9bfaabfa, apontando pro commit 0442dd15 que ja esta no nosso _deps).
     GIT_REPOSITORY https://github.com/petrinhu/glintfx
-    GIT_TAG        v0.26.0
+    GIT_TAG        v0.27.0
     SOURCE_SUBDIR  glintfx
 )
 FetchContent_MakeAvailable(glintfx)
