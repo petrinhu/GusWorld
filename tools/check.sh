@@ -215,11 +215,27 @@ python3 "$ROOT/tools/ctest_timeout_required.py"
 GATE_CTEST_TIMEOUT=$?
 set -e
 
+# (i) Zero-tolerancia PERMANENTE (FRAMEGRAB-7-SITIOS, 2026-07-30): os 7 sitios
+#     de captura de backbuffer via gus::platform::rmlui::gl3_read_backbuffer_rgba
+#     (leitura crua GL/glad) migraram pra glintfx::UiLayer::capture_frame()
+#     (battle_preview.cpp x4, difficulty_menu_loop.cpp, title_menu_loop.cpp,
+#     save_load_menu_loop.cpp). Este gate CONGELA o resultado: qualquer
+#     chamada NOVA em producao (app/src + app/include/gus/app, mesmo escopo
+#     dos gates acima) reprova na hora, exceto o unico site allowlisted e
+#     documentado (sdl_window.cpp - roda antes de qualquer UiLayer existir).
+#     Ver tools/gl3_readbackbuffer_zero.py (inclusive a auto-auditoria que
+#     reprova se a allowlist ficar desatualizada).
+set +e
+python3 "$ROOT/tools/gl3_readbackbuffer_zero.py"
+GATE_GL3_READBACKBUFFER=$?
+set -e
+
 GATE=0
 [ "$GATE_ARCH" = "0" ] && [ "$GATE_EXCL" = "0" ] && [ "$GATE_I18N" = "0" ] \
     && [ "$GATE_SDL_RATCHET" = "0" ] && [ "$GATE_LOG_CLOCK_ZERO" = "0" ] \
     && [ "$GATE_STBI_ZERO" = "0" ] && [ "$GATE_AUDIO_ZERO" = "0" ] \
-    && [ "$GATE_FETCHCONTENT" = "0" ] && [ "$GATE_CTEST_TIMEOUT" = "0" ] || GATE=1
+    && [ "$GATE_FETCHCONTENT" = "0" ] && [ "$GATE_CTEST_TIMEOUT" = "0" ] \
+    && [ "$GATE_GL3_READBACKBUFFER" = "0" ] || GATE=1
 echo "GATE=$GATE"
 
 # ---------------------------------------------------------------- SUITE
