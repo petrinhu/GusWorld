@@ -1,4 +1,4 @@
-# UILAYER-EXCLUSIVIDADE — auditoria de exclusividade do `glintfx::UiLayer`
+# UILAYER-EXCLUSIVIDADE: auditoria de exclusividade do `glintfx::UiLayer`
 
 Auditoria **read-only**, segundo agente da fatia (o primeiro commitou `287c29b`,
 verificado abaixo). Método: enumerar um universo fechado (grep de `UiLayer` em
@@ -9,14 +9,14 @@ dentro dele.
 
 - **SHA no início do trabalho:** `287c29bae380e3aafa17ae1883e09a2039ecea7d` (HEAD).
 - **`git status --porcelain` no início:** `?? GusEngine/app/tools/appmode_spike/`
-  (diretório untracked, conteúdo listado abaixo — não faz parte do universo
+  (diretório untracked, conteúdo listado abaixo, não faz parte do universo
   varrido, ver nota). Isto é **menos** do que as "3 frentes não commitadas do
   líder" mencionadas no brief; entre o brief ser escrito e este agente começar,
   outra atividade na sessão aparentemente consolidou (commitou) as demais. Não
   toquei em nada não commitado.
 - **`git status --porcelain` no fim:** ver seção final deste documento.
 
-### O diretório untracked (`appmode_spike/`) — fora do veredito desta fatia
+### O diretório untracked (`appmode_spike/`), fora do veredito desta fatia
 
 ```
 GusEngine/app/tools/appmode_spike/CMakeLists.txt
@@ -28,7 +28,7 @@ GusEngine/app/tools/appmode_spike/RUNBOOK.md
 ```
 
 `appmode_spike_probe.cpp` (o único arquivo `.cpp` ali) **não menciona `UiLayer`
-nenhuma vez** — confirmado por grep direto no arquivo, zero ocorrências. A
+nenhuma vez**, confirmado por grep direto no arquivo, zero ocorrências. A
 única menção a "UiLayer" no diretório inteiro é uma linha de **comentário**
 dentro de `main.rml` (arquivo `.rml`, fora do universo `*.cpp`/`*.hpp` definido
 pelo método). Logo este diretório **não contribui nenhuma ocorrência** ao N
@@ -44,7 +44,7 @@ Comando: `grep -rn "UiLayer" GusEngine/ --include='*.cpp' --include='*.hpp' | gr
 `/var/tmp/builds/claude-1000/-home-petrus-IDrive-Documentos-projetos-claudebrain-Projects-gusworld/8513691b-1636-4828-ab4f-09f0f2ee63ad/scratchpad/uilayer_grep.txt`
 antes de qualquer classificação (arquivo de trabalho, não versionado).
 
-## 2. Classificação exaustiva — cheque de conservação
+## 2. Classificação exaustiva: cheque de conservação
 
 | Classe | Descrição | Contagem |
 |---|---|---|
@@ -57,7 +57,7 @@ antes de qualquer classificação (arquivo de trabalho, não versionado).
 
 **233 = N declarado. A varredura está completa (cheque de conservação passou).**
 
-### (a) construção — 17 sítios
+### (a) construção: 17 sítios
 
 6 são `ui_.emplace(glintfx::UiLayer::Config{...})` dentro das 6 classes-dono
 (ver seção 3); os outros 11 são `glintfx::UiLayer ui(glintfx::UiLayer::Config{...})`
@@ -83,7 +83,7 @@ GusEngine/app/tools/frozen_bg_probe.cpp:281                         (probe stand
 GusEngine/app/tools/save_load_screenshot_probe.cpp:164              (probe standalone)
 ```
 
-### (b) declaração de storage próprio — 6 sítios (exatamente as 6 classes-dono)
+### (b) declaração de storage próprio: 6 sítios (exatamente as 6 classes-dono)
 
 ```
 GusEngine/app/src/screens/difficulty_menu_loop.cpp:641      std::optional<glintfx::UiLayer> ui_;
@@ -94,7 +94,7 @@ GusEngine/app/src/screens/system_menu_loop.cpp:1629         std::optional<glintf
 GusEngine/app/src/screens/save_load_menu_loop.cpp:931       std::optional<glintfx::UiLayer> ui_;
 ```
 
-### (c) uso via referência recebida — 5 sítios (todos o mesmo padrão helper)
+### (c) uso via referência recebida: 5 sítios (todos o mesmo padrão helper)
 
 ```
 GusEngine/app/src/screens/difficulty_menu_loop.cpp:118      void register_pixel_operator_mono_fonts(glintfx::UiLayer& ui)
@@ -104,20 +104,20 @@ GusEngine/app/src/screens/system_menu_loop.cpp:183          void register_pixel_
 GusEngine/app/src/screens/save_load_menu_loop.cpp:202       void register_pixel_operator_mono_fonts(glintfx::UiLayer& ui)
 ```
 
-Nenhum destes 5 constrói, guarda ou dá origem a uma segunda instância — recebem
+Nenhum destes 5 constrói, guarda ou dá origem a uma segunda instância: recebem
 a referência da UiLayer que a própria classe-dono já possui, registram fontes,
 e devolvem.
 
-### (d) comentário ou string — 199 sítios
+### (d) comentário ou string: 199 sítios
 
 A imensa maioria (175 detectados automaticamente por `stripped.startswith("//")`,
-mais 24 adicionais verificados manualmente — strings de diagnóstico em
+mais 24 adicionais verificados manualmente: strings de diagnóstico em
 `std::cerr`/`std::cout`/`std::fprintf`, mensagens `INFO`/descrição de `TEST_CASE`,
 e 3 blocos de comentário `/* ... */` sem prefixo `//` na continuação). Lista
 completa disponível no arquivo de trabalho do scratchpad (não repetida aqui por
 volume; nenhuma dessas 199 ocorrências constrói, guarda ou expõe um `UiLayer`).
 
-### (e) include, alias ou assinatura — 6 sítios
+### (e) include, alias ou assinatura: 6 sítios
 
 ```
 GusEngine/app/tests/difficulty_menu_loop_interaction_test.cpp:111   std::optional<glintfx::UiLayer> load_probe_ui(...)   (assinatura do helper de (a))
@@ -129,7 +129,7 @@ GusEngine/app/tools/framegrab_ordem/framegrab_ordem_probe.cpp:366   const glintf
 ```
 
 As 4 últimas são variáveis de um **tipo aninhado** (`UiLayer::CapturedFrame`),
-não do próprio `UiLayer` — não instanciam nem guardam a UiLayer, por isso não
+não do próprio `UiLayer`; não instanciam nem guardam a UiLayer, por isso não
 entram em (a)/(b); classificadas aqui por serem usos de um tipo qualificado
 pelo nome de `UiLayer` sem ser construção/storage/parâmetro.
 
@@ -154,7 +154,7 @@ aceita):** a coluna acima descreve o par emplace/reset canônico das 6
 classes, mas **`BattleScreen` tem um terceiro toque em `ui_`** que a tabela
 por si só não captura: `battle_preview.cpp:444`, um `ui_.reset()` **dentro do
 próprio `enter()`** (range 289–1612, o mesmo onde está o `.emplace()` de
-`:360`) — não em `exit()`. Contexto:
+`:360`), não em `exit()`. Contexto:
 
 ```cpp
 } else {
@@ -165,18 +165,18 @@ próprio `enter()`** (range 289–1612, o mesmo onde está o `.emplace()` de
 ```
 
 É o **ramo de falha do próprio `enter()`**: se o attach da `UiLayer` não deu
-certo (`ok()==false`), libera na hora e a tela segue sem UI — não é um sítio
+certo (`ok()==false`), libera na hora e a tela segue sem UI; não é um sítio
 fora do contrato, é limpeza de falha, e reforça a garantia (um layer que
 falhou não fica pendurado até o `exit()`). Verifiquei as outras 5 classes
 (`grep -n "ui_\.emplace\|ui_\.reset"` em cada arquivo) e **nenhuma tem
-equivalente** — cada uma tem exatamente 1 `emplace()` + 1 `reset()`, só
+equivalente**: cada uma tem exatamente 1 `emplace()` + 1 `reset()`, só
 `BattleScreen` tem os 3 toques. A formulação anterior deste documento
 ("`.reset()` só em `exit()`", sem essa ressalva) estava imprecisa; corrigida
 aqui e na seção 7.
 
 Prova de (ii) para cada classe: `grep -rn "\bNomeDaClasse\b"` no repo inteiro
 (fora do próprio arquivo de definição) não retorna **nenhum outro** ponto de
-construção — apenas comentários/docs citando o nome, e (para `BattleScreen`,
+construção; apenas comentários/docs citando o nome, e (para `BattleScreen`,
 `TitleScreen`, `SystemMenuLoopScreen`, `SaveLoadScreen`, `NpcDialogueScreen`,
 `DifficultyScreen`) as definições fora-de-linha dos próprios métodos. Cada
 classe é `final : public gus::app::ScreenState`.
@@ -188,15 +188,15 @@ o `TitleScreen title_screen(...)` é construído uma vez fora do loop; dentro do
 `for(;;)`, `run_screen_state(title_screen, sync_hook)` roda e só then, **depois
 que a chamada retorna** (o que estruturalmente já rodou `title_screen.exit()`,
 liberando a `UiLayer` do título), o driver invoca
-`run_difficulty_menu_loop_gl_current(...)` — que por sua vez constrói o
+`run_difficulty_menu_loop_gl_current(...)`, que por sua vez constrói o
 `DifficultyScreen` e chama seu próprio `run_screen_state`. A chamada aninhada
 está no **mesmo nível de aninhamento do driver**, nunca dentro de
-`handle_event()`/`tick()` do `TitleScreen` — não há caminho de código em que as
+`handle_event()`/`tick()` do `TitleScreen`; não há caminho de código em que as
 duas `UiLayer` (título e dificuldade) coexistam.
 
 **Pausa → Salvar/Carregar** (`system_menu_loop.cpp`, `ui_.reset()` em `:1044`
 antes das chamadas aninhadas em `:1671+`): **já verificado pelo líder da fatia
-(CTO) antes deste brief** — cito conforme instruído, sem re-derivar.
+(CTO) antes deste brief**: cito conforme instruído, sem re-derivar.
 
 ## 4. A hipótese dos quatro `_rml` (+ `battle_input`)
 
@@ -205,7 +205,7 @@ Hipótese: `system_menu_rml.{hpp,cpp}`, `save_load_menu_rml.{hpp,cpp}`,
 binding chamados **pelos** loops, não telas próprias.
 
 **Medida pela classificação da seção 2**: nenhuma das ocorrências de `UiLayer`
-nesses 8 arquivos cai em (a), (b) ou (c) — **todas são (d) comentário/string**.
+nesses 8 arquivos cai em (a), (b) ou (c): **todas são (d) comentário/string**.
 Nenhum deles constrói (`emplace`/ctor), guarda (`optional<UiLayer>`) ou recebe
 por referência um `UiLayer`. Tabela por arquivo:
 
@@ -231,39 +231,39 @@ e é passada/consultada de fora. Nenhum deles é uma tela própria.
 
 Recebem `glintfx::UiLayer&` de uma `UiLayer` já viva (a da classe-dono
 correspondente, chamados de dentro do próprio `enter()`). **MANUAL-SEGURO**
-por construção — não há storage próprio, a referência não sobrevive à chamada.
+por construção: não há storage próprio, a referência não sobrevive à chamada.
 
 ### Construções locais em pilha fora das classes-dono (11 sítios de classe a)
 
 Dividem-se em duas categorias:
 
-**PROCESS-SEPARADO** (9 sítios) — cada um é o único `add_executable` do seu
+**PROCESS-SEPARADO** (9 sítios): cada um é o único `add_executable` do seu
 próprio binário de ferramenta, nunca linkado ao jogo:
 `framegrab_ordem_probe.cpp:262`, `sysmenu_controls_screenshot_probe.cpp:150`,
 `npcdlg_screenshot_probe.cpp:162`, `sysmenu_pause_screenshot_probe.cpp:140`,
 `msaa_glintfx_probe.cpp:306`, `frozen_bg_probe.cpp:199` e `:281` (dois
 construtores no MESMO binário, mas em blocos `{ }` sequenciais dentro do mesmo
-`main()` — o primeiro (`"dialogo"`) sai de escopo e destrói antes do segundo
+`main()`: o primeiro (`"dialogo"`) sai de escopo e destrói antes do segundo
 (`"pausa"`) ser construído; verifiquei o código-fonte linha a linha, sem
-overlap), `save_load_screenshot_probe.cpp:164` — confirmado via
+overlap), `save_load_screenshot_probe.cpp:164`, confirmado via
 `GusEngine/app/tools/CMakeLists.txt` e `GusEngine/app/tools/framegrab_ordem/CMakeLists.txt`
 (cada nome tem seu próprio `add_executable`).
 
-**MANUAL-SEGURO** (2 sítios, mesmo binário de teste `gusengine_app_tests`) —
+**MANUAL-SEGURO** (2 sítios, mesmo binário de teste `gusengine_app_tests`):
 `difficulty_menu_loop_interaction_test.cpp:113` (helper `load_probe_ui`) e
 `save_load_menu_interaction_test.cpp:142`/`:904` (helper `load_ui` e um
-`TEST_CASE` direto): todas construções são locais de bloco `{ }` com RAII —
+`TEST_CASE` direto): todas construções são locais de bloco `{ }` com RAII:
 verifiquei especificamente o padrão em `save_load_menu_interaction_test.cpp:359-369`
 e `:379-386`, cada `auto probe_ui = load_ui(...)` sai de escopo (destruindo a
 `UiLayer`) antes do próximo ser aberto, com o comentário do próprio autor
 confirmando a disciplina ("FECHA a UiLayer de sondagem ANTES do loop real abrir
 a SUA PROPRIA"). Nota adicional: `catch_discover_tests(gusengine_app_tests ...)`
 (ver `app/tests/CMakeLists.txt:184`) registra **um CTest por `TEST_CASE`**, o
-que na prática invoca o binário filtrado por nome de teste — cada `TEST_CASE`
+que na prática invoca o binário filtrado por nome de teste; cada `TEST_CASE`
 roda em processo próprio quando disparado via `ctest`. Mesmo se alguém rodar o
 binário inteiro manualmente (todos os `TEST_CASE`s em 1 processo), o Catch2
 executa cada `TEST_CASE` até o fim, incluindo destrutores, antes do próximo
-começar — não há caminho para dois `UiLayer` de `TEST_CASE`s diferentes
+começar; não há caminho para dois `UiLayer` de `TEST_CASE`s diferentes
 coexistirem. **Nenhum destes 11 sítios é um caso de dois `UiLayer` simultâneos.**
 
 ## 6. Verificação da edição do agente anterior (commit `287c29b`)
@@ -277,7 +277,7 @@ não a working tree): o comentário "EXCLUSIVIDADE DO UILAYER" em
 de fato e tem a mensagem
 `fix(BATTLE-ESC-PAUSE-ACTOR-LIST): revert menu de pausa na arena de batalha (crash real ao vivo)`,
 batendo exatamente com o texto inserido. **Zero mudança de código**, a troca é
-puramente textual — a semântica da garantia estrutural descrita no comentário
+puramente textual; a semântica da garantia estrutural descrita no comentário
 (a que `run_screen_state()` implementa) não foi alterada. Edição do agente
 anterior **verificada e correta**.
 
@@ -287,7 +287,7 @@ anterior **verificada e correta**.
   a garantia estrutural de `run_screen_state()`/`ScreenState`: `.emplace()`
   só em `enter()`; `.reset()` no `exit()` em todas as 6, **mais um `reset()`
   de limpeza no ramo de falha do próprio `enter()` em `BattleScreen`
-  (`battle_preview.cpp:444`, quando `ui_->ok()==false` — libera na hora e
+  (`battle_preview.cpp:444`, quando `ui_->ok()==false`, libera na hora e
   segue sem UI, não fica pendurado até o `exit()`; ver correção na seção 3)**;
   e cada classe tem exatamente um ponto de instanciação no repositório
   inteiro, sempre seguido imediatamente por `run_screen_state()`.
@@ -295,7 +295,7 @@ anterior **verificada e correta**.
   (9, ferramentas standalone) ou **MANUAL-SEGURO** (2, helpers de teste
   RAII-escopados, comprovados sem overlap).
 - A hipótese dos 4 `_rml` (+ `battle_input`) **se confirma por medição**: 100%
-  das ocorrências nesses 8 arquivos são (d) comentário/string — nenhum
+  das ocorrências nesses 8 arquivos são (d) comentário/string; nenhum
   constrói, guarda ou recebe por referência um `UiLayer`.
 - A edição do commit `287c29b` foi **verificada e está correta**: troca de
   referência morta por âncoras estáveis, zero mudança de semântica.
@@ -312,5 +312,5 @@ $ git status --porcelain
 ?? GusEngine/app/tools/appmode_spike/
 ```
 
-Idêntico ao estado inicial — nenhuma mudança introduzida por esta auditoria
+Idêntico ao estado inicial; nenhuma mudança introduzida por esta auditoria
 além deste próprio documento.
