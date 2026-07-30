@@ -63,6 +63,7 @@
 #include <string>
 #include <vector>
 
+#include <glintfx/clock.hpp>  // FW-CLOCK (bump v0.26.0): substitui SDL_GetTicksNS
 #include <glintfx/element_box.hpp>
 #include <glintfx/ui_layer.hpp>
 
@@ -507,7 +508,7 @@ class TitleScreen final : public gus::app::ScreenState {
         // cada enter()).
         boot_bg_.load(*backdrop_, gus::platform::assets::FilesystemAssetSource().resolve_path(
                                        gus::core::assets::kVfxBootPixelDir));
-        boot_bg_start_ns_ = SDL_GetTicksNS();
+        boot_bg_start_ns_ = glintfx::monotonic_now_ns();  // FW-CLOCK (bump v0.26.0)
 
         // COCKPIT-SFX-HOVER-CLIQUE: SFX de hover/clique - load_sfx a CADA
         // enter() (MESMA cautela de "load_sfx NUNCA no frame", os SoundId
@@ -674,8 +675,8 @@ class TitleScreen final : public gus::app::ScreenState {
         const gus::core::spatial::Rect cam{0.0f, 0.0f, static_cast<float>(pw_),
                                             static_cast<float>(ph_)};
         backdrop_->begin_frame(cam, pw_, ph_);
-        const float boot_bg_elapsed_s =
-            static_cast<float>(SDL_GetTicksNS() - boot_bg_start_ns_) / 1.0e9f;
+        const float boot_bg_elapsed_s =  // FW-CLOCK (bump v0.26.0)
+            static_cast<float>(glintfx::monotonic_now_ns() - boot_bg_start_ns_) / 1.0e9f;
         const int boot_bg_frame = gus::core::anim::boot_pixel_idle_frame_index(
             boot_bg_elapsed_s, gus::core::anim::kBootPixelFrameCount);
         boot_bg_.draw_idle(*backdrop_, cam, boot_bg_frame);

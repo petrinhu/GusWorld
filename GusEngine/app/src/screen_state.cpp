@@ -24,6 +24,8 @@
 
 #include <stdexcept>
 
+#include <glintfx/clock.hpp>  // FW-CLOCK (bump v0.26.0): substitui SDL_GetTicksNS
+
 #include "gus/app/screen_state.hpp"
 
 namespace gus::app {
@@ -66,7 +68,9 @@ void run_screen_state(ScreenState& screen, const EventSyncHook& sync_hook,
         poll_fn = [](SDL_Event& ev) { return SDL_PollEvent(&ev); };
     }
     if (!now_fn) {
-        now_fn = [] { return SDL_GetTicksNS(); };
+        // FW-CLOCK (bump v0.26.0): assinatura identica a SDL_GetTicksNS
+        // (uint64_t(*)()) - troca de 1 token, sem lambda.
+        now_fn = glintfx::monotonic_now_ns;
     }
 
     screen.enter();

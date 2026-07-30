@@ -360,12 +360,14 @@ private:
     gus::domain::save::SaveData save_{};
 
     // SAVE-LOAD-UI etapa 6 (playtime REAL, nao fingido): playtime_seconds no
-    // instante de um Salvar = playtime_base_seconds_ + (SDL_GetTicksNS() -
-    // playtime_anchor_ns_)/1e9. playtime_anchor_ns_ e RESETADO pra "agora" (e
+    // instante de um Salvar = playtime_base_seconds_ + (glintfx::monotonic_now_ns()
+    // - playtime_anchor_ns_)/1e9 (FW-CLOCK, bump v0.26.0 - substitui SDL_GetTicksNS,
+    // mesmo contrato: relogio monotonico em nanossegundos desde o boot do
+    // processo). playtime_anchor_ns_ e RESETADO pra "agora" (e
     // playtime_base_seconds_ pro playtime_seconds do save) toda vez que um Load
     // aplica com sucesso - assim o acumulo segue correto mesmo apos carregar um
     // save de uma sessao anterior (o relogio da SESSAO ATUAL sempre comeca do
-    // zero, SDL_GetTicksNS() e desde o boot do processo, nao desde o save).
+    // zero, nao desde o save).
     unsigned long long playtime_anchor_ns_ = 0;
     double playtime_base_seconds_ = 0.0;
 
