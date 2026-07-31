@@ -551,6 +551,51 @@ set(GLINTFX_MODULE_DRAW2D    ON  CACHE BOOL "" FORCE)
 #     include/glintfx/config.hpp), nao no CMakeLists declarativo: "0.27.0".
 # Build local + gate ASan + suite completa (2596 testes, MESMA contagem do pin anterior - o bump
 # nao soma nem remove teste nosso) verdes no pin novo antes deste commit.
+#
+# BUMP v0.27.0 -> v0.28.0 (BUMP-GLINTFX-V028, 2026-07-30): SO o GIT_TAG, ZERO ajuste de codigo
+# de producao. ⚠️ Uma mudanca BREAKING no papel (UILAYER-CTOR-GUARD: o construtor do UiLayer
+# agora VALIDA logical_width/logical_height e deixa ok()==false em vez de construir um contexto
+# degenerado em silencio), mas ZERO impacto medido aqui: os 18 sitios de construcao de UiLayer
+# do repo (6 producao + 3 teste + 9 ferramenta) foram ENUMERADOS, nao amostrados - TODOS usam
+# 960/540 literal ou uma constante kW/kH do proprio arquivo, NENHUM le uma dimensao de janela
+# ao vivo que pudesse chegar 0x0 (o cenario Wayland-minimizado que o proprio changelog deles
+# aponta como o caso real). O achado de producao deles ("Element meta pool not empty on
+# shutdown, 75 object(s) leaked", UILAYER-SINGLETON) e o MESMO incidente que ja gerou o guard de
+# reentrancia deste projeto em screen_state.cpp (ActiveGuard, ver o comentario la: "o crash real
+# de 2 glintfx::UiLayer vivos ao mesmo tempo ja derrubou o lider ao vivo uma vez") - o hazard nao
+# e novo pra nos, ja estava mitigado em codigo antes desta tag chegar.
+#   - Flags GLINTFX_MODULE_*/GLINTFX_BACKEND_GLFW/GLINTFX_OWN_FONT_ENGINE: conjunto de NOMES
+#     IDENTICO entre v0.27.0 e v0.28.0 (diff do grep `GLINTFX_[A-Z0-9_]+` ordenado dos dois
+#     CMakeLists.txt deles = vazio). Unica mudanca no CMakeLists deles e cosmetica de
+#     organizacao: src/gl_proc.cpp e src/frame_capture.cpp saem do bloco gateado por
+#     GLINTFX_MODULE_APP e viram fontes INCONDICIONAIS (GLPROC-EMBED: gl_proc_address() deixou
+#     de ser so-modo-App), sem GATE novo nem flag nova pra nos setarmos.
+#   - Pin do RmlUi deles continua no MESMO SHA 2cd28864ae25ed345b70598751703a5433b12356 (linha
+#     751 do CMakeLists.txt deles na v0.28.0) e o patch
+#     patches/rmlui-2cd28864-teardown-ub.patch da tag v0.28.0 e IDENTICO byte-a-byte ao nosso
+#     vendorizado (`diff` limpo).
+#   - Vendors deles (gamecontrollerdb/khronos/miniaudio/stb): arvore GIT recursiva das duas tags
+#     (`gh api .../git/trees/v0.2{7,8}.0?recursive=true`, filtrada por `third_party`) comparada
+#     arquivo-a-arquivo, nao so por diretorio (a lacuna de metodo que o proprio
+#     THIRD-PARTY-LICENSES.md documentou na v0.27.0) - diff VAZIO, nenhum arquivo novo, nenhum
+#     removido. THIRD-PARTY-LICENSES.md NAO precisou de toque nesta fatia.
+#   - Seis funcoes ganham `noexcept` nesta release (FONT-NOTHROW/CAPTURE-NOTHROW/
+#     GAMEPAD-NOTHROW fecham a familia "never a crash" em 6 membros: Draw2d::load_font,
+#     Engine::capture_frame (por tras de UiLayer::capture_frame/App::capture_frame),
+#     Gamepads::load_mappings_file) - checado que nosso codigo NUNCA pega o ENDERECO dessas
+#     funcoes (`&glintfx::...`/`decltype`) nem espera excecao vinda delas (todo `catch` do
+#     repo foi listado; nenhum esta perto de um call site glintfx) - `noexcept` so muda o TIPO
+#     pra quem toma ponteiro-de-funcao, e nao existe nenhum caso aqui.
+#   - `capture_framebuffer()` (funcao livre nova, CAPTURE-FREE) e `decode_png_file()`
+#     (DEC-FORMAT-SURFACE) sao API nova ADITIVA, nao adotada nesta fatia (fora de escopo - o
+#     nosso `ui_->capture_frame()` ja e metodo de instancia e ja funciona; migrar pra funcao
+#     livre e decisao de fatia propria). `load_gl=false` (o gatilho do GLPROC-CRASH deles) NUNCA
+#     e usado no nosso repo - os 18 sitios sao TODOS `load_gl=true` (grep integral, nao
+#     amostrado).
+#   - GLINTFX_VERSION conferido no config.hpp GERADO (build/linux-release/_deps/glintfx-build/
+#     include/glintfx/config.hpp), nao no CMakeLists declarativo: "0.28.0".
+# Build local + suite completa (2611 testes) + tools/check.sh (10/10) verdes no pin novo antes
+# deste commit (contagem de testes no relatorio da fatia F1).
 
 FetchContent_Declare(
     glintfx
@@ -560,7 +605,7 @@ FetchContent_Declare(
     # evidencia, nao presumida: a tag v0.20.0 tem o MESMO sha nos dois hosts
     # (9bfaabfa, apontando pro commit 0442dd15 que ja esta no nosso _deps).
     GIT_REPOSITORY https://github.com/petrinhu/glintfx
-    GIT_TAG        v0.27.0
+    GIT_TAG        v0.28.0
     SOURCE_SUBDIR  glintfx
 )
 FetchContent_MakeAvailable(glintfx)
