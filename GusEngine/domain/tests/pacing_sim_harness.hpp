@@ -483,6 +483,13 @@ inline constexpr double kTrashNoDamagePctCeiling = 40.0;
 inline constexpr double kTrashFinalHpPctMin = 55.0;
 inline constexpr double kTrashFinalHpPctMax = 90.0;
 inline constexpr double kEliteFinalHpPctMax = 70.0;  // elite tem que doer
+
+// NOTA informativa de E2, NAO guarda-corpo (achado do team-lead 2026-08-01, Fase A
+// real): o guarda-corpo de cauda (p10>=2, p90<=7) pode aprovar um ponto onde quase
+// nenhuma luta cai de fato na janela 3-5. 50% e limiar NEUTRO (maioria vs minoria),
+// so pra imprimir um alerta - nunca usado por evaluate_guardrails, que continua
+// intocado (mudar guarda-corpo depois de ver dado seria pesca de resultado).
+inline constexpr double kE2WindowPctAsteriskThreshold = 50.0;
 // E8 (secao 4, regra dura, so trash): "Nenhum candidato com mediana de 1a queda nas
 // rodadas 1-2 no trash" - paulada injusta vs tensao construida, achado do QA 2026-08-01
 // (o harness JA calculava median_first_fall_round mas nenhum guarda-corpo bloqueava).
@@ -806,7 +813,20 @@ inline void print_point_report_layer1(std::ostream& out, const PacingPointReport
         << "  E2 (duracao, primaria): rounds mean=" << r.mean_rounds
         << " median=" << r.median_rounds << " p10=" << r.p10_rounds << " p90=" << r.p90_rounds
         << "  janela-3-5=" << r.pct_in_window_3_5.value << "%+-" << r.pct_in_window_3_5.moe95
-        << "\n"
+        << "\n";
+    if (r.pct_in_window_3_5.value < kE2WindowPctAsteriskThreshold) {
+        // Achado do QA/team-lead 2026-08-01 (Fase A real, ponto P3 healer): o
+        // guarda-corpo de E2 mede so a CAUDA (p10>=2, p90<=7), nao a % dentro da
+        // janela - um ponto pode APROVAR com p10=p90=7 e quase nenhuma luta caindo
+        // de fato em 3-5. NAO e para mudar o guarda-corpo por conta propria (regua
+        // pre-registrada, mudar depois de ver dado e pesca de resultado) - so
+        // registrar a observacao, pra quem ler nao confundir "aprovado" com "a
+        // maioria das lutas na janela". Limiar de 50% e informativo, nao guarda-corpo.
+        out << "  ATENCAO E2: so " << r.pct_in_window_3_5.value << "% das lutas caem de fato "
+            << "na janela 3-5 - o guarda-corpo de cauda (p10/p90) pode aprovar um ponto que "
+            << "raramente acerta o alvo primario. Merece asterisco antes de chegar ao lider.\n";
+    }
+    out
         << "  E3 (concentracao, regressao): media=" << r.concentration_pct.value << "%+-"
         << r.concentration_pct.moe95 << "  saco-de-pancadas=" << r.pct_saco_de_pancadas.value
         << "%+-" << r.pct_saco_de_pancadas.moe95 << "\n"
@@ -1084,6 +1104,126 @@ struct PacingPointResult {
         }
     }
     return out;
+}
+
+// ============================================================================
+// Fase B (protocolo secao 2.1/2.1 metodo, decisao do lider 2026-08-01 apos a Fase A
+// REAL rodar): SO TRASH - o braco elite ficou CONGELADO (decisao do lider: a party
+// simulada entra na luta de elite sem carta nenhuma, e sem a bateria de energia das
+// cartas - o motor de techMagic tem 11/12 efeitos e 5 cartas placeholder, mas falta o
+// CUSTO - uma party simulada usaria carta de graca toda rodada, trocando o erro
+// pessimista de hoje por um erro otimista do mesmo tamanho; NADA do braco elite foi
+// apagado deste arquivo, so nao entra nesta fase). Metodo DIRECIONAL, nao o mini-grid
+// simetrico generico: H1 confirmou na Fase A real que o HP e a alavanca dominante e
+// MONOTONICA da duracao (Atk=8 fixo: HP 0.40->2.00 rodadas, 0.60->4.00, 0.80->5.00,
+// 1.00->7.00 rodadas, sem excecao) - a bissecao deixou de ser suposicao (H1 ainda nao
+// confirmada) e virou conclusao apoiada pelos dados. Reusa neighbor_axes (10% de HP,
+// 1 de Atk, exatamente o passo que a H1 confirmada autoriza usar) SEM reimplementar o
+// passo, so aplicado aos 2 vencedores reais da Fase A (numeros abaixo sao DADO, nao
+// protocolo - vieram do run de 240.000 lutas/ponto do team-lead em 2026-08-01).
+// ============================================================================
+
+// Um "vencedor" da Fase A real: os eixos aprovados + os cenarios aos quais eles se
+// aplicam (P1/P2 compartilham o mesmo vencedor; P3 tem o seu proprio, com X4).
+struct PacingWinner {
+    std::vector<Scenario> scenarios;
+    PacingAxes axes;
+    std::string label;
+};
+
+// Os 2 vencedores da Fase A real (2026-08-01, N=240.000/ponto, 27.840.000 lutas, 3 de
+// 116 pontos aprovados - o 3o e o P3 abaixo). Estes numeros SAO DADO, nao protocolo:
+// mudam se uma nova Fase A rodar com N diferente ou seed diferente.
+[[nodiscard]] inline std::vector<PacingWinner> phase_a_winners_2026_08_01() {
+    // Vencedor P1/P2: HP=0.60 (33 HP) Atk=12 - vitoria 92.8%, 3.89 rodadas, 96.9% na
+    // janela 3-5, Gus caiu em 7.2% das lutas.
+    PacingAxes winner_p1p2;
+    winner_p1p2.hp_mult = 0.60;
+    winner_p1p2.atk = 12;
+
+    // Vencedor P3 (healer): HP=1.00 (55 HP) Atk=14 heal=6 - aprovado pelos guarda-
+    // corpos, MAS so 4.4% das lutas caem de fato na janela 3-5 (passou pela CAUDA,
+    // p10=7/p90=7 - ver a nota "ATENCAO E2" impressa automaticamente no relatorio,
+    // achado do team-lead: nao mudar o guarda-corpo, so registrar).
+    PacingAxes winner_p3;
+    winner_p3.hp_mult = 1.00;
+    winner_p3.atk = 14;
+    winner_p3.heal_amount = 6;
+
+    return {
+        {{Scenario::P1_TrashVanilla, Scenario::P2_TrashParede}, winner_p1p2,
+        "vencedor P1/P2 (HP=0.60 Atk=12)"},
+        {{Scenario::P3_TrashHealer}, winner_p3, "vencedor P3 healer (HP=1.00 Atk=14 heal=6)"},
+    };
+}
+
+// Grade da Fase B: vizinhanca de CADA vencedor (neighbor_axes, levels=1 - passo de 10%
+// de HP e 1 de Atk, exatamente o que o protocolo pede), rodada nos MESMOS cenarios a
+// que aquele vencedor se aplica. 2 vencedores: (8 vizinhos x 2 cenarios) + (8 vizinhos
+// x 1 cenario) = 24 pontos.
+[[nodiscard]] inline std::vector<PacingGridPoint> build_phase_b_grid() {
+    std::vector<PacingGridPoint> points;
+    for (const PacingWinner& w : phase_a_winners_2026_08_01()) {
+        const std::vector<PacingAxes> neighbors = neighbor_axes(w.axes, /*levels=*/1);
+        for (const PacingAxes& n : neighbors) {
+            for (Scenario s : w.scenarios) {
+                points.push_back({s, n,
+                                 phase_a_point_label("trash", s, n) + " (refino de " + w.label + ")"});
+            }
+        }
+    }
+    return points;
+}
+
+// Roda a Fase B inteira (SO se houver vencedores - a Fase B "para" que o time ja fez:
+// olhar os dados da Fase A real e decidir o metodo, protocolo secao 2.1 - ja aconteceu
+// ANTES desta funcao existir; phase_a_winners_2026_08_01() e o registro dessa decisao).
+// Mesma disciplina de impressao da Fase A: progresso em tempo real, relatorio de 2
+// camadas IMEDIATO por ponto, banner final com contagem de aprovados. Declara
+// explicitamente se a grade ficar vazia (defesa em profundidade - nesta fase o vetor de
+// vencedores e uma constante nao-vazia, mas o codigo nao presume isso por fora).
+[[nodiscard]] inline std::vector<PacingPointResult> run_phase_b(int n_per_point,
+                                                                 std::uint32_t base_seed,
+                                                                 std::ostream& out) {
+    const std::vector<PacingGridPoint> grid = build_phase_b_grid();
+    out << "=== PACING-SIM: Fase B (refino direcional, SO trash, " << grid.size()
+        << " pontos) ===\n"
+        << "protocolo: docs/design/mecanicas/proposta-protocolo-simulacao-pacing.md secao 2.1\n"
+        << "metodo: DIRECIONAL (H1 confirmada na Fase A real 2026-08-01 - HP e alavanca "
+        << "dominante e monotonica da duracao). Elite CONGELADO (falta a bateria de energia "
+        << "das cartas) - nao entra nesta fase.\n"
+        << "N por ponto: " << n_per_point << "  |  seed base: " << base_seed << "\n"
+        << "====================================================================\n";
+
+    if (grid.empty()) {
+        out << "Fase B NAO RODA: nenhum vencedor da Fase A disponivel pra refinar "
+            << "(protocolo secao 1.3 item 2: pode ser sinal de que o problema e a FORMULA, "
+            << "nao os numeros).\n";
+        return {};
+    }
+
+    std::vector<PacingPointResult> results;
+    results.reserve(grid.size());
+    int point_idx = 0;
+    for (const PacingGridPoint& gp : grid) {
+        ++point_idx;
+        PacingPointResult r = run_and_evaluate_point(gp, n_per_point, base_seed, &out, 'B',
+                                                     point_idx, static_cast<int>(grid.size()));
+        out << "\n### ponto " << point_idx << " de " << grid.size() << ": " << gp.label << " ###\n";
+        print_point_report_layer1(out, r.report);
+        print_point_guardrails_layer2(out, r.report);
+        out.flush();
+        results.push_back(std::move(r));
+    }
+
+    const long approved_count =
+        std::count_if(results.begin(), results.end(), [](const PacingPointResult& r) { return r.approved; });
+    out << "\n=== Fase B concluida: " << approved_count << " de " << results.size()
+        << " pontos aprovados em TODOS os guarda-corpos ===\n"
+        << "Fase C NAO RODA AUTOMATICAMENTE (decisao do lider): todos os sobreviventes da "
+        << "Fase B entram na bateria completa, e o corte para os 2-4 finalistas e feito por "
+        << "gente, na hora de levar ao lider - nunca por corte automatico deste harness.\n";
+    return results;
 }
 
 }  // namespace gus::domain::tests::pacing_sim

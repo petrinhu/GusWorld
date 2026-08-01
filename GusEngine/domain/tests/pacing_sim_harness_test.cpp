@@ -771,6 +771,39 @@ TEST_CASE("pacing_sim: relatorio avisa o escopo de E11 (protocolo define so P1) 
     CHECK(out.str().find("NOTA E11") != std::string::npos);
 }
 
+// Achado do team-lead 2026-08-01 (Fase A real, ponto P3 healer aprovado com so 4.4% na
+// janela 3-5): o guarda-corpo de E2 mede so a CAUDA (p10/p90), nao a % dentro da janela
+// - registrar a observacao no relatorio SEM mudar o guarda-corpo (pre-registrado, mudar
+// depois de ver dado e pesca de resultado).
+TEST_CASE("pacing_sim: relatorio avisa quando poucas lutas caem na janela apesar da cauda "
+          "aprovar (E2)",
+          "[domain][pacing_sim]") {
+    PacingPointReport r;
+    r.scenario = "ponto-teste";
+    r.n = 100;
+    r.pct_in_window_3_5.value = 4.4;  // MUITO abaixo do limiar informativo de 50%
+    r.p10_rounds = 7.0;
+    r.p90_rounds = 7.0;  // cauda OK (p90<=7), mas quase nada na janela
+
+    std::ostringstream out;
+    print_point_report_layer1(out, r);
+    CHECK(out.str().find("ATENCAO E2") != std::string::npos);
+}
+
+TEST_CASE("pacing_sim: relatorio NAO avisa quando a maioria das lutas cai na janela",
+          "[domain][pacing_sim]") {
+    PacingPointReport r;
+    r.scenario = "ponto-teste";
+    r.n = 100;
+    r.pct_in_window_3_5.value = 96.9;  // maioria clara na janela (caso real do vencedor P1/P2)
+    r.p10_rounds = 3.0;
+    r.p90_rounds = 5.0;
+
+    std::ostringstream out;
+    print_point_report_layer1(out, r);
+    CHECK(out.str().find("ATENCAO E2") == std::string::npos);
+}
+
 // ============================================================================
 // Grade da Fase A (protocolo secao 2.1/3): 116 pontos = 80 trash + 36 elite. Numeros
 // DERIVADOS A MAO da propria conta do protocolo (16 x 5 = 80; 18 x 2 = 36), conferida
@@ -923,6 +956,34 @@ TEST_CASE("pacing_sim: run_phase_a - disparo real da Fase A (N=240k - grava em a
     run_phase_a(n_per_point, base_seed, tee);
 }
 
+// Disparo REAL da Fase B (protocolo secao 2.1, metodo direcional - decisao do lider
+// 2026-08-01 apos H1 confirmada). Gate PROPRIO (GUSWORLD_PACING_SIM_PHASE_B_FULL),
+// separado do gate da Fase A - as duas fases NAO se encadeiam automaticamente (decisao
+// do lider), entao cada uma tem seu proprio disparo independente. 24 pontos x 240.000 =
+// 5.760.000 lutas (~1 minuto na taxa medida de ~93.000 lutas/seg).
+TEST_CASE("pacing_sim: run_phase_b - disparo real da Fase B (N=240k - grava em arquivo)",
+          "[domain][pacing_sim][pacing_sim_smoke]") {
+    const bool full_run = std::getenv("GUSWORLD_PACING_SIM_PHASE_B_FULL") != nullptr;
+    const std::uint32_t base_seed = 20260801;
+
+    if (!full_run) {
+        const int n_per_point = 5;
+        std::ostringstream out;
+        REQUIRE_NOTHROW(run_phase_b(n_per_point, base_seed, out));
+        return;
+    }
+
+    const int n_per_point = 240000;
+    const char* report_path_env = std::getenv("GUSWORLD_PACING_SIM_PHASE_B_REPORT_PATH");
+    const std::string report_path = report_path_env != nullptr
+                                        ? std::string(report_path_env)
+                                        : std::string("pacing_sim_phase_b_report.txt");
+    std::ofstream file(report_path);
+    REQUIRE(file.is_open());
+    TeeOstream tee(std::cout, file);
+    run_phase_b(n_per_point, base_seed, tee);
+}
+
 // ============================================================================
 // Primitivas puras pra Fase B/C (scenarios_for_tier, run_full_battery, neighbor_axes) -
 // NAO decidem o metodo (ambiguidade sinalizada ao team-lead), so os blocos mecanicos.
@@ -1004,6 +1065,88 @@ TEST_CASE("pacing_sim: neighbor_axes(levels=2) gera 24 vizinhos (5x5 menos o pro
     base.atk = 10;
     const auto neighbors = neighbor_axes(base, 2);
     REQUIRE(neighbors.size() == 24);  // 5x5 - 1
+}
+
+// ============================================================================
+// Fase B (protocolo secao 2.1, metodo direcional - decisao do lider 2026-08-01 apos H1
+// confirmada na Fase A real). SO trash; elite CONGELADO (nao apagado, so nao entra).
+// ============================================================================
+
+TEST_CASE("pacing_sim: phase_a_winners_2026_08_01 tem os 2 vencedores reais da Fase A",
+          "[domain][pacing_sim]") {
+    const auto winners = phase_a_winners_2026_08_01();
+    REQUIRE(winners.size() == 2);
+
+    const PacingWinner& w_p1p2 = winners[0];
+    CHECK(w_p1p2.scenarios.size() == 2);
+    CHECK(w_p1p2.axes.hp_mult == Catch::Approx(0.60));
+    CHECK(w_p1p2.axes.atk == 12);
+
+    const PacingWinner& w_p3 = winners[1];
+    REQUIRE(w_p3.scenarios.size() == 1);
+    CHECK(w_p3.scenarios[0] == Scenario::P3_TrashHealer);
+    CHECK(w_p3.axes.hp_mult == Catch::Approx(1.00));
+    CHECK(w_p3.axes.atk == 14);
+    CHECK(w_p3.axes.heal_amount == 6);
+}
+
+TEST_CASE("pacing_sim: build_phase_b_grid tem exatamente 24 pontos (8 vizinhos x 2 cenarios "
+          "+ 8 vizinhos x 1 cenario)",
+          "[domain][pacing_sim]") {
+    const auto grid = build_phase_b_grid();
+    REQUIRE(grid.size() == 24);
+    for (const PacingGridPoint& gp : grid) REQUIRE(tier_of(gp.scenario) == Tier::Trash);
+
+    // 16 pontos vem do vencedor P1/P2 (8 vizinhos x 2 cenarios).
+    const long p1_count = std::count_if(grid.begin(), grid.end(), [](const PacingGridPoint& gp) {
+        return gp.scenario == Scenario::P1_TrashVanilla;
+    });
+    const long p2_count = std::count_if(grid.begin(), grid.end(), [](const PacingGridPoint& gp) {
+        return gp.scenario == Scenario::P2_TrashParede;
+    });
+    const long p3_count = std::count_if(grid.begin(), grid.end(), [](const PacingGridPoint& gp) {
+        return gp.scenario == Scenario::P3_TrashHealer;
+    });
+    CHECK(p1_count == 8);
+    CHECK(p2_count == 8);
+    CHECK(p3_count == 8);
+}
+
+TEST_CASE("pacing_sim: build_phase_b_grid NUNCA inclui o proprio ponto vencedor (ja testado "
+          "na Fase A)",
+          "[domain][pacing_sim]") {
+    const auto grid = build_phase_b_grid();
+    for (const PacingGridPoint& gp : grid) {
+        const bool is_p1p2_center =
+            (gp.scenario == Scenario::P1_TrashVanilla || gp.scenario == Scenario::P2_TrashParede) &&
+            gp.axes.hp_mult == Catch::Approx(0.60) && gp.axes.atk == 12;
+        const bool is_p3_center = gp.scenario == Scenario::P3_TrashHealer &&
+                                 gp.axes.hp_mult == Catch::Approx(1.00) && gp.axes.atk == 14;
+        CHECK_FALSE(is_p1p2_center);
+        CHECK_FALSE(is_p3_center);
+    }
+}
+
+TEST_CASE("pacing_sim: run_phase_b smoke - progresso, 24 resultados, banner sem corte "
+          "automatico de Fase C",
+          "[domain][pacing_sim][pacing_sim_smoke]") {
+    const int n_per_point = 3;  // N pequeno de proposito - teste estrutural
+    const std::uint32_t base_seed = 20260801;
+
+    std::ostringstream out;
+    const std::vector<PacingPointResult> results = run_phase_b(n_per_point, base_seed, out);
+
+    REQUIRE(results.size() == 24);
+    for (const PacingPointResult& r : results) REQUIRE(r.report.n == n_per_point);
+
+    const std::string text = out.str();
+    REQUIRE(text.find("Fase B") != std::string::npos);
+    REQUIRE(text.find("SO trash") != std::string::npos);
+    REQUIRE(text.find("CONGELADO") != std::string::npos);
+    REQUIRE(text.find("fase [B], ponto [1] de [24], simulação [") != std::string::npos);
+    REQUIRE(text.find("Fase B concluida") != std::string::npos);
+    // Nunca encadeia Fase C automaticamente - decisao explicita do lider.
+    REQUIRE(text.find("NAO RODA AUTOMATICAMENTE") != std::string::npos);
 }
 
 // ============================================================================
