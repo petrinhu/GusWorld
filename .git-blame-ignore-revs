@@ -32,3 +32,7 @@
 
 # chore(legal): SPDX GPL-3.0-or-later nos 524 fontes C++ nossos (2026-07-28)
 9ed1dc752d9bef505eab71b82800fb4d76e62851
+
+# chore(licenca): rotaciona SPDX GPL-3.0-or-later -> Apache-2.0 em 531 fontes
+# do GusEngine (LIC-APACHE-3, 2026-07-31)
+0ab8e0a924db47960e8c9abe86f38f8b651a7d00
