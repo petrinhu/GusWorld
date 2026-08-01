@@ -29,9 +29,34 @@
 //      pelo motor nesta fatia. Ver relatorio de entrega.
 //   2. Cura da Jaci (L4, V10): nao existe CombatActionType de cura nem carta de cura
 //      canonica. Usa CombatActor::heal() (metodo PUBLICO, documentado pra isto) diretamente,
-//      fora do pipeline UseCard/resolve_use_card; a acao devolvida ao motor e Pass (Jaci
-//      gasta o turno). Nao e reimplementacao de regra: heal() e o mesmo metodo que
-//      qualquer carta de cura real usaria.
+//      fora do pipeline UseCard/resolve_use_card. Nao e reimplementacao de regra: heal() e
+//      o mesmo metodo que qualquer carta de cura real usaria. O CUSTO de turno da cura (e
+//      do honeypot/firewall, ambos test-only tambem) e resolvido pela ECONOMIA DE AP abaixo.
+//
+// ECONOMIA DE AP (correcao 2026-08-01, achado do team-lead contra o produto real -
+// battle_scene.cpp:210-224): CombatActor NAO diferencia AP por lado/tier (kBaseApPerTurn=3
+// pra TODO ator); a producao resolve isso na CASCA (nao no motor): o inimigo e gateado a 1
+// acao/turno por CIMA (BattleScene::enemy_acted_this_turn_), a party usa os 3 AP normalmente
+// (o jogador escolhe 3 vezes). Este harness espelha exatamente essa fronteira:
+//   - Inimigo: gateado a 1 acao/turno via `actor.ap() == actor.max_ap()` (so decide de
+//     verdade na 1a chamada do turno; demais chamadas = Pass). Mesmo efeito observavel do
+//     `enemy_acted_this_turn_` da producao, sem precisar de um flag externo (o proprio AP
+//     zerado apos o 1o ataque JA impede reentrar "novo turno" ate o proximo refresh).
+//   - Party: NUNCA gateada por cima. `AttackFront` ataca as 3 vezes (igual ao produto: um
+//     jogador competente usa o turno inteiro). Papeis com efeito test-only de UMA vez por
+//     turno (Defender-entao-atacar, Curar, Honeypot/Firewall) tambem usam
+//     `actor.ap() == actor.max_ap()` pra saber "e minha 1a decisao deste turno": nessa
+//     decisao fazem o efeito (defend()/heal()/flag) e devolvem uma acao real de 1 AP que
+//     NAO encerra o turno (CombatAction::scan_environment() - PROVADAMENTE inerte nestes
+//     cenarios, ja que nenhum lote chama set_environment: active_environments_ fica vazio,
+//     period_clock_ fica nullopt, entao resolve_scan_environment so seta um flag nao-lido e
+//     loga; ZERO efeito de jogo). As demais 2 chamadas do turno atacam o 1o inimigo vivo,
+//     igual ao AttackFront. Pass() foi descartado pra essas 3 acoes porque Pass encerra o
+//     turno INCONDICIONALMENTE (nao so quando AP=0) - usa-lo gastaria o turno inteiro no
+//     efeito test-only, o defeito que o team-lead apontou. A EXCECAO deliberada e L3 (turtle
+//     total): o papel `DefendOnlyTurtle` defende 1x e devolve Pass no resto do turno de
+//     proposito (joga fora os 2 AP restantes) - e o caso degenerado "so defender" que a
+//     pergunta de origem do lider pediu, documentado como tal (nao e o padrao geral).
 //
 // CAP DE RODADAS (V12 //SIM = 30): o motor NAO tem cap de rodadas embutido (run_until_end
 // tem so um teto de 10000 TURNOS que lanca excecao - nao um "empate" gracioso). Para nao
@@ -63,7 +88,6 @@
 #include <ostream>
 #include <stdexcept>
 #include <string>
-#include <unordered_map>
 #include <vector>
 
 #include "gus/domain/combat/combat_actor.hpp"
@@ -215,13 +239,23 @@ inline constexpr int kPartySize = 3;
 }
 
 // Papel de party por lote (protocolo secao 2.2). AttackFront = ataque basico no 1o
-// inimigo vivo (mesmo estilo sub-otimo de balance_harness.hpp/AutoResolveBrain secao 19.6).
+// inimigo vivo, as 3 vezes que o AP permitir (mesmo estilo sub-otimo de
+// balance_harness.hpp/AutoResolveBrain secao 19.6, mas SEM gate de turno - a party usa os
+// 3 AP normalmente, igual ao produto, ver "ECONOMIA DE AP" no cabecalho do arquivo).
+//
+// DefendThenAttack = defende 1x (1a decisao do turno, AP cheio) e ataca com o AP restante
+// (2 ataques) - o comportamento de um jogador competente que defende E ataca no mesmo
+// turno. DefendOnlyTurtle = EXCECAO deliberada de L3 (turtle total): defende 1x e devolve
+// Pass no resto do turno de proposito, jogando fora os 2 AP restantes - e o caso
+// degenerado "so defender" que a pergunta de origem do lider pediu (nao e o padrao geral,
+// documentado aqui e em L3_TurtleTotal).
 enum class PartyRole {
     AttackFront,
-    DefendSelf,
+    DefendThenAttack,
+    DefendOnlyTurtle,
     HealMostInjured,
-    HoneypotEntaoAtaca,   // L5/Caua: joga honeypot na rodada 1, ataca depois
-    FirewallEntaoAtaca,   // L5/Gus: recebe firewall pre-aplicado, ataca sempre
+    HoneypotEntaoAtaca,   // L5/Caua: joga honeypot na 1a decisao da rodada 1, ataca depois
+    FirewallEntaoAtaca,   // L5/Gus: joga firewall na 1a decisao da rodada 1, ataca depois
 };
 
 [[nodiscard]] inline std::array<PartyRole, kPartySize> roles_for(Lote l) {
@@ -230,20 +264,22 @@ enum class PartyRole {
         case Lote::L1_Vanilla:
             return {R::AttackFront, R::AttackFront, R::AttackFront};
         case Lote::L2_ParedeDedicada:
-            return {R::AttackFront, R::AttackFront, R::DefendSelf};  // Jaci = parede
+            return {R::AttackFront, R::AttackFront, R::DefendThenAttack};  // Jaci = parede
         case Lote::L3_TurtleTotal:
-            return {R::DefendSelf, R::DefendSelf, R::DefendSelf};
+            return {R::DefendOnlyTurtle, R::DefendOnlyTurtle, R::DefendOnlyTurtle};
         case Lote::L4_SuporteAtivo:
             return {R::AttackFront, R::AttackFront, R::HealMostInjured};  // Jaci cura
         case Lote::L5_CartasDeAgro:
-            // Suposicao explicita (protocolo nao fixa o turno 1 de Gus/Caua): Caua paga o
-            // turno 1 pra jogar honeypot; Gus "recebe" firewall pre-aplicado (sem custo de
-            // turno) e ataca desde a rodada 1; Jaci ataca sempre. Ver relatorio de entrega.
+            // Suposicao explicita (protocolo nao fixa o turno 1 de Gus/Caua): Caua gasta a
+            // 1a decisao da rodada 1 jogando honeypot; Gus gasta a 1a decisao da rodada 1
+            // jogando firewall (revisado 2026-08-01: ambos custam 1 AP igual, nao mais
+            // "Gus pre-aplicado sem custo" - unificado por pedido do team-lead); os dois
+            // atacam com o AP restante desde a rodada 1. Jaci ataca sempre. Ver relatorio.
             return {R::FirewallEntaoAtaca, R::HoneypotEntaoAtaca, R::AttackFront};
         case Lote::L6_VantagemInimigos:
-            return {R::AttackFront, R::AttackFront, R::DefendSelf};  // Jaci = parede sob pressao
+            return {R::AttackFront, R::AttackFront, R::DefendThenAttack};  // Jaci = parede sob pressao
         case Lote::L7_AtacanteUnico:
-            return {R::AttackFront, R::AttackFront, R::DefendSelf};
+            return {R::AttackFront, R::AttackFront, R::DefendThenAttack};
     }
     throw std::logic_error("Lote desconhecido em roles_for.");
 }
@@ -474,61 +510,94 @@ struct BattleTrace {
 
 // Decide a acao de UM membro da party, dado o papel (protocolo secao 2.2). `sm` e usado
 // SO pra estimate/preview (F1 bookkeeping); nunca muta o motor por fora do provider.
+// `trace` recebe o bookkeeping de defend_count (E7). Economia de AP: a party NUNCA e
+// gateada por cima (ver "ECONOMIA DE AP" no cabecalho) - `actor.ap() == actor.max_ap()`
+// identifica a 1a decisao do turno (AP recem-resetado por refresh_resources_for_turn); e
+// so nessa 1a decisao que os papeis com efeito test-only (defender/curar/honeypot/
+// firewall) disparam o efeito. As demais 1-2 chamadas do MESMO turno (AP < max_ap)
+// atacam o 1o inimigo vivo, igual ao AttackFront.
 [[nodiscard]] inline CombatAction decide_party_action(PartyMember m, PartyRole role,
                                                        CombatActor& actor,
                                                        const CombatState& state,
                                                        const CombatStateMachine& sm,
-                                                       AttractionTracker& tr, int round) {
+                                                       AttractionTracker& tr,
+                                                       BattleTrace& trace, int round) {
     // V12 //SIM: cap de rodadas via Fuga forcada (ver cabecalho do arquivo). Testado
     // determinístico pra este estudo (Caua SPD 13 > qualquer inimigo especificado).
     if (round >= kRoundCap) return CombatAction::flee();
 
+    const bool first_decision_this_turn = actor.ap() == actor.max_ap();
+
+    auto attack_front = [&]() -> CombatAction {
+        const auto enemies = state.alive_enemies();
+        if (enemies.empty()) return CombatAction::pass();
+        CombatActor* target = enemies.front();
+        const int predicted = sm.preview_basic_attack_damage(actor, *target);
+        tr.record_damage(m, round, predicted);  // F1/V2 bookkeeping
+        return CombatAction::attack(target->id());
+    };
+
     switch (role) {
         case PartyRole::AttackFront:
-        case PartyRole::FirewallEntaoAtaca: {
-            if (role == PartyRole::FirewallEntaoAtaca && round == 0)
-                tr.firewall_rounds_left[idx(m)] = kFirewallDurationRounds;  // V7, pre-aplicado
-            const auto enemies = state.alive_enemies();
-            if (enemies.empty()) return CombatAction::pass();
-            CombatActor* target = enemies.front();
-            const int predicted = sm.preview_basic_attack_damage(actor, *target);
-            tr.record_damage(m, round, predicted);  // F1/V2 bookkeeping
-            return CombatAction::attack(target->id());
-        }
-        case PartyRole::HoneypotEntaoAtaca: {
-            if (round == 0) {
+            return attack_front();
+
+        case PartyRole::DefendThenAttack:
+            if (first_decision_this_turn) {
+                trace.defend_count[idx(m)]++;
+                return CombatAction::defend();
+            }
+            return attack_front();
+
+        case PartyRole::DefendOnlyTurtle:
+            // EXCECAO deliberada de L3 (turtle total, ver PartyRole acima): defende 1x e
+            // devolve Pass no resto do turno, jogando fora os 2 AP restantes de proposito.
+            if (first_decision_this_turn) {
+                trace.defend_count[idx(m)]++;
+                return CombatAction::defend();
+            }
+            return CombatAction::pass();
+
+        case PartyRole::HealMostInjured:
+            if (first_decision_this_turn) {
+                const auto players = state.alive_players();
+                if (!players.empty()) {
+                    CombatActor* target = *std::min_element(
+                        players.begin(), players.end(),
+                        [](const CombatActor* a, const CombatActor* b) {
+                            const double fa = a->max_hp() > 0
+                                                  ? static_cast<double>(a->hp()) / a->max_hp()
+                                                  : 0.0;
+                            const double fb = b->max_hp() > 0
+                                                  ? static_cast<double>(b->hp()) / b->max_hp()
+                                                  : 0.0;
+                            return fa < fb;
+                        });
+                    // V10 //SIM: heal() e o metodo PUBLICO real (nao reimplementa regra); o
+                    // gap de engine e a ausencia de uma CombatAction de cura (cabecalho do
+                    // arquivo). Custa 1 AP via scan_environment() (inerte nestes cenarios,
+                    // ver "ECONOMIA DE AP"), preservando 2 AP pra atacar no mesmo turno.
+                    target->heal(kHealerHealAmount);
+                    tr.record_support(m, round);  // F3/V4 bookkeeping
+                }
+                return CombatAction::scan_environment();
+            }
+            return attack_front();
+
+        case PartyRole::HoneypotEntaoAtaca:
+            if (round == 0 && first_decision_this_turn) {
                 tr.honeypot_rounds_left[idx(m)] = kHoneypotDurationRounds;  // V6
                 // Bonus de +10% Def NAO aplicado (gap de engine, ver cabecalho do arquivo).
-                return CombatAction::pass();
+                // Custa 1 AP via scan_environment() (inerte), preserva 2 AP pra atacar.
+                return CombatAction::scan_environment();
             }
-            const auto enemies = state.alive_enemies();
-            if (enemies.empty()) return CombatAction::pass();
-            CombatActor* target = enemies.front();
-            const int predicted = sm.preview_basic_attack_damage(actor, *target);
-            tr.record_damage(m, round, predicted);
-            return CombatAction::attack(target->id());
-        }
-        case PartyRole::DefendSelf:
-            return CombatAction::defend();
-        case PartyRole::HealMostInjured: {
-            const auto players = state.alive_players();
-            if (players.empty()) return CombatAction::pass();
-            CombatActor* target = *std::min_element(
-                players.begin(), players.end(), [](const CombatActor* a, const CombatActor* b) {
-                    const double fa = a->max_hp() > 0
-                                          ? static_cast<double>(a->hp()) / a->max_hp()
-                                          : 0.0;
-                    const double fb = b->max_hp() > 0
-                                          ? static_cast<double>(b->hp()) / b->max_hp()
-                                          : 0.0;
-                    return fa < fb;
-                });
-            // V10 //SIM: heal() e o metodo PUBLICO real (nao reimplementa regra); gap de
-            // engine e a ausencia de uma CombatAction de cura (ver cabecalho do arquivo).
-            target->heal(kHealerHealAmount);
-            tr.record_support(m, round);  // F3/V4 bookkeeping
-            return CombatAction::pass();
-        }
+            return attack_front();
+
+        case PartyRole::FirewallEntaoAtaca:
+            if (round == 0 && first_decision_this_turn) {
+                tr.firewall_rounds_left[idx(m)] = kFirewallDurationRounds;  // V7
+                return CombatAction::scan_environment();
+            }
+            return attack_front();
     }
     throw std::logic_error("PartyRole desconhecido.");
 }
@@ -621,28 +690,25 @@ struct BattleTrace {
 
     // GAP DE ENGINE (reportado, nao contornado por reimplementacao de regra): CombatActor
     // nao tem setter publico de max_ap - TODO ator recebe kBaseApPerTurn=3 (combat_actor.hpp),
-    // sem diferenciacao trash/elite/party (combat.md secao 13.1/17 diz "1 AP" pro trash e
-    // "no VS todos a 1 AP", mas isso NAO esta wireado no motor ainda). Sem isto, o loop de
-    // ActionSelect<->ActionResolve chamaria o MESMO ator ate 3x por turno (3 AP), triplicando
-    // dano/cura/defesa e distorcendo exatamente a variavel que o estudo mede. Este harness
-    // contorna via "1 decisao real por turno, Pass nas chamadas extras do MESMO turno" -
-    // decisao do BOT (party e inimigo), NAO do motor: Pass sempre encerra o turno (secao 3),
-    // entao o efeito observado E o de "1 AP" sem mudar nenhuma formula de dano/Shield.
-    std::unordered_map<std::string, int> last_decided_round;
-
+    // sem diferenciacao trash/elite prevista em combat.md secao 13.1 (o "1 AP" ali e por
+    // TIER DE INIMIGO - Trash/Elite/Mini-boss -, nao "party e inimigo": a party continua
+    // com os 3 AP, secao 15 "AP escasso (3)"). A producao resolve isso na CASCA, nao no
+    // motor: BattleScene::enemy_acted_this_turn_ (battle_scene.cpp:210-224) gateia SO o
+    // inimigo a 1 acao/turno; a party consome o mailbox do jogador nas 3 chamadas. Este
+    // harness espelha essa MESMA fronteira via `actor.ap() == actor.max_ap()` (ver
+    // "ECONOMIA DE AP" no cabecalho do arquivo): o gate abaixo so vale pro INIMIGO.
     auto provider = [&](CombatActor& actor, const CombatState& state) -> CombatAction {
         const int round = state.round_index();
         tr.observe_round(round);
 
-        const auto it = last_decided_round.find(actor.id());
-        if (it != last_decided_round.end() && it->second == round) return CombatAction::pass();
-        last_decided_round[actor.id()] = round;
-
         if (actor.is_player_side()) {
             const PartyMember m = member_of(actor.id());
-            if (roles[idx(m)] == PartyRole::DefendSelf) trace.defend_count[idx(m)]++;
-            return decide_party_action(m, roles[idx(m)], actor, state, *sm_ptr, tr, round);
+            return decide_party_action(m, roles[idx(m)], actor, state, *sm_ptr, tr, trace, round);
         }
+
+        // Inimigo: 1 acao real por turno (igual ao produto, enemy_acted_this_turn_); as
+        // chamadas extras do MESMO turno (AP ja gasto pelo 1o ataque) so Pass.
+        if (actor.ap() < actor.max_ap()) return CombatAction::pass();
         return decide_enemy_action(arm, actor, state, *sm_ptr, tr, trace, rng, round,
                                    last_enemy_target);
     };

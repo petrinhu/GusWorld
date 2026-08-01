@@ -169,10 +169,20 @@ namespace detail {
     auto provider = [&](CombatActor& actor, const CombatState& state) -> CombatAction {
         CombatAction action;
         if (actor.is_player_side()) {
-            // Sub-otimo (secao 19.6): SO ataque basico, mira o 1o inimigo vivo.
+            // Sub-otimo (secao 19.6): SO ataque basico, mira o 1o inimigo vivo. NAO
+            // gateado: a party usa os 3 AP normalmente, igual ao produto real
+            // (battle_scene.cpp:210-224, jogador consome o mailbox 3 vezes).
             const auto enemies = state.alive_enemies();
             action = enemies.empty() ? CombatAction::pass()
                                      : CombatAction::attack(enemies.front()->id());
+        } else if (actor.ap() < actor.max_ap()) {
+            // CORRECAO (2026-08-01, achado do team-lead + decisao do lider, item MIRA-SIM):
+            // CombatActor nao diferencia AP por tier (kBaseApPerTurn=3 pra TODO ator); sem
+            // este gate o ScriptedBrain atacaria ate 3x por turno, o que nem o produto real
+            // faz (BattleScene::enemy_acted_this_turn_, battle_scene.cpp:210-224) nem o
+            // canon permite (combat.md secao 13.1: Trash = 1 AP/turno). O inimigo age 1x
+            // (decide_action, abaixo) e Pass no resto do MESMO turno.
+            action = CombatAction::pass();
         } else {
             action = enemy_brain.decide_action(state, actor);
         }

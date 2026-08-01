@@ -90,12 +90,12 @@ TEST_CASE("mira_sim: roles_for casa com a tabela do protocolo (secao 2.2)", "[do
     REQUIRE(l1 == std::array<R, 3>{R::AttackFront, R::AttackFront, R::AttackFront});
 
     const auto l2 = roles_for(Lote::L2_ParedeDedicada);
-    REQUIRE(l2[2] == R::DefendSelf);  // Jaci = parede
+    REQUIRE(l2[2] == R::DefendThenAttack);  // Jaci = parede
     REQUIRE(l2[0] == R::AttackFront);
     REQUIRE(l2[1] == R::AttackFront);
 
     const auto l3 = roles_for(Lote::L3_TurtleTotal);
-    REQUIRE(l3 == std::array<R, 3>{R::DefendSelf, R::DefendSelf, R::DefendSelf});
+    REQUIRE(l3 == std::array<R, 3>{R::DefendOnlyTurtle, R::DefendOnlyTurtle, R::DefendOnlyTurtle});
 
     const auto l4 = roles_for(Lote::L4_SuporteAtivo);
     REQUIRE(l4[2] == R::HealMostInjured);  // Jaci cura
@@ -105,8 +105,8 @@ TEST_CASE("mira_sim: roles_for casa com a tabela do protocolo (secao 2.2)", "[do
     REQUIRE(l5[0] == R::FirewallEntaoAtaca);  // Gus
     REQUIRE(l5[2] == R::AttackFront);         // Jaci
 
-    REQUIRE(roles_for(Lote::L6_VantagemInimigos)[2] == R::DefendSelf);
-    REQUIRE(roles_for(Lote::L7_AtacanteUnico)[2] == R::DefendSelf);
+    REQUIRE(roles_for(Lote::L6_VantagemInimigos)[2] == R::DefendThenAttack);
+    REQUIRE(roles_for(Lote::L7_AtacanteUnico)[2] == R::DefendThenAttack);
 }
 
 TEST_CASE("mira_sim: AttractionTracker janela de 2 rodadas (F1/F3) exclui rodadas antigas",
@@ -314,6 +314,77 @@ TEST_CASE("mira_sim: run_single_mira_battle e deterministico pra mesma seed/lote
     REQUIRE(a.outcome == b.outcome);
     REQUIRE(a.rounds == b.rounds);
     REQUIRE(a.damage_taken == b.damage_taken);
+}
+
+// Regressao do DEFEITO reportado pelo team-lead (2026-08-01, contra battle_scene.cpp:
+// 210-224): o inimigo tem que agir 1x por turno (economia de AP da producao), a party
+// tem que usar os 3 AP normalmente. Cenario controlado (HP altissimo dos 2 lados, atk/def
+// simples, sem RNG - ataque basico e deterministico secao 17) pra poder prever o dano
+// EXATO por rodada e provar a razao certa (nao 3x inflada de nenhum dos dois lados).
+TEST_CASE("mira_sim: economia de AP - inimigo 1x/turno, party 3x/turno (regressao do "
+          "defeito reportado, nao mais gateado por cima)",
+          "[domain][mira_sim]") {
+    using gus::domain::combat::CombatAction;
+    using gus::domain::combat::CombatActor;
+    using gus::domain::combat::CombatState;
+    using gus::domain::combat::CombatStateMachine;
+
+    // HP altissimo dos 2 lados: a luta so termina pelo cap de rodadas (V12=30), entao
+    // rounds_elapsed e conhecido de antemao (>= kRoundCap), permitindo prever o dano total.
+    CombatActor hero("hero", "hero", /*max_hp=*/1'000'000, /*atk=*/10, /*def=*/0, /*spd=*/10,
+                     CardFamily::Eletrico, /*is_player_side=*/true);
+    CombatActor foe("foe", "foe", /*max_hp=*/1'000'000, /*atk=*/7, /*def=*/0, /*spd=*/1,
+                    CardFamily::Cinetico, /*is_player_side=*/false);
+    std::vector<CombatActor*> actor_ptrs{&hero, &foe};
+
+    BattleTrace trace;
+    AttractionTracker tr;
+    std::optional<std::string> last_enemy_target;
+    gus::domain::tests::PropertyRandom rng(1);
+    const CombatStateMachine* sm_ptr = nullptr;
+    const std::array<PartyRole, kPartySize> roles{PartyRole::AttackFront, PartyRole::AttackFront,
+                                                   PartyRole::AttackFront};
+
+    auto provider = [&](CombatActor& actor, const CombatState& state) -> CombatAction {
+        const int round = state.round_index();
+        tr.observe_round(round);
+        if (actor.is_player_side()) {
+            // "hero" nao e gus/caua/jaci; decide_party_action so precisa do papel e do
+            // AttractionTracker (F1), que aqui nao importa - usamos Gus como PartyMember
+            // dummy so pra bater a assinatura (o teste nao consulta F1/F2/F3 de ninguem).
+            return decide_party_action(PartyMember::Gus, PartyRole::AttackFront, actor, state,
+                                       *sm_ptr, tr, trace, round);
+        }
+        if (actor.ap() < actor.max_ap()) return CombatAction::pass();
+        // "foe" nao e um PartyMember: chamamos a MESMA logica de braco A (front) direto,
+        // pra nao depender de member_of() (que so conhece gus/caua/jaci).
+        trace.enemy_target_turns++;
+        const int net = sm_ptr->preview_basic_attack_damage(actor, hero);
+        trace.damage_taken[idx(PartyMember::Gus)] += net;
+        return CombatAction::attack(hero.id());
+    };
+
+    CombatStateMachine sm(actor_ptrs, provider, nullptr, nullptr, &rng);
+    sm_ptr = &sm;
+    const auto result = sm.run_until_end();
+
+    REQUIRE(result.outcome == CombatOutcome::Fled);  // cap de rodadas via Fuga (kRoundCap)
+    REQUIRE(result.rounds_elapsed >= kRoundCap);
+
+    // Inimigo: 1 ataque de 7 por rodada (nao 3x21=63). Tolerancia de 1 rodada de folga na
+    // fronteira do cap (a ultima rodada pode nao completar o turno do inimigo).
+    const double dmg_per_round_to_hero =
+        static_cast<double>(trace.damage_taken[idx(PartyMember::Gus)]) / result.rounds_elapsed;
+    REQUIRE(dmg_per_round_to_hero < 10.0);   // 3x inflado daria ~21; o certo e ~7
+    REQUIRE(dmg_per_round_to_hero > 5.0);
+
+    // Party: 3 ataques de 10 por rodada = ~30 (nao ~10, que seria o gate incorreto que o
+    // team-lead apontou vazando pro lado da party).
+    const int hero_dmg_total = 1'000'000 - foe.hp();
+    const double dmg_per_round_from_hero =
+        static_cast<double>(hero_dmg_total) / result.rounds_elapsed;
+    REQUIRE(dmg_per_round_from_hero > 25.0);  // 1x nao-gateado daria ~10; o certo e ~30
+    REQUIRE(dmg_per_round_from_hero < 35.0);
 }
 
 TEST_CASE("mira_sim: L1 vanilla - C/D/E/F sao IDENTICOS (F4 nunca dispara, sanidade do "
