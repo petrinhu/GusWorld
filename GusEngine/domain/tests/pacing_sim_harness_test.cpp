@@ -433,6 +433,58 @@ TEST_CASE("pacing_sim: evaluate_guardrails reprova E8 (mediana da 1a queda na ro
     for (std::size_t i = 0; i < 5; ++i) CHECK(verdicts[i].green);
 }
 
+// Achado do QA 2026-08-01 (segunda rodada): o teste acima usa mediana=1.5 e o teste
+// "vacuamente verde" usa mediana=0.0 - nenhum dos dois exercita EXATAMENTE 1.0 ou 2.0,
+// entao mutar kFirstFallBadRoundMin (1.0->0.0), kFirstFallBadRoundMax (2.0->3.0), ou o
+// operador de inclusivo pra exclusivo sobrevivia em silencio. Mesma disciplina dos 5
+// guarda-corpos numericos: fronteira EXATA (reprova em cima do limite) MAIS 1 passo pra
+// FORA (aprova logo apos o limite) - so as DUAS pontas juntas provam largura E operador.
+// So a fronteira exata reprovando nao bastaria: alargar o limite (min 1.0->0.0 ou max
+// 2.0->3.0) mantem 1.0/2.0 dentro do intervalo ruim alargado, e sobreviveria em
+// silencio - e o exato mesmo mutante que o QA reportou.
+TEST_CASE("pacing_sim: evaluate_guardrails reprova E8 na fronteira EXATA e aprova 1 passo fora",
+          "[domain][pacing_sim]") {
+    auto make_baseline = []() {
+        PacingPointReport r;
+        r.tier = Tier::Trash;
+        r.win_rate_pct.value = 93.0;
+        r.pct_fall_by_member[idx(PartyMember::Gus)].value = 10.0;
+        r.p10_rounds = 3.0;
+        r.p90_rounds = 5.0;
+        r.pct_no_damage_taken.value = 20.0;
+        r.avg_final_hp_pct = 70.0;
+        r.pct_any_fall.value = 40.0;  // ha queda de verdade, entao E8 realmente avalia
+        return r;
+    };
+
+    {
+        PacingPointReport r = make_baseline();
+        r.median_first_fall_round = 1.0;  // exatamente o piso do intervalo ruim [1,2]
+        REQUIRE_FALSE(evaluate_guardrails(r)[5].green);
+    }
+    {
+        PacingPointReport r = make_baseline();
+        r.median_first_fall_round = 2.0;  // exatamente o teto do intervalo ruim [1,2]
+        REQUIRE_FALSE(evaluate_guardrails(r)[5].green);
+    }
+    {
+        // Mata o mutante que alarga kFirstFallBadRoundMin (1.0->0.0): sob o codigo
+        // correto isto APROVA (0.9 esta fora do intervalo ruim); sob o mutante
+        // alargado, 0.9 cairia dentro de [0,2] e reprovaria.
+        PacingPointReport r = make_baseline();
+        r.median_first_fall_round = 0.9;
+        CHECK(evaluate_guardrails(r)[5].green);
+    }
+    {
+        // Mata o mutante que alarga kFirstFallBadRoundMax (2.0->3.0): sob o codigo
+        // correto isto APROVA (2.1 esta fora do intervalo ruim); sob o mutante
+        // alargado, 2.1 cairia dentro de [1,3] e reprovaria.
+        PacingPointReport r = make_baseline();
+        r.median_first_fall_round = 2.1;
+        CHECK(evaluate_guardrails(r)[5].green);
+    }
+}
+
 // E8 nao pode reprovar quando NINGUEM cai (senao o default de percentile() sobre
 // amostra vazia - 0.0 - viraria uma coincidencia fragil, nao uma regra provada).
 TEST_CASE("pacing_sim: evaluate_guardrails E8 e vacuamente verde quando ninguem cai",
