@@ -550,6 +550,49 @@ TEST_CASE("mira_sim: pareamento por seed - MESMA seed sob 6 bracos, cada braco e
     }
 }
 
+// TESTE OBRIGATORIO (achado do QA 2026-08-01: shield_wasted_total e hits_while_defending
+// sem NENHUM teste - o QA matou os dois, shield_wasted_total sempre 0 e
+// hits_while_defending nunca incrementando, e a suite ficou verde). Numeros calculados A
+// MAO a partir do motor real (mesmo padrao do teste de E6): L3 turtle total, arm A
+// (status quo, sempre mira players.front()), seed 99 - a MESMA luta do teste L3 abaixo.
+//
+// Derivacao: com arm A, o alvo e sempre players.front() - deterministico, o mesmo membro
+// a luta inteira (front() nao muda quando ninguem morre). O QA/o proprio harness ja
+// provou (teste L3 abaixo) que shield_raw_total==shield_absorbed_total==180 nesta luta
+// (H1: Shield absorve 100%). Os 3 inimigos (Sentinela atk=10) sao gateados a 1 acao/turno
+// cada (economia de AP); os 3 atacam o MESMO alvo (front()) todo round, 30 rounds ->
+// 90 ataques total. raw por ataque = max(1, 10-Def_do_alvo); shield_raw_total=180 implica
+// 90 ataques de raw=2 cada (10-8=2, Def=8), ou seja o alvo E a Caua (Def 8) - Gus (Def 5,
+// raw=5) e Jaci (Def 10, raw=1) teriam totais diferentes se fossem o alvo. Logo:
+//   - Caua (idx 1): defend_count=30 (defende toda rodada, turtle), hits_while_defending=90
+//     (3 inimigos x 30 rounds, TODOS os hits enquanto o Shield dela esta ativo).
+//   - Gus (idx 0) e Jaci (idx 2): defend_count=30, hits_while_defending=0 (nunca targetados
+//     por A_StatusQuo, que so mira o front()) - as 30 rodadas de Shield delas nunca
+//     absorvem nada, 100% desperdicadas.
+// shield_wasted_total = wasted(Gus)*Def(Gus) + wasted(Caua)*Def(Caua) + wasted(Jaci)*Def(Jaci)
+//                     = 30*5 + 0*8 + 30*10 = 150 + 0 + 300 = 450.
+TEST_CASE("mira_sim: L3 - hits_while_defending/shield_wasted_total batem com o calculo a "
+          "mao (motor real, arm A, seed 99)",
+          "[domain][mira_sim]") {
+    const BattleTrace t = run_single_mira_battle(Lote::L3_TurtleTotal, MiraArm::A_StatusQuo, 99);
+    REQUIRE(t.rounds == 30);
+
+    REQUIRE(t.defend_count[idx(PartyMember::Gus)] == 30);
+    REQUIRE(t.defend_count[idx(PartyMember::Caua)] == 30);
+    REQUIRE(t.defend_count[idx(PartyMember::Jaci)] == 30);
+
+    REQUIRE(t.hits_while_defending[idx(PartyMember::Gus)] == 0);
+    REQUIRE(t.hits_while_defending[idx(PartyMember::Caua)] == 90);  // 3 inimigos x 30 rounds
+    REQUIRE(t.hits_while_defending[idx(PartyMember::Jaci)] == 0);
+
+    REQUIRE(t.wasted_defend_rounds(PartyMember::Gus) == 30);   // nunca atacada: 100% desperdicado
+    REQUIRE(t.wasted_defend_rounds(PartyMember::Caua) == 0);   // sempre atacada: 0% desperdicado
+    REQUIRE(t.wasted_defend_rounds(PartyMember::Jaci) == 30);
+
+    const LoteArmReport r = aggregate_mira("L3-calculo-mao", "A", {t});
+    REQUIRE(r.shield_wasted_total == 450);  // 30*5 + 0*8 + 30*10
+}
+
 TEST_CASE("mira_sim: L3 turtle total bate no cap de 30 rodadas (empate tecnico, V12) - "
           "estatlines canonicas absorvem 100% do dano bruto (H1 do lider)",
           "[domain][mira_sim]") {
@@ -776,11 +819,12 @@ TEST_CASE("mira_sim: aggregate_mira conta erro interno SEPARADO do empate tecnic
     capped.outcome = CombatOutcome::Ongoing;
     capped.capped = true;
     capped.rounds = 30;
-    capped.final_hp_fraction = {1.0, 1.0, 1.0};
+    capped.fell = {true, false, false};  // queda REAL (nao o wipe artificial removido)
+    capped.final_hp_fraction = {0.0, 0.8, 0.9};
 
     BattleTrace vitoria;
     vitoria.outcome = CombatOutcome::Victory;
-    vitoria.rounds = 4;
+    vitoria.rounds = 4;  // dentro da janela 3-5
     vitoria.final_hp_fraction = {1.0, 1.0, 1.0};
 
     const LoteArmReport r =
@@ -789,11 +833,24 @@ TEST_CASE("mira_sim: aggregate_mira conta erro interno SEPARADO do empate tecnic
     REQUIRE(r.internal_errors_count == 1);
     REQUIRE(r.internal_error_pct.value == Catch::Approx(100.0 / 3.0));
     REQUIRE(r.first_internal_error_message == "excecao de teste");
-    // As 4 fracoes usam o MESMO denominador (n=3) e nao se sobrepoem: 1 vitoria, 0
+    // As 4 fracoes de E1 usam o MESMO denominador (n=3) e nao se sobrepoem: 1 vitoria, 0
     // derrotas, 1 capped, 1 erro.
     REQUIRE(r.win_rate_pct.value == Catch::Approx(100.0 / 3.0));
     REQUIRE(r.defeat_rate_pct.value == Catch::Approx(0.0));
     REQUIRE(r.pct_hit_round_cap.value == Catch::Approx(100.0 / 3.0));
+
+    // DILUICAO DE DENOMINADOR (achado do QA 2026-08-01): pct_hit_round_cap_e7,
+    // pct_any_fall e pct_in_window_3_5 tem numerador que JA exclui a luta com erro
+    // (nunca incrementado, ver o continue em aggregate_mira) - o denominador tem que
+    // excluir tambem (valid_n = n - internal_errors = 3-1 = 2), senao dilui pra 33,33%
+    // (1/3) onde o certo e 50,00% (1/2). O QA mediu exatamente essa diluicao antes do fix.
+    REQUIRE(r.pct_hit_round_cap_e7.value == Catch::Approx(50.0));
+    REQUIRE(r.pct_any_fall.value == Catch::Approx(50.0));  // 1 queda real de 2 lutas validas
+    REQUIRE(r.pct_fall_by_member[0].value == Catch::Approx(50.0));  // Gus caiu na capada
+    REQUIRE(r.pct_in_window_3_5.value == Catch::Approx(50.0));  // so a vitoria (rounds=4)
+    // avg_final_hp_pct ja estava certo antes (denominador proprio, final_hp_count) - so
+    // reconfirma que continua certo: media de 6 valores (0.0+0.8+0.9+1.0+1.0+1.0)/6.
+    REQUIRE(r.avg_final_hp_pct == Catch::Approx(100.0 * 4.7 / 6.0));
 }
 
 // Prova de que o RELATORIO ("zero declarado vale mais que zero presumido"): sem erro
@@ -809,6 +866,76 @@ TEST_CASE("mira_sim: aggregate_mira reporta internal_errors_count=0 explicitamen
     REQUIRE(r.internal_errors_count == 0);
     REQUIRE(r.internal_error_pct.value == Catch::Approx(0.0));
     REQUIRE(r.first_internal_error_message.empty());
+}
+
+// Cobertura barata #1 (achado do QA 2026-08-01): first_internal_error_message tem que
+// guardar a PRIMEIRA excecao, nao a ultima - com 2 erros de mensagens DIFERENTES na
+// mesma agregacao, o mutante que trocasse o guard ".empty()" por "sempre sobrescreve"
+// (virando "guarda a ULTIMA") passaria batido sem este teste.
+TEST_CASE("mira_sim: aggregate_mira guarda a mensagem da PRIMEIRA excecao, nao a ultima",
+          "[domain][mira_sim]") {
+    BattleTrace erro1;
+    erro1.internal_error = true;
+    erro1.internal_error_message = "primeiro erro";
+
+    BattleTrace erro2;
+    erro2.internal_error = true;
+    erro2.internal_error_message = "segundo erro";
+
+    const LoteArmReport r = aggregate_mira("lote-2erros", "braco-2erros", {erro1, erro2});
+    REQUIRE(r.internal_errors_count == 2);
+    REQUIRE(r.first_internal_error_message == "primeiro erro");
+}
+
+// Cobertura barata #2 (achado do QA 2026-08-01): o `continue` do erro interno tem que
+// pular TODO o bookkeeping de E2-E8 mesmo quando a trace tem estado PARCIAL/poluido (o
+// que aconteceria de verdade se a excecao disparasse no MEIO da luta, com alguns campos
+// ja preenchidos antes do throw). Sem isto provado, um mutante que so pulasse PARTE do
+// bookkeeping (ex.: contasse queda mas nao rodada) passaria pelos testes que so usam
+// traces "limpas" (internal_error com todo o resto zerado).
+TEST_CASE("mira_sim: aggregate_mira ignora estado parcial/poluido de uma trace com erro "
+          "interno (nao so quando os outros campos estao zerados)",
+          "[domain][mira_sim]") {
+    BattleTrace erro_poluido;
+    erro_poluido.internal_error = true;
+    erro_poluido.internal_error_message = "excecao no meio da luta";
+    // Estado que teria sido parcialmente escrito ANTES do throw - deliberadamente
+    // implausivel (fell nos 3, dano gigante, capped=true junto de internal_error, que o
+    // invariante da classe diz que nunca deveria coexistir) pra provar que aggregate_mira
+    // NUNCA olha pra esses campos quando internal_error e verdadeiro, nao importa o que
+    // estejam contendo.
+    erro_poluido.rounds = 12345;
+    erro_poluido.fell = {true, true, true};
+    erro_poluido.damage_taken = {999, 999, 999};
+    erro_poluido.capped = true;
+    erro_poluido.final_hp_fraction = {0.0, 0.0, 0.0};
+    erro_poluido.first_fall_round = 1;
+
+    BattleTrace vitoria;
+    vitoria.outcome = CombatOutcome::Victory;
+    vitoria.rounds = 4;
+    vitoria.final_hp_fraction = {1.0, 1.0, 1.0};
+
+    const LoteArmReport r = aggregate_mira("lote-poluido", "braco-poluido", {erro_poluido, vitoria});
+    REQUIRE(r.internal_errors_count == 1);
+    // Nada do estado poluido vaza pra nenhuma metrica: 0 quedas, HP medio 100%, 1 rodada
+    // (so a vitoria), vitoria 100% das lutas VALIDAS refletida em win_rate (denominador
+    // n=2, ver os 4 categorias de E1).
+    REQUIRE(r.pct_any_fall.value == Catch::Approx(0.0));
+    REQUIRE(r.avg_final_hp_pct == Catch::Approx(100.0));
+    REQUIRE(r.mean_rounds == Catch::Approx(4.0));
+    REQUIRE(r.win_rate_pct.value == Catch::Approx(50.0));  // 1 vitoria de 2 (n=2, com o erro)
+}
+
+// Cobertura barata #3 (achado do QA 2026-08-01, mesma correcao tautologica ja aplicada em
+// V1/V6): kRoundCap (V12) e kDaemonGuardAtk (V8) tem que ser comparados contra LITERAIS do
+// protocolo, nao contra eles mesmos - um mutante que mudasse os valores (30->25, 18->5)
+// sobreviveu porque nenhum teste fixava o numero esperado.
+TEST_CASE("mira_sim: V8/V12 batem com os valores literais do protocolo (secao 5), nao a "
+          "constante contra ela mesma",
+          "[domain][mira_sim]") {
+    REQUIRE(kRoundCap == 30);
+    REQUIRE(kDaemonGuardAtk == 18);
 }
 
 TEST_CASE("mira_sim: L6 aplica 70% do HP inicial na party (protocolo secao 2.2)",

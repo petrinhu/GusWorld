@@ -929,7 +929,14 @@ struct LoteArmReport {
     // E7 (so L2/L3, lido pelo chamador): reusa win_rate_pct/pct_in_window_3_5 acima +
     // HP final medio da party + % de lutas que bateram no cap de 30 rodadas.
     double avg_final_hp_pct = 0.0;
+    // pct_hit_round_cap: DENOMINADOR = n (TODAS as lutas, inclusive erro interno) - e a 3a
+    // fracao de E1 (vitoria+derrota+capped+erro=100%). NAO e a metrica de E7 (achado do QA
+    // 2026-08-01: as duas funcoes precisam de denominadores DIFERENTES - ver
+    // pct_hit_round_cap_e7 abaixo e o comentario em aggregate_mira).
     MetricWithCi pct_hit_round_cap;
+    // pct_hit_round_cap_e7: DENOMINADOR = so lutas SEM erro interno (n - internal_errors_count).
+    // Esta e a metrica de E7 de verdade ("% de lutas validas que bateram no cap").
+    MetricWithCi pct_hit_round_cap_e7;
     // E8: rodada da 1a queda (so entre lutas em que alguem caiu).
     double mean_first_fall_round = 0.0;
     double median_first_fall_round = 0.0;
@@ -1034,21 +1041,30 @@ struct LoteArmReport {
         if (t.first_fall_round >= 0) first_fall_rounds.push_back(static_cast<double>(t.first_fall_round));
     }
 
+    // Denominador VALIDO (achado do QA 2026-08-01): lutas com erro interno pulam (continue)
+    // ANTES de incrementar in_window/any_fall/fall_by_member/hit_cap - os numeradores JA
+    // excluem erro interno. Usar r.n (que INCLUI erro interno) como denominador diluiria
+    // essas fracoes na presenca de erro. valid_n exclui erro interno do denominador
+    // tambem, pareando numerador e denominador. NAO se aplica a win_rate_pct/
+    // defeat_rate_pct/internal_error_pct (essas SAO as fracoes de E1, r.n e o denominador
+    // CERTO ali - as 4 categorias tem que somar 100% de TODAS as lutas).
+    const long valid_n = r.n - internal_errors;
+
     r.win_rate_pct = proportion_metric_pct(victories, r.n);
     r.defeat_rate_pct = proportion_metric_pct(defeats, r.n);
     r.mean_rounds = mean_metric(rounds_d).value;
     r.median_rounds = percentile(rounds_d, 0.5);
     r.p10_rounds = percentile(rounds_d, 0.10);
     r.p90_rounds = percentile(rounds_d, 0.90);
-    r.pct_in_window_3_5 = proportion_metric_pct(in_window, r.n);
+    r.pct_in_window_3_5 = proportion_metric_pct(in_window, valid_n);
 
     r.concentration_pct = mean_metric(concentration_samples);
     r.pct_saco_de_pancadas = proportion_metric_pct(
         saco_de_pancadas, static_cast<long>(concentration_samples.size()));
 
-    r.pct_any_fall = proportion_metric_pct(any_fall, r.n);
+    r.pct_any_fall = proportion_metric_pct(any_fall, valid_n);
     for (int i = 0; i < kPartySize; ++i)
-        r.pct_fall_by_member[i] = proportion_metric_pct(fall_by_member[i], r.n);
+        r.pct_fall_by_member[i] = proportion_metric_pct(fall_by_member[i], valid_n);
 
     r.repeat_target_pct = proportion_metric_pct(repeat_num, repeat_den);
 
@@ -1056,7 +1072,15 @@ struct LoteArmReport {
     r.shield_wasted_total = shield_wasted;
 
     r.avg_final_hp_pct = final_hp_count > 0 ? 100.0 * final_hp_sum / final_hp_count : 0.0;
+    // pct_hit_round_cap: denominador r.n DE PROPOSITO - e a 3a fracao de E1 (vitoria +
+    // derrota + empate tecnico + erro interno = 100% de TODAS as lutas). NAO confundir com
+    // a metrica de E7 (linha abaixo), que e sobre lutas VALIDAS especificamente.
     r.pct_hit_round_cap = proportion_metric_pct(hit_cap, r.n);
+    // pct_hit_round_cap_e7: denominador valid_n DE PROPOSITO - "% de lutas validas que
+    // bateram no cap" (E7 de verdade, achado do QA 2026-08-01: usar r.n aqui diluiria a
+    // fracao quando ha erro interno, ja que as lutas com erro nao tem rodada/queda validas
+    // pra E7 ler).
+    r.pct_hit_round_cap_e7 = proportion_metric_pct(hit_cap, valid_n);
 
     const MetricWithCi first_fall = mean_metric(first_fall_rounds);
     r.mean_first_fall_round = first_fall.value;
