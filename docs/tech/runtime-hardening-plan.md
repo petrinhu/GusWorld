@@ -12,7 +12,7 @@ Autor: security-engineer (defensivo)
 > 4. Manter HMAC do save (ADR-006) + hash-128 do controls (ADR-007).
 > FORA do escopo G1 (NAO fazer): kernel anti-cheat, anti-debug agressivo, deteccao de injection/hook, packing, pointer-scan dedicado.
 > Quando os valores de gameplay existirem (combate ja tem HP/AP/mana; economia/XP em progression/save), aplicar 1-3 nesses pontos.
-Escopo: GusWorld G1, C++20 + SDL3, engine propria, Linux + Windows, FOSS/GPLv3, SEM code signing.
+Escopo: GusWorld G1, C++20 + SDL3, engine propria, Linux + Windows, FOSS/Apache-2.0, SEM code signing.
 Conecta com: ADR-006 (HMAC-SHA256 save), ADR-007 (hash-128 controls.json), invariantes de combate.
 
 NAO e codigo. E um plano para o lider escolher o nivel. Descreve os vetores SO o
@@ -36,7 +36,7 @@ DONO da maquina, do processo e da RAM. Consequencias diretas e inegociaveis:
 
 2. **Anti-cheat de kernel e VETADO neste projeto** e seria contra-producente:
    - Contraria offline (nao ha servidor para apoiar a decisao).
-   - Contraria Linux + FOSS/GPLv3 (drivers de kernel anti-cheat sao proprietarios,
+   - Contraria Linux + FOSS/Apache-2.0 (drivers de kernel anti-cheat sao proprietarios,
      invasivos, e mal vistos no Linux; varios quebram em Proton/anti-cheat ring-0).
    - Contraria privacidade/LGPD (telemetria invasiva, varredura do sistema do jogador).
    - Sem code signing em G1, um driver nem carregaria sem fricao enorme.
@@ -164,8 +164,8 @@ Colunas: **Vetor** | **O que e** | **Da para impedir em solo offline?** |
   detectar edicao manual e oferecer restauro (ADR-007). Mesmo padrao pode estender a
   outros data-files sensiveis ao gameplay (tabelas de balanceamento) SE virarem
   externos editaveis. Para data embutido no binario, nao precisa nada. Reacao = avisar
-  / restaurar default, nunca crashar. Lembrar: GPLv3 da ao jogador o direito de
-  modificar; a meta e so distinguir "oficial" de "modificado", nao proibir.
+  / restaurar default, nunca crashar. Lembrar: a Apache-2.0 (codigo aberto) ja da ao
+  jogador o direito de modificar; a meta e so distinguir "oficial" de "modificado", nao proibir.
 - **Custo:** baixo (reusa crypto do core); zero antivirus; igual Linux/Win.
 - **Recomendacao G1:** **DEPOIS / conforme surgir** data-file externo sensivel. Reusar
   o padrao do ADR-007. Sem urgencia no vertical slice.
@@ -225,7 +225,7 @@ Colunas: **Vetor** | **O que e** | **Da para impedir em solo offline?** |
 - **Deteccao de DLL injection / hook / varredura de modulos:** caro, falso-positivo com
   overlay legitimo (Steam/Discord) e acessibilidade, cheira a malware. (2.5)
 - **Packing / virtualizacao de codigo (VMProtect-like):** peso de build enorme, quebra
-  reprodutibilidade, conflita com GPLv3 (codigo aberto de qualquer forma), dispara
+  reprodutibilidade, conflita com a Apache-2.0 (codigo aberto de qualquer forma), dispara
   antivirus. Inutil em solo.
 - **Pointer-scan defense dedicada:** sem ganho alem do que 2.1 ja da. (2.3)
 

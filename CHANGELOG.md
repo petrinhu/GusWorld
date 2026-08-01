@@ -27,7 +27,7 @@ Três viradas de base técnica até hoje. Cada uma reescreveu fundação; a últ
   Linguagem primária deixou de ser GDScript e virou C# .NET 8 (AOT), por critério de máxima performance em máquinas modestas. (Stack posteriormente abandonado, ver abaixo.)
 
 - **Godot/C# para C++20 + engine própria (Qt6), 2026-06-21, `docs/tech/pivot/engine-design.md`.**
-  Decisão do líder supremo: trocar Godot por engine própria em C++20, migração faseada anti big-bang (Godot vivo como referência de leitura até o decommission no M8). Arquitetura em 4 camadas (`core`/`domain` POCO puro + `platform`/`app` na fronteira). Câmera fixa top-down, combate por turnos estilo Pokémon, visual estilo Stardew. Licença migrada de AGPL-3.0 para GPLv3 ([ADR-005](docs/tech/adr/ADR-005-license-gpl3-assets-ccbysa.md)).
+  Decisão do líder supremo: trocar Godot por engine própria em C++20, migração faseada anti big-bang (Godot vivo como referência de leitura até o decommission no M8). Arquitetura em 4 camadas (`core`/`domain` POCO puro + `platform`/`app` na fronteira). Câmera fixa top-down, combate por turnos estilo Pokémon, visual estilo Stardew. Licença migrada de AGPL-3.0 para GPLv3 ([ADR-005](docs/tech/adr/ADR-005-license-gpl3-assets-ccbysa.md); código depois rotacionado para Apache-2.0, ver seção Legal abaixo).
 
 - **RE-PIVOT: Qt6 para SDL3 + RmlUi + miniaudio, 2026-06-22, [ADR-008](docs/tech/adr/ADR-008-repivot-qt-to-sdl3.md) (o mais recente e mais importante).**
   A camada de plataforma deixa de ser Qt6 e passa a ser SDL3 (janela, loop, input, gamepad), com **RmlUi** (HTML/CSS-like) para a UI do jogador e **miniaudio** para áudio. Motivos: o Qt RHI é API semi-privada e isso é risco (some com `SDL_Renderer`); gamepad nativo de classe AAA (o Qt6 removeu o QtGamepad); binário e deploy ~10x menores (licença zlib); portabilidade para mobile e console (Qt não vai para console). Custo baixo porque a lógica pura (`core`/`domain`, ~590 testes auditados) não muda: só a fronteira `platform/` + a casca `app/` são reescritas. A invariante das 4 camadas passa a proibir Qt **e** SDL em `core`/`domain`.
@@ -128,7 +128,8 @@ Três viradas de base técnica até hoje. Cada uma reescreveu fundação; a últ
 
 ### Legal
 
-- Licença do código migrada de AGPL-3.0 para **GPLv3**; assets sob **CC-BY-SA 4.0**; livros Vol1/Vol2 com direitos reservados (obra à parte). Modelo freeware + doação opcional. Ver [ADR-005](docs/tech/adr/ADR-005-license-gpl3-assets-ccbysa.md).
+- Licença do código migrada de AGPL-3.0 para **GPLv3**; assets sob **CC-BY-SA 4.0**; livros Vol1/Vol2 com direitos reservados (obra à parte). Modelo freeware + doação opcional. Ver [ADR-005](docs/tech/adr/ADR-005-license-gpl3-assets-ccbysa.md). **Nota:** o código foi depois rotacionado para **Apache-2.0** (ver entrada abaixo).
+- **Licença do código rotacionada de GPLv3 para Apache License 2.0** (2026-07-31, item `LIC-APACHE` do `TODO.md`; ADR de superação em preparação, ver `docs/tech/adr/ADR-005-license-gpl3-assets-ccbysa.md`, que fica como registro histórico da decisão original com nota de superação). Motivo resumido: adoção por terceiros sem exigência de copyleft e sem CLA, viabilidade em lojas como Steamworks, e a concessão explícita de patente da seção 5 da Apache 2.0. Assets seguem **CC-BY-SA 4.0** e os livros Vol1/Vol2 seguem em **direitos reservados**; nenhum dos dois entra nesta rotação (decisão independente do líder). `LICENSE` e `NOTICE` atualizados; ver `THIRD-PARTY-LICENSES.md` para a atribuição de terceiros sob a licença nova.
 
 ---
 

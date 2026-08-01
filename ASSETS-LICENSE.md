@@ -10,7 +10,7 @@ GusWorld é **freeware** (grátis, pra sempre). Tem partes sob licenças diferen
 
 | Parte | Licença | Onde |
 |---|---|---|
-| Código-fonte | GNU GPL v3.0 (GPLv3) | ver [LICENSE](LICENSE) |
+| Código-fonte | Apache License 2.0 | ver [LICENSE](LICENSE) |
 | Assets (arte, áudio, texturas, textos in-game) | Creative Commons BY-SA 4.0 | este arquivo |
 | Livros-companheiros (Vol 1 + Vol 2) | Direitos reservados (obra à parte) | ver exceção abaixo |
 

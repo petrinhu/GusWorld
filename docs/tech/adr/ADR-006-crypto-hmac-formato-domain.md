@@ -34,7 +34,7 @@ Eixo formato: (A) JSON compativel com o C# (nlohmann/json): preserva o oraculo b
 
 ## Consequencias
 
-Positivas: build reprodutivel Linux+Windows sem vcpkg/OpenSSL/JSON externos; invariante zero-Qt e zero-dep externa em core/domain preservada; soberania total do codigo critico (crypto + formato) sob GPLv3, sem atribuicao extra; o oraculo semantico prova nao-corrupcao sem acorrentar o C++ a quirks do .NET pos-M8.
+Positivas: build reprodutivel Linux+Windows sem vcpkg/OpenSSL/JSON externos; invariante zero-Qt e zero-dep externa em core/domain preservada; soberania total do codigo critico (crypto + formato) sob Apache-2.0, sem atribuicao extra; o oraculo semantico prova nao-corrupcao sem acorrentar o C++ a quirks do .NET pos-M8.
 
 Negativas (aceitas como custo): crypto propria exige suite de teste com vetores oficiais (FIPS 180-4 + RFC 4231) como gate; romper o formato C# significa abrir mao do oraculo byte-a-byte literal (os fixtures C# viram referencia semantica, nao binaria); saves/templates do C# antigo nao sao lidos pelo C++ (aceitavel: sem base instalada real).
 

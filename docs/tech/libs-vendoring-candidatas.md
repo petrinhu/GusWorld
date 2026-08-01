@@ -83,3 +83,7 @@ Avaliadas, sem candidata vendorizavel prioritaria pro nosso caso: fisica 2D seri
 2. Citar a lib em `THIRD-PARTY-LICENSES.md` + nos Creditos do README (nome, licenca, url).
 3. NAO virar dependencia de build externa (sem find_package/vcpkg): so `#include` do header local.
 4. Anti-over-engineering (YAGNI): incorporar so o que resolve necessidade real atual ou iminente; o resto fica nesta lista pra sob-demanda.
+
+---
+
+**Nota (LIC-APACHE, 2026-07-31):** este documento e um catalogo historico da pesquisa de 2026-06-22 (ver `THIRD-PARTY-LICENSES.md`); o filtro "compativel com GPLv3" acima registra o criterio REALMENTE usado naquela avaliacao, entao nao foi reescrito. A licenca vigente do codigo do GusWorld e a **Apache License 2.0** (rotacionada a partir de GPLv3); as libs Apache-2.0/MIT/BSD/zlib/publicdomain catalogadas acima continuam compativeis com o estado atual.

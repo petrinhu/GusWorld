@@ -126,7 +126,9 @@ Ordem real sugerida: **M0 → (M1 ‖ M3) → M2 → M4 → M5 → M6 → M7 →
 
 ---
 
-## 7. Licença (DECIDIDA pelo líder 2026-06-21; fecha o RF-9, ver ADR-005)
+## 7. Licença (DECIDIDA pelo líder 2026-06-21; fecha o RF-9, ver ADR-005): código SUPERADO pela rotação Apache-2.0
+
+> **Nota (LIC-APACHE, 2026-07-31):** esta seção documenta a decisão histórica de 2026-06-21 (raciocínio da época: GPLv3 sobre AGPL, static-link do Qt legado etc.) e fica intacta como registro, no mesmo espírito do `ADR-005` (que também não se edita). **A licença do código foi depois rotacionada de GPLv3 para Apache License 2.0** (ver `THIRD-PARTY-LICENSES.md`, `LICENSE` e o ADR novo de superação, item `LIC-APACHE` do `TODO.md`). O modelo de negócio (freeware + doação opcional) e a licença dos assets (CC-BY-SA 4.0) e dos livros (direitos reservados) não mudaram.
 
 **Modelo de negócio (decidido 2026-06-21):** o jogo é **freeware** (grátis) + **doação opcional** ("buy me a coffee and some AI tokens", PayPal donate (merchant `9XNZQ4RND67KL`, BRL), nunca obrigatória) + **código aberto sob GPLv3**.
 

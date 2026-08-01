@@ -72,7 +72,7 @@ gusworld/
 ├── AI-DISCLOSURE.md      # [tracked] divulgação de onde IA foi usada no projeto, por papel
 ├── ASSETS-LICENSE.md     # [tracked] licença dos assets (arte/música/lore), distinta da licença de código
 ├── THIRD-PARTY-LICENSES.md  # [tracked] atribuição de componentes de terceiros empacotados
-├── LICENSE               # [tracked] GPLv3 (código)
+├── LICENSE               # [tracked] Apache-2.0 (código)
 ├── resumo.pdf             # [gitignored] concept art/refs solto, local
 ├── .bigtech-porte         # [tracked] marcador de porte/ativação da constelação C-level (Cósimo)
 ├── .editorconfig          # [tracked] estilo de arquivo (indentação etc.)

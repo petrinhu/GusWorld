@@ -160,7 +160,7 @@ cmake --build --preset linux-release   # presets ativam -Werror
 ### Disciplina
 
 - Toda bump de SDL3, RmlUi ou lib vendorizada **MUST** gerar entry em `CHANGELOG.md` + commit `chore(deps): atualiza <lib> X.Y.Z`.
-- Dependências externas **MUST** ser auditadas antes de adicionar (licença permissiva compatível com GPLv3, mantenedor ativo nos últimos 12 meses).
+- Dependências externas **MUST** ser auditadas antes de adicionar (licença permissiva compatível com Apache-2.0, mantenedor ativo nos últimos 12 meses).
 - O pin de versão **MUST** estar versionado no CMake (nunca "latest" flutuante).
 
 ### Comando inventário

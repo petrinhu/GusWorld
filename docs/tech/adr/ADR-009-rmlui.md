@@ -138,12 +138,12 @@ O criador framou como "FreeType = dep nova vs stb ja vendorizado". **Contra-argu
 
 | Opcao | Como | Pros | Contras |
 |---|---|---|---|
-| **(A) FreeType** (default do RmlUi) | `RMLUI_FONT_ENGINE=freetype`; FreeType entra via FetchContent/vendor | Caminho **suportado e testado** pelo RmlUi (zero codigo nosso de fonte); hinting/kerning/subpixel de qualidade; cobre acentos pt-br e qualquer fonte futura sem esforco | +1 dependencia (FreeType, licenca FTL/GPL-compat OK pra GPLv3); +tempo de build |
+| **(A) FreeType** (default do RmlUi) | `RMLUI_FONT_ENGINE=freetype`; FreeType entra via FetchContent/vendor | Caminho **suportado e testado** pelo RmlUi (zero codigo nosso de fonte); hinting/kerning/subpixel de qualidade; cobre acentos pt-br e qualquer fonte futura sem esforco | +1 dependencia (FreeType, licenca FTL compativel com Apache-2.0); +tempo de build |
 | **(B) Custom FontEngineInterface sobre stb_truetype** | `RMLUI_FONT_ENGINE=none` (ja esta assim no CMake!) + implementar `Rml::FontEngineInterface` usando o `font_atlas` que JA temos | Zero dep nova; reusa o stb ja vendorizado e o font_atlas ja escrito/testado; controle total | **Trabalho nosso real:** implementar a interface inteira (medir string, layout de linha, kerning, fallback de glifo, geracao de geometria de texto, efeitos de fonte do RCSS tipo `font-effect: glow/shadow/outline`). stb_truetype e raster baixo-nivel; o RmlUi espera um motor de fonte COMPLETO. Os `font-effect` do RCSS (glow/outline na fonte) sao parte do "mock lindo" e dao trabalho a mao |
 
 **Recomendacao do arquiteto: (A) FreeType.** Razao de trade-off:
 - O objetivo de adotar RmlUi e **parar de reimplementar fidelidade visual a mao**. Escrever um FontEngineInterface custom e voltar a fazer exatamente isso (reimplementar tipografia a mao), so que num lugar mais critico. Contradiz o motivo da decisao.
-- FreeType e a unica dep nova relevante, e barata: licenca compativel com GPLv3, build estavel, e o caminho que 99% dos usuarios do RmlUi seguem (logo, o mais testado e documentado).
+- FreeType e a unica dep nova relevante, e barata: licenca compativel com Apache-2.0, build estavel, e o caminho que 99% dos usuarios do RmlUi seguem (logo, o mais testado e documentado).
 - O `font_atlas`/stb atual **nao e desperdicado**: continua servindo a arena/floaters no `Render2dSdl` (que NAO usa RmlUi). So o CHROME passa a usar FreeType. Convivem.
 - `font-effect` do RCSS (glow/shadow/outline no texto do log/banner) sai de graca com FreeType; com stb custom, cada um vira codigo nosso.
 

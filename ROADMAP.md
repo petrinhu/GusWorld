@@ -104,7 +104,7 @@ As viradas de stack e os contratos irreversíveis estão registrados em [`docs/t
 | [ADR-002](docs/tech/adr/ADR-002-csharp-aot-over-gdscript.md) | GDScript para C# .NET 8 AOT (depois superado) |
 | [ADR-003](docs/tech/adr/ADR-003-dialogue-library.md) | Biblioteca de diálogo (Godot) — **SUPERADO pela ADR-014** |
 | [ADR-004](docs/tech/adr/ADR-004-environment-modifier-contract.md) | Contrato do `EnvironmentModifier` (§18 combate) |
-| [ADR-005](docs/tech/adr/ADR-005-license-gpl3-assets-ccbysa.md) | GPLv3 (código) + CC-BY-SA 4.0 (assets) |
+| [ADR-005](docs/tech/adr/ADR-005-license-gpl3-assets-ccbysa.md) | GPLv3 (código) + CC-BY-SA 4.0 (assets); código **SUPERADO** pela rotação para Apache-2.0 (item `LIC-APACHE` do `TODO.md`; ADR novo de superação a caminho); assets seguem CC-BY-SA 4.0, fora desta rotação |
 | [ADR-006](docs/tech/adr/ADR-006-crypto-hmac-formato-domain.md) | Cripto HMAC-SHA256 + formato de serialização do domain |
 | [ADR-007](docs/tech/adr/ADR-007-controls-json-hash128-save-v4.md) | Persistência de controles + save V4 anti-tamper |
 | [ADR-008](docs/tech/adr/ADR-008-repivot-qt-to-sdl3.md) | Re-pivot Qt6 para SDL3 + RmlUi + miniaudio |
