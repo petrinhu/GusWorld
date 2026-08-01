@@ -2,7 +2,7 @@
 
 [![CI](https://github.com/petrinhu/GusWorld/actions/workflows/ci.yml/badge.svg)](https://github.com/petrinhu/GusWorld/actions/workflows/ci.yml)
 [![Windows](https://github.com/petrinhu/GusWorld/actions/workflows/windows.yml/badge.svg)](https://github.com/petrinhu/GusWorld/actions/workflows/windows.yml)
-[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](LICENSE)
+[![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
 
 > A stylized turn-based 2D RPG: an 11-year-old hacker prodigy against a cyber-gothic megacorporation.
 
@@ -123,7 +123,7 @@ Or scan the QR code with your phone's camera:
 
 ## License
 
-**Source code:** [GNU General Public License v3.0 (GPLv3)](LICENSE), strong copyleft. SDL3 (zlib) is permissive; glintfx (MPL-2.0, weak copyleft per-file) wraps RmlUi 6.3 (MIT); all of it is compatible with GPLv3, including static linking.
+**Source code:** [Apache License 2.0](LICENSE), permissive. SDL3 (zlib) is permissive; glintfx (MPL-2.0, weak copyleft per-file, as of the pinned `v0.28.0` tag) wraps RmlUi 6.3 (MIT); all of it is compatible with Apache 2.0, including static linking. See [NOTICE](NOTICE) for attribution and this project's trademark policy (the license covers the code, not the GusWorld name or logo).
 
 **Lore and art (assets):** [CC-BY-SA-4.0](ASSETS-LICENSE.md), except the Vol. 1 / Vol. 2 books (all rights reserved, a separate work). Full third-party attributions in [THIRD-PARTY-LICENSES.md](THIRD-PARTY-LICENSES.md).
 
@@ -160,7 +160,7 @@ The full acknowledgments (including a proper thank-you to the RmlUi and glintfx 
 
 [![CI](https://github.com/petrinhu/GusWorld/actions/workflows/ci.yml/badge.svg)](https://github.com/petrinhu/GusWorld/actions/workflows/ci.yml)
 [![Windows](https://github.com/petrinhu/GusWorld/actions/workflows/windows.yml/badge.svg)](https://github.com/petrinhu/GusWorld/actions/workflows/windows.yml)
-[![Licença: GPL v3](https://img.shields.io/badge/Licen%C3%A7a-GPLv3-blue.svg)](LICENSE)
+[![Licença: Apache 2.0](https://img.shields.io/badge/Licen%C3%A7a-Apache%202.0-blue.svg)](LICENSE)
 
 > Um RPG 2D estilizado com combate por turnos: um prodígio-hacker de 11 anos contra uma megacorporação ciber-gótica.
 
@@ -277,7 +277,7 @@ Ou aponte a câmera do celular no QR Code:
 
 ### Licença
 
-**Código-fonte:** [GNU General Public License v3.0 (GPLv3)](LICENSE), copyleft forte. SDL3 (zlib) é permissiva; o glintfx (MPL-2.0, copyleft fraco por arquivo) embrulha o RmlUi 6.3 (MIT); tudo compatível com GPLv3, inclusive em link estático.
+**Código-fonte:** [Apache License 2.0](LICENSE), permissiva. SDL3 (zlib) é permissiva; o glintfx (MPL-2.0, copyleft fraco por arquivo, na tag fixada `v0.28.0`) embrulha o RmlUi 6.3 (MIT); tudo compatível com Apache 2.0, inclusive em link estático. Veja o [NOTICE](NOTICE) para a atribuição e a política de marca deste projeto (a licença cobre o código, não o nome nem o logotipo do GusWorld).
 
 **Lore e arte (assets):** [CC-BY-SA-4.0](ASSETS-LICENSE.md), exceto os livros Vol. 1 / Vol. 2 (direitos reservados, obra à parte). Atribuições completas de terceiros em [THIRD-PARTY-LICENSES.md](THIRD-PARTY-LICENSES.md).
 
