@@ -16,6 +16,7 @@
 #include <catch2/catch_test_macros.hpp>
 
 #include <cstdlib>
+#include <fstream>
 #include <iostream>
 #include <sstream>
 #include <vector>
@@ -301,6 +302,21 @@ TEST_CASE("mira_sim: proportion_metric_pct/mean_metric batem com formula conheci
 
     REQUIRE(mean_metric({}).value == Catch::Approx(0.0));
     REQUIRE(mean_metric({5.0}).moe95 == Catch::Approx(0.0));  // n=1: sem desvio-padrao
+}
+
+// TeeOstream (achado do team-lead 2026-08-01: gravar em tela E em arquivo ao mesmo
+// tempo). Prova DECISIVA: escreve UMA vez no TeeOstream e confirma que o texto aparece
+// INTEIRO nos DOIS sinks subjacentes, nao so num deles (um bug de streambuf tipico e
+// "escreve no primeiro, esquece o segundo" ou vice-versa).
+TEST_CASE("mira_sim: TeeOstream escreve nos DOIS sinks subjacentes", "[domain][mira_sim]") {
+    std::ostringstream sink_a;
+    std::ostringstream sink_b;
+    TeeOstream tee(sink_a, sink_b);
+    tee << "linha 1\n" << 42 << " linha 2\n";
+    tee.flush();
+    REQUIRE(sink_a.str() == "linha 1\n42 linha 2\n");
+    REQUIRE(sink_b.str() == "linha 1\n42 linha 2\n");
+    REQUIRE(sink_a.str() == sink_b.str());
 }
 
 TEST_CASE("mira_sim: aggregate_mira calcula E1/E2/E3/E4/E5 sobre BattleTrace sintetico",
@@ -953,8 +969,9 @@ TEST_CASE("mira_sim: L6 aplica 70% do HP inicial na party (protocolo secao 2.2)"
 
 TEST_CASE("mira_sim: smoke - 7 lotes x 6 bracos, N pequeno, progresso no formato exato",
           "[domain][mira_sim][mira_sim_smoke]") {
-    const bool full_run = std::getenv("GUSWORLD_MIRA_SIM_FULL") != nullptr;
-    const int n_per_arm = full_run ? 240000 : 10;
+    // SEMPRE N pequeno (o proposito deste teste e estrutural/formato, nao o run pesado -
+    // ver o teste dedicado de run_full_study logo abaixo pro relatorio + o run completo).
+    const int n_per_arm = 10;
     const std::uint32_t base_seed = 20260801;
 
     std::ostringstream progress;
@@ -976,5 +993,49 @@ TEST_CASE("mira_sim: smoke - 7 lotes x 6 bracos, N pequeno, progresso no formato
     REQUIRE(out.find("lote [1] de [7], simulação [") != std::string::npos);
     REQUIRE(out.find("] de [" + std::to_string(n_per_arm * static_cast<int>(kAllArms.size())) + "]") !=
             std::string::npos);
-    if (!full_run) std::cout << out;
+}
+
+// Achado do team-lead 2026-08-01: nenhuma funcao imprimia o LoteArmReport (as 8 metricas
+// eram calculadas e descartadas) e o progresso do run cheio ficava preso num buffer so
+// despejado no fim. run_full_study() fecha os dois buracos: progresso em tempo real
+// (flush a cada 1%, ja em run_lote_all_arms) + relatorio de 2 camadas POR LOTE, impresso
+// assim que aquele lote termina (nao acumulado ate o fim do estudo inteiro).
+//
+// CI (sem GUSWORLD_MIRA_SIM_FULL): N pequeno, ostringstream, SEM tocar disco - so prova
+// que run_full_study nao lanca e produz as secoes esperadas.
+//
+// RUN COMPLETO (com GUSWORLD_MIRA_SIM_FULL=1, disparado SO pelo team-lead/lider, NUNCA
+// por este harness - protocolo secao 7 item 1): N=240.000, progresso e relatorio vao pro
+// std::cout E pro arquivo (GUSWORLD_MIRA_SIM_REPORT_PATH, default "mira_sim_report.txt")
+// AO MESMO TEMPO via TeeOstream - achado do team-lead: "o lider vai querer reler e
+// comparar", dez minutos de saida so na tela se perdem.
+TEST_CASE("mira_sim: run_full_study imprime o relatorio de 2 camadas e grava em arquivo "
+          "(o disparo real do estudo, protocolo secao 7)",
+          "[domain][mira_sim][mira_sim_smoke]") {
+    const bool full_run = std::getenv("GUSWORLD_MIRA_SIM_FULL") != nullptr;
+    const std::uint32_t base_seed = 20260801;
+
+    if (!full_run) {
+        const int n_per_arm = 5;
+        std::ostringstream out;
+        REQUIRE_NOTHROW(run_full_study(n_per_arm, base_seed, out));
+        const std::string text = out.str();
+        REQUIRE_FALSE(text.empty());
+        REQUIRE(text.find("MIRA-SIM") != std::string::npos);
+        REQUIRE(text.find("valores //SIM") != std::string::npos);
+        REQUIRE(text.find("erros internos:") != std::string::npos);
+        REQUIRE(text.find("MCID") != std::string::npos);
+        REQUIRE((text.find("DIFERENCA RELEVANTE") != std::string::npos ||
+                text.find("empate") != std::string::npos));
+        return;
+    }
+
+    const int n_per_arm = 240000;
+    const char* report_path_env = std::getenv("GUSWORLD_MIRA_SIM_REPORT_PATH");
+    const std::string report_path =
+        report_path_env != nullptr ? std::string(report_path_env) : std::string("mira_sim_report.txt");
+    std::ofstream file(report_path);
+    REQUIRE(file.is_open());
+    TeeOstream tee(std::cout, file);
+    run_full_study(n_per_arm, base_seed, tee);
 }

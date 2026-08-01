@@ -105,6 +105,7 @@
 #include <optional>
 #include <ostream>
 #include <stdexcept>
+#include <streambuf>
 #include <string>
 #include <vector>
 
@@ -1145,15 +1146,194 @@ struct McidComparison {
                 const int pct = (n_done * 100) / n_total_per_lote;
                 if (pct != last_pct_printed) {
                     last_pct_printed = pct;
+                    // .flush() explicito (achado do team-lead 2026-08-01): sem isto, um
+                    // stream redirecionado pra arquivo/pipe (nao um terminal interativo,
+                    // onde '\n' costuma auto-flushar) so mostraria o progresso quando o
+                    // buffer do SO decidisse, nao a cada 1% de verdade.
                     (*progress_out) << "lote [" << lote_idx_1based << "] de [" << lote_total
                                     << "], simulação [" << n_done << "] de [" << n_total_per_lote
                                     << "]\n";
+                    progress_out->flush();
                 }
             }
         }
         reports.push_back(aggregate_mira(lote_label(lote), arm_label(arm), traces));
     }
     return reports;
+}
+
+// ============================================================================
+// Relatorio (protocolo secao 7 item 5: "entrega em duas camadas"). Achado do team-lead
+// 2026-08-01: as 8 metricas eram calculadas e DESCARTADAS - nenhuma funcao as imprimia, e
+// mcid_compare_pct/rounds existiam sem NENHUM chamador. Sem isto, rodar os 10 milhoes nao
+// entrega dado nenhum ao lider.
+// ============================================================================
+
+// "Tee" minimo (streambuf composto, biblioteca padrao pura - nao reimplementa nada do
+// motor): escreve em 2 sinks subjacentes atraves de UM unico std::ostream, pra toda
+// funcao que ja recebe std::ostream& (print_* abaixo, o progress_out de
+// run_lote_all_arms) escrever em AMBOS sem mudar assinatura nenhuma. Usado pra gravar o
+// relatorio em std::cout E em arquivo ao mesmo tempo (achado do team-lead: "o lider vai
+// querer reler e comparar" - dez minutos de saida so na tela se perdem).
+class TeeStreambuf final : public std::streambuf {
+public:
+    TeeStreambuf(std::streambuf* a, std::streambuf* b) : a_(a), b_(b) {}
+
+protected:
+    int overflow(int c) override {
+        if (c == EOF) return 0;
+        const int ra = a_->sputc(static_cast<char>(c));
+        const int rb = b_->sputc(static_cast<char>(c));
+        return (ra == EOF || rb == EOF) ? EOF : c;
+    }
+    int sync() override {
+        const int ra = a_->pubsync();
+        const int rb = b_->pubsync();
+        return (ra == 0 && rb == 0) ? 0 : -1;
+    }
+
+private:
+    std::streambuf* a_;
+    std::streambuf* b_;
+};
+
+class TeeOstream final : public std::ostream {
+public:
+    TeeOstream(std::ostream& a, std::ostream& b) : std::ostream(&buf_), buf_(a.rdbuf(), b.rdbuf()) {}
+
+private:
+    TeeStreambuf buf_;
+};
+
+// Cabecalho do estudo (escopo do run - "a saida declara o que mediu"): N por braco,
+// contagem de lotes/bracos, seed base, e os valores //SIM usados (protocolo secao 5).
+inline void print_study_header(std::ostream& out, int n_per_arm, std::uint32_t base_seed) {
+    out << "=== MIRA-SIM: estudo de simulacao estatistica da mira inimiga ===\n"
+        << "protocolo: docs/design/mecanicas/proposta-protocolo-simulacao-mira.md\n"
+        << "N por braco: " << n_per_arm << "  |  bracos: " << kAllArms.size()
+        << "  |  lotes: " << kAllLotes.size() << "  |  seed base: " << base_seed << "\n"
+        << "N por lote (todos os bracos): " << (n_per_arm * static_cast<int>(kAllArms.size()))
+        << "  |  N total do estudo: "
+        << (n_per_arm * static_cast<int>(kAllArms.size()) * static_cast<int>(kAllLotes.size()))
+        << "\n"
+        << "valores //SIM (protocolo secao 5): "
+        << "V1=" << kBaseWeight << " (peso base) | "
+        << "V2=+" << kF1WeightPerDamagePoint << "/dano (F1) | "
+        << "V3=100x(1-hp/hpmax) (F2) | "
+        << "V4=+" << kF3SupportWeight << " (F3) | "
+        << "V5=x0.5/x0.1/x2.0/x1.0 por braco C/D/E/F (F4) | "
+        << "V6=x" << kHoneypotWeightMultiplier << " por " << kHoneypotDurationRounds
+        << " rodadas (honeypot, so peso) | "
+        << "V7=fallback uniforme quando peso total=0 | "
+        << "V8=" << kDaemonGuardAtk << " (Atk Daemon-Guard) | "
+        << "V9=SPD " << kSentinelaSpd << "/" << kDaemonGuardSpd << " (Sentinela/Daemon) | "
+        << "V10=" << kHealerHealAmount << "HP (cura Jaci) | "
+        << "V12=" << kRoundCap << " (cap de rodadas)\n"
+        << "===================================================================\n";
+}
+
+// Camada 1 (numeros): uma tabela por braco com as 8 metricas do protocolo secao 4 + a
+// linha OBRIGATORIA de escopo de erro interno, impressa MESMO EM ZERO ("zero declarado
+// vale mais que zero presumido", achado do team-lead).
+inline void print_lote_report_layer1(std::ostream& out, const std::string& lote_name,
+                                     const std::vector<LoteArmReport>& reports) {
+    out << "\n=== Lote: " << lote_name << " ===\n";
+    for (const LoteArmReport& r : reports) {
+        out << "[" << r.arm << "] n=" << r.n << "\n"
+            << "  E1 (vitoria/derrota/empate tecnico/erro interno, 4 fracoes de n=" << r.n
+            << "): vitoria=" << r.win_rate_pct.value << "%+-" << r.win_rate_pct.moe95
+            << "  derrota=" << r.defeat_rate_pct.value << "%+-" << r.defeat_rate_pct.moe95
+            << "  empate_tecnico=" << r.pct_hit_round_cap.value << "%+-" << r.pct_hit_round_cap.moe95
+            << "  erro_interno=" << r.internal_error_pct.value << "%+-" << r.internal_error_pct.moe95
+            << "\n"
+            << "  E2 (duracao): rounds mean=" << r.mean_rounds << " median=" << r.median_rounds
+            << " p10=" << r.p10_rounds << " p90=" << r.p90_rounds
+            << "  janela-3-5=" << r.pct_in_window_3_5.value << "%+-" << r.pct_in_window_3_5.moe95
+            << "\n"
+            << "  E3 (concentracao): media=" << r.concentration_pct.value << "%+-"
+            << r.concentration_pct.moe95 << "  saco-de-pancadas=" << r.pct_saco_de_pancadas.value
+            << "%+-" << r.pct_saco_de_pancadas.moe95 << "\n"
+            << "  E4 (quedas): qualquer=" << r.pct_any_fall.value << "%+-" << r.pct_any_fall.moe95
+            << "  gus=" << r.pct_fall_by_member[idx(PartyMember::Gus)].value << "%"
+            << "  caua=" << r.pct_fall_by_member[idx(PartyMember::Caua)].value << "%"
+            << "  jaci=" << r.pct_fall_by_member[idx(PartyMember::Jaci)].value << "%\n"
+            << "  E5 (previsibilidade): repeticao-de-alvo=" << r.repeat_target_pct.value << "%+-"
+            << r.repeat_target_pct.moe95 << "\n"
+            << "  E6 (eficiencia da parede): absorcao=" << r.shield_absorption_pct.value << "%+-"
+            << r.shield_absorption_pct.moe95 << "  desperdicado-total=" << r.shield_wasted_total
+            << "\n"
+            << "  E7 (exploit de defesa, so L2/L3): bateu-cap(lutas validas)="
+            << r.pct_hit_round_cap_e7.value << "%+-" << r.pct_hit_round_cap_e7.moe95
+            << "  hp-final-medio=" << r.avg_final_hp_pct << "%\n"
+            << "  E8 (rodada da 1a queda): mean=" << r.mean_first_fall_round
+            << " median=" << r.median_first_fall_round << "\n";
+    }
+
+    long total_errors = 0;
+    long total_n = 0;
+    std::string first_msg;
+    for (const LoteArmReport& r : reports) {
+        total_errors += r.internal_errors_count;
+        total_n += r.n;
+        if (first_msg.empty() && !r.first_internal_error_message.empty())
+            first_msg = r.first_internal_error_message;
+    }
+    out << "--- erros internos: " << total_errors << " de " << total_n << " ---\n";
+    if (!first_msg.empty()) out << "  primeira mensagem: " << first_msg << "\n";
+}
+
+// Camada 2 (MCID aplicado): compara TODOS os pares de bracos do MESMO lote nas 3
+// metricas decisorias (protocolo secao 4, "leitura cruzada pre-declarada": E3+E5+E6), com
+// o piso de relevancia FIXADO PELO LIDER ANTES DE VER DADOS (secao 3: 5pp / 0.5 rodada -
+// ja implementado em mcid_compare_pct/mcid_compare_rounds, que ate esta correcao nenhum
+// codigo chamava). E2 e restricao dura (impressa na camada 1, nao comparada par a par -
+// nao e uma competicao entre bracos, e um teto/piso que TODO braco deve respeitar); E1/E4
+// sao veto de balance/Pillar4 (idem, ja na camada 1).
+inline void print_lote_mcid_layer2(std::ostream& out, const std::vector<LoteArmReport>& reports) {
+    out << "--- MCID (piso do lider: <5pp = empate em %; <0.5 rodada = empate em rodadas) ---\n";
+    auto compare_pairs = [&](const char* label, auto getter) {
+        out << "  " << label << ":\n";
+        for (std::size_t i = 0; i < reports.size(); ++i) {
+            for (std::size_t j = i + 1; j < reports.size(); ++j) {
+                const double a = getter(reports[i]);
+                const double b = getter(reports[j]);
+                const McidComparison cmp = mcid_compare_pct(a, b);
+                out << "    " << reports[i].arm << " vs " << reports[j].arm
+                    << ": diff=" << cmp.diff_abs << "pp -> "
+                    << (cmp.verdict == McidVerdict::Empate ? "empate"
+                                                            : "DIFERENCA RELEVANTE")
+                    << "\n";
+            }
+        }
+    };
+    compare_pairs("E3 concentracao de dano",
+                  [](const LoteArmReport& r) { return r.concentration_pct.value; });
+    compare_pairs("E5 previsibilidade (repeticao de alvo)",
+                  [](const LoteArmReport& r) { return r.repeat_target_pct.value; });
+    compare_pairs("E6 eficiencia da parede (absorcao)",
+                  [](const LoteArmReport& r) { return r.shield_absorption_pct.value; });
+    out << "  E2 (restricao dura, nao comparada par a par - ver janela 3-5 na camada 1 "
+        << "acima) e E1/E4 (veto de balance/Pillar4, ver as 4 fracoes de E1 e as quedas na "
+        << "camada 1 acima) completam a leitura, mas nao entram no MCID par a par.\n";
+}
+
+// Orquestra o estudo COMPLETO (7 lotes x 6 bracos): progresso em tempo real (flush a cada
+// 1%, ver run_lote_all_arms), relatorio de 2 camadas por lote impresso IMEDIATAMENTE apos
+// aquele lote terminar (nao acumulado ate o fim - o lider ve cada lote assim que fecha).
+// `out` pode ser std::cout, um arquivo, ou um TeeOstream dos dois (achado do team-lead:
+// grava em tela E em arquivo). NAO roda o estudo sozinho - quem decide disparar e quem
+// chama esta funcao (fora do escopo desta fatia, ver protocolo secao 7 item 1).
+inline void run_full_study(int n_per_arm, std::uint32_t base_seed, std::ostream& out) {
+    print_study_header(out, n_per_arm, base_seed);
+    int lote_idx = 0;
+    for (Lote lote : kAllLotes) {
+        ++lote_idx;
+        const std::vector<LoteArmReport> reports = run_lote_all_arms(
+            lote, n_per_arm, base_seed, &out, lote_idx, static_cast<int>(kAllLotes.size()));
+        print_lote_report_layer1(out, lote_label(lote), reports);
+        print_lote_mcid_layer2(out, reports);
+        out.flush();
+    }
 }
 
 }  // namespace gus::domain::tests::mira_sim
