@@ -1421,3 +1421,59 @@ TEST_CASE("save_load_menu (harness headless, B5): arrastar a barra de rolagem "
     INFO("scroll_top_before=" << scroll_top_before << " scroll_top_after=" << scroll_top_after);
     REQUIRE(scroll_top_after > scroll_top_before);
 }
+
+// ---------------------------------------------------------------- tripwire GLINTFX-SCROLL-ALIGN
+
+// GUARD/TRIPWIRE (item SCROLL-REANCORA-AO-TOPO do TODO.md, bus
+// gusworld_ia_autocomm/inbox-glintfx/archive 20260801-0235): documenta o
+// comportamento ATUAL (errado) de glintfx::UiLayer::scroll_element_into_view -
+// reancora o item ao TOPO da area visivel TODA VEZ que roda (align_with_top=
+// true e o unico modo hoje), mesmo quando o item ja esta totalmente visivel.
+// Medido em reload_geometry_probe.cpp (efemero): reload puro = 0px de
+// deslocamento; chamar scroll_element_into_view com o item ja visivel = -68px.
+//
+// Este teste [!shouldfail] PASSA enquanto a lacuna existir (o Catch2 inverte:
+// conta como sucesso quando o REQUIRE de baixo FALHA). No dia em que o
+// glintfx expuser o alinhamento (ScrollAlignment::Nearest, pedido no bus) e o
+// comportamento virar de fato no-op para item ja visivel, este REQUIRE vai
+// PASSAR - e o Catch2 vai reportar o TEST_CASE inteiro como FALHOU, o sinal
+// pra trocar scroll_element_into_view() por uma chamada com o alinhamento
+// correto nas 2 telas que consomem isto (save/load e o menu de pausa).
+TEST_CASE("save_load_menu (harness headless, tripwire GLINTFX-SCROLL-ALIGN): "
+          "scroll_element_into_view NAO deveria mover um item ja visivel, mas "
+          "hoje reancora ao topo mesmo assim - quando o glintfx corrigir, este "
+          "guard quebra sozinho e avisa pra trocar a chamada",
+          "[save_load_menu_interaction][gl][!shouldfail]") {
+    GlTestEnv env = try_boot_gl();
+    if (!env.ok) {
+        INFO("GL/display indisponivel neste ambiente (sem Xvfb) - harness "
+             "pulado (degradacao segura, 0 assercoes). Rode com Xvfb :99 "
+             "(export DISPLAY=:99) pra exercitar de fato.");
+        return;
+    }
+
+    const gus::app::i18n::Translator translator = make_translator();
+
+    SaveLoadMenuState state;
+    save_load_menu_open(state, SaveLoadMode::Load, make_mixed_slots());
+    state.selected = 1;  // slot 1: ja selecionado/visivel (autosave + 1 ocupado, sem rolagem)
+
+    auto ui = load_ui(state, translator);
+    REQUIRE(ui.has_value());
+
+    const glintfx::ElementBox item_before = ui->get_element_box("slmenu-slot-1");
+    REQUIRE(item_before.found);
+
+    ui->scroll_element_into_view("slmenu-slot-1");
+
+    const glintfx::ElementBox item_after = ui->get_element_box("slmenu-slot-1");
+    REQUIRE(item_after.found);
+    INFO("item ja visivel antes: y=" << item_before.y << "; depois de "
+         "scroll_element_into_view: y=" << item_after.y);
+    // Comportamento DESEJADO (ainda nao existe): a caixa nao deveria se mover
+    // quando o item ja esta totalmente visivel. Hoje ela se move (-68px
+    // medidos) - este REQUIRE falha, e o [!shouldfail] faz o teste PASSAR
+    // documentando a lacuna. Quando o glintfx corrigir, o REQUIRE passa a
+    // valer, e o [!shouldfail] vira o teste FALHO - o sinal esperado.
+    REQUIRE(item_after.y == item_before.y);
+}

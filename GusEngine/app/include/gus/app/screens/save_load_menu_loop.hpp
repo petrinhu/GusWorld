@@ -271,24 +271,6 @@ struct SaveLoadStepResult {
                                                         const SDL_Event& ev,
                                                         const SaveLoadStepBoxes& boxes) noexcept;
 
-// SCROLL SEGUE A SELECAO, PARTE 2 - "SE precisa rolar" (B7, correcao 2026-08-01):
-// funcao PURA/testavel (so recebe caixas JA RESOLVIDAS, sem GL) que decide se o
-// CHAMADOR (SaveLoadScreen::reload_(), save_load_menu_loop.cpp) deve chamar
-// glintfx::UiLayer::scroll_element_into_view. Existe porque essa API NAO e
-// no-op quando o item alvo ja esta visivel - ela REANCORA o item ao TOPO da
-// area visivel TODA VEZ que roda (align_with_top=true e o default), mesmo se
-// ele ja estivesse visivel em outra posicao (medido: -68px de deslocamento so
-// por chamar a funcao com o item ja selecionado/visivel - reload_geometry_
-// probe.cpp, efemero). `list_box` e a caixa de ".slot-list" (o recorte
-// visivel), `item_box` e a caixa do slot ALVO - ambas resolvidas pelo CHAMADOR
-// via glintfx::UiLayer::get_element_box. Devolve true (precisa rolar) quando o
-// item NAO esta totalmente contido no recorte vertical de `list_box`, OU
-// quando qualquer uma das 2 caixas nao foi encontrada (found=false) - fallback
-// defensivo, rola de qualquer forma nesse caso (NUNCA pior que o comportamento
-// incondicional de antes desta correcao).
-[[nodiscard]] bool save_load_scroll_needed(const glintfx::ElementBox& list_box,
-                                           const glintfx::ElementBox& item_box) noexcept;
-
 }  // namespace gus::app::screens
 
 #endif  // GUS_APP_SCREENS_SAVE_LOAD_MENU_LOOP_HPP

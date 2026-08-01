@@ -564,14 +564,6 @@ SaveLoadStepResult save_load_screen_step(SaveLoadMenuState& state, const SDL_Eve
     return result;
 }
 
-bool save_load_scroll_needed(const glintfx::ElementBox& list_box,
-                              const glintfx::ElementBox& item_box) noexcept {
-    if (!list_box.found || !item_box.found) return true;  // fallback defensivo: rola mesmo assim
-    const bool fully_visible = item_box.y >= list_box.y &&
-                                (item_box.y + item_box.h) <= (list_box.y + list_box.h);
-    return !fully_visible;
-}
-
 namespace {
 
 // F4-1b.2: o ScreenState de PRODUCAO da tela de save/load (unico chamador:
@@ -995,28 +987,30 @@ private:
         // SCROLL SEGUE A SELECAO (B7, decisao do lider 2026-08-01): garante que o
         // slot state.selected fique DENTRO do recorte visivel de `.slot-list`.
         //
-        // CORRIGIDO (2026-08-01, achado medido apos o B1 revisao 2 introduzir o
-        // tremor - reload_geometry_probe.cpp, efemero): a chamada INCONDICIONAL a
-        // scroll_element_into_view NAO era no-op quando o item ja estava visivel
-        // - a API tem align_with_top=true por padrao, que REANCORA o item ao TOPO
-        // da area visivel TODA VEZ que roda, mesmo que ele ja estivesse visivel em
+        // ACHADO (2026-08-01, apos o B1 revisao 2 introduzir o tremor -
+        // reload_geometry_probe.cpp, efemero): esta chamada NAO e no-op quando o
+        // item ja esta visivel - o comentario antigo mentia isso. A API do
+        // glintfx tem align_with_top=true fixo, que REANCORA o item ao TOPO da
+        // area visivel TODA VEZ que roda, mesmo que ele ja estivesse visivel em
         // outra posicao (medido: -68px de deslocamento so por chamar a funcao com
-        // o item ja selecionado/visivel, reload puro sem a chamada = 0px de
-        // deslocamento). Isto fazia a lista "pular" a cada mudanca de selecao,
-        // mesmo sem precisar rolar - um tremor que NAO existia antes do B1 revisao
-        // 2 comecar a mudar a selecao a cada MOUSE_MOTION. Agora SO chama quando o
-        // item estiver de fato FORA do recorte visivel (save_load_scroll_needed,
-        // declarada no .hpp - PURA/testavel, ver save_load_scroll_needed_test.cpp)
-        // - "no-op quando ja visivel" agora e verdade, nao so a intencao
-        // documentada.
+        // o item ja selecionado/visivel; reload puro sem a chamada = 0px). Isto
+        // faz a lista "pular" a cada mudanca de selecao, mesmo sem precisar rolar.
+        //
+        // BLOQUEADO PELO GLINTFX (item SCROLL-REANCORA-AO-TOPO do TODO.md):
+        // consertar isto aqui seria escrever a matematica de visibilidade de
+        // lista (comparar item_box contra list_box e decidir se chama) do nosso
+        // lado - exatamente o tipo de logica generica de widget que a LEI do
+        // projeto proibe reimplementar em casa. Reportamos ao glintfx (bus,
+        // thread api-glintfx, 2026-08-01) pedindo para expor o alinhamento
+        // (ScrollAlignment::Nearest, que o RmlUi de baixo ja tem). Ate o bump,
+        // ficamos com o tremor cosmetico - e melhor que reverter o B7 e voltar a
+        // ter a selecao saindo da area visivel, que era um bug funcional. O
+        // guard `[!shouldfail]` em save_load_menu_interaction_test.cpp avisa
+        // sozinho quando o glintfx corrigir.
         const int scroll_target = save_load_scroll_target_index(state_);
         if (scroll_target >= 0) {
             const std::string item_id = slot_item_id(scroll_target);
-            const glintfx::ElementBox list_box = ui_->get_element_box("slmenu-list");
-            const glintfx::ElementBox item_box = ui_->get_element_box(item_id.c_str());
-            if (save_load_scroll_needed(list_box, item_box)) {
-                ui_->scroll_element_into_view(item_id.c_str());
-            }
+            ui_->scroll_element_into_view(item_id.c_str());
         }
     }
 

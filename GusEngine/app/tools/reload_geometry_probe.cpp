@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 // PROBE EFEMERO - investiga se scroll_element_into_view desloca a lista mesmo
 // quando o item ja esta visivel, ou se o desvio vem so do reload_()/re-load do
 // documento (achado do team-lead, 2026-08-01: -6px medido, precisa separar a
