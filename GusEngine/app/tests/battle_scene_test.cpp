@@ -2192,6 +2192,19 @@ TEST_CASE("PREVIEW (bug1): trocar de ator e LIVRE ate a 1a acao - nenhum e compr
     REQUIRE(std::find(pending.begin(), pending.end(), caua) != pending.end());
 }
 
+// Semantica revisada (COMBATE-FILA-CURSOR-FIX, decisao do lider 2026-07-27/28): antes,
+// `recompute_by_speed` reordenava a fila INTEIRA por SPD - o tick de Haste do Caua (12->14)
+// o jogava pra frente do cursor e empurrava um INIMIGO JA-AGIDO (que abriu a rodada, SPD
+// mais alta) de volta pra depois do cursor. O "proximo ator" apos o advance virava esse
+// inimigo ja-agido (nao-player-side), entao `should_offer_actor_picker()` (que exige
+// player-side) dava falso e a Janela de Comando da Party NAO reabria - mascarando que ela
+// deveria. Com o fix, o Caua fica FIXO no proprio slot (nunca cruza o cursor), o motor
+// avanca corretamente pro PROXIMO PENDENTE de verdade (gus, que ainda nao agiu nesta
+// rodada) e a Janela REABRE, exatamente como o desenho pede: "Repete ate todos os membros
+// da party terem agido nesta rodada" (combat.md §4.1, fluxo de rodada modelo 1B, passo 2) -
+// ha 2 elegiveis pendentes (gus, jaci) apos o Caua agir, entao `should_offer_actor_picker()`
+// (>1 elegivel) abre a lista de novo, sem exigir NENHUM update()/pump adicional (e chamada
+// sincrona dentro do proprio resolve_one_turn/start_active_turn).
 TEST_CASE("PREVIEW (bug1): a 1a ACAO e o commit - o tick de status roda SO agora (uma vez)",
           "[battle_scene][picker][preview]") {
     BattleScene scene;
@@ -2206,11 +2219,17 @@ TEST_CASE("PREVIEW (bug1): a 1a ACAO e o commit - o tick de status roda SO agora
     select_verb(scene, BattleVerb::Defender);
     scene.menu_confirm();  // PONTO-DE-NAO-RETORNO: commit_previewed_actor + begin_turn REAL
 
-    REQUIRE_FALSE(scene.is_actor_preview());  // comprometido
-    REQUIRE_FALSE(scene.is_choosing_actor());
+    REQUIRE_FALSE(scene.is_actor_preview());  // o preview do Caua fechou, comprometido
+    // A Janela de Comando da Party REABRE pro proximo bloco de elegiveis (gus, jaci) - ver
+    // comentario acima. Continua havendo >1 pendente nesta rodada, entao o modo NAO fecha.
+    REQUIRE(scene.is_choosing_actor());
     // O tick de Haste rodou EXATAMENTE agora (spd 12 -> 14, one-shot via apply_stat_delta) -
     // le pelo ponteiro original `pre` (mesmo objeto CombatActor, sobrevive ao avanco de turno).
     REQUIRE(pre->spd() == 14);
+    // O Caua (ja comprometido/agido nesta rodada) NAO reaparece na nova lista de elegiveis -
+    // so quem ainda falta agir (gus, jaci).
+    const auto choices = scene.actor_choices();
+    REQUIRE(std::find(choices.begin(), choices.end(), pre) == choices.end());
 }
 
 TEST_CASE("PREVIEW (bug2): Esc (actor_preview_cancel) volta ao picker sem commitar nada",
@@ -2982,11 +3001,47 @@ TEST_CASE("F3 M6: party E inimigo disparam, cada um no PROPRIO contato (2 hits =
     scene.update(kFloaterLifeSeconds + 0.1f);
     const unsigned int baseline = audio.sfx_play_count();
 
-    // (c.1) O JOGADOR ataca: 1 play_sfx a mais no contato dele.
+    // (c.1) O JOGADOR (Caua, 1o elegivel) ataca: 1 play_sfx a mais no contato dele.
     select_verb(scene, BattleVerb::Atacar);
     scene.menu_confirm();
     scene.aim_confirm();
     pump_player_strike(scene);
+    REQUIRE(audio.sfx_play_count() == baseline + 1);
+
+    // Semantica revisada (COMBATE-FILA-CURSOR-FIX, decisao do lider 2026-07-27/28): o
+    // Haste do Caua (spd 12->14, condicao inicial de make_demo_actors) tica no proprio
+    // turno acima - e como o current fica FIXO no proprio slot (nunca cruza o cursor), o
+    // motor avanca corretamente pro PROXIMO PENDENTE de verdade (gus, depois jaci), NAO
+    // mais pra um inimigo JA-AGIDO (a raiz do bug que este fix fecha - antes, o cursor
+    // cruzava pra frente de um inimigo que ja tinha atacado, e o "proximo ator" virava
+    // esse inimigo repetindo o turno, o que ANTES fazia este teste ver "o contato do
+    // inimigo" cedo demais - era o bug, nao o desenho). A Janela de Comando da Party
+    // (combat.md §4.1, fluxo de rodada modelo 1B, passo 2: "Repete ate todos os membros
+    // da party terem agido nesta rodada") reabre pra gus e jaci: Defender neles (verbo sem
+    // contato/sem sfx, ver play_hit_sfx() - so os 2 call-sites de ataque/projetil o
+    // chamam) ate a vez passar de verdade pro bloco inimigo. Como o Haste do Caua deixa a
+    // party mais rapida que os inimigos (spd 14 > 13) por 3 dos PROPRIOS turnos dele
+    // (Duration), o bloco da party pode reabrir por MAIS de 1 rodada antes do inimigo
+    // agir de novo - o loop abaixo e generico a isso (nao assume um numero fixo de
+    // Defenders): repete "pumpar ate o proximo ponto de decisao + Defender" enquanto o
+    // ativo continuar sendo da party, e para sozinho no instante em que virar a vez de um
+    // inimigo (ou o combate acabar).
+    int guard = 0;
+    while (!scene.combat_over() && scene.active_actor() != nullptr &&
+          scene.active_actor()->is_player_side() && guard++ < 50) {
+        pump_to_player_turn(scene);  // conduz ate o proximo ponto de decisao do jogador
+        if (scene.combat_over() || scene.active_actor() == nullptr ||
+            !scene.active_actor()->is_player_side()) {
+            break;  // virou a vez do inimigo (ou combate encerrou) enquanto pumpava
+        }
+        if (scene.is_choosing_actor()) {
+            scene.actor_picker_confirm();  // atravessa o picker (§4.1), nao ataca
+        }
+        select_verb(scene, BattleVerb::Defender);
+        scene.menu_confirm();  // Defender resolve NA HORA, sem sfx de contato
+    }
+    REQUIRE_FALSE(scene.combat_over());
+    // Nenhum Defender toca o sfx de contato (so ataque/projetil chamam play_hit_sfx()).
     REQUIRE(audio.sfx_play_count() == baseline + 1);
 
     // (c.2) Bombeia ate o proximo contato (o INIMIGO age, Beat 1 -> Beat 2) - mais 1
