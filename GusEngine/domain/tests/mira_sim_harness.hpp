@@ -484,8 +484,17 @@ private:
 
 struct BattleTrace {
     CombatOutcome outcome = CombatOutcome::Ongoing;
-    bool capped = false;  // empate tecnico (V12): Fled forcado no/apos round_index>=cap
+    // empate tecnico LEGITIMO (V12): round_bounded() parou no cap sem excecao, o combate
+    // so nao teve tempo de resolver - NUNCA setado junto de internal_error (ver abaixo).
+    bool capped = false;
     int rounds = 0;
+
+    // ERRO INTERNO (achado do team-lead 2026-08-01): a excecao capturada pelo try/catch de
+    // defesa em profundidade (ver "CAP DE RODADAS" no cabecalho) NUNCA e empate tecnico
+    // legitimo - "capturar em silencio" disfarçaria um bug real de um resultado esperado.
+    // Contado A PARTE na agregacao (4a categoria de E1, mesmo denominador das outras 3).
+    bool internal_error = false;
+    std::string internal_error_message;  // mensagem da excecao; vazio se internal_error=false
 
     // E3 (concentracao): dano REAL (pos-Shield) recebido por cada membro da party.
     std::array<int, kPartySize> damage_taken{0, 0, 0};
@@ -805,16 +814,22 @@ struct BoundedCombatResult {
     BoundedCombatResult result;
     try {
         result = run_bounded(sm, kRoundCap);
-    } catch (const std::exception&) {
+    } catch (const std::exception& e) {
         // DEFESA EM PROFUNDIDADE (ver "CAP DE RODADAS" no cabecalho): run_bounded() so
         // deveria lancar num caso fora do escopo estudado (ver comentario da funcao). Uma
         // excecao escapando pro laco de 10 milhoes de lutas e catastrofica demais pra
-        // confiar SO na logica acima. Registra como empate tecnico (SEM mexer no estado
-        // dos atores - ninguem e morto artificialmente) e devolve; o chamador
-        // (run_lote_all_arms) segue pra proxima luta.
-        result.capped = true;
+        // confiar SO na logica acima - mas capturar em SILENCIO disfarcaria um bug real
+        // de um empate tecnico legitimo (achado do team-lead 2026-08-01). `capped` fica
+        // FALSO de proposito: isto NAO e o resultado esperado do cap, e um erro interno,
+        // contado A PARTE (trace.internal_error) pra nunca se misturar com a estatistica
+        // de empate tecnico. rounds_elapsed = kRoundCap e so um valor de fallback (a luta
+        // NAO rodou ate la de verdade); esta trace e excluida das metricas de duracao/
+        // dano/queda na agregacao (aggregate_mira pula batalhas com internal_error).
+        result.capped = false;
         result.outcome = CombatOutcome::Ongoing;
         result.rounds_elapsed = kRoundCap;
+        trace.internal_error = true;
+        trace.internal_error_message = e.what();
     }
 
     trace.outcome = result.outcome;
@@ -882,10 +897,13 @@ struct LoteArmReport {
     std::string arm;
     int n = 0;
 
-    // E1: taxa de vitoria/derrota/empate tecnico da party - 3 FRACOES que somam ~100%
-    // (correcao 2026-08-01, achado do team-lead: luta capada NAO e derrota, e um 3o
-    // resultado - ver BattleTrace::outcome e "CAP DE RODADAS" no cabecalho do arquivo).
-    // A 3a fracao (empate tecnico) e pct_hit_round_cap, reusada abaixo (E7 tambem le).
+    // E1: taxa de vitoria/derrota/empate tecnico/erro interno da party - 4 FRACOES com o
+    // MESMO denominador (n), somam ~100% (correcao 2026-08-01, achado do team-lead: luta
+    // capada NAO e derrota, e um resultado a parte - ver BattleTrace::outcome e "CAP DE
+    // RODADAS" no cabecalho; erro interno tambem NAO e empate tecnico legitimo, e uma 4a
+    // categoria a parte - "capturar em silencio disfarcaria um bug real"). A 3a fracao
+    // (empate tecnico legitimo) e pct_hit_round_cap, reusada abaixo (E7 tambem le); a 4a
+    // (erro interno) e internal_error_pct, mais adiante.
     MetricWithCi win_rate_pct;
     MetricWithCi defeat_rate_pct;
     // E2: duracao em rodadas (media/mediana/p10/p90) + % dentro da janela 3-5
@@ -915,6 +933,17 @@ struct LoteArmReport {
     // E8: rodada da 1a queda (so entre lutas em que alguem caiu).
     double mean_first_fall_round = 0.0;
     double median_first_fall_round = 0.0;
+
+    // ERRO INTERNO (4a categoria de E1, achado do team-lead 2026-08-01): excecao capturada
+    // pelo try/catch de defesa em profundidade, NUNCA empate tecnico legitimo. Reportar
+    // SEMPRE, inclusive em zero ("zero declarado vale mais que zero presumido"). O count
+    // RAW (nao so a %) fica exposto pra quem gerar o relatorio poder imprimir "erros
+    // internos: 0 de 1440000" sem precisar reconstruir a partir da porcentagem.
+    MetricWithCi internal_error_pct;
+    long internal_errors_count = 0;
+    // Mensagem da PRIMEIRA excecao encontrada neste (lote,braco); vazio se count==0.
+    // Guardada pra diagnostico nao depender de reproduzir a luta que falhou.
+    std::string first_internal_error_message;
 };
 
 // Def canonica de referencia por PartyMember (Gus 5/Caua 8/Jaci 10, protocolo secao 2.2,
@@ -941,6 +970,8 @@ struct LoteArmReport {
 
     long victories = 0;
     long defeats = 0;
+    long internal_errors = 0;
+    std::string first_internal_error_message;
     std::vector<double> rounds_d;
     long in_window = 0;
     std::vector<double> concentration_samples;
@@ -955,6 +986,17 @@ struct LoteArmReport {
     std::vector<double> first_fall_rounds;
 
     for (const BattleTrace& t : traces) {
+        if (t.internal_error) {
+            // 4a categoria de E1 (ver LoteArmReport::internal_error_pct): conta A PARTE e
+            // PULA todo o resto do bookkeeping desta luta - rounds/dano/queda/etc sao
+            // fallback/garbage nesta trace (a luta nao rodou ate resolver de verdade), e
+            // NAO podem poluir E2-E8. "capturar em silencio" e o que este harness recusa
+            // (achado do team-lead 2026-08-01).
+            ++internal_errors;
+            if (first_internal_error_message.empty())
+                first_internal_error_message = t.internal_error_message;
+            continue;
+        }
         if (t.outcome == CombatOutcome::Victory) ++victories;
         else if (t.outcome == CombatOutcome::Defeat) ++defeats;
         // t.outcome == Ongoing (capped) NAO conta em nenhum dos dois - e o 3o resultado
@@ -1019,6 +1061,13 @@ struct LoteArmReport {
     const MetricWithCi first_fall = mean_metric(first_fall_rounds);
     r.mean_first_fall_round = first_fall.value;
     r.median_first_fall_round = percentile(first_fall_rounds, 0.5);
+
+    // 4a categoria de E1 (mesmo denominador r.n das outras 3): reportado SEMPRE, mesmo em
+    // zero (ver LoteArmReport::internal_error_pct - "zero declarado vale mais que zero
+    // presumido").
+    r.internal_error_pct = proportion_metric_pct(internal_errors, r.n);
+    r.internal_errors_count = internal_errors;
+    r.first_internal_error_message = first_internal_error_message;
 
     return r;
 }

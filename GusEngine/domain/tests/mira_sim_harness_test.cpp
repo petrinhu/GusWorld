@@ -731,6 +731,86 @@ TEST_CASE("mira_sim: L5 cartas de agro - motor real completa a luta sem excecao 
     }
 }
 
+// Regressao OBRIGATORIA (achado do team-lead 2026-08-01): o try/catch de defesa em
+// profundidade de run_single_mira_battle NAO pode disfarçar um erro interno de empate
+// tecnico legitimo. Injeta uma excecao REAL no caminho de verdade (nao uma copia isolada
+// do catch): aplica StatusId::Stun via pre_battle_hook antes da luta comecar - Stun e um
+// status REAL do motor (nao inventado pelo harness); quando a rodada chegar no turno do
+// atordoado, begin_turn() retorna stunned=true, e run_bounded() lanca (o ramo
+// stunned/morto no TurnStart e NAO coberto de proposito, ver comentario da funcao) -
+// exercitando o MESMO catch que run_single_mira_battle usa em producao.
+TEST_CASE("mira_sim: excecao real (Stun injetado) e contada como erro interno, NUNCA "
+          "como empate tecnico (regressao obrigatoria do team-lead)",
+          "[domain][mira_sim]") {
+    const BattleTrace t = run_single_mira_battle(
+        Lote::L1_Vanilla, MiraArm::A_StatusQuo, /*seed=*/1,
+        [](std::vector<CombatActor*>& actors) {
+            for (CombatActor* a : actors) {
+                if (a->id() == "jaci") {
+                    a->add_status(gus::domain::combat::StatusEffect{
+                        gus::domain::combat::StatusId::Stun, /*magnitude=*/1, /*duration=*/1,
+                        gus::domain::combat::StackRule::Replace, CardFamily::Eletrico});
+                }
+            }
+        });
+    REQUIRE(t.internal_error);
+    REQUIRE_FALSE(t.internal_error_message.empty());
+    // Mensagem util pro diagnostico (contrato 4: "guarde a mensagem da 1a excecao").
+    REQUIRE(t.internal_error_message.find("run_bounded") != std::string::npos);
+    // O ponto decisivo: NAO pode ser classificado como empate tecnico legitimo.
+    REQUIRE_FALSE(t.capped);
+    REQUIRE(t.outcome == CombatOutcome::Ongoing);  // nem Victory nem Defeat tambem
+}
+
+// Prova de agregacao (contrato 2/3 do team-lead): erro interno tem contador PROPRIO,
+// distinto de capped, com o MESMO denominador das outras 3 fracoes de E1.
+TEST_CASE("mira_sim: aggregate_mira conta erro interno SEPARADO do empate tecnico "
+          "(4a categoria de E1)",
+          "[domain][mira_sim]") {
+    BattleTrace erro;
+    erro.internal_error = true;
+    erro.internal_error_message = "excecao de teste";
+    erro.capped = false;  // NUNCA true junto de internal_error
+
+    BattleTrace capped;
+    capped.outcome = CombatOutcome::Ongoing;
+    capped.capped = true;
+    capped.rounds = 30;
+    capped.final_hp_fraction = {1.0, 1.0, 1.0};
+
+    BattleTrace vitoria;
+    vitoria.outcome = CombatOutcome::Victory;
+    vitoria.rounds = 4;
+    vitoria.final_hp_fraction = {1.0, 1.0, 1.0};
+
+    const LoteArmReport r =
+        aggregate_mira("lote-erro", "braco-erro", {erro, capped, vitoria});
+    REQUIRE(r.n == 3);
+    REQUIRE(r.internal_errors_count == 1);
+    REQUIRE(r.internal_error_pct.value == Catch::Approx(100.0 / 3.0));
+    REQUIRE(r.first_internal_error_message == "excecao de teste");
+    // As 4 fracoes usam o MESMO denominador (n=3) e nao se sobrepoem: 1 vitoria, 0
+    // derrotas, 1 capped, 1 erro.
+    REQUIRE(r.win_rate_pct.value == Catch::Approx(100.0 / 3.0));
+    REQUIRE(r.defeat_rate_pct.value == Catch::Approx(0.0));
+    REQUIRE(r.pct_hit_round_cap.value == Catch::Approx(100.0 / 3.0));
+}
+
+// Prova de que o RELATORIO ("zero declarado vale mais que zero presumido"): sem erro
+// nenhum, internal_errors_count e EXATAMENTE 0 (nao ausente, nao NaN) e reportavel.
+TEST_CASE("mira_sim: aggregate_mira reporta internal_errors_count=0 explicitamente "
+          "quando nao ha erro (zero declarado, nao presumido)",
+          "[domain][mira_sim]") {
+    BattleTrace vitoria;
+    vitoria.outcome = CombatOutcome::Victory;
+    vitoria.rounds = 4;
+
+    const LoteArmReport r = aggregate_mira("lote-sem-erro", "braco-sem-erro", {vitoria});
+    REQUIRE(r.internal_errors_count == 0);
+    REQUIRE(r.internal_error_pct.value == Catch::Approx(0.0));
+    REQUIRE(r.first_internal_error_message.empty());
+}
+
 TEST_CASE("mira_sim: L6 aplica 70% do HP inicial na party (protocolo secao 2.2)",
           "[domain][mira_sim]") {
     // Sanidade indireta: roda 1 luta e confirma que o cenario nao lanca e produz um
