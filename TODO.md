@@ -589,3 +589,32 @@ Regra transversal do criador (seed 9, ja no backlog doc, sem linha propria): tod
 5. **"Zero GPL no repositório" seria alvo ERRADO.** Sobram 11 arquivos citando GPL, e **todos são registro histórico deliberado**: o `ADR-005`, o catálogo de vendoring de junho, a §7 do `engine-design`, a entrada do **Qt** (licença DELE), mais 2 binários que casam por bytes aleatórios. Apagar isso destruiria o porquê das decisões.
 
 **Ressalvas do QA, não bloqueantes, viram follow-up:** (a) **3 arquivos nunca tiveram SPDX nenhum** (`player_sprites_loader.hpp/.cpp`, `player_sprites_layout_test.cpp`) — conferido por mim contra `a0d5b16`: **pré-existente à onda**, 531 de 534; (b) o `ADR-021` aparece no residual de GPL, o que é legítimo (mesma categoria do `ADR-005`) e só mostra que a whitelist foi escrita antes de ele nascer.
+
+---
+
+### 🎮 PLAYTEST DO LÍDER 2026-08-01 (sessão ao vivo, jogo rodado por mim, testado por ele)
+
+**Regra reafirmada nesta sessão, e por correção dele:** *"pela milésima vez, quem tem de rodar é você. Eu apenas testo!"* E mais adiante ele expôs o limite do que é playtestável: *"Impossível para um ser humano entender como ocorre a ordem dos turnos... a mesma coisa sobre decisões da IA inimiga. Simplesmente vejo acontecer e parece bom. Como vou saber o que acontece por dificuldade ao morrer?"* ⚠️ **Eu tinha entregado a ele uma lista de CONFERÊNCIA quando devia ter entregado uma lista de coisas para SENTIR.** Ordem de turnos, IA e consequência de morte são intestáveis por observação humana e voltam para teste automatizado. Cross-ref a regra de que o humano nunca é o QA.
+
+**✅ Verificado por ele, e o porquê conferido por mim no código:**
+- **Fundo congelado: TODAS as telas certas** (confirmação explícita dele ao fim da sessão: *"todas as telas congeladas ao fundo estavam certas"*), mais o diálogo. É o entregável do `FRAMEGRAB-7-SITIOS`, a mudança mais delicada da semana, e **fecha os 7 sítios migrados pelo lado humano**: o teste automatizado provou igualdade de pixel, e isto prova que a cena capturada é a CERTA em cada tela, que nenhum teste cobria. ⚠️ **O 8º sítio (pausa aberta direto no boot) continua no `glReadPixels` cru**, bloqueado esperando o `CAPTURE-FREE-LOADER` do glintfx, e ele NÃO relatou diferença visível nele.
+- **Diálogo: OK.**
+- **Morte do inimigo na arena:** *"some ele da tela, some a moldura dele e a caixa de seleção. Sensação que correu tudo certo."* Verifica o lado **visual** do caso difícil do `COMBATE-FILA-CURSOR-FIX`.
+- **Após a derrota, Gus volta à cidade e o inimigo continua lá.** **Correto por desenho:** `maestro.cpp:1270` só grava a flag de derrotado quando o desfecho marca vitória, e perder não é um deles. Se o inimigo sumisse, o jogador teria perdido e ganhado o mapa limpo de graça. O "volta pra cidade" é o placeholder declarado do M7 (`modos-morte.md` §5).
+- **Tela de derrota é a NOSSA (kernel panic diegético), não erro real.**
+
+**🐛 Sete bugs no save/load, todos com diagnóstico fechado** (ver `SAVELOAD-UX-BUGS` abaixo).
+
+**🐛 Achados novos que NÃO estavam no radar:**
+
+1. ⚠️ **`IA-ALVO-PRIMEIRO-DA-LISTA`** — jogando só na defensiva, o inimigo concentrou tudo num alvo (Cauã). **Não é a IA escolhendo:** `scripted_brain.cpp:26` faz `players.front()`, e o comentário da linha 34 assume: *"o roteiro Trash não usa self para decidir (mira o 1º player vivo)"*. São 42 linhas, zero avaliação de ameaça. ⚠️ **O próprio doc de teoria dos jogos do projeto já previu este bug com outro nome:** *"o targeting inimigo é determinístico puro. Isso transforma a proteção de Gus em uma estratégia dominante para o jogador e, ao mesmo tempo, torna o comportamento inimigo previsível e explorável."* Foi escrito pensando no Gus como alvo fixo; **o líder acabou de sentir o mesmo bug com o nome trocado, fazendo a coisa mais simples possível: só defender.** Correção proposta pelo próprio doc: priorização racional com variância controlada. **Regra de jogo, decisão do líder, NÃO implementar sem ele.**
+
+2. ⚠️ **`DERROTA-TELA-UNICA-SEM-DIFICULDADE`** — a tela de derrota **não ramifica por dificuldade**: `grep` por dificuldade em `battle_scene*.cpp` devolve zero, e o texto do panic está fixo em `battle_scene_render.cpp:172`. Pela spec (`modos-morte.md` §1), **o kernel-panic é do HARDCORE** (e lá é **puzzle jogável**: resolve, sobrevive; falha, permadeath), enquanto o **Difícil** deveria dar respawn deslocado com stats quase-zero. **Risco de sensação, não de código:** a tela mais dramática do jogo está sendo gasta em todos os modos, e quando o puzzle do Hardcore chegar ele já não impressiona. O líder marcou "ok" observando que a tela é nossa e não quebra, o que é verdade; **a divergência com a spec é achado meu, contra o "ok" dele.**
+
+3. **`COMPILAR-STUB-SEM-AVISO-NA-TELA`** — selecionar "compilar" na batalha não abre nada; sai `"COMPILAR: abriria o overlay de cartas (incr 4)"` **só no terminal**. **Não é bug de lógica**, é stub honesto e declarado (`battle_scene.cpp:823-828`, não consome o turno). **O defeito real é de comunicação:** o jogador não é avisado na tela de que a função ainda não existe, e conclui que travou. Fere a regra de que todo efeito loga com mensagem diegética. Mesmo sintoma dos bugs de save/load: ação sem retorno visível.
+
+4. **`LOG-RUIDO-INPUT-INJETADO`** — o cockpit despeja centenas de linhas de `BattlePreview: [glintfx] input injetado #N` no log, que **afogam qualquer mensagem útil** (foi o que me impediu de achar o aviso do "compilar" de primeira). Irmão da lição que o glintfx nos mandou no mesmo dia: **verificador com ponto cego confirma o que se espera dele**; aqui, log que grita tudo não avisa nada.
+
+5. **`M7-FB2-MAXIMIZE-TASKBAR` CONFIRMADO AINDA ABERTO** — maximizar a janela ainda esconde a parte de baixo atrás da barra de tarefas. Reportado originalmente pelo Gus Dragon no playtest de julho; segue reproduzindo.
+
+**Saída limpa:** `exit code 0`, autosave no slot Auto executado, zero leak, zero assert. A sessão inteira disparou `play_sfx(hit)` 423 vezes.
