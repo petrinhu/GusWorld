@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: Apache-2.0
 // gus/app/tools/poc_gl_single_context_probe.cpp
 //
 // POC (passo 1, GATE) do plano FLASH-CTX Opcao C - contexto de video UNICO

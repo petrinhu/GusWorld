@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: Apache-2.0
 // gus/app/src/maestro.cpp
 //
 // Implementacao da Maestro (M7-COSTURA, ADR-012 Onda 1). Ver header.

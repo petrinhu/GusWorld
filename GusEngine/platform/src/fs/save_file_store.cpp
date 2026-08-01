@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: Apache-2.0
 // gus/platform/src/fs/save_file_store.cpp
 //
 // Implementacao do I/O real do save (M2-SAVE-IO). Ver header. Travado por

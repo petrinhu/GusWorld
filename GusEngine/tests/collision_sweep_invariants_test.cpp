@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: Apache-2.0
 // GusEngine/tests/collision_sweep_invariants_test.cpp
 //
 // M7-FB1 fatia 1: varredura ADVERSARIAL sub-pixel deterministica da colisao

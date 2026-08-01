@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: Apache-2.0
 // gus/app/src/sdl_window.cpp
 //
 // Implementacao da SdlWindow - casca SDL de janela + loop PROPRIO + input. Ver

@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: Apache-2.0
 // gus/app/screens/battle_log_model.hpp
 //
 // MODELO PURO da caixa de LOG da BattleScreen (M5, incremento 3, D7): POCO 100%

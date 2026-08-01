@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: Apache-2.0
 // GusEngine/app/tests/npc_dialogue_overlay_test.cpp
 //
 // Catch2 (headless, SEM SDL) da logica de interacao do overlay de dialogo do NPC

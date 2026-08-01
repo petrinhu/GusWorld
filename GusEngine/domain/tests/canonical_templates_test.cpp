@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: Apache-2.0
 // canonical_templates_test.cpp
 //
 // Spec executavel (Catch2 v3) dos templates CANONICOS do encontro de referencia do

@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: Apache-2.0
 // argon2id_test.cpp
 //
 // Spec executavel (Catch2 v3) do Argon2id PROPRIO sobre o Monocypher vendorizado

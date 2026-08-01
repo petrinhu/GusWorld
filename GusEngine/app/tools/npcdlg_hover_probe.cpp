@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: Apache-2.0
 // PROBE EFEMERO (NAO COMMITADO - app/tools/ fica de fora do git ate hoje, MESMO
 // padrao de repro_bertoldo.cpp neste mesmo diretorio) - prova headless sob Xvfb
 // do botao "Continuar" (hover/clique/SFX) do dialogo do NPC. MESMO espirito do

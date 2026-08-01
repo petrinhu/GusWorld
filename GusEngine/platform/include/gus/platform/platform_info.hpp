@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: Apache-2.0
 // gus/platform/platform_info.hpp
 // Info da fronteira de plataforma (pos repivot ADR-008: SDL3). Reporta a versao do
 // SDL em runtime - util para diagnostico e prova que o link SDL esta de pe. Esta e

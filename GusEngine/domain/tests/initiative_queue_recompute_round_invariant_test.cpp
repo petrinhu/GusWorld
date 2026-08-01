@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: Apache-2.0
 // initiative_queue_recompute_round_invariant_test.cpp
 //
 // FALHA CONHECIDA, DOCUMENTADA DE PROPOSITO (Catch2 [!shouldfail]). Estes dois casos

@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: Apache-2.0
 // hardware_class_test.cpp
 //
 // Spec executavel (Catch2 v3) da classificacao derivada de hardware de uma carta

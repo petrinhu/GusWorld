@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: Apache-2.0
 // gus/core/math_util.hpp
 // Utilitarios matematicos puros (sem Qt, sem alocacao). POCO testavel headless.
 // No M0 expoe apenas clamp, alvo do teste dummy. Mais utils entram conforme

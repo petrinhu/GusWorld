@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: Apache-2.0
 // deck_invariants_property_test.cpp
 //
 // DECK-5 (revisao ADVERSARIAL INDEPENDENTE, qa-engineer): property-based testing "a

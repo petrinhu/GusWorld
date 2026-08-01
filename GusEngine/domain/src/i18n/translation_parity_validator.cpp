@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: Apache-2.0
 // gus/domain/i18n/translation_parity_validator.cpp
 //
 // Implementacao do validador de paridade estrutural i18n. Ver header para o

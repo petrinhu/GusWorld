@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: Apache-2.0
 // FRAMEGRAB-7-SITIOS - EXPERIMENTO DE VERIFICACAO (nao producao, nao migracao nova). Mede
 // diretamente a pergunta que framegrab_ordem_probe.cpp deixou em aberto no proprio
 // comentario (linhas 18-21 daquele arquivo): no MESMO instante (depois de ui.render(),

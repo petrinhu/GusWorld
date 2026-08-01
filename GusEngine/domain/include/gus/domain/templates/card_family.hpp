@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: Apache-2.0
 // gus/domain/templates/card_family.hpp
 //
 // FRONTEIRA FECHADA (A1, auditoria M3): templates::CardFamily NAO e mais uma copia local

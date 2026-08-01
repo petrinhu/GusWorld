@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: Apache-2.0
 // combat_formula_property_test.cpp
 //
 // REFORCO DE QA (marco M5) da formula de dano UseCard (secao 11) por PROPRIEDADE + FUZZ.

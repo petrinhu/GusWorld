@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: Apache-2.0
 // GusEngine/platform/tests/render2d_glintfx_test.cpp
 //
 // Catch2 do Render2dGlintfx (platform/render2d), a TERCEIRA implementacao de IRenderer

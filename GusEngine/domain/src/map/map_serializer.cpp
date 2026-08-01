@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: Apache-2.0
 // gus/domain/src/map/map_serializer.cpp
 //
 // Serializer binario proprio + HMAC-SHA256 (core/) do TileMap (.gmap). Ver header

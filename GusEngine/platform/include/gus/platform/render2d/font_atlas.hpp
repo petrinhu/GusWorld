@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: Apache-2.0
 // gus/platform/render2d/font_atlas.hpp
 //
 // FONT ATLAS (M5, incremento 3.5): carrega um .ttf via stb_truetype e RASTERIZA o ASCII

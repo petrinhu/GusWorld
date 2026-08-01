@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: Apache-2.0
 // gus/core/spatial/camera_clamp.cpp
 // Clamp de camera ao mapa (M4). Ver camera_clamp.hpp para o contrato (clamp nas
 // 4 bordas; mapa menor que viewport => centraliza). Matematica pura.

@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: Apache-2.0
 // GusEngine/app/tests/difficulty_menu_rml_test.cpp
 //
 // Catch2 (TEST-FIRST) de build_difficulty_menu_rml (MODOS-MORTE Fase 0). SO

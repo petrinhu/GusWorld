@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: Apache-2.0
 // gus/platform/render2d/render2d_gl3.hpp
 //
 // Render2dGl3: implementacao de IRenderer sobre OpenGL 3.3 core (ADR-009 adendo GL3).

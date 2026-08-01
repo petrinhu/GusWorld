@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: Apache-2.0
 // gus/domain/progression/xp_differential.hpp
 //
 // Formula PURA de XP differential por zona (F2-G.XP). Aritmetica isolada e

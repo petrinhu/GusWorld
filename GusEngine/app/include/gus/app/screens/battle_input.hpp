@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: Apache-2.0
 // gus/app/screens/battle_input.hpp
 //
 // AC-E11 A1 (ADR-019, decomposicao atomica de battle_preview.cpp): roteamento de INPUT

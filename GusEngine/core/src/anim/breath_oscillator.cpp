@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: Apache-2.0
 // gus/core/src/anim/breath_oscillator.cpp
 //
 // Implementacao do POCO BreathOscillator. Ver header. Travado por

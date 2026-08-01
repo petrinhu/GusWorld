@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: Apache-2.0
 // FRAMEGRAB-ORDEM - EXPERIMENTO (nao producao, nao migracao). Prova/refuta POR PIXEL a
 // hipotese que o glintfx declara no doc-comment de UiLayer::capture_frame()
 // (include/glintfx/ui_layer.hpp, bloco "TIMING - A UNICA REGRA QUE IMPORTA"): que a

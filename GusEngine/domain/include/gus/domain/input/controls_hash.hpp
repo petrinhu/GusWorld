@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: Apache-2.0
 // gus/domain/input/controls_hash.hpp
 //
 // Hash de 128 bits dos controles (ADR-007 item 2). POCO puro, ZERO Qt. Mora em

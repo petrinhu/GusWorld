@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: Apache-2.0
 // gus/domain/hardware/hardware_class.hpp
 //
 // Classificacao DERIVADA de hardware pra lookup de config (ATOM-1, decomposicao

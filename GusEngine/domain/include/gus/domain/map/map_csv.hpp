@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: Apache-2.0
 // gus/domain/map/map_csv.hpp
 //
 // Compilador de mapa (lado PURO): parser CSV -> TileMap. O CSV e a FONTE editavel

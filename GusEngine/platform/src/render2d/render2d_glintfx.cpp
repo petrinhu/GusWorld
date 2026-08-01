@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: Apache-2.0
 // gus/platform/src/render2d/render2d_glintfx.cpp
 //
 // Implementacao do Render2dGlintfx (3a impl. de IRenderer, delega ao glintfx::Draw2d

@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: Apache-2.0
 // gus/app/screens/anim_catalog.hpp
 //
 // AnimCatalog: monta, EM RUNTIME, a lista de animacoes do Gus varrendo a pasta de sprites

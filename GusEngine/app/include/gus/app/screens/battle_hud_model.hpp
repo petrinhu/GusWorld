@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: Apache-2.0
 // gus/app/screens/battle_hud_model.hpp
 //
 // MODELO PURO do HUD da BattleScreen (M5, incremento 2): POCO 100% testavel SEM SDL.

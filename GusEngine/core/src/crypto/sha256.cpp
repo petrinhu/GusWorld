@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: Apache-2.0
 // gus/core/src/crypto/sha256.cpp
 //
 // Implementacao SHA-256 (FIPS 180-4). Ver header para o contrato. Dominio

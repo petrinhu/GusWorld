@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: Apache-2.0
 // gus/platform/src/input/input_mapper.cpp
 //
 // Implementacao do InputMapper (M1). Ver header. Travado por

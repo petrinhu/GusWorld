@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: Apache-2.0
 // scripted_brain_test.cpp
 //
 // Spec executavel (Catch2 v3) do contrato de AI inimiga (enemy_brain.hpp / IEnemyBrain)

@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: Apache-2.0
 // GusEngine/platform/tests/audio_engine_test.cpp
 //
 // Catch2 do AudioEngine (platform/audio, M6 F1, ADR-011). TEST-FIRST.

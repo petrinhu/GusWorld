@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: Apache-2.0
 // action_clock.cpp
 //
 // Implementacao do ActionClock isolado (ADR-017). Ver action_clock.hpp para o contrato

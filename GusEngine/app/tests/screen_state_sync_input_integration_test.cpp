@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: Apache-2.0
 // GusEngine/app/tests/screen_state_sync_input_integration_test.cpp
 //
 // F4-1a QA-FOLLOWUP (auditoria adversarial): teste de INTEGRACAO que amarra a

@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: Apache-2.0
 // gus/platform/render2d/render2d_glintfx.hpp
 //
 // Render2dGlintfx: TERCEIRA implementacao de IRenderer (D2D-2-SENTINELA), delegando ao

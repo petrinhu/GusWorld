@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: Apache-2.0
 // gus/app/src/screens/title_menu.cpp
 //
 // Implementacao da logica pura da TELA DE TITULO. Ver header para o contrato

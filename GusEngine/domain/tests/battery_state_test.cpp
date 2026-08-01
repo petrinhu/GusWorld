@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: Apache-2.0
 // battery_state_test.cpp
 //
 // Spec executavel (Catch2 v3) da PECA de energia/bateria de uma carta possuida

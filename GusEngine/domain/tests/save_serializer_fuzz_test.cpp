@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: Apache-2.0
 // save_serializer_fuzz_test.cpp
 //
 // REFORCO DE QA (nao-bloqueante) do DECODER de save GDS3 (ADR-015). O deserialize binario

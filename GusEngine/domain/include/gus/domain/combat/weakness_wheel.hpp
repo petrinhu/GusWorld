@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: Apache-2.0
 // gus/domain/combat/weakness_wheel.hpp
 //
 // Roda de fraqueza fechada e deterministica (secao 6). Tabela consultavel:

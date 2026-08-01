@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: Apache-2.0
 // gus/domain/deck/deck_records.hpp
 //
 // Record de dados puros do sistema de deck/mao (DECK-1). POCO puro, ZERO

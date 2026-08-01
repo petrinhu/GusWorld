@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: Apache-2.0
 // gus/platform/rmlui/gl3_loader.cpp
 //
 // Ver header. Carrega o glad (GL 3.3 core) via gladLoadGL, usando o loader de

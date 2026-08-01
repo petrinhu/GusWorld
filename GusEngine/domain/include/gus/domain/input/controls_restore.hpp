@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: Apache-2.0
 // gus/domain/input/controls_restore.hpp
 //
 // Restauracao de controles (a partir do backup embutido no save) + fabrica do

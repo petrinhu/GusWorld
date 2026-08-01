@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: Apache-2.0
 // GusEngine/app/tests/difficulty_menu_test.cpp
 //
 // Catch2 (TEST-FIRST) de difficulty_menu.hpp (MODOS-MORTE Fase 0, TELA DE

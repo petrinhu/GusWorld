@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: Apache-2.0
 // balance_harness.hpp (dev tool, test-only)
 //
 // Harness de balanceamento OFFLINE (COMBATE-TEORIA-JOGOS item [1]). Orquestra N execucoes

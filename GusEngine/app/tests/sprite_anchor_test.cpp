@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: Apache-2.0
 // GusEngine/app/tests/sprite_anchor_test.cpp
 //
 // Catch2 da ANCORAGEM do sprite pelos pes reais (sprite_anchor.hpp), POCO puro.

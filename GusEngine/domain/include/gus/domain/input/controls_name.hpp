@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: Apache-2.0
 // gus/domain/input/controls_name.hpp
 //
 // Sanitize PURO do nome de perfil de jogador + formacao do nome de arquivo de

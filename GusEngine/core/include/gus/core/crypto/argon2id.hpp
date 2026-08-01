@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: Apache-2.0
 // gus/core/crypto/argon2id.hpp
 //
 // Argon2id (RFC 9106) PROPRIO sobre o Monocypher vendorizado (ADR-015 decisao

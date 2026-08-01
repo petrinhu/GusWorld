@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: Apache-2.0
 // gus/domain/save/new_game.hpp
 //
 // MENU-INICIAL (ACHADO 1, backend_engineer): "Novo Jogo" alcancado FORA do boot -

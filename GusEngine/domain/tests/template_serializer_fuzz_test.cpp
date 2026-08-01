@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: Apache-2.0
 // template_serializer_fuzz_test.cpp
 //
 // REFORCO DE QA (nao-bloqueante) do DECODER de templates GDT1. Os arquivos .gdt sao

@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: Apache-2.0
 // gus/platform/fs/settings_file_store.hpp
 //
 // I/O REAL em disco de SystemSettings (MENU-PAUSA-CONFIG-SOM, M7-COSTURA):

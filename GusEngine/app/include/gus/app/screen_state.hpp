@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: Apache-2.0
 // gus/app/screen_state.hpp
 //
 // F4-1a (onda F4 "casca SDL -> App mode do glintfx", fatia 1: converter os loops

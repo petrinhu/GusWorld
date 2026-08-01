@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: Apache-2.0
 // environment_cap_property_test.cpp
 //
 // REFORCO DE QA (marco M5) do CAP de mult_ambiente (secao 11/18) por FUZZ das combinacoes

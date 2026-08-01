@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: Apache-2.0
 // gus/domain/dialogue/dialogue_runtime.hpp
 //
 // Runtime PURO de dialogo (ADR-014). Percorre um DialogueGraph JA VALIDADO sobre

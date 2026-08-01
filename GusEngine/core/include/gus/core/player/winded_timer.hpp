@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: Apache-2.0
 // gus/core/player/winded_timer.hpp
 //
 // WindedTimer: o TIMER DE FOLEGO (do CORPO) do Gus - POCO C++ puro (ZERO SDL, ZERO

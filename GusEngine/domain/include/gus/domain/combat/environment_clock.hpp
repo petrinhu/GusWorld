@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: Apache-2.0
 // gus/domain/combat/environment_clock.hpp
 //
 // Roda temporal do PERIODO (secao 18.3): Dia(5) -> Crepusculo(2) -> Noite(5) ->

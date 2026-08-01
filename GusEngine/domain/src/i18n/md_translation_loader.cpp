@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: Apache-2.0
 // gus/domain/i18n/md_translation_loader.cpp
 //
 // Implementacao do parser de catalogo .md. Ver header para o contrato e as

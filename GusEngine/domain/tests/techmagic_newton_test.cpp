@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: Apache-2.0
 // techmagic_newton_test.cpp
 //
 // Spec executavel (Catch2 v3) do Newton (Poco Gravitacional + Reflect-em-aliado), PR2 do

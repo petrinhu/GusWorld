@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: Apache-2.0
 // gus/core/player/stamina.hpp
 //
 // Stamina: a CARGA DO APARATO (Tavus-Drive) do jogador - ver

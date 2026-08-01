@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: Apache-2.0
 // gus/domain/src/combat/urandom_algorithm.cpp
 //
 // Implementacao das 2 funcoes PURAS do motor da carta `urandom`. Ver header para o

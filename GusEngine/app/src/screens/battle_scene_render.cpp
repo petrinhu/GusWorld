@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: Apache-2.0
 // gus/app/src/screens/battle_scene_render.cpp
 //
 // AC-E11 A4 (TU-split, ADR-019): DEFINICOES de BattleScene::render() + draw_bar/draw_pips,

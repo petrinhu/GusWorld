@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: Apache-2.0
 // gus/domain/combat/random_source.hpp
 //
 // Porta INJETAVEL de aleatoriedade do combate (secao 11). PORTE FIEL da porta que o

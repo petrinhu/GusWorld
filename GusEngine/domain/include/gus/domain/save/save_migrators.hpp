@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: Apache-2.0
 // gus/domain/save/save_migrators.hpp
 //
 // MIGRATORS forward-only do save sobre STRUCTS VERSIONADAS (ADR-006), NAO sobre

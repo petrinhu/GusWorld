@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: Apache-2.0
 // combat_inc2_test.cpp
 //
 // Spec executavel (Catch2 v3) do incremento 2 (secao 5..12, 14): StackRule, status

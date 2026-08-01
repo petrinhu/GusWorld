@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: Apache-2.0
 // gus/core/spatial/tile_grid.hpp
 //
 // Modelo de mapa de grade (M4) - POCO C++ puro, ZERO Qt, ZERO I/O real.

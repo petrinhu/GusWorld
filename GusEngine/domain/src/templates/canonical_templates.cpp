@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: Apache-2.0
 // gus/domain/src/templates/canonical_templates.cpp
 //
 // Factory dos templates canonicos do encontro de referencia (combat.md secao 17).

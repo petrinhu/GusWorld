@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: Apache-2.0
 // gus/platform/src/input/key_translation_glintfx.cpp
 //
 // Tabela BIDIRECIONAL glintfx::Key <-> keycode Godot. Ver header pro "porque" de cada

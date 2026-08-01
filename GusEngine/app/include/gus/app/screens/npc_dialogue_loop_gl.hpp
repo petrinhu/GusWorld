@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: Apache-2.0
 // gus/app/screens/npc_dialogue_loop_gl.hpp
 //
 // LOOP INTERATIVO REAL do dialogo do NPC via glintfx::UiLayer (a caixa "quente" -

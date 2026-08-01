@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: Apache-2.0
 // gus/domain/combat/environment_enums.hpp
 //
 // Enums POCO do sistema de ambientes de combate (secao 18). Portado de

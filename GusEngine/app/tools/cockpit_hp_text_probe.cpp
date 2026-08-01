@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: Apache-2.0
 // PROBE EFEMERO (D2D-2-SENTINELA, verificacao kCockpitTextPx 8px -> 9px): reproduz o
 // TRECHO real do cockpit (BattleScene::render, battle_scene_render.cpp ~linha 289-303)
 // usando as MESMAS funcoes publicas de layout/metrica que o jogo usa de verdade

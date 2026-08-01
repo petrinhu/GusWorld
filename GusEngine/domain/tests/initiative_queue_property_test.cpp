@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: Apache-2.0
 // initiative_queue_property_test.cpp
 //
 // REFORCO DE QA (marco M5) da InitiativeQueue (secao 4) por PROPRIEDADE + FUZZ. A fila e a

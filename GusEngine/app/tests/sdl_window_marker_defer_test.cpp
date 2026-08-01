@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: Apache-2.0
 // gus/app/tests/sdl_window_marker_defer_test.cpp
 //
 // REGRESSAO do SIGSEGV real (coredump gusworld_app, playtest ao vivo do lider +

@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: Apache-2.0
 // gus/domain/tests/enum_wire_contract_test.cpp
 //
 // CONTRATO BINARIO DE SAVE - NAO REORDENAR (CARDS-HW-ENUMFREEZE, TODO.md).

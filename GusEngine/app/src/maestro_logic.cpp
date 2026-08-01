@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: Apache-2.0
 // gus/app/src/maestro_logic.cpp
 //
 // Implementacao da logica PURA da Maestro (M7-COSTURA). Ver header - travado por

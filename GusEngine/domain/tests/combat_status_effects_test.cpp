@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: Apache-2.0
 // combat_status_effects_test.cpp
 //
 // Spec executavel (Catch2 v3) dos status de combate (F2-E.5b): Silence, Disrupt, Break,

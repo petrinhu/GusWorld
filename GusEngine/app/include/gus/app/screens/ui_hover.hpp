@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: Apache-2.0
 // gus/app/screens/ui_hover.hpp
 //
 // COCKPIT-SFX-HOVER-CLIQUE: fatia PURA/testavel do "som de hover" de botoes de UI,

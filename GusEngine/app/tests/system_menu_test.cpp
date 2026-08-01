@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: Apache-2.0
 // GusEngine/app/tests/system_menu_test.cpp
 //
 // Catch2 (TEST-FIRST) da logica PURA do menu de sistema (pausa + config de som/

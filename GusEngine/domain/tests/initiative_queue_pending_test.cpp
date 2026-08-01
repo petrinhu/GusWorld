@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: Apache-2.0
 // initiative_queue_pending_test.cpp
 //
 // Spec executavel (Catch2 v3) das primitivas SEGURAS de reordenacao intra-rodada

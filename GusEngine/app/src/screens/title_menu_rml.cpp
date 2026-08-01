@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: Apache-2.0
 // gus/app/src/screens/title_menu_rml.cpp
 //
 // Implementacao de build_title_menu_rml. Ver header para o contrato.

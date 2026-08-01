@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: Apache-2.0
 // gus/platform/src/render2d/render2d_sdl.cpp
 //
 // Implementacao do Render2dSdl (backend de IRenderer sobre SDL_Renderer). Ver

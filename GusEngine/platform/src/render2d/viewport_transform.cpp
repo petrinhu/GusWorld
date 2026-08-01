@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: Apache-2.0
 // gus/platform/src/render2d/viewport_transform.cpp
 //
 // Implementacao da projecao mundo -> tela. Ver header. Travado por

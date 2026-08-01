@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: Apache-2.0
 // gus/app/src/screens/city_loader.cpp
 //
 // Ver header. Junta o I/O de arquivo (.gmap do disco), o load_map (dominio puro) e a

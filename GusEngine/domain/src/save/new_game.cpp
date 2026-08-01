@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: Apache-2.0
 // gus/domain/save/new_game.cpp
 //
 // Implementacao. Ver o header para o contrato e o racional de existir.

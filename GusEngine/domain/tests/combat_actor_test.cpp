@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: Apache-2.0
 // combat_actor_test.cpp
 //
 // Spec executavel (Catch2 v3) do CombatActor (modelo MUTAVEL de combatente), portado de

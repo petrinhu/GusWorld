@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: Apache-2.0
 // save_v4_test.cpp
 //
 // Spec executavel (Catch2 v3) do SAVE V4 (ADR-007 item 3 + camadas T1.1/T1.2/T2.2).

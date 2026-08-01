@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: Apache-2.0
 // gus/app/screens/sprite_animation.hpp
 //
 // LOGICA de animacao de locomocao do jogador, POCO "fora da casca Qt" (mesma

@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: Apache-2.0
 // gus/domain/combat/action_clock.hpp
 //
 // PROVA DE CONCEITO ISOLADA do ADR-017 (Action-Clock unificado, estilo Pokemon Legends:

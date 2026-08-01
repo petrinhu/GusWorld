@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: Apache-2.0
 // gus/app/screens/title_menu_loop.hpp
 //
 // LOOP INTERATIVO da TELA DE TITULO (SAVE-LOAD-UI etapa 4, wiring REAL do boot).

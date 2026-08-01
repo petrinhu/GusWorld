@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: Apache-2.0
 // md_translation_loader_test.cpp
 //
 // Spec executavel (Catch2 v3) do parser de catalogo .md de traducoes, portada

@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: Apache-2.0
 // gus/app/src/screens/city_scene.cpp
 //
 // Ver header. Montagem PURA da cena da cidade a partir de um TileMap + resolucao do

@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: Apache-2.0
 // input_remap_test.cpp
 //
 // Spec executavel do subsistema input_remap (marco M2, metade de logica pura).

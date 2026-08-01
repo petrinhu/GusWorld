@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: Apache-2.0
 // gus/domain/src/deck/contamination_service.cpp
 //
 // Implementacao da rolagem de contaminacao na aquisicao (CARDS-HW-3B). Ver o header

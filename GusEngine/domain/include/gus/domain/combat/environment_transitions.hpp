@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: Apache-2.0
 // gus/domain/combat/environment_transitions.hpp
 //
 // Tabela FECHADA e DETERMINISTICA de mutabilidade de ambiente (secao 18.6), portada de

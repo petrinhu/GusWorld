@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: Apache-2.0
 // gus/core/spatial/tile_grid.cpp
 // Implementacao do modelo de mapa de grade (M4). Ver tile_grid.hpp para o
 // contrato (unidades, origem, eixos, borda-como-parede).

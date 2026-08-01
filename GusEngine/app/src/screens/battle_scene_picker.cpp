@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: Apache-2.0
 // gus/app/src/screens/battle_scene_picker.cpp
 //
 // AC-E11 A5 (TU-split, ADR-019): DEFINICOES dos metodos de escolha de ator / Janela de

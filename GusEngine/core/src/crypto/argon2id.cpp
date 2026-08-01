@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: Apache-2.0
 // gus/core/src/crypto/argon2id.cpp
 //
 // Implementacao do Argon2id proprio (ADR-015 decisao 3). Ver header para o

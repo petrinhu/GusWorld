@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: Apache-2.0
 // gus/platform/render2d/text_metrics.hpp
 //
 // METRICAS DE TEXTO puras (POCO testavel SEM SDL, SEM I/O): largura/altura de uma

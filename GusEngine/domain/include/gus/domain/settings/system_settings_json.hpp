@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: Apache-2.0
 // gus/domain/settings/system_settings_json.hpp
 //
 // Serializer + parser JSON PROPRIO MINIMO do schema de SystemSettings

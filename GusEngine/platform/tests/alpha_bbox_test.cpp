@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: Apache-2.0
 // GusEngine/platform/tests/alpha_bbox_test.cpp
 //
 // Catch2 da VARREDURA do alpha-bbox (scan_alpha_content_bbox), POCO puro: mede o

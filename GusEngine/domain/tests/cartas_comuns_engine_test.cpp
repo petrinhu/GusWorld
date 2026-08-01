@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: Apache-2.0
 // cartas_comuns_engine_test.cpp
 //
 // Spec executavel (Catch2 v3) do CARTAS-COMUNS-ENGINE (TODO.md, decisoes do lider

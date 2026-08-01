@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: Apache-2.0
 // gus/core/src/anim/boot_pixel_sequence.cpp
 //
 // Implementacao dos POCO boot_pixel_frame_index/boot_pixel_safety_alpha. Ver header.

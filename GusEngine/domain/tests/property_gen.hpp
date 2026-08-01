@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: Apache-2.0
 // property_gen.hpp (test helper)
 //
 // Gerador deterministico minimo para os testes de PROPRIEDADE/FUZZ do motor de combate

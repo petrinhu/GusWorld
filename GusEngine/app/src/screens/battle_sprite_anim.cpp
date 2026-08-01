@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: Apache-2.0
 // gus/app/src/screens/battle_sprite_anim.cpp
 //
 // Implementacao do POCO de sprite animado da arena (ver header). Tabela de cadencia

@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: Apache-2.0
 // gus/core/src/time/fixed_timestep.cpp
 //
 // Implementacao do loop de tempo fixo (M1). Ver header pro contrato. Travado por

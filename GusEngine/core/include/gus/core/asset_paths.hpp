@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: Apache-2.0
 // gus/core/asset_paths.hpp
 //
 // CAMINHOS DE ASSET CENTRALIZADOS (fonte unica da verdade). Toda referencia a um

@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: Apache-2.0
 // gus/app/screens/system_menu_rml.hpp
 //
 // RML/RCSS do MENU DE SISTEMA (pausa + config de som/video/lingua/save),

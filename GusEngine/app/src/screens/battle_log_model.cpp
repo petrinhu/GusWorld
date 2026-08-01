@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: Apache-2.0
 // gus/app/src/screens/battle_log_model.cpp
 //
 // Implementacao do modelo PURO do log (ver header). Classifica CombatLogEntry e

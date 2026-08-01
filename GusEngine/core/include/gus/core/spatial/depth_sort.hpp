@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: Apache-2.0
 // gus/core/spatial/depth_sort.hpp
 //
 // Y-SORT (M7-COSTURA/M7-DIALOGO, colisao solida + profundidade no desenho): a

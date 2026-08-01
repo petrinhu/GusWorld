@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: Apache-2.0
 // gus/domain/src/hardware/battery_state.cpp
 //
 // Implementacao das funcoes puras derivadas de BatteryState (state_of_health_percent,

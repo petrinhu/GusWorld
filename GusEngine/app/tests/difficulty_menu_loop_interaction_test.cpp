@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: Apache-2.0
 // GusEngine/app/tests/difficulty_menu_loop_interaction_test.cpp
 //
 // Catch2 HEADLESS (GL REAL - Xvfb :99, MESMA receita de save_load_menu_

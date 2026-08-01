@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: Apache-2.0
 // counting_random.hpp (test helper)
 //
 // Duplo deterministico da porta IRandomSource (gus/domain/combat/random_source.hpp) que,

@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: Apache-2.0
 // gus/domain/save/save_serializer.hpp
 //
 // Serializacao BINARIA PROPRIA + AEAD XChaCha20-Poly1305 (do core/, sobre o

@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: Apache-2.0
 // gus/domain/input/action_registry.cpp
 //
 // Implementacao do registry canonico de actions. Ver header para o contrato e o

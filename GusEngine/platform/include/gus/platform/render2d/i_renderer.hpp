@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: Apache-2.0
 // gus/platform/render2d/i_renderer.hpp
 //
 // IRenderer: interface de desenho 2D. ABSTRACAO que isola o backend grafico

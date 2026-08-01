@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: Apache-2.0
 // deck_transactions_test.cpp
 //
 // Spec executavel (Catch2 v3) das transacoes atomicas do sistema de deck/mao (DECK-3):

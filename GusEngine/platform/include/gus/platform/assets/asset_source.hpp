@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: Apache-2.0
 // gus/platform/assets/asset_source.hpp
 //
 // AssetSource (ADR-013, ASSETS-VFS-F1): o "porteiro" unico de leitura de asset. Fase 1 =

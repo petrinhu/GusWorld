@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: Apache-2.0
 // gus/app/maestro_logic.hpp
 //
 // Logica PURA da Maestro (M7-COSTURA, ADR-012 Onda 1): POCO 100% testavel SEM SDL/janela

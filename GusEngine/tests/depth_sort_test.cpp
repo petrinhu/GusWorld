@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: Apache-2.0
 // GusEngine/tests/depth_sort_test.cpp
 //
 // Spec executavel (Catch2 v3) do Y-SORT (M7-COSTURA/M7-DIALOGO, ordem de desenho por

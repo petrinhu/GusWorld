@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: Apache-2.0
 // new_game_test.cpp
 //
 // Spec executavel (Catch2 v3) de gus::domain::save::fresh_new_game_save_data

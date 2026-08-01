@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: Apache-2.0
 // gus/domain/combat/adware_sterling.hpp
 //
 // Sequencia de propaganda da carta Adware Sterling (CARDS-HW-3C; docs/design/mecanicas/

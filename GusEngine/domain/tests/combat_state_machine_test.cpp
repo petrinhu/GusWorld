@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: Apache-2.0
 // combat_state_machine_test.cpp
 //
 // Spec executavel (Catch2 v3) da FSM de combate (secao 3): transicoes, loop de AP em

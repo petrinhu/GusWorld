@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: Apache-2.0
 // gus/domain/combat/card_collection_snapshot.hpp
 //
 // Snapshot READ-ONLY da coleçao (deck ativo) de um caster (CARDS-HW-2 fatia B, carta

@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: Apache-2.0
 // gus/domain/src/save/save_backup.cpp
 //
 // Politica de backup chain (pura) sobre o port SaveStore. Portada de

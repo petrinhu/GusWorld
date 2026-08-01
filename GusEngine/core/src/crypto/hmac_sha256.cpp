@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: Apache-2.0
 // gus/core/src/crypto/hmac_sha256.cpp
 //
 // Implementacao HMAC-SHA256 (RFC 2104) sobre o SHA-256 proprio. Ver header para

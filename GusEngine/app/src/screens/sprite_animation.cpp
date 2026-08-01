@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: Apache-2.0
 // gus/app/src/screens/sprite_animation.cpp
 //
 // Implementacao da logica de animacao de locomocao (M1+). Ver header. Travada por

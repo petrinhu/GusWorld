@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: Apache-2.0
 // gus/domain/i18n/md_translation_loader.hpp
 //
 // Parser de catalogo de traducoes em formato Markdown proprio. Portado de

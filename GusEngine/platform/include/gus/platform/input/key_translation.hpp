@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: Apache-2.0
 // gus/platform/input/key_translation.hpp
 //
 // Traducao de keycode SDL (SDL_Keycode) -> keycode no esquema Godot Key enum.

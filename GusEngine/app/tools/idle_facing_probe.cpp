@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: Apache-2.0
 // PROBE EFEMERO (mesmo padrao de repro_bertoldo.cpp/frozen_bg_probe.cpp neste
 // diretorio - janela SDL HIDDEN + renderer "software", SEM Xvfb/compositor, SEM
 // tocar a sessao viva): valida visualmente o breathing DIRECIONAL do Gus

@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: Apache-2.0
 // sha256_test.cpp
 //
 // Spec executavel (Catch2 v3) do SHA-256 PROPRIO de core/ (ADR-006). TEST-FIRST

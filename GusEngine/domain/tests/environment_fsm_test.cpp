@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: Apache-2.0
 // environment_fsm_test.cpp
 //
 // Spec executavel (Catch2 v3) da integracao do ambiente na CombatStateMachine:

@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: Apache-2.0
 // gus/app/sdl_window.hpp
 //
 // SdlWindow: a CASCA SDL (janela + loop PROPRIO + bombeamento de input). Vive em

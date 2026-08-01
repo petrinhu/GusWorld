@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: Apache-2.0
 // GusEngine/domain/tests/save_policy_test.cpp
 //
 // Catch2 (TEST-FIRST) de save_policy.hpp (SAVE-LOAD-UI etapa 5, AUTOSAVE). Cobre o

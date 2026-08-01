@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: Apache-2.0
 // cards_hw_i18n_registry_test.cpp
 //
 // CARDS-HW-QA1 fatia D (TODO.md): duas verificacoes cruzadas decision-free da onda

@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: Apache-2.0
 // gus/app/src/i18n/translator.cpp
 //
 // Implementacao do Translator de UI (ver header). Parser = POCO do dominio; I/O de

@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: Apache-2.0
 // gus/domain/src/input/controls_name.cpp
 //
 // Implementacao do sanitize de nome de perfil + nome de arquivo de controles

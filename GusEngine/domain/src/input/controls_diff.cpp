@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: Apache-2.0
 // gus/domain/src/input/controls_diff.cpp
 //
 // Diff puro de controles + tabela keycode->rotulo legivel (ADR-007 item 4). POCO

@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: Apache-2.0
 // gus/domain/src/cards/master_cards.cpp
 //
 // ATOM-2: movido de gus/domain/src/combat/master_cards.cpp.

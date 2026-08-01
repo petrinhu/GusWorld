@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: Apache-2.0
 // GusEngine/app/tests/battle_cockpit_rml_test.cpp
 //
 // AC-E11 A2 (ADR-019): teste de CARACTERIZACAO da montagem RML/RCSS do cockpit,

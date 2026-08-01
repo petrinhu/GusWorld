@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: Apache-2.0
 // gus/app/screens/save_load_menu.hpp
 //
 // Logica PURA da TELA DE SALVAR/CARREGAR (SAVE-LOAD-UI, PI9 — a peca que

@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: Apache-2.0
 // gus/platform/input/gamepad_mapping.hpp
 //
 // LOGICA pura de mapeamento de gamepad -> intencao cardinal (dx,dy em {-1,0,1}),

@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: Apache-2.0
 // gus/domain/cards/card_records.hpp
 //
 // Records imutaveis de VOCABULARIO DE CARTA (ATOM-2, extraidos de
