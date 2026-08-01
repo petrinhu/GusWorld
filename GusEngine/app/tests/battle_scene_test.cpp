@@ -662,6 +662,46 @@ TEST_CASE("turno: Compilar NAO consome o turno (so loga, incr 4)", "[battle_scen
     REQUIRE(has_system);  // "COMPILAR: abriria o overlay..." entrou no log de UI
 }
 
+TEST_CASE(
+    "DIAGNOSTICO COMPILAR-STUB-SEM-AVISO-NA-TELA: a mensagem sobrevive a janela de 2 "
+    "linhas do cockpit VIVO, mesmo apos varias rodadas de narracao acumulada",
+    "[battle_scene]") {
+    // Reproduz o cenario real do lider: varias rodadas de combate ANTES de tentar
+    // Compilar (narration_ ja com dezenas de entradas de dano/status), depois seleciona
+    // Compilar. O render REAL (battle_preview.cpp:1344) chama scene_->log_lines(2) - a
+    // MESMA janela de 2 linhas usada aqui - entao se o SYSTEM sobrevive aqui, o "painel
+    // cego" NAO esta no corte de N linhas (hipotese b), e o suspeito vira o consumo pelo
+    // cockpit RML (hipotese a) ou outra causa.
+    BattleScene scene;
+    pump_to_player_turn(scene);
+    // Acumula varias rodadas reais de combate (ataques resolvidos, narracao crescendo).
+    for (int round = 0; round < 5 && !scene.combat_over(); ++round) {
+        player_attack(scene);
+        pump_to_player_turn(scene);
+        if (scene.combat_over()) {
+            break;
+        }
+    }
+    if (scene.combat_over()) {
+        return;  // encontro demo pode fechar antes de 5 rounds; nao invalida o resto
+    }
+    const int narration_before = static_cast<int>(scene.log_lines(9999).size());
+    REQUIRE(narration_before > 2);  // precondicao: ha MAIS que 2 linhas acumuladas
+
+    select_verb(scene, BattleVerb::Compilar);
+    scene.menu_confirm();
+
+    // A MESMA chamada que battle_preview.cpp faz a cada frame pro cockpit VIVO.
+    const auto window = scene.log_lines(2);
+    bool has_system_in_window = false;
+    for (const auto& l : window) {
+        if (l.kind == LogLineKind::System) {
+            has_system_in_window = true;
+        }
+    }
+    REQUIRE(has_system_in_window);  // se falhar: hipotese (b) confirmada (corte de N)
+}
+
 TEST_CASE("turno: Defender aplica Shield no proprio ator (acao real)",
           "[battle_scene]") {
     BattleScene scene;

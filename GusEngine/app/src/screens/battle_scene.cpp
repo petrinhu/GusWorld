@@ -822,9 +822,14 @@ void BattleScene::menu_confirm() {
 
     // COMPILAR (incremento 3): NAO abre o overlay ainda (incr 4). So sinaliza no log que
     // abriria, e NAO consome o turno (o jogador continua podendo escolher outro verbo).
+    // TEXTO (COMPILAR-STUB-SEM-AVISO-NA-TELA, 2026-08-01): trocado de fala de programador
+    // ("abriria o overlay de cartas (incr 4)") pra mensagem DIEGETICA curta, no vocabulario
+    // do proprio mundo (magia = software, Pillar 1) - o compilador do jogador reporta que
+    // nao ha nada pra rodar ainda, sem citar "incremento" nem "overlay". Decisao autonoma
+    // do gameplay_engineer (autorizada pelo CTO); registrar pro lider confirmar depois.
     if (verb == BattleVerb::Compilar) {
-        ui_log_.push_back(LogLine{LogLineKind::System,
-                                  "COMPILAR: abriria o overlay de cartas (incr 4)"});
+        ui_log_.push_back(
+            LogLine{LogLineKind::System, "COMPILAR: nenhum Conjuro pronto no buffer."});
         return;
     }
 
