@@ -576,6 +576,22 @@ void handle_token_refund(const EffectSpec&, const Card&, TechMagicContext&) {
     // No-op deliberado: ver comentario acima.
 }
 
+// RandomRedirect (urandom/Onda Aleatoria, ADR-019 addendum 2026-08-01, lei do atomo):
+// MARCADOR no-op deliberado, MESMO padrao de handle_damage_quantize/handle_diversity_bonus/
+// handle_ap_efficiency/handle_token_refund acima. O sorteio de faixa + o redirecionamento
+// pra uma carta ja existente NAO passam por este dispatcher - o disparo real acontece ANTES
+// do dispatcher generico, num branch dedicado de combat_state_machine.cpp::resolve_use_card
+// (CombatStateMachine::resolve_urandom/resolve_redirected_card_effect), gatilhado agora por
+// este EffectKind em vez do id literal da carta (o achado da auditoria da lei do atomo -
+// ver urandom_algorithm.hpp e o addendum do ADR-019). Existe so pra satisfazer o invariante
+// fail-fast "EffectKind sem handler = bug" (techmagic.hpp) sem lancar; na pratica nunca
+// roda, porque resolve_use_card SEMPRE intercepta e retorna ANTES de qualquer carta com
+// RandomRedirect alcancar o `!card.effects.empty()` do dispatcher generico (mesmo racional
+// "nunca roda na pratica" do Planck/DamageQuantize).
+void handle_random_redirect(const EffectSpec&, const Card&, TechMagicContext&) {
+    // No-op deliberado: ver comentario acima.
+}
+
 void handle_reveal_intent(const EffectSpec& spec, const Card& card, TechMagicContext& ctx) {
     if (ctx.caster == nullptr)
         throw std::logic_error("techMagic::RevealIntent: ctx.caster nao pode ser nulo.");
@@ -759,14 +775,18 @@ void execute(TriggerHook hook, const Card& card, TechMagicContext& ctx) {
             case EffectKind::TokenRefund:
                 handle_token_refund(spec, card, ctx);
                 break;
+            case EffectKind::RandomRedirect:
+                handle_random_redirect(spec, card, ctx);
+                break;
             default:
                 throw std::logic_error(
                     "techMagic: EffectKind sem handler implementado na carta '" + card.id +
                     "' (steps 2-3-5-6-7-8 + manifesto5-6 + CARD-ENGINE-MANIFESTO item 7-9 e "
-                    "8 cobrem ApplyStatus/Leech/Reflect/HypotenuseCombo/CloneAlly/"
-                    "RepeatLastAction/ChainDamage/DelayAction/DamageQuantize/RevealIntent/"
-                    "DiversityBonus/ApEfficiency/TokenRefund; um EffectKind novo append-only "
-                    "sem case aqui e bug de implementacao, ADR-016).");
+                    "8 + ADR-019 addendum cobrem ApplyStatus/Leech/Reflect/HypotenuseCombo/"
+                    "CloneAlly/RepeatLastAction/ChainDamage/DelayAction/DamageQuantize/"
+                    "RevealIntent/DiversityBonus/ApEfficiency/TokenRefund/RandomRedirect; um "
+                    "EffectKind novo append-only sem case aqui e bug de implementacao, "
+                    "ADR-016).");
         }
     }
 }

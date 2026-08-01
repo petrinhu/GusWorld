@@ -76,6 +76,7 @@
 #include <utility>
 #include <vector>
 
+#include "gus/domain/combat/card_collection_snapshot.hpp"
 #include "gus/domain/combat/combat_actor.hpp"
 #include "gus/domain/combat/combat_enums.hpp"
 #include "gus/domain/combat/combat_records.hpp"
@@ -204,6 +205,15 @@ struct LastActionRecord {
 // (resolve_gambit_predict), que lanca std::out_of_range: o dump roda AUTOMATICO num hook de
 // rodada/scan, nao pode derrubar o combate por 1 inimigo sem brain registrado. So
 // forward-declarado (IEnemyBrain), nao inclui enemy_brain.hpp aqui.
+// `collection_snapshot`/`card_registry` (ADR-019 addendum 2026-08-01, lei do atomo -
+// generalizacao da urandom): o motor de efeitos ganha acesso a colecao (deck ativo) de CADA
+// participante e ao catalogo de cartas UMA VEZ SO, aqui na struct compartilhada - nao mais
+// so pra urandom, pra QUALQUER handler futuro que precisar enxergar a colecao inteira do
+// caster (mesmo racional do `combatants`/`brain_registry` acima). Campos ADITIVOS (default
+// nullptr preserva TODO call site/teste pre-existente intacto). Nesta fatia (RandomRedirect
+// e marcador no-op, ver abaixo) nenhum handler ainda consome estes 2 campos - o disparo real
+// da urandom continua em CombatStateMachine::resolve_urandom, que acessa collection_
+// snapshot_/card_registry_ direto como membro (nao via ctx). Ponteiros NAO-DONOS.
 struct TechMagicContext {
     CombatActor* caster = nullptr;
     CombatActor* counterpart = nullptr;
@@ -216,6 +226,8 @@ struct TechMagicContext {
     const std::vector<CombatActor*>* combatants = nullptr;
     InitiativeQueue* queue = nullptr;
     const std::unordered_map<std::string, IEnemyBrain*>* brain_registry = nullptr;
+    const std::vector<CardCollectionEntry>* collection_snapshot = nullptr;
+    const std::unordered_map<std::string, Card>* card_registry = nullptr;
 };
 
 // Executa, NA ORDEM declarada, os EffectSpec de `card` cujo `trigger == hook`. `ctx.caster`

@@ -477,7 +477,9 @@ private:
         std::uint64_t instance_id) const;
 
     // Sorteia e REDIRECIONA pra um efeito de carta JA EXISTENTE (secao 7.1). Chamado pelo
-    // branch dedicado de resolve_use_card quando `card.id == kUrandomCardId` - substitui
+    // branch dedicado de resolve_use_card quando `card` declara `EffectKind::RandomRedirect`
+    // (ADR-019 addendum 2026-08-01, lei do atomo - o gatilho era `card.id == kUrandomCardId`
+    // ate 2026-08-01, ver urandom_algorithm.hpp) - substitui
     // inteiramente a "RESOLUCAO NORMAL DO EFEITO" pra esta carta (NAO re-cobra mana/AP/
     // gates, ja pagos por resolve_use_card antes do branch). Fail-safe (dissipa, log, 1
     // draw) se collection_snapshot_ e nulo, `action.card_instance_id` ausente, ou a

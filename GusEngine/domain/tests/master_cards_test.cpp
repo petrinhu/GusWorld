@@ -810,8 +810,9 @@ TEST_CASE("master_cards: bruno (CloneAlly em OnCast) executa via techMagic::exec
 
 // ===== urandom (CARDS-HW-2B): a carta-caos do Gus =====
 
-TEST_CASE("master_cards: urandom = Ativa/Universal/mana 0/Self, effects VAZIO (o efeito "
-         "inteiro roda fora do dispatcher techMagic, branch dedicado de resolve_use_card)",
+TEST_CASE("master_cards: urandom = Ativa/Universal/mana 0/Self, effects [OnCast "
+         "RandomRedirect] (ADR-019 addendum: gatilho por EffectKind, o efeito de verdade "
+         "continua fora do dispatcher techMagic, branch dedicado de resolve_use_card)",
          "[domain][combat][cards][techmagic][mastercards][urandom]") {
     const auto reg = MasterCards::build_registry();
     const Card& c = reg.at("urandom");
@@ -820,7 +821,9 @@ TEST_CASE("master_cards: urandom = Ativa/Universal/mana 0/Self, effects VAZIO (o
     REQUIRE(c.tier == CardTier::Especial);
     REQUIRE(c.target_shape == TargetShape::Self);
     REQUIRE(c.ignores_weakness_wheel == false);
-    REQUIRE(c.effects.empty());
+    REQUIRE(c.effects.size() == 1);
+    REQUIRE(c.effects[0].trigger == TriggerHook::OnCast);
+    REQUIRE(c.effects[0].kind == EffectKind::RandomRedirect);
 }
 
 // ===== 4. Paridade i18n das 20 chaves (2 locales) =====

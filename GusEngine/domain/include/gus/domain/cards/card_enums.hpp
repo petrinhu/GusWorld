@@ -293,6 +293,17 @@ enum class EffectKind : std::uint32_t {
     // TokenRefund pode ser Hibrida/castavel: o marcador no-op ainda roda inofensivo se
     // dispachado via OnCast, mesmo padrao fail-fast "sem handler = bug").
     TokenRefund = 12,
+    // Onda Aleatoria (urandom/Random-Redirect, ADR-019 addendum 2026-08-01, lei do atomo):
+    // MARCADOR fora do dispatcher, MESMO padrao de DamageQuantize/DiversityBonus/
+    // ApEfficiency/TokenRefund acima (o handler em techmagic.cpp e no-op deliberado). O
+    // disparo real acontece ANTES do dispatcher generico, no branch dedicado de
+    // resolve_use_card (CombatStateMachine::resolve_urandom, combat_state_machine.cpp) -
+    // este EffectKind existe pra que o GATILHO desse branch seja um vocabulario
+    // compartilhado (qualquer carta com RandomRedirect em `effects` entra no mesmo branch),
+    // nao mais um `if` por id literal de UMA carta so (o achado da auditoria). Ver
+    // gus/domain/combat/urandom_algorithm.hpp (o motor puro de peso/classificacao) e
+    // docs/tech/adr/ADR-019-arquitetura-conteudo-atomica-data-driven.md (o addendum).
+    RandomRedirect = 13,
 };
 
 // Filtro de lado do alvo de um EffectSpec (ADR-016 Balde B, Faraday/EM-Shield). Data-driven:

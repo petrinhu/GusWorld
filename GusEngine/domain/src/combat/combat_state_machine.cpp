@@ -288,6 +288,20 @@ constexpr int kWormSlowDurationRestOfCombat = 999;   // sentinela "permanente en
     return false;
 }
 
+// urandom/Random-Redirect (ADR-019 addendum 2026-08-01, lei do atomo): checa se `card`
+// (a carta JOGADA, nao uma equipada - por isso le direto `card.effects`, sem varrer
+// equipped_special_ids() como quantize_spec_of/has_reveal_intent_equipped acima) declara
+// `kind` em algum EffectSpec. Substitui o antigo `if (card.id == kUrandomCardId)` de
+// resolve_use_card: o gatilho do branch dedicado da urandom vira vocabulario EffectKind
+// compartilhado (o mesmo mecanismo que toda outra especial usa pra dizer "o que eu faco"),
+// nao mais um id literal de UMA carta so. Qualquer carta futura com RandomRedirect entra no
+// MESMO branch de graca, sem novo `if`.
+[[nodiscard]] bool card_declares_effect(const Card& card, EffectKind kind) {
+    for (const EffectSpec& spec : card.effects)
+        if (spec.kind == kind) return true;
+    return false;
+}
+
 // ---- Free-Order (Hayek, CARD-ENGINE-MANIFESTO item 7, AMB-09, EffectKind::
 // DiversityBonus) ----------------------------------------------------------------------
 //
@@ -1621,13 +1635,25 @@ void CombatStateMachine::resolve_use_card(CombatActor& actor, const CombatAction
         return;  // efeito nominal INTEIRO substituido pelo backfire; nada mais roda.
 
     // urandom (CARDS-HW-2 fatia B; docs/design/mecanicas/cartas-spec-logica.md secao 7):
-    // branch dedicado, FORA do dispatcher techMagic (trigger reportado ao lider - ver
-    // urandom_algorithm.hpp). Substitui a "RESOLUCAO NORMAL DO EFEITO" inteira: sorteia e
-    // redireciona pra uma carta JA EXISTENTE (record-base OU techMagic::execute conforme o
-    // tier sorteado), sem re-cobrar mana/AP/gates (ja pagos acima). Virus post-cast da
-    // PROPRIA urandom ainda roda (a instancia pode estar infectada, agnostico do que ela
-    // resolveu) - mesmo pipeline de qualquer outra carta (secao 1 do doc-fonte).
-    if (card.id == kUrandomCardId) {
+    // branch dedicado, FORA do dispatcher techMagic. Substitui a "RESOLUCAO NORMAL DO
+    // EFEITO" inteira: sorteia e redireciona pra uma carta JA EXISTENTE (record-base OU
+    // techMagic::execute conforme o tier sorteado), sem re-cobrar mana/AP/gates (ja pagos
+    // acima). Virus post-cast da PROPRIA urandom ainda roda (a instancia pode estar
+    // infectada, agnostico do que ela resolveu) - mesmo pipeline de qualquer outra carta
+    // (secao 1 do doc-fonte).
+    //
+    // GATILHO (ADR-019 addendum 2026-08-01, lei do atomo - generalizacao da urandom): este
+    // branch disparava por `card.id == kUrandomCardId` (if por id literal de UMA carta so -
+    // o achado da auditoria). Agora dispara por `EffectKind::RandomRedirect` em
+    // `card.effects` (card_declares_effect acima), o MESMO vocabulario compartilhado que
+    // toda outra especial usa - uma 2a carta caotica futura entra neste branch de graca, sem
+    // novo desvio. O corpo (resolve_urandom/resolve_redirected_card_effect) fica
+    // BYTE-IDENTICO: nenhuma linha de logica mudou, so a condicao do `if`. O intercept
+    // PRECISA continuar retornando ANTES do loop padrao de dano/fogo-amigo (mais abaixo
+    // nesta funcao) - deixar a urandom cair nesse loop acrescentaria uma linha de log nova
+    // ("fogo amigo desligado: dano 0", TargetShape::Self sempre bate o guard de
+    // fogo-amigo), o que seria mudanca de comportamento OBSERVAVEL, nao so de gatilho.
+    if (card_declares_effect(card, EffectKind::RandomRedirect)) {
         resolve_urandom(actor, action, card);
         dispatch_virus_payload_post_cast(actor, card, action.card_instance_id);
         return;

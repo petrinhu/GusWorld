@@ -494,13 +494,17 @@ std::unordered_map<std::string, Card> assemble() {
 
         // --- urandom (a carta-caos do Gus): Ativa, Universal, mana 0, TargetShape::Self
         // (CARDS-HW-2B, ideia + numero do backfire 1/3 exato do Gus Dragon, playtester).
-        // effects VAZIO: o efeito inteiro (sorteio de faixa por peso + redirecionamento pra
-        // uma carta JA EXISTENTE, record-base OU techMagic::execute conforme o tier
-        // sorteado) roda FORA do dispatcher techMagic - branch dedicado de resolve_use_card
-        // (CombatStateMachine::resolve_urandom, combat_state_machine.cpp), mesmo racional
-        // "marcador fora do dispatcher" de Planck/Hayek/Mises acima, mas aqui NEM UM
-        // EffectSpec e necessario (o "programa" da carta e so as duas tabelas de peso, dados
-        // globais em gus/domain/combat/urandom_algorithm.hpp, nao parametros por-carta).
+        // effects = [OnCast -> RandomRedirect] (ADR-019 addendum 2026-08-01, lei do atomo -
+        // generalizacao da urandom, ver urandom_algorithm.hpp): o efeito inteiro (sorteio de
+        // faixa por peso + redirecionamento pra uma carta JA EXISTENTE, record-base OU
+        // techMagic::execute conforme o tier sorteado) continua rodando FORA do dispatcher
+        // techMagic - branch dedicado de resolve_use_card (CombatStateMachine::
+        // resolve_urandom, combat_state_machine.cpp) - mas agora o GATILHO desse branch e
+        // este EffectKind (vocabulario compartilhado, o mesmo mecanismo de toda outra
+        // especial), nao mais um `if` por id literal da carta. O "programa" de verdade da
+        // carta continua sendo so as duas tabelas de peso, dados globais em
+        // gus/domain/combat/urandom_algorithm.hpp, nao parametros do EffectSpec (por isso o
+        // EffectSpec aqui nao carrega magnitude/percent/status - so marca o gatilho).
         // TargetShape::Self porque o alvo REAL (self ou inimigo, 50/50 caotico) e sorteado
         // dentro de resolve_urandom, nao pelo pipeline normal de UseCard. Duas versoes por
         // CardOrigin da INSTANCIA jogada (pirata x original, cartas-numeros-proposta.md
@@ -508,7 +512,9 @@ std::unordered_map<std::string, Card> assemble() {
         // runtime pelo collection_snapshot (nao ha 2 entradas de catalogo). Mana 0
         // (aquisicao/preco = fatia futura, fora do escopo desta fatia). ---
         make_special("urandom", "CARD_EXEC_URANDOM_NAME", CardFamily::Universal,
-                     CardCategory::Ativa, /*mana_cost=*/0, /*effects=*/{},
+                     CardCategory::Ativa, /*mana_cost=*/0,
+                     /*effects=*/{EffectSpec{.trigger = TriggerHook::OnCast,
+                                             .kind = EffectKind::RandomRedirect}},
                      /*ignores_weakness_wheel=*/false, /*power=*/0,
                      /*target_shape=*/TargetShape::Self),
     };

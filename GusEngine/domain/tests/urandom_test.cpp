@@ -68,8 +68,12 @@ std::unordered_map<std::string, Card> registry(std::initializer_list<Card> cards
 }
 
 // Carta urandom de teste: mana 0 (foco no algoritmo, nao no ramp de mana), TargetShape::Self
-// (o alvo REAL e resolvido dentro de resolve_urandom, nao pelo pipeline normal), effects
-// vazio (o efeito inteiro roda fora do dispatcher techMagic, mesmo padrao de Planck/Hayek).
+// (o alvo REAL e resolvido dentro de resolve_urandom, nao pelo pipeline normal), effects =
+// [OnCast RandomRedirect] (ADR-019 addendum 2026-08-01: o GATILHO do branch dedicado em
+// resolve_use_card agora e este EffectKind, nao mais o id literal "urandom" - sem este
+// EffectSpec aqui, o intercept nao dispara e a carta cai no pipeline padrao). O efeito de
+// verdade (sorteio de faixa/pool/redirecionamento) continua fora do dispatcher techMagic,
+// mesmo padrao de Planck/Hayek - o EffectSpec so marca o gatilho.
 Card urandom_card(int mana_cost = 0) {
     Card c;
     c.id = "urandom";
@@ -82,6 +86,7 @@ Card urandom_card(int mana_cost = 0) {
     c.target_shape = TargetShape::Self;
     c.tier = CardTier::Especial;
     c.category = CardCategory::Ativa;
+    c.effects = {EffectSpec{.trigger = TriggerHook::OnCast, .kind = EffectKind::RandomRedirect}};
     return c;
 }
 

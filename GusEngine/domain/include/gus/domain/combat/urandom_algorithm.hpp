@@ -10,17 +10,32 @@
 // weighted_pick e o if-chain de classify sao logica de verdade, nao dado puro - mesmo
 // racional de combat_state_machine.cpp preferir .cpp a header pra funcoes com corpo).
 //
-// TRIGGER (decisao de arquitetura desta fatia, reportada ao lider): urandom NAO ganhou um
-// EffectKind novo no executor techMagic. O redirecionamento precisa da COLEÇAO INTEIRA do
-// caster (TechMagicContext nunca carregou um card_registry nem uma colecao - so o card_id/
-// instance da carta EM EXECUÇAO) e precisa re-executar o resolvedor de OUTRA carta (record-
-// base OU techMagic::execute conforme o tier sorteado) - a CombatStateMachine JA tem acesso
-// direto a tudo isso (card_registry_/rng_/queue_/log_, mesmos membros usados por resolve_
-// use_card). Por isso o trigger e um branch por card_id ("urandom") dentro de resolve_use_
-// card (CombatStateMachine::resolve_urandom, combat_state_machine.cpp) - mesmo racional
-// "embrulha resolve_use_card inteiro, agnostico do dispatcher techMagic" do CardHardwareLayer
-// descrito em docs/design/mecanicas/cartas-spec-logica.md secao 1 pro vírus/bateria. So as 2
-// funcoes PURAS abaixo (sorteio de faixa + classificacao) moram aqui, fora da FSM, pra serem
+// TRIGGER (GENERALIZADO em 2026-08-01, decisao do lider, ADR-019 addendum "lei do atomo"):
+// ate 2026-08-01, urandom nao tinha EffectKind proprio no executor techMagic - o gatilho do
+// branch dedicado de resolve_use_card era um `if (card.id == kUrandomCardId)`, isto e, um
+// desvio por ID LITERAL de UMA carta so (decisao de arquitetura da fatia original, reportada
+// ao lider na epoca, ver historico do ADR-019). A auditoria da lei do atomo (2026-08-01)
+// achou exatamente esse `if` como a violacao real: "cada carta e um atomo... nenhuma tem
+// caminho especial no motor". O lider decidiu GENERALIZAR (nao manter como excecao): o
+// gatilho agora e `EffectKind::RandomRedirect` (card_enums.hpp) declarado em `card.effects`
+// (urandom = [OnCast -> RandomRedirect] no catalogo, master_cards.cpp) - o MESMO vocabulario
+// compartilhado que toda outra especial usa pra dizer "o que eu faco", checado por
+// combat_state_machine.cpp::card_declares_effect. Uma 2a carta caotica futura que precisar
+// do mesmo redirecionamento entra no branch de graca, sem novo `if`.
+//
+// O CORPO do branch continua IDENTICO (byte-a-byte) ao de antes da generalizacao: o
+// redirecionamento AINDA precisa da COLEÇAO INTEIRA do caster (TechMagicContext ganhou 2
+// campos aditivos pra isso - collection_snapshot/card_registry, techmagic.hpp - mas
+// resolve_urandom continua sendo METODO PRIVADO da CombatStateMachine, acessando
+// card_registry_/collection_snapshot_/rng_/queue_/log_ DIRETO como membro, nao via ctx;
+// nenhum handler consome os 2 campos novos ainda) e precisa re-executar o resolvedor de
+// OUTRA carta (record-base OU techMagic::execute conforme o tier sorteado) - por isso a
+// ORQUESTRACAO continua vivendo em CombatStateMachine::resolve_urandom/
+// resolve_redirected_card_effect (combat_state_machine.cpp), so o GATILHO que a alcanca
+// mudou de id pra EffectKind. `kUrandomCardId` (a constante abaixo) SOBREVIVE, mas so como
+// FILTRO ANTI-RECURSAO dentro do pool de candidatos do redirecionamento (exclui a propria
+// urandom de se sortear a si mesma) - NAO E MAIS o gatilho de resolucao. So as 2 funcoes
+// PURAS abaixo (sorteio de faixa + classificacao) moram aqui, fora da FSM, pra serem
 // testaveis em isolamento (distribuicao estatistica sob N milhares de trials sem precisar
 // montar um combate inteiro por trial).
 //
