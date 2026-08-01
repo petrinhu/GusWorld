@@ -1029,6 +1029,63 @@ struct PacingPointResult {
     return results;
 }
 
+// ============================================================================
+// Primitivas reusaveis pra Fase B/C, PURAS e MECANICAS - nao decidem o METODO (direcao
+// da bissecao, quantos niveis, criterio de corte dos finalistas), so oferecem os blocos
+// de construcao. Achado 2026-08-01: sinalizado ao team-lead antes de fechar a
+// orquestracao completa das duas fases, porque o METODO tem ambiguidade real (ver
+// mensagem no bus); estas funcoes NAO resolvem essa ambiguidade, so a preparam.
+// ============================================================================
+
+// Cenarios de um tier (protocolo secao 2.2): P6 (turtle total) e trash-only (roles_for
+// so defende, enemies sao Sentinela-Bit - o mesmo elenco trash de P1-P3), nunca elite.
+[[nodiscard]] inline std::vector<Scenario> scenarios_for_tier(Tier tier) {
+    if (tier == Tier::Trash) {
+        return {Scenario::P1_TrashVanilla, Scenario::P2_TrashParede, Scenario::P3_TrashHealer,
+               Scenario::P6_TurtleTotal};
+    }
+    return {Scenario::P4_EliteEscolta, Scenario::P5_EliteSolo};
+}
+
+// "Bateria completa" (protocolo secao 2.2, Fase C): roda os MESMOS eixos contra TODOS
+// os cenarios do tier correspondente (P6 incluso so pro trash, por construcao - nao ha
+// P6 elite). NAO mistura eixo de tier errado: um candidato trash (eixos calibrados
+// sobre a referencia de 55 HP) so faz sentido nos cenarios trash; idem elite.
+[[nodiscard]] inline std::vector<PacingPointResult> run_full_battery(
+    Tier tier, const PacingAxes& axes, int n, std::uint32_t base_seed, std::ostream* progress_out,
+    int point_idx_1based, int point_total) {
+    const std::vector<Scenario> scenarios = scenarios_for_tier(tier);
+    std::vector<PacingPointResult> results;
+    results.reserve(scenarios.size());
+    const std::string tier_name = tier == Tier::Trash ? "trash" : "elite";
+    for (Scenario s : scenarios) {
+        PacingGridPoint gp{s, axes, phase_a_point_label(tier_name, s, axes)};
+        results.push_back(run_and_evaluate_point(gp, n, base_seed, progress_out, 'C',
+                                                  point_idx_1based, point_total));
+    }
+    return results;
+}
+
+// Vizinhanca SIMETRICA de um ponto (protocolo secao 2.1, Fase B: "passo de ~10% de HP e
+// ±1 de Atk"). Gera o mini-grid combinatorio (todas as combinacoes de HP-mult x Atk num
+// raio de `levels` passos), SEM decidir direcao (nao pressupoe que HP correlaciona com
+// duracao - essa e a hipotese H1 do protocolo, secao 1.2, ainda nao confirmada pelos
+// dados) nem quantos niveis usar de verdade (1 ou 2 - ambiguidade sinalizada ao
+// team-lead). O proprio ponto base (offset 0,0) NAO entra - ja foi testado na Fase A.
+[[nodiscard]] inline std::vector<PacingAxes> neighbor_axes(const PacingAxes& base, int levels) {
+    std::vector<PacingAxes> out;
+    for (int hp_level = -levels; hp_level <= levels; ++hp_level) {
+        for (int atk_level = -levels; atk_level <= levels; ++atk_level) {
+            if (hp_level == 0 && atk_level == 0) continue;
+            PacingAxes a = base;
+            a.hp_mult = base.hp_mult * (1.0 + 0.10 * hp_level);
+            a.atk = base.atk + atk_level;
+            out.push_back(a);
+        }
+    }
+    return out;
+}
+
 }  // namespace gus::domain::tests::pacing_sim
 
 #endif  // GUS_DOMAIN_TESTS_PACING_SIM_HARNESS_HPP

@@ -886,6 +886,89 @@ TEST_CASE("pacing_sim: run_phase_a smoke - progresso, 116 resultados, banner de 
 }
 
 // ============================================================================
+// Primitivas puras pra Fase B/C (scenarios_for_tier, run_full_battery, neighbor_axes) -
+// NAO decidem o metodo (ambiguidade sinalizada ao team-lead), so os blocos mecanicos.
+// ============================================================================
+
+TEST_CASE("pacing_sim: scenarios_for_tier poe P6 SO no trash, nunca no elite",
+          "[domain][pacing_sim]") {
+    const auto trash = scenarios_for_tier(Tier::Trash);
+    REQUIRE(trash.size() == 4);
+    CHECK(std::find(trash.begin(), trash.end(), Scenario::P6_TurtleTotal) != trash.end());
+
+    const auto elite = scenarios_for_tier(Tier::Elite);
+    REQUIRE(elite.size() == 2);
+    CHECK(std::find(elite.begin(), elite.end(), Scenario::P6_TurtleTotal) == elite.end());
+}
+
+TEST_CASE("pacing_sim: run_full_battery roda os 4 cenarios trash (incluindo P6) com os "
+          "MESMOS eixos",
+          "[domain][pacing_sim]") {
+    PacingAxes axes;  // referencia, valida pro tier trash
+    const auto results = run_full_battery(Tier::Trash, axes, /*n=*/10, /*base_seed=*/5u, nullptr, 1, 1);
+    REQUIRE(results.size() == 4);
+    std::vector<Scenario> seen;
+    for (const PacingPointResult& r : results) {
+        seen.push_back(r.point.scenario);
+        REQUIRE(r.report.n == 10);
+        CHECK(r.point.axes.hp_mult == Catch::Approx(axes.hp_mult));  // MESMOS eixos em todos
+    }
+    CHECK(std::find(seen.begin(), seen.end(), Scenario::P6_TurtleTotal) != seen.end());
+}
+
+TEST_CASE("pacing_sim: run_full_battery roda os 2 cenarios elite, sem P6", "[domain][pacing_sim]") {
+    PacingAxes axes;
+    axes.hp_mult = 0.80;
+    const auto results = run_full_battery(Tier::Elite, axes, /*n=*/10, /*base_seed=*/5u, nullptr, 1, 1);
+    REQUIRE(results.size() == 2);
+    for (const PacingPointResult& r : results)
+        CHECK(tier_of(r.point.scenario) == Tier::Elite);
+}
+
+TEST_CASE("pacing_sim: neighbor_axes(levels=1) gera 8 vizinhos (3x3 menos o proprio ponto)",
+          "[domain][pacing_sim]") {
+    PacingAxes base;
+    base.hp_mult = 1.0;
+    base.atk = 10;
+    const auto neighbors = neighbor_axes(base, 1);
+    REQUIRE(neighbors.size() == 8);  // 3x3 - 1 (o proprio ponto, offset 0,0, nao entra)
+    // fronteiras EXATAS dos passos (10% de HP, 1 de Atk) - derivadas a mao.
+    bool found_hp_plus_10pct = false, found_hp_minus_10pct = false;
+    bool found_atk_plus_1 = false, found_atk_minus_1 = false;
+    for (const PacingAxes& n : neighbors) {
+        if (n.hp_mult == Catch::Approx(1.10) && n.atk == 10) found_hp_plus_10pct = true;
+        if (n.hp_mult == Catch::Approx(0.90) && n.atk == 10) found_hp_minus_10pct = true;
+        if (n.hp_mult == Catch::Approx(1.0) && n.atk == 11) found_atk_plus_1 = true;
+        if (n.hp_mult == Catch::Approx(1.0) && n.atk == 9) found_atk_minus_1 = true;
+    }
+    CHECK(found_hp_plus_10pct);
+    CHECK(found_hp_minus_10pct);
+    CHECK(found_atk_plus_1);
+    CHECK(found_atk_minus_1);
+}
+
+TEST_CASE("pacing_sim: neighbor_axes NUNCA inclui o proprio ponto base (offset 0,0)",
+          "[domain][pacing_sim]") {
+    PacingAxes base;
+    base.hp_mult = 0.80;
+    base.atk = 12;
+    for (int level : {1, 2}) {
+        const auto neighbors = neighbor_axes(base, level);
+        for (const PacingAxes& n : neighbors)
+            REQUIRE_FALSE((n.hp_mult == Catch::Approx(base.hp_mult) && n.atk == base.atk));
+    }
+}
+
+TEST_CASE("pacing_sim: neighbor_axes(levels=2) gera 24 vizinhos (5x5 menos o proprio ponto)",
+          "[domain][pacing_sim]") {
+    PacingAxes base;
+    base.hp_mult = 1.0;
+    base.atk = 10;
+    const auto neighbors = neighbor_axes(base, 2);
+    REQUIRE(neighbors.size() == 24);  // 5x5 - 1
+}
+
+// ============================================================================
 // Reuso-seguranca: mira_sim_harness.hpp continua intacto (a suite dele, ja auditada por 2
 // QAs, segue existindo e passando - ver CMakeLists.txt, ambos os arquivos .cpp registrados
 // no mesmo executavel gusengine_domain_tests).
