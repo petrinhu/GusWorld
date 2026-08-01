@@ -11,6 +11,8 @@
 #include <catch2/catch_test_macros.hpp>
 
 #include <cstdlib>
+#include <fstream>
+#include <iostream>
 #include <sstream>
 
 #include "pacing_sim_harness.hpp"
@@ -883,6 +885,36 @@ TEST_CASE("pacing_sim: run_phase_a smoke - progresso, 116 resultados, banner de 
     REQUIRE(text.find("fase [A], ponto [1] de [116], simulação [") != std::string::npos);
     REQUIRE(text.find("VEREDICTO DO PONTO") != std::string::npos);
     REQUIRE(text.find("Fase A concluida") != std::string::npos);
+}
+
+// Disparo REAL da Fase A (protocolo secao 3: N=240.000 x 116 pontos, ~28 milhoes de
+// lutas, ~5 minutos medidos nesta maquina). Mesma disciplina do MIRA-SIM
+// (run_full_study): SEM GUSWORLD_PACING_SIM_FULL, roda so o smoke com N pequeno (CI);
+// COM a variavel setada, roda o N pleno e grava em std::cout E em arquivo ao mesmo
+// tempo via TeeOstream (GUSWORLD_PACING_SIM_REPORT_PATH, default
+// "pacing_sim_phase_a_report.txt"). NUNCA disparado por este harness sozinho - quem
+// decide rodar e o team-lead/lider (protocolo secao 7 item 1).
+TEST_CASE("pacing_sim: run_phase_a - disparo real da Fase A (N=240.000, grava em arquivo)",
+          "[domain][pacing_sim][pacing_sim_smoke]") {
+    const bool full_run = std::getenv("GUSWORLD_PACING_SIM_FULL") != nullptr;
+    const std::uint32_t base_seed = 20260801;
+
+    if (!full_run) {
+        const int n_per_point = 5;
+        std::ostringstream out;
+        REQUIRE_NOTHROW(run_phase_a(n_per_point, base_seed, out));
+        return;
+    }
+
+    const int n_per_point = 240000;
+    const char* report_path_env = std::getenv("GUSWORLD_PACING_SIM_REPORT_PATH");
+    const std::string report_path = report_path_env != nullptr
+                                        ? std::string(report_path_env)
+                                        : std::string("pacing_sim_phase_a_report.txt");
+    std::ofstream file(report_path);
+    REQUIRE(file.is_open());
+    TeeOstream tee(std::cout, file);
+    run_phase_a(n_per_point, base_seed, tee);
 }
 
 // ============================================================================
