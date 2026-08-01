@@ -58,16 +58,34 @@
 //     proposito (joga fora os 2 AP restantes) - e o caso degenerado "so defender" que a
 //     pergunta de origem do lider pediu, documentado como tal (nao e o padrao geral).
 //
-// CAP DE RODADAS (V12 //SIM = 30): o motor NAO tem cap de rodadas embutido (run_until_end
-// tem so um teto de 10000 TURNOS que lanca excecao - nao um "empate" gracioso). Para nao
-// reimplementar a FSM (os metodos de driving fino como expire_on_stunned_turn_end sao
-// PRIVADOS), o cap e obtido via a PROPRIA mecanica publica de Fuga: ao alcancar
-// round_index() >= kRoundCap, o bot da party forca CombatAction::flee() (resolve_flee e
-// deterministico: sucesso se SPD top da party >= SPD top dos inimigos vivos - verdadeiro
-// pra todos os cenarios deste estudo, ja que Caua SPD 13 > qualquer inimigo especificado).
-// O resultado e classificado como "empate tecnico" (capped=true) quando o Fled ocorre
-// exatamente no/apos o cap, distinguindo de uma fuga real (que nenhum bot deste harness
-// escolhe antes do cap).
+// CAP DE RODADAS (V12 //SIM = 30, CORRIGIDO 2026-08-01, achado CRITICO do QA independente):
+// o motor NAO tem cap de rodadas embutido (run_until_end tem so um teto de 10000 TURNOS que
+// LANCA excecao - nao um "empate" gracioso). A 1a versao deste harness tentava o cap via
+// CombatAction::flee() (resolve_flee: sucesso se SPD top da party >= SPD top dos inimigos
+// vivos, ambos contados SO entre vivos). O QA provou que isto FALHA: se a Caua (SPD 13, a
+// maior da party) cair e Gus(9)/Jaci(7) seguirem vivos contra um Daemon-Guard (SPD 10,
+// kDaemonGuardSpd), o SPD top da party vira 9 < 10 - a Fuga forcada passa a falhar PRA
+// SEMPRE (companion caido sozinho NAO encerra o combate, so o Gus - check_end, secao 3), e
+// o laco do estudo so pararia quando o motor lancasse a excecao do teto de 10000 turnos
+// (o QA mediu 3303 rodadas ALEM do cap antes disso, em L6/L7, exatamente os lotes
+// desenhados pra produzir quedas). Uma unica luta assim derrubaria o processo do estudo
+// inteiro de 10 milhoes.
+//
+// CORRECAO: o cap agora e GARANTIDO pelo harness, nao por uma regra de fuga que pode
+// falhar. Ao alcancar round_index() >= kRoundCap (em QUALQUER turno, de QUALQUER lado), o
+// provider forca o fim do combate zerando o HP de todos os membros VIVOS da party via
+// CombatActor::take_damage() (metodo PUBLICO, MESMO usado pela fracao de HP inicial de L6 -
+// nao reimplementa nenhuma regra de dano/Shield) e devolve Pass() (0 AP, encerra o turno
+// incondicionalmente). O check_end() NATIVO do motor (secao 3, "if (!any_player_alive)
+// outcome_ = Defeat") reconhece o wipe na PROXIMA checagem, sem depender de SPD, de quem
+// morreu antes, ou de qual lado estava agindo. `trace.capped` e setado por um flag PROPRIO
+// do harness (nao mais inferido do CombatOutcome::Fled) na MESMA rodada em que o cap
+// dispara - confiavel mesmo quando o resultado final e Defeat (o caminho normal agora).
+//
+// DEFESA EM PROFUNDIDADE: sm.run_until_end() roda dentro de um try/catch; se AINDA ASSIM
+// uma excecao do motor escapar (o wipe acima deveria tornar isto inalcancavel, mas
+// excecao vazando pro laco de 10 milhoes de lutas e catastrofico demais pra confiar so na
+// logica acima), a luta e registrada como capped=true e o estudo segue pra proxima luta.
 //
 // Cross-ref: docs/design/mecanicas/proposta-protocolo-simulacao-mira.md;
 //            docs/design/mecanicas/proposta-mira-inimiga.md;
@@ -132,7 +150,7 @@ inline constexpr int kHoneypotDurationRounds = 2;
 inline constexpr int kFirewallDurationRounds = 2;
 // V10 //SIM cura da Jaci (L4): 12 HP no aliado mais ferido.
 inline constexpr int kHealerHealAmount = 12;
-// V12 //SIM cap de rodadas (empate tecnico via Flee forcado, ver cabecalho).
+// V12 //SIM cap de rodadas (empate tecnico via wipe deterministico, ver cabecalho).
 inline constexpr int kRoundCap = 30;
 // Janela de memoria curta de F1/F3 ("ultimas 2 rodadas" = rodada corrente + anterior).
 inline constexpr int kAttractionWindowRounds = 2;
@@ -522,10 +540,10 @@ struct BattleTrace {
                                                        const CombatStateMachine& sm,
                                                        AttractionTracker& tr,
                                                        BattleTrace& trace, int round) {
-    // V12 //SIM: cap de rodadas via Fuga forcada (ver cabecalho do arquivo). Testado
-    // determinístico pra este estudo (Caua SPD 13 > qualquer inimigo especificado).
-    if (round >= kRoundCap) return CombatAction::flee();
-
+    // V12 //SIM: o cap de rodadas NAO e mais decidido aqui (era via Fuga forcada; o QA
+    // provou que Fuga pode falhar pra sempre se a party perder o membro de maior SPD - ver
+    // "CAP DE RODADAS" no cabecalho). O provider (run_single_mira_battle) intercepta
+    // round >= kRoundCap ANTES de chamar esta funcao, entao ela nunca ve round >= kRoundCap.
     const bool first_decision_this_turn = actor.ap() == actor.max_ap();
 
     auto attack_front = [&]() -> CombatAction {
@@ -652,8 +670,14 @@ struct BattleTrace {
 // Execucao de UMA luta (pareavel por seed: mesma seed sob os 6 bracos = mesma luta).
 // ============================================================================
 
-[[nodiscard]] inline BattleTrace run_single_mira_battle(Lote lote, MiraArm arm,
-                                                        std::uint32_t seed) {
+// `pre_battle_hook` (opcional, default nullptr): aplicado DEPOIS da fracao de HP inicial
+// (L6) e ANTES do combate comecar, recebendo os ponteiros estaveis dos atores. Usado por
+// testes de regressao pra reproduzir cenarios exatos (ex.: um membro da party ja caido no
+// inicio, achado do QA pro cap de rodadas) sem precisar de uma segunda funcao paralela.
+// Nunca chamado em producao/estudo real (os 7 lotes do protocolo nao o usam).
+[[nodiscard]] inline BattleTrace run_single_mira_battle(
+    Lote lote, MiraArm arm, std::uint32_t seed,
+    const std::function<void(std::vector<CombatActor*>&)>& pre_battle_hook = nullptr) {
     const LoteScenario scenario = scenario_for(lote);
     const std::array<PartyRole, kPartySize> roles = roles_for(lote);
 
@@ -682,6 +706,8 @@ struct BattleTrace {
         }
     }
 
+    if (pre_battle_hook) pre_battle_hook(actor_ptrs);
+
     AttractionTracker tr;
     BattleTrace trace;
     std::optional<std::string> last_enemy_target;
@@ -697,9 +723,26 @@ struct BattleTrace {
     // inimigo a 1 acao/turno; a party consome o mailbox do jogador nas 3 chamadas. Este
     // harness espelha essa MESMA fronteira via `actor.ap() == actor.max_ap()` (ver
     // "ECONOMIA DE AP" no cabecalho do arquivo): o gate abaixo so vale pro INIMIGO.
+    bool cap_triggered = false;
+
     auto provider = [&](CombatActor& actor, const CombatState& state) -> CombatAction {
         const int round = state.round_index();
         tr.observe_round(round);
+
+        if (round >= kRoundCap) {
+            // V12 //SIM: cap de rodadas GARANTIDO pelo harness (ver "CAP DE RODADAS" no
+            // cabecalho do arquivo - achado CRITICO do QA: Fuga forcada pode falhar pra
+            // sempre se a party perder o membro de maior SPD). Forca o wipe da party via
+            // CombatActor::take_damage() (metodo PUBLICO, mesmo usado pela fracao de HP
+            // inicial de L6) - o check_end() NATIVO do motor reconhece "!any_player_alive"
+            // na proxima checagem, SEM depender de SPD nem de quem agia. Pass() (0 AP)
+            // encerra o turno incondicionalmente, entao o combate termina no maximo 1
+            // acao apos o cap, de QUALQUER lado que estivesse agindo.
+            cap_triggered = true;
+            for (CombatActor* p : state.alive_players())
+                if (p->is_alive()) p->take_damage(p->hp());
+            return CombatAction::pass();
+        }
 
         if (actor.is_player_side()) {
             const PartyMember m = member_of(actor.id());
@@ -716,11 +759,23 @@ struct BattleTrace {
     CombatStateMachine sm(actor_ptrs, provider, /*card_registry=*/nullptr,
                          /*brain_registry=*/nullptr, &rng);
     sm_ptr = &sm;
-    const CombatResult result = sm.run_until_end();
+
+    CombatResult result;
+    try {
+        result = sm.run_until_end();
+    } catch (const std::exception&) {
+        // DEFESA EM PROFUNDIDADE (ver "CAP DE RODADAS" no cabecalho): o wipe acima deveria
+        // tornar isto inalcancavel, mas uma excecao escapando pro laco de 10 milhoes de
+        // lutas e catastrofica demais pra confiar SO na logica de wipe. Registra como
+        // empate tecnico e devolve - o chamador (run_lote_all_arms) segue pra proxima luta.
+        cap_triggered = true;
+        result.outcome = CombatOutcome::Ongoing;
+        result.rounds_elapsed = kRoundCap;
+    }
 
     trace.outcome = result.outcome;
     trace.rounds = result.rounds_elapsed;
-    trace.capped = result.outcome == CombatOutcome::Fled && result.rounds_elapsed >= kRoundCap;
+    trace.capped = cap_triggered;
 
     for (std::size_t i = 0; i < scenario.party.size(); ++i) {
         const CombatActor& a = actors[i];

@@ -164,21 +164,35 @@ gus::domain::combat::CombatActor make_actor(std::string id, int hp, int max_hp, 
 
 }  // namespace
 
-TEST_CASE("mira_sim: compute_target_weight aplica V1+F1+F2+F3 antes do F4/F5/F6",
+// Valores literais (nao simbolicos) nas asserções de resultado: comparar contra a MESMA
+// constante usada internamente e tautologico (se kBaseWeight mudar de valor, o teste
+// segue passando sem nunca ter provado nada). V1=100, V2=+1/ponto, V3=100x(1-hp/hpmax),
+// V4=+60 sao os valores do protocolo secao 5 - sao ELES que o teste tem de fixar.
+TEST_CASE("mira_sim: compute_target_weight aplica V1+F1+F2+F3 antes do F4/F5/F6 (valores "
+          "literais do protocolo, nao a constante contra ela mesma)",
           "[domain][mira_sim]") {
     AttractionTracker tr;
     auto full_hp = make_actor("caua", 55, 55, 8);
     const double w_full = compute_target_weight(PartyMember::Caua, full_hp, 0, tr, MiraArm::F_NoF4);
-    REQUIRE(w_full == Catch::Approx(kBaseWeight));  // V1 sozinho: hp cheio, sem dano, sem suporte
+    REQUIRE(w_full == Catch::Approx(100.0));  // V1 sozinho: hp cheio, sem dano, sem suporte
 
-    auto half_hp = make_actor("caua", 27, 55, 8);  // ~49% hp -> F2 soma ~51
+    // F2 (V3): magnitude EXATA, nao so ordem. 27/55 hp = 49.0909...%; F2 = 100*(1-27/55).
+    auto half_hp = make_actor("caua", 27, 55, 8);
     const double w_half = compute_target_weight(PartyMember::Caua, half_hp, 0, tr, MiraArm::F_NoF4);
-    REQUIRE(w_half > w_full);  // F2 (ferido atrai) aumenta o peso
+    REQUIRE(w_half == Catch::Approx(100.0 + 100.0 * (1.0 - 27.0 / 55.0)).epsilon(0.0001));
+    REQUIRE(w_half == Catch::Approx(150.909090909).epsilon(0.0001));
 
-    tr.record_damage(PartyMember::Caua, 0, 20);  // F1: +20 de peso
+    tr.record_damage(PartyMember::Caua, 0, 20);  // F1 (V2): +1 de peso por ponto de dano
     const double w_after_dmg =
         compute_target_weight(PartyMember::Caua, full_hp, 0, tr, MiraArm::F_NoF4);
-    REQUIRE(w_after_dmg == Catch::Approx(kBaseWeight + 20.0));
+    REQUIRE(w_after_dmg == Catch::Approx(120.0));  // 100 + 20
+
+    // F3 (V4): magnitude EXATA (+60), isolada num tracker limpo (sem F1 do bloco acima).
+    AttractionTracker tr_support;
+    tr_support.record_support(PartyMember::Caua, 0);
+    const double w_support =
+        compute_target_weight(PartyMember::Caua, full_hp, 0, tr_support, MiraArm::F_NoF4);
+    REQUIRE(w_support == Catch::Approx(160.0));  // 100 + 60
 }
 
 TEST_CASE("mira_sim: compute_target_weight aplica F4 SO quando o alvo tem Shield ativo",
@@ -187,7 +201,7 @@ TEST_CASE("mira_sim: compute_target_weight aplica F4 SO quando o alvo tem Shield
     auto no_shield = make_actor("jaci", 55, 55, 10);
     const double w_no_shield =
         compute_target_weight(PartyMember::Jaci, no_shield, 0, tr, MiraArm::D_F4Strong);
-    REQUIRE(w_no_shield == Catch::Approx(kBaseWeight));  // F4 nao entra sem Shield
+    REQUIRE(w_no_shield == Catch::Approx(100.0));  // F4 nao entra sem Shield
 
     auto shielded = make_actor("jaci", 55, 55, 10);
     shielded.add_status(gus::domain::combat::StatusEffect{
@@ -200,9 +214,9 @@ TEST_CASE("mira_sim: compute_target_weight aplica F4 SO quando o alvo tem Shield
     const double w_shield_inverted =
         compute_target_weight(PartyMember::Jaci, shielded, 0, tr, MiraArm::E_F4Inverted);
 
-    REQUIRE(w_shield_soft == Catch::Approx(kBaseWeight * 0.5));
-    REQUIRE(w_shield_strong == Catch::Approx(kBaseWeight * 0.1));
-    REQUIRE(w_shield_inverted == Catch::Approx(kBaseWeight * 2.0));
+    REQUIRE(w_shield_soft == Catch::Approx(50.0));    // 100 * 0.5 (V5 braco C)
+    REQUIRE(w_shield_strong == Catch::Approx(10.0));  // 100 * 0.1 (V5 braco D)
+    REQUIRE(w_shield_inverted == Catch::Approx(200.0));  // 100 * 2.0 (V5 braco E)
     // H1 do lider (proposta-protocolo secao 1.1): E (invertido) deve SEMPRE pesar mais
     // que D (forte) e C (suave) quando defendendo - e a ordem que os bracos codificam.
     REQUIRE(w_shield_inverted > w_shield_soft);
@@ -217,7 +231,7 @@ TEST_CASE("mira_sim: compute_target_weight aplica F5 (honeypot x3) e F6 (firewal
     tr.honeypot_rounds_left[idx(PartyMember::Caua)] = 1;
     const double w_honeypot =
         compute_target_weight(PartyMember::Caua, actor, 0, tr, MiraArm::F_NoF4);
-    REQUIRE(w_honeypot == Catch::Approx(kBaseWeight * kHoneypotWeightMultiplier));
+    REQUIRE(w_honeypot == Catch::Approx(300.0));  // 100 * 3.0 (V1 x V6)
 
     AttractionTracker tr2;
     tr2.firewall_rounds_left[idx(PartyMember::Caua)] = 1;
@@ -235,6 +249,31 @@ TEST_CASE("mira_sim: pick_weighted cai pro fallback uniforme quando total de pes
     gus::domain::tests::PropertyRandom rng(1);
     gus::domain::combat::CombatActor* picked = pick_weighted(alive, weights, rng);
     REQUIRE((picked == &a1 || picked == &a2));  // nao lanca, sempre escolhe alguem vivo
+}
+
+// PROVA ESTATISTICA de uniformidade (achado do QA: o teste acima so provava "nao lanca",
+// nao "e uniforme" - um mutante que sempre devolvesse alive[0] passaria igual). Roda 2000
+// sorteios com pesos zerados e diferentes seeds; ambos os candidatos tem de aparecer numa
+// faixa compativel com 50/50 (nao um sempre-o-primeiro).
+TEST_CASE("mira_sim: pick_weighted fallback (V7) e ESTATISTICAMENTE uniforme, nao sempre "
+          "o primeiro vivo",
+          "[domain][mira_sim]") {
+    auto a1 = make_actor("gus", 34, 34, 5);
+    auto a2 = make_actor("caua", 55, 55, 8);
+    std::vector<gus::domain::combat::CombatActor*> alive{&a1, &a2};
+    std::vector<double> weights{0.0, 0.0};
+
+    constexpr int kTrials = 2000;
+    int picked_first = 0;
+    for (std::uint32_t seed = 1; seed <= kTrials; ++seed) {
+        gus::domain::tests::PropertyRandom rng(seed);
+        if (pick_weighted(alive, weights, rng) == &a1) ++picked_first;
+    }
+    const double frac_first = static_cast<double>(picked_first) / kTrials;
+    // Faixa generosa (35%-65%) pra nao ser fragil ao LCG especifico, mas decisiva o
+    // bastante pra reprovar "sempre o primeiro" (100%) ou "sempre o segundo" (0%).
+    REQUIRE(frac_first > 0.35);
+    REQUIRE(frac_first < 0.65);
 }
 
 TEST_CASE("mira_sim: mcid_compare_pct/rounds respeita o piso do lider (secao 3)",
@@ -287,6 +326,9 @@ TEST_CASE("mira_sim: aggregate_mira calcula E1/E2/E3/E4/E5 sobre BattleTrace sin
     REQUIRE(r.n == 2);
     REQUIRE(r.win_rate_pct.value == Catch::Approx(50.0));
     REQUIRE(r.mean_rounds == Catch::Approx(8.0));
+    // mediana (percentile p=0.5), NAO p90: com rounds=[4,12] os dois divergem (p50=8.0,
+    // p90=11.2) - discrimina um mutante que troque o percentil usado.
+    REQUIRE(r.median_rounds == Catch::Approx(8.0));
     REQUIRE(r.pct_in_window_3_5.value == Catch::Approx(50.0));  // so a luta de 4 rounds entra
     REQUIRE(r.concentration_pct.value == Catch::Approx((100.0 + 33.333333333) / 2.0).epsilon(0.001));
     REQUIRE(r.pct_saco_de_pancadas.value == Catch::Approx(50.0));  // so a 1a bate >70%
@@ -295,6 +337,52 @@ TEST_CASE("mira_sim: aggregate_mira calcula E1/E2/E3/E4/E5 sobre BattleTrace sin
     REQUIRE(r.pct_fall_by_member[1].value == Catch::Approx(0.0));
     REQUIRE(r.repeat_target_pct.value == Catch::Approx(100.0 * 5.0 / 8.0));  // (4+1)/(4+4)
     REQUIRE(r.mean_first_fall_round == Catch::Approx(5.0));
+}
+
+// E6/E7 com valores ASSIMETRICOS (raw != absorvido; final_hp_pct != soma bruta; capped
+// misto): protocolo secao 4 chama E6 "a pergunta-mae em termos do motor" - uma inversao
+// absorvido<->bruto tem de dar um numero CLARAMENTE diferente, nunca coincidir por acaso.
+TEST_CASE("mira_sim: aggregate_mira E6 (shield_absorption_pct) nao troca absorvido por bruto",
+          "[domain][mira_sim]") {
+    BattleTrace b1;
+    b1.outcome = CombatOutcome::Victory;
+    b1.rounds = 4;
+    b1.shield_raw_total = 100;
+    b1.shield_absorbed_total = 60;  // absorcao PARCIAL (60% do bruto)
+
+    BattleTrace b2;
+    b2.outcome = CombatOutcome::Victory;
+    b2.rounds = 4;
+    b2.shield_raw_total = 50;
+    b2.shield_absorbed_total = 50;  // absorcao TOTAL
+
+    const LoteArmReport r = aggregate_mira("lote-e6", "braco-e6", {b1, b2});
+    // pooled: absorvido=110, bruto=150 -> 73.33%. Se trocado (bruto/absorvido): 136.36%.
+    REQUIRE(r.shield_absorption_pct.value == Catch::Approx(100.0 * 110.0 / 150.0));
+    REQUIRE(r.shield_absorption_pct.value < 100.0);  // absorcao nunca pode exceder o bruto
+}
+
+TEST_CASE("mira_sim: aggregate_mira E7 (avg_final_hp_pct/pct_hit_round_cap) com dados "
+          "assimetricos e mistos",
+          "[domain][mira_sim]") {
+    BattleTrace capped_battle;
+    capped_battle.outcome = CombatOutcome::Defeat;
+    capped_battle.rounds = 30;
+    capped_battle.capped = true;
+    capped_battle.final_hp_fraction = {1.0, 0.5, 0.0};
+
+    BattleTrace normal_battle;
+    normal_battle.outcome = CombatOutcome::Victory;
+    normal_battle.rounds = 4;
+    normal_battle.capped = false;
+    normal_battle.final_hp_fraction = {0.2, 0.2, 0.2};
+
+    const LoteArmReport r = aggregate_mira("lote-e7", "braco-e7", {capped_battle, normal_battle});
+    // media de 6 valores: (1.0+0.5+0.0+0.2+0.2+0.2)/6 = 0.35 -> 35%. Sem dividir por N
+    // (mutante) daria 210%.
+    REQUIRE(r.avg_final_hp_pct == Catch::Approx(35.0));
+    // 1 de 2 lutas capped -> 50%. Um mutante fixo em 100% falharia aqui.
+    REQUIRE(r.pct_hit_round_cap.value == Catch::Approx(50.0));
 }
 
 TEST_CASE("mira_sim: aggregate_mira com vetor vazio nao explode", "[domain][mira_sim]") {
@@ -348,6 +436,14 @@ TEST_CASE("mira_sim: economia de AP - inimigo 1x/turno, party 3x/turno (regressa
     auto provider = [&](CombatActor& actor, const CombatState& state) -> CombatAction {
         const int round = state.round_index();
         tr.observe_round(round);
+
+        if (round >= kRoundCap) {
+            // Mesmo mecanismo de cap de run_single_mira_battle (ver "CAP DE RODADAS" no
+            // cabecalho): wipe deterministico via take_damage(), nao mais Fuga forcada.
+            for (CombatActor* p : state.alive_players())
+                if (p->is_alive()) p->take_damage(p->hp());
+            return CombatAction::pass();
+        }
         if (actor.is_player_side()) {
             // "hero" nao e gus/caua/jaci; decide_party_action so precisa do papel e do
             // AttractionTracker (F1), que aqui nao importa - usamos Gus como PartyMember
@@ -368,7 +464,8 @@ TEST_CASE("mira_sim: economia de AP - inimigo 1x/turno, party 3x/turno (regressa
     sm_ptr = &sm;
     const auto result = sm.run_until_end();
 
-    REQUIRE(result.outcome == CombatOutcome::Fled);  // cap de rodadas via Fuga (kRoundCap)
+    // Wipe deterministico (nao mais Fuga): o resultado e Defeat, nao Fled.
+    REQUIRE(result.outcome == CombatOutcome::Defeat);
     REQUIRE(result.rounds_elapsed >= kRoundCap);
 
     // Inimigo: 1 ataque de 7 por rodada (nao 3x21=63). Tolerancia de 1 rodada de folga na
@@ -423,10 +520,85 @@ TEST_CASE("mira_sim: L3 turtle total bate no cap de 30 rodadas (empate tecnico, 
     const BattleTrace t = run_single_mira_battle(Lote::L3_TurtleTotal, MiraArm::A_StatusQuo, 99);
     REQUIRE(t.capped);
     REQUIRE(t.rounds >= kRoundCap);
-    REQUIRE(t.outcome == CombatOutcome::Fled);
+    // Cap garantido pelo harness (wipe deterministico, ver "CAP DE RODADAS" no cabecalho):
+    // o resultado e Defeat (a party e zerada), nao mais Fled (a Fuga forcada podia falhar
+    // pra sempre - achado CRITICO do QA).
+    REQUIRE(t.outcome == CombatOutcome::Defeat);
     // H1 (parede renovavel): dano bruto tentado > 0, mas absorvido quase/totalmente.
     REQUIRE(t.shield_raw_total > 0);
     REQUIRE(t.shield_absorbed_total == t.shield_raw_total);
+}
+
+// Regressao OBRIGATORIA do achado CRITICO do QA (2026-08-01): a Fuga forcada do cap
+// comparava SPD top da party (so entre vivos) com SPD top dos inimigos (so entre vivos).
+// Se a Caua (SPD 13, a maior da party) cai e so Gus(9)/Jaci(7) seguem vivos contra um
+// Daemon-Guard (SPD 10), o SPD top da party vira 9 < 10 - a Fuga falha PRA SEMPRE (so o
+// Gus caido encerra o combate, secao 3), e o motor so pararia ao lancar a excecao do teto
+// de 10000 turnos (o QA mediu 3303 rodadas ALEM do cap antes disso). Reproduz o cenario
+// EXATO: Caua morta, Gus e Jaci vivos com HP altissimo, Daemon vivo com HP altissimo
+// (nada morre "de verdade" antes do cap - a UNICA forma de terminar e o cap disparar).
+TEST_CASE("mira_sim: cap de rodadas e garantido mesmo com a party perdendo o maior SPD "
+          "(regressao do CRITICO achado pelo QA - Fuga forcada podia falhar pra sempre)",
+          "[domain][mira_sim]") {
+    using gus::domain::combat::CombatAction;
+    using gus::domain::combat::CombatActor;
+    using gus::domain::combat::CombatState;
+    using gus::domain::combat::CombatStateMachine;
+
+    CombatActor gus("gus", "gus", /*max_hp=*/1'000'000, /*atk=*/1, /*def=*/1000,
+                    /*spd=*/9, CardFamily::Eletrico, /*is_player_side=*/true, false, 0,
+                    /*is_universal_compiler=*/true);
+    CombatActor caua("caua", "caua", /*max_hp=*/55, /*atk=*/14, /*def=*/8, /*spd=*/13,
+                     CardFamily::Eletrico, /*is_player_side=*/true);
+    CombatActor jaci("jaci", "jaci", /*max_hp=*/1'000'000, /*atk=*/1, /*def=*/1000,
+                     /*spd=*/7, CardFamily::Bioquimico, /*is_player_side=*/true);
+    CombatActor daemon("daemon", "daemon", /*max_hp=*/1'000'000, /*atk=*/1, /*def=*/1000,
+                       kDaemonGuardSpd, CardFamily::Cinetico, /*is_player_side=*/false);
+    caua.take_damage(caua.hp());  // Caua morta ANTES da luta comecar (SPD top da party = 9)
+    REQUIRE_FALSE(caua.is_alive());
+    REQUIRE(gus.spd() < daemon.spd());   // 9 < 10: a condicao EXATA que quebrava a Fuga
+    REQUIRE(jaci.spd() < daemon.spd());  // 7 < 10
+
+    std::vector<CombatActor*> actor_ptrs{&gus, &caua, &jaci, &daemon};
+
+    BattleTrace trace;
+    AttractionTracker tr;
+    std::optional<std::string> last_enemy_target;
+    gus::domain::tests::PropertyRandom rng(7);
+    const CombatStateMachine* sm_ptr = nullptr;
+    bool cap_triggered = false;
+
+    // MESMO mecanismo de run_single_mira_battle (ver "CAP DE RODADAS" no cabecalho): wipe
+    // deterministico via take_damage(), NUNCA Fuga. Def altissima dos 2 lados (raw clamp em
+    // kMinDamage=1 sempre) garante que ninguem morre "de verdade" antes do cap disparar.
+    auto provider = [&](CombatActor& actor, const CombatState& state) -> CombatAction {
+        const int round = state.round_index();
+        tr.observe_round(round);
+        if (round >= kRoundCap) {
+            cap_triggered = true;
+            for (CombatActor* p : state.alive_players())
+                if (p->is_alive()) p->take_damage(p->hp());
+            return CombatAction::pass();
+        }
+        if (actor.is_player_side()) {
+            const auto enemies = state.alive_enemies();
+            return enemies.empty() ? CombatAction::pass()
+                                   : CombatAction::attack(enemies.front()->id());
+        }
+        if (actor.ap() < actor.max_ap()) return CombatAction::pass();
+        return decide_enemy_action(MiraArm::A_StatusQuo, actor, state, *sm_ptr, tr, trace, rng,
+                                   round, last_enemy_target);
+    };
+
+    CombatStateMachine sm(actor_ptrs, provider, nullptr, nullptr, &rng);
+    sm_ptr = &sm;
+
+    CombatResult result;
+    REQUIRE_NOTHROW(result = sm.run_until_end());  // NENHUMA excecao pode escapar (contrato 2)
+
+    REQUIRE(cap_triggered);                     // o cap disparou (contrato 3, capped confiavel)
+    REQUIRE(result.rounds_elapsed <= kRoundCap + 1);  // nunca passa do cap (contrato 1)
+    REQUIRE(result.outcome == CombatOutcome::Defeat);  // wipe da party, nao Fled
 }
 
 TEST_CASE("mira_sim: L2 parede dedicada - Jaci nunca cai a 0 enquanto so ela defende e "
@@ -436,6 +608,82 @@ TEST_CASE("mira_sim: L2 parede dedicada - Jaci nunca cai a 0 enquanto so ela def
     // Jaci (indice 2) e o unico defensor; com F4 forte (D), o inimigo quase nunca a mira -
     // e mesmo mirando, o Shield (Def 10) absorve o ataque do trash (raw=max(1,10-10)=1).
     REQUIRE_FALSE(t.fell[idx(PartyMember::Jaci)]);
+}
+
+// TESTE PONTA-A-PONTA de L4 (achado do QA: "L4 e L5 nao tem NENHUM teste ponta a ponta...
+// o QA matou o papel do honeypot... e a cura (V10 = 0) e a suite nao percebeu"). Roda o
+// motor REAL e prova que a cura teve efeito MENSURAVEL: o HP final perdido de verdade
+// (max_hp - hp final, somado nos 3 membros) tem de ser MENOR que o dano bruto recebido
+// (damage_taken, que NAO desconta cura - e o dano no momento em que o golpe landou) -
+// se a cura virasse no-op (V10=0 ou o heal() nunca fosse chamado), os dois valores
+// bateriam exatamente (nenhuma cura pra compensar o dano recebido).
+TEST_CASE("mira_sim: L4 suporte ativo - a cura da Jaci reduz o HP final perdido "
+          "abaixo do dano bruto recebido (teste ponta-a-ponta, prova a cura de verdade)",
+          "[domain][mira_sim]") {
+    const BattleTrace t = run_single_mira_battle(Lote::L4_SuporteAtivo, MiraArm::A_StatusQuo, 11);
+    const int total_damage_taken = t.damage_taken[0] + t.damage_taken[1] + t.damage_taken[2];
+    REQUIRE(total_damage_taken > 0);  // sanidade: a luta realmente trocou golpes
+
+    const std::array<int, kPartySize> max_hp{34, 55, 55};  // Gus/Caua/Jaci, combat.md secao 17
+    int total_hp_lost_de_verdade = 0;
+    for (int i = 0; i < kPartySize; ++i) {
+        const int final_hp = static_cast<int>(std::lround(t.final_hp_fraction[i] * max_hp[i]));
+        total_hp_lost_de_verdade += max_hp[i] - final_hp;
+    }
+    REQUIRE(total_hp_lost_de_verdade < total_damage_taken);
+}
+
+// TESTES PONTA-A-PONTA + UNITARIO de L5 (achado do QA: honeypot podia virar no-op sem
+// quebrar a suite). O unitario prova que decide_party_action realmente marca os
+// trackers; o E2E prova que o motor real completa a luta sem excecao com esses papeis.
+TEST_CASE("mira_sim: L5 cartas de agro - HoneypotEntaoAtaca/FirewallEntaoAtaca marcam os "
+          "trackers na 1a decisao da rodada 1 (unitario, mata o mutante 'vira no-op')",
+          "[domain][mira_sim]") {
+    using gus::domain::combat::CombatActor;
+
+    // Cenario minimo: 1 heroi (Caua ou Gus) vs 1 inimigo, so pra ter um CombatState valido.
+    CombatActor caua("caua", "caua", 55, 14, 8, 13, CardFamily::Eletrico, true);
+    CombatActor enemy("sentinela1", "sentinela1", 55, 10, 8, 8, CardFamily::Cinetico, false);
+    std::vector<CombatActor*> actor_ptrs{&caua, &enemy};
+
+    AttractionTracker tr;
+    BattleTrace trace;
+    gus::domain::tests::PropertyRandom rng(1);
+    auto noop_provider = [](CombatActor&, const gus::domain::combat::CombatState&) {
+        return CombatAction::pass();
+    };
+    gus::domain::combat::CombatStateMachine sm(actor_ptrs, noop_provider, nullptr, nullptr, &rng);
+    // refresh_resources_for_turn() e o que begin_turn() chama de verdade (secao 5): sem
+    // isto ap()==0 (default de construcao) != max_ap(), e first_decision_this_turn daria
+    // falso mesmo sendo a 1a decisao - o teste tem de espelhar o estado real de turno.
+    caua.refresh_resources_for_turn(/*round_index=*/0);
+    const gus::domain::combat::CombatState state(sm.queue(), &caua, /*round_index=*/0);
+
+    REQUIRE(tr.honeypot_rounds_left[idx(PartyMember::Caua)] == 0);  // antes: inativo
+    const CombatAction honeypot_action = decide_party_action(
+        PartyMember::Caua, PartyRole::HoneypotEntaoAtaca, caua, state, sm, tr, trace, /*round=*/0);
+    REQUIRE(tr.honeypot_rounds_left[idx(PartyMember::Caua)] == kHoneypotDurationRounds);
+    REQUIRE(honeypot_action.type == gus::domain::combat::CombatActionType::ScanEnvironment);
+
+    CombatActor gus_actor("gus", "gus", 34, 8, 5, 9, CardFamily::Eletrico, true);
+    gus_actor.refresh_resources_for_turn(/*round_index=*/0);
+    const gus::domain::combat::CombatState state_gus(sm.queue(), &gus_actor, /*round_index=*/0);
+    REQUIRE(tr.firewall_rounds_left[idx(PartyMember::Gus)] == 0);  // antes: inativo
+    const CombatAction firewall_action =
+        decide_party_action(PartyMember::Gus, PartyRole::FirewallEntaoAtaca, gus_actor, state_gus,
+                            sm, tr, trace, /*round=*/0);
+    REQUIRE(tr.firewall_rounds_left[idx(PartyMember::Gus)] == kFirewallDurationRounds);
+    REQUIRE(firewall_action.type == gus::domain::combat::CombatActionType::ScanEnvironment);
+}
+
+TEST_CASE("mira_sim: L5 cartas de agro - motor real completa a luta sem excecao "
+          "(ponta-a-ponta)",
+          "[domain][mira_sim]") {
+    for (MiraArm arm : {MiraArm::A_StatusQuo, MiraArm::F_NoF4}) {
+        const BattleTrace t = run_single_mira_battle(Lote::L5_CartasDeAgro, arm, 321);
+        REQUIRE(t.outcome != CombatOutcome::Ongoing);
+        REQUIRE(t.rounds >= 1);
+    }
 }
 
 TEST_CASE("mira_sim: L6 aplica 70% do HP inicial na party (protocolo secao 2.2)",
