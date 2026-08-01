@@ -124,6 +124,16 @@ enum class TitleSfxKind {
     Click,
 };
 
+// EFEITO DE PRESS (B2, decisao do lider 2026-08-01 - paridade com o menu de
+// pausa/system_menu_loop.cpp, ver SystemMenuFlashInfo la): estado ANTES da
+// mutacao (pra renderizar a tela DE ORIGEM com o item marcado ".pressed") +
+// indice do item confirmado. MESMO papel/contrato de SystemMenuFlashInfo -
+// esta tela reusa o mecanismo, nao reinventa.
+struct TitleFlashInfo {
+    TitleMenuState pre_action_state;
+    int item_index = -1;
+};
+
 // Resultado de UM title_screen_step(): o que o CHAMADOR (TitleScreen::
 // handle_event, title_menu_loop.cpp) deve fazer a seguir - MESMO espirito de
 // DifficultyStepResult (difficulty_menu_loop.hpp); TODOS os side effects REAIS
@@ -144,6 +154,13 @@ struct TitleStepResult {
     bool reload = false;          // TitleMenuAction::None - o CHAMADOR
                                   // reescreve o RML e re-renderiza.
     TitleSfxKind sfx = TitleSfxKind::None;
+    std::optional<TitleFlashInfo> flash;  // EFEITO DE PRESS pendente (B2) - o
+                                          // CHAMADOR chama flash_pressed_
+                                          // (toca o click_sfx + renderiza
+                                          // alguns frames com o item
+                                          // ".pressed") ANTES de aplicar
+                                          // `exit` (MESMA ordem de
+                                          // system_menu_loop.cpp).
     std::optional<TitleScreenExit> exit;  // ContinueGame/NewGameRequested/
                                            // QuitApp - o CHAMADOR retorna NA
                                            // HORA (equivalente ao antigo

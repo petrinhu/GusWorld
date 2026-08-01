@@ -192,6 +192,13 @@ body { font-family: "Pixel Operator Mono"; background: transparent; width: 100%;
 /* (sem :hover aqui - as pills participam de state.confirm_selected/delete_
    confirm_selected/warning_selected, mecanica last-input-wins, ver o
    comentario de .slot.focused acima; .focused sozinho ja reflete o mouse.) */
+/* EFEITO DE PRESS (B2, decisao do lider 2026-08-01) - MESMO efeito de
+   .slot.pressed/.btn-back.pressed acima, pras 3 pills de mini-dialogo/aviso
+   (overwrite/delete/warning) - ver pressed_class/kSlotCount+N abaixo. */
+.confirm-pill.pressed {
+  decorator: vertical-gradient( #22D3EE #0EA5C9 ); border: 1dp #ffffff;
+  box-shadow: #ffffff 0dp 0dp 24dp 3dp;
+}
 /* SAVE-LOAD-AVISOS (aviso #1, mock Tela 4a "warn-box"/"warn-btn.danger"): reusa
    .confirm-title/.confirm-pill (MESMO layout/foco cyan das outras 2 confirmacoes
    acima) - so o titulo (vermelho, severidade) e o botao PERIGOSO ("Tentar
@@ -250,6 +257,7 @@ std::string build_save_load_menu_rml(const SaveLoadMenuState& state,
         if (damaged) {
             body << "<div class=\"confirm-pill danger"
                  << (state.warning_selected == 0 ? " focused" : "")
+                 << pressed_class(0, pressed_index)
                  << "\" id=\"slmenu-warn-recover\">" << tr.tr("SAVE_LOAD_RECOVER_TRY")
                  << "</div>";
         }
@@ -259,6 +267,7 @@ std::string build_save_load_menu_rml(const SaveLoadMenuState& state,
         body << "<div class=\"confirm-pill" << ((!damaged || state.warning_selected == 1)
                                                      ? " focused"
                                                      : "")
+             << pressed_class(1, pressed_index)
              << "\" id=\"slmenu-warn-cancel\">" << tr.tr("SAVE_LOAD_WARN_CANCEL")
              << "</div>";
         body << "</div>";  // #slmenu-panel
@@ -284,9 +293,11 @@ std::string build_save_load_menu_rml(const SaveLoadMenuState& state,
             body << "<div class=\"confirm-title\">" << tr.tr("SAVE_CONFIRM_OVERWRITE")
                  << "</div>";
             body << "<div class=\"confirm-pill" << (state.confirm_selected == 0 ? " focused" : "")
+                 << pressed_class(0, pressed_index)
                  << "\" id=\"slmenu-confirm-yes\">" << tr.tr("SAVE_OVERWRITE_CONFIRM_YES")
                  << "</div>";
             body << "<div class=\"confirm-pill" << (state.confirm_selected == 1 ? " focused" : "")
+                 << pressed_class(1, pressed_index)
                  << "\" id=\"slmenu-confirm-no\">" << tr.tr("SAVE_OVERWRITE_CONFIRM_NO")
                  << "</div>";
         } else {
@@ -294,9 +305,11 @@ std::string build_save_load_menu_rml(const SaveLoadMenuState& state,
                  << interpolate(tr.tr("SAVE_CONFIRM_EMPTY"), std::to_string(state.selected))
                  << "</div>";
             body << "<div class=\"confirm-pill" << (state.confirm_selected == 0 ? " focused" : "")
+                 << pressed_class(0, pressed_index)
                  << "\" id=\"slmenu-confirm-yes\">" << tr.tr("SAVE_EMPTY_CONFIRM_YES")
                  << "</div>";
             body << "<div class=\"confirm-pill" << (state.confirm_selected == 1 ? " focused" : "")
+                 << pressed_class(1, pressed_index)
                  << "\" id=\"slmenu-confirm-no\">" << tr.tr("SAVE_EMPTY_CONFIRM_NO")
                  << "</div>";
         }
@@ -311,9 +324,11 @@ std::string build_save_load_menu_rml(const SaveLoadMenuState& state,
         body << "<div class=\"confirm-title\">" << tr.tr("SAVE_CONFIRM_DELETE")
              << "</div>";
         body << "<div class=\"confirm-pill" << (state.delete_confirm_selected == 0 ? " focused" : "")
+             << pressed_class(0, pressed_index)
              << "\" id=\"slmenu-delete-confirm-yes\">" << tr.tr("SAVE_DELETE_CONFIRM_YES")
              << "</div>";
         body << "<div class=\"confirm-pill" << (state.delete_confirm_selected == 1 ? " focused" : "")
+             << pressed_class(1, pressed_index)
              << "\" id=\"slmenu-delete-confirm-no\">" << tr.tr("SAVE_DELETE_CONFIRM_NO")
              << "</div>";
         body << "</div>";  // #slmenu-panel

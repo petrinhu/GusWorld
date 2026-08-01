@@ -267,10 +267,18 @@ DifficultyStepResult difficulty_screen_step(
             // (difficulty_menu_key_down, ver o header) - result.reload ainda vira
             // true (MESMO comportamento antigo: route_action recarrega o RML
             // mesmo quando o estado nao mudou de fato).
-            result.sfx = sfx_kind_for_item(state, difficulty_keyboard_focus_index(state),
-                                           DifficultySfxKind::Click);
+            const int item_index = difficulty_keyboard_focus_index(state);
+            result.sfx = sfx_kind_for_item(state, item_index, DifficultySfxKind::Click);
+            // EFEITO DE PRESS (B2, decisao do lider 2026-08-01): so quando o
+            // click e o NORMAL (nao Blocked) - o Hardcore bloqueado ja e no-op
+            // TOTAL de estado, nao merece flash visual (MESMA semantica "nao
+            // reage a nada" alem do som grave).
+            const DifficultyMenuState pre_action_state = state;
             const DifficultyMenuAction action =
                 difficulty_menu_key_down(state, sdl_keycode_to_menu_key(ev.key.key));
+            if (result.sfx == DifficultySfxKind::Click) {
+                result.flash = DifficultyFlashInfo{pre_action_state, item_index};
+            }
             apply_action_to_result(result, action);
         } else {
             // Navegacao (setas/WASD/ESC) - SOM DE HOVER paridade teclado x mouse
@@ -298,8 +306,11 @@ DifficultyStepResult difficulty_screen_step(
                 if (!hit_test(boxes[i], ev.button.x, ev.button.y)) continue;
                 // Os 2 pills de confirmacao sao SEMPRE selecionaveis - nunca
                 // tocam o SFX bloqueado (MESMO comentario do lambda antigo).
+                // EFEITO DE PRESS (B2): pill SEMPRE valida - flash incondicional.
                 result.sfx = DifficultySfxKind::Click;
+                const DifficultyMenuState pre_action_state = state;
                 const DifficultyMenuAction action = difficulty_menu_click_option(state, i);
+                result.flash = DifficultyFlashInfo{pre_action_state, i};
                 apply_action_to_result(result, action);
                 return result;
             }
@@ -311,9 +322,15 @@ DifficultyStepResult difficulty_screen_step(
             // difficulty_menu_click_option), mas AJUSTE polish playtest
             // 2026-07-10: toca o SFX bloqueado (grave/abafado) em vez de ficar
             // mudo - da feedback sonoro de "bloqueado" ao jogador. Facil/Medio/
-            // Dificil sempre selecionaveis, click normal toca.
+            // Dificil sempre selecionaveis, click normal toca. EFEITO DE PRESS
+            // (B2): so quando Click NORMAL (nao Blocked) - MESMO racional do
+            // ramo de teclado.
             result.sfx = sfx_kind_for_item(state, i, DifficultySfxKind::Click);
+            const DifficultyMenuState pre_action_state = state;
             const DifficultyMenuAction action = difficulty_menu_click_option(state, i);
+            if (result.sfx == DifficultySfxKind::Click) {
+                result.flash = DifficultyFlashInfo{pre_action_state, i};
+            }
             apply_action_to_result(result, action);
             return result;
         }
@@ -506,7 +523,14 @@ public:
             handle_mouse_motion_(step.mouse_x, step.mouse_y);
             return;
         }
-        if (step.sfx != DifficultySfxKind::None) {
+        // EFEITO DE PRESS (B2, decisao do lider 2026-08-01): quando ha flash
+        // pendente, o SOM (sempre Click nesse caso) toca DENTRO de
+        // flash_pressed_ (MESMO choke-point de system_menu_loop.cpp/
+        // title_menu_loop.cpp) - Hover/Blocked (sem flash associado) tocam
+        // aqui fora normalmente.
+        if (step.flash.has_value()) {
+            flash_pressed_(step.flash->pre_action_state, step.flash->item_index);
+        } else if (step.sfx != DifficultySfxKind::None) {
             audio_.play_sfx(sound_id_for_(step.sfx));
         }
         if (step.exit.has_value()) {
@@ -555,6 +579,26 @@ private:
         ui_->set_viewport(pw_, ph_);
         ui_->set_dp_ratio(dp_ratio_);
         ui_->update();  // MESMO assentamento a cada troca de documento
+    }
+
+    // EFEITO DE PRESS (B2, decisao do lider 2026-08-01 - paridade com o menu
+    // de pausa/system_menu_loop.cpp): renderiza a tela `pre_action_state`
+    // (snapshot tirado ANTES da mutacao que ja aconteceu em state_) com o
+    // item `item_index` marcado ".pressed", por ~100ms (4 frames de ~25ms) -
+    // SO DEPOIS o CHAMADOR (handle_event) segue com exit/reload (ja
+    // decididos por difficulty_screen_step, usando state_ JA MUTADO). SOM DE
+    // CLIQUE: dispara AQUI (MESMO choke-point do system_menu/title) - nao ha
+    // um 2o play fora disto, ver o comentario em handle_event.
+    void flash_pressed_(const DifficultyMenuState& pre_action_state, int item_index) {
+        audio_.play_sfx(click_sfx_id_);
+        rml_path_ = write_difficulty_rml_file(pre_action_state, translator_, item_index);
+        ui_->load(rml_path_.c_str());
+        ui_->set_viewport(pw_, ph_);
+        ui_->set_dp_ratio(dp_ratio_);
+        for (int frame = 0; frame < 4; ++frame) {
+            present_frame_();
+            SDL_Delay(25);
+        }
     }
 
     // FRAMEGRAB-7-SITIOS: extraido de present_frame_() (que so agrega o swap

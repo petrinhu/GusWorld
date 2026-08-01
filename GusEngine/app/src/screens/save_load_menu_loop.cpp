@@ -131,7 +131,8 @@ std::string resolve_menu_sfx_path(std::string_view file) {
 }
 
 std::string write_save_load_rml_file(const SaveLoadMenuState& state,
-                                      const gus::app::i18n::Translator& tr) {
+                                      const gus::app::i18n::Translator& tr,
+                                      int pressed_index = -1) {
     const fs::path stage = save_load_stage_dir();
     std::error_code ec;
     fs::create_directories(stage, ec);
@@ -155,7 +156,7 @@ std::string write_save_load_rml_file(const SaveLoadMenuState& state,
     // register_pixel_operator_mono_fonts abaixo). Os .ttf continuam copiados pro stage
     // acima (load_font_face resolve o path pela MESMA BaseUrlFileInterface que a
     // @font-face antiga usava).
-    std::string rml = build_save_load_menu_rml(state, tr);
+    std::string rml = build_save_load_menu_rml(state, tr, pressed_index);
 
     const fs::path out = stage / "save_load_menu.rml";
     std::ofstream f(out);
@@ -316,17 +317,25 @@ void route_mouse_click(SaveLoadMenuState& state, float x, float y,
         // "Tentar recuperar" (so existe quando Damaged) - checado ANTES do
         // Cancelar, MESMO padrao "mais especifico vence" do icone de apagar
         // abaixo (aqui nao ha sobreposicao real, mas mantem a ordem consistente).
+        // EFEITO DE PRESS (B2, decisao do lider 2026-08-01): item_index 0/1,
+        // MESMO esquema de pressed_class em save_load_menu_rml.cpp.
         if (hit_test(boxes.warn_recover, x, y)) {
             handled = true;
+            const SaveLoadMenuState pre_action_state = state;
+            result.flash = SaveLoadFlashInfo{pre_action_state, 0};
             apply_action_to_result(result, state, save_load_menu_click_warning_recover(state));
         } else if (hit_test(boxes.warn_cancel, x, y)) {
             handled = true;
+            const SaveLoadMenuState pre_action_state = state;
+            result.flash = SaveLoadFlashInfo{pre_action_state, 1};
             apply_action_to_result(result, state, save_load_menu_click_warning_cancel(state));
         }
     } else if (state.confirming_delete) {
         for (int i = 0; i < 2 && !handled; ++i) {
             if (!hit_test(boxes.delete_confirm[static_cast<std::size_t>(i)], x, y)) continue;
             handled = true;
+            const SaveLoadMenuState pre_action_state = state;
+            result.flash = SaveLoadFlashInfo{pre_action_state, i};
             apply_action_to_result(result, state,
                                     save_load_menu_click_delete_confirm(state, i));
         }
@@ -334,14 +343,19 @@ void route_mouse_click(SaveLoadMenuState& state, float x, float y,
         for (int i = 0; i < 2 && !handled; ++i) {
             if (!hit_test(boxes.overwrite_confirm[static_cast<std::size_t>(i)], x, y)) continue;
             handled = true;
+            const SaveLoadMenuState pre_action_state = state;
+            result.flash = SaveLoadFlashInfo{pre_action_state, i};
             apply_action_to_result(result, state,
                                     save_load_menu_click_overwrite_confirm(state, i));
         }
     } else {
         // Voltar (bug 1/6/9: antes desta onda, so o teclado fechava a tela) -
-        // id fixo, SEMPRE presente na lista normal.
+        // id fixo, SEMPRE presente na lista normal. item_index=kBackPressedIndex
+        // (MESMO sentinela que save_load_menu_rml.cpp ja usa pro botao Voltar).
         if (hit_test(boxes.back, x, y)) {
             handled = true;
+            const SaveLoadMenuState pre_action_state = state;
+            result.flash = SaveLoadFlashInfo{pre_action_state, gus::domain::save::kSlotCount};
             apply_action_to_result(result, state, SaveLoadMenuAction::Back);
         }
         // Icone de apagar por-linha (feature "Apagar") - checado ANTES dos
@@ -349,6 +363,10 @@ void route_mouse_click(SaveLoadMenuState& state, float x, float y,
         // save_load_menu_rml.cpp), o mais especifico vence. Muta o estado
         // DIRETO via save_load_menu_request_delete (nao passa por uma
         // SaveLoadMenuAction) - `result.action` fica nullopt, so `reload` liga.
+        // SEM flash (B2): o icone e secundario/pequeno dentro da linha do
+        // slot, save_load_menu_rml.cpp nao tem uma classe "pressed" pra ele -
+        // o proprio mini-dialogo de exclusao que abre em seguida ja da o
+        // feedback visual (reload imediato).
         for (int i = 0; i < gus::domain::save::kSlotCount && !handled; ++i) {
             if (!state.slots[static_cast<std::size_t>(i)].occupied) continue;
             if (!hit_test(boxes.delete_icons[static_cast<std::size_t>(i)], x, y)) continue;
@@ -361,6 +379,8 @@ void route_mouse_click(SaveLoadMenuState& state, float x, float y,
         for (int i = 0; i < gus::domain::save::kSlotCount && !handled; ++i) {
             if (!hit_test(boxes.slots[static_cast<std::size_t>(i)], x, y)) continue;
             handled = true;
+            const SaveLoadMenuState pre_action_state = state;
+            result.flash = SaveLoadFlashInfo{pre_action_state, i};
             apply_action_to_result(result, state, save_load_menu_click_slot(state, i));
         }
     }
@@ -511,8 +531,21 @@ SaveLoadStepResult save_load_screen_step(SaveLoadMenuState& state, const SDL_Eve
     const int index_before = save_load_focus_index(state);
 
     if (ev.type == SDL_EVENT_KEY_DOWN) {
-        const SaveLoadMenuAction action =
-                save_load_menu_key_down(state, sdl_keycode_to_menu_key(ev.key.key));
+        const glintfx::Key key = sdl_keycode_to_menu_key(ev.key.key);
+        // EFEITO DE PRESS (B2, decisao do lider 2026-08-01): Enter/Espaco/
+        // Delete sao as 3 teclas de CONFIRMACAO desta tela (Delete e a UNICA
+        // tecla dedicada que so esta tela usa, feature "Apagar" - ver
+        // save_load_menu.hpp) - MESMO racional de is_confirm_key em title_
+        // menu_loop.cpp/difficulty_menu_loop.cpp (setas/ESC NUNCA confirmam,
+        // so navegam/cancelam, nunca merecem flash).
+        const bool is_confirm_key =
+            (key == glintfx::Key::Enter || key == glintfx::Key::Space || key == glintfx::Key::Delete);
+        const SaveLoadMenuState pre_action_state = state;
+        const int item_index = save_load_focus_index(state);
+        const SaveLoadMenuAction action = save_load_menu_key_down(state, key);
+        if (is_confirm_key) {
+            result.flash = SaveLoadFlashInfo{pre_action_state, item_index};
+        }
         apply_action_to_result(result, state, action);
     } else {  // SDL_EVENT_MOUSE_MOTION
         result.mouse_move = true;
@@ -754,7 +787,14 @@ public:
             // PRECISA continuar ate o tratamento de sfx/reload abaixo.
             handle_mouse_motion_(step.mouse_x, step.mouse_y);
         }
-        if (step.sfx == SaveLoadSfxKind::Click) {
+        // EFEITO DE PRESS (B2, decisao do lider 2026-08-01): quando ha flash
+        // pendente, o SOM DE CLIQUE toca DENTRO de flash_pressed_ (MESMO
+        // choke-point de system_menu_loop.cpp/title_menu_loop.cpp/
+        // difficulty_menu_loop.cpp) - o clique no icone de apagar (sfx=Click
+        // SEM flash, ver route_mouse_click) toca aqui fora normalmente.
+        if (step.flash.has_value()) {
+            flash_pressed_(step.flash->pre_action_state, step.flash->item_index);
+        } else if (step.sfx == SaveLoadSfxKind::Click) {
             audio_.play_sfx(click_sfx_id_);
         } else if (step.sfx == SaveLoadSfxKind::Hover) {
             // B1+B4 UNIFICADOS (last-input-wins, decisao do lider 2026-08-01
@@ -951,6 +991,27 @@ private:
         const int scroll_target = save_load_scroll_target_index(state_);
         if (scroll_target >= 0) {
             ui_->scroll_element_into_view(slot_item_id(scroll_target).c_str());
+        }
+    }
+
+    // EFEITO DE PRESS (B2, decisao do lider 2026-08-01 - paridade com o menu
+    // de pausa/system_menu_loop.cpp): renderiza a tela `pre_action_state`
+    // (snapshot tirado ANTES da mutacao que ja aconteceu em state_) com o
+    // item `item_index` marcado ".pressed", por ~100ms (4 frames de ~25ms) -
+    // SO DEPOIS o CHAMADOR (handle_event) segue com o I/O real/exit (ja
+    // decididos por save_load_screen_step, usando state_ JA MUTADO). SOM DE
+    // CLIQUE: dispara AQUI (MESMO choke-point do system_menu/title/
+    // difficulty) - nao ha um 2o play fora disto, ver o comentario em
+    // handle_event.
+    void flash_pressed_(const SaveLoadMenuState& pre_action_state, int item_index) {
+        audio_.play_sfx(click_sfx_id_);
+        rml_path_ = write_save_load_rml_file(pre_action_state, translator_, item_index);
+        ui_->load(rml_path_.c_str());
+        ui_->set_viewport(pw_, ph_);
+        ui_->set_dp_ratio(dp_ratio_);
+        for (int frame = 0; frame < 4; ++frame) {
+            present_frame_();
+            SDL_Delay(25);
         }
     }
 

@@ -106,6 +106,16 @@ enum class DifficultySfxKind {
               // ver difficulty_item_selectable)
 };
 
+// EFEITO DE PRESS (B2, decisao do lider 2026-08-01 - paridade com o menu de
+// pausa/system_menu_loop.cpp, ver SystemMenuFlashInfo la): estado ANTES da
+// mutacao (pra renderizar a tela DE ORIGEM com o item marcado ".pressed") +
+// indice do item confirmado. MESMO papel/contrato de SystemMenuFlashInfo/
+// TitleFlashInfo - esta tela reusa o mecanismo, nao reinventa.
+struct DifficultyFlashInfo {
+    DifficultyMenuState pre_action_state;
+    int item_index = -1;
+};
+
 // Resultado de UM difficulty_screen_step(): o que o CHAMADOR (DifficultyScreen::
 // handle_event, difficulty_menu_loop.cpp) deve fazer a seguir - TODOS os side
 // effects REAIS (SDL/GL/audio) ficam do lado de fora desta struct/funcao, que so
@@ -130,6 +140,14 @@ struct DifficultyStepResult {
                                   // foco/aberto o splash, mesmo sem Chosen/
                                   // Cancelled) e re-renderiza.
     DifficultySfxKind sfx = DifficultySfxKind::None;
+    std::optional<DifficultyFlashInfo> flash;  // EFEITO DE PRESS pendente (B2) -
+                                               // o CHAMADOR chama flash_pressed_
+                                               // (toca o click_sfx + renderiza
+                                               // alguns frames com o item
+                                               // ".pressed") ANTES de aplicar
+                                               // `exit` (MESMA ordem de
+                                               // system_menu_loop.cpp/title_
+                                               // menu_loop.cpp).
     std::optional<DifficultyLoopExit> exit;  // Chosen/Cancelled - o CHAMADOR
                                               // retorna NA HORA (ver route_action
                                               // antigo); Chosen tambem exige

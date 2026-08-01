@@ -156,6 +156,104 @@ TEST_CASE("difficulty_screen_step: Enter/Espaco com o foco no Hardcore "
     REQUIRE(state_eq(state, before));
 }
 
+// ---------------------------------------------------------------- (B2) EFEITO DE PRESS
+
+TEST_CASE("difficulty_screen_step (B2): Enter num item NORMAL (Facil/Medio/Dificil) "
+          "seta result.flash (pre_action_state + item_index)",
+          "[difficulty_screen_step][b2-flash]") {
+    DifficultyMenuState state;
+    difficulty_menu_open(state);
+    state.selected = static_cast<int>(DifficultyMenuItem::Medio);
+    const DifficultyMenuState before = state;
+
+    const auto boxes = no_boxes();
+    const SDL_Event ev = key_down_event(SDLK_RETURN);
+    const DifficultyStepResult result = difficulty_screen_step(state, ev, boxes.data());
+
+    REQUIRE(result.sfx == DifficultySfxKind::Click);
+    REQUIRE(result.flash.has_value());
+    REQUIRE(result.flash->item_index == static_cast<int>(DifficultyMenuItem::Medio));
+    REQUIRE(state_eq(result.flash->pre_action_state, before));  // snapshot ANTES da mutacao
+}
+
+TEST_CASE("difficulty_screen_step (B2): Enter/clique no Hardcore BLOQUEADO NAO seta "
+          "flash (no-op TOTAL, so o SFX grave/abafado - MESMA semantica de nao reagir)",
+          "[difficulty_screen_step][b2-flash]") {
+    DifficultyMenuState state;
+    difficulty_menu_open(state);
+    state.selected = static_cast<int>(DifficultyMenuItem::Hardcore);
+
+    const auto boxes = no_boxes();
+    const DifficultyStepResult result =
+        difficulty_screen_step(state, key_down_event(SDLK_RETURN), boxes.data());
+
+    REQUIRE(result.sfx == DifficultySfxKind::Blocked);
+    REQUIRE_FALSE(result.flash.has_value());
+}
+
+TEST_CASE("difficulty_screen_step (B2): navegar (seta) NUNCA seta flash - so "
+          "Enter/clique confirmam",
+          "[difficulty_screen_step][b2-flash]") {
+    DifficultyMenuState state;
+    difficulty_menu_open(state);
+
+    const auto boxes = no_boxes();
+    const DifficultyStepResult result =
+        difficulty_screen_step(state, key_down_event(SDLK_DOWN), boxes.data());
+
+    REQUIRE_FALSE(result.flash.has_value());
+}
+
+TEST_CASE("difficulty_screen_step (B2): clicar num item NORMAL seta flash; clicar "
+          "no Hardcore BLOQUEADO nao seta",
+          "[difficulty_screen_step][b2-flash]") {
+    DifficultyMenuState state;
+    difficulty_menu_open(state);
+
+    SECTION("item normal") {
+        std::array<glintfx::ElementBox, kDifficultyItemCount> boxes{};
+        const int idx = static_cast<int>(DifficultyMenuItem::Facil);
+        boxes[static_cast<std::size_t>(idx)] = make_box(10.0f, 10.0f, 100.0f, 40.0f);
+        const DifficultyStepResult result =
+            difficulty_screen_step(state, mouse_button_down_event(30.0f, 25.0f), boxes.data());
+
+        REQUIRE(result.sfx == DifficultySfxKind::Click);
+        REQUIRE(result.flash.has_value());
+        REQUIRE(result.flash->item_index == idx);
+    }
+
+    SECTION("Hardcore bloqueado") {
+        std::array<glintfx::ElementBox, kDifficultyItemCount> boxes{};
+        const int idx = static_cast<int>(DifficultyMenuItem::Hardcore);
+        boxes[static_cast<std::size_t>(idx)] = make_box(10.0f, 200.0f, 100.0f, 40.0f);
+        const DifficultyStepResult result =
+            difficulty_screen_step(state, mouse_button_down_event(30.0f, 215.0f), boxes.data());
+
+        REQUIRE(result.sfx == DifficultySfxKind::Blocked);
+        REQUIRE_FALSE(result.flash.has_value());
+    }
+}
+
+TEST_CASE("difficulty_screen_step (B2): clicar numa pill do splash seta flash "
+          "(item_index = indice da pill)",
+          "[difficulty_screen_step][b2-flash]") {
+    DifficultyMenuState state;
+    difficulty_menu_open(state);
+    state.selected = static_cast<int>(DifficultyMenuItem::Medio);
+    (void)difficulty_screen_step(state, key_down_event(SDLK_RETURN), no_boxes().data());
+    REQUIRE(state.confirming);
+
+    std::array<glintfx::ElementBox, kDifficultyItemCount> boxes{};
+    boxes[0] = make_box(0.0f, 0.0f, 50.0f, 50.0f);  // pill "Confirmar" (indice 0)
+    const DifficultyStepResult result =
+        difficulty_screen_step(state, mouse_button_down_event(10.0f, 10.0f), boxes.data());
+
+    REQUIRE(result.flash.has_value());
+    REQUIRE(result.flash->item_index == 0);
+    REQUIRE(result.exit.has_value());
+    REQUIRE(*result.exit == DifficultyLoopExit::Chosen);
+}
+
 TEST_CASE("difficulty_screen_step: navegar (seta Baixo) ATE o Hardcore "
           "BLOQUEADO toca o MESMO SFX de bloqueio (paridade teclado x clique) - "
           "so o FOCO muda (reload=true), a selecao continua imutavel ate "

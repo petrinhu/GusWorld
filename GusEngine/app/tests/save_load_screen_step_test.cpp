@@ -650,3 +650,121 @@ TEST_CASE("save_load_screen_step: SDL_EVENT_KEY_DOWN com key.repeat!=0 "
     REQUIRE_FALSE(result.exit.has_value());
     REQUIRE(snapshot(state) == before);
 }
+
+// ---------------------------------------------------------------- (B2) EFEITO DE PRESS
+
+TEST_CASE("save_load_screen_step (B2): Enter num slot seta result.flash "
+          "(pre_action_state + item_index = slot focado)",
+          "[save_load_screen_step][b2-flash]") {
+    SaveLoadMenuState state = open_state_with_occupied_slot1(SaveLoadMode::Load);
+    REQUIRE(state.selected == 1);
+    const StateSnapshot before = snapshot(state);
+
+    const SaveLoadStepResult result =
+        save_load_screen_step(state, key_down_event(SDLK_RETURN), SaveLoadStepBoxes{});
+
+    REQUIRE(result.flash.has_value());
+    REQUIRE(result.flash->item_index == 1);
+    REQUIRE(snapshot(result.flash->pre_action_state) == before);  // snapshot ANTES da mutacao
+}
+
+TEST_CASE("save_load_screen_step (B2): navegar (seta) NUNCA seta flash - so "
+          "Enter/Espaco/Delete confirmam",
+          "[save_load_screen_step][b2-flash]") {
+    SaveLoadMenuState state = open_state_with_occupied_slot1(SaveLoadMode::Load);
+
+    const SaveLoadStepResult result =
+        save_load_screen_step(state, key_down_event(SDLK_UP), SaveLoadStepBoxes{});
+
+    REQUIRE_FALSE(result.flash.has_value());
+}
+
+TEST_CASE("save_load_screen_step (B2): tecla Delete num slot OCUPADO seta flash "
+          "(item_index = slot focado)",
+          "[save_load_screen_step][b2-flash]") {
+    SaveLoadMenuState state = open_state_with_occupied_slot1(SaveLoadMode::Load);
+    REQUIRE(state.selected == 1);
+
+    const SaveLoadStepResult result =
+        save_load_screen_step(state, key_down_event(SDLK_DELETE), SaveLoadStepBoxes{});
+
+    REQUIRE(result.flash.has_value());
+    REQUIRE(result.flash->item_index == 1);
+    REQUIRE(state.confirming_delete);
+}
+
+TEST_CASE("save_load_screen_step (B2): clique real em 'Voltar' seta flash com "
+          "item_index=kSlotCount (sentinela do botao Voltar)",
+          "[save_load_screen_step][b2-flash]") {
+    SaveLoadMenuState state = open_state_with_occupied_slot1(SaveLoadMode::Save);
+    SaveLoadStepBoxes boxes{};
+    boxes.back = make_box(10.0f, 400.0f, 100.0f, 30.0f);
+
+    const SDL_Event ev = mouse_button_down_event(30.0f, 410.0f);
+    const SaveLoadStepResult result = save_load_screen_step(state, ev, boxes);
+
+    REQUIRE(result.flash.has_value());
+    REQUIRE(result.flash->item_index == kSlotCount);
+}
+
+TEST_CASE("save_load_screen_step (B2): clique real num slot OCUPADO seta flash "
+          "(item_index = indice do slot clicado)",
+          "[save_load_screen_step][b2-flash]") {
+    SaveLoadMenuState state = open_state_with_occupied_slot1(SaveLoadMode::Load);
+    SaveLoadStepBoxes boxes{};
+    boxes.slots[1] = make_box(10.0f, 10.0f, 100.0f, 40.0f);
+
+    const SDL_Event ev = mouse_button_down_event(30.0f, 25.0f);
+    const SaveLoadStepResult result = save_load_screen_step(state, ev, boxes);
+
+    REQUIRE(result.flash.has_value());
+    REQUIRE(result.flash->item_index == 1);
+}
+
+TEST_CASE("save_load_screen_step (B2): clique real no icone de apagar NAO seta "
+          "flash (icone secundario, sem classe 'pressed' no RML) - mas AINDA "
+          "toca Click",
+          "[save_load_screen_step][b2-flash]") {
+    SaveLoadMenuState state = open_state_with_occupied_slot1(SaveLoadMode::Load);
+    SaveLoadStepBoxes boxes{};
+    boxes.delete_icons[1] = make_box(200.0f, 10.0f, 20.0f, 20.0f);
+
+    const SDL_Event ev = mouse_button_down_event(210.0f, 20.0f);
+    const SaveLoadStepResult result = save_load_screen_step(state, ev, boxes);
+
+    REQUIRE_FALSE(result.flash.has_value());
+    REQUIRE(result.sfx == SaveLoadSfxKind::Click);
+    REQUIRE(state.confirming_delete);
+}
+
+TEST_CASE("save_load_screen_step (B2): clicar numa pill do dialogo de "
+          "sobrescrita seta flash (item_index = indice da pill)",
+          "[save_load_screen_step][b2-flash]") {
+    SaveLoadMenuState state = open_state_with_occupied_slot1(SaveLoadMode::Save);
+    (void)save_load_screen_step(state, key_down_event(SDLK_RETURN), SaveLoadStepBoxes{});
+    REQUIRE(state.confirming_overwrite);
+
+    SaveLoadStepBoxes boxes{};
+    boxes.overwrite_confirm[1] = make_box(100.0f, 0.0f, 50.0f, 50.0f);
+    const SDL_Event ev = mouse_button_down_event(110.0f, 10.0f);
+    const SaveLoadStepResult result = save_load_screen_step(state, ev, boxes);
+
+    REQUIRE(result.flash.has_value());
+    REQUIRE(result.flash->item_index == 1);
+}
+
+TEST_CASE("save_load_screen_step (B2): dentro do AVISO Damaged, clicar em "
+          "'Tentar recuperar' seta flash (item_index=0)",
+          "[save_load_screen_step][b2-flash]") {
+    SaveLoadMenuState state = open_state_with_damaged_slot1();
+    (void)save_load_screen_step(state, key_down_event(SDLK_RETURN), SaveLoadStepBoxes{});
+    REQUIRE(state.warning_kind == SaveLoadMenuState::WarningKind::Damaged);
+
+    SaveLoadStepBoxes boxes{};
+    boxes.warn_recover = make_box(0.0f, 0.0f, 80.0f, 30.0f);
+    const SDL_Event ev = mouse_button_down_event(10.0f, 10.0f);
+    const SaveLoadStepResult result = save_load_screen_step(state, ev, boxes);
+
+    REQUIRE(result.flash.has_value());
+    REQUIRE(result.flash->item_index == 0);
+}

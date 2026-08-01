@@ -172,6 +172,21 @@ enum class SaveLoadSfxKind {
     Click,  // click_sfx_id - o CHAMADOR mapeia pro SoundId real
 };
 
+// EFEITO DE PRESS (B2, decisao do lider 2026-08-01 - paridade com o menu de
+// pausa/system_menu_loop.cpp, ver SystemMenuFlashInfo la): estado ANTES da
+// mutacao (pra renderizar a tela DE ORIGEM com o item marcado ".pressed") +
+// indice do item confirmado. `item_index` e um indice LOCAL ao sub-modo ATUAL
+// (state.warning_kind/confirming_delete/confirming_overwrite/lista normal -
+// ver save_load_focus_mode, save_load_menu.hpp): 0..kSlotCount-1 ou
+// kBackPressedIndex na lista; 0/1 (Sim/Nao ou Recover/Cancel) em qualquer
+// mini-dialogo/aviso - MESMO namespace LOCAL que pressed_class ja usa em
+// save_load_menu_rml.cpp (nunca ha colisao real porque so 1 sub-modo e
+// renderizado por vez).
+struct SaveLoadFlashInfo {
+    SaveLoadMenuState pre_action_state;
+    int item_index = -1;
+};
+
 // Caixas de hit-test resolvidas pelo CHAMADOR (SaveLoadScreen::
 // collect_click_boxes_, save_load_menu_loop.cpp) via
 // glintfx::UiLayer::get_element_box - SO as do ramo/estado ATUAL de
@@ -215,6 +230,13 @@ struct SaveLoadStepResult {
                           // (foco/dialogo/aviso abriu-fechou) mesmo sem `exit`
                           // preenchido.
     SaveLoadSfxKind sfx = SaveLoadSfxKind::None;
+    std::optional<SaveLoadFlashInfo> flash;  // EFEITO DE PRESS pendente (B2) -
+                                             // o CHAMADOR chama flash_pressed_
+                                             // (toca o click_sfx + renderiza
+                                             // alguns frames com o item
+                                             // ".pressed") ANTES de aplicar
+                                             // I/O real/exit (MESMA ordem de
+                                             // system_menu_loop.cpp).
     // Acao que resultou do evento (save_load_menu_key_down/save_load_menu_click_*)
     // - nullopt se nenhum roteamento de acao se aplicou (resize/mouse_move/
     // window_closed, tecla/clique sem efeito ainda mapeado, OU o clique no icone

@@ -331,9 +331,19 @@ TitleStepResult title_screen_step(TitleMenuState& state, const SDL_Event& ev,
             // uma confirmacao intencional de item/pill - toca INCONDICIONAL
             // (MESMO comportamento antigo: nao ha "item bloqueado" na tela de
             // titulo, ao contrario da tela de dificuldade).
+            // EFEITO DE PRESS (B2, decisao do lider 2026-08-01): captura o
+            // estado+indice ANTES da mutacao - Enter/Espaco AQUI e SEMPRE uma
+            // confirmacao intencional (diferente do system_menu, nao precisa
+            // de is_confirming(action): a distincao ja e feita pelo TIPO de
+            // tecla, nao pelo resultado - mesmo quando o resultado e None
+            // (abrir o mini-dialogo de Novo Jogo, ou cancelar com Nao) o item
+            // FOI confirmado/ativado e merece o flash visual).
             result.sfx = TitleSfxKind::Click;
+            const TitleMenuState pre_action_state = state;
+            const int item_index = title_keyboard_focus_index(state);
             const TitleMenuAction action =
                 title_menu_key_down(state, sdl_keycode_to_menu_key(ev.key.key));
+            result.flash = TitleFlashInfo{pre_action_state, item_index};
             apply_title_action_to_result(result, action);
         } else {
             // Navegacao (setas/WASD/ESC) - SOM DE HOVER PARIDADE TECLADO x
@@ -359,9 +369,13 @@ TitleStepResult title_screen_step(TitleMenuState& state, const SDL_Event& ev,
             for (int i = 0; i < 2; ++i) {
                 if (!hit_test(boxes[i], ev.button.x, ev.button.y)) continue;
                 // as 2 pills do mini-dialogo sao SEMPRE validas (sem conceito
-                // de "desabilitada" aqui) - som sempre toca.
+                // de "desabilitada" aqui) - som sempre toca. EFEITO DE PRESS
+                // (B2): MESMO racional do ramo de teclado - clique numa pill
+                // e SEMPRE confirmacao intencional.
                 result.sfx = TitleSfxKind::Click;
+                const TitleMenuState pre_action_state = state;
                 const TitleMenuAction action = title_menu_click_option(state, i);
+                result.flash = TitleFlashInfo{pre_action_state, i};
                 apply_title_action_to_result(result, action);
                 return result;
             }
@@ -370,12 +384,16 @@ TitleStepResult title_screen_step(TitleMenuState& state, const SDL_Event& ev,
         for (int i = 0; i < kTitleItemCount; ++i) {
             if (!hit_test(boxes[i], ev.button.x, ev.button.y)) continue;
             // Clicar num item DESABILITADO (Continuar sem save) e no-op TOTAL
-            // (ver title_menu_click_option) - sem som tambem, MESMA semantica
-            // "nao reage a nada".
+            // (ver title_menu_click_option) - sem som nem flash, MESMA
+            // semantica "nao reage a nada".
+            const TitleMenuState pre_action_state = state;
             if (title_item_selectable(state, i)) {
                 result.sfx = TitleSfxKind::Click;
             }
             const TitleMenuAction action = title_menu_click_option(state, i);
+            if (title_item_selectable(pre_action_state, i)) {
+                result.flash = TitleFlashInfo{pre_action_state, i};
+            }
             apply_title_action_to_result(result, action);
             return result;
         }
@@ -605,8 +623,15 @@ class TitleScreen final : public gus::app::ScreenState {
             handle_mouse_motion_(step.mouse_x, step.mouse_y);
             return;
         }
-        if (step.sfx != TitleSfxKind::None) {
-            audio_.play_sfx(step.sfx == TitleSfxKind::Hover ? hover_sfx_id_ : click_sfx_id_);
+        // EFEITO DE PRESS (B2, decisao do lider 2026-08-01): quando ha flash
+        // pendente, o SOM DE CLIQUE toca DENTRO de flash_pressed_ (MESMO
+        // choke-point de system_menu_loop.cpp) - so o Hover (sem flash
+        // associado) toca aqui fora, senao o clique soaria 2x.
+        if (step.sfx == TitleSfxKind::Hover) {
+            audio_.play_sfx(hover_sfx_id_);
+        }
+        if (step.flash.has_value()) {
+            flash_pressed_(step.flash->pre_action_state, step.flash->item_index);
         }
         if (step.exit.has_value()) {
             apply_exit_(*step.exit);
@@ -685,6 +710,26 @@ class TitleScreen final : public gus::app::ScreenState {
         ui_->set_viewport(pw_, ph_);
         ui_->set_dp_ratio(dp_ratio_);
         ui_->update();  // MESMO assentamento a cada troca de documento
+    }
+
+    // EFEITO DE PRESS (B2, decisao do lider 2026-08-01 - paridade com o menu
+    // de pausa/system_menu_loop.cpp): renderiza a tela `pre_action_state`
+    // (snapshot tirado ANTES da mutacao que ja aconteceu em state_) com o
+    // item `item_index` marcado ".pressed", por ~100ms (4 frames de ~25ms) -
+    // SO DEPOIS o CHAMADOR (handle_event) segue com exit/reload (ja
+    // decididos por title_screen_step, usando state_ JA MUTADO). SOM DE
+    // CLIQUE: dispara AQUI (MESMO choke-point do system_menu) - nao ha um
+    // 2o play fora disto, ver o comentario em handle_event.
+    void flash_pressed_(const TitleMenuState& pre_action_state, int item_index) {
+        audio_.play_sfx(click_sfx_id_);
+        rml_path_ = write_title_rml_file(pre_action_state, translator_, item_index);
+        ui_->load(rml_path_.c_str());
+        ui_->set_viewport(pw_, ph_);
+        ui_->set_dp_ratio(dp_ratio_);
+        for (int frame = 0; frame < 4; ++frame) {
+            present_frame_();
+            SDL_Delay(25);
+        }
     }
 
     // FRAMEGRAB-7-SITIOS: extraido de present_frame_() (que so agrega o swap

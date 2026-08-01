@@ -168,6 +168,81 @@ TEST_CASE("title_screen_step: Enter em Continuar (selecionavel, any_save_exists)
                                    // CHAMADOR retorna na hora.
 }
 
+// ---------------------------------------------------------------- (B2) EFEITO DE PRESS
+
+TEST_CASE("title_screen_step (B2): Enter num item seta result.flash (pre_action_state "
+          "+ item_index), MESMO quando o resultado e abrir o mini-dialogo (None)",
+          "[title_screen_step][b2-flash]") {
+    TitleMenuState state;
+    title_menu_open(state, /*any_save_exists=*/true);
+    state.selected = static_cast<int>(TitleMenuItem::NewGame);
+
+    const auto boxes = no_boxes();
+    const SDL_Event ev = key_down_event(SDLK_RETURN);
+    const TitleStepResult result = title_screen_step(state, ev, boxes.data());
+
+    REQUIRE(result.flash.has_value());
+    REQUIRE(result.flash->item_index == static_cast<int>(TitleMenuItem::NewGame));
+    REQUIRE_FALSE(result.flash->pre_action_state.confirming_new_game);  // ANTES da mutacao
+    REQUIRE(state.confirming_new_game);  // DEPOIS - o dialogo ja abriu de fato
+}
+
+TEST_CASE("title_screen_step (B2): navegar (seta) NUNCA seta flash - so Enter/clique "
+          "confirmam",
+          "[title_screen_step][b2-flash]") {
+    TitleMenuState state;
+    title_menu_open(state, /*any_save_exists=*/true);
+
+    const auto boxes = no_boxes();
+    const SDL_Event ev = key_down_event(SDLK_DOWN);
+    const TitleStepResult result = title_screen_step(state, ev, boxes.data());
+
+    REQUIRE_FALSE(result.flash.has_value());
+}
+
+TEST_CASE("title_screen_step (B2): clicar num item DESABILITADO nao seta flash "
+          "(MESMA semantica de nao tocar som)",
+          "[title_screen_step][b2-flash]") {
+    TitleMenuState state;
+    title_menu_open(state, /*any_save_exists=*/false);  // Continuar desabilitado
+
+    std::array<glintfx::ElementBox, kTitleItemCount> boxes{};
+    boxes[static_cast<std::size_t>(TitleMenuItem::Continue)] = make_box(10, 10, 100, 30);
+    SDL_Event ev{};
+    ev.type = SDL_EVENT_MOUSE_BUTTON_DOWN;
+    ev.button.button = SDL_BUTTON_LEFT;
+    ev.button.x = 30;
+    ev.button.y = 20;
+    const TitleStepResult result = title_screen_step(state, ev, boxes.data());
+
+    REQUIRE_FALSE(result.flash.has_value());
+    REQUIRE(result.sfx == TitleSfxKind::None);
+}
+
+TEST_CASE("title_screen_step (B2): clicar numa pill do mini-dialogo seta flash "
+          "(item_index = indice da pill)",
+          "[title_screen_step][b2-flash]") {
+    TitleMenuState state;
+    title_menu_open(state, /*any_save_exists=*/true);
+    state.selected = static_cast<int>(TitleMenuItem::NewGame);
+    (void)title_screen_step(state, key_down_event(SDLK_RETURN), no_boxes().data());
+    REQUIRE(state.confirming_new_game);
+
+    std::array<glintfx::ElementBox, kTitleItemCount> boxes{};
+    boxes[0] = make_box(10, 10, 100, 30);  // pill "Sim" (indice 0)
+    SDL_Event ev{};
+    ev.type = SDL_EVENT_MOUSE_BUTTON_DOWN;
+    ev.button.button = SDL_BUTTON_LEFT;
+    ev.button.x = 30;
+    ev.button.y = 20;
+    const TitleStepResult result = title_screen_step(state, ev, boxes.data());
+
+    REQUIRE(result.flash.has_value());
+    REQUIRE(result.flash->item_index == 0);
+    REQUIRE(result.exit.has_value());
+    REQUIRE(*result.exit == TitleScreenExit::NewGameRequested);
+}
+
 // ---------------------------------------------------------------- Novo Jogo SEM save existente
 
 TEST_CASE("title_screen_step: Enter em Novo Jogo SEM nenhum save existente "

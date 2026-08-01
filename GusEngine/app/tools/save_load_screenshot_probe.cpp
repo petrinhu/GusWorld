@@ -141,7 +141,16 @@ int main() {
         if (probe_select >= 0 && probe_select < kSlotCount) state.selected = probe_select;
     }
 
-    std::string rml = gus::app::screens::build_save_load_menu_rml(state, translator);
+    // B2 (flash de press, decisao do lider 2026-08-01): GUSWORLD_PROBE_PRESSED=<n>
+    // fixa pressed_index=n - simula "o item n esta com o flash de press ATIVO
+    // agora", pra provar visualmente a classe ".pressed" (glow cyan intenso,
+    // save_load_menu_rml.cpp) sem rodar o loop interativo de verdade.
+    int probe_pressed = -1;
+    if (const char* pressed_env = std::getenv("GUSWORLD_PROBE_PRESSED")) {
+        probe_pressed = std::atoi(pressed_env);
+    }
+
+    std::string rml = gus::app::screens::build_save_load_menu_rml(state, translator, probe_pressed);
 
     const fs::path stage = fs::temp_directory_path() / "gusworld_save_load_screenshot_probe";
     std::error_code ec;
