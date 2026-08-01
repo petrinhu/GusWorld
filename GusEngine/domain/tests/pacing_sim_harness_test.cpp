@@ -894,7 +894,13 @@ TEST_CASE("pacing_sim: run_phase_a smoke - progresso, 116 resultados, banner de 
 // tempo via TeeOstream (GUSWORLD_PACING_SIM_REPORT_PATH, default
 // "pacing_sim_phase_a_report.txt"). NUNCA disparado por este harness sozinho - quem
 // decide rodar e o team-lead/lider (protocolo secao 7 item 1).
-TEST_CASE("pacing_sim: run_phase_a - disparo real da Fase A (N=240.000, grava em arquivo)",
+//
+// NOME SEM VIRGULA DE PROPOSITO (achado do team-lead 2026-08-01, ao vivo no disparo):
+// Catch2 trata virgula como separador de filtros no argumento de linha de comando -
+// "nome com virgula" quebra em duas buscas e nenhuma bate, saindo com EXIT=2 e "No
+// tests ran" (o codigo de saida NAO-zero foi o que preveniu um relatorio velho passar
+// por novo). Nome de teste filtravel pelo proprio nome nao pode usar virgula.
+TEST_CASE("pacing_sim: run_phase_a - disparo real da Fase A (N=240k - grava em arquivo)",
           "[domain][pacing_sim][pacing_sim_smoke]") {
     const bool full_run = std::getenv("GUSWORLD_PACING_SIM_FULL") != nullptr;
     const std::uint32_t base_seed = 20260801;
