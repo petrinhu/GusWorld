@@ -122,7 +122,6 @@ using gus::domain::combat::CardFamily;
 using gus::domain::combat::CombatAction;
 using gus::domain::combat::CombatActor;
 using gus::domain::combat::CombatOutcome;
-using gus::domain::combat::CombatResult;
 using gus::domain::combat::CombatState;
 using gus::domain::combat::CombatStateMachine;
 using gus::domain::combat::StatusId;
@@ -666,6 +665,66 @@ struct BattleTrace {
     return CombatAction::attack(target->id());
 }
 
+// Resultado do driving passo-a-passo de run_bounded() abaixo. `outcome` fica Ongoing
+// quando `capped` e verdadeiro: o combate NAO resolveu (nem Victory, nem Defeat, nem
+// Fled) - o cap so faz o RELOGIO parar, ele nao decide o combate por ninguem (correcao
+// 2026-08-01, achado do team-lead: a versao anterior forcava wipe da party pra terminar a
+// luta, contaminando E1 - contava como derrota -, E4/E8 - marcava quedas que nunca
+// aconteceram -, e E7 - zerava o HP final de verdade). Empate tecnico e um resultado A
+// PARTE, nunca sinonimo de derrota.
+struct BoundedCombatResult {
+    CombatOutcome outcome = CombatOutcome::Ongoing;
+    int rounds_elapsed = 0;
+    bool capped = false;
+};
+
+// Conduz a MESMA sequencia PUBLICA que CombatStateMachine::run_until_end() usa por dentro
+// (begin_turn -> run_active_turn_to_end -> check_end -> advance_to_next_actor, nesta
+// ordem - combat_state_machine.cpp:993-1026), mas para no cap de rodadas SEM matar
+// ninguem: nenhuma regra e reimplementada, cada passo chamado aqui e um metodo PUBLICO
+// ja existente do motor. A UNICA diferenca de run_until_end() e ONDE parar.
+//
+// Por que nao da pra usar begin_turn/run_active_turn_to_end/check_end/advance direto sem
+// este wrapper: o ramo "ator stunned ou morto no TurnStart" do motor real chama
+// expire_on_stunned_turn_end() - metodo PRIVADO, inacessivel daqui. Nenhum dos 7 lotes
+// deste harness aplica Stun/Poison/Corrode (nenhum papel de party/braco de mira joga
+// carta), entao esse ramo NUNCA deveria disparar nestes cenarios - se disparar mesmo
+// assim, e um caso fora do escopo estudado, e MASCARAR seria pior que travar; por isso
+// lanca uma excecao clara (capturada por quem chama, ver run_single_mira_battle) em vez
+// de tentar reproduzir a logica privada por fora.
+[[nodiscard]] inline BoundedCombatResult run_bounded(CombatStateMachine& sm, int max_rounds) {
+    BoundedCombatResult result;
+    while (true) {
+        if (sm.queue().round_index() >= max_rounds) {
+            result.capped = true;
+            result.outcome = CombatOutcome::Ongoing;
+            result.rounds_elapsed = sm.queue().round_index();
+            return result;
+        }
+        const bool stunned = sm.begin_turn();
+        if (stunned || !sm.active_actor()->is_alive())
+            throw std::logic_error(
+                "run_bounded: ator stunned/morto no TurnStart - caso nao coberto pelos 7 "
+                "lotes do protocolo (nenhum aplica Stun/Poison/Corrode); investigar antes "
+                "de contornar.");
+        sm.run_active_turn_to_end();
+        if (sm.check_end()) {
+            result.outcome = sm.outcome();
+            result.rounds_elapsed = sm.queue().round_index();
+            return result;
+        }
+        sm.advance_to_next_actor();
+        if (sm.queue().count() == 0) {
+            // Wipe total legado (mesma semantica de run_until_end(): nunca deveria
+            // ocorrer aqui, ja que check_end() ja teria detectado "!any_player_alive" ou
+            // "!any_enemy_alive" antes disso).
+            result.outcome = CombatOutcome::Defeat;
+            result.rounds_elapsed = sm.queue().round_index();
+            return result;
+        }
+    }
+}
+
 // ============================================================================
 // Execucao de UMA luta (pareavel por seed: mesma seed sob os 6 bracos = mesma luta).
 // ============================================================================
@@ -723,26 +782,9 @@ struct BattleTrace {
     // inimigo a 1 acao/turno; a party consome o mailbox do jogador nas 3 chamadas. Este
     // harness espelha essa MESMA fronteira via `actor.ap() == actor.max_ap()` (ver
     // "ECONOMIA DE AP" no cabecalho do arquivo): o gate abaixo so vale pro INIMIGO.
-    bool cap_triggered = false;
-
     auto provider = [&](CombatActor& actor, const CombatState& state) -> CombatAction {
         const int round = state.round_index();
         tr.observe_round(round);
-
-        if (round >= kRoundCap) {
-            // V12 //SIM: cap de rodadas GARANTIDO pelo harness (ver "CAP DE RODADAS" no
-            // cabecalho do arquivo - achado CRITICO do QA: Fuga forcada pode falhar pra
-            // sempre se a party perder o membro de maior SPD). Forca o wipe da party via
-            // CombatActor::take_damage() (metodo PUBLICO, mesmo usado pela fracao de HP
-            // inicial de L6) - o check_end() NATIVO do motor reconhece "!any_player_alive"
-            // na proxima checagem, SEM depender de SPD nem de quem agia. Pass() (0 AP)
-            // encerra o turno incondicionalmente, entao o combate termina no maximo 1
-            // acao apos o cap, de QUALQUER lado que estivesse agindo.
-            cap_triggered = true;
-            for (CombatActor* p : state.alive_players())
-                if (p->is_alive()) p->take_damage(p->hp());
-            return CombatAction::pass();
-        }
 
         if (actor.is_player_side()) {
             const PartyMember m = member_of(actor.id());
@@ -760,28 +802,32 @@ struct BattleTrace {
                          /*brain_registry=*/nullptr, &rng);
     sm_ptr = &sm;
 
-    CombatResult result;
+    BoundedCombatResult result;
     try {
-        result = sm.run_until_end();
+        result = run_bounded(sm, kRoundCap);
     } catch (const std::exception&) {
-        // DEFESA EM PROFUNDIDADE (ver "CAP DE RODADAS" no cabecalho): o wipe acima deveria
-        // tornar isto inalcancavel, mas uma excecao escapando pro laco de 10 milhoes de
-        // lutas e catastrofica demais pra confiar SO na logica de wipe. Registra como
-        // empate tecnico e devolve - o chamador (run_lote_all_arms) segue pra proxima luta.
-        cap_triggered = true;
+        // DEFESA EM PROFUNDIDADE (ver "CAP DE RODADAS" no cabecalho): run_bounded() so
+        // deveria lancar num caso fora do escopo estudado (ver comentario da funcao). Uma
+        // excecao escapando pro laco de 10 milhoes de lutas e catastrofica demais pra
+        // confiar SO na logica acima. Registra como empate tecnico (SEM mexer no estado
+        // dos atores - ninguem e morto artificialmente) e devolve; o chamador
+        // (run_lote_all_arms) segue pra proxima luta.
+        result.capped = true;
         result.outcome = CombatOutcome::Ongoing;
         result.rounds_elapsed = kRoundCap;
     }
 
     trace.outcome = result.outcome;
     trace.rounds = result.rounds_elapsed;
-    trace.capped = cap_triggered;
+    trace.capped = result.capped;
 
     for (std::size_t i = 0; i < scenario.party.size(); ++i) {
         const CombatActor& a = actors[i];
         trace.final_hp_fraction[i] =
             a.max_hp() > 0 ? static_cast<double>(a.hp()) / a.max_hp() : 0.0;
-        if (a.hp() <= 0) trace.fell[i] = true;  // reconciliacao defensiva de borda
+        if (a.hp() <= 0) trace.fell[i] = true;  // reconciliacao defensiva de borda (queda
+                                                 // REAL: nada mata ninguem artificialmente
+                                                 // no cap desde a correcao acima)
     }
     return trace;
 }
@@ -836,8 +882,12 @@ struct LoteArmReport {
     std::string arm;
     int n = 0;
 
-    // E1: taxa de vitoria da party.
+    // E1: taxa de vitoria/derrota/empate tecnico da party - 3 FRACOES que somam ~100%
+    // (correcao 2026-08-01, achado do team-lead: luta capada NAO e derrota, e um 3o
+    // resultado - ver BattleTrace::outcome e "CAP DE RODADAS" no cabecalho do arquivo).
+    // A 3a fracao (empate tecnico) e pct_hit_round_cap, reusada abaixo (E7 tambem le).
     MetricWithCi win_rate_pct;
+    MetricWithCi defeat_rate_pct;
     // E2: duracao em rodadas (media/mediana/p10/p90) + % dentro da janela 3-5
     // (combat.md secao 15.1, item 7 do brief: SUBSTITUI a janela 4-8 antiga).
     double mean_rounds = 0.0;
@@ -890,6 +940,7 @@ struct LoteArmReport {
     if (traces.empty()) return r;
 
     long victories = 0;
+    long defeats = 0;
     std::vector<double> rounds_d;
     long in_window = 0;
     std::vector<double> concentration_samples;
@@ -905,6 +956,9 @@ struct LoteArmReport {
 
     for (const BattleTrace& t : traces) {
         if (t.outcome == CombatOutcome::Victory) ++victories;
+        else if (t.outcome == CombatOutcome::Defeat) ++defeats;
+        // t.outcome == Ongoing (capped) NAO conta em nenhum dos dois - e o 3o resultado
+        // (empate tecnico, ver pct_hit_round_cap abaixo), nao derrota disfarcada.
         rounds_d.push_back(static_cast<double>(t.rounds));
         if (t.rounds >= 3 && t.rounds <= 5) ++in_window;
 
@@ -939,6 +993,7 @@ struct LoteArmReport {
     }
 
     r.win_rate_pct = proportion_metric_pct(victories, r.n);
+    r.defeat_rate_pct = proportion_metric_pct(defeats, r.n);
     r.mean_rounds = mean_metric(rounds_d).value;
     r.median_rounds = percentile(rounds_d, 0.5);
     r.p10_rounds = percentile(rounds_d, 0.10);

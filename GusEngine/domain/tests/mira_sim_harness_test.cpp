@@ -325,6 +325,7 @@ TEST_CASE("mira_sim: aggregate_mira calcula E1/E2/E3/E4/E5 sobre BattleTrace sin
     const LoteArmReport r = aggregate_mira("lote-teste", "braco-teste", {vitoria_rapida, derrota_lenta});
     REQUIRE(r.n == 2);
     REQUIRE(r.win_rate_pct.value == Catch::Approx(50.0));
+    REQUIRE(r.defeat_rate_pct.value == Catch::Approx(50.0));  // a outra luta e Defeat de verdade
     REQUIRE(r.mean_rounds == Catch::Approx(8.0));
     // mediana (percentile p=0.5), NAO p90: com rounds=[4,12] os dois divergem (p50=8.0,
     // p90=11.2) - discrimina um mutante que troque o percentil usado.
@@ -366,7 +367,7 @@ TEST_CASE("mira_sim: aggregate_mira E7 (avg_final_hp_pct/pct_hit_round_cap) com 
           "assimetricos e mistos",
           "[domain][mira_sim]") {
     BattleTrace capped_battle;
-    capped_battle.outcome = CombatOutcome::Defeat;
+    capped_battle.outcome = CombatOutcome::Ongoing;  // empate tecnico, NAO Defeat
     capped_battle.rounds = 30;
     capped_battle.capped = true;
     capped_battle.final_hp_fraction = {1.0, 0.5, 0.0};
@@ -383,6 +384,43 @@ TEST_CASE("mira_sim: aggregate_mira E7 (avg_final_hp_pct/pct_hit_round_cap) com 
     REQUIRE(r.avg_final_hp_pct == Catch::Approx(35.0));
     // 1 de 2 lutas capped -> 50%. Um mutante fixo em 100% falharia aqui.
     REQUIRE(r.pct_hit_round_cap.value == Catch::Approx(50.0));
+}
+
+// Prova OBRIGATORIA (achado do team-lead 2026-08-01): uma luta capada (empate tecnico,
+// outcome=Ongoing, ninguem caido de verdade, HP final real preservado) NAO PODE virar
+// derrota em E1 nem queda em E4 - contaminaria justamente L3/E7 ("exploit de defesa"),
+// fazendo o estudo concluir "turtling e pessimo" quando a resposta real e "a luta nao
+// termina", medida ao contrario.
+TEST_CASE("mira_sim: aggregate_mira NAO conta luta capada como derrota (E1) nem como "
+          "queda (E4)",
+          "[domain][mira_sim]") {
+    BattleTrace capped;
+    capped.outcome = CombatOutcome::Ongoing;  // empate tecnico: nem Victory, nem Defeat
+    capped.rounds = 30;
+    capped.capped = true;
+    capped.fell = {false, false, false};  // ninguem caiu de verdade
+    capped.final_hp_fraction = {0.8, 0.9, 1.0};  // HP real preservado, nao zerado
+
+    BattleTrace vitoria;
+    vitoria.outcome = CombatOutcome::Victory;
+    vitoria.rounds = 4;
+    vitoria.fell = {false, false, false};
+    vitoria.final_hp_fraction = {1.0, 1.0, 1.0};
+
+    const LoteArmReport r = aggregate_mira("lote-capped", "braco-capped", {capped, vitoria});
+    REQUIRE(r.n == 2);
+    // A luta capada NAO e vitoria nem derrota: 1 vitoria em 2 = 50%, 0 derrotas em 2 = 0%.
+    // Se a luta capada tivesse virado Defeat (o defeito antigo), win_rate cairia igual
+    // (50%), mas defeat_rate subiria pra 50% em vez de 0% - e essa e a asserção decisiva.
+    REQUIRE(r.win_rate_pct.value == Catch::Approx(50.0));
+    REQUIRE(r.defeat_rate_pct.value == Catch::Approx(0.0));
+    // E4: ZERO quedas (nenhum membro caiu em nenhuma das 2 lutas, capada inclusive).
+    REQUIRE(r.pct_any_fall.value == Catch::Approx(0.0));
+    for (int i = 0; i < kPartySize; ++i)
+        REQUIRE(r.pct_fall_by_member[i].value == Catch::Approx(0.0));
+    // E7: o HP final medio reflete o estado REAL da luta capada (0.8/0.9/1.0), nao zero.
+    REQUIRE(r.avg_final_hp_pct > 90.0);
+    REQUIRE(r.pct_hit_round_cap.value == Catch::Approx(50.0));  // 1 de 2 lutas capped
 }
 
 TEST_CASE("mira_sim: aggregate_mira com vetor vazio nao explode", "[domain][mira_sim]") {
@@ -520,10 +558,15 @@ TEST_CASE("mira_sim: L3 turtle total bate no cap de 30 rodadas (empate tecnico, 
     const BattleTrace t = run_single_mira_battle(Lote::L3_TurtleTotal, MiraArm::A_StatusQuo, 99);
     REQUIRE(t.capped);
     REQUIRE(t.rounds >= kRoundCap);
-    // Cap garantido pelo harness (wipe deterministico, ver "CAP DE RODADAS" no cabecalho):
-    // o resultado e Defeat (a party e zerada), nao mais Fled (a Fuga forcada podia falhar
-    // pra sempre - achado CRITICO do QA).
-    REQUIRE(t.outcome == CombatOutcome::Defeat);
+    // Cap garantido pelo harness via driving passo-a-passo (ver "CAP DE RODADAS" no
+    // cabecalho, correcao 2026-08-01): o combate NAO resolve (Ongoing), NUNCA Defeat -
+    // ninguem e morto artificialmente pra forcar o fim (contaminaria E1/E4/E7/E8).
+    REQUIRE(t.outcome == CombatOutcome::Ongoing);
+    // Turtle total: ninguem cai de verdade (o Shield absorve 100% do dano bruto, H1).
+    REQUIRE_FALSE(t.any_fell());
+    REQUIRE(t.final_hp_fraction[0] > 0.0);
+    REQUIRE(t.final_hp_fraction[1] > 0.0);
+    REQUIRE(t.final_hp_fraction[2] > 0.0);
     // H1 (parede renovavel): dano bruto tentado > 0, mas absorvido quase/totalmente.
     REQUIRE(t.shield_raw_total > 0);
     REQUIRE(t.shield_absorbed_total == t.shield_raw_total);
@@ -566,20 +609,14 @@ TEST_CASE("mira_sim: cap de rodadas e garantido mesmo com a party perdendo o mai
     std::optional<std::string> last_enemy_target;
     gus::domain::tests::PropertyRandom rng(7);
     const CombatStateMachine* sm_ptr = nullptr;
-    bool cap_triggered = false;
 
-    // MESMO mecanismo de run_single_mira_battle (ver "CAP DE RODADAS" no cabecalho): wipe
-    // deterministico via take_damage(), NUNCA Fuga. Def altissima dos 2 lados (raw clamp em
-    // kMinDamage=1 sempre) garante que ninguem morre "de verdade" antes do cap disparar.
+    // MESMO mecanismo de run_single_mira_battle (ver "CAP DE RODADAS" no cabecalho,
+    // correcao 2026-08-01): run_bounded() para no cap SEM matar ninguem - o provider nao
+    // precisa mais saber do cap. Def altissima dos 2 lados (raw clamp em kMinDamage=1
+    // sempre) garante que ninguem morre "de verdade" antes do cap disparar.
     auto provider = [&](CombatActor& actor, const CombatState& state) -> CombatAction {
         const int round = state.round_index();
         tr.observe_round(round);
-        if (round >= kRoundCap) {
-            cap_triggered = true;
-            for (CombatActor* p : state.alive_players())
-                if (p->is_alive()) p->take_damage(p->hp());
-            return CombatAction::pass();
-        }
         if (actor.is_player_side()) {
             const auto enemies = state.alive_enemies();
             return enemies.empty() ? CombatAction::pass()
@@ -593,12 +630,20 @@ TEST_CASE("mira_sim: cap de rodadas e garantido mesmo com a party perdendo o mai
     CombatStateMachine sm(actor_ptrs, provider, nullptr, nullptr, &rng);
     sm_ptr = &sm;
 
-    CombatResult result;
-    REQUIRE_NOTHROW(result = sm.run_until_end());  // NENHUMA excecao pode escapar (contrato 2)
+    BoundedCombatResult result;
+    REQUIRE_NOTHROW(result = run_bounded(sm, kRoundCap));  // NENHUMA excecao escapa (contrato 2)
 
-    REQUIRE(cap_triggered);                     // o cap disparou (contrato 3, capped confiavel)
-    REQUIRE(result.rounds_elapsed <= kRoundCap + 1);  // nunca passa do cap (contrato 1)
-    REQUIRE(result.outcome == CombatOutcome::Defeat);  // wipe da party, nao Fled
+    REQUIRE(result.capped);                           // o cap disparou (contrato 3)
+    REQUIRE(result.rounds_elapsed <= kRoundCap);        // nunca passa do cap (contrato 1)
+    // O combate NAO resolve (nem Victory, nem Defeat): empate tecnico e um 3o resultado,
+    // NUNCA sinonimo de derrota (achado do team-lead: matar a party pra terminar
+    // contaminaria E1/E4/E7/E8 - o estudo concluiria "turtling e pessimo" quando a
+    // resposta real e "a luta nao termina", medida ao contrario).
+    REQUIRE(result.outcome == CombatOutcome::Ongoing);
+    REQUIRE(gus.is_alive());
+    REQUIRE(jaci.is_alive());
+    REQUIRE(gus.hp() > 0);
+    REQUIRE(jaci.hp() > 0);
 }
 
 TEST_CASE("mira_sim: L2 parede dedicada - Jaci nunca cai a 0 enquanto so ela defende e "
