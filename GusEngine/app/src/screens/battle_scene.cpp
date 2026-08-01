@@ -824,12 +824,17 @@ void BattleScene::menu_confirm() {
     // abriria, e NAO consome o turno (o jogador continua podendo escolher outro verbo).
     // TEXTO (COMPILAR-STUB-SEM-AVISO-NA-TELA, 2026-08-01): trocado de fala de programador
     // ("abriria o overlay de cartas (incr 4)") pra mensagem DIEGETICA curta, no vocabulario
-    // do proprio mundo (magia = software, Pillar 1) - o compilador do jogador reporta que
-    // nao ha nada pra rodar ainda, sem citar "incremento" nem "overlay". Decisao autonoma
-    // do gameplay_engineer (autorizada pelo CTO); registrar pro lider confirmar depois.
+    // do proprio mundo (magia = software, Pillar 1), sem citar "incremento" nem "overlay".
+    // CORRECAO (mesmo dia, achado do CTO): a 1a redacao ("nenhum Conjuro pronto no
+    // buffer") AFIRMAVA um estado de jogo (quantidade de cartas do jogador) que pode ser
+    // FALSO - se o jogador tiver cartas na mao e ler isso, conclui que o sistema de
+    // cartas esta bugado (falso-bug, pior que o falso-travamento original). A frase de
+    // stub tem que falar da FUNCAO estar indisponivel, nunca do estado do mundo. Decisao
+    // autonoma do gameplay_engineer (autorizada pelo CTO); registrar pro lider confirmar
+    // depois.
     if (verb == BattleVerb::Compilar) {
-        ui_log_.push_back(
-            LogLine{LogLineKind::System, "COMPILAR: nenhum Conjuro pronto no buffer."});
+        ui_log_.push_back(LogLine{LogLineKind::System,
+                                  "COMPILAR: modulo do compilador offline nesta build."});
         return;
     }
 
