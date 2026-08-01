@@ -106,6 +106,13 @@ add_executable(gusengine_domain_tests
     # via o motor ja existente + ScriptedBrain; agregacao win-rate/duracao/dominancia).
     # balance_harness.hpp e header-only (ver target_include_directories abaixo).
     balance_harness_test.cpp
+    # MIRA-SIM (protocolo docs/design/mecanicas/proposta-protocolo-simulacao-mira.md,
+    # aprovado pelo lider 2026-08-01): harness de simulacao estatistica da mira inimiga -
+    # 6 bracos (politicas de mira) x 7 lotes (cenarios), rodando a CombatStateMachine REAL
+    # headless. mira_sim_harness.hpp e header-only (mesmo padrao de balance_harness.hpp,
+    # ver target_include_directories abaixo). O run grande (10 milhoes, protocolo secao 3)
+    # fica atras de GUSWORLD_MIRA_SIM_FULL; aqui so o smoke com N pequeno.
+    mira_sim_harness_test.cpp
     # Executor techMagic (ADR-016, MVP step 2): dispatcher OnCast/OnDamageDealt/
     # OnDamageReceived/Always (ApplyStatus/Leech/Reflect) via a CombatStateMachine.
     techmagic_executor_test.cpp

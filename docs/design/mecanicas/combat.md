@@ -716,7 +716,7 @@ Alvo de sensação por tier (rodadas; conversão informal ~25-30s/rodada no mode
 | **Boss** | **12-18** | ~6-9 min | **Tático/pesado** — respira. **Bosses são estilo Zelda** (mecânica/puzzle, não esponja de HP): aguardam BRAINSTORM DEDICADO (ver INBOX `BOSSES-ZELDA-BRAINSTORM`); os números aqui são o envelope de duração, o DESIGN da luta vem depois |
 | **Boss final (Sterling, 2 fases / Dragon Victory)** | **~30** (somando fases) | ~15-18 min | **Tático/pesado — TAMBÉM estilo Zelda** (mecânica/puzzle no clímax, não só troca de dano): entra no mesmo `BOSSES-ZELDA-BRAINSTORM`. Evento clímax |
 
-Nota de harness: a janela histórica do normal era 4-8 rodadas; a decisão aperta o trash pra **3-5** (ágil). Retune do alvo do harness = item de balanceamento futuro (não bloqueia; 4-5 já é interseção). One-way-door de sensação: fica registrado, revisável só via nova decisão do líder.
+Nota de harness: a janela histórica do normal era 4-8 rodadas; a decisão aperta o trash pra **3-5** (ágil). **Retune concluído em 2026-08-01** (item MIRA-SIM, autorizado pelo líder): `balance_harness.hpp`/`balance_harness_test.cpp` (campo `window_3_5_ok`) e o novo `mira_sim_harness.hpp` (métrica E2, `pct_in_window_3_5`) já validam contra 3-5, não mais 4-8. One-way-door de sensação: fica registrado, revisável só via nova decisão do líder.
 
 ---
 

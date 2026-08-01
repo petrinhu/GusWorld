@@ -67,7 +67,7 @@ TEST_CASE("balance_harness: aggregate com vetor vazio nao explode (battles=0, tu
     REQUIRE(r.battles == 0);
     REQUIRE(r.win_rate_pct == 0.0);
     REQUIRE(r.mean_rounds == 0.0);
-    REQUIRE_FALSE(r.window_4_8_ok);
+    REQUIRE_FALSE(r.window_3_5_ok);
     REQUIRE(r.action_share_pct.empty());
 }
 
@@ -91,28 +91,29 @@ TEST_CASE("balance_harness: aggregate calcula media/mediana/p95 de rounds (dados
     REQUIRE(r.p95_rounds == Catch::Approx(15.5));
 }
 
-TEST_CASE("balance_harness: window_4_8_ok exige MEDIA e MEDIANA dentro de [4,8] (secao 15)",
+TEST_CASE("balance_harness: window_3_5_ok exige MEDIA e MEDIANA dentro de [3,5] (secao 15.1, "
+          "decisao lider+Gus 2026-07-19 - SUBSTITUI a janela historica 4-8)",
           "[domain][balance_harness]") {
     const std::vector<BattleOutcome> dentro{
+        make_outcome(CombatOutcome::Victory, 3),
         make_outcome(CombatOutcome::Victory, 4),
-        make_outcome(CombatOutcome::Victory, 6),
-        make_outcome(CombatOutcome::Victory, 8),
+        make_outcome(CombatOutcome::Victory, 5),
     };
-    REQUIRE(aggregate("dentro", dentro).window_4_8_ok);
+    REQUIRE(aggregate("dentro", dentro).window_3_5_ok);
 
     const std::vector<BattleOutcome> fora_rapido{
         make_outcome(CombatOutcome::Victory, 1),
         make_outcome(CombatOutcome::Victory, 1),
         make_outcome(CombatOutcome::Victory, 2),
     };
-    REQUIRE_FALSE(aggregate("fora-rapido", fora_rapido).window_4_8_ok);
+    REQUIRE_FALSE(aggregate("fora-rapido", fora_rapido).window_3_5_ok);
 
     const std::vector<BattleOutcome> fora_lento{
-        make_outcome(CombatOutcome::Victory, 15),
-        make_outcome(CombatOutcome::Victory, 20),
-        make_outcome(CombatOutcome::Victory, 25),
+        make_outcome(CombatOutcome::Victory, 6),
+        make_outcome(CombatOutcome::Victory, 8),
+        make_outcome(CombatOutcome::Victory, 10),
     };
-    REQUIRE_FALSE(aggregate("fora-lento", fora_lento).window_4_8_ok);
+    REQUIRE_FALSE(aggregate("fora-lento", fora_lento).window_3_5_ok);
 }
 
 TEST_CASE("balance_harness: aggregate computa dominancia de acao em % do total",

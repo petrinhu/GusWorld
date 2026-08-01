@@ -28,8 +28,10 @@
 // Camada: domain/tests, POCO puro, ZERO I/O real de plataforma (o unico "I/O" e o
 // relatorio texto impresso por quem chama print_report, responsabilidade do caller).
 //
-// Cross-ref: docs/design/mecanicas/combat.md secao 15 (janela-alvo 4-8 rounds), secao 17
-// (stats de referencia), secao 19 (AutoResolveBrain); TODO.md item COMBATE-TEORIA-JOGOS [1].
+// Cross-ref: docs/design/mecanicas/combat.md secao 15.1 (janela-alvo trash/elite 3-5
+// rounds, decisao lider+Gus 2026-07-19 - retune deste harness autorizado pelo lider em
+// 2026-08-01, item MIRA-SIM; a janela historica era 4-8), secao 17 (stats de referencia),
+// secao 19 (AutoResolveBrain); TODO.md item COMBATE-TEORIA-JOGOS [1].
 
 #ifndef GUS_DOMAIN_TESTS_BALANCE_HARNESS_HPP
 #define GUS_DOMAIN_TESTS_BALANCE_HARNESS_HPP
@@ -91,8 +93,10 @@ struct BalanceReport {
     double mean_rounds = 0.0;
     double median_rounds = 0.0;
     double p95_rounds = 0.0;
-    // true quando MEDIA e MEDIANA caem dentro da janela-alvo secao 15 (~4-8 rounds).
-    bool window_4_8_ok = false;
+    // true quando MEDIA e MEDIANA caem dentro da janela-alvo de trash/elite (secao 15.1,
+    // decisao lider+Gus 2026-07-19: 3-5 rounds, "agil classico" - SUBSTITUI a janela
+    // historica 4-8; retune autorizado pelo lider em 2026-08-01, item MIRA-SIM).
+    bool window_3_5_ok = false;
     // rotulo "<lado>:<acao>" -> % do total de acoes do cenario (dominancia).
     std::unordered_map<std::string, double> action_share_pct;
 };
@@ -220,8 +224,8 @@ namespace detail {
         std::accumulate(rounds.begin(), rounds.end(), 0.0) / static_cast<double>(rounds.size());
     report.median_rounds = detail::percentile(rounds, 0.5);
     report.p95_rounds = detail::percentile(rounds, 0.95);
-    report.window_4_8_ok = report.mean_rounds >= 4.0 && report.mean_rounds <= 8.0 &&
-                           report.median_rounds >= 4.0 && report.median_rounds <= 8.0;
+    report.window_3_5_ok = report.mean_rounds >= 3.0 && report.mean_rounds <= 5.0 &&
+                           report.median_rounds >= 3.0 && report.median_rounds <= 5.0;
 
     if (total_actions > 0) {
         for (const auto& [act_label, count] : action_totals)
@@ -248,7 +252,7 @@ inline void print_report(std::ostream& out, const BalanceReport& r) {
         << " (V=" << r.victories << " D=" << r.defeats << " F=" << r.fled << ")"
         << " rounds mean=" << r.mean_rounds << " median=" << r.median_rounds
         << " p95=" << r.p95_rounds
-        << " janela-4-8=" << (r.window_4_8_ok ? "OK" : "FORA") << "\n";
+        << " janela-3-5=" << (r.window_3_5_ok ? "OK" : "FORA") << "\n";
 
     std::vector<std::pair<std::string, double>> shares(r.action_share_pct.begin(),
                                                         r.action_share_pct.end());
