@@ -826,6 +826,21 @@ TEST_CASE("master_cards: urandom = Ativa/Universal/mana 0/Self, effects [OnCast 
     REQUIRE(c.effects[0].kind == EffectKind::RandomRedirect);
 }
 
+TEST_CASE("master_cards: urandom (RandomRedirect em OnCast) executa via techMagic::execute "
+         "sem lancar - handler no-op deliberado (o redirecionamento vive fora do "
+         "dispatcher, branch dedicado de resolve_use_card)",
+         "[domain][combat][cards][techmagic][mastercards][urandom]") {
+    const auto reg = MasterCards::build_registry();
+    const Card& c = reg.at("urandom");
+
+    CombatActor caster = make_actor("h", /*player_side=*/true);
+
+    techMagic::TechMagicContext ctx;
+    ctx.caster = &caster;
+
+    REQUIRE_NOTHROW(techMagic::execute(TriggerHook::OnCast, c, ctx));
+}
+
 // ===== 4. Paridade i18n das 20 chaves (2 locales) =====
 
 namespace {
