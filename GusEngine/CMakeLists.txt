@@ -596,6 +596,47 @@ set(GLINTFX_MODULE_DRAW2D    ON  CACHE BOOL "" FORCE)
 #     include/glintfx/config.hpp), nao no CMakeLists declarativo: "0.28.0".
 # Build local + suite completa (2611 testes) + tools/check.sh (10/10) verdes no pin novo antes
 # deste commit (contagem de testes no relatorio da fatia F1).
+#
+# BUMP v0.28.0 -> v0.29.0 (BUMP-GLINTFX-V029, 2026-07-31): release de LICENCA, nao de codigo. O
+# glintfx rotacionou de MPL-2.0 pra Apache-2.0, e a v0.29.0 e a TAG DE CORTE: toda tag ate a
+# v0.28.0 inclusive continua MPL-2.0 pra sempre; da v0.29.0 em diante e Apache-2.0. Eles
+# declararam "nenhuma API nova, nenhum bugfix, unico delta funcional e version() devolver
+# 0.29.0" - NAO aceito pela palavra deles, medido:
+#   - Diff do CMakeLists.txt deles nas duas tags (baixado via `gh api
+#     repos/petrinhu/glintfx/contents/glintfx/CMakeLists.txt?ref=v0.2{8,9}.0`): 3 hunks, e
+#     SO 3: (1) SPDX-License-Identifier MPL-2.0 -> Apache-2.0 na linha 1; (2) project(... VERSION
+#     0.28.0 -> 0.29.0); (3) um install(FILES LICENSE NOTICE ... DESTINATION
+#     CMAKE_INSTALL_DOCDIR) NOVO, inteiro dentro de `if(CMAKE_PROJECT_NAME STREQUAL
+#     PROJECT_NAME)` (linha 1724 deles) - condicao que so e verdadeira quando o glintfx e o
+#     projeto TOP-LEVEL, nunca quando consumido via FetchContent/add_subdirectory como aqui.
+#     Conjunto de flags GLINTFX_* (grep ordenado, diff) IDENTICO entre as duas tags.
+#   - Este repositorio NUNCA chama `cmake --install` pro glintfx (grep confirmado em
+#     GusEngine/CMakeLists.txt, */CMakeLists.txt e tools/*.sh: o unico `cmake --install` do
+#     projeto e o do FreeType, tools/winbuild_container.sh:71, prefixo proprio) - o install()
+#     novo e INERTE pra nos.
+#   - Pin do RmlUi deles continua no MESMO SHA 2cd28864ae25ed345b70598751703a5433b12356 (linha
+#     752 deles na v0.29.0), byte-a-byte igual ao bloco declarado acima neste arquivo.
+#   - Vendors deles (arvore GIT recursiva das duas tags, `gh api .../git/trees/v0.2{8,9}.0
+#     ?recursive=true`, filtrada por third_party, comparada arquivo-a-arquivo): os 4 DIRETORIOS
+#     continuam os mesmos (gamecontrollerdb/khronos/miniaudio/stb), ZERO arquivo novo, ZERO
+#     removido - so o SPDX interno de gamecontrollerdb/README.md e
+#     gamecontrollerdb_linux.inc mudou MPL-2.0 -> Apache-2.0 (mesma rotacao, arquivo deles).
+#     THIRD-PARTY-LICENSES.md atualizado com o resultado desta conferencia.
+#   - Diff de assinatura NAO e suficiente sozinho (licao do bump anterior, onde a mudanca que
+#     mais importava nao aparecia em diff nenhum) - por isso os 20 headers publicos de
+#     glintfx/include/glintfx/ foram baixados das duas tags e diffados um a um: byte-a-byte
+#     IDENTICOS exceto a linha 1 (SPDX), nos 20, sem excecao. CHANGELOG.md deles conferido: a
+#     entrada [0.29.0] tem UMA linha, exatamente a rotacao de licenca (ADR-0019 deles, sucede o
+#     ADR-0007 MPL-2.0).
+#   - LICENSE na raiz do repo deles conferido na tag v0.29.0: "Apache License, Version 2.0"
+#     (era "Mozilla Public License Version 2.0" na v0.28.0). NOTICE deles tambem migrado pro
+#     cabecalho Apache-2.0 (aviso "AS IS", sem garantias).
+#   - GLINTFX_VERSION conferido no config.hpp GERADO (build/linux-release/_deps/glintfx-build/
+#     include/glintfx/config.hpp), nao no CMakeLists declarativo: "0.29.0".
+# ZERO divergencia do que eles anunciaram: nenhuma API nova, nenhum bugfix, unico delta
+# funcional e version()==0.29.0 - confirmado por medicao, nao por confianca. Build local +
+# suite completa + tools/check.sh verdes no pin novo antes deste commit (numeros no relatorio
+# da fatia BUMP-GLINTFX-V029).
 
 FetchContent_Declare(
     glintfx
@@ -605,7 +646,7 @@ FetchContent_Declare(
     # evidencia, nao presumida: a tag v0.20.0 tem o MESMO sha nos dois hosts
     # (9bfaabfa, apontando pro commit 0442dd15 que ja esta no nosso _deps).
     GIT_REPOSITORY https://github.com/petrinhu/glintfx
-    GIT_TAG        v0.28.0
+    GIT_TAG        v0.29.0
     SOURCE_SUBDIR  glintfx
 )
 FetchContent_MakeAvailable(glintfx)

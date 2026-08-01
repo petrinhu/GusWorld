@@ -123,7 +123,7 @@ Or scan the QR code with your phone's camera:
 
 ## License
 
-**Source code:** [Apache License 2.0](LICENSE), permissive. SDL3 (zlib) is permissive; glintfx (MPL-2.0, weak copyleft per-file, as of the pinned `v0.28.0` tag) wraps RmlUi 6.3 (MIT); all of it is compatible with Apache 2.0, including static linking. See [NOTICE](NOTICE) for attribution and this project's trademark policy (the license covers the code, not the GusWorld name or logo).
+**Source code:** [Apache License 2.0](LICENSE), permissive. SDL3 (zlib) is permissive; glintfx (Apache-2.0 as of the pinned `v0.29.0` tag, the license rotation cut tag; every tag up to and including `v0.28.0` stays MPL-2.0 forever) wraps RmlUi 6.3 (MIT); all of it is compatible with Apache 2.0, including static linking. See [NOTICE](NOTICE) for attribution and this project's trademark policy (the license covers the code, not the GusWorld name or logo).
 
 **Lore and art (assets):** [CC-BY-SA-4.0](ASSETS-LICENSE.md), except the Vol. 1 / Vol. 2 books (all rights reserved, a separate work). Full third-party attributions in [THIRD-PARTY-LICENSES.md](THIRD-PARTY-LICENSES.md).
 
@@ -140,7 +140,7 @@ This game exists because of many people. First, **the people**:
 And the **technical credits and tools**:
 
 - **Creative direction, code, art and writing:** petrinhu (2026).
-- **Engine foundation:** SDL3 (zlib) + glintfx (MPL-2.0, UI/HUD engine wrapping RmlUi 6.3 MIT + GL3 backend) + miniaudio (Public Domain / MIT-0) at the platform layer.
+- **Engine foundation:** SDL3 (zlib) + glintfx (Apache-2.0 as of the pinned `v0.29.0`, UI/HUD engine wrapping RmlUi 6.3 MIT + GL3 backend) + miniaudio (Public Domain / MIT-0) at the platform layer.
 - **Vendored C++ libraries:** header-only libraries under permissive licenses, listed with full attribution in [THIRD-PARTY-LICENSES.md](THIRD-PARTY-LICENSES.md).
 - **2D image generation:** [Gemini (nano banana)](https://gemini.google.com/) and [Grok (xAI)](https://grok.com/), from prompts derived from the game's lore.
 - **3D generation (production tool only):** [Tripo3D](https://www.tripo3d.ai/), image-to-3D for the bake-to-sprite pipeline. The game itself is 2D at runtime.
@@ -277,7 +277,7 @@ Ou aponte a câmera do celular no QR Code:
 
 ### Licença
 
-**Código-fonte:** [Apache License 2.0](LICENSE), permissiva. SDL3 (zlib) é permissiva; o glintfx (MPL-2.0, copyleft fraco por arquivo, na tag fixada `v0.28.0`) embrulha o RmlUi 6.3 (MIT); tudo compatível com Apache 2.0, inclusive em link estático. Veja o [NOTICE](NOTICE) para a atribuição e a política de marca deste projeto (a licença cobre o código, não o nome nem o logotipo do GusWorld).
+**Código-fonte:** [Apache License 2.0](LICENSE), permissiva. SDL3 (zlib) é permissiva; o glintfx (Apache-2.0 na tag fixada `v0.29.0`, a tag de corte da rotação de licença; toda tag até a `v0.28.0` inclusive segue MPL-2.0 para sempre) embrulha o RmlUi 6.3 (MIT); tudo compatível com Apache 2.0, inclusive em link estático. Veja o [NOTICE](NOTICE) para a atribuição e a política de marca deste projeto (a licença cobre o código, não o nome nem o logotipo do GusWorld).
 
 **Lore e arte (assets):** [CC-BY-SA-4.0](ASSETS-LICENSE.md), exceto os livros Vol. 1 / Vol. 2 (direitos reservados, obra à parte). Atribuições completas de terceiros em [THIRD-PARTY-LICENSES.md](THIRD-PARTY-LICENSES.md).
 
@@ -294,7 +294,7 @@ Este jogo existe por causa de muita gente. Primeiro, **as pessoas**:
 E os **créditos técnicos e ferramentas**:
 
 - **Direção criativa, código, arte e roteiro:** petrinhu (2026).
-- **Base da engine:** SDL3 (zlib) + glintfx (MPL-2.0, motor de UI/HUD que embrulha RmlUi 6.3 MIT + backend GL3) + miniaudio (Domínio Público / MIT-0) na camada de plataforma.
+- **Base da engine:** SDL3 (zlib) + glintfx (Apache-2.0 na tag fixada `v0.29.0`, motor de UI/HUD que embrulha RmlUi 6.3 MIT + backend GL3) + miniaudio (Domínio Público / MIT-0) na camada de plataforma.
 - **Bibliotecas C++ vendorizadas:** bibliotecas header-only sob licenças permissivas, listadas com atribuição completa em [THIRD-PARTY-LICENSES.md](THIRD-PARTY-LICENSES.md).
 - **Geração de imagem 2D:** [Gemini (nano banana)](https://gemini.google.com/) e [Grok (xAI)](https://grok.com/), a partir de prompts derivados da lore do jogo.
 - **Geração 3D (só ferramenta de produção):** [Tripo3D](https://www.tripo3d.ai/), image-to-3D para o pipeline de bake-para-sprite. O jogo em si é 2D em runtime.
