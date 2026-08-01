@@ -563,3 +563,29 @@ Regra transversal do criador (seed 9, ja no backlog doc, sem linha propria): tod
 | LIC-APACHE-6-VERIFICA | LICENSE-APACHE | Legal_QA | **Verificação independente do implementer** (regra da casa): contagem final de `GPL` fora de `_deps`/`build` deve ser **zero em código** e só histórica em docs; os 3 SPDX de terceiros **intactos**; build e suíte verdes; `check.sh` 10/10. ⚠️ **Conferir com `git grep -i`, e o `-i` não é opcional** (`GPL`, `gpl`, `Gpl` em identificador e nome de arquivo). O grep sem `-i` já produziu falso negativo aqui antes. | Alta | LIC-APACHE-5-ADR | Baixa | ⏳ Pendente | — |
 
 **Fora do escopo desta onda, por decisão explícita:** o `glintfx` (repo separado, licença dele é decisão dele) e os **assets** (CC-BY-SA-4.0, decisão independente) — ambos só entram se o líder mandar no `LIC-APACHE-0-DECISOES`.
+
+---
+
+#### ✅ ONDA `LICENSE-APACHE` EXECUTADA E APROVADA (2026-07-31)
+
+**As 3 decisões do `LIC-APACHE-0` foram tomadas pelo líder:** (a) **glintfx FORA** — *"nao toque em glintfx, eu resolvo isso na sessao deles"*, e ele o rotacionou em paralelo; (b) **assets ENTRAM, em direitos reservados**; (c) **`NOTICE` criado**. **Fato novo dele durante a onda, que mudou o desenho:** *"planejo registrar a marca e o jogo, entenda isso. Mesmo gratuito."*
+
+| ID | Commit | Entregue |
+| :--- | :--- | :--- |
+| `LIC-APACHE-1-PROVENIENCIA` | (read-only) | **LIMPO.** Zero copyright alheio nos 531; nenhum irmão novo do `glad`; inventário de terceiros batendo; constantes do Godot são **valor de interface, não expressão** (e Godot é MIT). Os 3 maiores commits do histórico inspecionados: vendoring declarado, purga M9 e a inserção de SPDX. **Nenhuma importação de codebase alheia.** ⚠️ **Limite declarado, não encenado:** risco residual de regurgitação de treino, que **nenhuma ferramenta local detecta**; varredura contra corpus GPL mundial foi **recusada** por ser teatro sem base de referência licenciada. |
+| `LIC-APACHE-2-TEXTO` | `7943469` | `LICENSE` verbatim (conferido por `diff` contra o oficial: **idêntico**, só o placeholder de copyright preenchido), `NOTICE` novo com **política de marca**, README nos 2 idiomas. |
+| `LIC-APACHE-3-SPDX` | `0ab8e0a` + `0ae8b09` | **531 cabeçalhos** rotacionados, **todos com exatamente 1 inserção e 1 deleção** (prova de que nada além da linha SPDX foi tocado). SHA registrado no `.git-blame-ignore-revs` **somando** à entrada de 28/07. |
+| `LIC-APACHE-4-DOCS` | `2003a22` + `a4dfbdd` | Varredura com classificação **ocorrência a ocorrência** entre estado atual e registro histórico. |
+| `LIC-APACHE-5-ADR` | `de214e8` | `ASSETS-LICENSE.md` em **3 zonas**, `ADR-005` com bloco `SUPERADO` (**1 única linha alterada**, corpo intacto), e **`ADR-021`** novo. |
+| (wiki) | `26f17aa` | 5 ocorrências em 3 páginas; **pushada e verificada por clone fresco**: zero GPL nas 11 páginas. |
+| `LIC-APACHE-6-VERIFICA` | (QA independente) | **APROVADO COM RESSALVAS**, nenhuma bloqueante. 8 gates, 2611/2611 testes, 10/10 gates da casa. |
+
+**O que a onda ensinou, e vale mais que o resultado:**
+
+1. ⚠️ **`grep -i gpl` casa dentro de `WaitingPlayerInput`** (junção de "Waitin**g**" com "**Pl**ayerInput"). Eu passei 2 arquivos de design como alvos com contagem e tudo; **a contagem era lixo** e o agente poupou os dois. É o irmão em inglês da armadilha do `grep -i "eu "` casando em `seu`/`meu`. **`-w` é obrigatório junto com o `-i`.**
+2. ⚠️ **Verificação lida na working tree acusou defeito inexistente.** Li os arquivos no meio do commit de um agente e reportei que ele havia parado pela metade. **A regra existe desde 28/07: quem verifica lê o BLOB COMMITADO (`git show <sha>:<arquivo>`), não a árvore.** Eu a conhecia e não a apliquei.
+3. **Dois defeitos reais que só a verificação pegou:** o `THIRD-PARTY-LICENSES.md` dizia pino `v0.27.0` com o CMake em `v0.28.0` (a fatia do bump não atualizou o doc e a de docs não invadiu escopo alheio; **cada um agiu certo e o texto ficou mentindo**), e a patente foi atribuída à **seção 5** quando é a **3** (erro cuja origem foi minha).
+4. **Contradição interna achada por um agente fora do escopo dele:** o `ASSETS-LICENSE.md` tinha a tabela dizendo Apache e o corpo dizendo GPLv3.
+5. **"Zero GPL no repositório" seria alvo ERRADO.** Sobram 11 arquivos citando GPL, e **todos são registro histórico deliberado**: o `ADR-005`, o catálogo de vendoring de junho, a §7 do `engine-design`, a entrada do **Qt** (licença DELE), mais 2 binários que casam por bytes aleatórios. Apagar isso destruiria o porquê das decisões.
+
+**Ressalvas do QA, não bloqueantes, viram follow-up:** (a) **3 arquivos nunca tiveram SPDX nenhum** (`player_sprites_loader.hpp/.cpp`, `player_sprites_layout_test.cpp`) — conferido por mim contra `a0d5b16`: **pré-existente à onda**, 531 de 534; (b) o `ADR-021` aparece no residual de GPL, o que é legítimo (mesma categoria do `ADR-005`) e só mostra que a whitelist foi escrita antes de ele nascer.
