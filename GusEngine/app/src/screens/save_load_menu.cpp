@@ -174,6 +174,35 @@ bool slot_selectable(const SaveLoadMenuState& state, int index) noexcept {
     return slot.occupied || slot.present_unreadable;
 }
 
+int save_load_scroll_target_index(const SaveLoadMenuState& state) noexcept {
+    if (state.warning_kind != SaveLoadMenuState::WarningKind::None) return -1;
+    if (state.confirming_delete || state.confirming_overwrite) return -1;
+    return state.selected;
+}
+
+SaveLoadFocusMode save_load_focus_mode(const SaveLoadMenuState& state) noexcept {
+    if (state.warning_kind != SaveLoadMenuState::WarningKind::None) {
+        return SaveLoadFocusMode::Warning;
+    }
+    if (state.confirming_delete) return SaveLoadFocusMode::ConfirmDelete;
+    if (state.confirming_overwrite) return SaveLoadFocusMode::ConfirmOverwrite;
+    return SaveLoadFocusMode::List;
+}
+
+int save_load_focus_index(const SaveLoadMenuState& state) noexcept {
+    switch (save_load_focus_mode(state)) {
+        case SaveLoadFocusMode::Warning:
+            return state.warning_selected;
+        case SaveLoadFocusMode::ConfirmDelete:
+            return state.delete_confirm_selected;
+        case SaveLoadFocusMode::ConfirmOverwrite:
+            return state.confirm_selected;
+        case SaveLoadFocusMode::List:
+            return state.selected;
+    }
+    return state.selected;
+}
+
 namespace {
 
 // Proximo indice SELECIONAVEL a partir de `from`, andando em `step` (+1/-1) com

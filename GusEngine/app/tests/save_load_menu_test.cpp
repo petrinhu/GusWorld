@@ -267,6 +267,38 @@ TEST_CASE("slot_selectable (SAVE-LOAD-AVISOS): modo Load TAMBEM inclui slots "
     REQUIRE_FALSE(slot_selectable(state, 3));
 }
 
+// ---------------------------------------------------------------- save_load_scroll_target_index (B7)
+
+TEST_CASE("save_load_scroll_target_index: na lista normal devolve state.selected",
+          "[save_load_menu][b7-scroll]") {
+    SaveLoadMenuState state;
+    std::array<SaveSlotPreview, kSlotCount> slots{};
+    for (int i = 0; i < kSlotCount; ++i) slots[static_cast<std::size_t>(i)] = empty_slot_preview(i);
+    slots[2] = unreadable_slot_preview(2, gus::domain::save::LoadResult::Corrupt);
+    save_load_menu_open(state, SaveLoadMode::Load, slots);
+    state.selected = 2;
+
+    REQUIRE(save_load_scroll_target_index(state) == 2);
+}
+
+TEST_CASE("save_load_scroll_target_index: devolve -1 dentro de qualquer "
+          "mini-dialogo/aviso (overwrite/delete/warning) - nenhum deles desenha "
+          "'.slot-list'",
+          "[save_load_menu][b7-scroll]") {
+    SaveLoadMenuState state;
+
+    state.confirming_overwrite = true;
+    REQUIRE(save_load_scroll_target_index(state) == -1);
+
+    state = SaveLoadMenuState{};
+    state.confirming_delete = true;
+    REQUIRE(save_load_scroll_target_index(state) == -1);
+
+    state = SaveLoadMenuState{};
+    state.warning_kind = SaveLoadMenuState::WarningKind::Damaged;
+    REQUIRE(save_load_scroll_target_index(state) == -1);
+}
+
 // ---------------------------------------------------------------- save_load_menu_open
 
 TEST_CASE("save_load_menu_open: selecao inicial pula o autosave em modo Save",

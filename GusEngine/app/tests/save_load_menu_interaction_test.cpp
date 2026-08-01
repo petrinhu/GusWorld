@@ -453,14 +453,17 @@ TEST_CASE("save_load_menu (harness headless): clique de mouse REAL (SDL_PushEven
     std::filesystem::remove_all(saves_dir);
 }
 
-// ---------------------------------------------------------------- (d.1) SFX-MIGRATE-V0.9:
-// hover NATIVO (glintfx::UiLayer::set_hover_callback) toca o SFX de hover, e NAO
-// redispara num 2o motion sobre o MESMO item.
+// ---------------------------------------------------------------- (d.1) B1 revisao 2
+// (last-input-wins, decisao do lider 2026-08-01): mouse MOVE a selecao E toca o SFX
+// de hover ao entrar num item DIFERENTE, e NAO redispara num 2o motion sobre o MESMO
+// item. Substitui o teste antigo do callback NATIVO (glintfx::UiLayer::
+// set_hover_callback, REMOVIDO nesta revisao - o mecanismo agora e route_mouse_hover,
+// disparado SO por SDL_EVENT_MOUSE_MOTION fisico real).
 
-TEST_CASE("save_load_menu (harness headless): hover NATIVO (set_hover_callback) toca "
-          "o SFX de hover ao entrar num item, e NAO redispara num 2o motion sobre o "
-          "MESMO item (SFX-MIGRATE-V0.9)",
-          "[save_load_menu_interaction][gl]") {
+TEST_CASE("save_load_menu (harness headless, B1 revisao 2): mouse move a selecao (e "
+          "toca hover_sfx) ao entrar num slot DIFERENTE, e NAO redispara num 2o motion "
+          "sobre o MESMO slot (last-input-wins)",
+          "[save_load_menu_interaction][gl][b1-last-input-wins]") {
     GlTestEnv env = try_boot_gl();
     if (!env.ok) {
         INFO("GL/display indisponivel - harness pulado (rode com Xvfb :99).");
@@ -473,42 +476,46 @@ TEST_CASE("save_load_menu (harness headless): hover NATIVO (set_hover_callback) 
         std::filesystem::temp_directory_path() / "gusworld_save_load_interaction_hover_saves";
     std::filesystem::remove_all(saves_dir);  // hermetico (nunca o $HOME real do host)
 
-    // Pre-mede a posicao REAL de "slmenu-back" (id FIXO, presente em QUALQUER
-    // estado da lista normal - MESMO documento/viewport/dp_ratio que
-    // run_save_load_menu_loop_gl_current monta INTERNAMENTE, ver o comentario
-    // de load_ui acima).
+    // Modo Load LE OS PREVIEWS DE VERDADE DO DISCO - grava autosave (0) + slot 1
+    // (MESMA receita do teste b4-hover acima). save_load_menu_open abre focado no
+    // slot 1 ("sel" do mock) - mover o mouse pro AUTOSAVE (slot 0, DIFERENTE do
+    // focado) e uma mudanca real de selecao.
+    REQUIRE(gus::platform::fs::save_game(make_save_data(550), kAutosaveSlot, saves_dir.string()));
+    REQUIRE(gus::platform::fs::save_game(make_save_data(340), 1, saves_dir.string()));
+
+    // Pre-mede a posicao REAL do slot 0 (autosave) - MESMO documento/viewport/
+    // dp_ratio que run_save_load_menu_loop_gl_current monta INTERNAMENTE.
     SaveLoadMenuState probe_state;
-    std::array<SaveSlotPreview, kSlotCount> empty_slots{};
-    for (int i = 0; i < kSlotCount; ++i) {
-        empty_slots[static_cast<std::size_t>(i)] = empty_slot_preview(i);
-    }
-    save_load_menu_open(probe_state, SaveLoadMode::Load, empty_slots);
-    float back_cx = 0.0f, back_cy = 0.0f;
+    std::array<SaveSlotPreview, kSlotCount> probe_slots{};
+    probe_slots[kAutosaveSlot] = build_slot_preview(make_save_data(550), kAutosaveSlot);
+    probe_slots[1] = build_slot_preview(make_save_data(340), 1);
+    for (int i = 2; i < kSlotCount; ++i) probe_slots[static_cast<std::size_t>(i)] = empty_slot_preview(i);
+    save_load_menu_open(probe_state, SaveLoadMode::Load, probe_slots);
+    float slot0_cx = 0.0f, slot0_cy = 0.0f;
     {
         auto probe_ui = load_ui(probe_state, translator);
         REQUIRE(probe_ui.has_value());
-        const glintfx::ElementBox back_box = probe_ui->get_element_box("slmenu-back");
-        REQUIRE(box_hittable(back_box, kWinW, kWinH));
-        back_cx = back_box.x + back_box.w * 0.5f;
-        back_cy = back_box.y + back_box.h * 0.5f;
+        const glintfx::ElementBox slot0_box = probe_ui->get_element_box("slmenu-slot-0");
+        REQUIRE(box_hittable(slot0_box, kWinW, kWinH));
+        slot0_cx = slot0_box.x + slot0_box.w * 0.5f;
+        slot0_cy = slot0_box.y + slot0_box.h * 0.5f;
         // FECHA a UiLayer de sondagem ANTES do loop real abrir a SUA PROPRIA
         // (RmlUi NAO suporta 2 UiLayer simultaneos no processo, ver o comentario
         // extenso no teste (d) acima).
     }
 
-    // 2 MOUSE_MOTION IDENTICOS sobre "slmenu-back" (MESMA posicao): o 1o e a
-    // ENTRADA (deve tocar hover_sfx 1x, via set_hover_callback -> hover_cb em
-    // save_load_menu_loop.cpp); o 2o e um "motion parado" sobre o MESMO item -
-    // NAO deve redisparar (dedup por id, tanto o interno da glintfx quanto o
-    // nosso, ver o comentario de hover_cb). Sem clique nenhum aqui (so hover) -
-    // Esc fecha a tela pra a chamada RETORNAR.
+    // 2 MOUSE_MOTION IDENTICOS sobre o slot 0 (MESMA posicao): o 1o e a ENTRADA
+    // (muda state.selected de 1 -> 0, deve tocar hover_sfx 1x, via route_mouse_hover);
+    // o 2o e um "motion parado" sobre o MESMO item - NAO deve redisparar (0 ja e
+    // state.selected, ui_hover_entered_new_item(0,0)==false). Sem clique nenhum
+    // aqui (so hover) - Esc fecha a tela pra a chamada RETORNAR.
     SDL_Event motion1{};
     motion1.type = SDL_EVENT_MOUSE_MOTION;
-    motion1.motion.x = back_cx;
-    motion1.motion.y = back_cy;
+    motion1.motion.x = slot0_cx;
+    motion1.motion.y = slot0_cy;
     REQUIRE(SDL_PushEvent(&motion1));
 
-    SDL_Event motion2 = motion1;  // MESMA posicao/id - "parado sobre o mesmo item"
+    SDL_Event motion2 = motion1;  // MESMA posicao - "parado sobre o mesmo item"
     REQUIRE(SDL_PushEvent(&motion2));
 
     SDL_Event esc_ev{};
@@ -522,13 +529,253 @@ TEST_CASE("save_load_menu (harness headless): hover NATIVO (set_hover_callback) 
         env.window, audio, translator, SaveLoadMode::Load, saves_dir.string(),
         /*build_current_save_data=*/{}, /*apply_loaded_save_data=*/{});
 
-    // ANTES desta onda (hover-SFX via hit-test manual current_hover_index): a
-    // migracao pro callback nativo poderia silenciosamente "emudecer" o hover
-    // (regressao sonora que print/screenshot NAO pegam) OU redisparar a cada
-    // Mouseover cru do fan-out do RmlUi (ver o doc-comment de
-    // set_hover_callback) - este REQUIRE prova, headless e objetivo (via
-    // AudioEngine::sfx_play_count(), NAO julgamento visual), que nenhum dos 2
-    // aconteceu: exatamente 1 play pros 2 motions sobre o MESMO item.
+    // Prova headless e objetiva (AudioEngine::sfx_play_count(), NAO julgamento
+    // visual): exatamente 1 play pros 2 motions sobre o MESMO item (dedup por
+    // indice, ui_hover_entered_new_item).
+    REQUIRE(exit == SaveLoadLoopExit::BackToPause);
+    REQUIRE(audio.sfx_play_count() == 1);
+
+    std::filesystem::remove_all(saves_dir);
+}
+
+// ---------------------------------------------------------------- (d.2) B1 revisao 2:
+// o CASO CRITICO que motivou a revisao - mouse PARADO sobre um slot enquanto o
+// TECLADO navega. A selecao tem que SEGUIR O TECLADO, nao voltar pro slot sob o
+// ponteiro parado (last-input-wins: so um MOUSE_MOTION FISICO real reivindica a
+// selecao pro mouse - reload()/update() programaticos NUNCA disparam
+// route_mouse_hover).
+
+TEST_CASE("save_load_menu (harness headless, B1 revisao 2): mouse PARADO sobre um "
+          "slot enquanto o TECLADO navega - a selecao segue o teclado, nao volta pro "
+          "slot sob o ponteiro (last-input-wins)",
+          "[save_load_menu_interaction][gl][b1-last-input-wins]") {
+    GlTestEnv env = try_boot_gl();
+    if (!env.ok) {
+        INFO("GL/display indisponivel - harness pulado (rode com Xvfb :99).");
+        return;
+    }
+
+    const gus::app::i18n::Translator translator = make_translator();
+
+    const std::filesystem::path saves_dir = std::filesystem::temp_directory_path() /
+                                             "gusworld_save_load_interaction_mouse_parado_saves";
+    std::filesystem::remove_all(saves_dir);
+
+    // 3 slots ocupados (autosave=0, 1, 2) - abre focado no 1. O mouse vai
+    // parar sobre o slot 2 (reivindica a selecao 1x, MESMO racional do teste
+    // acima) e DEPOIS o teclado navega (Baixo: 1->2 nao muda nada pq ja e o
+    // slot 2... entao usamos Cima: 1->0) - a selecao final tem que ser a do
+    // TECLADO (0), nao voltar pro slot 2 so porque o mouse ainda esta la.
+    REQUIRE(gus::platform::fs::save_game(make_save_data(550), kAutosaveSlot, saves_dir.string()));
+    REQUIRE(gus::platform::fs::save_game(make_save_data(340), 1, saves_dir.string()));
+    REQUIRE(gus::platform::fs::save_game(make_save_data(810), 2, saves_dir.string()));
+
+    SaveLoadMenuState probe_state;
+    std::array<SaveSlotPreview, kSlotCount> probe_slots{};
+    probe_slots[kAutosaveSlot] = build_slot_preview(make_save_data(550), kAutosaveSlot);
+    probe_slots[1] = build_slot_preview(make_save_data(340), 1);
+    probe_slots[2] = build_slot_preview(make_save_data(810), 2);
+    for (int i = 3; i < kSlotCount; ++i) probe_slots[static_cast<std::size_t>(i)] = empty_slot_preview(i);
+    save_load_menu_open(probe_state, SaveLoadMode::Load, probe_slots);
+    float slot2_cx = 0.0f, slot2_cy = 0.0f;
+    {
+        auto probe_ui = load_ui(probe_state, translator);
+        REQUIRE(probe_ui.has_value());
+        const glintfx::ElementBox slot2_box = probe_ui->get_element_box("slmenu-slot-2");
+        REQUIRE(box_hittable(slot2_box, kWinW, kWinH));
+        slot2_cx = slot2_box.x + slot2_box.w * 0.5f;
+        slot2_cy = slot2_box.y + slot2_box.h * 0.5f;
+    }
+
+    // 1) mouse entra no slot 2 (1->2, reivindica a selecao pro mouse).
+    SDL_Event motion_ev{};
+    motion_ev.type = SDL_EVENT_MOUSE_MOTION;
+    motion_ev.motion.x = slot2_cx;
+    motion_ev.motion.y = slot2_cy;
+    REQUIRE(SDL_PushEvent(&motion_ev));
+
+    // 2) teclado aperta Cima 2x (2->1->0) - o mouse NAO se move de novo, entao
+    // route_mouse_hover NUNCA roda de novo (nenhum SDL_EVENT_MOUSE_MOTION na
+    // fila) - a selecao final tem que ser 0 (teclado), mesmo com o cursor
+    // fisicamente ainda sobre o slot 2.
+    SDL_Event up1{};
+    up1.type = SDL_EVENT_KEY_DOWN;
+    up1.key.key = SDLK_UP;
+    up1.key.repeat = 0;
+    REQUIRE(SDL_PushEvent(&up1));
+    SDL_Event up2 = up1;
+    REQUIRE(SDL_PushEvent(&up2));
+
+    // 3) Enter confirma o slot FOCADO - se a selecao tivesse voltado pro
+    // slot 2 (sob o mouse parado), isto carregaria o slot ERRADO.
+    SDL_Event enter_ev{};
+    enter_ev.type = SDL_EVENT_KEY_DOWN;
+    enter_ev.key.key = SDLK_RETURN;
+    enter_ev.key.repeat = 0;
+    REQUIRE(SDL_PushEvent(&enter_ev));
+
+    gus::platform::audio::AudioEngine audio(/*device_active=*/false);
+    gus::domain::save::SaveData loaded;
+    bool apply_called = false;
+    const std::function<void(const gus::domain::save::SaveData&)> apply_data =
+        [&](const gus::domain::save::SaveData& d) {
+            apply_called = true;
+            loaded = d;
+        };
+    const SaveLoadLoopExit exit = run_save_load_menu_loop_gl_current(
+        env.window, audio, translator, SaveLoadMode::Load, saves_dir.string(),
+        /*build_current_save_data=*/{}, apply_data);
+
+    REQUIRE(exit == SaveLoadLoopExit::ClosedAfterLoad);
+    REQUIRE(apply_called);
+    // O slot 0 (autosave) tem xp=550 - se a selecao tivesse ficado presa no
+    // slot 2 (xp=810, sob o mouse parado), este REQUIRE falharia.
+    REQUIRE(gus::app::screens::save_xp_for_display(loaded) == 550);
+
+    std::filesystem::remove_all(saves_dir);
+}
+
+// ---------------------------------------------------------------- (d.3) B1 revisao 2:
+// passar o mouse sobre um slot NAO SELECIONAVEL (autosave readonly em modo Save)
+// nunca move a selecao pra ele.
+
+TEST_CASE("save_load_menu (harness headless, B1 revisao 2): passar o mouse sobre o "
+          "autosave READONLY em modo Save NAO move a selecao pra ele",
+          "[save_load_menu_interaction][gl][b1-last-input-wins]") {
+    GlTestEnv env = try_boot_gl();
+    if (!env.ok) {
+        INFO("GL/display indisponivel - harness pulado (rode com Xvfb :99).");
+        return;
+    }
+
+    const gus::app::i18n::Translator translator = make_translator();
+
+    const std::filesystem::path saves_dir = std::filesystem::temp_directory_path() /
+                                             "gusworld_save_load_interaction_readonly_saves";
+    std::filesystem::remove_all(saves_dir);
+
+    // Modo Save: autosave (0) OCUPADO mas SO-LEITURA (nao selecionavel); slot 1
+    // vazio (selecionavel, foco inicial). Grava o autosave de fato (modo Save
+    // TAMBEM le previews reais do disco, ver build_previews_and_cache).
+    REQUIRE(gus::platform::fs::save_game(make_save_data(550), kAutosaveSlot, saves_dir.string()));
+
+    SaveLoadMenuState probe_state;
+    std::array<SaveSlotPreview, kSlotCount> probe_slots{};
+    probe_slots[kAutosaveSlot] = build_slot_preview(make_save_data(550), kAutosaveSlot);
+    for (int i = 1; i < kSlotCount; ++i) probe_slots[static_cast<std::size_t>(i)] = empty_slot_preview(i);
+    save_load_menu_open(probe_state, SaveLoadMode::Save, probe_slots);
+    REQUIRE(probe_state.selected == 1);  // pula o autosave (nao selecionavel em Save)
+    float slot0_cx = 0.0f, slot0_cy = 0.0f;
+    {
+        auto probe_ui = load_ui(probe_state, translator);
+        REQUIRE(probe_ui.has_value());
+        const glintfx::ElementBox slot0_box = probe_ui->get_element_box("slmenu-slot-0");
+        REQUIRE(box_hittable(slot0_box, kWinW, kWinH));
+        slot0_cx = slot0_box.x + slot0_box.w * 0.5f;
+        slot0_cy = slot0_box.y + slot0_box.h * 0.5f;
+    }
+
+    // Mouse entra no autosave (readonly, NAO selecionavel) - route_mouse_hover
+    // deve ser NO-OP (state.selected continua 1). Enter confirma o slot 1
+    // (vazio) - se a selecao tivesse ido pro autosave, o fluxo seria outro
+    // (autosave nao abre confirming_overwrite, e o teste falharia adiante).
+    SDL_Event motion_ev{};
+    motion_ev.type = SDL_EVENT_MOUSE_MOTION;
+    motion_ev.motion.x = slot0_cx;
+    motion_ev.motion.y = slot0_cy;
+    REQUIRE(SDL_PushEvent(&motion_ev));
+
+    SDL_Event enter_ev{};
+    enter_ev.type = SDL_EVENT_KEY_DOWN;
+    enter_ev.key.key = SDLK_RETURN;
+    enter_ev.key.repeat = 0;
+    REQUIRE(SDL_PushEvent(&enter_ev));
+
+    // Enter no slot 1 (vazio, modo Save) abre confirming_overwrite (AJUSTE
+    // polish playtest 2026-07-10, copy "Deseja salvar...") - 1o Esc cancela o
+    // DIALOGO (volta a lista, tela AINDA ABERTA); 2o Esc fecha a tela de fato
+    // (BackToPause) - SEM o 2o Esc a chamada NUNCA RETORNA (fila vazia,
+    // achado ao vivo ja documentado no teste (f) deste arquivo).
+    SDL_Event esc1_ev{};
+    esc1_ev.type = SDL_EVENT_KEY_DOWN;
+    esc1_ev.key.key = SDLK_ESCAPE;
+    esc1_ev.key.repeat = 0;
+    REQUIRE(SDL_PushEvent(&esc1_ev));
+
+    SDL_Event esc2_ev = esc1_ev;
+    REQUIRE(SDL_PushEvent(&esc2_ev));
+
+    gus::platform::audio::AudioEngine audio(/*device_active=*/false);
+    const SaveLoadLoopExit exit = run_save_load_menu_loop_gl_current(
+        env.window, audio, translator, SaveLoadMode::Save, saves_dir.string(),
+        /*build_current_save_data=*/{}, /*apply_loaded_save_data=*/{});
+
+    // Se a selecao tivesse ido pro autosave (readonly, NAO selecionavel), o
+    // Enter teria sido NO-OP (autosave nunca abre dialogo em modo Save) - a
+    // sequencia so fecha limpo (BackToPause) porque o Enter realmente abriu
+    // o dialogo do slot 1 e o 1o Esc o cancelou, MESMO fluxo esperado com a
+    // selecao intocada pelo mouse.
+    REQUIRE(exit == SaveLoadLoopExit::BackToPause);
+
+    std::filesystem::remove_all(saves_dir);
+}
+
+// ---------------------------------------------------------------- (B4) paridade
+// teclado x mouse: navegar com o TECLADO (seta) tambem toca o SFX de hover -
+// decisao do lider 2026-08-01, retoque ao vivo pos-bugs 1-9. ANTES desta onda,
+// nenhuma tecla tocava som nesta tela (omissao DOCUMENTADA, ver save_load_menu_
+// loop.hpp) - este teste E o fio REAL (SDL_PushEvent ate
+// run_save_load_menu_loop_gl_current) que teria falhado no codigo de ontem.
+
+TEST_CASE("save_load_menu (harness headless): navegar com SETA (teclado) entre "
+          "slots selecionaveis toca o SFX de hover de fato (B4 - paridade "
+          "teclado x mouse)",
+          "[save_load_menu_interaction][gl][b4-hover]") {
+    GlTestEnv env = try_boot_gl();
+    if (!env.ok) {
+        INFO("GL/display indisponivel - harness pulado (rode com Xvfb :99).");
+        return;
+    }
+
+    const gus::app::i18n::Translator translator = make_translator();
+
+    const std::filesystem::path saves_dir =
+        std::filesystem::temp_directory_path() / "gusworld_save_load_interaction_kbhover_saves";
+    std::filesystem::remove_all(saves_dir);  // hermetico (nunca o $HOME real do host)
+
+    // Modo Load LE OS PREVIEWS DE VERDADE DO DISCO (build_previews_and_cache,
+    // save_load_menu_loop.cpp) - PRECISA gravar saves REAIS via
+    // gus::platform::fs::save_game ANTES do loop abrir, senao TODOS os slots
+    // ficam vazios/nao-selecionaveis e save_load_menu_open degrada pra
+    // selected=kAutosaveSlot sem NENHUM slot pra navegar (MESMO padrao ja usado
+    // pelos testes (e)/(f) deste arquivo pra popular o disco de fato). Autosave
+    // (0) + slot 1 OCUPADOS - ambos selecionaveis em modo Load
+    // (save_load_menu_open abre focado no slot 1, "sel" do mock) - 1 seta CIMA
+    // move o foco 1 -> 0 (indice NOVO, deve soar).
+    REQUIRE(gus::platform::fs::save_game(make_save_data(550), kAutosaveSlot, saves_dir.string()));
+    REQUIRE(gus::platform::fs::save_game(make_save_data(340), 1, saves_dir.string()));
+
+    SDL_Event up_ev{};
+    up_ev.type = SDL_EVENT_KEY_DOWN;
+    up_ev.key.key = SDLK_UP;
+    up_ev.key.repeat = 0;
+    REQUIRE(SDL_PushEvent(&up_ev));
+
+    SDL_Event esc_ev{};
+    esc_ev.type = SDL_EVENT_KEY_DOWN;
+    esc_ev.key.key = SDLK_ESCAPE;
+    esc_ev.key.repeat = 0;
+    REQUIRE(SDL_PushEvent(&esc_ev));
+
+    gus::platform::audio::AudioEngine audio(/*device_active=*/false);  // sem hardware no CI
+    const SaveLoadLoopExit exit = run_save_load_menu_loop_gl_current(
+        env.window, audio, translator, SaveLoadMode::Load, saves_dir.string(),
+        /*build_current_save_data=*/{}, /*apply_loaded_save_data=*/{});
+
+    // ANTES desta onda: 0 plays (teclado nunca tocava SFX nesta tela) - este
+    // REQUIRE prova, headless e objetivo (AudioEngine::sfx_play_count(), NAO
+    // julgamento visual), que a seta de fato soou 1x (a mudanca de foco
+    // 1->0), e que Esc (Back, sem I/O) NAO soa alem disso.
     REQUIRE(exit == SaveLoadLoopExit::BackToPause);
     REQUIRE(audio.sfx_play_count() == 1);
 

@@ -105,12 +105,16 @@ int main() {
     slots[kAutosaveSlot] = gus::app::screens::build_slot_preview(
         make_save_data(550, "distritos_inferiores", 1783627200000LL, 3300.0),
         kAutosaveSlot);
-    slots[1] = gus::app::screens::build_slot_preview(
-        make_save_data(340, "distritos_inferiores", 1783455240000LL, 2532.0), 1);
-    slots[2] = gus::app::screens::build_slot_preview(
-        make_save_data(810, "distritos_inferiores", 1783368660000LL, 4680.0), 2);
-    for (int i = 3; i < kSlotCount; ++i)
-        slots[static_cast<std::size_t>(i)] = gus::app::screens::empty_slot_preview(i);
+    // B7 (scroll-follow): TODOS os slots manuais OCUPADOS (nao so 1/2) - o probe
+    // original so preenchia 2 (o resto ficava vazio) e nunca precisou rolar a
+    // lista pra ver o ultimo slot. Com os 7 ocupados, o slot kSlotCount-1 fica
+    // FORA do recorte visivel de 300dp na abertura (MESMO cenario real que exige
+    // scroll_element_into_view).
+    for (int i = 1; i < kSlotCount; ++i) {
+        slots[static_cast<std::size_t>(i)] = gus::app::screens::build_slot_preview(
+            make_save_data(100 * i, "distritos_inferiores", 1783455240000LL - i * 1000, 600.0 * i),
+            i);
+    }
 
     const std::string mode_env = std::getenv("GUSWORLD_PROBE_MODE")
                                       ? std::getenv("GUSWORLD_PROBE_MODE")
@@ -122,8 +126,19 @@ int main() {
 
     if (const char* confirm = std::getenv("GUSWORLD_PROBE_CONFIRM")) {
         if (confirm[0] == '1') {
-            gus::app::screens::save_load_menu_key_down(state, SDLK_RETURN);
+            gus::app::screens::save_load_menu_key_down(state, glintfx::Key::Enter);
         }
+    }
+
+    // B7 (scroll-follow, decisao do lider 2026-08-01): GUSWORLD_PROBE_SELECT=<n>
+    // fixa state.selected=n (sem rodar o loop interativo de verdade) - simula
+    // "o jogador navegou ate o slot n via teclado", que e o cenario que
+    // reload_() (save_load_menu_loop.cpp) resolve com
+    // save_load_scroll_target_index + scroll_element_into_view.
+    int probe_select = -1;
+    if (const char* select_env = std::getenv("GUSWORLD_PROBE_SELECT")) {
+        probe_select = std::atoi(select_env);
+        if (probe_select >= 0 && probe_select < kSlotCount) state.selected = probe_select;
     }
 
     std::string rml = gus::app::screens::build_save_load_menu_rml(state, translator);
@@ -174,6 +189,19 @@ int main() {
     ui.set_viewport(kW, kH);
     ui.set_dp_ratio(dp_ratio);
 
+    // B7 (scroll-follow): MESMA sequencia que SaveLoadScreen::reload_()
+    // (save_load_menu_loop.cpp) roda de verdade - update() ANTES de
+    // scroll_element_into_view (o layout do documento recem-carregado precisa
+    // ter rodado antes da API resolver a geometria da lista).
+    if (probe_select >= 0) {
+        ui.update();
+        const int scroll_target = gus::app::screens::save_load_scroll_target_index(state);
+        if (scroll_target >= 0) {
+            const std::string id = "slmenu-slot-" + std::to_string(scroll_target);
+            ui.scroll_element_into_view(id.c_str());
+        }
+    }
+
     gus::platform::render2d::Render2dGl3 backdrop(/*gl_active=*/true);
     const gus::core::spatial::Rect cam{0.0f, 0.0f, static_cast<float>(kW),
                                         static_cast<float>(kH)};
@@ -185,6 +213,30 @@ int main() {
         ui.update();
         ui.render();
         SDL_GL_SwapWindow(window);
+    }
+
+    // DIAGNOSTICO AD-HOC (B1, decisao do lider 2026-08-01): GUSWORLD_PROBE_HOVER_ID=<id>
+    // move o mouse (UiEvent::MouseMove) pro CENTRO da box daquele id ANTES de
+    // capturar - prova visual de "hover != selected ao mesmo tempo" (checar
+    // ambiguidade do glow identico).
+    if (const char* hover_id = std::getenv("GUSWORLD_PROBE_HOVER_ID")) {
+        const glintfx::ElementBox hbox = ui.get_element_box(hover_id);
+        if (hbox.found) {
+            glintfx::UiEvent mv{};
+            mv.type = glintfx::UiEvent::Type::MouseMove;
+            mv.x = hbox.x + hbox.w * 0.5f;
+            mv.y = hbox.y + hbox.h * 0.5f;
+            ui.process_event(mv);
+            for (int frame = 0; frame < 5; ++frame) {
+                backdrop.begin_frame(cam, kW, kH);
+                backdrop.end_frame();
+                ui.update();
+                ui.render();
+                SDL_GL_SwapWindow(window);
+            }
+        } else {
+            std::cerr << "GUSWORLD_PROBE_HOVER_ID=" << hover_id << " nao encontrado\n";
+        }
     }
 
     for (const char* id : {"slmenu-scrim", "slmenu-panel", "slmenu-slot-1", "slmenu-back"}) {

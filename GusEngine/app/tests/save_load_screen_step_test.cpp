@@ -240,9 +240,9 @@ TEST_CASE("save_load_screen_step: clique de mouse REAL em 'Voltar' devolve "
 // ---------------------------------------------------------------- navegacao (setas)
 
 TEST_CASE("save_load_screen_step: navegar (seta Baixo/Cima) entre slots "
-          "selecionaveis e action=None + reload=true, SEM sfx (teclado nunca "
-          "tocou som nesta tela)",
-          "[save_load_screen_step][f4-1b2]") {
+          "selecionaveis e action=None + reload=true, tocando Hover (B4 - "
+          "paridade teclado x mouse, decisao do lider 2026-08-01)",
+          "[save_load_screen_step][f4-1b2][b4-hover]") {
     // slot 1 ocupado, autosave (0) ocupado tambem em modo Load - 2 selecionaveis.
     std::array<SaveSlotPreview, kSlotCount> slots{};
     for (int i = 0; i < kSlotCount; ++i) {
@@ -263,7 +263,59 @@ TEST_CASE("save_load_screen_step: navegar (seta Baixo/Cima) entre slots "
     REQUIRE(*result.action == SaveLoadMenuAction::None);
     REQUIRE(result.reload);
     REQUIRE_FALSE(result.exit.has_value());
+    REQUIRE(result.sfx == SaveLoadSfxKind::Hover);
+}
+
+TEST_CASE("save_load_screen_step (B4): navegar PARADO no MESMO slot (ex.: "
+          "bater no limite do wrap-around sem mudar de indice) NAO redispara "
+          "Hover",
+          "[save_load_screen_step][f4-1b2][b4-hover]") {
+    // Estado com SO 1 slot selecionavel (o 1) - UP/DOWN sempre volta pro MESMO
+    // indice (wrap-around de 1 item so), MESMO racional de
+    // ui_hover_entered_new_item(prev, prev) == false.
+    std::array<SaveSlotPreview, kSlotCount> slots{};
+    for (int i = 0; i < kSlotCount; ++i) {
+        slots[static_cast<std::size_t>(i)] = gus::app::screens::empty_slot_preview(i);
+    }
+    slots[1] = gus::app::screens::build_slot_preview(make_save_data(), 1);
+    SaveLoadMenuState state;
+    gus::app::screens::save_load_menu_open(state, SaveLoadMode::Load, slots);
+    REQUIRE(state.selected == 1);
+
+    const SaveLoadStepResult result =
+        save_load_screen_step(state, key_down_event(SDLK_DOWN), SaveLoadStepBoxes{});
+
+    REQUIRE(state.selected == 1);
     REQUIRE(result.sfx == SaveLoadSfxKind::None);
+}
+
+TEST_CASE("save_load_screen_step (B4): abrir o mini-dialogo de sobrescrita "
+          "(Enter, mudanca de SUB-MODO) NAO toca Hover, so o Click da propria "
+          "confirmacao (racional identico a title_screen_step)",
+          "[save_load_screen_step][f4-1b2][b4-hover]") {
+    SaveLoadMenuState state = open_state_with_occupied_slot1(SaveLoadMode::Save);
+    REQUIRE(state.selected == 1);
+
+    const SaveLoadStepResult result =
+        save_load_screen_step(state, key_down_event(SDLK_RETURN), SaveLoadStepBoxes{});
+
+    REQUIRE(state.confirming_overwrite);
+    REQUIRE(result.sfx == SaveLoadSfxKind::None);
+}
+
+TEST_CASE("save_load_screen_step (B4): DENTRO do mini-dialogo de sobrescrita, "
+          "LEFT/RIGHT alternando a pill toca Hover (MESMO sub-modo)",
+          "[save_load_screen_step][f4-1b2][b4-hover]") {
+    SaveLoadMenuState state = open_state_with_occupied_slot1(SaveLoadMode::Save);
+    (void)save_load_screen_step(state, key_down_event(SDLK_RETURN), SaveLoadStepBoxes{});
+    REQUIRE(state.confirming_overwrite);
+    REQUIRE(state.confirm_selected == 1);  // default seguro, "Nao" focado
+
+    const SaveLoadStepResult result =
+        save_load_screen_step(state, key_down_event(SDLK_LEFT), SaveLoadStepBoxes{});
+
+    REQUIRE(state.confirm_selected == 0);
+    REQUIRE(result.sfx == SaveLoadSfxKind::Hover);
 }
 
 // ---------------------------------------------------------------- confirmacao de sobrescrita (modo Save)

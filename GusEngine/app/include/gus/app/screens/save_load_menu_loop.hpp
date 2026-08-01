@@ -152,14 +152,23 @@ enum class SaveLoadLoopExit {
 // clique que acertou um alvo real (slot/icone-de-apagar/Voltar/pill de
 // dialogo/aviso) soa Click, MESMA simplificacao "todo clique reconhecido soa"
 // do while(true) antigo (ver o comentario de "SOM DE CLIQUE" em
-// save_load_menu_loop.cpp) - o hover de mouse continua 100% no callback
+// save_load_menu_loop.cpp) - o hover de MOUSE continua 100% no callback
 // NATIVO glintfx::UiLayer::set_hover_callback (fora do escopo desta funcao, o
-// MESMO SFX-MIGRATE-V0.9 de sempre); teclado NUNCA tocou SFX nesta tela, ANTES
-// nem DEPOIS desta fatia (diferente de difficulty_screen_step, que tem
-// DifficultySfxKind::Hover/Blocked pra paridade teclado x mouse - esta tela
-// nao tem esse requisito, comportamento preservado tal qual).
+// MESMO SFX-MIGRATE-V0.9 de sempre).
+//
+// B4 (decisao do lider 2026-08-01 - retoque ao vivo pos-bugs 1-9): ATE esta
+// fatia, teclado NUNCA tocava SFX nesta tela (diferente de
+// difficulty_screen_step/title_screen_step, que ja tinham paridade teclado x
+// mouse) - era uma omissao DOCUMENTADA, nao um bug acidental (ver o historico
+// deste comentario). O lider pediu paridade: agora Hover (abaixo) toca quando
+// a NAVEGACAO por teclado move o foco pra um item NOVO dentro do MESMO
+// sub-modo (save_load_focus_mode/save_load_keyboard_focus_index,
+// save_load_menu.hpp) - MESMO racional de title_screen_step (compara
+// state.confirming_new_game antes/depois pra nao contar troca de sub-modo
+// como "moveu de item").
 enum class SaveLoadSfxKind {
     None,   // nenhum som (evento nao roteado, tecla, ou clique fora de qualquer box)
+    Hover,  // hover_sfx_id - teclado moveu o foco pra um item NOVO no MESMO sub-modo (B4)
     Click,  // click_sfx_id - o CHAMADOR mapeia pro SoundId real
 };
 

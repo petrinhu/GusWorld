@@ -265,6 +265,49 @@ struct SaveLoadMenuState {
 // index fora do intervalo devolve false (defensivo).
 [[nodiscard]] bool slot_selectable(const SaveLoadMenuState& state, int index) noexcept;
 
+// SCROLL SEGUE A SELECAO (B7, decisao do lider 2026-08-01 - retoque ao vivo
+// pos-bugs 1-9): devolve o INDICE do slot (0..kSlotCount-1) que o CHAMADOR deve
+// rolar pra dentro da vista via glintfx::UiLayer::scroll_element_into_view
+// (mapeando indice->id via "slmenu-slot-<indice>", save_load_menu_loop.cpp),
+// ou -1 quando nenhuma rolagem programatica faz sentido no estado ATUAL -
+// MESMO papel/contrato de controls_scroll_target_index (system_menu.hpp).
+// -1 quando warning_kind!=None OU confirming_delete OU confirming_overwrite
+// (nenhum desses estados desenha `.slot-list` - ver save_load_menu_rml.cpp,
+// os 3 substituem a lista inteira por um mini-dialogo/aviso). Fora desses
+// casos, devolve state.selected - chamar scroll_element_into_view de novo pra
+// um slot ja visivel e um no-op seguro (RmlUi so move o scroll quando
+// precisa), entao nao ha necessidade de mais um caso especial aqui.
+[[nodiscard]] int save_load_scroll_target_index(const SaveLoadMenuState& state) noexcept;
+
+// PARIDADE TECLADO x MOUSE / LAST-INPUT-WINS (B1+B4, decisao do lider
+// 2026-08-01, revisao 2 - pesquisa CommonUI Input Technical Guide/Epic):
+// qual dos 4 "sub-modos" mutuamente exclusivos desta tela esta ATIVO agora -
+// lista normal, ou um dos 3 mini-dialogos/avisos (cada um substitui a lista
+// INTEIRA, ver save_load_menu_rml.cpp). O CHAMADOR (save_load_screen_step,
+// save_load_menu_loop.cpp) le isto ANTES e DEPOIS de rotear uma tecla de
+// navegacao OU um MOUSE_MOTION fisico (route_mouse_hover, save_load_menu_
+// loop.cpp) - SO compara indices de foco (abaixo) quando o modo NAO mudou,
+// MESMO racional de title_screen_step comparando state.confirming_new_game
+// antes/depois (title_menu_loop.cpp) - abrir/fechar um dialogo ja toca Click
+// (a confirmacao em si), nao deve ALEM DISSO tocar Hover so por ter mudado de
+// sub-modo.
+enum class SaveLoadFocusMode { List, ConfirmOverwrite, ConfirmDelete, Warning };
+
+[[nodiscard]] SaveLoadFocusMode save_load_focus_mode(const SaveLoadMenuState& state) noexcept;
+
+// Indice de foco no sub-modo ATUAL (ver save_load_focus_mode acima) - UNICA
+// fonte de verdade tanto pra TECLADO quanto pra MOUSE (revisao 2, "last-input-
+// wins": o mouse ESCREVE em state.selected/confirm_selected/delete_confirm_
+// selected/warning_selected via route_mouse_hover, exatamente como o teclado
+// ja fazia - nao ha mais 2 canais de destaque separados, so 1 selecao). MESMO
+// papel de title_keyboard_focus_index/difficulty_keyboard_focus_index: List ->
+// state.selected; ConfirmOverwrite -> state.confirm_selected; ConfirmDelete ->
+// state.delete_confirm_selected; Warning -> state.warning_selected. So
+// comparavel entre 2 leituras do MESMO modo (ver o CHAMADOR, save_load_screen_
+// step) - comparar indices de sub-modos DIFERENTES nao tem significado (os
+// numeros podem coincidir por acaso).
+[[nodiscard]] int save_load_focus_index(const SaveLoadMenuState& state) noexcept;
+
 // SAVE-LOAD-UI etapa 4 (TELA DE TITULO): indice do slot OCUPADO com o MAIOR
 // timestamp_ms entre `slots` (Auto E manuais concorrem igualmente - "Continuar"
 // carrega o save mais recente da PARTIDA, nao um slot escolhido a dedo). Empate no

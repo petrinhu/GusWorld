@@ -129,6 +129,15 @@ body { font-family: "Pixel Operator Mono"; background: transparent; width: 100%;
 .slot.focused {
   border: 1dp #22D3EE; box-shadow: #22D3EE 0dp 0dp 0dp 1dp inset;
 }
+/* HOVER (mouse, decisao do lider 2026-08-01, revisao 2 - "last-input-wins",
+   CommonUI Input Technical Guide/Epic): o mouse ESCREVE em state.selected via
+   route_mouse_hover (save_load_menu_loop.cpp), nao existe mais um pseudo-
+   estado :hover NATIVO separado do .focused - so ha 1 selecao possivel por
+   vez, entao NENHUMA regra ":hover" e necessaria aqui: .focused JA reflete
+   onde o mouse esteve por ultimo (ou o teclado, o que tiver agido por
+   ultimo). A revisao 1 (":hover" identico ao ".focused") ficou redundante e
+   foi removida - ver o historico deste arquivo se precisar do contexto do
+   bug original (2 itens pintados iguais ao mesmo tempo, mouse != teclado). */
 .slot.pressed {
   decorator: vertical-gradient( #22D3EE #0EA5C9 ); border: 1dp #ffffff;
   box-shadow: #ffffff 0dp 0dp 24dp 3dp;
@@ -161,6 +170,12 @@ body { font-family: "Pixel Operator Mono"; background: transparent; width: 100%;
   box-sizing: border-box; text-align: center; width: 100dp; padding: 6dp 10dp;
   border: 1dp #3A4566; border-radius: 999dp; color: #9AA5C0; font-size: 11dp; letter-spacing: 1dp;
 }
+// "Voltar" NAO participa de state.selected (nunca e alcancado por
+// UP/DOWN/teclado) - sempre desenhado com a classe "focused" fixa (ver
+// build_save_load_menu_rml), entao o :hover SUTIL abaixo e so um
+// microfeedback extra pro mouse, sem relacao com a mecanica last-input-wins
+// dos slots/pills (esses SIM tem :hover removido, ver o comentario de
+// .slot.focused acima).
 .btn-back:hover { color: #c3cadb; border-color: #6a7aa2; }
 .btn-back.focused { color: #ffffff; border: 1dp #22D3EE; box-shadow: #22D3EE 0dp 0dp 14dp 1dp; }
 .btn-back.pressed {
@@ -174,6 +189,9 @@ body { font-family: "Pixel Operator Mono"; background: transparent; width: 100%;
   border: 1dp #ffffff12; border-radius: 999dp; font-size: 12dp; color: #E7ECF5; letter-spacing: 1dp;
 }
 .confirm-pill.focused { color: #ffffff; border: 1dp #22D3EE; box-shadow: #22D3EE 0dp 0dp 18dp 1dp; }
+/* (sem :hover aqui - as pills participam de state.confirm_selected/delete_
+   confirm_selected/warning_selected, mecanica last-input-wins, ver o
+   comentario de .slot.focused acima; .focused sozinho ja reflete o mouse.) */
 /* SAVE-LOAD-AVISOS (aviso #1, mock Tela 4a "warn-box"/"warn-btn.danger"): reusa
    .confirm-title/.confirm-pill (MESMO layout/foco cyan das outras 2 confirmacoes
    acima) - so o titulo (vermelho, severidade) e o botao PERIGOSO ("Tentar

@@ -59,6 +59,7 @@
 
 #include "gus/app/screens/save_load_menu_rml.hpp"
 #include "gus/app/screens/system_menu.hpp"  // system_menu_wheel_delta_to_rmlui (REUSO, POCO generico)
+#include "gus/app/screens/ui_hover.hpp"  // ui_hover_entered_new_item (B4, paridade teclado x mouse)
 #include "gus/core/asset_paths.hpp"  // kSfxDir/kMenuHoverSfxFile/kMenuClickSfxFile
 #include "gus/core/spatial/camera_clamp.hpp"  // gus::core::spatial::Rect
 #include "gus/domain/save/save_serializer.hpp"  // LoadResult
@@ -127,40 +128,6 @@ bool hit_test(const glintfx::ElementBox& box, float x, float y) noexcept {
 std::string resolve_menu_sfx_path(std::string_view file) {
     const std::string id = join(std::string(gus::core::assets::kSfxDir), std::string(file));
     return gus::platform::assets::FilesystemAssetSource().resolve_path(id);
-}
-
-// SFX-MIGRATE-V0.9: filtro NAVEGAVEL pro callback NATIVO de hover
-// (glintfx::UiLayer::set_hover_callback) - dado o `id` que o hover nativo
-// reportou (entered=true) e o estado ATUAL, devolve true SO se `id` e um dos
-// alvos hover-testaveis por CLIQUE (MESMOS ids do roteamento de
-// SDL_EVENT_MOUSE_BUTTON_DOWN mais abaixo: warning/confirming_delete/
-// confirming_overwrite/slot+icone-de-apagar+Voltar). Substitui o antigo
-// current_hover_index (que devolvia um INDICE linear pra
-// system_menu_hover_entered_new_item comparar) - o dedup agora e por ID,
-// interno ao proprio hover nativo (ver hover_cb mais abaixo). 100%
-// string/estado, sem GL.
-bool is_navigable_hover_id(const SaveLoadMenuState& state, const std::string& id) {
-    if (state.warning_kind != SaveLoadMenuState::WarningKind::None) {
-        // Damaged tem 2 botoes (0=recover, 1=cancel); Version/RecoverFailed so
-        // tem o Cancelar (o id recover nem existe na RML nesse caso - o hover
-        // nativo nunca reporta um id que nao existe no documento carregado).
-        return id == kWarnRecoverId || id == kWarnCancelId;
-    }
-    if (state.confirming_delete) {
-        return id == kDeleteConfirmId[0] || id == kDeleteConfirmId[1];
-    }
-    if (state.confirming_overwrite) {
-        return id == kOverwriteConfirmId[0] || id == kOverwriteConfirmId[1];
-    }
-    for (int i = 0; i < gus::domain::save::kSlotCount; ++i) {
-        if (slot_selectable(state, i) && id == slot_item_id(i)) return true;
-    }
-    for (int i = 0; i < gus::domain::save::kSlotCount; ++i) {
-        if (state.slots[static_cast<std::size_t>(i)].occupied && id == delete_item_id(i)) {
-            return true;
-        }
-    }
-    return id == kBackId;
 }
 
 std::string write_save_load_rml_file(const SaveLoadMenuState& state,
@@ -401,6 +368,70 @@ void route_mouse_click(SaveLoadMenuState& state, float x, float y,
     if (handled) result.sfx = SaveLoadSfxKind::Click;
 }
 
+// LAST-INPUT-WINS (B1, decisao do lider 2026-08-01, revisao 2 - CommonUI Input
+// Technical Guide/Epic: "o cursor do mouse dispara hovered, a navegacao por
+// gamepad dispara selected - essa distincao pode deixar um elemento pairado e
+// outro selecionado ao mesmo tempo"; a correcao PADRAO da industria e o
+// dispositivo que agiu por ULTIMO manda, nao fundir os 2 estados visuais):
+// dado o cursor (x,y, espaco-janela) sob um MOUSE_MOTION FISICO real, muta a
+// SELECAO do sub-modo ATUAL (state.selected/confirm_selected/delete_confirm_
+// selected/warning_selected, ver save_load_focus_mode/save_load_focus_index em
+// save_load_menu.hpp) pro item sob o cursor - MESMA ordem de prioridade de
+// route_mouse_click acima (warning > confirming_delete > confirming_overwrite >
+// lista normal). SO slots SELECIONAVEIS (slot_selectable) participam - passar
+// o mouse sobre o autosave readonly (modo Save) ou um vazio genuino (modo
+// Load) NUNCA move a selecao pra um item invalido. Item ja focado OU fora de
+// qualquer caixa: no-op (nao muta nada) - o CHAMADOR (save_load_screen_step)
+// compara o indice de foco antes/depois pra decidir se soa Hover/reload,
+// MESMO mecanismo generico que ja serve o teclado (B4 se torna o MESMO
+// caminho, nao uma 2a logica separada).
+//
+// POR QUE ISTO NAO PRECISA DE UM CAMPO "QUEM E O DONO" (nem de esconder o
+// cursor): so e chamada a partir de SDL_EVENT_MOUSE_MOTION FISICO real (o
+// ramo correspondente de save_load_screen_step abaixo) - NUNCA a partir de
+// reload()/update() (que podem re-resolver hover NATIVO do RmlUi sem o mouse
+// ter se movido de verdade, ver o comentario de "1 update() de assentamento"
+// mais abaixo). Navegar por teclado NUNCA gera SDL_EVENT_MOUSE_MOTION -
+// "last-input-wins" emerge da PROPRIA fonte do evento: um mouse PARADO
+// enquanto o teclado navega simplesmente nunca reinvoca esta funcao.
+void route_mouse_hover(SaveLoadMenuState& state, float x, float y,
+                       const SaveLoadStepBoxes& boxes) noexcept {
+    if (state.warning_kind != SaveLoadMenuState::WarningKind::None) {
+        if (state.warning_kind == SaveLoadMenuState::WarningKind::Damaged &&
+            hit_test(boxes.warn_recover, x, y)) {
+            state.warning_selected = 0;
+        } else if (hit_test(boxes.warn_cancel, x, y)) {
+            state.warning_selected = 1;
+        }
+        return;
+    }
+    if (state.confirming_delete) {
+        for (int i = 0; i < 2; ++i) {
+            if (hit_test(boxes.delete_confirm[static_cast<std::size_t>(i)], x, y)) {
+                state.delete_confirm_selected = i;
+                return;
+            }
+        }
+        return;
+    }
+    if (state.confirming_overwrite) {
+        for (int i = 0; i < 2; ++i) {
+            if (hit_test(boxes.overwrite_confirm[static_cast<std::size_t>(i)], x, y)) {
+                state.confirm_selected = i;
+                return;
+            }
+        }
+        return;
+    }
+    for (int i = 0; i < gus::domain::save::kSlotCount; ++i) {
+        if (!slot_selectable(state, i)) continue;
+        if (hit_test(boxes.slots[static_cast<std::size_t>(i)], x, y)) {
+            state.selected = i;
+            return;
+        }
+    }
+}
+
 // Traduz SDL_Keycode -> glintfx::Key REUSANDO a ponte SDL->Godot->glintfx JA
 // EXISTENTE e testada adversarialmente (F4-2, 8/8 mutantes mortos):
 // platform/input/key_translation.hpp (SDL_Keycode -> keycode Godot) +
@@ -453,31 +484,51 @@ SaveLoadStepResult save_load_screen_step(SaveLoadMenuState& state, const SDL_Eve
         return result;
     }
 
-    if (ev.type == SDL_EVENT_KEY_DOWN && !ev.key.repeat) {
-        const SaveLoadMenuAction action =
-                save_load_menu_key_down(state, sdl_keycode_to_menu_key(ev.key.key));
-        apply_action_to_result(result, state, action);
-        return result;
-    }
-
     if (ev.type == SDL_EVENT_MOUSE_BUTTON_DOWN && ev.button.button == SDL_BUTTON_LEFT) {
         route_mouse_click(state, ev.button.x, ev.button.y, boxes, result);
         return result;
     }
 
-    if (ev.type == SDL_EVENT_MOUSE_MOTION) {
+    // B1+B4 UNIFICADOS (last-input-wins, decisao do lider 2026-08-01 revisao
+    // 2): teclado (navegacao) E mouse (hover, route_mouse_hover acima) sao os
+    // 2 UNICOS jeitos de mudar o indice de foco SEM ser um clique/confirmacao
+    // - os 2 passam pela MESMA comparacao antes/depois (save_load_focus_mode/
+    // save_load_focus_index, save_load_menu.hpp), MESMO racional de
+    // title_screen_step (nao conta como "moveu de item" quando o SUB-MODO
+    // mudou - abrir/fechar dialogo ja toca Click via a acao em si).
+    const bool is_focus_event =
+        (ev.type == SDL_EVENT_KEY_DOWN && !ev.key.repeat) || ev.type == SDL_EVENT_MOUSE_MOTION;
+    if (!is_focus_event) {
+        // SDL_EVENT_MOUSE_WHEEL (forwarding pra `.slot-list`) e qualquer outro
+        // tipo de evento NAO sao roteados aqui - MOUSE_WHEEL exige
+        // SDL_GetMouseState (consulta IMPURA de cursor real), tratado direto
+        // em SaveLoadScreen::handle_event (save_load_menu_loop.cpp) ANTES de
+        // chamar esta funcao.
+        return result;  // no-op TOTAL
+    }
+
+    const SaveLoadFocusMode mode_before = save_load_focus_mode(state);
+    const int index_before = save_load_focus_index(state);
+
+    if (ev.type == SDL_EVENT_KEY_DOWN) {
+        const SaveLoadMenuAction action =
+                save_load_menu_key_down(state, sdl_keycode_to_menu_key(ev.key.key));
+        apply_action_to_result(result, state, action);
+    } else {  // SDL_EVENT_MOUSE_MOTION
         result.mouse_move = true;
         result.mouse_x = ev.motion.x;
         result.mouse_y = ev.motion.y;
-        return result;
+        route_mouse_hover(state, ev.motion.x, ev.motion.y, boxes);
     }
 
-    // SDL_EVENT_MOUSE_WHEEL (forwarding pra `.slot-list`) e qualquer outro tipo
-    // de evento NAO sao roteados aqui - MOUSE_WHEEL exige SDL_GetMouseState
-    // (consulta IMPURA de cursor real), tratado direto em
-    // SaveLoadScreen::handle_event (save_load_menu_loop.cpp) ANTES de chamar
-    // esta funcao.
-    return result;  // no-op TOTAL
+    if (save_load_focus_mode(state) == mode_before) {
+        const int index_after = save_load_focus_index(state);
+        if (ui_hover_entered_new_item(index_before, index_after)) {
+            result.sfx = SaveLoadSfxKind::Hover;
+            result.reload = true;
+        }
+    }
+    return result;
 }
 
 namespace {
@@ -559,13 +610,15 @@ public:
         hover_sfx_id_ = audio_.load_sfx(hover_sfx_path.c_str());
         click_sfx_id_ = audio_.load_sfx(click_sfx_path.c_str());
 
-        // SOM DE HOVER (mouse) - SFX-MIGRATE-V0.9: hover_cb e o callback NATIVO
-        // (glintfx::UiLayer::set_hover_callback) - ver o comentario extenso que
-        // vivia no while(true) antigo (last_hover_sfx_id_ + is_navigable_hover_id
-        // filtram os containers que o hover nativo TAMBEM resolve mas nunca devem
-        // soar).
-        ui_->set_hover_callback(
-            [this](const char* raw_id, bool entered) { native_hover_callback_(raw_id, entered); });
+        // B1 revisao 2 (last-input-wins, decisao do lider 2026-08-01): o SOM
+        // (e a SELECAO) de hover NAO vem mais do callback NATIVO do glintfx
+        // (glintfx::UiLayer::set_hover_callback, REMOVIDO nesta revisao) - o
+        // callback nativo podia re-disparar por um simples reload()/update()
+        // sem o mouse ter se movido de verdade (achado que motivou a
+        // revisao), o que quebraria "o teclado nao perde a selecao pro mouse
+        // parado". Route_mouse_hover (save_load_menu_loop.cpp, chamado SO a
+        // partir de SDL_EVENT_MOUSE_MOTION fisico real, ver save_load_screen_
+        // step) resolve os 2 (selecao E som) a partir do MESMO evento.
 
         // DIAGNOSTICO/PROVA (SAVE-LOAD-UI etapa 6, prova visual headless Xvfb
         // :99): GUSWORLD_SAVELOAD_SCREENSHOT_DIR=<dir> assenta alguns frames e
@@ -639,13 +692,15 @@ public:
             return;
         }
 
-        // Resolve as boxes SO quando o evento precisa (MESMO custo do
-        // while(true) antigo, que so chamava get_element_box dentro do ramo de
-        // clique) - demais eventos passam um SaveLoadStepBoxes default (todas
-        // found=false), que save_load_screen_step so consulta no ramo de
-        // MOUSE_BUTTON_DOWN.
+        // Resolve as boxes quando o evento precisa (MESMO custo do while(true)
+        // antigo pro clique) - B1 revisao 2 (last-input-wins) ESTENDE isto pro
+        // MOUSE_MOTION tambem: route_mouse_hover (save_load_screen_step)
+        // precisa das MESMAS caixas pra decidir se o cursor esta sobre um
+        // item VALIDO. Demais eventos passam um SaveLoadStepBoxes default
+        // (todas found=false).
         SaveLoadStepBoxes boxes{};
-        if (ev.type == SDL_EVENT_MOUSE_BUTTON_DOWN && ev.button.button == SDL_BUTTON_LEFT) {
+        if ((ev.type == SDL_EVENT_MOUSE_BUTTON_DOWN && ev.button.button == SDL_BUTTON_LEFT) ||
+            ev.type == SDL_EVENT_MOUSE_MOTION) {
             boxes = collect_click_boxes_();
         }
 
@@ -665,11 +720,21 @@ public:
             return;
         }
         if (step.mouse_move) {
+            // B1 revisao 2 (last-input-wins): NAO retorna mais aqui direto -
+            // route_mouse_hover (dentro de save_load_screen_step) pode ter
+            // mudado a selecao (step.reload/step.sfx=Hover), entao o fluxo
+            // PRECISA continuar ate o tratamento de sfx/reload abaixo.
             handle_mouse_motion_(step.mouse_x, step.mouse_y);
-            return;
         }
         if (step.sfx == SaveLoadSfxKind::Click) {
             audio_.play_sfx(click_sfx_id_);
+        } else if (step.sfx == SaveLoadSfxKind::Hover) {
+            // B1+B4 UNIFICADOS (last-input-wins, decisao do lider 2026-08-01
+            // revisao 2): MESMO SoundId, venha a mudanca de selecao do
+            // teclado ou do mouse (route_mouse_hover) - 1 unico caminho, sem
+            // callback nativo de hover (removido - ver o historico deste
+            // arquivo antes da revisao 2).
+            audio_.play_sfx(hover_sfx_id_);
         }
 
         if (step.action.has_value()) {
@@ -847,6 +912,18 @@ private:
         ui_->load(rml_path_.c_str());
         ui_->set_viewport(pw_, ph_);
         ui_->set_dp_ratio(dp_ratio_);
+        ui_->update();  // MESMO assentamento de system_menu_loop.cpp - o layout do
+                        // documento RECEM-carregado precisa ter rodado antes de
+                        // scroll_element_into_view resolver a geometria da lista.
+
+        // SCROLL SEGUE A SELECAO (B7, decisao do lider 2026-08-01): garante que o
+        // slot state.selected fique DENTRO do recorte visivel de `.slot-list` -
+        // no-op seguro quando ja visivel. MESMO padrao de system_menu_loop.cpp
+        // (controls_scroll_target_index/scroll_element_into_view).
+        const int scroll_target = save_load_scroll_target_index(state_);
+        if (scroll_target >= 0) {
+            ui_->scroll_element_into_view(slot_item_id(scroll_target).c_str());
+        }
     }
 
     // FRAMEGRAB-7-SITIOS: extraido de present_frame_() (que so agrega o swap
@@ -878,20 +955,6 @@ private:
         hover_ev.x = mx;
         hover_ev.y = my;
         ui_->process_event(hover_ev);
-    }
-
-    // Callback NATIVO de hover do glintfx (id-based, RCSS :hover) - MESMA
-    // receita do hover_cb lambda antigo, agora metodo (captura `this` em vez de
-    // fechar sobre variaveis locais).
-    void native_hover_callback_(const char* raw_id, bool entered) {
-        const std::string id = raw_id != nullptr ? raw_id : "";
-        if (!entered) {
-            if (id == last_hover_sfx_id_) last_hover_sfx_id_.clear();
-            return;
-        }
-        if (id == last_hover_sfx_id_ || !is_navigable_hover_id(state_, id)) return;
-        last_hover_sfx_id_ = id;
-        audio_.play_sfx(hover_sfx_id_);
     }
 
     // Resolve as boxes de CLIQUE do frame ATUAL - SO as do ramo/estado ATUAL de
@@ -963,7 +1026,6 @@ private:
 
     gus::platform::audio::SoundId hover_sfx_id_ = gus::platform::audio::kInvalidSound;
     gus::platform::audio::SoundId click_sfx_id_ = gus::platform::audio::kInvalidSound;
-    std::string last_hover_sfx_id_;
 
     // Default BackToPause (MESMO fallback do while(true) antigo: qualquer
     // saida que nao seja um Back/ClosedAfterLoad explicito por acao real
