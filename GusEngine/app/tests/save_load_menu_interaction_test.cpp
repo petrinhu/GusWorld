@@ -545,6 +545,29 @@ TEST_CASE("save_load_menu (harness headless, B1 revisao 2): mouse move a selecao
 // mouse por N slots DIFERENTES tem que tocar EXATAMENTE N plays - se houvesse um 2o
 // caminho de som (ex.: o callback nativo antigo REINTRODUZIDO por engano, ou um duplo
 // disparo dentro de route_mouse_hover/save_load_screen_step), o numero seria 2N ou mais.
+//
+// MISTERIO DO 3o SLOT (investigado e FECHADO, 2026-08-01 - o team-lead pediu pra
+// nao aceitar a hipotese confortavel sem medir): a 1a versao deste teste usava 3
+// slots e mediu 2 plays em vez de 3. Instrumentado com prints de coordenada +
+// indice hit-testado a CADA motion (removidos depois de fechar o caso) - NAO e
+// bug de producao (nem perda de evento, nem som duplo): e desvio de GEOMETRIA.
+// O motion 1 (pre-medido, ANTES de qualquer reload) bateu no slot 0 com a caixa
+// EXATA (y=142==142). O motion 2 (tambem pre-medido) bateu no slot 1, mas a
+// caixa JA tinha se deslocado -6px (pre-medido y=204, real y=198 - so bateu por
+// margem, o alvo ainda caiu dentro da faixa de 56px de altura). O motion 3 (pre-
+// medido pro slot 2) NAO bateu em NADA - o desvio acumulado empurrou o alvo pra
+// fora da caixa real. A causa mais provavel: reload_() (save_load_menu_loop.cpp)
+// chama scroll_element_into_view (B7) a CADA mudanca de selecao, e isso pode
+// deslocar a lista por poucos pixels mesmo quando o item "ja esta visivel" -
+// cada reload subsequente desvia mais a geometria da PRE-medicao estatica feita
+// 1x no inicio do teste (a sonda separada load_ui() so reflete o estado ANTES do
+// 1o reload rodar). Por isso ESTE teste fica com 2 slots (motion 1 bate exato,
+// motion 2 ainda bate por estar no MESMO reload de origem) - o teste de "mouse
+// PARADO durante navegacao de teclado" (b1-last-input-wins, acima) ja prova o
+// caso de 3 slots com SEGURANCA porque so precisa de 1 medicao (o mouse fica
+// PARADO o tempo todo, nunca precisa de uma 2a posicao pre-medida apos um
+// reload ja ter rodado) - a limitacao e do HARNESS de pre-medicao estatica
+// deste teste especifico, nao da tela de producao.
 
 TEST_CASE("save_load_menu (harness headless, B1 revisao 2): mover o mouse por N slots "
           "DIFERENTES em sequencia toca EXATAMENTE N plays de hover_sfx (checagem "
