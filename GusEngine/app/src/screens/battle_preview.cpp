@@ -242,7 +242,6 @@ private:
     std::optional<glintfx::UiLayer> ui_;
     bool glintfx_live_ = false;
     float glintfx_dp_override_ = 0.0f;
-    int glintfx_injected_ = 0;  // SMOKE: conta eventos injetados na UI (prova do pipeline)
 
     // ---- audio (M6/M7-COSTURA Inc 2, ADR-011) ----
     std::optional<gus::platform::audio::AudioEngine> local_audio_engine_;
@@ -992,23 +991,16 @@ void BattleScreen::handle_event_fade_(const SDL_Event& ev) {
 }
 
 void BattleScreen::handle_event_main_(const SDL_Event& ev) {
-    // ADR-010 F1 SMOKE: injeta o evento na UI glintfx (caminho NOVO; a UI e
-    // display-only por ora, mas ja recebe input). Em paralelo ao roteamento de cena
-    // abaixo (ambos veem o mesmo evento). Loga os PRIMEIROS eventos injetados (de
-    // qualquer tipo) + toda tecla, p/ provar que o evento SDL atravessa
-    // sdl_to_glintfx -> process_event ate o motor de UI.
+    // Injeta o evento na UI glintfx (em paralelo ao roteamento de cena abaixo,
+    // ambos veem o mesmo evento). O log de smoke do ADR-010 F1 (contagem de
+    // eventos injetados) provou o pipeline SDL -> sdl_to_glintfx -> process_event
+    // ha semanas e foi removido 2026-08-01 (LOG-RUIDO-INPUT-INJETADO): afogava o
+    // terminal com uma linha por tecla, sem ser efeito de jogo nem mensagem
+    // diegetica.
     if (glintfx_on_ && ui_) {
         glintfx::UiEvent ge{};
         if (sdl_to_glintfx(ev, window_, &ge)) {
             ui_->process_event(ge);
-            const bool is_key = ge.type == glintfx::UiEvent::Type::Key;
-            if (glintfx_injected_ < 6 || (is_key && ge.pressed)) {
-                std::cout << "BattlePreview: [glintfx] input injetado #" << glintfx_injected_
-                          << " type=" << static_cast<int>(ge.type)
-                          << " key=" << static_cast<int>(ge.key) << " x=" << ge.x
-                          << " y=" << ge.y << " mods=" << ge.modifiers << "\n";
-            }
-            ++glintfx_injected_;
         }
     }
     if (battle_screen_should_close_on_event(ev)) {
