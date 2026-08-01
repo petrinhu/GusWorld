@@ -1,0 +1,18 @@
+# Allowlist do GATE(spdx-required) - tools/spdx_header_required.py.
+#
+# Uma entrada por linha: <caminho relativo a raiz do repo>\t<motivo>
+# (separador = TAB; comentarios com # e linhas em branco sao ignorados).
+#
+# Regra de ouro: um arquivo entra aqui SE E SOMENTE SE ele e de TERCEIRO -
+# por-lo com o nosso "SPDX-License-Identifier: Apache-2.0" seria uma
+# declaracao de licenca FALSA (o codigo nao e nosso). Nenhuma outra razao
+# ("ainda nao deu tempo", "e pequeno", "e gerado") justifica entrada aqui:
+# nesse caso o arquivo precisa GANHAR o cabecalho, nao ser dispensado dele.
+#
+# Cada linha abaixo tambem esta documentada em THIRD-PARTY-LICENSES.md.
+
+GusEngine/third_party/monocypher/monocypher.c	terceiro (Monocypher, BSD-2-Clause OR CC0-1.0); ja tem SPDX proprio na linha 10, nao o nosso
+GusEngine/third_party/monocypher/monocypher.h	terceiro (Monocypher, BSD-2-Clause OR CC0-1.0); ja tem SPDX proprio na linha 10, nao o nosso
+GusEngine/platform/rmlui/RmlUi_Include_GL3.h	terceiro (glad, MIT); nome de arquivo enganoso mas NAO e API do RmlUi (ver THIRD-PARTY-LICENSES.md); upstream nao usa SPDX
+GusEngine/third_party/stb/stb_image_write.h	terceiro (stb, dominio publico / MIT); upstream nao usa SPDX
+GusEngine/third_party/stb/stb_truetype.h	terceiro (stb, dominio publico / MIT); upstream nao usa SPDX

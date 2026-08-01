@@ -127,6 +127,15 @@ jobs:
       - name: i18n parity gate
         run: python3 tools/i18n_parity.py
 
+      # Gate de licenca (GATE-SPDX, 2026-08-01): todo .cpp/.hpp/.h/.c rastreado
+      # precisa do cabecalho "SPDX-License-Identifier: Apache-2.0" (exceto o que
+      # estiver na allowlist versionada de terceiros, tools/spdx_allowlist.txt).
+      # Mesma checagem do tools/check.sh (estagio GATE) - fecha a lacuna que a
+      # onda LICENSE-APACHE deixou: sem isto, nada impedia o proximo arquivo de
+      # nascer sem cabecalho, ou o antigo GPL de voltar.
+      - name: SPDX header gate
+        run: python3 tools/spdx_header_required.py
+
   asan:
     name: ASan/UBSan (core+domain+app)
     runs-on: ubuntu-latest

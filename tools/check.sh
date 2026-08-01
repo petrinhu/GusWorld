@@ -14,6 +14,7 @@
 #   SMOKE : roda o gusworld_app --smoke (N ticks + 1 render headless, sai 0)
 #   GATE  : (a) arquitetura - core/ e domain/ NAO incluem Qt NEM SDL
 #           (b) paridade i18n - tabela por locale (tools/i18n_parity.py)
+#           (j) SPDX obrigatorio - tools/spdx_header_required.py
 #   SUITE : ctest (resumo "100% tests passed ... out of N")
 #
 # Idempotente. Reaproveita o build dir existente (so reconfigura no 1o uso).
@@ -230,12 +231,26 @@ python3 "$ROOT/tools/gl3_readbackbuffer_zero.py"
 GATE_GL3_READBACKBUFFER=$?
 set -e
 
+# (j) SPDX obrigatorio (GATE-SPDX, 2026-08-01): todo .cpp/.hpp/.h/.c
+#     RASTREADO (git ls-files - nunca find/os.walk, ver docstring do script)
+#     precisa do cabecalho "SPDX-License-Identifier: Apache-2.0" perto do
+#     topo, exceto o que estiver na allowlist versionada (terceiro com
+#     licenca propria - tools/spdx_allowlist.txt). Fecha a lacuna que a
+#     onda LICENSE-APACHE deixou: nada impedia o proximo arquivo de nascer
+#     sem cabecalho, ou o antigo GPL de voltar. Ver tools/spdx_header_required.py
+#     (inclusive a auto-auditoria que reprova se a allowlist ficar
+#     desatualizada).
+set +e
+python3 "$ROOT/tools/spdx_header_required.py"
+GATE_SPDX=$?
+set -e
+
 GATE=0
 [ "$GATE_ARCH" = "0" ] && [ "$GATE_EXCL" = "0" ] && [ "$GATE_I18N" = "0" ] \
     && [ "$GATE_SDL_RATCHET" = "0" ] && [ "$GATE_LOG_CLOCK_ZERO" = "0" ] \
     && [ "$GATE_STBI_ZERO" = "0" ] && [ "$GATE_AUDIO_ZERO" = "0" ] \
     && [ "$GATE_FETCHCONTENT" = "0" ] && [ "$GATE_CTEST_TIMEOUT" = "0" ] \
-    && [ "$GATE_GL3_READBACKBUFFER" = "0" ] || GATE=1
+    && [ "$GATE_GL3_READBACKBUFFER" = "0" ] && [ "$GATE_SPDX" = "0" ] || GATE=1
 echo "GATE=$GATE"
 
 # ---------------------------------------------------------------- SUITE
