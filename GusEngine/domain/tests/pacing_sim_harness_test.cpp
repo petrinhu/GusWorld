@@ -222,7 +222,14 @@ TEST_CASE("pacing_sim: elite_ap=2 produz mais acoes do inimigo que elite_ap=1 na
 // Cura parametrizavel (X4): heal_amount maior cura mais HP por uso (P3).
 // ============================================================================
 
-TEST_CASE("pacing_sim: heal_amount (X4) maior deixa a party com HP final mais alto em P3",
+// Achado do QA 2026-08-01: `>=` na soma final aceita EMPATE, e um mutante que
+// desconecta o eixo (heal(heal_amount) -> heal(12) fixo) faz as duas lutas ficarem
+// BYTE-IDENTICAS sob a mesma seed - sum_high==sum_low, e o `>=` engole a igualdade em
+// silencio ("o teste passa justamente porque o eixo parou de funcionar"). Duas defesas
+// agora: (1) `>` estrito em vez de `>=`; (2) as arrays de final_hp_fraction NAO podem
+// ser identicas - isso mata o mutante de raiz, mesmo que algum dia a soma empate por
+// coincidencia com o eixo ainda ligado.
+TEST_CASE("pacing_sim: heal_amount (X4) maior deixa a party com HP final estritamente mais alto em P3",
           "[domain][pacing_sim]") {
     PacingAxes axes_low;
     axes_low.heal_amount = 1;
@@ -234,11 +241,16 @@ TEST_CASE("pacing_sim: heal_amount (X4) maior deixa a party com HP final mais al
 
     REQUIRE_FALSE(low.base.internal_error);
     REQUIRE_FALSE(high.base.internal_error);
+    // Prova direta de que o eixo teve EFEITO (nao so na soma - nas arrays inteiras):
+    // se um mutante desconectar heal_amount, as duas lutas viram identicas sob a mesma
+    // seed e esta comparacao falha antes mesmo de olhar a soma.
+    REQUIRE_FALSE(low.base.final_hp_fraction == high.base.final_hp_fraction);
+
     const double sum_low = low.base.final_hp_fraction[0] + low.base.final_hp_fraction[1] +
                           low.base.final_hp_fraction[2];
     const double sum_high = high.base.final_hp_fraction[0] + high.base.final_hp_fraction[1] +
                            high.base.final_hp_fraction[2];
-    CHECK(sum_high >= sum_low);
+    CHECK(sum_high > sum_low);  // ESTRITO - `>=` aceitaria o empate do eixo desligado
 }
 
 // ============================================================================
@@ -335,6 +347,44 @@ TEST_CASE("pacing_sim: aggregate_pacing exclui luta com erro interno de E9/E10/E
     REQUIRE(r.mean_hits_to_kill == Catch::Approx(2.0));  // NAO poluido pelo 999 do erro
 }
 
+// Achado do QA 2026-08-01: trocar valid_n por r.n em pct_in_window_3_5 (E2) ou em
+// pct_no_damage_taken (E9) sobrevivia a suite - nenhum teste distinguia os dois
+// denominadores. 1 erro + 3 lutas validas (2 na janela 3-5, 1 fora; 2 sem dano, 1 com
+// dano): valid_n=3 da 66.67%, mas r.n=4 (INCLUI o erro) daria 50% - os dois numeros sao
+// bem separados, entao qualquer substituicao do denominador quebra esta asserção.
+TEST_CASE("pacing_sim: aggregate_pacing usa valid_n (nao r.n) como denominador de E2 e do "
+          "lado sem-dano de E9",
+          "[domain][pacing_sim]") {
+    PacingBattleTrace erro;
+    erro.base.internal_error = true;
+    erro.base.internal_error_message = "erro sintetico";
+
+    PacingBattleTrace vitoria_janela_sem_dano_1;
+    vitoria_janela_sem_dano_1.base.outcome = CombatOutcome::Victory;
+    vitoria_janela_sem_dano_1.base.rounds = 4;  // dentro de [3,5]
+    vitoria_janela_sem_dano_1.base.damage_taken = {0, 0, 0};
+
+    PacingBattleTrace vitoria_janela_sem_dano_2 = vitoria_janela_sem_dano_1;
+
+    PacingBattleTrace derrota_fora_com_dano;
+    derrota_fora_com_dano.base.outcome = CombatOutcome::Defeat;
+    derrota_fora_com_dano.base.rounds = 10;  // FORA de [3,5]
+    derrota_fora_com_dano.base.damage_taken = {5, 0, 0};  // dano > 0
+
+    const PacingPointReport r = aggregate_pacing(
+        "denominador-teste", Tier::Trash,
+        {erro, vitoria_janela_sem_dano_1, vitoria_janela_sem_dano_2, derrota_fora_com_dano});
+
+    REQUIRE(r.n == 4);
+    REQUIRE(r.internal_errors_count == 1);
+    // valid_n=3: 2 de 3 na janela (66.67%). Se o denominador fosse r.n=4, daria 50%.
+    REQUIRE(r.pct_in_window_3_5.value == Catch::Approx(200.0 / 3.0));
+    REQUIRE(r.pct_in_window_3_5.value != Catch::Approx(50.0));
+    // valid_n=3: 2 de 3 sem dano (66.67%). Mesma prova para o lado "sem-dano" de E9.
+    REQUIRE(r.pct_no_damage_taken.value == Catch::Approx(200.0 / 3.0));
+    REQUIRE(r.pct_no_damage_taken.value != Catch::Approx(50.0));
+}
+
 // ============================================================================
 // Guarda-corpos (protocolo secao 4.1): verde/vermelho contra os numeros FIXOS do
 // pre-registro do lider, aprovados 2026-08-01 ANTES de qualquer dado.
@@ -350,10 +400,57 @@ TEST_CASE("pacing_sim: evaluate_guardrails aprova um ponto trash dentro de todas
     r.p90_rounds = 5.0;  // dentro de 2-7
     r.pct_no_damage_taken.value = 20.0;  // <= 40
     r.avg_final_hp_pct = 70.0;           // dentro de 55-90
+    r.pct_any_fall.value = 30.0;         // ha queda...
+    r.median_first_fall_round = 4.0;     // ...mas fora das rodadas 1-2 (E8 verde)
 
     const auto verdicts = evaluate_guardrails(r);
-    REQUIRE(verdicts.size() == 5);  // trash: E1+E4+E2-cauda+E9-trivial+E9-hp
+    REQUIRE(verdicts.size() == 6);  // trash: E1+E4+E2-cauda+E9-trivial+E9-hp+E8
     for (const GuardrailVerdict& v : verdicts) CHECK(v.green);
+}
+
+// Achado do QA 2026-08-01: o harness JA calculava median_first_fall_round mas nenhum
+// guarda-corpo bloqueava - um candidato com paulada na rodada 1 ou 2 passava por todos
+// os checks. Regra do protocolo (secao 4, E8): "Nenhum candidato com mediana de 1a
+// queda nas rodadas 1-2 no trash".
+TEST_CASE("pacing_sim: evaluate_guardrails reprova E8 (mediana da 1a queda na rodada 1-2, trash)",
+          "[domain][pacing_sim]") {
+    PacingPointReport r;
+    r.tier = Tier::Trash;
+    r.win_rate_pct.value = 93.0;
+    r.pct_fall_by_member[idx(PartyMember::Gus)].value = 10.0;
+    r.p10_rounds = 3.0;
+    r.p90_rounds = 5.0;
+    r.pct_no_damage_taken.value = 20.0;
+    r.avg_final_hp_pct = 70.0;
+    r.pct_any_fall.value = 40.0;       // ha queda de verdade
+    r.median_first_fall_round = 1.5;   // mediana DENTRO das rodadas 1-2 (paulada)
+
+    const auto verdicts = evaluate_guardrails(r);
+    REQUIRE(verdicts.size() == 6);
+    REQUIRE_FALSE(verdicts[5].green);  // E8 e o ultimo (so trash)
+    CHECK(verdicts[5].label.find("E8") != std::string::npos);
+    // os demais nao sao contaminados por este guarda-corpo vermelho.
+    for (std::size_t i = 0; i < 5; ++i) CHECK(verdicts[i].green);
+}
+
+// E8 nao pode reprovar quando NINGUEM cai (senao o default de percentile() sobre
+// amostra vazia - 0.0 - viraria uma coincidencia fragil, nao uma regra provada).
+TEST_CASE("pacing_sim: evaluate_guardrails E8 e vacuamente verde quando ninguem cai",
+          "[domain][pacing_sim]") {
+    PacingPointReport r;
+    r.tier = Tier::Trash;
+    r.win_rate_pct.value = 93.0;
+    r.pct_fall_by_member[idx(PartyMember::Gus)].value = 10.0;
+    r.p10_rounds = 3.0;
+    r.p90_rounds = 5.0;
+    r.pct_no_damage_taken.value = 20.0;
+    r.avg_final_hp_pct = 70.0;
+    r.pct_any_fall.value = 0.0;         // ninguem caiu em luta nenhuma
+    r.median_first_fall_round = 0.0;    // default de aggregate_pacing sobre amostra vazia
+
+    const auto verdicts = evaluate_guardrails(r);
+    REQUIRE(verdicts.size() == 6);
+    CHECK(verdicts[5].green);  // E8 nao reprova por falta de dado
 }
 
 TEST_CASE("pacing_sim: evaluate_guardrails reprova taxa de vitoria trash fora da faixa",
@@ -408,6 +505,121 @@ TEST_CASE("pacing_sim: evaluate_guardrails reprova cauda de E2 fora do envelope"
 }
 
 // ============================================================================
+// Fronteira exata dos guarda-corpos numericos (achado do QA 2026-08-01: trocar
+// >=/<= por >/< sobrevivia a suite, porque nenhum teste usava o valor EXATO da
+// fronteira - 90.0, 97.0, 12.0, 40.0, 2.0, 7.0, 55.0, 90.0, 70.0). O pre-registro do
+// protocolo (secao 4.1) documenta teto/piso INCLUSIVOS; estes testes provam qual dos
+// dois o codigo de fato faz.
+// ============================================================================
+
+TEST_CASE("pacing_sim: evaluate_guardrails aceita a fronteira MINIMA exata (inclusive), trash",
+          "[domain][pacing_sim]") {
+    PacingPointReport r;
+    r.tier = Tier::Trash;
+    r.win_rate_pct.value = 90.0;                              // exatamente o piso de E1
+    r.pct_fall_by_member[idx(PartyMember::Gus)].value = 12.0;  // exatamente o teto de E4
+    r.p10_rounds = 2.0;                                        // exatamente o piso de E2
+    r.p90_rounds = 5.0;                                         // interior (nao testa o teto aqui)
+    r.pct_no_damage_taken.value = 40.0;                         // exatamente o teto de E9
+    r.avg_final_hp_pct = 55.0;                                  // exatamente o piso de E9 (trash)
+    r.pct_any_fall.value = 0.0;
+
+    const auto verdicts = evaluate_guardrails(r);
+    for (const GuardrailVerdict& v : verdicts) CHECK(v.green);
+}
+
+TEST_CASE("pacing_sim: evaluate_guardrails aceita a fronteira MAXIMA exata (inclusive), trash",
+          "[domain][pacing_sim]") {
+    PacingPointReport r;
+    r.tier = Tier::Trash;
+    r.win_rate_pct.value = 97.0;  // exatamente o teto de E1
+    r.pct_fall_by_member[idx(PartyMember::Gus)].value = 0.0;  // interior
+    r.p10_rounds = 3.0;                                        // interior
+    r.p90_rounds = 7.0;                                         // exatamente o teto de E2
+    r.pct_no_damage_taken.value = 10.0;                         // interior
+    r.avg_final_hp_pct = 90.0;                                  // exatamente o teto de E9 (trash)
+    r.pct_any_fall.value = 0.0;
+
+    const auto verdicts = evaluate_guardrails(r);
+    for (const GuardrailVerdict& v : verdicts) CHECK(v.green);
+}
+
+TEST_CASE("pacing_sim: evaluate_guardrails aceita a fronteira exata do elite (E1 min/max, E4, E9)",
+          "[domain][pacing_sim]") {
+    PacingPointReport r_min;
+    r_min.tier = Tier::Elite;
+    r_min.win_rate_pct.value = 55.0;  // exatamente o piso de E1 elite
+    r_min.pct_fall_by_member[idx(PartyMember::Gus)].value = 40.0;  // exatamente o teto de E4 elite
+    r_min.p10_rounds = 3.0;
+    r_min.p90_rounds = 6.0;
+    r_min.avg_final_hp_pct = 70.0;  // exatamente o teto de E9 elite
+    for (const GuardrailVerdict& v : evaluate_guardrails(r_min)) CHECK(v.green);
+
+    PacingPointReport r_max = r_min;
+    r_max.win_rate_pct.value = 80.0;  // exatamente o teto de E1 elite
+    for (const GuardrailVerdict& v : evaluate_guardrails(r_max)) CHECK(v.green);
+}
+
+// Cada metrica, isolada, reprova a UM PASSO da fronteira - prova que o operador e o
+// esperado (nao so que o valor exato passa, mas que passar do valor falha).
+TEST_CASE("pacing_sim: evaluate_guardrails reprova 1 passo alem de CADA fronteira, isoladamente",
+          "[domain][pacing_sim]") {
+    auto make_baseline = []() {
+        PacingPointReport r;
+        r.tier = Tier::Trash;
+        r.win_rate_pct.value = 93.0;
+        r.pct_fall_by_member[idx(PartyMember::Gus)].value = 10.0;
+        r.p10_rounds = 3.0;
+        r.p90_rounds = 5.0;
+        r.pct_no_damage_taken.value = 20.0;
+        r.avg_final_hp_pct = 70.0;
+        r.pct_any_fall.value = 0.0;
+        return r;
+    };
+
+    {
+        PacingPointReport r = make_baseline();
+        r.win_rate_pct.value = 89.9;  // 1 passo abaixo do piso 90.0
+        REQUIRE_FALSE(evaluate_guardrails(r)[0].green);
+    }
+    {
+        PacingPointReport r = make_baseline();
+        r.win_rate_pct.value = 97.1;  // 1 passo acima do teto 97.0
+        REQUIRE_FALSE(evaluate_guardrails(r)[0].green);
+    }
+    {
+        PacingPointReport r = make_baseline();
+        r.pct_fall_by_member[idx(PartyMember::Gus)].value = 12.1;  // 1 passo acima do teto 12.0
+        REQUIRE_FALSE(evaluate_guardrails(r)[1].green);
+    }
+    {
+        PacingPointReport r = make_baseline();
+        r.p10_rounds = 1.9;  // 1 passo abaixo do piso 2.0
+        REQUIRE_FALSE(evaluate_guardrails(r)[2].green);
+    }
+    {
+        PacingPointReport r = make_baseline();
+        r.p90_rounds = 7.1;  // 1 passo acima do teto 7.0
+        REQUIRE_FALSE(evaluate_guardrails(r)[2].green);
+    }
+    {
+        PacingPointReport r = make_baseline();
+        r.pct_no_damage_taken.value = 40.1;  // 1 passo acima do teto 40.0
+        REQUIRE_FALSE(evaluate_guardrails(r)[3].green);
+    }
+    {
+        PacingPointReport r = make_baseline();
+        r.avg_final_hp_pct = 54.9;  // 1 passo abaixo do piso 55.0 (trash)
+        REQUIRE_FALSE(evaluate_guardrails(r)[4].green);
+    }
+    {
+        PacingPointReport r = make_baseline();
+        r.avg_final_hp_pct = 90.1;  // 1 passo acima do teto 90.0 (trash)
+        REQUIRE_FALSE(evaluate_guardrails(r)[4].green);
+    }
+}
+
+// ============================================================================
 // Orquestracao de UM ponto: progresso no formato EXATO do protocolo (secao 8 item 6),
 // mesma disciplina do smoke test de run_lote_all_arms no MIRA-SIM.
 // ============================================================================
@@ -453,6 +665,27 @@ TEST_CASE("pacing_sim: relatorio de 2 camadas imprime E1-E11 e os guarda-corpos"
     CHECK(text.find("E11") != std::string::npos);
     CHECK(text.find("guarda-corpos") != std::string::npos);
     CHECK(text.find("erros internos: 0 de 20") != std::string::npos);
+    // Nota do QA 2026-08-01: E11 e definida no protocolo (secao 4) para P1; em P1 nao
+    // deve aparecer o aviso de escopo (a leitura oficial e aqui mesmo).
+    CHECK(text.find("NOTA E11") == std::string::npos);
+}
+
+// Achado do QA 2026-08-01: E11 e calculada e impressa em TODOS os 6 cenarios, mas o
+// protocolo (secao 4) so a define para P1. Nao e bug (o numero e legitimo em qualquer
+// cenario), mas quem ler o relatorio precisa saber que a leitura OFICIAL e so a linha
+// de P1 - o aviso de escopo tem que aparecer nos outros 5 cenarios.
+TEST_CASE("pacing_sim: relatorio avisa o escopo de E11 (protocolo define so P1) fora de P1",
+          "[domain][pacing_sim]") {
+    PacingAxes axes;
+    const std::vector<PacingBattleTrace> traces =
+        run_point_battles(Scenario::P5_EliteSolo, axes, /*n=*/10, /*base_seed=*/7u, nullptr,
+                          'A', 1, 1);
+    const PacingPointReport r = aggregate_pacing(scenario_label(Scenario::P5_EliteSolo),
+                                                 tier_of(Scenario::P5_EliteSolo), traces);
+
+    std::ostringstream out;
+    print_point_report_layer1(out, r);
+    CHECK(out.str().find("NOTA E11") != std::string::npos);
 }
 
 // ============================================================================

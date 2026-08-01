@@ -474,6 +474,11 @@ inline constexpr double kTrashNoDamagePctCeiling = 40.0;
 inline constexpr double kTrashFinalHpPctMin = 55.0;
 inline constexpr double kTrashFinalHpPctMax = 90.0;
 inline constexpr double kEliteFinalHpPctMax = 70.0;  // elite tem que doer
+// E8 (secao 4, regra dura, so trash): "Nenhum candidato com mediana de 1a queda nas
+// rodadas 1-2 no trash" - paulada injusta vs tensao construida, achado do QA 2026-08-01
+// (o harness JA calculava median_first_fall_round mas nenhum guarda-corpo bloqueava).
+inline constexpr double kFirstFallBadRoundMin = 1.0;
+inline constexpr double kFirstFallBadRoundMax = 2.0;
 
 // ============================================================================
 // PacingPointReport: agregado de UM ponto da grade (1 cenario, 1 combinacao dos 4
@@ -714,6 +719,19 @@ struct GuardrailVerdict {
             r.avg_final_hp_pct >= kTrashFinalHpPctMin && r.avg_final_hp_pct <= kTrashFinalHpPctMax;
         out.push_back({"E9 HP final medio (trash, faixa 55-90%)", hp_ok,
                        std::to_string(r.avg_final_hp_pct) + "%"});
+
+        // E8 (achado do QA 2026-08-01, regra dura do protocolo secao 4, so trash):
+        // "Nenhum candidato com mediana de 1a queda nas rodadas 1-2". Vacuamente OK
+        // quando ninguem cai (pct_any_fall==0) - sem isso, median_first_fall_round=0.0
+        // (default de percentile() sobre amostra vazia) cairia fora de [1,2] por
+        // coincidencia, e um mutante que mudasse esse default quebraria o guarda-corpo
+        // em silencio.
+        const bool no_falls = r.pct_any_fall.value <= 0.0;
+        const bool e8_ok = no_falls || !(r.median_first_fall_round >= kFirstFallBadRoundMin &&
+                                         r.median_first_fall_round <= kFirstFallBadRoundMax);
+        out.push_back({"E8 mediana da 1a queda fora das rodadas 1-2 (trash)", e8_ok,
+                       "mediana=" + std::to_string(r.median_first_fall_round) +
+                           " (quedas=" + std::to_string(r.pct_any_fall.value) + "%)"});
     } else {
         const bool hp_ok = r.avg_final_hp_pct <= kEliteFinalHpPctMax;
         out.push_back({"E9 HP final medio (elite, teto 70% - tem que doer)", hp_ok,
@@ -794,11 +812,19 @@ inline void print_point_report_layer1(std::ostream& out, const PacingPointReport
         << r.mean_damage_taken_hp.value << "HP+-" << r.mean_damage_taken_hp.moe95 << "  ("
         << r.mean_damage_taken_pct_pool.value << "%+-" << r.mean_damage_taken_pct_pool.moe95
         << " do pool de " << kPartyTotalHpPool << "HP)\n"
-        << "  E11 (golpes ate o 1o inimigo cair, nova - NAO e a mesma pergunta que E2): n_validas="
+        << "  E11 (golpes ate o 1o inimigo cair, nova - NAO e a mesma pergunta que E2, 'golpes "
+        << "para matar 1 inimigo' e 'rodadas pra vencer a luta inteira' coincidem em '3 a 5' "
+        << "por acidente historico de terminologia, protocolo secao 1.1): n_validas="
         << r.battles_with_a_kill << " mean=" << r.mean_hits_to_kill
         << " median=" << r.median_hits_to_kill << " p10=" << r.p10_hits_to_kill
-        << " p90=" << r.p90_hits_to_kill << "\n"
-        << "--- erros internos: " << r.internal_errors_count << " de " << r.n << " ---\n";
+        << " p90=" << r.p90_hits_to_kill << "\n";
+    if (r.scenario != scenario_label(Scenario::P1_TrashVanilla)) {
+        out << "  NOTA E11: o protocolo (secao 4) define esta metrica para o cenario P1; "
+            << "o numero acima e calculado e impresso aqui por uniformidade do relatorio, mas "
+            << "quem analisar deve LER E11 SO da linha de P1 - nos demais cenarios e "
+            << "informativo, nao a leitura oficial.\n";
+    }
+    out << "--- erros internos: " << r.internal_errors_count << " de " << r.n << " ---\n";
     if (!r.first_internal_error_message.empty())
         out << "  primeira mensagem: " << r.first_internal_error_message << "\n";
 }
