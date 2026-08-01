@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 // GusEngine/app/tests/player_sprites_layout_test.cpp
 //
 // Catch2 do MAPEAMENTO DE DIRECAO -> subpasta de walk/idle dos layouts de personagem

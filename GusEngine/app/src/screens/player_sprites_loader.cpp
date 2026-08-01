@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 // gus/app/src/screens/player_sprites_loader.cpp
 //
 // Ver header. Monta os caminhos dos PNGs (data-driven por SpriteLayout) e os carrega

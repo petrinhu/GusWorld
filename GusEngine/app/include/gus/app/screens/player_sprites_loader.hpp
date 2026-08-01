@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 // gus/app/screens/player_sprites_loader.hpp
 //
 // Carrega o PlayerSpriteSet de UM personagem a partir de uma pasta base, via
