@@ -60,8 +60,9 @@ TEST_CASE("pacing_sim: daemon_spec_x aplica X1/X2 sobre a referencia elite", "[d
 }
 
 // ============================================================================
-// Tier / rotulo / braco fixo por tier (protocolo secao 2.1: trash=B_Uniform "burro" da
-// doutrina de comedimento, elite=C_F4Soft).
+// Tier / rotulo / braco fixo por tier (protocolo secao 2.1: trash=F_NoF4, elite=
+// C_F4Soft - tabela tier-mira do economy-designer, fechada em 2026-08-01, substitui o
+// placeholder inicial de B_Uniform; o lider rejeitou o sorteio uniforme explicitamente).
 // ============================================================================
 
 TEST_CASE("pacing_sim: tier_of classifica os 6 cenarios corretamente", "[domain][pacing_sim]") {
@@ -73,8 +74,9 @@ TEST_CASE("pacing_sim: tier_of classifica os 6 cenarios corretamente", "[domain]
     CHECK(tier_of(Scenario::P6_TurtleTotal) == Tier::Trash);
 }
 
-TEST_CASE("pacing_sim: fixed_arm_for casa com a decisao do lider (2026-08-01)", "[domain][pacing_sim]") {
-    CHECK(fixed_arm_for(Tier::Trash) == MiraArm::B_Uniform);
+TEST_CASE("pacing_sim: fixed_arm_for casa com a tabela tier-mira do economy-designer (2026-08-01)",
+          "[domain][pacing_sim]") {
+    CHECK(fixed_arm_for(Tier::Trash) == MiraArm::F_NoF4);
     CHECK(fixed_arm_for(Tier::Elite) == MiraArm::C_F4Soft);
 }
 

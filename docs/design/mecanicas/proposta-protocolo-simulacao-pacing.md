@@ -366,7 +366,7 @@ mudança de uso.**
 
 | # | O que falta | Valor `//SIM` proposto | Justificativa |
 |---|---|---|---|
-| V1 | **Mira fixa por tier** | **INSUMO EXTERNO: tabela tier-mira do `economy-designer`** (em elaboração paralela, ainda não publicada em `docs/`). Placeholder até ela sair: trash = sorteio uniforme (a "burra" da decisão do líder), elite = ponderada F4 suave | A decisão do líder de 2026-08-01 manda a esperteza escalar por tier e manda a tabela vir do economy-designer. Se a tabela sair antes de rodar, substitui o placeholder e o relatório cita a fonte. Se não sair, o líder aprova o placeholder explicitamente ou o estudo espera |
+| V1 | **Mira fixa por tier** | **FECHADO 2026-08-01, não é mais placeholder.** Fonte: tabela tier-mira do `economy-designer` (`proposta-economia-comedimento.md`, tabela de tiers), última pergunta decidida pelo líder no mesmo dia. Trash comum = `F_NoF4` (ponderada por F1/F2/F3, sem F4); Elite = `C_F4Soft` | O líder **rejeitou explicitamente** o sorteio uniforme (braço B): "espalha mas é roleta sem porquê, o jogador não consegue formar teoria sobre o inimigo, fere o Pillar 1". A decisão sobre "minion burro" foi a leitura F: reage a quem bate e a quem está ferido, mas ignora quem se defende - burro no sentido de não fazer a jogada esperta, não no sentido de ser aleatório |
 | V2 | Faixas da grade (X1-X4) | seção 2.1 | Cercam a referência por baixo (a suspeita é HP inflado); passos de ~20% no screening, ~10% no refino |
 | V3 | SPD inimigos | Sentinela 8, Daemon 10 (herdado do estudo-pai) | Fora do escopo (ordem de turno é outra conversa); mesmo valor para comparabilidade entre os dois estudos |
 | V4 | Atk do Daemon-Guard | eixo X2 (14/18/22), centro no 18 do estudo-pai | TBD no canon; o estudo existe para propor a faixa |
@@ -377,6 +377,14 @@ mudança de uso.**
 | V9 | N por fase | 24k / 60k / 240k (seção 3) | Margens de erro 10x mais finas que o piso de relevância em cada fase |
 | V10 | Heróis a 70% HP no P4 | herdado do L6 do estudo-pai | Cenário de pressão; comparabilidade |
 | V11 | Faixas de E1 e teto de E4 | seção 4.1, **a fixar pelo líder antes de rodar** | Pré-registro; decisão de produto pura |
+
+**Escada completa de tiers (V1, para quem ler depois entender de onde vieram os dois
+braços deste estudo):** Trash comum = F (`F_NoF4`); Trash avançado = C (`C_F4Soft`);
+Elite = C com `UtilityBrain`, sem F8; Mini-boss = D (`D_F4Strong`) com os contrapesos
+obrigatórios; Boss = D + F8; Boss final = D + F7 + F8, com o Patch-Zero fora da escada
+por manter `is_chaotic`. Este estudo só exercita trash comum e elite (protocolo seção
+2.2); os demais degraus ficam registrados aqui para rastreabilidade da tabela do
+`economy-designer`, não para uso neste harness.
 
 ---
 
@@ -435,7 +443,9 @@ líder e o Gus Dragon.
 2. **Insumo V1:** a tabela tier-mira do `economy-designer` entra assim que publicada;
    se o estudo rodar antes dela, o placeholder da V1 precisa de aprovação explícita do
    líder (e a Fase C re-roda os candidatos sob a tabela final quando ela sair, antes
-   de qualquer canonização).
+   de qualquer canonização). **Atualização 2026-08-01: a tabela saiu antes do estudo
+   rodar, com a última pergunta decidida pelo líder no mesmo dia (ver V1, seção 6). Não
+   há mais placeholder nem re-rodagem pendente por esta cláusula.**
 3. **Harness:** extensão do `mira_sim_harness.hpp` existente (que já valida a janela
    3-5 e as métricas E1-E8), por agente de engenharia (backend-engineer /
    gameplay_engineer), não inline. Novidades: statline parametrizável por ponto da

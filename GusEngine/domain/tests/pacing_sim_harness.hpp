@@ -12,10 +12,14 @@
 // mira nao tinha (E11, ver abaixo).
 //
 // O QUE MUDA em relacao ao MIRA-SIM: la a variavel experimental era a POLITICA de mira (6
-// bracos fixos); aqui a mira fica FIXA POR TIER (placeholder V1 do protocolo: trash =
-// MiraArm::B_Uniform "a burra da decisao do lider", elite = MiraArm::C_F4Soft) e a
-// variavel experimental vira o ESPACO DE NUMEROS do inimigo (4 eixos: X1 HP-mult, X2 Atk,
-// X3 AP do elite, X4 cura da Jaci).
+// bracos fixos); aqui a mira fica FIXA POR TIER e a variavel experimental vira o ESPACO
+// DE NUMEROS do inimigo (4 eixos: X1 HP-mult, X2 Atk, X3 AP do elite, X4 cura da Jaci).
+// V1 (braco por tier) NAO e mais placeholder: a tabela tier-mira do economy-designer
+// saiu e fechou em 2026-08-01 (docs/design/mecanicas/proposta-economia-comedimento.md,
+// tabela de tiers), com a ultima pergunta decidida pelo lider no mesmo dia. Trash comum =
+// MiraArm::F_NoF4 (ponderada por F1/F2/F3, sem F4 - o lider rejeitou o sorteio uniforme
+// (B) explicitamente: "espalha mas e roleta sem porque, fere o Pillar 1"); Elite =
+// MiraArm::C_F4Soft. Ver fixed_arm_for() abaixo pra escada completa de tiers.
 //
 // GAP DE ENGINE reaproveitado do MIRA-SIM (mesma nota, nao repetida em profundidade aqui):
 // CombatActor nao diferencia AP por tier - o harness gateia o inimigo pela CONTAGEM de
@@ -215,13 +219,20 @@ struct PacingScenarioSetup {
     double party_hp_fraction_start = 1.0;
 };
 
-// Braco de mira FIXO por tier (V1, protocolo secao 2.1: "placeholder, nao e o resultado
-// final da mira - so um estimulo consistente pra medir pacing"). Trash = o braco mais burro
-// (B_Uniform, decisao do lider 2026-08-01: minion comum joga mais burro pra maioria vencer
-// mais - ver doutrina de comedimento); Elite = F4-soft (C), coerente com a escalada de
-// periculosidade por dificuldade (mesma decisao).
+// Braco de mira FIXO por tier (V1, protocolo secao 2.1). NAO e mais placeholder: a
+// tabela tier-mira do economy-designer saiu e fechou em 2026-08-01 (fonte:
+// docs/design/mecanicas/proposta-economia-comedimento.md, tabela de tiers), com a
+// ultima pergunta decidida pelo lider no mesmo dia. Trash comum = F_NoF4 (ponderada por
+// F1/F2/F3, SEM F4 - reage a quem bate e a quem esta ferido, mas ignora quem se
+// defende; o lider rejeitou o sorteio uniforme (B) explicitamente: "espalha mas e
+// roleta sem porque, o jogador nao consegue formar teoria sobre o inimigo, fere o
+// Pillar 1"). Elite = C_F4Soft, coerente com a escalada de periculosidade por
+// dificuldade (doutrina do comedido/esbanjador). Escada completa de tiers (D.1
+// tabela): Trash comum=F, Trash avancado=C, Elite=C (com UtilityBrain, sem F8),
+// Mini-boss=D (com contrapesos), Boss=D+F8, Boss final=D+F7+F8 (Patch-Zero fora da
+// escada, mantem is_chaotic) - este estudo so exercita trash comum e elite.
 [[nodiscard]] inline MiraArm fixed_arm_for(Tier tier) {
-    return tier == Tier::Trash ? MiraArm::B_Uniform : MiraArm::C_F4Soft;
+    return tier == Tier::Trash ? MiraArm::F_NoF4 : MiraArm::C_F4Soft;
 }
 
 [[nodiscard]] inline PacingScenarioSetup setup_for(Scenario s, const PacingAxes& axes) {
