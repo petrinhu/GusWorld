@@ -1506,10 +1506,27 @@ TEST_CASE("save_load_menu (harness headless, tripwire GLINTFX-SCROLL-ALIGN): "
           "[save_load_menu_interaction][gl][!shouldfail]") {
     GlTestEnv env = try_boot_gl();
     if (!env.ok) {
-        INFO("GL/display indisponivel neste ambiente (sem Xvfb) - harness "
-             "pulado (degradacao segura, 0 assercoes). Rode com Xvfb :99 "
-             "(export DISPLAY=:99) pra exercitar de fato.");
-        return;
+        // ACHADO (CI vermelho, 2026-08-01): os DEMAIS TEST_CASE deste arquivo
+        // degradam com `return` cedo (0 assercoes) quando GL/Xvfb esta
+        // indisponivel - o que E o padrao correto pra eles, porque um
+        // TEST_CASE comum com 0 assercoes conta como PASSED, sem drama. MAS
+        // este TEST_CASE tem `[!shouldfail]`: o Catch2 inverte "passou" em
+        // "falhou" (ver catch_run_context.cpp, RunContext::runTest -
+        // `if (testInfo.expectedToFail() && deltaTotals.testCases.passed > 0)`
+        // vira failed). Um `return` aqui e uma trivial "passagem" pro Catch2 -
+        // e vira FALHA FALSA no runner hospedado do GitHub (ubuntu-latest sem
+        // X11/Wayland/dev-dri, ver o comentario em .github/workflows/ci.yml
+        // job asan: "o unico teste que abre GL real degrada GRACIOSAMENTE").
+        // NAO e diferenca de comportamento entre ambientes (fonte/DPI/Mesa) -
+        // e simplesmente ausencia TOTAL de GL no runner, sempre, estrutural.
+        // SKIP() e a saida certa: Catch2 conta como "skipped" (categoria
+        // PROPRIA, verificado empiricamente - nao participa de
+        // testCases.passed), entao NAO aciona a inversao do [!shouldfail].
+        SKIP("GL/display indisponivel neste ambiente (sem Xvfb) - harness "
+             "pulado (degradacao segura). Rode com Xvfb :99 (export "
+             "DISPLAY=:99) pra exercitar de fato. NAO usar `return` aqui: "
+             "com [!shouldfail], um return conta como \"passou\" pro Catch2 "
+             "e o shouldfail inverte isso em falha (reproduzido no CI).");
     }
 
     const gus::app::i18n::Translator translator = make_translator();
