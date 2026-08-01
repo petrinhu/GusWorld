@@ -113,6 +113,14 @@ add_executable(gusengine_domain_tests
     # ver target_include_directories abaixo). O run grande (10 milhoes, protocolo secao 3)
     # fica atras de GUSWORLD_MIRA_SIM_FULL; aqui so o smoke com N pequeno.
     mira_sim_harness_test.cpp
+    # PACING-SIM (protocolo docs/design/mecanicas/proposta-protocolo-simulacao-pacing.md,
+    # aprovado pelo lider 2026-08-01, estudo-irmao do MIRA-SIM): harness de simulacao de
+    # pacing - statlines parametrizaveis (4 eixos) x 6 cenarios, mira fixa por tier,
+    # metricas E1-E11 (E9 trivialidade/E10 dano sofrido/E11 golpes-pra-derrubar sao novas).
+    # pacing_sim_harness.hpp REUSA mira_sim_harness.hpp (motor, cap, erro interno, MCID,
+    # relatorio) sem modifica-lo. O run grande fica atras de GUSWORLD_PACING_SIM_FULL;
+    # aqui so o smoke com N pequeno.
+    pacing_sim_harness_test.cpp
     # Executor techMagic (ADR-016, MVP step 2): dispatcher OnCast/OnDamageDealt/
     # OnDamageReceived/Always (ApplyStatus/Leech/Reflect) via a CombatStateMachine.
     techmagic_executor_test.cpp
