@@ -770,6 +770,122 @@ TEST_CASE("pacing_sim: relatorio avisa o escopo de E11 (protocolo define so P1) 
 }
 
 // ============================================================================
+// Grade da Fase A (protocolo secao 2.1/3): 116 pontos = 80 trash + 36 elite. Numeros
+// DERIVADOS A MAO da propria conta do protocolo (16 x 5 = 80; 18 x 2 = 36), conferida
+// tambem pelo team-lead de forma independente.
+// ============================================================================
+
+TEST_CASE("pacing_sim: build_phase_a_trash_grid tem exatamente 80 pontos (16 x 5)",
+          "[domain][pacing_sim]") {
+    const auto grid = build_phase_a_trash_grid();
+    REQUIRE(grid.size() == 80);
+    for (const PacingGridPoint& gp : grid) REQUIRE(tier_of(gp.scenario) == Tier::Trash);
+}
+
+TEST_CASE("pacing_sim: build_phase_a_elite_grid tem exatamente 36 pontos (18 x 2)",
+          "[domain][pacing_sim]") {
+    const auto grid = build_phase_a_elite_grid();
+    REQUIRE(grid.size() == 36);
+    for (const PacingGridPoint& gp : grid) REQUIRE(tier_of(gp.scenario) == Tier::Elite);
+}
+
+TEST_CASE("pacing_sim: build_phase_a_grid concatena trash+elite em 116 pontos",
+          "[domain][pacing_sim]") {
+    const auto grid = build_phase_a_grid();
+    REQUIRE(grid.size() == 116);  // 80 + 36, conferido tambem pelo team-lead
+}
+
+// X1 elite usa o multiplicador EXATO (HP alvo / referencia), nao o percentual
+// arredondado do texto do protocolo ("62%/80%/100%") - 144*0.62 daria 89 (lround), nao
+// 90. Prova que os 3 pontos batem EXATAMENTE em 90/115/144.
+TEST_CASE("pacing_sim: grade elite da Fase A produz HP EXATO 90/115/144, nao arredondado",
+          "[domain][pacing_sim]") {
+    for (double mult : kPhaseAEliteHpMult) {
+        PacingAxes axes;
+        axes.hp_mult = mult;
+        const int hp = daemon_spec_x(axes).hp;
+        CHECK((hp == 90 || hp == 115 || hp == 144));
+    }
+    // os 3 valores estao todos presentes (nenhum colapsou em duplicata por
+    // arredondamento).
+    std::vector<int> hps;
+    for (double mult : kPhaseAEliteHpMult) {
+        PacingAxes axes;
+        axes.hp_mult = mult;
+        hps.push_back(daemon_spec_x(axes).hp);
+    }
+    std::sort(hps.begin(), hps.end());
+    REQUIRE(hps == std::vector<int>{90, 115, 144});
+}
+
+TEST_CASE("pacing_sim: grade trash da Fase A produz HP EXATO 22/33/44/55", "[domain][pacing_sim]") {
+    std::vector<int> hps;
+    for (double mult : kPhaseATrashHpMult) {
+        PacingAxes axes;
+        axes.hp_mult = mult;
+        hps.push_back(sentinela_spec_x("s", axes).hp);
+    }
+    REQUIRE(hps == std::vector<int>{22, 33, 44, 55});
+}
+
+// Cada ponto de P3 (trash) desdobra em 3 valores de X4 - prova que os 3 pontos gerados
+// pra UM (X1,X2) fixo tem heal_amount 6/9/12 e nada mais se repete.
+TEST_CASE("pacing_sim: build_phase_a_trash_grid desdobra P3 nos 3 valores de X4",
+          "[domain][pacing_sim]") {
+    const auto grid = build_phase_a_trash_grid();
+    std::vector<int> heals;
+    for (const PacingGridPoint& gp : grid)
+        if (gp.scenario == Scenario::P3_TrashHealer) heals.push_back(gp.axes.heal_amount);
+    // 16 combinacoes de (X1,X2) x 3 valores de X4 = 48 pontos de P3.
+    REQUIRE(heals.size() == 48);
+    const long count_6 = std::count(heals.begin(), heals.end(), 6);
+    const long count_9 = std::count(heals.begin(), heals.end(), 9);
+    const long count_12 = std::count(heals.begin(), heals.end(), 12);
+    CHECK(count_6 == 16);
+    CHECK(count_9 == 16);
+    CHECK(count_12 == 16);
+}
+
+// ============================================================================
+// run_and_evaluate_point / run_phase_a: smoke com N pequeno (motor real). O run
+// COMPLETO (N=240.000, 116 pontos, ~28 milhoes de lutas) e disparo do team-lead/lider
+// (protocolo secao 7 item 1), nunca deste harness - mesma disciplina do run_full_study
+// do MIRA-SIM.
+// ============================================================================
+
+TEST_CASE("pacing_sim: run_and_evaluate_point roda 1 ponto e devolve veredicto coerente",
+          "[domain][pacing_sim]") {
+    PacingGridPoint gp{Scenario::P1_TrashVanilla, PacingAxes{}, "teste"};
+    const PacingPointResult r = run_and_evaluate_point(gp, /*n=*/20, /*base_seed=*/99u, nullptr,
+                                                       'A', 1, 1);
+    REQUIRE(r.report.n == 20);
+    REQUIRE(r.guardrails.size() == 6);  // trash: E1+E4+E2-cauda+E9-trivial+E9-hp+E8
+    REQUIRE(r.approved == point_approved(r.guardrails));  // veredicto bate com a funcao pura
+}
+
+TEST_CASE("pacing_sim: run_phase_a smoke - progresso, 116 resultados, banner de conclusao",
+          "[domain][pacing_sim][pacing_sim_smoke]") {
+    // N pequeno de proposito - o teste e estrutural (progresso + contagem + formato),
+    // nao o run pesado real.
+    const int n_per_point = 3;
+    const std::uint32_t base_seed = 20260801;
+
+    std::ostringstream out;
+    const std::vector<PacingPointResult> results = run_phase_a(n_per_point, base_seed, out);
+
+    REQUIRE(results.size() == 116);
+    for (const PacingPointResult& r : results) REQUIRE(r.report.n == n_per_point);
+
+    const std::string text = out.str();
+    REQUIRE(text.find("Fase A") != std::string::npos);
+    REQUIRE(text.find("116 pontos") != std::string::npos);
+    // formato exato de progresso (protocolo secao 8 item 6).
+    REQUIRE(text.find("fase [A], ponto [1] de [116], simulação [") != std::string::npos);
+    REQUIRE(text.find("VEREDICTO DO PONTO") != std::string::npos);
+    REQUIRE(text.find("Fase A concluida") != std::string::npos);
+}
+
+// ============================================================================
 // Reuso-seguranca: mira_sim_harness.hpp continua intacto (a suite dele, ja auditada por 2
 // QAs, segue existindo e passando - ver CMakeLists.txt, ambos os arquivos .cpp registrados
 // no mesmo executavel gusengine_domain_tests).

@@ -843,11 +843,190 @@ inline void print_point_report_layer1(std::ostream& out, const PacingPointReport
         out << "  primeira mensagem: " << r.first_internal_error_message << "\n";
 }
 
+// Veredicto AGREGADO do ponto: [APROVADO] so se TODOS os guarda-corpos estiverem
+// verdes (protocolo secao 4: "um candidato reprova por qualquer guarda-corpo vermelho,
+// mesmo com E2 perfeita" - nao ha meio-termo).
+[[nodiscard]] inline bool point_approved(const std::vector<GuardrailVerdict>& verdicts) {
+    for (const GuardrailVerdict& v : verdicts)
+        if (!v.green) return false;
+    return true;
+}
+
 inline void print_point_guardrails_layer2(std::ostream& out, const PacingPointReport& r) {
     out << "--- guarda-corpos (pre-registro do lider, secao 4.1 - reprova por qualquer "
         << "vermelho mesmo com E2 perfeita) ---\n";
-    for (const GuardrailVerdict& v : evaluate_guardrails(r))
+    const std::vector<GuardrailVerdict> verdicts = evaluate_guardrails(r);
+    for (const GuardrailVerdict& v : verdicts)
         out << "  [" << (v.green ? "OK" : "REPROVADO") << "] " << v.label << ": " << v.detail << "\n";
+    out << "VEREDICTO DO PONTO: [" << (point_approved(verdicts) ? "APROVADO" : "REPROVADO") << "]\n";
+}
+
+// ============================================================================
+// Grade da Fase A (protocolo secao 2.1 "corte de dimensao" + secao 3 "quantas lutas"):
+// fatorial FECHADO, todos os numeros ja fixados no protocolo - nao ha escolha de design
+// pendente aqui, so encodificacao. N pleno (240.000) em TODO ponto, decisao do lider
+// 2026-08-01 ("recusou a amostra escalonada... estatistica e ciencia de medir
+// repeticoes"): a Fase A NAO usa o N reduzido (24.000) que o rascunho original do
+// protocolo propunha pro screening.
+//
+// Trash: X1(4) x X2(4) x cenarios{P1, P2, P3 x X4(3)} = 16 x 5 = 80 pontos.
+// Elite: X1(3) x X2(3) x X3(2) x cenarios{P4, P5} = 18 x 2 = 36 pontos.
+// Total: 116 pontos (conferido com o team-lead, mesma conta dos dois lados).
+// ============================================================================
+
+// Um ponto da grade: cenario + eixos + rotulo legivel pro relatorio (identifica o ponto
+// sem precisar reconstruir os eixos a partir do texto).
+struct PacingGridPoint {
+    Scenario scenario;
+    PacingAxes axes;
+    std::string label;
+};
+
+// X1 trash: percentuais do protocolo (secao 2.1) SAO exatos sobre a referencia de 55
+// (22/33/44/55 = 55 x 0.40/0.60/0.80/1.00, sem arredondamento).
+inline constexpr std::array<double, 4> kPhaseATrashHpMult{0.40, 0.60, 0.80, 1.00};
+inline constexpr std::array<int, 4> kPhaseATrashAtk{8, 10, 12, 14};
+inline constexpr std::array<int, 3> kPhaseATrashHealAmounts{6, 9, 12};  // X4, so P3
+
+// X1 elite: o protocolo (secao 2.1) da o alvo em HP (90/115/144) e os percentuais
+// "62%/80%/100%" sao ARREDONDADOS pra leitura (90/144=62.5%, 115/144=79.86%). Usar o
+// multiplicador EXATO (HP alvo / referencia) evita que o arredondamento do texto vire
+// off-by-one no lround() de sentinela_spec_x/daemon_spec_x.
+inline constexpr std::array<double, 3> kPhaseAEliteHpMult{90.0 / 144.0, 115.0 / 144.0, 1.00};
+inline constexpr std::array<int, 3> kPhaseAEliteAtk{14, 18, 22};
+inline constexpr std::array<int, 2> kPhaseAEliteAp{1, 2};
+
+[[nodiscard]] inline std::string phase_a_point_label(const std::string& tier_name,
+                                                      Scenario scenario, const PacingAxes& axes) {
+    std::string s = tier_name + " " + scenario_label(scenario) + " hp_mult=" +
+                    std::to_string(axes.hp_mult) + " atk=" + std::to_string(axes.atk);
+    if (tier_of(scenario) == Tier::Elite) s += " elite_ap=" + std::to_string(axes.elite_ap);
+    if (scenario == Scenario::P3_TrashHealer) s += " heal=" + std::to_string(axes.heal_amount);
+    return s;
+}
+
+[[nodiscard]] inline std::vector<PacingGridPoint> build_phase_a_trash_grid() {
+    std::vector<PacingGridPoint> points;
+    points.reserve(80);
+    for (double hp_mult : kPhaseATrashHpMult) {
+        for (int atk : kPhaseATrashAtk) {
+            PacingAxes base_axes;
+            base_axes.hp_mult = hp_mult;
+            base_axes.atk = atk;
+
+            for (Scenario s : {Scenario::P1_TrashVanilla, Scenario::P2_TrashParede}) {
+                points.push_back({s, base_axes, phase_a_point_label("trash", s, base_axes)});
+            }
+            // P3 desdobra em X4 (cura, 3 valores) - so este cenario usa heal_amount.
+            for (int heal : kPhaseATrashHealAmounts) {
+                PacingAxes axes = base_axes;
+                axes.heal_amount = heal;
+                points.push_back({Scenario::P3_TrashHealer, axes,
+                                 phase_a_point_label("trash", Scenario::P3_TrashHealer, axes)});
+            }
+        }
+    }
+    return points;
+}
+
+[[nodiscard]] inline std::vector<PacingGridPoint> build_phase_a_elite_grid() {
+    std::vector<PacingGridPoint> points;
+    points.reserve(36);
+    for (double hp_mult : kPhaseAEliteHpMult) {
+        for (int atk : kPhaseAEliteAtk) {
+            for (int ap : kPhaseAEliteAp) {
+                PacingAxes axes;
+                axes.hp_mult = hp_mult;
+                axes.atk = atk;
+                axes.elite_ap = ap;
+                for (Scenario s : {Scenario::P4_EliteEscolta, Scenario::P5_EliteSolo}) {
+                    points.push_back({s, axes, phase_a_point_label("elite", s, axes)});
+                }
+            }
+        }
+    }
+    return points;
+}
+
+[[nodiscard]] inline std::vector<PacingGridPoint> build_phase_a_grid() {
+    std::vector<PacingGridPoint> points = build_phase_a_trash_grid();
+    const std::vector<PacingGridPoint> elite = build_phase_a_elite_grid();
+    points.insert(points.end(), elite.begin(), elite.end());
+    return points;
+}
+
+// ============================================================================
+// Resultado de UM ponto ja processado (agregado + guarda-corpos + veredicto), pronto
+// pra impressao e pra montar a lista final de sobreviventes.
+// ============================================================================
+
+struct PacingPointResult {
+    PacingGridPoint point;
+    PacingPointReport report;
+    std::vector<GuardrailVerdict> guardrails;
+    bool approved = false;
+};
+
+// Roda UM ponto da grade (N lutas pareadas por seed) e retorna o resultado processado.
+// Reusa run_point_battles (a mesma primitiva usada em qualquer chamada isolada) +
+// aggregate_pacing + evaluate_guardrails - nada reimplementado aqui.
+[[nodiscard]] inline PacingPointResult run_and_evaluate_point(const PacingGridPoint& gp, int n,
+                                                              std::uint32_t base_seed,
+                                                              std::ostream* progress_out,
+                                                              char phase, int point_idx_1based,
+                                                              int point_total) {
+    const std::vector<PacingBattleTrace> traces =
+        run_point_battles(gp.scenario, gp.axes, n, base_seed, progress_out, phase,
+                          point_idx_1based, point_total);
+    PacingPointResult result;
+    result.point = gp;
+    result.report = aggregate_pacing(gp.label, tier_of(gp.scenario), traces);
+    result.guardrails = evaluate_guardrails(result.report);
+    result.approved = point_approved(result.guardrails);
+    return result;
+}
+
+// Roda a Fase A inteira (grade fatorial fechada, 116 pontos) e imprime o relatorio de 2
+// camadas PONTO A PONTO (nao acumulado ate o fim - mesma disciplina do MIRA-SIM: o lider
+// ve cada ponto assim que fecha). Retorna os resultados de TODOS os pontos (aprovados e
+// reprovados), pra quem orquestrar Fase B/C decidir a partir dos aprovados.
+[[nodiscard]] inline std::vector<PacingPointResult> run_phase_a(int n_per_point,
+                                                                 std::uint32_t base_seed,
+                                                                 std::ostream& out) {
+    const std::vector<PacingGridPoint> grid = build_phase_a_grid();
+    out << "=== PACING-SIM: Fase A (grade fatorial fechada, " << grid.size() << " pontos) ===\n"
+        << "protocolo: docs/design/mecanicas/proposta-protocolo-simulacao-pacing.md secao 2.1/3\n"
+        << "N por ponto: " << n_per_point << "  |  seed base: " << base_seed << "\n"
+        << "====================================================================\n";
+
+    std::vector<PacingPointResult> results;
+    results.reserve(grid.size());
+    int point_idx = 0;
+    for (const PacingGridPoint& gp : grid) {
+        ++point_idx;
+        PacingPointResult r = run_and_evaluate_point(gp, n_per_point, base_seed, &out, 'A',
+                                                     point_idx, static_cast<int>(grid.size()));
+        out << "\n### ponto " << point_idx << " de " << grid.size() << ": " << gp.label << " ###\n";
+        print_point_report_layer1(out, r.report);
+        print_point_guardrails_layer2(out, r.report);
+        out.flush();
+        results.push_back(std::move(r));
+    }
+
+    const long approved_count =
+        std::count_if(results.begin(), results.end(), [](const PacingPointResult& r) { return r.approved; });
+    out << "\n=== Fase A concluida: " << approved_count << " de " << results.size()
+        << " pontos aprovados em TODOS os guarda-corpos ===\n";
+    if (approved_count == 0) {
+        // Achado explicito do team-lead (protocolo secao 2.1, item 2 da lista de
+        // mudanca de ideia): "se NENHUM ponto da grade entrar na janela... o estudo
+        // devolve 'redesign necessario' em vez de tabela". A Fase B NAO tem vizinhanca
+        // nenhuma pra refinar sem isto - declarar em vez de silenciar.
+        out << "Fase B NAO RODA: nenhum ponto da Fase A aprovou em todos os guarda-corpos, "
+            << "entao nao ha vizinhanca nenhuma pra refinar (protocolo secao 1.3 item 2: "
+            << "isto pode significar que o problema e a FORMULA, nao os numeros).\n";
+    }
+    return results;
 }
 
 }  // namespace gus::domain::tests::pacing_sim
