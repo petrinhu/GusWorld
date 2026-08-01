@@ -1063,7 +1063,22 @@ class SystemMenuLoopScreen final : public gus::app::ScreenState {
 
         // SCROLL SEGUE A SELECAO (M2/GLINTFX-SCROLL): garante que a linha
         // state.controls_selected fique DENTRO do recorte visivel de
-        // `.ctrl-list` - no-op seguro quando a linha ja esta visivel.
+        // `.ctrl-list`.
+        //
+        // ATENCAO (achado 2026-08-01, item SCROLL-REANCORA-AO-TOPO do
+        // TODO.md): NAO e no-op quando a linha ja esta visivel - este
+        // comentario mentia isso, e a receita foi copiada pra save/load
+        // (save_load_menu_loop.cpp) antes de o erro ser achado. A API do
+        // glintfx REANCORA a linha ao TOPO da area visivel toda vez que roda
+        // (align_with_top=true e o unico modo hoje), mesmo se ela ja estivesse
+        // visivel em outra posicao (medido: -68px de deslocamento so por
+        // chamar a funcao com o item ja selecionado/visivel). Efeito: a lista
+        // treme a cada mudanca de selecao, mesmo sem precisar rolar.
+        // BLOQUEADO PELO GLINTFX: aguardando ScrollAlignment::Nearest (ja
+        // existe no RmlUi 6.x que eles embrulham, uma camada abaixo do
+        // wrapper) - pedido no bus (thread api-glintfx). Quando sair, a troca
+        // e uma linha aqui E em save_load_menu_loop.cpp, no mesmo toque. Guard
+        // [!shouldfail] em save_load_menu_interaction_test.cpp avisa sozinho.
         const int scroll_target = controls_scroll_target_index(state_);
         if (scroll_target >= 0) {
             ui_->scroll_element_into_view(controls_item_id(scroll_target).c_str());

@@ -1422,6 +1422,66 @@ TEST_CASE("save_load_menu (harness headless, B5): arrastar a barra de rolagem "
     REQUIRE(scroll_top_after > scroll_top_before);
 }
 
+// ---------------------------------------------------------------- guarda permanente B7 (item fora entra na vista)
+
+// GUARDA PERMANENTE DO B7 (SCROLL-REANCORA-AO-TOPO, "lado A" pedido pelo
+// team-lead): confirma que o comportamento FUNCIONAL do B7 continua de pe -
+// um slot fora do recorte visivel de `.slot-list` E ROLADO ATE A VISTA por
+// SaveLoadScreen::reload_() (via save_load_scroll_target_index +
+// scroll_element_into_view, chamados incondicionalmente). Isto NAO depende de
+// nenhuma matematica de visibilidade nossa (essa foi revertida - ver o
+// tripwire logo abaixo) - so confirma que a chamada incondicional resolve o
+// caso que motivou o B7: a selecao saindo da area visivel ao navegar.
+TEST_CASE("save_load_menu (harness headless, B7): slot fora do recorte visivel "
+          "e rolado ate a vista",
+          "[save_load_menu_interaction][gl][b7-scroll-guard]") {
+    GlTestEnv env = try_boot_gl();
+    if (!env.ok) {
+        INFO("GL/display indisponivel neste ambiente (sem Xvfb) - harness "
+             "pulado (degradacao segura, 0 assercoes). Rode com Xvfb :99 "
+             "(export DISPLAY=:99) pra exercitar de fato.");
+        return;
+    }
+
+    const gus::app::i18n::Translator translator = make_translator();
+
+    std::array<SaveSlotPreview, kSlotCount> slots{};
+    slots[kAutosaveSlot] = build_slot_preview(make_save_data(550), kAutosaveSlot);
+    for (int i = 1; i < kSlotCount; ++i) {
+        slots[static_cast<std::size_t>(i)] = build_slot_preview(make_save_data(100 + i), i);
+    }
+
+    SaveLoadMenuState state;
+    save_load_menu_open(state, SaveLoadMode::Load, slots);
+    state.selected = kSlotCount - 1;  // ultimo slot - fora do recorte inicial de 300dp
+
+    auto ui = load_ui(state, translator);
+    REQUIRE(ui.has_value());
+
+    const std::string last_id = "slmenu-slot-" + std::to_string(kSlotCount - 1);
+    const glintfx::ElementBox list_box = ui->get_element_box("slmenu-list");
+    REQUIRE(list_box.found);
+    const glintfx::ElementBox item_before = ui->get_element_box(last_id.c_str());
+    REQUIRE(item_before.found);
+    const bool visible_before = item_before.y >= list_box.y &&
+                                (item_before.y + item_before.h) <= (list_box.y + list_box.h);
+    INFO("item_before.y=" << item_before.y << " list_box=[" << list_box.y << ","
+         << (list_box.y + list_box.h) << "]");
+    REQUIRE_FALSE(visible_before);  // pre-condicao: comeca FORA da vista
+
+    // MESMA chamada incondicional de SaveLoadScreen::reload_() (nao a
+    // matematica de visibilidade revertida) - o CHAMADOR real nao consulta
+    // geometria antes, so chama.
+    ui->scroll_element_into_view(last_id.c_str());
+
+    const glintfx::ElementBox item_after = ui->get_element_box(last_id.c_str());
+    REQUIRE(item_after.found);
+    const bool visible_after = item_after.y >= list_box.y &&
+                                (item_after.y + item_after.h) <= (list_box.y + list_box.h);
+    INFO("item_after.y=" << item_after.y);
+    REQUIRE(visible_after);  // pos-condicao: o B7 entregou - agora esta DENTRO da vista
+}
+
 // ---------------------------------------------------------------- tripwire GLINTFX-SCROLL-ALIGN
 
 // GUARD/TRIPWIRE (item SCROLL-REANCORA-AO-TOPO do TODO.md, bus
