@@ -619,3 +619,13 @@ Regra transversal do criador (seed 9, ja no backlog doc, sem linha propria): tod
 5. **`M7-FB2-MAXIMIZE-TASKBAR` CONFIRMADO AINDA ABERTO** — maximizar a janela ainda esconde a parte de baixo atrás da barra de tarefas. Reportado originalmente pelo Gus Dragon no playtest de julho; segue reproduzindo.
 
 **Saída limpa:** `exit code 0`, autosave no slot Auto executado, zero leak, zero assert. A sessão inteira disparou `play_sfx(hit)` 423 vezes.
+
+---
+
+### 🔒 `GATE-SPDX` — follow-up da onda `LICENSE-APACHE` (2026-08-01)
+
+A onda `LICENSE-APACHE` rotacionou 531 cabeçalhos para Apache-2.0, mas **não existia nenhum gate de licença** (nem em `tools/check.sh`, nem no CI): nada impedia o próximo arquivo de nascer sem cabeçalho, ou o GPL antigo de voltar. Fecha a ressalva não-bloqueante (a) que o QA de `LIC-APACHE-6-VERIFICA` deixou registrada.
+
+| ID | Onda | Grupo | Descrição Técnica | Prioridade | Pré-requisito | Dificuldade | Status | Estado Auditado |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| GATE-SPDX | GATE-SPDX | Legal_Codigo | **Gate de cabeçalho SPDX obrigatório.** Commit 1 (`ebcce8f6`): aplica `SPDX-License-Identifier: Apache-2.0` nos 3 órfãos (`player_sprites_loader.hpp/.cpp`, `player_sprites_layout_test.cpp`) que nunca tiveram cabeçalho. Commit 2 (`1a942368`): liga `tools/spdx_header_required.py` no estágio GATE de `tools/check.sh` e como passo novo no CI (`.github/workflows/ci.yml`, job linux). Enumera por `git ls-files` (nunca find/glob) restrito a `.cpp/.hpp/.h/.c`; allowlist versionada (`tools/spdx_allowlist.txt`, 5 entradas de terceiro, motivo obrigatório por linha); prova de que morde via `tools/tests/test_spdx_header_required.py` (9 testes, cria arquivo temporário sem SPDX e confirma reprovação). `.py/.sh/.cmake/.yml` ficam de fora por decisão registrada (medido: 0/9 `.sh`, 0/1 `.cmake`, 0/3 `.yml`, 0 dos nossos `.py` com qualquer cabeçalho hoje — ligar o gate ali agora nasceria vermelho contra ~27 arquivos pré-existentes). `check.sh` 11/11 gates, suíte 2620/2620 verde. | Alta | LIC-APACHE-6-VERIFICA | Baixa | 🔍 Pendente verificação | — |
