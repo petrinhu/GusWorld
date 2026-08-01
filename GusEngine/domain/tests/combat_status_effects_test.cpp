@@ -262,7 +262,16 @@ TEST_CASE("status: break def reduzida persiste durante a duracao",
 
 // ===== HASTE / SLOW =====
 
-TEST_CASE("status: haste aumenta spd e adianta na fila", "[domain][combat][status]") {
+// Semantica revisada (COMBATE-FILA-CURSOR-FIX, decisao do lider 2026-07-27/28): quando o
+// Haste tica no PROPRIO TurnStart do hero, o cursor JA esta no ULTIMO slot da fila (o foe
+// ja agiu antes dele - n=2). recompute_by_speed preserva a particao e NUNCA move o current
+// pra frente do foe - senao o foe (JA-AGIDO) seria reclassificado como pendente e ganharia
+// um 2o turno no proximo advance (achado QA 2026-07-28, o mesmo cenario reproduzido ao vivo
+// em battle_scene_test.cpp: "PREVIEW (bug1): a 1a ACAO e o commit"). Substitui o teste
+// antigo ("... e adianta na fila"), que afirmava o hero saltando pra frente do foe no
+// proprio tick - exatamente a raiz do bug de turno-duplo.
+TEST_CASE("status: haste aumenta spd mas nao desloca quem ja agiu (preserva particao)",
+          "[domain][combat][status]") {
     CombatActor h = hero("gus", 100, /*spd=*/10);
     CombatActor e = foe("enemy", 500, /*spd=*/20);
     h.add_status(effect(StatusId::Haste, 15, 3, CardFamily::Eletrico));
@@ -270,13 +279,25 @@ TEST_CASE("status: haste aumenta spd e adianta na fila", "[domain][combat][statu
     CombatStateMachine sm({&e, &h}, [](CombatActor&, const CombatState&) { return CombatAction::pass(); },
                           nullptr, nullptr, &rng);
     REQUIRE(order_ids(sm)[0] == "enemy");
-    sm.begin_turn(); sm.run_active_turn_to_end(); sm.advance_to_next_actor();  // foe
-    sm.begin_turn();  // hero tick aplica Haste
+    sm.begin_turn(); sm.run_active_turn_to_end(); sm.advance_to_next_actor();  // foe (ja agiu)
+    sm.begin_turn();  // hero tick aplica Haste (cursor ja aponta pro hero, ultimo slot)
     REQUIRE(h.spd() == 25);
-    REQUIRE(order_ids(sm)[0] == "gus");
+    // O hero nao pula pra frente do foe so porque ficou mais rapido - o foe ja agiu e nao
+    // pode virar "pendente" de novo (ganharia um 2o turno no proximo advance).
+    REQUIRE(order_ids(sm)[0] == "enemy");
+    REQUIRE(sm.active_actor()->id() == "gus");
 }
 
-TEST_CASE("status: slow reduz spd e atrasa na fila", "[domain][combat][status]") {
+// Semantica revisada (COMBATE-FILA-CURSOR-FIX, decisao do lider 2026-07-27/28): o Slow
+// tica no PROPRIO TurnStart do hero, ou seja, o cursor JA aponta pro hero quando o
+// recompute dispara. recompute_by_speed preserva a particao e NUNCA move o current pra
+// fora do proprio slot - senao o enemy (ainda pendente) "furaria" a fila e o hero
+// perderia o turno que ja estava em andamento (a mesma classe de bug do turno-duplo,
+// so que na forma de pulo). Substitui o teste antigo ("... e atrasa na fila"), que
+// afirmava o hero sendo empurrado pra tras do enemy no MESMO instante do proprio tick -
+// exatamente a raiz do bug (achado QA 2026-07-28).
+TEST_CASE("status: slow reduz spd mas nao desloca quem ja e o current (preserva particao)",
+          "[domain][combat][status]") {
     CombatActor h = hero("gus", 100, /*spd=*/30);
     CombatActor e = foe("enemy", 500, /*spd=*/20);
     h.add_status(effect(StatusId::Slow, 15, 3, CardFamily::Eletrico));
@@ -284,9 +305,15 @@ TEST_CASE("status: slow reduz spd e atrasa na fila", "[domain][combat][status]")
     CombatStateMachine sm({&h, &e}, [](CombatActor&, const CombatState&) { return CombatAction::pass(); },
                           nullptr, nullptr, &rng);
     REQUIRE(order_ids(sm)[0] == "gus");
-    sm.begin_turn();  // hero tick aplica Slow
+    sm.begin_turn();  // hero tick aplica Slow no proprio turno (cursor ja aponta pro hero)
     REQUIRE(h.spd() == 15);
-    REQUIRE(order_ids(sm)[0] == "enemy");
+    // O hero continua current: nao e pulado so porque ficou mais lento que o enemy
+    // pendente.
+    REQUIRE(order_ids(sm)[0] == "gus");
+    REQUIRE(sm.active_actor()->id() == "gus");
+    // A SPD mais baixa so pesa a partir da PROXIMA rodada, via round_opening_side (§4.1),
+    // que le a SPD ao vivo (nao a ordem congelada da fila desta rodada).
+    REQUIRE(sm.round_opening_side() == CombatSide::Enemy);
 }
 
 TEST_CASE("status: slow clamp spd em zero", "[domain][combat][status]") {

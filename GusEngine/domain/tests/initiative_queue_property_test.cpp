@@ -10,8 +10,17 @@
 //
 //   INV-9a o cursor SEMPRE indexa dentro de [0, count); current() devolve um ator presente.
 //   INV-9b count() == numero de atores ainda na fila (sem duplicatas, sem fantasmas).
-//   INV-9c ordem ESTAVEL por SPD apos recompute_by_speed (nao-crescente em SPD); o ator que
-//          estava em turno continua sendo o current() apos o recompute.
+//   INV-9c (revisado COMBATE-FILA-CURSOR-FIX, decisao do lider 2026-07-27/28) recompute_by_
+//          speed PRESERVA A PARTICAO: ordena dentro de [0, cursor) e dentro de (cursor, fim]
+//          separadamente, NUNCA move um ator de um lado pro outro do cursor - current()
+//          fica FIXO no proprio slot (identidade E indice) e todo ator com indice < cursor
+//          (ja agiu) continua com indice < cursor apos o recompute; todo ator com indice >
+//          cursor (pendente) continua com indice > cursor. Ordem NAO-crescente em SPD DENTRO
+//          de cada lado (nao mais global: current pode ficar fora de ordem de SPD em relacao
+//          aos dois lados - e o preco de nao dar 2o turno pra quem ja agiu nem pular quem
+//          falta). Substitui o INV-9c antigo (ordem global nao-crescente apos recompute), que
+//          descrevia o full-sort cruzando o cursor - a RAIZ do bug de turno-duplo/pulo
+//          (achado QA 2026-07-28, mesmo ramo do F2-QA.8 abaixo).
 //   INV-9d advance() em volta completa incrementa round_index exatamente uma vez por wrap.
 //   INV-9e remove de ator ausente / sync de ator ausente sao no-op (cursor intacto).
 //   INV-9f reorder_actor preserva o conjunto (mesma multiplicidade de atores) e o current().
@@ -130,18 +139,63 @@ TEST_CASE("property: a fila mantem integridade sob qualquer sequencia de operaco
                     (void)before_cur;
                     break;
                 }
-                case 2: {  // mudar SPD de um ator + recompute_by_speed
+                case 2: {  // mudar SPD de verdade (Haste/Slow) + recompute_by_speed
+                    // F2-QA.8 (achado QA 2026-07-28): este ramo se declarava "mudar SPD + "
+                    // recompute" mas NUNCA aplicava delta nenhum (fuzz morto, INV-9c passava
+                    // por vacuidade). Agora aplica de verdade via apply_stat_delta (mesma
+                    // primitiva que Haste/Slow usam em producao) e afirma a propriedade que
+                    // a fila existe pra proteger: "cada ator age 1x por rodada" - por
+                    // PRESERVACAO DA PARTICAO (COMBATE-FILA-CURSOR-FIX, decisao do lider
+                    // 2026-07-27/28), nao mais por ordem global (ver INV-9c revisado acima).
+                    const int cursor_before = q.cursor();
+                    std::vector<CombatActor*> acted_before(
+                        q.order().begin(), q.order().begin() + cursor_before);
+                    std::vector<CombatActor*> pending_before(
+                        q.order().begin() + cursor_before + 1, q.order().end());
+
+                    // Muda SPD de um ator QUALQUER da fila - inclusive o proprio current, ou
+                    // quem ja agiu, ou quem falta: o recompute precisa aguentar todos os
+                    // casos, nao so o de producao (onde e sempre o current mudando a propria
+                    // SPD). apply_stat_delta so aplica 1x por StatusId; se ja aplicado antes
+                    // neste ator, e no-op seguro (delta zero) - a chamada de recompute abaixo
+                    // continua valendo como fuzz de "recompute sem mudanca nenhuma".
                     CombatActor* who = q.order()[static_cast<std::size_t>(
                         g.in_range(0, q.count() - 1))];
-                    // SPD muda via Haste/Slow no jogo; aqui aplicamos delta de stat direto.
+                    const bool haste = g.in_range(0, 1) == 0;
+                    const int magnitude = g.in_range(1, 40);
+                    who->apply_stat_delta(haste ? StatusId::Haste : StatusId::Slow, 0,
+                                          haste ? +magnitude : -magnitude);
+
                     q.recompute_by_speed();
-                    // INV-9c: ordem nao-crescente em SPD apos recompute.
-                    const auto& order = q.order();
-                    for (std::size_t i = 1; i < order.size(); ++i)
-                        REQUIRE(order[i - 1]->spd() >= order[i]->spd());
-                    // current() continua sendo o ator que estava em turno.
+
+                    // current() preservado por IDENTIDADE E por INDICE - o slot do cursor
+                    // nunca muda, e e isso que impede um ja-agido de ganhar 2o turno ou um
+                    // pendente de ser pulado, pra qualquer SPD sorteada.
                     REQUIRE(q.current() == before_cur);
-                    (void)who;
+                    REQUIRE(q.cursor() == cursor_before);
+
+                    // As duas particoes preservam o CONJUNTO (mesmos atores por identidade;
+                    // so a ordem interna pode mudar) - ninguem cruza o cursor pro outro lado.
+                    std::vector<CombatActor*> acted_after(
+                        q.order().begin(), q.order().begin() + cursor_before);
+                    std::vector<CombatActor*> pending_after(
+                        q.order().begin() + cursor_before + 1, q.order().end());
+                    std::sort(acted_before.begin(), acted_before.end());
+                    std::sort(acted_after.begin(), acted_after.end());
+                    REQUIRE(acted_after == acted_before);
+                    std::sort(pending_before.begin(), pending_before.end());
+                    std::sort(pending_after.begin(), pending_after.end());
+                    REQUIRE(pending_after == pending_before);
+
+                    // Ordem nao-crescente em SPD DENTRO de cada lado (nao mais GLOBAL: o
+                    // current pode ficar fora de ordem de SPD em relacao aos dois lados -
+                    // e o preco de nao dar 2o turno pra quem ja agiu nem pular quem falta).
+                    const auto& order = q.order();
+                    for (std::size_t i = 1; i < acted_after.size(); ++i)
+                        REQUIRE(order[i - 1]->spd() >= order[i]->spd());
+                    for (std::size_t i = static_cast<std::size_t>(cursor_before) + 2;
+                        i < order.size(); ++i)
+                        REQUIRE(order[i - 1]->spd() >= order[i]->spd());
                     break;
                 }
                 case 3: {  // remove (so se sobrar >= 1; preserva precondicao de current())

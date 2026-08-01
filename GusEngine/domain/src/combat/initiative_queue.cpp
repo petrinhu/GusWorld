@@ -94,10 +94,29 @@ bool InitiativeQueue::delay_current(int n) {
 }
 
 void InitiativeQueue::recompute_by_speed() {
-    CombatActor* current_actor = current();
-    std::stable_sort(order_.begin(), order_.end(),
+    // PRESERVA A PARTICAO (COMBATE-FILA-CURSOR-FIX, decisao do lider 2026-07-27/28): sorts
+    // SEPARADOS pra [0, cursor_) - ja-agidos - e (cursor_, fim] - pendentes. O slot cursor_
+    // em si (order_[cursor_], o current()) fica de FORA dos dois ranges - nao participa de
+    // nenhum sort e portanto nunca se move.
+    //
+    // Por que o current NAO entra no sort do bloco ja-agido (mesmo sendo tecnicamente
+    // "[0, cursor_]" inclusive, como a decisao descreve em prosa): se ele entrasse e saisse
+    // mais rapido que algum ja-agido, o cursor teria que RECUAR pra acompanhar a nova
+    // posicao do current dentro do bloco (cursor_ = index_of(current_actor)) - e isso
+    // REABRE como "pendentes" os indices que ele ultrapassou, dando aos atores que la
+    // estavam um SEGUNDO turno na MESMA rodada. E a mesma classe de bug que este metodo
+    // existe pra fechar, so espelhada (ja-agido ganha turno extra em vez de pendente
+    // perder o seu). Fixar o current no proprio slot - cursor_ NUNCA recalculado por busca
+    // - e a unica construcao que preserva os dois invariantes ao mesmo tempo: identidade
+    // de current() E "cada ator age exatamente 1x por rodada", pra qualquer posicao do
+    // cursor, inclusive o caso-limite cursor_ no ultimo indice (onde o bloco "ja-agido"
+    // e a fila INTEIRA e o bloco pendente e vazio).
+    std::stable_sort(order_.begin(), order_.begin() + cursor_,
                      [](const CombatActor* a, const CombatActor* b) { return a->spd() > b->spd(); });
-    cursor_ = std::max(0, index_of(current_actor));
+    std::stable_sort(order_.begin() + cursor_ + 1, order_.end(),
+                     [](const CombatActor* a, const CombatActor* b) { return a->spd() > b->spd(); });
+    // cursor_ intocado por construcao: nenhum dos dois sorts acima cobre o indice cursor_,
+    // entao order_[cursor_] (current()) e sempre o MESMO ator, no MESMO slot.
 }
 
 void InitiativeQueue::sync_cursor_to(CombatActor* actor) {

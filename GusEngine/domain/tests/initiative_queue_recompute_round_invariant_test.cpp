@@ -1,31 +1,32 @@
 // SPDX-License-Identifier: Apache-2.0
 // initiative_queue_recompute_round_invariant_test.cpp
 //
-// FALHA CONHECIDA, DOCUMENTADA DE PROPOSITO (Catch2 [!shouldfail]). Estes dois casos
-// FALHAM hoje - e e exatamente por isso que existem. O [!shouldfail] faz o ctest
-// registra-los como PASSED enquanto a falha persistir, entao a suite continua verde; no
-// dia em que o bug for consertado, eles passam a PASSAR e o [!shouldfail] os reprova,
-// gritando "o bug morreu, tire a marcacao". Sao o CRITERIO DE ACEITE do conserto.
+// CONSERTADO (COMBATE-FILA-CURSOR-FIX, 2026-08-01). Ate esta data os dois casos abaixo
+// FALHAVAM DE PROPOSITO (Catch2 [!shouldfail]): o ctest os registrava como PASSED enquanto
+// a falha persistisse, mantendo a suite verde; no dia do conserto eles passariam a PASSAR
+// de verdade e o [!shouldfail] os reprovaria, gritando "o bug morreu, tire a marcacao".
+// Esse dia chegou - a marcacao foi REMOVIDA e os dois casos agora sao a rede de regressao
+// PERMANENTE da semantica nova. Historia preservada abaixo por registro.
 //
 // ---------------------------------------------------------------------------------
-// O BUG
+// O BUG (historico - ja corrigido)
 // ---------------------------------------------------------------------------------
 // Invariante violado: "cada ator age EXATAMENTE UMA VEZ por rodada da fila" (o mesmo
 // invariante que motivou o COMBATE-FILA-CURSOR-FIX, TODO.md).
 //
 // RAIZ: InitiativeQueue::recompute_by_speed() (domain/src/combat/initiative_queue.cpp)
-// re-ordena a fila INTEIRA por SPD - inclusive a regiao [0, cursor_], a dos atores que
-// JA AGIRAM nesta rodada - e so preserva a IDENTIDADE do current(), reapontando o cursor
-// com `cursor_ = index_of(current_actor)`. E a MESMA raiz que o COMBATE-FILA-CURSOR-FIX
-// fechou em reorder_actor/reorder_pending/delay_current ("a regiao [0, cursor_] NUNCA e
-// reescrita"), sobrevivendo por um portao que aquele fix nao tocou.
+// re-ordenava a fila INTEIRA por SPD - inclusive a regiao [0, cursor_], a dos atores que
+// JA AGIRAM nesta rodada - e so preservava a IDENTIDADE do current(), reapontando o cursor
+// com `cursor_ = index_of(current_actor)`. Era a MESMA raiz que o COMBATE-FILA-CURSOR-FIX
+// ja tinha fechado em reorder_actor/reorder_pending/delay_current ("a regiao [0, cursor_]
+// NUNCA e reescrita"), sobrevivendo por um portao que aquele fix ainda nao tinha tocado.
 //
 // Consequencia, nos dois sentidos:
-//   - um ator PENDENTE pode acabar ATRAS do cursor  => perde o turno (caso 1);
-//   - um ator JA-AGIDO pode acabar NA FRENTE do cursor => age de novo, com AP e mana
+//   - um ator PENDENTE podia acabar ATRAS do cursor  => perdia o turno (caso 1);
+//   - um ator JA-AGIDO podia acabar NA FRENTE do cursor => agia de novo, com AP e mana
 //     recarregados por refresh_resources_for_turn (caso 2, o mais grave).
 //
-// ALCANCE REAL (nao e teorico): a FSM chama recompute_by_speed NO MEIO DA RODADA em tres
+// ALCANCE REAL (nao era teorico): a FSM chama recompute_by_speed NO MEIO DA RODADA em tres
 // sitios de producao, sempre que Haste/Slow entra ou expira -
 //   domain/src/combat/combat_state_machine.cpp:842   (fim de turno ativo, expire)
 //   domain/src/combat/combat_state_machine.cpp:1039  (fim de turno perdido por Stun/morte)
@@ -35,23 +36,29 @@
 // Nenhum deles mexe na fila por tras.
 //
 // ---------------------------------------------------------------------------------
-// DECISAO DO LIDER (2026-07-28) - a semantica a implementar
+// DECISAO DO LIDER (2026-07-27/28) - a semantica implementada
 // ---------------------------------------------------------------------------------
-// Quando Haste/Slow muda a SPD no meio da rodada, recompute_by_speed passa a PRESERVAR A
-// PARTICAO: ordena por SPD DENTRO de [0, cursor_] e DENTRO de (cursor_, fim] de forma
-// independente, sem nunca mover ator de um lado pro outro. Quem ja agiu continua tendo
-// agido; quem falta continua faltando. O efeito de velocidade aparece na hora (a ordem
-// dos pendentes muda), mas ninguem age duas vezes nem e pulado.
+// Quando Haste/Slow muda a SPD no meio da rodada, recompute_by_speed PRESERVA A PARTICAO:
+// ordena por SPD DENTRO de [0, cursor_) e DENTRO de (cursor_, fim] de forma independente,
+// sem nunca mover ator de um lado pro outro. O current() (slot cursor_) fica FIXO no
+// proprio lugar - nao entra em nenhum dos dois sorts. Quem ja agiu continua tendo agido;
+// quem falta continua faltando. O efeito de velocidade aparece na hora pros PENDENTES
+// (a ordem entre eles muda), mas ninguem age duas vezes nem e pulado.
 // O lider preferiu isto a diferir o recompute para a virada da rodada.
 //
-// QUANDO O CONSERTO ENTRAR:
-//   1. estes dois casos vao PASSAR e, por causa do [!shouldfail], serao reportados como
-//      FAILED pelo ctest - isso e o sinal, nao uma regressao;
-//   2. TIRE o "[!shouldfail]" das duas tags e deixe os casos como testes normais (eles
-//      viram a rede de regressao permanente da semantica nova);
-//   3. so entao mexa no ramo de fuzz morto do F2-QA.8 (initiative_queue_property_test.cpp
-//      case 2 declara "mudar SPD + recompute" e nunca muda SPD) e acrescente ali a
-//      propriedade "cada ator age 1x por rodada". Os dois andam JUNTOS, de proposito.
+// Nota de implementacao (initiative_queue.cpp): o current NAO participa do sort do bloco
+// "ja-agido" (nao e um sort inclusivo de [0, cursor_] com o cursor recalculado por
+// index_of depois). Se participasse e saisse mais rapido que algum ja-agido, o cursor
+// teria que RECUAR pra acompanhar sua nova posicao - reabrindo como "pendentes" indices
+// que ja tinham atores agidos, dando a eles um 2o turno na mesma rodada (a MESMA classe de
+// bug, so espelhada). Fixar o current no proprio slot e a unica construcao que satisfaz
+// "current() identico" E "ninguem age 2x nem e pulado" simultaneamente, pra qualquer
+// posicao do cursor - inclusive o caso-limite cursor_ no ultimo slot (onde a regiao
+// "ja-agida" e a fila INTEIRA), coberto por teste em initiative_queue_test.cpp.
+//
+// F2-QA.8 (initiative_queue_property_test.cpp): o fuzz morto (case 2 se declarava "mudar
+// SPD + recompute" e nunca mudava SPD) foi corrigido no mesmo passo, com a propriedade
+// "cada ator age 1x por rodada" (preservacao da particao) acrescentada ali.
 //
 // Subsistema: domain/combat (InitiativeQueue + CombatStateMachine). POCO puro, headless.
 
@@ -136,10 +143,10 @@ Card mana_sink_card() {
 // ============================================================================
 
 TEST_CASE(
-    "FALHA CONHECIDA (recompute_by_speed reordena a regiao [0, cursor_]): Haste expirando "
-    "no meio da rodada empurra o portador para TRAS do cursor e o ator seguinte PERDE o "
-    "turno - viola 'cada ator age exatamente 1x por rodada' (combat_state_machine.cpp:842)",
-    "[domain][combat][queue][regressao][!shouldfail]") {
+    "regressao (COMBATE-FILA-CURSOR-FIX): Haste expirando no meio da rodada NAO empurra o "
+    "portador para TRAS do cursor - o ator seguinte nao perde o turno - 'cada ator age "
+    "exatamente 1x por rodada' (combat_state_machine.cpp:842)",
+    "[domain][combat][queue][regressao]") {
     // volt abre a rodada (SPD 8). gus tem SPD base 5, mas ganha Haste +10 no proprio
     // TurnStart (SPD 15) e o buff expira no FIM desse mesmo turno, derrubando pra 5.
     CombatActor volt = party_member("volt", /*spd=*/8);
@@ -155,9 +162,11 @@ TEST_CASE(
 
     const std::vector<TurnStart> turns = drive(sm, /*stop_at_round=*/1);
 
-    // O que acontece HOJE: ao expirar o Haste no fim do turno do gus, o recompute joga o
-    // gus pro fim da fila e o cursor o segue (cursor = index_of(gus) = 2). O advance
-    // seguinte da a volta e abre a rodada 1 - o e1, que estava pendente, nunca foi chamado.
+    // ANTES DO FIX: ao expirar o Haste no fim do turno do gus, o recompute jogava o gus pro
+    // fim da fila e o cursor o seguia (cursor = index_of(gus) = 2). O advance seguinte dava
+    // a volta e abria a rodada 1 - o e1, que estava pendente, nunca era chamado. DEPOIS DO
+    // FIX: gus fica FIXO no proprio slot (nao entra no sort do bloco ja-agido), entao o
+    // cursor nao recua e e1 recebe o turno normalmente.
     INFO("turnos observados na rodada 0: " << [&] {
         std::string s;
         for (const TurnStart& t : turns)
@@ -167,7 +176,6 @@ TEST_CASE(
 
     CHECK(turns_of(turns, 0, "volt") == 1);
     CHECK(turns_of(turns, 0, "gus") == 1);
-    // ESTA e a assercao que falha hoje (e1 = 0 turnos: foi pulado).
     CHECK(turns_of(turns, 0, "e1") == 1);
 }
 
@@ -176,14 +184,15 @@ TEST_CASE(
 // ============================================================================
 
 TEST_CASE(
-    "FALHA CONHECIDA (recompute_by_speed reordena a regiao [0, cursor_]): Haste aplicado no "
-    "meio da rodada joga um ator JA-AGIDO para a frente do cursor e ele age DUAS VEZES na "
-    "mesma rodada, com AP e mana recarregados nas duas - viola 'cada ator age exatamente 1x "
-    "por rodada' (combat_state_machine.cpp:2611)",
-    "[domain][combat][queue][regressao][!shouldfail]") {
-    // Mesma armacao do caso 1, com o Haste do gus DURANDO (nao expira dentro da rodada):
-    // o recompute do TurnStart do gus o joga pro slot 0 e empurra o volt - que JA AGIU -
-    // pro slot 1, na frente do cursor. O advance seguinte devolve o turno ao volt.
+    "regressao (COMBATE-FILA-CURSOR-FIX): Haste aplicado no meio da rodada NAO joga um ator "
+    "JA-AGIDO para a frente do cursor - ninguem age DUAS VEZES na mesma rodada - 'cada ator "
+    "age exatamente 1x por rodada' (combat_state_machine.cpp:2611)",
+    "[domain][combat][queue][regressao]") {
+    // Mesma armacao do caso 1, com o Haste do gus DURANDO (nao expira dentro da rodada).
+    // ANTES DO FIX: o recompute do TurnStart do gus o jogava pro slot 0 e empurrava o volt -
+    // que JA AGIU - pro slot 1, na frente do cursor; o advance seguinte devolvia o turno ao
+    // volt. DEPOIS DO FIX: gus fica FIXO no proprio slot (ultimo indice da rodada), entao o
+    // bloco ja-agido {volt} nao e reaberto como pendente.
     CombatActor volt = party_member("volt", /*spd=*/8);
     CombatActor gus = party_member("gus", /*spd=*/5);
     CombatActor e1 = enemy("e1", /*spd=*/7);

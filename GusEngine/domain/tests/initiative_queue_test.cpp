@@ -189,18 +189,61 @@ TEST_CASE("initiative_queue: contains e remove de ausente e seguro",
 }
 
 // ---- RecomputeBySpeed (Haste/Slow, secao 4) ---------------------------------------
+// Semantica revisada (COMBATE-FILA-CURSOR-FIX, decisao do lider 2026-07-27/28):
+// recompute_by_speed PRESERVA A PARTICAO - ordena dentro de [0, cursor) (ja-agidos,
+// EXCLUINDO o current) e dentro de (cursor, fim] (pendentes) separadamente. O current()
+// fica FIXO no proprio slot (nao entra em nenhum dos dois sorts): se ele participasse do
+// sort do bloco ja-agido e saisse mais rapido que algum deles, o cursor teria que RECUAR
+// pra acompanhar sua nova posicao - reabrindo como "pendentes" indices que ja tinham
+// atores AGIDOS, e dando a eles um SEGUNDO turno na mesma rodada (a mesma classe de bug
+// que este fix elimina, so que espelhada). Por isso o current nunca entra no sort: quem
+// ja agiu continua tendo agido, quem falta continua faltando, e ninguem age 2x nem e
+// pulado - para QUALQUER posicao do cursor, inclusive o fim da fila (ver o caso 2 do
+// tripwire de round-invariant, initiative_queue_recompute_round_invariant_test.cpp).
+// Substitui o teste antigo (pre-fix), que afirmava o full-sort cruzando o cursor como
+// comportamento desejado - exatamente a raiz do bug (achado QA 2026-07-28).
 
-TEST_CASE("initiative_queue: recompute_by_speed reordena mantendo o ator corrente",
+TEST_CASE("initiative_queue: recompute_by_speed reordena dentro de cada lado da particao, "
+          "sem cruzar o cursor",
           "[domain][combat][queue]") {
+    CombatActor a = actor("a", 30), b = actor("b", 20), c = actor("c", 10), d = actor("d", 5);
+    InitiativeQueue q({&a, &b, &c, &d});  // ordem: a, b, c, d
+    q.advance();                          // cursor 1, current = b (a ja agiu)
+    // d (PENDENTE, indice 3) fica mais rapido que TODOS - inclusive quem ja agiu (a, b):
+    // sob o full-sort antigo, d saltaria pra frente do cursor e contaria como "ja agido"
+    // sem NUNCA ter agido (raiz do bug de turno-duplo). Sob a particao nova, d so pode
+    // se mover DENTRO da regiao pendente (indices > cursor).
+    d.apply_stat_delta(StatusId::Haste, 0, +95);  // spd 100
+    q.recompute_by_speed();
+    // [0, cursor) = {a} intocado (unico elemento, nao ha o que reordenar). current() = b
+    // fixo no proprio slot (cursor 1). (cursor, fim] = {c, d} reordenado por SPD: d(100)
+    // antes de c(10) - o efeito de velocidade aparece na hora PRA QUEM AINDA VAI AGIR.
+    REQUIRE(order_ids(q) == std::vector<std::string>{"a", "b", "d", "c"});
+    REQUIRE(q.current()->id() == "b");
+    REQUIRE(q.cursor() == 1);
+}
+
+TEST_CASE("initiative_queue: recompute_by_speed no fim da fila (cursor no ultimo slot) nao "
+          "da 2o turno a quem ja agiu",
+          "[domain][combat][queue]") {
+    // Caso-limite que provou a necessidade de FIXAR o current no proprio slot (em vez de
+    // incluir o current no sort de [0,cursor] e re-localiza-lo por identidade): com o
+    // cursor no ULTIMO indice, a regiao "ja-agida" e a fila INTEIRA - se o current entrasse
+    // no sort e saisse mais rapido que os demais, o cursor teria que RECUAR pra
+    // index_of(current), reabrindo os slots que ele ultrapassou como "pendentes" e dando
+    // um 2o turno a quem ja tinha jogado (ver comentario acima e o Caso 2 do tripwire).
     CombatActor a = actor("a", 30), b = actor("b", 20), c = actor("c", 10);
     InitiativeQueue q({&a, &b, &c});  // ordem: a, b, c
-    q.advance();                      // current = b
-    // c fica mais rapido que todos (Haste): nova ordem por SPD = c, a, b
-    c.apply_stat_delta(StatusId::Haste, 0, +50);  // spd 60
+    q.advance();
+    q.advance();  // cursor 2 (ultimo slot), current = c; a e b ja agiram
+    c.apply_stat_delta(StatusId::Haste, 0, +90);  // spd 100: mais rapido que TODOS
     q.recompute_by_speed();
-    REQUIRE(order_ids(q) == std::vector<std::string>{"c", "a", "b"});
-    // o cursor continua apontando pro ator que estava em turno (b).
-    REQUIRE(q.current()->id() == "b");
+    // [0, cursor) = {a, b} pode se reordenar entre si (aqui ja estava em ordem de SPD,
+    // fica igual); current() = c fixo no proprio slot (cursor 2), NUNCA salta pra frente
+    // de a/b so porque ficou mais rapido - eles ja agiram e nao ganham 2o turno.
+    REQUIRE(order_ids(q) == std::vector<std::string>{"a", "b", "c"});
+    REQUIRE(q.current()->id() == "c");
+    REQUIRE(q.cursor() == 2);
 }
 
 // ---- SyncCursorTo (Knockback no proprio tick, secao 4) ----------------------------

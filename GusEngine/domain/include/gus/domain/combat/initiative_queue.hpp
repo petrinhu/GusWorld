@@ -84,7 +84,19 @@ public:
     bool delay_current(int n);
 
     // Recomputa a ordem por SPD (entrada de novos atores ou mudanca de SPD via
-    // Haste/Slow). secao 4. Mantem o cursor apontando pro ator que estava em turno.
+    // Haste/Slow). secao 4. PRESERVA A PARTICAO (COMBATE-FILA-CURSOR-FIX, decisao do
+    // lider 2026-07-27/28): ordena por SPD dentro de [0, cursor()) - ja-agidos - e dentro
+    // de (cursor(), fim] - pendentes - de forma independente, NUNCA cruzando o cursor. O
+    // ator current() fica FIXO no proprio slot (nao entra em nenhum dos dois sorts): se
+    // entrasse no sort do bloco ja-agido e saisse mais rapido que algum deles, o cursor
+    // teria que RECUAR pra acompanhar sua nova posicao, reabrindo indices ja-agidos como
+    // "pendentes" e dando a eles um 2o turno na mesma rodada (a mesma classe de bug do
+    // turno-duplo/pulo que este metodo existe pra evitar, so espelhada). current() e
+    // cursor() saem IDENTICOS (mesmo ator, mesmo indice); quem ja agiu continua tendo
+    // agido, quem falta continua faltando - so a ordem de EXIBICAO dentro de cada lado
+    // muda. Substitui o comportamento antigo (full-sort da fila inteira reapontando o
+    // cursor por index_of(current) - achado QA 2026-07-28, initiative_queue_recompute_
+    // round_invariant_test.cpp).
     void recompute_by_speed();
 
     // Re-sincroniza o cursor pra continuar apontando para actor (FSM quando uma
