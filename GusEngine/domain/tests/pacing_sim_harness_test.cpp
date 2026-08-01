@@ -512,6 +512,35 @@ TEST_CASE("pacing_sim: evaluate_guardrails reprova cauda de E2 fora do envelope"
 // dois o codigo de fato faz.
 // ============================================================================
 
+// Decisao do lider 2026-08-01 (respondendo a pergunta do team-lead sobre o achado do
+// QA): SO O TETO da queda do Gus importa, DE PROPOSITO, sem piso. Gus caindo quase
+// nunca (aqui 0%) NAO reprova E4 - a trivialidade tem regua propria em E9. Este teste
+// e o registro que evita reabrir a mesma pergunta numa proxima rodada de QA.
+TEST_CASE("pacing_sim: evaluate_guardrails E4 nao tem piso - Gus caindo 0% e sempre verde",
+          "[domain][pacing_sim]") {
+    PacingPointReport r_trash;
+    r_trash.tier = Tier::Trash;
+    r_trash.win_rate_pct.value = 93.0;
+    r_trash.pct_fall_by_member[idx(PartyMember::Gus)].value = 0.0;  // MUITO abaixo de 8-12%
+    r_trash.p10_rounds = 3.0;
+    r_trash.p90_rounds = 5.0;
+    r_trash.pct_no_damage_taken.value = 20.0;
+    r_trash.avg_final_hp_pct = 70.0;
+    r_trash.pct_any_fall.value = 0.0;
+    const auto verdicts_trash = evaluate_guardrails(r_trash);
+    CHECK(verdicts_trash[1].green);  // E4 e o 2o - PASSA mesmo com queda zero do Gus
+
+    PacingPointReport r_elite;
+    r_elite.tier = Tier::Elite;
+    r_elite.win_rate_pct.value = 65.0;
+    r_elite.pct_fall_by_member[idx(PartyMember::Gus)].value = 0.0;  // MUITO abaixo de 30-40%
+    r_elite.p10_rounds = 3.0;
+    r_elite.p90_rounds = 6.0;
+    r_elite.avg_final_hp_pct = 60.0;
+    const auto verdicts_elite = evaluate_guardrails(r_elite);
+    CHECK(verdicts_elite[1].green);  // mesma regra vale pro elite
+}
+
 TEST_CASE("pacing_sim: evaluate_guardrails aceita a fronteira MINIMA exata (inclusive), trash",
           "[domain][pacing_sim]") {
     PacingPointReport r;

@@ -341,6 +341,14 @@ são decisão de produto pura, e proponho faixas para ele escolher (ou mandar ou
    braço C cru reprovaram na análise); elite ≤ 30 a 40% (elite PODE derrubar o Gus às
    vezes: é para isso que a Análise Preditiva §2.1 existe).
 
+   **Decisão do líder, 2026-08-01 (achado do QA independente do harness, resolvido por
+   pergunta explícita do team-lead):** a faixa acima ("8% a 12%" trash, "30% a 40%"
+   elite) é lida como **TETO, sem piso**. Um candidato em que o Gus quase nunca cai
+   **aprova** este guarda-corpo - Gus cair pouco nunca é problema em si, e a
+   trivialidade (luta oca, sem tensão nenhuma) já tem régua PRÓPRIA em E9 (% de lutas
+   sem dano nenhum). A ausência de piso em E4 é intencional, não lacuna; este registro
+   existe para nenhuma auditoria futura reabrir a mesma pergunta.
+
 ---
 
 ## 5. Piso de relevância (MCID)

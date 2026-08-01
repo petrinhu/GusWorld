@@ -464,6 +464,15 @@ inline constexpr double kEliteWinRateMinPct = 55.0;
 inline constexpr double kEliteWinRateMaxPct = 80.0;
 // E4 (secao 4.1 item 2): teto de quedas do Gus por tier (limite SUPERIOR da faixa
 // aprovada - "teto" e o pior caso tolerado, nao o centro da faixa).
+//
+// DECISAO DO LIDER, 2026-08-01 (achado do QA, resolvido apos pergunta explicita do
+// team-lead): SO O TETO IMPORTA, DE PROPOSITO, SEM PISO. A faixa "8% a 12%" (trash) e
+// "30% a 40%" (elite) do pre-registro (secao 4.1) e lida como TETO de 12%/40%, NAO
+// como intervalo [8,12]/[30,40] com piso inferior obrigatorio. Um candidato em que o
+// Gus quase nunca cai PASSA no guarda-corpo E4 - Gus cair pouco nunca e problema em si,
+// e a trivialidade (luta oca, sem tensao nenhuma) ja e barrada por E9 (% de lutas sem
+// dano nenhum), guarda-corpo SEPARADO. Este comentario existe pra nenhum QA futuro
+// reabrir esta pergunta: a ausencia de piso e intencional, nao lacuna.
 inline constexpr double kTrashGusFallCeilingPct = 12.0;
 inline constexpr double kEliteGusFallCeilingPct = 40.0;
 // E2 (secao 4, "a CAUDA importa"): guarda-corpo de cauda, igual pros dois tiers.
@@ -701,10 +710,15 @@ struct GuardrailVerdict {
                    std::to_string(r.win_rate_pct.value) + "% (faixa " + std::to_string(win_min) +
                        "-" + std::to_string(win_max) + "%)"});
 
+    // SO TETO, SEM PISO - decisao do lider 2026-08-01 (ver o comentario em
+    // kTrashGusFallCeilingPct/kEliteGusFallCeilingPct acima): Gus cair pouco NUNCA
+    // reprova este guarda-corpo. A trivialidade tem regua PROPRIA em E9.
     const double gus_ceiling = trash ? kTrashGusFallCeilingPct : kEliteGusFallCeilingPct;
     const double gus_fall = r.pct_fall_by_member[idx(PartyMember::Gus)].value;
     const bool gus_ok = gus_fall <= gus_ceiling;
-    out.push_back({"E4 quedas do Gus dentro do teto pre-registrado", gus_ok,
+    out.push_back({"E4 quedas do Gus dentro do teto pre-registrado (so teto, sem piso, decisao "
+                   "do lider 2026-08-01)",
+                   gus_ok,
                    std::to_string(gus_fall) + "% (teto " + std::to_string(gus_ceiling) + "%)"});
 
     const bool tail_ok = r.p10_rounds >= kWindowP10MinRounds && r.p90_rounds <= kWindowP90MaxRounds;
