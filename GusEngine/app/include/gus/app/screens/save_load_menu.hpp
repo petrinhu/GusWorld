@@ -274,9 +274,20 @@ struct SaveLoadMenuState {
 // -1 quando warning_kind!=None OU confirming_delete OU confirming_overwrite
 // (nenhum desses estados desenha `.slot-list` - ver save_load_menu_rml.cpp,
 // os 3 substituem a lista inteira por um mini-dialogo/aviso). Fora desses
-// casos, devolve state.selected - chamar scroll_element_into_view de novo pra
-// um slot ja visivel e um no-op seguro (RmlUi so move o scroll quando
-// precisa), entao nao ha necessidade de mais um caso especial aqui.
+// casos, devolve state.selected.
+//
+// CORRIGIDO (2026-08-01 - achado medido em reload_geometry_probe.cpp,
+// efemero): esta funcao NAO decide mais "se" rolar - so QUAL slot e o alvo. O
+// CHAMADOR (SaveLoadScreen::reload_(), save_load_menu_loop.cpp) e quem checa
+// a geometria (get_element_box da lista vs do item) antes de chamar
+// scroll_element_into_view, porque a API NAO e no-op quando o item ja esta
+// visivel - ela REANCORA o item ao TOPO da area visivel sempre
+// (align_with_top=true e o default), mesmo se ele ja estivesse visivel em
+// outra posicao (medido: -68px de deslocamento so por chamar a funcao com o
+// item ja selecionado). Este comentario ANTES afirmava "no-op seguro quando
+// ja visivel" - estava ERRADO, e o erro produzia um tremor visivel na lista a
+// cada mudanca de selecao (B1 revisao 2 tornou isso frequente, ao mudar a
+// selecao a cada MOUSE_MOTION).
 [[nodiscard]] int save_load_scroll_target_index(const SaveLoadMenuState& state) noexcept;
 
 // PARIDADE TECLADO x MOUSE / LAST-INPUT-WINS (B1+B4, decisao do lider

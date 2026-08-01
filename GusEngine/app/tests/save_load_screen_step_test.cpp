@@ -39,6 +39,7 @@
 
 using gus::app::screens::SaveLoadLoopExit;
 using gus::app::screens::save_load_screen_step;
+using gus::app::screens::save_load_scroll_needed;
 using gus::app::screens::SaveLoadMenuAction;
 using gus::app::screens::SaveLoadMenuState;
 using gus::app::screens::SaveLoadMode;
@@ -767,4 +768,69 @@ TEST_CASE("save_load_screen_step (B2): dentro do AVISO Damaged, clicar em "
 
     REQUIRE(result.flash.has_value());
     REQUIRE(result.flash->item_index == 0);
+}
+
+// ---------------------------------------------------------------- (B7 correcao) save_load_scroll_needed
+//
+// Achado medido em reload_geometry_probe.cpp (efemero, 2026-08-01):
+// glintfx::UiLayer::scroll_element_into_view NAO e no-op quando o item ja
+// esta visivel - reancora ao TOPO da area visivel sempre (align_with_top=true
+// e o default), com deslocamento medido de -68px so por chamar a funcao com o
+// item ja selecionado. Esta bateria cobre os 2 lados que o team-lead pediu:
+// item ja visivel NAO precisa rolar; item fora da vista PRECISA.
+
+TEST_CASE("save_load_scroll_needed: item TOTALMENTE dentro do recorte visivel "
+          "da lista NAO precisa rolar",
+          "[save_load_scroll_needed][b7-scroll-fix]") {
+    glintfx::ElementBox list_box;
+    list_box.found = true; list_box.x = 277; list_box.y = 136; list_box.w = 388; list_box.h = 300;
+
+    glintfx::ElementBox item_box;
+    item_box.found = true; item_box.x = 277; item_box.y = 204; item_box.w = 388; item_box.h = 56;
+
+    REQUIRE_FALSE(save_load_scroll_needed(list_box, item_box));
+}
+
+TEST_CASE("save_load_scroll_needed: item FORA do recorte visivel (abaixo, "
+          "ex.: ultimo slot ainda nao rolado ate a vista) PRECISA rolar",
+          "[save_load_scroll_needed][b7-scroll-fix]") {
+    glintfx::ElementBox list_box;
+    list_box.found = true; list_box.x = 277; list_box.y = 136; list_box.w = 388; list_box.h = 300;
+
+    // item comeca DEPOIS do fim do recorte (136+300=436) - totalmente fora.
+    glintfx::ElementBox item_box;
+    item_box.found = true; item_box.x = 277; item_box.y = 514; item_box.w = 388; item_box.h = 56;
+
+    REQUIRE(save_load_scroll_needed(list_box, item_box));
+}
+
+TEST_CASE("save_load_scroll_needed: item PARCIALMENTE fora (cruza a borda de "
+          "baixo do recorte) PRECISA rolar - so 'totalmente dentro' conta como "
+          "visivel",
+          "[save_load_scroll_needed][b7-scroll-fix]") {
+    glintfx::ElementBox list_box;
+    list_box.found = true; list_box.x = 277; list_box.y = 136; list_box.w = 388; list_box.h = 300;
+
+    // item comeca dentro (y=410) mas termina em 410+56=466, PASSANDO do fim
+    // do recorte (436) - cruza a borda, nao esta totalmente visivel.
+    glintfx::ElementBox item_box;
+    item_box.found = true; item_box.x = 277; item_box.y = 410; item_box.w = 388; item_box.h = 56;
+
+    REQUIRE(save_load_scroll_needed(list_box, item_box));
+}
+
+TEST_CASE("save_load_scroll_needed: qualquer caixa nao encontrada (found=false) "
+          "e fallback defensivo - rola de qualquer forma (NUNCA pior que o "
+          "comportamento incondicional de antes desta correcao)",
+          "[save_load_scroll_needed][b7-scroll-fix]") {
+    glintfx::ElementBox list_box;
+    list_box.found = true; list_box.x = 277; list_box.y = 136; list_box.w = 388; list_box.h = 300;
+    glintfx::ElementBox item_box;
+    item_box.found = true; item_box.x = 277; item_box.y = 204; item_box.w = 388; item_box.h = 56;
+
+    glintfx::ElementBox not_found;  // found=false (default)
+
+    REQUIRE(save_load_scroll_needed(not_found, item_box));
+    REQUIRE(save_load_scroll_needed(list_box, not_found));
+    REQUIRE(save_load_scroll_needed(not_found, not_found));
 }

@@ -564,6 +564,14 @@ SaveLoadStepResult save_load_screen_step(SaveLoadMenuState& state, const SDL_Eve
     return result;
 }
 
+bool save_load_scroll_needed(const glintfx::ElementBox& list_box,
+                              const glintfx::ElementBox& item_box) noexcept {
+    if (!list_box.found || !item_box.found) return true;  // fallback defensivo: rola mesmo assim
+    const bool fully_visible = item_box.y >= list_box.y &&
+                                (item_box.y + item_box.h) <= (list_box.y + list_box.h);
+    return !fully_visible;
+}
+
 namespace {
 
 // F4-1b.2: o ScreenState de PRODUCAO da tela de save/load (unico chamador:
@@ -985,12 +993,30 @@ private:
                         // scroll_element_into_view resolver a geometria da lista.
 
         // SCROLL SEGUE A SELECAO (B7, decisao do lider 2026-08-01): garante que o
-        // slot state.selected fique DENTRO do recorte visivel de `.slot-list` -
-        // no-op seguro quando ja visivel. MESMO padrao de system_menu_loop.cpp
-        // (controls_scroll_target_index/scroll_element_into_view).
+        // slot state.selected fique DENTRO do recorte visivel de `.slot-list`.
+        //
+        // CORRIGIDO (2026-08-01, achado medido apos o B1 revisao 2 introduzir o
+        // tremor - reload_geometry_probe.cpp, efemero): a chamada INCONDICIONAL a
+        // scroll_element_into_view NAO era no-op quando o item ja estava visivel
+        // - a API tem align_with_top=true por padrao, que REANCORA o item ao TOPO
+        // da area visivel TODA VEZ que roda, mesmo que ele ja estivesse visivel em
+        // outra posicao (medido: -68px de deslocamento so por chamar a funcao com
+        // o item ja selecionado/visivel, reload puro sem a chamada = 0px de
+        // deslocamento). Isto fazia a lista "pular" a cada mudanca de selecao,
+        // mesmo sem precisar rolar - um tremor que NAO existia antes do B1 revisao
+        // 2 comecar a mudar a selecao a cada MOUSE_MOTION. Agora SO chama quando o
+        // item estiver de fato FORA do recorte visivel (save_load_scroll_needed,
+        // declarada no .hpp - PURA/testavel, ver save_load_scroll_needed_test.cpp)
+        // - "no-op quando ja visivel" agora e verdade, nao so a intencao
+        // documentada.
         const int scroll_target = save_load_scroll_target_index(state_);
         if (scroll_target >= 0) {
-            ui_->scroll_element_into_view(slot_item_id(scroll_target).c_str());
+            const std::string item_id = slot_item_id(scroll_target);
+            const glintfx::ElementBox list_box = ui_->get_element_box("slmenu-list");
+            const glintfx::ElementBox item_box = ui_->get_element_box(item_id.c_str());
+            if (save_load_scroll_needed(list_box, item_box)) {
+                ui_->scroll_element_into_view(item_id.c_str());
+            }
         }
     }
 
