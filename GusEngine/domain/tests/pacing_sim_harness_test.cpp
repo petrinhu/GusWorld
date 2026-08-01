@@ -959,8 +959,8 @@ TEST_CASE("pacing_sim: run_phase_a - disparo real da Fase A (N=240k - grava em a
 // Disparo REAL da Fase B (protocolo secao 2.1, metodo direcional - decisao do lider
 // 2026-08-01 apos H1 confirmada). Gate PROPRIO (GUSWORLD_PACING_SIM_PHASE_B_FULL),
 // separado do gate da Fase A - as duas fases NAO se encadeiam automaticamente (decisao
-// do lider), entao cada uma tem seu proprio disparo independente. 24 pontos x 240.000 =
-// 5.760.000 lutas (~1 minuto na taxa medida de ~93.000 lutas/seg).
+// do lider), entao cada uma tem seu proprio disparo independente. 52 pontos x 240.000 =
+// 12.480.000 lutas (~2-3 minutos na taxa medida de ~93.000 lutas/seg).
 TEST_CASE("pacing_sim: run_phase_b - disparo real da Fase B (N=240k - grava em arquivo)",
           "[domain][pacing_sim][pacing_sim_smoke]") {
     const bool full_run = std::getenv("GUSWORLD_PACING_SIM_PHASE_B_FULL") != nullptr;
@@ -1090,14 +1090,45 @@ TEST_CASE("pacing_sim: phase_a_winners_2026_08_01 tem os 2 vencedores reais da F
     CHECK(w_p3.axes.heal_amount == 6);
 }
 
-TEST_CASE("pacing_sim: build_phase_b_grid tem exatamente 24 pontos (8 vizinhos x 2 cenarios "
-          "+ 8 vizinhos x 1 cenario)",
+TEST_CASE("pacing_sim: build_phase_b_healer_heal_grid tem exatamente 36 pontos (9 combos de "
+          "HP/Atk x 4 curas)",
+          "[domain][pacing_sim]") {
+    const auto grid = build_phase_b_healer_heal_grid();
+    REQUIRE(grid.size() == 36);
+    for (const PacingGridPoint& gp : grid) {
+        CHECK(gp.scenario == Scenario::P3_TrashHealer);
+        // so os 4 valores de cura do CPO entram (2,3,4,5) - nunca 6/9/12 (ja saturados).
+        CHECK((gp.axes.heal_amount == 2 || gp.axes.heal_amount == 3 || gp.axes.heal_amount == 4 ||
+              gp.axes.heal_amount == 5));
+    }
+    // cada cura aparece exatamente 9 vezes (uma por combo de HP/Atk).
+    for (int heal : {2, 3, 4, 5}) {
+        const long count = std::count_if(grid.begin(), grid.end(), [heal](const PacingGridPoint& gp) {
+            return gp.axes.heal_amount == heal;
+        });
+        CHECK(count == 9);
+    }
+}
+
+TEST_CASE("pacing_sim: build_phase_b_healer_heal_grid inclui o HP/Atk do proprio vencedor "
+          "P3 (so a cura muda)",
+          "[domain][pacing_sim]") {
+    const auto grid = build_phase_b_healer_heal_grid();
+    const long center_hp_atk_count =
+        std::count_if(grid.begin(), grid.end(), [](const PacingGridPoint& gp) {
+            return gp.axes.hp_mult == Catch::Approx(1.00) && gp.axes.atk == 14;
+        });
+    // o HP/Atk do vencedor aparece 1x por cada uma das 4 curas novas.
+    REQUIRE(center_hp_atk_count == 4);
+}
+
+TEST_CASE("pacing_sim: build_phase_b_grid tem exatamente 52 pontos (16 do vencedor P1/P2 + "
+          "36 do braco de cura do P3)",
           "[domain][pacing_sim]") {
     const auto grid = build_phase_b_grid();
-    REQUIRE(grid.size() == 24);
+    REQUIRE(grid.size() == 52);
     for (const PacingGridPoint& gp : grid) REQUIRE(tier_of(gp.scenario) == Tier::Trash);
 
-    // 16 pontos vem do vencedor P1/P2 (8 vizinhos x 2 cenarios).
     const long p1_count = std::count_if(grid.begin(), grid.end(), [](const PacingGridPoint& gp) {
         return gp.scenario == Scenario::P1_TrashVanilla;
     });
@@ -1109,25 +1140,28 @@ TEST_CASE("pacing_sim: build_phase_b_grid tem exatamente 24 pontos (8 vizinhos x
     });
     CHECK(p1_count == 8);
     CHECK(p2_count == 8);
-    CHECK(p3_count == 8);
+    CHECK(p3_count == 36);
 }
 
-TEST_CASE("pacing_sim: build_phase_b_grid NUNCA inclui o proprio ponto vencedor (ja testado "
-          "na Fase A)",
+TEST_CASE("pacing_sim: build_phase_b_grid NUNCA repete o ponto EXATO do vencedor da Fase A "
+          "(mesmo HP/Atk/cura)",
           "[domain][pacing_sim]") {
     const auto grid = build_phase_b_grid();
     for (const PacingGridPoint& gp : grid) {
-        const bool is_p1p2_center =
+        const bool is_p1p2_exact_winner =
             (gp.scenario == Scenario::P1_TrashVanilla || gp.scenario == Scenario::P2_TrashParede) &&
             gp.axes.hp_mult == Catch::Approx(0.60) && gp.axes.atk == 12;
-        const bool is_p3_center = gp.scenario == Scenario::P3_TrashHealer &&
-                                 gp.axes.hp_mult == Catch::Approx(1.00) && gp.axes.atk == 14;
-        CHECK_FALSE(is_p1p2_center);
-        CHECK_FALSE(is_p3_center);
+        // o P3 pode repetir o MESMO HP/Atk (1.00/14) - so nao pode repetir tambem a
+        // MESMA cura (6), que ja foi testada na Fase A.
+        const bool is_p3_exact_winner = gp.scenario == Scenario::P3_TrashHealer &&
+                                        gp.axes.hp_mult == Catch::Approx(1.00) &&
+                                        gp.axes.atk == 14 && gp.axes.heal_amount == 6;
+        CHECK_FALSE(is_p1p2_exact_winner);
+        CHECK_FALSE(is_p3_exact_winner);
     }
 }
 
-TEST_CASE("pacing_sim: run_phase_b smoke - progresso, 24 resultados, banner sem corte "
+TEST_CASE("pacing_sim: run_phase_b smoke - progresso, 52 resultados, banner sem corte "
           "automatico de Fase C",
           "[domain][pacing_sim][pacing_sim_smoke]") {
     const int n_per_point = 3;  // N pequeno de proposito - teste estrutural
@@ -1136,14 +1170,14 @@ TEST_CASE("pacing_sim: run_phase_b smoke - progresso, 24 resultados, banner sem 
     std::ostringstream out;
     const std::vector<PacingPointResult> results = run_phase_b(n_per_point, base_seed, out);
 
-    REQUIRE(results.size() == 24);
+    REQUIRE(results.size() == 52);
     for (const PacingPointResult& r : results) REQUIRE(r.report.n == n_per_point);
 
     const std::string text = out.str();
     REQUIRE(text.find("Fase B") != std::string::npos);
     REQUIRE(text.find("SO trash") != std::string::npos);
     REQUIRE(text.find("CONGELADO") != std::string::npos);
-    REQUIRE(text.find("fase [B], ponto [1] de [24], simulação [") != std::string::npos);
+    REQUIRE(text.find("fase [B], ponto [1] de [52], simulação [") != std::string::npos);
     REQUIRE(text.find("Fase B concluida") != std::string::npos);
     // Nunca encadeia Fase C automaticamente - decisao explicita do lider.
     REQUIRE(text.find("NAO RODA AUTOMATICAMENTE") != std::string::npos);

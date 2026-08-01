@@ -1157,22 +1157,72 @@ struct PacingWinner {
     };
 }
 
-// Grade da Fase B: vizinhanca de CADA vencedor (neighbor_axes, levels=1 - passo de 10%
-// de HP e 1 de Atk, exatamente o que o protocolo pede), rodada nos MESMOS cenarios a
-// que aquele vencedor se aplica. 2 vencedores: (8 vizinhos x 2 cenarios) + (8 vizinhos
-// x 1 cenario) = 24 pontos.
-[[nodiscard]] inline std::vector<PacingGridPoint> build_phase_b_grid() {
+// Eixo de cura EXTRA do vencedor P3 (achado do CPO, retomado pelo team-lead 2026-08-01):
+// a cura 6-12 testada na Fase A satura o cenario P3 - 100% de vitoria em praticamente
+// toda a grade (so 4 de 48 celulas ficam abaixo de 99%, todas com Atk=14) - "a
+// curandeira anula o dano do trash", e mexer em HP/Atk ao redor NAO resolve isso (no
+// melhor caso empurra a vitoria de 100% pra 99.5%, ainda acima do teto de 97%). O CPO
+// recomendou testar cura BEM mais baixa: {2,3,4,5}.
+inline constexpr std::array<int, 4> kPhaseBHealerHealAmounts{2, 3, 4, 5};
+
+// Braco PROPRIO da Fase B, montado A PARTE (nao mexe em neighbor_axes, que continua
+// generico e reusavel pro vencedor P1/P2): cruza os 4 valores de cura com a vizinhanca
+// de HP/Atk do vencedor P3 - os 8 vizinhos de neighbor_axes MAIS o proprio ponto
+// central (HP=1.00/Atk=14), que so tinha sido testado com cura 6/9/12 ate agora; cura
+// 2-5 no MESMO HP/Atk do vencedor e a celula mais informativa de todas (isola o efeito
+// da cura, sem misturar com mudanca de HP/Atk). 9 combos de HP/Atk x 4 curas = 36 pontos.
+[[nodiscard]] inline std::vector<PacingGridPoint> build_phase_b_healer_heal_grid() {
     std::vector<PacingGridPoint> points;
-    for (const PacingWinner& w : phase_a_winners_2026_08_01()) {
-        const std::vector<PacingAxes> neighbors = neighbor_axes(w.axes, /*levels=*/1);
-        for (const PacingAxes& n : neighbors) {
-            for (Scenario s : w.scenarios) {
-                points.push_back({s, n,
-                                 phase_a_point_label("trash", s, n) + " (refino de " + w.label + ")"});
+    const std::vector<PacingWinner> winners = phase_a_winners_2026_08_01();
+    const PacingWinner& winner_p3 = winners[1];  // vencedor P3 healer
+
+    std::vector<PacingAxes> hp_atk_neighborhood = neighbor_axes(winner_p3.axes, /*levels=*/1);
+    hp_atk_neighborhood.push_back(winner_p3.axes);  // o proprio ponto central tambem entra
+
+    for (const PacingAxes& base_axes : hp_atk_neighborhood) {
+        for (int heal : kPhaseBHealerHealAmounts) {
+            PacingAxes axes = base_axes;
+            axes.heal_amount = heal;
+            for (Scenario s : winner_p3.scenarios) {  // so P3
+                points.push_back({s, axes,
+                                 phase_a_point_label("trash", s, axes) +
+                                     " (refino de cura do vencedor P3 healer)"});
             }
         }
     }
     return points;
+}
+
+// Grade da Fase B: vencedor P1/P2 usa a vizinhanca generica de HP/Atk (neighbor_axes,
+// levels=1 - passo de 10% de HP e 1 de Atk, exatamente o que o protocolo pede) - a cura
+// nem entra nesses 2 cenarios. Vencedor P3 usa o braco proprio acima (cura e a alavanca
+// que interessa ali, nao HP/Atk isolados). 16 pontos (P1/P2) + 36 pontos (P3 healer,
+// cruzando cura) = 52 pontos.
+[[nodiscard]] inline std::vector<PacingGridPoint> build_phase_b_grid() {
+    std::vector<PacingGridPoint> points;
+
+    const std::vector<PacingWinner> winners = phase_a_winners_2026_08_01();
+    const PacingWinner& winner_p1p2 = winners[0];
+    for (const PacingAxes& n : neighbor_axes(winner_p1p2.axes, /*levels=*/1)) {
+        for (Scenario s : winner_p1p2.scenarios) {
+            points.push_back(
+                {s, n, phase_a_point_label("trash", s, n) + " (refino de " + winner_p1p2.label + ")"});
+        }
+    }
+
+    const std::vector<PacingGridPoint> healer_points = build_phase_b_healer_heal_grid();
+    points.insert(points.end(), healer_points.begin(), healer_points.end());
+
+    return points;
+}
+
+// Funcao PURA (testavel sem rodar o motor): true se NENHUM ponto do braco de cura de
+// P3 aprovou em todos os guarda-corpos. Usada por run_phase_b pra decidir se imprime o
+// registro pre-declarado do CPO (ver comentario no corpo de run_phase_b).
+[[nodiscard]] inline bool healer_heal_axis_all_reproved(const std::vector<PacingPointResult>& results) {
+    return std::none_of(results.begin(), results.end(), [](const PacingPointResult& r) {
+        return r.point.scenario == Scenario::P3_TrashHealer && r.approved;
+    });
 }
 
 // Roda a Fase B inteira (SO se houver vencedores - a Fase B "para" que o time ja fez:
@@ -1223,6 +1273,22 @@ struct PacingWinner {
         << "Fase C NAO RODA AUTOMATICAMENTE (decisao do lider): todos os sobreviventes da "
         << "Fase B entram na bateria completa, e o corte para os 2-4 finalistas e feito por "
         << "gente, na hora de levar ao lider - nunca por corte automatico deste harness.\n";
+
+    // Registro PRE-DECLARADO (achado do CPO, retomado pelo team-lead 2026-08-01, ANTES
+    // de rodar): se nem a cura 2 ou 3 (as mais baixas testadas) aprovarem P3, a
+    // conclusao NAO e "nao achamos o numero certo" - e "a cura da curandeira nao se
+    // conserta por numero", e a resposta vira REGRA de design (limite de usos, custo
+    // crescente, cura bloqueada no mesmo turno que o alvo levou dano), decisao do
+    // lider, nao deste estudo. Declarado aqui pra ninguem espremer a grade depois
+    // procurando um numero que talvez nao exista.
+    if (healer_heal_axis_all_reproved(results)) {
+        out << "\nATENCAO P3 (healer): NENHUM ponto do braco de cura (2/3/4/5) aprovou em "
+            << "todos os guarda-corpos, nem os valores mais baixos testados (2 e 3). Achado "
+            << "pre-declarado do CPO: isto e sinal de que a cura da curandeira NAO se "
+            << "conserta por numero - a resposta e REGRA de design (ex.: limite de usos por "
+            << "batalha, custo crescente, cura bloqueada no mesmo turno em que o alvo levou "
+            << "dano), decisao do lider, nao deste estudo.\n";
+    }
     return results;
 }
 
