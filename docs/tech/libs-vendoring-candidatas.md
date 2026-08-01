@@ -71,7 +71,7 @@
 Avaliadas, sem candidata vendorizavel prioritaria pro nosso caso: fisica 2D seria (Box2D/Chipmunk) NAO e header-only (build proprio); concorrencia em single-player ja e coberta por Qt/std::thread/std::jthread. Revisitar sob demanda (geometria 2D leve = Wykobi acima ja cobre colisao/raycast/line-of-sight).
 
 ## Avisos de licenca (importantes)
-- **Apache-2.0** (PCG, Frozen, match(it), CTRE) e compativel com **GPLv3** (NAO com GPLv2). GusWorld e GPLv3, entao OK.
+- **Apache-2.0** (PCG, Frozen, match(it), CTRE) e compativel com **GPLv3** (NAO com GPLv2). GusWorld e Apache-2.0 (estado atual, 2026-07-31), entao OK.
 - **public-domain** (miniaudio, dr_libs, stb): zona cinza juridica em alguns paises. Vendorizar escolhendo o FALLBACK de licenca explicito quando oferecido: miniaudio -> MIT-0; dr_libs -> Unlicense; stb -> MIT. Preservar o cabecalho de licenca do autor intacto.
 - **Better Enums** = BSD-2-Clause (nao Boost; nome certo no third-party).
 - **GLM vs hlslpp**: escolher UM (redundantes).
