@@ -538,6 +538,86 @@ TEST_CASE("save_load_menu (harness headless, B1 revisao 2): mouse move a selecao
     std::filesystem::remove_all(saves_dir);
 }
 
+// ---------------------------------------------------------------- (d.1b) B1 revisao 2:
+// checagem EXPLICITA de "som duplo" (o team-lead pediu pra verificar - a combinacao de
+// B1 escrevendo em state.selected + B4 comparando o indice de foco antes/depois PODERIA,
+// em tese, somar 2 caminhos independentes que antes eram separados). N transicoes de
+// mouse por N slots DIFERENTES tem que tocar EXATAMENTE N plays - se houvesse um 2o
+// caminho de som (ex.: o callback nativo antigo REINTRODUZIDO por engano, ou um duplo
+// disparo dentro de route_mouse_hover/save_load_screen_step), o numero seria 2N ou mais.
+
+TEST_CASE("save_load_menu (harness headless, B1 revisao 2): mover o mouse por N slots "
+          "DIFERENTES em sequencia toca EXATAMENTE N plays de hover_sfx (checagem "
+          "explicita de 'som duplo' apos a fusao B1+B4)",
+          "[save_load_menu_interaction][gl][b1-last-input-wins]") {
+    GlTestEnv env = try_boot_gl();
+    if (!env.ok) {
+        INFO("GL/display indisponivel - harness pulado (rode com Xvfb :99).");
+        return;
+    }
+
+    const gus::app::i18n::Translator translator = make_translator();
+
+    const std::filesystem::path saves_dir = std::filesystem::temp_directory_path() /
+                                             "gusworld_save_load_interaction_no_double_sfx_saves";
+    std::filesystem::remove_all(saves_dir);
+
+    // 2 slots ocupados (autosave=0, 1) - o mouse vai visitar os 2, em
+    // sequencia, cada um DIFERENTE do anterior (0 -> 1): 2 mudancas reais de
+    // selecao a partir do foco inicial (1) - ver a conta abaixo.
+    REQUIRE(gus::platform::fs::save_game(make_save_data(550), kAutosaveSlot, saves_dir.string()));
+    REQUIRE(gus::platform::fs::save_game(make_save_data(340), 1, saves_dir.string()));
+
+    SaveLoadMenuState probe_state;
+    std::array<SaveSlotPreview, kSlotCount> probe_slots{};
+    probe_slots[kAutosaveSlot] = build_slot_preview(make_save_data(550), kAutosaveSlot);
+    probe_slots[1] = build_slot_preview(make_save_data(340), 1);
+    for (int i = 2; i < kSlotCount; ++i) probe_slots[static_cast<std::size_t>(i)] = empty_slot_preview(i);
+    save_load_menu_open(probe_state, SaveLoadMode::Load, probe_slots);
+    REQUIRE(probe_state.selected == 1);  // foco inicial (mock: slot 1 "sel")
+
+    float slot_cx[2] = {0.0f, 0.0f};
+    float slot_cy[2] = {0.0f, 0.0f};
+    {
+        auto probe_ui = load_ui(probe_state, translator);
+        REQUIRE(probe_ui.has_value());
+        for (int i = 0; i < 2; ++i) {
+            const glintfx::ElementBox box =
+                probe_ui->get_element_box(("slmenu-slot-" + std::to_string(i)).c_str());
+            REQUIRE(box_hittable(box, kWinW, kWinH));
+            slot_cx[i] = box.x + box.w * 0.5f;
+            slot_cy[i] = box.y + box.h * 0.5f;
+        }
+    }
+
+    // Sequencia: foco inicial=1 -> mouse entra em 0 (MUDA, play 1) -> mouse
+    // entra em 1 (MUDA de volta, play 2) - 2 mudancas reais = 2 plays
+    // esperados, NUNCA 4 (o que indicaria som duplo por transicao).
+    for (const int slot : {0, 1}) {
+        SDL_Event motion_ev{};
+        motion_ev.type = SDL_EVENT_MOUSE_MOTION;
+        motion_ev.motion.x = slot_cx[slot];
+        motion_ev.motion.y = slot_cy[slot];
+        REQUIRE(SDL_PushEvent(&motion_ev));
+    }
+
+    SDL_Event esc_ev{};
+    esc_ev.type = SDL_EVENT_KEY_DOWN;
+    esc_ev.key.key = SDLK_ESCAPE;
+    esc_ev.key.repeat = 0;
+    REQUIRE(SDL_PushEvent(&esc_ev));
+
+    gus::platform::audio::AudioEngine audio(/*device_active=*/false);
+    const SaveLoadLoopExit exit = run_save_load_menu_loop_gl_current(
+        env.window, audio, translator, SaveLoadMode::Load, saves_dir.string(),
+        /*build_current_save_data=*/{}, /*apply_loaded_save_data=*/{});
+
+    REQUIRE(exit == SaveLoadLoopExit::BackToPause);
+    REQUIRE(audio.sfx_play_count() == 2);
+
+    std::filesystem::remove_all(saves_dir);
+}
+
 // ---------------------------------------------------------------- (d.2) B1 revisao 2:
 // o CASO CRITICO que motivou a revisao - mouse PARADO sobre um slot enquanto o
 // TECLADO navega. A selecao tem que SEGUIR O TECLADO, nao voltar pro slot sob o
@@ -1224,4 +1304,97 @@ TEST_CASE("save_load_menu (harness headless): PROVA VISUAL - PNG do mini-dialogo
               << png_path.string() << " (" << kWinW << "x" << kWinH << ")\n";
     REQUIRE(std::filesystem::exists(png_path));
     REQUIRE(std::filesystem::file_size(png_path) > 0);
+}
+
+// ---------------------------------------------------------------- (h) B5: scrollbar
+// NATIVA arrastavel - decisao do lider 2026-08-01. ATE esta fatia,
+// SaveLoadScreen::handle_event NUNCA encaminhava o botao do mouse pro RmlUi (so
+// hit-test MANUAL, route_mouse_click) - a `sliderbar` nativa (CSS "#slmenu-list
+// scrollbarvertical", save_load_menu_rml.cpp) so arrasta se o proprio RmlUi
+// souber que o botao esta PRESSIONADO. Este teste prova a TECNICA em si
+// (MouseButton(pressed=true) -> MouseMove* -> MouseButton(pressed=false), via
+// glintfx::UiLayer::process_event DIRETO) - o encaminhamento no FIO de
+// producao (save_load_menu_loop.cpp) ja tem cobertura de NAO-REGRESSAO pelos
+// testes de clique em slot/botao/pill deste MESMO arquivo, que continuam
+// verdes com o forwarding ligado (nenhuma colisao: esta tela nunca registra
+// glintfx::UiLayer::set_click_callback, grep confirmado).
+
+TEST_CASE("save_load_menu (harness headless, B5): arrastar a barra de rolagem "
+          "NATIVA com o mouse (MouseButton+MouseMove) move o scroll de fato",
+          "[save_load_menu_interaction][gl][b5-scrollbar-drag]") {
+    GlTestEnv env = try_boot_gl();
+    if (!env.ok) {
+        INFO("GL/display indisponivel - harness pulado (rode com Xvfb :99).");
+        return;
+    }
+
+    const gus::app::i18n::Translator translator = make_translator();
+
+    // TODOS os 7 slots ocupados - forca overflow real de `.slot-list` (300dp
+    // de altura, ver save_load_menu_rml.cpp) - MESMA populacao de dados do
+    // probe efemero de B7 (app/tools/save_load_screenshot_probe.cpp).
+    std::array<SaveSlotPreview, kSlotCount> slots{};
+    slots[kAutosaveSlot] = build_slot_preview(make_save_data(550), kAutosaveSlot);
+    for (int i = 1; i < kSlotCount; ++i) {
+        slots[static_cast<std::size_t>(i)] = build_slot_preview(make_save_data(100 * i), i);
+    }
+    SaveLoadMenuState state;
+    save_load_menu_open(state, SaveLoadMode::Load, slots);
+
+    auto ui = load_ui(state, translator);
+    REQUIRE(ui.has_value());
+
+    const glintfx::ElementBox list_box = ui->get_element_box("slmenu-list");
+    REQUIRE(list_box.found);
+
+    float scroll_top_before = -1.0f;
+    REQUIRE(ui->get_element_scroll_top("slmenu-list", scroll_top_before));
+    REQUIRE(scroll_top_before == 0.0f);  // recem-aberta, topo (7 slots > recorte de 300dp)
+
+    // Faixa da scrollbar: 8dp de largura, encostada na borda direita de
+    // `.slot-list` - MESMA constante kScrollbarWidthDp do teste de
+    // posicionamento (a)(b)(c) acima.
+    constexpr float kScrollbarWidthDp = 8.0f;
+    const float scrollbar_cx = list_box.x + list_box.w - kScrollbarWidthDp * 0.5f;
+    const float drag_start_y = list_box.y + 10.0f;              // perto do topo da faixa
+    const float drag_end_y = list_box.y + list_box.h - 10.0f;   // quase no fim da faixa
+
+    // MESMA sequencia que SaveLoadScreen::handle_event agora encaminha de
+    // verdade (MouseMove assenta o hover sobre a sliderbar ANTES do
+    // MouseButtonDown - mesma exigencia "hover, nao foco" ja documentada pro
+    // MouseWheel em glintfx/ui_event.hpp).
+    glintfx::UiEvent mv1{};
+    mv1.type = glintfx::UiEvent::Type::MouseMove;
+    mv1.x = scrollbar_cx;
+    mv1.y = drag_start_y;
+    ui->process_event(mv1);
+
+    glintfx::UiEvent down_ev{};
+    down_ev.type = glintfx::UiEvent::Type::MouseButton;
+    down_ev.button = 0;
+    down_ev.pressed = true;
+    ui->process_event(down_ev);
+
+    // Varios passos intermediarios (MESMO racional de um arraste real - N
+    // MOUSE_MOTION entre down e up, nao 1 salto so).
+    constexpr int kDragSteps = 6;
+    for (int step = 1; step <= kDragSteps; ++step) {
+        const float t = static_cast<float>(step) / static_cast<float>(kDragSteps);
+        glintfx::UiEvent mv{};
+        mv.type = glintfx::UiEvent::Type::MouseMove;
+        mv.x = scrollbar_cx;
+        mv.y = drag_start_y + t * (drag_end_y - drag_start_y);
+        ui->process_event(mv);
+    }
+
+    glintfx::UiEvent up_ev{};
+    up_ev.type = glintfx::UiEvent::Type::MouseButton;
+    up_ev.button = 0;
+    up_ev.pressed = false;
+    ui->process_event(up_ev);
+
+    float scroll_top_after = -1.0f;
+    REQUIRE(ui->get_element_scroll_top("slmenu-list", scroll_top_after));
+    INFO("scroll_top_before=" << scroll_top_before << " scroll_top_after=" << scroll_top_after);
+    REQUIRE(scroll_top_after > scroll_top_before);
 }

@@ -692,6 +692,34 @@ public:
             return;
         }
 
+        // B5 (arrastar a SCROLLBAR NATIVA com o mouse, decisao do lider
+        // 2026-08-01): ATE esta fatia, o botao do mouse NUNCA era encaminhado
+        // pro RmlUi (so hit-test MANUAL via route_mouse_click/save_load_
+        // screen_step abaixo) - a `sliderbar` nativa do RmlUi (CSS "#slmenu-
+        // list scrollbarvertical", save_load_menu_rml.cpp) so arrasta se o
+        // proprio RmlUi souber que o botao esta PRESSIONADO (Rml::Context::
+        // ProcessMouseButtonDown/Up internos). Encaminha AQUI, EM PARALELO ao
+        // hit-test manual (que continua intocado logo abaixo) - SEM
+        // colisao: esta tela nunca registra glintfx::UiLayer::
+        // set_click_callback (grep confirmado, 2026-08-01), entao o RmlUi
+        // processando o clique internamente (:active, drag de scrollbar) NAO
+        // dispara NENHUM callback nosso - os dois canais (RmlUi nativo vs
+        // nosso hit-test) decidem coisas DIFERENTES (scrollbar vs
+        // slot/botao/pill) a partir do MESMO evento cru, sem se pisarem.
+        if (ev.type == SDL_EVENT_MOUSE_BUTTON_DOWN && ev.button.button == SDL_BUTTON_LEFT) {
+            glintfx::UiEvent btn_ev{};
+            btn_ev.type = glintfx::UiEvent::Type::MouseButton;
+            btn_ev.button = 0;
+            btn_ev.pressed = true;
+            ui_->process_event(btn_ev);
+        } else if (ev.type == SDL_EVENT_MOUSE_BUTTON_UP && ev.button.button == SDL_BUTTON_LEFT) {
+            glintfx::UiEvent btn_ev{};
+            btn_ev.type = glintfx::UiEvent::Type::MouseButton;
+            btn_ev.button = 0;
+            btn_ev.pressed = false;
+            ui_->process_event(btn_ev);
+        }
+
         // Resolve as boxes quando o evento precisa (MESMO custo do while(true)
         // antigo pro clique) - B1 revisao 2 (last-input-wins) ESTENDE isto pro
         // MOUSE_MOTION tambem: route_mouse_hover (save_load_screen_step)
