@@ -5,6 +5,66 @@
 
 ---
 
+## §0. Doutrina do comedimento (canon, decisão do líder, 2026-08-01)
+
+**Decisão, verbatim do líder (2026-08-01):**
+
+> "As batalhas, os itens, tudo que tem a ver com economia financeira ou de jogo, devem levar
+> sempre ao mesmo fim: quem é comedido sofre menos no final. O esbanjador sofre mais no final.
+> Isso deve ser canônico do jogo e colocado sempre ao agente de economia neste projeto."
+
+E sobre como isso escala com a periculosidade do inimigo, no mesmo dia:
+
+> "depende do grau de periculosidade do inimigo. Minions comuns usam opções mais burras a maioria
+> das vezes, até pra deixar o jogador mais feliz com mais vitórias, mas sem perder o desafio. e
+> isso se inverte proporcionalmente até chegar o mestre final, quando já se evoluiu,
+> comprou/achou/adquiriu cartas boas e vai depender de uma economia inteligente do jogador pra
+> chegar lá e ter uma vitória menos dolorosa: quem esbanja na juventude tem uma velhice pobre.
+> Quem poupa e tem constância, não sofre na velhice."
+
+### §0.1 Régua de validação (aplica a TODA mecânica nova de economia, craft, dano, bateria, carta,
+hospital, mira inimiga)
+
+Toda feature nova de economia responde, antes de fechar: **"o jogador comedido sai melhor no
+final do que o esbanjador, nesta mecânica?"** Se a resposta for NÃO (ou empate), **o número está
+errado, não a regra**: ajusta-se valor, curva ou peso até a resposta virar SIM. A doutrina nunca é
+descartada pra acomodar um número confortável.
+
+### §0.2 Generaliza o precedente do mesmo dia
+
+A carta de provocação (honeypot, `proposta-mira-inimiga.md` §2.A) já recebeu, no mesmo dia, um
+teto de bônus de defesa de **no máximo 10%**, e a justificativa do líder foi explícita:
+
+> "é um treinamento didático para o mundo real: devo investir meu dinheiro para o futuro com
+> prudência prevendo problemas maiores ou gastar logo e ter prazer imediato? a dúvida da
+> humanidade: prudência × yolo."
+
+A doutrina desta seção não é uma regra nova isolada: é o mesmo eixo (prudência × yolo) elevado de
+UMA carta específica para **todo o sistema econômico do jogo** (crédito, bateria, craft, mira).
+
+### §0.3 Escopo
+
+Economia de crédito (faucets/sinks, §2 a §7 abaixo), bateria/energia de cartas
+(`cartas-hardware-pirataria-energia.md`), pirataria × original (arco Bastiat, mesmo doc §12),
+craft/upgrade de tier (§7.6), e a mira do inimigo escalonada por periculosidade
+(`proposta-mira-inimiga.md`, mapeamento proposto em `proposta-economia-comedimento.md`).
+
+### §0.4 Não é sofrimento sem fim
+
+A doutrina NÃO revoga o anti-dark-pattern já canônico (§3.3.3 trava anti-bola-de-neve; Pillar 4
+"ameaçado, nunca massacrado"). O esbanjador sofre MAIS, nunca sofre SEM SAÍDA: sofrimento
+ilimitado é dark pattern, não ensino. O piso de recuperação (safe mode, cap de dívida) continua
+existindo para os dois perfis; o que muda é o RESULTADO relativo entre eles, não a existência de
+uma saída.
+
+### §0.5 Auditoria e proposta derivadas
+
+Análise de coerência da economia atual contra esta doutrina, tabela de escalonamento de mira por
+tier de periculosidade, e seeds de entrega narrativa: ver `proposta-economia-comedimento.md`
+(PROPOSTA, não canon; pendente de aprovação item a item do líder).
+
+---
+
 ## §1. Moeda
 
 **Moeda única no VS:** `crédito` (digital, rastreável, canon lore-bible §11.4).  
@@ -335,4 +395,12 @@ Anti-grind: ingredientes raros/épicos vêm de Knowledge-gated drops (inimigos-m
 
 ---
 
-**Última revisão:** 2026-07-12 (adição §2.1 recompensa de missão-capstone Helion Tusk escalada por dificuldade + §7.9 pedágio de bancada de terceiro/rede grátis do Tusk; specs aprovadas pelo criador, cross-ref `21-helion-tusk.md` §"Rewards"). Revisão anterior: 2026-07-06 (canonização `ECONOMIA-HOSPITAL-DOC`: cross-refs explícitos §3.3 + §3.5 vitória, sem números novos). Economia mínima = canon VS. Craft = spec F3-Alpha.
+**Última revisão:** 2026-08-01 (adição §0, doutrina do comedimento: "quem é comedido sofre menos
+no final, o esbanjador sofre mais", canonizada pelo líder e escalonada por periculosidade do
+inimigo; régua de validação aplicável a toda mecânica de economia nova; auditoria de coerência e
+mapeamento de mira por tier derivados em `proposta-economia-comedimento.md`, ainda PROPOSTA).
+Revisão anterior: 2026-07-12 (adição §2.1 recompensa de missão-capstone Helion Tusk escalada por
+dificuldade + §7.9 pedágio de bancada de terceiro/rede grátis do Tusk; specs aprovadas pelo
+criador, cross-ref `21-helion-tusk.md` §"Rewards"). Revisão anterior a essa: 2026-07-06
+(canonização `ECONOMIA-HOSPITAL-DOC`: cross-refs explícitos §3.3 + §3.5 vitória, sem números
+novos). Economia mínima = canon VS. Craft = spec F3-Alpha.
