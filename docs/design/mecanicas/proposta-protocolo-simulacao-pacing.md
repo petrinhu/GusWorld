@@ -110,21 +110,21 @@ TTK-in).
 team-lead e decidido pelo líder):** a versão anterior deste parágrafo dizia que o HP do
 trash foi "calibrado quando a janela-alvo ainda era 4 a 8 rodadas". Essa frase não tem
 lastro documental. O `git log -S` em `combat.md` mostra que a string "4-8" não existe em
-nenhum commit antes de 2026-07-19 — a primeira aparição é o PRÓPRIO commit que decide
+nenhum commit antes de 2026-07-19, e a primeira aparição é o PRÓPRIO commit que decide
 "3 a 5" (`ed411ec9`, §15.1), que chama "4-8" de "janela histórica" sem nenhum registro
 escrito anterior que a sustente. O que está de fato escrito em 2026-06-03 (§17, mesmo
 commit que traz o HP +60%) é **"TTK alvo 3-5 TURNOS"**, não rodadas. E "turno", no
 vocabulário do próprio documento naquele dia, significa a vez de UM ator (a mesma seção
 de AP, no mesmo commit, diz "AP pertence ao ator ativo no turno... cada membro da party
-tem seus 3 AP independentes quando age na fila" — bate com o motor real de hoje, onde
+tem seus 3 AP independentes quando age na fila", o que bate com o motor real de hoje, onde
 `begin_turn()` é por ator, não por rodada). Prova adicional: no MESMO dia, em outra
-seção (§18, ciclo de ambientes), foi preciso um override explícito — "'Turnos' do ciclo
-= rodadas completas de fila" — e só se escreve override quando o sentido padrão é
+seção (§18, ciclo de ambientes), foi preciso um override explícito ("'Turnos' do ciclo
+= rodadas completas de fila"), e só se escreve override quando o sentido padrão é
 outro. Ou seja: a inflação de HP de junho foi calibrada contra uma **unidade diferente**
 (turnos de ator, não rodadas), e a duração em RODADAS provavelmente nunca foi verificada
 até o MIRA-SIM medir 7, cravadas, em 2026-08-01. O alvo ATIVO deste estudo continua
 sendo **3 a 5 RODADAS** (§15.1, decisão do líder com o Gus em 2026-07-19; rodada definida
-sem ambiguidade em §4.1 como "uma volta completa da fila CTB") — isso não muda. O que
+sem ambiguidade em §4.1 como "uma volta completa da fila CTB"), e isso não muda. O que
 muda é a história de por que o HP está fora da janela: não é uma janela que apertou por
 cima de uma calibração antiga na MESMA unidade, é uma calibração antiga numa unidade
 diferente, talvez nunca verificada em rodadas. O estudo da mira mediu a consequência
@@ -133,7 +133,7 @@ mensurável, em rodadas: 7 cravadas.
 **Segunda decisão do líder daí derivada:** já que junho falava de "turnos de ator", e
 essa unidade mede naturalmente algo mais parecido com "quantos golpes derrubam um
 inimigo" do que "quantas rodadas dura a luta", este estudo mede TAMBÉM essa métrica
-separada (E11, seção 4) — não para substituir a janela de 3-5 rodadas (que é lei,
+separada (E11, seção 4), não para substituir a janela de 3-5 rodadas (que é lei,
 §15.1), mas para recuperar a intenção original de junho em vez de descartá-la. **São
 dois alvos distintos que coincidem no número "3 a 5" por acidente histórico de
 terminologia**; o relatório final declara os dois separadamente, para ninguém confundir
