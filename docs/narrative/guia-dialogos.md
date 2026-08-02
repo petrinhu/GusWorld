@@ -189,6 +189,55 @@ Não presuma nenhum dos dois lados. **Testar o caso concreto** é o único méto
 
 ---
 
+## 12. Escrita do Gus sob o canon de personalidade AHSD (2026-08-01)
+
+> Fonte e detalhe completo: `docs/narrative/characters/gus.md`, seção "Canon de personalidade (AHSD), adição 2026-08-01". Aqui só ficam as regras de ESCRITA derivadas dela. Perguntas ainda em aberto: `docs/narrative/PERGUNTAS-CANON-GUS-AHSD-2026-08-01.md`.
+
+Quatro regras, extraídas do exemplo do líder (a cena inteira NÃO é reproduzida aqui nem em lugar nenhum do jogo, ver a proibição correspondente em `gus.md`; só o padrão que ela ensina):
+
+1. **A fala nunca vira grosseria.** A agressão do Gus sai **embrulhada em educação**, nunca em xingamento ou rispidez explícita. Se uma fala dele soa mal-educada de forma direta, ela errou o personagem: reescreva embrulhando a mesma agressão em cortesia.
+2. **O pensamento (`//`) faz o trabalho inteiro, e vai perdendo a pontuação civilizada conforme desce.** A fala pode ficar cada vez mais curta e educada; o pensamento não dito é onde a impaciência real aparece, e ele fica **mais cru e menos filtrado** à medida que a cena avança (maiúsculas, pontuação truncada, interjeições), nunca o contrário.
+3. **As rubricas de corpo carregam mais que as falas.** Sorriso sem graça, olhar de baixo pra cima, olhar fixo, silêncio com olhar: essas ações comunicam mais impaciência do que qualquer linha dita. Priorize o beat de corpo (ver item 4 acima neste guia) ao escrever a escalada de desconforto do Gus especificamente.
+4. **O tiro final é uma gentileza com uma faca dentro.** Quando o Gus encerra de vez uma troca em que foi pressionado, a última fala dele continua educada na superfície, mas carrega a ironia mais afiada da cena.
+
+Lembrar, ao escrever qualquer fala dele: **fala curta não é o padrão dele, é o sintoma de desinteresse mascarado ou de máscara rachando sob insistência.** Em assunto do próprio interesse (contexto espontâneo, não induzido), ele fala **muito**, não pouco; ver a seção completa em `gus.md` antes de decidir o comprimento de uma fala do Gus numa cena nova.
+
+**Escopo da escada, resolvido pelo líder em 2026-08-01:** a escada de 8 degraus e o traço passivo-agressivo valem só para gente **de fora** do círculo de confiança da party. Dentro do círculo, o Gus é direto (canon antigo, intacto). Não escrever a escada acontecendo entre ele e um companion de confiança.
+
+### 12.1 O estudo dele é apetite, não esforço (adendo do líder, 2026-08-01)
+
+Verbatim: *"o estudo dele sobre jogos é satisfação de curiosidade, não obrigação, como quase tudo que ele gosta de estudar."*
+
+Há duas portas de erro ao escrever qualquer cena em que o Gus demonstra saber algo com antecedência (ex.: prever um bug antes de acontecer). A primeira é óbvia e já estava fechada: **infantilizar** ("que fofo, a criança achou um bug"). A segunda é sutil e **parece elogio**, o que a torna mais fácil de escrever por engano: **inventar um esforço que não houve** ("o menino aplicado, que estudou muito"). As duas diminuem o personagem; a segunda desenha o prodígio que se sacrifica, que não é ele. **Ele não se dedicou: ele quis saber, então foi saber.**
+
+| ⛔ nunca | ✅ sempre |
+|---|---|
+| "estudou muito", "se dedicou", "aplicado", "esforçado", "disciplinado", "focado nos estudos" | "ele já sabia", "ele tinha lido sobre isso", "ele foi atrás", "ele conhecia" |
+| estudo como **preparo** para uma tarefa | estudo como **prazer**; o que sobrou disso serviu de brinde |
+| o menino que **trabalhou** para acertar | o menino que **conhecia o terreno** porque gosta de andar nele |
+
+Vale para **qualquer** assunto que ele persiga, não só jogos ("como quase tudo que ele gosta de estudar"; o líder não listou quais outros assuntos além de TI/jogos, ver `PERGUNTAS-CANON-GUS-AHSD-2026-08-01.md`, Q4). Casa com o hiperfoco eterno já registrado em `gus.md`: a busca é "eterna busca **prazerosa** por conhecimento". **Se o texto fizer o estudo dele soar como dever, contradiz o canon.**
+
+O ganho de escrever certo: a previsão dos bugs fica **mais** impressionante, não menos. Se ele tivesse montado a lista *para* o projeto, seria trabalho bem-feito, comum. Como a lista já estava na cabeça dele porque o assunto o diverte, o aviso não é entrega de dever de casa: é alguém comentando o óbvio de quem já esteve ali.
+
+### 12.2 A cadeia do estudo e as três portas do mesmo erro (adendo do líder, 2026-08-01)
+
+Fonte e detalhe completo (os 6 passos da cadeia, a leitura dinâmica em duas línguas, a assinatura de comportamento): `docs/narrative/characters/gus.md`, seções "A cadeia do estudo" e "Assinatura de comportamento". Aqui ficam só as regras de escrita.
+
+**As três portas do mesmo erro, registradas juntas para o padrão ficar visível** (a 12.1 já cobriu as duas primeiras; a terceira é nova):
+
+1. **Infantilizar:** "que fofo, a criança achou um bug".
+2. **Inventar esforço que não houve:** "o menino aplicado, que estudou muito".
+3. **Somar as duas metades numa palavra só:** escrever "ele estuda muito" sem qualificar. Ele estuda **pouco** o que é obrigatório e **muito** o que quer, e o texto não pode juntar os dois regimes numa frase que soa neutra.
+
+**Três consequências de escrita sobre escola e dever de casa:**
+
+- ⛔ **Ele NÃO reclama de dever de casa como fardo.** Para ele é entediante e rápido, não pesado. Nada de "ele odeia a escola", nada de sofrimento.
+- ⛔ **Escola não é antagonista.** Ela é irrelevante e chata, o que é diferente de hostil. Escrever a escola como vilã cria um conflito que não existe no canon.
+- ⛔ **Nunca escrever "ele estuda muito" sozinho.** É a terceira porta acima: qualifique sempre qual regime está em jogo (o pouco obrigatório vs. o muito que ele escolhe).
+
+---
+
 ## Fontes consultadas
 
 **As 7 fontes indicadas:**
