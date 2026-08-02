@@ -75,3 +75,51 @@ A onda `AC-E11` é a aplicação concreta e pendente deste princípio: `battle_p
 ## Reversibilidade
 
 Two-way door quanto ao MECANISMO (nenhum código muda com este ADR — é canonização, não implementação); one-way door quanto à DISCIPLINA de enum append-only quando aplicada a formatos já persistidos (save, `.gmap`) — ali, reordenar um enum já em produção quebra dado existente e não é reversível sem migrator.
+
+## Addendum (2026-08-01, decisão do líder): a lei do átomo, nomeada, e a auditoria que a acompanha
+
+Decisão do líder supremo, verbatim: **"deixe canonizado: cada carta é um átomo, cada bateria um átomo, cada item no geral é um átomo."**
+
+Isto não é mecanismo novo. É o mesmo princípio deste ADR (§Decisão, "conteúdo como dado atômico composável"), agora dito na língua do líder e estendido explicitamente aos três substantivos que ele nomeia: carta, bateria, item. Registrado aqui porque este ADR é o lar canônico do princípio de conteúdo atômico; ver [[ADR-020]] para o mesmo racional no nível de MÓDULO (assunto novo nasce em módulo estreito, não campo acretado).
+
+### O que a lei significa em prática
+
+Toda unidade de conteúdo do jogo (carta, bateria, item, consumível, componente de craft) é um **registro de dados independente**: acrescentar unidade nova é acrescentar dado, nunca escrever código específico daquela unidade. Nenhuma unidade conhece outra unidade. Nenhuma tem caminho especial no motor.
+
+### Átomo contra vocabulário compartilhado
+
+O átomo (a linha de dado, ex. uma entrada de `Card` em `master_cards.cpp`) é distinto do **vocabulário compartilhado** que o motor interpreta (ex. o `EffectKind` do executor `techMagic`, ver [[ADR-016]]). O vocabulário é maquinário escrito uma vez, reutilizável por qualquer átomo futuro que o invoque. Unidade nova que usa efeito já existente continua sendo só dado; só efeito INÉDITO custa código, e esse código passa a servir a todas as próximas unidades que precisarem dele. É o mesmo par "executor pequeno e fixo / coleção de dados" já descrito na §Decisão deste ADR, agora com o nome que o líder deu ao lado do dado: átomo.
+
+### Estado verificado em 2026-08-01
+
+`Card` (`GusEngine/domain/include/gus/domain/cards/card_records.hpp`) já é registro puro: id, família, tipo-base, mana, AP, poder, forma de alvo, status, modificadores, maestria, crítico, tier, categoria, `effects` (vetor de `EffectSpec`), e os campos aditivos de hardware/pirataria (`mimics_special_id`, `has_adware`) chegaram todos no fim do struct com default neutro, com comentário explícito dizendo que isso "preserva TODA carta/teste existente intacta". Zero código por carta no struct. A disciplina de expansão já vinha sendo cumprida antes da lei existir; a decisão do líder generaliza o que já era prática para bateria e item.
+
+### A fronteira da bateria
+
+A bateria (o item físico, CR2032) é átomo, como qualquer outro item. Mas o **sistema de consumo de energia** (como a carga da bateria é gasta ao longo de uma partida) mexe em COMO a carta é jogada, e por isso é módulo, não dado, seguindo [[ADR-020]]. Hoje esse sistema existe só em design (`docs/design/mecanicas/cartas-hardware-pirataria-energia.md`), sem código. Isso não contradiz a lei do átomo; é a fronteira dela: o átomo é a unidade, o sistema que a consome é módulo.
+
+### Régua operacional
+
+Ao propor conteúdo novo, a pergunta obrigatória é: **isto é dado ou é módulo?** Se a resposta pede caminho especial no motor para UMA unidade só (um `if` por id, um `switch` que só cobre aquele caso, um catálogo que precisa de código C++ para crescer), o desenho está errado; a generalização certa é criar (ou reusar) vocabulário compartilhado antes de codar, não abrir uma exceção pontual.
+
+### Auditoria: onde o código de hoje FERE a lei
+
+Achado real, não hipotético. `CombatStateMachine::resolve_use_card`, em `GusEngine/domain/src/combat/combat_state_machine.cpp:1630`:
+
+```cpp
+if (card.id == kUrandomCardId) {
+    resolve_urandom(actor, action, card);
+    dispatch_virus_payload_post_cast(actor, card, action.card_instance_id);
+    return;
+}
+```
+
+`kUrandomCardId` (`GusEngine/domain/include/gus/domain/combat/urandom_algorithm.hpp:47`) é a string literal `"urandom"`. Isto é um `if` por id de UMA carta específica, e o próprio comentário do arquivo (`urandom_algorithm.hpp:13-25`) admite que é uma escolha deliberada: "urandom NAO ganhou um `EffectKind` novo no executor `techMagic`... o trigger é um branch por `card_id` ('urandom') dentro de `resolve_use_card`". A carta "urandom" tem, portanto, caminho especial no motor, exatamente o que a lei do átomo proíbe.
+
+**Contexto que atenua, sem anular o achado:** a razão registrada é técnica e específica, não preguiça: o redirecionamento da urandom precisa da coleção INTEIRA de cartas do jogador (o `TechMagicContext` do executor `techMagic` nunca carregou um catálogo nem uma coleção, só o id da carta em execução) e precisa reexecutar o resolvedor de OUTRA carta inteira. Modelar isto como um `EffectKind` exigiria primeiro dar ao `TechMagicContext` acesso ao catálogo e à coleção, algo que nenhum outro efeito hoje precisa. A decisão foi tomada e reportada ao líder antes desta lei existir (nota "reportada ao lider" no próprio arquivo), como exceção de arquitetura desta fatia específica; não foi escondida.
+
+**Isto não é uma aprovação retroativa.** É um achado de auditoria que o líder precisa decidir: (a) manter como exceção documentada e única (a urandom continua sendo a carta-caos, propositalmente fora do vocabulário comum), ou (b) generalizar (dar ao `TechMagicContext` acesso a catálogo/coleção e migrar a urandom para um `EffectKind` novo, ex. `RandomRedirect`, pagando o custo de estender o contexto compartilhado uma vez). Nenhum código foi alterado por este addendum.
+
+**Busca feita e o que NÃO apareceu:** varredura por `id ==` e por nome próprio de carta (godel, newton, einstein, tesla, faraday, maxwell, dee, planck, urandom) fora de `master_cards.cpp` (catálogo, onde nomear é esperado), dos arquivos de teste, e do dispatcher `techmagic.cpp` (que despacha por `EffectKind`, vocabulário, não por id). O `dispatch_adware_gate` (Adware Sterling) e o `dispatch_virus_payload_pre_cast/post_cast` (LogicBomb/Worm/ZipBomb/Backdoor) são despachados por um flag de dado (`Card::has_adware`) e por um enum de vocabulário (`VirusKind`, exaustivo via `switch` protegido por `-Werror=switch`), respectivamente, não por id de carta; ambos cumprem a lei. `mimics_special_id` é lido só via `.has_value()`, genérico. Nenhuma outra violação foi encontrada além da urandom.
+
+Cross-ref: [[ADR-016]] (o executor `techMagic` e o vocabulário `EffectKind`), [[ADR-020]] (a mesma lei no nível de módulo), `GusEngine/domain/src/combat/combat_state_machine.cpp` (o achado), `GusEngine/domain/include/gus/domain/combat/urandom_algorithm.hpp` (a justificativa registrada), `docs/design/mecanicas/cartas-hardware-pirataria-energia.md` (a fronteira da bateria).

@@ -57,7 +57,7 @@ O `ADR-019` já canoniza "motor genérico + conteúdo como dado atômico" no ní
 
 ## Onde aplicar a seguir (pendente)
 
-- **`ATOM-3` (items):** `items/`/`inventory/` nascem separados quando houver consumidor real — ver §Decisão item 4.
+- **`ATOM-3` (items):** `items/`/`inventory/` nascem separados quando houver consumidor real (ver §Decisão item 4). Ver também o addendum de 2026-08-01 em [[ADR-019]] ("a lei do átomo, nomeada"): carta/bateria/item são átomo (registro de dado independente); o sistema que CONSOME o átomo (ex. consumo de energia de bateria) é que é módulo, seguindo este ADR.
 - **`ATOM-4` (world):** refactor do `maestro` para consumir `AreaDescriptor` como dado, pago junto com a primeira área nova real — ver §Decisão item 5.
 
 ## Reversibilidade
