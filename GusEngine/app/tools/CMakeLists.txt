@@ -227,7 +227,8 @@ if(EXISTS "${_GUSENGINE_RELEASE}/app/libgusengine_app.a")
         sysmenu_controls_screenshot_probe
         save_load_screenshot_probe
         frozen_bg_probe
-        reload_geometry_probe)
+        reload_geometry_probe
+        city_audit_probe)
         add_executable(${_probe} ${_probe}.cpp)
 
         target_include_directories(${_probe} PRIVATE
