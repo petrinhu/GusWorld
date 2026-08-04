@@ -49,6 +49,16 @@ struct ScenePropInstance {
     // puzzle, marcações de calçada). Nunca esconde ninguém e nunca bloqueia.
     bool ground = false;
 
+    // A CÉLULA que a peça pisa (a mesma do ScenePropPlacement que a originou).
+    // A geometria já vem resolvida acima, então isto não serve para desenhar:
+    // serve para o sim saber QUAL célula esta peça VESTE, e não pintar a marcação
+    // de graybox por baixo dela (achado A3 do laudo visual - a caixa de cobertura
+    // É a célula de Parede, e pintar a parede atrás dela a deixa "pairando sobre
+    // um buraco" escuro). Negativo = peça sem célula de origem (montagem manual em
+    // teste), que nunca veste nada.
+    int cell_x = -1;
+    int cell_y = -1;
+
     [[nodiscard]] bool drawable() const noexcept {
         return tex != gus::platform::render2d::kInvalidTexture;
     }

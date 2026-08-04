@@ -104,13 +104,27 @@ inline constexpr CityPropRow kDistritosInferioresDressing[] = {
     // --- Pátio de Sucata e arena (R14/R15) ---
     {gus::domain::world::ScenePropKind::PosteNeonCiano, 36, 34},
     {gus::domain::world::ScenePropKind::PosteNeonCiano, 54, 34},
-    // Cobertura: a célula de baixo de cada bloco de Parede (a peça cresce da base
-    // para cima, então ancorar na de cima deixaria a arte flutuando meio tile).
+    // Cobertura: UMA caixa POR CÉLULA de Parede do bloco, de baixo para cima.
+    //
+    // A convenção do blockout (§2) é que a barricada É a célula de Parede. Os
+    // blocos do Pátio de Sucata e da arena têm DUAS células (a §5 chama de "4
+    // grupos verticais 1x2 simétricos"), e uma caixa só cobre 1,09 tile de
+    // conteúdo: sobrava meio tile de parede nua ACIMA dela, medido pelo laudo
+    // visual da fatia D (achado A3). Duas caixas empilhadas cobrem o bloco inteiro
+    // e leem como o que a barricada é - caixotes empilhados -, sem tocar em arte,
+    // em escala nem no traçado do mapa. Os blocos de UMA célula (Pátio da FIR)
+    // seguem com uma caixa só, pelo mesmo critério.
+    {gus::domain::world::ScenePropKind::CoverBox, 6, 36, PropCellRule::WallCell},
     {gus::domain::world::ScenePropKind::CoverBox, 6, 37, PropCellRule::WallCell},
+    {gus::domain::world::ScenePropKind::CoverBox, 10, 36, PropCellRule::WallCell},
     {gus::domain::world::ScenePropKind::CoverBox, 10, 37, PropCellRule::WallCell},
+    {gus::domain::world::ScenePropKind::CoverBox, 38, 36, PropCellRule::WallCell},
     {gus::domain::world::ScenePropKind::CoverBox, 38, 37, PropCellRule::WallCell},
+    {gus::domain::world::ScenePropKind::CoverBox, 52, 36, PropCellRule::WallCell},
     {gus::domain::world::ScenePropKind::CoverBox, 52, 37, PropCellRule::WallCell},
+    {gus::domain::world::ScenePropKind::CoverBox, 38, 42, PropCellRule::WallCell},
     {gus::domain::world::ScenePropKind::CoverBox, 38, 43, PropCellRule::WallCell},
+    {gus::domain::world::ScenePropKind::CoverBox, 52, 42, PropCellRule::WallCell},
     {gus::domain::world::ScenePropKind::CoverBox, 52, 43, PropCellRule::WallCell},
     // --- Corredor-puzzle e Pátio da FIR (R17/R19) ---
     {gus::domain::world::ScenePropKind::BoardPuzzle, 42, 47},

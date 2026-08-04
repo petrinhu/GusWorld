@@ -85,6 +85,16 @@ CityLoadOutcome load_city_or_fallback() {
     }
 
     OverworldSim sim = make_city_scene(std::move(loaded.map), make_city_tuning());
+    // LEITURA DO MAPA (fatia E): producao por default, blockout so por env var. A
+    // montagem da cena continua PURA; quem le o ambiente e esta fronteira, que ja
+    // e a que le disco. Nada acontece em silencio: a leitura escolhida aparece no
+    // terminal, senao "meu mapa esta laranja" vira mistério de meia hora.
+    const TilePalette palette = resolve_tile_palette();
+    sim.set_tile_palette(palette);
+    if (palette.reading == TileReading::Blockout) {
+        std::cout << "cidade: leitura de BLOCKOUT ligada (GUSWORLD_TILE_PALETTE) - a "
+                     "legenda de graybox pinta por cima da cidade vestida.\n";
+    }
     std::cout << "cidade: Distritos Inferiores carregados (" << sim.grid().width()
               << "x" << sim.grid().height() << " celulas, tile_size "
               << sim.grid().tile_size() << ") de " << path << "\n";

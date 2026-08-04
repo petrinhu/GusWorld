@@ -523,6 +523,21 @@ histórico no fim do arquivo. Novas descobertas entram como bullets abaixo desta
   cidade só). (b) inimigos **andam em rota fixa**, ida e volta, sem reagir ao jogador (estilo Chrono
   Trigger). (c) os slots únicos de NPC e inimigo viram **listas**. Sem bloqueio técnico conhecido: o
   `.gmap` guarda dimensão em `int32_t` e 90x60 cabe folgado.
+  **Fatia E entregue 2026-08-04, 🔍 Pendente verificação** (os 3 consertos baratos do laudo visual da
+  fatia D, escolhidos pelo líder): **A2** as cores de âncora viraram **duas leituras do mesmo mapa** —
+  produção (default, Marco/Entrada/Saída na cor do Chão) e blockout (a legenda inteira, por
+  `GUSWORLD_TILE_PALETTE=blockout`); medido zero pixel âmbar nas 3 telas de referência, contra 7.628 /
+  3.521 / 2.625. **A3** a célula de Parede que uma peça veste deixou de pintar em produção (a caixa não
+  paira mais sobre um buraco escuro), e os blocos de cobertura 1x2 passaram a receber **uma caixa por
+  célula** (8 → 14 caixas, só dado, arte e escala intocadas). **A5** o spawn saiu de (44,1) para (44,3):
+  o topo do desenho do jogador estava 1,9 unidade acima da borda do mundo e a cabeça dele era cortada no
+  primeiro quadro do jogo; agora sobra 2,1 unidade, travado por teste contra o mapa real.
+  ⚠️ **Fica em aberto:** o corte de cabeça volta se o jogador ANDAR até a linha 1 (o conserto do spawn
+  cobre o primeiro quadro, não a borda do mapa); o remédio geral é folga de câmera acima do mapa mais
+  preenchimento do fora-do-mundo, que é trabalho de `core/` e não coube nesta fatia. Continuam abertos
+  os outros 5 achados do laudo: **A1** escala (decisão de estética do líder, montagem comparativa),
+  **A4** volume de Parede exposto ao redor das peças sólidas, **A6** androides usando retrato de
+  batalha, **A7** peças isométricas sobre mundo ortogonal, **A8** cobertura de arte de 0,54%.
 
 - `TMPDIR-STAGE-FIXO-PRODUCAO`: o mesmo defeito de caminho temporário previsível existe em **código de
   produção**, não só em teste, e a fatia `FLAKY-*` deliberadamente não o tocou porque estava fora do

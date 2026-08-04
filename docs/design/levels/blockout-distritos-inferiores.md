@@ -28,12 +28,21 @@ O formato do mapa tem 5 tipos de tile e nenhum deles é "prop". Para não invent
 
 - **Marco não bloqueia** (só Parede bloqueia, ver `gus/domain/map/tile_map.hpp`). A âncora é onde o sprite deve ser plantado, não onde o jogador é impedido de andar.
 - **Peça sólida** (casa, fonte, portão, cover box): o volume é feito de **Parede**, e a âncora fica na **célula de rua em frente à fachada**, isto é, onde o jogador para para interagir ou de onde vê a peça de frente. Isso casa com a hitbox de ativação nos pés já usada no projeto.
-- **Cover box não tem âncora própria:** a peça é exatamente uma célula de Parede isolada. A fatia C pinta o sprite sobre a célula de Parede solta.
+- **Cover box não tem âncora própria:** a peça é exatamente uma célula de Parede isolada, e vale **uma caixa por célula** (bloco de 1x2 recebe duas caixas). A fatia C pinta o sprite sobre a célula de Parede solta, e o render deixa de pintar a cor de graybox dessa célula na leitura de produção: quem faz o papel de parede ali é a arte. Um bloco de 1x2 com uma caixa só deixava meio tile de parede nua acima dela, que é o que o laudo visual da fatia D mediu (achado A3).
 - **Peça sem volume** (board do puzzle, holograma projetado, poste): a âncora é o canto superior-esquerdo do sprite.
 
 São **34 âncoras** no mapa, listadas na §5. (Eram 29 na primeira versão deste traçado; os 5 postes
 acrescentados para cobrir as telas sem peça entraram depois, e este número ficou desatualizado até a
 fatia C cruzar doc contra CSV e achar a divergência. O CSV é a fonte da verdade: 34, conferidos.)
+
+**A cor da âncora só existe para quem traça o nível.** Marco (âmbar), Entrada (verde) e Saída (azul)
+eram a legenda de graybox, útil enquanto não havia arte nenhuma. Com a cidade vestida elas viraram
+defeito medido (achado A2 do laudo visual da fatia D): o âmbar vaza por baixo e ao redor de cada peça,
+e as âncoras sem sprite viram quadrados chapados no meio da rua. Desde a fatia E o jogo tem **duas
+leituras do mesmo mapa**: em **produção** (o default) esses três tipos saem na cor do Chão, e quem
+marca o lugar é a arte; a legenda inteira volta com `GUSWORLD_TILE_PALETTE=blockout`, que é a
+ferramenta para conferir traçado. Chão e Parede são iguais nas duas. Ou seja: **continue usando Marco
+como âncora exatamente como antes** e confira o traçado com a env var ligada.
 
 ## 3. Regiões (retângulos exatos, conferíveis contra o CSV)
 
@@ -41,7 +50,7 @@ Eixo X para a direita (0..89), Y para baixo (0..59). Bordas do mapa (x=0, x=89, 
 
 | # | Região | Faixa | Função (por que existe) |
 |---|---|---|---|
-| R1 | Portal Norte + Alameda | x40..49, y0..8 | Chegada. Entrada em (44,0)/(45,0), spawn em (44,1). Corredor de 10 de largura com sightline reta para o sul: o jogador vê o holograma à esquerda e o vão da praça ao fundo. |
+| R1 | Portal Norte + Alameda | x40..49, y0..8 | Chegada. Entrada em (44,0)/(45,0), spawn em (44,3). Corredor de 10 de largura com sightline reta para o sul: o jogador vê o holograma à esquerda e o vão da praça ao fundo. |
 | R2 | Terraço de Chegada | x30..57, y1..6 | Átrio antes da praça. Holograma Sterling e primeiro poste. Dois canteiros quebram a largura. |
 | R3 | Quarteirões Norte | x3..15 e x19..29 e x58..70 e x74..88, y1..7 | Massa construída. Definem a alameda por contraste, não por muro de arena. |
 | R4 | Becos Norte | x16..18 e x71..73, y1..8 | Duas descidas laterais paralelas à alameda. A leste é o começo da rota do explorador (§7). |
@@ -121,7 +130,7 @@ Todas as peças vivem em `resources/sprites/world/distritos_inferiores/`. Coorde
 | `casa_cibergotica_a.png` (2ª) | (82,21) | x79..85, y13..20 | Espelho no bairro leste, para o leste não parecer só corredor de serviço. |
 | `casa_cibergotica_b.png` (2ª) | (73,17) | x68..75, y18..33 | Fachada norte, fecha a praceta do terminal ao sul. |
 | `poste_neon_ciano.png` x18 | (17,4), (52,4), (72,4), (40,7), (48,9), (33,15), (56,15), (33,27), (56,27), (13,28), (66,28), (36,34), (54,34), (75,48), (10,53), (33,53), (78,53), (52,54) | nenhum | Ritmo de iluminação e breadcrumb noturno. Distribuídos para marcar cada mudança de região, nunca em fileira regular. Os cinco de (17,4), (72,4), (13,28), (66,28) e (33,53) entraram depois da medição de densidade por tela (ver §10): eram becos e ruas com espaço andável e nenhuma peça. |
-| `cover_box.png` x8 | sem âncora | (6,36),(6,37),(10,36),(10,37) no pátio; (38,36),(38,37),(38,42),(38,43),(52,36),(52,37),(52,42),(52,43) na arena; (70,49),(78,49) no pátio da FIR | Cobertura real (célula de Parede). Na arena formam 4 grupos verticais 1x2 simétricos, com o pilar central 2x2 (x44..45, y39..40) fechando a leitura tática. |
+| `cover_box.png` x14 | sem âncora | (6,36),(6,37),(10,36),(10,37) no pátio; (38,36),(38,37),(38,42),(38,43),(52,36),(52,37),(52,42),(52,43) na arena; (70,49),(78,49) no pátio da FIR | Cobertura real (célula de Parede), **uma caixa por célula**. Na arena formam 4 grupos verticais 1x2 simétricos, com o pilar central 2x2 (x44..45, y39..40) fechando a leitura tática. |
 | `board_puzzle.png` | (42,47) | nenhum | Canto superior-esquerdo do tabuleiro 7x5 (x42..48, y47..51), alinhado célula a célula com o grid do puzzle-gambito §8. |
 | `portao_sul_fechado.png` | (44,55) e (45,55) | x40..43 e x46..49 em y55 | Único vão do muro sul. Os batentes já são Parede; o vão está aberto por ora (ver §8, decisão em aberto). |
 
@@ -131,7 +140,7 @@ Conferência: **34 âncoras** no CSV, sendo **18 postes**, **8 de arquitetura** 
 
 ## 6. Gold path
 
-1. **Chegada (y0..8).** Spawn em (44,1). Alameda larga, hazard zero, holograma à vista. Espaço seguro para aprender a andar.
+1. **Chegada (y0..8).** Spawn em (44,3). Alameda larga, hazard zero, holograma à vista. Espaço seguro para aprender a andar.
 2. **Anel Norte (y9..12).** Primeira escolha barata: seguir reto (gold path) ou ir para os becos laterais. A boca da praça em x40..49 é a abertura mais larga do mapa e puxa o olho.
 3. **Praça (y13..29).** Bertoldo em (32,19) logo à esquerda de quem entra; a fonte em frente; a placa em (36,24) no caminho de saída ao sul. NPC, lore e landmark na ordem pedagógica sem forçar corredor.
 4. **Choke (y30..33).** Vão único de 6 células que estreita para 4. Momento de leitura: daqui se vê a arena antes de entrar nela.
@@ -188,7 +197,7 @@ Limite conhecido da métrica: a grade é fixa e a câmera real segue o jogador, 
 | # | Decisão | Escolha |
 |---|---|---|
 | **DA-1** | Topônimo "Distritos Inferiores" | **Canonizado como sub-local novo** em PLACES.md (borda baixa do Núcleo descendo à charneira da Periferia, engloba a Praça da Compilação e a descida sul). |
-| **DA-2** | Save points | **Entrada (S0) + portão sul.** No traçado novo: spawn (44,1) e vestíbulo (44,57). |
+| **DA-2** | Save points | **Entrada (S0) + portão sul.** No traçado novo: spawn (44,3) e vestíbulo (44,57). |
 | **DA-3** | Daemon-Guard (HP144) | **Spawn na arena, ativado pós-Sentinela.** A arena de 23x12 comporta o segundo encontro sem inflar o tutorial. |
 
 <details>

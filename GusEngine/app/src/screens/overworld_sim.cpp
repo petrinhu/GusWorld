@@ -52,6 +52,21 @@ int OverworldSim::add_scene_prop(const ScenePropInstance& prop) {
 
 void OverworldSim::clear_scene_props() noexcept { props_.clear(); }
 
+bool OverworldSim::is_cell_dressed(int cx, int cy) const noexcept {
+    if (cx < 0 || cy < 0) {
+        return false;  // celula invalida nunca esta vestida
+    }
+    // Varredura linear sobre a lista de pecas: uma cidade tem dezenas, e so as
+    // celulas de Parede visiveis chegam aqui (o chamador ja filtrou). Se um dia
+    // forem milhares, o indice entra AQUI, num lugar so.
+    for (const ScenePropInstance& p : props_) {
+        if (p.cell_x == cx && p.cell_y == cy && p.drawable()) {
+            return true;
+        }
+    }
+    return false;
+}
+
 gus::core::spatial::Aabb OverworldSim::actor_sprite_rect(
     const gus::core::spatial::Aabb& anchor,
     float sprite_height_tiles) const noexcept {
@@ -502,7 +517,22 @@ void OverworldSim::render(gus::platform::render2d::IRenderer& renderer,
             }
             if (map_.has_value()) {
                 const std::uint16_t tile_id = map_->at(cx, cy);
-                renderer.draw_filled_rect(cell, color_for_tile(palette_, tile_id));
+                // A CELULA VESTIDA nao pinta (fatia E, achado A3 do laudo visual).
+                // A caixa de cobertura nao fica AO LADO de um obstaculo: ela E a
+                // celula de Parede. Pintar a parede de graybox atras dela deixa a
+                // barricada "pairando sobre um buraco" escuro, porque o conteudo
+                // do PNG termina 0,19 tile antes da base do quadro. Na leitura de
+                // PRODUCAO a celula sai na cor do Chao e quem faz o papel de
+                // parede ali e a arte; a COLISAO nao muda (a celula continua
+                // Parede na TileGrid). Na leitura de BLOCKOUT a parede volta,
+                // porque quem traça o nivel precisa ver o solido de verdade.
+                const bool vestida =
+                    palette_.reading == TileReading::Production &&
+                    static_cast<gus::domain::map::TileKind>(tile_id) ==
+                        gus::domain::map::TileKind::Parede &&
+                    is_cell_dressed(cx, cy);
+                renderer.draw_filled_rect(
+                    cell, vestida ? palette_.chao : color_for_tile(palette_, tile_id));
             } else if (grid_.is_blocked(cx, cy)) {
                 renderer.draw_filled_rect(cell, tuning_.wall_color);
             }

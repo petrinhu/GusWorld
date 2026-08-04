@@ -57,6 +57,25 @@ logica de transformacao e POCO puro do `domain/` (sem SDL, sem fstream).
   - `#portal <id> <x> <y>` portal/saida nomeada (pode repetir)
 - Linhas em branco e comentarios `//` (linha inteira) sao ignorados.
 
+## Ver o mapa com a legenda de blockout
+
+O jogo tem DUAS leituras do mesmo mapa (fatia E do DEMO-CIDADE-VESTIDA):
+
+- **producao** (default): `Marco`, `Entrada` e `Saida` saem na cor do `Chao`, e a
+  celula de `Parede` que uma peca de cenario VESTE tambem nao pinta. E o que o
+  jogador ve: so chao e parede, com a ARTE marcando o lugar.
+- **blockout**: a legenda inteira de volta (Marco ambar, Entrada verde, Saida azul,
+  parede vestida pintando parede). Ligada por env var:
+
+```bash
+GUSWORLD_TILE_PALETTE=blockout build/linux-release/app/gusworld_app
+```
+
+Qualquer outro valor (ou a ausencia dela) cai em producao, de proposito: a tela
+limpa e o estado de repouso, e mostrar a legenda e um ato deliberado. Ao conferir
+tracado depois de mexer neste CSV, ligue a env var - senao as ancoras estao
+invisiveis, que e exatamente o objetivo delas em producao.
+
 ## 1o mapa: Distritos Inferiores (graybox)
 
 Derivado de `docs/design/levels/blockout-distritos-inferiores.md` (F2-G.1).

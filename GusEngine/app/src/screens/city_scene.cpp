@@ -8,6 +8,8 @@
 
 #include "gus/app/screens/city_scene.hpp"
 
+#include <cstdlib>  // std::getenv
+#include <cstring>  // std::strcmp
 #include <utility>  // std::move
 
 #include "gus/core/asset_paths.hpp"  // caminhos de asset centralizados (mapa .gmap)
@@ -52,6 +54,16 @@ OverworldTuning make_city_tuning() {
     // Default do OverworldTuning (velocidade em TILES/s; o tile_size real do .gmap
     // entra via o grid, ajustando a velocidade em mundo). Ponto unico de feel.
     return OverworldTuning{};
+}
+
+TilePalette resolve_tile_palette() {
+    const char* v = std::getenv("GUSWORLD_TILE_PALETTE");
+    if (v != nullptr && std::strcmp(v, "blockout") == 0) {
+        return blockout_palette();
+    }
+    // Qualquer outro valor cai em producao (inclusive um valor escrito errado): o
+    // caminho SEGURO e o que o jogador ve, nunca a legenda de graybox no jogo.
+    return production_palette();
 }
 
 std::string resolve_distritos_inferiores_gmap() {

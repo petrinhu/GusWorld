@@ -63,6 +63,14 @@ inline constexpr float kPlayerHitboxTileFraction = 0.6f;
 // a velocidade em mundo se ajusta sozinha. Ponto unico de feel pro lider mexer.
 [[nodiscard]] OverworldTuning make_city_tuning();
 
+// Qual das duas LEITURAS do mapa usar (ver tile_palette.hpp). Le a env var
+// GUSWORLD_TILE_PALETTE (mesmo padrao de GUSWORLD_MAPS / GUSWORLD_RENDER2D_BACKEND):
+//   "blockout" -> a legenda de graybox inteira, ferramenta de quem traça o nivel;
+//   qualquer outra coisa, ou ausente -> PRODUCAO (o que o jogador ve).
+// O default e producao de proposito: a tela limpa e o estado de repouso do jogo, e
+// mostrar a legenda e um ato deliberado. Toca env (getenv), nao abre arquivo.
+[[nodiscard]] TilePalette resolve_tile_palette();
+
 // Resolve o caminho do .gmap dos Distritos Inferiores (toca std::filesystem). Ordem,
 // igual ao resolver de sprites:
 //   1) env GUSWORLD_MAPS  -> <env>/distritos_inferiores.gmap;

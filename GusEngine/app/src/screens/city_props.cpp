@@ -114,6 +114,11 @@ std::vector<ScenePropInstance> build_scene_prop_instances(
             gus::domain::world::scene_prop_solid(inst.footprint, def, tile_size, scale);
         inst.tex = tex;
         inst.ground = def.ground;
+        // A célula que a peça VESTE viaja junto com a geometria: é por ela que o
+        // render sabe não pintar a marcação de graybox por baixo de quem já é a
+        // marcação (ver OverworldSim::is_cell_dressed).
+        inst.cell_x = p.cell_x;
+        inst.cell_y = p.cell_y;
         out.push_back(inst);
     }
     return out;

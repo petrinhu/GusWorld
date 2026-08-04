@@ -14,6 +14,7 @@
 #include <catch2/matchers/catch_matchers_floating_point.hpp>
 
 #include <cstdint>
+#include <cstdlib>  // setenv/unsetenv (seam de env do resolve_tile_palette)
 
 #include "gus/app/screens/city_scene.hpp"
 #include "gus/app/screens/overworld_sim.hpp"
@@ -170,4 +171,206 @@ TEST_CASE("render do mapa real pinta TODAS as celulas por TileKind", "[city_scen
         }
     }
     REQUIRE(found_marco);
+}
+
+// ===========================================================================
+//  DUAS LEITURAS DO MAPA (DEMO-CIDADE-VESTIDA fatia E, achado A2 do laudo visual)
+//
+//  As cores de Marco/Entrada/Saida eram a LEGENDA do blockout, util enquanto nao
+//  havia arte. Com a cidade vestida elas viraram defeito: o ambar vaza por baixo e
+//  ao redor de cada peca (o poste tem 23 px de largura numa celula de 43 px) e as
+//  ancoras sem peca ficam como quadrados chapados. Apagar a legenda consertaria a
+//  tela e mataria a ferramenta de quem traca o nivel - por isso sao DUAS leituras
+//  do MESMO dado, nao uma cor trocada.
+// ===========================================================================
+
+TEST_CASE("na leitura de PRODUCAO a marcacao de blockout nao pinta", "[tile_palette]") {
+    const TilePalette pal;  // default = producao
+    REQUIRE(pal.reading == gus::app::screens::TileReading::Production);
+    // Marco/Entrada/Saida saem na cor do Chao: sobra chao e parede, e quem marca o
+    // lugar passa a ser a ARTE da peca.
+    REQUIRE(color_for_tile(pal, k(TileKind::Marco)).r == pal.chao.r);
+    REQUIRE(color_for_tile(pal, k(TileKind::Marco)).g == pal.chao.g);
+    REQUIRE(color_for_tile(pal, k(TileKind::Marco)).b == pal.chao.b);
+    REQUIRE(color_for_tile(pal, k(TileKind::Entrada)).g == pal.chao.g);
+    REQUIRE(color_for_tile(pal, k(TileKind::Saida)).b == pal.chao.b);
+    // Chao e Parede continuam distintos: a leitura de traçado do mapa sobrevive.
+    REQUIRE(color_for_tile(pal, k(TileKind::Parede)).b != pal.chao.b);
+}
+
+TEST_CASE("a leitura de BLOCKOUT devolve a legenda inteira", "[tile_palette]") {
+    const TilePalette pal = gus::app::screens::blockout_palette();
+    REQUIRE(pal.reading == gus::app::screens::TileReading::Blockout);
+    REQUIRE(color_for_tile(pal, k(TileKind::Marco)).r == gus::app::screens::kLegendMarco.r);
+    REQUIRE(color_for_tile(pal, k(TileKind::Entrada)).g ==
+            gus::app::screens::kLegendEntrada.g);
+    REQUIRE(color_for_tile(pal, k(TileKind::Saida)).b == gus::app::screens::kLegendSaida.b);
+    // E os tres sao DISTINTOS do chao - senao a legenda nao legenda nada.
+    REQUIRE(color_for_tile(pal, k(TileKind::Marco)).r != pal.chao.r);
+    REQUIRE(color_for_tile(pal, k(TileKind::Entrada)).g != pal.chao.g);
+    REQUIRE(color_for_tile(pal, k(TileKind::Saida)).b != pal.chao.b);
+    // Chao e Parede sao os MESMOS nas duas leituras: so a legenda muda.
+    const TilePalette prod;
+    REQUIRE(pal.chao.r == prod.chao.r);
+    REQUIRE(pal.parede.b == prod.parede.b);
+}
+
+TEST_CASE("o render usa a leitura corrente na celula de Marco", "[city_scene]") {
+    const TileMap m = small_walled_map();  // Marco em (2,1)
+    OverworldSim sim = make_city_scene(m, make_city_tuning());
+    CountingRenderer r;
+
+    // Centro da celula (2,1) em mundo: x=5.0, y=3.0.
+    const auto cor_do_marco = [&]() {
+        for (const auto& f : r.fills) {
+            if (f.rect.x <= 5.0f && f.rect.x + f.rect.w > 5.0f && f.rect.y <= 3.0f &&
+                f.rect.y + f.rect.h > 3.0f) {
+                return f.color;
+            }
+        }
+        return DrawColor{-1.0f, -1.0f, -1.0f, -1.0f};
+    };
+
+    // PRODUCAO (default): a ancora some no chao.
+    sim.render(r, 1000.0f, 1000.0f, 0.0f);
+    REQUIRE(cor_do_marco().r == sim.tile_palette().chao.r);
+
+    // BLOCKOUT: o ambar volta, sem tocar em nada alem da paleta.
+    sim.set_tile_palette(gus::app::screens::blockout_palette());
+    sim.render(r, 1000.0f, 1000.0f, 0.0f);
+    REQUIRE(cor_do_marco().r == gus::app::screens::kLegendMarco.r);
+}
+
+// ===========================================================================
+//  A CELULA QUE UMA PECA VESTE (achado A3 do laudo visual)
+//
+//  A caixa de cobertura NAO fica ao lado de um obstaculo: ela E a celula de
+//  Parede. Pintar essa celula com a cor de graybox da parede deixa a barricada
+//  "pairando sobre um buraco" escuro. Na leitura de producao a celula vestida sai
+//  na cor do Chao - quem faz o papel de parede ali e a arte. A colisao NAO muda:
+//  a celula continua Parede na TileGrid.
+// ===========================================================================
+
+namespace {
+
+// Peca de pe plantada na celula (cx,cy) de um mapa de tile_size ts.
+gus::app::screens::ScenePropInstance prop_em(int cx, int cy, float ts,
+                                             TextureId tex) {
+    gus::app::screens::ScenePropInstance p;
+    p.footprint = Aabb{static_cast<float>(cx) * ts, static_cast<float>(cy) * ts, ts, ts};
+    p.solid = p.footprint;
+    p.tex = tex;
+    p.ground = false;
+    p.cell_x = cx;
+    p.cell_y = cy;
+    return p;
+}
+
+}  // namespace
+
+TEST_CASE("a celula de Parede que uma peca veste nao pinta na producao",
+          "[city_scene]") {
+    const TileMap m = small_walled_map();  // borda inteira de Parede; (0,1) e Parede
+    OverworldSim sim = make_city_scene(m, make_city_tuning());
+    CountingRenderer r;
+
+    // Centro da celula (0,1) em mundo: x=1.0, y=3.0.
+    const auto cor_da_celula = [&]() {
+        for (const auto& f : r.fills) {
+            if (f.rect.x <= 1.0f && f.rect.x + f.rect.w > 1.0f && f.rect.y <= 3.0f &&
+                f.rect.y + f.rect.h > 3.0f) {
+                return f.color;
+            }
+        }
+        return DrawColor{-1.0f, -1.0f, -1.0f, -1.0f};
+    };
+
+    // SEM peca: parede pinta parede.
+    sim.render(r, 1000.0f, 1000.0f, 0.0f);
+    REQUIRE(cor_da_celula().b == sim.tile_palette().parede.b);
+
+    // COM peca desenhavel em cima: a celula sai na cor do chao.
+    sim.add_scene_prop(prop_em(0, 1, 2.0f, /*tex=*/7));
+    sim.render(r, 1000.0f, 1000.0f, 0.0f);
+    REQUIRE(cor_da_celula().b == sim.tile_palette().chao.b);
+    // A vizinha (0,2), tambem Parede e SEM peca, segue parede: a supressao e da
+    // celula vestida, nao da coluna.
+    bool achou_vizinha = false;
+    for (const auto& f : r.fills) {
+        if (f.rect.x <= 1.0f && f.rect.x + f.rect.w > 1.0f && f.rect.y <= 5.0f &&
+            f.rect.y + f.rect.h > 5.0f) {
+            REQUIRE(f.color.b == sim.tile_palette().parede.b);
+            achou_vizinha = true;
+        }
+    }
+    REQUIRE(achou_vizinha);
+
+    // BLOCKOUT: quem traca o nivel volta a ver a parede de verdade.
+    sim.set_tile_palette(gus::app::screens::blockout_palette());
+    sim.render(r, 1000.0f, 1000.0f, 0.0f);
+    REQUIRE(cor_da_celula().b == sim.tile_palette().parede.b);
+}
+
+TEST_CASE("peca SEM arte nao esconde a parede que ela deveria vestir",
+          "[city_scene]") {
+    // REGRA DE DEGRADACAO, irma da que ja vale para o bloqueio: peca sem textura
+    // nao entra no mundo, entao suprimir a parede por causa dela deixaria um
+    // obstaculo INVISIVEL - o jogador travaria contra chao pintado.
+    const TileMap m = small_walled_map();
+    OverworldSim sim = make_city_scene(m, make_city_tuning());
+    CountingRenderer r;
+
+    sim.add_scene_prop(
+        prop_em(0, 1, 2.0f, /*tex=*/gus::platform::render2d::kInvalidTexture));
+    sim.render(r, 1000.0f, 1000.0f, 0.0f);
+    for (const auto& f : r.fills) {
+        if (f.rect.x <= 1.0f && f.rect.x + f.rect.w > 1.0f && f.rect.y <= 3.0f &&
+            f.rect.y + f.rect.h > 3.0f) {
+            REQUIRE(f.color.b == sim.tile_palette().parede.b);
+        }
+    }
+}
+
+TEST_CASE("clear_scene_props devolve a parede a celula", "[city_scene]") {
+    const TileMap m = small_walled_map();
+    OverworldSim sim = make_city_scene(m, make_city_tuning());
+    CountingRenderer r;
+
+    sim.add_scene_prop(prop_em(0, 1, 2.0f, /*tex=*/7));
+    sim.clear_scene_props();
+    sim.render(r, 1000.0f, 1000.0f, 0.0f);
+    for (const auto& f : r.fills) {
+        if (f.rect.x <= 1.0f && f.rect.x + f.rect.w > 1.0f && f.rect.y <= 3.0f &&
+            f.rect.y + f.rect.h > 3.0f) {
+            REQUIRE(f.color.b == sim.tile_palette().parede.b);
+        }
+    }
+}
+
+TEST_CASE("resolve_tile_palette: producao por default, blockout so por env",
+          "[city_scene]") {
+    // O default e o caminho SEGURO: sem env var (ou com valor escrito errado) o
+    // jogo pinta a leitura de producao. A legenda so aparece se for pedida.
+    ::unsetenv("GUSWORLD_TILE_PALETTE");
+    REQUIRE(gus::app::screens::resolve_tile_palette().reading ==
+            gus::app::screens::TileReading::Production);
+
+    ::setenv("GUSWORLD_TILE_PALETTE", "blockout", 1);
+    REQUIRE(gus::app::screens::resolve_tile_palette().reading ==
+            gus::app::screens::TileReading::Blockout);
+    REQUIRE(gus::app::screens::resolve_tile_palette().marco.r ==
+            gus::app::screens::kLegendMarco.r);
+
+    // Valor QUALQUER (typo, lixo, string vazia) NAO liga a legenda por acidente.
+    ::setenv("GUSWORLD_TILE_PALETTE", "blockuot", 1);
+    REQUIRE(gus::app::screens::resolve_tile_palette().reading ==
+            gus::app::screens::TileReading::Production);
+    ::setenv("GUSWORLD_TILE_PALETTE", "", 1);
+    REQUIRE(gus::app::screens::resolve_tile_palette().reading ==
+            gus::app::screens::TileReading::Production);
+    ::setenv("GUSWORLD_TILE_PALETTE", "BLOCKOUT", 1);
+    REQUIRE(gus::app::screens::resolve_tile_palette().reading ==
+            gus::app::screens::TileReading::Production);
+
+    ::unsetenv("GUSWORLD_TILE_PALETTE");
 }

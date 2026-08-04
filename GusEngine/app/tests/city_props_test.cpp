@@ -26,6 +26,7 @@
 #include "gus/domain/map/tile_map.hpp"
 #include "gus/app/screens/city_patrol.hpp"
 #include "gus/app/screens/city_props.hpp"
+#include "gus/app/screens/city_scene.hpp"  // spawn_player_aabb (invariante do 1o quadro)
 #include "gus/core/spatial/tile_grid.hpp"
 #include "gus/platform/render2d/i_renderer.hpp"
 
@@ -414,4 +415,35 @@ TEST_CASE("cidade real: nenhuma peça nasce em cima do jogador",
                              kDistritosInferioresDressing[i].cell_y == spawn.y;
         REQUIRE_FALSE(em_cima);
     }
+}
+
+TEST_CASE("cidade real: no primeiro quadro o jogador cabe INTEIRO na tela",
+          "[city-props][mapa-real]") {
+    // ACHADO A5 do laudo visual da fatia D: o Gus nascia em (44,1), a câmera não
+    // rola acima de y=0, e 27% do sprite (a cabeça) ficava fora do quadro - no
+    // PRIMEIRO frame do jogo. Medido pelo laudo: bbox de 58x77 px no spawn contra
+    // 61x105 px em qualquer outro lugar.
+    //
+    // A invariante é geométrica e não depende de câmera nenhuma: o desenho do
+    // jogador é um quadrado de player_sprite_height_tiles ancorado na BASE da
+    // hitbox e crescendo para cima, e a borda de cima do mundo é y=0. Se o topo
+    // desse quadrado é negativo, ele está fora do mapa e nenhuma câmera consegue
+    // mostrá-lo.
+    //
+    // Medido com o QUADRO inteiro (não com o conteúdo do PNG): a margem
+    // transparente do sprite é dado de arte que pode mudar sem aviso, e um teste
+    // que dependesse dela passaria a aprovar corte de cabelo por meio pixel.
+    const gus::app::screens::CityLoadOutcome city = load_real_city();
+    const gus::core::spatial::Aabb hitbox =
+        gus::app::screens::spawn_player_aabb(*city.sim.tile_map());
+    const float tile = city.sim.grid().tile_size();
+    const float altura_do_desenho =
+        city.sim.tuning().player_sprite_height_tiles * tile;
+    const float base_dos_pes = hitbox.y + hitbox.h;
+    const float topo_do_desenho = base_dos_pes - altura_do_desenho;
+
+    INFO("base dos pes = " << base_dos_pes << " unidades, desenho = "
+                           << altura_do_desenho << " unidades, topo = "
+                           << topo_do_desenho);
+    REQUIRE(topo_do_desenho >= 0.0f);
 }

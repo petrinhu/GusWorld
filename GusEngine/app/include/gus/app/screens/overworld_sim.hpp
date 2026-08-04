@@ -234,6 +234,12 @@ public:
         return props_;
     }
 
+    // A celula (cx,cy) esta VESTIDA por uma peca DESENHAVEL? Usada pelo render
+    // para nao pintar a marcacao de graybox por baixo de quem ja e a marcacao.
+    // Peca sem arte NAO veste nada (a mesma regra de degradacao do bloqueio: peca
+    // invisivel que esconde a parede deixaria um obstaculo que o jogador nao ve).
+    [[nodiscard]] bool is_cell_dressed(int cx, int cy) const noexcept;
+
     // =======================================================================
     //  ATORES (DEMO-CIDADE-VESTIDA B2) - VARIOS NPCs e VARIOS inimigos.
     //
