@@ -78,8 +78,15 @@ invisiveis, que e exatamente o objetivo delas em producao.
 
 ## 1o mapa: Distritos Inferiores (graybox)
 
-Derivado de `docs/design/levels/blockout-distritos-inferiores.md` (F2-G.1).
-Grade **30x20 celulas x tile_size 2.0m = caixa ~60x40m**. Topologia hub+radiais
+Derivado de `docs/design/levels/blockout-distritos-inferiores.md`, que e a
+descricao VIVA do tracado - o paragrafo abaixo descreve a topologia, nao o
+tamanho.
+
+Grade **90x60 celulas x tile_size 2.0m = caixa 180x120m** (retracado na fatia A
+do DEMO-CIDADE-VESTIDA, 2026-08). O texto abaixo dizia **30x20** e ficou
+desatualizado desde entao: corrigido de passagem ao documentar a env var da
+paleta, porque numero de grade errado num README de pipeline e do tipo que
+alguem copia. Topologia hub+radiais
 fiel: corredor de entrada norte -> hub (Praca da Compilacao, fonte como Marco
 central; Bertoldo e a placa Era 2 como Marcos) -> ramo leste opcional com o
 Terminal (Marco) -> choke (vao central) -> arena rebaixada (spawn do encontro
