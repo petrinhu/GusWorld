@@ -6,7 +6,7 @@ Fontes lidas, nesta ordem por precedência: `20260801-1945-site-CORRECAO-do-cano
 
 ---
 
-## Respondidas pelo líder (2026-08-01)
+## Respondidas pelo líder (2026-08-01 e 2026-08-04)
 
 ### Q1 (e Q8). A máscara vale dentro do círculo de confiança (a party)?
 
@@ -20,30 +20,30 @@ Fontes lidas, nesta ordem por precedência: `20260801-1945-site-CORRECAO-do-cano
 
 **Resposta: só prosa, sem sistema.** Nada de medidor de paciência, nada de estado numérico de diálogo derivado dela. A escada é guia de escrita. **Se surgir proposta de medidor de paciência ou affinity gauge baseado nesta escada, a resposta já está dada: não.** Aplicado em `gus.md`, seção "A escada da rachadura".
 
+### Q4. Os hiperfocos "eternos" têm uma lista fechada além de "TI"?
+
+**Resposta do líder (2026-08-04): a lista fechada é TI, economia e geopolítica.** Não é só TI, como o canon anterior deixava supor. **Consequência que protege contra um erro feio de escrita:** o interesse dele por economia é **diegético**, não conveniência de roteiro. A doutrina econômica do jogo (o comedimento, `docs/design/mecanicas/economia.md` §0) e a axiologia canônica caem **dentro** de um hiperfoco eterno dele. Ou seja: o Gus discutindo esses temas é o personagem sendo ele mesmo, não o autor falando pela boca dele. Aplicado em `gus.md`, seção "Hiperfoco".
+
+### Q5. "Assunto induzido vira inimigo com insistência" tem gancho de gameplay?
+
+**Resposta do líder (2026-08-04): sim, vira comportamento de jogo.** O NPC que insiste num tema que o Gus não escolheu perde afinidade e muda de estado de diálogo. Aplicado em `gus.md`, seção "Hiperfoco". **O desenho de como a afinidade/estado funciona é de outra alçada** (`lead-game-designer` + aprovação do líder); esta resposta registra a decisão, não a implementação.
+
+### Q6. O "eu avisei, agora aguente" e a "ideia adotada a tempo com mérito" viram mecânica in-game?
+
+**Resposta do líder (2026-08-04): sim, vira escolha do jogador, com consequência.** O Gus avisa de uma armadilha, o jogador ouve ou ignora, o jogo responde diferente nos dois casos, e há reconhecimento do mérito quando ouvido a tempo. O líder chamou esta forma de "mais bonita e menos usada". Aplicado em `gus.md`, seção "Proibições". **O desenho de como a escolha funciona é de outra alçada** (`lead-game-designer` + aprovação do líder); esta resposta registra a decisão, não a implementação.
+
+### Q7. O padrão de "entrevista" se aplica a alguma cena DENTRO do jogo?
+
+**Resposta do líder (2026-08-04): sim, vai existir cena de ato social IMPOSTO dentro do jogo**, equivalente estrutural à entrevista (o Gus obrigado a discorrer sobre o que um sim resolveria). É onde a escada de 8 degraus se realiza em cena jogável. Aplicado em `gus.md`, seção "A escada da rachadura". **O desenho de como essa cena funciona em termos de jogo é de outra alçada** (`lead-game-designer` + aprovação do líder); esta resposta registra a decisão, não a implementação.
+
+**Sobre uma aparente contradição entre Q3 e Q5/Q6 (registrado para ninguém "corrigir" depois):** Q3 diz que a escada NÃO vira sistema; Q5 e Q6 dizem que outros dois traços VIRAM sistema. **Não se anulam.** A régua não é "personalidade não vira sistema", é **caso a caso**: a escada é textura de cena e perde ao virar número; a afinidade (Q5) e a escolha do aviso (Q6) são decisões do jogador, e decisão do jogador é justamente o que merece sistema. Detalhe também em `docs/narrative/guia-dialogos.md`, seção 12.
+
 ---
 
 ## Ainda em aberto
 
-### Q4. Os hiperfocos "eternos" têm uma lista fechada além de "TI"?
-
-O canon cita um hiperfoco eventual de exemplo ("como funciona um motor a explosão") e um eterno ("TI"). **A pergunta:** existem outros hiperfocos eternos do Gus além de TI (ex.: xadrez, C-Arcane especificamente, otimização em geral), ou "TI" é a única categoria eterna citada e tudo mais é eventual?
-
-**Nuance (adendo `2112`, 2026-08-01):** o líder ampliou o escopo ao dizer que o estudo por curiosidade satisfeita vale "como quase tudo que ele gosta de estudar", não só jogos/TI. Isso **amplia** o alcance geral do apetite de estudo, mas **não lista** quais outros assuntos especificamente contariam como hiperfoco ETERNO (vs. eventual). A pergunta original permanece: existe uma lista fechada de hiperfocos eternos, ou "TI" segue sendo o único citado como tal e o resto é eventual, ainda que o apetite de estudo em si seja amplo?
-
-**Nuance adicional (adendo `2120`, 2026-08-01, a cadeia do estudo):** esta mensagem deu a cadeia completa de por que sobra tempo para o hiperfoco (60% do conteúdo escolar já sabido, os outros 40% por indução, dever de casa em minutos) e a leitura dinâmica natural em duas línguas. **Esta mensagem também NÃO fecha a Q4**: ela explica o mecanismo pelo qual o tempo sobra, não lista quais assuntos além de TI seriam hiperfoco eterno. A pergunta segue aberta, e isso importa para não inventar um segundo hiperfoco eterno sem autorização ao escrever cenas futuras, e para o sistema de Knowledge Progression / Diário do Gus (já canônico em `pillars.md`), se ele quiser distinguir hiperfoco eventual de eterno como categoria de conteúdo.
-
-### Q5. "Assunto induzido vira inimigo com insistência" tem gancho de gameplay?
-
-O canon diz que insistir num assunto induzido (não escolhido por ele) "o torna um inimigo" (mensagem `1945`, seção hiperfoco). **A pergunta:** isso deveria ter representação sistêmica (ex.: um NPC que insiste demais num tema imposto perde afinidade ou muda de estado de diálogo com o Gus), ou é só textura de caracterização para prosa/cutscene, sem sistema de jogo associado?
-
-### Q6. O "eu avisei, agora aguente" e a "ideia adotada a tempo com mérito" viram mecânica in-game?
-
-O canon descreve duas formas de satisfação do Gus: (a) ver o aviso ignorado explodir depois, e (b) ter a ideia adotada a tempo e receber o crédito. **A pergunta:** isso deveria virar uma mecânica narrativa dentro do jogo (o Gus avisa sobre um bug/armadilha futura em diálogo, o jogador escolhe ouvir ou ignorar, com consequência textual distinta em cada caso e uma linha de reconhecimento de mérito se ouvido a tempo), ou fica só como traço de personalidade para escrever cenas, sem gancho sistêmico?
-
-### Q7. O padrão de "entrevista" se aplica a alguma cena DENTRO do jogo?
-
-O padrão da fala longa-que-encurta (a escada) foi observado pelo líder no contexto de uma entrevista real do Gus Dragon (ato social induzido, fora do jogo, para a revista). **A pergunta:** existe, ou está prevista, alguma cena DENTRO do jogo que seja um "ato social induzido" equivalente (um NPC entrevistador, uma coletiva de imprensa in-game, um interrogatório não-hostil), onde esse padrão de escada se aplicaria? Ou o padrão fica reservado ao material de mídia real (site/revista), e dentro do jogo o Gus nunca passa por uma cena estruturalmente parecida?
+*(Vazia desde 2026-08-04. Todas as sete perguntas desta lista já têm resposta do líder, acima. Esta seção fica registrada e vazia, não apagada, para o leitor saber que foi esvaziada por resposta, e não perdida por descuido. Se surgir pergunta nova de personalidade do Gus, ela entra aqui.)*
 
 ---
 
-**Como usar esta lista:** as três primeiras perguntas já têm resposta e estão aplicadas nos documentos canônicos. Q4 a Q7 seguem sem decisão. Ao escrever uma cena nova que dependa de uma delas, marcar explicitamente "aguardando resposta do líder (Q-N)" em vez de escolher uma leitura.
+**Como usar esta lista:** as sete perguntas já têm resposta e estão aplicadas nos documentos canônicos (`gus.md`, `guia-dialogos.md`). Q5, Q6 e Q7 geraram itens de design de mecânica ainda não desenhados; ao escrever ou implementar algo que dependa deles, checar se o desenho da mecânica já foi decidido pelo `lead-game-designer` + líder antes de presumir como ela funciona.
