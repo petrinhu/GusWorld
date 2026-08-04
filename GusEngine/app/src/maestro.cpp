@@ -18,6 +18,7 @@
 #include "gus/app/app_icon.hpp"  // APP-ICON: set_window_icon_if_available
 #include "gus/app/dialogue/npc_dialogue_catalog.hpp"  // M7-DIALOGO: I/O do .dlg.txt
 #include "gus/app/screens/battle_preview.hpp"    // run_battle_preview_embedded
+#include "gus/app/screens/city_patrol.hpp"  // DEMO-CIDADE-VESTIDA B3: ronda em rota fixa
 // DIALOGO-TERMINAL: loop GL real (caixa quente com retrato) - substitui o overlay
 // funcional simples de texto (npc_dialogue_loop.hpp, aposentado - ver seu header).
 #include "gus/app/screens/npc_dialogue_loop_gl.hpp"
@@ -341,6 +342,35 @@ bool Maestro::init() {
     std::cout << "Maestro: inimigo fixo (kFixedEnemy1) em (" << enemy_aabb_.x << ", "
               << enemy_aabb_.y << "); jogador em (" << city_->player_aabb().x << ", "
               << city_->player_aabb().y << ").\n";
+
+    // RONDA EM ROTA FIXA (DEMO-CIDADE-VESTIDA B3, decisao do lider 2026-08-04: ida e
+    // volta, SEM reagir ao jogador, estilo Chrono Trigger). A rota e construida
+    // contra o mapa REAL (gus/app/screens/city_patrol.hpp): encurta onde houver
+    // parede/borda, e devolve rota invalida se nao houver para onde andar - nesse
+    // caso o inimigo fica parado, exatamente como era antes desta fatia.
+    //
+    // A celula de origem e a do ANCHOR (nao a do footprint visual, que e o quad alto
+    // do desenho): e ali que ele pisa.
+    const int enemy_cell_x =
+        city_->grid().world_to_cell(enemy_anchor.x + enemy_anchor.w * 0.5f);
+    const int enemy_cell_y =
+        city_->grid().world_to_cell(enemy_anchor.y + enemy_anchor.h * 0.5f);
+    const gus::domain::world::PatrolRoute enemy_route =
+        gus::app::screens::build_horizontal_patrol_route(
+            city_->grid(), enemy_cell_x, enemy_cell_y,
+            gus::app::screens::kDemoPatrolReachTiles,
+            gus::app::screens::kDemoPatrolSpeedTilesPerSec,
+            gus::app::screens::kDemoPatrolPauseSeconds);
+    city_->set_enemy_patrol_route(enemy_route);
+    if (enemy_route.valid()) {
+        std::cout << "Maestro: [ronda] o androide faz a ronda da celula "
+                  << enemy_route.waypoints[0].x << " a "
+                  << enemy_route.waypoints[1].x << " na linha " << enemy_cell_y
+                  << ", a " << enemy_route.speed_tiles_per_sec << " tiles/s.\n";
+    } else {
+        std::cout << "Maestro: [ronda] sem espaco livre ao redor do androide - ele "
+                     "monta guarda parado.\n";
+    }
 
     // M7-DIALOGO (NPC-MVP): MESMA tecnica de posicionamento do inimigo acima (offset
     // diferente - ver kNpcBertoldoOffsetTilesX/Y). O Bertoldo agora TEM sprite
@@ -1006,6 +1036,24 @@ void Maestro::run() {
         // usa enemy_trigger_aabb_ (caixa pequena ancorada nos pes), NAO mais o
         // footprint visual inteiro (enemy_aabb_, que continua servindo SO o quad
         // desenhado via set_enemy_marker em init()).
+        //
+        // RONDA (DEMO-CIDADE-VESTIDA B3): com o inimigo ANDANDO, a caixa de ativacao
+        // nao pode mais ser calculada uma vez no init() - ela tem que acompanhar. Le
+        // a posicao CORRENTE do marcador (o OverworldSim e quem avanca a ronda no
+        // passo fixo) e recalcula pelas MESMAS funcoes de sempre. Consequencia de
+        // regra que vale registrar: como o teste de sobreposicao e simetrico, o
+        // inimigo que anda ATE o jogador dispara a batalha do mesmo jeito que o
+        // jogador que anda ate ele - encostou, brigou (estilo Chrono Trigger). O
+        // edge-trigger continua valendo, entao fugir e ficar parado no lugar nao
+        // re-dispara enquanto nao houver uma nova entrada na caixa.
+        if (const std::optional<gus::core::spatial::Aabb> live_enemy =
+                city_->enemy_marker_aabb();
+            live_enemy.has_value()) {
+            enemy_aabb_ = *live_enemy;
+            enemy_trigger_aabb_ =
+                feet_trigger_aabb(enemy_aabb_, city_->grid().tile_size(),
+                                  city_->tuning().npc_solid_box_tiles);
+        }
         const bool overlapping_now = should_trigger_battle(
             city_->player_aabb(), enemy_trigger_aabb_, enemy_defeated_);
         if (should_trigger_battle_on_edge(overlapping_now, was_overlapping_enemy_)) {

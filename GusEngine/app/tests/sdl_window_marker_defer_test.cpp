@@ -56,3 +56,31 @@ TEST_CASE(
         city.set_npc_bertoldo_marker(Aabb{140.0f, 70.0f, 8.0f, 8.0f}));
     REQUIRE_NOTHROW(city.clear_npc_bertoldo_marker());
 }
+
+// MESMA FAMILIA, agora para a vestimenta da cidade (DEMO-CIDADE-VESTIDA B1):
+// dress_city() carrega textura, logo derefa render2d_ - e nasceria com a MESMA
+// raiz do coredump acima se nao trouxesse a mesma guarda. Este e o gemeo que a
+// auditoria-domino manda procurar quando um guard existe num irmao.
+TEST_CASE("sdl_window: dress_city sem renderer NAO crasha - degrada limpo",
+          "[sdlwindow][city-props][regression]") {
+    gus::app::SdlWindow city;  // render2d_ == nullptr
+
+    REQUIRE_NOTHROW(city.dress_city());
+    // Rechamar tambem e seguro (a funcao e idempotente por contrato).
+    REQUIRE_NOTHROW(city.dress_city());
+}
+
+// Ronda armada sem marcador de inimigo e sem renderer: no-op seguro, nao cria
+// ator nenhum e nao derefa nada.
+TEST_CASE("sdl_window: armar ronda sem marcador de inimigo NAO crasha",
+          "[sdlwindow][patrol][regression]") {
+    gus::app::SdlWindow city;
+    gus::domain::world::PatrolRoute rota;
+    rota.waypoints[0] = {2.0f, 2.0f};
+    rota.waypoints[1] = {6.0f, 2.0f};
+    rota.count = 2;
+    rota.speed_tiles_per_sec = 1.5f;
+
+    REQUIRE_NOTHROW(city.set_enemy_patrol_route(rota));
+    REQUIRE_FALSE(city.enemy_marker_aabb().has_value());
+}

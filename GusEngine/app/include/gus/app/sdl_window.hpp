@@ -43,6 +43,7 @@
 #define GUS_APP_SDL_WINDOW_HPP
 
 #include <memory>
+#include <optional>
 #include <string>
 #include <vector>
 
@@ -219,6 +220,24 @@ public:
     // clear_enemy_marker acima; sem uso previsto hoje - o Bertoldo nunca "derrota" -
     // mas mantido por simetria/futuro-proofing barato).
     void clear_npc_bertoldo_marker();
+
+    // DEMO-CIDADE-VESTIDA B1: veste a cidade corrente - resolve a tabela de pecas
+    // contra o mapa REAL carregado (descartando o que cair em parede/fora), carrega
+    // a arte de cada peca no renderer corrente e entrega as instancias ao
+    // OverworldSim. Idempotente: limpa as pecas anteriores antes, entao pode ser
+    // rechamada (troca de mapa, recarga de renderer) sem duplicar casa. Arte
+    // ausente/headless degrada peca a peca (a que faltar simplesmente nao entra).
+    void dress_city();
+
+    // DEMO-CIDADE-VESTIDA B3: arma a ronda do marcador de inimigo. No-op seguro se
+    // nenhum set_enemy_marker aconteceu ainda. Rota invalida = inimigo parado (o
+    // comportamento de sempre).
+    void set_enemy_patrol_route(const gus::domain::world::PatrolRoute& route);
+
+    // Posicao CORRENTE do marcador de inimigo (nullopt se nao ha marcador ativo).
+    // Com uma ronda armada, este valor MUDA a cada passo fixo - e por isso que a
+    // Maestro precisa reler daqui em vez de guardar a posicao inicial.
+    [[nodiscard]] std::optional<gus::core::spatial::Aabb> enemy_marker_aabb() const;
 
     // M7-DIALOGO (NPC-MVP): desenha 1 frame ESTATICO da cidade (NAO avanca
     // step_fixed - o jogador fica PARADO durante o dialogo, mesma alpha=1.0 sempre,

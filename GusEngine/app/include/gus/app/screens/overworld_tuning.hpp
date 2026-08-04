@@ -320,6 +320,17 @@ struct OverworldTuning {
     // tile: menor = mais "furta-corpo" e pode revivir o bug de sumir; maior = comeca
     // a travar o corredor).
     float npc_solid_box_tiles = 1.0f;
+
+    // --- PECAS DE CENARIO (DEMO-CIDADE-VESTIDA B1) --------------------------
+    // BOTAO UNICO da escala de TODA peca de cenario (casa, poste, fonte, portao).
+    // O tamanho de cada peca ja vem DERIVADO da arte (32 px por tile, medido nos
+    // PNGs - ver gus/domain/world/scene_prop.hpp), entao 1.0 desenha a peca no
+    // tamanho em que ela foi autorada. Este numero e a correcao GLOBAL para o dia
+    // em que o lider olhar o display e disser "as construcoes estao pequenas
+    // demais perto do Gus" - mexer aqui reescala a cidade inteira sem tocar em
+    // nenhuma linha do catalogo, e SEM tirar peca nenhuma do chao (a base fica
+    // ancorada). Faixa util sugerida ~0.8..1.6. //PLAYTEST
+    float scene_prop_scale = 1.0f;
 };
 
 }  // namespace gus::app::screens

@@ -14,6 +14,11 @@ add_library(gusengine_app STATIC
     src/screens/anim_preview.cpp
     src/screens/city_scene.cpp
     src/screens/city_loader.cpp
+    # DEMO-CIDADE-VESTIDA fatia B (TODO.md): vestir a cidade (dado do catálogo +
+    # textura -> instância que o sim desenha) e construir a rota de ronda contra
+    # o mapa REAL (a ronda é um trilho; quem garante que o trilho é chão é aqui).
+    src/screens/city_props.cpp
+    src/screens/city_patrol.cpp
     src/screens/battle_layout.cpp
     src/screens/battle_cockpit_verb_ids.cpp
     # COCKPIT-SFX-HOVER-CLIQUE: POCO generico de "som de hover" de botoes (menu E

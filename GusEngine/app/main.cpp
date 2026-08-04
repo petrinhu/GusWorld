@@ -38,6 +38,7 @@
 #include "gus/app/screens/anim_preview.hpp"
 #include "gus/app/screens/battle_preview.hpp"  // run_battle_preview (viewer M5)
 #include "gus/app/screens/city_loader.hpp"   // load_city_or_fallback (cena real headless)
+#include "gus/app/screens/city_props.hpp"  // DEMO-CIDADE-VESTIDA: vestimenta da cidade
 #include "gus/app/screens/overworld_sim.hpp"
 #include "gus/app/screens/player_sprites_loader.hpp"
 #include "gus/core/spatial/grid_collision.hpp"
@@ -185,6 +186,17 @@ int run_smoke(int ticks) {
     const std::string assets = gus::app::screens::resolve_gus_sprites_dir();
     sim.set_player_sprites(gus::app::screens::load_gus_sprites(renderer, assets));
 
+    // DEMO-CIDADE-VESTIDA B1: exercita a VESTIMENTA contra o mapa REAL tambem no
+    // headless. Aqui as texturas degradam (renderer nulo), entao nenhuma peca chega
+    // a entrar no mundo - o que interessa neste caminho e o passo ANTES disso: quantas
+    // celulas da tabela de vestimenta caem em chao valido do .gmap carregado. Uma
+    // tabela que so acerta parede aparece como zero AQUI, no CI, em vez de aparecer
+    // como uma cidade vazia no playtest do lider.
+    const std::vector<gus::domain::world::ScenePropPlacement> dressing =
+        gus::app::screens::resolve_spawn_relative_props(
+            sim.grid(), sim.player(), gus::app::screens::kDistritosInferioresDressing,
+            gus::app::screens::kDistritosInferioresDressingCount);
+
     gus::core::time::FixedTimestep clock(1.0 / 60.0, 5);
     const float dt = static_cast<float>(clock.fixed_dt());
     for (int i = 0; i < ticks; ++i) {
@@ -201,7 +213,10 @@ int run_smoke(int ticks) {
     std::cout << "GusEngine " << gus::core::engine_version()
               << " smoke OK (SDL): " << ticks << " ticks, cena=" << scene
               << ", jogador em (" << p.x << ", " << p.y << "), "
-              << renderer.last_draw_count() << " primitivos desenhados\n";
+              << renderer.last_draw_count() << " primitivos desenhados, "
+              << dressing.size() << " de "
+              << gus::app::screens::kDistritosInferioresDressingCount
+              << " pecas de cenario couberam no mapa\n";
     return 0;
 }
 

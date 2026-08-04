@@ -16,6 +16,7 @@
 
 #include "gus/app/screens/anim_catalog.hpp"  // resolve_gus_sprites_dir
 #include "gus/app/screens/city_loader.hpp"   // load_city_or_fallback
+#include "gus/app/screens/city_props.hpp"    // DEMO-CIDADE-VESTIDA: vestir a cidade
 #include "gus/app/screens/player_sprites_loader.hpp"
 #include "gus/core/asset_paths.hpp"  // kRetratosDir/kRetratoInimigoFile (marcador do inimigo); kBertoldoSpritesDir/kBertoldoSpriteSouthFile (marcador do Bertoldo)
 #include "gus/platform/assets/asset_source.hpp"  // ASSETS-VFS-F1 (ADR-013): porteiro
@@ -150,6 +151,10 @@ bool SdlWindow::init() {
 
     load_player_sprites();
     load_boot_pixel_frames();
+    // DEMO-CIDADE-VESTIDA B1: as pecas de cenario entram JUNTO com os sprites do
+    // jogador, no MESMO ponto e pelo mesmo motivo (os TextureId sao locais ao
+    // renderer vivo, entao quem cria o renderer e quem carrega a arte).
+    dress_city();
     return true;
 }
 
@@ -174,6 +179,10 @@ bool SdlWindow::init_attached(SDL_Window* window) {
     input_.open_gamepads();
     load_player_sprites();
     load_boot_pixel_frames();
+    // DEMO-CIDADE-VESTIDA B1: as pecas de cenario entram JUNTO com os sprites do
+    // jogador, no MESMO ponto e pelo mesmo motivo (os TextureId sao locais ao
+    // renderer vivo, entao quem cria o renderer e quem carrega a arte).
+    dress_city();
     return true;
 }
 
@@ -260,6 +269,54 @@ void SdlWindow::load_npc_bertoldo_marker_texture() {
 void SdlWindow::set_npc_bertoldo_marker(const gus::core::spatial::Aabb& aabb) {
     npc_bertoldo_marker_aabb_ = aabb;
     load_npc_bertoldo_marker_texture();
+}
+
+void SdlWindow::dress_city() {
+    // Mesma defesa dos carregadores de marcador acima (ponteiro nulo em caminho
+    // headless/degradado): sem renderer nao ha textura para carregar.
+    if (render2d_ == nullptr || sim_ == nullptr) {
+        return;
+    }
+    // IDEMPOTENTE: limpa antes de vestir de novo, para uma segunda chamada (troca
+    // de mapa, renderer recriado) nao empilhar uma segunda casa em cima da
+    // primeira.
+    sim_->clear_scene_props();
+
+    const std::vector<gus::domain::world::ScenePropPlacement> places =
+        gus::app::screens::resolve_spawn_relative_props(
+            sim_->grid(), sim_->player(),
+            gus::app::screens::kDistritosInferioresDressing,
+            gus::app::screens::kDistritosInferioresDressingCount);
+    const gus::app::screens::ScenePropTextures textures =
+        gus::app::screens::load_scene_prop_textures(*render2d_);
+    const std::vector<gus::app::screens::ScenePropInstance> props =
+        gus::app::screens::build_scene_prop_instances(
+            places.data(), static_cast<int>(places.size()), sim_->grid().tile_size(),
+            sim_->tuning().scene_prop_scale, textures);
+
+    for (const gus::app::screens::ScenePropInstance& p : props) {
+        sim_->add_scene_prop(p);
+    }
+    // Nada acontece em silencio: o que subiu na rua aparece no terminal.
+    glintfx::log(glintfx::LogLevel::Info,
+                 ("SdlWindow: [cidade] " + std::to_string(props.size()) +
+                  " peca(s) de cenario erguida(s) nos Distritos Inferiores.")
+                     .c_str());
+}
+
+void SdlWindow::set_enemy_patrol_route(
+    const gus::domain::world::PatrolRoute& route) {
+    if (sim_ == nullptr) {
+        return;
+    }
+    sim_->set_actor_patrol(sim_->enemy_marker_handle(), route);
+}
+
+std::optional<gus::core::spatial::Aabb> SdlWindow::enemy_marker_aabb() const {
+    if (sim_ == nullptr) {
+        return std::nullopt;
+    }
+    return sim_->enemy_marker_aabb();
 }
 
 void SdlWindow::clear_npc_bertoldo_marker() {
