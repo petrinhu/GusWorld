@@ -473,6 +473,21 @@ histórico no fim do arquivo. Novas descobertas entram como bullets abaixo desta
   na base (varrido `Guard x(std::string())` e `Dir x(std::string())` em todo o `GusEngine`).
   Achado pelo `-Wvexing-parse` do clang em 2026-08-04.
 
+- `TMPDIR-VAZAMENTO-UNIQUE-SEM-RAII`: o conserto do flake trocou **colisão** por **acúmulo**, e
+  ninguém mediu isso. Uma rodada da suíte deixa **254 diretórios órfãos** em `$TMPDIR` (13 MB,
+  contados em 2026-08-04 logo após a suíte). Causa localizada: o helper novo oferece **duas** portas,
+  `ScopedTempDir` (RAII, remove no destrutor) e `unique_temp_dir` (só devolve o caminho, **não
+  limpa**, e o comentário do header diz isso). Os 3 arquivos que usam a segunda porta são exatamente
+  os que vazam, e os nomes batem um a um: `difficulty_menu_loop_interaction_test.cpp` (2 usos),
+  `save_load_menu_interaction_test.cpp` (4) e `asset_source_test.cpp` (1). Os outros 12 arquivos
+  migrados usam só `ScopedTempDir` e não deixam nada para trás. **Não é regressão do conserto** (o
+  código antigo também não limpava; ele só reusava o mesmo caminho, o que mascarava o acúmulo em
+  troca do bug de corrida). Conserto provável: migrar os 7 usos restantes para `ScopedTempDir`, ou
+  documentar por que cada um precisa sobreviver ao escopo. ⚠️ **Antes de migrar, verificar caso a
+  caso:** pelo menos um deles é o PNG de prova visual que o commit `7c2425dd` declara deliberado
+  (path descobrível para debug humano), então a resposta certa ali pode ser manter e anotar, não
+  migrar. Achado durante a higiene de temporários de 2026-08-04.
+
 ## 🗄️ Arquivado: eras Godot/C# e Qt6 (superadas, mantidas por registro)
 
 **Motivo do arquivamento:** stack superada pelos dois pivôs em sequência (Godot 4.6 + C# .NET 8
