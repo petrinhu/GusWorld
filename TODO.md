@@ -488,6 +488,24 @@ histórico no fim do arquivo. Novas descobertas entram como bullets abaixo desta
   (path descobrível para debug humano), então a resposta certa ali pode ser manter e anotar, não
   migrar. Achado durante a higiene de temporários de 2026-08-04.
 
+- `UILAYER-CONFIG-DESIGNATED-INIT`: converter os **19** sítios de `glintfx::UiLayer::Config`
+  de inicialização **posicional** para **designated-init**, ANTES de bumpar o pin para a versão
+  que remove o campo `load_gl`. ⚠️ **Por que isso não é preferência de estilo, e sim defesa contra
+  troca silenciosa:** o glintfx renomeou `load_gl` para `assume_gl_loaded` **invertendo a
+  polaridade** (`load_gl = false` equivale a `assume_gl_loaded = true`); o campo antigo vive
+  `[[deprecated]]` por uma versão e some na v0.31. Todos os nossos 19 sítios escrevem o valor **por
+  posição**, com o nome do campo apenas como comentário decorativo
+  (`Config{/*logical_width=*/960, /*logical_height=*/540, /*load_gl=*/true, /*dp_ratio=*/x}`), e
+  **um deles nem isso** (`app/tools/reload_geometry_probe.cpp:79`, `Config{960, 540, true,
+  dp_ratio}`, invisível a qualquer busca por `load_gl`). Quando o campo sair da struct, o `true`
+  passa a valer para o campo que ocupar aquela posição, **sem erro de compilação**, e o comentário
+  continua apontando para um campo que não existe mais. ⚠️ **A receita que o glintfx recomendou
+  ("apaguem o campo da designated-init") destruiria os 19 aqui**: apagar o terceiro elemento faz o
+  `dp_ratio` deslizar para a posição do flag. Com designated-init, a mesma remoção vira **erro de
+  compilação nomeado**, que é o desfecho que se quer. Pedido feito a eles pelo bus para que o campo
+  novo não ocupe a posição do removido. Medido e respondido em 2026-08-04; o rename ainda está na
+  `main` deles, sem tag, então não há nada a fazer até o bump.
+
 - `TMPDIR-STAGE-FIXO-PRODUCAO`: o mesmo defeito de caminho temporário previsível existe em **código de
   produção**, não só em teste, e a fatia `FLAKY-*` deliberadamente não o tocou porque estava fora do
   escopo dela. **8 sítios em 7 arquivos**, todos com nome FIXO em `temp_directory_path()`:
