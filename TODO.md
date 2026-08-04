@@ -506,6 +506,24 @@ histórico no fim do arquivo. Novas descobertas entram como bullets abaixo desta
   novo não ocupe a posição do removido. Medido e respondido em 2026-08-04; o rename ainda está na
   `main` deles, sem tag, então não há nada a fazer até o bump.
 
+- `DEMO-CIDADE-VESTIDA` (**decisões do líder tomadas em 2026-08-04, aguardando execução**): levar o demo
+  jogável de esboço em blocos para cidade apresentável. **Estado medido antes de decidir:** mapa de
+  **30x20 células** (~1,4 tela de largura por 1,6 de altura), tudo **retângulo de cor chapada** (5 tipos:
+  chão, parede, marco, entrada, saída), **um** NPC e **um** inimigo em slots FIXOS no código (não listas),
+  e **9 peças de cenário desenhadas desde 25/06 e nunca integradas** (2 casas cibergóticas, poste de neon,
+  fonte de latão, portão sul, placa de lore, terminal de hack, caixa de cobertura, tabuleiro de puzzle).
+  **DECIDIDO:** (a) cidade nasce em **90x60** densa, não no 480x320 que o líder pediu primeiro.
+  ⚠️ **O contra-argumento que mudou a decisão, registrado porque a conta vale para o próximo mapa
+  também:** 480x320 são 153.600 células, **256x a área atual**, 559 telas, quase 1 km de mundo, 1min48 de
+  travessia em linha reta; com as 9 peças que temos daria **uma peça a cada 17 mil células**, ou seja dois
+  minutos de chão liso. Mapa grande sem conteúdo não parece grande, parece **abandonado**, e fica pior que
+  o mapa pequeno denso. Havia ainda o custo técnico: o desenho varre todas as células por quadro, o que
+  viraria **9,2 milhões de verificações por segundo** para descartar 99,8%. O líder aceitou o 90x60, e o
+  mapa gigante fica para quando existir conteúdo (e aí como **mapa-múndi com várias cidades**, não uma
+  cidade só). (b) inimigos **andam em rota fixa**, ida e volta, sem reagir ao jogador (estilo Chrono
+  Trigger). (c) os slots únicos de NPC e inimigo viram **listas**. Sem bloqueio técnico conhecido: o
+  `.gmap` guarda dimensão em `int32_t` e 90x60 cabe folgado.
+
 - `TMPDIR-STAGE-FIXO-PRODUCAO`: o mesmo defeito de caminho temporário previsível existe em **código de
   produção**, não só em teste, e a fatia `FLAKY-*` deliberadamente não o tocou porque estava fora do
   escopo dela. **8 sítios em 7 arquivos**, todos com nome FIXO em `temp_directory_path()`:
