@@ -488,6 +488,24 @@ histórico no fim do arquivo. Novas descobertas entram como bullets abaixo desta
   (path descobrível para debug humano), então a resposta certa ali pode ser manter e anotar, não
   migrar. Achado durante a higiene de temporários de 2026-08-04.
 
+- `TMPDIR-STAGE-FIXO-PRODUCAO`: o mesmo defeito de caminho temporário previsível existe em **código de
+  produção**, não só em teste, e a fatia `FLAKY-*` deliberadamente não o tocou porque estava fora do
+  escopo dela. **8 sítios em 7 arquivos**, todos com nome FIXO em `temp_directory_path()`:
+  `app/src/audio_smoke.cpp:94` (`gusworld_audio_smoke_tone.wav`), `screens/title_menu_loop.cpp:115`,
+  `screens/difficulty_menu_loop.cpp:80`, `screens/battle_cockpit_rml.cpp:378` e `:414`,
+  `screens/npc_dialogue_loop_gl.cpp:131`, `screens/save_load_menu_loop.cpp:100`,
+  `screens/system_menu_loop.cpp:133`. ⚠️ **Duas consequências distintas, e a segunda é a que importa:**
+  (a) dois processos que exercitem a mesma tela disputam o mesmo diretório, que é a corrida já medida
+  no lado dos testes; (b) **nome previsível dentro de um diretório onde qualquer usuário escreve é o
+  vetor clássico de ataque por link simbólico** (um terceiro cria o caminho apontando para outro lugar
+  antes do jogo, e a escrita do jogo vai para onde o atacante mandou). Em máquina de um dono só o
+  risco é baixo; em máquina compartilhada não é, e o custo de arrumar é o mesmo nos dois casos.
+  ⚠️ **Não migrar no automático:** parte destes é *stage dir* de propósito, para o caminho ser
+  descobrível e o humano ir olhar durante depuração. A decisão é caso a caso, e onde o descobrível for
+  requisito de verdade a saída é caminho fixo **por sessão** (fixo dentro da execução, único entre
+  execuções), não caminho fixo eterno. Flagueado pelo agente do conserto de teste, que explicitamente
+  deixou a chamada para nós; confirmado por varredura própria em 2026-08-04.
+
 ## 🗄️ Arquivado: eras Godot/C# e Qt6 (superadas, mantidas por registro)
 
 **Motivo do arquivamento:** stack superada pelos dois pivôs em sequência (Godot 4.6 + C# .NET 8
