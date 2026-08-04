@@ -23,10 +23,12 @@
 #define GUS_APP_SCREENS_OVERWORLD_SIM_HPP
 
 #include <optional>
+#include <vector>
 
 #include "gus/app/screens/overworld_tuning.hpp"
 #include "gus/app/screens/sprite_anchor.hpp"  // FootInset (ancoragem pelos pes)
 #include "gus/app/screens/sprite_animation.hpp"
+#include "gus/app/screens/world_entities.hpp"  // pecas de cenario + atores (listas)
 #include "gus/app/screens/tile_palette.hpp"  // TilePalette (cor por TileKind, graybox)
 #include "gus/domain/map/tile_map.hpp"  // TileMap (mapa real, pinta por TileKind)
 #include "gus/core/anim/anim_clock.hpp"  // idle OFEGANTE (breathing) por TEMPO
@@ -34,6 +36,7 @@
 #include "gus/core/player/stamina.hpp"  // Carga do aparato: drena correndo
 #include "gus/core/player/winded_timer.hpp"  // folego do corpo: ofega ao parar (>= 5 s)
 #include "gus/core/spatial/camera_clamp.hpp"
+#include "gus/core/spatial/depth_sort.hpp"  // DepthEntry (Y-sort de N entidades)
 #include "gus/core/spatial/grid_collision.hpp"
 #include "gus/core/spatial/tile_grid.hpp"
 #include "gus/platform/render2d/i_renderer.hpp"
@@ -212,76 +215,138 @@ public:
     //     Gus 5 = breathing), tocado por TEMPO no step_fixed (loop em loop).
     void set_player_sprites(const PlayerSpriteSet& sprites) noexcept;
 
+    // =======================================================================
+    //  PECAS DE CENARIO (DEMO-CIDADE-VESTIDA B1) - a cidade deixa de ser so chao
+    //  colorido. A peca chega JA RESOLVIDA (retangulo em unidades de mundo +
+    //  textura da casca): quem traduz o dado do catalogo em instancia e
+    //  city_props.hpp, e o dado em si mora em gus/domain/world/scene_prop.hpp.
+    //  O sim so desenha (com Y-sort) e colide.
+    // =======================================================================
+
+    // Poe uma peca no mundo. Devolve o indice dela (leitura/teste); a lista so
+    // cresce ate um clear_scene_props.
+    int add_scene_prop(const ScenePropInstance& prop);
+
+    // Tira TODAS as pecas (troca de area, recarregar cidade).
+    void clear_scene_props() noexcept;
+
+    [[nodiscard]] const std::vector<ScenePropInstance>& scene_props() const noexcept {
+        return props_;
+    }
+
+    // =======================================================================
+    //  ATORES (DEMO-CIDADE-VESTIDA B2) - VARIOS NPCs e VARIOS inimigos.
+    //
+    //  ANTES desta fatia existiam DOIS SLOTS FIXOS (um inimigo, um NPC), cada um
+    //  com par proprio de AABB/textura/caixa solida, e o Y-sort era um array de 3
+    //  posicoes. Agora e uma lista so: o papel (NPC/inimigo) e dado do ator, nao
+    //  estrutura de codigo, e a ordenacao por profundidade vale para N.
+    //
+    //  HANDLE = INDICE, e indice NUNCA escorrega: remover um ator apaga o
+    //  conteudo mas preserva o slot, senao todo handle guardado por quem chamou
+    //  (a Maestro, um save) passaria a apontar para o vizinho.
+    // =======================================================================
+
+    // Poe um personagem no mundo. Devolve o handle. A ronda (spec.route) e
+    // opcional: rota invalida = personagem parado, o comportamento de sempre.
+    int add_actor(const WorldActorSpec& spec);
+
+    // (Re)arma a ronda de um ator ja existente. A rota e aplicada como
+    // DESLOCAMENTO a partir de onde o ator esta AGORA - armar nunca teleporta.
+    // Handle invalido e no-op seguro.
+    void set_actor_patrol(int handle,
+                          const gus::domain::world::PatrolRoute& route) noexcept;
+
+    // Tira o ator do desenho E da colisao (inimigo derrotado, NPC que foi embora).
+    // Handle invalido e no-op seguro.
+    void remove_actor(int handle) noexcept;
+
+    // Posicao logica CORRENTE do ator (nullopt se o handle nao existe ou o ator
+    // foi removido). E por aqui que a Maestro le onde o inimigo em ronda esta
+    // AGORA para recalcular a caixa de ativacao da batalha.
+    [[nodiscard]] std::optional<gus::core::spatial::Aabb> actor_anchor(
+        int handle) const noexcept;
+
+    [[nodiscard]] const std::vector<WorldActor>& actors() const noexcept {
+        return actors_;
+    }
+
+    // =======================================================================
+    //  FACHADA LEGADA dos dois marcadores (M7-COSTURA/M7-DIALOGO).
+    //
+    //  Continua valendo palavra por palavra para quem ja chamava (Maestro,
+    //  SdlWindow, app/tools) - o que mudou por baixo e que cada marcador virou UM
+    //  ATOR RESERVADO da lista, em vez de um slot paralelo. Mesma escala, mesma
+    //  ancoragem, mesma caixa solida, mesma degradacao com textura invalida.
+    //  Reposicionar NAO empilha ator novo: reusa o slot reservado e REARMA a ronda
+    //  a partir da posicao nova (carregar um save reposiciona o inimigo).
+    // =======================================================================
+
     // MARCADOR DE INIMIGO FIXO (M7-COSTURA Inc 2): posiciona (ou reposiciona) um
-    // marcador visivel de inimigo ESTATICO no mapa, desenhado por cima do chao na MESMA
-    // escala/ancoragem do sprite do Gus (tuning_.player_sprite_height_tiles), pra ficar
-    // do tamanho certo e visivel na celula. `tex` e o TextureId JA RESOLVIDO pela casca
-    // SDL (mesmo padrao de set_player_sprites) - a MESMA textura (retrato_inimigo.png)
-    // que a tela de BATALHA usa pros inimigos, pra o jogador reconhecer "e o mesmo
-    // bicho". kInvalidTexture => nada e desenhado (fallback seguro/headless). A Maestro
-    // (dona da posicao logica do inimigo) chama isto apos calcular a posicao; NAO muda a
-    // colisao/regra de jogo, so o desenho.
+    // marcador visivel de inimigo no mapa, desenhado por cima do chao na MESMA
+    // escala/ancoragem do sprite do Gus (tuning_.player_sprite_height_tiles). `tex`
+    // e o TextureId JA RESOLVIDO pela casca SDL (mesmo padrao de set_player_sprites)
+    // - a MESMA textura (retrato_inimigo.png) que a tela de BATALHA usa pros
+    // inimigos, pra o jogador reconhecer "e o mesmo bicho". kInvalidTexture => nada
+    // e desenhado (fallback seguro/headless).
     // COLISAO SOLIDA (M7-COSTURA, ver overworld_tuning.hpp::npc_solid_box_tiles):
-    // toda vez que o marcador e (re)definido, deriva TAMBEM a caixa de bloqueio
-    // FISICO (enemy_solid_aabb_) a partir do footprint visual recebido - mesma
-    // ancoragem do feet_trigger_aabb (centro em X, base = base do footprint), so
-    // que MAIOR (~1 tile, nao a faixa fina do trigger). step_fixed passa essa caixa
-    // como ObstacleSpan pro resolve_move_with_corner_assist: o jogador NUNCA mais
+    // deriva TAMBEM a caixa de bloqueio FISICO a partir do footprint recebido -
+    // mesma ancoragem do feet_trigger_aabb (centro em X, base = base do footprint),
+    // so que MAIOR (~1 tile, nao a faixa fina do trigger). step_fixed passa essa
+    // caixa como ObstacleSpan pro resolve_move_with_corner_assist: o jogador NUNCA
     // ocupa a mesma posicao do inimigo (mas contorna livre pelos tiles adjacentes).
     void set_enemy_marker(const gus::core::spatial::Aabb& aabb,
-                          gus::platform::render2d::TextureId tex) noexcept {
-        enemy_marker_aabb_ = aabb;
-        enemy_marker_tex_ = tex;
-        enemy_solid_aabb_ = solid_obstacle_from_footprint(aabb);
+                          gus::platform::render2d::TextureId tex) noexcept;
+
+    // Some com o marcador (Victory, item 4 do escopo M7 Inc 1: "o inimigo derrotado
+    // some do mapa"). No-op seguro se nao havia marcador. TAMBEM libera o bloqueio
+    // FISICO (o inimigo derrotado nao deve mais colidir com o jogador).
+    void clear_enemy_marker() noexcept;
+
+    // true se ha um marcador de inimigo ATIVO e desenhavel (posicao definida +
+    // textura valida). Leitura/teste.
+    [[nodiscard]] bool has_enemy_marker() const noexcept;
+
+    // Posicao CORRENTE do marcador de inimigo (nullopt se nao ha). Diferente do
+    // valor que a Maestro passou em set_enemy_marker assim que uma ronda esteja
+    // armada: e daqui que se le onde ele esta AGORA.
+    [[nodiscard]] std::optional<gus::core::spatial::Aabb> enemy_marker_aabb()
+        const noexcept {
+        return actor_anchor(enemy_marker_handle_);
     }
 
-    // Some com o marcador (Victory, item 4 do escopo M7 Inc 1: "o inimigo derrotado some
-    // do mapa"). No-op seguro se nao havia marcador. TAMBEM libera o bloqueio FISICO
-    // (o inimigo derrotado nao deve mais colidir com o jogador).
-    void clear_enemy_marker() noexcept {
-        enemy_marker_aabb_.reset();
-        enemy_marker_tex_ = gus::platform::render2d::kInvalidTexture;
-        enemy_solid_aabb_.reset();
-    }
-
-    // true se ha um marcador de inimigo ATIVO e desenhavel (AABB definida + textura
-    // valida). Leitura/teste.
-    [[nodiscard]] bool has_enemy_marker() const noexcept {
-        return enemy_marker_aabb_.has_value() &&
-               enemy_marker_tex_ != gus::platform::render2d::kInvalidTexture;
+    // Handle do ator reservado ao marcador de inimigo (kInvalidWorldActor enquanto
+    // nenhum set_enemy_marker tiver acontecido). Serve para armar a ronda dele
+    // pelas APIs genericas de ator, sem uma segunda via so para o slot legado.
+    [[nodiscard]] int enemy_marker_handle() const noexcept {
+        return enemy_marker_handle_;
     }
 
     // MARCADOR DO NPC BERTOLDO (M7-DIALOGO, NPC-MVP): posiciona/reposiciona o sprite
     // ESTATICO do Seu Bertoldo Caim (south.png, sem locomocao/direcao dinamica) no
-    // mapa. Slot PROPRIO (`npc_bertoldo_marker_*`, NAO compartilha AABB/textura com
-    // enemy_marker_* acima) - o Bertoldo e um NPC amigavel, sprite distinto do
-    // androide-inimigo (mesmo motivo do comentario original da Maestro sobre nao
-    // reusar o marcador do inimigo). MESMA escala/ancoragem "busto simples" do
-    // marcador de inimigo (quad quadrado centrado em X, base do quad = base da AABB,
-    // SEM foot-inset medido - o NPC nao anda, nao precisa da ancoragem-por-pes do
-    // jogador). `tex` ja resolvido pela casca SDL (mesmo padrao de set_enemy_marker).
-    // COLISAO SOLIDA (M7-DIALOGO, ver comentario espelho em set_enemy_marker acima):
-    // MESMA tecnica - deriva npc_bertoldo_solid_aabb_ do footprint recebido.
+    // mapa. Ator PROPRIO (nao compartilha slot com o marcador de inimigo) - o
+    // Bertoldo e um NPC amigavel, sprite distinto do androide-inimigo. ESCALA
+    // PROPRIA (tuning_.npc_bertoldo_sprite_height_tiles): o retrato dele tem margem
+    // transparente maior que o do Gus, e reusar a altura de canvas do jogador fazia
+    // o adulto renderizar mais baixo que a crianca (bug do playtest ao vivo).
+    // `tex` ja resolvido pela casca SDL. COLISAO SOLIDA: MESMA tecnica do inimigo.
     void set_npc_bertoldo_marker(const gus::core::spatial::Aabb& aabb,
-                                 gus::platform::render2d::TextureId tex) noexcept {
-        npc_bertoldo_marker_aabb_ = aabb;
-        npc_bertoldo_marker_tex_ = tex;
-        npc_bertoldo_solid_aabb_ = solid_obstacle_from_footprint(aabb);
-    }
+                                 gus::platform::render2d::TextureId tex) noexcept;
 
     // Some com o marcador (asset ausente/headless degrada com seguranca). No-op se
     // nao havia marcador. TAMBEM libera o bloqueio FISICO.
-    void clear_npc_bertoldo_marker() noexcept {
-        npc_bertoldo_marker_aabb_.reset();
-        npc_bertoldo_marker_tex_ = gus::platform::render2d::kInvalidTexture;
-        npc_bertoldo_solid_aabb_.reset();
-    }
+    void clear_npc_bertoldo_marker() noexcept;
 
-    // true se o marcador do Bertoldo esta ATIVO e desenhavel (AABB definida +
-    // textura valida). Leitura/teste.
-    [[nodiscard]] bool has_npc_bertoldo_marker() const noexcept {
-        return npc_bertoldo_marker_aabb_.has_value() &&
-               npc_bertoldo_marker_tex_ != gus::platform::render2d::kInvalidTexture;
+    // true se o marcador do Bertoldo esta ATIVO e desenhavel. Leitura/teste.
+    [[nodiscard]] bool has_npc_bertoldo_marker() const noexcept;
+
+    // Posicao CORRENTE e handle do Bertoldo (espelho do par do inimigo acima).
+    [[nodiscard]] std::optional<gus::core::spatial::Aabb> npc_bertoldo_marker_aabb()
+        const noexcept {
+        return actor_anchor(npc_bertoldo_handle_);
+    }
+    [[nodiscard]] int npc_bertoldo_marker_handle() const noexcept {
+        return npc_bertoldo_handle_;
     }
 
     // Direcao e quadro de walk correntes (leitura/teste).
@@ -329,6 +394,35 @@ private:
     [[nodiscard]] gus::core::spatial::Aabb solid_obstacle_from_footprint(
         const gus::core::spatial::Aabb& footprint) const noexcept;
 
+    // Quad DESENHADO de um ator a partir da sua ancora: quadrado de
+    // sprite_height_tiles, centrado em X, base na base da ancora. A MESMA formula
+    // que os dois marcadores usavam separadamente antes desta fatia - uma so, agora,
+    // parametrizada pela altura (que e dado do ator).
+    [[nodiscard]] gus::core::spatial::Aabb actor_sprite_rect(
+        const gus::core::spatial::Aabb& anchor,
+        float sprite_height_tiles) const noexcept;
+
+    // (Re)arma a ronda de um ator ja resolvido, ancorando a rota na posicao ATUAL
+    // dele. Usada por add_actor, set_actor_patrol e pela fachada legada (que rearma
+    // ao reposicionar).
+    void rearm_patrol(WorldActor& actor,
+                      const gus::domain::world::PatrolRoute& route) const noexcept;
+
+    // Avanca a ronda de TODOS os atores por um passo fixo (posicao + corpo solido).
+    // Roda ANTES de qualquer saida antecipada do step_fixed: a cidade tem que
+    // continuar viva com o jogador parado.
+    void advance_actor_patrols(float fixed_dt) noexcept;
+
+    // Slot reservado da fachada legada: cria na primeira chamada e reusa depois.
+    int ensure_reserved_actor(int& handle, WorldActorRole role,
+                              const gus::core::spatial::Aabb& aabb,
+                              gus::platform::render2d::TextureId tex,
+                              float sprite_height_tiles) noexcept;
+
+    [[nodiscard]] bool valid_actor_handle(int handle) const noexcept {
+        return handle >= 0 && handle < static_cast<int>(actors_.size());
+    }
+
     gus::core::spatial::TileGrid grid_;
     // MAPA REAL opcional: presente quando construido do TileMap. Da ao render a
     // identidade (TileKind) de cada celula pra pintar por cor (graybox). Ausente
@@ -346,27 +440,25 @@ private:
     WalkCycle walk_;
     PlayerSpriteSet sprites_{};
 
-    // MARCADOR DE INIMIGO FIXO (M7-COSTURA Inc 2): AABB + textura do marcador visivel
-    // (ver set_enemy_marker acima). nullopt/kInvalidTexture = nada desenhado (default,
-    // headless/sem Maestro).
-    std::optional<gus::core::spatial::Aabb> enemy_marker_aabb_{};
-    gus::platform::render2d::TextureId enemy_marker_tex_ =
-        gus::platform::render2d::kInvalidTexture;
-    // COLISAO SOLIDA do inimigo (M7-COSTURA): derivada de enemy_marker_aabb_ em
-    // set_enemy_marker (ver solid_obstacle_from_footprint acima). nullopt = sem
-    // bloqueio (nenhum marcador ativo/inimigo derrotado) - step_fixed le isto pra
-    // montar o ObstacleSpan passado ao resolve_move_with_corner_assist.
-    std::optional<gus::core::spatial::Aabb> enemy_solid_aabb_{};
+    // PECAS DE CENARIO e ATORES do mundo (DEMO-CIDADE-VESTIDA B1/B2). Substituem os
+    // dois slots fixos de marcador que existiam aqui ate esta fatia (um inimigo, um
+    // NPC, com par proprio de AABB/textura/caixa solida cada). Vazias por default:
+    // uma cidade sem nada continua sendo uma cidade valida (headless/sem Maestro).
+    std::vector<ScenePropInstance> props_{};
+    std::vector<WorldActor> actors_{};
 
-    // MARCADOR DO NPC BERTOLDO (M7-DIALOGO, NPC-MVP): AABB + textura do sprite
-    // ESTATICO (ver set_npc_bertoldo_marker acima). nullopt/kInvalidTexture = nada
-    // desenhado (default, headless/sem Maestro) - slot PROPRIO, distinto do
-    // enemy_marker_* acima.
-    std::optional<gus::core::spatial::Aabb> npc_bertoldo_marker_aabb_{};
-    gus::platform::render2d::TextureId npc_bertoldo_marker_tex_ =
-        gus::platform::render2d::kInvalidTexture;
-    // COLISAO SOLIDA do Bertoldo (M7-DIALOGO): idem enemy_solid_aabb_ acima.
-    std::optional<gus::core::spatial::Aabb> npc_bertoldo_solid_aabb_{};
+    // Slots RESERVADOS da fachada legada. kInvalidWorldActor ate a primeira chamada
+    // de set_enemy_marker/set_npc_bertoldo_marker - dai em diante o MESMO indice e
+    // reusado, para reposicionar nao empilhar ator novo a cada save carregado.
+    int enemy_marker_handle_ = kInvalidWorldActor;
+    int npc_bertoldo_handle_ = kInvalidWorldActor;
+
+    // Rascunhos reaproveitados entre quadros (sem alocar no laco de jogo depois do
+    // aquecimento): obstaculos pontuais do passo fixo e entradas do Y-sort. O
+    // segundo e mutable porque o render e const - ele nao muda o mundo, so precisa
+    // de um lugar para ordenar quem desenha antes de quem.
+    std::vector<gus::core::spatial::Aabb> obstacle_scratch_{};
+    mutable std::vector<gus::core::spatial::DepthEntry> depth_scratch_{};
 
     // IDLE OFEGANTE (cansado): troca os QUADROS do breathing por TEMPO (AnimClock),
     // num ritmo RAPIDO (idle_tired_breaths_per_minute). So e mostrado quando parado E

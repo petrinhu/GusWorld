@@ -41,6 +41,179 @@ WalkCycle::Config make_walk_config(const OverworldTuning& t,
 
 }  // namespace
 
+// ===========================================================================
+//  PECAS DE CENARIO e ATORES (DEMO-CIDADE-VESTIDA B1/B2/B3)
+// ===========================================================================
+
+int OverworldSim::add_scene_prop(const ScenePropInstance& prop) {
+    props_.push_back(prop);
+    return static_cast<int>(props_.size()) - 1;
+}
+
+void OverworldSim::clear_scene_props() noexcept { props_.clear(); }
+
+gus::core::spatial::Aabb OverworldSim::actor_sprite_rect(
+    const gus::core::spatial::Aabb& anchor,
+    float sprite_height_tiles) const noexcept {
+    const float h = (sprite_height_tiles > 0.0f
+                         ? sprite_height_tiles
+                         : tuning_.player_sprite_height_tiles) *
+                    grid_.tile_size();
+    gus::core::spatial::Aabb rect;
+    rect.w = h;  // retrato quadrado (mesma convencao dos dois marcadores legados)
+    rect.h = h;
+    rect.x = anchor.x + anchor.w * 0.5f - rect.w * 0.5f;
+    // sprite_top_y com bottom_fraction/offset zerados: e um busto/icone, nao um
+    // sprite de corpo com pes medidos pelo alpha-bbox (o jogador tem isso, o
+    // marcador nunca teve).
+    rect.y = sprite_top_y(anchor.y + anchor.h, rect.h, /*bottom_fraction=*/0.0f,
+                          /*manual_offset_world=*/0.0f);
+    return rect;
+}
+
+void OverworldSim::rearm_patrol(
+    WorldActor& actor,
+    const gus::domain::world::PatrolRoute& route) const noexcept {
+    actor.route = route;
+    actor.patrol = gus::domain::world::PatrolState{};
+    // A rota e aplicada como DESLOCAMENTO a partir de onde o ator esta AGORA (ver
+    // world_entities.hpp): armar/rearmar nunca teleporta ninguem, e um erro de
+    // celula na tabela vira um desvio, nao um sumico.
+    actor.route_origin_anchor = actor.anchor;
+    actor.route_origin_point =
+        route.count >= 1 ? route.waypoints[0] : gus::domain::world::PatrolWaypoint{};
+}
+
+int OverworldSim::add_actor(const WorldActorSpec& spec) {
+    WorldActor a;
+    a.role = spec.role;
+    a.anchor = spec.anchor;
+    a.prev_anchor = spec.anchor;
+    a.tex = spec.tex;
+    a.sprite_height_tiles = spec.sprite_height_tiles > 0.0f
+                                ? spec.sprite_height_tiles
+                                : tuning_.player_sprite_height_tiles;
+    a.solid = solid_obstacle_from_footprint(spec.anchor);
+    a.active = true;
+    rearm_patrol(a, spec.route);
+    actors_.push_back(a);
+    return static_cast<int>(actors_.size()) - 1;
+}
+
+void OverworldSim::set_actor_patrol(
+    int handle, const gus::domain::world::PatrolRoute& route) noexcept {
+    if (!valid_actor_handle(handle)) {
+        return;
+    }
+    rearm_patrol(actors_[static_cast<std::size_t>(handle)], route);
+}
+
+void OverworldSim::remove_actor(int handle) noexcept {
+    if (!valid_actor_handle(handle)) {
+        return;
+    }
+    // O SLOT permanece (handle e indice; indice nao pode escorregar). Zera o que
+    // faz o ator existir no mundo: desenho, colisao e ronda.
+    WorldActor& a = actors_[static_cast<std::size_t>(handle)];
+    a.active = false;
+    a.tex = gus::platform::render2d::kInvalidTexture;
+    a.solid = gus::core::spatial::Aabb{};
+    a.route = gus::domain::world::PatrolRoute{};
+}
+
+std::optional<gus::core::spatial::Aabb> OverworldSim::actor_anchor(
+    int handle) const noexcept {
+    if (!valid_actor_handle(handle)) {
+        return std::nullopt;
+    }
+    const WorldActor& a = actors_[static_cast<std::size_t>(handle)];
+    if (!a.active) {
+        return std::nullopt;
+    }
+    return a.anchor;
+}
+
+void OverworldSim::advance_actor_patrols(float fixed_dt) noexcept {
+    const float ts = grid_.tile_size();
+    for (WorldActor& a : actors_) {
+        // prev_anchor SEMPRE acompanha (mesmo parado): o render interpola entre os
+        // dois, e um prev_ desatualizado faria o ator "saltar" ao comecar a andar.
+        a.prev_anchor = a.anchor;
+        if (!a.patrolling()) {
+            continue;
+        }
+        const gus::domain::world::PatrolSample s =
+            gus::domain::world::advance_patrol(a.route, a.patrol, fixed_dt);
+        // Deslocamento em CELULAS -> unidades de mundo, somado a ancora de origem.
+        a.anchor.x =
+            a.route_origin_anchor.x + (s.x - a.route_origin_point.x) * ts;
+        a.anchor.y =
+            a.route_origin_anchor.y + (s.y - a.route_origin_point.y) * ts;
+        // O corpo solido acompanha: sem isto o inimigo andaria e deixaria a
+        // colisao para tras (o jogador trombaria no ar e atravessaria o sprite).
+        a.solid = solid_obstacle_from_footprint(a.anchor);
+    }
+}
+
+int OverworldSim::ensure_reserved_actor(
+    int& handle, WorldActorRole role, const gus::core::spatial::Aabb& aabb,
+    gus::platform::render2d::TextureId tex, float sprite_height_tiles) noexcept {
+    if (!valid_actor_handle(handle)) {
+        WorldActorSpec spec;
+        spec.role = role;
+        spec.anchor = aabb;
+        spec.tex = tex;
+        spec.sprite_height_tiles = sprite_height_tiles;
+        handle = add_actor(spec);
+        return handle;
+    }
+    WorldActor& a = actors_[static_cast<std::size_t>(handle)];
+    const gus::domain::world::PatrolRoute route = a.route;  // preserva a ronda
+    a.role = role;
+    a.anchor = aabb;
+    a.prev_anchor = aabb;
+    a.tex = tex;
+    a.sprite_height_tiles = sprite_height_tiles;
+    a.solid = solid_obstacle_from_footprint(aabb);
+    a.active = true;
+    // REARMA a ronda na posicao nova: reposicionar acontece ao carregar um save, e
+    // a ronda tem que recomecar dali - nao continuar medindo do lugar antigo.
+    rearm_patrol(a, route);
+    return handle;
+}
+
+void OverworldSim::set_enemy_marker(
+    const gus::core::spatial::Aabb& aabb,
+    gus::platform::render2d::TextureId tex) noexcept {
+    ensure_reserved_actor(enemy_marker_handle_, WorldActorRole::Enemy, aabb, tex,
+                          tuning_.player_sprite_height_tiles);
+}
+
+void OverworldSim::clear_enemy_marker() noexcept {
+    remove_actor(enemy_marker_handle_);
+}
+
+bool OverworldSim::has_enemy_marker() const noexcept {
+    return valid_actor_handle(enemy_marker_handle_) &&
+           actors_[static_cast<std::size_t>(enemy_marker_handle_)].drawable();
+}
+
+void OverworldSim::set_npc_bertoldo_marker(
+    const gus::core::spatial::Aabb& aabb,
+    gus::platform::render2d::TextureId tex) noexcept {
+    ensure_reserved_actor(npc_bertoldo_handle_, WorldActorRole::Npc, aabb, tex,
+                          tuning_.npc_bertoldo_sprite_height_tiles);
+}
+
+void OverworldSim::clear_npc_bertoldo_marker() noexcept {
+    remove_actor(npc_bertoldo_handle_);
+}
+
+bool OverworldSim::has_npc_bertoldo_marker() const noexcept {
+    return valid_actor_handle(npc_bertoldo_handle_) &&
+           actors_[static_cast<std::size_t>(npc_bertoldo_handle_)].drawable();
+}
+
 gus::core::spatial::Aabb OverworldSim::solid_obstacle_from_footprint(
     const gus::core::spatial::Aabb& footprint) const noexcept {
     // MESMA ancoragem do feet_trigger_aabb (maestro_logic.hpp): centro em X sobre o
@@ -113,6 +286,14 @@ OverworldSim::OverworldSim(gus::core::spatial::TileGrid grid,
 void OverworldSim::step_fixed(int dx, int dy, bool run, float fixed_dt) noexcept {
     // A posicao atual vira a "anterior" deste frame (base da interpolacao).
     prev_ = curr_;
+
+    // RONDA DOS ATORES (DEMO-CIDADE-VESTIDA B3) - LOGO NO INICIO, ANTES de
+    // qualquer saida antecipada. A cidade tem que continuar viva com o jogador
+    // parado: se isto ficasse depois do `return` do ramo "sem input", o inimigo so
+    // andaria enquanto o jogador andasse - e ninguem notaria no playtest, porque o
+    // jogador esta quase sempre andando. Tambem precisa vir antes da colisao do
+    // jogador, para que os corpos solidos usados abaixo sejam os deste quadro.
+    advance_actor_patrols(fixed_dt);
 
     // IDLE OFEGANTE (breathing rapido) e a respiracao CALMA procedural tocam por TEMPO,
     // sempre - so um deles e MOSTRADO quando parado (decide a stamina). Avancar tambem
@@ -189,20 +370,30 @@ void OverworldSim::step_fixed(int dx, int dy, bool run, float fixed_dt) noexcept
     const float move_x = fx * dist;
     const float move_y = fy * dist;
 
-    // OBSTACULOS PONTUAIS (M7-COSTURA/M7-DIALOGO, colisao SOLIDA de NPC/inimigo):
-    // enemy_solid_aabb_/npc_bertoldo_solid_aabb_ (derivados em set_enemy_marker/
-    // set_npc_bertoldo_marker - ver solid_obstacle_from_footprint) entram como
-    // "paredes pontuais" adicionais, NAO fazem parte da TileGrid estatica. Array
-    // FIXO de no maximo 2 (sem heap, mesmo espirito data-driven do resto do sim).
-    gus::core::spatial::Aabb obstacle_storage[2];
-    int obstacle_count = 0;
-    if (enemy_solid_aabb_.has_value()) {
-        obstacle_storage[obstacle_count++] = *enemy_solid_aabb_;
+    // OBSTACULOS PONTUAIS (M7-COSTURA/M7-DIALOGO, colisao SOLIDA de NPC/inimigo;
+    // estendido em DEMO-CIDADE-VESTIDA B1/B2 para pecas de cenario e N atores):
+    // entram como "paredes pontuais" adicionais, NAO fazem parte da TileGrid
+    // estatica. Ate esta fatia era um array FIXO de 2 (os dois slots de marcador);
+    // agora e a lista inteira - casa, poste, fonte, cada NPC e cada inimigo.
+    //
+    // O rascunho e um membro reaproveitado entre quadros: depois do primeiro
+    // quadro nao ha mais alocacao no laco de jogo, so refill. A varredura e linear
+    // no numero de corpos, o que e barato na ordem de grandeza de uma cidade
+    // (dezenas); se um dia forem milhares, o corte por proximidade entra aqui, num
+    // lugar so.
+    obstacle_scratch_.clear();
+    for (const ScenePropInstance& p : props_) {
+        if (p.blocks()) {
+            obstacle_scratch_.push_back(p.solid);
+        }
     }
-    if (npc_bertoldo_solid_aabb_.has_value()) {
-        obstacle_storage[obstacle_count++] = *npc_bertoldo_solid_aabb_;
+    for (const WorldActor& a : actors_) {
+        if (a.blocks()) {
+            obstacle_scratch_.push_back(a.solid);
+        }
     }
-    const gus::core::spatial::ObstacleSpan obstacles{obstacle_storage, obstacle_count};
+    const gus::core::spatial::ObstacleSpan obstacles{
+        obstacle_scratch_.data(), static_cast<int>(obstacle_scratch_.size())};
 
     // Colisao que desliza nas paredes (resolucao por eixo: X depois Y), agora com
     // corner-assist quando ligado no tuning (escorrega na quina se ha abertura) E os
@@ -332,90 +523,109 @@ void OverworldSim::render(gus::platform::render2d::IRenderer& renderer,
     // de CADA desenho fica INTACTA (mesmas formulas de sempre) - so a SEQUENCIA de
     // invocacao muda. depth_sort.hpp e POCO puro (core/spatial), testado sem GL em
     // depth_sort_test.cpp.
-    enum class DrawableId : int { kEnemy = 0, kNpc = 1, kPlayer = 2 };
+    //
+    // GENERALIZACAO (DEMO-CIDADE-VESTIDA B1/B2): a lista deixou de ser um array de
+    // 3 posicoes com um enum de 3 valores. Agora entram o jogador, TODOS os atores
+    // (N NPCs e N inimigos) e TODAS as pecas de cenario de pe - a casa cibergotica
+    // esconde quem passa atras dela pela MESMA regra que o Bertoldo ja escondia.
+    // O `id` de DepthEntry e opaco (ver depth_sort.hpp): aqui ele codifica QUEM
+    // desenhar - jogador, peca `i` ou ator `i`.
+    constexpr int kPlayerDepthId = -1;
+    // Base do intervalo de ator. Separa os dois espacos de indice sem par de
+    // vetores paralelos; o valor e folgado o bastante para nao colidir com
+    // nenhuma contagem de pecas plausivel (uma cidade tem dezenas, nao um milhao).
+    constexpr int kActorDepthIdBase = 1 << 20;
 
-    const bool draw_enemy_marker =
-        has_enemy_marker() &&
-        overlaps(gus::core::spatial::Rect{enemy_marker_aabb_->x, enemy_marker_aabb_->y,
-                                          enemy_marker_aabb_->w, enemy_marker_aabb_->h},
-                view.rect);
-    const bool draw_npc_marker =
-        has_npc_bertoldo_marker() &&
-        overlaps(gus::core::spatial::Rect{
-                     npc_bertoldo_marker_aabb_->x, npc_bertoldo_marker_aabb_->y,
-                     npc_bertoldo_marker_aabb_->w, npc_bertoldo_marker_aabb_->h},
-                view.rect);
+    const gus::platform::render2d::UvRect kFullUv{0.0f, 0.0f, 1.0f, 1.0f};
+    const gus::platform::render2d::DrawColor kNoTint{1.0f, 1.0f, 1.0f, 1.0f};
 
-    // MARCADOR DE INIMIGO FIXO (M7-COSTURA Inc 2): o placeholder do androide (a MESMA
-    // textura que a tela de BATALHA usa pros inimigos). MESMA escala/ancoragem do
-    // sprite do Gus (player_sprite_height_tiles): quad quadrado, centrado em X sobre a
-    // AABB do inimigo, base do quad = base da AABB (sem foot-inset - e um busto/icone,
-    // nao um sprite de corpo com pes medidos). Culling ja resolvido acima
-    // (draw_enemy_marker); kInvalidTexture/sem AABB (ver has_enemy_marker) => nada e
-    // desenhado (fallback seguro).
-    const auto do_draw_enemy_marker = [&]() {
-        const gus::core::spatial::Aabb& ea = *enemy_marker_aabb_;
-        const float esprite_h =
-            tuning_.player_sprite_height_tiles * grid_.tile_size();
-        const float esprite_w = esprite_h;  // retrato quadrado
-        const float ex = ea.x + ea.w * 0.5f - esprite_w * 0.5f;
-        const float ey = sprite_top_y(ea.y + ea.h, esprite_h,
-                                      /*bottom_fraction=*/0.0f,
-                                      /*manual_offset_world=*/0.0f);
-        const gus::core::spatial::Rect enemy_rect{ex, ey, esprite_w, esprite_h};
-        const gus::platform::render2d::UvRect euv{0.0f, 0.0f, 1.0f, 1.0f};
-        const gus::platform::render2d::DrawColor ewhite{1.0f, 1.0f, 1.0f, 1.0f};
-        renderer.draw_textured_rect(enemy_rect, enemy_marker_tex_, euv, ewhite);
+    // PECAS DE CHAO (tabuleiro de puzzle, marcacao de calcada): pintadas JUNTO com
+    // os tiles, antes de tudo. Nao entram no Y-sort de proposito - a base delas e
+    // baixa na tela e um Y-sort ingenuo as desenharia POR CIMA do jogador que esta
+    // pisando nelas.
+    for (const ScenePropInstance& p : props_) {
+        if (!p.ground || !p.drawable()) {
+            continue;
+        }
+        const gus::core::spatial::Rect r{p.footprint.x, p.footprint.y, p.footprint.w,
+                                         p.footprint.h};
+        if (!overlaps(r, view.rect)) {
+            continue;
+        }
+        renderer.draw_textured_rect(r, p.tex, kFullUv, kNoTint);
+    }
+
+    // Desenha UMA peca de cenario de pe (o retangulo ja vem resolvido do dado).
+    const auto do_draw_prop = [&](int index) {
+        const ScenePropInstance& p = props_[static_cast<std::size_t>(index)];
+        renderer.draw_textured_rect(
+            gus::core::spatial::Rect{p.footprint.x, p.footprint.y, p.footprint.w,
+                                     p.footprint.h},
+            p.tex, kFullUv, kNoTint);
     };
 
-    // MARCADOR DO NPC BERTOLDO (M7-DIALOGO, NPC-MVP): sprite ESTATICO (Seu Bertoldo
-    // Caim, pose "south" - de frente pro jogador/camera, sem locomocao) na posicao
-    // fixa calculada pela Maestro (npc_bertoldo_aabb_). MESMA formula/culling do
-    // marcador de inimigo acima ("busto simples": quad quadrado, centrado em X,
-    // base do quad = base da AABB, sem foot-inset - o NPC nao anda), so que com
-    // ESCALA PROPRIA (tuning_.npc_bertoldo_sprite_height_tiles, NAO player_sprite_
-    // height_tiles - FIX BUG do lider "Bertoldo menor que o Gus": o retrato do
-    // Bertoldo tem margem transparente maior que o do Gus, reusar a mesma altura-
-    // de-canvas do jogador fazia o adulto renderizar mais baixo que a crianca; ver
-    // o comentario completo em overworld_tuning.hpp). Slot PROPRIO
-    // (npc_bertoldo_marker_*), independente do marcador de inimigo. `na` (a AABB
-    // recebida) e EXATAMENTE a mesma que a Maestro usa pra disparar o dialogo
-    // (aabb_overlaps) - o quad abaixo e derivado dela pela MESMA formula
-    // (sprite_top_y) que a Maestro usou pra computa-la (enemy_sprite_footprint_
-    // aabb), entao trigger e visual COINCIDEM por construcao (nao ha 2 formulas
-    // divergentes pra manter em sincronia).
-    const auto do_draw_npc_marker = [&]() {
-        const gus::core::spatial::Aabb& na = *npc_bertoldo_marker_aabb_;
-        const float nsprite_h =
-            tuning_.npc_bertoldo_sprite_height_tiles * grid_.tile_size();
-        const float nsprite_w = nsprite_h;  // sprite quadrado
-        const float nx = na.x + na.w * 0.5f - nsprite_w * 0.5f;
-        const float ny = sprite_top_y(na.y + na.h, nsprite_h,
-                                      /*bottom_fraction=*/0.0f,
-                                      /*manual_offset_world=*/0.0f);
-        const gus::core::spatial::Rect npc_rect{nx, ny, nsprite_w, nsprite_h};
-        const gus::platform::render2d::UvRect nuv{0.0f, 0.0f, 1.0f, 1.0f};
-        const gus::platform::render2d::DrawColor nwhite{1.0f, 1.0f, 1.0f, 1.0f};
-        renderer.draw_textured_rect(npc_rect, npc_bertoldo_marker_tex_, nuv, nwhite);
+    // Desenha UM ator (NPC ou inimigo). Mesma formula que os dois marcadores
+    // legados usavam separadamente - quad quadrado, centrado em X sobre a ancora,
+    // base do quad na base dela, sem foot-inset (e um busto/icone, nao um sprite de
+    // corpo com pes medidos pelo alpha-bbox). A ALTURA vem do proprio ator, o que
+    // preserva a escala propria do Bertoldo (retrato com margem transparente maior
+    // que a do Gus; reusar a altura do jogador fazia o adulto sair mais baixo que a
+    // crianca, bug do playtest ao vivo).
+    //
+    // POSICAO INTERPOLADA entre o passo anterior e o atual, igual ao jogador: um
+    // inimigo em ronda desenhado so na posicao do passo fixo andaria aos trancos
+    // enquanto o jogador desliza liso.
+    const auto do_draw_actor = [&](int index) {
+        const WorldActor& a = actors_[static_cast<std::size_t>(index)];
+        gus::core::spatial::Aabb anchor = a.anchor;
+        anchor.x = a.prev_anchor.x + (a.anchor.x - a.prev_anchor.x) * alpha;
+        anchor.y = a.prev_anchor.y + (a.anchor.y - a.prev_anchor.y) * alpha;
+        const gus::core::spatial::Aabb rect =
+            actor_sprite_rect(anchor, a.sprite_height_tiles);
+        renderer.draw_textured_rect(
+            gus::core::spatial::Rect{rect.x, rect.y, rect.w, rect.h}, a.tex, kFullUv,
+            kNoTint);
     };
 
     // Monta as entradas ordenaveis (so as ATIVAS/visiveis - o jogador SEMPRE entra).
     // depth_key = base/pe (y+h): MAIOR = mais "embaixo" na tela = desenha por
     // ULTIMO = fica na FRENTE (ver depth_sort.hpp).
-    gus::core::spatial::DepthEntry depth_entries[3];
-    int depth_count = 0;
-    if (draw_enemy_marker) {
-        depth_entries[depth_count++] = {enemy_marker_aabb_->y + enemy_marker_aabb_->h,
-                                        static_cast<int>(DrawableId::kEnemy)};
+    depth_scratch_.clear();
+    for (std::size_t i = 0; i < props_.size(); ++i) {
+        const ScenePropInstance& p = props_[i];
+        if (p.ground || !p.drawable()) {
+            continue;
+        }
+        const gus::core::spatial::Rect r{p.footprint.x, p.footprint.y, p.footprint.w,
+                                         p.footprint.h};
+        if (!overlaps(r, view.rect)) {
+            continue;
+        }
+        depth_scratch_.push_back({p.footprint.y + p.footprint.h, static_cast<int>(i)});
     }
-    if (draw_npc_marker) {
-        depth_entries[depth_count++] = {
-            npc_bertoldo_marker_aabb_->y + npc_bertoldo_marker_aabb_->h,
-            static_cast<int>(DrawableId::kNpc)};
+    for (std::size_t i = 0; i < actors_.size(); ++i) {
+        const WorldActor& a = actors_[i];
+        if (!a.drawable()) {
+            continue;
+        }
+        gus::core::spatial::Aabb anchor = a.anchor;
+        anchor.x = a.prev_anchor.x + (a.anchor.x - a.prev_anchor.x) * alpha;
+        anchor.y = a.prev_anchor.y + (a.anchor.y - a.prev_anchor.y) * alpha;
+        const gus::core::spatial::Aabb rect =
+            actor_sprite_rect(anchor, a.sprite_height_tiles);
+        if (!overlaps(gus::core::spatial::Rect{rect.x, rect.y, rect.w, rect.h},
+                      view.rect)) {
+            continue;
+        }
+        // A profundidade e a BASE da ancora (onde o ator pisa), nao a do quad
+        // desenhado - o quad "vaza" para cima e daria uma leitura de profundidade
+        // errada para sprites de alturas diferentes.
+        depth_scratch_.push_back(
+            {anchor.y + anchor.h, kActorDepthIdBase + static_cast<int>(i)});
     }
-    depth_entries[depth_count++] = {shown.y + shown.h,
-                                    static_cast<int>(DrawableId::kPlayer)};
-    gus::core::spatial::sort_by_depth(depth_entries, depth_count);
+    depth_scratch_.push_back({shown.y + shown.h, kPlayerDepthId});
+    gus::core::spatial::sort_by_depth(depth_scratch_.data(),
+                                      static_cast<int>(depth_scratch_.size()));
 
     // Desenha na ORDEM ja resolvida por profundidade. O bloco do jogador (sprite OU
     // fallback de contorno) e chamado atraves da MESMA lambda de sempre - a logica de
@@ -515,17 +725,13 @@ void OverworldSim::render(gus::platform::render2d::IRenderer& renderer,
     }
     };  // fim de do_draw_player
 
-    for (int i = 0; i < depth_count; ++i) {
-        switch (static_cast<DrawableId>(depth_entries[i].id)) {
-            case DrawableId::kEnemy:
-                do_draw_enemy_marker();
-                break;
-            case DrawableId::kNpc:
-                do_draw_npc_marker();
-                break;
-            case DrawableId::kPlayer:
-                do_draw_player();
-                break;
+    for (const gus::core::spatial::DepthEntry& e : depth_scratch_) {
+        if (e.id == kPlayerDepthId) {
+            do_draw_player();
+        } else if (e.id >= kActorDepthIdBase) {
+            do_draw_actor(e.id - kActorDepthIdBase);
+        } else {
+            do_draw_prop(e.id);
         }
     }
 
