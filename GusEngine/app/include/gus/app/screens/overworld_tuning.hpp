@@ -329,8 +329,27 @@ struct OverworldTuning {
     // em que o lider olhar o display e disser "as construcoes estao pequenas
     // demais perto do Gus" - mexer aqui reescala a cidade inteira sem tocar em
     // nenhuma linha do catalogo, e SEM tirar peca nenhuma do chao (a base fica
-    // ancorada). Faixa util sugerida ~0.8..1.6. //PLAYTEST
-    float scene_prop_scale = 1.0f;
+    // ancorada). Faixa util sugerida ~0.8..2.0. //PLAYTEST
+    //
+    // LIDER 2026-08-04 (variante A2, escolhida vendo a montagem comparativa da
+    // fatia F do DEMO-CIDADE-VESTIDA): 1.00 -> 1.83. O dia previsto no paragrafo
+    // acima chegou - o poste de rua era 0,91x a altura do Gus (uma luminaria mais
+    // BAIXA que uma crianca de 11 anos) e a casa mais alta do bairro leste, que o
+    // blockout chama de predio, empatava com ele. As DUAS vias possiveis foram
+    // montadas e vistas lado a lado: (A) encolher o personagem, (B) crescer as
+    // pecas. O lider escolheu a A2 - as PECAS crescem, o personagem fica INTACTO
+    // (player_sprite_height_tiles 2.75 e camera_zoom_px_per_tile 43 NAO mudam, de
+    // proposito: mexer neles reescalaria o mundo visivel, que e o oposto do que
+    // ele pediu). Razoes resultantes, medidas em pixel na montagem: poste 1,70x /
+    // casa terrea 2,05x / predio 2,80x a crianca.
+    //
+    // CUSTO CONHECIDO E ACEITO: a MESMA escala multiplica a caixa que BLOQUEIA
+    // (scene_prop_solid). Medido no mapa real 90x60: as pecas tocavam 62 celulas
+    // andaveis em 1,00x e passam a tocar 155 em 1,83x. O lider aceitou o numero
+    // sabendo dele, e a conectividade da cidade vestida (spawn -> todo canto,
+    // saida sul, chokes do blockout) passou a ser travada por teste - ver
+    // app/tests/city_props_test.cpp, secao "cidade vestida".
+    float scene_prop_scale = 1.83f;
 };
 
 }  // namespace gus::app::screens

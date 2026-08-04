@@ -491,3 +491,323 @@ TEST_CASE("cidade real: no primeiro quadro o jogador cabe INTEIRO na tela",
                            << topo_do_desenho);
     REQUIRE(topo_do_desenho >= 0.0f);
 }
+
+// ===========================================================================
+//  ESCALA A2 (fatia G): as PEÇAS crescem, o personagem fica intacto.
+//
+//  O líder viu a montagem comparativa da fatia F e escolheu A2: subir
+//  `scene_prop_scale` sem mexer no sprite do Gus nem no zoom da câmera. O que
+//  esta seção trava NÃO é o número escolhido - é a RAZÃO que ele produz na tela,
+//  que é o que o líder de fato olhou. Testar o número seria copiar a constante
+//  para um segundo lugar e chamar isso de verificação.
+//
+//  As faixas abaixo são de INTENÇÃO DE LEITURA, não de tolerância numérica:
+//  "criança de 11 anos diante de uma cidade que a domina". Elas reprovam tanto o
+//  estado antigo (peça mais BAIXA que a criança) quanto um exagero que
+//  transformasse a rua em desfiladeiro.
+//
+//  Razão de QUADRO (altura de canvas em tiles), que é o que o motor desenha. A
+//  razão VISÍVEL medida em pixel é maior, porque o conteúdo do PNG do Gus ocupa
+//  88,3% do canvas dele e o das peças ocupa mais (poste 90,0%, casa A 90,6%,
+//  casa B 93,0% - alpha-bbox medido). Na escala vigente isso dá, em pixel,
+//  poste 1,70x / casa A 2,05x / casa B 2,80x a criança - os números que o QA
+//  mediu na montagem e que o líder aprovou.
+// ===========================================================================
+
+namespace {
+
+// Altura DESENHADA de uma peça, em tiles, já com a escala global do líder.
+float altura_desenhada_tiles(gus::domain::world::ScenePropKind kind, float escala) {
+    return gus::domain::world::scene_prop_def(kind).height_tiles() * escala;
+}
+
+}  // namespace
+
+TEST_CASE("escala A2: a cidade domina a criança na altura de tela",
+          "[city-props][escala]") {
+    const gus::app::screens::OverworldTuning tuning = gus::app::screens::make_city_tuning();
+    const float escala = tuning.scene_prop_scale;
+    const float crianca = tuning.player_sprite_height_tiles;
+    REQUIRE(crianca > 0.0f);
+
+    const float poste =
+        altura_desenhada_tiles(ScenePropKind::PosteNeonCiano, escala) / crianca;
+    const float casa_a =
+        altura_desenhada_tiles(ScenePropKind::CasaCibergoticaA, escala) / crianca;
+    const float casa_b =
+        altura_desenhada_tiles(ScenePropKind::CasaCibergoticaB, escala) / crianca;
+
+    INFO("razoes de QUADRO peca/Gus: poste " << poste << ", casa A " << casa_a
+                                             << ", casa B " << casa_b
+                                             << " (scene_prop_scale " << escala << ")");
+
+    // Poste de rua: acima da cabeça da criança com folga, e ainda um poste - não
+    // uma torre. Reprova o estado anterior à fatia G, em que o poste era 0,91x o
+    // Gus (uma luminária mais baixa que uma criança de 11 anos).
+    REQUIRE(poste > 1.55f);
+    REQUIRE(poste < 1.80f);
+
+    // Casa térrea: o dobro da criança. É a leitura de "porta que ela mal alcança".
+    REQUIRE(casa_a > 1.90f);
+    REQUIRE(casa_a < 2.15f);
+
+    // O prédio alto do bairro leste: quase o triplo. É o que dá verticalidade ao
+    // skyline ciber-gótico sem sair da escala de rua.
+    REQUIRE(casa_b > 2.50f);
+    REQUIRE(casa_b < 2.85f);
+
+    // Ordem de massa: poste < casa térrea < prédio. Invariante de leitura de
+    // cidade, independente de qual escala esteja em vigor.
+    REQUIRE(poste < casa_a);
+    REQUIRE(casa_a < casa_b);
+}
+
+TEST_CASE("escala A2: escalar peça NÃO mexe no corpo do jogador",
+          "[city-props][escala][mapa-real]") {
+    // O par da decisão A2: a via descartada era encolher o Gus. Este teste é o que
+    // reprova alguém "compensando" a escala das peças no personagem depois. A
+    // hitbox do jogador vem de kPlayerHitboxTileFraction e do tile do mapa - a
+    // escala de cenário não entra na conta, e não pode passar a entrar.
+    const gus::app::screens::CityLoadOutcome city = load_real_city();
+    const Aabb hitbox = gus::app::screens::spawn_player_aabb(*city.sim.tile_map());
+    const float tile = city.sim.grid().tile_size();
+    const float lado_esperado = gus::app::screens::kPlayerHitboxTileFraction * tile;
+
+    INFO("hitbox " << hitbox.w << "x" << hitbox.h << ", esperado lado "
+                   << lado_esperado << ", scene_prop_scale "
+                   << city.sim.tuning().scene_prop_scale);
+    REQUIRE_THAT(static_cast<double>(hitbox.w),
+                 WithinAbs(static_cast<double>(lado_esperado), kEps));
+    REQUIRE_THAT(static_cast<double>(hitbox.h),
+                 WithinAbs(static_cast<double>(lado_esperado), kEps));
+}
+
+// ===========================================================================
+//  CONECTIVIDADE DA CIDADE VESTIDA (fatia G)
+//
+//  A MESMA escala que aumenta o desenho multiplica a caixa que BLOQUEIA
+//  (domain/src/world/scene_prop.cpp::scene_prop_solid). Subir a escala cobra rua:
+//  medido na fatia F, 62 células andáveis eram tocadas por peça em 1,00x e 155 na
+//  escala vigente. O líder aceitou esse custo sabendo o número - o que NINGUÉM
+//  tinha verificado é se alguma dessas células é um gargalo que parte a cidade em
+//  duas.
+//
+//  Este teste é a verificação. Ele NÃO conta células seladas (número que muda a
+//  cada peça nova e viraria teste de baixa fidelidade): ele responde a única
+//  pergunta que interessa ao jogador - dá para ir do spawn a todo canto do mapa
+//  com a cidade vestida?
+//
+//  A régua é a do MOTOR, não a da célula: o jogo colide em AABB contínua, então a
+//  busca varre uma sub-grade fina e aceita uma posição quando a hitbox REAL do
+//  jogador cabe ali sem encostar em parede nem em caixa de peça. Uma busca por
+//  célula aprovaria fresta de meio tile por onde o Gus não passa.
+// ===========================================================================
+
+namespace {
+
+// Sub-amostras por tile na busca. 4 = passo de 0,25 tile contra uma hitbox de
+// 0,6 tile: fino o bastante para não inventar passagem, grosso o bastante para a
+// varredura inteira (90x60x16 posições) rodar em fração de segundo.
+constexpr int kSubAmostras = 4;
+
+// Mapa de alcance do jogador sobre a cidade vestida.
+struct AlcanceDaCidade {
+    int largura_celulas = 0;
+    int altura_celulas = 0;
+    std::vector<char> livre;      // sub-grade: a hitbox cabe aqui
+    std::vector<char> visitado;   // sub-grade: alcançável a pé desde o spawn
+
+    [[nodiscard]] bool celula_tem_espaco(int cx, int cy) const {
+        for (int sy = cy * kSubAmostras; sy < (cy + 1) * kSubAmostras; ++sy) {
+            for (int sx = cx * kSubAmostras; sx < (cx + 1) * kSubAmostras; ++sx) {
+                if (livre[static_cast<std::size_t>(sy) * largura_celulas * kSubAmostras
+                          + sx] != 0) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    [[nodiscard]] bool celula_alcancada(int cx, int cy) const {
+        for (int sy = cy * kSubAmostras; sy < (cy + 1) * kSubAmostras; ++sy) {
+            for (int sx = cx * kSubAmostras; sx < (cx + 1) * kSubAmostras; ++sx) {
+                if (visitado[static_cast<std::size_t>(sy) * largura_celulas
+                                 * kSubAmostras + sx] != 0) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+};
+
+AlcanceDaCidade varrer_cidade_vestida(const gus::app::screens::CityLoadOutcome& city) {
+    const TileGrid& grid = city.sim.grid();
+    const float ts = grid.tile_size();
+    const float escala = city.sim.tuning().scene_prop_scale;
+
+    // As caixas que BLOQUEIAM, exatamente como o jogo as monta.
+    std::vector<Aabb> solidos;
+    for (const ScenePropPlacement& p :
+         resolve_city_props(grid, kDistritosInferioresDressing,
+                            kDistritosInferioresDressingCount)) {
+        const gus::domain::world::ScenePropDef& def =
+            gus::domain::world::scene_prop_def(p.kind);
+        if (!def.solid()) continue;
+        const Aabb fp = gus::domain::world::scene_prop_footprint(p, def, ts, escala);
+        solidos.push_back(gus::domain::world::scene_prop_solid(fp, def, ts, escala));
+    }
+
+    AlcanceDaCidade out;
+    out.largura_celulas = grid.width();
+    out.altura_celulas = grid.height();
+    const int W = out.largura_celulas * kSubAmostras;
+    const int H = out.altura_celulas * kSubAmostras;
+    out.livre.assign(static_cast<std::size_t>(W) * H, 0);
+    out.visitado.assign(static_cast<std::size_t>(W) * H, 0);
+
+    const float meio = gus::app::screens::kPlayerHitboxTileFraction * ts * 0.5f;
+    const float passo = ts / static_cast<float>(kSubAmostras);
+    const float largura_mundo = static_cast<float>(out.largura_celulas) * ts;
+    const float altura_mundo = static_cast<float>(out.altura_celulas) * ts;
+
+    for (int sy = 0; sy < H; ++sy) {
+        for (int sx = 0; sx < W; ++sx) {
+            const float cx = (static_cast<float>(sx) + 0.5f) * passo;
+            const float cy = (static_cast<float>(sy) + 0.5f) * passo;
+            const float x0 = cx - meio, y0 = cy - meio;
+            const float x1 = cx + meio, y1 = cy + meio;
+            if (x0 < 0.0f || y0 < 0.0f || x1 > largura_mundo || y1 > altura_mundo) {
+                continue;
+            }
+            bool livre = true;
+            for (int gy = grid.world_to_cell(y0); gy <= grid.world_to_cell(y1 - 1e-4f)
+                 && livre; ++gy) {
+                for (int gx = grid.world_to_cell(x0);
+                     gx <= grid.world_to_cell(x1 - 1e-4f); ++gx) {
+                    if (grid.is_blocked(gx, gy)) {
+                        livre = false;
+                        break;
+                    }
+                }
+            }
+            if (livre) {
+                for (const Aabb& s : solidos) {
+                    if (x0 < s.x + s.w && x1 > s.x && y0 < s.y + s.h && y1 > s.y) {
+                        livre = false;
+                        break;
+                    }
+                }
+            }
+            out.livre[static_cast<std::size_t>(sy) * W + sx] = livre ? 1 : 0;
+        }
+    }
+
+    // Busca em largura a partir do spawn REAL do mapa.
+    const gus::domain::map::Cell spawn = city.sim.tile_map()->spawn();
+    int inicio_x = spawn.x * kSubAmostras + kSubAmostras / 2;
+    int inicio_y = spawn.y * kSubAmostras + kSubAmostras / 2;
+    REQUIRE(out.livre[static_cast<std::size_t>(inicio_y) * W + inicio_x] != 0);
+
+    std::vector<int> fila;
+    fila.reserve(static_cast<std::size_t>(W) * H);
+    fila.push_back(inicio_y * W + inicio_x);
+    out.visitado[static_cast<std::size_t>(inicio_y) * W + inicio_x] = 1;
+    for (std::size_t i = 0; i < fila.size(); ++i) {
+        const int no = fila[i];
+        const int x = no % W, y = no / W;
+        const int viz[4][2] = {{x + 1, y}, {x - 1, y}, {x, y + 1}, {x, y - 1}};
+        for (const auto& v : viz) {
+            if (v[0] < 0 || v[0] >= W || v[1] < 0 || v[1] >= H) continue;
+            const std::size_t k = static_cast<std::size_t>(v[1]) * W + v[0];
+            if (out.livre[k] != 0 && out.visitado[k] == 0) {
+                out.visitado[k] = 1;
+                fila.push_back(static_cast<int>(k));
+            }
+        }
+    }
+    return out;
+}
+
+}  // namespace
+
+TEST_CASE("cidade vestida: nenhuma célula andável fica ilhada",
+          "[city-props][mapa-real][conectividade]") {
+    const gus::app::screens::CityLoadOutcome city = load_real_city();
+    const AlcanceDaCidade alcance = varrer_cidade_vestida(city);
+
+    std::vector<std::pair<int, int>> ilhadas;
+    for (int cy = 0; cy < alcance.altura_celulas; ++cy) {
+        for (int cx = 0; cx < alcance.largura_celulas; ++cx) {
+            if (alcance.celula_tem_espaco(cx, cy) && !alcance.celula_alcancada(cx, cy)) {
+                ilhadas.emplace_back(cx, cy);
+            }
+        }
+    }
+    std::string amostra;
+    for (std::size_t i = 0; i < ilhadas.size() && i < 12; ++i) {
+        amostra += "(" + std::to_string(ilhadas[i].first) + "," +
+                   std::to_string(ilhadas[i].second) + ") ";
+    }
+    INFO("celulas com espaco util mas inalcancaveis a pe: " << ilhadas.size() << " "
+                                                            << amostra);
+    REQUIRE(ilhadas.empty());
+}
+
+TEST_CASE("cidade vestida: a saída sul continua alcançável",
+          "[city-props][mapa-real][conectividade]") {
+    // O jogador tem que conseguir SAIR da área. Peça que sele o vestíbulo tranca o
+    // jogo com o mapa inteiro parecendo normal.
+    const gus::app::screens::CityLoadOutcome city = load_real_city();
+    const AlcanceDaCidade alcance = varrer_cidade_vestida(city);
+
+    bool achou_saida = false;
+    for (const gus::domain::map::Portal& portal : city.sim.tile_map()->portals()) {
+        INFO("portal " << portal.id << " em (" << portal.cell.x << ","
+                       << portal.cell.y << ")");
+        REQUIRE(alcance.celula_alcancada(portal.cell.x, portal.cell.y));
+        if (portal.id == "saida_sul") achou_saida = true;
+    }
+    REQUIRE(achou_saida);
+}
+
+TEST_CASE("cidade vestida: os chokes do blockout continuam passáveis",
+          "[city-props][mapa-real][conectividade]") {
+    // Os três estrangulamentos declarados no doc de blockout. São os pontos onde a
+    // rua já é estreita de propósito, e por isso os primeiros a fechar quando a
+    // caixa das peças cresce: o degrau da escadaria (R13, 4 células em y32) e as
+    // duas únicas aberturas laterais da praça (R9).
+    const gus::app::screens::CityLoadOutcome city = load_real_city();
+    const AlcanceDaCidade alcance = varrer_cidade_vestida(city);
+    const TileGrid& grid = city.sim.grid();
+
+    struct Choke {
+        const char* nome;
+        int x0, y0, x1, y1;  // faixa inclusiva de células
+    };
+    const Choke chokes[] = {
+        {"R13 degrau da escadaria (y32)", 43, 32, 46, 32},
+        {"R9 abertura oeste do hub (x25)", 25, 20, 25, 22},
+        {"R9 abertura leste do hub (x64)", 64, 16, 64, 18},
+    };
+
+    for (const Choke& c : chokes) {
+        int passaveis = 0;
+        int livres_no_tracado = 0;
+        for (int cy = c.y0; cy <= c.y1; ++cy) {
+            for (int cx = c.x0; cx <= c.x1; ++cx) {
+                if (grid.is_blocked(cx, cy)) continue;
+                ++livres_no_tracado;
+                if (alcance.celula_alcancada(cx, cy)) ++passaveis;
+            }
+        }
+        INFO(c.nome << ": " << livres_no_tracado << " celulas livres no tracado, "
+                    << passaveis << " alcancaveis com a cidade vestida");
+        // Toda célula que o traçado deixou livre tem que continuar servindo: um
+        // choke que perde metade da largura ainda "passa", mas vira funil de
+        // colisão que o jogador sente como travamento.
+        REQUIRE(livres_no_tracado > 0);
+        REQUIRE(passaveis == livres_no_tracado);
+    }
+}

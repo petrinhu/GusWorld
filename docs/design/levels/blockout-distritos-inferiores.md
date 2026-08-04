@@ -129,7 +129,7 @@ Todas as peças vivem em `resources/sprites/world/distritos_inferiores/`. Coorde
 | `casa_cibergotica_b.png` | (17,21) | x15..21, y13..20 | Vizinha da anterior, mesma rua, silhueta diferente (torre). Duas silhuetas distintas lado a lado dão leitura de bairro. |
 | `casa_cibergotica_a.png` (2ª) | (82,21) | x79..85, y13..20 | Espelho no bairro leste, para o leste não parecer só corredor de serviço. |
 | `casa_cibergotica_b.png` (2ª) | (73,17) | x68..75, y18..33 | Fachada norte, fecha a praceta do terminal ao sul. |
-| `poste_neon_ciano.png` x18 | (17,4), (52,4), (72,4), (40,7), (48,9), (33,15), (56,15), (33,27), (56,27), (13,28), (66,28), (36,34), (54,34), (75,48), (10,53), (33,53), (78,53), (52,54) | nenhum | Ritmo de iluminação e breadcrumb noturno. Distribuídos para marcar cada mudança de região, nunca em fileira regular. Os cinco de (17,4), (72,4), (13,28), (66,28) e (33,53) entraram depois da medição de densidade por tela (ver §10): eram becos e ruas com espaço andável e nenhuma peça. |
+| `poste_neon_ciano.png` x18 | (17,4), (40,4), (52,4), (72,4), (50,11), (33,15), (56,15), (33,27), (56,27), (13,28), (66,28), (36,34), (54,34), (75,48), (10,53), (33,53), (78,53), (52,54) | nenhum | Ritmo de iluminação e breadcrumb noturno. Distribuídos para marcar cada mudança de região, nunca em fileira regular. Os cinco de (17,4), (72,4), (13,28), (66,28) e (33,53) entraram depois da medição de densidade por tela (ver §10): eram becos e ruas com espaço andável e nenhuma peça. **Dois mudaram de lugar na fatia G** (playtest do líder, "tem um poste no meio da rua"): **(40,7) → (40,4)** e **(48,9) → (50,11)** — ver a nota abaixo. |
 | `cover_box.png` x14 | sem âncora | (6,36),(6,37),(10,36),(10,37) no pátio; (38,36),(38,37),(38,42),(38,43),(52,36),(52,37),(52,42),(52,43) na arena; (70,49),(78,49) no pátio da FIR | Cobertura real (célula de Parede), **uma caixa por célula**. Na arena formam 4 grupos verticais 1x2 simétricos, com o pilar central 2x2 (x44..45, y39..40) fechando a leitura tática. |
 | `board_puzzle.png` | (42,47) | nenhum | Canto superior-esquerdo do tabuleiro 7x5 (x42..48, y47..51), alinhado célula a célula com o grid do puzzle-gambito §8. |
 | `portao_sul_fechado.png` | (44,55) e (45,55) | x40..43 e x46..49 em y55 | Único vão do muro sul. Os batentes já são Parede; o vão está aberto por ora (ver §8, decisão em aberto). |
@@ -137,6 +137,28 @@ Todas as peças vivem em `resources/sprites/world/distritos_inferiores/`. Coorde
 Âncoras que ainda não têm sprite e são marcação de design: **(52,21)** pedestal Era 3 vazio "reservado para futuro monumento Sterling Corp" (canon de `01-cidade-cyber-gotica.md` §2; peça a desenhar, do lado oposto à fonte), **(32,19)** banco do Bertoldo (spawn do NPC), **(23,33)** fundo do beco morto (loot/lore da fatia D), **(44,57)** save point do vestíbulo (DA-2), **(12,49)** pichação do beco sudoeste.
 
 Conferência: **34 âncoras** no CSV, sendo **18 postes**, **8 de arquitetura** (holograma, fonte, placa, terminal e 4 casas), **3 de instalação** (board do puzzle e as 2 células do portão) e **5 de marcação sem sprite** (pedestal, banco, beco, save, pichação).
+
+### 5.1 Os dois postes que saíram do meio da rua (fatia G)
+
+O líder viu a cidade vestida e reclamou: *"tem um poste no meio da rua"*. Enumerando as 18
+âncoras de poste e medindo a parede mais próxima de cada uma, **dois** estavam em chão liso
+absoluto, sem uma única célula de Parede num raio de nove por cinco células, e os dois dentro da
+**Alameda de Chegada (R1)** — o corredor por onde o jogador entra no jogo. Poste solto num
+corredor de passagem não lê como iluminação, lê como obstáculo sem motivo.
+
+| Antes | Depois | Em que encosta | Por que ali |
+|---|---|---|---|
+| (40,7) | **(40,4)** | face **leste** do canteiro de (38..39, 3..4) | Espelho exato do poste que já existia em **(52,4)**, encostado na face **oeste** do canteiro de (53..54, 3..4). Os dois canteiros que a §3 R2 diz existirem "para quebrar a largura" do terraço passam a ter, cada um, a sua luminária, e a alameda continua com âncora em vez de virar a tela vazia que a §10 existe para evitar. |
+| (48,9) | **(50,11)** | batente **leste** da boca da praça, sobre a célula de Parede (50,12) do muro R7 | Ilumina o único choke de entrada do hub, que é a função declarada daquele muro na §3 ("enquadra a primeira visão da fonte"). É também o menor deslocamento que tira o poste do meio do Anel Norte. |
+
+**Os quatro postes soltos da praça — (33,15), (56,15), (33,27), (56,27) — NÃO foram tocados, de
+propósito.** Eles também estão em chão liso, mas por decisão de traçado: a §3 R8 os põe ali para
+quebrar o vão de 38x17 da Praça da Compilação. Poste no meio de uma praça é iluminação de praça;
+poste no meio de um corredor de passagem é obstáculo. A régua que separa os dois casos é a
+FUNÇÃO da região, não a distância até a parede mais próxima.
+
+Movimento de âncora toca o mapa, então o CSV foi reeditado, o `.gmap` recompilado e a
+conectividade da cidade vestida reconferida célula a célula (§9).
 
 ## 6. Gold path
 
@@ -176,6 +198,38 @@ A verificação obrigatória, sempre que este CSV mudar, é **busca em largura a
 3. entrada, saída e todo `#portal` alcançáveis.
 
 O que a busca provou e a leitura não prova: uma ligação pode estar **descrita no doc e ausente no CSV**. Foi exatamente o caso, e por isso a §3 agora enuncia a continuidade de y53 como **invariante**, não como descrição.
+
+### 9.1 A partir da fatia G, a busca roda sobre a cidade VESTIDA
+
+O CSV deixou de ser a única coisa que barra o jogador. Cada peça de cenário carrega uma caixa
+sólida (`scene_prop_solid`), e a escala global das peças **multiplica essa caixa junto com o
+desenho**. Quando o líder subiu a escala para 1,83 (variante A2), o custo medido no mapa real foi
+**de 62 para 154 células andáveis tocadas por peça** — 92 células de rua a mais barradas. O
+número foi aceito com conhecimento de causa; o que ninguém tinha verificado era se alguma dessas
+células era um **gargalo que parte a cidade em duas**.
+
+Por isso a verificação obrigatória passou a rodar sobre **paredes do CSV mais as caixas sólidas
+das peças na escala vigente**, e com a régua do motor, não a da célula: o jogo colide em AABB
+contínua, então a busca varre uma sub-grade fina e aceita uma posição quando a **hitbox real do
+jogador** (0,6 tile) cabe ali. Uma busca por célula aprovaria fresta de meio tile por onde o Gus
+não passa.
+
+Os três chokes declarados neste doc — o degrau da escadaria (R13, 4 células em y32) e as duas
+aberturas laterais do hub (R9, x25 em y20..22 e x64 em y16..18) — são conferidos **um a um**,
+exigindo que **toda** célula que o traçado deixou livre continue servindo. Choke que perde metade
+da largura ainda "passa" numa busca, mas vira funil de colisão que o jogador sente como
+travamento.
+
+Isto vive como teste, não como procedimento manual: `app/tests/city_props_test.cpp`, seção
+"cidade vestida". Quem mexer no CSV, na tabela de vestimenta ou na escala das peças vai ver o
+teste falhar antes de ver o playtest travar.
+
+Observação medida e aceita na escala 1,83: a âncora **(73,17)**, do prédio alto do bairro leste,
+fica **cercada pela base do próprio prédio** (a caixa dele passou a cobrir a fileira de calçada
+ao norte, e ao sul já era o quarteirão). Não é quebra de conectividade — zero células ficam
+ilhadas e o jogador contorna pelo norte, por y14/y15 —, e não há interação presa àquela peça. É
+consequência esperada de um prédio com 5,5 células de base, e está registrado aqui para não ser
+"descoberto" de novo como se fosse defeito novo.
 
 ## 10. Densidade por tela
 

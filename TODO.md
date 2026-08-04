@@ -538,6 +538,25 @@ histórico no fim do arquivo. Novas descobertas entram como bullets abaixo desta
   os outros 5 achados do laudo: **A1** escala (decisão de estética do líder, montagem comparativa),
   **A4** volume de Parede exposto ao redor das peças sólidas, **A6** androides usando retrato de
   batalha, **A7** peças isométricas sobre mundo ortogonal, **A8** cobertura de arte de 0,54%.
+  **Fatia G entregue 2026-08-04, 🔍 Pendente verificação** (fecha o achado **A1**): o líder viu a
+  montagem comparativa da fatia F e escolheu a **variante A2 — as peças crescem, o personagem fica
+  intacto**: `scene_prop_scale` **1,00 → 1,83**, com `player_sprite_height_tiles` (2,75) e
+  `camera_zoom_px_per_tile` (43) **inalterados de propósito** (mexer neles reescalaria o mundo
+  visível, o oposto do pedido). Razões **medidas em pixel** no frame capturado, contra a altura
+  visível do Gus (104 px): poste **0,93x → 1,70x**, casa térrea **1,13x → 2,06x**, prédio do bairro
+  leste **1,54x → 2,81x**. ⚠️ **O risco da escolha foi verificado, não presumido:** a mesma escala
+  multiplica a caixa que BLOQUEIA, e as peças passaram a tocar **154 células andáveis** contra 62
+  (custo que o líder aceitou sabendo o número). Busca em largura sobre o mapa **vestido** (paredes do
+  CSV + caixas sólidas na escala nova), com a régua do motor (sub-grade fina, hitbox real de 0,6
+  tile): **zero células ilhadas**, saída sul alcançável, 34 âncoras acessíveis e os 3 chokes do
+  blockout (degrau da escadaria e as 2 aberturas do hub) **passáveis em 100% da largura**. Virou
+  teste (`app/tests/city_props_test.cpp`, seção "cidade vestida"), não procedimento manual. Junto,
+  os **dois postes que estavam no meio da rua** (reclamação do líder) saíram do chão liso da Alameda
+  de Chegada: **(40,7) → (40,4)** (encosta no canteiro, espelho do poste de (52,4)) e **(48,9) →
+  (50,11)** (encosta no batente leste da boca da praça). Os 4 postes soltos da praça **não** foram
+  tocados: ali o vão de 38x17 é que pede poste. Mapa reeditado, `.gmap` recompilado, blockout §5.1 e
+  §9.1 atualizados. **Segue aberto o A7** (peças em perspectiva isométrica sobre mundo ortogonal):
+  decisão do líder é **arte nova em onda própria**, não girar PNG nem compensar no render.
 
 - `TMPDIR-STAGE-FIXO-PRODUCAO`: o mesmo defeito de caminho temporário previsível existe em **código de
   produção**, não só em teste, e a fatia `FLAKY-*` deliberadamente não o tocou porque estava fora do

@@ -85,8 +85,27 @@ inline constexpr CityPropRow kDistritosInferioresDressing[] = {
     {gus::domain::world::ScenePropKind::HoloSterling, 35, 4},
     {gus::domain::world::ScenePropKind::PosteNeonCiano, 52, 4},
     {gus::domain::world::ScenePropKind::PosteNeonCiano, 72, 4},
-    {gus::domain::world::ScenePropKind::PosteNeonCiano, 40, 7},
-    {gus::domain::world::ScenePropKind::PosteNeonCiano, 48, 9},
+    // OS DOIS POSTES QUE SAÍRAM DO MEIO DA RUA (fatia G, playtest do líder: "tem um
+    // poste no meio da rua"). Estavam em (40,7) e (48,9) - chão liso absoluto, sem
+    // uma parede em nove por cinco células ao redor, dentro da Alameda de Chegada,
+    // que é o corredor por onde o jogador entra no jogo. Poste solto em corredor de
+    // passagem não é iluminação, é obstáculo sem razão; poste solto na PRAÇA é
+    // deliberado (blockout §3 R8: os quatro de (33,15)/(56,15)/(33,27)/(56,27)
+    // existem para quebrar o vão de 38x17) e NÃO foi tocado.
+    //
+    // (40,7) -> (40,4): encosta na face leste do canteiro de (38..39, 3..4). Vira o
+    // ESPELHO exato do poste que já existia em (52,4), que encosta na face oeste do
+    // canteiro de (53..54, 3..4). Os dois canteiros que a §3 R2 diz existirem "para
+    // quebrar a largura" do terraço passam a ter, cada um, a sua luminária - e a
+    // alameda continua com âncora, em vez de virar a tela vazia que a §10 existe
+    // para evitar.
+    //
+    // (48,9) -> (50,11): encosta no batente LESTE da boca da praça (a célula de
+    // Parede (50,12) do muro R7). Ilumina o único choke de entrada do hub, que é a
+    // função declarada daquele muro ("enquadra a primeira visão da fonte"), e é o
+    // menor deslocamento que tira o poste do meio do Anel Norte.
+    {gus::domain::world::ScenePropKind::PosteNeonCiano, 40, 4},
+    {gus::domain::world::ScenePropKind::PosteNeonCiano, 50, 11},
     // --- Praça da Compilação e os dois bairros (R8/R10/R12) ---
     {gus::domain::world::ScenePropKind::PosteNeonCiano, 33, 15},
     {gus::domain::world::ScenePropKind::PosteNeonCiano, 56, 15},
