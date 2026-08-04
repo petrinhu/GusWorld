@@ -31,6 +31,7 @@
 #include "gus/domain/combat/weakness_wheel.hpp"     // WeaknessWheel (fraco = 1.5 no teste)
 #include "gus/platform/audio/audio_engine.hpp"  // AudioEngine/SoundId (M6 F3, ADR-011)
 #include "gus/platform/render2d/i_renderer.hpp"
+#include "tmp_dir_test_support.hpp"
 
 #include <cmath>
 #include <cstdint>
@@ -2905,7 +2906,7 @@ TEST_CASE("F3 M6: contato do JOGADOR dispara 1 play_sfx; windup/aproximacao fica
 
     AudioEngine audio(/*device_active=*/false);  // null-device: sem hardware
     const auto tmp =
-        std::filesystem::temp_directory_path() / "gusworld_test_hit_sfx_player.wav";
+        gus::test_support::unique_temp_file("gusworld_test_hit_sfx_player", ".wav");
     write_hit_test_tone_wav(tmp);
     const auto hit_id = audio.load_sfx(tmp.string().c_str());
     REQUIRE(hit_id != kInvalidSound);
@@ -2945,7 +2946,7 @@ TEST_CASE("F3 M6: contato do INIMIGO dispara 1 play_sfx; Beat 1 anuncio fica MUD
 
     AudioEngine audio(/*device_active=*/false);
     const auto tmp =
-        std::filesystem::temp_directory_path() / "gusworld_test_hit_sfx_enemy.wav";
+        gus::test_support::unique_temp_file("gusworld_test_hit_sfx_enemy", ".wav");
     write_hit_test_tone_wav(tmp);
     const auto hit_id = audio.load_sfx(tmp.string().c_str());
     REQUIRE(hit_id != kInvalidSound);
@@ -2987,7 +2988,7 @@ TEST_CASE("F3 M6: party E inimigo disparam, cada um no PROPRIO contato (2 hits =
 
     AudioEngine audio(/*device_active=*/false);
     const auto tmp =
-        std::filesystem::temp_directory_path() / "gusworld_test_hit_sfx_both_sides.wav";
+        gus::test_support::unique_temp_file("gusworld_test_hit_sfx_both_sides", ".wav");
     write_hit_test_tone_wav(tmp);
     const auto hit_id = audio.load_sfx(tmp.string().c_str());
     REQUIRE(hit_id != kInvalidSound);
@@ -3063,7 +3064,7 @@ TEST_CASE("F3 M6: call-site do PROJETIL (impacto) dispara 1 play_sfx; conjuracao
 
     AudioEngine audio(/*device_active=*/false);
     const auto tmp =
-        std::filesystem::temp_directory_path() / "gusworld_test_hit_sfx_projectile.wav";
+        gus::test_support::unique_temp_file("gusworld_test_hit_sfx_projectile", ".wav");
     write_hit_test_tone_wav(tmp);
     const auto hit_id = audio.load_sfx(tmp.string().c_str());
     REQUIRE(hit_id != kInvalidSound);

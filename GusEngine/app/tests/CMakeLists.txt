@@ -173,8 +173,13 @@ target_compile_definitions(gusengine_app_tests
 # IMPLEMENTACAO ja vive UMA vez em battle_preview.cpp (gusengine_app), linkado
 # abaixo - MESMO padrao de nao redefinir STB_IMAGE_WRITE_IMPLEMENTATION 2x usado
 # em difficulty_menu_loop.cpp/save_load_menu_loop.cpp.
+#
+# tests/support: helper compartilhado gus::test_support::unique_temp_dir/ScopedTempDir
+# (FLAKY-PLAYER-SPRITES-ANIM/FLAKY-SAVELOAD-WARNING-RECOVER) - MESMO header usado por
+# platform/tests/CMakeLists.txt, um unico lugar em vez de logica duplicada em 19 arquivos.
 target_include_directories(gusengine_app_tests
     PRIVATE ${CMAKE_SOURCE_DIR}/third_party/stb
+    PRIVATE ${CMAKE_SOURCE_DIR}/tests/support
 )
 
 target_compile_features(gusengine_app_tests PRIVATE cxx_std_20)

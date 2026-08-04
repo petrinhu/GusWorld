@@ -28,6 +28,7 @@
 #include <vector>
 
 #include "gus/platform/audio/audio_engine.hpp"
+#include "tmp_dir_test_support.hpp"
 
 using gus::platform::audio::AudioEngine;
 using gus::platform::audio::kInvalidSound;
@@ -146,7 +147,7 @@ TEST_CASE("AudioEngine set_master_volume clampa para [0,1]", "[audio_engine]") {
 TEST_CASE("AudioEngine load_sfx com WAV sintetico valido: id valido + play repetido",
           "[audio_engine]") {
     AudioEngine engine(/*device_active=*/false);  // null-device: decode nao depende de hardware
-    const auto tmp = std::filesystem::temp_directory_path() / "gusworld_test_sfx_tone.wav";
+    const auto tmp = gus::test_support::unique_temp_file("gusworld_test_sfx_tone", ".wav");
     write_test_tone_wav(tmp);
 
     const SoundId id = engine.load_sfx(tmp.string().c_str());
@@ -165,7 +166,7 @@ TEST_CASE("AudioEngine load_sfx com WAV sintetico valido: id valido + play repet
 TEST_CASE("AudioEngine load_music com WAV sintetico valido: play/loop/stop com fade",
           "[audio_engine]") {
     const auto tmp =
-        std::filesystem::temp_directory_path() / "gusworld_test_music_tone.wav";
+        gus::test_support::unique_temp_file("gusworld_test_music_tone", ".wav");
     write_test_tone_wav(tmp, /*sample_rate=*/22050, /*duration_s=*/0.2f, /*freq_hz=*/220.0f);
 
     {
@@ -202,7 +203,7 @@ TEST_CASE("AudioEngine play_music sem fade_in_seconds preserva o comportamento a
           "(default 0.0f = volume cheio imediato, chamada de 2 args ainda compila)",
           "[audio_engine][m6_f4]") {
     const auto tmp =
-        std::filesystem::temp_directory_path() / "gusworld_test_music_default.wav";
+        gus::test_support::unique_temp_file("gusworld_test_music_default", ".wav");
     write_test_tone_wav(tmp, /*sample_rate=*/22050, /*duration_s=*/0.2f, /*freq_hz=*/220.0f);
 
     {
@@ -227,7 +228,7 @@ TEST_CASE("AudioEngine play_music com fade_in_seconds toca em loop e conta 1x "
           "(M6 F4, ADR-011)",
           "[audio_engine][m6_f4]") {
     const auto tmp =
-        std::filesystem::temp_directory_path() / "gusworld_test_music_fadein.wav";
+        gus::test_support::unique_temp_file("gusworld_test_music_fadein", ".wav");
     write_test_tone_wav(tmp, /*sample_rate=*/22050, /*duration_s=*/0.2f, /*freq_hz=*/220.0f);
 
     {
@@ -263,7 +264,7 @@ TEST_CASE("AudioEngine stop_music com fade para o node de musica (music_is_playi
           "reflete o estado apos o fade programado terminar de ser AGENDADO)",
           "[audio_engine][m6_f4]") {
     const auto tmp =
-        std::filesystem::temp_directory_path() / "gusworld_test_music_stopfade.wav";
+        gus::test_support::unique_temp_file("gusworld_test_music_stopfade", ".wav");
     write_test_tone_wav(tmp, /*sample_rate=*/22050, /*duration_s=*/0.2f, /*freq_hz=*/220.0f);
 
     {
@@ -295,11 +296,11 @@ TEST_CASE("AudioEngine: SFX e musica coexistem - tocar o hit NAO para a musica "
           "(grupos music/sfx independentes, M6 F4)",
           "[audio_engine][m6_f4]") {
     const auto music_tmp =
-        std::filesystem::temp_directory_path() / "gusworld_test_coexist_music.wav";
+        gus::test_support::unique_temp_file("gusworld_test_coexist_music", ".wav");
     write_test_tone_wav(music_tmp, /*sample_rate=*/22050, /*duration_s=*/0.2f,
                          /*freq_hz=*/220.0f);
     const auto sfx_tmp =
-        std::filesystem::temp_directory_path() / "gusworld_test_coexist_sfx.wav";
+        gus::test_support::unique_temp_file("gusworld_test_coexist_sfx", ".wav");
     write_test_tone_wav(sfx_tmp, /*sample_rate=*/22050, /*duration_s=*/0.1f,
                          /*freq_hz=*/880.0f);
 
@@ -397,7 +398,7 @@ TEST_CASE("AudioEngine sfx_play_count: conta so os play_sfx que TOCARAM de fato 
     REQUIRE(engine.sfx_play_count() == 0);
 
     const auto tmp =
-        std::filesystem::temp_directory_path() / "gusworld_test_sfx_count.wav";
+        gus::test_support::unique_temp_file("gusworld_test_sfx_count", ".wav");
     write_test_tone_wav(tmp);
     const SoundId id = engine.load_sfx(tmp.string().c_str());
     REQUIRE(id != kInvalidSound);

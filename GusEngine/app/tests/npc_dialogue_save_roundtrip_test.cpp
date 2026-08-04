@@ -25,6 +25,7 @@
 #include "gus/domain/save/save_data.hpp"
 #include "gus/domain/save/save_serializer.hpp"
 #include "gus/platform/fs/save_file_store.hpp"
+#include "tmp_dir_test_support.hpp"
 
 using gus::app::dialogue::load_dialogue_graph_from_file;
 using gus::app::dialogue::resolve_npc_intro_bertoldo_dialogue_path;
@@ -35,13 +36,6 @@ using gus::platform::fs::load_game;
 using gus::platform::fs::save_game;
 
 namespace {
-
-std::filesystem::path make_temp_dir(const char* suffix) {
-    auto dir = std::filesystem::temp_directory_path() /
-               (std::string("gusworld_npc_dialogue_roundtrip_") + suffix);
-    std::filesystem::remove_all(dir);
-    return dir;
-}
 
 // SaveData minimo mas valido (validate() nao lanca), slot_id coerente com o slot
 // fisico (contrato de save_game - MESMO padrao de save_file_store_test.cpp).
@@ -93,7 +87,7 @@ TEST_CASE("M7-DIALOGO NPC-MVP: falar com o Bertoldo, escolher um ramo, e a flag 
     }
 
     // 3) Persiste em disco (I/O REAL, FsSaveStore) e RECARREGA - prova o round-trip.
-    const auto dir = make_temp_dir("m7_dialogo_bertoldo");
+    const gus::test_support::ScopedTempDir dir("gusworld_npc_dialogue_roundtrip_m7_dialogo_bertoldo");
     REQUIRE(save_game(data, 1, dir.string()));
 
     const auto outcome = load_game(1, dir.string());
@@ -109,7 +103,7 @@ TEST_CASE("M7-DIALOGO NPC-MVP: falar com o Bertoldo, escolher um ramo, e a flag 
     CHECK_FALSE(loaded_flags.count("npc_intro.choice_pragmatico"));
     CHECK_FALSE(loaded_flags.count("npc_intro.choice_seco"));
 
-    std::filesystem::remove_all(dir);
+    // dir e um gus::test_support::ScopedTempDir - RAII remove no fim do escopo.
 }
 
 TEST_CASE("M7-DIALOGO NPC-MVP: os 3 ramos de escolha sao MUTUAMENTE EXCLUSIVOS na "
@@ -130,7 +124,7 @@ TEST_CASE("M7-DIALOGO NPC-MVP: os 3 ramos de escolha sao MUTUAMENTE EXCLUSIVOS n
         REQUIRE(rt.finished());
     }
 
-    const auto dir = make_temp_dir("m7_dialogo_pragmatico");
+    const gus::test_support::ScopedTempDir dir("gusworld_npc_dialogue_roundtrip_m7_dialogo_pragmatico");
     REQUIRE(save_game(data, 2, dir.string()));
     const auto outcome = load_game(2, dir.string());
     REQUIRE(outcome.has_value());
@@ -141,5 +135,5 @@ TEST_CASE("M7-DIALOGO NPC-MVP: os 3 ramos de escolha sao MUTUAMENTE EXCLUSIVOS n
     CHECK_FALSE(loaded_flags.count("npc_intro.choice_curioso"));
     CHECK_FALSE(loaded_flags.count("npc_intro.choice_seco"));
 
-    std::filesystem::remove_all(dir);
+    // dir e um gus::test_support::ScopedTempDir - RAII remove no fim do escopo.
 }

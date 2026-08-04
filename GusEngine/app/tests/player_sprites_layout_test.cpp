@@ -25,6 +25,7 @@
 #include "gus/app/screens/player_sprites_loader.hpp"
 #include "gus/app/screens/sprite_animation.hpp"
 #include "gus/platform/render2d/i_renderer.hpp"
+#include "tmp_dir_test_support.hpp"
 
 namespace fs = std::filesystem;
 
@@ -48,15 +49,14 @@ void touch_png(const fs::path& p) {
     std::ofstream(p.string()).put('\0');
 }
 
-// Raiz temporaria unica por chamada (evita colisao entre TEST_CASEs).
-fs::path make_temp_root(const char* tag) {
-    static int counter = 0;
-    const fs::path root = fs::temp_directory_path() /
-                           ("gus_player_sprites_test_" + std::string(tag) + "_" +
-                            std::to_string(counter++));
-    fs::remove_all(root);
-    fs::create_directories(root);
-    return root;
+// Raiz temporaria unica por PROCESSO + chamada (gus::test_support::ScopedTempDir,
+// GusEngine/tests/support/tmp_dir_test_support.hpp). Um contador `static` sozinho NAO
+// evita colisao entre TEST_CASEs: catch_discover_tests roda 1 PROCESSO por TEST_CASE,
+// e o contador comeca em 0 a cada processo - dois processos concorrentes calculavam o
+// MESMO path (medido: 100 falhas em 100 pares concorrentes antes deste conserto,
+// FLAKY-PLAYER-SPRITES-ANIM). RAII: o diretorio e removido no fim do escopo do teste.
+gus::test_support::ScopedTempDir make_temp_root(const char* tag) {
+    return gus::test_support::ScopedTempDir(std::string("gus_player_sprites_test_") + tag);
 }
 
 // Renderer FALSO que mapeia CADA caminho de arquivo a um TextureId estavel: dois loads
@@ -130,7 +130,8 @@ TEST_CASE(
     // nomes fisicos que walk usa, so que gus_layout() PERMUTA qual enum-direcao le
     // qual pasta). Cada direcao deve carregar o proprio loop de 5 quadros, e o slot
     // Leste deve ler da pasta fisica "west" (mesma correcao de rotulo que o walk).
-    const fs::path root = make_temp_root("full4dir");
+    const gus::test_support::ScopedTempDir root_dir = make_temp_root("full4dir");
+    const fs::path& root = root_dir.path();
     for (const char* dir_name : {"south", "north", "east", "west"}) {
         for (int f = 0; f < 5; ++f) {
             touch_png(root / "anims" / "breathing_idle" / dir_name /
@@ -178,7 +179,8 @@ TEST_CASE(
     // arte de UM lado por enquanto - ex.: os companions ate ganharem a arte deles).
     // Norte, Leste e Oeste NAO tem a pasta - o loader tem que cair pro walk f0 de CADA
     // uma dessas direcoes, sem crash e sem exigir tudo-ou-nada.
-    const fs::path root = make_temp_root("partial_south_only");
+    const gus::test_support::ScopedTempDir root_dir = make_temp_root("partial_south_only");
+    const fs::path& root = root_dir.path();
     for (int f = 0; f < 5; ++f) {
         touch_png(root / "anims" / "breathing_idle" / "south" /
                   ("f" + std::to_string(f) + ".png"));

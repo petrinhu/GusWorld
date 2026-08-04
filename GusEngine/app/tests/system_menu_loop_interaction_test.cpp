@@ -29,6 +29,7 @@
 #include "gus/app/screens/system_menu_loop.hpp"
 #include "gus/platform/audio/audio_engine.hpp"
 #include "gus/platform/rmlui/gl3_loader.hpp"
+#include "tmp_dir_test_support.hpp"
 
 using namespace gus::app::screens;
 using gus::platform::audio::AudioEngine;
@@ -187,12 +188,10 @@ TEST_CASE("system_menu_loop (harness headless): SDL_EVENT_QUIT real "
 
     const gus::app::i18n::Translator translator = make_translator();
 
-    const std::filesystem::path saves_dir =
-        std::filesystem::temp_directory_path() / "gusworld_sysmenu_loop_interaction_quit_saves";
-    const std::filesystem::path settings_dir =
-        std::filesystem::temp_directory_path() / "gusworld_sysmenu_loop_interaction_quit_settings";
-    std::filesystem::remove_all(saves_dir);     // hermetico (nunca o $HOME real do host)
-    std::filesystem::remove_all(settings_dir);  // idem
+    const gus::test_support::ScopedTempDir saves_dir(
+        "gusworld_sysmenu_loop_interaction_quit_saves");
+    const gus::test_support::ScopedTempDir settings_dir(
+        "gusworld_sysmenu_loop_interaction_quit_settings");
 
     SDL_Event quit_ev{};
     quit_ev.type = SDL_EVENT_QUIT;
@@ -239,12 +238,10 @@ TEST_CASE("system_menu_loop (harness headless): fluxo Pause -> Salvar -> "
 
     const gus::app::i18n::Translator translator = make_translator();
 
-    const std::filesystem::path saves_dir = std::filesystem::temp_directory_path() /
-                                             "gusworld_sysmenu_loop_interaction_reentry_saves";
-    const std::filesystem::path settings_dir = std::filesystem::temp_directory_path() /
-                                                "gusworld_sysmenu_loop_interaction_reentry_settings";
-    std::filesystem::remove_all(saves_dir);     // hermetico
-    std::filesystem::remove_all(settings_dir);  // idem
+    const gus::test_support::ScopedTempDir saves_dir(
+        "gusworld_sysmenu_loop_interaction_reentry_saves");
+    const gus::test_support::ScopedTempDir settings_dir(
+        "gusworld_sysmenu_loop_interaction_reentry_settings");
 
     // 1) DOWN: Continuar(0) -> Salvar(1).
     SDL_Event down_ev = key_down_event(SDLK_DOWN);

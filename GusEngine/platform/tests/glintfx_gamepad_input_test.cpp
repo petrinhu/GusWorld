@@ -33,6 +33,7 @@
 
 #include "gus/platform/input/gamepad_mapping.hpp"
 #include "gus/platform/input/glintfx_gamepad_input.hpp"
+#include "tmp_dir_test_support.hpp"
 
 using gus::platform::input::GamepadState;
 using gus::platform::input::gamepad_dx;
@@ -248,12 +249,7 @@ TEST_CASE("GlintfxGamepadInput: desconectado devolve GamepadState zerado mesmo c
 TEST_CASE("GlintfxGamepadInput(const glintfx::Gamepads&): dir vazio (sem device) da "
           "GamepadState zerado, sem crash",
           "[glintfx_gamepad][sem-device]") {
-    namespace fs = std::filesystem;
-    const fs::path dir = fs::temp_directory_path() / "glintfx-gamepad-input-test-empty";
-    std::error_code ec;
-    fs::remove_all(dir, ec);
-    fs::create_directories(dir, ec);
-    REQUIRE(!ec);
+    const gus::test_support::ScopedTempDir dir("glintfx-gamepad-input-test-empty");
 
     glintfx::Gamepads pads;
     glintfx::GamepadsConfig cfg;
@@ -276,20 +272,14 @@ TEST_CASE("GlintfxGamepadInput(const glintfx::Gamepads&): dir vazio (sem device)
     REQUIRE(gamepad_dy(state) == 0);
 
     pads.shutdown();
-
-    fs::remove_all(dir, ec);
+    // dir e um gus::test_support::ScopedTempDir - RAII remove no fim do escopo.
 }
 
 // Nao-regressao: pad_index fora de faixa (kMaxPads=8) tambem tem que devolver zerado, sem
 // crash - mesmo fail-high do glintfx::Gamepads::connected() pra indice invalido.
 TEST_CASE("GlintfxGamepadInput(const glintfx::Gamepads&): pad_index fora de faixa nao crasha",
           "[glintfx_gamepad][sem-device]") {
-    namespace fs = std::filesystem;
-    const fs::path dir = fs::temp_directory_path() / "glintfx-gamepad-input-test-oob";
-    std::error_code ec;
-    fs::remove_all(dir, ec);
-    fs::create_directories(dir, ec);
-    REQUIRE(!ec);
+    const gus::test_support::ScopedTempDir dir("glintfx-gamepad-input-test-oob");
 
     glintfx::Gamepads pads;
     glintfx::GamepadsConfig cfg;
@@ -304,5 +294,5 @@ TEST_CASE("GlintfxGamepadInput(const glintfx::Gamepads&): pad_index fora de faix
     REQUIRE(state.connected == false);
 
     pads.shutdown();
-    fs::remove_all(dir, ec);
+    // dir e um gus::test_support::ScopedTempDir - RAII remove no fim do escopo.
 }

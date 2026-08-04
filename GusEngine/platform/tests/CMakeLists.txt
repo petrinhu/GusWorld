@@ -69,6 +69,13 @@ target_link_libraries(gusengine_platform_tests
         glintfx::glintfx
 )
 
+# tests/support: helper compartilhado gus::test_support::unique_temp_dir/ScopedTempDir
+# (FLAKY-PLAYER-SPRITES-ANIM/FLAKY-SAVELOAD-WARNING-RECOVER) - MESMO header usado por
+# app/tests/CMakeLists.txt, um unico lugar em vez de logica duplicada em 19 arquivos.
+target_include_directories(gusengine_platform_tests
+    PRIVATE ${CMAKE_SOURCE_DIR}/tests/support
+)
+
 target_compile_features(gusengine_platform_tests PRIVATE cxx_std_20)
 
 # ASSETS-VFS-F1/ASSETS-VFS-F1b/ASSETS-VFS-F1c: espelha as MESMAS 6 macros do alvo

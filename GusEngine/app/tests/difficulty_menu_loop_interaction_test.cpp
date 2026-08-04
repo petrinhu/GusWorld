@@ -41,6 +41,7 @@
 #include "gus/platform/assets/asset_source.hpp"
 #include "gus/platform/audio/audio_engine.hpp"
 #include "gus/platform/rmlui/gl3_loader.hpp"
+#include "tmp_dir_test_support.hpp"
 #include "ui_box_assertions.hpp"
 
 using namespace gus::app::screens;
@@ -116,8 +117,14 @@ std::optional<glintfx::UiLayer> load_probe_ui(const DifficultyMenuState& state,
                                                   /*dp_ratio=*/1.0f});
     if (!ui.ok()) return std::nullopt;
 
-    const std::filesystem::path stage =
-        std::filesystem::temp_directory_path() / "gusworld_difficulty_interaction_test";
+    // unique_temp_dir (NAO ScopedTempDir): o stage precisa sobreviver ao retorno desta
+    // funcao (o UiLayer devolvido referencia asset_base_url/rml_path dentro dele
+    // enquanto vive) - um ScopedTempDir local apagaria o diretorio no fim do ESCOPO
+    // desta funcao, invalidando as referencias. Nome FIXO antes (mesmo defeito de
+    // FLAKY-PLAYER-SPRITES-ANIM); sem limpeza automatica aqui, IGUAL ao original (o
+    // stage acumulava por nome fixo antes, agora acumula por nome unico).
+    const std::filesystem::path stage = gus::test_support::unique_temp_dir(
+        "gusworld_difficulty_interaction_test");
     std::error_code ec;
     std::filesystem::create_directories(stage, ec);
 

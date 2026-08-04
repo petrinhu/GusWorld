@@ -16,6 +16,7 @@
 
 #include "gus/app/dialogue/npc_dialogue_catalog.hpp"
 #include "gus/domain/dialogue/dialogue_text.hpp"  // DialogueTextError
+#include "tmp_dir_test_support.hpp"
 
 using gus::app::dialogue::load_dialogue_graph_from_file;
 using gus::app::dialogue::resolve_npc_intro_bertoldo_dialogue_path;
@@ -37,32 +38,28 @@ TEST_CASE("load_dialogue_graph_from_file: arquivo ausente devolve nullopt "
 
 TEST_CASE("load_dialogue_graph_from_file: conteudo vazio devolve nullopt",
           "[npc_dialogue][catalog]") {
-    const auto dir = std::filesystem::temp_directory_path() /
-                      "gusworld_npc_dialogue_catalog_test_vazio";
-    std::filesystem::create_directories(dir);
-    const auto path = dir / "vazio.dlg.txt";
+    const gus::test_support::ScopedTempDir dir("gusworld_npc_dialogue_catalog_test_vazio");
+    const auto path = dir.path() / "vazio.dlg.txt";
     {
         std::ofstream out(path, std::ios::binary | std::ios::trunc);
     }
     const auto result = load_dialogue_graph_from_file(path.string());
     CHECK_FALSE(result.has_value());
-    std::filesystem::remove_all(dir);
+    // dir e um gus::test_support::ScopedTempDir - RAII remove no fim do escopo.
 }
 
 TEST_CASE("load_dialogue_graph_from_file: conteudo malformado PROPAGA "
           "DialogueTextError (fail-fast de autoria, nao um caso de I/O)",
           "[npc_dialogue][catalog]") {
-    const auto dir = std::filesystem::temp_directory_path() /
-                      "gusworld_npc_dialogue_catalog_test_malformado";
-    std::filesystem::create_directories(dir);
-    const auto path = dir / "malformado.dlg.txt";
+    const gus::test_support::ScopedTempDir dir("gusworld_npc_dialogue_catalog_test_malformado");
+    const auto path = dir.path() / "malformado.dlg.txt";
     {
         std::ofstream out(path, std::ios::binary | std::ios::trunc);
         out << "isso nao segue a sintaxe do formato-texto\n";
     }
     CHECK_THROWS_AS(load_dialogue_graph_from_file(path.string()),
                     gus::domain::dialogue::DialogueTextError);
-    std::filesystem::remove_all(dir);
+    // dir e um gus::test_support::ScopedTempDir - RAII remove no fim do escopo.
 }
 
 TEST_CASE("load_dialogue_graph_from_file: o ARQUIVO REAL shipado "

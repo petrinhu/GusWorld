@@ -16,6 +16,7 @@
 
 #include "gus/domain/input/controls_restore.hpp"
 #include "gus/platform/fs/controls_file_store.hpp"
+#include "tmp_dir_test_support.hpp"
 
 using gus::domain::input::default_controls;
 using gus::domain::input::InputRemapConfig;
@@ -24,33 +25,24 @@ using gus::platform::fs::controls_file_path;
 using gus::platform::fs::load_controls;
 using gus::platform::fs::save_controls;
 
-namespace {
-
-std::filesystem::path make_temp_dir(const char* suffix) {
-    auto dir = std::filesystem::temp_directory_path() /
-               (std::string("gusworld_controls_test_") + suffix);
-    std::filesystem::remove_all(dir);
-    return dir;
-}
-
-}  // namespace
-
 TEST_CASE("load_controls: diretorio/arquivo AUSENTE devolve default_controls() "
           "(1a execucao/perfil novo - degradacao segura)",
           "[controls_file_store]") {
-    const auto dir = make_temp_dir("ausente");
-    REQUIRE_FALSE(std::filesystem::exists(dir));
+    const gus::test_support::ScopedTempDir dir(
+        "gusworld_controls_test_ausente", gus::test_support::TempDirCreate::kDeferCreation);
+    REQUIRE_FALSE(std::filesystem::exists(dir.path()));
 
     const InputRemapConfig cfg = load_controls(dir.string(), "default");
     REQUIRE(cfg == default_controls());
 
-    std::filesystem::remove_all(dir);
+    // dir e um gus::test_support::ScopedTempDir - RAII remove no fim do escopo.
 }
 
 TEST_CASE("save_controls + load_controls: roundtrip real em disco (config "
           "customizado sobrevive)",
           "[controls_file_store]") {
-    const auto dir = make_temp_dir("roundtrip");
+    const gus::test_support::ScopedTempDir dir(
+        "gusworld_controls_test_roundtrip", gus::test_support::TempDirCreate::kDeferCreation);
 
     InputRemapConfig cfg = default_controls();
     cfg.actions.front().keys = {KeyBinding{.keycode = 'K'}};
@@ -61,13 +53,14 @@ TEST_CASE("save_controls + load_controls: roundtrip real em disco (config "
     const InputRemapConfig loaded = load_controls(dir.string(), "default");
     REQUIRE(loaded == cfg);
 
-    std::filesystem::remove_all(dir);
+    // dir e um gus::test_support::ScopedTempDir - RAII remove no fim do escopo.
 }
 
 TEST_CASE("controls_file_path: perfis DISTINTOS resolvem pra arquivos "
           "DISTINTOS (multi-perfil, ADR-007 fork 3)",
           "[controls_file_store]") {
-    const auto dir = make_temp_dir("multiperfil");
+    const gus::test_support::ScopedTempDir dir(
+        "gusworld_controls_test_multiperfil", gus::test_support::TempDirCreate::kDeferCreation);
 
     InputRemapConfig cfg_a = default_controls();
     cfg_a.actions.front().keys = {KeyBinding{.keycode = 'A'}};
@@ -82,16 +75,17 @@ TEST_CASE("controls_file_path: perfis DISTINTOS resolvem pra arquivos "
     REQUIRE(controls_file_path(dir.string(), "tester") !=
             controls_file_path(dir.string(), "iago"));
 
-    std::filesystem::remove_all(dir);
+    // dir e um gus::test_support::ScopedTempDir - RAII remove no fim do escopo.
 }
 
 TEST_CASE("save_controls: cria o diretorio com permissao 0700 e o arquivo com "
           "permissao 0600 (LGPD)",
           "[controls_file_store]") {
-    const auto dir = make_temp_dir("perms");
+    const gus::test_support::ScopedTempDir dir(
+        "gusworld_controls_test_perms", gus::test_support::TempDirCreate::kDeferCreation);
     REQUIRE(save_controls(default_controls(), dir.string(), "default"));
 
-    const auto dir_perms = std::filesystem::status(dir).permissions();
+    const auto dir_perms = std::filesystem::status(dir.path()).permissions();
     const auto file_perms =
         std::filesystem::status(controls_file_path(dir.string(), "default")).permissions();
 
@@ -114,14 +108,15 @@ TEST_CASE("save_controls: cria o diretorio com permissao 0700 e o arquivo com "
     REQUIRE((file_perms & perms::others_all) == perms::none);
 #endif
 
-    std::filesystem::remove_all(dir);
+    // dir e um gus::test_support::ScopedTempDir - RAII remove no fim do escopo.
 }
 
 TEST_CASE("load_controls: arquivo CORROMPIDO (JSON malformado) degrada para "
           "default_controls() sem crashar",
           "[controls_file_store]") {
-    const auto dir = make_temp_dir("corrompido");
-    std::filesystem::create_directories(dir);
+    const gus::test_support::ScopedTempDir dir(
+        "gusworld_controls_test_corrompido", gus::test_support::TempDirCreate::kDeferCreation);
+    std::filesystem::create_directories(dir.path());
     {
         std::ofstream out(controls_file_path(dir.string(), "default"), std::ios::trunc);
         out << "{ isso nao e json valido !!!";
@@ -130,13 +125,14 @@ TEST_CASE("load_controls: arquivo CORROMPIDO (JSON malformado) degrada para "
     const InputRemapConfig cfg = load_controls(dir.string(), "default");
     REQUIRE(cfg == default_controls());
 
-    std::filesystem::remove_all(dir);
+    // dir e um gus::test_support::ScopedTempDir - RAII remove no fim do escopo.
 }
 
 TEST_CASE("save_controls: arquivo escrito e PRETTY/legivel (contem quebras de "
           "linha, nao e uma unica linha compacta)",
           "[controls_file_store]") {
-    const auto dir = make_temp_dir("pretty");
+    const gus::test_support::ScopedTempDir dir(
+        "gusworld_controls_test_pretty", gus::test_support::TempDirCreate::kDeferCreation);
     REQUIRE(save_controls(default_controls(), dir.string(), "default"));
 
     std::string content;
@@ -150,13 +146,14 @@ TEST_CASE("save_controls: arquivo escrito e PRETTY/legivel (contem quebras de "
     }
     REQUIRE(content.find('\n') != std::string::npos);
 
-    std::filesystem::remove_all(dir);
+    // dir e um gus::test_support::ScopedTempDir - RAII remove no fim do escopo.
 }
 
 TEST_CASE("save_controls: sobrescreve um arquivo existente (remap novo "
           "persistido de novo)",
           "[controls_file_store]") {
-    const auto dir = make_temp_dir("sobrescreve");
+    const gus::test_support::ScopedTempDir dir(
+        "gusworld_controls_test_sobrescreve", gus::test_support::TempDirCreate::kDeferCreation);
 
     InputRemapConfig cfg1 = default_controls();
     cfg1.actions.front().keys = {KeyBinding{.keycode = 'A'}};
@@ -168,5 +165,5 @@ TEST_CASE("save_controls: sobrescreve um arquivo existente (remap novo "
 
     REQUIRE(load_controls(dir.string(), "default") == cfg2);
 
-    std::filesystem::remove_all(dir);
+    // dir e um gus::test_support::ScopedTempDir - RAII remove no fim do escopo.
 }

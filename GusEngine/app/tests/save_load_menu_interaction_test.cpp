@@ -51,6 +51,7 @@
 #include "gus/platform/audio/audio_engine.hpp"
 #include "gus/platform/fs/save_file_store.hpp"
 #include "gus/platform/rmlui/gl3_loader.hpp"
+#include "tmp_dir_test_support.hpp"
 #include "ui_box_assertions.hpp"
 
 // stb_image_write: item 2 (retoque ao vivo 2026-07-10/11), prova visual PNG do
@@ -145,8 +146,13 @@ std::optional<glintfx::UiLayer> load_ui(const SaveLoadMenuState& state,
                                                   /*dp_ratio=*/1.0f});
     if (!ui.ok()) return std::nullopt;
 
+    // unique_temp_dir (NAO ScopedTempDir): o stage precisa sobreviver ao retorno desta
+    // funcao (o UiLayer devolvido referencia asset_base_url/rml_path dentro dele
+    // enquanto vive) - um ScopedTempDir local apagaria o diretorio no fim do ESCOPO
+    // desta funcao. Nome FIXO antes (mesmo defeito de FLAKY-PLAYER-SPRITES-ANIM); sem
+    // limpeza automatica aqui, IGUAL ao original.
     const std::filesystem::path stage =
-        std::filesystem::temp_directory_path() / "gusworld_save_load_interaction_test";
+        gus::test_support::unique_temp_dir("gusworld_save_load_interaction_test");
     std::error_code ec;
     std::filesystem::create_directories(stage, ec);
 
@@ -339,9 +345,7 @@ TEST_CASE("save_load_menu (harness headless): clique de mouse REAL (SDL_PushEven
 
     const gus::app::i18n::Translator translator = make_translator();
 
-    const std::filesystem::path saves_dir =
-        std::filesystem::temp_directory_path() / "gusworld_save_load_interaction_saves";
-    std::filesystem::remove_all(saves_dir);  // hermetico (nunca o $HOME real do host)
+    const gus::test_support::ScopedTempDir saves_dir("gusworld_save_load_interaction_saves");
 
     std::array<SaveSlotPreview, kSlotCount> empty_slots{};
     for (int i = 0; i < kSlotCount; ++i) {
@@ -450,7 +454,7 @@ TEST_CASE("save_load_menu (harness headless): clique de mouse REAL (SDL_PushEven
     REQUIRE(build_called);
     REQUIRE(gus::platform::fs::has_save(1, saves_dir.string()));
 
-    std::filesystem::remove_all(saves_dir);
+    // saves_dir e um gus::test_support::ScopedTempDir - RAII remove no fim do escopo.
 }
 
 // ---------------------------------------------------------------- (d.1) B1 revisao 2
@@ -472,9 +476,7 @@ TEST_CASE("save_load_menu (harness headless, B1 revisao 2): mouse move a selecao
 
     const gus::app::i18n::Translator translator = make_translator();
 
-    const std::filesystem::path saves_dir =
-        std::filesystem::temp_directory_path() / "gusworld_save_load_interaction_hover_saves";
-    std::filesystem::remove_all(saves_dir);  // hermetico (nunca o $HOME real do host)
+    const gus::test_support::ScopedTempDir saves_dir("gusworld_save_load_interaction_hover_saves");
 
     // Modo Load LE OS PREVIEWS DE VERDADE DO DISCO - grava autosave (0) + slot 1
     // (MESMA receita do teste b4-hover acima). save_load_menu_open abre focado no
@@ -535,7 +537,7 @@ TEST_CASE("save_load_menu (harness headless, B1 revisao 2): mouse move a selecao
     REQUIRE(exit == SaveLoadLoopExit::BackToPause);
     REQUIRE(audio.sfx_play_count() == 1);
 
-    std::filesystem::remove_all(saves_dir);
+    // saves_dir e um gus::test_support::ScopedTempDir - RAII remove no fim do escopo.
 }
 
 // ---------------------------------------------------------------- (d.1b) B1 revisao 2:
@@ -581,9 +583,8 @@ TEST_CASE("save_load_menu (harness headless, B1 revisao 2): mover o mouse por N 
 
     const gus::app::i18n::Translator translator = make_translator();
 
-    const std::filesystem::path saves_dir = std::filesystem::temp_directory_path() /
-                                             "gusworld_save_load_interaction_no_double_sfx_saves";
-    std::filesystem::remove_all(saves_dir);
+    const gus::test_support::ScopedTempDir saves_dir("gusworld_save_load_interaction_no_double_sfx_saves");
+    // saves_dir e um gus::test_support::ScopedTempDir - RAII remove no fim do escopo.
 
     // 2 slots ocupados (autosave=0, 1) - o mouse vai visitar os 2, em
     // sequencia, cada um DIFERENTE do anterior (0 -> 1): 2 mudancas reais de
@@ -638,7 +639,7 @@ TEST_CASE("save_load_menu (harness headless, B1 revisao 2): mover o mouse por N 
     REQUIRE(exit == SaveLoadLoopExit::BackToPause);
     REQUIRE(audio.sfx_play_count() == 2);
 
-    std::filesystem::remove_all(saves_dir);
+    // saves_dir e um gus::test_support::ScopedTempDir - RAII remove no fim do escopo.
 }
 
 // ---------------------------------------------------------------- (d.2) B1 revisao 2:
@@ -660,9 +661,8 @@ TEST_CASE("save_load_menu (harness headless, B1 revisao 2): mouse PARADO sobre u
 
     const gus::app::i18n::Translator translator = make_translator();
 
-    const std::filesystem::path saves_dir = std::filesystem::temp_directory_path() /
-                                             "gusworld_save_load_interaction_mouse_parado_saves";
-    std::filesystem::remove_all(saves_dir);
+    const gus::test_support::ScopedTempDir saves_dir("gusworld_save_load_interaction_mouse_parado_saves");
+    // saves_dir e um gus::test_support::ScopedTempDir - RAII remove no fim do escopo.
 
     // 3 slots ocupados (autosave=0, 1, 2) - abre focado no 1. O mouse vai
     // parar sobre o slot 2 (reivindica a selecao 1x, MESMO racional do teste
@@ -735,7 +735,7 @@ TEST_CASE("save_load_menu (harness headless, B1 revisao 2): mouse PARADO sobre u
     // slot 2 (xp=810, sob o mouse parado), este REQUIRE falharia.
     REQUIRE(gus::app::screens::save_xp_for_display(loaded) == 550);
 
-    std::filesystem::remove_all(saves_dir);
+    // saves_dir e um gus::test_support::ScopedTempDir - RAII remove no fim do escopo.
 }
 
 // ---------------------------------------------------------------- (d.3) B1 revisao 2:
@@ -753,9 +753,8 @@ TEST_CASE("save_load_menu (harness headless, B1 revisao 2): passar o mouse sobre
 
     const gus::app::i18n::Translator translator = make_translator();
 
-    const std::filesystem::path saves_dir = std::filesystem::temp_directory_path() /
-                                             "gusworld_save_load_interaction_readonly_saves";
-    std::filesystem::remove_all(saves_dir);
+    const gus::test_support::ScopedTempDir saves_dir("gusworld_save_load_interaction_readonly_saves");
+    // saves_dir e um gus::test_support::ScopedTempDir - RAII remove no fim do escopo.
 
     // Modo Save: autosave (0) OCUPADO mas SO-LEITURA (nao selecionavel); slot 1
     // vazio (selecionavel, foco inicial). Grava o autosave de fato (modo Save
@@ -820,7 +819,7 @@ TEST_CASE("save_load_menu (harness headless, B1 revisao 2): passar o mouse sobre
     // selecao intocada pelo mouse.
     REQUIRE(exit == SaveLoadLoopExit::BackToPause);
 
-    std::filesystem::remove_all(saves_dir);
+    // saves_dir e um gus::test_support::ScopedTempDir - RAII remove no fim do escopo.
 }
 
 // ---------------------------------------------------------------- (B4) paridade
@@ -842,9 +841,7 @@ TEST_CASE("save_load_menu (harness headless): navegar com SETA (teclado) entre "
 
     const gus::app::i18n::Translator translator = make_translator();
 
-    const std::filesystem::path saves_dir =
-        std::filesystem::temp_directory_path() / "gusworld_save_load_interaction_kbhover_saves";
-    std::filesystem::remove_all(saves_dir);  // hermetico (nunca o $HOME real do host)
+    const gus::test_support::ScopedTempDir saves_dir("gusworld_save_load_interaction_kbhover_saves");
 
     // Modo Load LE OS PREVIEWS DE VERDADE DO DISCO (build_previews_and_cache,
     // save_load_menu_loop.cpp) - PRECISA gravar saves REAIS via
@@ -882,7 +879,7 @@ TEST_CASE("save_load_menu (harness headless): navegar com SETA (teclado) entre "
     REQUIRE(exit == SaveLoadLoopExit::BackToPause);
     REQUIRE(audio.sfx_play_count() == 1);
 
-    std::filesystem::remove_all(saves_dir);
+    // saves_dir e um gus::test_support::ScopedTempDir - RAII remove no fim do escopo.
 }
 
 // ---------------------------------------------------------------- (e) SAVE-LOAD-AVISOS:
@@ -901,9 +898,7 @@ TEST_CASE("save_load_menu (harness headless): clique de mouse REAL num slot "
 
     const gus::app::i18n::Translator translator = make_translator();
 
-    const std::filesystem::path saves_dir = std::filesystem::temp_directory_path() /
-                                             "gusworld_save_load_interaction_recover_saves";
-    std::filesystem::remove_all(saves_dir);  // hermetico
+    const gus::test_support::ScopedTempDir saves_dir("gusworld_save_load_interaction_recover_saves");
 
     // Grava 2x no slot 1 (a 1a gravacao vira backup1) e corrompe o PRIMARIO - so
     // o backup fica Ok (MESMO repro de CRIT-1/save_file_store_test.cpp).
@@ -918,7 +913,7 @@ TEST_CASE("save_load_menu (harness headless): clique de mouse REAL num slot "
     second.playtime_seconds = 2.0;
     REQUIRE(gus::platform::fs::save_game(second, 1, saves_dir.string()));  // first -> backup1
     {
-        std::fstream f(saves_dir / "save_1.sav", std::ios::in | std::ios::out | std::ios::binary);
+        std::fstream f(saves_dir.path() / "save_1.sav", std::ios::in | std::ios::out | std::ios::binary);
         REQUIRE(f.is_open());
         char byte = 0;
         f.seekg(10);
@@ -1018,7 +1013,7 @@ TEST_CASE("save_load_menu (harness headless): clique de mouse REAL num slot "
     // de fato, nao fingiu um load.
     REQUIRE(applied->playtime_seconds == 1.0);
 
-    std::filesystem::remove_all(saves_dir);
+    // saves_dir e um gus::test_support::ScopedTempDir - RAII remove no fim do escopo.
 }
 
 // ---------------------------------------------------------------- (f) item 2 (retoque
@@ -1038,9 +1033,7 @@ TEST_CASE("save_load_menu (harness headless): clique de mouse REAL num slot "
 
     const gus::app::i18n::Translator translator = make_translator();
 
-    const std::filesystem::path saves_dir = std::filesystem::temp_directory_path() /
-                                             "gusworld_save_load_interaction_empty_confirm_saves";
-    std::filesystem::remove_all(saves_dir);  // hermetico
+    const gus::test_support::ScopedTempDir saves_dir("gusworld_save_load_interaction_empty_confirm_saves");
 
     std::array<SaveSlotPreview, kSlotCount> empty_slots{};
     for (int i = 0; i < kSlotCount; ++i) empty_slots[static_cast<std::size_t>(i)] = empty_slot_preview(i);
@@ -1110,7 +1103,7 @@ TEST_CASE("save_load_menu (harness headless): clique de mouse REAL num slot "
     REQUIRE_FALSE(build_called);
     REQUIRE_FALSE(gus::platform::fs::has_save(1, saves_dir.string()));
 
-    std::filesystem::remove_all(saves_dir);
+    // saves_dir e um gus::test_support::ScopedTempDir - RAII remove no fim do escopo.
 }
 
 TEST_CASE("save_load_menu (harness headless): confirmar ('Salvar') o mini-dialogo "
@@ -1125,10 +1118,7 @@ TEST_CASE("save_load_menu (harness headless): confirmar ('Salvar') o mini-dialog
 
     const gus::app::i18n::Translator translator = make_translator();
 
-    const std::filesystem::path saves_dir =
-        std::filesystem::temp_directory_path() /
-        "gusworld_save_load_interaction_empty_confirm_yes_saves";
-    std::filesystem::remove_all(saves_dir);  // hermetico
+    const gus::test_support::ScopedTempDir saves_dir("gusworld_save_load_interaction_empty_confirm_yes_saves");
 
     std::array<SaveSlotPreview, kSlotCount> empty_slots{};
     for (int i = 0; i < kSlotCount; ++i) empty_slots[static_cast<std::size_t>(i)] = empty_slot_preview(i);
@@ -1218,7 +1208,7 @@ TEST_CASE("save_load_menu (harness headless): confirmar ('Salvar') o mini-dialog
     REQUIRE(build_called);
     REQUIRE(gus::platform::fs::has_save(1, saves_dir.string()));
 
-    std::filesystem::remove_all(saves_dir);
+    // saves_dir e um gus::test_support::ScopedTempDir - RAII remove no fim do escopo.
 }
 
 // ---------------------------------------------------------------- (g) item 2: PROVA
@@ -1257,8 +1247,11 @@ TEST_CASE("save_load_menu (harness headless): PROVA VISUAL - PNG do mini-dialogo
                                                   /*dp_ratio=*/1.0f});
     REQUIRE(ui.ok());
 
+    // unique_temp_dir (NAO ScopedTempDir): mesma cautela do load_ui() acima - "ui" e
+    // "stage" seriam destruidos em ordem reversa de declaracao (ui primeiro), mas
+    // evitamos qualquer duvida de ordem usando um path sem dono aqui tambem.
     const std::filesystem::path stage =
-        std::filesystem::temp_directory_path() / "gusworld_save_load_empty_confirm_png";
+        gus::test_support::unique_temp_dir("gusworld_save_load_empty_confirm_png");
     std::error_code ec;
     std::filesystem::create_directories(stage, ec);
     std::string fonts_dir = GUSWORLD_FONTS_DIR;

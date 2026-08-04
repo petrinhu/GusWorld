@@ -17,6 +17,7 @@
 
 #include "gus/app/maestro_logic.hpp"
 #include "gus/app/screens/overworld_tuning.hpp"  // BUG-7: OverworldTuning::npc_bertoldo_*
+#include "tmp_dir_test_support.hpp"
 
 using gus::app::aabb_overlaps;
 using gus::app::battle_crossfade_target;
@@ -755,7 +756,7 @@ TEST_CASE("crossfade_music: dispara stop_music + play_music da PROXIMA faixa "
           "[maestro][logic][audio][m7_costura]") {
     AudioEngine engine(/*device_active=*/false);
     const auto tmp =
-        std::filesystem::temp_directory_path() / "gusworld_test_crossfade_music.wav";
+        gus::test_support::unique_temp_file("gusworld_test_crossfade_music", ".wav");
     write_crossfade_test_tone_wav(tmp);
 
     const SoundId id = engine.load_music(tmp.string().c_str());
@@ -829,8 +830,8 @@ using gus::app::FrozenBgRemoveGuard;
 
 TEST_CASE("FrozenBgRemoveGuard: apaga o arquivo no FIM DO ESCOPO (dtor)",
           "[maestro][logic][frozen_bg]") {
-    const auto tmp = std::filesystem::temp_directory_path() /
-                      "gusworld_test_frozen_bg_guard_scope_exit.png";
+    const auto tmp = gus::test_support::unique_temp_file(
+        "gusworld_test_frozen_bg_guard_scope_exit", ".png");
     {
         std::ofstream out(tmp, std::ios::binary | std::ios::trunc);
         out << "conteudo fake de PNG - so o path importa pro guardia";
@@ -853,8 +854,8 @@ TEST_CASE("FrozenBgRemoveGuard: path VAZIO (frozen_ok==false) e no-op no dtor - 
     // Arquivo de controle que NAO tem nada a ver com o guardia (simula um arquivo
     // preexistente qualquer no disco) - prova que o dtor com path_ vazio nao sai
     // "limpando" nada por engano.
-    const auto sentinel = std::filesystem::temp_directory_path() /
-                           "gusworld_test_frozen_bg_guard_sentinel.png";
+    const auto sentinel = gus::test_support::unique_temp_file(
+        "gusworld_test_frozen_bg_guard_sentinel", ".png");
     {
         std::ofstream out(sentinel, std::ios::binary | std::ios::trunc);
         out << "sentinela - nao deve ser tocado";
@@ -870,8 +871,8 @@ TEST_CASE("FrozenBgRemoveGuard: path VAZIO (frozen_ok==false) e no-op no dtor - 
 TEST_CASE("FrozenBgRemoveGuard: arquivo INEXISTENTE (frozen_ok==true mas o "
           "arquivo sumiu por outra via) nao crasha no dtor",
           "[maestro][logic][frozen_bg]") {
-    const auto tmp = std::filesystem::temp_directory_path() /
-                      "gusworld_test_frozen_bg_guard_missing.png";
+    const auto tmp = gus::test_support::unique_temp_file(
+        "gusworld_test_frozen_bg_guard_missing", ".png");
     std::filesystem::remove(tmp);  // garante que NAO existe
     REQUIRE_FALSE(std::filesystem::exists(tmp));
 

@@ -30,6 +30,7 @@
 #include "gus/platform/audio/audio_engine.hpp"
 #include "gus/platform/fs/save_file_store.hpp"
 #include "gus/platform/rmlui/gl3_loader.hpp"
+#include "tmp_dir_test_support.hpp"
 
 using namespace gus::app::screens;
 using gus::platform::audio::AudioEngine;
@@ -138,9 +139,7 @@ TEST_CASE("title_menu_loop (harness headless): SDL_EVENT_QUIT real "
 
     const gus::app::i18n::Translator translator = make_translator();
 
-    const std::filesystem::path saves_dir =
-        std::filesystem::temp_directory_path() / "gusworld_title_loop_interaction_quit_saves";
-    std::filesystem::remove_all(saves_dir);  // hermetico (nunca o $HOME real do host)
+    const gus::test_support::ScopedTempDir saves_dir("gusworld_title_loop_interaction_quit_saves");
 
     SDL_Event quit_ev{};
     quit_ev.type = SDL_EVENT_QUIT;
@@ -186,9 +185,8 @@ TEST_CASE("title_menu_loop (harness headless): fluxo titulo -> Novo Jogo -> "
 
     const gus::app::i18n::Translator translator = make_translator();
 
-    const std::filesystem::path saves_dir = std::filesystem::temp_directory_path() /
-                                             "gusworld_title_loop_interaction_reentry_saves";
-    std::filesystem::remove_all(saves_dir);  // hermetico
+    const gus::test_support::ScopedTempDir saves_dir(
+        "gusworld_title_loop_interaction_reentry_saves");
 
     // Grava um save REAL no slot Auto (0) - any_save_exists=true, Continuar
     // vira SELECIONAVEL e o foco DEFAULT (title_menu_open) recai nele - o

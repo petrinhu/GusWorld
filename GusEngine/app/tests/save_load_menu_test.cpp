@@ -19,6 +19,7 @@
 
 #include "gus/app/screens/save_load_menu.hpp"
 #include "gus/platform/fs/save_file_store.hpp"
+#include "tmp_dir_test_support.hpp"
 
 using namespace gus::app::screens;
 using gus::domain::save::kAutosaveSlot;
@@ -853,8 +854,9 @@ TEST_CASE("CRIT-1: slot com primario presente-mas-corrompido PEDE confirmacao de
           "sobrescrita em modo Save (nao regrava direto por cima, protege a cadeia "
           "de backup)",
           "[save_load_menu][CRIT-1]") {
-    const auto dir = std::filesystem::temp_directory_path() / "gusworld_crit1_overwrite_test";
-    std::filesystem::remove_all(dir);
+    const gus::test_support::ScopedTempDir dir_guard(
+        "gusworld_crit1_overwrite_test", gus::test_support::TempDirCreate::kDeferCreation);
+    const std::filesystem::path& dir = dir_guard.path();
 
     gus::domain::save::SaveData first;
     first.current_scene_path = "city_intro";
@@ -906,14 +908,15 @@ TEST_CASE("CRIT-1: slot com primario presente-mas-corrompido PEDE confirmacao de
     REQUIRE(state.confirming_overwrite);
     REQUIRE(state.confirm_selected == 1);  // default seguro = Nao
 
-    std::filesystem::remove_all(dir);
+    // dir_guard e um gus::test_support::ScopedTempDir - RAII remove no fim do escopo.
 }
 
 TEST_CASE("CRIT-1: MESMO cenario via teclado (Enter, nao so clique de mouse) "
           "tambem pede confirmacao",
           "[save_load_menu][CRIT-1]") {
-    const auto dir = std::filesystem::temp_directory_path() / "gusworld_crit1_keyboard_test";
-    std::filesystem::remove_all(dir);
+    const gus::test_support::ScopedTempDir dir_guard(
+        "gusworld_crit1_keyboard_test", gus::test_support::TempDirCreate::kDeferCreation);
+    const std::filesystem::path& dir = dir_guard.path();
 
     gus::domain::save::SaveData data;
     data.current_scene_path = "city_intro";
@@ -945,7 +948,7 @@ TEST_CASE("CRIT-1: MESMO cenario via teclado (Enter, nao so clique de mouse) "
     REQUIRE(save_load_menu_key_down(state, glintfx::Key::Enter) == SaveLoadMenuAction::None);
     REQUIRE(state.confirming_overwrite);
 
-    std::filesystem::remove_all(dir);
+    // dir_guard e um gus::test_support::ScopedTempDir - RAII remove no fim do escopo.
 }
 
 // ---------------------------------------------------------------- SAVE-LOAD-AVISOS
@@ -1127,9 +1130,9 @@ TEST_CASE("save_load_menu_click_slot/save_load_menu_request_delete: no-op "
 TEST_CASE("SAVE-LOAD-AVISOS: RecoverRequested + load_game_from_backup real "
           "recupera o backup bom (fluxo completo ate o ponto que o CHAMADOR usa)",
           "[save_load_menu][save-load-avisos]") {
-    const auto dir =
-        std::filesystem::temp_directory_path() / "gusworld_avisos_recover_sucesso_test";
-    std::filesystem::remove_all(dir);
+    const gus::test_support::ScopedTempDir dir_guard(
+        "gusworld_avisos_recover_sucesso_test", gus::test_support::TempDirCreate::kDeferCreation);
+    const std::filesystem::path& dir = dir_guard.path();
 
     gus::domain::save::SaveData first;
     first.current_scene_path = "city_intro";
@@ -1170,15 +1173,15 @@ TEST_CASE("SAVE-LOAD-AVISOS: RecoverRequested + load_game_from_backup real "
     REQUIRE(recovered->result == gus::domain::save::LoadResult::Ok);
     REQUIRE(recovered->data.playtime_seconds == 1.0);
 
-    std::filesystem::remove_all(dir);
+    // dir_guard e um gus::test_support::ScopedTempDir - RAII remove no fim do escopo.
 }
 
 TEST_CASE("SAVE-LOAD-AVISOS: RecoverRequested + load_game_from_backup real "
           "FALHA (nenhum backup bom) - o CHAMADOR transita pra RecoverFailed",
           "[save_load_menu][save-load-avisos]") {
-    const auto dir =
-        std::filesystem::temp_directory_path() / "gusworld_avisos_recover_falha_test";
-    std::filesystem::remove_all(dir);
+    const gus::test_support::ScopedTempDir dir_guard(
+        "gusworld_avisos_recover_falha_test", gus::test_support::TempDirCreate::kDeferCreation);
+    const std::filesystem::path& dir = dir_guard.path();
 
     gus::domain::save::SaveData data;
     data.current_scene_path = "city_intro";
@@ -1221,5 +1224,5 @@ TEST_CASE("SAVE-LOAD-AVISOS: RecoverRequested + load_game_from_backup real "
     REQUIRE(save_load_menu_key_down(state, glintfx::Key::Enter) == SaveLoadMenuAction::WarningCancelled);
     REQUIRE(state.warning_kind == SaveLoadMenuState::WarningKind::None);
 
-    std::filesystem::remove_all(dir);
+    // dir_guard e um gus::test_support::ScopedTempDir - RAII remove no fim do escopo.
 }

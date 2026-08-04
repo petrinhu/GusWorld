@@ -13,8 +13,6 @@
 
 #include <catch2/catch_test_macros.hpp>
 
-#include <atomic>
-#include <cstdint>
 #include <cstdlib>
 #include <filesystem>
 #include <fstream>
@@ -24,6 +22,7 @@
 #include <vector>
 
 #include "gus/platform/assets/asset_source.hpp"
+#include "tmp_dir_test_support.hpp"
 
 // Mesmas macros embutidas pelo CMake no alvo gusengine_platform (ver platform/CMakeLists.txt) -
 // espelhadas aqui (platform/tests/CMakeLists.txt) SO pra as asserts "sem env" poderem
@@ -133,32 +132,16 @@ private:
     std::string prev_;
 };
 
-// Diretorio temporario proprio de um teste (apagado no destrutor). Nome unico por
-// contador atomico (nao por endereco de objeto - evita colisao entre TempDirs
-// criados/destruidos em enderecos de pilha reaproveitados).
-std::atomic<std::uint64_t> g_tempdir_seq{0};
-
-class TempDir {
+// Diretorio temporario proprio de um teste: alias do helper compartilhado
+// gus::test_support::ScopedTempDir (GusEngine/tests/support/tmp_dir_test_support.hpp).
+// O contador atomico POR-PROCESSO usado aqui ANTES nao evitava colisao entre
+// TEST_CASEs: catch_discover_tests roda 1 PROCESSO por TEST_CASE, e o contador comeca
+// em 0 a cada processo - dois processos concorrentes calculavam o MESMO path (mesmo
+// defeito de FLAKY-PLAYER-SPRITES-ANIM). unique_temp_dir compoe PID + contador +
+// sufixo aleatorio, unico mesmo entre processos concorrentes.
+class TempDir : public gus::test_support::ScopedTempDir {
 public:
-    TempDir() {
-        const std::uint64_t n = g_tempdir_seq.fetch_add(1);
-        path_ = fs::temp_directory_path() /
-                ("gusworld_asset_source_test_" + std::to_string(n));
-        std::error_code ec;
-        fs::remove_all(path_, ec);
-        fs::create_directories(path_, ec);
-    }
-    ~TempDir() {
-        std::error_code ec;
-        fs::remove_all(path_, ec);
-    }
-    TempDir(const TempDir&) = delete;
-    TempDir& operator=(const TempDir&) = delete;
-
-    [[nodiscard]] const fs::path& path() const noexcept { return path_; }
-
-private:
-    fs::path path_;
+    TempDir() : gus::test_support::ScopedTempDir("gusworld_asset_source_test") {}
 };
 
 void write_file(const fs::path& p, const std::string& content) {

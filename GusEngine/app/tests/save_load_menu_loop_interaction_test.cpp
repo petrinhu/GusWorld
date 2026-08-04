@@ -38,6 +38,7 @@
 #include "gus/app/screens/save_load_menu_loop.hpp"
 #include "gus/platform/audio/audio_engine.hpp"
 #include "gus/platform/rmlui/gl3_loader.hpp"
+#include "tmp_dir_test_support.hpp"
 
 using namespace gus::app::screens;
 using gus::platform::audio::AudioEngine;
@@ -141,9 +142,7 @@ TEST_CASE("save_load_menu_loop (harness headless): SDL_EVENT_QUIT real "
 
     const gus::app::i18n::Translator translator = make_translator();
 
-    const std::filesystem::path saves_dir =
-        std::filesystem::temp_directory_path() / "gusworld_save_load_loop_interaction_quit_saves";
-    std::filesystem::remove_all(saves_dir);  // hermetico (nunca o $HOME real do host)
+    const gus::test_support::ScopedTempDir saves_dir("gusworld_save_load_loop_interaction_quit_saves");
 
     SDL_Event quit_ev{};
     quit_ev.type = SDL_EVENT_QUIT;
@@ -164,5 +163,5 @@ TEST_CASE("save_load_menu_loop (harness headless): SDL_EVENT_QUIT real "
     // - nenhum som deveria ter tocado no caminho ate fechar a janela.
     REQUIRE(audio.sfx_play_count() == 0);
 
-    std::filesystem::remove_all(saves_dir);
+    // saves_dir e um gus::test_support::ScopedTempDir - RAII remove no fim do escopo.
 }

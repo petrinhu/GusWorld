@@ -21,6 +21,7 @@
 #include <vector>
 
 #include "gus/app/screens/anim_catalog.hpp"
+#include "tmp_dir_test_support.hpp"
 
 namespace fs = std::filesystem;
 
@@ -34,14 +35,9 @@ void touch_png(const fs::path& p) {
     std::ofstream(p.string()).put('\0');  // arquivo vazio basta (catalog so olha o nome)
 }
 
-// Cria uma raiz temporaria unica e nela uma arvore de sprites de teste.
-fs::path make_tree() {
-    static int counter = 0;
-    const fs::path root =
-        fs::temp_directory_path() /
-        ("gus_anim_catalog_test_" + std::to_string(counter++) + "_" +
-         std::to_string(reinterpret_cast<std::uintptr_t>(&root)));
-    fs::remove_all(root);
+// Povoa uma arvore de sprites de teste dentro de `root` (que ja existe - cada
+// TEST_CASE cria a raiz via gus::test_support::ScopedTempDir e passa dir.path() aqui).
+void populate_tree(const fs::path& root) {
     // anims/attack_melee com 11 frames f0..f10 (testa ordenacao numerica).
     for (int i = 0; i <= 10; ++i) {
         touch_png(root / "anims" / "attack_melee" / ("f" + std::to_string(i) + ".png"));
@@ -57,8 +53,18 @@ fs::path make_tree() {
     touch_png(root / "rotations" / "0_south.png");
     touch_png(root / "rotations" / "2_west.png");
     touch_png(root / "rotations" / "1_south-west.png");
-    return root;
 }
+
+// NOTA: cada TEST_CASE constroi seu PROPRIO gus::test_support::ScopedTempDir (RAII,
+// nao-copiavel/nao-movivel de proposito - ver o header) e chama populate_tree(dir.path())
+// - nao ha uma make_tree() unica devolvendo o objeto porque isso exigiria mover um
+// ScopedTempDir para fora da funcao, o que o tipo recusa por design (evita path
+// duplicado por copia acidental). O contador `static` + endereco de variavel local
+// usados aqui ANTES nao evitavam colisao entre TEST_CASEs: catch_discover_tests roda 1
+// PROCESSO por TEST_CASE, e tanto o contador quanto o endereco de pilha reiniciam/se
+// repetem a cada processo - dois processos concorrentes podiam calcular o MESMO path
+// (medido: 100 falhas em 100 pares concorrentes antes deste conserto,
+// FLAKY-PLAYER-SPRITES-ANIM). RAII: o diretorio e removido no fim do escopo do teste.
 
 const AnimEntry* find(const std::vector<AnimEntry>& v, const std::string& label) {
     for (const auto& e : v) {
@@ -68,7 +74,6 @@ const AnimEntry* find(const std::vector<AnimEntry>& v, const std::string& label)
     }
     return nullptr;
 }
-
 }  // namespace
 
 TEST_CASE("anim_catalog: pasta ausente devolve catalogo vazio", "[anim_catalog]") {
@@ -77,7 +82,9 @@ TEST_CASE("anim_catalog: pasta ausente devolve catalogo vazio", "[anim_catalog]"
 }
 
 TEST_CASE("anim_catalog: monta anims/, walk_<dir> e turntable", "[anim_catalog]") {
-    const fs::path root = make_tree();
+    gus::test_support::ScopedTempDir root_dir("gus_anim_catalog_test");
+    const fs::path& root = root_dir.path();
+    populate_tree(root);
     const auto cat = build_gus_anim_catalog(root.string());
 
     REQUIRE(find(cat, "attack_melee") != nullptr);
@@ -88,13 +95,13 @@ TEST_CASE("anim_catalog: monta anims/, walk_<dir> e turntable", "[anim_catalog]"
     CHECK(find(cat, "cast")->frames.size() == 3);
     CHECK(find(cat, "walk_south")->frames.size() == 2);
     CHECK(find(cat, "turntable")->frames.size() == 3);
-
-    fs::remove_all(root);
 }
 
 TEST_CASE("anim_catalog: ordena frames por indice NUMERICO (f10 depois de f9)",
           "[anim_catalog]") {
-    const fs::path root = make_tree();
+    gus::test_support::ScopedTempDir root_dir("gus_anim_catalog_test");
+    const fs::path& root = root_dir.path();
+    populate_tree(root);
     const auto cat = build_gus_anim_catalog(root.string());
     const AnimEntry* melee = find(cat, "attack_melee");
     REQUIRE(melee != nullptr);
@@ -104,12 +111,12 @@ TEST_CASE("anim_catalog: ordena frames por indice NUMERICO (f10 depois de f9)",
     CHECK(melee->frames.back().find("f10.png") != std::string::npos);
     // O penultimo deve ser f9 (prova ordem numerica, nao textual).
     CHECK(melee->frames[9].find("f9.png") != std::string::npos);
-
-    fs::remove_all(root);
 }
 
 TEST_CASE("anim_catalog: turntable ordenado pelo indice da rotacao", "[anim_catalog]") {
-    const fs::path root = make_tree();
+    gus::test_support::ScopedTempDir root_dir("gus_anim_catalog_test");
+    const fs::path& root = root_dir.path();
+    populate_tree(root);
     const auto cat = build_gus_anim_catalog(root.string());
     const AnimEntry* tt = find(cat, "turntable");
     REQUIRE(tt != nullptr);
@@ -117,15 +124,14 @@ TEST_CASE("anim_catalog: turntable ordenado pelo indice da rotacao", "[anim_cata
     CHECK(tt->frames[0].find("0_south.png") != std::string::npos);
     CHECK(tt->frames[1].find("1_south-west.png") != std::string::npos);
     CHECK(tt->frames[2].find("2_west.png") != std::string::npos);
-
-    fs::remove_all(root);
 }
 
 TEST_CASE("anim_catalog: catalogo ordenado por rotulo", "[anim_catalog]") {
-    const fs::path root = make_tree();
+    gus::test_support::ScopedTempDir root_dir("gus_anim_catalog_test");
+    const fs::path& root = root_dir.path();
+    populate_tree(root);
     const auto cat = build_gus_anim_catalog(root.string());
     for (std::size_t i = 1; i < cat.size(); ++i) {
         CHECK(cat[i - 1].label <= cat[i].label);
     }
-    fs::remove_all(root);
 }
