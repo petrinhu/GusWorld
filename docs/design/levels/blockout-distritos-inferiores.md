@@ -1,6 +1,6 @@
 # Blockout: Distritos Inferiores (Vertical Slice)
 
-**Status:** Canônico (design). Ratificado Sprint 5 W3 2026-06-03; **traçado reescrito em 90x60 em 2026-08-04** (`DEMO-CIDADE-VESTIDA` fatia A). O grafo de nós, as decisões DA-1/DA-2/DA-3 e a pedagogia da versão 30x20 seguem valendo; o que mudou foi a escala, a densidade urbana em volta e a passagem de "5 blocos soltos" para "bairro construído".
+**Status:** Canônico (design). Ratificado Sprint 5 W3 2026-06-03; **traçado reescrito em 90x60 em 2026-08-04** (`DEMO-CIDADE-VESTIDA` fatia A); **adensado com 16 fachadas em 2026-08-04** (fatia H, ver §5.2). O grafo de nós, as decisões DA-1/DA-2/DA-3 e a pedagogia da versão 30x20 seguem valendo; o que mudou foi a escala, a densidade urbana em volta e a passagem de "5 blocos soltos" para "bairro construído".
 
 **Fonte da verdade do traçado:** `GusEngine/assets/maps/source/distritos_inferiores.csv` (90x60, `tile_size` 2.0 m). Este doc explica o porquê; o CSV manda no o quê.
 
@@ -31,9 +31,10 @@ O formato do mapa tem 5 tipos de tile e nenhum deles é "prop". Para não invent
 - **Cover box não tem âncora própria:** a peça é exatamente uma célula de Parede isolada, e vale **uma caixa por célula** (bloco de 1x2 recebe duas caixas). A fatia C pinta o sprite sobre a célula de Parede solta, e o render deixa de pintar a cor de graybox dessa célula na leitura de produção: quem faz o papel de parede ali é a arte. Um bloco de 1x2 com uma caixa só deixava meio tile de parede nua acima dela, que é o que o laudo visual da fatia D mediu (achado A3).
 - **Peça sem volume** (board do puzzle, holograma projetado, poste): a âncora é o canto superior-esquerdo do sprite.
 
-São **34 âncoras** no mapa, listadas na §5. (Eram 29 na primeira versão deste traçado; os 5 postes
-acrescentados para cobrir as telas sem peça entraram depois, e este número ficou desatualizado até a
-fatia C cruzar doc contra CSV e achar a divergência. O CSV é a fonte da verdade: 34, conferidos.)
+São **50 âncoras** no mapa, listadas na §5. (Eram 29 na primeira versão deste traçado, 34 depois dos
+postes de cobertura de tela, e 50 desde a fatia H, que adensou a cidade com 16 fachadas novas. Este
+número já ficou desatualizado uma vez, e a divergência só apareceu quando a fatia C cruzou doc contra
+CSV. O CSV é a fonte da verdade: 50, reconferidos célula a célula na fatia H.)
 
 **A cor da âncora só existe para quem traça o nível.** Marco (âmbar), Entrada (verde) e Saída (azul)
 eram a legenda de graybox, útil enquanto não havia arte nenhuma. Com a cidade vestida elas viraram
@@ -129,6 +130,7 @@ Todas as peças vivem em `resources/sprites/world/distritos_inferiores/`. Coorde
 | `casa_cibergotica_b.png` | (17,21) | x15..21, y13..20 | Vizinha da anterior, mesma rua, silhueta diferente (torre). Duas silhuetas distintas lado a lado dão leitura de bairro. |
 | `casa_cibergotica_a.png` (2ª) | (82,21) | x79..85, y13..20 | Espelho no bairro leste, para o leste não parecer só corredor de serviço. |
 | `casa_cibergotica_b.png` (2ª) | (73,17) | x68..75, y18..33 | Fachada norte, fecha a praceta do terminal ao sul. |
+| **16 fachadas do adensamento (fatia H)** | ver §5.2 | quarteirões existentes | Repetição dos dois modelos para a cidade ler como cidade. Nenhuma parede nova: toda âncora se apoia em quarteirão que já existia. |
 | `poste_neon_ciano.png` x18 | (17,4), (40,4), (52,4), (72,4), (50,11), (33,15), (56,15), (33,27), (56,27), (13,28), (66,28), (36,34), (54,34), (75,48), (10,53), (33,53), (78,53), (52,54) | nenhum | Ritmo de iluminação e breadcrumb noturno. Distribuídos para marcar cada mudança de região, nunca em fileira regular. Os cinco de (17,4), (72,4), (13,28), (66,28) e (33,53) entraram depois da medição de densidade por tela (ver §10): eram becos e ruas com espaço andável e nenhuma peça. **Dois mudaram de lugar na fatia G** (playtest do líder, "tem um poste no meio da rua"): **(40,7) → (40,4)** e **(48,9) → (50,11)** — ver a nota abaixo. |
 | `cover_box.png` x14 | sem âncora | (6,36),(6,37),(10,36),(10,37) no pátio; (38,36),(38,37),(38,42),(38,43),(52,36),(52,37),(52,42),(52,43) na arena; (70,49),(78,49) no pátio da FIR | Cobertura real (célula de Parede), **uma caixa por célula**. Na arena formam 4 grupos verticais 1x2 simétricos, com o pilar central 2x2 (x44..45, y39..40) fechando a leitura tática. |
 | `board_puzzle.png` | (42,47) | nenhum | Canto superior-esquerdo do tabuleiro 7x5 (x42..48, y47..51), alinhado célula a célula com o grid do puzzle-gambito §8. |
@@ -136,7 +138,7 @@ Todas as peças vivem em `resources/sprites/world/distritos_inferiores/`. Coorde
 
 Âncoras que ainda não têm sprite e são marcação de design: **(52,21)** pedestal Era 3 vazio "reservado para futuro monumento Sterling Corp" (canon de `01-cidade-cyber-gotica.md` §2; peça a desenhar, do lado oposto à fonte), **(32,19)** banco do Bertoldo (spawn do NPC), **(23,33)** fundo do beco morto (loot/lore da fatia D), **(44,57)** save point do vestíbulo (DA-2), **(12,49)** pichação do beco sudoeste.
 
-Conferência: **34 âncoras** no CSV, sendo **18 postes**, **8 de arquitetura** (holograma, fonte, placa, terminal e 4 casas), **3 de instalação** (board do puzzle e as 2 células do portão) e **5 de marcação sem sprite** (pedestal, banco, beco, save, pichação).
+Conferência (cruzada célula a célula contra o CSV na fatia H): **50 âncoras**, sendo **18 postes**, **24 de arquitetura** (holograma, fonte, placa, terminal e **20 casas**), **3 de instalação** (board do puzzle e as 2 células do portão) e **5 de marcação sem sprite** (pedestal, banco, beco, save, pichação). As 14 barricadas continuam **sem âncora** por definição (a peça É a célula de Parede), então a tabela de vestimenta tem **57 linhas** para 50 âncoras.
 
 ### 5.1 Os dois postes que saíram do meio da rua (fatia G)
 
@@ -159,6 +161,75 @@ FUNÇÃO da região, não a distância até a parede mais próxima.
 
 Movimento de âncora toca o mapa, então o CSV foi reeditado, o `.gmap` recompilado e a
 conectividade da cidade vestida reconferida célula a célula (§9).
+
+### 5.2 As 16 fachadas do adensamento (fatia H)
+
+Decisão do líder, verbatim: *"como é um demo, deixe esses prédios assim como placeholders. Pode
+repetir os prédios, como em uma cidade de verdade, no jogo vamos fazer certo as imagens."* Duas
+ordens numa frase. A primeira: **a arte fica como está** (a perspectiva isométrica sobre mundo
+ortogonal, achado A7 do laudo visual, é trabalho do jogo, não do demo). A segunda: **repetir**. Havia
+4 fachadas num mapa de 90x60 com quase metade da área construída, ou seja quarteirão atrás de
+quarteirão de retângulo preto liso.
+
+**A régua que escolheu cada célula. Nenhuma das três é gosto, e é por elas que a fatia não quebrou o
+mapa:**
+
+1. **A âncora fica na célula de rua imediatamente abaixo da face sul de um quarteirão.** A caixa
+   sólida de uma casa mede **5,49 x 1,83 células** na escala 1,83, e ela se apoia na base do desenho,
+   crescendo para cima: sela a fileira da âncora **mais a de cima**. Ancorando logo abaixo de uma
+   parede, a fileira de cima já era parede e a peça custa **uma só** fileira de rua. É o placement das
+   casas que já estavam de pé em (8,21), (17,21) e (82,21), agora enunciado como regra.
+2. **O desenho tem que cair inteiro sobre massa construída.** A térrea tem 5,49 células de altura e a
+   torre 7,32, desenhadas para cima a partir da base. Se houver rua andável nesse retângulo, o Y-sort
+   põe o jogador **atrás do prédio** e ele some por vários passos. É o defeito conhecido de (73,17), e
+   nenhuma peça nova o repete: cada uma foi conferida contra as fileiras de parede acima dela.
+3. **Duas fachadas nunca ficam a menos de 5,5 células em x na mesma fileira.** Mesma base = empate de
+   Y-sort, e os desenhos se cortam.
+
+| # | Âncora | Peça | Onde e por quê |
+|---|---|---|---|
+| 1 | (27,7) | B | Torre isolada no canto sudeste do quarteirão x19..29, na boca da alameda. Primeira silhueta alta que o jogador vê. |
+| 2 | (77,7) | A | Quarteirão NE, face sul, de frente para a Rua do Terraço. |
+| 3 | (84,7) | A | Vizinha da anterior. Duas térreas seguidas a leste. |
+| 4 | (6,8) | A | Quarteirão NO (x3..15), face sul. |
+| 5 | (13,8) | A | Mesmo quarteirão, segunda térrea. Duas seguidas a oeste. |
+| 6 | (61,8) | A | Quarteirão x58..70, face sul. Fecha a leitura da Rua do Terraço. |
+| 7 | (8,34) | A | Face norte do Pátio de Sucata (R14), que era muro liso com duas barricadas. |
+| 8 | (71,36) | A | Travessa Leste (R16), bloco x68..75. A rota do explorador descia entre dois paredões de 18 fileiras. |
+| 9 | (82,36) | B | Travessa Leste, bloco x79..85. Torre isolada entre térreas. |
+| 10 | (18,47) | A | Topo leste do Beco da Pichação (R18). A pichação de (12,49) continua livre a oeste. |
+| 11 | (68,47) | A | Pátio da FIR (R19). |
+| 12 | (74,47) | A | Pátio da FIR. |
+| 13 | (80,47) | A | Pátio da FIR. As três formam fileira de sobrados de conjunto habitacional. |
+| 14 | (35,52) | A | Antepraça (R20), isolada a oeste. |
+| 15 | (52,52) | A | Antepraça, par encostado. |
+| 16 | (58,52) | B | Antepraça. Última silhueta alta antes do portão sul. |
+
+**Distribuição:** 13 térreas e 3 torres novas, o que deixa a cidade em **15 A para 5 B**. Torre é
+exceção numa cidade, e as cinco ficam isoladas entre térreas. A alternância é **irregular de
+propósito**: dois pares colados, uma fileira de três, quatro peças solitárias. A-B-A-B lê mais
+artificial que repetição.
+
+**Onde NÃO entrou fachada, e por quê:**
+
+- **Praça da Compilação (R8).** É o coração social, e a geometria concorda com o design: as únicas
+  faces disponíveis são o muro R7, de **uma** fileira de espessura, com o Anel Norte andável logo
+  acima. Qualquer prédio ali violaria a regra 2 e esconderia quem anda no anel. Zero fachadas.
+- **Arena (R15) e corredor-puzzle (R17).** Espaço de jogo, não de cenário.
+- **Ruas norte-sul de 3 células** (x1..3, x12..14, x22..24, x65..67, x76..78, x86..88) e os becos
+  (R4). A caixa da casa tem 5,49 de largura: uma fachada ali **fecha a rua inteira**.
+- **Faixa x21..29 da antepraça.** Ali a fileira y54 já é parede, e uma casa deixaria a rua de ligação
+  y53 com 2 sub-fileiras úteis. y53 é **invariante de traçado** (§3 R20b), e não se estreita uma
+  invariante para ganhar decoração.
+
+**O bug que a fatia produziu e o teste pegou (registro, para não renascer).** O primeiro arranjo do
+Pátio da FIR foi 68/74/**82**, com folgas irregulares de 6 e 8 células. O teste *"nenhuma célula
+andável fica ilhada"* reprovou: a folga entre a casa de 74 e a de 82 caía **exatamente sobre a
+barricada de (78,49)**, e sobravam 2 sub-fileiras de rua em y47 cercadas por casa a oeste, casa a
+leste, o muro y46 ao norte e a barricada ao sul. Um quarto sem porta. Com 68/74/**80** as caixas se
+encostam e não existe folga onde o bolsão possa se formar. **Regra que fica: entre duas fachadas
+vizinhas, a folga nunca pode cair sobre uma peça sólida da fileira de baixo.** A leitura de nível não
+pegaria isso; o teste pegou na primeira rodada.
 
 ## 6. Gold path
 
@@ -223,6 +294,13 @@ travamento.
 Isto vive como teste, não como procedimento manual: `app/tests/city_props_test.cpp`, seção
 "cidade vestida". Quem mexer no CSV, na tabela de vestimenta ou na escala das peças vai ver o
 teste falhar antes de ver o playtest travar.
+
+**A fatia H foi a primeira prova de fogo desses três testes, e eles morderam.** O adensamento levou a
+cidade de 41 para 57 peças, das quais 16 são prédios com caixa de 5,49 x 1,83 células, e o teste de
+células ilhadas reprovou um dos arranjos (o bolsão do Pátio da FIR, §5.2). O arranjo foi corrigido e
+os três voltaram ao verde. Registro do que isso significa na prática: **a densidade desta cidade não é
+mais escolhida no olho**, é escolhida contra o teste, e cada fachada nova a partir daqui paga o mesmo
+pedágio.
 
 Observação medida e aceita na escala 1,83: a âncora **(73,17)**, do prédio alto do bairro leste,
 fica **cercada pela base do próprio prédio** (a caixa dele passou a cobrir a fileira de calçada

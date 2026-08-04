@@ -14,8 +14,11 @@
 // A TABELA É ABSOLUTA E VEM DO LEVEL DESIGN (fatia C, a costura). Até a fatia B
 // ela era relativa ao spawn, porque o mapa estava sendo redesenhado de 30x20 para
 // 90x60 e qualquer célula fixa escrita naquele momento apontaria para dentro de
-// uma parede nova. O traçado de 90x60 chegou, e com ele as 34 âncoras da §5 do
+// uma parede nova. O traçado de 90x60 chegou, e com ele as âncoras da §5 do
 // blockout: cada linha daqui é uma daquelas âncoras, transcrita, não escolhida.
+// São 50 âncoras no CSV desde a fatia H (adensamento urbano, 16 fachadas novas) e
+// 57 linhas aqui - a diferença são as 14 barricadas, que por convenção não têm
+// âncora própria (a peça É a célula de Parede).
 //
 // Cross-ref: docs/design/levels/blockout-distritos-inferiores.md §2 (convenção de
 //            âncora) e §5 (a tabela de peça por âncora);
@@ -106,6 +109,34 @@ inline constexpr CityPropRow kDistritosInferioresDressing[] = {
     // menor deslocamento que tira o poste do meio do Anel Norte.
     {gus::domain::world::ScenePropKind::PosteNeonCiano, 40, 4},
     {gus::domain::world::ScenePropKind::PosteNeonCiano, 50, 11},
+    // --- FACHADAS DA RUA DO TERRAÇO (R3/R5, fatia H) --------------------------
+    //
+    // Decisão do líder: "pode repetir os prédios, como em uma cidade de verdade".
+    // Os quarteirões do norte eram massa preta sem uma fachada sequer, e é a
+    // SEGUNDA tela do jogo - a primeira rua depois da alameda de chegada.
+    //
+    // As três regras que escolhem CADA célula abaixo (nenhuma é gosto):
+    //  1. a âncora fica na célula de rua imediatamente ABAIXO da face sul de um
+    //     quarteirão. Assim a caixa sólida (5,49 x 1,83 tiles na escala 1,83)
+    //     cobre uma fileira que JÁ era parede mais uma só de rua - é o placement
+    //     mais barato que existe em conectividade, e é o mesmo das casas que já
+    //     estavam de pé em (8,21)/(17,21)/(82,21);
+    //  2. o desenho (5,49 tiles de altura na térrea, 7,32 na torre) tem que cair
+    //     inteiro sobre massa construída. Prédio com rua ANDÁVEL atrás esconde o
+    //     jogador que passa por lá - é o defeito conhecido de (73,17), e nenhuma
+    //     peça nova daqui repete isso;
+    //  3. duas fachadas nunca ficam a menos de 5,5 células em x na mesma fileira,
+    //     senão os desenhos se sobrepõem (mesma base = empate de Y-sort).
+    //
+    // A alternância é IRREGULAR de propósito: duas térreas seguidas a oeste, uma
+    // torre isolada na boca da alameda, e duas térreas seguidas a leste. Cidade
+    // real não faz A-B-A-B; padrão regular lê mais artificial que repetição.
+    {gus::domain::world::ScenePropKind::CasaCibergoticaB, 27, 7},
+    {gus::domain::world::ScenePropKind::CasaCibergoticaA, 77, 7},
+    {gus::domain::world::ScenePropKind::CasaCibergoticaA, 84, 7},
+    {gus::domain::world::ScenePropKind::CasaCibergoticaA, 6, 8},
+    {gus::domain::world::ScenePropKind::CasaCibergoticaA, 13, 8},
+    {gus::domain::world::ScenePropKind::CasaCibergoticaA, 61, 8},
     // --- Praça da Compilação e os dois bairros (R8/R10/R12) ---
     {gus::domain::world::ScenePropKind::PosteNeonCiano, 33, 15},
     {gus::domain::world::ScenePropKind::PosteNeonCiano, 56, 15},
@@ -121,6 +152,11 @@ inline constexpr CityPropRow kDistritosInferioresDressing[] = {
     {gus::domain::world::ScenePropKind::PosteNeonCiano, 13, 28},
     {gus::domain::world::ScenePropKind::PosteNeonCiano, 66, 28},
     // --- Pátio de Sucata e arena (R14/R15) ---
+    // Fachada norte do pátio (fatia H): a face sul do quarteirão x4..11/y23..33.
+    // Dá fundo construído ao branch oeste, que era muro liso com duas barricadas.
+    // O vão útil do pátio fica a oeste da casa (x1..5,4) e no corredor entre as
+    // duas pilhas de barricada - medido, não estimado.
+    {gus::domain::world::ScenePropKind::CasaCibergoticaA, 8, 34},
     {gus::domain::world::ScenePropKind::PosteNeonCiano, 36, 34},
     {gus::domain::world::ScenePropKind::PosteNeonCiano, 54, 34},
     // Cobertura: UMA caixa POR CÉLULA de Parede do bloco, de baixo para cima.
@@ -145,12 +181,51 @@ inline constexpr CityPropRow kDistritosInferioresDressing[] = {
     {gus::domain::world::ScenePropKind::CoverBox, 38, 43, PropCellRule::WallCell},
     {gus::domain::world::ScenePropKind::CoverBox, 52, 42, PropCellRule::WallCell},
     {gus::domain::world::ScenePropKind::CoverBox, 52, 43, PropCellRule::WallCell},
+    // --- Travessa Leste (R16, fatia H) ---------------------------------------
+    // A rota do explorador descia entre dois paredões pretos de 18 fileiras. Duas
+    // fachadas na face sul dos quarteirões x68..75 e x79..85 fazem a travessa ler
+    // como rua entre prédios, que é o que ela é. A torre fica no bloco de fora
+    // (x79..85), isolada entre térreas - arranha-céu é exceção numa cidade.
+    {gus::domain::world::ScenePropKind::CasaCibergoticaA, 71, 36},
+    {gus::domain::world::ScenePropKind::CasaCibergoticaB, 82, 36},
     // --- Corredor-puzzle e Pátio da FIR (R17/R19) ---
+    // Fachadas dos dois branches pós-puzzle (fatia H). Todas na face sul do muro
+    // que já separava o corredor-puzzle dos becos, então nenhuma custa fileira de
+    // rua além da própria. A do beco fecha o topo LESTE dele, deixando a pichação
+    // de (12,49) livre a oeste; as três da FIR são uma FILEIRA de sobrados iguais,
+    // que é como conjunto habitacional de periferia se forma de verdade.
+    //
+    // ⚠️ O ESPAÇAMENTO DAS TRÊS NÃO É GOSTO, É CONSERTO DE BUG MEDIDO. A primeira
+    // tentativa foi 68/74/82 (gaps irregulares, 6 e 8) e o teste "nenhuma célula
+    // andável fica ilhada" REPROVOU: a folga entre a casa de 74 e a de 82 caía
+    // exatamente em cima da barricada de (78,49), e sobrava um bolsão de rua de
+    // 2 sub-fileiras em y47 cercado por casa a oeste, casa a leste, o muro y46 ao
+    // norte e a barricada ao sul. Com 68/74/80 as caixas das casas se encostam e
+    // não existe folga onde um bolsão possa se formar. Regra que fica: entre duas
+    // fachadas vizinhas, a folga NUNCA pode cair sobre uma barricada da fileira
+    // de baixo - ou ela vira quarto sem porta.
+    {gus::domain::world::ScenePropKind::CasaCibergoticaA, 18, 47},
     {gus::domain::world::ScenePropKind::BoardPuzzle, 42, 47},
+    {gus::domain::world::ScenePropKind::CasaCibergoticaA, 68, 47},
+    {gus::domain::world::ScenePropKind::CasaCibergoticaA, 74, 47},
+    {gus::domain::world::ScenePropKind::CasaCibergoticaA, 80, 47},
     {gus::domain::world::ScenePropKind::PosteNeonCiano, 75, 48},
     {gus::domain::world::ScenePropKind::CoverBox, 70, 49, PropCellRule::WallCell},
     {gus::domain::world::ScenePropKind::CoverBox, 78, 49, PropCellRule::WallCell},
     // --- Rua de ligação e antepraça (R20/R20b) ---
+    // Fachadas do último respiro antes do portão sul (fatia H). Face sul do muro
+    // que separa o corredor-puzzle da antepraça, portanto custo zero de fileira
+    // nova. Uma isolada a oeste e um PAR encostado a leste (52 e 58), com a torre
+    // no fim - a última silhueta alta antes da saída.
+    //
+    // ⚠️ NADA entra na faixa x21..29 desta fileira, de propósito: ali a fileira
+    // y54 já é parede, e uma casa deixaria a rua de ligação y53 com 2 sub-fileiras
+    // úteis. A linha y53 é INVARIANTE de traçado (blockout §3 R20b) - é o que
+    // mantém o Beco da Pichação e o Pátio da FIR vivos -, e não se estreita uma
+    // invariante para ganhar decoração.
+    {gus::domain::world::ScenePropKind::CasaCibergoticaA, 35, 52},
+    {gus::domain::world::ScenePropKind::CasaCibergoticaA, 52, 52},
+    {gus::domain::world::ScenePropKind::CasaCibergoticaB, 58, 52},
     {gus::domain::world::ScenePropKind::PosteNeonCiano, 10, 53},
     {gus::domain::world::ScenePropKind::PosteNeonCiano, 33, 53},
     {gus::domain::world::ScenePropKind::PosteNeonCiano, 78, 53},

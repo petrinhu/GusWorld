@@ -557,6 +557,32 @@ histórico no fim do arquivo. Novas descobertas entram como bullets abaixo desta
   tocados: ali o vão de 38x17 é que pede poste. Mapa reeditado, `.gmap` recompilado, blockout §5.1 e
   §9.1 atualizados. **Segue aberto o A7** (peças em perspectiva isométrica sobre mundo ortogonal):
   decisão do líder é **arte nova em onda própria**, não girar PNG nem compensar no render.
+  **Fatia H entregue 2026-08-04, ⏳ Em andamento (falta recompilar o `.gmap`)** (adensamento urbano).
+  Ordem do líder, verbatim: *"como é um demo, deixe esses prédios assim como placeholders. Pode
+  repetir os prédios, como em uma cidade de verdade, no jogo vamos fazer certo as imagens."* Duas
+  ordens: **a arte fica como está** (A7 continua sendo trabalho do jogo, não do demo) e **repetir**.
+  A cidade tinha **4 fachadas** num mapa de 90x60 com 49,5% de massa construída, ou seja quarteirão
+  atrás de quarteirão de retângulo preto liso. Entraram **16 fachadas** (13 térreas + 3 torres),
+  levando a cidade a **20 prédios (15 A / 5 B)**, 50 âncoras no CSV e 57 linhas de vestimenta.
+  **A régua não é gosto, e é por ela que o mapa não quebrou:** (1) âncora sempre na célula de rua
+  logo abaixo da face sul de um quarteirão, porque a caixa sólida de 5,49x1,83 células sela a fileira
+  da âncora **mais a de cima** e assim a de cima já era parede, custando **uma só** fileira de rua;
+  (2) o desenho (5,49 células na térrea, 7,32 na torre) tem que cair inteiro sobre massa construída,
+  senão o Y-sort esconde o jogador atrás do prédio (é o defeito conhecido de (73,17), não repetido em
+  nenhuma peça nova); (3) nunca duas fachadas a menos de 5,5 células na mesma fileira. Alternância
+  **irregular de propósito** (dois pares colados, uma fileira de três, quatro solitárias): A-B-A-B lê
+  mais artificial que repetição. **Praça, arena e corredor-puzzle ficaram sem fachada nenhuma**, os
+  dois primeiros por design (coração social e espaço de jogo) e a praça também por geometria (o muro
+  R7 tem 1 fileira e o Anel Norte andável logo acima viola a regra 2). ⚠️ **O teste mordeu na
+  primeira rodada:** o arranjo 68/74/**82** do Pátio da FIR reprovou em *"nenhuma célula andável fica
+  ilhada"* porque a folga entre duas casas caía **exatamente sobre a barricada de (78,49)**, criando
+  um bolsão de 2 sub-fileiras cercado por casa/casa/muro/barricada. Corrigido para 68/74/**80** (as
+  caixas se encostam, não sobra folga) e os 3 testes de conectividade voltaram ao verde. Regra que
+  fica no blockout §5.2: **a folga entre fachadas vizinhas nunca pode cair sobre peça sólida da
+  fileira de baixo**. ⛔ **PENDENTE para fechar a fatia** (o agente não tinha ferramenta de shell):
+  recompilar o `.gmap` (`gusworld_app --compile-map`), rodar `bash tools/check.sh` até 2862/2862, e
+  capturar as imagens `DEPOIS_H_*` em `~/Imagens/gusworld_escala/`. Enquanto o `.gmap` for o antigo,
+  **1 teste fica vermelho**: "toda peça de rua pisa numa âncora do level design".
 
 - `TMPDIR-STAGE-FIXO-PRODUCAO`: o mesmo defeito de caminho temporário previsível existe em **código de
   produção**, não só em teste, e a fatia `FLAKY-*` deliberadamente não o tocou porque estava fora do
