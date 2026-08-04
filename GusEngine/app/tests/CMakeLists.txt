@@ -17,6 +17,9 @@ add_executable(gusengine_app_tests
     # listas de NPCs/inimigos no lugar dos dois slots fixos, e ronda em rota fixa.
     overworld_world_entities_test.cpp
     city_props_test.cpp
+    # DEMO-CIDADE-VESTIDA fatia C (a costura): o elenco da cidade como dado,
+    # conferido contra o .gmap REAL (mapa de 90x60).
+    city_actors_test.cpp
     sprite_animation_test.cpp
     sprite_anchor_test.cpp
     anim_catalog_test.cpp

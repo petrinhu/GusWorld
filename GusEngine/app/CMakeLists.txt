@@ -19,6 +19,8 @@ add_library(gusengine_app STATIC
     # o mapa REAL (a ronda é um trilho; quem garante que o trilho é chão é aqui).
     src/screens/city_props.cpp
     src/screens/city_patrol.cpp
+    # DEMO-CIDADE-VESTIDA fatia C: quem povoa a cidade (elenco como dado).
+    src/screens/city_actors.cpp
     src/screens/battle_layout.cpp
     src/screens/battle_cockpit_verb_ids.cpp
     # COCKPIT-SFX-HOVER-CLIQUE: POCO generico de "som de hover" de botoes (menu E

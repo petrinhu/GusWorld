@@ -78,6 +78,16 @@ inline constexpr std::string_view kIaraSpritesDir = "sprites/iara_lumen";
 inline constexpr std::string_view kBertoldoSpritesDir = "sprites/seu_bertoldo_caim";
 inline constexpr std::string_view kBertoldoSpriteSouthFile = "south.png";
 
+// --- FIGURANTES DO OVERWORLD (DEMO-CIDADE-VESTIDA fatia C) ---
+// Pose FRONTAL de qualquer NPC estatico da rua: o overworld so consome "south"
+// (de frente pro jogador/camera), a mesma regra ja usada pro Bertoldo. A constante
+// e propria (e nao um reuso da linha do Bertoldo acima) porque o arquivo vale pra
+// TODO figurante - amarrar o nome dela a um personagem convidaria a proxima pessoa
+// a escrever "south.png" na mao.
+inline constexpr std::string_view kNpcSpriteSouthFile = "south.png";
+// Vanda do Cafe (NPC ambiental canonico da Praca da Compilacao, CHARS.md secao 7).
+inline constexpr std::string_view kVandaDoCafeSpritesDir = "sprites/vanda_do_cafe";
+
 // ============================================================================
 // PECAS DE CENARIO DO MUNDO (sob resources/sprites/world/<area>/).
 //

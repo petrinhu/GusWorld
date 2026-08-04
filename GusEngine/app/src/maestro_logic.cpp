@@ -163,6 +163,18 @@ gus::core::spatial::Aabb pick_fixed_enemy_position(
     return enemy;
 }
 
+gus::core::spatial::Aabb pick_actor_position_at_cell(
+    const gus::core::spatial::TileGrid& grid,
+    const gus::core::spatial::Aabb& player_start, int cell_x, int cell_y) noexcept {
+    // Converte celula absoluta -> offset a partir do spawn e delega. A leitura da
+    // celula do jogador e a MESMA da irma (centro da hitbox), entao a conversao e
+    // exata: pedir a celula C produz o alvo C, sem arredondamento pelo caminho.
+    const int spawn_cx = grid.world_to_cell(player_start.x + player_start.w * 0.5f);
+    const int spawn_cy = grid.world_to_cell(player_start.y + player_start.h * 0.5f);
+    return pick_fixed_enemy_position(grid, player_start, cell_x - spawn_cx,
+                                     cell_y - spawn_cy);
+}
+
 gus::core::spatial::Aabb enemy_sprite_footprint_aabb(
     const gus::core::spatial::Aabb& anchor, float sprite_height_tiles,
     float tile_size) noexcept {

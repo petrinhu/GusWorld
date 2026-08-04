@@ -14,7 +14,9 @@
 #include <glintfx/clock.hpp>  // FW-CLOCK (bump v0.26.0): substitui SDL_GetTicksNS
 #include <glintfx/log.hpp>  // FW-LOG (bump v0.26.0): substitui SDL_Log
 
+#include "gus/app/maestro_logic.hpp"  // pick_actor_position_at_cell (celula -> ancora)
 #include "gus/app/screens/anim_catalog.hpp"  // resolve_gus_sprites_dir
+#include "gus/app/screens/city_actors.hpp"   // DEMO-CIDADE-VESTIDA C: povoar a cidade
 #include "gus/app/screens/city_loader.hpp"   // load_city_or_fallback
 #include "gus/app/screens/city_props.hpp"    // DEMO-CIDADE-VESTIDA: vestir a cidade
 #include "gus/app/screens/player_sprites_loader.hpp"
@@ -155,6 +157,8 @@ bool SdlWindow::init() {
     // jogador, no MESMO ponto e pelo mesmo motivo (os TextureId sao locais ao
     // renderer vivo, entao quem cria o renderer e quem carrega a arte).
     dress_city();
+    // DEMO-CIDADE-VESTIDA C: e a cidade recebe a gente dela pelo mesmo motivo.
+    populate_city();
     return true;
 }
 
@@ -183,6 +187,8 @@ bool SdlWindow::init_attached(SDL_Window* window) {
     // jogador, no MESMO ponto e pelo mesmo motivo (os TextureId sao locais ao
     // renderer vivo, entao quem cria o renderer e quem carrega a arte).
     dress_city();
+    // DEMO-CIDADE-VESTIDA C: e a cidade recebe a gente dela pelo mesmo motivo.
+    populate_city();
     return true;
 }
 
@@ -283,9 +289,8 @@ void SdlWindow::dress_city() {
     sim_->clear_scene_props();
 
     const std::vector<gus::domain::world::ScenePropPlacement> places =
-        gus::app::screens::resolve_spawn_relative_props(
-            sim_->grid(), sim_->player(),
-            gus::app::screens::kDistritosInferioresDressing,
+        gus::app::screens::resolve_city_props(
+            sim_->grid(), gus::app::screens::kDistritosInferioresDressing,
             gus::app::screens::kDistritosInferioresDressingCount);
     const gus::app::screens::ScenePropTextures textures =
         gus::app::screens::load_scene_prop_textures(*render2d_);
@@ -301,6 +306,67 @@ void SdlWindow::dress_city() {
     glintfx::log(glintfx::LogLevel::Info,
                  ("SdlWindow: [cidade] " + std::to_string(props.size()) +
                   " peca(s) de cenario erguida(s) nos Distritos Inferiores.")
+                     .c_str());
+}
+
+void SdlWindow::populate_city() {
+    // Mesma defesa dos carregadores acima: sem renderer não há textura, e sem sim
+    // não há mundo onde pôr ninguém.
+    if (render2d_ == nullptr || sim_ == nullptr) {
+        return;
+    }
+
+    const std::vector<gus::app::screens::CityActorPlacement> cast =
+        gus::app::screens::resolve_city_actors(
+            sim_->grid(), gus::app::screens::kDistritosInferioresCast,
+            gus::app::screens::kDistritosInferioresCastCount);
+
+    int erguidos = 0;
+    int sem_arte = 0;
+    for (const gus::app::screens::CityActorPlacement& p : cast) {
+        const std::string id =
+            std::string(p.sprite_dir) + "/" + std::string(p.sprite_file);
+        const std::string path = resolve_assets_subdir_local(id);
+        const gus::platform::render2d::TextureId tex =
+            render2d_->load_texture(path.c_str());
+        if (tex == gus::platform::render2d::kInvalidTexture) {
+            // Personagem sem arte NÃO entra: invisível que bloqueia é a mesma
+            // parede fantasma das peças de cenário.
+            ++sem_arte;
+            // via PLANA: path e caminho de arquivo, texto EXTERNO.
+            glintfx::log(glintfx::LogLevel::Warn,
+                         ("SdlWindow: sprite de figurante ausente/ilegivel (" + path +
+                          ") - o personagem nao entra na cidade.")
+                             .c_str());
+            continue;
+        }
+
+        gus::app::screens::WorldActorSpec spec;
+        spec.role = p.role;
+        // Âncora = a célula onde ele PISA. Pela MESMA função que posiciona o
+        // Bertoldo e o sentinela, e não por conta própria: assim o figurante herda
+        // a garantia de ALCANÇABILIDADE (célula livre mas ilhada não vale) e o
+        // dimensionamento lógico do corpo, sem uma segunda convenção no jogo.
+        spec.anchor = gus::app::pick_actor_position_at_cell(
+            sim_->grid(), sim_->player(), p.cell_x, p.cell_y);
+        spec.tex = tex;
+        // Altura do quad POR PAPEL: os retratos de NPC adulto têm mais margem
+        // transparente que o do Gus (bug do playtest ao vivo "o Bertoldo aparece
+        // menor"), e o androide usa a mesma altura do jogador desde o M7.
+        spec.sprite_height_tiles =
+            (p.role == gus::app::screens::WorldActorRole::Npc)
+                ? sim_->tuning().npc_bertoldo_sprite_height_tiles
+                : sim_->tuning().player_sprite_height_tiles;
+        spec.route = p.route;
+        sim_->add_actor(spec);
+        ++erguidos;
+    }
+
+    // Nada acontece em silêncio: quem entrou na rua aparece no terminal.
+    glintfx::log(glintfx::LogLevel::Info,
+                 ("SdlWindow: [cidade] " + std::to_string(erguidos) +
+                  " figurante(s) na rua dos Distritos Inferiores (" +
+                  std::to_string(sem_arte) + " sem arte).")
                      .c_str());
 }
 

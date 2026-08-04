@@ -7,16 +7,23 @@
 // headless (o único toque em plataforma é um IRenderer falso).
 //
 // O que esta spec protege: a tabela de vestimenta é escrita à mão por quem faz
-// level design, e mapa muda (o próprio mapa desta cidade está sendo redesenhado
-// de 30x20 para 90x60 enquanto esta fatia é escrita). Célula inválida na tabela
-// não pode virar casa dentro de parede, prop fora do mapa nem crash - tem que
-// virar peça descartada, com aviso.
+// level design, e mapa muda (o mapa desta cidade já foi redesenhado uma vez, de
+// 30x20 para 90x60). Célula inválida na tabela não pode virar casa dentro de
+// parede, prop fora do mapa nem crash - tem que virar peça descartada, com aviso.
+//
+// FATIA C (a costura): a tabela deixou de ser relativa ao spawn e passou a ser
+// ABSOLUTA, derivada das 34 âncoras do doc de blockout. Por isso a seção final
+// desta spec carrega o .gmap REAL e exige que a cidade inteira caiba nele - é o
+// teste que falha no dia em que alguém mexer no mapa e esquecer da vestimenta.
 
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/matchers/catch_matchers_floating_point.hpp>
 
+#include <cstdint>
 #include <vector>
 
+#include "gus/app/screens/city_loader.hpp"
+#include "gus/domain/map/tile_map.hpp"
 #include "gus/app/screens/city_patrol.hpp"
 #include "gus/app/screens/city_props.hpp"
 #include "gus/core/spatial/tile_grid.hpp"
@@ -25,12 +32,13 @@
 using Catch::Matchers::WithinAbs;
 using gus::app::screens::build_horizontal_patrol_route;
 using gus::app::screens::build_scene_prop_instances;
+using gus::app::screens::CityPropRow;
 using gus::app::screens::kDistritosInferioresDressing;
 using gus::app::screens::kDistritosInferioresDressingCount;
 using gus::app::screens::load_scene_prop_textures;
-using gus::app::screens::resolve_spawn_relative_props;
+using gus::app::screens::PropCellRule;
+using gus::app::screens::resolve_city_props;
 using gus::app::screens::ScenePropTextures;
-using gus::app::screens::SpawnRelativePropRow;
 using gus::core::spatial::Aabb;
 using gus::core::spatial::Rect;
 using gus::core::spatial::TileGrid;
@@ -78,27 +86,19 @@ public:
 // Grade 20x20 aberta, tile 2.0 - o mesmo tile_size do mapa real.
 TileGrid open_grid() { return TileGrid(20, 20, kTile); }
 
-// Jogador nascido no centro da célula (5,5).
-Aabb spawn_at(int cx, int cy) {
-    const float side = 0.6f * kTile;
-    return Aabb{(static_cast<float>(cx) + 0.5f) * kTile - side * 0.5f,
-                (static_cast<float>(cy) + 0.5f) * kTile - side * 0.5f, side, side};
-}
-
 }  // namespace
 
 // ===========================================================================
 //  Resolução da tabela de vestimenta
 // ===========================================================================
 
-TEST_CASE("vestir: linha relativa vira célula absoluta somada ao spawn",
-          "[city-props]") {
+TEST_CASE("vestir: linha absoluta vira placement na MESMA célula", "[city-props]") {
     const TileGrid g = open_grid();
-    const SpawnRelativePropRow rows[] = {
-        {ScenePropKind::CasaCibergoticaA, 3, -2},
-        {ScenePropKind::PosteNeonCiano, -1, 4},
+    const CityPropRow rows[] = {
+        {ScenePropKind::CasaCibergoticaA, 8, 3, PropCellRule::WalkableCell},
+        {ScenePropKind::PosteNeonCiano, 4, 9, PropCellRule::WalkableCell},
     };
-    const auto out = resolve_spawn_relative_props(g, spawn_at(5, 5), rows, 2);
+    const auto out = resolve_city_props(g, rows, 2);
 
     REQUIRE(out.size() == 2);
     REQUIRE(out[0].kind == ScenePropKind::CasaCibergoticaA);
@@ -110,40 +110,73 @@ TEST_CASE("vestir: linha relativa vira célula absoluta somada ao spawn",
 
 TEST_CASE("vestir: peça que cai fora do mapa é descartada", "[city-props]") {
     const TileGrid g = open_grid();
-    const SpawnRelativePropRow rows[] = {
-        {ScenePropKind::CasaCibergoticaA, 100, 0},
-        {ScenePropKind::PosteNeonCiano, 0, -99},
-        {ScenePropKind::FonteLatao, 1, 1},  // esta é válida
+    const CityPropRow rows[] = {
+        {ScenePropKind::CasaCibergoticaA, 105, 5, PropCellRule::WalkableCell},
+        {ScenePropKind::PosteNeonCiano, 5, -94, PropCellRule::WalkableCell},
+        {ScenePropKind::FonteLatao, 6, 6, PropCellRule::WalkableCell},  // válida
     };
-    const auto out = resolve_spawn_relative_props(g, spawn_at(5, 5), rows, 3);
+    const auto out = resolve_city_props(g, rows, 3);
     REQUIRE(out.size() == 1);
     REQUIRE(out[0].kind == ScenePropKind::FonteLatao);
 }
 
-TEST_CASE("vestir: peça que cai dentro de parede é descartada", "[city-props]") {
+TEST_CASE("vestir: peça de RUA que cai dentro de parede é descartada",
+          "[city-props]") {
     // Casa dentro de parede é o erro clássico de tabela escrita à mão, e o mais
     // difícil de ver no playtest: a arte fica meio enterrada e ninguém percebe
     // que aquele tile era chão.
     TileGrid g = open_grid();
     g.set_blocked(8, 5, true);
-    const SpawnRelativePropRow rows[] = {
-        {ScenePropKind::CasaCibergoticaA, 3, 0},   // cai em (8,5) - parede
-        {ScenePropKind::PosteNeonCiano, 2, 0},     // cai em (7,5) - livre
+    const CityPropRow rows[] = {
+        {ScenePropKind::CasaCibergoticaA, 8, 5, PropCellRule::WalkableCell},
+        {ScenePropKind::PosteNeonCiano, 7, 5, PropCellRule::WalkableCell},
     };
-    const auto out = resolve_spawn_relative_props(g, spawn_at(5, 5), rows, 2);
+    const auto out = resolve_city_props(g, rows, 2);
     REQUIRE(out.size() == 1);
     REQUIRE(out[0].kind == ScenePropKind::PosteNeonCiano);
 }
 
-TEST_CASE("vestir: tabela vazia devolve lista vazia sem estourar", "[city-props]") {
-    const TileGrid g = open_grid();
-    REQUIRE(resolve_spawn_relative_props(g, spawn_at(5, 5), nullptr, 0).empty());
-    const SpawnRelativePropRow rows[] = {{ScenePropKind::CasaCibergoticaA, 1, 1}};
-    REQUIRE(resolve_spawn_relative_props(g, spawn_at(5, 5), rows, 0).empty());
+TEST_CASE("vestir: peça que É a parede exige célula de parede", "[city-props]") {
+    // A caixa de cobertura não fica ao LADO de um obstáculo: ela É o obstáculo -
+    // uma célula de Parede solta desenhada como caixa (convenção do blockout, §2).
+    // Validá-la com a régua da peça de rua a descartaria sempre, e a arena
+    // ficaria sem cobertura nenhuma sem ninguém notar.
+    TileGrid g = open_grid();
+    g.set_blocked(9, 9, true);
+    const CityPropRow rows[] = {
+        {ScenePropKind::CoverBox, 9, 9, PropCellRule::WallCell},  // certa
+        {ScenePropKind::CoverBox, 3, 3, PropCellRule::WallCell},  // chão: descartada
+    };
+    const auto out = resolve_city_props(g, rows, 2);
+    REQUIRE(out.size() == 1);
+    REQUIRE(out[0].cell_x == 9);
+    REQUIRE(out[0].cell_y == 9);
 }
 
-TEST_CASE("vestir: a tabela provisória da cidade é toda de peças conhecidas",
+TEST_CASE("vestir: peça de parede FORA do mapa também é descartada",
           "[city-props]") {
+    // Fora dos limites o TileGrid responde "bloqueado" (a borda é parede
+    // implícita). Sem um teste de limites próprio, a régua da peça-parede
+    // aceitaria qualquer célula do lado de fora do mapa.
+    const TileGrid g = open_grid();
+    const CityPropRow rows[] = {
+        {ScenePropKind::CoverBox, -1, 5, PropCellRule::WallCell},
+        {ScenePropKind::CoverBox, 20, 5, PropCellRule::WallCell},
+        {ScenePropKind::CoverBox, 5, -1, PropCellRule::WallCell},
+        {ScenePropKind::CoverBox, 5, 20, PropCellRule::WallCell},
+    };
+    REQUIRE(resolve_city_props(g, rows, 4).empty());
+}
+
+TEST_CASE("vestir: tabela vazia devolve lista vazia sem estourar", "[city-props]") {
+    const TileGrid g = open_grid();
+    REQUIRE(resolve_city_props(g, nullptr, 0).empty());
+    const CityPropRow rows[] = {
+        {ScenePropKind::CasaCibergoticaA, 1, 1, PropCellRule::WalkableCell}};
+    REQUIRE(resolve_city_props(g, rows, 0).empty());
+}
+
+TEST_CASE("vestir: a tabela da cidade é toda de peças conhecidas", "[city-props]") {
     REQUIRE(kDistritosInferioresDressingCount > 0);
     for (int i = 0; i < kDistritosInferioresDressingCount; ++i) {
         const int k = static_cast<int>(kDistritosInferioresDressing[i].kind);
@@ -152,29 +185,19 @@ TEST_CASE("vestir: a tabela provisória da cidade é toda de peças conhecidas",
     }
 }
 
-TEST_CASE("vestir: a tabela provisória não põe duas peças na mesma célula",
+TEST_CASE("vestir: a tabela da cidade não põe duas peças na mesma célula",
           "[city-props]") {
     // Duas peças no mesmo lugar é erro de autoria que só aparece no playtest
     // como arte sobreposta (ou pior, como duas caixas de colisão empilhadas).
     for (int i = 0; i < kDistritosInferioresDressingCount; ++i) {
         for (int j = i + 1; j < kDistritosInferioresDressingCount; ++j) {
             const bool mesmo =
-                kDistritosInferioresDressing[i].offset_tiles_x ==
-                    kDistritosInferioresDressing[j].offset_tiles_x &&
-                kDistritosInferioresDressing[i].offset_tiles_y ==
-                    kDistritosInferioresDressing[j].offset_tiles_y;
+                kDistritosInferioresDressing[i].cell_x ==
+                    kDistritosInferioresDressing[j].cell_x &&
+                kDistritosInferioresDressing[i].cell_y ==
+                    kDistritosInferioresDressing[j].cell_y;
             REQUIRE_FALSE(mesmo);
         }
-    }
-}
-
-TEST_CASE("vestir: nenhuma peça da tabela nasce em cima do jogador",
-          "[city-props]") {
-    // Offset (0,0) enterraria o Gus dentro da casa no primeiro quadro do jogo.
-    for (int i = 0; i < kDistritosInferioresDressingCount; ++i) {
-        const bool em_cima = kDistritosInferioresDressing[i].offset_tiles_x == 0 &&
-                             kDistritosInferioresDressing[i].offset_tiles_y == 0;
-        REQUIRE_FALSE(em_cima);
     }
 }
 
@@ -315,4 +338,80 @@ TEST_CASE("ronda: célula de origem fora do mapa devolve rota inválida",
     const TileGrid g = open_grid();
     REQUIRE_FALSE(build_horizontal_patrol_route(g, -5, 8, 3, 1.5f, 0.0f).valid());
     REQUIRE_FALSE(build_horizontal_patrol_route(g, 10, 999, 3, 1.5f, 0.0f).valid());
+}
+
+// ===========================================================================
+//  A COSTURA (fatia C): a tabela contra o .gmap REAL da cidade.
+//
+//  Os testes acima provam a REGRA com grades sintéticas; estes provam o DADO
+//  contra o mapa que o jogo de fato carrega. É a única verificação que pega o
+//  erro que interessa: alguém redesenha o mapa, a vestimenta continua apontando
+//  para onde a rua estava, e o jogo não reclama - só fica com menos cidade.
+// ===========================================================================
+
+namespace {
+
+// Carrega a cidade REAL (o mesmo caminho da janela e do smoke). Falha explícita
+// se cair no fallback: um teste que degrada em silêncio aqui passaria a medir a
+// cena de teste do M1 em vez do mapa de verdade.
+gus::app::screens::CityLoadOutcome load_real_city() {
+    gus::app::screens::CityLoadOutcome city =
+        gus::app::screens::load_city_or_fallback();
+    REQUIRE(city.status == gus::app::screens::CityLoadStatus::CityOk);
+    return city;
+}
+
+}  // namespace
+
+TEST_CASE("cidade real: a vestimenta inteira cabe no mapa carregado",
+          "[city-props][mapa-real]") {
+    const gus::app::screens::CityLoadOutcome city = load_real_city();
+    const auto out = resolve_city_props(city.sim.grid(), kDistritosInferioresDressing,
+                                        kDistritosInferioresDressingCount);
+    // TODAS as peças, não "quase todas": peça descartada é peça que o líder não
+    // vê no playtest e ninguém procura.
+    REQUIRE(static_cast<int>(out.size()) == kDistritosInferioresDressingCount);
+}
+
+TEST_CASE("cidade real: o mapa carregado é o traçado de 90x60",
+          "[city-props][mapa-real]") {
+    // Guarda contra o defeito que abriu esta fatia: o CSV foi redesenhado e o
+    // .gmap compilado continuou o antigo, de 30x20. Nada quebrava - o jogo só
+    // carregava outra cidade.
+    const gus::app::screens::CityLoadOutcome city = load_real_city();
+    REQUIRE(city.sim.tile_map().has_value());
+    REQUIRE(city.sim.tile_map()->width() == 90);
+    REQUIRE(city.sim.tile_map()->height() == 60);
+}
+
+TEST_CASE("cidade real: toda peça de rua pisa numa âncora do level design",
+          "[city-props][mapa-real]") {
+    // A convenção do blockout (§2) é que a célula da peça é um tile Marco. Este
+    // teste é o que impede a tabela de voltar a ser escrita "no olho": posição
+    // inventada cai em Chão comum e reprova aqui, mesmo estando livre.
+    const gus::app::screens::CityLoadOutcome city = load_real_city();
+    const gus::domain::map::TileMap& map = *city.sim.tile_map();
+    for (int i = 0; i < kDistritosInferioresDressingCount; ++i) {
+        const CityPropRow& row = kDistritosInferioresDressing[i];
+        REQUIRE(map.in_bounds(row.cell_x, row.cell_y));
+        const std::uint16_t tile = map.at(row.cell_x, row.cell_y);
+        if (row.cell_rule == PropCellRule::WalkableCell) {
+            REQUIRE(tile == static_cast<std::uint16_t>(gus::domain::map::TileKind::Marco));
+        } else {
+            // Peça que É a parede (caixa de cobertura): célula sólida, por definição.
+            REQUIRE(tile == static_cast<std::uint16_t>(gus::domain::map::TileKind::Parede));
+        }
+    }
+}
+
+TEST_CASE("cidade real: nenhuma peça nasce em cima do jogador",
+          "[city-props][mapa-real]") {
+    // Peça na célula de spawn enterraria o Gus dentro da casa no primeiro quadro.
+    const gus::app::screens::CityLoadOutcome city = load_real_city();
+    const gus::domain::map::Cell spawn = city.sim.tile_map()->spawn();
+    for (int i = 0; i < kDistritosInferioresDressingCount; ++i) {
+        const bool em_cima = kDistritosInferioresDressing[i].cell_x == spawn.x &&
+                             kDistritosInferioresDressing[i].cell_y == spawn.y;
+        REQUIRE_FALSE(em_cima);
+    }
 }

@@ -37,6 +37,7 @@
 #include "gus/app/screens/anim_catalog.hpp"  // resolve_gus_sprites_dir
 #include "gus/app/screens/anim_preview.hpp"
 #include "gus/app/screens/battle_preview.hpp"  // run_battle_preview (viewer M5)
+#include "gus/app/screens/city_actors.hpp"  // DEMO-CIDADE-VESTIDA: quem povoa a cidade
 #include "gus/app/screens/city_loader.hpp"   // load_city_or_fallback (cena real headless)
 #include "gus/app/screens/city_props.hpp"  // DEMO-CIDADE-VESTIDA: vestimenta da cidade
 #include "gus/app/screens/overworld_sim.hpp"
@@ -189,13 +190,29 @@ int run_smoke(int ticks) {
     // DEMO-CIDADE-VESTIDA B1: exercita a VESTIMENTA contra o mapa REAL tambem no
     // headless. Aqui as texturas degradam (renderer nulo), entao nenhuma peca chega
     // a entrar no mundo - o que interessa neste caminho e o passo ANTES disso: quantas
-    // celulas da tabela de vestimenta caem em chao valido do .gmap carregado. Uma
-    // tabela que so acerta parede aparece como zero AQUI, no CI, em vez de aparecer
-    // como uma cidade vazia no playtest do lider.
+    // celulas da tabela de vestimenta caem onde o level design mandou no .gmap
+    // carregado. Uma tabela que so acerta parede aparece como zero AQUI, no CI, em
+    // vez de aparecer como uma cidade vazia no playtest do lider.
     const std::vector<gus::domain::world::ScenePropPlacement> dressing =
-        gus::app::screens::resolve_spawn_relative_props(
-            sim.grid(), sim.player(), gus::app::screens::kDistritosInferioresDressing,
+        gus::app::screens::resolve_city_props(
+            sim.grid(), gus::app::screens::kDistritosInferioresDressing,
             gus::app::screens::kDistritosInferioresDressingCount);
+
+    // FATIA C: os ATORES pelo mesmo critério. O smoke não tem renderer de verdade
+    // (nenhum sprite carrega), então o que ele mede é o passo anterior: quantos
+    // personagens da tabela caem em célula andável do mapa, e quantas rondas
+    // nascem válidas. Cidade com ator de menos é defeito silencioso igual à
+    // cidade com casa de menos.
+    const std::vector<gus::app::screens::CityActorPlacement> cast =
+        gus::app::screens::resolve_city_actors(
+            sim.grid(), gus::app::screens::kDistritosInferioresCast,
+            gus::app::screens::kDistritosInferioresCastCount);
+    int rondas = 0;
+    for (const gus::app::screens::CityActorPlacement& a : cast) {
+        if (a.route.valid()) {
+            ++rondas;
+        }
+    }
 
     gus::core::time::FixedTimestep clock(1.0 / 60.0, 5);
     const float dt = static_cast<float>(clock.fixed_dt());
@@ -216,7 +233,9 @@ int run_smoke(int ticks) {
               << renderer.last_draw_count() << " primitivos desenhados, "
               << dressing.size() << " de "
               << gus::app::screens::kDistritosInferioresDressingCount
-              << " pecas de cenario couberam no mapa\n";
+              << " pecas de cenario couberam no mapa, " << cast.size() << " de "
+              << gus::app::screens::kDistritosInferioresCastCount
+              << " atores couberam no mapa (" << rondas << " em ronda)\n";
     return 0;
 }
 

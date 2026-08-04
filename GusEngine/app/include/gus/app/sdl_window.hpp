@@ -229,6 +229,23 @@ public:
     // ausente/headless degrada peca a peca (a que faltar simplesmente nao entra).
     void dress_city();
 
+    // DEMO-CIDADE-VESTIDA C: POVOA a cidade corrente com os FIGURANTES (a gente que
+    // não tem diálogo nem batalha: ver gus/app/screens/city_actors.hpp). Mesma
+    // receita e mesmo momento do dress_city - resolve a tabela contra o mapa real,
+    // carrega a arte de cada um, entrega os atores ao OverworldSim -, e pelo mesmo
+    // motivo: TextureId é local ao renderer vivo, então quem cria o renderer é quem
+    // carrega a arte.
+    //
+    // Os atores COM papel (o Bertoldo e o androide sentinela) NÃO entram por aqui:
+    // continuam nos slots reservados que a Maestro posiciona e arma, porque ela
+    // guarda o estado deles (conversa aberta, inimigo derrotado).
+    //
+    // NÃO é idempotente por si: não existe "limpar figurantes" no OverworldSim
+    // (handle de ator é índice, e índice não pode escorregar). Chamar duas vezes
+    // duplica o elenco - por isso a chamada mora ao lado do dress_city, no
+    // init/init_attached, que é onde o renderer nasce.
+    void populate_city();
+
     // DEMO-CIDADE-VESTIDA B3: arma a ronda do marcador de inimigo. No-op seguro se
     // nenhum set_enemy_marker aconteceu ainda. Rota invalida = inimigo parado (o
     // comportamento de sempre).

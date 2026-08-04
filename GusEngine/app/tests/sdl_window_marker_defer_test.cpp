@@ -70,6 +70,19 @@ TEST_CASE("sdl_window: dress_city sem renderer NAO crasha - degrada limpo",
     REQUIRE_NOTHROW(city.dress_city());
 }
 
+// O GEMEO da mesma familia para o povoamento (DEMO-CIDADE-VESTIDA fatia C):
+// populate_city() carrega textura por figurante, logo derefa render2d_ pelo mesmo
+// caminho. Auditoria-domino: guard que existe num irmao tem que existir aqui.
+TEST_CASE("sdl_window: populate_city sem renderer NAO crasha - degrada limpo",
+          "[sdlwindow][city-actors][regression]") {
+    gus::app::SdlWindow city;  // render2d_ == nullptr
+
+    REQUIRE_NOTHROW(city.populate_city());
+    // Sem renderer a funcao sai antes de qualquer add_actor, entao rechamar nao
+    // duplica ninguem (o que NAO vale com renderer vivo - ver o header).
+    REQUIRE_NOTHROW(city.populate_city());
+}
+
 // Ronda armada sem marcador de inimigo e sem renderer: no-op seguro, nao cria
 // ator nenhum e nao derefa nada.
 TEST_CASE("sdl_window: armar ronda sem marcador de inimigo NAO crasha",

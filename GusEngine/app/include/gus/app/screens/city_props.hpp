@@ -11,16 +11,15 @@
 //      via IRenderer, com o caminho vindo de core/asset_paths.hpp);
 //   3. montar as instâncias com a geometria calculada pelo domínio.
 //
-// POR QUE A TABELA É RELATIVA AO SPAWN (e é PROVISÓRIA): o mapa dos Distritos
-// Inferiores está sendo redesenhado de 30x20 para 90x60 em paralelo a esta fatia.
-// Uma tabela de células ABSOLUTAS escrita agora seria jogada fora amanhã, e pior,
-// apontaria para dentro de paredes novas sem ninguém perceber. Amarrar ao spawn é
-// a mesma técnica que o posicionamento do inimigo fixo e do Bertoldo já usam
-// (pick_fixed_enemy_position), e é imune à troca de mapa. Quando o level design
-// entregar as posições definitivas, elas entram como ScenePropPlacement absoluto
-// e esta tabela relativa sai - o resto do caminho não muda.
+// A TABELA É ABSOLUTA E VEM DO LEVEL DESIGN (fatia C, a costura). Até a fatia B
+// ela era relativa ao spawn, porque o mapa estava sendo redesenhado de 30x20 para
+// 90x60 e qualquer célula fixa escrita naquele momento apontaria para dentro de
+// uma parede nova. O traçado de 90x60 chegou, e com ele as 34 âncoras da §5 do
+// blockout: cada linha daqui é uma daquelas âncoras, transcrita, não escolhida.
 //
-// Cross-ref: gus/domain/world/scene_prop.hpp (o catálogo, uma linha por peça);
+// Cross-ref: docs/design/levels/blockout-distritos-inferiores.md §2 (convenção de
+//            âncora) e §5 (a tabela de peça por âncora);
+//            gus/domain/world/scene_prop.hpp (o catálogo, uma linha por peça);
 //            gus/app/screens/world_entities.hpp (a instância);
 //            app/tests/city_props_test.cpp.
 
@@ -37,50 +36,92 @@
 
 namespace gus::app::screens {
 
-// Uma linha da vestimenta provisória: peça + deslocamento em CÉLULAS a partir da
-// célula onde o jogador nasce.
-struct SpawnRelativePropRow {
+// O que a célula da tabela PRECISA ser no mapa para a peça ser aceita.
+//
+// Existe porque o blockout tem duas convenções de âncora, e uma régua só reprova
+// metade das peças: peça de rua (casa, fonte, poste) fica numa célula ANDÁVEL, em
+// frente à fachada; caixa de cobertura não fica ao lado de um obstáculo, ela É o
+// obstáculo - uma célula de Parede solta que a arte cobre. Validar as duas com a
+// régua da primeira descartaria toda cobertura da arena em silêncio.
+enum class PropCellRule : int {
+    WalkableCell = 0,  // a peça pisa em chão livre (a esmagadora maioria)
+    WallCell = 1,      // a peça É a parede daquela célula (caixa de cobertura)
+};
+
+// Uma linha da vestimenta: peça + a CÉLULA ABSOLUTA do mapa + a régua de validação.
+struct CityPropRow {
     gus::domain::world::ScenePropKind kind{};
-    int offset_tiles_x = 0;
-    int offset_tiles_y = 0;
+    int cell_x = 0;
+    int cell_y = 0;
+    PropCellRule cell_rule = PropCellRule::WalkableCell;
 };
 
 // ===========================================================================
-//  VESTIMENTA PROVISÓRIA DOS DISTRITOS INFERIORES
+//  VESTIMENTA DOS DISTRITOS INFERIORES (90x60)
 //
-//  Uma linha por peça posta na rua. Layout pensado para o demo ser LEGÍVEL, não
-//  para ser o level design final: duas casas fechando um lado da praça, a fonte
-//  como ponto central, o poste iluminando o caminho do jogador, a placa de lore
-//  perto de onde ele nasce (é o primeiro texto que ele encontra), o terminal de
-//  hack e a caixa de cobertura na direção do inimigo, o portão sul fechando o
-//  fundo, e o tabuleiro de puzzle no chão a caminho do Bertoldo.
+//  Uma linha por peça, na ORDEM DO PERCURSO (norte para sul), transcrita da §5 do
+//  blockout. A coluna "por que ali" mora no doc, não aqui: duplicá-la produziria
+//  duas fontes de verdade que divergem na primeira revisão de level design.
 //
-//  Os offsets do inimigo fixo (-5,+4) e do Bertoldo (-5,+13) estão RESERVADOS -
-//  nenhuma peça ocupa nem encosta neles, senão a arte cobriria o personagem com
-//  quem o jogador precisa esbarrar.
+//  ⚠️ AS CÉLULAS NÃO SÃO ESCOLHIDAS AQUI. São as âncoras (tile Marco) que o
+//  traçado já reserva, e um teste as confere contra o .gmap REAL célula a célula
+//  ("toda peça de rua pisa numa âncora do level design"). As duas primeiras
+//  versões desta tabela foram escritas "no olho" contra o mapa antigo e perderam
+//  4 das 10 peças sem o jogo reclamar - só ficava com menos casa.
+//
+//  Fora desta tabela, de propósito:
+//   - as 5 âncoras de MARCAÇÃO sem sprite (pedestal Era 3, banco do Bertoldo,
+//     fundo do beco morto, save point, pichação). Duas delas viram POSIÇÃO DE
+//     ATOR (ver city_actors.hpp); as outras esperam arte;
+//   - o PORTÃO SUL (44,55)/(45,55). A peça do catálogo é sólida e o vão é o único
+//     do muro sul: plantá-la hoje sela 28 células (o vestíbulo inteiro, o save
+//     point e a saída), e nada no jogo ainda abre portão. O próprio blockout §8
+//     pede o vão livre até o bloqueio virar regra de jogo. Decisão do líder
+//     pendente; quando houver a lógica de abertura, entram duas linhas aqui.
 // ===========================================================================
-//  ⚠️ OS OFFSETS FORAM MEDIDOS CONTRA O MAPA REAL, não estimados. As duas
-//  primeiras versões desta tabela foram escritas "no olho" e perderam 4 das 10
-//  peças - e o jogo não reclamava, só ficava com menos casa. O mapa vigente tem o
-//  spawn em (15,1), dentro de um corredor de DUAS células de largura que só abre
-//  na linha 4; qualquer peça espalhada para os lados perto do spawn cai em
-//  parede. Daí a formação: desce o corredor primeiro, e só então se abre na praça.
-//  O smoke headless imprime "N de M peças couberam no mapa" justamente para esse
-//  erro aparecer no CI, e não num playtest.
-inline constexpr SpawnRelativePropRow kDistritosInferioresDressing[] = {
-    // Saindo do corredor para a praça: poste de um lado, placa do outro.
-    {gus::domain::world::ScenePropKind::PosteNeonCiano, -1, 3},
-    {gus::domain::world::ScenePropKind::PlacaLore, 1, 3},
-    {gus::domain::world::ScenePropKind::TerminalHack, 5, 3},
-    // A praça propriamente dita.
-    {gus::domain::world::ScenePropKind::CoverBox, -10, 4},
-    {gus::domain::world::ScenePropKind::FonteLatao, 3, 5},
-    {gus::domain::world::ScenePropKind::CasaCibergoticaA, -7, 6},
-    {gus::domain::world::ScenePropKind::CasaCibergoticaB, -3, 6},
-    {gus::domain::world::ScenePropKind::HoloSterling, 7, 6},
-    {gus::domain::world::ScenePropKind::BoardPuzzle, -3, 8},
-    // O portão fecha a passagem estreita que leva à metade sul do mapa.
-    {gus::domain::world::ScenePropKind::PortaoSulFechado, 0, 9},
+inline constexpr CityPropRow kDistritosInferioresDressing[] = {
+    // --- Chegada: alameda e terraço (R1/R2) ---
+    {gus::domain::world::ScenePropKind::PosteNeonCiano, 17, 4},
+    {gus::domain::world::ScenePropKind::HoloSterling, 35, 4},
+    {gus::domain::world::ScenePropKind::PosteNeonCiano, 52, 4},
+    {gus::domain::world::ScenePropKind::PosteNeonCiano, 72, 4},
+    {gus::domain::world::ScenePropKind::PosteNeonCiano, 40, 7},
+    {gus::domain::world::ScenePropKind::PosteNeonCiano, 48, 9},
+    // --- Praça da Compilação e os dois bairros (R8/R10/R12) ---
+    {gus::domain::world::ScenePropKind::PosteNeonCiano, 33, 15},
+    {gus::domain::world::ScenePropKind::PosteNeonCiano, 56, 15},
+    {gus::domain::world::ScenePropKind::TerminalHack, 69, 15},
+    {gus::domain::world::ScenePropKind::CasaCibergoticaB, 73, 17},
+    {gus::domain::world::ScenePropKind::CasaCibergoticaA, 8, 21},
+    {gus::domain::world::ScenePropKind::CasaCibergoticaB, 17, 21},
+    {gus::domain::world::ScenePropKind::FonteLatao, 43, 21},
+    {gus::domain::world::ScenePropKind::CasaCibergoticaA, 82, 21},
+    {gus::domain::world::ScenePropKind::PlacaLore, 36, 24},
+    {gus::domain::world::ScenePropKind::PosteNeonCiano, 33, 27},
+    {gus::domain::world::ScenePropKind::PosteNeonCiano, 56, 27},
+    {gus::domain::world::ScenePropKind::PosteNeonCiano, 13, 28},
+    {gus::domain::world::ScenePropKind::PosteNeonCiano, 66, 28},
+    // --- Pátio de Sucata e arena (R14/R15) ---
+    {gus::domain::world::ScenePropKind::PosteNeonCiano, 36, 34},
+    {gus::domain::world::ScenePropKind::PosteNeonCiano, 54, 34},
+    // Cobertura: a célula de baixo de cada bloco de Parede (a peça cresce da base
+    // para cima, então ancorar na de cima deixaria a arte flutuando meio tile).
+    {gus::domain::world::ScenePropKind::CoverBox, 6, 37, PropCellRule::WallCell},
+    {gus::domain::world::ScenePropKind::CoverBox, 10, 37, PropCellRule::WallCell},
+    {gus::domain::world::ScenePropKind::CoverBox, 38, 37, PropCellRule::WallCell},
+    {gus::domain::world::ScenePropKind::CoverBox, 52, 37, PropCellRule::WallCell},
+    {gus::domain::world::ScenePropKind::CoverBox, 38, 43, PropCellRule::WallCell},
+    {gus::domain::world::ScenePropKind::CoverBox, 52, 43, PropCellRule::WallCell},
+    // --- Corredor-puzzle e Pátio da FIR (R17/R19) ---
+    {gus::domain::world::ScenePropKind::BoardPuzzle, 42, 47},
+    {gus::domain::world::ScenePropKind::PosteNeonCiano, 75, 48},
+    {gus::domain::world::ScenePropKind::CoverBox, 70, 49, PropCellRule::WallCell},
+    {gus::domain::world::ScenePropKind::CoverBox, 78, 49, PropCellRule::WallCell},
+    // --- Rua de ligação e antepraça (R20/R20b) ---
+    {gus::domain::world::ScenePropKind::PosteNeonCiano, 10, 53},
+    {gus::domain::world::ScenePropKind::PosteNeonCiano, 33, 53},
+    {gus::domain::world::ScenePropKind::PosteNeonCiano, 78, 53},
+    {gus::domain::world::ScenePropKind::PosteNeonCiano, 52, 54},
 };
 
 inline constexpr int kDistritosInferioresDressingCount =
@@ -101,15 +142,14 @@ struct ScenePropTextures {
     }
 };
 
-// Converte a tabela relativa em células absolutas, DESCARTANDO o que não cabe no
-// mapa carregado: fora dos limites ou dentro de parede. Descartar é de propósito
-// (e avisa no terminal): uma casa dentro de uma parede é o erro mais difícil de
-// enxergar no playtest, porque a arte fica meio enterrada e parece proposital.
+// Confere a tabela contra o mapa CARREGADO e devolve os placements que passaram,
+// DESCARTANDO (com aviso no terminal) o que não cabe: célula fora dos limites, ou
+// célula que contraria a régua da linha. Descartar é de propósito: uma casa dentro
+// de uma parede é o erro mais difícil de enxergar no playtest, porque a arte fica
+// meio enterrada e parece proposital.
 // `rows == nullptr` ou `count <= 0` devolve lista vazia.
-[[nodiscard]] std::vector<gus::domain::world::ScenePropPlacement>
-resolve_spawn_relative_props(const gus::core::spatial::TileGrid& grid,
-                             const gus::core::spatial::Aabb& player_spawn,
-                             const SpawnRelativePropRow* rows, int count);
+[[nodiscard]] std::vector<gus::domain::world::ScenePropPlacement> resolve_city_props(
+    const gus::core::spatial::TileGrid& grid, const CityPropRow* rows, int count);
 
 // Carrega a arte de TODAS as peças do catálogo no renderer corrente. O caminho de
 // cada uma é montado a partir do header central de assets (pasta da área + o

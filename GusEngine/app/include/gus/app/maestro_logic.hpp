@@ -113,6 +113,25 @@ enum class EncounterId : int {
     const gus::core::spatial::Aabb& player_start, int offset_tiles_x,
     int offset_tiles_y) noexcept;
 
+// MESMA escolha de posicao, so que a partir de uma CELULA ABSOLUTA do mapa em vez
+// de um deslocamento a partir do spawn (DEMO-CIDADE-VESTIDA fatia C).
+//
+// POR QUE ESTA EXISTE: enquanto a cidade cabia em uma tela e meia, "5 celulas a
+// esquerda e 13 abaixo de onde o Gus nasce" era uma descricao razoavel de onde o
+// Bertoldo senta. No tracado de 90x60 o mesmo deslocamento cai no meio da alameda
+// de chegada - longe do banco dele, e o inimigo longe da arena onde o encontro foi
+// desenhado. Posicao de personagem virou dado do LEVEL DESIGN (as celulas moram em
+// gus/app/screens/city_actors.hpp), e o que se pede aqui e a celula, nao o offset.
+//
+// Delega a irma acima convertendo celula em offset, de proposito: toda a garantia
+// de ALCANCABILIDADE (flood-fill do spawn + espiral deterministica ao redor do
+// alvo) e a mesma, e nao existe uma segunda nocao de "celula valida" no jogo. Se a
+// celula pedida estiver bloqueada ou ilhada, o personagem cai na celula alcancavel
+// mais proxima dela, exatamente como acontece com o offset.
+[[nodiscard]] gus::core::spatial::Aabb pick_actor_position_at_cell(
+    const gus::core::spatial::TileGrid& grid,
+    const gus::core::spatial::Aabb& player_start, int cell_x, int cell_y) noexcept;
+
 // FIX BUG-1 (playtest ao vivo do lider, M7-COSTURA: "a tela de batalha so ativou
 // quando toquei o inimigo pelo sul"). Causa raiz: `pick_fixed_enemy_position` devolve
 // um AABB MINUSCULO (mesmo w/h do jogador, ~0.6 tile) centrado na celula-alvo - esse

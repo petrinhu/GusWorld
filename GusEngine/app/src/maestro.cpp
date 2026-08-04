@@ -18,6 +18,7 @@
 #include "gus/app/app_icon.hpp"  // APP-ICON: set_window_icon_if_available
 #include "gus/app/dialogue/npc_dialogue_catalog.hpp"  // M7-DIALOGO: I/O do .dlg.txt
 #include "gus/app/screens/battle_preview.hpp"    // run_battle_preview_embedded
+#include "gus/app/screens/city_actors.hpp"  // DEMO-CIDADE-VESTIDA C: celulas do elenco
 #include "gus/app/screens/city_patrol.hpp"  // DEMO-CIDADE-VESTIDA B3: ronda em rota fixa
 // DIALOGO-TERMINAL: loop GL real (caixa quente com retrato) - substitui o overlay
 // funcional simples de texto (npc_dialogue_loop.hpp, aposentado - ver seu header).
@@ -44,30 +45,20 @@ namespace {
 constexpr int kWindowW = 1280;
 constexpr int kWindowH = 720;
 
-// Offset cardinal (em CELULAS) do inimigo fixo em relacao ao spawn do jogador (celula
-// (15,1), passagem estreita logo abaixo do portal entrada_norte). O offset antigo (3,0)
-// mirava a celula (18,1) - uma saleta isolada (canto sup-direito do mapa) - e a
-// alcancabilidade (pick_fixed_enemy_position/flood-fill) caia de volta no fallback mais
-// proximo: a celula (15,0), EM CIMA do proprio portal entrada_norte. Feio (decisao do
-// lider, M7-COSTURA): trocado para (-5,+4), que mira a celula (10,5) - Chao aberto,
-// alcancavel DIRETO (sem fallback), bem no meio do SALAO PRINCIPAL ESQUERDO onde o
-// jogador cai ao descer a passagem central (cols1-13, rows1-9 de
-// distritos_inferiores.csv) - a 5 celulas (chebyshev) do spawn, perto o bastante pra o
-// lider esbarrar nele cedo no playtest ao vivo, longe o bastante do portal e da
-// passagem estreita. Ver app/tests/maestro_logic_test.cpp (regressao com reproducao
-// fiel do mapa real) para a prova headless de ambos os offsets.
-constexpr int kEnemyOffsetTilesX = -5;
-constexpr int kEnemyOffsetTilesY = 4;
-
-// M7-DIALOGO (NPC-MVP): offset cardinal (em CELULAS) do Bertoldo em relacao ao
-// spawn do jogador (celula (15,1) - MESMA base do inimigo acima). Mira a celula
-// (10,14): Chao aberto da SALA SUL de distritos_inferiores.gmap (alcancavel via a
-// passagem estreita cols14-16/row10 que liga o salao principal - rows1-9 - a essa
-// sala), DISTANTE da celula do inimigo fixo (10,5) - nenhum dos dois marcadores
-// disputa a mesma area. Ver app/tests/maestro_logic_test.cpp (reproducao fiel do
-// mapa real) pra a prova headless de reachability/distincao.
-constexpr int kNpcBertoldoOffsetTilesX = -5;
-constexpr int kNpcBertoldoOffsetTilesY = 13;
+// ONDE O INIMIGO FIXO E O BERTOLDO FICAM: ver gus/app/screens/city_actors.hpp.
+//
+// DEMO-CIDADE-VESTIDA fatia C: ate aqui os dois eram posicionados por OFFSET a
+// partir do spawn (o inimigo em (-5,+4), o Bertoldo em (-5,+13)). Aquilo resolvia
+// um problema real do M7 - offset e imune a troca de mapa, e o mapa estava para ser
+// redesenhado -, mas so descrevia bem a cidade de 30x20, em que tudo cabia em uma
+// tela e meia. No tracado de 90x60 os mesmos offsets caem no terraco de chegada:
+// o Bertoldo longe do banco dele na praca, e o inimigo longe da arena onde o
+// encontro foi desenhado (blockout secao 6, passo 5).
+//
+// Agora a posicao dos dois e dado de LEVEL DESIGN (celula absoluta, conferida
+// contra o .gmap real por app/tests/city_actors_test.cpp) e a resolucao passa por
+// pick_actor_position_at_cell, que preserva integralmente a garantia de
+// alcancabilidade da versao por offset.
 
 // Chave da flag (SaveData::flags) que registra o inimigo fixo derrotado. Espelha o
 // EncounterId::kFixedEnemy1 (unico valor desta onda) - quando houver mais encontros, a
@@ -321,8 +312,10 @@ bool Maestro::init() {
     // e mais o footprint visual inteiro - e uma caixa PEQUENA ancorada na base do
     // footprint, DESACOPLADA do tamanho do sprite (mesma tecnica de Zelda/Stardew
     // Valley). enemy_trigger_aabb_ e derivada do footprint (enemy_aabb_) UMA vez aqui.
-    const gus::core::spatial::Aabb enemy_anchor = pick_fixed_enemy_position(
-        city_->grid(), city_->player_aabb(), kEnemyOffsetTilesX, kEnemyOffsetTilesY);
+    const gus::core::spatial::Aabb enemy_anchor = pick_actor_position_at_cell(
+        city_->grid(), city_->player_aabb(),
+        gus::app::screens::kSentinelArenaCellX,
+        gus::app::screens::kSentinelArenaCellY);
     enemy_aabb_ = enemy_sprite_footprint_aabb(
         enemy_anchor, city_->tuning().player_sprite_height_tiles,
         city_->grid().tile_size());
@@ -396,9 +389,10 @@ bool Maestro::init() {
     // compensar o busto estreito do Bertoldo) por uma solucao generica, independente
     // do sprite: a caixa de ativacao do dialogo agora nunca precisa saber quanta
     // margem transparente cada retrato tem.
-    const gus::core::spatial::Aabb npc_anchor = pick_fixed_enemy_position(
-        city_->grid(), city_->player_aabb(), kNpcBertoldoOffsetTilesX,
-        kNpcBertoldoOffsetTilesY);
+    const gus::core::spatial::Aabb npc_anchor = pick_actor_position_at_cell(
+        city_->grid(), city_->player_aabb(),
+        gus::app::screens::kBertoldoBenchCellX,
+        gus::app::screens::kBertoldoBenchCellY);
     npc_bertoldo_aabb_ = enemy_sprite_footprint_aabb(
         npc_anchor, city_->tuning().npc_bertoldo_sprite_height_tiles,
         city_->grid().tile_size());

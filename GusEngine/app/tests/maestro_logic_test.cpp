@@ -27,6 +27,7 @@ using gus::app::enemy_sprite_footprint_aabb;
 using gus::app::feet_trigger_aabb;
 using gus::app::kFeetTriggerMarginTiles;
 using gus::app::outcome_marks_enemy_defeated;
+using gus::app::pick_actor_position_at_cell;
 using gus::app::pick_fixed_enemy_position;
 using gus::app::should_autosave_after_battle;
 using gus::app::should_stop_running_after_battle;
@@ -1277,4 +1278,51 @@ TEST_CASE("BUG-8 revisitado: com o trigger ANTIGO (0.8x0.4 tile, contido dentro 
         walk_axis_until_hit(g, south_start, /*horizontal=*/false, target_y_centered, obstacles);
     REQUIRE(south_result.hit_y);
     CHECK_FALSE(aabb_overlaps(south_result.box, old_trigger));
+}
+
+// ===========================================================================
+//  Posicionamento por CELULA ABSOLUTA (DEMO-CIDADE-VESTIDA fatia C)
+// ===========================================================================
+
+TEST_CASE(
+    "pick_actor_position_at_cell: a celula pedida e a celula entregue, "
+    "independente de onde o jogador nasce",
+    "[maestro][logic][city-actors]") {
+    // O ponto da fatia C: posicao de personagem deixou de ser "tantas celulas a
+    // partir do spawn" e passou a ser a celula que o level design escolheu. Se o
+    // spawn mudar de lugar, o Bertoldo continua no banco dele.
+    const TileGrid grid(30, 30, 2.0f);  // aberta: a celula pedida esta livre
+    const float side = 0.6f * 2.0f;
+    const auto player_at = [side](int cx, int cy) {
+        return Aabb{(static_cast<float>(cx) + 0.5f) * 2.0f - side * 0.5f,
+                    (static_cast<float>(cy) + 0.5f) * 2.0f - side * 0.5f, side, side};
+    };
+
+    for (const auto& spawn : {player_at(1, 1), player_at(20, 25), player_at(15, 3)}) {
+        const Aabb pos = pick_actor_position_at_cell(grid, spawn, /*cell_x=*/12,
+                                                     /*cell_y=*/18);
+        CHECK(grid.world_to_cell(pos.x + pos.w * 0.5f) == 12);
+        CHECK(grid.world_to_cell(pos.y + pos.h * 0.5f) == 18);
+    }
+}
+
+TEST_CASE(
+    "pick_actor_position_at_cell: celula bloqueada cai na alcancavel mais "
+    "proxima, nunca dentro da parede",
+    "[maestro][logic][city-actors]") {
+    // Mesma garantia da irma por offset: dado de mundo e escrito a mao e erra, e o
+    // erro nao pode virar personagem enterrado no predio.
+    TileGrid grid(20, 20, 2.0f);
+    grid.set_blocked(10, 10, true);
+    const float side = 0.6f * 2.0f;
+    const Aabb spawn{(1.0f + 0.5f) * 2.0f - side * 0.5f,
+                     (1.0f + 0.5f) * 2.0f - side * 0.5f, side, side};
+
+    const Aabb pos = pick_actor_position_at_cell(grid, spawn, 10, 10);
+    const int cx = grid.world_to_cell(pos.x + pos.w * 0.5f);
+    const int cy = grid.world_to_cell(pos.y + pos.h * 0.5f);
+    CHECK_FALSE(grid.is_blocked(cx, cy));
+    // Vizinha imediata do alvo: a espiral para no primeiro anel.
+    CHECK(std::abs(cx - 10) <= 1);
+    CHECK(std::abs(cy - 10) <= 1);
 }

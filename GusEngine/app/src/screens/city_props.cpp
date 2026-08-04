@@ -27,29 +27,30 @@ std::string prop_asset_path(const gus::domain::world::ScenePropDef& def) {
 
 }  // namespace
 
-std::vector<gus::domain::world::ScenePropPlacement> resolve_spawn_relative_props(
-    const gus::core::spatial::TileGrid& grid,
-    const gus::core::spatial::Aabb& player_spawn, const SpawnRelativePropRow* rows,
-    int count) {
+std::vector<gus::domain::world::ScenePropPlacement> resolve_city_props(
+    const gus::core::spatial::TileGrid& grid, const CityPropRow* rows, int count) {
     std::vector<gus::domain::world::ScenePropPlacement> out;
     if (rows == nullptr || count <= 0) {
         return out;
     }
-    // Célula do CENTRO da hitbox do jogador - a mesma leitura que o
-    // posicionamento do inimigo fixo usa (maestro_logic::pick_fixed_enemy_position).
-    const int spawn_cx =
-        grid.world_to_cell(player_spawn.x + player_spawn.w * 0.5f);
-    const int spawn_cy =
-        grid.world_to_cell(player_spawn.y + player_spawn.h * 0.5f);
+
+    // Limites do mapa, checados à parte de propósito: is_blocked devolve true para
+    // célula de fora (a borda é parede implícita), então a régua da peça-parede
+    // aceitaria o lado de fora do mundo se confiasse só nela.
+    const auto in_bounds = [&grid](int cx, int cy) {
+        return cx >= 0 && cx < grid.width() && cy >= 0 && cy < grid.height();
+    };
 
     out.reserve(static_cast<std::size_t>(count));
     int descartadas = 0;
     for (int i = 0; i < count; ++i) {
-        const int cx = spawn_cx + rows[i].offset_tiles_x;
-        const int cy = spawn_cy + rows[i].offset_tiles_y;
-        // is_blocked já devolve true para célula fora dos limites (ver TileGrid),
-        // então este único teste cobre "fora do mapa" e "dentro de parede".
-        if (grid.is_blocked(cx, cy)) {
+        const int cx = rows[i].cell_x;
+        const int cy = rows[i].cell_y;
+        const bool cabe =
+            in_bounds(cx, cy) && (rows[i].cell_rule == PropCellRule::WallCell
+                                      ? grid.is_blocked(cx, cy)
+                                      : !grid.is_blocked(cx, cy));
+        if (!cabe) {
             ++descartadas;
             continue;
         }
