@@ -31,7 +31,9 @@ O formato do mapa tem 5 tipos de tile e nenhum deles é "prop". Para não invent
 - **Cover box não tem âncora própria:** a peça é exatamente uma célula de Parede isolada. A fatia C pinta o sprite sobre a célula de Parede solta.
 - **Peça sem volume** (board do puzzle, holograma projetado, poste): a âncora é o canto superior-esquerdo do sprite.
 
-São **29 âncoras** no mapa, listadas na §5.
+São **34 âncoras** no mapa, listadas na §5. (Eram 29 na primeira versão deste traçado; os 5 postes
+acrescentados para cobrir as telas sem peça entraram depois, e este número ficou desatualizado até a
+fatia C cruzar doc contra CSV e achar a divergência. O CSV é a fonte da verdade: 34, conferidos.)
 
 ## 3. Regiões (retângulos exatos, conferíveis contra o CSV)
 
