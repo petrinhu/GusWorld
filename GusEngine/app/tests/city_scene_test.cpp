@@ -347,7 +347,10 @@ TEST_CASE("clear_scene_props devolve a parede a celula", "[city_scene]") {
     }
 }
 
-TEST_CASE("resolve_tile_palette: producao por default, blockout so por env",
+// NOME SEM VIRGULA de proposito: o Catch2 trata virgula como SEPARADOR de filtro,
+// entao um nome com virgula nao casa por nome nenhum e o binario sai com "No tests
+// ran" - que e facil de ler como sucesso.
+TEST_CASE("resolve_tile_palette da producao por default e blockout so por env",
           "[city_scene]") {
     // O default e o caminho SEGURO: sem env var (ou com valor escrito errado) o
     // jogo pinta a leitura de producao. A legenda so aparece se for pedida.

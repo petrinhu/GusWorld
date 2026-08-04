@@ -224,6 +224,50 @@ TEST_CASE("vestir: instância recebe a geometria que o catálogo mandou",
     REQUIRE(out[0].blocks());
 }
 
+TEST_CASE("vestir: a CÉLULA que a peça pisa chega na instância", "[city-props]") {
+    // Sem isto o conserto do achado A3 funciona no teste e NÃO funciona no jogo:
+    // o render decide não pintar a marcação de graybox por baixo de uma peça
+    // olhando a célula que a instância carrega (OverworldSim::is_cell_dressed).
+    // Se a montagem esquecer de copiar a célula, todo teste de supressão continua
+    // verde (eles montam a instância à mão) e a cidade volta a mostrar a parede
+    // atrás de cada caixa de cobertura, sem nada reclamar. Provado por mutante:
+    // apagar as duas linhas da cópia deixava 20 casos e 1097 asserções passando.
+    StubRenderer r(/*assets_present=*/true);
+    const ScenePropTextures tex = load_scene_prop_textures(r);
+    const ScenePropPlacement places[] = {{ScenePropKind::CoverBox, 7, 9},
+                                         {ScenePropKind::PosteNeonCiano, 31, 2}};
+    const auto out = build_scene_prop_instances(places, 2, kTile, /*scale=*/1.0f, tex);
+
+    REQUIRE(out.size() == 2);
+    REQUIRE(out[0].cell_x == 7);
+    REQUIRE(out[0].cell_y == 9);
+    REQUIRE(out[1].cell_x == 31);
+    REQUIRE(out[1].cell_y == 2);
+}
+
+TEST_CASE("vestir: peça descartada não desloca a célula das outras",
+          "[city-props]") {
+    // A lista de saída é MENOR que a de entrada quando falta arte, então copiar a
+    // célula por índice paralelo (out[i] <- places[i]) daria a célula errada para
+    // todas as peças depois do buraco - e o defeito seria "a parede some no lugar
+    // errado", que ninguém liga à peça que faltou.
+    StubRenderer r(/*assets_present=*/false);  // NENHUMA arte carrega
+    ScenePropTextures tex = load_scene_prop_textures(r);
+    StubRenderer r2(/*assets_present=*/true);
+    const ScenePropTextures tex_ok = load_scene_prop_textures(r2);
+    // Só a segunda peça tem arte.
+    tex.by_kind[static_cast<int>(ScenePropKind::PosteNeonCiano)] =
+        tex_ok.at(ScenePropKind::PosteNeonCiano);
+
+    const ScenePropPlacement places[] = {{ScenePropKind::CoverBox, 7, 9},
+                                         {ScenePropKind::PosteNeonCiano, 31, 2}};
+    const auto out = build_scene_prop_instances(places, 2, kTile, /*scale=*/1.0f, tex);
+
+    REQUIRE(out.size() == 1);
+    REQUIRE(out[0].cell_x == 31);
+    REQUIRE(out[0].cell_y == 2);
+}
+
 TEST_CASE("vestir: a escala global chega na instância", "[city-props]") {
     StubRenderer r(true);
     const ScenePropTextures tex = load_scene_prop_textures(r);
