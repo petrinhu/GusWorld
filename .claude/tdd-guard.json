@@ -1,0 +1,41 @@
+{
+  "_comment": "Marcador de que o ciclo TDD deste projeto esta SOB HOOK, e nao apenas sob convencao. Lido pela skill tab_pendencias, que deixa de avisar 'TDD nao esta sob hook neste projeto' quando este arquivo existe. O bloqueio de verdade NAO acontece aqui: acontece no hook PreToolUse registrado em .claude/settings.json, que executa o script abaixo. Este arquivo e declaracao e documentacao, nao motor.",
+
+  "enabled": true,
+  "armed_at": "2026-08-03",
+  "language": "cpp",
+
+  "enforcement": {
+    "mechanism": "hook PreToolUse do harness (bloqueio real, exit 2)",
+    "registered_in": ".claude/settings.json",
+    "matcher": "Write|Edit|MultiEdit",
+    "script": ".claude/hooks/tdd_guard_cpp.py",
+    "contract": "le o tool-call em JSON no stdin; exit 0 permite, exit 2 mais mensagem no stderr bloqueia a escrita antes dela acontecer"
+  },
+
+  "rule": "Escrever ou editar um arquivo de IMPLEMENTACAO C++ dentro de GusEngine/ e BLOQUEADO enquanto nenhum arquivo de teste mencionar o stem daquele arquivo. Na pratica: escreva o teste Catch2 primeiro, veja-o falhar, e so entao implemente. Editar implementacao que ja tem teste passa normalmente, entao refactor nao trava.",
+
+  "scope": {
+    "enforced": [
+      "GusEngine/core/**/*.{cpp,cc,cxx,hpp,hxx,h}",
+      "GusEngine/domain/**/*.{cpp,cc,cxx,hpp,hxx,h}",
+      "GusEngine/platform/**/*.{cpp,cc,cxx,hpp,hxx,h}"
+    ],
+    "exempt": [
+      "arquivos de teste (qualquer coisa em /tests/ ou casando test_ / _test.)",
+      "GusEngine/app/** (isencao ORIGINAL de 2026-06-21, quando app/ era stub e glue sem logica de negocio)",
+      "tudo fora de GusEngine/"
+    ]
+  },
+
+  "known_limitations": [
+    "A heuristica e ESTRUTURAL, nao semantica: basta um arquivo de teste mencionar o stem para liberar. Um teste que so inclui o header ja conta. E um empurrao barato para o test-first, nao prova de cobertura. A prova de que o teste MORDE vem do mutation testing adversarial, que e disciplina de processo, nao de hook.",
+    "A isencao de GusEngine/app/** foi escrita quando app/ era casca fina. Desde entao app/ ganhou logica de verdade (telas de batalha, menu de save e load, maestro). A isencao pode estar larga demais hoje: ver a pendencia registrada no TODO.md."
+  ],
+
+  "cross_ref": [
+    "CONTRACT.md (TDD obrigatorio)",
+    "docs/arquitetura-principios.md (red/green/refactor)",
+    "TESTES.md (T1 e coberto por este hook e por isso NUNCA vira item da tabela de pendencias)"
+  ]
+}
