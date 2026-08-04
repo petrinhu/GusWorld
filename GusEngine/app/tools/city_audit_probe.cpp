@@ -20,12 +20,15 @@
 #include <iostream>
 #include <string>
 #include <thread>
+#include <vector>
 
 #include <SDL3/SDL.h>
 
 #include "gus/app/maestro_logic.hpp"
 #include "gus/app/screens/city_actors.hpp"
 #include "gus/app/screens/city_patrol.hpp"
+#include "gus/app/screens/city_props.hpp"
+#include "gus/domain/world/scene_prop.hpp"
 #include "gus/app/sdl_window.hpp"
 #include "gus/platform/rmlui/gl3_loader.hpp"
 
@@ -152,6 +155,48 @@ int main() {
                   << city.grid().world_to_cell(city.player_aabb().y +
                                                city.player_aabb().h * 0.5f)
                   << ")\n";
+
+        // ===== ANDAIME EFEMERO DA MONTAGEM DE ESCALA (fatia F) =====
+        // Custo MEDIDO de subir scene_prop_scale: a MESMA escala multiplica a caixa
+        // que BLOQUEIA (scene_prop_solid, domain/src/world/scene_prop.cpp), entao peca
+        // maior come rua. Conta quantas celulas ANDAVEIS do mapa REAL cada escala
+        // sela. AUDIT_SOLID_REPORT=1 liga; nao muda nada do caminho de captura.
+        if (env_int("AUDIT_SOLID_REPORT", 0) == 1) {
+            const gus::core::spatial::TileGrid& g = city.grid();
+            const float ts = g.tile_size();
+            const std::vector<gus::domain::world::ScenePropPlacement> places =
+                gus::app::screens::resolve_city_props(
+                    g, gus::app::screens::kDistritosInferioresDressing,
+                    gus::app::screens::kDistritosInferioresDressingCount);
+            for (const float k : {1.0f, 1.25f, 1.5f, 1.83f, 2.0f}) {
+                int sealed = 0;
+                for (int cy = 0; cy < g.height(); ++cy) {
+                    for (int cx = 0; cx < g.width(); ++cx) {
+                        if (g.is_blocked(cx, cy)) continue;  // ja era parede
+                        const float x0 = static_cast<float>(cx) * ts;
+                        const float y0 = static_cast<float>(cy) * ts;
+                        bool hit = false;
+                        for (const auto& p : places) {
+                            const gus::domain::world::ScenePropDef& d =
+                                gus::domain::world::scene_prop_def(p.kind);
+                            if (!d.solid()) continue;
+                            const gus::core::spatial::Aabb fp =
+                                gus::domain::world::scene_prop_footprint(p, d, ts, k);
+                            const gus::core::spatial::Aabb s =
+                                gus::domain::world::scene_prop_solid(fp, d, ts, k);
+                            if (x0 < s.x + s.w && x0 + ts > s.x && y0 < s.y + s.h &&
+                                y0 + ts > s.y) {
+                                hit = true;
+                                break;
+                            }
+                        }
+                        if (hit) ++sealed;
+                    }
+                }
+                std::cout << "[escala] scene_prop_scale=" << k
+                          << " => celulas ANDAVEIS seladas por peca: " << sealed << "\n";
+            }
+        }
 
         const int steps = env_int("AUDIT_STEPS", 8);
         for (int i = 0; i < steps; ++i) {
