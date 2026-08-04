@@ -320,6 +320,11 @@ add_executable(gusengine_domain_tests
     cards_hw_ops_property_test.cpp
     cards_hw_i18n_registry_test.cpp
     cards_hw_mutation_killers_test.cpp
+    # DEMO-CIDADE-VESTIDA fatia B (TODO.md): regra do MUNDO como dado (ADR-020
+    # decisão 5) - catálogo de peças de cenário + ronda em rota fixa. POCO puro:
+    # nada aqui sabe de textura, tela ou tile_size.
+    scene_prop_test.cpp
+    patrol_route_test.cpp
 )
 
 # Os testes do combate incluem helpers de teste headers-only (fixed_random.hpp).

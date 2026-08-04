@@ -121,6 +121,12 @@ add_library(gusengine_domain STATIC
     # camadas). Chamada por acquire()/craft() em deck_transactions.cpp, no MESMO ponto
     # onde a origem fisica ja foi resolvida (CARDS-HW-3A).
     src/deck/contamination_service.cpp
+    # DEMO-CIDADE-VESTIDA fatia B (TODO.md): a REGRA DO MUNDO como dado (ADR-020
+    # decisão 5) - catálogo de peças de cenário (posição/tamanho/bloqueio derivados
+    # de UMA tabela) e ronda em rota fixa (ida e volta, decisão do líder 2026-08-04).
+    # world/ não inclui combat/ nem deck/: depende só de core/ (Aabb + asset_paths).
+    src/world/scene_prop.cpp
+    src/world/patrol_route.cpp
 )
 
 target_include_directories(gusengine_domain

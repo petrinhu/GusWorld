@@ -79,6 +79,35 @@ inline constexpr std::string_view kBertoldoSpritesDir = "sprites/seu_bertoldo_ca
 inline constexpr std::string_view kBertoldoSpriteSouthFile = "south.png";
 
 // ============================================================================
+// PECAS DE CENARIO DO MUNDO (sob resources/sprites/world/<area>/).
+//
+// DEMO-CIDADE-VESTIDA fatia B1: arte de cenario desenhada em 2026-06-25 (a cidade
+// era so retangulo de cor chapada ate entao). Cada arquivo aqui e UMA LINHA da
+// tabela kMasterSceneProps (gus/domain/world/scene_prop.hpp) - peca nova = arquivo
+// novo + constante aqui + linha la, NUNCA funcao nova (lei do atomo, ADR-019/020).
+//
+// A arte foi autorada a 32 px por TILE (medido: casa 96x96 = 3x3 tiles, poste
+// 32x80 = 1x2.5 tiles, placa 32x48 = 1x1.5 tiles) - o tamanho em tiles e DERIVADO
+// da dimensao do PNG, nao chutado peca a peca (ver kScenePropArtPixelsPerTile).
+// ============================================================================
+
+// Pasta das pecas de cenario dos Distritos Inferiores (1a area do jogo).
+inline constexpr std::string_view kWorldPropsDistritosDir =
+    "sprites/world/distritos_inferiores";
+
+// Uma constante por peca (ordem espelhando o enum ScenePropKind do dominio).
+inline constexpr std::string_view kPropCasaCibergoticaAFile = "casa_cibergotica_a.png";
+inline constexpr std::string_view kPropCasaCibergoticaBFile = "casa_cibergotica_b.png";
+inline constexpr std::string_view kPropPosteNeonCianoFile = "poste_neon_ciano.png";
+inline constexpr std::string_view kPropFonteLatoFile = "fonte_latao.png";
+inline constexpr std::string_view kPropPortaoSulFechadoFile = "portao_sul_fechado.png";
+inline constexpr std::string_view kPropPlacaLoreFile = "placa_lore.png";
+inline constexpr std::string_view kPropTerminalHackFile = "terminal_hack.png";
+inline constexpr std::string_view kPropCoverBoxFile = "cover_box.png";
+inline constexpr std::string_view kPropBoardPuzzleFile = "board_puzzle.png";
+inline constexpr std::string_view kPropHoloSterlingFile = "holo_sterling.png";
+
+// ============================================================================
 // ICONES DA TELA DE BATALHA (sob resources/sprites/icons-m5/). NAO mudou na reorg.
 // ============================================================================
 
