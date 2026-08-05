@@ -618,8 +618,13 @@ void OverworldSim::render(gus::platform::render2d::IRenderer& renderer,
     };
 
     // Monta as entradas ordenaveis (so as ATIVAS/visiveis - o jogador SEMPRE entra).
-    // depth_key = base/pe (y+h): MAIOR = mais "embaixo" na tela = desenha por
-    // ULTIMO = fica na FRENTE (ver depth_sort.hpp).
+    //
+    // CADA entrada leva DUAS coisas (ver depth_sort.hpp): a FATIA DE CHAO que o
+    // desenhavel ocupa e a FAIXA LATERAL do DESENHO. Ate a fatia I ia so um numero
+    // (a base/pe), e um numero nao consegue responder "quem esta atras de quem"
+    // quando o desenho e MUITO maior que a celula: com scene_prop_scale 1,83 uma
+    // casa de 3 celulas ocupa 5,49 de largura e cobre vizinho a duas celulas de
+    // distancia, ainda que o vizinho esteja NIVELADO com a base dela.
     depth_scratch_.clear();
     for (std::size_t i = 0; i < props_.size(); ++i) {
         const ScenePropInstance& p = props_[i];
@@ -631,7 +636,28 @@ void OverworldSim::render(gus::platform::render2d::IRenderer& renderer,
         if (!overlaps(r, view.rect)) {
             continue;
         }
-        depth_scratch_.push_back({p.footprint.y + p.footprint.h, static_cast<int>(i)});
+        gus::core::spatial::DepthEntry e;
+        // A fatia de chao da peca e onde ela PISA, nao o retangulo alto do desenho,
+        // que sobe pelo ar e nao encosta em nada. Duas fontes, e vale a mais funda:
+        //   - a caixa que BLOQUEIA, quando existe (a casa pisa 1,83 celula de
+        //     profundidade na escala do lider);
+        //   - a CELULA em que a peca foi plantada, que e a propria definicao de
+        //     "onde a peca pisa" (ver ScenePropPlacement). E o que salva a peca
+        //     ATRAVESSAVEL: o holograma nao tem caixa nenhuma, e sem este piso
+        //     entraria como uma LINHA - voltando a esconder quem esta ao lado dele.
+        // Peca montada a mao em teste (sem celula de origem) fica so com a caixa.
+        e.ground_front = p.footprint.y + p.footprint.h;
+        e.ground_back = e.ground_front - p.solid.h;
+        if (p.cell_y >= 0) {
+            const float topo_da_celula = static_cast<float>(p.cell_y) * grid_.tile_size();
+            if (topo_da_celula < e.ground_back) {
+                e.ground_back = topo_da_celula;
+            }
+        }
+        e.draw_left = p.footprint.x;
+        e.draw_right = p.footprint.x + p.footprint.w;
+        e.id = static_cast<int>(i);
+        depth_scratch_.push_back(e);
     }
     for (std::size_t i = 0; i < actors_.size(); ++i) {
         const WorldActor& a = actors_[i];
@@ -647,15 +673,40 @@ void OverworldSim::render(gus::platform::render2d::IRenderer& renderer,
                       view.rect)) {
             continue;
         }
-        // A profundidade e a BASE da ancora (onde o ator pisa), nao a do quad
-        // desenhado - o quad "vaza" para cima e daria uma leitura de profundidade
-        // errada para sprites de alturas diferentes.
-        depth_scratch_.push_back(
-            {anchor.y + anchor.h, kActorDepthIdBase + static_cast<int>(i)});
+        gus::core::spatial::DepthEntry e;
+        // A profundidade e a da ANCORA (onde o ator pisa), nao a do quad desenhado -
+        // o quad "vaza" para cima e daria leitura errada para sprites de alturas
+        // diferentes. Ja a faixa LATERAL e a do QUAD, porque e o quad que cobre
+        // pixel de vizinho.
+        e.ground_back = anchor.y;
+        e.ground_front = anchor.y + anchor.h;
+        e.draw_left = rect.x;
+        e.draw_right = rect.x + rect.w;
+        e.id = kActorDepthIdBase + static_cast<int>(i);
+        depth_scratch_.push_back(e);
     }
-    depth_scratch_.push_back({shown.y + shown.h, kPlayerDepthId});
-    gus::core::spatial::sort_by_depth(depth_scratch_.data(),
-                                      static_cast<int>(depth_scratch_.size()));
+    {
+        gus::core::spatial::DepthEntry e;
+        e.ground_back = shown.y;
+        e.ground_front = shown.y + shown.h;
+        if (sprites_.loaded()) {
+            // MESMA formula do desenho logo abaixo (quadrado de N tiles, centrado
+            // em X sobre a hitbox): a faixa lateral tem de ser a do que e PINTADO.
+            const float sprite_w =
+                tuning_.player_sprite_height_tiles * grid_.tile_size();
+            e.draw_left = shown.x + shown.w * 0.5f - sprite_w * 0.5f;
+            e.draw_right = e.draw_left + sprite_w;
+        } else {
+            // Sem arte o desenho e o contorno da propria hitbox.
+            e.draw_left = shown.x;
+            e.draw_right = shown.x + shown.w;
+        }
+        e.id = kPlayerDepthId;
+        depth_scratch_.push_back(e);
+    }
+    gus::core::spatial::sort_by_occlusion(depth_scratch_.data(),
+                                          static_cast<int>(depth_scratch_.size()),
+                                          depth_graph_scratch_);
 
     // Desenha na ORDEM ja resolvida por profundidade. O bloco do jogador (sprite OU
     // fallback de contorno) e chamado atraves da MESMA lambda de sempre - a logica de

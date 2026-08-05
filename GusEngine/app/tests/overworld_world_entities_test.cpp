@@ -298,6 +298,140 @@ TEST_CASE("mundo: peça de CHÃO é pintada antes de todo mundo e nunca esconde 
 }
 
 // ===========================================================================
+//  REGRESSÃO DO CASO RELATADO PELO LÍDER (DEMO-CIDADE-VESTIDA fatia I).
+//
+//  Ele olhou uma captura da cidade e viu o PRÉDIO DESENHADO POR CIMA DO GUS, com
+//  a parede cortando o rosto e o ombro, apesar de o menino estar nivelado com a
+//  base da casa. A aritmética do defeito, medida na cena real:
+//
+//    - a casa cibergótica A tem 3 células na arte e a escala global de peças está
+//      em 1,83, então o DESENHO ocupa 5,49 células: ancorado na célula 8, cobre da
+//      5,75 até a 11,25 - e o jogador estava na célula 10, DENTRO dessa faixa,
+//      a duas células de distância da casa;
+//    - a base do desenho da casa cai na base da célula (y = 44,0), enquanto a
+//      âncora do jogador é uma caixa CENTRADA na célula, cuja base fica 0,4
+//      unidade acima (y = 43,6).
+//
+//  Resultado com a chave escalar de antes: 44,0 > 43,6, a casa desenhava por
+//  último e engolia o menino. E a diferença de 0,4 é ESTRUTURAL, não acidental -
+//  vale para TODA peça contra TODO personagem na mesma linha, em qualquer ponto do
+//  mapa. Nenhuma escolha de número conserta isso: só um modelo que compare a fatia
+//  de chão de cada um, que é o que a ordenação por oclusão faz.
+//
+//  As coordenadas abaixo são as da cena real (grade 90x60 com tile 2,0 do mapa dos
+//  Distritos Inferiores), e a geometria da peça vem do CATÁLOGO de verdade, não
+//  copiada à mão: se a arte, a escala ou a fórmula de ancoragem mudarem, este
+//  teste acompanha em vez de mentir.
+// ===========================================================================
+TEST_CASE("mundo: REGRESSÃO do líder - jogador nivelado com a base da casa fica NA FRENTE",
+          "[overworld][props][depth-sort][regressao-lider]") {
+    constexpr float kTileCidade = 2.0f;
+    constexpr int kCasaCelulaX = 8;
+    constexpr int kCasaCelulaY = 21;
+    constexpr int kJogadorCelulaX = 10;
+
+    OverworldTuning t;  // scene_prop_scale = 1,83, o botão do líder
+    TileGrid grid(90, 60, kTileCidade);
+
+    // Âncora do jogador na célula pedida: caixa de kPlayerHitboxTileFraction do
+    // tile, CENTRADA na célula (a mesma regra de pick_actor_position_at_cell).
+    const auto ancora_na_celula = [&](int cx, int cy) {
+        const float lado = kTileCidade * 0.6f;
+        return Aabb{(static_cast<float>(cx) + 0.5f) * kTileCidade - lado * 0.5f,
+                    (static_cast<float>(cy) + 0.5f) * kTileCidade - lado * 0.5f, lado,
+                    lado};
+    };
+
+    const gus::domain::world::ScenePropPlacement onde{
+        gus::domain::world::ScenePropKind::CasaCibergoticaA, kCasaCelulaX,
+        kCasaCelulaY};
+    const gus::domain::world::ScenePropDef& def =
+        gus::domain::world::scene_prop_def(onde.kind);
+    ScenePropInstance casa;
+    casa.footprint = gus::domain::world::scene_prop_footprint(onde, def, kTileCidade,
+                                                              t.scene_prop_scale);
+    casa.solid = gus::domain::world::scene_prop_solid(casa.footprint, def, kTileCidade,
+                                                      t.scene_prop_scale);
+    casa.tex = 700;
+    casa.cell_x = kCasaCelulaX;
+    casa.cell_y = kCasaCelulaY;
+
+    SECTION("na MESMA linha da base: o menino aparece na frente") {
+        const Aabb jogador = ancora_na_celula(kJogadorCelulaX, kCasaCelulaY);
+        // Trava a premissa do defeito: a base do jogador é MENOR que a da casa (era
+        // exatamente isso que a chave escalar lia), e o desenho da casa cobre ele.
+        REQUIRE(jogador.y + jogador.h < casa.footprint.y + casa.footprint.h);
+        REQUIRE(jogador.x > casa.footprint.x);
+        REQUIRE(jogador.x + jogador.w < casa.footprint.x + casa.footprint.w);
+
+        OverworldSim sim(grid, jogador, t);
+        sim.add_scene_prop(casa);
+
+        RecordingRenderer r;
+        sim.render(r, 4000.0f, 4000.0f, 0.0f);
+        REQUIRE(r.index_of(700) >= 0);
+        REQUIRE(r.index_of(0) >= 0);
+        REQUIRE(r.index_of(700) < r.index_of(0));  // casa antes = jogador NA FRENTE
+    }
+
+    SECTION("duas linhas ao NORTE da base: o menino continua escondido atrás") {
+        // O contrapeso. Consertar o caso de cima não pode fazer o jogador flutuar na
+        // frente de uma casa que ele está claramente contornando por trás - isso
+        // seria trocar um defeito por outro pior, porque o jogador ANDA ali.
+        const Aabb jogador = ancora_na_celula(kJogadorCelulaX, kCasaCelulaY - 2);
+        OverworldSim sim(grid, jogador, t);
+        sim.add_scene_prop(casa);
+
+        RecordingRenderer r;
+        sim.render(r, 4000.0f, 4000.0f, 0.0f);
+        REQUIRE(r.index_of(0) < r.index_of(700));  // jogador antes = ATRÁS da casa
+    }
+
+    SECTION("uma linha ao SUL da base: o menino continua na frente") {
+        const Aabb jogador = ancora_na_celula(kJogadorCelulaX, kCasaCelulaY + 1);
+        OverworldSim sim(grid, jogador, t);
+        sim.add_scene_prop(casa);
+
+        RecordingRenderer r;
+        sim.render(r, 4000.0f, 4000.0f, 0.0f);
+        REQUIRE(r.index_of(700) < r.index_of(0));
+    }
+
+    SECTION("peça ATRAVESSÁVEL (sem caixa que bloqueia) vale pela CÉLULA que pisa") {
+        // O holograma do Sterling é o único de pé que não bloqueia nada: a caixa
+        // sólida dele é degenerada. Sem um piso, a fatia de chão viraria uma LINHA
+        // na base da célula, e o jogador nivelado com ele voltaria a sumir atrás de
+        // uma PROJEÇÃO - o pior lugar possível para o defeito reaparecer, porque
+        // luz não esconde ninguém. Quem segura é a célula em que a peça foi
+        // plantada, que é a própria definição de "onde a peça pisa".
+        const gus::domain::world::ScenePropPlacement onde_holo{
+            gus::domain::world::ScenePropKind::HoloSterling, kCasaCelulaX,
+            kCasaCelulaY};
+        const gus::domain::world::ScenePropDef& holo_def =
+            gus::domain::world::scene_prop_def(onde_holo.kind);
+        ScenePropInstance holo;
+        holo.footprint = gus::domain::world::scene_prop_footprint(
+            onde_holo, holo_def, kTileCidade, t.scene_prop_scale);
+        holo.solid = gus::domain::world::scene_prop_solid(
+            holo.footprint, holo_def, kTileCidade, t.scene_prop_scale);
+        holo.tex = 701;
+        holo.cell_x = kCasaCelulaX;
+        holo.cell_y = kCasaCelulaY;
+        // Trava a premissa: esta peça REALMENTE não tem caixa sólida.
+        REQUIRE(holo.solid.h == 0.0f);
+
+        const Aabb jogador = ancora_na_celula(kCasaCelulaX + 1, kCasaCelulaY);
+        OverworldSim sim(grid, jogador, t);
+        sim.add_scene_prop(holo);
+
+        RecordingRenderer r;
+        sim.render(r, 4000.0f, 4000.0f, 0.0f);
+        REQUIRE(r.index_of(701) >= 0);
+        REQUIRE(r.index_of(701) < r.index_of(0));  // holograma atrás do menino
+    }
+}
+
+// ===========================================================================
 //  B2 - vários NPCs e vários inimigos (os dois slots únicos viraram lista)
 // ===========================================================================
 

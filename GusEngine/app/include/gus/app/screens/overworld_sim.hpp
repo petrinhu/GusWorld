@@ -460,11 +460,13 @@ private:
     int npc_bertoldo_handle_ = kInvalidWorldActor;
 
     // Rascunhos reaproveitados entre quadros (sem alocar no laco de jogo depois do
-    // aquecimento): obstaculos pontuais do passo fixo e entradas do Y-sort. O
-    // segundo e mutable porque o render e const - ele nao muda o mundo, so precisa
-    // de um lugar para ordenar quem desenha antes de quem.
+    // aquecimento): obstaculos pontuais do passo fixo, entradas da ordem de desenho
+    // e os buffers do grafo de oclusao. Os dois ultimos sao mutable porque o render
+    // e const - ele nao muda o mundo, so precisa de um lugar para resolver quem
+    // desenha antes de quem.
     std::vector<gus::core::spatial::Aabb> obstacle_scratch_{};
     mutable std::vector<gus::core::spatial::DepthEntry> depth_scratch_{};
+    mutable gus::core::spatial::DepthSortScratch depth_graph_scratch_{};
 
     // IDLE OFEGANTE (cansado): troca os QUADROS do breathing por TEMPO (AnimClock),
     // num ritmo RAPIDO (idle_tired_breaths_per_minute). So e mostrado quando parado E
