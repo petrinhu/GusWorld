@@ -85,6 +85,36 @@ std::string strip_prefix(std::string_view id, std::string_view prefix) {
     return std::string(id);
 }
 
+// ASSETS-PATH-CASCATA: os 2 ULTIMOS niveis da cadeia (`macro de compilacao` > `relativo
+// ao CWD`), com a MESMA regra que resolve_font (abaixo) ja aplicava: so aceita o candidato
+// do macro se ele EXISTIR no disco; senao desce pro relativo; e se nenhum existir, devolve
+// o "melhor chute" pro erro sair legivel no log.
+//
+// POR QUE ISTO IMPORTA: o macro carrega o caminho ABSOLUTO DA MAQUINA DE BUILD
+// (GUSWORLD_ASSETS_DIR="${CMAKE_SOURCE_DIR}/../resources" e irmas, platform/CMakeLists.txt).
+// Aceita-lo sem checar significa que um binario compilado aqui e copiado pra outra maquina
+// (o caso EXATO do AppImage, RELEASE-DEMO-APPIMAGE) procura em /home/<outro-usuario>/... e
+// NUNCA olha o `resources/` que esta ao lado dele. Seis familias faziam isso; so a de
+// FONTES ja estava certa - dai ela ser o modelo, e nao ter sido tocada.
+//
+// `compiled_candidate` vazio = a macro da familia esta vazia (build sem -D): a cadeia
+// degrada pro relativo, que era exatamente o comportamento anterior nesse caso.
+//
+// A ENV NAO PASSA POR AQUI, de proposito: nas seis familias ela e decisao consciente de
+// quem roda o jogo e continua vencendo SEM checagem de existencia, com a semantica propria
+// de cada uma (override LITERAL em I18N/DIALOGUES; PASTA em SFX/MUSICA/MAPAS/GENERICA).
+// Ver os TEST_CASE "env ... vence mesmo inexistente" em platform/tests/asset_source_test.cpp.
+std::string compiled_or_cwd(const std::string& compiled_candidate,
+                            const std::string& cwd_relative) {
+    if (exists_on_disk(compiled_candidate)) {
+        return compiled_candidate;
+    }
+    if (exists_on_disk(cwd_relative)) {
+        return cwd_relative;
+    }
+    return compiled_candidate.empty() ? cwd_relative : compiled_candidate;
+}
+
 constexpr std::string_view kFontsPrefix = "assets/fonts/";
 // M8 decommission: prefixos migraram de game/translations/ e game/dialogues/ pra
 // resources/translations/ e resources/dialogues/ (git mv preservando historico).
@@ -99,8 +129,11 @@ bool starts_with(std::string_view s, std::string_view prefix) {
 }
 
 // --- FAMILIA FONTES (paridade com font_atlas::resolve_font_path) ------------------
-// Unica familia que faz cascata de EXISTENCIA: env nao pode "sequestrar" a fonte pra
-// uma pasta sem o arquivo (comentario original preservado).
+// Unica familia que checa EXISTENCIA TAMBEM NA ENV: env nao pode "sequestrar" a fonte pra
+// uma pasta sem o arquivo (comentario original preservado). Nas demais familias a env e
+// override consciente e vence sem checagem - so os 2 niveis de baixo passam por
+// compiled_or_cwd (ASSETS-PATH-CASCATA). NAO TOCAR: esta funcao e o MODELO que as outras
+// seis passaram a seguir.
 std::string resolve_font(std::string_view id) {
     const std::string filename = strip_prefix(id, kFontsPrefix);
     const std::string env = env_or_empty("GUSWORLD_ASSETS");
@@ -124,37 +157,37 @@ std::string resolve_font(std::string_view id) {
 }
 
 // --- FAMILIA I18N (paridade com translator::resolve_translations_path) ------------
-// env e OVERRIDE LITERAL (ignora o id por completo) - unica familia assim, pois so
-// existe 1 catalogo hoje e o lider aponta o .md inteiro. Nenhuma checagem de exists.
+// env e OVERRIDE LITERAL (ignora o id por completo) - unica familia assim junto de
+// DIALOGUES, pois so existe 1 catalogo hoje e o lider aponta o .md inteiro. A env nao
+// passa por checagem de exists (decisao consciente de quem roda vence); os 2 niveis
+// abaixo dela sim, via compiled_or_cwd (ASSETS-PATH-CASCATA).
 std::string resolve_translations(std::string_view id) {
     const std::string env = env_or_empty("GUSWORLD_TRANSLATIONS");
     if (!env.empty()) {
         return env;
     }
     const std::string filename = strip_prefix(id, kTranslationsPrefix);
-    const std::string compiled = std::string(GUSWORLD_TRANSLATIONS_DIR);
-    if (!compiled.empty()) {
-        return join(compiled, filename);
-    }
-    return std::string(id);
+    const std::string compiled_dir = std::string(GUSWORLD_TRANSLATIONS_DIR);
+    const std::string compiled =
+        compiled_dir.empty() ? std::string() : join(compiled_dir, filename);
+    return compiled_or_cwd(compiled, std::string(id));
 }
 
 // --- FAMILIA DIALOGUES (paridade com resolve_npc_intro_bertoldo_dialogue_path,
 // npc_dialogue_catalog.cpp, M7-DIALOGO/ASSETS-VFS-F1b) -----------------------------
 // env e OVERRIDE LITERAL (ignora o id por completo) - MESMO padrao da familia I18N
-// (so existe 1 grafo hoje, o lider aponta o .dlg.txt inteiro). Nenhuma checagem de
-// exists.
+// (so existe 1 grafo hoje, o lider aponta o .dlg.txt inteiro), inclusive em nao checar
+// exists na env; os 2 niveis abaixo passam por compiled_or_cwd (ASSETS-PATH-CASCATA).
 std::string resolve_dialogues(std::string_view id) {
     const std::string env = env_or_empty("GUSWORLD_DIALOGUES");
     if (!env.empty()) {
         return env;
     }
     const std::string filename = strip_prefix(id, kDialoguesPrefix);
-    const std::string compiled = std::string(GUSWORLD_DIALOGUES_DIR);
-    if (!compiled.empty()) {
-        return join(compiled, filename);
-    }
-    return std::string(id);
+    const std::string compiled_dir = std::string(GUSWORLD_DIALOGUES_DIR);
+    const std::string compiled =
+        compiled_dir.empty() ? std::string() : join(compiled_dir, filename);
+    return compiled_or_cwd(compiled, std::string(id));
 }
 
 // --- FAMILIA SFX (paridade com resolve_hit_sfx_path/resolve_ui_sfx_path/
@@ -165,11 +198,10 @@ std::string resolve_sfx(std::string_view id) {
     if (!env.empty()) {
         return join(env, filename);
     }
-    const std::string compiled = std::string(GUSWORLD_SFX_DIR);
-    if (!compiled.empty()) {
-        return join(compiled, filename);
-    }
-    return std::string(id);
+    const std::string compiled_dir = std::string(GUSWORLD_SFX_DIR);
+    const std::string compiled =
+        compiled_dir.empty() ? std::string() : join(compiled_dir, filename);
+    return compiled_or_cwd(compiled, std::string(id));
 }
 
 // --- FAMILIA MUSICA (paridade com resolve_music_path) -----------------------------
@@ -179,30 +211,28 @@ std::string resolve_music(std::string_view id) {
     if (!env.empty()) {
         return join(env, filename);
     }
-    const std::string compiled = std::string(GUSWORLD_MUSIC_DIR);
-    if (!compiled.empty()) {
-        return join(compiled, filename);
-    }
-    return std::string(id);
+    const std::string compiled_dir = std::string(GUSWORLD_MUSIC_DIR);
+    const std::string compiled =
+        compiled_dir.empty() ? std::string() : join(compiled_dir, filename);
+    return compiled_or_cwd(compiled, std::string(id));
 }
 
 // --- FAMILIA MAPAS (paridade com city_scene.cpp::resolve_distritos_inferiores_gmap,
 // ASSETS-VFS-F1c) -------------------------------------------------------------------
 // MESMO padrao de SFX/MUSICA: env e uma PASTA (juntada so ao NOME do arquivo, via
 // strip_prefix), NAO um override literal do id inteiro (diferente de I18N/DIALOGUES).
-// Nenhuma checagem de exists (paridade com o resolver original, que tambem nunca
-// verificava o disco).
+// A env segue sem checagem de exists (paridade com o resolver original); o macro e o
+// relativo passam por compiled_or_cwd (ASSETS-PATH-CASCATA).
 std::string resolve_maps(std::string_view id) {
     const std::string filename = strip_prefix(id, kMapsPrefix);
     const std::string env = env_or_empty("GUSWORLD_MAPS");
     if (!env.empty()) {
         return join(env, filename);
     }
-    const std::string compiled = std::string(GUSWORLD_MAPS_DIR);
-    if (!compiled.empty()) {
-        return join(compiled, filename);
-    }
-    return std::string(id);
+    const std::string compiled_dir = std::string(GUSWORLD_MAPS_DIR);
+    const std::string compiled =
+        compiled_dir.empty() ? std::string() : join(compiled_dir, filename);
+    return compiled_or_cwd(compiled, std::string(id));
 }
 
 // --- FAMILIA GENERICA (paridade com resolve_sprites_dir/resolve_gus_sprites_dir/
@@ -212,11 +242,11 @@ std::string resolve_generic(std::string_view id) {
     if (!env.empty()) {
         return join(env, std::string(id));
     }
-    const std::string compiled = std::string(GUSWORLD_ASSETS_DIR);
-    if (!compiled.empty()) {
-        return join(compiled, std::string(id));
-    }
-    return join("resources", std::string(id));
+    const std::string compiled_dir = std::string(GUSWORLD_ASSETS_DIR);
+    const std::string compiled =
+        compiled_dir.empty() ? std::string() : join(compiled_dir, std::string(id));
+    // Unica familia cujo 3o nivel NAO e o id cru: a raiz relativa e "resources/".
+    return compiled_or_cwd(compiled, join("resources", std::string(id)));
 }
 
 // Dispatcher por PREFIXO do id (ver header pra tabela completa por familia).

@@ -144,6 +144,28 @@ public:
     TempDir() : gus::test_support::ScopedTempDir("gusworld_asset_source_test") {}
 };
 
+// RAII: troca o diretorio de trabalho do processo e restaura no fim do escopo.
+// ASSETS-PATH-CASCATA: e o unico jeito de exercitar o TERCEIRO nivel da cascata
+// (`relativo ao CWD`) sem mexer nas macros, que sao fixadas em tempo de COMPILACAO.
+// Declarar SEMPRE depois do TempDir que ele aponta, pra destruicao em ordem reversa
+// restaurar o CWD ANTES do remove_all (remover a pasta em que se esta parado deixaria o
+// processo com um CWD invalido).
+class ScopedCwd {
+public:
+    explicit ScopedCwd(const fs::path& p) : prev_(fs::current_path()) {
+        fs::current_path(p);
+    }
+    ~ScopedCwd() {
+        std::error_code ec;
+        fs::current_path(prev_, ec);
+    }
+    ScopedCwd(const ScopedCwd&) = delete;
+    ScopedCwd& operator=(const ScopedCwd&) = delete;
+
+private:
+    fs::path prev_;
+};
+
 void write_file(const fs::path& p, const std::string& content) {
     std::error_code ec;
     fs::create_directories(p.parent_path(), ec);
@@ -367,6 +389,322 @@ TEST_CASE("FilesystemAssetSource familia MAPAS: sem env cai no macro/CWD",
     const std::string expected =
         !compiled.empty() ? join(compiled, "distritos_inferiores.gmap") : id;
     REQUIRE(src.resolve_path(id) == expected);
+}
+
+// ============================================================ ASSETS-PATH-CASCATA
+// O macro embutido pelo CMake carrega o caminho ABSOLUTO DA MAQUINA DE BUILD
+// (GUSWORLD_ASSETS_DIR="${CMAKE_SOURCE_DIR}/../resources" e irmas). Ate esta fatia, SEIS
+// familias aceitavam esse macro SEM checar o disco, entao nunca chegavam ao 3o nivel da
+// cadeia (`relativo ao CWD`): um binario compilado numa maquina e copiado pra outra (o caso
+// EXATO do AppImage de RELEASE-DEMO-APPIMAGE) procurava em /home/<outro-usuario>/... e nunca
+// olhava o `resources/` que estava ao lado dele. A familia FONTES ja fazia a cascata certa e
+// e o modelo seguido aqui.
+//
+// COMO ESTES TESTES EXERCITAM O 3o NIVEL: as macros sao fixadas em tempo de COMPILACAO e nao
+// dao pra variar em runtime; o que se varia e o OUTRO lado da comparacao - o processo passa a
+// rodar de um CWD temporario onde o caminho relativo da familia EXISTE, enquanto o id pedido
+// nao existe sob o macro. E o mesmo cenario do jogo empacotado.
+//
+// LIMITE DA MUDANCA (proposital): so o nivel do MACRO ganhou checagem de existencia. A env
+// continua vencendo SEM checagem nas seis familias, com a semantica propria de cada uma
+// (override LITERAL em I18N/DIALOGUES; PASTA em SFX/MUSICA/MAPAS/GENERICA) - os casos "env
+// aponta pra caminho INEXISTENTE e AINDA ASSIM vence" abaixo travam isso.
+
+TEST_CASE(
+    "ASSETS-PATH-CASCATA familia GENERICA: macro inexistente cai no relativo ao CWD",
+    "[asset_source]") {
+    ScopedUnsetEnv no_env("GUSWORLD_ASSETS");
+    TempDir dir;
+    const std::string id = "sprites/zz_cascata_inexistente_sob_o_macro.png";
+    const std::string cwd_rel = join("resources", id);
+    write_file(dir.path() / cwd_rel, "PNGDATA");
+    ScopedCwd cwd(dir.path());  // depois do TempDir: destroi antes dele (ordem reversa)
+
+    FilesystemAssetSource src;
+    REQUIRE(src.resolve_path(id) == cwd_rel);
+    const auto bytes = src.read(id);
+    REQUIRE(bytes.has_value());
+    REQUIRE(bytes->size() == std::string("PNGDATA").size());
+}
+
+TEST_CASE(
+    "ASSETS-PATH-CASCATA familia GENERICA: macro EXISTENTE continua vencendo o relativo",
+    "[asset_source]") {
+    ScopedUnsetEnv no_env("GUSWORLD_ASSETS");
+    TempDir dir;
+    const std::string id = "sprites/caua_volt/south.png";  // existe sob o macro (repo real)
+    write_file(dir.path() / join("resources", id), "HOMONIMO");  // isca no CWD
+    ScopedCwd cwd(dir.path());
+
+    FilesystemAssetSource src;
+    const std::string compiled = GUSWORLD_ASSETS_DIR;
+    REQUIRE_FALSE(compiled.empty());
+    REQUIRE(src.resolve_path(id) == join(compiled, id));
+}
+
+TEST_CASE(
+    "ASSETS-PATH-CASCATA familia GENERICA: nada existe devolve o melhor chute (macro)",
+    "[asset_source]") {
+    ScopedUnsetEnv no_env("GUSWORLD_ASSETS");
+    TempDir dir;
+    ScopedCwd cwd(dir.path());
+
+    FilesystemAssetSource src;
+    const std::string id = "sprites/zz_nao_existe_em_lugar_nenhum.png";
+    const std::string compiled = GUSWORLD_ASSETS_DIR;
+    const std::string expected =
+        !compiled.empty() ? join(compiled, id) : join("resources", id);
+    REQUIRE(src.resolve_path(id) == expected);  // log aponta o caminho esperado
+    REQUIRE_FALSE(src.read(id).has_value());    // e nao crasha
+}
+
+TEST_CASE(
+    "ASSETS-PATH-CASCATA familia GENERICA: env vence mesmo apontando pra pasta inexistente",
+    "[asset_source]") {
+    TempDir dir;
+    const std::string root = (dir.path() / "pasta_que_nao_existe").string();
+    ScopedEnv env("GUSWORLD_ASSETS", root);
+    ScopedCwd cwd(dir.path());
+
+    FilesystemAssetSource src;
+    const std::string id = "sprites/caua_volt/south.png";  // existe sob o macro
+    REQUIRE(src.resolve_path(id) == join(root, id));       // env manda assim mesmo
+}
+
+TEST_CASE("ASSETS-PATH-CASCATA familia I18N: macro inexistente cai no relativo ao CWD",
+          "[asset_source]") {
+    ScopedUnsetEnv no_env("GUSWORLD_TRANSLATIONS");
+    TempDir dir;
+    const std::string id = "resources/translations/zz_cascata.md";
+    write_file(dir.path() / id, "## X\nvalor\n");
+    ScopedCwd cwd(dir.path());
+
+    FilesystemAssetSource src;
+    REQUIRE(src.resolve_path(id) == id);
+    REQUIRE(src.read(id).has_value());
+}
+
+TEST_CASE("ASSETS-PATH-CASCATA familia I18N: macro EXISTENTE vence, e nada-existe cai no chute",
+          "[asset_source]") {
+    ScopedUnsetEnv no_env("GUSWORLD_TRANSLATIONS");
+    TempDir dir;
+    const std::string id = "resources/translations/pt_br.md";  // existe sob o macro
+    write_file(dir.path() / id, "ISCA");
+    ScopedCwd cwd(dir.path());
+
+    FilesystemAssetSource src;
+    const std::string compiled = GUSWORLD_TRANSLATIONS_DIR;
+    REQUIRE_FALSE(compiled.empty());
+    REQUIRE(src.resolve_path(id) == join(compiled, "pt_br.md"));
+
+    const std::string ausente = "resources/translations/zz_nem_aqui_nem_la.md";
+    REQUIRE(src.resolve_path(ausente) == join(compiled, "zz_nem_aqui_nem_la.md"));
+    REQUIRE_FALSE(src.read(ausente).has_value());
+}
+
+TEST_CASE(
+    "ASSETS-PATH-CASCATA familia I18N: env e override LITERAL e vence mesmo inexistente",
+    "[asset_source]") {
+    TempDir dir;
+    const std::string literal = (dir.path() / "nao_gravado.md").string();
+    ScopedEnv env("GUSWORLD_TRANSLATIONS", literal);
+    ScopedCwd cwd(dir.path());
+
+    FilesystemAssetSource src;
+    // Ignora o id INTEIRO (nao junta com o nome do arquivo) e nao checa o disco.
+    REQUIRE(src.resolve_path("resources/translations/pt_br.md") == literal);
+}
+
+TEST_CASE("ASSETS-PATH-CASCATA familia DIALOGUES: macro inexistente cai no relativo ao CWD",
+          "[asset_source]") {
+    ScopedUnsetEnv no_env("GUSWORLD_DIALOGUES");
+    TempDir dir;
+    const std::string id = "resources/dialogues/zz_cascata.dlg.txt";
+    write_file(dir.path() / id, "@dialogue zz\n");
+    ScopedCwd cwd(dir.path());
+
+    FilesystemAssetSource src;
+    REQUIRE(src.resolve_path(id) == id);
+    REQUIRE(src.read(id).has_value());
+}
+
+TEST_CASE(
+    "ASSETS-PATH-CASCATA familia DIALOGUES: macro EXISTENTE vence, e nada-existe cai no chute",
+    "[asset_source]") {
+    ScopedUnsetEnv no_env("GUSWORLD_DIALOGUES");
+    TempDir dir;
+    const std::string id = "resources/dialogues/npc_intro_bertoldo.dlg.txt";
+    write_file(dir.path() / id, "ISCA");
+    ScopedCwd cwd(dir.path());
+
+    FilesystemAssetSource src;
+    const std::string compiled = GUSWORLD_DIALOGUES_DIR;
+    REQUIRE_FALSE(compiled.empty());
+    REQUIRE(src.resolve_path(id) == join(compiled, "npc_intro_bertoldo.dlg.txt"));
+
+    const std::string ausente = "resources/dialogues/zz_nem_aqui_nem_la.dlg.txt";
+    REQUIRE(src.resolve_path(ausente) == join(compiled, "zz_nem_aqui_nem_la.dlg.txt"));
+    REQUIRE_FALSE(src.read(ausente).has_value());
+}
+
+TEST_CASE(
+    "ASSETS-PATH-CASCATA familia DIALOGUES: env e override LITERAL e vence mesmo inexistente",
+    "[asset_source]") {
+    TempDir dir;
+    const std::string literal = (dir.path() / "nao_gravado.dlg.txt").string();
+    ScopedEnv env("GUSWORLD_DIALOGUES", literal);
+    ScopedCwd cwd(dir.path());
+
+    FilesystemAssetSource src;
+    REQUIRE(src.resolve_path("resources/dialogues/npc_intro_bertoldo.dlg.txt") == literal);
+}
+
+TEST_CASE("ASSETS-PATH-CASCATA familia SFX: macro inexistente cai no relativo ao CWD",
+          "[asset_source]") {
+    ScopedUnsetEnv no_env("GUSWORLD_SFX");
+    TempDir dir;
+    const std::string id = "assets/sfx/zz_cascata.wav";
+    write_file(dir.path() / id, "RIFFFAKE");
+    ScopedCwd cwd(dir.path());
+
+    FilesystemAssetSource src;
+    REQUIRE(src.resolve_path(id) == id);
+    REQUIRE(src.read(id).has_value());
+}
+
+TEST_CASE("ASSETS-PATH-CASCATA familia SFX: macro EXISTENTE vence, e nada-existe cai no chute",
+          "[asset_source]") {
+    ScopedUnsetEnv no_env("GUSWORLD_SFX");
+    TempDir dir;
+    const std::string id = "assets/sfx/hit_digital_provisorio.wav";
+    write_file(dir.path() / id, "ISCA");
+    ScopedCwd cwd(dir.path());
+
+    FilesystemAssetSource src;
+    const std::string compiled = GUSWORLD_SFX_DIR;
+    REQUIRE_FALSE(compiled.empty());
+    REQUIRE(src.resolve_path(id) == join(compiled, "hit_digital_provisorio.wav"));
+
+    const std::string ausente = "assets/sfx/zz_nem_aqui_nem_la.wav";
+    REQUIRE(src.resolve_path(ausente) == join(compiled, "zz_nem_aqui_nem_la.wav"));
+    REQUIRE_FALSE(src.read(ausente).has_value());
+}
+
+TEST_CASE("ASSETS-PATH-CASCATA familia SFX: env e PASTA e vence mesmo inexistente",
+          "[asset_source]") {
+    TempDir dir;
+    const std::string root = (dir.path() / "pasta_que_nao_existe").string();
+    ScopedEnv env("GUSWORLD_SFX", root);
+    ScopedCwd cwd(dir.path());
+
+    FilesystemAssetSource src;
+    // Junta so o NOME do arquivo (nao o id inteiro) e nao checa o disco.
+    REQUIRE(src.resolve_path("assets/sfx/hit_digital_provisorio.wav") ==
+            join(root, "hit_digital_provisorio.wav"));
+}
+
+TEST_CASE("ASSETS-PATH-CASCATA familia MUSICA: macro inexistente cai no relativo ao CWD",
+          "[asset_source]") {
+    ScopedUnsetEnv no_env("GUSWORLD_MUSIC");
+    TempDir dir;
+    const std::string id = "assets/music/zz_cascata.mp3";
+    write_file(dir.path() / id, "ID3FAKE");
+    ScopedCwd cwd(dir.path());
+
+    FilesystemAssetSource src;
+    REQUIRE(src.resolve_path(id) == id);
+    REQUIRE(src.read(id).has_value());
+}
+
+TEST_CASE(
+    "ASSETS-PATH-CASCATA familia MUSICA: macro EXISTENTE vence, e nada-existe cai no chute",
+    "[asset_source]") {
+    ScopedUnsetEnv no_env("GUSWORLD_MUSIC");
+    TempDir dir;
+    const std::string id = "assets/music/cidade_tema_provisorio.mp3";
+    write_file(dir.path() / id, "ISCA");
+    ScopedCwd cwd(dir.path());
+
+    FilesystemAssetSource src;
+    const std::string compiled = GUSWORLD_MUSIC_DIR;
+    REQUIRE_FALSE(compiled.empty());
+    REQUIRE(src.resolve_path(id) == join(compiled, "cidade_tema_provisorio.mp3"));
+
+    const std::string ausente = "assets/music/zz_nem_aqui_nem_la.mp3";
+    REQUIRE(src.resolve_path(ausente) == join(compiled, "zz_nem_aqui_nem_la.mp3"));
+    REQUIRE_FALSE(src.read(ausente).has_value());
+}
+
+TEST_CASE("ASSETS-PATH-CASCATA familia MUSICA: env e PASTA e vence mesmo inexistente",
+          "[asset_source]") {
+    TempDir dir;
+    const std::string root = (dir.path() / "pasta_que_nao_existe").string();
+    ScopedEnv env("GUSWORLD_MUSIC", root);
+    ScopedCwd cwd(dir.path());
+
+    FilesystemAssetSource src;
+    REQUIRE(src.resolve_path("assets/music/cidade_tema_provisorio.mp3") ==
+            join(root, "cidade_tema_provisorio.mp3"));
+}
+
+TEST_CASE("ASSETS-PATH-CASCATA familia MAPAS: macro inexistente cai no relativo ao CWD",
+          "[asset_source]") {
+    ScopedUnsetEnv no_env("GUSWORLD_MAPS");
+    TempDir dir;
+    const std::string id = "assets/maps/compiled/zz_cascata.gmap";
+    write_file(dir.path() / id, "GMAPFAKE");
+    ScopedCwd cwd(dir.path());
+
+    FilesystemAssetSource src;
+    REQUIRE(src.resolve_path(id) == id);
+    REQUIRE(src.read(id).has_value());
+}
+
+TEST_CASE(
+    "ASSETS-PATH-CASCATA familia MAPAS: macro EXISTENTE vence, e nada-existe cai no chute",
+    "[asset_source]") {
+    ScopedUnsetEnv no_env("GUSWORLD_MAPS");
+    TempDir dir;
+    const std::string id = "assets/maps/compiled/distritos_inferiores.gmap";
+    write_file(dir.path() / id, "ISCA");
+    ScopedCwd cwd(dir.path());
+
+    FilesystemAssetSource src;
+    const std::string compiled = GUSWORLD_MAPS_DIR;
+    REQUIRE_FALSE(compiled.empty());
+    REQUIRE(src.resolve_path(id) == join(compiled, "distritos_inferiores.gmap"));
+
+    const std::string ausente = "assets/maps/compiled/zz_nem_aqui_nem_la.gmap";
+    REQUIRE(src.resolve_path(ausente) == join(compiled, "zz_nem_aqui_nem_la.gmap"));
+    REQUIRE_FALSE(src.read(ausente).has_value());
+}
+
+TEST_CASE("ASSETS-PATH-CASCATA familia MAPAS: env e PASTA e vence mesmo inexistente",
+          "[asset_source]") {
+    TempDir dir;
+    const std::string root = (dir.path() / "pasta_que_nao_existe").string();
+    ScopedEnv env("GUSWORLD_MAPS", root);
+    ScopedCwd cwd(dir.path());
+
+    FilesystemAssetSource src;
+    REQUIRE(src.resolve_path("assets/maps/compiled/distritos_inferiores.gmap") ==
+            join(root, "distritos_inferiores.gmap"));
+}
+
+TEST_CASE(
+    "ASSETS-PATH-CASCATA familia FONTES: cascata de existencia INTACTA (modelo, nao "
+    "regride)",
+    "[asset_source]") {
+    ScopedUnsetEnv no_env("GUSWORLD_ASSETS");
+    TempDir dir;
+    const std::string id = "assets/fonts/zz_cascata.ttf";
+    write_file(dir.path() / id, "FAKEFONT");
+    ScopedCwd cwd(dir.path());
+
+    FilesystemAssetSource src;
+    // A fonte ja fazia isto ANTES desta fatia - o teste existe pra travar o modelo.
+    REQUIRE(src.resolve_path(id) == id);
+    REQUIRE(src.read(id).has_value());
 }
 
 // ---------------------------------------------------------------- FakeAssetSource (double)

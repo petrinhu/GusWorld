@@ -94,13 +94,20 @@ public:
 //                ASSETS-VFS-F1c).
 //   - generico (sprites/images/vfx/...): GUSWORLD_ASSETS > macro GUSWORLD_ASSETS_DIR >
 //                relativo a "resources/" (CWD).
-// SO a familia de FONTES verifica existencia em cada candidato (paridade com o
-// comportamento anterior de font_atlas::resolve_font_path); as demais usam o PRIMEIRO
-// candidato com raiz nao-vazia, sem checar o disco (paridade com resolve_sprites_dir/
-// resolve_hit_sfx_path/resolve_music_path/resolve_translations_path/
-// resolve_npc_intro_bertoldo_dialogue_path, que tambem nunca verificavam existencia -
-// read()/stat() e quem acaba falhando se o caminho estiver errado, exatamente como o
-// comportamento de hoje).
+// CHECAGEM DE EXISTENCIA (ASSETS-PATH-CASCATA, pre-requisito de RELEASE-DEMO-APPIMAGE):
+// TODAS as familias checam existencia nos 2 niveis de baixo - so aceitam o candidato do
+// MACRO se ele existir no disco, senao descem pro relativo ao CWD; se nenhum existir,
+// devolvem o "melhor chute" (o do macro) pro erro sair legivel no log. Motivo: o macro
+// carrega o caminho ABSOLUTO DA MAQUINA DE BUILD, entao aceita-lo as cegas faz um binario
+// copiado pra outra maquina (AppImage) procurar em /home/<outro-usuario>/... e nunca olhar
+// o `resources/` que esta ao lado dele. Ate esta fatia so a familia de FONTES fazia isso
+// certo (as demais herdaram dos resolvers originais o "usa o primeiro candidato com raiz
+// nao-vazia", que era descuido, nao desenho).
+// A ENV continua FORA dessa checagem em TODAS as familias exceto FONTES: e decisao
+// consciente de quem roda o jogo e vence sem consultar o disco (em FONTES a checagem da
+// env e comportamento antigo e proposital - env nao pode "sequestrar" a fonte pra uma
+// pasta sem o arquivo). read()/stat() continuam sendo quem falha se o caminho final
+// estiver errado.
 class FilesystemAssetSource final : public AssetSource {
 public:
     [[nodiscard]] std::optional<std::vector<std::byte>> read(
