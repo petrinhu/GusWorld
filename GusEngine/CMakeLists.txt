@@ -637,6 +637,90 @@ set(GLINTFX_MODULE_DRAW2D    ON  CACHE BOOL "" FORCE)
 # funcional e version()==0.29.0 - confirmado por medicao, nao por confianca. Build local +
 # suite completa + tools/check.sh verdes no pin novo antes deste commit (numeros no relatorio
 # da fatia BUMP-GLINTFX-V029).
+#
+# BUMP v0.29.0 -> v0.30.0 (BUMP-GLINTFX-V030, 2026-08-05): SO o GIT_TAG, ZERO ajuste de codigo
+# de producao. ⚠️ A NOTA DE ENTRADA E UMA CORRECAO DE ESCOPO, e ela e o achado principal desta
+# fatia: a release foi anunciada como "a onda RMLX-0 nao tocou a superficie publica (zero
+# mudanca em glintfx/include/ e em *.rcss/*.rml)". Isso e VERDADE SOBRE A ONDA RMLX-0 e FALSO
+# SOBRE A TAG v0.30.0 - a tag carrega MUITO mais que a RMLX-0. Medido por enumeracao dos 21
+# headers publicos das duas tags, baixados um a um e diffados byte-a-byte (mesmo metodo do bump
+# v0.29.0, que existe justamente porque "diff de assinatura nao basta"): 5 headers MUDARAM
+# (app.hpp, clock.hpp, ui_layer.hpp com codigo; frame_capture.hpp e gl_proc.hpp so comentario,
+# 0 linha nao-comentario) e 1 header NOVO entrou (scroll_types.hpp, 20 -> 21 arquivos). Aceitar
+# a frase do anuncio pelo valor de face teria pulado a conferencia inteira. Nada disso quebrou
+# nada aqui, mas o motivo e medicao, nao sorte - ver o paragrafo do load_gl abaixo.
+#   - Flags GLINTFX_MODULE_*/GLINTFX_BACKEND_GLFW/GLINTFX_OWN_FONT_ENGINE: conjunto de NOMES
+#     IDENTICO entre v0.29.0 e v0.30.0 (diff do grep `GLINTFX_[A-Z0-9_]+` ordenado dos dois
+#     CMakeLists.txt deles = VAZIO, 19 nomes de cada lado). O CMakeLists deles tem 4 hunks nesta
+#     release, e os 4 sao a mesma coisa: os fontes de UI migraram de `src/` pra `src/rml/`
+#     (render_gl3/bootstrap/data_binder/font_engine_own/decorator_*/fx/effects_gl3), mais
+#     `src/rml/input_map.cpp` NOVO (traducao glintfx::Key -> Rml::Input, extraida de engine.cpp
+#     pra aquele arquivo deixar de incluir RmlUi). ZERO flag nova, ZERO gate novo, ZERO valor de
+#     default mudado - nada a setar do nosso lado. Confirmado que TEXT/FX/AUDIO seguem ON,
+#     GAMEPAD ON so em Linux, I18N/WINDOW/APP OFF, BACKEND_GLFW OFF (embed) e OWN_FONT_ENGINE
+#     OFF (FreeType fica), exatamente como os `set(... FORCE)` acima ja fixam.
+#   - Guard de plataforma do libm em glintfx_audio: continua por COMPILADOR, nao por plataforma
+#     (`target_link_libraries(glintfx_audio PRIVATE ... $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:m>)`,
+#     linha 1398 do CMakeLists deles na v0.30.0) - o shim de 3 linhas que a v0.18.0 exigiu por
+#     causa do LNK1181 no MinGW continua desnecessario.
+#   - Pin do RmlUi deles continua no MESMO SHA 2cd28864ae25ed345b70598751703a5433b12356 (linha
+#     752 deles na v0.30.0), igual ao declarado na linha 100 deste arquivo; e o patch
+#     patches/rmlui-2cd28864-teardown-ub.patch da tag v0.30.0 e IDENTICO byte-a-byte ao nosso
+#     vendorizado em GusEngine/patches/ (md5 4a5f04a1cd8683ee01d48dd3b2da035a nos dois, `diff`
+#     limpo) - o PATCH_COMMAND da NOSSA Declare(RmlUi) segue aplicando o mesmo conteudo.
+#   - Vendors deles: arvore GIT recursiva das duas tags comparada por SHA DE BLOB + path
+#     (`gh api .../git/trees/v0.{29,30}.0?recursive=true`), nao so por path - diff VAZIO nos 19
+#     arquivos. Os 4 diretorios seguem os mesmos (gamecontrollerdb/khronos/miniaudio/stb), ZERO
+#     arquivo novo, ZERO removido, ZERO byte alterado (nem o SPDX interno, que foi o unico delta
+#     do bump anterior). NOTA DE METODO, na mesma linhagem da correcao `ls` -> `find` da v0.27.0
+#     e da comparacao arquivo-a-arquivo da v0.28.0: comparar PATH nao prova CONTEUDO. A primeira
+#     passada desta fatia comparou so os paths e teria assinado "identico" sem ter olhado um byte
+#     de conteudo; a comparacao por SHA de blob e o minimo que responde a pergunta certa.
+#     THIRD-PARTY-LICENSES.md NAO precisou de linha nova (nenhuma entrada nova pra classificar
+#     entre "entra no binario" e "so build"), so da atualizacao do numero do pin.
+#   - Licenca: v0.30.0 segue Apache-2.0 (LICENSE na raiz deles = "Apache License, Version 2.0";
+#     NOTICE com o cabecalho Apache e o aviso "AS IS"). A v0.29.0 continua sendo a tag de corte
+#     MPL-2.0 -> Apache-2.0; nada mudou de regime nesta.
+#   - ⚠️ DEFEITO DELES, registrado e NAO contornado (nao afeta build, nao bloqueia a fatia): a
+#     tag v0.30.0 NAO bumpou a versao do projeto. `project(glintfx ... VERSION 0.29.0)` esta
+#     literal na linha 3 do CMakeLists.txt DELES na tag v0.30.0, e como o config.hpp.in injeta
+#     `#define GLINTFX_VERSION "@PROJECT_VERSION@"`, o config.hpp GERADO aqui
+#     (build/linux-release/_deps/glintfx-build/include/glintfx/config.hpp:164) diz "0.29.0"
+#     rodando a v0.30.0 - ou seja, `glintfx::version()` MENTE nesta release. Conferido no header
+#     GERADO, nao no declarativo (mesma disciplina dos 3 bumps anteriores), e e exatamente por
+#     essa disciplina que apareceu. Na mesma linha, o CHANGELOG.md deles na tag NAO tem secao
+#     `## [0.30.0]`: todo o conteudo desta release esta sob `## [Unreleased]`. Consequencia
+#     pratica pra nos: NENHUMA (nao lemos version() em lugar nenhum do repo), mas quem for
+#     depurar por GLINTFX_VERSION vai ler o numero errado. Reportado a eles pelo bus.
+#   - API nova, ADITIVA, NAO consumida nesta fatia (bump e alinhamento de pin): `App::
+#     is_scancode_down(int)`, `UiLayer/App::set_cursor_callback(std::function<void(const char*)>)`,
+#     `UiLayer/App::scroll_element_into_view(const char*, ScrollAlign)` + o header novo
+#     `<glintfx/scroll_types.hpp>` que traz o enum ScrollAlign, `UiLayer/App::ready() const
+#     noexcept`, e `glintfx::sleep_ms(std::uint64_t)` em <glintfx/clock.hpp>. Nenhuma remocao,
+#     nenhuma renomeacao de simbolo, nenhuma mudanca de assinatura existente.
+#   - ⚠️ `UiLayerConfig::load_gl` virou `[[deprecated]]` nesta release (SEED-LOADGL-NOME),
+#     substituido por `assume_gl_loaded` com POLARIDADE INVERTIDA (`load_gl=false` <=>
+#     `assume_gl_loaded=true`), e eles anunciam remocao "nao antes da v0.31". Os campos novos
+#     (`assume_gl_loaded`, `gl_proc_resolver`) entraram no FIM da struct, DEPOIS de `font_engine`
+#     - a ordem dos 5 campos anteriores (logical_width, logical_height, load_gl, dp_ratio,
+#     font_engine) esta PRESERVADA, o que importa porque os nossos ~18 sitios constroem o
+#     UiLayerConfig por AGREGADO POSICIONAL (`{960, 540, /*load_gl=*/true, dp_ratio, ...}` - o
+#     `/*load_gl=*/` ali e COMENTARIO, nao designated initializer). Medido que o `[[deprecated]]`
+#     NAO dispara warning nenhum aqui (rebuild forcado dos 4 arquivos que constroem o config,
+#     saida limpa de `deprecat|warning|error`): init posicional nao NOMEIA o membro, entao o
+#     atributo nao e acionado. ⚠️ DIVIDA DATADA, que esta init posicional cria pra v0.31: no dia
+#     em que `load_gl` for REMOVIDO da struct, todo sitio posicional desloca em silencio um campo
+#     pra esquerda (o `true` do slot 3 cai em `dp_ratio`), e o comentario `/*load_gl=*/` vai
+#     continuar dizendo a coisa errada em cada um deles sem o compilador ter como reclamar do
+#     comentario. Migrar os sitios pra designated initializers ANTES do bump da v0.31 e o
+#     conserto barato; deixar pra descobrir no bump e o caro. Nao feito aqui (fora do escopo
+#     desta fatia, que e alinhamento de pin) - item proprio no TODO.
+# Build local + suite completa (2905 testes, 2905 passando, MESMA contagem da baseline - o bump
+# nao soma nem remove teste nosso, e nenhum dos 2 flakes conhecidos de display/audio caiu) +
+# tools/check.sh (todos os gates verdes) no pin novo antes deste commit. Checkout do _deps
+# CONFERIDO no disco, nao presumido do reconfigure: `git log -1` em _deps/glintfx-src devolve
+# 38a301c7cbdd657efcdc631da0a38661bff59c6c (HEAD, tag: v0.30.0), e `glintfx/src/rml/` (a marca
+# estrutural desta release) existe na arvore baixada.
 
 FetchContent_Declare(
     glintfx
@@ -646,7 +730,7 @@ FetchContent_Declare(
     # evidencia, nao presumida: a tag v0.20.0 tem o MESMO sha nos dois hosts
     # (9bfaabfa, apontando pro commit 0442dd15 que ja esta no nosso _deps).
     GIT_REPOSITORY https://github.com/petrinhu/glintfx
-    GIT_TAG        v0.29.0
+    GIT_TAG        v0.30.0
     SOURCE_SUBDIR  glintfx
 )
 FetchContent_MakeAvailable(glintfx)
