@@ -55,9 +55,15 @@ FORA DE ESCOPO (de proposito, NAO e omissao)
   proprio construtor, logo `app` tem de nascer primeiro e morre por ultimo);
   o remedio seria desarmar o callback antes do fim do escopo.
 - Desarmar o callback no destrutor (`set_*_callback(nullptr)`) e o conserto
-  complementar, mais forte, que o proprio glintfx adotou. NAO foi aprovado
-  nesta fatia; se um dia entrar, este gate continua valendo (os dois se somam,
-  nenhum substitui o outro).
+  complementar, mais forte, que o proprio glintfx adotou. ENTROU em 2026-08-05
+  (fatia CALLBACK-DTOR-DESARME) e tem gate proprio, tools/callback_dtor_disarm.py:
+  os dois se somam, nenhum substitui o outro, e este aqui NAO foi afrouxado.
+  Divisao de trabalho: aquele gate cobre a fragilidade MEDIDA deste - um membro
+  NOVO declarado DEPOIS de `ui_` nao aparece na tabela SITES acima e passa verde
+  por aqui, enquanto o desarme e insensivel a ordem de membro. Este continua
+  valendo porque o desarme depende de o glintfx honrar o nullptr (premissa que
+  GusEngine/app/tests/callback_disarm_contract_test.cpp vigia contra o pin),
+  enquanto a ordem de declaracao e garantia da propria linguagem.
 """
 
 import os

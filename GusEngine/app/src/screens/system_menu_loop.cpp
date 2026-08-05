@@ -831,6 +831,30 @@ class SystemMenuLoopScreen final : public gus::app::ScreenState {
         system_menu_open(state_);
     }
 
+    // ATENCAO - CALLBACK-DTOR-DESARME (2026-08-05): SEGUNDA linha de defesa, que se
+    // SOMA a (nao substitui) a ordem de declaracao de `ui_` no fim da lista de
+    // membros (CALLBACK-DTOR-ORDER, gate tools/callback_dtor_order.py). A ordem e
+    // estrutural mas fragil socialmente - depende do comentario ser lido, e o gate
+    // dela so conhece os membros de HOJE (um membro NOVO declarado depois de `ui_`
+    // passa batido). O desarme e local, explicito e INSENSIVEL a ordem de membro.
+    // PRIMEIRA instrucao de proposito: ~UiLayer() descarrega os documentos do RmlUi,
+    // o que recalcula a hover chain e pode emitir UM ultimo evento de hover - a
+    // lambda de set_hover_callback() chama native_hover_callback_, que toca
+    // last_hover_sfx_id_/state_, entao ela nao pode rodar depois que o teardown
+    // comecou. Contrato do glintfx v0.30.0, explicito deles: "nenhum consumidor e
+    // chamado de volta depois de pedir para ser desligado" - passar nullptr e
+    // suportado, nao gambiarra (o proprio ~UiLayer::Impl() deles faz
+    // clock.set_cursor_callback(nullptr) como 1a instrucao, glintfx/src/
+    // ui_layer.cpp:138; o listener guarda com `if (!cb_ || !*cb_) return;`,
+    // glintfx/src/rml/bootstrap.cpp, ou seja std::function vazio = no-op identico a
+    // "nunca houve callback"). `if (ui_)`: exit() ja faz ui_.reset() no caminho
+    // normal e enter() pode nem ter chegado ao emplace() - desarmar tem de ser
+    // seguro com o optional VAZIO.
+    // Gate automatico: tools/callback_dtor_disarm.py (roda no tools/check.sh).
+    ~SystemMenuLoopScreen() override {
+        if (ui_) ui_->set_hover_callback(nullptr);
+    }
+
     void enter() override {
         // Flags TRANSIENTES de UMA rodada do driver - resetadas a CADA enter(),
         // diferente de state_ (persiste entre rodadas, ver o comentario da

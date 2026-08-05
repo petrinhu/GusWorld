@@ -152,6 +152,12 @@ add_executable(gusengine_app_tests
     # metade do fio que falhava EM SILENCIO. Captura o log via glintfx::set_log_sink pra
     # provar que a falha de copia passou a ser reportada.
     font_stage_test.cpp
+    # CALLBACK-DTOR-DESARME: prova a PREMISSA do desarme no destrutor das 4 telas -
+    # que `set_*_callback(nullptr)` DESARMA de verdade no glintfx do pin. O conserto
+    # em si nao e observavel (classe em namespace anonimo + exit() ja reseta o ui_);
+    # este teste e o alarme se um bump futuro do glintfx quebrar a semantica em
+    # silencio. Harness GL real (Xvfb :99), MESMA receita dos irmaos, degrada seguro.
+    callback_disarm_contract_test.cpp
 )
 
 target_link_libraries(gusengine_app_tests

@@ -261,13 +261,31 @@ python3 "$ROOT/tools/callback_dtor_order.py"
 GATE_CALLBACK_DTOR=$?
 set -e
 
+# (l) Desarme do callback no destrutor (CALLBACK-DTOR-DESARME, 2026-08-05): a
+#     SEGUNDA linha de defesa, que se SOMA a (k) sem substitui-la. Cada tela que
+#     registra callback no UiLayer tem de desarma-lo (`set_*_callback(nullptr)`)
+#     como PRIMEIRA instrucao do proprio destrutor - foi o conserto que o glintfx
+#     adotou no bug real deles, e o contrato publico da v0.30.0 diz explicitamente
+#     que "nenhum consumidor e chamado de volta depois de pedir para ser
+#     desligado". Existe como gate pelo MESMO motivo de (k) - apagar o desarme nao
+#     deixa teste vermelho -, e cobre o furo MEDIDO de (k): aquele gate nao pega um
+#     membro NOVO declarado depois de `ui_`, e o desarme e insensivel a ordem de
+#     membro. Este gate DESCOBRE os registros (git ls-files, nao lista escrita a
+#     mao) e reprova tela nova sem desarme, tabela obsoleta, e familia de callback
+#     nao classificada. Ver tools/callback_dtor_disarm.py.
+set +e
+python3 "$ROOT/tools/callback_dtor_disarm.py"
+GATE_CALLBACK_DISARM=$?
+set -e
+
 GATE=0
 [ "$GATE_ARCH" = "0" ] && [ "$GATE_EXCL" = "0" ] && [ "$GATE_I18N" = "0" ] \
     && [ "$GATE_SDL_RATCHET" = "0" ] && [ "$GATE_LOG_CLOCK_ZERO" = "0" ] \
     && [ "$GATE_STBI_ZERO" = "0" ] && [ "$GATE_AUDIO_ZERO" = "0" ] \
     && [ "$GATE_FETCHCONTENT" = "0" ] && [ "$GATE_CTEST_TIMEOUT" = "0" ] \
     && [ "$GATE_GL3_READBACKBUFFER" = "0" ] && [ "$GATE_SPDX" = "0" ] \
-    && [ "$GATE_CALLBACK_DTOR" = "0" ] || GATE=1
+    && [ "$GATE_CALLBACK_DTOR" = "0" ] && [ "$GATE_CALLBACK_DISARM" = "0" ] \
+    || GATE=1
 echo "GATE=$GATE"
 
 # ---------------------------------------------------------------- SUITE
