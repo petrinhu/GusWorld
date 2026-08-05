@@ -397,6 +397,71 @@ TEST_CASE("mundo: REGRESSÃO do líder - jogador nivelado com a base da casa fic
         REQUIRE(r.index_of(700) < r.index_of(0));
     }
 
+    SECTION("A TRANSIÇÃO: com o corpo a cavalo na borda da célula, ainda fica atrás") {
+        // ONDE exatamente o menino deixa de estar atrás e passa a estar na frente.
+        // Enquanto a caixa dos pés dele estiver PARTIDA entre a linha da peça e a
+        // linha de cima, ele ainda não está nivelado com a base: continua atrás. A
+        // troca acontece quando o corpo INTEIRO entra na linha da peça. Fixar isto
+        // por teste é o que impede a virada de escorregar sem ninguém ver, já que a
+        // largura dessa faixa é só 0,6 de uma célula.
+        const Aabb dentro = ancora_na_celula(kJogadorCelulaX, kCasaCelulaY);
+        const float topo_da_celula =
+            static_cast<float>(kCasaCelulaY) * kTileCidade;  // 42,0
+        Aabb a_cavalo = dentro;
+        a_cavalo.y = topo_da_celula - dentro.h * 0.5f;  // metade dentro, metade fora
+        REQUIRE(a_cavalo.y < topo_da_celula);
+        REQUIRE(a_cavalo.y + a_cavalo.h > topo_da_celula);
+
+        OverworldSim sim(grid, a_cavalo, t);
+        sim.add_scene_prop(casa);
+        RecordingRenderer r;
+        sim.render(r, 4000.0f, 4000.0f, 0.0f);
+        REQUIRE(r.index_of(0) < r.index_of(700));  // ainda atrás
+
+        // Um fio de cabelo adiante, com o corpo inteiro dentro da linha: vira.
+        Aabb inteiro_dentro = dentro;
+        inteiro_dentro.y = topo_da_celula;
+        OverworldSim sim2(grid, inteiro_dentro, t);
+        sim2.add_scene_prop(casa);
+        RecordingRenderer r2;
+        sim2.render(r2, 4000.0f, 4000.0f, 0.0f);
+        REQUIRE(r2.index_of(700) < r2.index_of(0));  // agora na frente
+    }
+
+    SECTION("a faixa lateral do jogador é a do SPRITE, não a da hitbox") {
+        // O sprite do Gus é bem mais largo que a caixa dos pés (2,75 células contra
+        // 0,6). Se a faixa lateral viesse da hitbox, um menino parado logo ao lado
+        // da casa teria a caixa FORA do desenho dela e o sprite DENTRO: nenhuma
+        // aresta seria criada, a comparação cairia na borda de chão, e a parede
+        // voltaria a cortar o ombro dele - o defeito original, agora só na margem.
+        PlayerSpriteSet sprites;
+        for (int d = 0; d < gus::app::screens::kDirectionCount; ++d) {
+            sprites.idle[d] = 900 + d;
+            sprites.idle_frames[d][0] = sprites.idle[d];
+            sprites.idle_count[d] = 1;
+        }
+
+        // Uma célula à direita da borda direita do desenho da casa: a hitbox fica
+        // fora do retângulo pintado, o sprite não.
+        const float borda_direita = casa.footprint.x + casa.footprint.w;
+        Aabb jogador = ancora_na_celula(kJogadorCelulaX, kCasaCelulaY);
+        jogador.x = borda_direita + 0.1f;
+        REQUIRE(jogador.x > borda_direita);
+        const float meio_sprite = t.player_sprite_height_tiles * kTileCidade * 0.5f;
+        REQUIRE(jogador.x + jogador.w * 0.5f - meio_sprite < borda_direita);
+
+        OverworldSim sim(grid, jogador, t);
+        sim.set_player_sprites(sprites);
+        sim.add_scene_prop(casa);
+
+        RecordingRenderer r;
+        sim.render(r, 4000.0f, 4000.0f, 0.0f);
+        const int i_jogador = r.index_of(sprites.idle[static_cast<int>(
+            gus::app::screens::Direction::South)]);
+        REQUIRE(i_jogador >= 0);
+        REQUIRE(r.index_of(700) < i_jogador);  // casa antes = ombro preservado
+    }
+
     SECTION("peça ATRAVESSÁVEL (sem caixa que bloqueia) vale pela CÉLULA que pisa") {
         // O holograma do Sterling é o único de pé que não bloqueia nada: a caixa
         // sólida dele é degenerada. Sem um piso, a fatia de chão viraria uma LINHA
