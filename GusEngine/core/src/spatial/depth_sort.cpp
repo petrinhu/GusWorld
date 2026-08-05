@@ -120,10 +120,17 @@ void resolve_draw_order(unsigned char* behind, const float* key, int count,
 
         if (pick < 0) {
             // CICLO (ou coordenada não-finita envenenando as comparações): ninguém
-            // está liberado. Escolhe o de MENOR chave entre os que sobraram e CORTA
-            // as arestas que entram nele. Determinístico e sempre progride, então a
-            // saída continua sendo uma permutação completa - nunca trava, nunca
-            // aborta, e a cena não treme entre quadros.
+            // está liberado. Escolhe o de MENOR chave entre os que sobraram e o
+            // emite assim mesmo. Determinístico (a chave e o índice são um critério
+            // total) e sempre progride, então a saída continua sendo uma permutação
+            // completa - nunca trava, nunca aborta, e a cena não treme entre
+            // quadros.
+            //
+            // NÃO é preciso cortar as arestas que ENTRAM no eleito: marcá-lo como
+            // emitido já as tira do jogo, porque quem calcula "liberado" ignora
+            // aresta vinda de quem já saiu. A primeira versão fazia esse corte, e
+            // ele era LETRA MORTA - apagar aquela linha não mudava saída nenhuma,
+            // que é a definição de trecho que nenhum teste pode cobrir.
             for (int i = 0; i < count; ++i) {
                 if (!emitted(i) && (pick < 0 || key[i] < key[pick])) {
                     pick = i;
@@ -131,9 +138,6 @@ void resolve_draw_order(unsigned char* behind, const float* key, int count,
             }
             if (pick < 0) {
                 return;  // inalcançável enquanto step < count: sempre sobra alguém
-            }
-            for (int j = 0; j < count; ++j) {
-                behind[j * count + pick] = 0;
             }
         }
 
