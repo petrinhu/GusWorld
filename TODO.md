@@ -584,6 +584,41 @@ histórico no fim do arquivo. Novas descobertas entram como bullets abaixo desta
   capturar as imagens `DEPOIS_H_*` em `~/Imagens/gusworld_escala/`. Enquanto o `.gmap` for o antigo,
   **1 teste fica vermelho**: "toda peça de rua pisa numa âncora do level design".
 
+
+- `PLAYTEST-LIDER-2026-08-04-CIDADE`: **playtest do líder na cidade nova, o que passou e o que ele
+  reprovou.** ✅ **Passou:** jogabilidade, efeitos de hover no menu, e a barra de rolagem respondendo ao
+  mouse. 🔴 **Reprovou o design da cidade**, verbatim: *"Esse que você gerou está péssimo de design,
+  cheio de postes pela rua, prédios e postes fora do mapa. Não mude o demo, mas preciso de algo que
+  seja uma cidade melhor. Tá cheio de espaços vazios, apenas chão cinza."* ⚠️ **ORDEM EXPLÍCITA: NÃO
+  MUDAR O DEMO.** O que está commitado fica; o que se pede é a cidade seguinte.
+  **MEDI CADA QUEIXA antes de aceitar ou recusar, e as três apontam para a MESMA causa:**
+  (a) **"fora do mapa"**: só **1 peça de 57** cruza a borda de verdade (o holograma em (35,4), meia
+  célula ao norte). Mas **55 de 57 invadem 2 ou mais células andáveis vizinhas** com o desenho. A
+  percepção do líder está certa e o diagnóstico dele é o sintoma: com `scene_prop_scale` em **1,83**
+  (escolha dele na fatia G), toda peça transborda da própria célula. Uma casa de 3 células vira 5,49;
+  um poste de 1 vira 1,83 e cobre a célula de cada lado.
+  (b) **"postes pela rua"**: **nenhum** poste está em chão liso absoluto (varri os 18, zero com raio de
+  2 sem parede). Eles PARECEM no meio da rua porque a base pintada se espalha para as vizinhas. Mesma
+  causa de (a).
+  (c) 🔴 **"espaços vazios, chão cinza" NÃO se resolve pondo mais peças, e este é o achado que muda o
+  plano.** Medido: a distância mediana de uma célula andável até a peça mais próxima é **4 células**, o
+  p90 é 6, e só **1,3%** do mapa está a 8 ou mais. Densidade de OBJETO está boa. O vazio é **falta de
+  TEXTURA**: o chão é uma cor chapada única, e a arte cobre 0,54% dos pixels (achado A8 do laudo da
+  fatia D). **Acrescentar peça pioraria (a) e (b) sem resolver (c).** O caminho é tileset de chão
+  (calçada, meio-fio, asfalto, sombra), não mais mobiliário urbano.
+  **Restrição de engenharia que o líder somou:** *"ordenar de forma a não ocupar muita memória com
+  tantas peças no cenário"*. Hoje não é problema (média de 7,1 desenháveis por quadro, pior caso 14,
+  0,98 µs de ordenação, medido na fatia I), mas a cidade "de verdade" terá ordem de magnitude a mais e
+  a estrutura precisa nascer pensando nisso.
+
+- `SEED-TRANSICAO-DE-MAPA` (**o líder marcou explicitamente como NÃO É PARA AGORA**, só registrou para
+  não perder): pontos de mudança de cenário. Três casos que ele citou: **cidade para estrada**
+  (transição entre mapas de exterior), **entrar numa casa de um pavimento**, e **casa de mais de um
+  pavimento** (o que implica mapa interno com níveis). Hoje o `.gmap` já tem o conceito de `#portal`
+  com nome (`entrada_norte`, `saida_sul`), usado só como marcação; virar transição de verdade pede
+  carregar mapa novo, preservar estado e decidir o que acontece com a party. Cross-ref: a lei do átomo
+  (ADR-020) manda que lugar novo nasça como DADO, então interior de casa é `AreaDescriptor`, nunca
+  método par-a-par.
 - `TMPDIR-STAGE-FIXO-PRODUCAO`: o mesmo defeito de caminho temporário previsível existe em **código de
   produção**, não só em teste, e a fatia `FLAKY-*` deliberadamente não o tocou porque estava fora do
   escopo dela. **8 sítios em 7 arquivos**, todos com nome FIXO em `temp_directory_path()`:
