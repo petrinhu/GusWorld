@@ -736,6 +736,41 @@ histórico no fim do arquivo. Novas descobertas entram como bullets abaixo desta
   **pré-requisito**: o macro morto deixou de bloquear o fallback. Registrado aqui para ninguém achar
   que o AppImage passou a funcionar sozinho.
 
+- `ASSETS-FONTE-TOOLS-GEMEO-3` (2026-08-05, **terceira geração do mesmo defeito**, achada pelo
+  implementer do `ASSETS-FONTE-TELAS-GEMEO` enquanto consertava a segunda): o padrão
+  `GUSWORLD_FONTS_DIR` cru **ainda vive em mais 9 sítios**, todos fora de produção e por isso fora
+  do brief daquela fatia: `app/tools/sysmenu_pause_screenshot_probe.cpp`,
+  `sysmenu_controls_screenshot_probe.cpp`, `save_load_screenshot_probe.cpp`,
+  `reload_geometry_probe.cpp`, `npcdlg_screenshot_probe.cpp`, `frozen_bg_probe.cpp`,
+  `framegrab_ordem/framegrab_ordem_probe.cpp`, mais os harnesses
+  `app/tests/difficulty_menu_loop_interaction_test.cpp` e `save_load_menu_interaction_test.cpp`
+  (2 sítios neste). Conserto trivial agora que existe o helper: trocar o bloco por
+  `gus::app::screens::stage_ui_fonts(stage)`. **Por que não é urgente:** ferramenta e teste rodam na
+  máquina de build, onde a macro existe; o defeito só morde em máquina alheia. **Por que ainda
+  assim vale:** enquanto o padrão viver na base, ele é copiado para o próximo sítio novo, que é
+  exatamente como esta terceira geração nasceu. ⚠️ **Nota de dominó:** a primeira geração era o
+  porteiro (`ASSETS-PATH-CASCATA`), a segunda as telas de produção, esta é a terceira. Ao consertar,
+  varrer de novo por `GUSWORLD_FONTS_DIR` e por qualquer macro `GUSWORLD_*_DIR` lida crua, em vez de
+  confiar nesta lista.
+
+- `MACRO-FONTS-ORFA-NO-APP` (2026-08-05): depois que as 6 telas passaram a delegar ao porteiro,
+  **nenhum `.cpp` do target `gusengine_app` lê mais `GUSWORLD_FONTS_DIR`**, e a definição dela no
+  `app/CMakeLists.txt` ficou órfã. O implementer deliberadamente **não** removeu, porque o brief
+  proibia tocar em macro. Só remover depois que o `ASSETS-FONTE-TOOLS-GEMEO-3` fechar: os targets de
+  `app/tools/` e `app/tests/` têm definição própria e continuam usando a deles.
+
+- `FLAKE-HARNESS-DISPLAY-AUDIO` (2026-08-05): **o flake que o agente anterior viu sem capturar nome
+  agora tem nome, e são DOIS, não um.** Em três rodadas do `tools/check.sh` durante a fatia
+  `ASSETS-FONTE-TELAS-GEMEO`, uma falha isolada apareceu a cada vez e o **nome mudou**:
+  `battle_preview (harness headless): SDL_EVENT_QUIT real ...` estourando o `TIMEOUT` de 60 s (duas
+  vezes) e `AudioEngine device real: nunca crasha ...` (uma). Todas as reexecuções imediatas deram
+  verde, e a primeira ocorrência foi **antes** de qualquer edição da fatia. Nomes extraídos de
+  `build/linux-release/Testing/Temporary/LastTestsFailed.log`, que é onde procurar da próxima vez.
+  ⚠️ **A hipótese óbvia é contenção** (são justamente os dois testes que dependem de display e de
+  dispositivo de áudio reais, e a máquina estava compilando em paralelo), mas **isso é hipótese, não
+  medição** — ninguém correlacionou carga com falha ainda. O que importa registrar é que a suíte
+  **não é 100% determinística hoje**, e que um verde isolado não prova ausência destes dois.
+
 ## 🗄️ Arquivado: eras Godot/C# e Qt6 (superadas, mantidas por registro)
 
 **Motivo do arquivamento:** stack superada pelos dois pivôs em sequência (Godot 4.6 + C# .NET 8
