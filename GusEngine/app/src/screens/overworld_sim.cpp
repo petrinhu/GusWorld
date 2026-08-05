@@ -637,22 +637,31 @@ void OverworldSim::render(gus::platform::render2d::IRenderer& renderer,
             continue;
         }
         gus::core::spatial::DepthEntry e;
-        // A fatia de chao da peca e onde ela PISA, nao o retangulo alto do desenho,
-        // que sobe pelo ar e nao encosta em nada. Duas fontes, e vale a mais funda:
-        //   - a caixa que BLOQUEIA, quando existe (a casa pisa 1,83 celula de
-        //     profundidade na escala do lider);
-        //   - a CELULA em que a peca foi plantada, que e a propria definicao de
-        //     "onde a peca pisa" (ver ScenePropPlacement). E o que salva a peca
-        //     ATRAVESSAVEL: o holograma nao tem caixa nenhuma, e sem este piso
-        //     entraria como uma LINHA - voltando a esconder quem esta ao lado dele.
-        // Peca montada a mao em teste (sem celula de origem) fica so com a caixa.
+        // A fatia de chao da peca e a CELULA em que ela foi plantada - a propria
+        // definicao de "onde a peca pisa" (ver ScenePropPlacement) -, NAO o
+        // retangulo alto do desenho, que sobe pelo ar e nao encosta em nada.
+        //
+        // POR QUE A CELULA E NAO A CAIXA QUE BLOQUEIA: a caixa foi a primeira
+        // escolha e o mutation testing a derrubou. Ela e mais funda que a celula
+        // (1,83 celula na escala do lider), mas a diferenca so muda resposta onde
+        // um personagem esteja DENTRO da caixa e ao norte da celula - e ali ninguem
+        // consegue estar, porque a caixa e justamente o que barra a passagem.
+        // Sabotar aquele termo nao reprovava teste NENHUM (mutante sobrevivente na
+        // suite real do app), que e a definicao de trecho que nao decide nada. Com
+        // a celula sozinha o modelo cabe numa frase, cobre a peca ATRAVESSAVEL (o
+        // holograma nao tem caixa: entraria como uma LINHA e voltaria a esconder
+        // quem esta ao lado dele) e da a leitura certa para quem esta ao NORTE da
+        // peca - esse fica atras, como tem de ser.
+        //
+        // PREMISSA: o corpo de um personagem e MENOR que uma celula (a hitbox e
+        // 0,6 do tile). Se um dia existir ator com corpo mais fundo que uma celula,
+        // ele deixa de caber na fatia da peca e cai na comparacao de borda - vale
+        // remedir aqui. Peca montada a mao em teste (sem celula de origem) entra
+        // como linha na base, que e o comportamento antigo.
         e.ground_front = p.footprint.y + p.footprint.h;
-        e.ground_back = e.ground_front - p.solid.h;
+        e.ground_back = e.ground_front;
         if (p.cell_y >= 0) {
-            const float topo_da_celula = static_cast<float>(p.cell_y) * grid_.tile_size();
-            if (topo_da_celula < e.ground_back) {
-                e.ground_back = topo_da_celula;
-            }
+            e.ground_back = static_cast<float>(p.cell_y) * grid_.tile_size();
         }
         e.draw_left = p.footprint.x;
         e.draw_right = p.footprint.x + p.footprint.w;
