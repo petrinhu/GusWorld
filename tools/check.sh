@@ -245,12 +245,29 @@ python3 "$ROOT/tools/spdx_header_required.py"
 GATE_SPDX=$?
 set -e
 
+# (k) Ordem de destruicao dos membros (CALLBACK-DTOR-ORDER, 2026-08-05): nas 4
+#     telas que registram callback no glintfx::UiLayer, `ui_` tem de ser
+#     declarado DEPOIS de tudo que a lambda alcanca (logo destruido ANTES).
+#     Existe como GATE, e nao so como comentario, porque desfazer a ordem NAO
+#     deixa nenhum teste vermelho: o cenario exige uma excecao escapando de
+#     enter()/tick()/handle_event() (o exit() esta solto, fora de guard RAII,
+#     em screen_state.cpp), que o codigo de hoje nao lanca. Sem gate, a proxima
+#     reorganizacao de membros reabre o use-after-free em silencio - foi
+#     exatamente essa a forma do bug que o glintfx levou ao vivo (achado so
+#     pelo ASan). Ver tools/callback_dtor_order.py (inclusive a auto-auditoria
+#     que reprova se a tabela de membros ficar desatualizada por rename).
+set +e
+python3 "$ROOT/tools/callback_dtor_order.py"
+GATE_CALLBACK_DTOR=$?
+set -e
+
 GATE=0
 [ "$GATE_ARCH" = "0" ] && [ "$GATE_EXCL" = "0" ] && [ "$GATE_I18N" = "0" ] \
     && [ "$GATE_SDL_RATCHET" = "0" ] && [ "$GATE_LOG_CLOCK_ZERO" = "0" ] \
     && [ "$GATE_STBI_ZERO" = "0" ] && [ "$GATE_AUDIO_ZERO" = "0" ] \
     && [ "$GATE_FETCHCONTENT" = "0" ] && [ "$GATE_CTEST_TIMEOUT" = "0" ] \
-    && [ "$GATE_GL3_READBACKBUFFER" = "0" ] && [ "$GATE_SPDX" = "0" ] || GATE=1
+    && [ "$GATE_GL3_READBACKBUFFER" = "0" ] && [ "$GATE_SPDX" = "0" ] \
+    && [ "$GATE_CALLBACK_DTOR" = "0" ] || GATE=1
 echo "GATE=$GATE"
 
 # ---------------------------------------------------------------- SUITE

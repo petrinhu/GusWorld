@@ -1631,9 +1631,6 @@ class SystemMenuLoopScreen final : public gus::app::ScreenState {
     // iteracao). -1 = nenhum arrasto em curso; 0=Music, 1=Sfx.
     int drag_item_ = -1;
 
-    // std::optional (nao um objeto direto): enter()/exit() controlam o ciclo de
-    // vida (EXCLUSIVIDADE DO UILAYER, ver gus/app/screen_state.hpp).
-    std::optional<glintfx::UiLayer> ui_;
     std::optional<gus::platform::render2d::Render2dGl3> backdrop_;
     gus::platform::render2d::TextureId frozen_bg_tex_ = gus::platform::render2d::kInvalidTexture;
 
@@ -1648,6 +1645,28 @@ class SystemMenuLoopScreen final : public gus::app::ScreenState {
     // driver quando done_==true (ou bailed_==true por ui_->ok()==false /
     // selftest, que tambem setam este campo explicitamente).
     SystemMenuScreenExit result_ = SystemMenuScreenExit::Continue;
+
+    // std::optional (nao um objeto direto): enter()/exit() controlam o ciclo de
+    // vida (EXCLUSIVIDADE DO UILAYER, ver gus/app/screen_state.hpp).
+    //
+    // ATENCAO - CALLBACK-DTOR-ORDER (2026-08-05): ui_ e o ULTIMO membro DE
+    // PROPOSITO. Nao mova pra cima "por organizacao" - a posicao E o conserto.
+    // Membro morre na ordem INVERSA da declaracao, entao declarado por ultimo o
+    // ui_ e o PRIMEIRO a ser destruido, ANTES de last_hover_sfx_id_/state_ -
+    // exatamente o que a lambda registrada em set_hover_callback() alcanca (via
+    // native_hover_callback_). Importa porque ~UiLayer() descarrega os
+    // documentos do RmlUi, o que RECALCULA a hover chain e pode emitir UM
+    // ultimo evento de hover: o glintfx levou esse mesmo use-after-free ao vivo
+    // (achado so pelo ASan; passou na revisao, na suite local e em 3 dos 4 jobs
+    // do CI pesado deles). No caminho normal exit() ja destroi ui_ com tudo
+    // vivo; a janela e o caminho em que exit() NAO roda - ele esta solto na
+    // ultima linha de run_screen_state() (app/src/screen_state.cpp), FORA de
+    // guard RAII, e uma excecao escapando de enter()/tick()/handle_event()
+    // desenrola a pilha, pula o exit() e vai direto pra ~SystemMenuLoopScreen.
+    // Ali so a ordem de declaracao protege. Bonus: alinha a destruicao
+    // implicita com o que exit() ja faz a mao (ui_.reset() ANTES do resto).
+    // Gate automatico: tools/callback_dtor_order.py (roda no tools/check.sh).
+    std::optional<glintfx::UiLayer> ui_;
 };
 
 }  // namespace

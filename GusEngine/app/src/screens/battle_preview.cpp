@@ -240,8 +240,8 @@ private:
     int ph0_ = kWindowH;
 
     // ---- glintfx (ADR-010 F3) ----
+    // ui_ NAO mora aqui: ver CALLBACK-DTOR-ORDER no FIM da lista de membros.
     bool glintfx_on_ = false;
-    std::optional<glintfx::UiLayer> ui_;
     bool glintfx_live_ = false;
     float glintfx_dp_override_ = 0.0f;
 
@@ -294,6 +294,28 @@ private:
     // ---- desfecho (cacheado em exit(), ANTES de scene_ ser destruida) ----
     gus::domain::combat::CombatOutcome cached_outcome_ =
         gus::domain::combat::CombatOutcome::Ongoing;
+
+    // ---- glintfx: a UiLayer (declarada por ULTIMO de proposito) ----
+    // ATENCAO - CALLBACK-DTOR-ORDER (2026-08-05): ui_ e o ULTIMO membro DE
+    // PROPOSITO. Nao mova pra cima "por organizacao" (o lugar "natural" seria
+    // junto de glintfx_on_/glintfx_live_, la em cima) - a posicao E o conserto.
+    // Membro morre na ordem INVERSA da declaracao, entao declarado por ultimo o
+    // ui_ e o PRIMEIRO a ser destruido, ANTES de scene_/local_audio_engine_/
+    // audio_ptr_/ui_click_sfx_id_ - exatamente o que a lambda registrada em
+    // set_click_callback() alcanca (ela captura `this` e derreferencia *scene_
+    // e audio_ptr_). Importa porque ~UiLayer() descarrega os documentos do
+    // RmlUi, o que RECALCULA a hover chain e pode emitir UM ultimo evento: o
+    // glintfx levou esse mesmo use-after-free ao vivo (achado so pelo ASan;
+    // passou na revisao, na suite local e em 3 dos 4 jobs do CI pesado deles).
+    // No caminho normal exit() ja destroi ui_ com tudo vivo; a janela e o
+    // caminho em que exit() NAO roda - ele esta solto na ultima linha de
+    // run_screen_state() (app/src/screen_state.cpp), FORA de guard RAII, e uma
+    // excecao escapando de enter()/tick()/handle_event() desenrola a pilha,
+    // pula o exit() e vai direto pra ~BattleScreen. Ali so a ordem de
+    // declaracao protege. Bonus: alinha a destruicao implicita com a ordem que
+    // exit() ja faz a mao (ui_ ANTES de scene_/renderer_/local_audio_engine_).
+    // Gate automatico: tools/callback_dtor_order.py (roda no tools/check.sh).
+    std::optional<glintfx::UiLayer> ui_;
 };
 
 void BattleScreen::enter() {
