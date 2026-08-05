@@ -25,6 +25,12 @@
 #include <sstream>
 #include <string>
 
+// I18N-ESCAPE-MARKUP: todo texto vindo do catalogo de traducao passa por
+// rml_escape ANTES de entrar no ostringstream (ponto UNICO de aplicacao, ver
+// gus/app/screens/rml_escape.hpp). Onde ha interpolacao ("{0}" -> numero do slot/
+// XP/capitulo), o escape vem DEPOIS da interpolacao: cobre a chave traduzida e o
+// valor injetado numa unica chamada, sem risco de escapar 2x.
+#include "gus/app/screens/rml_escape.hpp"
 #include "gus/domain/save/save_slots.hpp"
 
 namespace gus::app::screens {
@@ -233,12 +239,12 @@ std::string build_save_load_menu_rml(const SaveLoadMenuState& state,
 
     const bool is_save = (state.mode == SaveLoadMode::Save);
     body << "<div class=\"title\">"
-         << tr.tr(is_save ? "SAVE_SCREEN_TITLE_SAVE" : "SAVE_SCREEN_TITLE_LOAD")
+         << rml_escape(tr.tr(is_save ? "SAVE_SCREEN_TITLE_SAVE" : "SAVE_SCREEN_TITLE_LOAD"))
          << "</div>";
     body << "<div class=\"subtitle\">"
-         << interpolate(tr.tr(is_save ? "SAVE_SCREEN_SUBTITLE_SAVE"
-                                       : "SAVE_SCREEN_SUBTITLE_LOAD"),
-                        std::to_string(kSlotCount))
+         << rml_escape(interpolate(tr.tr(is_save ? "SAVE_SCREEN_SUBTITLE_SAVE"
+                                                  : "SAVE_SCREEN_SUBTITLE_LOAD"),
+                                    std::to_string(kSlotCount)))
          << "</div>";
 
     if (state.warning_kind != SaveLoadMenuState::WarningKind::None) {
@@ -253,13 +259,13 @@ std::string build_save_load_menu_rml(const SaveLoadMenuState& state,
         const char* msg_key = damaged   ? "SAVE_LOAD_WARN_DAMAGED"
                               : version ? "SAVE_LOAD_WARN_VERSION"
                                         : "SAVE_LOAD_RECOVER_FAILED";
-        body << "<div class=\"warn-title\">" << tr.tr(msg_key) << "</div>";
+        body << "<div class=\"warn-title\">" << rml_escape(tr.tr(msg_key)) << "</div>";
         if (damaged) {
             body << "<div class=\"confirm-pill danger"
                  << (state.warning_selected == 0 ? " focused" : "")
                  << pressed_class(0, pressed_index)
-                 << "\" id=\"slmenu-warn-recover\">" << tr.tr("SAVE_LOAD_RECOVER_TRY")
-                 << "</div>";
+                 << "\" id=\"slmenu-warn-recover\">"
+                 << rml_escape(tr.tr("SAVE_LOAD_RECOVER_TRY")) << "</div>";
         }
         // Cancelar: sempre presente. So-1-botao (Version/RecoverFailed) fica SEMPRE
         // focado (nao ha outra pill pra disputar o foco); em Damaged, so quando
@@ -268,8 +274,8 @@ std::string build_save_load_menu_rml(const SaveLoadMenuState& state,
                                                      ? " focused"
                                                      : "")
              << pressed_class(1, pressed_index)
-             << "\" id=\"slmenu-warn-cancel\">" << tr.tr("SAVE_LOAD_WARN_CANCEL")
-             << "</div>";
+             << "\" id=\"slmenu-warn-cancel\">"
+             << rml_escape(tr.tr("SAVE_LOAD_WARN_CANCEL")) << "</div>";
         body << "</div>";  // #slmenu-panel
         return wrap_document(body.str());
     }
@@ -290,28 +296,29 @@ std::string build_save_load_menu_rml(const SaveLoadMenuState& state,
         const SaveSlotPreview& target = state.slots[static_cast<std::size_t>(state.selected)];
         const bool overwrite_case = target.occupied || target.present_unreadable;
         if (overwrite_case) {
-            body << "<div class=\"confirm-title\">" << tr.tr("SAVE_CONFIRM_OVERWRITE")
-                 << "</div>";
+            body << "<div class=\"confirm-title\">"
+                 << rml_escape(tr.tr("SAVE_CONFIRM_OVERWRITE")) << "</div>";
             body << "<div class=\"confirm-pill" << (state.confirm_selected == 0 ? " focused" : "")
                  << pressed_class(0, pressed_index)
-                 << "\" id=\"slmenu-confirm-yes\">" << tr.tr("SAVE_OVERWRITE_CONFIRM_YES")
-                 << "</div>";
+                 << "\" id=\"slmenu-confirm-yes\">"
+                 << rml_escape(tr.tr("SAVE_OVERWRITE_CONFIRM_YES")) << "</div>";
             body << "<div class=\"confirm-pill" << (state.confirm_selected == 1 ? " focused" : "")
                  << pressed_class(1, pressed_index)
-                 << "\" id=\"slmenu-confirm-no\">" << tr.tr("SAVE_OVERWRITE_CONFIRM_NO")
-                 << "</div>";
+                 << "\" id=\"slmenu-confirm-no\">"
+                 << rml_escape(tr.tr("SAVE_OVERWRITE_CONFIRM_NO")) << "</div>";
         } else {
             body << "<div class=\"confirm-title\">"
-                 << interpolate(tr.tr("SAVE_CONFIRM_EMPTY"), std::to_string(state.selected))
+                 << rml_escape(interpolate(tr.tr("SAVE_CONFIRM_EMPTY"),
+                                            std::to_string(state.selected)))
                  << "</div>";
             body << "<div class=\"confirm-pill" << (state.confirm_selected == 0 ? " focused" : "")
                  << pressed_class(0, pressed_index)
-                 << "\" id=\"slmenu-confirm-yes\">" << tr.tr("SAVE_EMPTY_CONFIRM_YES")
-                 << "</div>";
+                 << "\" id=\"slmenu-confirm-yes\">"
+                 << rml_escape(tr.tr("SAVE_EMPTY_CONFIRM_YES")) << "</div>";
             body << "<div class=\"confirm-pill" << (state.confirm_selected == 1 ? " focused" : "")
                  << pressed_class(1, pressed_index)
-                 << "\" id=\"slmenu-confirm-no\">" << tr.tr("SAVE_EMPTY_CONFIRM_NO")
-                 << "</div>";
+                 << "\" id=\"slmenu-confirm-no\">"
+                 << rml_escape(tr.tr("SAVE_EMPTY_CONFIRM_NO")) << "</div>";
         }
         body << "</div>";  // #slmenu-panel
         return wrap_document(body.str());
@@ -321,16 +328,16 @@ std::string build_save_load_menu_rml(const SaveLoadMenuState& state,
         // Mini-dialogo Sim/Nao da feature "Apagar" (aprovada pelo lider) - MESMA
         // mecanica de confirming_overwrite acima (ids proprios, so 1 dialogo por
         // vez, ver save_load_menu_request_delete).
-        body << "<div class=\"confirm-title\">" << tr.tr("SAVE_CONFIRM_DELETE")
+        body << "<div class=\"confirm-title\">" << rml_escape(tr.tr("SAVE_CONFIRM_DELETE"))
              << "</div>";
         body << "<div class=\"confirm-pill" << (state.delete_confirm_selected == 0 ? " focused" : "")
              << pressed_class(0, pressed_index)
-             << "\" id=\"slmenu-delete-confirm-yes\">" << tr.tr("SAVE_DELETE_CONFIRM_YES")
-             << "</div>";
+             << "\" id=\"slmenu-delete-confirm-yes\">"
+             << rml_escape(tr.tr("SAVE_DELETE_CONFIRM_YES")) << "</div>";
         body << "<div class=\"confirm-pill" << (state.delete_confirm_selected == 1 ? " focused" : "")
              << pressed_class(1, pressed_index)
-             << "\" id=\"slmenu-delete-confirm-no\">" << tr.tr("SAVE_DELETE_CONFIRM_NO")
-             << "</div>";
+             << "\" id=\"slmenu-delete-confirm-no\">"
+             << rml_escape(tr.tr("SAVE_DELETE_CONFIRM_NO")) << "</div>";
         body << "</div>";  // #slmenu-panel
         return wrap_document(body.str());
     }
@@ -356,36 +363,45 @@ std::string build_save_load_menu_rml(const SaveLoadMenuState& state,
 
         body << "<div class=\"" << classes << "\" id=\"slmenu-slot-" << i << "\">";
         body << "<div class=\"slot-num\">"
-             << (slot.is_autosave ? tr.tr("SAVE_SLOT_AUTO_NAME") : std::to_string(i))
+             << rml_escape(slot.is_autosave ? tr.tr("SAVE_SLOT_AUTO_NAME")
+                                             : std::to_string(i))
              << "</div>";
         body << "<div class=\"slot-body\">";
         if (show_unreadable_label) {
             const bool version_incompativel =
                 slot.unreadable_reason == UnreadableReason::VersionTooNew;
             body << "<div class=\"slot-empty-label unreadable\">"
-                 << tr.tr(version_incompativel ? "SAVE_LOAD_SLOT_VERSION_LABEL"
-                                                : "SAVE_LOAD_SLOT_DAMAGED_LABEL")
+                 << rml_escape(tr.tr(version_incompativel ? "SAVE_LOAD_SLOT_VERSION_LABEL"
+                                                           : "SAVE_LOAD_SLOT_DAMAGED_LABEL"))
                  << "</div>";
         } else if (!slot.occupied) {
             body << "<div class=\"slot-empty-label\">"
-                 << interpolate(tr.tr("SAVE_SLOT_EMPTY"), std::to_string(i)) << "</div>";
+                 << rml_escape(interpolate(tr.tr("SAVE_SLOT_EMPTY"), std::to_string(i)))
+                 << "</div>";
         } else {
             const std::string slot_label = slot.is_autosave
                                                 ? tr.tr("SAVE_SLOT_AUTO_NAME")
                                                 : interpolate(tr.tr("SAVE_SLOT_LABEL"),
                                                               std::to_string(i));
-            body << "<div class=\"slot-title\">" << slot_label << " <span class=\"loc\">- "
-                 << tr.tr(location_key_for_scene(slot.scene_path)) << "</span>";
+            body << "<div class=\"slot-title\">" << rml_escape(slot_label)
+                 << " <span class=\"loc\">- "
+                 << rml_escape(tr.tr(location_key_for_scene(slot.scene_path))) << "</span>";
             if (readonly) {
-                body << " <span class=\"ro\">" << tr.tr("SAVE_SLOT_READONLY_TAG")
-                     << "</span>";
+                body << " <span class=\"ro\">"
+                     << rml_escape(tr.tr("SAVE_SLOT_READONLY_TAG")) << "</span>";
             }
             body << "</div>";
+            // format_timestamp_ms/format_playtime_seconds NAO passam por rml_escape:
+            // nao sao texto externo - montam digitos e separadores fixos ("dd/mm/aaaa
+            // hh:mm", "Nh Mm") a partir de campos NUMERICOS do save, sem nenhum
+            // caminho por onde '&'/'<'/'>' possa entrar. Escapa-los seria no-op
+            // permanente e sugeriria, falsamente, que sao conteudo de terceiro.
             body << "<div class=\"slot-meta\">" << format_timestamp_ms(slot.timestamp_ms)
                  << "  -  " << format_playtime_seconds(slot.playtime_seconds) << "  -  "
-                 << interpolate(tr.tr("SAVE_XP_LABEL"), std::to_string(slot.xp))
-                 << "  -  " << interpolate(tr.tr("SAVE_CHAPTER_LABEL"),
-                                            std::to_string(slot.chapter))
+                 << rml_escape(interpolate(tr.tr("SAVE_XP_LABEL"), std::to_string(slot.xp)))
+                 << "  -  "
+                 << rml_escape(interpolate(tr.tr("SAVE_CHAPTER_LABEL"),
+                                            std::to_string(slot.chapter)))
                  << "</div>";
         }
         body << "</div>";  // .slot-body
@@ -395,7 +411,7 @@ std::string build_save_load_menu_rml(const SaveLoadMenuState& state,
             // apagavel). id proprio por linha (independente de state.selected -
             // clicavel mesmo numa linha NAO focada, ver save_load_menu_loop.cpp).
             body << "<div class=\"slot-delete\" id=\"slmenu-delete-" << i << "\">"
-                 << tr.tr("SAVE_DELETE_BUTTON_LABEL") << "</div>";
+                 << rml_escape(tr.tr("SAVE_DELETE_BUTTON_LABEL")) << "</div>";
         }
         body << "</div>";  // .slot
     }
@@ -403,10 +419,10 @@ std::string build_save_load_menu_rml(const SaveLoadMenuState& state,
 
     body << "<div class=\"footer\">";
     body << "<span class=\"footer-hint\">"
-         << tr.tr(is_save ? "SAVE_SCREEN_FOOTER_SAVE" : "SAVE_SCREEN_FOOTER_LOAD")
+         << rml_escape(tr.tr(is_save ? "SAVE_SCREEN_FOOTER_SAVE" : "SAVE_SCREEN_FOOTER_LOAD"))
          << "</span>";
     body << "<div class=\"btn-back focused" << pressed_class(kBackPressedIndex, pressed_index)
-         << "\" id=\"slmenu-back\">" << tr.tr("SETTINGS_BACK") << "</div>";
+         << "\" id=\"slmenu-back\">" << rml_escape(tr.tr("SETTINGS_BACK")) << "</div>";
     body << "</div>";  // .footer
 
     body << "</div>";  // #slmenu-panel

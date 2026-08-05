@@ -11,6 +11,13 @@
 #include <sstream>
 
 #include "gus/app/screens/npc_dialogue_overlay.hpp"  // npc_dialogue_actor_display_name
+// I18N-ESCAPE-MARKUP: aqui o texto externo vem de DUAS fontes - o catalogo de
+// traducao E os arquivos de dialogo (resources/dialogues/*.dlg.txt, cujo parser le
+// "speaker: <val>"/"text: <val>" CRUS, sem restricao de charset). Os dois chegam ao
+// markup, inclusive pelos caminhos de FALLBACK (speaker_id quando ACTOR_<ID> nao
+// existe; a propria chave quando a fala nao existe no catalogo). Ver
+// gus/app/screens/rml_escape.hpp.
+#include "gus/app/screens/rml_escape.hpp"
 
 namespace gus::app::screens {
 
@@ -169,11 +176,19 @@ std::string build_npc_dialogue_rml(
     body << "<div class=\"warm-corner tl\"></div><div class=\"warm-corner tr\">"
             "</div><div class=\"warm-corner bl\"></div><div class=\"warm-corner br\">"
             "</div>";
-    body << "<div id=\"npcdlg-portrait\" style=\"decorator: image( " << portrait_file
-         << " cover );\"></div>";
+    // portrait_file e o UNICO ponto de ATRIBUTO desta fatia que recebe dado derivado
+    // de arquivo externo: npc_dialogue_portrait_file monta "retrato_<speaker_id>.png"
+    // com o speaker_id lido do .dlg.txt. Escapado pelos mesmos 3 metacaracteres - e
+    // no-op para todo nome de arquivo real, e fecha o caso de um speaker_id com '&'.
+    // LIMITE DECLARADO: aspas NAO entram no escape desta fatia (decisao do lider foi
+    // '&'/'<'/'>'), entao um speaker_id com '"' ainda escaparia do atributo. Fica
+    // registrado como achado, nao como cobertura.
+    body << "<div id=\"npcdlg-portrait\" style=\"decorator: image( "
+         << rml_escape(portrait_file) << " cover );\"></div>";
     body << "<div id=\"npcdlg-body\">";
-    body << "<div id=\"npcdlg-name\">" << speaker_label << "</div>";
-    body << "<div id=\"npcdlg-line\">" << translator.tr(node.text_key) << "</div>";
+    body << "<div id=\"npcdlg-name\">" << rml_escape(speaker_label) << "</div>";
+    body << "<div id=\"npcdlg-line\">" << rml_escape(translator.tr(node.text_key))
+         << "</div>";
 
     if (node.options.empty()) {
         // BOTAO "Continuar" (pedido do lider - ver header): id fixo (so 1 no LINEAR
@@ -181,8 +196,8 @@ std::string build_npc_dialogue_rml(
         // system_menu_rml.cpp) - o CHAMADOR (npc_dialogue_loop_gl.cpp) faz
         // get_element_box("npcdlg-continue-btn") pro hit-test de hover/clique.
         body << "<div class=\"warm-continue-btn" << (continue_pressed ? " pressed" : "")
-             << "\" id=\"npcdlg-continue-btn\">" << translator.tr("DIALOGUE_CONTINUE")
-             << "</div>";
+             << "\" id=\"npcdlg-continue-btn\">"
+             << rml_escape(translator.tr("DIALOGUE_CONTINUE")) << "</div>";
     } else {
         body << "<div class=\"warm-choices\">";
         for (std::size_t i = 0; i < node.options.size(); ++i) {
@@ -197,9 +212,13 @@ std::string build_npc_dialogue_rml(
             body << "<div class=\"warm-choice" << (is_selected ? " selected" : "")
                  << (is_pressed ? " pressed" : "") << "\" id=\"npcdlg-choice-" << i
                  << "\">"
+                 // As entidades abaixo ("&nbsp;" do recuo, "&gt; " do cursor de
+                 // selecao) sao markup DELIBERADO que NOS escrevemos - NAO passam
+                 // por rml_escape (virariam "&amp;nbsp;"/"&amp;gt;" e o jogador veria
+                 // o codigo cru na tela). So o rotulo TRADUZIDO e escapado.
                  << "<span class=\"warm-choice-num\">" << (i + 1) << ".</span>&nbsp;"
                  << (is_selected ? "&gt; " : "&nbsp;&nbsp;")
-                 << translator.tr(node.options[i].label_key) << "</div>";
+                 << rml_escape(translator.tr(node.options[i].label_key)) << "</div>";
         }
         body << "</div>";  // .warm-choices
     }

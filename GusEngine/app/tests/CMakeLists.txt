@@ -61,6 +61,11 @@ add_executable(gusengine_app_tests
     npc_dialogue_save_roundtrip_test.cpp
     # DIALOGO-TERMINAL: gerador de RML da caixa quente (retrato real).
     npc_dialogue_rml_test.cpp
+    # I18N-ESCAPE-MARKUP: rml_escape (unidade: a ORDEM '&' primeiro) + a costura
+    # ponta-a-ponta nas 5 telas que injetam texto EXTERNO no markup, com catalogo
+    # HOSTIL, mais a guarda ENUMERANTE que varre todo '&' do RML gerado (a mesma
+    # regra do parser estrito do glintfx que pegou o "Menu & Diálogo").
+    rml_escape_test.cpp
     # DIALOGO-TERMINAL (opcoes clicaveis + numeradas): fatia PURA exposta do
     # loop GL (npc_dialogue_digit_for_key), MESMO racional de
     # battle_key_routing_test.cpp.

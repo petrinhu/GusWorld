@@ -14,6 +14,11 @@
 #include <sstream>
 #include <string>
 
+// I18N-ESCAPE-MARKUP: todo texto vindo do catalogo de traducao passa por
+// rml_escape ANTES de entrar no ostringstream (ponto UNICO de aplicacao, ver
+// gus/app/screens/rml_escape.hpp).
+#include "gus/app/screens/rml_escape.hpp"
+
 namespace gus::app::screens {
 
 namespace {
@@ -166,8 +171,8 @@ std::string build_difficulty_menu_rml(const DifficultyMenuState& state,
     body << "<div id=\"difficulty-panel\">";
     body << "<div class=\"corner tl\"></div><div class=\"corner tr\"></div>"
             "<div class=\"corner bl\"></div><div class=\"corner br\"></div>";
-    body << "<div class=\"difficulty-title\">" << translator.tr("SAVE_DIFFICULTY_TITLE")
-         << "</div>";
+    body << "<div class=\"difficulty-title\">"
+         << rml_escape(translator.tr("SAVE_DIFFICULTY_TITLE")) << "</div>";
 
     if (state.confirming) {
         // Splash Aviso #2 (§2.2): titulo/botao "Sim" PROPRIOS da dificuldade
@@ -178,16 +183,16 @@ std::string build_difficulty_menu_rml(const DifficultyMenuState& state,
             state.selected >= 0 && state.selected < kDifficultyItemCount
                 ? state.selected
                 : static_cast<int>(DifficultyMenuItem::Medio));
-        body << "<div class=\"confirm-title\">" << translator.tr(kConfirmTitleKeys[idx])
-             << "</div>";
+        body << "<div class=\"confirm-title\">"
+             << rml_escape(translator.tr(kConfirmTitleKeys[idx])) << "</div>";
         body << "<div class=\"confirm-body\">"
-             << translator.tr("SAVE_DIFFICULTY_CONFIRM_BODY") << "</div>";
+             << rml_escape(translator.tr("SAVE_DIFFICULTY_CONFIRM_BODY")) << "</div>";
         body << "<div class=\"confirm-pill" << (state.confirm_selected == 0 ? " focused" : "")
-             << "\" id=\"difficulty-confirm-0\">" << translator.tr(kConfirmYesKeys[idx])
-             << "</div>";
+             << "\" id=\"difficulty-confirm-0\">"
+             << rml_escape(translator.tr(kConfirmYesKeys[idx])) << "</div>";
         body << "<div class=\"confirm-pill" << (state.confirm_selected == 1 ? " focused" : "")
              << "\" id=\"difficulty-confirm-1\">"
-             << translator.tr("SAVE_DIFFICULTY_CONFIRM_NO") << "</div>";
+             << rml_escape(translator.tr("SAVE_DIFFICULTY_CONFIRM_NO")) << "</div>";
         body << "</div>";  // #difficulty-panel
         return wrap_document(body.str());
     }
@@ -205,11 +210,11 @@ std::string build_difficulty_menu_rml(const DifficultyMenuState& state,
 
         body << "<div class=\"" << classes << "\" id=\"difficulty-item-" << i << "\">";
         body << "<div class=\"difficulty-item-label\">"
-             << translator.tr(kLabelKeys[static_cast<std::size_t>(i)]);
+             << rml_escape(translator.tr(kLabelKeys[static_cast<std::size_t>(i)]));
         // Badge "Recomendado" SO no Medio (§2.1 default canonico).
         if (static_cast<DifficultyMenuItem>(i) == DifficultyMenuItem::Medio) {
             body << "<span class=\"difficulty-badge\">"
-                 << translator.tr("SAVE_DIFFICULTY_MEDIO_BADGE") << "</span>";
+                 << rml_escape(translator.tr("SAVE_DIFFICULTY_MEDIO_BADGE")) << "</span>";
         }
         // Afordancia de bloqueio (scope-add REVISAO 2026-07-10, "cenoura"
         // visivel-travada): badge de TEXTO, nao glifo de cadeado unicode - a
@@ -221,14 +226,15 @@ std::string build_difficulty_menu_rml(const DifficultyMenuState& state,
         }
         body << "</div>";
         body << "<div class=\"difficulty-item-desc\">"
-             << translator.tr(desc_key_for_item(i, state.hardcore_unlocked)) << "</div>";
+             << rml_escape(translator.tr(desc_key_for_item(i, state.hardcore_unlocked)))
+             << "</div>";
         body << "</div>";
     }
     // Aviso #1 (§2.2): aviso fixo, sempre visivel enquanto navega a lista.
-    body << "<div class=\"difficulty-hint\">" << translator.tr("SAVE_DIFFICULTY_HINT")
-         << "</div>";
+    body << "<div class=\"difficulty-hint\">"
+         << rml_escape(translator.tr("SAVE_DIFFICULTY_HINT")) << "</div>";
     body << "<div class=\"difficulty-foot\">"
-         << translator.tr("SAVE_DIFFICULTY_FOOTER_HINT") << "</div>";
+         << rml_escape(translator.tr("SAVE_DIFFICULTY_FOOTER_HINT")) << "</div>";
 
     body << "</div>";  // #difficulty-panel
     return wrap_document(body.str());

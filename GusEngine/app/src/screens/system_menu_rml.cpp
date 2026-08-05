@@ -115,6 +115,13 @@
 #include <sstream>
 #include <string>
 
+// I18N-ESCAPE-MARKUP: esta tela e a ORIGEM do achado - CONTROLS_GROUP_MENU_DIALOGUE
+// vale "Menu & Diálogo" no pt_br.md, e era o '&' dele que o parser estrito de RML do
+// glintfx rejeitava. Todo texto de traducao passa por rml_escape ANTES de entrar no
+// ostringstream (ponto UNICO, ver gus/app/screens/rml_escape.hpp); onde ha
+// interpolacao manual de "{0}", o escape vem DEPOIS dela, cobrindo as duas partes
+// numa unica chamada.
+#include "gus/app/screens/rml_escape.hpp"
 #include "gus/domain/input/action_registry.hpp"  // ActionDefinition (label i18n key + categoria)
 #include "gus/domain/input/controls_diff.hpp"    // human_label_for_keycode (rotulo legivel da tecla)
 
@@ -646,8 +653,8 @@ void append_panel_open(std::ostringstream& body, const gus::app::i18n::Translato
                         const char* title_key, const char* extra_panel_class = "") {
     body << "<div id=\"sysmenu-scrim\"></div>";
     body << "<div id=\"sysmenu-panel\" class=\"" << extra_panel_class << "\">" << kCorners;
-    body << "<div class=\"kicker\">" << tr.tr("MENU_SYSTEM_KICKER") << "</div>";
-    body << "<div class=\"title\">" << tr.tr(title_key) << "</div>";
+    body << "<div class=\"kicker\">" << rml_escape(tr.tr("MENU_SYSTEM_KICKER")) << "</div>";
+    body << "<div class=\"title\">" << rml_escape(tr.tr(title_key)) << "</div>";
     body << "<div class=\"divider\"></div>";
 }
 
@@ -662,15 +669,15 @@ std::string build_pause_body(const SystemMenuState& state,
     // sem CSS novo).
     if (state.pause_confirming_to_title) {
         body << "<div class=\"ctrl-confirm-title\">"
-             << tr.tr("MENU_TO_TITLE_CONFIRM_TITLE") << "</div>";
+             << rml_escape(tr.tr("MENU_TO_TITLE_CONFIRM_TITLE")) << "</div>";
         const bool yes_focused = (state.pause_to_title_confirm_selected == 0);
         const bool no_focused = (state.pause_to_title_confirm_selected == 1);
         body << "<div class=\"verb-pill" << (yes_focused ? " focused" : "")
              << pressed_class(0, pressed_index) << "\" id=\"pause-totitle-confirm-0\">"
-             << tr.tr("MENU_TO_TITLE_CONFIRM_YES") << "</div>";
+             << rml_escape(tr.tr("MENU_TO_TITLE_CONFIRM_YES")) << "</div>";
         body << "<div class=\"btn-back" << (no_focused ? " focused" : "")
              << pressed_class(1, pressed_index) << "\" id=\"pause-totitle-confirm-1\">"
-             << tr.tr("MENU_TO_TITLE_CONFIRM_NO") << "</div>";
+             << rml_escape(tr.tr("MENU_TO_TITLE_CONFIRM_NO")) << "</div>";
         body << "</div>";  // #sysmenu-panel
         return body.str();
     }
@@ -698,7 +705,7 @@ std::string build_pause_body(const SystemMenuState& state,
         const bool focused = (state.pause_selected == item.index);
         body << "<div class=\"verb-pill" << item.extra_class
              << (focused ? " focused" : "") << pressed_class(item.index, pressed_index)
-             << "\" id=\"pause-item-" << item.index << "\">" << tr.tr(item.key)
+             << "\" id=\"pause-item-" << item.index << "\">" << rml_escape(tr.tr(item.key))
              << "</div>";
     }
 
@@ -714,7 +721,9 @@ std::string build_pause_body(const SystemMenuState& state,
     if (const auto pos1 = hint.find("{1}"); pos1 != std::string::npos) {
         hint.replace(pos1, 3, "Esc");
     }
-    body << "<div class=\"footer-hint\">" << hint << "</div>";
+    // Escape DEPOIS da interpolacao: uma unica chamada cobre o texto traduzido E os
+    // literais "Enter"/"Esc" injetados acima (que sao nossos e sem metacaractere).
+    body << "<div class=\"footer-hint\">" << rml_escape(hint) << "</div>";
     body << "</div>";  // #sysmenu-panel
     return body.str();
 }
@@ -745,7 +754,7 @@ std::string build_config_categories_body(const SystemMenuState& state,
         const char* base_class = item.is_back ? "btn-back" : "verb-pill";
         body << "<div class=\"" << base_class << (focused ? " focused" : "")
              << pressed_class(item.index, pressed_index) << "\" id=\"category-item-"
-             << item.index << "\">" << tr.tr(item.key) << "</div>";
+             << item.index << "\">" << rml_escape(tr.tr(item.key)) << "</div>";
     }
 
     body << "</div>";  // #sysmenu-panel
@@ -779,7 +788,7 @@ std::string build_audio_body(const SystemMenuState& state,
         // cima / "barra" embaixo.
         body << "<div class=\"field\" id=\"audio-item-" << row.index << "\">"
              << "<div class=\"field-row\">"
-             << "<span class=\"name\">" << tr.tr(row.name_key) << "</span>"
+             << "<span class=\"name\">" << rml_escape(tr.tr(row.name_key)) << "</span>"
              << "<span class=\"val\">" << pct << "</span>"
              << "</div>"
              << "<div class=\"track\" id=\"slider-track-" << row.index << "\">"
@@ -796,7 +805,7 @@ std::string build_audio_body(const SystemMenuState& state,
     const bool back_focused = (state.audio_selected == back_index);
     body << "<div class=\"btn-back" << (back_focused ? " focused" : "")
          << pressed_class(back_index, pressed_index) << "\" id=\"audio-item-"
-         << back_index << "\">" << tr.tr("SETTINGS_BACK") << "</div>";
+         << back_index << "\">" << rml_escape(tr.tr("SETTINGS_BACK")) << "</div>";
 
     body << "</div>";  // #sysmenu-panel
     return body.str();
@@ -812,11 +821,11 @@ std::string build_placeholder_body(const gus::app::i18n::Translator& tr,
     std::ostringstream body;
     append_panel_open(body, tr, title_key);
 
-    body << "<div class=\"placeholder-text\">" << tr.tr("MENU_PLACEHOLDER_TEXT")
+    body << "<div class=\"placeholder-text\">" << rml_escape(tr.tr("MENU_PLACEHOLDER_TEXT"))
          << "</div>";
     body << "<div class=\"btn-back focused"
          << pressed_class(kPlaceholderBackIndex, pressed_index) << "\" id=\"placeholder-back\">"
-         << tr.tr("SETTINGS_BACK") << "</div>";
+         << rml_escape(tr.tr("SETTINGS_BACK")) << "</div>";
 
     body << "</div>";  // #sysmenu-panel
     return body.str();
@@ -861,15 +870,15 @@ std::string build_controls_body(const SystemMenuState& state,
 
     if (state.controls_confirming_restore) {
         body << "<div class=\"ctrl-confirm-title\">"
-             << tr.tr("CONTROLS_RESTORE_CONFIRM_TITLE") << "</div>";
+             << rml_escape(tr.tr("CONTROLS_RESTORE_CONFIRM_TITLE")) << "</div>";
         const bool yes_focused = (state.controls_restore_confirm_selected == 0);
         const bool no_focused = (state.controls_restore_confirm_selected == 1);
         body << "<div class=\"verb-pill" << (yes_focused ? " focused" : "")
              << pressed_class(0, pressed_index) << "\" id=\"controls-confirm-0\">"
-             << tr.tr("CONTROLS_RESTORE_CONFIRM_YES") << "</div>";
+             << rml_escape(tr.tr("CONTROLS_RESTORE_CONFIRM_YES")) << "</div>";
         body << "<div class=\"btn-back" << (no_focused ? " focused" : "")
              << pressed_class(1, pressed_index) << "\" id=\"controls-confirm-1\">"
-             << tr.tr("CONTROLS_RESTORE_CONFIRM_NO") << "</div>";
+             << rml_escape(tr.tr("CONTROLS_RESTORE_CONFIRM_NO")) << "</div>";
         body << "</div>";  // #sysmenu-panel
         return body.str();
     }
@@ -880,23 +889,23 @@ std::string build_controls_body(const SystemMenuState& state,
     // pra nao colidir (embora mutuamente exclusivos - so 1 dialogo por vez).
     if (state.controls_confirming_discard) {
         body << "<div class=\"ctrl-confirm-title\">"
-             << tr.tr("CONTROLS_DISCARD_CONFIRM_TITLE") << "</div>";
+             << rml_escape(tr.tr("CONTROLS_DISCARD_CONFIRM_TITLE")) << "</div>";
         const bool yes_focused = (state.controls_discard_confirm_selected == 0);
         const bool no_focused = (state.controls_discard_confirm_selected == 1);
         body << "<div class=\"verb-pill" << (yes_focused ? " focused" : "")
              << pressed_class(0, pressed_index) << "\" id=\"controls-discard-confirm-0\">"
-             << tr.tr("CONTROLS_DISCARD_CONFIRM_YES") << "</div>";
+             << rml_escape(tr.tr("CONTROLS_DISCARD_CONFIRM_YES")) << "</div>";
         body << "<div class=\"btn-back" << (no_focused ? " focused" : "")
              << pressed_class(1, pressed_index) << "\" id=\"controls-discard-confirm-1\">"
-             << tr.tr("CONTROLS_DISCARD_CONFIRM_NO") << "</div>";
+             << rml_escape(tr.tr("CONTROLS_DISCARD_CONFIRM_NO")) << "</div>";
         body << "</div>";  // #sysmenu-panel
         return body.str();
     }
 
     body << "<div class=\"ctrl-cols-head\" id=\"ctrl-cols-head\">"
-         << "<span class=\"c-act\">" << tr.tr("CONTROLS_COL_ACTION") << "</span>"
-         << "<span class=\"c-key\">" << tr.tr("CONTROLS_COL_KEYBOARD") << "</span>"
-         << "<span class=\"c-pad\">" << tr.tr("CONTROLS_COL_GAMEPAD") << "</span>"
+         << "<span class=\"c-act\">" << rml_escape(tr.tr("CONTROLS_COL_ACTION")) << "</span>"
+         << "<span class=\"c-key\">" << rml_escape(tr.tr("CONTROLS_COL_KEYBOARD")) << "</span>"
+         << "<span class=\"c-pad\">" << rml_escape(tr.tr("CONTROLS_COL_GAMEPAD")) << "</span>"
          << "</div>";
 
     body << "<div class=\"ctrl-list\" id=\"ctrl-list\">";
@@ -910,7 +919,10 @@ std::string build_controls_body(const SystemMenuState& state,
     for (int i = 0; i < kControlsActionCount; ++i) {
         const int group = controls_group_at(i);
         if (group != last_group && group >= 0 && group < 4) {
-            body << "<div class=\"ctrl-group\">" << tr.tr(kGroupKeys[group]) << "</div>";
+            // ESTE e o ponto exato do achado: kGroupKeys[3] e
+            // CONTROLS_GROUP_MENU_DIALOGUE = "Menu & Diálogo" no pt_br.md.
+            body << "<div class=\"ctrl-group\">" << rml_escape(tr.tr(kGroupKeys[group]))
+                 << "</div>";
             last_group = group;
         }
 
@@ -932,7 +944,10 @@ std::string build_controls_body(const SystemMenuState& state,
         }
 
         body << "<div class=\"" << row_class << "\" id=\"controls-item-" << i << "\">";
-        body << "<span class=\"c-act\">" << label;
+        // `label` cobre os DOIS ramos: o rotulo traduzido (def != nullptr) e o
+        // fallback com o action_name cru. Escapar aqui, no ponto de insercao, trata
+        // os dois com uma chamada so.
+        body << "<span class=\"c-act\">" << rml_escape(label);
         if (selected && state.controls_last_action_swapped) {
             // Aviso de troca (decisao 1 do lider): CONTROLS_SWAP_NOTICE tem 1
             // placeholder posicional "{0}" (mesmo padrao manual de MENU_PAUSE_HINT
@@ -942,18 +957,25 @@ std::string build_controls_body(const SystemMenuState& state,
             if (const auto pos = notice.find("{0}"); pos != std::string::npos) {
                 notice.replace(pos, 3, other);
             }
-            body << "<span class=\"ctrl-conflict\">" << notice << "</span>";
+            // Escape DEPOIS da interpolacao: `notice` ja carrega as DUAS strings
+            // traduzidas (o aviso e o rotulo da outra action), e uma unica chamada
+            // cobre as duas sem escapar nenhuma delas 2x.
+            body << "<span class=\"ctrl-conflict\">" << rml_escape(notice) << "</span>";
         }
         body << "</span>";
 
         body << "<span class=\"c-key\">";
         if (capturing_here) {
-            body << "<span class=\"ctrl-capture-text\">" << tr.tr("CONTROLS_CAPTURE_PROMPT")
-                 << "</span>";
+            body << "<span class=\"ctrl-capture-text\">"
+                 << rml_escape(tr.tr("CONTROLS_CAPTURE_PROMPT")) << "</span>";
         } else if (key_label.empty()) {
-            body << "<span class=\"keycap none\">" << tr.tr("CONTROLS_NO_BINDING") << "</span>";
+            body << "<span class=\"keycap none\">" << rml_escape(tr.tr("CONTROLS_NO_BINDING"))
+                 << "</span>";
         } else {
-            body << "<span class=\"keycap\">" << key_label << "</span>";
+            // key_label vem de human_label_for_keycode (tabela interna), mas o
+            // KEYCODE que a escolhe vem do controls.json editavel pelo jogador -
+            // escapado pela mesma regra, sem excecao por "a origem parece nossa".
+            body << "<span class=\"keycap\">" << rml_escape(key_label) << "</span>";
         }
         body << "</span>";
 
@@ -961,7 +983,7 @@ std::string build_controls_body(const SystemMenuState& state,
         // funcao acima - decisao 2 do lider + default_controls() nao popula
         // gamepad ainda).
         body << "<span class=\"c-pad\"><span class=\"keycap none\">"
-             << tr.tr("CONTROLS_NO_BINDING") << "</span></span>";
+             << rml_escape(tr.tr("CONTROLS_NO_BINDING")) << "</span></span>";
 
         body << "</div>";  // .ctrl-row
     }
@@ -976,21 +998,22 @@ std::string build_controls_body(const SystemMenuState& state,
     const bool back_focused = (state.controls_selected == kControlsBackIndex);
     body << "<div class=\"ctrl-btn ghost" << (restore_focused ? " focused" : "")
          << pressed_class(kControlsRestoreIndex, pressed_index) << "\" id=\"controls-item-"
-         << kControlsRestoreIndex << "\">" << tr.tr("SETTINGS_RESET_DEFAULTS") << "</div>";
+         << kControlsRestoreIndex << "\">" << rml_escape(tr.tr("SETTINGS_RESET_DEFAULTS"))
+         << "</div>";
     body << "<div class=\"ctrl-foot-right\">";
     // "Aplicar" esmaecido (sinal visual OPCIONAL) quando nao ha mudanca staged
     // pendente (!controls_dirty) - continua clicavel (no-op seguro).
     body << "<div class=\"ctrl-btn apply" << (state.controls_dirty ? "" : " disabled")
          << (apply_focused ? " focused" : "") << pressed_class(kControlsApplyIndex, pressed_index)
-         << "\" id=\"controls-item-" << kControlsApplyIndex << "\">" << tr.tr("SETTINGS_APPLY")
-         << "</div>";
+         << "\" id=\"controls-item-" << kControlsApplyIndex << "\">"
+         << rml_escape(tr.tr("SETTINGS_APPLY")) << "</div>";
     body << "<div class=\"ctrl-btn" << (back_focused ? " focused" : "")
          << pressed_class(kControlsBackIndex, pressed_index) << "\" id=\"controls-item-"
-         << kControlsBackIndex << "\">" << tr.tr("SETTINGS_BACK") << "</div>";
+         << kControlsBackIndex << "\">" << rml_escape(tr.tr("SETTINGS_BACK")) << "</div>";
     body << "</div>";  // .ctrl-foot-right
     body << "</div>";  // .ctrl-foot
 
-    body << "<div class=\"footer-hint\">" << tr.tr("CONTROLS_NAV_HINT") << "</div>";
+    body << "<div class=\"footer-hint\">" << rml_escape(tr.tr("CONTROLS_NAV_HINT")) << "</div>";
 
     body << "</div>";  // #sysmenu-panel
     return body.str();

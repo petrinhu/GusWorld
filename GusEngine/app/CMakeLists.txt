@@ -97,6 +97,11 @@ add_library(gusengine_app STATIC
     # system_menu_loop.cpp, ver npc_dialogue_loop_gl.hpp).
     src/screens/npc_dialogue_rml.cpp
     src/screens/npc_dialogue_loop_gl.cpp
+    # I18N-ESCAPE-MARKUP: escape dos 3 metacaracteres de markup ('&', '<', '>') para
+    # o texto EXTERNO (catalogo i18n + .dlg.txt) que os *_rml.cpp acima injetam no
+    # RML. Fica em app/screens/ porque e aqui que o markup nasce - ver o header
+    # (gus/app/screens/rml_escape.hpp) para o achado que originou e as 3 armadilhas.
+    src/screens/rml_escape.cpp
     src/sdl_window.cpp
     # APP-ICON: aplica o icone do app (opcao C do mock, Gus combate + glow cyan) na
     # SDL_Window - chamado por SdlWindow::init() E por Maestro::init() (a dona da

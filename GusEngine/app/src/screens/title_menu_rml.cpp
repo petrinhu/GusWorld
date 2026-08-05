@@ -14,6 +14,12 @@
 #include <sstream>
 #include <string>
 
+// I18N-ESCAPE-MARKUP: todo texto vindo do catalogo de traducao passa por
+// rml_escape ANTES de entrar no ostringstream (ponto UNICO de aplicacao, ver
+// gus/app/screens/rml_escape.hpp). Sem isto, um valor com '&'/'<'/'>' produz
+// markup que um parser ESTRITO de RML recusa.
+#include "gus/app/screens/rml_escape.hpp"
+
 namespace gus::app::screens {
 
 namespace {
@@ -111,23 +117,25 @@ std::string build_title_menu_rml(const TitleMenuState& state,
     body << "<div class=\"corner tl\"></div><div class=\"corner tr\"></div>"
             "<div class=\"corner bl\"></div><div class=\"corner br\"></div>";
 
-    body << "<div class=\"game-logo\">" << translator.tr("TITLE_LOGO_PREFIX")
-         << "<span class=\"w\">" << translator.tr("TITLE_LOGO_SUFFIX") << "</span></div>";
-    body << "<div class=\"game-sub\">" << translator.tr("TITLE_SUBTITLE") << "</div>";
+    body << "<div class=\"game-logo\">" << rml_escape(translator.tr("TITLE_LOGO_PREFIX"))
+         << "<span class=\"w\">" << rml_escape(translator.tr("TITLE_LOGO_SUFFIX"))
+         << "</span></div>";
+    body << "<div class=\"game-sub\">" << rml_escape(translator.tr("TITLE_SUBTITLE"))
+         << "</div>";
 
     if (state.confirming_new_game) {
         // Mini-dialogo Sim/Nao (MESMA mecanica de confirming_overwrite em
         // save_load_menu_rml.cpp) - substitui a lista de itens enquanto aberto.
-        body << "<div class=\"confirm-title\">" << translator.tr("TITLE_NEW_GAME_CONFIRM")
-             << "</div>";
+        body << "<div class=\"confirm-title\">"
+             << rml_escape(translator.tr("TITLE_NEW_GAME_CONFIRM")) << "</div>";
         body << "<div class=\"confirm-pill"
              << (state.confirm_selected == 0 ? " focused" : "")
-             << "\" id=\"title-confirm-0\">" << translator.tr("TITLE_NEW_GAME_CONFIRM_YES")
-             << "</div>";
+             << "\" id=\"title-confirm-0\">"
+             << rml_escape(translator.tr("TITLE_NEW_GAME_CONFIRM_YES")) << "</div>";
         body << "<div class=\"confirm-pill"
              << (state.confirm_selected == 1 ? " focused" : "")
-             << "\" id=\"title-confirm-1\">" << translator.tr("TITLE_NEW_GAME_CONFIRM_NO")
-             << "</div>";
+             << "\" id=\"title-confirm-1\">"
+             << rml_escape(translator.tr("TITLE_NEW_GAME_CONFIRM_NO")) << "</div>";
         body << "</div>";  // #title-panel
         return wrap_document(body.str());
     }
@@ -142,9 +150,10 @@ std::string build_title_menu_rml(const TitleMenuState& state,
         classes += pressed_class(i, pressed_index);
 
         body << "<div class=\"" << classes << "\" id=\"title-item-" << i << "\">"
-             << translator.tr(kItemKeys[i]) << "</div>";
+             << rml_escape(translator.tr(kItemKeys[i])) << "</div>";
     }
-    body << "<div class=\"title-foot\">" << translator.tr("TITLE_FOOTER_HINT") << "</div>";
+    body << "<div class=\"title-foot\">" << rml_escape(translator.tr("TITLE_FOOTER_HINT"))
+         << "</div>";
 
     body << "</div>";  // #title-panel
     return wrap_document(body.str());
