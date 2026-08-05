@@ -703,6 +703,29 @@ histórico no fim do arquivo. Novas descobertas entram como bullets abaixo desta
   libfuse2 do sistema. **Nada disso é para fazer agora** — o líder perguntou o que seria preciso, não
   mandou executar.
 
+- `ASSETS-FONTE-TELAS-GEMEO` (2026-08-05, **achado-dominó da fatia `ASSETS-PATH-CASCATA`**): o
+  conserto da cascata arrumou o **porteiro** de assets, mas o mesmo defeito vive **fora dele**, em
+  código de tela. Seis telas leem `GUSWORLD_FONTS_DIR` **direto**, sem checar existência e sem
+  fallback relativo, para copiar a fonte ao stage do RmlUi: `title_menu_loop.cpp:125`,
+  `system_menu_loop.cpp:155`, `save_load_menu_loop.cpp:140`, `difficulty_menu_loop.cpp:90`,
+  `npc_dialogue_loop_gl.cpp:158` e `battle_cockpit_rml.cpp:444` e `:543`. O padrão é sempre
+  `std::string fonts_dir = GUSWORLD_FONTS_DIR;` seguido de `fs::copy_file(..., ec)` **com o `ec`
+  ignorado**, então numa máquina onde o macro não existe a cópia falha **em silêncio** e a UI fica
+  sem fonte. ⚠️ **Segundo achado no mesmo lugar: divergência de nome de env.** O porteiro honra
+  `GUSWORLD_ASSETS` + `/fonts`; estas telas honram `GUSWORLD_FONTS`. São variáveis **diferentes**,
+  então hoje quem quiser redirecionar a fonte precisa setar as duas, e isso entra direto no `AppRun`
+  do `RELEASE-DEMO-APPIMAGE`. Encontrado pelo implementer da fatia, que corretamente **não** tocou
+  (o brief cravou arquivo único) e reportou.
+
+- `APPRUN-CWD-OU-ENV` (2026-08-05, **escopo que a fatia `ASSETS-PATH-CASCATA` NÃO cobre, dito pelo
+  próprio implementer**): a cascata consertada cai, no último nível, num caminho relativo ao **CWD**,
+  e não ao diretório do executável. Num AppImage o CWD é o de onde a pessoa invocou o arquivo, **não**
+  o AppDir. Portanto o `AppRun` ainda tem de fazer `cd` para o AppDir **ou** exportar as sete env
+  vars (`GUSWORLD_ASSETS`, `GUSWORLD_SFX`, `GUSWORLD_MUSIC`, `GUSWORLD_MAPS`,
+  `GUSWORLD_TRANSLATIONS`, `GUSWORLD_DIALOGUES`, `GUSWORLD_FONTS`). O que a fatia entregou é o
+  **pré-requisito**: o macro morto deixou de bloquear o fallback. Registrado aqui para ninguém achar
+  que o AppImage passou a funcionar sozinho.
+
 ## 🗄️ Arquivado: eras Godot/C# e Qt6 (superadas, mantidas por registro)
 
 **Motivo do arquivamento:** stack superada pelos dois pivôs em sequência (Godot 4.6 + C# .NET 8
