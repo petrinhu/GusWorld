@@ -462,6 +462,41 @@ TEST_CASE("mundo: REGRESSÃO do líder - jogador nivelado com a base da casa fic
         REQUIRE(r.index_of(700) < i_jogador);  // casa antes = ombro preservado
     }
 
+    SECTION("a mesma transição vale para NPC/inimigo, não só para o jogador") {
+        // Os atores passam pela mesma regra, mas por OUTRA linha de código - e essa
+        // linha tem de ser exercitada por si. Um Bertoldo a cavalo na borda da
+        // célula da casa continua atrás; com o corpo inteiro dentro, vem à frente.
+        // Vale mais aqui do que para o jogador: o posicionamento de ator não olha a
+        // caixa que bloqueia (só as paredes do mapa), então ator NIVELADO com a
+        // base de uma peça é situação comum, não canto raro.
+        const float topo_da_celula = static_cast<float>(kCasaCelulaY) * kTileCidade;
+        const Aabb longe = ancora_na_celula(kJogadorCelulaX, kCasaCelulaY - 8);
+
+        WorldActorSpec a_cavalo;
+        a_cavalo.role = WorldActorRole::Npc;
+        a_cavalo.anchor = ancora_na_celula(kJogadorCelulaX, kCasaCelulaY);
+        a_cavalo.anchor.y = topo_da_celula - a_cavalo.anchor.h * 0.5f;
+        a_cavalo.tex = 800;
+        a_cavalo.sprite_height_tiles = 1.0f;
+
+        OverworldSim sim(grid, longe, t);
+        sim.add_scene_prop(casa);
+        REQUIRE(sim.add_actor(a_cavalo) >= 0);
+        RecordingRenderer r;
+        sim.render(r, 4000.0f, 4000.0f, 0.0f);
+        REQUIRE(r.index_of(800) >= 0);
+        REQUIRE(r.index_of(800) < r.index_of(700));  // ainda atrás da casa
+
+        WorldActorSpec dentro = a_cavalo;
+        dentro.anchor.y = topo_da_celula;
+        OverworldSim sim2(grid, longe, t);
+        sim2.add_scene_prop(casa);
+        REQUIRE(sim2.add_actor(dentro) >= 0);
+        RecordingRenderer r2;
+        sim2.render(r2, 4000.0f, 4000.0f, 0.0f);
+        REQUIRE(r2.index_of(700) < r2.index_of(800));  // agora na frente
+    }
+
     SECTION("peça ATRAVESSÁVEL (sem caixa que bloqueia) vale pela CÉLULA que pisa") {
         // O holograma do Sterling é o único de pé que não bloqueia nada: a caixa
         // sólida dele é degenerada. Sem um piso, a fatia de chão viraria uma LINHA
