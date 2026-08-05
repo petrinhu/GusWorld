@@ -93,9 +93,11 @@
 // STB_IMAGE_WRITE_IMPLEMENTATION aqui, senao da symbol duplicado no link).
 #include "stb_image_write.h"
 
-#ifndef GUSWORLD_FONTS_DIR
-#define GUSWORLD_FONTS_DIR ""
-#endif
+// ASSETS-FONTE-TELAS-GEMEO (2026-08-05): a macro GUSWORLD_FONTS_DIR NAO e mais lida aqui
+// (nem o getenv("GUSWORLD_FONTS") a mao) - o staging das 2 fontes pro stage do glintfx
+// migrou pra stage_ui_fonts, que resolve o caminho pelo porteiro de assets e reporta a
+// falha de copia. Ver gus/app/screens/font_stage.hpp.
+#include "gus/app/screens/font_stage.hpp"
 
 namespace gus::app::screens {
 
@@ -122,18 +124,15 @@ std::string write_title_rml_file(const TitleMenuState& state,
     std::error_code ec;
     fs::create_directories(stage, ec);
 
-    std::string fonts_dir = GUSWORLD_FONTS_DIR;
-    if (const char* envf = std::getenv("GUSWORLD_FONTS")) {
-        if (envf[0] != '\0') fonts_dir = envf;
-    }
-    if (!fonts_dir.empty()) {
-        fs::copy_file(join(fonts_dir, "PixelOperatorMono.ttf"),
-                      stage / "PixelOperatorMono.ttf",
-                      fs::copy_options::overwrite_existing, ec);
-        fs::copy_file(join(fonts_dir, "PixelOperatorMono-Bold.ttf"),
-                      stage / "PixelOperatorMono-Bold.ttf",
-                      fs::copy_options::overwrite_existing, ec);
-    }
+    // ASSETS-FONTE-TELAS-GEMEO (2026-08-05): as 2 fontes vao pro stage por
+    // stage_ui_fonts (font_stage.hpp), que resolve o caminho pelo PORTEIRO de assets
+    // (cascata checada `GUSWORLD_FONTS > GUSWORLD_ASSETS+"/fonts" > macro > CWD`) e LOGA
+    // a falha de copia. Antes, este bloco lia a macro GUSWORLD_FONTS_DIR crua - o caminho
+    // absoluto da MAQUINA DE BUILD - sem checar existencia e engolindo o error_code, o que
+    // deixava a tela sem fonte EM SILENCIO em qualquer maquina que nao a de build.
+    // Retorno ignorado de proposito: fonte ausente degrada (o RmlUi usa o fallback dele) e
+    // stage_ui_fonts ja logou; nao ha o que decidir aqui.
+    stage_ui_fonts(stage);
 
     // FONT-EXTEND-GLITCH (2026-07-29): a fonte NAO e mais injetada aqui via @font-face
     // de string - TitleScreen::enter() registra a familia 1x via

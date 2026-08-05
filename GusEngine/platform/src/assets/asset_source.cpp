@@ -132,10 +132,40 @@ bool starts_with(std::string_view s, std::string_view prefix) {
 // Unica familia que checa EXISTENCIA TAMBEM NA ENV: env nao pode "sequestrar" a fonte pra
 // uma pasta sem o arquivo (comentario original preservado). Nas demais familias a env e
 // override consciente e vence sem checagem - so os 2 niveis de baixo passam por
-// compiled_or_cwd (ASSETS-PATH-CASCATA). NAO TOCAR: esta funcao e o MODELO que as outras
-// seis passaram a seguir.
+// compiled_or_cwd (ASSETS-PATH-CASCATA). Esta funcao e o MODELO que as outras seis
+// passaram a seguir; mexer aqui exige manter as duas propriedades (checar exists na env,
+// e nunca lancar).
+//
+// ASSETS-FONTE-TELAS-GEMEO (2026-08-05): esta familia passou a honrar DUAS envs, nesta
+// PRECEDENCIA, do mais ESPECIFICO pro mais GENERICO:
+//   1. GUSWORLD_FONTS  - a pasta DAS FONTES: o .ttf mora DIRETO nela (<env>/<arquivo>).
+//   2. GUSWORLD_ASSETS - a RAIZ de assets: o .ttf mora em <env>/fonts/<arquivo>.
+//   3. macro GUSWORLD_FONTS_DIR + <arquivo>  (caminho absoluto da maquina de BUILD).
+//   4. relativo ao CWD (o id como esta).
+// POR QUE A PRECEDENCIA E ESSA: quem seta GUSWORLD_FONTS esta apontando a pasta de fonte
+// NOMINALMENTE, uma decisao mais estreita e mais recente que "a raiz de assets inteira";
+// deixar a generica ganhar da especifica tornaria GUSWORLD_FONTS inutil pra quem tem as
+// duas setadas. Nao ha regressao pra quem so usa GUSWORLD_ASSETS: sem GUSWORLD_FONTS no
+// ambiente, o nivel 1 e pulado e a cadeia e byte-a-byte a de antes.
+// POR QUE GUSWORLD_FONTS EXISTE AQUI: ate esta fatia, SEIS telas de UI (title/system/
+// save-load/difficulty/npc-dialogue/cockpit) liam a macro GUSWORLD_FONTS_DIR e a env
+// GUSWORLD_FONTS DIRETO, por FORA deste porteiro, pra copiar os 2 .ttf pro stage do
+// glintfx - sem checar existencia, sem cascata, e com o std::error_code do copy_file
+// IGNORADO (numa maquina sem a macro, a interface ficava sem fonte EM SILENCIO). As telas
+// agora delegam pra ca (gus::app::screens::stage_ui_fonts); se GUSWORLD_FONTS nao
+// chegasse ate este resolver, quem ja a usava PERDERIA o override - regressao silenciosa.
+// A regra do nao-sequestro vale para as DUAS envs (so vencem se o arquivo EXISTIR la),
+// senao apontar pra uma pasta vazia deixaria a UI sem fonte em vez de degradar pro nivel
+// de baixo. Travado por 6 TEST_CASE "FONTES/GEMEO" em platform/tests/asset_source_test.cpp.
 std::string resolve_font(std::string_view id) {
     const std::string filename = strip_prefix(id, kFontsPrefix);
+    const std::string env_fonts = env_or_empty("GUSWORLD_FONTS");
+    if (!env_fonts.empty()) {
+        const std::string cand = join(env_fonts, filename);
+        if (exists_on_disk(cand)) {
+            return cand;
+        }
+    }
     const std::string env = env_or_empty("GUSWORLD_ASSETS");
     if (!env.empty()) {
         const std::string cand = join(join(env, "fonts"), filename);

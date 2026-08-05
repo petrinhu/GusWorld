@@ -120,10 +120,13 @@ struct FontAtlas {
     [[nodiscard]] bool glyph_has_ink(int codepoint) const noexcept;
 };
 
-// Resolve o caminho de um .ttf da pasta de fontes da engine (assets/fonts/). Ordem,
-// igual aos outros resolvers: env GUSWORLD_ASSETS (<env>/../assets/fonts? nao - ver .cpp)
-// > macro GUSWORLD_FONTS_DIR embutido em compilacao > relativo ao CWD. So monta a
-// STRING; nao abre arquivo.
+// Resolve o caminho de um .ttf da pasta de fontes da engine (assets/fonts/). Delega pro
+// porteiro (FilesystemAssetSource, familia FONTES); ordem: env GUSWORLD_FONTS (pasta DAS
+// fontes) > env GUSWORLD_ASSETS + "/fonts" (raiz de assets) > macro GUSWORLD_FONTS_DIR
+// embutido em compilacao > relativo ao CWD - com checagem de EXISTENCIA em todos os
+// niveis, pra nao "sequestrar" a fonte pra uma pasta sem o arquivo (precedencia completa
+// documentada em platform/src/assets/asset_source.cpp::resolve_font). So monta a STRING;
+// nao abre arquivo.
 [[nodiscard]] std::string resolve_font_path(const std::string& ttf_file);
 
 // Bakeia o atlas de um .ttf no tamanho cell_px (altura da celula). Le o arquivo (I/O,

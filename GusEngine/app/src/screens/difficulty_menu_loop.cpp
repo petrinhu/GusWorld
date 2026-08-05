@@ -59,9 +59,10 @@
 // STB_IMAGE_WRITE_IMPLEMENTATION aqui, senao da symbol duplicado no link).
 #include "stb_image_write.h"
 
-#ifndef GUSWORLD_FONTS_DIR
-#define GUSWORLD_FONTS_DIR ""
-#endif
+// ASSETS-FONTE-TELAS-GEMEO (2026-08-05): a macro GUSWORLD_FONTS_DIR NAO e mais lida aqui
+// (nem o getenv("GUSWORLD_FONTS") a mao) - o staging das 2 fontes migrou pra
+// stage_ui_fonts, que resolve pelo porteiro de assets e reporta a falha de copia.
+#include "gus/app/screens/font_stage.hpp"
 
 namespace gus::app::screens {
 
@@ -87,18 +88,12 @@ std::string write_difficulty_rml_file(const DifficultyMenuState& state,
     std::error_code ec;
     fs::create_directories(stage, ec);
 
-    std::string fonts_dir = GUSWORLD_FONTS_DIR;
-    if (const char* envf = std::getenv("GUSWORLD_FONTS")) {
-        if (envf[0] != '\0') fonts_dir = envf;
-    }
-    if (!fonts_dir.empty()) {
-        fs::copy_file(join(fonts_dir, "PixelOperatorMono.ttf"),
-                      stage / "PixelOperatorMono.ttf",
-                      fs::copy_options::overwrite_existing, ec);
-        fs::copy_file(join(fonts_dir, "PixelOperatorMono-Bold.ttf"),
-                      stage / "PixelOperatorMono-Bold.ttf",
-                      fs::copy_options::overwrite_existing, ec);
-    }
+    // ASSETS-FONTE-TELAS-GEMEO: staging das 2 fontes pelo helper unico (font_stage.hpp),
+    // que resolve pelo PORTEIRO (cascata checada) e LOGA a falha de copia. Antes, este
+    // bloco lia a macro GUSWORLD_FONTS_DIR crua (caminho da maquina de BUILD) sem checar
+    // existencia e com o error_code descartado - falha 100% silenciosa. Retorno ignorado
+    // de proposito: fonte ausente degrada e o helper ja logou.
+    stage_ui_fonts(stage);
 
     // FONT-EXTEND-GLITCH (2026-07-29): a fonte NAO e mais injetada aqui via @font-face
     // de string - DifficultyScreen::enter() registra a familia 1x via

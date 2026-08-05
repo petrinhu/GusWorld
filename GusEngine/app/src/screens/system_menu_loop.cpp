@@ -106,13 +106,11 @@
 // STB_IMAGE_WRITE_IMPLEMENTATION aqui, senao da symbol duplicado no link).
 #include "stb_image_write.h"
 
-// Pasta das fontes (.ttf), embutida pelo CMake (mesma macro que battle_preview.cpp
-// ja usa - PRIVATE no CMakeLists do target app, aplica a TODO .cpp do target). SO usada
-// pelo staging de fonte pro glintfx (write_system_menu_rml_file) - FORA do escopo do
-// retrofit ASSETS-VFS-F1 (ADR-013 marca esse staging como ESCRITA, nao leitura).
-#ifndef GUSWORLD_FONTS_DIR
-#define GUSWORLD_FONTS_DIR ""
-#endif
+// ASSETS-FONTE-TELAS-GEMEO (2026-08-05): a macro GUSWORLD_FONTS_DIR NAO e mais lida aqui
+// (nem o getenv("GUSWORLD_FONTS") a mao). O staging continua sendo ESCRITA (e portanto
+// fora do porteiro, que e so-leitura por decisao do ADR-013), mas quem RESOLVE o caminho
+// de origem passou a ser o porteiro - via stage_ui_fonts. Ver gus/app/screens/font_stage.hpp.
+#include "gus/app/screens/font_stage.hpp"
 
 namespace gus::app::screens {
 
@@ -134,9 +132,9 @@ std::string menu_stage_dir() {
 }
 
 // Escreve o RML do menu (build_system_menu_rml, ver system_menu_rml.hpp) num arquivo
-// dentro do stage. Copia as 2 fontes pro stage (fonte: GUSWORLD_FONTS_DIR, env
-// GUSWORLD_FONTS tem prioridade - mesma ordem de resolucao de asset do resto do
-// app/). Devolve o path do .rml escrito. `pressed_index` repassado direto pra
+// dentro do stage. Copia as 2 fontes pro stage via stage_ui_fonts (font_stage.hpp), que
+// resolve a origem pelo PORTEIRO de assets - MESMA cadeia do resto do app/, agora de
+// verdade e nao por copia (ASSETS-FONTE-TELAS-GEMEO). Devolve o path do .rml escrito. `pressed_index` repassado direto pra
 // build_system_menu_rml (ver seu header) - default -1 (nenhum item pressionado).
 //
 // FONT-EXTEND-GLITCH (2026-07-29): a fonte NAO e mais injetada aqui via @font-face de
@@ -152,18 +150,12 @@ std::string write_system_menu_rml_file(const SystemMenuState& state,
     std::error_code ec;
     fs::create_directories(stage, ec);
 
-    std::string fonts_dir = GUSWORLD_FONTS_DIR;
-    if (const char* envf = std::getenv("GUSWORLD_FONTS")) {
-        if (envf[0] != '\0') fonts_dir = envf;
-    }
-    if (!fonts_dir.empty()) {
-        fs::copy_file(join(fonts_dir, "PixelOperatorMono.ttf"),
-                      stage / "PixelOperatorMono.ttf",
-                      fs::copy_options::overwrite_existing, ec);
-        fs::copy_file(join(fonts_dir, "PixelOperatorMono-Bold.ttf"),
-                      stage / "PixelOperatorMono-Bold.ttf",
-                      fs::copy_options::overwrite_existing, ec);
-    }
+    // ASSETS-FONTE-TELAS-GEMEO: staging das 2 fontes pelo helper unico (font_stage.hpp),
+    // que resolve pelo PORTEIRO (cascata checada) e LOGA a falha de copia. Antes, este
+    // bloco lia a macro GUSWORLD_FONTS_DIR crua (caminho da maquina de BUILD) sem checar
+    // existencia e com o error_code descartado - falha 100% silenciosa. Retorno ignorado
+    // de proposito: fonte ausente degrada e o helper ja logou.
+    stage_ui_fonts(stage);
 
     std::string rml = build_system_menu_rml(state, tr, pressed_index);
 

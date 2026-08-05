@@ -80,9 +80,11 @@
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "stb_image_write.h"
 
-// AC-E11 A2 (ADR-019): GUSWORLD_FONTS_DIR (a macro da pasta de fontes do cockpit
-// BAKED/LIVE) e <filesystem>/<fstream> (tempfile do RML) MORARAM pra
-// battle_cockpit_rml.cpp - so quem escreve o .rml precisa deles agora. A familia "Pixel
+// AC-E11 A2 (ADR-019): o staging da pasta de fontes do cockpit BAKED/LIVE e
+// <filesystem>/<fstream> (tempfile do RML) MORARAM pra battle_cockpit_rml.cpp - so quem
+// escreve o .rml precisa deles agora. (ASSETS-FONTE-TELAS-GEMEO, 2026-08-05: la a macro
+// GUSWORLD_FONTS_DIR deixou de ser lida a mao - o caminho vem do porteiro de assets via
+// gus::app::screens::stage_ui_fonts.) A familia "Pixel
 // Operator Mono" e registrada AQUI (load_font_face, ver mais abaixo) - FONT-EXTEND-GLITCH,
 // 2026-07-29.
 

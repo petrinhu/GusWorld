@@ -146,6 +146,12 @@ add_executable(gusengine_app_tests
     # de evento extraida do while(true) antigo - headless, SEM SDL_Init/
     # janela/IRenderer/AnimClock real (ver o topo do arquivo).
     anim_preview_step_test.cpp
+    # ASSETS-FONTE-TELAS-GEMEO: staging das 2 fontes de UI pro stage do glintfx
+    # (stage_ui_fonts) - HEADLESS de verdade (I/O de arquivo puro, sem SDL_Init/janela/
+    # GL): o staging acontece ANTES de qualquer contexto GL existir, e era justamente a
+    # metade do fio que falhava EM SILENCIO. Captura o log via glintfx::set_log_sink pra
+    # provar que a falha de copia passou a ser reportada.
+    font_stage_test.cpp
 )
 
 target_link_libraries(gusengine_app_tests

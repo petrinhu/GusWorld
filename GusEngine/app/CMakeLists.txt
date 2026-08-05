@@ -54,6 +54,10 @@ add_library(gusengine_app STATIC
     # battle_preview.cpp - ver gus/app/screens/battle_cockpit_rml.hpp.
     src/screens/battle_cockpit_rml.cpp
     src/screens/battle_preview.cpp
+    # ASSETS-FONTE-TELAS-GEMEO: staging das 2 fontes de UI pro stage do glintfx, UM
+    # lugar so - substitui as 7 copias identicas que liam a macro GUSWORLD_FONTS_DIR
+    # DIRETO (por fora do porteiro de assets) e engoliam o erro do copy_file.
+    src/screens/font_stage.cpp
     # MENU-PAUSA-CONFIG-SOM (M7-COSTURA): logica pura do menu de pausa + config de som.
     src/screens/system_menu.cpp
     src/screens/system_menu_rml.cpp

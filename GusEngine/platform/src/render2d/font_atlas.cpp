@@ -128,7 +128,9 @@ std::string resolve_font_path(const std::string& ttf_file) {
     // ASSETS-VFS-F1 (ADR-013): a cadeia `env GUSWORLD_ASSETS+"/fonts" (com exists(), pra
     // nao "sequestrar" a fonte) > macro GUSWORLD_FONTS_DIR > CWD (kFontsDir)` foi
     // CONSOLIDADA em FilesystemAssetSource::resolve_path (familia FONTES, dispatch pelo
-    // prefixo "assets/fonts/" do id). Contrato/assinatura desta funcao INTOCADOS (segue
+    // prefixo "assets/fonts/" do id). ASSETS-FONTE-TELAS-GEMEO (2026-08-05): aquela cadeia
+    // ganhou um nivel ACIMA de todos - a env GUSWORLD_FONTS (a pasta DAS fontes), que as
+    // telas de UI liam por conta propria antes de passarem a delegar pro porteiro. Contrato/assinatura desta funcao INTOCADOS (segue
     // aceitando so o nome do arquivo e devolvendo um caminho de disco resolvido) -
     // paridade provada em platform/tests/asset_source_test.cpp.
     const std::string id =

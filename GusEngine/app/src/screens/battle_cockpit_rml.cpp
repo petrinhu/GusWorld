@@ -7,21 +7,19 @@
 
 #include "gus/app/screens/battle_cockpit_rml.hpp"
 
-#include <cstdlib>  // std::getenv
 #include <filesystem>
 #include <fstream>
 
 #include "gus/app/screens/battle_assets.hpp"  // join/resolve_asset_dir/retrato_file_for (AC-E11 A3)
+// ASSETS-FONTE-TELAS-GEMEO (2026-08-05): a macro GUSWORLD_FONTS_DIR NAO e mais lida aqui
+// (nem o getenv("GUSWORLD_FONTS") a mao, que era o UNICO uso de <cstdlib> neste arquivo -
+// dai o include ter saido junto). Os 2 sitios de staging deste arquivo (cockpit BAKED e
+// LIVE) delegam pra stage_ui_fonts, que resolve pelo porteiro e reporta a falha de copia.
+// O destino continua o mesmo stage pra onde glintfx::UiLayer::load_font_face aponta
+// (FONT-EXTEND-GLITCH, 2026-07-29 - ver battle_preview.cpp).
+#include "gus/app/screens/font_stage.hpp"
 #include "gus/core/asset_paths.hpp"
 #include "gus/domain/combat/combat_actor.hpp"
-
-// Pasta das fontes (.ttf), embutida pelo CMake (ADR-010 F2a). So usada no caminho glintfx
-// (cockpit BAKED/LIVE): os .ttf sao copiados pro stage daqui, e e pra la que
-// glintfx::UiLayer::load_font_face aponta (FONT-EXTEND-GLITCH, 2026-07-29 - ver
-// battle_preview.cpp). Fallback vazio se ausente.
-#ifndef GUSWORLD_FONTS_DIR
-#define GUSWORLD_FONTS_DIR ""
-#endif
 
 namespace gus::app::screens {
 
@@ -435,21 +433,19 @@ std::string write_baked_cockpit_rml(bool intro) {
     std::error_code ec;
     fs::create_directories(stage, ec);
 
-    // Copia os assets pro stage (flat). Fonte: GUSWORLD_FONTS_DIR (env GUSWORLD_FONTS tem
-    // prioridade). Sprites: cockpit_asset_base_dir() (icons-m5) + retratos/.
+    // Copia os assets pro stage (flat). Sprites: cockpit_asset_base_dir() (icons-m5) +
+    // retratos/.
     auto copy_into = [&](const std::string& src, const std::string& dst_name) {
         if (src.empty()) return;
         fs::copy_file(src, stage / dst_name, fs::copy_options::overwrite_existing, ec);
     };
-    std::string fonts_dir = GUSWORLD_FONTS_DIR;
-    if (const char* envf = std::getenv("GUSWORLD_FONTS")) {
-        if (envf[0] != '\0') fonts_dir = envf;
-    }
-    if (!fonts_dir.empty()) {
-        copy_into(join(fonts_dir, "PixelOperatorMono.ttf"), "PixelOperatorMono.ttf");
-        copy_into(join(fonts_dir, "PixelOperatorMono-Bold.ttf"),
-                  "PixelOperatorMono-Bold.ttf");
-    }
+    // ASSETS-FONTE-TELAS-GEMEO: as 2 FONTES saem do copy_into local e vao pelo helper
+    // unico (font_stage.hpp), que resolve pelo PORTEIRO (cascata checada) e LOGA a falha.
+    // Antes, este bloco lia a macro GUSWORLD_FONTS_DIR crua (caminho da maquina de BUILD)
+    // sem checar existencia e com o error_code descartado - falha 100% silenciosa. Os
+    // SPRITES seguem no copy_into (nao sao escopo desta fatia). Retorno ignorado de
+    // proposito: fonte ausente degrada e o helper ja logou.
+    stage_ui_fonts(stage);
     const std::string icons = cockpit_asset_base_dir();
     copy_into(join(icons, std::string(gus::core::assets::kMolduraCartaFrameFile)),
               "moldura_carta_frame.png");
@@ -540,15 +536,9 @@ std::string write_live_cockpit_rml() {
         if (src.empty()) return;
         fs::copy_file(src, stage / dst_name, fs::copy_options::overwrite_existing, ec);
     };
-    std::string fonts_dir = GUSWORLD_FONTS_DIR;
-    if (const char* envf = std::getenv("GUSWORLD_FONTS")) {
-        if (envf[0] != '\0') fonts_dir = envf;
-    }
-    if (!fonts_dir.empty()) {
-        copy_into(join(fonts_dir, "PixelOperatorMono.ttf"), "PixelOperatorMono.ttf");
-        copy_into(join(fonts_dir, "PixelOperatorMono-Bold.ttf"),
-                  "PixelOperatorMono-Bold.ttf");
-    }
+    // ASSETS-FONTE-TELAS-GEMEO: MESMA troca do BAKED acima - as 2 fontes vao pelo helper
+    // unico (porteiro + log da falha), os sprites seguem no copy_into local.
+    stage_ui_fonts(stage);
     const std::string icons = cockpit_asset_base_dir();
     copy_into(join(icons, std::string(gus::core::assets::kMolduraCartaFrameFile)),
               "moldura_carta_frame.png");

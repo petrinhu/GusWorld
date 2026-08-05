@@ -231,6 +231,10 @@ TEST_CASE(
     "FilesystemAssetSource familia FONTES: env so vence SE o arquivo existir la (nao "
     "sequestra)",
     "[asset_source]") {
+    // ASSETS-FONTE-TELAS-GEMEO: a familia FONTES passou a honrar TAMBEM GUSWORLD_FONTS
+    // (com precedencia sobre GUSWORLD_ASSETS) - os TEST_CASE que afirmam algo sobre
+    // GUSWORLD_ASSETS so sao hermeticos se a env mais especifica estiver AUSENTE.
+    ScopedUnsetEnv no_fonts("GUSWORLD_FONTS");
     TempDir dir;  // NAO tem fonts/<arquivo> dentro - candidato do env nao existe
     ScopedEnv env("GUSWORLD_ASSETS", dir.path().string());
     FilesystemAssetSource src;
@@ -242,6 +246,7 @@ TEST_CASE(
 
 TEST_CASE("FilesystemAssetSource familia FONTES: env vence quando o arquivo existe la",
           "[asset_source]") {
+    ScopedUnsetEnv no_fonts("GUSWORLD_FONTS");  // ver nota de hermetismo acima
     TempDir dir;
     write_file(dir.path() / "fonts" / "Fake.ttf", "FAKEFONT");
     ScopedEnv env("GUSWORLD_ASSETS", dir.path().string());
@@ -258,6 +263,7 @@ TEST_CASE(
     "FilesystemAssetSource familia FONTES: sem env cai no macro/CWD (fonte real do repo)",
     "[asset_source]") {
     ScopedUnsetEnv no_env("GUSWORLD_ASSETS");
+    ScopedUnsetEnv no_fonts("GUSWORLD_FONTS");  // "sem env" = sem NENHUMA das duas
     FilesystemAssetSource src;
     const std::string id = "assets/fonts/PixelOperatorMono.ttf";
     const auto bytes = src.read(id);
@@ -696,6 +702,7 @@ TEST_CASE(
     "regride)",
     "[asset_source]") {
     ScopedUnsetEnv no_env("GUSWORLD_ASSETS");
+    ScopedUnsetEnv no_fonts("GUSWORLD_FONTS");  // o 3o nivel so e alcancavel sem env
     TempDir dir;
     const std::string id = "assets/fonts/zz_cascata.ttf";
     write_file(dir.path() / id, "FAKEFONT");
@@ -705,6 +712,110 @@ TEST_CASE(
     // A fonte ja fazia isto ANTES desta fatia - o teste existe pra travar o modelo.
     REQUIRE(src.resolve_path(id) == id);
     REQUIRE(src.read(id).has_value());
+}
+
+// ------------------------------------- ASSETS-FONTE-TELAS-GEMEO: env GUSWORLD_FONTS
+// A familia FONTES passou a honrar DUAS envs, nesta PRECEDENCIA (documentada em
+// resolve_font e no header): GUSWORLD_FONTS (pasta DAS fontes) > GUSWORLD_ASSETS +
+// "/fonts" (raiz de assets) > macro > CWD. Motivo: as 6 telas de UI liam GUSWORLD_FONTS
+// DIRETO (por fora do porteiro) pra copiar os .ttf pro stage do glintfx; ao passarem a
+// delegar pro porteiro, quem ja usava GUSWORLD_FONTS perderia o override se ele nao
+// chegasse ate aqui. A regra de NAO-SEQUESTRO (a env so vence se o arquivo EXISTIR la)
+// vale para as DUAS envs - e o que impede apontar pra uma pasta vazia e ficar sem fonte.
+TEST_CASE("FONTES/GEMEO: env GUSWORLD_FONTS vence quando o arquivo existe la",
+          "[asset_source]") {
+    ScopedUnsetEnv no_assets("GUSWORLD_ASSETS");
+    TempDir dir;
+    // Repare: o .ttf mora DIRETO na pasta (sem o "/fonts" que GUSWORLD_ASSETS exige) -
+    // e essa a diferenca de semantica entre as duas envs.
+    write_file(dir.path() / "Fake.ttf", "FONTEDOENV");
+    ScopedEnv env_fonts("GUSWORLD_FONTS", dir.path().string());
+
+    FilesystemAssetSource src;
+    const std::string id = "assets/fonts/Fake.ttf";
+    REQUIRE(src.resolve_path(id) == join(dir.path().string(), "Fake.ttf"));
+    const auto bytes = src.read(id);
+    REQUIRE(bytes.has_value());
+    REQUIRE(bytes->size() == std::string("FONTEDOENV").size());
+}
+
+TEST_CASE(
+    "FONTES/GEMEO: env GUSWORLD_FONTS NAO sequestra quando o arquivo nao existe la",
+    "[asset_source]") {
+    ScopedUnsetEnv no_assets("GUSWORLD_ASSETS");
+    TempDir dir;  // vazia de proposito: o candidato do env NAO existe
+    ScopedEnv env_fonts("GUSWORLD_FONTS", dir.path().string());
+
+    FilesystemAssetSource src;
+    const std::string id = "assets/fonts/PixelOperatorMono.ttf";
+    const std::string p = src.resolve_path(id);
+    REQUIRE(p.find(dir.path().string()) == std::string::npos);
+    // E continua achando a fonte REAL do repo pelo macro/CWD (degradou pro nivel certo,
+    // nao pro nada).
+    REQUIRE(src.read(id).has_value());
+}
+
+TEST_CASE(
+    "FONTES/GEMEO: PRECEDENCIA - GUSWORLD_FONTS (especifica) vence GUSWORLD_ASSETS "
+    "(generica) quando as duas tem o arquivo",
+    "[asset_source]") {
+    TempDir dir_fonts;
+    TempDir dir_assets;
+    write_file(dir_fonts.path() / "Fake.ttf", "DA_FONTS");
+    write_file(dir_assets.path() / "fonts" / "Fake.ttf", "DA_ASSETS");
+    ScopedEnv env_fonts("GUSWORLD_FONTS", dir_fonts.path().string());
+    ScopedEnv env_assets("GUSWORLD_ASSETS", dir_assets.path().string());
+
+    FilesystemAssetSource src;
+    const std::string id = "assets/fonts/Fake.ttf";
+    REQUIRE(src.resolve_path(id) == join(dir_fonts.path().string(), "Fake.ttf"));
+    const auto bytes = src.read(id);
+    REQUIRE(bytes.has_value());
+    REQUIRE(bytes->size() == std::string("DA_FONTS").size());
+}
+
+TEST_CASE(
+    "FONTES/GEMEO: PRECEDENCIA - cai em GUSWORLD_ASSETS quando GUSWORLD_FONTS nao tem "
+    "o arquivo",
+    "[asset_source]") {
+    TempDir dir_fonts;   // vazia: o candidato de GUSWORLD_FONTS nao existe
+    TempDir dir_assets;  // tem <raiz>/fonts/Fake.ttf
+    write_file(dir_assets.path() / "fonts" / "Fake.ttf", "DA_ASSETS");
+    ScopedEnv env_fonts("GUSWORLD_FONTS", dir_fonts.path().string());
+    ScopedEnv env_assets("GUSWORLD_ASSETS", dir_assets.path().string());
+
+    FilesystemAssetSource src;
+    const std::string id = "assets/fonts/Fake.ttf";
+    REQUIRE(src.resolve_path(id) ==
+            join(join(dir_assets.path().string(), "fonts"), "Fake.ttf"));
+}
+
+TEST_CASE("FONTES/GEMEO: GUSWORLD_FONTS VAZIA e ignorada (nao apaga a cascata)",
+          "[asset_source]") {
+    ScopedUnsetEnv no_assets("GUSWORLD_ASSETS");
+    // As telas testavam `envf[0] != '\0'` a mao; env_or_empty ja trata vazio como
+    // ausente - este teste trava essa paridade.
+    ScopedEnv env_fonts("GUSWORLD_FONTS", "");
+
+    FilesystemAssetSource src;
+    const std::string id = "assets/fonts/PixelOperatorMono.ttf";
+    REQUIRE(src.read(id).has_value());
+}
+
+TEST_CASE(
+    "FONTES/GEMEO: GUSWORLD_FONTS vence o macro compilado (fonte de disco diferente)",
+    "[asset_source]") {
+    ScopedUnsetEnv no_assets("GUSWORLD_ASSETS");
+    TempDir dir;
+    // MESMO nome da fonte real do repo: se o macro vencesse, o conteudo lido seria o
+    // .ttf de verdade (grande), nao estes 8 bytes.
+    write_file(dir.path() / "PixelOperatorMono.ttf", "IMPOSTOR");
+    ScopedEnv env_fonts("GUSWORLD_FONTS", dir.path().string());
+
+    FilesystemAssetSource src;
+    const auto bytes = src.read("assets/fonts/PixelOperatorMono.ttf");
+    REQUIRE(bytes.has_value());
+    REQUIRE(bytes->size() == std::string("IMPOSTOR").size());
 }
 
 // ---------------------------------------------------------------- FakeAssetSource (double)

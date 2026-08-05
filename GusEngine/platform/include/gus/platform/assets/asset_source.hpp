@@ -71,9 +71,18 @@ public:
 // Implementacao Fase 1: le do filesystem solto, reproduzindo EXATAMENTE a cadeia de
 // resolucao que cada consumidor fazia antes (por FAMILIA de asset - env/macro/raiz
 // DIFERENTES por familia, ver ADR-013 "achado da investigacao"):
-//   - fontes    (prefixo "assets/fonts/"):      GUSWORLD_ASSETS+"/fonts" (com checagem
-//                de exists, pra nao "sequestrar" a fonte) > macro GUSWORLD_FONTS_DIR >
-//                relativo ao CWD (id como esta).
+//   - fontes    (prefixo "assets/fonts/"):      GUSWORLD_FONTS (a pasta DAS fontes: o
+//                .ttf mora direto nela) > GUSWORLD_ASSETS+"/fonts" (a RAIZ de assets) >
+//                macro GUSWORLD_FONTS_DIR > relativo ao CWD (id como esta). As DUAS
+//                envs passam por checagem de exists, pra nao "sequestrar" a fonte pra
+//                uma pasta sem o arquivo - unica familia assim (ver o paragrafo da ENV
+//                mais abaixo). PRECEDENCIA (ASSETS-FONTE-TELAS-GEMEO, 2026-08-05): a
+//                env mais ESPECIFICA (GUSWORLD_FONTS, so fontes) vence a mais GENERICA
+//                (GUSWORLD_ASSETS, todos os assets); quem so usa GUSWORLD_ASSETS nao ve
+//                diferenca nenhuma. GUSWORLD_FONTS entrou aqui porque as 6 telas de UI
+//                a liam DIRETO, por fora deste porteiro, no staging de .ttf pro glintfx
+//                (gus::app::screens::stage_ui_fonts) - delegar sem trazer a env junto
+//                seria perder o override de quem ja a usava.
 //   - traducoes (prefixo "resources/translations/", M8 decommission moveu de
 //                game/translations/ via git mv): GUSWORLD_TRANSLATIONS = override
 //                LITERAL completo (ignora o id, mesmo comportamento de hoje) > macro

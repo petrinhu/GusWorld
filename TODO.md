@@ -716,6 +716,16 @@ histórico no fim do arquivo. Novas descobertas entram como bullets abaixo desta
   então hoje quem quiser redirecionar a fonte precisa setar as duas, e isso entra direto no `AppRun`
   do `RELEASE-DEMO-APPIMAGE`. Encontrado pelo implementer da fatia, que corretamente **não** tocou
   (o brief cravou arquivo único) e reportou.
+  **🔍 Pendente verificação — implementado em 2026-08-05.** Decisão do líder: as telas passam a usar
+  o porteiro. Os 7 sítios chamam agora `gus::app::screens::stage_ui_fonts` (novo
+  `app/src/screens/font_stage.cpp`), um lugar só no lugar das 7 cópias, que resolve por
+  `FilesystemAssetSource::resolve_path("assets/fonts/<arquivo>")` e **loga** a falha de cópia via
+  `glintfx::log(Warn)` (via plana, porque a mensagem embute caminho de disco). A divergência de env
+  morreu **sem regressão**: `resolve_font` passou a honrar `GUSWORLD_FONTS` **acima** de
+  `GUSWORLD_ASSETS`+`/fonts` (mais específico vence o mais genérico), as duas com a regra de
+  não-sequestro (só vencem se o arquivo existir lá). 12 TEST_CASE novos (6 no porteiro, 6 no
+  helper), suíte 2905/2905, 5 gates verdes. **Segue valendo o `APPRUN-CWD-OU-ENV` abaixo**, e o
+  `AppRun` agora pode exportar só `GUSWORLD_FONTS` para a fonte (ou `GUSWORLD_ASSETS`, tanto faz).
 
 - `APPRUN-CWD-OU-ENV` (2026-08-05, **escopo que a fatia `ASSETS-PATH-CASCATA` NÃO cobre, dito pelo
   próprio implementer**): a cascata consertada cai, no último nível, num caminho relativo ao **CWD**,
