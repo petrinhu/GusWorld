@@ -637,6 +637,34 @@ histórico no fim do arquivo. Novas descobertas entram como bullets abaixo desta
   execuções), não caminho fixo eterno. Flagueado pelo agente do conserto de teste, que explicitamente
   deixou a chamada para nós; confirmado por varredura própria em 2026-08-04.
 
+- `CONTRATO-RML-CORPUS-GLINTFX` (2026-08-05, do bus): as **6 telas RML da casa viraram fixture de
+  teste do glintfx** e, com isso, um contrato que nasce agora. A onda `RMLX-1` deles constrói um DOM
+  próprio (parser de RML + árvore, sem layout), e o aceite é parsear as cenas deles **mais as nossas
+  6**, com a `battle_cockpit_rml.cpp` como representativa. As 6, conferidas por varredura própria em
+  2026-08-05 (`git grep -l '<body|<div|<rml' -- app/src/screens/*.cpp`): `battle_cockpit_rml.cpp`,
+  `difficulty_menu_rml.cpp`, `npc_dialogue_rml.cpp`, `save_load_menu_rml.cpp`,
+  `system_menu_rml.cpp`, `title_menu_rml.cpp`. **A obrigação que fica conosco: se mudarmos a
+  ESTRUTURA de qualquer uma dessas 6** (tag nova, aninhamento novo, atributo novo), **avisar pelo
+  bus na mesma fatia** — a fixture congela o markup de hoje e o motor novo é validado contra ela, então
+  mudança estrutural silenciosa quebra o teste deles sem que ninguém saiba por quê. Mudar só texto de
+  fala ou valor de estilo **não** dispara o aviso. Nota deles sobre privacidade, que resolve a
+  preocupação óbvia: o glintfx é repo **público**, então **o texto vai sanitizado** (falas viram
+  marcador de mesmo perfil: comprimento, acentos, entidades), com estrutura, ids, classes e atributos
+  idênticos; nada de lore ou diálogo sai. `app/tools/appmode_spike/main.rml` **não entra**, porque é
+  scratch untracked aqui e pode sumir.
+
+- `CONTRATO-RCSS-SUBSET-GLINTFX` (2026-08-05, do bus): o subset de RCSS que o motor próprio deles vai
+  implementar **está congelado** em `docs/rmlx-subset.md` do glintfx, e os **12 números que
+  levantamos daqui viraram parte do contrato** (reconferidos por eles, batem): `:hover` 53, `:focus`
+  3, `:active` 2, `display:flex` 10, `data-if` 23, `data-for` 8, `data-model` 24, `@keyframes` 6,
+  `transform` 19, `overflow` 42, `nth-child` 0, `:not(` 0, `z-index` 0. **A obrigação: avisar ANTES de
+  passar a depender de recurso de RCSS fora dessa lista.** A spec é anti-scope-creep, então recurso de
+  fora não é "vai demorar", é "não está previsto até a spec mudar". Os três que ficaram de fora
+  (`nth-child`, `:not()`, `z-index`) deram zero nos dois projetos; **reconferido aqui de forma
+  independente em 2026-08-05**, varrendo `*.cpp/*.hpp/*.rml/*.rcss` tracked: zero nos três. O risco
+  concreto é o `z-index`, que é o que a gente pediria primeiro num HUD composto se precisasse
+  sobrepor camada sem depender da ordem do documento.
+
 ## 🗄️ Arquivado: eras Godot/C# e Qt6 (superadas, mantidas por registro)
 
 **Motivo do arquivamento:** stack superada pelos dois pivôs em sequência (Godot 4.6 + C# .NET 8
