@@ -665,6 +665,44 @@ histórico no fim do arquivo. Novas descobertas entram como bullets abaixo desta
   concreto é o `z-index`, que é o que a gente pediria primeiro num HUD composto se precisasse
   sobrepor camada sem depender da ordem do documento.
 
+- `RELEASE-DEMO-APPIMAGE` (2026-08-05, **decisão do líder**: o demo e o release final Linux têm de
+  rodar em **Fedora 44, Arch e Ubuntu**, e o formato escolhido por ele foi **AppImage**, arquivo
+  único). ⚠️ **O binário de hoje não roda em Ubuntu nenhum**, e isso foi MEDIDO, não estimado:
+  `objdump -T` no `build/linux-release/app/gusworld_app` exige **`GLIBC_2.43`**, que é o glibc desta
+  Fedora 44 (`ldd --version` confirma 2.43); Ubuntu 24.04 LTS tem 2.39 e o 22.04 tem 2.35, e glibc só
+  é compatível para trás. Das três distros alvo, hoje temos **uma** (Arch, rolling). Também exige
+  `GLIBCXX_3.4.32`. O que a fatia precisa entregar:
+  1. **Build em container de distro antiga** (o piso vira o glibc do container; Ubuntu 22.04 / 2.35
+     cobre as três com folga). `podman` e `docker` já instalados, e a casa já tem o precedente do
+     `GusEngine/tools/winbuild_container.sh`.
+  2. **Separar as 22 libs dinâmicas em duas classes.** Ficam de FORA do pacote, obrigatoriamente, as
+     amarradas ao driver e ao servidor gráfico do jogador: `libGLX`, `libGLdispatch`, `libOpenGL`,
+     `libX11`, `libxcb`, `libXau`, `libXext`, mais `libc`/`libm`/`ld-linux`. Entram as outras doze
+     (`libfreetype`, `libharfbuzz`, `libgraphite2`, `libpng16`, `libbrotlicommon`, `libbrotlidec`,
+     `libbz2`, `libpcre2-8`, `libglib-2.0`, `libz`, `libstdc++`, `libgcc_s`). `patchelf` já
+     instalado. **Origem desse rabo de doze:** o RmlUi resolve fonte por `find_package(Freetype)`, ou
+     seja, FreeType vem do SISTEMA (documentado em `GusEngine/CMakeLists.txt:66-67`), e o FreeType
+     arrasta harfbuzz/png/brotli/bz2/glib. Matar na raiz com FreeType estático mexeria na build do
+     RmlUi, que é **território do glintfx**: vira pedido pelo bus, nunca conserto nosso.
+  3. **Consertar o caminho de assets ANTES de empacotar**, senão o jogo abre sem achar sprite: em
+     `platform/src/assets/asset_source.cpp`, `resolve_generic` usa o macro `GUSWORLD_ASSETS_DIR`
+     (caminho ABSOLUTO da máquina de build, embutido pelo CMake) com precedência sobre o fallback
+     relativo `resources/`, e **não checa se existe** antes de aceitar. Curiosidade que mostra que é
+     descuido e não desenho: o caminho da FONTE, no mesmo arquivo, já faz a cadeia certa com
+     `exists_on_disk` (linhas 109/114/118). Conserto: ou o AppImage exporta `GUSWORLD_ASSETS` no
+     `AppRun`, ou o `resolve_generic` ganha a mesma checagem de existência do caminho de fonte.
+  4. **Decidir o que entra de asset.** Os assets realmente carregados somam **276 MB**
+     (`vfx` 160, `sprites` 82, `images` 24, áudio 12, e diálogos/traduções/mapas em kilobytes). O
+     `resources/` inteiro tem 1,6 GB, mas 1,35 GB disso é `livros/` (corpus RAG) + `glb/` (arte
+     conceitual), que **não** entram. Vale medir quanto do `vfx` o demo carrega de fato.
+  5. **Criar o job de release na CI**, que hoje **não existe**: `ci.yml` e `windows.yml` só compilam
+     e testam, nenhum empacota nem publica.
+  ⚠️ **Contra do formato, dito ao líder antes da escolha e mantido aqui:** Ubuntu 24.04 e 25.04 não
+  trazem mais `libfuse2` de fábrica, então o AppImage clássico pede um pacote a mais na máquina do
+  jogador. Mitigação a avaliar na fatia: gerar com runtime estático mais novo, que dispensa a
+  libfuse2 do sistema. **Nada disso é para fazer agora** — o líder perguntou o que seria preciso, não
+  mandou executar.
+
 ## 🗄️ Arquivado: eras Godot/C# e Qt6 (superadas, mantidas por registro)
 
 **Motivo do arquivamento:** stack superada pelos dois pivôs em sequência (Godot 4.6 + C# .NET 8
