@@ -478,6 +478,25 @@ glintfx::Key sdl_keycode_to_menu_key(SDL_Keycode sdl_key) noexcept {
 
 }  // namespace
 
+// I18N-UILOG: ver o contrato no .hpp. Diagnostico de dev (stderr), nao texto de jogador -
+// por isso string fixa, sem translator. O caso interessante e o 2o: backup carregou Ok e
+// mesmo assim a recuperacao falha, porque o CHAMADOR (maestro.cpp) nao forneceu o
+// callback - a mensagem antiga culpava o backup por um defeito de wiring.
+std::string_view save_load_recover_failure_reason(bool backup_loaded_ok,
+                                                  bool apply_callback_present) noexcept {
+    if (!backup_loaded_ok) {
+        return "nenhuma geracao de backup carregou Ok";
+    }
+    if (!apply_callback_present) {
+        return "backup carregou Ok, mas o chamador nao forneceu apply_loaded_save_data - "
+               "o save NAO esta corrompido, o wiring da tela e que esta incompleto";
+    }
+    // Inalcancavel pelo do_recover_ (com os dois true ele ja retornou ClosedAfterLoad
+    // antes de chamar esta funcao); existe para a funcao ser TOTAL - nunca devolver
+    // string vazia nem cair em UB se um chamador futuro perguntar pelo caso de sucesso.
+    return "sem falha (backup Ok e callback presente)";
+}
+
 // F4-1b.2: implementacao de save_load_screen_step (declarada no .hpp) - ver o
 // comentario grande la pro contrato completo. Extracao BEHAVIOR-PRESERVING do
 // corpo do while(true) antigo (MESMO racional/ordem de checagem de tipo de
@@ -888,14 +907,20 @@ private:
     // nullopt igual aos outros ramos que "so tratam e continuam".
     std::optional<SaveLoadLoopExit> do_recover_(int slot) {
         const auto recovered = gus::platform::fs::load_game_from_backup(slot, saves_dir_);
-        if (recovered.has_value() && recovered->result == gus::domain::save::LoadResult::Ok &&
-            apply_loaded_save_data_) {
+        const bool backup_loaded_ok =
+            recovered.has_value() && recovered->result == gus::domain::save::LoadResult::Ok;
+        if (backup_loaded_ok && apply_loaded_save_data_) {
             apply_loaded_save_data_(recovered->data);
             return SaveLoadLoopExit::ClosedAfterLoad;
         }
-        std::cerr << "[save_load_menu_loop] recuperacao do slot " << slot
-                  << " falhou (nenhuma geracao de backup carregou Ok) - abrindo "
-                     "o aviso RecoverFailed.\n";
+        // I18N-UILOG (2026-08-06): a mensagem era UMA so pros DOIS caminhos de falha e
+        // MENTIA no segundo - com o backup carregando Ok e o callback ausente, ela
+        // afirmava "nenhuma geracao de backup carregou Ok". Agora a razao vem da funcao
+        // pura save_load_recover_failure_reason (testada sem disco).
+        std::cerr << "[save_load_menu_loop] recuperacao do slot " << slot << " falhou ("
+                  << save_load_recover_failure_reason(
+                         backup_loaded_ok, static_cast<bool>(apply_loaded_save_data_))
+                  << ") - abrindo o aviso RecoverFailed.\n";
         state_.warning_kind = SaveLoadMenuState::WarningKind::RecoverFailed;
         state_.warning_selected = 1;
         reload_();

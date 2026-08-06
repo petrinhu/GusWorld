@@ -660,7 +660,13 @@ TEST_CASE("turno: Compilar NAO consome o turno (so loga, incr 4)", "[battle_scen
             has_system = true;
         }
     }
-    REQUIRE(has_system);  // "COMPILAR: abriria o overlay..." entrou no log de UI
+    // A linha de sistema do stub de COMPILAR entrou no log de UI. O TEXTO dela nao e
+    // afirmado aqui (este teste e sobre o turno nao ter sido consumido) - quem pina a
+    // origem do texto e o par de testes I18N-UILOG mais abaixo. O comentario antigo aqui
+    // citava "COMPILAR: abriria o overlay...", uma frase que ja tinha sido trocada duas
+    // vezes no codigo e nunca mais aqui: comentario que descreve texto de tela envelhece
+    // sozinho, entao passou a apontar pro teste que de fato o trava.
+    REQUIRE(has_system);
 }
 
 TEST_CASE(
@@ -3319,4 +3325,167 @@ TEST_CASE("sprite W3.1: melee do GUS com PERFIS - run_east na ida, murro de perf
     f = scene.actor_sprite_frame("gus");
     REQUIRE(f.has_value());
     REQUIRE(f->first == BattleClipId::Idle);
+}
+
+// ---------------------------------------------------------------- I18N-UILOG (2026-08-06)
+//
+// ORIGEM NO CATALOGO, nao o texto. Antes desta fatia, o canal ui_log_ nao passava pelo
+// translator: as 3 mensagens de stub (COMPILAR / GAMBITO / auto-resolve) eram literais
+// pt-br dentro do .cpp, e o jogador em ingles lia portugues numa tela cujo resto e 100%
+// traduzido. Nenhum teste travava isso - o unico que mencionava a frase citava, num
+// COMENTARIO, um texto que ja tinha sido trocado no codigo.
+//
+// A tecnica destes testes e o SENTINELA: o catalogo injetado da a cada chave um valor
+// UNICO e improvavel. Se a cena le do translator, esse valor aparece no log; se alguem
+// reintroduzir o literal no .cpp, aparece a frase de producao e o teste fica VERMELHO.
+// Isso pina a ORIGEM (o catalogo) sem congelar a COPY - o lider pode reescrever qualquer
+// uma das 3 frases em resources/translations/ sem tocar em teste nenhum.
+//
+// O par deste teste e o de baixo (as 3 chaves existem nos 2 catalogos REAIS): sentinela
+// prova que a UI le do catalogo; o outro prova que a chave lida esta de fato registrada,
+// e nao e uma chave fantasma que cairia pra sempre no fallback.
+
+namespace {
+
+// Valores-sentinela: improvaveis de aparecer por acaso e distintos entre si.
+constexpr const char* kSentinelCompile = "<<<CATALOGO-COMPILAR>>>";
+constexpr const char* kSentinelGambit = "<<<CATALOGO-GAMBITO>>>";
+constexpr const char* kSentinelAutoResolve = "<<<CATALOGO-AUTORESOLVE>>>";
+
+gus::app::i18n::Translator make_ui_log_sentinel_translator() {
+    gus::app::i18n::Translator tr;
+    tr.load_from_content(
+        std::string("## COMBAT_LOG_COMPILE_UNAVAILABLE\n") + kSentinelCompile + "\n\n" +
+        "## COMBAT_LOG_GAMBIT_UNAVAILABLE\n" + kSentinelGambit + "\n\n" +
+        "## COMBAT_LOG_AUTORESOLVE_UNAVAILABLE\n" + kSentinelAutoResolve + "\n\n");
+    return tr;
+}
+
+bool log_has_text(const BattleScene& scene, const std::string& text) {
+    for (const auto& l : scene.log_lines(9999)) {
+        if (l.text == text) {
+            return true;
+        }
+    }
+    return false;
+}
+
+}  // namespace
+
+TEST_CASE("I18N-UILOG: a linha de COMPILAR vem do CATALOGO (translator), nao de um "
+          "literal no codigo",
+          "[battle_scene][i18n]") {
+    BattleScene scene;
+    gus::app::i18n::Translator tr = make_ui_log_sentinel_translator();
+    scene.set_translator(&tr);
+    pump_to_player_turn(scene);
+    if (scene.combat_over()) {
+        return;  // encontro demo fechou antes do turno do jogador; nada a afirmar
+    }
+
+    select_verb(scene, BattleVerb::Compilar);
+    scene.menu_confirm();
+
+    REQUIRE(log_has_text(scene, kSentinelCompile));
+}
+
+TEST_CASE("I18N-UILOG: a linha de GAMBITO vem do CATALOGO (translator), nao de um "
+          "literal no codigo",
+          "[battle_scene][i18n]") {
+    BattleScene scene;
+    gus::app::i18n::Translator tr = make_ui_log_sentinel_translator();
+    scene.set_translator(&tr);
+    pump_to_player_turn(scene);
+    if (scene.combat_over()) {
+        return;
+    }
+
+    select_verb(scene, BattleVerb::Gambito);
+    scene.menu_confirm();
+
+    REQUIRE(log_has_text(scene, kSentinelGambit));
+}
+
+TEST_CASE("I18N-UILOG: a linha do auto-resolve vem do CATALOGO (translator), nao de um "
+          "literal no codigo",
+          "[battle_scene][i18n]") {
+    BattleScene scene;
+    gus::app::i18n::Translator tr = make_ui_log_sentinel_translator();
+    scene.set_translator(&tr);
+    // O verbo so e OFERECIDO na ABERTURA e com inimigos todos trash (demo satisfaz):
+    // por isso este caso NAO chama pump_to_player_turn (que sai do Intro).
+    REQUIRE(scene.offers_auto_resolve());
+    scene.request_auto_resolve();
+
+    REQUIRE(log_has_text(scene, kSentinelAutoResolve));
+}
+
+TEST_CASE("I18N-UILOG: sem translator o log de UI degrada pra PROPRIA CHAVE (nunca "
+          "texto pt-br embutido no binario)",
+          "[battle_scene][i18n]") {
+    BattleScene scene;  // nenhum set_translator: caminho headless/degradado
+    REQUIRE(scene.offers_auto_resolve());
+    scene.request_auto_resolve();
+
+    // Fallback VISIVEL (mesmo contrato de Translator::tr pra chave ausente): a chave
+    // crua na tela grita "falta traducao", em vez de esconder a falta atras de uma
+    // frase pt-br que so o publico pt-br entenderia.
+    REQUIRE(log_has_text(scene, "COMBAT_LOG_AUTORESOLVE_UNAVAILABLE"));
+}
+
+// GUSWORLD_TRANSLATIONS_DIR e injetado por app/tests/CMakeLists.txt (caminho ABSOLUTO,
+// robusto ao CWD com que o ctest roda o binario) - MESMA receita de
+// domain/tests/master_cards_test.cpp.
+#ifndef GUSWORLD_TRANSLATIONS_DIR
+#define GUSWORLD_TRANSLATIONS_DIR "../../../../resources/translations"
+#endif
+
+namespace {
+
+std::vector<std::string> catalog_keys_in(const std::string& path) {
+    std::vector<std::string> out;
+    std::ifstream in(path);
+    std::string line;
+    while (std::getline(in, line)) {
+        if (line.rfind("## ", 0) == 0) {
+            out.push_back(line.substr(3));
+        }
+    }
+    return out;
+}
+
+}  // namespace
+
+TEST_CASE("I18N-UILOG: as 3 chaves do log de UI existem nos catalogos REAIS pt_br.md e "
+          "en_intl.md",
+          "[battle_scene][i18n]") {
+    const std::vector<std::string> pt =
+        catalog_keys_in(std::string(GUSWORLD_TRANSLATIONS_DIR) + "/pt_br.md");
+    const std::vector<std::string> en =
+        catalog_keys_in(std::string(GUSWORLD_TRANSLATIONS_DIR) + "/en_intl.md");
+    REQUIRE_FALSE(pt.empty());
+    REQUIRE_FALSE(en.empty());
+
+    for (const char* key : {"COMBAT_LOG_COMPILE_UNAVAILABLE",
+                            "COMBAT_LOG_GAMBIT_UNAVAILABLE",
+                            "COMBAT_LOG_AUTORESOLVE_UNAVAILABLE"}) {
+        INFO("chave: " << key);
+        REQUIRE(std::find(pt.begin(), pt.end(), key) != pt.end());
+        REQUIRE(std::find(en.begin(), en.end(), key) != en.end());
+    }
+}
+
+TEST_CASE("I18N-UILOG: no catalogo pt-br a frase de COMPILAR esta com a ortografia "
+          "correta (modulo com acento)",
+          "[battle_scene][i18n]") {
+    // A frase foi aprovada como texto final e ainda assim entrou no codigo com "modulo"
+    // sem acento. Ela agora mora no catalogo, e este teste trava o conserto: NAO congela
+    // a copy inteira (o lider pode reescrever a frase), so exige que a palavra, SE
+    // presente, apareca acentuada - e nunca na forma crua.
+    gus::app::i18n::Translator tr;
+    REQUIRE(tr.load_from_file(std::string(GUSWORLD_TRANSLATIONS_DIR) + "/pt_br.md"));
+    const std::string frase = tr.tr("COMBAT_LOG_COMPILE_UNAVAILABLE");
+    REQUIRE(frase != "COMBAT_LOG_COMPILE_UNAVAILABLE");  // a chave existe de verdade
+    REQUIRE(frase.find("m\xc3\xb3""dulo") != std::string::npos);  // "modulo" com acento (UTF-8)
+    REQUIRE(frase.find("modulo") == std::string::npos);
 }

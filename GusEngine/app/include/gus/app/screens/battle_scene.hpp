@@ -587,6 +587,13 @@ private:
     // string vazia (o render trata: a caixa colorida fica sem nome, mas nao crasha).
     [[nodiscard]] std::string tr_verb_label(BattleVerb verb) const;
 
+    // I18N-UILOG: unico caminho pra empilhar linha em ui_log_. Recebe a CHAVE i18n (a
+    // FONTE do texto e o catalogo, resources/translations/*.md - nunca um literal aqui,
+    // ver tools/ui_log_key_only.py) e resolve pelo translator_. Sem translator (headless/
+    // teste sem catalogo) devolve a PROPRIA chave, mesmo contrato de Translator::tr pra
+    // chave ausente: degrada visivel, nunca crasha e nunca inventa texto pt-br no binario.
+    void push_ui_log(LogLineKind kind, std::string_view key);
+
     // Drena os logs NOVOS do motor (desde log_cursor_) e spawna um numero flutuante
     // sobre o alvo pra cada dano/cura. Chamado apos cada resolucao de turno.
     void spawn_floaters_from_new_logs();
@@ -642,6 +649,8 @@ private:
         gus::domain::combat::CombatAction::pass()};
     // Linhas de log geradas pela UI (nao pelo motor): COMPILAR/GAMBITO sinalizados antes
     // de existir mecanica (incr 4/5). Mescladas com o log do motor em log_lines().
+    // I18N-UILOG: empilhe SEMPRE por push_ui_log(kind, "CHAVE") - nunca push_back com
+    // texto. O gate tools/ui_log_key_only.py reprova literal aqui.
     std::vector<LogLine> ui_log_;
     // Translator de UI (NAO-DONO). nullptr = sem traducao (fallback no render).
     const gus::app::i18n::Translator* translator_ = nullptr;

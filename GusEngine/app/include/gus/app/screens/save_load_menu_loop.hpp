@@ -88,6 +88,7 @@
 #include <functional>
 #include <optional>
 #include <string>
+#include <string_view>
 
 #include <SDL3/SDL.h>
 #include <glintfx/element_box.hpp>  // F4-1b.2: glintfx::ElementBox, INPUT de save_load_screen_step
@@ -270,6 +271,20 @@ struct SaveLoadStepResult {
 [[nodiscard]] SaveLoadStepResult save_load_screen_step(SaveLoadMenuState& state,
                                                         const SDL_Event& ev,
                                                         const SaveLoadStepBoxes& boxes) noexcept;
+
+// I18N-UILOG (2026-08-06): motivo REAL de uma tentativa de recuperacao ter caido no ramo
+// de falha (SaveLoadScreen::do_recover_, save_load_menu_loop.cpp). Existe porque a
+// mensagem era UMA so ("nenhuma geracao de backup carregou Ok") para DOIS caminhos
+// diferentes: o backup pode ter carregado Ok e ainda assim cair na falha, quando o
+// CHAMADOR nao forneceu o callback apply_loaded_save_data - e ai a frase antiga era
+// literalmente FALSA, mandando quem depurasse procurar corrupcao de backup onde o
+// problema e wiring do chamador.
+//
+// DIAGNOSTICO DE DEV (stderr), NAO texto de jogador: por isso devolve string fixa e NAO
+// passa pelo translator (o canal e o mesmo dos outros std::cerr deste arquivo, que o
+// jogador nunca ve). Funcao PURA (sem I/O) pra o ramo ser testavel sem disco.
+[[nodiscard]] std::string_view save_load_recover_failure_reason(
+    bool backup_loaded_ok, bool apply_callback_present) noexcept;
 
 }  // namespace gus::app::screens
 

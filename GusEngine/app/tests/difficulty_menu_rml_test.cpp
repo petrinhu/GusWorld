@@ -38,6 +38,7 @@ Translator make_translator() {
         "## SAVE_DIFFICULTY_HARDCORE_LABEL\nHardcore\n\n"
         "## SAVE_DIFFICULTY_HARDCORE_DESC_LOCKED\nAlgo sombrio aguarda\n\n"
         "## SAVE_DIFFICULTY_HARDCORE_DESC_UNLOCKED\nSo para os valorosos\n\n"
+        "## SAVE_DIFFICULTY_HARDCORE_BADGE_LOCKED\n[BLOQUEADO]\n\n"
         "## SAVE_DIFFICULTY_CONFIRM_TITLE_FACIL\nJogar no Facil?\n\n"
         "## SAVE_DIFFICULTY_CONFIRM_TITLE_MEDIO\nJogar no Medio?\n\n"
         "## SAVE_DIFFICULTY_CONFIRM_TITLE_DIFICIL\nJogar no Dificil?\n\n"
@@ -183,4 +184,47 @@ TEST_CASE("build_difficulty_menu_rml: hardcore_unlocked=true mostra a DESC "
     const auto pos3 = rml.find("id=\"difficulty-item-3\"");
     const auto div3 = rml.rfind("<div class=\"", pos3);
     REQUIRE(rml.substr(div3, pos3 - div3).find("locked") == std::string::npos);
+}
+
+// ---------------------------------------------------------------- I18N-UILOG (2026-08-06)
+//
+// ORIGEM NO CATALOGO. O badge "[BLOQUEADO]" era o unico texto de tela LITERAL deste
+// builder - quatro linhas abaixo de um translator.tr(), numa tela em que as outras 21
+// strings ja tinham chave. Os dois testes de cima (que exigem "[BLOQUEADO]" presente/
+// ausente) continuam validos e uteis, mas eles NAO distinguem a origem: passariam
+// identicos com o literal de volta no .cpp, porque o catalogo de teste tem o mesmo
+// texto. Por isso o SENTINELA abaixo: um valor unico injetado na chave, que so aparece
+// no RML se o builder de fato consultou o translator.
+TEST_CASE("I18N-UILOG: o badge de bloqueio vem do CATALOGO (translator), nao de um "
+          "literal no builder",
+          "[difficulty_menu_rml][i18n]") {
+    // O sentinela evita `<` e `>`: o builder passa o texto por rml_escape, que os
+    // converteria em &lt;/&gt; e faria o teste falhar por um motivo que nao e o defeito
+    // sob teste (medido: a 1a versao deste teste falhou exatamente assim).
+    Translator tr;
+    tr.load_from_content(
+        "## SAVE_DIFFICULTY_HARDCORE_BADGE_LOCKED\n[SENTINELA-DO-CATALOGO]\n\n");
+    DifficultyMenuState state;
+    difficulty_menu_open(state);  // hardcore_unlocked=false -> o badge aparece
+
+    const std::string rml = build_difficulty_menu_rml(state, tr);
+    REQUIRE(rml.find("[SENTINELA-DO-CATALOGO]") != std::string::npos);
+    // E o literal antigo NAO reaparece por outro caminho.
+    REQUIRE(rml.find("[BLOQUEADO]") == std::string::npos);
+}
+
+// GUSWORLD_TRANSLATIONS_DIR e injetado por app/tests/CMakeLists.txt (caminho ABSOLUTO,
+// robusto ao CWD com que o ctest roda o binario).
+#ifndef GUSWORLD_TRANSLATIONS_DIR
+#define GUSWORLD_TRANSLATIONS_DIR "../../../../resources/translations"
+#endif
+
+TEST_CASE("I18N-UILOG: a chave do badge de bloqueio existe no catalogo REAL pt_br.md "
+          "(nao e chave fantasma que cairia no fallback)",
+          "[difficulty_menu_rml][i18n]") {
+    Translator tr;
+    REQUIRE(tr.load_from_file(std::string(GUSWORLD_TRANSLATIONS_DIR) + "/pt_br.md"));
+    const std::string badge = tr.tr("SAVE_DIFFICULTY_HARDCORE_BADGE_LOCKED");
+    REQUIRE(badge != "SAVE_DIFFICULTY_HARDCORE_BADGE_LOCKED");  // resolveu de verdade
+    REQUIRE_FALSE(badge.empty());
 }

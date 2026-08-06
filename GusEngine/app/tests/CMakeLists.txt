@@ -188,8 +188,15 @@ target_link_libraries(gusengine_app_tests PRIVATE glintfx::glintfx)
 # fazendo o teste medir um alvo ERRADO). MESMO valor/receita de app/CMakeLists.txt
 # e platform/CMakeLists.txt (CMAKE_SOURCE_DIR = raiz GusEngine/, NAO
 # CMAKE_CURRENT_SOURCE_DIR - as fontes vivem em GusEngine/assets/fonts).
+# GUSWORLD_TRANSLATIONS_DIR (I18N-UILOG, 2026-08-06): os testes de ORIGEM-NO-CATALOGO
+# (battle_scene_test.cpp, difficulty_menu_rml_test.cpp) leem o catalogo REAL
+# resources/translations/pt_br.md pra provar que o texto que o jogador ve vem de la, e
+# nao de um literal no codigo. MESMO valor/receita de app/CMakeLists.txt,
+# platform/CMakeLists.txt e domain/tests/CMakeLists.txt (CMAKE_SOURCE_DIR = raiz
+# GusEngine/; caminho ABSOLUTO, robusto ao CWD com que o ctest roda o binario).
 target_compile_definitions(gusengine_app_tests
     PRIVATE GUSWORLD_FONTS_DIR="${CMAKE_SOURCE_DIR}/assets/fonts"
+    PRIVATE GUSWORLD_TRANSLATIONS_DIR="${CMAKE_SOURCE_DIR}/../resources/translations"
 )
 
 # stb_image_write (item 2, prova visual PNG do dialogo "Deseja salvar no Espaco

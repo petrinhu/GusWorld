@@ -329,6 +329,9 @@ Algo mais sombrio aguarda além do Difícil. Vença-o pra desbloquear.
 ## SAVE_DIFFICULTY_HARDCORE_DESC_UNLOCKED
 Apenas para os mais valorosos, que arriscam tudo numa vida só. NÃO TEM SAVE AQUI. Jogue por sua conta e risco.
 
+## SAVE_DIFFICULTY_HARDCORE_BADGE_LOCKED
+[BLOQUEADO]
+
 ## SAVE_DIFFICULTY_CONFIRM_TITLE_FACIL
 Jogar no Fácil?
 
@@ -489,6 +492,15 @@ COMPILADO: {0}
 
 ## COMBAT_LOG_COMPILE_ERROR
 ERRO DE COMPILAÇÃO
+
+## COMBAT_LOG_COMPILE_UNAVAILABLE
+COMPILAR: módulo do compilador offline nesta build.
+
+## COMBAT_LOG_AUTORESOLVE_UNAVAILABLE
+[auto-resolve: a implementar]
+
+## COMBAT_LOG_GAMBIT_UNAVAILABLE
+GAMBITO: requer brain do alvo (telegraph entra no incr 5)
 
 ## COMBAT_ACTOR_RESOURCES
 AP {0}/{1} | Mana {2}/{3}

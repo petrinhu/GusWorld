@@ -25,6 +25,7 @@
 
 #include <array>
 #include <optional>
+#include <string_view>
 
 #include <catch2/catch_test_macros.hpp>
 
@@ -778,3 +779,50 @@ TEST_CASE("save_load_screen_step (B2): dentro do AVISO Damaged, clicar em "
 // conserto e do lado do glintfx (bus, thread api-glintfx, item
 // SCROLL-REANCORA-AO-TOPO do TODO.md) - ver o guard [!shouldfail] em
 // save_load_menu_interaction_test.cpp.
+
+
+// ---------------------------------------------------------------- I18N-UILOG (2026-08-06)
+//
+// A tentativa de recuperacao ("Tentar recuperar", aviso Damaged) tem DOIS caminhos de
+// falha distintos e imprimia UMA mensagem so pros dois - e no segundo ela era FALSA:
+// com o backup carregando Ok e o callback apply_loaded_save_data ausente, o log dizia
+// "nenhuma geracao de backup carregou Ok", mandando quem depurasse caçar corrupcao de
+// backup onde o defeito e wiring do chamador. save_load_recover_failure_reason isola
+// essa decisao numa funcao PURA (sem disco), e estes testes travam as duas frases.
+TEST_CASE("save_load_recover_failure_reason: nenhum backup carregou Ok -> a razao "
+          "acusa o BACKUP",
+          "[save_load_screen_step][save_load_menu_loop]") {
+    const std::string_view r = gus::app::screens::save_load_recover_failure_reason(
+        /*backup_loaded_ok=*/false, /*apply_callback_present=*/true);
+    REQUIRE(r.find("nenhuma geracao de backup carregou Ok") != std::string_view::npos);
+}
+
+TEST_CASE("save_load_recover_failure_reason: backup Ok SEM callback -> a razao acusa o "
+          "WIRING e NEGA que o save esteja corrompido",
+          "[save_load_screen_step][save_load_menu_loop]") {
+    const std::string_view r = gus::app::screens::save_load_recover_failure_reason(
+        /*backup_loaded_ok=*/true, /*apply_callback_present=*/false);
+    // O bug era exatamente este ramo: a frase antiga afirmava o oposto do que ocorreu.
+    REQUIRE(r.find("nenhuma geracao de backup carregou Ok") == std::string_view::npos);
+    REQUIRE(r.find("apply_loaded_save_data") != std::string_view::npos);
+    REQUIRE(r.find("NAO esta corrompido") != std::string_view::npos);
+}
+
+TEST_CASE("save_load_recover_failure_reason: sem backup E sem callback -> acusa o "
+          "BACKUP (a causa que veio ANTES na ordem de execucao)",
+          "[save_load_screen_step][save_load_menu_loop]") {
+    // Ordem importa: com os dois quebrados, a recuperacao teria falhado no backup de
+    // qualquer jeito - reportar o callback aqui mandaria o leitor pro sintoma errado.
+    const std::string_view r = gus::app::screens::save_load_recover_failure_reason(
+        /*backup_loaded_ok=*/false, /*apply_callback_present=*/false);
+    REQUIRE(r.find("nenhuma geracao de backup carregou Ok") != std::string_view::npos);
+}
+
+TEST_CASE("save_load_recover_failure_reason: e TOTAL - o caso de sucesso (inalcancavel "
+          "pelo do_recover_) devolve texto proprio, nunca vazio",
+          "[save_load_screen_step][save_load_menu_loop]") {
+    const std::string_view r = gus::app::screens::save_load_recover_failure_reason(
+        /*backup_loaded_ok=*/true, /*apply_callback_present=*/true);
+    REQUIRE_FALSE(r.empty());
+    REQUIRE(r.find("sem falha") != std::string_view::npos);
+}

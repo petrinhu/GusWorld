@@ -338,6 +338,23 @@ else
 fi
 set -e
 
+# (n) Zero-tolerancia ESTREITA no canal ui_log_ (I18N-UILOG, 2026-08-06): texto de
+#     TELA nao se escreve dentro de `ui_log_.push_back` - a fonte e o catalogo
+#     (resources/translations/*.md), via BattleScene::push_ui_log(kind, "CHAVE").
+#     Superficie MEDIDA e FECHADA: 3 call sites, todos em battle_scene.cpp, e o
+#     gate NASCE VERDE no mesmo commit que os fia pelo translator. Sao 3 regras
+#     (literal proibido; sentinela de escopo que reprova se a varredura colapsar
+#     pra zero site; e chave literal obrigatoriamente existente nos DOIS
+#     catalogos - a regra que fecha o furo de escrever o texto solto por dentro
+#     do helper). NAO e um detector de "literal acentuado": medimos que os 4
+#     ofensores reais eram TODOS sem acento, entao essa heuristica erraria 4 de
+#     4. O que este gate nao cobre (literal em builder de RML) fica com os testes
+#     de origem-no-catalogo - ver o docstring de tools/ui_log_key_only.py.
+set +e
+python3 "$ROOT/tools/ui_log_key_only.py"
+GATE_UI_LOG_KEY=$?
+set -e
+
 GATE=0
 [ "$GATE_ARCH" = "0" ] && [ "$GATE_EXCL" = "0" ] && [ "$GATE_I18N" = "0" ] \
     && [ "$GATE_SDL_RATCHET" = "0" ] && [ "$GATE_LOG_CLOCK_ZERO" = "0" ] \
@@ -348,6 +365,7 @@ GATE=0
     && [ "$GATE_DECODE_IMAGE_ZERO" = "0" ] \
     && [ "$GATE_PRODUCTION_SCOPE" = "0" ] \
     && [ "$GATE_TOOLS_TESTS" = "0" ] \
+    && [ "$GATE_UI_LOG_KEY" = "0" ] \
     || GATE=1
 echo "GATE=$GATE"
 

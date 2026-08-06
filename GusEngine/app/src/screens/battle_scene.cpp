@@ -248,6 +248,19 @@ std::string BattleScene::tr_verb_label(BattleVerb verb) const {
     return translator_->tr(std::string(gus::app::i18n::verb_label_key(verb)));
 }
 
+void BattleScene::push_ui_log(LogLineKind kind, std::string_view key) {
+    // I18N-UILOG (2026-08-06): o canal ui_log_ nao passava pelo translator - o jogador em
+    // ingles lia portugues numa tela cujo resto e 100% traduzido. Aqui esta o UNICO
+    // push_back de ui_log_ do arquivo, e ele recebe CHAVE, nunca texto: a fonte do que o
+    // jogador le e o catalogo (resources/translations/*.md). Sem translator (headless/
+    // teste sem catalogo) o fallback e a propria chave - MESMO contrato de Translator::tr
+    // pra chave ausente: fica visivel que falta traducao, sem crashar e sem esconder a
+    // falta atras de um texto pt-br embutido no binario.
+    ui_log_.push_back(LogLine{kind, translator_ != nullptr
+                                        ? translator_->tr(std::string(key))
+                                        : std::string(key)});
+}
+
 std::optional<gus::core::spatial::Rect> BattleScene::arena_rect_for_actor(
     const std::string& actor_id) const {
     const ArenaLayout arena =
@@ -634,8 +647,12 @@ void BattleScene::request_auto_resolve() {
     if (!offers_auto_resolve()) {
         return;  // so quando oferecido (trash, na abertura)
     }
-    ui_log_.push_back(LogLine{LogLineKind::System,
-                              "[auto-resolve: a implementar]"});
+    // TEXTO PROVISORIO, AGUARDA COPY DO LIDER (I18N-UILOG, 2026-08-06): o encanamento i18n
+    // esta pronto (chave nos 2 catalogos, resolvida pelo translator), mas o VALOR de
+    // COMBAT_LOG_AUTORESOLVE_UNAVAILABLE continua a fala de programador do stub. Texto que o
+    // jogador le e canon: quem escreve a frase definitiva e o lider, e a troca sera no
+    // CATALOGO (uma linha em resources/translations/), sem tocar este arquivo.
+    push_ui_log(LogLineKind::System, "COMBAT_LOG_AUTORESOLVE_UNAVAILABLE");
 }
 
 std::string_view BattleScene::turn_banner_key() const noexcept {
@@ -832,9 +849,12 @@ void BattleScene::menu_confirm() {
     // stub tem que falar da FUNCAO estar indisponivel, nunca do estado do mundo. Decisao
     // autonoma do gameplay_engineer (autorizada pelo CTO); registrar pro lider confirmar
     // depois.
+    // I18N-UILOG (2026-08-06): a frase saiu do codigo e virou COMBAT_LOG_COMPILE_UNAVAILABLE
+    // nos 2 catalogos - o texto aprovado foi PRESERVADO ao pe da letra, com uma unica
+    // correcao ortografica objetiva: a palavra "modulo" ganhou o acento agudo que faltava
+    // (decisao autonoma autorizada pelo CTO; confirmar retroativamente com o lider).
     if (verb == BattleVerb::Compilar) {
-        ui_log_.push_back(LogLine{LogLineKind::System,
-                                  "COMPILAR: modulo do compilador offline nesta build."});
+        push_ui_log(LogLineKind::System, "COMBAT_LOG_COMPILE_UNAVAILABLE");
         return;
     }
 
@@ -849,9 +869,11 @@ void BattleScene::menu_confirm() {
         case BattleVerb::Gambito: {
             // Gambito-Prever exige IEnemyBrain registrado (a demo nao registra brains):
             // no incremento 3 sinaliza no log e NAO submete (evita excecao do motor).
-            ui_log_.push_back(LogLine{
-                LogLineKind::System,
-                "GAMBITO: requer brain do alvo (telegraph entra no incr 5)"});
+            // TEXTO PROVISORIO, AGUARDA COPY DO LIDER (I18N-UILOG, 2026-08-06): mesma
+            // situacao do auto-resolve acima - encanamento i18n pronto, mas o VALOR de
+            // COMBAT_LOG_GAMBIT_UNAVAILABLE ainda e a fala de programador do stub ("brain",
+            // "telegraph", "incr 5"). A frase definitiva e do lider e entra no CATALOGO.
+            push_ui_log(LogLineKind::System, "COMBAT_LOG_GAMBIT_UNAVAILABLE");
             return;
         }
         case BattleVerb::Defender:

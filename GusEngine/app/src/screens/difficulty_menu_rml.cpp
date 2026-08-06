@@ -221,8 +221,15 @@ std::string build_difficulty_menu_rml(const DifficultyMenuState& state,
         // fonte pixel do jogo (PixelOperatorMono.ttf, cmap verificado) NAO tem
         // o glifo U+1F512 (renderizaria tofu/vazio) - texto e determinístico
         // em qualquer plataforma/fonte.
+        // I18N-UILOG (2026-08-06): o badge era o unico texto de tela LITERAL deste
+        // builder - 4 linhas abaixo de um translator.tr(), numa tela em que as outras 21
+        // strings tem chave. Passou a vir de SAVE_DIFFICULTY_HARDCORE_BADGE_LOCKED (os 2
+        // catalogos), com o texto aprovado "[BLOQUEADO]" preservado; os colchetes fazem
+        // parte da copy (afordancia de badge), nao da sintaxe da chave.
         if (locked) {
-            body << "<span class=\"difficulty-badge-locked\">[BLOQUEADO]</span>";
+            body << "<span class=\"difficulty-badge-locked\">"
+                 << rml_escape(translator.tr("SAVE_DIFFICULTY_HARDCORE_BADGE_LOCKED"))
+                 << "</span>";
         }
         body << "</div>";
         body << "<div class=\"difficulty-item-desc\">"

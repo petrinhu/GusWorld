@@ -10,9 +10,15 @@
 // (visivel na UI, sinaliza traducao faltando sem crashar).
 //
 // i18n-ready (canon do projeto): nenhuma string user-facing e hardcoded em pt-br no
-// codigo; tudo passa por tr(KEY). As mensagens-CODIGO do log de combate (COMPILADO,
-// ERRO DE COMPILACAO) sao literais tecnicas NAO-traduziveis por design (combat-flavor.md)
-// e NAO passam por aqui.
+// codigo; tudo passa por tr(KEY). As mensagens-CODIGO que o MOTOR produz no log de
+// combate (COMPILADO, ERRO DE COMPILACAO) sao literais tecnicas NAO-traduziveis por
+// design (combat-flavor.md) e NAO passam por aqui.
+//
+// I18N-UILOG (2026-08-06): esta nota NAO cobre o canal `ui_log_` da BattleScene (as
+// mensagens de stub de COMPILAR/GAMBITO/auto-resolve), que ate esta data era literal
+// pt-br no .cpp por descuido, e nao por design - o jogador em ingles lia portugues numa
+// tela cujo resto ja era traduzido. Esse canal PASSA por aqui agora, via
+// BattleScene::push_ui_log(kind, "CHAVE"), com gate proprio (tools/ui_log_key_only.py).
 //
 // Cross-ref: gus/domain/i18n/md_translation_loader.hpp (parser POCO);
 //            resources/translations/pt_br.md (catalogo dev primario);
