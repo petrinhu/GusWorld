@@ -84,6 +84,12 @@ add_executable(gusengine_domain_tests
     # recarregados. Area ate entao INTESTADA (o fuzz de remove so afirmava cardinalidade).
     # Ver o cabecalho do arquivo pro bug, a condicao exata e a semantica implementada.
     initiative_queue_remove_round_invariant_test.cpp
+    # FILA-SYNC-CURSOR-GUARDA (2026-08-06): QUARTO portao da mesma raiz -
+    # InitiativeQueue::sync_cursor_to() era um SALTO CRU do cursor (cursor_ = index_of), sem
+    # guarda: pra TRAS reabria a rodada (turno duplo), pra FRENTE pulava o vizinho (o bug do
+    # Knockback de 2026-07-15). Estava INERTE (zero caller de producao) mas PUBLICA, e dois
+    # comentarios afirmavam que a FSM a chamava. Ver o cabecalho do arquivo.
+    initiative_queue_sync_cursor_guard_test.cpp
     # Marco M2 (metade de logica pura): input_remap (ActionRegistry/InputBinding)
     # portado C#->C++ POCO. O backend de evento Qt (platform/input/) NAO entra aqui.
     input_remap_test.cpp

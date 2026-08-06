@@ -147,9 +147,18 @@ TEST_CASE("property: a fila mantem integridade sob qualquer sequencia de operaco
                     // INV-9f: reorder preserva o CONJUNTO (mesma cardinalidade, ator ainda
                     // presente) e mantem o cursor num indice VALIDO. NOTA: reorder NAO
                     // re-aponta current() por identidade de ator - ele preserva o INDICE do
-                    // cursor (contrato initiative_queue.hpp/.cpp); a FSM chama sync_cursor_to
-                    // apos reorder pra re-apontar pro ator em turno (ver initiative_queue_test
-                    // linhas 209-211). Logo NAO afirmamos current()==before_cur aqui.
+                    // cursor (contrato initiative_queue.hpp/.cpp). Logo NAO afirmamos
+                    // current()==before_cur aqui.
+                    //
+                    // ATENCAO - ESTA NOTA MENTIA ate 2026-08-06 (FILA-SYNC-CURSOR-GUARDA):
+                    // dizia que "a FSM chama sync_cursor_to apos reorder pra re-apontar pro
+                    // ator em turno". A FSM NUNCA chamou sync_cursor_to (zero caller de
+                    // producao na varredura da fatia), e reorder_actor esta privatizada desde
+                    // o M9, tambem sem caller. Comentario que mente convida codigo novo a usar
+                    // a primitiva errada - o gemeo no doc do header foi corrigido junto. Quem
+                    // realmente re-aponta o current() em producao e bring_to_current
+                    // (permutacao, cursor fixo), chamado por begin_turn na Janela de Comando
+                    // da Party.
                     REQUIRE(q.count() == before_count);
                     REQUIRE(q.contains(who));
                     (void)before_cur;
@@ -278,10 +287,54 @@ TEST_CASE("property: a fila mantem integridade sob qualquer sequencia de operaco
                     break;
                 }
                 default: {  // sync_cursor_to (ator presente)
+                    // FILA-SYNC-CURSOR-GUARDA (2026-08-06): este ramo so afirmava
+                    // `current() == who`, ou seja, exatamente o EFEITO do salto cru - e por
+                    // isso o fuzz atravessou milhoes de assercoes sem ver que a funcao movia
+                    // o cursor atraves da fronteira da particao (pra tras, reabrindo a
+                    // rodada; pra frente, pulando quem nunca agiu). O contrato novo esta
+                    // abaixo (INV-9k), e ele proibe o que o antigo exigia quando o alvo ja
+                    // agiu.
+                    const int cursor_before = q.cursor();
+                    const std::vector<CombatActor*> acted_before(
+                        q.order().begin(), q.order().begin() + cursor_before);
+                    std::vector<const CombatActor*> pending_before(
+                        q.order().begin() + cursor_before + 1, q.order().end());
+
                     CombatActor* who = q.order()[static_cast<std::size_t>(
                         g.in_range(0, q.count() - 1))];
+                    const int idx_before = q.index_of(who);
                     q.sync_cursor_to(who);
-                    REQUIRE(q.current() == who);
+
+                    // INV-9k: sync_cursor_to NAO MOVE O CURSOR - nem pra tras (turno duplo)
+                    // nem pra frente (vizinho pulado) - e nao conta rodada. Ele move o ATOR
+                    // ate o slot do cursor, por permutacao (encaminha pra bring_to_current).
+                    REQUIRE(q.cursor() == cursor_before);
+                    REQUIRE(q.round_index() == round_before);
+
+                    // A particao aguenta: o bloco ja-agido [0, cursor) fica IDENTICO
+                    // (ponteiros e ordem) e o bloco pendente preserva o CONJUNTO - ninguem
+                    // atravessa o cursor nos dois sentidos.
+                    const std::vector<CombatActor*> acted_after(
+                        q.order().begin(), q.order().begin() + cursor_before);
+                    REQUIRE(acted_after == acted_before);
+                    std::vector<const CombatActor*> pending_after(
+                        q.order().begin() + cursor_before + 1, q.order().end());
+                    std::vector<const CombatActor*> pending_expected = pending_before;
+                    if (idx_before > cursor_before) {
+                        // Alvo PENDENTE: vira o current, e sai do bloco pendente pro slot do
+                        // cursor. O antigo current entra no bloco pendente (segue pendente).
+                        REQUIRE(q.current() == who);
+                        pending_expected.erase(
+                            std::remove(pending_expected.begin(), pending_expected.end(), who),
+                            pending_expected.end());
+                        pending_expected.push_back(before_cur);
+                    } else {
+                        // Alvo JA-AGIDO, o proprio current, ou ausente: NO-OP total.
+                        REQUIRE(q.current() == before_cur);
+                    }
+                    std::sort(pending_expected.begin(), pending_expected.end());
+                    std::sort(pending_after.begin(), pending_after.end());
+                    REQUIRE(pending_after == pending_expected);
                     break;
                 }
             }

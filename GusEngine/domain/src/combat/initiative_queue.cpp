@@ -120,9 +120,34 @@ void InitiativeQueue::recompute_by_speed() {
 }
 
 void InitiativeQueue::sync_cursor_to(CombatActor* actor) {
-    const int idx = index_of(actor);
-    if (idx >= 0)
-        cursor_ = idx;
+    // FILA-SYNC-CURSOR-GUARDA (2026-08-06, QUARTO portao da mesma raiz de reorder_actor
+    // 2026-07-15, recompute_by_speed 2026-08-01 e remove 2026-08-06). Ate esta data o corpo
+    // era um SALTO CRU do cursor:
+    //
+    //     const int idx = index_of(actor);
+    //     if (idx >= 0) cursor_ = idx;
+    //
+    // O cursor e a FRONTEIRA da particao "indice <= cursor_ ja agiu / indice > cursor_ esta
+    // pendente". Um salto a atravessa, e cada sentido reproduz um dos dois bugs historicos:
+    // PRA TRAS reabre a rodada (quem ja agiu volta a ser pendente e joga de novo com AP/mana
+    // recarregados - o bug do 3o portao); PRA FRENTE marca como "ja agiu" quem nunca agiu, e
+    // esse ator e PULADO na rodada (o bug do Knockback de 2026-07-15, que motivou criar
+    // delay_current). Nao existe direcao segura: "so avanca" fecharia metade do buraco e
+    // deixaria a outra metade com cara de guarda.
+    //
+    // Guarda: o cursor deixa de se mover. A intencao legitima da funcao - "current() volta a
+    // ser `actor` depois que a ordem mudou" - ja era realizada com seguranca por
+    // bring_to_current, que move o ATOR ate o slot do cursor por PERMUTACAO, com o indice do
+    // cursor e round_index_ FIXOS. Delegar apaga o `cursor_ = idx` do arquivo: apos este
+    // conserto, `cursor_` so e escrito no construtor (0), em regroup_stable (0, fronteira de
+    // rodada), em advance() (o unico ++round_index_) e em remove() (deslize/recuo, contratos
+    // contados) - nenhuma escrita por busca de indice sobrou.
+    //
+    // Efeito por caso: alvo PENDENTE -> vira current() por permutacao (os intermediarios
+    // continuam > cursor_, seguem pendentes); alvo JA-AGIDO -> no-op (nao se re-sincroniza
+    // pra quem ja jogou sem lhe dar 2o turno); alvo AUSENTE ou ja e o current -> no-op
+    // (contrato antigo preservado). Ver initiative_queue_sync_cursor_guard_test.cpp.
+    bring_to_current(actor);
 }
 
 void InitiativeQueue::bring_to_current(CombatActor* actor) {

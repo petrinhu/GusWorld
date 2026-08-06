@@ -247,6 +247,12 @@ TEST_CASE("initiative_queue: recompute_by_speed no fim da fila (cursor no ultimo
 }
 
 // ---- SyncCursorTo (Knockback no proprio tick, secao 4) ----------------------------
+// FILA-SYNC-CURSOR-GUARDA (2026-08-06): sync_cursor_to NAO move mais o cursor - encaminha
+// pra bring_to_current, que traz o ATOR ate o slot do cursor por permutacao. A intencao
+// original ("current() volta a ser `a`") continua cumprida; o que muda e que o vizinho `b`
+// nao e mais PULADO (com o salto cru, o cursor ia pra 1 e `b`, parado no indice 0, passava
+// a contar como ja-agido sem nunca ter agido - literalmente o bug do Knockback de
+// 2026-07-15). Ver initiative_queue_sync_cursor_guard_test.cpp pros dois sentidos.
 
 TEST_CASE("initiative_queue: sync_cursor_to reaponta pro ator dado",
           "[domain][combat][queue]") {
@@ -256,6 +262,10 @@ TEST_CASE("initiative_queue: sync_cursor_to reaponta pro ator dado",
     InitiativeQueueRawReorderTestAccess::reorder_actor(q, &a, +1);
     q.sync_cursor_to(&a);
     REQUIRE(q.current()->id() == "a");
+    // O cursor NAO se moveu, e `b` segue PENDENTE (indice > cursor): ninguem foi pulado.
+    REQUIRE(q.cursor() == 0);
+    REQUIRE(q.index_of(&b) > q.cursor());
+    REQUIRE(q.round_index() == 0);
 }
 
 // ---- cursor() + bring_to_current (Janela de Comando da Party 1B, secao 4.1) --------

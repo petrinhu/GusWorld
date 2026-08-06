@@ -99,9 +99,31 @@ public:
     // round_invariant_test.cpp).
     void recompute_by_speed();
 
-    // Re-sincroniza o cursor pra continuar apontando para actor (FSM quando uma
-    // reordenacao no proprio tick muda a ordem mas o ator NAO perde o turno). secao 4.
-    // No-op se o ator nao esta na fila.
+    // Faz current() voltar a ser `actor` depois que a ordem mudou (reordenacao no proprio
+    // tick que NAO tira o turno do ator). secao 4. No-op se o ator nao esta na fila.
+    //
+    // CONTRATO DE CURSOR (FILA-SYNC-CURSOR-GUARDA, 2026-08-06) - o cursor NAO SE MOVE: esta
+    // funcao e hoje um encaminhamento pra bring_to_current, ou seja, move o ATOR ate o slot
+    // do cursor por PERMUTACAO, com cursor() e round_index() INVARIANTES. Ate esta data o
+    // corpo era um salto cru (`cursor_ = index_of(actor)`) e o nome dizia a verdade sobre o
+    // mecanismo - o problema e que o mecanismo era inseguro nos DOIS sentidos: pra TRAS
+    // reabria a rodada (ja-agido volta a pendente e joga 2x, com AP/mana recarregados - o bug
+    // do 3o portao) e pra FRENTE marcava como ja-agido quem nunca agiu, PULANDO o ator (o bug
+    // do Knockback de 2026-07-15, que motivou criar delay_current). Por isso a guarda nao e um
+    // clamp direcional ("so avanca" fecharia so metade do buraco).
+    //
+    // ATENCAO - ESTE DOC MENTIA ate 2026-08-06: dizia que a CombatStateMachine chamava a funcao
+    // "apos reorder". A FSM nunca chamou - a varredura da fatia achou ZERO caller de producao
+    // (so testes e o fuzz). O comentario gemeo em initiative_queue_property_test.cpp foi
+    // corrigido no mesmo commit. Comentario que mente convida codigo novo a usar a primitiva
+    // errada; era metade do defeito.
+    //
+    // Efeito por caso: alvo PENDENTE (indice > cursor()) -> vira current(), os intermediarios
+    // sao empurrados uma casa a frente e seguem PENDENTES; alvo JA-AGIDO (indice < cursor())
+    // -> no-op (nao se re-sincroniza pra quem ja jogou sem lhe dar um 2o turno); alvo AUSENTE
+    // ou ja e o current() -> no-op. bring_to_current e o nome canonico do primitivo; este
+    // sobrevive como o nome HISTORICO que o codigo de jogo poderia procurar, agora pousando
+    // no caminho seguro. Ver initiative_queue_sync_cursor_guard_test.cpp.
     void sync_cursor_to(CombatActor* actor);
 
     // Traz `actor` para o SLOT DO CURSOR (passa a ser current()) SEM mexer no indice do
