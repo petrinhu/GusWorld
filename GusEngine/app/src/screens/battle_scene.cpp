@@ -647,7 +647,7 @@ void BattleScene::request_auto_resolve() {
     if (!offers_auto_resolve()) {
         return;  // so quando oferecido (trash, na abertura)
     }
-    // TEXTO PROVISORIO, AGUARDA COPY DO LIDER (I18N-UILOG, 2026-08-06): o encanamento i18n
+    // COPY APROVADA PELO LIDER (COPY-STUBS-COMBATE, 2026-08-06): opcao 1A da proposta
     // esta pronto (chave nos 2 catalogos, resolvida pelo translator), mas o VALOR de
     // COMBAT_LOG_AUTORESOLVE_UNAVAILABLE continua a fala de programador do stub. Texto que o
     // jogador le e canon: quem escreve a frase definitiva e o lider, e a troca sera no
@@ -869,7 +869,7 @@ void BattleScene::menu_confirm() {
         case BattleVerb::Gambito: {
             // Gambito-Prever exige IEnemyBrain registrado (a demo nao registra brains):
             // no incremento 3 sinaliza no log e NAO submete (evita excecao do motor).
-            // TEXTO PROVISORIO, AGUARDA COPY DO LIDER (I18N-UILOG, 2026-08-06): mesma
+            // COPY APROVADA PELO LIDER (COPY-STUBS-COMBATE, 2026-08-06): opcao 2A da proposta
             // situacao do auto-resolve acima - encanamento i18n pronto, mas o VALOR de
             // COMBAT_LOG_GAMBIT_UNAVAILABLE ainda e a fala de programador do stub ("brain",
             // "telegraph", "incr 5"). A frase definitiva e do lider e entra no CATALOGO.

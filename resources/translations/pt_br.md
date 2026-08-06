@@ -494,13 +494,13 @@ COMPILADO: {0}
 ERRO DE COMPILAÇÃO
 
 ## COMBAT_LOG_COMPILE_UNAVAILABLE
-COMPILAR: módulo do compilador offline nesta build.
+COMPILAR: módulo do compilador offline.
 
 ## COMBAT_LOG_AUTORESOLVE_UNAVAILABLE
-[auto-resolve: a implementar]
+RESOLVER SEM ENCARAR: rotina offline.
 
 ## COMBAT_LOG_GAMBIT_UNAVAILABLE
-GAMBITO: requer brain do alvo (telegraph entra no incr 5)
+GAMBITO: previsão offline.
 
 ## COMBAT_ACTOR_RESOURCES
 AP {0}/{1} | Mana {2}/{3}
