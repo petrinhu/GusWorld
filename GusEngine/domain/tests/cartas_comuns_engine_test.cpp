@@ -381,6 +381,115 @@ TEST_CASE("synergy: log diegetico presente com sufixo SINERGIA quando dispara",
     REQUIRE(log_has_substring(sm, "+40%"));
 }
 
+// ================================================================================
+// PECA 1-bis: LEI DO ATOMO - o NUMERO e da CARTA, nunca do resolvedor
+// ================================================================================
+//
+// TESTES-MUTANTES-W1 (auditoria da onda W1): trocar `card.synergy_percent` por um
+// literal `40.0f` dentro do resolvedor SOBREVIVIA a suite inteira. Causa medida: as 8
+// ocorrencias de synergy_percent neste arquivo valiam 40, TODAS - nenhum caso exercitava
+// um percentual diferente, entao o literal e o campo eram indistinguiveis.
+//
+// Isso e a LEI DO ATOMO do projeto (carta e DADO, nunca codigo por unidade) sem teste que
+// a defendesse - e card_records.hpp:104-105 promete o contrario POR ESCRITO: "a logica do
+// resolvedor NUNCA hardcoda 40 (a carta e quem carrega o numero)".
+//
+// Os casos abaixo varrem QUATRO percentuais diferentes (0/25/40/100). Qualquer constante
+// cravada no resolvedor morre em pelo menos 3 deles, e a razao 100% / 0% == 2.0 morre em
+// TODOS (um literal produz razao 1.0).
+
+namespace {
+
+// Dano REAL de um cast com sinergia DISPARADA, com `percent` variavel. Setup deliberadamente
+// neutro pra que o dano seja EXATAMENTE lround(power * (1 + percent/100)):
+//   atk 0 + def 0            -> base = card.power, sem termo de ataque nem mitigacao;
+//   familias iguais          -> roda de fraqueza Neutra (x1.0), sem ambiente ativo (x1.0);
+//   FixedRandom(0.5, 99)     -> canal COMUM (roll=99) com variancia ZERO (r=0.5).
+// So o fator de sinergia sobra na cadeia divisiva - o dano E o numero da carta.
+int synergy_damage_at(int percent, int power = 30) {
+    CombatActor h = hero("gus", 50, 20, /*atk=*/0, /*def=*/2, CardFamily::Eletrico);
+    CombatActor e = foe("enemy", 500, 10, /*atk=*/6, /*def=*/0, CardFamily::Eletrico);
+    e.add_status({StatusId::Stun, 0, 1, StackRule::Replace, CardFamily::Eletrico});
+
+    Card card = make_card("tavusa_fulminante", CardFamily::Eletrico, power);
+    card.synergy_statuses = {StatusId::Stun};
+    card.synergy_percent = percent;
+    auto reg = registry({card});
+
+    FixedRandom rng;
+    CombatStateMachine sm({&h, &e}, play_once(CombatAction::use_card(card.id, e.id())), &reg,
+                          nullptr, &rng);
+    sm.begin_turn();
+    sm.run_active_turn_to_end();
+    return e.max_hp() - e.hp();
+}
+
+}  // namespace
+
+TEST_CASE("synergy: o percentual vem da CARTA, nao do resolvedor - 4 percentuais DIFERENTES "
+          "produzem 4 danos diferentes (LEI DO ATOMO; mata o mutante que crava 40 no codigo)",
+          "[domain][combat][cartas_comuns_engine][synergy][atom]") {
+    // base = power = 30 (setup neutro documentado em synergy_damage_at).
+    REQUIRE(synergy_damage_at(0) == 30);     // x1.00 - sinergia dispara mas NAO amplia
+    REQUIRE(synergy_damage_at(25) == 38);    // x1.25 -> lround(37.5)
+    REQUIRE(synergy_damage_at(40) == 42);    // x1.40 - a carta canonica de producao
+    REQUIRE(synergy_damage_at(100) == 60);   // x2.00
+}
+
+TEST_CASE("synergy: razao 100% / 0% == 2.0 exatamente - a proporcao segue o campo da carta, "
+          "e um literal no resolvedor a achataria em 1.0",
+          "[domain][combat][cartas_comuns_engine][synergy][atom]") {
+    const int at_zero = synergy_damage_at(0);
+    const int at_hundred = synergy_damage_at(100);
+
+    REQUIRE(at_zero > 0);  // guarda: a razao so significa algo com denominador nao-nulo
+    REQUIRE(at_hundred == 2 * at_zero);
+}
+
+TEST_CASE("synergy: o percentual da carta manda tambem no PREVIEW (estimate_card_damage) - "
+          "gemeo preview<->real com percent != 40",
+          "[domain][combat][cartas_comuns_engine][synergy][atom]") {
+    Card card = make_card("tavusa_fulminante", CardFamily::Eletrico, /*power=*/30, /*mana=*/0);
+    card.synergy_statuses = {StatusId::Stun};
+    card.synergy_percent = 25;  // DIFERENTE de 40 de proposito
+    auto reg = registry({card});
+
+    CombatActor h = hero("gus", 50, 20, /*atk=*/0, /*def=*/2, CardFamily::Eletrico);
+    CombatActor e = foe("enemy", 500, 10, /*atk=*/6, /*def=*/0, CardFamily::Eletrico);
+    e.add_status({StatusId::Stun, 0, 1, StackRule::Replace, CardFamily::Eletrico});
+    CombatStateMachine sm_est({&h, &e}, play_once(CombatAction::pass()), &reg, nullptr, nullptr);
+    const CardDamageEstimate est = sm_est.estimate_card_damage(h, e, card);
+
+    // r=0.5 (variancia zero) cai exatamente no meio de [min, max] do canal COMUM, que e o
+    // que synergy_damage_at mede - e o valor tem que ser o de 25%, nunca o de 40%.
+    REQUIRE(synergy_damage_at(25) == 38);
+    REQUIRE(est.min_damage <= 38);
+    REQUIRE(est.max_damage >= 38);
+    REQUIRE(est.min_damage < synergy_damage_at(40));  // 40% desloca a faixa inteira pra cima
+}
+
+TEST_CASE("synergy: o LOG diegetico imprime o percentual DA CARTA (+25%), nao um 40 cravado",
+          "[domain][combat][cartas_comuns_engine][synergy][atom][log]") {
+    CombatActor h = hero("gus", 50, 20, /*atk=*/0, /*def=*/2, CardFamily::Eletrico);
+    CombatActor e = foe("enemy", 500, 10, /*atk=*/6, /*def=*/0, CardFamily::Eletrico);
+    e.add_status({StatusId::Stun, 0, 1, StackRule::Replace, CardFamily::Eletrico});
+
+    Card card = make_card("tavusa_fulminante", CardFamily::Eletrico, /*power=*/30);
+    card.synergy_statuses = {StatusId::Stun};
+    card.synergy_percent = 25;
+    auto reg = registry({card});
+
+    FixedRandom rng;
+    CombatStateMachine sm({&h, &e}, play_once(CombatAction::use_card(card.id, e.id())), &reg,
+                          nullptr, &rng);
+    sm.begin_turn();
+    sm.run_active_turn_to_end();
+
+    REQUIRE(log_has_substring(sm, "SINERGIA"));
+    REQUIRE(log_has_substring(sm, "+25%"));
+    REQUIRE_FALSE(log_has_substring(sm, "+40%"));
+}
+
 // NOTA DE COBERTURA (curto-circuito de imunidade x sinergia): o tier Imune (mult_fraqueza ==
 // 0.0) e "flag de inimigo/lore, incremento futuro" e NAO e exercitavel pela roda de fraqueza
 // publica hoje (mesma limitacao documentada em weakness_wheel_property_test.cpp INV-8, linha

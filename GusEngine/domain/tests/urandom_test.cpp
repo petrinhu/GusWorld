@@ -681,6 +681,148 @@ TEST_CASE("urandom FSM: carta sorteada com TargetShape::Single NAO loga o sufixo
     REQUIRE_FALSE(log_has(sm, "(efeito de area reduzido a alvo unico)"));
 }
 
+// ----- TESTES-MUTANTES-W1: os 3 pontos de log do sufixo, e as 3 formas de area ---------
+//
+// Auditoria da onda W1: dos 3 pontos de log do sufixo de downgrade, so 1 tinha teste (o
+// ramo OFENSIVO, nos dois casos acima). Dois mutantes sobreviviam a suite inteira:
+//   U1 - remover o sufixo do ramo FRIENDLY (alvo = o proprio lado): 0 testes pegavam.
+//   U2 - desligar TargetShape::Linha (ou Area3x3) do predicado area_reduced_to_single:
+//        0 testes pegavam, porque os dois casos acima so exercitavam Grupo e Single.
+// Regra da casa violada nos dois: "todo efeito loga no terminal, com mensagem diegetica;
+// nada em silencio" - o jogador que caisse nesses caminhos nao era avisado do downgrade.
+//
+// RAMO SEM TESTE, DE PROPOSITO (nao e esquecimento): o TERCEIRO ponto de log fica dentro
+// do guard `if (mult_fraqueza == 0.0f)` de resolve_redirected_card_effect, e hoje e CODIGO
+// MORTO - inalcancavel por qualquer combinacao de familias. mult_fraqueza vem de
+// WeaknessWheel::multiplier(), que so devolve 0.0f para WeaknessTier::Imune, e
+// WeaknessWheel::tier_for() NUNCA devolve Imune (weakness_wheel.hpp:60-74: os unicos
+// retornos sao Fraco/Resistente/Neutro; o proprio header diz que "Imune NAO faz parte da
+// roda base; e flag de inimigo/lore, incremento futuro"). Teste que nao consegue chegar no
+// ramo que afirma cobrir e teste de vaidade: passaria por inercia, verde para sempre, sem
+// jamais exercitar a linha. Quando Imune entrar na roda, este comentario e o gatilho para
+// escrever o caso - e ate la o ramo continua reportado como o que e: morto.
+
+namespace {
+
+// Roda um redirecionamento de urandom com a carta sorteada tendo `shape`, mandando o lado
+// sorteado para o CASTER (side_draw=0, ramo friendly) ou para o INIMIGO (side_draw=1, ramo
+// ofensivo). Devolve se o sufixo de downgrade apareceu no log.
+bool redirect_logs_area_downgrade(TargetShape shape, int side_draw) {
+    Card sorteada = comum_card("sorteada", /*mana=*/1, /*power=*/4);
+    sorteada.target_shape = shape;
+
+    CombatActor caster = make_actor("h", true, /*hp=*/100, /*atk=*/10, /*def=*/0);
+    CombatActor target = make_actor("e", false, /*hp=*/300, /*atk=*/0, /*def=*/0);
+    Card urandom = urandom_card();
+    auto reg = registry({urandom, sorteada});
+    std::vector<CardCollectionEntry> snapshot = {
+        CardCollectionEntry{0, urandom.id, 1, CardOrigin::OriginalRom},
+        CardCollectionEntry{1, sorteada.id, 1, CardOrigin::OriginalRom}};
+    CombatAction cast = CombatAction::use_card(urandom.id, caster.id());
+    cast.card_instance_id = 0;
+    // draw1=0 (Fraco), draw2=0 (unico candidato), draw3=side_draw (lado), draw4=99 (canal
+    // COMUM, consumido so no ramo ofensivo).
+    SequenceRandom rng({0, 0, side_draw, 99}, /*next_double_value=*/0.5);
+    auto provider = play_sequence({cast});
+    CombatStateMachine sm({&caster, &target}, provider, &reg, nullptr, &rng, nullptr, &snapshot);
+
+    sm.begin_turn();
+    sm.run_active_turn_to_end();
+
+    REQUIRE(log_has(sm, "sorteou sorteada"));  // guarda: o redirect de fato aconteceu
+    return log_has(sm, "(efeito de area reduzido a alvo unico)");
+}
+
+}  // namespace
+
+TEST_CASE("urandom FSM: as TRES formas de area (Linha/Area3x3/Grupo) logam o sufixo de "
+         "downgrade no ramo ofensivo - nenhuma delas fica muda (mutante U2)",
+         "[domain][combat][urandom][fsm][log]") {
+    REQUIRE(redirect_logs_area_downgrade(TargetShape::Linha, /*side_draw=*/1));
+    REQUIRE(redirect_logs_area_downgrade(TargetShape::Area3x3, /*side_draw=*/1));
+    REQUIRE(redirect_logs_area_downgrade(TargetShape::Grupo, /*side_draw=*/1));
+}
+
+TEST_CASE("urandom FSM: as formas NAO-area (Single/Self) continuam sem sufixo no ramo "
+         "ofensivo - o aviso so sai quando houve reducao de verdade",
+         "[domain][combat][urandom][fsm][log]") {
+    REQUIRE_FALSE(redirect_logs_area_downgrade(TargetShape::Single, /*side_draw=*/1));
+    REQUIRE_FALSE(redirect_logs_area_downgrade(TargetShape::Self, /*side_draw=*/1));
+}
+
+// Sem VIRGULA no nome de proposito: o Catch2 trata virgula como SEPARADOR de filtros, entao
+// um nome com virgula quebra o `-R`/filtro manual e sai "No tests ran" com EXIT=2 - que se le
+// como "o teste sumiu" quando na verdade e o filtro que se partiu em dois.
+TEST_CASE("urandom FSM: o ramo FRIENDLY (lado sorteado = o proprio caster / fogo amigo "
+         "desligado) tambem loga o sufixo de downgrade - o aviso nao depende de ter dado "
+         "dano (mutante U1)",
+         "[domain][combat][urandom][fsm][log][chaos]") {
+    REQUIRE(redirect_logs_area_downgrade(TargetShape::Linha, /*side_draw=*/0));
+    REQUIRE(redirect_logs_area_downgrade(TargetShape::Area3x3, /*side_draw=*/0));
+    REQUIRE(redirect_logs_area_downgrade(TargetShape::Grupo, /*side_draw=*/0));
+}
+
+TEST_CASE("urandom FSM: ramo FRIENDLY com carta Single NAO loga o sufixo (o ramo nao passou "
+         "a avisar sempre - o predicado continua sendo o da forma da carta)",
+         "[domain][combat][urandom][fsm][log][chaos]") {
+    REQUIRE_FALSE(redirect_logs_area_downgrade(TargetShape::Single, /*side_draw=*/0));
+}
+
+// ----- LEI DO ATOMO no redirect: o percentual de sinergia e da CARTA aqui tambem ------
+//
+// ACHADO DA FATIA TESTES-MUTANTES-W1 (fora do escopo original, medido durante o replay do
+// mutante C1): resolve_redirected_card_effect tem a SUA propria copia da cadeia divisiva, e
+// portanto um TERCEIRO sitio de `card.synergy_percent` alem dos dois de resolve_use_card/
+// estimate_card_damage. Trocar SO esse terceiro sitio por um literal 40.0f sobrevivia a
+// suite inteira - 1501 casos, 4,36 milhoes de assercoes, zero falha - inclusive DEPOIS dos
+// testes novos de cartas_comuns_engine_test.cpp, porque nenhum teste redirecionava uma
+// carta COM sinergia. Ver card_records.hpp:104-105 ("a logica do resolvedor NUNCA hardcoda
+// 40") e project_tudo_e_atomo (carta e DADO, nunca codigo por unidade).
+
+namespace {
+
+// Dano REAL de um redirect de urandom para uma carta com sinergia DISPARADA no alvo.
+// Setup escolhido pra que o dano seja EXATAMENTE lround((power + atk) * (1 + percent/100)):
+// def 0, alvo de familia Universal (curto-circuita a roda em Neutro x1.0), sem ambiente,
+// canal COMUM (draw4=99) com variancia zero (next_double=0.5).
+int redirect_synergy_damage_at(int percent) {
+    Card sting = comum_card("sting", /*mana=*/1, /*power=*/4);
+    sting.synergy_statuses = {StatusId::Stun};
+    sting.synergy_percent = percent;
+
+    CombatActor caster = make_actor("h", true, /*hp=*/100, /*atk=*/10, /*def=*/0);
+    CombatActor target = make_actor("e", false, /*hp=*/300, /*atk=*/0, /*def=*/0);
+    target.add_status({StatusId::Stun, 0, 3, StackRule::Replace, CardFamily::Cinetico});
+
+    Card urandom = urandom_card();
+    auto reg = registry({urandom, sting});
+    std::vector<CardCollectionEntry> snapshot = {
+        CardCollectionEntry{0, urandom.id, 1, CardOrigin::OriginalRom},
+        CardCollectionEntry{1, sting.id, 1, CardOrigin::OriginalRom}};
+    CombatAction cast = CombatAction::use_card(urandom.id, caster.id());
+    cast.card_instance_id = 0;
+    SequenceRandom rng({0, 0, 1, 99}, /*next_double_value=*/0.5);
+    auto provider = play_sequence({cast});
+    CombatStateMachine sm({&caster, &target}, provider, &reg, nullptr, &rng, nullptr, &snapshot);
+
+    sm.begin_turn();
+    sm.run_active_turn_to_end();
+
+    REQUIRE(log_has(sm, "sorteou sting"));  // guarda: o redirect de fato aconteceu
+    return 300 - target.hp();
+}
+
+}  // namespace
+
+TEST_CASE("urandom FSM: a sinergia da carta REDIRECIONADA usa o percentual DA CARTA - o "
+         "redirect tem cadeia divisiva propria e ela nao pode cravar 40 (LEI DO ATOMO)",
+         "[domain][combat][urandom][fsm][atom]") {
+    // base = power(4) + atk(10) = 14, sem mitigacao nem roda (alvo Universal).
+    REQUIRE(redirect_synergy_damage_at(0) == 14);     // x1.00
+    REQUIRE(redirect_synergy_damage_at(100) == 28);   // x2.00
+    REQUIRE(redirect_synergy_damage_at(100) == 2 * redirect_synergy_damage_at(0));
+}
+
 TEST_CASE("urandom FSM: redirecionamento pra uma ESPECIAL (jackpot) executa via "
          "techMagic::execute e produz o MESMO status que o cast direto",
          "[domain][combat][urandom][fsm][parity][jackpot]") {
