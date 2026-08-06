@@ -69,6 +69,18 @@ O glintfx vendoriza as SUAS PRÓPRIAS cópias de `stb_image.h` e `stb_image_writ
 
 ---
 
+## Ferramenta de design de terceiro (NÃO entra no binário nem no pacote de release)
+
+Código de terceiro que vive no repositório mas não é compilado, não é linkado e não é distribuído com o jogo. Fica listado porque esta tabela se pretende exaustiva, e porque `tools/spdx_allowlist.txt` promete que toda linha de terceiro da allowlist do `GATE(spdx-required)` está documentada aqui (promessa que estava em aberto até 2026-08-06: a entrada existia na allowlist e não constava deste arquivo).
+
+| Componente | Licença | Titular / fonte | Nota |
+|---|---|---|---|
+| 8values (fork/port Python) | MIT | 8values (<https://github.com/8values/8values.github.io>), `Copyright (c) 2020 8values. http://8values.github.io.` | **Ferramenta de design, fora do binário.** `docs/design/roster-analogos/8values-engine/8values_engine.py` é um port Python fiel do quiz de espectro político 8values, usado para classificar as 21 figuras do roster de análogos. As 70 perguntas, os pesos por eixo, a fórmula de scoring, os thresholds de rótulo e a tabela de 52 ideologias são transcritos verbatim do original. O aviso de copyright e o texto de permissão estão preservados em `LICENSE_8VALUES_ORIGINAL.txt`, na mesma pasta, e os créditos completos em `ATTRIBUTION.md`. Entrada correspondente na allowlist do gate de SPDX (é o único caso "terceiro" fora de `GusEngine/`). |
+
+⚠️ **O arquivo vizinho `gus_rightness.py`, na mesma pasta, NÃO é de terceiro e não pertence a esta seção:** é a camada v2 ponderada, escrita pelo GusWorld (decisão do líder em 2026-07-11), que importa o fork em runtime sem copiar nenhuma linha dele. Declarava MIT até 2026-08-06, por acompanhar o vizinho, e passou a Apache-2.0 junto com o resto do código próprio (item `LICENCA-GUS-RIGHTNESS`); saiu da allowlist do gate no mesmo commit. A análise que autorizou a troca está em `ATTRIBUTION.md`, seção "Licenca de CADA arquivo desta pasta". A licença do `8values_engine.py` **não** acompanhou a troca, e não pode acompanhar: pôr o SPDX Apache-2.0 do GusWorld nele seria declaração de licença falsa.
+
+---
+
 ## Links das licenças (texto oficial)
 
 Referência por nome + URL; o texto legal completo de cada licença vive na fonte oficial e/ou é embarcado junto do respectivo componente no pacote de release.

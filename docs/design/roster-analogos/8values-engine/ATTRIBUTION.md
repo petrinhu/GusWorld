@@ -35,6 +35,35 @@ inteiro sob os mesmos termos -- mas optamos por manter `8values_engine.py`
 tambem sob **MIT** (mesma licenca do original), por simplicidade e por ser
 a pratica mais segura/idiomatica para um fork direto.
 
+## Licenca de CADA arquivo desta pasta (atualizado em 2026-08-06)
+
+A pasta tem dois arquivos de codigo e eles **nao tem a mesma licenca**. A
+diferenca e proposital e segue o criterio de quem escreveu o que:
+
+| Arquivo | Licenca | Por que |
+|---|---|---|
+| `8values_engine.py` | **MIT** (herdada) | Obra derivada do 8values: as 70 perguntas, os pesos por eixo, a formula de scoring, os thresholds de rotulo e a tabela de 52 ideologias sao transcritos verbatim do projeto original. A licenca acompanha o material do autor original. Este arquivo esta na allowlist do `GATE(spdx-required)` (`tools/spdx_allowlist.txt`) exatamente por isso: por o SPDX Apache-2.0 do GusWorld nele seria declaracao de licenca falsa. |
+| `gus_rightness.py` | **Apache-2.0** (nossa) | Codigo 100% do GusWorld: a camada v2 ponderada (pesos 0.50/0.25/0.15/0.10) e decisao de design do lider do projeto em 2026-07-11 e nao tem contraparte no 8values. O arquivo **importa** o engine em runtime (`importlib`), nao copia nem transcreve nenhuma linha dele. Ate 2026-08-06 declarava MIT por acompanhar o vizinho; o lider decidiu padronizar com o resto do repo (item `LICENCA-GUS-RIGHTNESS`). |
+| `PERGUNTAS.md` | conteudo do 8values | As 70 perguntas sao texto do projeto original, so renumeradas/reformatadas para uso com persona-agents. |
+| `LICENSE_8VALUES_ORIGINAL.txt` | (o proprio aviso) | Copia verbatim do `LICENSE` do repositorio original. Nao editar. |
+
+**A troca de `gus_rightness.py` para Apache-2.0 nao afeta a atribuicao ao
+8values**, por tres razoes que ficam registradas aqui para quem auditar isto
+no futuro sem reabrir a analise:
+
+1. **Nenhuma expressao do upstream esta naquele arquivo.** O que ele repete do
+   vizinho (decodificacao do JSON de entrada, formato do relatorio CLI) e
+   justamente o que o proprio ATTRIBUTION lista, na secao seguinte, como
+   adicao do GusWorld ao fork ("plumbing de I/O", "relatorio CLI legivel"),
+   nao material do 8values.
+2. **A licenca original permite sublicenciar.** Mesmo na leitura conservadora
+   de que `gus_rightness.py` fosse obra derivada do fork, a MIT autoriza
+   expressamente "sublicense", desde que o aviso de copyright e o aviso de
+   permissao permanecam nas copias.
+3. **O aviso permanece.** `LICENSE_8VALUES_ORIGINAL.txt` continua verbatim, o
+   cabecalho de `8values_engine.py` continua declarando a origem, e este
+   documento continua distribuido junto. A condicao da MIT segue cumprida.
+
 ## O que foi transcrito verbatim do 8values (dados/formula deles)
 
 Fetch feito em 2026-07-11 via `raw.githubusercontent.com/8values/8values.github.io/master/...`:

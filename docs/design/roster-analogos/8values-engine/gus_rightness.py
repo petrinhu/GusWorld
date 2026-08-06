@@ -1,8 +1,31 @@
 #!/usr/bin/env python3
-# SPDX-License-Identifier: MIT
+# SPDX-License-Identifier: Apache-2.0
 #
 # gus_rightness.py -- GusWorld roster political scalar, camada v2 (ponderada)
 # =============================================================================
+#
+# LICENCA (LICENCA-GUS-RIGHTNESS, 2026-08-06): este arquivo e codigo NOSSO e
+# fica sob Apache-2.0, a mesma licenca do resto do projeto (ver `LICENSE` na
+# raiz do repo). Ate esta data ele declarava MIT, por acompanhar o vizinho
+# `8values_engine.py`; o lider decidiu padronizar com o projeto. A troca e
+# licita e NAO afrouxa nada da atribuicao ao 8values original:
+#
+#   - Nenhuma linha do 8values vive neste arquivo. As 70 perguntas, os pesos
+#     por eixo, a formula de scoring/normalizacao, os thresholds de rotulo e a
+#     tabela de 52 ideologias moram TODOS no vizinho `8values_engine.py`, que
+#     este arquivo IMPORTA em runtime (nao copia, nao transcreve, nao adapta).
+#     O que existe aqui e a camada v2 ponderada, decisao de design do GusWorld
+#     (2026-07-11) que nao tem contraparte no projeto original.
+#   - `8values_engine.py` CONTINUA MIT (obra derivada do 8values, Copyright (c)
+#     2020 8values, http://8values.github.io) e continua dispensado do
+#     GATE(spdx-required) pela allowlist. Este arquivo nao mexe nele.
+#   - O aviso de copyright e o texto de permissao do upstream seguem
+#     preservados verbatim em `LICENSE_8VALUES_ORIGINAL.txt` e citados em
+#     `ATTRIBUTION.md`, nesta mesma pasta, distribuidos junto com o fork, que
+#     e o que a licenca do upstream exige. Mesmo na leitura conservadora de
+#     que este arquivo fosse obra derivada do fork, aquela licenca permissiva
+#     autoriza sublicenciar desde que o aviso original permaneca -- e ele
+#     permanece, intocado, ao lado.
 #
 # Contexto: ferramenta de design (nao codigo do jogo) que fica POR CIMA do
 # fork 8values desta mesma pasta (`8values_engine.py`, MIT, ver
@@ -54,7 +77,8 @@
 #     original, ideologia mais proxima) + duas linhas parseaveis
 #     `RIGHTNESS_V1=` / `RIGHTNESS_V2=`.
 #
-# Licenca deste arquivo: MIT (mesmos termos de `8values_engine.py`).
+# Licenca deste arquivo: Apache-2.0 (codigo nosso; ver o bloco LICENCA no topo
+# do arquivo). O vizinho `8values_engine.py` continua MIT, herdada do upstream.
 
 """gus_rightness.py -- camada v2 (ponderada) do escalar de direita/esquerda
 do roster GusWorld, por cima do fork 8values (`8values_engine.py`, mesma

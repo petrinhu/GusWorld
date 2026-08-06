@@ -29,4 +29,15 @@ GusEngine/platform/rmlui/RmlUi_Include_GL3.h	terceiro (glad, MIT); nome de arqui
 GusEngine/third_party/stb/stb_image_write.h	terceiro (stb, dominio publico / MIT); upstream nao usa SPDX
 GusEngine/third_party/stb/stb_truetype.h	terceiro (stb, dominio publico / MIT); upstream nao usa SPDX
 docs/design/roster-analogos/8values-engine/8values_engine.py	caso (a) terceiro: OBRA DERIVADA (fork/port py) do 8values, Copyright (c) 2020 8values, MIT - a licenca e herdada do upstream (ver ATTRIBUTION.md e LICENSE_8VALUES_ORIGINAL.txt na mesma pasta); relicenciar para Apache-2.0 seria declaracao falsa
-docs/design/roster-analogos/8values-engine/gus_rightness.py	caso (b) nosso, MIT DE PROPOSITO: ferramenta de design escrita por nos que fica POR CIMA do fork MIT da mesma pasta e foi licenciada MIT para acompanha-lo; trocar para Apache-2.0 e decisao de licenciamento do lider, nao efeito colateral deste gate
+
+# SAIU DAQUI EM 2026-08-06 (LICENCA-GUS-RIGHTNESS), e o motivo fica registrado
+# porque o vizinho dele CONTINUA na lista e a diferenca entre os dois e sutil:
+# `gus_rightness.py` era o unico caso (b) da allowlist (nosso, MIT de proposito
+# para acompanhar o fork). O lider decidiu padronizar em Apache-2.0; a analise
+# de licenciamento confirmou que a troca e licita porque o arquivo NAO contem
+# nenhuma expressao do 8values (importa o fork em runtime, nao copia nada dele)
+# e o aviso do upstream segue preservado em LICENSE_8VALUES_ORIGINAL.txt /
+# ATTRIBUTION.md, ao lado. Logo ele ganhou o cabecalho Apache-2.0 e a dispensa
+# morreu. O `8values_engine.py` acima e caso (a) e NAO acompanha essa troca:
+# ali dentro moram as 70 perguntas, os pesos, a formula e as 52 ideologias do
+# projeto original, e por o nosso SPDX naquele arquivo seria licenca falsa.
