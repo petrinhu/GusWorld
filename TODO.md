@@ -771,6 +771,21 @@ histórico no fim do arquivo. Novas descobertas entram como bullets abaixo desta
   medição** — ninguém correlacionou carga com falha ainda. O que importa registrar é que a suíte
   **não é 100% determinística hoje**, e que um verde isolado não prova ausência destes dois.
 
+- `I18N-ESCAPE-ASPAS` (2026-08-05, **limite declarado da fatia `I18N-ESCAPE-MARKUP`**, com uma
+  advertência técnica que chegou do glintfx em 06/08): o escape de texto externo cobre **três**
+  caracteres (`&`, `<`, `>`). **Aspas ficaram de fora**, e existe **um** ponto em que dado externo
+  entra em VALOR DE ATRIBUTO: o nome do arquivo de retrato, derivado do `speaker_id` lido de
+  `resources/dialogues/*.dlg.txt` (`npc_dialogue_rml.cpp:183`). Um `speaker_id` com `"` escaparia do
+  atributo. Hoje nenhum tem, e o arquivo é nosso, então o risco é de quem editar amanhã.
+  ⚠️ **Se estender, a FORMA importa e não é livre** (medido pelo glintfx contra o fonte do RmlUi ao
+  comparar as árvores dos dois motores): o RmlUi decodifica **`&lt;` `&gt;` `&amp;` `&quot;` e
+  referências numéricas (`&#NN;`)**, e **nada mais**. Portanto `&quot;` é seguro para aspas duplas,
+  mas **apóstrofo TEM de ser `&#39;`, NUNCA `&apos;`** — não existe ramo para essa forma no
+  decodificador deles, e ela sobreviveria **literal** no texto. A frase que resume, deles: *"escapar
+  para uma forma que o motor não decodifica é pior que não escapar"*. Mesma razão pela qual o
+  `&nbsp;` que usamos como recuo decorativo **não** é decodificado pelo RmlUi (ele passa literal, e
+  é isso que queremos ali).
+
 ## 🗄️ Arquivado: eras Godot/C# e Qt6 (superadas, mantidas por registro)
 
 **Motivo do arquivamento:** stack superada pelos dois pivôs em sequência (Godot 4.6 + C# .NET 8
