@@ -18,6 +18,9 @@
 // O destino continua o mesmo stage pra onde glintfx::UiLayer::load_font_face aponta
 // (FONT-EXTEND-GLITCH, 2026-07-29 - ver battle_preview.cpp).
 #include "gus/app/screens/font_stage.hpp"
+// TEMPFILE-PROD-UNICO (2026-08-06): stage/tempfile deste arquivo saem daqui (fixos por
+// EXECUCAO, unicos entre execucoes) em vez do nome fixo eterno de antes.
+#include "gus/app/temp_session.hpp"
 #include "gus/core/asset_paths.hpp"
 #include "gus/domain/combat/combat_actor.hpp"
 
@@ -371,9 +374,17 @@ std::string cockpit_retrato_flat_for(const gus::domain::combat::CombatActor& act
 // carrega fonte default (so a v0.2.2) - por isso o smoke e um DIV com gradiente
 // semitransparente + glow (decorator/box-shadow nativos), SEM texto. Prova so o compose do
 // embed mode por cima da arena. Unidades em 'px' (deterministico; dp-ratio fica pra v0.2.2).
+//
+// TEMPFILE-PROD-UNICO (2026-08-06): o nome era FIXO ETERNO
+// (`<tmp>/gusworld_glintfx_smoke.rml`) - dois processos gravavam o mesmo arquivo. Agora e
+// FIXO POR EXECUCAO (mesmo prefixo + sufixo da execucao, ver gus/app/temp_session.hpp).
+// Por que fixo-por-execucao e nao unico-por-chamada: reescrever o MESMO arquivo a cada
+// chamada dentro do processo e desejavel (o smoke e um artefato de depuracao que o humano
+// abre; um path novo por chamada encheria o /tmp de copias identicas), e o conteudo e
+// literal constante - nao ha o que atropelar dentro da propria execucao.
 std::string write_smoke_glintfx_rml() {
     namespace fs = std::filesystem;
-    const fs::path path = fs::temp_directory_path() / "gusworld_glintfx_smoke.rml";
+    const fs::path path = gus::app::session_temp_file("gusworld_glintfx_smoke", ".rml");
     std::ofstream f(path);
     f << R"RML(<rml>
 <head>
@@ -407,9 +418,18 @@ body { background: transparent; }
 // robusta (= ao teste base_url_sanity do glintfx): juntar doc + assets num dir unico, com
 // referencias RELATIVAS achatadas. As fontes (GusEngine/assets/) e os sprites
 // (resources/sprites/icons-m5/) vivem em ARVORES diferentes; o stage os reune.
+//
+// TEMPFILE-PROD-UNICO (2026-08-06): o dir era FIXO ETERNO
+// (`<tmp>/gusworld_glintfx_cockpit`), entao duas execucoes disputavam o MESMO stage - com
+// escrita E leitura de volta (medido: dois TEST_CASEs gravando conteudo mutuamente
+// exclusivo no mesmo cockpit_baked.rml). Agora e FIXO POR EXECUCAO: mesmo prefixo (o glob
+// `gusworld_glintfx_cockpit*` continua achando na depuracao) + sufixo da execucao.
+// UNICO-POR-CHAMADA ESTA FORA DE COGITACAO AQUI, e este e o caso mais rigido dos quatro: o
+// chamador (battle_preview.cpp) pega este dir por FORA, como base_url, DEPOIS que
+// write_baked/write_live copiaram os assets la dentro - se o valor mudasse por chamada, o
+// base_url apontaria pra um dir vazio e a UI carregaria sem fonte/sprite.
 std::string glintfx_cockpit_stage_dir() {
-    namespace fs = std::filesystem;
-    return (fs::temp_directory_path() / "gusworld_glintfx_cockpit").string();
+    return gus::app::session_temp_dir("gusworld_glintfx_cockpit").string();
 }
 
 // ADR-010 F2a: produz a variante BAKED (valores ESTATICOS) do cockpit REAL pelo
@@ -504,6 +524,12 @@ std::string write_baked_cockpit_rml(bool intro) {
         replace_all(" data-if=\"!intro\"", "");
     }
 
+    // TEMPFILE-PROD-UNICO (2026-08-06): o NOME DA FOLHA continua fixo de proposito - quem
+    // da unicidade e o dir PAI (stage, unico por execucao). Motivo: e este nome que faz o
+    // stage ser legivel pra quem depura ("cockpit_baked.rml" x "cockpit_live.rml" lado a
+    // lado). Dentro da MESMA execucao, intro=true e intro=false gravam neste mesmo arquivo
+    // e a ultima chamada vence - isso e o contrato (ha um documento ativo por vez, e a
+    // funcao devolve o path recem-escrito); a corrida real era ENTRE execucoes.
     const fs::path out = stage / "cockpit_baked.rml";
     std::ofstream f(out);
     f << rml;
@@ -641,6 +667,9 @@ std::string write_live_cockpit_rml() {
         "        <div class=\"ln now\">&gt; {{verb}} -&gt; {{alvo}}</div>\n"
         "      </div>");
 
+    // TEMPFILE-PROD-UNICO: mesma decisao do BAKED acima - folha de nome fixo (legivel),
+    // unicidade vinda do dir PAI (stage por execucao). Aqui o nome distinto de
+    // "cockpit_baked.rml" ja evita ate a sobrescrita dentro da mesma execucao.
     const fs::path out = stage / "cockpit_live.rml";
     std::ofstream f(out);
     f << rml;

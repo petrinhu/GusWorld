@@ -1310,8 +1310,15 @@ TEST_CASE("save_load_menu (harness headless): PROVA VISUAL - PNG do mini-dialogo
     }
     std::error_code ec_dir;
     std::filesystem::create_directories(out_dir, ec_dir);
+    // TEMPFILE-PROD-UNICO (2026-08-06, carona da fatia): o nome era FIXO
+    // ("save_load_empty_confirm.png"), entao duas execucoes do harness ao mesmo tempo
+    // gravavam o MESMO arquivo (risco menor que o do cockpit - so escrita, ninguem le de
+    // volta -, mas o PNG que o humano abre podia ser um meio-a-meio de dois processos).
+    // unique_temp_file da o nome unico e PRESERVA o prefixo legivel; o DIRETORIO continua
+    // sendo o out_dir de cima (GUSWORLD_TMPDIR manda), por isso so a folha vem do helper.
     const std::filesystem::path png_path =
-        std::filesystem::path(out_dir) / "save_load_empty_confirm.png";
+        std::filesystem::path(out_dir) /
+        gus::test_support::unique_temp_file("save_load_empty_confirm", ".png").filename();
     const int written = stbi_write_png(png_path.string().c_str(), kWinW, kWinH, 4, buf.data(),
                                         kWinW * 4);
     REQUIRE(written != 0);
