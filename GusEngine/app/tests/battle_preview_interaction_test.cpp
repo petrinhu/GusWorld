@@ -24,10 +24,13 @@
 
 #include <catch2/catch_test_macros.hpp>
 
+#include <cstdlib>
+
 #include <SDL3/SDL.h>
 
 #include "gus/app/screens/battle_preview.hpp"
 #include "gus/domain/combat/combat_enums.hpp"
+#include "gus/platform/audio/audio_engine.hpp"
 #include "gus/platform/rmlui/gl3_loader.hpp"
 
 namespace {
@@ -75,6 +78,96 @@ GlTestEnv try_boot_gl() {
     return env;
 }
 
+// SFX-COCKPIT: env var COM RAII. A BattleScreen le os env vars de diagnostico dentro do
+// proprio enter(), e a suite Catch2 roda TODOS os casos no MESMO processo - deixar uma
+// var setada contaminaria os testes seguintes (o de QUIT acima, por exemplo, passaria a
+// abrir a batalha ja no modo-mira). Nao ha "unsetenv depois" confiavel sem RAII: um
+// REQUIRE que falha no meio do teste sai da funcao por excecao.
+class ScopedEnv {
+public:
+    ScopedEnv(const char* name, const char* value) : name_(name) {
+        const char* previous = std::getenv(name);
+        had_previous_ = previous != nullptr;
+        if (had_previous_) previous_ = previous;
+        setenv(name, value, /*overwrite=*/1);
+    }
+    ~ScopedEnv() {
+        if (had_previous_) {
+            setenv(name_, previous_.c_str(), /*overwrite=*/1);
+        } else {
+            unsetenv(name_);
+        }
+    }
+    ScopedEnv(const ScopedEnv&) = delete;
+    ScopedEnv& operator=(const ScopedEnv&) = delete;
+
+private:
+    const char* name_;
+    bool had_previous_ = false;
+    std::string previous_;
+};
+
+// SFX-COCKPIT: os SoundId sao 1-BASED na ORDEM de load_sfx (contrato explicito de
+// gus/platform/audio/audio_engine.hpp, que documenta este uso: "um consumidor de teste
+// que sabe a ordem de load_sfx do caminho de producao pode comparar last_sfx_id() contra
+// o id esperado"). BattleScreen::enter() carrega, nesta ordem exata:
+//   1 = SFX de HIT (resolve_hit_sfx_path)
+//   2 = blip de HOVER de UI (kMenuHoverSfxFile)
+//   3 = blip de CLIQUE de UI (kMenuClickSfxFile)
+// O engine e' construido PELO TESTE e passado como external_audio, entao nada mais e'
+// carregado nele antes. Se alguem inserir um load_sfx novo antes desses, estes testes
+// falham ALTO (e o conserto e' 1 linha aqui) - preferivel a um teste que so conta plays
+// e nao sabe QUAL blip tocou, que e' o que deixaria "tocou o som errado" passar.
+constexpr gus::platform::audio::SoundId kHitSfxId = 1;
+constexpr gus::platform::audio::SoundId kUiHoverSfxId = 2;
+constexpr gus::platform::audio::SoundId kUiClickSfxId = 3;
+
+void push_key_down(SDL_Keycode key) {
+    SDL_Event ev{};
+    ev.type = SDL_EVENT_KEY_DOWN;
+    ev.key.key = key;
+    ev.key.repeat = 0;
+    REQUIRE(SDL_PushEvent(&ev));
+}
+
+void push_quit() {
+    SDL_Event ev{};
+    ev.type = SDL_EVENT_QUIT;
+    REQUIRE(SDL_PushEvent(&ev));
+}
+
+// Roda o HOST REAL da batalha com o AudioEngine do teste e devolve quantos play_sfx
+// aconteceram DEPOIS que o setup terminou - ou seja, os que o INPUT causou.
+//
+// POR QUE DELTA E NAO ABSOLUTO (medido, nao suposto): o bloco GUSWORLD_BATTLE_AIM de
+// enter() assenta a cena bombeando `skip() + update()` ate a vez do jogador, e nesse
+// caminho os INIMIGOS AGEM - cada golpe dispara o SFX de HIT no MESMO engine. Medi 2 e 3
+// hits em rodadas diferentes do mesmo teste: o absoluto NAO e' deterministico. Comparar
+// contra um numero fixo daria um teste que falha sozinho (ou, pior, que passa por
+// coincidencia). O `sync_hook` de run_screen_state recebe TODO evento pumpado ANTES de a
+// tela trata-lo, entao a 1a chamada dele e' exatamente a fronteira "setup acabou, o
+// primeiro input ainda nao foi tratado" - e a costura que faltava pra medir so o input.
+unsigned int input_sfx_plays(gus::platform::audio::AudioEngine& audio, SDL_Window* window) {
+    unsigned int baseline = 0;
+    bool captured = false;
+    const gus::app::EventSyncHook hook = [&](const SDL_Event&) {
+        if (!captured) {
+            baseline = audio.sfx_play_count();
+            captured = true;
+        }
+    };
+
+    gus::domain::combat::CombatOutcome outcome = gus::domain::combat::CombatOutcome::Ongoing;
+    bool quit_requested = false;
+    gus::app::screens::run_battle_preview_embedded_gl_current(
+        window, &outcome, &quit_requested, &audio, /*fade_in_seconds=*/0.0f,
+        /*fade_out_seconds=*/0.0f, hook);
+
+    REQUIRE(quit_requested);  // saiu pelo QUIT, nao por outro caminho
+    REQUIRE(captured);        // o hook viu ao menos 1 evento (senao o delta seria fake)
+    return audio.sfx_play_count() - baseline;
+}
+
 }  // namespace
 
 // ---------------------------------------------------------------- QUIT real (F4-1b.5)
@@ -117,4 +210,123 @@ TEST_CASE("battle_preview (harness headless): SDL_EVENT_QUIT real (SDL_PushEvent
     // de combate nunca chegou a CombatEnd (a Maestro trata isto como "abortou", ver o
     // comentario grande em battle_preview.hpp).
     REQUIRE(outcome == gus::domain::combat::CombatOutcome::Ongoing);
+}
+
+// ============================================================== SFX-COCKPIT (2026-08-06)
+//
+// A FIACAO do som no HOST REAL. A DECISAO (que blip sai, quantas vezes, em qual
+// transicao) e' travada headless em app/tests/battle_ui_sfx_test.cpp; o que ESTES casos
+// provam e' o que so a funcao de producao pode provar: que BattleScreen::
+// handle_event_main_ de fato CHAMA aquela camada, no evento SDL certo.
+//
+// Sem eles, o defeito que a auditoria achou continuaria de pe do lado do host: era
+// possivel apagar o disparo de som e ver a suite inteira VERDE.
+//
+// RECEITA (por que ela e' deterministica, e nao um teste de sorte):
+//   - GUSWORLD_BATTLE_AIM=1 assenta a cena NO MODO-MIRA ainda DENTRO do enter(), de forma
+//     SINCRONA (o bloco stop_in_aim de battle_preview.cpp) - nao dependemos de N frames de
+//     pacing nem de geometria de RmlUi ja calculada.
+//   - todos os eventos sao enfileirados ANTES da chamada; run_screen_state drena a fila
+//     inteira no 1o pump e o QUIT final encerra ANTES do 1o tick() - logo NENHUM frame e'
+//     desenhado e NENHUM update() roda, o que elimina qualquer SFX de combate (hit) como
+//     ruido na contagem.
+//   - a prova e' por sfx_play_count() E por last_sfx_id(): a contagem sozinha nao
+//     distinguiria "tocou o blip certo" de "tocou o som de hit".
+
+TEST_CASE("battle_preview (harness headless, SFX-COCKPIT): CONTROLE - abrir a batalha no "
+          "modo-mira e sair sem NENHUM input nao toca blip de UI algum (prova que a "
+          "contagem dos casos abaixo mede o INPUT, nao ruido do setup)",
+          "[battle_preview_interaction][gl][sfx-cockpit]") {
+    GlTestEnv env = try_boot_gl();
+    if (!env.ok) {
+        INFO("GL/display indisponivel - harness pulado (rode com Xvfb :99).");
+        return;
+    }
+    const ScopedEnv aim("GUSWORLD_BATTLE_AIM", "1");
+
+    push_quit();
+
+    gus::platform::audio::AudioEngine audio(/*device_active=*/false);
+    REQUIRE(input_sfx_plays(audio, env.window) == 0u);
+}
+
+TEST_CASE("battle_preview (harness headless, SFX-COCKPIT): superficie MIRA / canal "
+          "TECLADO - a seta que troca de inimigo toca o blip de HOVER no HOST REAL "
+          "(ANTES desta fatia: silencio; grep play_sfx battle_input.cpp = 0, e o hover so "
+          "saia no ramo SDL_EVENT_MOUSE_MOTION)",
+          "[battle_preview_interaction][gl][sfx-cockpit]") {
+    GlTestEnv env = try_boot_gl();
+    if (!env.ok) {
+        INFO("GL/display indisponivel - harness pulado (rode com Xvfb :99).");
+        return;
+    }
+    const ScopedEnv aim("GUSWORLD_BATTLE_AIM", "1");
+
+    push_key_down(SDLK_DOWN);  // aim_move(+1): o encontro de demo tem 2 inimigos vivos
+    push_quit();
+
+    gus::platform::audio::AudioEngine audio(/*device_active=*/false);
+    REQUIRE(input_sfx_plays(audio, env.window) == 1u);
+    REQUIRE(audio.last_sfx_id() == kUiHoverSfxId);  // hover, NAO clique, NAO hit
+}
+
+TEST_CASE("battle_preview (harness headless, SFX-COCKPIT): superficie MIRA / canal "
+          "TECLADO - Enter que CONFIRMA o alvo toca o blip de CLIQUE no HOST REAL, e SO "
+          "ele (confirmar nao soma um hover junto)",
+          "[battle_preview_interaction][gl][sfx-cockpit]") {
+    GlTestEnv env = try_boot_gl();
+    if (!env.ok) {
+        INFO("GL/display indisponivel - harness pulado (rode com Xvfb :99).");
+        return;
+    }
+    const ScopedEnv aim("GUSWORLD_BATTLE_AIM", "1");
+
+    push_key_down(SDLK_RETURN);  // aim_confirm
+    push_quit();
+
+    gus::platform::audio::AudioEngine audio(/*device_active=*/false);
+    REQUIRE(input_sfx_plays(audio, env.window) == 1u);
+    REQUIRE(audio.last_sfx_id() == kUiClickSfxId);
+}
+
+TEST_CASE("battle_preview (harness headless, SFX-COCKPIT): superficie MIRA / canal "
+          "TECLADO - Esc CANCELA em silencio (cancelar nao e acionar); o blip so volta "
+          "quando o jogador navega de novo, ja no menu de verbos",
+          "[battle_preview_interaction][gl][sfx-cockpit]") {
+    GlTestEnv env = try_boot_gl();
+    if (!env.ok) {
+        INFO("GL/display indisponivel - harness pulado (rode com Xvfb :99).");
+        return;
+    }
+    const ScopedEnv aim("GUSWORLD_BATTLE_AIM", "1");
+
+    push_key_down(SDLK_ESCAPE);  // aim_cancel -> volta ao menu de verbos, MUDO
+    push_key_down(SDLK_DOWN);    // ja no menu: navega um verbo -> 1 HOVER
+    push_quit();
+
+    gus::platform::audio::AudioEngine audio(/*device_active=*/false);
+    REQUIRE(input_sfx_plays(audio, env.window) == 1u);
+    REQUIRE(audio.last_sfx_id() == kUiHoverSfxId);
+    // (Se o Esc tivesse soado, seriam 2. Se a seta no MENU DE VERBOS nao soasse - o
+    // buraco de paridade teclado x mouse - seria 0.)
+}
+
+TEST_CASE("battle_preview (harness headless, SFX-COCKPIT): a tecla que NAO navega nem "
+          "aciona (Q, auto-resolve placeholder) e' muda no HOST REAL",
+          "[battle_preview_interaction][gl][sfx-cockpit]") {
+    GlTestEnv env = try_boot_gl();
+    if (!env.ok) {
+        INFO("GL/display indisponivel - harness pulado (rode com Xvfb :99).");
+        return;
+    }
+    const ScopedEnv aim("GUSWORLD_BATTLE_AIM", "1");
+
+    push_key_down(SDLK_Q);
+    push_quit();
+
+    gus::platform::audio::AudioEngine audio(/*device_active=*/false);
+    REQUIRE(input_sfx_plays(audio, env.window) == 0u);
+    // O unico som da sessao foi o HIT que o proprio setup (skip+update ate a vez do
+    // jogador) disparou - nenhum blip de UI entrou depois dele.
+    REQUIRE(audio.last_sfx_id() == kHitSfxId);
 }

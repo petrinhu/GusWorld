@@ -59,6 +59,35 @@ enum class BattleEscEffect {
 // (battle_key_routing_test.cpp) - headless, sem SDL_Init.
 [[nodiscard]] int battle_digit_for_key(SDL_Keycode key) noexcept;
 
+// SFX-COCKPIT: "esta tecla, NESTE estado, ACIONA um botao?" - o predicado do blip de
+// CLIQUE no canal TECLADO. Mora aqui (e nao em battle_ui_sfx.hpp, dono do resto do
+// assunto SOM) por dois motivos que apontam pro mesmo lugar: e' um predicado sobre
+// SDL_Keycode, irmao direto de battle_digit_for_key/battle_key_down (a decisao "o que
+// esta tecla faz" tem UMA casa so); e battle_ui_sfx.hpp e SDL-free de proposito, pra
+// nao subir o teto do gate sdl-ratchet.
+//
+// PURO: avaliado ANTES do roteamento (battle_key_down), nao muta a cena. O canal MOUSE
+// nao precisa deste predicado - la o "acionou?" ja vem do bool de
+// battle_cockpit_verb_click (pills) e do bool de battle_mouse_click (mira/picker).
+//
+// SOA (as 3 superficies clicaveis do cockpit, e so elas):
+//   Enter/KP_Enter/Espaco confirmando no PICKER (escolhe o membro), na MIRA (confirma o
+//     alvo) e no MENU DE VERBOS (aciona o verbo - o MESMO gesto que o clique no pill,
+//     que ja soava).
+//   Digito 1-9 COM candidato correspondente (nth <= aim_count()/actor_pick_count()):
+//     aim_hotkey/actor_picker_hotkey sao "seleciona E confirma", ou seja, um clique.
+//     Fora de faixa o roteamento e no-op -> nao soa (som so onde houve acao).
+//
+// NAO SOA (decisao explicita desta fatia; timbre/volume/incomodo ao vivo sao do lider):
+//   - Enter na ABERTURA ("Encarar"): banner de tela cheia, nao menu com botoes - nao tem
+//     hover correspondente. "Comecou a luta" seria um SFX de outra natureza, nao o blip
+//     de UI.
+//   - Enter FORA da vez do jogador: cai em scene.skip() (ACELERAR o ritmo). Nao e botao,
+//     e soaria a cada toque de quem esta apressando a animacao.
+//   - Esc (cancela/desempilha) e Q (auto-resolve, placeholder).
+[[nodiscard]] bool battle_key_activates_button(const BattleScene& scene,
+                                               SDL_Keycode key) noexcept;
+
 // Roteamento de TECLADO do host (extraido do loop de eventos - ver definicao/comentario
 // completo em battle_input.cpp). Esc DESEMPILHA 1 nivel de modal por vez (FIX bug2 do
 // playtest do lider: "Esc fecha a tela" com um picker/preview aberto) - mira > preview de
@@ -115,7 +144,16 @@ bool battle_cockpit_verb_click(BattleScene& scene, const char* element_id);
 // caminhos recebem o clique). Pressuposto: mouse em px de janela == px do viewport (sem
 // HiDPI neste alvo; MESMO pressuposto do forward glintfx). Se houver escala HiDPI no
 // futuro, converter mouse(pontos)->px antes.
-void battle_mouse_click(BattleScene& scene, float mx, float my, int pw, int ph);
+//
+// SFX-COCKPIT: devolve true SE o clique de fato ACIONOU alguma coisa (confirmou o alvo
+// mirado OU o membro da party sob o cursor) - MESMO contrato de retorno que
+// battle_cockpit_verb_click ja tinha pros pills, agora estendido as 2 superficies que
+// eram MUDAS. O host usa isso pra tocar o blip de clique SO quando houve acao (clicar no
+// vazio da arena segue sendo no-op silencioso). [[nodiscard]] de proposito: um call-site
+// que descarta este bool em silencio e' exatamente a classe de defeito que esta fatia
+// fechou - quem quiser ignorar tem de escrever `(void)` e assumir.
+[[nodiscard]] bool battle_mouse_click(BattleScene& scene, float mx, float my, int pw,
+                                      int ph);
 
 // Incremento A2 (HOVER, nice-to-have): SO o inimigo. Durante a mira, mover o mouse sobre um
 // inimigo PRE-SELECIONA ele (reusa o realce multimodal do alvo do Incremento A, dirigido por

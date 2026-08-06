@@ -52,6 +52,7 @@
 // warning/erro de build - so um header, nao gera unused-var): o modulo system_menu_loop.*
 // fica intacto e reutilizavel se o nesting da lib for resolvido no futuro.
 #include "gus/app/screens/system_menu_loop.hpp"
+#include "gus/app/screens/battle_ui_sfx.hpp"  // SFX-COCKPIT: dono dos blips de UI do cockpit
 #include "gus/app/screens/ui_hover.hpp"  // COCKPIT-SFX-HOVER-CLIQUE: edge-detect POCO do som de hover
 #include "gus/core/asset_paths.hpp"             // caminhos de asset centralizados
 #include "gus/domain/combat/combat_enums.hpp"  // StatusId
@@ -224,11 +225,20 @@ private:
     // O VISUAL do hover ja e nativo do glintfx (process_event(MouseMove)); AQUI so o SOM.
     // GATE: so soa quando o MENU DE VERBOS esta de fato interativo (vez do jogador, sem
     // mira/escolha-de-ator/abertura) - mesma condicao em que a pill responde ao clique.
+    //
+    // SFX-COCKPIT (2026-08-06): o edge-detect + o play_sfx SAIRAM daqui pra
+    // gus/app/screens/battle_ui_sfx.hpp; o que sobrou nesta funcao e' a unica parte que
+    // PRECISA de GL/glintfx (perguntar as caixas dos pills ao UiLayer). Motivo: enquanto
+    // o play_sfx morava aqui dentro (classe em namespace anonimo, exigindo janela +
+    // contexto GL vivos), NENHUM teste o alcancava - apaga-lo deixava a suite verde. O
+    // GATE de "menu interativo" tambem passou a ser lido de battle_focus_of, fonte UNICA
+    // compartilhada com o som de foco (teclado/mira/picker) - antes eram duas copias da
+    // mesma condicao, que podiam divergir em silencio.
     void handle_cockpit_hover_(float mx, float my) {
         if (!glintfx_on_ || !ui_) return;
-        if (!scene_->waiting_player_input() || scene_->is_aiming() ||
-            scene_->is_choosing_actor() || scene_->is_intro()) {
-            hovered_verb_ = -1;  // menu nao-interativo: zera (nao "prende" o ultimo pill)
+        if (gus::app::screens::battle_focus_of(*scene_).surface !=
+            gus::app::screens::BattleFocusSurface::VerbMenu) {
+            ui_sfx_.reset_pill_hover();  // menu nao-interativo: zera (nao "prende" o ultimo pill)
             return;
         }
         gus::app::screens::UiHoverBox boxes[gus::app::screens::kBattleVerbCount];
@@ -237,12 +247,7 @@ private:
                 ui_->get_element_box(gus::app::screens::kCockpitVerbElementIds[i]);
             boxes[i] = gus::app::screens::UiHoverBox{b.found, b.x, b.y, b.w, b.h};
         }
-        const int new_hover = gus::app::screens::ui_hover_index(
-            mx, my, boxes, gus::app::screens::kBattleVerbCount);
-        if (gus::app::screens::ui_hover_entered_new_item(hovered_verb_, new_hover)) {
-            audio_ptr_->play_sfx(ui_hover_sfx_id_);
-        }
-        hovered_verb_ = new_hover;
+        ui_sfx_.on_pill_motion(mx, my, boxes, gus::app::screens::kBattleVerbCount);
     }
 
     // ---- config de construcao (imutaveis apos o ctor) ----
@@ -272,7 +277,9 @@ private:
     gus::platform::audio::AudioEngine* audio_ptr_ = nullptr;
     gus::platform::audio::SoundId ui_hover_sfx_id_ = gus::platform::audio::kInvalidSound;
     gus::platform::audio::SoundId ui_click_sfx_id_ = gus::platform::audio::kInvalidSound;
-    int hovered_verb_ = -1;
+    // SFX-COCKPIT: dono de TODO play_sfx de UI desta tela (hover de pill, hover de foco -
+    // mira/picker/menu por teclado -, e clique em qualquer canal). Ver battle_ui_sfx.hpp.
+    gus::app::screens::BattleUiSfx ui_sfx_;
 
     // ---- traducao + cena ----
     gus::app::i18n::Translator translator_;
@@ -530,6 +537,9 @@ void BattleScreen::enter() {
         resolve_ui_sfx_path(gus::core::assets::kMenuClickSfxFile);
     ui_hover_sfx_id_ = audio_ptr_->load_sfx(ui_hover_sfx_path.c_str());
     ui_click_sfx_id_ = audio_ptr_->load_sfx(ui_click_sfx_path.c_str());
+    // SFX-COCKPIT: liga o dono dos blips de UI. Ponteiro NAO-DONO do engine (mesmo padrao
+    // de BattleScene::set_audio); daqui pra frente NENHUM play_sfx de UI sai desta casca.
+    ui_sfx_.bind(audio_ptr_, ui_hover_sfx_id_, ui_click_sfx_id_);
     std::cout << "BattlePreview: [audio] SFX de UI (cockpit) hover "
               << (ui_hover_sfx_id_ != gus::platform::audio::kInvalidSound ? "carregado"
                                                                           : "AUSENTE")
@@ -590,7 +600,7 @@ void BattleScreen::enter() {
         // fato ACIONOU um verbo (battle_cockpit_verb_click devolve true).
         ui_->set_click_callback([this](const char* element_id) {
             if (battle_cockpit_verb_click(*scene_, element_id)) {
-                audio_ptr_->play_sfx(ui_click_sfx_id_);
+                ui_sfx_.play_click();
             }
         });
     }
@@ -896,7 +906,10 @@ void BattleScreen::enter() {
             const std::string alvo_antes =
                 scene_->aim_target() != nullptr ? scene_->aim_target()->id() : "?";
             const int hit = scene_->aim_index_at_arena(wcx, wcy);
-            battle_mouse_click(*scene_, pxcx, pxcy, pw0_, ph0_);
+            // SFX-COCKPIT: este self-test SINTETICO prova o hit-test, nao o som (o
+            // AudioEngine deste modo pode nem ter device) - descarta o "acionou?" de
+            // proposito. O caminho de PRODUCAO que toca o blip e' handle_event_main_.
+            (void)battle_mouse_click(*scene_, pxcx, pxcy, pw0_, ph0_);
             std::cout << "  CLIQUE inimigo#" << want << " (alvo pre-clique=" << alvo_antes
                       << ") world(" << wcx << "," << wcy << ") px(" << pxcx << "," << pxcy
                       << ") hit_idx=" << hit << " -> is_aiming="
@@ -974,7 +987,9 @@ void BattleScreen::enter() {
                 }
             }
             if (pxc >= 0.0f) {
-                battle_mouse_click(sb, pxc, pyc, pw0_, ph0_);
+                // SFX-COCKPIT: self-test do hit-test do PICKER; o "acionou?" e' descartado
+                // aqui de proposito (ver o gemeo no selftest de mira, acima).
+                (void)battle_mouse_click(sb, pxc, pyc, pw0_, ph0_);
                 const std::string got = sb.active_actor() != nullptr ? sb.active_actor()->id() : "?";
                 const bool ok = !sb.is_choosing_actor() && got == want_id;
                 std::cout << "BattlePreview: [actor-selftest] (B clique) elegivel#" << want_idx
@@ -1073,22 +1088,52 @@ void BattleScreen::handle_event_main_(const SDL_Event& ev) {
         // ora (ver TODO.md). battle_key_down/BattleEscEffect/OpenPauseMenu CONTINUAM
         // existindo e funcionando (testadas em battle_key_routing_test.cpp com
         // out_effect explicito) - so este HOST DE PRODUCAO para de passar o ponteiro.
+        //
+        // SFX-COCKPIT: PARIDADE TECLADO x MOUSE (o defeito 3 da auditoria - quem joga de
+        // teclado ouvia blip nos 6 outros menus do jogo e SILENCIO na batalha). Duas
+        // medidas em volta do MESMO roteamento, sem duplicar regra nenhuma:
+        //   CLIQUE: predicado PURO avaliado ANTES (a cena ainda no estado em que a tecla
+        //     foi apertada) - depois do roteamento ja e' tarde, o estado mudou.
+        //   HOVER: foco ANTES x DEPOIS (mesma receita de save_load_menu_loop.cpp) - pega
+        //     setas no menu de verbos, na mira E no picker de uma vez so.
+        const bool activated = battle_key_activates_button(*scene_, ev.key.key);
+        const gus::app::screens::BattleFocus focus_before =
+            gus::app::screens::battle_focus_of(*scene_);
         battle_key_down(*scene_, ev.key.key, running_);
+        if (activated) {
+            ui_sfx_.play_click();
+        }
+        ui_sfx_.on_focus_change(focus_before, gus::app::screens::battle_focus_of(*scene_));
     } else if (ev.type == SDL_EVENT_MOUSE_BUTTON_DOWN && ev.button.button == SDL_BUTTON_LEFT) {
         // MOUSE (A2): clique ESQUERDO aciona verbo (menu) ou alvo (mira). ADITIVO ao
         // teclado (que segue igual). O forward pro glintfx (acima) ja rolou (so
         // visual); a ACAO real vem do hit-test do host em px de janela.
         int pw = kWindowW, ph = kWindowH;
         SDL_GetWindowSizeInPixels(window_, &pw, &ph);
-        battle_mouse_click(*scene_, ev.button.x, ev.button.y, pw, ph);
+        // SFX-COCKPIT: clique na MIRA / no PICKER agora soa (antes: mudos - grep play_sfx
+        // battle_input.cpp devolvia zero). Sem risco de som DUPLO com o pill: o callback
+        // do glintfx (acima, no process_event) so aciona verbo quando NAO ha mira/picker
+        // aberto, e battle_mouse_click so devolve true quando HA - as duas guardas sao
+        // complementares por construcao.
+        if (battle_mouse_click(*scene_, ev.button.x, ev.button.y, pw, ph)) {
+            ui_sfx_.play_click();
+        }
     } else if (ev.type == SDL_EVENT_MOUSE_MOTION) {
         // MOUSE (A2, hover): na mira, passar sobre um inimigo pre-seleciona (realce).
         int pw = kWindowW, ph = kWindowH;
         SDL_GetWindowSizeInPixels(window_, &pw, &ph);
+        // SFX-COCKPIT: o realce que o mouse MOVE na mira/no picker agora soa - mesmo
+        // choke-point de foco do teclado, logo mesma regra de dedup (parado sobre o mesmo
+        // alvo nao redispara).
+        const gus::app::screens::BattleFocus focus_before =
+            gus::app::screens::battle_focus_of(*scene_);
         battle_mouse_hover(*scene_, ev.motion.x, ev.motion.y, pw, ph);
+        ui_sfx_.on_focus_change(focus_before, gus::app::screens::battle_focus_of(*scene_));
         // COCKPIT-SFX-HOVER-CLIQUE: SOM de hover dos pills de verbo (visual :hover ja
         // saiu no process_event nativo acima). Edge-detect: toca so ao ENTRAR num pill
-        // NOVO. Em px de janela == px do viewport (sem HiDPI neste alvo).
+        // NOVO. Em px de janela == px do viewport (sem HiDPI neste alvo). NAO soma com o
+        // foco acima: mouse sobre pill nao mexe em menu().selected_index(), e o gate de
+        // superficie deste caminho e' exatamente VerbMenu.
         handle_cockpit_hover_(ev.motion.x, ev.motion.y);
     }
 }
@@ -1477,7 +1522,7 @@ void BattleScreen::tick_main_(float dt) {
             };
 
             const unsigned int hover_base = audio_ptr_->sfx_play_count();
-            hovered_verb_ = -1;
+            ui_sfx_.reset_pill_hover();
             int swept = 0;
             for (int v = 0; v < gus::app::screens::kBattleVerbCount; ++v) {
                 float cx = 0.0f, cy = 0.0f;
@@ -1504,7 +1549,7 @@ void BattleScreen::tick_main_(float dt) {
                 if (battle_cockpit_verb_click(
                         *scene_, gus::app::screens::kCockpitVerbElementIds[static_cast<int>(
                                      BattleVerb::Atacar)])) {
-                    audio_ptr_->play_sfx(ui_click_sfx_id_);
+                    ui_sfx_.play_click();
                 }
             }
             const unsigned int after_click = audio_ptr_->sfx_play_count();

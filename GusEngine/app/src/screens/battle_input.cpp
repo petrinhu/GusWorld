@@ -126,9 +126,9 @@ bool battle_cockpit_verb_click(BattleScene& scene, const char* element_id) {
 // funcao pro MESMO evento SDL (ver o loop de eventos: ambos os caminhos recebem o clique).
 // Pressuposto: mouse em px de janela == px do viewport (sem HiDPI neste alvo; MESMO pressuposto
 // do forward glintfx). Se houver escala HiDPI no futuro, converter mouse(pontos)->px antes.
-void battle_mouse_click(BattleScene& scene, float mx, float my, int pw, int ph) {
+bool battle_mouse_click(BattleScene& scene, float mx, float my, int pw, int ph) {
     if (pw < 1 || ph < 1) {
-        return;
+        return false;
     }
     if (scene.is_choosing_actor()) {
         // ESCOLHA DE ATOR (§4.1): clique num SLOT da party. MESMA conversao MUNDO/arena do modo-
@@ -143,9 +143,10 @@ void battle_mouse_click(BattleScene& scene, float mx, float my, int pw, int ph) 
         if (idx >= 0) {
             scene.actor_picker_select(idx);   // poe o cursor no membro clicado
             scene.actor_picker_confirm();      // clique unico = escolhe E ENTRA no preview dele
+            return true;  // SFX-COCKPIT: acionou um membro -> o host toca o blip de clique
         }
         // Fora de qualquer membro elegivel: NO-OP (o picker precede o menu; nao ha o que cancelar).
-        return;
+        return false;
     }
     if (scene.is_aiming()) {
         // Clique num INIMIGO (mira): coordenadas de MUNDO da arena (estica; Y por ph).
@@ -155,13 +156,15 @@ void battle_mouse_click(BattleScene& scene, float mx, float my, int pw, int ph) 
         if (idx >= 0) {
             scene.aim_select(idx);  // pousa a mira no alvo clicado
             scene.aim_confirm();    // clique unico = mira E confirma (aciona), igual ao verbo
+            return true;  // SFX-COCKPIT: acionou um alvo -> o host toca o blip de clique
         }
         // Fora de qualquer inimigo: NO-OP (nao cancela, nao "erra" o alvo) -- escopo A2.
-        return;
+        return false;
     }
     // Fora de escolha-de-ator/mira: nao ha mais hit-test de MUNDO a fazer aqui (a ABERTURA
     // tambem nao tem nada clicavel em coordenadas de mundo). O clique nos pills de verbo e'
     // resolvido pelo callback do glintfx (battle_cockpit_verb_click), nao por esta funcao.
+    return false;
 }
 
 // Incremento A2 (HOVER, nice-to-have): SO o inimigo. Durante a mira, mover o mouse sobre um
@@ -216,6 +219,42 @@ int battle_digit_for_key(SDL_Keycode key) noexcept {
         case SDLK_8: case SDLK_KP_8: return 8;
         case SDLK_9: case SDLK_KP_9: return 9;
         default: return 0;
+    }
+}
+
+// SFX-COCKPIT: ver o contrato completo (o que soa e o que NAO soa, com o porque de cada
+// exclusao) no header. ESPELHO EXATO da cadeia de decisao de battle_key_down abaixo - se
+// aquela mudar, esta muda junto, senao o som passa a mentir sobre a acao. Por isso as
+// duas vivem no MESMO arquivo, coladas.
+bool battle_key_activates_button(const BattleScene& scene, SDL_Keycode key) noexcept {
+    // TECLAS-ATALHO NUMERICAS: mesma PRIORIDADE mira > picker de battle_key_down, e o
+    // MESMO criterio de faixa que aim_hotkey/actor_picker_hotkey usam internamente pra
+    // decidir agir ou virar no-op (nth e' 1-based). Fora de faixa nada acontece, entao
+    // nada soa.
+    if (const int nth = battle_digit_for_key(key); nth != 0) {
+        if (scene.is_aiming()) {
+            return nth <= scene.aim_count();
+        }
+        if (scene.is_choosing_actor()) {
+            return nth <= scene.actor_pick_count();
+        }
+        return false;
+    }
+    switch (key) {
+        case SDLK_RETURN:
+        case SDLK_KP_ENTER:
+        case SDLK_SPACE:
+            if (scene.is_intro()) {
+                return false;  // "Encarar" na abertura: banner, nao botao (ver header)
+            }
+            if (scene.is_choosing_actor() || scene.is_aiming()) {
+                return true;  // confirma o membro / confirma o alvo
+            }
+            // Vez do jogador -> menu_confirm (aciona o verbo). Fora dela -> skip()
+            // (acelerar o ritmo), que NAO e botao e por isso nao soa.
+            return scene.waiting_player_input();
+        default:
+            return false;  // Esc (cancela), setas (navegam, som de HOVER), Q, resto
     }
 }
 

@@ -38,6 +38,12 @@ add_executable(gusengine_app_tests
     battle_pacing_test.cpp
     battle_scene_test.cpp
     battle_key_routing_test.cpp
+    # SFX-COCKPIT: som de hover/clique das 3 superficies clicaveis do cockpit, nos 2
+    # canais de entrada. HEADLESS de verdade (BattleScene real + AudioEngine real em
+    # null-device, sem SDL_Init/janela/GL) - prova por sfx_play_count()/last_sfx_id(),
+    # a MESMA receita objetiva de save_load_menu_interaction_test.cpp. Fecha o buraco
+    # em que apagar o play_sfx do cockpit deixava a suite inteira verde.
+    battle_ui_sfx_test.cpp
     # AC-E11 A2 (ADR-019): caracterizacao da montagem RML/RCSS do cockpit, extraida de
     # battle_preview.cpp - ver gus/app/screens/battle_cockpit_rml.hpp.
     battle_cockpit_rml_test.cpp

@@ -47,6 +47,11 @@ add_library(gusengine_app STATIC
     # AC-E11 A1 (ADR-019): roteamento de input (teclado/mouse/SDL->glintfx) extraido de
     # battle_preview.cpp - ver gus/app/screens/battle_input.hpp.
     src/screens/battle_input.cpp
+    # SFX-COCKPIT: som de hover/clique das 3 superficies clicaveis do cockpit (pills de
+    # verbo, mira, picker de ator), nos 2 canais de entrada. Modulo proprio (ADR-020)
+    # porque, enquanto o play_sfx morava dentro da casca GL de battle_preview.cpp,
+    # NENHUM teste o alcancava - ver gus/app/screens/battle_ui_sfx.hpp.
+    src/screens/battle_ui_sfx.cpp
     # AC-E11 A3 (ADR-019): resolucao de paths/loaders de asset extraida de
     # battle_preview.cpp - ver gus/app/screens/battle_assets.hpp.
     src/screens/battle_assets.cpp
