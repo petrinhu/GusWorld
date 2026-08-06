@@ -3,7 +3,7 @@
 //
 // AssetSource (ADR-013, ASSETS-VFS-F1): o "porteiro" unico de leitura de asset. Fase 1 =
 // SO indirecao (opcao D do ADR): nenhum asset e empacotado ainda, tudo continua solto no
-// disco - a novidade e que os ~15 call-sites de I/O direto (stbi_load/fopen/ifstream/
+// disco - a novidade e que os ~15 call-sites de I/O direto (decode de imagem/fopen/ifstream/
 // ma_sound_init_from_file) passam a poder falar com UMA interface em vez de reimplementar
 // a cadeia de resolucao `env > macro de compilacao > relativo ao CWD` cada um a sua moda
 // (motivador central do ADR: essa cadeia estava DUPLICADA em 6+ lugares, com nomes de env
@@ -129,7 +129,8 @@ public:
     // consumidores que ainda precisam de um PATH de verdade (nao bytes) nesta fase -
     // ex.: audio_engine.cpp (ma_sound_init_from_file le do arquivo; retrofit do ATO de
     // ler adiado, ver relato do dispatch ASSETS-VFS-F1) e o cache-por-caminho de
-    // IRenderer::load_texture (stb_image ainda le via stbi_load(path) nesta Fase 1). E o
+    // IRenderer::load_texture (o decode do glintfx ainda le do PATH, via
+    // decode_png_file(path), nesta Fase 1 - nao somos nos que lemos). E o
     // ponto que SUBSTITUI as 6+ copias divergentes de `env > macro > CWD` por-familia.
     [[nodiscard]] std::string resolve_path(std::string_view id) const;
 };

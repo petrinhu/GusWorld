@@ -13,7 +13,9 @@
 // 4 linhas finas para contorno, SDL_RenderTexture para sprite); end_frame
 // apresenta (SDL_RenderPresent).
 //
-// TEXTURAS: load_texture le o PNG via stb_image (RGBA8) e cria um SDL_Texture com
+// TEXTURAS: load_texture le o PNG via glintfx::decode_png_file (RGBA8 straight; NAO
+// somos nos que decodificamos - o stb_image vive DENTRO do glintfx desde a
+// STB-IMAGE-PLATFORM, e a variante so-PNG entrou na PNG-DECODE-ADOPT) e cria um SDL_Texture com
 // SDL_SCALEMODE_NEAREST (pixel-art crisp) e blend alpha. Cache por caminho. Se o
 // arquivo faltar ou o renderer for nulo, devolve kInvalidTexture (o app degrada
 // para o contorno). Idempotente por caminho.

@@ -15,7 +15,8 @@
 // a base da AABB. A margem e MEDIDA do alpha de cada sprite (alpha-bbox) no load
 // - NAO hardcode: varia por personagem e por direcao.
 //
-// FONTE DA MEDICAO: o renderer (render2d_sdl) ja decodifica o PNG via stb_image
+// FONTE DA MEDICAO: o renderer (render2d_sdl) ja decodifica o PNG via
+// glintfx::decode_png_file (o decode e do glintfx, nao nosso - PNG-DECODE-ADOPT)
 // no load_texture; ele expoe o content-bbox (IRenderer::texture_content_bbox). O
 // loader le o bottom-margin do sprite IDLE de cada direcao e preenche o
 // FootInset (em fracao do canvas). Aqui so convertemos fracao -> mundo e

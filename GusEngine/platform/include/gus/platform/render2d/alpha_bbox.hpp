@@ -8,7 +8,8 @@
 // IRenderer); mas a VARREDURA em si nao toca SDL, entao da pra travar com Catch2
 // sem display (platform/tests/alpha_bbox_test.cpp).
 //
-// PARA QUE SERVE: o Render2dSdl decodifica o PNG via stb_image (RGBA8) no
+// PARA QUE SERVE: o Render2dSdl decodifica o PNG via glintfx::decode_png_file (RGBA8
+// straight; o decode e do glintfx, nao nosso - ver render2d_sdl.cpp) no
 // load_texture; chama scan_alpha_content_bbox sobre esses pixels e cacheia o
 // ContentBbox por TextureId. O anchor do sprite (app/screens/sprite_anchor.hpp)
 // le ContentBbox::bottom_margin pra COLAR o pe na base da AABB (M1-BUG.SUL), sem
