@@ -130,8 +130,25 @@ public:
     // Avanca o ponteiro pro proximo ator. Ao dar a volta (wrap), incrementa round_index.
     void advance();
 
-    // Remove um ator da fila (morte/incapacitacao). Ajusta o cursor pra continuar
-    // apontando pro "proximo a jogar" coerente. No-op se o ator nao esta na fila.
+    // Remove um ator da fila (morte/incapacitacao). Ajusta o cursor pra continuar apontando
+    // pro "proximo a jogar" coerente. No-op se o ator nao esta na fila.
+    //
+    // CONTRATO DE CURSOR (FILA-REMOVE-ROUND-WRAP, auditoria independente 2026-08-06) -
+    // remove NUNCA conta rodada: advance() e o UNICO dono do ++round_index. Os 4 casos:
+    //   - removido ANTES do cursor (ja agiu): cursor desliza -1, current() preservado por
+    //     IDENTIDADE;
+    //   - removido DEPOIS do cursor (pendente): cursor e current() intocados;
+    //   - removido E o current, com pendentes atras: cursor intocado, current() passa a ser
+    //     o ator SEGUINTE (que assume o turno);
+    //   - removido E o current NO ULTIMO SLOT (todos os outros ja agiram): o cursor recua
+    //     pro NOVO ultimo slot, deixando a volta de fila PENDENTE - o proximo advance() a
+    //     executa, conta a rodada e abre a nova no topo. Ate 2026-08-06 o cursor SALTAVA
+    //     pro topo (0) aqui, sem contar rodada: a rodada REABRIA e todo ator do indice 1 pra
+    //     frente ganhava um 2o turno nela (com AP/mana recarregados), enquanto o do indice 0
+    //     era pulado na seguinte. Ver initiative_queue_remove_round_invariant_test.cpp.
+    // Em TODOS os casos vale a particao "todo indice <= cursor() ja agiu nesta rodada / todo
+    // indice > cursor() esta pendente" - a mesma que reorder_pending/recompute_by_speed
+    // protegem. Fila esvaziada: cursor 0 (e current() deixa de ter contrato - count()==0).
     void remove(CombatActor* actor);
 
     // true se o ator esta na fila.

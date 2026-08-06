@@ -24,6 +24,22 @@
 //   INV-9d advance() em volta completa incrementa round_index exatamente uma vez por wrap.
 //   INV-9e remove de ator ausente / sync de ator ausente sao no-op (cursor intacto).
 //   INV-9f reorder_actor preserva o conjunto (mesma multiplicidade de atores) e o current().
+//   INV-9h (FILA-REMOVE-ROUND-WRAP, auditoria independente 2026-08-06) remove() NUNCA conta
+//          rodada: advance() e o UNICO dono do ++round_index (e o unico ponto onde a FSM ve
+//          a fronteira, comparando round_index antes/depois, pra disparar os hooks de fim
+//          de rodada). Ate esta data remove() dava a volta na fila (cursor -> 0) sem contar
+//          rodada quando o current no ULTIMO slot saia (veneno matando no proprio TurnStart,
+//          via prune_dead), e a rodada REABRIA.
+//   INV-9i (FILA-REMOVE-ROUND-WRAP) remove() PRESERVA A PARTICAO, como reorder_pending e
+//          recompute_by_speed: apos o remove, todo ator com indice < cursor() era ja-agido
+//          (indice <= cursor() antes) e todo ator com indice > cursor() era pendente
+//          (indice > cursor() antes). Ninguem atravessa o cursor - era exatamente isso que o
+//          wrap mudo quebrava (com cursor_ = 0, tudo a partir do indice 1 virava "pendente"
+//          de novo e ganhava um 2o turno na mesma rodada, com AP/mana recarregados).
+//   INV-9j (FILA-REMOVE-ROUND-WRAP) remover OUTRO ator (que nao o current) preserva
+//          current() por IDENTIDADE: quem esta em acao nao perde o turno pro vizinho quando
+//          alguem cai da fila. Achado por mutation testing 2026-08-06 (apagar o slide
+//          `--cursor_` do ramo "removido ja-agido" sobrevivia a suite inteira).
 //   INV-9g (COMBATE-FILA-CURSOR-FIX, decisao do lider 2026-07-15) reorder_pending NUNCA
 //          cruza o cursor: current() e todo ator com indice <= cursor(), POR IDENTIDADE,
 //          permanecem intactos apos qualquer reorder_pending, para qualquer alvo/delta
@@ -199,13 +215,65 @@ TEST_CASE("property: a fila mantem integridade sob qualquer sequencia de operaco
                     break;
                 }
                 case 3: {  // remove (so se sobrar >= 1; preserva precondicao de current())
+                    // FILA-REMOVE-ROUND-WRAP (achado de auditoria 2026-08-06): este ramo so
+                    // afirmava CARDINALIDADE e AUSENCIA - nunca a rodada nem a particao -,
+                    // e por isso o fuzz atravessou milhoes de assercoes sem ver que remove()
+                    // dava a volta na fila (cursor -> 0) SEM contar rodada quando o current
+                    // no ULTIMO slot saia, reabrindo a rodada pra quem ja tinha agido. As
+                    // duas propriedades que faltavam entram aqui (INV-9h/INV-9i).
                     if (q.count() > 1) {
                         CombatActor* who = q.order()[static_cast<std::size_t>(
                             g.in_range(0, q.count() - 1))];
                         const int before_count = q.count();
+                        const int cursor_before = q.cursor();
+
+                        // Particao ANTES: quem ja agiu ou esta agindo ([0, cursor]) x quem
+                        // ainda falta ((cursor, fim]) - menos o proprio removido.
+                        std::vector<CombatActor*> acted_before(
+                            q.order().begin(), q.order().begin() + cursor_before + 1);
+                        std::vector<CombatActor*> pending_before(
+                            q.order().begin() + cursor_before + 1, q.order().end());
+                        const auto erase_who = [who](std::vector<CombatActor*>& v) {
+                            v.erase(std::remove(v.begin(), v.end(), who), v.end());
+                        };
+                        erase_who(acted_before);
+                        erase_who(pending_before);
+
                         q.remove(who);
+
                         REQUIRE(q.count() == before_count - 1);
                         REQUIRE_FALSE(q.contains(who));
+
+                        // INV-9h: remove NUNCA conta rodada - advance() e o unico dono do
+                        // ++round_index (e o unico ponto onde a FSM ve a fronteira pra
+                        // disparar os hooks de fim de rodada).
+                        REQUIRE(q.round_index() == round_before);
+
+                        // INV-9j: remover OUTRO ator (nao o current) preserva current() por
+                        // IDENTIDADE - quem esta em acao nao perde o turno pro vizinho. E o
+                        // que o slide `--cursor_` (removido ANTES do cursor) e o "cursor
+                        // intocado" (removido DEPOIS) garantem juntos. Achado por mutation
+                        // testing 2026-08-06: apagar o slide sobrevivia a suite inteira,
+                        // porque o unico caso unitario de "removido ja-agido" tinha o cursor
+                        // no ULTIMO slot - onde a guarda do wrap corrige por acidente.
+                        if (who != before_cur)
+                            REQUIRE(q.current() == before_cur);
+
+                        // INV-9i: remove PRESERVA A PARTICAO - ninguem atravessa o cursor.
+                        // Todo ator ANTES do novo cursor tem de ser um ja-agido; todo ator
+                        // DEPOIS tem de ser um pendente. E exatamente o que o wrap mudo
+                        // quebrava: com cursor_ = 0, a fila inteira a partir do indice 1
+                        // ficava cheia de ja-agidos "reabertos" como pendentes.
+                        const auto& after = q.order();
+                        const int cursor_after = q.cursor();
+                        const auto in = [](const std::vector<CombatActor*>& v,
+                                           const CombatActor* a) {
+                            return std::find(v.begin(), v.end(), a) != v.end();
+                        };
+                        for (int i = 0; i < cursor_after; ++i)
+                            REQUIRE(in(acted_before, after[static_cast<std::size_t>(i)]));
+                        for (int i = cursor_after + 1; i < q.count(); ++i)
+                            REQUIRE(in(pending_before, after[static_cast<std::size_t>(i)]));
                     }
                     break;
                 }

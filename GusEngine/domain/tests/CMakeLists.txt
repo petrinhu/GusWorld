@@ -76,6 +76,13 @@ add_executable(gusengine_domain_tests
     # PERMANENTE da semantica nova (particao preservada). Ver o cabecalho do arquivo pro
     # historico do bug e a decisao do lider.
     initiative_queue_recompute_round_invariant_test.cpp
+    # FILA-REMOVE-ROUND-WRAP (auditoria independente 2026-08-06): TERCEIRO portao da mesma
+    # raiz - InitiativeQueue::remove() dava a volta na fila (cursor -> 0) SEM contar rodada
+    # quando o current no ultimo slot morria (veneno/corrosao no proprio TurnStart), e a
+    # rodada REABRIA: todo mundo do indice 1 pra frente jogava de novo, com AP/mana
+    # recarregados. Area ate entao INTESTADA (o fuzz de remove so afirmava cardinalidade).
+    # Ver o cabecalho do arquivo pro bug, a condicao exata e a semantica implementada.
+    initiative_queue_remove_round_invariant_test.cpp
     # Marco M2 (metade de logica pura): input_remap (ActionRegistry/InputBinding)
     # portado C#->C++ POCO. O backend de evento Qt (platform/input/) NAO entra aqui.
     input_remap_test.cpp

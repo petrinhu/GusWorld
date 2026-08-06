@@ -175,13 +175,36 @@ void InitiativeQueue::remove(CombatActor* actor) {
         return;
     }
 
-    // Se removemos antes do cursor, o cursor desliza pra esquerda.
+    // Se removemos antes do cursor, o cursor desliza pra esquerda (o current continua sendo
+    // o MESMO ator, agora uma casa antes). Nunca sai do intervalo valido.
     if (idx < cursor_)
         --cursor_;
-    // Se removemos o proprio ator no cursor, o cursor agora aponta pro que era o
-    // seguinte; se estava no fim, faz wrap pro topo.
+
+    // Se removemos o proprio ator no cursor, o cursor (intocado) passa a apontar pro que era
+    // o seguinte - a menos que o removido fosse o ULTIMO slot: ai o cursor cai fora da fila
+    // encurtada e precisa voltar pra dentro.
+    //
+    // FILA-REMOVE-ROUND-WRAP (auditoria independente 2026-08-06): aqui ficava
+    // `cursor_ = 0`, ou seja, a fila DAVA A VOLTA sem contar a rodada - e o advance()
+    // seguinte (advance_to_next_actor) levava o cursor de 0 pra 1 com a rodada ainda aberta:
+    // todo ator do indice 1 em diante ganhava um SEGUNDO turno nela, com AP e mana
+    // recarregados por refresh_resources_for_turn, e o ator do indice 0 era PULADO na rodada
+    // seguinte. Terceiro portao da mesma raiz de reorder_actor (2026-07-15) e
+    // recompute_by_speed (2026-08-01).
+    //
+    // O conserto NAO conta rodada aqui: advance() segue sendo o UNICO dono do
+    // ++round_index_ (e o unico ponto onde a FSM detecta a fronteira - advance_to_next_actor
+    // compara round_index antes/depois pra disparar process_round_end_hooks/
+    // regroup_round_by_side/advance_period_clock; contar a rodada DENTRO do prune tornaria
+    // essa fronteira invisivel pra ela). O cursor recua pro NOVO ultimo slot, deixando a
+    // volta PENDENTE: o proximo advance() a executa, conta a rodada e abre a nova no topo.
+    //
+    // Bonus de invariante: o slot pro qual o cursor recua e de um ator que JA AGIU nesta
+    // rodada, entao a particao "todo indice <= cursor_ ja agiu / todo indice > cursor_ esta
+    // pendente" continua valendo - a mesma particao que recompute_by_speed existe pra
+    // preservar. Saltar pro topo a quebrava (indices > 0 ficavam cheios de ja-agidos).
     if (cursor_ >= static_cast<int>(order_.size()))
-        cursor_ = 0;
+        cursor_ = static_cast<int>(order_.size()) - 1;
 }
 
 bool InitiativeQueue::contains(CombatActor* actor) const { return index_of(actor) >= 0; }
