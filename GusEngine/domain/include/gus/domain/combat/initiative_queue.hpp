@@ -143,11 +143,37 @@ public:
     // desfaria). A fila nao conhece "lado": quem abre e o predicado sao decididos pelo caller
     // (CombatStateMachine).
     //
-    // CONTRATO DE CURSOR: operacao de INICIO de rodada. O cursor volta a 0 (o primeiro ator do
-    // primeiro grupo passa a ser current()) e round_index NAO muda. Chamar SOMENTE na fronteira
-    // da rodada (onde o cursor ja e 0); no meio da rodada quebraria "cada ator age uma vez por
-    // rodada". No-op de ordenacao quando a fila ja esta agrupada.
-    void regroup_stable(const std::function<bool(const CombatActor*)>& first_group);
+    // CONTRATO DE CURSOR (FILA-REGROUP-GUARDA, 2026-08-06) - operacao de INICIO de rodada, e
+    // agora IMPOSTA pelo codigo em vez de prometida pelo comentario. Ate esta data o corpo
+    // reparticionava a fila INTEIRA e fazia `cursor_ = 0` incondicionalmente: chamada no meio
+    // da rodada, ela REABRIA a rodada - todo ator que ja tinha agido voltava a "pendente" e
+    // jogava de novo, com AP/mana recarregados por refresh_resources_for_turn. E a assinatura
+    // exata do bug de remove() (3o portao), pela quinta porta da mesma raiz.
+    //
+    // A guarda e a precondicao REAL do metodo, "estamos na fronteira da rodada" == cursor_ == 0:
+    //   - cursor_ != 0 -> NO-OP TOTAL (ordem, cursor e round_index intocados), retorna false;
+    //   - cursor_ == 0 -> particiona a fila inteira, retorna true. round_index NAO muda.
+    // Retorna true tambem quando nao havia o que mover (fila ja agrupada): o retorno responde
+    // "a operacao foi ACEITA?", nao "a ordem mudou?".
+    //
+    // [[nodiscard]] de proposito: com -Werror=unused-result ligado (2026-08-06), um caller
+    // futuro NAO COMPILA ignorando a recusa. A guarda nao e um no-op silencioso - ela e
+    // sinalizada em tempo de COMPILACAO (o retorno obrigatorio) e em runtime pelo caller
+    // (CombatStateMachine::regroup_round_by_side loga a recusa no log de combate).
+    //
+    // POR QUE NAO "alargar" em vez de guardar: a alternativa de reparticionar so [cursor_, fim)
+    // sem tocar o cursor e byte-identica na fronteira e PARECE seguro, mas foi MEDIDA e
+    // reprovada - a permutacao tira do slot do cursor o ator que esta agindo e o joga pra tras,
+    // onde ele volta a contar como pendente: age 2x e quem tomou seu slot e pulado. Mesma classe
+    // de bug, raio de 1 ator em vez de N. (Nao contradiz bring_to_current, que faz permutacao
+    // parecida: ela e chamada por begin_turn no COMECO do turno, quando o ator do slot do cursor
+    // ainda nao agiu. regroup_stable nao sabe em que ponto do turno esta, entao nao pode assumir
+    // esse timing.) Ver initiative_queue_regroup_guard_test.cpp.
+    //
+    // Os 2 callers de producao entram SEMPRE na fronteira - medido, nao presumido: instrumentando
+    // CombatStateMachine::regroup_round_by_side e rodando a suite de domain inteira, cursor == 0
+    // em 62.684 de 62.684 chamadas.
+    [[nodiscard]] bool regroup_stable(const std::function<bool(const CombatActor*)>& first_group);
 
     // Avanca o ponteiro pro proximo ator. Ao dar a volta (wrap), incrementa round_index.
     void advance();

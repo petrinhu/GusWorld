@@ -166,19 +166,42 @@ void InitiativeQueue::bring_to_current(CombatActor* actor) {
     // cursor_ inalterado de proposito: order_[cursor_] agora e `actor` => current() == actor.
 }
 
-void InitiativeQueue::regroup_stable(
+bool InitiativeQueue::regroup_stable(
     const std::function<bool(const CombatActor*)>& first_group) {
+    // FILA-REGROUP-GUARDA (2026-08-06, QUINTO e ultimo portao da mesma raiz de reorder_actor
+    // 2026-07-15, recompute_by_speed 2026-08-01, remove 2026-08-06 e sync_cursor_to
+    // 2026-08-06). Ate esta data o corpo era incondicional:
+    //
+    //     std::stable_partition(order_.begin(), order_.end(), first_group);
+    //     cursor_ = 0;
+    //
+    // `cursor_ = 0` fora da fronteira da rodada e a assinatura EXATA do bug de remove(): a
+    // fila da a volta sem contar rodada, todo ator ja-agido volta a "pendente" e joga de novo
+    // na MESMA rodada, com AP/mana recarregados. O contrato "chamar somente na fronteira"
+    // existia so no comentario do header, e garantia por comentario nao e garantia.
+    //
+    // A guarda e a precondicao real - "estamos na fronteira da rodada" == cursor_ == 0. Fora
+    // dela, NO-OP TOTAL: recusamos ANTES do stable_partition, entao nem a ordem e tocada (um
+    // reagrupamento parcial seguido de recusa seria pior que nada - deixaria a fila numa ordem
+    // que ninguem pediu). Recusar e a resposta certa, e nao "reagrupar so os pendentes": ver a
+    // secao "POR QUE NAO alargar" no header (medido e reprovado - a permutacao desloca o ator
+    // que esta agindo e lhe da um 2o turno).
+    if (cursor_ != 0) return false;
+
     // stable_partition move os que satisfazem `first_group` para a frente PRESERVANDO a ordem
     // relativa de AMBOS os grupos (ao contrario de std::partition, que nao garante ordem). E o
     // que torna o regroup Gambito-safe: um empurrao intra-rodada (reorder_actor) fica gravado
     // na ordem relativa e sobrevive ao agrupamento. NAO recomputa por SPD.
     std::stable_partition(order_.begin(), order_.end(), first_group);
 
-    // Inicio de rodada: o cursor aponta pro primeiro ator do primeiro grupo (slot 0). Na
-    // fronteira o cursor ja e 0 (wrap de advance); zeramos explicitamente pra nao depender
-    // disso (contrato do metodo) e pra deixar current() == primeiro do lado que abre.
-    // round_index_ NAO muda: regroup nao e uma volta de fila.
-    cursor_ = 0;
+    // Nao ha `cursor_ = 0` aqui: sob a guarda ele JA e 0, entao a escrita era redundante - e
+    // era ela, e nao a particao, o mecanismo do bug. Com isso regroup_stable deixa de escrever
+    // cursor_ POR COMPLETO e vira uma operacao de pura reordenacao. Depois deste conserto, os
+    // unicos escritores de cursor_ na classe sao: o construtor (0), advance() (o UNICO dono do
+    // ++round_index_) e remove() (deslize/recuo, contratos contados) - nenhum outro metodo o
+    // move, e nenhum o move por busca de indice. round_index_ segue intocado: regroup nunca foi
+    // e nunca e uma volta de fila.
+    return true;
 }
 
 void InitiativeQueue::advance() {

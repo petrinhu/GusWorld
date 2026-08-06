@@ -715,11 +715,29 @@ void CombatStateMachine::regroup_round_by_side() {
     // side-split, nos dois sentidos (party abre ou inimigo abre) - reusa o mesmo primitivo
     // regroup_stable de sempre, sem reordenar Gambito/Knockback (opera na FRONTEIRA de
     // rodada, mesma garantia do side-split).
-    queue_.regroup_stable([&delayed](const CombatActor* a) { return !delayed(a); });
+    const bool grouped_delay =
+        queue_.regroup_stable([&delayed](const CombatActor* a) { return !delayed(a); });
 
-    queue_.regroup_stable([party_opens](const CombatActor* a) {
+    const bool grouped_side = queue_.regroup_stable([party_opens](const CombatActor* a) {
         return a->is_player_side() == party_opens;
     });
+
+    // FILA-REGROUP-GUARDA (2026-08-06): regroup_stable so aceita na FRONTEIRA da rodada
+    // (cursor == 0) e devolve false fora dela, em vez de reabrir a rodada zerando o cursor
+    // como fazia ate esta data. Os dois callers de producao (este, chamado do construtor em
+    // SetupPhase e do wrap de advance_to_next_actor) entram SEMPRE na fronteira - medido
+    // instrumentando esta funcao e rodando a suite de domain inteira: cursor == 0 em 62.684
+    // de 62.684 chamadas. Logo este ramo e inalcancavel HOJE; ele existe pra que, se um
+    // caminho novo passar por aqui no meio da rodada, a recusa apareca no log em vez de
+    // acontecer em silencio (regra da casa) - e o proprio [[nodiscard]] + -Werror=unused-result
+    // ja obriga qualquer caller futuro a olhar pro retorno em tempo de compilacao.
+    if (!grouped_delay || !grouped_side) {
+        log_.push_back(CombatLogEntry{
+            std::string{}, CombatActionType::StatusTick, std::nullopt, 0,
+            "fila: regroup por lado RECUSADO fora da fronteira da rodada (cursor=" +
+                std::to_string(queue_.cursor()) +
+                "); a ordem da rodada segue como estava (nenhum ator perdeu nem ganhou turno)."});
+    }
 }
 
 // ---------------------------------------------------------------------------

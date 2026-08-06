@@ -90,6 +90,17 @@ add_executable(gusengine_domain_tests
     # Knockback de 2026-07-15). Estava INERTE (zero caller de producao) mas PUBLICA, e dois
     # comentarios afirmavam que a FSM a chamava. Ver o cabecalho do arquivo.
     initiative_queue_sync_cursor_guard_test.cpp
+    # FILA-REGROUP-GUARDA (2026-08-06): QUINTO e ultimo portao da mesma raiz -
+    # InitiativeQueue::regroup_stable() reparticionava a fila INTEIRA e fazia `cursor_ = 0`
+    # incondicionalmente, a assinatura exata do bug de remove(): chamada no meio da rodada,
+    # REABRIA a rodada. O contrato "so na fronteira" so existia no comentario. Estava INERTE -
+    # e inerte MEDIDO, nao presumido: instrumentando o unico caminho de producao
+    # (CombatStateMachine::regroup_round_by_side) a suite de domain deu cursor == 0 em 62.684
+    # de 62.684 chamadas. Conserto = guarda `cursor_ != 0 -> no-op + false`, com [[nodiscard]]
+    # pra que -Werror=unused-result impeca um caller futuro de ignorar a recusa. O arquivo
+    # tambem MATA a alternativa "alargar pra [cursor_, fim)" (medida e reprovada: desloca o
+    # ator que esta agindo e lhe da 2o turno). Ver o cabecalho do arquivo.
+    initiative_queue_regroup_guard_test.cpp
     # Marco M2 (metade de logica pura): input_remap (ActionRegistry/InputBinding)
     # portado C#->C++ POCO. O backend de evento Qt (platform/input/) NAO entra aqui.
     input_remap_test.cpp

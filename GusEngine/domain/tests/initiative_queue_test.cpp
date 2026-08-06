@@ -353,7 +353,10 @@ TEST_CASE("initiative_queue: regroup_stable agrupa por predicado preservando ord
     InitiativeQueueRawReorderTestAccess::reorder_actor(q, &pA1, +2);
     REQUIRE(order_ids(q) == std::vector<std::string>{"eB1", "pA2", "pA1", "eB2"});
 
-    q.regroup_stable([](const CombatActor* a) { return a->is_player_side(); });
+    // FILA-REGROUP-GUARDA (2026-08-06): regroup_stable virou [[nodiscard]] bool - true =
+    // aceito (estamos na fronteira da rodada, cursor 0), false = recusado. Aqui a fila e nova,
+    // cursor 0, entao o regroup e ACEITO. Ver initiative_queue_regroup_guard_test.cpp.
+    REQUIRE(q.regroup_stable([](const CombatActor* a) { return a->is_player_side(); }));
     // player-side na frente NA ORDEM RELATIVA CORRENTE (pA2 antes de pA1), depois enemy-side.
     REQUIRE(order_ids(q) == std::vector<std::string>{"pA2", "pA1", "eB1", "eB2"});
 }
@@ -368,7 +371,8 @@ TEST_CASE("initiative_queue: regroup_stable zera o cursor e nao toca round_index
     REQUIRE(q.round_index() == 1);
 
     // enemy-first (predicado = NAO player-side): [a, c] enemigos, [b] party.
-    q.regroup_stable([](const CombatActor* x) { return !x->is_player_side(); });
+    // Cursor 0 pelo WRAP do advance (fronteira legitima da rodada 1): regroup ACEITO.
+    REQUIRE(q.regroup_stable([](const CombatActor* x) { return !x->is_player_side(); }));
     REQUIRE(order_ids(q) == std::vector<std::string>{"a", "c", "b"});
     REQUIRE(q.cursor() == 0);        // inicio de rodada: primeiro do lado que abre
     REQUIRE(q.round_index() == 1);   // regroup nao conta rodada
@@ -381,7 +385,9 @@ TEST_CASE("initiative_queue: regroup_stable e no-op de ordem quando ja esta agru
     CombatActor b = actor("b", 20, /*player=*/true);
     CombatActor c = actor("c", 10, /*player=*/false);
     InitiativeQueue q({&a, &b, &c});  // [a, b, c], ja player-first
-    q.regroup_stable([](const CombatActor* x) { return x->is_player_side(); });
+    // Fila nova (cursor 0): ACEITO. "Aceito" e distinto de "mudou a ordem" - aqui nao havia
+    // o que mover e o retorno e true do mesmo jeito.
+    REQUIRE(q.regroup_stable([](const CombatActor* x) { return x->is_player_side(); }));
     REQUIRE(order_ids(q) == std::vector<std::string>{"a", "b", "c"});
     REQUIRE(q.cursor() == 0);
 }
