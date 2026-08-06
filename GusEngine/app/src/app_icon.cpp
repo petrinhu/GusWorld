@@ -3,10 +3,11 @@
 //
 // Implementacao de set_window_icon_if_available. Ver header.
 //
-// PNG -> pixels RGBA via glintfx::decode_image_file (STB-IMAGE-APP, 2026-07-29); pixels ->
-// SDL_Surface via SDL_CreateSurfaceFrom; SDL_Surface -> icone da janela via
-// SDL_SetWindowIcon (que COPIA os pixels pro proprio uso interno - a surface/buffer podem
-// ser liberados logo em seguida, sem lifetime compartilhado com a janela).
+// PNG -> pixels RGBA via glintfx::decode_png_file (PNG-DECODE-ADOPT, 2026-08-06; antes era
+// decode_image_file, ver abaixo); pixels -> SDL_Surface via SDL_CreateSurfaceFrom;
+// SDL_Surface -> icone da janela via SDL_SetWindowIcon (que COPIA os pixels pro proprio uso
+// interno - a surface/buffer podem ser liberados logo em seguida, sem lifetime
+// compartilhado com a janela).
 //
 // STB-IMAGE-APP (2026-07-29): antes este arquivo incluia "stb_image.h" e chamava
 // stbi_load() direto - violacao do contrato de camadas (app/ e a UNICA camada, com
@@ -15,7 +16,17 @@
 // glintfx::decode_image_file (glintfx/include/glintfx/image.hpp), que decodifica o PNG em
 // pixels sem exigir contexto GL - substitui stbi_load 1-pra-1 aqui.
 //
-// ALPHA: decode_image_file devolve alpha STRAIGHT (nao-premultiplicado), exatamente o que
+// PNG-DECODE-ADOPT (2026-08-06): a chamada abaixo passou de decode_image_file pra
+// decode_png_file (glintfx v0.30.0+, image.hpp:691). Motivo: decode_image_file faz dispatch
+// PNG/JPG/TGA pelo sniffing do stb_image, e a perna TGA e FROUXA - 82 bytes de header TGA
+// forjado com nome ".png" decodificam "com sucesso" (ok == true!) numa RGBA8 4096x4096
+// toda alpha-zero, 64 MB alocados a partir de 82 bytes de entrada. decode_png_file checa os
+// 8 bytes da assinatura PNG antes de o buffer chegar ao stb_image e RECUSA o forjado. Troca
+// drop-in (mesmo DecodedImagePixels, mesmo contrato fail-high, mesmo alpha straight, mesmo
+// noexcept) e segura aqui porque este caminho carrega SEMPRE o icone PNG do app
+// (kAppIconFile256). Congelado pelo GATE(decode-image-file-zero), tools/decode_image_file_zero.py.
+//
+// ALPHA: decode_png_file devolve alpha STRAIGHT (nao-premultiplicado), exatamente o que
 // stbi_load ja devolvia e o que SDL_CreateSurfaceFrom/SDL_SetWindowIcon esperam (o SDL
 // compoe o icone sozinho, fora do pipeline de blend do jogo - NAO passa por
 // Draw2d::create_texture, que premultiplica Rgba8 na ingestao pro proprio blend GL). Como
@@ -40,7 +51,7 @@ void set_window_icon_if_available(SDL_Window* window) {
     const std::string path =
         gus::platform::assets::FilesystemAssetSource().resolve_path(id);
 
-    const glintfx::DecodedImagePixels decoded = glintfx::decode_image_file(path.c_str());
+    const glintfx::DecodedImagePixels decoded = glintfx::decode_png_file(path.c_str());
     if (!decoded.ok) {
         // via PLANA (nao printf-style): path e caminho de arquivo, texto EXTERNO - um "%"
         // literal nele nao pode virar especificador de formato (FW-LOG, bump v0.26.0).

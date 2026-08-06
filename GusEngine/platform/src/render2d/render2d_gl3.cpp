@@ -16,14 +16,27 @@
 // glad (GLAD_GL_IMPLEMENTATION) e definida pelo gl3_loader.cpp (ADR-010 F3) - aqui so o
 // header (declaracoes + ponteiros de funcao globais que aquele .cpp resolve).
 //
-// PNG -> pixels via glintfx::decode_image_file (STB-IMAGE-PLATFORM, 2026-07-30;
-// sucessora do STB-IMAGE-APP, commit 46a12e3). Antes este .cpp so incluia
-// "stb_image.h" (impl compartilhada de render2d_sdl.cpp) e chamava stbi_load()
-// direto - mesma violacao de camada corrigida la. decode_image_file devolve alpha
-// STRAIGHT (identico ao stbi_load); este backend PREMULTIPLICA in-place logo apos
-// o decode (ver load_texture) porque o blend GL daqui e premultiplied
-// (GL_ONE, GL_ONE_MINUS_SRC_ALPHA, begin_frame) - o passo de premultiply e
-// preexistente e NAO mudou, so a fonte dos pixels mudou.
+// PNG -> pixels via glintfx::decode_png_file (PNG-DECODE-ADOPT, 2026-08-06; antes
+// decode_image_file, STB-IMAGE-PLATFORM 2026-07-30, sucessora do STB-IMAGE-APP,
+// commit 46a12e3). Antes disso tudo este .cpp so incluia "stb_image.h" (impl
+// compartilhada de render2d_sdl.cpp) e chamava stbi_load() direto - mesma violacao
+// de camada corrigida la. decode_png_file devolve alpha STRAIGHT (identico ao
+// stbi_load); este backend PREMULTIPLICA in-place logo apos o decode (ver
+// load_texture) porque o blend GL daqui e premultiplied (GL_ONE,
+// GL_ONE_MINUS_SRC_ALPHA, begin_frame) - o passo de premultiply e preexistente e
+// NAO mudou, so a fonte dos pixels mudou.
+//
+// PNG-DECODE-ADOPT (2026-08-06): decode_image_file faz dispatch PNG/JPG/TGA pelo
+// sniffing do stb_image, e a perna TGA e FROUXA - 82 bytes de header TGA forjado com
+// nome ".png" decodificam "com sucesso" (ok == true!) numa RGBA8 4096x4096 toda
+// alpha-zero, 64 MB alocados a partir de 82 bytes (amplificacao ~818.000x).
+// decode_png_file (glintfx v0.30.0+, image.hpp:691) checa os 8 bytes da assinatura
+// PNG ANTES de o buffer alcancar o stb_image e RECUSA o forjado - drop-in (mesmo
+// DecodedImagePixels, mesmo contrato fail-high, mesmo alpha straight, mesmo
+// noexcept). Seguro aqui porque o pipeline de asset do jogo e SO-PNG, e isso foi
+// MEDIDO (1283 .png / zero tga-bmp-jpg em resources+assets; 103 de 103 literais de
+// extensao de imagem em producao sao .png). Congelado pelo
+// GATE(decode-image-file-zero), tools/decode_image_file_zero.py.
 
 #include "gus/platform/render2d/render2d_gl3.hpp"
 
@@ -500,12 +513,14 @@ TextureId Render2dGl3::load_texture(const char* path) {
     if (it != impl_->by_path.end()) {
         return it->second;
     }
-    // decode_image_file devolve alpha STRAIGHT (identico ao stbi_load); ok==false
+    // decode_png_file devolve alpha STRAIGHT (identico ao stbi_load); ok==false
     // cobre path nulo/ilegivel/corrompido/acima do teto - mesma degradacao que
-    // pixels==nullptr do stbi_load cobria. decoded e mutavel de proposito: o
-    // premultiply abaixo escreve IN-PLACE no proprio buffer RAII (sem free manual,
+    // pixels==nullptr do stbi_load cobria - E TAMBEM arquivo que nao comeca pela
+    // assinatura PNG (PNG-DECODE-ADOPT: e exatamente esse caso a mais que fecha o
+    // buraco do TGA forjado; ver o topo do arquivo). decoded e mutavel de proposito:
+    // o premultiply abaixo escreve IN-PLACE no proprio buffer RAII (sem free manual,
     // sem alocacao extra - o mesmo padrao que o stbi_load mutando seu buffer tinha).
-    glintfx::DecodedImagePixels decoded = glintfx::decode_image_file(path);
+    glintfx::DecodedImagePixels decoded = glintfx::decode_png_file(path);
     if (!decoded.ok || decoded.width <= 0 || decoded.height <= 0) {
         return kInvalidTexture;
     }

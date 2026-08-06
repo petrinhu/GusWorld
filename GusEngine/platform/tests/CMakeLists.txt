@@ -36,6 +36,12 @@ add_executable(gusengine_platform_tests
     save_file_store_test.cpp
     # ASSETS-VFS-F1 (ADR-013): AssetSource/FilesystemAssetSource, por familia de asset.
     asset_source_test.cpp
+    # PNG-DECODE-ADOPT (2026-08-06): decode de PNG so via glintfx::decode_png_file - o
+    # TGA forjado de 82 bytes com nome ".png" (64 MB alocados, amplificacao ~818.000x
+    # pelo decode_image_file antigo) e RECUSADO. Vive aqui, e nao em app/tests, porque 2
+    # dos 3 call sites migrados sao desta camada (render2d_{gl3,sdl}.cpp) e o alvo ja
+    # linka glintfx::glintfx.
+    decode_png_file_test.cpp
 )
 
 # F4-2.4 (Onda F4, costura de input): adaptador de GAMEPAD do backend novo (glintfx, evdev

@@ -278,6 +278,27 @@ python3 "$ROOT/tools/callback_dtor_disarm.py"
 GATE_CALLBACK_DISARM=$?
 set -e
 
+# (m) Zero-tolerancia CROSS-CAMADA (PNG-DECODE-ADOPT, 2026-08-06): `decode_image_file`
+#     do glintfx faz dispatch PNG/JPG/TGA pelo sniffing do stb_image, e a perna TGA e
+#     FROUXA - medido pela auditoria da W1 e reconferido: 82 bytes de header TGA
+#     forjado com nome ".png" decodificam "COM SUCESSO" (ok == true, nao falha!) numa
+#     RGBA8 4096x4096 toda alpha-zero: 64 MB alocados a partir de 82 bytes de arquivo,
+#     amplificacao de ~818.000x, superficie de ataque por asset malicioso. Os 3 call
+#     sites (app_icon.cpp + render2d_{gl3,sdl}.cpp) migraram pra `decode_png_file`
+#     (glintfx v0.30.0+, ja no pin que usamos), que checa a assinatura PNG antes do
+#     stb_image e RECUSA o forjado - drop-in, mesmo contrato. Este gate CONGELA o
+#     estado, allowlist VAZIA. Adotar API que a lib ja expoe pra este fim NAO e
+#     contornar lacuna (o oposto do que a lei de 2026-07-29 proibe). `decode_image_
+#     memory` fica de FORA de proposito (sem irma so-PNG no glintfx = sem substituto
+#     pra oferecer; zero uso em producao hoje) - mesmo criterio que deixou stbi_write
+#     fora do (e) e SDL_Delay fora do (d). Ver tools/decode_image_file_zero.py
+#     (inclusive a sentinela de escopo que reprova se a varredura colapsar pra zero
+#     arquivo, em vez de imprimir um OK falso).
+set +e
+python3 "$ROOT/tools/decode_image_file_zero.py"
+GATE_DECODE_IMAGE_ZERO=$?
+set -e
+
 GATE=0
 [ "$GATE_ARCH" = "0" ] && [ "$GATE_EXCL" = "0" ] && [ "$GATE_I18N" = "0" ] \
     && [ "$GATE_SDL_RATCHET" = "0" ] && [ "$GATE_LOG_CLOCK_ZERO" = "0" ] \
@@ -285,6 +306,7 @@ GATE=0
     && [ "$GATE_FETCHCONTENT" = "0" ] && [ "$GATE_CTEST_TIMEOUT" = "0" ] \
     && [ "$GATE_GL3_READBACKBUFFER" = "0" ] && [ "$GATE_SPDX" = "0" ] \
     && [ "$GATE_CALLBACK_DTOR" = "0" ] && [ "$GATE_CALLBACK_DISARM" = "0" ] \
+    && [ "$GATE_DECODE_IMAGE_ZERO" = "0" ] \
     || GATE=1
 echo "GATE=$GATE"
 

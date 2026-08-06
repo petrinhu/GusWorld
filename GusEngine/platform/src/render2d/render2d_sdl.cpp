@@ -5,16 +5,30 @@
 // header. Travado por platform/tests/render2d_sdl_test.cpp (TEST-FIRST, caminho
 // headless) + smoke do app (caminho com renderer real).
 //
-// PNG -> SDL_Texture via glintfx::decode_image_file (STB-IMAGE-PLATFORM, 2026-07-30;
-// sucessora do STB-IMAGE-APP que tirou o stbi_load direto do app/, commit 46a12e3).
-// Antes esta TU incluia "stb_image.h" com STB_IMAGE_IMPLEMENTATION (unica TU do
-// render2d a definir os simbolos - render2d_gl3.cpp so incluia o header, reusando-os
-// no link) e chamava stbi_load()/stbi_image_free() direto - violacao do contrato de
-// camadas (stb_image e detalhe de decode, nao fronteira SDL/GL que platform/ tem
-// licenca de tocar). glintfx::decode_image_file substitui 1-pra-1, sem exigir
+// PNG -> SDL_Texture via glintfx::decode_png_file (PNG-DECODE-ADOPT, 2026-08-06;
+// antes decode_image_file, STB-IMAGE-PLATFORM 2026-07-30, sucessora do STB-IMAGE-APP
+// que tirou o stbi_load direto do app/, commit 46a12e3).
+// Antes disso tudo esta TU incluia "stb_image.h" com STB_IMAGE_IMPLEMENTATION (unica
+// TU do render2d a definir os simbolos - render2d_gl3.cpp so incluia o header,
+// reusando-os no link) e chamava stbi_load()/stbi_image_free() direto - violacao do
+// contrato de camadas (stb_image e detalhe de decode, nao fronteira SDL/GL que
+// platform/ tem licenca de tocar). O decode do glintfx substituiu 1-pra-1, sem exigir
 // contexto GL e sem free manual (RAII em DecodedImagePixels::pixels).
 //
-// ALPHA: decode_image_file devolve alpha STRAIGHT (nao-premultiplicado), exatamente
+// PNG-DECODE-ADOPT (2026-08-06): decode_image_file faz dispatch PNG/JPG/TGA pelo
+// sniffing do stb_image, e a perna TGA e FROUXA - 82 bytes de header TGA forjado com
+// nome ".png" decodificam "com sucesso" (ok == true!) numa RGBA8 4096x4096 toda
+// alpha-zero, 64 MB alocados a partir de 82 bytes (amplificacao ~818.000x).
+// decode_png_file (glintfx v0.30.0+, image.hpp:691) checa os 8 bytes da assinatura
+// PNG ANTES de o buffer alcancar o stb_image e RECUSA o forjado - drop-in (mesmo
+// DecodedImagePixels, mesmo contrato fail-high, mesmo alpha straight, mesmo
+// noexcept). Seguro aqui porque o pipeline de asset do jogo e SO-PNG, e isso foi
+// MEDIDO (1283 .png / zero tga-bmp-jpg em resources+assets; 103 de 103 literais de
+// extensao de imagem em producao sao .png). Congelado pelo
+// GATE(decode-image-file-zero), tools/decode_image_file_zero.py. Provado por
+// platform/tests/decode_png_file_test.cpp.
+//
+// ALPHA: decode_png_file devolve alpha STRAIGHT (nao-premultiplicado), exatamente
 // o que stbi_load ja devolvia. SDL_BLENDMODE_BLEND (setado no load_texture abaixo)
 // espera justamente alpha straight (formula dst=src*srcA+dst*(1-srcA)) - este
 // arquivo nunca passa pelo Draw2d::create_texture do glintfx (que premultiplica
@@ -146,10 +160,11 @@ TextureId Render2dSdl::load_texture(const char* path) {
     }
 
     // Carrega o PNG como RGBA8 (4 canais forcados) straight-alpha via
-    // glintfx::decode_image_file (STB-IMAGE-PLATFORM). ok==false cobre path
+    // glintfx::decode_png_file (PNG-DECODE-ADOPT). ok==false cobre path
     // nulo/ilegivel/corrompido/acima do teto - mesma degradacao que
-    // pixels==nullptr do stbi_load cobria.
-    const glintfx::DecodedImagePixels decoded = glintfx::decode_image_file(path);
+    // pixels==nullptr do stbi_load cobria - E TAMBEM arquivo que nao comeca pela
+    // assinatura PNG (o caso a mais que fecha o buraco do TGA forjado; ver topo).
+    const glintfx::DecodedImagePixels decoded = glintfx::decode_png_file(path);
     if (!decoded.ok || decoded.width <= 0 || decoded.height <= 0) {
         return kInvalidTexture;
     }
