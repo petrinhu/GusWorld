@@ -665,44 +665,6 @@ histórico no fim do arquivo. Novas descobertas entram como bullets abaixo desta
   concreto é o `z-index`, que é o que a gente pediria primeiro num HUD composto se precisasse
   sobrepor camada sem depender da ordem do documento.
 
-- `RELEASE-DEMO-APPIMAGE` (2026-08-05, **decisão do líder**: o demo e o release final Linux têm de
-  rodar em **Fedora 44, Arch e Ubuntu**, e o formato escolhido por ele foi **AppImage**, arquivo
-  único). ⚠️ **O binário de hoje não roda em Ubuntu nenhum**, e isso foi MEDIDO, não estimado:
-  `objdump -T` no `build/linux-release/app/gusworld_app` exige **`GLIBC_2.43`**, que é o glibc desta
-  Fedora 44 (`ldd --version` confirma 2.43); Ubuntu 24.04 LTS tem 2.39 e o 22.04 tem 2.35, e glibc só
-  é compatível para trás. Das três distros alvo, hoje temos **uma** (Arch, rolling). Também exige
-  `GLIBCXX_3.4.32`. O que a fatia precisa entregar:
-  1. **Build em container de distro antiga** (o piso vira o glibc do container; Ubuntu 22.04 / 2.35
-     cobre as três com folga). `podman` e `docker` já instalados, e a casa já tem o precedente do
-     `GusEngine/tools/winbuild_container.sh`.
-  2. **Separar as 22 libs dinâmicas em duas classes.** Ficam de FORA do pacote, obrigatoriamente, as
-     amarradas ao driver e ao servidor gráfico do jogador: `libGLX`, `libGLdispatch`, `libOpenGL`,
-     `libX11`, `libxcb`, `libXau`, `libXext`, mais `libc`/`libm`/`ld-linux`. Entram as outras doze
-     (`libfreetype`, `libharfbuzz`, `libgraphite2`, `libpng16`, `libbrotlicommon`, `libbrotlidec`,
-     `libbz2`, `libpcre2-8`, `libglib-2.0`, `libz`, `libstdc++`, `libgcc_s`). `patchelf` já
-     instalado. **Origem desse rabo de doze:** o RmlUi resolve fonte por `find_package(Freetype)`, ou
-     seja, FreeType vem do SISTEMA (documentado em `GusEngine/CMakeLists.txt:66-67`), e o FreeType
-     arrasta harfbuzz/png/brotli/bz2/glib. Matar na raiz com FreeType estático mexeria na build do
-     RmlUi, que é **território do glintfx**: vira pedido pelo bus, nunca conserto nosso.
-  3. **Consertar o caminho de assets ANTES de empacotar**, senão o jogo abre sem achar sprite: em
-     `platform/src/assets/asset_source.cpp`, `resolve_generic` usa o macro `GUSWORLD_ASSETS_DIR`
-     (caminho ABSOLUTO da máquina de build, embutido pelo CMake) com precedência sobre o fallback
-     relativo `resources/`, e **não checa se existe** antes de aceitar. Curiosidade que mostra que é
-     descuido e não desenho: o caminho da FONTE, no mesmo arquivo, já faz a cadeia certa com
-     `exists_on_disk` (linhas 109/114/118). Conserto: ou o AppImage exporta `GUSWORLD_ASSETS` no
-     `AppRun`, ou o `resolve_generic` ganha a mesma checagem de existência do caminho de fonte.
-  4. **Decidir o que entra de asset.** Os assets realmente carregados somam **276 MB**
-     (`vfx` 160, `sprites` 82, `images` 24, áudio 12, e diálogos/traduções/mapas em kilobytes). O
-     `resources/` inteiro tem 1,6 GB, mas 1,35 GB disso é `livros/` (corpus RAG) + `glb/` (arte
-     conceitual), que **não** entram. Vale medir quanto do `vfx` o demo carrega de fato.
-  5. **Criar o job de release na CI**, que hoje **não existe**: `ci.yml` e `windows.yml` só compilam
-     e testam, nenhum empacota nem publica.
-  ⚠️ **Contra do formato, dito ao líder antes da escolha e mantido aqui:** Ubuntu 24.04 e 25.04 não
-  trazem mais `libfuse2` de fábrica, então o AppImage clássico pede um pacote a mais na máquina do
-  jogador. Mitigação a avaliar na fatia: gerar com runtime estático mais novo, que dispensa a
-  libfuse2 do sistema. **Nada disso é para fazer agora** — o líder perguntou o que seria preciso, não
-  mandou executar.
-
 - `ASSETS-FONTE-TELAS-GEMEO` (2026-08-05, **achado-dominó da fatia `ASSETS-PATH-CASCATA`**): o
   conserto da cascata arrumou o **porteiro** de assets, mas o mesmo defeito vive **fora dele**, em
   código de tela. Seis telas leem `GUSWORLD_FONTS_DIR` **direto**, sem checar existência e sem
@@ -726,15 +688,6 @@ histórico no fim do arquivo. Novas descobertas entram como bullets abaixo desta
   não-sequestro (só vencem se o arquivo existir lá). 12 TEST_CASE novos (6 no porteiro, 6 no
   helper), suíte 2905/2905, 5 gates verdes. **Segue valendo o `APPRUN-CWD-OU-ENV` abaixo**, e o
   `AppRun` agora pode exportar só `GUSWORLD_FONTS` para a fonte (ou `GUSWORLD_ASSETS`, tanto faz).
-
-- `APPRUN-CWD-OU-ENV` (2026-08-05, **escopo que a fatia `ASSETS-PATH-CASCATA` NÃO cobre, dito pelo
-  próprio implementer**): a cascata consertada cai, no último nível, num caminho relativo ao **CWD**,
-  e não ao diretório do executável. Num AppImage o CWD é o de onde a pessoa invocou o arquivo, **não**
-  o AppDir. Portanto o `AppRun` ainda tem de fazer `cd` para o AppDir **ou** exportar as sete env
-  vars (`GUSWORLD_ASSETS`, `GUSWORLD_SFX`, `GUSWORLD_MUSIC`, `GUSWORLD_MAPS`,
-  `GUSWORLD_TRANSLATIONS`, `GUSWORLD_DIALOGUES`, `GUSWORLD_FONTS`). O que a fatia entregou é o
-  **pré-requisito**: o macro morto deixou de bloquear o fallback. Registrado aqui para ninguém achar
-  que o AppImage passou a funcionar sozinho.
 
 - `ASSETS-FONTE-TOOLS-GEMEO-3` (2026-08-05, **terceira geração do mesmo defeito**, achada pelo
   implementer do `ASSETS-FONTE-TELAS-GEMEO` enquanto consertava a segunda): o padrão
@@ -895,6 +848,62 @@ no CI do GitHub). Os três seguem na tabela viva.
 | RF-7 | ARQ | Refat_Brainstorm | **Brainstorm bigtech do COMO da refatoração** (líder + constelação; Cósimo monta time). Eixos: estratégia de engine (fina vs full), reaproveitar lógica POCO C#→C++ (combate/save/progressão) vs reescrever, câmera, combate Pokémon × pillar cartas, áudio próprio, licença, porte, plano de migração faseado. **GATE:** define ordem/dependências/viabilidade de todos os RF-* | Alta | — | Média | 🔄 Em andamento — **sub-rodada ENGINE fechada 2026-06-21** (7 decisões ratificadas: híbrida; 2D-only; Qt RHI+Quick; cena híbrida; Catch2+Qt Test; CMake+Qt6 LTS; lógica-pura-primeiro. Design: `docs/tech/pivot/engine-design.md`; migração 8 marcos M0→M8). Pendente: RF-4 combate / RF-3 câmera / RF-5 arte / RF-8 áudio / RF-6 porte / RF-9 licença | — |
 | RF-8 | ARQ | Refat_Áudio | **Camada de áudio própria SOBRE Qt Multimedia** (ESCLARECIDO 2026-06-21: NÃO do zero — Qt Multimedia como base; camada in-house por cima: música adaptativa, SFX, mixagem/fade, hook aos eventos de jogo). Escopo bem menor que motor-do-zero | Média | RF-1 | Média | 💡 Decisão (líder) | — |
 | RF-9 | ARQ | Refat_Legal | **Modelo: FREEWARE + doação opcional ("buy me a coffee and some AI tokens", PayPal, não-obrigatória) + código ABERTO GPLv3** (DECIDIDO 2026-06-21: líder escolheu GPLv3). LICENSE raiz trocado de AGPL p/ GPLv3; compatível com Qt sem custo (pode static-linkar); EULA proprietário (F2-LEG.1) OBSOLETO. **Validação compliance-legal entregue:** assets = CC-BY-SA-4.0 (recomendado); 3 inconsistências (engine/LICENSE.md=AGPL, engine/README.md:9=PolyForm quebra GPL, README raiz já corrigido); criar FUNDING.yml + ASSETS-LICENSE + THIRD-PARTY-LICENSES; SPDX headers; ADR-005. Doação NÃO no corpo do LICENSE (suja detecção). DECIDIDO 2026-06-21: assets=CC-BY-SA-4.0; livros Vol1/2=direitos reservados (obra à parte); doação=link PayPal donate (merchant 9XNZQ4RND67KL, BRL); submodule engine=arquivar (morre no pivot, não relicenciar). Correções EXECUTADAS (commit 8fbec29): ASSETS-LICENSE + THIRD-PARTY-LICENSES + FUNDING.yml + ADR-005 + design-doc §7. Submodule engine ARQUIVADO no Codeberg 2026-06-21 (read-only). Dívida residual: SPDX nos fontes C++ do pivot (futuro). _(Nota 2026-07-25: desfecho real diferente do planejado aqui: o repo `gus_dragon-engine` acabou **apagado**, não arquivado, do Codeberg em 2026-07-22, ver M8 em `TODO_ARCHIVE.md`; e o projeto GusWorld como um todo saiu do Codeberg nesta data, GitHub é o host único.)_ | Alta | RF-1 | Média | ✅ **Concluído: APROVADO em RE-AUDITORIA independente 2026-07-28** (`internal-auditor`, depois de os 3 achados serem corrigidos no mesmo dia). Medição refeita por mim, sem aceitar relatório: **524 de 528** fontes C++ com SPDX, e os 4 sem são EXATAMENTE os declarados (3 em edição do líder + o header do glad). O pin do glintfx no `THIRD-PARTY-LICENSES.md` bate com `CMakeLists.txt:337` (`v0.20.0`), o Catch2 bate com a linha 349 (`v3.7.1`), o header do glad tem as 3.582 linhas que o doc afirma, e os 4 vendors do glintfx no pin atual são os 4 catalogados. **A pergunta que mais importava foi respondida:** o auditor procurou especificamente se as correções de hoje criaram afirmação nova SEM lastro, e não achou nenhuma. Toda claim testada (números de linha, SHAs, contagens, versões de pin) bateu com o disco. Pendente verificação: GPLv3 + correções + engine arquivado; resta SPDX nos fontes C++ futuros **SPDX APLICADO 2026-07-28 (`9ed1dc75`): a dívida fechou.** Cobertura era **0 de 528 (0%)**, medida por auditoria independente; agora é **524 de 528**, e os 4 que faltam faltam por motivo declarado. Decisão do líder supera a redação do ADR-005 ("só nos NOVOS, conforme forem criados"), que nunca aconteceu enquanto a base ia de zero a 528; o ADR foi atualizado com o motivo. **Fora:** `third_party/` (SPDX nosso em código de terceiro seria declaração FALSA de licença), o header do **glad** em `platform/rmlui/` (código de terceiro FORA de `third_party/`, achado nesta passada e agora na tabela de licenças) e 3 arquivos com edição em voo do líder. **Provas que eu refiz de forma independente:** numstat `1 0` em todos os 524, zero linha adicionada que não seja o cabeçalho, zero removida, e a prova forte byte a byte (`sha256` do conteúdo a partir da linha 2 == `sha256` do blob em HEAD) com **524 verificados e 0 divergentes**. Idempotência provada por hash do diff. Suíte 2576 verde. `.git-blame-ignore-revs` criado com o SHA, **e ele só faz efeito depois de `git config blame.ignoreRevsFile`, por clone**. | — |
+
+### 📦 Demo distribuível (AppImage): ADIADO pelo líder em 2026-08-06
+
+**Decisão dele, verbatim:** *"esquece do demo, vou deixar para depois"*. Os dois itens saíram da
+fila de trabalho e vieram para cá **com os números preservados**, porque medi-los custou uma sessão
+inteira e remedir seria retrabalho puro. ⚠️ **O que NÃO veio para cá, e continua na fila por valer
+sozinho:** `ASSETS-FONTE-TOOLS-GEMEO-3`, `MACRO-FONTS-ORFA-NO-APP`, `I18N-ESCAPE-ASPAS` e
+`FLAKE-HARNESS-DISPLAY-AUDIO` nasceram do mesmo dominó, mas são higiene do código, não do pacote.
+
+- `RELEASE-DEMO-APPIMAGE` (2026-08-05, **decisão do líder**: o demo e o release final Linux têm de
+  rodar em **Fedora 44, Arch e Ubuntu**, e o formato escolhido por ele foi **AppImage**, arquivo
+  único). ⚠️ **O binário de hoje não roda em Ubuntu nenhum**, e isso foi MEDIDO, não estimado:
+  `objdump -T` no `build/linux-release/app/gusworld_app` exige **`GLIBC_2.43`**, que é o glibc desta
+  Fedora 44 (`ldd --version` confirma 2.43); Ubuntu 24.04 LTS tem 2.39 e o 22.04 tem 2.35, e glibc só
+  é compatível para trás. Das três distros alvo, hoje temos **uma** (Arch, rolling). Também exige
+  `GLIBCXX_3.4.32`. O que a fatia precisa entregar:
+  1. **Build em container de distro antiga** (o piso vira o glibc do container; Ubuntu 22.04 / 2.35
+     cobre as três com folga). `podman` e `docker` já instalados, e a casa já tem o precedente do
+     `GusEngine/tools/winbuild_container.sh`.
+  2. **Separar as 22 libs dinâmicas em duas classes.** Ficam de FORA do pacote, obrigatoriamente, as
+     amarradas ao driver e ao servidor gráfico do jogador: `libGLX`, `libGLdispatch`, `libOpenGL`,
+     `libX11`, `libxcb`, `libXau`, `libXext`, mais `libc`/`libm`/`ld-linux`. Entram as outras doze
+     (`libfreetype`, `libharfbuzz`, `libgraphite2`, `libpng16`, `libbrotlicommon`, `libbrotlidec`,
+     `libbz2`, `libpcre2-8`, `libglib-2.0`, `libz`, `libstdc++`, `libgcc_s`). `patchelf` já
+     instalado. **Origem desse rabo de doze:** o RmlUi resolve fonte por `find_package(Freetype)`, ou
+     seja, FreeType vem do SISTEMA (documentado em `GusEngine/CMakeLists.txt:66-67`), e o FreeType
+     arrasta harfbuzz/png/brotli/bz2/glib. Matar na raiz com FreeType estático mexeria na build do
+     RmlUi, que é **território do glintfx**: vira pedido pelo bus, nunca conserto nosso.
+  3. **Consertar o caminho de assets ANTES de empacotar**, senão o jogo abre sem achar sprite: em
+     `platform/src/assets/asset_source.cpp`, `resolve_generic` usa o macro `GUSWORLD_ASSETS_DIR`
+     (caminho ABSOLUTO da máquina de build, embutido pelo CMake) com precedência sobre o fallback
+     relativo `resources/`, e **não checa se existe** antes de aceitar. Curiosidade que mostra que é
+     descuido e não desenho: o caminho da FONTE, no mesmo arquivo, já faz a cadeia certa com
+     `exists_on_disk` (linhas 109/114/118). Conserto: ou o AppImage exporta `GUSWORLD_ASSETS` no
+     `AppRun`, ou o `resolve_generic` ganha a mesma checagem de existência do caminho de fonte.
+  4. **Decidir o que entra de asset.** Os assets realmente carregados somam **276 MB**
+     (`vfx` 160, `sprites` 82, `images` 24, áudio 12, e diálogos/traduções/mapas em kilobytes). O
+     `resources/` inteiro tem 1,6 GB, mas 1,35 GB disso é `livros/` (corpus RAG) + `glb/` (arte
+     conceitual), que **não** entram. Vale medir quanto do `vfx` o demo carrega de fato.
+  5. **Criar o job de release na CI**, que hoje **não existe**: `ci.yml` e `windows.yml` só compilam
+     e testam, nenhum empacota nem publica.
+  ⚠️ **Contra do formato, dito ao líder antes da escolha e mantido aqui:** Ubuntu 24.04 e 25.04 não
+  trazem mais `libfuse2` de fábrica, então o AppImage clássico pede um pacote a mais na máquina do
+  jogador. Mitigação a avaliar na fatia: gerar com runtime estático mais novo, que dispensa a
+  libfuse2 do sistema. **Nada disso é para fazer agora** — o líder perguntou o que seria preciso, não
+  mandou executar.
+
+- `APPRUN-CWD-OU-ENV` (2026-08-05, **escopo que a fatia `ASSETS-PATH-CASCATA` NÃO cobre, dito pelo
+  próprio implementer**): a cascata consertada cai, no último nível, num caminho relativo ao **CWD**,
+  e não ao diretório do executável. Num AppImage o CWD é o de onde a pessoa invocou o arquivo, **não**
+  o AppDir. Portanto o `AppRun` ainda tem de fazer `cd` para o AppDir **ou** exportar as sete env
+  vars (`GUSWORLD_ASSETS`, `GUSWORLD_SFX`, `GUSWORLD_MUSIC`, `GUSWORLD_MAPS`,
+  `GUSWORLD_TRANSLATIONS`, `GUSWORLD_DIALOGUES`, `GUSWORLD_FONTS`). O que a fatia entregou é o
+  **pré-requisito**: o macro morto deixou de bloquear o fallback. Registrado aqui para ninguém achar
+  que o AppImage passou a funcionar sozinho.
+
 ## 🗄️ Histórico de drenos, ondas fechadas e notas de método (sem ação pendente)
 
 Tudo o que a INBOX e os cabeçalhos de seção guardavam e que **não é linha de tabela**: os logs
