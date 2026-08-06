@@ -113,31 +113,44 @@ struct BattleFocus {
 // SDL_Keycode, e este header e SDL-free por causa do gate sdl-ratchet, ver o topo.)
 
 // -------------------------------------------------------------- SFX-COCKPIT-AJUSTES
-// Os 3 blips que o cockpit tem a disposicao. Existe pra que a ESCOLHA DE TIMBRE seja um
+// Os 4 blips que o cockpit tem a disposicao. Existe pra que a ESCOLHA DE TIMBRE seja um
 // dado (uma constante nomeada), e nao um `play_sfx(este_id)` espalhado pelo host.
+//
+// A ORDEM DESTE ENUM NAO E' A ORDEM DOS load_sfx (que decide os SoundId 1-based e e'
+// contrato com app/tests/battle_preview_interaction_test.cpp) - sao coisas distintas de
+// proposito. Ainda assim, slot novo entra no FIM: e' a mesma disciplina, e o `Confirm`
+// abaixo nasceu no fim justamente por isso.
 enum class BattleUiSfxSlot {
     Hover,    // kMenuHoverSfxFile   - realce entrou num item novo
     Click,    // kMenuClickSfxFile   - botao acionou
     Blocked,  // kMenuBlockedSfxFile - botao existia e RECUSOU (grave/abafado; ja usado
               //                       pelo card Hardcore da tela de dificuldade)
+    Confirm,  // kUiConfirmSfxFile   - confirmacao PESADA (encorpada, nao blip de menu);
+              //                       SFX-ABERTURA-TIMBRE, so a abertura usa hoje
 };
 
-// PONTO DE ESCOLHA DO TIMBRE DA ABERTURA - decisao do lider PENDENTE, isolada nesta
-// UNICA linha de proposito.
+// TIMBRE DA ABERTURA - DECIDIDO PELO LIDER em 2026-08-06: kUiConfirmSfxFile
+// (BattleUiSfxSlot::Confirm). Segue isolado nesta UNICA linha, e continua sendo o unico
+// lugar do codigo que sabe qual e' o som - trocar o timbre outra vez e' trocar ESTE valor.
 //
-// O lider decidiu (2026-08-06) que o Enter que "Encara" na abertura PASSA A TER SOM (a
-// fatia anterior o deixou mudo de proposito, argumentando que "comecou a luta" e' SFX de
-// outra natureza, nao blip de interface - argumento que segue de pe e e' justamente o que
-// esta constante deixa em aberto). Como a regra da casa e' ZERO ASSET NOVO sem decisao de
-// timbre, fiamos com o que JA EXISTE no repo: o blip de CLIQUE (o "Encarar" e', afinal, um
-// confirmar). Trocar o timbre = trocar ESTE valor; nada mais no codigo sabe qual e'.
+// HISTORICO da decisao, em 2 passos:
+//   1. A fatia SFX-COCKPIT-AJUSTES deu SOM ao Enter que "Encara" (antes era mudo de
+//      proposito, sob o argumento de que "comecou a luta" e' SFX de outra natureza, nao
+//      blip de interface). Como nao havia decisao de TIMBRE ainda, ela fiou provisoriamente
+//      com o blip de CLIQUE - o mesmo dos 6 menus - e deixou esta constante como o ponto
+//      de troca barata.
+//   2. SFX-ABERTURA-TIMBRE (esta fatia): o lider escolheu ui_confirm_provisorio.wav. Faz
+//      sentido com o argumento do passo 1 e sem contradizer a regra de ZERO ASSET NOVO: o
+//      wav JA existia no kit provisorio (curadoria F2) e nao era carregado por tela
+//      nenhuma - o "Encarar" deixa de soar como mais um item de menu e passa a ter timbre
+//      PROPRIO, distinto de todo o resto do cockpit.
 //
-// Alternativas que existem HOJE em assets/sfx/ (nenhum asset novo foi criado): os 3 slots
-// acima mais hit_digital_provisorio.wav / hit_digital_alt_provisorio.wav (som de golpe) e
-// ui_confirm_provisorio.wav. Os 2 ultimos NAO estao neste enum porque o cockpit nao os
-// carrega hoje - se o lider escolher um deles, entra um load_sfx a mais em
-// BattleScreen::enter() e um slot novo aqui.
-inline constexpr BattleUiSfxSlot kBattleOpeningSfxSlot = BattleUiSfxSlot::Click;
+// O que existe HOJE em assets/sfx/ e continua FORA deste enum, se um dia a escolha mudar:
+// hit_digital_provisorio.wav / hit_digital_alt_provisorio.wav (som de GOLPE - carregados
+// pelo cockpit, mas outro assunto). Entrar um deles aqui custa 1 slot + 1 load_sfx no FIM
+// de BattleScreen::enter() (o fim importa: inserir no meio desloca os SoundId 1-based que
+// battle_preview_interaction_test.cpp compara contra last_sfx_id()).
+inline constexpr BattleUiSfxSlot kBattleOpeningSfxSlot = BattleUiSfxSlot::Confirm;
 
 // O QUE um "confirmar" (Enter/Espaco/clique) fez - e, por consequencia, QUAL blip sai.
 // Enum e nao bool porque os 4 casos sao mutuamente exclusivos POR CONSTRUCAO: com dois
@@ -174,11 +187,13 @@ public:
     BattleUiSfx() = default;
 
     // Ponteiro NAO-DONO (mesmo padrao de BattleScene::set_audio). Chamado uma vez por
-    // entrada na batalha, depois que os 3 blips ja foram carregados.
+    // entrada na batalha, depois que os 4 blips ja foram carregados. A ordem dos
+    // parametros espelha a do enum acima (Hover, Click, Blocked, Confirm).
     void bind(gus::platform::audio::AudioEngine* audio,
               gus::platform::audio::SoundId hover_sfx,
               gus::platform::audio::SoundId click_sfx,
-              gus::platform::audio::SoundId blocked_sfx) noexcept;
+              gus::platform::audio::SoundId blocked_sfx,
+              gus::platform::audio::SoundId confirm_sfx) noexcept;
 
     // HOVER por FOCO (teclado + mouse de mundo). Toca 1 blip SE (e so se)
     // battle_focus_entered_new_item(before, after). Devolve se tocou (pros testes e pro
@@ -222,6 +237,7 @@ private:
     gus::platform::audio::SoundId hover_sfx_ = gus::platform::audio::kInvalidSound;
     gus::platform::audio::SoundId click_sfx_ = gus::platform::audio::kInvalidSound;
     gus::platform::audio::SoundId blocked_sfx_ = gus::platform::audio::kInvalidSound;
+    gus::platform::audio::SoundId confirm_sfx_ = gus::platform::audio::kInvalidSound;
     int hovered_pill_ = -1;
 };
 

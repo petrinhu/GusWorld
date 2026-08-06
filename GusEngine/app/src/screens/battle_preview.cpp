@@ -280,6 +280,10 @@ private:
     // SFX-COCKPIT-AJUSTES: blip de RECUSA (verbo sem AP) - kMenuBlockedSfxFile, o mesmo
     // do card Hardcore bloqueado da tela de dificuldade.
     gus::platform::audio::SoundId ui_blocked_sfx_id_ = gus::platform::audio::kInvalidSound;
+    // SFX-ABERTURA-TIMBRE: confirmacao PESADA (kUiConfirmSfxFile) - o timbre que o lider
+    // escolheu em 2026-08-06 pro Enter que "Encara" na abertura. Quem decide QUE slot a
+    // abertura toca e' kBattleOpeningSfxSlot (battle_ui_sfx.hpp), nao esta linha.
+    gus::platform::audio::SoundId ui_confirm_sfx_id_ = gus::platform::audio::kInvalidSound;
     // SFX-COCKPIT: dono de TODO play_sfx de UI desta tela (hover de pill, hover de foco -
     // mira/picker/menu por teclado -, e clique em qualquer canal). Ver battle_ui_sfx.hpp.
     gus::app::screens::BattleUiSfx ui_sfx_;
@@ -542,18 +546,26 @@ void BattleScreen::enter() {
     // 2026-08-06. ZERO asset novo: e' o MESMO kMenuBlockedSfxFile (grave/abafado) que a
     // tela de dificuldade ja toca no card Hardcore bloqueado.
     //
+    // SFX-ABERTURA-TIMBRE: 4o blip - a confirmacao PESADA da ABERTURA (kUiConfirmSfxFile),
+    // timbre escolhido pelo lider em 2026-08-06. ZERO asset novo: o wav ja existia no kit
+    // provisorio (curadoria F2) e nao era carregado por tela nenhuma ate aqui.
+    //
     // A ORDEM destes load_sfx e' CONTRATO com app/tests/battle_preview_interaction_test.cpp
-    // (SoundId e' 1-based na ordem de load_sfx): 1=hit, 2=hover, 3=clique, 4=bloqueado. O
-    // novo entra no FIM de proposito - inserir antes deslocaria os 3 ids que aqueles
-    // testes ja comparam contra last_sfx_id().
+    // (SoundId e' 1-based na ordem de load_sfx): 1=hit, 2=hover, 3=clique, 4=bloqueado,
+    // 5=confirmacao. Cada novo entra no FIM de proposito - inserir antes deslocaria os ids
+    // que aqueles testes ja comparam contra last_sfx_id().
     const std::string ui_blocked_sfx_path =
         resolve_ui_sfx_path(gus::core::assets::kMenuBlockedSfxFile);
+    const std::string ui_confirm_sfx_path =
+        resolve_ui_sfx_path(gus::core::assets::kUiConfirmSfxFile);
     ui_hover_sfx_id_ = audio_ptr_->load_sfx(ui_hover_sfx_path.c_str());
     ui_click_sfx_id_ = audio_ptr_->load_sfx(ui_click_sfx_path.c_str());
     ui_blocked_sfx_id_ = audio_ptr_->load_sfx(ui_blocked_sfx_path.c_str());
+    ui_confirm_sfx_id_ = audio_ptr_->load_sfx(ui_confirm_sfx_path.c_str());
     // SFX-COCKPIT: liga o dono dos blips de UI. Ponteiro NAO-DONO do engine (mesmo padrao
     // de BattleScene::set_audio); daqui pra frente NENHUM play_sfx de UI sai desta casca.
-    ui_sfx_.bind(audio_ptr_, ui_hover_sfx_id_, ui_click_sfx_id_, ui_blocked_sfx_id_);
+    ui_sfx_.bind(audio_ptr_, ui_hover_sfx_id_, ui_click_sfx_id_, ui_blocked_sfx_id_,
+                 ui_confirm_sfx_id_);
     std::cout << "BattlePreview: [audio] SFX de UI (cockpit) hover "
               << (ui_hover_sfx_id_ != gus::platform::audio::kInvalidSound ? "carregado"
                                                                           : "AUSENTE")
@@ -563,7 +575,10 @@ void BattleScreen::enter() {
               << " / bloqueado "
               << (ui_blocked_sfx_id_ != gus::platform::audio::kInvalidSound ? "carregado"
                                                                             : "AUSENTE")
-              << " (reuso dos blips do menu de sistema)\n";
+              << " / confirmacao (abertura) "
+              << (ui_confirm_sfx_id_ != gus::platform::audio::kInvalidSound ? "carregado"
+                                                                            : "AUSENTE")
+              << " (blips do menu de sistema + o confirm do kit provisorio)\n";
 
     std::cout << "BattlePreview: [audio] device "
               << (audio_ptr_->available() ? "disponivel" : "INDISPONIVEL (mudo)")

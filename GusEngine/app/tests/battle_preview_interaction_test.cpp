@@ -115,17 +115,20 @@ private:
 //   2 = blip de HOVER de UI (kMenuHoverSfxFile)
 //   3 = blip de CLIQUE de UI (kMenuClickSfxFile)
 //   4 = blip de BLOQUEADO de UI (kMenuBlockedSfxFile) - SFX-COCKPIT-AJUSTES, 2026-08-06
+//   5 = CONFIRMACAO da abertura (kUiConfirmSfxFile) - SFX-ABERTURA-TIMBRE, 2026-08-06
 // O engine e' construido PELO TESTE e passado como external_audio, entao nada mais e'
 // carregado nele antes. Se alguem inserir um load_sfx novo antes desses, estes testes
 // falham ALTO (e o conserto e' 1 linha aqui) - preferivel a um teste que so conta plays
 // e nao sabe QUAL blip tocou, que e' o que deixaria "tocou o som errado" passar.
 //
-// O 4o entrou no FIM do enter() de proposito, justamente pra NAO deslocar os 3 ids acima:
-// ZERO destes casos precisou de ajuste por causa dele.
+// O 4o e o 5o entraram no FIM do enter() de proposito, justamente pra NAO deslocar os ids
+// acima: ZERO destes casos precisou de ajuste por causa da POSICAO deles (o unico caso que
+// mudou foi o da ABERTURA, e por DECISAO DE TIMBRE do lider, nao por deslocamento).
 constexpr gus::platform::audio::SoundId kHitSfxId = 1;
 constexpr gus::platform::audio::SoundId kUiHoverSfxId = 2;
 constexpr gus::platform::audio::SoundId kUiClickSfxId = 3;
 constexpr gus::platform::audio::SoundId kUiBlockedSfxId = 4;
+constexpr gus::platform::audio::SoundId kUiConfirmSfxId = 5;
 
 void push_key_down(SDL_Keycode key) {
     SDL_Event ev{};
@@ -359,11 +362,22 @@ TEST_CASE("battle_preview (harness headless, SFX-COCKPIT-AJUSTES): a ABERTURA so
 
     gus::platform::audio::AudioEngine audio(/*device_active=*/false);
     REQUIRE(input_sfx_plays(audio, env.window) == 1u);
-    // O timbre de HOJE = kBattleOpeningSfxSlot == BattleUiSfxSlot::Click (battle_ui_sfx.hpp).
-    // Quando o lider escolher o som definitivo da abertura, ESTA linha muda junto com
-    // aquela constante - de proposito, pra a troca de timbre nao passar despercebida.
-    REQUIRE(audio.last_sfx_id() == kUiClickSfxId);
+    // O timbre de HOJE = kBattleOpeningSfxSlot == BattleUiSfxSlot::Confirm
+    // (battle_ui_sfx.hpp), decisao do lider em SFX-ABERTURA-TIMBRE (2026-08-06). Se ele
+    // escolher outro som pra abertura, ESTA linha muda junto com aquela constante - de
+    // proposito, pra a troca de timbre nao passar despercebida.
+    //
+    // Prova pelo ID no HOST REAL: a contagem `== 1u` acima sozinha nao distingue "tocou o
+    // som da abertura" de "tocou qualquer outro blip carregado no enter()". Este e' o
+    // unico caso da suite que atravessa a cadeia inteira - load_sfx de producao, ordem
+    // real dos SoundId, roteamento de teclado do host - ate o alto-falante.
+    REQUIRE(audio.last_sfx_id() == kUiConfirmSfxId);
+    // E NAO e' nenhum dos outros 4 que o mesmo enter() carregou (o clique era o timbre
+    // PROVISORIO que esta fatia substituiu; enumerados um a um, nao "!= o de antes").
+    REQUIRE(audio.last_sfx_id() != kUiClickSfxId);
     REQUIRE(audio.last_sfx_id() != kUiBlockedSfxId);
+    REQUIRE(audio.last_sfx_id() != kUiHoverSfxId);
+    REQUIRE(audio.last_sfx_id() != kHitSfxId);
 }
 
 TEST_CASE("battle_preview (harness headless, SFX-COCKPIT): superficie PILLS DE VERBO / "

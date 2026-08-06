@@ -72,6 +72,27 @@ TEST_CASE("asset_paths: SFX do hit (M6 F3, ADR-011) - principal + variante A/B",
     REQUIRE(ap::kHitSfxFile != ap::kHitSfxAltFile);
 }
 
+TEST_CASE("asset_paths: os 4 blips de UI (hover/click/blocked/confirm) sao arquivos "
+          "DISTINTOS - se dois apontassem pro mesmo wav, todo teste de 'tocou o som certo' "
+          "viraria enfeite",
+          "[core][assets]") {
+    REQUIRE(ap::kMenuHoverSfxFile == std::string_view("menu_hover_provisorio.wav"));
+    REQUIRE(ap::kMenuClickSfxFile == std::string_view("menu_click_provisorio.wav"));
+    REQUIRE(ap::kMenuBlockedSfxFile == std::string_view("menu_blocked_provisorio.wav"));
+    // SFX-ABERTURA-TIMBRE (decisao do lider 2026-08-06): timbre da abertura da batalha.
+    REQUIRE(ap::kUiConfirmSfxFile == std::string_view("ui_confirm_provisorio.wav"));
+    // 6 pares, enumerados na marra: espaco pequeno e fechado.
+    REQUIRE(ap::kMenuHoverSfxFile != ap::kMenuClickSfxFile);
+    REQUIRE(ap::kMenuHoverSfxFile != ap::kMenuBlockedSfxFile);
+    REQUIRE(ap::kMenuHoverSfxFile != ap::kUiConfirmSfxFile);
+    REQUIRE(ap::kMenuClickSfxFile != ap::kMenuBlockedSfxFile);
+    REQUIRE(ap::kMenuClickSfxFile != ap::kUiConfirmSfxFile);
+    REQUIRE(ap::kMenuBlockedSfxFile != ap::kUiConfirmSfxFile);
+    // E nenhum deles colide com os SFX de GOLPE (outro assunto, mesma pasta).
+    REQUIRE(ap::kUiConfirmSfxFile != ap::kHitSfxFile);
+    REQUIRE(ap::kUiConfirmSfxFile != ap::kHitSfxAltFile);
+}
+
 TEST_CASE("asset_paths: todos os caminhos sao RELATIVOS e nao-vazios",
           "[core][assets]") {
     const std::string_view all[] = {

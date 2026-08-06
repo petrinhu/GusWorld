@@ -94,11 +94,13 @@ BattleClickOutcome battle_confirm_outcome(bool is_intro, BattleFocusSurface surf
 void BattleUiSfx::bind(gus::platform::audio::AudioEngine* audio,
                        gus::platform::audio::SoundId hover_sfx,
                        gus::platform::audio::SoundId click_sfx,
-                       gus::platform::audio::SoundId blocked_sfx) noexcept {
+                       gus::platform::audio::SoundId blocked_sfx,
+                       gus::platform::audio::SoundId confirm_sfx) noexcept {
     audio_ = audio;
     hover_sfx_ = hover_sfx;
     click_sfx_ = click_sfx;
     blocked_sfx_ = blocked_sfx;
+    confirm_sfx_ = confirm_sfx;
 }
 
 gus::platform::audio::SoundId BattleUiSfx::sound_of(BattleUiSfxSlot slot) const noexcept {
@@ -106,6 +108,7 @@ gus::platform::audio::SoundId BattleUiSfx::sound_of(BattleUiSfxSlot slot) const 
         case BattleUiSfxSlot::Hover: return hover_sfx_;
         case BattleUiSfxSlot::Click: return click_sfx_;
         case BattleUiSfxSlot::Blocked: return blocked_sfx_;
+        case BattleUiSfxSlot::Confirm: return confirm_sfx_;
     }
     return gus::platform::audio::kInvalidSound;
 }

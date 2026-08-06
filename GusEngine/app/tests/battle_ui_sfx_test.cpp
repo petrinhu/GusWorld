@@ -111,6 +111,7 @@ struct SfxHarness {
     SoundId hover = kInvalidSound;
     SoundId click = kInvalidSound;
     SoundId blocked = kInvalidSound;  // SFX-COCKPIT-AJUSTES: som de RECUSA (verbo sem AP)
+    SoundId confirm = kInvalidSound;  // SFX-ABERTURA-TIMBRE: confirmacao PESADA (abertura)
     BattleUiSfx sfx;
 
     SfxHarness() {
@@ -123,7 +124,14 @@ struct SfxHarness {
         blocked = audio.load_sfx(gus::app::screens::resolve_ui_sfx_path(
                                      gus::core::assets::kMenuBlockedSfxFile)
                                      .c_str());
-        sfx.bind(&audio, hover, click, blocked);
+        // SFX-ABERTURA-TIMBRE: carregado por ULTIMO, espelhando a ordem do enter() de
+        // producao (battle_preview.cpp) - aqui a ordem nao vira contrato de id (este
+        // harness nunca compara last_sfx_id() contra numero literal, so contra os campos
+        // acima), mas manter o mesmo desenho evita que alguem "arrume" um lado so.
+        confirm = audio.load_sfx(gus::app::screens::resolve_ui_sfx_path(
+                                     gus::core::assets::kUiConfirmSfxFile)
+                                     .c_str());
+        sfx.bind(&audio, hover, click, blocked, confirm);
     }
 
     [[nodiscard]] unsigned int plays() const { return audio.sfx_play_count(); }
@@ -131,7 +139,7 @@ struct SfxHarness {
     // 0 == 0 e o teste passaria sem provar nada (falso verde). Checar explicitamente.
     [[nodiscard]] bool loaded() const {
         return hover != kInvalidSound && click != kInvalidSound &&
-               blocked != kInvalidSound;
+               blocked != kInvalidSound && confirm != kInvalidSound;
     }
 };
 
@@ -181,23 +189,45 @@ float pill_cy(int i) { return 110.0f + 20.0f * static_cast<float>(i); }
 // (0) PRE-CONDICAO DO HARNESS - sem isto, todo o resto vira 0 == 0 (falso verde)
 // =====================================================================================
 
-TEST_CASE("battle_ui_sfx: o harness carrega os 3 blips REAIS do cockpit (mesmos wavs dos "
-          "6 menus, ZERO asset novo) - sem isto toda contagem abaixo seria 0==0, um falso "
-          "verde",
+TEST_CASE("battle_ui_sfx: o harness carrega os 4 blips REAIS do cockpit (wavs do kit "
+          "provisorio, ZERO asset novo) - sem isto toda contagem abaixo seria 0==0, um "
+          "falso verde",
           "[battle_ui_sfx][sfx-cockpit]") {
     SfxHarness h;
     REQUIRE(h.audio.available());
     REQUIRE(h.loaded());
     REQUIRE(h.plays() == 0u);  // carregar NAO toca
-    // Os 3 SoundId sao DISTINTOS - senao "tocou o blip certo" seria indistinguivel de
-    // "tocou qualquer um", e todo REQUIRE de last_sfx_id() abaixo viraria enfeite.
+    // Os 4 SoundId sao DISTINTOS DOIS A DOIS - senao "tocou o blip certo" seria
+    // indistinguivel de "tocou qualquer um", e todo REQUIRE de last_sfx_id() abaixo
+    // viraria enfeite. Enumerados na marra (6 pares) de proposito: e' espaco pequeno e
+    // fechado, e checar so "o novo != os outros" deixaria buraco se um dia sumir um par.
     REQUIRE(h.hover != h.click);
-    REQUIRE(h.click != h.blocked);
     REQUIRE(h.hover != h.blocked);
+    REQUIRE(h.hover != h.confirm);
+    REQUIRE(h.click != h.blocked);
+    REQUIRE(h.click != h.confirm);
+    REQUIRE(h.blocked != h.confirm);
     // E o modulo mapeia cada slot ao id que o harness carregou (prova a fiacao do bind).
     REQUIRE(h.sfx.sound_of(BattleUiSfxSlot::Hover) == h.hover);
     REQUIRE(h.sfx.sound_of(BattleUiSfxSlot::Click) == h.click);
     REQUIRE(h.sfx.sound_of(BattleUiSfxSlot::Blocked) == h.blocked);
+    REQUIRE(h.sfx.sound_of(BattleUiSfxSlot::Confirm) == h.confirm);
+}
+
+TEST_CASE("SFX-ABERTURA-TIMBRE: a constante de timbre da abertura aponta pro slot CONFIRM "
+          "(decisao do lider 2026-08-06) - e NAO pro clique de menu, que era o provisorio",
+          "[battle_ui_sfx][sfx-cockpit][sfx-abertura-timbre]") {
+    // ANCORA DA DECISAO, no nivel da CONSTANTE (o teste de play_outcome abaixo prova o
+    // mesmo no nivel do SOM QUE SAI). Se alguem trocar kBattleOpeningSfxSlot sem que o
+    // lider tenha decidido de novo, esta linha e a de la caem juntas - de proposito.
+    STATIC_REQUIRE(kBattleOpeningSfxSlot == BattleUiSfxSlot::Confirm);
+    STATIC_REQUIRE(kBattleOpeningSfxSlot != BattleUiSfxSlot::Click);
+    // O timbre da abertura tem arquivo PROPRIO, distinto dos blips dos 6 menus: o
+    // "Encarar" deixou de soar como mais um item de menu.
+    SfxHarness h;
+    REQUIRE(h.loaded());
+    REQUIRE(h.sfx.sound_of(kBattleOpeningSfxSlot) == h.confirm);
+    REQUIRE(h.sfx.sound_of(kBattleOpeningSfxSlot) != h.click);
 }
 
 // =====================================================================================
@@ -566,10 +596,16 @@ TEST_CASE("BattleUiSfx: play_outcome traduz os 4 resultados em 3 blips + silenci
         REQUIRE(h.sfx.play_outcome(BattleClickOutcome::Opening));
         REQUIRE(h.plays() == 1u);
         REQUIRE(h.audio.last_sfx_id() == h.sfx.sound_of(kBattleOpeningSfxSlot));
-        // ANCORA CONCRETA do timbre de HOJE. Quando o lider escolher outro som pra
-        // abertura, ESTA e' a linha que muda junto com a constante - de proposito: um
-        // teste que so compara com a propria constante nao provaria nada.
-        REQUIRE(h.audio.last_sfx_id() == h.click);
+        // ANCORA CONCRETA do timbre de HOJE (SFX-ABERTURA-TIMBRE, decisao do lider
+        // 2026-08-06 = kUiConfirmSfxFile). Se o lider escolher outro som pra abertura,
+        // ESTA e' a linha que muda junto com a constante - de proposito: um teste que so
+        // compara com a propria constante nao provaria nada (A == A).
+        REQUIRE(h.audio.last_sfx_id() == h.confirm);
+        // E prova o que a fatia TROCOU: o provisorio era o blip de CLIQUE dos 6 menus.
+        // Contagem sozinha ("tocou 1") nao distinguiria um do outro.
+        REQUIRE(h.audio.last_sfx_id() != h.click);
+        REQUIRE(h.audio.last_sfx_id() != h.hover);
+        REQUIRE(h.audio.last_sfx_id() != h.blocked);
     }
     SECTION("None -> silencio") {
         SfxHarness h;
@@ -594,7 +630,7 @@ TEST_CASE("BattleUiSfx: degrada MUDO (nunca crasha) sem engine ou com blip ausen
     SECTION("engine ok mas wav ausente (SoundId invalido)") {
         AudioEngine audio(/*device_active=*/false);
         gus::app::screens::BattleUiSfx sfx;
-        sfx.bind(&audio, kInvalidSound, kInvalidSound, kInvalidSound);
+        sfx.bind(&audio, kInvalidSound, kInvalidSound, kInvalidSound, kInvalidSound);
         REQUIRE_FALSE(sfx.play_click());
         REQUIRE_FALSE(sfx.play_outcome(BattleClickOutcome::Blocked));
         REQUIRE_FALSE(sfx.play_outcome(BattleClickOutcome::Opening));
@@ -607,11 +643,27 @@ TEST_CASE("BattleUiSfx: degrada MUDO (nunca crasha) sem engine ou com blip ausen
         SfxHarness h;
         REQUIRE(h.loaded());
         gus::app::screens::BattleUiSfx sfx;
-        sfx.bind(&h.audio, h.hover, h.click, kInvalidSound);
+        sfx.bind(&h.audio, h.hover, h.click, kInvalidSound, h.confirm);
         REQUIRE_FALSE(sfx.play_outcome(BattleClickOutcome::Blocked));
         REQUIRE(h.plays() == 0u);
         REQUIRE(sfx.play_outcome(BattleClickOutcome::Activated));
         REQUIRE(h.audio.last_sfx_id() == h.click);
+    }
+    SECTION("o blip da ABERTURA some do disco, os outros 3 seguem - so a abertura emudece") {
+        // GEMEO do caso acima, para o asset desta fatia (kUiConfirmSfxFile). Mesmo risco,
+        // mesma resposta: a abertura fica MUDA, e NAO cai no clique de menu como consolo -
+        // isso seria voltar em silencio ao provisorio que o lider acabou de trocar.
+        SfxHarness h;
+        REQUIRE(h.loaded());
+        gus::app::screens::BattleUiSfx sfx;
+        sfx.bind(&h.audio, h.hover, h.click, h.blocked, kInvalidSound);
+        REQUIRE_FALSE(sfx.play_outcome(BattleClickOutcome::Opening));
+        REQUIRE(h.plays() == 0u);
+        // O resto do cockpit segue soando normalmente.
+        REQUIRE(sfx.play_outcome(BattleClickOutcome::Activated));
+        REQUIRE(h.audio.last_sfx_id() == h.click);
+        REQUIRE(sfx.play_outcome(BattleClickOutcome::Blocked));
+        REQUIRE(h.audio.last_sfx_id() == h.blocked);
     }
 }
 
@@ -834,9 +886,12 @@ TEST_CASE("SFX-COCKPIT-AJUSTES: a ABERTURA SOA - Enter que 'Encara' toca 1 blip 
     REQUIRE_FALSE(scene.is_intro());  // encarou de verdade
     REQUIRE(h.plays() == 1u);
     REQUIRE(h.audio.last_sfx_id() == h.sfx.sound_of(kBattleOpeningSfxSlot));
-    // O timbre de HOJE (ancora concreta - muda junto com kBattleOpeningSfxSlot quando o
-    // lider escolher o som definitivo).
-    REQUIRE(h.audio.last_sfx_id() == h.click);
+    // O timbre de HOJE (ancora concreta - muda junto com kBattleOpeningSfxSlot). Desde
+    // SFX-ABERTURA-TIMBRE (decisao do lider 2026-08-06) e' o CONFIRM encorpado, nao mais
+    // o blip de clique dos menus: prova pelo ID, porque `plays() == 1` acima nao
+    // distingue "tocou o som certo" de "tocou outro".
+    REQUIRE(h.audio.last_sfx_id() == h.confirm);
+    REQUIRE(h.audio.last_sfx_id() != h.click);
 }
 
 TEST_CASE("SFX-COCKPIT-AJUSTES: na abertura, so o Enter/Espaco soa - navegar, cancelar e "

@@ -246,6 +246,13 @@ inline constexpr std::string_view kMenuClickSfxFile = "menu_click_provisorio.wav
 // paralelo (mesma pasta/formato de kMenuHoverSfxFile/kMenuClickSfxFile). MESMA
 // degradacao segura de load_sfx (arquivo ausente -> SoundId invalido -> play() no-op).
 inline constexpr std::string_view kMenuBlockedSfxFile = "menu_blocked_provisorio.wav";
+// SFX de CONFIRMACAO PESADA (SFX-ABERTURA-TIMBRE, decisao do lider 2026-08-06): timbre
+// mais encorpado que o blip de clique de menu, escolhido pro Enter que "Encara" na
+// ABERTURA da batalha ("BATALHA!" -> comeca a luta). Ja estava no kit provisorio desde a
+// curadoria F2 e nao era carregado por tela nenhuma; agora e' o timbre da abertura, via
+// gus/app/screens/battle_ui_sfx.hpp (kBattleOpeningSfxSlot). MESMA degradacao segura de
+// load_sfx (arquivo ausente -> SoundId invalido -> play() no-op).
+inline constexpr std::string_view kUiConfirmSfxFile = "ui_confirm_provisorio.wav";
 
 // Pasta da musica (MP3, streaming - M6 F4, ADR-011). Raiz assets/music/ (irma de
 // assets/sfx/, mesmo padrao/resolvedor - ver comentario de kSfxDir acima).
