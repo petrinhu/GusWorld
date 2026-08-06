@@ -26,6 +26,13 @@
 #include <SDL3/SDL.h>
 
 #include "gus/app/screens/battle_scene.hpp"
+// SFX-COCKPIT-AJUSTES: o VOCABULARIO do resultado de um clique (BattleClickOutcome) e a
+// decisao PURA que o produz (battle_confirm_outcome) moram no modulo de SOM, que e
+// SDL-free. A direcao da dependencia e' de proposito: o roteamento (SDL) conhece o
+// vocabulario, e nao o contrario - por o enum aqui obrigaria battle_ui_sfx.hpp a incluir
+// SDL e subiria o teto do gate sdl-ratchet. Zero include novo na pratica: battle_ui_sfx.hpp
+// so puxa battle_scene.hpp (ja acima) e ui_hover.hpp/audio_engine.hpp (POCO).
+#include "gus/app/screens/battle_ui_sfx.hpp"
 
 // Forward-decl PROPOSITAL (nao #include <glintfx/ui_event.hpp> aqui): este header e
 // PUBLICO dentro de gusengine_app (battle_preview.hpp o inclui, main.cpp inclui
@@ -59,34 +66,40 @@ enum class BattleEscEffect {
 // (battle_key_routing_test.cpp) - headless, sem SDL_Init.
 [[nodiscard]] int battle_digit_for_key(SDL_Keycode key) noexcept;
 
-// SFX-COCKPIT: "esta tecla, NESTE estado, ACIONA um botao?" - o predicado do blip de
-// CLIQUE no canal TECLADO. Mora aqui (e nao em battle_ui_sfx.hpp, dono do resto do
-// assunto SOM) por dois motivos que apontam pro mesmo lugar: e' um predicado sobre
-// SDL_Keycode, irmao direto de battle_digit_for_key/battle_key_down (a decisao "o que
-// esta tecla faz" tem UMA casa so); e battle_ui_sfx.hpp e SDL-free de proposito, pra
-// nao subir o teto do gate sdl-ratchet.
+// SFX-COCKPIT: "esta tecla, NESTE estado, aciona o que?" - a decisao do blip do canal
+// TECLADO. Mora aqui (e nao em battle_ui_sfx.hpp, dono do resto do assunto SOM) por dois
+// motivos que apontam pro mesmo lugar: e' uma funcao de SDL_Keycode, irma direta de
+// battle_digit_for_key/battle_key_down (a decisao "o que esta tecla faz" tem UMA casa
+// so); e battle_ui_sfx.hpp e SDL-free de proposito, pra nao subir o teto do gate
+// sdl-ratchet.
 //
-// PURO: avaliado ANTES do roteamento (battle_key_down), nao muta a cena. O canal MOUSE
-// nao precisa deste predicado - la o "acionou?" ja vem do bool de
-// battle_cockpit_verb_click (pills) e do bool de battle_mouse_click (mira/picker).
+// PURA: avaliada ANTES do roteamento (battle_key_down), nao muta a cena. O canal MOUSE
+// tem os gemeos dela: battle_cockpit_verb_click (pills) devolve o MESMO enum, e
+// battle_mouse_click (mira/picker) devolve bool porque la nao existe alvo "bloqueado".
 //
-// SOA (as 3 superficies clicaveis do cockpit, e so elas):
+// SFX-COCKPIT-AJUSTES (2026-08-06): era `battle_key_activates_button`, um bool. Virou um
+// enum de 4 estados porque o lider decidiu DUAS coisas que um bool nao representa:
+//   (a) verbo SEM AP passa a tocar o som de BLOQUEADO (antes: o clique normal, ou seja,
+//       confirmacao de uma acao que menu_confirm() recusa);
+//   (b) o Enter da ABERTURA ("Encarar") passa a TER som (antes: mudo de proposito).
+//
+// Activated (blip de CLIQUE):
 //   Enter/KP_Enter/Espaco confirmando no PICKER (escolhe o membro), na MIRA (confirma o
-//     alvo) e no MENU DE VERBOS (aciona o verbo - o MESMO gesto que o clique no pill,
-//     que ja soava).
+//     alvo) e no MENU DE VERBOS com o verbo HABILITADO.
 //   Digito 1-9 COM candidato correspondente (nth <= aim_count()/actor_pick_count()):
 //     aim_hotkey/actor_picker_hotkey sao "seleciona E confirma", ou seja, um clique.
-//     Fora de faixa o roteamento e no-op -> nao soa (som so onde houve acao).
-//
-// NAO SOA (decisao explicita desta fatia; timbre/volume/incomodo ao vivo sao do lider):
-//   - Enter na ABERTURA ("Encarar"): banner de tela cheia, nao menu com botoes - nao tem
-//     hover correspondente. "Comecou a luta" seria um SFX de outra natureza, nao o blip
-//     de UI.
+// Blocked (blip de BLOQUEADO, kMenuBlockedSfxFile - o mesmo do card Hardcore):
+//   Enter/Espaco no MENU DE VERBOS com o verbo DESABILITADO por AP.
+// Opening (timbre em kBattleOpeningSfxSlot):
+//   Enter/Espaco na ABERTURA ("Encarar").
+// None (MUDO):
 //   - Enter FORA da vez do jogador: cai em scene.skip() (ACELERAR o ritmo). Nao e botao,
 //     e soaria a cada toque de quem esta apressando a animacao.
-//   - Esc (cancela/desempilha) e Q (auto-resolve, placeholder).
-[[nodiscard]] bool battle_key_activates_button(const BattleScene& scene,
-                                               SDL_Keycode key) noexcept;
+//   - Digito 1-9 fora de faixa: o roteamento e' no-op, o som seria mentira.
+//   - Esc (cancela/desempilha) e Q (auto-resolve, placeholder) - MANTIDOS mudos por
+//     decisao do lider nesta mesma rodada.
+[[nodiscard]] BattleClickOutcome battle_key_click_outcome(const BattleScene& scene,
+                                                          SDL_Keycode key) noexcept;
 
 // Roteamento de TECLADO do host (extraido do loop de eventos - ver definicao/comentario
 // completo em battle_input.cpp). Esc DESEMPILHA 1 nivel de modal por vez (FIX bug2 do
@@ -127,11 +140,15 @@ bool sdl_to_glintfx(const SDL_Event& ev, SDL_Window* window, glintfx::UiEvent* o
 // enquanto mira/escolhe ator selecionaria um verbo por baixo -- regressao. Na ABERTURA
 // (is_intro()) o bloco #combat inteiro (pills inclusos) nem existe no DOM -- o id nunca
 // bateria mesmo sem a guarda, mas ela fica explicita por clareza/defesa-em-profundidade.
-// COCKPIT-SFX-HOVER-CLIQUE: devolve true SE o clique de fato ACIONOU um pill de verbo
-// valido (id resolvido + estado que aceita clique de pill) - o callback do glintfx usa
-// isso pra tocar o SFX de clique SO quando uma pill foi acionada (nunca em id de outro
-// elemento do cockpit nem durante mira/escolha-de-ator/abertura). false = no-op.
-bool battle_cockpit_verb_click(BattleScene& scene, const char* element_id);
+// COCKPIT-SFX-HOVER-CLIQUE: o callback do glintfx usa o retorno pra tocar o SFX certo -
+// nunca em id de outro elemento do cockpit nem durante mira/escolha-de-ator/abertura.
+//   None      = no-op (id de outro elemento, ou estado que nao aceita clique de pill)
+//   Activated = acionou um verbo HABILITADO
+//   Blocked   = o pill existe mas o verbo esta SEM AP (SFX-COCKPIT-AJUSTES: menu_confirm
+//               ja era no-op nesse caso, e mesmo assim saia o clique de confirmacao -
+//               decisao do lider 2026-08-06 de tocar o som de recusa, IGUAL ao teclado)
+[[nodiscard]] BattleClickOutcome battle_cockpit_verb_click(BattleScene& scene,
+                                                           const char* element_id);
 
 // ADR-010 / Incremento A2 (MOUSE), revisado GLINTFX-CLICK: hit-tests de MUNDO/ARENA
 // (escolha de ator + mira de alvo) resolvidos AQUI, no host, em coordenadas de MUNDO

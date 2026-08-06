@@ -95,25 +95,32 @@ bool sdl_to_glintfx(const SDL_Event& ev, SDL_Window* window, glintfx::UiEvent* o
 // enquanto mira/escolhe ator selecionaria um verbo por baixo -- regressao. Na ABERTURA
 // (is_intro()) o bloco #combat inteiro (pills inclusos) nem existe no DOM -- o id nunca
 // bateria mesmo sem a guarda, mas ela fica explicita por clareza/defesa-em-profundidade.
-// COCKPIT-SFX-HOVER-CLIQUE: devolve true SE o clique de fato ACIONOU um pill de verbo
-// valido (id resolvido + estado que aceita clique de pill) - o callback do glintfx usa
-// isso pra tocar o SFX de clique SO quando uma pill foi acionada (nunca em id de outro
-// elemento do cockpit nem durante mira/escolha-de-ator/abertura). false = no-op.
-bool battle_cockpit_verb_click(BattleScene& scene, const char* element_id) {
+// COCKPIT-SFX-HOVER-CLIQUE / SFX-COCKPIT-AJUSTES: ver o contrato do retorno no header.
+BattleClickOutcome battle_cockpit_verb_click(BattleScene& scene, const char* element_id) {
     if (scene.is_choosing_actor() || scene.is_aiming() || scene.is_intro()) {
-        return false;
+        return BattleClickOutcome::None;
     }
     const int idx = gus::app::screens::cockpit_verb_index_for_click_id(element_id);
     if (idx < 0) {
-        return false;  // id de outro elemento do cockpit (#combat/#vitals/#log/...) ou "" -> NO-OP
+        // id de outro elemento do cockpit (#combat/#vitals/#log/...) ou "" -> NO-OP
+        return BattleClickOutcome::None;
     }
+    // O verbo do PILL CLICADO - lido ANTES do menu_move, e pelo indice do pill (nao por
+    // selected_enabled() depois do move). Motivo: menu_move e' NO-OP fora do turno do
+    // jogador, entao "ler a selecao depois de mover" devolveria a habilitacao do verbo
+    // ERRADO justamente nos estados em que o move nao pegou.
+    const BattleVerb verb = static_cast<BattleVerb>(idx);
+    const bool enabled = scene.menu().is_enabled(verb);
     // Clique = SELECIONA e CONFIRMA. menu_move (delta ate o indice) + menu_confirm; ambos
     // ja sao NO-OP fora do turno do jogador (mesma guarda do teclado) -> seguro em turno
     // de inimigo/combate acabado. menu_move faz WRAP, mas o delta idx-sel (ambos 0..5) cai
     // exato no indice. menu_confirm respeita 'enabled' (verbo sem AP: seleciona, nao aciona).
     scene.menu_move(idx - scene.menu().selected_index());
     scene.menu_confirm();
-    return true;  // acionou um pill de verbo -> o chamador pode tocar o SFX de clique
+    // SFX-COCKPIT-AJUSTES (decisao do lider 2026-08-06): sem AP o menu_confirm acima e' um
+    // no-op declarado, e ate aqui saia o blip de CONFIRMACAO - o jogador ouvia que a acao
+    // aconteceu. Agora sai o som de RECUSA, o MESMO que o teclado passa a tocar.
+    return enabled ? BattleClickOutcome::Activated : BattleClickOutcome::Blocked;
 }
 
 // ADR-010 / Incremento A2 (MOUSE), revisado GLINTFX-CLICK: hit-tests de MUNDO/ARENA
@@ -222,39 +229,46 @@ int battle_digit_for_key(SDL_Keycode key) noexcept {
     }
 }
 
-// SFX-COCKPIT: ver o contrato completo (o que soa e o que NAO soa, com o porque de cada
-// exclusao) no header. ESPELHO EXATO da cadeia de decisao de battle_key_down abaixo - se
-// aquela mudar, esta muda junto, senao o som passa a mentir sobre a acao. Por isso as
-// duas vivem no MESMO arquivo, coladas.
-bool battle_key_activates_button(const BattleScene& scene, SDL_Keycode key) noexcept {
+// SFX-COCKPIT: ver o contrato completo (que blip sai em cada caso, com o porque) no
+// header. ESPELHO EXATO da cadeia de decisao de battle_key_down abaixo - se aquela mudar,
+// esta muda junto, senao o som passa a mentir sobre a acao. Por isso as duas vivem no
+// MESMO arquivo, coladas.
+//
+// SFX-COCKPIT-AJUSTES: a REGRA em si (que som cada situacao merece) nao mora aqui - mora
+// em battle_confirm_outcome (battle_ui_sfx.hpp), funcao PURA testavel sem cena. Esta aqui
+// e' so a COMPOSICAO "le a cena -> aplica a regra", o que impede a regra de divergir entre
+// o canal teclado e o do mouse.
+BattleClickOutcome battle_key_click_outcome(const BattleScene& scene,
+                                            SDL_Keycode key) noexcept {
     // TECLAS-ATALHO NUMERICAS: mesma PRIORIDADE mira > picker de battle_key_down, e o
     // MESMO criterio de faixa que aim_hotkey/actor_picker_hotkey usam internamente pra
     // decidir agir ou virar no-op (nth e' 1-based). Fora de faixa nada acontece, entao
-    // nada soa.
+    // nada soa - nem clique, nem bloqueado (nao ha botao nenhum ali pra recusar).
     if (const int nth = battle_digit_for_key(key); nth != 0) {
         if (scene.is_aiming()) {
-            return nth <= scene.aim_count();
+            return nth <= scene.aim_count() ? BattleClickOutcome::Activated
+                                            : BattleClickOutcome::None;
         }
         if (scene.is_choosing_actor()) {
-            return nth <= scene.actor_pick_count();
+            return nth <= scene.actor_pick_count() ? BattleClickOutcome::Activated
+                                                   : BattleClickOutcome::None;
         }
-        return false;
+        return BattleClickOutcome::None;
     }
     switch (key) {
         case SDLK_RETURN:
         case SDLK_KP_ENTER:
         case SDLK_SPACE:
-            if (scene.is_intro()) {
-                return false;  // "Encarar" na abertura: banner, nao botao (ver header)
-            }
-            if (scene.is_choosing_actor() || scene.is_aiming()) {
-                return true;  // confirma o membro / confirma o alvo
-            }
-            // Vez do jogador -> menu_confirm (aciona o verbo). Fora dela -> skip()
-            // (acelerar o ritmo), que NAO e botao e por isso nao soa.
-            return scene.waiting_player_input();
+            // As 3 leituras que a regra pede, e nenhuma a mais. `battle_focus_of` ja e' a
+            // fonte UNICA de "que superficie esta interativa" (compartilhada com o som de
+            // hover), entao aqui nao ha copia da cadeia is_choosing_actor/is_aiming/
+            // waiting_player_input que pudesse divergir dela em silencio. Fora da vez do
+            // jogador a superficie e' None -> Enter cai em skip() e a regra devolve None.
+            return battle_confirm_outcome(scene.is_intro(), battle_focus_of(scene).surface,
+                                          scene.menu().selected_enabled());
         default:
-            return false;  // Esc (cancela), setas (navegam, som de HOVER), Q, resto
+            // Esc (cancela), setas (navegam, som de HOVER), Q, resto.
+            return BattleClickOutcome::None;
     }
 }
 

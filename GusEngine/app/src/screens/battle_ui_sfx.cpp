@@ -59,12 +59,55 @@ bool battle_focus_entered_new_item(const BattleFocus& before,
     return before != after;
 }
 
+// SFX-COCKPIT-AJUSTES (decisao do lider, 2026-08-06). A tabela inteira, em 4 linhas:
+//   abertura ("Encarar")            -> Opening   (timbre em kBattleOpeningSfxSlot)
+//   picker de ator / mira           -> Activated (o alvo/membro existe: confirmar aciona)
+//   menu de verbos, verbo COM AP    -> Activated
+//   menu de verbos, verbo SEM AP    -> Blocked   <- a mudanca: antes saia o CLIQUE normal,
+//       ou seja, o jogador ouvia a confirmacao de uma acao que menu_confirm() recusou
+//       (battle_scene.cpp: "verbo sem AP: confirm e no-op").
+//   nada realcado (turno do inimigo, acao em voo, combate acabado) -> None (Enter cai em
+//       skip(), que ACELERA o ritmo e nao e' botao).
+BattleClickOutcome battle_confirm_outcome(bool is_intro, BattleFocusSurface surface,
+                                          bool selected_enabled) noexcept {
+    if (is_intro) {
+        // DOMINA de proposito: na abertura battle_focus_of devolve None (ninguem navega),
+        // entao sem esta guarda o "Encarar" cairia no ramo mudo la embaixo.
+        return BattleClickOutcome::Opening;
+    }
+    switch (surface) {
+        case BattleFocusSurface::VerbMenu:
+            return selected_enabled ? BattleClickOutcome::Activated
+                                    : BattleClickOutcome::Blocked;
+        case BattleFocusSurface::Aiming:
+        case BattleFocusSurface::ActorPicker:
+            // Estas 2 superficies nao tem item "desabilitado": o cursor so pousa em
+            // candidato vivo/elegivel (aim_target/actor_pick_target ja filtram). Se um dia
+            // tiverem, o `selected_enabled` daqui passa a valer pra elas tambem.
+            return BattleClickOutcome::Activated;
+        case BattleFocusSurface::None:
+            return BattleClickOutcome::None;
+    }
+    return BattleClickOutcome::None;
+}
+
 void BattleUiSfx::bind(gus::platform::audio::AudioEngine* audio,
                        gus::platform::audio::SoundId hover_sfx,
-                       gus::platform::audio::SoundId click_sfx) noexcept {
+                       gus::platform::audio::SoundId click_sfx,
+                       gus::platform::audio::SoundId blocked_sfx) noexcept {
     audio_ = audio;
     hover_sfx_ = hover_sfx;
     click_sfx_ = click_sfx;
+    blocked_sfx_ = blocked_sfx;
+}
+
+gus::platform::audio::SoundId BattleUiSfx::sound_of(BattleUiSfxSlot slot) const noexcept {
+    switch (slot) {
+        case BattleUiSfxSlot::Hover: return hover_sfx_;
+        case BattleUiSfxSlot::Click: return click_sfx_;
+        case BattleUiSfxSlot::Blocked: return blocked_sfx_;
+    }
+    return gus::platform::audio::kInvalidSound;
 }
 
 bool BattleUiSfx::play_(gus::platform::audio::SoundId id) {
@@ -99,5 +142,19 @@ bool BattleUiSfx::on_pill_motion(float mouse_x, float mouse_y, const UiHoverBox*
 void BattleUiSfx::reset_pill_hover() noexcept { hovered_pill_ = -1; }
 
 bool BattleUiSfx::play_click() { return play_(click_sfx_); }
+
+bool BattleUiSfx::play_slot(BattleUiSfxSlot slot) { return play_(sound_of(slot)); }
+
+bool BattleUiSfx::play_outcome(BattleClickOutcome outcome) {
+    switch (outcome) {
+        case BattleClickOutcome::Activated: return play_slot(BattleUiSfxSlot::Click);
+        case BattleClickOutcome::Blocked: return play_slot(BattleUiSfxSlot::Blocked);
+        // O timbre da ABERTURA e' um DADO (kBattleOpeningSfxSlot, ver o header): o lider
+        // troca aquela constante e nada aqui muda.
+        case BattleClickOutcome::Opening: return play_slot(kBattleOpeningSfxSlot);
+        case BattleClickOutcome::None: return false;
+    }
+    return false;
+}
 
 }  // namespace gus::app::screens

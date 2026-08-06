@@ -114,13 +114,18 @@ private:
 //   1 = SFX de HIT (resolve_hit_sfx_path)
 //   2 = blip de HOVER de UI (kMenuHoverSfxFile)
 //   3 = blip de CLIQUE de UI (kMenuClickSfxFile)
+//   4 = blip de BLOQUEADO de UI (kMenuBlockedSfxFile) - SFX-COCKPIT-AJUSTES, 2026-08-06
 // O engine e' construido PELO TESTE e passado como external_audio, entao nada mais e'
 // carregado nele antes. Se alguem inserir um load_sfx novo antes desses, estes testes
 // falham ALTO (e o conserto e' 1 linha aqui) - preferivel a um teste que so conta plays
 // e nao sabe QUAL blip tocou, que e' o que deixaria "tocou o som errado" passar.
+//
+// O 4o entrou no FIM do enter() de proposito, justamente pra NAO deslocar os 3 ids acima:
+// ZERO destes casos precisou de ajuste por causa dele.
 constexpr gus::platform::audio::SoundId kHitSfxId = 1;
 constexpr gus::platform::audio::SoundId kUiHoverSfxId = 2;
 constexpr gus::platform::audio::SoundId kUiClickSfxId = 3;
+constexpr gus::platform::audio::SoundId kUiBlockedSfxId = 4;
 
 void push_key_down(SDL_Keycode key) {
     SDL_Event ev{};
@@ -334,6 +339,31 @@ TEST_CASE("battle_preview (harness headless, SFX-COCKPIT): a tecla que NAO naveg
     // O unico som da sessao foi o HIT que o proprio setup (skip+update ate a vez do
     // jogador) disparou - nenhum blip de UI entrou depois dele.
     REQUIRE(audio.last_sfx_id() == kHitSfxId);
+}
+
+TEST_CASE("battle_preview (harness headless, SFX-COCKPIT-AJUSTES): a ABERTURA soa no HOST "
+          "REAL - o Enter que 'Encara' toca 1 blip (decisao do lider 2026-08-06; a fatia "
+          "anterior deixava a intro MUDA de proposito)",
+          "[battle_preview_interaction][gl][sfx-cockpit]") {
+    GlTestEnv env = try_boot_gl();
+    if (!env.ok) {
+        INFO("GL/display indisponivel - harness pulado (rode com Xvfb :99).");
+        return;
+    }
+    // SEM GUSWORLD_BATTLE_AIM de proposito: e' o UNICO caso desta suite que precisa da
+    // cena PARADA na abertura ("BATALHA!"), que e' justamente o estado que aquele env
+    // atravessa. Consequencia util: sem o assentamento, o setup nao bombeia turno de
+    // inimigo nenhum, entao nao ha SFX de hit competindo pela contagem.
+    push_key_down(SDLK_RETURN);  // Encarar
+    push_quit();
+
+    gus::platform::audio::AudioEngine audio(/*device_active=*/false);
+    REQUIRE(input_sfx_plays(audio, env.window) == 1u);
+    // O timbre de HOJE = kBattleOpeningSfxSlot == BattleUiSfxSlot::Click (battle_ui_sfx.hpp).
+    // Quando o lider escolher o som definitivo da abertura, ESTA linha muda junto com
+    // aquela constante - de proposito, pra a troca de timbre nao passar despercebida.
+    REQUIRE(audio.last_sfx_id() == kUiClickSfxId);
+    REQUIRE(audio.last_sfx_id() != kUiBlockedSfxId);
 }
 
 TEST_CASE("battle_preview (harness headless, SFX-COCKPIT): superficie PILLS DE VERBO / "

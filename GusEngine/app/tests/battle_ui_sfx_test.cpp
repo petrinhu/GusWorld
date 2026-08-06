@@ -32,20 +32,25 @@
 #include <catch2/catch_test_macros.hpp>
 
 #include "gus/app/screens/battle_assets.hpp"  // resolve_ui_sfx_path (mesmo do host)
+#include "gus/app/screens/battle_cockpit_verb_ids.hpp"  // kCockpitVerbElementIds
 #include "gus/app/screens/battle_input.hpp"
 #include "gus/app/screens/battle_menu.hpp"
 #include "gus/app/screens/battle_scene.hpp"
 #include "gus/app/screens/battle_ui_sfx.hpp"
 #include "gus/platform/audio/audio_engine.hpp"
 
+using gus::app::screens::battle_confirm_outcome;
 using gus::app::screens::battle_focus_entered_new_item;
 using gus::app::screens::battle_focus_of;
-using gus::app::screens::battle_key_activates_button;
+using gus::app::screens::battle_key_click_outcome;
+using gus::app::screens::BattleClickOutcome;
 using gus::app::screens::BattleFocus;
 using gus::app::screens::BattleFocusSurface;
 using gus::app::screens::BattleScene;
 using gus::app::screens::BattleUiSfx;
+using gus::app::screens::BattleUiSfxSlot;
 using gus::app::screens::BattleVerb;
+using gus::app::screens::kBattleOpeningSfxSlot;
 using gus::app::screens::UiHoverBox;
 using gus::platform::audio::AudioEngine;
 using gus::platform::audio::kInvalidSound;
@@ -105,6 +110,7 @@ struct SfxHarness {
     AudioEngine audio{/*device_active=*/false};  // null-device: sem hardware no CI
     SoundId hover = kInvalidSound;
     SoundId click = kInvalidSound;
+    SoundId blocked = kInvalidSound;  // SFX-COCKPIT-AJUSTES: som de RECUSA (verbo sem AP)
     BattleUiSfx sfx;
 
     SfxHarness() {
@@ -114,14 +120,18 @@ struct SfxHarness {
         click = audio.load_sfx(gus::app::screens::resolve_ui_sfx_path(
                                    gus::core::assets::kMenuClickSfxFile)
                                    .c_str());
-        sfx.bind(&audio, hover, click);
+        blocked = audio.load_sfx(gus::app::screens::resolve_ui_sfx_path(
+                                     gus::core::assets::kMenuBlockedSfxFile)
+                                     .c_str());
+        sfx.bind(&audio, hover, click, blocked);
     }
 
     [[nodiscard]] unsigned int plays() const { return audio.sfx_play_count(); }
     // Pre-condicao do harness: se os wavs nao abriram, TODA assercao de contagem viraria
     // 0 == 0 e o teste passaria sem provar nada (falso verde). Checar explicitamente.
     [[nodiscard]] bool loaded() const {
-        return hover != kInvalidSound && click != kInvalidSound;
+        return hover != kInvalidSound && click != kInvalidSound &&
+               blocked != kInvalidSound;
     }
 };
 
@@ -131,12 +141,10 @@ struct SfxHarness {
 // FIACAO equivalente no host e' provada em battle_preview_interaction_test.cpp.
 void route_key(BattleScene& scene, BattleUiSfx& sfx, SDL_Keycode key) {
     bool running = true;
-    const bool activated = battle_key_activates_button(scene, key);
+    const BattleClickOutcome outcome = battle_key_click_outcome(scene, key);
     const BattleFocus before = battle_focus_of(scene);
     gus::app::screens::battle_key_down(scene, key, running);
-    if (activated) {
-        sfx.play_click();
-    }
+    sfx.play_outcome(outcome);
     sfx.on_focus_change(before, battle_focus_of(scene));
 }
 
@@ -173,13 +181,23 @@ float pill_cy(int i) { return 110.0f + 20.0f * static_cast<float>(i); }
 // (0) PRE-CONDICAO DO HARNESS - sem isto, todo o resto vira 0 == 0 (falso verde)
 // =====================================================================================
 
-TEST_CASE("battle_ui_sfx: o harness carrega os 2 blips REAIS do cockpit (mesmos wavs dos "
-          "6 menus) - sem isto toda contagem abaixo seria 0==0, um falso verde",
+TEST_CASE("battle_ui_sfx: o harness carrega os 3 blips REAIS do cockpit (mesmos wavs dos "
+          "6 menus, ZERO asset novo) - sem isto toda contagem abaixo seria 0==0, um falso "
+          "verde",
           "[battle_ui_sfx][sfx-cockpit]") {
     SfxHarness h;
     REQUIRE(h.audio.available());
     REQUIRE(h.loaded());
     REQUIRE(h.plays() == 0u);  // carregar NAO toca
+    // Os 3 SoundId sao DISTINTOS - senao "tocou o blip certo" seria indistinguivel de
+    // "tocou qualquer um", e todo REQUIRE de last_sfx_id() abaixo viraria enfeite.
+    REQUIRE(h.hover != h.click);
+    REQUIRE(h.click != h.blocked);
+    REQUIRE(h.hover != h.blocked);
+    // E o modulo mapeia cada slot ao id que o harness carregou (prova a fiacao do bind).
+    REQUIRE(h.sfx.sound_of(BattleUiSfxSlot::Hover) == h.hover);
+    REQUIRE(h.sfx.sound_of(BattleUiSfxSlot::Click) == h.click);
+    REQUIRE(h.sfx.sound_of(BattleUiSfxSlot::Blocked) == h.blocked);
 }
 
 // =====================================================================================
@@ -281,73 +299,139 @@ TEST_CASE("battle_focus_entered_new_item: superficie aberta mas SEM item realcad
 }
 
 // =====================================================================================
-// (3) battle_key_activates_button - a REGRA do blip de clique no TECLADO
+// (2b) battle_confirm_outcome - a REGRA de "que blip merece um confirmar", ENUMERADA
+//
+// SFX-COCKPIT-AJUSTES: as 2 decisoes do lider de 2026-08-06 vivem AQUI, numa funcao pura
+// de 3 argumentos. O espaco e' pequeno e FECHADO (2 x 4 x 2 = 16), entao ele e' ENUMERADO
+// inteiro em vez de amostrado - busca dirigida acha o que a gente ja suspeita, enumeracao
+// acha o que a gente nao sabia que devia suspeitar.
 // =====================================================================================
 
-TEST_CASE("battle_key_activates_button: Enter/Espaco CONFIRMANDO nas 3 superficies aciona "
+TEST_CASE("battle_confirm_outcome: as 16 combinacoes (intro x 4 superficies x habilitado) "
+          "- a tabela INTEIRA da decisao do lider, sem amostragem",
+          "[battle_ui_sfx][sfx-cockpit]") {
+    const BattleFocusSurface surfaces[] = {
+        BattleFocusSurface::None, BattleFocusSurface::ActorPicker,
+        BattleFocusSurface::Aiming, BattleFocusSurface::VerbMenu};
+
+    // (a) ABERTURA: DOMINA as 4 superficies e os 2 valores de habilitacao. 8 casos.
+    for (const BattleFocusSurface s : surfaces) {
+        for (const bool enabled : {true, false}) {
+            INFO("intro=true surface=" << static_cast<int>(s) << " enabled=" << enabled);
+            REQUIRE(battle_confirm_outcome(true, s, enabled) == BattleClickOutcome::Opening);
+        }
+    }
+
+    // (b) FORA da abertura, os 8 restantes, um a um.
+    REQUIRE(battle_confirm_outcome(false, BattleFocusSurface::None, true) ==
+            BattleClickOutcome::None);
+    REQUIRE(battle_confirm_outcome(false, BattleFocusSurface::None, false) ==
+            BattleClickOutcome::None);
+    REQUIRE(battle_confirm_outcome(false, BattleFocusSurface::ActorPicker, true) ==
+            BattleClickOutcome::Activated);
+    REQUIRE(battle_confirm_outcome(false, BattleFocusSurface::ActorPicker, false) ==
+            BattleClickOutcome::Activated);  // picker nao tem item desabilitado
+    REQUIRE(battle_confirm_outcome(false, BattleFocusSurface::Aiming, true) ==
+            BattleClickOutcome::Activated);
+    REQUIRE(battle_confirm_outcome(false, BattleFocusSurface::Aiming, false) ==
+            BattleClickOutcome::Activated);  // idem mira
+    REQUIRE(battle_confirm_outcome(false, BattleFocusSurface::VerbMenu, true) ==
+            BattleClickOutcome::Activated);
+    // ***A MUDANCA*** (decisao do lider 2026-08-06): verbo SEM AP nao devolve mais o
+    // clique de confirmacao.
+    REQUIRE(battle_confirm_outcome(false, BattleFocusSurface::VerbMenu, false) ==
+            BattleClickOutcome::Blocked);
+}
+
+TEST_CASE("battle_confirm_outcome: 'sem AP' e 'nada realcado' sao respostas DIFERENTES - "
+          "recusar um botao (som grave) nao e o mesmo que nao ter botao (silencio)",
+          "[battle_ui_sfx][sfx-cockpit]") {
+    REQUIRE(battle_confirm_outcome(false, BattleFocusSurface::VerbMenu, false) !=
+            battle_confirm_outcome(false, BattleFocusSurface::None, false));
+}
+
+// =====================================================================================
+// (3) battle_key_click_outcome - a REGRA do blip de clique no TECLADO
+// =====================================================================================
+
+TEST_CASE("battle_key_click_outcome: Enter/Espaco CONFIRMANDO nas 3 superficies aciona "
           "botao (picker, mira, menu de verbos)",
           "[battle_ui_sfx][sfx-cockpit]") {
     SECTION("picker de ator") {
         BattleScene scene;
         pump_to_actor_picker(scene);
         REQUIRE(scene.is_choosing_actor());
-        REQUIRE(battle_key_activates_button(scene, SDLK_RETURN));
-        REQUIRE(battle_key_activates_button(scene, SDLK_SPACE));
-        REQUIRE(battle_key_activates_button(scene, SDLK_KP_ENTER));
+        REQUIRE(battle_key_click_outcome(scene, SDLK_RETURN) == BattleClickOutcome::Activated);
+        REQUIRE(battle_key_click_outcome(scene, SDLK_SPACE) == BattleClickOutcome::Activated);
+        REQUIRE(battle_key_click_outcome(scene, SDLK_KP_ENTER) ==
+                BattleClickOutcome::Activated);
     }
     SECTION("menu de verbos") {
         BattleScene scene;
         pump_to_verb_menu(scene);
         REQUIRE(scene.waiting_player_input());
-        REQUIRE(battle_key_activates_button(scene, SDLK_RETURN));
+        // Pre-condicao HONESTA deste caso: no encontro de demo o ator ativo tem AP de
+        // sobra, entao TODOS os 6 verbos estao habilitados. Sem esta linha, o teste
+        // passaria por Activated sem provar que a habilitacao foi consultada.
+        REQUIRE(scene.menu().selected_enabled());
+        REQUIRE(battle_key_click_outcome(scene, SDLK_RETURN) == BattleClickOutcome::Activated);
     }
     SECTION("mira") {
         BattleScene scene;
         pump_to_aiming(scene);
         REQUIRE(scene.is_aiming());
-        REQUIRE(battle_key_activates_button(scene, SDLK_RETURN));
+        REQUIRE(battle_key_click_outcome(scene, SDLK_RETURN) == BattleClickOutcome::Activated);
     }
 }
 
-TEST_CASE("battle_key_activates_button: NAVEGAR nao e acionar - setas/W/S nunca contam "
+TEST_CASE("battle_key_click_outcome: NAVEGAR nao e acionar - setas/W/S nunca contam "
           "como clique (elas tem o som de HOVER, nao o de clique)",
           "[battle_ui_sfx][sfx-cockpit]") {
     BattleScene scene;
     pump_to_verb_menu(scene);
     for (const SDL_Keycode k : {SDLK_UP, SDLK_DOWN, SDLK_LEFT, SDLK_RIGHT, SDLK_W, SDLK_S}) {
-        REQUIRE_FALSE(battle_key_activates_button(scene, k));
+        REQUIRE(battle_key_click_outcome(scene, k) == BattleClickOutcome::None);
     }
 }
 
-TEST_CASE("battle_key_activates_button: Esc (cancela/desempilha) e Q (auto-resolve) nao "
-          "acionam botao",
+TEST_CASE("battle_key_click_outcome: Esc (cancela/desempilha) e Q (auto-resolve) nao "
+          "acionam botao - MANTIDOS mudos por decisao do lider (2026-08-06)",
           "[battle_ui_sfx][sfx-cockpit]") {
     BattleScene scene;
     pump_to_aiming(scene);
-    REQUIRE_FALSE(battle_key_activates_button(scene, SDLK_ESCAPE));
-    REQUIRE_FALSE(battle_key_activates_button(scene, SDLK_Q));
+    REQUIRE(battle_key_click_outcome(scene, SDLK_ESCAPE) == BattleClickOutcome::None);
+    REQUIRE(battle_key_click_outcome(scene, SDLK_Q) == BattleClickOutcome::None);
 }
 
-TEST_CASE("battle_key_activates_button: ABERTURA (Encarar) NAO soa - banner de tela "
-          "cheia, nao menu com botoes (decisao desta fatia, pendente do lider)",
+TEST_CASE("battle_key_click_outcome: ABERTURA (Encarar) SOA - decisao do lider 2026-08-06 "
+          "(a fatia anterior a deixou muda de proposito; ele mandou dar som)",
           "[battle_ui_sfx][sfx-cockpit]") {
     BattleScene scene;
     REQUIRE(scene.is_intro());
-    REQUIRE_FALSE(battle_key_activates_button(scene, SDLK_RETURN));
-    REQUIRE_FALSE(battle_key_activates_button(scene, SDLK_SPACE));
+    REQUIRE(battle_key_click_outcome(scene, SDLK_RETURN) == BattleClickOutcome::Opening);
+    REQUIRE(battle_key_click_outcome(scene, SDLK_SPACE) == BattleClickOutcome::Opening);
+    REQUIRE(battle_key_click_outcome(scene, SDLK_KP_ENTER) == BattleClickOutcome::Opening);
+    // Opening e' um caso PROPRIO, nao um apelido de Activated: o timbre dele e' o unico do
+    // cockpit que e' escolha aberta do lider (kBattleOpeningSfxSlot).
+    REQUIRE(BattleClickOutcome::Opening != BattleClickOutcome::Activated);
+    // E a abertura segue sem hover/navegacao: so o Enter/Espaco fala com ela.
+    REQUIRE(battle_key_click_outcome(scene, SDLK_DOWN) == BattleClickOutcome::None);
+    REQUIRE(battle_key_click_outcome(scene, SDLK_ESCAPE) == BattleClickOutcome::None);
+    REQUIRE(battle_key_click_outcome(scene, SDLK_1) == BattleClickOutcome::None);
 }
 
-TEST_CASE("battle_key_activates_button: atalho numerico SO soa quando ha candidato - o "
+TEST_CASE("battle_key_click_outcome: atalho numerico SO soa quando ha candidato - o "
           "roteamento e' no-op fora de faixa, entao o som seria mentira",
           "[battle_ui_sfx][sfx-cockpit]") {
     SECTION("mira: 2 inimigos vivos no encontro de demo") {
         BattleScene scene;
         pump_to_aiming(scene);
         REQUIRE(scene.aim_count() == 2);
-        REQUIRE(battle_key_activates_button(scene, SDLK_1));
-        REQUIRE(battle_key_activates_button(scene, SDLK_2));
-        REQUIRE_FALSE(battle_key_activates_button(scene, SDLK_3));  // fora de faixa
-        REQUIRE_FALSE(battle_key_activates_button(scene, SDLK_9));
+        REQUIRE(battle_key_click_outcome(scene, SDLK_1) == BattleClickOutcome::Activated);
+        REQUIRE(battle_key_click_outcome(scene, SDLK_2) == BattleClickOutcome::Activated);
+        // Fora de faixa: MUDO, e nao "bloqueado" - nao ha botao ali pra recusar.
+        REQUIRE(battle_key_click_outcome(scene, SDLK_3) == BattleClickOutcome::None);
+        REQUIRE(battle_key_click_outcome(scene, SDLK_9) == BattleClickOutcome::None);
     }
     SECTION("picker: N elegiveis, N+1 nao existe") {
         BattleScene scene;
@@ -355,14 +439,14 @@ TEST_CASE("battle_key_activates_button: atalho numerico SO soa quando ha candida
         const int n = scene.actor_pick_count();
         REQUIRE(n >= 1);
         REQUIRE(n <= 8);  // o encontro de demo tem 3 na party - nunca chega a 9
-        REQUIRE(battle_key_activates_button(scene, SDLK_1));
-        REQUIRE_FALSE(battle_key_activates_button(
-            scene, static_cast<SDL_Keycode>(SDLK_1 + n)));  // o (n+1)-esimo nao existe
+        REQUIRE(battle_key_click_outcome(scene, SDLK_1) == BattleClickOutcome::Activated);
+        REQUIRE(battle_key_click_outcome(scene, static_cast<SDL_Keycode>(SDLK_1 + n)) ==
+                BattleClickOutcome::None);  // o (n+1)-esimo nao existe
     }
     SECTION("fora dos 2 modos, digito nao aciona nada") {
         BattleScene scene;
         pump_to_verb_menu(scene);
-        REQUIRE_FALSE(battle_key_activates_button(scene, SDLK_1));
+        REQUIRE(battle_key_click_outcome(scene, SDLK_1) == BattleClickOutcome::None);
     }
 }
 
@@ -458,6 +542,43 @@ TEST_CASE("BattleUiSfx: hover e clique usam SoundId DIFERENTES - o blip certo em
     REQUIRE(h.audio.last_sfx_id() == h.click);
 }
 
+TEST_CASE("BattleUiSfx: play_outcome traduz os 4 resultados em 3 blips + silencio - a "
+          "tabela do lider chegando ao alto-falante",
+          "[battle_ui_sfx][sfx-cockpit]") {
+    SECTION("Activated -> CLIQUE") {
+        SfxHarness h;
+        REQUIRE(h.loaded());
+        REQUIRE(h.sfx.play_outcome(BattleClickOutcome::Activated));
+        REQUIRE(h.plays() == 1u);
+        REQUIRE(h.audio.last_sfx_id() == h.click);
+    }
+    SECTION("Blocked -> BLOQUEADO (nao o clique: era exatamente esse o defeito)") {
+        SfxHarness h;
+        REQUIRE(h.loaded());
+        REQUIRE(h.sfx.play_outcome(BattleClickOutcome::Blocked));
+        REQUIRE(h.plays() == 1u);
+        REQUIRE(h.audio.last_sfx_id() == h.blocked);
+        REQUIRE(h.audio.last_sfx_id() != h.click);
+    }
+    SECTION("Opening -> o slot escolhido em kBattleOpeningSfxSlot") {
+        SfxHarness h;
+        REQUIRE(h.loaded());
+        REQUIRE(h.sfx.play_outcome(BattleClickOutcome::Opening));
+        REQUIRE(h.plays() == 1u);
+        REQUIRE(h.audio.last_sfx_id() == h.sfx.sound_of(kBattleOpeningSfxSlot));
+        // ANCORA CONCRETA do timbre de HOJE. Quando o lider escolher outro som pra
+        // abertura, ESTA e' a linha que muda junto com a constante - de proposito: um
+        // teste que so compara com a propria constante nao provaria nada.
+        REQUIRE(h.audio.last_sfx_id() == h.click);
+    }
+    SECTION("None -> silencio") {
+        SfxHarness h;
+        REQUIRE(h.loaded());
+        REQUIRE_FALSE(h.sfx.play_outcome(BattleClickOutcome::None));
+        REQUIRE(h.plays() == 0u);
+    }
+}
+
 TEST_CASE("BattleUiSfx: degrada MUDO (nunca crasha) sem engine ou com blip ausente - o "
           "jogo nao depende de audio pra rodar",
           "[battle_ui_sfx][sfx-cockpit]") {
@@ -465,15 +586,32 @@ TEST_CASE("BattleUiSfx: degrada MUDO (nunca crasha) sem engine ou com blip ausen
         gus::app::screens::BattleUiSfx sfx;
         int a = 0, b = 0;
         REQUIRE_FALSE(sfx.play_click());
+        REQUIRE_FALSE(sfx.play_outcome(BattleClickOutcome::Blocked));
+        REQUIRE_FALSE(sfx.play_outcome(BattleClickOutcome::Opening));
         REQUIRE_FALSE(sfx.on_focus_change(BattleFocus{BattleFocusSurface::Aiming, -1, &a},
                                           BattleFocus{BattleFocusSurface::Aiming, -1, &b}));
     }
     SECTION("engine ok mas wav ausente (SoundId invalido)") {
         AudioEngine audio(/*device_active=*/false);
         gus::app::screens::BattleUiSfx sfx;
-        sfx.bind(&audio, kInvalidSound, kInvalidSound);
+        sfx.bind(&audio, kInvalidSound, kInvalidSound, kInvalidSound);
         REQUIRE_FALSE(sfx.play_click());
+        REQUIRE_FALSE(sfx.play_outcome(BattleClickOutcome::Blocked));
+        REQUIRE_FALSE(sfx.play_outcome(BattleClickOutcome::Opening));
         REQUIRE(audio.sfx_play_count() == 0u);
+    }
+    SECTION("o blip de BLOQUEADO some do disco, os outros 2 seguem - so ele emudece") {
+        // Degradacao PARCIAL: o asset novo desta fatia (kMenuBlockedSfxFile) e' o unico
+        // que pode faltar sem o resto faltar junto. O jogo nao pode ficar mudo por causa
+        // dele nem, pior, cair no clique de confirmacao como consolo.
+        SfxHarness h;
+        REQUIRE(h.loaded());
+        gus::app::screens::BattleUiSfx sfx;
+        sfx.bind(&h.audio, h.hover, h.click, kInvalidSound);
+        REQUIRE_FALSE(sfx.play_outcome(BattleClickOutcome::Blocked));
+        REQUIRE(h.plays() == 0u);
+        REQUIRE(sfx.play_outcome(BattleClickOutcome::Activated));
+        REQUIRE(h.audio.last_sfx_id() == h.click);
     }
 }
 
@@ -685,8 +823,8 @@ TEST_CASE("SFX-COCKPIT superficie MENU DE VERBOS / canal TECLADO: Enter aciona o
     REQUIRE(h.audio.last_sfx_id() == h.click);
 }
 
-TEST_CASE("SFX-COCKPIT: ABERTURA e' MUDA - Enter que 'Encara' nao toca blip de UI "
-          "(decisao desta fatia; ver o header de battle_input.hpp)",
+TEST_CASE("SFX-COCKPIT-AJUSTES: a ABERTURA SOA - Enter que 'Encara' toca 1 blip (e SO 1: "
+          "sair da intro e' troca de superficie, que nao soma hover)",
           "[battle_ui_sfx][sfx-cockpit]") {
     SfxHarness h;
     REQUIRE(h.loaded());
@@ -694,7 +832,25 @@ TEST_CASE("SFX-COCKPIT: ABERTURA e' MUDA - Enter que 'Encara' nao toca blip de U
     REQUIRE(scene.is_intro());
     route_key(scene, h.sfx, SDLK_RETURN);
     REQUIRE_FALSE(scene.is_intro());  // encarou de verdade
-    REQUIRE(h.plays() == 0u);
+    REQUIRE(h.plays() == 1u);
+    REQUIRE(h.audio.last_sfx_id() == h.sfx.sound_of(kBattleOpeningSfxSlot));
+    // O timbre de HOJE (ancora concreta - muda junto com kBattleOpeningSfxSlot quando o
+    // lider escolher o som definitivo).
+    REQUIRE(h.audio.last_sfx_id() == h.click);
+}
+
+TEST_CASE("SFX-COCKPIT-AJUSTES: na abertura, so o Enter/Espaco soa - navegar, cancelar e "
+          "digitar seguem MUDOS (o banner nao virou menu)",
+          "[battle_ui_sfx][sfx-cockpit]") {
+    for (const SDL_Keycode k : {SDLK_DOWN, SDLK_UP, SDLK_ESCAPE, SDLK_Q, SDLK_1}) {
+        SfxHarness h;
+        REQUIRE(h.loaded());
+        BattleScene scene;
+        REQUIRE(scene.is_intro());
+        route_key(scene, h.sfx, k);
+        INFO("tecla=" << k);
+        REQUIRE(h.plays() == 0u);
+    }
 }
 
 TEST_CASE("SFX-COCKPIT: ACELERAR o ritmo (Enter fora da vez do jogador) e' MUDO - nao e "
@@ -728,6 +884,106 @@ TEST_CASE("SFX-COCKPIT: Esc CANCELANDO a mira e' MUDO (cancelar nao e acionar, e
     route_key(scene, h.sfx, SDLK_ESCAPE);
     REQUIRE_FALSE(scene.is_aiming());  // cancelou de verdade
     REQUIRE(h.plays() == 0u);
+}
+
+// =====================================================================================
+// (6) SFX-COCKPIT-AJUSTES - o verbo BLOQUEADO, nos 2 canais
+// =====================================================================================
+
+TEST_CASE("SFX-COCKPIT-AJUSTES superficie MENU DE VERBOS / canal MOUSE: o clique no pill "
+          "devolve o MESMO vocabulario do teclado - Activated com AP, e id de outro "
+          "elemento do cockpit segue mudo",
+          "[battle_ui_sfx][sfx-cockpit]") {
+    SfxHarness h;
+    REQUIRE(h.loaded());
+    BattleScene scene;
+    pump_to_verb_menu(scene);
+    REQUIRE(scene.waiting_player_input());
+    REQUIRE(scene.menu().is_enabled(BattleVerb::Atacar));
+
+    // id de OUTRO elemento (nao e' pill de verbo): NO-OP silencioso.
+    REQUIRE(h.sfx.play_outcome(gus::app::screens::battle_cockpit_verb_click(
+                scene, "#vitals")) == false);
+    REQUIRE(h.plays() == 0u);
+
+    const BattleClickOutcome out = gus::app::screens::battle_cockpit_verb_click(
+        scene, gus::app::screens::kCockpitVerbElementIds[static_cast<int>(BattleVerb::Atacar)]);
+    REQUIRE(out == BattleClickOutcome::Activated);
+    REQUIRE(scene.is_aiming());  // acionou de verdade
+    REQUIRE(h.sfx.play_outcome(out));
+    REQUIRE(h.plays() == 1u);
+    REQUIRE(h.audio.last_sfx_id() == h.click);
+}
+
+TEST_CASE("SFX-COCKPIT-AJUSTES: PARIDADE dos 2 canais no menu de verbos - pra CADA um dos "
+          "6 pills, o clique do mouse e o Enter do teclado devolvem o MESMO outcome (e' o "
+          "que impede a regra de recusa de existir so de um lado)",
+          "[battle_ui_sfx][sfx-cockpit]") {
+    for (int v = 0; v < gus::app::screens::kBattleVerbCount; ++v) {
+        // Duas cenas GEMEAS (o clique/Enter muta a cena, entao cada canal precisa da sua).
+        BattleScene por_mouse;
+        BattleScene por_teclado;
+        pump_to_verb_menu(por_mouse);
+        pump_to_verb_menu(por_teclado);
+        REQUIRE(por_mouse.waiting_player_input());
+        REQUIRE(por_teclado.waiting_player_input());
+
+        // Teclado: navega ate o verbo v (as setas ja tem som proprio - de HOVER) e confirma.
+        for (int i = 0; i < gus::app::screens::kBattleVerbCount &&
+                        por_teclado.menu().selected_index() != v;
+             ++i) {
+            por_teclado.menu_move(+1);
+        }
+        REQUIRE(por_teclado.menu().selected_index() == v);
+
+        const BattleClickOutcome do_teclado =
+            battle_key_click_outcome(por_teclado, SDLK_RETURN);
+        const BattleClickOutcome do_mouse = gus::app::screens::battle_cockpit_verb_click(
+            por_mouse, gus::app::screens::kCockpitVerbElementIds[v]);
+        INFO("verbo indice=" << v);
+        REQUIRE(do_mouse == do_teclado);
+    }
+}
+
+TEST_CASE("SFX-COCKPIT-AJUSTES: verbo SEM AP toca o som de RECUSA - alcance HONESTO desta "
+          "prova no encontro de demo",
+          "[battle_ui_sfx][sfx-cockpit]") {
+    // A REGRA em si esta travada, exaustivamente, em battle_confirm_outcome (secao 2b) e
+    // em play_outcome (secao 4): sem AP -> Blocked -> kMenuBlockedSfxFile.
+    //
+    // O QUE ESTE CASO MEDE, e o que ele NAO mede (honestidade de escopo): ele varre o
+    // encontro de DEMO atras de um estado alcancavel com verbo desabilitado. Hoje NAO
+    // existe: todo verbo custa 1 AP (Compilar, 0), o ator ativo sempre comeca o turno com
+    // AP >= 1, e a rodada dele termina em run_active_turn_to_end - logo `enabled` nunca e'
+    // false enquanto o menu esta interativo. A varredura fica aqui de proposito: no dia em
+    // que a economia de AP permitir mais de uma acao por turno, ela ACHA o estado e a
+    // assercao passa a valer sozinha, sem ninguem lembrar de escrever este teste.
+    SfxHarness h;
+    REQUIRE(h.loaded());
+    BattleScene scene;
+    pump_to_verb_menu(scene);
+
+    bool achou_desabilitado = false;
+    for (int v = 0; v < gus::app::screens::kBattleVerbCount; ++v) {
+        const BattleVerb verb = static_cast<BattleVerb>(v);
+        if (scene.menu().is_enabled(verb)) {
+            continue;
+        }
+        achou_desabilitado = true;
+        BattleScene alvo;
+        pump_to_verb_menu(alvo);
+        const BattleClickOutcome out = gus::app::screens::battle_cockpit_verb_click(
+            alvo, gus::app::screens::kCockpitVerbElementIds[v]);
+        REQUIRE(out == BattleClickOutcome::Blocked);
+        REQUIRE(h.sfx.play_outcome(out));
+        REQUIRE(h.audio.last_sfx_id() == h.blocked);
+        break;
+    }
+    if (!achou_desabilitado) {
+        // Nao e' "passou": e' "nao ha o que medir AQUI". A regra segue provada na secao 2b.
+        SUCCEED("encontro de demo nao alcanca verbo sem AP (todos os 6 habilitados no "
+                "menu interativo) - a regra e' provada em battle_confirm_outcome");
+    }
 }
 
 TEST_CASE("SFX-COCKPIT: atalho numerico na mira toca 1 CLIQUE (seleciona E confirma), e "

@@ -277,6 +277,9 @@ private:
     gus::platform::audio::AudioEngine* audio_ptr_ = nullptr;
     gus::platform::audio::SoundId ui_hover_sfx_id_ = gus::platform::audio::kInvalidSound;
     gus::platform::audio::SoundId ui_click_sfx_id_ = gus::platform::audio::kInvalidSound;
+    // SFX-COCKPIT-AJUSTES: blip de RECUSA (verbo sem AP) - kMenuBlockedSfxFile, o mesmo
+    // do card Hardcore bloqueado da tela de dificuldade.
+    gus::platform::audio::SoundId ui_blocked_sfx_id_ = gus::platform::audio::kInvalidSound;
     // SFX-COCKPIT: dono de TODO play_sfx de UI desta tela (hover de pill, hover de foco -
     // mira/picker/menu por teclado -, e clique em qualquer canal). Ver battle_ui_sfx.hpp.
     gus::app::screens::BattleUiSfx ui_sfx_;
@@ -535,17 +538,31 @@ void BattleScreen::enter() {
         resolve_ui_sfx_path(gus::core::assets::kMenuHoverSfxFile);
     const std::string ui_click_sfx_path =
         resolve_ui_sfx_path(gus::core::assets::kMenuClickSfxFile);
+    // SFX-COCKPIT-AJUSTES: 3o blip - o de RECUSA (verbo sem AP), decisao do lider
+    // 2026-08-06. ZERO asset novo: e' o MESMO kMenuBlockedSfxFile (grave/abafado) que a
+    // tela de dificuldade ja toca no card Hardcore bloqueado.
+    //
+    // A ORDEM destes load_sfx e' CONTRATO com app/tests/battle_preview_interaction_test.cpp
+    // (SoundId e' 1-based na ordem de load_sfx): 1=hit, 2=hover, 3=clique, 4=bloqueado. O
+    // novo entra no FIM de proposito - inserir antes deslocaria os 3 ids que aqueles
+    // testes ja comparam contra last_sfx_id().
+    const std::string ui_blocked_sfx_path =
+        resolve_ui_sfx_path(gus::core::assets::kMenuBlockedSfxFile);
     ui_hover_sfx_id_ = audio_ptr_->load_sfx(ui_hover_sfx_path.c_str());
     ui_click_sfx_id_ = audio_ptr_->load_sfx(ui_click_sfx_path.c_str());
+    ui_blocked_sfx_id_ = audio_ptr_->load_sfx(ui_blocked_sfx_path.c_str());
     // SFX-COCKPIT: liga o dono dos blips de UI. Ponteiro NAO-DONO do engine (mesmo padrao
     // de BattleScene::set_audio); daqui pra frente NENHUM play_sfx de UI sai desta casca.
-    ui_sfx_.bind(audio_ptr_, ui_hover_sfx_id_, ui_click_sfx_id_);
+    ui_sfx_.bind(audio_ptr_, ui_hover_sfx_id_, ui_click_sfx_id_, ui_blocked_sfx_id_);
     std::cout << "BattlePreview: [audio] SFX de UI (cockpit) hover "
               << (ui_hover_sfx_id_ != gus::platform::audio::kInvalidSound ? "carregado"
                                                                           : "AUSENTE")
               << " / clique "
               << (ui_click_sfx_id_ != gus::platform::audio::kInvalidSound ? "carregado"
                                                                           : "AUSENTE")
+              << " / bloqueado "
+              << (ui_blocked_sfx_id_ != gus::platform::audio::kInvalidSound ? "carregado"
+                                                                            : "AUSENTE")
               << " (reuso dos blips do menu de sistema)\n";
 
     std::cout << "BattlePreview: [audio] device "
@@ -596,12 +613,11 @@ void BattleScreen::enter() {
     // por referencia + audio_ptr/ui_click_sfx_id por valor).
     if (glintfx_on_ && ui_) {
         // COCKPIT-SFX-HOVER-CLIQUE: o glintfx JA fez o hit-test nativo (o mesmo do
-        // :hover) e devolveu o `id`; aqui so somamos o SFX de CLIQUE quando a pill de
-        // fato ACIONOU um verbo (battle_cockpit_verb_click devolve true).
+        // :hover) e devolveu o `id`; aqui so somamos o SFX que o clique MERECE.
+        // SFX-COCKPIT-AJUSTES: um pill de verbo SEM AP passa a tocar o som de RECUSA em
+        // vez do clique de confirmacao - mesma regra do teclado, mesmo choke-point.
         ui_->set_click_callback([this](const char* element_id) {
-            if (battle_cockpit_verb_click(*scene_, element_id)) {
-                ui_sfx_.play_click();
-            }
+            ui_sfx_.play_outcome(battle_cockpit_verb_click(*scene_, element_id));
         });
     }
 
@@ -889,7 +905,10 @@ void BattleScreen::enter() {
                       << (back == v ? " OK" : " MISMATCH") << "\n";
         }
         if (scene_->waiting_player_input() && !scene_->is_aiming()) {
-            battle_cockpit_verb_click(
+            // SFX-COCKPIT-AJUSTES: este self-test prova o ROTEAMENTO id->verbo, nao o som
+            // - descarta o outcome de proposito (o gemeo do (void) dos self-tests de
+            // mira/picker mais abaixo).
+            (void)battle_cockpit_verb_click(
                 *scene_, gus::app::screens::kCockpitVerbElementIds[static_cast<int>(
                              BattleVerb::Atacar)]);
             std::cout << "  CLIQUE (callback) pill ATACAR -> is_aiming="
@@ -1096,13 +1115,12 @@ void BattleScreen::handle_event_main_(const SDL_Event& ev) {
         //     foi apertada) - depois do roteamento ja e' tarde, o estado mudou.
         //   HOVER: foco ANTES x DEPOIS (mesma receita de save_load_menu_loop.cpp) - pega
         //     setas no menu de verbos, na mira E no picker de uma vez so.
-        const bool activated = battle_key_activates_button(*scene_, ev.key.key);
+        const gus::app::screens::BattleClickOutcome outcome =
+            battle_key_click_outcome(*scene_, ev.key.key);
         const gus::app::screens::BattleFocus focus_before =
             gus::app::screens::battle_focus_of(*scene_);
         battle_key_down(*scene_, ev.key.key, running_);
-        if (activated) {
-            ui_sfx_.play_click();
-        }
+        ui_sfx_.play_outcome(outcome);
         ui_sfx_.on_focus_change(focus_before, gus::app::screens::battle_focus_of(*scene_));
     } else if (ev.type == SDL_EVENT_MOUSE_BUTTON_DOWN && ev.button.button == SDL_BUTTON_LEFT) {
         // MOUSE (A2): clique ESQUERDO aciona verbo (menu) ou alvo (mira). ADITIVO ao
@@ -1546,11 +1564,12 @@ void BattleScreen::tick_main_(float dt) {
 
             const unsigned int click_base = audio_ptr_->sfx_play_count();
             if (scene_->waiting_player_input() && !scene_->is_aiming()) {
-                if (battle_cockpit_verb_click(
-                        *scene_, gus::app::screens::kCockpitVerbElementIds[static_cast<int>(
-                                     BattleVerb::Atacar)])) {
-                    ui_sfx_.play_click();
-                }
+                // MESMO choke-point do callback de producao (play_outcome), pra o
+                // self-test medir o som que o jogador ouviria de verdade - inclusive o de
+                // RECUSA, se [Atacar] estivesse sem AP.
+                ui_sfx_.play_outcome(battle_cockpit_verb_click(
+                    *scene_, gus::app::screens::kCockpitVerbElementIds[static_cast<int>(
+                                 BattleVerb::Atacar)]));
             }
             const unsigned int after_click = audio_ptr_->sfx_play_count();
 

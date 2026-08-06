@@ -108,9 +108,60 @@ struct BattleFocus {
 [[nodiscard]] bool battle_focus_entered_new_item(const BattleFocus& before,
                                                  const BattleFocus& after) noexcept;
 
-// (O predicado do blip de CLIQUE no canal TECLADO - battle_key_activates_button - mora em
+// (O predicado do blip de CLIQUE no canal TECLADO - battle_key_click_outcome - mora em
 // gus/app/screens/battle_input.hpp, ao lado de battle_key_down/battle_digit_for_key: e'
 // SDL_Keycode, e este header e SDL-free por causa do gate sdl-ratchet, ver o topo.)
+
+// -------------------------------------------------------------- SFX-COCKPIT-AJUSTES
+// Os 3 blips que o cockpit tem a disposicao. Existe pra que a ESCOLHA DE TIMBRE seja um
+// dado (uma constante nomeada), e nao um `play_sfx(este_id)` espalhado pelo host.
+enum class BattleUiSfxSlot {
+    Hover,    // kMenuHoverSfxFile   - realce entrou num item novo
+    Click,    // kMenuClickSfxFile   - botao acionou
+    Blocked,  // kMenuBlockedSfxFile - botao existia e RECUSOU (grave/abafado; ja usado
+              //                       pelo card Hardcore da tela de dificuldade)
+};
+
+// PONTO DE ESCOLHA DO TIMBRE DA ABERTURA - decisao do lider PENDENTE, isolada nesta
+// UNICA linha de proposito.
+//
+// O lider decidiu (2026-08-06) que o Enter que "Encara" na abertura PASSA A TER SOM (a
+// fatia anterior o deixou mudo de proposito, argumentando que "comecou a luta" e' SFX de
+// outra natureza, nao blip de interface - argumento que segue de pe e e' justamente o que
+// esta constante deixa em aberto). Como a regra da casa e' ZERO ASSET NOVO sem decisao de
+// timbre, fiamos com o que JA EXISTE no repo: o blip de CLIQUE (o "Encarar" e', afinal, um
+// confirmar). Trocar o timbre = trocar ESTE valor; nada mais no codigo sabe qual e'.
+//
+// Alternativas que existem HOJE em assets/sfx/ (nenhum asset novo foi criado): os 3 slots
+// acima mais hit_digital_provisorio.wav / hit_digital_alt_provisorio.wav (som de golpe) e
+// ui_confirm_provisorio.wav. Os 2 ultimos NAO estao neste enum porque o cockpit nao os
+// carrega hoje - se o lider escolher um deles, entra um load_sfx a mais em
+// BattleScreen::enter() e um slot novo aqui.
+inline constexpr BattleUiSfxSlot kBattleOpeningSfxSlot = BattleUiSfxSlot::Click;
+
+// O QUE um "confirmar" (Enter/Espaco/clique) fez - e, por consequencia, QUAL blip sai.
+// Enum e nao bool porque os 4 casos sao mutuamente exclusivos POR CONSTRUCAO: com dois
+// predicados booleanos irmaos, "acionou E bloqueou" seria representavel e algum dia
+// aconteceria.
+enum class BattleClickOutcome {
+    None,       // nada aconteceu (tecla sem efeito, clique no vazio) -> MUDO
+    Activated,  // um botao acionou -> blip de CLIQUE
+    Blocked,    // o botao existia e RECUSOU (verbo sem AP) -> blip de BLOQUEADO. Decisao
+                // do lider 2026-08-06: antes saia o clique normal, ou seja, o jogador
+                // ouvia CONFIRMACAO de uma acao que nao aconteceu.
+    Opening,    // "Encarar" da abertura -> o timbre de kBattleOpeningSfxSlot acima
+};
+
+// DECISAO PURA do som de um "confirmar". NAO le a cena de proposito: recebe so os 3 fatos
+// que importam, pra ser exercitada exaustivamente (2 x 4 x 2 combinacoes) sem motor, sem
+// janela e sem audio. Quem compoe isto com a BattleScene e' battle_key_click_outcome
+// (battle_input.hpp), que le is_intro()/battle_focus_of()/menu().selected_enabled().
+//
+// `is_intro` DOMINA: durante a abertura battle_focus_of devolve None (ninguem navega), e
+// e' justamente ai que o Enter Encara.
+[[nodiscard]] BattleClickOutcome battle_confirm_outcome(bool is_intro,
+                                                        BattleFocusSurface surface,
+                                                        bool selected_enabled) noexcept;
 
 // O UNICO lugar de todo o cockpit onde `play_sfx` de UI e chamado. O host so DECIDE
 // QUANDO chamar; QUANTO soa (edge-detect, dedup, gate de superficie) e responsabilidade
@@ -123,10 +174,11 @@ public:
     BattleUiSfx() = default;
 
     // Ponteiro NAO-DONO (mesmo padrao de BattleScene::set_audio). Chamado uma vez por
-    // entrada na batalha, depois que os 2 blips ja foram carregados.
+    // entrada na batalha, depois que os 3 blips ja foram carregados.
     void bind(gus::platform::audio::AudioEngine* audio,
               gus::platform::audio::SoundId hover_sfx,
-              gus::platform::audio::SoundId click_sfx) noexcept;
+              gus::platform::audio::SoundId click_sfx,
+              gus::platform::audio::SoundId blocked_sfx) noexcept;
 
     // HOVER por FOCO (teclado + mouse de mundo). Toca 1 blip SE (e so se)
     // battle_focus_entered_new_item(before, after). Devolve se tocou (pros testes e pro
@@ -147,8 +199,21 @@ public:
     // party), em qualquer canal de entrada. Devolve se tocou.
     bool play_click();
 
+    // O UNICO tradutor "o que o confirmar fez" -> "que blip sai". Os dois canais (mouse e
+    // teclado) passam por aqui, entao a paridade que a fatia SFX-COCKPIT conquistou nao
+    // depende de ninguem lembrar de repetir a regra do outro lado. Devolve se tocou.
+    bool play_outcome(BattleClickOutcome outcome);
+
+    // Toca um slot nomeado (o "que blip" ja decidido). Publico porque a escolha de timbre
+    // da abertura e' um DADO (kBattleOpeningSfxSlot), nao um ramo de codigo.
+    bool play_slot(BattleUiSfxSlot slot);
+
     // Estado do edge-detect geometrico (leitura pros testes/diagnostico).
     [[nodiscard]] int hovered_pill() const noexcept { return hovered_pill_; }
+
+    // SoundId de um slot (leitura pros testes: prova QUAL blip saiu, nao so quantos).
+    [[nodiscard]] gus::platform::audio::SoundId sound_of(
+        BattleUiSfxSlot slot) const noexcept;
 
 private:
     bool play_(gus::platform::audio::SoundId id);
@@ -156,6 +221,7 @@ private:
     gus::platform::audio::AudioEngine* audio_ = nullptr;
     gus::platform::audio::SoundId hover_sfx_ = gus::platform::audio::kInvalidSound;
     gus::platform::audio::SoundId click_sfx_ = gus::platform::audio::kInvalidSound;
+    gus::platform::audio::SoundId blocked_sfx_ = gus::platform::audio::kInvalidSound;
     int hovered_pill_ = -1;
 };
 
