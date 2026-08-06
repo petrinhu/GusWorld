@@ -20,6 +20,21 @@
 # Idempotente. Reaproveita o build dir existente (so reconfigura no 1o uso).
 # So Linux por enquanto (preset linux-release; Windows e fase posterior).
 #
+# ARGUMENTOS:
+#   --gates-only  roda SO o estagio GATE (pula BUILD/SMOKE/SUITE) e devolve o rc
+#                 dele. Existe para o CI (.github/workflows/ci.yml) invocar ESTE
+#                 arquivo em vez de reimplementar gate por gate no YAML - ver
+#                 CI-RODA-OS-GATES (2026-08-06). O CI ja tem step proprio de
+#                 Build, Test e Smoke; o que faltava era o GATE, e ele custa
+#                 ~2,7s medidos (14 scripts Python ~1,8s + pytest ~0,8s + dois
+#                 greps), contra minutos do build - por isso vale rodar o
+#                 estagio INTEIRO em vez de escolher um subconjunto.
+#                 ATENCAO: o gate (h) (ctest_timeout_required) mede por
+#                 INTROSPECAO REAL do ctest, entao --gates-only ainda exige um
+#                 build dir CONFIGURADO (no CI roda depois do step de Build). Sem
+#                 ele, aquele gate REPROVA - de proposito, nunca passa em
+#                 silencio.
+#
 # Variaveis de ambiente uteis:
 #   CHECK_QUIET=1 silencia o log de build/ctest (so mostra os marcadores e a
 #                 tabela); usado pelo hook para nao poluir o transcript.
@@ -37,28 +52,57 @@ APP_BIN="$ENGINE/build/$PRESET/app/gusworld_app"
 QUIET="${CHECK_QUIET:-0}"
 MIN_I18N="${CHECK_MIN_I18N:-}"
 
+# ---------------------------------------------------------------- ARGUMENTOS
+# Um unico modo alternativo: --gates-only (ver cabecalho). Argumento desconhecido
+# ABORTA com rc=2 em vez de ser ignorado - um CI que invoque `check.sh --gate`
+# (nome errado) tem de falhar barulhento, nunca rodar a coisa toda em silencio
+# nem, pior, rodar nada e sair 0.
+GATES_ONLY=0
+for _arg in "$@"; do
+    case "$_arg" in
+        --gates-only) GATES_ONLY=1 ;;
+        -h|--help)
+            echo "uso: check.sh [--gates-only]"
+            echo "  (sem argumento) BUILD + SMOKE + GATE + SUITE"
+            echo "  --gates-only    so o estagio GATE (exige build dir configurado)"
+            exit 0 ;;
+        *)
+            echo "check.sh: argumento desconhecido '$_arg' (use --help)" >&2
+            exit 2 ;;
+    esac
+done
+
 # Redireciona stdout de comandos verbosos quando QUIET=1.
 run_log() {
     if [ "$QUIET" = "1" ]; then "$@" >/dev/null; else "$@"; fi
 }
 
-echo "=== build + smoke + gate + suite ==="
+if [ "$GATES_ONLY" = "1" ]; then
+    echo "=== gate (--gates-only: BUILD, SMOKE e SUITE NAO executados aqui) ==="
+else
+    echo "=== build + smoke + gate + suite ==="
+fi
 
 # ---------------------------------------------------------------- BUILD
 # Reconfigura so se o build dir ainda nao existe (1a vez). Depois e incremental.
-if [ ! -f "$ENGINE/build/$PRESET/build.ninja" ] \
-   && [ ! -f "$ENGINE/build/$PRESET/Makefile" ]; then
-    run_log cmake --preset "$PRESET" -S "$ENGINE" || true
-fi
-set +e
-( cd "$ENGINE" && run_log cmake --build --preset "$PRESET" )
-BUILD=$?
-set -e
-echo "BUILD=$BUILD"
-if [ "$BUILD" != "0" ]; then
-    # build quebrado: smoke/suite nao fazem sentido; gate de arquitetura ainda
-    # roda (e estatico) para ja apontar se a causa foi Qt vazando em core/domain.
-    echo "(build falhou; pulando SMOKE e SUITE)"
+BUILD=0
+if [ "$GATES_ONLY" = "1" ]; then
+    echo "BUILD=pulado (--gates-only)"
+else
+    if [ ! -f "$ENGINE/build/$PRESET/build.ninja" ] \
+       && [ ! -f "$ENGINE/build/$PRESET/Makefile" ]; then
+        run_log cmake --preset "$PRESET" -S "$ENGINE" || true
+    fi
+    set +e
+    ( cd "$ENGINE" && run_log cmake --build --preset "$PRESET" )
+    BUILD=$?
+    set -e
+    echo "BUILD=$BUILD"
+    if [ "$BUILD" != "0" ]; then
+        # build quebrado: smoke/suite nao fazem sentido; gate de arquitetura ainda
+        # roda (e estatico) para ja apontar se a causa foi Qt vazando em core/domain.
+        echo "(build falhou; pulando SMOKE e SUITE)"
+    fi
 fi
 
 # ---------------------------------------------------------------- SMOKE
@@ -71,7 +115,9 @@ fi
 # nem audio (vale no CI sem X/Wayland). timeout como cinto de seguranca: se algum
 # dia o smoke travar, falha rapido em vez de pendurar o hook/CI.
 SMOKE=0
-if [ "$BUILD" = "0" ]; then
+if [ "$GATES_ONLY" = "1" ]; then
+    echo "SMOKE=pulado (--gates-only)"
+elif [ "$BUILD" = "0" ]; then
     if [ -x "$APP_BIN" ]; then
         set +e
         SDL_VIDEODRIVER=dummy SDL_AUDIODRIVER=dummy \
@@ -376,7 +422,9 @@ echo "GATE=$GATE"
 # arquivos por sessao de trabalho poluindo o Lixo do usuario (AC-E6).
 CTEST_LOG="$ENGINE/build/$PRESET/last_ctest.log"
 SUITE=0
-if [ "$BUILD" = "0" ]; then
+if [ "$GATES_ONLY" = "1" ]; then
+    echo "SUITE=pulado (--gates-only)"
+elif [ "$BUILD" = "0" ]; then
     set +e
     # XDG_RUNTIME_DIR ISOLADO (2026-07-24, achado do glintfx via bus - o furo que sobrou
     # no 1o conserto): forcar SDL_VIDEODRIVER=x11 e unsetar WAYLAND_DISPLAY **NAO ISOLA**.
@@ -466,14 +514,23 @@ if [ "$BUILD" = "0" ]; then
     [ -n "$_suite_xvfb_pid" ] && kill "$_suite_xvfb_pid" 2>/dev/null
     grep -E "tests passed|tests failed|Total Test" "$CTEST_LOG" || true
     set -e
+    echo "SUITE=$SUITE"
 fi
-echo "SUITE=$SUITE"
 
 # ---------------------------------------------------------------- VEREDITO
+# Em --gates-only o veredito olha SO o GATE, EXPLICITAMENTE - e nao "os outros
+# ficaram 0 mesmo, entao a conta da certo". A diferenca importa no dia em que
+# nascer um estagio novo: com a composicao explicita, esquecer de trata-lo aqui
+# aparece; com o zero-por-omissao, ele passaria em silencio (o mesmo defeito que
+# o GATE_TOOLS_TESTS teve em 2026-08-06, ver tools/tests/test_check_sh_gates_ligados.py).
 RC=0
-[ "$BUILD" = "0" ] || RC=1
-[ "$SMOKE" = "0" ] || RC=1
-[ "$GATE"  = "0" ] || RC=1
-[ "$SUITE" = "0" ] || RC=1
+if [ "$GATES_ONLY" = "1" ]; then
+    [ "$GATE" = "0" ] || RC=1
+else
+    [ "$BUILD" = "0" ] || RC=1
+    [ "$SMOKE" = "0" ] || RC=1
+    [ "$GATE"  = "0" ] || RC=1
+    [ "$SUITE" = "0" ] || RC=1
+fi
 echo "=== resultado: $([ $RC = 0 ] && echo OK || echo FALHOU) (rc=$RC) ==="
 exit $RC

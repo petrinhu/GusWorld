@@ -1,0 +1,22 @@
+<!--
+main.rml (F3-SPIKE-1, scratch, NAO commitado). Documento MINIMO carregado via
+glintfx::App::load() - ver appmode_spike_probe.cpp.
+
+pause_overlay: display:none inicial (SpikeState::City default); o probe alterna
+para "block" via App::set_property ao apertar P (toggle pausa) - MESMO idioma de
+DOM-write usado hoje pelo run_system_menu_loop_gl_current/UiLayer em producao,
+so que atraves da API do App (paridade documentada em app.hpp).
+
+hud_status: texto atualizado 1x/frame (App::set_text) - prova a chamada DOM
+funcionando de dentro do frame_callback, MESMA superficie da tela de pausa/dialogo
+de producao.
+-->
+<rml>
+<head><link type="text/rcss" href="main.rcss"/></head>
+<body>
+  <div id="hud_status">boot...</div>
+  <div id="pause_overlay">
+    <span>PAUSA</span>
+  </div>
+</body>
+</rml>

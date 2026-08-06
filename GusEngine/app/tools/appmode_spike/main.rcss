@@ -1,0 +1,50 @@
+/* main.rcss (F3-SPIKE-1, scratch, NAO commitado).
+
+body: SEM background-color (transparente) - a cidade (Render2dGl3, desenhada pelo
+frame_callback ANTES do passe de UI, ver app.hpp::set_frame_callback) precisa
+aparecer POR BAIXO da UI; um body opaco a esconderia por completo.
+
+hud_status: canto superior-esquerdo, texto pequeno sempre visivel (fps/estado/frame).
+
+pause_overlay: cobre a janela inteira (960x540, MESMA resolucao logica da cidade),
+display:none por default (SpikeState::City) - o probe alterna via
+App::set_property("pause_overlay","display","block"/"none"). */
+
+body {
+  width: 100%;
+  height: 100%;
+}
+
+#hud_status {
+  display: block;
+  position: absolute;
+  left: 8px;
+  top: 8px;
+  width: 400px;
+  height: 20px;
+  color: #e0e0e0;
+  font-size: 14px;
+}
+
+#pause_overlay {
+  display: none;
+  position: absolute;
+  left: 0px;
+  top: 0px;
+  width: 960px;
+  height: 540px;
+  background-color: rgba(0, 0, 0, 180);
+  text-align: center;
+}
+
+#pause_overlay span {
+  display: block;
+  position: absolute;
+  left: 0px;
+  top: 250px;
+  width: 960px;
+  height: 40px;
+  color: #ffffff;
+  font-size: 32px;
+  text-align: center;
+}

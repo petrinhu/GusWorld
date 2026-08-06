@@ -24,15 +24,29 @@ name: ci
 # O job "windows" (MSVC real) fica em .github/workflows/windows.yml, mantido
 # a parte (nao mexer aqui).
 
+# FILTRO DE CAMINHO (ampliado em 2026-08-06, CI-RODA-OS-GATES): so 'GusEngine/**'
+# deixava DOIS buracos do mesmo tipo - o gate existe, mas o evento nunca chega
+# nele. Medido: um PR que mexesse SO em `tools/` (inclusive AFROUXANDO um gate,
+# ex. production_scope.py, ou acrescentando entrada em spdx_allowlist.txt) ou SO
+# em `resources/translations/` (quebrando a paridade i18n, ou apagando a chave
+# que o gate ui-log-key-only exige nos DOIS catalogos) NAO disparava CI nenhum.
+# Sao exatamente as entradas que os gates leem fora de GusEngine/, enumeradas dos
+# proprios scripts: i18n_parity.py e ui_log_key_only.py leem
+# resources/translations; spdx_header_required.py le tools/spdx_allowlist.txt; e
+# os 14 scripts de gate + tools/tests/ vivem em tools/.
 on:
   push:
     branches: [main]
     paths:
       - 'GusEngine/**'
+      - 'tools/**'
+      - 'resources/translations/**'
       - '.github/workflows/ci.yml'
   pull_request:
     paths:
       - 'GusEngine/**'
+      - 'tools/**'
+      - 'resources/translations/**'
       - '.github/workflows/ci.yml'
 
 concurrency:
@@ -62,7 +76,7 @@ jobs:
           sudo apt-get update -qq
           sudo apt-get install -y --no-install-recommends \
             cmake ninja-build g++ build-essential git \
-            python3 python3-pip python3-venv \
+            python3 python3-pip python3-venv python3-pytest \
             libx11-dev libxext-dev libxrandr-dev libxcursor-dev libxi-dev \
             libxfixes-dev libxss-dev libxtst-dev \
             libxkbcommon-dev libwayland-dev wayland-protocols libdecor-0-dev \
@@ -70,24 +84,12 @@ jobs:
             libpulse-dev libasound2-dev libdbus-1-3 \
             libfreetype-dev
 
-      # Gate de arquitetura (invariante ADR-008 + ADR-009 + ADR-010 F3): core/ e domain/
-      # sao POCO puro e NAO podem incluir Qt, SDL, RmlUi NEM glintfx (nem vazar os
-      # namespaces Rml::/glintfx::). Falha o CI cedo, antes de gastar build, se algo vazar
-      # para essas camadas. Sincronizado com tools/check.sh (GATE arch).
-      - name: Architecture gate (no Qt/SDL/RmlUi/glintfx in core/domain)
-        run: |
-          set -eu
-          if grep -rnE '#[[:space:]]*include[[:space:]]*<(Q[A-Za-z]|SDL|RmlUi|glintfx)' \
-               GusEngine/core GusEngine/domain; then
-            echo "::error::include de Qt, SDL, RmlUi ou glintfx encontrado em core/ ou domain/ (POCO)."
-            echo "core/ e domain/ devem ser headless. Mover para platform/ ou app/."
-            exit 1
-          fi
-          if grep -rnE '\b(Rml|glintfx)::' GusEngine/core GusEngine/domain; then
-            echo "::error::namespace Rml:: ou glintfx:: encontrado em core/ ou domain/ (POCO)."
-            exit 1
-          fi
-          echo "OK: nenhum include/namespace Qt/SDL/RmlUi/glintfx em core/ ou domain/."
+      # python3-pytest (acrescentado em 2026-08-06, CI-RODA-OS-GATES): o gate (o)
+      # do check.sh roda `pytest tools/tests` - os testes DOS PROPRIOS GATES - e,
+      # de proposito, REPROVA se o pytest nao existir, em vez de pular em silencio
+      # ("OK" tem de significar "rodei", nunca "nao consegui rodar"). Vem por apt,
+      # nao por pip: o Ubuntu 24.04 do runner e externally-managed (PEP 668) e um
+      # `pip install` sem --break-system-packages falharia.
 
       # Cache dos fontes de FetchContent (_deps: SDL3, RmlUi, glintfx, Catch2). Evita
       # re-clonar/recompilar a cada run. Chave amarrada ao CMakeLists (onde os pins vivem).
@@ -105,6 +107,36 @@ jobs:
         working-directory: GusEngine
         run: cmake --build --preset linux-release
 
+      # ============================ O ESTAGIO GATE ============================
+      # CI-RODA-OS-GATES (2026-08-06). ANTES desta linha, este arquivo NAO
+      # executava o tools/check.sh: as 4 mencoes a ele eram TODAS comentario
+      # (`grep -n check.sh ci.yml | grep -v '#'` devolvia ZERO linha). O CI
+      # rodava 3 checagens (arch por grep inline, i18n_parity, spdx) e os
+      # OUTROS 14 gates do estagio GATE so existiam na maquina local, via hook -
+      # um PR podia entrar com sdl-ratchet, production-scope,
+      # fetchcontent-manifest, callback-dtor-order, callback-dtor-disarm,
+      # decode-image-file-zero e ui-log-key-only VERMELHOS sem nada barrar.
+      #
+      # A correcao NAO e reimplementar os 14 aqui - e chamar a implementacao de
+      # verdade. O grep de arquitetura inline que existia acima foi REMOVIDO
+      # pelo mesmo motivo: duas implementacoes da mesma regra divergem com o
+      # tempo, e a copia do YAML nao tinha dono. Agora ha uma fonte so
+      # (tools/check.sh), e gate novo passa a valer no CI no mesmo commit em que
+      # nasce, sem ninguem lembrar de espelhar nada aqui.
+      #
+      # DEPOIS do Build, de proposito: o gate (h) (ctest_timeout_required) mede
+      # por INTROSPECAO REAL (`ctest --show-only=json-v1`), e os 4 alvos usam
+      # `catch_discover_tests` em DISCOVERY_MODE default (POST_BUILD) - a lista
+      # de testes so existe depois de compilar. Rodar antes devolveria ZERO
+      # testes e reprovaria por motivo errado. Custo medido do estagio: 2,7s
+      # (14 scripts Python ~1,8s + pytest de tools/tests ~0,8s + 2 greps), ante
+      # minutos de build - o recorte "estagio GATE inteiro" sai mais barato que
+      # escolher subconjunto, e nao deixa gate de fora por engano.
+      # BUILD/SMOKE/SUITE ficam de fora do --gates-only porque ja tem step
+      # proprio neste job (Build acima, Test e Smoke abaixo).
+      - name: Gates (tools/check.sh --gates-only)
+        run: bash tools/check.sh --gates-only
+
       - name: Test
         working-directory: GusEngine
         run: ctest --preset linux-release
@@ -120,21 +152,12 @@ jobs:
           SDL_VIDEODRIVER=dummy SDL_AUDIODRIVER=dummy \
             timeout 60 ./build/linux-release/app/gusworld_app --smoke
 
-      # Gate de paridade i18n (tools/i18n_parity.py): mesma checagem estrutural do
-      # tools/check.sh (estagio GATE). Reprova em chave faltando/extra/duplicada;
-      # cobertura de conteudo (%) so e exibida, nao reprova (en_intl e debito
-      # deliberado ate pos-v1.0.0, CUT.9).
-      - name: i18n parity gate
-        run: python3 tools/i18n_parity.py
-
-      # Gate de licenca (GATE-SPDX, 2026-08-01): todo .cpp/.hpp/.h/.c rastreado
-      # precisa do cabecalho "SPDX-License-Identifier: Apache-2.0" (exceto o que
-      # estiver na allowlist versionada de terceiros, tools/spdx_allowlist.txt).
-      # Mesma checagem do tools/check.sh (estagio GATE) - fecha a lacuna que a
-      # onda LICENSE-APACHE deixou: sem isto, nada impedia o proximo arquivo de
-      # nascer sem cabecalho, ou o antigo GPL de voltar.
-      - name: SPDX header gate
-        run: python3 tools/spdx_header_required.py
+      # Os steps "i18n parity gate" e "SPDX header gate" que ficavam aqui foram
+      # REMOVIDOS em 2026-08-06 (CI-RODA-OS-GATES): nao sumiram do CI, passaram a
+      # ser rodados pelo step "Gates (tools/check.sh --gates-only)" acima, junto
+      # dos outros 15 - eram justamente os 2 (de 17) que alguem tinha lembrado de
+      # espelhar a mao neste arquivo. Espelhar a mao e o defeito; a lista de
+      # gates tem UM dono agora, tools/check.sh.
 
   asan:
     name: ASan/UBSan (core+domain+app)

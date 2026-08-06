@@ -693,6 +693,15 @@ set(GLINTFX_MODULE_DRAW2D    ON  CACHE BOOL "" FORCE)
 #     `## [0.30.0]`: todo o conteudo desta release esta sob `## [Unreleased]`. Consequencia
 #     pratica pra nos: NENHUMA (nao lemos version() em lugar nenhum do repo), mas quem for
 #     depurar por GLINTFX_VERSION vai ler o numero errado. Reportado a eles pelo bus.
+#     ⚠️ CONSERTO DE METODO NO NOSSO LADO (CI-RODA-OS-GATES, 2026-08-06): o ritual de bump
+#     NAO confere mais versao pelo config.hpp - ele nao distingue v0.29.0 de v0.30.0, entao
+#     um bump entre essas duas tags parece "sem efeito" e um bump NAO aplicado parece
+#     aplicado. A conferencia agora le a TAG do checkout:
+#         python3 tools/glintfx_pin_check.py
+#     que compara o GIT_TAG declarado abaixo com `git -C _deps/glintfx-src describe --tags
+#     --exact-match` e devolve rc 0/1/2 (2 = nao consegui medir, NUNCA 0 por omissao). O
+#     numero do config.hpp continua sendo IMPRESSO, mas so como informacao - ele nao decide
+#     nada. Nao e gate do check.sh (depende do _deps populado); e passo do ritual.
 #   - API nova, ADITIVA, NAO consumida nesta fatia (bump e alinhamento de pin): `App::
 #     is_scancode_down(int)`, `UiLayer/App::set_cursor_callback(std::function<void(const char*)>)`,
 #     `UiLayer/App::scroll_element_into_view(const char*, ScrollAlign)` + o header novo
