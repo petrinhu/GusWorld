@@ -81,6 +81,99 @@ def test_find_stale_allowlist_pega_arquivo_apagado(tmp_path):
     assert stale == [("nao_existe.cpp", "arquivo nao existe mais")]
 
 
+# ------------------------------- FURO 3: a licenca antiga nao pode VOLTAR
+#
+# GATES-HARDEN (2026-08-06): o gate procurava a PRESENCA do Apache e nunca a
+# AUSENCIA de outra licenca. Medido: GPL na linha 1 + Apache na linha 2 passava
+# VERDE, enquanto o docstring do script prometia impedir "o antigo GPL de
+# voltar". Os testes abaixo sao a prova VERMELHO-ANTES: cada um deles passaria
+# (has_required_header == True) com a regra antiga.
+
+_GPL = "GPL-3" + ".0-or-later"  # partido pra nao virar tag SPDX neste arquivo
+
+
+def test_gpl_convivendo_com_apache_no_cabecalho_reprova(tmp_path):
+    """O FURO EXATO, verbatim: GPL na linha 1, Apache na linha 2."""
+    fp = tmp_path / "voltou.cpp"
+    _write(str(fp), f"// SPDX-License-Identifier: {_GPL}\n"
+                    "// SPDX-License-Identifier: Apache-2.0\n")
+    # A regra ANTIGA (presenca) dava OK - e e por isso que ela nao bastava:
+    assert gate.has_required_header(str(fp)) is True
+    # A regra NOVA (exclusividade) pega:
+    assert gate.foreign_license_tags(str(fp)) == [(1, _GPL)]
+    assert gate.find_foreign(["voltou.cpp"], str(tmp_path), {}) == [
+        ("voltou.cpp", 1, _GPL)
+    ]
+
+
+def test_gpl_longe_do_topo_tambem_reprova(tmp_path):
+    """A variante seguinte do mesmo furo: fora da janela de cabecalho. Se a
+    regra nova so olhasse as 5 primeiras linhas, a linha 40 reabriria o buraco."""
+    fp = tmp_path / "fundo.cpp"
+    corpo = "// SPDX-License-Identifier: Apache-2.0\n" + "// codigo\n" * 40
+    corpo += f"/* SPDX-License-Identifier: {_GPL} */\n"
+    _write(str(fp), corpo)
+    achados = gate.foreign_license_tags(str(fp))
+    assert achados == [(42, _GPL)], achados
+
+
+def test_rabo_de_comentario_de_bloco_nao_escapa(tmp_path):
+    """`/* SPDX-...: Apache-2.0 */` e legal em C: o ` */` nao pode fazer o valor
+    parecer diferente de Apache-2.0 (falso POSITIVO que barraria arquivo bom)."""
+    fp = tmp_path / "bloco.cpp"
+    _write(str(fp), "/* SPDX-License-Identifier: Apache-2.0 */\n")
+    assert gate.foreign_license_tags(str(fp)) == []
+
+
+def test_arquivo_so_com_apache_passa(tmp_path):
+    """CRESCIMENTO LEGITIMO: o formato de 571 arquivos do repo nao pode barrar."""
+    fp = tmp_path / "normal.cpp"
+    _write(str(fp), "// SPDX-License-Identifier: Apache-2.0\n// gus/normal.cpp\n"
+                    "// menciona GPL e Apache em prosa, sem tag nenhuma\n")
+    assert gate.foreign_license_tags(str(fp)) == []
+    assert gate.find_foreign(["normal.cpp"], str(tmp_path), {}) == []
+
+
+def test_terceiro_na_allowlist_nao_reprova(tmp_path):
+    """monocypher.c declara BSD-2-Clause OR CC0-1.0 de verdade: a allowlist e o
+    caminho, nao afrouxar a regra (nem por o nosso SPDX por cima - seria falso)."""
+    fp = tmp_path / "vendor.c"
+    _write(str(fp), "// SPDX-License-Identifier: BSD-2-Clause OR CC0-1.0\n")
+    assert gate.foreign_license_tags(str(fp)) != []
+    assert gate.find_foreign(["vendor.c"], str(tmp_path),
+                             {"vendor.c": "terceiro"}) == []
+
+
+def test_main_reprova_licenca_antiga_voltando(tmp_path, monkeypatch):
+    """Ponta-a-ponta: main() != 0 com o arquivo do furo."""
+    fp = tmp_path / "GusEngine" / "app" / "src" / "voltou.cpp"
+    _write(str(fp), f"// SPDX-License-Identifier: {_GPL}\n"
+                    "// SPDX-License-Identifier: Apache-2.0\n")
+    monkeypatch.setattr(gate, "ROOT", str(tmp_path))
+    monkeypatch.setattr(
+        gate, "list_tracked_files",
+        lambda root, extensions: ["GusEngine/app/src/voltou.cpp"],
+    )
+    monkeypatch.setattr(gate, "ALLOWLIST_PATH", str(tmp_path / "allowlist_vazio.txt"))
+    assert gate.main() == 1
+
+
+def test_extensoes_novas_estao_no_escopo():
+    """`.cc/.cxx/.inl/.hxx/.ipp` entraram (custo 1 linha, zero divida medida)."""
+    for ext in ("cc", "cxx", "inl", "hxx", "ipp"):
+        assert ext in gate.EXTENSIONS
+    # ⚠️ .py/.sh/.cmake continuam FORA de proposito (fatia PROPRIA, com os
+    # cabecalhos aplicados ANTES): liga-las hoje faria o gate nascer VERMELHO
+    # contra ~27 arquivos pre-existentes.
+    for fora in ("py", "sh", "cmake", "yml"):
+        assert fora not in gate.EXTENSIONS
+
+
+def test_repo_real_nasce_verde():
+    """Requisito (b): a arvore de hoje passa nas DUAS regras."""
+    assert gate.main() == 0
+
+
 # --------------------------------------------------------- ponta-a-ponta
 
 

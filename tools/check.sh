@@ -299,6 +299,45 @@ python3 "$ROOT/tools/decode_image_file_zero.py"
 GATE_DECODE_IMAGE_ZERO=$?
 set -e
 
+# (n) Auto-auditoria do ESCOPO de producao (GATES-HARDEN, 2026-08-06): a lista de
+#     diretorios que os gates (e), (f) e (m) varrem e ESCRITA A MAO
+#     (tools/production_scope.py) - uma 5a camada, ou um arquivo de codigo solto na
+#     raiz de uma camada, nasceria FORA dela e os tres diriam "OK" sem nunca ter
+#     olhado pra ela ("um verificador com ponto cego confirma o que se espera
+#     dele"). Nao e hipotese: `GusEngine/app/main.cpp` - a UNICA fonte do
+#     executavel - estava exatamente nessa situacao, e carregava um
+#     `#include <SDL3/SDL.h>` orfao que nenhum gate de camada via. Este gate
+#     ENUMERA o disco (GusEngine/*/src, */include e a raiz de cada camada) e
+#     reprova se algo estiver fora da lista - mesmo desenho do (j), que enumera
+#     por `git ls-files` em vez de procurar onde ja se sabe.
+set +e
+python3 "$ROOT/tools/production_scope.py"
+GATE_PRODUCTION_SCOPE=$?
+set -e
+
+# (o) OS PROPRIOS GATES SOB TESTE (GATES-HARDEN, 2026-08-06): `tools/tests/`
+#     existe desde a fatia GATE-SPDX e NAO ERA EXECUTADO POR NINGUEM - nem aqui,
+#     nem no .github/workflows/ci.yml. E o mesmo defeito que os gates existem pra
+#     impedir, aplicado a eles mesmos: "gate correto e DESLIGADO e gate que nao
+#     existe". Cada furo fechado nesta fatia tem um teste que prova o
+#     VERMELHO-ANTES (a arvore antiga passava) e o VERDE-DEPOIS, mais o caso de
+#     CRESCIMENTO LEGITIMO (arquivo novo em src/, camada nova sem dependencia
+#     nova) - se o gate so soubesse reprovar, ele barraria trabalho honesto. Sem
+#     esta linha, nada disso rodava.
+#     Sem pytest instalado o estagio REPROVA (nao pula em silencio): "OK" tem de
+#     significar "rodei os testes", nunca "nao consegui rodar e deixei passar".
+set +e
+if python3 -c "import pytest" 2>/dev/null; then
+    python3 -m pytest "$ROOT/tools/tests" -q --no-header
+    GATE_TOOLS_TESTS=$?
+else
+    echo "GATE(tools-tests): FALHA - pytest nao encontrado; os testes dos gates"
+    echo "  (tools/tests/) NAO rodaram. Instale com 'python3 -m pip install pytest'."
+    echo "  Nao pulamos em silencio: um gate que nao roda nao protege nada."
+    GATE_TOOLS_TESTS=1
+fi
+set -e
+
 GATE=0
 [ "$GATE_ARCH" = "0" ] && [ "$GATE_EXCL" = "0" ] && [ "$GATE_I18N" = "0" ] \
     && [ "$GATE_SDL_RATCHET" = "0" ] && [ "$GATE_LOG_CLOCK_ZERO" = "0" ] \
@@ -307,6 +346,7 @@ GATE=0
     && [ "$GATE_GL3_READBACKBUFFER" = "0" ] && [ "$GATE_SPDX" = "0" ] \
     && [ "$GATE_CALLBACK_DTOR" = "0" ] && [ "$GATE_CALLBACK_DISARM" = "0" ] \
     && [ "$GATE_DECODE_IMAGE_ZERO" = "0" ] \
+    && [ "$GATE_PRODUCTION_SCOPE" = "0" ] \
     || GATE=1
 echo "GATE=$GATE"
 

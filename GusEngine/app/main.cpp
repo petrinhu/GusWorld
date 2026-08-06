@@ -20,7 +20,14 @@
 // (OverworldSim::step_fixed) e o MESMO renderer (Render2dSdl) que a janela - so
 // troca o loop interativo por um for de N ticks e a janela por um render headless.
 
-#include <SDL3/SDL.h>
+// SEM `#include <SDL3/SDL.h>` (GATES-HARDEN, 2026-08-06): este arquivo NAO usa
+// nenhum simbolo SDL_* - a auditoria mediu ZERO token `SDL_*` fora de comentario
+// aqui. O include era orfao: sobrou de quando main() ainda possuia SDL_Init/janela
+// (hoje isso vive na Maestro, app/src/maestro.cpp, e nos viewers). Removido pra o
+// arquivo entrar no escopo do GATE(sdl-ratchet) SEM subir o teto (24 -> 24): ele
+// era ponto cego dos gates de camada (unico .cpp solto na raiz de app/, fora dos
+// dirs varridos), e um include de SDL num ponto cego e exatamente o tipo de coisa
+// que o ratchet existe pra impedir.
 
 #include <cstdint>
 #include <cstdlib>

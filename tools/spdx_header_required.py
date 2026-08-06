@@ -46,6 +46,27 @@ trivial (so mexer em EXTENSIONS abaixo) - mas isso e uma fatia NOVA, com
 cabecalhos aplicados ANTES do gate ligar, exatamente como esta fatia fez
 para .cpp/.hpp/.h/.c.
 
+DUAS REGRAS, NAO UMA (GATES-HARDEN, 2026-08-06): ate esta fatia o gate so
+procurava a PRESENCA do Apache-2.0 perto do topo, e nunca a AUSENCIA de outra
+licenca - a auditoria mediu o furo: com `GPL-3.0-or-later` na linha 1 e
+`Apache-2.0` na linha 2, o gate passava VERDE. O proprio docstring acima
+promete impedir "o antigo GPL de voltar", e a promessa escrita era maior que o
+comportamento. Agora:
+
+  REGRA 1 (presenca): "SPDX-License-Identifier: Apache-2.0" nas primeiras
+  MAX_HEADER_LINES linhas - o que ja existia.
+  REGRA 2 (exclusividade): NENHUMA outra tag `SPDX-License-Identifier:` pode
+  aparecer no arquivo INTEIRO, em nenhuma linha. Nao e o teto do cabecalho: a
+  linha 40 tambem reprova - senao a proxima variante do mesmo furo (GPL longe
+  do topo) reabriria o buraco que este trecho fecha.
+
+A regra 2 vale para o arquivo inteiro porque a medicao permite: em 2026-08-06,
+os 571 arquivos rastreados no escopo tinham exatamente 566 tags `Apache-2.0` e
+2 `BSD-2-Clause OR CC0-1.0` (monocypher.c/.h, ja na allowlist) - nenhuma outra
+string, em nenhuma linha. O gate nasce verde. Se um dia um arquivo NOSSO
+precisar citar outra licenca de verdade (fixture de teste, por exemplo), o
+caminho e a allowlist com motivo, nao afrouxar a regra.
+
 ALLOWLIST (tools/spdx_allowlist.txt, arquivo VERSIONADO, uma entrada por
 linha com motivo obrigatorio - nao lista embutida neste script): so cobre
 arquivo de TERCEIRO, onde por o nosso SPDX Apache-2.0 seria declaracao de
@@ -58,6 +79,7 @@ nome de arquivo, so pela allowlist explicita.
 from __future__ import annotations
 
 import os
+import re
 import subprocess
 import sys
 
@@ -70,9 +92,25 @@ ALLOWLIST_PATH = os.path.join(SCRIPT_DIR, "spdx_allowlist.txt")
 # Extensoes fechadas por construcao (ver docstring, secao ESCOPO). Cada
 # entrada vira um pathspec `*.<ext>` passado ao `git ls-files` - nunca um
 # glob de diretorio, nunca os.walk.
-EXTENSIONS = ("cpp", "hpp", "h", "c")
+#
+# GATES-HARDEN (2026-08-06): `.cc/.cxx/.inl/.hxx/.ipp` entraram porque o custo e
+# uma linha e a medicao do dia deu ZERO arquivo rastreado com essas extensoes -
+# o gate nasce verde e fecha a porta pro proximo `.inl` nascer sem cabecalho.
+# ⚠️ `.py/.sh/.cmake/CMakeLists.txt` continuam FORA (ver "FORA DE ESCOPO" acima):
+# ~27 arquivos pre-existentes sem cabecalho fariam o gate nascer VERMELHO. Isso e
+# fatia PROPRIA, com os cabecalhos aplicados ANTES de a extensao entrar aqui.
+EXTENSIONS = ("cpp", "hpp", "h", "c", "cc", "cxx", "inl", "hxx", "ipp")
 
 REQUIRED = "SPDX-License-Identifier: Apache-2.0"
+
+# REGRA 2 (exclusividade, ver docstring): captura o VALOR de qualquer tag SPDX
+# no arquivo. O valor vai ate o fim da linha, com o rabo de comentario de bloco
+# (` */`) e espaco a direita descartados - a forma `/* SPDX-...: X */` e legal
+# em C e nao pode escapar da regra por causa do fechamento do comentario.
+_SPDX_TAG_RE = re.compile(r"SPDX-License-Identifier:\s*(.*)")
+_TAG_TAIL_RE = re.compile(r"\s*(?:\*/|-->|#>)\s*$")
+
+REQUIRED_VALUE = "Apache-2.0"
 
 # O cabecalho vive na linha 1 nos 531 arquivos ja rotacionados (medido nesta
 # mesma auditoria); tolera ate a linha 5 para nao reprovar por variacao
@@ -130,6 +168,28 @@ def has_required_header(fp: str) -> bool:
     return False
 
 
+def foreign_license_tags(fp: str) -> list[tuple[int, str]]:
+    """REGRA 2: toda tag SPDX do arquivo INTEIRO cujo valor NAO e Apache-2.0.
+
+    Devolve [(linha, valor)]. Lista vazia = so ha Apache-2.0 (ou nenhuma tag -
+    a ausencia e problema da REGRA 1, nao desta). E o que impede a licenca
+    antiga de VOLTAR: procurar so a presenca do Apache deixava passar um
+    arquivo com GPL na linha 1 e Apache na linha 2 (furo medido)."""
+    found: list[tuple[int, str]] = []
+    try:
+        with open(fp, encoding="utf-8", errors="replace") as f:
+            for lineno, line in enumerate(f, start=1):
+                m = _SPDX_TAG_RE.search(line)
+                if not m:
+                    continue
+                value = _TAG_TAIL_RE.sub("", m.group(1)).strip()
+                if value != REQUIRED_VALUE:
+                    found.append((lineno, value))
+    except OSError:
+        return []
+    return found
+
+
 def find_offenders(files: list[str], root: str, allowlist: dict[str, str]) -> list[str]:
     offenders = []
     for rel in files:
@@ -140,6 +200,18 @@ def find_offenders(files: list[str], root: str, allowlist: dict[str, str]) -> li
             offenders.append(rel)
     offenders.sort()
     return offenders
+
+
+def find_foreign(files: list[str], root: str,
+                 allowlist: dict[str, str]) -> list[tuple[str, int, str]]:
+    out: list[tuple[str, int, str]] = []
+    for rel in files:
+        if rel in allowlist:
+            continue
+        for lineno, value in foreign_license_tags(os.path.join(root, rel)):
+            out.append((rel, lineno, value))
+    out.sort()
+    return out
 
 
 def find_stale_allowlist(root: str, allowlist: dict[str, str]) -> list[tuple[str, str]]:
@@ -156,6 +228,7 @@ def main() -> int:
     allowlist = load_allowlist(ALLOWLIST_PATH)
     files = list_tracked_files(ROOT, EXTENSIONS)
     offenders = find_offenders(files, ROOT, allowlist)
+    foreign = find_foreign(files, ROOT, allowlist)
     stale = find_stale_allowlist(ROOT, allowlist)
 
     ext_list = ", ".join(f".{e}" for e in EXTENSIONS)
@@ -182,6 +255,22 @@ def main() -> int:
             "arquivo de terceiro com o nosso SPDX - seria licenca falsa)."
         )
 
+    if foreign:
+        ok = False
+        print(
+            f"GATE(spdx-required): FALHA - {len(foreign)} tag(s) "
+            "SPDX-License-Identifier com licenca DIFERENTE de "
+            f"{REQUIRED_VALUE} (a licenca antiga nao pode voltar, nem "
+            "convivendo com a nova no mesmo arquivo):"
+        )
+        for rel, lineno, value in foreign:
+            print(f"    - {rel}:{lineno}: {value!r}")
+        print(
+            "  Um arquivo NOSSO declara Apache-2.0 e mais nada. Se o arquivo e de "
+            f"TERCEIRO, ele vai pra {os.path.relpath(ALLOWLIST_PATH, ROOT)} com "
+            "motivo (nunca ganha o nosso SPDX por cima da licenca dele)."
+        )
+
     if stale:
         ok = False
         print(
@@ -201,7 +290,8 @@ def main() -> int:
     print(
         f"GATE(spdx-required): OK ({len(files)} arquivo(s) varrido(s), "
         f"{len(allowlist)} na allowlist auditada e sem entrada desatualizada, "
-        f'0 sem "{REQUIRED}").'
+        f'0 sem "{REQUIRED}" perto do topo e 0 com tag SPDX de outra licenca '
+        "em qualquer linha)."
     )
     return 0
 

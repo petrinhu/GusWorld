@@ -37,7 +37,7 @@ import re
 import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from sdl_layer_ratchet import PRODUCTION_DIRS, strip_comments  # noqa: E402
+from sdl_layer_ratchet import iter_production_files, strip_comments  # noqa: E402
 
 # Raiz do repo = pai de tools/ (resolve symlink do proprio script).
 _SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -61,23 +61,18 @@ ALLOWLIST = {
 
 
 def find_offenders():
+    # GATES-HARDEN (2026-08-06): iter_production_files() em vez do os.walk
+    # proprio - o walk deixava `app/main.cpp` de fora (ver sdl_layer_ratchet.py).
     offenders = []
-    for base in PRODUCTION_DIRS:
-        if not os.path.isdir(base):
+    for fp in iter_production_files():
+        rel = os.path.relpath(fp, _ROOT)
+        if rel in ALLOWLIST:
             continue
-        for dirpath, _dirnames, filenames in os.walk(base):
-            for fn in filenames:
-                if not (fn.endswith(".cpp") or fn.endswith(".hpp")):
-                    continue
-                fp = os.path.join(dirpath, fn)
-                rel = os.path.relpath(fp, _ROOT)
-                if rel in ALLOWLIST:
-                    continue
-                with open(fp, encoding="utf-8", errors="replace") as f:
-                    stripped = strip_comments(f.read())
-                count = len(_TOKEN_RE.findall(stripped))
-                if count:
-                    offenders.append((rel, count))
+        with open(fp, encoding="utf-8", errors="replace") as f:
+            stripped = strip_comments(f.read())
+        count = len(_TOKEN_RE.findall(stripped))
+        if count:
+            offenders.append((rel, count))
     offenders.sort()
     return offenders
 
@@ -102,6 +97,11 @@ def check_allowlist_still_valid():
 def main() -> int:
     offenders = find_offenders()
     stale = check_allowlist_still_valid()
+    n_scanned = sum(1 for _ in iter_production_files())
+    if n_scanned == 0:
+        print("GATE(gl3-readbackbuffer-zero): FALHA - escopo colapsou pra ZERO "
+              "arquivo de producao. Sem varrer nada, este gate nao pode dizer OK.")
+        return 1
     ok = True
 
     if offenders:
@@ -129,9 +129,9 @@ def main() -> int:
     if not ok:
         return 1
 
-    print(f"GATE(gl3-readbackbuffer-zero): OK (zero chamada de {_TOKEN} em producao "
-          f"fora da allowlist de {len(ALLOWLIST)} site; allowlist auditada, sem "
-          "entrada desatualizada).")
+    print(f"GATE(gl3-readbackbuffer-zero): OK (zero chamada de {_TOKEN} em "
+          f"{n_scanned} arquivo(s) de producao varrido(s), fora da allowlist de "
+          f"{len(ALLOWLIST)} site; allowlist auditada, sem entrada desatualizada).")
     return 0
 
 

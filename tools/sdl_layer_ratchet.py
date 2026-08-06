@@ -42,6 +42,29 @@ PRODUCTION_DIRS = [
     os.path.join(APP, "include", "gus", "app"),
 ]
 
+# GATES-HARDEN (2026-08-06): os dois dirs acima nao alcancam `app/main.cpp` - o
+# unico .cpp solto na RAIZ de app/ e a UNICA fonte do executavel
+# (`app/CMakeLists.txt`: add_executable(gusworld_app main.cpp)). Ele era ponto
+# cego de TODOS os gates de camada (deste ratchet, do log-clock-zero, do
+# gl3-readbackbuffer-zero e do production_scope.py), e a auditoria mediu o custo:
+# carregava um `#include <SDL3/SDL.h>` ORFAO que ninguem via. O include saiu no
+# MESMO commit que este arquivo entrou aqui (a medicao deu ZERO token `SDL_*`
+# fora de comentario nele), por isso o teto continua 24 e o gate nasce verde -
+# nao foi teto subido por conveniencia.
+#
+# Quem consome este escopo NAO deve iterar PRODUCTION_DIRS na mao: use
+# iter_production_files() abaixo, senao o ponto cego volta a existir num gate de
+# cada vez (foi exatamente como ele sobreviveu ate hoje).
+PRODUCTION_FILES = [
+    os.path.join(APP, "main.cpp"),
+]
+
+# Mesma nota de production_scope.py: extensao e filtro barato, nao criterio de
+# autoria. Medido em 2026-08-06: zero arquivo com estas extensoes dentro do
+# escopo de app/ hoje, entao acrescenta-las nao move nenhuma contagem - so
+# fecha a porta pra um `.h`/`.inl` futuro entrar invisivel.
+CODE_EXTENSIONS = (".cpp", ".hpp", ".h", ".c", ".cc", ".cxx", ".inl", ".hxx", ".ipp")
+
 # TETO DE NAO-REGRESSAO. Medido em 2026-07-29 (docs/tech/plano-camadas-sdl.md
 # secao 2): 32 arquivos de producao tocavam SDL3 fora de comentario. Cada
 # fatia que reduz esse numero de verdade ATUALIZA o valor abaixo no mesmo
@@ -146,6 +169,26 @@ def strip_comments(text: str) -> str:
     return "".join(out)
 
 
+def iter_production_files():
+    """Gera caminhos absolutos de TODO arquivo de producao de app/ - os dirs de
+    PRODUCTION_DIRS mais os arquivos soltos de PRODUCTION_FILES.
+
+    Ponto unico de verdade do escopo de app/: este ratchet, o
+    GATE(log-clock-zero) e o GATE(gl3-readbackbuffer-zero) chamam esta funcao em
+    vez de repetir o os.walk - se um dia entrar outro arquivo solto, os tres
+    passam a ve-lo no mesmo commit."""
+    for base in PRODUCTION_DIRS:
+        if not os.path.isdir(base):
+            continue
+        for dirpath, _dirnames, filenames in os.walk(base):
+            for fn in sorted(filenames):
+                if fn.endswith(CODE_EXTENSIONS):
+                    yield os.path.join(dirpath, fn)
+    for fp in PRODUCTION_FILES:
+        if os.path.isfile(fp):
+            yield fp
+
+
 def file_touches_sdl(path: str) -> bool:
     with open(path, encoding="utf-8", errors="replace") as f:
         text = f.read()
@@ -157,16 +200,9 @@ def file_touches_sdl(path: str) -> bool:
 
 def find_offenders():
     offenders = []
-    for base in PRODUCTION_DIRS:
-        if not os.path.isdir(base):
-            continue
-        for dirpath, _dirnames, filenames in os.walk(base):
-            for fn in filenames:
-                if not (fn.endswith(".cpp") or fn.endswith(".hpp")):
-                    continue
-                fp = os.path.join(dirpath, fn)
-                if file_touches_sdl(fp):
-                    offenders.append(os.path.relpath(fp, ROOT))
+    for fp in iter_production_files():
+        if file_touches_sdl(fp):
+            offenders.append(os.path.relpath(fp, ROOT))
     offenders.sort()
     return offenders
 
@@ -174,9 +210,19 @@ def find_offenders():
 def main() -> int:
     offenders = find_offenders()
     n = len(offenders)
+    # DECLARA O QUE VARRE (mesma regra do GATE(spdx-required)): "OK" so pode
+    # significar "varri estes N", nunca "nao achei problema onde procurei". Se o
+    # escopo colapsar (dir renomeado, arvore mexida), o numero cai a vista em vez
+    # de o gate imprimir um OK vazio.
+    n_scanned = sum(1 for _ in iter_production_files())
+    if n_scanned == 0:
+        print("GATE(sdl-ratchet): FALHA - escopo colapsou pra ZERO arquivo "
+              "(app/src + app/include/gus/app + app/main.cpp). O gate nao pode "
+              "dizer OK sem ter olhado pra nada.")
+        return 1
     print(f"GATE(sdl-ratchet): {n} arquivo(s) de producao em app/ tocam SDL3 "
-          f"(teto={CEILING}, escopo: app/src + app/include/gus/app, "
-          f"excluindo app/tests/ e app/tools/).")
+          f"(teto={CEILING}, escopo: app/src + app/include/gus/app + app/main.cpp, "
+          f"excluindo app/tests/ e app/tools/; {n_scanned} arquivo(s) varrido(s)).")
     if n > CEILING:
         print(f"GATE(sdl-ratchet): FALHA - {n} > teto {CEILING}.")
         print("  Isso quebra o contrato de 4 camadas: platform/ e a UNICA")
