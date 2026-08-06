@@ -93,7 +93,7 @@ Timeline-alvo do jogador novato (N=3 familiar). Tempos são limites superiores c
 
 ## 8. Hipótese falseável de playtest (N=3 familiar, GDD §8)
 
-**Hipótese primária (falseável):** "Um jogador novato (Gus Dragon 11 / Iago / Petrus, sem briefing prévio) executa o core loop completo (scan → compilar → prever → combo → resolve o Sentinela-Bit) em ≤5:00 de gameplay real, e cruza a 1ª patrulha em ≤6:00, sem que nenhum modal de texto seja necessário."
+**Hipótese primária (falseável):** "Um jogador novato (Gus Dragon 11 / [Iagows](https://github.com/iagows) / Petrus, sem briefing prévio) executa o core loop completo (scan → compilar → prever → combo → resolve o Sentinela-Bit) em ≤5:00 de gameplay real, e cruza a 1ª patrulha em ≤6:00, sem que nenhum modal de texto seja necessário."
 
 **Métrica primária:** time-to-fun = tempo do start até o jogador ter executado os 4 verbs ao menos 1× cada e vencido o Sentinela. Cronômetro de gameplay (exclui pausas).
 

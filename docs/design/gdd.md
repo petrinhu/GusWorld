@@ -125,7 +125,7 @@ Cross-ref: seed `MUNDO-TOPOLOGIA-AREAS` #7 (`docs/design/brainstorm-backlog.md`,
 
 ## 8. Métrica de sucesso
 
-**Time-to-fun ≤ 5 minutos.** Em playtest interno N=3 (Petrus + Gus Dragon + Iago — time familiar), jogador novo precisa ter executado o core loop completo (scan → compilar → prever → resolver 1 encontro) em até 5 minutos de gameplay real. Se falhar, onboarding é refeito.
+**Time-to-fun ≤ 5 minutos.** Em playtest interno N=3 (Petrus + Gus Dragon + [Iagows](https://github.com/iagows) — time familiar), jogador novo precisa ter executado o core loop completo (scan → compilar → prever → resolver 1 encontro) em até 5 minutos de gameplay real. Se falhar, onboarding é refeito.
 
 Secundárias (não bloqueantes): "would play again" ≥70%, taxa de conclusão da campanha ≥40% em primeira run.
 

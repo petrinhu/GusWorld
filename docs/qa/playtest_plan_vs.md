@@ -21,10 +21,10 @@ Time fixo canônico (memória project_inspiracoes_pessoais). **Sem briefing pré
 | Testador | Papel | Por que importa |
 |---|---|---|
 | **Gus Dragon** (filho, 11 anos) | jogador-alvo | idade canônica do Gus; referência de tom e de skill-floor real (Pillar 4) |
-| **Iago** (irmão, eng. sênior) | jogador analítico | testa se o sistema "lê" para quem decompõe rápido; risco oposto (otimiza cedo demais) |
+| **[Iagows](https://github.com/iagows)** (irmão, eng. sênior) | jogador analítico | testa se o sistema "lê" para quem decompõe rápido; risco oposto (otimiza cedo demais) |
 | **Petrus** (criador) | jogador + facilitador | conhece o design; roda por último para não enviesar; útil como baseline de teto |
 
-Ordem sugerida: Gus Dragon e Iago primeiro (frios de verdade), Petrus por último. Cada um joga isolado (sem assistir os outros antes da própria run).
+Ordem sugerida: Gus Dragon e [Iagows](https://github.com/iagows) primeiro (frios de verdade), Petrus por último. Cada um joga isolado (sem assistir os outros antes da própria run).
 
 ## 3. Métrica primária
 
@@ -75,7 +75,7 @@ Regra de ouro (GDD §8 / onboarding §8): durante a run, **não interferir, não
 
 ## 6. Hipótese falseável + critério de REFAZER onboarding (GDD §8, onboarding §8)
 
-**Hipótese primária (falseável):** "Um jogador novato (Gus Dragon / Iago / Petrus, sem briefing) executa o core loop completo (scan -> compilar -> prever -> combo -> resolve o Sentinela-Bit) em ≤ 5:00 de gameplay real, cruza a 1ª patrulha em ≤ 6:00, sem que nenhum modal de texto seja necessário."
+**Hipótese primária (falseável):** "Um jogador novato (Gus Dragon / [Iagows](https://github.com/iagows) / Petrus, sem briefing) executa o core loop completo (scan -> compilar -> prever -> combo -> resolve o Sentinela-Bit) em ≤ 5:00 de gameplay real, cruza a 1ª patrulha em ≤ 6:00, sem que nenhum modal de texto seja necessário."
 
 **Dispara REFAZER o onboarding (qualquer um dos três):**
 1. time-to-fun **> 5:00 em ≥ 2 dos 3** testadores, OU

@@ -60,7 +60,7 @@ O `build.md §7.4` prevê Linux ~80-120MB / Windows ~70-100MB (trade-off aceito 
 
 | Critério (mensurável) | Método de verificação |
 |---|---|
-| Os 3 testadores (Petrus, Gus Dragon, Iago) executam o loop completo (scan → compilar → prever → resolver 1 encontro) em ≤ 5min de gameplay real cada | Timer real por sessão; medir do primeiro input ao fim do 1º combate; 3/3 dentro do alvo |
+| Os 3 testadores (Petrus, Gus Dragon, [Iagows](https://github.com/iagows)) executam o loop completo (scan → compilar → prever → resolver 1 encontro) em ≤ 5min de gameplay real cada | Timer real por sessão; medir do primeiro input ao fim do 1º combate; 3/3 dentro do alvo |
 | Nenhum testador pede ajuda externa para passar do tutorial diegético | Observação registrada; intervenção do facilitador = fail daquela run |
 | Secundária (não bloqueante): "would play again" ≥ 70% | Pergunta pós-sessão (sim/não); 2 de 3 já satisfaz |
 

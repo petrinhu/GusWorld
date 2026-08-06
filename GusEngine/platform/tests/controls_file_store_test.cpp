@@ -68,12 +68,12 @@ TEST_CASE("controls_file_path: perfis DISTINTOS resolvem pra arquivos "
     cfg_b.actions.front().keys = {KeyBinding{.keycode = 'B'}};
 
     REQUIRE(save_controls(cfg_a, dir.string(), "tester"));
-    REQUIRE(save_controls(cfg_b, dir.string(), "iago"));
+    REQUIRE(save_controls(cfg_b, dir.string(), "iagows"));
 
     REQUIRE(load_controls(dir.string(), "tester") == cfg_a);
-    REQUIRE(load_controls(dir.string(), "iago") == cfg_b);
+    REQUIRE(load_controls(dir.string(), "iagows") == cfg_b);
     REQUIRE(controls_file_path(dir.string(), "tester") !=
-            controls_file_path(dir.string(), "iago"));
+            controls_file_path(dir.string(), "iagows"));
 
     // dir e um gus::test_support::ScopedTempDir - RAII remove no fim do escopo.
 }

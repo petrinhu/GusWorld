@@ -1,6 +1,6 @@
 # O Homem que Escuta a Terra Antes de Cavar
 
-*Para Iago, que inspirou este tio.*
+*Para [Iagows](https://github.com/iagows), que inspirou este tio.*
 
 ---
 
