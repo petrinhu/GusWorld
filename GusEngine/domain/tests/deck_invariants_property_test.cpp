@@ -338,7 +338,12 @@ bool apply_random_step(Lcg& g, int op, CardCollection& collection, HandLoadout& 
                     // capturado.
             const std::uint64_t id = random_candidate_id(g, collection);
             try {
-                diagnose_in_deck(collection, id);
+                // Descarte DELIBERADO do outcome (cast-to-void explicito, exigido
+                // por -Werror=unused-result): aqui so interessa o EFEITO no
+                // collection sob sequencia arbitraria - qual outcome saiu
+                // (RejectedNotInfected/etc.) e verificado nos testes dedicados de
+                // turing_service, nao neste property test.
+                static_cast<void>(diagnose_in_deck(collection, id));
             } catch (const std::invalid_argument&) {
                 // id fora do ativo - esperado.
             }
@@ -352,7 +357,11 @@ bool apply_random_step(Lcg& g, int op, CardCollection& collection, HandLoadout& 
                     // arbitraria, sem cravar o resultado.
             const std::uint64_t id = random_candidate_id(g, collection);
             try {
-                attempt_cure_in_deck(collection, id, tier_of_pool, rng);
+                // Descarte DELIBERADO do outcome - mesmo motivo do case 12 acima:
+                // o property test cobra o INVARIANTE do collection, nao o veredicto
+                // de cada chamada.
+                static_cast<void>(
+                    attempt_cure_in_deck(collection, id, tier_of_pool, rng));
             } catch (const std::invalid_argument&) {
                 // id fora do ativo - esperado.
             }

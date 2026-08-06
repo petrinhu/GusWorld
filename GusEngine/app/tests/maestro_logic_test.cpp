@@ -863,7 +863,13 @@ TEST_CASE("FrozenBgRemoveGuard: path VAZIO (frozen_ok==false) e no-op no dtor - 
     }
     REQUIRE(std::filesystem::exists(sentinel));
 
-    { const FrozenBgRemoveGuard guard(std::string()); }  // path vazio: dtor no-op
+    // CHAVES, nao parenteses (WARN-GATE, 2026-08-06): com `guard(std::string())`
+    // isto era *most vexing parse* - o C++ lia a linha como DECLARACAO DE FUNCAO
+    // (`guard` recebendo um std::string sem nome e devolvendo FrozenBgRemoveGuard),
+    // entao nenhum guardia era construido, nenhum destrutor rodava, e o CHECK
+    // abaixo passava por vacuidade - o teste nao provava nada. Com braces o objeto
+    // existe de verdade e o dtor de path vazio e exercitado.
+    { const FrozenBgRemoveGuard guard{std::string()}; }  // path vazio: dtor no-op
 
     CHECK(std::filesystem::exists(sentinel));  // intacto
     std::filesystem::remove(sentinel);

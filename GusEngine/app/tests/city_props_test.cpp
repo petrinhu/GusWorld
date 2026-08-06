@@ -316,7 +316,10 @@ TEST_CASE("vestir: o caminho de cada arte sai do header central de assets",
     // Caminho de asset nunca hardcoded: o carregador junta a pasta da área com o
     // arquivo da linha do catálogo, os dois vindos de core/asset_paths.hpp.
     StubRenderer r(true);
-    load_scene_prop_textures(r);
+    // Descarte DELIBERADO das texturas (cast-to-void explicito, exigido por
+    // -Werror=unused-result): o que este teste cobra e o CAMINHO que o carregador
+    // pediu ao renderer (r.paths), nao os handles devolvidos.
+    static_cast<void>(load_scene_prop_textures(r));
     for (const std::string& p : r.paths) {
         REQUIRE(p.find("sprites/world/distritos_inferiores/") != std::string::npos);
         REQUIRE(p.find(".png") != std::string::npos);

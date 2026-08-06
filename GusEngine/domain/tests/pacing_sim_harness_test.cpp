@@ -953,7 +953,11 @@ TEST_CASE("pacing_sim: run_phase_a - disparo real da Fase A (N=240k - grava em a
     std::ofstream file(report_path);
     REQUIRE(file.is_open());
     TeeOstream tee(std::cout, file);
-    run_phase_a(n_per_point, base_seed, tee);
+    // Descarte DELIBERADO do vetor de resultados (cast-to-void explicito, exigido
+    // por -Werror=unused-result): o ENTREGAVEL desta fase e o relatorio impresso no
+    // `tee` (arquivo + stdout), nao o vetor - que aqui seria copia redundante do que
+    // ja foi gravado.
+    static_cast<void>(run_phase_a(n_per_point, base_seed, tee));
 }
 
 // Disparo REAL da Fase B (protocolo secao 2.1, metodo direcional - decisao do lider
@@ -981,7 +985,9 @@ TEST_CASE("pacing_sim: run_phase_b - disparo real da Fase B (N=240k - grava em a
     std::ofstream file(report_path);
     REQUIRE(file.is_open());
     TeeOstream tee(std::cout, file);
-    run_phase_b(n_per_point, base_seed, tee);
+    // Descarte DELIBERADO do vetor de resultados - mesmo motivo da Fase A acima:
+    // o entregavel e o relatorio no `tee`.
+    static_cast<void>(run_phase_b(n_per_point, base_seed, tee));
 }
 
 // ============================================================================

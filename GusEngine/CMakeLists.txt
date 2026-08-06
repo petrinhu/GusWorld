@@ -778,10 +778,51 @@ add_subdirectory(third_party/monocypher)
 # Fase D (promocao, esta mudanca): com o projeto ja limpo, -Wswitch vira ERRO
 # (Werror=switch/we4062) - switch nao-exaustivo novo QUEBRA o build a partir daqui,
 # em vez de so avisar.
+#
+# WARN-GATE (2026-08-06): promocao de MAIS DUAS classes a erro -
+# -Werror=unused-result e -Werror=vexing-parse.
+#
+# O DEFEITO que fecha: as duas ja eram emitidas pelo GCC/Clang por conta propria
+# (nao precisam de -Wall), mas como o build terminava com SUCESSO, ninguem via.
+# Uma fatia anterior chegou a declarar "build limpo, zero warning nosso" - era
+# falso: o rebuild das 375 unidades do projeto produzia 6 avisos (5
+# unused-result + 1 vexing-parse), enumerados por classe, nao procurados. Sem
+# trava, todo conserto vale ate o proximo arquivo novo.
+#
+# POR QUE ESTAS DUAS, E NAO -Wall -Wextra: as duas apanham BUG DE VERDADE, nao
+# estilo. O vexing-parse encontrado escondia um teste vazio -
+# `FrozenBgRemoveGuard guard(std::string())` era lido como DECLARACAO DE FUNCAO,
+# o guardia nunca era construido, o destrutor nunca rodava, e o CHECK seguinte
+# passava por vacuidade (corrigido no mesmo commit desta promocao,
+# app/tests/maestro_logic_test.cpp). O custo de ruido foi MEDIDO: com os 6
+# consertos aplicados, o rebuild completo produz ZERO aviso, entao a promocao
+# nasce verde. O custo de -Wall -Wextra NAO foi medido, e gate que nasce
+# vermelho nao entra - fica para uma fatia que o meca.
+#
+# ONDE ISTO PEGA: no COMPILADOR, logo em todo build local, no tools/check.sh e
+# no CI Linux, SEM passo novo em lugar nenhum - descartar retorno [[nodiscard]]
+# ou escrever most-vexing-parse passa a QUEBRAR o build, nao a sussurrar.
+# Descarte deliberado continua legitimo pelo cast-to-void explicito
+# (`static_cast<void>(f())`), que e justamente o ponto: obriga a dizer que o
+# descarte foi de proposito.
+#
+# MSVC FICA DE FORA, e isto e explicito, nao esquecimento: as duas flags sao de
+# sintaxe GCC/Clang e o MSVC nao tem equivalente 1-para-1 (o C4834 dele cobre
+# so [[nodiscard]] descartado, e nao ha analogo de vexing-parse). O CI Windows
+# (windows.yml, MSVC) portanto NAO exerce esta trava - quem a exerce e o build
+# Linux, que roda em todo PR. Ligar /we4834 no MSVC exigiria medir o ruido dele
+# separado, e nao foi medido aqui.
 add_library(gus_warnings INTERFACE)
 target_compile_options(gus_warnings INTERFACE
     $<$<CXX_COMPILER_ID:GNU,Clang>:-Werror=switch>
     $<$<CXX_COMPILER_ID:MSVC>:/we4062>
+    # WARN-GATE: -Wvexing-parse existe no GCC >= 11 (implementado em r11-4756,
+    # ligado por padrao) e no Clang ha muito mais tempo; num toolchain
+    # que nao a conheca o proprio compilador ABORTA com "no option
+    # -Wvexing-parse" (medido), ou seja, falha RUIDOSA - esta trava nunca fica
+    # silenciosamente desligada.
+    $<$<CXX_COMPILER_ID:GNU,Clang>:-Werror=unused-result>
+    $<$<CXX_COMPILER_ID:GNU,Clang>:-Werror=vexing-parse>
 )
 
 # --- Camadas ---
