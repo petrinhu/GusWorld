@@ -347,6 +347,7 @@ GATE=0
     && [ "$GATE_CALLBACK_DTOR" = "0" ] && [ "$GATE_CALLBACK_DISARM" = "0" ] \
     && [ "$GATE_DECODE_IMAGE_ZERO" = "0" ] \
     && [ "$GATE_PRODUCTION_SCOPE" = "0" ] \
+    && [ "$GATE_TOOLS_TESTS" = "0" ] \
     || GATE=1
 echo "GATE=$GATE"
 
