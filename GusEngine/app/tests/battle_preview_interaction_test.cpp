@@ -147,7 +147,8 @@ void push_quit() {
 // coincidencia). O `sync_hook` de run_screen_state recebe TODO evento pumpado ANTES de a
 // tela trata-lo, entao a 1a chamada dele e' exatamente a fronteira "setup acabou, o
 // primeiro input ainda nao foi tratado" - e a costura que faltava pra medir so o input.
-unsigned int input_sfx_plays(gus::platform::audio::AudioEngine& audio, SDL_Window* window) {
+unsigned int run_and_measure(gus::platform::audio::AudioEngine& audio, SDL_Window* window,
+                             bool expect_quit) {
     unsigned int baseline = 0;
     bool captured = false;
     const gus::app::EventSyncHook hook = [&](const SDL_Event&) {
@@ -163,9 +164,13 @@ unsigned int input_sfx_plays(gus::platform::audio::AudioEngine& audio, SDL_Windo
         window, &outcome, &quit_requested, &audio, /*fade_in_seconds=*/0.0f,
         /*fade_out_seconds=*/0.0f, hook);
 
-    REQUIRE(quit_requested);  // saiu pelo QUIT, nao por outro caminho
-    REQUIRE(captured);        // o hook viu ao menos 1 evento (senao o delta seria fake)
+    REQUIRE(quit_requested == expect_quit);
+    REQUIRE(captured);  // o hook viu ao menos 1 evento (senao o delta seria fake)
     return audio.sfx_play_count() - baseline;
+}
+
+unsigned int input_sfx_plays(gus::platform::audio::AudioEngine& audio, SDL_Window* window) {
+    return run_and_measure(audio, window, /*expect_quit=*/true);
 }
 
 }  // namespace
@@ -329,4 +334,50 @@ TEST_CASE("battle_preview (harness headless, SFX-COCKPIT): a tecla que NAO naveg
     // O unico som da sessao foi o HIT que o proprio setup (skip+update ate a vez do
     // jogador) disparou - nenhum blip de UI entrou depois dele.
     REQUIRE(audio.last_sfx_id() == kHitSfxId);
+}
+
+TEST_CASE("battle_preview (harness headless, SFX-COCKPIT): superficie PILLS DE VERBO / "
+          "canal MOUSE - a varredura sintetica dos 6 pills toca 6 hovers (1 por pill), 0 "
+          "de repique, +1 ao sair-e-voltar e +1 no clique, atravessando a QUERY DE CAIXA "
+          "REAL do glintfx - o unico ponto que nenhum outro teste alcanca",
+          "[battle_preview_interaction][gl][sfx-cockpit]") {
+    GlTestEnv env = try_boot_gl();
+    if (!env.ok) {
+        INFO("GL/display indisponivel - harness pulado (rode com Xvfb :99).");
+        return;
+    }
+    // ESTE CASO EXISTE POR UM MUTANTE QUE SOBREVIVEU. Com os 5 casos acima + os 32
+    // headless no lugar, trocar `b.found` por `false` na montagem das UiHoverBox de
+    // BattleScreen::handle_cockpit_hover_ (isto e': o cockpit deixa de achar QUALQUER
+    // pill) mantinha a suite INTEIRA verde, 2997/2997. Aquele laco e' o unico pedaco do
+    // som do cockpit que so existe COM RmlUi vivo, e os outros 5 casos GL nao passam por
+    // ele: eles enfileiram todos os eventos ANTES da chamada, e run_screen_state drena a
+    // fila inteira no 1o pump - ANTES do 1o ui_->update(), quando a geometria do
+    // documento ainda nao assentou e get_element_box devolve found=false pra tudo.
+    //
+    // A SAIDA nao foi inventar um jeito de injetar evento no frame N: o proprio host ja
+    // tem esse caminho pronto - GUSWORLD_BATTLE_UI_SFX_SELFTEST=1 assenta a cena ate a
+    // vez do jogador, espera 12 frames pela geometria e ENTAO varre MouseMoves sinteticos
+    // pelos 6 pills chamando o MESMO handle_cockpit_hover_ de producao. Ele existia desde
+    // 2026-07-04 e SO IMPRIMIA no terminal: nao estava no ctest, nem no CI, nem no
+    // check.sh - "prova" que ninguem rodava (achado (1) da auditoria). Aqui ele deixa de
+    // ser um printf e vira assercao.
+    const ScopedEnv selftest("GUSWORLD_BATTLE_UI_SFX_SELFTEST", "1");
+
+    // 1 evento inofensivo SO pra o sync_hook capturar a baseline (ele so dispara com
+    // evento). Canto superior esquerdo: fora da coluna do cockpit - e, no frame 0, a
+    // geometria nem existe ainda. Nao ha QUIT: o proprio self-test encerra a tela
+    // (running_=false) quando termina a prova, entao expect_quit=false.
+    SDL_Event motion{};
+    motion.type = SDL_EVENT_MOUSE_MOTION;
+    motion.motion.x = 5.0f;
+    motion.motion.y = 5.0f;
+    REQUIRE(SDL_PushEvent(&motion));
+
+    gus::platform::audio::AudioEngine audio(/*device_active=*/false);
+    const unsigned int plays = run_and_measure(audio, env.window, /*expect_quit=*/false);
+
+    // 6 (varredura) + 0 (repique) + 1 (sair-e-voltar) + 1 (clique ATACAR) = 8.
+    REQUIRE(plays == 8u);
+    REQUIRE(audio.last_sfx_id() == kUiClickSfxId);  // o ultimo gesto foi o clique
 }
