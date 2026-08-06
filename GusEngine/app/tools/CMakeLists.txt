@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: Apache-2.0
 # PROBE EFEMERO (app/tools/ e UNTRACKED - nada aqui e commitado). Projeto CMake
 # STANDALONE (nao e add_subdirectory do GusEngine/CMakeLists.txt principal - nao toca
 # em NENHUM arquivo tracked) so para buildar o msaa_glintfx_probe.

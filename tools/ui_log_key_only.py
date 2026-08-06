@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: Apache-2.0
 """ui_log_key_only.py - GATE(ui-log-key-only) do tools/check.sh.
 
 O DEFEITO QUE MOTIVOU (I18N-UILOG, 2026-08-06): o canal `ui_log_` da BattleScene

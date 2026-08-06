@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: Apache-2.0
 """test_ui_log_key_only.py - prova que o GATE(ui-log-key-only) MORDE.
 
 Um gate so vale se (a) mede de verdade o defeito que motivou sua criacao, (b)

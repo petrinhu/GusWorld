@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: Apache-2.0
 # gusengine_core - POCO C++ puro, ZERO Qt E ZERO SDL (ADR-008).
 #
 # INVARIANTE (engine-design.md sec 2 + ADR-008): este target NAO pode linkar Qt

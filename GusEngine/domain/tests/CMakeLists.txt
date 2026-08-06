@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: Apache-2.0
 # Testes headless (Catch2 v3) de domain/ (subsistemas portados do C#).
 #
 # Espelha o padrao de GusEngine/tests/ do M0: executavel Catch2 +

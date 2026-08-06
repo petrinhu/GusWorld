@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: Apache-2.0
 # tools/gitleaks_staged_check.sh
 #
 # Recomendacao no 3 do TST-8 (docs/auditoria/TST-8-secret-scan-2026-07-25.md

@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: Apache-2.0
 """test_fetchcontent_manifest.py - prova que o GATE(fetchcontent-manifest)
 enxerga o GRAFO de add_subdirectory, nao um arquivo so (FURO 2 da auditoria dos
 gates, GATES-HARDEN 2026-08-06).

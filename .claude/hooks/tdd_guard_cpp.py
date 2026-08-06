@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: Apache-2.0
 """TDD guard leve para C++ no GusEngine (reforco do ciclo test-first).
 
 Bloqueia Write/Edit de um arquivo de IMPLEMENTACAO C++ dentro de GusEngine/

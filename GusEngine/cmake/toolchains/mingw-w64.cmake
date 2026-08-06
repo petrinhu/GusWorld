@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: Apache-2.0
 # mingw-w64.cmake - toolchain de cross-compile Linux -> Windows x86_64 (MinGW-w64).
 #
 # WIN-CROSS-VALIDATE (2026-07-14): usado para validar, DENTRO de um container

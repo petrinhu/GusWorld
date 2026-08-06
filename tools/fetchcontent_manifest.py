@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: Apache-2.0
 """fetchcontent_manifest.py - GATE(fetchcontent-manifest) do tools/check.sh.
 
 LISTA FECHADA (nao ratchet, nao zero-tolerancia de token - de NOME): reprova

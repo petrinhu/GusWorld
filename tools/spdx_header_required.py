@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: Apache-2.0
 """spdx_header_required.py - GATE(spdx-required) do tools/check.sh.
 
 NAO EXISTIA NENHUM GATE DE LICENCA (2026-08-01): a onda LICENSE-APACHE
@@ -35,16 +36,50 @@ segue na allowlist porque o gate exige espedificamente Apache-2.0, nao
 "qualquer SPDX". Nao existe hoje nenhum .cpp/.hpp/.h/.c fora de GusEngine/,
 entao o escopo "repo inteiro" e "GusEngine/" coincidem na pratica.
 
-FORA DE ESCOPO, DE PROPOSITO (nao omissao - decisao registrada): .py/.sh/
-.cmake/.yml. Medido no mesmo dia: 0/9 .sh, 0/1 .cmake, 0/3 .yml e 0/14 .py
-NOSSOS (os 2 .py com SPDX sao os roster-analogos, MIT, de terceiro) tem
-QUALQUER cabecalho de licenca hoje - ligar o gate nessas extensoes agora
-faria ele nascer vermelho contra ~27 arquivos pre-existentes, violando a
-regra de "nao nascer vermelho" (docs/tech, requisito 3 desta fatia). Se o
-projeto decidir estender a rotacao a tooling/CI, a extensao deste gate e
-trivial (so mexer em EXTENSIONS abaixo) - mas isso e uma fatia NOVA, com
-cabecalhos aplicados ANTES do gate ligar, exatamente como esta fatia fez
-para .cpp/.hpp/.h/.c.
+QUITACAO DE .py/.cmake/CMakeLists.txt (SPDX-QUITACAO, 2026-08-06): a fatia
+que criou este gate deixou tooling/build DECLARADAMENTE de fora, com item
+aberto para quitar depois - e a divida CRESCEU enquanto o item esperava: em
+2026-08-01 havia 18 .py sem cabecalho, em 2026-08-06 havia 20 (os dois novos,
+tools/callback_dtor_*.py, nasceram sem SPDX quatro dias depois, materializando
+exatamente o risco que este gate existe para cobrir, nas extensoes deixadas de
+fora). O escopo declarado tambem estava errado POR OMISSAO: `CMakeLists.txt`
+nao casa com nenhuma extensao e nao estava na conta - 14 arquivos rastreados,
+14 sem cabecalho, incluindo os que definem os alvos de build. A superficie real
+media nesta fatia foi 51 arquivos (27 .py + 9 .sh + 1 .cmake + 14 CMakeLists),
+nao os ~27 que a ficha dizia; 48 ganharam cabecalho aqui, 2 foram pra allowlist
+e 1 (tools/check.sh) ficou bloqueado (ver .sh abaixo).
+
+.sh: FORA HOJE, POR BLOQUEIO TEMPORAL, NAO POR DECISAO. Os 8 outros .sh
+rastreados ja receberam o cabecalho nesta fatia; falta so `tools/check.sh`,
+que estava sendo editado por OUTRA fatia em voo no mesmo momento (tocar o
+arquivo a duas maos arrisca perder a edicao alheia e deixar o gate vermelho
+para todos). Ligar `.sh` custa uma palavra em EXTENSIONS no dia em que
+check.sh ganhar o cabecalho - e para isso NAO depender de alguem lembrar,
+tools/tests/test_spdx_header_required.py tem um TRIPWIRE que fica vermelho
+assim que check.sh ganhar o header, com a instrucao do que fazer.
+
+.yml: FORA DE PROPOSITO (decisao, nao esquecimento). Cabecalho de licenca em
+workflow de CI nao e pratica da industria - os .yml aqui sao configuracao de
+plataforma (.github/workflows/, FUNDING.yml), nao obra autoral distribuida, e
+o LICENSE da raiz ja cobre o repositorio. Se o projeto mudar de ideia, reverter
+custa uma palavra em EXTENSIONS mais o cabecalho nos 3 arquivos.
+
+DECLARACAO x MENCAO (SPDX-QUITACAO, decisao autonoma - CONFIRMAR
+RETROATIVAMENTE): estender o escopo a tooling exigiu ensinar as duas regras a
+diferenca entre uma tag SPDX DECLARADA e uma tag MENCIONADA dentro de string
+de codigo ou de prosa. Sem isso o gate REPROVA A SI MESMO: este script cita a
+tag no docstring e na regex, e o teste dele constroi fixtures com a tag em
+string literal - medido, 18 falsos positivos da REGRA 2, sendo 4 neste arquivo.
+A distincao usa o VALOR: uma expressao SPDX (spec, anexo D) so tem letra,
+digito, ponto, `+`, `-`, parenteses e espaco (`MIT`, `Apache-2.0`,
+`BSD-2-Clause OR CC0-1.0`). Valor com aspas, barra, contrabarra, chave ou
+crase nao e declaracao de licenca nenhuma - e codigo ou prosa. NAO E
+AFROUXAMENTO, e precisao, e foi medido nas duas direcoes: no escopo C++ de 575
+arquivos a mudanca altera ZERO veredito (nenhum .cpp/.hpp menciona a tag), as
+2 declaracoes reais nao-Apache (monocypher) continuam pegas, e os 18 falsos
+positivos somem. O criterio e permissivo PARA SINALIZAR: valor limpo mas
+estranho (ex.: `GPL-3.0-or-later provisorio`) continua reprovando, porque
+sinalizar de mais e seguro e sinalizar de menos nao e.
 
 DUAS REGRAS, NAO UMA (GATES-HARDEN, 2026-08-06): ate esta fatia o gate so
 procurava a PRESENCA do Apache-2.0 perto do topo, e nunca a AUSENCIA de outra
@@ -96,10 +131,20 @@ ALLOWLIST_PATH = os.path.join(SCRIPT_DIR, "spdx_allowlist.txt")
 # GATES-HARDEN (2026-08-06): `.cc/.cxx/.inl/.hxx/.ipp` entraram porque o custo e
 # uma linha e a medicao do dia deu ZERO arquivo rastreado com essas extensoes -
 # o gate nasce verde e fecha a porta pro proximo `.inl` nascer sem cabecalho.
-# ⚠️ `.py/.sh/.cmake/CMakeLists.txt` continuam FORA (ver "FORA DE ESCOPO" acima):
-# ~27 arquivos pre-existentes sem cabecalho fariam o gate nascer VERMELHO. Isso e
-# fatia PROPRIA, com os cabecalhos aplicados ANTES de a extensao entrar aqui.
-EXTENSIONS = ("cpp", "hpp", "h", "c", "cc", "cxx", "inl", "hxx", "ipp")
+# SPDX-QUITACAO (2026-08-06): `.py` e `.cmake` entraram DEPOIS de os 48 arquivos
+# receberem cabecalho no MESMO commit - o gate nasce verde, nunca vermelho.
+# ⚠️ `.sh` fica de fora por bloqueio temporal (tools/check.sh em voo por outra
+# fatia) e `.yml` de proposito; os dois motivos estao no docstring, e o `.sh` tem
+# tripwire no teste para nao virar divida silenciosa outra vez.
+EXTENSIONS = ("cpp", "hpp", "h", "c", "cc", "cxx", "inl", "hxx", "ipp",
+              "py", "cmake")
+
+# Arquivo de build sem extensao nenhuma: `CMakeLists.txt` nao casa com nenhum
+# `*.<ext>` e por isso ficou fora da conta da fatia anterior por OMISSAO (14
+# rastreados, 14 sem cabecalho, incluindo os que definem os alvos de build).
+# Enumerado por basename explicito, mesma disciplina do EXTENSIONS: espaco
+# fechado por construcao, `git ls-files` com pathspec literal.
+EXTRA_BASENAMES = ("CMakeLists.txt",)
 
 REQUIRED = "SPDX-License-Identifier: Apache-2.0"
 
@@ -110,7 +155,28 @@ REQUIRED = "SPDX-License-Identifier: Apache-2.0"
 _SPDX_TAG_RE = re.compile(r"SPDX-License-Identifier:\s*(.*)")
 _TAG_TAIL_RE = re.compile(r"\s*(?:\*/|-->|#>)\s*$")
 
+# DECLARACAO x MENCAO (ver docstring): alfabeto de uma expressao SPDX (spec,
+# anexo D) - identificador de licenca, operadores AND/OR/WITH, parenteses e o
+# sufixo `+`. Aspas, barra, contrabarra, chave e crase NAO ocorrem em expressao
+# SPDX nenhuma: quando aparecem, a "tag" esta dentro de uma string de codigo ou
+# de prosa e nao declara licenca coisa nenhuma.
+_SPDX_VALUE_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9.+()\- ]*$")
+
 REQUIRED_VALUE = "Apache-2.0"
+
+
+def spdx_declaration(line: str) -> str | None:
+    """Valor da licenca DECLARADA nesta linha, ou None se for so mencao.
+
+    E o unico ponto onde as duas regras decidem "isto e uma declaracao": mudar
+    aqui muda as duas juntas, de proposito (a REGRA 1 tinha o mesmo ponto cego
+    - um arquivo cuja linha 3 CITASSE a string do cabecalho satisfazia a
+    presenca sem declarar nada)."""
+    m = _SPDX_TAG_RE.search(line)
+    if not m:
+        return None
+    value = _TAG_TAIL_RE.sub("", m.group(1)).strip()
+    return value if _SPDX_VALUE_RE.match(value) else None
 
 # O cabecalho vive na linha 1 nos 531 arquivos ja rotacionados (medido nesta
 # mesma auditoria); tolera ate a linha 5 para nao reprovar por variacao
@@ -119,9 +185,16 @@ REQUIRED_VALUE = "Apache-2.0"
 MAX_HEADER_LINES = 5
 
 
-def list_tracked_files(root: str, extensions: tuple[str, ...]) -> list[str]:
-    """Enumera via `git ls-files`, nunca find/os.walk (ver docstring)."""
+def list_tracked_files(root: str, extensions: tuple[str, ...],
+                       basenames: tuple[str, ...] = ()) -> list[str]:
+    """Enumera via `git ls-files`, nunca find/os.walk (ver docstring).
+
+    `basenames` cobre arquivo sem extensao (CMakeLists.txt): dois pathspecs
+    literais por nome - o da raiz e o de qualquer subdiretorio -, e nunca um
+    glob de sufixo (`*CMakeLists.txt` casaria tambem `fooCMakeLists.txt`)."""
     patterns = [f"*.{ext}" for ext in extensions]
+    for name in basenames:
+        patterns += [name, f"*/{name}"]
     out = subprocess.run(
         ["git", "-C", root, "ls-files", "--"] + patterns,
         capture_output=True,
@@ -161,7 +234,7 @@ def has_required_header(fp: str) -> bool:
                 line = f.readline()
                 if not line:
                     break
-                if REQUIRED in line:
+                if spdx_declaration(line) == REQUIRED_VALUE:
                     return True
     except OSError:
         return False
@@ -179,11 +252,8 @@ def foreign_license_tags(fp: str) -> list[tuple[int, str]]:
     try:
         with open(fp, encoding="utf-8", errors="replace") as f:
             for lineno, line in enumerate(f, start=1):
-                m = _SPDX_TAG_RE.search(line)
-                if not m:
-                    continue
-                value = _TAG_TAIL_RE.sub("", m.group(1)).strip()
-                if value != REQUIRED_VALUE:
+                value = spdx_declaration(line)
+                if value is not None and value != REQUIRED_VALUE:
                     found.append((lineno, value))
     except OSError:
         return []
@@ -226,12 +296,14 @@ def find_stale_allowlist(root: str, allowlist: dict[str, str]) -> list[tuple[str
 
 def main() -> int:
     allowlist = load_allowlist(ALLOWLIST_PATH)
-    files = list_tracked_files(ROOT, EXTENSIONS)
+    files = list_tracked_files(ROOT, EXTENSIONS, EXTRA_BASENAMES)
     offenders = find_offenders(files, ROOT, allowlist)
     foreign = find_foreign(files, ROOT, allowlist)
     stale = find_stale_allowlist(ROOT, allowlist)
 
-    ext_list = ", ".join(f".{e}" for e in EXTENSIONS)
+    # DECLARA O QUE VARRE (requisito 2 do docstring): a saida enumera extensao
+    # E basename - senao "OK" esconderia que CMakeLists.txt entrou no escopo.
+    ext_list = ", ".join([f".{e}" for e in EXTENSIONS] + list(EXTRA_BASENAMES))
     print(
         f"GATE(spdx-required): varrendo {len(files)} arquivo(s) rastreado(s) "
         f"({ext_list}) via git ls-files; allowlist = "

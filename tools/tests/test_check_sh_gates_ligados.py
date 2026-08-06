@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: Apache-2.0
 """test_check_sh_gates_ligados.py - todo gate do check.sh esta LIGADO no rc.
 
 REGRA (c) DA CASA: um gate so existe se (a) mede de verdade, (b) nasce verde na

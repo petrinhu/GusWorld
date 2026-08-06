@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: Apache-2.0
 """sdl_layer_ratchet.py - GATE(sdl-ratchet) do tools/check.sh.
 
 Conta quantos arquivos de PRODUCAO em GusEngine/app (src/ + include/gus/app/,

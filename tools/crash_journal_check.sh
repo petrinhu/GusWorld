@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: Apache-2.0
 # tools/crash_journal_check.sh
 #
 # Entregavel 1 (defense-in-depth #1) do par anti-crash/UAF do GusWorld.

@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: Apache-2.0
 # FRAMEGRAB-ORDEM - projeto CMake STANDALONE (nao e add_subdirectory do GusEngine:
 # app/CMakeLists.txt so faz add_subdirectory(tests)). Subdiretorio PROPRIO (mesma forma de
 # app/tools/glintfx_input_e2e/) pra nao tocar em app/tools/CMakeLists.txt, que esta com

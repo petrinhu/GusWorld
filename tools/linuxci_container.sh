@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: Apache-2.0
 # linuxci_container.sh - CI-POLICY-LOCAL-FIRST: gemeo Linux do winbuild_container.sh.
 #
 # Reproduz o job "Linux (gcc, Release)" do CI (.github/workflows/ci.yml) DENTRO de

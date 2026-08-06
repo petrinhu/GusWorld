@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: Apache-2.0
 # gusengine_platform - fronteira SDL3 (pos repivot ADR-008). UNICA camada (com
 # app/) que conhece SDL. Toda dependencia de SDL fica confinada aqui e em app/, de
 # modo que core/ e domain/ permanecam puros (sem Qt E sem SDL) e reutilizaveis.

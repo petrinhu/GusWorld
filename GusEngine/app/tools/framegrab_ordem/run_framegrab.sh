@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: Apache-2.0
 # FRAMEGRAB-ORDEM - roda o framegrab_ordem_probe com ISOLAMENTO OBRIGATORIO da sessao viva
 # do lider. A receita de isolamento e COPIADA INTEIRA de
 # app/tools/glintfx_input_e2e/run_e2e.sh (a invocacao canonica da casa) e so entao adaptada

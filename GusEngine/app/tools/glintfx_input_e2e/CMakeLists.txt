@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: Apache-2.0
 # F4-2.5 - CMake SCRATCH proprio (TRACKED, ao contrario de ../appmode_spike/, que e
 # scratch/nao-commitado). NAO e add_subdirectory do GusEngine/CMakeLists.txt
 # principal nem do ../CMakeLists.txt (aquele forca GLINTFX_BACKEND_GLFW=OFF, que e

@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: Apache-2.0
 # F4-2.5 - roteiro DETERMINISTICO ponta-a-ponta do input novo (glintfx::App real ->
 # GlintfxInput -> InputMapper -> movimento observavel), com ISOLAMENTO OBRIGATORIO
 # da sessao viva do lider (ver o brief da fatia / docs/window-modes.md). NUNCA

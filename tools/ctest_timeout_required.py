@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: Apache-2.0
 """ctest_timeout_required.py - GATE(ctest-timeout-required) do tools/check.sh.
 
 ZERO-TOLERANCIA: TODO teste registrado no ctest precisa ter a propriedade

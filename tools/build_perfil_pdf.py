@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: Apache-2.0
 """Gera os PDFs de "perfil canonico" de personagem, no template do Brunus.
 
 Fonte: os contos canonicos em docs/narrative/characters/*-conto.md (formato

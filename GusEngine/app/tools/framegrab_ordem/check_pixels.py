@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: Apache-2.0
 """FRAMEGRAB-ORDEM - verificador INDEPENDENTE das capturas do framegrab_ordem_probe.
 
 Por que separado do probe: o programa que produz o artefato nao e testemunha confiavel

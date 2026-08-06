@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: Apache-2.0
 """test_sdl_layer_ratchet.py - prova que o escopo do GATE(sdl-ratchet) alcanca
 `app/main.cpp` (FURO 1 da auditoria dos gates, GATES-HARDEN 2026-08-06).
 

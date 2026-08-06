@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: Apache-2.0
 """test_spdx_header_required.py - prova que o GATE(spdx-required) MORDE.
 
 "Verificador em que ninguem confia e pior que verificador nenhum" (requisito
@@ -13,6 +14,7 @@ Uso: `python3 -m pytest tools/tests/test_spdx_header_required.py -q`
 """
 
 import os
+import subprocess
 import sys
 
 import pytest
@@ -152,7 +154,7 @@ def test_main_reprova_licenca_antiga_voltando(tmp_path, monkeypatch):
     monkeypatch.setattr(gate, "ROOT", str(tmp_path))
     monkeypatch.setattr(
         gate, "list_tracked_files",
-        lambda root, extensions: ["GusEngine/app/src/voltou.cpp"],
+        lambda root, extensions, basenames=(): ["GusEngine/app/src/voltou.cpp"],
     )
     monkeypatch.setattr(gate, "ALLOWLIST_PATH", str(tmp_path / "allowlist_vazio.txt"))
     assert gate.main() == 1
@@ -162,11 +164,153 @@ def test_extensoes_novas_estao_no_escopo():
     """`.cc/.cxx/.inl/.hxx/.ipp` entraram (custo 1 linha, zero divida medida)."""
     for ext in ("cc", "cxx", "inl", "hxx", "ipp"):
         assert ext in gate.EXTENSIONS
-    # ⚠️ .py/.sh/.cmake continuam FORA de proposito (fatia PROPRIA, com os
-    # cabecalhos aplicados ANTES): liga-las hoje faria o gate nascer VERMELHO
-    # contra ~27 arquivos pre-existentes.
-    for fora in ("py", "sh", "cmake", "yml"):
+    # SPDX-QUITACAO (2026-08-06): .py e .cmake entraram DEPOIS de os 48 arquivos
+    # ganharem cabecalho no mesmo commit (o gate nasce verde, nunca vermelho).
+    for ext in ("py", "cmake"):
+        assert ext in gate.EXTENSIONS
+    # CMakeLists.txt nao tem extensao: ficou fora da fatia anterior por OMISSAO
+    # (14 rastreados, 14 sem cabecalho, incluindo os alvos de build).
+    assert "CMakeLists.txt" in gate.EXTRA_BASENAMES
+    # ⚠️ .sh: bloqueio TEMPORAL (tools/check.sh em voo por outra fatia no dia) -
+    # ver o tripwire abaixo. .yml: decisao (workflow de CI nao leva cabecalho de
+    # licenca por pratica da industria; o LICENSE da raiz cobre o repo).
+    for fora in ("sh", "yml"):
         assert fora not in gate.EXTENSIONS
+
+
+# ------------------------------------------- SPDX-QUITACAO: tooling no escopo
+
+
+def test_py_novo_sem_cabecalho_reprova(tmp_path, monkeypatch):
+    """A PROVA desta fatia: um .py NOVO sem cabecalho tem que REPROVAR.
+
+    E o defeito medido, verbatim: entre 2026-08-01 e 2026-08-06 nasceram dois
+    .py sem SPDX (tools/callback_dtor_*.py) porque a extensao estava fora do
+    gate. Com .py dentro, isso passa a morder."""
+    novo = tmp_path / "tools" / "ferramenta_nova.py"
+    _write(str(novo), "#!/usr/bin/env python3\n"
+                      '"""ferramenta nova, sem cabecalho de licenca."""\n')
+    monkeypatch.setattr(gate, "ROOT", str(tmp_path))
+    monkeypatch.setattr(gate, "list_tracked_files",
+                        lambda root, extensions, basenames=(): ["tools/ferramenta_nova.py"])
+    monkeypatch.setattr(gate, "ALLOWLIST_PATH", str(tmp_path / "vazio.txt"))
+    assert gate.main() == 1
+
+
+def test_py_com_cabecalho_depois_do_shebang_passa(tmp_path, monkeypatch):
+    """O shebang TEM de continuar na linha 1 (senao o script deixa de rodar):
+    o cabecalho vai pra linha 2, e isso precisa contar como cabecalho valido."""
+    ok = tmp_path / "tools" / "ok.py"
+    _write(str(ok), "#!/usr/bin/env python3\n"
+                    "# SPDX-License-Identifier: Apache-2.0\n"
+                    '"""docstring depois do cabecalho."""\n')
+    assert gate.has_required_header(str(ok)) is True
+    monkeypatch.setattr(gate, "ROOT", str(tmp_path))
+    monkeypatch.setattr(gate, "list_tracked_files",
+                        lambda root, extensions, basenames=(): ["tools/ok.py"])
+    monkeypatch.setattr(gate, "ALLOWLIST_PATH", str(tmp_path / "vazio.txt"))
+    assert gate.main() == 0
+
+
+def test_py_de_terceiro_na_allowlist_nao_reprova(tmp_path, monkeypatch):
+    """O CASO LEGITIMO: 8values_engine.py e obra derivada MIT. Nao pode ganhar o
+    nosso Apache (declaracao falsa) nem reprovar - a allowlist e o caminho, e
+    ela tem que cobrir as DUAS regras (falta de Apache E presenca de MIT)."""
+    terceiro = tmp_path / "docs" / "vendor_tool.py"
+    _write(str(terceiro), "#!/usr/bin/env python3\n"
+                          "# SPDX-License-Identifier: MIT\n"
+                          "# fork de projeto de terceiro\n")
+    rel = "docs/vendor_tool.py"
+    allow = {rel: "terceiro (fork MIT)"}
+    assert gate.find_offenders([rel], str(tmp_path), allow) == []
+    assert gate.find_foreign([rel], str(tmp_path), allow) == []
+    # ... e SEM a allowlist as duas regras mordem:
+    assert gate.find_offenders([rel], str(tmp_path), {}) == [rel]
+    assert gate.find_foreign([rel], str(tmp_path), {}) == [(rel, 2, "MIT")]
+
+
+def test_cmakelists_entra_por_basename_e_nao_por_sufixo(tmp_path):
+    """`CMakeLists.txt` nao casa com `*.<ext>` nenhum - entra por basename. O
+    pathspec e literal (`CMakeLists.txt` e `*/CMakeLists.txt`), nunca o glob de
+    sufixo `*CMakeLists.txt`, que arrastaria `fooCMakeLists.txt` junto."""
+    repo = tmp_path / "repo"
+    (repo / "sub").mkdir(parents=True)
+    for rel in ("CMakeLists.txt", "sub/CMakeLists.txt", "sub/fooCMakeLists.txt", "a.py"):
+        _write(str(repo / rel), "# vazio\n")
+    for cmd in (["git", "init", "-q"], ["git", "add", "-A"]):
+        subprocess.run(cmd, cwd=str(repo), check=True, capture_output=True)
+    achados = gate.list_tracked_files(str(repo), ("py",), ("CMakeLists.txt",))
+    assert sorted(achados) == ["CMakeLists.txt", "a.py", "sub/CMakeLists.txt"]
+
+
+def test_tripwire_sh_ligar_quando_check_sh_quitar():
+    """TRIPWIRE (some quando a divida quitar) - de proposito fica VERMELHO no
+    dia em que `tools/check.sh` ganhar o cabecalho.
+
+    `.sh` ficou fora do gate por bloqueio TEMPORAL: os outros 8 .sh rastreados
+    ja receberam cabecalho na fatia SPDX-QUITACAO; so o check.sh nao, porque
+    estava sendo editado por outra fatia em voo (edicao a duas maos perde
+    trabalho alheio). Sem este tripwire, "ligar depois" vira exatamente a
+    divida silenciosa que esta fatia existiu para pagar - a divida de .py
+    CRESCEU de 18 para 20 arquivos enquanto o item esperava.
+
+    SE ESTE TESTE FALHOU: check.sh ja tem cabecalho. Acao (1 minuto):
+      1. acrescente "sh" em EXTENSIONS no tools/spdx_header_required.py;
+      2. rode `python3 tools/spdx_header_required.py` e confirme rc=0;
+      3. APAGUE este teste (a divida acabou; tripwire cumprido nao fica).
+    """
+    check_sh = os.path.join(gate.ROOT, "tools", "check.sh")
+    if not os.path.isfile(check_sh):
+        pytest.skip("tools/check.sh nao existe nesta arvore")
+    assert gate.has_required_header(check_sh) is False, (
+        "tools/check.sh ganhou cabecalho SPDX: acrescente 'sh' em "
+        "gate.EXTENSIONS e apague este tripwire (ver docstring do teste)"
+    )
+
+
+# ------------------------------------------- DECLARACAO x MENCAO (precisao)
+
+
+def test_mencao_em_string_de_codigo_nao_e_declaracao(tmp_path):
+    """SEM ISTO O GATE REPROVA A SI MESMO: spdx_header_required.py cita a tag no
+    docstring e na regex, e o teste dele constroi fixture com a tag em string
+    literal - 18 falsos positivos medidos em 2026-08-06, 4 no proprio gate."""
+    fp = tmp_path / "gate_like.py"
+    _write(str(fp), "# SPDX-License-Identifier: Apache-2.0\n"
+                    'REQUIRED = "SPDX-License-Identifier: Apache-2.0"\n'
+                    'RE = re.compile(r"SPDX-License-Identifier:\\s*(.*)")\n'
+                    '_write(fp, "// SPDX-License-Identifier: GPL-3.0-or-later\\n")\n')
+    assert gate.foreign_license_tags(str(fp)) == []
+    assert gate.has_required_header(str(fp)) is True
+
+
+def test_declaracao_de_outra_licenca_continua_reprovando(tmp_path):
+    """NAO E AFROUXAMENTO: valor limpo = expressao SPDX = declaracao = reprova.
+    Pina que a precisao nova nao reabriu o furo que a fatia anterior fechou."""
+    for valor in (_GPL, "MIT", "BSD-2-Clause OR CC0-1.0", "LGPL-2.1-only"):
+        fp = tmp_path / "decl.cpp"
+        _write(str(fp), "// SPDX-License-Identifier: Apache-2.0\n"
+                        f"// SPDX-License-Identifier: {valor}\n")
+        assert gate.foreign_license_tags(str(fp)) == [(2, valor)], valor
+
+
+def test_valor_limpo_porem_estranho_ainda_reprova(tmp_path):
+    """O criterio e PERMISSIVO PARA SINALIZAR: sinalizar de mais e seguro
+    (alguem conserta a prosa), sinalizar de menos nao e."""
+    fp = tmp_path / "estranho.cpp"
+    _write(str(fp), f"// SPDX-License-Identifier: {_GPL} provisorio\n")
+    assert gate.foreign_license_tags(str(fp)) == [(1, f"{_GPL} provisorio")]
+
+
+def test_mencao_perto_do_topo_nao_satisfaz_a_regra_1(tmp_path):
+    """O GEMEO do furo (auditoria-domino): a REGRA 1 era substring pura, entao
+    um arquivo que apenas CITASSE a string do cabecalho nas 5 primeiras linhas
+    passava sem declarar licenca nenhuma."""
+    fp = tmp_path / "so_cita.py"
+    _write(str(fp), "#!/usr/bin/env python3\n"
+                    '"""procura por "SPDX-License-Identifier: Apache-2.0" no topo."""\n')
+    assert gate.has_required_header(str(fp)) is False
+    assert gate.find_offenders(["so_cita.py"], str(tmp_path), {}) == ["so_cita.py"]
 
 
 def test_repo_real_nasce_verde():
@@ -188,7 +332,7 @@ def test_main_reprova_com_arquivo_novo_sem_spdx(tmp_path, monkeypatch):
     monkeypatch.setattr(
         gate,
         "list_tracked_files",
-        lambda root, extensions: ["GusEngine/app/src/novo_sem_spdx.cpp"],
+        lambda root, extensions, basenames=(): ["GusEngine/app/src/novo_sem_spdx.cpp"],
     )
     # Allowlist vazia para este cenario (o real do repo nao cobre este arquivo).
     monkeypatch.setattr(gate, "ALLOWLIST_PATH", str(tmp_path / "allowlist_vazio.txt"))
@@ -203,7 +347,7 @@ def test_main_passa_quando_todo_arquivo_tem_spdx(tmp_path, monkeypatch):
 
     monkeypatch.setattr(gate, "ROOT", str(tmp_path))
     monkeypatch.setattr(
-        gate, "list_tracked_files", lambda root, extensions: ["GusEngine/core/bom.hpp"]
+        gate, "list_tracked_files", lambda root, extensions, basenames=(): ["GusEngine/core/bom.hpp"]
     )
     monkeypatch.setattr(gate, "ALLOWLIST_PATH", str(tmp_path / "allowlist_vazio.txt"))
 

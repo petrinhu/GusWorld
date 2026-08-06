@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: Apache-2.0
 # gusworld_app - executavel GusWorld-specific + a lib gusengine_app (pos repivot
 # SDL3, ADR-008).
 #

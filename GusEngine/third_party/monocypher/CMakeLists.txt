@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: Apache-2.0
 # Monocypher vendorizado (ADR-015 Onda 1, SAVE-CRYPTO-V2-VENDOR). 2 arquivos C
 # (monocypher.c/.h), dominio publico de fato (dupla licenca CC0-1.0 / BSD-2-Clause),
 # ZERO dependencia externa. Ver README-VENDOR.md deste diretorio para versao/commit

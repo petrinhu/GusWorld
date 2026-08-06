@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: Apache-2.0
 # Testes da camada app/ (Catch2 v3, headless). O OverworldSim e desenhado num
 # IRenderer FALSO (sem GPU), e o movimento/colisao/camera/interpolacao/sprite sao
 # exercitados deterministicamente. A LOGICA de animacao (sprite_animation) e POCO

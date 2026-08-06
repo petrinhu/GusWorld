@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: Apache-2.0
 """Gera os 2 SFX de UI do menu de sistema (hover + clique) por sintese pura.
 
 SEM dependencia externa (so stdlib `wave` + `math` + `struct`) - offline,

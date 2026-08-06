@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: Apache-2.0
 # GusEngine - raiz do build (pos repivot SDL3, ADR-008).
 #
 # Arquitetura de 4 camadas (engine-design.md secao 2, atualizada por ADR-008):

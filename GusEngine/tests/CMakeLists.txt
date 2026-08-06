@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: Apache-2.0
 # Testes headless (Catch2 v3) de core/ + domain/.
 #
 # Estes testes NAO linkam SDL3/OpenGL/glintfx: exercitam apenas as camadas

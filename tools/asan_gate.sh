@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: Apache-2.0
 # tools/asan_gate.sh
 #
 # Entregavel 2 (defense-in-depth #2) do par anti-crash/UAF do GusWorld.

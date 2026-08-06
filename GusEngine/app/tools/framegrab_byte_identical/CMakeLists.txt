@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: Apache-2.0
 # FRAMEGRAB-7-SITIOS - projeto CMake STANDALONE (mesma forma de
 # app/tools/framegrab_ordem/, motivo identico: nao tocar em app/tools/CMakeLists.txt).
 #

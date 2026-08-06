@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: Apache-2.0
 """gl3_readbackbuffer_zero.py - GATE(gl3-readbackbuffer-zero) do tools/check.sh.
 
 ZERO-TOLERANCIA (nao ratchet, com UMA excecao documentada) pra

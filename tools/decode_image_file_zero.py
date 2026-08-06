@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: Apache-2.0
 """decode_image_file_zero.py - GATE(decode-image-file-zero) do tools/check.sh.
 
 ZERO-TOLERANCIA (nao ratchet, allowlist VAZIA) a `glintfx::decode_image_file`

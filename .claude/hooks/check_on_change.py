@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: Apache-2.0
 """PostToolUse hook: roda tools/check.sh (build + smoke + gate + suite) apos
 edicoes que tocam codigo/i18n da engine. Espelha o automatismo do
 PokemonTCGViewer, adaptado a stack C++20/SDL3/glintfx/CMake/Catch2 do

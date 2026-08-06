@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: Apache-2.0
 # Testes da camada platform/ (Catch2 v3, headless). Pos repivot ADR-008: a logica
 # testavel da fronteira SDL roda sem abrir janela e sem GPU - traducao de input
 # (teclado SDL + gamepad), fusao de intencao, matematica de projecao do render, e o

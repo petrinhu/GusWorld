@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: Apache-2.0
 # FRAMEGRAB-7-SITIOS - roda o framegrab_byte_identical_probe com ISOLAMENTO OBRIGATORIO
 # da sessao viva do lider. Receita COPIADA INTEIRA de
 # app/tools/framegrab_ordem/run_framegrab.sh (a invocacao canonica da casa pra este tipo

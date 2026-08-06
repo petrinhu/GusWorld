@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: Apache-2.0
 """production_scope.py - lista canonica de arquivos de PRODUCAO nas 4
 camadas (core/domain/platform/app), para os gates CROSS-CAMADA de
 zero-tolerancia de tools/check.sh (stb_image_zero.py, audio_ma_zero.py,

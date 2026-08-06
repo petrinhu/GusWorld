@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: Apache-2.0
 # winbuild_container.sh - valida cross-compile Windows x86_64 (MinGW-w64) do
 # GusEngine DENTRO de um container efemero, sem tocar o host (WIN-CROSS-VALIDATE).
 #

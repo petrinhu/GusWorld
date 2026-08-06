@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: Apache-2.0
 """audio_ma_zero.py - GATE(audio-zero) do tools/check.sh.
 
 ZERO-TOLERANCIA (nao ratchet) a `ma_*` (miniaudio DIRETO) e a inclusao de

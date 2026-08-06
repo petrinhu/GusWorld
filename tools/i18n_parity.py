@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: Apache-2.0
 # -*- coding: utf-8 -*-
 """Tabela de paridade i18n do GusWorld (estagio GATE do check.sh).
 

@@ -3,16 +3,30 @@
 # Uma entrada por linha: <caminho relativo a raiz do repo>\t<motivo>
 # (separador = TAB; comentarios com # e linhas em branco sao ignorados).
 #
-# Regra de ouro: um arquivo entra aqui SE E SOMENTE SE ele e de TERCEIRO -
-# por-lo com o nosso "SPDX-License-Identifier: Apache-2.0" seria uma
-# declaracao de licenca FALSA (o codigo nao e nosso). Nenhuma outra razao
-# ("ainda nao deu tempo", "e pequeno", "e gerado") justifica entrada aqui:
-# nesse caso o arquivo precisa GANHAR o cabecalho, nao ser dispensado dele.
+# Regra de ouro: um arquivo entra aqui SE E SOMENTE SE por nele o nosso
+# "SPDX-License-Identifier: Apache-2.0" seria uma declaracao de licenca FALSA.
+# So ha duas formas disso acontecer:
 #
-# Cada linha abaixo tambem esta documentada em THIRD-PARTY-LICENSES.md.
+#   (a) o arquivo e de TERCEIRO (o codigo nao e nosso); ou
+#   (b) o arquivo e NOSSO mas declara OUTRA licenca de proposito - caso ja
+#       previsto no docstring do gate ("se um dia um arquivo NOSSO precisar
+#       citar outra licenca de verdade, o caminho e a allowlist com motivo,
+#       nao afrouxar a regra"). Trocar a licenca de um arquivo desses e
+#       decisao do lider, nao efeito colateral de um gate.
+#
+# Nenhuma outra razao ("ainda nao deu tempo", "e pequeno", "e gerado")
+# justifica entrada aqui: nesse caso o arquivo precisa GANHAR o cabecalho, nao
+# ser dispensado dele. Em particular, bloqueio TEMPORAL (arquivo em voo por
+# outra fatia) nao entra aqui - a extensao inteira fica fora do gate ate a
+# quitacao, com tripwire no teste (foi o caso de .sh/tools/check.sh).
+#
+# Cada linha de TERCEIRO abaixo tambem esta documentada em
+# THIRD-PARTY-LICENSES.md.
 
 GusEngine/third_party/monocypher/monocypher.c	terceiro (Monocypher, BSD-2-Clause OR CC0-1.0); ja tem SPDX proprio na linha 10, nao o nosso
 GusEngine/third_party/monocypher/monocypher.h	terceiro (Monocypher, BSD-2-Clause OR CC0-1.0); ja tem SPDX proprio na linha 10, nao o nosso
 GusEngine/platform/rmlui/RmlUi_Include_GL3.h	terceiro (glad, MIT); nome de arquivo enganoso mas NAO e API do RmlUi (ver THIRD-PARTY-LICENSES.md); upstream nao usa SPDX
 GusEngine/third_party/stb/stb_image_write.h	terceiro (stb, dominio publico / MIT); upstream nao usa SPDX
 GusEngine/third_party/stb/stb_truetype.h	terceiro (stb, dominio publico / MIT); upstream nao usa SPDX
+docs/design/roster-analogos/8values-engine/8values_engine.py	caso (a) terceiro: OBRA DERIVADA (fork/port py) do 8values, Copyright (c) 2020 8values, MIT - a licenca e herdada do upstream (ver ATTRIBUTION.md e LICENSE_8VALUES_ORIGINAL.txt na mesma pasta); relicenciar para Apache-2.0 seria declaracao falsa
+docs/design/roster-analogos/8values-engine/gus_rightness.py	caso (b) nosso, MIT DE PROPOSITO: ferramenta de design escrita por nos que fica POR CIMA do fork MIT da mesma pasta e foi licenciada MIT para acompanha-lo; trocar para Apache-2.0 e decisao de licenciamento do lider, nao efeito colateral deste gate

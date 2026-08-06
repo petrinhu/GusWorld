@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: Apache-2.0
 """callback_dtor_disarm.py - GATE(callback-dtor-disarm) do tools/check.sh.
 
 ZERO-TOLERANCIA (nao ratchet). Exige que TODA tela que registra um callback da

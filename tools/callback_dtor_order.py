@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: Apache-2.0
 """callback_dtor_order.py - GATE(callback-dtor-order) do tools/check.sh.
 
 ZERO-TOLERANCIA (nao ratchet). CONGELA a ordem de DECLARACAO dos membros nas

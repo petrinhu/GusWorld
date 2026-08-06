@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: Apache-2.0
 """stb_image_zero.py - GATE(stbi-load-zero) do tools/check.sh.
 
 ZERO-TOLERANCIA (nao ratchet) a `stbi_load`/`stbi_image_free`/inclusao direta

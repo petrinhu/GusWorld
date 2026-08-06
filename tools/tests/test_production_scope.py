@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: Apache-2.0
 """test_production_scope.py - prova que o GATE(production-scope) MORDE.
 
 Fecha os FUROS 1 e 4 medidos pela auditoria dos gates (GATES-HARDEN,

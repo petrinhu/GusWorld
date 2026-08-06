@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: Apache-2.0
 """sdl_log_clock_zero.py - GATE(log-clock-zero) do tools/check.sh.
 
 ZERO-TOLERANCIA (nao ratchet) pras DUAS categorias que a Fatia 1 do
