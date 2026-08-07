@@ -169,7 +169,7 @@ PlayerSpriteSet load_player_sprites(gus::platform::render2d::IRenderer& renderer
 }
 
 std::string resolve_sprites_dir(const std::string& rel_subpath) {
-    // rel_subpath = caminho RELATIVO completo do header central (ex.: "sprites/caua_volt").
+    // rel_subpath = caminho RELATIVO completo do header central (ex.: "sprites/caua_volt_cyan_v2").
     // ASSETS-VFS-F1 (ADR-013): a cadeia `env GUSWORLD_ASSETS > macro GUSWORLD_ASSETS_DIR >
     // CWD (resources/)` foi CONSOLIDADA em FilesystemAssetSource (familia GENERICA).
     // Assinatura INTOCADA.
