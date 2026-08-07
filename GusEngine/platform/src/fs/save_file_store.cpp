@@ -16,8 +16,7 @@
 #include <iterator>
 #include <system_error>
 
-#include "gus/domain/save/save_backup.hpp"
-#include "gus/domain/save/save_slots.hpp"
+#include "gus/domain/save/save_backup.hpp"  // primary_logical_name (nao vem de save_slots.hpp)
 
 namespace gus::platform::fs {
 

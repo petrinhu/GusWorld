@@ -21,7 +21,6 @@
 
 #include <cmath>
 #include <cstdint>
-#include <cstdio>
 #include <filesystem>
 #include <fstream>
 #include <string>

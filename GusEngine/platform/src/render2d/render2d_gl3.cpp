@@ -50,6 +50,7 @@
 
 #include "gus/core/asset_paths.hpp"               // nomes de arquivo de fonte
 #include "gus/platform/render2d/alpha_bbox.hpp"   // scan_alpha_content_bbox (POCO)
+#include "gus/platform/render2d/font_atlas.hpp"  // FontAtlas (HARDENING-GCC16-SWEEP: vinha so transitivo do header)
 #include "gus/platform/render2d/text_metrics.hpp"  // glyph_advance + decode_utf8
 #include "gus/platform/render2d/viewport_transform.hpp"
 

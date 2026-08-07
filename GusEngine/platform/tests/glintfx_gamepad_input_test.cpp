@@ -23,9 +23,7 @@
 //      convencoes de sinal diferentes no eixo Y - aqui NAO tem, glintfx usa o mesmo
 //      ABS_Y positivo-pra-baixo do kernel que o SDL ja usa, mas o teste prova isso).
 
-#include <filesystem>
 #include <map>
-#include <system_error>
 
 #include <catch2/catch_test_macros.hpp>
 

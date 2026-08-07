@@ -37,7 +37,6 @@
 
 #include <algorithm>  // std::clamp
 #include <cmath>      // std::isfinite
-#include <cstdint>    // std::uint32_t (glintfx::Audio::SoundId)
 #include <iostream>
 #include <vector>
 

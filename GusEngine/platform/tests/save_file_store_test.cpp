@@ -19,7 +19,6 @@
 #include "gus/domain/save/save_data.hpp"
 #include "gus/domain/save/save_serializer.hpp"
 #include "gus/domain/save/save_slots.hpp"
-#include "gus/domain/save/save_store.hpp"
 #include "gus/platform/fs/save_file_store.hpp"
 #include "tmp_dir_test_support.hpp"
 

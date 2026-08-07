@@ -30,13 +30,8 @@
 #ifndef GUS_PLATFORM_RENDER2D_RENDER2D_GL3_HPP
 #define GUS_PLATFORM_RENDER2D_RENDER2D_GL3_HPP
 
-#include <cstdint>
 #include <memory>
-#include <string>
-#include <unordered_map>
-#include <vector>
 
-#include "gus/platform/render2d/font_atlas.hpp"
 #include "gus/platform/render2d/i_renderer.hpp"
 
 namespace gus::platform::render2d {
