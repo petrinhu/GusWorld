@@ -130,6 +130,31 @@ int main() {
         }
     }
 
+    // SAVE-LOAD-AVISOS (aviso #2, ControlsDiffer - decisao do lider 2026-08-06/
+    // 07): GUSWORLD_PROBE_WARNING=controls_diff abre o aviso dedicado DIRETO
+    // (mutacao do campo publico warning_kind, MESMO padrao de teste ja usado
+    // pra RecoverFailed em save_load_menu_test.cpp - a DETECCAO real por hash
+    // de disco mora no CHAMADOR impuro, save_load_menu_loop.cpp, ja provada
+    // ponta-a-ponta em save_load_menu_interaction_test.cpp; este probe so
+    // prova o VISUAL). Demais valores reusam os avisos ja existentes (aviso
+    // #1) pra facilitar comparacao lado a lado.
+    if (const char* warning_env = std::getenv("GUSWORLD_PROBE_WARNING")) {
+        const std::string w = warning_env;
+        using WK = SaveLoadMenuState::WarningKind;
+        if (w == "controls_diff") {
+            state.warning_kind = WK::ControlsDiffer;
+        } else if (w == "damaged") {
+            state.warning_kind = WK::Damaged;
+        } else if (w == "version") {
+            state.warning_kind = WK::Version;
+        } else if (w == "recover_failed") {
+            state.warning_kind = WK::RecoverFailed;
+        }
+        if (const char* sel_env = std::getenv("GUSWORLD_PROBE_WARNING_SELECTED")) {
+            state.warning_selected = std::atoi(sel_env);
+        }
+    }
+
     // B7 (scroll-follow, decisao do lider 2026-08-01): GUSWORLD_PROBE_SELECT=<n>
     // fixa state.selected=n (sem rodar o loop interativo de verdade) - simula
     // "o jogador navegou ate o slot n via teclado", que e o cenario que
