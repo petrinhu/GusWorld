@@ -569,6 +569,37 @@ WSJF principal. Novas descobertas entram como bullets abaixo desta linha.)_
   jogabilidade, pode prender o jogador se não houver direção livre nenhuma no momento do
   encontro. Escolha de correção (mudança de feel de física) pendente de decisão do líder.
 
+- EXPLOIT-TRIGGER-SKIP-FRAME: pesquisa de exploits pedida pelo líder em 2026-08-07 (o mesmo
+  playtest do clipping, o Gus Dragon testa deliberadamente como quem estuda speedrun/glitch
+  hunting — ver `project_gus_testa_como_speedrunner`). Categoria "sequence break": triggers de
+  batalha/diálogo (`should_trigger_battle`) são checados por overlap discreto por quadro, sem
+  swept/CCD; o teto anti-tunneling protege paredes sólidas mas não foi verificado se protege
+  contra "pular por cima" de uma hitbox de trigger fina num único quadro de movimento rápido.
+  Investigar quando houver janela de QA para o motor de movimento. Detalhe completo em
+  `reference_catalogo_exploits_speedrun` (categoria B).
+- EXPLOIT-SOFTLOCK-FLAGS-PROGRESSO: categoria "softlock": nenhum inventário conhecido de todas
+  as flags de progresso (`npc_intro.met`, `encounter_*_defeated`, etc.) nem prova de que cada
+  uma tem caminho de recuperação se nunca for setada. Vira checklist de QA quando o número de
+  NPCs/quests crescer, não mudança de código isolada agora. Categoria C na referência.
+- EXPLOIT-DUPE-ECONOMIA-CRAFT: categoria "duplicação": o deck de cartas já segue o padrão
+  correto (rota única autoritativa, TOCTOU fechado em `deck_transactions.cpp`, achado da W1).
+  Quando a economia (loja/compra/venda) e o craft crescerem, exigir o MESMO padrão como
+  critério de aceite. Categoria D na referência.
+- EXPLOIT-RNG-SEED-PREVISIVEL: categoria "manipulação de RNG": hoje não há RNG de gameplay
+  centralizado (loot/crítico ainda não implementados na vertical slice). Risco futuro, não
+  atual — quando um sistema de RNG de gameplay nascer, a semente não pode ser trivialmente
+  previsível/replay-ável em produção. Registrar como critério de design da primeira feature
+  que usar RNG de verdade. Categoria F na referência.
+- EXPLOIT-UI-ESTADOS-SOBREPOSTOS: categoria "softlock de menu/UI": não foi testado se dois
+  estados de UI diferentes (ex.: menu de pausa + diálogo de NPC) podem ficar abertos ao mesmo
+  tempo, um sobre o outro, e gerar estado inconsistente. Vale teste de interação dedicado
+  quando o número de telas crescer. Categoria G na referência.
+- EXPLOIT-INPUT-BUFFER-COMBATE: categoria "frame-perfect/input buffering": o combate já tem
+  mecanismo de "acelera o ritmo" ao pressionar fora do próprio turno; não investigado se
+  permite spam de input pra pular animação ou embaralhar a fila de iniciativa. Item de mutation
+  testing/QA quando o motor de turnos for coberto com verificação adversarial. Categoria H na
+  referência.
+
 ## 🗄️ Arquivado: eras Godot/C# e Qt6 (superadas, mantidas por registro)
 
 **Motivo do arquivamento:** stack superada pelos dois pivôs em sequência (Godot 4.6 + C# .NET 8
