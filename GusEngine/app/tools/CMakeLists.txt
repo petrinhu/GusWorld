@@ -320,6 +320,49 @@ if(EXISTS "${_GUSENGINE_RELEASE}/app/libgusengine_app.a")
     )
 
     # =========================================================================
+    # ASSETS-VERSIONAR-SPRITES (2026-08-06): caua_idle_facing_probe - valida
+    # visualmente a migracao do Cauã pra sprites/caua_volt_cyan_v2/ (4 PNGs, 1 por
+    # direcao). MESMA receita de idle_facing_probe acima (Render2dSdl "software",
+    # janela HIDDEN, sem Xvfb/GL/compositor).
+    add_executable(caua_idle_facing_probe caua_idle_facing_probe.cpp)
+
+    target_include_directories(caua_idle_facing_probe PRIVATE
+        "${_GUSENGINE_ROOT}/core/include"
+        "${_GUSENGINE_ROOT}/domain/include"
+        "${_GUSENGINE_ROOT}/platform/include"
+        "${_GUSENGINE_ROOT}/app/include"
+        "${_GUSENGINE_ROOT}/third_party/stb"
+        "${_GUSENGINE_RELEASE}/_deps/sdl3-build/include-revision"
+        "${_GUSENGINE_RELEASE}/_deps/sdl3-src/include"
+    )
+
+    target_compile_features(caua_idle_facing_probe PRIVATE cxx_std_20)
+
+    target_compile_definitions(caua_idle_facing_probe PRIVATE
+        GUSWORLD_ASSETS_DIR="${_GUSENGINE_ROOT}/../resources"
+        GUSWORLD_FONTS_DIR="${_GUSENGINE_ROOT}/assets/fonts"
+    )
+
+    target_link_libraries(caua_idle_facing_probe PRIVATE
+        gusengine_app_imported
+        gusengine_core_imported
+        gusengine_domain_imported
+        gusengine_platform_imported
+        sdl3_imported
+        gusengine_domain_imported
+        gusengine_core_imported
+        monocypher_imported
+        rmlui_debugger_imported
+        glintfx_imported
+        rmlui_imported
+        OpenGL::GL
+        Freetype::Freetype
+        Threads::Threads
+        ${CMAKE_DL_LIBS}
+        m
+    )
+
+    # =========================================================================
     # cockpit_hp_text_probe (D2D-2-SENTINELA, kCockpitTextPx 8px->9px): reproduz o
     # trecho real do cockpit (nome + barra de HP + numero) com CombatActor avulso
     # hp=144/144 - MESMA receita de idle_facing_probe acima (Render2dSdl "software",
