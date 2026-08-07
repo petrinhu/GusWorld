@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: Apache-2.0
 # check.sh - build + smoke + gate + suite do GusEngine, num comando.
 #
 # Espelha o "=== build + smoke + gate + suite ===" do PokemonTCGViewer,

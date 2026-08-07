@@ -166,16 +166,18 @@ def test_extensoes_novas_estao_no_escopo():
         assert ext in gate.EXTENSIONS
     # SPDX-QUITACAO (2026-08-06): .py e .cmake entraram DEPOIS de os 48 arquivos
     # ganharem cabecalho no mesmo commit (o gate nasce verde, nunca vermelho).
-    for ext in ("py", "cmake"):
+    # GATE-SPDX-ESCOPO-SH (2026-08-07): .sh entrou pelo mesmo desenho, DEPOIS de
+    # os 2 arquivos sem cabecalho (tools/check.sh e o monitor_input.sh do
+    # appmode_spike) ganharem o header no mesmo commit.
+    for ext in ("py", "cmake", "sh"):
         assert ext in gate.EXTENSIONS
     # CMakeLists.txt nao tem extensao: ficou fora da fatia anterior por OMISSAO
     # (14 rastreados, 14 sem cabecalho, incluindo os alvos de build).
     assert "CMakeLists.txt" in gate.EXTRA_BASENAMES
-    # ⚠️ .sh: bloqueio TEMPORAL (tools/check.sh em voo por outra fatia no dia) -
-    # ver o tripwire abaixo. .yml: decisao (workflow de CI nao leva cabecalho de
-    # licenca por pratica da industria; o LICENSE da raiz cobre o repo).
-    for fora in ("sh", "yml"):
-        assert fora not in gate.EXTENSIONS
+    # .yml: decisao (workflow de CI nao leva cabecalho de licenca por pratica da
+    # industria; o LICENSE da raiz cobre o repo) - unica extensao fora HOJE por
+    # escolha, nao por divida.
+    assert "yml" not in gate.EXTENSIONS
 
 
 # ------------------------------------------- SPDX-QUITACAO: tooling no escopo
@@ -243,29 +245,34 @@ def test_cmakelists_entra_por_basename_e_nao_por_sufixo(tmp_path):
     assert sorted(achados) == ["CMakeLists.txt", "a.py", "sub/CMakeLists.txt"]
 
 
-def test_tripwire_sh_ligar_quando_check_sh_quitar():
-    """TRIPWIRE (some quando a divida quitar) - de proposito fica VERMELHO no
-    dia em que `tools/check.sh` ganhar o cabecalho.
+def test_sh_novo_sem_cabecalho_reprova(tmp_path, monkeypatch):
+    """A PROVA desta fatia (GATE-SPDX-ESCOPO-SH): um .sh NOVO sem cabecalho tem
+    que REPROVAR, nomeando o arquivo - mesmo defeito medido em .py
+    (tools/callback_dtor_*.py nasceram sem SPDX porque a extensao estava fora
+    do gate), agora exercitado em .sh."""
+    novo = tmp_path / "tools" / "script_novo.sh"
+    _write(str(novo), "#!/usr/bin/env bash\necho sem cabecalho de licenca\n")
+    monkeypatch.setattr(gate, "ROOT", str(tmp_path))
+    monkeypatch.setattr(gate, "list_tracked_files",
+                        lambda root, extensions, basenames=(): ["tools/script_novo.sh"])
+    monkeypatch.setattr(gate, "ALLOWLIST_PATH", str(tmp_path / "vazio.txt"))
+    assert gate.main() == 1
 
-    `.sh` ficou fora do gate por bloqueio TEMPORAL: os outros 8 .sh rastreados
-    ja receberam cabecalho na fatia SPDX-QUITACAO; so o check.sh nao, porque
-    estava sendo editado por outra fatia em voo (edicao a duas maos perde
-    trabalho alheio). Sem este tripwire, "ligar depois" vira exatamente a
-    divida silenciosa que esta fatia existiu para pagar - a divida de .py
-    CRESCEU de 18 para 20 arquivos enquanto o item esperava.
 
-    SE ESTE TESTE FALHOU: check.sh ja tem cabecalho. Acao (1 minuto):
-      1. acrescente "sh" em EXTENSIONS no tools/spdx_header_required.py;
-      2. rode `python3 tools/spdx_header_required.py` e confirme rc=0;
-      3. APAGUE este teste (a divida acabou; tripwire cumprido nao fica).
-    """
-    check_sh = os.path.join(gate.ROOT, "tools", "check.sh")
-    if not os.path.isfile(check_sh):
-        pytest.skip("tools/check.sh nao existe nesta arvore")
-    assert gate.has_required_header(check_sh) is False, (
-        "tools/check.sh ganhou cabecalho SPDX: acrescente 'sh' em "
-        "gate.EXTENSIONS e apague este tripwire (ver docstring do teste)"
-    )
+def test_sh_com_cabecalho_depois_do_shebang_passa(tmp_path, monkeypatch):
+    """O shebang TEM de continuar na linha 1 (senao o script deixa de rodar):
+    o cabecalho vai pra linha 2, e isso precisa contar como cabecalho valido
+    - mesma regra do .py, agora provada em .sh."""
+    ok = tmp_path / "tools" / "script_ok.sh"
+    _write(str(ok), "#!/usr/bin/env bash\n"
+                    "# SPDX-License-Identifier: Apache-2.0\n"
+                    "echo ok\n")
+    assert gate.has_required_header(str(ok)) is True
+    monkeypatch.setattr(gate, "ROOT", str(tmp_path))
+    monkeypatch.setattr(gate, "list_tracked_files",
+                        lambda root, extensions, basenames=(): ["tools/script_ok.sh"])
+    monkeypatch.setattr(gate, "ALLOWLIST_PATH", str(tmp_path / "vazio.txt"))
+    assert gate.main() == 0
 
 
 # ------------------------------------------- DECLARACAO x MENCAO (precisao)

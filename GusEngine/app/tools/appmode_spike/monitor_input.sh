@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-# app/tools/appmode_spike/monitor_input.sh (F3-SPIKE-1, scratch, NAO commitado).
+# SPDX-License-Identifier: Apache-2.0
+# app/tools/appmode_spike/monitor_input.sh (F3-SPIKE-1, scratch, commitado).
 #
 # Instrumentacao de diagnostico pro ROTEIRO LIVE de winmodes (RUNBOOK.md deste
 # diretorio) - NAO roda nada sozinho, so OBSERVA: snapshot inicial do estado de

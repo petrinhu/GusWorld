@@ -49,14 +49,14 @@ media nesta fatia foi 51 arquivos (27 .py + 9 .sh + 1 .cmake + 14 CMakeLists),
 nao os ~27 que a ficha dizia; 48 ganharam cabecalho aqui, 2 foram pra allowlist
 e 1 (tools/check.sh) ficou bloqueado (ver .sh abaixo).
 
-.sh: FORA HOJE, POR BLOQUEIO TEMPORAL, NAO POR DECISAO. Os 8 outros .sh
-rastreados ja receberam o cabecalho nesta fatia; falta so `tools/check.sh`,
-que estava sendo editado por OUTRA fatia em voo no mesmo momento (tocar o
-arquivo a duas maos arrisca perder a edicao alheia e deixar o gate vermelho
-para todos). Ligar `.sh` custa uma palavra em EXTENSIONS no dia em que
-check.sh ganhar o cabecalho - e para isso NAO depender de alguem lembrar,
-tools/tests/test_spdx_header_required.py tem um TRIPWIRE que fica vermelho
-assim que check.sh ganhar o header, com a instrucao do que fazer.
+.sh: DENTRO DO ESCOPO (GATE-SPDX-ESCOPO-SH, 2026-08-07). O bloqueio temporal
+(tools/check.sh em voo por outra fatia) acabou: `check.sh` e
+`GusEngine/app/tools/appmode_spike/monitor_input.sh` (este ultimo entrou em
+`58d16ff3` ja sem cabecalho, achado `SPDX-SH-DRIFT` da auditoria W1) ganharam
+o cabecalho no mesmo commit que ligou `sh` em EXTENSIONS - o gate nasce verde,
+nunca vermelho, mesma disciplina do SPDX-QUITACAO. O tripwire que cobria esta
+divida (`test_tripwire_sh_ligar_quando_check_sh_quitar`) foi apagado: a divida
+que ele vigiava acabou, e tripwire cumprido nao fica.
 
 .yml: FORA DE PROPOSITO (decisao, nao esquecimento). Cabecalho de licenca em
 workflow de CI nao e pratica da industria - os .yml aqui sao configuracao de
@@ -133,11 +133,12 @@ ALLOWLIST_PATH = os.path.join(SCRIPT_DIR, "spdx_allowlist.txt")
 # o gate nasce verde e fecha a porta pro proximo `.inl` nascer sem cabecalho.
 # SPDX-QUITACAO (2026-08-06): `.py` e `.cmake` entraram DEPOIS de os 48 arquivos
 # receberem cabecalho no MESMO commit - o gate nasce verde, nunca vermelho.
-# ⚠️ `.sh` fica de fora por bloqueio temporal (tools/check.sh em voo por outra
-# fatia) e `.yml` de proposito; os dois motivos estao no docstring, e o `.sh` tem
-# tripwire no teste para nao virar divida silenciosa outra vez.
+# GATE-SPDX-ESCOPO-SH (2026-08-07): `.sh` entrou DEPOIS de os 2 arquivos sem
+# cabecalho (tools/check.sh e o monitor_input.sh do appmode_spike) receberem o
+# header no MESMO commit - o gate nasce verde. `.yml` segue fora, DE PROPOSITO
+# (motivo no docstring).
 EXTENSIONS = ("cpp", "hpp", "h", "c", "cc", "cxx", "inl", "hxx", "ipp",
-              "py", "cmake")
+              "py", "cmake", "sh")
 
 # Arquivo de build sem extensao nenhuma: `CMakeLists.txt` nao casa com nenhum
 # `*.<ext>` e por isso ficou fora da conta da fatia anterior por OMISSAO (14
