@@ -5,8 +5,6 @@
 
 #include "gus/core/spatial/grid_collision.hpp"
 
-#include <cmath>
-
 #include "gus/core/spatial/step_clamp.hpp"
 #include "gus/core/spatial/tile_grid.hpp"
 
