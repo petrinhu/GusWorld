@@ -145,6 +145,13 @@ void CardCollection::apply_to_physical(std::uint64_t instance_id, const Physical
     // remove_for_sale, aqui reforcada: nem card_id nem physical são referencias.
     const std::string card_id_copy = it->card_id;
     CardPhysicalState working = it->physical;
+    // Snapshot pra detectar mutacao por baixo do pe (APPLY-PHYSICAL-ANINHADO, achado
+    // de auditoria): se fn reentrar com uma chamada ANINHADA de apply_to_physical()
+    // sobre esta MESMA instancia, aquele commit interno escreve DIRETO no container
+    // real antes deste ponto - sem este snapshot, o commit deste (outer) sobrescreveria
+    // o do inner em silencio (perda de escrita), ja que 'working' foi copiado ANTES do
+    // inner rodar e nunca reflete o commit dele.
+    const CardPhysicalState before = working;
 
     fn(card_id_copy, working);
 
@@ -164,6 +171,19 @@ void CardCollection::apply_to_physical(std::uint64_t instance_id, const Physical
         throw std::invalid_argument(
             "CardCollection::apply_to_physical: instance_id sumiu do deck ativo durante "
             "a mutacao (fn nao pode mutar o agregado por fora)");
+    }
+    // Guard de reentrancia (APPLY-PHYSICAL-ANINHADO): a instancia continua no ativo,
+    // mas se o estado fisico REAL mudou entre o snapshot ('before') e agora, alguem
+    // (uma chamada aninhada de apply_to_physical sobre este MESMO instance_id, dentro
+    // de fn) ja commitou por baixo do pe - escrever 'working' agora apagaria aquele
+    // commit em silencio. Fail-fast em vez de corromper (mesma familia de excecao das
+    // demais checagens deste metodo).
+    if (it->physical != before) {
+        throw std::invalid_argument(
+            "CardCollection::apply_to_physical: instance_id foi mutado por uma chamada "
+            "aninhada de apply_to_physical() sobre a MESMA instancia durante o "
+            "emprestimo (fn nao pode reentrar neste agregado pra esta instancia) - "
+            "commit recusado pra nao sobrescrever o commit da chamada aninhada");
     }
     it->physical = std::move(working);
 }

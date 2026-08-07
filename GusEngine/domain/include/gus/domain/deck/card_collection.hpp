@@ -132,7 +132,12 @@ public:
     // cautela de discard_to_dead/remove_for_sale contra o callback ser opaco: o
     // iterador e REANCORADO apos fn rodar (fail-fast, std::invalid_argument, se a
     // instancia sumiu do ativo durante a chamada - fn nao pode mutar o agregado por
-    // fora, mesmo que so enxergue a copia local).
+    // fora, mesmo que so enxergue a copia local). Fail-fast tambem (std::invalid_argument,
+    // achado de auditoria APPLY-PHYSICAL-ANINHADO) se fn reentrar com uma chamada
+    // ANINHADA de apply_to_physical() sobre a MESMA instancia: o commit do inner ja
+    // escreveu no container real por baixo do pe, e o commit do outer (que so
+    // enxergava o estado de ANTES) seria uma perda de escrita silenciosa - recusado em
+    // vez de sobrescrever. Aninhar sobre instancias DIFERENTES continua permitido.
     void apply_to_physical(std::uint64_t instance_id, const PhysicalMutator& fn);
 
     // Views read-only (copia por referencia const; chamador nao muta por aqui).

@@ -468,6 +468,78 @@ TEST_CASE("card_collection: apply_to_physical falha (fail-fast) se fn, por fora,
     REQUIRE(deck.dead().front().instance_id == a.instance_id);
 }
 
+// ---- APPLY-PHYSICAL-ANINHADO (TODO.md): duas chamadas de apply_to_physical
+// aninhadas na MESMA instancia - o outer le sua copia local ANTES do inner rodar; se
+// o inner commita direto no container real e o outer, ao retornar, escreve por cima
+// com a SUA copia (que nunca viu o commit do inner), a escrita do inner se perde SEM
+// ERRO NENHUM. Fronteira do guard: aninhar na MESMA instancia deve falhar
+// (fail-fast); aninhar em instancias DIFERENTES (um passo fora da fronteira) precisa
+// continuar funcionando normal - nenhuma das duas e "sumico" do ativo (o guard
+// existente ate aqui so cobria isso), e sim MUTACAO por baixo do pe.
+
+TEST_CASE("card_collection: apply_to_physical aninhado na MESMA instancia falha "
+          "fail-fast (nao pode sobrescrever em silencio o commit do inner, "
+          "APPLY-PHYSICAL-ANINHADO)",
+          "[domain][deck][card_collection][apply_to_physical][invariant]") {
+    CardCollection deck(kDeckCapacityTier1);
+    const CardInstance a = deck.add_to_active("pulso_eletrico");
+
+    REQUIRE_THROWS_AS(
+        deck.apply_to_physical(
+            a.instance_id,
+            [&deck, &a](const std::string&, CardPhysicalState& outer) {
+                outer.is_infected = true;
+                outer.virus_kind = VirusKind::Worm;
+
+                // Aninha: chama apply_to_physical de NOVO sobre a MESMA instancia
+                // DENTRO do emprestimo externo. O inner LE o estado ainda
+                // nao-commitado do container (ainda o valor de ANTES do outer
+                // rodar) e commita direto - ANTES do outer retornar e escrever a
+                // SUA copia por cima.
+                deck.apply_to_physical(a.instance_id,
+                                        [](const std::string&, CardPhysicalState& inner) {
+                                            inner.battery_recharge_cycles = 7;
+                                        });
+            }),
+        std::invalid_argument);
+
+    // ALL-OR-NOTHING (propriedade 3 do contrato): o outer falhou, entao NENHUM dos
+    // dois commits deveria ter sobrevivido incoerente - mas o inner JA commitou de
+    // verdade no container antes do outer detectar o conflito (o inner em si e uma
+    // chamada valida e completa, so o OUTER que reentrou e quem e recusado). O
+    // container reflete o commit do inner, nao o do outer (que foi bloqueado).
+    REQUIRE(deck.active().front().physical.battery_recharge_cycles == 7);
+    REQUIRE_FALSE(deck.active().front().physical.is_infected);
+    REQUIRE(deck.active().front().physical.virus_kind == VirusKind::None);
+}
+
+TEST_CASE("card_collection: apply_to_physical aninhado em instancias DIFERENTES "
+          "continua funcionando normal - so a MESMA instancia e o problema (um passo "
+          "fora da fronteira do guard, APPLY-PHYSICAL-ANINHADO)",
+          "[domain][deck][card_collection][apply_to_physical]") {
+    CardCollection deck(kDeckCapacityTier1);
+    const CardInstance a = deck.add_to_active("pulso_bio");
+    const CardInstance b = deck.add_to_active("pulso_sonico");
+
+    REQUIRE_NOTHROW(deck.apply_to_physical(
+        a.instance_id, [&deck, &b](const std::string&, CardPhysicalState& outer) {
+            outer.battery_recharge_cycles = 3;
+            deck.apply_to_physical(b.instance_id,
+                                    [](const std::string&, CardPhysicalState& inner) {
+                                        inner.battery_recharge_cycles = 9;
+                                    });
+        }));
+
+    for (const auto& c : deck.active()) {
+        if (c.instance_id == a.instance_id) {
+            REQUIRE(c.physical.battery_recharge_cycles == 3);
+        } else {
+            REQUIRE(c.instance_id == b.instance_id);
+            REQUIRE(c.physical.battery_recharge_cycles == 9);
+        }
+    }
+}
+
 // ---- Constantes de deck_constants.hpp: presenca + valores //PLAYTEST (secao 8c) ---
 
 TEST_CASE("deck_constants: valores baseline //PLAYTEST da mao/deck (secao 8c)",
