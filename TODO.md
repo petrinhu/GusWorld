@@ -474,6 +474,26 @@ histórico no fim do arquivo. Novas descobertas entram como bullets abaixo desta
   de temp dirs: conferido no blob commitado (`git show HEAD:...`, linha 864). Ocorrência **única**
   na base (varrido `Guard x(std::string())` e `Dir x(std::string())` em todo o `GusEngine`).
   Achado pelo `-Wvexing-parse` do clang em 2026-08-04.
+- `CI-NODE20-ACTIONS`: **aviso do CI rastreado até nós pela sessão do glintfx** (bus, 2026-08-06). O
+  líder levou a mensagem achando que era deles; eles rastrearam e devolveram: nomeia
+  `ilammy/msvc-dev-cmd@v1` e o job `Windows (MSVC, Release)`, que não existem no lado deles.
+  **Confirmei por enumeração aqui:** `.github/workflows/windows.yml:53` tem a ação citada, e ao todo
+  são **8 pontos** de ação de terceiro (`actions/cache@v4` x4, `actions/checkout@v4` x3,
+  `ilammy/msvc-dev-cmd@v1` x1). Todas miram **Node.js 20**, descontinuado; o GitHub hoje as força a
+  rodar em Node 24. **Funciona agora, quebra quando a ponte cair.** Eles medem 16 pontos do mesmo
+  problema no repo deles, ou seja é maré geral, não erro nosso. Versões que eles mediram:
+  `actions/checkout` v7.0.1, `actions/cache` v6.1.0 (não reconferi). **Adiado de propósito para
+  depois de fechar a onda em curso** (mesmo critério que eles adotaram): mexer em 8 pontos enquanto
+  se tenta obter uma rodada verde troca risco imediato por benefício futuro.
+- `GLINTFX-HEAP-AGUARDA-TAG`: o glintfx **consertou a corrupção de heap que reportamos** e achou
+  **três gêmeos** que não tínhamos visto: o gêmeo algorítmico na outra função de captura (a mais
+  alcançada, porque as duas fachadas delegam para ela), uma terceira implementação independente do
+  mesmo padrão alcançável pelo gancho de frame que usamos, e o lado espelhado no upload de textura
+  (leitura fora dos limites, 4 pontos de envio de imagem). Cinco arquivos de teste novos ou
+  estendidos, um deles verificando **conteúdo** e não só sobrevivência. ⚠️ **Ainda não está em versão
+  etiquetada** — está na linha principal deles, e a etiqueta espera o verde completo. Eles avisam
+  pelo bus quando sair, com a linha pronta. **Nada a fazer aqui até lá**; a superfície pública não
+  mudou (`v0.30.0..HEAD` em `include/` volta vazio, validado com controle positivo).
 - `SFX-ACTORPICKER-HOVER-MOUSE`: **lacuna de teste PROVADA** (auditoria W1, lote E, 2026-08-06). Das 12
   combinações superfície x canal do cockpit, 11 têm teste ponta-a-ponta; falta **ActorPicker x hover x
   mouse**. O auditor não deduziu: desativou o ramo em `battle_input.cpp` (`battle_mouse_hover`),
