@@ -62,8 +62,11 @@
 #include "gus/app/screens/ui_hover.hpp"  // ui_hover_entered_new_item (B4, paridade teclado x mouse)
 #include "gus/core/asset_paths.hpp"  // kSfxDir/kMenuHoverSfxFile/kMenuClickSfxFile
 #include "gus/core/spatial/camera_clamp.hpp"  // gus::core::spatial::Rect
+#include "gus/domain/input/controls_hash.hpp"  // controls_hash128 (aviso #2, SAVE-LOAD-AVISOS)
+#include "gus/domain/input/controls_name.hpp"  // kDefaultProfile (aviso #2)
 #include "gus/domain/save/save_serializer.hpp"  // LoadResult
 #include "gus/platform/assets/asset_source.hpp"  // FilesystemAssetSource (resolve SFX)
+#include "gus/platform/fs/controls_file_store.hpp"  // load_controls/save_controls (aviso #2)
 #include "gus/platform/fs/save_file_store.hpp"  // has_save/save_game/load_game/delete_save
 #include "gus/platform/input/key_translation.hpp"  // sdl_key_to_godot_keycode (Fatia 2)
 #include "gus/platform/input/key_translation_glintfx.hpp"  // godot_keycode_to_glintfx_key
@@ -293,6 +296,12 @@ void apply_action_to_result(SaveLoadStepResult& result, const SaveLoadMenuState&
             // sabe se foi ClosedAfterLoad ou se precisa recarregar com
             // warning_kind=RecoverFailed).
             return;
+        case SaveLoadMenuAction::ControlsDiffUseSave:
+        case SaveLoadMenuAction::ControlsDiffKeepCurrent:
+            // Aviso #2 (ControlsDiffer): MESMO racional de RecoverRequested -
+            // apply_action_side_effects_ (I/O real: aplica o SaveData pendente,
+            // com ou sem trocar os controles) decide o exit de fato, NUNCA aqui.
+            return;
     }
 }
 
@@ -412,8 +421,13 @@ void route_mouse_click(SaveLoadMenuState& state, float x, float y,
 void route_mouse_hover(SaveLoadMenuState& state, float x, float y,
                        const SaveLoadStepBoxes& boxes) noexcept {
     if (state.warning_kind != SaveLoadMenuState::WarningKind::None) {
-        if (state.warning_kind == SaveLoadMenuState::WarningKind::Damaged &&
-            hit_test(boxes.warn_recover, x, y)) {
+        // pill 0 SO existe em Damaged/ControlsDiffer (2 botoes - ver a doc de
+        // WarningKind em save_load_menu.hpp); Version/RecoverFailed cai direto
+        // no ramo do Cancelar abaixo.
+        const bool has_primary_pill =
+            (state.warning_kind == SaveLoadMenuState::WarningKind::Damaged ||
+             state.warning_kind == SaveLoadMenuState::WarningKind::ControlsDiffer);
+        if (has_primary_pill && hit_test(boxes.warn_recover, x, y)) {
             state.warning_selected = 0;
         } else if (hit_test(boxes.warn_cancel, x, y)) {
             state.warning_selected = 1;
@@ -595,7 +609,9 @@ public:
                    const std::function<gus::domain::save::SaveData()>& build_current_save_data,
                    const std::function<void(const gus::domain::save::SaveData&)>&
                        apply_loaded_save_data,
-                   std::string frozen_background_png)
+                   std::string frozen_background_png, const std::string& settings_dir,
+                   const std::function<void(const gus::domain::input::InputRemapConfig&)>&
+                       apply_controls_config)
         : window_(window),
           audio_(audio),
           translator_(translator),
@@ -603,7 +619,9 @@ public:
           saves_dir_(saves_dir),
           build_current_save_data_(build_current_save_data),
           apply_loaded_save_data_(apply_loaded_save_data),
-          frozen_background_png_(std::move(frozen_background_png)) {}
+          frozen_background_png_(std::move(frozen_background_png)),
+          settings_dir_(settings_dir),
+          apply_controls_config_(apply_controls_config) {}
 
     void enter() override {
         const std::array<SaveSlotPreview, gus::domain::save::kSlotCount> previews =
@@ -900,16 +918,47 @@ private:
         save_load_menu_reselect_if_needed(state_);
     }
 
+    // Aviso #2 (SAVE-LOAD-AVISOS, ControlsDiffer - decisao do lider 2026-08-06/
+    // 07): chamado DEPOIS de um Load ja ter carregado `data` com sucesso
+    // (SlotChosen com cache, ou load_game_from_backup Ok), ANTES de aplicar/
+    // fechar. Le o controls.json VIVO (settings_dir_/kDefaultProfile - MESMO
+    // perfil unico que Maestro/Controles usam) e compara o hash contra
+    // data.controls_hash128 (gravado no INSTANTE do save original, ADR-007).
+    // Devolve true (DEFERRED) quando abriu o aviso - o CHAMADOR guarda `data`
+    // em pending_load_data_ e so aplica/fecha quando o jogador escolher (ver
+    // ControlsDiffUseSave/ControlsDiffKeepCurrent em apply_action_side_
+    // effects_); false quando pode prosseguir NA HORA (feature desligada -
+    // settings_dir_ vazio, MESMA convencao de degradacao de apply_
+    // loaded_save_data_ ausente - ou os controles ja BATEM, o caso comum).
+    bool maybe_open_controls_diff_warning_(const gus::domain::save::SaveData& data) {
+        if (settings_dir_.empty()) return false;
+        const gus::domain::input::InputRemapConfig current = gus::platform::fs::load_controls(
+            settings_dir_, std::string(gus::domain::input::kDefaultProfile));
+        if (gus::domain::input::controls_hash128(current) == data.controls_hash128) return false;
+        pending_load_data_ = data;
+        state_.warning_kind = SaveLoadMenuState::WarningKind::ControlsDiffer;
+        state_.warning_selected = 1;  // default seguro = Manter atuais
+        return true;
+    }
+
     // SAVE-LOAD-AVISOS: "Tentar recuperar" do aviso Damaged - tenta a cadeia
     // de backup de fato. Sucesso: MESMO caminho de um Load normal
-    // bem-sucedido (ClosedAfterLoad). Falha: transita state_.warning_kind pra
-    // RecoverFailed e MANTEM a tela aberta (reload_(), nao fecha) - devolve
-    // nullopt igual aos outros ramos que "so tratam e continuam".
+    // bem-sucedido (ClosedAfterLoad, OU o aviso #2 ControlsDiffer se os
+    // controles do backup recuperado divergirem dos atuais - ver
+    // maybe_open_controls_diff_warning_ acima). Falha: transita
+    // state_.warning_kind pra RecoverFailed e MANTEM a tela aberta
+    // (reload_(), nao fecha) - devolve nullopt igual aos outros ramos que "so
+    // tratam e continuam" (o ramo ControlsDiffer TAMBEM devolve nullopt, MESMO
+    // padrao - a tela continua aberta ate a escolha do jogador).
     std::optional<SaveLoadLoopExit> do_recover_(int slot) {
         const auto recovered = gus::platform::fs::load_game_from_backup(slot, saves_dir_);
         const bool backup_loaded_ok =
             recovered.has_value() && recovered->result == gus::domain::save::LoadResult::Ok;
         if (backup_loaded_ok && apply_loaded_save_data_) {
+            if (maybe_open_controls_diff_warning_(recovered->data)) {
+                reload_();
+                return std::nullopt;
+            }
             apply_loaded_save_data_(recovered->data);
             return SaveLoadLoopExit::ClosedAfterLoad;
         }
@@ -953,6 +1002,10 @@ private:
                     const auto& cached =
                         loaded_cache_[static_cast<std::size_t>(state_.selected)];
                     if (cached.has_value() && apply_loaded_save_data_) {
+                        if (maybe_open_controls_diff_warning_(*cached)) {
+                            reload_();
+                            return true;
+                        }
                         apply_loaded_save_data_(*cached);
                         done_ = true;
                         result_ = SaveLoadLoopExit::ClosedAfterLoad;
@@ -984,6 +1037,63 @@ private:
                 }
                 // do_recover_ ja chama reload_() no caminho de falha
                 // (RecoverFailed) - nao reload_() de novo aqui.
+                return true;
+            }
+            case SaveLoadMenuAction::ControlsDiffUseSave: {
+                // Aviso #2: o jogador escolheu "Usar os do save" - persiste
+                // data.input_remap_backup em controls.json (I/O direto, MESMO
+                // arquivo/perfil que a tela Controles usa) e aplica na sessao
+                // VIVA via o callback do CHAMADOR (Maestro/city_->set_controls) -
+                // ANTES de aplicar o resto do save/fechar, MESMA ordem de
+                // apply_loaded_save_data_ acima (posicao/flags por ultimo).
+                if (pending_load_data_.has_value()) {
+                    const bool persisted = gus::platform::fs::save_controls(
+                        pending_load_data_->input_remap_backup, settings_dir_,
+                        std::string(gus::domain::input::kDefaultProfile));
+                    if (!persisted) {
+                        std::cerr << "[save_load_menu_loop] aviso #2: falha ao persistir "
+                                     "os controles do save em controls.json (I/O) - "
+                                     "aplicando so NA SESSAO ATUAL (o proximo boot volta "
+                                     "pro controls.json anterior).\n";
+                    }
+                    if (apply_controls_config_) {
+                        apply_controls_config_(pending_load_data_->input_remap_backup);
+                    } else {
+                        std::cerr << "[save_load_menu_loop] aviso #2: CHAMADOR nao forneceu "
+                                     "apply_controls_config - os controles do save NAO tomam "
+                                     "efeito NESTA sessao (so no proximo boot, ja persistido "
+                                     "acima).\n";
+                    }
+                    if (apply_loaded_save_data_) apply_loaded_save_data_(*pending_load_data_);
+                    done_ = true;
+                    result_ = SaveLoadLoopExit::ClosedAfterLoad;
+                } else {
+                    // Defensivo (nao deveria acontecer - ControlsDiffUseSave so
+                    // sai do aviso que maybe_open_controls_diff_warning_ abriu,
+                    // que sempre seta pending_load_data_ antes): nao finge um
+                    // load, so recarrega a lista.
+                    std::cerr << "[save_load_menu_loop] BUG defensivo: "
+                                 "ControlsDiffUseSave sem pending_load_data_ - "
+                                 "ignorando (nao finge um load).\n";
+                    reload_();
+                }
+                pending_load_data_.reset();
+                return true;
+            }
+            case SaveLoadMenuAction::ControlsDiffKeepCurrent: {
+                // Aviso #2: "Manter atuais" - aplica o save pendente SEM tocar
+                // controls.json nem a sessao viva.
+                if (pending_load_data_.has_value() && apply_loaded_save_data_) {
+                    apply_loaded_save_data_(*pending_load_data_);
+                    done_ = true;
+                    result_ = SaveLoadLoopExit::ClosedAfterLoad;
+                } else {
+                    std::cerr << "[save_load_menu_loop] BUG defensivo: "
+                                 "ControlsDiffKeepCurrent sem pending_load_data_ - "
+                                 "ignorando (nao finge um load).\n";
+                    reload_();
+                }
+                pending_load_data_.reset();
                 return true;
             }
             case SaveLoadMenuAction::None:
@@ -1130,10 +1240,22 @@ private:
     const std::function<gus::domain::save::SaveData()>& build_current_save_data_;
     const std::function<void(const gus::domain::save::SaveData&)>& apply_loaded_save_data_;
     std::string frozen_background_png_;
+    // aviso #2 (SAVE-LOAD-AVISOS, ControlsDiffer): settings_dir_ vazio (default
+    // dos callers que nao passam - MESMA convencao de nullptr em
+    // apply_loaded_save_data_) DESLIGA a feature com seguranca (ver
+    // maybe_open_controls_diff_warning_ abaixo) - nao quebra nenhum chamador
+    // existente (probes/testes) que ainda nao conhece este parametro.
+    const std::string& settings_dir_;
+    const std::function<void(const gus::domain::input::InputRemapConfig&)>& apply_controls_config_;
 
     SaveLoadMenuState state_;
     std::array<std::optional<gus::domain::save::SaveData>, gus::domain::save::kSlotCount>
         loaded_cache_{};
+    // aviso #2: o SaveData de um Load JA bem-sucedido (SlotChosen com cache OU
+    // load_game_from_backup Ok) enquanto o aviso ControlsDiffer aguarda a
+    // escolha do jogador (ver maybe_open_controls_diff_warning_/apply_action_
+    // side_effects_). nullopt fora dessa janela.
+    std::optional<gus::domain::save::SaveData> pending_load_data_;
 
     int pw_ = 0;
     int ph_ = 0;
@@ -1172,9 +1294,13 @@ SaveLoadLoopExit run_save_load_menu_loop_gl_current(
     const std::function<gus::domain::save::SaveData()>& build_current_save_data,
     const std::function<void(const gus::domain::save::SaveData&)>&
         apply_loaded_save_data,
-    const std::string& frozen_background_png, const gus::app::EventSyncHook& sync_hook) {
+    const std::string& frozen_background_png, const gus::app::EventSyncHook& sync_hook,
+    const std::string& settings_dir,
+    const std::function<void(const gus::domain::input::InputRemapConfig&)>&
+        apply_controls_config) {
     SaveLoadScreen screen(window, audio, translator, mode, saves_dir, build_current_save_data,
-                          apply_loaded_save_data, frozen_background_png);
+                          apply_loaded_save_data, frozen_background_png, settings_dir,
+                          apply_controls_config);
     gus::app::run_screen_state(screen, sync_hook);
     if (screen.window_closed()) return SaveLoadLoopExit::QuitApp;
     return screen.result();

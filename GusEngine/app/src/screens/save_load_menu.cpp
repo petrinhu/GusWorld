@@ -330,33 +330,42 @@ SaveLoadMenuAction save_load_menu_click_delete_confirm(SaveLoadMenuState& state,
 }
 
 SaveLoadMenuAction save_load_menu_click_warning_recover(SaveLoadMenuState& state) noexcept {
-    // O botao "Tentar recuperar" SO EXISTE quando warning_kind==Damaged (ver a
-    // doc de save_load_menu_click_warning_recover no header) - qualquer outro
-    // caso (aviso fechado, Version, RecoverFailed) e no-op defensivo.
-    if (state.warning_kind != SaveLoadMenuState::WarningKind::Damaged) {
+    // O pill 0 ("acao primaria") SO EXISTE quando warning_kind==Damaged
+    // ("Tentar recuperar") ou ControlsDiffer ("Usar os do save", aviso #2 - ver
+    // a doc de WarningKind no header) - qualquer outro caso (aviso fechado,
+    // Version, RecoverFailed) e no-op defensivo.
+    const bool controls_diff = (state.warning_kind == SaveLoadMenuState::WarningKind::ControlsDiffer);
+    if (state.warning_kind != SaveLoadMenuState::WarningKind::Damaged && !controls_diff) {
         return SaveLoadMenuAction::None;
     }
     state.warning_kind = SaveLoadMenuState::WarningKind::None;
     state.warning_selected = 1;
-    return SaveLoadMenuAction::RecoverRequested;
+    return controls_diff ? SaveLoadMenuAction::ControlsDiffUseSave
+                          : SaveLoadMenuAction::RecoverRequested;
 }
 
 SaveLoadMenuAction save_load_menu_click_warning_cancel(SaveLoadMenuState& state) noexcept {
     if (state.warning_kind == SaveLoadMenuState::WarningKind::None) {
         return SaveLoadMenuAction::None;
     }
+    // ControlsDiffer (aviso #2): o pill 1/Esc NAO cancela o load (que ja
+    // aconteceu) - so decide "manter os controles atuais" (ver a doc de
+    // WarningKind/SaveLoadMenuAction no header).
+    const bool controls_diff = (state.warning_kind == SaveLoadMenuState::WarningKind::ControlsDiffer);
     state.warning_kind = SaveLoadMenuState::WarningKind::None;
     state.warning_selected = 1;
-    return SaveLoadMenuAction::WarningCancelled;
+    return controls_diff ? SaveLoadMenuAction::ControlsDiffKeepCurrent
+                          : SaveLoadMenuAction::WarningCancelled;
 }
 
 SaveLoadMenuAction save_load_menu_key_down(SaveLoadMenuState& state,
                                             glintfx::Key key) noexcept {
     if (state.warning_kind != SaveLoadMenuState::WarningKind::None) {
-        // Damaged tem 2 botoes (0=Tentar recuperar, 1=Cancelar); Version/
-        // RecoverFailed tem SO Cancelar (nao ha pill 0 pra alternar - ver a doc
-        // de WarningKind no header).
-        const bool two_buttons = (state.warning_kind == SaveLoadMenuState::WarningKind::Damaged);
+        // Damaged/ControlsDiffer tem 2 botoes (pill 0 = acao primaria, pill 1 =
+        // Cancelar/Manter); Version/RecoverFailed tem SO Cancelar (nao ha pill 0
+        // pra alternar - ver a doc de WarningKind no header).
+        const bool two_buttons = (state.warning_kind == SaveLoadMenuState::WarningKind::Damaged ||
+                                   state.warning_kind == SaveLoadMenuState::WarningKind::ControlsDiffer);
         if (is_back_key(key)) return save_load_menu_click_warning_cancel(state);
         if (two_buttons &&
             (is_left_key(key) || is_right_key(key) || is_up_key(key) || is_down_key(key))) {

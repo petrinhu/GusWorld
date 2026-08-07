@@ -248,14 +248,29 @@ struct SaveLoadMenuState {
     // SAVE-LOAD-AVISOS (aviso #1, mock Tela 4a) - aberto ao confirmar (Enter/
     // clique) um slot present_unreadable EM MODO LOAD (ver confirm_selected_slot/
     // slot_selectable). Kind::None = fechado. warning_selected so importa em
-    // Damaged (2 botoes: 0=Tentar recuperar, 1=Cancelar); Version/RecoverFailed
-    // tem SO Cancelar (nao ha pill 0 pra focar - forward-only/recuperacao ja
-    // falhou, nao ha "tentar" de novo). O slot ALVO e SEMPRE state.selected (o
-    // aviso so abre a partir do slot focado, sem icone por-linha separado como
-    // Apagar).
-    enum class WarningKind { None, Damaged, Version, RecoverFailed };
+    // Damaged/ControlsDiffer (2 botoes: 0=acao primaria, 1=Cancelar/Manter);
+    // Version/RecoverFailed tem SO Cancelar (nao ha pill 0 pra focar -
+    // forward-only/recuperacao ja falhou, nao ha "tentar" de novo). O slot ALVO
+    // e SEMPRE state.selected (o aviso so abre a partir do slot focado, sem
+    // icone por-linha separado como Apagar).
+    //
+    // ControlsDiffer (aviso #2, SAVE-LOAD-AVISOS/TODO.md item SAVE-LOAD-AVISOS -
+    // decisao do lider 2026-08-06/07): aberto pelo CHAMADOR (save_load_menu_
+    // loop.cpp, camada IMPURA - a comparacao exige ler o controls.json vivo do
+    // disco, gus::platform::fs::load_controls + gus::domain::input::
+    // controls_hash128, fora do alcance desta camada PURA) DEPOIS de um Load
+    // JA TER SIDO BEM-SUCEDIDO (SlotChosen com cache, ou RecoverRequested com
+    // load_game_from_backup Ok) quando gus::domain::save::SaveData::
+    // controls_hash128 do save carregado DIVERGE do hash dos controles ATUAIS.
+    // Diferente de Damaged/Version/RecoverFailed (que decidem SE um load
+    // acontece), aqui o load JA aconteceu - a UNICA pergunta pendente e "que
+    // controles usar dali em diante" (mock/TODO: "usar os do save OU manter os
+    // atuais"), entao NAO ha ramo de "cancelar o load" - ESC equivale ao pill 1
+    // (ControlsDiffKeepCurrent, default seguro), NUNCA a WarningCancelled (ver
+    // save_load_menu_click_warning_cancel abaixo).
+    enum class WarningKind { None, Damaged, Version, RecoverFailed, ControlsDiffer };
     WarningKind warning_kind = WarningKind::None;
-    int warning_selected = 1; // 0=Tentar recuperar (so em Damaged), 1=Cancelar (default seguro)
+    int warning_selected = 1; // 0=acao primaria (Damaged/ControlsDiffer), 1=Cancelar/Manter (default seguro)
 };
 
 // true se o slot em `index` (0..kSlotCount-1) e SELECIONAVEL no modo ATUAL de
@@ -368,6 +383,18 @@ enum class SaveLoadMenuAction {
                         // save_load_menu_loop.cpp)
     WarningCancelled,   // qualquer um dos 3 avisos (Damaged/Version/RecoverFailed)
                         // fechou com "Cancelar"/Esc - permanece na lista, NENHUM I/O
+    ControlsDiffUseSave,     // aviso #2 (ControlsDiffer) - pill 0 ("Usar os do
+                             // save") confirmado - o CHAMADOR (que ja tem o
+                             // SaveData pendente do load bem-sucedido) persiste
+                             // data.input_remap_backup em controls.json e aplica
+                             // na sessao VIVA (se o wiring tiver o callback), ANTES
+                             // de aplicar o load e fechar (ClosedAfterLoad)
+    ControlsDiffKeepCurrent, // aviso #2 (ControlsDiffer) - pill 1 ("Manter
+                             // atuais")/Esc (default seguro) - o CHAMADOR aplica o
+                             // load pendente SEM tocar os controles e fecha
+                             // (ClosedAfterLoad). NUNCA "cancela o load" (ao
+                             // contrario de WarningCancelled) - o load JA
+                             // aconteceu, so a escolha de controles fica pendente.
 };
 
 // Roteia UMA tecla pelo estado ATUAL (lista de slots OU um dos mini-dialogos/

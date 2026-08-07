@@ -246,6 +246,22 @@ Não foi possível recuperar (nenhum backup válido).
 ## SAVE_LOAD_WARN_CANCEL
 Cancelar
 
+# SAVE_LOAD_CONTROLS_*: aviso #2 (SAVE-LOAD-AVISOS, item TODO.md - decisão do
+# líder 2026-08-06/07). Diferente do aviso #1 acima, aqui o load JÁ teve
+# sucesso - a única pendência é qual esquema de controles usar dali em diante
+# (o save carrega gus::domain::save::SaveData::controls_hash128/
+# input_remap_backup desde o V4/ADR-007; a tela só compara contra os
+# controles ATUAIS, gus::platform::fs::load_controls). Por isso o título usa
+# tom NEUTRO (sem "!"/vermelho do aviso #1 - não é dano/corrupção).
+## SAVE_LOAD_WARN_CONTROLS_DIFF
+Os controles deste save são diferentes dos atuais.
+
+## SAVE_LOAD_CONTROLS_USE_SAVE
+Usar os do save
+
+## SAVE_LOAD_CONTROLS_KEEP_CURRENT
+Manter atuais
+
 ## LOAD_CONFIRM
 Carregar este save? Progresso não salvo será perdido.
 

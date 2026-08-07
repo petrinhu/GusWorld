@@ -1226,3 +1226,100 @@ TEST_CASE("SAVE-LOAD-AVISOS: RecoverRequested + load_game_from_backup real "
 
     // dir_guard e um gus::test_support::ScopedTempDir - RAII remove no fim do escopo.
 }
+
+// aviso #2 (SAVE-LOAD-AVISOS, ControlsDiffer - decisao do lider 2026-08-06/07):
+// a DETECCAO (comparar controls_hash128) mora no CHAMADOR (save_load_menu_
+// loop.cpp, camada IMPURA, disco) - aqui testamos so o CONTRATO PURO do
+// dialogo depois de state.warning_kind ja estar em ControlsDiffer, MESMO
+// padrao ja usado pro teste de RecoverFailed acima (mutacao direta do campo
+// publico, ver o comentario la).
+
+TEST_CASE("save_load_menu_key_down: aviso ControlsDiffer - LEFT/RIGHT alternam "
+          "entre as 2 pills (MESMO contrato de Damaged)",
+          "[save_load_menu][save-load-avisos]") {
+    SaveLoadMenuState state;
+    state.warning_kind = SaveLoadMenuState::WarningKind::ControlsDiffer;
+    state.warning_selected = 1;  // default seguro = Manter atuais
+
+    REQUIRE(save_load_menu_key_down(state, glintfx::Key::Left) == SaveLoadMenuAction::None);
+    REQUIRE(state.warning_selected == 0);
+    REQUIRE(save_load_menu_key_down(state, glintfx::Key::Right) == SaveLoadMenuAction::None);
+    REQUIRE(state.warning_selected == 1);
+}
+
+TEST_CASE("save_load_menu_key_down: aviso ControlsDiffer - Enter com pill 0 "
+          "focada devolve ControlsDiffUseSave",
+          "[save_load_menu][save-load-avisos]") {
+    SaveLoadMenuState state;
+    state.warning_kind = SaveLoadMenuState::WarningKind::ControlsDiffer;
+    state.warning_selected = 0;
+
+    REQUIRE(save_load_menu_key_down(state, glintfx::Key::Enter) ==
+            SaveLoadMenuAction::ControlsDiffUseSave);
+    REQUIRE(state.warning_kind == SaveLoadMenuState::WarningKind::None);
+}
+
+TEST_CASE("save_load_menu_key_down: aviso ControlsDiffer - Enter com pill 1 "
+          "focada (default) devolve ControlsDiffKeepCurrent",
+          "[save_load_menu][save-load-avisos]") {
+    SaveLoadMenuState state;
+    state.warning_kind = SaveLoadMenuState::WarningKind::ControlsDiffer;
+    state.warning_selected = 1;
+
+    REQUIRE(save_load_menu_key_down(state, glintfx::Key::Enter) ==
+            SaveLoadMenuAction::ControlsDiffKeepCurrent);
+    REQUIRE(state.warning_kind == SaveLoadMenuState::WarningKind::None);
+}
+
+TEST_CASE("save_load_menu_key_down: aviso ControlsDiffer - Esc devolve "
+          "ControlsDiffKeepCurrent, NUNCA WarningCancelled (o load ja "
+          "aconteceu, nao ha 'cancelar')",
+          "[save_load_menu][save-load-avisos]") {
+    SaveLoadMenuState state;
+    state.warning_kind = SaveLoadMenuState::WarningKind::ControlsDiffer;
+    state.warning_selected = 0;  // mesmo com "Usar os do save" focado, Esc = manter
+
+    REQUIRE(save_load_menu_key_down(state, glintfx::Key::Escape) ==
+            SaveLoadMenuAction::ControlsDiffKeepCurrent);
+    REQUIRE(state.warning_kind == SaveLoadMenuState::WarningKind::None);
+}
+
+TEST_CASE("save_load_menu_click_warning_recover: clique direto devolve "
+          "ControlsDiffUseSave quando ControlsDiffer",
+          "[save_load_menu][save-load-avisos]") {
+    SaveLoadMenuState state;
+    state.warning_kind = SaveLoadMenuState::WarningKind::ControlsDiffer;
+
+    REQUIRE(save_load_menu_click_warning_recover(state) == SaveLoadMenuAction::ControlsDiffUseSave);
+    REQUIRE(state.warning_kind == SaveLoadMenuState::WarningKind::None);
+}
+
+TEST_CASE("save_load_menu_click_warning_cancel: clique direto devolve "
+          "ControlsDiffKeepCurrent quando ControlsDiffer (NUNCA WarningCancelled)",
+          "[save_load_menu][save-load-avisos]") {
+    SaveLoadMenuState state;
+    state.warning_kind = SaveLoadMenuState::WarningKind::ControlsDiffer;
+
+    REQUIRE(save_load_menu_click_warning_cancel(state) ==
+            SaveLoadMenuAction::ControlsDiffKeepCurrent);
+    REQUIRE(state.warning_kind == SaveLoadMenuState::WarningKind::None);
+}
+
+TEST_CASE("save_load_menu_click_slot/save_load_menu_request_delete: no-op "
+          "enquanto o aviso ControlsDiffer esta aberto (MESMO contrato dos "
+          "outros 3 avisos)",
+          "[save_load_menu][save-load-avisos]") {
+    SaveLoadMenuState state;
+    std::array<SaveSlotPreview, kSlotCount> slots{};
+    for (int i = 0; i < kSlotCount; ++i) slots[static_cast<std::size_t>(i)] = empty_slot_preview(i);
+    slots[2] = build_slot_preview(make_save_data(100), 2);
+    save_load_menu_open(state, SaveLoadMode::Load, slots);
+    state.warning_kind = SaveLoadMenuState::WarningKind::ControlsDiffer;
+    state.warning_selected = 1;
+
+    REQUIRE(save_load_menu_click_slot(state, 2) == SaveLoadMenuAction::None);
+    REQUIRE(state.warning_kind == SaveLoadMenuState::WarningKind::ControlsDiffer);  // intocado
+
+    save_load_menu_request_delete(state, 2);
+    REQUIRE_FALSE(state.confirming_delete);  // ignorado - aviso ja aberto
+}

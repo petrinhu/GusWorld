@@ -299,6 +299,12 @@ enum class SystemMenuFlowStep {
 // papel/contrato de title_menu_loop.hpp. NAO repassado pra
 // run_save_load_menu_loop_gl_current (a tela de save/load aninhada continua
 // sem sync_hook de producao, MESMO estado de antes desta fatia).
+// `apply_controls_config` (aviso #2, SAVE-LOAD-AVISOS - decisao do lider
+// 2026-08-06/07, default nullptr = "sem capacidade de trocar controles ao
+// vivo", MESMA convencao de build_current_save_data/apply_loaded_save_data
+// vazios acima): repassado direto pra run_save_load_menu_loop_gl_current
+// (junto de `settings_dir`, ja recebido acima e agora TAMBEM repassado pra
+// la) - ver o header de save_load_menu_loop.hpp pro contrato completo.
 [[nodiscard]] SystemMenuLoopOutcome run_system_menu_loop_gl_current(
     SDL_Window* window, gus::platform::audio::AudioEngine& audio,
     const gus::app::i18n::Translator& translator, const std::string& settings_dir,
@@ -308,7 +314,9 @@ enum class SystemMenuFlowStep {
     const std::function<void(const gus::domain::save::SaveData&)>&
         apply_loaded_save_data = {},
     const std::string& frozen_background_png = std::string(),
-    const gus::app::EventSyncHook& sync_hook = nullptr);
+    const gus::app::EventSyncHook& sync_hook = nullptr,
+    const std::function<void(const gus::domain::input::InputRemapConfig&)>&
+        apply_controls_config = nullptr);
 
 }  // namespace gus::app::screens
 

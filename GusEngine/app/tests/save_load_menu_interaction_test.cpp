@@ -47,8 +47,12 @@
 #include "gus/app/screens/save_load_menu.hpp"
 #include "gus/app/screens/save_load_menu_loop.hpp"
 #include "gus/app/screens/save_load_menu_rml.hpp"
+#include "gus/domain/input/controls_hash.hpp"  // controls_hash128 (aviso #2, SAVE-LOAD-AVISOS)
+#include "gus/domain/input/controls_name.hpp"  // kDefaultProfile (aviso #2)
+#include "gus/domain/input/controls_restore.hpp"  // default_controls (aviso #2)
 #include "gus/domain/save/save_data.hpp"
 #include "gus/platform/audio/audio_engine.hpp"
+#include "gus/platform/fs/controls_file_store.hpp"  // load_controls/save_controls (aviso #2)
 #include "gus/platform/fs/save_file_store.hpp"
 #include "gus/platform/rmlui/gl3_loader.hpp"
 #include "tmp_dir_test_support.hpp"
@@ -222,6 +226,9 @@ gus::app::i18n::Translator make_translator() {
         "## SAVE_LOAD_SLOT_DAMAGED_LABEL\n! Danificado\n\n"
         "## SAVE_LOAD_SLOT_VERSION_LABEL\n! Versao incompativel\n\n"
         "## SAVE_LOAD_WARN_CANCEL\nCancelar\n\n"
+        "## SAVE_LOAD_WARN_CONTROLS_DIFF\nOs controles deste save sao diferentes dos atuais.\n\n"
+        "## SAVE_LOAD_CONTROLS_USE_SAVE\nUsar os do save\n\n"
+        "## SAVE_LOAD_CONTROLS_KEEP_CURRENT\nManter atuais\n\n"
         "## SETTINGS_BACK\nVoltar\n\n"
         "## LOCATION_PRACA_COMPILACAO\nx\n\n"
         "## LOCATION_UNKNOWN\nx\n\n");
@@ -1553,4 +1560,165 @@ TEST_CASE("save_load_menu (harness headless, tripwire GLINTFX-SCROLL-ALIGN): "
     // documentando a lacuna. Quando o glintfx corrigir, o REQUIRE passa a
     // valer, e o [!shouldfail] vira o teste FALHO - o sinal esperado.
     REQUIRE(item_after.y == item_before.y);
+}
+
+// ---------------------------------------------------------------- aviso #2 (SAVE-LOAD-
+// AVISOS, ControlsDiffer - decisao do lider 2026-08-06/07): fio REAL ate
+// run_save_load_menu_loop_gl_current, incluindo I/O de controls.json (settings_dir),
+// PROVANDO que a comparacao gus::domain::input::controls_hash128(load_controls(...))
+// vs SaveData::controls_hash128 (o coracao de maybe_open_controls_diff_warning_,
+// save_load_menu_loop.cpp) dispara de fato contra disco real - nao so a mecanica PURA
+// do dialogo (ja coberta em save_load_menu_test.cpp/save_load_menu_rml_test.cpp via
+// mutacao direta de state.warning_kind).
+
+TEST_CASE("save_load_menu (harness headless): aviso #2 ControlsDiffer - Enter no "
+          "unico slot com controles DIFERENTES dos atuais abre o aviso; Enter de "
+          "novo (default = Manter atuais) aplica o load SEM trocar controles",
+          "[save_load_menu_interaction][gl][save-load-avisos]") {
+    GlTestEnv env = try_boot_gl();
+    if (!env.ok) {
+        INFO("GL/display indisponivel - harness pulado (rode com Xvfb :99).");
+        return;
+    }
+
+    const gus::app::i18n::Translator translator = make_translator();
+    const gus::test_support::ScopedTempDir saves_dir(
+        "gusworld_save_load_interaction_controls_diff_saves");
+    const gus::test_support::ScopedTempDir settings_dir(
+        "gusworld_save_load_interaction_controls_diff_settings");
+
+    // Controles ATUAIS no disco (settings_dir/kDefaultProfile): default() com 1
+    // keycode trocado - DIVERGE do que o save abaixo vai trazer.
+    gus::domain::input::InputRemapConfig current = gus::domain::input::default_controls();
+    REQUIRE_FALSE(current.actions.empty());
+    REQUIRE_FALSE(current.actions[0].keys.empty());
+    current.actions[0].keys[0].keycode = 999999;
+    REQUIRE(gus::platform::fs::save_controls(
+        current, settings_dir.string(), std::string(gus::domain::input::kDefaultProfile)));
+
+    // Slot 1 (unico ocupado - selecionado automaticamente por save_load_menu_open):
+    // input_remap_backup = default() PURO (SEM o keycode trocado acima) ->
+    // controls_hash128 diverge do hash do arquivo em disco.
+    gus::domain::save::SaveData data = make_save_data(340);
+    data.slot_id = 1;
+    data.party_roster = {"gus"};
+    data.party_active = {"gus"};
+    data.input_remap_backup = gus::domain::input::default_controls();
+    data.controls_hash128 = gus::domain::input::controls_hash128(data.input_remap_backup);
+    REQUIRE(gus::platform::fs::save_game(data, 1, saves_dir.string()));
+
+    // Enter #1: foca+confirma o slot 1 (unico selecionavel) - load bem-sucedido,
+    // hash diverge -> abre ControlsDiffer (warning_selected default = 1, "Manter
+    // atuais"). Enter #2: confirma o default SEM alternar pill.
+    SDL_Event enter1{};
+    enter1.type = SDL_EVENT_KEY_DOWN;
+    enter1.key.key = SDLK_RETURN;
+    REQUIRE(SDL_PushEvent(&enter1));
+    SDL_Event enter2{};
+    enter2.type = SDL_EVENT_KEY_DOWN;
+    enter2.key.key = SDLK_RETURN;
+    REQUIRE(SDL_PushEvent(&enter2));
+
+    std::optional<gus::domain::save::SaveData> applied;
+    const std::function<void(const gus::domain::save::SaveData&)> apply_data =
+        [&](const gus::domain::save::SaveData& d) { applied = d; };
+    std::optional<gus::domain::input::InputRemapConfig> applied_controls;
+    const std::function<void(const gus::domain::input::InputRemapConfig&)> apply_controls =
+        [&](const gus::domain::input::InputRemapConfig& c) { applied_controls = c; };
+
+    gus::platform::audio::AudioEngine audio(/*device_active=*/false);  // sem hardware no CI
+    const SaveLoadLoopExit exit = run_save_load_menu_loop_gl_current(
+        env.window, audio, translator, SaveLoadMode::Load, saves_dir.string(),
+        /*build_current_save_data=*/{}, apply_data, /*frozen_background_png=*/std::string(),
+        /*sync_hook=*/nullptr, settings_dir.string(), apply_controls);
+
+    REQUIRE(exit == SaveLoadLoopExit::ClosedAfterLoad);
+    REQUIRE(applied.has_value());  // o load do save SEMPRE acontece, ControlsDiffer ou nao
+    REQUIRE_FALSE(applied_controls.has_value());  // "Manter atuais" - NAO trocou ao vivo
+
+    // controls.json no disco CONTINUA o customizado (nao sobrescrito).
+    const gus::domain::input::InputRemapConfig on_disk = gus::platform::fs::load_controls(
+        settings_dir.string(), std::string(gus::domain::input::kDefaultProfile));
+    REQUIRE(on_disk.actions[0].keys[0].keycode == 999999);
+
+    // saves_dir/settings_dir sao gus::test_support::ScopedTempDir - RAII remove no
+    // fim do escopo.
+}
+
+TEST_CASE("save_load_menu (harness headless): aviso #2 ControlsDiffer - LEFT+Enter "
+          "escolhe 'Usar os do save' - aplica o load E troca os controles (persiste "
+          "em disco + aplica na sessao viva via o callback)",
+          "[save_load_menu_interaction][gl][save-load-avisos]") {
+    GlTestEnv env = try_boot_gl();
+    if (!env.ok) {
+        INFO("GL/display indisponivel - harness pulado (rode com Xvfb :99).");
+        return;
+    }
+
+    const gus::app::i18n::Translator translator = make_translator();
+    const gus::test_support::ScopedTempDir saves_dir(
+        "gusworld_save_load_interaction_controls_diff_use_saves");
+    const gus::test_support::ScopedTempDir settings_dir(
+        "gusworld_save_load_interaction_controls_diff_use_settings");
+
+    gus::domain::input::InputRemapConfig current = gus::domain::input::default_controls();
+    REQUIRE_FALSE(current.actions.empty());
+    REQUIRE_FALSE(current.actions[0].keys.empty());
+    current.actions[0].keys[0].keycode = 999999;
+    REQUIRE(gus::platform::fs::save_controls(
+        current, settings_dir.string(), std::string(gus::domain::input::kDefaultProfile)));
+
+    gus::domain::save::SaveData data = make_save_data(340);
+    data.slot_id = 1;
+    data.party_roster = {"gus"};
+    data.party_active = {"gus"};
+    data.input_remap_backup = gus::domain::input::default_controls();
+    data.controls_hash128 = gus::domain::input::controls_hash128(data.input_remap_backup);
+    REQUIRE(gus::platform::fs::save_game(data, 1, saves_dir.string()));
+
+    // Enter (abre ControlsDiffer) -> Left (foca pill 0, "Usar os do save") -> Enter
+    // (confirma).
+    SDL_Event enter1{};
+    enter1.type = SDL_EVENT_KEY_DOWN;
+    enter1.key.key = SDLK_RETURN;
+    REQUIRE(SDL_PushEvent(&enter1));
+    SDL_Event left_ev{};
+    left_ev.type = SDL_EVENT_KEY_DOWN;
+    left_ev.key.key = SDLK_LEFT;
+    REQUIRE(SDL_PushEvent(&left_ev));
+    SDL_Event enter2{};
+    enter2.type = SDL_EVENT_KEY_DOWN;
+    enter2.key.key = SDLK_RETURN;
+    REQUIRE(SDL_PushEvent(&enter2));
+
+    std::optional<gus::domain::save::SaveData> applied;
+    const std::function<void(const gus::domain::save::SaveData&)> apply_data =
+        [&](const gus::domain::save::SaveData& d) { applied = d; };
+    std::optional<gus::domain::input::InputRemapConfig> applied_controls;
+    const std::function<void(const gus::domain::input::InputRemapConfig&)> apply_controls =
+        [&](const gus::domain::input::InputRemapConfig& c) { applied_controls = c; };
+
+    gus::platform::audio::AudioEngine audio(/*device_active=*/false);
+    const SaveLoadLoopExit exit = run_save_load_menu_loop_gl_current(
+        env.window, audio, translator, SaveLoadMode::Load, saves_dir.string(),
+        /*build_current_save_data=*/{}, apply_data, /*frozen_background_png=*/std::string(),
+        /*sync_hook=*/nullptr, settings_dir.string(), apply_controls);
+
+    REQUIRE(exit == SaveLoadLoopExit::ClosedAfterLoad);
+    REQUIRE(applied.has_value());
+    REQUIRE(applied_controls.has_value());  // "Usar os do save" - trocou AO VIVO
+    // O que foi aplicado ao vivo E o que o save trazia (default(), SEM o keycode
+    // 999999 customizado que estava em disco antes).
+    REQUIRE(applied_controls->actions[0].keys[0].keycode !=
+            static_cast<long long>(999999));
+
+    // controls.json no disco AGORA reflete o save (persistido por
+    // ControlsDiffUseSave, save_load_menu_loop.cpp) - NAO o customizado de antes.
+    const gus::domain::input::InputRemapConfig on_disk = gus::platform::fs::load_controls(
+        settings_dir.string(), std::string(gus::domain::input::kDefaultProfile));
+    REQUIRE(on_disk.actions[0].keys[0].keycode != static_cast<long long>(999999));
+    REQUIRE(gus::domain::input::controls_hash128(on_disk) == data.controls_hash128);
+
+    // saves_dir/settings_dir sao gus::test_support::ScopedTempDir - RAII remove no
+    // fim do escopo.
 }

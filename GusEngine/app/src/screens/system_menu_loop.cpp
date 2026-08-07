@@ -1707,7 +1707,9 @@ SystemMenuLoopOutcome run_system_menu_loop_gl_current(
     const std::function<gus::domain::save::SaveData()>& build_current_save_data,
     const std::function<void(const gus::domain::save::SaveData&)>&
         apply_loaded_save_data,
-    const std::string& frozen_background_png, const gus::app::EventSyncHook& sync_hook) {
+    const std::string& frozen_background_png, const gus::app::EventSyncHook& sync_hook,
+    const std::function<void(const gus::domain::input::InputRemapConfig&)>&
+        apply_controls_config) {
     SystemMenuLoopOutcome outcome;
 
     // DIAGNOSTICO/PROVA (SAVE-LOAD-UI etapa 6, prova visual headless Xvfb :99):
@@ -1718,9 +1720,10 @@ SystemMenuLoopOutcome run_system_menu_loop_gl_current(
     // em modo Save e depois Load, salvando 1 PNG de cada).
     if (const char* saveload_screenshot_dir = std::getenv("GUSWORLD_SAVELOAD_SCREENSHOT_DIR");
         saveload_screenshot_dir != nullptr && saveload_screenshot_dir[0] != '\0') {
-        (void)run_save_load_menu_loop_gl_current(window, audio, translator, SaveLoadMode::Save,
-                                                  saves_dir, build_current_save_data,
-                                                  apply_loaded_save_data, frozen_background_png);
+        (void)run_save_load_menu_loop_gl_current(
+            window, audio, translator, SaveLoadMode::Save, saves_dir, build_current_save_data,
+            apply_loaded_save_data, frozen_background_png, /*sync_hook=*/nullptr, settings_dir,
+            apply_controls_config);
         if (build_current_save_data) {
             // Semeia o slot 1 de verdade (I/O real, MESMO save_game que o
             // jogador aciona) - o modo Load abaixo mostra esse slot OCUPADO.
@@ -1732,9 +1735,10 @@ SystemMenuLoopOutcome run_system_menu_loop_gl_current(
                              "- resultado do modo Load abaixo nao e representativo.\n";
             }
         }
-        (void)run_save_load_menu_loop_gl_current(window, audio, translator, SaveLoadMode::Load,
-                                                  saves_dir, build_current_save_data,
-                                                  apply_loaded_save_data, frozen_background_png);
+        (void)run_save_load_menu_loop_gl_current(
+            window, audio, translator, SaveLoadMode::Load, saves_dir, build_current_save_data,
+            apply_loaded_save_data, frozen_background_png, /*sync_hook=*/nullptr, settings_dir,
+            apply_controls_config);
         return outcome;
     }
 
@@ -1775,7 +1779,8 @@ SystemMenuLoopOutcome run_system_menu_loop_gl_current(
             // acima).
             saveload_exit = run_save_load_menu_loop_gl_current(
                 window, audio, translator, mode, saves_dir, build_current_save_data,
-                apply_loaded_save_data, frozen_background_png);
+                apply_loaded_save_data, frozen_background_png, /*sync_hook=*/nullptr,
+                settings_dir, apply_controls_config);
         }
 
         switch (pause_flow_next(sexit, saveload_exit)) {

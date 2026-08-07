@@ -250,32 +250,45 @@ std::string build_save_load_menu_rml(const SaveLoadMenuState& state,
     if (state.warning_kind != SaveLoadMenuState::WarningKind::None) {
         // Aviso dedicado (SAVE-LOAD-AVISOS, mock Tela 4a) - substitui a lista
         // enquanto aberto, MESMA mecanica de confirming_overwrite/confirming_delete
-        // abaixo (title + pill(s), tingido de vermelho via .warn-title/.confirm-
-        // pill.danger). Damaged tem 2 botoes ("Tentar recuperar" + Cancelar);
+        // abaixo (title + pill(s)). Damaged tem 2 botoes ("Tentar recuperar" +
+        // Cancelar), tingido de vermelho (.warn-title/.confirm-pill.danger - e
+        // dado de INTEGRIDADE, save danificado). ControlsDiffer (aviso #2,
+        // decisao do lider 2026-08-06/07) TAMBEM tem 2 botoes ("Usar os do
+        // save" + "Manter atuais"), mas NEUTRO (.confirm-title, SEM .danger) -
+        // o load ja teve SUCESSO, a unica pendencia e uma ESCOLHA, nao um erro.
         // Version/RecoverFailed tem SO Cancelar (forward-only/recuperacao ja
         // tentada - nao ha pill 0 pra desenhar).
         const bool damaged = (state.warning_kind == SaveLoadMenuState::WarningKind::Damaged);
         const bool version = (state.warning_kind == SaveLoadMenuState::WarningKind::Version);
-        const char* msg_key = damaged   ? "SAVE_LOAD_WARN_DAMAGED"
-                              : version ? "SAVE_LOAD_WARN_VERSION"
-                                        : "SAVE_LOAD_RECOVER_FAILED";
-        body << "<div class=\"warn-title\">" << rml_escape(tr.tr(msg_key)) << "</div>";
-        if (damaged) {
-            body << "<div class=\"confirm-pill danger"
+        const bool controls_diff =
+            (state.warning_kind == SaveLoadMenuState::WarningKind::ControlsDiffer);
+        const bool two_buttons = damaged || controls_diff;
+        const char* msg_key = damaged        ? "SAVE_LOAD_WARN_DAMAGED"
+                              : version       ? "SAVE_LOAD_WARN_VERSION"
+                              : controls_diff ? "SAVE_LOAD_WARN_CONTROLS_DIFF"
+                                              : "SAVE_LOAD_RECOVER_FAILED";
+        body << "<div class=\"" << (controls_diff ? "confirm-title" : "warn-title") << "\">"
+             << rml_escape(tr.tr(msg_key)) << "</div>";
+        if (two_buttons) {
+            body << "<div class=\"confirm-pill" << (damaged ? " danger" : "")
                  << (state.warning_selected == 0 ? " focused" : "")
                  << pressed_class(0, pressed_index)
                  << "\" id=\"slmenu-warn-recover\">"
-                 << rml_escape(tr.tr("SAVE_LOAD_RECOVER_TRY")) << "</div>";
+                 << rml_escape(tr.tr(damaged ? "SAVE_LOAD_RECOVER_TRY"
+                                              : "SAVE_LOAD_CONTROLS_USE_SAVE"))
+                 << "</div>";
         }
-        // Cancelar: sempre presente. So-1-botao (Version/RecoverFailed) fica SEMPRE
-        // focado (nao ha outra pill pra disputar o foco); em Damaged, so quando
-        // warning_selected==1 (default seguro).
-        body << "<div class=\"confirm-pill" << ((!damaged || state.warning_selected == 1)
+        // Cancelar/Manter: sempre presente. So-1-botao (Version/RecoverFailed)
+        // fica SEMPRE focado (nao ha outra pill pra disputar o foco); em
+        // Damaged/ControlsDiffer, so quando warning_selected==1 (default seguro).
+        body << "<div class=\"confirm-pill" << ((!two_buttons || state.warning_selected == 1)
                                                      ? " focused"
                                                      : "")
              << pressed_class(1, pressed_index)
              << "\" id=\"slmenu-warn-cancel\">"
-             << rml_escape(tr.tr("SAVE_LOAD_WARN_CANCEL")) << "</div>";
+             << rml_escape(tr.tr(controls_diff ? "SAVE_LOAD_CONTROLS_KEEP_CURRENT"
+                                                : "SAVE_LOAD_WARN_CANCEL"))
+             << "</div>";
         body << "</div>";  // #slmenu-panel
         return wrap_document(body.str());
     }

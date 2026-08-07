@@ -663,6 +663,16 @@ bool Maestro::open_pause_from_city() {
     const auto apply_loaded_save_data = [this](const gus::domain::save::SaveData& data) {
         this->apply_loaded_save_data(data);
     };
+    // Aviso #2 (SAVE-LOAD-AVISOS, ControlsDiffer - decisao do lider 2026-08-06/
+    // 07): SO a Maestro/city_ conhece o SdlInput VIVO da sessao - MESMO
+    // racional de build_current_save_data/apply_loaded_save_data acima (o
+    // CHAMADOR de baixo, save_load_menu_loop.cpp, nao toca gameplay direto).
+    // Persistencia em controls.json (gus::platform::fs::save_controls) e feita
+    // pelo PROPRIO save_load_menu_loop.cpp (MESMO dono do I/O de disco desta
+    // tela) - este callback SO aplica na sessao ATUAL.
+    const auto apply_controls_config = [this](const gus::domain::input::InputRemapConfig& cfg) {
+        city_->set_controls(cfg);
+    };
 
     gus::app::screens::SystemMenuLoopOutcome outcome;
     {
@@ -699,7 +709,7 @@ bool Maestro::open_pause_from_city() {
             window_, audio_, translator_, settings_dir,
             gus::platform::fs::resolve_saves_dir(), build_current_save_data,
             apply_loaded_save_data, frozen_ok ? frozen_bg_path : std::string(),
-            [this](const SDL_Event& ev) { city_->sync_input_event(ev); });
+            [this](const SDL_Event& ev) { city_->sync_input_event(ev); }, apply_controls_config);
 
         // M2 (GAP FINAL) -> M2 STAGED CHANGES: RELE o controls.json e realimenta o
         // SdlInput da cidade - aplica o remap SEM exigir restart. O jogador pode

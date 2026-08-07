@@ -53,6 +53,9 @@ Translator make_translator() {
         "## SAVE_LOAD_SLOT_DAMAGED_LABEL\n! Danificado\n\n"
         "## SAVE_LOAD_SLOT_VERSION_LABEL\n! Versao incompativel\n\n"
         "## SAVE_LOAD_WARN_CANCEL\nCancelar\n\n"
+        "## SAVE_LOAD_WARN_CONTROLS_DIFF\nOs controles deste save sao diferentes dos atuais.\n\n"
+        "## SAVE_LOAD_CONTROLS_USE_SAVE\nUsar os do save\n\n"
+        "## SAVE_LOAD_CONTROLS_KEEP_CURRENT\nManter atuais\n\n"
         "## SETTINGS_BACK\nVoltar\n\n"
         "## LOCATION_PRACA_COMPILACAO\nPraca da Compilacao\n\n"
         "## LOCATION_UNKNOWN\nLocal desconhecido\n\n");
@@ -333,4 +336,54 @@ TEST_CASE("build_save_load_menu_rml: aviso RecoverFailed mostra a mensagem de "
     REQUIRE(rml.find("Nao foi possivel recuperar.") != std::string::npos);
     REQUIRE(rml.find("id=\"slmenu-warn-recover\"") == std::string::npos);
     REQUIRE(rml.find("id=\"slmenu-warn-cancel\"") != std::string::npos);
+}
+
+TEST_CASE("build_save_load_menu_rml: aviso #2 ControlsDiffer mostra os 2 "
+          "botoes ('Usar os do save' + 'Manter atuais'), titulo NEUTRO "
+          "(confirm-title, SEM warn-title/danger)",
+          "[save_load_menu_rml][save-load-avisos]") {
+    SaveLoadMenuState state;
+    state.warning_kind = SaveLoadMenuState::WarningKind::ControlsDiffer;
+    state.warning_selected = 1;  // default seguro = Manter atuais
+
+    const std::string rml = build_save_load_menu_rml(state, make_translator());
+    REQUIRE(rml.find("Os controles deste save sao diferentes dos atuais.") != std::string::npos);
+    REQUIRE(rml.find("class=\"confirm-title\"") != std::string::npos);  // NAO warn-title
+    REQUIRE(rml.find("class=\"warn-title\"") == std::string::npos);
+    REQUIRE(rml.find("id=\"slmenu-warn-recover\"") != std::string::npos);
+    REQUIRE(rml.find("id=\"slmenu-warn-cancel\"") != std::string::npos);
+    REQUIRE(rml.find("Usar os do save") != std::string::npos);
+    REQUIRE(rml.find("Manter atuais") != std::string::npos);
+    REQUIRE(rml.find("id=\"slmenu-list\"") == std::string::npos);  // lista NAO aparece
+
+    // pill 0 ("Usar os do save") NAO leva .danger (o load ja teve sucesso -
+    // NAO e um erro/dado corrompido, so uma escolha).
+    const auto pos_recover = rml.find("id=\"slmenu-warn-recover\"");
+    const auto div_start_recover = rml.rfind("<div class=\"", pos_recover);
+    REQUIRE(rml.substr(div_start_recover, pos_recover - div_start_recover).find("danger") ==
+            std::string::npos);
+
+    // Manter atuais (pill 1) focada por default.
+    const auto pos_cancel = rml.find("id=\"slmenu-warn-cancel\"");
+    const auto div_start_cancel = rml.rfind("<div class=\"", pos_cancel);
+    REQUIRE(rml.substr(div_start_cancel, pos_cancel - div_start_cancel).find("focused") !=
+            std::string::npos);
+}
+
+TEST_CASE("build_save_load_menu_rml: aviso ControlsDiffer - alternar pra "
+          "'Usar os do save' move o foco pra ele",
+          "[save_load_menu_rml][save-load-avisos]") {
+    SaveLoadMenuState state;
+    state.warning_kind = SaveLoadMenuState::WarningKind::ControlsDiffer;
+    state.warning_selected = 0;  // "Usar os do save" focado
+
+    const std::string rml = build_save_load_menu_rml(state, make_translator());
+    const auto pos_recover = rml.find("id=\"slmenu-warn-recover\"");
+    const auto div_start = rml.rfind("<div class=\"", pos_recover);
+    REQUIRE(rml.substr(div_start, pos_recover - div_start).find("focused") != std::string::npos);
+
+    const auto pos_cancel = rml.find("id=\"slmenu-warn-cancel\"");
+    const auto div_start_cancel = rml.rfind("<div class=\"", pos_cancel);
+    REQUIRE(rml.substr(div_start_cancel, pos_cancel - div_start_cancel).find("focused") ==
+            std::string::npos);
 }

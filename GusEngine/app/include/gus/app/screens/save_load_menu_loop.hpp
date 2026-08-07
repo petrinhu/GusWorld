@@ -96,6 +96,7 @@
 #include "gus/app/i18n/translator.hpp"
 #include "gus/app/screen_state.hpp"  // F4-1b.2: gus::app::EventSyncHook (MESMO contrato de F4-1a/F4-1b.1)
 #include "gus/app/screens/save_load_menu.hpp"
+#include "gus/domain/input/input_binding.hpp"  // InputRemapConfig (aviso #2, SAVE-LOAD-AVISOS)
 #include "gus/domain/save/save_data.hpp"
 #include "gus/domain/save/save_slots.hpp"  // gus::domain::save::kSlotCount
 #include "gus/platform/audio/audio_engine.hpp"
@@ -139,6 +140,17 @@ enum class SaveLoadLoopExit {
 // nesta fatia) - nenhum chamador de producao passa `sync_hook` ainda; o
 // parametro existe pra esta tela ja seguir o MESMO contrato de ScreenState/
 // EventSyncHook que o resto da onda F4 vai adotar tela a tela.
+// `settings_dir`/`apply_controls_config` (aviso #2, SAVE-LOAD-AVISOS - decisao
+// do lider 2026-08-06/07): ver o comentario grande de WarningKind::
+// ControlsDiffer em save_load_menu.hpp pro contrato completo. `settings_dir`
+// vazio (default) DESLIGA a feature com seguranca - o load procede DIRETO
+// (ClosedAfterLoad) como antes desta feature existir, MESMA convencao de
+// degradacao de `apply_loaded_save_data` ausente. `apply_controls_config`
+// (default nullptr) e chamado SO quando o jogador escolhe "Usar os do save" E
+// os controles do save divergem dos atuais - o CHAMADOR (Maestro) aplica na
+// sessao VIVA (city_->set_controls); ausente degrada com seguranca (loga e so
+// NAO troca ao vivo - o controls.json AINDA e persistido, o proximo boot ja
+// nasce certo).
 [[nodiscard]] SaveLoadLoopExit run_save_load_menu_loop_gl_current(
     SDL_Window* window, gus::platform::audio::AudioEngine& audio,
     const gus::app::i18n::Translator& translator, SaveLoadMode mode,
@@ -147,7 +159,10 @@ enum class SaveLoadLoopExit {
     const std::function<void(const gus::domain::save::SaveData&)>&
         apply_loaded_save_data,
     const std::string& frozen_background_png = std::string(),
-    const gus::app::EventSyncHook& sync_hook = nullptr);
+    const gus::app::EventSyncHook& sync_hook = nullptr,
+    const std::string& settings_dir = std::string(),
+    const std::function<void(const gus::domain::input::InputRemapConfig&)>&
+        apply_controls_config = nullptr);
 
 // F4-1b.2: SFX que pode resultar de UM save_load_screen_step() - QUALQUER
 // clique que acertou um alvo real (slot/icone-de-apagar/Voltar/pill de
