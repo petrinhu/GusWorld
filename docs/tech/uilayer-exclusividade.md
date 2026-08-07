@@ -5,6 +5,38 @@ verificado abaixo). Método: enumerar um universo fechado (grep de `UiLayer` em
 `*.cpp`/`*.hpp`) e exigir conservação (soma das classes = N), nunca buscar
 dentro dele.
 
+**CORREÇÃO 2026-08-07 (`UILAYER-EXCLUSIVIDADE`, achado da auditoria de
+2026-08-06):** o **N=233** abaixo (seção 1) **não era reproduzível** — um
+auditor independente rodando o mesmo comando mediu 523 ou 359, conforme o
+escopo. **Causa raiz medida:** o comando original (`grep -rn "UiLayer"
+GusEngine/ --include='*.cpp' --include='*.hpp' | grep -v '/build'`) foi
+digitado num shell interativo do Claude Code cujo `grep` é, na verdade, uma
+**função que embrulha `ugrep --ignore-files`** — ela já respeita
+`.gitignore` e tira `GusEngine/build/` da varredura **antes** do `grep -v
+'/build'` redundante agir; por isso bateu, por acidente, com a contagem
+sobre arquivos rastreados. Um `grep`/script fora desse shell (GNU grep puro,
+subprocesso Python, outra máquina) **não filtra `.gitignore`**, e
+`GusEngine/build/` nesta máquina pode conter **até 8 árvores de
+build/scratch diferentes** (`linux-release`, `asan-gate`,
+`caua_probe_scratch` etc.), cada uma com sua própria cópia vendorizada do
+glintfx via FetchContent — uma única dessas árvores somou **2186**
+ocorrências sozinha. O número final dependia de quantas árvores de scratch
+existiam no disco **naquele instante**, um estado efêmero de sessão, nunca
+canônico — daí a divergência 523/359 entre auditores honestos.
+**Conserto:** `tools/uilayer_census.py`, commitado, varre **somente
+`git ls-files`** (nunca o disco cru) — `GusEngine/build/` nunca aparece em
+`git ls-files` porque está no `.gitignore`, então o número independe de
+`grep` instalado, alias de shell ou árvores de scratch no disco. Rodado hoje
+(HEAD pós-`287c29b`, árvore avançou desde a medição original):
+**N = 294** (não mais 233 — código novo desde então, ex. `battle_ui_sfx.hpp`,
+adicionou ocorrências reais). **A classificação exaustiva em classes a-e
+(seção 2) NÃO foi re-derivada para o delta 233→294** — isso é trabalho de
+julgamento de arquitetura (fora do escopo desta correção de
+reprodutibilidade); os 6 sítios-dono e o veredito da seção 7 continuam
+válidos para o que foi auditado, mas o próximo agente que tocar este
+documento deve rodar `python3 tools/uilayer_census.py --list` e reconferir a
+soma antes de declarar N atualizado.
+
 ## Estado auditado
 
 - **SHA no início do trabalho:** `287c29bae380e3aafa17ae1883e09a2039ecea7d` (HEAD).
@@ -38,11 +70,23 @@ veredito.
 
 ## 1. Universo fechado
 
-Comando: `grep -rn "UiLayer" GusEngine/ --include='*.cpp' --include='*.hpp' | grep -v '/build'`
+Comando original (não reproduzível fora do shell específico que o mediu —
+ver a nota de correção no topo do documento):
+`grep -rn "UiLayer" GusEngine/ --include='*.cpp' --include='*.hpp' | grep -v '/build'`
 
-**N = 233 ocorrências** (arquivo:linha), gravadas integralmente em
-`/var/tmp/builds/claude-1000/-home-petrus-IDrive-Documentos-projetos-claudebrain-Projects-gusworld/8513691b-1636-4828-ab4f-09f0f2ee63ad/scratchpad/uilayer_grep.txt`
-antes de qualquer classificação (arquivo de trabalho, não versionado).
+**Comando reproduzível, commitado (2026-08-07):** `python3
+tools/uilayer_census.py --list` — escopo declarado dentro do script
+(`git ls-files GusEngine/*.cpp GusEngine/*.hpp`, nunca o disco cru).
+
+**N = 233 ocorrências** medidas no commit `287c29b` (arquivo:linha, gravadas
+na época em
+`/var/tmp/builds/claude-1000/-home-petrus-IDrive-Documentos-projetos-claudebrain-Projects-gusworld/8513691b-1636-4828-ab4f-09f0f2ee63ad/scratchpad/uilayer_grep.txt`,
+arquivo de trabalho não versionado) antes de qualquer classificação.
+**Reconferido nesta correção rodando `tools/uilayer_census.py` sobre a
+árvore no commit `287c29b`: bate exatamente em 233** — o número em si
+estava certo naquele instante; o que faltava era o script que o
+reproduzisse independente de shell/máquina. **No HEAD atual, o mesmo script
+devolve N = 294** (ver nota de correção no topo).
 
 ## 2. Classificação exaustiva: cheque de conservação
 
