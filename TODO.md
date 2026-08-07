@@ -495,7 +495,10 @@ histórico no fim do arquivo. Novas descobertas entram como bullets abaixo desta
 - `CI-STEP-SUMMARY-DESPERDICIO`: **zero usos de `$GITHUB_STEP_SUMMARY`** nos nossos 2 fluxos
   (conferido). O `tools/check.sh` já calcula o resumo dos 17 gates e o enterra no log. Baixo custo,
   ganho de legibilidade em cada execução. Sem urgência.
-- `CI-DIAGNOSTICO-PROCEDIMENTO`: procedimento do glintfx, que poupou horas a eles e vale registrar:
+- `CI-DIAGNOSTICO-PROCEDIMENTO`: **o conhecimento já está na memória GLOBAL, não precisa duplicar
+  aqui** — `~/.claude/memory/github-actions.md` (conferido: 646 linhas, a seção nova com as lições
+  medidas está lá, e o índice global já a descreve). Resumo do procedimento, para quem estiver com o
+  item aberto:
   (1) descobrir QUAL passo falhou antes de ler log (`gh run view <id> --json jobs`, olhar o passo em
   `failure`); (2) **falha em `Set up job` é infraestrutura do GitHub**, não código nosso — confundir
   leva a "consertar" o que não está quebrado; (3) assinatura de pane: contar no log as ocorrências dos
