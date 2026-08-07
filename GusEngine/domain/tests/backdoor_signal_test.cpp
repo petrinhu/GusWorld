@@ -42,7 +42,6 @@
 #include "gus/domain/combat/combat_state.hpp"
 #include "gus/domain/combat/combat_state_machine.hpp"
 #include "gus/domain/combat/enemy_brain.hpp"
-#include "gus/domain/combat/random_source.hpp"
 #include "gus/domain/combat/scripted_brain.hpp"
 #include "gus/domain/infection/integrity_state.hpp"
 

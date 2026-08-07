@@ -68,8 +68,6 @@
 #include "gus/domain/combat/combat_records.hpp"
 #include "gus/domain/combat/combat_state.hpp"
 #include "gus/domain/combat/combat_state_machine.hpp"
-#include "gus/domain/combat/random_source.hpp"
-#include "gus/domain/deck/card_hardware.hpp"
 #include "gus/domain/deck/contamination_service.hpp"
 #include "gus/domain/deck/turing_service.hpp"
 #include "gus/domain/infection/integrity_state.hpp"

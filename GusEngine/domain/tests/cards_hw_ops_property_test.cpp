@@ -72,7 +72,6 @@
 #include <vector>
 
 #include "gus/domain/cards/card_enums.hpp"
-#include "gus/domain/combat/combat_enums.hpp"
 #include "gus/domain/combat/random_source.hpp"
 #include "gus/domain/deck/card_collection.hpp"
 #include "gus/domain/deck/card_hardware.hpp"
@@ -87,7 +86,6 @@
 using namespace gus::domain::deck;
 using gus::domain::combat::CardTier;
 using gus::domain::combat::IRandomSource;
-using gus::domain::infection::IntegrityState;
 using gus::domain::infection::VirusKind;
 using gus::domain::tests::Lcg;
 using gus::domain::tests::PropertyRandom;

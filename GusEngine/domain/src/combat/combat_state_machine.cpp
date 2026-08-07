@@ -30,6 +30,7 @@
 #include "gus/domain/combat/enemy_brain.hpp"
 #include "gus/domain/combat/environment_catalog.hpp"
 #include "gus/domain/combat/techmagic.hpp"
+#include "gus/domain/combat/urandom_algorithm.hpp"  // UrandomWeightEntry/kUrandomBackfire* (HARDENING-GCC16-SWEEP: vinha so transitivo pelo header)
 #include "gus/domain/combat/weakness_wheel.hpp"
 
 namespace gus::domain::combat {

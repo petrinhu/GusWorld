@@ -14,7 +14,6 @@
 
 #include <catch2/catch_test_macros.hpp>
 
-#include <cstdint>
 #include <stdexcept>
 
 #include "gus/domain/hardware/card_provenance.hpp"

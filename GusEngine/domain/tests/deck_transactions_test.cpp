@@ -30,7 +30,6 @@
 
 #include "counting_random.hpp"
 #include "fixed_random.hpp"
-#include "gus/domain/combat/combat_enums.hpp"
 #include "gus/domain/deck/card_collection.hpp"
 #include "gus/domain/deck/card_hardware.hpp"
 #include "gus/domain/deck/deck_constants.hpp"

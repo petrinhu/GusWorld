@@ -27,7 +27,6 @@
 #include "gus/domain/input/input_binding.hpp"
 #include "gus/domain/save/save_data.hpp"
 
-using gus::domain::input::ActionBindings;
 using gus::domain::input::ActionRegistry;
 using gus::domain::input::default_controls;
 using gus::domain::input::InputRemapConfig;

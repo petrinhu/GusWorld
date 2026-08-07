@@ -25,7 +25,6 @@
 #include <string>
 #include <type_traits>
 
-#include "gus/domain/combat/combat_enums.hpp"
 #include "gus/domain/deck/card_collection.hpp"
 #include "gus/domain/deck/deck_constants.hpp"
 #include "gus/domain/deck/deck_records.hpp"

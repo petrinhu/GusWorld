@@ -28,7 +28,6 @@
 #include <cmath>
 #include <string>
 #include <unordered_map>
-#include <utility>
 #include <vector>
 
 #include "fixed_random.hpp"

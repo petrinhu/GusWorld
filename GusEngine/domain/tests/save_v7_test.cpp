@@ -44,7 +44,6 @@ using gus::domain::deck::CardInstance;
 using gus::domain::deck::CardOrigin;
 using gus::domain::deck::CardPhysicalState;
 using gus::domain::deck::VirusKind;
-using gus::domain::save::CardCollectionState;
 using gus::domain::save::CharacterSaveState;
 using gus::domain::save::deserialize_save;
 using gus::domain::save::load_save;

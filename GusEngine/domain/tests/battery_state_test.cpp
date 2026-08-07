@@ -14,8 +14,6 @@
 
 #include <catch2/catch_test_macros.hpp>
 
-#include <cstdint>
-
 #include "gus/domain/hardware/battery_state.hpp"
 
 using gus::domain::hardware::battery_charge_remaining;

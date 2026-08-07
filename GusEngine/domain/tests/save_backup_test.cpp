@@ -21,12 +21,10 @@
 
 #include <catch2/catch_test_macros.hpp>
 
-#include <optional>
 #include <string>
 #include <vector>
 
 #include "gus/domain/save/save_backup.hpp"
-#include "gus/domain/save/save_slots.hpp"
 #include "gus/domain/save/save_store.hpp"
 
 using gus::domain::save::backup_logical_name;

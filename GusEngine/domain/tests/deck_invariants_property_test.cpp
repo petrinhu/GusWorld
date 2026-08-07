@@ -57,7 +57,6 @@
 #include <string>
 #include <vector>
 
-#include "gus/domain/combat/combat_enums.hpp"
 #include "gus/domain/deck/card_collection.hpp"
 #include "gus/domain/deck/deck_records.hpp"
 #include "gus/domain/deck/deck_transactions.hpp"

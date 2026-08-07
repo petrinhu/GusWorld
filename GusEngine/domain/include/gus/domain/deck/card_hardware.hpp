@@ -53,8 +53,6 @@
 #ifndef GUS_DOMAIN_DECK_CARD_HARDWARE_HPP
 #define GUS_DOMAIN_DECK_CARD_HARDWARE_HPP
 
-#include <cstdint>
-
 #include "gus/domain/hardware/battery_state.hpp"
 #include "gus/domain/hardware/card_provenance.hpp"
 #include "gus/domain/hardware/hardware_class.hpp"

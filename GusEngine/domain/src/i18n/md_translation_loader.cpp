@@ -6,7 +6,6 @@
 
 #include "gus/domain/i18n/md_translation_loader.hpp"
 
-#include <cctype>
 #include <string>
 #include <string_view>
 #include <vector>

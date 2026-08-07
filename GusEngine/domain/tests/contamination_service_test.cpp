@@ -30,7 +30,6 @@
 #include <catch2/catch_test_macros.hpp>
 
 #include <cmath>
-#include <cstdint>
 
 #include "counting_random.hpp"
 #include "fixed_random.hpp"

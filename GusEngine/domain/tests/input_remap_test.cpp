@@ -21,7 +21,6 @@
 // Cross-ref: GusEngine/domain/include/gus/domain/input/{action_registry,input_binding}.hpp;
 //            engine/foundation/input_remap/{ActionRegistry,InputBinding}.cs.
 
-#include <algorithm>
 #include <set>
 #include <string>
 #include <vector>

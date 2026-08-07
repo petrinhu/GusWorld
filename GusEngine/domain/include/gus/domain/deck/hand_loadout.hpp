@@ -40,7 +40,6 @@
 #include <vector>
 
 #include "gus/domain/deck/card_collection.hpp"
-#include "gus/domain/deck/deck_constants.hpp"
 
 namespace gus::domain::deck {
 

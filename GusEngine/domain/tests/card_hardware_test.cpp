@@ -17,7 +17,7 @@
 #include <cstdint>
 #include <stdexcept>
 
-#include "gus/domain/combat/combat_enums.hpp"
+#include "gus/domain/combat/combat_enums.hpp"  // CardTier (nao vem transitivo por card_hardware.hpp)
 #include "gus/domain/deck/card_hardware.hpp"
 #include "gus/domain/deck/card_hardware_constants.hpp"
 #include "gus/domain/save/save_data.hpp"

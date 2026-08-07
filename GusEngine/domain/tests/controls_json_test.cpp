@@ -23,7 +23,6 @@
 
 #include <string>
 
-#include "gus/domain/input/action_registry.hpp"
 #include "gus/domain/input/controls_json.hpp"
 #include "gus/domain/input/input_binding.hpp"
 

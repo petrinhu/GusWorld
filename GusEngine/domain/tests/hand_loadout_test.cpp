@@ -21,11 +21,9 @@
 
 #include <catch2/catch_test_macros.hpp>
 
-#include <cstdint>
 #include <stdexcept>
 #include <string>
 
-#include "gus/domain/combat/combat_enums.hpp"
 #include "gus/domain/deck/card_collection.hpp"
 #include "gus/domain/deck/deck_constants.hpp"
 #include "gus/domain/deck/hand_loadout.hpp"

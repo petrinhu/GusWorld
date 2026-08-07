@@ -61,8 +61,6 @@
 #include "gus/domain/combat/initiative_queue.hpp"
 #include "gus/domain/combat/random_source.hpp"
 #include "gus/domain/combat/techmagic.hpp"
-#include "gus/domain/combat/urandom_algorithm.hpp"
-#include "gus/domain/infection/integrity_state.hpp"
 
 namespace gus::domain::combat {
 

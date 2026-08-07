@@ -60,7 +60,6 @@
 #include "gus/domain/combat/combat_state.hpp"
 #include "gus/domain/combat/combat_state_machine.hpp"
 #include "gus/domain/combat/enemy_brain.hpp"
-#include "gus/domain/combat/random_source.hpp"
 #include "gus/domain/deck/card_collection.hpp"
 #include "gus/domain/deck/card_hardware.hpp"
 #include "gus/domain/deck/card_hardware_constants.hpp"
@@ -104,7 +103,6 @@ using gus::domain::deck::TransactionError;
 using gus::domain::deck::upload;
 using gus::domain::deck::UploadResult;
 using gus::domain::deck::VirusKind;
-using gus::domain::save::CardCollectionState;
 using gus::domain::save::CharacterSaveState;
 using gus::domain::save::deserialize_save;
 using gus::domain::save::SaveData;

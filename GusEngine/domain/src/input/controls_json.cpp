@@ -12,9 +12,6 @@
 
 #include "gus/domain/input/controls_json.hpp"
 
-#include <array>
-#include <cmath>
-#include <cstdint>
 #include <string>
 #include <vector>
 

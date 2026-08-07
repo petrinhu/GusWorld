@@ -24,7 +24,6 @@
 
 #include <cstdint>
 #include <random>
-#include <stdexcept>
 #include <vector>
 
 #include "gus/domain/save/save_serializer.hpp"
@@ -33,7 +32,6 @@ using gus::domain::save::deserialize_save;
 using gus::domain::save::pack_save;
 using gus::domain::save::SaveCorruptError;
 using gus::domain::save::SaveData;
-using gus::domain::save::SaveIntegrityError;
 using gus::domain::save::SaveVersionTooNewError;
 using gus::domain::save::serialize_save;
 

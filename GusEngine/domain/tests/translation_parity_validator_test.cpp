@@ -24,7 +24,6 @@
 #include "gus/domain/i18n/translation_parity_validator.hpp"
 
 using gus::domain::i18n::find_duplicate_keys;
-using gus::domain::i18n::TranslationParityReport;
 using gus::domain::i18n::validate;
 using Locale = std::map<std::string, std::string>;
 

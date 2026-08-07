@@ -11,7 +11,6 @@
 
 #include "gus/domain/input/action_registry.hpp"
 
-#include <string>
 #include <string_view>
 #include <vector>
 
