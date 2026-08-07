@@ -474,7 +474,7 @@ histórico no fim do arquivo. Novas descobertas entram como bullets abaixo desta
   de temp dirs: conferido no blob commitado (`git show HEAD:...`, linha 864). Ocorrência **única**
   na base (varrido `Guard x(std::string())` e `Dir x(std::string())` em todo o `GusEngine`).
   Achado pelo `-Wvexing-parse` do clang em 2026-08-04.
-- `CI-WORKFLOW-DISPATCH`: **`ci.yml` não tem `workflow_dispatch`** (confirmado por mim: o bloco `on:`
+- `CI-WORKFLOW-DISPATCH` ✅ **FEITO 2026-08-06** (ordem do líder): o gatilho manual entrou no `ci.yml`, mesmo padrão do `windows.yml`, sem filtro de `paths` de propósito. YAML validado (3 gatilhos, 2 jobs). Contexto original: **`ci.yml` não tinha `workflow_dispatch`** (confirmado por mim: o bloco `on:`
   só tem `push` e `pull_request`; o `windows.yml` **tem**, linha 34). Achado do glintfx pelo caminho
   difícil: na pane de ~4h do GitHub Actions de 2026-08-06, **evento de `push` parou de criar
   execução** (commit provado no remoto por `ls-remote`, zero execuções geradas) e **só o disparo

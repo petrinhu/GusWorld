@@ -48,6 +48,17 @@ on:
       - 'tools/**'
       - 'resources/translations/**'
       - '.github/workflows/ci.yml'
+  # CI-WORKFLOW-DISPATCH (2026-08-06): via manual de disparo, mesmo padrao do
+  # windows.yml. Motivo MEDIDO pela sessao do glintfx na pane de ~4h do GitHub
+  # Actions de 2026-08-06: o evento de `push` PAROU de criar execucao (commit
+  # provado no remoto por `ls-remote`, ZERO execucoes geradas) e so o disparo
+  # manual (`gh workflow run ci.yml --ref main`) continuou funcionando. Tres dos
+  # seis fluxos deles nao tinham o gatilho e devolviam HTTP 422 - justamente os
+  # tres mais importantes. Sem filtro de `paths` de proposito: o disparo manual
+  # tem de rodar independente do que mudou. Licao: resiliencia de CI so se mede
+  # quando o caminho normal cai; um fluxo com via manual e um sem sao
+  # indistinguiveis enquanto tudo funciona.
+  workflow_dispatch: {}
 
 concurrency:
   group: ci-${{ github.ref }}
