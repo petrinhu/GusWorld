@@ -114,6 +114,87 @@ TEST_CASE("layout Caua: mapeamento DIRETO (arte correta, nao mexer)",
     CHECK(std::string(walk_dir(l, Direction::West)) == "west");
 }
 
+// --- ASSETS-VERSIONAR-SPRITES (2026-08-06): migracao pra caua_volt_cyan_v2 ----------
+//
+// O Caua antigo (sprites/caua_volt/, 68x68) perdeu east/north/west.png num acidente
+// sem backup. Em vez de tentar recupera-los, caua_layout() passou a apontar pra
+// sprites/caua_volt_cyan_v2/ (180x180, ciano canonico) e ganhou o MESMO fallback
+// gracioso do Gus (idle = walk f0 quando falta breathing direcional). Estes TEST_CASEs
+// travam essa decisao: se alguem devolver o layout pro diretorio antigo, ou
+// reintroduzir o ramo de idle "congelado direcional" (que exigia south.png/north.png/
+// east.png/west.png soltos na raiz do personagem - o ramo fragil que causou a perda),
+// eles acendem.
+
+TEST_CASE("layout Caua: aponta pra caua_volt_cyan_v2 (a versao boa), walk PLANO",
+          "[player_sprites][layout][caua]") {
+    const SpriteLayout l = caua_layout();
+    CHECK(std::string(l.subdir) == "caua_volt_cyan_v2");
+    CHECK_FALSE(l.walk_dir_subfolder);
+    CHECK(l.walk_frames == 6);
+    CHECK(std::string(l.walk_prefix) == "walk_");
+}
+
+TEST_CASE(
+    "loader Caua: walk PLANO resolve pro nome exportado (walk_<dir>_<f>.png, sem "
+    "subpasta por direcao)",
+    "[player_sprites][loader][caua]") {
+    const gus::test_support::ScopedTempDir root_dir = make_temp_root("caua_flat_walk");
+    const fs::path& root = root_dir.path();
+    for (const char* dir_name : {"south", "north", "east", "west"}) {
+        for (int f = 0; f < 6; ++f) {
+            touch_png(root / "walk" /
+                      ("walk_" + std::string(dir_name) + "_" + std::to_string(f) + ".png"));
+        }
+    }
+
+    PathRenderer r;
+    const PlayerSpriteSet s = load_player_sprites(r, root.string(), caua_layout());
+
+    const int south = static_cast<int>(Direction::South);
+    const int west = static_cast<int>(Direction::West);
+    REQUIRE(s.walk_count[south] == 6);
+    REQUIRE(s.walk_count[west] == 6);
+
+    const std::string south_f0 = (root / "walk" / "walk_south_0.png").string();
+    const std::string west_f3 = (root / "walk" / "walk_west_3.png").string();
+    REQUIRE(s.walk[south][0] == r.load_texture(south_f0.c_str()));
+    REQUIRE(s.walk[west][3] == r.load_texture(west_f3.c_str()));
+}
+
+TEST_CASE(
+    "loader Caua: SEM south.png/north.png/east.png/west.png soltos na raiz - idle cai "
+    "pro walk f0 (o ramo fragil de idle congelado foi removido)",
+    "[player_sprites][loader][caua][fallback]") {
+    // Regressao: se alguem reintroduzir o ramo "idle congelado direcional" (que exigia
+    // <base>/<dir>.png) OU apontar caua_layout() de volta pra sprites/caua_volt (onde
+    // east/north/west.png foram perdidos sem backup, 2026-08-06), este cenario nao
+    // reflete mais a realidade do disco - ele deliberadamente NAO cria south.png/
+    // north.png/east.png/west.png na raiz do personagem, so walk/, e exige que o idle
+    // carregue mesmo assim (fallback pro walk f0, igual a qualquer direcao do Gus sem
+    // breathing proprio).
+    const gus::test_support::ScopedTempDir root_dir = make_temp_root("caua_no_frozen_idle");
+    const fs::path& root = root_dir.path();
+    for (const char* dir_name : {"south", "north", "east", "west"}) {
+        for (int f = 0; f < 6; ++f) {
+            touch_png(root / "walk" /
+                      ("walk_" + std::string(dir_name) + "_" + std::to_string(f) + ".png"));
+        }
+    }
+    // Confirma a premissa do teste: nao existe <dir>.png solto na raiz do personagem.
+    for (const char* dir_name : {"south", "north", "east", "west"}) {
+        REQUIRE_FALSE(fs::exists(root / (std::string(dir_name) + ".png")));
+    }
+
+    PathRenderer r;
+    const PlayerSpriteSet s = load_player_sprites(r, root.string(), caua_layout());
+
+    for (int d = 0; d < gus::app::screens::kDirectionCount; ++d) {
+        REQUIRE(s.idle_count[d] == 1);
+        REQUIRE(s.idle[d] == s.walk[d][0]);
+        REQUIRE(s.idle[d] != gus::platform::render2d::kInvalidTexture);
+    }
+}
+
 TEST_CASE("layout default: mapeamento direto (Caua-like, sem surpresa)",
           "[player_sprites][layout]") {
     const SpriteLayout l;  // default

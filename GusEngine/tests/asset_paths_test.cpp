@@ -35,7 +35,14 @@ TEST_CASE("asset_paths: companions continuam na RAIZ de sprites/ (nao moveram)",
           "[core][assets]") {
     // So o Gus (e os inspirados) foram pra personagens_inspirados. Os companions ficam
     // em sprites/<nome> direto.
-    REQUIRE(ap::kCauaSpritesDir == std::string_view("sprites/caua_volt"));
+    //
+    // ASSETS-VERSIONAR-SPRITES (2026-08-06): o Cauã migrou de "sprites/caua_volt"
+    // (68x68 - east/north/west.png perdidos num acidente sem backup) pra
+    // "sprites/caua_volt_cyan_v2" (180x180, ciano canônico, walk completo) - decisão do
+    // líder. Este REQUIRE trava o valor NOVO de propósito: se alguém devolver
+    // kCauaSpritesDir pro diretório antigo, este teste acende (ver caua_layout() em
+    // player_sprites_loader.cpp e o teste de regressão em player_sprites_layout_test.cpp).
+    REQUIRE(ap::kCauaSpritesDir == std::string_view("sprites/caua_volt_cyan_v2"));
     REQUIRE(ap::kJaciSpritesDir == std::string_view("sprites/jaci_proxy"));
     REQUIRE(ap::kBentoSpritesDir == std::string_view("sprites/bento_requiem"));
     REQUIRE(ap::kDanteSpritesDir == std::string_view("sprites/dante_grid"));
