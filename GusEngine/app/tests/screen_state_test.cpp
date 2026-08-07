@@ -12,7 +12,6 @@
 // real (NpcDialogueScreen, GL-heavy) continua sem teste direto - ver o topo de
 // gus/app/src/screens/npc_dialogue_loop_gl.cpp.
 
-#include <string>
 #include <vector>
 
 #include <catch2/catch_test_macros.hpp>

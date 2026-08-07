@@ -17,11 +17,9 @@
 
 #include "gus/app/screens/battle_scene.hpp"
 
-#include <algorithm>  // std::remove_if (poda floaters mortos)
 #include <cstdio>     // std::snprintf (numeros do painel)
 #include <optional>
 #include <string>
-#include <utility>    // std::move
 #include <vector>
 
 #include "gus/app/screens/battle_floaters.hpp"
@@ -30,9 +28,7 @@
 #include "gus/app/screens/sprite_anchor.hpp"  // pe real do sprite (W3: bbox do idle)
 #include "gus/domain/combat/combat_actor.hpp"
 #include "gus/domain/combat/combat_constants.hpp"
-#include "gus/domain/combat/combat_enums.hpp"
 #include "gus/domain/combat/combat_records.hpp"
-#include "gus/domain/combat/combat_state.hpp"  // CombatState (preview_intent)
 #include "gus/domain/combat/weakness_wheel.hpp"  // WeaknessWheel (pre-selecao D3 de mira)
 
 namespace gus::app::screens {
@@ -42,7 +38,6 @@ namespace {
 using gus::core::spatial::Rect;
 using gus::domain::combat::CardFamily;
 using gus::domain::combat::CombatActor;
-using gus::domain::combat::StatusId;
 using gus::platform::render2d::DrawColor;
 using gus::platform::render2d::IRenderer;
 using gus::platform::render2d::kInvalidTexture;

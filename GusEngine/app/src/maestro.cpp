@@ -28,6 +28,7 @@
 #include "gus/app/screens/title_menu_loop.hpp"  // SAVE-LOAD-UI etapa 4: TELA DE TITULO no boot
 #include "gus/domain/dialogue/dialogue_runtime.hpp"
 #include "gus/domain/input/controls_name.hpp"  // kDefaultProfile (M2: liga a tela Controles ao input real)
+#include "gus/domain/save/new_game.hpp"  // fresh_new_game_save_data (HARDENING-GCC16-SWEEP: vinha so transitivo do header)
 #include "gus/domain/save/save_policy.hpp"  // SAVE-LOAD-UI etapa 5: autosave_allowed_at
 #include "gus/domain/save/save_slots.hpp"  // kAutosaveSlot
 #include "gus/domain/settings/system_settings.hpp"

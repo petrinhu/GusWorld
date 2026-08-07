@@ -61,7 +61,6 @@
 #include <iostream>
 #include <optional>
 #include <string>
-#include <vector>
 
 #include <glintfx/clock.hpp>  // FW-CLOCK (bump v0.26.0): substitui SDL_GetTicksNS
 #include <glintfx/element_box.hpp>

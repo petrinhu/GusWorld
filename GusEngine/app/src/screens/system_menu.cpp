@@ -10,7 +10,6 @@
 #include <algorithm>  // std::clamp
 
 #include "gus/app/screens/ui_hover.hpp"  // COCKPIT-SFX-HOVER-CLIQUE: POCO de hover generico (delegacao)
-#include "gus/domain/input/action_registry.hpp"        // ActionRegistry (label i18n do swap)
 #include "gus/domain/input/controls_remap_apply.hpp"   // apply_key_remap (swap-on-conflict)
 #include "gus/domain/input/controls_restore.hpp"       // default_controls (Restaurar padrao)
 

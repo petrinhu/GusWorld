@@ -81,7 +81,6 @@
 #include <optional>
 #include <sstream>
 #include <string>
-#include <vector>
 
 #include <glintfx/element_box.hpp>
 #include <glintfx/ui_layer.hpp>

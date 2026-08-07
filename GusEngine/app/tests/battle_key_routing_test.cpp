@@ -18,7 +18,9 @@
 #include <catch2/catch_test_macros.hpp>
 
 #include "gus/app/screens/battle_menu.hpp"
-#include "gus/app/screens/battle_preview.hpp"
+#include "gus/app/screens/battle_preview.hpp"  // battle_key_down/BattleEscEffect (battle_input.hpp,
+                                                // HARDENING-GCC16-SWEEP: verificado load-bearing por
+                                                // build real - nao vem de battle_scene.hpp)
 #include "gus/app/screens/battle_scene.hpp"
 
 using gus::app::screens::battle_key_down;

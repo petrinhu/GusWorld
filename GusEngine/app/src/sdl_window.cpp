@@ -32,8 +32,6 @@
 // M7-DIALOGO/MENU-PAUSA-CONFIG-SOM).
 #include "stb_image_write.h"
 
-#include "gus/app/app_icon.hpp"  // APP-ICON: set_window_icon_if_available
-
 namespace gus::app {
 
 namespace {

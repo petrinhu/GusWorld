@@ -77,7 +77,6 @@
 // MENU-INICIAL (ACHADO 1): fresh_new_game_save_data - a peca de DOMINIO/POCO que
 // reset_to_new_game() abaixo consome (ver gus/domain/save/new_game.hpp pro contrato
 // completo e o racional de existir).
-#include "gus/domain/save/new_game.hpp"
 
 namespace gus::app {
 

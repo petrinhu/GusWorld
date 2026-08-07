@@ -34,14 +34,10 @@
 #include "gus/app/screens/battle_floaters.hpp"
 #include "gus/app/screens/battle_hud_model.hpp"
 #include "gus/app/screens/battle_layout.hpp"
-#include "gus/app/screens/sprite_anchor.hpp"  // pe real do sprite (W3: bbox do idle)
 #include "gus/domain/combat/combat_actor.hpp"
-#include "gus/domain/combat/combat_constants.hpp"
 #include "gus/domain/combat/combat_enums.hpp"
 #include "gus/domain/combat/combat_records.hpp"
 #include "gus/domain/combat/combat_state.hpp"  // CombatState (preview_intent)
-#include "gus/domain/combat/weakness_wheel.hpp"  // WeaknessWheel (pre-selecao D3 de mira)
-#include "gus/platform/render2d/text_metrics.hpp"  // text_width (centrar floater)
 
 namespace gus::app::screens {
 
@@ -51,11 +47,8 @@ using gus::core::spatial::Rect;
 using gus::domain::combat::CardFamily;
 using gus::domain::combat::CombatActor;
 using gus::domain::combat::StatusId;
-using gus::platform::render2d::DrawColor;
-using gus::platform::render2d::IRenderer;
 using gus::platform::render2d::kInvalidTexture;
 using gus::platform::render2d::TextureId;
-using gus::platform::render2d::UvRect;
 
 // --- FLAVOR DE DERROTA (M7-COSTURA Inc 3, docs/design/mecanicas/combat-flavor.md §3b
 //     "Derrota"): o Gus reboota, nao morre (echo Batman, Pillar 1 "magia = software"). ---
@@ -160,7 +153,6 @@ TextureId BattleStatusIconSet::find(StatusId id) const noexcept {
 }
 
 // Aliases de dominio usados pelas DEFINICOES de metodo abaixo (fora do anon namespace).
-using gus::domain::combat::CardFamily;
 using gus::domain::combat::CombatAction;
 using gus::domain::combat::CombatActor;
 using gus::domain::combat::CombatOutcome;

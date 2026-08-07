@@ -20,7 +20,6 @@
 #ifndef GUS_APP_MAESTRO_LOGIC_HPP
 #define GUS_APP_MAESTRO_LOGIC_HPP
 
-#include <filesystem>  // FrozenBgRemoveGuard
 #include <string>      // FrozenBgRemoveGuard::path_
 
 #include "gus/core/spatial/grid_collision.hpp"  // Aabb

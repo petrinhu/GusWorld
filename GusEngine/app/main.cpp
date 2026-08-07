@@ -30,7 +30,6 @@
 // que o ratchet existe pra impedir.
 
 #include <cstdint>
-#include <cstdlib>
 #include <fstream>
 #include <ios>
 #include <iostream>

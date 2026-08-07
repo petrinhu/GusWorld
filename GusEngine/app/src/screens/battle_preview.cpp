@@ -57,7 +57,6 @@
 #include "gus/core/asset_paths.hpp"             // caminhos de asset centralizados
 #include "gus/domain/combat/combat_enums.hpp"  // StatusId
 #include "gus/platform/audio/audio_engine.hpp"     // AudioEngine (M6 F3, ADR-011)
-#include "gus/platform/fs/settings_file_store.hpp"  // MENU-PAUSA-CONFIG-SOM: resolve_settings_dir
 #include "gus/platform/render2d/render2d_gl3.hpp"  // ADR-009 GL3: backend OpenGL da arena
 // FRAMEGRAB-7-SITIOS (2026-07-30): so gl3_load_functions (glad, ~linha 1745)
 // ainda vem daqui - as 4 capturas de backbuffer deste arquivo (hover/anim/

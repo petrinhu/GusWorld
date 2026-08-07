@@ -52,7 +52,6 @@
 #include <fstream>
 #include <iostream>
 #include <optional>
-#include <vector>
 
 #include <glintfx/element_box.hpp>
 #include <glintfx/ui_layer.hpp>

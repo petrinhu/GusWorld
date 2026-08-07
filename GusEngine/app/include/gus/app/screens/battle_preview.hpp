@@ -25,9 +25,6 @@
 #ifndef GUS_APP_SCREENS_BATTLE_PREVIEW_HPP
 #define GUS_APP_SCREENS_BATTLE_PREVIEW_HPP
 
-#include <string>
-#include <string_view>
-
 #include <SDL3/SDL.h>  // SDL_Window (dono da janela do host, ver run_battle_preview_embedded)
 
 #include "gus/app/screen_state.hpp"  // F4-1b.5: gus::app::EventSyncHook (MESMO contrato da onda F4)
@@ -35,11 +32,19 @@
                                                // resolve_music_path/etc moraram pra ca
                                                // (ADR-019); incluido aqui pra call-sites
                                                // existentes (ex. maestro.cpp) continuarem
-                                               // intactos.
+                                               // intactos. HARDENING-GCC16-SWEEP: verificado
+                                               // load-bearing por build real (maestro.cpp usa
+                                               // resolve_music_path sem incluir este header
+                                               // direto) - NAO e o mesmo caso de
+                                               // save_migrators.hpp (zero consumidor medido).
 #include "gus/app/screens/battle_input.hpp"  // AC-E11 A1: battle_key_down/BattleEscEffect/
                                               // battle_digit_for_key moraram pra ca (ADR-019);
                                               // incluido aqui pra call-site existentes que so
                                               // incluem battle_preview.hpp continuarem intactos.
+                                              // HARDENING-GCC16-SWEEP: verificado load-bearing
+                                              // por build real (battle_key_routing_test.cpp e
+                                              // battle_screen_step_test.cpp usam battle_key_down/
+                                              // BattleEscEffect sem incluir este header direto).
 #include "gus/app/screens/battle_scene.hpp"
 #include "gus/domain/combat/combat_enums.hpp"  // CombatOutcome (out-param do embedded)
 #include "gus/platform/audio/audio_engine.hpp"  // AudioEngine externo (M7-COSTURA Inc 2)
