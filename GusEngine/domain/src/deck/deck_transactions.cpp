@@ -114,6 +114,14 @@ AcquireResult acquire(CardCollection& collection, std::int64_t& credits, std::st
     // DEPOIS dos guards de saldo/capacidade acima (nenhum draw de RNG numa transacao
     // que ja seria rejeitada) - card_id ainda intocado (nao movido ainda) pro
     // tier_of() ler. mimics_special SEMPRE false (canal clone-falso ainda nao existe).
+    //
+    // tier_of e OPACO (std::function do chamador) - se ele reentrar e mutar esta MESMA
+    // collection (gemeo do CRAFT-TOCTOU-REENTRANTE achado em craft() abaixo, mesmo
+    // padrao "checa capacidade -> chama callback opaco -> muta"), a capacidade checada
+    // acima pode ter ficado stale por quando chegarmos no add_to_active real logo
+    // abaixo. O try/catch que envolve aquela chamada e a UNICA defesa necessaria aqui
+    // (nao ha um "consumer" intermediario como em craft() pra reverificar antes do
+    // roll de RNG).
     const cards::CardTier catalog_tier = tier_of(card_id);
     const ContaminationRollOutcome contamination =
         roll_contamination_on_acquisition(physical, catalog_tier, /*mimics_special=*/false, rng);
@@ -123,7 +131,21 @@ AcquireResult acquire(CardCollection& collection, std::int64_t& credits, std::st
     // interno de capacidade de add_to_active); so credita/debita depois que ela teve
     // sucesso, pra nao deixar a wallet debitada sem a carta correspondente em nenhum
     // cenario defensivo.
-    CardInstance instance = collection.add_to_active(std::move(card_id), std::nullopt, physical);
+    //
+    // Defesa em profundidade (TOCTOU via tier_of reentrante, achado gemeo do
+    // CRAFT-TOCTOU-REENTRANTE): mesmo com o guard de capacidade acima, tier_of pode
+    // ter mutado a collection entre aquele guard e este ponto. add_to_active() levanta
+    // std::logic_error se a capacidade estourou nesse meio-tempo - essa e uma condicao
+    // de FLUXO ESPERADO (capacidade cheia), NAO uma excecao de programacao, entao o
+    // header promete que ela nunca escapa pro chamador. Traduzimos pro mesmo
+    // TransactionError::ActiveCapacityFull ja usado pelo guard preventivo (mesmo
+    // significado: "o ativo nao tinha espaco").
+    CardInstance instance;
+    try {
+        instance = collection.add_to_active(std::move(card_id), std::nullopt, physical);
+    } catch (const std::logic_error&) {
+        return AcquireResult{TransactionError::ActiveCapacityFull, CardInstance{}, 0};
+    }
     credits -= price;
     return AcquireResult{TransactionError::Ok, instance, price, contamination};
 }
@@ -141,6 +163,17 @@ CraftResult craft(CardCollection& collection, std::string result_card_id,
         return CraftResult{TransactionError::MaterialsUnavailable, CardInstance{}};
     }
 
+    // Guard TOCTOU - 1a camada (CRAFT-TOCTOU-REENTRANTE, achado de auditoria QA
+    // adversarial): consumer() e um std::function OPACO do chamador - se ele capturou
+    // e mutou esta MESMA collection (ex.: um caller adversarial/errado que reentra),
+    // a capacidade checada antes de invoca-lo pode ter ficado stale. Recheca AQUI,
+    // ANTES de rolar RNG (contaminacao) - fecha a janela mais larga sem gastar draw
+    // de RNG numa transacao que sera rejeitada de qualquer forma (mesma garantia de
+    // determinismo dos demais guards desta funcao, CARDS-HW-3B).
+    if (collection.active_is_full()) {
+        return CraftResult{TransactionError::ActiveCapacityFull, CardInstance{}};
+    }
+
     // Origem fisica (CARDS-HW-3A, cartas-hardware-pirataria-energia.md secao 2/3):
     // toda carta craftada via F3-Alpha e GRAVADA numa EPROM de bancada (o "terminal
     // de bancada" do doc-fonte) - nunca sai como ROM de fabrica.
@@ -151,12 +184,28 @@ CraftResult craft(CardCollection& collection, std::string result_card_id,
     // confirmado consumido - result_card_id ainda intocado (nao movido ainda) pro
     // tier_of() ler. mimics_special SEMPRE false. F3-Alpha nunca crafta Especial/
     // Super por design (inv.9), mas o guard defensivo se aplica igual.
+    //
+    // tier_of TAMBEM e opaco - a mesma janela reabre entre este ponto e o
+    // add_to_active real logo abaixo (a 2a camada, try/catch, fecha essa).
     const cards::CardTier catalog_tier = tier_of(result_card_id);
     const ContaminationRollOutcome contamination =
         roll_contamination_on_acquisition(physical, catalog_tier, /*mimics_special=*/false, rng);
 
-    CardInstance instance =
-        collection.add_to_active(std::move(result_card_id), std::nullopt, physical);
+    // Guard TOCTOU - 2a camada (defesa em profundidade): mesmo com o recheck acima,
+    // tier_of() (chamado logo depois) e igualmente opaco e pode ter mutado a
+    // collection nessa janela remanescente. add_to_active() levantaria
+    // std::logic_error (capacidade cheia) - fluxo ESPERADO, nunca uma excecao de
+    // programacao - e o header promete que ela nunca escapa pro chamador. Traduz pro
+    // mesmo TransactionError::ActiveCapacityFull da 1a camada (mesmo significado: "o
+    // ativo nao tinha espaco"); aqui o RNG ja foi consumido (efeito colateral aceito
+    // e documentado deste ramo raro de reentrancia via tier_of, distinto da 1a
+    // camada que e coberta com precisao de zero-draw por CountingRandom).
+    CardInstance instance;
+    try {
+        instance = collection.add_to_active(std::move(result_card_id), std::nullopt, physical);
+    } catch (const std::logic_error&) {
+        return CraftResult{TransactionError::ActiveCapacityFull, CardInstance{}};
+    }
     return CraftResult{TransactionError::Ok, instance, contamination};
 }
 

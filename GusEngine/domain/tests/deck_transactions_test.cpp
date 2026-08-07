@@ -627,3 +627,97 @@ TEST_CASE("deck_transactions: craft() rejeitado (ActiveCapacityFull) consome "
     REQUIRE(rng.next_calls == 0);
     REQUIRE(rng.next_double_calls == 0);
 }
+
+// ---- CRAFT-TOCTOU-REENTRANTE (TODO.md): MaterialConsumer/TierLookup reentrantes que
+// mutam a MESMA CardCollection durante craft() nao podem deixar o logic_error interno
+// de CardCollection::add_to_active() (capacidade cheia) escapar NAO-CAPTURADO - isso
+// violaria a promessa documentada do header ("nao usa excecao pra fluxo esperado").
+// Dois vetores distintos, duas camadas de defesa: (1) consumer() reentra ANTES do
+// roll de contaminacao - o guard preventivo recheca capacidade logo apos consumer()
+// e rejeita sem gastar RNG; (2) tier_of() reentra DEPOIS desse recheck (janela
+// remanescente, mais estreita) - so o try/catch em volta do add_to_active real fecha
+// essa 2a janela. --------------------------------------------------------------------
+
+TEST_CASE("deck_transactions: craft() com MaterialConsumer reentrante que enche o "
+          "ativo NAO deixa logic_error escapar (fronteira do guard preventivo, "
+          "CRAFT-TOCTOU-REENTRANTE)",
+          "[domain][deck][deck_transactions][invariant][craft_toctou]") {
+    CardCollection deck(/*active_capacity=*/2);
+    deck.add_to_active("ja_ocupa_um_slot");
+    // 1 slot livre no momento do 1o guard de craft() (active_is_full() == false).
+    FixedRandom rng = never_infects_rng();
+
+    auto consumer = [&deck]() {
+        // Reentra na MESMA collection e ocupa o unico slot livre restante - simula um
+        // caller adversarial/errado (achado QA, deck_transactions.cpp:131-161).
+        deck.add_to_active("consumido_reentrante");
+        return true;
+    };
+
+    CraftResult result;
+    REQUIRE_NOTHROW(result = craft(deck, "carta_craftada", consumer, fake_tier_of, rng));
+
+    REQUIRE_FALSE(result.ok());
+    REQUIRE(result.error == TransactionError::ActiveCapacityFull);
+    // O ativo continua com as 2 cartas que o consumer reentrante colocou - craft() nao
+    // adicionou uma 3a (nem existiria capacidade).
+    REQUIRE(deck.active_count() == 2);
+}
+
+TEST_CASE("deck_transactions: craft() com TierLookup reentrante que enche o ativo "
+          "DEPOIS do guard do consumer tambem nao deixa logic_error escapar (um passo "
+          "alem da 1a camada, 2a camada de defesa, CRAFT-TOCTOU-REENTRANTE)",
+          "[domain][deck][deck_transactions][invariant][craft_toctou]") {
+    CardCollection deck(/*active_capacity=*/2);
+    deck.add_to_active("ja_ocupa_um_slot");
+    FixedRandom rng = never_infects_rng();
+    auto consumer = []() { return true; };  // NAO reentra - so o tier_of reentra agora.
+
+    auto reentrant_tier_of = [&deck](const std::string& card_id) {
+        // Reentra DEPOIS que o guard de recheck do consumer ja passou (aquele so
+        // roda logo apos consumer()) - prova que a 2a camada (try/catch em volta do
+        // add_to_active real) fecha a janela remanescente, nao so a 1a.
+        if (!deck.active_is_full()) {
+            deck.add_to_active("consumido_via_tier_of_reentrante");
+        }
+        return fake_tier_of(card_id);
+    };
+
+    CraftResult result;
+    REQUIRE_NOTHROW(result = craft(deck, "carta_craftada", consumer, reentrant_tier_of, rng));
+
+    REQUIRE_FALSE(result.ok());
+    REQUIRE(result.error == TransactionError::ActiveCapacityFull);
+    REQUIRE(deck.active_count() == 2);
+}
+
+// ---- Gemeo investigado no MESMO arquivo (regra da casa: achado nao e isolado) -----
+// acquire() tem a MESMA forma estrutural que craft() tinha (checa capacidade -> chama
+// callback OPACO do chamador -> add_to_active real): tier_of(card_id) e chamado ANTES
+// do add_to_active final, e e opaco (std::function) como o MaterialConsumer de
+// craft(). Prova de que a mesma classe de TOCTOU NAO se aplica aqui (ou aplica -
+// dependendo do resultado empirico) - reentrando tier_of pra encher o ativo entre o
+// guard inicial e o add_to_active real.
+TEST_CASE("deck_transactions: acquire() com TierLookup reentrante que enche o ativo "
+          "NAO deixa logic_error escapar (gemeo investigado do CRAFT-TOCTOU-REENTRANTE)",
+          "[domain][deck][deck_transactions][invariant][craft_toctou]") {
+    CardCollection deck(/*active_capacity=*/2);
+    deck.add_to_active("ja_ocupa_um_slot");
+    std::int64_t credits = 1000;
+    FixedRandom rng = never_infects_rng();
+
+    auto reentrant_tier_of = [&deck](const std::string& card_id) {
+        if (!deck.active_is_full()) {
+            deck.add_to_active("consumido_via_tier_of_reentrante");
+        }
+        return fake_tier_of(card_id);
+    };
+
+    AcquireResult result;
+    REQUIRE_NOTHROW(
+        result = acquire(deck, credits, "carta_nova", 0, reentrant_tier_of, rng));
+
+    REQUIRE_FALSE(result.ok());
+    REQUIRE(result.error == TransactionError::ActiveCapacityFull);
+    REQUIRE(deck.active_count() == 2);
+}
