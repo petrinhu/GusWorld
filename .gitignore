@@ -48,6 +48,43 @@ resumo.pdf
 resources/sprites/*
 # EXCECAO: icones/retratos do M5 (pixel-art pequenos) versionados pra backup. Politica: pixel-art pequeno = git normal; asset grande = LFS
 !resources/sprites/icons-m5/
+
+# EXCECOES ASSETS-VERSIONAR-SPRITES (2026-08-06): sprites que o CODIGO e a SUITE
+# automatizada exigem existir num clone limpo (sem eles a suite fica vermelha - o CI
+# nao tem o disco local do lider, so o que o git versiona). Padrao: un-ignore o
+# DIRETORIO -> re-ignore o conteudo -> un-ignore so os arquivos/subpastas realmente
+# citados por codigo/teste (por DIRETORIO, nao por nome exato solto - um nome exato
+# deixa de casar em silencio se o arquivo for renomeado; ver .gitignore de resources/glb/
+# pra um caso onde isso ja aconteceu).
+
+# Vanda do Cafe (NPC fixo do overworld, cast em city_actors.hpp/kDistritosInferioresCast):
+# so a pose Sul e consumida (kNpcSpriteSouthFile) - travado por
+# app/tests/city_actors_test.cpp "elenco: toda linha da tabela aponta para uma arte QUE
+# EXISTE". north/east/west.png do personagem seguem fora do git (nao usadas ainda).
+!resources/sprites/vanda_do_cafe/
+resources/sprites/vanda_do_cafe/*
+!resources/sprites/vanda_do_cafe/south.png
+
+# Caua Volt - versao BOA (caua_volt_cyan_v2/): o walk COMPLETO (24 arquivos, 4 direcoes
+# x 6 quadros) e o que gus::app::screens::caua_layout() carrega (walk_dir_subfolder =
+# false, arquivos flat walk_<dir>_<f>.png). O idle cai no walk f0 (fallback gracioso,
+# ver player_sprites_loader.cpp) - nao precisa de south.png/north.png/east.png/west.png
+# soltos na raiz desta pasta, por isso NAO estao na excecao (so walk/ entra).
+!resources/sprites/caua_volt_cyan_v2/
+resources/sprites/caua_volt_cyan_v2/*
+!resources/sprites/caua_volt_cyan_v2/walk/
+
+# Caua Volt - pasta ANTIGA (caua_volt/, 68x68): east/north/west.png se perderam num
+# acidente sem backup (2026-08-06, nunca estiveram no git); south.png sobreviveu e
+# virou fixture de teste da familia GENERICA da cascata de assets (travado por
+# platform/tests/asset_source_test.cpp, "ASSETS-PATH-CASCATA familia GENERICA: macro
+# EXISTENTE continua vencendo o relativo", tambem executado sob ASan). Nenhum codigo de
+# producao le mais esta pasta (kCauaSpritesDir aponta pra caua_volt_cyan_v2 agora) - so
+# o teste precisa dela continuar existindo num clone limpo.
+!resources/sprites/caua_volt/
+resources/sprites/caua_volt/*
+!resources/sprites/caua_volt/south.png
+
 # Fotos pessoais (do filho do criador): NUNCA versionar (o repo e publico)
 resources/gus_baby/
 
