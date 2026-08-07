@@ -800,6 +800,52 @@ TEST_CASE("SFX-COCKPIT superficie PICKER DE ATOR / canal TECLADO: navegar entre 
     REQUIRE(h.audio.last_sfx_id() == h.hover);
 }
 
+TEST_CASE("SFX-COCKPIT superficie PICKER DE ATOR / canal MOUSE: passar o mouse sobre um "
+          "membro toca 1 hover; parado sobre o MESMO membro NAO redispara (COCKPIT-SFX-"
+          "HOVER-CLIQUE: a 12a combinacao que faltava - GEMEO exato do teste de MIRA/MOUSE "
+          "acima; a auditoria de 2026-08-06 provou a lacuna desativando battle_mouse_hover "
+          "e vendo a suite inteira passar)",
+          "[battle_ui_sfx][sfx-cockpit]") {
+    SfxHarness h;
+    REQUIRE(h.loaded());
+    BattleScene scene;
+    pump_to_actor_picker(scene);
+    REQUIRE(scene.is_choosing_actor());
+    REQUIRE(scene.actor_pick_count() >= 2);
+
+    // Procura, em coordenadas de MUNDO (960x540), o ponto de um membro que NAO esta com o
+    // cursor agora - o hit-test da propria cena e' a fonte da verdade (mesma tecnica do
+    // teste irmao de MIRA/MOUSE).
+    const auto* membro0 = scene.actor_pick_target();
+    float hit_x = -1.0f, hit_y = -1.0f;
+    for (float y = 0.0f; y < 540.0f && hit_x < 0.0f; y += 4.0f) {
+        for (float x = 0.0f; x < 960.0f; x += 4.0f) {
+            const int idx = scene.actor_pick_index_at_arena(x, y);
+            if (idx < 0) continue;
+            // So serve o ponto que MUDA o cursor (senao nao ha transicao pra provar).
+            BattleScene probe;
+            pump_to_actor_picker(probe);
+            probe.actor_picker_select(idx);
+            if (probe.actor_pick_target() != nullptr &&
+                probe.actor_pick_target()->id() != membro0->id()) {
+                hit_x = x;
+                hit_y = y;
+                break;
+            }
+        }
+    }
+    REQUIRE(hit_x >= 0.0f);  // achou um membro clicavel diferente do que estava com o cursor
+
+    // pw/ph == 960x540 -> px de janela == px de mundo (a conversao vira identidade).
+    route_mouse_hover(scene, h.sfx, hit_x, hit_y, 960, 540);
+    REQUIRE(scene.actor_pick_target() != membro0);
+    REQUIRE(h.plays() == 1u);
+    REQUIRE(h.audio.last_sfx_id() == h.hover);
+
+    route_mouse_hover(scene, h.sfx, hit_x, hit_y, 960, 540);  // parado
+    REQUIRE(h.plays() == 1u);
+}
+
 TEST_CASE("SFX-COCKPIT superficie PICKER DE ATOR: CONFIRMAR o membro toca o blip de "
           "CLIQUE (1), nos DOIS canais",
           "[battle_ui_sfx][sfx-cockpit]") {
