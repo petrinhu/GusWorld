@@ -30,7 +30,7 @@ A tabela do brief **confere integralmente** após as correções de escopo acima
 
 | dependência | `app/` (arq/occ) | `platform/` (arq/occ) | onde exatamente |
 |---|---|---|---|
-| SDL3 | **32 / 457** | 6 / 95 | app: mapa completo no `plano-camadas-sdl.md` §9; platform: `render2d_sdl.cpp` 49, `sdl_input.cpp` 34, `platform_info.cpp` 5, +3 headers |
+| SDL3 | **32 / 459** (corrigido 2026-08-07, categoria log era 30, recontagem deu 32 — ver `plano-camadas-sdl.md`) | 6 / 95 | app: mapa completo no `plano-camadas-sdl.md` §9; platform: `render2d_sdl.cpp` 49, `sdl_input.cpp` 34, `platform_info.cpp` 5, +3 headers |
 | stb_image (`stbi_*`) | **6 / 13** | 2 / 14 | app: `app_icon` 4, `battle_preview` 4, `sdl_window` 2, `title/difficulty/save_load_menu_loop` 1 cada; platform: `render2d_gl3.cpp` 8, `render2d_sdl.cpp` 6 |
 | GL cru (`glX(...)`) | 0 | **3 / 162** | `render2d_gl3.cpp` 94, `render2d_glintfx.cpp` 65, `rmlui/gl3_loader.cpp` 3 |
 | glad (loader) | 0 | 2 | `rmlui/gl3_loader.cpp` (API) + `rmlui/RmlUi_Include_GL3.h` (o header do glad vendorizado — as "1450 ocorrências" são ele declarando a si mesmo) |
@@ -51,7 +51,7 @@ Pin do glintfx: **v0.24.0** (`GusEngine/CMakeLists.txt:438`), bumpado hoje.
 | W4 | Coabitação GL no App mode (contexto corrente, loader, estado na entrada/saída) | `DOC-GLCOHAB` | aceito; (a)+(c) = doc; **(b) loader = decisão de fronteira deles, o ponto duro** |
 | W5 | `stbi_load` para decodificar imagem→pixels (8 arquivos) | decode-para-pixels (inventário de 14:40) | enviado, sem resposta |
 | W6 | `SDL_GetTicksNS`/`SDL_Delay` (17 occ) | relógio monotônico (Pedido C, retificação 14:35) | enviado, sem resposta |
-| W7 | `SDL_Log` (30 occ) | log (Pedido D, retificação 14:35) | enviado, sem resposta |
+| W7 | `SDL_Log` (32 occ, corrigido 2026-08-07; era citado como 30) | log (Pedido D, retificação 14:35) | enviado, sem resposta |
 | — | acentos 8px do motor de fonte deles (`FONT-ACCENT-8PX`) | retirado | era **culpa nossa** (corpo fora do envelope 9-13dp); cockpit já subiu para 9px (`battle_scene_render.cpp:61`, `kCockpitTextPx = 9.0f`) |
 | — | bake fixo `cell_px=16` + downscale NEAREST | nenhum — **defeito nosso**, consertado em casa (commits `b80da6a`, `38144a4`), como manda a régua ("o código problemático é nosso?") | fechado |
 

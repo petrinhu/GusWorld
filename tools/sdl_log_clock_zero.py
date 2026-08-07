@@ -5,10 +5,13 @@
 ZERO-TOLERANCIA (nao ratchet) pras DUAS categorias que a Fatia 1 do
 docs/tech/plano-camadas-sdl.md matou de vez em GusEngine/app (producao: src/ +
 include/gus/app/, EXCLUINDO app/tests/ e app/tools/ - MESMO escopo/exclusoes de
-sdl_layer_ratchet.py, motivo identico): `SDL_Log` (~30 call sites antes desta
-fatia, todos substituidos por glintfx::log/log_info/log_warn/log_error, FW-LOG)
-e `SDL_GetTicksNS` (~17 call sites, substituidos por glintfx::monotonic_now_ns,
-FW-CLOCK). A decisao ja foi tomada e nao ha transicao a acomodar (ao contrario
+sdl_layer_ratchet.py, motivo identico): `SDL_Log` (32 call sites antes desta
+fatia - recontado em 2026-08-07 com este mesmo strip_comments() sobre a arvore
+do commit anterior a migracao, 4f4bc9ee; o numero citado antes era 30, errado -
+todos substituidos por glintfx::log/log_info/log_warn/log_error, FW-LOG)
+e `SDL_GetTicksNS` (12 call sites, mesma recontagem; substituidos por
+glintfx::monotonic_now_ns, FW-CLOCK). O plano cita "17 relogio" porque aquela
+categoria soma SDL_GetTicksNS (12) com SDL_Delay (5, nao migrado - ver abaixo). A decisao ja foi tomada e nao ha transicao a acomodar (ao contrario
 do ratchet por-arquivo, que ainda cobre categorias NAO fechadas) - por isso
 zero-tolerancia direta, sem teto numerico: qualquer ocorrencia REAL (fora de
 comentario/string) reprova na hora.

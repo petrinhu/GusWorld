@@ -79,7 +79,8 @@ CODE_EXTENSIONS = (".cpp", ".hpp", ".h", ".c", ".cc", ".cxx", ".inl", ".hxx", ".
 # ficou 100% nos 4 *_loop.cpp (que continuam contando, corretamente).
 #
 # 24 -> 24, SEM MUDANCA (Fatia 1, log-e-relogio, 2026-07-30): SDL_Log
-# (~30 call sites) e SDL_GetTicksNS (~17 call sites) saíram por completo de
+# (32 call sites, recontado em 2026-08-07 - o numero citado antes era 30,
+# errado) e SDL_GetTicksNS (12 call sites) saíram por completo de
 # producao (glintfx::log*/FW-LOG, glintfx::monotonic_now_ns/FW-CLOCK) - medido
 # ANTES e DEPOIS desta fatia, os mesmos 24 arquivos continuam na lista porque
 # TODOS OS 24, sem excecao, ja tinham OUTRO uso real de SDL3 (SDL_Window*,

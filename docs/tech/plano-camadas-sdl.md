@@ -2,6 +2,7 @@
 
 **Status:** proposto, aguardando aprovação do líder. **Este documento não altera código, `CMakeLists.txt`, `tools/check.sh` nem `TODO.md`.**
 **Medido em:** commit `b0d9dcd` (2026-07-29). Verificado que nada em `GusEngine/app/` mudou até o HEAD atual `c514851` na hora de escrever este plano (`git diff --stat b0d9dcd c514851 -- GusEngine/app/` vazio) — os números abaixo continuam válidos, mas a árvore está sob edição concorrente de vários agentes (`bump-glintfx-023`, `cockpit-8-para-9`, `dossie-fonte-draw2d`, `fix-font-atlas-bake`, `impl-render2d-glintfx`, `verif-4dir`); **reconferir os greps abaixo antes de executar qualquer fatia**.
+**CORREÇÃO 2026-08-07 (`FATIA1-LOG-CLOCK`):** a categoria `log` deste plano dizia **30 ocorrências**; recontagem independente com o mesmo `strip_comments()` do gate (`tools/sdl_log_clock_zero.py`), sobre a árvore no commit imediatamente anterior à migração (`4f4bc9ee`), deu **32** (4 arquivos: `app_icon.cpp` 3, `maestro.cpp` 5, `sdl_window.cpp` 7, `npc_dialogue_loop_gl.cpp` 17). Os totais dependentes (linha 27/48/61/107/146) foram corrigidos junto. `SDL_GetTicksNS` (categoria `relógio`) reconferiu em **12**, dentro dos 17 já citados (os outros 5 são `SDL_Delay`, que não migrou) — sem mudança aí.
 
 ## 0. O contrato quebrado
 
@@ -24,7 +25,7 @@ Resultado: **62 arquivos** (não 74) realmente tocam SDL3 fora de comentário. D
 
 | grupo | arquivos | total de tokens SDL_ | onde compila |
 |---|---|---|---|
-| **produção** (`src/` + `include/gus/app/`, exceto `tests/`) | **32** | 457 | `gusengine_app` (linka em `gusworld_app`, o binário shippado) |
+| **produção** (`src/` + `include/gus/app/`, exceto `tests/`) | **32** | 459 | `gusengine_app` (linka em `gusworld_app`, o binário shippado) |
 | `tests/` | 16 | 540 | binário `ctest` próprio (Catch2), não shippa |
 | `tools/` | 14 | 453 | projeto CMake **standalone e separado** (`app/tools/CMakeLists.txt`), não shippa, não faz parte de `gusengine_app` |
 
@@ -45,7 +46,7 @@ app/include/gus/app/maestro_logic.hpp:219     // SDL_Init - Maestro::to_battle()
 app/src/screens/battle_cockpit_rml.cpp:57     // ...achado da F0: o SDL_Renderer nao fazia.
 ```
 
-Nenhum dos 4 tem `SDL_` fora de comentário — são zero infração, não um "quase". **Os dois números (36 do brief e 32 meu) estão corretos para o que cada um mediu**; a diferença é 100% o filtro de comentário, não erro de escopo. `tools/` já estava na minha medição desde o início (14 arquivos, contados à parte, seção 1) — não foi esquecido aqui. **Total real do diretório `app/` inteiro, produção+testes+tools, pós-filtro de comentário: 62 arquivos, 1450 ocorrências** (457 produção + 540 testes + 453 tools). Uso **32 (produção real, shippada em `gusworld_app`)** como número-guia do resto do plano, porque é o que reflete o binário do jogo; `tests/` e `tools/` têm tratamento próprio na seção 6 (exceções), reforçado abaixo com a trava que a correção do team-lead pediu.
+Nenhum dos 4 tem `SDL_` fora de comentário — são zero infração, não um "quase". **Os dois números (36 do brief e 32 meu) estão corretos para o que cada um mediu**; a diferença é 100% o filtro de comentário, não erro de escopo. `tools/` já estava na minha medição desde o início (14 arquivos, contados à parte, seção 1) — não foi esquecido aqui. **Total real do diretório `app/` inteiro, produção+testes+tools, pós-filtro de comentário: 62 arquivos, 1452 ocorrências** (459 produção + 540 testes + 453 tools; produção corrigida de 457 para 459 em 2026-08-07, ver nota de correção no topo do documento). Uso **32 (produção real, shippada em `gusworld_app`)** como número-guia do resto do plano, porque é o que reflete o binário do jogo; `tests/` e `tools/` têm tratamento próprio na seção 6 (exceções), reforçado abaixo com a trava que a correção do team-lead pediu.
 
 ## 2. Números por categoria (produção — os 32 arquivos que shippam)
 
@@ -55,10 +56,10 @@ Nenhum dos 4 tem `SDL_` fora de comentário — são zero infração, não um "q
 | eventos/loop | 94 | ~18 | `SDL_Event`, `SDL_EVENT_*`, `SDL_PollEvent` |
 | diversos | 65 | ~14 | `SDL_GetError`, `SDL_BUTTON_*`, `SDL_Rect`, `SDL_DisplayID` |
 | input | 39 | 9 | `SDL_Keycode`, `SDL_KMOD_*`, `SDL_GetMouseState` |
-| log | 30 | 4 | `SDL_Log` |
+| log | 32 | 4 | `SDL_Log` |
 | relógio | 17 | ~8 | `SDL_GetTicksNS`, `SDL_Delay` |
 | render SDL | 4 | 1 | `SDL_Renderer`, `SDL_CreateWindowAndRenderer` |
-| **total** | **457** | **32** | |
+| **total** | **459** | **32** | |
 
 Os 32 arquivos, por peso (ver lista completa no fim, seção 9):
 
@@ -104,7 +105,7 @@ Spot-check em `battle_preview.cpp` (função por função, contando tokens `SDL_
 
 | categoria | total produção | morre garantido (F4 ou já-morto) | sobra em qualquer cenário | incerto/depende de decisão |
 |---|---|---|---|---|
-| log | 30 | 0 pela F4 | 0 | **30 — mata na Fatia 1 (decisão já tomada, zero relação com F4)** |
+| log | 32 | 0 pela F4 | 0 | **32 — mata na Fatia 1 (decisão já tomada, zero relação com F4)** |
 | relógio | 17 | 0 pela F4 | 0 | **17 — mata na Fatia 1 (idem)** |
 | janela/contexto GL | 208 | ~48 já morto (Fatia 0: `sdl_window.cpp` inteiro entra em decommission no F4-4; `run_title/system_menu_loop_owning_gl` já mortos hoje) + o essencial de `maestro.cpp` (~21, F4-3 cria `glintfx::App` no lugar) | **0 garantido** — mesmo o `SDL_GL_SwapWindow`/`GetWindowSizeInPixels` chamado dentro do `tick()` de cada tela pode sobreviver se o glintfx App mode exigir isso do host (lacuna L-coabitação-GL ainda sem resposta) | **~139 (o resto): depende INTEIRAMENTE da lacuna de coabitação GL já pedida ao glintfx e ainda sem resposta** |
 | eventos/loop | 94 | 0 confirmado | **o TIPO `SDL_Event` pode sobreviver inteiro** — ver seção 5 | **94 — depende de uma decisão de contrato que a F3 ainda não tomou explicitamente (ver seção 5)** |
@@ -143,7 +144,7 @@ O comentário que fundou a F4-1 (`screen_state.hpp:14-17`) diz: *"o LOOP de cima
 | # | fatia | depende de | remove (produção) | risco | reversibilidade |
 |---|---|---|---|---|---|
 | **0** | Apagar `run_title_menu_loop_owning_gl` + `run_system_menu_loop_owning_gl` (confirmados sem NENHUM call-site); avaliar (não apagar sem checar) `run_npc_dialogue_loop_gl` (1 call-site em probe de `tools/`, avisar o dono antes) | nada — pode rodar hoje | ~42 ocorrências confirmadas (mais o que a análise arquivo-por-arquivo de `battle_preview.cpp`/`npc_dialogue_loop_gl.cpp` revelar ao aplicar o mesmo corte) | Baixíssimo — grep exaustivo já provou zero uso; reconferir de novo antes de aplicar (árvore concorrente) | Two-way door trivial (é `git revert` de uma remoção) |
-| **1** | Relógio (`SDL_GetTicksNS`/`SDL_Delay` → `std::chrono::steady_clock`) + log (`SDL_Log*` → utilitário em `core/`) | nada — decisão já tomada pelo líder/CTO, não depende de F4 nem de glintfx | 47 ocorrências (30 log + 17 relógio), ~9-10 arquivos | Baixo — troca mecânica de implementação, comportamento observável idêntico | Two-way door |
+| **1** | Relógio (`SDL_GetTicksNS`/`SDL_Delay` → `std::chrono::steady_clock`) + log (`SDL_Log*` → utilitário em `core/`) | nada — decisão já tomada pelo líder/CTO, não depende de F4 nem de glintfx | 49 ocorrências (32 log + 17 relógio), ~9-10 arquivos | Baixo — troca mecânica de implementação, comportamento observável idêntico | Two-way door |
 | **2** | `SDL_Keycode` como TIPO de parâmetro nas 4 telas de lógica pura (`title_menu.cpp`, `difficulty_menu.cpp`, `system_menu.cpp`, `save_load_menu.cpp`) → tipo neutro já criado pelo F4-2 (tabela Godot-Key) | F4-2 (✅ já fechado, 🔍 pendente só de validação ao vivo pós-cutover, não bloqueia este uso) | ~21 ocorrências, 100% categoria "input" | Baixo — a tabela de tradução já existe e já foi testada adversarialmente na F4-2 | Two-way door |
 | **3** | F4-2 fecha validação ao vivo → **F4-3 (cutover, ponto que decide a seção 5)** → **F4-4 (decommission, ponto de não-retorno)** | decisões do líder pendentes (F4-3/F4-4 já marcadas ⏳ no `TODO.md`) + resposta do glintfx à lacuna de coabitação GL + a decisão da seção 5 sobre o tipo de `handle_event` | ~139-208 ocorrências de janela/contexto GL + até 94 de eventos/loop, a depender EXATAMENTE de como a seção 5 for decidida | Alto — é o cutover real, `sdl_window.cpp` inteiro some, ponto de não-retorno por definição do próprio `TODO.md` (F4-4) | F4-3 é two-way door (paralelo, SDL ainda existe); F4-4 é **one-way door** por desenho |
 | **4** | Decisão sobre `anim_preview.cpp` (viewer `--anim-preview`) e `battle_input.cpp` (mover pra `platform/`?) | decisão do líder (seção 8), pode rodar em paralelo com a 3 | 27 (anim_preview) + 23 (battle_input) = 50 ocorrências, SE o líder decidir mover/eliminar | Médio — mexe em fronteira de camada, precisa de teste de regressão | Depende da opção escolhida |

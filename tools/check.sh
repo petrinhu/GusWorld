@@ -401,6 +401,21 @@ python3 "$ROOT/tools/ui_log_key_only.py"
 GATE_UI_LOG_KEY=$?
 set -e
 
+# (p) GATE(tools-isolation) (FATIA1-LOG-CLOCK, 2026-08-07): ate esta fatia,
+#     "GATE(tools-isolation)" era citado como existente em TRES lugares (TODO.md,
+#     o docstring do sdl_layer_ratchet.py e docs/tech/plano-camadas-sdl.md) e nao
+#     existia em NENHUM ponto executavel - a fronteira app/tools/ so era
+#     protegida ESTRUTURALMENTE (CMakeLists.txt standalone), sem gate ativo. Este
+#     gate torna a citacao verdadeira: reprova se GusEngine/CMakeLists.txt ou
+#     GusEngine/app/CMakeLists.txt ganharem `add_subdirectory(tools)` de verdade
+#     (fora de comentario) - o dia em que isso acontecer invalida de uma vez tres
+#     exececoes documentadas em outros gates (sdl_layer_ratchet.py,
+#     sdl_log_clock_zero.py, fetchcontent_manifest.py). Ver tools/tools_isolation_zero.py.
+set +e
+python3 "$ROOT/tools/tools_isolation_zero.py"
+GATE_TOOLS_ISOLATION=$?
+set -e
+
 GATE=0
 [ "$GATE_ARCH" = "0" ] && [ "$GATE_EXCL" = "0" ] && [ "$GATE_I18N" = "0" ] \
     && [ "$GATE_SDL_RATCHET" = "0" ] && [ "$GATE_LOG_CLOCK_ZERO" = "0" ] \
@@ -412,6 +427,7 @@ GATE=0
     && [ "$GATE_PRODUCTION_SCOPE" = "0" ] \
     && [ "$GATE_TOOLS_TESTS" = "0" ] \
     && [ "$GATE_UI_LOG_KEY" = "0" ] \
+    && [ "$GATE_TOOLS_ISOLATION" = "0" ] \
     || GATE=1
 echo "GATE=$GATE"
 
