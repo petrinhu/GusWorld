@@ -62,7 +62,15 @@ inline constexpr std::string_view kBrunusVetorialSpritesDir =
 
 // --- companions (na RAIZ de sprites/, nao moveram) ---
 // O sub-NOME (depois de "sprites/") e o usado pelo resolve_sprites_dir generico.
-inline constexpr std::string_view kCauaSpritesDir = "sprites/caua_volt";
+//
+// ASSETS-VERSIONAR-SPRITES (2026-08-06): o Cauã migrou de "sprites/caua_volt" (68x68)
+// pra "sprites/caua_volt_cyan_v2" (180x180, ciano canônico, walk completo 4x6) -
+// decisão do líder, depois que east/north/west.png da pasta antiga se perderam num
+// acidente sem backup (nunca estiveram no git). "caua_volt/" continua no disco (não
+// apagada) e sua south.png sobrevivente segue versionada como fixture de teste (ver
+// platform/tests/asset_source_test.cpp, família GENÉRICA), mas NENHUM código de
+// produção lê mais aquela pasta. Ver player_sprites_loader.cpp::caua_layout().
+inline constexpr std::string_view kCauaSpritesDir = "sprites/caua_volt_cyan_v2";
 inline constexpr std::string_view kJaciSpritesDir = "sprites/jaci_proxy";
 inline constexpr std::string_view kBentoSpritesDir = "sprites/bento_requiem";
 inline constexpr std::string_view kDanteSpritesDir = "sprites/dante_grid";

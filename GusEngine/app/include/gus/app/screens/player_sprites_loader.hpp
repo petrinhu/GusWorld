@@ -10,10 +10,21 @@
 // numero de quadros e a convencao de nome de cada personagem (o Caua e o Gus tem
 // layouts diferentes). Mantem os dois caminhos sem if espalhado:
 //
-//   CAUA (legado):                          GUS:
-//     <base>/south.png  north.png ...          <base>/walk/<dir>/f0..f6.png  (7 walk)
-//     <base>/walk/<dir>/0..3.png  (4 walk)      <base>/anims/breathing_idle/<dir>/f0..f4.png
-//     idle = 1 quadro congelado por direcao      (5 quadros de breathing, POR DIRECAO)
+//   CAUA (caua_volt_cyan_v2):               GUS:
+//     <base>/walk/walk_<dir>_0..5.png          <base>/walk/<dir>/f0..f6.png  (7 walk)
+//     (6 walk, pasta PLANA - export do             <base>/anims/breathing_idle/<dir>/f0..f4.png
+//      gerador, walk_dir_subfolder=false)          (5 quadros de breathing, POR DIRECAO)
+//     idle = walk f0 (sem anims/breathing_idle/
+//      no disco - cai no fallback gracioso,
+//      igual a qualquer direcao do Gus sem
+//      breathing proprio; ver ARTE-RESP-4DIR)
+//
+// ASSETS-VERSIONAR-SPRITES (2026-08-06): ate aqui o Cauã tinha um SEGUNDO ramo de idle
+// ("congelado direcional", <base>/<dir>.png, controlado por um bool idle_animated) so
+// pra ele - o UNICO condicional por-personagem do arquivo, e frágil (textura invalida
+// se um dos 4 arquivos faltasse, como aconteceu). Foi REMOVIDO: o Cauã passou a usar o
+// MESMO fallback gracioso do Gus (walk f0 quando falta breathing direcional), entao o
+// loader agora tem um UNICO comportamento de idle pra qualquer layout.
 //
 // RESOLUCAO DO <base>: a casca (main/SdlWindow) decide. Ordem sugerida:
 //   1) variavel de ambiente GUSWORLD_ASSETS (se setada): <env>/sprites/<subdir>;
@@ -49,13 +60,24 @@ namespace gus::app::screens {
 // Convencao de nomes/quadros de UM personagem. Header-only (dados puros). O loader
 // le isto pra montar os caminhos - trocar de personagem = trocar o layout, sem if.
 struct SpriteLayout {
-    // Subpasta dentro de resources/sprites/ (ex.: "gus", "caua_volt").
+    // Subpasta dentro de resources/sprites/ (ex.: "gus", "caua_volt_cyan_v2").
     const char* subdir = "gus";
 
     // --- WALK ---
-    int walk_frames = 7;        // quadros por direcao (Gus 7, Caua 4)
-    // Prefixo do arquivo de walk: "f" -> f0.png..f6.png (Gus); "" -> 0.png..3.png (Caua).
+    int walk_frames = 7;        // quadros por direcao (Gus 7, Caua 6)
+    // Prefixo do arquivo de walk: "f" -> f0.png..f6.png (Gus); "walk_" -> walk_0.png..
+    // (usado junto de walk_dir_subfolder, ver abaixo).
     const char* walk_prefix = "f";
+
+    // Layout de PASTA do walk no disco:
+    //   true  (default, Gus): <base>/walk/<dir>/<walk_prefix><f>.png - UMA SUBPASTA
+    //         por direcao.
+    //   false (Caua, caua_volt_cyan_v2): <base>/walk/<walk_prefix><dir>_<f>.png - pasta
+    //         UNICA; direcao e frame no NOME do arquivo (ex.: walk_east_0.png), do jeito
+    //         que o gerador exportou. ASSETS-VERSIONAR-SPRITES (2026-08-06): virou campo
+    //         de DADO (lei do atomo, ADR-020) em vez de if por personagem no loader -
+    //         qualquer personagem futuro com o mesmo export flat usa este MESMO campo.
+    bool walk_dir_subfolder = true;
 
     // Subpasta de walk POR DIRECAO, indexada pela ORDEM do enum Direction
     // (Sul=0, Norte=1, Leste=2, Oeste=3). DATA-DRIVEN pra absorver convencoes de
@@ -72,17 +94,17 @@ struct SpriteLayout {
     // intactos; Caua intacto.
     std::array<const char*, 4> walk_dir_names = {"south", "north", "east", "west"};
 
-    // --- IDLE ---
-    // true: idle ANIMADO (breathing), POR DIRECAO: <base>/<idle_dir>/<dir>/<pref>f.png,
-    //       onde <dir> reusa walk_dir_names[d] (MESMA correcao de rotulo leste/oeste do
-    //       walk - ver comentario acima). ARTE-RESP-4DIR (2026-07-23): cada direcao tem
-    //       seus proprios 5 quadros (sem flip - Pillar 3, hardware assimetrico). GRACIOSO
-    //       POR DIRECAO: se a pasta <dir> nao existir no disco pra este personagem, o
-    //       loader NAO tenta carregar (nem loga erro) e cai pro walk f0 congelado
-    //       daquela direcao - assim personagens com breathing so parcial (ou nenhum)
-    //       degradam sozinhos, direcao por direcao, sem exigir tudo-ou-nada.
-    // false: idle CONGELADO direcional, 1 quadro por direcao, ex.: Caua <base>/<dir>.png.
-    bool idle_animated = true;
+    // --- IDLE (breathing animado opcional, POR DIRECAO) ---
+    // <base>/<idle_dir>/<dir>/<idle_prefix><f>.png, onde <dir> reusa walk_dir_names[d]
+    // (MESMA correcao de rotulo leste/oeste do walk - ver comentario acima).
+    // ARTE-RESP-4DIR (2026-07-23): cada direcao tem seus proprios quadros (sem flip -
+    // Pillar 3, hardware assimetrico). GRACIOSO POR DIRECAO: se a pasta <dir> nao
+    // existir no disco pra este personagem, o loader NAO tenta carregar (nem loga erro)
+    // e cai pro walk f0 congelado daquela direcao - assim um personagem com breathing
+    // parcial (so algumas direcoes) OU NENHUM (ASSETS-VERSIONAR-SPRITES, 2026-08-06: o
+    // Caua nao tem anims/breathing_idle/ ainda - as 4 direcoes caem no walk f0) degrada
+    // sozinho, sem exigir tudo-ou-nada e sem precisar de um segundo ramo de idle
+    // "congelado" (removido - era o unico condicional por-personagem do loader).
     int idle_frames = 5;                          // quadros do breathing (Gus 5)
     const char* idle_dir = "anims/breathing_idle";  // subpasta-base do idle animado
     const char* idle_prefix = "f";                // prefixo dos quadros do idle animado
