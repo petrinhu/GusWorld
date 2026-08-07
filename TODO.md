@@ -552,6 +552,23 @@ arquivo — nenhum foi descartado. Duas frentes que a W1 fechou no mesmo dia já
 com ✅ (`COCKPIT-SFX-HOVER-CLIQUE` 12/12, `f31da512`). Scoring WSJF do dreno logo após a tabela
 WSJF principal. Novas descobertas entram como bullets abaixo desta linha.)_
 
+- CLIPPING-ATOR-RONDA-SEM-COLISAO: playtest do Gus Dragon em 2026-08-07 (demo jogado ao vivo pelo
+  líder). Dois achados de colisão jogador↔ator: (1) parado encostado num prop sólido, um NPC em
+  ronda andou por cima dele e ele ficou "preso" na interseção NPC+prop, só saindo ao apertar
+  Sul/Baixo; (2) o mesmo com um androide inimigo a leste, mas sem prop atrás — clipou e saiu livre
+  sem ficar preso; observado também que o androide "entra e sai" de objetos livremente, com ou
+  sem o jogador no caminho. **Causa raiz já confirmada por leitura de código** (não é suposição):
+  `OverworldSim::advance_actor_patrols` (`GusEngine/app/src/screens/overworld_sim.cpp:151-171`)
+  posiciona o ator pela rota (`advance_patrol`) e atualiza `a.solid` direto, SEM nunca chamar
+  `resolve_move`/`resolve_move_with_corner_assist` — a resolução de colisão contra obstáculos
+  (`ObstacleSpan`, que inclui props E atores) só roda do lado do JOGADOR, quando ELE se move
+  (`overworld_sim.cpp:399-419`). Um ator em ronda atravessa o jogador e qualquer prop sem nenhuma
+  checagem; se o jogador estiver parado e encostado numa parede/prop quando o ator passa por cima
+  dele, a sobreposição fica sem resolução até o jogador se mover. Prints em `/tmp/clipping1.png`
+  (preso) e `/tmp/clipping2.png` (androide isolado, contexto do clip 2). Prioridade alta —
+  jogabilidade, pode prender o jogador se não houver direção livre nenhuma no momento do
+  encontro. Escolha de correção (mudança de feel de física) pendente de decisão do líder.
+
 ## 🗄️ Arquivado: eras Godot/C# e Qt6 (superadas, mantidas por registro)
 
 **Motivo do arquivamento:** stack superada pelos dois pivôs em sequência (Godot 4.6 + C# .NET 8
