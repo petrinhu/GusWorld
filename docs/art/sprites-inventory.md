@@ -3,14 +3,27 @@
 Mapa de onde vivem os sprites de cada personagem, o que cada pasta já tem, e como
 gerar o que falta. **Fonte da verdade sobre a árvore `resources/sprites/`.**
 
-> Atualizado 2026-07-23. Contagem via `identify` + `find` sobre o disco.
+> Atualizado 2026-08-06 (ASSETS-VERSIONAR-SPRITES). Contagem via `identify` + `find`
+> sobre o disco.
 
 ## Onde ficam
 
 Todos em **`resources/sprites/<slug>/`**, um diretório por personagem. Os PNGs são
-**gitignored** (`.gitignore`: `resources/sprites/*`), vivem só no disco + backup
-IDrive — este doc, sim, é versionado, então o mapa sobrevive a um clone limpo
-mesmo que os binários não.
+**gitignored por padrão** (`.gitignore`: `resources/sprites/*`), vivem só no disco +
+backup IDrive — este doc, sim, é versionado, então o mapa sobrevive a um clone limpo
+mesmo que a maior parte dos binários não.
+
+**Exceção (ASSETS-VERSIONAR-SPRITES, 2026-08-06):** um punhado de arquivos ESPECÍFICOS
+(não a pasta inteira) é versionado no git normal porque **código de produção e testes
+automatizados exigem que existam num clone limpo** — sem eles a suíte fica vermelha,
+já que o CI não tem o disco local do líder. Padrão do `.gitignore`: un-ignore o
+diretório → re-ignore o conteúdo → un-ignore só o(s) arquivo(s)/subpasta(s) citados por
+código/teste (por diretório, nunca por nome exato solto — nome exato deixa de casar em
+silêncio se o arquivo for renomeado). Hoje são 3 exceções:
+- `resources/sprites/vanda_do_cafe/south.png` — NPC fixo do overworld (`city_actors.hpp`).
+- `resources/sprites/caua_volt_cyan_v2/walk/` (24 arquivos) — o walk do Cauã ativo.
+- `resources/sprites/caua_volt/south.png` — fixture da família GENÉRICA da cascata de
+  assets (`platform/tests/asset_source_test.cpp`); ver seção do Cauã abaixo.
 
 ## Convenção de arquivos por personagem
 
@@ -84,13 +97,39 @@ Estes 7 têm ciclo de caminhada pronto (o alvo de completude):
 
 | slug | dim | walk frames | nota |
 |---|---|---|---|
-| `caua_volt` | 68×68 | 16 | versão antiga/pequena (pipeline test 2026-06-22) |
-| `caua_volt_cyan_v2` | 180×180 | 24 | **versão boa do Cauã** (ciano canônico reforçado) |
+| `caua_volt` | 68×68 | 16 | **APOSENTADA** — leia a nota abaixo antes de mexer |
+| `caua_volt_cyan_v2` | 180×180 | 24 | **ATIVA — o Cauã do jogo** (ciano canônico reforçado) |
 | `iara_lumen` | 180×180 | 24 | Infiltradora |
 | `bento_requiem` | 180×180 | 24 | Tanque |
 | `linda_siren` | 180×180 | 24 | Crowd Control |
 | `dante_grid` | 180×180 | 24 | TRAIDOR |
 | `jaci_proxy` | 180×180 | 24 | Healer |
+
+### Cauã Volt — migração 2026-08-06 (ASSETS-VERSIONAR-SPRITES)
+
+Um agente moveu por engano arquivos de personagens **diferentes com o MESMO nome**
+(`east.png`/`north.png`/`west.png`) para um destino plano, e a movida sobrescreveu em
+silêncio os 3 arquivos de idle congelado (68×68) da pasta antiga `caua_volt/`. Nunca
+estiveram no git (a política era "sprite = disco local", ver seção "Onde ficam" acima),
+então não havia como recuperá-los — decisão do líder: **não tentar reconstruir; apontar
+o Cauã para a arte boa que já existia**, em vez de regenerar a antiga.
+
+- **`kCauaSpritesDir`** (`core/asset_paths.hpp`) passou de `sprites/caua_volt` pra
+  `sprites/caua_volt_cyan_v2` — o Cauã do jogo usa **essa** pasta agora.
+- **`caua_layout()`** (`player_sprites_loader.cpp`) ganhou o mesmo comportamento
+  gracioso do Gus: sem `anims/breathing_idle/` no disco, o idle cai no **walk f0**
+  congelado de cada direção (em vez de exigir `south.png`/`north.png`/`east.png`/
+  `west.png` soltos na raiz — o ramo que causou a perda). Isso tornou os 3 arquivos
+  perdidos **desnecessários**: o personagem não depende mais deles pra existir.
+  `walk/` do `caua_volt_cyan_v2/` é **plano** (`walk_<dir>_<f>.png`, sem subpasta por
+  direção — export direto do gerador), suportado pelo campo de dado novo
+  `SpriteLayout::walk_dir_subfolder` (não um `if` por personagem — lei do átomo,
+  ADR-020).
+- **`caua_volt/`** (a pasta antiga) fica **APOSENTADA**: nenhum código de produção a lê
+  mais. Só `south.png` (a única sobrevivente) segue versionada, como fixture de um
+  teste de infraestrutura genérica (família GENÉRICA da cascata de assets,
+  `platform/tests/asset_source_test.cpp`) que só precisa de ALGUM arquivo real — não é
+  mais "a arte do Cauã". Não editar nem regenerar essa pasta esperando que afete o jogo.
 
 **GERAÇÃO 2026-07-23 (party completa + Gus breathing):** os 6 companions ganharam o
 conjunto de anims do Gus via API HTTP direta (`animate-with-text-v3`, `no_background`,
