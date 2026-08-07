@@ -664,6 +664,29 @@ TEST_CASE("deck_transactions: craft() com MaterialConsumer reentrante que enche 
     REQUIRE(deck.active_count() == 2);
 }
 
+TEST_CASE("deck_transactions: craft() com MaterialConsumer reentrante que enche o "
+          "ativo consome EXATAMENTE 0 draws de RNG (o guard preventivo recheca ANTES "
+          "de rolar contaminacao - sem ele, o try/catch da 2a camada ainda pegaria a "
+          "excecao, mas so DEPOIS de ja ter gasto o draw, quebrando o determinismo "
+          "CARDS-HW-3B; CRAFT-TOCTOU-REENTRANTE)",
+          "[domain][deck][deck_transactions][invariant][craft_toctou][cards_hw_3b][determinism]") {
+    CardCollection deck(/*active_capacity=*/2);
+    deck.add_to_active("ja_ocupa_um_slot");
+    CountingRandom rng;
+
+    auto consumer = [&deck]() {
+        deck.add_to_active("consumido_reentrante");
+        return true;
+    };
+
+    const CraftResult result = craft(deck, "carta_craftada", consumer, fake_tier_of, rng);
+
+    REQUIRE_FALSE(result.ok());
+    REQUIRE(result.error == TransactionError::ActiveCapacityFull);
+    REQUIRE(rng.next_calls == 0);
+    REQUIRE(rng.next_double_calls == 0);
+}
+
 TEST_CASE("deck_transactions: craft() com TierLookup reentrante que enche o ativo "
           "DEPOIS do guard do consumer tambem nao deixa logic_error escapar (um passo "
           "alem da 1a camada, 2a camada de defesa, CRAFT-TOCTOU-REENTRANTE)",
