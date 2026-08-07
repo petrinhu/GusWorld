@@ -474,6 +474,61 @@ histórico no fim do arquivo. Novas descobertas entram como bullets abaixo desta
   de temp dirs: conferido no blob commitado (`git show HEAD:...`, linha 864). Ocorrência **única**
   na base (varrido `Guard x(std::string())` e `Dir x(std::string())` em todo o `GusEngine`).
   Achado pelo `-Wvexing-parse` do clang em 2026-08-04.
+- `CI-WORKFLOW-DISPATCH`: **`ci.yml` não tem `workflow_dispatch`** (confirmado por mim: o bloco `on:`
+  só tem `push` e `pull_request`; o `windows.yml` **tem**, linha 34). Achado do glintfx pelo caminho
+  difícil: na pane de ~4h do GitHub Actions de 2026-08-06, **evento de `push` parou de criar
+  execução** (commit provado no remoto por `ls-remote`, zero execuções geradas) e **só o disparo
+  manual funcionou** (`gh workflow run <arquivo> --ref main`). Três dos seis fluxos deles não tinham o
+  gatilho e devolviam `HTTP 422` — justamente os três mais importantes. Conserto: uma linha no bloco
+  `on:`, preservando os gatilhos atuais. **Lição:** resiliência de CI só se mede quando o caminho
+  normal cai; um fluxo com via manual e um sem são indistinguíveis enquanto tudo funciona. ⚠️ O
+  gatilho só existe no servidor DEPOIS que o commit sobe (testar antes dá 422, é esperado).
+- `GATES-LOTE-ESCONDE-COBERTURA`: **nossos gates rodam em lote e não distinguem crash de reprovação**
+  (confirmado por mim: `grep` por tratamento de código >= 128 nos gates volta **vazio**). O
+  `spdx-required` varre **625 arquivos numa chamada só**; se o interpretador morrer no meio, o gate
+  reporta falha genérica e **ninguém sabe quantos arquivos ficaram sem análise**. Foi exatamente o que
+  aconteceu com o glintfx: verificador estático recebeu 51 arquivos, crashou com falha de segmentação
+  (código 139), e o crash **mascarava cinco arquivos que já reprovavam**. Conserto deles: laço
+  arquivo-a-arquivo + resumo `encontrados/analisados/falharam` impresso **mesmo quando é zero**, e
+  distinção entre **código >= 128 (a ferramenta morreu)** e **código 1 (violação real)**, porque
+  exigem ações opostas. **Lição: crash não reprova, ESCONDE.**
+- `CI-STEP-SUMMARY-DESPERDICIO`: **zero usos de `$GITHUB_STEP_SUMMARY`** nos nossos 2 fluxos
+  (conferido). O `tools/check.sh` já calcula o resumo dos 17 gates e o enterra no log. Baixo custo,
+  ganho de legibilidade em cada execução. Sem urgência.
+- `CI-DIAGNOSTICO-PROCEDIMENTO`: procedimento do glintfx, que poupou horas a eles e vale registrar:
+  (1) descobrir QUAL passo falhou antes de ler log (`gh run view <id> --json jobs`, olhar o passo em
+  `failure`); (2) **falha em `Set up job` é infraestrutura do GitHub**, não código nosso — confundir
+  leva a "consertar" o que não está quebrado; (3) assinatura de pane: contar no log as ocorrências dos
+  próprios comandos (`cmake`, `ctest`) — **zero** significa que nenhum passo nosso executou;
+  (4) código >= 128 é a ferramenta morrendo, 1 é reprovação legítima; (5) ⚠️ **o painel do GitHub
+  MENTE** — mostrou 4 trabalhos "na fila" enquanto o log do próprio container provava que um rodava
+  havia 10 minutos. **A fonte que descreve o trabalho de longe erra; a que está dentro dele acerta.**
+- `CAUA-LESTE-OESTE-FALSO-ALARME`: **eu (orquestrador) reportei uma inversão leste/oeste do Cauã que
+  NÃO EXISTE.** Concluí de olho, numa imagem ampliada, e errei. O agente encarregado do conserto
+  **contra-argumentou e se recusou a aplicar**, provando com métrica objetiva; refiz a medição de
+  forma independente (centroide dos pixels de pele na metade superior contra o centro do corpo) e
+  **confirmei o agente**: `walk_east_0.png` tem pele em x=96,3 com corpo centrado em 88,0 (rosto para
+  a DIREITA, correto) e `walk_west_0.png` em x=82,7 contra 91,5 (ESQUERDA, correto). Controle
+  positivo da métrica no bug REAL do Gus: `walk/east/f0.png` dá pele em 131,9 contra centro 133,5
+  (ESQUERDA, invertido) e `walk/west/f0.png` 120,8 contra 118,0 (DIREITA, invertido) — a métrica
+  acusa o defeito verdadeiro e inocenta o Cauã. **Nada a fazer no código.** ⚠️ Detalhe que engana:
+  o `rotations/` do Gus está CORRETO; só o `walk/` dele está invertido — exports diferentes do mesmo
+  gerador podem divergir, então medir a pasta que o layout realmente consome. **Lição: julgamento
+  visual de perfil em sprite é não confiável; medir.**
+- `CAUA-OESTE-MANCHA-CIANO`: **defeito de arte medido** (2026-08-06). A direção **oeste** de
+  `resources/sprites/caua_volt_cyan_v2/walk/` tem um borrão ciano preenchido em **5 dos 6 frames**
+  (0, 2, 3, 4, 5; só o frame 1 está limpo). Medido por contagem de pixels claros: média de **1822 px**
+  no oeste contra 629 (sul), 236 (leste) e 208 (norte) da **mesma arte** — 8x a média das irmãs. **A
+  versão antiga 68x68 NÃO tem o problema** (oeste=63 px, na faixa das outras). Está no arquivo de
+  origem, não no render (conferido abrindo o PNG direto do disco). Não bloqueia: é retrabalho de arte,
+  não de código. Decisão do líder de 2026-08-06: corrigir a inversão leste/oeste primeiro, e deixar a
+  mancha como item à parte.
+- `ASSETS-VERSIONAR-SPRITES`: **ID citado em 6 commits sem linha na tabela** (apontado pelo hook
+  `todo-fresh`, que avisou e não bloqueou, em todos eles). Cobre a versionagem dos PNGs mínimos
+  (26 arquivos, 252 KB), a migração do Cauã para `caua_volt_cyan_v2`, a remoção do ramo frágil de idle
+  e a correção da inversão leste/oeste. **Entregue e verificado** (clone limpo do zero: 3027/3027;
+  17 gates; `main` em 27587ec0). Falta só decidir em qual onda a linha entra — por isso está aqui e
+  não na tabela.
 - `CI-NODE20-ACTIONS`: **aviso do CI rastreado até nós pela sessão do glintfx** (bus, 2026-08-06). O
   líder levou a mensagem achando que era deles; eles rastrearam e devolveram: nomeia
   `ilammy/msvc-dev-cmd@v1` e o job `Windows (MSVC, Release)`, que não existem no lado deles.
