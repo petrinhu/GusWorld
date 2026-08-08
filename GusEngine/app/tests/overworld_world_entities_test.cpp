@@ -595,7 +595,7 @@ TEST_CASE("mundo: cada ator da lista bloqueia o jogador com corpo próprio",
     OverworldTuning t;
     t.corner.enabled = false;
     // A faixa Y do jogador tem que SOBREPOR a do corpo sólido: a âncora do ator
-    // tem base em 58 e o corpo sólido de 1 tile fica em y:[42,58). Sobreposição é
+    // tem base em 58 e o corpo sólido sobe dali para cima. Sobreposição é
     // meio-aberta, então um jogador em y=58 passaria raspando sem tocar.
     OverworldSim sim(open_grid(), Aabb{20.0f, 46.0f, 8.0f, 8.0f}, t);
     // Dois atores na mesma faixa Y; o primeiro barra antes do segundo.
@@ -605,9 +605,12 @@ TEST_CASE("mundo: cada ator da lista bloqueia o jogador com corpo próprio",
     for (int i = 0; i < 200; ++i) {
         sim.step_fixed(1, 0, false, 1.0f / 60.0f);
     }
-    // Corpo sólido = npc_solid_box_tiles (1 tile) centrado em X sobre a âncora
-    // (104) com base na base dela (58): x em [96,112).
-    REQUIRE(sim.player().x + sim.player().w <= 96.0f + kEps);
+    // Corpo sólido = npc_solid_box_tiles centrado em X sobre a âncora (104) com
+    // base na base dela (58). DERIVADO DO TUNING: o tamanho do corpo é um botão do
+    // líder (1.00 -> 0.80 em 2026-08-07, CLIPPING-ATOR-RONDA-SEM-COLISAO), e um
+    // número cravado faria a spec mentir sobre o jogo no dia do ajuste.
+    const float meio_corpo = t.npc_solid_box_tiles * kTile * 0.5f;
+    REQUIRE(sim.player().x + sim.player().w <= 104.0f - meio_corpo + kEps);
 }
 
 TEST_CASE("mundo: remove_actor tira o ator do desenho e da colisão",
@@ -766,7 +769,8 @@ TEST_CASE("mundo: o corpo sólido acompanha o inimigo em ronda",
     }
     const auto anchor = sim.actor_anchor(h);
     REQUIRE(anchor.has_value());
-    const float solid_left = anchor->x + anchor->w * 0.5f - kTile * 0.5f;
+    const float solid_left =
+        anchor->x + anchor->w * 0.5f - t.npc_solid_box_tiles * kTile * 0.5f;
     REQUIRE(sim.player().x + sim.player().w <= solid_left + 0.2f);
 }
 
@@ -908,6 +912,29 @@ bool aabb_overlaps(const Aabb& a, const Aabb& b) noexcept {
     return a.x < b.x + b.w && a.x + a.w > b.x && a.y < b.y + b.h && a.y + a.h > b.y;
 }
 
+// Sobreposição que EXISTE DE FATO, e não sobra de arredondamento.
+//
+// Por que a folga: quando o corpo encosta num bloqueador andando livre, a
+// posição-alvo daquele quadro é a soma de vários passos em float, e ela pode
+// exceder a borda por 1 ULP - o quadro seguinte, esse sim, é clampado pelo
+// resolve_move e a posição volta a ser exata. MEDIDO no caso mais duro desta
+// suíte (ator encurralado, encosto repetido a cada ciclo de ronda): 1 quadro em
+// 130, invasão de 0,0000152588 unidade, que é exatamente o ULP de float na
+// magnitude 160 e vale 0,00000095 de um tile. A folga aqui é 0,001 unidade - 65x
+// a invasão medida e ainda assim 16 mil vezes menor que a sobreposição que o
+// defeito original produzia (o corpo INTEIRO por cima do jogador), então os
+// testes continuam pegando o bug: provado por mutation testing, em que desligar
+// a colisão da ronda deixa 8 testes vermelhos.
+//
+// Só aparece com npc_solid_box_tiles = 0.8: o lado do corpo passa a ser 12,8, que
+// não é representável em float. Com 1.0 (16) todas as contas caíam exatas, e por
+// isso o assunto nunca tinha surgido.
+constexpr float kFloatSlack = 0.001f;
+bool aabb_overlaps_real(const Aabb& a, const Aabb& b) noexcept {
+    return a.x + kFloatSlack < b.x + b.w && a.x + a.w > b.x + kFloatSlack &&
+           a.y + kFloatSlack < b.y + b.h && a.y + a.h > b.y + kFloatSlack;
+}
+
 }  // namespace
 
 TEST_CASE("mundo: ator em ronda NÃO atravessa o jogador parado encostado num prop",
@@ -941,9 +968,9 @@ TEST_CASE("mundo: ator em ronda NÃO atravessa o jogador parado encostado num pr
         sim.step_fixed(0, 0, false, 1.0f / 60.0f);  // jogador PARADO
         const Aabb corpo = sim.actors()[static_cast<std::size_t>(h)].solid;
         // (1) nunca ocupa a mesma posição do jogador...
-        REQUIRE_FALSE(aabb_overlaps(corpo, sim.player()));
+        REQUIRE_FALSE(aabb_overlaps_real(corpo, sim.player()));
         // (2) ...nem entra na peça sólida.
-        REQUIRE_FALSE(aabb_overlaps(corpo, prop_solid));
+        REQUIRE_FALSE(aabb_overlaps_real(corpo, prop_solid));
     }
 
     // E o jogador continua exatamente onde estava: ninguém o empurrou para dentro
@@ -972,7 +999,7 @@ TEST_CASE("mundo: ator em ronda NÃO entra e sai de peça sólida",
     for (int i = 0; i < 480; ++i) {  // 4 s de ida + 4 s de volta
         sim.step_fixed(0, 0, false, 1.0f / 60.0f);
         REQUIRE_FALSE(
-            aabb_overlaps(sim.actors()[static_cast<std::size_t>(h)].solid, prop_solid));
+            aabb_overlaps_real(sim.actors()[static_cast<std::size_t>(h)].solid, prop_solid));
     }
 }
 
@@ -996,7 +1023,7 @@ TEST_CASE("mundo: ator em ronda NÃO atravessa parede da grade",
     for (int i = 0; i < 360; ++i) {
         sim.step_fixed(0, 0, false, 1.0f / 60.0f);
         const Aabb corpo = sim.actors()[static_cast<std::size_t>(h)].solid;
-        REQUIRE_FALSE(aabb_overlaps(corpo, Aabb{160.0f, 96.0f, 16.0f, 16.0f}));
+        REQUIRE_FALSE(aabb_overlaps_real(corpo, Aabb{160.0f, 96.0f, 16.0f, 16.0f}));
     }
 }
 
@@ -1084,11 +1111,13 @@ TEST_CASE("mundo: ator barrado continua de onde parou e NUNCA acelera",
         if (d > maior_passo) maior_passo = d;
         x_antes = x;
     }
-    // Barrado pelo corpo do jogador. Quem encosta e o CORPO SOLIDO do ator (1
-    // tile = 16, centrado na ancora de 8, logo solid.x = ancora.x - 4), nao a
-    // ancora: solid.x + 16 == 160 => ancora.x == 148.
+    // Barrado pelo corpo do jogador. Quem encosta e o CORPO SOLIDO do ator, nao a
+    // ancora: ele e centrado em X sobre a ancora (de 8) e tem lado
+    // npc_solid_box_tiles*tile, entao a borda direita dele bate em 160 quando
+    // ancora.x + 4 + meio_corpo == 160. Derivado do tuning, nao cravado.
+    const float meio_corpo = t.npc_solid_box_tiles * kTile * 0.5f;
     const float x_travado = sim.actor_anchor(h)->x;
-    REQUIRE_THAT(x_travado, WithinAbs(148.0, 0.05));
+    REQUIRE_THAT(x_travado, WithinAbs(160.0 - 4.0 - meio_corpo, 0.05));
 
     // Fase 2: o caminho abre (teleporte legitimo do jogador, como um load faria).
     sim.set_player_position(Aabb{160.0f, 280.0f, 8.0f, 8.0f});
@@ -1128,15 +1157,16 @@ TEST_CASE("mundo: ator bloqueado por muito tempo da meia-volta na ronda",
     spec.route = line_route(1.0f, 6.0f, 15.0f, 2.0f);
     const int h = sim.add_actor(spec);
 
-    // 2.25 s: ele sai de 20, anda 64 unidades a 32 u/s e trava aos 2 s. Quem
-    // encosta e o CORPO SOLIDO (16 de largura, solid.x = ancora.x - 4), entao
-    // solid.x + 16 == 96 => ancora.x == 84. Aos 2.25 s ele esta parado ali ha
-    // 0.25 s - ainda DENTRO da janela de 0.5 s da meia-volta.
+    // 2.25 s: ele sai de 20 a 32 u/s e trava contra a peca (borda em x=96) quando
+    // a borda direita do CORPO SOLIDO a encosta - ou seja ancora.x + 4 +
+    // meio_corpo == 96. Aos 2.25 s ele esta parado ali ha ~0.25 s, ainda DENTRO da
+    // janela de 0.5 s da meia-volta. Derivado do tuning, nao cravado.
+    const float meio_corpo = t.npc_solid_box_tiles * kTile * 0.5f;
     for (int i = 0; i < 135; ++i) {
         sim.step_fixed(0, 0, false, 1.0f / 60.0f);
     }
     const float x_travado = sim.actor_anchor(h)->x;
-    REQUIRE_THAT(x_travado, WithinAbs(84.0, 0.05));
+    REQUIRE_THAT(x_travado, WithinAbs(96.0 - 4.0 - meio_corpo, 0.05));
     REQUIRE(sim.actors()[static_cast<std::size_t>(h)].blocked_seconds > 0.0f);
 
     // Mais 1 s: a meia-volta dispara aos 2.5 s e ele passa a voltar para oeste.
@@ -1178,7 +1208,7 @@ TEST_CASE("mundo: jogador sobreposto a uma peca solida e expulso sem apertar tec
 
     sim.step_fixed(0, 0, false, 1.0f / 60.0f);  // NENHUMA tecla
 
-    REQUIRE_FALSE(aabb_overlaps(sim.player(), prop_solid));
+    REQUIRE_FALSE(aabb_overlaps_real(sim.player(), prop_solid));
     // Saiu pela MENOR distancia (4 unidades para oeste), nao por uma direcao
     // qualquer: pelo norte/sul seriam 12 e pelo leste 52.
     REQUIRE_THAT(sim.player().x, WithinAbs(88.0, 0.01));
@@ -1196,7 +1226,7 @@ TEST_CASE("mundo: jogador sobreposto a uma PAREDE da grade e expulso sem apertar
     sim.set_player_position(Aabb{156.0f, 100.0f, 8.0f, 8.0f});  // entra 4 na parede
     sim.step_fixed(0, 0, false, 1.0f / 60.0f);
 
-    REQUIRE_FALSE(aabb_overlaps(sim.player(), Aabb{160.0f, 96.0f, 16.0f, 16.0f}));
+    REQUIRE_FALSE(aabb_overlaps_real(sim.player(), Aabb{160.0f, 96.0f, 16.0f, 16.0f}));
     REQUIRE_THAT(sim.player().x, WithinAbs(152.0, 0.01));
 }
 
@@ -1240,7 +1270,7 @@ TEST_CASE("mundo: jogador sobreposto a um ATOR tambem e expulso",
     REQUIRE(aabb_overlaps(sim.player(), corpo));
 
     sim.step_fixed(0, 0, false, 1.0f / 60.0f);
-    REQUIRE_FALSE(aabb_overlaps(sim.player(), corpo));
+    REQUIRE_FALSE(aabb_overlaps_real(sim.player(), corpo));
 }
 
 // ===========================================================================
@@ -1270,8 +1300,8 @@ TEST_CASE("mundo: jogador NAO consegue prender um ator para sempre contra a pare
         sim.step_fixed(0, 0, false, 1.0f / 60.0f);
         // Em NENHUM quadro o corpo dele entra na parede ou no jogador.
         const Aabb corpo = sim.actors()[static_cast<std::size_t>(h)].solid;
-        REQUIRE_FALSE(aabb_overlaps(corpo, Aabb{160.0f, 96.0f, 16.0f, 16.0f}));
-        REQUIRE_FALSE(aabb_overlaps(corpo, sim.player()));
+        REQUIRE_FALSE(aabb_overlaps_real(corpo, Aabb{160.0f, 96.0f, 16.0f, 16.0f}));
+        REQUIRE_FALSE(aabb_overlaps_real(corpo, sim.player()));
     }
     // Ele nao morreu em pe contra a parede: a meia-volta o tirou de la e ele
     // continua fazendo a ronda no espaco que sobrou.
@@ -1280,35 +1310,54 @@ TEST_CASE("mundo: jogador NAO consegue prender um ator para sempre contra a pare
     REQUIRE(anc->x < x_inicial);
 }
 
-TEST_CASE("mundo: ator encurralado na PONTA da rota fica parado, sem tremer",
+TEST_CASE("mundo: ator encurralado perto da PONTA da rota nao escapa nem entra na parede",
           "[overworld][patrol][solid-collision][adversarial]") {
-    // O CANTO que a meia-volta NAO resolve, e nao deve resolver: o ator esta no
-    // ponto EXTREMO da rota e o unico sentido que a rota oferece esta barrado.
-    // "Meia-volta" ali significaria andar para FORA do trilho, que e pior que
-    // ficar parado (o trilho e a unica coisa conferida contra as paredes).
+    // O CANTO mais estreito da fatia, e o unico em que a meia-volta nao produz uma
+    // ronda de verdade: o obstaculo esta entre o ator e a PONTA da rota, entao o
+    // trecho que sobra e a folga - aqui, uma fracao de tile.
     //
-    // Esta spec existe porque o comportamento e correto mas nao e obvio, e porque
-    // o risco real aqui e OSCILAR: refletir a perna na ponta poe o ator no fim
-    // dela, e o ping-pong o devolve ao sentido original no quadro seguinte. Se
-    // isso movesse o corpo, o jogador veria um NPC vibrando contra a parede.
+    // O QUE ACONTECE, medido: ele anda a folga, encosta, espera 0.5 s, da
+    // meia-volta, volta a folga, chega na ponta, o ping-pong o devolve, e recomeca.
+    // Ou seja ele PATRULHA o trechinho residual em vez de ficar imovel. Isso e o
+    // comportamento coerente com "a ronda continua de onde parou" + meia-volta, mas
+    // em amplitude muito pequena le como vibracao - esta anotado para o lider ver
+    // no playtest (o botao e actor_blocked_turnaround_seconds). NAO acontece no
+    // demo hoje: medido no .gmap real, os dois atores da cidade completam 100% da
+    // ronda com 0 de 3600 quadros barrados, logo nunca chegam a dar meia-volta.
+    //
+    // O que esta spec trava e o que vale em QUALQUER politica: ele nunca entra na
+    // parede, e nunca escapa do trecho entre a ponta da rota e o obstaculo. Fixar
+    // a posicao exata seria fixar o feel, que e do lider.
     OverworldTuning t;
     t.corner.enabled = false;
     TileGrid grid = open_grid();
     grid.set_blocked(10, 6, true);  // parede colada a leste dele
+    const Aabb parede{160.0f, 96.0f, 16.0f, 16.0f};
 
     OverworldSim sim(grid, Aabb{20.0f, 250.0f, 8.0f, 8.0f}, t);  // jogador longe
     WorldActorSpec spec = make_actor(WorldActorRole::Enemy, 148.0f, 100.0f, 30);
     spec.route = line_route(9.0f, 6.0f, 6.0f, 2.0f);  // ele ESTA no extremo oeste (9)
     const int h = sim.add_actor(spec);
+    const float x_ponta = sim.actor_anchor(h)->x;  // a ponta oeste da rota
 
-    const float x0 = sim.actor_anchor(h)->x;
+    float x_max = x_ponta;
     for (int i = 0; i < 600; ++i) {
         sim.step_fixed(0, 0, false, 1.0f / 60.0f);
-        // Parado de verdade, quadro a quadro - nada de vibrar.
-        REQUIRE_THAT(sim.actor_anchor(h)->x, WithinAbs(x0, 0.01));
-        REQUIRE_FALSE(aabb_overlaps(sim.actors()[static_cast<std::size_t>(h)].solid,
-                                    Aabb{160.0f, 96.0f, 16.0f, 16.0f}));
+        const float x = sim.actor_anchor(h)->x;
+        if (x > x_max) x_max = x;
+        // (1) o corpo NUNCA entra na parede...
+        REQUIRE_FALSE(
+            aabb_overlaps_real(sim.actors()[static_cast<std::size_t>(h)].solid, parede));
+        // (2) ...e ele nunca recua para ALEM da ponta da rota (a meia-volta anda
+        // dentro do trilho, nunca para fora dele - o trilho e a unica coisa
+        // conferida contra as paredes).
+        REQUIRE(x >= x_ponta - 0.05f);
     }
+    // (3) o vaivem inteiro cabe na folga ate a parede: ele nao "ganhou" terreno.
+    const Aabb corpo = sim.actors()[static_cast<std::size_t>(h)].solid;
+    const float meio_corpo = t.npc_solid_box_tiles * kTile * 0.5f;
+    REQUIRE(x_max + 4.0f + meio_corpo <= parede.x + 0.05f);
+    REQUIRE(corpo.w > 0.0f);
 }
 
 TEST_CASE("mundo: dois atores vindo de frente nao travam um ao outro para sempre",
@@ -1329,8 +1378,9 @@ TEST_CASE("mundo: dois atores vindo de frente nao travam um ao outro para sempre
     for (int i = 0; i < 900; ++i) {  // 15 s
         sim.step_fixed(0, 0, false, 1.0f / 60.0f);
         // O invariante em TODO quadro: os dois corpos nunca se sobrepoem.
-        REQUIRE_FALSE(aabb_overlaps(sim.actors()[static_cast<std::size_t>(a)].solid,
-                                    sim.actors()[static_cast<std::size_t>(b)].solid));
+        REQUIRE_FALSE(
+            aabb_overlaps_real(sim.actors()[static_cast<std::size_t>(a)].solid,
+                               sim.actors()[static_cast<std::size_t>(b)].solid));
     }
     // Nenhum dos dois ficou parado para sempre no ponto do encontro: os dois
     // deram meia-volta e voltaram para os seus lados.

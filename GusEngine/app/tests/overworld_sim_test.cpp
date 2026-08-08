@@ -480,10 +480,13 @@ TEST_CASE("overworld: colisao solida bloqueia o jogador na posicao do marcador d
     // entrada pra derivar a caixa solida (~1 tile = 16 unidades neste tile_size).
     sim.set_enemy_marker(Aabb{100.0f, 50.0f, 20.0f, 20.0f}, /*tex=*/7);
     // Caixa solida esperada (MESMA formula de solid_obstacle_from_footprint): centro
-    // em X do footprint (110), base = base do footprint (70), tamanho 16.
-    //   solid.x = 110 - 8 = 102; solid.y = 70 - 16 = 54 (x:[102,118) y:[54,70)).
-    constexpr float kSolidX = 102.0f;
-    constexpr float kSolidW = 16.0f;
+    // em X do footprint (110), base = base do footprint (70), lado =
+    // npc_solid_box_tiles * tile_size. DERIVADA DO TUNING, e nao escrita a mao: o
+    // tamanho do corpo e um botao do lider (mexeu de 1.00 para 0.80 em 2026-08-07,
+    // CLIPPING-ATOR-RONDA-SEM-COLISAO), e um numero cravado aqui faria a spec
+    // mentir sobre o jogo no dia seguinte ao ajuste.
+    const float kSolidW = sim.tuning().npc_solid_box_tiles * 16.0f;
+    const float kSolidX = 110.0f - kSolidW * 0.5f;
 
     // Anda pra DIREITA repetidamente com passo PEQUENO por frame (evita tunneling,
     // documentado como limite conhecido do resolve_move para deltas grandes demais).
@@ -530,7 +533,9 @@ TEST_CASE("overworld: colisao solida do Bertoldo (NPC) tambem bloqueia o jogador
     t.corner.enabled = false;
     OverworldSim sim(g, Aabb{20.0f, 58.0f, 8.0f, 8.0f}, t);
     sim.set_npc_bertoldo_marker(Aabb{100.0f, 50.0f, 20.0f, 20.0f}, /*tex=*/9);
-    constexpr float kSolidX = 102.0f;
+    // Derivada do tuning (ver a spec do inimigo acima), nao cravada.
+    const float kSolidX =
+        110.0f - sim.tuning().npc_solid_box_tiles * 16.0f * 0.5f;
 
     for (int i = 0; i < 200; ++i) {
         sim.step_fixed(1, 0, false, 1.0f / 60.0f);

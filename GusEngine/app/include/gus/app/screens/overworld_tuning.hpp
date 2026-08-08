@@ -319,7 +319,27 @@ struct OverworldTuning {
     // 2.75-3.3 tiles). O lider ajusta vendo o playtest (faixa util sugerida ~0.7..1.3
     // tile: menor = mais "furta-corpo" e pode revivir o bug de sumir; maior = comeca
     // a travar o corredor).
-    float npc_solid_box_tiles = 1.0f;
+    //
+    // LIDER 2026-08-07 (CLIPPING-ATOR-RONDA-SEM-COLISAO): 1.00 -> 0.80. O dia do
+    // "comeca a travar o corredor" previsto no paragrafo acima chegou, e por um
+    // caminho que ninguem tinha visto: a partir desta fatia o ATOR tambem respeita
+    // colisao solida, e ele se move com ESTA caixa - a mesma que apresenta aos
+    // outros. Como ela e ancorada pela BASE e e maior que a ancora (0.6 tile), ela
+    // sobe acima da linha em que o ator pisa e invade a fileira de CIMA por
+    // construcao. Numa cidade, a fileira de cima e fachada.
+    //
+    // MEDIDO no .gmap real (90x60, tile 2.0), rota a rota, amostrando 401 pontos:
+    // com 1.00 o androide da FIR colidia em 238/401 amostras com a fachada da
+    // celula (70,49) - corpo em y[99.60,101.60) contra solido da peca em
+    // y[96.34,100.00), 0.40 unidade de invasao - e a ronda dele encolhia de 12
+    // para 4.4 celulas (580 de 3600 quadros barrado). A varredura do botao deu um
+    // degrau limpo: 0.6/0.7/0.8 -> 0 colisoes; 0.9 -> 232; 1.0 -> 238; 1.3 -> 258.
+    // A conta fecha: a caixa so cabe na fileira do ator enquanto
+    // (ancora.base - tamanho) >= topo da fileira, o que da tamanho <= 0.8 tile.
+    // 0.80 e o MAIOR valor que ainda cabe, entao preserva o maximo de "corpo
+    // solido" sem travar corredor - continua acima da hitbox do jogador (0.6) e
+    // bem acima do trigger (0.8x0.4), que e o que sustenta a leitura original.
+    float npc_solid_box_tiles = 0.8f;
 
     // Quanto tempo (s) um ator em ronda aguenta BARRADO antes de dar meia-volta
     // na rota (CLIPPING-ATOR-RONDA-SEM-COLISAO, decisao do lider 2026-08-07).
