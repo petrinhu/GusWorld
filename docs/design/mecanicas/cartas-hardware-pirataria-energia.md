@@ -30,6 +30,21 @@ As cartas especiais são **únicas** (uma no jogo). Mas existe **imitação pira
 
 ## 3. Física da carta (o que prova original × pirata × homebrew)
 
+> **PRINCÍPIO CANÔNICO (líder, 2026-08-08): todo mecanismo de uso de carta depende
+> da originalidade da carta (§3, esta seção) E da degradação da bateria (§5, "Energia:
+> baterias CR2032") — as duas variáveis JUNTAS, não uma ou outra.** Nasceu da carta de
+> cura da curandeira (`CURANDEIRA-LIMITE-USOS`), mas é regra GERAL: qualquer efeito
+> futuro de carta que consome energia (dano, buff, cura, o que vier) precisa responder
+> às duas perguntas antes de existir — "o que muda se a carta for original × pirata ×
+> homebrew?" e "o que muda se a bateria estiver nova × degradada?". Não é opcional
+> nem específico da curandeira; é o mesmo espírito da lei do átomo (ADR-019/020)
+> aplicado à energia da carta: a variação vem de DADO cruzando as duas dimensões,
+> nunca de comportamento hardcoded para um efeito só. Exemplo já especificado (cura):
+> original cura magnitude fixa e drena fração fixa da carga; pirata cura em faixa RNG
+> e drena fração RNG maior; bateria degradada (SoH baixo) ganha chance de falha total
+> no uso, proporcional à degradação — ver `EnemyDifficultyConstants`-style tabela em
+> código (`GusEngine/domain/`), não `if` espalhado.
+
 | | **Original (oficial)** | **Vazia (homebrew)** | **Pirata (clone)** |
 |---|---|---|---|
 | Memória | ROM pura | **EPROM** de baixa qualidade | ROM |
