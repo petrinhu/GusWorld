@@ -39,7 +39,13 @@ namespace gus::domain::templates::canonical {
 
 // ---- Inimigos do encontro de referencia (combat.md secao 17) --------------
 
-// Sentinela-Bit: Trash, HP55/Def8, Cinetico, Scripted. secao 17.
+// Sentinela-Bit: Trash, HP33/Atk12/Def8, Cinetico, Scripted. secao 17. Atualizado
+// 2026-08-07 (BAL-STATLINES-APLICAR): HP 55->33, Atk 6->12 (o Atk deste comentario
+// historicamente NAO citava o campo - o valor real em codigo tinha ficado parado em 6
+// desde o M3, nunca sincronizado com o "10 provisorio" que combat.md secao 17 chegou a
+// documentar em 2026-06-25; nenhum teste travava o campo Atk deste inimigo ate agora,
+// ver canonical_templates_test.cpp). Fonte do valor novo: Fase A do PACING-SIM,
+// docs/design/mecanicas/analise-pacing-fase-a.md secao 4.
 [[nodiscard]] EnemyTemplate sentinela_bit();
 
 // Daemon-Guard: Elite, HP144/Def14, Cinetico, Scripted (placeholder). secao 17/13.

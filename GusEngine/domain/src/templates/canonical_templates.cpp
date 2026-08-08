@@ -47,8 +47,14 @@ CharacterTemplate jaci() {
 EnemyTemplate sentinela_bit() {
     return EnemyTemplate{
         /*id=*/"sentinela_bit",
-        /*max_hp=*/55,
-        /*atk=*/6,
+        // BAL-STATLINES-APLICAR (2026-08-07): HP 55->33, Atk 6->12. Ponto vencedor da
+        // Fase A do PACING-SIM (analise-pacing-fase-a.md secao 4). Achado a parte, nao
+        // decidido nesta tarefa: o Atk anterior (6) nunca foi o "10 provisorio" que
+        // combat.md secao 17 documentava como valor de producao - ficou parado no valor
+        // do commit M3 (2026-06-21), 4 dias antes da decisao "10 provisorio" (2026-06-25)
+        // existir, e nenhum teste travava este campo (ver canonical_templates_test.cpp).
+        /*max_hp=*/33,
+        /*atk=*/12,
         /*def=*/8,
         /*spd=*/4,
         /*family=*/CardFamily::Cinetico,

@@ -331,6 +331,19 @@ struct ActorSpec {
 }
 
 // Sentinela-Bit (Trash, combat.md secao 17). SPD = V9 //SIM (protocolo secao 5).
+//
+// NAO SINCRONIZADO com o canon 2026-08-07 (BAL-STATLINES-APLICAR, HP33/Atk12) DE
+// PROPOSITO - tentativa revertida, achado reportado no relatorio da tarefa (nao decidido
+// aqui): Atk=12 quebra 2 testes pre-existentes (mira_sim_harness_test.cpp, "L3 turtle
+// total" e o calculo-a-mao irmao) que travam um invariante NOMEADO PELO LIDER ("H1 do
+// lider"): com Atk<=10, o Shield do Defend (magnitude=Def, combat_state_machine.cpp
+// resolve_defend) absorve 100% do dano basico subtrativo (raw=max(1,Atk-Def)) contra
+// QUALQUER Def da party, porque Atk<=2xDef vale ate para o Gus (Def=5, o mais fragil:
+// 10<=2x5 e um empate exato). Atk=12 quebra so pro Gus (12>2x5=10), vaza 2 HP/golpe nao-
+// absorvido, e como este harness trata "Gus caiu = fim" (Rei caiu, ver cabecalho do
+// arquivo), o turtle-total deixa de bater no cap de 30 rodadas. NAO mexer neste valor
+// sem decisao do lider (mira do trash e escopo congelado aqui, ver TODO.md
+// MIRA-PONDERADA-PROD).
 [[nodiscard]] inline ActorSpec sentinela_spec(std::string id) {
     return ActorSpec{std::move(id), 55, 10, 8, kSentinelaSpd, CardFamily::Cinetico, false};
 }

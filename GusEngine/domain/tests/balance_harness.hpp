@@ -290,10 +290,13 @@ inline void print_report(std::ostream& out, const BalanceReport& r) {
     const BalanceActorSpec jaci{"jaci", 55, 9, 10, 7, CardFamily::Bioquimico};
     const std::vector<BalanceActorSpec> party{gus, caua, jaci};
 
-    // Sentinela-Bit (Trash, secao 17): HP55/Atk10(provisorio)/Def8/Cinetico.
-    const BalanceActorSpec sentinela1{"sentinela1", 55, 10, 8, 5, CardFamily::Cinetico};
-    const BalanceActorSpec sentinela2{"sentinela2", 55, 10, 8, 5, CardFamily::Cinetico};
-    const BalanceActorSpec sentinela3{"sentinela3", 55, 10, 8, 5, CardFamily::Cinetico};
+    // Sentinela-Bit (Trash, secao 17): HP33/Atk12/Def8/Cinetico. Atualizado 2026-08-07
+    // (BAL-STATLINES-APLICAR): ponto vencedor da Fase A do PACING-SIM, ja NAO provisorio
+    // (analise-pacing-fase-a.md secao 4). SPD=5 permanece placeholder de medicao (TBD na
+    // secao 17), fora do escopo desta mudanca.
+    const BalanceActorSpec sentinela1{"sentinela1", 33, 12, 8, 5, CardFamily::Cinetico};
+    const BalanceActorSpec sentinela2{"sentinela2", 33, 12, 8, 5, CardFamily::Cinetico};
+    const BalanceActorSpec sentinela3{"sentinela3", 33, 12, 8, 5, CardFamily::Cinetico};
 
     // Daemon-Guard (Elite, secao 17): HP144/Def14/Cinetico. Atk PLACEHOLDER (ver nota acima).
     const BalanceActorSpec daemon{"daemon", 144, 18, 14, 6, CardFamily::Cinetico};

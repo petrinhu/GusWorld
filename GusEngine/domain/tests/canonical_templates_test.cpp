@@ -64,11 +64,16 @@ TEST_CASE("canon: Jaci HP55/Atk9/Def10/SPD7 bioquimico healer",
 
 // ---- Inimigos do encontro de referencia (combat.md secao 17) --------------
 
-TEST_CASE("canon: Sentinela-Bit Trash HP55/Def8 cinetico scripted",
+TEST_CASE("canon: Sentinela-Bit Trash HP33/Atk12/Def8 cinetico scripted",
           "[domain][templates][canonical]") {
     const auto s = canon::sentinela_bit();
     REQUIRE(s.id == "sentinela_bit");
-    REQUIRE(s.max_hp == 55);
+    REQUIRE(s.max_hp == 33);
+    // Atk trava a partir de agora (BAL-STATLINES-APLICAR, 2026-08-07): virou valor MEDIDO
+    // (Fase A do PACING-SIM), nao mais provisorio/TBD - mesmo padrao de trava que Gus/
+    // Caua/Jaci ja tinham acima. Antes desta trava o campo podia divergir do canon em
+    // silencio (foi o que aconteceu: ficou em 6, nao 10, por ~1,5 mes sem nenhum RED).
+    REQUIRE(s.atk == 12);
     REQUIRE(s.def == 8);
     REQUIRE(s.family == CardFamily::Cinetico);
     REQUIRE(s.brain == BrainKind::Scripted);
