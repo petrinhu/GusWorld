@@ -302,6 +302,12 @@ add_executable(gusengine_domain_tests
     battery_state_test.cpp
     integrity_state_test.cpp
     hardware_class_test.cpp
+    # CURANDEIRA-LIMITE-USOS (TODO.md, W2): motor PURO da carta de cura da Jaci
+    # (Sylvesse-Religação) contra a bateria FISICA da copia jogada - cura+dreno
+    # data-driven por HardwareClass (ComumOriginal fixo, PirataComum RNG) e chance de
+    # falha total proporcional a degradacao (SoH). docs/design/mecanicas/
+    # cartas-hardware-pirataria-energia.md §3 (principio canonico, 2026-08-08).
+    healer_card_test.cpp
     # CARDS-HW-2 fatia 1 (VIRUS EM COMBATE, TODO.md): ponte instancia->combate
     # (CardIntegrityRef/integrity_ledger, CombatAction::card_instance_id) + os 3
     # payloads desta fatia (LogicBomb pre-cast/Worm+ZipBomb pos-cast) no

@@ -48,6 +48,11 @@ add_library(gusengine_domain STATIC
     # Executor techMagic (ADR-016, MVP step 2): dispatcher OnCast/OnDamageDealt/
     # OnDamageReceived/Always sobre EffectSpec de Card (ApplyStatus/Leech/Reflect).
     src/combat/techmagic.cpp
+    # CURANDEIRA-LIMITE-USOS (TODO.md, W2): motor PURO da carta de cura da Jaci
+    # (Sylvesse-Religação) contra a bateria FISICA da copia jogada - NAO e um EffectKind
+    # (a carta e Comum, o executor techMagic so roda ESPECIAL/SUPER; ver o doc-comment
+    # do header pro racional completo, cartas-spec-logica.md §1/CardHardwareLayer).
+    src/combat/healer_card.cpp
     # CARDS-HW-2 fatia B (CARDS-HW-2B, TODO.md): motor PURO da carta `urandom` (a carta-
     # caos do Gus) - sorteio de faixa por peso (original x pirata) + classificacao da
     # coleçao do caster. Fora do dispatcher techMagic (trigger = branch por card_id em
