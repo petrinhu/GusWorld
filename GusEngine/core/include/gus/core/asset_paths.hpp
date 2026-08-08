@@ -66,11 +66,15 @@ inline constexpr std::string_view kBrunusVetorialSpritesDir =
 // ASSETS-VERSIONAR-SPRITES (2026-08-06): o Cauã migrou de "sprites/caua_volt" (68x68)
 // pra "sprites/caua_volt_cyan_v2" (180x180, ciano canônico, walk completo 4x6) -
 // decisão do líder, depois que east/north/west.png da pasta antiga se perderam num
-// acidente sem backup (nunca estiveram no git). "caua_volt/" continua no disco (não
-// apagada) e sua south.png sobrevivente segue versionada como fixture de teste (ver
-// platform/tests/asset_source_test.cpp, família GENÉRICA), mas NENHUM código de
-// produção lê mais aquela pasta. Ver player_sprites_loader.cpp::caua_layout().
-inline constexpr std::string_view kCauaSpritesDir = "sprites/caua_volt_cyan_v2";
+// acidente sem backup (nunca estiveram no git).
+//
+// REVERTIDO 2026-08-08 (decisão do líder): ele recuperou east/north/west.png +
+// walk/ completo (24 quadros) de uma cópia própria em "caua_volt/" e voltou a
+// apontar o Cauã pra lá. A estrutura de walk/ é IDÊNTICA entre as duas pastas
+// (flat, walk_<dir>_<f>.png), então caua_layout() não precisou mudar parâmetro
+// nenhum além do subdir. "caua_volt_cyan_v2/" continua no disco (não apagada).
+// Ver player_sprites_loader.cpp::caua_layout().
+inline constexpr std::string_view kCauaSpritesDir = "sprites/caua_volt";
 inline constexpr std::string_view kJaciSpritesDir = "sprites/jaci_proxy";
 inline constexpr std::string_view kBentoSpritesDir = "sprites/bento_requiem";
 inline constexpr std::string_view kDanteSpritesDir = "sprites/dante_grid";

@@ -75,12 +75,15 @@ resources/sprites/caua_volt_cyan_v2/*
 !resources/sprites/caua_volt_cyan_v2/walk/
 
 # Caua Volt - pasta ANTIGA (caua_volt/, 68x68): east/north/west.png se perderam num
-# acidente sem backup (2026-08-06, nunca estiveram no git); south.png sobreviveu e
-# virou fixture de teste da familia GENERICA da cascata de assets (travado por
-# platform/tests/asset_source_test.cpp, "ASSETS-PATH-CASCATA familia GENERICA: macro
-# EXISTENTE continua vencendo o relativo", tambem executado sob ASan). Nenhum codigo de
+# acidente de colisao de nome em 2026-08-06 (nunca estiveram no git); south.png
+# sobreviveu e virou fixture de teste da familia GENERICA da cascata de assets
+# (travado por platform/tests/asset_source_test.cpp, "ASSETS-PATH-CASCATA familia
+# GENERICA: macro EXISTENTE continua vencendo o relativo", tambem executado sob ASan).
+# ATUALIZACAO 2026-08-08: o lider recuperou east/north/west.png (mais o walk/
+# completo) de uma copia propria - a perda nao era definitiva, so "sem backup
+# alcancavel na hora". Continuam FORA do git por decisao dele: nenhum codigo de
 # producao le mais esta pasta (kCauaSpritesDir aponta pra caua_volt_cyan_v2 agora) - so
-# o teste precisa dela continuar existindo num clone limpo.
+# o teste precisa dela continuar existindo num clone limpo, e south.png ja basta.
 !resources/sprites/caua_volt/
 resources/sprites/caua_volt/*
 !resources/sprites/caua_volt/south.png

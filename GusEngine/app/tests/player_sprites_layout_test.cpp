@@ -114,21 +114,25 @@ TEST_CASE("layout Caua: mapeamento DIRETO (arte correta, nao mexer)",
     CHECK(std::string(walk_dir(l, Direction::West)) == "west");
 }
 
-// --- ASSETS-VERSIONAR-SPRITES (2026-08-06): migracao pra caua_volt_cyan_v2 ----------
+// --- ASSETS-VERSIONAR-SPRITES (2026-08-06 -> REVERTIDO 2026-08-08) -----------------
 //
 // O Caua antigo (sprites/caua_volt/, 68x68) perdeu east/north/west.png num acidente
-// sem backup. Em vez de tentar recupera-los, caua_layout() passou a apontar pra
-// sprites/caua_volt_cyan_v2/ (180x180, ciano canonico) e ganhou o MESMO fallback
-// gracioso do Gus (idle = walk f0 quando falta breathing direcional). Estes TEST_CASEs
-// travam essa decisao: se alguem devolver o layout pro diretorio antigo, ou
-// reintroduzir o ramo de idle "congelado direcional" (que exigia south.png/north.png/
-// east.png/west.png soltos na raiz do personagem - o ramo fragil que causou a perda),
-// eles acendem.
+// sem backup em 2026-08-06. Em vez de tentar recupera-los, caua_layout() passou a
+// apontar pra sprites/caua_volt_cyan_v2/ (180x180, ciano canonico) e ganhou o MESMO
+// fallback gracioso do Gus (idle = walk f0 quando falta breathing direcional).
+//
+// REVERTIDO 2026-08-08 (decisao do lider): east/north/west.png + walk/ completo
+// recuperados de uma copia propria em "caua_volt/"; caua_layout() volta a apontar
+// pra la. A estrutura de walk/ e IDENTICA entre as duas pastas (flat,
+// walk_<dir>_<f>.png), entao so o subdir mudou - walk_dir_subfolder/walk_frames/
+// walk_prefix continuam os mesmos. Este TEST_CASE trava a decisao ATUAL: se alguem
+// mudar o subdir sem querer, ou reintroduzir o ramo de idle "congelado direcional"
+// (o ramo fragil que causou a perda original), ele acende.
 
-TEST_CASE("layout Caua: aponta pra caua_volt_cyan_v2 (a versao boa), walk PLANO",
+TEST_CASE("layout Caua: aponta pra caua_volt (recuperado), walk PLANO",
           "[player_sprites][layout][caua]") {
     const SpriteLayout l = caua_layout();
-    CHECK(std::string(l.subdir) == "caua_volt_cyan_v2");
+    CHECK(std::string(l.subdir) == "caua_volt");
     CHECK_FALSE(l.walk_dir_subfolder);
     CHECK(l.walk_frames == 6);
     CHECK(std::string(l.walk_prefix) == "walk_");

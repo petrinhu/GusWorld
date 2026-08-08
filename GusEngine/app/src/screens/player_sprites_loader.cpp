@@ -57,19 +57,22 @@ SpriteLayout caua_layout() noexcept {
     SpriteLayout l;
     // ASSETS-VERSIONAR-SPRITES (2026-08-06, decisao do lider): os 68x68 antigos
     // (sprites/caua_volt/) perderam east/north/west.png num acidente sem backup; em
-    // vez de tentar recupera-los, o Caua passa a apontar pra arte CIANO boa que ja
-    // existia (sprites/caua_volt_cyan_v2/, 180x180, 4 direcoes + 24 quadros de walk) e
-    // ganha o MESMO fallback gracioso do Gus (idle = walk f0 quando falta breathing
-    // direcional - aqui, SEMPRE, pois caua_volt_cyan_v2/ nao tem anims/breathing_idle/
-    // ainda). Isso torna os 3 arquivos perdidos DESNECESSARIOS.
-    l.subdir = "caua_volt_cyan_v2";
+    // vez de tentar recupera-los, o Caua passou a apontar pra arte CIANO
+    // (sprites/caua_volt_cyan_v2/, 180x180, 4 direcoes + 24 quadros de walk).
+    //
+    // REVERTIDO 2026-08-08 (decisao do lider): east/north/west.png + walk/ completo
+    // recuperados de uma copia propria em "caua_volt/" - volta a ser o subdir ativo.
+    // A ESTRUTURA de walk/ e IDENTICA entre as duas pastas (flat,
+    // walk_<dir>_<f>.png, 6 quadros x 4 direcoes), entao nenhum outro campo do
+    // layout mudou. "caua_volt_cyan_v2/" continua no disco, so parou de ser lida.
+    l.subdir = "caua_volt";
     l.walk_frames = 6;              // 0..5 (24 quadros / 4 direcoes)
     l.walk_prefix = "walk_";        // <base>/walk/walk_<dir>_<f>.png
     l.walk_dir_subfolder = false;   // pasta walk/ PLANA (export do gerador), nao <dir>/
     // idle_dir/idle_frames/idle_prefix ficam no default (breathing_idle/5/"f"): a
-    // pasta nao existe no disco do Caua ainda, entao a sondagem do loader falha nas 4
-    // direcoes e cai pro walk f0 congelado - comportamento identico ao de qualquer
-    // direcao do Gus sem breathing proprio.
+    // pasta "anims/" existe mas esta VAZIA no disco do Caua, entao a sondagem do
+    // loader falha nas 4 direcoes e cai pro walk f0 congelado - comportamento
+    // identico ao de qualquer direcao do Gus sem breathing proprio.
     return l;
 }
 

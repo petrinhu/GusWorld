@@ -38,11 +38,14 @@ TEST_CASE("asset_paths: companions continuam na RAIZ de sprites/ (nao moveram)",
     //
     // ASSETS-VERSIONAR-SPRITES (2026-08-06): o Cauã migrou de "sprites/caua_volt"
     // (68x68 - east/north/west.png perdidos num acidente sem backup) pra
-    // "sprites/caua_volt_cyan_v2" (180x180, ciano canônico, walk completo) - decisão do
-    // líder. Este REQUIRE trava o valor NOVO de propósito: se alguém devolver
-    // kCauaSpritesDir pro diretório antigo, este teste acende (ver caua_layout() em
+    // "sprites/caua_volt_cyan_v2" (180x180, ciano canônico, walk completo).
+    //
+    // REVERTIDO 2026-08-08 (decisão do líder): east/north/west.png + walk/ completo
+    // recuperados de uma cópia própria em "caua_volt/"; kCauaSpritesDir volta a
+    // apontar pra lá. Este REQUIRE trava o valor ATUAL de propósito: se alguém
+    // mudar kCauaSpritesDir sem querer, este teste acende (ver caua_layout() em
     // player_sprites_loader.cpp e o teste de regressão em player_sprites_layout_test.cpp).
-    REQUIRE(ap::kCauaSpritesDir == std::string_view("sprites/caua_volt_cyan_v2"));
+    REQUIRE(ap::kCauaSpritesDir == std::string_view("sprites/caua_volt"));
     REQUIRE(ap::kJaciSpritesDir == std::string_view("sprites/jaci_proxy"));
     REQUIRE(ap::kBentoSpritesDir == std::string_view("sprites/bento_requiem"));
     REQUIRE(ap::kDanteSpritesDir == std::string_view("sprites/dante_grid"));
