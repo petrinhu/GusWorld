@@ -19,6 +19,7 @@
 
 #include <algorithm>
 #include <cmath>
+#include <deque>
 #include <stdexcept>
 #include <string>
 #include <utility>
@@ -1350,6 +1351,12 @@ void CombatStateMachine::apply_damage_with_hooks(CombatActor& attacker, CombatAc
     target.take_damage(damage);
     if (damage <= 0) return;  // canal FALHA/imunidade: hooks nao disparam (secao 20 item 2/3)
 
+    // F1 da mira ponderada (MIRA-PONDERADA-PROD, Opcao F): choke point unico - cobre
+    // ataque basico E dano de carta (os DOIS caminhos que chegam aqui), sem formula
+    // paralela. Registra o dano JA aplicado a `target` (mesmo valor pre-Shield que
+    // round_hits_/last_action_ abaixo usam como "o dano desta acao").
+    record_mira_damage(attacker.id(), queue_.round_index(), damage);
+
     // Ledger cross-ator (ADR-016 secao 20 item 4, HypotenuseCombo/OnRoundEnd): registra o
     // hit DEPOIS do guard acima (canal FALHA/imunidade nunca entra). Ticks de DoT (Poison/
     // Corrode, apply_status_tick) chamam CombatActor::take_damage direto - FORA deste
@@ -1393,6 +1400,103 @@ void CombatStateMachine::apply_damage_with_hooks(CombatActor& attacker, CombatAc
                 attacker.id() + " (status Reflect)."});
         break;  // 1 entrada por StatusId (insert_or_stack_status nao duplica).
     }
+}
+
+// ---- Mira ponderada do trash inimigo (MIRA-PONDERADA-PROD, W2, Opcao F) ----
+
+namespace {
+
+// Remove do fim-mais-antigo (front) toda entrada fora da janela [round - (kMiraAttraction-
+// WindowRounds - 1), round] - prune LAZY, chamado a cada insercao (mesmo padrao de
+// AttractionTracker::prune em mira_sim_harness.hpp, generalizado pra deque<pair> e
+// deque<int> via 2 overloads).
+void prune_mira_window(std::deque<std::pair<int, int>>& window, int round) {
+    const int cutoff = round - (combat_constants::kMiraAttractionWindowRounds - 1);
+    while (!window.empty() && window.front().first < cutoff) window.pop_front();
+}
+
+void prune_mira_window(std::deque<int>& window, int round) {
+    const int cutoff = round - (combat_constants::kMiraAttractionWindowRounds - 1);
+    while (!window.empty() && window.front() < cutoff) window.pop_front();
+}
+
+}  // namespace
+
+void CombatStateMachine::record_mira_damage(const std::string& actor_id, int round,
+                                            int amount) {
+    MiraAttraction& attraction = mira_attraction_[actor_id];
+    attraction.damage_window.emplace_back(round, amount);
+    prune_mira_window(attraction.damage_window, round);
+}
+
+void CombatStateMachine::record_mira_support(const std::string& supporter_id) {
+    const int round = queue_.round_index();
+    MiraAttraction& attraction = mira_attraction_[supporter_id];
+    attraction.support_rounds.push_back(round);
+    prune_mira_window(attraction.support_rounds, round);
+}
+
+double CombatStateMachine::mira_target_weight(const CombatActor& candidate) const {
+    const int round = queue_.round_index();
+    double weight = combat_constants::kMiraBaseWeight;  // V1
+
+    const auto it = mira_attraction_.find(candidate.id());
+    if (it != mira_attraction_.end()) {
+        const int cutoff = round - (combat_constants::kMiraAttractionWindowRounds - 1);
+
+        int damage_in_window = 0;
+        for (const auto& [r, amount] : it->second.damage_window)
+            if (r >= cutoff) damage_in_window += amount;
+        weight += combat_constants::kMiraDamageWeightPerPoint *  // F1
+                 static_cast<double>(damage_in_window);
+
+        const bool supported_recently = std::any_of(
+            it->second.support_rounds.begin(), it->second.support_rounds.end(),
+            [cutoff](int r) { return r >= cutoff; });
+        if (supported_recently) weight += combat_constants::kMiraSupportWeight;  // F3
+    }
+
+    const double hp_frac = candidate.max_hp() > 0
+                               ? static_cast<double>(candidate.hp()) /
+                                     static_cast<double>(candidate.max_hp())
+                               : 0.0;
+    weight += combat_constants::kMiraLowHpWeightScale * (1.0 - hp_frac);  // F2
+
+    // SEM F4 (Opcao F, decisao do lider 2026-08-03/2026-08-08): de proposito NAO consulta
+    // StatusId::Shield/Defend aqui - a mira ignora quem esta defendendo no sorteio.
+
+    return std::max(0.0, weight);
+}
+
+CombatActor* CombatStateMachine::pick_weighted_enemy_target(
+    const std::vector<CombatActor*>& candidates) {
+    if (candidates.empty())
+        throw std::invalid_argument("pick_weighted_enemy_target: candidates vazio.");
+
+    std::vector<double> weights;
+    weights.reserve(candidates.size());
+    double total = 0.0;
+    for (const CombatActor* c : candidates) {
+        const double w = mira_target_weight(*c);
+        weights.push_back(w);
+        total += w;
+    }
+
+    // Fallback uniforme (V7/protocolo secao 5): soma<=0 acontece tipicamente no round de
+    // abertura (ninguem feriu/curou ainda, F1=F2=F3=0 pra todos) - mesmo padrao de
+    // mira_sim_harness.hpp::pick_weighted.
+    if (total <= 0.0) {
+        const int i = rng_->next(static_cast<int>(candidates.size()));
+        return candidates[static_cast<std::size_t>(i)];
+    }
+
+    const double roll = rng_->next_double() * total;
+    double cumulative = 0.0;
+    for (std::size_t i = 0; i < candidates.size(); ++i) {
+        cumulative += weights[i];
+        if (roll < cumulative) return candidates[i];
+    }
+    return candidates.back();  // fallback numerico (arredondamento de ponto flutuante)
 }
 
 void CombatStateMachine::apply_offensive_status(CombatActor& actor, CombatActor& target,

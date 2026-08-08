@@ -568,67 +568,90 @@ TEST_CASE("mira_sim: pareamento por seed - MESMA seed sob 6 bracos, cada braco e
 
 // TESTE OBRIGATORIO (achado do QA 2026-08-01: shield_wasted_total e hits_while_defending
 // sem NENHUM teste - o QA matou os dois, shield_wasted_total sempre 0 e
-// hits_while_defending nunca incrementando, e a suite ficou verde). Numeros calculados A
-// MAO a partir do motor real (mesmo padrao do teste de E6): L3 turtle total, arm A
-// (status quo, sempre mira players.front()), seed 99 - a MESMA luta do teste L3 abaixo.
+// hits_while_defending nunca incrementando, e a suite ficou verde). Numeros ATUALIZADOS
+// 2026-08-08 (MIRA-PONDERADA-PROD, sincronizacao do Atk do Sentinela-Bit pro canon
+// 10->12, ver sentinela_spec acima) - RECALCULADOS a mao a partir do motor real, NAO
+// ajustados por analogia com os antigos.
 //
-// Derivacao: com arm A, o alvo e sempre players.front() - deterministico, o mesmo membro
-// a luta inteira (front() nao muda quando ninguem morre). O QA/o proprio harness ja
-// provou (teste L3 abaixo) que shield_raw_total==shield_absorbed_total==180 nesta luta
-// (H1: Shield absorve 100%). Os 3 inimigos (Sentinela atk=10) sao gateados a 1 acao/turno
-// cada (economia de AP); os 3 atacam o MESMO alvo (front()) todo round, 30 rounds ->
-// 90 ataques total. raw por ataque = max(1, 10-Def_do_alvo); shield_raw_total=180 implica
-// 90 ataques de raw=2 cada (10-8=2, Def=8), ou seja o alvo E a Caua (Def 8) - Gus (Def 5,
-// raw=5) e Jaci (Def 10, raw=1) teriam totais diferentes se fossem o alvo. Logo:
-//   - Caua (idx 1): defend_count=30 (defende toda rodada, turtle), hits_while_defending=90
-//     (3 inimigos x 30 rounds, TODOS os hits enquanto o Shield dela esta ativo).
-//   - Gus (idx 0) e Jaci (idx 2): defend_count=30, hits_while_defending=0 (nunca targetados
-//     por A_StatusQuo, que so mira o front()) - as 30 rodadas de Shield delas nunca
-//     absorvem nada, 100% desperdicadas.
-// shield_wasted_total = wasted(Gus)*Def(Gus) + wasted(Caua)*Def(Caua) + wasted(Jaci)*Def(Jaci)
-//                     = 30*5 + 0*8 + 30*10 = 150 + 0 + 300 = 450.
+// ACHADO, nao decisao de design (medido, nao presumido): com Atk=12, "H1 do lider" (Shield
+// absorve 100% contra QUALQUER Def da party) deixa de valer sob ESTA fatia especifica -
+// 3 sentinelas atuam no MESMO round contra o MESMO alvo (front()), e o pool do Shield
+// (magnitude=Def, aplicado 1x/rodada por resolve_defend) e COMPARTILHADO entre os 3 hits
+// daquele round, nao renovado por hit. Contra Caua (Def=8): raw/hit = max(1,12-8) = 4;
+// 3 hits = 12 de dano bruto contra um pool de 8 -> os 2 primeiros hits absorvem
+// (4+4=8, pool esgotado), o 3o vaza inteiro (4). Isso NAO e mais "vazamento uniforme de
+// 2 HP/golpe" (a descricao que motivou esta sincronizacao, pensada pro caso de 1 UNICO
+// atacante contra o Gus) - e um vazamento MAIOR e CONCENTRADO no ultimo hit do round,
+// PIOR quanto mais atacantes miram o mesmo alvo no mesmo round. Resultado medido (seed 99):
+// Caua cai primeiro (front() ate entao), o alvo passa pro proximo maior SPD vivo (Gus,
+// Def=5: raw/hit=7, pool=5, vaza AINDA mais rapido), e a party inteira e derrotada na
+// rodada 16 - NAO bate mais no cap de 30. O turtle-total deixa de ser um empate eterno sob
+// a mira ATUAL (arm A/status_quo, o que scripted_brain.cpp/battle_scene.cpp AINDA fazem em
+// producao hoje) assim que o Atk sobe pra 12; e um achado relevante pro roadmap de
+// balanceamento (nao resolvido aqui, fora do escopo de MIRA-PONDERADA-PROD - reportado).
 TEST_CASE("mira_sim: L3 - hits_while_defending/shield_wasted_total batem com o calculo a "
-          "mao (motor real, arm A, seed 99)",
+          "mao (motor real, arm A, seed 99, Atk=12 sincronizado 2026-08-08)",
           "[domain][mira_sim]") {
     const BattleTrace t = run_single_mira_battle(Lote::L3_TurtleTotal, MiraArm::A_StatusQuo, 99);
-    REQUIRE(t.rounds == 30);
+    REQUIRE(t.rounds == 16);
+    REQUIRE_FALSE(t.capped);
+    REQUIRE(t.outcome == CombatOutcome::Defeat);
 
-    REQUIRE(t.defend_count[idx(PartyMember::Gus)] == 30);
-    REQUIRE(t.defend_count[idx(PartyMember::Caua)] == 30);
-    REQUIRE(t.defend_count[idx(PartyMember::Jaci)] == 30);
+    REQUIRE(t.fell[idx(PartyMember::Gus)]);
+    REQUIRE(t.fell[idx(PartyMember::Caua)]);
+    REQUIRE_FALSE(t.fell[idx(PartyMember::Jaci)]);
+    REQUIRE(t.first_fall_round == 13);
 
-    REQUIRE(t.hits_while_defending[idx(PartyMember::Gus)] == 0);
-    REQUIRE(t.hits_while_defending[idx(PartyMember::Caua)] == 90);  // 3 inimigos x 30 rounds
-    REQUIRE(t.hits_while_defending[idx(PartyMember::Jaci)] == 0);
+    REQUIRE(t.defend_count[idx(PartyMember::Gus)] == 17);
+    REQUIRE(t.defend_count[idx(PartyMember::Caua)] == 14);
+    REQUIRE(t.defend_count[idx(PartyMember::Jaci)] == 17);
 
-    REQUIRE(t.wasted_defend_rounds(PartyMember::Gus) == 30);   // nunca atacada: 100% desperdicado
-    REQUIRE(t.wasted_defend_rounds(PartyMember::Caua) == 0);   // sempre atacada: 0% desperdicado
-    REQUIRE(t.wasted_defend_rounds(PartyMember::Jaci) == 30);
+    // Caua (front() ate cair): hits_while_defending EXCEDE defend_count (28 > 14) porque
+    // os 3 sentinelas podem hita-la varias vezes DENTRO da mesma rodada em que ela
+    // defendeu 1x so (Shield Duration=1, mas cobre TODOS os hits daquela rodada, nao so o
+    // 1o) - nao e um bug de contagem, e o pool compartilhado descrito acima.
+    REQUIRE(t.hits_while_defending[idx(PartyMember::Gus)] == 3);   // so depois de Caua cair
+    REQUIRE(t.hits_while_defending[idx(PartyMember::Caua)] == 28);
+    REQUIRE(t.hits_while_defending[idx(PartyMember::Jaci)] == 0);  // nunca foi front()
+
+    // wasted_defend_rounds = max(0, defend_count - hits_while_defending) - Caua fica em 0
+    // (nao no negativo) pelo clamp de BattleTrace::wasted_defend_rounds.
+    REQUIRE(t.wasted_defend_rounds(PartyMember::Gus) == 14);
+    REQUIRE(t.wasted_defend_rounds(PartyMember::Caua) == 0);
+    REQUIRE(t.wasted_defend_rounds(PartyMember::Jaci) == 17);
 
     const LoteArmReport r = aggregate_mira("L3-calculo-mao", "A", {t});
-    REQUIRE(r.shield_wasted_total == 450);  // 30*5 + 0*8 + 30*10
+    REQUIRE(r.shield_wasted_total == 240);  // 14*5 + 0*8 + 17*10
 }
 
-TEST_CASE("mira_sim: L3 turtle total bate no cap de 30 rodadas (empate tecnico, V12) - "
-          "estatlines canonicas absorvem 100% do dano bruto (H1 do lider)",
+TEST_CASE("mira_sim: L3 turtle total NAO bate mais no cap de 30 rodadas com Atk=12 - a "
+          "party inteira e derrotada na rodada 16 (H1 do lider deixa de valer sob 3 "
+          "atacantes simultaneos, MIRA-PONDERADA-PROD 2026-08-08)",
           "[domain][mira_sim]") {
-    // Determinístico: Sentinela atk=10 vs qualquer Def da party (5/8/10) da raw<=Def,
-      // logo o Shield (magnitude=Def) absorve TUDO sempre - stalemate ate o cap.
+    // ATUALIZADO 2026-08-08 (sincronizacao Atk 10->12, ver sentinela_spec acima e o
+    // comentario do teste-irmao logo acima): com Atk=10, raw<=Def SEMPRE valia (H1), pool
+    // do Shield nunca esgotava dentro de uma rodada de 3 hits (3*2=6 < pool=8). Com Atk=12,
+    // 3 hits de raw=4 somam 12 > pool=8: o pool esgota DENTRO da propria rodada, o ultimo
+    // hit vaza inteiro, e o efeito bola-de-neve (alvo cai -> mira migra pro proximo maior
+    // SPD vivo, cujo pool e AINDA menor) derruba a party inteira antes do cap. H1 NAO e
+    // mais universal - so vale enquanto um UNICO atacante ataca por rodada (ver combat.md/
+    // proposta-protocolo-simulacao-mira.md secao 1.1, escopo original da observacao).
     const BattleTrace t = run_single_mira_battle(Lote::L3_TurtleTotal, MiraArm::A_StatusQuo, 99);
-    REQUIRE(t.capped);
-    REQUIRE(t.rounds >= kRoundCap);
-    // Cap garantido pelo harness via driving passo-a-passo (ver "CAP DE RODADAS" no
-    // cabecalho, correcao 2026-08-01): o combate NAO resolve (Ongoing), NUNCA Defeat -
-    // ninguem e morto artificialmente pra forcar o fim (contaminaria E1/E4/E7/E8).
-    REQUIRE(t.outcome == CombatOutcome::Ongoing);
-    // Turtle total: ninguem cai de verdade (o Shield absorve 100% do dano bruto, H1).
-    REQUIRE_FALSE(t.any_fell());
-    REQUIRE(t.final_hp_fraction[0] > 0.0);
-    REQUIRE(t.final_hp_fraction[1] > 0.0);
-    REQUIRE(t.final_hp_fraction[2] > 0.0);
-    // H1 (parede renovavel): dano bruto tentado > 0, mas absorvido quase/totalmente.
-    REQUIRE(t.shield_raw_total > 0);
-    REQUIRE(t.shield_absorbed_total == t.shield_raw_total);
+    REQUIRE_FALSE(t.capped);
+    REQUIRE(t.rounds == 16);
+    REQUIRE(t.rounds < kRoundCap);
+    REQUIRE(t.outcome == CombatOutcome::Defeat);
+    // Turtle total AGORA falha: a party inteira cai (Gus + Caua), nao "ninguem cai".
+    REQUIRE(t.any_fell());
+    REQUIRE(t.final_hp_fraction[idx(PartyMember::Gus)] == 0.0);
+    REQUIRE(t.final_hp_fraction[idx(PartyMember::Caua)] == 0.0);
+    REQUIRE(t.final_hp_fraction[idx(PartyMember::Jaci)] == 1.0);  // Jaci nunca foi alvo
+    // O Shield ainda absorve MUITO (nao e "zero defesa"), so nao mais 100%: dano bruto
+    // tentado 133, absorvido 127 - 6 pontos vazam ao longo da luta (o pool esgotando no
+    // 3o hit de cada rodada em que o alvo corrente e atacado pelos 3 sentinelas).
+    REQUIRE(t.shield_raw_total == 133);
+    REQUIRE(t.shield_absorbed_total == 127);
+    REQUIRE(t.shield_absorbed_total < t.shield_raw_total);  // H1 (100%) NAO vale mais aqui
 }
 
 // Regressao OBRIGATORIA do achado CRITICO do QA (2026-08-01): a Fuga forcada do cap
@@ -1039,3 +1062,4 @@ TEST_CASE("mira_sim: run_full_study imprime o relatorio de 2 camadas e grava em 
     TeeOstream tee(std::cout, file);
     run_full_study(n_per_arm, base_seed, tee);
 }
+

@@ -332,20 +332,24 @@ struct ActorSpec {
 
 // Sentinela-Bit (Trash, combat.md secao 17). SPD = V9 //SIM (protocolo secao 5).
 //
-// NAO SINCRONIZADO com o canon 2026-08-07 (BAL-STATLINES-APLICAR, HP33/Atk12) DE
-// PROPOSITO - tentativa revertida, achado reportado no relatorio da tarefa (nao decidido
-// aqui): Atk=12 quebra 2 testes pre-existentes (mira_sim_harness_test.cpp, "L3 turtle
-// total" e o calculo-a-mao irmao) que travam um invariante NOMEADO PELO LIDER ("H1 do
-// lider"): com Atk<=10, o Shield do Defend (magnitude=Def, combat_state_machine.cpp
-// resolve_defend) absorve 100% do dano basico subtrativo (raw=max(1,Atk-Def)) contra
-// QUALQUER Def da party, porque Atk<=2xDef vale ate para o Gus (Def=5, o mais fragil:
-// 10<=2x5 e um empate exato). Atk=12 quebra so pro Gus (12>2x5=10), vaza 2 HP/golpe nao-
-// absorvido, e como este harness trata "Gus caiu = fim" (Rei caiu, ver cabecalho do
-// arquivo), o turtle-total deixa de bater no cap de 30 rodadas. NAO mexer neste valor
-// sem decisao do lider (mira do trash e escopo congelado aqui, ver TODO.md
-// MIRA-PONDERADA-PROD).
+// SINCRONIZADO com o canon 2026-08-08 (MIRA-PONDERADA-PROD): Atk 10->12, batendo com
+// BAL-STATLINES-APLICAR (2026-08-07). HP continua em 55 (//SIM) DE PROPOSITO - o
+// resync de HP e escopo do estudo de pacing (PACING-FASE-B), fora desta fatia (que so
+// mexe na mira). O sync de Atk foi feito de olhos abertos pro achado que ele revela:
+//
+// ACHADO (medido, nao decidido aqui - reportado ao lider/economy-designer): "H1 do lider"
+// (Shield absorve 100% do dano basico contra QUALQUER Def da party, porque Atk<=2xDef)
+// so vale enquanto UM UNICO atacante ataca por rodada. Com Atk=10 isso era universal (ate
+// o Gus, Def=5, empatava exato: 10<=2x5). Com Atk=12 (12>2x5=10) o Gus vaza SOZINHO contra
+// 1 atacante; mas o cenario L3 (turtle total) tem 3 Sentinelas atacando o MESMO alvo
+// (front()) na MESMA rodada, compartilhando o pool do Shield daquele alvo (nao renovado
+// por hit) - 3 hits de raw=4 contra o pool=8 da Caua (Def 8) ja esgotam o pool no 2o hit,
+// vazando o 3o inteiro. Isso derruba a party inteira em cascata (mira_sim_harness_test.cpp,
+// "L3 turtle total... NAO bate mais no cap") em vez do empate eterno que valia com Atk=10 -
+// achado relevante pro roadmap de balanceamento, fora do escopo desta fatia (que so
+// implementa a Opcao F da mira, nao mexe em statlines/pacing).
 [[nodiscard]] inline ActorSpec sentinela_spec(std::string id) {
-    return ActorSpec{std::move(id), 55, 10, 8, kSentinelaSpd, CardFamily::Cinetico, false};
+    return ActorSpec{std::move(id), 55, 12, 8, kSentinelaSpd, CardFamily::Cinetico, false};
 }
 // Daemon-Guard (Elite, combat.md secao 17). Atk/SPD = V8/V9 //SIM (protocolo secao 5).
 [[nodiscard]] inline ActorSpec daemon_spec() {

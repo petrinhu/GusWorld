@@ -77,6 +77,35 @@ inline constexpr float kEnvMultHostilLeve = 0.85f;
 // Hostil forte x0.66 (secao 18, espelha o piso da roda de fraqueza).
 inline constexpr float kEnvMultHostilForte = 0.66f;
 
+// ---- Mira ponderada do trash inimigo, Opcao F (MIRA-PONDERADA-PROD, W2) ----
+//
+// Decisao do lider 2026-08-03 (confirmada 2026-08-08): peso = F1 + F2 + F3, SEM F4 (o
+// sorteio ignora deliberadamente quem esta defendendo). Fonte: docs/design/mecanicas/
+// analise-mira-resultados.md "Opcao F" e proposta-protocolo-simulacao-mira.md secao 5
+// (V1-V4). Valores IDENTICOS aos usados no estudo MIRA-SIM que validou a Opcao F (vitoria
+// 82,6%, Gus cai 17,4%, turtle perde 97%, repeticao de alvo 32% - ver mira_sim_harness.hpp,
+// que reimplementa o MESMO formato so pra fins de estudo/TEST-ONLY).
+
+// V1: peso base por candidato vivo. Escala arbitraria (so as proporcoes entre pesos
+// importam no sorteio); junto com o fallback uniforme (soma<=0), evita degenerescencia no
+// round de abertura (ninguem feriu/curou ainda, F1=F2=F3=0 pra todos).
+inline constexpr double kMiraBaseWeight = 100.0;
+
+// F1 (dano causado atrai): +peso por ponto de dano que o candidato causou na janela de
+// kMiraAttractionWindowRounds rodadas (memoria curta, "ele revida quem bateu").
+inline constexpr double kMiraDamageWeightPerPoint = 1.0;
+
+// F2 (ferido atrai): peso += kMiraLowHpWeightScale * (1 - hp/hpmax). Sem janela (le o HP
+// corrente do candidato no momento do sorteio).
+inline constexpr double kMiraLowHpWeightScale = 100.0;
+
+// F3 (suporte atrai): +peso FIXO se o candidato curou ou deu buff em um aliado na janela
+// de kMiraAttractionWindowRounds rodadas ("caca o curandeiro", sem obsessao).
+inline constexpr double kMiraSupportWeight = 60.0;
+
+// Janela de memoria curta de F1/F3: rodada corrente + a anterior (inclui `round`).
+inline constexpr int kMiraAttractionWindowRounds = 2;
+
 }  // namespace gus::domain::combat::combat_constants
 
 #endif  // GUS_DOMAIN_COMBAT_COMBAT_CONSTANTS_HPP

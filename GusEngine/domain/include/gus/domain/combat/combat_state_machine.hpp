@@ -43,11 +43,13 @@
 #define GUS_DOMAIN_COMBAT_COMBAT_STATE_MACHINE_HPP
 
 #include <cstdint>
+#include <deque>
 #include <functional>
 #include <optional>
 #include <string>
 #include <unordered_map>
 #include <unordered_set>
+#include <utility>
 #include <vector>
 
 #include "gus/domain/combat/adware_sterling.hpp"
@@ -328,6 +330,34 @@ public:
                                                           const Card& card,
                                                           float mult_combo = 1.0f) const noexcept;
 
+    // ---- Mira ponderada do trash inimigo (MIRA-PONDERADA-PROD, W2, Opcao F: decisao do
+    // lider 2026-08-03/2026-08-08, peso = F1+F2+F3, SEM F4 - o sorteio ignora quem esta
+    // defendendo. Fonte: docs/design/mecanicas/analise-mira-resultados.md "Opcao F" e
+    // proposta-protocolo-simulacao-mira.md secao 5) ----
+
+    // Peso de mira de `candidate` nesta rodada (F1 dano causado + F2 ferido + F3 suporte
+    // dado, combat_constants.hpp kMira*). Query PURA (nao muta nada, nao consome RNG).
+    // SEM F4 de proposito: NAO consulta StatusId::Shield/Defend - a Opcao F ignora
+    // deliberadamente quem esta defendendo no sorteio.
+    [[nodiscard]] double mira_target_weight(const CombatActor& candidate) const;
+
+    // Sorteio ponderado (Opcao F) entre `candidates` via rng_ injetado (secao 11, ADR-006).
+    // Fallback uniforme (rng_->next) se a soma dos pesos for <= 0 (ex.: round de abertura,
+    // ninguem feriu/curou ainda) - mesmo padrao de mira_sim_harness.hpp::pick_weighted.
+    // Lanca std::invalid_argument se `candidates` estiver vazio (bug de call site: quem
+    // chama deve filtrar vivos antes, mesmo contrato de resolve_basic_attack pra TargetId).
+    [[nodiscard]] CombatActor* pick_weighted_enemy_target(
+        const std::vector<CombatActor*>& candidates);
+
+    // Registra que `supporter_id` curou ou aplicou um buff em ALGUM aliado NESTA rodada
+    // (F3, janela de kMiraAttractionWindowRounds). PUBLICO e ainda NAO chamado por nenhum
+    // caminho de producao (achado da fatia MIRA-PONDERADA-PROD: hoje NAO EXISTE resolucao
+    // de cura/buff-em-aliado ligada em resolve_use_card - healer_card.hpp/
+    // CURANDEIRA-LIMITE-USOS documenta o mesmo gap, "wiring real... escopo FUTURO"); pronto
+    // pra a carta de cura/buff que vier a ligar isto quando o wiring acontecer, e usado
+    // pelos testes desta fatia pra exercitar F3 isoladamente.
+    void record_mira_support(const std::string& supporter_id);
+
     // ---- Conducao da FSM ----
 
     // TurnStart do ator corrente (secao 3/5): recarrega mana/AP, aplica tick de status.
@@ -584,6 +614,24 @@ private:
                                                             const Card& card);
 
     [[nodiscard]] static bool dispel_buffs(CombatActor& actor);
+
+    // ---- Mira ponderada do trash inimigo (MIRA-PONDERADA-PROD, Opcao F) ----
+
+    // F1 (dano causado, choke point unico): registra que `actor_id` causou `amount` de
+    // dano em `round`. Chamado de apply_damage_with_hooks (DEPOIS do guard damage<=0,
+    // mesmo ponto que alimenta round_hits_/OnDamageDealt) - cobre ataque basico E dano de
+    // carta, os DOIS caminhos que passam por ali, sem formula paralela.
+    void record_mira_damage(const std::string& actor_id, int round, int amount);
+
+    // Janela de "atracao" de mira de UM candidato (F1: dano causado; F3: suporte dado),
+    // rastreada por id de ator - generica, nao presa a um tamanho fixo de party (diferente
+    // do estudo MIRA-SIM, mira_sim_harness.hpp, que fixa 3 PartyMember). Prune lazy: cada
+    // record_* remove entradas fora da janela ANTES de inserir a nova.
+    struct MiraAttraction {
+        std::deque<std::pair<int, int>> damage_window;  // (rodada, dano causado)
+        std::deque<int> support_rounds;                  // rodadas em que deu suporte
+    };
+    std::unordered_map<std::string, MiraAttraction> mira_attraction_;
 
     // ---- Janela de Comando da Party (§4.1) ----
     // true se `actor` e um membro elegivel da party nesta rodada (esta em

@@ -60,6 +60,10 @@ add_executable(gusengine_domain_tests
     scripted_brain_test.cpp
     placeholder_cards_test.cpp
     combat_state_machine_test.cpp
+    # MIRA-PONDERADA-PROD (W2): mira ponderada do trash em producao (Opcao F, F1+F2+F3,
+    # SEM F4) - novos metodos publicos de CombatStateMachine (mira_target_weight/
+    # pick_weighted_enemy_target/record_mira_support).
+    mira_weighted_targeting_test.cpp
     combat_formula_test.cpp
     combat_inc2_test.cpp
     combat_inc3_test.cpp
