@@ -30,14 +30,20 @@ As cartas especiais são **únicas** (uma no jogo). Mas existe **imitação pira
 
 ## 3. Física da carta (o que prova original × pirata × homebrew)
 
-> **PRINCÍPIO CANÔNICO (líder, 2026-08-08): todo mecanismo de uso de carta depende
-> da originalidade da carta (§3, esta seção) E da degradação da bateria (§5, "Energia:
-> baterias CR2032") — as duas variáveis JUNTAS, não uma ou outra.** Nasceu da carta de
-> cura da curandeira (`CURANDEIRA-LIMITE-USOS`), mas é regra GERAL: qualquer efeito
-> futuro de carta que consome energia (dano, buff, cura, o que vier) precisa responder
-> às duas perguntas antes de existir — "o que muda se a carta for original × pirata ×
-> homebrew?" e "o que muda se a bateria estiver nova × degradada?". Não é opcional
-> nem específico da curandeira; é o mesmo espírito da lei do átomo (ADR-019/020)
+> **PRINCÍPIO CANÔNICO (líder, 2026-08-08, AMPLIADO no mesmo dia): TODAS as cartas
+> devem passar pelo mecanismo de originalidade da carta (§3, esta seção) E degradação
+> da bateria (§5, "Energia: baterias CR2032") — as duas variáveis JUNTAS, não uma ou
+> outra. Isso é o DEFAULT; exceções existem, mas cada uma se discute e se aprova caso
+> a caso com o líder, nunca por omissão.** Redação original (mesmo dia, mais estreita):
+> "qualquer efeito que CONSOME energia" — o líder ampliou para "todas as cartas" horas
+> depois, ao ver a implementação da curandeira fechar. Ao planejar uma carta nova,
+> o ponto de partida é "ela passa pelo mecanismo"; só vira exceção se alguém levantar
+> o caso e o líder concordar (ex.: uma passiva mana-0 sem custo de bateria pode ser
+> candidata a exceção, mas isso ainda não foi decidido — não presumir). Nasceu da
+> carta de cura da curandeira (`CURANDEIRA-LIMITE-USOS`), primeiro caso implementado:
+> ao planejar CADA carta nova, responder às duas perguntas antes de existir — "o que
+> muda se a carta for original × pirata × homebrew?" e "o que muda se a bateria
+> estiver nova × degradada?". É o mesmo espírito da lei do átomo (ADR-019/020)
 > aplicado à energia da carta: a variação vem de DADO cruzando as duas dimensões,
 > nunca de comportamento hardcoded para um efeito só. Exemplo já especificado (cura):
 > original cura magnitude fixa e drena fração fixa da carga; pirata cura em faixa RNG
