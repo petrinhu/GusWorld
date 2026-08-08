@@ -122,6 +122,14 @@ struct WorldActor {
     gus::core::spatial::Aabb route_origin_anchor{};
     gus::domain::world::PatrolWaypoint route_origin_point{};
 
+    // Há quanto tempo (s) a ronda dele está sendo BARRADA por um corpo sólido
+    // (CLIPPING-ATOR-RONDA-SEM-COLISAO, decisão do líder 2026-08-07). Zera assim
+    // que ele consegue andar o passo inteiro. Ao passar de
+    // OverworldTuning::actor_blocked_turnaround_seconds, o ator dá meia-volta na
+    // ronda em vez de esperar para sempre - que é o que aconteceria com uma peça
+    // atravessada na rota ou com dois atores vindo de frente um para o outro.
+    float blocked_seconds = 0.0f;
+
     // false = removido (derrotado, ou nunca ocupado). O slot PERMANECE na lista:
     // handle de ator é índice, e índice não pode escorregar quando um vizinho sai.
     bool active = false;

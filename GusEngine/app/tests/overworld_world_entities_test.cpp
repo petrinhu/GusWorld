@@ -21,6 +21,7 @@
 
 #include <vector>
 
+#include "gus/app/screens/city_patrol.hpp"  // build_horizontal_patrol_route
 #include "gus/app/screens/overworld_sim.hpp"
 #include "gus/app/screens/overworld_tuning.hpp"
 #include "gus/app/screens/world_entities.hpp"
@@ -874,4 +875,347 @@ TEST_CASE("mundo: ator removido no meio da ronda para de andar", "[overworld][pa
         sim.step_fixed(0, 0, false, 1.0f / 60.0f);
     }
     REQUIRE_FALSE(sim.actor_anchor(h).has_value());
+}
+
+// ===========================================================================
+//  CLIPPING-ATOR-RONDA-SEM-COLISAO - regressão do playtest ao vivo do líder
+//  (Gus Dragon, 2026-08-07).
+//
+//  O QUE ELE VIU: parado, encostado num prop sólido, um NPC em ronda andou POR
+//  CIMA dele; o menino ficou "preso" na interseção NPC+prop e só saiu apertando
+//  Sul. Segundo achado do mesmo playtest: o androide "entra e sai" de objetos
+//  livremente, com ou sem o jogador no caminho.
+//
+//  A CAUSA: até esta fatia, advance_actor_patrols posicionava o ator DIRETO pela
+//  rota (advance_patrol) e atualizava a.solid, sem NUNCA passar por
+//  resolve_move/resolve_move_with_corner_assist. A resolução contra o
+//  ObstacleSpan (props E atores) só rodava do lado do JOGADOR, e só quando ELE se
+//  movia - então um jogador PARADO nunca resolvia sobreposição nenhuma, e a
+//  interseção ficava de pé até ele apertar uma direção livre.
+//
+//  O INVARIANTE que estas specs travam, e que vale sob QUALQUER política de
+//  atraso/recuperação da rota: o corpo sólido de um ator em ronda NUNCA sobrepõe
+//  o corpo do jogador nem uma peça sólida, em NENHUM quadro da simulação. É
+//  medido a cada passo (não só no fim), porque a travessia é transitória: uma
+//  aferição só no estado final passaria com o ator já do outro lado.
+// ===========================================================================
+
+namespace {
+
+// true se os dois retângulos de mundo se sobrepõem (meio-aberto, a MESMA
+// convenção de overlaps_aabb do resolve_move).
+bool aabb_overlaps(const Aabb& a, const Aabb& b) noexcept {
+    return a.x < b.x + b.w && a.x + a.w > b.x && a.y < b.y + b.h && a.y + a.h > b.y;
+}
+
+}  // namespace
+
+TEST_CASE("mundo: ator em ronda NÃO atravessa o jogador parado encostado num prop",
+          "[overworld][patrol][solid-collision][regressao-lider]") {
+    // A CENA EXATA do playtest. Jogador parado com a borda direita COLADA na peça
+    // (96 == 96, encosta sem entrar) e um ator em ronda vindo do oeste pela mesma
+    // faixa de Y. O jogador não tecla NADA o tempo todo - é justamente essa a
+    // condição em que o defeito aparece.
+    OverworldTuning t;
+    t.corner.enabled = false;  // resultado 100% analítico
+    const Aabb jogador{88.0f, 100.0f, 8.0f, 8.0f};  // caixa [88,96) x [100,108)
+    OverworldSim sim(open_grid(), jogador, t);
+
+    // Caixa/engradado: base sólida em x:[96,144), y:[96,112).
+    sim.add_scene_prop(make_prop(96.0f, 64.0f, 48.0f, 48.0f, /*tex=*/70, true));
+    const Aabb prop_solid = sim.scene_props()[0].solid;
+
+    // Ator em ronda: âncora em (20,100) -> corpo sólido [16,32) x [92,108), que
+    // SOBREPÕE a faixa Y do jogador. A rota leva ele 6 tiles para leste (96
+    // unidades), passando por cima do jogador e entrando na peça.
+    WorldActorSpec spec = make_actor(WorldActorRole::Enemy, 20.0f, 100.0f, 30);
+    spec.route = line_route(/*cx=*/1.0f, /*cy=*/6.0f, /*len=*/6.0f, /*speed=*/2.0f);
+    const int h = sim.add_actor(spec);
+
+    // Premissas da cena (se alguma quebrar, o teste vira tautologia silenciosa).
+    REQUIRE_THAT(jogador.x + jogador.w, WithinAbs(prop_solid.x, kEps));  // encostado
+    REQUIRE(aabb_overlaps(Aabb{prop_solid.x - 1.0f, 92.0f, 2.0f, 16.0f}, prop_solid));
+
+    // 5 s de simulação: 3 s de ida (6 tiles a 2 tiles/s) + 2 s de volta.
+    for (int i = 0; i < 300; ++i) {
+        sim.step_fixed(0, 0, false, 1.0f / 60.0f);  // jogador PARADO
+        const Aabb corpo = sim.actors()[static_cast<std::size_t>(h)].solid;
+        // (1) nunca ocupa a mesma posição do jogador...
+        REQUIRE_FALSE(aabb_overlaps(corpo, sim.player()));
+        // (2) ...nem entra na peça sólida.
+        REQUIRE_FALSE(aabb_overlaps(corpo, prop_solid));
+    }
+
+    // E o jogador continua exatamente onde estava: ninguém o empurrou para dentro
+    // da peça (o oposto do defeito, que era ele acabar DENTRO da interseção).
+    REQUIRE_THAT(sim.player().x, WithinAbs(jogador.x, kEps));
+    REQUIRE_THAT(sim.player().y, WithinAbs(jogador.y, kEps));
+}
+
+TEST_CASE("mundo: ator em ronda NÃO entra e sai de peça sólida",
+          "[overworld][patrol][solid-collision][regressao-lider]") {
+    // O segundo achado do mesmo playtest, isolado do jogador: o androide
+    // atravessava objeto do cenário mesmo sem ninguém no caminho. A rota nasce
+    // conferida contra as PAREDES do mapa (city_patrol.hpp), nunca contra as
+    // peças - então este caso não é canto raro, é o dia a dia da cidade vestida.
+    OverworldTuning t;
+    t.corner.enabled = false;
+    OverworldSim sim(open_grid(), Aabb{20.0f, 20.0f, 8.0f, 8.0f}, t);  // longe
+
+    sim.add_scene_prop(make_prop(200.0f, 64.0f, 48.0f, 48.0f, /*tex=*/70, true));
+    const Aabb prop_solid = sim.scene_props()[0].solid;  // [200,248) x [96,112)
+
+    WorldActorSpec spec = make_actor(WorldActorRole::Enemy, 100.0f, 100.0f, 30);
+    spec.route = line_route(/*cx=*/6.0f, /*cy=*/6.0f, /*len=*/8.0f, /*speed=*/2.0f);
+    const int h = sim.add_actor(spec);
+
+    for (int i = 0; i < 480; ++i) {  // 4 s de ida + 4 s de volta
+        sim.step_fixed(0, 0, false, 1.0f / 60.0f);
+        REQUIRE_FALSE(
+            aabb_overlaps(sim.actors()[static_cast<std::size_t>(h)].solid, prop_solid));
+    }
+}
+
+TEST_CASE("mundo: ator em ronda NÃO atravessa parede da grade",
+          "[overworld][patrol][solid-collision][regressao-lider]") {
+    // Rede de segurança do mesmo mecanismo. Hoje a rota do demo é construída
+    // encurtando nas paredes (build_horizontal_patrol_route), então a grade não
+    // costuma ser exercitada - mas rota é DADO escrito à mão, e dado escrito à
+    // mão erra. Uma rota que atravessa prédio tem de virar "ele para na parede",
+    // nunca "ele anda dentro do prédio".
+    OverworldTuning t;
+    t.corner.enabled = false;
+    TileGrid grid = open_grid();
+    grid.set_blocked(10, 6, true);  // parede na célula (10,6) = x:[160,176) y:[96,112)
+    OverworldSim sim(grid, Aabb{20.0f, 20.0f, 8.0f, 8.0f}, t);
+
+    WorldActorSpec spec = make_actor(WorldActorRole::Enemy, 100.0f, 100.0f, 30);
+    spec.route = line_route(/*cx=*/6.0f, /*cy=*/6.0f, /*len=*/6.0f, /*speed=*/2.0f);
+    const int h = sim.add_actor(spec);
+
+    for (int i = 0; i < 360; ++i) {
+        sim.step_fixed(0, 0, false, 1.0f / 60.0f);
+        const Aabb corpo = sim.actors()[static_cast<std::size_t>(h)].solid;
+        REQUIRE_FALSE(aabb_overlaps(corpo, Aabb{160.0f, 96.0f, 16.0f, 16.0f}));
+    }
+}
+
+// ---------------------------------------------------------------------------
+//  D4 - a ronda andava FORA do trecho que foi conferido contra as paredes.
+//
+//  Defeito medido em 2026-08-07 contra o .gmap real, e SEPARADO do clipping
+//  acima: build_horizontal_patrol_route escreve waypoints[0] = celula - alcance,
+//  e rearm_patrol ancorava o deslocamento da rota nesse waypoint[0] estando o
+//  ator na celula do MEIO. Resultado: o trecho conferido era [c-alcance,
+//  c+alcance] e o percorrido era [c, c+2*alcance], deslocado de um alcance
+//  inteiro. No demo isso pos a Vanda em [30..38] (conferido [26..34]) e o
+//  androide da FIR em [74..86] (conferido [68..80]) - e a celula (86,50) do
+//  percurso real dele E PAREDE, ou seja, ele terminava a ida dentro de um
+//  predio. E a explicacao medida do "o androide entra e sai de objetos
+//  livremente" do playtest.
+// ---------------------------------------------------------------------------
+TEST_CASE("mundo: a ronda anda no trecho que foi CONFERIDO contra as paredes",
+          "[overworld][patrol][regressao-lider]") {
+    OverworldTuning t;
+    t.corner.enabled = false;
+    TileGrid grid = open_grid();
+    grid.set_blocked(14, 3, true);  // corta o alcance do lado leste
+
+    // Ator no CENTRO da celula (10,3): a mesma convencao de
+    // pick_actor_position_at_cell (caixa centrada na celula).
+    OverworldSim sim(grid, Aabb{20.0f, 250.0f, 8.0f, 8.0f}, t);  // jogador longe
+    WorldActorSpec spec = make_actor(WorldActorRole::Enemy, 164.0f, 52.0f, 30);
+    spec.route = gus::app::screens::build_horizontal_patrol_route(
+        grid, /*cell_x=*/10, /*cell_y=*/3, /*reach_tiles=*/3, /*speed=*/2.0f,
+        /*pause=*/0.0f);
+    const int h = sim.add_actor(spec);
+
+    // A rota nasceu encurtada na parede: celulas 7 a 13 (a 14 esta bloqueada).
+    REQUIRE(spec.route.valid());
+    REQUIRE_THAT(spec.route.waypoints[0].x, WithinAbs(7.0, kEps));
+    REQUIRE_THAT(spec.route.waypoints[1].x, WithinAbs(13.0, kEps));
+
+    // O trecho CONFERIDO, em unidades de mundo, para uma ancora de 8 de largura
+    // centrada na celula: da celula 7 a celula 13.
+    const float limite_oeste = 164.0f - 3.0f * kTile;          // 116
+    const float limite_leste = 164.0f + 3.0f * kTile + 8.0f;   // 220
+
+    for (int i = 0; i < 600; ++i) {  // 10 s: varias idas e voltas
+        sim.step_fixed(0, 0, false, 1.0f / 60.0f);
+        const auto anc = sim.actor_anchor(h);
+        REQUIRE(anc.has_value());
+        REQUIRE(anc->x >= limite_oeste - 0.05f);
+        REQUIRE(anc->x + anc->w <= limite_leste + 0.05f);
+    }
+}
+
+// ---------------------------------------------------------------------------
+//  D1 (decisao do lider) - "continua de onde parou, sem pressa".
+//
+//  O relogio da rota so avanca enquanto o ator efetivamente anda. Ele nunca
+//  acelera para recuperar o atraso e nunca salta para o ponto onde a rota diria
+//  que ele deveria estar. A rota e um trilho com o ator EM CIMA dele, nao um
+//  alvo que o ator persegue.
+// ---------------------------------------------------------------------------
+TEST_CASE("mundo: ator barrado continua de onde parou e NUNCA acelera",
+          "[overworld][patrol][solid-collision][regressao-lider]") {
+    OverworldTuning t;
+    t.corner.enabled = false;
+    // ISOLA O D1 DO D2: sem isto a meia-volta dispararia no meio da medicao e o
+    // teste passaria a medir DOIS comportamentos de uma vez. A meia-volta tem
+    // spec propria logo abaixo.
+    t.actor_blocked_turnaround_seconds = 1000.0f;
+    // Jogador parado no caminho da ronda, na MESMA faixa Y do corpo do ator.
+    OverworldSim sim(open_grid(), Aabb{160.0f, 100.0f, 8.0f, 8.0f}, t);
+    WorldActorSpec spec = make_actor(WorldActorRole::Enemy, 20.0f, 100.0f, 30);
+    spec.route = line_route(/*cx=*/1.0f, /*cy=*/6.0f, /*len=*/15.0f, /*speed=*/2.0f);
+    const int h = sim.add_actor(spec);
+
+    // Passo maximo LEGITIMO da ronda: velocidade * tile * dt.
+    const float passo_da_ronda = 2.0f * kTile / 60.0f;
+    float maior_passo = 0.0f;
+    float x_antes = sim.actor_anchor(h)->x;
+
+    // Fase 1: ele avanca ate esbarrar no jogador e fica preso 4 s.
+    for (int i = 0; i < 300; ++i) {
+        sim.step_fixed(0, 0, false, 1.0f / 60.0f);
+        const float x = sim.actor_anchor(h)->x;
+        const float d = x - x_antes < 0.0f ? x_antes - x : x - x_antes;
+        if (d > maior_passo) maior_passo = d;
+        x_antes = x;
+    }
+    // Barrado pelo corpo do jogador. Quem encosta e o CORPO SOLIDO do ator (1
+    // tile = 16, centrado na ancora de 8, logo solid.x = ancora.x - 4), nao a
+    // ancora: solid.x + 16 == 160 => ancora.x == 148.
+    const float x_travado = sim.actor_anchor(h)->x;
+    REQUIRE_THAT(x_travado, WithinAbs(148.0, 0.05));
+
+    // Fase 2: o caminho abre (teleporte legitimo do jogador, como um load faria).
+    sim.set_player_position(Aabb{160.0f, 280.0f, 8.0f, 8.0f});
+    for (int i = 0; i < 120; ++i) {
+        sim.step_fixed(0, 0, false, 1.0f / 60.0f);
+        const float x = sim.actor_anchor(h)->x;
+        const float d = x - x_antes < 0.0f ? x_antes - x : x - x_antes;
+        if (d > maior_passo) maior_passo = d;
+        x_antes = x;
+    }
+
+    // A TRAVA DO D1: em NENHUM quadro ele andou mais que o passo da ronda. Com a
+    // politica rejeitada ("corre pra recuperar"), o passo de recuperacao iria ao
+    // teto anti-tunneling (0.95 tile = 15.2), quase 30x isto.
+    REQUIRE(maior_passo <= passo_da_ronda * 1.02f);
+    // E ele nao ficou travado depois que o caminho abriu.
+    REQUIRE(sim.actor_anchor(h)->x > x_travado + 8.0f);
+}
+
+// ---------------------------------------------------------------------------
+//  D2 (decisao do lider) - bloqueio prolongado vira MEIA-VOLTA.
+//
+//  Sem isto, "a rota espera pelo ator" tem um custo escondido: um ator barrado
+//  por algo que nunca sai (uma peca no meio da rota, outro ator vindo de frente)
+//  espera para SEMPRE, e a ronda dele morre em pe. Meia-volta e a saida que se
+//  cura sozinha e ainda le bem em cena ("viu o obstaculo e voltou").
+// ---------------------------------------------------------------------------
+TEST_CASE("mundo: ator bloqueado por muito tempo da meia-volta na ronda",
+          "[overworld][patrol][solid-collision][regressao-lider]") {
+    OverworldTuning t;
+    t.corner.enabled = false;
+    OverworldSim sim(open_grid(), Aabb{20.0f, 250.0f, 8.0f, 8.0f}, t);  // longe
+    // Peca solida atravessada na rota: [96,144) x [96,112).
+    sim.add_scene_prop(make_prop(96.0f, 64.0f, 48.0f, 48.0f, /*tex=*/70, true));
+
+    WorldActorSpec spec = make_actor(WorldActorRole::Enemy, 20.0f, 100.0f, 30);
+    spec.route = line_route(1.0f, 6.0f, 15.0f, 2.0f);
+    const int h = sim.add_actor(spec);
+
+    // 2.25 s: ele sai de 20, anda 64 unidades a 32 u/s e trava aos 2 s. Quem
+    // encosta e o CORPO SOLIDO (16 de largura, solid.x = ancora.x - 4), entao
+    // solid.x + 16 == 96 => ancora.x == 84. Aos 2.25 s ele esta parado ali ha
+    // 0.25 s - ainda DENTRO da janela de 0.5 s da meia-volta.
+    for (int i = 0; i < 135; ++i) {
+        sim.step_fixed(0, 0, false, 1.0f / 60.0f);
+    }
+    const float x_travado = sim.actor_anchor(h)->x;
+    REQUIRE_THAT(x_travado, WithinAbs(84.0, 0.05));
+    REQUIRE(sim.actors()[static_cast<std::size_t>(h)].blocked_seconds > 0.0f);
+
+    // Mais 1 s: a meia-volta dispara aos 2.5 s e ele passa a voltar para oeste.
+    for (int i = 0; i < 60; ++i) {
+        sim.step_fixed(0, 0, false, 1.0f / 60.0f);
+    }
+    REQUIRE(sim.actor_anchor(h)->x < x_travado - kTile);
+    // E a contagem de bloqueio zerou: ele nao esta mais barrado, esta andando.
+    REQUIRE_THAT(sim.actors()[static_cast<std::size_t>(h)].blocked_seconds,
+                 WithinAbs(0.0, kEps));
+}
+
+// ===========================================================================
+//  DEPENETRACAO DO JOGADOR - blindagem contra a classe de exploit de
+//  sobreposicao deliberada (pedido do lider, 2026-08-07).
+//
+//  Contexto: quem achou o clipping estuda glitch hunting, e "corpo empurra o
+//  jogador para dentro da parede, jogador atravessa" e um exploit documentado
+//  em jogos comerciais. A defesa padrao nao e tapar o caso particular: e uma
+//  passada que, a CADA quadro e INDEPENDENTE de input, tira qualquer corpo que
+//  esteja sobreposto a um bloqueador, empurrando pela MENOR distancia de saida.
+//
+//  A trava e "sem apertar tecla nenhuma": o defeito original do playtest era
+//  exatamente uma sobreposicao que so se resolvia quando o jogador se movia.
+// ===========================================================================
+
+TEST_CASE("mundo: jogador sobreposto a uma peca solida e expulso sem apertar tecla",
+          "[overworld][depenetracao][regressao-lider]") {
+    OverworldTuning t;
+    t.corner.enabled = false;
+    OverworldSim sim(open_grid(), Aabb{20.0f, 20.0f, 8.0f, 8.0f}, t);
+    sim.add_scene_prop(make_prop(96.0f, 64.0f, 48.0f, 48.0f, /*tex=*/70, true));
+    const Aabb prop_solid = sim.scene_props()[0].solid;  // [96,144) x [96,112)
+
+    // O estado que um exploit produziria: corpo DENTRO do solido, sem ter
+    // passado por resolve_move nenhum.
+    sim.set_player_position(Aabb{92.0f, 100.0f, 8.0f, 8.0f});  // [92,100) x [100,108)
+    REQUIRE(aabb_overlaps(sim.player(), prop_solid));
+
+    sim.step_fixed(0, 0, false, 1.0f / 60.0f);  // NENHUMA tecla
+
+    REQUIRE_FALSE(aabb_overlaps(sim.player(), prop_solid));
+    // Saiu pela MENOR distancia (4 unidades para oeste), nao por uma direcao
+    // qualquer: pelo norte/sul seriam 12 e pelo leste 52.
+    REQUIRE_THAT(sim.player().x, WithinAbs(88.0, 0.01));
+    REQUIRE_THAT(sim.player().y, WithinAbs(100.0, 0.01));
+}
+
+TEST_CASE("mundo: jogador sobreposto a uma PAREDE da grade e expulso sem apertar tecla",
+          "[overworld][depenetracao][regressao-lider]") {
+    OverworldTuning t;
+    t.corner.enabled = false;
+    TileGrid grid = open_grid();
+    grid.set_blocked(10, 6, true);  // x:[160,176) y:[96,112)
+    OverworldSim sim(grid, Aabb{20.0f, 20.0f, 8.0f, 8.0f}, t);
+
+    sim.set_player_position(Aabb{156.0f, 100.0f, 8.0f, 8.0f});  // entra 4 na parede
+    sim.step_fixed(0, 0, false, 1.0f / 60.0f);
+
+    REQUIRE_FALSE(aabb_overlaps(sim.player(), Aabb{160.0f, 96.0f, 16.0f, 16.0f}));
+    REQUIRE_THAT(sim.player().x, WithinAbs(152.0, 0.01));
+}
+
+TEST_CASE("mundo: jogador ENCOSTADO (sem sobrepor) nao e empurrado por nada",
+          "[overworld][depenetracao]") {
+    // O contrapeso da blindagem, e o que a impede de virar um defeito novo: o
+    // resolve_move deixa o jogador com a borda COINCIDINDO com a do obstaculo o
+    // tempo todo, e sobreposicao e meio-aberta. Se a depenetracao lesse encosto
+    // como sobreposicao, o jogador seria empurrado para longe de toda parede em
+    // que encostasse - visivel em todo quadro do jogo.
+    OverworldTuning t;
+    t.corner.enabled = false;
+    OverworldSim sim(open_grid(), Aabb{20.0f, 20.0f, 8.0f, 8.0f}, t);
+    sim.add_scene_prop(make_prop(96.0f, 64.0f, 48.0f, 48.0f, /*tex=*/70, true));
+
+    sim.set_player_position(Aabb{88.0f, 100.0f, 8.0f, 8.0f});  // borda em 96 == 96
+    for (int i = 0; i < 60; ++i) {
+        sim.step_fixed(0, 0, false, 1.0f / 60.0f);
+    }
+    REQUIRE_THAT(sim.player().x, WithinAbs(88.0, kEps));
+    REQUIRE_THAT(sim.player().y, WithinAbs(100.0, kEps));
 }

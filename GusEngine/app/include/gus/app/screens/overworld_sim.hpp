@@ -411,13 +411,45 @@ private:
     // (Re)arma a ronda de um ator ja resolvido, ancorando a rota na posicao ATUAL
     // dele. Usada por add_actor, set_actor_patrol e pela fachada legada (que rearma
     // ao reposicionar).
+    //
+    // D4 (CLIPPING-ATOR-RONDA-SEM-COLISAO, 2026-08-07): quando o ator ESTA EM CIMA
+    // da rota, a ronda comeca no ponto da rota mais proximo dele, e nao no
+    // waypoint 0. Ver a implementacao para o defeito que isto conserta (o ator
+    // percorria um trecho DESLOCADO em relacao ao que foi conferido contra as
+    // paredes) e para a degradacao preservada quando ele esta LONGE da rota.
     void rearm_patrol(WorldActor& actor,
                       const gus::domain::world::PatrolRoute& route) const noexcept;
 
     // Avanca a ronda de TODOS os atores por um passo fixo (posicao + corpo solido).
     // Roda ANTES de qualquer saida antecipada do step_fixed: a cidade tem que
     // continuar viva com o jogador parado.
+    //
+    // A posicao resultante passa por resolve_move contra a grade, as pecas, o
+    // jogador e os DEMAIS atores - um ator em ronda nao atravessa mais ninguem.
     void advance_actor_patrols(float fixed_dt) noexcept;
+
+    // Meia-volta na ronda SEM sair do lugar: troca as pontas da perna corrente e
+    // reflete o quanto ja foi andado nela. Usada quando o ator fica barrado tempo
+    // demais (ver OverworldTuning::actor_blocked_turnaround_seconds).
+    void reverse_patrol(WorldActor& actor) const noexcept;
+
+    // Enche obstacle_scratch_ com TODO corpo solido do mundo, PULANDO o ator de
+    // indice `skip_actor` (um ator nao e obstaculo de si mesmo). `include_player`
+    // liga o corpo do jogador. Devolve o span pronto para o resolve_move.
+    //
+    // O rascunho e UM SO para o passo inteiro (ronda + jogador): quem chama por
+    // ultimo o reescreve, e ninguem guarda o span entre chamadas.
+    [[nodiscard]] gus::core::spatial::ObstacleSpan rebuild_obstacles(
+        int skip_actor, bool include_player) noexcept;
+
+    // DEPENETRACAO (blindagem anti-exploit, pedido do lider 2026-08-07): se `box`
+    // estiver SOBREPOSTA a alguma parede da grade ou a algum obstaculo, devolve a
+    // caixa empurrada para FORA pela MENOR distancia de saida. Sem sobreposicao,
+    // devolve a caixa intacta (o caso de todo quadro normal - encostar NAO e
+    // sobrepor). Deterministica.
+    [[nodiscard]] gus::core::spatial::Aabb depenetrate(
+        const gus::core::spatial::Aabb& box,
+        gus::core::spatial::ObstacleSpan obstacles) const noexcept;
 
     // Slot reservado da fachada legada: cria na primeira chamada e reusa depois.
     int ensure_reserved_actor(int& handle, WorldActorRole role,

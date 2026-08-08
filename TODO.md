@@ -552,7 +552,7 @@ arquivo — nenhum foi descartado. Duas frentes que a W1 fechou no mesmo dia já
 com ✅ (`COCKPIT-SFX-HOVER-CLIQUE` 12/12, `f31da512`). Scoring WSJF do dreno logo após a tabela
 WSJF principal. Novas descobertas entram como bullets abaixo desta linha.)_
 
-- CLIPPING-ATOR-RONDA-SEM-COLISAO: playtest do Gus Dragon em 2026-08-07 (demo jogado ao vivo pelo
+- **🔍 Pendente verificação** — CLIPPING-ATOR-RONDA-SEM-COLISAO: playtest do Gus Dragon em 2026-08-07 (demo jogado ao vivo pelo
   líder). Dois achados de colisão jogador↔ator: (1) parado encostado num prop sólido, um NPC em
   ronda andou por cima dele e ele ficou "preso" na interseção NPC+prop, só saindo ao apertar
   Sul/Baixo; (2) o mesmo com um androide inimigo a leste, mas sem prop atrás — clipou e saiu livre
@@ -568,6 +568,24 @@ WSJF principal. Novas descobertas entram como bullets abaixo desta linha.)_
   (preso) e `/tmp/clipping2.png` (androide isolado, contexto do clip 2). Prioridade alta —
   jogabilidade, pode prender o jogador se não houver direção livre nenhuma no momento do
   encontro. Escolha de correção (mudança de feel de física) pendente de decisão do líder.
+  **↳ DECISÕES DO LÍDER (2026-08-07) e ENTREGA.** Decidido: (D1) ator barrado "continua de onde
+  parou, sem pressa" — o relógio da rota só avança na fração do passo efetivamente cumprida, então
+  ele nunca acelera para recuperar atraso nem salta; (D2/D3) não empurra o jogador, e barrado além
+  de `actor_blocked_turnaround_seconds` (0.5 s, //PLAYTEST) dá meia-volta na ronda em vez de
+  esperar para sempre; (D4) consertar junto o **segundo defeito, achado ao medir**: a rota era
+  conferida contra as paredes no trecho `[célula−alcance, célula+alcance]` mas o ator percorria
+  `[célula, célula+2·alcance]`, deslocado de um alcance inteiro, porque `rearm_patrol` ancorava o
+  deslocamento no waypoint 0 estando o ator no meio da rota — medido no `.gmap` real: Vanda
+  percorria [30..38] (conferido [26..34]) e o androide da FIR [74..86] (conferido [68..80]), e a
+  célula (86,50) do percurso dele **é parede**; era a explicação do "entra e sai de objetos".
+  Somada a isso, blindagem **anti-exploit pedida pelo líder**: depenetração do jogador a cada
+  quadro, independente de input, empurrando pela menor distância de saída. Entregue em
+  `overworld_sim.cpp` (ronda via `resolve_move` contra grade+peças+jogador+atores, movendo o corpo
+  sólido; `rearm_patrol` projeta na rota; `reverse_patrol`; `depenetrate`), `world_entities.hpp`
+  (`blocked_seconds`) e `overworld_tuning.hpp`. 10 testes novos; `tools/check.sh` rc=0, 3054/3054,
+  18 gates. **Achado colateral:** dois testes de `overworld_sim_test.cpp` posicionavam o jogador
+  100% dentro de célula de parede (violando a pré-condição documentada do `resolve_move`) e nunca
+  falharam porque nada conferia — fixtures corrigidas para células livres, intenção preservada.
 
 - EXPLOIT-TRIGGER-SKIP-FRAME: pesquisa de exploits pedida pelo líder em 2026-08-07 (o mesmo
   playtest do clipping, o Gus Dragon testa deliberadamente como quem estuda speedrun/glitch

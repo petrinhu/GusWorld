@@ -196,7 +196,17 @@ TEST_CASE("overworld: set_player_position teleporta sem interpolar do ponto anti
     OverworldSim sim(g, Aabb{16.0f, 16.0f, 8.0f, 8.0f}, 4.0f);
     sim.step_fixed(1, 0, false, 1.0f / 60.0f);  // anda um pouco, so pra sujar prev_/curr_
 
-    const Aabb destino{64.0f, 48.0f, 8.0f, 8.0f};
+    // CELULA LIVRE (3,3) do make_map. A coordenada anterior, {64,48}, caia
+    // INTEIRA dentro da celula (4,3), que e `#` - parede da borda direita. Isso
+    // violava a pre-condicao do resolve_move ("a posicao de entrada nao esta
+    // DENTRO de uma parede", grid_collision.hpp) e passava despercebido porque
+    // nada no jogo conferia. A partir da depenetracao
+    // (CLIPPING-ATOR-RONDA-SEM-COLISAO, 2026-08-07) o passo fixo EXPULSA quem
+    // esta sobreposto a um bloqueador, entao um destino dentro de parede nao fica
+    // mais parado ali - de proposito, e a blindagem funcionando. O que este teste
+    // trava (teleporte instantaneo e estavel, sem deslizar de volta ao ponto
+    // antigo) nao muda em nada com a coordenada corrigida.
+    const Aabb destino{52.0f, 52.0f, 8.0f, 8.0f};
     sim.set_player_position(destino);
     REQUIRE_THAT(sim.player().x, WithinAbs(destino.x, kEps));
     REQUIRE_THAT(sim.player().y, WithinAbs(destino.y, kEps));
@@ -619,7 +629,15 @@ TEST_CASE("overworld: render interpola posicao do jogador", "[overworld]") {
 
 TEST_CASE("overworld: passo parado nao move", "[overworld]") {
     TileGrid g = make_map();
-    OverworldSim sim(g, Aabb{36.0f, 36.0f, 8.0f, 8.0f}, 4.0f);
+    // CELULA LIVRE (1,1). A coordenada anterior, {36,36}, caia INTEIRA dentro da
+    // celula (2,2), que e o `#` do MEIO do make_map - o jogador nascia dentro de
+    // uma parede, violando a pre-condicao do resolve_move, e ninguem via porque
+    // nada conferia. Com a depenetracao (CLIPPING-ATOR-RONDA-SEM-COLISAO,
+    // 2026-08-07) o passo fixo passa a expulsar quem esta sobreposto a um
+    // bloqueador, e um jogador plantado dentro da parede sai dela - que e o
+    // comportamento pedido. O que este teste trava (sem input, nao anda) segue
+    // exatamente igual a partir de uma celula valida.
+    OverworldSim sim(g, Aabb{20.0f, 20.0f, 8.0f, 8.0f}, 4.0f);
     float x0 = sim.player().x;
     float y0 = sim.player().y;
     sim.step_fixed(0, 0, false, 1.0f / 60.0f);

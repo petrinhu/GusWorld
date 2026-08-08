@@ -321,6 +321,24 @@ struct OverworldTuning {
     // a travar o corredor).
     float npc_solid_box_tiles = 1.0f;
 
+    // Quanto tempo (s) um ator em ronda aguenta BARRADO antes de dar meia-volta
+    // na rota (CLIPPING-ATOR-RONDA-SEM-COLISAO, decisao do lider 2026-08-07).
+    //
+    // POR QUE ISTO EXISTE: a partir desta fatia a ronda respeita colisao solida, e
+    // a politica escolhida pelo lider e "continua de onde parou, sem pressa" - o
+    // relogio da rota so anda enquanto o ator anda. Isso resolve o clipping, mas
+    // sozinho troca um defeito por outro: um ator barrado por algo que NAO SAI (uma
+    // peca atravessada na rota, outro ator vindo de frente) esperaria para sempre e
+    // a ronda dele morreria em pe. A meia-volta e a saida que se cura sozinha, e
+    // ainda le bem em cena: "ele viu o obstaculo e voltou".
+    //
+    // O NUMERO: 0.5 s e curto o bastante para ninguem ver um guarda congelado, e
+    // longo o bastante para nao disparar num roce de meio quadro (o jogador
+    // passando na frente dele). Referencia da vizinhanca: a pausa da ronda nas
+    // pontas e 0.8 s (kDemoPatrolPauseSeconds). Zero ou negativo = meia-volta
+    // IMEDIATA ao primeiro quadro barrado. //PLAYTEST
+    float actor_blocked_turnaround_seconds = 0.5f;
+
     // --- PECAS DE CENARIO (DEMO-CIDADE-VESTIDA B1) --------------------------
     // BOTAO UNICO da escala de TODA peca de cenario (casa, poste, fonte, portao).
     // O tamanho de cada peca ja vem DERIVADO da arte (32 px por tile, medido nos

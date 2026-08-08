@@ -24,6 +24,41 @@ bool overlaps(const gus::core::spatial::Rect& a, const gus::core::spatial::Rect&
     return a.x < b.x + b.w && a.x + a.w > b.x && a.y < b.y + b.h && a.y + a.h > b.y;
 }
 
+// Idem para duas Aabb (mesma convencao meio-aberta do overlaps_aabb interno do
+// resolve_move - encostar NAO e sobrepor).
+bool aabb_overlaps(const gus::core::spatial::Aabb& a,
+                   const gus::core::spatial::Aabb& b) noexcept {
+    return a.x < b.x + b.w && a.x + a.w > b.x && a.y < b.y + b.h && a.y + a.h > b.y;
+}
+
+// Comprimento de uma perna da rota, em CELULAS.
+float leg_length_cells(const gus::domain::world::PatrolRoute& route, int from,
+                       int to) noexcept {
+    const float dx = route.waypoints[to].x - route.waypoints[from].x;
+    const float dy = route.waypoints[to].y - route.waypoints[from].y;
+    return std::sqrt(dx * dx + dy * dy);
+}
+
+// Quao longe (em CELULAS) o ator pode estar da rota e ainda ser considerado EM
+// CIMA dela. Ver rearm_patrol: dentro desta folga a ronda comeca no ponto da rota
+// mais proximo dele; fora dela, vale a degradacao legada (a rota como
+// deslocamento cru a partir do waypoint 0), que existe para o caso de a tabela do
+// level design ter apontado uma celula que nao e a do ator.
+constexpr float kOnRouteToleranceCells = 1.0f;
+
+// Passo pedido pela rota abaixo disto (em unidades de mundo) conta como "a rota
+// nao pediu movimento nenhum" - fim de perna, pausa, rota degenerada. Serve para
+// nao classificar ruido de float como bloqueio.
+constexpr float kPatrolNoStepSq = 1e-8f;
+
+// Folga na fracao do passo cumprida: abaixo de (1 - isto) o ator conta como
+// BARRADO no quadro. Larga o bastante para nao acusar arredondamento de float.
+constexpr float kPatrolProgressEps = 1e-3f;
+
+// A borda em p+size e EXCLUSIVA: o mesmo epsilon do overlaps_blocked do
+// resolve_move, para a varredura de celulas nao vazar para a celula seguinte.
+constexpr float kCellEdgeEps = 1e-4f;
+
 // Converte a cadencia do walk de FRACAO DE TILE (tuning, imune a escala) para UNIDADES
 // DE MUNDO por troca de quadro (o que o WalkCycle consome, ja em unidades de mundo, do
 // mesmo jeito que o "moved" do step_fixed). Multiplica pelo tile_size REAL do mapa:
@@ -91,12 +126,126 @@ void OverworldSim::rearm_patrol(
     const gus::domain::world::PatrolRoute& route) const noexcept {
     actor.route = route;
     actor.patrol = gus::domain::world::PatrolState{};
+    actor.blocked_seconds = 0.0f;
     // A rota e aplicada como DESLOCAMENTO a partir de onde o ator esta AGORA (ver
     // world_entities.hpp): armar/rearmar nunca teleporta ninguem, e um erro de
     // celula na tabela vira um desvio, nao um sumico.
     actor.route_origin_anchor = actor.anchor;
     actor.route_origin_point =
         route.count >= 1 ? route.waypoints[0] : gus::domain::world::PatrolWaypoint{};
+
+    // =======================================================================
+    //  D4 (CLIPPING-ATOR-RONDA-SEM-COLISAO, 2026-08-07): a ronda comeca no ponto
+    //  da rota MAIS PROXIMO do ator, e nao no waypoint 0.
+    //
+    //  O DEFEITO QUE ISTO CONSERTA, medido contra o .gmap real: a rota do demo
+    //  nasce de build_horizontal_patrol_route(grid, celula_do_ator, alcance),
+    //  que escreve waypoints[0] = celula - alcance. Como o estado zerado tambem
+    //  comeca no waypoint 0, o par (origem_da_ancora, waypoint 0) casava a
+    //  posicao do ator com a PONTA OESTE da rota - e ele passava a percorrer
+    //  [celula, celula + 2*alcance] em vez de [celula - alcance, celula +
+    //  alcance]. Um alcance inteiro de deslocamento, sistematico, em todo ator
+    //  do jogo. O efeito colateral e grave e silencioso: a rota e conferida
+    //  contra as paredes no trecho ESCRITO (city_patrol.hpp encurta onde bate),
+    //  e essa garantia nao valia para o trecho ANDADO. No demo isso punha a
+    //  Vanda em [30..38] (conferido [26..34]) e o androide da FIR em [74..86]
+    //  (conferido [68..80]), sendo que a celula (86,50) e PAREDE - ele
+    //  terminava a ida dentro de um predio. E a explicacao medida do "o
+    //  androide entra e sai de objetos livremente" do playtest do lider.
+    //
+    //  A DEGRADACAO LEGADA FICA DE PE, e de proposito: se o ator estiver LONGE
+    //  da rota (acima de kOnRouteToleranceCells), nada disto se aplica e vale o
+    //  deslocamento cru a partir do waypoint 0. Esse e o caso que o comentario
+    //  acima descreve - a tabela do level design apontou uma celula que nao e a
+    //  do ator -, e ali "aplicar a rota como desvio" continua sendo a leitura
+    //  certa: projetar teleportaria a ronda para um trilho que ninguem pediu.
+    // =======================================================================
+    const float ts = grid_.tile_size();
+    if (!route.valid() || ts <= 0.0f) {
+        return;
+    }
+
+    // Onde o ator esta, na MESMA unidade dos waypoints (indice de celula). O
+    // centro do corpo cai no centro da celula (pick_actor_position_at_cell) e o
+    // waypoint NOMEIA a celula, dai o -0.5.
+    const float cx = (actor.anchor.x + actor.anchor.w * 0.5f) / ts - 0.5f;
+    const float cy = (actor.anchor.y + actor.anchor.h * 0.5f) / ts - 0.5f;
+
+    int best_leg = -1;
+    float best_t = 0.0f;
+    float best_len = 0.0f;
+    float best_d2 = 0.0f;
+    gus::domain::world::PatrolWaypoint best_point{};
+    for (int i = 0; i + 1 < route.count; ++i) {
+        const gus::domain::world::PatrolWaypoint& a = route.waypoints[i];
+        const gus::domain::world::PatrolWaypoint& b = route.waypoints[i + 1];
+        const float ex = b.x - a.x;
+        const float ey = b.y - a.y;
+        const float len2 = ex * ex + ey * ey;
+        float t = 0.0f;
+        if (len2 > 0.0f) {
+            t = ((cx - a.x) * ex + (cy - a.y) * ey) / len2;
+            if (t < 0.0f) {
+                t = 0.0f;
+            } else if (t > 1.0f) {
+                t = 1.0f;
+            }
+        }
+        const float px = a.x + ex * t;
+        const float py = a.y + ey * t;
+        const float d2 = (cx - px) * (cx - px) + (cy - py) * (cy - py);
+        if (best_leg < 0 || d2 < best_d2) {
+            best_leg = i;
+            best_t = t;
+            best_d2 = d2;
+            best_len = std::sqrt(len2);
+            best_point = gus::domain::world::PatrolWaypoint{px, py};
+        }
+    }
+    if (best_leg < 0 ||
+        best_d2 > kOnRouteToleranceCells * kOnRouteToleranceCells) {
+        return;  // longe da rota: degradacao legada, intacta
+    }
+    actor.patrol.from_index = best_leg;
+    actor.patrol.to_index = best_leg + 1;
+    actor.patrol.traveled_tiles = best_t * best_len;
+    actor.patrol.forward = true;
+    actor.route_origin_point = best_point;
+}
+
+void OverworldSim::reverse_patrol(WorldActor& actor) const noexcept {
+    const gus::domain::world::PatrolRoute& route = actor.route;
+    if (!route.valid()) {
+        return;
+    }
+    const int from = actor.patrol.from_index;
+    const int to = actor.patrol.to_index;
+    if (from < 0 || from >= route.count || to < 0 || to >= route.count ||
+        from == to) {
+        return;  // estado corrompido: o proprio advance_patrol reancora
+    }
+    // MEIA-VOLTA NO PONTO, sem teleporte: as pontas da perna corrente trocam de
+    // papel e o que ja foi andado nela e REFLETIDO (o resto da perna vira o
+    // andado). A posicao amostrada antes e depois disto e a MESMA - so o sentido
+    // muda. `forward` acompanha para o ping-pong das pontas continuar coerente.
+    const float len = leg_length_cells(route, from, to);
+    float traveled = len - actor.patrol.traveled_tiles;
+    if (traveled < 0.0f) {
+        traveled = 0.0f;
+    }
+    actor.patrol.from_index = to;
+    actor.patrol.to_index = from;
+    actor.patrol.traveled_tiles = traveled;
+    actor.patrol.forward = !actor.patrol.forward;
+    actor.patrol.pause_left = 0.0f;
+    // A ancora tem de continuar casando com a rota depois da troca de sentido: o
+    // par (origem da ancora, ponto de origem) e reancorado AQUI, na posicao
+    // corrente, senao o proximo quadro mediria o deslocamento a partir de um
+    // ponto que a nova perna nao usa mais.
+    const gus::domain::world::PatrolSample here =
+        gus::domain::world::sample_patrol(route, actor.patrol);
+    actor.route_origin_anchor = actor.anchor;
+    actor.route_origin_point = gus::domain::world::PatrolWaypoint{here.x, here.y};
 }
 
 int OverworldSim::add_actor(const WorldActorSpec& spec) {
@@ -148,26 +297,243 @@ std::optional<gus::core::spatial::Aabb> OverworldSim::actor_anchor(
     return a.anchor;
 }
 
+gus::core::spatial::ObstacleSpan OverworldSim::rebuild_obstacles(
+    int skip_actor, bool include_player) noexcept {
+    // Rascunho reaproveitado entre quadros: depois do aquecimento nao ha mais
+    // alocacao no laco de jogo, so refill. UM SO para o passo inteiro (ronda de
+    // cada ator + jogador) - quem chama por ultimo o reescreve, e ninguem guarda
+    // o span entre chamadas.
+    obstacle_scratch_.clear();
+    for (const ScenePropInstance& p : props_) {
+        if (p.blocks()) {
+            obstacle_scratch_.push_back(p.solid);
+        }
+    }
+    if (include_player) {
+        // O corpo do jogador e a propria hitbox dele - a MESMA caixa que ele move.
+        obstacle_scratch_.push_back(curr_);
+    }
+    for (std::size_t i = 0; i < actors_.size(); ++i) {
+        if (static_cast<int>(i) == skip_actor) {
+            continue;  // ninguem e obstaculo de si mesmo
+        }
+        if (actors_[i].blocks()) {
+            obstacle_scratch_.push_back(actors_[i].solid);
+        }
+    }
+    return gus::core::spatial::ObstacleSpan{
+        obstacle_scratch_.data(), static_cast<int>(obstacle_scratch_.size())};
+}
+
+// ===========================================================================
+//  RONDA COM COLISAO SOLIDA (CLIPPING-ATOR-RONDA-SEM-COLISAO, playtest ao vivo
+//  do lider por Gus Dragon, 2026-08-07).
+//
+//  ANTES: esta funcao punha o ator na posicao que a rota mandava e pronto - sem
+//  nunca chamar resolve_move. A resolucao contra obstaculos so rodava do lado do
+//  JOGADOR, e so quando ELE se movia. Consequencias vistas no playtest: o NPC em
+//  ronda andava POR CIMA do jogador parado (e a sobreposicao ficava de pe ate ele
+//  apertar uma direcao livre - com o jogador encostado num prop, "preso"), e o
+//  androide entrava e saia de objetos livremente.
+//
+//  AGORA: a posicao que a rota pede vira um DESLOCAMENTO, que passa pelo mesmo
+//  resolve_move do jogador, contra a grade + as pecas + o jogador + os demais
+//  atores.
+//
+//  QUAL CAIXA SE MOVE: a caixa SOLIDA do ator - a MESMA que os outros enxergam
+//  dele. Nao a ancora. Isso e o que mantem a fisica simetrica: um corpo tem UM
+//  tamanho. Mover a ancora (0.6 tile) enquanto os outros veem o solido (1 tile)
+//  deixaria o ator encostar a ancora no jogador e, com isso, meter 0.2 tile do
+//  corpo dentro dele - o mesmo defeito de novo, so que menor e mais dificil de
+//  ver. A ancora acompanha pelo deslocamento REALMENTE cumprido.
+//
+//  SEM CORNER-ASSIST, de proposito: o corner-assist existe para perdoar a
+//  imprecisao de quem TECLA (empurra o corpo de lado para escorregar na quina).
+//  Um ator scripted nao tecla, e o empurrao lateral o tiraria da linha da rota -
+//  justamente o que a politica "continua de onde parou" nao quer.
+//
+//  POLITICA AO SER BARRADO (D1, decisao do lider): "continua de onde parou, sem
+//  pressa". O relogio da rota so avanca na fracao do passo que ele DE FATO
+//  cumpriu, entao ele nunca acelera para recuperar atraso e nunca salta para
+//  onde a rota diria que ele deveria estar. Barrado tempo demais (D2), da
+//  meia-volta em vez de esperar para sempre.
+// ===========================================================================
 void OverworldSim::advance_actor_patrols(float fixed_dt) noexcept {
     const float ts = grid_.tile_size();
-    for (WorldActor& a : actors_) {
+    for (std::size_t i = 0; i < actors_.size(); ++i) {
+        WorldActor& a = actors_[i];
         // prev_anchor SEMPRE acompanha (mesmo parado): o render interpola entre os
         // dois, e um prev_ desatualizado faria o ator "saltar" ao comecar a andar.
         a.prev_anchor = a.anchor;
         if (!a.patrolling()) {
             continue;
         }
+
+        const gus::core::spatial::ObstacleSpan obstacles =
+            rebuild_obstacles(static_cast<int>(i), /*include_player=*/true);
+
+        // O estado ANTES do passo: se o passo for barrado, o relogio volta para
+        // ca e so a fracao cumprida e reaplicada.
+        const gus::domain::world::PatrolState before = a.patrol;
         const gus::domain::world::PatrolSample s =
             gus::domain::world::advance_patrol(a.route, a.patrol, fixed_dt);
-        // Deslocamento em CELULAS -> unidades de mundo, somado a ancora de origem.
-        a.anchor.x =
-            a.route_origin_anchor.x + (s.x - a.route_origin_point.x) * ts;
-        a.anchor.y =
-            a.route_origin_anchor.y + (s.y - a.route_origin_point.y) * ts;
+
+        // Onde a rota quer que ele esteja, como DESLOCAMENTO a partir de onde ele
+        // esta (celulas -> unidades de mundo).
+        const float want_x =
+            a.route_origin_anchor.x + (s.x - a.route_origin_point.x) * ts - a.anchor.x;
+        const float want_y =
+            a.route_origin_anchor.y + (s.y - a.route_origin_point.y) * ts - a.anchor.y;
+
+        const gus::core::spatial::MoveResult r = gus::core::spatial::resolve_move(
+            grid_, a.solid, want_x, want_y, obstacles);
+        const float got_x = r.box.x - a.solid.x;
+        const float got_y = r.box.y - a.solid.y;
+        a.anchor.x += got_x;
+        a.anchor.y += got_y;
+
+        const float want2 = want_x * want_x + want_y * want_y;
+        if (want2 > kPatrolNoStepSq) {
+            // Quanto do caminho PRETENDIDO foi cumprido: a projecao do que andou
+            // sobre o que queria andar. Projecao, e nao razao de modulos, porque
+            // o resolve_move DESLIZA - a componente perpendicular anda, mas nao e
+            // progresso na rota.
+            float progress = (got_x * want_x + got_y * want_y) / want2;
+            if (progress < 0.0f) {
+                progress = 0.0f;
+            } else if (progress > 1.0f) {
+                progress = 1.0f;
+            }
+            if (progress < 1.0f - kPatrolProgressEps) {
+                // BARRADO: o relogio da rota volta e anda so a fracao cumprida.
+                a.patrol = before;
+                if (progress > 0.0f) {
+                    gus::domain::world::advance_patrol(a.route, a.patrol,
+                                                       fixed_dt * progress);
+                }
+                a.blocked_seconds += fixed_dt;
+                if (a.blocked_seconds >= tuning_.actor_blocked_turnaround_seconds) {
+                    reverse_patrol(a);
+                    a.blocked_seconds = 0.0f;
+                }
+            } else {
+                a.blocked_seconds = 0.0f;
+            }
+        } else {
+            // A rota nao pediu passo nenhum (pausa na ponta, fim de perna): isso
+            // NAO e estar barrado, e nao pode acumular para a meia-volta.
+            a.blocked_seconds = 0.0f;
+        }
+
         // O corpo solido acompanha: sem isto o inimigo andaria e deixaria a
         // colisao para tras (o jogador trombaria no ar e atravessaria o sprite).
         a.solid = solid_obstacle_from_footprint(a.anchor);
     }
+}
+
+// ===========================================================================
+//  DEPENETRACAO (blindagem anti-exploit, pedido do lider 2026-08-07).
+//
+//  Quem achou o clipping estuda speedrun/glitch hunting, e "um corpo empurra o
+//  jogador para dentro da parede, o jogador atravessa" e uma classe de exploit
+//  documentada em jogos comerciais. A defesa padrao da industria nao tapa o caso
+//  particular: e uma passada que, a CADA quadro e INDEPENDENTE de input, tira
+//  qualquer corpo sobreposto a um bloqueador, empurrando pela MENOR distancia de
+//  saida.
+//
+//  POR QUE A MENOR: e a unica escolha que nao inventa uma direcao. Empurrar por
+//  um eixo fixo (ou pelo "lado de onde ele veio") atravessa a parede quando a
+//  penetracao daquele lado e maior que a espessura do bloqueador - que e
+//  exatamente o atravessamento que se quer barrar.
+//
+//  NO-OP NO QUADRO NORMAL: o resolve_move deixa o corpo com a borda COINCIDINDO
+//  com a do obstaculo, e sobreposicao aqui e meio-aberta - encostar nao e
+//  sobrepor. Sem isso, o jogador seria empurrado para longe de toda parede em
+//  que encostasse, em todo quadro.
+//
+//  SO O JOGADOR, e isto e conclusao da implementacao, nao suposicao: os atores
+//  ja passam pelo resolve_move acima com a MESMA caixa que apresentam aos
+//  outros, entao nao entram em sobreposicao por movimento proprio. Aplicar a
+//  mesma passada a eles seria ativamente ERRADO num caso legitimo do jogo - a
+//  caixa solida do ator e maior que a ancora e ancorada pela base, entao ela
+//  invade a celula de cima; um ator andando colado numa fachada teria o corpo
+//  parcialmente dentro dela por construcao, e a depenetracao ficaria empurrando
+//  ele para fora da propria rua, todo quadro.
+// ===========================================================================
+gus::core::spatial::Aabb OverworldSim::depenetrate(
+    const gus::core::spatial::Aabb& box,
+    gus::core::spatial::ObstacleSpan obstacles) const noexcept {
+    // Sair de um bloqueador pode meter o corpo noutro (quina de dois props). O
+    // teto existe para o pior caso (corpo enfiado bem fundo num amontoado) sair
+    // com a posicao inalterada em vez de pendurar o passo fixo.
+    constexpr int kMaxPasses = 4;
+
+    const float ts = grid_.tile_size();
+    gus::core::spatial::Aabb out = box;
+    if (ts <= 0.0f || out.w <= 0.0f || out.h <= 0.0f) {
+        return out;
+    }
+
+    for (int pass = 0; pass < kMaxPasses; ++pass) {
+        float push_x = 0.0f;
+        float push_y = 0.0f;
+        float best = 0.0f;
+        bool found = false;
+
+        const auto consider = [&](const gus::core::spatial::Aabb& ob) noexcept {
+            if (!aabb_overlaps(out, ob)) {
+                return;
+            }
+            // As 4 saidas possiveis, com sinal. A de menor MODULO vence.
+            const float cand[4] = {(ob.x + ob.w) - out.x,   // para leste
+                                   ob.x - (out.x + out.w),  // para oeste
+                                   (ob.y + ob.h) - out.y,   // para sul
+                                   ob.y - (out.y + out.h)};  // para norte
+            const bool on_x[4] = {true, true, false, false};
+            for (int k = 0; k < 4; ++k) {
+                const float mag = cand[k] < 0.0f ? -cand[k] : cand[k];
+                // `>=` mantem o PRIMEIRO da ordem em caso de empate: a escolha
+                // fica deterministica (o corpo no centro exato de um bloqueador
+                // quadrado tem os 4 empatados).
+                if (found && mag >= best) {
+                    continue;
+                }
+                found = true;
+                best = mag;
+                push_x = on_x[k] ? cand[k] : 0.0f;
+                push_y = on_x[k] ? 0.0f : cand[k];
+            }
+        };
+
+        // (a) PAREDES DA GRADE sobrepostas, cada celula como um retangulo. A
+        // borda do mapa e parede implicita (is_blocked cobre fora dos limites),
+        // entao um corpo que vazou para fora tambem e trazido de volta.
+        const int cx0 = grid_.world_to_cell(out.x);
+        const int cy0 = grid_.world_to_cell(out.y);
+        const int cx1 = grid_.world_to_cell(out.x + out.w - kCellEdgeEps);
+        const int cy1 = grid_.world_to_cell(out.y + out.h - kCellEdgeEps);
+        for (int cy = cy0; cy <= cy1; ++cy) {
+            for (int cx = cx0; cx <= cx1; ++cx) {
+                if (!grid_.is_blocked(cx, cy)) {
+                    continue;
+                }
+                consider(gus::core::spatial::Aabb{static_cast<float>(cx) * ts,
+                                                  static_cast<float>(cy) * ts, ts,
+                                                  ts});
+            }
+        }
+        // (b) OBSTACULOS PONTUAIS (pecas e corpos de personagem).
+        for (int i = 0; i < obstacles.count; ++i) {
+            consider(obstacles.items[i]);
+        }
+
+        if (!found) {
+            break;  // livre - o caso de todo quadro normal, e a saida barata
+        }
+        out.x += push_x;
+        out.y += push_y;
+    }
+    return out;
 }
 
 int OverworldSim::ensure_reserved_actor(
@@ -310,6 +676,22 @@ void OverworldSim::step_fixed(int dx, int dy, bool run, float fixed_dt) noexcept
     // jogador, para que os corpos solidos usados abaixo sejam os deste quadro.
     advance_actor_patrols(fixed_dt);
 
+    // OBSTACULOS PONTUAIS do JOGADOR (M7-COSTURA/M7-DIALOGO, colisao SOLIDA de
+    // NPC/inimigo; estendido em DEMO-CIDADE-VESTIDA B1/B2 para pecas de cenario e
+    // N atores): entram como "paredes pontuais" adicionais, NAO fazem parte da
+    // TileGrid estatica. Montados AQUI, antes de qualquer saida antecipada,
+    // porque a depenetracao logo abaixo tambem precisa deles - e ela roda com o
+    // jogador PARADO, que e justamente o caso do defeito.
+    const gus::core::spatial::ObstacleSpan obstacles =
+        rebuild_obstacles(/*skip_actor=*/kInvalidWorldActor, /*include_player=*/false);
+
+    // DEPENETRACAO (blindagem anti-exploit; ver o metodo). Roda TODO quadro, com
+    // ou sem tecla apertada: sobreposicao que so se resolve quando o jogador se
+    // move foi exatamente o defeito do playtest. Depois do `prev_ = curr_` acima,
+    // de proposito - assim o empurrao aparece interpolado no render em vez de
+    // saltar. No quadro normal e um no-op (encostar nao e sobrepor).
+    curr_ = depenetrate(curr_, obstacles);
+
     // IDLE OFEGANTE (breathing rapido) e a respiracao CALMA procedural tocam por TEMPO,
     // sempre - so um deles e MOSTRADO quando parado (decide a stamina). Avancar tambem
     // andando mantem ambos vivos e evita "pulo" ao voltar pro idle.
@@ -384,31 +766,6 @@ void OverworldSim::step_fixed(int dx, int dy, bool run, float fixed_dt) noexcept
     }
     const float move_x = fx * dist;
     const float move_y = fy * dist;
-
-    // OBSTACULOS PONTUAIS (M7-COSTURA/M7-DIALOGO, colisao SOLIDA de NPC/inimigo;
-    // estendido em DEMO-CIDADE-VESTIDA B1/B2 para pecas de cenario e N atores):
-    // entram como "paredes pontuais" adicionais, NAO fazem parte da TileGrid
-    // estatica. Ate esta fatia era um array FIXO de 2 (os dois slots de marcador);
-    // agora e a lista inteira - casa, poste, fonte, cada NPC e cada inimigo.
-    //
-    // O rascunho e um membro reaproveitado entre quadros: depois do primeiro
-    // quadro nao ha mais alocacao no laco de jogo, so refill. A varredura e linear
-    // no numero de corpos, o que e barato na ordem de grandeza de uma cidade
-    // (dezenas); se um dia forem milhares, o corte por proximidade entra aqui, num
-    // lugar so.
-    obstacle_scratch_.clear();
-    for (const ScenePropInstance& p : props_) {
-        if (p.blocks()) {
-            obstacle_scratch_.push_back(p.solid);
-        }
-    }
-    for (const WorldActor& a : actors_) {
-        if (a.blocks()) {
-            obstacle_scratch_.push_back(a.solid);
-        }
-    }
-    const gus::core::spatial::ObstacleSpan obstacles{
-        obstacle_scratch_.data(), static_cast<int>(obstacle_scratch_.size())};
 
     // Colisao que desliza nas paredes (resolucao por eixo: X depois Y), agora com
     // corner-assist quando ligado no tuning (escorrega na quina se ha abertura) E os
