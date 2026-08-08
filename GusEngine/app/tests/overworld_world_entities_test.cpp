@@ -1219,3 +1219,147 @@ TEST_CASE("mundo: jogador ENCOSTADO (sem sobrepor) nao e empurrado por nada",
     REQUIRE_THAT(sim.player().x, WithinAbs(88.0, kEps));
     REQUIRE_THAT(sim.player().y, WithinAbs(100.0, kEps));
 }
+
+TEST_CASE("mundo: jogador sobreposto a um ATOR tambem e expulso",
+          "[overworld][depenetracao][regressao-lider]") {
+    // O corpo de personagem entra no MESMO span de obstaculos das pecas, entao a
+    // blindagem tem de valer para ele. Vale a spec propria porque e outro ramo de
+    // preenchimento do span (atores, nao pecas) e porque e o caso mais explorado
+    // por quem cutuca: encostar num NPC e forcar sobreposicao.
+    OverworldTuning t;
+    t.corner.enabled = false;
+    OverworldSim sim(open_grid(), Aabb{20.0f, 20.0f, 8.0f, 8.0f}, t);
+    const int h = sim.add_actor(make_actor(WorldActorRole::Npc, 100.0f, 100.0f, 30));
+    const Aabb corpo = sim.actors()[static_cast<std::size_t>(h)].solid;
+    REQUIRE(corpo.w > 0.0f);
+
+    // Bem no meio do corpo do NPC.
+    Aabb dentro{corpo.x + corpo.w * 0.5f - 4.0f, corpo.y + corpo.h * 0.5f - 4.0f, 8.0f,
+                8.0f};
+    sim.set_player_position(dentro);
+    REQUIRE(aabb_overlaps(sim.player(), corpo));
+
+    sim.step_fixed(0, 0, false, 1.0f / 60.0f);
+    REQUIRE_FALSE(aabb_overlaps(sim.player(), corpo));
+}
+
+// ===========================================================================
+//  VERIFICACAO ADVERSARIAL - os cantos que se tentou usar para quebrar a fatia.
+// ===========================================================================
+
+TEST_CASE("mundo: jogador NAO consegue prender um ator para sempre contra a parede",
+          "[overworld][patrol][solid-collision][adversarial]") {
+    // O ataque: encurralar um ator entre uma parede e o proprio corpo e deixa-lo
+    // ali. Com "a ronda espera pelo ator" e SEM a meia-volta, ele esperaria o
+    // resto da partida - a ronda morreria em pe e o jogador teria descoberto como
+    // apagar um NPC do mundo sem nenhum poder para isso.
+    OverworldTuning t;
+    t.corner.enabled = false;
+    TileGrid grid = open_grid();
+    grid.set_blocked(10, 6, true);  // parede em x:[160,176) y:[96,112)
+
+    // O ator arranca do MEIO da rota (celula 7), com espaco livre atras dele: e a
+    // situacao real de cerco. Rota para LESTE, onde esta a parede.
+    OverworldSim sim(grid, Aabb{130.0f, 100.0f, 8.0f, 8.0f}, t);
+    WorldActorSpec spec = make_actor(WorldActorRole::Enemy, 116.0f, 100.0f, 30);
+    spec.route = line_route(4.0f, 6.0f, 6.0f, 2.0f);  // celulas 4 a 10, ele esta na 7
+    const int h = sim.add_actor(spec);
+    const float x_inicial = sim.actor_anchor(h)->x;
+
+    for (int i = 0; i < 600; ++i) {  // 10 s de cerco
+        sim.step_fixed(0, 0, false, 1.0f / 60.0f);
+        // Em NENHUM quadro o corpo dele entra na parede ou no jogador.
+        const Aabb corpo = sim.actors()[static_cast<std::size_t>(h)].solid;
+        REQUIRE_FALSE(aabb_overlaps(corpo, Aabb{160.0f, 96.0f, 16.0f, 16.0f}));
+        REQUIRE_FALSE(aabb_overlaps(corpo, sim.player()));
+    }
+    // Ele nao morreu em pe contra a parede: a meia-volta o tirou de la e ele
+    // continua fazendo a ronda no espaco que sobrou.
+    const auto anc = sim.actor_anchor(h);
+    REQUIRE(anc.has_value());
+    REQUIRE(anc->x < x_inicial);
+}
+
+TEST_CASE("mundo: ator encurralado na PONTA da rota fica parado, sem tremer",
+          "[overworld][patrol][solid-collision][adversarial]") {
+    // O CANTO que a meia-volta NAO resolve, e nao deve resolver: o ator esta no
+    // ponto EXTREMO da rota e o unico sentido que a rota oferece esta barrado.
+    // "Meia-volta" ali significaria andar para FORA do trilho, que e pior que
+    // ficar parado (o trilho e a unica coisa conferida contra as paredes).
+    //
+    // Esta spec existe porque o comportamento e correto mas nao e obvio, e porque
+    // o risco real aqui e OSCILAR: refletir a perna na ponta poe o ator no fim
+    // dela, e o ping-pong o devolve ao sentido original no quadro seguinte. Se
+    // isso movesse o corpo, o jogador veria um NPC vibrando contra a parede.
+    OverworldTuning t;
+    t.corner.enabled = false;
+    TileGrid grid = open_grid();
+    grid.set_blocked(10, 6, true);  // parede colada a leste dele
+
+    OverworldSim sim(grid, Aabb{20.0f, 250.0f, 8.0f, 8.0f}, t);  // jogador longe
+    WorldActorSpec spec = make_actor(WorldActorRole::Enemy, 148.0f, 100.0f, 30);
+    spec.route = line_route(9.0f, 6.0f, 6.0f, 2.0f);  // ele ESTA no extremo oeste (9)
+    const int h = sim.add_actor(spec);
+
+    const float x0 = sim.actor_anchor(h)->x;
+    for (int i = 0; i < 600; ++i) {
+        sim.step_fixed(0, 0, false, 1.0f / 60.0f);
+        // Parado de verdade, quadro a quadro - nada de vibrar.
+        REQUIRE_THAT(sim.actor_anchor(h)->x, WithinAbs(x0, 0.01));
+        REQUIRE_FALSE(aabb_overlaps(sim.actors()[static_cast<std::size_t>(h)].solid,
+                                    Aabb{160.0f, 96.0f, 16.0f, 16.0f}));
+    }
+}
+
+TEST_CASE("mundo: dois atores vindo de frente nao travam um ao outro para sempre",
+          "[overworld][patrol][solid-collision][adversarial]") {
+    // O deadlock que "a ronda espera pelo ator" cria sozinho: A espera B, B
+    // espera A, e nenhum dos dois tem desvio. A meia-volta e o que desfaz o no.
+    OverworldTuning t;
+    t.corner.enabled = false;
+    OverworldSim sim(open_grid(), Aabb{20.0f, 250.0f, 8.0f, 8.0f}, t);  // jogador longe
+
+    WorldActorSpec oeste = make_actor(WorldActorRole::Enemy, 60.0f, 100.0f, 30);
+    oeste.route = line_route(3.0f, 6.0f, 10.0f, 2.0f);  // anda para LESTE
+    WorldActorSpec leste = make_actor(WorldActorRole::Npc, 220.0f, 100.0f, 31);
+    leste.route = line_route(13.0f, 6.0f, -10.0f, 2.0f);  // anda para OESTE
+    const int a = sim.add_actor(oeste);
+    const int b = sim.add_actor(leste);
+
+    for (int i = 0; i < 900; ++i) {  // 15 s
+        sim.step_fixed(0, 0, false, 1.0f / 60.0f);
+        // O invariante em TODO quadro: os dois corpos nunca se sobrepoem.
+        REQUIRE_FALSE(aabb_overlaps(sim.actors()[static_cast<std::size_t>(a)].solid,
+                                    sim.actors()[static_cast<std::size_t>(b)].solid));
+    }
+    // Nenhum dos dois ficou parado para sempre no ponto do encontro: os dois
+    // deram meia-volta e voltaram para os seus lados.
+    REQUIRE(sim.actor_anchor(a)->x < 140.0f);
+    REQUIRE(sim.actor_anchor(b)->x > 140.0f);
+}
+
+TEST_CASE("mundo: o corner-assist do jogador continua contornando o corpo do ator",
+          "[overworld][solid-collision][adversarial]") {
+    // O ator entrou no ObstacleSpan como bloqueador de pleno direito. O
+    // corner-assist do JOGADOR (que so ele usa) tem de continuar valendo contra
+    // ele: sem isso, encostar de raspao num NPC passaria a ser uma parede seca, e
+    // o feel de "contorna a quina" morreria justamente perto de quem anda.
+    OverworldTuning t;
+    t.corner.enabled = true;  // o botao do lider, LIGADO (o default)
+    // DE RASPAO, que e o unico caso que o corner-assist atende: o corpo do ator
+    // fica em y:[92,108) e o jogador em y:[104,112), ou seja 4 unidades de
+    // sobreposicao - dentro do perdao de max_assist_fraction (0,35 tile = 5,6).
+    // Peito a peito o corner-assist NAO ajuda, e nao deve mesmo: ali o corpo e uma
+    // parede pontual e o jogador da a volta, que e o feel pedido.
+    OverworldSim sim(open_grid(), Aabb{20.0f, 104.0f, 8.0f, 8.0f}, t);
+    sim.add_actor(make_actor(WorldActorRole::Npc, 100.0f, 100.0f, 30));
+    const Aabb corpo = sim.actors()[0].solid;
+    REQUIRE_THAT(corpo.y + corpo.h, WithinAbs(108.0, kEps));  // trava a premissa
+
+    const float x0 = sim.player().x;
+    for (int i = 0; i < 240; ++i) {
+        sim.step_fixed(1, 0, false, 1.0f / 60.0f);  // andando para LESTE o tempo todo
+    }
+    // Passou do corpo do ator (o corner-assist empurrou o suficiente para alinhar).
+    REQUIRE(sim.player().x > x0 + 100.0f);
+}
