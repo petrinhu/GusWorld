@@ -85,6 +85,22 @@ resources/sprites/caua_volt_cyan_v2/*
 resources/sprites/caua_volt/*
 !resources/sprites/caua_volt/south.png
 
+# Distritos Inferiores - pecas de cenario da cidade (kMasterSceneProps,
+# asset_paths.hpp): 4 pecas regeradas pelo lider em 2026-08-07 com arte final
+# ("face sul de verdade", substituindo o placeholder de 2026-06-25) -
+# versionadas para nao depender do disco local do lider. Caminho aninhado: cada
+# nivel intermediario precisa da propria excecao, senao resources/sprites/*
+# (acima) nunca deixa o git DESCER ate world/distritos_inferiores/ pra avaliar
+# as excecoes mais profundas (medido: sem esta linha, git add recusa os PNGs).
+!resources/sprites/world/
+resources/sprites/world/*
+!resources/sprites/world/distritos_inferiores/
+resources/sprites/world/distritos_inferiores/*
+!resources/sprites/world/distritos_inferiores/casa_cibergotica_a.png
+!resources/sprites/world/distritos_inferiores/casa_cibergotica_b.png
+!resources/sprites/world/distritos_inferiores/fonte_latao.png
+!resources/sprites/world/distritos_inferiores/holo_sterling.png
+
 # Fotos pessoais (do filho do criador): NUNCA versionar (o repo e publico)
 resources/gus_baby/
 
