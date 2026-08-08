@@ -60,6 +60,10 @@ void EnemyTemplate::validate() const {
     if (static_cast<std::uint32_t>(kind) >= kEnemyKindCount) {
         throw std::invalid_argument("EnemyTemplate.kind fora do dominio (ordinal invalido).");
     }
+    // DIFICULDADE-TABELA-DADO: MESMO hardening de ordinal acima, aplicado ao campo novo.
+    if (static_cast<std::uint32_t>(tier) >= kEnemyTierCount) {
+        throw std::invalid_argument("EnemyTemplate.tier fora do dominio (ordinal invalido).");
+    }
     for (const auto& card_id : base_deck) {
         if (is_null_or_whitespace(card_id)) {
             throw std::invalid_argument(

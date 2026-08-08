@@ -26,6 +26,7 @@ using gus::domain::templates::BrainKind;
 using gus::domain::templates::CardFamily;
 using gus::domain::templates::CharacterTemplate;
 using gus::domain::templates::EnemyTemplate;
+using gus::domain::templates::EnemyTier;
 
 namespace {
 
@@ -274,5 +275,29 @@ TEST_CASE("enemy_template: brain Utility (ordinal 1, ultimo valido) nao lanca",
           "[domain][templates][a1]") {
     auto e = sentinela_fixture();
     e.brain = BrainKind::Utility;
+    REQUIRE_NOTHROW(e.validate());
+}
+
+// ---- DIFICULDADE-TABELA-DADO: validate() rejeita ordinal de tier fora do dominio ----
+//
+// MESMO hardening de ordinal de brain/family/kind acima (A1 + MODOS-MORTE Fase 0),
+// aplicado ao campo novo EnemyTier (Trash/Elite).
+
+TEST_CASE("enemy_template: tier default e Trash", "[domain][templates][difficulty]") {
+    // sentinela_fixture() nao seta o campo novo no init posicional - default.
+    REQUIRE(sentinela_fixture().tier == EnemyTier::Trash);
+}
+
+TEST_CASE("enemy_template: tier com ordinal fora do dominio lanca",
+          "[domain][templates][difficulty]") {
+    auto e = sentinela_fixture();
+    e.tier = static_cast<EnemyTier>(2u);  // fora de {0..1}
+    REQUIRE_THROWS_AS(e.validate(), std::invalid_argument);
+}
+
+TEST_CASE("enemy_template: tier Elite (ordinal 1, ultimo valido) nao lanca",
+          "[domain][templates][difficulty]") {
+    auto e = sentinela_fixture();
+    e.tier = EnemyTier::Elite;
     REQUIRE_NOTHROW(e.validate());
 }

@@ -19,6 +19,12 @@ add_executable(gusengine_domain_tests
     template_serializer_test.cpp
     template_source_test.cpp
     canonical_templates_test.cpp
+    # DIFICULDADE-TABELA-DADO (TODO.md, W2): tabela+lookup do multiplicador de
+    # dificuldade sobre HP/Atk de inimigo, cruzando EnemyTier (Trash/Elite) x
+    # save::DifficultyLevel - MESMO padrao de battery_capacity_for
+    # (card_hardware_constants.hpp). enemy_difficulty_constants.hpp e header-only
+    # (ver domain/CMakeLists.txt).
+    enemy_difficulty_constants_test.cpp
     save_slots_test.cpp
     save_serializer_test.cpp
     save_serializer_fuzz_test.cpp

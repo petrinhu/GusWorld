@@ -282,6 +282,9 @@ std::vector<std::uint8_t> serialize_enemy(const EnemyTemplate& tpl) {
     // que o formato SEGUE sem discriminador de versao - gap sistemico pre-existente,
     // sinalizado ao lider no relatorio desta leva (nao inventado por esta mudanca).
     payload.push_back(tpl.central_command ? 1u : 0u);
+    // DIFICULDADE-TABELA-DADO: campo NOVO no FINAL do payload, MESMO padrao append-only
+    // de `kind`/`central_command` acima.
+    put_u32(payload, static_cast<std::uint32_t>(tpl.tier));
 
     return pack(payload);
 }
@@ -302,6 +305,7 @@ EnemyTemplate deserialize_enemy(const std::vector<std::uint8_t>& data) {
     tpl.base_deck = r.read_deck();
     tpl.kind = static_cast<EnemyKind>(r.read_u32());
     tpl.central_command = (r.read_u8() != 0);
+    tpl.tier = static_cast<EnemyTier>(r.read_u32());
     r.expect_end();
 
     tpl.validate();

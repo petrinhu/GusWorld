@@ -33,6 +33,8 @@
 //     (serialize_character ~230) e EnemyTemplate::family (serialize_enemy ~267)
 //   - BrainKind  (enemy_template.hpp) - EnemyTemplate::brain (serialize_enemy ~268)
 //   - EnemyKind  (enemy_template.hpp) - EnemyTemplate::kind (serialize_enemy ~274)
+//   - EnemyTier  (enemy_template.hpp) - EnemyTemplate::tier (serialize_enemy ~283,
+//     DIFICULDADE-TABELA-DADO, campo aditivo apos central_command)
 //
 // Se este arquivo PARAR de compilar depois de voce mexer num destes enums: NAO
 // mude os numeros aqui pra "consertar o erro" - isso e EXATAMENTE o alarme
@@ -94,10 +96,12 @@ using gus::domain::save::kDifficultyLevelCount;
 using gus::domain::templates::BrainKind;
 using gus::domain::templates::CardFamily;
 using gus::domain::templates::EnemyKind;
+using gus::domain::templates::EnemyTier;
 using gus::domain::templates::kBrainKindCount;
 using gus::domain::templates::kCardFamilyCount;
 using gus::domain::templates::kWheelFamilyCount;
 using gus::domain::templates::kEnemyKindCount;
+using gus::domain::templates::kEnemyTierCount;
 
 // ---- CardOrigin (card_provenance.hpp) - CardPhysicalState::origin, u32 no wire --
 static_assert(static_cast<std::uint32_t>(CardOrigin::OriginalRom) == 0);
@@ -143,6 +147,13 @@ static_assert(kBrainKindCount == 2, "CONTRATO BINARIO GDT1 - NAO REORDENAR");
 static_assert(static_cast<std::uint32_t>(EnemyKind::Creature) == 0);
 static_assert(static_cast<std::uint32_t>(EnemyKind::Human) == 1);
 static_assert(kEnemyKindCount == 2, "CONTRATO BINARIO GDT1 - NAO REORDENAR");
+
+// ---- EnemyTier (enemy_template.hpp) - EnemyTemplate::tier, u32 no wire (GDT1) -----
+// DIFICULDADE-TABELA-DADO: campo aditivo novo (apos central_command), MESMO contrato
+// binario append-only dos enums acima.
+static_assert(static_cast<std::uint32_t>(EnemyTier::Trash) == 0);
+static_assert(static_cast<std::uint32_t>(EnemyTier::Elite) == 1);
+static_assert(kEnemyTierCount == 2, "CONTRATO BINARIO GDT1 - NAO REORDENAR");
 
 // ===========================================================================
 // TRIPWIRE DE APPEND (TESTES-MUTANTES-W1) - ver o cabecalho deste arquivo
@@ -257,6 +268,16 @@ constexpr bool is_named_enemy_kind(EnemyKind v) {
     return false;
 }
 static_assert(!is_named_enemy_kind(static_cast<EnemyKind>(kEnemyKindCount)), GUS_ENUM_APPEND_MSG);
+
+constexpr bool is_named_enemy_tier(EnemyTier v) {
+    switch (v) {
+        case EnemyTier::Trash:
+        case EnemyTier::Elite:
+            return true;
+    }
+    return false;
+}
+static_assert(!is_named_enemy_tier(static_cast<EnemyTier>(kEnemyTierCount)), GUS_ENUM_APPEND_MSG);
 
 }  // namespace
 

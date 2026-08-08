@@ -54,6 +54,23 @@ enum class EnemyKind : std::uint32_t {
 // validacao de ordinal (mesmo padrao de kBrainKindCount acima).
 inline constexpr std::uint32_t kEnemyKindCount = 2;
 
+// Classificacao de BALANCEAMENTO do inimigo (DIFICULDADE-TABELA-DADO, TODO.md;
+// combat.md secao 17 "Stats de referencia do encontro"): eixo consumido pela tabela de
+// dado que escala HP/Atk por save::DifficultyLevel (ver
+// templates/enemy_difficulty_constants.hpp::difficulty_multiplier_for). NAO e o mesmo
+// conceito de BrainKind acima (aquele e sobre IA/decisao; este e sobre peso no
+// balanceamento) - os dois podem divergir no futuro (ex.: um mini-boss podia ter brain
+// Scripted e ainda ser Elite para fins de dificuldade). Ordinal EXPLICITO (contrato
+// binario, mesmo padrao de BrainKind/EnemyKind acima).
+enum class EnemyTier : std::uint32_t {
+    Trash = 0,  // default - a maioria dos encontros do VS e trash (secao 13.1)
+    Elite = 1,
+};
+
+// Numero de valores canonicos de EnemyTier (0..kEnemyTierCount-1). Usado pela
+// validacao de ordinal (mesmo padrao de kBrainKindCount/kEnemyKindCount acima).
+inline constexpr std::uint32_t kEnemyTierCount = 2;
+
 // Template imutavel de inimigo. Source de stats + identidade de AI (secao 13/17).
 struct EnemyTemplate {
     // Identidade estavel (chave de repositorio/i18n). Invariante: nao vazia.
@@ -101,6 +118,18 @@ struct EnemyTemplate {
     // design/lore do criador, FORA de escopo desta implementacao - o bestiario canonico
     // fica intocado; so templates de TESTE ganham a tag.
     bool central_command = false;
+
+    // Classificacao de balanceamento (Trash/Elite, ver EnemyTier acima). Eixo
+    // consumido pela tabela de multiplicador de dificuldade (DIFICULDADE-TABELA-DADO,
+    // templates/enemy_difficulty_constants.hpp) - NAO aplicado aqui (este struct so
+    // guarda o DADO; a multiplicacao fica no lookup + no sitio, ainda inexistente em
+    // producao, que constroi CombatActor a partir de EnemyTemplate, mesma lacuna ja
+    // documentada acima em `central_command`). Campo NOVO no FINAL da struct (mesmo
+    // padrao de `kind`/`central_command` acima) - preserva os aggregate-inits
+    // posicionais existentes (canonical_templates.cpp/testes com 11 campos explicitos
+    // continuam validos, este 12o usa o default). Default Trash: e o valor mais comum
+    // no bestiario (so 1 dos 2 templates canonicos hoje e Elite).
+    EnemyTier tier = EnemyTier::Trash;
 
     // Igualdade por valor (semantica de record do C#).
     [[nodiscard]] bool operator==(const EnemyTemplate&) const = default;

@@ -63,7 +63,15 @@ EnemyTemplate sentinela_bit() {
         /*base_deck=*/{},
         // MODOS-MORTE Fase 0 (§3.1): construto digital, nao humano - fauna/sentinela
         // da Selve/dos Dutos, mesma classe diegetica de daemon_guard abaixo.
-        /*kind=*/EnemyKind::Creature};
+        /*kind=*/EnemyKind::Creature,
+        // Mises/Calc-Edge: sem tag "comando central" no bestiario canonico (curadoria
+        // de design fora de escopo, ver enemy_template.hpp). Explicito aqui SO pra
+        // poder nomear o campo seguinte (tier) no init posicional - mesmo valor que o
+        // default ja daria.
+        /*central_command=*/false,
+        // DIFICULDADE-TABELA-DADO (2026-08-07): Sentinela-Bit = Trash (combat.md
+        // secao 17, tabela "Stats de referencia do encontro").
+        /*tier=*/EnemyTier::Trash};
 }
 
 EnemyTemplate daemon_guard() {
@@ -78,7 +86,13 @@ EnemyTemplate daemon_guard() {
         /*is_boss=*/false,
         /*base_deck=*/{},
         // MODOS-MORTE Fase 0 (§3.1): daemon = construto/processo, nao humano.
-        /*kind=*/EnemyKind::Creature};
+        /*kind=*/EnemyKind::Creature,
+        // Mises/Calc-Edge: sem tag "comando central" no bestiario canonico (mesma nota
+        // de sentinela_bit() acima).
+        /*central_command=*/false,
+        // DIFICULDADE-TABELA-DADO (2026-08-07): Daemon-Guard = Elite (combat.md
+        // secao 17, tabela "Stats de referencia do encontro").
+        /*tier=*/EnemyTier::Elite};
 }
 
 std::vector<CharacterTemplate> all_characters() {

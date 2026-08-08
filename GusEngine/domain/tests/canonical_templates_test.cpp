@@ -20,6 +20,7 @@
 namespace canon = gus::domain::templates::canonical;
 using gus::domain::templates::BrainKind;
 using gus::domain::templates::CardFamily;
+using gus::domain::templates::EnemyTier;
 
 // ---- Party (combat.md secao 17) -------------------------------------------
 
@@ -78,6 +79,9 @@ TEST_CASE("canon: Sentinela-Bit Trash HP33/Atk12/Def8 cinetico scripted",
     REQUIRE(s.family == CardFamily::Cinetico);
     REQUIRE(s.brain == BrainKind::Scripted);
     REQUIRE(s.is_boss == false);
+    // DIFICULDADE-TABELA-DADO (2026-08-07): eixo de balanceamento consumido pela
+    // tabela de multiplicador de dificuldade (enemy_difficulty_constants.hpp).
+    REQUIRE(s.tier == EnemyTier::Trash);
     REQUIRE_NOTHROW(s.validate());
 }
 
@@ -90,6 +94,9 @@ TEST_CASE("canon: Daemon-Guard Elite HP144/Def14 cinetico scripted",
     REQUIRE(d.family == CardFamily::Cinetico);
     REQUIRE(d.brain == BrainKind::Scripted);
     REQUIRE(d.is_boss == false);
+    // DIFICULDADE-TABELA-DADO (2026-08-07): eixo de balanceamento consumido pela
+    // tabela de multiplicador de dificuldade (enemy_difficulty_constants.hpp).
+    REQUIRE(d.tier == EnemyTier::Elite);
     REQUIRE_NOTHROW(d.validate());
 }
 

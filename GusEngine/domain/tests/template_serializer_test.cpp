@@ -38,6 +38,7 @@ using gus::domain::templates::deserialize_character;
 using gus::domain::templates::deserialize_enemy;
 using gus::domain::templates::EnemyKind;
 using gus::domain::templates::EnemyTemplate;
+using gus::domain::templates::EnemyTier;
 using gus::domain::templates::pack;
 using gus::domain::templates::serialize_character;
 using gus::domain::templates::serialize_enemy;
@@ -144,6 +145,41 @@ TEST_CASE("serializer: EnemyTemplate.central_command roundtrippa (campo aditivo 
         REQUIRE(restored.central_command == true);
         REQUIRE(restored == original);
     }
+}
+
+// ---- DIFICULDADE-TABELA-DADO: EnemyTemplate.tier ---------------------------------
+
+TEST_CASE("serializer: EnemyTemplate.tier roundtrippa (campo aditivo no FINAL "
+         "do payload, default Trash)",
+         "[domain][templates][serializer][difficulty]") {
+    // (a) default Trash roundtrippa (fixture nao seta o campo novo - guarda de
+    // regressao pra QUALQUER .gdt/fixture anterior a esta leva, MESMO padrao de
+    // central_command acima).
+    {
+        const auto original = daemon_fixture();
+        REQUIRE(original.tier == EnemyTier::Trash);
+        const auto restored = deserialize_enemy(serialize_enemy(original));
+        REQUIRE(restored.tier == EnemyTier::Trash);
+        REQUIRE(restored == original);
+    }
+    // (b) Elite roundtrippa.
+    {
+        auto original = sentinela_fixture();
+        original.tier = EnemyTier::Elite;
+        const auto restored = deserialize_enemy(serialize_enemy(original));
+        REQUIRE(restored.tier == EnemyTier::Elite);
+        REQUIRE(restored == original);
+    }
+}
+
+TEST_CASE("serializer: EnemyTemplate.tier com ordinal fora do dominio rejeitado",
+          "[domain][templates][serializer][difficulty]") {
+    // MESMO hardening de family/brain/kind (A1 + MODOS-MORTE Fase 0) aplicado ao
+    // campo novo.
+    auto tpl = daemon_fixture();
+    REQUIRE_NOTHROW(tpl.validate());  // sanity: valido hoje
+    tpl.tier = static_cast<EnemyTier>(77u);
+    REQUIRE_THROWS_AS(tpl.validate(), std::invalid_argument);
 }
 
 // ---- header binario valido ------------------------------------------------
