@@ -586,6 +586,20 @@ WSJF principal. Novas descobertas entram como bullets abaixo desta linha.)_
   18 gates. **Achado colateral:** dois testes de `overworld_sim_test.cpp` posicionavam o jogador
   100% dentro de célula de parede (violando a pré-condição documentada do `resolve_move`) e nunca
   falharam porque nada conferia — fixtures corrigidas para células livres, intenção preservada.
+  **↳ DECISÃO FINAL DO LÍDER (2026-08-07): `npc_solid_box_tiles` 1.00 → 0.80.** Como o ator passa a
+  se mover com a caixa que apresenta aos outros, e ela é ancorada pela BASE e maior que a âncora
+  (0,6 tile), ela invade a fileira de cima por construção — e numa cidade a fileira de cima é
+  fachada. Com 1.00 o androide da FIR colidia em 238/401 amostras da própria rota com a fachada da
+  célula (70,49) e a ronda encolhia de 12 para 4,4 células (580/3600 quadros barrado). Varredura do
+  botão: 0.6/0.7/0.8 → 0 colisões; 0.9 → 232; 1.0 → 238; 1.3 → 258 — 0.80 é o MAIOR valor que ainda
+  cabe na fileira. Medido depois: os dois atores completam **100% da ronda, 0/3600 barrado, 0/3600
+  dentro de peça**. Sete testes que cravavam "16" a mão passaram a derivar do tuning.
+  **Duas observações para o playtest**, nenhuma bloqueante: (a) no canto em que o obstáculo fica
+  entre o ator e a PONTA da rota, ele patrulha o trecho residual e em amplitude pequena isso lê
+  como vibração — não ocorre no demo (0 quadros barrados), botão =
+  `actor_blocked_turnaround_seconds`; (b) o corpo vaza 1 ULP de float (0,0000152588 u = 0,00000095
+  tile) em 1 quadro de 130 ao encostar, corrigido no quadro seguinte — invariantes de teste passaram
+  a declarar folga de 0,001 u, com mutation testing provando que não enfraqueceu.
 
 - EXPLOIT-TRIGGER-SKIP-FRAME: pesquisa de exploits pedida pelo líder em 2026-08-07 (o mesmo
   playtest do clipping, o Gus Dragon testa deliberadamente como quem estuda speedrun/glitch
