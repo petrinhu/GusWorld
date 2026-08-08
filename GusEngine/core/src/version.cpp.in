@@ -1,0 +1,17 @@
+// SPDX-License-Identifier: Apache-2.0
+// gus/core/version.cpp
+// GERADO PELO CMAKE EM TEMPO DE CONFIGURE A PARTIR DESTE TEMPLATE
+// (core/src/version.cpp.in) -- NAO EDITAR O .cpp GERADO A MAO.
+// A string completa vem de GUSWORLD_VERSION_FULL (GusEngine/CMakeLists.txt):
+// "<major>.<minor>.<patch>.<tweak>[+<sha>[.dirty]]", capturada em tempo de
+// CONFIGURE (nao de build) -- o sha/dirty so atualiza quando alguem roda
+// `cmake` de novo, nao a cada `ninja`.
+#include "gus/core/version.hpp"
+
+namespace gus::core {
+
+std::string_view engine_version() noexcept {
+    return "@GUSWORLD_VERSION_FULL@";
+}
+
+}  // namespace gus::core

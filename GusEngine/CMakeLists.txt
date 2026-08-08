@@ -14,10 +14,95 @@
 
 cmake_minimum_required(VERSION 3.21)
 
+# ===========================================================================
+#  Versionamento (esquema 4-componentes, mesma logica que a glintfx adotou --
+#  relatado pelo bus, thread "versionamento", 2026-08-08). major.minor.patch.
+#  tweak no campo NATIVO de project(VERSION ...), mais sufixo de build-metadata
+#  SemVer (+sha[.dirty], SemVer 2.0.0 secao 10) capturado em tempo de CONFIGURE
+#  (nao de build) logo abaixo, depois do project().
+#
+#  - major.minor: significado SemVer normal (quebra de compatibilidade bump
+#    major). Decisao do lider (2026-08-08): pula o marco retroativo "0.2" (fim
+#    da dependencia de Godot/C#, M8/M9 ja fechados sem bump formal em
+#    2026-07-22/28) e sobe DIRETO pra 0.3 agora; RmlUi acabar sera 0.4 (nao
+#    mais 0.2).
+#  - patch: contador de itens do TODO.md marcados "✅ Concluido" na coluna
+#    Status da tabela ATIVA de 9 colunas (ID/Onda/Grupo/Descricao Tecnica/
+#    Prioridade/Pre-requisito/Dificuldade/Status/Estado Auditado), ANTES da
+#    secao "## 🗄️ Arquivado: eras Godot/C# e Qt6" (TODO.md ~linha 635).
+#    ⚠️ NAO contar por grep cru de "| ✅" na faixa de linhas inteira: essa
+#    mesma faixa tambem contem a tabela SEPARADA "Inventario de assets
+#    PixelLab" (TODO.md ~502-538), que reusa o glifo ✅ com legenda PROPRIA
+#    ("icone ja renderizado", TODO.md linha 504) -- NAO "item de trabalho
+#    concluido". Um grep cru (`grep -cE '^\|.*\| ✅'`) conta 95 nessa faixa
+#    porque soma as 9 linhas da tabela de assets (510-515, 526-528) as 86
+#    linhas reais da tabela de itens. Contagem por COLUNA (respeitando `\|`
+#    escapado e pipe literal dentro de celula, ex. `` `if(GCC|Clang)` `` na
+#    linha 148) feita em 2026-08-08: **86**. Reconferir por coluna, nao por
+#    grep cru, a cada bump.
+#  - tweak: contador de hotfix aplicado DEPOIS que o patch mais recente ja
+#    fechou. Zera a cada bump de patch. Hoje: 0 (nenhum hotfix neste esquema
+#    ainda).
+set(GUSWORLD_VERSION_MAJOR 0)
+set(GUSWORLD_VERSION_MINOR 3)
+set(GUSWORLD_VERSION_PATCH 86)
+set(GUSWORLD_VERSION_TWEAK 0)
+
 project(GusEngine
-    VERSION 0.1.0
+    VERSION ${GUSWORLD_VERSION_MAJOR}.${GUSWORLD_VERSION_MINOR}.${GUSWORLD_VERSION_PATCH}.${GUSWORLD_VERSION_TWEAK}
     DESCRIPTION "Engine propria do GusWorld (C++/SDL3, pivot pos-Qt)"
     LANGUAGES CXX
+)
+
+# --- Sufixo +sha[.dirty] (build-metadata SemVer, NAO e o 4o componente do
+#     CMake -- e concatenado a parte na string completa que core/src/
+#     version.cpp.in expoe via engine_version()). Capturado a cada CONFIGURE
+#     (nao a cada build/ninja -- mesma escolha da glintfx, replicada aqui de
+#     proposito): so atualiza quando alguem roda `cmake` de novo, e o
+#     `.dirty` reflete o estado da arvore NO MOMENTO do configure (recalculado
+#     toda vez que o CMake reconfigura, nunca cacheado). Gracioso fora de um
+#     repo git ou sem git instalado (ex.: alguem compilando de um tarball):
+#     fica sem sufixo, NUNCA falha o configure.
+find_package(Git QUIET)
+set(_guws_git_sha "")
+set(_guws_git_dirty_suffix "")
+if(GIT_FOUND)
+    execute_process(
+        COMMAND ${GIT_EXECUTABLE} rev-parse --short HEAD
+        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+        OUTPUT_VARIABLE _guws_git_sha
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+        RESULT_VARIABLE _guws_git_sha_rc
+        ERROR_QUIET
+    )
+    if(NOT _guws_git_sha_rc EQUAL 0)
+        set(_guws_git_sha "")
+    endif()
+    if(NOT _guws_git_sha STREQUAL "")
+        execute_process(
+            COMMAND ${GIT_EXECUTABLE} status --porcelain
+            WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+            OUTPUT_VARIABLE _guws_git_status
+            OUTPUT_STRIP_TRAILING_WHITESPACE
+            RESULT_VARIABLE _guws_git_status_rc
+            ERROR_QUIET
+        )
+        if(_guws_git_status_rc EQUAL 0 AND NOT _guws_git_status STREQUAL "")
+            set(_guws_git_dirty_suffix ".dirty")
+        endif()
+    endif()
+endif()
+
+set(GUSWORLD_VERSION_METADATA "")
+if(NOT _guws_git_sha STREQUAL "")
+    set(GUSWORLD_VERSION_METADATA "+${_guws_git_sha}${_guws_git_dirty_suffix}")
+endif()
+
+# String completa consumida por core/src/version.cpp.in (engine_version()).
+# Ex.: "0.3.86.0+840479e3" com a arvore limpa, ou "0.3.86.0+840479e3.dirty"
+# com mudanca nao commitada. Sem git/fora de um repo: "0.3.86.0" (sem sufixo).
+set(GUSWORLD_VERSION_FULL
+    "${GUSWORLD_VERSION_MAJOR}.${GUSWORLD_VERSION_MINOR}.${GUSWORLD_VERSION_PATCH}.${GUSWORLD_VERSION_TWEAK}${GUSWORLD_VERSION_METADATA}"
 )
 
 # Monocypher (ADR-015 Onda 1, SAVE-CRYPTO-V2-VENDOR) e C99 puro, nao C++: habilita

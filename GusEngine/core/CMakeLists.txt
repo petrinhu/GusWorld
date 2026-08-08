@@ -10,8 +10,25 @@
 # subdominios sao populados em marcos posteriores. M4 adiciona spatial/
 # (grade + colisao AABB-desliza + clamp de camera), matematica de engine pura.
 
+# gus/core/version.{hpp,cpp}: GERADOS em tempo de CONFIGURE a partir dos
+# templates versionados (version.hpp.in/version.cpp.in), substituindo
+# GUSWORLD_VERSION_MAJOR/MINOR/PATCH/TWEAK/FULL (variaveis definidas no
+# CMakeLists.txt raiz, herdadas por escopo de diretorio). Saida em
+# CMAKE_CURRENT_BINARY_DIR (nao versionada) para nao duplicar a fonte de
+# verdade da versao entre disco e CMake.
+configure_file(
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/gus/core/version.hpp.in
+    ${CMAKE_CURRENT_BINARY_DIR}/include/gus/core/version.hpp
+    @ONLY
+)
+configure_file(
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/version.cpp.in
+    ${CMAKE_CURRENT_BINARY_DIR}/generated/version.cpp
+    @ONLY
+)
+
 add_library(gusengine_core STATIC
-    src/version.cpp
+    ${CMAKE_CURRENT_BINARY_DIR}/generated/version.cpp
     src/math_util.cpp
     src/crypto/sha256.cpp
     src/crypto/hmac_sha256.cpp
@@ -38,7 +55,11 @@ add_library(gusengine_core STATIC
 )
 
 target_include_directories(gusengine_core
-    PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include
+    PUBLIC
+        ${CMAKE_CURRENT_SOURCE_DIR}/include
+        # gus/core/version.hpp GERADO (configure_file acima) vive aqui, nao no
+        # source dir -- version.hpp.in nao e um header valido pra incluir.
+        ${CMAKE_CURRENT_BINARY_DIR}/include
 )
 
 target_compile_features(gusengine_core PUBLIC cxx_std_20)

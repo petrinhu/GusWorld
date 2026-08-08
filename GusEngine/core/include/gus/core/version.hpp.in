@@ -1,0 +1,33 @@
+// SPDX-License-Identifier: Apache-2.0
+// gus/core/version.hpp
+// GERADO PELO CMAKE EM TEMPO DE CONFIGURE A PARTIR DESTE TEMPLATE
+// (core/include/gus/core/version.hpp.in) -- NAO EDITAR O .hpp GERADO A MAO.
+// Fonte unica dos numeros: GUSWORLD_VERSION_MAJOR/MINOR/PATCH/TWEAK em
+// GusEngine/CMakeLists.txt. Ver core/src/version.cpp.in para a string
+// completa (com sufixo +sha[.dirty]).
+//
+// Versao da engine, exposta como POCO puro (sem Qt). Usada como ponto de
+// ancoragem do teste dummy do M0 e como fonte unica da versao da engine.
+#ifndef GUS_CORE_VERSION_HPP
+#define GUS_CORE_VERSION_HPP
+
+#include <string_view>
+
+namespace gus::core {
+
+// Componentes numericos da versao da engine (esquema 4-componentes
+// major.minor.patch.tweak, ver o comentario grande em CMakeLists.txt).
+inline constexpr int kEngineVersionMajor = @GUSWORLD_VERSION_MAJOR@;
+inline constexpr int kEngineVersionMinor = @GUSWORLD_VERSION_MINOR@;
+inline constexpr int kEngineVersionPatch = @GUSWORLD_VERSION_PATCH@;
+inline constexpr int kEngineVersionTweak = @GUSWORLD_VERSION_TWEAK@;
+
+// String da versao completa da engine, ex: "0.3.86.0+840479e3" (com o
+// sufixo +sha[.dirty] de build-metadata quando o build roda dentro de um
+// repo git). Definida em version.cpp para garantir que a lib estatica tenha
+// simbolo real (e o link seja exercitado).
+std::string_view engine_version() noexcept;
+
+}  // namespace gus::core
+
+#endif  // GUS_CORE_VERSION_HPP

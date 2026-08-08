@@ -9,6 +9,8 @@
 
 #include <catch2/catch_test_macros.hpp>
 
+#include <regex>
+
 #include "gus/core/math_util.hpp"
 #include "gus/core/version.hpp"
 #include "gus/domain/domain_info.hpp"
@@ -31,11 +33,30 @@ TEST_CASE("core::clamp restringe ao intervalo fechado", "[core][math]") {
     }
 }
 
-TEST_CASE("core::engine_version expoe a versao semver", "[core][version]") {
-    REQUIRE(gus::core::engine_version() == "0.1.0");
+TEST_CASE("core::engine_version expoe o esquema 4-componentes + build-metadata", "[core][version]") {
+    // Esquema major.minor.patch.tweak (ver comentario grande em
+    // GusEngine/CMakeLists.txt) + sufixo +sha[.dirty] opcional (SemVer 2.0.0
+    // secao 10, capturado em tempo de CONFIGURE). O SHA/dirty NAO e testavel
+    // por valor exato (muda a cada commit) -- so o FORMATO e uma invariante
+    // estavel, entao o teste verifica a forma via regex, nao a string
+    // literal completa.
+    static const std::regex kVersionFormat(
+        R"(^\d+\.\d+\.\d+\.\d+(\+[0-9a-f]+(\.dirty)?)?$)");
+    REQUIRE(std::regex_match(std::string(gus::core::engine_version()), kVersionFormat));
+
+    // Os componentes numericos continuam testaveis por valor exato: sao
+    // constantes de compilacao, nao mudam a cada commit como o sha.
     REQUIRE(gus::core::kEngineVersionMajor == 0);
-    REQUIRE(gus::core::kEngineVersionMinor == 1);
-    REQUIRE(gus::core::kEngineVersionPatch == 0);
+    REQUIRE(gus::core::kEngineVersionMinor == 3);
+    REQUIRE(gus::core::kEngineVersionPatch == 86);
+    REQUIRE(gus::core::kEngineVersionTweak == 0);
+
+    // A string completa comeca com "major.minor.patch.tweak" literal (os 4
+    // componentes numericos exatos), seguido ou nao do sufixo +sha[.dirty].
+    static const std::string kExpectedPrefix = "0.3.86.0";
+    const std::string version(gus::core::engine_version());
+    const bool starts_with_expected_prefix = version.compare(0, kExpectedPrefix.size(), kExpectedPrefix) == 0;
+    REQUIRE(starts_with_expected_prefix);
 }
 
 TEST_CASE("domain expoe identidade e schema de save", "[domain]") {
