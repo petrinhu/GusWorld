@@ -1,0 +1,33 @@
+LicenseRef-GusWorld-Assets-Reserved
+
+Copyright (C) 2026 Petrus Alves da Silva Costa. Todos os direitos reservados.
+
+Esta licença de referência cobre todo asset e todo texto in-game do jogo
+GusWorld: arte, música, som, sprite, texto de sabor e prosa exibida no jogo
+(diálogos, lore, descrições, textos de interface).
+
+Nenhum direito de uso, cópia, distribuição, exibição pública ou criação de
+obra derivada é concedido por esta licença, salvo o descrito abaixo.
+
+Marca (carve-out): o nome "GusWorld", seu logotipo, seu trade dress e os
+nomes de personagem não são cedidos por nenhuma licença de código ou de
+asset. Nenhum fork ou derivado pode se apresentar como o produto oficial
+ou usar essa identidade sem autorização.
+
+Conteúdo de fã (permissão explícita, não-comercial): é permitido gravar e
+publicar vídeos de jogabilidade (Let's Plays, reviews, tutoriais,
+compilações), transmitir ao vivo, publicar capturas de tela e clipes
+curtos, e criar e compartilhar fan art e fan fiction inspiradas nos
+personagens e no mundo do jogo, sem fins comerciais. Monetização padrão de
+plataforma (anúncios de vídeo do criador de conteúdo) é permitida ao
+criador. Isto não cobre vender o asset original como próprio, republicar o
+jogo, ou uso comercial dos assets fora do contexto de conteúdo de fã aqui
+descrito.
+
+Os dois livros-companheiros do GusWorld (Vol 1: bíblia de worldbuilding;
+Vol 2: antologia de contos) são obra literária à parte, com todos os
+direitos reservados ao titular. A aparição da lore no jogo não estende
+nenhuma licença ao texto dos livros.
+
+Para o texto completo do regime de licenciamento do projeto, ver
+ASSETS-LICENSE.md na raiz do repositório.

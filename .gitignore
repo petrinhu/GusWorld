@@ -1,0 +1,38 @@
+# GusWorld - .gitignore
+# GODS_LAWS.md L-15: fora do git por serem regeneraveis ou pessoais.
+
+# Bancos vetoriais de RAG (943 MB), regeneraveis
+resources/livros/
+
+# Pipeline 3D pessoal do lider (402 MB), fora do jogo (L-02)
+resources/glb/
+
+# Build e cache
+build/
+cmake-build-*/
+.cache/
+CMakeFiles/
+CMakeCache.txt
+*.o
+*.obj
+*.a
+*.so
+*.dylib
+*.dll
+*.exe
+*.pdb
+
+# Editor / IDE
+.vscode/
+.idea/
+*.swp
+*~
+
+# Sistema operacional
+.DS_Store
+Thumbs.db
+
+# Ambiente virtual / ferramentas locais
+.venv/
+__pycache__/
+*.pyc

@@ -1,0 +1,27 @@
+# GusWorld - .gitattributes
+
+# git-crypt: docs/_secret/ e cifrado, nunca versionado em texto puro (GODS_LAWS.md L-08, L-18)
+docs/_secret/** filter=git-crypt diff=git-crypt
+docs/narrative/deep/stinger/** filter=git-crypt diff=git-crypt
+docs/book/** filter=git-crypt diff=git-crypt
+
+# Git LFS: binario pesado sob resources/ e assets/ (GODS_LAWS.md L-15)
+resources/**/*.png filter=lfs diff=lfs merge=lfs -text
+resources/**/*.jpg filter=lfs diff=lfs merge=lfs -text
+resources/**/*.jpeg filter=lfs diff=lfs merge=lfs -text
+resources/**/*.gif filter=lfs diff=lfs merge=lfs -text
+resources/**/*.wav filter=lfs diff=lfs merge=lfs -text
+resources/**/*.mp3 filter=lfs diff=lfs merge=lfs -text
+resources/**/*.ogg filter=lfs diff=lfs merge=lfs -text
+resources/**/*.flac filter=lfs diff=lfs merge=lfs -text
+resources/**/*.zip filter=lfs diff=lfs merge=lfs -text
+
+assets/**/*.png filter=lfs diff=lfs merge=lfs -text
+assets/**/*.jpg filter=lfs diff=lfs merge=lfs -text
+assets/**/*.jpeg filter=lfs diff=lfs merge=lfs -text
+assets/**/*.gif filter=lfs diff=lfs merge=lfs -text
+assets/**/*.wav filter=lfs diff=lfs merge=lfs -text
+assets/**/*.mp3 filter=lfs diff=lfs merge=lfs -text
+assets/**/*.ogg filter=lfs diff=lfs merge=lfs -text
+assets/**/*.flac filter=lfs diff=lfs merge=lfs -text
+assets/**/*.zip filter=lfs diff=lfs merge=lfs -text

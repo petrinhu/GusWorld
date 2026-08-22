@@ -1,0 +1,84 @@
+version = 1
+SPDX-PackageName = "GusWorld"
+SPDX-PackageSupplier = "Petrus Alves da Silva Costa"
+SPDX-PackageDownloadLocation = "https://github.com/petrinhu/GusWorld"
+
+# Codigo-fonte: AGPL-3.0-or-later (GODS_LAWS.md L-08).
+[[annotations]]
+path = [
+  "**/*.cpp",
+  "**/*.hpp",
+  "**/*.h",
+  "**/*.cc",
+  "**/*.cmake",
+  "CMakeLists.txt",
+  "**/CMakeLists.txt",
+]
+SPDX-FileCopyrightText = "2026 Petrus Alves da Silva Costa"
+SPDX-License-Identifier = "AGPL-3.0-or-later"
+
+# Assets (arte, musica, som, sprite, texto de sabor e prosa in-game):
+# todos os direitos reservados (GODS_LAWS.md L-08, L-25). Numero e regra de
+# carta (identificador, custo, poder, velocidade, efeito) sao codigo sob
+# AGPL, tratados junto com o codigo-fonte acima quando forem escritos.
+[[annotations]]
+path = "resources/**"
+SPDX-FileCopyrightText = "2026 Petrus Alves da Silva Costa"
+SPDX-License-Identifier = "LicenseRef-GusWorld-Assets-Reserved"
+
+[[annotations]]
+path = "assets/**"
+SPDX-FileCopyrightText = "2026 Petrus Alves da Silva Costa"
+SPDX-License-Identifier = "LicenseRef-GusWorld-Assets-Reserved"
+
+# Documentacao de PROJETO em docs/ (arquitetura, decisao, design,
+# processo): acompanha a licenca do codigo. Fronteira DECIDIDA pelo
+# lider em 22/08/2026: docs/narrative/** e docs/specs/** sao obra
+# reservada (excecoes abaixo); docs/design/** e o restante de docs/
+# ficam sob a licenca do codigo. As excecoes vem DEPOIS desta regra e
+# a VENCEM: no REUSE.toml, quando varias tabelas [[annotations]]
+# cobrem o mesmo arquivo, vale exclusivamente a ULTIMA que casa
+# (REUSE Spec 3.3).
+[[annotations]]
+path = "docs/**"
+SPDX-FileCopyrightText = "2026 Petrus Alves da Silva Costa"
+SPDX-License-Identifier = "AGPL-3.0-or-later"
+
+# Livros-companheiros: obra a parte, todos os direitos reservados
+# (GODS_LAWS.md L-08); cifrados por git-crypt (L-25). Nunca AGPL.
+[[annotations]]
+path = "docs/book/**"
+SPDX-FileCopyrightText = "2026 Petrus Alves da Silva Costa"
+SPDX-License-Identifier = "LicenseRef-GusWorld-Assets-Reserved"
+
+# Material reservado e cifrado por git-crypt (GODS_LAWS.md L-25):
+# easter eggs e cosmologia de origem (_secret), ganchos pos-creditos e
+# de continuacao (stinger). Reservados pelo mesmo motivo por que foram
+# cifrados.
+[[annotations]]
+path = ["docs/_secret/**", "docs/narrative/deep/stinger/**"]
+SPDX-FileCopyrightText = "2026 Petrus Alves da Silva Costa"
+SPDX-License-Identifier = "LicenseRef-GusWorld-Assets-Reserved"
+
+# Obra criativa em docs/ (decisao do lider, 22/08/2026; GODS_LAWS.md
+# L-08): lore, narrativa, fichas de personagem e worldbuilding sao a
+# obra, nao documentacao de projeto. Inclui a antologia em
+# docs/narrative/deep/antologia/, insumo do Vol 2 dos livros.
+[[annotations]]
+path = ["docs/narrative/**", "docs/specs/**"]
+SPDX-FileCopyrightText = "2026 Petrus Alves da Silva Costa"
+SPDX-License-Identifier = "LicenseRef-GusWorld-Assets-Reserved"
+
+[[annotations]]
+path = ["*.md", "NOTICE"]
+SPDX-FileCopyrightText = "2026 Petrus Alves da Silva Costa"
+SPDX-License-Identifier = "AGPL-3.0-or-later"
+
+# Excecao na raiz (decisao do lider, 22/08/2026): inventario de
+# personagens, de lugares e a sinopse sao da mesma natureza da biblia
+# de lore; estao na raiz por conveniencia. Esta tabela vem DEPOIS da
+# regra ["*.md", "NOTICE"] para vence-la (ultima que casa vence).
+[[annotations]]
+path = ["CHARS.md", "PLACES.md", "sinopse.md"]
+SPDX-FileCopyrightText = "2026 Petrus Alves da Silva Costa"
+SPDX-License-Identifier = "LicenseRef-GusWorld-Assets-Reserved"
