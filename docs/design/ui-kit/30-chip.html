@@ -1,0 +1,39 @@
+<!-- @dsCard group="Components" -->
+<!doctype html>
+<html lang="pt-br"><head><meta charset="utf-8"><title>GusWorld UI :: Chip de familia</title>
+<style>
+  :root{--line:#1d2c3d;--cyan:#3ad0e0;--ink-dim:#6d8299;--slot:#0a1119;
+    --fam-eletrico:#3ad0e0;--fam-termico:#e0703a;--fam-grupo:#e0c93a;--fam-bio:#5fe08a;--fam-anomalia:#a06be0}
+  body{margin:0;background:#080b11;color:#c9d6e2;font-family:"PixelOperatorMono","DejaVu Sans Mono",ui-monospace,monospace;padding:18px}
+  h2{color:var(--cyan);font-size:11px;letter-spacing:1.5px;text-transform:uppercase;margin:0 0 12px}
+  .filters{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+  .f{font-size:12px;padding:3px 11px;border:1px solid var(--line);border-radius:11px;color:var(--ink-dim);background:var(--slot)}
+  .f.on{color:#04121a;font-weight:bold}
+  .f[data-k=all].on{background:var(--cyan);border-color:var(--cyan)}
+  .f[data-k=eletrico].on{background:var(--fam-eletrico);border-color:var(--fam-eletrico)}
+  .f[data-k=termico].on{background:var(--fam-termico);border-color:var(--fam-termico);color:#150a04}
+  .f[data-k=grupo].on{background:var(--fam-grupo);border-color:var(--fam-grupo);color:#151204}
+  .f[data-k=bio].on{background:var(--fam-bio);border-color:var(--fam-bio);color:#04150a}
+  .f[data-k=anom].on{background:var(--fam-anomalia);border-color:var(--fam-anomalia);color:#0f0418}
+  .note{color:var(--ink-dim);font-size:11px}
+</style></head>
+<body>
+  <h2>Chip de filtro por familia</h2>
+  <div class="filters">
+    <span class="f on" data-k="all">todas</span>
+    <span class="f" data-k="eletrico">eletrico</span>
+    <span class="f" data-k="termico">termico</span>
+    <span class="f" data-k="grupo">grupo</span>
+    <span class="f" data-k="bio">biologico</span>
+    <span class="f" data-k="anom">anomalia</span>
+  </div>
+  <h2>Estado ligado (cada familia acende na sua cor)</h2>
+  <div class="filters">
+    <span class="f on" data-k="eletrico">eletrico</span>
+    <span class="f on" data-k="termico">termico</span>
+    <span class="f on" data-k="grupo">grupo</span>
+    <span class="f on" data-k="bio">biologico</span>
+    <span class="f on" data-k="anom">anomalia</span>
+  </div>
+  <div class="note">off = contorno; on = preenchido na cor da familia (leitura instantanea).</div>
+</body></html>

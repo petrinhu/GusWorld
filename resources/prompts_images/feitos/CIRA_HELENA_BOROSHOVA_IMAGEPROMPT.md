@@ -1,0 +1,7 @@
+# Cira Helena Boroshova — image prompt (nano banana)
+
+An extreme chibi super-deformed (SD) figurine of a crystal-singing nun-cantor woman from an ancient medieval-monastic era, styled like a small collectible vinyl figure (Funko Pop / nendoroid). VERY IMPORTANT PROPORTIONS: the head is enormous, round and as large as the entire rest of the body; the whole character is only about three heads tall; tiny torso, very short stubby arms and legs. This is NOT a realistic human body.
+
+She is a brilliant soprano stone-singer, intense and proud. Her huge round head has a focused, expressive adult-woman face, mouth open mid-song, with bright eyes and long dark hair pulled into a high braided knot under a thin pale veil. She wears medieval-monastic cantor robes in deep midnight-blue and pale silver-grey, flecked with tiny embedded crystals along the collar and sleeves that catch faint cyan light. A worn leather scrip holding a small portable manual hangs across her chest, beside a thick knotted rope cord. Her stubby hands cup a faintly glowing cyan resonance crystal raised near her lips. No modern cyber elements — ancient era.
+
+Art style: cel-shaded anime 3D, low-poly stylized, somber gothic mood with cyan crystal glow accents. Full body head to feet, centered, facing camera, plain pure-white (#FFFFFF) background, flat even lighting. REMINDER — extreme chibi: gigantic round head equal to whole body, three heads tall, tiny stubby limbs. Do NOT draw realistic adult proportions.

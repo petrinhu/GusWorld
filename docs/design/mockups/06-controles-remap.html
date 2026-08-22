@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GusWorld - Mock Tela de Controles (remap) - Proposta A</title>
+<style>
+  :root{
+    --bg-deep:#0A0E1A; --bg-mid:#1B2238; --bg-light:#3A4566;
+    --neutral:#6B6F7A; --cyan:#22D3EE; --hot:#FACC15;
+    --brass:#C9A24B; --brass-dark:#7A5A2E; --brass-light:#F0D98C;
+    --text-1:#E7ECF5; --text-2:#9AA5C0; --warn:#F43F5E;
+    --font-ui:"Courier New", ui-monospace, "Consolas", monospace;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{background:#05070c;color:var(--text-1);font-family:var(--font-ui);
+    display:flex;flex-direction:column;align-items:center;gap:20px;padding:30px 12px 60px}
+  .doc-head{max-width:1000px;text-align:center}
+  .doc-head .kicker{color:var(--brass);letter-spacing:3px;font-size:11px;text-transform:uppercase}
+  .doc-head h1{font-size:18px;margin:6px 0 4px;color:#fff}
+  .doc-head p{color:var(--text-2);font-size:12px;line-height:1.6;margin:0}
+  .doc-head b{color:var(--brass-light)}
+
+  .screen{position:relative;width:1000px;height:600px;overflow:hidden;border-radius:6px;
+    box-shadow:0 0 0 1px #000,0 24px 70px rgba(0,0,0,.6);
+    background:radial-gradient(ellipse 1000px 560px at 50% -10%, var(--bg-light) 0%, var(--bg-mid) 45%, var(--bg-deep) 100%)}
+  .city-blur{position:absolute;inset:0;opacity:.35;filter:blur(3px) saturate(.5);
+    background:repeating-linear-gradient(90deg,#1c2440 0 70px,#141b30 70px 140px)}
+  .scrim{position:absolute;inset:0;background:rgba(5,7,12,.55)}
+
+  .panel{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+    width:760px;height:520px;display:flex;flex-direction:column;
+    background:linear-gradient(180deg,#241c12,#15100a);
+    border:1px solid var(--brass-dark);border-radius:14px;
+    box-shadow:0 0 0 1px #000,0 0 46px rgba(201,162,75,.10),inset 0 1px 0 rgba(255,255,255,.04);
+    padding:22px 26px}
+  .corner{position:absolute;width:16px;height:16px;
+    background:radial-gradient(circle at 35% 30%,var(--brass-light),var(--brass) 55%,var(--brass-dark) 100%);
+    clip-path:polygon(25% 3%,75% 3%,97% 50%,75% 97%,25% 97%,3% 50%);box-shadow:0 1px 3px rgba(0,0,0,.7)}
+  .corner.tl{top:-8px;left:-8px}.corner.tr{top:-8px;right:-8px}
+  .corner.bl{bottom:-8px;left:-8px}.corner.br{bottom:-8px;right:-8px}
+
+  .panel-title{color:var(--brass-light);letter-spacing:4px;font-size:15px;text-transform:uppercase;
+    text-align:center;margin-bottom:4px}
+  .panel-sub{color:var(--text-2);font-size:10px;letter-spacing:1px;text-align:center;margin-bottom:14px}
+  .cols-head{display:flex;color:var(--text-2);font-size:10px;letter-spacing:2px;text-transform:uppercase;
+    padding:0 10px 6px;border-bottom:1px solid #33281a}
+  .cols-head .c-act{flex:1}.cols-head .c-key{width:150px;text-align:center}.cols-head .c-pad{width:120px;text-align:center}
+
+  .list{flex:1;overflow-y:auto;margin-top:4px;padding-right:4px}
+  .grp{color:var(--brass);font-size:10px;letter-spacing:2px;text-transform:uppercase;
+    margin:12px 0 4px;padding-left:8px;opacity:.8}
+  .grp:first-child{margin-top:6px}
+  .row{display:flex;align-items:center;padding:7px 10px;border-radius:6px}
+  .row .c-act{flex:1;color:var(--text-1);font-size:13px}
+  .row .c-key{width:150px;text-align:center}
+  .row .c-pad{width:120px;text-align:center}
+  .keycap{display:inline-block;min-width:44px;padding:3px 10px;border-radius:5px;
+    background:#0d1320;border:1px solid #33405e;color:var(--text-1);font-size:12px;box-shadow:inset 0 -2px 0 rgba(0,0,0,.4)}
+  .keycap.pad{border-color:#3a2e18;background:#1a140b;color:var(--brass-light)}
+  .keycap.none{color:var(--neutral);border-style:dashed}
+
+  .row.sel{background:linear-gradient(90deg,rgba(201,162,75,.14),rgba(201,162,75,.04));
+    box-shadow:inset 0 0 0 1px rgba(201,162,75,.4)}
+  .row.capturing{background:rgba(34,211,238,.10);box-shadow:inset 0 0 0 1px var(--cyan)}
+  .row.capturing .capture{color:var(--cyan);font-size:12px;animation:blink 1s step-end infinite}
+  @keyframes blink{50%{opacity:.35}}
+  .row .conflict{color:var(--warn);font-size:10px;margin-left:10px}
+
+  .foot{display:flex;justify-content:space-between;align-items:center;margin-top:12px;padding-top:12px;border-top:1px solid #33281a}
+  .hint{color:var(--text-2);font-size:10px;letter-spacing:.5px}
+  .btns{display:flex;gap:10px}
+  .btn{font-family:var(--font-ui);font-size:12px;letter-spacing:1px;padding:7px 16px;border-radius:8px;
+    border:1px solid var(--brass-dark);background:linear-gradient(180deg,#2a2113,#1a140b);color:var(--brass-light);cursor:pointer}
+  .btn.ghost{color:var(--text-2);border-color:#3a4256}
+
+  .callouts{width:1000px;display:flex;gap:14px;flex-wrap:wrap}
+  .callo{flex:1;min-width:300px;background:#10172a;border:1px solid #2a3450;border-radius:8px;padding:14px 16px;font-size:12px;color:var(--text-2);line-height:1.6}
+  .callo b{color:var(--text-1)}
+  .callo .q{color:var(--hot)}
+</style>
+</head>
+<body>
+
+  <div class="doc-head">
+    <div class="kicker">GusWorld - M2 - Tela de Controles (remapear teclas)</div>
+    <h1>Mock: "Controles" no menu de config (mesmo visual latão do menu de pausa aprovado)</h1>
+    <p>O <b>motor de remap já existe e está testado</b> (controls.json, hash, diff, restaurar-padrão). Falta ESTA tela: a ponte
+    pro jogador. Mock reusa a Proposta A "Console Centralizado" (latão + hexágonos). Lista <b>curada</b>: as 7 ações de câmera 3D
+    orbital (era Godot) foram OMITIDAS por não valerem no 2D top-down. Pontos amarelos abaixo = decisões suas.</p>
+  </div>
+
+  <div class="screen">
+    <div class="city-blur"></div><div class="scrim"></div>
+    <div class="panel">
+      <div class="corner tl"></div><div class="corner tr"></div><div class="corner bl"></div><div class="corner br"></div>
+      <div class="panel-title">Controles</div>
+      <div class="panel-sub">Selecione uma ação e pressione a nova tecla · Esc cancela a captura</div>
+
+      <div class="cols-head"><span class="c-act">Ação</span><span class="c-key">Teclado</span><span class="c-pad">Controle</span></div>
+
+      <div class="list">
+        <div class="grp">Movimento</div>
+        <div class="row sel"><span class="c-act">Andar para frente</span><span class="c-key"><span class="keycap">W</span></span><span class="c-pad"><span class="keycap pad">↑</span></span></div>
+        <div class="row"><span class="c-act">Andar para trás</span><span class="c-key"><span class="keycap">S</span></span><span class="c-pad"><span class="keycap pad">↓</span></span></div>
+        <div class="row"><span class="c-act">Andar para esquerda</span><span class="c-key"><span class="keycap">A</span></span><span class="c-pad"><span class="keycap pad">←</span></span></div>
+        <div class="row"><span class="c-act">Andar para direita</span><span class="c-key"><span class="keycap">D</span></span><span class="c-pad"><span class="keycap pad">→</span></span></div>
+        <div class="row"><span class="c-act">Correr</span><span class="c-key"><span class="keycap">Shift</span></span><span class="c-pad"><span class="keycap pad">B</span></span></div>
+
+        <div class="grp">Mundo</div>
+        <div class="row capturing"><span class="c-act">Interagir / Falar</span><span class="c-key"><span class="capture">Pressione uma tecla…</span></span><span class="c-pad"><span class="keycap pad">A</span></span></div>
+        <div class="row"><span class="c-act">Abrir inventário</span><span class="c-key"><span class="keycap">I</span></span><span class="c-pad"><span class="keycap pad">Y</span></span></div>
+        <div class="row"><span class="c-act">Abrir diário</span><span class="c-key"><span class="keycap">J</span></span><span class="c-pad"><span class="keycap pad">◧</span></span></div>
+
+        <div class="grp">Combate</div>
+        <div class="row"><span class="c-act">Ataque básico</span><span class="c-key"><span class="keycap">E</span> <span class="conflict">(!) tecla "E" já é de Interagir</span></span><span class="c-pad"><span class="keycap pad">X</span></span></div>
+        <div class="row"><span class="c-act">Conjurar (carta)</span><span class="c-key"><span class="keycap">Q</span></span><span class="c-pad"><span class="keycap pad">Y</span></span></div>
+        <div class="row"><span class="c-act">Defender</span><span class="c-key"><span class="keycap">R</span></span><span class="c-pad"><span class="keycap pad">LB</span></span></div>
+        <div class="row"><span class="c-act">Encerrar turno</span><span class="c-key"><span class="keycap">Espaço</span></span><span class="c-pad"><span class="keycap pad">Start</span></span></div>
+
+        <div class="grp">Menu &amp; Diálogo</div>
+        <div class="row"><span class="c-act">Confirmar</span><span class="c-key"><span class="keycap">Enter</span></span><span class="c-pad"><span class="keycap pad">A</span></span></div>
+        <div class="row"><span class="c-act">Cancelar / Voltar</span><span class="c-key"><span class="keycap">Esc</span></span><span class="c-pad"><span class="keycap pad">B</span></span></div>
+        <div class="row"><span class="c-act">Continuar diálogo</span><span class="c-key"><span class="keycap">Espaço</span></span><span class="c-pad"><span class="keycap pad">A</span></span></div>
+      </div>
+
+      <div class="foot">
+        <span class="hint">▲▼ navega · Enter remapeia · Esc volta</span>
+        <div class="btns">
+          <button class="btn ghost">Restaurar padrão</button>
+          <button class="btn">Voltar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="callouts">
+    <div class="callo"><b>1. Conflito de tecla:</b> no mock, "Ataque básico" mostra <span style="color:var(--warn)">(!) a tecla já é de Interagir</span>.
+    <span class="q">Decisão sua:</span> quando a nova tecla já é de outra ação, (a) avisa e TROCA as duas de lugar, (b) avisa e RECUSA (escolhe outra), ou (c) deixa as duas com a mesma tecla?</div>
+    <div class="callo"><b>2. Controle (gamepad):</b> o mock mostra 2 colunas (teclado + controle).
+    <span class="q">Decisão sua:</span> remapear o controle também já nesta tela, ou só teclado agora e o controle fica pra depois?</div>
+    <div class="callo"><b>3. Lista de ações:</b> curei, omiti as 7 de câmera 3D orbital (era Godot, não valem no 2D top-down) e agrupei o resto.
+    <span class="q">Decisão sua:</span> essa curadoria/agrupamento está bom, ou quer incluir/tirar alguma ação?</div>
+    <div class="callo"><b>4. "Restaurar padrão":</b> botão que devolve tudo ao mapeamento de fábrica (o motor <code>controls_restore</code> já existe).
+    <span class="q">Decisão sua:</span> mantém esse botão? Pede confirmação ("tem certeza?") antes de resetar?</div>
+  </div>
+
+</body>
+</html>

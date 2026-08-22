@@ -1,0 +1,57 @@
+<!-- @dsCard group="Tokens" -->
+<!doctype html>
+<html lang="pt-br"><head><meta charset="utf-8"><title>GusWorld UI :: Tokens</title>
+<style>
+  :root{
+    --bg:#080b11; --panel:#0d131c; --panel2:#111a26; --line:#1d2c3d;
+    --cyan:#3ad0e0; --cyan-dim:#1c6b74; --ink:#c9d6e2; --ink-dim:#6d8299;
+    --amber:#e0a53a; --violet:#a06be0; --green:#5fe08a; --red:#e05f6b;
+    --fam-eletrico:#3ad0e0; --fam-termico:#e0703a; --fam-grupo:#e0c93a;
+    --fam-bio:#5fe08a; --fam-anomalia:#a06be0;
+  }
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:"PixelOperatorMono","DejaVu Sans Mono",ui-monospace,monospace;padding:18px}
+  h1{color:var(--cyan);font-size:15px;letter-spacing:2px;text-transform:uppercase;margin:0 0 4px}
+  .sub{color:var(--ink-dim);font-size:12px;margin-bottom:16px}
+  h2{color:var(--cyan);font-size:11px;letter-spacing:1.5px;text-transform:uppercase;margin:18px 0 8px;border-bottom:1px solid var(--line);padding-bottom:4px}
+  .row{display:flex;flex-wrap:wrap;gap:10px}
+  .sw{width:120px;border:1px solid var(--line);border-radius:3px;overflow:hidden;background:var(--panel)}
+  .chip{height:44px} .sw .lbl{font-size:10px;padding:4px 6px;color:var(--ink-dim)}
+  .sw .lbl b{color:var(--ink);display:block;font-size:11px}
+  .fonts div{margin:5px 0}
+  .big{font-size:22px;color:var(--ink)} .mid{font-size:15px} .small{font-size:11px;color:var(--ink-dim)}
+  .num{color:var(--cyan)}
+</style></head>
+<body>
+  <h1>GusWorld :: Design Tokens</h1>
+  <div class="sub">estetica cockpit "Tatico" / terminal cyber-gotico. Fonte mono (PixelOperatorMono).</div>
+
+  <h2>Cores base</h2>
+  <div class="row">
+    <div class="sw"><div class="chip" style="background:#080b11"></div><div class="lbl"><b>bg</b>#080b11</div></div>
+    <div class="sw"><div class="chip" style="background:#0d131c"></div><div class="lbl"><b>panel</b>#0d131c</div></div>
+    <div class="sw"><div class="chip" style="background:#1d2c3d"></div><div class="lbl"><b>line</b>#1d2c3d</div></div>
+    <div class="sw"><div class="chip" style="background:#3ad0e0"></div><div class="lbl"><b>cyan</b>#3ad0e0</div></div>
+    <div class="sw"><div class="chip" style="background:#c9d6e2"></div><div class="lbl"><b>ink</b>#c9d6e2</div></div>
+    <div class="sw"><div class="chip" style="background:#6d8299"></div><div class="lbl"><b>ink-dim</b>#6d8299</div></div>
+    <div class="sw"><div class="chip" style="background:#e0a53a"></div><div class="lbl"><b>amber</b>#e0a53a</div></div>
+    <div class="sw"><div class="chip" style="background:#a06be0"></div><div class="lbl"><b>violet</b>#a06be0</div></div>
+    <div class="sw"><div class="chip" style="background:#5fe08a"></div><div class="lbl"><b>green</b>#5fe08a</div></div>
+    <div class="sw"><div class="chip" style="background:#e05f6b"></div><div class="lbl"><b>red</b>#e05f6b</div></div>
+  </div>
+
+  <h2>Familias de carta</h2>
+  <div class="row">
+    <div class="sw"><div class="chip" style="background:#3ad0e0"></div><div class="lbl"><b>eletrico</b>#3ad0e0</div></div>
+    <div class="sw"><div class="chip" style="background:#e0703a"></div><div class="lbl"><b>termico</b>#e0703a</div></div>
+    <div class="sw"><div class="chip" style="background:#e0c93a"></div><div class="lbl"><b>grupo</b>#e0c93a</div></div>
+    <div class="sw"><div class="chip" style="background:#5fe08a"></div><div class="lbl"><b>biologico</b>#5fe08a</div></div>
+    <div class="sw"><div class="chip" style="background:#a06be0"></div><div class="lbl"><b>anomalia</b>#a06be0</div></div>
+  </div>
+
+  <h2>Tipografia</h2>
+  <div class="fonts">
+    <div class="big">Gus Dragon compila <span class="num">144</span> tokens</div>
+    <div class="mid">Broadcast.sh :: dano em area, todos os alvos</div>
+    <div class="small">// nota de sistema, terminal, cor ink-dim</div>
+  </div>
+</body></html>

@@ -1,0 +1,37 @@
+<!-- @dsCard group="Components" -->
+<!doctype html>
+<html lang="pt-br"><head><meta charset="utf-8"><title>GusWorld UI :: Slot</title>
+<style>
+  :root{--line:#1d2c3d;--cyan:#3ad0e0;--ink:#c9d6e2;--ink-dim:#6d8299;--violet:#a06be0;--slot:#0a1119;
+    --fam-eletrico:#3ad0e0;--fam-grupo:#e0c93a;--fam-bio:#5fe08a}
+  body{margin:0;background:#080b11;color:var(--ink);font-family:"PixelOperatorMono","DejaVu Sans Mono",ui-monospace,monospace;padding:18px}
+  h2{color:var(--cyan);font-size:11px;letter-spacing:1.5px;text-transform:uppercase;margin:0 0 12px}
+  .row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:8px}
+  .slot{width:130px;height:80px;border:1px dashed var(--line);border-radius:3px;background:var(--slot);display:flex;flex-direction:column;justify-content:center;padding:8px 9px;position:relative}
+  .slot.filled{border-style:solid}
+  .slot.filled::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--fam,#555)}
+  .slot.eletrico{--fam:var(--fam-eletrico)}.slot.grupo{--fam:var(--fam-grupo)}.slot.bio{--fam:var(--fam-bio)}
+  .sn{font-weight:bold;font-size:13px}.sm{color:var(--ink-dim);font-size:10.5px;margin-top:3px}
+  .mchip{position:absolute;right:7px;top:6px;color:var(--cyan);font-size:11px}
+  .slot.empty{color:var(--ink-dim);align-items:center;text-align:center;font-size:11px}
+  .slot.special{border-color:var(--violet);background:#120a1c}.slot.special.empty{color:#7d5aa8}
+  .slot.special .mchip{color:#d9b8ff}.slot.special.filled::before{background:var(--violet)}
+  .slot.focus{box-shadow:0 0 0 1px var(--cyan),0 0 12px rgba(58,208,224,.3)}
+  .note{color:var(--ink-dim);font-size:11px;margin:6px 0 14px}
+</style></head>
+<body>
+  <h2>Slot da mao :: comum</h2>
+  <div class="row">
+    <div class="slot filled eletrico"><span class="mchip">1</span><div class="sn">Descarga.exe</div><div class="sm">dano eletrico</div></div>
+    <div class="slot filled grupo focus"><span class="mchip">3</span><div class="sn">Broadcast.sh</div><div class="sm">dano em area</div></div>
+    <div class="slot empty">+ vazio<br><span style="font-size:9px">(escolha uma carta)</span></div>
+  </div>
+  <div class="note">preenchido / com foco (teclado-gamepad) / vazio.</div>
+
+  <h2>Slot especial :: so Gus</h2>
+  <div class="row">
+    <div class="slot special filled"><span class="mchip">8</span><div class="sn" style="color:#d9b8ff">Tesla</div><div class="sm">cadeia (1x/batalha)</div></div>
+    <div class="slot special empty">+ especial<br><span style="font-size:9px">(Einstein, Planck...)</span></div>
+  </div>
+  <div class="note">borda violeta = slot dedicado das cartas historicas do Gus.</div>
+</body></html>

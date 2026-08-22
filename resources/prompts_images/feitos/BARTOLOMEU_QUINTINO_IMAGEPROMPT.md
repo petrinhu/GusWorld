@@ -1,0 +1,7 @@
+# Bartolomeu Quintino — image prompt (nano banana)
+
+An extreme chibi super-deformed (SD) figurine of a very old village elder, styled like a small collectible vinyl figure (Funko Pop / nendoroid). VERY IMPORTANT PROPORTIONS: the head is enormous, round and as large as the entire rest of the body; the whole character is only about three heads tall; tiny torso, very short stubby arms and legs. This is NOT a realistic human body.
+
+He is an ancient elder from a remote frontier farming village. His huge round head has a deeply wrinkled, weathered elderly face, sun-darkened, with a long white beard, bushy white eyebrows, and small calm tired eyes. He wears simple rural clothing in earthy tones: a homespun ochre-brown tunic over a faded olive-green shirt, a patched woollen shawl, loose linen trousers, and worn leather sandals. Small dried seed-pods, twine, and a sprig of green leaves are tucked into his belt and chest pocket. His stubby hands lean on a gnarled wooden walking staff topped with a small spiral-shell motif.
+
+Art style: cel-shaded anime 3D, low-poly stylized, somber cyber-gothic mood (but this character is warm rural, earthy). Full body head to feet, centered, facing camera, plain pure-white (#FFFFFF) background, flat even lighting. REMINDER — extreme chibi: gigantic round head equal to whole body, three heads tall, tiny stubby limbs. Do NOT draw realistic adult proportions.

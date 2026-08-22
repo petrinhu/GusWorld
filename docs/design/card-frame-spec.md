@@ -1,0 +1,69 @@
+# Spec da moldura das cartas (Codex de Conjuros)
+
+> **STATUS: PROPOSTA (design aprovado pelo criador 2026-07-09; produção de arte pendente).** Fecha a DIREÇÃO da moldura das cartas do roster de análogos (ver `brainstorm-backlog.md` + `roster-analogos/`). A moldura é a MESMA estrutura pra todas as cartas; muda só a cor por domínio + o tratamento lendário do Tusk.
+
+## Direção aprovada
+
+- **Conceito: Híbrido Vetorial** (mock `mockups/16-moldura-cartas.html`, conceito 3): estrutura gótica em pedra/ouro (topo em arco, tipografia serifada small-caps no nome) + **canais de runa com energia** correndo na cor do domínio. É o próprio núcleo do jogo (ciber-gótico × magia=software). Descartados: cartucho tech puro (1) e grimório gótico puro (2).
+- **Cor por DOMÍNIO** (mock `17-moldura-cores-dominio.html`): mesma estrutura/tipografia/layout; muda a **cor do acento/borda + o sigilo**. Paleta aprovada:
+  - ⚡ Eletromagnetismo = **ciano** `#22D3EE` (glow do Cauã)
+  - 🌌 Física = **violeta** `#A78BFA` (espaço-tempo)
+  - 🔢 Matemática = **verde** `#34D399` (Selve fractal)
+  - 💻 Computação = **azul** `#60A5FA` (software/dado)
+  - 🜀 Ocultistas = **carmesim** `#F43F5E` (ritual/obsidiana)
+  - 📈 Economia = **âmbar/ouro** `#F59E0B` (valor)
+- **A Carta Perdida de Tusk (capstone) = tratamento LENDÁRIO** (mocks `18` + `19`): base **B** (moldura de ouro + canais de runa pulsando nas 6 cores de domínio, fininho, "contém os 20") **+ GLOW DOURADO PULSANTE** (respira entre médio e forte, ~2.4s). Descartados: prismática de borda (arco-íris, demais), branco-dourado radiante, ônix.
+
+## Layout comum (todas as cartas)
+
+- Topo em arco: **nome** da carta (serifado, small-caps).
+- **Janela de arte** (~45-55% da altura): onde entra a FIGURA INTERIOR da carta (gravura/desenho, discussão futura separada; NÃO a foto de referência de sprite).
+- **Sigilo do domínio** (canto sup. esq. da arte, com glow na cor do domínio) + **custo** (canto sup. dir.).
+- **Linha de tipo** (ex.: `passiva // chave`, monoespaçada, na cor do domínio).
+- **Caixa de texto de efeito**.
+- **Rodapé**: marcador de **raridade** (comum / rara / lendária) + **de quem se descobre** (ex.: "Faraday").
+- Emojis dos sigilos = placeholder; viram **sigilos desenhados** na produção.
+
+## Produção de arte — plano de DUAS TRILHAS (criador 2026-07-09)
+
+- **Trilha 1 (testar primeiro):** o **PixelLab** tenta reproduzir a moldura, provavelmente melhor alimentado com um **print do mock escolhido** como referência (image-to-pixelart / style-transfer / create_ui_asset). Se sair fiel, usa-se.
+- **Trilha 2 (fallback, provável para a moldura):** se o PixelLab não reproduzir bem, a **moldura é renderizada pelo glintfx** (RCSS já faz gradiente + glow + animação + recolor por domínio via variável; os mocks são literalmente CSS/RCSS-like; o glow pulsante do Tusk é animação nativa) e o **PixelLab faz SÓ as figuras internas das cartas + os sprites** das figuras no mundo. (Consumir o glintfx apenas; NÃO mexer na lib.)
+- Em ambas: **PixelLab sempre faz as figuras internas + os sprites**; a dúvida é só quem faz a MOLDURA.
+
+**DECISAO DO CRIADOR (2026-07-09): TRILHA HIBRIDA.** O **PixelLab gera a TEXTURA base da moldura** (a pedra gotica + runas + estrutura de ouro, em pixel-art nativo; teste `create_ui_asset` provou que sai lindo e on-brand, ver `resources/images/card-frame-tests/pixellab-frame-cyan-v1.png`). O **glintfx (RCSS) sobrepoe**: a COR do dominio (tint/recolor por 1 variavel), o **GLOW dourado PULSANTE** do Tusk (animacao nativa), os ESTADOS (hover/selecionada/desabilitada), e compoe a figura interior + nome + custo + texto de efeito + sigilo + raridade. Implicacao de pipeline: gerar a base PixelLab de forma RECOLORIVEL (runas/energia em tom neutro/claro que o glintfx tinge; ou base pedra+ouro neutra + canal de energia adicionado pelo glintfx). Implementacao = tarefa de engenharia UI (consumir glintfx, NAO mexer na lib; ver `reference_glintfx_api`), na camada `app/`. PixelLab sempre faz as figuras internas + os sprites.
+
+## Cross-refs
+
+`docs/design/brainstorm-backlog.md` (seção Fase B, decisões do roster), `docs/design/roster-analogos/*.md`, `reference_pixellab_mcp`, `reference_glintfx_api`.
+
+
+## Recolor por dominio — mecanismo confirmado (2026-07-09)
+
+**`image-color` (RCSS nativo do glintfx)** faz o recolor. UMA base neutra (runas brancas) -> 6 dominios trocando 1 variavel:
+```css
+.card { decorator: image( frame_neutral_arched.png ); image-color: var(--domain); transition: image-color .4s; }
+.card.eletromag { --domain: #22D3EE; }  /* fisica #A78BFA, matematica #34D399, computacao #60A5FA, oculto #F43F5E, economia #F59E0B */
+```
+Multiply premultiplicado, interpolavel (anima com o glow), default white=no-op. **LIMITE:** tinge o ouro junto (multiply uniforme). Se incomodar no teste real -> **puxar** o luminance-key (semente no INBOX do glintfx). Base neutra gerada: `resources/images/card-frame-tests/pixellab-frame-neutral-arched-v2.png`. **PENDENTE:** montar um render minimo glintfx (__DEP_REMOVIDA__+RCSS) da carta pra testar o recolor de verdade e julgar o ouro.
+
+**DECISAO (criador, 2026-07-09, pos-teste empirico):** o `image-color` multiply tinge o ouro junto (perde o "ouro constante"). => **PUXADO o luminance-key do glintfx** (so as runas mudam, ouro/pedra ficam). Ate sair (v0.7.0), a moldura fica em standby pro recolor final; a base neutra arqueada (`pixellab-frame-neutral-arched-v2.png`) e o texto do pull estao prontos.
+
+**FECHADO (2026-07-09): glintfx v0.7.0 = luminance-key.** Recolor por dominio resolvido a partir de 1 base neutra: `decorator: image-tint(pixellab-frame-neutral-arched-v2.png); image-tint-color: var(--domain); image-tint-mode: luminance-multiply; image-tint-threshold: 0.70;`. Threshold **0.70** preserva o ouro 100% (medido na base real) e tinge so as runas. Pin bumpado v0.7.0, suite 1517/1517 verde. Proximo (engenharia UI): componente glintfx da carta que compoe base+figura+texto+glow, com `--domain` por dominio + variante lendaria do Tusk (glow pulsante via keyframes na cor).
+
+## CARTA-AMOSTRA FARADAY — CANONIZADA (criador, 2026-07-09)
+
+Pipeline da carta APROVADO e validado ponta a ponta na "Gaiola de Faraday". Molde para as outras 20.
+
+**Camadas (data-driven):** (1) base neutra de slots VAZIOS gerada no PixelLab (`pixellab-frame-clean-v1.png`, arco gotico, runas brancas); (2) recolor por dominio via glintfx `image-tint` luminance-key threshold **0.70** (ouro preservado; aqui `clean-eletromag.png` = ciano); (3) figura interior no PixelLab (`faraday-cage-t.png`, a gaiola anti-PEM, fundo transparente); (4) textos por dado: nome, custo, tipo, efeito, sigilo, raridade; (5) **sigilo = SVG vetorial NA COR DO DOMINIO** (nao emoji). Mock: `docs/design/mockups/25-carta-faraday.html`; amostra: `resources/images/card-frame-tests/cards/CARTA-gaiola-faraday-amostra.png`.
+
+**Centros de slot medidos (base 384x688, = % do card):** circulo/sigilo (20.83, 24.27); quadrado/custo (83.72, 24.27) [ASSIMETRICO, nao e espelho do circulo]; janela de arte centro (50, 46); banner/nome y~16.1; plaqueta/efeito y~83.2.
+
+**LICOES DE MONTAGEM DO MOCK (pra as proximas cartas):**
+1. O card div renderiza a **CY0=51px** no headless (`body{min-height:820}` faz o body ter 820, nao os 900 da janela; a carta centra no body de 820). MEDIR a bbox real da carta no print, nunca assumir a posicao.
+2. Medir os centros de slot por **cv2** (HoughCircles no circulo, findContours no quadrado). **NAO assumir simetria** (o quadrado do custo e assimetrico em relacao ao circulo).
+3. **Sigilos = SVG vetorial** com `viewBox` = bbox exata do desenho + `preserveAspectRatio xMidYMid meet`, centrado por construcao. NUNCA emoji (assimetrico + metrica de fonte propria = descentraliza).
+4. No **componente glintfx real** (CARTAS-PRODUCAO) o alinhamento e NATIVO (flex/align RCSS) — toda essa medicao e so pra o mock HTML sobre raster ser fiel.
+
+
+## Código/ID de carta (criador 2026-07-09)
+Rodape esquerdo = **`DOM-NN-R_vM.m`** (id interno, dispensa o nome): DOM=dominio 3 letras (ELM/FIS/MAT/CMP/OCU/ECO/CAP), NN=ordem no dominio, R=raridade C/R/L, vM.m=versao. Rodape direito = nome da figura. Faraday = `ELM-01-C_v1.0`. Tabela dos 21 IDs em `reference_carta_mock_posicoes`. Gaiola (figura interior) centrada em top:53% (o arco puxa o centro geometrico pra cima).

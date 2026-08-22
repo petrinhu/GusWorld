@@ -1,0 +1,167 @@
+// cena15_m1_pergunta.dlg.txt
+//
+// Cena 15 "Pergunta amanha", Movimento 1: a pergunta.
+// Fonte canonica: docs/narrative/comic-reliefs.md, Cena 15 (nenhuma fala alterada).
+// Forma-jogo da cena; a forma-livro continua sendo a prosa do comic-reliefs.md
+// (comic-reliefs.md, "Como estas cenas chegam ao jogador").
+//
+// REGISTRO: warm nas falas (humanos, caixa quente + retrato); terminal na
+// narracao (mesmo registro dos logs e telas de sistema).
+//
+// GATILHO: entrar no bloco em reconstrucao durante a mini-quest posterior do
+// Caua (characters/caua-volt.md:65-67).
+//
+// FLAG ESCRITA: cena15.m1_done (no ultimo no). Junto com cena15.m3_done, codifica
+// os tres estados do bordao (CAUA-BORDAO-3-ESTADOS).
+//
+// REGRA DE FERRO DA CENA: ninguem comenta. A mao parada do Caua no ultimo no e a
+// unica marca da ausencia do tic, e nenhum personagem repara nela.
+
+#meta dialogue_id cena15_m1
+#meta default_register warm
+#meta entry n01_abertura
+
+@node n01_abertura
+speaker: terminal
+text: DIALOGUE_CENA15_M1_N01_ABERTURA
+register: terminal
+-> n02_escreve
+
+@node n02_escreve
+speaker: caua
+text: DIALOGUE_CENA15_M1_N02_ESCREVE
+-> n03_errado
+
+@node n03_errado
+speaker: moleque
+text: DIALOGUE_CENA15_M1_N03_ERRADO
+-> n04_perdoa
+
+@node n04_perdoa
+speaker: caua
+text: DIALOGUE_CENA15_M1_N04_PERDOA
+-> n05_jaescreve
+
+@node n05_jaescreve
+speaker: terminal
+text: DIALOGUE_CENA15_M1_N05_JAESCREVE
+register: terminal
+-> n06_pronto
+
+@node n06_pronto
+speaker: moleque
+text: DIALOGUE_CENA15_M1_N06_PRONTO
+-> n07_leitura
+
+@node n07_leitura
+speaker: terminal
+text: DIALOGUE_CENA15_M1_N07_LEITURA
+register: terminal
+-> n08_ligatudo
+
+@node n08_ligatudo
+speaker: caua
+text: DIALOGUE_CENA15_M1_N08_LIGATUDO
+-> n09_equeeuquero
+
+@node n09_equeeuquero
+speaker: moleque
+text: DIALOGUE_CENA15_M1_N09_EQUEEUQUERO
+-> n10_tudooque
+
+@node n10_tudooque
+speaker: caua
+text: DIALOGUE_CENA15_M1_N10_TUDOOQUE
+-> n11_tudo
+
+@node n11_tudo
+speaker: moleque
+text: DIALOGUE_CENA15_M1_N11_TUDO
+-> n12_apaga
+
+@node n12_apaga
+speaker: caua
+text: DIALOGUE_CENA15_M1_N12_APAGA
+-> n13_riem
+
+@node n13_riem
+speaker: terminal
+text: DIALOGUE_CENA15_M1_N13_RIEM
+register: terminal
+-> n14_consertar
+
+@node n14_consertar
+speaker: moleque
+text: DIALOGUE_CENA15_M1_N14_CONSERTAR
+-> n15_mechama
+
+@node n15_mechama
+speaker: caua
+text: DIALOGUE_CENA15_M1_N15_MECHAMA
+-> n16_naoestiver
+
+@node n16_naoestiver
+speaker: moleque
+text: DIALOGUE_CENA15_M1_N16_NAOESTIVER
+-> n17_olhabloco
+
+@node n17_olhabloco
+speaker: terminal
+text: DIALOGUE_CENA15_M1_N17_OLHABLOCO
+register: terminal
+-> n18_outro
+
+@node n18_outro
+speaker: caua
+text: DIALOGUE_CENA15_M1_N18_OUTRO
+-> n19_aceita
+
+@node n19_aceita
+speaker: terminal
+text: DIALOGUE_CENA15_M1_N19_ACEITA
+register: terminal
+-> n20_caua
+
+@node n20_caua
+speaker: moleque
+text: DIALOGUE_CENA15_M1_N20_CAUA
+-> n21_oi
+
+@node n21_oi
+speaker: caua
+text: DIALOGUE_CENA15_M1_N21_OI
+-> n22_compilar
+
+@node n22_compilar
+speaker: moleque
+text: DIALOGUE_CENA15_M1_N22_COMPILAR
+-> n23_silencio
+
+@node n23_silencio
+speaker: terminal
+text: DIALOGUE_CENA15_M1_N23_SILENCIO
+register: terminal
+-> n24_equando
+
+@node n24_equando
+speaker: caua
+text: DIALOGUE_CENA15_M1_N24_EQUANDO
+-> n25_naocontinua
+
+@node n25_naocontinua
+speaker: terminal
+text: DIALOGUE_CENA15_M1_N25_NAOCONTINUA
+register: terminal
+-> n26_amanha
+
+@node n26_amanha
+speaker: caua
+text: DIALOGUE_CENA15_M1_N26_AMANHA
+-> n27_saida
+
+@node n27_saida
+speaker: terminal
+text: DIALOGUE_CENA15_M1_N27_SAIDA
+register: terminal
+on_enter: cena15.m1_done=true
+-> @exit
