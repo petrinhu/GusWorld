@@ -297,12 +297,13 @@ Cada camada depende só das de baixo, nunca o contrário. **Um gate de CI reprov
 
 **Ao delegar (L-10):** a ordem de serviço exige **a saída real do teste falhando** antes da implementação, e a saída real dele passando depois. Relatório que só mostra o verde final não cumpriu a lei: falta a metade que prova que o teste morde.
 
-**Quatro portões de qualidade, todos adotados:**
+**Cinco portões de qualidade, todos adotados:**
 
 1. **Zero aviso de compilação em todo commit**, com `-Werror` no CI.
 2. **ASan e UBSan a cada fatia fechada**, em build separado.
 3. **Análise estática no CI:** `clang-tidy` e `cppcheck`.
 4. **Scan de segredo no CI:** `gitleaks`. Aviso honesto: ele **não** pega nome de projeto e, por padrão, olha a árvore e não o histórico. Para dado sensível, a verificação é `git log --all -p | grep -ci <termo>`, com `-i`, nunca `git grep`.
+5. **Gate de mensagem de commit**, `tools/security/commit_gate.py`, instalado como gancho `commit-msg` local por `tools/git-hooks/install.py`. Motivo: **o git-crypt cifra o conteúdo do arquivo, e não cifra a mensagem de commit, o nome do arquivo nem o do diretório.** Sem este portão, o texto que a L-25 protege dentro do repositório vaza pela porta que ninguém trancou. Ele barra quatro classes: termo da lista cifrada, caminho de área cifrada, dado pessoal e credencial. **Sem a chave, ele reprova o commit** em vez de aprovar em silêncio, cumprindo a lição 3 acima. A lista de termos vive cifrada, porque uma lista de segredos em texto puro é ela mesma o vazamento.
 
 **Script local que espelha o CI, rodado antes do push**, não depois. As ferramentas que ele exige são instalação de sistema, e passam pelo líder.
 
@@ -421,13 +422,14 @@ O `inicial.md` é o documento fundador deste projeto: os 28 itens que o líder d
 | `docs/_secret/**` | easter eggs e cosmologia de origem; segredo por natureza |
 | `docs/narrative/deep/stinger/**` | ganchos pós-créditos e de continuação; spoiler máximo |
 | `docs/book/**` | os dois livros-companheiros, obra à parte com direitos reservados (L-08) |
+| `tools/security/termos_proibidos.txt` | a lista que o gate da L-19 consulta; em texto puro ela seria o próprio vazamento que existe para impedir |
 
-Ferramenta: `git-crypt`, **uma chave só**, a simétrica exportada para fora da árvore do projeto. **Nada além desses três caminhos entra na cifra** sem ordem nova do líder.
+Ferramenta: `git-crypt`, **uma chave só**, a simétrica exportada para fora da árvore do projeto. **Nada além desses quatro caminhos entra na cifra** sem ordem nova do líder.
 
 **Três verdades que este mecanismo obriga a assumir:**
 
 1. **Cifrar é irreversível para quem já clonou.** Quem tem o arquivo cifrado o tem para sempre; se a chave vazar ou o algoritmo envelhecer, tudo que já esteve lá se abre de uma vez.
-2. **Uma chave é tudo ou nada.** Quem a recebe lê os três caminhos. Não existe acesso parcial enquanto houver uma chave só, e a decisão de criar uma segunda é do líder.
+2. **Uma chave é tudo ou nada.** Quem a recebe lê os quatro caminhos. Não existe acesso parcial enquanto houver uma chave só, e a decisão de criar uma segunda é do líder.
 3. **Perder a chave é perder o conteúdo.** Não há recuperação.
 
 **Aplicação:** o caminho é marcado no `.gitattributes` **antes** do primeiro `git add` do conteúdo, nunca depois. Marcar depois deixa o texto puro no objeto já gravado, e o objeto sobrevive à "correção". Prove com `git-crypt status -e` antes de commitar, e nunca confie no relatório de quem marcou.
